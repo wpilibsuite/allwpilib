@@ -12,6 +12,8 @@
 #include <memory>
 #include <utility>
 
+#include <wpi/concepts.h>
+
 #include "frc2/command/CommandBase.h"
 #include "frc2/command/CommandHelper.h"
 
@@ -39,11 +41,11 @@ class WrapperCommand : public CommandHelper<CommandBase, WrapperCommand> {
    * @param command the command being wrapped. Trying to directly schedule this
    * command or add it to a group will throw an exception.
    */
-  template <class T, typename = std::enable_if_t<std::is_base_of_v<
-                         Command, std::remove_reference_t<T>>>>
+  template <std::derived_from<Command> T>
+  // NOLINTNEXTLINE (bugprone-forwarding-reference-overload)
   explicit WrapperCommand(T&& command)
-      : WrapperCommand(std::make_unique<std::remove_reference_t<T>>(
-            std::forward<T>(command))) {}
+      : WrapperCommand(
+            std::make_unique<std::decay_t<T>>(std::forward<T>(command))) {}
 
   WrapperCommand(WrapperCommand&& other) = default;
 

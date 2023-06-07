@@ -42,20 +42,21 @@ public class SwerveDriveKinematics {
   private Translation2d m_prevCoR = new Translation2d();
 
   /**
-   * Constructs a swerve drive kinematics object. This takes in a variable number of wheel locations
-   * as Translation2d objects. The order in which you pass in the wheel locations is the same order
-   * that you will receive the module states when performing inverse kinematics. It is also expected
-   * that you pass in the module states in the same order when calling the forward kinematics
-   * methods.
+   * Constructs a swerve drive kinematics object. This takes in a variable number of module
+   * locations as Translation2d objects. The order in which you pass in the module locations is the
+   * same order that you will receive the module states when performing inverse kinematics. It is
+   * also expected that you pass in the module states in the same order when calling the forward
+   * kinematics methods.
    *
-   * @param wheelsMeters The locations of the wheels relative to the physical center of the robot.
+   * @param moduleTranslationsMeters The locations of the modules relative to the physical center of
+   *     the robot.
    */
-  public SwerveDriveKinematics(Translation2d... wheelsMeters) {
-    if (wheelsMeters.length < 2) {
+  public SwerveDriveKinematics(Translation2d... moduleTranslationsMeters) {
+    if (moduleTranslationsMeters.length < 2) {
       throw new IllegalArgumentException("A swerve drive requires at least two modules");
     }
-    m_numModules = wheelsMeters.length;
-    m_modules = Arrays.copyOf(wheelsMeters, m_numModules);
+    m_numModules = moduleTranslationsMeters.length;
+    m_modules = Arrays.copyOf(moduleTranslationsMeters, m_numModules);
     m_moduleStates = new SwerveModuleState[m_numModules];
     Arrays.fill(m_moduleStates, new SwerveModuleState());
     m_inverseKinematics = new SimpleMatrix(m_numModules * 2, 3);
@@ -163,21 +164,21 @@ public class SwerveDriveKinematics {
    * This method is often used for odometry -- determining the robot's position on the field using
    * data from the real-world speed and angle of each module on the robot.
    *
-   * @param wheelStates The state of the modules (as a SwerveModuleState type) as measured from
+   * @param moduleStates The state of the modules (as a SwerveModuleState type) as measured from
    *     respective encoders and gyros. The order of the swerve module states should be same as
    *     passed into the constructor of this class.
    * @return The resulting chassis speed.
    */
-  public ChassisSpeeds toChassisSpeeds(SwerveModuleState... wheelStates) {
-    if (wheelStates.length != m_numModules) {
+  public ChassisSpeeds toChassisSpeeds(SwerveModuleState... moduleStates) {
+    if (moduleStates.length != m_numModules) {
       throw new IllegalArgumentException(
-          "Number of modules is not consistent with number of wheel locations provided in "
+          "Number of modules is not consistent with number of module locations provided in "
               + "constructor");
     }
     var moduleStatesMatrix = new SimpleMatrix(m_numModules * 2, 1);
 
     for (int i = 0; i < m_numModules; i++) {
-      var module = wheelStates[i];
+      var module = moduleStates[i];
       moduleStatesMatrix.set(i * 2, 0, module.speedMetersPerSecond * module.angle.getCos());
       moduleStatesMatrix.set(i * 2 + 1, module.speedMetersPerSecond * module.angle.getSin());
     }
@@ -194,21 +195,21 @@ public class SwerveDriveKinematics {
    * This method is often used for odometry -- determining the robot's position on the field using
    * data from the real-world speed and angle of each module on the robot.
    *
-   * @param wheelDeltas The latest change in position of the modules (as a SwerveModulePosition
+   * @param moduleDeltas The latest change in position of the modules (as a SwerveModulePosition
    *     type) as measured from respective encoders and gyros. The order of the swerve module states
    *     should be same as passed into the constructor of this class.
    * @return The resulting Twist2d.
    */
-  public Twist2d toTwist2d(SwerveModulePosition... wheelDeltas) {
-    if (wheelDeltas.length != m_numModules) {
+  public Twist2d toTwist2d(SwerveModulePosition... moduleDeltas) {
+    if (moduleDeltas.length != m_numModules) {
       throw new IllegalArgumentException(
-          "Number of modules is not consistent with number of wheel locations provided in "
+          "Number of modules is not consistent with number of module locations provided in "
               + "constructor");
     }
     var moduleDeltaMatrix = new SimpleMatrix(m_numModules * 2, 1);
 
     for (int i = 0; i < m_numModules; i++) {
-      var module = wheelDeltas[i];
+      var module = moduleDeltas[i];
       moduleDeltaMatrix.set(i * 2, 0, module.distanceMeters * module.angle.getCos());
       moduleDeltaMatrix.set(i * 2 + 1, module.distanceMeters * module.angle.getSin());
     }
