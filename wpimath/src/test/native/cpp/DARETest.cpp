@@ -27,7 +27,8 @@ void ExpectMatrixEqual(const Eigen::MatrixXd& lhs, const Eigen::MatrixXd& rhs,
 }
 
 void ExpectPositiveSemidefinite(const Eigen::Ref<const Eigen::MatrixXd>& X) {
-  Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> eigX(X);
+  Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> eigX{X,
+                                                      Eigen::EigenvaluesOnly};
   for (int i = 0; i < X.rows(); ++i) {
     EXPECT_GE(eigX.eigenvalues()[i], 0.0);
   }
