@@ -5,6 +5,8 @@
 package edu.wpi.first.hal;
 
 public class CANAPIJNI extends JNIWrapper {
+  public static native long getCANPacketBaseTime();
+
   public static native int initializeCAN(int manufacturer, int deviceId, int deviceType);
 
   public static native void cleanCAN(int handle);
