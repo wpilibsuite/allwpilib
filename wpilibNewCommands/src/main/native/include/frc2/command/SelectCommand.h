@@ -16,6 +16,7 @@
 #include <utility>
 #include <vector>
 
+#include <wpi/deprecated.h>
 #include <wpi/sendable/SendableBuilder.h>
 
 #include "frc2/command/CommandBase.h"
@@ -103,8 +104,8 @@ class SelectCommand : public CommandHelper<CommandBase, SelectCommand<Key>> {
    * @deprecated Replace with {@link ProxyCommand},
    * composing multiple of them in a {@link ParallelRaceGroup} if needed.
    */
-  [[deprecated("Replace with ProxyCommand")]] explicit SelectCommand(
-      std::function<Command*()> toRun)
+  WPI_DEPRECATED("Replace with ProxyCommand")
+  explicit SelectCommand(std::function<Command*()> toRun)
       : m_toRun{std::move(toRun)} {}
 
   SelectCommand(SelectCommand&& other) = default;

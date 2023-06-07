@@ -9,6 +9,8 @@
 #include <span>
 #include <utility>
 
+#include <wpi/deprecated.h>
+
 #include "Trigger.h"
 #include "frc2/command/CommandPtr.h"
 
@@ -30,8 +32,8 @@ class Button : public Trigger {
    * @param isPressed Whether the button is pressed.
    * @deprecated Replace with Trigger
    */
-  [[deprecated("Replace with Trigger")]] explicit Button(
-      std::function<bool()> isPressed);
+  WPI_DEPRECATED("Replace with Trigger")
+  explicit Button(std::function<bool()> isPressed);
 
   /**
    * Create a new button that is pressed active (default constructor) - activity
