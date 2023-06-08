@@ -16,6 +16,7 @@
 #include <utility>
 #include <vector>
 
+#include <wpi/deprecated.h>
 #include <wpi/sendable/SendableBuilder.h>
 
 #include "frc2/command/CommandBase.h"

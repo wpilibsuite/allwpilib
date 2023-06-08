@@ -16,7 +16,6 @@
 #include <networktables/NTSendable.h>
 #include <units/time.h>
 #include <wpi/FunctionExtras.h>
-#include <wpi/deprecated.h>
 #include <wpi/sendable/SendableHelper.h>
 
 namespace frc2 {
@@ -81,7 +80,7 @@ class CommandScheduler final : public nt::NTSendable,
   /**
    * Removes all button bindings from the scheduler.
    */
-  WPI_DEPRECATED("Call Clear on the EventLoop instance directly!")
+  [[deprecated("Call Clear on the EventLoop instance directly!")]]
   void ClearButtons();
 
   /**
