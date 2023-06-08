@@ -4,6 +4,8 @@
 
 #include "frc2/command/button/Button.h"
 
+#include <wpi/deprecated.h>
+
 using namespace frc2;
 
 Button::Button(std::function<bool()> isPressed) : Trigger(isPressed) {}

@@ -13,7 +13,6 @@
 #include <units/time.h>
 #include <wpi/Demangle.h>
 #include <wpi/SmallSet.h>
-#include <wpi/deprecated.h>
 
 #include "frc2/command/Subsystem.h"
 
@@ -161,8 +160,7 @@ class Command {
    * @return the command with the interrupt condition added
    * @deprecated Replace with Until()
    */
-  WPI_DEPRECATED("Replace with Until()")
-  [[nodiscard]]
+  [[deprecated("Replace with Until()")]] [[nodiscard]]
   CommandPtr WithInterrupt(std::function<bool()> condition) &&;
 
   /**
@@ -220,13 +218,13 @@ valid. This was unsafe/undefined behavior from the start, and RepeatCommand
 provides an easy way to achieve similar end results with slightly different (and
 safe) semantics.
    */
-  WPI_DEPRECATED(
+  [[deprecated(
       "PerpetualCommand violates the assumption that execute() doesn't get "
       "called after isFinished() returns true -- an assumption that should be "
       "valid."
       "This was unsafe/undefined behavior from the start, and RepeatCommand "
       "provides an easy way to achieve similar end results with slightly "
-      "different (and safe) semantics.")
+      "different (and safe) semantics.")]]
   PerpetualCommand Perpetually() &&;
 
   /**
@@ -373,7 +371,7 @@ safe) semantics.
    *
    * @deprecated Moved to IsComposed()
    */
-  WPI_DEPRECATED("Moved to IsComposed()")
+  [[deprecated("Moved to IsComposed()")]]
   bool IsGrouped() const;
 
   /**
@@ -383,7 +381,7 @@ safe) semantics.
    *
    * @deprecated Moved to SetComposed()
    */
-  WPI_DEPRECATED("Moved to SetComposed()")
+  [[deprecated("Moved to SetComposed()")]]
   void SetGrouped(bool grouped);
 
   /**

@@ -13,6 +13,7 @@
 #include <utility>
 
 #include <wpi/concepts.h>
+#include <wpi/deprecated.h>
 
 #include "frc2/command/CommandBase.h"
 #include "frc2/command/CommandHelper.h"
