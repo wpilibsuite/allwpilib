@@ -4,9 +4,8 @@
 
 #pragma once
 
+#include <concepts>
 #include <utility>
-
-#include <wpi/concepts.h>
 
 #include "frc2/command/CommandScheduler.h"
 

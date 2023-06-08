@@ -7,6 +7,7 @@
 
 #include <jni.h>
 
+#include <concepts>
 #include <queue>
 #include <span>
 #include <string>
@@ -19,7 +20,6 @@
 #include "wpi/SmallString.h"
 #include "wpi/SmallVector.h"
 #include "wpi/StringExtras.h"
-#include "wpi/concepts.h"
 #include "wpi/mutex.h"
 #include "wpi/raw_ostream.h"
 

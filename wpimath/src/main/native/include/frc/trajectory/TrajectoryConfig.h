@@ -4,12 +4,12 @@
 
 #pragma once
 
+#include <concepts>
 #include <memory>
 #include <utility>
 #include <vector>
 
 #include <wpi/SymbolExports.h>
-#include <wpi/concepts.h>
 
 #include "frc/kinematics/DifferentialDriveKinematics.h"
 #include "frc/kinematics/MecanumDriveKinematics.h"

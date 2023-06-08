@@ -4,9 +4,8 @@
 
 #pragma once
 
+#include <concepts>
 #include <type_traits>
-
-#include "wpi/concepts.h"
 
 namespace wpi {
 

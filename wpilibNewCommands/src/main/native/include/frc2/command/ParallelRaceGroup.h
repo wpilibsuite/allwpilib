@@ -9,13 +9,13 @@
 #pragma warning(disable : 4521)
 #endif
 
+#include <concepts>
 #include <memory>
 #include <type_traits>
 #include <utility>
 #include <vector>
 
 #include <wpi/DecayedDerivedFrom.h>
-#include <wpi/concepts.h>
 
 #include "frc2/command/CommandGroupBase.h"
 #include "frc2/command/CommandHelper.h"

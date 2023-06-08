@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <concepts>
 #include <initializer_list>
 #include <memory>
 #include <span>
@@ -15,7 +16,6 @@
 #include <networktables/NTSendable.h>
 #include <units/time.h>
 #include <wpi/FunctionExtras.h>
-#include <wpi/concepts.h>
 #include <wpi/deprecated.h>
 #include <wpi/sendable/SendableHelper.h>
 

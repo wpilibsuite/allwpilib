@@ -4,10 +4,9 @@
 
 #pragma once
 
+#include <concepts>
 #include <memory>
 #include <utility>
-
-#include <wpi/concepts.h>
 
 #include "frc2/command/Command.h"
 #include "frc2/command/CommandPtr.h"

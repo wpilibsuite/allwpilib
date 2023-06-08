@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <concepts>
 #include <functional>
 #include <initializer_list>
 #include <memory>
@@ -11,8 +12,6 @@
 #include <string>
 #include <utility>
 #include <vector>
-
-#include <wpi/concepts.h>
 
 #include "frc2/command/CommandBase.h"
 

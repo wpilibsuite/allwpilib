@@ -4,10 +4,10 @@
 
 #pragma once
 
+#include <concepts>
 #include <stdexcept>
 
 #include <wpi/SymbolExports.h>
-#include <wpi/concepts.h>
 
 #include "frc/system/LinearSystem.h"
 #include "frc/system/plant/DCMotor.h"

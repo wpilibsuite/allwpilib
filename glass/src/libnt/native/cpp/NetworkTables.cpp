@@ -5,6 +5,7 @@
 #include "glass/networktables/NetworkTables.h"
 
 #include <cinttypes>
+#include <concepts>
 #include <cstdio>
 #include <cstring>
 #include <initializer_list>
@@ -24,7 +25,6 @@
 #include <wpi/SmallString.h>
 #include <wpi/SpanExtras.h>
 #include <wpi/StringExtras.h>
-#include <wpi/concepts.h>
 #include <wpi/mpack.h>
 #include <wpi/raw_ostream.h>
 
