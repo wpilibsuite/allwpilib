@@ -78,7 +78,7 @@
     // This warning is a false positive
     #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
   #endif
-  #if __GNUC__==12
+  #if __GNUC__>=12
     // This warning is a false positive
     #pragma GCC diagnostic ignored "-Warray-bounds"
   #endif

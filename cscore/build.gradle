@@ -36,7 +36,6 @@ model {
                         srcDir 'src/main/native/include'
                         include '**/*.h'
                     }
-
                 }
             }
             binaries.all {

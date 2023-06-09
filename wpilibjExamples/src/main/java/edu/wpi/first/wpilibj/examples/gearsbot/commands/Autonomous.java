@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj.examples.gearsbot.commands;
 
+import edu.wpi.first.wpilibj.examples.gearsbot.Constants.AutoConstants;
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Claw;
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Drivetrain;
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Elevator;
@@ -18,11 +19,12 @@ public class Autonomous extends SequentialCommandGroup {
     addCommands(
         new PrepareToPickup(claw, wrist, elevator),
         new Pickup(claw, wrist, elevator),
-        new SetDistanceToBox(0.10, drive),
+        new SetDistanceToBox(AutoConstants.kDistToBox1, drive),
         // new DriveStraight(4), // Use encoders if ultrasonic is broken
         new Place(claw, wrist, elevator),
-        new SetDistanceToBox(0.60, drive),
+        new SetDistanceToBox(AutoConstants.kDistToBox2, drive),
         // new DriveStraight(-2), // Use Encoders if ultrasonic is broken
-        Commands.parallel(new SetWristSetpoint(-45, wrist), new CloseClaw(claw)));
+        Commands.parallel(
+            new SetWristSetpoint(AutoConstants.kWristSetpoint, wrist), new CloseClaw(claw)));
   }
 }

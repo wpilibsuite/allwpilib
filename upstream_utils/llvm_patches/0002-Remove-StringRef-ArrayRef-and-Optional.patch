@@ -1,4 +1,4 @@
-From afca62cd2f1616bcf2e648dc121a057d59168424 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:09:18 -0400
 Subject: [PATCH 02/28] Remove StringRef, ArrayRef, and Optional
@@ -34,7 +34,7 @@ Subject: [PATCH 02/28] Remove StringRef, ArrayRef, and Optional
  27 files changed, 248 insertions(+), 304 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/PointerUnion.h b/llvm/include/llvm/ADT/PointerUnion.h
-index 04d566bbc..1d4cc747c 100644
+index 04d566bbc75e01d4bd648273e1a299de9e1d97b6..1d4cc747ce320e27004170fb0aa76323d2ac22b1 100644
 --- a/llvm/include/llvm/ADT/PointerUnion.h
 +++ b/llvm/include/llvm/ADT/PointerUnion.h
 @@ -17,7 +17,6 @@
@@ -46,7 +46,7 @@ index 04d566bbc..1d4cc747c 100644
  #include <algorithm>
  #include <cassert>
 diff --git a/llvm/include/llvm/ADT/SmallSet.h b/llvm/include/llvm/ADT/SmallSet.h
-index 0eed85449..bfe93e997 100644
+index 0eed85449c9d6bf88068c8b5c0f5f10ed9b9ff7b..bfe93e997fc896e82a9b96219967f754df82bcfb 100644
 --- a/llvm/include/llvm/ADT/SmallSet.h
 +++ b/llvm/include/llvm/ADT/SmallSet.h
 @@ -14,15 +14,14 @@
@@ -97,7 +97,7 @@ index 0eed85449..bfe93e997 100644
  
    template <typename IterT>
 diff --git a/llvm/include/llvm/ADT/SmallString.h b/llvm/include/llvm/ADT/SmallString.h
-index 874968f0a..50cbdade4 100644
+index 874968f0a13f3e7de07caf1c42794b36e7a5c237..50cbdade405770e80a6a45521a446a28e4177d11 100644
 --- a/llvm/include/llvm/ADT/SmallString.h
 +++ b/llvm/include/llvm/ADT/SmallString.h
 @@ -15,8 +15,9 @@
@@ -344,7 +344,7 @@ index 874968f0a..50cbdade4 100644
      return *this;
    }
 diff --git a/llvm/include/llvm/ADT/StringMap.h b/llvm/include/llvm/ADT/StringMap.h
-index 23248093c..8747cdb35 100644
+index 23248093c67e25505e980bc99c067f8e4aff6fd4..8747cdb353a89952e242ccfa5ea8a3e68571d456 100644
 --- a/llvm/include/llvm/ADT/StringMap.h
 +++ b/llvm/include/llvm/ADT/StringMap.h
 @@ -60,12 +60,12 @@ protected:
@@ -485,7 +485,7 @@ index 23248093c..8747cdb35 100644
  
  } // end namespace llvm
 diff --git a/llvm/include/llvm/ADT/StringMapEntry.h b/llvm/include/llvm/ADT/StringMapEntry.h
-index 6e13c8618..39976a02b 100644
+index 6e13c8618c851d32466f4b44908ffc9d044140f8..39976a02b5ecbbf5d08a6073708cac0a5aef447d 100644
 --- a/llvm/include/llvm/ADT/StringMapEntry.h
 +++ b/llvm/include/llvm/ADT/StringMapEntry.h
 @@ -16,9 +16,8 @@
@@ -563,7 +563,7 @@ index 6e13c8618..39976a02b 100644
      return new (StringMapEntryBase::allocateWithKey(
          sizeof(StringMapEntry), alignof(StringMapEntry), key, allocator))
 diff --git a/llvm/include/llvm/Support/Chrono.h b/llvm/include/llvm/Support/Chrono.h
-index 9c2bd45d2..a7dea19d9 100644
+index 9c2bd45d2803e56ed316d8552d899d87f2fbbb07..a7dea19d9193bcff4bc6b553b80a10b2bc7b64af 100644
 --- a/llvm/include/llvm/Support/Chrono.h
 +++ b/llvm/include/llvm/Support/Chrono.h
 @@ -70,7 +70,7 @@ raw_ostream &operator<<(raw_ostream &OS, sys::TimePoint<> TP);
@@ -606,7 +606,7 @@ index 9c2bd45d2..a7dea19d9 100644
      bool show_unit = consumeShowUnit(Style);
  
 diff --git a/llvm/include/llvm/Support/Compiler.h b/llvm/include/llvm/Support/Compiler.h
-index 80b2dfaec..f5d726ec8 100644
+index 80b2dfaec4273a9831adc92ffa1a2b2059d9659f..f5d726ec8a2c4c39a31a6a557591a99a64caea3a 100644
 --- a/llvm/include/llvm/Support/Compiler.h
 +++ b/llvm/include/llvm/Support/Compiler.h
 @@ -312,7 +312,7 @@
@@ -619,7 +619,7 @@ index 80b2dfaec..f5d726ec8 100644
  #define LLVM_GSL_POINTER [[gsl::Pointer]]
  #else
 diff --git a/llvm/include/llvm/Support/ConvertUTF.h b/llvm/include/llvm/Support/ConvertUTF.h
-index 374cdb907..7f1527f51 100644
+index 374cdb907fdc2c41912c2fa606b36e108259fa31..7f1527f51cdf59238607becfb2fdaf4afc91d4b6 100644
 --- a/llvm/include/llvm/Support/ConvertUTF.h
 +++ b/llvm/include/llvm/Support/ConvertUTF.h
 @@ -89,12 +89,12 @@
@@ -716,7 +716,7 @@ index 374cdb907..7f1527f51 100644
                              SmallVectorImpl<char> &utf8);
  /// Convert from UTF16 to the current code page used in the system
 diff --git a/llvm/include/llvm/Support/DJB.h b/llvm/include/llvm/Support/DJB.h
-index 8a04a324a..8737cd144 100644
+index 8a04a324a5dc6cccaaa6af7b0e9b340f0755587e..8737cd144c37f9041a781a74e9f2b43384e85761 100644
 --- a/llvm/include/llvm/Support/DJB.h
 +++ b/llvm/include/llvm/Support/DJB.h
 @@ -13,13 +13,13 @@
@@ -737,7 +737,7 @@ index 8a04a324a..8737cd144 100644
    return H;
  }
 diff --git a/llvm/include/llvm/Support/ErrorHandling.h b/llvm/include/llvm/Support/ErrorHandling.h
-index 6791df6be..3f726d40b 100644
+index 6791df6be3362fa199556ecb2131f971cfef5210..3f726d40ba7b8987c504cc3d933b137cfbc895d3 100644
 --- a/llvm/include/llvm/Support/ErrorHandling.h
 +++ b/llvm/include/llvm/Support/ErrorHandling.h
 @@ -15,10 +15,10 @@
@@ -769,7 +769,7 @@ index 6791df6be..3f726d40b 100644
  
  /// Installs a new bad alloc error handler that should be used whenever a
 diff --git a/llvm/include/llvm/Support/SmallVectorMemoryBuffer.h b/llvm/include/llvm/Support/SmallVectorMemoryBuffer.h
-index f7f2d4e54..b5e321b5f 100644
+index f7f2d4e54e705d6f29812dc93d1fb0a3ca2dee12..b5e321b5f74ce35940649b9d1342b3cdf0c4931f 100644
 --- a/llvm/include/llvm/Support/SmallVectorMemoryBuffer.h
 +++ b/llvm/include/llvm/Support/SmallVectorMemoryBuffer.h
 @@ -35,8 +35,8 @@ public:
@@ -793,7 +793,7 @@ index f7f2d4e54..b5e321b5f 100644
    BufferKind getBufferKind() const override { return MemoryBuffer_Malloc; }
  
 diff --git a/llvm/include/llvm/Support/VersionTuple.h b/llvm/include/llvm/Support/VersionTuple.h
-index 1a1072d22..3d6573bf5 100644
+index 1a1072d228f1164b22fa66ce9d020e9c6a5b1935..3d6573bf5a96e115ef264c7885b91aa3b32ac91e 100644
 --- a/llvm/include/llvm/Support/VersionTuple.h
 +++ b/llvm/include/llvm/Support/VersionTuple.h
 @@ -16,14 +16,13 @@
@@ -855,7 +855,7 @@ index 1a1072d22..3d6573bf5 100644
  
  /// Print a version number.
 diff --git a/llvm/include/llvm/Support/Windows/WindowsSupport.h b/llvm/include/llvm/Support/Windows/WindowsSupport.h
-index 917822678..180803fbd 100644
+index 917822678e979690dc09173510f8c62569e467f1..180803fbd3104ddf32c183684f226954c4fb8b0e 100644
 --- a/llvm/include/llvm/Support/Windows/WindowsSupport.h
 +++ b/llvm/include/llvm/Support/Windows/WindowsSupport.h
 @@ -35,8 +35,6 @@
@@ -877,7 +877,7 @@ index 917822678..180803fbd 100644
  
  template <typename HandleTraits>
 diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
-index 58adb41cb..9a1dd7a60 100644
+index 58adb41cb0ef6e57011694bc678c9ae13b416904..9a1dd7a6070c20609660bfc63db10a509e54fe2f 100644
 --- a/llvm/include/llvm/Support/raw_ostream.h
 +++ b/llvm/include/llvm/Support/raw_ostream.h
 @@ -14,9 +14,7 @@
@@ -1005,7 +1005,7 @@ index 58adb41cb..9a1dd7a60 100644
  
  } // end namespace llvm
 diff --git a/llvm/lib/Support/ConvertUTFWrapper.cpp b/llvm/lib/Support/ConvertUTFWrapper.cpp
-index 392c4c489..396ab0c65 100644
+index 392c4c4890e1666714acaa3630276515e4dec176..396ab0c655ed50707c8725ebd22b1f8be5e0e030 100644
 --- a/llvm/lib/Support/ConvertUTFWrapper.cpp
 +++ b/llvm/lib/Support/ConvertUTFWrapper.cpp
 @@ -6,24 +6,24 @@
@@ -1120,7 +1120,7 @@ index 392c4c489..396ab0c65 100644
          Result);
    } else if (sizeof(wchar_t) == 4) {
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index 80c0e0043..8ae8fb8b4 100644
+index 80c0e00439a58078742fe75569a980ea3dd9bdf1..8ae8fb8b40079a5da59f4008b9dc8de258d8cb5a 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
 @@ -14,7 +14,6 @@
@@ -1169,7 +1169,7 @@ index 80c0e0043..8ae8fb8b4 100644
      (void)written; // If something went wrong, we deliberately just give up.
    }
 diff --git a/llvm/lib/Support/SmallVector.cpp b/llvm/lib/Support/SmallVector.cpp
-index 8cafbc7fa..8bad715e4 100644
+index 8cafbc7fad0de3fa672f747feffbf933e88d53ca..8bad715e45cdf894e811020f3c146fc234e8e9f0 100644
 --- a/llvm/lib/Support/SmallVector.cpp
 +++ b/llvm/lib/Support/SmallVector.cpp
 @@ -11,7 +11,6 @@
@@ -1199,7 +1199,7 @@ index 8cafbc7fa..8bad715e4 100644
  }
  
 diff --git a/llvm/lib/Support/StringMap.cpp b/llvm/lib/Support/StringMap.cpp
-index 012c785b4..317f4ee43 100644
+index 012c785b4351d13183205099acb214df382510e3..317f4ee43bced6d76031babfae043befc42608b4 100644
 --- a/llvm/lib/Support/StringMap.cpp
 +++ b/llvm/lib/Support/StringMap.cpp
 @@ -70,7 +70,7 @@ void StringMapImpl::init(unsigned InitSize) {
@@ -1256,7 +1256,7 @@ index 012c785b4..317f4ee43 100644
    if (Bucket == -1)
      return nullptr;
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index 69d4fe96b..e4c318eb8 100644
+index 69d4fe96bee898967e1637d495283bc0281ec255..e4c318eb8265c588f1d84dd1abeafc7fd0d055de 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
 @@ -159,7 +159,7 @@ raw_ostream &raw_ostream::write_uuid(const uuid_t UUID) {
@@ -1355,7 +1355,7 @@ index 69d4fe96b..e4c318eb8 100644
    if (OutputFileName == "-")
      return Write(outs());
 diff --git a/llvm/unittests/ADT/DenseMapTest.cpp b/llvm/unittests/ADT/DenseMapTest.cpp
-index 4dd314c5c..e505b1907 100644
+index 4dd314c5c90191f733676f037fb476e96f284380..e505b19070bfdc9af45e0c2ae017e6ea50d81c98 100644
 --- a/llvm/unittests/ADT/DenseMapTest.cpp
 +++ b/llvm/unittests/ADT/DenseMapTest.cpp
 @@ -481,31 +481,6 @@ TEST(DenseMapCustomTest, ReserveTest) {
@@ -1391,7 +1391,7 @@ index 4dd314c5c..e505b1907 100644
  // In the latter case, "a" == 0, "b" == 1 and so on.
  struct TestDenseMapInfo {
 diff --git a/llvm/unittests/ADT/FunctionExtrasTest.cpp b/llvm/unittests/ADT/FunctionExtrasTest.cpp
-index fc856a976..aff9d61c7 100644
+index fc856a976946bf6decda9b6724cac66afc7bdcd6..aff9d61c7f0d48834123b04b74a2e4f7c86a56d8 100644
 --- a/llvm/unittests/ADT/FunctionExtrasTest.cpp
 +++ b/llvm/unittests/ADT/FunctionExtrasTest.cpp
 @@ -249,23 +249,23 @@ TEST(UniqueFunctionTest, Const) {
@@ -1425,7 +1425,7 @@ index fc856a976..aff9d61c7 100644
  TEST(UniqueFunctionTest, SFINAE) {
    EXPECT_EQ("not a function", returns("boo!"));
 diff --git a/llvm/unittests/ADT/HashingTest.cpp b/llvm/unittests/ADT/HashingTest.cpp
-index bb19a5699..0634767a4 100644
+index bb19a569999f2dc3cae4eaff07d4da73c13ff6fd..0634767a456345a980fa43b67aa1937be1fcb8ae 100644
 --- a/llvm/unittests/ADT/HashingTest.cpp
 +++ b/llvm/unittests/ADT/HashingTest.cpp
 @@ -277,7 +277,7 @@ TEST(HashingTest, HashCombineRangeGoldenTest) {
@@ -1438,7 +1438,7 @@ index bb19a5699..0634767a4 100644
  #if 0 // Enable this to generate paste-able text for the above structure.
      std::string member_str = "\"" + str.str() + "\",";
 diff --git a/llvm/unittests/ADT/SmallPtrSetTest.cpp b/llvm/unittests/ADT/SmallPtrSetTest.cpp
-index 414298c4e..6f3c94eed 100644
+index 414298c4e67df194dd69bbb674908b920fdfd828..6f3c94eed2737d4e35995454ec7d007cedb1235a 100644
 --- a/llvm/unittests/ADT/SmallPtrSetTest.cpp
 +++ b/llvm/unittests/ADT/SmallPtrSetTest.cpp
 @@ -12,7 +12,6 @@
@@ -1450,7 +1450,7 @@ index 414298c4e..6f3c94eed 100644
  #include "gtest/gtest.h"
  
 diff --git a/llvm/unittests/ADT/SmallStringTest.cpp b/llvm/unittests/ADT/SmallStringTest.cpp
-index b207f582e..bee3875d1 100644
+index b207f582e9197fa9ee0f1676b2d3f1f62333b144..bee3875d11c9b793d79ac442312559b11dba9f5f 100644
 --- a/llvm/unittests/ADT/SmallStringTest.cpp
 +++ b/llvm/unittests/ADT/SmallStringTest.cpp
 @@ -50,43 +50,43 @@ TEST_F(SmallStringTest, AssignRepeated) {
@@ -1589,7 +1589,7 @@ index b207f582e..bee3875d1 100644
    theString = "hellx xello hell ello world foo bar hello";
    EXPECT_EQ(36U, theString.find("hello"));
 diff --git a/llvm/unittests/ADT/SmallVectorTest.cpp b/llvm/unittests/ADT/SmallVectorTest.cpp
-index 3fbea5299..fe827546a 100644
+index 3fbea5299501bdb2c36ceb2caf8f2cbda40efdde..fe827546aef2c26b8c5372b2643e84d60683a19a 100644
 --- a/llvm/unittests/ADT/SmallVectorTest.cpp
 +++ b/llvm/unittests/ADT/SmallVectorTest.cpp
 @@ -11,7 +11,7 @@
@@ -1627,7 +1627,7 @@ index 3fbea5299..fe827546a 100644
  class SmallVectorReferenceInvalidationTest : public SmallVectorTestBase {
  protected:
 diff --git a/llvm/unittests/ADT/StringMapTest.cpp b/llvm/unittests/ADT/StringMapTest.cpp
-index 817fec6c3..86907ab61 100644
+index 817fec6c37a2a6a443e9cee9a4322b15c10da2b7..86907ab61a2c24effcef3b88c7849482eadd314d 100644
 --- a/llvm/unittests/ADT/StringMapTest.cpp
 +++ b/llvm/unittests/ADT/StringMapTest.cpp
 @@ -7,8 +7,6 @@
@@ -1753,7 +1753,7 @@ index 817fec6c3..86907ab61 100644
  
    // Test that the entry can hold at least max size_t.
 diff --git a/llvm/unittests/Support/ConvertUTFTest.cpp b/llvm/unittests/Support/ConvertUTFTest.cpp
-index 7bda6ea28..9c798437a 100644
+index 7bda6ea28ad69c579b29bb656bf019d3b5a4b358..9c798437a12d971a9206cbaff546ebc46c70f0d8 100644
 --- a/llvm/unittests/Support/ConvertUTFTest.cpp
 +++ b/llvm/unittests/Support/ConvertUTFTest.cpp
 @@ -7,7 +7,6 @@
