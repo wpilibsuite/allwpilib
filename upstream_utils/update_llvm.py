@@ -198,6 +198,7 @@ def main():
         "0026-constexpr-endian-byte-swap.patch",
         "0027-Copy-type-traits-from-STLExtras.h-into-PointerUnion..patch",
         "0028-Remove-StringMap-test-for-llvm-sort.patch",
+        "0029-Fix-docs-typo-in-SmallVector.patch",
     ]:
         git_am(
             os.path.join(wpilib_root, "upstream_utils/llvm_patches", f),
