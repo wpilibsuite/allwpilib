@@ -103,7 +103,7 @@ public class ProfiledPIDController implements Sendable {
    * total accumulated error will reset to zero, disabling integral gain until the absolute value of
    * the position error is less than IZone. This is used to prevent integral windup. Must be
    * non-negative. Passing a value of zero will effectively disable integral gain. Passing a value
-   * of {@link Double.POSITIVE_INFINITY} disables IZone functionality.
+   * of {@link Double#POSITIVE_INFINITY} disables IZone functionality.
    *
    * @param izone Maximum magnitude of error to allow integral control.
    */
