@@ -6,10 +6,15 @@ package edu.wpi.first.math;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import edu.wpi.first.wpilibj.UtilityClassTest;
 import org.ejml.simple.SimpleMatrix;
 import org.junit.jupiter.api.Test;
 
-class DARETest {
+class DARETest extends UtilityClassTest<DARE> {
+  DARETest() {
+    super(DARE.class);
+  }
+
   public static void assertMatrixEqual(SimpleMatrix A, SimpleMatrix B) {
     for (int i = 0; i < A.numRows(); i++) {
       for (int j = 0; j < A.numCols(); j++) {
