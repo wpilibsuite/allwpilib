@@ -20,7 +20,7 @@ void Tracer::PublishToNetworkTables(std::string_view topicName) {
   m_publishNT = true;
   m_inst = nt::NetworkTableInstance::GetDefault();
   m_ntTopic = topicName;
-  m_publisherCache = wpi::StringMap<nt::IntegerPublisher*>(10);
+  m_publisherCache = wpi::StringMap<std::shared_ptr<nt::IntegerPublisher>>(10);
 }
 
 void Tracer::StartDataLog(wpi::log::DataLog& dataLog, std::string_view entry) {
@@ -50,8 +50,8 @@ void Tracer::AddEpoch(std::string_view epochName) {
       // Create and prep the epoch publisher
       auto topic =
           m_inst.GetIntegerTopic(fmt::format("{}/{}", m_ntTopic, epochName));
-      auto pub = topic.Publish();
-      m_publisherCache.insert(std::pair(epochName, &pub));
+      auto pub = std::make_shared<nt::IntegerPublisher>(topic.Publish());
+      m_publisherCache.insert(std::pair(epochName, pub));
     }
     m_publisherCache.lookup(epochName)->Set(epoch.count());
   }

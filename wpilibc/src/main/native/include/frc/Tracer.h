@@ -5,6 +5,7 @@
 #pragma once
 
 #include <chrono>
+#include <memory>
 #include <string_view>
 
 #include <hal/cpp/fpga_clock.h>
@@ -87,7 +88,7 @@ class Tracer {
   bool m_publishNT;
   nt::NetworkTableInstance m_inst;
   std::string_view m_ntTopic;
-  wpi::StringMap<nt::IntegerPublisher*> m_publisherCache;
+  wpi::StringMap<std::shared_ptr<nt::IntegerPublisher>> m_publisherCache;
   bool m_dataLogEnabled = false;
   wpi::log::DataLog* m_dataLog;
   std::string_view m_dataLogEntry;
