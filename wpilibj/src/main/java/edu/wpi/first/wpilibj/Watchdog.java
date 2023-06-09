@@ -93,7 +93,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   /**
    * Starts logging added epochs to the data log.
    *
-   *  @param dataLog The data log to log epochs to
+   * @param dataLog The data log to log epochs to
    * @param entry The name of the entry to log to
    */
   public void startDataLog(DataLog dataLog, String entry) {
