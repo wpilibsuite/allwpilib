@@ -25,7 +25,7 @@ public class PIDController implements Sendable, AutoCloseable {
   private double m_kd;
 
   // The error range where "integral" control applies
-  private double m_izone = Double.POSITIVE_INFINITY;
+  private double m_iZone = Double.POSITIVE_INFINITY;
 
   // The period (in seconds) of the loop that calls the controller
   private final double m_period;
@@ -151,13 +151,13 @@ public class PIDController implements Sendable, AutoCloseable {
    * non-negative. Passing a value of zero will effectively disable integral gain. Passing a value
    * of {@link Double#POSITIVE_INFINITY} disables IZone functionality.
    *
-   * @param izone Maximum magnitude of error to allow integral control.
+   * @param iZone Maximum magnitude of error to allow integral control.
    */
-  public void setIZone(double izone) {
-    if (izone < 0) {
+  public void setIZone(double iZone) {
+    if (iZone < 0) {
       throw new IllegalArgumentException("IZone must be a non-negative number!");
     }
-    m_izone = izone;
+    m_iZone = iZone;
   }
 
   /**
@@ -193,7 +193,7 @@ public class PIDController implements Sendable, AutoCloseable {
    * @return Maximum magnitude of error to allow integral control.
    */
   public double getIZone() {
-    return m_izone;
+    return m_iZone;
   }
 
   /**
@@ -380,7 +380,7 @@ public class PIDController implements Sendable, AutoCloseable {
     m_velocityError = (m_positionError - m_prevError) / m_period;
 
     // If the absolute value of the position error is greater than IZone, reset the total error
-    if (Math.abs(m_positionError) > m_izone) {
+    if (Math.abs(m_positionError) > m_iZone) {
       m_totalError = 0;
     } else if (m_ki != 0) {
       m_totalError =

@@ -57,7 +57,7 @@ class PIDInputOutputTest {
   }
 
   @Test
-  void izoneNoOutputTest() {
+  void iZoneNoOutputTest() {
     m_controller.setI(1);
     m_controller.setIZone(1);
 
@@ -67,7 +67,7 @@ class PIDInputOutputTest {
   }
 
   @Test
-  void izoneOutputTest() {
+  void iZoneOutputTest() {
     m_controller.setI(1);
     m_controller.setIZone(1);
 

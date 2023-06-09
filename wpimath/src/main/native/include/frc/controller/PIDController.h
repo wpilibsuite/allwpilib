@@ -81,9 +81,9 @@ class WPILIB_DLLEXPORT PIDController
    * non-negative. Passing a value of zero will effectively disable integral
    * gain. Passing a value of infinity disables IZone functionality.
    *
-   * @param izone Maximum magnitude of error to allow integral control.
+   * @param iZone Maximum magnitude of error to allow integral control.
    */
-  void SetIZone(double izone);
+  void SetIZone(double iZone);
 
   /**
    * Gets the proportional coefficient.
@@ -241,7 +241,7 @@ class WPILIB_DLLEXPORT PIDController
   double m_Kd;
 
   // The error range where "integral" control applies
-  double m_izone = std::numeric_limits<double>::infinity();
+  double m_iZone = std::numeric_limits<double>::infinity();
 
   // The period (in seconds) of the control loop running this controller
   units::second_t m_period;

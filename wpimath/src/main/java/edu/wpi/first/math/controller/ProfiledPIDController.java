@@ -105,10 +105,10 @@ public class ProfiledPIDController implements Sendable {
    * non-negative. Passing a value of zero will effectively disable integral gain. Passing a value
    * of {@link Double#POSITIVE_INFINITY} disables IZone functionality.
    *
-   * @param izone Maximum magnitude of error to allow integral control.
+   * @param iZone Maximum magnitude of error to allow integral control.
    */
-  public void setIZone(double izone) {
-    m_controller.setIZone(izone);
+  public void setIZone(double iZone) {
+    m_controller.setIZone(iZone);
   }
 
   /**

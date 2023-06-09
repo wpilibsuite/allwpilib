@@ -114,9 +114,9 @@ class ProfiledPIDController
    * non-negative. Passing a value of zero will effectively disable integral
    * gain. Passing a value of infinity disables IZone functionality.
    *
-   * @param izone Maximum magnitude of error to allow integral control.
+   * @param iZone Maximum magnitude of error to allow integral control.
    */
-  void SetIZone(double izone) { m_controller.SetIZone(izone); }
+  void SetIZone(double iZone) { m_controller.SetIZone(iZone); }
 
   /**
    * Gets the proportional coefficient.

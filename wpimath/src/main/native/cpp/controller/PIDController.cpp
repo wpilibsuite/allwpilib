@@ -52,12 +52,12 @@ void PIDController::SetD(double Kd) {
   m_Kd = Kd;
 }
 
-void PIDController::SetIZone(double izone) {
-  if (izone < 0) {
+void PIDController::SetIZone(double iZone) {
+  if (iZone < 0) {
     wpi::math::MathSharedStore::ReportError(
-        "IZone must be a non-negative number, got {}!", izone);
+        "IZone must be a non-negative number, got {}!", iZone);
   }
-  m_izone = izone;
+  m_iZone = iZone;
 }
 
 double PIDController::GetP() const {
@@ -73,7 +73,7 @@ double PIDController::GetD() const {
 }
 
 double PIDController::GetIZone() const {
-  return m_izone;
+  return m_iZone;
 }
 
 units::second_t PIDController::GetPeriod() const {
@@ -165,7 +165,7 @@ double PIDController::Calculate(double measurement) {
 
   // If the absolute value of the position error is outside of IZone, reset the
   // total error
-  if (std::abs(m_positionError) > m_izone) {
+  if (std::abs(m_positionError) > m_iZone) {
     m_totalError = 0;
   } else if (m_Ki != 0) {
     m_totalError =
