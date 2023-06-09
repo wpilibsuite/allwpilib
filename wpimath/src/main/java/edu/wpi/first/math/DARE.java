@@ -7,7 +7,9 @@ package edu.wpi.first.math;
 import org.ejml.simple.SimpleMatrix;
 
 public final class DARE {
-  private DARE() {}
+  private DARE() {
+    throw new UnsupportedOperationException("This is a utility class!");
+  }
 
   /**
    * Solves the discrete algebraic Riccati equation.

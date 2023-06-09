@@ -15,7 +15,7 @@ public final class StateSpaceUtil {
   private static Random rand = new Random();
 
   private StateSpaceUtil() {
-    // Utility class
+    throw new UnsupportedOperationException("This is a utility class!");
   }
 
   /**
