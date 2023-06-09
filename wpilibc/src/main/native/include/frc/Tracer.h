@@ -85,7 +85,7 @@ class Tracer {
 
   hal::fpga_clock::time_point m_startTime;
   hal::fpga_clock::time_point m_lastEpochsPrintTime = hal::fpga_clock::epoch();
-  bool m_publishNT;
+  bool m_publishNT = false;
   nt::NetworkTableInstance m_inst;
   std::string_view m_ntTopic;
   wpi::StringMap<std::shared_ptr<nt::IntegerPublisher>> m_publisherCache;
