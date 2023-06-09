@@ -29,7 +29,8 @@ class SolenoidSim {
    * Save a reference to this object; it being deconstructed cancels the
    * callback.
    */
-  [[nodiscard]] virtual std::unique_ptr<CallbackStore> RegisterOutputCallback(
+  [[nodiscard]]
+  virtual std::unique_ptr<CallbackStore> RegisterOutputCallback(
       NotifyCallback callback, bool initialNotify);
 
   std::shared_ptr<PneumaticsBaseSim> GetModuleSim() const;

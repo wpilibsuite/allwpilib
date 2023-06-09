@@ -9,6 +9,7 @@
 #include <vector>
 
 #include <wpi/SymbolExports.h>
+#include <wpi/concepts.h>
 
 #include "frc/kinematics/DifferentialDriveKinematics.h"
 #include "frc/kinematics/MecanumDriveKinematics.h"
@@ -74,8 +75,7 @@ class WPILIB_DLLEXPORT TrajectoryConfig {
    * Adds a user-defined constraint to the trajectory.
    * @param constraint The user-defined constraint.
    */
-  template <typename Constraint, typename = std::enable_if_t<std::is_base_of_v<
-                                     TrajectoryConstraint, Constraint>>>
+  template <std::derived_from<TrajectoryConstraint> Constraint>
   void AddConstraint(Constraint constraint) {
     m_constraints.emplace_back(std::make_unique<Constraint>(constraint));
   }

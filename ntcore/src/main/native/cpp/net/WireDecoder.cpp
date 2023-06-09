@@ -9,6 +9,7 @@
 #include <fmt/format.h>
 #include <wpi/Logger.h>
 #include <wpi/SpanExtras.h>
+#include <wpi/concepts.h>
 #include <wpi/json.h>
 #include <wpi/mpack.h>
 
@@ -104,12 +105,10 @@ static bool ObjGetStringArray(wpi::json::object_t& obj, std::string_view key,
 #endif
 
 template <typename T>
+  requires(std::same_as<T, ClientMessageHandler> ||
+           std::same_as<T, ServerMessageHandler>)
 static void WireDecodeTextImpl(std::string_view in, T& out,
                                wpi::Logger& logger) {
-  static_assert(std::is_same_v<T, ClientMessageHandler> ||
-                    std::is_same_v<T, ServerMessageHandler>,
-                "T must be ClientMessageHandler or ServerMessageHandler");
-
   wpi::json j;
   try {
     j = wpi::json::parse(in);
@@ -150,7 +149,7 @@ static void WireDecodeTextImpl(std::string_view in, T& out,
         goto err;
       }
 
-      if constexpr (std::is_same_v<T, ClientMessageHandler>) {
+      if constexpr (std::same_as<T, ClientMessageHandler>) {
         if (*method == PublishMsg::kMethodStr) {
           // name
           auto name = ObjGetString(*params, "name", &error);
@@ -302,7 +301,7 @@ static void WireDecodeTextImpl(std::string_view in, T& out,
           error = fmt::format("unrecognized method '{}'", *method);
           goto err;
         }
-      } else if constexpr (std::is_same_v<T, ServerMessageHandler>) {
+      } else if constexpr (std::same_as<T, ServerMessageHandler>) {
         if (*method == AnnounceMsg::kMethodStr) {
           // name
           auto name = ObjGetString(*params, "name", &error);

@@ -54,7 +54,7 @@ public final class WPIMathJNI {
    * @param inputs Number of inputs in B matrix.
    * @param S Array storage for DARE solution.
    */
-  public static native void discreteAlgebraicRiccatiEquation(
+  public static native void dare(
       double[] A, double[] B, double[] Q, double[] R, int states, int inputs, double[] S);
 
   /**

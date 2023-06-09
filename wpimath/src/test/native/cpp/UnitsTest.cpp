@@ -1420,7 +1420,7 @@ TEST_F(UnitContainer, cout) {
 }
 #endif
 
-#if !defined(UNIT_LIB_DISABLE_FMT)
+#if __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
 TEST_F(UnitContainer, fmtlib) {
   testing::internal::CaptureStdout();
   fmt::print("{}", degree_t(349.87));

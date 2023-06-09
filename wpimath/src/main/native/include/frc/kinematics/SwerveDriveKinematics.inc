@@ -13,9 +13,9 @@
 
 namespace frc {
 
-template <class... Wheels>
-SwerveDriveKinematics(Translation2d, Wheels...)
-    -> SwerveDriveKinematics<1 + sizeof...(Wheels)>;
+template <typename ModuleTranslation, typename... ModuleTranslations>
+SwerveDriveKinematics(ModuleTranslation, ModuleTranslations...)
+    -> SwerveDriveKinematics<1 + sizeof...(ModuleTranslations)>;
 
 template <size_t NumModules>
 wpi::array<SwerveModuleState, NumModules>
@@ -65,21 +65,8 @@ SwerveDriveKinematics<NumModules>::ToSwerveModuleStates(
 }
 
 template <size_t NumModules>
-template <typename... ModuleStates>
 ChassisSpeeds SwerveDriveKinematics<NumModules>::ToChassisSpeeds(
-    ModuleStates&&... wheelStates) const {
-  static_assert(sizeof...(wheelStates) == NumModules,
-                "Number of modules is not consistent with number of wheel "
-                "locations provided in constructor.");
-
-  wpi::array<SwerveModuleState, NumModules> moduleStates{wheelStates...};
-
-  return this->ToChassisSpeeds(moduleStates);
-}
-
-template <size_t NumModules>
-ChassisSpeeds SwerveDriveKinematics<NumModules>::ToChassisSpeeds(
-    wpi::array<SwerveModuleState, NumModules> moduleStates) const {
+    const wpi::array<SwerveModuleState, NumModules>& moduleStates) const {
   Matrixd<NumModules * 2, 1> moduleStateMatrix;
 
   for (size_t i = 0; i < NumModules; ++i) {
@@ -94,19 +81,6 @@ ChassisSpeeds SwerveDriveKinematics<NumModules>::ToChassisSpeeds(
   return {units::meters_per_second_t{chassisSpeedsVector(0)},
           units::meters_per_second_t{chassisSpeedsVector(1)},
           units::radians_per_second_t{chassisSpeedsVector(2)}};
-}
-
-template <size_t NumModules>
-template <typename... ModuleDeltas>
-Twist2d SwerveDriveKinematics<NumModules>::ToTwist2d(
-    ModuleDeltas&&... wheelDeltas) const {
-  static_assert(sizeof...(wheelDeltas) == NumModules,
-                "Number of modules is not consistent with number of wheel "
-                "locations provided in constructor.");
-
-  wpi::array<SwerveModulePosition, NumModules> moduleDeltas{wheelDeltas...};
-
-  return this->ToTwist2d(moduleDeltas);
 }
 
 template <size_t NumModules>
