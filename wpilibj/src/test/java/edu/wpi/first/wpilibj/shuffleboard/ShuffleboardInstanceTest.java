@@ -13,6 +13,8 @@ import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableEvent.Kind;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.PubSubOption;
+import edu.wpi.first.networktables.StringSubscriber;
 import java.util.EnumSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.AfterEach;
@@ -130,9 +132,13 @@ class ShuffleboardInstanceTest {
     int listener = 0;
     AtomicInteger counter = new AtomicInteger();
     try {
+      StringSubscriber subscriber =
+          m_ntInstance
+              .getStringTopic("/Shuffleboard/.metadata/Selected")
+              .subscribe("", PubSubOption.keepDuplicates(true));
       listener =
           m_ntInstance.addListener(
-              m_ntInstance.getStringTopic("/Shuffleboard/.metadata/Selected"),
+              subscriber,
               EnumSet.of(Kind.kValueAll, Kind.kImmediate),
               event -> counter.incrementAndGet());
 

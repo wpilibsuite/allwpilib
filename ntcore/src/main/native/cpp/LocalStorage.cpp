@@ -285,7 +285,7 @@ struct LSImpl {
   void CheckReset(TopicData* topic);
 
   bool SetValue(TopicData* topic, const Value& value, unsigned int eventFlags,
-                bool isDuplicate, const PublisherData* publisher);
+                bool suppressIfDuplicate, bool isDuplicate, const PublisherData* publisher);
   void NotifyValue(TopicData* topic, unsigned int eventFlags, bool isDuplicate,
                    const PublisherData* publisher);
 
@@ -495,6 +495,7 @@ void LSImpl::CheckReset(TopicData* topic) {
 
 bool LSImpl::SetValue(TopicData* topic, const Value& value,
                       unsigned int eventFlags, bool isDuplicate,
+                      bool suppressIfDuplicate,
                       const PublisherData* publisher) {
   DEBUG4("SetValue({}, {}, {}, {})", topic->name, value.time(), eventFlags,
          isDuplicate);
@@ -502,18 +503,21 @@ bool LSImpl::SetValue(TopicData* topic, const Value& value,
     return false;
   }
   if (!topic->lastValue || topic->lastValue.time() == 0 ||
-      (!isDuplicate && value.time() >= topic->lastValue.time())) {
+      value.time() >= topic->lastValue.time()) {
     // TODO: notify option even if older value
-    topic->type = value.type();
-    topic->lastValue = value;
-    topic->lastValueFromNetwork = false;
-    NotifyValue(topic, eventFlags, isDuplicate, publisher);
+    if (!(suppressIfDuplicate && isDuplicate)) {
+      topic->type = value.type();
+      topic->lastValue = value;
+      topic->lastValueFromNetwork = false;
+      NotifyValue(topic, eventFlags, isDuplicate, publisher);
+      if (topic->datalogType == value.type()) {
+        for (auto&& datalog : topic->datalogs) {
+          datalog.Append(value);
+        }
+      }
+    }  
   }
-  if (!isDuplicate && topic->datalogType == value.type()) {
-    for (auto&& datalog : topic->datalogs) {
-      datalog.Append(value);
-    }
-  }
+  
   return true;
 }
 
@@ -1259,20 +1263,21 @@ bool LSImpl::PublishLocalValue(PublisherData* publisher, const Value& value,
     return false;
   }
   if (publisher->active) {
-    bool isDuplicate, isNetworkDuplicate;
+    bool isDuplicate, isNetworkDuplicate, suppressDuplicates;
     if (force || publisher->config.keepDuplicates) {
-      isDuplicate = false;
+      suppressDuplicates = false;
       isNetworkDuplicate = false;
     } else {
-      isDuplicate = (publisher->topic->lastValue == value);
+      suppressDuplicates = true;    
       isNetworkDuplicate = (publisher->topic->lastValueNetwork == value);
     }
+    isDuplicate = (publisher->topic->lastValue == value);
     if (!isNetworkDuplicate && m_network) {
       publisher->topic->lastValueNetwork = value;
       m_network->SetValue(publisher->handle, value);
     }
-    return SetValue(publisher->topic, value, NT_EVENT_VALUE_LOCAL, isDuplicate,
-                    publisher);
+    return SetValue(publisher->topic, value, NT_EVENT_VALUE_LOCAL, isDuplicate, 
+                    suppressDuplicates, publisher);
   } else {
     return false;
   }
@@ -1392,7 +1397,7 @@ void LocalStorage::NetworkSetValue(NT_Topic topicHandle, const Value& value) {
   std::scoped_lock lock{m_mutex};
   if (auto topic = m_impl->m_topics.Get(topicHandle)) {
     if (m_impl->SetValue(topic, value, NT_EVENT_VALUE_REMOTE,
-                         value == topic->lastValue, nullptr)) {
+                         value == topic->lastValue, false, nullptr)) {
       topic->lastValueNetwork = value;
       topic->lastValueFromNetwork = true;
     }

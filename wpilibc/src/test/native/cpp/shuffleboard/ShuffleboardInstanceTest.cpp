@@ -113,8 +113,10 @@ TEST(ShuffleboardInstanceTest, DuplicateSelectTabs) {
   NTWrapper ntInst;
   frc::detail::ShuffleboardInstance shuffleboardInst{ntInst.inst};
   std::atomic_int counter = 0;
-  auto listener = nt::NetworkTableListener::CreateListener(
-      ntInst.inst.GetStringTopic("/Shuffleboard/.metadata/Selected"),
+  auto subscriber = ntInst.inst.GetStringTopic("/Shuffleboard/.metadata/Selected")
+        .Subscribe("", {.keepDuplicates = true});
+  ntInst.inst.AddListener(
+      subscriber,
       nt::EventFlags::kValueAll | nt::EventFlags::kImmediate,
       [&counter](auto& event) { counter++; });
 
