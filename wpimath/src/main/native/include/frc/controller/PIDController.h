@@ -75,7 +75,7 @@ class WPILIB_DLLEXPORT PIDController
 
   /**
    * Sets the IZone range. When the absolute value of the position error is
-   * greater than iZone, the total accumulated error will reset to zero,
+   * greater than IZone, the total accumulated error will reset to zero,
    * disabling integral gain until the absolute value of the position error is
    * less than IZone. This is used to prevent integral windup. Must be
    * non-negative. Passing a value of zero will effectively disable integral

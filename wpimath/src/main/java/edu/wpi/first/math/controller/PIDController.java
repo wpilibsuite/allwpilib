@@ -145,7 +145,7 @@ public class PIDController implements Sendable, AutoCloseable {
   }
 
   /**
-   * Sets the IZone range. When the absolute value of the position error is greater than iZone, the
+   * Sets the IZone range. When the absolute value of the position error is greater than IZone, the
    * total accumulated error will reset to zero, disabling integral gain until the absolute value of
    * the position error is less than IZone. This is used to prevent integral windup. Must be
    * non-negative. Passing a value of zero will effectively disable integral gain. Passing a value
