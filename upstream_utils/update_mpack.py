@@ -31,6 +31,7 @@ def main():
         "0001-Don-t-emit-inline-defs.patch",
         "0002-Update-amalgamation-script.patch",
         "0003-Use-namespace-for-C.patch",
+        "0004-Group-doxygen-into-MPack-module.patch",
     ]:
         git_am(
             os.path.join(wpilib_root, "upstream_utils/mpack_patches", f),
