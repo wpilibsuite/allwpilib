@@ -76,7 +76,7 @@ void UnscentedKalmanFilter<States, Inputs, Outputs>::Predict(
       NumericalJacobianX<States, States, Inputs>(m_f, m_xHat, u);
   StateMatrix discA;
   StateMatrix discQ;
-  DiscretizeAQTaylor<States>(contA, m_contQ, m_dt, &discA, &discQ);
+  DiscretizeAQ<States>(contA, m_contQ, m_dt, &discA, &discQ);
   Eigen::internal::llt_inplace<double, Eigen::Lower>::blocked(discQ);
 
   Matrixd<States, 2 * States + 1> sigmas =

@@ -35,7 +35,7 @@ model {
 
                             archiveBaseName = '_M_' + zipBaseName
                             duplicatesStrategy = 'exclude'
-                            classifier = nativeUtils.getPublishClassifier(binary)
+                            archiveClassifier = nativeUtils.getPublishClassifier(binary)
 
                             from(licenseFile) {
                                 into '/'

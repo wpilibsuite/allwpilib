@@ -151,12 +151,22 @@ CommandPtr CommandPtr::Until(std::function<bool()> condition) && {
   return std::move(*this);
 }
 
+CommandPtr CommandPtr::OnlyWhile(std::function<bool()> condition) && {
+  AssertValid();
+  return std::move(*this).Until(std::not_fn(std::move(condition)));
+}
+
 CommandPtr CommandPtr::Unless(std::function<bool()> condition) && {
   AssertValid();
   m_ptr = std::make_unique<ConditionalCommand>(
       std::make_unique<InstantCommand>(), std::move(m_ptr),
       std::move(condition));
   return std::move(*this);
+}
+
+CommandPtr CommandPtr::OnlyIf(std::function<bool()> condition) && {
+  AssertValid();
+  return std::move(*this).Unless(std::not_fn(std::move(condition)));
 }
 
 CommandPtr CommandPtr::DeadlineWith(CommandPtr&& parallel) && {

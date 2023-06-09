@@ -14,7 +14,7 @@ public class AddressableLEDJNI extends JNIWrapper {
   public static native void setData(int handle, byte[] data);
 
   public static native void setBitTiming(
-      int handle, int lowTime0, int highTime0, int lowTime1, int highTime1);
+      int handle, int highTime0, int lowTime0, int highTime1, int lowTime1);
 
   public static native void setSyncTime(int handle, int syncTime);
 

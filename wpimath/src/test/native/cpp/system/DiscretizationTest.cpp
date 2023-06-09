@@ -7,6 +7,7 @@
 #include <functional>
 
 #include "Eigen/Eigenvalues"
+#include "Eigen/src/Core/util/Constants.h"
 #include "frc/EigenCore.h"
 #include "frc/system/Discretization.h"
 #include "frc/system/NumericalIntegration.h"
@@ -126,7 +127,8 @@ TEST(DiscretizationTest, DiscretizeSlowModelAQTaylor) {
   frc::Matrixd<2, 2> discATaylor;
 
   // Continuous Q should be positive semidefinite
-  Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> esCont{contQ};
+  Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> esCont{contQ,
+                                                        Eigen::EigenvaluesOnly};
   for (int i = 0; i < contQ.rows(); ++i) {
     EXPECT_GE(esCont.eigenvalues()[i], 0);
   }
@@ -154,7 +156,8 @@ TEST(DiscretizationTest, DiscretizeSlowModelAQTaylor) {
   EXPECT_LT((discA - discATaylor).norm(), 1e-10);
 
   // Discrete Q should be positive semidefinite
-  Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> esDisc{discQTaylor};
+  Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> esDisc{discQTaylor,
+                                                        Eigen::EigenvaluesOnly};
   for (int i = 0; i < discQTaylor.rows(); ++i) {
     EXPECT_GE(esDisc.eigenvalues()[i], 0);
   }
@@ -172,7 +175,8 @@ TEST(DiscretizationTest, DiscretizeFastModelAQTaylor) {
   frc::Matrixd<2, 2> discATaylor;
 
   // Continuous Q should be positive semidefinite
-  Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> esCont(contQ);
+  Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> esCont{contQ,
+                                                        Eigen::EigenvaluesOnly};
   for (int i = 0; i < contQ.rows(); ++i) {
     EXPECT_GE(esCont.eigenvalues()[i], 0);
   }
@@ -200,7 +204,8 @@ TEST(DiscretizationTest, DiscretizeFastModelAQTaylor) {
   EXPECT_LT((discA - discATaylor).norm(), 1e-10);
 
   // Discrete Q should be positive semidefinite
-  Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> esDisc(discQTaylor);
+  Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> esDisc{discQTaylor,
+                                                        Eigen::EigenvaluesOnly};
   for (int i = 0; i < discQTaylor.rows(); ++i) {
     EXPECT_GE(esDisc.eigenvalues()[i], 0);
   }

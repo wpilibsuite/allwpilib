@@ -15,6 +15,7 @@
 #include <utility>
 #include <vector>
 
+#include <wpi/concepts.h>
 #include <wpi/future.h>
 #include <wpi/mutex.h>
 
@@ -127,7 +128,7 @@ class AsyncFunction<R(T...)> final
 
     auto loop = m_loop.lock();
     if (loop->IsClosing()) {
-      if constexpr (std::is_same_v<R, void>) {
+      if constexpr (std::same_as<R, void>) {
         return m_promises.MakeReadyFuture();
       } else {
         return m_promises.MakeReadyFuture({});

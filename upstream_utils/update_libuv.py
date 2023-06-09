@@ -26,7 +26,7 @@ def main():
         "0004-Cleanup-problematic-language.patch",
         "0005-Use-roborio-time.patch",
         "0006-Style-comments-cleanup.patch",
-        "0007-Squelch-GCC-12.1-warnings.patch",
+        "0007-Squelch-GCC-warnings-we-don-t-know-how-to-fix.patch",
         "0008-Fix-Win32-warning-suppression-pragma.patch",
         "0009-Avoid-unused-variable-warning-on-Mac.patch",
     ]:
