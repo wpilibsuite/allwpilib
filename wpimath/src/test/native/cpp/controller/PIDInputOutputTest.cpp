@@ -56,7 +56,7 @@ TEST_F(PIDInputOutputTest, IZoneNoOutput) {
 
   double out = controller->Calculate(2, 0);
 
-  EXPECT_DOUBLE_EQ(0 * controller->GetPeriod().value(), out);
+  EXPECT_DOUBLE_EQ(0, out);
 }
 
 TEST_F(PIDInputOutputTest, IZoneOutput) {

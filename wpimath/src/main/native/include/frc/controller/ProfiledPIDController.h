@@ -108,12 +108,13 @@ class ProfiledPIDController
 
   /**
    * Sets the IZone range. When the absolute value of the position error is
-   * outside IZone, the total accumulated error will reset to zero, disabling
-   * integral gain until the absolute value of the position error is within
-   * IZone. This is used to prevent integral windup. Must be non-negative.
-   * Setting to zero disables integral gain, setting to infinity disables IZone
+   * greater than iZone, the total accumulated error will reset to zero,
+   * disabling integral gain until the absolute value of the position error is
+   * less than IZone. This is used to prevent integral windup. Must be
+   * non-negative. Passing a value of zero will effectively disable integral
+   * gain. Passing a value of infinity disables IZone functionality.
    *
-   * @param izone izone range
+   * @param izone Maximum magnitude of error to allow integral control.
    */
   void SetIZone(double izone) { m_controller.SetIZone(izone); }
 
@@ -141,7 +142,7 @@ class ProfiledPIDController
   /**
    * Get the IZone range.
    *
-   * @return izone range
+   * @return Maximum magnitude of error to allow integral control.
    */
   double GetIZone() const { return m_controller.GetIZone(); }
 
