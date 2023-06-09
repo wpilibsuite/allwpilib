@@ -16,7 +16,7 @@ set_property(TARGET libglass PROPERTY POSITION_INDEPENDENT_CODE ON)
 set_property(TARGET libglass PROPERTY FOLDER "libraries")
 
 wpilib_target_warnings(libglass)
-target_link_libraries(libglass PUBLIC wpigui wpimath wpiutil)
+target_link_libraries(libglass PUBLIC wpigui wpimath wpiutil fieldImages)
 
 target_include_directories(libglass PUBLIC
                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/lib/native/include>

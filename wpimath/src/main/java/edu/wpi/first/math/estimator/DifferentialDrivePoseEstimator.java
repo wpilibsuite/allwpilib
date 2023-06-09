@@ -339,7 +339,7 @@ public class DifferentialDrivePoseEstimator {
     /**
      * Constructs an Interpolation Record with the specified parameters.
      *
-     * @param pose The pose observed given the current sensor inputs and the previous pose.
+     * @param poseMeters The pose observed given the current sensor inputs and the previous pose.
      * @param gyro The current gyro angle.
      * @param leftMeters The distance traveled by the left encoder.
      * @param rightMeters The distanced traveled by the right encoder.

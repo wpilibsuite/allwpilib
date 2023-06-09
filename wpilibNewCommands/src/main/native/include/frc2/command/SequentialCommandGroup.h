@@ -16,6 +16,9 @@
 #include <utility>
 #include <vector>
 
+#include <wpi/DecayedDerivedFrom.h>
+#include <wpi/concepts.h>
+
 #include "frc2/command/CommandGroupBase.h"
 #include "frc2/command/CommandHelper.h"
 
@@ -53,11 +56,9 @@ class SequentialCommandGroup
    *
    * @param commands the commands to include in this composition.
    */
-  template <class... Types,
-            typename = std::enable_if_t<std::conjunction_v<
-                std::is_base_of<Command, std::remove_reference_t<Types>>...>>>
-  explicit SequentialCommandGroup(Types&&... commands) {
-    AddCommands(std::forward<Types>(commands)...);
+  template <wpi::DecayedDerivedFrom<Command>... Commands>
+  explicit SequentialCommandGroup(Commands&&... commands) {
+    AddCommands(std::forward<Commands>(commands)...);
   }
 
   SequentialCommandGroup(SequentialCommandGroup&& other) = default;
@@ -68,13 +69,11 @@ class SequentialCommandGroup
   // Prevent template expansion from emulating copy ctor
   SequentialCommandGroup(SequentialCommandGroup&) = delete;
 
-  template <class... Types,
-            typename = std::enable_if_t<std::conjunction_v<
-                std::is_base_of<Command, std::remove_reference_t<Types>>...>>>
-  void AddCommands(Types&&... commands) {
+  template <wpi::DecayedDerivedFrom<Command>... Commands>
+  void AddCommands(Commands&&... commands) {
     std::vector<std::unique_ptr<Command>> foo;
-    ((void)foo.emplace_back(std::make_unique<std::remove_reference_t<Types>>(
-         std::forward<Types>(commands))),
+    ((void)foo.emplace_back(std::make_unique<std::decay_t<Commands>>(
+         std::forward<Commands>(commands))),
      ...);
     AddCommands(std::move(foo));
   }

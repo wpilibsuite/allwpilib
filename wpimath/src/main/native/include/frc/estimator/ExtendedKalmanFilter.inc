@@ -5,7 +5,7 @@
 #pragma once
 
 #include "Eigen/Cholesky"
-#include "drake/math/discrete_algebraic_riccati_equation.h"
+#include "frc/DARE.h"
 #include "frc/StateSpaceUtil.h"
 #include "frc/estimator/ExtendedKalmanFilter.h"
 #include "frc/system/Discretization.h"
@@ -36,13 +36,12 @@ ExtendedKalmanFilter<States, Inputs, Outputs>::ExtendedKalmanFilter(
 
   StateMatrix discA;
   StateMatrix discQ;
-  DiscretizeAQTaylor<States>(contA, m_contQ, dt, &discA, &discQ);
+  DiscretizeAQ<States>(contA, m_contQ, dt, &discA, &discQ);
 
   Matrixd<Outputs, Outputs> discR = DiscretizeR<Outputs>(m_contR, dt);
 
   if (IsDetectable<States, Outputs>(discA, C) && Outputs <= States) {
-    m_initP = drake::math::DiscreteAlgebraicRiccatiEquation(
-        discA.transpose(), C.transpose(), discQ, discR);
+    m_initP = DARE(discA.transpose(), C.transpose(), discQ, discR);
   } else {
     m_initP = StateMatrix::Zero();
   }
@@ -72,13 +71,12 @@ ExtendedKalmanFilter<States, Inputs, Outputs>::ExtendedKalmanFilter(
 
   StateMatrix discA;
   StateMatrix discQ;
-  DiscretizeAQTaylor<States>(contA, m_contQ, dt, &discA, &discQ);
+  DiscretizeAQ<States>(contA, m_contQ, dt, &discA, &discQ);
 
   Matrixd<Outputs, Outputs> discR = DiscretizeR<Outputs>(m_contR, dt);
 
   if (IsDetectable<States, Outputs>(discA, C) && Outputs <= States) {
-    m_initP = drake::math::DiscreteAlgebraicRiccatiEquation(
-        discA.transpose(), C.transpose(), discQ, discR);
+    m_initP = DARE(discA.transpose(), C.transpose(), discQ, discR);
   } else {
     m_initP = StateMatrix::Zero();
   }
@@ -95,7 +93,7 @@ void ExtendedKalmanFilter<States, Inputs, Outputs>::Predict(
   // Find discrete A and Q
   StateMatrix discA;
   StateMatrix discQ;
-  DiscretizeAQTaylor<States>(contA, m_contQ, dt, &discA, &discQ);
+  DiscretizeAQ<States>(contA, m_contQ, dt, &discA, &discQ);
 
   m_xHat = RK4(m_f, m_xHat, u, dt);
 

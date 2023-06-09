@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj.examples.gearsbot.commands;
 
+import edu.wpi.first.wpilibj.examples.gearsbot.Constants.Positions;
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Claw;
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Elevator;
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Wrist;
@@ -22,6 +23,8 @@ public class PrepareToPickup extends SequentialCommandGroup {
   public PrepareToPickup(Claw claw, Wrist wrist, Elevator elevator) {
     addCommands(
         new OpenClaw(claw),
-        Commands.parallel(new SetWristSetpoint(0, wrist), new SetElevatorSetpoint(0, elevator)));
+        Commands.parallel(
+            new SetWristSetpoint(Positions.PrepareToPickup.kWristSetpoint, wrist),
+            new SetElevatorSetpoint(Positions.PrepareToPickup.kElevatorSetpoint, elevator)));
   }
 }

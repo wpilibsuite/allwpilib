@@ -200,8 +200,7 @@ void HAL_SetDigitalPWMRate(double rate, int32_t* status) {
   if (*status != 0) {
     return;
   }
-  uint16_t pwmPeriodPower =
-      std::lround(std::log(1.0 / (16 * 1.0E-6 * rate)) / std::log(2.0));
+  uint16_t pwmPeriodPower = std::lround(std::log2(1.0 / (16 * 1.0E-6 * rate)));
   digitalSystem->writePWMPeriodPower(pwmPeriodPower, status);
 }
 

@@ -1,4 +1,4 @@
-From 61646f76602a77059c18298caa575b95b702c94c Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 24 May 2022 01:24:31 -0400
 Subject: [PATCH 3/3] Add advapi pragma
@@ -8,7 +8,7 @@ Subject: [PATCH 3/3] Add advapi pragma
  1 file changed, 1 insertion(+)
 
 diff --git a/Main/StackWalker/StackWalker.cpp b/Main/StackWalker/StackWalker.cpp
-index 48c7c57..6f0fbf2 100644
+index 48c7c57c439dd8feb7ea88fda17d68a4bbbb3d68..6f0fbf28a61f13b796edee56c37737bf14f5a933 100644
 --- a/Main/StackWalker/StackWalker.cpp
 +++ b/Main/StackWalker/StackWalker.cpp
 @@ -88,6 +88,7 @@
