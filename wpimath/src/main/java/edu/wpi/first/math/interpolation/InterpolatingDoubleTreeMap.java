@@ -2,8 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.util;
+package edu.wpi.first.math.interpolation;
 
+import edu.wpi.first.math.MathUtil;
 import java.util.TreeMap;
 
 /**
@@ -50,7 +51,11 @@ public class InterpolatingDoubleTreeMap<K extends Number, V extends Number> {
       V floor = m_map.get(floorKey);
       V ceiling = m_map.get(ceilingKey);
 
-      return interpolate(floor, ceiling, inverseInterpolate(ceilingKey, key, floorKey));
+      return MathUtil.interpolate(
+          floor.doubleValue(),
+          ceiling.doubleValue(),
+          MathUtil.inverseInterpolate(
+              floorKey.doubleValue(), ceilingKey.doubleValue(), key.doubleValue()));
     } else {
       return val.doubleValue();
     }
@@ -59,19 +64,6 @@ public class InterpolatingDoubleTreeMap<K extends Number, V extends Number> {
   /** Clears the contents. */
   public void clear() {
     m_map.clear();
-  }
-
-  /**
-   * Return the value interpolated between val1 and val2 by the interpolant d.
-   *
-   * @param val1 The lower part of the interpolation range.
-   * @param val2 The upper part of the interpolation range.
-   * @param d The interpolant in the range [0, 1].
-   * @return The interpolated value.
-   */
-  private double interpolate(V val1, V val2, double d) {
-    double dydx = val2.doubleValue() - val1.doubleValue();
-    return dydx * d + val1.doubleValue();
   }
 
   /**
