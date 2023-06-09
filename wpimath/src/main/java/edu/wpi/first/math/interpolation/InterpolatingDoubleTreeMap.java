@@ -65,24 +65,4 @@ public class InterpolatingDoubleTreeMap<K extends Number, V extends Number> {
   public void clear() {
     m_map.clear();
   }
-
-  /**
-   * Return where within interpolation range [0, 1] q is between down and up.
-   *
-   * @param up Upper part of interpolation range.
-   * @param q Query.
-   * @param down Lower part of interpolation range.
-   * @return Interpolant in range [0, 1].
-   */
-  private double inverseInterpolate(K up, K q, K down) {
-    double upperToLower = up.doubleValue() - down.doubleValue();
-    if (upperToLower <= 0) {
-      return 0.0;
-    }
-    double queryToLower = q.doubleValue() - down.doubleValue();
-    if (queryToLower <= 0) {
-      return 0.0;
-    }
-    return queryToLower / upperToLower;
-  }
 }
