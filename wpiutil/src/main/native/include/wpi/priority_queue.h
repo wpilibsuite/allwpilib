@@ -6,11 +6,10 @@
 #define WPIUTIL_WPI_PRIORITY_QUEUE_H_
 
 #include <algorithm>
+#include <concepts>
 #include <functional>
 #include <utility>
 #include <vector>
-
-#include "wpi/concepts.h"
 
 namespace wpi {
 

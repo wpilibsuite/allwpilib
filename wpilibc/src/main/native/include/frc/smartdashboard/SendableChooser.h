@@ -4,11 +4,11 @@
 
 #pragma once
 
+#include <concepts>
 #include <memory>
 #include <string_view>
 
 #include <wpi/StringMap.h>
-#include <wpi/concepts.h>
 
 #include "frc/smartdashboard/SendableChooserBase.h"
 

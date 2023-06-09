@@ -9,10 +9,10 @@
 #pragma warning(disable : 4521)
 #endif
 
+#include <concepts>
 #include <memory>
 #include <utility>
 
-#include <wpi/concepts.h>
 #include <wpi/deprecated.h>
 
 #include "frc2/command/CommandBase.h"

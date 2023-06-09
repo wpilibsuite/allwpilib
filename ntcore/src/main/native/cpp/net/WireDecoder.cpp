@@ -5,11 +5,11 @@
 #include "WireDecoder.h"
 
 #include <algorithm>
+#include <concepts>
 
 #include <fmt/format.h>
 #include <wpi/Logger.h>
 #include <wpi/SpanExtras.h>
-#include <wpi/concepts.h>
 #include <wpi/json.h>
 #include <wpi/mpack.h>
 
