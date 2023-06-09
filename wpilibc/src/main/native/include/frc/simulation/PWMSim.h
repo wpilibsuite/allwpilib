@@ -48,7 +48,8 @@ class PWMSim {
    * @param initialNotify whether to run the callback with the initial state
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterInitializedCallback(
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterInitializedCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**
@@ -72,7 +73,8 @@ class PWMSim {
    * @param initialNotify whether to run the callback with the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterPulseMicrosecondCallback(
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterPulseMicrosecondCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**
@@ -96,8 +98,9 @@ class PWMSim {
    * @param initialNotify whether to run the callback with the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterSpeedCallback(
-      NotifyCallback callback, bool initialNotify);
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterSpeedCallback(NotifyCallback callback,
+                                                       bool initialNotify);
 
   /**
    * Get the PWM speed.
@@ -120,7 +123,8 @@ class PWMSim {
    * @param initialNotify whether to run the callback with the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterPositionCallback(
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterPositionCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**
@@ -144,7 +148,8 @@ class PWMSim {
    * @param initialNotify whether to run the callback with the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterPeriodScaleCallback(
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterPeriodScaleCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**
@@ -168,7 +173,8 @@ class PWMSim {
    * @param initialNotify whether to run the callback with the initial state
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterZeroLatchCallback(
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterZeroLatchCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**

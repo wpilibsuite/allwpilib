@@ -55,7 +55,8 @@ HAL_ENUM(HAL_CANManufacturer) {
   HAL_CAN_Man_kCopperforge = 10,
   HAL_CAN_Man_kPWF = 11,
   HAL_CAN_Man_kStudica = 12,
-  HAL_CAN_Man_kTheThriftyBot = 13
+  HAL_CAN_Man_kTheThriftyBot = 13,
+  HAL_CAN_Man_kReduxRobotics = 14
 };
 // clang-format on
 /** @} */

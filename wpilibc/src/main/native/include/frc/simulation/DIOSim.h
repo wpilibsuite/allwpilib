@@ -48,7 +48,8 @@ class DIOSim {
    * @param initialNotify whether to run the callback with the initial state
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterInitializedCallback(
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterInitializedCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**
@@ -73,8 +74,9 @@ class DIOSim {
    *                      initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterValueCallback(
-      NotifyCallback callback, bool initialNotify);
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterValueCallback(NotifyCallback callback,
+                                                       bool initialNotify);
 
   /**
    * Read the value of the DIO port.
@@ -97,7 +99,8 @@ class DIOSim {
    * @param initialNotify whether to call the callback with the initial state
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterPulseLengthCallback(
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterPulseLengthCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**
@@ -122,7 +125,8 @@ class DIOSim {
    *                      initial state
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterIsInputCallback(
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterIsInputCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**
@@ -147,7 +151,8 @@ class DIOSim {
    *                      initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterFilterIndexCallback(
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterFilterIndexCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**

@@ -20,10 +20,10 @@ plugins {
     id 'edu.wpi.first.GradleVsCode'
     id 'idea'
     id 'visual-studio'
-    id 'net.ltgt.errorprone' version '2.0.2' apply false
-    id 'com.github.johnrengelman.shadow' version '7.1.2' apply false
-    id 'com.diffplug.spotless' version '6.12.0' apply false
-    id 'com.github.spotbugs' version '5.0.8' apply false
+    id 'net.ltgt.errorprone' version '3.1.0' apply false
+    id 'com.github.johnrengelman.shadow' version '8.1.1' apply false
+    id 'com.diffplug.spotless' version '6.18.0' apply false
+    id 'com.github.spotbugs' version '5.0.14' apply false
 }
 
 wpilibVersioning.buildServerMode = project.hasProperty('buildServer')
@@ -94,8 +94,8 @@ ext.addTaskToCopyAllOutputs = { task ->
         return
     }
     copyAllOutputs.dependsOn task
-    copyAllOutputs.inputs.file task.archivePath
-    copyAllOutputs.from task.archivePath
+    copyAllOutputs.inputs.file task.archiveFile
+    copyAllOutputs.from task.archiveFile
 }
 
 subprojects {
@@ -167,5 +167,5 @@ ext.getCurrentArch = {
 }
 
 wrapper {
-    gradleVersion = '7.5.1'
+    gradleVersion = '8.1'
 }

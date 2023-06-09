@@ -52,7 +52,7 @@ if (!project.hasProperty('onlylinuxathena')) {
                 sources {
                     cpp {
                         source {
-                            srcDirs "$buildDir/generated/main/cpp"
+                            srcDirs 'src/main/native/cpp', "$buildDir/generated/main/cpp"
                             include '**/*.cpp'
                         }
                         exportedHeaders {

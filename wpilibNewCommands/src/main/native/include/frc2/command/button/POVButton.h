@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #pragma once
+
 #include <frc/GenericHID.h>
 #include <wpi/deprecated.h>
 

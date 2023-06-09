@@ -331,7 +331,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
     // Discretize Q before projecting mean and covariance forward
     Matrix<States, States> contA =
         NumericalJacobian.numericalJacobianX(m_states, m_states, m_f, m_xHat, u);
-    var discQ = Discretization.discretizeAQTaylor(contA, m_contQ, dtSeconds).getSecond();
+    var discQ = Discretization.discretizeAQ(contA, m_contQ, dtSeconds).getSecond();
     var squareRootDiscQ = discQ.lltDecompose(true);
 
     var sigmas = m_pts.squareRootSigmaPoints(m_xHat, m_S);

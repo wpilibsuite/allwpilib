@@ -76,6 +76,13 @@ bool RobotController::IsBrownedOut() {
   return retVal;
 }
 
+bool RobotController::GetRSLState() {
+  int32_t status = 0;
+  bool retVal = HAL_GetRSLState(&status);
+  FRC_CheckErrorStatus(status, "GetRSLState");
+  return retVal;
+}
+
 double RobotController::GetInputVoltage() {
   int32_t status = 0;
   double retVal = HAL_GetVinVoltage(&status);
