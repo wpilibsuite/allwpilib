@@ -491,7 +491,7 @@ namespace units
 
 	 /**
 	  * @defgroup	CompileTimeUnitManipulators Compile-time Unit Manipulators
-	  * @ingroup		Units
+	  * @ingroup	Units
 	  * @brief		Defines a series of classes used to manipulate `unit_value_t` types at compile-time, such as `unit_value_add<>`, `unit_value_sqrt<>`, etc.
 	  *				Compile-time manipulators can be chained together, e.g. `unit_value_sqrt<unit_value_add<unit_value_power<a, 2>, unit_value_power<b, 2>>>` to
 	  *				represent `c = sqrt(a^2 + b^2).
