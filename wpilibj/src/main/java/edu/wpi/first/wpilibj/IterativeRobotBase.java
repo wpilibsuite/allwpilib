@@ -265,7 +265,7 @@ public abstract class IterativeRobotBase extends RobotBase {
   }
 
   /**
-   * Starts logging added epochs to the data log.
+   * Starts logging loop timings to the data log.
    *
    * <p>This will log the execution time of method calls in the robot loop; methods like robot
    * periodic and init methods, various NT updates (SmartDashboard.update(),

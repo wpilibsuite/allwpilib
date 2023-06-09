@@ -206,7 +206,7 @@ class IterativeRobotBase : public RobotBase {
   virtual void TestExit();
 
   /**
-   * Starts publishing added epochs to NetworkTables.
+   * Starts publishing loop timings to NetworkTables.
    *
    * This will publish the execution time of method calls in the robot loop;
    * methods like robot periodic and init methods, various NT
@@ -217,7 +217,7 @@ class IterativeRobotBase : public RobotBase {
   void PublishToNetworkTables(std::string_view topicName);
 
   /**
-   * Starts logging added epochs to the data log.
+   * Starts logging loop timings to the data log.
    *
    * This will publish the execution time of method calls in the robot loop;
    * methods like robot periodic and init methods, various NT

@@ -72,7 +72,6 @@ class CommandScheduler final : public wpi::Sendable,
   /**
    * Starts logging loop timings to the data log.
    *
-   * <p>
    * This will log how long it takes for methods in the command-based
    * framework to execute; periodic methods in subsystems, execute methods in
    * commands, etc.
