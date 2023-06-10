@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:53:50 -0400
-Subject: [PATCH 08/30] Remove format_provider
+Subject: [PATCH 08/29] Remove format_provider
 
 ---
  llvm/include/llvm/Support/Chrono.h      | 109 ------------------------
@@ -137,10 +137,10 @@ index a7dea19d9193bcff4bc6b553b80a10b2bc7b64af..9f9a2b5cab270327898cee3f97d9ae7c
  
  #endif // LLVM_SUPPORT_CHRONO_H
 diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
-index 9a1dd7a6070c20609660bfc63db10a509e54fe2f..a25ca5b7b556fd9ccd08ad13a6ceae6bedbcb09e 100644
+index c8a94f46fab18dabc123fd709974138c8b0b0beb..0bf165c55921d7e09208a8fa8df7f9f5ad68d1e2 100644
 --- a/llvm/include/llvm/Support/raw_ostream.h
 +++ b/llvm/include/llvm/Support/raw_ostream.h
-@@ -28,12 +28,6 @@
+@@ -27,12 +27,6 @@
  
  namespace llvm {
  
@@ -150,7 +150,7 @@ index 9a1dd7a6070c20609660bfc63db10a509e54fe2f..a25ca5b7b556fd9ccd08ad13a6ceae6b
 -class FormattedString;
 -class FormattedNumber;
 -class FormattedBytes;
- template <class T> class LLVM_NODISCARD Expected;
+ template <class T> class [[nodiscard]] Expected;
  
  namespace sys {
 diff --git a/llvm/unittests/Support/Chrono.cpp b/llvm/unittests/Support/Chrono.cpp

@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 13:48:59 -0400
-Subject: [PATCH 12/30] Add vectors to raw_ostream
+Subject: [PATCH 12/29] Add vectors to raw_ostream
 
 ---
  llvm/include/llvm/Support/raw_ostream.h | 115 ++++++++++++++++++++++++
@@ -9,18 +9,18 @@ Subject: [PATCH 12/30] Add vectors to raw_ostream
  2 files changed, 162 insertions(+)
 
 diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
-index d4521c8e285f3fc404d27a6c528c410121c71f83..bf5630ab549d39cedcdaac80672c5122883e125b 100644
+index 429d1dca24942d16e5c3a551035c0d459e7c5c00..d656123867f331b32463f2da9e637892e0e39930 100644
 --- a/llvm/include/llvm/Support/raw_ostream.h
 +++ b/llvm/include/llvm/Support/raw_ostream.h
-@@ -25,6 +25,7 @@
- #endif
+@@ -24,6 +24,7 @@
+ #include <string_view>
  #include <system_error>
  #include <type_traits>
 +#include <vector>
  
  namespace llvm {
  
-@@ -248,12 +249,24 @@ public:
+@@ -261,12 +262,24 @@ public:
      return write(Str.data(), Str.size());
    }
  
@@ -45,7 +45,7 @@ index d4521c8e285f3fc404d27a6c528c410121c71f83..bf5630ab549d39cedcdaac80672c5122
  
    /// indent - Insert 'NumSpaces' spaces.
    raw_ostream &indent(unsigned NumSpaces);
-@@ -604,6 +617,108 @@ public:
+@@ -617,6 +630,108 @@ public:
    }
  };
  
@@ -155,10 +155,10 @@ index d4521c8e285f3fc404d27a6c528c410121c71f83..bf5630ab549d39cedcdaac80672c5122
  class raw_null_ostream : public raw_pwrite_stream {
    /// See raw_ostream::write_impl.
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index 875eda7ba440f2ae64dc32ebb0502ad3ad8d2c74..36faf744cf6c429917a793a363a7d3f22a6d7e67 100644
+index 76c32155b4296fbbf3f4b164cd58d63f472ccd5e..dcdfdfd7a8e3fcc4019538a4fc9e158aeda0a8b8 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
-@@ -658,6 +658,53 @@ void raw_svector_ostream::pwrite_impl(const char *Ptr, size_t Size,
+@@ -670,6 +670,53 @@ void raw_svector_ostream::pwrite_impl(const char *Ptr, size_t Size,
    memcpy(OS.data() + Offset, Ptr, Size);
  }
  
