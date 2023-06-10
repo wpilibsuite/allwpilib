@@ -265,6 +265,7 @@ model {
                                 run.dependsOn it.tasks.install
                                 run.systemProperty 'java.library.path', filePath
                                 run.environment 'LD_LIBRARY_PATH', filePath
+                                run.environment 'DYLD_LIBRARY_PATH', filePath
 
                                 def installTask = it.tasks.install
 
