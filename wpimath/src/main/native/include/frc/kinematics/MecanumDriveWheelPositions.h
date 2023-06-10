@@ -11,7 +11,7 @@
 
 namespace frc {
 /**
- * Represents the wheel speeds for a mecanum drive drivetrain.
+ * Represents the wheel positions for a mecanum drive drivetrain.
  */
 struct WPILIB_DLLEXPORT MecanumDriveWheelPositions {
   /**

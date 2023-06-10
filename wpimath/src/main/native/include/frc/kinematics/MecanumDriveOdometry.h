@@ -42,7 +42,7 @@ class WPILIB_DLLEXPORT MecanumDriveOdometry
       const Pose2d& initialPose = Pose2d{});
 
  private:
-  MecanumDriveKinematics m_kinematics;
+  MecanumDriveKinematics m_kinematicsImpl;
 };
 
 }  // namespace frc

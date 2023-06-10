@@ -21,10 +21,10 @@ template <typename T>
 class WPILIB_DLLEXPORT Kinematics {
  public:
   /**
-   * Performs forward kinematics to return the resulting from the given wheel
-   * deltas. This method is often used for odometry -- determining the robot's
-   * position on the field using changes in the distance driven by each wheel on
-   * the robot.
+   * Performs forward kinematics to return the resulting Twist2d from the given
+   * wheel deltas. This method is often used for odometry -- determining the
+   * robot's position on the field using changes in the distance driven by each
+   * wheel on the robot.
    *
    * @param wheelDeltas The distances driven by each wheel.
    *

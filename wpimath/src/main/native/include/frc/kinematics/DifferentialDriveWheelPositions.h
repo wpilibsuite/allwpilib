@@ -11,7 +11,7 @@
 
 namespace frc {
 /**
- * Represents the wheel speeds for a differential drive drivetrain.
+ * Represents the wheel positions for a differential drive drivetrain.
  */
 struct WPILIB_DLLEXPORT DifferentialDriveWheelPositions {
   /**
