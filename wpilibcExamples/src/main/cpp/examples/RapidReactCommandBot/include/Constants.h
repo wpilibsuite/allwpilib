@@ -6,10 +6,13 @@
 
 #include <numbers>
 
+#include <units/acceleration.h>
 #include <units/angle.h>
+#include <units/angular_acceleration.h>
 #include <units/angular_velocity.h>
 #include <units/length.h>
 #include <units/time.h>
+#include <units/velocity.h>
 #include <units/voltage.h>
 
 namespace DriveConstants {
@@ -28,6 +31,14 @@ constexpr units::meter_t kWheelDiameter = 6.0_in;
 constexpr double kEncoderDistancePerPulse =
     // Assumes the encoders are directly mounted on the wheel shafts
     ((kWheelDiameter * std::numbers::pi) / kEncoderCPR).value();
+
+constexpr auto kTrackwidth = 0.69_m;
+
+constexpr auto kv = 1.98 * 1_V / 1_mps;
+constexpr auto ka = 0.2 * 1_V / 1_mps_sq;
+
+constexpr auto kvAngular = 1.5 * 1_V / 1_mps;
+constexpr auto kaAngular = 0.3 * 1_V / 1_mps_sq;
 
 }  // namespace DriveConstants
 
@@ -58,12 +69,14 @@ constexpr auto kShooterTolerance = 50_tps;
 
 // These are not real PID gains, and will have to be tuned for your specific
 // robot.
-constexpr double kP = 1;
+constexpr double kP = 0.1;
 
 constexpr units::volt_t kS = 0.05_V;
 constexpr auto kV =
     // Should have value 12V at free speed...
     12.0_V / kShooterFree;
+
+constexpr auto kA = 1.0_V / 100_tr_per_s_sq;
 
 constexpr double kFeederSpeed = 0.5;
 }  // namespace ShooterConstants
@@ -75,5 +88,5 @@ constexpr int kDriverControllerPort = 0;
 namespace AutoConstants {
 constexpr units::second_t kTimeout = 3.0_s;
 constexpr units::meter_t kDriveDistance = 2.0_m;
-constexpr double kDriveSpeed = 0.5;
+constexpr double kDriveSpeed = 0.3;
 }  // namespace AutoConstants

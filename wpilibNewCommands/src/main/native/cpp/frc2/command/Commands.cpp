@@ -11,6 +11,7 @@
 #include "frc2/command/ParallelDeadlineGroup.h"
 #include "frc2/command/ParallelRaceGroup.h"
 #include "frc2/command/PrintCommand.h"
+#include "frc2/command/ProxyCommand.h"
 #include "frc2/command/RunCommand.h"
 #include "frc2/command/SequentialCommandGroup.h"
 #include "frc2/command/WaitCommand.h"
@@ -88,6 +89,10 @@ CommandPtr cmd::Wait(units::second_t duration) {
 
 CommandPtr cmd::WaitUntil(std::function<bool()> condition) {
   return WaitUntilCommand(condition).ToPtr();
+}
+
+CommandPtr cmd::Deferred(wpi::unique_function<CommandPtr()> supplier) {
+  return ProxyCommand(std::move(supplier)).ToPtr();
 }
 
 CommandPtr cmd::Either(CommandPtr&& onTrue, CommandPtr&& onFalse,
