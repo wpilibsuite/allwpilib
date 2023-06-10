@@ -4,6 +4,7 @@
 
 package edu.wpi.first.hal;
 
+/** REV Pneumatic Hub (PH) HAL JNI functions. */
 public class REVPHJNI extends JNIWrapper {
   public static final int COMPRESSOR_CONFIG_TYPE_DISABLED = 0;
   public static final int COMPRESSOR_CONFIG_TYPE_DIGITAL = 1;
