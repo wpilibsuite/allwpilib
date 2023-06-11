@@ -1,7 +1,7 @@
-From f35fcb2c40caceed14437e65131e9fe1cf94deac Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:53:50 -0400
-Subject: [PATCH 08/28] Remove format_provider
+Subject: [PATCH 08/29] Remove format_provider
 
 ---
  llvm/include/llvm/Support/Chrono.h      | 109 ------------------------
@@ -10,7 +10,7 @@ Subject: [PATCH 08/28] Remove format_provider
  3 files changed, 176 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/Chrono.h b/llvm/include/llvm/Support/Chrono.h
-index a7dea19d9..9f9a2b5ca 100644
+index a7dea19d9193bcff4bc6b553b80a10b2bc7b64af..9f9a2b5cab270327898cee3f97d9ae7cf77eb564 100644
 --- a/llvm/include/llvm/Support/Chrono.h
 +++ b/llvm/include/llvm/Support/Chrono.h
 @@ -10,7 +10,6 @@
@@ -137,7 +137,7 @@ index a7dea19d9..9f9a2b5ca 100644
  
  #endif // LLVM_SUPPORT_CHRONO_H
 diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
-index 9a1dd7a60..a25ca5b7b 100644
+index 9a1dd7a6070c20609660bfc63db10a509e54fe2f..a25ca5b7b556fd9ccd08ad13a6ceae6bedbcb09e 100644
 --- a/llvm/include/llvm/Support/raw_ostream.h
 +++ b/llvm/include/llvm/Support/raw_ostream.h
 @@ -28,12 +28,6 @@
@@ -154,7 +154,7 @@ index 9a1dd7a60..a25ca5b7b 100644
  
  namespace sys {
 diff --git a/llvm/unittests/Support/Chrono.cpp b/llvm/unittests/Support/Chrono.cpp
-index 9a08a5c1b..3c049de18 100644
+index 9a08a5c1bfdff409c2240b7d15727d32d6339399..3c049de18c0a80465f4b0a8c054df2602d5e9b1c 100644
 --- a/llvm/unittests/Support/Chrono.cpp
 +++ b/llvm/unittests/Support/Chrono.cpp
 @@ -30,37 +30,6 @@ TEST(Chrono, TimeTConversion) {

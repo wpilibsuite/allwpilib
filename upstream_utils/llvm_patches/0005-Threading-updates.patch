@@ -1,7 +1,7 @@
-From bc86b62f72cbb76a0911996f4b1c6ce476cd1fac Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:17:19 -0400
-Subject: [PATCH 05/28] Threading updates
+Subject: [PATCH 05/29] Threading updates
 
 - Remove guards for threads and exception
 - Prefer scope gaurd over lock gaurd
@@ -12,7 +12,7 @@ Subject: [PATCH 05/28] Threading updates
  3 files changed, 11 insertions(+), 43 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/Compiler.h b/llvm/include/llvm/Support/Compiler.h
-index f5d726ec8..ede1cb172 100644
+index f5d726ec8a2c4c39a31a6a557591a99a64caea3a..ede1cb1726f2d2dd89e588489e062368763a4b68 100644
 --- a/llvm/include/llvm/Support/Compiler.h
 +++ b/llvm/include/llvm/Support/Compiler.h
 @@ -540,7 +540,6 @@ void AnnotateIgnoreWritesEnd(const char *file, int line);
@@ -36,7 +36,7 @@ index f5d726ec8..ede1cb172 100644
  /// \macro LLVM_ENABLE_EXCEPTIONS
  /// Whether LLVM is built with exception support.
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index 8ae8fb8b4..89440b5ab 100644
+index 8ae8fb8b40079a5da59f4008b9dc8de258d8cb5a..89440b5ab872cbeb5e3fbebfa4550e67aea1486b 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
 @@ -44,7 +44,6 @@ static void *ErrorHandlerUserData = nullptr;
@@ -151,7 +151,7 @@ index 8ae8fb8b4..89440b5ab 100644
  void llvm::llvm_unreachable_internal(const char *msg, const char *file,
                                       unsigned line) {
 diff --git a/llvm/lib/Support/ManagedStatic.cpp b/llvm/lib/Support/ManagedStatic.cpp
-index a6ae67066..fc798b7ec 100644
+index a6ae67066ea0423334e8ee52106f220cd456e25e..fc798b7ec1b788e232c7374b9968dc71d4f506f0 100644
 --- a/llvm/lib/Support/ManagedStatic.cpp
 +++ b/llvm/lib/Support/ManagedStatic.cpp
 @@ -12,23 +12,23 @@

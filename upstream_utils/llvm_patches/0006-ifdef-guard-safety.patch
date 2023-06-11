@@ -1,7 +1,7 @@
-From 008e921f77933f475174d74a6b70309c6fbe0771 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:28:13 -0400
-Subject: [PATCH 06/28] \#ifdef guard safety
+Subject: [PATCH 06/29] \#ifdef guard safety
 
 Prevents redefinition if someone is pulling in real LLVM, since the macros are in global namespace
 ---
@@ -9,7 +9,7 @@ Prevents redefinition if someone is pulling in real LLVM, since the macros are i
  1 file changed, 50 insertions(+)
 
 diff --git a/llvm/include/llvm/Support/Compiler.h b/llvm/include/llvm/Support/Compiler.h
-index ede1cb172..8b8260b50 100644
+index ede1cb1726f2d2dd89e588489e062368763a4b68..8b8260b50504876d79bd94ae5b82763088bb74a8 100644
 --- a/llvm/include/llvm/Support/Compiler.h
 +++ b/llvm/include/llvm/Support/Compiler.h
 @@ -86,6 +86,7 @@

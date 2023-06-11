@@ -9,9 +9,13 @@
 #pragma warning(disable : 4521)
 #endif
 
+#include <concepts>
 #include <memory>
+#include <type_traits>
 #include <utility>
 #include <vector>
+
+#include <wpi/DecayedDerivedFrom.h>
 
 #include "frc2/command/CommandGroupBase.h"
 #include "frc2/command/CommandHelper.h"
@@ -40,11 +44,9 @@ class ParallelRaceGroup
    */
   explicit ParallelRaceGroup(std::vector<std::unique_ptr<Command>>&& commands);
 
-  template <class... Types,
-            typename = std::enable_if_t<std::conjunction_v<
-                std::is_base_of<Command, std::remove_reference_t<Types>>...>>>
-  explicit ParallelRaceGroup(Types&&... commands) {
-    AddCommands(std::forward<Types>(commands)...);
+  template <wpi::DecayedDerivedFrom<Command>... Commands>
+  explicit ParallelRaceGroup(Commands&&... commands) {
+    AddCommands(std::forward<Commands>(commands)...);
   }
 
   ParallelRaceGroup(ParallelRaceGroup&& other) = default;
@@ -55,11 +57,11 @@ class ParallelRaceGroup
   // Prevent template expansion from emulating copy ctor
   ParallelRaceGroup(ParallelRaceGroup&) = delete;
 
-  template <class... Types>
-  void AddCommands(Types&&... commands) {
+  template <wpi::DecayedDerivedFrom<Command>... Commands>
+  void AddCommands(Commands&&... commands) {
     std::vector<std::unique_ptr<Command>> foo;
-    ((void)foo.emplace_back(std::make_unique<std::remove_reference_t<Types>>(
-         std::forward<Types>(commands))),
+    ((void)foo.emplace_back(std::make_unique<std::decay_t<Commands>>(
+         std::forward<Commands>(commands))),
      ...);
     AddCommands(std::move(foo));
   }

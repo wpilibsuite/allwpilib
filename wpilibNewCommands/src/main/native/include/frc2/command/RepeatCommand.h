@@ -9,6 +9,7 @@
 #pragma warning(disable : 4521)
 #endif
 
+#include <concepts>
 #include <memory>
 #include <utility>
 
@@ -44,11 +45,11 @@ class RepeatCommand : public CommandHelper<CommandBase, RepeatCommand> {
    *
    * @param command the command to run repeatedly
    */
-  template <class T, typename = std::enable_if_t<std::is_base_of_v<
-                         Command, std::remove_reference_t<T>>>>
+  template <std::derived_from<Command> T>
+  // NOLINTNEXTLINE (bugprone-forwarding-reference-overload)
   explicit RepeatCommand(T&& command)
-      : RepeatCommand(std::make_unique<std::remove_reference_t<T>>(
-            std::forward<T>(command))) {}
+      : RepeatCommand(
+            std::make_unique<std::decay_t<T>>(std::forward<T>(command))) {}
 
   RepeatCommand(RepeatCommand&& other) = default;
 

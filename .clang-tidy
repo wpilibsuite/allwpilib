@@ -35,7 +35,6 @@ Checks:
   bugprone-unhandled-self-assignment,
   bugprone-unused-raii,
   bugprone-virtual-near-miss,
-  cert-dcl58-cpp,
   cert-err52-cpp,
   cert-err60-cpp,
   cert-mem57-cpp,

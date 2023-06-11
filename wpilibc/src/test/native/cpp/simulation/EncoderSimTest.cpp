@@ -5,6 +5,7 @@
 #include "frc/simulation/EncoderSim.h"  // NOLINT(build/include_order)
 
 #include <hal/HAL.h>
+#include <wpi/deprecated.h>
 
 #include "callback_helpers/TestCallbackHelpers.h"
 #include "frc/Encoder.h"

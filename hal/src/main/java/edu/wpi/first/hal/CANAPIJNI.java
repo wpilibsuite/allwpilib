@@ -11,6 +11,15 @@ package edu.wpi.first.hal;
  */
 public class CANAPIJNI extends JNIWrapper {
   /**
+   * Reads the current value of the millisecond-resolution timer that the CAN API functions use as a
+   * time base.
+   *
+   * @return Current value of timer used as a base time by the CAN API in milliseconds.
+   * @see "HAL_GetCANPacketBaseTime"
+   */
+  public static native long getCANPacketBaseTime();
+
+  /**
    * Initializes a CAN device.
    *
    * <p>These follow the FIRST standard CAN layout.

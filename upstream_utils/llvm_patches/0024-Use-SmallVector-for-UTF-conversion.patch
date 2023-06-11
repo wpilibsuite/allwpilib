@@ -1,7 +1,7 @@
-From f58b9bad86f61c35cc530ff113ccbb13415261c8 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Mon, 9 May 2022 00:04:30 -0400
-Subject: [PATCH 24/28] Use SmallVector for UTF conversion
+Subject: [PATCH 24/29] Use SmallVector for UTF conversion
 
 ---
  llvm/include/llvm/Support/ConvertUTF.h    |  6 +++---
@@ -10,7 +10,7 @@ Subject: [PATCH 24/28] Use SmallVector for UTF conversion
  3 files changed, 17 insertions(+), 17 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/ConvertUTF.h b/llvm/include/llvm/Support/ConvertUTF.h
-index b085c8a17..c82947006 100644
+index b085c8a179e8767a258f9feafc8d1111828f10b1..c82947006afb3f8b41c0369352de63fd62be574b 100644
 --- a/llvm/include/llvm/Support/ConvertUTF.h
 +++ b/llvm/include/llvm/Support/ConvertUTF.h
 @@ -213,7 +213,7 @@ bool ConvertUTF8toWide(const char *Source, std::wstring &Result);
@@ -41,7 +41,7 @@ index b085c8a17..c82947006 100644
  /**
   * Converts a UTF-8 string into a UTF-16 string with native endianness.
 diff --git a/llvm/lib/Support/ConvertUTFWrapper.cpp b/llvm/lib/Support/ConvertUTFWrapper.cpp
-index cff30f16c..d3689d92a 100644
+index cff30f16ca907959843dd58ff30f58ead333f17f..d3689d92a45a289aaca30c47790a5e46c484344c 100644
 --- a/llvm/lib/Support/ConvertUTFWrapper.cpp
 +++ b/llvm/lib/Support/ConvertUTFWrapper.cpp
 @@ -84,7 +84,7 @@ bool hasUTF16ByteOrderMark(span<const char> S) {
@@ -72,7 +72,7 @@ index cff30f16c..d3689d92a 100644
      const UTF8 *Start = reinterpret_cast<const UTF8 *>(Source.data());
      const UTF8 *End =
 diff --git a/llvm/unittests/Support/ConvertUTFTest.cpp b/llvm/unittests/Support/ConvertUTFTest.cpp
-index 2fee8ad5c..7d7650b1c 100644
+index 2fee8ad5c01294988457002517dcb8d983cac23d..7d7650b1c077af7baed2b408584e857602bc329a 100644
 --- a/llvm/unittests/Support/ConvertUTFTest.cpp
 +++ b/llvm/unittests/Support/ConvertUTFTest.cpp
 @@ -19,22 +19,22 @@ TEST(ConvertUTFTest, ConvertUTF16LittleEndianToUTF8String) {

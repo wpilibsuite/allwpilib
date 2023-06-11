@@ -76,7 +76,7 @@
 	#include <locale>
 	#include <string>
 #endif
-#if !defined(UNIT_LIB_DISABLE_FMT)
+#if __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
 	#include <locale>
 	#include <string>
 	#include <fmt/format.h>
@@ -176,7 +176,7 @@ namespace units
  * @param		abbrev - abbreviated unit name, e.g. 'm'
  * @note		When UNIT_LIB_ENABLE_IOSTREAM isn't defined, the macro does not generate any code
  */
-#if !defined(UNIT_LIB_DISABLE_FMT)
+#if __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
 	#define UNIT_ADD_IO(namespaceName, nameSingular, abbrev)\
 	}\
 	template <>\
@@ -463,13 +463,19 @@ namespace units
 	//----------------------------------
 
 	/**
+	 * @defgroup 	Units Unit API
+	*/
+
+	/**
 	 * @defgroup	UnitContainers Unit Containers
+	 * @ingroup		Units
 	 * @brief		Defines a series of classes which contain dimensioned values. Unit containers
 	 *				store a value, and support various arithmetic operations.
 	 */
 
 	/**
 	 * @defgroup	UnitTypes Unit Types
+	 * @ingroup		Units
 	 * @brief		Defines a series of classes which represent units. These types are tags used by
 	 *				the conversion function, to create compound units, or to create `unit_t` types.
 	 *				By themselves, they are not containers and have no stored value.
@@ -477,6 +483,7 @@ namespace units
 
 	/**
 	 * @defgroup	UnitManipulators Unit Manipulators
+	 * @ingroup		Units
 	 * @brief		Defines a series of classes used to manipulate unit types, such as `inverse<>`, `squared<>`, and metric prefixes.
 	 *				Unit manipulators can be chained together, e.g. `inverse<squared<pico<time::seconds>>>` to
 	 *				represent picoseconds^-2.
@@ -484,6 +491,7 @@ namespace units
 
 	 /**
 	  * @defgroup	CompileTimeUnitManipulators Compile-time Unit Manipulators
+	  * @ingroup	Units
 	  * @brief		Defines a series of classes used to manipulate `unit_value_t` types at compile-time, such as `unit_value_add<>`, `unit_value_sqrt<>`, etc.
 	  *				Compile-time manipulators can be chained together, e.g. `unit_value_sqrt<unit_value_add<unit_value_power<a, 2>, unit_value_power<b, 2>>>` to
 	  *				represent `c = sqrt(a^2 + b^2).
@@ -491,17 +499,20 @@ namespace units
 
 	 /**
 	 * @defgroup	UnitMath Unit Math
+	 * @ingroup		Units
 	 * @brief		Defines a collection of unit-enabled, strongly-typed versions of `<cmath>` functions.
 	 * @details		Includes most c++11 extensions.
 	 */
 
 	/**
 	 * @defgroup	Conversion Explicit Conversion
+	 * @ingroup		Units
 	 * @brief		Functions used to convert values of one logical type to another.
 	 */
 
 	/**
 	 * @defgroup	TypeTraits Type Traits
+	 * @ingroup		Units
 	 * @brief		Defines a series of classes to obtain unit type information at compile-time.
 	 */
 
@@ -2875,7 +2886,7 @@ namespace units
 	}
 #endif
 }
-#if !defined(UNIT_LIB_DISABLE_FMT)
+#if __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
 template <>
 struct fmt::formatter<units::dimensionless::dB_t> : fmt::formatter<double>
 {
@@ -3440,6 +3451,6 @@ namespace units::literals {}
 using namespace units::literals;
 #endif  // UNIT_HAS_LITERAL_SUPPORT
 
-#if !defined(UNIT_LIB_DISABLE_FMT)
-#include "frc/fmt/Units.h"
+#if __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
+#include "units/formatter.h"
 #endif

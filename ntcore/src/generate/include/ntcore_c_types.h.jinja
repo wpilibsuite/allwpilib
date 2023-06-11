@@ -15,7 +15,7 @@ extern "C" {
 {% for t in types %}
 /**
  * Timestamped {{ t.TypeName }}.
- * @ingroup ntcore_c_handle_api
+ * @ingroup ntcore_c_api
  */
 struct NT_Timestamped{{ t.TypeName }} {
   /**
@@ -42,7 +42,7 @@ struct NT_Timestamped{{ t.TypeName }} {
 
 /**
  * @defgroup ntcore_{{ t.TypeName }}_cfunc {{ t.TypeName }} Functions
- * @ingroup ntcore_c_handle_api
+ * @ingroup ntcore_c_api
  * @{
  */
 

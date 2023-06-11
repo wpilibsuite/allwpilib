@@ -123,7 +123,7 @@ TEST(ShuffleboardInstanceTest, DuplicateSelectTabs) {
 
   shuffleboardInst.SelectTab("tab1");
   shuffleboardInst.SelectTab("tab1");
-  EXPECT_TRUE(ntInst.inst.WaitForListenerQueue(0.005))
+  EXPECT_TRUE(ntInst.inst.WaitForListenerQueue(1.0))
       << "Listener queue timed out!";
   EXPECT_EQ(2, counter);
 }

@@ -38,6 +38,11 @@
 #include "mpack-config.h"
 #endif
 
+/**
+ * @defgroup mpack MPack
+ * MPack is a C implementation of an encoder and decoder for the MessagePack
+ * serialization format.
+ */
 
 /* mpack/mpack-platform.h.h */
 
@@ -62,7 +67,8 @@
 
 
 /**
- * @defgroup config Configuration Options
+ * @defgroup mpack_config Configuration Options
+ * @ingroup mpack
  *
  * Defines the MPack configuration options.
  *
@@ -1880,7 +1886,8 @@ MPACK_EXTERN_C_BEGIN
 
 
 /**
- * @defgroup common Tags and Common Elements
+ * @defgroup mpack_common Tags and Common Elements
+ * @ingroup mpack
  *
  * Contains types, constants and functions shared by both the encoding
  * and decoding portions of MPack.
@@ -3056,7 +3063,8 @@ struct mpack_track_t;
 #endif
 
 /**
- * @defgroup writer Write API
+ * @defgroup mpack_writer Write API
+ * @ingroup mpack
  *
  * The MPack Write API encodes structured data of a fixed (hardcoded) schema to MessagePack.
  *
@@ -4361,7 +4369,8 @@ struct mpack_track_t;
 #define MPACK_READER_SMALL_FRACTION_DENOMINATOR 32
 
 /**
- * @defgroup reader Reader API
+ * @defgroup mpack_reader Reader API
+ * @ingroup mpack
  *
  * The MPack Reader API contains functions for imperatively reading dynamically
  * typed data from a MessagePack stream.
@@ -5303,7 +5312,8 @@ MPACK_EXTERN_C_BEGIN
 #endif
 
 /**
- * @defgroup expect Expect API
+ * @defgroup mpack_expect Expect API
+ * @ingroup mpack
  *
  * The MPack Expect API allows you to easily read MessagePack data when you
  * expect it to follow a predefined schema.
@@ -6770,7 +6780,8 @@ MPACK_EXTERN_C_BEGIN
 #if MPACK_NODE
 
 /**
- * @defgroup node Node API
+ * @defgroup mpack_node Node API
+ * @ingroup mpack
  *
  * The MPack Node API allows you to parse a chunk of MessagePack into a
  * dynamically typed data structure, providing random access to the parsed

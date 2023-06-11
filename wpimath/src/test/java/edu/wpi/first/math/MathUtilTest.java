@@ -6,9 +6,14 @@ package edu.wpi.first.math;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import edu.wpi.first.wpilibj.UtilityClassTest;
 import org.junit.jupiter.api.Test;
 
-class MathUtilTest {
+class MathUtilTest extends UtilityClassTest<MathUtil> {
+  MathUtilTest() {
+    super(MathUtil.class);
+  }
+
   @Test
   void testApplyDeadbandUnityScale() {
     // < 0
