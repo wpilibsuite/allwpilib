@@ -257,6 +257,7 @@ public final class DataLogManager {
             }
             long length = file.length();
             if (file.delete()) {
+              DriverStation.reportWarning("DataLogManager: Deleted " + file.getName(), false);
               freeSpace += length;
               if (freeSpace >= kFreeSpaceThreshold) {
                 break;
@@ -266,6 +267,15 @@ public final class DataLogManager {
             }
           }
         }
+      } else if (freeSpace < 2 * kFreeSpaceThreshold) {
+        DriverStation.reportWarning(
+            "DataLogManager: Log storage device has "
+                + freeSpace / 1000000
+                + " MB of free space remaining! Logs will get deleted below "
+                + kFreeSpaceThreshold / 1000000
+                + " MB of free space."
+                + "Consider deleting logs off the storage device.",
+            false);
       }
     }
 

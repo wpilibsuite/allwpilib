@@ -4,6 +4,7 @@
 
 #include <stdint.h>
 
+#include <concepts>
 #include <span>
 #include <string_view>
 #include <vector>
@@ -99,12 +100,12 @@ static std::vector<uint8_t> EncodeServerBinary(const T& msgs) {
   std::vector<uint8_t> data;
   wpi::raw_uvector_ostream os{data};
   for (auto&& msg : msgs) {
-    if constexpr (std::is_same_v<typename T::value_type, net::ServerMessage>) {
+    if constexpr (std::same_as<typename T::value_type, net::ServerMessage>) {
       if (auto m = std::get_if<net::ServerValueMsg>(&msg.contents)) {
         net::WireEncodeBinary(os, m->topic, m->value.time(), m->value);
       }
-    } else if constexpr (std::is_same_v<typename T::value_type,
-                                        net::ClientMessage>) {
+    } else if constexpr (std::same_as<typename T::value_type,
+                                      net::ClientMessage>) {
       if (auto m = std::get_if<net::ClientValueMsg>(&msg.contents)) {
         net::WireEncodeBinary(os, Handle{m->pubHandle}.GetIndex(),
                               m->value.time(), m->value);

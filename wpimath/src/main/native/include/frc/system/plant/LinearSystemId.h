@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <concepts>
 #include <stdexcept>
 
 #include <wpi/SymbolExports.h>
@@ -76,9 +77,9 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * @param kA The acceleration gain, in volts/(unit/sec²).
    * @throws std::domain_error if kV <= 0 or kA <= 0.
    */
-  template <typename Distance, typename = std::enable_if_t<
-                                   std::is_same_v<units::meter, Distance> ||
-                                   std::is_same_v<units::radian, Distance>>>
+  template <typename Distance>
+    requires std::same_as<units::meter, Distance> ||
+             std::same_as<units::radian, Distance>
   static LinearSystem<1, 1, 1> IdentifyVelocitySystem(
       decltype(1_V / Velocity_t<Distance>(1)) kV,
       decltype(1_V / Acceleration_t<Distance>(1)) kA) {
@@ -117,9 +118,9 @@ class WPILIB_DLLEXPORT LinearSystemId {
    *
    * @throws std::domain_error if kV <= 0 or kA <= 0.
    */
-  template <typename Distance, typename = std::enable_if_t<
-                                   std::is_same_v<units::meter, Distance> ||
-                                   std::is_same_v<units::radian, Distance>>>
+  template <typename Distance>
+    requires std::same_as<units::meter, Distance> ||
+             std::same_as<units::radian, Distance>
   static LinearSystem<2, 1, 1> IdentifyPositionSystem(
       decltype(1_V / Velocity_t<Distance>(1)) kV,
       decltype(1_V / Acceleration_t<Distance>(1)) kA) {

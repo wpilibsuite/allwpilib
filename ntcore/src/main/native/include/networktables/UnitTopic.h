@@ -295,7 +295,8 @@ class UnitTopic final : public Topic {
    * @param options subscribe options
    * @return subscriber
    */
-  [[nodiscard]] SubscriberType Subscribe(
+  [[nodiscard]]
+  SubscriberType Subscribe(
       ParamType defaultValue,
       const PubSubOptions& options = kDefaultPubSubOptions);
 
@@ -315,7 +316,8 @@ class UnitTopic final : public Topic {
    * @param options subscribe options
    * @return subscriber
    */
-  [[nodiscard]] SubscriberType SubscribeEx(
+  [[nodiscard]]
+  SubscriberType SubscribeEx(
       std::string_view typeString, ParamType defaultValue,
       const PubSubOptions& options = kDefaultPubSubOptions);
 
@@ -334,8 +336,8 @@ class UnitTopic final : public Topic {
    * @param options publish options
    * @return publisher
    */
-  [[nodiscard]] PublisherType Publish(
-      const PubSubOptions& options = kDefaultPubSubOptions);
+  [[nodiscard]]
+  PublisherType Publish(const PubSubOptions& options = kDefaultPubSubOptions);
 
   /**
    * Create a new publisher to the topic, with type string and initial
@@ -355,9 +357,10 @@ class UnitTopic final : public Topic {
    * @param options publish options
    * @return publisher
    */
-  [[nodiscard]] PublisherType PublishEx(
-      std::string_view typeString, const wpi::json& properties,
-      const PubSubOptions& options = kDefaultPubSubOptions);
+  [[nodiscard]]
+  PublisherType PublishEx(std::string_view typeString,
+                          const wpi::json& properties,
+                          const PubSubOptions& options = kDefaultPubSubOptions);
 
   /**
    * Create a new entry for the topic.
@@ -379,9 +382,9 @@ class UnitTopic final : public Topic {
    * @param options publish and/or subscribe options
    * @return entry
    */
-  [[nodiscard]] EntryType GetEntry(
-      ParamType defaultValue,
-      const PubSubOptions& options = kDefaultPubSubOptions);
+  [[nodiscard]]
+  EntryType GetEntry(ParamType defaultValue,
+                     const PubSubOptions& options = kDefaultPubSubOptions);
 
   /**
    * Create a new entry for the topic, with specific type string.
@@ -404,9 +407,9 @@ class UnitTopic final : public Topic {
    * @param options publish and/or subscribe options
    * @return entry
    */
-  [[nodiscard]] EntryType GetEntryEx(
-      std::string_view typeString, ParamType defaultValue,
-      const PubSubOptions& options = kDefaultPubSubOptions);
+  [[nodiscard]]
+  EntryType GetEntryEx(std::string_view typeString, ParamType defaultValue,
+                       const PubSubOptions& options = kDefaultPubSubOptions);
 };
 
 }  // namespace nt

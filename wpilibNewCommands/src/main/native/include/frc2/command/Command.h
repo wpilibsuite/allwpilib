@@ -13,7 +13,6 @@
 #include <units/time.h>
 #include <wpi/Demangle.h>
 #include <wpi/SmallSet.h>
-#include <wpi/deprecated.h>
 
 #include "frc2/command/Subsystem.h"
 
@@ -124,7 +123,8 @@ class Command {
    * @param duration the timeout duration
    * @return the command with the timeout added
    */
-  [[nodiscard]] CommandPtr WithTimeout(units::second_t duration) &&;
+  [[nodiscard]]
+  CommandPtr WithTimeout(units::second_t duration) &&;
 
   /**
    * Decorates this command with an interrupt condition.  If the specified
@@ -135,7 +135,8 @@ class Command {
    * @param condition the interrupt condition
    * @return the command with the interrupt condition added
    */
-  [[nodiscard]] CommandPtr Until(std::function<bool()> condition) &&;
+  [[nodiscard]]
+  CommandPtr Until(std::function<bool()> condition) &&;
 
   /**
    * Decorates this command with a run condition.  If the specified condition
@@ -146,7 +147,8 @@ class Command {
    * @param condition the interrupt condition
    * @return the command with the interrupt condition added
    */
-  [[nodiscard]] CommandPtr OnlyWhile(std::function<bool()> condition) &&;
+  [[nodiscard]]
+  CommandPtr OnlyWhile(std::function<bool()> condition) &&;
 
   /**
    * Decorates this command with an interrupt condition.  If the specified
@@ -158,8 +160,8 @@ class Command {
    * @return the command with the interrupt condition added
    * @deprecated Replace with Until()
    */
-  WPI_DEPRECATED("Replace with Until()")
-  [[nodiscard]] CommandPtr WithInterrupt(std::function<bool()> condition) &&;
+  [[deprecated("Replace with Until()")]] [[nodiscard]]
+  CommandPtr WithInterrupt(std::function<bool()> condition) &&;
 
   /**
    * Decorates this command with a runnable to run before this command starts.
@@ -168,9 +170,9 @@ class Command {
    * @param requirements the required subsystems
    * @return the decorated command
    */
-  [[nodiscard]] CommandPtr BeforeStarting(
-      std::function<void()> toRun,
-      std::initializer_list<Subsystem*> requirements) &&;
+  [[nodiscard]]
+  CommandPtr BeforeStarting(std::function<void()> toRun,
+                            std::initializer_list<Subsystem*> requirements) &&;
 
   /**
    * Decorates this command with a runnable to run before this command starts.
@@ -179,9 +181,9 @@ class Command {
    * @param requirements the required subsystems
    * @return the decorated command
    */
-  [[nodiscard]] CommandPtr BeforeStarting(
-      std::function<void()> toRun,
-      std::span<Subsystem* const> requirements = {}) &&;
+  [[nodiscard]]
+  CommandPtr BeforeStarting(std::function<void()> toRun,
+                            std::span<Subsystem* const> requirements = {}) &&;
 
   /**
    * Decorates this command with a runnable to run after the command finishes.
@@ -190,9 +192,9 @@ class Command {
    * @param requirements the required subsystems
    * @return the decorated command
    */
-  [[nodiscard]] CommandPtr AndThen(
-      std::function<void()> toRun,
-      std::initializer_list<Subsystem*> requirements) &&;
+  [[nodiscard]]
+  CommandPtr AndThen(std::function<void()> toRun,
+                     std::initializer_list<Subsystem*> requirements) &&;
 
   /**
    * Decorates this command with a runnable to run after the command finishes.
@@ -201,9 +203,9 @@ class Command {
    * @param requirements the required subsystems
    * @return the decorated command
    */
-  [[nodiscard]] CommandPtr AndThen(
-      std::function<void()> toRun,
-      std::span<Subsystem* const> requirements = {}) &&;
+  [[nodiscard]]
+  CommandPtr AndThen(std::function<void()> toRun,
+                     std::span<Subsystem* const> requirements = {}) &&;
 
   /**
    * Decorates this command to run perpetually, ignoring its ordinary end
@@ -216,13 +218,13 @@ valid. This was unsafe/undefined behavior from the start, and RepeatCommand
 provides an easy way to achieve similar end results with slightly different (and
 safe) semantics.
    */
-  WPI_DEPRECATED(
+  [[deprecated(
       "PerpetualCommand violates the assumption that execute() doesn't get "
       "called after isFinished() returns true -- an assumption that should be "
       "valid."
       "This was unsafe/undefined behavior from the start, and RepeatCommand "
       "provides an easy way to achieve similar end results with slightly "
-      "different (and safe) semantics.")
+      "different (and safe) semantics.")]]
   PerpetualCommand Perpetually() &&;
 
   /**
@@ -231,7 +233,8 @@ safe) semantics.
    *
    * @return the decorated command
    */
-  [[nodiscard]] CommandPtr Repeatedly() &&;
+  [[nodiscard]]
+  CommandPtr Repeatedly() &&;
 
   /**
    * Decorates this command to run "by proxy" by wrapping it in a
@@ -243,7 +246,8 @@ safe) semantics.
    *
    * @return the decorated command
    */
-  [[nodiscard]] CommandPtr AsProxy() &&;
+  [[nodiscard]]
+  CommandPtr AsProxy() &&;
 
   /**
    * Decorates this command to only run if this condition is not met. If the
@@ -254,7 +258,8 @@ safe) semantics.
    * @param condition the condition that will prevent the command from running
    * @return the decorated command
    */
-  [[nodiscard]] CommandPtr Unless(std::function<bool()> condition) &&;
+  [[nodiscard]]
+  CommandPtr Unless(std::function<bool()> condition) &&;
 
   /**
    * Decorates this command to only run if this condition is met. If the command
@@ -265,7 +270,8 @@ safe) semantics.
    * @param condition the condition that will allow the command to run
    * @return the decorated command
    */
-  [[nodiscard]] CommandPtr OnlyIf(std::function<bool()> condition) &&;
+  [[nodiscard]]
+  CommandPtr OnlyIf(std::function<bool()> condition) &&;
 
   /**
    * Decorates this command to run or stop when disabled.
@@ -273,7 +279,8 @@ safe) semantics.
    * @param doesRunWhenDisabled true to run when disabled.
    * @return the decorated command
    */
-  [[nodiscard]] CommandPtr IgnoringDisable(bool doesRunWhenDisabled) &&;
+  [[nodiscard]]
+  CommandPtr IgnoringDisable(bool doesRunWhenDisabled) &&;
 
   /**
    * Decorates this command to run or stop when disabled.
@@ -281,7 +288,8 @@ safe) semantics.
    * @param interruptBehavior true to run when disabled.
    * @return the decorated command
    */
-  [[nodiscard]] CommandPtr WithInterruptBehavior(
+  [[nodiscard]]
+  CommandPtr WithInterruptBehavior(
       Command::InterruptionBehavior interruptBehavior) &&;
 
   /**
@@ -292,7 +300,8 @@ safe) semantics.
    * command was interrupted.
    * @return the decorated command
    */
-  [[nodiscard]] CommandPtr FinallyDo(std::function<void(bool)> end) &&;
+  [[nodiscard]]
+  CommandPtr FinallyDo(std::function<void(bool)> end) &&;
 
   /**
    * Decorates this command with a lambda to call on interrupt, following the
@@ -301,7 +310,8 @@ safe) semantics.
    * @param handler a lambda to run when the command is interrupted
    * @return the decorated command
    */
-  [[nodiscard]] CommandPtr HandleInterrupt(std::function<void()> handler) &&;
+  [[nodiscard]]
+  CommandPtr HandleInterrupt(std::function<void()> handler) &&;
 
   /**
    * Decorates this Command with a name.
@@ -309,7 +319,8 @@ safe) semantics.
    * @param name name
    * @return the decorated Command
    */
-  [[nodiscard]] CommandPtr WithName(std::string_view name) &&;
+  [[nodiscard]]
+  CommandPtr WithName(std::string_view name) &&;
 
   /**
    * Schedules this command.
@@ -360,7 +371,7 @@ safe) semantics.
    *
    * @deprecated Moved to IsComposed()
    */
-  WPI_DEPRECATED("Moved to IsComposed()")
+  [[deprecated("Moved to IsComposed()")]]
   bool IsGrouped() const;
 
   /**
@@ -370,7 +381,7 @@ safe) semantics.
    *
    * @deprecated Moved to SetComposed()
    */
-  WPI_DEPRECATED("Moved to SetComposed()")
+  [[deprecated("Moved to SetComposed()")]]
   void SetGrouped(bool grouped);
 
   /**

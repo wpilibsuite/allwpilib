@@ -37,7 +37,7 @@ namespace {
  */
 bool IsStabilizable(const Eigen::Ref<const Eigen::MatrixXd>& A,
                     const Eigen::Ref<const Eigen::MatrixXd>& B) {
-  Eigen::EigenSolver<Eigen::MatrixXd> es{A};
+  Eigen::EigenSolver<Eigen::MatrixXd> es{A, false};
 
   for (int i = 0; i < A.rows(); ++i) {
     if (es.eigenvalues()[i].real() * es.eigenvalues()[i].real() +
@@ -81,7 +81,7 @@ bool IsDetectable(const Eigen::Ref<const Eigen::MatrixXd>& A,
  * @param A The matrix.
  */
 bool IsPositiveSemidefinite(const Eigen::Ref<const Eigen::MatrixXd>& A) {
-  Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> es{A};
+  Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> es{A, Eigen::EigenvaluesOnly};
   for (int i = 0; i < A.rows(); ++i) {
     if (es.eigenvalues()[i] < 0) {
       return false;
@@ -97,7 +97,7 @@ bool IsPositiveSemidefinite(const Eigen::Ref<const Eigen::MatrixXd>& A) {
  * @param A The matrix.
  */
 bool IsPositiveDefinite(const Eigen::Ref<const Eigen::MatrixXd>& A) {
-  Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> es{A};
+  Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> es{A, Eigen::EigenvaluesOnly};
   for (int i = 0; i < A.rows(); ++i) {
     if (es.eigenvalues()[i] <= 0) {
       return false;
