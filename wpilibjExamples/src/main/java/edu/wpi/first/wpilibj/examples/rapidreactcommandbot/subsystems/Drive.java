@@ -10,10 +10,10 @@ import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.Constants.DriveConsta
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import java.util.function.DoubleSupplier;
 
-public class Drive extends SubsystemBase {
+public class Drive extends Subsystem {
   // The motors on the left side of the drive.
   private final MotorControllerGroup m_leftMotors =
       new MotorControllerGroup(
