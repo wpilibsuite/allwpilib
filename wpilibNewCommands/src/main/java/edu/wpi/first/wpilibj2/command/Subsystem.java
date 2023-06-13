@@ -91,6 +91,42 @@ public class Subsystem implements Sendable {
   }
 
   /**
+   * Gets the name of this Subsystem.
+   *
+   * @return Name
+   */
+  public String getName() {
+    return SendableRegistry.getName(this);
+  }
+
+  /**
+   * Sets the name of this Subsystem.
+   *
+   * @param name name
+   */
+  public void setName(String name) {
+    SendableRegistry.setName(this, name);
+  }
+
+  /**
+   * Gets the subsystem name of this Subsystem.
+   *
+   * @return Subsystem name
+   */
+  public String getSubsystem() {
+    return SendableRegistry.getSubsystem(this);
+  }
+
+  /**
+   * Sets the subsystem name of this Subsystem.
+   *
+   * @param subsystem subsystem name
+   */
+  public void setSubsystem(String subsystem) {
+    SendableRegistry.setSubsystem(this, subsystem);
+  }
+
+  /**
    * Registers this subsystem with the {@link CommandScheduler}, allowing its {@link
    * Subsystem#periodic()} method to be called when the scheduler runs.
    */
@@ -144,42 +180,6 @@ public class Subsystem implements Sendable {
    */
   public Command runEnd(Runnable run, Runnable end) {
     return Commands.runEnd(run, end, this);
-  }
-
-  /**
-   * Gets the name of this Subsystem.
-   *
-   * @return Name
-   */
-  public String getName() {
-    return SendableRegistry.getName(this);
-  }
-
-  /**
-   * Sets the name of this Subsystem.
-   *
-   * @param name name
-   */
-  public void setName(String name) {
-    SendableRegistry.setName(this, name);
-  }
-
-  /**
-   * Gets the subsystem name of this Subsystem.
-   *
-   * @return Subsystem name
-   */
-  public String getSubsystem() {
-    return SendableRegistry.getSubsystem(this);
-  }
-
-  /**
-   * Sets the subsystem name of this Subsystem.
-   *
-   * @param subsystem subsystem name
-   */
-  public void setSubsystem(String subsystem) {
-    SendableRegistry.setSubsystem(this, subsystem);
   }
 
   /**
