@@ -37,7 +37,7 @@ const size_t invalid_index = std::numeric_limits<size_t>::max();
  * This class is provided by the NewCommands VendorDep
  */
 class SequentialCommandGroup
-    : public CommandHelper<CommandBase, SequentialCommandGroup> {
+    : public CommandHelper<Command, SequentialCommandGroup> {
  public:
   /**
    * Creates a new SequentialCommandGroup. The given commands will be run

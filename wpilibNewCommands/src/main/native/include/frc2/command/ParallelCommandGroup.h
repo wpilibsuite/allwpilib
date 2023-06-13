@@ -33,7 +33,7 @@ namespace frc2 {
  * This class is provided by the NewCommands VendorDep
  */
 class ParallelCommandGroup
-    : public CommandHelper<CommandBase, ParallelCommandGroup> {
+    : public CommandHelper<Command, ParallelCommandGroup> {
  public:
   /**
    * Creates a new ParallelCommandGroup. The given commands will be executed

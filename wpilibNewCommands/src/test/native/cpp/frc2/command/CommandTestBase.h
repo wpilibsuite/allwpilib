@@ -32,7 +32,7 @@ class TestSubsystem : public SubsystemBase {
 /**
  * NOTE: Moving mock objects causes EXPECT_CALL to not work correctly!
  */
-class MockCommand : public CommandHelper<CommandBase, MockCommand> {
+class MockCommand : public CommandHelper<Command, MockCommand> {
  public:
   MOCK_CONST_METHOD0(GetRequirements, wpi::SmallSet<Subsystem*, 4>());
   MOCK_METHOD0(IsFinished, bool());

@@ -13,7 +13,7 @@
 #include <utility>
 #include <vector>
 
-#include "frc2/command/CommandBase.h"
+#include "frc2/command/Command.h"
 
 namespace frc2 {
 /**
@@ -28,7 +28,7 @@ namespace frc2 {
  */
 class CommandPtr final {
  public:
-  explicit CommandPtr(std::unique_ptr<CommandBase>&& command)
+  explicit CommandPtr(std::unique_ptr<Command>&& command)
       : m_ptr(std::move(command)) {}
 
   template <std::derived_from<Command> T>
@@ -269,15 +269,15 @@ class CommandPtr final {
   /**
    * Get a raw pointer to the held command.
    */
-  CommandBase* get() const&;
+  Command* get() const&;
 
   // Prevent calls on a temporary, as the returned pointer would be invalid
-  CommandBase* get() && = delete;
+  Command* get() && = delete;
 
   /**
    * Convert to the underlying unique_ptr.
    */
-  std::unique_ptr<CommandBase> Unwrap() &&;
+  std::unique_ptr<Command> Unwrap() &&;
 
   /**
    * Schedules this command.
@@ -336,7 +336,7 @@ class CommandPtr final {
       std::vector<CommandPtr>&& vec);
 
  private:
-  std::unique_ptr<CommandBase> m_ptr;
+  std::unique_ptr<Command> m_ptr;
   void AssertValid() const;
 };
 

@@ -30,7 +30,7 @@ bool WaitCommand::RunsWhenDisabled() const {
 }
 
 void WaitCommand::InitSendable(wpi::SendableBuilder& builder) {
-  CommandBase::InitSendable(builder);
+  Command::InitSendable(builder);
   builder.AddDoubleProperty(
       "duration", [this] { return m_duration.value(); }, nullptr);
 }
