@@ -93,7 +93,7 @@ public interface Subsystem {
    * @return the command
    * @see InstantCommand
    */
-  default CommandBase runOnce(Runnable action) {
+  default Command runOnce(Runnable action) {
     return Commands.runOnce(action, this);
   }
 
@@ -105,7 +105,7 @@ public interface Subsystem {
    * @return the command
    * @see RunCommand
    */
-  default CommandBase run(Runnable action) {
+  default Command run(Runnable action) {
     return Commands.run(action, this);
   }
 
@@ -118,7 +118,7 @@ public interface Subsystem {
    * @return the command
    * @see StartEndCommand
    */
-  default CommandBase startEnd(Runnable start, Runnable end) {
+  default Command startEnd(Runnable start, Runnable end) {
     return Commands.startEnd(start, end, this);
   }
 
@@ -130,7 +130,7 @@ public interface Subsystem {
    * @param end the action to run on interrupt
    * @return the command
    */
-  default CommandBase runEnd(Runnable run, Runnable end) {
+  default Command runEnd(Runnable run, Runnable end) {
     return Commands.runEnd(run, end, this);
   }
 }

@@ -17,7 +17,7 @@ import java.util.function.Consumer;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public class FunctionalCommand extends CommandBase {
+public class FunctionalCommand extends Command {
   protected final Runnable m_onInit;
   protected final Runnable m_onExecute;
   protected final Consumer<Boolean> m_onEnd;

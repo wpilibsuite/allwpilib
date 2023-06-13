@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.subsystems.Intake;
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.subsystems.Pneumatics;
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.subsystems.Shooter;
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.subsystems.Storage;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -81,7 +81,7 @@ public class RapidReactCommandBot {
    *
    * <p>Scheduled during {@link Robot#autonomousInit()}.
    */
-  public CommandBase getAutonomousCommand() {
+  public Command getAutonomousCommand() {
     // Drive forward for 2 meters at half speed with a 3 second timeout
     return m_drive
         .driveDistanceCommand(AutoConstants.kDriveDistanceMeters, AutoConstants.kDriveSpeed)

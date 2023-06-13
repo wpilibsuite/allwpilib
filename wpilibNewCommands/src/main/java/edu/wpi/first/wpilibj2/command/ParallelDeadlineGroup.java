@@ -20,7 +20,7 @@ import java.util.Map;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public class ParallelDeadlineGroup extends CommandBase {
+public class ParallelDeadlineGroup extends Command {
   // maps commands in this composition to whether they are still running
   private final Map<Command, Boolean> m_commands = new HashMap<>();
   private boolean m_runWhenDisabled = true;
