@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <frc/simulation/SimHooks.h>
+#include <wpi/deprecated.h>
 
 #include "../CommandTestBase.h"
 #include "frc2/command/CommandPtr.h"

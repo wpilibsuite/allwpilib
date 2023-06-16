@@ -324,9 +324,9 @@ public class SwerveDrivePoseEstimator {
     /**
      * Constructs an Interpolation Record with the specified parameters.
      *
-     * @param pose The pose observed given the current sensor inputs and the previous pose.
+     * @param poseMeters The pose observed given the current sensor inputs and the previous pose.
      * @param gyro The current gyro angle.
-     * @param wheelPositions The distances and rotations measured at each wheel.
+     * @param modulePositions The distances and rotations measured at each wheel.
      */
     private InterpolationRecord(
         Pose2d poseMeters, Rotation2d gyro, SwerveModulePosition[] modulePositions) {

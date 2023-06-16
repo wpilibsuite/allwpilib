@@ -24,7 +24,7 @@ int main(int argc, char* argv[]) {
     std::perror("readlink");
     return 1;
   } else if (readlink_len == PATH_MAX) {
-    std::printf("Truncation occured\n");
+    std::printf("Truncation occurred\n");
     return 1;
   }
 

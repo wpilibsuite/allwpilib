@@ -484,6 +484,12 @@ bool DriverStation::IsTest() {
   return controlWord.test;
 }
 
+bool DriverStation::IsTestEnabled() {
+  HAL_ControlWord controlWord;
+  HAL_GetControlWord(&controlWord);
+  return controlWord.test && controlWord.enabled;
+}
+
 bool DriverStation::IsDSAttached() {
   HAL_ControlWord controlWord;
   HAL_GetControlWord(&controlWord);

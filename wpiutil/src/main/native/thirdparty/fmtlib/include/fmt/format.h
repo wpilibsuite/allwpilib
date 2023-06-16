@@ -922,8 +922,16 @@ FMT_CONSTEXPR20 void basic_memory_buffer<T, SIZE, Allocator>::grow(
   T* new_data =
       std::allocator_traits<Allocator>::allocate(alloc_, new_capacity);
   // The following code doesn't throw, so the raw pointer above doesn't leak.
+#if FMT_GCC_VERSION && FMT_GCC_VERSION >= 1300
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Warray-bounds"
+#  pragma GCC diagnostic ignored "-Wstringop-overflow"
+#endif
   std::uninitialized_copy(old_data, old_data + this->size(),
                           detail::make_checked(new_data, new_capacity));
+#if FMT_GCC_VERSION && FMT_GCC_VERSION >= 1300
+#  pragma GCC diagnostic pop
+#endif
   this->set(new_data, new_capacity);
   // deallocate must not throw according to the standard, but even if it does,
   // the buffer already uses the new storage and will deallocate it in
@@ -2804,7 +2812,14 @@ class bigint {
     auto size = other.bigits_.size();
     bigits_.resize(size);
     auto data = other.bigits_.data();
+#if FMT_GCC_VERSION && FMT_GCC_VERSION >= 1300
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Warray-bounds"
+#endif
     std::copy(data, data + size, make_checked(bigits_.data(), size));
+#if FMT_GCC_VERSION && FMT_GCC_VERSION >= 1300
+#  pragma GCC diagnostic pop
+#endif
     exp_ = other.exp_;
   }
 

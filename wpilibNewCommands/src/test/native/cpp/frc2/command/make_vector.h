@@ -34,8 +34,12 @@ struct all_constructible_and_convertible<T, First, Rest...>
           std::is_constructible_v<T, First> && std::is_convertible_v<First, T>,
           all_constructible_and_convertible<T, Rest...>, std::false_type> {};
 
-template <typename T, typename... Args,
-          typename std::enable_if_t<!std::is_trivially_copyable_v<T>, int> = 0>
+template <typename T, typename First, typename... Rest>
+inline constexpr bool all_constructible_and_convertible_v =
+    all_constructible_and_convertible<T, First, Rest...>::value;
+
+template <typename T, typename... Args>
+  requires(!std::is_trivially_copyable_v<T>)
 std::vector<T> make_vector_impl(Args&&... args) {
   std::vector<T> vec;
   vec.reserve(sizeof...(Args));
@@ -44,19 +48,17 @@ std::vector<T> make_vector_impl(Args&&... args) {
   return vec;
 }
 
-template <typename T, typename... Args,
-          typename std::enable_if_t<std::is_trivially_copyable_v<T>, int> = 0>
+template <typename T, typename... Args>
+  requires std::is_trivially_copyable_v<T>
 std::vector<T> make_vector_impl(Args&&... args) {
   return std::vector<T>{std::forward<Args>(args)...};
 }
 
 }  // namespace detail
 
-template <
-    typename T = void, typename... Args,
-    typename V = detail::vec_type_helper_t<T, Args...>,
-    typename std::enable_if_t<
-        detail::all_constructible_and_convertible<V, Args...>::value, int> = 0>
+template <typename T = void, typename... Args,
+          typename V = detail::vec_type_helper_t<T, Args...>>
+  requires detail::all_constructible_and_convertible_v<V, Args...>
 std::vector<V> make_vector(Args&&... args) {
   return detail::make_vector_impl<V>(std::forward<Args>(args)...);
 }

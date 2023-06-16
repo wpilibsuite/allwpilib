@@ -30,7 +30,7 @@ public class RobotContainer {
   private final Drivetrain m_drivetrain = new Drivetrain();
   private final OnBoardIO m_onboardIO = new OnBoardIO(ChannelMode.INPUT, ChannelMode.INPUT);
 
-  // Assumes a gamepad plugged into channnel 0
+  // Assumes a gamepad plugged into channel 0
   private final Joystick m_controller = new Joystick(0);
 
   // Create SmartDashboard chooser for autonomous routines

@@ -170,6 +170,7 @@ model {
                                 test.dependsOn it.tasks.install
                                 test.systemProperty 'java.library.path', filePath
                                 test.environment 'LD_LIBRARY_PATH', filePath
+                                test.environment 'DYLD_LIBRARY_PATH', filePath
                                 test.workingDir filePath
                             }
 
@@ -181,6 +182,7 @@ model {
                                     run.dependsOn it.tasks.install
                                     run.systemProperty 'java.library.path', filePath
                                     run.environment 'LD_LIBRARY_PATH', filePath
+                                    run.environment 'DYLD_LIBRARY_PATH', filePath
                                     run.workingDir filePath
                                     doFirst { doFirstTask(run) }
 
@@ -205,6 +207,7 @@ model {
                                     }
                                     testTask.systemProperty 'java.library.path', filePath
                                     testTask.environment 'LD_LIBRARY_PATH', filePath
+                                    testTask.environment 'DYLD_LIBRARY_PATH', filePath
                                     testTask.workingDir filePath
                                 }
                             }

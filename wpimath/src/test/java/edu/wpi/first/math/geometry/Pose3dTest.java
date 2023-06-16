@@ -6,6 +6,7 @@ package edu.wpi.first.math.geometry;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import edu.wpi.first.math.VecBuilder;
@@ -228,6 +229,44 @@ class Pose3dTest {
                   start_exp.getRotation().getQuaternion().getZ(),
                   end.getRotation().getQuaternion().getZ(),
                   eps));
+    }
+  }
+
+  @Test
+  void testTwistNaN() {
+    var initial_poses =
+        Arrays.asList(
+            new Pose3d(
+                new Translation3d(6.32, 4.12, 0.00),
+                new Rotation3d(
+                    new Quaternion(-0.9999999999999999, 0.0, 0.0, 1.9208309264993548E-8))),
+            new Pose3d(
+                new Translation3d(3.75, 2.95, 0.00),
+                new Rotation3d(
+                    new Quaternion(0.9999999999999793, 0.0, 0.0, 2.0352360299846772E-7))));
+    var final_poses =
+        Arrays.asList(
+            new Pose3d(
+                new Translation3d(6.33, 4.15, 0.00),
+                new Rotation3d(
+                    new Quaternion(-0.9999999999999999, 0.0, 0.0, 2.416890209039172E-8))),
+            new Pose3d(
+                new Translation3d(3.66, 2.93, 0.00),
+                new Rotation3d(
+                    new Quaternion(0.9999999999999782, 0.0, 0.0, 2.0859477994905617E-7))));
+
+    for (int i = 0; i < initial_poses.size(); i++) {
+      var start = initial_poses.get(i);
+      var end = final_poses.get(i);
+
+      var twist = start.log(end);
+      assertAll(
+          () -> assertFalse(((Double) twist.dx).isNaN()),
+          () -> assertFalse(((Double) twist.dy).isNaN()),
+          () -> assertFalse(((Double) twist.dz).isNaN()),
+          () -> assertFalse(((Double) twist.rx).isNaN()),
+          () -> assertFalse(((Double) twist.ry).isNaN()),
+          () -> assertFalse(((Double) twist.rz).isNaN()));
     }
   }
 }

@@ -1,7 +1,7 @@
-From 5db7e9f9370a5e04949846cc68eeb13e2c1db187 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 22:16:10 -0400
-Subject: [PATCH 13/28] Extra collections features
+Subject: [PATCH 13/29] Extra collections features
 
 ---
  llvm/include/llvm/ADT/StringMap.h | 103 +++++++++++++++++++++++++++++-
@@ -9,7 +9,7 @@ Subject: [PATCH 13/28] Extra collections features
  2 files changed, 110 insertions(+), 1 deletion(-)
 
 diff --git a/llvm/include/llvm/ADT/StringMap.h b/llvm/include/llvm/ADT/StringMap.h
-index 8747cdb35..16f13f048 100644
+index 8747cdb353a89952e242ccfa5ea8a3e68571d456..16f13f048415182e061de6ba439eb23ddddb3bdc 100644
 --- a/llvm/include/llvm/ADT/StringMap.h
 +++ b/llvm/include/llvm/ADT/StringMap.h
 @@ -42,7 +42,7 @@ protected:
@@ -142,7 +142,7 @@ index 8747cdb35..16f13f048 100644
  
  #endif // LLVM_ADT_STRINGMAP_H
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index 36faf744c..95152849c 100644
+index 36faf744cf6c429917a793a363a7d3f22a6d7e67..95152849cb920a61b4906f886f78d76e3fa2b22c 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
 @@ -76,6 +76,14 @@ constexpr raw_ostream::Colors raw_ostream::WHITE;

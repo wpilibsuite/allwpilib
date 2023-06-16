@@ -95,15 +95,16 @@ inline void ReportError(int32_t status, const char* fileName, int lineNumber,
  * @param[in]  args error message format args
  * @return runtime error object
  */
-[[nodiscard]] RuntimeError MakeErrorV(int32_t status, const char* fileName,
-                                      int lineNumber, const char* funcName,
-                                      fmt::string_view format,
-                                      fmt::format_args args);
+[[nodiscard]]
+RuntimeError MakeErrorV(int32_t status, const char* fileName, int lineNumber,
+                        const char* funcName, fmt::string_view format,
+                        fmt::format_args args);
 
 template <typename... Args>
-[[nodiscard]] inline RuntimeError MakeError(
-    int32_t status, const char* fileName, int lineNumber, const char* funcName,
-    fmt::string_view format, Args&&... args) {
+[[nodiscard]]
+inline RuntimeError MakeError(int32_t status, const char* fileName,
+                              int lineNumber, const char* funcName,
+                              fmt::string_view format, Args&&... args) {
   return MakeErrorV(status, fileName, lineNumber, funcName, format,
                     fmt::make_format_args(args...));
 }

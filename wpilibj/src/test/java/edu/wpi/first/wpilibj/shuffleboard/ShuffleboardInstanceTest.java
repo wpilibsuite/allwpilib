@@ -11,7 +11,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableEvent.Kind;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import java.util.EnumSet;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -120,5 +123,29 @@ class ShuffleboardInstanceTest {
     m_shuffleboardInstance.disableActuatorWidgets();
     controllable = controllableEntry.getValue().getBoolean();
     assertFalse(controllable, "The nested actuator widget should have been disabled");
+  }
+
+  @Test
+  void testDuplicateSelectTabs() {
+    int listener = 0;
+    AtomicInteger counter = new AtomicInteger();
+    try {
+      listener =
+          m_ntInstance.addListener(
+              m_ntInstance.getStringTopic("/Shuffleboard/.metadata/Selected"),
+              EnumSet.of(Kind.kValueAll, Kind.kImmediate),
+              event -> counter.incrementAndGet());
+
+      // There shouldn't be anything there
+      assertEquals(0, counter.get());
+
+      m_shuffleboardInstance.selectTab("tab1");
+      m_shuffleboardInstance.selectTab("tab1");
+      assertTrue(m_ntInstance.waitForListenerQueue(1.0), "Listener queue timed out!");
+      assertEquals(2, counter.get());
+
+    } finally {
+      m_ntInstance.removeListener(listener);
+    }
   }
 }

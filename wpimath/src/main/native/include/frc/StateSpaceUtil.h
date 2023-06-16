@@ -6,9 +6,9 @@
 
 #include <array>
 #include <cmath>
+#include <concepts>
 #include <limits>
 #include <random>
-#include <type_traits>
 
 #include <wpi/SymbolExports.h>
 #include <wpi/deprecated.h>
@@ -20,16 +20,6 @@
 
 namespace frc {
 namespace detail {
-
-template <int Rows, int Cols, typename Matrix, typename T, typename... Ts>
-void MatrixImpl(Matrix& result, T elem, Ts... elems) {
-  constexpr int count = Rows * Cols - (sizeof...(Ts) + 1);
-
-  result(count / Cols, count % Cols) = elem;
-  if constexpr (sizeof...(Ts) > 0) {
-    MatrixImpl<Rows, Cols>(result, elems...);
-  }
-}
 
 template <typename Matrix, typename T, typename... Ts>
 void CostMatrixImpl(Matrix& result, T elem, Ts... elems) {
@@ -66,7 +56,7 @@ void WhiteNoiseVectorImpl(Matrix& result, T elem, Ts... elems) {
 template <int States, int Inputs>
 bool IsStabilizableImpl(const Matrixd<States, States>& A,
                         const Matrixd<States, Inputs>& B) {
-  Eigen::EigenSolver<Matrixd<States, States>> es{A};
+  Eigen::EigenSolver<Matrixd<States, States>> es{A, false};
 
   for (int i = 0; i < States; ++i) {
     if (es.eigenvalues()[i].real() * es.eigenvalues()[i].real() +
@@ -106,8 +96,7 @@ bool IsStabilizableImpl(const Matrixd<States, States>& A,
  *                   of the control inputs from no actuation.
  * @return State excursion or control effort cost matrix.
  */
-template <typename... Ts, typename = std::enable_if_t<
-                              std::conjunction_v<std::is_same<double, Ts>...>>>
+template <std::same_as<double>... Ts>
 Matrixd<sizeof...(Ts), sizeof...(Ts)> MakeCostMatrix(Ts... tolerances) {
   Eigen::DiagonalMatrix<double, sizeof...(Ts)> result;
   detail::CostMatrixImpl(result.diagonal(), tolerances...);
@@ -126,8 +115,7 @@ Matrixd<sizeof...(Ts), sizeof...(Ts)> MakeCostMatrix(Ts... tolerances) {
  *                output measurement.
  * @return Process noise or measurement noise covariance matrix.
  */
-template <typename... Ts, typename = std::enable_if_t<
-                              std::conjunction_v<std::is_same<double, Ts>...>>>
+template <std::same_as<double>... Ts>
 Matrixd<sizeof...(Ts), sizeof...(Ts)> MakeCovMatrix(Ts... stdDevs) {
   Eigen::DiagonalMatrix<double, sizeof...(Ts)> result;
   detail::CovMatrixImpl(result.diagonal(), stdDevs...);
@@ -138,7 +126,8 @@ Matrixd<sizeof...(Ts), sizeof...(Ts)> MakeCovMatrix(Ts... stdDevs) {
  * Creates a cost matrix from the given vector for use with LQR.
  *
  * The cost matrix is constructed using Bryson's rule. The inverse square of
- * each element in the input is taken and placed on the cost matrix diagonal.
+ * each element in the input is placed on the cost matrix diagonal. If a
+ * tolerance is infinity, its cost matrix entry is set to zero.
  *
  * @param costs An array. For a Q matrix, its elements are the maximum allowed
  *              excursions of the states from the reference. For an R matrix,
@@ -151,7 +140,11 @@ Matrixd<N, N> MakeCostMatrix(const std::array<double, N>& costs) {
   Eigen::DiagonalMatrix<double, N> result;
   auto& diag = result.diagonal();
   for (size_t i = 0; i < N; ++i) {
-    diag(i) = 1.0 / std::pow(costs[i], 2);
+    if (costs[i] == std::numeric_limits<double>::infinity()) {
+      diag(i) = 0.0;
+    } else {
+      diag(i) = 1.0 / std::pow(costs[i], 2);
+    }
   }
   return result;
 }
@@ -178,8 +171,7 @@ Matrixd<N, N> MakeCovMatrix(const std::array<double, N>& stdDevs) {
   return result;
 }
 
-template <typename... Ts, typename = std::enable_if_t<
-                              std::conjunction_v<std::is_same<double, Ts>...>>>
+template <std::same_as<double>... Ts>
 Matrixd<sizeof...(Ts), 1> MakeWhiteNoiseVector(Ts... stdDevs) {
   Matrixd<sizeof...(Ts), 1> result;
   detail::WhiteNoiseVectorImpl(result, stdDevs...);
@@ -238,7 +230,7 @@ Vectord<4> PoseTo4dVector(const Pose2d& pose);
  *
  * (A, B) is stabilizable if and only if the uncontrollable eigenvalues of A, if
  * any, have absolute values less than one, where an eigenvalue is
- * uncontrollable if rank(λI - A, B) < n where n is the number of states.
+ * uncontrollable if rank([λI - A, B]) < n where n is the number of states.
  *
  * @tparam States The number of states.
  * @tparam Inputs The number of inputs.
@@ -256,7 +248,7 @@ bool IsStabilizable(const Matrixd<States, States>& A,
  *
  * (A, C) is detectable if and only if the unobservable eigenvalues of A, if
  * any, have absolute values less than one, where an eigenvalue is unobservable
- * if rank(λI - A; C) < n where n is the number of states.
+ * if rank([λI - A; C]) < n where n is the number of states.
  *
  * @tparam States The number of states.
  * @tparam Outputs The number of outputs.

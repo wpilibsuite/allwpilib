@@ -1,7 +1,7 @@
-From 1c3e8a6ff8d8b6c054141503c7318d69319d8d41 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 16:42:09 -0400
-Subject: [PATCH 18/28] Use std::is_trivially_copy_constructible
+Subject: [PATCH 18/29] Use std::is_trivially_copy_constructible
 
 ---
  llvm/include/llvm/ADT/PointerIntPair.h  | 12 ----
@@ -9,7 +9,7 @@ Subject: [PATCH 18/28] Use std::is_trivially_copy_constructible
  2 files changed, 2 insertions(+), 101 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/PointerIntPair.h b/llvm/include/llvm/ADT/PointerIntPair.h
-index b7ddf8855..a48fb904b 100644
+index b7ddf8855605d23ebe3d7587e4ccc694a72045ac..a48fb904bbf6fa70d8d81bffc34202978eccb71a 100644
 --- a/llvm/include/llvm/ADT/PointerIntPair.h
 +++ b/llvm/include/llvm/ADT/PointerIntPair.h
 @@ -128,18 +128,6 @@ public:
@@ -32,7 +32,7 @@ index b7ddf8855..a48fb904b 100644
  template <typename PointerT, unsigned IntBits, typename PtrTraits>
  struct PointerIntPairInfo {
 diff --git a/llvm/include/llvm/Support/type_traits.h b/llvm/include/llvm/Support/type_traits.h
-index 7b7d5d991..72a2e84ad 100644
+index 7b7d5d991f3f51862fad3267798737bc6ef8c845..72a2e84ad452a609d42ce7a43a3d26d118a08043 100644
 --- a/llvm/include/llvm/Support/type_traits.h
 +++ b/llvm/include/llvm/Support/type_traits.h
 @@ -92,98 +92,11 @@ union trivial_helper {

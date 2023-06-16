@@ -626,7 +626,6 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
    *
    * @param command The command to check
    * @return true if composed
-   * @throws IllegalArgumentException if the given commands have already been composed.
    */
   public boolean isComposed(Command command) {
     return getComposedCommands().contains(command);

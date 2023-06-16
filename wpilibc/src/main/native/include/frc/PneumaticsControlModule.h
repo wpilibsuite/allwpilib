@@ -118,7 +118,7 @@ class PneumaticsControlModule : public PneumaticsBase {
   /**
    * Returns whether the compressor has been disconnected since sticky faults
    * were last cleared. This fault is persistent and can be cleared by
-   * ClearAllStickyFaults()}
+   * ClearAllStickyFaults()
    *
    * @return True if the compressor has been disconnected since sticky faults
    * were last cleared, otherwise false.
@@ -126,7 +126,22 @@ class PneumaticsControlModule : public PneumaticsBase {
    */
   bool GetCompressorNotConnectedStickyFault() const;
 
+  /**
+   * Returns whether the solenoid is currently reporting a voltage fault.
+   *
+   * @return True if solenoid is reporting a fault, otherwise false.
+   * @see GetSolenoidVoltageStickyFault()
+   */
   bool GetSolenoidVoltageFault() const;
+
+  /**
+   * Returns whether the solenoid has reported a voltage fault since sticky
+   * faults were last cleared. This fault is persistent and can be cleared by
+   * ClearAllStickyFaults()
+   *
+   * @return True if solenoid is reporting a fault, otherwise false.
+   * @see GetSolenoidVoltageFault()
+   */
   bool GetSolenoidVoltageStickyFault() const;
 
   /** Clears all sticky faults on this device. */

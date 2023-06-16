@@ -7,10 +7,10 @@
 #include <stdint.h>
 
 #include <atomic>
+#include <concepts>
 #include <functional>
 #include <string_view>
 #include <thread>
-#include <type_traits>
 #include <utility>
 
 #include <hal/Types.h>
@@ -36,9 +36,8 @@ class Notifier {
    */
   explicit Notifier(std::function<void()> handler);
 
-  template <
-      typename Callable, typename Arg, typename... Args,
-      typename = std::enable_if_t<std::is_invocable_v<Callable, Arg, Args...>>>
+  template <typename Callable, typename Arg, typename... Args>
+    requires std::invocable<Callable, Arg, Args...>
   Notifier(Callable&& f, Arg&& arg, Args&&... args)
       : Notifier(std::bind(std::forward<Callable>(f), std::forward<Arg>(arg),
                            std::forward<Args>(args)...)) {}
@@ -59,6 +58,7 @@ class Notifier {
   explicit Notifier(int priority, std::function<void()> handler);
 
   template <typename Callable, typename Arg, typename... Args>
+    requires std::invocable<Callable, Arg, Args...>
   Notifier(int priority, Callable&& f, Arg&& arg, Args&&... args)
       : Notifier(priority,
                  std::bind(std::forward<Callable>(f), std::forward<Arg>(arg),

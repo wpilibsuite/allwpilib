@@ -31,7 +31,7 @@ extern "C" {
  * Expected to be called internally, not by users.
  *
  * @param library the library path
- * @return the succes state of the initialization
+ * @return the success state of the initialization
  */
 int HAL_LoadOneExtension(const char* library);
 
@@ -39,7 +39,7 @@ int HAL_LoadOneExtension(const char* library);
  * Loads any extra halsim libraries provided in the HALSIM_EXTENSIONS
  * environment variable.
  *
- * @return the succes state of the initialization
+ * @return the success state of the initialization
  */
 int HAL_LoadExtensions(void);
 

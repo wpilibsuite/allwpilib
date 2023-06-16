@@ -257,6 +257,7 @@ public final class DataLogManager {
             }
             long length = file.length();
             if (file.delete()) {
+              DriverStation.reportWarning("DataLogManager: Deleted " + file.getName(), false);
               freeSpace += length;
               if (freeSpace >= kFreeSpaceThreshold) {
                 break;
@@ -266,6 +267,15 @@ public final class DataLogManager {
             }
           }
         }
+      } else if (freeSpace < 2 * kFreeSpaceThreshold) {
+        DriverStation.reportWarning(
+            "DataLogManager: Log storage device has "
+                + freeSpace / 1000000
+                + " MB of free space remaining! Logs will get deleted below "
+                + kFreeSpaceThreshold / 1000000
+                + " MB of free space."
+                + "Consider deleting logs off the storage device.",
+            false);
       }
     }
 
@@ -316,7 +326,7 @@ public final class DataLogManager {
         } else {
           dsAttachCount = 0;
         }
-        if (dsAttachCount > 50) { // 1 second
+        if (dsAttachCount > 300) { // 6 seconds
           LocalDateTime now = LocalDateTime.now(m_utc);
           if (now.getYear() > 2000) {
             // assume local clock is now synchronized to DS, so rename based on
@@ -336,7 +346,7 @@ public final class DataLogManager {
         } else {
           fmsAttachCount = 0;
         }
-        if (fmsAttachCount > 100) { // 2 seconds
+        if (fmsAttachCount > 250) { // 5 seconds
           // match info comes through TCP, so we need to double-check we've
           // actually received it
           DriverStation.MatchType matchType = DriverStation.getMatchType();

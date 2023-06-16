@@ -211,16 +211,40 @@ public interface PneumaticsBase extends AutoCloseable {
    */
   void unreserveSolenoids(int mask);
 
+  /**
+   * Reserve the compressor.
+   *
+   * @return true if successful; false if compressor already reserved
+   */
   boolean reserveCompressor();
 
+  /** Unreserve the compressor. */
   void unreserveCompressor();
 
   @Override
   void close();
 
+  /**
+   * Create a solenoid object for the specified channel.
+   *
+   * @param channel solenoid channel
+   * @return Solenoid object
+   */
   Solenoid makeSolenoid(int channel);
 
+  /**
+   * Create a double solenoid object for the specified channels.
+   *
+   * @param forwardChannel solenoid channel for forward
+   * @param reverseChannel solenoid channel for reverse
+   * @return DoubleSolenoid object
+   */
   DoubleSolenoid makeDoubleSolenoid(int forwardChannel, int reverseChannel);
 
+  /**
+   * Create a compressor object.
+   *
+   * @return Compressor object
+   */
   Compressor makeCompressor();
 }

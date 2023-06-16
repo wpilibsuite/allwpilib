@@ -75,7 +75,7 @@ public class FakePotentiometerSource implements AutoCloseable {
     return voltage * (m_potMaxAngle / m_potMaxVoltage);
   }
 
-  /** Frees the resouce. */
+  /** Frees the resource. */
   @Override
   public void close() {
     if (m_initOutput) {

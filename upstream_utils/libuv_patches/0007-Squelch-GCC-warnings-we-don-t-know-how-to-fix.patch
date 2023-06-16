@@ -1,0 +1,46 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Tue, 17 May 2022 21:36:57 -0700
+Subject: [PATCH 07/10] Squelch GCC warnings we don't know how to fix
+
+---
+ src/queue.h | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/src/queue.h b/src/queue.h
+index ff3540a0a51c840d7ff5e6a3cea95f24c27b0812..c0d5efc187c78f7d60776447be492a9310c3b36c 100644
+--- a/src/queue.h
++++ b/src/queue.h
+@@ -58,6 +58,7 @@ typedef void *QUEUE[2];
+   }                                                                           \
+   while (0)
+ 
++#if defined(__GNUC__) && !defined(__clang__) && __GNUC__ >= 12
+ #define QUEUE_SPLIT(h, q, n)                                                  \
+   do {                                                                        \
+     QUEUE_PREV(n) = QUEUE_PREV(h);                                            \
+@@ -65,9 +66,24 @@ typedef void *QUEUE[2];
+     QUEUE_NEXT(n) = (q);                                                      \
+     QUEUE_PREV(h) = QUEUE_PREV(q);                                            \
+     QUEUE_PREV_NEXT(h) = (h);                                                 \
++    _Pragma("GCC diagnostic push")                                            \
++    _Pragma("GCC diagnostic ignored \"-Wdangling-pointer=\"")                 \
+     QUEUE_PREV(q) = (n);                                                      \
++    _Pragma("GCC diagnostic pop")                                             \
+   }                                                                           \
+   while (0)
++#else
++#define QUEUE_SPLIT(h, q, n)                                                  \
++  do {                                                                        \
++    QUEUE_PREV(n) = QUEUE_PREV(h);                                            \
++    QUEUE_PREV_NEXT(n) = (n);                                                 \
++    QUEUE_NEXT(n) = (q);                                                      \
++    QUEUE_PREV(h) = QUEUE_PREV(q);                                            \
++    QUEUE_PREV_NEXT(h) = (h);                                                 \
++    QUEUE_PREV(q) = (n);                                                      \
++  }                                                                           \
++  while (0)
++#endif  // defined(__GNUC__) && !defined(__clang__)
+ 
+ #define QUEUE_MOVE(h, n)                                                      \
+   do {                                                                        \

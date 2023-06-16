@@ -21,6 +21,10 @@ void Subsystem::SetDefaultCommand(CommandPtr&& defaultCommand) {
                                                     std::move(defaultCommand));
 }
 
+void Subsystem::RemoveDefaultCommand() {
+  CommandScheduler::GetInstance().RemoveDefaultCommand(this);
+}
+
 Command* Subsystem::GetDefaultCommand() const {
   return CommandScheduler::GetInstance().GetDefaultCommand(this);
 }

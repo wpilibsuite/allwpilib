@@ -79,7 +79,7 @@ extern "C" {
 /**
  * Signals in message Compressor_Config.
  *
- * Configures compressor to use digitial/analog sensors
+ * Configures compressor to use digital/analog sensors
  *
  * All signal values are as on the CAN bus.
  */
