@@ -98,7 +98,7 @@ class DoubleSolenoid : public wpi::Sendable,
    * If a solenoid is shorted, it is added to the DisabledList and disabled
    * until power cycle, or until faults are cleared.
    *
-   * @see ClearAllPCMStickyFaults()
+   * @see ClearAllStickyFaults()
    * @return If solenoid is disabled due to short.
    */
   bool IsFwdSolenoidDisabled() const;
@@ -109,7 +109,7 @@ class DoubleSolenoid : public wpi::Sendable,
    * If a solenoid is shorted, it is added to the DisabledList and disabled
    * until power cycle, or until faults are cleared.
    *
-   * @see ClearAllPCMStickyFaults()
+   * @see ClearAllStickyFaults()
    * @return If solenoid is disabled due to short.
    */
   bool IsRevSolenoidDisabled() const;
