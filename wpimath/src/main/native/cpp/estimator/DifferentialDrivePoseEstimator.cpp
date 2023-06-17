@@ -19,6 +19,5 @@ DifferentialDrivePoseEstimator::DifferentialDrivePoseEstimator(
     units::meter_t leftDistance, units::meter_t rightDistance,
     const Pose2d& initialPose, const wpi::array<double, 3>& stateStdDevs,
     const wpi::array<double, 3>& visionMeasurementStdDevs)
-    : PoseEstimator<DifferentialDriveWheelPositions>(
-          kinematics, m_odometryImpl, stateStdDevs, visionMeasurementStdDevs),
+    : PE(kinematics, m_odometryImpl, stateStdDevs, visionMeasurementStdDevs),
       m_odometryImpl{gyroAngle, leftDistance, rightDistance, initialPose} {}

@@ -27,6 +27,8 @@ namespace frc {
  */
 class WPILIB_DLLEXPORT MecanumDriveOdometry
     : public Odometry<MecanumDriveWheelPositions> {
+  using O = Odometry<MecanumDriveWheelPositions>;
+
  public:
   /**
    * Constructs a MecanumDriveOdometry object.

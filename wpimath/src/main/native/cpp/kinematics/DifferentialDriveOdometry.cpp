@@ -11,9 +11,8 @@ using namespace frc;
 DifferentialDriveOdometry::DifferentialDriveOdometry(
     const Rotation2d& gyroAngle, units::meter_t leftDistance,
     units::meter_t rightDistance, const Pose2d& initialPose)
-    : Odometry<DifferentialDriveWheelPositions>(m_kinematicsImpl, gyroAngle,
-                                                {leftDistance, rightDistance},
-                                                initialPose) {
+    : O(m_kinematicsImpl, gyroAngle, {leftDistance, rightDistance},
+        initialPose) {
   wpi::math::MathSharedStore::ReportUsage(
       wpi::math::MathUsageId::kOdometry_DifferentialDrive, 1);
 }
