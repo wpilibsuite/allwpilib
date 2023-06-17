@@ -32,8 +32,6 @@ namespace frc {
 template <size_t NumModules>
 class SwerveDriveOdometry
     : public Odometry<SwerveDriveWheelPositions<NumModules>> {
-  using O = Odometry<SwerveDriveWheelPositions<NumModules>>;
-
  public:
   /**
    * Constructs a SwerveDriveOdometry object.
@@ -62,7 +60,8 @@ class SwerveDriveOdometry
       const Rotation2d& gyroAngle,
       const wpi::array<SwerveModulePosition, NumModules>& modulePositions,
       const Pose2d& pose) {
-    O::ResetPosition(gyroAngle, {modulePositions}, pose);
+    Odometry<SwerveDriveWheelPositions<NumModules>>::ResetPosition(
+        gyroAngle, {modulePositions}, pose);
   }
 
   /**
@@ -81,7 +80,8 @@ class SwerveDriveOdometry
   const Pose2d& Update(
       const Rotation2d& gyroAngle,
       const wpi::array<SwerveModulePosition, NumModules>& modulePositions) {
-    return O::Update(gyroAngle, {modulePositions});
+    return Odometry<SwerveDriveWheelPositions<NumModules>>::Update(
+        gyroAngle, {modulePositions});
   }
 
  private:

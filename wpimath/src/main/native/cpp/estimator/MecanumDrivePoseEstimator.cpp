@@ -24,5 +24,6 @@ frc::MecanumDrivePoseEstimator::MecanumDrivePoseEstimator(
     const MecanumDriveWheelPositions& wheelPositions, const Pose2d& initialPose,
     const wpi::array<double, 3>& stateStdDevs,
     const wpi::array<double, 3>& visionMeasurementStdDevs)
-    : PE(kinematics, m_odometryImpl, stateStdDevs, visionMeasurementStdDevs),
+    : PoseEstimator<MecanumDriveWheelPositions>(
+          kinematics, m_odometryImpl, stateStdDevs, visionMeasurementStdDevs),
       m_odometryImpl(kinematics, gyroAngle, wheelPositions, initialPose) {}

@@ -32,8 +32,6 @@ namespace frc {
  */
 class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator
     : public PoseEstimator<DifferentialDriveWheelPositions> {
-  using PE = PoseEstimator<DifferentialDriveWheelPositions>;
-
  public:
   /**
    * Constructs a DifferentialDrivePoseEstimator with default standard
@@ -90,7 +88,8 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator
    */
   void ResetPosition(const Rotation2d& gyroAngle, units::meter_t leftDistance,
                      units::meter_t rightDistance, const Pose2d& pose) {
-    PE::ResetPosition(gyroAngle, {leftDistance, rightDistance}, pose);
+    PoseEstimator<DifferentialDriveWheelPositions>::ResetPosition(
+        gyroAngle, {leftDistance, rightDistance}, pose);
   }
 
   /**
@@ -105,7 +104,8 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator
    */
   Pose2d Update(const Rotation2d& gyroAngle, units::meter_t leftDistance,
                 units::meter_t rightDistance) {
-    return PE::Update(gyroAngle, {leftDistance, rightDistance});
+    return PoseEstimator<DifferentialDriveWheelPositions>::Update(
+        gyroAngle, {leftDistance, rightDistance});
   }
 
   /**
@@ -123,8 +123,8 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator
                         const Rotation2d& gyroAngle,
                         units::meter_t leftDistance,
                         units::meter_t rightDistance) {
-    return PE::UpdateWithTime(currentTime, gyroAngle,
-                              {leftDistance, rightDistance});
+    return PoseEstimator<DifferentialDriveWheelPositions>::UpdateWithTime(
+        currentTime, gyroAngle, {leftDistance, rightDistance});
   }
 
  private:
