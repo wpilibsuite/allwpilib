@@ -200,6 +200,15 @@ public class ProfiledPIDController implements Sendable {
   }
 
   /**
+   * Get the velocity and acceleration constraints for this controller.
+   *
+   * @return Velocity and acceleration constraints.
+   */
+  public TrapezoidProfile.Constraints getConstraints() {
+    return m_constraints;
+  }
+
+  /**
    * Returns the current setpoint of the ProfiledPIDController.
    *
    * @return The current setpoint.
