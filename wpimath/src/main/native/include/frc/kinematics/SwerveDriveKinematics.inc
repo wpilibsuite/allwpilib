@@ -19,7 +19,7 @@ SwerveDriveKinematics(ModuleTranslation, ModuleTranslations...)
 
 template <size_t NumModules>
 void SwerveDriveKinematics<NumModules>::ResetHeadings(
-    wpi::array<Rotation2d, NumModules>& moduleHeadings) {
+    wpi::array<Rotation2d, NumModules> moduleHeadings) {
   m_moduleHeadings = moduleHeadings;
 }
 
@@ -67,6 +67,7 @@ SwerveDriveKinematics<NumModules>::ToSwerveModuleStates(
     Rotation2d rotation{x.value(), y.value()};
 
     moduleStates[i] = {speed, rotation};
+    m_moduleHeadings[i] = rotation;
   }
 
   return moduleStates;

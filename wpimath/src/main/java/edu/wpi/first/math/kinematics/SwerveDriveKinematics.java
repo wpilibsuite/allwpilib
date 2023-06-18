@@ -89,10 +89,11 @@ public class SwerveDriveKinematics
 
   /**
    * Reset the internal swerve module headings.
-   * @param moduleHeadings The swerve module headings. The order of the module headings should be same as
-   * passed into the constructor of this class.
+   *
+   * @param moduleHeadings The swerve module headings. The order of the module headings should be
+   *     same as passed into the constructor of this class.
    */
-  public void resetHeadings(Rotation2d... moduleHeadings){
+  public void resetHeadings(Rotation2d... moduleHeadings) {
     m_moduleHeadings = moduleHeadings;
   }
 
@@ -119,9 +120,9 @@ public class SwerveDriveKinematics
    */
   public SwerveModuleState[] toSwerveModuleStates(
       ChassisSpeeds chassisSpeeds, Translation2d centerOfRotationMeters) {
-   var moduleStates = new SwerveModuleState[m_numModules];
+    var moduleStates = new SwerveModuleState[m_numModules];
 
-   if (chassisSpeeds.vxMetersPerSecond == 0.0
+    if (chassisSpeeds.vxMetersPerSecond == 0.0
         && chassisSpeeds.vyMetersPerSecond == 0.0
         && chassisSpeeds.omegaRadiansPerSecond == 0.0) {
       for (int i = 0; i < m_numModules; i++) {
