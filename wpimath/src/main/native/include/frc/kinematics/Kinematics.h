@@ -17,9 +17,32 @@ namespace frc {
  * Inverse kinematics converts a desired chassis speed into wheel speeds whereas
  * forward kinematics converts wheel speeds into chassis speed.
  */
-template <typename T>
+template <typename WheelSpeeds, typename WheelPositions>
 class WPILIB_DLLEXPORT Kinematics {
  public:
+  /**
+   * Performs forward kinematics to return the resulting chassis speed from the
+   * wheel speeds. This method is often used for odometry -- determining the
+   * robot's position on the field using data from the real-world speed of each
+   * wheel on the robot.
+   *
+   * @param wheelSpeeds The speeds of the wheels.
+   * @return The chassis speed.
+   */
+  virtual ChassisSpeeds ToChassisSpeeds(
+      const WheelSpeeds& wheelSpeeds) const = 0;
+
+  /**
+   * Performs inverse kinematics to return the wheel speeds from a desired
+   * chassis velocity. This method is often used to convert joystick values into
+   * wheel speeds.
+   *
+   * @param chassisSpeeds The desired chassis speed.
+   * @return The wheel speeds.
+   */
+  virtual WheelSpeeds ToWheelSpeeds(
+      const ChassisSpeeds& chassisSpeeds) const = 0;
+
   /**
    * Performs forward kinematics to return the resulting Twist2d from the given
    * wheel deltas. This method is often used for odometry -- determining the
@@ -30,6 +53,6 @@ class WPILIB_DLLEXPORT Kinematics {
    *
    * @return The resulting Twist2d in the robot's movement.
    */
-  virtual Twist2d ToTwist2d(const T& wheelDeltas) const = 0;
+  virtual Twist2d ToTwist2d(const WheelPositions& wheelDeltas) const = 0;
 };
 }  // namespace frc

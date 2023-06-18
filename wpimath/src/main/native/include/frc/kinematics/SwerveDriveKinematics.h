@@ -24,6 +24,10 @@
 #include "wpimath/MathShared.h"
 
 namespace frc {
+
+template <size_t NumModules>
+using SwerveDriveWheelSpeeds = wpi::array<SwerveModuleState, NumModules>;
+
 /**
  * Helper class that converts a chassis velocity (dx, dy, and dtheta components)
  * into individual module states (speed and angle).
@@ -48,7 +52,8 @@ namespace frc {
  */
 template <size_t NumModules>
 class SwerveDriveKinematics
-    : public Kinematics<SwerveDriveWheelPositions<NumModules>> {
+    : public Kinematics<SwerveDriveWheelSpeeds<NumModules>,
+                        SwerveDriveWheelPositions<NumModules>> {
  public:
   /**
    * Constructs a swerve drive kinematics object. This takes in a variable
@@ -137,6 +142,11 @@ class SwerveDriveKinematics
       const ChassisSpeeds& chassisSpeeds,
       const Translation2d& centerOfRotation = Translation2d{}) const;
 
+  SwerveDriveWheelSpeeds<NumModules> ToWheelSpeeds(
+      const ChassisSpeeds& chassisSpeeds) const override {
+    return ToSwerveModuleStates(chassisSpeeds);
+  }
+
   /**
    * Performs forward kinematics to return the resulting chassis state from the
    * given module states. This method is often used for odometry -- determining
@@ -168,8 +178,8 @@ class SwerveDriveKinematics
    *
    * @return The resulting chassis speed.
    */
-  ChassisSpeeds ToChassisSpeeds(
-      const wpi::array<SwerveModuleState, NumModules>& moduleStates) const;
+  ChassisSpeeds ToChassisSpeeds(const wpi::array<SwerveModuleState, NumModules>&
+                                    moduleStates) const override;
 
   /**
    * Performs forward kinematics to return the resulting Twist2d from the

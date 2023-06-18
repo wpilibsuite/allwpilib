@@ -29,7 +29,7 @@ namespace frc {
  * AddVisionMeasurement() can be called as infrequently as you want; if you
  * never call it, then this class will behave like regular encoder odometry.
  */
-template <WheelPositions T>
+template <typename WheelSpeeds, WheelPositions WheelPositions>
 class WPILIB_DLLEXPORT PoseEstimator {
  public:
   /**
@@ -46,7 +46,8 @@ class WPILIB_DLLEXPORT PoseEstimator {
    *     radians). Increase these numbers to trust the vision pose measurement
    *     less.
    */
-  PoseEstimator(Kinematics<T>& kinematics, Odometry<T>& odometry,
+  PoseEstimator(Kinematics<WheelSpeeds, WheelPositions>& kinematics,
+                Odometry<WheelSpeeds, WheelPositions>& odometry,
                 const wpi::array<double, 3>& stateStdDevs,
                 const wpi::array<double, 3>& visionMeasurementStdDevs);
 
@@ -73,8 +74,8 @@ class WPILIB_DLLEXPORT PoseEstimator {
    * @param wheelPositions The distances traveled by the encoders.
    * @param pose The estimated pose of the robot on the field.
    */
-  void ResetPosition(const Rotation2d& gyroAngle, const T& wheelPositions,
-                     const Pose2d& pose);
+  void ResetPosition(const Rotation2d& gyroAngle,
+                     const WheelPositions& wheelPositions, const Pose2d& pose);
 
   /**
    * Gets the estimated robot pose.
@@ -150,7 +151,8 @@ class WPILIB_DLLEXPORT PoseEstimator {
    *
    * @return The estimated pose of the robot in meters.
    */
-  Pose2d Update(const Rotation2d& gyroAngle, const T& wheelPositions);
+  Pose2d Update(const Rotation2d& gyroAngle,
+                const WheelPositions& wheelPositions);
 
   /**
    * Updates the pose estimator with wheel encoder and gyro information. This
@@ -163,7 +165,8 @@ class WPILIB_DLLEXPORT PoseEstimator {
    * @return The estimated pose of the robot in meters.
    */
   Pose2d UpdateWithTime(units::second_t currentTime,
-                        const Rotation2d& gyroAngle, const T& wheelPositions);
+                        const Rotation2d& gyroAngle,
+                        const WheelPositions& wheelPositions);
 
  private:
   struct InterpolationRecord {
@@ -174,7 +177,7 @@ class WPILIB_DLLEXPORT PoseEstimator {
     Rotation2d gyroAngle;
 
     // The distances traveled by the wheels.
-    T wheelPositions;
+    WheelPositions wheelPositions;
 
     /**
      * Checks equality between this InterpolationRecord and another object.
@@ -200,15 +203,15 @@ class WPILIB_DLLEXPORT PoseEstimator {
      *
      * @return The interpolated state.
      */
-    InterpolationRecord Interpolate(Kinematics<T>& kinematics,
-                                    InterpolationRecord endValue,
-                                    double i) const;
+    InterpolationRecord Interpolate(
+        Kinematics<WheelSpeeds, WheelPositions>& kinematics,
+        InterpolationRecord endValue, double i) const;
   };
 
   static constexpr units::second_t kBufferDuration = 1.5_s;
 
-  Kinematics<T>& m_kinematics;
-  Odometry<T>& m_odometry;
+  Kinematics<WheelSpeeds, WheelPositions>& m_kinematics;
+  Odometry<WheelSpeeds, WheelPositions>& m_odometry;
   wpi::array<double, 3> m_q{wpi::empty_array};
   Eigen::Matrix3d m_visionK = Eigen::Matrix3d::Zero();
 

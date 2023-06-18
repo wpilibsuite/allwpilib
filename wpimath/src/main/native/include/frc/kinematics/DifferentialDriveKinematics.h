@@ -25,7 +25,8 @@ namespace frc {
  * component velocities into a linear and angular chassis speed.
  */
 class WPILIB_DLLEXPORT DifferentialDriveKinematics
-    : public Kinematics<DifferentialDriveWheelPositions> {
+    : public Kinematics<DifferentialDriveWheelSpeeds,
+                        DifferentialDriveWheelPositions> {
  public:
   /**
    * Constructs a differential drive kinematics object.
@@ -49,7 +50,7 @@ class WPILIB_DLLEXPORT DifferentialDriveKinematics
    * @return The chassis speed.
    */
   constexpr ChassisSpeeds ToChassisSpeeds(
-      const DifferentialDriveWheelSpeeds& wheelSpeeds) const {
+      const DifferentialDriveWheelSpeeds& wheelSpeeds) const override {
     return {(wheelSpeeds.left + wheelSpeeds.right) / 2.0, 0_mps,
             (wheelSpeeds.right - wheelSpeeds.left) / trackWidth * 1_rad};
   }
@@ -63,7 +64,7 @@ class WPILIB_DLLEXPORT DifferentialDriveKinematics
    * @return The left and right velocities.
    */
   constexpr DifferentialDriveWheelSpeeds ToWheelSpeeds(
-      const ChassisSpeeds& chassisSpeeds) const {
+      const ChassisSpeeds& chassisSpeeds) const override {
     return {chassisSpeeds.vx - trackWidth / 2 * chassisSpeeds.omega / 1_rad,
             chassisSpeeds.vx + trackWidth / 2 * chassisSpeeds.omega / 1_rad};
   }

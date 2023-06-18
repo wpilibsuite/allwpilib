@@ -20,7 +20,7 @@ namespace frc {
  * path following. Furthermore, odometry can be used for latency compensation
  * when using computer-vision systems.
  */
-template <WheelPositions T>
+template <typename WheelSpeeds, WheelPositions WheelPositions>
 class WPILIB_DLLEXPORT Odometry {
  public:
   /**
@@ -31,8 +31,9 @@ class WPILIB_DLLEXPORT Odometry {
    * @param wheelPositions The current distances measured by each wheel.
    * @param initialPose The starting position of the robot on the field.
    */
-  explicit Odometry(const Kinematics<T>& kinematics,
-                    const Rotation2d& gyroAngle, const T& wheelPositions,
+  explicit Odometry(const Kinematics<WheelSpeeds, WheelPositions>& kinematics,
+                    const Rotation2d& gyroAngle,
+                    const WheelPositions& wheelPositions,
                     const Pose2d& initialPose = Pose2d{});
 
   /**
@@ -45,8 +46,8 @@ class WPILIB_DLLEXPORT Odometry {
    * @param wheelPositions The current distances measured by each wheel.
    * @param pose The position on the field that your robot is at.
    */
-  void ResetPosition(const Rotation2d& gyroAngle, const T& wheelPositions,
-                     const Pose2d& pose) {
+  void ResetPosition(const Rotation2d& gyroAngle,
+                     const WheelPositions& wheelPositions, const Pose2d& pose) {
     m_pose = pose;
     m_previousAngle = pose.Rotation();
     m_gyroOffset = m_pose.Rotation() - gyroAngle;
@@ -70,13 +71,14 @@ class WPILIB_DLLEXPORT Odometry {
    *
    * @return The new pose of the robot.
    */
-  const Pose2d& Update(const Rotation2d& gyroAngle, const T& wheelPositions);
+  const Pose2d& Update(const Rotation2d& gyroAngle,
+                       const WheelPositions& wheelPositions);
 
  private:
-  const Kinematics<T>& m_kinematics;
+  const Kinematics<WheelSpeeds, WheelPositions>& m_kinematics;
   Pose2d m_pose;
 
-  T m_previousWheelPositions;
+  WheelPositions m_previousWheelPositions;
   Rotation2d m_previousAngle;
   Rotation2d m_gyroOffset;
 };

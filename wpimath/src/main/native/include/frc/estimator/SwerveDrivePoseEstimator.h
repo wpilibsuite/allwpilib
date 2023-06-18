@@ -32,7 +32,8 @@ namespace frc {
  */
 template <size_t NumModules>
 class SwerveDrivePoseEstimator
-    : public PoseEstimator<SwerveDriveWheelPositions<NumModules>> {
+    : public PoseEstimator<SwerveDriveWheelSpeeds<NumModules>,
+                           SwerveDriveWheelPositions<NumModules>> {
  public:
   /**
    * Constructs a SwerveDrivePoseEstimator with default standard deviations
@@ -82,7 +83,8 @@ class SwerveDrivePoseEstimator
       const wpi::array<SwerveModulePosition, NumModules>& modulePositions,
       const Pose2d& initialPose, const wpi::array<double, 3>& stateStdDevs,
       const wpi::array<double, 3>& visionMeasurementStdDevs)
-      : PoseEstimator<SwerveDriveWheelPositions<NumModules>>(
+      : PoseEstimator<SwerveDriveWheelSpeeds<NumModules>,
+                      SwerveDriveWheelPositions<NumModules>>(
             kinematics, m_odometryImpl, stateStdDevs, visionMeasurementStdDevs),
         m_odometryImpl{kinematics, gyroAngle, modulePositions, initialPose} {}
 
@@ -101,8 +103,11 @@ class SwerveDrivePoseEstimator
       const Rotation2d& gyroAngle,
       const wpi::array<SwerveModulePosition, NumModules>& modulePositions,
       const Pose2d& pose) {
-    PoseEstimator<SwerveDriveWheelPositions<NumModules>>::ResetPosition(
-        gyroAngle, {modulePositions}, pose);
+    PoseEstimator<
+        SwerveDriveWheelSpeeds<NumModules>,
+        SwerveDriveWheelPositions<NumModules>>::ResetPosition(gyroAngle,
+                                                              {modulePositions},
+                                                              pose);
   }
 
   /**
@@ -117,8 +122,10 @@ class SwerveDrivePoseEstimator
   Pose2d Update(
       const Rotation2d& gyroAngle,
       const wpi::array<SwerveModulePosition, NumModules>& modulePositions) {
-    return PoseEstimator<SwerveDriveWheelPositions<NumModules>>::Update(
-        gyroAngle, {modulePositions});
+    return PoseEstimator<
+        SwerveDriveWheelSpeeds<NumModules>,
+        SwerveDriveWheelPositions<NumModules>>::Update(gyroAngle,
+                                                       {modulePositions});
   }
 
   /**
@@ -134,8 +141,9 @@ class SwerveDrivePoseEstimator
   Pose2d UpdateWithTime(
       units::second_t currentTime, const Rotation2d& gyroAngle,
       const wpi::array<SwerveModulePosition, NumModules>& modulePositions) {
-    return PoseEstimator<SwerveDriveWheelPositions<NumModules>>::UpdateWithTime(
-        currentTime, gyroAngle, {modulePositions});
+    return PoseEstimator<SwerveDriveWheelSpeeds<NumModules>,
+                         SwerveDriveWheelPositions<NumModules>>::
+        UpdateWithTime(currentTime, gyroAngle, {modulePositions});
   }
 
  private:

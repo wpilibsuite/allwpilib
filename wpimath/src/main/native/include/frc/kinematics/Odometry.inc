@@ -7,10 +7,11 @@
 #include "frc/kinematics/Odometry.h"
 
 namespace frc {
-template <WheelPositions T>
-Odometry<T>::Odometry(const Kinematics<T>& kinematics,
-                      const Rotation2d& gyroAngle, const T& wheelPositions,
-                      const Pose2d& initialPose)
+template <typename WheelSpeeds, WheelPositions WheelPositions>
+Odometry<WheelSpeeds, WheelPositions>::Odometry(
+    const Kinematics<WheelSpeeds, WheelPositions>& kinematics,
+    const Rotation2d& gyroAngle, const WheelPositions& wheelPositions,
+    const Pose2d& initialPose)
     : m_kinematics(kinematics),
       m_pose(initialPose),
       m_previousWheelPositions(wheelPositions) {
@@ -18,9 +19,9 @@ Odometry<T>::Odometry(const Kinematics<T>& kinematics,
   m_gyroOffset = m_pose.Rotation() - gyroAngle;
 }
 
-template <WheelPositions T>
-const Pose2d& Odometry<T>::Update(const Rotation2d& gyroAngle,
-                                  const T& wheelPositions) {
+template <typename WheelSpeeds, WheelPositions WheelPositions>
+const Pose2d& Odometry<WheelSpeeds, WheelPositions>::Update(
+    const Rotation2d& gyroAngle, const WheelPositions& wheelPositions) {
   auto angle = gyroAngle + m_gyroOffset;
 
   auto wheelDeltas = wheelPositions - m_previousWheelPositions;

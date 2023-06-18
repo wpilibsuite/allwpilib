@@ -9,6 +9,7 @@
 #include "frc/geometry/Pose2d.h"
 #include "frc/kinematics/DifferentialDriveKinematics.h"
 #include "frc/kinematics/DifferentialDriveWheelPositions.h"
+#include "frc/kinematics/DifferentialDriveWheelSpeeds.h"
 #include "frc/kinematics/Odometry.h"
 #include "units/length.h"
 
@@ -26,7 +27,8 @@ namespace frc {
  * Any subsequent pose resets also require the encoders to be reset to zero.
  */
 class WPILIB_DLLEXPORT DifferentialDriveOdometry
-    : public Odometry<DifferentialDriveWheelPositions> {
+    : public Odometry<DifferentialDriveWheelSpeeds,
+                      DifferentialDriveWheelPositions> {
  public:
   /**
    * Constructs a DifferentialDriveOdometry object.
@@ -60,8 +62,11 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry
    */
   void ResetPosition(const Rotation2d& gyroAngle, units::meter_t leftDistance,
                      units::meter_t rightDistance, const Pose2d& pose) {
-    Odometry<DifferentialDriveWheelPositions>::ResetPosition(
-        gyroAngle, {leftDistance, rightDistance}, pose);
+    Odometry<DifferentialDriveWheelSpeeds,
+             DifferentialDriveWheelPositions>::ResetPosition(gyroAngle,
+                                                             {leftDistance,
+                                                              rightDistance},
+                                                             pose);
   }
 
   /**
@@ -77,8 +82,10 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry
    */
   const Pose2d& Update(const Rotation2d& gyroAngle, units::meter_t leftDistance,
                        units::meter_t rightDistance) {
-    return Odometry<DifferentialDriveWheelPositions>::Update(
-        gyroAngle, {leftDistance, rightDistance});
+    return Odometry<DifferentialDriveWheelSpeeds,
+                    DifferentialDriveWheelPositions>::Update(gyroAngle,
+                                                             {leftDistance,
+                                                              rightDistance});
   }
 
  private:
