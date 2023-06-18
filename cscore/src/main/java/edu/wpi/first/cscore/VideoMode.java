@@ -75,4 +75,24 @@ public class VideoMode {
 
   /** Frames per second. */
   public int fps;
+
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+    }
+    if (other == null) {
+      return false;
+    }
+    if (getClass() != other.getClass()) {
+      return false;
+    }
+    VideoMode mode = (VideoMode) other;
+    if (pixelFormat != mode.pixelFormat) return false;
+    if (width != mode.width) return false;
+    if (height != mode.height) return false;
+    if (fps != mode.fps) return false;
+
+    return true;
+  }
 }
