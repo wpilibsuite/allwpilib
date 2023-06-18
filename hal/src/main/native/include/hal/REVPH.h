@@ -316,7 +316,7 @@ void HAL_GetREVPHVersion(HAL_REVPHHandle handle, HAL_REVPHVersion* version,
 int32_t HAL_GetREVPHSolenoids(HAL_REVPHHandle handle, int32_t* status);
 
 /**
- * Sets solenoids on a pneumatics module.
+ * Sets solenoids on a PH.
  *
  * @param[in] handle  the PH handle
  * @param[in] mask bitmask to set
