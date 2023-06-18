@@ -108,7 +108,6 @@ class SwerveDriveKinematics
    * @param moduleHeadings The swerve module headings. The order of the module
    * headings should be same as passed into the constructor of this class.
    */
-
   template <std::convertible_to<Rotation2d>... ModuleHeadings>
     requires(sizeof...(ModuleHeadings) == NumModules)
   void ResetHeadings(ModuleHeadings&&... moduleHeadings) {
