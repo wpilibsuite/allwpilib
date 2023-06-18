@@ -18,17 +18,25 @@ SwerveDriveKinematics(ModuleTranslation, ModuleTranslations...)
     -> SwerveDriveKinematics<1 + sizeof...(ModuleTranslations)>;
 
 template <size_t NumModules>
+void SwerveDriveKinematics<NumModules>::ResetHeadings(
+    wpi::array<Rotation2d, NumModules>& moduleHeadings) {
+  m_moduleHeadings = moduleHeadings;
+}
+
+template <size_t NumModules>
 wpi::array<SwerveModuleState, NumModules>
 SwerveDriveKinematics<NumModules>::ToSwerveModuleStates(
     const ChassisSpeeds& chassisSpeeds,
     const Translation2d& centerOfRotation) const {
+  wpi::array<SwerveModuleState, NumModules> moduleStates(wpi::empty_array);
+
   if (chassisSpeeds.vx == 0_mps && chassisSpeeds.vy == 0_mps &&
       chassisSpeeds.omega == 0_rad_per_s) {
     for (size_t i = 0; i < NumModules; i++) {
-      m_moduleStates[i].speed = 0_mps;
+      moduleStates[i] = {0_mps, m_moduleHeadings[i]};
     }
 
-    return m_moduleStates;
+    return moduleStates;
   }
 
   // We have a new center of rotation. We need to compute the matrix again.
@@ -58,10 +66,10 @@ SwerveDriveKinematics<NumModules>::ToSwerveModuleStates(
     auto speed = units::math::hypot(x, y);
     Rotation2d rotation{x.value(), y.value()};
 
-    m_moduleStates[i] = {speed, rotation};
+    moduleStates[i] = {speed, rotation};
   }
 
-  return m_moduleStates;
+  return moduleStates;
 }
 
 template <size_t NumModules>

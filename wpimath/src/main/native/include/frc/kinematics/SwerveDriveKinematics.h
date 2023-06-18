@@ -69,7 +69,7 @@ class SwerveDriveKinematics
   template <std::convertible_to<Translation2d>... ModuleTranslations>
     requires(sizeof...(ModuleTranslations) == NumModules)
   explicit SwerveDriveKinematics(ModuleTranslations&&... moduleTranslations)
-      : m_modules{moduleTranslations...}, m_moduleStates(wpi::empty_array) {
+      : m_modules{moduleTranslations...}, m_moduleHeadings(wpi::empty_array) {
     for (size_t i = 0; i < NumModules; i++) {
       // clang-format off
       m_inverseKinematics.template block<2, 3>(i * 2, 0) <<
@@ -86,7 +86,7 @@ class SwerveDriveKinematics
 
   explicit SwerveDriveKinematics(
       const wpi::array<Translation2d, NumModules>& modules)
-      : m_modules{modules}, m_moduleStates(wpi::empty_array) {
+      : m_modules{modules}, m_moduleHeadings(wpi::empty_array) {
     for (size_t i = 0; i < NumModules; i++) {
       // clang-format off
       m_inverseKinematics.template block<2, 3>(i * 2, 0) <<
@@ -102,6 +102,13 @@ class SwerveDriveKinematics
   }
 
   SwerveDriveKinematics(const SwerveDriveKinematics&) = default;
+
+  /**
+   * Reset the internal swerve module headings.
+   * @param moduleHeadings The swerve module headings. The order of the module
+   * headings should be same as passed into the constructor of this class.
+   */
+  void ResetHeadings(wpi::array<Rotation2d, NumModules>& moduleHeadings);
 
   /**
    * Performs inverse kinematics to return the module states from a desired
@@ -270,7 +277,7 @@ class SwerveDriveKinematics
   mutable Matrixd<NumModules * 2, 3> m_inverseKinematics;
   Eigen::HouseholderQR<Matrixd<NumModules * 2, 3>> m_forwardKinematics;
   wpi::array<Translation2d, NumModules> m_modules;
-  mutable wpi::array<SwerveModuleState, NumModules> m_moduleStates;
+  mutable wpi::array<Rotation2d, NumModules> m_moduleHeadings;
 
   mutable Translation2d m_previousCoR;
 };
