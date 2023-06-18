@@ -94,7 +94,14 @@ public class SwerveDriveKinematics
    *     same as passed into the constructor of this class.
    */
   public void resetHeadings(Rotation2d... moduleHeadings) {
-    m_moduleHeadings = moduleHeadings;
+    if (moduleHeadings.length != m_numModules) {
+      throw new IllegalArgumentException(
+          "Number of headings is not consistent with number of module locations provided in "
+              + "constructor");
+    }
+    for (int i = 0; i < moduleHeadings.length; i++) {
+      m_moduleHeadings[i] = moduleHeadings[i];
+    }
   }
 
   /**
@@ -168,6 +175,7 @@ public class SwerveDriveKinematics
       Rotation2d angle = new Rotation2d(x, y);
 
       moduleStates[i] = new SwerveModuleState(speed, angle);
+      m_moduleHeadings[i] = angle;
     }
 
     return moduleStates;

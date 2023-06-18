@@ -126,10 +126,10 @@ TEST_F(SwerveDriveKinematicsTest, ConserveWheelAngle) {
   EXPECT_NEAR(br.angle.Degrees().value(), -45.0, kEpsilon);
 }
 TEST_F(SwerveDriveKinematicsTest, ResetWheelAngle) {
-  Rotation2d fl = {90_deg};
+  Rotation2d fl = {0_deg};
   Rotation2d fr = {90_deg};
-  Rotation2d bl = {90_deg};
-  Rotation2d br = {90_deg};
+  Rotation2d bl = {180_deg};
+  Rotation2d br = {270_deg};
   m_kinematics.ResetHeadings(fl, fr, bl, br);
   auto [flMod, frMod, blMod, brMod] =
       m_kinematics.ToSwerveModuleStates(ChassisSpeeds{});
@@ -139,10 +139,10 @@ TEST_F(SwerveDriveKinematicsTest, ResetWheelAngle) {
   EXPECT_NEAR(blMod.speed.value(), 0.0, kEpsilon);
   EXPECT_NEAR(brMod.speed.value(), 0.0, kEpsilon);
 
-  EXPECT_NEAR(flMod.angle.Degrees().value(), 90.0, kEpsilon);
+  EXPECT_NEAR(flMod.angle.Degrees().value(), 0.0, kEpsilon);
   EXPECT_NEAR(frMod.angle.Degrees().value(), 90.0, kEpsilon);
-  EXPECT_NEAR(blMod.angle.Degrees().value(), 90.0, kEpsilon);
-  EXPECT_NEAR(brMod.angle.Degrees().value(), 90.0, kEpsilon);
+  EXPECT_NEAR(blMod.angle.Degrees().value(), 180.0, kEpsilon);
+  EXPECT_NEAR(brMod.angle.Degrees().value(), 270.0, kEpsilon);
 }
 
 TEST_F(SwerveDriveKinematicsTest, TurnInPlaceForwardKinematics) {
