@@ -90,12 +90,11 @@ public class VideoMode {
       return false;
     }
     VideoMode mode = (VideoMode) other;
-    if (pixelFormat != mode.pixelFormat) return false;
-    if (width != mode.width) return false;
-    if (height != mode.height) return false;
-    if (fps != mode.fps) return false;
 
-    return true;
+    return pixelFormat == mode.pixelFormat
+            && width == mode.width
+            && height == mode.height 
+            && fps == mode.fps;
   }
 
   @Override
