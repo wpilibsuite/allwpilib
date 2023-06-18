@@ -92,9 +92,9 @@ public class VideoMode {
     VideoMode mode = (VideoMode) other;
 
     return pixelFormat == mode.pixelFormat
-            && width == mode.width
-            && height == mode.height 
-            && fps == mode.fps;
+        && width == mode.width
+        && height == mode.height
+        && fps == mode.fps;
   }
 
   @Override
