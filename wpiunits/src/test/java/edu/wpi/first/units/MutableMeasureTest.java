@@ -4,9 +4,14 @@
 
 package edu.wpi.first.units;
 
+import static edu.wpi.first.units.Units.Centimeters;
 import static edu.wpi.first.units.Units.FeetPerSecond;
+import static edu.wpi.first.units.Units.InchesPerSecond;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Millisecond;
+import static edu.wpi.first.units.Units.Millivolts;
+import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Volts;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
@@ -86,5 +91,43 @@ class MutableMeasureTest {
     assertSame(measure, result);
     assertSame(FeetPerSecond, measure.unit());
     assertEquals(122.980999, measure.magnitude(), 0);
+  }
+
+  @Test
+  void testMutPlusMeasure() {
+    var measure = MutableMeasure.ofRelativeUnits(400, InchesPerSecond);
+    var other = Centimeters.per(Second).of(41.312);
+    var result = measure.mut_plus(other);
+    assertSame(measure, result);
+    assertSame(InchesPerSecond, result.unit());
+    assertEquals(416.2645669291339, measure.magnitude(), 1e-12);
+  }
+
+  @Test
+  void testMutPlusRaw() {
+    var measure = MutableMeasure.ofRelativeUnits(31.51, Volts);
+    var result = measure.mut_plus(66.641, Millivolts);
+    assertSame(measure, result);
+    assertSame(Volts, result.unit());
+    assertEquals(31.576641, result.magnitude(), 1e-10);
+  }
+
+  @Test
+  void testMutMinusMeasure() {
+    var measure = MutableMeasure.ofRelativeUnits(400, InchesPerSecond);
+    var other = Centimeters.per(Second).of(41.312);
+    var result = measure.mut_minus(other);
+    assertSame(measure, result);
+    assertSame(InchesPerSecond, result.unit());
+    assertEquals(383.7354330708662, measure.magnitude(), 1e-12);
+  }
+
+  @Test
+  void testMutMinusRaw() {
+    var measure = MutableMeasure.ofRelativeUnits(31.51, Volts);
+    var result = measure.mut_minus(66.641, Millivolts);
+    assertSame(measure, result);
+    assertSame(Volts, result.unit());
+    assertEquals(31.443359, result.magnitude(), 1e-10);
   }
 }

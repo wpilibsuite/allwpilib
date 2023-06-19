@@ -16,6 +16,11 @@ import java.util.Objects;
  * This can greatly reduce memory pressure, but comes at the cost of increased code complexity and
  * sensitivity to race conditions if used poorly.
  *
+ * <p>Any unsafe methods are prefixed with {@code mut_*}, such as {@link #mut_plus(Measure)} or
+ * {@link #mut_replace(Measure)}. These methods will change the internal state of the measurement
+ * object, and as such can be dangerous to use. They are primarily intended for use to track
+ * internal state of things like sensors
+ *
  * @param <U> the type of the unit of measure
  */
 public final class MutableMeasure<U extends Unit<U>> implements Measure<U> {
@@ -118,30 +123,6 @@ public final class MutableMeasure<U extends Unit<U>> implements Measure<U> {
   }
 
   /**
-   * Multiplies this measurement by some constant value. This will mutate the object instead of
-   * generated a new measurement object.
-   *
-   * @param multiplier the multiplier to scale the measurement by
-   * @return this measure
-   */
-  public MutableMeasure<U> mut_times(double multiplier) {
-    mut_setBaseUnitMagnitude(m_baseUnitMagnitude * multiplier);
-    return this;
-  }
-
-  /**
-   * Divides this measurement by some constant value. This will mutate the object instead of
-   * generated a new measurement object.
-   *
-   * @param divisor the divisor to scale the measurement by
-   * @return this measure
-   */
-  public MutableMeasure<U> mut_divide(double divisor) {
-    mut_setBaseUnitMagnitude(m_baseUnitMagnitude / divisor);
-    return this;
-  }
-
-  /**
    * Overwrites the state of this measure and replaces it with values from the given one.
    *
    * @param other the other measure to copy values from
@@ -194,6 +175,104 @@ public final class MutableMeasure<U extends Unit<U>> implements Measure<U> {
     // be scalar multiples (eg adding 0C to 100K should result in 373.15K, not 100K)
     m_magnitude = m_unit.fromBaseUnits(m_baseUnitMagnitude);
     return this;
+  }
+
+  // Math
+
+  /**
+   * Adds another measurement to this one. This will mutate the object instead of
+   * generating a new measurement object.
+   *
+   * @param other the measurement to add
+   * @return this measure
+   */
+  public MutableMeasure<U> mut_plus(Measure<U> other) {
+    return mut_plus(other.magnitude(), other.unit());
+  }
+
+  /**
+   * Adds another measurement to this one. This will mutate the object instead of
+   * generating a new measurement object. This is a denormalized version of
+   * {@link #mut_plus(Measure)} to avoid having to wrap raw numbers in a {@code Measure} object
+   * and pay for an object allocation.
+   *
+   * @param magnitude the magnitude of the other measurement.
+   * @param unit the unit of the other measurement
+   * @return this measure
+   */
+  public MutableMeasure<U> mut_plus(double magnitude, U unit) {
+    mut_setBaseUnitMagnitude(m_baseUnitMagnitude + unit.toBaseUnits(magnitude));
+    return this;
+  }
+
+  /**
+   * Subtracts another measurement to this one. This will mutate the object instead of
+   * generating a new measurement object.
+   *
+   * @param other the measurement to add
+   * @return this measure
+   */
+  public MutableMeasure<U> mut_minus(Measure<U> other) {
+    return mut_minus(other.magnitude(), other.unit());
+  }
+
+  /**
+   * Subtracts another measurement to this one. This will mutate the object instead of
+   * generating a new measurement object. This is a denormalized version of
+   * {@link #mut_minus(Measure)} to avoid having to wrap raw numbers in a {@code Measure} object
+   * and pay for an object allocation.
+   *
+   * @param magnitude the magnitude of the other measurement.
+   * @return this measure
+   */
+  public MutableMeasure<U> mut_minus(double magnitude, U unit) {
+    return mut_plus(-magnitude, unit);
+  }
+
+  /**
+   * Multiplies this measurement by some constant value. This will mutate the object instead of
+   * generating a new measurement object.
+   *
+   * @param multiplier the multiplier to scale the measurement by
+   * @return this measure
+   */
+  public MutableMeasure<U> mut_times(double multiplier) {
+    mut_setBaseUnitMagnitude(m_baseUnitMagnitude * multiplier);
+    return this;
+  }
+
+  /**
+   * Multiplies this measurement by some constant value. This will mutate the object instead of
+   * generating a new measurement object.
+   *
+   * @param multiplier the multiplier to scale the measurement by
+   * @return this measure
+   */
+  public MutableMeasure<U> mut_times(Measure<? extends Dimensionless> multiplier) {
+    return mut_times(multiplier.baseUnitMagnitude());
+  }
+
+  /**
+   * Divides this measurement by some constant value. This will mutate the object instead of
+   * generating a new measurement object.
+   *
+   * @param divisor the divisor to scale the measurement by
+   * @return this measure
+   */
+  public MutableMeasure<U> mut_divide(double divisor) {
+    mut_setBaseUnitMagnitude(m_baseUnitMagnitude / divisor);
+    return this;
+  }
+
+  /**
+   * Divides this measurement by some constant value. This will mutate the object instead of
+   * generating a new measurement object.
+   *
+   * @param divisor the divisor to scale the measurement by
+   * @return this measure
+   */
+  public MutableMeasure<U> mut_divide(Measure<? extends Dimensionless> divisor) {
+    return mut_divide(divisor.baseUnitMagnitude());
   }
 
   @Override
