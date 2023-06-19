@@ -8,8 +8,10 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 /**
- * Class for odometry. Odometry allows you to track the robot's position on the field over the
- * course of a match using readings from encoders and a gyroscope.
+ * Class for odometry. Robot code should not use this directly- Instead, use the particular type for
+ * your drivetrain (e.g., {@link DifferentialDriveOdometry}). Odometry allows you to track the
+ * robot's position on the field over the course of a match using readings from encoders and a
+ * gyroscope.
  *
  * <p>Teams can use odometry during the autonomous period for complex tasks like path following.
  * Furthermore, odometry can be used for latency compensation when using computer-vision systems.

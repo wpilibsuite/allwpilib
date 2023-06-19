@@ -7,7 +7,9 @@ package edu.wpi.first.math.kinematics;
 import edu.wpi.first.math.geometry.Twist2d;
 
 /**
- * Helper class that converts a chassis velocity (dx and dtheta components) into wheel speeds.
+ * Helper class that converts a chassis velocity (dx and dtheta components) into wheel speeds. Robot
+ * code should not use this directly- Instead, use the particular type for your drivetrain (e.g.,
+ * {@link DifferentialDriveKinematics}).
  *
  * @param <S> The type of the wheel speeds.
  * @param <P> The type of the wheel positions.

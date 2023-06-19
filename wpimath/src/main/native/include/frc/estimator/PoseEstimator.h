@@ -20,9 +20,11 @@
 namespace frc {
 /**
  * This class wraps odometry to fuse latency-compensated
- * vision measurements with encoder measurements. It will
- * correct for noisy vision measurements and encoder drift. It is intended to be
- * an easy drop-in for Odometry.
+ * vision measurements with encoder measurements. Robot code should not use this
+ * directly- Instead, use the particular type for your drivetrain (e.g.,
+ * DifferentialDrivePoseEstimator). It will correct for noisy vision
+ * measurements and encoder drift. It is intended to be an easy drop-in for
+ * Odometry.
  *
  * Update() should be called every robot loop.
  *

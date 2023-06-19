@@ -12,7 +12,9 @@
 namespace frc {
 /**
  * Helper class that converts a chassis velocity (dx, dy, and dtheta components)
- * into individual wheel speeds.
+ * into individual wheel speeds. Robot code should not use this directly-
+ * Instead, use the particular type for your drivetrain (e.g.,
+ * DifferentialDriveKinematics).
  *
  * Inverse kinematics converts a desired chassis speed into wheel speeds whereas
  * forward kinematics converts wheel speeds into chassis speed.

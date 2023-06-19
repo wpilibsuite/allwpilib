@@ -24,9 +24,11 @@ import java.util.Objects;
 
 /**
  * This class wraps {@link Odometry} to fuse latency-compensated vision measurements with encoder
- * measurements. It is intended to be a drop-in replacement for {@link Odometry}; in fact, if you
- * never call {@link PoseEstimator#addVisionMeasurement} and only call {@link PoseEstimator#update}
- * then this will behave exactly the same as Odometry.
+ * measurements. Robot code should not use this directly- Instead, use the particular type for your
+ * drivetrain (e.g., {@link DifferentialDrivePoseEstimator}). It is intended to be a drop-in
+ * replacement for {@link Odometry}; in fact, if you never call {@link
+ * PoseEstimator#addVisionMeasurement} and only call {@link PoseEstimator#update} then this will
+ * behave exactly the same as Odometry.
  *
  * <p>{@link PoseEstimator#update} should be called every robot loop.
  *

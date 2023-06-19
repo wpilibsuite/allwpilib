@@ -12,9 +12,10 @@
 
 namespace frc {
 /**
- * Class for odometry. Odometry allows you to track the robot's
- * position on the field over a course of a match using readings from your
- * wheel encoders.
+ * Class for odometry. Robot code should not use this directly- Instead, use the
+ * particular type for your drivetrain (e.g., DifferentialDriveOdometry).
+ * Odometry allows you to track the robot's position on the field over a course
+ * of a match using readings from your wheel encoders.
  *
  * Teams can use odometry during the autonomous period for complex tasks like
  * path following. Furthermore, odometry can be used for latency compensation
