@@ -6,100 +6,43 @@ package edu.wpi.first.math.interpolation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.Objects;
 import org.junit.jupiter.api.Test;
 
 class InterpolatingTreeMapTest {
-  static class DoubleInterpolatable
-      implements Interpolatable<DoubleInterpolatable>,
-          InverseInterpolatable<DoubleInterpolatable>,
-          Comparable<DoubleInterpolatable> {
-    public final double value;
-
-    DoubleInterpolatable(double value) {
-      this.value = value;
-    }
-
-    @Override
-    public DoubleInterpolatable interpolate(DoubleInterpolatable endValue, double t) {
-      return new DoubleInterpolatable(t * (endValue.value - value) + value);
-    }
-
-    @Override
-    public double inverseInterpolate(DoubleInterpolatable lower, DoubleInterpolatable upper) {
-      double upperToLower = upper.value - lower.value;
-      if (upperToLower <= 0) {
-        return 0;
-      }
-      double valueToLower = value - lower.value;
-      if (valueToLower <= 0) {
-        return 0;
-      }
-      return valueToLower / upperToLower;
-    }
-
-    @Override
-    public int compareTo(DoubleInterpolatable other) {
-      return Double.compare(value, other.value);
-    }
-
-    // Satisfy Spotbugs
-    @Override
-    public boolean equals(Object obj) {
-      if (this == obj) {
-        return true;
-      }
-      if (obj == null || getClass() != obj.getClass()) {
-        return false;
-      }
-      DoubleInterpolatable other = (DoubleInterpolatable) obj;
-      return this.value == other.value;
-    }
-
-    @Override
-    public int hashCode() {
-      return Objects.hash(value);
-    }
-  }
-
-  private static DoubleInterpolatable wrap(double value) {
-    return new DoubleInterpolatable(value);
-  }
-
   @Test
   void testInterpolation() {
-    InterpolatingTreeMap<DoubleInterpolatable, DoubleInterpolatable> table =
-        new InterpolatingTreeMap<>();
+    InterpolatingTreeMap<Double, Double> table =
+        new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), Interpolator.forDouble());
 
-    table.put(wrap(125.0), wrap(450.0));
-    table.put(wrap(200.0), wrap(510.0));
-    table.put(wrap(268.0), wrap(525.0));
-    table.put(wrap(312.0), wrap(550.0));
-    table.put(wrap(326.0), wrap(650.0));
+    table.put(125.0, 450.0);
+    table.put(200.0, 510.0);
+    table.put(268.0, 525.0);
+    table.put(312.0, 550.0);
+    table.put(326.0, 650.0);
 
     // Key below minimum gives the smallest value
-    assertEquals(450.0, table.get(wrap(100.0)).value);
+    assertEquals(450.0, table.get(100.0));
 
     // Minimum key gives exact value
-    assertEquals(450.0, table.get(wrap(125.0)).value);
+    assertEquals(450.0, table.get(125.0));
 
     // Key gives interpolated value
-    assertEquals(480.0, table.get(wrap(162.5)).value);
+    assertEquals(480.0, table.get(162.5));
 
     // Key at right of interpolation range gives exact value
-    assertEquals(510.0, table.get(wrap(200.0)).value);
+    assertEquals(510.0, table.get(200.0));
 
     // Maximum key gives exact value
-    assertEquals(650.0, table.get(wrap(326.0)).value);
+    assertEquals(650.0, table.get(326.0));
 
     // Key above maximum gives largest value
-    assertEquals(650.0, table.get(wrap(400.0)).value);
+    assertEquals(650.0, table.get(400.0));
 
     table.clear();
 
-    table.put(wrap(100.0), wrap(250.0));
-    table.put(wrap(200.0), wrap(500.0));
+    table.put(100.0, 250.0);
+    table.put(200.0, 500.0);
 
-    assertEquals(375.0, table.get(wrap(150.0)).value);
+    assertEquals(375.0, table.get(150.0));
   }
 }

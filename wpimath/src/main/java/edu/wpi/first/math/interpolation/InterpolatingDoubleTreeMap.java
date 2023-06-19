@@ -4,15 +4,13 @@
 
 package edu.wpi.first.math.interpolation;
 
-import edu.wpi.first.math.MathUtil;
-import java.util.TreeMap;
-
 /**
  * Interpolating Tree Maps are used to get values at points that are not defined by making a guess
  * from points that are defined. This uses linear interpolation.
  */
 public class InterpolatingDoubleTreeMap<K extends Number, V extends Number> {
-  private final TreeMap<K, V> m_map = new TreeMap<>();
+  private final InterpolatingTreeMap<Double, Double> m_map =
+      new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), Interpolator.forDouble());
 
   /**
    * Inserts a key-value pair.
@@ -21,7 +19,7 @@ public class InterpolatingDoubleTreeMap<K extends Number, V extends Number> {
    * @param value The value.
    */
   public void put(K key, V value) {
-    m_map.put(key, value);
+    m_map.put(key.doubleValue(), value.doubleValue());
   }
 
   /**
@@ -34,31 +32,7 @@ public class InterpolatingDoubleTreeMap<K extends Number, V extends Number> {
    * @return The value associated with the given key.
    */
   public Double get(K key) {
-    V val = m_map.get(key);
-    if (val == null) {
-      K ceilingKey = m_map.ceilingKey(key);
-      K floorKey = m_map.floorKey(key);
-
-      if (ceilingKey == null && floorKey == null) {
-        return null;
-      }
-      if (ceilingKey == null) {
-        return m_map.get(floorKey).doubleValue();
-      }
-      if (floorKey == null) {
-        return m_map.get(ceilingKey).doubleValue();
-      }
-      V floor = m_map.get(floorKey);
-      V ceiling = m_map.get(ceilingKey);
-
-      return MathUtil.interpolate(
-          floor.doubleValue(),
-          ceiling.doubleValue(),
-          MathUtil.inverseInterpolate(
-              floorKey.doubleValue(), ceilingKey.doubleValue(), key.doubleValue()));
-    } else {
-      return val.doubleValue();
-    }
+    return m_map.get(key.doubleValue());
   }
 
   /** Clears the contents. */

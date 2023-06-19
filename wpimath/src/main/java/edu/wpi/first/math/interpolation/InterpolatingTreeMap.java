@@ -17,20 +17,38 @@ import java.util.TreeMap;
  * @param <K> The type of keys held in this map.
  * @param <V> The type of values held in this map.
  */
-public class InterpolatingTreeMap<K extends InverseInterpolatable<K>, V extends Interpolatable<V>> {
+public class InterpolatingTreeMap<K, V> {
   private final TreeMap<K, V> m_map;
 
-  /** Constructs an InterpolatingTreeMap. */
-  public InterpolatingTreeMap() {
+  private final InverseInterpolator<K> m_inverseInterpolator;
+  private final Interpolator<V> m_interpolator;
+
+  /**
+   * Constructs an InterpolatingTreeMap.
+   *
+   * @param inverseInterpolator Function to use for inverse interpolation of the keys.
+   * @param interpolator Function to use for interpolation of the values.
+   */
+  public InterpolatingTreeMap(
+      InverseInterpolator<K> inverseInterpolator, Interpolator<V> interpolator) {
     m_map = new TreeMap<>();
+    m_inverseInterpolator = inverseInterpolator;
+    m_interpolator = interpolator;
   }
 
   /**
    * Constructs an InterpolatingTreeMap using {@code comparator}.
    *
+   * @param inverseInterpolator Function to use for inverse interpolation of the keys.
+   * @param interpolator Function to use for interpolation of the values.
    * @param comparator Comparator to use on keys.
    */
-  public InterpolatingTreeMap(Comparator<K> comparator) {
+  public InterpolatingTreeMap(
+      InverseInterpolator<K> inverseInterpolator,
+      Interpolator<V> interpolator,
+      Comparator<K> comparator) {
+    m_inverseInterpolator = inverseInterpolator;
+    m_interpolator = interpolator;
     m_map = new TreeMap<>(comparator);
   }
 
@@ -47,8 +65,9 @@ public class InterpolatingTreeMap<K extends InverseInterpolatable<K>, V extends 
   /**
    * Returns the value associated with a given key.
    *
-   * <p>If there's no matching key, the value returned will be a linear interpolation between the
-   * keys before and after the provided one.
+   * <p>If there's no matching key, the value returned will be an interpolation between the keys
+   * before and after the provided one, using the {@link Interpolator} and {@link
+   * InverseInterpolator} provided.
    *
    * @param key The key.
    * @return The value associated with the given key.
@@ -71,7 +90,8 @@ public class InterpolatingTreeMap<K extends InverseInterpolatable<K>, V extends 
       V floor = m_map.get(floorKey);
       V ceiling = m_map.get(ceilingKey);
 
-      return floor.interpolate(ceiling, key.inverseInterpolate(floorKey, ceilingKey));
+      return m_interpolator.interpolate(
+          floor, ceiling, m_inverseInterpolator.inverseInterpolate(floorKey, ceilingKey, key));
     } else {
       return val;
     }
