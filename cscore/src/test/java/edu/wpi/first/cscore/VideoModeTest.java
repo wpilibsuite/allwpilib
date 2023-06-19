@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import org.junit.jupiter.api.Test;
 
-public class VideoModeTest {
+class VideoModeTest {
   @Test
   void equalityTest() {
     VideoMode a = new VideoMode(VideoMode.PixelFormat.kMJPEG, 1920, 1080, 30);
