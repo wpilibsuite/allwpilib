@@ -95,7 +95,7 @@ class LinearFilter {
     static int instances = 0;
     instances++;
     wpi::math::MathSharedStore::ReportUsage(
-        wpi::math::MathUsageId::kFilter_Linear, 1);
+        wpi::math::MathUsageId::kFilter_Linear, instances);
   }
 
   /**
