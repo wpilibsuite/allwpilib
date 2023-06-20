@@ -154,6 +154,8 @@ HAL_Bool HAL_GetCTREPCMCompressorShortedFault(HAL_CTREPCMHandle handle,
  * were last cleared. This fault is persistent and can be cleared by
  * HAL_ClearAllCTREPCMStickyFaults()
  *
+ * @param[in] handle  the PCM handle
+ * @param[out] status Error status variable. 0 on success.
  * @return True if the compressor has been disconnected since sticky faults
  * were last cleared, otherwise false.
  * @see HAL_GetCTREPCMCompressorShortedFault()
@@ -207,6 +209,8 @@ int32_t HAL_GetCTREPCMSolenoidDisabledList(HAL_CTREPCMHandle handle,
  * were last cleared. This fault is persistent and can be cleared by
  * HAL_ClearAllCTREPCMStickyFaults()
  *
+ * @param[in] handle  the PCM handle
+ * @param[out] status Error status variable. 0 on success.
  * @return True if solenoid is reporting a fault, otherwise false.
  * @see HAL_GetCTREPCMSolenoidVoltageFault()
  */
@@ -223,7 +227,12 @@ HAL_Bool HAL_GetCTREPCMSolenoidVoltageStickyFault(HAL_CTREPCMHandle handle,
 HAL_Bool HAL_GetCTREPCMSolenoidVoltageFault(HAL_CTREPCMHandle handle,
                                             int32_t* status);
 
-/** Clears all sticky faults on this device. */
+/**
+ * Clears all sticky faults on this device.
+ *
+ * @param[in] handle  the PCM handle
+ * @param[out] status Error status variable. 0 on success.
+ */
 void HAL_ClearAllCTREPCMStickyFaults(HAL_CTREPCMHandle handle, int32_t* status);
 
 /**
