@@ -28,7 +28,7 @@ TEST(SpinlockTest, Benchmark) {
 
   // warmup
   std::thread thr([]() {
-    int value = 0;
+    [[maybe_unused]] int value = 0;
 
     auto start = high_resolution_clock::now();
     for (int i = 0; i < 10000000; i++) {
