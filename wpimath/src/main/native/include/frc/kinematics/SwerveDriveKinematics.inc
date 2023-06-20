@@ -126,7 +126,7 @@ void SwerveDriveKinematics<NumModules>::DesaturateWheelSpeeds(
 template <size_t NumModules>
 void SwerveDriveKinematics<NumModules>::DesaturateWheelSpeeds(
     wpi::array<SwerveModuleState, NumModules>* moduleStates,
-    ChassisSpeeds currentChassisSpeed,
+    ChassisSpeeds desiredChassisSpeed,
     units::meters_per_second_t attainableMaxModuleSpeed,
     units::meters_per_second_t attainableMaxRobotTranslationSpeed,
     units::radians_per_second_t attainableMaxRobotRotationSpeed) {

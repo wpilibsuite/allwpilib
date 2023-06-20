@@ -252,7 +252,7 @@ class SwerveDriveKinematics
    *
    * @param moduleStates Reference to array of module states. The array will be
    * mutated with the normalized speeds!
-   * @param currentChassisSpeed Current speed of the robot
+   * @param desiredChassisSpeed The desired speed of the robot
    * @param attainableMaxModuleSpeed The absolute max speed a module can reach
    * @param attainableMaxRobotTranslationSpeed The absolute max speed the robot
    * can reach while translating
@@ -261,7 +261,7 @@ class SwerveDriveKinematics
    */
   static void DesaturateWheelSpeeds(
       wpi::array<SwerveModuleState, NumModules>* moduleStates,
-      ChassisSpeeds currentChassisSpeed,
+      ChassisSpeeds desiredChassisSpeed,
       units::meters_per_second_t attainableMaxModuleSpeed,
       units::meters_per_second_t attainableMaxRobotTranslationSpeed,
       units::radians_per_second_t attainableMaxRobotRotationSpeed);
