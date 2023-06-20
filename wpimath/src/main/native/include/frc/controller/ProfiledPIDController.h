@@ -186,6 +186,12 @@ class ProfiledPIDController
   void SetConstraints(Constraints constraints) { m_constraints = constraints; }
 
   /**
+   * Get the velocity and acceleration constraints for this controller.
+   * @return Velocity and acceleration constraints.
+   */
+  Constraints GetConstraints() { return m_constraints; }
+
+  /**
    * Returns the current setpoint of the ProfiledPIDController.
    *
    * @return The current setpoint.
