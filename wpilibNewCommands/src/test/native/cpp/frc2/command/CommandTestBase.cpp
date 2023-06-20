@@ -24,6 +24,7 @@ void CommandTestBase::TearDown() {
 }
 
 void CommandTestBase::SetDSEnabled(bool enabled) {
+  frc::sim::DriverStationSim::SetDsAttached(true);
   frc::sim::DriverStationSim::SetEnabled(enabled);
   frc::sim::DriverStationSim::NotifyNewData();
 }
