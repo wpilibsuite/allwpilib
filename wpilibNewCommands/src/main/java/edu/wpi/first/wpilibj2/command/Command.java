@@ -91,7 +91,10 @@ public abstract class Command implements Sendable {
   }
 
   /**
-   * Gets the name of this Command. Defaults to the simple class name if not overridden.
+   * Gets the name of this Command.
+   *
+   * <p>By default, the simple class name is used. This can be changed with {@link
+   * #setName(String)}.
    *
    * @return The display name of the Command
    */
@@ -100,7 +103,7 @@ public abstract class Command implements Sendable {
   }
 
   /**
-   * Sets the name of this Command. Nullop if not overridden.
+   * Sets the name of this Command.
    *
    * @param name The display name of the Command.
    */
@@ -543,7 +546,7 @@ public abstract class Command implements Sendable {
      * This command ends, {@link #end(boolean) end(true)} is called, and the incoming command is
      * scheduled normally.
      *
-     * <p>This is the public behavior.
+     * <p>This is the default behavior.
      */
     kCancelSelf,
     /** This command continues, and the incoming command is not scheduled. */

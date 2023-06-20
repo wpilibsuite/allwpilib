@@ -291,6 +291,10 @@ void CommandScheduler::UnregisterSubsystem(
   }
 }
 
+void CommandScheduler::UnregisterAllSubsystems() {
+  m_impl->subsystems.clear();
+}
+
 void CommandScheduler::SetDefaultCommand(Subsystem* subsystem,
                                          CommandPtr&& defaultCommand) {
   if (!defaultCommand.get()->HasRequirement(subsystem)) {

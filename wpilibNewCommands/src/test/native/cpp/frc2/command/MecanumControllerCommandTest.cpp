@@ -110,7 +110,8 @@ TEST_F(MecanumControllerCommandTest, ReachesReference) {
         m_rearLeftSpeed = rearLeft;
         m_frontRightSpeed = frontRight;
         m_rearRightSpeed = rearRight;
-      });
+      },
+      {&subsystem});
 
   m_timer.Restart();
 

@@ -14,4 +14,5 @@ package edu.wpi.first.wpilibj2.command;
  *     Subsystem}. Use {@link Subsystem} instead.
  */
 @Deprecated(since = "2024", forRemoval = true)
-public class SubsystemBase extends Subsystem {}
+@SuppressWarnings("PMD.AbstractClassWithoutAnyMethod")
+public abstract class SubsystemBase extends Subsystem {}
