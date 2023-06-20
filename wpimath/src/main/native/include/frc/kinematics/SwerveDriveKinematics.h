@@ -16,12 +16,18 @@
 #include "frc/geometry/Translation2d.h"
 #include "frc/geometry/Twist2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
+#include "frc/kinematics/Kinematics.h"
+#include "frc/kinematics/SwerveDriveWheelPositions.h"
 #include "frc/kinematics/SwerveModulePosition.h"
 #include "frc/kinematics/SwerveModuleState.h"
 #include "units/velocity.h"
 #include "wpimath/MathShared.h"
 
 namespace frc {
+
+template <size_t NumModules>
+using SwerveDriveWheelSpeeds = wpi::array<SwerveModuleState, NumModules>;
+
 /**
  * Helper class that converts a chassis velocity (dx, dy, and dtheta components)
  * into individual module states (speed and angle).
@@ -45,7 +51,9 @@ namespace frc {
  * the robot on the field using encoders and a gyro.
  */
 template <size_t NumModules>
-class SwerveDriveKinematics {
+class SwerveDriveKinematics
+    : public Kinematics<SwerveDriveWheelSpeeds<NumModules>,
+                        SwerveDriveWheelPositions<NumModules>> {
  public:
   /**
    * Constructs a swerve drive kinematics object. This takes in a variable
@@ -130,6 +138,11 @@ class SwerveDriveKinematics {
       const ChassisSpeeds& chassisSpeeds,
       const Translation2d& centerOfRotation = Translation2d{}) const;
 
+  SwerveDriveWheelSpeeds<NumModules> ToWheelSpeeds(
+      const ChassisSpeeds& chassisSpeeds) const override {
+    return ToSwerveModuleStates(chassisSpeeds);
+  }
+
   /**
    * Performs forward kinematics to return the resulting chassis state from the
    * given module states. This method is often used for odometry -- determining
@@ -162,8 +175,8 @@ class SwerveDriveKinematics {
    *
    * @return The resulting chassis speed.
    */
-  ChassisSpeeds ToChassisSpeeds(
-      const wpi::array<SwerveModuleState, NumModules>& moduleStates) const;
+  ChassisSpeeds ToChassisSpeeds(const wpi::array<SwerveModuleState, NumModules>&
+                                    moduleStates) const override;
 
   /**
    * Performs forward kinematics to return the resulting Twist2d from the
@@ -200,6 +213,11 @@ class SwerveDriveKinematics {
    */
   Twist2d ToTwist2d(
       wpi::array<SwerveModulePosition, NumModules> moduleDeltas) const;
+
+  Twist2d ToTwist2d(
+      const SwerveDriveWheelPositions<NumModules>& wheelDeltas) const override {
+    return ToTwist2d(wheelDeltas.positions);
+  }
 
   /**
    * Renormalizes the wheel speeds if any individual speed is above the
