@@ -11,12 +11,14 @@ CommandTestBase::CommandTestBase() {
   scheduler.CancelAll();
   scheduler.Enable();
   scheduler.GetActiveButtonLoop()->Clear();
+  scheduler.UnregisterAllSubsystems();
 
   SetDSEnabled(true);
 }
 
 CommandTestBase::~CommandTestBase() {
   CommandScheduler::GetInstance().GetActiveButtonLoop()->Clear();
+  CommandScheduler::GetInstance().UnregisterAllSubsystems();
 }
 
 CommandScheduler CommandTestBase::GetScheduler() {

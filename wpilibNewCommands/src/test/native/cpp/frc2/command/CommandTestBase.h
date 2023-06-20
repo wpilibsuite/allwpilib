@@ -107,12 +107,14 @@ class CommandTestBaseWithParam : public ::testing::TestWithParam<T> {
     scheduler.CancelAll();
     scheduler.Enable();
     scheduler.GetActiveButtonLoop()->Clear();
+    scheduler.UnregisterAllSubsystems();
 
     SetDSEnabled(true);
   }
 
   ~CommandTestBaseWithParam() override {
     CommandScheduler::GetInstance().GetActiveButtonLoop()->Clear();
+    CommandScheduler::GetInstance().UnregisterAllSubsystems();
   }
 
  protected:

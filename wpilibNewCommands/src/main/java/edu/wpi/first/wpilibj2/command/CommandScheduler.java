@@ -363,6 +363,15 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
   }
 
   /**
+   * Un-registers all registered Subsystems with the scheduler. All currently registered subsystems
+   * will no longer have their periodic block called, and will not have their default command
+   * scheduled.
+   */
+  public void unregisterAllSubsystems() {
+    m_subsystems.clear();
+  }
+
+  /**
    * Sets the default command for a subsystem. Registers that subsystem if it is not already
    * registered. Default commands will run whenever there is no other command currently scheduled
    * that requires the subsystem. Default commands should be written to never end (i.e. their {@link

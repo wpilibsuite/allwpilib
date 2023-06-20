@@ -159,6 +159,13 @@ class CommandScheduler final : public nt::NTSendable,
   void UnregisterSubsystem(std::span<Subsystem* const> subsystems);
 
   /**
+   * Un-registers all registered Subsystems with the scheduler. All currently
+   * registered subsystems will no longer have their periodic block called, and
+   * will not have their default command scheduled.
+   */
+  void UnregisterAllSubsystems();
+
+  /**
    * Sets the default command for a subsystem.  Registers that subsystem if it
    * is not already registered.  Default commands will run whenever there is no
    * other command currently scheduled that requires the subsystem.  Default
