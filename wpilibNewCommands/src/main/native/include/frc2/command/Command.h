@@ -44,7 +44,7 @@ std::string GetTypeName(const T& type) {
  */
 class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
  public:
-  virtual ~Command();
+  ~Command() override;
 
   Command(const Command&) = default;
   Command& operator=(const Command& rhs);

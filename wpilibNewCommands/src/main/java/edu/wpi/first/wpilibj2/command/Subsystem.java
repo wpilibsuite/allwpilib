@@ -22,7 +22,7 @@ import edu.wpi.first.util.sendable.SendableRegistry;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public class Subsystem implements Sendable {
+public abstract class Subsystem implements Sendable {
   /** Constructor. */
   public Subsystem() {
     String name = this.getClass().getSimpleName();

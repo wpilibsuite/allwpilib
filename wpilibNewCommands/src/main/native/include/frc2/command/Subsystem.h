@@ -41,8 +41,7 @@ class CommandPtr;
  */
 class Subsystem : public wpi::Sendable, public wpi::SendableHelper<Subsystem> {
  public:
-  Subsystem();
-  virtual ~Subsystem() override;
+  ~Subsystem() override;
 
   /**
    * This method is called periodically by the CommandScheduler.  Useful for
@@ -191,5 +190,8 @@ class Subsystem : public wpi::Sendable, public wpi::SendableHelper<Subsystem> {
   CommandPtr RunEnd(std::function<void()> run, std::function<void()> end);
 
   void InitSendable(wpi::SendableBuilder& builder) override;
+
+ protected:
+  Subsystem();
 };
 }  // namespace frc2
