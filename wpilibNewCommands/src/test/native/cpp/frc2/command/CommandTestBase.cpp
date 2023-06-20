@@ -11,14 +11,12 @@ CommandTestBase::CommandTestBase() {
   scheduler.CancelAll();
   scheduler.Enable();
   scheduler.GetActiveButtonLoop()->Clear();
+
+  SetDSEnabled(true);
 }
 
 CommandScheduler CommandTestBase::GetScheduler() {
   return CommandScheduler();
-}
-
-void CommandTestBase::SetUp() {
-  SetDSEnabled(true);
 }
 
 void CommandTestBase::TearDown() {

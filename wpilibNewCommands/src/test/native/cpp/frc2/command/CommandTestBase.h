@@ -86,8 +86,6 @@ class CommandTestBase : public ::testing::Test {
  protected:
   CommandScheduler GetScheduler();
 
-  void SetUp() override;
-
   void TearDown() override;
 
   void SetDSEnabled(bool enabled);
@@ -101,14 +99,12 @@ class CommandTestBaseWithParam : public ::testing::TestWithParam<T> {
     scheduler.CancelAll();
     scheduler.Enable();
     scheduler.GetActiveButtonLoop()->Clear();
+
+    SetDSEnabled(true);
   }
 
  protected:
   CommandScheduler GetScheduler() { return CommandScheduler(); }
-
-  void SetUp() override {
-    SetDSEnabled(true);
-  }
 
   void TearDown() override {
     CommandScheduler::GetInstance().GetActiveButtonLoop()->Clear();
