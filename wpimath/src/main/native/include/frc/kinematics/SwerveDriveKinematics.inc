@@ -146,10 +146,10 @@ void SwerveDriveKinematics<NumModules>::DesaturateWheelSpeeds(
   }
 
   auto translationalK =
-      units::math::hypot(currentChassisSpeed.vx, currentChassisSpeed.vy) /
+      units::math::hypot(desiredChassisSpeed.vx, desiredChassisSpeed.vy) /
       attainableMaxRobotTranslationSpeed;
 
-  auto rotationalK = units::math::abs(currentChassisSpeed.omega) /
+  auto rotationalK = units::math::abs(desiredChassisSpeed.omega) /
                      attainableMaxRobotRotationSpeed;
 
   auto k = units::math::max(translationalK, rotationalK);
