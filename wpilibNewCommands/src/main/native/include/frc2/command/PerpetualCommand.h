@@ -69,7 +69,7 @@ class PerpetualCommand : public CommandHelper<CommandBase, PerpetualCommand> {
       "be valid. This was unsafe/undefined behavior from the start, and "
       "RepeatCommand provides an easy way to achieve similar end results "
       "with slightly different (and safe) semantics.")
-  // NOLINTNEXTLINE (bugprone-forwarding-reference-overload)
+  // NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
   explicit PerpetualCommand(T&& command)
       : PerpetualCommand(
             std::make_unique<std::decay_t<T>>(std::forward<T>(command))) {}

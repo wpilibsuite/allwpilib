@@ -71,7 +71,7 @@ void ExpectDARESolution(const Eigen::Ref<const Eigen::MatrixXd>& A,
   ExpectMatrixEqual(Y, Eigen::MatrixXd::Zero(X.rows(), X.cols()), 1e-10);
 }
 
-// NOLINTNEXTLINE (google-readability-avoid-underscore-in-googletest-name)
+// NOLINTNEXTLINE(google-readability-avoid-underscore-in-googletest-name)
 TEST(DARETest, NonInvertibleA_ABQR) {
   // Example 2 of "On the Numerical Solution of the Discrete-Time Algebraic
   // Riccati Equation"
@@ -91,7 +91,7 @@ TEST(DARETest, NonInvertibleA_ABQR) {
   ExpectDARESolution(A, B, Q, R, X);
 }
 
-// NOLINTNEXTLINE (google-readability-avoid-underscore-in-googletest-name)
+// NOLINTNEXTLINE(google-readability-avoid-underscore-in-googletest-name)
 TEST(DARETest, NonInvertibleA_ABQRN) {
   // Example 2 of "On the Numerical Solution of the Discrete-Time Algebraic
   // Riccati Equation"
@@ -117,7 +117,7 @@ TEST(DARETest, NonInvertibleA_ABQRN) {
   ExpectDARESolution(A, B, Q, R, N, X);
 }
 
-// NOLINTNEXTLINE (google-readability-avoid-underscore-in-googletest-name)
+// NOLINTNEXTLINE(google-readability-avoid-underscore-in-googletest-name)
 TEST(DARETest, InvertibleA_ABQR) {
   Eigen::MatrixXd A{2, 2};
   A << 1, 1, 0, 1;
@@ -134,7 +134,7 @@ TEST(DARETest, InvertibleA_ABQR) {
   ExpectDARESolution(A, B, Q, R, X);
 }
 
-// NOLINTNEXTLINE (google-readability-avoid-underscore-in-googletest-name)
+// NOLINTNEXTLINE(google-readability-avoid-underscore-in-googletest-name)
 TEST(DARETest, InvertibleA_ABQRN) {
   Eigen::MatrixXd A{2, 2};
   A << 1, 1, 0, 1;
@@ -157,7 +157,7 @@ TEST(DARETest, InvertibleA_ABQRN) {
   ExpectDARESolution(A, B, Q, R, N, X);
 }
 
-// NOLINTNEXTLINE (google-readability-avoid-underscore-in-googletest-name)
+// NOLINTNEXTLINE(google-readability-avoid-underscore-in-googletest-name)
 TEST(DARETest, FirstGeneralizedEigenvalueOfSTIsStable_ABQR) {
   // The first generalized eigenvalue of (S, T) is stable
 
@@ -176,7 +176,7 @@ TEST(DARETest, FirstGeneralizedEigenvalueOfSTIsStable_ABQR) {
   ExpectDARESolution(A, B, Q, R, X);
 }
 
-// NOLINTNEXTLINE (google-readability-avoid-underscore-in-googletest-name)
+// NOLINTNEXTLINE(google-readability-avoid-underscore-in-googletest-name)
 TEST(DARETest, FirstGeneralizedEigenvalueOfSTIsStable_ABQRN) {
   // The first generalized eigenvalue of (S, T) is stable
 
@@ -201,7 +201,7 @@ TEST(DARETest, FirstGeneralizedEigenvalueOfSTIsStable_ABQRN) {
   ExpectDARESolution(A, B, Q, R, N, X);
 }
 
-// NOLINTNEXTLINE (google-readability-avoid-underscore-in-googletest-name)
+// NOLINTNEXTLINE(google-readability-avoid-underscore-in-googletest-name)
 TEST(DARETest, IdentitySystem_ABQR) {
   const Eigen::MatrixXd A{Eigen::Matrix2d::Identity()};
   const Eigen::MatrixXd B{Eigen::Matrix2d::Identity()};
@@ -214,7 +214,7 @@ TEST(DARETest, IdentitySystem_ABQR) {
   ExpectDARESolution(A, B, Q, R, X);
 }
 
-// NOLINTNEXTLINE (google-readability-avoid-underscore-in-googletest-name)
+// NOLINTNEXTLINE(google-readability-avoid-underscore-in-googletest-name)
 TEST(DARETest, IdentitySystem_ABQRN) {
   const Eigen::MatrixXd A{Eigen::Matrix2d::Identity()};
   const Eigen::MatrixXd B{Eigen::Matrix2d::Identity()};

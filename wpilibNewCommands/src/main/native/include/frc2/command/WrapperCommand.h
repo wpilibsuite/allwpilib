@@ -41,7 +41,7 @@ class WrapperCommand : public CommandHelper<CommandBase, WrapperCommand> {
    * command or add it to a group will throw an exception.
    */
   template <std::derived_from<Command> T>
-  // NOLINTNEXTLINE (bugprone-forwarding-reference-overload)
+  // NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
   explicit WrapperCommand(T&& command)
       : WrapperCommand(
             std::make_unique<std::decay_t<T>>(std::forward<T>(command))) {}
