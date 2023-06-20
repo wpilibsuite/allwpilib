@@ -83,10 +83,10 @@ class CommandTestBase : public ::testing::Test {
  public:
   CommandTestBase();
 
+  ~CommandTestBase() override;
+
  protected:
   CommandScheduler GetScheduler();
-
-  void TearDown() override;
 
   void SetDSEnabled(bool enabled);
 };
@@ -103,12 +103,12 @@ class CommandTestBaseWithParam : public ::testing::TestWithParam<T> {
     SetDSEnabled(true);
   }
 
- protected:
-  CommandScheduler GetScheduler() { return CommandScheduler(); }
-
-  void TearDown() override {
+  ~CommandTestBaseWithParam() override {
     CommandScheduler::GetInstance().GetActiveButtonLoop()->Clear();
   }
+
+ protected:
+  CommandScheduler GetScheduler() { return CommandScheduler(); }
 
   void SetDSEnabled(bool enabled) {
     frc::sim::DriverStationSim::SetDsAttached(true);

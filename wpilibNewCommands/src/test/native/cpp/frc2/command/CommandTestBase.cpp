@@ -15,12 +15,12 @@ CommandTestBase::CommandTestBase() {
   SetDSEnabled(true);
 }
 
-CommandScheduler CommandTestBase::GetScheduler() {
-  return CommandScheduler();
+CommandTestBase::~CommandTestBase() {
+  CommandScheduler::GetInstance().GetActiveButtonLoop()->Clear();
 }
 
-void CommandTestBase::TearDown() {
-  CommandScheduler::GetInstance().GetActiveButtonLoop()->Clear();
+CommandScheduler CommandTestBase::GetScheduler() {
+  return CommandScheduler();
 }
 
 void CommandTestBase::SetDSEnabled(bool enabled) {
