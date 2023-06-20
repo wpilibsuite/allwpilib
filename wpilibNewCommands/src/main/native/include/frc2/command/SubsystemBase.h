@@ -14,6 +14,9 @@ namespace frc2 {
  * provides a more intuitive method for setting the default command.
  *
  * This class is provided by the NewCommands VendorDep
+ *
+ * @deprecated All functionality provided by SubsystemBase has been merged into
+ * Subsystem. Use Subsystem instead.
  */
 class [[deprecated("Use Subsystem instead")]] SubsystemBase : public Subsystem {
  protected:

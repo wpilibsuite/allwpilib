@@ -13,6 +13,9 @@ namespace frc2 {
  * A Sendable base class for Commands.
  *
  * This class is provided by the NewCommands VendorDep
+ *
+ * @deprecated All functionality provided by CommandBase has been merged into
+ * Command. Use Command instead.
  */
 class [[deprecated("Use Command instead")]] CommandBase : public Command {
  protected:
