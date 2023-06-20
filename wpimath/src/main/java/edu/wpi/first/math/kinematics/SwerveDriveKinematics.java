@@ -55,7 +55,7 @@ public class SwerveDriveKinematics
 
   private final int m_numModules;
   private final Translation2d[] m_modules;
-  private SwerveModuleState[] m_moduleStates;
+  private Rotation2d[] m_moduleHeadings;
   private Translation2d m_prevCoR = new Translation2d();
 
   /**
@@ -74,8 +74,8 @@ public class SwerveDriveKinematics
     }
     m_numModules = moduleTranslationsMeters.length;
     m_modules = Arrays.copyOf(moduleTranslationsMeters, m_numModules);
-    m_moduleStates = new SwerveModuleState[m_numModules];
-    Arrays.fill(m_moduleStates, new SwerveModuleState());
+    m_moduleHeadings = new Rotation2d[m_numModules];
+    Arrays.fill(m_moduleHeadings, new Rotation2d());
     m_inverseKinematics = new SimpleMatrix(m_numModules * 2, 3);
 
     for (int i = 0; i < m_numModules; i++) {
@@ -85,6 +85,21 @@ public class SwerveDriveKinematics
     m_forwardKinematics = m_inverseKinematics.pseudoInverse();
 
     MathSharedStore.reportUsage(MathUsageId.kKinematics_SwerveDrive, 1);
+  }
+
+  /**
+   * Reset the internal swerve module headings.
+   *
+   * @param moduleHeadings The swerve module headings. The order of the module headings should be
+   *     same as passed into the constructor of this class.
+   */
+  public void resetHeadings(Rotation2d... moduleHeadings) {
+    if (moduleHeadings.length != m_numModules) {
+      throw new IllegalArgumentException(
+          "Number of headings is not consistent with number of module locations provided in "
+              + "constructor");
+    }
+    m_moduleHeadings = Arrays.copyOf(moduleHeadings, 4);
   }
 
   /**
@@ -108,19 +123,18 @@ public class SwerveDriveKinematics
    *     attainable max velocity. Use the {@link #desaturateWheelSpeeds(SwerveModuleState[], double)
    *     DesaturateWheelSpeeds} function to rectify this issue.
    */
-  @SuppressWarnings("PMD.MethodReturnsInternalArray")
   public SwerveModuleState[] toSwerveModuleStates(
       ChassisSpeeds chassisSpeeds, Translation2d centerOfRotationMeters) {
+    var moduleStates = new SwerveModuleState[m_numModules];
+
     if (chassisSpeeds.vxMetersPerSecond == 0.0
         && chassisSpeeds.vyMetersPerSecond == 0.0
         && chassisSpeeds.omegaRadiansPerSecond == 0.0) {
-      SwerveModuleState[] newStates = new SwerveModuleState[m_numModules];
       for (int i = 0; i < m_numModules; i++) {
-        newStates[i] = new SwerveModuleState(0.0, m_moduleStates[i].angle);
+        moduleStates[i] = new SwerveModuleState(0.0, m_moduleHeadings[i]);
       }
 
-      m_moduleStates = newStates;
-      return m_moduleStates;
+      return moduleStates;
     }
 
     if (!centerOfRotationMeters.equals(m_prevCoR)) {
@@ -151,7 +165,6 @@ public class SwerveDriveKinematics
 
     var moduleStatesMatrix = m_inverseKinematics.mult(chassisSpeedsVector);
 
-    m_moduleStates = new SwerveModuleState[m_numModules];
     for (int i = 0; i < m_numModules; i++) {
       double x = moduleStatesMatrix.get(i * 2, 0);
       double y = moduleStatesMatrix.get(i * 2 + 1, 0);
@@ -159,10 +172,11 @@ public class SwerveDriveKinematics
       double speed = Math.hypot(x, y);
       Rotation2d angle = new Rotation2d(x, y);
 
-      m_moduleStates[i] = new SwerveModuleState(speed, angle);
+      moduleStates[i] = new SwerveModuleState(speed, angle);
+      m_moduleHeadings[i] = angle;
     }
 
-    return m_moduleStates;
+    return moduleStates;
   }
 
   /**
