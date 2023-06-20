@@ -106,7 +106,10 @@ class CommandTestBaseWithParam : public ::testing::TestWithParam<T> {
  protected:
   CommandScheduler GetScheduler() { return CommandScheduler(); }
 
-  void SetUp() override { frc::sim::DriverStationSim::SetEnabled(true); }
+  void SetUp() override {
+    frc::sim::DriverStationSim::SetEnabled(true);
+    frc::sim::DriverStationSim::NotifyNewData();
+  }
 
   void TearDown() override {
     CommandScheduler::GetInstance().GetActiveButtonLoop()->Clear();
@@ -114,6 +117,7 @@ class CommandTestBaseWithParam : public ::testing::TestWithParam<T> {
 
   void SetDSEnabled(bool enabled) {
     frc::sim::DriverStationSim::SetEnabled(enabled);
+    frc::sim::DriverStationSim::NotifyNewData();
   }
 };
 
