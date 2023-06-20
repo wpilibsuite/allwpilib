@@ -302,7 +302,7 @@ public class SwerveDriveKinematics
    *
    * @param moduleStates Reference to array of module states. The array will be mutated with the
    *     normalized speeds!
-   * @param currentChassisSpeed The current speed of the robot
+   * @param desiredChassisSpeed The desired speed of the robot
    * @param attainableMaxModuleSpeedMetersPerSecond The absolute max speed that a module can reach
    * @param attainableMaxTranslationalSpeedMetersPerSecond The absolute max speed that your robot
    *     can reach while translating
@@ -311,7 +311,7 @@ public class SwerveDriveKinematics
    */
   public static void desaturateWheelSpeeds(
       SwerveModuleState[] moduleStates,
-      ChassisSpeeds currentChassisSpeed,
+      ChassisSpeeds desiredChassisSpeed,
       double attainableMaxModuleSpeedMetersPerSecond,
       double attainableMaxTranslationalSpeedMetersPerSecond,
       double attainableMaxRotationalVelocityRadiansPerSecond) {
@@ -326,10 +326,10 @@ public class SwerveDriveKinematics
       return;
     }
     double translationalK =
-        Math.hypot(currentChassisSpeed.vxMetersPerSecond, currentChassisSpeed.vyMetersPerSecond)
+        Math.hypot(desiredChassisSpeed.vxMetersPerSecond, desiredChassisSpeed.vyMetersPerSecond)
             / attainableMaxTranslationalSpeedMetersPerSecond;
     double rotationalK =
-        Math.abs(currentChassisSpeed.omegaRadiansPerSecond)
+        Math.abs(desiredChassisSpeed.omegaRadiansPerSecond)
             / attainableMaxRotationalVelocityRadiansPerSecond;
     double k = Math.max(translationalK, rotationalK);
     double scale = Math.min(k * attainableMaxModuleSpeedMetersPerSecond / realMaxSpeed, 1);
