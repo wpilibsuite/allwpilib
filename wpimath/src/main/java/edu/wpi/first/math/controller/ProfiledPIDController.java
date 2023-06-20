@@ -99,6 +99,19 @@ public class ProfiledPIDController implements Sendable {
   }
 
   /**
+   * Sets the IZone range. When the absolute value of the position error is greater than IZone, the
+   * total accumulated error will reset to zero, disabling integral gain until the absolute value of
+   * the position error is less than IZone. This is used to prevent integral windup. Must be
+   * non-negative. Passing a value of zero will effectively disable integral gain. Passing a value
+   * of {@link Double#POSITIVE_INFINITY} disables IZone functionality.
+   *
+   * @param iZone Maximum magnitude of error to allow integral control.
+   */
+  public void setIZone(double iZone) {
+    m_controller.setIZone(iZone);
+  }
+
+  /**
    * Gets the proportional coefficient.
    *
    * @return proportional coefficient
@@ -123,6 +136,15 @@ public class ProfiledPIDController implements Sendable {
    */
   public double getD() {
     return m_controller.getD();
+  }
+
+  /**
+   * Get the IZone range.
+   *
+   * @return Maximum magnitude of error to allow integral control.
+   */
+  public double getIZone() {
+    return m_controller.getIZone();
   }
 
   /**
@@ -400,6 +422,7 @@ public class ProfiledPIDController implements Sendable {
     builder.addDoubleProperty("p", this::getP, this::setP);
     builder.addDoubleProperty("i", this::getI, this::setI);
     builder.addDoubleProperty("d", this::getD, this::setD);
+    builder.addDoubleProperty("izone", this::getIZone, this::setIZone);
     builder.addDoubleProperty("goal", () -> getGoal().position, this::setGoal);
   }
 }
