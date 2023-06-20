@@ -107,8 +107,7 @@ class CommandTestBaseWithParam : public ::testing::TestWithParam<T> {
   CommandScheduler GetScheduler() { return CommandScheduler(); }
 
   void SetUp() override {
-    frc::sim::DriverStationSim::SetEnabled(true);
-    frc::sim::DriverStationSim::NotifyNewData();
+    SetDSEnabled(true);
   }
 
   void TearDown() override {
