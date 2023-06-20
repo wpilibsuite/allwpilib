@@ -260,7 +260,7 @@ public abstract class IterativeRobotBase extends RobotBase {
    *
    * @param topicName The NetworkTables topic to publish to
    */
-  public void publishToNetworkTables(String topicName) {
+  public void publishLoopTimingsToNetworkTables(String topicName) {
     m_watchdog.publishToNetworkTables(topicName);
   }
 
@@ -274,7 +274,7 @@ public abstract class IterativeRobotBase extends RobotBase {
    * @param dataLog The data log to log epochs to
    * @param entry The name of the entry to log to
    */
-  public void startDataLog(DataLog dataLog, String entry) {
+  public void startLoopTimingsDataLog(DataLog dataLog, String entry) {
     m_watchdog.startDataLog(dataLog, entry);
   }
 

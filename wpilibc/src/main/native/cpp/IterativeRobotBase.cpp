@@ -93,12 +93,13 @@ void IterativeRobotBase::TeleopExit() {}
 
 void IterativeRobotBase::TestExit() {}
 
-void IterativeRobotBase::PublishToNetworkTables(std::string_view topicName) {
+void IterativeRobotBase::PublishLoopTimingsToNetworkTables(
+    std::string_view topicName) {
   m_watchdog.PublishToNetworkTables(topicName);
 }
 
-void IterativeRobotBase::StartDataLog(wpi::log::DataLog& dataLog,
-                                      std::string_view entry) {
+void IterativeRobotBase::StartLoopTimingsDataLog(wpi::log::DataLog& dataLog,
+                                                 std::string_view entry) {
   m_watchdog.StartDataLog(dataLog, entry);
 }
 

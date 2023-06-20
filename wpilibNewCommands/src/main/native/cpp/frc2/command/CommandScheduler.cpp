@@ -96,12 +96,13 @@ void CommandScheduler::SetPeriod(units::second_t period) {
   m_watchdog.SetTimeout(period);
 }
 
-void CommandScheduler::PublishToNetworkTables(std::string_view topicName) {
+void CommandScheduler::PublishLoopTimingsToNetworkTables(
+    std::string_view topicName) {
   m_watchdog.PublishToNetworkTables(topicName);
 }
 
-void CommandScheduler::StartDataLog(wpi::log::DataLog& dataLog,
-                                    std::string_view entry) {
+void CommandScheduler::StartLoopTimingsDataLog(wpi::log::DataLog& dataLog,
+                                               std::string_view entry) {
   m_watchdog.StartDataLog(dataLog, entry);
 }
 

@@ -132,7 +132,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
    *
    * @param topicName The NetworkTables topic to publish to
    */
-  public void publishToNetworkTables(String topicName) {
+  public void publishLoopTimingsToNetworkTables(String topicName) {
     m_watchdog.publishToNetworkTables(topicName);
   }
 
@@ -145,7 +145,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
    * @param dataLog The data log to log loop timings to
    * @param entry The name of the entry to log to
    */
-  public void startDataLog(DataLog dataLog, String entry) {
+  public void startLoopTimingsDataLog(DataLog dataLog, String entry) {
     m_watchdog.startDataLog(dataLog, entry);
   }
 

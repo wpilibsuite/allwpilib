@@ -214,7 +214,7 @@ class IterativeRobotBase : public RobotBase {
    * LiveWindow.updateValues(),) etc.
    * @param topicName The NetworkTables topic to publish to
    */
-  void PublishToNetworkTables(std::string_view topicName);
+  void PublishLoopTimingsToNetworkTables(std::string_view topicName);
 
   /**
    * Starts logging loop timings to the data log.
@@ -226,7 +226,8 @@ class IterativeRobotBase : public RobotBase {
    * @param dataLog The data log to log epochs to
    * @param entry The name of the entry to log to
    */
-  void StartDataLog(wpi::log::DataLog& dataLog, std::string_view entry);
+  void StartLoopTimingsDataLog(wpi::log::DataLog& dataLog,
+                               std::string_view entry);
 
   /**
    * Enables or disables flushing NetworkTables every loop iteration.
