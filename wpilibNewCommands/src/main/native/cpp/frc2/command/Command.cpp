@@ -11,7 +11,6 @@
 #include "frc2/command/ParallelCommandGroup.h"
 #include "frc2/command/ParallelDeadlineGroup.h"
 #include "frc2/command/ParallelRaceGroup.h"
-#include "frc2/command/PerpetualCommand.h"
 #include "frc2/command/RepeatCommand.h"
 #include "frc2/command/SequentialCommandGroup.h"
 #include "frc2/command/WaitCommand.h"
@@ -80,12 +79,6 @@ CommandPtr Command::AndThen(std::function<void()> toRun,
 CommandPtr Command::AndThen(std::function<void()> toRun,
                             std::span<Subsystem* const> requirements) && {
   return std::move(*this).ToPtr().AndThen(std::move(toRun), requirements);
-}
-
-PerpetualCommand Command::Perpetually() && {
-  WPI_IGNORE_DEPRECATED
-  return PerpetualCommand(std::move(*this).TransferOwnership());
-  WPI_UNIGNORE_DEPRECATED
 }
 
 CommandPtr Command::Repeatedly() && {

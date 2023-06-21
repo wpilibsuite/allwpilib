@@ -23,8 +23,6 @@ std::string GetTypeName(const T& type) {
   return wpi::Demangle(typeid(type).name());
 }
 
-class PerpetualCommand;
-
 /**
  * A state machine representing a complete action to be performed by the robot.
  * Commands are run by the CommandScheduler, and can be composed into
@@ -202,26 +200,6 @@ class Command {
   [[nodiscard]]
   CommandPtr AndThen(std::function<void()> toRun,
                      std::span<Subsystem* const> requirements = {}) &&;
-
-  /**
-   * Decorates this command to run perpetually, ignoring its ordinary end
-   * conditions.  The decorated command can still be interrupted or canceled.
-   *
-   * @return the decorated command
-   * @deprecated PerpetualCommand violates the assumption that execute() doesn't
-get called after isFinished() returns true -- an assumption that should be
-valid. This was unsafe/undefined behavior from the start, and RepeatCommand
-provides an easy way to achieve similar end results with slightly different (and
-safe) semantics.
-   */
-  [[deprecated(
-      "PerpetualCommand violates the assumption that execute() doesn't get "
-      "called after isFinished() returns true -- an assumption that should be "
-      "valid."
-      "This was unsafe/undefined behavior from the start, and RepeatCommand "
-      "provides an easy way to achieve similar end results with slightly "
-      "different (and safe) semantics.")]]
-  PerpetualCommand Perpetually() &&;
 
   /**
    * Decorates this command to run repeatedly, restarting it when it ends, until
