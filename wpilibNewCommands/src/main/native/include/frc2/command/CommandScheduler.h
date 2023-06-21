@@ -78,12 +78,6 @@ class CommandScheduler final : public nt::NTSendable,
   frc::EventLoop* GetDefaultButtonLoop() const;
 
   /**
-   * Removes all button bindings from the scheduler.
-   */
-  [[deprecated("Call Clear on the EventLoop instance directly!")]]
-  void ClearButtons();
-
-  /**
    * Schedules a command for execution. Does nothing if the command is already
    * scheduled. If a command's requirements are not available, it will only be
    * started if all the commands currently using those requirements are
