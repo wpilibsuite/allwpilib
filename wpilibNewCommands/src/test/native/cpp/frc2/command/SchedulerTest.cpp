@@ -43,14 +43,30 @@ TEST_F(SchedulerTest, SchedulerLambdaInterrupt) {
   EXPECT_EQ(counter, 1);
 }
 
+TEST_F(SchedulerTest, RegisterSubsystem) {
+  CommandScheduler scheduler = GetScheduler();
+
+  int counter = 0;
+  TestSubsystem system{[&counter] { counter++; }};
+
+  EXPECT_NO_FATAL_FAILURE(scheduler.RegisterSubsystem(&system));
+
+  scheduler.Run();
+  EXPECT_EQ(counter, 1);
+}
+
 TEST_F(SchedulerTest, UnregisterSubsystem) {
   CommandScheduler scheduler = GetScheduler();
 
-  TestSubsystem system;
+  int counter = 0;
+  TestSubsystem system{[&counter] { counter++; }};
 
   scheduler.RegisterSubsystem(&system);
 
   EXPECT_NO_FATAL_FAILURE(scheduler.UnregisterSubsystem(&system));
+
+  scheduler.Run();
+  ASSERT_EQ(counter, 0);
 }
 
 TEST_F(SchedulerTest, SchedulerCancelAll) {

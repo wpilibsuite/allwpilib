@@ -19,7 +19,15 @@
 
 namespace frc2 {
 
-class TestSubsystem : public SubsystemBase {};
+class TestSubsystem : public SubsystemBase {
+ public:
+  explicit TestSubsystem(std::function<void()> periodic = [] {})
+      : m_periodic{periodic} {}
+  void Periodic() override { m_periodic(); }
+
+ private:
+  std::function<void()> m_periodic;
+};
 
 /**
  * NOTE: Moving mock objects causes EXPECT_CALL to not work correctly!
