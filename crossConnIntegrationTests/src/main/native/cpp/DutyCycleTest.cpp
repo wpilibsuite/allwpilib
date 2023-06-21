@@ -41,8 +41,9 @@ TEST_P(DutyCycleTest, DutyCycle) {
   // Sleep enough time for the frequency to converge
   usleep(3500000);
 
-  ASSERT_NEAR(1000 / 5.05,
-              (double)HAL_GetDutyCycleFrequency(dutyCycle, &status), 1);
+  ASSERT_NEAR(
+      1000 / 5.05,
+      static_cast<double>(HAL_GetDutyCycleFrequency(dutyCycle, &status)), 1);
 
   // TODO measure output
 }
