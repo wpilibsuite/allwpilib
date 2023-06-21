@@ -92,8 +92,7 @@ class PWM : public wpi::Sendable, public wpi::SendableHelper<PWM> {
    *
    * This is intended to be used by servos.
    *
-   * @pre SetMaxPositivePwm() called.
-   * @pre SetMinNegativePwm() called.
+   * @pre SetBounds() called.
    *
    * @param pos The position to set the servo between 0.0 and 1.0.
    */
@@ -104,8 +103,7 @@ class PWM : public wpi::Sendable, public wpi::SendableHelper<PWM> {
    *
    * This is intended to be used by servos.
    *
-   * @pre SetMaxPositivePwm() called.
-   * @pre SetMinNegativePwm() called.
+   * @pre SetBounds() called.
    *
    * @return The position the servo is set to between 0.0 and 1.0.
    */
@@ -116,11 +114,7 @@ class PWM : public wpi::Sendable, public wpi::SendableHelper<PWM> {
    *
    * This is intended to be used by motor controllers.
    *
-   * @pre SetMaxPositivePwm() called.
-   * @pre SetMinPositivePwm() called.
-   * @pre SetCenterPwm() called.
-   * @pre SetMaxNegativePwm() called.
-   * @pre SetMinNegativePwm() called.
+   * @pre SetBounds() called.
    *
    * @param speed The speed to set the motor controller between -1.0 and 1.0.
    */
@@ -131,10 +125,7 @@ class PWM : public wpi::Sendable, public wpi::SendableHelper<PWM> {
    *
    * This is intended to be used by motor controllers.
    *
-   * @pre SetMaxPositivePwm() called.
-   * @pre SetMinPositivePwm() called.
-   * @pre SetMaxNegativePwm() called.
-   * @pre SetMinNegativePwm() called.
+   * @pre SetBounds() called.
    *
    * @return The most recently set speed between -1.0 and 1.0.
    */
@@ -189,7 +180,7 @@ class PWM : public wpi::Sendable, public wpi::SendableHelper<PWM> {
    * controller. The values determine the upper and lower speeds as well as the
    * deadband bracket.
    *
-   * @param max         The Minimum pwm value
+   * @param max         The maximum pwm value
    * @param deadbandMax The high end of the deadband range
    * @param center      The center speed (off)
    * @param deadbandMin The low end of the deadband range
@@ -200,7 +191,7 @@ class PWM : public wpi::Sendable, public wpi::SendableHelper<PWM> {
                  units::microsecond_t* deadbandMin, units::microsecond_t* min);
 
   /**
-   * Sets the PWM output to be a continous high signal while enabled.
+   * Sets the PWM output to be a continuous high signal while enabled.
    *
    */
   void SetAlwaysHighMode();
