@@ -17,7 +17,7 @@
 
 #include <wpi/DecayedDerivedFrom.h>
 
-#include "frc2/command/CommandGroupBase.h"
+#include "frc2/command/CommandBase.h"
 #include "frc2/command/CommandHelper.h"
 
 namespace frc2 {
@@ -34,7 +34,7 @@ namespace frc2 {
  * This class is provided by the NewCommands VendorDep
  */
 class ParallelDeadlineGroup
-    : public CommandHelper<CommandGroupBase, ParallelDeadlineGroup> {
+    : public CommandHelper<CommandBase, ParallelDeadlineGroup> {
  public:
   /**
    * Creates a new ParallelDeadlineGroup. The given commands (including the
@@ -73,6 +73,11 @@ class ParallelDeadlineGroup
   // Prevent template expansion from emulating copy ctor
   ParallelDeadlineGroup(ParallelDeadlineGroup&) = delete;
 
+  /**
+   * Adds the given commands to the group.
+   *
+   * @param commands Commands to add to the group.
+   */
   template <wpi::DecayedDerivedFrom<Command>... Commands>
   void AddCommands(Commands&&... commands) {
     std::vector<std::unique_ptr<Command>> foo;
@@ -97,7 +102,7 @@ class ParallelDeadlineGroup
   void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
-  void AddCommands(std::vector<std::unique_ptr<Command>>&& commands) final;
+  void AddCommands(std::vector<std::unique_ptr<Command>>&& commands);
 
   void SetDeadline(std::unique_ptr<Command>&& deadline);
 

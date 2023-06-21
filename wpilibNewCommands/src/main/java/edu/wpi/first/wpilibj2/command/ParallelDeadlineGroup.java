@@ -20,8 +20,7 @@ import java.util.Map;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-@SuppressWarnings("removal")
-public class ParallelDeadlineGroup extends CommandGroupBase {
+public class ParallelDeadlineGroup extends CommandBase {
   // maps commands in this composition to whether they are still running
   private final Map<Command, Boolean> m_commands = new HashMap<>();
   private boolean m_runWhenDisabled = true;
@@ -59,7 +58,11 @@ public class ParallelDeadlineGroup extends CommandGroupBase {
     m_deadline = deadline;
   }
 
-  @Override
+  /**
+   * Adds the given commands to the group.
+   *
+   * @param commands Commands to add to the group.
+   */
   public final void addCommands(Command... commands) {
     if (!m_finished) {
       throw new IllegalStateException(

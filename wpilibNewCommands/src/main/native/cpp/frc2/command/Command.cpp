@@ -143,14 +143,6 @@ void Command::SetComposed(bool isComposed) {
   m_isComposed = isComposed;
 }
 
-bool Command::IsGrouped() const {
-  return IsComposed();
-}
-
-void Command::SetGrouped(bool grouped) {
-  SetComposed(grouped);
-}
-
 namespace frc2 {
 bool RequirementsDisjoint(Command* first, Command* second) {
   bool disjoint = true;

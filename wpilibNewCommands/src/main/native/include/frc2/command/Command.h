@@ -340,25 +340,6 @@ class Command {
   void SetComposed(bool isComposed);
 
   /**
-   * Whether the command is currently grouped in a command group.  Used as extra
-   * insurance to prevent accidental independent use of grouped commands.
-   *
-   * @deprecated Moved to IsComposed()
-   */
-  [[deprecated("Moved to IsComposed()")]]
-  bool IsGrouped() const;
-
-  /**
-   * Sets whether the command is currently grouped in a command group.  Can be
-   * used to "reclaim" a command if a group is no longer going to use it.  NOT
-   * ADVISED!
-   *
-   * @deprecated Moved to SetComposed()
-   */
-  [[deprecated("Moved to SetComposed()")]]
-  void SetGrouped(bool grouped);
-
-  /**
    * Whether the given command should run when the robot is disabled.  Override
    * to return true if the command should run when disabled.
    *
