@@ -53,10 +53,6 @@ CommandPtr Command::WithInterruptBehavior(
   return std::move(*this).ToPtr().WithInterruptBehavior(interruptBehavior);
 }
 
-CommandPtr Command::WithInterrupt(std::function<bool()> condition) && {
-  return std::move(*this).ToPtr().Until(std::move(condition));
-}
-
 CommandPtr Command::BeforeStarting(
     std::function<void()> toRun,
     std::initializer_list<Subsystem*> requirements) && {

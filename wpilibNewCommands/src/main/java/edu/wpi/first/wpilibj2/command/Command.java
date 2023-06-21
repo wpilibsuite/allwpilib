@@ -116,25 +116,6 @@ public interface Command {
   }
 
   /**
-   * Decorates this command with an interrupt condition. If the specified condition becomes true
-   * before the command finishes normally, the command will be interrupted and un-scheduled.
-   *
-   * <p>Note: This decorator works by adding this command to a composition. The command the
-   * decorator was called on cannot be scheduled independently or be added to a different
-   * composition (namely, decorators), unless it is manually cleared from the list of composed
-   * commands with {@link CommandScheduler#removeComposedCommand(Command)}. The command composition
-   * returned from this method can be further decorated without issue.
-   *
-   * @param condition the interrupt condition
-   * @return the command with the interrupt condition added
-   * @deprecated Replace with {@link #until(BooleanSupplier)}
-   */
-  @Deprecated(since = "2023")
-  default ParallelRaceGroup withInterrupt(BooleanSupplier condition) {
-    return until(condition);
-  }
-
-  /**
    * Decorates this command with a runnable to run before this command starts.
    *
    * <p>Note: This decorator works by adding this command to a composition. The command the

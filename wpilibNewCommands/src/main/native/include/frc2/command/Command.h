@@ -146,18 +146,6 @@ class Command {
   CommandPtr OnlyWhile(std::function<bool()> condition) &&;
 
   /**
-   * Decorates this command with an interrupt condition.  If the specified
-   * condition becomes true before the command finishes normally, the command
-   * will be interrupted and un-scheduled.
-   *
-   * @param condition the interrupt condition
-   * @return the command with the interrupt condition added
-   * @deprecated Replace with Until()
-   */
-  [[deprecated("Replace with Until()")]] [[nodiscard]]
-  CommandPtr WithInterrupt(std::function<bool()> condition) &&;
-
-  /**
    * Decorates this command with a runnable to run before this command starts.
    *
    * @param toRun the Runnable to run
