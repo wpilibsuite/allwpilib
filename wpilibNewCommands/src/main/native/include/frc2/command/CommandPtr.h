@@ -32,7 +32,7 @@ class CommandPtr final {
       : m_ptr(std::move(command)) {}
 
   template <std::derived_from<Command> T>
-  // NOLINTNEXTLINE (bugprone-forwarding-reference-overload)
+  // NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
   explicit CommandPtr(T&& command)
       : CommandPtr(
             std::make_unique<std::decay_t<T>>(std::forward<T>(command))) {}
