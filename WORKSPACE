@@ -20,15 +20,23 @@ load("@rules_jvm_external//:repositories.bzl", "rules_jvm_external_deps")
 
 rules_jvm_external_deps()
 
+# TODO temporary
+http_archive(
+    name = "rules_bzlmodrio_toolchains",
+    sha256 = "5cc49c34a56cef8560446146d4ad124b61b3af6e3068a5cdba0df09861eaba97",
+    strip_prefix = "rules_bzlmodrio_toolchains-8ed5bdadbca20c0f6e7c3c1e8d0f8089fe449706",
+    url = "https://github.com/bzlmodRio/rules_bzlmodrio_toolchains/archive/8ed5bdadbca20c0f6e7c3c1e8d0f8089fe449706.zip",
+)
+
 # local_repository(
 #     name = "bzlmodRio",
 #     path = "../bzlmodRio/monorepo/bzlmodRio",
 # )
 http_archive(
     name = "bzlmodRio",
-    sha256 = "0a7f80a644bf7cced089c7e537e1480060e461638279541f235268ec47fe59ae",
-    strip_prefix = "bzlmodRio-413eb5f372d929dc4066f52d4a5f35acc76a86ea",
-    url = "https://github.com/bzlmodRio/bzlmodRio/archive/413eb5f372d929dc4066f52d4a5f35acc76a86ea.tar.gz",
+    sha256 = "90928c94a79a715276b2cb9e70c9cabb5e4e9778d782ec381d03a0bba481620b",
+    strip_prefix = "bzlmodRio-7e05a206c4e123075e1b7b88e03a63e7627fec23",
+    url = "https://github.com/bzlmodRio/bzlmodRio/archive/7e05a206c4e123075e1b7b88e03a63e7627fec23.tar.gz",
 )
 
 load("@bzlmodRio//private/non_bzlmod:download_dependencies.bzl", "download_dependencies")
@@ -48,7 +56,7 @@ download_dependencies(
     rules_checkstyle_version = None,
     rules_pmd_version = None,
     rules_spotless_version = None,
-    rules_toolchains_version = "2023-7",
+    rules_toolchains_version = None,
     rules_wpi_styleguide_version = None,
     rules_wpiformat_version = None,
 )

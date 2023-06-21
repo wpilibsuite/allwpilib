@@ -6,4 +6,9 @@ compile_pip_requirements(
     extra_args = ["--allow-unsafe"],
     requirements_in = "requirements.txt",
     requirements_txt = "requirements_lock.txt",
+    tags = [
+        "no-bullseye",
+        "no-raspi",
+        "no-roborio",
+    ],
 )

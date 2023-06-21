@@ -73,6 +73,15 @@ def wpilib_java_binary(name, deps = [], runtime_deps = [], data = [], tags = [],
         **kwargs
     )
 
+def _get_runfiles_suffix(name):
+    lbl = Label(native.repository_name() + "//" + native.package_name() + ":" + name)
+
+    runfiles_suffix = "__main__"
+    if str(lbl).startswith("@@"):
+        runfiles_suffix = "_main"
+
+    return runfiles_suffix
+
 def wpilib_java_junit5_test(
         name,
         deps = [],
@@ -89,7 +98,7 @@ def wpilib_java_junit5_test(
         name = native_shared_libraries_symlink,
         deps = deps + runtime_deps,
         output_directory = select({
-            "@bazel_tools//src/conditions:windows": name + ".exe.runfiles/__main__",
+            "@bazel_tools//src/conditions:windows": name + ".exe.runfiles/" + _get_runfiles_suffix(name),
             "//conditions:default": extracted_native_dir,
         }),
         tags = ["manual"],

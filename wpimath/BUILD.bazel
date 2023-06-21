@@ -10,6 +10,7 @@ py_binary(
     name = "generate_numbers",
     srcs = ["generate_numbers.py"],
     data = [":templates"],
+    tags = ["manual"],
     visibility = ["//visibility:public"],
     deps = [requirement("jinja2")],
 )

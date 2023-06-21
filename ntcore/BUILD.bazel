@@ -14,6 +14,7 @@ py_binary(
     name = "generate_topics",
     srcs = ["generate_topics.py"],
     data = [":templates"],
+    tags = ["manual"],
     visibility = ["//visibility:public"],
     deps = [requirement("jinja2")],
 )

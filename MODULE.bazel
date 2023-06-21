@@ -4,17 +4,30 @@ module(
     compatibility_level = 2023,
 )
 
-bazel_dep(name = "rules_cc", version = "0.0.6")
-bazel_dep(name = "rules_java", version = "5.5.0")
-bazel_dep(name = "rules_python", version = "0.21.0")
 bazel_dep(name = "googletest", version = "1.12.1", repo_name = "gtest")
+bazel_dep(name = "rules_cc", version = "0.0.6")
+bazel_dep(name = "rules_java", version = "6.1.0")
 bazel_dep(name = "rules_jvm_external", version = "5.2")
+bazel_dep(name = "rules_python", version = "0.21.0")
 bazel_dep(name = "bzlmodrio-apriltaglib", version = "3.2.0-3")
 bazel_dep(name = "bzlmodrio-imgui", version = "1.89.1-1")
 bazel_dep(name = "bzlmodrio-libssh", version = "0.95-6")
 bazel_dep(name = "bzlmodrio-ni", version = "2023.3.0")
 bazel_dep(name = "bzlmodrio-opencv", version = "4.6.0-4")
 bazel_dep(name = "rules_bzlmodrio_toolchains", version = "2023-7")
+bazel_dep(name = "rules_bazelrio", version = "0.0.10")
+
+# TODO temporary
+git_override(
+    module_name = "rules_bzlmodrio_toolchains",
+    commit = "8ed5bdadbca20c0f6e7c3c1e8d0f8089fe449706",
+    remote = "https://github.com/bzlmodRio/rules_bzlmodrio_toolchains",
+)
+
+# local_path_override(
+#     module_name = "rules_bzlmodrio_toolchains",
+#     path = "C:/Users/PJ/git/bzlmodrio/monorepo/rules/rules_bzlmodrio_toolchains",
+# )
 
 maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
 maven.install(
