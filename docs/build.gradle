@@ -67,9 +67,6 @@ doxygen {
     cppIncludeRoots << '../ntcore/build/generated/main/native/include/'
 
     if (project.hasProperty('docWarningsAsErrors')) {
-        // C++20 shims
-        exclude 'wpi/ghc/filesystem.hpp'
-
         // Drake
         exclude 'drake/common/**'
 
