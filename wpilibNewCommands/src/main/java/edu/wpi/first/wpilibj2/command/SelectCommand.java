@@ -23,7 +23,6 @@ import java.util.function.Supplier;
 public class SelectCommand extends CommandBase {
   private final Map<Object, Command> m_commands;
   private final Supplier<Object> m_selector;
-  private final Supplier<Command> m_toRun;
   private Command m_selectedCommand;
   private boolean m_runsWhenDisabled = true;
   private InterruptionBehavior m_interruptBehavior = InterruptionBehavior.kCancelIncoming;
@@ -41,8 +40,6 @@ public class SelectCommand extends CommandBase {
     CommandScheduler.getInstance()
         .registerComposedCommands(commands.values().toArray(new Command[] {}));
 
-    m_toRun = null;
-
     for (Command command : m_commands.values()) {
       m_requirements.addAll(command.getRequirements());
       m_runsWhenDisabled &= command.runsWhenDisabled();
@@ -52,35 +49,13 @@ public class SelectCommand extends CommandBase {
     }
   }
 
-  /**
-   * Creates a new SelectCommand.
-   *
-   * @param toRun a supplier providing the command to run
-   * @deprecated Replace with {@link ProxyCommand}
-   */
-  @Deprecated
-  public SelectCommand(Supplier<Command> toRun) {
-    m_commands = null;
-    m_selector = null;
-    m_toRun = requireNonNullParam(toRun, "toRun", "SelectCommand");
-
-    // we have no way of checking the underlying command, so default.
-    m_runsWhenDisabled = false;
-    m_interruptBehavior = InterruptionBehavior.kCancelSelf;
-  }
-
   @Override
   public void initialize() {
-    if (m_selector != null) {
-      if (!m_commands.containsKey(m_selector.get())) {
-        m_selectedCommand =
-            new PrintCommand(
-                "SelectCommand selector value does not correspond to" + " any command!");
-        return;
-      }
-      m_selectedCommand = m_commands.get(m_selector.get());
+    if (!m_commands.containsKey(m_selector.get())) {
+      m_selectedCommand =
+          new PrintCommand("SelectCommand selector value does not correspond to" + " any command!");
     } else {
-      m_selectedCommand = m_toRun.get();
+      m_selectedCommand = m_commands.get(m_selector.get());
     }
     m_selectedCommand.initialize();
   }
