@@ -53,7 +53,7 @@ public class SelectCommand extends CommandBase {
   public void initialize() {
     if (!m_commands.containsKey(m_selector.get())) {
       m_selectedCommand =
-          new PrintCommand("SelectCommand selector value does not correspond to" + " any command!");
+          new PrintCommand("SelectCommand selector value does not correspond to any command!");
     } else {
       m_selectedCommand = m_commands.get(m_selector.get());
     }
