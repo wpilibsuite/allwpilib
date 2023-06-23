@@ -507,11 +507,6 @@ public abstract class Command implements Sendable {
     return wrapper;
   }
 
-  /**
-   * Initializes this sendable. Useful for allowing implementations to easily extend SendableBase.
-   *
-   * @param builder the builder used to construct this sendable
-   */
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Command");
