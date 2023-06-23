@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <units/angle.h>
+
 #include "frc/PWM.h"
 
 namespace frc {
@@ -98,11 +100,11 @@ class Servo : public PWM {
  private:
   double GetServoAngleRange() const;
 
-  static constexpr double kMaxServoAngle = 180.0;
+  static constexpr double kMaxServoAngle = 180.;
   static constexpr double kMinServoAngle = 0.0;
 
-  static constexpr double kDefaultMaxServoPWM = 2.4;
-  static constexpr double kDefaultMinServoPWM = 0.6;
+  static constexpr units::millisecond_t kDefaultMaxServoPWM = 2.4_ms;
+  static constexpr units::millisecond_t kDefaultMinServoPWM = 0.6_ms;
 };
 
 }  // namespace frc
