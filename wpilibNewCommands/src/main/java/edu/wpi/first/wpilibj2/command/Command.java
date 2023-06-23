@@ -541,7 +541,7 @@ public abstract class Command implements Sendable {
    * An enum describing the command's behavior when another command with a shared requirement is
    * scheduled.
    */
-  enum InterruptionBehavior {
+  public enum InterruptionBehavior {
     /**
      * This command ends, {@link #end(boolean) end(true)} is called, and the incoming command is
      * scheduled normally.
