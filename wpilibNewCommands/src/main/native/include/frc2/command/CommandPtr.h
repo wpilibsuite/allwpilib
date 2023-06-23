@@ -63,16 +63,16 @@ class CommandPtr final {
   /**
    * Decorates this command to run or stop when disabled.
    *
-   * @param doesRunWhenDisabled true to run when disabled.
+   * @param doesRunWhenDisabled true to run when disabled
    * @return the decorated command
    */
   [[nodiscard]]
   CommandPtr IgnoringDisable(bool doesRunWhenDisabled) &&;
 
   /**
-   * Decorates this command to run or stop when disabled.
+   * Decorates this command to have a different interrupt behavior.
    *
-   * @param interruptBehavior true to run when disabled.
+   * @param interruptBehavior the desired interrupt behavior
    * @return the decorated command
    */
   [[nodiscard]]
@@ -145,10 +145,9 @@ class CommandPtr final {
   CommandPtr BeforeStarting(CommandPtr&& before) &&;
 
   /**
-   * Decorates this command with a timeout.  If the specified timeout is
+   * Decorates this command with a timeout. If the specified timeout is
    * exceeded before the command finishes normally, the command will be
-   * interrupted and un-scheduled.  Note that the timeout only applies to the
-   * command returned by this method; the calling command is not itself changed.
+   * interrupted and un-scheduled.
    *
    * @param duration the timeout duration
    * @return the command with the timeout added
@@ -157,10 +156,9 @@ class CommandPtr final {
   CommandPtr WithTimeout(units::second_t duration) &&;
 
   /**
-   * Decorates this command with an interrupt condition.  If the specified
+   * Decorates this command with an interrupt condition. If the specified
    * condition becomes true before the command finishes normally, the command
-   * will be interrupted and un-scheduled. Note that this only applies to the
-   * command returned by this method; the calling command is not itself changed.
+   * will be interrupted and un-scheduled.
    *
    * @param condition the interrupt condition
    * @return the command with the interrupt condition added
@@ -169,13 +167,12 @@ class CommandPtr final {
   CommandPtr Until(std::function<bool()> condition) &&;
 
   /**
-   * Decorates this command with a run condition.  If the specified condition
+   * Decorates this command with a run condition. If the specified condition
    * becomes false before the command finishes normally, the command will be
-   * interrupted and un-scheduled. Note that this only applies to the command
-   * returned by this method; the calling command is not itself changed.
+   * interrupted and un-scheduled.
    *
-   * @param condition the interrupt condition
-   * @return the command with the interrupt condition added
+   * @param condition the run condition
+   * @return the command with the run condition added
    */
   [[nodiscard]]
   CommandPtr OnlyWhile(std::function<bool()> condition) &&;
@@ -243,7 +240,7 @@ class CommandPtr final {
    * the command's inherent Command::End(bool) method.
    *
    * @param end a lambda accepting a boolean parameter specifying whether the
-   * command was interrupted.
+   * command was interrupted
    * @return the decorated command
    */
   [[nodiscard]]
