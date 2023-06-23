@@ -183,7 +183,7 @@ void CommandScheduler::Run() {
     if constexpr (frc::RobotBase::IsSimulation()) {
       subsystem.getFirst()->SimulationPeriodic();
     }
-    m_watchdog.AddEpoch(GetTypeName(subsystem) + ".Periodic()");
+    m_watchdog.AddEpoch(subsystem.getFirst()->GetName() + ".Periodic()");
   }
 
   // Cache the active instance to avoid concurrency problems if SetActiveLoop()

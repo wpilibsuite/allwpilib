@@ -260,7 +260,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
       if (RobotBase.isSimulation()) {
         subsystem.simulationPeriodic();
       }
-      m_watchdog.addEpoch(subsystem.getClass().getSimpleName() + ".periodic()");
+      m_watchdog.addEpoch(subsystem.getName() + ".periodic()");
     }
 
     // Cache the active instance to avoid concurrency problems if setActiveLoop() is called from
