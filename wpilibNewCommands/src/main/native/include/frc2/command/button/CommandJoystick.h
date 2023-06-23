@@ -18,7 +18,7 @@ namespace frc2 {
  */
 class CommandJoystick : public CommandGenericHID, public virtual frc::Joystick {
  public:
-  CommandJoystick(int port);
+  explicit CommandJoystick(int port);
 
   /**
    * Constructs an event instance around the trigger button's digital signal.
