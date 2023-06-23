@@ -175,7 +175,9 @@ doxygen {
     enable_preprocessing true
     macro_expansion true
     expand_only_predef true
-    predefined "WPI_DEPRECATED(x)=[[deprecated(x)]]"
+    predefined "WPI_DEPRECATED(x)=[[deprecated(x)]]\"\\\n" +
+            "\"__cplusplus"
+
 
     if (project.hasProperty('docWarningsAsErrors')) {
         warn_as_error 'FAIL_ON_WARNINGS'
