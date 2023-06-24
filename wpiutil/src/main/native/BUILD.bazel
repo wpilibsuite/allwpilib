@@ -37,7 +37,6 @@ wpilib_cc_static_and_shared_library(
     includes = ["include"],
     standard_deps = [
         "//wpiutil/src/main/native/thirdparty/fmtlib:fmtlib-headers",
-        "//wpiutil/src/main/native/thirdparty/ghc:ghc-headers",
         "//wpiutil/src/main/native/thirdparty/json:json-headers",
         "//wpiutil/src/main/native/thirdparty/llvm:llvm-headers",
         "//wpiutil/src/main/native/thirdparty/mpack:mpack-headers",

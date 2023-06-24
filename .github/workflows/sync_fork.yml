@@ -13,6 +13,8 @@ jobs:
     steps:
       - uses: tgymnich/fork-sync@v1.8
         with:
+          token: ${{ secrets.AUTO_UPDATE_KEY }}
           owner: bazelRio
-          base: master
-          head: master
+          base: main
+          head: main
+          auto_merge: false
