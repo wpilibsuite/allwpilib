@@ -125,6 +125,25 @@ TEST_F(SwerveDriveKinematicsTest, ConserveWheelAngle) {
   EXPECT_NEAR(bl.angle.Degrees().value(), -135.0, kEpsilon);
   EXPECT_NEAR(br.angle.Degrees().value(), -45.0, kEpsilon);
 }
+TEST_F(SwerveDriveKinematicsTest, ResetWheelAngle) {
+  Rotation2d fl = {0_deg};
+  Rotation2d fr = {90_deg};
+  Rotation2d bl = {180_deg};
+  Rotation2d br = {270_deg};
+  m_kinematics.ResetHeadings(fl, fr, bl, br);
+  auto [flMod, frMod, blMod, brMod] =
+      m_kinematics.ToSwerveModuleStates(ChassisSpeeds{});
+
+  EXPECT_NEAR(flMod.speed.value(), 0.0, kEpsilon);
+  EXPECT_NEAR(frMod.speed.value(), 0.0, kEpsilon);
+  EXPECT_NEAR(blMod.speed.value(), 0.0, kEpsilon);
+  EXPECT_NEAR(brMod.speed.value(), 0.0, kEpsilon);
+
+  EXPECT_NEAR(flMod.angle.Degrees().value(), 0.0, kEpsilon);
+  EXPECT_NEAR(frMod.angle.Degrees().value(), 90.0, kEpsilon);
+  EXPECT_NEAR(blMod.angle.Degrees().value(), 180.0, kEpsilon);
+  EXPECT_NEAR(brMod.angle.Degrees().value(), 270.0, kEpsilon);
+}
 
 TEST_F(SwerveDriveKinematicsTest, TurnInPlaceForwardKinematics) {
   SwerveModuleState fl{106.629_mps, 135_deg};
@@ -273,4 +292,19 @@ TEST_F(SwerveDriveKinematicsTest, DesaturateSmooth) {
   EXPECT_NEAR(arr[1].speed.value(), 6.0 * kFactor, kEpsilon);
   EXPECT_NEAR(arr[2].speed.value(), 4.0 * kFactor, kEpsilon);
   EXPECT_NEAR(arr[3].speed.value(), 7.0 * kFactor, kEpsilon);
+}
+
+TEST_F(SwerveDriveKinematicsTest, DesaturateNegativeSpeed) {
+  SwerveModuleState state1{1.0_mps, 0_deg};
+  SwerveModuleState state2{1.0_mps, 0_deg};
+  SwerveModuleState state3{-2.0_mps, 0_deg};
+  SwerveModuleState state4{-2.0_mps, 0_deg};
+
+  wpi::array<SwerveModuleState, 4> arr{state1, state2, state3, state4};
+  SwerveDriveKinematics<4>::DesaturateWheelSpeeds(&arr, 1.0_mps);
+
+  EXPECT_NEAR(arr[0].speed.value(), 0.5, kEpsilon);
+  EXPECT_NEAR(arr[1].speed.value(), 0.5, kEpsilon);
+  EXPECT_NEAR(arr[2].speed.value(), -1.0, kEpsilon);
+  EXPECT_NEAR(arr[3].speed.value(), -1.0, kEpsilon);
 }

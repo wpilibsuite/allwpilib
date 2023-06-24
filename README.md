@@ -17,6 +17,7 @@ Welcome to the WPILib project. This repository contains the HAL, WPILibJ, and WP
     - [Custom toolchain location](#custom-toolchain-location)
     - [Formatting/Linting](#formattinglinting)
     - [CMake](#cmake)
+  - [Running examples in simulation](#running-examples-in-simulation)
   - [Publishing](#publishing)
   - [Structure and Organization](#structure-and-organization)
 - [Contributing to WPILib](#contributing-to-wpilib)
@@ -61,7 +62,7 @@ On macOS ARM, run `softwareupdate --install-rosetta`. This is necessary to be ab
 
 Clone the WPILib repository and follow the instructions above for installing any required tooling.
 
-See the [styleguide README](https://github.com/wpilibsuite/styleguide/blob/main/README.md) for wpiformat setup instructions. We use clang-format 14.
+See the [styleguide README](https://github.com/wpilibsuite/styleguide/blob/main/README.md) for wpiformat setup instructions.
 
 ## Building
 
@@ -119,7 +120,7 @@ Once a PR has been submitted, formatting can be run in CI by commenting `/format
 
 #### wpiformat
 
-wpiformat can be executed anywhere in the repository via `py -3 -m wpiformat -clang 14` on Windows or `python3 -m wpiformat -clang 14` on other platforms.
+wpiformat can be executed anywhere in the repository via `py -3 -m wpiformat` on Windows or `python3 -m wpiformat` on other platforms.
 
 #### Java Code Quality Tools
 
@@ -130,6 +131,16 @@ If you only want to run the Java autoformatter, run `./gradlew spotlessApply`.
 ### CMake
 
 CMake is also supported for building. See [README-CMAKE.md](README-CMAKE.md).
+
+## Running examples in simulation
+
+Examples can be run in simulation with the following command:
+
+```bash
+./gradlew wpilibcExamples:runExample
+./gradlew wpilibjExamples:runExample
+```
+where `Example` is the example's folder name.
 
 ## Publishing
 

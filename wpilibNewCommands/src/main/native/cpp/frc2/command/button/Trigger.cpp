@@ -5,6 +5,7 @@
 #include "frc2/command/button/Trigger.h"
 
 #include <frc/filter/Debouncer.h>
+#include <wpi/deprecated.h>
 
 #include "frc2/command/InstantCommand.h"
 

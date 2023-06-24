@@ -1,7 +1,7 @@
-From a172c93df929ac6c9f783fd5af1e4df3604c4c66 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 19:16:51 -0400
-Subject: [PATCH 22/28] Remove unused functions
+Subject: [PATCH 22/29] Remove unused functions
 
 ---
  llvm/include/llvm/Support/DJB.h         |  3 -
@@ -12,7 +12,7 @@ Subject: [PATCH 22/28] Remove unused functions
  5 files changed, 23 insertions(+), 131 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/DJB.h b/llvm/include/llvm/Support/DJB.h
-index 8737cd144..67b0ae91b 100644
+index 8737cd144c37f9041a781a74e9f2b43384e85761..67b0ae91b4b1401374d7d39d859daaf30da17ee2 100644
 --- a/llvm/include/llvm/Support/DJB.h
 +++ b/llvm/include/llvm/Support/DJB.h
 @@ -24,9 +24,6 @@ inline uint32_t djbHash(std::string_view Buffer, uint32_t H = 5381) {
@@ -26,7 +26,7 @@ index 8737cd144..67b0ae91b 100644
  
  #endif // LLVM_SUPPORT_DJB_H
 diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
-index 256bcec25..9b3a87e1b 100644
+index 256bcec259a8026473a5f3926bd79b215bd5b888..9b3a87e1bbc0abe83b204bd8f889ffe3a3cafffa 100644
 --- a/llvm/include/llvm/Support/raw_ostream.h
 +++ b/llvm/include/llvm/Support/raw_ostream.h
 @@ -71,7 +71,6 @@ private:
@@ -50,7 +50,7 @@ index 256bcec25..9b3a87e1b 100644
    /// Tie this stream to the specified stream. Replaces any existing tied-to
    /// stream. Specifying a nullptr unties the stream.
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index 8de7b726d..bc08199a1 100644
+index 27ca15f7d239a8e5050cadd159dad96de150e444..53fe22b5eb8dad289cced414ed6f544fd0249504 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
 @@ -178,22 +178,6 @@ void llvm::llvm_unreachable_internal(const char *msg, const char *file,
@@ -77,7 +77,7 @@ index 8de7b726d..bc08199a1 100644
  
  #include <winerror.h>
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index 878a3a5e9..632b52235 100644
+index 878a3a5e99949da360a93dc51298460cc61d4f3f..632b522358c969682f01dbbb9a6f86cf14093bc3 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
 @@ -167,16 +167,6 @@ raw_ostream &raw_ostream::write_escaped(std::string_view Str,
@@ -185,7 +185,7 @@ index 878a3a5e9..632b52235 100644
    pos = ::lseek(FD, off, SEEK_SET);
  #endif
 diff --git a/llvm/unittests/ADT/SmallStringTest.cpp b/llvm/unittests/ADT/SmallStringTest.cpp
-index bee3875d1..87600ea47 100644
+index bee3875d11c9b793d79ac442312559b11dba9f5f..87600ea4704bc98acab9085d16cfafd3d586714e 100644
 --- a/llvm/unittests/ADT/SmallStringTest.cpp
 +++ b/llvm/unittests/ADT/SmallStringTest.cpp
 @@ -129,23 +129,6 @@ TEST_F(SmallStringTest, StdStringConversion) {

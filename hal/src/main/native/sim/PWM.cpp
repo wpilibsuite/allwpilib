@@ -105,7 +105,7 @@ HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
   SimPWMData[origChannel].initialized = true;
 
   // Defaults to allow an always valid config.
-  HAL_SetPWMConfig(handle, 2.0, 1.501, 1.5, 1.499, 1.0, status);
+  HAL_SetPWMConfigMicroseconds(handle, 2000, 1501, 1500, 1499, 1000, status);
 
   port->previousAllocation = allocationLocation ? allocationLocation : "";
 
@@ -127,62 +127,28 @@ HAL_Bool HAL_CheckPWMChannel(int32_t channel) {
   return channel < kNumPWMChannels && channel >= 0;
 }
 
-void HAL_SetPWMConfig(HAL_DigitalHandle pwmPortHandle, double max,
-                      double deadbandMax, double center, double deadbandMin,
-                      double min, int32_t* status) {
+void HAL_SetPWMConfigMicroseconds(HAL_DigitalHandle pwmPortHandle, int32_t max,
+                                  int32_t deadbandMax, int32_t center,
+                                  int32_t deadbandMin, int32_t min,
+                                  int32_t* status) {
   auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
   }
 
-  // calculate the loop time in milliseconds
-  double loopTime =
-      HAL_GetPWMLoopTiming(status) / (kSystemClockTicksPerMicrosecond * 1e3);
-  if (*status != 0) {
-    return;
-  }
-
-  int32_t maxPwm = static_cast<int32_t>((max - kDefaultPwmCenter) / loopTime +
-                                        kDefaultPwmStepsDown - 1);
-  int32_t deadbandMaxPwm = static_cast<int32_t>(
-      (deadbandMax - kDefaultPwmCenter) / loopTime + kDefaultPwmStepsDown - 1);
-  int32_t centerPwm = static_cast<int32_t>(
-      (center - kDefaultPwmCenter) / loopTime + kDefaultPwmStepsDown - 1);
-  int32_t deadbandMinPwm = static_cast<int32_t>(
-      (deadbandMin - kDefaultPwmCenter) / loopTime + kDefaultPwmStepsDown - 1);
-  int32_t minPwm = static_cast<int32_t>((min - kDefaultPwmCenter) / loopTime +
-                                        kDefaultPwmStepsDown - 1);
-
-  port->maxPwm = maxPwm;
-  port->deadbandMaxPwm = deadbandMaxPwm;
-  port->deadbandMinPwm = deadbandMinPwm;
-  port->centerPwm = centerPwm;
-  port->minPwm = minPwm;
+  port->maxPwm = max;
+  port->deadbandMaxPwm = deadbandMax;
+  port->deadbandMinPwm = deadbandMin;
+  port->centerPwm = center;
+  port->minPwm = min;
   port->configSet = true;
 }
 
-void HAL_SetPWMConfigRaw(HAL_DigitalHandle pwmPortHandle, int32_t maxPwm,
-                         int32_t deadbandMaxPwm, int32_t centerPwm,
-                         int32_t deadbandMinPwm, int32_t minPwm,
-                         int32_t* status) {
-  auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
-  if (port == nullptr) {
-    *status = HAL_HANDLE_ERROR;
-    return;
-  }
-
-  port->maxPwm = maxPwm;
-  port->deadbandMaxPwm = deadbandMaxPwm;
-  port->deadbandMinPwm = deadbandMinPwm;
-  port->centerPwm = centerPwm;
-  port->minPwm = minPwm;
-}
-
-void HAL_GetPWMConfigRaw(HAL_DigitalHandle pwmPortHandle, int32_t* maxPwm,
-                         int32_t* deadbandMaxPwm, int32_t* centerPwm,
-                         int32_t* deadbandMinPwm, int32_t* minPwm,
-                         int32_t* status) {
+void HAL_GetPWMConfigMicroseconds(HAL_DigitalHandle pwmPortHandle,
+                                  int32_t* maxPwm, int32_t* deadbandMaxPwm,
+                                  int32_t* centerPwm, int32_t* deadbandMinPwm,
+                                  int32_t* minPwm, int32_t* status) {
   auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -215,15 +181,15 @@ HAL_Bool HAL_GetPWMEliminateDeadband(HAL_DigitalHandle pwmPortHandle,
   return port->eliminateDeadband;
 }
 
-void HAL_SetPWMRaw(HAL_DigitalHandle pwmPortHandle, int32_t value,
-                   int32_t* status) {
+void HAL_SetPWMPulseTimeMicroseconds(HAL_DigitalHandle pwmPortHandle,
+                                     int32_t value, int32_t* status) {
   auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
   }
 
-  SimPWMData[port->channel].rawValue = value;
+  SimPWMData[port->channel].pulseMicrosecond = value;
 
   DigitalPort* dPort = port.get();
   double speed = 0.0;
@@ -301,7 +267,7 @@ void HAL_SetPWMSpeed(HAL_DigitalHandle pwmPortHandle, double speed,
     return;
   }
 
-  HAL_SetPWMRaw(pwmPortHandle, rawValue, status);
+  HAL_SetPWMPulseTimeMicroseconds(pwmPortHandle, rawValue, status);
 }
 
 void HAL_SetPWMPosition(HAL_DigitalHandle pwmPortHandle, double pos,
@@ -335,7 +301,7 @@ void HAL_SetPWMPosition(HAL_DigitalHandle pwmPortHandle, double pos,
     return;
   }
 
-  HAL_SetPWMRaw(pwmPortHandle, rawValue, status);
+  HAL_SetPWMPulseTimeMicroseconds(pwmPortHandle, rawValue, status);
 }
 
 void HAL_SetPWMDisabled(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
@@ -344,19 +310,20 @@ void HAL_SetPWMDisabled(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
     *status = HAL_HANDLE_ERROR;
     return;
   }
-  SimPWMData[port->channel].rawValue = 0;
+  SimPWMData[port->channel].pulseMicrosecond = 0;
   SimPWMData[port->channel].position = 0;
   SimPWMData[port->channel].speed = 0;
 }
 
-int32_t HAL_GetPWMRaw(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
+int32_t HAL_GetPWMPulseTimeMicroseconds(HAL_DigitalHandle pwmPortHandle,
+                                        int32_t* status) {
   auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return 0;
   }
 
-  return SimPWMData[port->channel].rawValue;
+  return SimPWMData[port->channel].pulseMicrosecond;
 }
 
 double HAL_GetPWMSpeed(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
@@ -410,6 +377,19 @@ void HAL_LatchPWMZero(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
 
   SimPWMData[port->channel].zeroLatch = true;
   SimPWMData[port->channel].zeroLatch = false;
+}
+
+void HAL_SetPWMAlwaysHighMode(HAL_DigitalHandle pwmPortHandle,
+                              int32_t* status) {
+  auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
+  if (port == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+
+  SimPWMData[port->channel].pulseMicrosecond = 0xFFFF;
+  SimPWMData[port->channel].position = 0xFFFF;
+  SimPWMData[port->channel].speed = 0xFFFF;
 }
 
 void HAL_SetPWMPeriodScale(HAL_DigitalHandle pwmPortHandle, int32_t squelchMask,

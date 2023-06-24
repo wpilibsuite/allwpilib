@@ -22,6 +22,7 @@ def main():
     for f in [
         "0001-Don-t-throw-on-write-failure.patch",
         "0002-Suppress-C-20-clang-tidy-warning-false-positive.patch",
+        "0003-Suppress-warnings-we-can-t-fix.patch",
     ]:
         git_am(os.path.join(wpilib_root, "upstream_utils/fmt_patches", f))
 

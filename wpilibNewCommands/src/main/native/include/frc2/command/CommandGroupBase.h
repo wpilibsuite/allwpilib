@@ -7,8 +7,6 @@
 #include <memory>
 #include <vector>
 
-#include <wpi/deprecated.h>
-
 #include "frc2/command/CommandBase.h"
 
 namespace frc2 {

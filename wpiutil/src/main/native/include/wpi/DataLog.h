@@ -190,43 +190,146 @@ class DataLog final {
   void SetMetadata(int entry, std::string_view metadata, int64_t timestamp = 0);
 
   /**
-   * Appends a record to the log.
+   * Appends a raw record to the log.
    *
    * @param entry Entry index, as returned by Start()
-   * @param data Data to record
+   * @param data Byte array to record
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
   void AppendRaw(int entry, std::span<const uint8_t> data, int64_t timestamp);
 
   /**
-   * Appends a record to the log.
+   * Appends a raw record to the log.
    *
    * @param entry Entry index, as returned by Start()
-   * @param data Data to record
+   * @param data Byte array to record
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
   void AppendRaw2(int entry, std::span<const std::span<const uint8_t>> data,
                   int64_t timestamp);
 
+  /**
+   * Appends a boolean record to the log.
+   *
+   * @param entry Entry index, as returned by Start()
+   * @param value Boolean value to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
   void AppendBoolean(int entry, bool value, int64_t timestamp);
+
+  /**
+   * Appends an integer record to the log.
+   *
+   * @param entry Entry index, as returned by Start()
+   * @param value Integer value to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
   void AppendInteger(int entry, int64_t value, int64_t timestamp);
+
+  /**
+   * Appends a float record to the log.
+   *
+   * @param entry Entry index, as returned by Start()
+   * @param value Float value to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
   void AppendFloat(int entry, float value, int64_t timestamp);
+
+  /**
+   * Appends a double record to the log.
+   *
+   * @param entry Entry index, as returned by Start()
+   * @param value Double value to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
   void AppendDouble(int entry, double value, int64_t timestamp);
+
+  /**
+   * Appends a string record to the log.
+   *
+   * @param entry Entry index, as returned by Start()
+   * @param value String value to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
   void AppendString(int entry, std::string_view value, int64_t timestamp);
+
+  /**
+   * Appends a boolean array record to the log.
+   *
+   * @param entry Entry index, as returned by Start()
+   * @param arr Boolean array to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
   void AppendBooleanArray(int entry, std::span<const bool> arr,
                           int64_t timestamp);
+
+  /**
+   * Appends a boolean array record to the log.
+   *
+   * @param entry Entry index, as returned by Start()
+   * @param arr Boolean array to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
   void AppendBooleanArray(int entry, std::span<const int> arr,
                           int64_t timestamp);
+
+  /**
+   * Appends a boolean array record to the log.
+   *
+   * @param entry Entry index, as returned by Start()
+   * @param arr Boolean array to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
   void AppendBooleanArray(int entry, std::span<const uint8_t> arr,
                           int64_t timestamp);
+
+  /**
+   * Appends an integer array record to the log.
+   *
+   * @param entry Entry index, as returned by Start()
+   * @param arr Integer array to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
   void AppendIntegerArray(int entry, std::span<const int64_t> arr,
                           int64_t timestamp);
+
+  /**
+   * Appends a float array record to the log.
+   *
+   * @param entry Entry index, as returned by Start()
+   * @param arr Float array to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
   void AppendFloatArray(int entry, std::span<const float> arr,
                         int64_t timestamp);
+
+  /**
+   * Appends a double array record to the log.
+   *
+   * @param entry Entry index, as returned by Start()
+   * @param arr Double array to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
   void AppendDoubleArray(int entry, std::span<const double> arr,
                          int64_t timestamp);
+
+  /**
+   * Appends a string array record to the log.
+   *
+   * @param entry Entry index, as returned by Start()
+   * @param arr String array to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
   void AppendStringArray(int entry, std::span<const std::string> arr,
                          int64_t timestamp);
+
+  /**
+   * Appends a string array record to the log.
+   *
+   * @param entry Entry index, as returned by Start()
+   * @param arr String array to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
   void AppendStringArray(int entry, std::span<const std::string_view> arr,
                          int64_t timestamp);
 

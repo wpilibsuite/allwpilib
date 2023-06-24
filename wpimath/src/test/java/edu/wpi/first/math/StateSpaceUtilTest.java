@@ -12,13 +12,18 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
+import edu.wpi.first.wpilibj.UtilityClassTest;
 import java.util.ArrayList;
 import java.util.List;
 import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.ejml.simple.SimpleMatrix;
 import org.junit.jupiter.api.Test;
 
-class StateSpaceUtilTest {
+class StateSpaceUtilTest extends UtilityClassTest<StateSpaceUtil> {
+  StateSpaceUtilTest() {
+    super(StateSpaceUtil.class);
+  }
+
   @Test
   void testCostArray() {
     var mat = StateSpaceUtil.makeCostMatrix(VecBuilder.fill(1.0, 2.0, 3.0));

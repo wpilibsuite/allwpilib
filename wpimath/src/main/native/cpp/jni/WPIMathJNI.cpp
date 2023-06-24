@@ -12,46 +12,50 @@
 #include "Eigen/Core"
 #include "Eigen/Eigenvalues"
 #include "Eigen/QR"
-#include "drake/math/discrete_algebraic_riccati_equation.h"
 #include "edu_wpi_first_math_WPIMathJNI.h"
+#include "frc/DARE.h"
 #include "frc/trajectory/TrajectoryUtil.h"
 #include "unsupported/Eigen/MatrixFunctions"
 
 using namespace wpi::java;
+
+namespace {
 
 /**
  * Returns true if (A, B) is a stabilizable pair.
  *
  * (A, B) is stabilizable if and only if the uncontrollable eigenvalues of A, if
  * any, have absolute values less than one, where an eigenvalue is
- * uncontrollable if rank(λI - A, B) < n where n is the number of states.
+ * uncontrollable if rank([λI - A, B]) < n where n is the number of states.
  *
  * @param A System matrix.
  * @param B Input matrix.
  */
-bool check_stabilizable(const Eigen::Ref<const Eigen::MatrixXd>& A,
-                        const Eigen::Ref<const Eigen::MatrixXd>& B) {
-  int states = B.rows();
-  int inputs = B.cols();
-  Eigen::EigenSolver<Eigen::MatrixXd> es{A};
-  for (int i = 0; i < states; ++i) {
+bool IsStabilizable(const Eigen::Ref<const Eigen::MatrixXd>& A,
+                    const Eigen::Ref<const Eigen::MatrixXd>& B) {
+  Eigen::EigenSolver<Eigen::MatrixXd> es{A, false};
+
+  for (int i = 0; i < A.rows(); ++i) {
     if (es.eigenvalues()[i].real() * es.eigenvalues()[i].real() +
             es.eigenvalues()[i].imag() * es.eigenvalues()[i].imag() <
         1) {
       continue;
     }
 
-    Eigen::MatrixXcd E{states, states + inputs};
-    E << es.eigenvalues()[i] * Eigen::MatrixXcd::Identity(states, states) - A,
+    Eigen::MatrixXcd E{A.rows(), A.rows() + B.cols()};
+    E << es.eigenvalues()[i] * Eigen::MatrixXcd::Identity(A.rows(), A.rows()) -
+             A,
         B;
+
     Eigen::ColPivHouseholderQR<Eigen::MatrixXcd> qr{E};
-    if (qr.rank() < states) {
+    if (qr.rank() < A.rows()) {
       return false;
     }
   }
-
   return true;
 }
+
+}  // namespace
 
 std::vector<double> GetElementsFromTrajectory(
     const frc::Trajectory& trajectory) {
@@ -97,11 +101,11 @@ extern "C" {
 
 /*
  * Class:     edu_wpi_first_math_WPIMathJNI
- * Method:    discreteAlgebraicRiccatiEquation
+ * Method:    dare
  * Signature: ([D[D[D[DII[D)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_math_WPIMathJNI_discreteAlgebraicRiccatiEquation
+Java_edu_wpi_first_math_WPIMathJNI_dare
   (JNIEnv* env, jclass, jdoubleArray A, jdoubleArray B, jdoubleArray Q,
    jdoubleArray R, jint states, jint inputs, jdoubleArray S)
 {
@@ -124,8 +128,7 @@ Java_edu_wpi_first_math_WPIMathJNI_discreteAlgebraicRiccatiEquation
       Rmat{nativeR, inputs, inputs};
 
   try {
-    Eigen::MatrixXd result =
-        drake::math::DiscreteAlgebraicRiccatiEquation(Amat, Bmat, Qmat, Rmat);
+    Eigen::MatrixXd result = frc::DARE(Amat, Bmat, Qmat, Rmat);
 
     env->ReleaseDoubleArrayElements(A, nativeA, 0);
     env->ReleaseDoubleArrayElements(B, nativeB, 0);
@@ -205,7 +208,7 @@ Java_edu_wpi_first_math_WPIMathJNI_isStabilizable
       Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>
       B{nativeB, states, inputs};
 
-  bool isStabilizable = check_stabilizable(A, B);
+  bool isStabilizable = IsStabilizable(A, B);
 
   env->ReleaseDoubleArrayElements(aSrc, nativeA, 0);
   env->ReleaseDoubleArrayElements(bSrc, nativeB, 0);

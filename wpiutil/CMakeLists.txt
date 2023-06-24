@@ -146,11 +146,6 @@ target_include_directories(wpiutil PUBLIC
                             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/memory/include>
                             $<INSTALL_INTERFACE:${include_dest}/wpiutil>)
 
-install(DIRECTORY src/main/native/thirdparty/ghc/include/ DESTINATION "${include_dest}/wpiutil")
-target_include_directories(wpiutil PUBLIC
-                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/ghc/include>
-                            $<INSTALL_INTERFACE:${include_dest}/wpiutil>)
-
 install(DIRECTORY src/main/native/thirdparty/json/include/ DESTINATION "${include_dest}/wpiutil")
 target_include_directories(wpiutil PUBLIC
                             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/json/include>

@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <concepts>
 #include <functional>
 #include <initializer_list>
 #include <memory>
@@ -14,7 +15,6 @@
 #include <frc/event/EventLoop.h>
 #include <frc/filter/Debouncer.h>
 #include <units/time.h>
-#include <wpi/deprecated.h>
 
 #include "frc2/command/Command.h"
 #include "frc2/command/CommandScheduler.h"
@@ -213,7 +213,7 @@ class Trigger {
    * @return The trigger, for chained calls.
    * @deprecated Use OnTrue(Command) instead
    */
-  WPI_DEPRECATED("Use OnTrue(Command) instead")
+  [[deprecated("Use OnTrue(Command) instead")]]
   Trigger WhenActive(Command* command);
 
   /**
@@ -226,12 +226,11 @@ class Trigger {
    * @return The trigger, for chained calls.
    * @deprecated Use OnTrue(Command) instead
    */
-  template <class T, typename = std::enable_if_t<std::is_base_of_v<
-                         Command, std::remove_reference_t<T>>>>
-  WPI_DEPRECATED("Use OnTrue(Command) instead")
+  template <std::derived_from<Command> T>
+  [[deprecated("Use OnTrue(Command) instead")]]
   Trigger WhenActive(T&& command) {
     m_loop->Bind([condition = m_condition, previous = m_condition(),
-                  command = std::make_unique<std::remove_reference_t<T>>(
+                  command = std::make_unique<std::decay_t<T>>(
                       std::forward<T>(command))]() mutable {
       bool current = condition();
 
@@ -252,8 +251,8 @@ class Trigger {
    * @deprecated Use OnTrue(Command) instead and construct the InstantCommand
    * manually
    */
-  WPI_DEPRECATED(
-      "Use OnTrue(Command) instead and construct the InstantCommand manually")
+  [[deprecated(
+      "Use OnTrue(Command) instead and construct the InstantCommand manually")]]
   Trigger WhenActive(std::function<void()> toRun,
                      std::initializer_list<Subsystem*> requirements);
 
@@ -265,8 +264,8 @@ class Trigger {
    * @deprecated Use OnTrue(Command) instead and construct the InstantCommand
    * manually
    */
-  WPI_DEPRECATED(
-      "Use OnTrue(Command) instead and construct the InstantCommand manually")
+  [[deprecated(
+      "Use OnTrue(Command) instead and construct the InstantCommand manually")]]
   Trigger WhenActive(std::function<void()> toRun,
                      std::span<Subsystem* const> requirements = {});
 
@@ -280,9 +279,9 @@ class Trigger {
    * @deprecated Use WhileTrue(Command) with RepeatCommand, or bind
    command::Schedule with IfHigh(std::function<void()>).
    */
-  WPI_DEPRECATED(
+  [[deprecated(
       "Use WhileTrue(Command) with RepeatCommand, or bind command::Schedule "
-      "with IfHigh(std::function<void()>).")
+      "with IfHigh(std::function<void()>).")]]
   Trigger WhileActiveContinous(Command* command);
 
   /**
@@ -296,14 +295,13 @@ class Trigger {
    * @deprecated Use WhileTrue(Command) with RepeatCommand, or bind
    command::Schedule with IfHigh(std::function<void()>).
    */
-  template <class T, typename = std::enable_if_t<std::is_base_of_v<
-                         Command, std::remove_reference_t<T>>>>
-  WPI_DEPRECATED(
+  template <std::derived_from<Command> T>
+  [[deprecated(
       "Use WhileTrue(Command) with RepeatCommand, or bind command::Schedule "
-      "with IfHigh(std::function<void()>).")
+      "with IfHigh(std::function<void()>).")]]
   Trigger WhileActiveContinous(T&& command) {
     m_loop->Bind([condition = m_condition, previous = m_condition(),
-                  command = std::make_unique<std::remove_reference_t<T>>(
+                  command = std::make_unique<std::decay_t<T>>(
                       std::forward<T>(command))]() mutable {
       bool current = condition();
 
@@ -326,7 +324,7 @@ class Trigger {
    * @param requirements the required subsystems.
    * @deprecated Use WhileTrue(Command) and construct a RunCommand manually
    */
-  WPI_DEPRECATED("Use WhileTrue(Command) and construct a RunCommand manually")
+  [[deprecated("Use WhileTrue(Command) and construct a RunCommand manually")]]
   Trigger WhileActiveContinous(std::function<void()> toRun,
                                std::initializer_list<Subsystem*> requirements);
 
@@ -337,7 +335,7 @@ class Trigger {
    * @param requirements the required subsystems.
    * @deprecated Use WhileTrue(Command) and construct a RunCommand manually
    */
-  WPI_DEPRECATED("Use WhileTrue(Command) and construct a RunCommand manually")
+  [[deprecated("Use WhileTrue(Command) and construct a RunCommand manually")]]
   Trigger WhileActiveContinous(std::function<void()> toRun,
                                std::span<Subsystem* const> requirements = {});
 
@@ -350,7 +348,7 @@ class Trigger {
    * @return The trigger, for chained calls.
    * @deprecated Use WhileTrue(Command) instead.
    */
-  WPI_DEPRECATED("Use WhileTrue(Command) instead.")
+  [[deprecated("Use WhileTrue(Command) instead.")]]
   Trigger WhileActiveOnce(Command* command);
 
   /**
@@ -363,12 +361,11 @@ class Trigger {
    * @return The trigger, for chained calls.
    * @deprecated Use WhileTrue(Command) instead.
    */
-  template <class T, typename = std::enable_if_t<std::is_base_of_v<
-                         Command, std::remove_reference_t<T>>>>
-  WPI_DEPRECATED("Use WhileTrue(Command) instead.")
+  template <std::derived_from<Command> T>
+  [[deprecated("Use WhileTrue(Command) instead.")]]
   Trigger WhileActiveOnce(T&& command) {
     m_loop->Bind([condition = m_condition, previous = m_condition(),
-                  command = std::make_unique<std::remove_reference_t<T>>(
+                  command = std::make_unique<std::decay_t<T>>(
                       std::forward<T>(command))]() mutable {
       bool current = condition();
 
@@ -392,7 +389,7 @@ class Trigger {
    * @return The trigger, for chained calls.
    * @deprecated Use OnFalse(Command) instead.
    */
-  WPI_DEPRECATED("Use OnFalse(Command) instead.")
+  [[deprecated("Use OnFalse(Command) instead.")]]
   Trigger WhenInactive(Command* command);
 
   /**
@@ -405,12 +402,11 @@ class Trigger {
    * @return The trigger, for chained calls.
    * @deprecated Use OnFalse(Command) instead.
    */
-  template <class T, typename = std::enable_if_t<std::is_base_of_v<
-                         Command, std::remove_reference_t<T>>>>
-  WPI_DEPRECATED("Use OnFalse(Command) instead.")
+  template <std::derived_from<Command> T>
+  [[deprecated("Use OnFalse(Command) instead.")]]
   Trigger WhenInactive(T&& command) {
     m_loop->Bind([condition = m_condition, previous = m_condition(),
-                  command = std::make_unique<std::remove_reference_t<T>>(
+                  command = std::make_unique<std::decay_t<T>>(
                       std::forward<T>(command))]() mutable {
       bool current = condition();
 
@@ -431,8 +427,9 @@ class Trigger {
    * @deprecated Use OnFalse(Command) instead and construct the InstantCommand
    * manually
    */
-  WPI_DEPRECATED(
-      "Use OnFalse(Command) instead and construct the InstantCommand manually")
+  [[deprecated(
+      "Use OnFalse(Command) instead and construct the InstantCommand "
+      "manually")]]
   Trigger WhenInactive(std::function<void()> toRun,
                        std::initializer_list<Subsystem*> requirements);
 
@@ -444,8 +441,9 @@ class Trigger {
    * @deprecated Use OnFalse(Command) instead and construct the InstantCommand
    * manually
    */
-  WPI_DEPRECATED(
-      "Use OnFalse(Command) instead and construct the InstantCommand manually")
+  [[deprecated(
+      "Use OnFalse(Command) instead and construct the InstantCommand "
+      "manually")]]
   Trigger WhenInactive(std::function<void()> toRun,
                        std::span<Subsystem* const> requirements = {});
 
@@ -458,7 +456,7 @@ class Trigger {
    * @return The trigger, for chained calls.
    * @deprecated Use ToggleOnTrue(Command) instead.
    */
-  WPI_DEPRECATED("Use ToggleOnTrue(Command) instead.")
+  [[deprecated("Use ToggleOnTrue(Command) instead.")]]
   Trigger ToggleWhenActive(Command* command);
 
   /**
@@ -471,12 +469,11 @@ class Trigger {
    * @return The trigger, for chained calls.
    * @deprecated Use ToggleOnTrue(Command) instead.
    */
-  template <class T, typename = std::enable_if_t<std::is_base_of_v<
-                         Command, std::remove_reference_t<T>>>>
-  WPI_DEPRECATED("Use ToggleOnTrue(Command) instead.")
+  template <std::derived_from<Command> T>
+  [[deprecated("Use ToggleOnTrue(Command) instead.")]]
   Trigger ToggleWhenActive(T&& command) {
     m_loop->Bind([condition = m_condition, previous = m_condition(),
-                  command = std::make_unique<std::remove_reference_t<T>>(
+                  command = std::make_unique<std::decay_t<T>>(
                       std::forward<T>(command))]() mutable {
       bool current = condition();
 
@@ -503,7 +500,7 @@ class Trigger {
    * @return The trigger, for chained calls.
    * @deprecated Pass this as a command end condition with Until() instead.
    */
-  WPI_DEPRECATED("Pass this as a command end condition with Until() instead.")
+  [[deprecated("Pass this as a command end condition with Until() instead.")]]
   Trigger CancelWhenActive(Command* command);
 
   /**

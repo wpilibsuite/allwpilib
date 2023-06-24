@@ -41,24 +41,24 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew docs:generateJavaDocs docs:doxygen -PbuildServer ${{ env.EXTRA_GRADLE_ARGS }}
       - name: Install SSH Client 🔑
-        uses: webfactory/ssh-agent@v0.7.0
+        uses: webfactory/ssh-agent@v0.8.0
         with:
           ssh-private-key: ${{ secrets.GH_DEPLOY_KEY }}
       - name: Deploy Java 🚀
-        uses: JamesIves/github-pages-deploy-action@3.7.1
+        uses: JamesIves/github-pages-deploy-action@v4.4.1
         with:
-          SSH: true
-          REPOSITORY_NAME: wpilibsuite/wpilibsuite.github.io
-          BRANCH: main
-          CLEAN: true
-          FOLDER: docs/build/docs/javadoc
-          TARGET_FOLDER: ${{ env.TARGET_FOLDER }}/java
+          ssh-key: true
+          repository-name: wpilibsuite/wpilibsuite.github.io
+          branch: main
+          clean: true
+          folder: docs/build/docs/javadoc
+          target-folder: ${{ env.TARGET_FOLDER }}/java
       - name: Deploy C++ 🚀
-        uses: JamesIves/github-pages-deploy-action@3.7.1
+        uses: JamesIves/github-pages-deploy-action@v4.4.1
         with:
-          SSH: true
-          REPOSITORY_NAME: wpilibsuite/wpilibsuite.github.io
-          BRANCH: main
-          CLEAN: true
-          FOLDER: docs/build/docs/doxygen/html
-          TARGET_FOLDER: ${{ env.TARGET_FOLDER }}/cpp
+          ssh-key: true
+          repository-name: wpilibsuite/wpilibsuite.github.io
+          branch: main
+          clean: true
+          folder: docs/build/docs/doxygen/html
+          target-folder: ${{ env.TARGET_FOLDER }}/cpp

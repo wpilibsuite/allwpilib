@@ -1,7 +1,7 @@
-From d5613423f057b088f6b3753f49162947d5559ad9 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 26 Apr 2022 15:01:25 -0400
-Subject: [PATCH 1/9] Fix missing casts
+Subject: [PATCH 01/10] Fix missing casts
 
 ---
  include/uv/unix.h              |  2 +-
@@ -47,7 +47,7 @@ Subject: [PATCH 1/9] Fix missing casts
  40 files changed, 166 insertions(+), 162 deletions(-)
 
 diff --git a/include/uv/unix.h b/include/uv/unix.h
-index ea37d787..420be86c 100644
+index ea37d78768654eef98e10982a6b6ddce934bbbbf..420be86c6f9984486c6420ff710c9dbcad09e411 100644
 --- a/include/uv/unix.h
 +++ b/include/uv/unix.h
 @@ -223,7 +223,7 @@ typedef struct {
@@ -60,7 +60,7 @@ index ea37d787..420be86c 100644
    unsigned int nfds;                                                          \
    void* wq[2];                                                                \
 diff --git a/src/fs-poll.c b/src/fs-poll.c
-index 1bac1c56..5a39daed 100644
+index 1bac1c568e36cadd0b68451926c6f045f88342d2..5a39daed095502b2db34f23fcaf0ab04f31f96ff 100644
 --- a/src/fs-poll.c
 +++ b/src/fs-poll.c
 @@ -77,7 +77,7 @@ int uv_fs_poll_start(uv_fs_poll_t* handle,
@@ -109,7 +109,7 @@ index 1bac1c56..5a39daed 100644
           last = it, it = it->previous) {
        assert(last->previous != NULL);
 diff --git a/src/inet.c b/src/inet.c
-index ddabf22f..ca8b6ac8 100644
+index ddabf22fa52a0d4d25987c65f59e0e5456406fe3..ca8b6ac8b69779655f69da758aa63d810332c800 100644
 --- a/src/inet.c
 +++ b/src/inet.c
 @@ -40,9 +40,9 @@ static int inet_pton6(const char *src, unsigned char *dst);
@@ -148,7 +148,7 @@ index ddabf22f..ca8b6ac8 100644
    default:
      return UV_EAFNOSUPPORT;
 diff --git a/src/strscpy.c b/src/strscpy.c
-index 20df6fcb..6b4cc3bc 100644
+index 20df6fcbed29e9d944c866ddbcd5c09345a426b3..6b4cc3bc741b40b9c2b13d4c06e7090f8083a7ba 100644
 --- a/src/strscpy.c
 +++ b/src/strscpy.c
 @@ -27,7 +27,7 @@ ssize_t uv__strscpy(char* d, const char* s, size_t n) {
@@ -161,7 +161,7 @@ index 20df6fcb..6b4cc3bc 100644
    if (i == 0)
      return 0;
 diff --git a/src/threadpool.c b/src/threadpool.c
-index e804c7c4..1241ace1 100644
+index e804c7c4b6f03c843965001f4c2179d349e156d4..1241ace1cc304c14bf1b79cc2a588c1a50ef4507 100644
 --- a/src/threadpool.c
 +++ b/src/threadpool.c
 @@ -206,7 +206,7 @@ static void init_threads(void) {
@@ -174,7 +174,7 @@ index e804c7c4..1241ace1 100644
        nthreads = ARRAY_SIZE(default_threads);
        threads = default_threads;
 diff --git a/src/unix/bsd-ifaddrs.c b/src/unix/bsd-ifaddrs.c
-index 11ca9559..c3dd71a1 100644
+index 11ca95591fc38244e931fecd9dd4038d3968af7a..c3dd71a1889bfae08cfdf95acda61e6c3472bd2c 100644
 --- a/src/unix/bsd-ifaddrs.c
 +++ b/src/unix/bsd-ifaddrs.c
 @@ -92,7 +92,7 @@ int uv_interface_addresses(uv_interface_address_t** addresses, int* count) {
@@ -187,7 +187,7 @@ index 11ca9559..c3dd71a1 100644
    if (*addresses == NULL) {
      freeifaddrs(addrs);
 diff --git a/src/unix/core.c b/src/unix/core.c
-index 54c769f3..6353b0e3 100644
+index 54c769f37f2331136c87a37c13fb4e3f9a8f22f9..6353b0e3cc9448aa35dc2ccc9b259277b3fae9a5 100644
 --- a/src/unix/core.c
 +++ b/src/unix/core.c
 @@ -824,7 +824,7 @@ static unsigned int next_power_of_two(unsigned int val) {
@@ -238,7 +238,7 @@ index 54c769f3..6353b0e3 100644
    if (*envitems == NULL)
      return UV_ENOMEM;
 diff --git a/src/unix/darwin-proctitle.c b/src/unix/darwin-proctitle.c
-index 5288083e..9bd55dd7 100644
+index 5288083ef04fd78d90c34071cc76281adbc310d8..9bd55dd764b845cf8ea441d525b4e136699eb52e 100644
 --- a/src/unix/darwin-proctitle.c
 +++ b/src/unix/darwin-proctitle.c
 @@ -128,8 +128,9 @@ int uv__set_process_title(const char* title) {
@@ -254,7 +254,7 @@ index 5288083e..9bd55dd7 100644
    if (display_name_key == NULL || *display_name_key == NULL)
      goto out;
 diff --git a/src/unix/darwin.c b/src/unix/darwin.c
-index 62f04d31..5fbf7342 100644
+index 62f04d315423d5b642294ff588b57d2babacad89..5fbf734218fa17cc61c03402c8b1dd6b66110ecb 100644
 --- a/src/unix/darwin.c
 +++ b/src/unix/darwin.c
 @@ -353,7 +353,7 @@ int uv_cpu_info(uv_cpu_info_t** cpu_infos, int* count) {
@@ -267,7 +267,7 @@ index 62f04d31..5fbf7342 100644
      vm_deallocate(mach_task_self(), (vm_address_t)info, msg_type);
      return UV_ENOMEM;
 diff --git a/src/unix/epoll.c b/src/unix/epoll.c
-index 97348e25..4c057fb3 100644
+index 97348e254b4556908a2d013300f3f9ee61ff230b..4c057fb3da37706906692750fc2fb42951843157 100644
 --- a/src/unix/epoll.c
 +++ b/src/unix/epoll.c
 @@ -325,7 +325,7 @@ void uv__io_poll(uv_loop_t* loop, int timeout) {
@@ -280,7 +280,7 @@ index 97348e25..4c057fb3 100644
        if (w == NULL) {
          /* File descriptor that we've stopped watching, disarm it.
 diff --git a/src/unix/freebsd.c b/src/unix/freebsd.c
-index 658ff262..6700ff61 100644
+index 658ff262d3738e95b24d8fb8992da905635170f7..6700ff6196245bdce7f14d9edd38607f18812200 100644
 --- a/src/unix/freebsd.c
 +++ b/src/unix/freebsd.c
 @@ -215,7 +215,7 @@ int uv_cpu_info(uv_cpu_info_t** cpu_infos, int* count) {
@@ -302,7 +302,7 @@ index 658ff262..6700ff61 100644
      uv__free(*cpu_infos);
      return UV_ENOMEM;
 diff --git a/src/unix/fs.c b/src/unix/fs.c
-index 933c9c0d..1a615244 100644
+index 933c9c0dc2da40e5bbdc70d73d131f678cafd7fb..1a615244f50dc75e560821f5bfbf5af97e592cc7 100644
 --- a/src/unix/fs.c
 +++ b/src/unix/fs.c
 @@ -137,7 +137,7 @@ extern char *mkdtemp(char *template); /* See issue #740 on AIX < 7 */
@@ -396,7 +396,7 @@ index 933c9c0d..1a615244 100644
    if (req->bufs == NULL)
      return UV_ENOMEM;
 diff --git a/src/unix/fsevents.c b/src/unix/fsevents.c
-index bf4f1f6a..648c8a98 100644
+index bf4f1f6a5180ab4f6ef6776bc3f854c0c9fe67cd..648c8a98b817cb9a8bd03e85bf9b2175bb53eb1a 100644
 --- a/src/unix/fsevents.c
 +++ b/src/unix/fsevents.c
 @@ -185,7 +185,7 @@ static void (*pFSEventStreamStop)(FSEventStreamRef);
@@ -553,7 +553,7 @@ index bf4f1f6a..648c8a98 100644
    QUEUE_REMOVE(&handle->cf_member);
    state->fsevent_handle_count--;
 diff --git a/src/unix/getaddrinfo.c b/src/unix/getaddrinfo.c
-index 77337ace..41dc3909 100644
+index 77337ace9454e032a392c97cb9aa311f15518956..41dc3909969a643e129847ae3a3252d51feadb27 100644
 --- a/src/unix/getaddrinfo.c
 +++ b/src/unix/getaddrinfo.c
 @@ -172,7 +172,7 @@ int uv_getaddrinfo(uv_loop_t* loop,
@@ -587,7 +587,7 @@ index 77337ace..41dc3909 100644
    if (cb) {
      uv__work_submit(loop,
 diff --git a/src/unix/ibmi.c b/src/unix/ibmi.c
-index 8c6ae636..56af31e9 100644
+index 8c6ae636329e5b2e17742fc46b5094237381712a..56af31e979f34b0182aa82dbb3a04d1c5dd747cc 100644
 --- a/src/unix/ibmi.c
 +++ b/src/unix/ibmi.c
 @@ -288,7 +288,7 @@ int uv_cpu_info(uv_cpu_info_t** cpu_infos, int* count) {
@@ -600,7 +600,7 @@ index 8c6ae636..56af31e9 100644
      return UV_ENOMEM;
    }
 diff --git a/src/unix/kqueue.c b/src/unix/kqueue.c
-index 5dac76ae..86eb529b 100644
+index 5dac76ae753c6caf47e2795a715cae74e6e5930c..86eb529bcdaf69591850232084c1b3b2f526f838 100644
 --- a/src/unix/kqueue.c
 +++ b/src/unix/kqueue.c
 @@ -281,8 +281,8 @@ void uv__io_poll(uv_loop_t* loop, int timeout) {
@@ -624,7 +624,7 @@ index 5dac76ae..86eb529b 100644
        if (w == NULL) {
          /* File descriptor that we've stopped watching, disarm it.
 diff --git a/src/unix/linux-core.c b/src/unix/linux-core.c
-index 23a7dafe..85f3fc01 100644
+index 23a7dafec814f6ecbd94e66d513fafe1cf8b3e80..85f3fc0170288577d2e39030dc728de9a694a752 100644
 --- a/src/unix/linux-core.c
 +++ b/src/unix/linux-core.c
 @@ -117,7 +117,6 @@ void uv__platform_loop_delete(uv_loop_t* loop) {
@@ -654,7 +654,7 @@ index 23a7dafe..85f3fc01 100644
      freeifaddrs(addrs);
      return UV_ENOMEM;
 diff --git a/src/unix/linux-inotify.c b/src/unix/linux-inotify.c
-index c1bd260e..f5366e96 100644
+index c1bd260e16e5e9fd023cd00cd673951347545d00..f5366e9626ff5eb063f89a63415a6df9eec75f53 100644
 --- a/src/unix/linux-inotify.c
 +++ b/src/unix/linux-inotify.c
 @@ -281,12 +281,12 @@ int uv_fs_event_start(uv_fs_event_t* handle,
@@ -673,7 +673,7 @@ index c1bd260e..f5366e96 100644
    w->iterating = 0;
    RB_INSERT(watcher_root, CAST(&handle->loop->inotify_watchers), w);
 diff --git a/src/unix/loop.c b/src/unix/loop.c
-index a88e71c3..2e819cdd 100644
+index a88e71c339351f2ebcdd6c3f933fc3b1122910ed..2e819cdda71f0da2aa957148d3e6df18e027e5c8 100644
 --- a/src/unix/loop.c
 +++ b/src/unix/loop.c
 @@ -148,7 +148,7 @@ int uv_loop_fork(uv_loop_t* loop) {
@@ -686,7 +686,7 @@ index a88e71c3..2e819cdd 100644
        continue;
  
 diff --git a/src/unix/netbsd.c b/src/unix/netbsd.c
-index c66333f5..b6886a1c 100644
+index c66333f522c5d43bdb6a2aea4e29d0baa278579f..b6886a1ce5ad2e04c64e0bde4e5709c3dac5a219 100644
 --- a/src/unix/netbsd.c
 +++ b/src/unix/netbsd.c
 @@ -206,14 +206,14 @@ int uv_cpu_info(uv_cpu_info_t** cpu_infos, int* count) {
@@ -707,7 +707,7 @@ index c66333f5..b6886a1c 100644
      uv__free(cp_times);
      uv__free(*cpu_infos);
 diff --git a/src/unix/openbsd.c b/src/unix/openbsd.c
-index f32a94df..62740f73 100644
+index f32a94df38765fb54e7176efe0d172a5a88bccb4..62740f7349889833689d091e8cdd8010c404c28c 100644
 --- a/src/unix/openbsd.c
 +++ b/src/unix/openbsd.c
 @@ -72,7 +72,7 @@ int uv_exepath(char* buffer, size_t* size) {
@@ -729,7 +729,7 @@ index f32a94df..62740f73 100644
      return UV_ENOMEM;
  
 diff --git a/src/unix/pipe.c b/src/unix/pipe.c
-index e8cfa148..c8ba31da 100644
+index e8cfa1481c3648928eeebceeebb642d358f2a0a8..c8ba31daf847fc206b392327ebf6cd4a5501b2d5 100644
 --- a/src/unix/pipe.c
 +++ b/src/unix/pipe.c
 @@ -309,7 +309,7 @@ int uv_pipe_pending_count(uv_pipe_t* handle) {
@@ -751,7 +751,7 @@ index e8cfa148..c8ba31da 100644
      return UV_ENOMEM;
  
 diff --git a/src/unix/poll.c b/src/unix/poll.c
-index 7a12e2d1..73647317 100644
+index 7a12e2d1488a9d48712439e62c6637b9e1161f69..7364731757599d647bedc8e44d3930a32b743f5d 100644
 --- a/src/unix/poll.c
 +++ b/src/unix/poll.c
 @@ -117,7 +117,7 @@ int uv_poll_stop(uv_poll_t* handle) {
@@ -764,7 +764,7 @@ index 7a12e2d1..73647317 100644
    int events;
  
 diff --git a/src/unix/posix-poll.c b/src/unix/posix-poll.c
-index 0f4bf938..8da038d1 100644
+index 0f4bf93874be89f2c4deb71e7eeca0416e3bd9ff..8da038d1da6dd893a141b14a593a9cc84b7fbf2f 100644
 --- a/src/unix/posix-poll.c
 +++ b/src/unix/posix-poll.c
 @@ -61,7 +61,7 @@ static void uv__pollfds_maybe_resize(uv_loop_t* loop) {
@@ -777,7 +777,7 @@ index 0f4bf938..8da038d1 100644
      abort();
  
 diff --git a/src/unix/process.c b/src/unix/process.c
-index f8415368..0916aa45 100644
+index f84153687f799a201e55e465da998ea0b690da0f..0916aa458d4df07fb3b4e9e83f80b9e43c1f82a0 100644
 --- a/src/unix/process.c
 +++ b/src/unix/process.c
 @@ -403,7 +403,7 @@ static int posix_spawn_can_use_setsid;
@@ -799,7 +799,7 @@ index f8415368..0916aa45 100644
    if (pipes == NULL)
      goto error;
 diff --git a/src/unix/proctitle.c b/src/unix/proctitle.c
-index 9d1f00dd..8cdec753 100644
+index 9d1f00ddf66e291abd40d0c0052a7f9bd5c03017..8cdec753d003ebe16485db2b47ffb3863a9473ff 100644
 --- a/src/unix/proctitle.c
 +++ b/src/unix/proctitle.c
 @@ -65,7 +65,7 @@ char** uv_setup_args(int argc, char** argv) {
@@ -812,7 +812,7 @@ index 9d1f00dd..8cdec753 100644
      return argv;
  
 diff --git a/src/unix/random-sysctl-linux.c b/src/unix/random-sysctl-linux.c
-index 66ba8d74..9ef18df0 100644
+index 66ba8d74ec22b72d318b91d82365f5b9693feb3c..9ef18df01a51aa6a26ae6d1d9660a819d18604d0 100644
 --- a/src/unix/random-sysctl-linux.c
 +++ b/src/unix/random-sysctl-linux.c
 @@ -48,7 +48,7 @@ int uv__random_sysctl(void* buf, size_t buflen) {
@@ -825,7 +825,7 @@ index 66ba8d74..9ef18df0 100644
  
    while (p < pe) {
 diff --git a/src/unix/stream.c b/src/unix/stream.c
-index b1f6359e..c6cc50e7 100644
+index b1f6359e0de2c520ed71bd689956de971006bb21..c6cc50e709989f30f4393b509d859663717d1770 100644
 --- a/src/unix/stream.c
 +++ b/src/unix/stream.c
 @@ -113,7 +113,7 @@ static void uv__stream_osx_interrupt_select(uv_stream_t* stream) {
@@ -950,7 +950,7 @@ index b1f6359e..c6cc50e7 100644
        uv__close(queued_fds->fds[i]);
      uv__free(handle->queued_fds);
 diff --git a/src/unix/thread.c b/src/unix/thread.c
-index d89e5cd1..759cd0c2 100644
+index d89e5cd13ba0ad73913b74f5e5fe4b5f139eb650..759cd0c28518928127837ba82cbf8e761c6223d3 100644
 --- a/src/unix/thread.c
 +++ b/src/unix/thread.c
 @@ -59,7 +59,7 @@ int uv_barrier_init(uv_barrier_t* barrier, unsigned int count) {
@@ -982,7 +982,7 @@ index d89e5cd1..759cd0c2 100644
      return UV_ENOMEM;
  
 diff --git a/src/unix/udp.c b/src/unix/udp.c
-index 4d985b88..a130aeaa 100644
+index 4d985b88ba9304d57aea42d9c1b4a9a9e924ddc5..a130aeaa59581176147d5f060156b57ef5ad658a 100644
 --- a/src/unix/udp.c
 +++ b/src/unix/udp.c
 @@ -227,11 +227,11 @@ static int uv__udp_recvmmsg(uv_udp_t* handle, uv_buf_t* buf) {
@@ -1018,7 +1018,7 @@ index 4d985b88..a130aeaa 100644
    if (req->bufs == NULL) {
      uv__req_unregister(handle->loop, req);
 diff --git a/src/uv-common.c b/src/uv-common.c
-index efc9eb50..dfb606e3 100644
+index efc9eb50ee3b9ee204f9f16827dc800200f3d094..dfb606e3e842ccb3b2d9327e2b3048c4cfdd0314 100644
 --- a/src/uv-common.c
 +++ b/src/uv-common.c
 @@ -54,10 +54,10 @@ static uv__allocator_t uv__allocator = {
@@ -1085,7 +1085,7 @@ index efc9eb50..dfb606e3 100644
      return NULL;
  
 diff --git a/src/win/core.c b/src/win/core.c
-index 67af93e6..0752edff 100644
+index 67af93e6571ed4324d80b6dfb2ff93db7b9cd9b1..0752edff3ebdf61e056157ef21109538f6e4b358 100644
 --- a/src/win/core.c
 +++ b/src/win/core.c
 @@ -98,7 +98,8 @@ static int uv__loops_add(uv_loop_t* loop) {
@@ -1118,7 +1118,7 @@ index 67af93e6..0752edff 100644
      err = UV_ENOMEM;
      goto fail_timers_alloc;
 diff --git a/src/win/fs-event.c b/src/win/fs-event.c
-index 6758c7c7..15046731 100644
+index 6758c7c78bc1d6a5316a8ae7dc2d1e23cd0f32bc..150467313d576bfe2966b55f3d8cffa23cbb8ea3 100644
 --- a/src/win/fs-event.c
 +++ b/src/win/fs-event.c
 @@ -73,7 +73,7 @@ static void uv__relative_path(const WCHAR* filename,
@@ -1140,7 +1140,7 @@ index 6758c7c7..15046731 100644
        goto short_path_done;
      }
 diff --git a/src/win/fs-fd-hash-inl.h b/src/win/fs-fd-hash-inl.h
-index 0b532af1..703a8d8f 100644
+index 0b532af12d4371c2311bd50a66913287a0716f43..703a8d8f87de1089ac8b18bd817d416d48dc442e 100644
 --- a/src/win/fs-fd-hash-inl.h
 +++ b/src/win/fs-fd-hash-inl.h
 @@ -146,7 +146,7 @@ INLINE static void uv__fd_hash_add(int fd, struct uv__fd_info_s* info) {
@@ -1153,7 +1153,7 @@ index 0b532af1..703a8d8f 100644
          uv_fatal_error(ERROR_OUTOFMEMORY, "uv__malloc");
        }
 diff --git a/src/win/fs.c b/src/win/fs.c
-index 79230799..8374012f 100644
+index 792307995f60c8ac34b44c6c255102cd227354b7..8374012f0e9ee094eed5db19e5f7d12286052d70 100644
 --- a/src/win/fs.c
 +++ b/src/win/fs.c
 @@ -285,7 +285,7 @@ static int fs__wide_to_utf8(WCHAR* w_source_ptr,
@@ -1274,7 +1274,7 @@ index 79230799..8374012f 100644
    if (req->fs.info.bufs == NULL) {
      SET_REQ_UV_ERROR(req, UV_ENOMEM, ERROR_OUTOFMEMORY);
 diff --git a/src/win/pipe.c b/src/win/pipe.c
-index 99846181..cd77061a 100644
+index 998461811fb87fafa8ffd43bb9c9f5d88f00c6f9..cd77061a079094b11350a01ddd364e15fa3078bc 100644
 --- a/src/win/pipe.c
 +++ b/src/win/pipe.c
 @@ -728,7 +728,7 @@ int uv_pipe_bind(uv_pipe_t* handle, const char* name) {
@@ -1323,7 +1323,7 @@ index 99846181..cd77061a 100644
        *size = 0;
        err = UV_ENOMEM;
 diff --git a/src/win/process.c b/src/win/process.c
-index 24c63339..e857db3e 100644
+index 24c633393fd15dcf87726b174d6b027a969e0f0d..e857db3e98eb24f8de12e6b6d90ae3905cc49ce7 100644
 --- a/src/win/process.c
 +++ b/src/win/process.c
 @@ -616,8 +616,8 @@ error:
@@ -1367,7 +1367,7 @@ index 24c63339..e857db3e 100644
      uv__free(dst_copy);
      return ERROR_OUTOFMEMORY;
 diff --git a/src/win/tcp.c b/src/win/tcp.c
-index b6aa4c51..4cccee42 100644
+index b6aa4c512050e012bdfa1395f0011a5371b11768..4cccee429223cbd6f7b876341982816e4998dc10 100644
 --- a/src/win/tcp.c
 +++ b/src/win/tcp.c
 @@ -612,7 +612,7 @@ int uv__tcp_listen(uv_tcp_t* handle, int backlog, uv_connection_cb cb) {
@@ -1380,7 +1380,7 @@ index b6aa4c51..4cccee42 100644
        uv_fatal_error(ERROR_OUTOFMEMORY, "uv__malloc");
      }
 diff --git a/src/win/thread.c b/src/win/thread.c
-index d3b1c96b..9ad60c91 100644
+index d3b1c96b6199a7ff034d8646b76a6a21712702d8..9ad60c9164c8ff26223309a9aa388fa5e4621914 100644
 --- a/src/win/thread.c
 +++ b/src/win/thread.c
 @@ -98,7 +98,7 @@ static UINT __stdcall uv__thread_start(void* arg) {
@@ -1402,7 +1402,7 @@ index d3b1c96b..9ad60c91 100644
      return UV_ENOMEM;
  
 diff --git a/src/win/util.c b/src/win/util.c
-index 99432053..c655f532 100644
+index 99432053cc3b242e514268b7aba2e2d83a9e64f2..c655f532dbcc6c63516027caf1453ca4ef817cff 100644
 --- a/src/win/util.c
 +++ b/src/win/util.c
 @@ -164,7 +164,7 @@ int uv_cwd(char* buffer, size_t* size) {

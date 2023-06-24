@@ -1,14 +1,14 @@
-From 3d09b3d7b78ffc037a32725cc4002976b908d965 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 20:50:26 -0400
-Subject: [PATCH 01/28] Fix spelling/language errors
+Subject: [PATCH 01/29] Fix spelling/language errors
 
 ---
  llvm/include/llvm/Support/ErrorHandling.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/llvm/include/llvm/Support/ErrorHandling.h b/llvm/include/llvm/Support/ErrorHandling.h
-index f980510d3..6791df6be 100644
+index f980510d37f0644bceea5b54e1469625b8115c97..6791df6be3362fa199556ecb2131f971cfef5210 100644
 --- a/llvm/include/llvm/Support/ErrorHandling.h
 +++ b/llvm/include/llvm/Support/ErrorHandling.h
 @@ -44,7 +44,7 @@ namespace llvm {

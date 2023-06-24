@@ -6,6 +6,7 @@ def outputsFolder = file("$buildDir/outputs")
 def baseArtifactId = nativeName
 def artifactGroupId = "edu.wpi.first.${nativeName}"
 def zipBaseName = "_GROUP_edu_wpi_first_${nativeName}_ID_${nativeName}-cpp_CLS"
+ext.zipBaseName = zipBaseName
 def jniBaseName = "_GROUP_edu_wpi_first_${nativeName}_ID_${nativeName}-jni_CLS"
 def jniCvStaticBaseName = "_GROUP_edu_wpi_first_${nativeName}_ID_${nativeName}-jnicvstatic_CLS"
 
@@ -14,7 +15,7 @@ def licenseFile = file("$rootDir/license.md")
 task cppSourcesZip(type: Zip) {
     destinationDirectory = outputsFolder
     archiveBaseName = zipBaseName
-    classifier = "sources"
+    archiveClassifier = "sources"
     duplicatesStrategy = 'exclude'
 
     from(licenseFile) {
@@ -44,7 +45,7 @@ task cppSourcesZip(type: Zip) {
 task cppHeadersZip(type: Zip) {
     destinationDirectory = outputsFolder
     archiveBaseName = zipBaseName
-    classifier = "headers"
+    archiveClassifier = "headers"
 
     from(licenseFile) {
         into '/'

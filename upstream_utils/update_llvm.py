@@ -13,7 +13,6 @@ from upstream_utils import (
 
 
 def run_global_replacements(wpiutil_llvm_files):
-
     for wpi_file in wpiutil_llvm_files:
         with open(wpi_file) as f:
             content = f.read()
@@ -100,7 +99,6 @@ def flattened_llvm_files(llvm, dirs_to_keep):
 
 
 def find_wpiutil_llvm_files(wpiutil_root, subfolder):
-
     # These files have substantial changes, not worth managing with the patching process
     ignore_list = [
         "StringExtras.h",
@@ -200,6 +198,7 @@ def main():
         "0026-constexpr-endian-byte-swap.patch",
         "0027-Copy-type-traits-from-STLExtras.h-into-PointerUnion..patch",
         "0028-Remove-StringMap-test-for-llvm-sort.patch",
+        "0029-Fix-docs-typo-in-SmallVector.patch",
     ]:
         git_am(
             os.path.join(wpilib_root, "upstream_utils/llvm_patches", f),
