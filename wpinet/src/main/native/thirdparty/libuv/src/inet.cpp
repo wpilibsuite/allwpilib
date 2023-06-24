@@ -139,7 +139,14 @@ static int inet_ntop6(const unsigned char *src, char *dst, size_t size) {
       tp += strlen(tp);
       break;
     }
+#if defined(__APPLE__) && defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#endif  // defined(__APPLE__) && defined(__clang__)
     tp += sprintf(tp, "%x", words[i]);
+#if defined(__APPLE__) && defined(__clang__)
+#pragma clang diagnostic pop
+#endif  // defined(__APPLE__) && defined(__clang__)
   }
   /* Was it a trailing run of 0x00's? */
   if (best.base != -1 && (best.base + best.len) == ARRAY_SIZE(words))

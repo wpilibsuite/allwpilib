@@ -30,7 +30,7 @@ void HALSimWSProviderPWM::RegisterCallbacks() {
   m_initCbKey = REGISTER(Initialized, "<init", bool, boolean);
   m_speedCbKey = REGISTER(Speed, "<speed", double, double);
   m_positionCbKey = REGISTER(Position, "<position", double, double);
-  m_rawCbKey = REGISTER(RawValue, "<raw", int32_t, int);
+  m_rawCbKey = REGISTER(PulseMicrosecond, "<raw", int32_t, int);
   m_periodScaleCbKey = REGISTER(PeriodScale, "<period_scale", int32_t, int);
   m_zeroLatchCbKey = REGISTER(ZeroLatch, "<zero_latch", bool, boolean);
 }
@@ -43,7 +43,7 @@ void HALSimWSProviderPWM::DoCancelCallbacks() {
   HALSIM_CancelPWMInitializedCallback(m_channel, m_initCbKey);
   HALSIM_CancelPWMSpeedCallback(m_channel, m_speedCbKey);
   HALSIM_CancelPWMPositionCallback(m_channel, m_positionCbKey);
-  HALSIM_CancelPWMRawValueCallback(m_channel, m_rawCbKey);
+  HALSIM_CancelPWMPulseMicrosecondCallback(m_channel, m_rawCbKey);
   HALSIM_CancelPWMPeriodScaleCallback(m_channel, m_periodScaleCbKey);
   HALSIM_CancelPWMZeroLatchCallback(m_channel, m_zeroLatchCbKey);
 

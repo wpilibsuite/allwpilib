@@ -7,12 +7,12 @@
 #include <stdint.h>
 
 #include <cassert>
+#include <concepts>
 #include <initializer_list>
 #include <memory>
 #include <span>
 #include <string>
 #include <string_view>
-#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -377,11 +377,10 @@ class Value final {
    *             time)
    * @return The entry value
    */
-  template <typename T,
-            typename std::enable_if<std::is_same<T, std::string>::value>::type>
+  template <std::same_as<std::string> T>
   static Value MakeString(T&& value, int64_t time = 0) {
     Value val{NT_STRING, time, private_init{}};
-    auto data = std::make_shared<std::string>(std::forward(value));
+    auto data = std::make_shared<std::string>(std::forward<T>(value));
     val.m_val.data.v_string.str = const_cast<char*>(data->c_str());
     val.m_val.data.v_string.len = data->size();
     val.m_storage = std::move(data);
@@ -414,11 +413,10 @@ class Value final {
    *             time)
    * @return The entry value
    */
-  template <typename T, typename std::enable_if<
-                            std::is_same<T, std::vector<uint8_t>>::value>::type>
+  template <std::same_as<std::vector<uint8_t>> T>
   static Value MakeRaw(T&& value, int64_t time = 0) {
     Value val{NT_RAW, time, private_init{}};
-    auto data = std::make_shared<std::vector<uint8_t>>(std::forward(value));
+    auto data = std::make_shared<std::vector<uint8_t>>(std::forward<T>(value));
     val.m_val.data.v_raw.data = const_cast<uint8_t*>(data->data());
     val.m_val.data.v_raw.size = data->size();
     val.m_storage = std::move(data);

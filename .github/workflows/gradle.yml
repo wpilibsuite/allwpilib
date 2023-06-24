@@ -46,7 +46,7 @@ jobs:
 
   build-host:
     env:
-      MACOSX_DEPLOYMENT_TARGET: 10.15
+      MACOSX_DEPLOYMENT_TARGET: 11
     strategy:
       fail-fast: false
       matrix:
@@ -63,7 +63,7 @@ jobs:
             build-options: "-PciReleaseOnly --max-workers 1"
             task: "copyAllOutputs"
             outputs: "build/allOutputs"
-          - os: macOS-11
+          - os: macOS-12
             artifact-name: macOS
             architecture: x64
             task: "build"

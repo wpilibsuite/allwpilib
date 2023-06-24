@@ -30,7 +30,8 @@ import org.ejml.simple.SimpleMatrix;
  * <p>Forward kinematics is also used for odometry -- determining the position of the robot on the
  * field using encoders and a gyro.
  */
-public class MecanumDriveKinematics {
+public class MecanumDriveKinematics
+    implements Kinematics<MecanumDriveWheelSpeeds, MecanumDriveWheelPositions> {
   private final SimpleMatrix m_inverseKinematics;
   private final SimpleMatrix m_forwardKinematics;
 
@@ -125,6 +126,7 @@ public class MecanumDriveKinematics {
    * @param chassisSpeeds The desired chassis speed.
    * @return The wheel speeds.
    */
+  @Override
   public MecanumDriveWheelSpeeds toWheelSpeeds(ChassisSpeeds chassisSpeeds) {
     return toWheelSpeeds(chassisSpeeds, new Translation2d());
   }
@@ -137,6 +139,7 @@ public class MecanumDriveKinematics {
    * @param wheelSpeeds The current mecanum drive wheel speeds.
    * @return The resulting chassis speed.
    */
+  @Override
   public ChassisSpeeds toChassisSpeeds(MecanumDriveWheelSpeeds wheelSpeeds) {
     var wheelSpeedsVector = new SimpleMatrix(4, 1);
     wheelSpeedsVector.setColumn(
@@ -154,14 +157,7 @@ public class MecanumDriveKinematics {
         chassisSpeedsVector.get(2, 0));
   }
 
-  /**
-   * Performs forward kinematics to return the resulting Twist2d from the given wheel deltas. This
-   * method is often used for odometry -- determining the robot's position on the field using
-   * changes in the distance driven by each wheel on the robot.
-   *
-   * @param wheelDeltas The distances driven by each wheel.
-   * @return The resulting Twist2d.
-   */
+  @Override
   public Twist2d toTwist2d(MecanumDriveWheelPositions wheelDeltas) {
     var wheelDeltasVector = new SimpleMatrix(4, 1);
     wheelDeltasVector.setColumn(

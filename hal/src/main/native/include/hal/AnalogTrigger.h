@@ -45,6 +45,7 @@ HAL_AnalogTriggerHandle HAL_InitializeAnalogTrigger(
  *
  * @param[in] dutyCycleHandle the analog input to use for duty cycle
  * @param[out] status          Error status variable. 0 on success.
+ * @return tbe created analog trigger handle
  */
 HAL_AnalogTriggerHandle HAL_InitializeAnalogTriggerDutyCycle(
     HAL_DutyCycleHandle dutyCycleHandle, int32_t* status);

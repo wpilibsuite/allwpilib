@@ -74,6 +74,18 @@ class WPILIB_DLLEXPORT PIDController
   void SetD(double Kd);
 
   /**
+   * Sets the IZone range. When the absolute value of the position error is
+   * greater than IZone, the total accumulated error will reset to zero,
+   * disabling integral gain until the absolute value of the position error is
+   * less than IZone. This is used to prevent integral windup. Must be
+   * non-negative. Passing a value of zero will effectively disable integral
+   * gain. Passing a value of infinity disables IZone functionality.
+   *
+   * @param iZone Maximum magnitude of error to allow integral control.
+   */
+  void SetIZone(double iZone);
+
+  /**
    * Gets the proportional coefficient.
    *
    * @return proportional coefficient
@@ -93,6 +105,13 @@ class WPILIB_DLLEXPORT PIDController
    * @return differential coefficient
    */
   double GetD() const;
+
+  /**
+   * Get the IZone range.
+   *
+   * @return Maximum magnitude of error to allow integral control.
+   */
+  double GetIZone() const;
 
   /**
    * Gets the period of this controller.
@@ -220,6 +239,9 @@ class WPILIB_DLLEXPORT PIDController
 
   // Factor for "derivative" control
   double m_Kd;
+
+  // The error range where "integral" control applies
+  double m_iZone = std::numeric_limits<double>::infinity();
 
   // The period (in seconds) of the control loop running this controller
   units::second_t m_period;

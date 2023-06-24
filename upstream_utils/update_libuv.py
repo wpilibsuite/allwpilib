@@ -29,6 +29,7 @@ def main():
         "0007-Squelch-GCC-warnings-we-don-t-know-how-to-fix.patch",
         "0008-Fix-Win32-warning-suppression-pragma.patch",
         "0009-Avoid-unused-variable-warning-on-Mac.patch",
+        "0010-Squelch-Apple-Clang-sprintf-deprecation-warning.patch",
     ]:
         git_am(os.path.join(wpilib_root, "upstream_utils/libuv_patches", f))
 
