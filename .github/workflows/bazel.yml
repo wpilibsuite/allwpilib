@@ -98,6 +98,9 @@ jobs:
         run: bazel ${{ matrix.action }} -k ...   --config=ci ${{ matrix.config }} --nojava_header_compilation --verbose_failures
         shell: bash
 
+      - name: Check Lockfile update
+        run: git --no-pager diff --exit-code HEAD
+
   build-linux:
     strategy:
       fail-fast: false
