@@ -6,7 +6,8 @@ test --test_output=errors
 
 import shared/bazel/rc/buildbuddy.rc
 import shared/bazel/compiler_flags/sanitizers.rc
-import shared/bazel/compiler_flags/bullseye_flags.rc
+import shared/bazel/compiler_flags/bullseye32_flags.rc
+import shared/bazel/compiler_flags/bullseye64_flags.rc
 import shared/bazel/compiler_flags/linux_flags.rc
 import shared/bazel/compiler_flags/osx_flags.rc
 import shared/bazel/compiler_flags/raspbian_flags.rc

@@ -1,6 +1,33 @@
 
-build:raspi32 --copt=-std=c++20
 build:raspi32 --platforms=@rules_bzlmodrio_toolchains//platforms/raspi32
 build:raspi32 --build_tag_filters=-no-raspi
 build:raspi32 --features=compiler_param_file
 build:raspi32 --platform_suffix=raspi32
+
+
+
+build:raspi32 --cxxopt=-std=c++20
+build:raspi32 --cxxopt=-Wformat=2
+build:raspi32 --cxxopt=-pedantic
+build:raspi32 --cxxopt=-Wno-psabi
+build:raspi32 --cxxopt=-Wno-unused-parameter
+build:raspi32 --cxxopt=-Wno-error=deprecated-declarations
+build:raspi32 --cxxopt=-fPIC
+build:raspi32 --cxxopt=-pthread
+
+# Extra 11
+build:raspi32 --cxxopt=-Wno-error=deprecated-enum-enum-conversion
+
+# C Only
+build:raspi32 --conlyopt=-Wformat=2
+build:raspi32 --conlyopt=-pedantic
+build:raspi32 --conlyopt=-Wno-psabi
+build:raspi32 --conlyopt=-Wno-unused-parameter
+build:raspi32 --conlyopt=-fPIC
+build:raspi32 --conlyopt=-pthread
+
+# Linker
+build:raspi32 --linkopt=-rdynamic
+build:raspi32 --linkopt=-pthread
+build:raspi32 --linkopt=-ldl
+build:raspi32 --linkopt=-latomic

@@ -1,0 +1,32 @@
+
+build:bullseye64 --platforms=@rules_bzlmodrio_toolchains//platforms/bullseye64
+build:bullseye64 --build_tag_filters=-no-bullseye
+build:bullseye64 --features=compiler_param_file
+build:bullseye64 --platform_suffix=bullseye64
+
+
+build:bullseye64 --cxxopt=-std=c++20
+build:bullseye64 --cxxopt=-Wformat=2
+build:bullseye64 --cxxopt=-pedantic
+build:bullseye64 --cxxopt=-Wno-psabi
+build:bullseye64 --cxxopt=-Wno-unused-parameter
+build:bullseye64 --cxxopt=-Wno-error=deprecated-declarations
+build:bullseye64 --cxxopt=-fPIC
+build:bullseye64 --cxxopt=-pthread
+
+# Extra 11
+build:bullseye64 --cxxopt=-Wno-error=deprecated-enum-enum-conversion
+
+# C Only
+build:bullseye64 --conlyopt=-Wformat=2
+build:bullseye64 --conlyopt=-pedantic
+build:bullseye64 --conlyopt=-Wno-psabi
+build:bullseye64 --conlyopt=-Wno-unused-parameter
+build:bullseye64 --conlyopt=-fPIC
+build:bullseye64 --conlyopt=-pthread
+
+# Linker
+build:bullseye64 --linkopt=-rdynamic
+build:bullseye64 --linkopt=-pthread
+build:bullseye64 --linkopt=-ldl
+build:bullseye64 --linkopt=-latomic

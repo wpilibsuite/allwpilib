@@ -4,17 +4,26 @@ build:linux --copt=-Wall
 build:linux --copt=-Wextra
 build:linux --copt=-Werror
 
-build:linux --copt=-std=c++20
-build:linux --copt=-Wformat=2
-build:linux --copt=-pedantic
-build:linux --copt=-Wno-psabi
-build:linux --copt=-Wno-unused-parameter
-build:linux --copt=-Wno-error=deprecated-declarations
-build:linux --copt=-Wno-error=deprecated-enum-enum-conversion
-build:linux --copt=-fPIC
-build:linux --copt=-rdynamic
-build:linux --copt=-pthread
+# C++ args
+build:linux --cxxopt=-std=c++20
+build:linux --cxxopt=-Wformat=2
+build:linux --cxxopt=-pedantic
+build:linux --cxxopt=-Wno-psabi
+build:linux --cxxopt=-Wno-unused-parameter
+build:linux --cxxopt=-Wno-error=deprecated-declarations
+build:linux --cxxopt=-Wno-error=deprecated-enum-enum-conversion
+build:linux --cxxopt=-fPIC
+build:linux --cxxopt=-pthread
 
+# C only
+build:linux --conlyopt=-Wformat=2
+build:linux --conlyopt=-pedantic
+build:linux --conlyopt=-Wno-psabi
+build:linux --conlyopt=-Wno-unused-parameter
+build:linux --conlyopt=-fPIC
+build:linux --conlyopt=-pthread
+
+# Linker
 build:linux --linkopt=-rdynamic
 build:linux --linkopt=-pthread
 build:linux --linkopt=-ldl
