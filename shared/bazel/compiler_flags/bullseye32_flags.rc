@@ -14,7 +14,7 @@ build:bullseye32 --cxxopt=-fPIC
 build:bullseye32 --cxxopt=-pthread
 
 # Extra 11
-build:bullseye32 --cxxopt=-Wno-error=deprecated-enum-enum-conversion
+# build:bullseye32 --cxxopt=-Wno-error=deprecated-enum-enum-conversion
 
 # C Only
 build:bullseye32 --conlyopt=-Wformat=2

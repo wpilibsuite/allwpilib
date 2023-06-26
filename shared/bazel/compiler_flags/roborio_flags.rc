@@ -15,7 +15,7 @@ build:roborio --cxxopt=-fPIC
 build:roborio --cxxopt=-pthread
 
 # Extra 11
-build:roborio --cxxopt=-Wno-error=deprecated-enum-enum-conversion
+# build:roborio --cxxopt=-Wno-error=deprecated-enum-enum-conversion
 
 # C Only
 build:roborio --conlyopt=-Wformat=2
