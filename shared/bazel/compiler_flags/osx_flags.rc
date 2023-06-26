@@ -37,7 +37,7 @@ build:osx --linkopt=-framework
 build:osx --linkopt=CoreMedia
 build:osx --linkopt=-framework
 build:osx --linkopt=CoreVideo
-build:osx --linkoot=-headerpad_max_install_names
+build:osx --linkopt=-headerpad_max_install_names
 
 # Things not in nativetools
 build:osx --copt=-Wno-shorten-64-to-32

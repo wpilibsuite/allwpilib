@@ -16,7 +16,7 @@ build:raspi32 --cxxopt=-fPIC
 build:raspi32 --cxxopt=-pthread
 
 # Extra 11
-build:raspi32 --cxxopt=-Wno-error=deprecated-enum-enum-conversion
+# build:raspi32 --cxxopt=-Wno-error=deprecated-enum-enum-conversion
 
 # C Only
 build:raspi32 --conlyopt=-Wformat=2
