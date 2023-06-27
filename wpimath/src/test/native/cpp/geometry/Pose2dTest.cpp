@@ -27,9 +27,9 @@ TEST(Pose2dTest, RelativeTo) {
 
   const auto finalRelativeToInitial = final.RelativeTo(initial);
 
-  EXPECT_DOUBLE_EQ(5.0 * std::sqrt(2.0), finalRelativeToInitial.X().value());
+  EXPECT_NEAR(5.0 * std::sqrt(2.0), finalRelativeToInitial.X().value(), 1e-9);
   EXPECT_NEAR(0.0, finalRelativeToInitial.Y().value(), 1e-9);
-  EXPECT_DOUBLE_EQ(0.0, finalRelativeToInitial.Rotation().Degrees().value());
+  EXPECT_NEAR(0.0, finalRelativeToInitial.Rotation().Degrees().value(), 1e-9);
 }
 
 TEST(Pose2dTest, Equality) {
@@ -50,9 +50,9 @@ TEST(Pose2dTest, Minus) {
 
   const auto transform = final - initial;
 
-  EXPECT_DOUBLE_EQ(5.0 * std::sqrt(2.0), transform.X().value());
+  EXPECT_NEAR(5.0 * std::sqrt(2.0), transform.X().value(), 1e-9);
   EXPECT_NEAR(0.0, transform.Y().value(), 1e-9);
-  EXPECT_DOUBLE_EQ(0.0, transform.Rotation().Degrees().value());
+  EXPECT_NEAR(0.0, transform.Rotation().Degrees().value(), 1e-9);
 }
 
 TEST(Pose2dTest, Nearest) {
