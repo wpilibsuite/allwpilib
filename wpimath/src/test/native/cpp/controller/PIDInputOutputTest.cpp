@@ -49,3 +49,21 @@ TEST_F(PIDInputOutputTest, DerivativeGainOutput) {
   EXPECT_DOUBLE_EQ(-10_ms / controller->GetPeriod(),
                    controller->Calculate(0.0025, 0));
 }
+
+TEST_F(PIDInputOutputTest, IZoneNoOutput) {
+  controller->SetI(1);
+  controller->SetIZone(1);
+
+  double out = controller->Calculate(2, 0);
+
+  EXPECT_DOUBLE_EQ(0, out);
+}
+
+TEST_F(PIDInputOutputTest, IZoneOutput) {
+  controller->SetI(1);
+  controller->SetIZone(1);
+
+  double out = controller->Calculate(1, 0);
+
+  EXPECT_DOUBLE_EQ(-1 * controller->GetPeriod().value(), out);
+}

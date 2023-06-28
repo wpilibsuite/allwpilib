@@ -76,6 +76,16 @@ void HALSimHttpConnection::ProcessWsUpgrade() {
 }
 
 void HALSimHttpConnection::OnSimValueChanged(const wpi::json& msg) {
+  // Skip sending if this message is not in the allowed filter list
+  try {
+    auto& type = msg.at("type").get_ref<const std::string&>();
+    if (!m_server->CanSendMessage(type)) {
+      return;
+    }
+  } catch (wpi::json::exception& e) {
+    fmt::print(stderr, "Error with message: {}\n", e.what());
+  }
+
   // render json to buffers
   wpi::SmallVector<uv::Buffer, 4> sendBufs;
   wpi::raw_uv_ostream os{sendBufs, [this]() -> uv::Buffer {

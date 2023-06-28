@@ -64,8 +64,7 @@ public interface Command {
 
   /**
    * Decorates this command with a timeout. If the specified timeout is exceeded before the command
-   * finishes normally, the command will be interrupted and un-scheduled. Note that the timeout only
-   * applies to the command returned by this method; the calling command is not itself changed.
+   * finishes normally, the command will be interrupted and un-scheduled.
    *
    * <p>Note: This decorator works by adding this command to a composition. The command the
    * decorator was called on cannot be scheduled independently or be added to a different
@@ -108,8 +107,8 @@ public interface Command {
    * commands with {@link CommandScheduler#removeComposedCommand(Command)}. The command composition
    * returned from this method can be further decorated without issue.
    *
-   * @param condition the interrupt condition
-   * @return the command with the interrupt condition added
+   * @param condition the run condition
+   * @return the command with the run condition added
    * @see #until(BooleanSupplier)
    */
   default ParallelRaceGroup onlyWhile(BooleanSupplier condition) {
@@ -118,9 +117,7 @@ public interface Command {
 
   /**
    * Decorates this command with an interrupt condition. If the specified condition becomes true
-   * before the command finishes normally, the command will be interrupted and un-scheduled. Note
-   * that this only applies to the command returned by this method; the calling command is not
-   * itself changed.
+   * before the command finishes normally, the command will be interrupted and un-scheduled.
    *
    * <p>Note: This decorator works by adding this command to a composition. The command the
    * decorator was called on cannot be scheduled independently or be added to a different

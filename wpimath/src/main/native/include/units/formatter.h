@@ -26,13 +26,11 @@ struct fmt::formatter<units::unit_t<Units, T, NonLinearScale>>
   /**
    * Writes out a formatted unit.
    *
-   * @tparam FormatContext Format string context type.
    * @param obj Unit instance.
    * @param ctx Format string context.
    */
-  template <typename FormatContext>
   auto format(const units::unit_t<Units, T, NonLinearScale>& obj,
-              FormatContext& ctx) {
+              fmt::format_context& ctx) const {
     using BaseUnits =
         units::unit<std::ratio<1>,
                     typename units::traits::unit_traits<Units>::base_unit_type>;

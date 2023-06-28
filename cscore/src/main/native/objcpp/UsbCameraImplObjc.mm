@@ -328,8 +328,6 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
   @autoreleasepool {
     NSArray<AVCaptureDeviceFormat*>* formats = self.videoDevice.formats;
 
-    int count = 0;
-
     for (AVCaptureDeviceFormat* format in formats) {
       CMFormatDescriptionRef cmformat = format.formatDescription;
       CMVideoDimensions s1 = CMVideoFormatDescriptionGetDimensions(cmformat);
@@ -363,7 +361,6 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
 
       modes.emplace_back(store.mode);
       platformModes.emplace_back(store);
-      count++;
     }
   }
 
