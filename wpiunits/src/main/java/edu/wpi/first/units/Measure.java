@@ -38,7 +38,7 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
    * @param unit the unit to convert this measure to
    * @return the value of this measure in the given unit
    */
-  default double in(U unit) {
+  default double in(Unit<U> unit) {
     if (this.unit().equals(unit)) {
       return magnitude();
     } else {
