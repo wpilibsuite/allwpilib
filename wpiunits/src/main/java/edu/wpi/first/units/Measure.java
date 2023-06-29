@@ -183,6 +183,15 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
   Measure<U> copy();
 
   /**
+   * Creates a new mutable copy of this measure.
+   *
+   * @return a mutable measure initialized to be identical to this measure
+   */
+  default MutableMeasure<U> mutableCopy() {
+    return MutableMeasure.mutable(this);
+  }
+
+  /**
    * Checks if this measure is near another measure of the same unit. Provide a variance threshold
    * for use for a +/- scalar, such as 0.05 for +/- 5%.
    *
@@ -257,7 +266,7 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
   }
 
   /**
-   * Checks if this measure is less than or equivalent to than another measure of the same unit.
+   * Checks if this measure is less than or equivalent to another measure of the same unit.
    *
    * @param o the other measure to compare to
    */
