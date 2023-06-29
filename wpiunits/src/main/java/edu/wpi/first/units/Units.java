@@ -39,6 +39,7 @@ public final class Units {
 
   // Angle
   public static final Angle Revolutions = BaseUnits.Angle;
+  public static final Angle Rotations = new Angle(1, "Rotation", "R"); // alias
   public static final Angle Radians =
       derive(Revolutions).splitInto(2 * Math.PI).named("Radian").symbol("rad").make();
   public static final Angle Degrees =
@@ -50,7 +51,8 @@ public final class Units {
   public static final Velocity<Distance> InchesPerSecond = Inches.per(Second);
 
   public static final Velocity<Angle> RevolutionsPerSecond = Revolutions.per(Second);
-  public static final Velocity<Angle> RPM = Revolutions.per(Minute);
+  public static final Velocity<Angle> RotationsPerSecond = Rotations.per(Second);
+  public static final Velocity<Angle> RPM = Rotations.per(Minute);
   public static final Velocity<Angle> RadiansPerSecond = Radians.per(Second);
   public static final Velocity<Angle> DegreesPerSecond = Degrees.per(Second);
 
@@ -104,6 +106,13 @@ public final class Units {
           .named("Fahrenheit")
           .symbol("°F")
           .make();
+
+  // Standard feedforward units for kV and kA (kS and kG are just volts, which is already defined earlier)
+  public static final Per<Voltage, Velocity<Distance>> VoltsPerMeterPerSecond = Volts.per(MetersPerSecond);
+  public static final Per<Voltage, Velocity<Velocity<Distance>>> VoltsPerMeterPerSecondSquared = Volts.per(MetersPerSecondPerSecond);
+
+  public static final Per<Voltage, Velocity<Angle>> VoltsPerRadianPerSecond = Volts.per(RadiansPerSecond);
+  public static final Per<Voltage, Velocity<Velocity<Angle>>> VoltsPerRadianPerSecondSquared = Volts.per(RadiansPerSecond.per(Second));
 
   /**
    * Creates a unit equal to a thousandth of the base unit, eg Milliseconds = Milli(Units.Seconds).
