@@ -14,9 +14,11 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Intake extends SubsystemBase {
   private final PWMSparkMax m_motor = new PWMSparkMax(IntakeConstants.kMotorPort);
+
+  // Double solenoid connected to two channels of a PCM with the default CAN ID
   private final DoubleSolenoid m_pistons =
       new DoubleSolenoid(
-          PneumaticsModuleType.REVPH,
+          PneumaticsModuleType.CTREPCM,
           IntakeConstants.kSolenoidPorts[0],
           IntakeConstants.kSolenoidPorts[1]);
 

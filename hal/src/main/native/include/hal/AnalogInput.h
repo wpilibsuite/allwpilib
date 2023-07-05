@@ -33,14 +33,14 @@ HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(
 /**
  * Frees an analog input port.
  *
- * @param analogPortHandle Handle to the analog port.
+ * @param[in,out] analogPortHandle Handle to the analog port.
  */
 void HAL_FreeAnalogInputPort(HAL_AnalogInputHandle analogPortHandle);
 
 /**
  * Checks that the analog module number is valid.
  *
- * @param module The analog module number.
+ * @param[in] module The analog module number.
  * @return Analog module is valid and present
  */
 HAL_Bool HAL_CheckAnalogModule(int32_t module);
@@ -50,7 +50,7 @@ HAL_Bool HAL_CheckAnalogModule(int32_t module);
  * Verifies that the analog channel number is one of the legal channel numbers.
  * Channel numbers are 0-based.
  *
- * @param channel The analog output channel number.
+ * @param[in] channel The analog output channel number.
  * @return Analog channel is valid
  */
 HAL_Bool HAL_CheckAnalogInputChannel(int32_t channel);

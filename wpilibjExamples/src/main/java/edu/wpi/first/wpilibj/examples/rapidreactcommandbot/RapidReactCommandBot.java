@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.Constants.OIConstants
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.Constants.ShooterConstants;
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.subsystems.Drive;
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.subsystems.Intake;
+import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.subsystems.Pneumatics;
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.subsystems.Shooter;
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.subsystems.Storage;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -29,6 +30,7 @@ public class RapidReactCommandBot {
   private final Intake m_intake = new Intake();
   private final Storage m_storage = new Storage();
   private final Shooter m_shooter = new Shooter();
+  private final Pneumatics m_pneumatics = new Pneumatics();
 
   // The driver's controller
   CommandXboxController m_driverController =
@@ -69,6 +71,9 @@ public class RapidReactCommandBot {
                     m_storage.runCommand())
                 // Since we composed this inline we should give it a name
                 .withName("Shoot"));
+
+    // Toggle compressor with the Start button
+    m_driverController.start().toggleOnTrue(m_pneumatics.disableCompressorCommand());
   }
 
   /**

@@ -46,7 +46,7 @@ class RepeatCommand : public CommandHelper<CommandBase, RepeatCommand> {
    * @param command the command to run repeatedly
    */
   template <std::derived_from<Command> T>
-  // NOLINTNEXTLINE (bugprone-forwarding-reference-overload)
+  // NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
   explicit RepeatCommand(T&& command)
       : RepeatCommand(
             std::make_unique<std::decay_t<T>>(std::forward<T>(command))) {}

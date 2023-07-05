@@ -4,11 +4,14 @@
 
 package edu.wpi.first.math.kinematics;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.interpolation.Interpolatable;
 import java.util.Objects;
 
 /** Represents the state of one swerve module. */
-public class SwerveModulePosition implements Comparable<SwerveModulePosition> {
+public class SwerveModulePosition
+    implements Comparable<SwerveModulePosition>, Interpolatable<SwerveModulePosition> {
   /** Distance measured by the wheel of the module. */
   public double distanceMeters;
 
@@ -59,5 +62,33 @@ public class SwerveModulePosition implements Comparable<SwerveModulePosition> {
   public String toString() {
     return String.format(
         "SwerveModulePosition(Distance: %.2f m, Angle: %s)", distanceMeters, angle);
+  }
+
+  /**
+   * Returns a copy of this swerve module position.
+   *
+   * @return A copy.
+   */
+  public SwerveModulePosition copy() {
+    return new SwerveModulePosition(distanceMeters, angle);
+  }
+
+  /**
+   * Calculates the difference between two swerve module positions. The difference has a length
+   * equal to the difference in lengths and an angle equal to the ending angle (this module
+   * position's angle).
+   *
+   * @param other The swerve module position to subtract.
+   * @return The difference.
+   */
+  public SwerveModulePosition minus(SwerveModulePosition other) {
+    return new SwerveModulePosition(this.distanceMeters - other.distanceMeters, this.angle);
+  }
+
+  @Override
+  public SwerveModulePosition interpolate(SwerveModulePosition endValue, double t) {
+    return new SwerveModulePosition(
+        MathUtil.interpolate(this.distanceMeters, endValue.distanceMeters, t),
+        this.angle.interpolate(endValue.angle, t));
   }
 }
