@@ -285,7 +285,8 @@ struct LSImpl {
   void CheckReset(TopicData* topic);
 
   bool SetValue(TopicData* topic, const Value& value, unsigned int eventFlags,
-                bool suppressIfDuplicate, bool isDuplicate, const PublisherData* publisher);
+                bool suppressIfDuplicate, bool isDuplicate, 
+                const PublisherData* publisher);
   void NotifyValue(TopicData* topic, unsigned int eventFlags, bool isDuplicate,
                    const PublisherData* publisher);
 
@@ -515,9 +516,9 @@ bool LSImpl::SetValue(TopicData* topic, const Value& value,
           datalog.Append(value);
         }
       }
-    }  
+    }
   }
-  
+
   return true;
 }
 
@@ -1268,7 +1269,7 @@ bool LSImpl::PublishLocalValue(PublisherData* publisher, const Value& value,
       suppressDuplicates = false;
       isNetworkDuplicate = false;
     } else {
-      suppressDuplicates = true;    
+      suppressDuplicates = true;
       isNetworkDuplicate = (publisher->topic->lastValueNetwork == value);
     }
     isDuplicate = (publisher->topic->lastValue == value);
@@ -1276,7 +1277,7 @@ bool LSImpl::PublishLocalValue(PublisherData* publisher, const Value& value,
       publisher->topic->lastValueNetwork = value;
       m_network->SetValue(publisher->handle, value);
     }
-    return SetValue(publisher->topic, value, NT_EVENT_VALUE_LOCAL, isDuplicate, 
+    return SetValue(publisher->topic, value, NT_EVENT_VALUE_LOCAL, isDuplicate,
                     suppressDuplicates, publisher);
   } else {
     return false;

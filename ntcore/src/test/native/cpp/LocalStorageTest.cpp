@@ -522,7 +522,7 @@ void LocalStorageDuplicatesTest::SetValues(bool expectDuplicates) {
   storage.SetEntryValue(pub, val1);
   storage.SetEntryValue(pub, val2);
   // verify the timestamp was updated (or not)
-  EXPECT_EQ(storage.GetEntryLastChange(sub), 
+  EXPECT_EQ(storage.GetEntryLastChange(sub),
             expectDuplicates ? val2.time() : val1.time());
   storage.SetEntryValue(pub, val3);
 }

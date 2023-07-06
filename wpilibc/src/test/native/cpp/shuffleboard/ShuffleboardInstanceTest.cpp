@@ -113,11 +113,11 @@ TEST(ShuffleboardInstanceTest, DuplicateSelectTabs) {
   NTWrapper ntInst;
   frc::detail::ShuffleboardInstance shuffleboardInst{ntInst.inst};
   std::atomic_int counter = 0;
-  auto subscriber = ntInst.inst.GetStringTopic("/Shuffleboard/.metadata/Selected")
-        .Subscribe("", {.keepDuplicates = true});
+  auto subscriber =
+      ntInst.inst.GetStringTopic("/Shuffleboard/.metadata/Selected")
+          .Subscribe("", {.keepDuplicates = true});
   ntInst.inst.AddListener(
-      subscriber,
-      nt::EventFlags::kValueAll | nt::EventFlags::kImmediate,
+      subscriber, nt::EventFlags::kValueAll | nt::EventFlags::kImmediate,
       [&counter](auto& event) { counter++; });
 
   // There shouldn't be anything there
