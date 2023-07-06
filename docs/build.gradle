@@ -173,8 +173,8 @@ doxygen {
     macro_expansion true
     expand_only_predef true
     predefined "WPI_DEPRECATED(x)=[[deprecated(x)]]\"\\\n" +
-            "\"__cplusplus"
-
+            "\"__cplusplus\"\\\n" +
+            "\"HAL_ENUM(name)=enum name : int32_t"
 
     if (project.hasProperty('docWarningsAsErrors')) {
         warn_as_error 'FAIL_ON_WARNINGS'
