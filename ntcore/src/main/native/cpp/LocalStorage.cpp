@@ -285,7 +285,7 @@ struct LSImpl {
   void CheckReset(TopicData* topic);
 
   bool SetValue(TopicData* topic, const Value& value, unsigned int eventFlags,
-                bool suppressIfDuplicate, bool isDuplicate, 
+                bool suppressIfDuplicate, bool isDuplicate,
                 const PublisherData* publisher);
   void NotifyValue(TopicData* topic, unsigned int eventFlags, bool isDuplicate,
                    const PublisherData* publisher);
