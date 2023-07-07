@@ -6,6 +6,9 @@ package edu.wpi.first.wpilibj.examples.rapidreactcommandbot;
 
 import static edu.wpi.first.wpilibj2.command.Commands.parallel;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.Constants.AutoConstants;
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.Constants.OIConstants;
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.Constants.ShooterConstants;
@@ -14,6 +17,8 @@ import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.subsystems.Intake;
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.subsystems.Pneumatics;
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.subsystems.Shooter;
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.subsystems.Storage;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.telemetry.Telemetry;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -74,6 +79,10 @@ public class RapidReactCommandBot {
 
     // Toggle compressor with the Start button
     m_driverController.start().toggleOnTrue(m_pneumatics.disableCompressorCommand());
+  }
+
+  public void setupTelemetry() {
+    Telemetry.publishNode("/Shuffleboard/Storage", m_storage);
   }
 
   /**
