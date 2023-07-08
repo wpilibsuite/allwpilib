@@ -4,6 +4,7 @@
 
 package edu.wpi.first.math.kinematics;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 /**
@@ -41,6 +42,29 @@ public class ChassisSpeeds {
     this.vxMetersPerSecond = vxMetersPerSecond;
     this.vyMetersPerSecond = vyMetersPerSecond;
     this.omegaRadiansPerSecond = omegaRadiansPerSecond;
+  }
+
+  /**
+   * Returns a chassis speed that, after a given duration, will produce this chassis speed scaled by
+   * the duration.
+   *
+   * <p>If the returned chassis speed is applied for the given duration, it will produce the effect
+   * of independently applying this chassis speed's translation and rotation components for the
+   * given duration. (Note that the returned chassis speed's rotation component will affect its
+   * translation component relative to the field.)
+   *
+   * @param dtSeconds The time in seconds the chassis speed should be held for- Usually the period
+   *     of the control loop.
+   * @return The chassis speed that will produce this chassis speed.
+   */
+  public ChassisSpeeds compensateForTimestep(double dtSeconds) {
+    var desiredDeltaPose =
+        new Pose2d(
+            vxMetersPerSecond * dtSeconds,
+            vyMetersPerSecond * dtSeconds,
+            new Rotation2d(omegaRadiansPerSecond * dtSeconds));
+    var twist = new Pose2d().log(desiredDeltaPose);
+    return new ChassisSpeeds(twist.dx / dtSeconds, twist.dy / dtSeconds, twist.dtheta / dtSeconds);
   }
 
   /**

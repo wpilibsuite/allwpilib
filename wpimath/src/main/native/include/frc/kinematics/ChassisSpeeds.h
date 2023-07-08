@@ -6,6 +6,7 @@
 
 #include <wpi/SymbolExports.h>
 
+#include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
 #include "units/angular_velocity.h"
 #include "units/velocity.h"
@@ -37,6 +38,27 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
    * Represents the angular velocity of the robot frame. (CCW is +)
    */
   units::radians_per_second_t omega = 0_rad_per_s;
+
+  /**
+   * Returns a chassis speed that, after a given duration, will produce this
+   * chassis speed scaled by the duration.
+   *
+   * If the returned chassis speed is applied for the given duration, it will
+   * produce the effect of independently applying this chassis speed's
+   * translation and rotation components for the given duration. (Note that
+   * the returned chassis speed's rotation component will affect its translation
+   * component relative to the field.)
+   *
+   * @param dt The time the chassis speed should be held for- Usually the period
+   * of the control loop.
+   *
+   * @return The chassis speed that will produce this chassis speed.
+   */
+  ChassisSpeeds CompensateForTimestep(units::second_t dt) const {
+    Pose2d desiredDeltaPose{vx * dt, vy * dt, omega * dt};
+    auto twist = Pose2d{}.Log(desiredDeltaPose);
+    return {twist.dx / dt, twist.dy / dt, twist.dtheta / dt};
+  }
 
   /**
    * Converts a user provided field-relative set of speeds into a robot-relative
