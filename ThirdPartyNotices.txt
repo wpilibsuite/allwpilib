@@ -41,9 +41,6 @@ Team 254 Library      wpilibj/src/main/java/edu/wpi/first/wpilibj/spline/SplineP
                       wpilibc/src/main/native/include/trajectory/TrajectoryParameterizer.h
                       wpilibc/src/main/native/cpp/trajectory/TrajectoryParameterizer.cpp
 Portable File Dialogs wpigui/src/main/native/include/portable-file-dialogs.h
-Drake                 wpimath/src/main/native/thirdparty/drake/
-                      wpimath/src/test/native/cpp/drake/
-                      wpimath/src/test/native/include/drake/
 V8 export-template    wpiutil/src/main/native/include/wpi/SymbolExports.h
 GCEM                  wpimath/src/main/native/thirdparty/gcem/include/
 

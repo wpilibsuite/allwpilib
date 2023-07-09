@@ -67,9 +67,6 @@ doxygen {
     cppIncludeRoots << '../ntcore/build/generated/main/native/include/'
 
     if (project.hasProperty('docWarningsAsErrors')) {
-        // Drake
-        exclude 'drake/common/**'
-
         // Eigen
         exclude 'Eigen/**'
         exclude 'unsupported/**'
