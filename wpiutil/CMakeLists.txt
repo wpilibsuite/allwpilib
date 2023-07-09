@@ -100,7 +100,7 @@ file(GLOB_RECURSE wpiutil_windows_src src/main/native/windows/*.cpp)
 file(GLOB fmtlib_native_src src/main/native/thirdparty/fmtlib/src/*.cpp)
 file(GLOB_RECURSE memory_native_src src/main/native/thirdparty/memory/src/*.cpp)
 
-add_library(wpiutil ${wpiutil_native_src} ${fmtlib_native_src} ${memory_native_src} ${wpiutil_resources_src})
+add_library(wpiutil ${wpiutil_native_src} ${memory_native_src} ${wpiutil_resources_src})
 set_target_properties(wpiutil PROPERTIES DEBUG_POSTFIX "d")
 
 set_property(TARGET wpiutil PROPERTY FOLDER "libraries")
