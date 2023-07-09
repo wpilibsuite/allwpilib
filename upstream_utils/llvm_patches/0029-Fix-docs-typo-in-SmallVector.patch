@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Ryan Blue <ryanzblue@gmail.com>
 Date: Thu, 8 Jun 2023 18:49:52 -0400
-Subject: [PATCH 29/29] Fix docs typo in SmallVector
+Subject: [PATCH 29/30] Fix docs typo in SmallVector
 
 ---
  llvm/include/llvm/ADT/SmallVector.h | 2 +-
