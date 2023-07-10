@@ -45,19 +45,24 @@ public class ChassisSpeeds {
   }
 
   /**
-   * Returns a chassis speed that, after a given duration, will produce this chassis speed scaled by
-   * the duration.
+   * Converts from a chassis speed for a discrete timestep into chassis speed for continuous time.
    *
-   * <p>If the returned chassis speed is applied for the given duration, it will produce the effect
-   * of independently applying this chassis speed's translation and rotation components for the
-   * given duration. (Note that the returned chassis speed's rotation component will affect its
-   * translation component relative to the field.)
+   * <p>The difference between applying a chassis speed for a discrete timestep vs. continuously is
+   * that applying for a discrete timestep is just scaling the velocity components by the time and
+   * adding, while when applying continuously the changes to the heading affect the direction the
+   * translational components are applied to relative to the field.
    *
-   * @param dtSeconds The time in seconds the chassis speed should be held for- Usually the period
-   *     of the control loop.
-   * @return The chassis speed that will produce this chassis speed.
+   * @param vxMetersPerSecond Forward velocity.
+   * @param vyMetersPerSecond Sideways velocity.
+   * @param omegaRadiansPerSecond Angular velocity.
+   * @param dtSeconds The duration of the timestep the speeds should be applied for.
+   * @return ChassisSpeeds that can be applied continuously to produce the discrete chassis speeds.
    */
-  public ChassisSpeeds compensateForTimestep(double dtSeconds) {
+  public static ChassisSpeeds fromDiscreteSpeeds(
+      double vxMetersPerSecond,
+      double vyMetersPerSecond,
+      double omegaRadiansPerSecond,
+      double dtSeconds) {
     var desiredDeltaPose =
         new Pose2d(
             vxMetersPerSecond * dtSeconds,
@@ -65,6 +70,26 @@ public class ChassisSpeeds {
             new Rotation2d(omegaRadiansPerSecond * dtSeconds));
     var twist = new Pose2d().log(desiredDeltaPose);
     return new ChassisSpeeds(twist.dx / dtSeconds, twist.dy / dtSeconds, twist.dtheta / dtSeconds);
+  }
+
+  /**
+   * Converts from a chassis speed for a discrete timestep into chassis speed for continuous time.
+   *
+   * <p>The difference between applying a chassis speed for a discrete timestep vs. continuously is
+   * that applying for a discrete timestep is just scaling the velocity components by the time and
+   * adding, while when applying continuously the changes to the heading affect the direction the
+   * translational components are applied to relative to the field.
+   *
+   * @param discreteSpeeds The speeds for a discrete timestep.
+   * @param dtSeconds The duration of the timestep the speeds should be applied for.
+   * @return ChassisSpeeds that can be applied continuously to produce the discrete chassis speeds.
+   */
+  public static ChassisSpeeds fromDiscreteSpeeds(ChassisSpeeds discreteSpeeds, double dtSeconds) {
+    return fromDiscreteSpeeds(
+        discreteSpeeds.vxMetersPerSecond,
+        discreteSpeeds.vyMetersPerSecond,
+        discreteSpeeds.omegaRadiansPerSecond,
+        dtSeconds);
   }
 
   /**

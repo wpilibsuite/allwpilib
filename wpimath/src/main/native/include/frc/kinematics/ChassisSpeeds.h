@@ -40,24 +40,52 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
   units::radians_per_second_t omega = 0_rad_per_s;
 
   /**
-   * Returns a chassis speed that, after a given duration, will produce this
-   * chassis speed scaled by the duration.
+   * Converts from a chassis speed for a discrete timestep into chassis speed
+   * for continuous time.
    *
-   * If the returned chassis speed is applied for the given duration, it will
-   * produce the effect of independently applying this chassis speed's
-   * translation and rotation components for the given duration. (Note that
-   * the returned chassis speed's rotation component will affect its translation
-   * component relative to the field.)
+   * The difference between applying a chassis speed for a discrete timestep vs.
+   * continuously is that applying for a discrete timestep is just scaling the
+   * velocity components by the time and adding, while when applying
+   * continuously the changes to the heading affect the direction the
+   * translational components are applied to relative to the field.
    *
-   * @param dt The time the chassis speed should be held for- Usually the period
-   * of the control loop.
+   * @param vx Forward velocity.
+   * @param vy Sideways velocity.
+   * @param omega Angular velocity.
+   * @param dt The duration of the timestep the speeds should be applied for.
    *
-   * @return The chassis speed that will produce this chassis speed.
+   * @return ChassisSpeeds that can be applied continuously to produce the
+   * discrete ChassisSpeeds.
    */
-  ChassisSpeeds CompensateForTimestep(units::second_t dt) const {
+  static ChassisSpeeds FromDiscreteSpeeds(units::meters_per_second_t vx,
+                                          units::meters_per_second_t vy,
+                                          units::radians_per_second_t omega,
+                                          units::second_t dt) {
     Pose2d desiredDeltaPose{vx * dt, vy * dt, omega * dt};
     auto twist = Pose2d{}.Log(desiredDeltaPose);
     return {twist.dx / dt, twist.dy / dt, twist.dtheta / dt};
+  }
+
+  /**
+   * Converts from a chassis speed for a discrete timestep into chassis speed
+   * for continuous time.
+   *
+   * The difference between applying a chassis speed for a discrete timestep vs.
+   * continuously is that applying for a discrete timestep is just scaling the
+   * velocity components by the time and adding, while when applying
+   * continuously the changes to the heading affect the direction the
+   * translational components are applied to relative to the field.
+   *
+   * @param discreteSpeeds The speeds for a discrete timestep.
+   * @param dt The duration of the timestep the speeds should be applied for.
+   *
+   * @return ChassisSpeeds that can be applied continuously to produce the
+   * discrete ChassisSpeeds.
+   */
+  static ChassisSpeeds FromDiscreteSpeeds(const ChassisSpeeds& discreteSpeeds,
+                                          units::second_t dt) {
+    return FromDiscreteSpeeds(discreteSpeeds.vx, discreteSpeeds.vy,
+                              discreteSpeeds.omega, dt);
   }
 
   /**
