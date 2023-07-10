@@ -442,6 +442,9 @@ class SignalObject final {
   T m_handle;
 };
 
+template<typename T>
+auto format_as(const SignalObject<T> &s) { return s.GetHandle(); }
+
 }  // namespace wpi
 
 extern "C" {
