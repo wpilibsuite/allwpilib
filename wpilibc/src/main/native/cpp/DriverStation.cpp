@@ -568,6 +568,20 @@ int DriverStation::GetLocation() {
   }
 }
 
+bool DriverStation::WaitForDsConnection(units::second_t timeout) {
+  wpi::Event event{true, false};
+  HAL_ProvideNewDataEventHandle(event.GetHandle());
+  bool result = false;
+  if (timeout == 0_s) {
+    result = wpi::WaitForObject(event.GetHandle());
+  } else {
+    result = wpi::WaitForObject(event.GetHandle(), timeout.value(), nullptr);
+  }
+
+  HAL_RemoveNewDataEventHandle(event.GetHandle());
+  return result;
+}
+
 double DriverStation::GetMatchTime() {
   int32_t status = 0;
   return HAL_GetMatchTime(&status);
