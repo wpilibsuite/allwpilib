@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Leander Schulten <Leander.Schulten@rwth-aachen.de>
+Date: Mon, 10 Jul 2023 00:53:43 +0200
+Subject: [PATCH 30/30] Unused variable in release mode
+
+---
+ llvm/include/llvm/ADT/DenseMap.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/llvm/include/llvm/ADT/DenseMap.h b/llvm/include/llvm/ADT/DenseMap.h
+index 975c3b97e2cbf09225299c421406ad2bbe4ef125..ada70d6c826d8f5bb65e502be15317692febb55c 100644
+--- a/llvm/include/llvm/ADT/DenseMap.h
++++ b/llvm/include/llvm/ADT/DenseMap.h
+@@ -126,7 +126,7 @@ public:
+       for (BucketT *P = getBuckets(), *E = getBucketsEnd(); P != E; ++P)
+         P->getFirst() = EmptyKey;
+     } else {
+-      unsigned NumEntries = getNumEntries();
++      [[maybe_unused]] unsigned NumEntries = getNumEntries();
+       for (BucketT *P = getBuckets(), *E = getBucketsEnd(); P != E; ++P) {
+         if (!KeyInfoT::isEqual(P->getFirst(), EmptyKey)) {
+           if (!KeyInfoT::isEqual(P->getFirst(), TombstoneKey)) {
