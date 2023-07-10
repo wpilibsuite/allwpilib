@@ -12,6 +12,8 @@
 
 namespace frc::sim {
 
+constexpr double kPWMStepSize = 1.0 / 2000.0;
+
 TEST(PWMSimTest, Initialize) {
   HAL_Initialize(500, 0);
 
@@ -55,13 +57,47 @@ TEST(PWMSimTest, SetSpeed) {
 
   auto cb = sim.RegisterSpeedCallback(callback.GetCallback(), false);
   PWM pwm{0};
-  constexpr double kTestValue = 0.3504;
+  double kTestValue = 0.3504;
   pwm.SetSpeed(kTestValue);
 
-  EXPECT_EQ(kTestValue, sim.GetSpeed());
-  EXPECT_EQ(kTestValue, pwm.GetSpeed());
+  EXPECT_NEAR(kTestValue, sim.GetSpeed(), kPWMStepSize);
+  EXPECT_NEAR(kTestValue, pwm.GetSpeed(), kPWMStepSize);
   EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_EQ(kTestValue, callback.GetLastValue());
+  EXPECT_NEAR(kTestValue, callback.GetLastValue(), kPWMStepSize);
+  EXPECT_NEAR(kTestValue / 2 + 0.5, sim.GetPosition(), kPWMStepSize * 2);
+  EXPECT_NEAR(kTestValue / 2 + 0.5, pwm.GetPosition(), kPWMStepSize * 2);
+
+  kTestValue = -1.0;
+  pwm.SetSpeed(kTestValue);
+
+  EXPECT_NEAR(kTestValue, sim.GetSpeed(), kPWMStepSize);
+  EXPECT_NEAR(kTestValue, pwm.GetSpeed(), kPWMStepSize);
+  EXPECT_NEAR(0.0, sim.GetPosition(), kPWMStepSize);
+  EXPECT_NEAR(0.0, pwm.GetPosition(), kPWMStepSize);
+
+  kTestValue = 0.0;
+  pwm.SetSpeed(kTestValue);
+
+  EXPECT_NEAR(kTestValue, sim.GetSpeed(), kPWMStepSize);
+  EXPECT_NEAR(kTestValue, pwm.GetSpeed(), kPWMStepSize);
+  EXPECT_NEAR(0.5, sim.GetPosition(), kPWMStepSize);
+  EXPECT_NEAR(0.5, pwm.GetPosition(), kPWMStepSize);
+
+  kTestValue = 1.0;
+  pwm.SetSpeed(kTestValue);
+
+  EXPECT_NEAR(kTestValue, sim.GetSpeed(), kPWMStepSize);
+  EXPECT_NEAR(kTestValue, pwm.GetSpeed(), kPWMStepSize);
+  EXPECT_NEAR(kTestValue, sim.GetPosition(), kPWMStepSize);
+  EXPECT_NEAR(kTestValue, pwm.GetPosition(), kPWMStepSize);
+
+  kTestValue = 1.1;
+  pwm.SetSpeed(kTestValue);
+
+  EXPECT_NEAR(1.0, sim.GetSpeed(), kPWMStepSize);
+  EXPECT_NEAR(1.0, pwm.GetSpeed(), kPWMStepSize);
+  EXPECT_NEAR(1.0, sim.GetPosition(), kPWMStepSize);
+  EXPECT_NEAR(1.0, pwm.GetPosition(), kPWMStepSize);
 }
 
 TEST(PWMSimTest, SetPosition) {
@@ -75,13 +111,47 @@ TEST(PWMSimTest, SetPosition) {
 
   auto cb = sim.RegisterPositionCallback(callback.GetCallback(), false);
   PWM pwm{0};
-  constexpr double kTestValue = 0.3504;
+  double kTestValue = 0.3504;
   pwm.SetPosition(kTestValue);
 
-  EXPECT_EQ(kTestValue, sim.GetPosition());
-  EXPECT_EQ(kTestValue, pwm.GetPosition());
+  EXPECT_NEAR(kTestValue, sim.GetPosition(), kPWMStepSize);
+  EXPECT_NEAR(kTestValue, pwm.GetPosition(), kPWMStepSize);
   EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_EQ(kTestValue, callback.GetLastValue());
+  EXPECT_NEAR(kTestValue, callback.GetLastValue(), kPWMStepSize);
+  EXPECT_NEAR(kTestValue * 2 - 1.0, sim.GetSpeed(), kPWMStepSize * 2);
+  EXPECT_NEAR(kTestValue * 2 - 1.0, pwm.GetSpeed(), kPWMStepSize * 2);
+
+  kTestValue = -1.0;
+  pwm.SetPosition(kTestValue);
+
+  EXPECT_NEAR(0.0, sim.GetPosition(), kPWMStepSize);
+  EXPECT_NEAR(0.0, pwm.GetPosition(), kPWMStepSize);
+  EXPECT_NEAR(kTestValue, sim.GetSpeed(), kPWMStepSize);
+  EXPECT_NEAR(kTestValue, pwm.GetSpeed(), kPWMStepSize);
+
+  kTestValue = 0.0;
+  pwm.SetPosition(kTestValue);
+
+  EXPECT_NEAR(kTestValue, sim.GetPosition(), kPWMStepSize);
+  EXPECT_NEAR(kTestValue, pwm.GetPosition(), kPWMStepSize);
+  EXPECT_NEAR(-1.0, sim.GetSpeed(), kPWMStepSize);
+  EXPECT_NEAR(-1.0, pwm.GetSpeed(), kPWMStepSize);
+
+  kTestValue = 1.0;
+  pwm.SetPosition(kTestValue);
+
+  EXPECT_NEAR(kTestValue, sim.GetPosition(), kPWMStepSize);
+  EXPECT_NEAR(kTestValue, pwm.GetPosition(), kPWMStepSize);
+  EXPECT_NEAR(kTestValue, sim.GetSpeed(), kPWMStepSize);
+  EXPECT_NEAR(kTestValue, pwm.GetSpeed(), kPWMStepSize);
+
+  kTestValue = 1.1;
+  pwm.SetPosition(kTestValue);
+
+  EXPECT_NEAR(1.0, sim.GetPosition(), kPWMStepSize);
+  EXPECT_NEAR(1.0, pwm.GetPosition(), kPWMStepSize);
+  EXPECT_NEAR(1.0, sim.GetSpeed(), kPWMStepSize);
+  EXPECT_NEAR(1.0, pwm.GetSpeed(), kPWMStepSize);
 }
 
 TEST(PWMSimTest, SetPeriodScale) {
