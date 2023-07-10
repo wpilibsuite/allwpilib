@@ -6,7 +6,6 @@
 #include "frc2/command/Commands.h"
 #include "frc2/command/ConditionalCommand.h"
 #include "frc2/command/InstantCommand.h"
-#include "frc2/command/SelectCommand.h"
 
 using namespace frc2;
 class ConditionalCommandTest : public CommandTestBase {};

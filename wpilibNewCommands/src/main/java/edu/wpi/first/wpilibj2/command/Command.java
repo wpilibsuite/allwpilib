@@ -116,25 +116,6 @@ public interface Command {
   }
 
   /**
-   * Decorates this command with an interrupt condition. If the specified condition becomes true
-   * before the command finishes normally, the command will be interrupted and un-scheduled.
-   *
-   * <p>Note: This decorator works by adding this command to a composition. The command the
-   * decorator was called on cannot be scheduled independently or be added to a different
-   * composition (namely, decorators), unless it is manually cleared from the list of composed
-   * commands with {@link CommandScheduler#removeComposedCommand(Command)}. The command composition
-   * returned from this method can be further decorated without issue.
-   *
-   * @param condition the interrupt condition
-   * @return the command with the interrupt condition added
-   * @deprecated Replace with {@link #until(BooleanSupplier)}
-   */
-  @Deprecated(since = "2023")
-  default ParallelRaceGroup withInterrupt(BooleanSupplier condition) {
-    return until(condition);
-  }
-
-  /**
    * Decorates this command with a runnable to run before this command starts.
    *
    * <p>Note: This decorator works by adding this command to a composition. The command the
@@ -259,28 +240,6 @@ public interface Command {
     ParallelRaceGroup group = new ParallelRaceGroup(this);
     group.addCommands(parallel);
     return group;
-  }
-
-  /**
-   * Decorates this command to run perpetually, ignoring its ordinary end conditions. The decorated
-   * command can still be interrupted or canceled.
-   *
-   * <p>Note: This decorator works by adding this command to a composition. The command the
-   * decorator was called on cannot be scheduled independently or be added to a different
-   * composition (namely, decorators), unless it is manually cleared from the list of composed
-   * commands with {@link CommandScheduler#removeComposedCommand(Command)}. The command composition
-   * returned from this method can be further decorated without issue.
-   *
-   * @return the decorated command
-   * @deprecated PerpetualCommand violates the assumption that execute() doesn't get called after
-   *     isFinished() returns true -- an assumption that should be valid. This was unsafe/undefined
-   *     behavior from the start, and RepeatCommand provides an easy way to achieve similar end
-   *     results with slightly different (and safe) semantics.
-   */
-  @SuppressWarnings("removal") // PerpetualCommand
-  @Deprecated(forRemoval = true, since = "2023")
-  default PerpetualCommand perpetually() {
-    return new PerpetualCommand(this);
   }
 
   /**

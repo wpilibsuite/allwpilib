@@ -107,10 +107,6 @@ frc::EventLoop* CommandScheduler::GetDefaultButtonLoop() const {
   return &(m_impl->defaultButtonLoop);
 }
 
-void CommandScheduler::ClearButtons() {
-  m_impl->activeButtonLoop->Clear();
-}
-
 void CommandScheduler::Schedule(Command* command) {
   if (m_impl->inRunLoop) {
     m_impl->toSchedule.emplace_back(command);

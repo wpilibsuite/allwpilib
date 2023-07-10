@@ -19,7 +19,7 @@
 
 #include <wpi/DecayedDerivedFrom.h>
 
-#include "frc2/command/CommandGroupBase.h"
+#include "frc2/command/CommandBase.h"
 #include "frc2/command/CommandHelper.h"
 
 namespace frc2 {
@@ -37,7 +37,7 @@ const size_t invalid_index = std::numeric_limits<size_t>::max();
  * This class is provided by the NewCommands VendorDep
  */
 class SequentialCommandGroup
-    : public CommandHelper<CommandGroupBase, SequentialCommandGroup> {
+    : public CommandHelper<CommandBase, SequentialCommandGroup> {
  public:
   /**
    * Creates a new SequentialCommandGroup. The given commands will be run
@@ -69,6 +69,11 @@ class SequentialCommandGroup
   // Prevent template expansion from emulating copy ctor
   SequentialCommandGroup(SequentialCommandGroup&) = delete;
 
+  /**
+   * Adds the given commands to the group.
+   *
+   * @param commands Commands to add, in order of execution.
+   */
   template <wpi::DecayedDerivedFrom<Command>... Commands>
   void AddCommands(Commands&&... commands) {
     std::vector<std::unique_ptr<Command>> foo;
@@ -93,7 +98,7 @@ class SequentialCommandGroup
   void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
-  void AddCommands(std::vector<std::unique_ptr<Command>>&& commands) final;
+  void AddCommands(std::vector<std::unique_ptr<Command>>&& commands);
 
   wpi::SmallVector<std::unique_ptr<Command>, 4> m_commands;
   size_t m_currentCommandIndex{invalid_index};

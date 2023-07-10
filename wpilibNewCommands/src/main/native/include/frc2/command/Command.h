@@ -23,8 +23,6 @@ std::string GetTypeName(const T& type) {
   return wpi::Demangle(typeid(type).name());
 }
 
-class PerpetualCommand;
-
 /**
  * A state machine representing a complete action to be performed by the robot.
  * Commands are run by the CommandScheduler, and can be composed into
@@ -148,18 +146,6 @@ class Command {
   CommandPtr OnlyWhile(std::function<bool()> condition) &&;
 
   /**
-   * Decorates this command with an interrupt condition.  If the specified
-   * condition becomes true before the command finishes normally, the command
-   * will be interrupted and un-scheduled.
-   *
-   * @param condition the interrupt condition
-   * @return the command with the interrupt condition added
-   * @deprecated Replace with Until()
-   */
-  [[deprecated("Replace with Until()")]] [[nodiscard]]
-  CommandPtr WithInterrupt(std::function<bool()> condition) &&;
-
-  /**
    * Decorates this command with a runnable to run before this command starts.
    *
    * @param toRun the Runnable to run
@@ -202,26 +188,6 @@ class Command {
   [[nodiscard]]
   CommandPtr AndThen(std::function<void()> toRun,
                      std::span<Subsystem* const> requirements = {}) &&;
-
-  /**
-   * Decorates this command to run perpetually, ignoring its ordinary end
-   * conditions.  The decorated command can still be interrupted or canceled.
-   *
-   * @return the decorated command
-   * @deprecated PerpetualCommand violates the assumption that execute() doesn't
-get called after isFinished() returns true -- an assumption that should be
-valid. This was unsafe/undefined behavior from the start, and RepeatCommand
-provides an easy way to achieve similar end results with slightly different (and
-safe) semantics.
-   */
-  [[deprecated(
-      "PerpetualCommand violates the assumption that execute() doesn't get "
-      "called after isFinished() returns true -- an assumption that should be "
-      "valid."
-      "This was unsafe/undefined behavior from the start, and RepeatCommand "
-      "provides an easy way to achieve similar end results with slightly "
-      "different (and safe) semantics.")]]
-  PerpetualCommand Perpetually() &&;
 
   /**
    * Decorates this command to run repeatedly, restarting it when it ends, until
@@ -360,25 +326,6 @@ safe) semantics.
    * use it.  NOT ADVISED!
    */
   void SetComposed(bool isComposed);
-
-  /**
-   * Whether the command is currently grouped in a command group.  Used as extra
-   * insurance to prevent accidental independent use of grouped commands.
-   *
-   * @deprecated Moved to IsComposed()
-   */
-  [[deprecated("Moved to IsComposed()")]]
-  bool IsGrouped() const;
-
-  /**
-   * Sets whether the command is currently grouped in a command group.  Can be
-   * used to "reclaim" a command if a group is no longer going to use it.  NOT
-   * ADVISED!
-   *
-   * @deprecated Moved to SetComposed()
-   */
-  [[deprecated("Moved to SetComposed()")]]
-  void SetGrouped(bool grouped);
 
   /**
    * Whether the given command should run when the robot is disabled.  Override
