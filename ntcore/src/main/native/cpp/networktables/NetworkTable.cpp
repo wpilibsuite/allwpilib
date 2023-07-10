@@ -231,8 +231,14 @@ std::vector<std::string> NetworkTable::GetSubTables() const {
     if (end_subtable == std::string_view::npos) {
       continue;
     }
-    keys.emplace_back(wpi::substr(relative_key, 0, end_subtable));
+    auto subTable = wpi::substr(relative_key, 0, end_subtable);
+    if (keys.empty() || keys.back() != subTable) {
+      keys.emplace_back(subTable);
+    }
   }
+  // remove duplicates
+  std::sort(keys.begin(), keys.end());
+  keys.erase(std::unique(keys.begin(), keys.end()), keys.end());
   return keys;
 }
 
