@@ -16,8 +16,8 @@
 #include <networktables/StringArrayTopic.h>
 #include <wpi/DenseMap.h>
 #include <wpi/SmallVector.h>
-#include <wpi/sendable/SendableRegistry.h>
 #include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
 
 #include "frc2/command/CommandPtr.h"
 #include "frc2/command/Subsystem.h"

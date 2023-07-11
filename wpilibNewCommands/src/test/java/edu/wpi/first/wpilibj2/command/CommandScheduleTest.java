@@ -119,7 +119,7 @@ class CommandScheduleTest extends CommandTestBase {
       assertDoesNotThrow(() -> scheduler.cancel(mockCommand));
     }
   }
-  
+
   @Test
   void smartDashboardCancelTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {

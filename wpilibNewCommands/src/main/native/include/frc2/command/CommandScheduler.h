@@ -16,8 +16,8 @@
 #include <frc/event/EventLoop.h>
 #include <units/time.h>
 #include <wpi/FunctionExtras.h>
-#include <wpi/sendable/SendableHelper.h>
 #include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
 
 namespace frc2 {
 class Command;

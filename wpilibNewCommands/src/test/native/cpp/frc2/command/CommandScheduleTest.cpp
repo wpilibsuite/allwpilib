@@ -2,9 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "CommandTestBase.h"
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <networktables/NetworkTableInstance.h>
+
+#include "CommandTestBase.h"
+
 using namespace frc2;
 class CommandScheduleTest : public CommandTestBase {};
 
@@ -100,7 +102,7 @@ TEST_F(CommandScheduleTest, NotScheduledCancel) {
   EXPECT_NO_FATAL_FAILURE(scheduler.Cancel(&command));
 }
 
-TEST_F(CommandScheduleTest, SmartDashboardCancelTest) {
+TEST_F(CommandScheduleTest, SmartDashboardCancel) {
   CommandScheduler scheduler = GetScheduler();
   frc::SmartDashboard::PutData("Scheduler", &scheduler);
   frc::SmartDashboard::UpdateValues();
@@ -113,10 +115,10 @@ TEST_F(CommandScheduleTest, SmartDashboardCancelTest) {
 
   uintptr_t ptrTmp = reinterpret_cast<uintptr_t>(&command);
   nt::NetworkTableInstance::GetDefault()
-                    .GetEntry("/SmartDashboard/Scheduler/Cancel")
-                    .SetIntegerArray(std::span<const int64_t>{{static_cast<int64_t>(ptrTmp)}});
+      .GetEntry("/SmartDashboard/Scheduler/Cancel")
+      .SetIntegerArray(
+          std::span<const int64_t>{{static_cast<int64_t>(ptrTmp)}});
   frc::SmartDashboard::UpdateValues();
   scheduler.Run();
   EXPECT_FALSE(scheduler.IsScheduled(&command));
-
 }
