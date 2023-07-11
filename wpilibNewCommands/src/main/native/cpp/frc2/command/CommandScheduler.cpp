@@ -478,7 +478,7 @@ void CommandScheduler::InitSendable(wpi::SendableBuilder& builder) {
       },
       nullptr);
   builder.AddIntegerArrayProperty(
-      "Cancel", [this]() { return std::vector<int64_t>{}; },
+      "Cancel", []() { return std::vector<int64_t>{}; },
       [this](std::span<const int64_t> toCancel) mutable {
         for (auto cancel : toCancel) {
           uintptr_t ptrTmp = static_cast<uintptr_t>(cancel);
