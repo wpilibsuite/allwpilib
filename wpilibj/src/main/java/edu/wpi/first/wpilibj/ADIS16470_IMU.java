@@ -13,12 +13,12 @@ package edu.wpi.first.wpilibj;
 
 // import java.lang.FdLibm.Pow;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SimBoolean;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDouble;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
