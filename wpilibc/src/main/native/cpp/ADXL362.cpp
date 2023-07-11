@@ -6,7 +6,7 @@
 
 #include <hal/FRCUsageReporting.h>
 #include <networktables/DoubleTopic.h>
-#include <wpi/sendable/SendableBuilder.h>
+#include <networktables/NTSendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/Errors.h"
@@ -180,12 +180,15 @@ ADXL362::AllAxes ADXL362::GetAccelerations() {
   return data;
 }
 
-void ADXL362::InitSendable(wpi::SendableBuilder& builder) {
+void ADXL362::InitSendable(nt::NTSendableBuilder& builder) {
   builder.SetSmartDashboardType("3AxisAccelerometer");
-  builder.AddDoubleProperty(
-      "X", [this]() mutable { return GetAccelerations().XAxis; }, nullptr);
-  builder.AddDoubleProperty(
-      "Y", [this]() mutable { return GetAccelerations().YAxis; }, nullptr);
-  builder.AddDoubleProperty(
-      "Z", [this]() mutable { return GetAccelerations().ZAxis; }, nullptr);
+  builder.SetUpdateTable(
+      [this, x = nt::DoubleTopic{builder.GetTopic("X")}.Publish(),
+       y = nt::DoubleTopic{builder.GetTopic("Y")}.Publish(),
+       z = nt::DoubleTopic{builder.GetTopic("Z")}.Publish()]() mutable {
+        auto data = GetAccelerations();
+        x.Set(data.XAxis);
+        y.Set(data.YAxis);
+        z.Set(data.ZAxis);
+      });
 }

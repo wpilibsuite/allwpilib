@@ -5,7 +5,7 @@
 #pragma once
 
 #include <hal/SimDevice.h>
-#include <wpi/sendable/Sendable.h>
+#include <networktables/NTSendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
 #include "frc/SPI.h"
@@ -96,7 +96,7 @@ class ADXL362 : public wpi::Sendable, public wpi::SendableHelper<ADXL362> {
    */
   virtual AllAxes GetAccelerations();
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void InitSendable(nt::NTSendableBuilder& builder) override;
 
  private:
   SPI m_spi;

@@ -5,7 +5,7 @@
 #pragma once
 
 #include <hal/SimDevice.h>
-#include <wpi/sendable/Sendable.h>
+#include <networktables/NTSendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
 #include "frc/I2C.h"
@@ -98,7 +98,7 @@ class ADXL345_I2C : public wpi::Sendable,
    */
   virtual AllAxes GetAccelerations();
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void InitSendable(nt::NTSendableBuilder& builder) override;
 
  protected:
   I2C m_i2c;
