@@ -9,10 +9,8 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.hal.SimEnum;
-import edu.wpi.first.networktables.DoublePublisher;
-import edu.wpi.first.networktables.DoubleTopic;
-import edu.wpi.first.networktables.NTSendable;
-import edu.wpi.first.networktables.NTSendableBuilder;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -22,7 +20,7 @@ import java.nio.ByteOrder;
  *
  * <p>This class allows access to an Analog Devices ADXL362 3-axis accelerometer.
  */
-public class ADXL362 implements NTSendable, AutoCloseable {
+public class ADXL362 implements Sendable, AutoCloseable {
   private static final byte kRegWrite = 0x0A;
   private static final byte kRegRead = 0x0B;
 
@@ -283,20 +281,10 @@ public class ADXL362 implements NTSendable, AutoCloseable {
   }
 
   @Override
-  public void initSendable(NTSendableBuilder builder) {
+  public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("3AxisAccelerometer");
-    DoublePublisher pubX = new DoubleTopic(builder.getTopic("X")).publish();
-    DoublePublisher pubY = new DoubleTopic(builder.getTopic("Y")).publish();
-    DoublePublisher pubZ = new DoubleTopic(builder.getTopic("Z")).publish();
-    builder.addCloseable(pubX);
-    builder.addCloseable(pubY);
-    builder.addCloseable(pubZ);
-    builder.setUpdateTable(
-        () -> {
-          AllAxes data = getAccelerations();
-          pubX.set(data.XAxis);
-          pubY.set(data.YAxis);
-          pubZ.set(data.ZAxis);
-        });
+    builder.addDoubleProperty("X", () -> getAccelerations().XAxis, null);
+    builder.addDoubleProperty("Y", () -> getAccelerations().YAxis, null);
+    builder.addDoubleProperty("Z", () -> getAccelerations().ZAxis, null);
   }
 }

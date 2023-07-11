@@ -5,7 +5,7 @@
 #pragma once
 
 #include <hal/SimDevice.h>
-#include <networktables/NTSendable.h>
+#include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
 #include "frc/I2C.h"
@@ -23,7 +23,7 @@ namespace frc {
  * href="https://docs.wpilib.org/en/stable/docs/yearly-overview/known-issues.html#onboard-i2c-causing-system-lockups">
  * WPILib Known Issues</a> page for details.
  */
-class ADXL345_I2C : public nt::NTSendable,
+class ADXL345_I2C : public wpi::Sendable,
                     public wpi::SendableHelper<ADXL345_I2C> {
  public:
   enum Range { kRange_2G = 0, kRange_4G = 1, kRange_8G = 2, kRange_16G = 3 };
@@ -98,7 +98,7 @@ class ADXL345_I2C : public nt::NTSendable,
    */
   virtual AllAxes GetAccelerations();
 
-  void InitSendable(nt::NTSendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  protected:
   I2C m_i2c;

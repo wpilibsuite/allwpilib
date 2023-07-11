@@ -10,10 +10,8 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.hal.SimEnum;
-import edu.wpi.first.networktables.DoublePublisher;
-import edu.wpi.first.networktables.DoubleTopic;
-import edu.wpi.first.networktables.NTSendable;
-import edu.wpi.first.networktables.NTSendableBuilder;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -26,7 +24,7 @@ import java.nio.ByteOrder;
  * WPILib Known Issues</a> page for details.
  */
 @SuppressWarnings({"TypeName", "PMD.UnusedPrivateField"})
-public class ADXL345_I2C implements NTSendable, AutoCloseable {
+public class ADXL345_I2C implements Sendable, AutoCloseable {
   private static final byte kAddress = 0x1D;
   private static final byte kPowerCtlRegister = 0x2D;
   private static final byte kDataFormatRegister = 0x31;
@@ -252,20 +250,10 @@ public class ADXL345_I2C implements NTSendable, AutoCloseable {
   }
 
   @Override
-  public void initSendable(NTSendableBuilder builder) {
+  public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("3AxisAccelerometer");
-    DoublePublisher pubX = new DoubleTopic(builder.getTopic("X")).publish();
-    DoublePublisher pubY = new DoubleTopic(builder.getTopic("Y")).publish();
-    DoublePublisher pubZ = new DoubleTopic(builder.getTopic("Z")).publish();
-    builder.addCloseable(pubX);
-    builder.addCloseable(pubY);
-    builder.addCloseable(pubZ);
-    builder.setUpdateTable(
-        () -> {
-          AllAxes data = getAccelerations();
-          pubX.set(data.XAxis);
-          pubY.set(data.YAxis);
-          pubZ.set(data.ZAxis);
-        });
+    builder.addDoubleProperty("X", () -> getAccelerations().XAxis, null);
+    builder.addDoubleProperty("Y", () -> getAccelerations().YAxis, null);
+    builder.addDoubleProperty("Z", () -> getAccelerations().ZAxis, null);
   }
 }
