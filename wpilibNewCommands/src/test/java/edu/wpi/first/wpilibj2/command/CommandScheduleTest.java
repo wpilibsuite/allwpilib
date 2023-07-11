@@ -11,10 +11,9 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import org.junit.jupiter.api.Test;
-
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import org.junit.jupiter.api.Test;
 
 class CommandScheduleTest extends CommandTestBase {
   @Test
@@ -124,7 +123,6 @@ class CommandScheduleTest extends CommandTestBase {
   void smartDashboardCancelTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       var inst = NetworkTableInstance.create();
-      var table = inst.getTable("SmartDashboard");
       SmartDashboard.setNetworkTableInstance(inst);
       SmartDashboard.putData("Scheduler", scheduler);
       SmartDashboard.updateValues();
@@ -136,7 +134,8 @@ class CommandScheduleTest extends CommandTestBase {
       SmartDashboard.updateValues();
       assertTrue(scheduler.isScheduled(mockCommand));
 
-      table.getEntry("Scheduler/Cancel").setIntegerArray(new long[]{ mockCommand.hashCode()});
+      var table = inst.getTable("SmartDashboard");
+      table.getEntry("Scheduler/Cancel").setIntegerArray(new long[] {mockCommand.hashCode()});
       SmartDashboard.updateValues();
       scheduler.run();
       assertFalse(scheduler.isScheduled(mockCommand));
