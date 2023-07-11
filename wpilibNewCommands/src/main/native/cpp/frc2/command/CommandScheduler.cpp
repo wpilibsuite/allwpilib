@@ -13,11 +13,11 @@
 #include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
 #include <networktables/IntegerArrayTopic.h>
-#include <networktables/NTSendableBuilder.h>
 #include <networktables/StringArrayTopic.h>
 #include <wpi/DenseMap.h>
 #include <wpi/SmallVector.h>
 #include <wpi/sendable/SendableRegistry.h>
+#include <wpi/sendable/SendableBuilder.h>
 
 #include "frc2/command/CommandPtr.h"
 #include "frc2/command/Subsystem.h"
@@ -454,36 +454,40 @@ void CommandScheduler::RequireUngrouped(
   }
 }
 
-void CommandScheduler::InitSendable(nt::NTSendableBuilder& builder) {
+void CommandScheduler::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Scheduler");
-  builder.SetUpdateTable(
-      [this,
-       namesPub = nt::StringArrayTopic{builder.GetTopic("Names")}.Publish(),
-       idsPub = nt::IntegerArrayTopic{builder.GetTopic("Ids")}.Publish(),
-       cancelEntry = nt::IntegerArrayTopic{builder.GetTopic("Cancel")}.GetEntry(
-           {})]() mutable {
-        auto toCancel = cancelEntry.Get();
-        if (!toCancel.empty()) {
-          for (auto cancel : cancelEntry.Get()) {
-            uintptr_t ptrTmp = static_cast<uintptr_t>(cancel);
-            Command* command = reinterpret_cast<Command*>(ptrTmp);
-            if (m_impl->scheduledCommands.find(command) !=
-                m_impl->scheduledCommands.end()) {
-              Cancel(command);
-            }
-          }
-          cancelEntry.Set({});
-        }
-
-        wpi::SmallVector<std::string, 8> names;
-        wpi::SmallVector<int64_t, 8> ids;
+  builder.AddStringArrayProperty(
+      "Names",
+      [this]() mutable {
+        std::vector<std::string> names;
         for (Command* command : m_impl->scheduledCommands) {
           names.emplace_back(command->GetName());
+        }
+        return names;
+      },
+      nullptr);
+  builder.AddIntegerArrayProperty(
+      "Ids",
+      [this]() mutable {
+        std::vector<int64_t> ids;
+        for (Command* command : m_impl->scheduledCommands) {
           uintptr_t ptrTmp = reinterpret_cast<uintptr_t>(command);
           ids.emplace_back(static_cast<int64_t>(ptrTmp));
         }
-        namesPub.Set(names);
-        idsPub.Set(ids);
+        return ids;
+      },
+      nullptr);
+  builder.AddIntegerArrayProperty(
+      "Cancel", [this]() { return std::vector<int64_t>{}; },
+      [this](std::span<const int64_t> toCancel) mutable {
+        for (auto cancel : toCancel) {
+          uintptr_t ptrTmp = static_cast<uintptr_t>(cancel);
+          Command* command = reinterpret_cast<Command*>(ptrTmp);
+          if (m_impl->scheduledCommands.find(command) !=
+              m_impl->scheduledCommands.end()) {
+            Cancel(command);
+          }
+        }
       });
 }
 

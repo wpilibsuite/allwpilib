@@ -46,7 +46,7 @@ import java.util.function.Consumer;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public final class CommandScheduler implements NTSendable, AutoCloseable {
+public final class CommandScheduler implements Sendable, AutoCloseable {
   /** The Singleton Instance. */
   private static CommandScheduler instance;
 
@@ -624,45 +624,46 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
   }
 
   @Override
-  public void initSendable(NTSendableBuilder builder) {
+  public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Scheduler");
-    final StringArrayPublisher namesPub = new StringArrayTopic(builder.getTopic("Names")).publish();
-    final IntegerArrayPublisher idsPub = new IntegerArrayTopic(builder.getTopic("Ids")).publish();
-    final IntegerArrayEntry cancelEntry =
-        new IntegerArrayTopic(builder.getTopic("Cancel")).getEntry(new long[] {});
-    builder.addCloseable(namesPub);
-    builder.addCloseable(idsPub);
-    builder.addCloseable(cancelEntry);
-    builder.setUpdateTable(
+    builder.addStringArrayProperty(
+        "Names",
         () -> {
-          if (namesPub == null || idsPub == null || cancelEntry == null) {
-            return;
-          }
-
-          Map<Long, Command> ids = new LinkedHashMap<>();
-          List<String> names = new ArrayList<>();
-          long[] ids2 = new long[m_scheduledCommands.size()];
-
+          String[] names = new String[m_scheduledCommands.size()];
           int i = 0;
+          for (Command command : m_scheduledCommands) {
+            names[i] = command.getName();
+            i++;
+          }
+          return names;
+        },
+        null);
+    builder.addIntegerArrayProperty(
+        "Ids",
+        () -> {
+          long[] ids = new long[m_scheduledCommands.size()];
+          int i = 0;
+          for (Command command : m_scheduledCommands) {
+            ids[i] = command.hashCode();
+            i++;
+          }
+          return ids;
+        },
+        null);
+    builder.addIntegerArrayProperty(
+        "Cancel",
+        () -> {
+          return new long[] {};
+        },
+        toCancel -> {
+          Map<Long, Command> ids = new LinkedHashMap<>();
           for (Command command : m_scheduledCommands) {
             long id = command.hashCode();
             ids.put(id, command);
-            names.add(command.getName());
-            ids2[i] = id;
-            i++;
           }
-
-          long[] toCancel = cancelEntry.get();
-          if (toCancel.length > 0) {
-            for (long hash : toCancel) {
-              cancel(ids.get(hash));
-              ids.remove(hash);
-            }
-            cancelEntry.set(new long[] {});
+          for (long hash : toCancel) {
+            cancel(ids.get(hash));
           }
-
-          namesPub.set(names.toArray(new String[] {}));
-          idsPub.set(ids2);
         });
   }
 }
