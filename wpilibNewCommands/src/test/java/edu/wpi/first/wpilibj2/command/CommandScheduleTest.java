@@ -139,6 +139,7 @@ class CommandScheduleTest extends CommandTestBase {
       SmartDashboard.updateValues();
       scheduler.run();
       assertFalse(scheduler.isScheduled(mockCommand));
+      inst.close();
     }
   }
 }
