@@ -147,10 +147,7 @@ ext {
                     source {
                         srcDirs 'src/main/native/thirdparty/libuv/src/unix'
                         includes = [
-                            'epoll.cpp',
-                            'linux-core.cpp',
-                            'linux-inotify.cpp',
-                            'linux-syscalls.cpp',
+                            'linux.cpp',
                             'procfs-exepath.cpp',
                             'proctitle.cpp',
                             'random-sysctl-linux.cpp',
