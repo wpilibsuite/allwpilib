@@ -11,9 +11,10 @@ Subject: [PATCH 17/30] Fixup includes
  llvm/lib/Support/ErrorHandling.cpp                |  7 +++----
  llvm/lib/Support/raw_ostream.cpp                  | 11 ++++++-----
  llvm/unittests/ADT/SmallPtrSetTest.cpp            |  2 ++
+ llvm/unittests/ADT/SmallVectorTest.cpp            |  1 +
  llvm/unittests/ADT/StringMapTest.cpp              |  1 +
  llvm/unittests/Support/ConvertUTFTest.cpp         |  2 ++
- 9 files changed, 24 insertions(+), 9 deletions(-)
+ 10 files changed, 25 insertions(+), 9 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/StringMap.h b/llvm/include/llvm/ADT/StringMap.h
 index 99a183772f909ed9eab8c8e0c0fc87f183d2c98d..2605dcd3dfd60a93d714caf8bc8058e3c983dbde 100644
@@ -140,6 +141,18 @@ index 531f81ab5b3fc1dcff731230f3cb7649cb90aedf..3db8b6e37d31a0a3cc304da8fc4cbbe1
  using namespace llvm;
  
  TEST(SmallPtrSetTest, Assignment) {
+diff --git a/llvm/unittests/ADT/SmallVectorTest.cpp b/llvm/unittests/ADT/SmallVectorTest.cpp
+index 26ef3aee0bebf351c148a3ce9eaada24d365f603..adb0755988c67ecd126931425296d32d833da561 100644
+--- a/llvm/unittests/ADT/SmallVectorTest.cpp
++++ b/llvm/unittests/ADT/SmallVectorTest.cpp
+@@ -13,6 +13,7 @@
+ #include "llvm/ADT/SmallVector.h"
+ #include "llvm/Support/Compiler.h"
+ #include "gtest/gtest.h"
++#include <array>
+ #include <list>
+ #include <span>
+ #include <stdarg.h>
 diff --git a/llvm/unittests/ADT/StringMapTest.cpp b/llvm/unittests/ADT/StringMapTest.cpp
 index d12c585660ba8d00556c37bd1e5e41fbc953acc1..a45dde69f833900fa1d7c5a1984edee3d501111d 100644
 --- a/llvm/unittests/ADT/StringMapTest.cpp

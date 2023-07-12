@@ -13,6 +13,7 @@
 #include "wpi/SmallVector.h"
 #include "wpi/Compiler.h"
 #include "gtest/gtest.h"
+#include <array>
 #include <list>
 #include <span>
 #include <stdarg.h>
