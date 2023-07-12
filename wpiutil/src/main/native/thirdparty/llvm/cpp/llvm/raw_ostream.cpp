@@ -522,7 +522,6 @@ void raw_fd_ostream::write_impl(const char *Ptr, size_t Size) {
       DWORD WinLastError = GetLastError();
       if (WinLastError == ERROR_BROKEN_PIPE ||
           (WinLastError == ERROR_NO_DATA && errno == EINVAL)) {
-        wpi::sys::CallOneShotPipeSignalHandler();
         errno = EPIPE;
       }
 #endif

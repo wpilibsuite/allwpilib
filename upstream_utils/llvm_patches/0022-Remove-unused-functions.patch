@@ -77,7 +77,7 @@ index 54137a331ca9e752b02c0f16ae996094a6f2fafa..e253d6f7a5ca3aee75823efdb9717dcd
  
  #include <winerror.h>
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index 3b7d8d6db5f0df31e18b91be716a4fd21e7e3549..2e4270384fd9f9e86a11419d9936c64e1e1a33d3 100644
+index 4769d34a14f3f2cbaaa4df50ea7111fe9fa2792f..f9928ac969932b6baea60a80750477d78b6a5b02 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
 @@ -175,16 +175,6 @@ raw_ostream &raw_ostream::write_escaped(std::string_view Str,
@@ -164,7 +164,7 @@ index 3b7d8d6db5f0df31e18b91be716a4fd21e7e3549..2e4270384fd9f9e86a11419d9936c64e
  
      if (ret < 0) {
        // If it's a recoverable error, swallow it and retry the write.
-@@ -555,8 +550,8 @@ void raw_fd_ostream::close() {
+@@ -554,8 +549,8 @@ void raw_fd_ostream::close() {
    assert(ShouldClose);
    ShouldClose = false;
    flush();

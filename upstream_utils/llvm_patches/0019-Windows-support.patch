@@ -6,7 +6,8 @@ Subject: [PATCH 19/30] Windows support
 ---
  .../llvm/Support/Windows/WindowsSupport.h     | 45 +++++----
  llvm/lib/Support/ConvertUTF.cpp               | 95 +++++++++++++++++++
- 2 files changed, 124 insertions(+), 16 deletions(-)
+ llvm/lib/Support/raw_ostream.cpp              |  1 -
+ 3 files changed, 124 insertions(+), 17 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/Windows/WindowsSupport.h b/llvm/include/llvm/Support/Windows/WindowsSupport.h
 index aabdb2f14668a990329b57f5454a0d7db73e12ce..2ac474092a62d488da1ec7f07a1cd10b0781d938 100644
@@ -202,3 +203,15 @@ index bc04c5ab5113563fb82d7b3b168985369b611f4b..57eb64a6017a6964ab14b40b8c6b3563
  } // namespace llvm
  
  ConvertUTF_RESTORE_WARNINGS
+diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
+index 3b7d8d6db5f0df31e18b91be716a4fd21e7e3549..4769d34a14f3f2cbaaa4df50ea7111fe9fa2792f 100644
+--- a/llvm/lib/Support/raw_ostream.cpp
++++ b/llvm/lib/Support/raw_ostream.cpp
+@@ -534,7 +534,6 @@ void raw_fd_ostream::write_impl(const char *Ptr, size_t Size) {
+       DWORD WinLastError = GetLastError();
+       if (WinLastError == ERROR_BROKEN_PIPE ||
+           (WinLastError == ERROR_NO_DATA && errno == EINVAL)) {
+-        llvm::sys::CallOneShotPipeSignalHandler();
+         errno = EPIPE;
+       }
+ #endif

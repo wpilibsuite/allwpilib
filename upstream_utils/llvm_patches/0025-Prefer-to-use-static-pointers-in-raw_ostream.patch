@@ -9,10 +9,10 @@ See #1401
  1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index 2e4270384fd9f9e86a11419d9936c64e1e1a33d3..923d8d1edafb4e7fa5ae2aa33a2ef9f6357d99a3 100644
+index f9928ac969932b6baea60a80750477d78b6a5b02..1de34976844d500970b833fca35324e2948733b7 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
-@@ -614,15 +614,15 @@ void raw_fd_ostream::anchor() {}
+@@ -613,15 +613,15 @@ void raw_fd_ostream::anchor() {}
  raw_fd_ostream &llvm::outs() {
    // Set buffer settings to model stdout behavior.
    std::error_code EC;
