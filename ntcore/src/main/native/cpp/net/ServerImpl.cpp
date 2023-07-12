@@ -20,8 +20,8 @@
 #include <wpi/StringExtras.h>
 #include <wpi/StringMap.h>
 #include <wpi/UidVector.h>
+#include <wpi/detail/output/serializer.h>
 #include <wpi/json.h>
-#include <wpi/json_serializer.h>
 #include <wpi/raw_ostream.h>
 #include <wpi/timestamp.h>
 

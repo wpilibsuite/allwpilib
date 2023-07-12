@@ -14,9 +14,9 @@
 #include <imgui_internal.h>
 #include <imgui_stdlib.h>
 #include <wpi/StringExtras.h>
+#include <wpi/detail/output/serializer.h>
 #include <wpi/fs.h>
 #include <wpi/json.h>
-#include <wpi/json_serializer.h>
 #include <wpi/raw_istream.h>
 #include <wpi/raw_ostream.h>
 #include <wpi/timestamp.h>

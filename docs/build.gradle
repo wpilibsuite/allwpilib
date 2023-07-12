@@ -120,7 +120,16 @@ doxygen {
         exclude 'wpinet/uv/**'
 
         // json
+        exclude 'wpi/adl_serializer.h'
         exclude 'wpi/json.h'
+        exclude 'wpi/detail/exceptions.h'
+        exclude 'wpi/detail/input/binary_reader.h'
+        exclude 'wpi/detail/iterators/iter_impl.h'
+        exclude 'wpi/detail/iterators/json_reverse_iterator.h'
+        exclude 'wpi/detail/json_pointer.h'
+        exclude 'wpi/detail/meta.h'
+        exclude 'wpi/detail/output/binary_writer.h'
+        exclude 'wpi/detail/value_t.h'
 
         // memory
         exclude 'wpi/memory/**'

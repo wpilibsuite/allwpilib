@@ -5,7 +5,7 @@
 #include "ConnectionList.h"
 
 #include <wpi/SmallVector.h>
-#include <wpi/json_serializer.h>
+#include <wpi/detail/output/serializer.h>
 #include <wpi/raw_ostream.h>
 
 #include "IListenerStorage.h"
