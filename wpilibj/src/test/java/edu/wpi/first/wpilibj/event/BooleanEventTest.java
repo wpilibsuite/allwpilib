@@ -148,8 +148,47 @@ class BooleanEventTest {
     bool.set(true);
     loop.poll();
 
-    // unlike the previous test ...
-    assertEquals(2, counter.get()); // as natural sense dictates, counter == 2
+    assertEquals(2, counter.get());
+
+    loop.poll();
+
+    assertEquals(2, counter.get());
+
+    bool.set(false);
+    loop.poll();
+
+    assertEquals(2, counter.get());
+
+    bool.set(true);
+    loop.poll();
+
+    assertEquals(4, counter.get());
+  }
+
+  @Test
+  void testMidLoopBooleanChange() {
+    var loop = new EventLoop();
+    var bool = new AtomicBoolean(false);
+    var counter = new AtomicInteger(0);
+
+    var event = new BooleanEvent(loop, bool::get).rising();
+    event.ifHigh(
+        () -> {
+          bool.set(false);
+          counter.incrementAndGet();
+        });
+    event.ifHigh(counter::incrementAndGet);
+
+    assertEquals(0, counter.get());
+
+    loop.poll();
+
+    assertEquals(0, counter.get());
+
+    bool.set(true);
+    loop.poll();
+
+    assertEquals(2, counter.get());
 
     loop.poll();
 

@@ -3,8 +3,9 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <atomic>
-#include "frc/event/EventLoop.h"
+
 #include "frc/event/BooleanEvent.h"
+#include "frc/event/EventLoop.h"
 #include "gtest/gtest.h"
 
 using namespace frc;
@@ -17,8 +18,12 @@ TEST(BooleanEventTest, BinaryCompositions) {
   EXPECT_EQ(0, andCounter);
   EXPECT_EQ(0, orCounter);
 
-  (BooleanEvent(&loop,[]{return true;}) && BooleanEvent(&loop, [](){return false;})).IfHigh([&] {++andCounter;});
-  (BooleanEvent(&loop,[]{return true;}) || BooleanEvent(&loop, [](){return false;})).IfHigh([&] {++orCounter;});
+  (BooleanEvent(&loop, [] { return true; }) && BooleanEvent(&loop, [] {
+     return false;
+   })).IfHigh([&] { ++andCounter; });
+  (BooleanEvent(&loop, [] { return true; }) || BooleanEvent(&loop, [] {
+     return false;
+   })).IfHigh([&] { ++orCounter; });
 
   loop.Poll();
 
@@ -33,8 +38,12 @@ TEST(BooleanEventTest, BinaryCompositionLoopSemantics) {
   std::atomic_int counter1 = 0;
   std::atomic_int counter2 = 0;
 
-  (BooleanEvent(&loop1,[]{return true;}) && BooleanEvent(&loop2, [](){return true;})).IfHigh([&] {++counter1;});
-  (BooleanEvent(&loop2,[]{return true;}) && BooleanEvent(&loop1, [](){return true;})).IfHigh([&] {++counter2;});
+  (BooleanEvent(&loop1, [] { return true; }) && BooleanEvent(&loop2, [] {
+     return true;
+   })).IfHigh([&] { ++counter1; });
+  (BooleanEvent(&loop2, [] { return true; }) && BooleanEvent(&loop1, [] {
+     return true;
+   })).IfHigh([&] { ++counter2; });
 
   EXPECT_EQ(0, counter1);
   EXPECT_EQ(0, counter2);
@@ -52,11 +61,15 @@ TEST(BooleanEventTest, BinaryCompositionLoopSemantics) {
 
 TEST(BooleanEventTest, EdgeDecorators) {
   EventLoop loop;
-  std::atomic_bool boolean = false;
+  bool boolean = false;
   std::atomic_int counter = 0;
 
-  BooleanEvent(&loop,[&]{return boolean;}).Falling().IfHigh([&] {--counter;});
-  BooleanEvent(&loop,[&]{return boolean;}).Rising().IfHigh([&] {++counter;});
+  BooleanEvent(&loop, [&] { return boolean; }).Falling().IfHigh([&] {
+    --counter;
+  });
+  BooleanEvent(&loop, [&] { return boolean; }).Rising().IfHigh([&] {
+    ++counter;
+  });
 
   EXPECT_EQ(0, counter);
 
@@ -83,12 +96,12 @@ TEST(BooleanEventTest, EdgeDecorators) {
 
 TEST(BooleanEventTest, EdgeReuse) {
   EventLoop loop;
-  std::atomic_bool boolean = false;
+  bool boolean = false;
   std::atomic_int counter = 0;
 
-  auto event = BooleanEvent(&loop,[&]{return boolean;}).Rising();
-  event.IfHigh([&] {++counter;});
-  event.IfHigh([&] {++counter;});
+  auto event = BooleanEvent(&loop, [&] { return boolean; }).Rising();
+  event.IfHigh([&] { ++counter; });
+  event.IfHigh([&] { ++counter; });
 
   EXPECT_EQ(0, counter);
 
@@ -118,12 +131,47 @@ TEST(BooleanEventTest, EdgeReuse) {
 
 TEST(BooleanEventTest, EdgeReconstruct) {
   EventLoop loop;
-  std::atomic_bool boolean = false;
+  bool boolean = false;
   std::atomic_int counter = 0;
 
-  auto event = BooleanEvent(&loop,[&]{return boolean;});
-  event.Rising().IfHigh([&] {++counter;});
-  event.Rising().IfHigh([&] {++counter;});
+  auto event = BooleanEvent(&loop, [&] { return boolean; });
+  event.Rising().IfHigh([&] { ++counter; });
+  event.Rising().IfHigh([&] { ++counter; });
+
+  EXPECT_EQ(0, counter);
+
+  loop.Poll();
+
+  EXPECT_EQ(0, counter);
+
+  boolean = true;
+  loop.Poll();
+
+  EXPECT_EQ(2, counter);
+
+  loop.Poll();
+
+  EXPECT_EQ(2, counter);
+
+  boolean = false;
+  loop.Poll();
+
+  EXPECT_EQ(2, counter);
+
+  boolean = true;
+  loop.Poll();
+
+  EXPECT_EQ(4, counter);
+}
+
+TEST(BooleanEventTest, MidLoopBooleanChange) {
+  EventLoop loop;
+  bool boolean = false;
+  std::atomic_int counter = 0;
+
+  auto event = BooleanEvent(&loop, [&] { return boolean; }).Rising();
+  event.IfHigh([&] { boolean = false; ++counter;});
+  event.IfHigh([&] { ++counter; });
 
   EXPECT_EQ(0, counter);
 
