@@ -185,7 +185,7 @@ Then solving for `a_y`:
 Solving for `cos(a_x) cos(a_y)`:
 
 ```
-  cos(a_x) cos(a_y) = (cos(a_x/2)² - sin(a_x/2)²)(cos(a_y/2)² - sin(a_y/2)²)
+  cos(a_x) cos(a_y) = (cos²(a_x/2) - sin²(a_x/2))(cos²(a_y/2) - sin²(a_y/2))
   cos(a_x) cos(a_y) = (c_x² - s_x²)(c_y² - s_y²)
   cos(a_x) cos(a_y) = c_x² c_y² - c_x² s_y² - s_x² c_y² + s_x² s_y²
   cos(a_x) cos(a_y) = c_x² (1 - s_y²) - c_x² s_y² - s_x² c_y² + s_x² (1 - c_y²)
@@ -205,7 +205,7 @@ Solving for `cos(a_x) cos(a_y)`:
 Solving for `sin(a_x) cos(a_y)`:
 
 ```
-  sin(a_x) cos(a_y) = (2 cos(a_x/2) sin(a_x/2))(cos(a_y/2)² - sin(a_y/2)²)
+  sin(a_x) cos(a_y) = (2 cos(a_x/2) sin(a_x/2))(cos²(a_y/2) - sin²(a_y/2))
   sin(a_x) cos(a_y) = (2 c_x s_x)(c_y² - s_y²)
   sin(a_x) cos(a_y) = 2 (c_x s_x c_y² - c_x s_x s_y²)
   sin(a_x) cos(a_y) = 2 (c_x s_x c_y² c_z² + c_x s_x c_y² s_z²
@@ -222,7 +222,7 @@ Solving for `sin(a_x) cos(a_y)`:
 Similarly, solving for `cos(a_z) cos(a_y)`:
 
 ```
-  cos(a_z) cos(a_y) = (cos(a_z/2)² - sin(a_z/2)²)(cos(a_y/2)² - sin(a_y/2)²)
+  cos(a_z) cos(a_y) = (cos²(a_z/2) - sin²(a_z/2))(cos²(a_y/2) - sin²(a_y/2))
   cos(a_z) cos(a_y) = (c_z² - s_z²)(c_y² - s_y²)
   cos(a_z) cos(a_y) = c_y² c_z² - s_y² c_z² - c_y² s_z² + s_y² s_z²
   cos(a_z) cos(a_y) = c_y² (1 - s_z²) - s_y² c_z² - c_y² s_z² + s_y² (1 - c_z²)
@@ -242,7 +242,7 @@ Similarly, solving for `cos(a_z) cos(a_y)`:
 Similarly, solving for `sin(a_z) cos(a_y)`:
 
 ```
-  sin(a_z) cos(a_y) = (2 cos(a_z/2) sin(a_z/2))(cos(a_y/2)² - sin(a_y/2)²)
+  sin(a_z) cos(a_y) = (2 cos(a_z/2) sin(a_z/2))(cos²(a_y/2) - sin²(a_y/2))
   sin(a_z) cos(a_y) = (2 c_z s_z)(c_y² - s_y²)
   sin(a_z) cos(a_y) = 2 (c_y² c_z s_z - s_y² c_z s_z)
   sin(a_z) cos(a_y) = 2 (c_x² c_y² c_z s_z + s_x² c_y² c_z s_z
@@ -313,7 +313,7 @@ In either case only the sum or the difference between `a_x` and `a_z` can be det
   q_z = √2/2 sin(a_z/2 ∓ 0)
   q_z = √2/2 sin(a_z/2)
   sin(a_z/2) = √2 q_z
-  cos(a_z) = cos(a_z/2)² - sin(a_z/2)²
+  cos(a_z) = cos²(a_z/2) - sin²(a_z/2)
   cos(a_z) = (√2 q_w)² - (√2 q_z)²
   cos(a_z) = 2 q_w² - 2 q_z²
   cos(a_z) = 2 (q_w² - q_z²)
@@ -330,8 +330,8 @@ When calculating `a_x`:
 
 ```
   cos(a_y) ≈ 0
-  cos(a_y)² ≈ 0
-  cos(a_x)² cos(a_y)² + sin(a_x)² cos(a_y)² ≈ 0
+  cos²(a_y) ≈ 0
+  cos²(a_x) cos²(a_y) + sin²(a_x) cos²(a_y) ≈ 0
   (cos(a_x) cos(a_y))² + (sin(a_x) cos(a_y))² ≈ 0
 ```
 
@@ -341,8 +341,8 @@ When calculating `a_z`:
 
 ```
   cos(a_y) ≈ 0
-  cos(a_y)² ≈ 0
-  cos(a_y)² cos(a_z)² + cos(a_y)² sin(a_z)² ≈ 0
+  cos²(a_y) ≈ 0
+  cos²(a_y) cos²(a_z) + cos²(a_y) sin²(a_z) ≈ 0
   (cos(a_y) cos(a_z))² + (cos(a_y) sin(a_z))² ≈ 0
 ```
 
