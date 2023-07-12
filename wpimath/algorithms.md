@@ -86,3 +86,264 @@ For q ≠ 0 and r = 0,
   k = q / q
   k = 1
 ```
+
+## Quaternion to Euler angle conversion
+
+### Conventions
+
+We'll use the extrinsic X-Y-Z rotation order for Euler angles. The direction of rotation is CCW looking into the positive axis- If you point your right thumb along the positive axis direction, your fingers curl in the direction of rotation.
+
+The angles are `a_x` around the X-axis, `a_y` around the Y-axis, and `a_z` around the Z-axis, with the following constraints:
+
+```
+  -π ≤ a_x ≤ π
+  -π/2 ≤ a_y ≤ π/2
+  -π ≤ a_z ≤ π
+```
+
+The coordinate system is right-handed- If you point your right thumb along the +Z axis, your fingers curl from the +X axis to the +Y axis.
+
+The quaternion imaginary numbers are defined as follows:
+
+```
+  îĵ = k̂
+  ĵk̂ = î
+  k̂î = ĵ
+  îĵ = -k̂
+  k̂ĵ = -î
+  îk̂ = -ĵ
+  î^2 = ĵ^2 = k̂^2 = -1
+```
+
+### Quaternion representation of axis rotations
+
+We will take it as given that a rotation by `θ` radians around a normalized vector `v` is represented with the quaternion `cos(θ/2) + sin(θ/2) (v_x î + v_y ĵ + v_z k̂)`.
+
+### Derivation
+
+For convenience, we'll define the following variables:
+
+```
+  c_x = cos(a_x/2)
+  s_x = sin(a_x/2)
+  c_y = cos(a_y/2)
+  s_y = sin(a_y/2)
+  c_z = cos(a_z/2)
+  s_z = sin(a_z/2)
+```
+
+We can calculate the quaternion corresponding to a set of Euler angles by applying each rotation in sequence. Recall that quaternions are composed with left multiplication, like matrices.
+
+```
+  q = (cos(a_z/2) + sin(a_z/2) k̂)(cos(a_y/2) + sin(a_y/2) ĵ)(cos(a_x/2) + sin(a_x/2) î)
+  q = (c_z + s_z k̂)(c_y + s_y ĵ)(c_x + s_x î)
+  q = (c_y c_z - s_y s_z î + s_y c_z ĵ + c_y s_z k̂)(c_x + s_x î)
+    = (c_x c_y c_z + s_x s_y s_z)
+      + (s_x c_y c_z - c_x s_y s_z) î
+      + (s_x c_y s_z + c_x s_y c_z) ĵ
+      + (c_x c_y s_z - s_x s_y c_z) k̂
+```
+
+Letting `q = q_w + q_x î + q_y ĵ + q_z k̂`, we can extract the components of the quaternion:
+
+```
+  q_w = c_x c_y c_z + s_x s_y s_z
+  q_x = s_x c_y c_z - c_x s_y s_z
+  q_y = c_x s_y c_z + s_x c_y s_z
+  q_z = c_x c_y s_z - s_x s_y c_z
+```
+
+### Solving for `a_y`
+
+Solving for `sin(a_y)`:
+
+```
+  sin(a_y) = 2 c_y s_y
+  sin(a_y) = 2 (c_x^2 c_y s_y + s_x^2 c_y s_y)
+  sin(a_y) = 2 (c_x^2 c_y s_y c_z^2 + c_x^2 c_y s_y s_z^2
+              + s_x^2 c_y s_y c_z^2 + s_x^2 c_y s_y s_z^2)
+  sin(a_y) = 2 (c_x^2 c_y s_y c_z^2 + s_x^2 c_y s_y s_z^2
+              + s_x^2 c_y s_y c_z^2 + c_x^2 c_y s_y s_z^2)
+  sin(a_y) = 2 (c_x^2 c_y s_y c_z^2 + c_x s_x c_y^2 c_z s_z
+              + c_x s_x s_y^2 c_z s_z + s_x^2 c_y s_y s_z^2
+              - c_x s_x c_y^2 c_z s_z + s_x^2 c_y s_y c_z^2
+              + c_x^2 c_y s_y s_z^2 - c_x s_x s_y^2 c_z s_z)
+  sin(a_y) = 2 ((c_x c_y c_z + s_x s_y s_z)(c_x s_y c_z + s_x c_y s_z)
+              - (s_x c_y c_z - c_x s_y s_z)(c_x c_y s_z - s_x s_y c_z))
+  sin(a_y) = 2 (q_w q_y - q_x q_z)
+```
+
+Then solving for `a_y`:
+
+```
+  a_y = sin^-1(sin(a_y))
+  a_y = sin^-1(2 (q_w q_y - q_x q_z))
+```
+
+### Solving for `a_x` and `a_z`
+
+Solving for `cos(a_x) cos(a_y)`:
+
+```
+  cos(a_x) cos(a_y) = (cos(a_x/2)^2 - sin(a_x/2)^2)(cos(a_y/2)^2 - sin(a_y/2)^2)
+  cos(a_x) cos(a_y) = (c_x^2 - s_x^2)(c_y^2 - s_y^2)
+  cos(a_x) cos(a_y) = c_x^2 c_y^2 - c_x^2 s_y^2 - s_x^2 c_y^2 + s_x^2 s_y^2
+  cos(a_x) cos(a_y) = c_x^2 (1 - s_y^2) - c_x^2 s_y^2 - s_x^2 c_y^2 + s_x^2 (1 - c_y^2)
+  cos(a_x) cos(a_y) = c_x^2 - c_x^2 s_y^2 - c_x^2 s_y^2 - s_x^2 c_y^2 + s_x^2 - s_x^2 c_y^2
+  cos(a_x) cos(a_y) = c_x^2 + s_x^2 - 2 (c_x^2 s_y^2 + s_x^2 c_y^2)
+  cos(a_x) cos(a_y) = 1 - 2 (c_x^2 s_y^2 + s_x^2 c_y^2)
+  cos(a_x) cos(a_y) = 1 - 2 (c_x^2 s_y^2 c_z^2 + c_x^2 s_y^2 s_z^2
+                         + s_x^2 c_y^2 c_z^2 + s_x^2 c_y^2 s_z^2)
+  cos(a_x) cos(a_y) = 1 - 2 (s_x^2 c_y^2 c_z^2 + c_x^2 s_y^2 s_z^2
+                         + c_x^2 s_y^2 c_z^2 + s_x^2 c_y^2 s_z^2)
+  cos(a_x) cos(a_y) = 1 - 2 (s_x^2 c_y^2 c_z^2 - 2 c_x s_x c_y s_y c_z s_z + s_x^2 s_y^2 s_z^2
+                         + c_x^2 s_y^2 c_z^2 + 2 c_x s_x c_y s_y c_z s_z + s_x^2 c_y^2 s_z^2)
+  cos(a_x) cos(a_y) = 1 - 2 ((s_x c_y c_z - s_x s_y s_z)^2 + (c_x s_y c_z + s_x c_y s_z)^2)
+  cos(a_x) cos(a_y) = 1 - 2 (q_x^2 + q_y^2)
+```
+
+Solving for `sin(a_x) cos(a_y)`:
+
+```
+  sin(a_x) cos(a_y) = (2 cos(a_x/2) sin(a_x/2))(cos(a_y/2)^2 - sin(a_y/2)^2)
+  sin(a_x) cos(a_y) = (2 c_x s_x)(c_y^2 - s_y^2)
+  sin(a_x) cos(a_y) = 2 (c_x s_x c_y^2 - c_x s_x s_y^2)
+  sin(a_x) cos(a_y) = 2 (c_x s_x c_y^2 c_z^2 + c_x s_x c_y^2 s_z^2
+                     - c_x s_x s_y^2 c_z^2 - c_x s_x s_y^2 s_z^2)
+  sin(a_x) cos(a_y) = 2 (c_x s_x c_y^2 c_z^2 - c_x^2 c_y s_y c_z s_z
+                     + s_x^2 c_y s_y c_z s_z - c_x s_x s_y^2 s_z^2
+                     + c_x^2 c_y s_y c_z s_z - c_x s_x s_y^2 c_z^2
+                     + c_x s_x c_y^2 s_z^2 - s_x^2 c_y s_y c_z s_z)
+  sin(a_x) cos(a_y) = 2 ((c_x c_y c_z + s_x s_y s_z)(s_x c_y c_z - c_x s_y s_z)
+                     + (c_x s_y c_z + s_x c_y s_z)(c_x c_y s_z - s_x s_y c_z))
+  sin(a_x) cos(a_y) = 2 (q_w q_x + q_y q_z)
+```
+
+Similarly, solving for `cos(a_z) cos(a_y)`:
+
+```
+  cos(a_z) cos(a_y) = (cos(a_z/2)^2 - sin(a_z/2)^2)(cos(a_y/2)^2 - sin(a_y/2)^2)
+  cos(a_z) cos(a_y) = (c_z^2 - s_z^2)(c_y^2 - s_y^2)
+  cos(a_z) cos(a_y) = c_y^2 c_z^2 - s_y^2 c_z^2 - c_y^2 s_z^2 + s_y^2 s_z^2
+  cos(a_z) cos(a_y) = c_y^2 (1 - s_z^2) - s_y^2 c_z^2 - c_y^2 s_z^2 + s_y^2 (1 - c_z^2)
+  cos(a_z) cos(a_y) = c_y^2 - c_y^2 s_z^2 - s_y^2 c_z^2 - c_y^2 s_z^2 + s_y^2 - s_y^2 c_z^2
+  cos(a_z) cos(a_y) = c_y^2 + s_y^2 - 2 (c_y^2 s_z^2 + s_y^2 c_z^2)
+  cos(a_z) cos(a_y) = 1 - 2 (c_y^2 s_z^2 + s_y^2 c_z^2)
+  cos(a_z) cos(a_y) = 1 - 2 (c_x^2 c_y^2 s_z^2 + s_x^2 c_y^2 s_z^2
+                         + c_x^2 s_y^2 c_z^2 + s_x^2 s_y^2 c_z^2)
+  cos(a_z) cos(a_y) = 1 - 2 (c_x^2 s_y^2 c_z^2 + s_x^2 c_y^2 s_z^2
+                         + c_x^2 c_y^2 s_z^2 + s_x^2 s_y^2 c_z^2)
+  cos(a_z) cos(a_y) = 1 - 2 (c_x^2 s_y^2 c_z^2 + 2 c_x s_x c_y s_y c_z s_z + s_x^2 c_y^2 s_z^2
+                         + c_x^2 c_y^2 s_z^2 - 2 c_x s_x c_y s_y c_z s_z + s_x^2 s_y^2 c_z^2)
+  cos(a_z) cos(a_y) = 1 - 2 ((c_x s_y c_z + s_x c_y s_z)^2 + (c_x c_y s_z - s_x s_y c_z)^2)
+  cos(a_z) cos(a_y) = 1 - 2 (q_y^2 + q_z^2)
+```
+
+Similarly, solving for `sin(a_z) cos(a_y)`:
+
+```
+  sin(a_z) cos(a_y) = (2 cos(a_z/2) sin(a_z/2))(cos(a_y/2)^2 - sin(a_y/2)^2)
+  sin(a_z) cos(a_y) = (2 c_z s_z)(c_y^2 - s_y^2)
+  sin(a_z) cos(a_y) = 2 (c_y^2 c_z s_z - s_y^2 c_z s_z)
+  sin(a_z) cos(a_y) = 2 (c_x^2 c_y^2 c_z s_z + s_x^2 c_y^2 c_z s_z
+                     - c_x^2 s_y^2 c_z s_z - s_x^2 s_y^2 c_z s_z)
+  sin(a_z) cos(a_y) = 2 (c_x^2 c_y^2 c_z s_z - c_x s_x c_y s_y c_z^2
+                     + c_x s_x c_y s_y s_z^2 - s_x^2 s_y^2 c_z s_z
+                     + c_x s_x c_y s_y c_z^2 + s_x^2 c_y^2 c_z s_z
+                     - c_x^2 s_y^2 c_z s_z - c_x s_x c_y s_y s_z^2)
+  sin(a_z) cos(a_y) = 2 ((c_x c_y c_z + s_x s_y s_z)(c_x c_y s_z - s_x s_y c_z)
+                     + (s_x c_y c_z - c_x s_y s_z)(c_x s_y c_z + s_x c_y s_z))
+  sin(a_z) cos(a_y) = 2 (q_w q_z + q_x q_y)
+```
+
+Solving for `a_x` and `a_z`:
+
+```
+  a_x = atan2(sin(a_x), cos(a_x))
+  a_z = atan2(sin(a_z), cos(a_z))
+```
+
+If `cos(a_y) > 0`:
+
+```
+  a_x = atan2(sin(a_x) cos(a_y), cos(a_x) cos(a_y))
+  a_z = atan2(sin(a_z) cos(a_y), cos(a_z) cos(a_y))
+  a_x = atan2(2 (q_w q_x + q_y q_z), 1 - 2 (q_x^2 + q_y^2))
+  a_z = atan2(2 (q_w q_z + q_x q_y), 1 - 2 (q_y^2 + q_z^2))
+```
+
+Because `-π/2 ≤ a_y ≤ π/2`, `cos(a_y) ≥ 0`. Therefore, the only remaining case is `cos(a_y) = 0`, whose only solutions in that range are `a_y = ±π/2`.
+
+```
+  a_y = ±π/2
+  a_y/2 = ±π/4
+  cos(a_y/2) = √2/2
+  c_y = √2/2
+  sin(a_y/2) = ±√2/2
+  s_y = ±√2/2
+```
+
+Plugging into the quaternion components:
+
+```
+  q_w = c_x c_y c_z + s_x s_y s_z
+  q_x = s_x c_y c_z - c_x s_y s_z
+  q_y = c_x s_y c_z + s_x c_y s_z
+  q_z = c_x c_y s_z - s_x s_y c_z
+  q_w = √2/2 c_x c_z ± √2/2 s_x s_z
+  q_x = √2/2 s_x c_z ∓ √2/2 c_x s_z
+  q_y = ±√2/2 c_x c_z + √2/2 s_x s_z
+  q_z = √2/2 c_x s_z ∓ √2/2 s_x c_z
+  q_w = √2/2 (c_x c_z ± s_x s_z)
+  q_x = √2/2 (s_x c_z ∓ c_x s_z)
+  q_y = √2/2 (± c_x c_z + s_x s_z)
+  q_z = √2/2 (c_x s_z ∓ s_x c_z)
+  q_w = √2/2 cos(a_z/2 ∓ a_x/2)
+  q_x = √2/2 sin(a_x/2 ∓ a_z/2)
+  q_y = √2/2 -cos(a_x/2 ∓ a_z/2)
+  q_z = √2/2 sin(a_z/2 ∓ a_x/2)
+```
+
+In either case only the sum or the difference between `a_x` and `a_z` can be determined. We'll pick the solution where `a_x = 0`.
+
+```
+  q_w = √2/2 cos(a_z/2 ∓ 0)
+  q_w = √2/2 cos(a_z/2)
+  cos(a_z/2) = √2 q_w
+  q_z = √2/2 sin(a_z/2 ∓ 0)
+  q_z = √2/2 sin(a_z/2)
+  sin(a_z/2) = √2 q_z
+  cos(a_z) = cos(a_z/2)^2 - sin(a_z/2)^2
+  cos(a_z) = (√2 q_w)^2 - (√2 q_z)^2
+  cos(a_z) = 2 q_w^2 - 2 q_z^2
+  cos(a_z) = 2 (q_w^2 - q_z^2)
+  sin(a_z) = 2 cos(a_z/2) sin(a_z/2)
+  sin(a_z) = 2 (√2 q_w) (√2 q_z)
+  sin(a_z) = 4 q_w q_z
+  a_z = atan2(4 q_w q_z, 2 (q_w^2 - q_z^2))
+  a_z = atan2(2 q_w q_z, q_w^2 - q_z^2)
+```
+
+### Determining if `cos(a_y) ≈ 0`
+
+When calculating `a_x`:
+
+```
+  cos(a_y) ≈ 0
+  cos(a_y)^2 ≈ 0
+  cos(a_x)^2 cos(a_y)^2 + sin(a_x)^2 cos(a_y)^2 ≈ 0
+  (cos(a_x) cos(a_y))^2 + (sin(a_x) cos(a_y))^2 ≈ 0
+```
+
+Note that this reuses the `cos(a_x) cos(a_y)` and `sin(a_x) cos(a_y)` terms needed to calculate `a_x`.
+
+When calculating `a_z`:
+
+```
+  cos(a_y) ≈ 0
+  cos(a_y)^2 ≈ 0
+  cos(a_y)^2 cos(a_z)^2 + cos(a_y)^2 sin(a_z)^2 ≈ 0
+  (cos(a_y) cos(a_z))^2 + (cos(a_y) sin(a_z))^2 ≈ 0
+```
+
+Note that this reuses the `cos(a_y) cos(a_z)` and `cos(a_y) sin(a_z)` terms needed to calculate `a_z`.
