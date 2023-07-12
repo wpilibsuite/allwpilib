@@ -112,21 +112,21 @@ class BooleanEventTest {
     bool.set(true);
     loop.poll();
 
-    assertEquals(1, counter.get()); // FIXME?: natural sense dictates counter == 2!!
+    assertEquals(2, counter.get());
 
     loop.poll();
 
-    assertEquals(1, counter.get());
+    assertEquals(2, counter.get());
 
     bool.set(false);
     loop.poll();
 
-    assertEquals(1, counter.get());
+    assertEquals(2, counter.get());
 
     bool.set(true);
     loop.poll();
 
-    assertEquals(2, counter.get());
+    assertEquals(4, counter.get());
   }
 
   @Test
