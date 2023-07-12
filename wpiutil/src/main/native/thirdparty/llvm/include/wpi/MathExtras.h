@@ -15,6 +15,7 @@
 
 #include "wpi/bit.h"
 #include "wpi/Compiler.h"
+#include <bit>
 #include <cassert>
 #include <climits>
 #include <cstdint>
@@ -41,7 +42,7 @@ enum ZeroBehavior {
 template <typename T> unsigned countTrailingZeros(T Val) {
   static_assert(std::is_unsigned_v<T>,
                 "Only unsigned integral types are allowed.");
-  return wpi::countr_zero(Val);
+  return std::countr_zero(Val);
 }
 
 /// Count number of 0's from the most significant bit to the least
@@ -53,7 +54,7 @@ template <typename T> unsigned countTrailingZeros(T Val) {
 template <typename T> unsigned countLeadingZeros(T Val) {
   static_assert(std::is_unsigned_v<T>,
                 "Only unsigned integral types are allowed.");
-  return wpi::countl_zero(Val);
+  return std::countl_zero(Val);
 }
 
 /// Get the index of the first set bit starting from the least
@@ -66,7 +67,7 @@ template <typename T> T findFirstSet(T Val, ZeroBehavior ZB = ZB_Max) {
   if (ZB == ZB_Max && Val == 0)
     return (std::numeric_limits<T>::max)();
 
-  return wpi::countr_zero(Val);
+  return std::countr_zero(Val);
 }
 
 /// Create a bitmask with the N right-most bits set to 1, and all other
@@ -108,7 +109,7 @@ template <typename T> T findLastSet(T Val, ZeroBehavior ZB = ZB_Max) {
 
   // Use ^ instead of - because both gcc and llvm can remove the associated ^
   // in the __builtin_clz intrinsic on x86.
-  return wpi::countl_zero(Val) ^ (std::numeric_limits<T>::digits - 1);
+  return std::countl_zero(Val) ^ (std::numeric_limits<T>::digits - 1);
 }
 
 /// Macro compressed bit reversal table for 256 bits.
@@ -295,12 +296,12 @@ constexpr inline bool isShiftedMask_64(uint64_t Value) {
 /// Return true if the argument is a power of two > 0.
 /// Ex. isPowerOf2_32(0x00100000U) == true (32 bit edition.)
 constexpr inline bool isPowerOf2_32(uint32_t Value) {
-  return wpi::has_single_bit(Value);
+  return std::has_single_bit(Value);
 }
 
 /// Return true if the argument is a power of two > 0 (64 bit edition.)
 constexpr inline bool isPowerOf2_64(uint64_t Value) {
-  return wpi::has_single_bit(Value);
+  return std::has_single_bit(Value);
 }
 
 /// Count the number of ones from the most significant bit to the first
@@ -313,7 +314,7 @@ constexpr inline bool isPowerOf2_64(uint64_t Value) {
 template <typename T> unsigned countLeadingOnes(T Value) {
   static_assert(std::is_unsigned_v<T>,
                 "Only unsigned integral types are allowed.");
-  return wpi::countl_one<T>(Value);
+  return std::countl_one<T>(Value);
 }
 
 /// Count the number of ones from the least significant bit to the first
@@ -326,7 +327,7 @@ template <typename T> unsigned countLeadingOnes(T Value) {
 template <typename T> unsigned countTrailingOnes(T Value) {
   static_assert(std::is_unsigned_v<T>,
                 "Only unsigned integral types are allowed.");
-  return wpi::countr_one<T>(Value);
+  return std::countr_one<T>(Value);
 }
 
 /// Count the number of set bits in a value.
@@ -336,7 +337,7 @@ template <typename T>
 inline unsigned countPopulation(T Value) {
   static_assert(std::is_unsigned_v<T>,
                 "Only unsigned integral types are allowed.");
-  return (unsigned)wpi::popcount(Value);
+  return (unsigned)std::popcount(Value);
 }
 
 /// Return true if the argument contains a non-empty sequence of ones with the
@@ -348,8 +349,8 @@ inline bool isShiftedMask_32(uint32_t Value, unsigned &MaskIdx,
                              unsigned &MaskLen) {
   if (!isShiftedMask_32(Value))
     return false;
-  MaskIdx = wpi::countr_zero(Value);
-  MaskLen = wpi::popcount(Value);
+  MaskIdx = std::countr_zero(Value);
+  MaskLen = std::popcount(Value);
   return true;
 }
 
@@ -361,8 +362,8 @@ inline bool isShiftedMask_64(uint64_t Value, unsigned &MaskIdx,
                              unsigned &MaskLen) {
   if (!isShiftedMask_64(Value))
     return false;
-  MaskIdx = wpi::countr_zero(Value);
-  MaskLen = wpi::popcount(Value);
+  MaskIdx = std::countr_zero(Value);
+  MaskLen = std::popcount(Value);
   return true;
 }
 
@@ -380,26 +381,26 @@ template <> constexpr inline size_t CTLog2<1>() { return 0; }
 /// (32 bit edition.)
 /// Ex. Log2_32(32) == 5, Log2_32(1) == 0, Log2_32(0) == -1, Log2_32(6) == 2
 inline unsigned Log2_32(uint32_t Value) {
-  return static_cast<unsigned>(31 - wpi::countl_zero(Value));
+  return static_cast<unsigned>(31 - std::countl_zero(Value));
 }
 
 /// Return the floor log base 2 of the specified value, -1 if the value is zero.
 /// (64 bit edition.)
 inline unsigned Log2_64(uint64_t Value) {
-  return static_cast<unsigned>(63 - wpi::countl_zero(Value));
+  return static_cast<unsigned>(63 - std::countl_zero(Value));
 }
 
 /// Return the ceil log base 2 of the specified value, 32 if the value is zero.
 /// (32 bit edition).
 /// Ex. Log2_32_Ceil(32) == 5, Log2_32_Ceil(1) == 0, Log2_32_Ceil(6) == 3
 inline unsigned Log2_32_Ceil(uint32_t Value) {
-  return static_cast<unsigned>(32 - wpi::countl_zero(Value - 1));
+  return static_cast<unsigned>(32 - std::countl_zero(Value - 1));
 }
 
 /// Return the ceil log base 2 of the specified value, 64 if the value is zero.
 /// (64 bit edition.)
 inline unsigned Log2_64_Ceil(uint64_t Value) {
-  return static_cast<unsigned>(64 - wpi::countl_zero(Value - 1));
+  return static_cast<unsigned>(64 - std::countl_zero(Value - 1));
 }
 
 /// This function takes a 64-bit integer and returns the bit equivalent double.
@@ -456,7 +457,7 @@ constexpr inline uint64_t NextPowerOf2(uint64_t A) {
 /// Returns the power of two which is less than or equal to the given value.
 /// Essentially, it is a floor operation across the domain of powers of two.
 inline uint64_t PowerOf2Floor(uint64_t A) {
-  return wpi::bit_floor(A);
+  return std::bit_floor(A);
 }
 
 /// Returns the power of two which is greater than or equal to the given value.

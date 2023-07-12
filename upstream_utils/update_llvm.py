@@ -207,6 +207,7 @@ def main():
         "0027-Copy-type-traits-from-STLExtras.h-into-PointerUnion..patch",
         "0028-Remove-StringMap-test-for-llvm-sort.patch",
         "0029-Unused-variable-in-release-mode.patch",
+        "0030-Use-C-20-bit-header.patch",
     ]:
         git_am(
             os.path.join(wpilib_root, "upstream_utils/llvm_patches", f),
