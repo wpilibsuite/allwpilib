@@ -53,3 +53,13 @@ jobs:
           clean: true
           single-commit: true
           folder: docs/build/docs
+      - name: Trigger Workflow
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: 'wpilibsuite.github.io',
+              workflow_id: 'static.yml',
+              ref: 'main',
+            })
