@@ -8,7 +8,6 @@
 
 #include <functional>
 #include <memory>
-#include <vector>
 
 #include <units/time.h>
 #include <wpi/FunctionExtras.h>
@@ -132,6 +131,6 @@ class BooleanEvent {
  private:
   EventLoop* m_loop;
   std::function<bool()> m_condition;
-  std::vector<std::function<void()>> m_actions;
+  bool m_state = false;  // A programmer's worst nightmare.
 };
 }  // namespace frc

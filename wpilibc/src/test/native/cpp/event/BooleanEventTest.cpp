@@ -170,7 +170,10 @@ TEST(BooleanEventTest, MidLoopBooleanChange) {
   std::atomic_int counter = 0;
 
   auto event = BooleanEvent(&loop, [&] { return boolean; }).Rising();
-  event.IfHigh([&] { boolean = false; ++counter;});
+  event.IfHigh([&] {
+    boolean = false;
+    ++counter;
+  });
   event.IfHigh([&] { ++counter; });
 
   EXPECT_EQ(0, counter);
