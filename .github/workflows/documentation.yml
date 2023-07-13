@@ -49,7 +49,7 @@ jobs:
         with:
           ssh-key: true
           repository-name: wpilibsuite/wpilibsuite.github.io
-          branch: ${{ env.BRANCH }}
+          branch: allwpilib-${{ env.BRANCH }}
           clean: true
           single-commit: true
           folder: docs/build/docs
