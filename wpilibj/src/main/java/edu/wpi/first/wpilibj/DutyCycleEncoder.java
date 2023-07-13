@@ -219,6 +219,9 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
    * @return The scale factor that will be used to convert rotation to useful units.
    */
   public double getDistancePerRotation() {
+    if (m_simDistancePerRotation != null) {
+      return m_simDistancePerRotation.get();
+    }
     return m_distancePerRotation;
   }
 

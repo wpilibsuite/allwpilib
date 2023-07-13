@@ -149,6 +149,9 @@ void DutyCycleEncoder::SetDistancePerRotation(double distancePerRotation) {
 }
 
 double DutyCycleEncoder::GetDistancePerRotation() const {
+  if (m_simDistancePerRotation) {
+    return m_simDistancePerRotation.Get();
+  }
   return m_distancePerRotation;
 }
 
