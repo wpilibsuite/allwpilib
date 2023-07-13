@@ -11,7 +11,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.BuiltInAccelerometer;
-import edu.wpi.first.wpilibj.interfaces.Accelerometer;
 import edu.wpi.first.wpilibj.simulation.testutils.BooleanCallback;
 import edu.wpi.first.wpilibj.simulation.testutils.DoubleCallback;
 import edu.wpi.first.wpilibj.simulation.testutils.EnumCallback;
@@ -102,7 +101,7 @@ class AccelerometerSimTest {
 
     EnumCallback callback = new EnumCallback();
 
-    Accelerometer.Range range = Accelerometer.Range.k4G;
+    BuiltInAccelerometer.Range range = BuiltInAccelerometer.Range.k4G;
     try (CallbackStore cb = sim.registerRangeCallback(callback, false);
         BuiltInAccelerometer accel = new BuiltInAccelerometer(range)) {
       assertTrue(callback.wasTriggered());
@@ -111,7 +110,7 @@ class AccelerometerSimTest {
 
       // 2G
       callback.reset();
-      range = Accelerometer.Range.k2G;
+      range = BuiltInAccelerometer.Range.k2G;
       accel.setRange(range);
       assertTrue(callback.wasTriggered());
       assertEquals(range.ordinal(), sim.getRange());
@@ -119,7 +118,7 @@ class AccelerometerSimTest {
 
       // 4G
       callback.reset();
-      range = Accelerometer.Range.k4G;
+      range = BuiltInAccelerometer.Range.k4G;
       accel.setRange(range);
       assertTrue(callback.wasTriggered());
       assertEquals(range.ordinal(), sim.getRange());
@@ -127,7 +126,7 @@ class AccelerometerSimTest {
 
       // 8G
       callback.reset();
-      range = Accelerometer.Range.k8G;
+      range = BuiltInAccelerometer.Range.k8G;
       accel.setRange(range);
       assertTrue(callback.wasTriggered());
       assertEquals(range.ordinal(), sim.getRange());
@@ -135,7 +134,8 @@ class AccelerometerSimTest {
 
       // 16G - Not supported
       callback.reset();
-      assertThrows(IllegalArgumentException.class, () -> accel.setRange(Accelerometer.Range.k16G));
+      assertThrows(
+          IllegalArgumentException.class, () -> accel.setRange(BuiltInAccelerometer.Range.k16G));
       assertFalse(callback.wasTriggered());
     }
   }

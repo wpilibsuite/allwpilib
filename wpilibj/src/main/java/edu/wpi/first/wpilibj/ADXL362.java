@@ -14,7 +14,6 @@ import edu.wpi.first.networktables.DoubleTopic;
 import edu.wpi.first.networktables.NTSendable;
 import edu.wpi.first.networktables.NTSendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
-import edu.wpi.first.wpilibj.interfaces.Accelerometer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -23,7 +22,7 @@ import java.nio.ByteOrder;
  *
  * <p>This class allows access to an Analog Devices ADXL362 3-axis accelerometer.
  */
-public class ADXL362 implements Accelerometer, NTSendable, AutoCloseable {
+public class ADXL362 implements NTSendable, AutoCloseable {
   private static final byte kRegWrite = 0x0A;
   private static final byte kRegRead = 0x0B;
 
@@ -43,6 +42,13 @@ public class ADXL362 implements Accelerometer, NTSendable, AutoCloseable {
   private static final byte kPowerCtl_AutoSleep = 0x04;
 
   private static final byte kPowerCtl_Measure = 0x02;
+
+  public enum Range {
+    k2G,
+    k4G,
+    k8G,
+    k16G
+  }
 
   public enum Axes {
     kX((byte) 0x00),
@@ -153,7 +159,12 @@ public class ADXL362 implements Accelerometer, NTSendable, AutoCloseable {
     }
   }
 
-  @Override
+  /**
+   * Set the measuring range of the accelerometer.
+   *
+   * @param range The maximum acceleration, positive or negative, that the accelerometer will
+   *     measure. Not all accelerometers support all ranges.
+   */
   public void setRange(Range range) {
     if (m_spi == null) {
       return;
@@ -188,17 +199,29 @@ public class ADXL362 implements Accelerometer, NTSendable, AutoCloseable {
     }
   }
 
-  @Override
+  /**
+   * Returns the acceleration along the X axis in g-forces.
+   *
+   * @return The acceleration along the X axis in g-forces.
+   */
   public double getX() {
     return getAcceleration(Axes.kX);
   }
 
-  @Override
+  /**
+   * Returns the acceleration along the Y axis in g-forces.
+   *
+   * @return The acceleration along the Y axis in g-forces.
+   */
   public double getY() {
     return getAcceleration(Axes.kY);
   }
 
-  @Override
+  /**
+   * Returns the acceleration along the Z axis in g-forces.
+   *
+   * @return The acceleration along the Z axis in g-forces.
+   */
   public double getZ() {
     return getAcceleration(Axes.kZ);
   }

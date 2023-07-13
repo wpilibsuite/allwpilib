@@ -8,8 +8,11 @@ namespace frc {
 
 /**
  * Interface for 3-axis accelerometers.
+ *
+ * @deprecated This interface is being removed with no replacement.
  */
-class Accelerometer {
+class [[deprecated(
+    "This interface is being removed with no replacement.")]] Accelerometer {
  public:
   Accelerometer() = default;
   virtual ~Accelerometer() = default;

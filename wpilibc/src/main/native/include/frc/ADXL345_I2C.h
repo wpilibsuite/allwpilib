@@ -9,7 +9,6 @@
 #include <wpi/sendable/SendableHelper.h>
 
 #include "frc/I2C.h"
-#include "frc/interfaces/Accelerometer.h"
 
 namespace frc {
 
@@ -24,10 +23,11 @@ namespace frc {
  * href="https://docs.wpilib.org/en/stable/docs/yearly-overview/known-issues.html#onboard-i2c-causing-system-lockups">
  * WPILib Known Issues</a> page for details.
  */
-class ADXL345_I2C : public Accelerometer,
-                    public nt::NTSendable,
+class ADXL345_I2C : public nt::NTSendable,
                     public wpi::SendableHelper<ADXL345_I2C> {
  public:
+  enum Range { kRange_2G = 0, kRange_4G = 1, kRange_8G = 2, kRange_16G = 3 };
+
   enum Axes { kAxis_X = 0x00, kAxis_Y = 0x02, kAxis_Z = 0x04 };
 
   struct AllAxes {
@@ -53,11 +53,34 @@ class ADXL345_I2C : public Accelerometer,
   I2C::Port GetI2CPort() const;
   int GetI2CDeviceAddress() const;
 
-  // Accelerometer interface
-  void SetRange(Range range) final;
-  double GetX() override;
-  double GetY() override;
-  double GetZ() override;
+  /**
+   * Set the measuring range of the accelerometer.
+   *
+   * @param range The maximum acceleration, positive or negative, that the
+   *     accelerometer will measure. Not all accelerometers support all ranges.
+   */
+  void SetRange(Range range);
+
+  /**
+   * Returns the acceleration along the X axis in g-forces.
+   *
+   * @return The acceleration along the X axis in g-forces.
+   */
+  double GetX();
+
+  /**
+   * Returns the acceleration along the Y axis in g-forces.
+   *
+   * @return The acceleration along the Y axis in g-forces.
+   */
+  double GetY();
+
+  /**
+   * Returns the acceleration along the Z axis in g-forces.
+   *
+   * @return The acceleration along the Z axis in g-forces.
+   */
+  double GetZ();
 
   /**
    * Get the acceleration of one axis in Gs.
