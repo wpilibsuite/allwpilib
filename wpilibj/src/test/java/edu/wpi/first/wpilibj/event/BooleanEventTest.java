@@ -204,4 +204,67 @@ class BooleanEventTest {
 
     assertEquals(4, counter.get());
   }
+
+  @Test
+  void testEventReuse() {
+    var loop = new EventLoop();
+    var bool1 = new AtomicBoolean(false);
+    var bool2 = new AtomicBoolean(false);
+    var bool3 = new AtomicBoolean(false);
+    var counter = new AtomicInteger(0);
+
+    var event1 = new BooleanEvent(loop, bool1::get).rising();
+    var event2 = new BooleanEvent(loop, bool2::get).rising();
+    var event3 = new BooleanEvent(loop, bool3::get).rising();
+    event1.ifHigh(
+        () -> {
+          bool1.set(false);
+          counter.incrementAndGet();
+        });
+    event1
+        .and(event2)
+        .ifHigh(
+            () -> {
+              bool3.set(false);
+              counter.incrementAndGet();
+            });
+    event1
+        .and(event3)
+        .ifHigh(
+            () -> {
+              bool2.set(false);
+              counter.incrementAndGet();
+            });
+
+    assertEquals(0, counter.get());
+
+    bool1.set(true);
+    bool2.set(true);
+    bool3.set(true);
+    loop.poll();
+
+    assertEquals(3, counter.get());
+
+    bool1.set(true);
+    loop.poll();
+
+    assertEquals(4, counter.get());
+
+    bool2.set(true);
+    bool3.set(true);
+    loop.poll();
+
+    assertEquals(4, counter.get());
+
+    bool1.set(true);
+    loop.poll();
+
+    assertEquals(7, counter.get());
+
+    bool1.set(true);
+    bool2.set(true);
+    loop.poll();
+
+    assertEquals(9, counter.get());
+  }
 }

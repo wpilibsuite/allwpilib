@@ -201,3 +201,59 @@ TEST(BooleanEventTest, MidLoopBooleanChange) {
 
   EXPECT_EQ(4, counter);
 }
+
+TEST(BooleanEventTest, EventReuse) {
+  EventLoop loop;
+  bool boolean1 = false;
+  bool boolean2 = false;
+  bool boolean3 = false;
+  std::atomic_int counter = 0;
+  std::atomic_int counter = 0;
+
+  auto event1 = BooleanEvent(&loop, [&] { return boolean1; });
+  auto event2 = BooleanEvent(&loop, [&] { return boolean2; });
+  auto event3 = BooleanEvent(&loop, [&] { return boolean3; });
+  event1.IfHigh([&] {
+    boolean1 = false;
+    ++counter;
+  });
+  (event1 && event2).IfHigh([&] {
+    boolean3 = false;
+    ++counter;
+  });
+  (event1 && event3).IfHigh([&] {
+    boolean2 = false;
+    ++counter;
+  });
+
+  EXPECT_EQ(0, counter);
+
+  boolean1 = true;
+  boolean2 = true;
+  boolean3 = true;
+  loop.Poll();
+
+  EXPECT_EQ(3, counter);
+
+  boolean1 = true;
+  loop.Poll();
+
+  EXPECT_EQ(4, counter);
+
+  boolean2 = true;
+  boolean3 = true;
+  loop.Poll();
+
+  EXPECT_EQ(4, counter);
+
+  boolean1 = true;
+  loop.Poll();
+
+  EXPECT_EQ(7, counter);
+
+  boolean1 = true;
+  boolean2 = true;
+  loop.Poll();
+
+  EXPECT_EQ(9, counter);
+}

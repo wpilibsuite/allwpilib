@@ -131,6 +131,6 @@ class BooleanEvent {
  private:
   EventLoop* m_loop;
   std::function<bool()> m_condition;
-  bool m_state = false;  // A programmer's worst nightmare.
+  std::shared_ptr<bool> m_state;  // A programmer's worst nightmare.
 };
 }  // namespace frc

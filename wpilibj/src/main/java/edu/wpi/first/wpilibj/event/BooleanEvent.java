@@ -7,6 +7,8 @@ package edu.wpi.first.wpilibj.event;
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.math.filter.Debouncer;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiFunction;
 import java.util.function.BooleanSupplier;
 
@@ -28,7 +30,7 @@ public class BooleanEvent implements BooleanSupplier {
   /** Condition. */
   private final BooleanSupplier m_signal;
   /** The state of the condition in the current loop poll. Nightmare to manage. */
-  private boolean m_state;
+  private AtomicBoolean m_state = new AtomicBoolean(false);
 
   /**
    * Creates a new event with the given signal determining whether it is active.
@@ -39,7 +41,7 @@ public class BooleanEvent implements BooleanSupplier {
   public BooleanEvent(EventLoop loop, BooleanSupplier signal) {
     m_loop = requireNonNullParam(loop, "loop", "BooleanEvent");
     m_signal = requireNonNullParam(signal, "signal", "BooleanEvent");
-    m_loop.bind(() -> m_state = m_signal.getAsBoolean());
+    m_loop.bind(() -> m_state.set(m_signal.getAsBoolean()));
   }
 
   /**
@@ -60,7 +62,7 @@ public class BooleanEvent implements BooleanSupplier {
   public final void ifHigh(Runnable action) {
     m_loop.bind(
         () -> {
-          if (m_state) {
+          if (m_state.get()) {
             action.run();
           }
         });

@@ -8,8 +8,9 @@ using namespace frc;
 
 BooleanEvent::BooleanEvent(EventLoop* loop, std::function<bool()> condition)
     : m_loop(loop), m_condition(std::move(condition)) {
-  m_loop->Bind(
-      [condition = m_condition, &state = m_state] { state = condition(); });
+  m_loop->Bind([condition = m_condition, &state = m_state] {
+    state = std::make_shared<bool>(condition());
+  });
 }
 
 BooleanEvent::operator std::function<bool()>() {
@@ -22,7 +23,7 @@ bool BooleanEvent::GetAsBoolean() const {
 
 void BooleanEvent::IfHigh(std::function<void()> action) {
   m_loop->Bind([&state = m_state, action = std::move(action)] {
-    if (state) {
+    if (*state) {
       action();
     }
   });
