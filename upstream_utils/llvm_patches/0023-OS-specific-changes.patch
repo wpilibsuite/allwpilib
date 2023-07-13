@@ -4,14 +4,14 @@ Date: Sun, 8 May 2022 19:30:43 -0400
 Subject: [PATCH 23/30] OS-specific changes
 
 ---
- llvm/lib/Support/ErrorHandling.cpp | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
+ llvm/lib/Support/ErrorHandling.cpp | 16 +++++++---------
+ 1 file changed, 7 insertions(+), 9 deletions(-)
 
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index 53fe22b5eb8dad289cced414ed6f544fd0249504..5c08e469e2e44b27e69f4aa974bc59deb8217c9b 100644
+index e253d6f7a5ca3aee75823efdb9717dcd93fff5dc..5c08e469e2e44b27e69f4aa974bc59deb8217c9b 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
-@@ -96,12 +96,7 @@ void llvm::report_fatal_error(std::string_view Reason, bool GenCrashDiag) {
+@@ -96,15 +96,7 @@ void llvm::report_fatal_error(std::string_view Reason, bool GenCrashDiag) {
      fmt::print(stderr, "LLVM ERROR: {}\n", Reason);
    }
  
@@ -20,12 +20,15 @@ index 53fe22b5eb8dad289cced414ed6f544fd0249504..5c08e469e2e44b27e69f4aa974bc59de
 -  // files registered with RemoveFileOnSignal.
 -  sys::RunInterruptHandlers();
 -
--  abort();
+-  if (GenCrashDiag)
+-    abort();
+-  else
+-    exit(1);
 +  exit(1);
  }
  
  void llvm::install_bad_alloc_error_handler(fatal_error_handler_t handler,
-@@ -138,9 +133,15 @@ void llvm::report_bad_alloc_error(const char *Reason, bool GenCrashDiag) {
+@@ -141,9 +133,15 @@ void llvm::report_bad_alloc_error(const char *Reason, bool GenCrashDiag) {
    // an OOM to stderr and abort.
    const char *OOMMessage = "LLVM ERROR: out of memory\n";
    const char *Newline = "\n";

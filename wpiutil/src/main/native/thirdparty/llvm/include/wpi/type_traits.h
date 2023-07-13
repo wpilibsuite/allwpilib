@@ -98,7 +98,6 @@ using is_trivially_move_constructible = std::is_trivially_move_constructible<T>;
 template <typename T>
 using is_trivially_copy_constructible = std::is_trivially_copy_constructible<T>;
 
-
 } // end namespace wpi
 
 #endif // WPIUTIL_WPI_TYPE_TRAITS_H

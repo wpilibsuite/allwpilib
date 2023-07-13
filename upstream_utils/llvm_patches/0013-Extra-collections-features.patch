@@ -9,7 +9,7 @@ Subject: [PATCH 13/30] Extra collections features
  2 files changed, 110 insertions(+), 1 deletion(-)
 
 diff --git a/llvm/include/llvm/ADT/StringMap.h b/llvm/include/llvm/ADT/StringMap.h
-index 8747cdb353a89952e242ccfa5ea8a3e68571d456..16f13f048415182e061de6ba439eb23ddddb3bdc 100644
+index 1c8cda7ef0f8e2984f2d7960260f2a109a2986f7..99a183772f909ed9eab8c8e0c0fc87f183d2c98d 100644
 --- a/llvm/include/llvm/ADT/StringMap.h
 +++ b/llvm/include/llvm/ADT/StringMap.h
 @@ -42,7 +42,7 @@ protected:
@@ -142,7 +142,7 @@ index 8747cdb353a89952e242ccfa5ea8a3e68571d456..16f13f048415182e061de6ba439eb23d
  
  #endif // LLVM_ADT_STRINGMAP_H
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index 36faf744cf6c429917a793a363a7d3f22a6d7e67..95152849cb920a61b4906f886f78d76e3fa2b22c 100644
+index dcdfdfd7a8e3fcc4019538a4fc9e158aeda0a8b8..b2a726633b48b179abfd24a5de110a2301e0f877 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
 @@ -76,6 +76,14 @@ constexpr raw_ostream::Colors raw_ostream::WHITE;

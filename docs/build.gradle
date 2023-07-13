@@ -73,6 +73,7 @@ doxygen {
 
         // LLVM
         exclude 'wpi/AlignOf.h'
+        exclude 'wpi/Casting.h'
         exclude 'wpi/Chrono.h'
         exclude 'wpi/Compiler.h'
         exclude 'wpi/ConvertUTF.h'
@@ -83,6 +84,7 @@ doxygen {
         exclude 'wpi/Errc.h'
         exclude 'wpi/Errno.h'
         exclude 'wpi/ErrorHandling.h'
+        exclude 'wpi/bit.h'
         exclude 'wpi/fs.h'
         exclude 'wpi/FunctionExtras.h'
         exclude 'wpi/function_ref.h'

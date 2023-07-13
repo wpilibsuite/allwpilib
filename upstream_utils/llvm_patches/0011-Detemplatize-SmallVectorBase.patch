@@ -4,15 +4,15 @@ Date: Thu, 5 May 2022 23:18:34 -0400
 Subject: [PATCH 11/30] Detemplatize SmallVectorBase
 
 ---
- llvm/include/llvm/ADT/SmallVector.h | 21 +++++++-----------
- llvm/lib/Support/SmallVector.cpp    | 34 +++++------------------------
- 2 files changed, 13 insertions(+), 42 deletions(-)
+ llvm/include/llvm/ADT/SmallVector.h | 27 +++++++--------------
+ llvm/lib/Support/SmallVector.cpp    | 37 +++++------------------------
+ 2 files changed, 14 insertions(+), 50 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/SmallVector.h b/llvm/include/llvm/ADT/SmallVector.h
-index 1e311ea56fd1d35505ca6740922c713d97636f09..4b6bbdeb2ea3e602978733351e352968ccdca36d 100644
+index 70c77618b307acfee816006d54eeddc422ab619b..3c523c969bd6ee0cc2f19c923231e55787879df9 100644
 --- a/llvm/include/llvm/ADT/SmallVector.h
 +++ b/llvm/include/llvm/ADT/SmallVector.h
-@@ -50,14 +50,14 @@ template <typename IteratorT> class iterator_range;
+@@ -56,14 +56,14 @@ using EnableIfConvertibleToInputIterator = std::enable_if_t<std::is_convertible<
  /// Using 64 bit size is desirable for cases like SmallVector<char>, where a
  /// 32 bit size would limit the vector to ~4GB. SmallVectors are used for
  /// buffering bitcode output - which can exceed 4GB.
@@ -30,14 +30,14 @@ index 1e311ea56fd1d35505ca6740922c713d97636f09..4b6bbdeb2ea3e602978733351e352968
    }
  
    SmallVectorBase() = delete;
-@@ -91,15 +91,10 @@ protected:
+@@ -111,15 +111,10 @@ protected:
    }
  };
  
 -template <class T>
 -using SmallVectorSizeType =
--    typename std::conditional<sizeof(T) < 4 && sizeof(void *) >= 8, uint64_t,
--                              uint32_t>::type;
+-    std::conditional_t<sizeof(T) < 4 && sizeof(void *) >= 8, uint64_t,
+-                       uint32_t>;
 -
  /// Figure out the offset of the first element.
  template <class T, typename = void> struct SmallVectorAlignmentAndSize {
@@ -48,7 +48,7 @@ index 1e311ea56fd1d35505ca6740922c713d97636f09..4b6bbdeb2ea3e602978733351e352968
    alignas(T) char FirstEl[sizeof(T)];
  };
  
-@@ -108,8 +103,8 @@ template <class T, typename = void> struct SmallVectorAlignmentAndSize {
+@@ -128,8 +123,8 @@ template <class T, typename = void> struct SmallVectorAlignmentAndSize {
  /// to avoid unnecessarily requiring T to be complete.
  template <typename T, typename = void>
  class SmallVectorTemplateCommon
@@ -57,19 +57,32 @@ index 1e311ea56fd1d35505ca6740922c713d97636f09..4b6bbdeb2ea3e602978733351e352968
 +    : public SmallVectorBase {
 +  using Base = SmallVectorBase;
  
+ protected:
    /// Find the address of the first element.  For this pointer math to be valid
-   /// with small-size of 0 for T with lots of alignment, it's important that
-@@ -356,7 +351,7 @@ protected:
-   /// in \p NewCapacity. This is the first section of \a grow().
-   T *mallocForGrow(size_t MinSize, size_t &NewCapacity) {
-     return static_cast<T *>(
--        SmallVectorBase<SmallVectorSizeType<T>>::mallocForGrow(
-+        SmallVectorBase::mallocForGrow(
-             MinSize, sizeof(T), NewCapacity));
-   }
+@@ -451,7 +446,7 @@ template <typename T, bool TriviallyCopyable>
+ T *SmallVectorTemplateBase<T, TriviallyCopyable>::mallocForGrow(
+     size_t MinSize, size_t &NewCapacity) {
+   return static_cast<T *>(
+-      SmallVectorBase<SmallVectorSizeType<T>>::mallocForGrow(
++      SmallVectorBase::mallocForGrow(
+           this->getFirstEl(), MinSize, sizeof(T), NewCapacity));
+ }
  
+@@ -1319,12 +1314,6 @@ template <typename Out, typename R> SmallVector<Out> to_vector_of(R &&Range) {
+   return {std::begin(Range), std::end(Range)};
+ }
+ 
+-// Explicit instantiations
+-extern template class llvm::SmallVectorBase<uint32_t>;
+-#if SIZE_MAX > UINT32_MAX
+-extern template class llvm::SmallVectorBase<uint64_t>;
+-#endif
+-
+ } // end namespace llvm
+ 
+ namespace std {
 diff --git a/llvm/lib/Support/SmallVector.cpp b/llvm/lib/Support/SmallVector.cpp
-index a2b4899e1ffe0ae19d236f43e2e2e2fe1db14110..bdfc963d7ff8ca684e37d08410b92a84d5d27730 100644
+index 6cefdff7c28060ca18b522acf5279af3a206e23a..ae64a36dcf4b9ceaf8767adbf8100f164f3738ac 100644
 --- a/llvm/lib/Support/SmallVector.cpp
 +++ b/llvm/lib/Support/SmallVector.cpp
 @@ -51,10 +51,6 @@ static_assert(sizeof(SmallVector<void *, 1>) ==
@@ -94,17 +107,31 @@ index a2b4899e1ffe0ae19d236f43e2e2e2fe1db14110..bdfc963d7ff8ca684e37d08410b92a84
  
    // Ensure we can fit the new capacity.
    // This is only going to be applicable when the capacity is 32 bit.
-@@ -108,18 +103,16 @@ static size_t getNewCapacity(size_t MinSize, size_t TSize, size_t OldCapacity) {
+@@ -107,8 +102,7 @@ static size_t getNewCapacity(size_t MinSize, size_t TSize, size_t OldCapacity) {
+   return std::clamp(NewCapacity, MinSize, MaxSize);
+ }
+ 
+-template <class Size_T>
+-void *SmallVectorBase<Size_T>::replaceAllocation(void *NewElts, size_t TSize,
++void *SmallVectorBase::replaceAllocation(void *NewElts, size_t TSize,
+                                                  size_t NewCapacity,
+                                                  size_t VSize) {
+   void *NewEltsReplace = llvm::safe_malloc(NewCapacity * TSize);
+@@ -119,11 +113,10 @@ void *SmallVectorBase<Size_T>::replaceAllocation(void *NewElts, size_t TSize,
  }
  
  // Note: Moving this function into the header may cause performance regression.
 -template <class Size_T>
--void *SmallVectorBase<Size_T>::mallocForGrow(size_t MinSize, size_t TSize,
-+void *SmallVectorBase::mallocForGrow(size_t MinSize, size_t TSize,
+-void *SmallVectorBase<Size_T>::mallocForGrow(void *FirstEl, size_t MinSize,
++void *SmallVectorBase::mallocForGrow(void *FirstEl, size_t MinSize,
+                                              size_t TSize,
                                               size_t &NewCapacity) {
 -  NewCapacity = getNewCapacity<Size_T>(MinSize, TSize, this->capacity());
 +  NewCapacity = getNewCapacity(MinSize, TSize, this->capacity());
-   return llvm::safe_malloc(NewCapacity * TSize);
+   // Even if capacity is not 0 now, if the vector was originally created with
+   // capacity 0, it's possible for the malloc to return FirstEl.
+   void *NewElts = llvm::safe_malloc(NewCapacity * TSize);
+@@ -133,10 +126,9 @@ void *SmallVectorBase<Size_T>::mallocForGrow(void *FirstEl, size_t MinSize,
  }
  
  // Note: Moving this function into the header may cause performance regression.
@@ -116,8 +143,8 @@ index a2b4899e1ffe0ae19d236f43e2e2e2fe1db14110..bdfc963d7ff8ca684e37d08410b92a84
 +  size_t NewCapacity = getNewCapacity(MinSize, TSize, this->capacity());
    void *NewElts;
    if (BeginX == FirstEl) {
-     NewElts = safe_malloc(NewCapacity * TSize);
-@@ -134,20 +127,3 @@ void SmallVectorBase<Size_T>::grow_pod(void *FirstEl, size_t MinSize,
+     NewElts = llvm::safe_malloc(NewCapacity * TSize);
+@@ -155,20 +147,3 @@ void SmallVectorBase<Size_T>::grow_pod(void *FirstEl, size_t MinSize,
    this->BeginX = NewElts;
    this->Capacity = NewCapacity;
  }

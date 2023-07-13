@@ -12,10 +12,10 @@ Subject: [PATCH 05/30] Threading updates
  3 files changed, 11 insertions(+), 43 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/Compiler.h b/llvm/include/llvm/Support/Compiler.h
-index f5d726ec8a2c4c39a31a6a557591a99a64caea3a..ede1cb1726f2d2dd89e588489e062368763a4b68 100644
+index 4a54933031baa90c6f21138fb1f04c5da89878a4..ef9c0d1a73aec870b924faace3b4a32b187e197f 100644
 --- a/llvm/include/llvm/Support/Compiler.h
 +++ b/llvm/include/llvm/Support/Compiler.h
-@@ -540,7 +540,6 @@ void AnnotateIgnoreWritesEnd(const char *file, int line);
+@@ -518,7 +518,6 @@ void AnnotateIgnoreWritesEnd(const char *file, int line);
  /// initialize to some constant value. In almost all circumstances this is most
  /// appropriate for use with a pointer, integer, or small aggregation of
  /// pointers and integers.
@@ -23,7 +23,7 @@ index f5d726ec8a2c4c39a31a6a557591a99a64caea3a..ede1cb1726f2d2dd89e588489e062368
  #if __has_feature(cxx_thread_local) || defined(_MSC_VER)
  #define LLVM_THREAD_LOCAL thread_local
  #else
-@@ -548,11 +547,6 @@ void AnnotateIgnoreWritesEnd(const char *file, int line);
+@@ -526,11 +525,6 @@ void AnnotateIgnoreWritesEnd(const char *file, int line);
  // we only need the restricted functionality that provides.
  #define LLVM_THREAD_LOCAL __thread
  #endif
@@ -36,7 +36,7 @@ index f5d726ec8a2c4c39a31a6a557591a99a64caea3a..ede1cb1726f2d2dd89e588489e062368
  /// \macro LLVM_ENABLE_EXCEPTIONS
  /// Whether LLVM is built with exception support.
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index 8ae8fb8b40079a5da59f4008b9dc8de258d8cb5a..89440b5ab872cbeb5e3fbebfa4550e67aea1486b 100644
+index 0aa13a0f78eb370b2a673ca4a773f26820575052..637b669a7d0dae69ef4b34955f21a9fb8ba1276e 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
 @@ -44,7 +44,6 @@ static void *ErrorHandlerUserData = nullptr;
@@ -83,7 +83,7 @@ index 8ae8fb8b40079a5da59f4008b9dc8de258d8cb5a..89440b5ab872cbeb5e3fbebfa4550e67
      handler = ErrorHandler;
      handlerData = ErrorHandlerUserData;
    }
-@@ -123,18 +115,14 @@ void llvm::report_fatal_error(std::string_view Reason, bool GenCrashDiag) {
+@@ -126,18 +118,14 @@ void llvm::report_fatal_error(std::string_view Reason, bool GenCrashDiag) {
  
  void llvm::install_bad_alloc_error_handler(fatal_error_handler_t handler,
                                             void *user_data) {
@@ -104,7 +104,7 @@ index 8ae8fb8b40079a5da59f4008b9dc8de258d8cb5a..89440b5ab872cbeb5e3fbebfa4550e67
    BadAllocErrorHandler = nullptr;
    BadAllocErrorHandlerUserData = nullptr;
  }
-@@ -145,9 +133,7 @@ void llvm::report_bad_alloc_error(const char *Reason, bool GenCrashDiag) {
+@@ -148,9 +136,7 @@ void llvm::report_bad_alloc_error(const char *Reason, bool GenCrashDiag) {
    {
      // Only acquire the mutex while reading the handler, so as not to invoke a
      // user-supplied callback under a lock.
@@ -115,7 +115,7 @@ index 8ae8fb8b40079a5da59f4008b9dc8de258d8cb5a..89440b5ab872cbeb5e3fbebfa4550e67
      Handler = BadAllocErrorHandler;
      HandlerData = BadAllocErrorHandlerUserData;
    }
-@@ -157,10 +143,6 @@ void llvm::report_bad_alloc_error(const char *Reason, bool GenCrashDiag) {
+@@ -160,10 +146,6 @@ void llvm::report_bad_alloc_error(const char *Reason, bool GenCrashDiag) {
      llvm_unreachable("bad alloc handler should not return");
    }
  
@@ -126,7 +126,7 @@ index 8ae8fb8b40079a5da59f4008b9dc8de258d8cb5a..89440b5ab872cbeb5e3fbebfa4550e67
    // Don't call the normal error handler. It may allocate memory. Directly write
    // an OOM to stderr and abort.
    const char *OOMMessage = "LLVM ERROR: out of memory\n";
-@@ -169,15 +151,8 @@ void llvm::report_bad_alloc_error(const char *Reason, bool GenCrashDiag) {
+@@ -172,15 +154,8 @@ void llvm::report_bad_alloc_error(const char *Reason, bool GenCrashDiag) {
    (void)!::write(2, Reason, strlen(Reason));
    (void)!::write(2, Newline, strlen(Newline));
    abort();
@@ -142,7 +142,7 @@ index 8ae8fb8b40079a5da59f4008b9dc8de258d8cb5a..89440b5ab872cbeb5e3fbebfa4550e67
  // Causes crash on allocation failure. It is called prior to the handler set by
  // 'install_bad_alloc_error_handler'.
  static void out_of_memory_new_handler() {
-@@ -192,7 +167,6 @@ void llvm::install_out_of_memory_new_handler() {
+@@ -195,7 +170,6 @@ void llvm::install_out_of_memory_new_handler() {
    assert((old == nullptr || old == out_of_memory_new_handler) &&
           "new-handler already installed");
  }

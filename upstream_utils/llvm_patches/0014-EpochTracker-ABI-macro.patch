@@ -8,7 +8,7 @@ Subject: [PATCH 14/30] EpochTracker ABI macro
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/llvm/include/llvm/ADT/EpochTracker.h b/llvm/include/llvm/ADT/EpochTracker.h
-index b06888494466496b0c768e824ee25e2154d20f15..f35461d1c6e424cea6f072d749a6324699f8edd4 100644
+index a639d1b5b3ec4a18d3666ee62d83a9a382075d93..6fb2199ca3b9d7bb636a3e46e18b71f15bfa0494 100644
 --- a/llvm/include/llvm/ADT/EpochTracker.h
 +++ b/llvm/include/llvm/ADT/EpochTracker.h
 @@ -22,7 +22,7 @@

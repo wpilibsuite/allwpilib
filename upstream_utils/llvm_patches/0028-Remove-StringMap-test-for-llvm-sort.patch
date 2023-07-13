@@ -8,7 +8,7 @@ Subject: [PATCH 28/30] Remove StringMap test for llvm::sort()
  1 file changed, 14 deletions(-)
 
 diff --git a/llvm/unittests/ADT/StringMapTest.cpp b/llvm/unittests/ADT/StringMapTest.cpp
-index de6daf3daf4e59b57fa43df2526c62e854fa65ee..ca41631ccf9519740e9f5f303dfbfe31762e3ab8 100644
+index a45dde69f833900fa1d7c5a1984edee3d501111d..d232c61e84a93fdc4d4c3a77b1f6124269d1fc05 100644
 --- a/llvm/unittests/ADT/StringMapTest.cpp
 +++ b/llvm/unittests/ADT/StringMapTest.cpp
 @@ -308,20 +308,6 @@ TEST_F(StringMapTest, InsertOrAssignTest) {

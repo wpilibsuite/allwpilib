@@ -8,16 +8,16 @@ Subject: [PATCH 21/30] Prefer wpi's fs.h
  1 file changed, 2 insertions(+), 5 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
-index bf5630ab549d39cedcdaac80672c5122883e125b..256bcec259a8026473a5f3926bd79b215bd5b888 100644
+index d656123867f331b32463f2da9e637892e0e39930..582b731b0495ad2a38911ef1f9fe6d2aec58aea1 100644
 --- a/llvm/include/llvm/Support/raw_ostream.h
 +++ b/llvm/include/llvm/Support/raw_ostream.h
-@@ -27,18 +27,15 @@
+@@ -26,18 +26,15 @@
  #include <type_traits>
  #include <vector>
  
 -namespace llvm {
 -
--template <class T> class LLVM_NODISCARD Expected;
+-template <class T> class [[nodiscard]] Expected;
  
 -namespace sys {
  namespace fs {

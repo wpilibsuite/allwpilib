@@ -4,18 +4,18 @@ Date: Sun, 8 May 2022 13:43:50 -0400
 Subject: [PATCH 10/30] Remove unused functions
 
 ---
- llvm/include/llvm/ADT/SmallString.h      |  80 ------
+ llvm/include/llvm/ADT/SmallString.h      |  85 +-----
  llvm/include/llvm/Support/Errno.h        |   9 -
- llvm/include/llvm/Support/VersionTuple.h |  40 ---
- llvm/include/llvm/Support/raw_ostream.h  | 115 +-------
- llvm/lib/Support/raw_ostream.cpp         | 328 -----------------------
- 5 files changed, 8 insertions(+), 564 deletions(-)
+ llvm/include/llvm/Support/VersionTuple.h |  39 ---
+ llvm/include/llvm/Support/raw_ostream.h  | 127 +--------
+ llvm/lib/Support/raw_ostream.cpp         | 329 -----------------------
+ 5 files changed, 10 insertions(+), 579 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/SmallString.h b/llvm/include/llvm/ADT/SmallString.h
-index 50cbdade405770e80a6a45521a446a28e4177d11..bfa965fd68a09d7ca3b332e38585ae37a5982ed0 100644
+index 4d673cc8b1c49cf8a3f19653de53881cd12662ee..bfa965fd68a09d7ca3b332e38585ae37a5982ed0 100644
 --- a/llvm/include/llvm/ADT/SmallString.h
 +++ b/llvm/include/llvm/ADT/SmallString.h
-@@ -88,48 +88,12 @@ public:
+@@ -88,49 +88,12 @@ public:
    /// @name String Comparison
    /// @{
  
@@ -30,8 +30,11 @@ index 50cbdade405770e80a6a45521a446a28e4177d11..bfa965fd68a09d7ca3b332e38585ae37
 -    return str().equals_insensitive(RHS);
 -  }
 -
-   /// Compare two strings; the result is -1, 0, or 1 if this string is
-   /// lexicographically less than, equal to, or greater than the \p RHS.
+-  /// compare - Compare two strings; the result is negative, zero, or positive
+-  /// if this string is lexicographically less than, equal to, or greater than
+-  /// the \p RHS.
++  /// Compare two strings; the result is -1, 0, or 1 if this string is
++  /// lexicographically less than, equal to, or greater than the \p RHS.
    int compare(std::string_view RHS) const {
      return str().compare(RHS);
    }
@@ -64,7 +67,7 @@ index 50cbdade405770e80a6a45521a446a28e4177d11..bfa965fd68a09d7ca3b332e38585ae37
    /// @}
    /// @name String Searching
    /// @{
-@@ -210,50 +174,6 @@ public:
+@@ -211,50 +174,6 @@ public:
    }
  
    /// @}
@@ -116,10 +119,10 @@ index 50cbdade405770e80a6a45521a446a28e4177d11..bfa965fd68a09d7ca3b332e38585ae37
    // Extra methods.
  
 diff --git a/llvm/include/llvm/Support/Errno.h b/llvm/include/llvm/Support/Errno.h
-index 07df6765d9dbf5d6b88092737e081b441b1ccdc4..d9bf68bb369e524be5453c738ab9faa42f4b8cb8 100644
+index e095c66b90860001d90b5c2eb74f6032de6de454..787805dac6c5e3c8cb85dabeb80254443d60806c 100644
 --- a/llvm/include/llvm/Support/Errno.h
 +++ b/llvm/include/llvm/Support/Errno.h
-@@ -20,15 +20,6 @@
+@@ -19,15 +19,6 @@
  namespace llvm {
  namespace sys {
  
@@ -136,24 +139,16 @@ index 07df6765d9dbf5d6b88092737e081b441b1ccdc4..d9bf68bb369e524be5453c738ab9faa4
  inline decltype(auto) RetryAfterSignal(const FailT &Fail, const Fun &F,
                                         const Args &... As) {
 diff --git a/llvm/include/llvm/Support/VersionTuple.h b/llvm/include/llvm/Support/VersionTuple.h
-index 3d6573bf5a96e115ef264c7885b91aa3b32ac91e..a28e12adcc251bc3673f6a7c07d96d447aa0da98 100644
+index 953b40701dc934c1a356b5413c9c6c692d5f5679..30cf717973fb15ff65a47a2d80795c351b0d2768 100644
 --- a/llvm/include/llvm/Support/VersionTuple.h
 +++ b/llvm/include/llvm/Support/VersionTuple.h
-@@ -16,7 +16,6 @@
- 
- #include "llvm/ADT/DenseMapInfo.h"
- #include "llvm/ADT/Hashing.h"
--#include "llvm/Support/HashBuilder.h"
- #include <optional>
- #include <string>
- #include <tuple>
-@@ -159,45 +158,6 @@ public:
+@@ -168,45 +168,6 @@ public:
    friend bool operator>=(const VersionTuple &X, const VersionTuple &Y) {
      return !(X < Y);
    }
 -
--  friend llvm::hash_code hash_value(const VersionTuple &VT) {
--    return llvm::hash_combine(VT.Major, VT.Minor, VT.Subminor, VT.Build);
+-  friend hash_code hash_value(const VersionTuple &VT) {
+-    return hash_combine(VT.Major, VT.Minor, VT.Subminor, VT.Build);
 -  }
 -
 -  template <typename HasherT, llvm::support::endianness Endianness>
@@ -194,10 +189,10 @@ index 3d6573bf5a96e115ef264c7885b91aa3b32ac91e..a28e12adcc251bc3673f6a7c07d96d44
  
  } // end namespace llvm
 diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
-index a25ca5b7b556fd9ccd08ad13a6ceae6bedbcb09e..d4521c8e285f3fc404d27a6c528c410121c71f83 100644
+index 0bf165c55921d7e09208a8fa8df7f9f5ad68d1e2..429d1dca24942d16e5c3a551035c0d459e7c5c00 100644
 --- a/llvm/include/llvm/Support/raw_ostream.h
 +++ b/llvm/include/llvm/Support/raw_ostream.h
-@@ -248,32 +248,6 @@ public:
+@@ -261,32 +261,6 @@ public:
      return write(Str.data(), Str.size());
    }
  
@@ -230,7 +225,7 @@ index a25ca5b7b556fd9ccd08ad13a6ceae6bedbcb09e..d4521c8e285f3fc404d27a6c528c4101
    /// Output \p Str, turning '\\', '\t', '\n', '"', and anything that doesn't
    /// satisfy llvm::isPrint into an escape sequence.
    raw_ostream &write_escaped(std::string_view Str, bool UseHexEscapes = false);
-@@ -281,21 +255,6 @@ public:
+@@ -294,21 +268,6 @@ public:
    raw_ostream &write(unsigned char C);
    raw_ostream &write(const char *Ptr, size_t Size);
  
@@ -252,7 +247,7 @@ index a25ca5b7b556fd9ccd08ad13a6ceae6bedbcb09e..d4521c8e285f3fc404d27a6c528c4101
    /// indent - Insert 'NumSpaces' spaces.
    raw_ostream &indent(unsigned NumSpaces);
  
-@@ -310,14 +269,19 @@ public:
+@@ -323,14 +282,19 @@ public:
    /// @param BG if true change the background, default: change foreground
    /// @returns itself so it can be used within << invocations
    virtual raw_ostream &changeColor(enum Colors Color, bool Bold = false,
@@ -275,7 +270,7 @@ index a25ca5b7b556fd9ccd08ad13a6ceae6bedbcb09e..d4521c8e285f3fc404d27a6c528c4101
  
    /// This function determines if this stream is connected to a "tty" or
    /// "console" window. That is, the output would be displayed to the user
-@@ -392,10 +356,6 @@ private:
+@@ -405,10 +369,6 @@ private:
    /// unused bytes in the buffer.
    void copy_to_buffer(const char *Ptr, size_t Size);
  
@@ -286,7 +281,7 @@ index a25ca5b7b556fd9ccd08ad13a6ceae6bedbcb09e..d4521c8e285f3fc404d27a6c528c4101
    /// Flush the tied-to stream (if present) and then write the required data.
    void flush_tied_then_write(const char *Ptr, size_t Size);
  
-@@ -447,7 +407,6 @@ class raw_fd_ostream : public raw_pwrite_stream {
+@@ -460,7 +420,6 @@ class raw_fd_ostream : public raw_pwrite_stream {
    bool ShouldClose;
    bool SupportsSeeking = false;
    bool IsRegularFile = false;
@@ -294,7 +289,7 @@ index a25ca5b7b556fd9ccd08ad13a6ceae6bedbcb09e..d4521c8e285f3fc404d27a6c528c4101
  
  #ifdef _WIN32
    /// True if this fd refers to a Windows console device. Mintty and other
-@@ -523,10 +482,6 @@ public:
+@@ -536,10 +495,6 @@ public:
    /// to the offset specified from the beginning of the file.
    uint64_t seek(uint64_t off);
  
@@ -305,7 +300,7 @@ index a25ca5b7b556fd9ccd08ad13a6ceae6bedbcb09e..d4521c8e285f3fc404d27a6c528c4101
    std::error_code error() const { return EC; }
  
    /// Return the value of the flag in this raw_fd_ostream indicating whether an
-@@ -545,38 +500,6 @@ public:
+@@ -558,38 +513,6 @@ public:
    ///      - from The Zen of Python, by Tim Peters
    ///
    void clear_error() { EC = std::error_code(); }
@@ -330,7 +325,7 @@ index a25ca5b7b556fd9ccd08ad13a6ceae6bedbcb09e..d4521c8e285f3fc404d27a6c528c4101
 -  ///     });
 -  ///   }
 -  ///   @endcode
--  LLVM_NODISCARD Expected<sys::fs::FileLocker> lock();
+-  [[nodiscard]] Expected<sys::fs::FileLocker> lock();
 -
 -  /// Tries to lock the underlying file within the specified period.
 -  ///
@@ -339,12 +334,12 @@ index a25ca5b7b556fd9ccd08ad13a6ceae6bedbcb09e..d4521c8e285f3fc404d27a6c528c4101
 -  ///          error code.
 -  ///
 -  /// It is used as @ref lock.
--  LLVM_NODISCARD
--  Expected<sys::fs::FileLocker> tryLockFor(Duration const& Timeout);
+-  [[nodiscard]] Expected<sys::fs::FileLocker>
+-  tryLockFor(Duration const &Timeout);
  };
  
  /// This returns a reference to a raw_fd_ostream for standard output. Use it
-@@ -606,17 +529,6 @@ public:
+@@ -619,17 +542,6 @@ public:
    /// immediately destroyed.
    raw_fd_stream(std::string_view Filename, std::error_code &EC);
  
@@ -362,7 +357,7 @@ index a25ca5b7b556fd9ccd08ad13a6ceae6bedbcb09e..d4521c8e285f3fc404d27a6c528c4101
    /// Check if \p OS is a pointer of type raw_fd_stream*.
    static bool classof(const raw_ostream *OS);
  };
-@@ -734,17 +646,6 @@ public:
+@@ -747,29 +659,6 @@ public:
    ~buffer_unique_ostream() override { *OS << str(); }
  };
  
@@ -377,14 +372,26 @@ index a25ca5b7b556fd9ccd08ad13a6ceae6bedbcb09e..d4521c8e285f3fc404d27a6c528c4101
 -Error writeToOutput(std::string_view OutputFileName,
 -                    std::function<Error(raw_ostream &)> Write);
 -
+-raw_ostream &operator<<(raw_ostream &OS, std::nullopt_t);
+-
+-template <typename T, typename = decltype(std::declval<raw_ostream &>()
+-                                          << std::declval<const T &>())>
+-raw_ostream &operator<<(raw_ostream &OS, const std::optional<T> &O) {
+-  if (O)
+-    OS << *O;
+-  else
+-    OS << std::nullopt;
+-  return OS;
+-}
+-
  } // end namespace llvm
  
  #endif // LLVM_SUPPORT_RAW_OSTREAM_H
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index ee01a95220806c500d2c0149e9f1e667ea8bf28b..875eda7ba440f2ae64dc32ebb0502ad3ad8d2c74 100644
+index a2778407119ccd73031b22a5a091e21923905aa9..76c32155b4296fbbf3f4b164cd58d63f472ccd5e 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
-@@ -19,7 +19,6 @@
+@@ -18,7 +18,6 @@
  #include "llvm/ADT/StringExtras.h"
  #include "llvm/Config/config.h"
  #include "llvm/Support/Compiler.h"
@@ -392,7 +399,7 @@ index ee01a95220806c500d2c0149e9f1e667ea8bf28b..875eda7ba440f2ae64dc32ebb0502ad3
  #include "llvm/Support/ErrorHandling.h"
  #include "llvm/Support/FileSystem.h"
  #include "llvm/Support/Format.h"
-@@ -120,49 +119,6 @@ void raw_ostream::SetBufferAndMode(char *BufferStart, size_t Size,
+@@ -127,49 +126,6 @@ void raw_ostream::SetBufferAndMode(char *BufferStart, size_t Size,
    assert(OutBufStart <= OutBufEnd && "Invalid size!");
  }
  
@@ -442,7 +449,7 @@ index ee01a95220806c500d2c0149e9f1e667ea8bf28b..875eda7ba440f2ae64dc32ebb0502ad3
  raw_ostream &raw_ostream::write_escaped(std::string_view Str,
                                          bool UseHexEscapes) {
    for (unsigned char c : Str) {
-@@ -308,172 +264,6 @@ void raw_ostream::flush_tied_then_write(const char *Ptr, size_t Size) {
+@@ -315,173 +271,6 @@ void raw_ostream::flush_tied_then_write(const char *Ptr, size_t Size) {
    write_impl(Ptr, Size);
  }
  
@@ -550,7 +557,7 @@ index ee01a95220806c500d2c0149e9f1e667ea8bf28b..875eda7ba440f2ae64dc32ebb0502ad3
 -  const size_t Size = Bytes.size();
 -  HexPrintStyle HPS = FB.Upper ? HexPrintStyle::Upper : HexPrintStyle::Lower;
 -  uint64_t OffsetWidth = 0;
--  if (FB.FirstByteOffset.hasValue()) {
+-  if (FB.FirstByteOffset) {
 -    // Figure out how many nibbles are needed to print the largest offset
 -    // represented by this data set, so that we can align the offset field
 -    // to the right width.
@@ -570,8 +577,8 @@ index ee01a95220806c500d2c0149e9f1e667ea8bf28b..875eda7ba440f2ae64dc32ebb0502ad3
 -  while (!Bytes.empty()) {
 -    indent(FB.IndentLevel);
 -
--    if (FB.FirstByteOffset.hasValue()) {
--      uint64_t Offset = FB.FirstByteOffset.getValue();
+-    if (FB.FirstByteOffset) {
+-      uint64_t Offset = *FB.FirstByteOffset;
 -      llvm::write_hex(*this, Offset + LineIndex, HPS, OffsetWidth);
 -      *this << ": ";
 -    }
@@ -612,10 +619,11 @@ index ee01a95220806c500d2c0149e9f1e667ea8bf28b..875eda7ba440f2ae64dc32ebb0502ad3
 -  }
 -  return *this;
 -}
- 
+-
  template <char C>
  static raw_ostream &write_padding(raw_ostream &OS, unsigned NumChars) {
-@@ -506,63 +296,8 @@ raw_ostream &raw_ostream::write_zeros(unsigned NumZeros) {
+   static const char Chars[] = {C, C, C, C, C, C, C, C, C, C, C, C, C, C, C, C,
+@@ -512,63 +301,8 @@ raw_ostream &raw_ostream::write_zeros(unsigned NumZeros) {
    return write_padding<'\0'>(*this, NumZeros);
  }
  
@@ -679,7 +687,7 @@ index ee01a95220806c500d2c0149e9f1e667ea8bf28b..875eda7ba440f2ae64dc32ebb0502ad3
  //===----------------------------------------------------------------------===//
  //  raw_fd_ostream
  //===----------------------------------------------------------------------===//
-@@ -854,31 +589,6 @@ size_t raw_fd_ostream::preferred_buffer_size() const {
+@@ -867,31 +601,6 @@ size_t raw_fd_ostream::preferred_buffer_size() const {
  #endif
  }
  
@@ -711,7 +719,7 @@ index ee01a95220806c500d2c0149e9f1e667ea8bf28b..875eda7ba440f2ae64dc32ebb0502ad3
  void raw_fd_ostream::anchor() {}
  
  //===----------------------------------------------------------------------===//
-@@ -921,16 +631,6 @@ raw_fd_stream::raw_fd_stream(std::string_view Filename, std::error_code &EC)
+@@ -934,16 +643,6 @@ raw_fd_stream::raw_fd_stream(std::string_view Filename, std::error_code &EC)
      EC = std::make_error_code(std::errc::invalid_argument);
  }
  
@@ -728,7 +736,7 @@ index ee01a95220806c500d2c0149e9f1e667ea8bf28b..875eda7ba440f2ae64dc32ebb0502ad3
  bool raw_fd_stream::classof(const raw_ostream *OS) {
    return OS->get_kind() == OStreamKind::OK_FDStream;
  }
-@@ -986,31 +686,3 @@ void raw_pwrite_stream::anchor() {}
+@@ -999,31 +698,3 @@ void raw_pwrite_stream::anchor() {}
  void buffer_ostream::anchor() {}
  
  void buffer_unique_ostream::anchor() {}
