@@ -53,6 +53,7 @@ public class DutyCycleEncoderSim {
    */
   public void set(double turns) {
     m_simPosition.set(turns);
+    m_simAbsolutePosition.set(turns % 1);
   }
 
   /**
@@ -70,7 +71,9 @@ public class DutyCycleEncoderSim {
    * @param distance The distance.
    */
   public void setDistance(double distance) {
-    m_simPosition.set(distance / m_simDistancePerRotation.get());
+    double pos = distance / m_simDistancePerRotation.get();
+    m_simPosition.set(pos);
+    m_simAbsolutePosition.set(pos % 1);
   }
 
   /**

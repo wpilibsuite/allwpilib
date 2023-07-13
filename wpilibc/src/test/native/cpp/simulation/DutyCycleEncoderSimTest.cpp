@@ -21,6 +21,7 @@ TEST(DutyCycleEncoderSimTest, Set) {
   constexpr units::turn_t kTestValue{5.67};
   sim.Set(kTestValue);
   EXPECT_EQ(kTestValue, enc.Get());
+  EXPECT_NEAR(0.67, enc.GetAbsolutePosition(), 1e-3);
 }
 
 TEST(DutyCycleEncoderSimTest, SetDistance) {
@@ -30,6 +31,7 @@ TEST(DutyCycleEncoderSimTest, SetDistance) {
   DutyCycleEncoderSim sim(enc);
   sim.SetDistance(19.1);
   EXPECT_EQ(19.1, enc.GetDistance());
+  EXPECT_NEAR(0.1, enc.GetAbsolutePosition(), 1e-3);
 }
 
 TEST(DutyCycleEncoderSimTest, SetDistancePerRotation) {
@@ -60,6 +62,18 @@ TEST(DutyCycleEncoderSimTest, SetIsConnected) {
   EXPECT_TRUE(enc.IsConnected());
   sim.SetConnected(false);
   EXPECT_FALSE(enc.IsConnected());
+}
+
+TEST(DutyCycleEncoderSimTest, Reset) {
+  HAL_Initialize(500, 0);
+
+  DutyCycleEncoder enc{0};
+  DutyCycleEncoderSim sim(enc);
+  sim.SetDistance(2.5);
+  EXPECT_EQ(2.5, enc.GetDistance());
+  enc.Reset();
+  EXPECT_EQ(0, enc.GetDistance());
+  EXPECT_EQ(0, enc.GetAbsolutePosition());
 }
 
 }  // namespace frc::sim

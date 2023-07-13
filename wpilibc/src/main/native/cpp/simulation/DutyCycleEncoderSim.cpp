@@ -26,6 +26,7 @@ double DutyCycleEncoderSim::Get() {
 
 void DutyCycleEncoderSim::Set(units::turn_t turns) {
   m_simPosition.Set(turns.value());
+  m_simAbsolutePosition.Set(std::fmod(turns.value(), 1));
 }
 
 double DutyCycleEncoderSim::GetDistance() {
@@ -33,7 +34,9 @@ double DutyCycleEncoderSim::GetDistance() {
 }
 
 void DutyCycleEncoderSim::SetDistance(double distance) {
-  m_simPosition.Set(distance / m_simDistancePerRotation.Get());
+  double pos = distance / m_simDistancePerRotation.Get();
+  m_simPosition.Set(pos);
+  m_simAbsolutePosition.Set(std::fmod(pos, 1));
 }
 
 double DutyCycleEncoderSim::GetAbsolutePosition() {

@@ -20,6 +20,7 @@ class DutyCycleEncoderSimTest {
 
       sim.set(5.67);
       assertEquals(5.67, encoder.get());
+      assertEquals(0.67, encoder.getAbsolutePosition(), 1e-3);
     }
   }
 
@@ -32,6 +33,7 @@ class DutyCycleEncoderSimTest {
 
       sim.setDistance(19.1);
       assertEquals(19.1, encoder.getDistance());
+      assertEquals(0.1, encoder.getAbsolutePosition(), 1e-10);
     }
   }
 
@@ -70,6 +72,21 @@ class DutyCycleEncoderSimTest {
       assertTrue(encoder.isConnected());
       sim.setConnected(false);
       assertFalse(encoder.isConnected());
+    }
+  }
+
+  @Test
+  void resetTest() {
+    HAL.initialize(500, 0);
+
+    try (DutyCycleEncoder encoder = new DutyCycleEncoder(0)) {
+      DutyCycleEncoderSim sim = new DutyCycleEncoderSim(encoder);
+
+      sim.setDistance(2.5);
+      assertEquals(2.5, encoder.getDistance());
+      encoder.reset();
+      assertEquals(0.0, encoder.getDistance());
+      assertEquals(0.0, encoder.getAbsolutePosition(), 1e-3);
     }
   }
 }
