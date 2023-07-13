@@ -53,10 +53,11 @@ class DutyCycleEncoderSim {
    */
 
   double GetDistance();
+
   /**
    * Set the distance.
    *
-   * @return The distance.
+   * @param distance The distance.
    */
   void SetDistance(double distance);
 
