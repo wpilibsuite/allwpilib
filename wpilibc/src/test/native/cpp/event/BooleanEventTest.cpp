@@ -208,7 +208,6 @@ TEST(BooleanEventTest, EventReuse) {
   bool boolean2 = false;
   bool boolean3 = false;
   std::atomic_int counter = 0;
-  std::atomic_int counter = 0;
 
   auto event1 = BooleanEvent(&loop, [&] { return boolean1; });
   auto event2 = BooleanEvent(&loop, [&] { return boolean2; });
