@@ -14,7 +14,7 @@ import edu.wpi.first.math.geometry.Twist3d;
 import org.junit.jupiter.api.Test;
 
 public class WPIMathJNITest {
-  private static double[] toDoubleArray(Pose3d pose) {
+  private static double[] pose3dToDoubleArray(Pose3d pose) {
     Quaternion quaternion = pose.getRotation().getQuaternion();
     return new double[] {
       pose.getX(),
@@ -27,7 +27,7 @@ public class WPIMathJNITest {
     };
   }
 
-  private static double[] toDoubleArray(Twist3d twist) {
+  private static double[] twist3dToDoubleArray(Twist3d twist) {
     return new double[] {twist.dx, twist.dy, twist.dz, twist.rx, twist.ry, twist.rz};
   }
 
@@ -51,7 +51,7 @@ public class WPIMathJNITest {
     final var twist = new Twist3d(0, 1, 0, Math.PI, 0, 0);
     final var expected = start.exp(twist);
     final var result =
-        pose3dFromDoubleArray(WPIMathJNI.expPose3d(toDoubleArray(start), toDoubleArray(twist)));
+        pose3dFromDoubleArray(WPIMathJNI.expPose3d(pose3dToDoubleArray(start), twist3dToDoubleArray(twist)));
     assertEquals(expected, result);
   }
 
@@ -61,7 +61,7 @@ public class WPIMathJNITest {
     final var end = new Pose3d(0, 1, 0, new Rotation3d(Math.PI / 2, 0, 0));
     final var expected = start.log(end);
     final var result =
-        twist3dFromDoubleArray(WPIMathJNI.logPose3d(toDoubleArray(start), toDoubleArray(end)));
+        twist3dFromDoubleArray(WPIMathJNI.logPose3d(pose3dToDoubleArray(start), pose3dToDoubleArray(end)));
     assertEquals(expected, result);
   }
 }
