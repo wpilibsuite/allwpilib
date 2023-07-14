@@ -14,6 +14,7 @@
 #include "Eigen/QR"
 #include "edu_wpi_first_math_WPIMathJNI.h"
 #include "frc/DARE.h"
+#include "frc/geometry/Pose3d.h"
 #include "frc/trajectory/TrajectoryUtil.h"
 #include "unsupported/Eigen/MatrixFunctions"
 
@@ -56,6 +57,207 @@ bool IsStabilizable(const Eigen::Ref<const Eigen::MatrixXd>& A,
 }
 
 }  // namespace
+
+static JClass pose3dCls;
+static JClass quaternionCls;
+static JClass rotation3dCls;
+static JClass translation3dCls;
+static JClass twist3dCls;
+
+static const JClassInit classes[] = {
+    {"edu/wpi/first/math/geometry/Pose3d", &pose3dCls},
+    {"edu/wpi/first/math/geometry/Quaternion", &quaternionCls},
+    {"edu/wpi/first/math/geometry/Rotation3d", &rotation3dCls},
+    {"edu/wpi/first/math/geometry/Translation3d", &translation3dCls},
+    {"edu/wpi/first/math/geometry/Twist3d", &twist3dCls}};
+
+extern "C" {
+
+JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
+  JNIEnv* env;
+  if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
+    return JNI_ERR;
+  }
+
+  for (auto& c : classes) {
+    *c.cls = JClass(env, c.name);
+    if (!*c.cls) {
+      return JNI_ERR;
+    }
+  }
+
+  return JNI_VERSION_1_6;
+}
+
+JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
+  JNIEnv* env;
+  if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
+    return;
+  }
+
+  for (auto& c : classes) {
+    c.cls->free(env);
+  }
+}
+
+}  // extern "C"
+
+frc::Pose3d FromJavaPose3d(JNIEnv* env, jobject pose) {
+  static jfieldID poseTranslationField = nullptr;
+  static jfieldID poseRotationField = nullptr;
+  static jfieldID translationXField = nullptr;
+  static jfieldID translationYField = nullptr;
+  static jfieldID translationZField = nullptr;
+  static jfieldID rotationQuaternionField = nullptr;
+  static jfieldID quaternionWField = nullptr;
+  static jmethodID quaternionXMethod = nullptr;
+  static jmethodID quaternionYMethod = nullptr;
+  static jmethodID quaternionZMethod = nullptr;
+
+  if (!poseTranslationField) {
+    poseTranslationField =
+        env->GetFieldID(pose3dCls, "m_translation",
+                        "Ledu/wpi/first/math/geometry/Translation3d;");
+  }
+  if (!poseRotationField) {
+    poseRotationField = env->GetFieldID(
+        pose3dCls, "m_rotation", "Ledu/wpi/first/math/geometry/Rotation3d;");
+  }
+  if (!translationXField) {
+    translationXField = env->GetFieldID(translation3dCls, "m_x", "D");
+  }
+  if (!translationYField) {
+    translationYField = env->GetFieldID(translation3dCls, "m_y", "D");
+  }
+  if (!translationZField) {
+    translationZField = env->GetFieldID(translation3dCls, "m_z", "D");
+  }
+  if (!rotationQuaternionField) {
+    rotationQuaternionField = env->GetFieldID(
+        rotation3dCls, "m_q", "Ledu/wpi/first/math/geometry/Quaternion;");
+  }
+  if (!quaternionWField) {
+    quaternionWField = env->GetFieldID(quaternionCls, "m_r", "D");
+  }
+  if (!quaternionXMethod) {
+    quaternionXMethod = env->GetMethodID(quaternionCls, "getX", "()D");
+  }
+  if (!quaternionYMethod) {
+    quaternionYMethod = env->GetMethodID(quaternionCls, "getY", "()D");
+  }
+  if (!quaternionZMethod) {
+    quaternionZMethod = env->GetMethodID(quaternionCls, "getZ", "()D");
+  }
+
+  jobject translation = env->GetObjectField(pose, poseTranslationField);
+  jdouble dx = env->GetDoubleField(translation, translationXField);
+  jdouble dy = env->GetDoubleField(translation, translationYField);
+  jdouble dz = env->GetDoubleField(translation, translationZField);
+  jobject rotation = env->GetObjectField(pose, poseRotationField);
+  jobject quaternion = env->GetObjectField(rotation, rotationQuaternionField);
+  jdouble qw = env->GetDoubleField(quaternion, quaternionWField);
+  jdouble qx = env->CallDoubleMethod(quaternion, quaternionXMethod);
+  jdouble qy = env->CallDoubleMethod(quaternion, quaternionYMethod);
+  jdouble qz = env->CallDoubleMethod(quaternion, quaternionZMethod);
+
+  return {units::meter_t{dx}, units::meter_t{dy}, units::meter_t{dz},
+          frc::Rotation3d{frc::Quaternion{qw, qx, qy, qz}}};
+}
+
+frc::Twist3d FromJavaTwist3d(JNIEnv* env, jobject twist) {
+  static jfieldID twistDxField = nullptr;
+  static jfieldID twistDyField = nullptr;
+  static jfieldID twistDzField = nullptr;
+  static jfieldID twistRxField = nullptr;
+  static jfieldID twistRyField = nullptr;
+  static jfieldID twistRzField = nullptr;
+
+  if (!twistDxField) {
+    twistDxField = env->GetFieldID(twist3dCls, "dx", "D");
+  }
+  if (!twistDyField) {
+    twistDyField = env->GetFieldID(twist3dCls, "dy", "D");
+  }
+  if (!twistDzField) {
+    twistDzField = env->GetFieldID(twist3dCls, "dz", "D");
+  }
+  if (!twistRxField) {
+    twistRxField = env->GetFieldID(twist3dCls, "rx", "D");
+  }
+  if (!twistRyField) {
+    twistRyField = env->GetFieldID(twist3dCls, "ry", "D");
+  }
+  if (!twistRzField) {
+    twistRzField = env->GetFieldID(twist3dCls, "rz", "D");
+  }
+
+  jdouble twistDx = env->GetDoubleField(twist, twistDxField);
+  jdouble twistDy = env->GetDoubleField(twist, twistDyField);
+  jdouble twistDz = env->GetDoubleField(twist, twistDzField);
+  jdouble twistRx = env->GetDoubleField(twist, twistRxField);
+  jdouble twistRy = env->GetDoubleField(twist, twistRyField);
+  jdouble twistRz = env->GetDoubleField(twist, twistRzField);
+
+  return {units::meter_t{twistDx},  units::meter_t{twistDy},
+          units::meter_t{twistDz},  units::radian_t{twistRx},
+          units::radian_t{twistRy}, units::radian_t{twistRz}};
+}
+
+jobject MakeJObject(JNIEnv* env, const frc::Pose3d& pose) {
+  static jmethodID pose3dCtor = nullptr;
+  static jmethodID quaternionCtor = nullptr;
+  static jmethodID rotation3dCtor = nullptr;
+  static jmethodID translation3dCtor = nullptr;
+
+  if (!pose3dCtor) {
+    pose3dCtor =
+        env->GetMethodID(pose3dCls, "<init>",
+                         "(Ledu/wpi/first/math/geometry/Translation3d;Ledu/wpi/"
+                         "first/math/geometry/Rotation3d;)V");
+  }
+  if (!quaternionCtor) {
+    quaternionCtor = env->GetMethodID(quaternionCls, "<init>", "(DDDD)V");
+  }
+  if (!rotation3dCtor) {
+    rotation3dCtor = env->GetMethodID(
+        rotation3dCls, "<init>", "(Ledu/wpi/first/math/geometry/Quaternion;)V");
+  }
+  if (!translation3dCtor) {
+    translation3dCtor = env->GetMethodID(translation3dCls, "<init>", "(DDD)V");
+  }
+
+  frc::Quaternion quaternion = pose.Rotation().GetQuaternion();
+
+  double dx = pose.X().value();
+  double dy = pose.Y().value();
+  double dz = pose.Z().value();
+  double qw = quaternion.W();
+  double qx = quaternion.X();
+  double qy = quaternion.Y();
+  double qz = quaternion.Z();
+
+  jobject jTranslation =
+      env->NewObject(translation3dCls, translation3dCtor, dx, dy, dz);
+  jobject jQuaternion =
+      env->NewObject(quaternionCls, quaternionCtor, qw, qx, qy, qz);
+  jobject jRotation =
+      env->NewObject(rotation3dCls, rotation3dCtor, jQuaternion);
+  jobject jPose =
+      env->NewObject(pose3dCls, pose3dCtor, jTranslation, jRotation);
+
+  return jPose;
+}
+
+jobject MakeJObject(JNIEnv* env, const frc::Twist3d& twist) {
+  static jmethodID twist3dCtor = nullptr;
+  if (!twist3dCtor) {
+    twist3dCtor = env->GetMethodID(twist3dCls, "<init>", "(DDDDDD)V");
+  }
+
+  return env->NewObject(twist3dCls, twist3dCtor, twist.dx.value(),
+                        twist.dy.value(), twist.dz.value(), twist.rx.value(),
+                        twist.ry.value(), twist.rz.value());
+}
 
 std::vector<double> GetElementsFromTrajectory(
     const frc::Trajectory& trajectory) {
@@ -185,6 +387,40 @@ Java_edu_wpi_first_math_WPIMathJNI_pow
 
   env->ReleaseDoubleArrayElements(src, arrayBody, 0);
   env->SetDoubleArrayRegion(dst, 0, rows * rows, Apow.data());
+}
+
+/*
+ * Class:     edu_wpi_first_math_WPIMathJNI
+ * Method:    expPose3d
+ * Signature: (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+ */
+JNIEXPORT jobject JNICALL
+Java_edu_wpi_first_math_WPIMathJNI_expPose3d
+  (JNIEnv* env, jclass, jobject startPose, jobject twist)
+{
+  frc::Pose3d startPoseCpp = FromJavaPose3d(env, startPose);
+  frc::Twist3d twistCpp = FromJavaTwist3d(env, twist);
+
+  frc::Pose3d result = startPoseCpp.Exp(twistCpp);
+
+  return MakeJObject(env, result);
+}
+
+/*
+ * Class:     edu_wpi_first_math_WPIMathJNI
+ * Method:    logPose3d
+ * Signature: (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+ */
+JNIEXPORT jobject JNICALL
+Java_edu_wpi_first_math_WPIMathJNI_logPose3d
+  (JNIEnv* env, jclass, jobject start, jobject end)
+{
+  frc::Pose3d startCpp = FromJavaPose3d(env, start);
+  frc::Pose3d endCpp = FromJavaPose3d(env, end);
+
+  frc::Twist3d result = startCpp.Log(endCpp);
+
+  return MakeJObject(env, result);
 }
 
 /*

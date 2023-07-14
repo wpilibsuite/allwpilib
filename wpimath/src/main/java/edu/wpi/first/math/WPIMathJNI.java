@@ -4,6 +4,8 @@
 
 package edu.wpi.first.math;
 
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Twist3d;
 import edu.wpi.first.util.RuntimeLoader;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -75,6 +77,24 @@ public final class WPIMathJNI {
    * @param dst Array where the result will be stored.
    */
   public static native void pow(double[] src, int rows, double exponent, double[] dst);
+
+  /**
+   * Obtain a Pose3d from a (constant curvature) velocity.
+   *
+   * @param start The starting Pose3d.
+   * @param twist The twist to apply.
+   * @return The new pose.
+   */
+  public static native Pose3d expPose3d(Pose3d start, Twist3d twist);
+
+  /**
+   * Returns a Twist3d that maps this pose to the end pose.
+   *
+   * @param start The starting Pose3d.
+   * @param end The ending Pose3d.
+   * @return The twist that maps start to end.
+   */
+  public static native Twist3d logPose3d(Pose3d start, Pose3d end);
 
   /**
    * Returns true if (A, B) is a stabilizable pair.
