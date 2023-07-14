@@ -4,6 +4,10 @@
 
 package edu.wpi.first.hal;
 
+import java.lang.reflect.Field;
+import java.util.HashSet;
+import java.util.Set;
+
 @SuppressWarnings("MemberName")
 public class REVPHFaults {
   public final boolean Channel0Fault;
@@ -72,11 +76,32 @@ public class REVPHFaults {
     Channel13Fault = (faults & 0x2000) != 0;
     Channel14Fault = (faults & 0x4000) != 0;
     Channel15Fault = (faults & 0x8000) != 0;
-    CompressorOverCurrent = (faults & 0x8000) != 0;
-    CompressorOpen = (faults & 0x10000) != 0;
-    SolenoidOverCurrent = (faults & 0x20000) != 0;
-    Brownout = (faults & 0x40000) != 0;
-    CanWarning = (faults & 0x80000) != 0;
-    HardwareFault = (faults & 0x100000) != 0;
+    CompressorOverCurrent = (faults & 0x10000) != 0;
+    CompressorOpen = (faults & 0x20000) != 0;
+    SolenoidOverCurrent = (faults & 0x40000) != 0;
+    Brownout = (faults & 0x80000) != 0;
+    CanWarning = (faults & 0x1000000) != 0;
+    HardwareFault = (faults & 0x200000) != 0;
+  }
+
+  /**
+   * Get all currently active faults.
+   *
+   * @return a set of string representations of all active faults.
+   */
+  public Set<String> getActiveFaults() {
+    var fields = this.getClass().getDeclaredFields();
+    Set<String> set = new HashSet<>();
+    for (Field field : fields) {
+      try {
+        if (field.canAccess(this) && field.getType() == boolean.class && field.getBoolean(this)) {
+          set.add(field.getName());
+        }
+      } catch (IllegalAccessException e) {
+        // This shouldn't happen!
+        DriverStationJNI.sendConsoleLine(e.toString());
+      }
+    }
+    return set;
   }
 }

@@ -4,6 +4,10 @@
 
 package edu.wpi.first.hal;
 
+import java.lang.reflect.Field;
+import java.util.HashSet;
+import java.util.Set;
+
 @SuppressWarnings("MemberName")
 public class PowerDistributionFaults {
   public final boolean Channel0BreakerFault;
@@ -93,5 +97,26 @@ public class PowerDistributionFaults {
     Brownout = (faults & 0x1000000) != 0;
     CanWarning = (faults & 0x2000000) != 0;
     HardwareFault = (faults & 0x4000000) != 0;
+  }
+
+  /**
+   * Get all currently active faults.
+   *
+   * @return a set of string representations of all active faults.
+   */
+  public Set<String> getActiveFaults() {
+    var fields = this.getClass().getDeclaredFields();
+    Set<String> set = new HashSet<>();
+    for (Field field : fields) {
+      try {
+        if (field.canAccess(this) && field.getType() == boolean.class && field.getBoolean(this)) {
+          set.add(field.getName());
+        }
+      } catch (IllegalAccessException e) {
+        // This shouldn't happen!
+        DriverStationJNI.sendConsoleLine(e.toString());
+      }
+    }
+    return set;
   }
 }
