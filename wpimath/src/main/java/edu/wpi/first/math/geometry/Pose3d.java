@@ -8,14 +8,8 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import edu.wpi.first.math.MatBuilder;
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Nat;
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.WPIMathJNI;
 import edu.wpi.first.math.interpolation.Interpolatable;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
 import java.util.Objects;
 
 /** Represents a 3D pose containing translational and rotational elements. */
@@ -201,53 +195,8 @@ public class Pose3d implements Interpolatable<Pose3d> {
    * @return The new pose of the robot.
    */
   public Pose3d exp(Twist3d twist) {
-    // Implementation from Section 3.2 of https://ethaneade.org/lie.pdf
-    final var u = VecBuilder.fill(twist.dx, twist.dy, twist.dz);
-    final var rvec = VecBuilder.fill(twist.rx, twist.ry, twist.rz);
-    final var omega = rotationVectorToMatrix(rvec);
-    final var omegaSq = omega.times(omega);
-    double theta = rvec.norm();
-    double thetaSq = theta * theta;
-
-    double A;
-    double B;
-    double C;
-    if (Math.abs(theta) < 1E-7) {
-      // Taylor Expansions around θ = 0
-      // A = 1/1! - θ²/3! + θ⁴/5!
-      // B = 1/2! - θ²/4! + θ⁴/6!
-      // C = 1/3! - θ²/5! + θ⁴/7!
-      // sources:
-      // A:
-      // https://www.wolframalpha.com/input?i2d=true&i=series+expansion+of+Divide%5Bsin%5C%2840%29x%5C%2841%29%2Cx%5D+at+x%3D0
-      // B:
-      // https://www.wolframalpha.com/input?i2d=true&i=series+expansion+of+Divide%5B1-cos%5C%2840%29x%5C%2841%29%2CPower%5Bx%2C2%5D%5D+at+x%3D0
-      // C:
-      // https://www.wolframalpha.com/input?i2d=true&i=series+expansion+of+Divide%5B1-Divide%5Bsin%5C%2840%29x%5C%2841%29%2Cx%5D%2CPower%5Bx%2C2%5D%5D+at+x%3D0
-      A = 1 - thetaSq / 6 + thetaSq * thetaSq / 120;
-      B = 1 / 2.0 - thetaSq / 24 + thetaSq * thetaSq / 720;
-      C = 1 / 6.0 - thetaSq / 120 + thetaSq * thetaSq / 5040;
-    } else {
-      // A = sin(θ)/θ
-      // B = (1 - cos(θ)) / θ²
-      // C = (1 - A) / θ²
-      A = Math.sin(theta) / theta;
-      B = (1 - Math.cos(theta)) / thetaSq;
-      C = (1 - A) / thetaSq;
-    }
-
-    Matrix<N3, N3> R = Matrix.eye(Nat.N3()).plus(omega.times(A)).plus(omegaSq.times(B));
-    Matrix<N3, N3> V = Matrix.eye(Nat.N3()).plus(omega.times(B)).plus(omegaSq.times(C));
-    Matrix<N3, N1> translation_component = V.times(u);
-    final var transform =
-        new Transform3d(
-            new Translation3d(
-                translation_component.get(0, 0),
-                translation_component.get(1, 0),
-                translation_component.get(2, 0)),
-            new Rotation3d(R));
-
-    return this.plus(transform);
+    return pose3dFromDoubleArray(
+        WPIMathJNI.expPose3d(pose3dToDoubleArray(this), twist3dToDoubleArray(twist)));
   }
 
   /**
@@ -258,51 +207,8 @@ public class Pose3d implements Interpolatable<Pose3d> {
    * @return The twist that maps this to end.
    */
   public Twist3d log(Pose3d end) {
-    // Implementation from Section 3.2 of https://ethaneade.org/lie.pdf
-    final var transform = end.relativeTo(this);
-
-    final var rvec = transform.getRotation().getQuaternion().toRotationVector();
-
-    final var omega = rotationVectorToMatrix(rvec);
-    final var theta = rvec.norm();
-    final var thetaSq = theta * theta;
-
-    double C;
-    if (Math.abs(theta) < 1E-7) {
-      // Taylor Expansions around θ = 0
-      // A = 1/1! - θ²/3! + θ⁴/5!
-      // B = 1/2! - θ²/4! + θ⁴/6!
-      // C = 1/6 * (1/2 + θ²/5! + θ⁴/7!)
-      // sources:
-      // A:
-      // https://www.wolframalpha.com/input?i2d=true&i=series+expansion+of+Divide%5Bsin%5C%2840%29x%5C%2841%29%2Cx%5D+at+x%3D0
-      // B:
-      // https://www.wolframalpha.com/input?i2d=true&i=series+expansion+of+Divide%5B1-cos%5C%2840%29x%5C%2841%29%2CPower%5Bx%2C2%5D%5D+at+x%3D0
-      // C:
-      // https://www.wolframalpha.com/input?i2d=true&i=series+expansion+of+Divide%5B1-Divide%5BDivide%5Bsin%5C%2840%29x%5C%2841%29%2Cx%5D%2C2Divide%5B1-cos%5C%2840%29x%5C%2841%29%2CPower%5Bx%2C2%5D%5D%5D%2CPower%5Bx%2C2%5D%5D+at+x%3D0
-      C = 1 / 12.0 + thetaSq / 720 + thetaSq * thetaSq / 30240;
-    } else {
-      // A = sin(θ)/θ
-      // B = (1 - cos(θ)) / θ²
-      // C = (1 - A/(2*B)) / θ²
-      double A = Math.sin(theta) / theta;
-      double B = (1 - Math.cos(theta)) / thetaSq;
-      C = (1 - A / (2 * B)) / thetaSq;
-    }
-
-    final var V_inv =
-        Matrix.eye(Nat.N3()).minus(omega.times(0.5)).plus(omega.times(omega).times(C));
-
-    final var twist_translation =
-        V_inv.times(VecBuilder.fill(transform.getX(), transform.getY(), transform.getZ()));
-
-    return new Twist3d(
-        twist_translation.get(0, 0),
-        twist_translation.get(1, 0),
-        twist_translation.get(2, 0),
-        rvec.get(0, 0),
-        rvec.get(1, 0),
-        rvec.get(2, 0));
+    return twist3dFromDoubleArray(
+        WPIMathJNI.logPose3d(pose3dToDoubleArray(this), pose3dToDoubleArray(end)));
   }
 
   /**
@@ -355,29 +261,52 @@ public class Pose3d implements Interpolatable<Pose3d> {
   }
 
   /**
-   * Applies the hat operator to a rotation vector.
+   * Converts a Pose3d to the double array format for the JNI.
    *
-   * <p>It takes a rotation vector and returns the corresponding matrix representation of the Lie
-   * algebra element (a 3x3 rotation matrix).
-   *
-   * @param rotation The rotation vector.
-   * @return The rotation vector as a 3x3 rotation matrix.
+   * @param pose The pose to convert.
+   * @return The double array representing the pose.
    */
-  private Matrix<N3, N3> rotationVectorToMatrix(Vector<N3> rotation) {
-    // Given a rotation vector <a, b, c>,
-    //         [ 0 -c  b]
-    // Omega = [ c  0 -a]
-    //         [-b  a  0]
-    return new MatBuilder<>(Nat.N3(), Nat.N3())
-        .fill(
-            0.0,
-            -rotation.get(2, 0),
-            rotation.get(1, 0),
-            rotation.get(2, 0),
-            0.0,
-            -rotation.get(0, 0),
-            -rotation.get(1, 0),
-            rotation.get(0, 0),
-            0.0);
+  private static double[] pose3dToDoubleArray(Pose3d pose) {
+    Quaternion quaternion = pose.getRotation().getQuaternion();
+    return new double[] {
+      pose.getX(),
+      pose.getY(),
+      pose.getZ(),
+      quaternion.getW(),
+      quaternion.getX(),
+      quaternion.getY(),
+      quaternion.getZ()
+    };
+  }
+
+  /**
+   * Converts a Twist3d to the double array format for the JNI.
+   *
+   * @param twist The twist to convert.
+   * @return The double array representing the twist.
+   */
+  private static double[] twist3dToDoubleArray(Twist3d twist) {
+    return new double[] {twist.dx, twist.dy, twist.dz, twist.rx, twist.ry, twist.rz};
+  }
+
+  /**
+   * Constructs a Pose3d from the JNI double array format.
+   *
+   * @param arr The JNI double array to convert.
+   * @return The corresponding pose.
+   */
+  private static Pose3d pose3dFromDoubleArray(double[] arr) {
+    return new Pose3d(
+        arr[0], arr[1], arr[2], new Rotation3d(new Quaternion(arr[3], arr[4], arr[5], arr[6])));
+  }
+
+  /**
+   * Constructs a Twist3d from the JNI double array format.
+   *
+   * @param arr The JNI double array to convert.
+   * @return The corresponding twist.
+   */
+  private static Twist3d twist3dFromDoubleArray(double[] arr) {
+    return new Twist3d(arr[0], arr[1], arr[2], arr[3], arr[4], arr[5]);
   }
 }
