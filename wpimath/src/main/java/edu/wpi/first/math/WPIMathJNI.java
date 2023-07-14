@@ -4,8 +4,6 @@
 
 package edu.wpi.first.math;
 
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Twist3d;
 import edu.wpi.first.util.RuntimeLoader;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -81,20 +79,26 @@ public final class WPIMathJNI {
   /**
    * Obtain a Pose3d from a (constant curvature) velocity.
    *
-   * @param start The starting Pose3d.
-   * @param twist The twist to apply.
-   * @return The new pose.
+   * <p>A Pose3d is represented by [t_x, t_y, t_z, q_w, q_x, q_y, q_z] and a Twist3d is represented
+   * by [dx, dy, dz, rx, ry, rz].
+   *
+   * @param start The starting Pose3d as a double array.
+   * @param twist The twist to apply as a double array.
+   * @return The new pose as a double array.
    */
-  public static native Pose3d expPose3d(Pose3d start, Twist3d twist);
+  public static native double[] expPose3d(double[] start, double[] twist);
 
   /**
    * Returns a Twist3d that maps this pose to the end pose.
    *
-   * @param start The starting Pose3d.
-   * @param end The ending Pose3d.
-   * @return The twist that maps start to end.
+   * <p>A Pose3d is represented by [t_x, t_y, t_z, q_w, q_x, q_y, q_z] and a Twist3d is represented
+   * by [dx, dy, dz, rx, ry, rz].
+   *
+   * @param start The starting Pose3d as a double array.
+   * @param end The ending Pose3d as a double array.
+   * @return The twist that maps start to end as a double array.
    */
-  public static native Twist3d logPose3d(Pose3d start, Pose3d end);
+  public static native double[] logPose3d(double[] start, double[] end);
 
   /**
    * Returns true if (A, B) is a stabilizable pair.
