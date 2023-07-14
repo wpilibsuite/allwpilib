@@ -40,6 +40,7 @@ public class BooleanEvent implements BooleanSupplier {
   public BooleanEvent(EventLoop loop, BooleanSupplier signal) {
     m_loop = requireNonNullParam(loop, "loop", "BooleanEvent");
     m_signal = requireNonNullParam(signal, "signal", "BooleanEvent");
+    m_state.set(m_signal.getAsBoolean());
     m_loop.bind(() -> m_state.set(m_signal.getAsBoolean()));
   }
 
@@ -76,11 +77,11 @@ public class BooleanEvent implements BooleanSupplier {
     return new BooleanEvent(
         m_loop,
         new BooleanSupplier() {
-          private boolean m_previous = m_signal.getAsBoolean();
+          private boolean m_previous = m_state.get();
 
           @Override
           public boolean getAsBoolean() {
-            boolean present = m_signal.getAsBoolean();
+            boolean present = m_state.get();
             boolean ret = !m_previous && present;
             m_previous = present;
             return ret;
@@ -97,11 +98,11 @@ public class BooleanEvent implements BooleanSupplier {
     return new BooleanEvent(
         m_loop,
         new BooleanSupplier() {
-          private boolean m_previous = m_signal.getAsBoolean();
+          private boolean m_previous = m_state.get();
 
           @Override
           public boolean getAsBoolean() {
-            boolean present = m_signal.getAsBoolean();
+            boolean present = m_state.get();
             boolean ret = m_previous && !present;
             m_previous = present;
             return ret;
@@ -136,7 +137,7 @@ public class BooleanEvent implements BooleanSupplier {
 
           @Override
           public boolean getAsBoolean() {
-            return m_debouncer.calculate(m_signal.getAsBoolean());
+            return m_debouncer.calculate(m_state.get());
           }
         });
   }
@@ -148,7 +149,7 @@ public class BooleanEvent implements BooleanSupplier {
    * @return the negated event
    */
   public BooleanEvent negate() {
-    return new BooleanEvent(m_loop, () -> !m_signal.getAsBoolean());
+    return new BooleanEvent(m_loop, () -> !m_state.get());
   }
 
   /**
@@ -162,8 +163,8 @@ public class BooleanEvent implements BooleanSupplier {
    */
   public BooleanEvent and(BooleanEvent other) {
     requireNonNullParam(other, "other", "and");
-    if (!m_loop.equals(other.m_loop)) {
-      m_loop.bind(() -> other.m_state.set(other.m_signal.getAsBoolean()));
+    if (m_loop != other.m_loop) {
+      m_loop.bind(() -> other.m_state.set(other.m_state.get()));
     }
     return new BooleanEvent(m_loop, () -> m_state.get() && other.m_state.get());
   }
@@ -177,7 +178,7 @@ public class BooleanEvent implements BooleanSupplier {
    */
   public BooleanEvent and(BooleanSupplier other) {
     requireNonNullParam(other, "other", "and");
-    return new BooleanEvent(m_loop, () -> m_signal.getAsBoolean() && other.getAsBoolean());
+    return new BooleanEvent(m_loop, () -> m_state.get() && other.getAsBoolean());
   }
 
   /**
@@ -191,8 +192,8 @@ public class BooleanEvent implements BooleanSupplier {
    */
   public BooleanEvent or(BooleanEvent other) {
     requireNonNullParam(other, "other", "or");
-    if (!m_loop.equals(other.m_loop)) {
-      m_loop.bind(() -> other.m_state.set(other.m_signal.getAsBoolean()));
+    if (m_loop != other.m_loop) {
+      m_loop.bind(() -> other.m_state.set(other.m_state.get()));
     }
     return new BooleanEvent(m_loop, () -> m_state.get() || other.m_state.get());
   }
@@ -206,7 +207,7 @@ public class BooleanEvent implements BooleanSupplier {
    */
   public BooleanEvent or(BooleanSupplier other) {
     requireNonNullParam(other, "other", "or");
-    return new BooleanEvent(m_loop, () -> m_signal.getAsBoolean() || other.getAsBoolean());
+    return new BooleanEvent(m_loop, () -> m_state.get() || other.getAsBoolean());
   }
 
   /**
