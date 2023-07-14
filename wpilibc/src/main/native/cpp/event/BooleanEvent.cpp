@@ -33,9 +33,13 @@ BooleanEvent BooleanEvent::operator!() {
   return BooleanEvent(this->m_loop, [lhs = m_condition] { return !lhs(); });
 }
 
-BooleanEvent BooleanEvent::operator&&(std::function<bool()> rhs) {
+BooleanEvent BooleanEvent::operator&&(BooleanEvent rhs) {
+  if (m_loop != rhs.m_loop) {
+    m_loop->Bind(
+        [&rhs] { rhs.m_state = std::make_shared<bool>(rhs.m_condition()); });
+  }
   return BooleanEvent(this->m_loop,
-                      [lhs = m_condition, rhs] { return lhs() && rhs(); });
+                      [state = m_state, &rhs] { return state && rhs.m_state; });
 }
 
 BooleanEvent BooleanEvent::operator||(std::function<bool()> rhs) {

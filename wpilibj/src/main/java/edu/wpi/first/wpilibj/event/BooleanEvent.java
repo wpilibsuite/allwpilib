@@ -7,7 +7,6 @@ package edu.wpi.first.wpilibj.event;
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.math.filter.Debouncer;
-
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiFunction;
 import java.util.function.BooleanSupplier;
@@ -161,6 +160,21 @@ public class BooleanEvent implements BooleanSupplier {
    * @param other the event to compose with
    * @return the event that is active when both events are active
    */
+  public BooleanEvent and(BooleanEvent other) {
+    requireNonNullParam(other, "other", "and");
+    if (!m_loop.equals(other.m_loop)) {
+      m_loop.bind(() -> other.m_state.set(other.m_signal.getAsBoolean()));
+    }
+    return new BooleanEvent(m_loop, () -> m_state.get() && other.m_state.get());
+  }
+
+  /**
+   * Composes this event with a signal, returning a new signal that is in the high state when both
+   * signals are in the high state.
+   *
+   * @param other the signal to compose with
+   * @return the event that is active when both this event and the supplier are active
+   */
   public BooleanEvent and(BooleanSupplier other) {
     requireNonNullParam(other, "other", "and");
     return new BooleanEvent(m_loop, () -> m_signal.getAsBoolean() && other.getAsBoolean());
@@ -173,6 +187,21 @@ public class BooleanEvent implements BooleanSupplier {
    * <p>The new event will use this event's polling loop.
    *
    * @param other the event to compose with
+   * @return a signal that is high when either signal is high.
+   */
+  public BooleanEvent or(BooleanEvent other) {
+    requireNonNullParam(other, "other", "or");
+    if (!m_loop.equals(other.m_loop)) {
+      m_loop.bind(() -> other.m_state.set(other.m_signal.getAsBoolean()));
+    }
+    return new BooleanEvent(m_loop, () -> m_state.get() || other.m_state.get());
+  }
+
+  /**
+   * Composes this event with a signal, returning a new signal that is high when either signal is
+   * high.
+   *
+   * @param other the signal to compose with
    * @return a signal that is high when either signal is high.
    */
   public BooleanEvent or(BooleanSupplier other) {

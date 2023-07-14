@@ -209,9 +209,9 @@ TEST(BooleanEventTest, EventReuse) {
   bool boolean3 = false;
   std::atomic_int counter = 0;
 
-  auto event1 = BooleanEvent(&loop, [&] { return boolean1; });
-  auto event2 = BooleanEvent(&loop, [&] { return boolean2; });
-  auto event3 = BooleanEvent(&loop, [&] { return boolean3; });
+  auto event1 = BooleanEvent(&loop, [&] { return boolean1; }).Rising();
+  auto event2 = BooleanEvent(&loop, [&] { return boolean2; }).Rising();
+  auto event3 = BooleanEvent(&loop, [&] { return boolean3; }).Rising();
   event1.IfHigh([&] {
     boolean1 = false;
     ++counter;
@@ -233,26 +233,22 @@ TEST(BooleanEventTest, EventReuse) {
   loop.Poll();
 
   EXPECT_EQ(3, counter);
+  loop.Poll();
+
+  EXPECT_EQ(3, counter);
 
   boolean1 = true;
   loop.Poll();
 
   EXPECT_EQ(4, counter);
 
-  boolean2 = true;
-  boolean3 = true;
   loop.Poll();
 
   EXPECT_EQ(4, counter);
 
   boolean1 = true;
-  loop.Poll();
-
-  EXPECT_EQ(7, counter);
-
-  boolean1 = true;
   boolean2 = true;
   loop.Poll();
 
-  EXPECT_EQ(9, counter);
+  EXPECT_EQ(6, counter);
 }

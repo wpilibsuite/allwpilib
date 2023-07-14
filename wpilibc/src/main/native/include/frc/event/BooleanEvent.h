@@ -89,7 +89,7 @@ class BooleanEvent {
    * @param rhs the event to compose with
    * @return the event that is active when both events are active
    */
-  BooleanEvent operator&&(std::function<bool()> rhs);
+  BooleanEvent operator&&(BooleanEvent rhs);
 
   /**
    * Composes this event with another event, returning a new event that is
