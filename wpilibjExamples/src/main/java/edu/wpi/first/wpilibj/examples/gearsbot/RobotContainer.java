@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Elevator;
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Wrist;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 /**
@@ -38,7 +37,7 @@ public class RobotContainer {
 
   private final XboxController m_joystick = new XboxController(0);
 
-  private final CommandBase m_autonomousCommand =
+  private final Command m_autonomousCommand =
       new Autonomous(m_drivetrain, m_claw, m_wrist, m_elevator);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */

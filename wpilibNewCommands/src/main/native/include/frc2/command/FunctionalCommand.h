@@ -8,7 +8,7 @@
 #include <initializer_list>
 #include <span>
 
-#include "frc2/command/CommandBase.h"
+#include "frc2/command/Command.h"
 #include "frc2/command/CommandHelper.h"
 
 namespace frc2 {
@@ -21,7 +21,7 @@ namespace frc2 {
  *
  * This class is provided by the NewCommands VendorDep
  */
-class FunctionalCommand : public CommandHelper<CommandBase, FunctionalCommand> {
+class FunctionalCommand : public CommandHelper<Command, FunctionalCommand> {
  public:
   /**
    * Creates a new FunctionalCommand.

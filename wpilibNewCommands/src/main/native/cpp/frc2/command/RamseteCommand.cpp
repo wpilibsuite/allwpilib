@@ -161,7 +161,7 @@ bool RamseteCommand::IsFinished() {
 }
 
 void RamseteCommand::InitSendable(wpi::SendableBuilder& builder) {
-  CommandBase::InitSendable(builder);
+  Command::InitSendable(builder);
   builder.AddDoubleProperty(
       "leftVelocity", [this] { return m_prevSpeeds.left.value(); }, nullptr);
   builder.AddDoubleProperty(

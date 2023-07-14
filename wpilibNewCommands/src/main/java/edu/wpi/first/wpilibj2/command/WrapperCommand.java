@@ -14,7 +14,7 @@ import java.util.Set;
  * added to any other composition or scheduled individually, and the composition requires all
  * subsystems its components require.
  */
-public abstract class WrapperCommand extends CommandBase {
+public abstract class WrapperCommand extends Command {
   protected final Command m_command;
 
   /**

@@ -20,7 +20,7 @@ import java.util.function.Supplier;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public class SelectCommand extends CommandBase {
+public class SelectCommand extends Command {
   private final Map<Object, Command> m_commands;
   private final Supplier<Object> m_selector;
   private Command m_selectedCommand;

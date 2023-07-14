@@ -23,7 +23,7 @@
 #include <units/velocity.h>
 #include <units/voltage.h>
 
-#include "CommandBase.h"
+#include "Command.h"
 #include "CommandHelper.h"
 
 #pragma once
@@ -51,7 +51,7 @@ namespace frc2 {
  * This class is provided by the NewCommands VendorDep
  */
 class MecanumControllerCommand
-    : public CommandHelper<CommandBase, MecanumControllerCommand> {
+    : public CommandHelper<Command, MecanumControllerCommand> {
  public:
   /**
    * Constructs a new MecanumControllerCommand that when executed will follow

@@ -13,11 +13,11 @@
 #include <frc/kinematics/MecanumDriveOdometry.h>
 #include <frc/kinematics/MecanumDriveWheelSpeeds.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
-#include <frc2/command/SubsystemBase.h>
+#include <frc2/command/Subsystem.h>
 
 #include "Constants.h"
 
-class DriveSubsystem : public frc2::SubsystemBase {
+class DriveSubsystem : public frc2::Subsystem {
  public:
   DriveSubsystem();
 

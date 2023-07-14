@@ -48,7 +48,7 @@ class SchedulerTest extends CommandTestBase {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicInteger counter = new AtomicInteger(0);
       Subsystem system =
-          new SubsystemBase() {
+          new Subsystem() {
             @Override
             public void periodic() {
               counter.incrementAndGet();
@@ -67,7 +67,7 @@ class SchedulerTest extends CommandTestBase {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicInteger counter = new AtomicInteger(0);
       Subsystem system =
-          new SubsystemBase() {
+          new Subsystem() {
             @Override
             public void periodic() {
               counter.incrementAndGet();
