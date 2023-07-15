@@ -57,7 +57,7 @@ class ADXL345_I2C : public nt::NTSendable,
    * Set the measuring range of the accelerometer.
    *
    * @param range The maximum acceleration, positive or negative, that the
-   *     accelerometer will measure. Not all accelerometers support all ranges.
+   *     accelerometer will measure.
    */
   void SetRange(Range range);
 

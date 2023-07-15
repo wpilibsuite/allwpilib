@@ -163,7 +163,7 @@ public class ADXL362 implements NTSendable, AutoCloseable {
    * Set the measuring range of the accelerometer.
    *
    * @param range The maximum acceleration, positive or negative, that the accelerometer will
-   *     measure. Not all accelerometers support all ranges.
+   *     measure.
    */
   public void setRange(Range range) {
     if (m_spi == null) {

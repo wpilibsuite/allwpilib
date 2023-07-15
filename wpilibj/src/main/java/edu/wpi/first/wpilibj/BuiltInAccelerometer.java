@@ -49,7 +49,7 @@ public class BuiltInAccelerometer implements Sendable, AutoCloseable {
    * Set the measuring range of the accelerometer.
    *
    * @param range The maximum acceleration, positive or negative, that the accelerometer will
-   *     measure. Not all accelerometers support all ranges.
+   *     measure.
    */
   public void setRange(Range range) {
     AccelerometerJNI.setAccelerometerActive(false);
