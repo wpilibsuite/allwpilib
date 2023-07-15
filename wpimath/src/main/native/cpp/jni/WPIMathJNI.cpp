@@ -295,8 +295,8 @@ Java_edu_wpi_first_math_WPIMathJNI_expPose3d
       units::meter_t{poseX}, units::meter_t{poseY}, units::meter_t{poseZ},
       frc::Rotation3d{frc::Quaternion{poseQw, poseQx, poseQy, poseQz}}};
   frc::Twist3d twist{units::meter_t{twistDx},  units::meter_t{twistDy},
-                           units::meter_t{twistDz},  units::radian_t{twistRx},
-                           units::radian_t{twistRy}, units::radian_t{twistRz}};
+                     units::meter_t{twistDz},  units::radian_t{twistRx},
+                     units::radian_t{twistRy}, units::radian_t{twistRz}};
 
   frc::Pose3d result = pose.Exp(twist);
 
