@@ -102,27 +102,6 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
 
 }  // extern "C"
 
-// frc::Pose3d Pose3dFromJDoubleArray(JNIEnv* env, jdoubleArray arr) {
-//   jdouble* nativeArray = env->GetDoubleArrayElements(arr, nullptr);
-//   frc::Translation3d translation{units::meter_t{nativeArray[0]},
-//                                  units::meter_t{nativeArray[1]},
-//                                  units::meter_t{nativeArray[2]}};
-//   frc::Quaternion quaternion{nativeArray[3], nativeArray[4], nativeArray[5],
-//                              nativeArray[6]};
-//   env->ReleaseDoubleArrayElements(arr, nativeArray, 0);
-//   return {translation, frc::Rotation3d{quaternion}};
-// }
-//
-// frc::Twist3d Twist3dFromJDoubleArray(JNIEnv* env, jdoubleArray arr) {
-//   jdouble* nativeArray = env->GetDoubleArrayElements(arr, nullptr);
-//   frc::Twist3d twist = {
-//       units::meter_t{nativeArray[0]},  units::meter_t{nativeArray[1]},
-//       units::meter_t{nativeArray[2]},  units::radian_t{nativeArray[3]},
-//       units::radian_t{nativeArray[4]}, units::radian_t{nativeArray[5]}};
-//   env->ReleaseDoubleArrayElements(arr, nativeArray, 0);
-//   return twist;
-// }
-
 jobject MakeJObject(JNIEnv* env, const frc::Pose3d& pose) {
   static jmethodID quaternionCtor = nullptr;
   static jmethodID rotation3dCtor = nullptr;
@@ -169,34 +148,6 @@ jobject MakeJObject(JNIEnv* env, const frc::Twist3d& twist) {
 
   return jTwist;
 }
-
-// jdoubleArray MakeJDoubleArray(JNIEnv* env, const frc::Pose3d& pose) {
-//   const frc::Quaternion& quaternion = pose.Rotation().GetQuaternion();
-//   jdoubleArray results = env->NewDoubleArray(7);
-//   jdouble* buffer = env->GetDoubleArrayElements(results, nullptr);
-//   buffer[0] = pose.X().value();
-//   buffer[1] = pose.Y().value();
-//   buffer[2] = pose.Z().value();
-//   buffer[3] = quaternion.W();
-//   buffer[4] = quaternion.X();
-//   buffer[5] = quaternion.Y();
-//   buffer[6] = quaternion.Z();
-//   env->ReleaseDoubleArrayElements(results, buffer, 0);
-//   return results;
-// }
-//
-// jdoubleArray MakeJDoubleArray(JNIEnv* env, const frc::Twist3d& twist) {
-//   jdoubleArray results = env->NewDoubleArray(6);
-//   jdouble* buffer = env->GetDoubleArrayElements(results, nullptr);
-//   buffer[0] = twist.dx.value();
-//   buffer[1] = twist.dy.value();
-//   buffer[2] = twist.dz.value();
-//   buffer[3] = twist.rx.value();
-//   buffer[4] = twist.ry.value();
-//   buffer[5] = twist.rz.value();
-//   env->ReleaseDoubleArrayElements(results, buffer, 0);
-//   return results;
-// }
 
 std::vector<double> GetElementsFromTrajectory(
     const frc::Trajectory& trajectory) {
@@ -340,14 +291,14 @@ Java_edu_wpi_first_math_WPIMathJNI_expPose3d
    jdouble twistDx, jdouble twistDy, jdouble twistDz, jdouble twistRx,
    jdouble twistRy, jdouble twistRz)
 {
-  frc::Pose3d poseCpp = {
+  frc::Pose3d pose{
       units::meter_t{poseX}, units::meter_t{poseY}, units::meter_t{poseZ},
       frc::Rotation3d{frc::Quaternion{poseQw, poseQx, poseQy, poseQz}}};
-  frc::Twist3d twistCpp = {units::meter_t{twistDx},  units::meter_t{twistDy},
+  frc::Twist3d twist{units::meter_t{twistDx},  units::meter_t{twistDy},
                            units::meter_t{twistDz},  units::radian_t{twistRx},
                            units::radian_t{twistRy}, units::radian_t{twistRz}};
 
-  frc::Pose3d result = poseCpp.Exp(twistCpp);
+  frc::Pose3d result = pose.Exp(twist);
 
   return MakeJObject(env, result);
 }
@@ -364,14 +315,14 @@ Java_edu_wpi_first_math_WPIMathJNI_logPose3d
    jdouble endX, jdouble endY, jdouble endZ, jdouble endQw, jdouble endQx,
    jdouble endQy, jdouble endQz)
 {
-  frc::Pose3d startCpp = {
+  frc::Pose3d startPose{
       units::meter_t{startX}, units::meter_t{startY}, units::meter_t{startZ},
       frc::Rotation3d{frc::Quaternion{startQw, startQx, startQy, startQz}}};
-  frc::Pose3d endCpp = {
+  frc::Pose3d endPose{
       units::meter_t{endX}, units::meter_t{endY}, units::meter_t{endZ},
       frc::Rotation3d{frc::Quaternion{endQw, endQx, endQy, endQz}}};
 
-  frc::Twist3d result = startCpp.Log(endCpp);
+  frc::Twist3d result = startPose.Log(endPose);
 
   return MakeJObject(env, result);
 }

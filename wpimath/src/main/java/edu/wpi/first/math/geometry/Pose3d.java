@@ -195,7 +195,7 @@ public class Pose3d implements Interpolatable<Pose3d> {
    * @return The new pose of the robot.
    */
   public Pose3d exp(Twist3d twist) {
-    Quaternion quaternion = this.getRotation().getQuaternion();
+    var quaternion = this.getRotation().getQuaternion();
     return WPIMathJNI.expPose3d(
         this.getX(),
         this.getY(),
@@ -220,8 +220,8 @@ public class Pose3d implements Interpolatable<Pose3d> {
    * @return The twist that maps this to end.
    */
   public Twist3d log(Pose3d end) {
-    Quaternion thisQuaternion = this.getRotation().getQuaternion();
-    Quaternion endQuaternion = end.getRotation().getQuaternion();
+    var thisQuaternion = this.getRotation().getQuaternion();
+    var endQuaternion = end.getRotation().getQuaternion();
     return WPIMathJNI.logPose3d(
         this.getX(),
         this.getY(),
@@ -286,55 +286,5 @@ public class Pose3d implements Interpolatable<Pose3d> {
               twist.dx * t, twist.dy * t, twist.dz * t, twist.rx * t, twist.ry * t, twist.rz * t);
       return this.exp(scaledTwist);
     }
-  }
-
-  /**
-   * Converts a Pose3d to the double array format for the JNI.
-   *
-   * @param pose The pose to convert.
-   * @return The double array representing the pose.
-   */
-  private static double[] pose3dToDoubleArray(Pose3d pose) {
-    Quaternion quaternion = pose.getRotation().getQuaternion();
-    return new double[] {
-      pose.getX(),
-      pose.getY(),
-      pose.getZ(),
-      quaternion.getW(),
-      quaternion.getX(),
-      quaternion.getY(),
-      quaternion.getZ()
-    };
-  }
-
-  /**
-   * Converts a Twist3d to the double array format for the JNI.
-   *
-   * @param twist The twist to convert.
-   * @return The double array representing the twist.
-   */
-  private static double[] twist3dToDoubleArray(Twist3d twist) {
-    return new double[] {twist.dx, twist.dy, twist.dz, twist.rx, twist.ry, twist.rz};
-  }
-
-  /**
-   * Constructs a Pose3d from the JNI double array format.
-   *
-   * @param arr The JNI double array to convert.
-   * @return The corresponding pose.
-   */
-  private static Pose3d pose3dFromDoubleArray(double[] arr) {
-    return new Pose3d(
-        arr[0], arr[1], arr[2], new Rotation3d(new Quaternion(arr[3], arr[4], arr[5], arr[6])));
-  }
-
-  /**
-   * Constructs a Twist3d from the JNI double array format.
-   *
-   * @param arr The JNI double array to convert.
-   * @return The corresponding twist.
-   */
-  private static Twist3d twist3dFromDoubleArray(double[] arr) {
-    return new Twist3d(arr[0], arr[1], arr[2], arr[3], arr[4], arr[5]);
   }
 }
