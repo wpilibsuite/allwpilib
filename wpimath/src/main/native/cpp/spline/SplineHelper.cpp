@@ -6,8 +6,6 @@
 
 #include <cstddef>
 
-#include "frc/StateSpaceUtil.h"
-
 using namespace frc;
 
 std::vector<CubicHermiteSpline> SplineHelper::CubicSplinesFromControlVectors(
@@ -212,7 +210,7 @@ std::vector<QuinticHermiteSpline> SplineHelper::OptimizeCurvature(
                           Trim(bFinal.y)};
 
     // Calculate the second derivatives at the knot points.
-    auto bases = frc::MakeMatrix<4, 1>(1.0, 1.0, 1.0, 1.0);
+    frc::Matrixd<4, 1> bases{1.0, 1.0, 1.0, 1.0};
     auto combinedA = ca.Coefficients() * bases;
 
     double ddxA = combinedA(4);
