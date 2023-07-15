@@ -129,11 +129,5 @@ TEST(AcclerometerSimTest, SetRange) {
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_EQ(static_cast<int>(range), sim.GetRange());
   EXPECT_EQ(static_cast<int>(range), callback.GetLastValue());
-
-  // 16G - Not supported
-  callback.Reset();
-  EXPECT_THROW(accel.SetRange(BuiltInAccelerometer::kRange_16G),
-               std::runtime_error);
-  EXPECT_FALSE(callback.WasTriggered());
 }
 }  // namespace frc::sim

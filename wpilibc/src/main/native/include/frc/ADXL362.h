@@ -19,7 +19,7 @@ namespace frc {
  */
 class ADXL362 : public nt::NTSendable, public wpi::SendableHelper<ADXL362> {
  public:
-  enum Range { kRange_2G = 0, kRange_4G = 1, kRange_8G = 2, kRange_16G = 3 };
+  enum Range { kRange_2G = 0, kRange_4G = 1, kRange_8G = 2 };
 
   enum Axes { kAxis_X = 0x00, kAxis_Y = 0x02, kAxis_Z = 0x04 };
   struct AllAxes {

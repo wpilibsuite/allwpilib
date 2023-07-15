@@ -46,8 +46,7 @@ public class ADXL362 implements NTSendable, AutoCloseable {
   public enum Range {
     k2G,
     k4G,
-    k8G,
-    k16G
+    k8G
   }
 
   public enum Axes {
@@ -181,7 +180,6 @@ public class ADXL362 implements NTSendable, AutoCloseable {
         m_gsPerLSB = 0.002;
         break;
       case k8G:
-      case k16G: // 16G not supported; treat as 8G
         value = kFilterCtl_Range8G;
         m_gsPerLSB = 0.004;
         break;

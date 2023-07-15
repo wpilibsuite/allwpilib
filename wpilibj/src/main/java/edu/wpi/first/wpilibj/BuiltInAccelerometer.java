@@ -20,8 +20,7 @@ public class BuiltInAccelerometer implements Sendable, AutoCloseable {
   public enum Range {
     k2G,
     k4G,
-    k8G,
-    k16G
+    k8G
   }
 
   /**
@@ -64,9 +63,6 @@ public class BuiltInAccelerometer implements Sendable, AutoCloseable {
       case k8G:
         AccelerometerJNI.setAccelerometerRange(2);
         break;
-      case k16G:
-      default:
-        throw new IllegalArgumentException(range + " range not supported (use k2G, k4G, or k8G)");
     }
 
     AccelerometerJNI.setAccelerometerActive(true);

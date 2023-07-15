@@ -6,7 +6,6 @@ package edu.wpi.first.wpilibj.simulation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.hal.HAL;
@@ -131,12 +130,6 @@ class AccelerometerSimTest {
       assertTrue(callback.wasTriggered());
       assertEquals(range.ordinal(), sim.getRange());
       assertEquals(range.ordinal(), callback.getSetValue());
-
-      // 16G - Not supported
-      callback.reset();
-      assertThrows(
-          IllegalArgumentException.class, () -> accel.setRange(BuiltInAccelerometer.Range.k16G));
-      assertFalse(callback.wasTriggered());
     }
   }
 }
