@@ -43,6 +43,10 @@ dependencies {
     api "com.fasterxml.jackson.core:jackson-databind:2.12.4"
 }
 
+configurations {
+    devImplementation.extendsFrom(implementation)
+}
+
 def wpilibNumberFileInput = file("src/generate/GenericNumber.java.jinja")
 def natFileInput = file("src/generate/Nat.java.jinja")
 def wpilibNumberFileOutputDir = file("$buildDir/generated/java/edu/wpi/first/math/numbers")
