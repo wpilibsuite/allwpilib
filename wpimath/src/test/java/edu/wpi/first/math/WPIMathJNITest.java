@@ -41,11 +41,18 @@ public class WPIMathJNITest {
   public void timePose3dExp() {
     final var start = new Pose3d(1, 0, 0, new Rotation3d(0, -Math.PI / 2, 0));
     final var twist = new Twist3d(0, 0, 0, Math.PI, 0, 0);
+    final int warmupCount = 100_000;
     final int count = 1_000;
     var msg = new StringBuilder();
     msg.append("Pose3d.exp():\n");
     msg.append("  start = " + start + "\n");
     msg.append("  twist = " + twist + "\n");
+    msg.append(
+        "  warm up ("
+            + warmupCount
+            + " iterations): average "
+            + timePose3dExpMicros(start, twist, warmupCount)
+            + "µs\n");
     msg.append("  iterations per run: " + count + "\n");
     for (int i = 1; i <= 5; i++) {
       msg.append("  run " + i + ": average " + timePose3dExpMicros(start, twist, count) + "μs\n");
@@ -57,11 +64,18 @@ public class WPIMathJNITest {
   public void timePose3dLog() {
     final var start = new Pose3d(1, 0, 0, new Rotation3d(0, -Math.PI / 2, 0));
     final var end = new Pose3d(0, 1, 0, new Rotation3d(Math.PI / 2, 0, 0));
+    final int warmupCount = 100_000;
     final int count = 1_000;
     var msg = new StringBuilder();
     msg.append("Pose3d.log():\n");
     msg.append("  start = " + start + "\n");
     msg.append("  end = " + end + "\n");
+    msg.append(
+        "  warm up ("
+            + warmupCount
+            + " iterations): average "
+            + timePose3dLogMicros(start, end, warmupCount)
+            + "µs\n");
     msg.append("  iterations per run: " + count + "\n");
     for (int i = 1; i <= 5; i++) {
       msg.append("  run " + i + ": average " + timePose3dLogMicros(start, end, count) + "μs\n");
