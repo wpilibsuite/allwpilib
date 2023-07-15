@@ -90,6 +90,8 @@ class Ultrasonic : public wpi::Sendable,
   Ultrasonic(Ultrasonic&&) = default;
   Ultrasonic& operator=(Ultrasonic&&) = default;
 
+  int GetEchoChannel() const;
+
   /**
    * Single ping to ultrasonic sensor.
    *
@@ -162,11 +164,8 @@ class Ultrasonic : public wpi::Sendable,
    */
   static void UltrasonicChecker();
 
-  // Time (sec) for the ping trigger pulse.
-  static constexpr double kPingTime = 10 * 1e-6;
-
-  // Priority that the ultrasonic round robin task runs.
-  static constexpr int kPriority = 64;
+  // Time (usec) for the ping trigger pulse.
+  static constexpr auto kPingTime = 10_us;
 
   // Max time (ms) between readings.
   static constexpr auto kMaxUltrasonicTime = 0.1_s;

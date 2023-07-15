@@ -54,7 +54,7 @@ public final class WPIMathJNI {
    * @param inputs Number of inputs in B matrix.
    * @param S Array storage for DARE solution.
    */
-  public static native void discreteAlgebraicRiccatiEquation(
+  public static native void dare(
       double[] A, double[] B, double[] Q, double[] R, int states, int inputs, double[] S);
 
   /**
@@ -79,9 +79,9 @@ public final class WPIMathJNI {
   /**
    * Returns true if (A, B) is a stabilizable pair.
    *
-   * <p>(A,B) is stabilizable if and only if the uncontrollable eigenvalues of A, if any, have
+   * <p>(A, B) is stabilizable if and only if the uncontrollable eigenvalues of A, if any, have
    * absolute values less than one, where an eigenvalue is uncontrollable if rank(lambda * I - A, B)
-   * &lt; n where n is number of states.
+   * &lt; n where n is the number of states.
    *
    * @param states the number of states of the system.
    * @param inputs the number of inputs to the system.
@@ -125,6 +125,19 @@ public final class WPIMathJNI {
    */
   public static native String serializeTrajectory(double[] elements);
 
+  /**
+   * Performs an inplace rank one update (or downdate) of an upper triangular Cholesky decomposition
+   * matrix.
+   *
+   * @param mat Array of elements of the matrix to be updated.
+   * @param lowerTriangular Whether mat is lower triangular.
+   * @param rows How many rows there are.
+   * @param vec Vector to use for the rank update.
+   * @param sigma Sigma value to use for the rank update.
+   */
+  public static native void rankUpdate(
+      double[] mat, int rows, double[] vec, double sigma, boolean lowerTriangular);
+
   public static class Helper {
     private static AtomicBoolean extractOnStaticLoad = new AtomicBoolean(true);
 
@@ -136,4 +149,18 @@ public final class WPIMathJNI {
       extractOnStaticLoad.set(load);
     }
   }
+
+  /**
+   * Solves the least-squares problem Ax=B using a QR decomposition with full pivoting.
+   *
+   * @param A Array of elements of the A matrix.
+   * @param Arows Number of rows of the A matrix.
+   * @param Acols Number of rows of the A matrix.
+   * @param B Array of elements of the B matrix.
+   * @param Brows Number of rows of the B matrix.
+   * @param Bcols Number of rows of the B matrix.
+   * @param dst Array to store solution in. If A is m-n and B is m-p, dst is n-p.
+   */
+  public static native void solveFullPivHouseholderQr(
+      double[] A, int Arows, int Acols, double[] B, int Brows, int Bcols, double[] dst);
 }

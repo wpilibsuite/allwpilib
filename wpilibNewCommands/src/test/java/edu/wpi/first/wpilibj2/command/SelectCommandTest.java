@@ -9,10 +9,11 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
+import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
-class SelectCommandTest extends CommandTestBase {
+class SelectCommandTest extends CommandTestBase implements MultiCompositionTestBase<SelectCommand> {
   @Test
   void selectCommandTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
@@ -74,10 +75,10 @@ class SelectCommandTest extends CommandTestBase {
 
   @Test
   void selectCommandRequirementTest() {
-    Subsystem system1 = new TestSubsystem();
-    Subsystem system2 = new TestSubsystem();
-    Subsystem system3 = new TestSubsystem();
-    Subsystem system4 = new TestSubsystem();
+    Subsystem system1 = new Subsystem() {};
+    Subsystem system2 = new Subsystem() {};
+    Subsystem system3 = new Subsystem() {};
+    Subsystem system4 = new Subsystem() {};
 
     try (CommandScheduler scheduler = new CommandScheduler()) {
       MockCommandHolder command1Holder = new MockCommandHolder(true, system1, system2);
@@ -104,5 +105,14 @@ class SelectCommandTest extends CommandTestBase {
       verify(command2, never()).end(true);
       verify(command3, never()).end(true);
     }
+  }
+
+  @Override
+  public SelectCommand compose(Command... members) {
+    var map = new HashMap<Object, Command>();
+    for (int i = 0; i < members.length; i++) {
+      map.put(i, members[i]);
+    }
+    return new SelectCommand(map, () -> 0);
   }
 }

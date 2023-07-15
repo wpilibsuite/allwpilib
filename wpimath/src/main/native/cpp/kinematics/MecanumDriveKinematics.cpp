@@ -21,45 +21,52 @@ MecanumDriveWheelSpeeds MecanumDriveKinematics::ToWheelSpeeds(
     m_previousCoR = centerOfRotation;
   }
 
-  Eigen::Vector3d chassisSpeedsVector;
-  chassisSpeedsVector << chassisSpeeds.vx.to<double>(),
-      chassisSpeeds.vy.to<double>(), chassisSpeeds.omega.to<double>();
+  Eigen::Vector3d chassisSpeedsVector{chassisSpeeds.vx.value(),
+                                      chassisSpeeds.vy.value(),
+                                      chassisSpeeds.omega.value()};
 
-  Eigen::Matrix<double, 4, 1> wheelsMatrix =
-      m_inverseKinematics * chassisSpeedsVector;
+  Vectord<4> wheelsVector = m_inverseKinematics * chassisSpeedsVector;
 
   MecanumDriveWheelSpeeds wheelSpeeds;
-  wheelSpeeds.frontLeft = units::meters_per_second_t{wheelsMatrix(0, 0)};
-  wheelSpeeds.frontRight = units::meters_per_second_t{wheelsMatrix(1, 0)};
-  wheelSpeeds.rearLeft = units::meters_per_second_t{wheelsMatrix(2, 0)};
-  wheelSpeeds.rearRight = units::meters_per_second_t{wheelsMatrix(3, 0)};
+  wheelSpeeds.frontLeft = units::meters_per_second_t{wheelsVector(0)};
+  wheelSpeeds.frontRight = units::meters_per_second_t{wheelsVector(1)};
+  wheelSpeeds.rearLeft = units::meters_per_second_t{wheelsVector(2)};
+  wheelSpeeds.rearRight = units::meters_per_second_t{wheelsVector(3)};
   return wheelSpeeds;
 }
 
 ChassisSpeeds MecanumDriveKinematics::ToChassisSpeeds(
     const MecanumDriveWheelSpeeds& wheelSpeeds) const {
-  Eigen::Matrix<double, 4, 1> wheelSpeedsMatrix;
-  // clang-format off
-  wheelSpeedsMatrix << wheelSpeeds.frontLeft.to<double>(), wheelSpeeds.frontRight.to<double>(),
-                       wheelSpeeds.rearLeft.to<double>(), wheelSpeeds.rearRight.to<double>();
-  // clang-format on
+  Vectord<4> wheelSpeedsVector{
+      wheelSpeeds.frontLeft.value(), wheelSpeeds.frontRight.value(),
+      wheelSpeeds.rearLeft.value(), wheelSpeeds.rearRight.value()};
 
   Eigen::Vector3d chassisSpeedsVector =
-      m_forwardKinematics.solve(wheelSpeedsMatrix);
+      m_forwardKinematics.solve(wheelSpeedsVector);
 
   return {units::meters_per_second_t{chassisSpeedsVector(0)},  // NOLINT
           units::meters_per_second_t{chassisSpeedsVector(1)},
           units::radians_per_second_t{chassisSpeedsVector(2)}};
 }
 
+Twist2d MecanumDriveKinematics::ToTwist2d(
+    const MecanumDriveWheelPositions& wheelDeltas) const {
+  Vectord<4> wheelDeltasVector{
+      wheelDeltas.frontLeft.value(), wheelDeltas.frontRight.value(),
+      wheelDeltas.rearLeft.value(), wheelDeltas.rearRight.value()};
+
+  Eigen::Vector3d twistVector = m_forwardKinematics.solve(wheelDeltasVector);
+
+  return {units::meter_t{twistVector(0)},  // NOLINT
+          units::meter_t{twistVector(1)}, units::radian_t{twistVector(2)}};
+}
+
 void MecanumDriveKinematics::SetInverseKinematics(Translation2d fl,
                                                   Translation2d fr,
                                                   Translation2d rl,
                                                   Translation2d rr) const {
-  // clang-format off
-  m_inverseKinematics << 1, -1, (-(fl.X() + fl.Y())).template to<double>(),
-                         1,  1, (fr.X() - fr.Y()).template to<double>(),
-                         1,  1, (rl.X() - rl.Y()).template to<double>(),
-                         1, -1, (-(rr.X() + rr.Y())).template to<double>();
-  // clang-format on
+  m_inverseKinematics = Matrixd<4, 3>{{1, -1, (-(fl.X() + fl.Y())).value()},
+                                      {1, 1, (fr.X() - fr.Y()).value()},
+                                      {1, 1, (rl.X() - rl.Y()).value()},
+                                      {1, -1, (-(rr.X() + rr.Y())).value()}};
 }

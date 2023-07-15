@@ -8,7 +8,7 @@
 using namespace frc2;
 class DefaultCommandTest : public CommandTestBase {};
 
-TEST_F(DefaultCommandTest, DefaultCommandScheduleTest) {
+TEST_F(DefaultCommandTest, DefaultCommandSchedule) {
   CommandScheduler scheduler = GetScheduler();
 
   TestSubsystem subsystem;
@@ -22,7 +22,7 @@ TEST_F(DefaultCommandTest, DefaultCommandScheduleTest) {
   EXPECT_TRUE(scheduler.IsScheduled(handle));
 }
 
-TEST_F(DefaultCommandTest, DefaultCommandInterruptResumeTest) {
+TEST_F(DefaultCommandTest, DefaultCommandInterruptResume) {
   CommandScheduler scheduler = GetScheduler();
 
   TestSubsystem subsystem;

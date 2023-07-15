@@ -22,14 +22,12 @@ import edu.wpi.first.math.system.NumericalJacobian;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings("ParameterName")
-public class ExtendedKalmanFilterTest {
-  public static Matrix<N5, N1> getDynamics(final Matrix<N5, N1> x, final Matrix<N2, N1> u) {
+class ExtendedKalmanFilterTest {
+  private static Matrix<N5, N1> getDynamics(final Matrix<N5, N1> x, final Matrix<N2, N1> u) {
     final var motors = DCMotor.getCIM(2);
 
     final var gr = 7.08; // Gear ratio
@@ -59,17 +57,18 @@ public class ExtendedKalmanFilterTest {
     return result;
   }
 
-  public static Matrix<N3, N1> getLocalMeasurementModel(Matrix<N5, N1> x, Matrix<N2, N1> u) {
+  @SuppressWarnings("PMD.UnusedFormalParameter")
+  private static Matrix<N3, N1> getLocalMeasurementModel(Matrix<N5, N1> x, Matrix<N2, N1> u) {
     return VecBuilder.fill(x.get(2, 0), x.get(3, 0), x.get(4, 0));
   }
 
-  public static Matrix<N5, N1> getGlobalMeasurementModel(Matrix<N5, N1> x, Matrix<N2, N1> u) {
+  @SuppressWarnings("PMD.UnusedFormalParameter")
+  private static Matrix<N5, N1> getGlobalMeasurementModel(Matrix<N5, N1> x, Matrix<N2, N1> u) {
     return VecBuilder.fill(x.get(0, 0), x.get(1, 0), x.get(2, 0), x.get(3, 0), x.get(4, 0));
   }
 
-  @SuppressWarnings("LocalVariableName")
   @Test
-  public void testInit() {
+  void testInit() {
     double dtSeconds = 0.00505;
 
     assertDoesNotThrow(
@@ -98,9 +97,8 @@ public class ExtendedKalmanFilterTest {
         });
   }
 
-  @SuppressWarnings("LocalVariableName")
   @Test
-  public void testConvergence() {
+  void testConvergence() {
     double dtSeconds = 0.00505;
     double rbMeters = 0.8382 / 2.0; // Robot radius
 
@@ -126,12 +124,6 @@ public class ExtendedKalmanFilterTest {
 
     Matrix<N5, N1> nextR = new Matrix<>(Nat.N5(), Nat.N1());
     Matrix<N2, N1> u = new Matrix<>(Nat.N2(), Nat.N1());
-
-    List<Double> trajXs = new ArrayList<>();
-    List<Double> trajYs = new ArrayList<>();
-
-    List<Double> observerXs = new ArrayList<>();
-    List<Double> observerYs = new ArrayList<>();
 
     var B =
         NumericalJacobian.numericalJacobianU(
@@ -177,12 +169,6 @@ public class ExtendedKalmanFilterTest {
               ExtendedKalmanFilterTest::getDynamics, groundTruthX, u, dtSeconds);
 
       r = nextR;
-
-      trajXs.add(ref.poseMeters.getTranslation().getX());
-      trajYs.add(ref.poseMeters.getTranslation().getY());
-
-      observerXs.add(observer.getXhat().get(0, 0));
-      observerYs.add(observer.getXhat().get(1, 0));
     }
 
     var localY = getLocalMeasurementModel(observer.getXhat(), u);
@@ -191,22 +177,6 @@ public class ExtendedKalmanFilterTest {
     var globalY = getGlobalMeasurementModel(observer.getXhat(), u);
     var R = StateSpaceUtil.makeCostMatrix(VecBuilder.fill(0.01, 0.01, 0.0001, 0.5, 0.5));
     observer.correct(Nat.N5(), u, globalY, ExtendedKalmanFilterTest::getGlobalMeasurementModel, R);
-
-    //    var chartBuilder = new XYChartBuilder();
-    //    chartBuilder.title = "The Magic of Sensor Fusion, now with a "
-    //          + observer.getClass().getSimpleName();
-    //    var xyPosChart = chartBuilder.build();
-    //
-    //    xyPosChart.setXAxisTitle("X pos, meters");
-    //    xyPosChart.setYAxisTitle("Y pos, meters");
-    //    xyPosChart.addSeries("Trajectory", trajXs, trajYs);
-    //    xyPosChart.addSeries("xHat", observerXs, observerYs);
-    //    new SwingWrapper<>(xyPosChart).displayChart();
-    //    try {
-    //      Thread.sleep(1000000000);
-    //    } catch (InterruptedException ex) {
-    //      ex.printStackTrace();
-    //    }
 
     var finalPosition = trajectory.sample(trajectory.getTotalTimeSeconds());
     assertEquals(finalPosition.poseMeters.getTranslation().getX(), observer.getXhat(0), 1.0);

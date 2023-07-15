@@ -79,6 +79,15 @@ public class EncoderDataJNI extends JNIWrapper {
 
   public static native void setSamplesToAverage(int index, int samplesToAverage);
 
+  public static native int registerDistancePerPulseCallback(
+      int index, NotifyCallback callback, boolean initialNotify);
+
+  public static native void cancelDistancePerPulseCallback(int index, int uid);
+
+  public static native double getDistancePerPulse(int index);
+
+  public static native void setDistancePerPulse(int index, double distancePerPulse);
+
   public static native void setDistance(int index, double distance);
 
   public static native double getDistance(int index);

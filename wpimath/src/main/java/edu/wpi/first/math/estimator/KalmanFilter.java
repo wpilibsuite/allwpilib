@@ -4,14 +4,14 @@
 
 package edu.wpi.first.math.estimator;
 
-import edu.wpi.first.math.Discretization;
-import edu.wpi.first.math.Drake;
+import edu.wpi.first.math.DARE;
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Num;
 import edu.wpi.first.math.StateSpaceUtil;
 import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.system.Discretization;
 import edu.wpi.first.math.system.LinearSystem;
 
 /**
@@ -29,18 +29,15 @@ import edu.wpi.first.math.system.LinearSystem;
  * https://file.tavsys.net/control/controls-engineering-in-frc.pdf chapter 9 "Stochastic control
  * theory".
  */
-@SuppressWarnings("ClassTypeParameterName")
 public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extends Num> {
   private final Nat<States> m_states;
 
   private final LinearSystem<States, Inputs, Outputs> m_plant;
 
   /** The steady-state Kalman gain matrix. */
-  @SuppressWarnings("MemberName")
   private final Matrix<States, Outputs> m_K;
 
   /** The state estimate. */
-  @SuppressWarnings("MemberName")
   private Matrix<States, N1> m_xHat;
 
   /**
@@ -52,8 +49,8 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
    * @param stateStdDevs Standard deviations of model states.
    * @param measurementStdDevs Standard deviations of measurements.
    * @param dtSeconds Nominal discretization timestep.
+   * @throws IllegalArgumentException If the system is unobservable.
    */
-  @SuppressWarnings("LocalVariableName")
   public KalmanFilter(
       Nat<States> states,
       Nat<Outputs> outputs,
@@ -68,7 +65,7 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
     var contQ = StateSpaceUtil.makeCovarianceMatrix(states, stateStdDevs);
     var contR = StateSpaceUtil.makeCovarianceMatrix(outputs, measurementStdDevs);
 
-    var pair = Discretization.discretizeAQTaylor(plant.getA(), contQ, dtSeconds);
+    var pair = Discretization.discretizeAQ(plant.getA(), contQ, dtSeconds);
     var discA = pair.getFirst();
     var discQ = pair.getSecond();
 
@@ -76,34 +73,37 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
 
     var C = plant.getC();
 
-    // isStabilizable(A^T, C^T) will tell us if the system is observable.
-    var isObservable = StateSpaceUtil.isStabilizable(discA.transpose(), C.transpose());
-    if (!isObservable) {
-      MathSharedStore.reportError(
-          "The system passed to the Kalman filter is not observable!",
-          Thread.currentThread().getStackTrace());
-      throw new IllegalArgumentException(
-          "The system passed to the Kalman filter is not observable!");
+    if (!StateSpaceUtil.isDetectable(discA, C)) {
+      var builder =
+          new StringBuilder("The system passed to the Kalman filter is unobservable!\n\nA =\n");
+      builder
+          .append(discA.getStorage().toString())
+          .append("\nC =\n")
+          .append(C.getStorage().toString())
+          .append('\n');
+
+      var msg = builder.toString();
+      MathSharedStore.reportError(msg, Thread.currentThread().getStackTrace());
+      throw new IllegalArgumentException(msg);
     }
 
-    var P =
-        new Matrix<>(
-            Drake.discreteAlgebraicRiccatiEquation(discA.transpose(), C.transpose(), discQ, discR));
+    var P = new Matrix<>(DARE.dare(discA.transpose(), C.transpose(), discQ, discR));
 
+    // S = CPCᵀ + R
     var S = C.times(P).times(C.transpose()).plus(discR);
 
-    // We want to put K = PC^T S^-1 into Ax = b form so we can solve it more
+    // We want to put K = PCᵀS⁻¹ into Ax = b form so we can solve it more
     // efficiently.
     //
-    // K = PC^T S^-1
-    // KS = PC^T
-    // (KS)^T = (PC^T)^T
-    // S^T K^T = CP^T
+    // K = PCᵀS⁻¹
+    // KS = PCᵀ
+    // (KS)ᵀ = (PCᵀ)ᵀ
+    // SᵀKᵀ = CPᵀ
     //
     // The solution of Ax = b can be found via x = A.solve(b).
     //
-    // K^T = S^T.solve(CP^T)
-    // K = (S^T.solve(CP^T))^T
+    // Kᵀ = Sᵀ.solve(CPᵀ)
+    // K = (Sᵀ.solve(CPᵀ))ᵀ
     m_K =
         new Matrix<>(
             S.transpose().getStorage().solve((C.times(P.transpose())).getStorage()).transpose());
@@ -167,7 +167,7 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
    * Returns an element of the state estimate x-hat.
    *
    * @param row Row of x-hat.
-   * @return the state estimate x-hat at i.
+   * @return the state estimate x-hat at that row.
    */
   public double getXhat(int row) {
     return m_xHat.get(row, 0);
@@ -179,7 +179,6 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
    * @param u New control input from controller.
    * @param dtSeconds Timestep for prediction.
    */
-  @SuppressWarnings("ParameterName")
   public void predict(Matrix<Inputs, N1> u, double dtSeconds) {
     this.m_xHat = m_plant.calculateX(m_xHat, u, dtSeconds);
   }
@@ -190,10 +189,10 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
    * @param u Same control input used in the last predict step.
    * @param y Measurement vector.
    */
-  @SuppressWarnings("ParameterName")
   public void correct(Matrix<Inputs, N1> u, Matrix<Outputs, N1> y) {
     final var C = m_plant.getC();
     final var D = m_plant.getD();
+    // x̂ₖ₊₁⁺ = x̂ₖ₊₁⁻ + K(y − (Cx̂ₖ₊₁⁻ + Duₖ₊₁))
     m_xHat = m_xHat.plus(m_K.times(y.minus(C.times(m_xHat).plus(D.times(u)))));
   }
 }

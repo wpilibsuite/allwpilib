@@ -6,7 +6,6 @@
 
 #include <wpi/MathExtras.h>
 
-#include "frc/StateSpaceUtil.h"
 #include "frc/system/NumericalIntegration.h"
 #include "frc/system/plant/LinearSystemId.h"
 
@@ -16,19 +15,20 @@ using namespace frc::sim;
 ElevatorSim::ElevatorSim(const LinearSystem<2, 1, 1>& plant,
                          const DCMotor& gearbox, double gearing,
                          units::meter_t drumRadius, units::meter_t minHeight,
-                         units::meter_t maxHeight,
+                         units::meter_t maxHeight, bool simulateGravity,
                          const std::array<double, 1>& measurementStdDevs)
     : LinearSystemSim(plant, measurementStdDevs),
       m_gearbox(gearbox),
       m_drumRadius(drumRadius),
       m_minHeight(minHeight),
       m_maxHeight(maxHeight),
-      m_gearing(gearing) {}
+      m_gearing(gearing),
+      m_simulateGravity(simulateGravity) {}
 
 ElevatorSim::ElevatorSim(const DCMotor& gearbox, double gearing,
                          units::kilogram_t carriageMass,
                          units::meter_t drumRadius, units::meter_t minHeight,
-                         units::meter_t maxHeight,
+                         units::meter_t maxHeight, bool simulateGravity,
                          const std::array<double, 1>& measurementStdDevs)
     : LinearSystemSim(LinearSystemId::ElevatorSystem(gearbox, carriageMass,
                                                      drumRadius, gearing),
@@ -37,22 +37,23 @@ ElevatorSim::ElevatorSim(const DCMotor& gearbox, double gearing,
       m_drumRadius(drumRadius),
       m_minHeight(minHeight),
       m_maxHeight(maxHeight),
-      m_gearing(gearing) {}
+      m_gearing(gearing),
+      m_simulateGravity(simulateGravity) {}
 
 bool ElevatorSim::WouldHitLowerLimit(units::meter_t elevatorHeight) const {
-  return elevatorHeight < m_minHeight;
+  return elevatorHeight <= m_minHeight;
 }
 
 bool ElevatorSim::WouldHitUpperLimit(units::meter_t elevatorHeight) const {
-  return elevatorHeight > m_maxHeight;
+  return elevatorHeight >= m_maxHeight;
 }
 
 bool ElevatorSim::HasHitLowerLimit() const {
-  return WouldHitLowerLimit(units::meter_t(m_y(0)));
+  return WouldHitLowerLimit(units::meter_t{m_y(0)});
 }
 
 bool ElevatorSim::HasHitUpperLimit() const {
-  return WouldHitUpperLimit(units::meter_t(m_y(0)));
+  return WouldHitUpperLimit(units::meter_t{m_y(0)});
 }
 
 units::meter_t ElevatorSim::GetPosition() const {
@@ -79,25 +80,27 @@ units::ampere_t ElevatorSim::GetCurrentDraw() const {
 }
 
 void ElevatorSim::SetInputVoltage(units::volt_t voltage) {
-  SetInput(frc::MakeMatrix<1, 1>(voltage.to<double>()));
+  SetInput(Vectord<1>{voltage.value()});
 }
 
-Eigen::Matrix<double, 2, 1> ElevatorSim::UpdateX(
-    const Eigen::Matrix<double, 2, 1>& currentXhat,
-    const Eigen::Matrix<double, 1, 1>& u, units::second_t dt) {
+Vectord<2> ElevatorSim::UpdateX(const Vectord<2>& currentXhat,
+                                const Vectord<1>& u, units::second_t dt) {
   auto updatedXhat = RKDP(
-      [&](const Eigen::Matrix<double, 2, 1>& x,
-          const Eigen::Matrix<double, 1, 1>& u_)
-          -> Eigen::Matrix<double, 2, 1> {
-        return m_plant.A() * x + m_plant.B() * u_ + MakeMatrix<2, 1>(0.0, -9.8);
+      [&](const Vectord<2>& x, const Vectord<1>& u_) -> Vectord<2> {
+        Vectord<2> xdot = m_plant.A() * x + m_plant.B() * u;
+
+        if (m_simulateGravity) {
+          xdot += Vectord<2>{0.0, -9.8};
+        }
+        return xdot;
       },
       currentXhat, u, dt);
   // Check for collision after updating x-hat.
-  if (WouldHitLowerLimit(units::meter_t(updatedXhat(0)))) {
-    return MakeMatrix<2, 1>(m_minHeight.to<double>(), 0.0);
+  if (WouldHitLowerLimit(units::meter_t{updatedXhat(0)})) {
+    return Vectord<2>{m_minHeight.value(), 0.0};
   }
-  if (WouldHitUpperLimit(units::meter_t(updatedXhat(0)))) {
-    return MakeMatrix<2, 1>(m_maxHeight.to<double>(), 0.0);
+  if (WouldHitUpperLimit(units::meter_t{updatedXhat(0)})) {
+    return Vectord<2>{m_maxHeight.value(), 0.0};
   }
   return updatedXhat;
 }

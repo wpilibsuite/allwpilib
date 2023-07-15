@@ -5,9 +5,14 @@
 #include "frc/Joystick.h"
 
 #include <cmath>
+#include <numbers>
 
 #include <hal/FRCUsageReporting.h>
-#include <wpi/numbers>
+#include <units/dimensionless.h>
+#include <units/math.h>
+#include <wpi/deprecated.h>
+
+#include "frc/event/BooleanEvent.h"
 
 using namespace frc;
 
@@ -61,11 +66,11 @@ int Joystick::GetThrottleChannel() const {
   return m_axes[Axis::kThrottle];
 }
 
-double Joystick::GetX(JoystickHand hand) const {
+double Joystick::GetX() const {
   return GetRawAxis(m_axes[Axis::kX]);
 }
 
-double Joystick::GetY(JoystickHand hand) const {
+double Joystick::GetY() const {
   return GetRawAxis(m_axes[Axis::kY]);
 }
 
@@ -93,6 +98,10 @@ bool Joystick::GetTriggerReleased() {
   return GetRawButtonReleased(Button::kTrigger);
 }
 
+BooleanEvent Joystick::Trigger(EventLoop* loop) const {
+  return BooleanEvent(loop, [this]() { return this->GetTrigger(); });
+}
+
 bool Joystick::GetTop() const {
   return GetRawButton(Button::kTop);
 }
@@ -105,8 +114,12 @@ bool Joystick::GetTopReleased() {
   return GetRawButtonReleased(Button::kTop);
 }
 
+BooleanEvent Joystick::Top(EventLoop* loop) const {
+  return BooleanEvent(loop, [this]() { return this->GetTop(); });
+}
+
 double Joystick::GetMagnitude() const {
-  return std::sqrt(std::pow(GetX(), 2) + std::pow(GetY(), 2));
+  return std::hypot(GetX(), GetY());
 }
 
 double Joystick::GetDirectionRadians() const {
@@ -114,5 +127,11 @@ double Joystick::GetDirectionRadians() const {
 }
 
 double Joystick::GetDirectionDegrees() const {
-  return (180 / wpi::numbers::pi) * GetDirectionRadians();
+  WPI_IGNORE_DEPRECATED
+  return (180 / std::numbers::pi) * GetDirectionRadians();
+}
+
+units::radian_t Joystick::GetDirection() const {
+  return units::math::atan2(units::dimensionless::scalar_t{GetX()},
+                            units::dimensionless::scalar_t{-GetY()});
 }

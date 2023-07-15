@@ -7,6 +7,7 @@ package edu.wpi.first.math.kinematics;
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Twist2d;
 import org.ejml.simple.SimpleMatrix;
 
 /**
@@ -15,8 +16,8 @@ import org.ejml.simple.SimpleMatrix;
  *
  * <p>The inverse kinematics (converting from a desired chassis velocity to individual wheel speeds)
  * uses the relative locations of the wheels with respect to the center of rotation. The center of
- * rotation for inverse kinematics is also variable. This means that you can set your set your
- * center of rotation in a corner of the robot to perform special evasion maneuvers.
+ * rotation for inverse kinematics is also variable. This means that you can set your center of
+ * rotation in a corner of the robot to perform special evasion maneuvers.
  *
  * <p>Forward kinematics (converting an array of wheel speeds into the overall chassis motion) is
  * performs the exact opposite of what inverse kinematics does. Since this is an overdetermined
@@ -29,7 +30,8 @@ import org.ejml.simple.SimpleMatrix;
  * <p>Forward kinematics is also used for odometry -- determining the position of the robot on the
  * field using encoders and a gyro.
  */
-public class MecanumDriveKinematics {
+public class MecanumDriveKinematics
+    implements Kinematics<MecanumDriveWheelSpeeds, MecanumDriveWheelPositions> {
   private final SimpleMatrix m_inverseKinematics;
   private final SimpleMatrix m_forwardKinematics;
 
@@ -86,7 +88,7 @@ public class MecanumDriveKinematics {
    *     component, the robot will rotate around that corner.
    * @return The wheel speeds. Use caution because they are not normalized. Sometimes, a user input
    *     may cause one of the wheel speeds to go above the attainable max velocity. Use the {@link
-   *     MecanumDriveWheelSpeeds#normalize(double)} function to rectify this issue.
+   *     MecanumDriveWheelSpeeds#desaturate(double)} function to rectify this issue.
    */
   public MecanumDriveWheelSpeeds toWheelSpeeds(
       ChassisSpeeds chassisSpeeds, Translation2d centerOfRotationMeters) {
@@ -109,12 +111,12 @@ public class MecanumDriveKinematics {
         chassisSpeeds.vyMetersPerSecond,
         chassisSpeeds.omegaRadiansPerSecond);
 
-    var wheelsMatrix = m_inverseKinematics.mult(chassisSpeedsVector);
+    var wheelsVector = m_inverseKinematics.mult(chassisSpeedsVector);
     return new MecanumDriveWheelSpeeds(
-        wheelsMatrix.get(0, 0),
-        wheelsMatrix.get(1, 0),
-        wheelsMatrix.get(2, 0),
-        wheelsMatrix.get(3, 0));
+        wheelsVector.get(0, 0),
+        wheelsVector.get(1, 0),
+        wheelsVector.get(2, 0),
+        wheelsVector.get(3, 0));
   }
 
   /**
@@ -124,6 +126,7 @@ public class MecanumDriveKinematics {
    * @param chassisSpeeds The desired chassis speed.
    * @return The wheel speeds.
    */
+  @Override
   public MecanumDriveWheelSpeeds toWheelSpeeds(ChassisSpeeds chassisSpeeds) {
     return toWheelSpeeds(chassisSpeeds, new Translation2d());
   }
@@ -136,21 +139,37 @@ public class MecanumDriveKinematics {
    * @param wheelSpeeds The current mecanum drive wheel speeds.
    * @return The resulting chassis speed.
    */
+  @Override
   public ChassisSpeeds toChassisSpeeds(MecanumDriveWheelSpeeds wheelSpeeds) {
-    var wheelSpeedsMatrix = new SimpleMatrix(4, 1);
-    wheelSpeedsMatrix.setColumn(
+    var wheelSpeedsVector = new SimpleMatrix(4, 1);
+    wheelSpeedsVector.setColumn(
         0,
         0,
         wheelSpeeds.frontLeftMetersPerSecond,
         wheelSpeeds.frontRightMetersPerSecond,
         wheelSpeeds.rearLeftMetersPerSecond,
         wheelSpeeds.rearRightMetersPerSecond);
-    var chassisSpeedsVector = m_forwardKinematics.mult(wheelSpeedsMatrix);
+    var chassisSpeedsVector = m_forwardKinematics.mult(wheelSpeedsVector);
 
     return new ChassisSpeeds(
         chassisSpeedsVector.get(0, 0),
         chassisSpeedsVector.get(1, 0),
         chassisSpeedsVector.get(2, 0));
+  }
+
+  @Override
+  public Twist2d toTwist2d(MecanumDriveWheelPositions wheelDeltas) {
+    var wheelDeltasVector = new SimpleMatrix(4, 1);
+    wheelDeltasVector.setColumn(
+        0,
+        0,
+        wheelDeltas.frontLeftMeters,
+        wheelDeltas.frontRightMeters,
+        wheelDeltas.rearLeftMeters,
+        wheelDeltas.rearRightMeters);
+    var twist = m_forwardKinematics.mult(wheelDeltasVector);
+
+    return new Twist2d(twist.get(0, 0), twist.get(1, 0), twist.get(2, 0));
   }
 
   /**

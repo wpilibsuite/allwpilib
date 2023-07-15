@@ -14,7 +14,7 @@ using namespace glass;
 static const char* stations[] = {"Red 1",  "Red 2",  "Red 3",
                                  "Blue 1", "Blue 2", "Blue 3"};
 
-void glass::DisplayFMS(FMSModel* model, bool* matchTimeEnabled) {
+void glass::DisplayFMS(FMSModel* model) {
   if (!model->Exists() || model->IsReadOnly()) {
     return DisplayFMSReadOnly(model);
   }
@@ -49,10 +49,6 @@ void glass::DisplayFMS(FMSModel* model, bool* matchTimeEnabled) {
 
   // Match Time
   if (auto data = model->GetMatchTimeData()) {
-    if (matchTimeEnabled) {
-      ImGui::Checkbox("Match Time Enabled", matchTimeEnabled);
-    }
-
     double val = data->GetValue();
     ImGui::SetNextItemWidth(ImGui::GetFontSize() * 8);
     if (ImGui::InputDouble("Match Time", &val, 0, 0, "%.1f",
@@ -60,9 +56,17 @@ void glass::DisplayFMS(FMSModel* model, bool* matchTimeEnabled) {
       model->SetMatchTime(val);
     }
     data->EmitDrag();
+    bool enabled = false;
+    if (auto enabledData = model->GetEnabledData()) {
+      enabled = enabledData->GetValue();
+    }
     ImGui::SameLine();
-    if (ImGui::Button("Reset")) {
-      model->SetMatchTime(0.0);
+    if (ImGui::Button("Auto") && !enabled) {
+      model->SetMatchTime(15.0);
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Teleop") && !enabled) {
+      model->SetMatchTime(135.0);
     }
   }
 

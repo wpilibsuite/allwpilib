@@ -8,33 +8,12 @@
 
 using namespace frc;
 
-MecanumDriveOdometry::MecanumDriveOdometry(MecanumDriveKinematics kinematics,
-                                           const Rotation2d& gyroAngle,
-                                           const Pose2d& initialPose)
-    : m_kinematics(kinematics), m_pose(initialPose) {
-  m_previousAngle = m_pose.Rotation();
-  m_gyroOffset = m_pose.Rotation() - gyroAngle;
+MecanumDriveOdometry::MecanumDriveOdometry(
+    MecanumDriveKinematics kinematics, const Rotation2d& gyroAngle,
+    const MecanumDriveWheelPositions& wheelPositions, const Pose2d& initialPose)
+    : Odometry<MecanumDriveWheelSpeeds, MecanumDriveWheelPositions>(
+          m_kinematicsImpl, gyroAngle, wheelPositions, initialPose),
+      m_kinematicsImpl(kinematics) {
   wpi::math::MathSharedStore::ReportUsage(
       wpi::math::MathUsageId::kOdometry_MecanumDrive, 1);
-}
-
-const Pose2d& MecanumDriveOdometry::UpdateWithTime(
-    units::second_t currentTime, const Rotation2d& gyroAngle,
-    MecanumDriveWheelSpeeds wheelSpeeds) {
-  units::second_t deltaTime =
-      (m_previousTime >= 0_s) ? currentTime - m_previousTime : 0_s;
-  m_previousTime = currentTime;
-
-  auto angle = gyroAngle + m_gyroOffset;
-
-  auto [dx, dy, dtheta] = m_kinematics.ToChassisSpeeds(wheelSpeeds);
-  static_cast<void>(dtheta);
-
-  auto newPose = m_pose.Exp(
-      {dx * deltaTime, dy * deltaTime, (angle - m_previousAngle).Radians()});
-
-  m_previousAngle = angle;
-  m_pose = {newPose.Translation(), angle};
-
-  return m_pose;
 }

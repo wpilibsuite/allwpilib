@@ -35,72 +35,168 @@ class XboxController : public GenericHID {
   XboxController& operator=(XboxController&&) = default;
 
   /**
-   * Get the X axis value of the controller.
+   * Get the X axis value of left side of the controller.
    *
-   * @param hand Side of controller whose value should be returned.
+   * @return the axis value
    */
-  double GetX(JoystickHand hand) const override;
+  double GetLeftX() const;
 
   /**
-   * Get the Y axis value of the controller.
+   * Get the X axis value of right side of the controller.
    *
-   * @param hand Side of controller whose value should be returned.
+   * @return the axis value
    */
-  double GetY(JoystickHand hand) const override;
+  double GetRightX() const;
 
   /**
-   * Get the trigger axis value of the controller.
+   * Get the Y axis value of left side of the controller.
    *
-   * @param hand Side of controller whose value should be returned.
+   * @return the axis value
    */
-  double GetTriggerAxis(JoystickHand hand) const;
+  double GetLeftY() const;
 
   /**
-   * Read the value of the bumper button on the controller.
+   * Get the Y axis value of right side of the controller.
    *
-   * @param hand Side of controller whose value should be returned.
+   * @return the axis value
    */
-  bool GetBumper(JoystickHand hand) const;
+  double GetRightY() const;
 
   /**
-   * Whether the bumper was pressed since the last check.
+   * Get the left trigger (LT) axis value of the controller. Note that this axis
+   * is bound to the range of [0, 1] as opposed to the usual [-1, 1].
    *
-   * @param hand Side of controller whose value should be returned.
-   * @return Whether the button was pressed since the last check.
+   * @return the axis value
    */
-  bool GetBumperPressed(JoystickHand hand);
+  double GetLeftTriggerAxis() const;
 
   /**
-   * Whether the bumper was released since the last check.
+   * Get the right trigger (RT) axis value of the controller. Note that this
+   * axis is bound to the range of [0, 1] as opposed to the usual [-1, 1].
    *
-   * @param hand Side of controller whose value should be returned.
+   * @return the axis value
+   */
+  double GetRightTriggerAxis() const;
+
+  /**
+   * Read the value of the left bumper (LB) button on the controller.
+   *
+   * @return the state of the button
+   */
+  bool GetLeftBumper() const;
+
+  /**
+   * Read the value of the right bumper (RB) button on the controller.
+   *
+   * @return the state of the button
+   */
+  bool GetRightBumper() const;
+
+  /**
+   * Whether the left bumper (LB) was pressed since the last check.
+   *
+   * @return Whether the button was pressed since the last check
+   */
+  bool GetLeftBumperPressed();
+
+  /**
+   * Whether the right bumper (RB) was pressed since the last check.
+   *
+   * @return Whether the button was pressed since the last check
+   */
+  bool GetRightBumperPressed();
+
+  /**
+   * Whether the left bumper (LB) was released since the last check.
+   *
    * @return Whether the button was released since the last check.
    */
-  bool GetBumperReleased(JoystickHand hand);
+  bool GetLeftBumperReleased();
 
   /**
-   * Read the value of the stick button on the controller.
+   * Whether the right bumper (RB) was released since the last check.
    *
-   * @param hand Side of controller whose value should be returned.
-   * @return The state of the button.
-   */
-  bool GetStickButton(JoystickHand hand) const;
-
-  /**
-   * Whether the stick button was pressed since the last check.
-   *
-   * @param hand Side of controller whose value should be returned.
-   * @return Whether the button was pressed since the last check.
-   */
-  bool GetStickButtonPressed(JoystickHand hand);
-
-  /**
-   * Whether the stick button was released since the last check.
-   *
-   * @param hand Side of controller whose value should be returned.
    * @return Whether the button was released since the last check.
    */
-  bool GetStickButtonReleased(JoystickHand hand);
+  bool GetRightBumperReleased();
+
+  /**
+   * Constructs an event instance around the left bumper's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the left bumper's digital signal
+   * attached to the given loop.
+   */
+  BooleanEvent LeftBumper(EventLoop* loop) const;
+
+  /**
+   * Constructs an event instance around the right bumper's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the right bumper's digital signal
+   * attached to the given loop.
+   */
+  BooleanEvent RightBumper(EventLoop* loop) const;
+
+  /**
+   * Read the value of the left stick button (LSB) on the controller.
+   *
+   * @return the state of the button
+   */
+  bool GetLeftStickButton() const;
+
+  /**
+   * Read the value of the right stick button (RSB) on the controller.
+   *
+   * @return the state of the button
+   */
+  bool GetRightStickButton() const;
+
+  /**
+   * Whether the left stick button (LSB) was pressed since the last check.
+   *
+   * @return Whether the button was pressed since the last check.
+   */
+  bool GetLeftStickButtonPressed();
+
+  /**
+   * Whether the right stick button (RSB) was pressed since the last check.
+   *
+   * @return Whether the button was pressed since the last check
+   */
+  bool GetRightStickButtonPressed();
+
+  /**
+   * Whether the left stick button (LSB) was released since the last check.
+   *
+   * @return Whether the button was released since the last check.
+   */
+  bool GetLeftStickButtonReleased();
+
+  /**
+   * Whether the right stick button (RSB) was released since the last check.
+   *
+   * @return Whether the button was released since the last check.
+   */
+  bool GetRightStickButtonReleased();
+
+  /**
+   * Constructs an event instance around the left stick's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the left stick's digital signal
+   * attached to the given loop.
+   */
+  BooleanEvent LeftStick(EventLoop* loop) const;
+
+  /**
+   * Constructs an event instance around the right stick's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the right stick's digital signal
+   * attached to the given loop.
+   */
+  BooleanEvent RightStick(EventLoop* loop) const;
 
   /**
    * Read the value of the A button on the controller.
@@ -124,6 +220,15 @@ class XboxController : public GenericHID {
   bool GetAButtonReleased();
 
   /**
+   * Constructs an event instance around the A button's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the A button's digital signal
+   * attached to the given loop.
+   */
+  BooleanEvent A(EventLoop* loop) const;
+
+  /**
    * Read the value of the B button on the controller.
    *
    * @return The state of the button.
@@ -143,6 +248,15 @@ class XboxController : public GenericHID {
    * @return Whether the button was released since the last check.
    */
   bool GetBButtonReleased();
+
+  /**
+   * Constructs an event instance around the B button's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the B button's digital signal
+   * attached to the given loop.
+   */
+  BooleanEvent B(EventLoop* loop) const;
 
   /**
    * Read the value of the X button on the controller.
@@ -166,6 +280,15 @@ class XboxController : public GenericHID {
   bool GetXButtonReleased();
 
   /**
+   * Constructs an event instance around the X button's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the X button's digital signal
+   * attached to the given loop.
+   */
+  BooleanEvent X(EventLoop* loop) const;
+
+  /**
    * Read the value of the Y button on the controller.
    *
    * @return The state of the button.
@@ -187,9 +310,18 @@ class XboxController : public GenericHID {
   bool GetYButtonReleased();
 
   /**
-   * Whether the Y button was released since the last check.
+   * Constructs an event instance around the Y button's digital signal.
    *
-   * @return Whether the button was released since the last check.
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the Y button's digital signal
+   * attached to the given loop.
+   */
+  BooleanEvent Y(EventLoop* loop) const;
+
+  /**
+   * Read the value of the back button on the controller.
+   *
+   * @return The state of the button.
    */
   bool GetBackButton() const;
 
@@ -208,9 +340,17 @@ class XboxController : public GenericHID {
   bool GetBackButtonReleased();
 
   /**
+   * Constructs an event instance around the back button's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the back button's digital signal
+   * attached to the given loop.
+   */
+  BooleanEvent Back(EventLoop* loop) const;
+
+  /**
    * Read the value of the start button on the controller.
    *
-   * @param hand Side of controller whose value should be returned.
    * @return The state of the button.
    */
   bool GetStartButton() const;
@@ -229,26 +369,79 @@ class XboxController : public GenericHID {
    */
   bool GetStartButtonReleased();
 
-  enum class Button {
-    kBumperLeft = 5,
-    kBumperRight = 6,
-    kStickLeft = 9,
-    kStickRight = 10,
-    kA = 1,
-    kB = 2,
-    kX = 3,
-    kY = 4,
-    kBack = 7,
-    kStart = 8
+  /**
+   * Constructs an event instance around the start button's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the start button's digital signal
+   * attached to the given loop.
+   */
+  BooleanEvent Start(EventLoop* loop) const;
+
+  /**
+   * Constructs an event instance around the axis value of the left trigger. The
+   * returned trigger will be true when the axis value is greater than {@code
+   * threshold}.
+   * @param threshold the minimum axis value for the returned event to be true.
+   * This value should be in the range [0, 1] where 0 is the unpressed state of
+   * the axis.
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance that is true when the left trigger's axis exceeds
+   * the provided threshold, attached to the given event loop
+   */
+  BooleanEvent LeftTrigger(double threshold, EventLoop* loop) const;
+
+  /**
+   * Constructs an event instance around the axis value of the left trigger.
+   * The returned trigger will be true when the axis value is greater than 0.5.
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance that is true when the left trigger's axis
+   * exceeds 0.5, attached to the given event loop
+   */
+  BooleanEvent LeftTrigger(EventLoop* loop) const;
+
+  /**
+   * Constructs an event instance around the axis value of the right trigger.
+   * The returned trigger will be true when the axis value is greater than
+   * {@code threshold}.
+   * @param threshold the minimum axis value for the returned event to be true.
+   * This value should be in the range [0, 1] where 0 is the unpressed state of
+   * the axis.
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance that is true when the right trigger's axis
+   * exceeds the provided threshold, attached to the given event loop
+   */
+  BooleanEvent RightTrigger(double threshold, EventLoop* loop) const;
+
+  /**
+   * Constructs an event instance around the axis value of the right trigger.
+   * The returned trigger will be true when the axis value is greater than 0.5.
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance that is true when the right trigger's axis
+   * exceeds 0.5, attached to the given event loop
+   */
+  BooleanEvent RightTrigger(EventLoop* loop) const;
+
+  struct Button {
+    static constexpr int kLeftBumper = 5;
+    static constexpr int kRightBumper = 6;
+    static constexpr int kLeftStick = 9;
+    static constexpr int kRightStick = 10;
+    static constexpr int kA = 1;
+    static constexpr int kB = 2;
+    static constexpr int kX = 3;
+    static constexpr int kY = 4;
+    static constexpr int kBack = 7;
+    static constexpr int kStart = 8;
   };
 
-  enum class Axis {
-    kLeftX = 0,
-    kRightX = 4,
-    kLeftY = 1,
-    kRightY = 5,
-    kLeftTrigger = 2,
-    kRightTrigger = 3
+  struct Axis {
+    static constexpr int kLeftX = 0;
+    static constexpr int kRightX = 4;
+    static constexpr int kLeftY = 1;
+    static constexpr int kRightY = 5;
+    static constexpr int kLeftTrigger = 2;
+    static constexpr int kRightTrigger = 3;
   };
 };
 

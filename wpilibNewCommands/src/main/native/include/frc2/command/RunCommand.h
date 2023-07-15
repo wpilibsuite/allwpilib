@@ -6,20 +6,21 @@
 
 #include <functional>
 #include <initializer_list>
+#include <span>
 
-#include <wpi/span.h>
-
-#include "frc2/command/CommandBase.h"
 #include "frc2/command/CommandHelper.h"
+#include "frc2/command/FunctionalCommand.h"
 
 namespace frc2 {
 /**
  * A command that runs a Runnable continuously.  Has no end condition as-is;
  * either subclass it or use Command.WithTimeout() or
- * Command.WithInterrupt() to give it one.  If you only wish
+ * Command.Until() to give it one.  If you only wish
  * to execute a Runnable once, use InstantCommand.
+ *
+ * This class is provided by the NewCommands VendorDep
  */
-class RunCommand : public CommandHelper<CommandBase, RunCommand> {
+class RunCommand : public CommandHelper<FunctionalCommand, RunCommand> {
  public:
   /**
    * Creates a new RunCommand.  The Runnable will be run continuously until the
@@ -39,15 +40,10 @@ class RunCommand : public CommandHelper<CommandBase, RunCommand> {
    * @param requirements the subsystems to require
    */
   explicit RunCommand(std::function<void()> toRun,
-                      wpi::span<Subsystem* const> requirements = {});
+                      std::span<Subsystem* const> requirements = {});
 
   RunCommand(RunCommand&& other) = default;
 
   RunCommand(const RunCommand& other) = default;
-
-  void Execute() override;
-
- protected:
-  std::function<void()> m_toRun;
 };
 }  // namespace frc2

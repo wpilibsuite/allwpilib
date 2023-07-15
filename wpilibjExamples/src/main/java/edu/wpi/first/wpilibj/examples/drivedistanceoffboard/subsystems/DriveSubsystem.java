@@ -9,9 +9,9 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.examples.drivedistanceoffboard.Constants.DriveConstants;
 import edu.wpi.first.wpilibj.examples.drivedistanceoffboard.ExampleSmartMotorController;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 
-public class DriveSubsystem extends SubsystemBase {
+public class DriveSubsystem extends Subsystem {
   // The motors on the left side of the drive.
   private final ExampleSmartMotorController m_leftLeader =
       new ExampleSmartMotorController(DriveConstants.kLeftMotor1Port);
@@ -19,12 +19,14 @@ public class DriveSubsystem extends SubsystemBase {
   private final ExampleSmartMotorController m_leftFollower =
       new ExampleSmartMotorController(DriveConstants.kLeftMotor2Port);
 
+  // The motors on the right side of the drive.
   private final ExampleSmartMotorController m_rightLeader =
       new ExampleSmartMotorController(DriveConstants.kRightMotor1Port);
 
   private final ExampleSmartMotorController m_rightFollower =
       new ExampleSmartMotorController(DriveConstants.kRightMotor2Port);
 
+  // The feedforward controller.
   private final SimpleMotorFeedforward m_feedforward =
       new SimpleMotorFeedforward(
           DriveConstants.ksVolts,

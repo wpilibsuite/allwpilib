@@ -4,33 +4,39 @@
 
 package edu.wpi.first.wpilibj.smartdashboard;
 
+import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.NTSendable;
 import edu.wpi.first.networktables.NTSendableBuilder;
 import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
 /**
- * Visual 2D representation of arms, elevators, and general mechanisms; through a node-based API.
+ * Visual 2D representation of arms, elevators, and general mechanisms through a node-based API.
  *
- * <p>A Mechanism2d object is published and contains at least one root node. Other nodes (such as
- * ligaments) are recursively based on other nodes.
+ * <p>A Mechanism2d object is published and contains at least one root node. A root is the anchor
+ * point of other nodes (such as ligaments). Other nodes are recursively appended based on other
+ * nodes.
  *
  * @see MechanismObject2d
  * @see MechanismLigament2d
  * @see MechanismRoot2d
  */
-public final class Mechanism2d implements NTSendable {
-  private static final String kBackgroundColor = "backgroundColor";
+public final class Mechanism2d implements NTSendable, AutoCloseable {
   private NetworkTable m_table;
   private final Map<String, MechanismRoot2d> m_roots;
   private final double[] m_dims = new double[2];
   private String m_color;
+  private DoubleArrayPublisher m_dimsPub;
+  private StringPublisher m_colorPub;
 
   /**
    * Create a new Mechanism2d with the given dimensions and default color (dark blue).
+   *
+   * <p>The dimensions represent the canvas that all the nodes are drawn on.
    *
    * @param width the width
    * @param height the height
@@ -42,6 +48,8 @@ public final class Mechanism2d implements NTSendable {
   /**
    * Create a new Mechanism2d with the given dimensions.
    *
+   * <p>The dimensions represent the canvas that all the nodes are drawn on.
+   *
    * @param width the width
    * @param height the height
    * @param backgroundColor the background color. Defaults to dark blue.
@@ -51,6 +59,19 @@ public final class Mechanism2d implements NTSendable {
     m_dims[0] = width;
     m_dims[1] = height;
     setBackgroundColor(backgroundColor);
+  }
+
+  @Override
+  public void close() {
+    if (m_dimsPub != null) {
+      m_dimsPub.close();
+    }
+    if (m_colorPub != null) {
+      m_colorPub.close();
+    }
+    for (MechanismRoot2d root : m_roots.values()) {
+      root.close();
+    }
   }
 
   /**
@@ -83,19 +104,27 @@ public final class Mechanism2d implements NTSendable {
    * @param color the new color
    */
   public synchronized void setBackgroundColor(Color8Bit color) {
-    this.m_color = String.format("#%02X%02X%02X", color.red, color.green, color.blue);
-    if (m_table != null) {
-      m_table.getEntry(kBackgroundColor).setString(m_color);
+    m_color = color.toHexString();
+    if (m_colorPub != null) {
+      m_colorPub.set(m_color);
     }
   }
 
   @Override
   public void initSendable(NTSendableBuilder builder) {
     builder.setSmartDashboardType("Mechanism2d");
-    m_table = builder.getTable();
-    m_table.getEntry("dims").setDoubleArray(m_dims);
-    m_table.getEntry(kBackgroundColor).setString(m_color);
     synchronized (this) {
+      m_table = builder.getTable();
+      if (m_dimsPub != null) {
+        m_dimsPub.close();
+      }
+      m_dimsPub = m_table.getDoubleArrayTopic("dims").publish();
+      m_dimsPub.set(m_dims);
+      if (m_colorPub != null) {
+        m_colorPub.close();
+      }
+      m_colorPub = m_table.getStringTopic("backgroundColor").publish();
+      m_colorPub.set(m_color);
       for (Entry<String, MechanismRoot2d> entry : m_roots.entrySet()) {
         String name = entry.getKey();
         MechanismRoot2d root = entry.getValue();

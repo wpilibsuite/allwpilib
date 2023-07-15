@@ -4,41 +4,42 @@
 
 #pragma once
 
+#include <concepts>
+
 #include <fmt/format.h>
 
 #include "Eigen/Core"
+#include "Eigen/SparseCore"
 
-template <int Rows, int Cols, int... Args>
-struct fmt::formatter<Eigen::Matrix<double, Rows, Cols, Args...>> {
-  char presentation = 'f';
-
+/**
+ * Formatter for classes derived from Eigen::MatrixBase<Derived> or
+ * Eigen::SparseCompressedBase<Derived>.
+ */
+template <typename Derived, typename CharT>
+  requires std::derived_from<Derived, Eigen::MatrixBase<Derived>> ||
+           std::derived_from<Derived, Eigen::SparseCompressedBase<Derived>>
+struct fmt::formatter<Derived, CharT> {
   constexpr auto parse(fmt::format_parse_context& ctx) {
-    auto it = ctx.begin(), end = ctx.end();
-    if (it != end && (*it == 'f' || *it == 'e')) {
-      presentation = *it++;
-    }
-
-    if (it != end && *it != '}') {
-      throw fmt::format_error("invalid format");
-    }
-
-    return it;
+    return m_underlying.parse(ctx);
   }
 
-  template <typename FormatContext>
-  auto format(const Eigen::Matrix<double, Rows, Cols, Args...>& mat,
-              FormatContext& ctx) {
+  auto format(const Derived& mat, fmt::format_context& ctx) const {
     auto out = ctx.out();
-    for (int i = 0; i < Rows; ++i) {
-      for (int j = 0; j < Cols; ++j) {
-        out = fmt::format_to(out, "  {:f}", mat(i, j));
+
+    for (int row = 0; row < mat.rows(); ++row) {
+      for (int col = 0; col < mat.cols(); ++col) {
+        out = fmt::format_to(out, "  ");
+        out = m_underlying.format(mat.coeff(row, col), ctx);
       }
 
-      if (i < Rows - 1) {
+      if (row < mat.rows() - 1) {
         out = fmt::format_to(out, "\n");
       }
     }
 
     return out;
   }
+
+ private:
+  fmt::formatter<typename Derived::Scalar, CharT> m_underlying;
 };

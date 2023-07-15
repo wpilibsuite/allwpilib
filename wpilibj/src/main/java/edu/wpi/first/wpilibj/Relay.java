@@ -4,11 +4,12 @@
 
 package edu.wpi.first.wpilibj;
 
-import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.RelayJNI;
+import edu.wpi.first.hal.util.HalHandleException;
 import edu.wpi.first.hal.util.UncleanStatusException;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -30,7 +31,6 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
    * This class represents errors in trying to set relay values contradictory to the direction to
    * which the relay is set.
    */
-  @SuppressWarnings("serial")
   public static class InvalidValueException extends RuntimeException {
     /**
      * Create a new exception with the given message.
@@ -135,12 +135,12 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
   private void freeRelay() {
     try {
       RelayJNI.setRelay(m_forwardHandle, false);
-    } catch (UncleanStatusException ignored) {
+    } catch (UncleanStatusException | HalHandleException ignored) {
       // do nothing. Ignore
     }
     try {
       RelayJNI.setRelay(m_reverseHandle, false);
-    } catch (UncleanStatusException ignored) {
+    } catch (UncleanStatusException | HalHandleException ignored) {
       // do nothing. Ignore
     }
 
@@ -159,7 +159,7 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
    * <p>When set to kBothDirections, the relay can be set to any of the four states: 0v-0v, 12v-0v,
    * 0v-12v, 12v-12v
    *
-   * <p>When set to kForwardOnly or kReverseOnly, you can specify the constant for the direction or
+   * <p>When set to kForwardOnly or kReverseOnly, you can specify the constant for the direction, or
    * you can simply specify kOff and kOn. Using only kOff and kOn is recommended.
    *
    * @param value The state to set the relay.

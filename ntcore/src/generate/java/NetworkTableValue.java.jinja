@@ -1,0 +1,248 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+package edu.wpi.first.networktables;
+
+import java.util.Objects;
+
+/** A network table entry value. */
+@SuppressWarnings({"UnnecessaryParentheses", "PMD.MethodReturnsInternalArray"})
+public final class NetworkTableValue {
+  NetworkTableValue(NetworkTableType type, Object value, long time, long serverTime) {
+    m_type = type;
+    m_value = value;
+    m_time = time;
+    m_serverTime = serverTime;
+  }
+
+  NetworkTableValue(NetworkTableType type, Object value, long time) {
+    this(type, value, time, time == 0 ? 0 : 1);
+  }
+
+  NetworkTableValue(NetworkTableType type, Object value) {
+    this(type, value, NetworkTablesJNI.now(), 1);
+  }
+
+  NetworkTableValue(int type, Object value, long time, long serverTime) {
+    this(NetworkTableType.getFromInt(type), value, time, serverTime);
+  }
+
+  /**
+   * Get the data type.
+   *
+   * @return The type.
+   */
+  public NetworkTableType getType() {
+    return m_type;
+  }
+
+  /**
+   * Get the data value stored.
+   *
+   * @return The type.
+   */
+  public Object getValue() {
+    return m_value;
+  }
+
+  /**
+   * Get the creation time of the value in local time.
+   *
+   * @return The time, in the units returned by NetworkTablesJNI.now().
+   */
+  public long getTime() {
+    return m_time;
+  }
+
+  /**
+   * Get the creation time of the value in server time.
+   *
+   * @return The server time.
+   */
+  public long getServerTime() {
+    return m_serverTime;
+  }
+
+  /*
+   * Type Checkers
+   */
+
+  /**
+   * Determine if entry value contains a value or is unassigned.
+   *
+   * @return True if the entry value contains a value.
+   */
+  public boolean isValid() {
+    return m_type != NetworkTableType.kUnassigned;
+  }
+{% for t in types %}
+  /**
+   * Determine if entry value contains a {{ t.java.ValueType }}.
+   *
+   * @return True if the entry value is of {{ t.java.ValueType }} type.
+   */
+  public boolean is{{ t.TypeName }}() {
+    return m_type == NetworkTableType.k{{ t.TypeName }};
+  }
+{% endfor %}
+  /*
+   * Type-Safe Getters
+   */
+{% for t in types %}
+  /**
+   * Get the {{ t.java.ValueType }} value.
+   *
+   * @return The {{ t.java.ValueType }} value.
+   * @throws ClassCastException if the entry value is not of {{ t.java.ValueType }} type.
+   */
+  public {{ t.java.ValueType }} get{{ t.TypeName }}() {
+    if (m_type != NetworkTableType.k{{ t.TypeName }}) {
+      throw new ClassCastException("cannot convert " + m_type + " to {{ t.java.ValueType }}");
+    }
+    return {{ t.java.FromStorageBegin }}m_value{{ t.java.FromStorageEnd }};
+  }
+{% endfor %}
+  /*
+   * Factory functions.
+   */
+{% for t in types %}
+  /**
+   * Creates a {{ t.java.ValueType }} value.
+   *
+   * @param value the value
+   * @return The entry value
+   */
+  public static NetworkTableValue make{{ t.TypeName }}({{ t.java.ValueType }} value) {
+    return new NetworkTableValue(NetworkTableType.k{{ t.TypeName }}, {{ t.java.ToWrapObject }}(value));
+  }
+
+  /**
+   * Creates a {{ t.java.ValueType }} value.
+   *
+   * @param value the value
+   * @param time the creation time to use (instead of the current time)
+   * @return The entry value
+   */
+  public static NetworkTableValue make{{ t.TypeName }}({{ t.java.ValueType }} value, long time) {
+    return new NetworkTableValue(NetworkTableType.k{{ t.TypeName }}, {{ t.java.ToWrapObject }}(value), time);
+  }
+{% if t.java.WrapValueType %}
+  /**
+   * Creates a {{ t.java.ValueType }} value.
+   *
+   * @param value the value
+   * @return The entry value
+   */
+  public static NetworkTableValue make{{ t.TypeName }}({{ t.java.WrapValueType }} value) {
+    return new NetworkTableValue(NetworkTableType.k{{ t.TypeName }}, toNative{{ t.TypeName }}(value));
+  }
+
+  /**
+   * Creates a {{ t.java.ValueType }} value.
+   *
+   * @param value the value
+   * @param time the creation time to use (instead of the current time)
+   * @return The entry value
+   */
+  public static NetworkTableValue make{{ t.TypeName }}({{ t.java.WrapValueType }} value, long time) {
+    return new NetworkTableValue(NetworkTableType.k{{ t.TypeName }}, toNative{{ t.TypeName }}(value), time);
+  }
+{% endif -%}
+{% endfor %}
+  @Override
+  public boolean equals(Object other) {
+    if (other == this) {
+      return true;
+    }
+    if (!(other instanceof NetworkTableValue)) {
+      return false;
+    }
+    NetworkTableValue ntOther = (NetworkTableValue) other;
+    return m_type == ntOther.m_type && m_value.equals(ntOther.m_value);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(m_type, m_value);
+  }
+
+  // arraycopy() doesn't know how to unwrap boxed values; this is a false positive in PMD
+  // (see https://sourceforge.net/p/pmd/bugs/804/)
+  @SuppressWarnings("PMD.AvoidArrayLoops")
+  static boolean[] toNativeBooleanArray(Boolean[] arr) {
+    boolean[] out = new boolean[arr.length];
+    for (int i = 0; i < arr.length; i++) {
+      out[i] = arr[i];
+    }
+    return out;
+  }
+
+  @SuppressWarnings("PMD.AvoidArrayLoops")
+  static double[] toNativeDoubleArray(Number[] arr) {
+    double[] out = new double[arr.length];
+    for (int i = 0; i < arr.length; i++) {
+      out[i] = arr[i].doubleValue();
+    }
+    return out;
+  }
+
+  @SuppressWarnings("PMD.AvoidArrayLoops")
+  static long[] toNativeIntegerArray(Number[] arr) {
+    long[] out = new long[arr.length];
+    for (int i = 0; i < arr.length; i++) {
+      out[i] = arr[i].longValue();
+    }
+    return out;
+  }
+
+  @SuppressWarnings("PMD.AvoidArrayLoops")
+  static float[] toNativeFloatArray(Number[] arr) {
+    float[] out = new float[arr.length];
+    for (int i = 0; i < arr.length; i++) {
+      out[i] = arr[i].floatValue();
+    }
+    return out;
+  }
+
+  @SuppressWarnings("PMD.AvoidArrayLoops")
+  static Boolean[] fromNativeBooleanArray(boolean[] arr) {
+    Boolean[] out = new Boolean[arr.length];
+    for (int i = 0; i < arr.length; i++) {
+      out[i] = arr[i];
+    }
+    return out;
+  }
+
+  @SuppressWarnings("PMD.AvoidArrayLoops")
+  static Long[] fromNativeIntegerArray(long[] arr) {
+    Long[] out = new Long[arr.length];
+    for (int i = 0; i < arr.length; i++) {
+      out[i] = arr[i];
+    }
+    return out;
+  }
+
+  @SuppressWarnings("PMD.AvoidArrayLoops")
+  static Float[] fromNativeFloatArray(float[] arr) {
+    Float[] out = new Float[arr.length];
+    for (int i = 0; i < arr.length; i++) {
+      out[i] = arr[i];
+    }
+    return out;
+  }
+
+  @SuppressWarnings("PMD.AvoidArrayLoops")
+  static Double[] fromNativeDoubleArray(double[] arr) {
+    Double[] out = new Double[arr.length];
+    for (int i = 0; i < arr.length; i++) {
+      out[i] = arr[i];
+    }
+    return out;
+  }
+
+  private NetworkTableType m_type;
+  private Object m_value;
+  private long m_time;
+  private long m_serverTime;
+}

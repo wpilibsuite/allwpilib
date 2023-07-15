@@ -20,7 +20,7 @@ namespace frc {
 int GetThreadPriority(std::thread& thread, bool* isRealTime);
 
 /**
- * Get the thread priority for the current thread
+ * Get the thread priority for the current thread.
  *
  * @param isRealTime Set to true if thread is real-time, otherwise false.
  * @return           The current thread priority. For real-time, this is 1-99
@@ -30,7 +30,7 @@ int GetThreadPriority(std::thread& thread, bool* isRealTime);
 int GetCurrentThreadPriority(bool* isRealTime);
 
 /**
- * Sets the thread priority for the specified thread
+ * Sets the thread priority for the specified thread.
  *
  * @param thread   Reference to the thread to set the priority of.
  * @param realTime Set to true to set a real-time priority, false for standard
@@ -43,7 +43,7 @@ int GetCurrentThreadPriority(bool* isRealTime);
 bool SetThreadPriority(std::thread& thread, bool realTime, int priority);
 
 /**
- * Sets the thread priority for the current thread
+ * Sets the thread priority for the current thread.
  *
  * @param realTime Set to true to set a real-time priority, false for standard
  *                 priority.

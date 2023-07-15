@@ -4,7 +4,6 @@
 
 package edu.wpi.first.hal;
 
-@SuppressWarnings("AbbreviationAsWordInName")
 public final class HALValue {
   public static final int kUnassigned = 0;
   public static final int kBoolean = 0x01;
@@ -147,15 +146,15 @@ public final class HALValue {
    */
   public static HALValue fromNative(int type, long value1, double value2) {
     switch (type) {
-      case 0x01:
+      case kBoolean:
         return makeBoolean(value1 != 0);
-      case 0x02:
+      case kDouble:
         return makeDouble(value2);
-      case 0x16:
+      case kEnum:
         return makeEnum((int) value1);
-      case 0x32:
+      case kInt:
         return makeInt((int) value1);
-      case 0x64:
+      case kLong:
         return makeLong(value1);
       default:
         return makeUnassigned();

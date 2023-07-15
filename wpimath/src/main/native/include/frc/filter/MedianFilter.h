@@ -45,13 +45,13 @@ class MedianFilter {
       m_orderedValues.erase(std::find(m_orderedValues.begin(),
                                       m_orderedValues.end(),
                                       m_valueBuffer.pop_back()));
-      curSize = curSize - 1;
+      --curSize;
     }
 
     // Add next value to circular buffer
     m_valueBuffer.push_front(next);
 
-    if (curSize % 2 == 1) {
+    if (curSize % 2 != 0) {
       // If size is odd, return middle element of sorted list
       return m_orderedValues[curSize / 2];
     } else {

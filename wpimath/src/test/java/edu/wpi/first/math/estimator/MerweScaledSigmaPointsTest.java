@@ -11,12 +11,12 @@ import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import org.junit.jupiter.api.Test;
 
-public class MerweScaledSigmaPointsTest {
+class MerweScaledSigmaPointsTest {
   @Test
-  public void testZeroMeanPoints() {
+  void testZeroMeanPoints() {
     var merweScaledSigmaPoints = new MerweScaledSigmaPoints<>(Nat.N2());
     var points =
-        merweScaledSigmaPoints.sigmaPoints(
+        merweScaledSigmaPoints.squareRootSigmaPoints(
             VecBuilder.fill(0, 0), Matrix.mat(Nat.N2(), Nat.N2()).fill(1, 0, 0, 1));
 
     assertTrue(
@@ -28,11 +28,11 @@ public class MerweScaledSigmaPointsTest {
   }
 
   @Test
-  public void testNonzeroMeanPoints() {
+  void testNonzeroMeanPoints() {
     var merweScaledSigmaPoints = new MerweScaledSigmaPoints<>(Nat.N2());
     var points =
-        merweScaledSigmaPoints.sigmaPoints(
-            VecBuilder.fill(1, 2), Matrix.mat(Nat.N2(), Nat.N2()).fill(1, 0, 0, 10));
+        merweScaledSigmaPoints.squareRootSigmaPoints(
+            VecBuilder.fill(1, 2), Matrix.mat(Nat.N2(), Nat.N2()).fill(1, 0, 0, Math.sqrt(10)));
 
     assertTrue(
         points.isEqual(

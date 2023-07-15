@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.interfaces.Accelerometer.Range;
  * <p>For example, setting a number to be displayed with a slider:
  *
  * <pre>{@code
- * NetworkTableEntry example = Shuffleboard.getTab("My Tab")
+ * GenericEntry example = Shuffleboard.getTab("My Tab")
  *   .add("My Number", 0)
  *   .withWidget(BuiltInWidgets.kNumberSlider)
  *   .withProperties(Map.of("min", 0, "max", 1))
@@ -188,11 +188,11 @@ public enum BuiltInWidgets implements WidgetType {
    */
   kVoltageView("Voltage View"),
   /**
-   * Displays a {@link edu.wpi.first.wpilibj.PowerDistributionPanel PowerDistributionPanel}. <br>
+   * Displays a {@link edu.wpi.first.wpilibj.PowerDistribution PowerDistribution}. <br>
    * Supported types:
    *
    * <ul>
-   *   <li>{@link edu.wpi.first.wpilibj.PowerDistributionPanel}
+   *   <li>{@link edu.wpi.first.wpilibj.PowerDistribution}
    * </ul>
    *
    * <br>
@@ -204,7 +204,7 @@ public enum BuiltInWidgets implements WidgetType {
    * <td>Whether or not to display the voltage and current draw</td></tr>
    * </table>
    */
-  kPowerDistributionPanel("PDP"),
+  kPowerDistribution("PDP"),
   /**
    * Displays a {@link edu.wpi.first.wpilibj.smartdashboard.SendableChooser SendableChooser} with a
    * dropdown combo box with a list of options. <br>
@@ -246,7 +246,7 @@ public enum BuiltInWidgets implements WidgetType {
   kEncoder("Encoder"),
   /**
    * Displays a {@link edu.wpi.first.wpilibj.motorcontrol.MotorController MotorController}. The
-   * speed controller will be controllable from the dashboard when test mode is enabled, but will
+   * motor controller will be controllable from the dashboard when test mode is enabled, but will
    * otherwise be view-only. <br>
    * Supported types:
    *
@@ -284,9 +284,8 @@ public enum BuiltInWidgets implements WidgetType {
    * Supported types:
    *
    * <ul>
-   *   <li>{@link edu.wpi.first.wpilibj.command.Command}
-   *   <li>{@link edu.wpi.first.wpilibj.command.CommandGroup}
-   *   <li>Any custom subclass of {@code Command} or {@code CommandGroup}
+   *   <li>{@link edu.wpi.first.wpilibj2.command.Command}
+   *   <li>Any custom subclass of {@code Command}
    * </ul>
    *
    * <br>
@@ -300,7 +299,7 @@ public enum BuiltInWidgets implements WidgetType {
    * Supported types:
    *
    * <ul>
-   *   <li>{@link edu.wpi.first.wpilibj.command.PIDCommand}
+   *   <li>{@link edu.wpi.first.wpilibj2.command.PIDCommand}
    *   <li>Any custom subclass of {@code PIDCommand}
    * </ul>
    *
@@ -314,7 +313,7 @@ public enum BuiltInWidgets implements WidgetType {
    * Supported types:
    *
    * <ul>
-   *   <li>{@link edu.wpi.first.wpilibj.PIDController}
+   *   <li>{@link edu.wpi.first.math.controller.PIDController}
    * </ul>
    *
    * <br>
@@ -473,6 +472,15 @@ public enum BuiltInWidgets implements WidgetType {
    * </table>
    */
   kCameraStream("Camera Stream"),
+  /**
+   * Displays a Field2d object.<br>
+   * Supported types:
+   *
+   * <ul>
+   *   <li>{@link edu.wpi.first.wpilibj.smartdashboard.Field2d}
+   * </ul>
+   */
+  kField("Field"),
   ;
 
   private final String m_widgetName;

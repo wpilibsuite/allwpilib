@@ -4,68 +4,29 @@
 
 #include "frc/XboxController.h"  // NOLINT(build/include_order)
 
+#include "JoystickTestMacros.h"
 #include "frc/simulation/XboxControllerSim.h"
 #include "gtest/gtest.h"
 
 using namespace frc;
 
-TEST(XboxControllerTests, GetX) {
-  XboxController joy{2};
-  sim::XboxControllerSim joysim{joy};
+BUTTON_TEST(XboxController, LeftBumper)
+BUTTON_TEST(XboxController, RightBumper)
 
-  joysim.SetX(XboxController::kLeftHand, 0.35);
-  joysim.SetX(XboxController::kRightHand, 0.45);
-  joysim.NotifyNewData();
-  ASSERT_NEAR(joy.GetX(XboxController::kLeftHand), 0.35, 0.001);
-  ASSERT_NEAR(joy.GetX(XboxController::kRightHand), 0.45, 0.001);
-}
+BUTTON_TEST(XboxController, LeftStickButton)
+BUTTON_TEST(XboxController, RightStickButton)
 
-TEST(XboxControllerTests, GetBumper) {
-  XboxController joy{1};
-  sim::XboxControllerSim joysim{joy};
+BUTTON_TEST(XboxController, AButton)
+BUTTON_TEST(XboxController, BButton)
+BUTTON_TEST(XboxController, XButton)
+BUTTON_TEST(XboxController, YButton)
+BUTTON_TEST(XboxController, BackButton)
+BUTTON_TEST(XboxController, StartButton)
 
-  joysim.SetBumper(XboxController::kLeftHand, false);
-  joysim.SetBumper(XboxController::kRightHand, true);
-  joysim.NotifyNewData();
-  ASSERT_FALSE(joy.GetBumper(XboxController::kLeftHand));
-  ASSERT_TRUE(joy.GetBumper(XboxController::kRightHand));
-  // need to call pressed and released to clear flags
-  joy.GetBumperPressed(XboxController::kLeftHand);
-  joy.GetBumperReleased(XboxController::kLeftHand);
-  joy.GetBumperPressed(XboxController::kRightHand);
-  joy.GetBumperReleased(XboxController::kRightHand);
+AXIS_TEST(XboxController, LeftX)
+AXIS_TEST(XboxController, RightX)
+AXIS_TEST(XboxController, LeftY)
+AXIS_TEST(XboxController, RightY)
 
-  joysim.SetBumper(XboxController::kLeftHand, true);
-  joysim.SetBumper(XboxController::kRightHand, false);
-  joysim.NotifyNewData();
-  ASSERT_TRUE(joy.GetBumper(XboxController::kLeftHand));
-  ASSERT_TRUE(joy.GetBumperPressed(XboxController::kLeftHand));
-  ASSERT_FALSE(joy.GetBumperReleased(XboxController::kLeftHand));
-  ASSERT_FALSE(joy.GetBumper(XboxController::kRightHand));
-  ASSERT_FALSE(joy.GetBumperPressed(XboxController::kRightHand));
-  ASSERT_TRUE(joy.GetBumperReleased(XboxController::kRightHand));
-}
-
-TEST(XboxControllerTests, GetAButton) {
-  XboxController joy{1};
-  sim::XboxControllerSim joysim{joy};
-
-  joysim.SetAButton(false);
-  joysim.NotifyNewData();
-  ASSERT_FALSE(joy.GetAButton());
-  // need to call pressed and released to clear flags
-  joy.GetAButtonPressed();
-  joy.GetAButtonReleased();
-
-  joysim.SetAButton(true);
-  joysim.NotifyNewData();
-  ASSERT_TRUE(joy.GetAButton());
-  ASSERT_TRUE(joy.GetAButtonPressed());
-  ASSERT_FALSE(joy.GetAButtonReleased());
-
-  joysim.SetAButton(false);
-  joysim.NotifyNewData();
-  ASSERT_FALSE(joy.GetAButton());
-  ASSERT_FALSE(joy.GetAButtonPressed());
-  ASSERT_TRUE(joy.GetAButtonReleased());
-}
+AXIS_TEST(XboxController, LeftTriggerAxis)
+AXIS_TEST(XboxController, RightTriggerAxis)

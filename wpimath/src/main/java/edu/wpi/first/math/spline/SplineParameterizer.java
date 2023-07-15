@@ -46,7 +46,6 @@ public final class SplineParameterizer {
    */
   private static final int kMaxIterations = 5000;
 
-  @SuppressWarnings("MemberName")
   private static class StackContents {
     final double t1;
     final double t0;
@@ -57,7 +56,6 @@ public final class SplineParameterizer {
     }
   }
 
-  @SuppressWarnings("serial")
   public static class MalformedSplineException extends RuntimeException {
     /**
      * Create a new exception with the given message.
@@ -73,8 +71,8 @@ public final class SplineParameterizer {
   private SplineParameterizer() {}
 
   /**
-   * Parameterizes the spline. This method breaks up the spline into various arcs until their dx,
-   * dy, and dtheta are within specific tolerances.
+   * Parametrizes the spline. This method breaks up the spline into various arcs until their dx, dy,
+   * and dtheta are within specific tolerances.
    *
    * @param spline The spline to parameterize.
    * @return A list of poses and curvatures that represents various points on the spline.
@@ -86,8 +84,8 @@ public final class SplineParameterizer {
   }
 
   /**
-   * Parameterizes the spline. This method breaks up the spline into various arcs until their dx,
-   * dy, and dtheta are within specific tolerances.
+   * Parametrizes the spline. This method breaks up the spline into various arcs until their dx, dy,
+   * and dtheta are within specific tolerances.
    *
    * @param spline The spline to parameterize.
    * @param t0 Starting internal spline parameter. It is recommended to use 0.0.

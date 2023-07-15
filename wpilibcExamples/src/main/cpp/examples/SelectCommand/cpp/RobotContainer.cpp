@@ -17,5 +17,5 @@ void RobotContainer::ConfigureButtonBindings() {
 
 frc2::Command* RobotContainer::GetAutonomousCommand() {
   // Run the select command in autonomous
-  return &m_exampleSelectCommand;
+  return m_exampleSelectCommand.get();
 }

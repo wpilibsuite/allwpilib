@@ -8,7 +8,7 @@ if (!project.hasProperty('onlylinuxathena')) {
 
     ext {
         includeWpiutil = true
-        includeNtCore = true
+        includeWpinet = true
         pluginName = 'halsim_ws_core'
     }
 
@@ -41,6 +41,7 @@ if (!project.hasProperty('onlylinuxathena')) {
                 }
                 binaries.all {
                     project(':hal').addHalDependency(it, 'shared')
+                    lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 }
                 appendDebugPathToBinaries(binaries)

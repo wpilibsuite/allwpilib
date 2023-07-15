@@ -9,7 +9,7 @@
 namespace frc {
 
 /**
- * REV Robotics SPARK MAX Motor Controller.
+ * REV Robotics SPARK MAX Motor %Controller.
  *
  * Note that the SPARK MAX uses the following bounds for PWM values. These
  * values should work reasonably well for most controllers, but if users

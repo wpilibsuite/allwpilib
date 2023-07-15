@@ -6,14 +6,14 @@
 
 #include <frc/DigitalInput.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
-#include <frc2/command/SubsystemBase.h>
+#include <frc2/command/Subsystem.h>
 
 /**
  * The claw subsystem is a simple system with a motor for opening and closing.
  * If using stronger motors, you should probably use a sensor so that the
  * motors don't stall.
  */
-class Claw : public frc2::SubsystemBase {
+class Claw : public frc2::Subsystem {
  public:
   Claw();
 
@@ -36,7 +36,7 @@ class Claw : public frc2::SubsystemBase {
    * Return true when the robot is grabbing an object hard enough
    * to trigger the limit switch.
    */
-  bool IsGripping();
+  bool IsGripping() const;
 
   /**
    * The log method puts interesting information to the SmartDashboard.

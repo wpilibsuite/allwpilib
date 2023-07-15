@@ -15,14 +15,23 @@
 #include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
 #include <networktables/NetworkTableInstance.h>
+#include <wpi/timestamp.h>
 #include <wpimath/MathShared.h>
 
 #include "WPILibVersion.h"
 #include "frc/DriverStation.h"
 #include "frc/Errors.h"
+#include "frc/Notifier.h"
 #include "frc/RobotState.h"
 #include "frc/livewindow/LiveWindow.h"
 #include "frc/smartdashboard/SmartDashboard.h"
+
+static_assert(frc::RuntimeType::kRoboRIO ==
+              static_cast<frc::RuntimeType>(HAL_Runtime_RoboRIO));
+static_assert(frc::RuntimeType::kRoboRIO2 ==
+              static_cast<frc::RuntimeType>(HAL_Runtime_RoboRIO2));
+static_assert(frc::RuntimeType::kSimulation ==
+              static_cast<frc::RuntimeType>(HAL_Runtime_Simulation));
 
 using SetCameraServerSharedFP = void (*)(frc::CameraServerShared*);
 
@@ -33,8 +42,15 @@ int frc::RunHALInitialization() {
     std::puts("FATAL ERROR: HAL could not be initialized");
     return -1;
   }
+  DriverStation::RefreshData();
   HAL_Report(HALUsageReporting::kResourceType_Language,
              HALUsageReporting::kLanguage_CPlusPlus, 0, GetWPILibVersion());
+
+  if (!frc::Notifier::SetHALThreadPriority(true, 40)) {
+    FRC_ReportError(warn::Warning,
+                    "Setting HAL Notifier RT priority to 40 failed\n");
+  }
+
   std::puts("\n********** Robot program starting **********");
   return 0;
 }
@@ -123,6 +139,10 @@ class WPILibMathShared : public wpi::math::MathShared {
         break;
     }
   }
+
+  units::second_t GetTimestamp() override {
+    return units::second_t{wpi::Now() * 1.0e-6};
+  }
 };
 }  // namespace
 
@@ -178,24 +198,28 @@ bool RobotBase::IsAutonomousEnabled() const {
   return DriverStation::IsAutonomousEnabled();
 }
 
-bool RobotBase::IsOperatorControl() const {
-  return DriverStation::IsOperatorControl();
+bool RobotBase::IsTeleop() const {
+  return DriverStation::IsTeleop();
 }
 
-bool RobotBase::IsOperatorControlEnabled() const {
-  return DriverStation::IsOperatorControlEnabled();
+bool RobotBase::IsTeleopEnabled() const {
+  return DriverStation::IsTeleopEnabled();
 }
 
 bool RobotBase::IsTest() const {
   return DriverStation::IsTest();
 }
 
-bool RobotBase::IsNewDataAvailable() const {
-  return DriverStation::IsNewControlData();
+bool RobotBase::IsTestEnabled() const {
+  return DriverStation::IsTestEnabled();
 }
 
 std::thread::id RobotBase::GetThreadId() {
   return m_threadId;
+}
+
+RuntimeType RobotBase::GetRuntimeType() {
+  return static_cast<RuntimeType>(HAL_GetRuntimeType());
 }
 
 RobotBase::RobotBase() {
@@ -205,12 +229,25 @@ RobotBase::RobotBase() {
   SetupMathShared();
 
   auto inst = nt::NetworkTableInstance::GetDefault();
-  inst.SetNetworkIdentity("Robot");
+  // subscribe to "" to force persistent values to propagate to local
+  nt::SubscribeMultiple(inst.GetHandle(), {{std::string_view{}}});
 #ifdef __FRC_ROBORIO__
-  inst.StartServer("/home/lvuser/networktables.ini");
+  inst.StartServer("/home/lvuser/networktables.json");
 #else
   inst.StartServer();
 #endif
+
+  // wait for the NT server to actually start
+  int count = 0;
+  while ((inst.GetNetworkMode() & NT_NET_MODE_STARTING) != 0) {
+    using namespace std::chrono_literals;
+    std::this_thread::sleep_for(10ms);
+    ++count;
+    if (count > 100) {
+      fmt::print(stderr, "timed out while waiting for NT server to start\n");
+      break;
+    }
+  }
 
   SmartDashboard::init();
 
@@ -225,11 +262,9 @@ RobotBase::RobotBase() {
     }
   }
 
-  // First and one-time initialization
-  inst.GetTable("LiveWindow")
-      ->GetSubTable(".status")
-      ->GetEntry("LW Enabled")
-      .SetBoolean(false);
+  // Call DriverStation::RefreshData() to kick things off
+  DriverStation::RefreshData();
 
+  // First and one-time initialization
   LiveWindow::SetEnabled(false);
 }

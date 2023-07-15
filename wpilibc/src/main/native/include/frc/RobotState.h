@@ -13,7 +13,7 @@ class RobotState {
   static bool IsDisabled();
   static bool IsEnabled();
   static bool IsEStopped();
-  static bool IsOperatorControl();
+  static bool IsTeleop();
   static bool IsAutonomous();
   static bool IsTest();
 };

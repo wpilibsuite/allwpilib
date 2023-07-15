@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <concepts>
 #include <limits>
 
 #include "frc/geometry/Rotation2d.h"
@@ -14,8 +15,7 @@ namespace frc {
 /**
  * Enforces a particular constraint only within a rectangular region.
  */
-template <typename Constraint, typename = std::enable_if_t<std::is_base_of_v<
-                                   TrajectoryConstraint, Constraint>>>
+template <std::derived_from<TrajectoryConstraint> Constraint>
 class RectangularRegionConstraint : public TrajectoryConstraint {
  public:
   /**
@@ -41,8 +41,8 @@ class RectangularRegionConstraint : public TrajectoryConstraint {
     if (IsPoseInRegion(pose)) {
       return m_constraint.MaxVelocity(pose, curvature, velocity);
     } else {
-      return units::meters_per_second_t(
-          std::numeric_limits<double>::infinity());
+      return units::meters_per_second_t{
+          std::numeric_limits<double>::infinity()};
     }
   }
 

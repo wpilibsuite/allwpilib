@@ -96,7 +96,7 @@ class Shuffleboard final {
   static void SelectTab(std::string_view title);
 
   /**
-   * Enables user control of widgets containing actuators: speed controllers,
+   * Enables user control of widgets containing actuators: motor controllers,
    * relays, etc. This should only be used when the robot is in test mode.
    * IterativeRobotBase and SampleRobot are both configured to call this method
    * when entering test mode; most users should not need to use this method
@@ -147,7 +147,7 @@ class Shuffleboard final {
    * Clears the custom name format for recording files. New recordings will use
    * the default format.
    *
-   * @see #setRecordingFileNameFormat(String)
+   * @see SetRecordingFileNameFormat(std::string_view)
    */
   static void ClearRecordingFileNameFormat();
 

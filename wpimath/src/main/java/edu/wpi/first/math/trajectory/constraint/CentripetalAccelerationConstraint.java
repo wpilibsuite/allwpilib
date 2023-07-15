@@ -38,12 +38,12 @@ public class CentripetalAccelerationConstraint implements TrajectoryConstraint {
   @Override
   public double getMaxVelocityMetersPerSecond(
       Pose2d poseMeters, double curvatureRadPerMeter, double velocityMetersPerSecond) {
-    // ac = v^2 / r
-    // k (curvature) = 1 / r
+    // ac = v²/r
+    // k (curvature) = 1/r
 
-    // therefore, ac = v^2 * k
-    // ac / k = v^2
-    // v = std::sqrt(ac / k)
+    // therefore, ac = v²k
+    // ac/k = v²
+    // v = √(ac/k)
 
     return Math.sqrt(
         m_maxCentripetalAccelerationMetersPerSecondSq / Math.abs(curvatureRadPerMeter));

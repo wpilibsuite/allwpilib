@@ -9,14 +9,14 @@
 #include <string_view>
 
 #include <fmt/format.h>
-#include <wpi/MimeTypes.h>
 #include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
-#include <wpi/UrlParser.h>
 #include <wpi/fs.h>
 #include <wpi/raw_istream.h>
-#include <wpi/raw_uv_ostream.h>
-#include <wpi/uv/Request.h>
+#include <wpinet/MimeTypes.h>
+#include <wpinet/UrlParser.h>
+#include <wpinet/raw_uv_ostream.h>
+#include <wpinet/uv/Request.h>
 
 namespace uv = wpi::uv;
 
@@ -76,6 +76,16 @@ void HALSimHttpConnection::ProcessWsUpgrade() {
 }
 
 void HALSimHttpConnection::OnSimValueChanged(const wpi::json& msg) {
+  // Skip sending if this message is not in the allowed filter list
+  try {
+    auto& type = msg.at("type").get_ref<const std::string&>();
+    if (!m_server->CanSendMessage(type)) {
+      return;
+    }
+  } catch (wpi::json::exception& e) {
+    fmt::print(stderr, "Error with message: {}\n", e.what());
+  }
+
   // render json to buffers
   wpi::SmallVector<uv::Buffer, 4> sendBufs;
   wpi::raw_uv_ostream os{sendBufs, [this]() -> uv::Buffer {

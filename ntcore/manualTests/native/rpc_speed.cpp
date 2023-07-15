@@ -4,10 +4,9 @@
 
 #include <chrono>
 #include <climits>
-#include <cstdio>
-#include <iostream>
 #include <thread>
 
+#include <fmt/core.h>
 #include <support/json.h>
 
 #include "ntcore.h"
@@ -17,11 +16,11 @@ void callback1(const nt::RpcAnswer& answer) {
   try {
     params = wpi::json::from_cbor(answer.params);
   } catch (wpi::json::parse_error err) {
-    std::fputs("could not decode params?\n", stderr);
+    fmt::print(stderr, "could not decode params?\n");
     return;
   }
   if (!params.is_number()) {
-    std::fputs("did not get number\n", stderr);
+    fmt::print(stderr, "did not get number\n");
     return;
   }
   double val = params.get<double>();
@@ -44,29 +43,25 @@ int main() {
     try {
       call1_result = wpi::json::from_cbor(call1_result_str);
     } catch (wpi::json::parse_error err) {
-      std::fputs("could not decode result?\n", stderr);
+      fmt::print(stderr, "could not decode result?\n");
       return 1;
     }
     if (!call1_result.is_number()) {
-      std::fputs("result is not number?\n", stderr);
+      fmt::print(stderr, "result is not number?\n");
       return 1;
     }
   }
   auto end2 = std::chrono::high_resolution_clock::now();
   auto end = nt::Now();
-  std::cerr << "nt::Now start=" << start << " end=" << end << '\n';
-  std::cerr << "std::chrono start="
-            << std::chrono::duration_cast<std::chrono::nanoseconds>(
-                   start2.time_since_epoch())
-                   .count()
-            << " end="
-            << std::chrono::duration_cast<std::chrono::nanoseconds>(
-                   end2.time_since_epoch())
-                   .count()
-            << '\n';
-  std::fprintf(stderr, "time/call = %g us\n", (end - start) / 10.0 / 10000.0);
+  fmt::print(stderr, "nt::Now start={} end={}\n", start, end);
+  fmt::print(stderr, "std::chrono start={} end={}\n",
+             std::chrono::duration_cast<std::chrono::nanoseconds>(
+                 start2.time_since_epoch())
+                 .count(),
+             std::chrono::duration_cast<std::chrono::nanoseconds>(
+                 end2.time_since_epoch())
+                 .count());
+  fmt::print(stderr, "time/call = %g us\n", (end - start) / 10.0 / 10000.0);
   std::chrono::duration<double, std::micro> diff = end2 - start2;
-  std::cerr << "time/call = " << (diff.count() / 10000.0) << " us\n";
-
-  return 0;
+  fmt::print(stderr, "time/call = {} us\n", diff.count() / 10000.0);
 }

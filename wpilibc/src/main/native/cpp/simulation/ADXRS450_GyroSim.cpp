@@ -16,9 +16,9 @@ ADXRS450_GyroSim::ADXRS450_GyroSim(const frc::ADXRS450_Gyro& gyro) {
 }
 
 void ADXRS450_GyroSim::SetAngle(units::degree_t angle) {
-  m_simAngle.Set(angle.to<double>());
+  m_simAngle.Set(angle.value());
 }
 
 void ADXRS450_GyroSim::SetRate(units::degrees_per_second_t rate) {
-  m_simRate.Set(rate.to<double>());
+  m_simRate.Set(rate.value());
 }

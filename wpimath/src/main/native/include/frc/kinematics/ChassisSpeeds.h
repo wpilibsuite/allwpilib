@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <wpi/SymbolExports.h>
+
 #include "frc/geometry/Rotation2d.h"
 #include "units/angular_velocity.h"
 #include "units/velocity.h"
@@ -20,7 +22,7 @@ namespace frc {
  * never have a dy component because it can never move sideways. Holonomic
  * drivetrains such as swerve and mecanum will often have all three components.
  */
-struct ChassisSpeeds {
+struct WPILIB_DLLEXPORT ChassisSpeeds {
   /**
    * Represents forward velocity w.r.t the robot frame of reference. (Fwd is +)
    */
@@ -57,6 +59,27 @@ struct ChassisSpeeds {
       units::radians_per_second_t omega, const Rotation2d& robotAngle) {
     return {vx * robotAngle.Cos() + vy * robotAngle.Sin(),
             -vx * robotAngle.Sin() + vy * robotAngle.Cos(), omega};
+  }
+
+  /**
+   * Converts a user provided field-relative ChassisSpeeds object into a
+   * robot-relative ChassisSpeeds object.
+   *
+   * @param fieldRelativeSpeeds The ChassisSpeeds object representing the speeds
+   *    in the field frame of reference. Positive x is away from your alliance
+   *    wall. Positive y is to your left when standing behind the alliance wall.
+   * @param robotAngle The angle of the robot as measured by a gyroscope. The
+   *    robot's angle is considered to be zero when it is facing directly away
+   *    from your alliance station wall. Remember that this should be CCW
+   *    positive.
+   * @return ChassisSpeeds object representing the speeds in the robot's frame
+   *    of reference.
+   */
+  static ChassisSpeeds FromFieldRelativeSpeeds(
+      const ChassisSpeeds& fieldRelativeSpeeds, const Rotation2d& robotAngle) {
+    return FromFieldRelativeSpeeds(fieldRelativeSpeeds.vx,
+                                   fieldRelativeSpeeds.vy,
+                                   fieldRelativeSpeeds.omega, robotAngle);
   }
 };
 }  // namespace frc

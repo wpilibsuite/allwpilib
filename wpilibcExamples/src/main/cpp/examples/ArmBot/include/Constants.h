@@ -4,11 +4,12 @@
 
 #pragma once
 
+#include <numbers>
+
 #include <units/angle.h>
 #include <units/angular_velocity.h>
 #include <units/time.h>
 #include <units/voltage.h>
-#include <wpi/numbers>
 
 /**
  * The Constants header provides a convenient place for teams to hold robot-wide
@@ -34,7 +35,7 @@ constexpr int kEncoderCPR = 1024;
 constexpr double kWheelDiameterInches = 6;
 constexpr double kEncoderDistancePerPulse =
     // Assumes the encoders are directly mounted on the wheel shafts
-    (kWheelDiameterInches * wpi::numbers::pi) /
+    (kWheelDiameterInches * std::numbers::pi) /
     static_cast<double>(kEncoderCPR);
 }  // namespace DriveConstants
 
@@ -46,7 +47,7 @@ constexpr double kP = 1;
 // These are fake gains; in actuality these must be determined individually for
 // each robot
 constexpr auto kS = 1_V;
-constexpr auto kCos = 1_V;
+constexpr auto kG = 1_V;
 constexpr auto kV = 0.5_V * 1_s / 1_rad;
 constexpr auto kA = 0.1_V * 1_s * 1_s / 1_rad;
 
@@ -56,7 +57,7 @@ constexpr auto kMaxAcceleration = 10_rad / (1_s * 1_s);
 constexpr int kEncoderPorts[]{4, 5};
 constexpr int kEncoderPPR = 256;
 constexpr auto kEncoderDistancePerPulse =
-    2.0_rad * wpi::numbers::pi / kEncoderPPR;
+    2.0_rad * std::numbers::pi / kEncoderPPR;
 
 // The offset of the arm from the horizontal in its neutral position,
 // measured from the horizontal
@@ -69,5 +70,5 @@ constexpr auto kAutoShootTimeSeconds = 7_s;
 }  // namespace AutoConstants
 
 namespace OIConstants {
-constexpr int kDriverControllerPort = 1;
+constexpr int kDriverControllerPort = 0;
 }  // namespace OIConstants

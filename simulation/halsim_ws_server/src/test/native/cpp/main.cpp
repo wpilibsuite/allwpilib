@@ -9,7 +9,7 @@
 #include <hal/HALBase.h>
 #include <hal/Main.h>
 #include <hal/simulation/DIOData.h>
-#include <wpi/uv/Loop.h>
+#include <wpinet/uv/Loop.h>
 
 #include "HALSimWSServer.h"
 #include "WebServerClientTest.h"
@@ -28,7 +28,7 @@ class WebServerIntegrationTest : public ::testing::Test {
     m_server.Initialize();
 
     // Create and initialize client
-    m_server.runner.ExecSync([=](auto& loop) {
+    m_server.runner.ExecSync([=, this](auto& loop) {
       m_webserverClient = std::make_shared<WebServerClientTest>(loop);
       m_webserverClient->Initialize();
     });
@@ -156,6 +156,8 @@ TEST_F(WebServerIntegrationTest, DriverStation) {
 
   using namespace std::chrono_literals;
   std::this_thread::sleep_for(1s);
+
+  HAL_RefreshDSData();
 
   // Compare results
   HAL_ControlWord cw;

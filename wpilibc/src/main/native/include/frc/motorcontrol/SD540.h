@@ -9,7 +9,7 @@
 namespace frc {
 
 /**
- * Mindsensors SD540 Motor Controller.
+ * Mindsensors SD540 Motor %Controller.
  *
  * Note that the SD540 uses the following bounds for PWM values. These values
  * should work reasonably well for most controllers, but if users experience

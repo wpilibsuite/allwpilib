@@ -12,7 +12,7 @@ public class CANStatusTest {
   @Test
   public void canStatusGetDoesntThrow() {
     CANStatus status = new CANStatus();
-    CANJNI.GetCANStatus(status);
+    CANJNI.getCANStatus(status);
     // Nothing we can assert, so just make sure it didn't throw.
   }
 }

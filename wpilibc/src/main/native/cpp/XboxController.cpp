@@ -6,152 +6,216 @@
 
 #include <hal/FRCUsageReporting.h>
 
+#include "frc/event/BooleanEvent.h"
+
 using namespace frc;
 
 XboxController::XboxController(int port) : GenericHID(port) {
   HAL_Report(HALUsageReporting::kResourceType_XboxController, port + 1);
 }
 
-double XboxController::GetX(JoystickHand hand) const {
-  if (hand == kLeftHand) {
-    return GetRawAxis(static_cast<int>(Axis::kLeftX));
-  } else {
-    return GetRawAxis(static_cast<int>(Axis::kRightX));
-  }
+double XboxController::GetLeftX() const {
+  return GetRawAxis(Axis::kLeftX);
 }
 
-double XboxController::GetY(JoystickHand hand) const {
-  if (hand == kLeftHand) {
-    return GetRawAxis(static_cast<int>(Axis::kLeftY));
-  } else {
-    return GetRawAxis(static_cast<int>(Axis::kRightY));
-  }
+double XboxController::GetRightX() const {
+  return GetRawAxis(Axis::kRightX);
 }
 
-double XboxController::GetTriggerAxis(JoystickHand hand) const {
-  if (hand == kLeftHand) {
-    return GetRawAxis(static_cast<int>(Axis::kLeftTrigger));
-  } else {
-    return GetRawAxis(static_cast<int>(Axis::kRightTrigger));
-  }
+double XboxController::GetLeftY() const {
+  return GetRawAxis(Axis::kLeftY);
 }
 
-bool XboxController::GetBumper(JoystickHand hand) const {
-  if (hand == kLeftHand) {
-    return GetRawButton(static_cast<int>(Button::kBumperLeft));
-  } else {
-    return GetRawButton(static_cast<int>(Button::kBumperRight));
-  }
+double XboxController::GetRightY() const {
+  return GetRawAxis(Axis::kRightY);
 }
 
-bool XboxController::GetBumperPressed(JoystickHand hand) {
-  if (hand == kLeftHand) {
-    return GetRawButtonPressed(static_cast<int>(Button::kBumperLeft));
-  } else {
-    return GetRawButtonPressed(static_cast<int>(Button::kBumperRight));
-  }
+double XboxController::GetLeftTriggerAxis() const {
+  return GetRawAxis(Axis::kLeftTrigger);
 }
 
-bool XboxController::GetBumperReleased(JoystickHand hand) {
-  if (hand == kLeftHand) {
-    return GetRawButtonReleased(static_cast<int>(Button::kBumperLeft));
-  } else {
-    return GetRawButtonReleased(static_cast<int>(Button::kBumperRight));
-  }
+double XboxController::GetRightTriggerAxis() const {
+  return GetRawAxis(Axis::kRightTrigger);
 }
 
-bool XboxController::GetStickButton(JoystickHand hand) const {
-  if (hand == kLeftHand) {
-    return GetRawButton(static_cast<int>(Button::kStickLeft));
-  } else {
-    return GetRawButton(static_cast<int>(Button::kStickRight));
-  }
+bool XboxController::GetLeftBumper() const {
+  return GetRawButton(Button::kLeftBumper);
 }
 
-bool XboxController::GetStickButtonPressed(JoystickHand hand) {
-  if (hand == kLeftHand) {
-    return GetRawButtonPressed(static_cast<int>(Button::kStickLeft));
-  } else {
-    return GetRawButtonPressed(static_cast<int>(Button::kStickRight));
-  }
+bool XboxController::GetRightBumper() const {
+  return GetRawButton(Button::kRightBumper);
 }
 
-bool XboxController::GetStickButtonReleased(JoystickHand hand) {
-  if (hand == kLeftHand) {
-    return GetRawButtonReleased(static_cast<int>(Button::kStickLeft));
-  } else {
-    return GetRawButtonReleased(static_cast<int>(Button::kStickRight));
-  }
+bool XboxController::GetLeftBumperPressed() {
+  return GetRawButtonPressed(Button::kLeftBumper);
+}
+
+bool XboxController::GetRightBumperPressed() {
+  return GetRawButtonPressed(Button::kRightBumper);
+}
+
+bool XboxController::GetLeftBumperReleased() {
+  return GetRawButtonReleased(Button::kLeftBumper);
+}
+
+bool XboxController::GetRightBumperReleased() {
+  return GetRawButtonReleased(Button::kRightBumper);
+}
+
+BooleanEvent XboxController::LeftBumper(EventLoop* loop) const {
+  return BooleanEvent(loop, [this]() { return this->GetLeftBumper(); });
+}
+
+BooleanEvent XboxController::RightBumper(EventLoop* loop) const {
+  return BooleanEvent(loop, [this]() { return this->GetRightBumper(); });
+}
+
+bool XboxController::GetLeftStickButton() const {
+  return GetRawButton(Button::kLeftStick);
+}
+
+bool XboxController::GetRightStickButton() const {
+  return GetRawButton(Button::kRightStick);
+}
+
+bool XboxController::GetLeftStickButtonPressed() {
+  return GetRawButtonPressed(Button::kLeftStick);
+}
+
+bool XboxController::GetRightStickButtonPressed() {
+  return GetRawButtonPressed(Button::kRightStick);
+}
+
+bool XboxController::GetLeftStickButtonReleased() {
+  return GetRawButtonReleased(Button::kLeftStick);
+}
+
+bool XboxController::GetRightStickButtonReleased() {
+  return GetRawButtonReleased(Button::kRightStick);
+}
+
+BooleanEvent XboxController::LeftStick(EventLoop* loop) const {
+  return BooleanEvent(loop, [this]() { return this->GetLeftStickButton(); });
+}
+
+BooleanEvent XboxController::RightStick(EventLoop* loop) const {
+  return BooleanEvent(loop, [this]() { return this->GetRightStickButton(); });
 }
 
 bool XboxController::GetAButton() const {
-  return GetRawButton(static_cast<int>(Button::kA));
+  return GetRawButton(Button::kA);
 }
 
 bool XboxController::GetAButtonPressed() {
-  return GetRawButtonPressed(static_cast<int>(Button::kA));
+  return GetRawButtonPressed(Button::kA);
 }
 
 bool XboxController::GetAButtonReleased() {
-  return GetRawButtonReleased(static_cast<int>(Button::kA));
+  return GetRawButtonReleased(Button::kA);
+}
+
+BooleanEvent XboxController::A(EventLoop* loop) const {
+  return BooleanEvent(loop, [this]() { return this->GetAButton(); });
 }
 
 bool XboxController::GetBButton() const {
-  return GetRawButton(static_cast<int>(Button::kB));
+  return GetRawButton(Button::kB);
 }
 
 bool XboxController::GetBButtonPressed() {
-  return GetRawButtonPressed(static_cast<int>(Button::kB));
+  return GetRawButtonPressed(Button::kB);
 }
 
 bool XboxController::GetBButtonReleased() {
-  return GetRawButtonReleased(static_cast<int>(Button::kB));
+  return GetRawButtonReleased(Button::kB);
+}
+
+BooleanEvent XboxController::B(EventLoop* loop) const {
+  return BooleanEvent(loop, [this]() { return this->GetBButton(); });
 }
 
 bool XboxController::GetXButton() const {
-  return GetRawButton(static_cast<int>(Button::kX));
+  return GetRawButton(Button::kX);
 }
 
 bool XboxController::GetXButtonPressed() {
-  return GetRawButtonPressed(static_cast<int>(Button::kX));
+  return GetRawButtonPressed(Button::kX);
 }
 
 bool XboxController::GetXButtonReleased() {
-  return GetRawButtonReleased(static_cast<int>(Button::kX));
+  return GetRawButtonReleased(Button::kX);
+}
+
+BooleanEvent XboxController::X(EventLoop* loop) const {
+  return BooleanEvent(loop, [this]() { return this->GetXButton(); });
 }
 
 bool XboxController::GetYButton() const {
-  return GetRawButton(static_cast<int>(Button::kY));
+  return GetRawButton(Button::kY);
 }
 
 bool XboxController::GetYButtonPressed() {
-  return GetRawButtonPressed(static_cast<int>(Button::kY));
+  return GetRawButtonPressed(Button::kY);
 }
 
 bool XboxController::GetYButtonReleased() {
-  return GetRawButtonReleased(static_cast<int>(Button::kY));
+  return GetRawButtonReleased(Button::kY);
+}
+
+BooleanEvent XboxController::Y(EventLoop* loop) const {
+  return BooleanEvent(loop, [this]() { return this->GetYButton(); });
 }
 
 bool XboxController::GetBackButton() const {
-  return GetRawButton(static_cast<int>(Button::kBack));
+  return GetRawButton(Button::kBack);
 }
 
 bool XboxController::GetBackButtonPressed() {
-  return GetRawButtonPressed(static_cast<int>(Button::kBack));
+  return GetRawButtonPressed(Button::kBack);
 }
 
 bool XboxController::GetBackButtonReleased() {
-  return GetRawButtonReleased(static_cast<int>(Button::kBack));
+  return GetRawButtonReleased(Button::kBack);
+}
+
+BooleanEvent XboxController::Back(EventLoop* loop) const {
+  return BooleanEvent(loop, [this]() { return this->GetBackButton(); });
 }
 
 bool XboxController::GetStartButton() const {
-  return GetRawButton(static_cast<int>(Button::kStart));
+  return GetRawButton(Button::kStart);
 }
 
 bool XboxController::GetStartButtonPressed() {
-  return GetRawButtonPressed(static_cast<int>(Button::kStart));
+  return GetRawButtonPressed(Button::kStart);
 }
 
 bool XboxController::GetStartButtonReleased() {
-  return GetRawButtonReleased(static_cast<int>(Button::kStart));
+  return GetRawButtonReleased(Button::kStart);
+}
+
+BooleanEvent XboxController::Start(EventLoop* loop) const {
+  return BooleanEvent(loop, [this]() { return this->GetStartButton(); });
+}
+
+BooleanEvent XboxController::LeftTrigger(double threshold,
+                                         EventLoop* loop) const {
+  return BooleanEvent(loop, [this, threshold]() {
+    return this->GetLeftTriggerAxis() > threshold;
+  });
+}
+
+BooleanEvent XboxController::LeftTrigger(EventLoop* loop) const {
+  return this->LeftTrigger(0.5, loop);
+}
+
+BooleanEvent XboxController::RightTrigger(double threshold,
+                                          EventLoop* loop) const {
+  return BooleanEvent(loop, [this, threshold]() {
+    return this->GetRightTriggerAxis() > threshold;
+  });
+}
+
+BooleanEvent XboxController::RightTrigger(EventLoop* loop) const {
+  return this->RightTrigger(0.5, loop);
 }

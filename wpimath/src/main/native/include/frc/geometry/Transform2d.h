@@ -4,16 +4,18 @@
 
 #pragma once
 
+#include <wpi/SymbolExports.h>
+
 #include "Translation2d.h"
 
 namespace frc {
 
-class Pose2d;
+class WPILIB_DLLEXPORT Pose2d;
 
 /**
  * Represents a transformation for a Pose2d.
  */
-class Transform2d {
+class WPILIB_DLLEXPORT Transform2d {
  public:
   /**
    * Constructs the transform that maps the initial pose to the final pose.
@@ -29,7 +31,7 @@ class Transform2d {
    * @param translation Translational component of the transform.
    * @param rotation Rotational component of the transform.
    */
-  Transform2d(Translation2d translation, Rotation2d rotation);
+  constexpr Transform2d(Translation2d translation, Rotation2d rotation);
 
   /**
    * Constructs the identity transform -- maps an initial pose to itself.
@@ -41,64 +43,73 @@ class Transform2d {
    *
    * @return Reference to the translational component of the transform.
    */
-  const Translation2d& Translation() const { return m_translation; }
+  constexpr const Translation2d& Translation() const { return m_translation; }
 
   /**
    * Returns the X component of the transformation's translation.
    *
    * @return The x component of the transformation's translation.
    */
-  units::meter_t X() const { return m_translation.X(); }
+  constexpr units::meter_t X() const { return m_translation.X(); }
 
   /**
    * Returns the Y component of the transformation's translation.
    *
    * @return The y component of the transformation's translation.
    */
-  units::meter_t Y() const { return m_translation.Y(); }
+  constexpr units::meter_t Y() const { return m_translation.Y(); }
 
   /**
    * Returns the rotational component of the transformation.
    *
    * @return Reference to the rotational component of the transform.
    */
-  const Rotation2d& Rotation() const { return m_rotation; }
+  constexpr const Rotation2d& Rotation() const { return m_rotation; }
 
   /**
    * Invert the transformation. This is useful for undoing a transformation.
    *
    * @return The inverted transformation.
    */
-  Transform2d Inverse() const;
+  constexpr Transform2d Inverse() const;
 
   /**
-   * Scales the transform by the scalar.
+   * Multiplies the transform by the scalar.
    *
    * @param scalar The scalar.
    * @return The scaled Transform2d.
    */
-  Transform2d operator*(double scalar) const {
+  constexpr Transform2d operator*(double scalar) const {
     return Transform2d(m_translation * scalar, m_rotation * scalar);
   }
 
   /**
-   * Checks equality between this Transform2d and another object.
+   * Divides the transform by the scalar.
    *
-   * @param other The other object.
-   * @return Whether the two objects are equal.
+   * @param scalar The scalar.
+   * @return The scaled Transform2d.
    */
-  bool operator==(const Transform2d& other) const;
+  constexpr Transform2d operator/(double scalar) const {
+    return *this * (1.0 / scalar);
+  }
 
   /**
-   * Checks inequality between this Transform2d and another object.
+   * Composes two transformations.
    *
-   * @param other The other object.
-   * @return Whether the two objects are not equal.
+   * @param other The transform to compose with this one.
+   * @return The composition of the two transformations.
    */
-  bool operator!=(const Transform2d& other) const;
+  Transform2d operator+(const Transform2d& other) const;
+
+  /**
+   * Checks equality between this Transform2d and another object.
+   */
+  bool operator==(const Transform2d&) const = default;
 
  private:
   Translation2d m_translation;
   Rotation2d m_rotation;
 };
 }  // namespace frc
+
+#include "Transform2d.inc"

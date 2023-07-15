@@ -87,7 +87,6 @@ public final class AngleStatistics {
    * @param angleStateIdx The row containing the angles.
    * @return Mean of sigma points.
    */
-  @SuppressWarnings("checkstyle:ParameterName")
   public static <S extends Num> Matrix<S, N1> angleMean(
       Matrix<S, ?> sigmas, Matrix<?, N1> Wm, int angleStateIdx) {
     double[] angleSigmas = sigmas.extractRowVector(angleStateIdx).getData();
@@ -115,7 +114,6 @@ public final class AngleStatistics {
    * @param angleStateIdx The row containing the angles.
    * @return Function returning mean of sigma points.
    */
-  @SuppressWarnings("LambdaParameterName")
   public static <S extends Num> BiFunction<Matrix<S, ?>, Matrix<?, N1>, Matrix<S, N1>> angleMean(
       int angleStateIdx) {
     return (sigmas, Wm) -> angleMean(sigmas, Wm, angleStateIdx);

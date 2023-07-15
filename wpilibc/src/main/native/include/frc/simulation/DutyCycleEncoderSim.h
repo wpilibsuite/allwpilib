@@ -21,12 +21,19 @@ class DutyCycleEncoderSim {
   /**
    * Constructs from a DutyCycleEncoder object.
    *
-   * @param dutyCycleEncoder DutyCycleEncoder to simulate
+   * @param encoder DutyCycleEncoder to simulate
    */
   explicit DutyCycleEncoderSim(const DutyCycleEncoder& encoder);
 
   /**
-   * Set the position tin turns.
+   * Constructs from a digital input channel.
+   *
+   * @param channel digital input channel
+   */
+  explicit DutyCycleEncoderSim(int channel);
+
+  /**
+   * Set the position in turns.
    *
    * @param turns The position.
    */

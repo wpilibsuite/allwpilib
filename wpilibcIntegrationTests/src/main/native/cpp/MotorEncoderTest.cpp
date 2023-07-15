@@ -195,5 +195,5 @@ TEST_P(MotorEncoderTest, Reset) {
   EXPECT_EQ(0, m_encoder->Get()) << "Encoder did not reset to 0";
 }
 
-INSTANTIATE_TEST_SUITE_P(Test, MotorEncoderTest,
+INSTANTIATE_TEST_SUITE_P(Tests, MotorEncoderTest,
                          testing::Values(TEST_VICTOR, TEST_JAGUAR, TEST_TALON));

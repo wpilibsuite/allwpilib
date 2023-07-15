@@ -1,0 +1,127 @@
+import org.gradle.internal.os.OperatingSystem
+
+if (!project.hasProperty('onlylinuxathena')) {
+
+    description = "roboRIO Team Number Setter"
+
+    apply plugin: 'cpp'
+    apply plugin: 'c'
+    apply plugin: 'google-test-test-suite'
+    apply plugin: 'visual-studio'
+    apply plugin: 'edu.wpi.first.NativeUtils'
+
+    if (OperatingSystem.current().isWindows()) {
+        apply plugin: 'windows-resources'
+    }
+
+    ext {
+        nativeName = 'roborioteamnumbersetter'
+    }
+
+    apply from: "${rootDir}/shared/resources.gradle"
+    apply from: "${rootDir}/shared/config.gradle"
+
+    def wpilibVersionFileInput = file("src/main/generate/WPILibVersion.cpp.in")
+    def wpilibVersionFileOutput = file("$buildDir/generated/main/cpp/WPILibVersion.cpp")
+
+    apply from: "${rootDir}/shared/libssh.gradle"
+    apply from: "${rootDir}/shared/imgui.gradle"
+
+    task generateCppVersion() {
+        description = 'Generates the wpilib version class'
+        group = 'WPILib'
+
+        outputs.file wpilibVersionFileOutput
+        inputs.file wpilibVersionFileInput
+
+        if (wpilibVersioning.releaseMode) {
+            outputs.upToDateWhen { false }
+        }
+
+        // We follow a simple set of checks to determine whether we should generate a new version file:
+        // 1. If the release type is not development, we generate a new version file
+        // 2. If there is no generated version number, we generate a new version file
+        // 3. If there is a generated build number, and the release type is development, then we will
+        //    only generate if the publish task is run.
+        doLast {
+            def version = wpilibVersioning.version.get()
+            println "Writing version ${version} to $wpilibVersionFileOutput"
+
+            if (wpilibVersionFileOutput.exists()) {
+                wpilibVersionFileOutput.delete()
+            }
+            def read = wpilibVersionFileInput.text.replace('${wpilib_version}', version)
+            wpilibVersionFileOutput.write(read)
+        }
+    }
+
+    gradle.taskGraph.addTaskExecutionGraphListener { graph ->
+        def willPublish = graph.hasTask(publish)
+        if (willPublish) {
+            generateCppVersion.outputs.upToDateWhen { false }
+        }
+    }
+
+    def generateTask = createGenerateResourcesTask('main', 'RTNS', 'rtns', project)
+
+    project(':').libraryBuild.dependsOn build
+    tasks.withType(CppCompile) {
+        dependsOn generateTask
+        dependsOn generateCppVersion
+    }
+
+    model {
+        components {
+            // By default, a development executable will be generated. This is to help the case of
+            // testing specific functionality of the library.
+            "${nativeName}"(NativeExecutableSpec) {
+                baseName = 'roborioteamnumbersetter'
+                sources {
+                    cpp {
+                        source {
+                            srcDirs 'src/main/native/cpp', "$buildDir/generated/main/cpp"
+                            include '**/*.cpp'
+                        }
+                        exportedHeaders {
+                            srcDirs 'src/main/native/include'
+                        }
+                    }
+                    if (OperatingSystem.current().isWindows()) {
+                        rc {
+                            source {
+                                srcDirs 'src/main/native/win'
+                                include '*.rc'
+                            }
+                        }
+                    }
+                }
+                binaries.all {
+                    if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                        it.buildable = false
+                        return
+                    }
+                    it.cppCompiler.define("LIBSSH_STATIC")
+                    lib project: ':glass', library: 'glass', linkage: 'static'
+                    lib project: ':wpinet', library: 'wpinet', linkage: 'static'
+                    lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
+                    lib project: ':wpigui', library: 'wpigui', linkage: 'static'
+                    nativeUtils.useRequiredLibrary(it, 'imgui', 'libssh')
+                    if (it.targetPlatform.operatingSystem.isWindows()) {
+                        it.linker.args << 'Gdi32.lib' << 'Shell32.lib' << 'd3d11.lib' << 'd3dcompiler.lib'
+                        it.linker.args << 'ws2_32.lib' << 'advapi32.lib' << 'crypt32.lib' << 'user32.lib'
+                    } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
+                        it.linker.args << '-framework' << 'Metal' << '-framework' << 'MetalKit' << '-framework' << 'Cocoa' << '-framework' << 'IOKit' << '-framework' << 'CoreFoundation' << '-framework' << 'CoreVideo' << '-framework' << 'QuartzCore'
+                        it.linker.args << '-framework' << 'Kerberos'
+                    } else {
+                        it.linker.args << '-lX11'
+                        if (it.targetPlatform.name.startsWith('linuxarm')) {
+                            it.linker.args << '-lGL'
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    apply from: 'publish.gradle'
+}

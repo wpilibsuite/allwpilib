@@ -9,13 +9,13 @@
 namespace frc {
 
 /**
- * Vex Robotics Victor SP Motor Controller.
+ * Vex Robotics %Victor SP Motor %Controller.
  *
- * Note that the Victor SP uses the following bounds for PWM values. These
+ * Note that the %Victor SP uses the following bounds for PWM values. These
  * values should work reasonably well for most controllers, but if users
  * experience issues such as asymmetric behavior around the deadband or
  * inability to saturate the controller in either direction, calibration is
- * recommended. The calibration procedure can be found in the Victor SP User
+ * recommended. The calibration procedure can be found in the %Victor SP User
  * Manual available from Vex.
  *
  * \li 2.004ms = full "forward"
@@ -27,9 +27,9 @@ namespace frc {
 class VictorSP : public PWMMotorController {
  public:
   /**
-   * Constructor for a Victor SP.
+   * Constructor for a %Victor SP.
    *
-   * @param channel The PWM channel that the VictorSP is attached to. 0-9 are
+   * @param channel The PWM channel that the Victor SP is attached to. 0-9 are
    *                on-board, 10-19 are on the MXP port
    */
   explicit VictorSP(int channel);

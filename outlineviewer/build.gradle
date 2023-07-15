@@ -1,6 +1,6 @@
 import org.gradle.internal.os.OperatingSystem
 
-if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxraspbian') && !project.hasProperty('onlylinuxaarch64bionic')) {
+if (!project.hasProperty('onlylinuxathena')) {
 
     description = "NetworkTables Viewer"
 
@@ -23,6 +23,8 @@ if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxra
 
     def wpilibVersionFileInput = file("src/main/generate/WPILibVersion.cpp.in")
     def wpilibVersionFileOutput = file("$buildDir/generated/main/cpp/WPILibVersion.cpp")
+
+    apply from: "${rootDir}/shared/imgui.gradle"
 
     task generateCppVersion() {
         description = 'Generates the wpilib version class'
@@ -93,22 +95,27 @@ if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxra
                     }
                 }
                 binaries.all {
-                    if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio || it.targetPlatform.name == nativeUtils.wpi.platforms.raspbian || it.targetPlatform.name == nativeUtils.wpi.platforms.aarch64bionic) {
+                    if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                         it.buildable = false
                         return
                     }
                     lib project: ':glass', library: 'glassnt', linkage: 'static'
                     lib project: ':glass', library: 'glass', linkage: 'static'
-                    lib project: ':ntcore', library: 'ntcore', linkage: 'static'
+                    project(':ntcore').addNtcoreDependency(it, 'static')
+                    lib project: ':wpinet', library: 'wpinet', linkage: 'static'
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
                     lib project: ':wpigui', library: 'wpigui', linkage: 'static'
-                    nativeUtils.useRequiredLibrary(it, 'imgui_static')
+                    lib project: ':fieldImages', library: 'fieldImages', linkage: 'static'
+                    nativeUtils.useRequiredLibrary(it, 'imgui')
                     if (it.targetPlatform.operatingSystem.isWindows()) {
                         it.linker.args << 'Gdi32.lib' << 'Shell32.lib' << 'd3d11.lib' << 'd3dcompiler.lib'
                     } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
                         it.linker.args << '-framework' << 'Metal' << '-framework' << 'MetalKit' << '-framework' << 'Cocoa' << '-framework' << 'IOKit' << '-framework' << 'CoreFoundation' << '-framework' << 'CoreVideo' << '-framework' << 'QuartzCore'
                     } else {
                         it.linker.args << '-lX11'
+                        if (it.targetPlatform.name.startsWith('linuxarm')) {
+                            it.linker.args << '-lGL'
+                        }
                     }
                 }
             }

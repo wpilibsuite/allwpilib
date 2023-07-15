@@ -63,7 +63,7 @@ struct object {
 
 namespace wpi {
 
-TEST(Signal, Recursive) {
+TEST(SignalTest, Recursive) {
   object<int> i1(-1);
   object<int> i2(10);
 
@@ -75,7 +75,7 @@ TEST(Signal, Recursive) {
   ASSERT_EQ(i1.v, i2.v);
 }
 
-TEST(Signal, SelfRecursive) {
+TEST(SignalTest, SelfRecursive) {
   int i = 0;
 
   wpi::sig::Signal_r<int> s;

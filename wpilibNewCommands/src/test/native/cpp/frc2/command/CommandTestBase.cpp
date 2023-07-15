@@ -10,21 +10,23 @@ CommandTestBase::CommandTestBase() {
   auto& scheduler = CommandScheduler::GetInstance();
   scheduler.CancelAll();
   scheduler.Enable();
-  scheduler.ClearButtons();
+  scheduler.GetActiveButtonLoop()->Clear();
+  scheduler.UnregisterAllSubsystems();
+
+  SetDSEnabled(true);
+}
+
+CommandTestBase::~CommandTestBase() {
+  CommandScheduler::GetInstance().GetActiveButtonLoop()->Clear();
+  CommandScheduler::GetInstance().UnregisterAllSubsystems();
 }
 
 CommandScheduler CommandTestBase::GetScheduler() {
   return CommandScheduler();
 }
 
-void CommandTestBase::SetUp() {
-  frc::sim::DriverStationSim::SetEnabled(true);
-}
-
-void CommandTestBase::TearDown() {
-  CommandScheduler::GetInstance().ClearButtons();
-}
-
 void CommandTestBase::SetDSEnabled(bool enabled) {
+  frc::sim::DriverStationSim::SetDsAttached(true);
   frc::sim::DriverStationSim::SetEnabled(enabled);
+  frc::sim::DriverStationSim::NotifyNewData();
 }

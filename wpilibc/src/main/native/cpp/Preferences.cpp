@@ -6,9 +6,13 @@
 
 #include <algorithm>
 
+#include <fmt/format.h>
 #include <hal/FRCUsageReporting.h>
+#include <networktables/MultiSubscriber.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>
+#include <networktables/NetworkTableListener.h>
+#include <networktables/StringTopic.h>
 
 using namespace frc;
 
@@ -21,7 +25,10 @@ struct Instance {
 
   std::shared_ptr<nt::NetworkTable> table{
       nt::NetworkTableInstance::GetDefault().GetTable(kTableName)};
-  NT_EntryListener listener;
+  nt::StringPublisher typePublisher{table->GetStringTopic(".type").Publish()};
+  nt::MultiSubscriber tableSubscriber{nt::NetworkTableInstance::GetDefault(),
+                                      {{fmt::format("{}/", table->GetPath())}}};
+  nt::NetworkTableListener listener;
 };
 }  // namespace
 
@@ -30,11 +37,13 @@ static Instance& GetInstance() {
   return instance;
 }
 
-Preferences* Preferences::GetInstance() {
-  ::GetInstance();
-  static Preferences instance;
-  return &instance;
+#ifndef __FRC_ROBORIO__
+namespace frc::impl {
+void ResetPreferencesInstance() {
+  GetInstance() = Instance();
 }
+}  // namespace frc::impl
+#endif
 
 std::vector<std::string> Preferences::GetKeys() {
   return ::GetInstance().table->GetKeys();
@@ -42,28 +51,27 @@ std::vector<std::string> Preferences::GetKeys() {
 
 std::string Preferences::GetString(std::string_view key,
                                    std::string_view defaultValue) {
-  return ::GetInstance().table->GetString(key, defaultValue);
+  return ::GetInstance().table->GetEntry(key).GetString(defaultValue);
 }
 
 int Preferences::GetInt(std::string_view key, int defaultValue) {
-  return static_cast<int>(::GetInstance().table->GetNumber(key, defaultValue));
+  return ::GetInstance().table->GetEntry(key).GetInteger(defaultValue);
 }
 
 double Preferences::GetDouble(std::string_view key, double defaultValue) {
-  return ::GetInstance().table->GetNumber(key, defaultValue);
+  return ::GetInstance().table->GetEntry(key).GetDouble(defaultValue);
 }
 
 float Preferences::GetFloat(std::string_view key, float defaultValue) {
-  return ::GetInstance().table->GetNumber(key, defaultValue);
+  return ::GetInstance().table->GetEntry(key).GetFloat(defaultValue);
 }
 
 bool Preferences::GetBoolean(std::string_view key, bool defaultValue) {
-  return ::GetInstance().table->GetBoolean(key, defaultValue);
+  return ::GetInstance().table->GetEntry(key).GetBoolean(defaultValue);
 }
 
 int64_t Preferences::GetLong(std::string_view key, int64_t defaultValue) {
-  return static_cast<int64_t>(
-      ::GetInstance().table->GetNumber(key, defaultValue));
+  return ::GetInstance().table->GetEntry(key).GetInteger(defaultValue);
 }
 
 void Preferences::SetString(std::string_view key, std::string_view value) {
@@ -72,28 +80,22 @@ void Preferences::SetString(std::string_view key, std::string_view value) {
   entry.SetPersistent();
 }
 
-void Preferences::PutString(std::string_view key, std::string_view value) {
-  SetString(key, value);
-}
-
 void Preferences::InitString(std::string_view key, std::string_view value) {
   auto entry = ::GetInstance().table->GetEntry(key);
   entry.SetDefaultString(value);
+  entry.SetPersistent();
 }
 
 void Preferences::SetInt(std::string_view key, int value) {
   auto entry = ::GetInstance().table->GetEntry(key);
-  entry.SetDouble(value);
+  entry.SetInteger(value);
   entry.SetPersistent();
-}
-
-void Preferences::PutInt(std::string_view key, int value) {
-  SetInt(key, value);
 }
 
 void Preferences::InitInt(std::string_view key, int value) {
   auto entry = ::GetInstance().table->GetEntry(key);
-  entry.SetDefaultDouble(value);
+  entry.SetDefaultInteger(value);
+  entry.SetPersistent();
 }
 
 void Preferences::SetDouble(std::string_view key, double value) {
@@ -102,28 +104,22 @@ void Preferences::SetDouble(std::string_view key, double value) {
   entry.SetPersistent();
 }
 
-void Preferences::PutDouble(std::string_view key, double value) {
-  SetDouble(key, value);
-}
-
 void Preferences::InitDouble(std::string_view key, double value) {
   auto entry = ::GetInstance().table->GetEntry(key);
   entry.SetDefaultDouble(value);
+  entry.SetPersistent();
 }
 
 void Preferences::SetFloat(std::string_view key, float value) {
   auto entry = ::GetInstance().table->GetEntry(key);
-  entry.SetDouble(value);
+  entry.SetFloat(value);
   entry.SetPersistent();
-}
-
-void Preferences::PutFloat(std::string_view key, float value) {
-  SetFloat(key, value);
 }
 
 void Preferences::InitFloat(std::string_view key, float value) {
   auto entry = ::GetInstance().table->GetEntry(key);
-  entry.SetDefaultDouble(value);
+  entry.SetDefaultFloat(value);
+  entry.SetPersistent();
 }
 
 void Preferences::SetBoolean(std::string_view key, bool value) {
@@ -132,28 +128,22 @@ void Preferences::SetBoolean(std::string_view key, bool value) {
   entry.SetPersistent();
 }
 
-void Preferences::PutBoolean(std::string_view key, bool value) {
-  SetBoolean(key, value);
-}
-
 void Preferences::InitBoolean(std::string_view key, bool value) {
   auto entry = ::GetInstance().table->GetEntry(key);
   entry.SetDefaultBoolean(value);
+  entry.SetPersistent();
 }
 
 void Preferences::SetLong(std::string_view key, int64_t value) {
   auto entry = ::GetInstance().table->GetEntry(key);
-  entry.SetDouble(value);
+  entry.SetInteger(value);
   entry.SetPersistent();
-}
-
-void Preferences::PutLong(std::string_view key, int64_t value) {
-  SetLong(key, value);
 }
 
 void Preferences::InitLong(std::string_view key, int64_t value) {
   auto entry = ::GetInstance().table->GetEntry(key);
-  entry.SetDefaultDouble(value);
+  entry.SetDefaultInteger(value);
+  entry.SetPersistent();
 }
 
 bool Preferences::ContainsKey(std::string_view key) {
@@ -161,7 +151,9 @@ bool Preferences::ContainsKey(std::string_view key) {
 }
 
 void Preferences::Remove(std::string_view key) {
-  ::GetInstance().table->Delete(key);
+  auto entry = ::GetInstance().table->GetEntry(key);
+  entry.ClearPersistent();
+  entry.Unpublish();
 }
 
 void Preferences::RemoveAll() {
@@ -173,11 +165,15 @@ void Preferences::RemoveAll() {
 }
 
 Instance::Instance() {
-  table->GetEntry(".type").SetString("RobotPreferences");
-  listener = table->AddEntryListener(
-      [=](nt::NetworkTable* table, std::string_view name,
-          nt::NetworkTableEntry entry, std::shared_ptr<nt::Value> value,
-          int flags) { entry.SetPersistent(); },
-      NT_NOTIFY_NEW | NT_NOTIFY_IMMEDIATE);
+  typePublisher.Set("RobotPreferences");
+  listener = nt::NetworkTableListener::CreateListener(
+      tableSubscriber, NT_EVENT_PUBLISH | NT_EVENT_IMMEDIATE,
+      [typeTopic = typePublisher.GetTopic().GetHandle()](auto& event) {
+        if (auto topicInfo = event.GetTopicInfo()) {
+          if (topicInfo->topic != typeTopic) {
+            nt::SetTopicPersistent(topicInfo->topic, true);
+          }
+        }
+      });
   HAL_Report(HALUsageReporting::kResourceType_Preferences, 0);
 }

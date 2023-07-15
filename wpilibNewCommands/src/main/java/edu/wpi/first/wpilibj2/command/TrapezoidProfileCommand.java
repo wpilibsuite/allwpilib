@@ -5,7 +5,7 @@
 package edu.wpi.first.wpilibj2.command;
 
 import static edu.wpi.first.math.trajectory.TrapezoidProfile.State;
-import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Timer;
@@ -13,8 +13,10 @@ import java.util.function.Consumer;
 
 /**
  * A command that runs a {@link TrapezoidProfile}. Useful for smoothly controlling mechanism motion.
+ *
+ * <p>This class is provided by the NewCommands VendorDep
  */
-public class TrapezoidProfileCommand extends CommandBase {
+public class TrapezoidProfileCommand extends Command {
   private final TrapezoidProfile m_profile;
   private final Consumer<State> m_output;
 
@@ -37,8 +39,7 @@ public class TrapezoidProfileCommand extends CommandBase {
 
   @Override
   public void initialize() {
-    m_timer.reset();
-    m_timer.start();
+    m_timer.restart();
   }
 
   @Override

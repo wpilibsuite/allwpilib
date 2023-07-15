@@ -108,4 +108,234 @@ class LinearFilterTest {
             (DoubleFunction<Double>) LinearFilterTest::getPulseData,
             0.0));
   }
+
+  /** Test central finite difference. */
+  @Test
+  void centralFiniteDifferenceTest() {
+    double h = 0.005;
+
+    assertCentralResults(
+        1,
+        3,
+        // f(x) = x²
+        (double x) -> x * x,
+        // df/dx = 2x
+        (double x) -> 2.0 * x,
+        h,
+        -20.0,
+        20.0);
+
+    assertCentralResults(
+        1,
+        3,
+        // f(x) = sin(x)
+        (double x) -> Math.sin(x),
+        // df/dx = cos(x)
+        (double x) -> Math.cos(x),
+        h,
+        -20.0,
+        20.0);
+
+    assertCentralResults(
+        1,
+        3,
+        // f(x) = ln(x)
+        (double x) -> Math.log(x),
+        // df/dx = 1/x
+        (double x) -> 1.0 / x,
+        h,
+        1.0,
+        20.0);
+
+    assertCentralResults(
+        2,
+        5,
+        // f(x) = x²
+        (double x) -> x * x,
+        // d²f/dx² = 2
+        (double x) -> 2.0,
+        h,
+        -20.0,
+        20.0);
+
+    assertCentralResults(
+        2,
+        5,
+        // f(x) = sin(x)
+        (double x) -> Math.sin(x),
+        // d²f/dx² = -sin(x)
+        (double x) -> -Math.sin(x),
+        h,
+        -20.0,
+        20.0);
+
+    assertCentralResults(
+        2,
+        5,
+        // f(x) = ln(x)
+        (double x) -> Math.log(x),
+        // d²f/dx² = -1/x²
+        (double x) -> -1.0 / (x * x),
+        h,
+        1.0,
+        20.0);
+  }
+
+  /** Test backward finite difference. */
+  @Test
+  void backwardFiniteDifferenceTest() {
+    double h = 0.005;
+
+    assertBackwardResults(
+        1,
+        2,
+        // f(x) = x²
+        (double x) -> x * x,
+        // df/dx = 2x
+        (double x) -> 2.0 * x,
+        h,
+        -20.0,
+        20.0);
+
+    assertBackwardResults(
+        1,
+        2,
+        // f(x) = sin(x)
+        (double x) -> Math.sin(x),
+        // df/dx = cos(x)
+        (double x) -> Math.cos(x),
+        h,
+        -20.0,
+        20.0);
+
+    assertBackwardResults(
+        1,
+        2,
+        // f(x) = ln(x)
+        (double x) -> Math.log(x),
+        // df/dx = 1/x
+        (double x) -> 1.0 / x,
+        h,
+        1.0,
+        20.0);
+
+    assertBackwardResults(
+        2,
+        4,
+        // f(x) = x²
+        (double x) -> x * x,
+        // d²f/dx² = 2
+        (double x) -> 2.0,
+        h,
+        -20.0,
+        20.0);
+
+    assertBackwardResults(
+        2,
+        4,
+        // f(x) = sin(x)
+        (double x) -> Math.sin(x),
+        // d²f/dx² = -sin(x)
+        (double x) -> -Math.sin(x),
+        h,
+        -20.0,
+        20.0);
+
+    assertBackwardResults(
+        2,
+        4,
+        // f(x) = ln(x)
+        (double x) -> Math.log(x),
+        // d²f/dx² = -1/x²
+        (double x) -> -1.0 / (x * x),
+        h,
+        1.0,
+        20.0);
+  }
+
+  /**
+   * Helper for checking results of central finite difference.
+   *
+   * @param derivative The order of the derivative.
+   * @param samples The number of sample points.
+   * @param f Function of which to take derivative.
+   * @param dfdx Derivative of f.
+   * @param h Sample period in seconds.
+   * @param min Minimum of f's domain to test.
+   * @param max Maximum of f's domain to test.
+   */
+  void assertCentralResults(
+      int derivative,
+      int samples,
+      DoubleFunction<Double> f,
+      DoubleFunction<Double> dfdx,
+      double h,
+      double min,
+      double max) {
+    if (samples % 2 == 0) {
+      throw new IllegalArgumentException("Number of samples must be odd.");
+    }
+
+    // Generate stencil points from -(samples - 1)/2 to (samples - 1)/2
+    int[] stencil = new int[samples];
+    for (int i = 0; i < samples; ++i) {
+      stencil[i] = -(samples - 1) / 2 + i;
+    }
+
+    var filter = LinearFilter.finiteDifference(derivative, stencil, h);
+
+    for (int i = (int) (min / h); i < (int) (max / h); ++i) {
+      // Let filter initialize
+      if (i < (int) (min / h) + samples) {
+        filter.calculate(f.apply(i * h));
+        continue;
+      }
+
+      // The order of accuracy is O(h^(N - d)) where N is number of stencil
+      // points and d is order of derivative
+      assertEquals(
+          dfdx.apply((i - samples / 2) * h),
+          filter.calculate(f.apply(i * h)),
+          Math.pow(h, samples - derivative));
+    }
+  }
+
+  /**
+   * Helper for checking results of backward finite difference.
+   *
+   * @param derivative The order of the derivative.
+   * @param samples The number of sample points.
+   * @param f Function of which to take derivative.
+   * @param dfdx Derivative of f.
+   * @param h Sample period in seconds.
+   * @param min Minimum of f's domain to test.
+   * @param max Maximum of f's domain to test.
+   */
+  void assertBackwardResults(
+      int derivative,
+      int samples,
+      DoubleFunction<Double> f,
+      DoubleFunction<Double> dfdx,
+      double h,
+      double min,
+      double max) {
+    var filter = LinearFilter.backwardFiniteDifference(derivative, samples, h);
+
+    for (int i = (int) (min / h); i < (int) (max / h); ++i) {
+      // Let filter initialize
+      if (i < (int) (min / h) + samples) {
+        filter.calculate(f.apply(i * h));
+        continue;
+      }
+
+      // For central finite difference, the derivative computed at this point is
+      // half the window size in the past.
+      // The order of accuracy is O(h^(N - d)) where N is number of stencil
+      // points and d is order of derivative
+      assertEquals(
+          dfdx.apply(i * h),
+          filter.calculate(f.apply(i * h)),
+          10.0 * Math.pow(h, samples - derivative));
+    }
+  }
 }

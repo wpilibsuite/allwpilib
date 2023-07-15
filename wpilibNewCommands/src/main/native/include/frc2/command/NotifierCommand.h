@@ -6,26 +6,28 @@
 
 #include <functional>
 #include <initializer_list>
+#include <span>
 
 #include <frc/Notifier.h>
 #include <units/time.h>
-#include <wpi/span.h>
 
-#include "frc2/command/CommandBase.h"
+#include "frc2/command/Command.h"
 #include "frc2/command/CommandHelper.h"
 
 namespace frc2 {
 /**
  * A command that starts a notifier to run the given runnable periodically in a
- * separate thread. Has no end condition as-is; either subclass it or use {@link
- * Command#withTimeout(double)} or
- * {@link Command#withInterrupt(BooleanSupplier)} to give it one.
+ * separate thread. Has no end condition as-is; either subclass it or use
+ * Command::WithTimeout(double) or Command::Until(BooleanSupplier) to
+ * give it one.
  *
  * <p>WARNING: Do not use this class unless you are confident in your ability to
  * make the executed code thread-safe.  If you do not know what "thread-safe"
  * means, that is a good sign that you should not use this class.
+ *
+ * This class is provided by the NewCommands VendorDep
  */
-class NotifierCommand : public CommandHelper<CommandBase, NotifierCommand> {
+class NotifierCommand : public CommandHelper<Command, NotifierCommand> {
  public:
   /**
    * Creates a new NotifierCommand.
@@ -45,7 +47,7 @@ class NotifierCommand : public CommandHelper<CommandBase, NotifierCommand> {
    * @param requirements the subsystems required by this command
    */
   NotifierCommand(std::function<void()> toRun, units::second_t period,
-                  wpi::span<Subsystem* const> requirements = {});
+                  std::span<Subsystem* const> requirements = {});
 
   NotifierCommand(NotifierCommand&& other);
 

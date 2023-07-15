@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.RamseteController;
@@ -14,6 +14,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.Timer;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
@@ -29,8 +30,10 @@ import java.util.function.Supplier;
  * <p>Advanced teams seeking more flexibility (for example, those who wish to use the onboard PID
  * functionality of a "smart" motor controller) may use the secondary constructor that omits the PID
  * and feedforward functionality, returning only the raw wheel speeds from the RAMSETE controller.
+ *
+ * <p>This class is provided by the NewCommands VendorDep
  */
-public class RamseteCommand extends CommandBase {
+public class RamseteCommand extends Command {
   private final Timer m_timer = new Timer();
   private final boolean m_usePID;
   private final Trajectory m_trajectory;
@@ -42,7 +45,7 @@ public class RamseteCommand extends CommandBase {
   private final PIDController m_leftController;
   private final PIDController m_rightController;
   private final BiConsumer<Double, Double> m_output;
-  private DifferentialDriveWheelSpeeds m_prevSpeeds;
+  private DifferentialDriveWheelSpeeds m_prevSpeeds = new DifferentialDriveWheelSpeeds();
   private double m_prevTime;
 
   /**
@@ -117,7 +120,8 @@ public class RamseteCommand extends CommandBase {
     m_pose = requireNonNullParam(pose, "pose", "RamseteCommand");
     m_follower = requireNonNullParam(follower, "follower", "RamseteCommand");
     m_kinematics = requireNonNullParam(kinematics, "kinematics", "RamseteCommand");
-    m_output = requireNonNullParam(outputMetersPerSecond, "output", "RamseteCommand");
+    m_output =
+        requireNonNullParam(outputMetersPerSecond, "outputMetersPerSecond", "RamseteCommand");
 
     m_feedforward = null;
     m_speeds = null;
@@ -139,8 +143,7 @@ public class RamseteCommand extends CommandBase {
                 initialState.velocityMetersPerSecond,
                 0,
                 initialState.curvatureRadPerMeter * initialState.velocityMetersPerSecond));
-    m_timer.reset();
-    m_timer.start();
+    m_timer.restart();
     if (m_usePID) {
       m_leftController.reset();
       m_rightController.reset();
@@ -207,5 +210,12 @@ public class RamseteCommand extends CommandBase {
   @Override
   public boolean isFinished() {
     return m_timer.hasElapsed(m_trajectory.getTotalTimeSeconds());
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    super.initSendable(builder);
+    builder.addDoubleProperty("leftVelocity", () -> m_prevSpeeds.leftMetersPerSecond, null);
+    builder.addDoubleProperty("rightVelocity", () -> m_prevSpeeds.rightMetersPerSecond, null);
   }
 }

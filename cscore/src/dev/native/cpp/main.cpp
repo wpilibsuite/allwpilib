@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <iostream>
+#include <fmt/core.h>
 
 #include "cscore.h"
 
 int main() {
-  std::cout << cs::GetHostname() << std::endl;
+  fmt::print("{}\n", cs::GetHostname());
 }

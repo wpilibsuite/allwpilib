@@ -5,7 +5,8 @@
 package edu.wpi.first.wpilibj.examples.gearsbot.commands;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.DriveTrain;
+import edu.wpi.first.wpilibj.examples.gearsbot.Constants.DriveStraightConstants;
+import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Drivetrain;
 import edu.wpi.first.wpilibj2.command.PIDCommand;
 
 /**
@@ -14,16 +15,20 @@ import edu.wpi.first.wpilibj2.command.PIDCommand;
  * averaged values of the left and right encoders.
  */
 public class DriveStraight extends PIDCommand {
-  private final DriveTrain m_drivetrain;
+  private final Drivetrain m_drivetrain;
 
   /**
    * Create a new DriveStraight command.
    *
    * @param distance The distance to drive
    */
-  public DriveStraight(double distance, DriveTrain drivetrain) {
+  public DriveStraight(double distance, Drivetrain drivetrain) {
     super(
-        new PIDController(4, 0, 0), drivetrain::getDistance, distance, d -> drivetrain.drive(d, d));
+        new PIDController(
+            DriveStraightConstants.kP, DriveStraightConstants.kI, DriveStraightConstants.kD),
+        drivetrain::getDistance,
+        distance,
+        d -> drivetrain.drive(d, d));
 
     m_drivetrain = drivetrain;
     addRequirements(m_drivetrain);

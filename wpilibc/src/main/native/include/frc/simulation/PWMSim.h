@@ -11,6 +11,7 @@
 namespace frc {
 
 class PWM;
+class PWMMotorController;
 
 namespace sim {
 
@@ -27,6 +28,13 @@ class PWMSim {
   explicit PWMSim(const PWM& pwm);
 
   /**
+   * Constructs from a PWMMotorController object.
+   *
+   * @param motorctrl PWMMotorController to simulate
+   */
+  explicit PWMSim(const PWMMotorController& motorctrl);
+
+  /**
    * Constructs from a PWM channel number.
    *
    * @param channel Channel number
@@ -40,7 +48,8 @@ class PWMSim {
    * @param initialNotify whether to run the callback with the initial state
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterInitializedCallback(
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterInitializedCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**
@@ -58,28 +67,29 @@ class PWMSim {
   void SetInitialized(bool initialized);
 
   /**
-   * Register a callback to be run when the PWM raw value changes.
+   * Register a callback to be run when the PWM pulse microsecond value changes.
    *
    * @param callback the callback
    * @param initialNotify whether to run the callback with the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterRawValueCallback(
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterPulseMicrosecondCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**
-   * Get the PWM raw value.
+   * Get the PWM pulse microsecond value.
    *
-   * @return the PWM raw value
+   * @return the PWM pulse microsecond value
    */
-  int GetRawValue() const;
+  int32_t GetPulseMicrosecond() const;
 
   /**
-   * Set the PWM raw value.
+   * Set the PWM pulse microsecond value.
    *
-   * @param rawValue the PWM raw value
+   * @param microsecondPulseTime the PWM pulse microsecond value
    */
-  void SetRawValue(int rawValue);
+  void SetPulseMicrosecond(int32_t microsecondPulseTime);
 
   /**
    * Register a callback to be run when the PWM speed changes.
@@ -88,8 +98,9 @@ class PWMSim {
    * @param initialNotify whether to run the callback with the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterSpeedCallback(
-      NotifyCallback callback, bool initialNotify);
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterSpeedCallback(NotifyCallback callback,
+                                                       bool initialNotify);
 
   /**
    * Get the PWM speed.
@@ -112,7 +123,8 @@ class PWMSim {
    * @param initialNotify whether to run the callback with the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterPositionCallback(
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterPositionCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**
@@ -136,7 +148,8 @@ class PWMSim {
    * @param initialNotify whether to run the callback with the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterPeriodScaleCallback(
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterPeriodScaleCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**
@@ -160,7 +173,8 @@ class PWMSim {
    * @param initialNotify whether to run the callback with the initial state
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterZeroLatchCallback(
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterZeroLatchCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**

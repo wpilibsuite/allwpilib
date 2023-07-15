@@ -7,8 +7,8 @@
 #include <array>
 #include <cmath>
 
-#include "Eigen/Core"
 #include "Eigen/QR"
+#include "frc/EigenCore.h"
 #include "frc/StateSpaceUtil.h"
 #include "frc/estimator/ExtendedKalmanFilter.h"
 #include "frc/system/NumericalJacobian.h"
@@ -18,8 +18,7 @@
 
 namespace {
 
-Eigen::Matrix<double, 5, 1> Dynamics(const Eigen::Matrix<double, 5, 1>& x,
-                                     const Eigen::Matrix<double, 2, 1>& u) {
+frc::Vectord<5> Dynamics(const frc::Vectord<5>& x, const frc::Vectord<2>& u) {
   auto motors = frc::DCMotor::CIM(2);
 
   // constexpr double Glow = 15.32;       // Low gear ratio
@@ -40,36 +39,26 @@ Eigen::Matrix<double, 5, 1> Dynamics(const Eigen::Matrix<double, 5, 1>& x,
   units::volt_t Vl{u(0)};
   units::volt_t Vr{u(1)};
 
-  Eigen::Matrix<double, 5, 1> result;
   auto v = 0.5 * (vl + vr);
-  result(0) = v.to<double>() * std::cos(x(2));
-  result(1) = v.to<double>() * std::sin(x(2));
-  result(2) = ((vr - vl) / (2.0 * rb)).to<double>();
-  result(3) =
-      k1.to<double>() * ((C1 * vl).to<double>() + (C2 * Vl).to<double>()) +
-      k2.to<double>() * ((C1 * vr).to<double>() + (C2 * Vr).to<double>());
-  result(4) =
-      k2.to<double>() * ((C1 * vl).to<double>() + (C2 * Vl).to<double>()) +
-      k1.to<double>() * ((C1 * vr).to<double>() + (C2 * Vr).to<double>());
-  return result;
+  return frc::Vectord<5>{
+      v.value() * std::cos(x(2)), v.value() * std::sin(x(2)),
+      ((vr - vl) / (2.0 * rb)).value(),
+      k1.value() * ((C1 * vl).value() + (C2 * Vl).value()) +
+          k2.value() * ((C1 * vr).value() + (C2 * Vr).value()),
+      k2.value() * ((C1 * vl).value() + (C2 * Vl).value()) +
+          k1.value() * ((C1 * vr).value() + (C2 * Vr).value())};
 }
 
-Eigen::Matrix<double, 3, 1> LocalMeasurementModel(
-    const Eigen::Matrix<double, 5, 1>& x,
-    const Eigen::Matrix<double, 2, 1>& u) {
+frc::Vectord<3> LocalMeasurementModel(const frc::Vectord<5>& x,
+                                      const frc::Vectord<2>& u) {
   static_cast<void>(u);
-  Eigen::Matrix<double, 3, 1> y;
-  y << x(2), x(3), x(4);
-  return y;
+  return frc::Vectord<3>{x(2), x(3), x(4)};
 }
 
-Eigen::Matrix<double, 5, 1> GlobalMeasurementModel(
-    const Eigen::Matrix<double, 5, 1>& x,
-    const Eigen::Matrix<double, 2, 1>& u) {
+frc::Vectord<5> GlobalMeasurementModel(const frc::Vectord<5>& x,
+                                       const frc::Vectord<2>& u) {
   static_cast<void>(u);
-  Eigen::Matrix<double, 5, 1> y;
-  y << x(0), x(1), x(2), x(3), x(4);
-  return y;
+  return frc::Vectord<5>{x(0), x(1), x(2), x(3), x(4)};
 }
 }  // namespace
 
@@ -81,8 +70,7 @@ TEST(ExtendedKalmanFilterTest, Init) {
                                               {0.5, 0.5, 10.0, 1.0, 1.0},
                                               {0.0001, 0.01, 0.01},
                                               dt};
-  Eigen::Matrix<double, 2, 1> u;
-  u << 12.0, 12.0;
+  frc::Vectord<2> u{12.0, 12.0};
   observer.Predict(u, dt);
 
   auto localY = LocalMeasurementModel(observer.Xhat(), u);
@@ -109,41 +97,34 @@ TEST(ExtendedKalmanFilterTest, Convergence) {
   auto trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
       waypoints, {8.8_mps, 0.1_mps_sq});
 
-  Eigen::Matrix<double, 5, 1> r = Eigen::Matrix<double, 5, 1>::Zero();
+  frc::Vectord<5> r = frc::Vectord<5>::Zero();
+  frc::Vectord<2> u = frc::Vectord<2>::Zero();
 
-  Eigen::Matrix<double, 5, 1> nextR;
-  Eigen::Matrix<double, 2, 1> u = Eigen::Matrix<double, 2, 1>::Zero();
+  auto B = frc::NumericalJacobianU<5, 5, 2>(Dynamics, frc::Vectord<5>::Zero(),
+                                            frc::Vectord<2>::Zero());
 
-  auto B = frc::NumericalJacobianU<5, 5, 2>(
-      Dynamics, Eigen::Matrix<double, 5, 1>::Zero(),
-      Eigen::Matrix<double, 2, 1>::Zero());
-
-  observer.SetXhat(frc::MakeMatrix<5, 1>(
-      trajectory.InitialPose().Translation().X().to<double>(),
-      trajectory.InitialPose().Translation().Y().to<double>(),
-      trajectory.InitialPose().Rotation().Radians().to<double>(), 0.0, 0.0));
+  observer.SetXhat(frc::Vectord<5>{
+      trajectory.InitialPose().Translation().X().value(),
+      trajectory.InitialPose().Translation().Y().value(),
+      trajectory.InitialPose().Rotation().Radians().value(), 0.0, 0.0});
 
   auto totalTime = trajectory.TotalTime();
-  for (size_t i = 0; i < (totalTime / dt).to<double>(); ++i) {
+  for (size_t i = 0; i < (totalTime / dt).value(); ++i) {
     auto ref = trajectory.Sample(dt * i);
     units::meters_per_second_t vl =
-        ref.velocity * (1 - (ref.curvature * rb).to<double>());
+        ref.velocity * (1 - (ref.curvature * rb).value());
     units::meters_per_second_t vr =
-        ref.velocity * (1 + (ref.curvature * rb).to<double>());
+        ref.velocity * (1 + (ref.curvature * rb).value());
 
-    nextR(0) = ref.pose.Translation().X().to<double>();
-    nextR(1) = ref.pose.Translation().Y().to<double>();
-    nextR(2) = ref.pose.Rotation().Radians().to<double>();
-    nextR(3) = vl.to<double>();
-    nextR(4) = vr.to<double>();
+    frc::Vectord<5> nextR{
+        ref.pose.Translation().X().value(), ref.pose.Translation().Y().value(),
+        ref.pose.Rotation().Radians().value(), vl.value(), vr.value()};
 
-    auto localY =
-        LocalMeasurementModel(nextR, Eigen::Matrix<double, 2, 1>::Zero());
+    auto localY = LocalMeasurementModel(nextR, frc::Vectord<2>::Zero());
     observer.Correct(u, localY + frc::MakeWhiteNoiseVector(0.0001, 0.5, 0.5));
 
-    Eigen::Matrix<double, 5, 1> rdot = (nextR - r) / dt.to<double>();
-    u = B.householderQr().solve(
-        rdot - Dynamics(r, Eigen::Matrix<double, 2, 1>::Zero()));
+    frc::Vectord<5> rdot = (nextR - r) / dt.value();
+    u = B.householderQr().solve(rdot - Dynamics(r, frc::Vectord<2>::Zero()));
 
     observer.Predict(u, dt);
 
@@ -158,12 +139,12 @@ TEST(ExtendedKalmanFilterTest, Convergence) {
   observer.Correct<5>(u, globalY, GlobalMeasurementModel, R);
 
   auto finalPosition = trajectory.Sample(trajectory.TotalTime());
-  ASSERT_NEAR(finalPosition.pose.Translation().X().template to<double>(),
-              observer.Xhat(0), 1.0);
-  ASSERT_NEAR(finalPosition.pose.Translation().Y().template to<double>(),
-              observer.Xhat(1), 1.0);
-  ASSERT_NEAR(finalPosition.pose.Rotation().Radians().template to<double>(),
-              observer.Xhat(2), 1.0);
+  ASSERT_NEAR(finalPosition.pose.Translation().X().value(), observer.Xhat(0),
+              1.0);
+  ASSERT_NEAR(finalPosition.pose.Translation().Y().value(), observer.Xhat(1),
+              1.0);
+  ASSERT_NEAR(finalPosition.pose.Rotation().Radians().value(), observer.Xhat(2),
+              1.0);
   ASSERT_NEAR(0.0, observer.Xhat(3), 1.0);
   ASSERT_NEAR(0.0, observer.Xhat(4), 1.0);
 }

@@ -15,13 +15,14 @@ import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Class to enable glitch filtering on a set of digital inputs. This class will manage adding and
- * removing digital inputs from a FPGA glitch filter. The filter lets the user configure the time
+ * removing digital inputs from an FPGA glitch filter. The filter lets the user configure the time
  * that an input must remain high or low before it is classified as high or low.
  */
 public class DigitalGlitchFilter implements Sendable, AutoCloseable {
   /** Configures the Digital Glitch Filter to its default settings. */
   public DigitalGlitchFilter() {
-    synchronized (m_mutex) {
+    m_mutex.lock();
+    try {
       int index = 0;
       while (m_filterAllocated[index] && index < m_filterAllocated.length) {
         index++;
@@ -32,6 +33,8 @@ public class DigitalGlitchFilter implements Sendable, AutoCloseable {
         HAL.report(tResourceType.kResourceType_DigitalGlitchFilter, m_channelIndex + 1, 0);
         SendableRegistry.addLW(this, "DigitalGlitchFilter", index);
       }
+    } finally {
+      m_mutex.unlock();
     }
   }
 
@@ -39,9 +42,13 @@ public class DigitalGlitchFilter implements Sendable, AutoCloseable {
   public void close() {
     SendableRegistry.remove(this);
     if (m_channelIndex >= 0) {
-      synchronized (m_mutex) {
+      m_mutex.lock();
+      try {
         m_filterAllocated[m_channelIndex] = false;
+      } finally {
+        m_mutex.unlock();
       }
+
       m_channelIndex = -1;
     }
   }

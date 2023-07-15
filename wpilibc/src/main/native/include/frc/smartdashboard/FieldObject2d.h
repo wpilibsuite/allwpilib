@@ -5,16 +5,16 @@
 #pragma once
 
 #include <initializer_list>
+#include <span>
 #include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
 
-#include <networktables/NetworkTableEntry.h>
+#include <networktables/DoubleArrayTopic.h>
 #include <units/length.h>
 #include <wpi/SmallVector.h>
 #include <wpi/mutex.h>
-#include <wpi/span.h>
 
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
@@ -66,13 +66,12 @@ class FieldObject2d {
    *
    * @param poses array of 2D poses
    */
-  void SetPoses(wpi::span<const Pose2d> poses);
+  void SetPoses(std::span<const Pose2d> poses);
 
   /**
    * Set multiple poses from an array of Pose objects.
    * The total number of poses is limited to 85.
    *
-   * @param obj Object entry
    * @param poses array of 2D poses
    */
   void SetPoses(std::initializer_list<Pose2d> poses);
@@ -95,11 +94,10 @@ class FieldObject2d {
   /**
    * Get multiple poses.
    *
-   * @param obj Object entry
    * @param out output SmallVector to hold 2D poses
    * @return span referring to output SmallVector
    */
-  wpi::span<const Pose2d> GetPoses(wpi::SmallVectorImpl<Pose2d>& out) const;
+  std::span<const Pose2d> GetPoses(wpi::SmallVectorImpl<Pose2d>& out) const;
 
  private:
   void UpdateEntry(bool setDefault = false);
@@ -107,7 +105,7 @@ class FieldObject2d {
 
   mutable wpi::mutex m_mutex;
   std::string m_name;
-  nt::NetworkTableEntry m_entry;
+  nt::DoubleArrayEntry m_entry;
   mutable wpi::SmallVector<Pose2d, 1> m_poses;
 };
 

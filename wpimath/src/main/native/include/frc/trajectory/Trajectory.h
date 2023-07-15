@@ -6,6 +6,8 @@
 
 #include <vector>
 
+#include <wpi/SymbolExports.h>
+
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Transform2d.h"
 #include "units/acceleration.h"
@@ -23,12 +25,12 @@ namespace frc {
  * various States that represent the pose, curvature, time elapsed, velocity,
  * and acceleration at that point.
  */
-class Trajectory {
+class WPILIB_DLLEXPORT Trajectory {
  public:
   /**
    * Represents one point on the trajectory.
    */
-  struct State {
+  struct WPILIB_DLLEXPORT State {
     // The time elapsed since the beginning of the trajectory.
     units::second_t t = 0_s;
 
@@ -46,19 +48,8 @@ class Trajectory {
 
     /**
      * Checks equality between this State and another object.
-     *
-     * @param other The other object.
-     * @return Whether the two objects are equal.
      */
-    bool operator==(const State& other) const;
-
-    /**
-     * Checks inequality between this State and another object.
-     *
-     * @param other The other object.
-     * @return Whether the two objects are not equal.
-     */
-    bool operator!=(const State& other) const;
+    bool operator==(const State&) const = default;
 
     /**
      * Interpolates between two States.
@@ -138,41 +129,18 @@ class Trajectory {
 
   /**
    * Checks equality between this Trajectory and another object.
-   *
-   * @param other The other object.
-   * @return Whether the two objects are equal.
    */
-  bool operator==(const Trajectory& other) const;
-
-  /**
-   * Checks inequality between this Trajectory and another object.
-   *
-   * @param other The other object.
-   * @return Whether the two objects are inequal.
-   */
-  bool operator!=(const Trajectory& other) const;
+  bool operator==(const Trajectory&) const = default;
 
  private:
   std::vector<State> m_states;
   units::second_t m_totalTime = 0_s;
-
-  /**
-   * Linearly interpolates between two values.
-   *
-   * @param startValue The start value.
-   * @param endValue The end value.
-   * @param t The fraction for interpolation.
-   *
-   * @return The interpolated value.
-   */
-  template <typename T>
-  static T Lerp(const T& startValue, const T& endValue, const double t) {
-    return startValue + (endValue - startValue) * t;
-  }
 };
 
+WPILIB_DLLEXPORT
 void to_json(wpi::json& json, const Trajectory::State& state);
 
+WPILIB_DLLEXPORT
 void from_json(const wpi::json& json, Trajectory::State& state);
 
 }  // namespace frc

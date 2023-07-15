@@ -304,6 +304,38 @@ public class EncoderSim {
   }
 
   /**
+   * Register a callback on the distance per pulse value of this encoder.
+   *
+   * @param callback the callback that will be called whenever the distance per pulse is changed
+   * @param initialNotify if true, the callback will be run on the initial value
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
+   */
+  public CallbackStore registerDistancePerPulseCallback(
+      NotifyCallback callback, boolean initialNotify) {
+    int uid = EncoderDataJNI.registerDistancePerPulseCallback(m_index, callback, initialNotify);
+    return new CallbackStore(m_index, uid, EncoderDataJNI::cancelDistancePerPulseCallback);
+  }
+
+  /**
+   * Get the distance per pulse value.
+   *
+   * @return the distance per pulse value
+   */
+  public double getDistancePerPulse() {
+    return EncoderDataJNI.getDistancePerPulse(m_index);
+  }
+
+  /**
+   * Set the distance per pulse value.
+   *
+   * @param samplesToAverage the new value
+   */
+  public void setDistancePerPulse(double samplesToAverage) {
+    EncoderDataJNI.setDistancePerPulse(m_index, samplesToAverage);
+  }
+
+  /**
    * Change the encoder distance.
    *
    * @param distance the new distance

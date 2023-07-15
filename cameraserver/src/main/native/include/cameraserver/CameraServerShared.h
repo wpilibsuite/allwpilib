@@ -27,20 +27,17 @@ class CameraServerShared {
 
   template <typename S, typename... Args>
   inline void SetCameraServerError(const S& format, Args&&... args) {
-    SetCameraServerErrorV(format,
-                          fmt::make_args_checked<Args...>(format, args...));
+    SetCameraServerErrorV(format, fmt::make_format_args(args...));
   }
 
   template <typename S, typename... Args>
   inline void SetVisionRunnerError(const S& format, Args&&... args) {
-    SetVisionRunnerErrorV(format,
-                          fmt::make_args_checked<Args...>(format, args...));
+    SetVisionRunnerErrorV(format, fmt::make_format_args(args...));
   }
 
   template <typename S, typename... Args>
   inline void ReportDriverStationError(const S& format, Args&&... args) {
-    ReportDriverStationErrorV(format,
-                              fmt::make_args_checked<Args...>(format, args...));
+    ReportDriverStationErrorV(format, fmt::make_format_args(args...));
   }
 };
 

@@ -18,7 +18,7 @@ namespace frc {
 /**
  * Use a rate gyro to return the robots heading relative to a starting position.
  *
- * The Gyro class tracks the robots heading based on the starting position. As
+ * The %Gyro class tracks the robots heading based on the starting position. As
  * the robot rotates the new heading is computed by integrating the rate of
  * rotation returned by the sensor. When the class is instantiated, it does a
  * short calibration routine where it samples the gyro while at rest to
@@ -26,19 +26,19 @@ namespace frc {
  * determine the heading.
  *
  * This class is for the digital ADXRS450 gyro sensor that connects via SPI.
- * Only one instance of an ADXRS Gyro is supported.
+ * Only one instance of an ADXRS %Gyro is supported.
  */
 class ADXRS450_Gyro : public Gyro,
                       public wpi::Sendable,
                       public wpi::SendableHelper<ADXRS450_Gyro> {
  public:
   /**
-   * Gyro constructor on onboard CS0.
+   * %Gyro constructor on onboard CS0.
    */
   ADXRS450_Gyro();
 
   /**
-   * Gyro constructor on the specified SPI port.
+   * %Gyro constructor on the specified SPI port.
    *
    * @param port The SPI port the gyro is attached to.
    */
@@ -48,6 +48,8 @@ class ADXRS450_Gyro : public Gyro,
 
   ADXRS450_Gyro(ADXRS450_Gyro&&) = default;
   ADXRS450_Gyro& operator=(ADXRS450_Gyro&&) = default;
+
+  bool IsConnected() const;
 
   /**
    * Return the actual angle in degrees that the robot is currently facing.
@@ -105,8 +107,10 @@ class ADXRS450_Gyro : public Gyro,
  private:
   SPI m_spi;
   SPI::Port m_port;
+  bool m_connected{false};
 
   hal::SimDevice m_simDevice;
+  hal::SimBoolean m_simConnected;
   hal::SimDouble m_simAngle;
   hal::SimDouble m_simRate;
 

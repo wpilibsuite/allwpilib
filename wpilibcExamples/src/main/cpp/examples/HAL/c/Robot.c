@@ -72,7 +72,7 @@ int main(void) {
   }
 
   // Set PWM config to standard servo speeds
-  HAL_SetPWMConfig(pwmPort, 2.0, 1.501, 1.5, 1.499, 1.0, &status);
+  HAL_SetPWMConfigMicroseconds(pwmPort, 2000, 1501, 1500, 1499, 1000, &status);
 
   // Create an Input
   status = 0;
@@ -87,13 +87,18 @@ int main(void) {
     return 1;
   }
 
+  WPI_EventHandle eventHandle = WPI_CreateEvent(1, 0);
+  HAL_ProvideNewDataEventHandle(eventHandle);
+
   while (1) {
     // Wait for DS data, with a timeout
-    HAL_Bool validData = HAL_WaitForDSDataTimeout(1.0);
-    if (!validData) {
+    int timed_out = 0;
+    int signaled = WPI_WaitForObjectTimeout(eventHandle, 1.0, &timed_out);
+    if (!signaled) {
       // Do something here on no packet
       continue;
     }
+
     enum DriverStationMode dsMode = getDSMode();
     switch (dsMode) {
       case DisabledMode:
@@ -116,6 +121,9 @@ int main(void) {
   }
 
   // Clean up resources
+  HAL_RemoveNewDataEventHandle(eventHandle);
+  WPI_DestroyEvent(eventHandle);
+
   status = 0;
   HAL_FreeDIOPort(dio);
   HAL_FreePWMPort(pwmPort, &status);

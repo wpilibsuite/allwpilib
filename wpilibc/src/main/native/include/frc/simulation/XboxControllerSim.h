@@ -32,86 +32,116 @@ class XboxControllerSim : public GenericHIDSim {
   explicit XboxControllerSim(int port);
 
   /**
-   * Change the X value of the joystick.
+   * Change the X axis value of the controller's left stick.
    *
-   * @param hand the joystick hand
    * @param value the new value
    */
-  void SetX(GenericHID::JoystickHand hand, double value);
+  void SetLeftX(double value);
 
   /**
-   * Change the Y value of the joystick.
+   * Change the X axis value of the controller's right stick.
    *
-   * @param hand the joystick hand
    * @param value the new value
    */
-  void SetY(GenericHID::JoystickHand hand, double value);
+  void SetRightX(double value);
 
   /**
-   * Change the value of a trigger axis on the joystick.
+   * Change the Y axis value of the controller's left stick.
    *
-   * @param hand the joystick hand
    * @param value the new value
    */
-  void SetTriggerAxis(GenericHID::JoystickHand hand, double value);
+  void SetLeftY(double value);
 
   /**
-   * Change the value of a bumper on the joystick.
+   * Change the Y axis value of the controller's right stick.
    *
-   * @param hand the joystick hand
-   * @param state the new value
+   * @param value the new value
    */
-  void SetBumper(GenericHID::JoystickHand hand, bool state);
+  void SetRightY(double value);
 
   /**
-   * Change the value of a button on the joystick.
+   * Change the left trigger axis value of the joystick.
    *
-   * @param hand the joystick hand
-   * @param state the new value
+   * @param value the new value
    */
-  void SetStickButton(GenericHID::JoystickHand hand, bool state);
+  void SetLeftTriggerAxis(double value);
+
+  /**
+   * Change the right trigger axis value of the joystick.
+   *
+   * @param value the new value
+   */
+  void SetRightTriggerAxis(double value);
+
+  /**
+   * Change the left bumper value of the joystick.
+   *
+   * @param value the new value
+   */
+  void SetLeftBumper(bool value);
+
+  /**
+   * Change the right bumper value of the joystick.
+   *
+   * @param value the new value
+   */
+  void SetRightBumper(bool value);
+
+  /**
+   * Change the left button value of the joystick.
+   *
+   * @param value the new value
+   */
+  void SetLeftStickButton(bool value);
+
+  /**
+   * Change the right button value of the joystick.
+   *
+   * @param value the new value
+   */
+  void SetRightStickButton(bool value);
 
   /**
    * Change the value of the A button.
    *
-   * @param state the new value
+   * @param value the new value
    */
-  void SetAButton(bool state);
+  void SetAButton(bool value);
 
   /**
    * Change the value of the B button.
    *
-   * @param state the new value
+   * @param value the new value
    */
-  void SetBButton(bool state);
+  void SetBButton(bool value);
 
   /**
    * Change the value of the X button.
    *
-   * @param state the new value
+   * @param value the new value
    */
-  void SetXButton(bool state);
+  void SetXButton(bool value);
 
   /**
    * Change the value of the Y button.
    *
-   * @param state the new value
+   * @param value the new value
    */
-  void SetYButton(bool state);
+  void SetYButton(bool value);
 
   /**
    * Change the value of the Back button.
    *
-   * @param state the new value
+   * @param value the new value
    */
-  void SetBackButton(bool state);
+  void SetBackButton(bool value);
 
   /**
    * Change the value of the Start button.
    *
-   * @param state the new value
+   * @param value the new value
    */
-  void SetStartButton(bool state);
+  void SetStartButton(bool value);
 };
 
 }  // namespace sim

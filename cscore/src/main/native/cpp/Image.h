@@ -34,7 +34,9 @@ class Image {
   Image& operator=(const Image&) = delete;
 
   // Getters
-  operator std::string_view() const { return str(); }  // NOLINT
+  operator std::string_view() const {  // NOLINT
+    return str();
+  }
   std::string_view str() const { return {data(), size()}; }
   size_t capacity() const { return m_data.capacity(); }
   const char* data() const {
@@ -54,6 +56,8 @@ class Image {
     switch (pixelFormat) {
       case VideoMode::kYUYV:
       case VideoMode::kRGB565:
+      case VideoMode::kY16:
+      case VideoMode::kUYVY:
         type = CV_8UC2;
         break;
       case VideoMode::kBGR:

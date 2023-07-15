@@ -4,6 +4,11 @@
 
 #pragma once
 
+#include <cstddef>
+#include <string>
+
+#include <wpi/spinlock.h>
+
 #include "hal/simulation/RoboRioData.h"
 #include "hal/simulation/SimDataValue.h"
 
@@ -24,6 +29,10 @@ class RoboRioData {
   HAL_SIMDATAVALUE_DEFINE_NAME(UserFaults6V)
   HAL_SIMDATAVALUE_DEFINE_NAME(UserFaults5V)
   HAL_SIMDATAVALUE_DEFINE_NAME(UserFaults3V3)
+  HAL_SIMDATAVALUE_DEFINE_NAME(BrownoutVoltage)
+
+  HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(SerialNumber)
+  HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(Comments);
 
  public:
   SimDataValue<HAL_Bool, HAL_MakeBoolean, GetFPGAButtonName> fpgaButton{false};
@@ -46,8 +55,35 @@ class RoboRioData {
   SimDataValue<int32_t, HAL_MakeInt, GetUserFaults6VName> userFaults6V{0};
   SimDataValue<int32_t, HAL_MakeInt, GetUserFaults5VName> userFaults5V{0};
   SimDataValue<int32_t, HAL_MakeInt, GetUserFaults3V3Name> userFaults3V3{0};
+  SimDataValue<double, HAL_MakeDouble, GetBrownoutVoltageName> brownoutVoltage{
+      6.75};
+
+  int32_t RegisterSerialNumberCallback(HAL_RoboRioStringCallback callback,
+                                       void* param, HAL_Bool initialNotify);
+  void CancelSerialNumberCallback(int32_t uid);
+  size_t GetSerialNumber(char* buffer, size_t size);
+  void SetSerialNumber(const char* serialNumber, size_t size);
+
+  int32_t RegisterCommentsCallback(HAL_RoboRioStringCallback callback,
+                                   void* param, HAL_Bool initialNotify);
+  void CancelCommentsCallback(int32_t uid);
+  size_t GetComments(char* buffer, size_t size);
+  void SetComments(const char* comments, size_t size);
 
   virtual void ResetData();
+
+ private:
+  wpi::spinlock m_serialNumberMutex;
+  std::string m_serialNumber;
+
+  wpi::spinlock m_commentsMutex;
+  std::string m_comments;
+
+  SimCallbackRegistry<HAL_RoboRioStringCallback, GetSerialNumberName>
+      m_serialNumberCallbacks;
+
+  SimCallbackRegistry<HAL_RoboRioStringCallback, GetCommentsName>
+      m_commentsCallbacks;
 };
 extern RoboRioData* SimRoboRioData;
 }  // namespace hal

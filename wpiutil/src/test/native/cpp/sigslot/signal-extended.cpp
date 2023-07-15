@@ -68,7 +68,7 @@ struct o {
 
 namespace wpi {
 
-TEST(SignalExtended, FreeConnection) {
+TEST(SignalExtendedTest, FreeConnection) {
   sum = 0;
   Signal<int> sig;
   sig.connect_extended(f);
@@ -79,7 +79,7 @@ TEST(SignalExtended, FreeConnection) {
   ASSERT_EQ(sum, 1);
 }
 
-TEST(SignalExtended, StaticConnection) {
+TEST(SignalExtendedTest, StaticConnection) {
   sum = 0;
   Signal<int> sig;
   sig.connect_extended(&s::sf);
@@ -90,7 +90,7 @@ TEST(SignalExtended, StaticConnection) {
   ASSERT_EQ(sum, 1);
 }
 
-TEST(SignalExtended, PmfConnection) {
+TEST(SignalExtendedTest, PmfConnection) {
   sum = 0;
   Signal<int> sig;
   s p;
@@ -102,7 +102,7 @@ TEST(SignalExtended, PmfConnection) {
   ASSERT_EQ(sum, 1);
 }
 
-TEST(SignalExtended, FunctionObjectConnection) {
+TEST(SignalExtendedTest, FunctionObjectConnection) {
   sum = 0;
   Signal<int> sig;
   sig.connect_extended(o{});
@@ -113,7 +113,7 @@ TEST(SignalExtended, FunctionObjectConnection) {
   ASSERT_EQ(sum, 1);
 }
 
-TEST(SignalExtended, LambdaConnection) {
+TEST(SignalExtendedTest, LambdaConnection) {
   sum = 0;
   Signal<int> sig;
 

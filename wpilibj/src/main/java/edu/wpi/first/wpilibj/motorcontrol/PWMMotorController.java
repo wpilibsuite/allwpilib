@@ -78,7 +78,8 @@ public abstract class PWMMotorController extends MotorSafety
 
   @Override
   public void stopMotor() {
-    disable();
+    // Don't use set(0) as that will feed the watch kitty
+    m_pwm.setSpeed(0);
   }
 
   @Override
@@ -102,6 +103,17 @@ public abstract class PWMMotorController extends MotorSafety
    */
   public int getChannel() {
     return m_pwm.getChannel();
+  }
+
+  /**
+   * Optionally eliminate the deadband from a motor controller.
+   *
+   * @param eliminateDeadband If true, set the motor curve for the motor controller to eliminate the
+   *     deadband in the middle of the range. Otherwise, keep the full range without modifying any
+   *     values.
+   */
+  public void enableDeadbandElimination(boolean eliminateDeadband) {
+    m_pwm.enableDeadbandElimination(eliminateDeadband);
   }
 
   @Override

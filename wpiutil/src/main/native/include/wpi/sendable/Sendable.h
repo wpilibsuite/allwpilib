@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "wpi/SymbolExports.h"
+
 namespace wpi {
 
 class SendableBuilder;
@@ -11,7 +13,7 @@ class SendableBuilder;
 /**
  * Interface for Sendable objects.
  */
-class Sendable {
+class WPILIB_DLLEXPORT Sendable {
  public:
   virtual ~Sendable() = default;
 

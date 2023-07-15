@@ -98,8 +98,9 @@ void initializeDigital(int32_t* status) {
 
   // Make sure that the 9403 IONode has had a chance to initialize before
   // continuing.
-  while (pwmSystem->readLoopTiming(status) == 0)
+  while (pwmSystem->readLoopTiming(status) == 0) {
     std::this_thread::yield();
+  }
 
   if (pwmSystem->readLoopTiming(status) != kExpectedLoopTiming) {
     *status = LOOP_TIMING_ERROR;  // NOTE: Doesn't display the error
@@ -111,9 +112,7 @@ void initializeDigital(int32_t* status) {
 
   pwmSystem->writeConfig_Period(std::lround(kDefaultPwmPeriod / loopTime),
                                 status);
-  uint16_t minHigh = std::lround(
-      (kDefaultPwmCenter - kDefaultPwmStepsDown * loopTime) / loopTime);
-  pwmSystem->writeConfig_MinHigh(minHigh, status);
+  pwmSystem->writeConfig_MinHigh(0, status);
   // Ensure that PWM output values are set to OFF
   for (uint8_t pwmIndex = 0; pwmIndex < kNumPWMChannels; pwmIndex++) {
     // Copy of SetPWM

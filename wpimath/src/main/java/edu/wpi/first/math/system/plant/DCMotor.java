@@ -8,38 +8,23 @@ import edu.wpi.first.math.util.Units;
 
 /** Holds the constants for a DC motor. */
 public class DCMotor {
-  @SuppressWarnings("MemberName")
   public final double nominalVoltageVolts;
-
-  @SuppressWarnings("MemberName")
   public final double stallTorqueNewtonMeters;
-
-  @SuppressWarnings("MemberName")
   public final double stallCurrentAmps;
-
-  @SuppressWarnings("MemberName")
   public final double freeCurrentAmps;
-
-  @SuppressWarnings("MemberName")
   public final double freeSpeedRadPerSec;
-
-  @SuppressWarnings("MemberName")
   public final double rOhms;
-
-  @SuppressWarnings("MemberName")
   public final double KvRadPerSecPerVolt;
-
-  @SuppressWarnings("MemberName")
   public final double KtNMPerAmp;
 
   /**
    * Constructs a DC motor.
    *
    * @param nominalVoltageVolts Voltage at which the motor constants were measured.
-   * @param stallTorqueNewtonMeters Current draw when stalled.
-   * @param stallCurrentAmps Current draw when stalled.
-   * @param freeCurrentAmps Current draw under no load.
-   * @param freeSpeedRadPerSec Angular velocity under no load.
+   * @param stallTorqueNewtonMeters Torque when stalled in Newton-meters.
+   * @param stallCurrentAmps Current draw when stalled in amps.
+   * @param freeCurrentAmps Current draw under no load in amps.
+   * @param freeSpeedRadPerSec Angular velocity under no load in radians per second.
    * @param numMotors Number of motors in a gearbox.
    */
   public DCMotor(
@@ -64,12 +49,61 @@ public class DCMotor {
   /**
    * Estimate the current being drawn by this motor.
    *
-   * @param speedRadiansPerSec The speed of the rotor.
+   * @param speedRadiansPerSec The speed of the motor.
    * @param voltageInputVolts The input voltage.
    * @return The estimated current.
    */
   public double getCurrent(double speedRadiansPerSec, double voltageInputVolts) {
     return -1.0 / KvRadPerSecPerVolt / rOhms * speedRadiansPerSec + 1.0 / rOhms * voltageInputVolts;
+  }
+
+  /**
+   * Calculate the torque produced by the motor for a given current.
+   *
+   * @param currentAmpere The current drawn by the motor.
+   * @return The torque produced.
+   */
+  public double getTorque(double currentAmpere) {
+    return currentAmpere * KtNMPerAmp;
+  }
+
+  /**
+   * Calculate the voltage provided to the motor at a given torque and angular velocity.
+   *
+   * @param torqueNm The torque produced by the motor.
+   * @param speedRadiansPerSec The speed of the motor.
+   * @return The voltage of the motor.
+   */
+  public double getVoltage(double torqueNm, double speedRadiansPerSec) {
+    return 1.0 / KvRadPerSecPerVolt * speedRadiansPerSec + 1.0 / KtNMPerAmp * rOhms * torqueNm;
+  }
+
+  /**
+   * Calculate the speed of the motor at a given torque and input voltage.
+   *
+   * @param torqueNm The torque produced by the motor.
+   * @param voltageInputVolts The voltage applied to the motor.
+   * @return The speed of the motor.
+   */
+  public double getSpeed(double torqueNm, double voltageInputVolts) {
+    return voltageInputVolts * KvRadPerSecPerVolt
+        - 1.0 / KtNMPerAmp * torqueNm * rOhms * KvRadPerSecPerVolt;
+  }
+
+  /**
+   * Returns a copy of this motor with the given gearbox reduction applied.
+   *
+   * @param gearboxReduction The gearbox reduction.
+   * @return A motor with the gearbox reduction applied.
+   */
+  public DCMotor withReduction(double gearboxReduction) {
+    return new DCMotor(
+        nominalVoltageVolts,
+        stallTorqueNewtonMeters * gearboxReduction,
+        stallCurrentAmps,
+        freeCurrentAmps,
+        freeSpeedRadPerSec / gearboxReduction,
+        1);
   }
 
   /**

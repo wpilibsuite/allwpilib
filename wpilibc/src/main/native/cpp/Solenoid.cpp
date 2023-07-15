@@ -16,22 +16,12 @@
 
 using namespace frc;
 
-Solenoid::Solenoid(PneumaticsBase& module, int channel)
-    : Solenoid{std::shared_ptr<PneumaticsBase>{
-                   &module, wpi::NullDeleter<PneumaticsBase>()},
-               channel} {}
-
-Solenoid::Solenoid(PneumaticsBase* module, int channel)
-    : Solenoid{std::shared_ptr<PneumaticsBase>{
-                   module, wpi::NullDeleter<PneumaticsBase>()},
-               channel} {}
-
-Solenoid::Solenoid(std::shared_ptr<PneumaticsBase> module, int channel)
-    : m_module{std::move(module)} {
+Solenoid::Solenoid(int module, PneumaticsModuleType moduleType, int channel)
+    : m_module{PneumaticsBase::GetForType(module, moduleType)},
+      m_channel{channel} {
   if (!m_module->CheckSolenoidChannel(m_channel)) {
     throw FRC_MakeError(err::ChannelIndexOutOfRange, "Channel {}", m_channel);
   }
-  m_channel = channel;
   m_mask = 1 << channel;
 
   if (m_module->CheckAndReserveSolenoids(m_mask) != 0) {
@@ -44,8 +34,14 @@ Solenoid::Solenoid(std::shared_ptr<PneumaticsBase> module, int channel)
                                m_channel);
 }
 
+Solenoid::Solenoid(PneumaticsModuleType moduleType, int channel)
+    : Solenoid{PneumaticsBase::GetDefaultForType(moduleType), moduleType,
+               channel} {}
+
 Solenoid::~Solenoid() {
-  m_module->UnreserveSolenoids(m_mask);
+  if (m_module) {
+    m_module->UnreserveSolenoids(m_mask);
+  }
 }
 
 void Solenoid::Set(bool on) {
@@ -81,7 +77,8 @@ void Solenoid::StartPulse() {
 void Solenoid::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Solenoid");
   builder.SetActuator(true);
-  builder.SetSafeState([=] { Set(false); });
+  builder.SetSafeState([=, this] { Set(false); });
   builder.AddBooleanProperty(
-      "Value", [=] { return Get(); }, [=](bool value) { Set(value); });
+      "Value", [=, this] { return Get(); },
+      [=, this](bool value) { Set(value); });
 }

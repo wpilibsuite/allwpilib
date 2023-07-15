@@ -16,6 +16,6 @@ class CANStatusTest {
   void canStatusGetDoesntThrow() {
     HAL.initialize(500, 0);
     CANStatus status = new CANStatus();
-    assertDoesNotThrow(() -> CANJNI.GetCANStatus(status));
+    assertDoesNotThrow(() -> CANJNI.getCANStatus(status));
   }
 }

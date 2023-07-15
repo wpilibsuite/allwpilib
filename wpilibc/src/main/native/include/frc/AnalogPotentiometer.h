@@ -58,7 +58,7 @@ class AnalogPotentiometer : public wpi::Sendable,
    * This will calculate the result from the fullRange times the fraction of the
    * supply voltage, plus the offset.
    *
-   * @param channel   The existing Analog Input pointer
+   * @param input     The existing Analog Input pointer
    * @param fullRange The value (in desired units) representing the full
    *                  0-5V range of the input.
    * @param offset    The value (in desired units) representing the
@@ -80,7 +80,7 @@ class AnalogPotentiometer : public wpi::Sendable,
    * This will calculate the result from the fullRange times the fraction of the
    * supply voltage, plus the offset.
    *
-   * @param channel   The existing Analog Input pointer
+   * @param input     The existing Analog Input pointer
    * @param fullRange The value (in desired units) representing the full
    *                  0-5V range of the input.
    * @param offset    The value (in desired units) representing the

@@ -7,6 +7,7 @@
 #include <cstdio>
 #include <fstream>
 
+#include <networktables/MultiSubscriber.h>
 #include <networktables/NetworkTableInstance.h>
 #include <ntcore.h>
 #include <units/time.h>
@@ -14,7 +15,7 @@
 #include "frc/Timer.h"
 #include "gtest/gtest.h"
 
-static const char* kFileName = "networktables.ini";
+static const char* kFileName = "networktables.json";
 static constexpr auto kSaveTime = 1.2_s;
 
 /**
@@ -27,23 +28,40 @@ TEST(PreferencesTest, ReadPreferencesFromFile) {
 
   std::remove(kFileName);
   std::ofstream preferencesFile(kFileName);
-  preferencesFile << "[NetworkTables Storage 3.0]" << std::endl;
-  preferencesFile
-      << "string \"/Preferences/testFileGetString\"=\"Hello, preferences file\""
-      << std::endl;
-  preferencesFile << "double \"/Preferences/testFileGetInt\"=1" << std::endl;
-  preferencesFile << "double \"/Preferences/testFileGetDouble\"=0.5"
-                  << std::endl;
-  preferencesFile << "double \"/Preferences/testFileGetFloat\"=0.25"
-                  << std::endl;
-  preferencesFile << "boolean \"/Preferences/testFileGetBoolean\"=true"
-                  << std::endl;
-  preferencesFile
-      << "double \"/Preferences/testFileGetLong\"=1000000000000000000"
-      << std::endl;
+  preferencesFile << "[" << std::endl;
+  preferencesFile << "{\"type\":\"string\","
+                  << "\"name\":\"/Preferences/testFileGetString\","
+                  << "\"value\":\"Hello, preferences file\","
+                  << "\"properties\":{\"persistent\":true}}," << std::endl;
+  preferencesFile << "{\"type\":\"int\","
+                  << "\"name\":\"/Preferences/testFileGetInt\","
+                  << "\"value\":1,"
+                  << "\"properties\":{\"persistent\":true}}," << std::endl;
+  preferencesFile << "{\"type\":\"double\","
+                  << "\"name\":\"/Preferences/testFileGetDouble\","
+                  << "\"value\":0.5,"
+                  << "\"properties\":{\"persistent\":true}}," << std::endl;
+  preferencesFile << "{\"type\":\"float\","
+                  << "\"name\":\"/Preferences/testFileGetFloat\","
+                  << "\"value\":0.25,"
+                  << "\"properties\":{\"persistent\":true}}," << std::endl;
+  preferencesFile << "{\"type\":\"boolean\","
+                  << "\"name\":\"/Preferences/testFileGetBoolean\","
+                  << "\"value\":true,"
+                  << "\"properties\":{\"persistent\":true}}]" << std::endl;
   preferencesFile.close();
 
+  nt::MultiSubscriber suball{inst, {{std::string_view{}}}};
   inst.StartServer();
+
+  int count = 0;
+  while ((inst.GetNetworkMode() & NT_NET_MODE_STARTING) != 0) {
+    frc::Wait(10_ms);
+    count++;
+    if (count > 30) {
+      FAIL() << "timed out waiting for server startup";
+    }
+  }
 
   EXPECT_EQ("Hello, preferences file",
             frc::Preferences::GetString("testFileGetString"));
@@ -51,23 +69,30 @@ TEST(PreferencesTest, ReadPreferencesFromFile) {
   EXPECT_FLOAT_EQ(0.5, frc::Preferences::GetDouble("testFileGetDouble"));
   EXPECT_FLOAT_EQ(0.25f, frc::Preferences::GetFloat("testFileGetFloat"));
   EXPECT_TRUE(frc::Preferences::GetBoolean("testFileGetBoolean"));
-  EXPECT_EQ(1000000000000000000ll,
-            frc::Preferences::GetLong("testFileGetLong"));
 }
 
 /**
  * If we set some values using the Preferences class, test that they show up
- * in networktables.ini
+ * in networktables.json
  */
 TEST(PreferencesTest, WritePreferencesToFile) {
   auto inst = nt::NetworkTableInstance::GetDefault();
   inst.StartServer();
+
+  int count = 0;
+  while ((inst.GetNetworkMode() & NT_NET_MODE_STARTING) != 0) {
+    frc::Wait(10_ms);
+    count++;
+    if (count > 30) {
+      FAIL() << "timed out waiting for server startup";
+    }
+  }
+
   frc::Preferences::Remove("testFileGetString");
   frc::Preferences::Remove("testFileGetInt");
   frc::Preferences::Remove("testFileGetDouble");
   frc::Preferences::Remove("testFileGetFloat");
   frc::Preferences::Remove("testFileGetBoolean");
-  frc::Preferences::Remove("testFileGetLong");
 
   frc::Wait(kSaveTime);
 
@@ -76,19 +101,52 @@ TEST(PreferencesTest, WritePreferencesToFile) {
   frc::Preferences::SetDouble("testFileSetDouble", 0.5);
   frc::Preferences::SetFloat("testFileSetFloat", 0.25f);
   frc::Preferences::SetBoolean("testFileSetBoolean", true);
-  frc::Preferences::SetLong("testFileSetLong", 1000000000000000000ll);
 
   frc::Wait(kSaveTime);
 
   static char const* kExpectedFileContents[] = {
-      "[NetworkTables Storage 3.0]",
-      "string \"/Preferences/.type\"=\"RobotPreferences\"",
-      "boolean \"/Preferences/testFileSetBoolean\"=true",
-      "double \"/Preferences/testFileSetDouble\"=0.5",
-      "double \"/Preferences/testFileSetFloat\"=0.25",
-      "double \"/Preferences/testFileSetInt\"=1",
-      "double \"/Preferences/testFileSetLong\"=1e+18",
-      "string \"/Preferences/testFileSetString\"=\"Hello, preferences file\""};
+      "[",
+      "  {",
+      "    \"name\": \"/Preferences/testFileSetString\",",
+      "    \"type\": \"string\",",
+      "    \"value\": \"Hello, preferences file\",",
+      "    \"properties\": {",
+      "      \"persistent\": true",
+      "    }",
+      "  },",
+      "  {",
+      "    \"name\": \"/Preferences/testFileSetInt\",",
+      "    \"type\": \"int\",",
+      "    \"value\": 1,",
+      "    \"properties\": {",
+      "      \"persistent\": true",
+      "    }",
+      "  },",
+      "  {",
+      "    \"name\": \"/Preferences/testFileSetDouble\",",
+      "    \"type\": \"double\",",
+      "    \"value\": 0.5,",
+      "    \"properties\": {",
+      "      \"persistent\": true",
+      "    }",
+      "  },",
+      "  {",
+      "    \"name\": \"/Preferences/testFileSetFloat\",",
+      "    \"type\": \"float\",",
+      "    \"value\": 0.25,",
+      "    \"properties\": {",
+      "      \"persistent\": true",
+      "    }",
+      "  },",
+      "  {",
+      "    \"name\": \"/Preferences/testFileSetBoolean\",",
+      "    \"type\": \"boolean\",",
+      "    \"value\": true,",
+      "    \"properties\": {",
+      "      \"persistent\": true",
+      "    }",
+      "  }",
+      "]"};
 
   std::ifstream preferencesFile(kFileName);
   for (auto& kExpectedFileContent : kExpectedFileContents) {
@@ -99,6 +157,6 @@ TEST(PreferencesTest, WritePreferencesToFile) {
     std::getline(preferencesFile, line);
 
     ASSERT_EQ(kExpectedFileContent, line)
-        << "A line in networktables.ini was not correct";
+        << "A line in networktables.json was not correct";
   }
 }

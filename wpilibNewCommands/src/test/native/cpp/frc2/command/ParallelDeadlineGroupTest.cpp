@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "CommandTestBase.h"
+#include "CompositionTestBase.h"
 #include "frc2/command/InstantCommand.h"
 #include "frc2/command/ParallelDeadlineGroup.h"
 #include "frc2/command/WaitUntilCommand.h"
@@ -10,7 +11,7 @@
 using namespace frc2;
 class ParallelDeadlineGroupTest : public CommandTestBase {};
 
-TEST_F(ParallelDeadlineGroupTest, DeadlineGroupScheduleTest) {
+TEST_F(ParallelDeadlineGroupTest, DeadlineGroupSchedule) {
   CommandScheduler scheduler = GetScheduler();
 
   std::unique_ptr<MockCommand> command1Holder = std::make_unique<MockCommand>();
@@ -48,7 +49,7 @@ TEST_F(ParallelDeadlineGroupTest, DeadlineGroupScheduleTest) {
   EXPECT_FALSE(scheduler.IsScheduled(&group));
 }
 
-TEST_F(ParallelDeadlineGroupTest, SequentialGroupInterruptTest) {
+TEST_F(ParallelDeadlineGroupTest, SequentialGroupInterrupt) {
   CommandScheduler scheduler = GetScheduler();
 
   TestSubsystem subsystem;
@@ -87,7 +88,7 @@ TEST_F(ParallelDeadlineGroupTest, SequentialGroupInterruptTest) {
   EXPECT_FALSE(scheduler.IsScheduled(&group));
 }
 
-TEST_F(ParallelDeadlineGroupTest, DeadlineGroupNotScheduledCancelTest) {
+TEST_F(ParallelDeadlineGroupTest, DeadlineGroupNotScheduledCancel) {
   CommandScheduler scheduler = GetScheduler();
 
   ParallelDeadlineGroup group{InstantCommand(), InstantCommand()};
@@ -95,7 +96,7 @@ TEST_F(ParallelDeadlineGroupTest, DeadlineGroupNotScheduledCancelTest) {
   EXPECT_NO_FATAL_FAILURE(scheduler.Cancel(&group));
 }
 
-TEST_F(ParallelDeadlineGroupTest, ParallelDeadlineCopyTest) {
+TEST_F(ParallelDeadlineGroupTest, ParallelDeadlineCopy) {
   CommandScheduler scheduler = GetScheduler();
 
   bool finished = false;
@@ -111,7 +112,7 @@ TEST_F(ParallelDeadlineGroupTest, ParallelDeadlineCopyTest) {
   EXPECT_FALSE(scheduler.IsScheduled(&group));
 }
 
-TEST_F(ParallelDeadlineGroupTest, ParallelDeadlineRequirementTest) {
+TEST_F(ParallelDeadlineGroupTest, ParallelDeadlineRequirement) {
   CommandScheduler scheduler = GetScheduler();
 
   TestSubsystem requirement1;
@@ -131,3 +132,23 @@ TEST_F(ParallelDeadlineGroupTest, ParallelDeadlineRequirementTest) {
   EXPECT_TRUE(scheduler.IsScheduled(&command3));
   EXPECT_FALSE(scheduler.IsScheduled(&group));
 }
+
+class TestableDeadlineCommand : public ParallelDeadlineGroup {
+  static ParallelDeadlineGroup ToCommand(
+      std::vector<std::unique_ptr<Command>>&& commands) {
+    std::vector<std::unique_ptr<Command>> vec;
+    std::unique_ptr<Command> deadline = std::move(commands[0]);
+    for (unsigned int i = 1; i < commands.size(); i++) {
+      vec.emplace_back(std::move(commands[i]));
+    }
+    return ParallelDeadlineGroup(std::move(deadline), std::move(vec));
+  }
+
+ public:
+  explicit TestableDeadlineCommand(
+      std::vector<std::unique_ptr<Command>>&& commands)
+      : ParallelDeadlineGroup(ToCommand(std::move(commands))) {}
+};
+
+INSTANTIATE_MULTI_COMMAND_COMPOSITION_TEST_SUITE(ParallelDeadlineGroupTest,
+                                                 TestableDeadlineCommand);

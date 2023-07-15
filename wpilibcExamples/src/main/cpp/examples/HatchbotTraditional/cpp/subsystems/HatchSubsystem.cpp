@@ -4,11 +4,13 @@
 
 #include "subsystems/HatchSubsystem.h"
 
+#include <wpi/sendable/SendableBuilder.h>
+
 using namespace HatchConstants;
 
 HatchSubsystem::HatchSubsystem()
-    : m_hatchSolenoid{m_pneumaticsModule, kHatchSolenoidPorts[0],
-                      kHatchSolenoidPorts[1]} {}
+    : m_hatchSolenoid{frc::PneumaticsModuleType::CTREPCM,
+                      kHatchSolenoidPorts[0], kHatchSolenoidPorts[1]} {}
 
 void HatchSubsystem::GrabHatch() {
   m_hatchSolenoid.Set(frc::DoubleSolenoid::kForward);
@@ -16,4 +18,14 @@ void HatchSubsystem::GrabHatch() {
 
 void HatchSubsystem::ReleaseHatch() {
   m_hatchSolenoid.Set(frc::DoubleSolenoid::kReverse);
+}
+
+void HatchSubsystem::InitSendable(wpi::SendableBuilder& builder) {
+  Subsystem::InitSendable(builder);
+
+  // Publish the solenoid state to telemetry.
+  builder.AddBooleanProperty(
+      "extended",
+      [this] { return m_hatchSolenoid.Get() == frc::DoubleSolenoid::kForward; },
+      nullptr);
 }

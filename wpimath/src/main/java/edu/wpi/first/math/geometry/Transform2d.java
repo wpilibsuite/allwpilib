@@ -47,13 +47,33 @@ public class Transform2d {
   }
 
   /**
-   * Scales the transform by the scalar.
+   * Multiplies the transform by the scalar.
    *
    * @param scalar The scalar.
    * @return The scaled Transform2d.
    */
   public Transform2d times(double scalar) {
     return new Transform2d(m_translation.times(scalar), m_rotation.times(scalar));
+  }
+
+  /**
+   * Divides the transform by the scalar.
+   *
+   * @param scalar The scalar.
+   * @return The scaled Transform2d.
+   */
+  public Transform2d div(double scalar) {
+    return times(1.0 / scalar);
+  }
+
+  /**
+   * Composes two transformations.
+   *
+   * @param other The transform to compose with this one.
+   * @return The composition of the two transformations.
+   */
+  public Transform2d plus(Transform2d other) {
+    return new Transform2d(new Pose2d(), new Pose2d().transformBy(this).transformBy(other));
   }
 
   /**

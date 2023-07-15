@@ -47,7 +47,7 @@ public final class SplineHelper {
    * Returns quintic splines from a set of waypoints.
    *
    * @param waypoints The waypoints
-   * @return List of splines.
+   * @return array of splines.
    */
   public static QuinticHermiteSpline[] getQuinticSplinesFromWaypoints(List<Pose2d> waypoints) {
     QuinticHermiteSpline[] splines = new QuinticHermiteSpline[waypoints.size() - 1];
@@ -79,7 +79,6 @@ public final class SplineHelper {
    * @return A vector of cubic hermite splines that interpolate through the provided waypoints and
    *     control vectors.
    */
-  @SuppressWarnings("LocalVariableName")
   public static CubicHermiteSpline[] getCubicSplinesFromControlVectors(
       Spline.ControlVector start, Translation2d[] waypoints, Spline.ControlVector end) {
     CubicHermiteSpline[] splines = new CubicHermiteSpline[waypoints.length + 1];
@@ -203,7 +202,6 @@ public final class SplineHelper {
    * @param controlVectors The control vectors.
    * @return A vector of quintic hermite splines that interpolate through the provided waypoints.
    */
-  @SuppressWarnings("LocalVariableName")
   public static QuinticHermiteSpline[] getQuinticSplinesFromControlVectors(
       Spline.ControlVector[] controlVectors) {
     QuinticHermiteSpline[] splines = new QuinticHermiteSpline[controlVectors.length - 1];
@@ -302,7 +300,6 @@ public final class SplineHelper {
    * @param d the vector on the rhs
    * @param solutionVector the unknown (solution) vector, modified in-place
    */
-  @SuppressWarnings({"ParameterName", "LocalVariableName"})
   private static void thomasAlgorithm(
       double[] a, double[] b, double[] c, double[] d, double[] solutionVector) {
     int N = d.length;

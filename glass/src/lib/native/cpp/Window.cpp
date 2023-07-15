@@ -4,27 +4,34 @@
 
 #include "glass/Window.h"
 
+#include <imgui.h>
 #include <imgui_internal.h>
 #include <wpi/StringExtras.h>
 
 #include "glass/Context.h"
+#include "glass/Storage.h"
+#include "glass/support/ExtraGuiWidgets.h"
 
 using namespace glass;
 
+Window::Window(Storage& storage, std::string_view id,
+               Visibility defaultVisibility)
+    : m_id{id},
+      m_name{storage.GetString("name")},
+      m_defaultName{id},
+      m_visible{storage.GetBool("visible", defaultVisibility != kHide)},
+      m_enabled{storage.GetBool("enabled", defaultVisibility != kDisabled)},
+      m_defaultVisible{storage.GetValue("visible").boolDefault},
+      m_defaultEnabled{storage.GetValue("enabled").boolDefault} {}
+
 void Window::SetVisibility(Visibility visibility) {
-  switch (visibility) {
-    case kHide:
-      m_visible = false;
-      m_enabled = true;
-      break;
-    case kShow:
-      m_visible = true;
-      m_enabled = true;
-      break;
-    case kDisabled:
-      m_enabled = false;
-      break;
-  }
+  m_visible = visibility != kHide;
+  m_enabled = visibility != kDisabled;
+}
+
+void Window::SetDefaultVisibility(Visibility visibility) {
+  m_defaultVisible = visibility != kHide;
+  m_defaultEnabled = visibility != kDisabled;
 }
 
 void Window::Display() {
@@ -54,9 +61,57 @@ void Window::Display() {
                 m_id.c_str());
 
   if (Begin(label, &m_visible, m_flags)) {
-    if (m_renamePopupEnabled) {
-      PopupEditName(nullptr, &m_name);
+    if (m_renamePopupEnabled || m_view->HasSettings()) {
+      bool isClicked = (ImGui::IsMouseReleased(ImGuiMouseButton_Right) &&
+                        ImGui::IsItemHovered());
+      ImGuiWindow* window = ImGui::GetCurrentWindow();
+
+      bool settingsButtonClicked = false;
+      // Not docked, and window has just enough for the circles not to be
+      // touching
+      if (!ImGui::IsWindowDocked() &&
+          ImGui::GetWindowWidth() > (ImGui::GetFontSize() + 2) * 3 +
+                                        ImGui::GetStyle().FramePadding.x * 2) {
+        const ImGuiItemFlags itemFlagsRestore =
+            ImGui::GetCurrentContext()->CurrentItemFlags;
+
+        ImGui::GetCurrentContext()->CurrentItemFlags |=
+            ImGuiItemFlags_NoNavDefaultFocus;
+        window->DC.NavLayerCurrent = ImGuiNavLayer_Menu;
+
+        // Allow to draw outside of normal window
+        ImGui::PushClipRect(window->OuterRectClipped.Min,
+                            window->OuterRectClipped.Max, false);
+
+        const ImRect titleBarRect = ImGui::GetCurrentWindow()->TitleBarRect();
+        const ImVec2 position = {titleBarRect.Max.x -
+                                     (ImGui::GetStyle().FramePadding.x * 3) -
+                                     (ImGui::GetFontSize() * 2),
+                                 titleBarRect.Min.y};
+        settingsButtonClicked =
+            HamburgerButton(ImGui::GetID("#SETTINGS"), position);
+
+        ImGui::PopClipRect();
+
+        ImGui::GetCurrentContext()->CurrentItemFlags = itemFlagsRestore;
+      }
+      if (settingsButtonClicked || isClicked) {
+        ImGui::OpenPopup(window->ID);
+      }
+
+      if (ImGui::BeginPopupEx(window->ID,
+                              ImGuiWindowFlags_AlwaysAutoResize |
+                                  ImGuiWindowFlags_NoTitleBar |
+                                  ImGuiWindowFlags_NoSavedSettings)) {
+        if (m_renamePopupEnabled) {
+          ItemEditName(&m_name);
+        }
+        m_view->Settings();
+
+        ImGui::EndPopup();
+      }
     }
+
     m_view->Display();
   } else {
     m_view->Hidden();
@@ -84,28 +139,4 @@ void Window::ScaleDefault(float scale) {
     m_size.x *= scale;
     m_size.y *= scale;
   }
-}
-
-void Window::IniReadLine(const char* line) {
-  auto [name, value] = wpi::split(line, '=');
-  name = wpi::trim(name);
-  value = wpi::trim(value);
-
-  if (name == "name") {
-    m_name = value;
-  } else if (name == "visible") {
-    if (auto num = wpi::parse_integer<int>(value, 10)) {
-      m_visible = num.value();
-    }
-  } else if (name == "enabled") {
-    if (auto num = wpi::parse_integer<int>(value, 10)) {
-      m_enabled = num.value();
-    }
-  }
-}
-
-void Window::IniWriteAll(const char* typeName, ImGuiTextBuffer* out_buf) {
-  out_buf->appendf("[%s][%s]\nname=%s\nvisible=%d\nenabled=%d\n\n", typeName,
-                   m_id.c_str(), m_name.c_str(), m_visible ? 1 : 0,
-                   m_enabled ? 1 : 0);
 }

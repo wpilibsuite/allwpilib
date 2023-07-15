@@ -4,19 +4,19 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.math.controller.PIDController;
 
 /**
  * A subsystem that uses a {@link PIDController} to control an output. The controller is run
  * synchronously from the subsystem's periodic() method.
+ *
+ * <p>This class is provided by the NewCommands VendorDep
  */
-public abstract class PIDSubsystem extends SubsystemBase {
+public abstract class PIDSubsystem extends Subsystem {
   protected final PIDController m_controller;
   protected boolean m_enabled;
-
-  private double m_setpoint;
 
   /**
    * Creates a new PIDSubsystem.
@@ -25,8 +25,8 @@ public abstract class PIDSubsystem extends SubsystemBase {
    * @param initialPosition the initial setpoint of the subsystem
    */
   public PIDSubsystem(PIDController controller, double initialPosition) {
-    setSetpoint(initialPosition);
     m_controller = requireNonNullParam(controller, "controller", "PIDSubsystem");
+    setSetpoint(initialPosition);
     addChild("PID Controller", m_controller);
   }
 
@@ -42,7 +42,7 @@ public abstract class PIDSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     if (m_enabled) {
-      useOutput(m_controller.calculate(getMeasurement(), m_setpoint), m_setpoint);
+      useOutput(m_controller.calculate(getMeasurement()), getSetpoint());
     }
   }
 
@@ -56,7 +56,7 @@ public abstract class PIDSubsystem extends SubsystemBase {
    * @param setpoint the setpoint for the subsystem
    */
   public void setSetpoint(double setpoint) {
-    m_setpoint = setpoint;
+    m_controller.setSetpoint(setpoint);
   }
 
   /**
@@ -65,7 +65,7 @@ public abstract class PIDSubsystem extends SubsystemBase {
    * @return The current setpoint
    */
   public double getSetpoint() {
-    return m_setpoint;
+    return m_controller.getSetpoint();
   }
 
   /**

@@ -12,13 +12,11 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.numbers.N1;
 import org.junit.jupiter.api.Test;
 
-public class NumericalIntegrationTest {
+class NumericalIntegrationTest {
   @Test
-  @SuppressWarnings({"ParameterName", "LocalVariableName"})
-  public void testExponential() {
+  void testExponential() {
     Matrix<N1, N1> y0 = VecBuilder.fill(0.0);
 
-    //noinspection SuspiciousNameCombination
     var y1 =
         NumericalIntegration.rk4(
             (Matrix<N1, N1> x) -> {
@@ -33,31 +31,23 @@ public class NumericalIntegrationTest {
   }
 
   @Test
-  @SuppressWarnings({"ParameterName", "LocalVariableName"})
-  public void testExponentialRKF45() {
-    Matrix<N1, N1> y0 = VecBuilder.fill(0.0);
-
-    //noinspection SuspiciousNameCombination
+  void testZeroRKDP() {
     var y1 =
-        NumericalIntegration.rkf45(
+        NumericalIntegration.rkdp(
             (x, u) -> {
-              var y = new Matrix<>(Nat.N1(), Nat.N1());
-              y.set(0, 0, Math.exp(x.get(0, 0)));
-              return y;
+              return VecBuilder.fill(0);
             },
-            y0,
+            VecBuilder.fill(0),
             VecBuilder.fill(0),
             0.1);
 
-    assertEquals(Math.exp(0.1) - Math.exp(0.0), y1.get(0, 0), 1e-3);
+    assertEquals(0.0, y1.get(0, 0), 1e-3);
   }
 
   @Test
-  @SuppressWarnings({"ParameterName", "LocalVariableName"})
-  public void testExponentialRKDP() {
+  void testExponentialRKDP() {
     Matrix<N1, N1> y0 = VecBuilder.fill(0.0);
 
-    //noinspection SuspiciousNameCombination
     var y1 =
         NumericalIntegration.rkdp(
             (x, u) -> {

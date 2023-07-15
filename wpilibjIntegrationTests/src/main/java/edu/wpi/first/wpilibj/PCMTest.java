@@ -64,16 +64,16 @@ public class PCMTest extends AbstractComsSetup {
 
   @Before
   public void reset() {
-    pcm.setClosedLoopControl(false);
+    pcm.disableCompressor();
     fakePressureSwitch.set(false);
   }
 
   /** Test if the compressor turns on and off when the pressure switch is toggled. */
   @Test
-  public void testPressureSwitch() throws Exception {
+  public void testPressureSwitch() {
     final double range = 0.5;
     reset();
-    pcm.setClosedLoopControl(true);
+    pcm.enableCompressorDigital();
 
     // Turn on the compressor
     fakePressureSwitch.set(true);
@@ -96,11 +96,11 @@ public class PCMTest extends AbstractComsSetup {
 
   /** Test if the correct solenoids turn on and off when they should. */
   @Test
-  public void testSolenoid() throws Exception {
+  public void testSolenoid() {
     reset();
 
-    Solenoid solenoid1 = new Solenoid(pcm, 0);
-    Solenoid solenoid2 = new Solenoid(pcm, 1);
+    Solenoid solenoid1 = new Solenoid(PneumaticsModuleType.CTREPCM, 0);
+    Solenoid solenoid2 = new Solenoid(PneumaticsModuleType.CTREPCM, 1);
 
     solenoid1.set(false);
     solenoid2.set(false);
@@ -147,7 +147,7 @@ public class PCMTest extends AbstractComsSetup {
    */
   @Test
   public void doubleSolenoid() {
-    DoubleSolenoid solenoid = new DoubleSolenoid(pcm, 0, 1);
+    DoubleSolenoid solenoid = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 0, 1);
 
     solenoid.set(DoubleSolenoid.Value.kOff);
     Timer.delay(kSolenoidDelayTime);
@@ -174,11 +174,11 @@ public class PCMTest extends AbstractComsSetup {
 
   /** Test if the correct solenoids turn on and off when they should. */
   @Test
-  public void testOneShot() throws Exception {
+  public void testOneShot() {
     reset();
 
-    Solenoid solenoid1 = new Solenoid(pcm, 0);
-    Solenoid solenoid2 = new Solenoid(pcm, 1);
+    Solenoid solenoid1 = new Solenoid(PneumaticsModuleType.CTREPCM, 0);
+    Solenoid solenoid2 = new Solenoid(PneumaticsModuleType.CTREPCM, 1);
 
     solenoid1.set(false);
     solenoid2.set(false);

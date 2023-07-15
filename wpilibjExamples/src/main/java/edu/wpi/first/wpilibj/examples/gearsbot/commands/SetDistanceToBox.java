@@ -5,7 +5,7 @@
 package edu.wpi.first.wpilibj.examples.gearsbot.commands;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.DriveTrain;
+import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Drivetrain;
 import edu.wpi.first.wpilibj2.command.PIDCommand;
 
 /**
@@ -14,14 +14,14 @@ import edu.wpi.first.wpilibj2.command.PIDCommand;
  * values of the left and right encoders.
  */
 public class SetDistanceToBox extends PIDCommand {
-  private final DriveTrain m_drivetrain;
+  private final Drivetrain m_drivetrain;
 
   /**
    * Create a new set distance to box command.
    *
    * @param distance The distance away from the box to drive to
    */
-  public SetDistanceToBox(double distance, DriveTrain drivetrain) {
+  public SetDistanceToBox(double distance, Drivetrain drivetrain) {
     super(
         new PIDController(-2, 0, 0),
         drivetrain::getDistanceToObstacle,

@@ -1,0 +1,31 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+package edu.wpi.first.math;
+
+//CHECKSTYLE.OFF: ImportOrder
+{% for num in nums %}
+import edu.wpi.first.math.numbers.N{{ num }};
+{%- endfor %}
+//CHECKSTYLE.ON
+
+/**
+ * A natural number expressed as a java class.
+ * The counterpart to {@link Num} that should be used as a concrete value.
+ *
+ * @param <T> The {@link Num} this represents.
+ */
+public interface Nat<T extends Num> {
+  /**
+   * The number this interface represents.
+   *
+   * @return The number backing this value.
+   */
+  int getNum();
+{% for num in nums %}
+  static Nat<N{{ num }}> N{{ num }}() {
+    return N{{ num }}.instance;
+  }
+{% endfor %}
+}

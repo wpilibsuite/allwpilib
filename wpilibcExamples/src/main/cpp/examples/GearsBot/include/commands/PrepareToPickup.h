@@ -17,5 +17,5 @@
 class PrepareToPickup : public frc2::CommandHelper<frc2::SequentialCommandGroup,
                                                    PrepareToPickup> {
  public:
-  PrepareToPickup(Claw* claw, Wrist* wrist, Elevator* elevator);
+  PrepareToPickup(Claw& claw, Wrist& wrist, Elevator& elevator);
 };

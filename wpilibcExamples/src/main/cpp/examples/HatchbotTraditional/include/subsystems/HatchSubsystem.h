@@ -6,11 +6,11 @@
 
 #include <frc/DoubleSolenoid.h>
 #include <frc/PneumaticsControlModule.h>
-#include <frc2/command/SubsystemBase.h>
+#include <frc2/command/Subsystem.h>
 
 #include "Constants.h"
 
-class HatchSubsystem : public frc2::SubsystemBase {
+class HatchSubsystem : public frc2::Subsystem {
  public:
   HatchSubsystem();
 
@@ -26,9 +26,10 @@ class HatchSubsystem : public frc2::SubsystemBase {
    */
   void ReleaseHatch();
 
+  void InitSendable(wpi::SendableBuilder& builder) override;
+
  private:
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.
-  frc::PneumaticsControlModule m_pneumaticsModule;
   frc::DoubleSolenoid m_hatchSolenoid;
 };

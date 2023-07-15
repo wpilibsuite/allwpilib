@@ -242,6 +242,9 @@ static SIM_JniHandle AllocateDeviceCallback(
 static void FreeDeviceCallback(JNIEnv* env, SIM_JniHandle handle,
                                FreeDeviceCallbackFunc freeCallback) {
   auto callback = deviceCallbackHandles->Free(handle);
+  if (callback == nullptr) {
+    return;
+  }
   freeCallback(callback->getCallbackId());
   callback->free(env);
 }
@@ -296,6 +299,9 @@ static SIM_JniHandle AllocateValueCallback(
 static void FreeValueCallback(JNIEnv* env, SIM_JniHandle handle,
                               FreeValueCallbackFunc freeCallback) {
   auto callback = valueCallbackHandles->Free(handle);
+  if (callback == nullptr) {
+    return;
+  }
   freeCallback(callback->getCallbackId());
   callback->free(env);
 }
@@ -462,7 +468,11 @@ JNIEXPORT jstring JNICALL
 Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_getSimDeviceName
   (JNIEnv* env, jclass, jint handle)
 {
-  return MakeJString(env, HALSIM_GetSimDeviceName(handle));
+  const char* name = HALSIM_GetSimDeviceName(handle);
+  if (!name) {
+    return nullptr;
+  }
+  return MakeJString(env, name);
 }
 
 /*
@@ -668,7 +678,7 @@ Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_getSimValueEnumDoubleValues
 {
   int32_t numElems = 0;
   const double* elems = HALSIM_GetSimValueEnumDoubleValues(handle, &numElems);
-  return MakeJDoubleArray(env, wpi::span(elems, numElems));
+  return MakeJDoubleArray(env, std::span(elems, numElems));
 }
 
 /*

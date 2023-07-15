@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <wpi/SymbolExports.h>
+
 #include "frc/geometry/Rotation2d.h"
 #include "units/angle.h"
 #include "units/math.h"
@@ -13,7 +15,7 @@ namespace frc {
 /**
  * Represents the state of one swerve module.
  */
-struct SwerveModuleState {
+struct WPILIB_DLLEXPORT SwerveModuleState {
   /**
    * Speed of the wheel of the module.
    */
@@ -25,6 +27,14 @@ struct SwerveModuleState {
   Rotation2d angle;
 
   /**
+   * Checks equality between this SwerveModuleState and another object.
+   *
+   * @param other The other object.
+   * @return Whether the two objects are equal.
+   */
+  bool operator==(const SwerveModuleState& other) const;
+
+  /**
    * Minimize the change in heading the desired swerve module state would
    * require by potentially reversing the direction the wheel spins. If this is
    * used with the PIDController class's continuous input functionality, the
@@ -34,13 +44,6 @@ struct SwerveModuleState {
    * @param currentAngle The current module angle.
    */
   static SwerveModuleState Optimize(const SwerveModuleState& desiredState,
-                                    const Rotation2d& currentAngle) {
-    auto delta = desiredState.angle - currentAngle;
-    if (units::math::abs(delta.Degrees()) > 90_deg) {
-      return {-desiredState.speed, desiredState.angle + Rotation2d{180_deg}};
-    } else {
-      return {desiredState.speed, desiredState.angle};
-    }
-  }
+                                    const Rotation2d& currentAngle);
 };
 }  // namespace frc

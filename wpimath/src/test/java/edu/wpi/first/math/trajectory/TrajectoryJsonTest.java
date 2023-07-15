@@ -12,11 +12,11 @@ import edu.wpi.first.math.trajectory.constraint.DifferentialDriveKinematicsConst
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-public class TrajectoryJsonTest {
+class TrajectoryJsonTest {
   @Test
   void deserializeMatches() {
     var config =
-        List.of(new DifferentialDriveKinematicsConstraint(new DifferentialDriveKinematics(20), 3));
+        List.of(new DifferentialDriveKinematicsConstraint(new DifferentialDriveKinematics(0.5), 3));
     var trajectory = TrajectoryGeneratorTest.getTrajectory(config);
 
     var deserialized =

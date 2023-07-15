@@ -30,19 +30,7 @@ void RobotDriveBase::FeedWatchdog() {
   Feed();
 }
 
-double RobotDriveBase::ApplyDeadband(double value, double deadband) {
-  if (std::abs(value) > deadband) {
-    if (value > 0.0) {
-      return (value - deadband) / (1.0 - deadband);
-    } else {
-      return (value + deadband) / (1.0 - deadband);
-    }
-  } else {
-    return 0.0;
-  }
-}
-
-void RobotDriveBase::Normalize(wpi::span<double> wheelSpeeds) {
+void RobotDriveBase::Desaturate(std::span<double> wheelSpeeds) {
   double maxMagnitude = std::abs(wheelSpeeds[0]);
   for (size_t i = 1; i < wheelSpeeds.size(); i++) {
     double temp = std::abs(wheelSpeeds[i]);

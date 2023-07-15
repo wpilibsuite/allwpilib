@@ -15,7 +15,7 @@
 using namespace frc2;
 class POVButtonTest : public CommandTestBase {};
 
-TEST_F(POVButtonTest, SetPOVTest) {
+TEST_F(POVButtonTest, SetPOV) {
   frc::sim::JoystickSim joysim(1);
   joysim.SetPOV(0);
   joysim.NotifyNewData();
@@ -26,7 +26,7 @@ TEST_F(POVButtonTest, SetPOVTest) {
   WaitUntilCommand command([&finished] { return finished; });
 
   frc::Joystick joy(1);
-  POVButton(&joy, 90).WhenPressed(&command);
+  POVButton(&joy, 90).OnTrue(&command);
   scheduler.Run();
   EXPECT_FALSE(scheduler.IsScheduled(&command));
 

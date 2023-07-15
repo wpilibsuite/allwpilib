@@ -26,7 +26,7 @@ import java.nio.ByteOrder;
  * <p>This class is for the digital ADXRS450 gyro sensor that connects via SPI. Only one instance of
  * an ADXRS Gyro is supported.
  */
-@SuppressWarnings({"TypeName", "AbbreviationAsWordInName", "PMD.UnusedPrivateField"})
+@SuppressWarnings({"TypeName", "PMD.UnusedPrivateField"})
 public class ADXRS450_Gyro implements Gyro, Sendable {
   private static final double kSamplePeriod = 0.0005;
   private static final double kCalibrationSampleTime = 5.0;
@@ -43,7 +43,6 @@ public class ADXRS450_Gyro implements Gyro, Sendable {
   private static final int kSNLowRegister = 0x10;
 
   private SPI m_spi;
-  private SPI.Port m_port;
 
   private SimDevice m_simDevice;
   private SimBoolean m_simConnected;
@@ -62,7 +61,6 @@ public class ADXRS450_Gyro implements Gyro, Sendable {
    */
   public ADXRS450_Gyro(SPI.Port port) {
     m_spi = new SPI(port);
-    m_port = port;
 
     // simulation
     m_simDevice = SimDevice.create("Gyro:ADXRS450", port.value);
@@ -73,9 +71,7 @@ public class ADXRS450_Gyro implements Gyro, Sendable {
     }
 
     m_spi.setClockRate(3000000);
-    m_spi.setMSBFirst();
-    m_spi.setSampleDataOnLeadingEdge();
-    m_spi.setClockActiveHigh();
+    m_spi.setMode(SPI.Mode.kMode0);
     m_spi.setChipSelectActiveLow();
 
     if (m_simDevice == null) {
@@ -132,7 +128,7 @@ public class ADXRS450_Gyro implements Gyro, Sendable {
    * @return The SPI port number.
    */
   public int getPort() {
-    return m_port.value;
+    return m_spi.getPort();
   }
 
   private boolean calcParity(int value) {

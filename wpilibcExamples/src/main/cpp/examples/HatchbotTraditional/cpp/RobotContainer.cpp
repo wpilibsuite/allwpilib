@@ -21,34 +21,61 @@ RobotContainer::RobotContainer() {
 
   // Put the chooser on the dashboard
   frc::Shuffleboard::GetTab("Autonomous").Add(m_chooser);
+  // Put subsystems to dashboard.
+  frc::Shuffleboard::GetTab("Drivetrain").Add(m_drive);
+  frc::Shuffleboard::GetTab("HatchSubsystem").Add(m_hatch);
+
+  // Log Shuffleboard events for command initialize, execute, finish, interrupt
+  frc2::CommandScheduler::GetInstance().OnCommandInitialize(
+      [](const frc2::Command& command) {
+        frc::Shuffleboard::AddEventMarker(
+            "Command initialized", command.GetName(),
+            frc::ShuffleboardEventImportance::kNormal);
+      });
+  frc2::CommandScheduler::GetInstance().OnCommandExecute(
+      [](const frc2::Command& command) {
+        frc::Shuffleboard::AddEventMarker(
+            "Command executed", command.GetName(),
+            frc::ShuffleboardEventImportance::kNormal);
+      });
+  frc2::CommandScheduler::GetInstance().OnCommandFinish(
+      [](const frc2::Command& command) {
+        frc::Shuffleboard::AddEventMarker(
+            "Command finished", command.GetName(),
+            frc::ShuffleboardEventImportance::kNormal);
+      });
+  frc2::CommandScheduler::GetInstance().OnCommandInterrupt(
+      [](const frc2::Command& command) {
+        frc::Shuffleboard::AddEventMarker(
+            "Command interrupted", command.GetName(),
+            frc::ShuffleboardEventImportance::kNormal);
+      });
 
   // Configure the button bindings
   ConfigureButtonBindings();
 
   // Set up default drive command
   m_drive.SetDefaultCommand(DefaultDrive(
-      &m_drive,
-      [this] { return m_driverController.GetY(frc::GenericHID::kLeftHand); },
-      [this] { return m_driverController.GetX(frc::GenericHID::kRightHand); }));
+      &m_drive, [this] { return -m_driverController.GetLeftY(); },
+      [this] { return -m_driverController.GetRightX(); }));
 }
 
 void RobotContainer::ConfigureButtonBindings() {
   // Configure your button bindings here
 
-  // NOTE: Using `new` here will leak these commands if they are ever no longer
-  // needed. This is usually a non-issue as button-bindings tend to be permanent
-  // - however, if you wish to avoid this, the commands should be
-  // stack-allocated and declared as members of RobotContainer.
+  // NOTE: since we're binding a CommandPtr, command ownership here is moved to
+  // the scheduler thus, no memory leaks!
 
   // Grab the hatch when the 'A' button is pressed.
-  frc2::JoystickButton(&m_driverController, 1)
-      .WhenPressed(new GrabHatch(&m_hatch));
+  frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kA)
+      .OnTrue(GrabHatch(&m_hatch).ToPtr());
   // Release the hatch when the 'B' button is pressed.
-  frc2::JoystickButton(&m_driverController, 2)
-      .WhenPressed(new ReleaseHatch(&m_hatch));
+  frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kB)
+      .OnTrue(ReleaseHatch(&m_hatch).ToPtr());
   // While holding the shoulder button, drive at half speed
-  frc2::JoystickButton(&m_driverController, 6)
-      .WhenHeld(new HalveDriveSpeed(&m_drive));
+  frc2::JoystickButton(&m_driverController,
+                       frc::XboxController::Button::kRightBumper)
+      .WhileTrue(HalveDriveSpeed(&m_drive).ToPtr());
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() {

@@ -4,8 +4,13 @@
 
 #pragma once
 
+#include <wpi/SymbolExports.h>
+
+#include "frc/geometry/Twist2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
+#include "frc/kinematics/DifferentialDriveWheelPositions.h"
 #include "frc/kinematics/DifferentialDriveWheelSpeeds.h"
+#include "frc/kinematics/Kinematics.h"
 #include "units/angle.h"
 #include "units/length.h"
 #include "wpimath/MathShared.h"
@@ -19,7 +24,9 @@ namespace frc {
  * velocity components whereas forward kinematics converts left and right
  * component velocities into a linear and angular chassis speed.
  */
-class DifferentialDriveKinematics {
+class WPILIB_DLLEXPORT DifferentialDriveKinematics
+    : public Kinematics<DifferentialDriveWheelSpeeds,
+                        DifferentialDriveWheelPositions> {
  public:
   /**
    * Constructs a differential drive kinematics object.
@@ -43,7 +50,7 @@ class DifferentialDriveKinematics {
    * @return The chassis speed.
    */
   constexpr ChassisSpeeds ToChassisSpeeds(
-      const DifferentialDriveWheelSpeeds& wheelSpeeds) const {
+      const DifferentialDriveWheelSpeeds& wheelSpeeds) const override {
     return {(wheelSpeeds.left + wheelSpeeds.right) / 2.0, 0_mps,
             (wheelSpeeds.right - wheelSpeeds.left) / trackWidth * 1_rad};
   }
@@ -57,9 +64,28 @@ class DifferentialDriveKinematics {
    * @return The left and right velocities.
    */
   constexpr DifferentialDriveWheelSpeeds ToWheelSpeeds(
-      const ChassisSpeeds& chassisSpeeds) const {
+      const ChassisSpeeds& chassisSpeeds) const override {
     return {chassisSpeeds.vx - trackWidth / 2 * chassisSpeeds.omega / 1_rad,
             chassisSpeeds.vx + trackWidth / 2 * chassisSpeeds.omega / 1_rad};
+  }
+
+  /**
+   * Returns a twist from left and right distance deltas using
+   * forward kinematics.
+   *
+   * @param leftDistance The distance measured by the left encoder.
+   * @param rightDistance The distance measured by the right encoder.
+   * @return The resulting Twist2d.
+   */
+  constexpr Twist2d ToTwist2d(const units::meter_t leftDistance,
+                              const units::meter_t rightDistance) const {
+    return {(leftDistance + rightDistance) / 2, 0_m,
+            (rightDistance - leftDistance) / trackWidth * 1_rad};
+  }
+
+  Twist2d ToTwist2d(
+      const DifferentialDriveWheelPositions& wheelDeltas) const override {
+    return ToTwist2d(wheelDeltas.left, wheelDeltas.right);
   }
 
   units::meter_t trackWidth;

@@ -68,7 +68,7 @@ void connect_emit(Signal_mt<int>& sig) {
 
 namespace wpi {
 
-TEST(Signal, ThreadedMix) {
+TEST(SignalTest, ThreadedMix) {
   sum = 0;
 
   Signal_mt<int> sig;
@@ -83,7 +83,7 @@ TEST(Signal, ThreadedMix) {
   }
 }
 
-TEST(Signal, ThreadedEmission) {
+TEST(SignalTest, ThreadedEmission) {
   sum = 0;
 
   Signal_mt<int> sig;

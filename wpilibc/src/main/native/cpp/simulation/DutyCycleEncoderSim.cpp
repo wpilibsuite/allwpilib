@@ -9,15 +9,17 @@
 
 using namespace frc::sim;
 
-DutyCycleEncoderSim::DutyCycleEncoderSim(const frc::DutyCycleEncoder& encoder) {
-  frc::sim::SimDeviceSim deviceSim{"DutyCycle:DutyCycleEncoder",
-                                   encoder.GetSourceChannel()};
+DutyCycleEncoderSim::DutyCycleEncoderSim(const frc::DutyCycleEncoder& encoder)
+    : DutyCycleEncoderSim{encoder.GetSourceChannel()} {}
+
+DutyCycleEncoderSim::DutyCycleEncoderSim(int channel) {
+  frc::sim::SimDeviceSim deviceSim{"DutyCycle:DutyCycleEncoder", channel};
   m_simPosition = deviceSim.GetDouble("position");
   m_simDistancePerRotation = deviceSim.GetDouble("distance_per_rot");
 }
 
 void DutyCycleEncoderSim::Set(units::turn_t turns) {
-  m_simPosition.Set(turns.to<double>());
+  m_simPosition.Set(turns.value());
 }
 
 void DutyCycleEncoderSim::SetDistance(double distance) {

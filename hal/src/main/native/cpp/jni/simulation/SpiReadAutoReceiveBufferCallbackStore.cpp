@@ -59,7 +59,7 @@ int32_t SpiReadAutoReceiveBufferCallbackStore::performCallback(
   }
 
   auto toCallbackArr = MakeJIntArray(
-      env, wpi::span<const uint32_t>{buffer, static_cast<size_t>(numToRead)});
+      env, std::span<const uint32_t>{buffer, static_cast<size_t>(numToRead)});
 
   jint ret = env->CallIntMethod(m_call, sim::GetBufferCallback(),
                                 MakeJString(env, name), toCallbackArr,
@@ -127,6 +127,9 @@ SIM_JniHandle sim::AllocateSpiBufferCallback(
 void sim::FreeSpiBufferCallback(JNIEnv* env, SIM_JniHandle handle, jint index,
                                 FreeSpiBufferCallbackFunc freeCallback) {
   auto callback = callbackHandles->Free(handle);
+  if (callback == nullptr) {
+    return;
+  }
   freeCallback(index, callback->getCallbackId());
   callback->free(env);
 }

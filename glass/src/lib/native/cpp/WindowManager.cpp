@@ -10,30 +10,23 @@
 #include <fmt/format.h>
 #include <wpigui.h>
 
+#include "glass/Context.h"
+#include "glass/Storage.h"
+
 using namespace glass;
 
-WindowManager::WindowManager(std::string_view iniName)
-    : m_iniSaver{iniName, this} {}
-
-// read/write open state to ini file
-void* WindowManager::IniSaver::IniReadOpen(const char* name) {
-  return m_manager->GetOrAddWindow(name, true);
-}
-
-void WindowManager::IniSaver::IniReadLine(void* entry, const char* lineStr) {
-  static_cast<Window*>(entry)->IniReadLine(lineStr);
-}
-
-void WindowManager::IniSaver::IniWriteAll(ImGuiTextBuffer* out_buf) {
-  const char* typeName = GetTypeName();
-  for (auto&& window : m_manager->m_windows) {
-    window->IniWriteAll(typeName, out_buf);
-  }
+WindowManager::WindowManager(Storage& storage) : m_storage{storage} {
+  storage.SetCustomApply([this] {
+    for (auto&& childIt : m_storage.GetChildren()) {
+      GetOrAddWindow(childIt.key(), true);
+    }
+  });
 }
 
 Window* WindowManager::AddWindow(std::string_view id,
-                                 wpi::unique_function<void()> display) {
-  auto win = GetOrAddWindow(id, false);
+                                 wpi::unique_function<void()> display,
+                                 Window::Visibility defaultVisibility) {
+  auto win = GetOrAddWindow(id, false, defaultVisibility);
   if (!win) {
     return nullptr;
   }
@@ -46,8 +39,9 @@ Window* WindowManager::AddWindow(std::string_view id,
 }
 
 Window* WindowManager::AddWindow(std::string_view id,
-                                 std::unique_ptr<View> view) {
-  auto win = GetOrAddWindow(id, false);
+                                 std::unique_ptr<View> view,
+                                 Window::Visibility defaultVisibility) {
+  auto win = GetOrAddWindow(id, false, defaultVisibility);
   if (!win) {
     return nullptr;
   }
@@ -59,7 +53,8 @@ Window* WindowManager::AddWindow(std::string_view id,
   return win;
 }
 
-Window* WindowManager::GetOrAddWindow(std::string_view id, bool duplicateOk) {
+Window* WindowManager::GetOrAddWindow(std::string_view id, bool duplicateOk,
+                                      Window::Visibility defaultVisibility) {
   // binary search
   auto it = std::lower_bound(
       m_windows.begin(), m_windows.end(), id,
@@ -72,7 +67,11 @@ Window* WindowManager::GetOrAddWindow(std::string_view id, bool duplicateOk) {
     return it->get();
   }
   // insert before (keeps sort)
-  return m_windows.emplace(it, std::make_unique<Window>(id))->get();
+  return m_windows
+      .emplace(it, std::make_unique<Window>(
+                       m_storage.GetChild(id).GetChild("window"), id,
+                       defaultVisibility))
+      ->get();
 }
 
 Window* WindowManager::GetWindow(std::string_view id) {
@@ -86,8 +85,12 @@ Window* WindowManager::GetWindow(std::string_view id) {
   return it->get();
 }
 
+void WindowManager::RemoveWindow(size_t index) {
+  m_storage.Erase(m_windows[index]->GetId());
+  m_windows.erase(m_windows.begin() + index);
+}
+
 void WindowManager::GlobalInit() {
-  wpi::gui::AddInit([this] { m_iniSaver.Initialize(); });
   wpi::gui::AddWindowScaler([this](float scale) {
     // scale default window positions
     for (auto&& window : m_windows) {
@@ -104,7 +107,9 @@ void WindowManager::DisplayMenu() {
 }
 
 void WindowManager::DisplayWindows() {
+  PushStorageStack(m_storage);
   for (auto&& window : m_windows) {
     window->Display();
   }
+  PopStorageStack();
 }

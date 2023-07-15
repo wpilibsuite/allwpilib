@@ -22,16 +22,16 @@ public interface Accelerometer {
   void setRange(Range range);
 
   /**
-   * Common interface for getting the x axis acceleration.
+   * Common interface for getting the x-axis acceleration.
    *
-   * @return The acceleration along the x axis in g-forces
+   * @return The acceleration along the x-axis in g-forces
    */
   double getX();
 
   /**
-   * Common interface for getting the y axis acceleration.
+   * Common interface for getting the y-axis acceleration.
    *
-   * @return The acceleration along the y axis in g-forces
+   * @return The acceleration along the y-axis in g-forces
    */
   double getY();
 

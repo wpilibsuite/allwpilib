@@ -7,8 +7,8 @@
 #include <array>
 #include <functional>
 
-#include "Eigen/Core"
 #include "Eigen/QR"
+#include "frc/EigenCore.h"
 #include "frc/system/Discretization.h"
 #include "frc/system/LinearSystem.h"
 #include "units/time.h"
@@ -24,15 +24,22 @@ namespace frc {
  *
  * For more on the underlying math, read
  * https://file.tavsys.net/control/controls-engineering-in-frc.pdf.
+ *
+ * @tparam States The number of states.
+ * @tparam Inputs The number of inputs.
  */
 template <int States, int Inputs>
 class LinearPlantInversionFeedforward {
  public:
+  using StateVector = Vectord<States>;
+  using InputVector = Vectord<Inputs>;
+
   /**
    * Constructs a feedforward with the given plant.
    *
-   * @param plant     The plant being controlled.
-   * @param dtSeconds Discretization timestep.
+   * @tparam Outputs The number of outputs.
+   * @param plant The plant being controlled.
+   * @param dt    Discretization timestep.
    */
   template <int Outputs>
   LinearPlantInversionFeedforward(
@@ -42,13 +49,13 @@ class LinearPlantInversionFeedforward {
   /**
    * Constructs a feedforward with the given coefficients.
    *
-   * @param A         Continuous system matrix of the plant being controlled.
-   * @param B         Continuous input matrix of the plant being controlled.
-   * @param dtSeconds Discretization timestep.
+   * @param A  Continuous system matrix of the plant being controlled.
+   * @param B  Continuous input matrix of the plant being controlled.
+   * @param dt Discretization timestep.
    */
-  LinearPlantInversionFeedforward(
-      const Eigen::Matrix<double, States, States>& A,
-      const Eigen::Matrix<double, States, Inputs>& B, units::second_t dt)
+  LinearPlantInversionFeedforward(const Matrixd<States, States>& A,
+                                  const Matrixd<States, Inputs>& B,
+                                  units::second_t dt)
       : m_dt(dt) {
     DiscretizeAB<States, Inputs>(A, B, dt, &m_A, &m_B);
     Reset();
@@ -59,23 +66,23 @@ class LinearPlantInversionFeedforward {
    *
    * @return The calculated feedforward.
    */
-  const Eigen::Matrix<double, Inputs, 1>& Uff() const { return m_uff; }
+  const InputVector& Uff() const { return m_uff; }
 
   /**
    * Returns an element of the previously calculated feedforward.
    *
-   * @param row Row of uff.
+   * @param i Row of uff.
    *
    * @return The row of the calculated feedforward.
    */
-  double Uff(int i) const { return m_uff(i, 0); }
+  double Uff(int i) const { return m_uff(i); }
 
   /**
    * Returns the current reference vector r.
    *
    * @return The current reference vector.
    */
-  const Eigen::Matrix<double, States, 1>& R() const { return m_r; }
+  const StateVector& R() const { return m_r; }
 
   /**
    * Returns an element of the reference vector r.
@@ -84,14 +91,14 @@ class LinearPlantInversionFeedforward {
    *
    * @return The row of the current reference vector.
    */
-  double R(int i) const { return m_r(i, 0); }
+  double R(int i) const { return m_r(i); }
 
   /**
    * Resets the feedforward with a specified initial state vector.
    *
    * @param initialState The initial state vector.
    */
-  void Reset(const Eigen::Matrix<double, States, 1>& initialState) {
+  void Reset(const StateVector& initialState) {
     m_r = initialState;
     m_uff.setZero();
   }
@@ -109,17 +116,16 @@ class LinearPlantInversionFeedforward {
    * future reference. This uses the internally stored "current"
    * reference.
    *
-   * If this method is used the initial state of the system is the one
-   * set using Reset(const Eigen::Matrix<double, States, 1>&).
-   * If the initial state is not set it defaults to a zero vector.
+   * If this method is used the initial state of the system is the one set using
+   * Reset(const StateVector&). If the initial state is not
+   * set it defaults to a zero vector.
    *
    * @param nextR The reference state of the future timestep (k + dt).
    *
    * @return The calculated feedforward.
    */
-  Eigen::Matrix<double, Inputs, 1> Calculate(
-      const Eigen::Matrix<double, States, 1>& nextR) {
-    return Calculate(m_r, nextR);  // NOLINT
+  InputVector Calculate(const StateVector& nextR) {
+    return Calculate(m_r, nextR);
   }
 
   /**
@@ -130,25 +136,23 @@ class LinearPlantInversionFeedforward {
    *
    * @return The calculated feedforward.
    */
-  Eigen::Matrix<double, Inputs, 1> Calculate(
-      const Eigen::Matrix<double, States, 1>& r,
-      const Eigen::Matrix<double, States, 1>& nextR) {
+  InputVector Calculate(const StateVector& r, const StateVector& nextR) {
     m_uff = m_B.householderQr().solve(nextR - (m_A * r));
     m_r = nextR;
     return m_uff;
   }
 
  private:
-  Eigen::Matrix<double, States, States> m_A;
-  Eigen::Matrix<double, States, Inputs> m_B;
+  Matrixd<States, States> m_A;
+  Matrixd<States, Inputs> m_B;
 
   units::second_t m_dt;
 
   // Current reference
-  Eigen::Matrix<double, States, 1> m_r;
+  StateVector m_r;
 
   // Computed feedforward
-  Eigen::Matrix<double, Inputs, 1> m_uff;
+  InputVector m_uff;
 };
 
 }  // namespace frc

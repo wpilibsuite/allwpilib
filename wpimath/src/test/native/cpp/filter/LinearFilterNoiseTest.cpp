@@ -5,9 +5,8 @@
 #include "frc/filter/LinearFilter.h"  // NOLINT(build/include_order)
 
 #include <cmath>
+#include <numbers>
 #include <random>
-
-#include <wpi/numbers>
 
 #include "gtest/gtest.h"
 #include "units/time.h"
@@ -21,7 +20,7 @@ static constexpr int32_t kMovAvgTaps = 6;
 enum LinearFilterNoiseTestType { kTestSinglePoleIIR, kTestMovAvg };
 
 static double GetData(double t) {
-  return 100.0 * std::sin(2.0 * wpi::numbers::pi * t);
+  return 100.0 * std::sin(2.0 * std::numbers::pi * t);
 }
 
 class LinearFilterNoiseTest
@@ -52,7 +51,7 @@ TEST_P(LinearFilterNoiseTest, NoiseReduce) {
   std::normal_distribution<double> distr{0.0, 10.0};
 
   for (auto t = 0_s; t < kFilterTime; t += kFilterStep) {
-    double theory = GetData(t.to<double>());
+    double theory = GetData(t.value());
     double noise = distr(gen);
     filterError += std::abs(m_filter.Calculate(theory + noise) - theory);
     noiseGenError += std::abs(noise - theory);
@@ -65,5 +64,5 @@ TEST_P(LinearFilterNoiseTest, NoiseReduce) {
       << "Filter should have reduced noise accumulation but failed";
 }
 
-INSTANTIATE_TEST_SUITE_P(Test, LinearFilterNoiseTest,
+INSTANTIATE_TEST_SUITE_P(Tests, LinearFilterNoiseTest,
                          testing::Values(kTestSinglePoleIIR, kTestMovAvg));

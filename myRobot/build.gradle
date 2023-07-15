@@ -1,5 +1,6 @@
-import jaci.gradle.toolchains.*
-import jaci.gradle.nativedeps.*
+import edu.wpi.first.deployutils.deploy.target.RemoteTarget
+import edu.wpi.first.deployutils.deploy.target.location.SshDeployLocation
+import edu.wpi.first.deployutils.deploy.artifact.*
 import org.gradle.internal.os.OperatingSystem
 
 plugins {
@@ -10,7 +11,7 @@ plugins {
 }
 
 apply plugin: 'edu.wpi.first.NativeUtils'
-apply plugin: 'jaci.gradle.EmbeddedTools'
+apply plugin: 'edu.wpi.first.DeployUtils'
 
 apply from: '../shared/config.gradle'
 
@@ -30,97 +31,14 @@ ext {
 
 apply from: "${rootDir}/shared/opencv.gradle"
 
-deploy {
-    targets {
-        target('roborio') {
-            directory = '/home/admin'
-            maxChannels = 4
-            locations {
-                ssh {
-                    address = "172.22.11.2"
-                    user = 'admin'
-                    password = ''
-                    ipv6 = false
-                }
-            }
-        }
-    }
-    artifacts {
-        all {
-            targets << 'roborio'
-            predeploy << { ctx ->
-                ctx.execute('/usr/local/frc/bin/frcKillRobot.sh -t')
-            }
-            postdeploy << { ctx ->
-                ctx.execute("sync")
-                ctx.execute("ldconfig")
-            }
-        }
-
-        artifact('jre', JREArtifact) {
-            jreDependency = 'edu.wpi.first.jdk:roborio-2020:11.0.4u10-2'
-        }
-
-        javaArtifact('myRobotJava') {
-            jar = 'shadowJar'
-            postdeploy << { ctx ->
-                ctx.execute("echo '/usr/local/frc/JRE/bin/java -XX:+UseConcMarkSweepGC -Djava.library.path=/usr/local/frc/third-party/lib -Djava.lang.invoke.stringConcat=BC_SB -jar /home/admin/myRobot-all.jar' > /home/admin/myRobotJavaRun")
-                ctx.execute("chmod +x /home/admin/myRobotJavaRun; chown lvuser /home/admin/myRobotJavaRun")
-            }
-        }
-
-        nativeArtifact('myRobotCpp') {
-            component = 'myRobotCpp'
-            targetPlatform = nativeUtils.wpi.platforms.roborio
-            libraryDirectory = '/usr/local/frc/third-party/lib'
-            buildType = 'debug'
-            postdeploy << { ctx ->
-                ctx.execute('chmod +x myRobotCpp')
-            }
-        }
-
-        nativeArtifact('myRobotCppStatic') {
-            component = 'myRobotCppStatic'
-            targetPlatform = nativeUtils.wpi.platforms.roborio
-            buildType = 'debug'
-
-            postdeploy << { ctx ->
-                ctx.execute('chmod +x myRobotCppStatic')
-            }
-        }
-    }
-}
-
-tasks.register('deployJava') {
-    try {
-        dependsOn tasks.named('deployJreRoborio')
-        dependsOn tasks.named('deployMyRobotJavaRoborio')
-        dependsOn tasks.named('deployMyRobotCppLibrariesRoborio')
-    } catch (ignored) {
-    }
-}
-
-tasks.register('deployShared') {
-    try {
-        dependsOn tasks.named('deployMyRobotCppLibrariesRoborio')
-        dependsOn tasks.named('deployMyRobotCppRoborio')
-    } catch (ignored) {
-    }
-}
-
-tasks.register('deployStatic') {
-    try {
-        dependsOn tasks.named('deployMyRobotCppStaticRoborio')
-    } catch (ignored) {
-    }
-}
-
 mainClassName = 'frc.robot.Main'
 
 apply plugin: 'com.github.johnrengelman.shadow'
 
 repositories {
-    mavenCentral()
+    maven {
+        url = 'https://frcmaven.wpi.edu/artifactory/ex-mvn'
+    }
 }
 
 dependencies {
@@ -128,14 +46,118 @@ dependencies {
     implementation project(':wpimath')
     implementation project(':hal')
     implementation project(':wpiutil')
+    implementation project(':wpinet')
     implementation project(':ntcore')
     implementation project(':cscore')
     implementation project(':cameraserver')
-    implementation project(':wpilibOldCommands')
     implementation project(':wpilibNewCommands')
 }
 
+tasks.withType(com.github.spotbugs.snom.SpotBugsTask).configureEach {
+    onlyIf { false }
+}
+
 def simProjects = ['halsim_gui']
+
+deploy {
+    targets {
+        roborio(RemoteTarget) {
+            directory = '/home/lvuser'
+            maxChannels = 4
+            locations {
+                ssh(SshDeployLocation) {
+                    address = "172.22.11.2"
+                    user = 'admin'
+                    password = ''
+                    ipv6 = false
+                }
+            }
+
+            def remote = it
+
+            artifacts.registerFactory(WPIJREArtifact) {
+                return objects.newInstance(WPIJREArtifact, it, remote)
+            }
+
+            artifacts {
+                all {
+                    predeploy << { ctx ->
+                        ctx.execute('. /etc/profile.d/natinst-path.sh; /usr/local/frc/bin/frcKillRobot.sh -t 2> /dev/null')
+                        ctx.execute("sed -i -e 's/\"exec /\"/' /usr/local/frc/bin/frcRunRobot.sh")
+                    }
+                    postdeploy << { ctx ->
+                        ctx.execute("sync")
+                        ctx.execute("ldconfig")
+                    }
+                }
+
+                myRobotCpp(NativeExecutableArtifact) {
+                    libraryDirectory = '/usr/local/frc/third-party/lib'
+                    def excludes = getLibraryFilter().getExcludes()
+                    excludes.add('**/*.so.debug')
+                    excludes.add('**/*.so.*.debug')
+                    postdeploy << { ctx ->
+                        ctx.execute("echo '/home/lvuser/myRobotCpp' > /home/lvuser/robotCommand")
+                        ctx.execute("chmod +x /home/lvuser/robotCommand; chown lvuser /home/lvuser/robotCommand")
+                        ctx.execute("setcap cap_sys_nice+eip \"/home/lvuser/myRobotCpp\"")
+                        ctx.execute('chmod +x myRobotCpp')
+                    }
+                }
+
+                myRobotCppStatic(NativeExecutableArtifact) {
+                    libraryDirectory = '/usr/local/frc/third-party/lib'
+                    postdeploy << { ctx ->
+                        ctx.execute("echo '/home/lvuser/myRobotCppStatic' > /home/lvuser/robotCommand")
+                        ctx.execute("chmod +x /home/lvuser/robotCommand; chown lvuser /home/lvuser/robotCommand")
+                        ctx.execute("setcap cap_sys_nice+eip \"/home/lvuser/myRobotCppStatic\"")
+                        ctx.execute('chmod +x myRobotCppStatic')
+                    }
+                }
+
+                myRobotCppJava(NativeExecutableArtifact) {
+                    libraryDirectory = '/usr/local/frc/third-party/lib'
+                    def excludes = getLibraryFilter().getExcludes()
+                    excludes.add('**/*.so.debug')
+                    excludes.add('**/*.so.*.debug')
+                }
+
+                jre(WPIJREArtifact) {
+                }
+
+                myRobotJava(JavaArtifact) {
+                    jarTask = shadowJar
+                    postdeploy << { ctx ->
+                        ctx.execute("echo '/usr/local/frc/JRE/bin/java -XX:+UseG1GC -XX:MaxGCPauseMillis=1 -XX:GCTimeRatio=1 -Djava.library.path=/usr/local/frc/third-party/lib -Djava.lang.invoke.stringConcat=BC_SB -jar /home/lvuser/myRobot-all.jar' > /home/lvuser/robotCommand")
+                        ctx.execute("chmod +x /home/lvuser/robotCommand; chown lvuser /home/lvuser/robotCommand")
+                    }
+                }
+            }
+        }
+    }
+}
+
+tasks.register('deployJava') {
+    try {
+        dependsOn tasks.named('deployjreroborio')
+        dependsOn tasks.named('deploymyRobotJavaroborio')
+        dependsOn tasks.named('deploymyRobotCppJavaroborio') // Deploying shared C++ is how to get the Java shared libraries.
+    } catch (ignored) {
+    }
+}
+
+tasks.register('deployShared') {
+    try {
+        dependsOn tasks.named('deploymyRobotCpproborio')
+    } catch (ignored) {
+    }
+}
+
+tasks.register('deployStatic') {
+    try {
+        dependsOn tasks.named('deploymyRobotCppStaticroborio')
+    } catch (ignored) {
+    }
+}
 
 model {
     components {
@@ -154,20 +176,29 @@ model {
                 }
             }
             binaries.all { binary ->
-                lib project: ':wpilibOldCommands', library: 'wpilibOldCommands', linkage: 'shared'
+                if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                    if (binary.buildType.name == 'debug') {
+                        deploy.targets.roborio.artifacts.myRobotCpp.binary = binary
+                        deploy.targets.roborio.artifacts.myRobotCppJava.binary = binary
+                    }
+                }
                 lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'
                 lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
-                lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
+                lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
+                project(':ntcore').addNtcoreDependency(binary, 'shared')
+                project(':ntcore').addNtcoreJniDependency(binary)
                 lib project: ':cscore', library: 'cscore', linkage: 'shared'
-                lib project: ':ntcore', library: 'ntcoreJNIShared', linkage: 'shared'
                 lib project: ':cscore', library: 'cscoreJNIShared', linkage: 'shared'
+                lib project: ':wpimath', library: 'wpimathJNIShared', linkage: 'shared'
+                lib project: ':wpinet', library: 'wpinetJNIShared', linkage: 'shared'
+                lib project: ':wpiutil', library: 'wpiutilJNIShared', linkage: 'shared'
                 project(':hal').addHalDependency(binary, 'shared')
                 project(':hal').addHalJniDependency(binary)
+                lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                 if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
-                    nativeUtils.useRequiredLibrary(binary, 'netcomm_shared', 'chipobject_shared', 'visa_shared', 'ni_runtime_shared')
+                    nativeUtils.useRequiredLibrary(binary, 'ni_link_libraries', 'ni_runtime_libraries')
                 } else {
                     def systemArch = getCurrentArch()
                     if (binary.targetPlatform.name == systemArch) {
@@ -194,17 +225,22 @@ model {
                 }
             }
             binaries.all { binary ->
-                lib project: ':wpilibOldCommands', library: 'wpilibOldCommands', linkage: 'static'
+                if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                    if (binary.buildType.name == 'debug') {
+                        deploy.targets.roborio.artifacts.myRobotCppStatic.binary = binary
+                    }
+                }
                 lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'static'
                 lib project: ':wpilibc', library: 'wpilibc', linkage: 'static'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'static'
-                lib project: ':ntcore', library: 'ntcore', linkage: 'static'
+                lib project: ':cameraserver', library: 'cameraserver', linkage: 'static'
+                project(':ntcore').addNtcoreDependency(binary, 'static')
                 lib project: ':cscore', library: 'cscore', linkage: 'static'
                 project(':hal').addHalDependency(binary, 'static')
+                lib project: ':wpinet', library: 'wpinet', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
-                lib project: ':cameraserver', library: 'cameraserver', linkage: 'static'
                 if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
-                    nativeUtils.useRequiredLibrary(binary, 'netcomm_shared', 'chipobject_shared', 'visa_shared', 'ni_runtime_shared')
+                    nativeUtils.useRequiredLibrary(binary, 'ni_link_libraries', 'ni_runtime_libraries')
                 }
             }
         }
@@ -229,6 +265,7 @@ model {
                                 run.dependsOn it.tasks.install
                                 run.systemProperty 'java.library.path', filePath
                                 run.environment 'LD_LIBRARY_PATH', filePath
+                                run.environment 'DYLD_LIBRARY_PATH', filePath
 
                                 def installTask = it.tasks.install
 

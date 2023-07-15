@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <iostream>
+#include <numbers>
 
-#include <wpi/numbers>
+#include <fmt/core.h>
 
 int main() {
-  std::cout << wpi::numbers::pi << std::endl;
+  fmt::print("{}\n", std::numbers::pi);
 }

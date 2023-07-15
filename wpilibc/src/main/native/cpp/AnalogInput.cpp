@@ -180,13 +180,13 @@ void AnalogInput::GetAccumulatorOutput(int64_t& value, int64_t& count) const {
 void AnalogInput::SetSampleRate(double samplesPerSecond) {
   int32_t status = 0;
   HAL_SetAnalogSampleRate(samplesPerSecond, &status);
-  FRC_CheckErrorStatus(status, "{}", "SetSampleRate");
+  FRC_CheckErrorStatus(status, "SetSampleRate");
 }
 
 double AnalogInput::GetSampleRate() {
   int32_t status = 0;
   double sampleRate = HAL_GetAnalogSampleRate(&status);
-  FRC_CheckErrorStatus(status, "{}", "GetSampleRate");
+  FRC_CheckErrorStatus(status, "GetSampleRate");
   return sampleRate;
 }
 
@@ -197,5 +197,5 @@ void AnalogInput::SetSimDevice(HAL_SimDeviceHandle device) {
 void AnalogInput::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Analog Input");
   builder.AddDoubleProperty(
-      "Value", [=] { return GetAverageVoltage(); }, nullptr);
+      "Value", [=, this] { return GetAverageVoltage(); }, nullptr);
 }

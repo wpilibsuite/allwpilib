@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <wpi/SymbolExports.h>
+
 #include "frc/kinematics/DifferentialDriveKinematics.h"
 #include "frc/trajectory/constraint/TrajectoryConstraint.h"
 #include "units/velocity.h"
@@ -15,11 +17,11 @@ namespace frc {
  * commanded velocities for both sides of the drivetrain stay below a certain
  * limit.
  */
-class DifferentialDriveKinematicsConstraint : public TrajectoryConstraint {
+class WPILIB_DLLEXPORT DifferentialDriveKinematicsConstraint
+    : public TrajectoryConstraint {
  public:
-  DifferentialDriveKinematicsConstraint(
-      const DifferentialDriveKinematics& kinematics,
-      units::meters_per_second_t maxSpeed);
+  DifferentialDriveKinematicsConstraint(DifferentialDriveKinematics kinematics,
+                                        units::meters_per_second_t maxSpeed);
 
   units::meters_per_second_t MaxVelocity(
       const Pose2d& pose, units::curvature_t curvature,
@@ -29,7 +31,7 @@ class DifferentialDriveKinematicsConstraint : public TrajectoryConstraint {
                             units::meters_per_second_t speed) const override;
 
  private:
-  const DifferentialDriveKinematics& m_kinematics;
+  DifferentialDriveKinematics m_kinematics;
   units::meters_per_second_t m_maxSpeed;
 };
 }  // namespace frc

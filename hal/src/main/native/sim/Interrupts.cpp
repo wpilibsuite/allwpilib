@@ -121,16 +121,18 @@ static void ProcessInterruptDigitalSynchronous(const char* name, void* param,
     return;
   }
   bool retVal = value->data.v_boolean;
+  auto previousState = interrupt->previousState;
+  interrupt->previousState = retVal;
   // If no change in interrupt, return;
-  if (retVal == interrupt->previousState) {
+  if (retVal == previousState) {
     return;
   }
   // If its a falling change, and we dont fire on falling return
-  if (interrupt->previousState && !interrupt->fireOnDown) {
+  if (previousState && !interrupt->fireOnDown) {
     return;
   }
   // If its a rising change, and we dont fire on rising return.
-  if (!interrupt->previousState && !interrupt->fireOnUp) {
+  if (!previousState && !interrupt->fireOnUp) {
     return;
   }
 
@@ -174,16 +176,18 @@ static void ProcessInterruptAnalogSynchronous(const char* name, void* param,
     // Pulse interrupt
     interruptData->waitCond.notify_all();
   }
+  auto previousState = interrupt->previousState;
+  interrupt->previousState = retVal;
   // If no change in interrupt, return;
-  if (retVal == interrupt->previousState) {
+  if (retVal == previousState) {
     return;
   }
   // If its a falling change, and we dont fire on falling return
-  if (interrupt->previousState && !interrupt->fireOnDown) {
+  if (previousState && !interrupt->fireOnDown) {
     return;
   }
   // If its a rising change, and we dont fire on rising return.
-  if (!interrupt->previousState && !interrupt->fireOnUp) {
+  if (!previousState && !interrupt->fireOnUp) {
     return;
   }
 
@@ -332,6 +336,26 @@ static int64_t WaitForInterruptAnalog(HAL_InterruptHandle handle,
 int64_t HAL_WaitForInterrupt(HAL_InterruptHandle interruptHandle,
                              double timeout, HAL_Bool ignorePrevious,
                              int32_t* status) {
+  auto interrupt = interruptHandles->Get(interruptHandle);
+  if (interrupt == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return WaitResult::Timeout;
+  }
+
+  if (interrupt->isAnalog) {
+    return WaitForInterruptAnalog(interruptHandle, interrupt.get(), timeout,
+                                  ignorePrevious);
+  } else {
+    return WaitForInterruptDigital(interruptHandle, interrupt.get(), timeout,
+                                   ignorePrevious);
+  }
+}
+
+int64_t HAL_WaitForMultipleInterrupts(HAL_InterruptHandle interruptHandle,
+                                      int64_t mask, double timeout,
+                                      HAL_Bool ignorePrevious,
+                                      int32_t* status) {
+  // TODO make this properly work, will require a decent rewrite
   auto interrupt = interruptHandles->Get(interruptHandle);
   if (interrupt == nullptr) {
     *status = HAL_HANDLE_ERROR;

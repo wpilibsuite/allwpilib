@@ -8,8 +8,8 @@
 
 #include "Robot.h"
 
-SetElevatorSetpoint::SetElevatorSetpoint(double setpoint, Elevator* elevator)
-    : m_setpoint(setpoint), m_elevator(elevator) {
+SetElevatorSetpoint::SetElevatorSetpoint(double setpoint, Elevator& elevator)
+    : m_setpoint(setpoint), m_elevator(&elevator) {
   SetName("SetElevatorSetpoint");
   AddRequirements({m_elevator});
 }

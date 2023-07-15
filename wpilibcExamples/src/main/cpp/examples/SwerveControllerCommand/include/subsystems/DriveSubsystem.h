@@ -14,12 +14,12 @@
 #include <frc/kinematics/SwerveDriveKinematics.h>
 #include <frc/kinematics/SwerveDriveOdometry.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
-#include <frc2/command/SubsystemBase.h>
+#include <frc2/command/Subsystem.h>
 
 #include "Constants.h"
 #include "SwerveModule.h"
 
-class DriveSubsystem : public frc2::SubsystemBase {
+class DriveSubsystem : public frc2::Subsystem {
  public:
   DriveSubsystem();
 
@@ -94,10 +94,10 @@ class DriveSubsystem : public frc2::SubsystemBase {
       0.7_m;  // Distance between centers of front and back wheels on robot
 
   frc::SwerveDriveKinematics<4> kDriveKinematics{
-      frc::Translation2d(kWheelBase / 2, kTrackWidth / 2),
-      frc::Translation2d(kWheelBase / 2, -kTrackWidth / 2),
-      frc::Translation2d(-kWheelBase / 2, kTrackWidth / 2),
-      frc::Translation2d(-kWheelBase / 2, -kTrackWidth / 2)};
+      frc::Translation2d{kWheelBase / 2, kTrackWidth / 2},
+      frc::Translation2d{kWheelBase / 2, -kTrackWidth / 2},
+      frc::Translation2d{-kWheelBase / 2, kTrackWidth / 2},
+      frc::Translation2d{-kWheelBase / 2, -kTrackWidth / 2}};
 
  private:
   // Components (e.g. motor controllers and sensors) should generally be

@@ -12,20 +12,35 @@
 #include <wpi/sendable/SendableHelper.h>
 
 #include "frc/PneumaticsBase.h"
+#include "frc/PneumaticsModuleType.h"
 
 namespace frc {
 
 /**
- * Solenoid class for running high voltage Digital Output (PCM).
+ * Solenoid class for running high voltage Digital Output on a pneumatics
+ * module.
  *
  * The Solenoid class is typically used for pneumatics solenoids, but could be
- * used for any device within the current spec of the PCM.
+ * used for any device within the current spec of the module.
  */
 class Solenoid : public wpi::Sendable, public wpi::SendableHelper<Solenoid> {
  public:
-  Solenoid(PneumaticsBase& module, int channel);
-  Solenoid(PneumaticsBase* module, int channel);
-  Solenoid(std::shared_ptr<PneumaticsBase> module, int channel);
+  /**
+   * Constructs a solenoid for a specified module and type.
+   *
+   * @param module The module ID to use.
+   * @param moduleType The module type to use.
+   * @param channel The channel the solenoid is on.
+   */
+  Solenoid(int module, PneumaticsModuleType moduleType, int channel);
+
+  /**
+   * Constructs a solenoid for a default module and specified type.
+   *
+   * @param moduleType The module type to use.
+   * @param channel The channel the solenoid is on.
+   */
+  Solenoid(PneumaticsModuleType moduleType, int channel);
 
   ~Solenoid() override;
 
@@ -72,19 +87,22 @@ class Solenoid : public wpi::Sendable, public wpi::SendableHelper<Solenoid> {
   bool IsDisabled() const;
 
   /**
-   * Set the pulse duration in the PCM. This is used in conjunction with
-   * the startPulse method to allow the PCM to control the timing of a pulse.
-   * The timing can be controlled in 0.01 second increments.
+   * Set the pulse duration in the pneumatics module. This is used in
+   * conjunction with the startPulse method to allow the pneumatics module to
+   * control the timing of a pulse.
    *
-   * @param durationSeconds The duration of the pulse, from 0.01 to 2.55
-   *                        seconds.
+   * On the PCM, the timing can be controlled in 0.01 second increments, with a
+   * maximum of 2.55 seconds. On the PH, the timing can be controlled in 0.001
+   * second increments, with a maximum of 65.534 seconds.
+   *
+   * @param duration The duration of the pulse.
    *
    * @see startPulse()
    */
   void SetPulseDuration(units::second_t duration);
 
   /**
-   * Trigger the PCM to generate a pulse of the duration set in
+   * %Trigger the pneumatics module to generate a pulse of the duration set in
    * setPulseDuration.
    *
    * @see setPulseDuration()

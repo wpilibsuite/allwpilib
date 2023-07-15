@@ -1,0 +1,48 @@
+name: Sanitizers
+
+on: [pull_request, push]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: asan
+            cmake-flags: "-DCMAKE_BUILD_TYPE=Asan"
+            ctest-env: ""
+            ctest-flags: "-E 'wpilibc'"
+          - name: tsan
+            cmake-flags: "-DCMAKE_BUILD_TYPE=Tsan"
+            ctest-env: "TSAN_OPTIONS=second_deadlock_stack=1"
+            ctest-flags: "-E 'cscore|cameraserver|wpilibc|wpilibNewCommands'"
+          - name: ubsan
+            cmake-flags: "-DCMAKE_BUILD_TYPE=Ubsan"
+            ctest-env: ""
+            ctest-flags: ""
+    name: "${{ matrix.name }}"
+    runs-on: ubuntu-22.04
+    container: wpilib/roborio-cross-ubuntu:2023-22.04
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Dependencies
+        run: sudo apt-get update && sudo apt-get install -y libopencv-dev libopencv4.5-java python-is-python3 clang-14
+
+      - name: Install jinja
+        run: python -m pip install jinja2
+
+      - name: configure
+        run: mkdir build && cd build && cmake -DCMAKE_C_COMPILER:FILEPATH=/usr/bin/clang-14 -DCMAKE_CXX_COMPILER:FILEPATH=/usr/bin/clang++-14 ${{ matrix.cmake-flags }} ..
+
+      - name: build
+        working-directory: build
+        run: cmake --build . --parallel $(nproc)
+
+      - name: test
+        working-directory: build
+        run: ${{ matrix.ctest-env }} ctest --output-on-failure ${{ matrix.ctest-flags }}

@@ -5,6 +5,7 @@
 package edu.wpi.first.cscore;
 
 /** USB camera information. */
+@SuppressWarnings("MemberName")
 public class UsbCameraInfo {
   /**
    * Create a new set of UsbCameraInfo.
@@ -28,26 +29,20 @@ public class UsbCameraInfo {
   }
 
   /** Device number (e.g. N in '/dev/videoN' on Linux). */
-  @SuppressWarnings("MemberName")
   public int dev;
 
   /** Path to device if available (e.g. '/dev/video0' on Linux). */
-  @SuppressWarnings("MemberName")
   public String path;
 
   /** Vendor/model name of the camera as provided by the USB driver. */
-  @SuppressWarnings("MemberName")
   public String name;
 
   /** Other path aliases to device (e.g. '/dev/v4l/by-id/...' etc on Linux). */
-  @SuppressWarnings("MemberName")
   public String[] otherPaths;
 
   /** USB vendor id. */
-  @SuppressWarnings("MemberName")
   public int vendorId;
 
   /** USB product id. */
-  @SuppressWarnings("MemberName")
   public int productId;
 }

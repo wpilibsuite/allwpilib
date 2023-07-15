@@ -4,6 +4,12 @@
 
 package edu.wpi.first.wpilibj;
 
+/**
+ * A timer class.
+ *
+ * <p>Note that if the user calls SimHooks.restartTiming(), they should also reset the timer so
+ * get() won't return a negative duration.
+ */
 public class Timer {
   /**
    * Return the system clock time in seconds. Return the time from the FPGA hardware clock in
@@ -11,7 +17,6 @@ public class Timer {
    *
    * @return Robot running time in seconds.
    */
-  @SuppressWarnings("AbbreviationAsWordInName")
   public static double getFPGATimestamp() {
     return RobotController.getFPGATime() / 1000000.0;
   }
@@ -49,10 +54,7 @@ public class Timer {
   private double m_accumulatedTime;
   private boolean m_running;
 
-  /** Lock for synchronization. */
-  private final Object m_lock = new Object();
-
-  @SuppressWarnings("MissingJavadocMethod")
+  /** Timer constructor. */
   public Timer() {
     reset();
   }
@@ -69,24 +71,21 @@ public class Timer {
    * @return Current time value for this timer in seconds
    */
   public double get() {
-    synchronized (m_lock) {
-      if (m_running) {
-        return m_accumulatedTime + (getMsClock() - m_startTime) / 1000.0;
-      } else {
-        return m_accumulatedTime;
-      }
+    if (m_running) {
+      return m_accumulatedTime + (getMsClock() - m_startTime) / 1000.0;
+    } else {
+      return m_accumulatedTime;
     }
   }
 
   /**
-   * Reset the timer by setting the time to 0. Make the timer startTime the current time so new
-   * requests will be relative now
+   * Reset the timer by setting the time to 0.
+   *
+   * <p>Make the timer startTime the current time so new requests will be relative now.
    */
   public void reset() {
-    synchronized (m_lock) {
-      m_accumulatedTime = 0;
-      m_startTime = getMsClock();
-    }
+    m_accumulatedTime = 0;
+    m_startTime = getMsClock();
   }
 
   /**
@@ -95,12 +94,23 @@ public class Timer {
    * already running.
    */
   public void start() {
-    synchronized (m_lock) {
-      if (!m_running) {
-        m_startTime = getMsClock();
-        m_running = true;
-      }
+    if (!m_running) {
+      m_startTime = getMsClock();
+      m_running = true;
     }
+  }
+
+  /**
+   * Restart the timer by stopping the timer, if it is not already stopped, resetting the
+   * accumulated time, then starting the timer again. If you want an event to periodically reoccur
+   * at some time interval from the start time, consider using advanceIfElapsed() instead.
+   */
+  public void restart() {
+    if (m_running) {
+      stop();
+    }
+    reset();
+    start();
   }
 
   /**
@@ -109,10 +119,8 @@ public class Timer {
    * clock.
    */
   public void stop() {
-    synchronized (m_lock) {
-      m_accumulatedTime = get();
-      m_running = false;
-    }
+    m_accumulatedTime = get();
+    m_running = false;
   }
 
   /**
@@ -122,21 +130,7 @@ public class Timer {
    * @return Whether the period has passed.
    */
   public boolean hasElapsed(double seconds) {
-    synchronized (m_lock) {
-      return get() > seconds;
-    }
-  }
-
-  /**
-   * Check if the period specified has passed and if it has, advance the start time by that period.
-   * This is useful to decide if it's time to do periodic work without drifting later by the time it
-   * took to get around to checking.
-   *
-   * @param period The period to check for (in seconds).
-   * @return Whether the period has passed.
-   */
-  public boolean hasPeriodPassed(double period) {
-    return advanceIfElapsed(period);
+    return get() >= seconds;
   }
 
   /**
@@ -148,15 +142,13 @@ public class Timer {
    * @return Whether the period has passed.
    */
   public boolean advanceIfElapsed(double seconds) {
-    synchronized (m_lock) {
-      if (get() > seconds) {
-        // Advance the start time by the period.
-        // Don't set it to the current time... we want to avoid drift.
-        m_startTime += seconds * 1000;
-        return true;
-      } else {
-        return false;
-      }
+    if (get() >= seconds) {
+      // Advance the start time by the period.
+      // Don't set it to the current time... we want to avoid drift.
+      m_startTime += seconds * 1000;
+      return true;
+    } else {
+      return false;
     }
   }
 }

@@ -70,6 +70,7 @@ HAL_Bool HAL_SetThreadPriority(NativeThreadHandle handle, HAL_Bool realTime,
     // Only need to set 0 priority for non RT thread
     sch.sched_priority = 0;
   }
+
   if (pthread_setschedparam(*reinterpret_cast<const pthread_t*>(handle),
                             scheduler, &sch)) {
     *status = HAL_THREAD_PRIORITY_ERROR;

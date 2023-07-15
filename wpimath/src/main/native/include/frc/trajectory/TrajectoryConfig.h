@@ -4,9 +4,12 @@
 
 #pragma once
 
+#include <concepts>
 #include <memory>
 #include <utility>
 #include <vector>
+
+#include <wpi/SymbolExports.h>
 
 #include "frc/kinematics/DifferentialDriveKinematics.h"
 #include "frc/kinematics/MecanumDriveKinematics.h"
@@ -29,7 +32,7 @@ namespace frc {
  * have been defaulted to reasonable values (0, 0, {}, false). These values can
  * be changed via the SetXXX methods.
  */
-class TrajectoryConfig {
+class WPILIB_DLLEXPORT TrajectoryConfig {
  public:
   /**
    * Constructs a config object.
@@ -72,8 +75,7 @@ class TrajectoryConfig {
    * Adds a user-defined constraint to the trajectory.
    * @param constraint The user-defined constraint.
    */
-  template <typename Constraint, typename = std::enable_if_t<std::is_base_of_v<
-                                     TrajectoryConstraint, Constraint>>>
+  template <std::derived_from<TrajectoryConstraint> Constraint>
   void AddConstraint(Constraint constraint) {
     m_constraints.emplace_back(std::make_unique<Constraint>(constraint));
   }

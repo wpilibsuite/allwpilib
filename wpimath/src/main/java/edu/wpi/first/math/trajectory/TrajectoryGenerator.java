@@ -15,14 +15,13 @@ import edu.wpi.first.math.spline.SplineHelper;
 import edu.wpi.first.math.spline.SplineParameterizer;
 import edu.wpi.first.math.spline.SplineParameterizer.MalformedSplineException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.BiConsumer;
 
 public final class TrajectoryGenerator {
   private static final Trajectory kDoNothingTrajectory =
-      new Trajectory(Arrays.asList(new Trajectory.State()));
+      new Trajectory(List.of(new Trajectory.State()));
   private static BiConsumer<String, StackTraceElement[]> errorFunc;
 
   /** Private constructor because this is a utility class. */
@@ -193,7 +192,6 @@ public final class TrajectoryGenerator {
    * @param config The configuration for the trajectory.
    * @return The generated trajectory.
    */
-  @SuppressWarnings("LocalVariableName")
   public static Trajectory generateTrajectory(List<Pose2d> waypoints, TrajectoryConfig config) {
     final var flip = new Transform2d(new Translation2d(), Rotation2d.fromDegrees(180.0));
 
@@ -266,7 +264,6 @@ public final class TrajectoryGenerator {
   }
 
   // Work around type erasure signatures
-  @SuppressWarnings("serial")
   public static class ControlVectorList extends ArrayList<Spline.ControlVector> {
     public ControlVectorList(int initialCapacity) {
       super(initialCapacity);

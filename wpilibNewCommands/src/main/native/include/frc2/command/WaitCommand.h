@@ -7,16 +7,16 @@
 #include <frc/Timer.h>
 #include <units/time.h>
 
-#include "frc2/command/CommandBase.h"
+#include "frc2/command/Command.h"
 #include "frc2/command/CommandHelper.h"
 
 namespace frc2 {
 /**
  * A command that does nothing but takes a specified amount of time to finish.
- * Useful for CommandGroups.  Can also be subclassed to make a command with an
- * internal timer.
+ *
+ * This class is provided by the NewCommands VendorDep
  */
-class WaitCommand : public CommandHelper<CommandBase, WaitCommand> {
+class WaitCommand : public CommandHelper<Command, WaitCommand> {
  public:
   /**
    * Creates a new WaitCommand.  This command will do nothing, and end after the
@@ -37,6 +37,8 @@ class WaitCommand : public CommandHelper<CommandBase, WaitCommand> {
   bool IsFinished() override;
 
   bool RunsWhenDisabled() const override;
+
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  protected:
   frc::Timer m_timer;

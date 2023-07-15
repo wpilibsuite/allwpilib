@@ -2,9 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <cstdio>
-#include <iostream>
-
+#include <fmt/core.h>
 #include <opencv2/core/core.hpp>
 
 #include "cscore.h"
@@ -26,11 +24,11 @@ int main() {
   for (;;) {
     uint64_t time = cvsink.GrabFrame(test);
     if (time == 0) {
-      std::cout << "error: " << cvsink.GetError() << std::endl;
+      fmt::print("error: {}\n", cvsink.GetError());
       continue;
     }
-    std::cout << "got frame at time " << time << " size " << test.size()
-              << std::endl;
+    fmt::print("got frame at time {} size ({}, {})\n", time, test.size().width,
+               test.size().height);
     cv::flip(test, flip, 0);
     cvsource.PutFrame(flip);
   }

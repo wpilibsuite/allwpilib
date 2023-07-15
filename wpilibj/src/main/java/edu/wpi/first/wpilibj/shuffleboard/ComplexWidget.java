@@ -9,7 +9,7 @@ import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilderImpl;
 
 /**
- * A Shuffleboard widget that handles a {@link Sendable} object such as a speed controller or
+ * A Shuffleboard widget that handles a {@link Sendable} object such as a motor controller or
  * sensor.
  */
 public final class ComplexWidget extends ShuffleboardWidget<ComplexWidget> {

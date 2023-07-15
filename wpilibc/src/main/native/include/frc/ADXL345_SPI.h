@@ -44,6 +44,8 @@ class ADXL345_SPI : public Accelerometer,
   ADXL345_SPI(ADXL345_SPI&&) = default;
   ADXL345_SPI& operator=(ADXL345_SPI&&) = default;
 
+  SPI::Port GetSpiPort() const;
+
   // Accelerometer interface
   void SetRange(Range range) final;
   double GetX() override;

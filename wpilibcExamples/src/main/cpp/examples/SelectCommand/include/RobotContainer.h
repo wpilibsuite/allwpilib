@@ -5,8 +5,7 @@
 #pragma once
 
 #include <frc2/command/Command.h>
-#include <frc2/command/PrintCommand.h>
-#include <frc2/command/SelectCommand.h>
+#include <frc2/command/Commands.h>
 
 /**
  * This class is where the bulk of the robot should be declared.  Since
@@ -36,12 +35,12 @@ class RobotContainer {
   // value returned by the selector method at runtime.  Note that selectcommand
   // takes a generic type, so the selector does not have to be an enum; it could
   // be any desired type (string, integer, boolean, double...)
-  frc2::SelectCommand<CommandSelector> m_exampleSelectCommand{
+  frc2::CommandPtr m_exampleSelectCommand = frc2::cmd::Select<CommandSelector>(
       [this] { return Select(); },
       // Maps selector values to commands
-      std::pair{ONE, frc2::PrintCommand{"Command one was selected!"}},
-      std::pair{TWO, frc2::PrintCommand{"Command two was selected!"}},
-      std::pair{THREE, frc2::PrintCommand{"Command three was selected!"}}};
+      std::pair{ONE, frc2::cmd::Print("Command one was selected!")},
+      std::pair{TWO, frc2::cmd::Print("Command two was selected!")},
+      std::pair{THREE, frc2::cmd::Print("Command three was selected!")});
 
   void ConfigureButtonBindings();
 };

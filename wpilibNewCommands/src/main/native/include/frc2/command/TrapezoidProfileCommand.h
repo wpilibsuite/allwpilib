@@ -6,12 +6,12 @@
 
 #include <functional>
 #include <initializer_list>
+#include <span>
 
 #include <frc/Timer.h>
 #include <frc/trajectory/TrapezoidProfile.h>
-#include <wpi/span.h>
 
-#include "frc2/command/CommandBase.h"
+#include "frc2/command/Command.h"
 #include "frc2/command/CommandHelper.h"
 
 namespace frc2 {
@@ -19,11 +19,13 @@ namespace frc2 {
  * A command that runs a TrapezoidProfile.  Useful for smoothly controlling
  * mechanism motion.
  *
+ * This class is provided by the NewCommands VendorDep
+ *
  * @see TrapezoidProfile
  */
 template <class Distance>
 class TrapezoidProfileCommand
-    : public CommandHelper<CommandBase, TrapezoidProfileCommand<Distance>> {
+    : public CommandHelper<Command, TrapezoidProfileCommand<Distance>> {
   using Distance_t = units::unit_t<Distance>;
   using Velocity =
       units::compound_unit<Distance, units::inverse<units::seconds>>;
@@ -35,8 +37,9 @@ class TrapezoidProfileCommand
    * Creates a new TrapezoidProfileCommand that will execute the given
    * TrapezoidalProfile. Output will be piped to the provided consumer function.
    *
-   * @param profile The motion profile to execute.
-   * @param output  The consumer for the profile output.
+   * @param profile      The motion profile to execute.
+   * @param output       The consumer for the profile output.
+   * @param requirements The list of requirements.
    */
   TrapezoidProfileCommand(frc::TrapezoidProfile<Distance> profile,
                           std::function<void(State)> output,
@@ -49,20 +52,18 @@ class TrapezoidProfileCommand
    * Creates a new TrapezoidProfileCommand that will execute the given
    * TrapezoidalProfile. Output will be piped to the provided consumer function.
    *
-   * @param profile The motion profile to execute.
-   * @param output  The consumer for the profile output.
+   * @param profile      The motion profile to execute.
+   * @param output       The consumer for the profile output.
+   * @param requirements The list of requirements.
    */
   TrapezoidProfileCommand(frc::TrapezoidProfile<Distance> profile,
                           std::function<void(State)> output,
-                          wpi::span<Subsystem* const> requirements = {})
+                          std::span<Subsystem* const> requirements = {})
       : m_profile(profile), m_output(output) {
     this->AddRequirements(requirements);
   }
 
-  void Initialize() override {
-    m_timer.Reset();
-    m_timer.Start();
-  }
+  void Initialize() override { m_timer.Restart(); }
 
   void Execute() override { m_output(m_profile.Calculate(m_timer.Get())); }
 

@@ -55,24 +55,20 @@ public class DIOCrossConnectFixture implements ITestFixture {
   }
 
   @Override
-  public boolean setup() {
-    return true;
-  }
+  public void setup() {}
 
   @Override
-  public boolean reset() {
+  public void reset() {
     m_output.set(false);
-    return true;
   }
 
   @Override
-  public boolean teardown() {
+  public void teardown() {
     logger.log(Level.FINE, "Beginning teardown");
     if (m_allocated) {
       m_input.close();
       m_output.close();
       m_allocated = false;
     }
-    return true;
   }
 }

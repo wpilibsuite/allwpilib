@@ -54,16 +54,14 @@ class Robot : public frc::TimedRobot {
   void TeleopPeriodic() override {
     // Get the x speed. We are inverting this because Xbox controllers return
     // negative values when we push forward.
-    const auto xSpeed = -m_speedLimiter.Calculate(
-                            m_controller.GetY(frc::GenericHID::kLeftHand)) *
+    const auto xSpeed = -m_speedLimiter.Calculate(m_controller.GetLeftY()) *
                         Drivetrain::kMaxSpeed;
 
     // Get the rate of angular rotation. We are inverting this because we want a
     // positive value when we pull to the left (remember, CCW is positive in
     // mathematics). Xbox controllers return positive values when you pull to
     // the right by default.
-    const auto rot = -m_rotLimiter.Calculate(
-                         m_controller.GetX(frc::GenericHID::kRightHand)) *
+    const auto rot = -m_rotLimiter.Calculate(m_controller.GetRightX()) *
                      Drivetrain::kMaxAngularSpeed;
 
     m_drive.Drive(xSpeed, rot);
@@ -81,9 +79,9 @@ class Robot : public frc::TimedRobot {
 
   // An example trajectory to follow.
   frc::Trajectory m_trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
-      frc::Pose2d(0_m, 0_m, 0_rad),
-      {frc::Translation2d(1_m, 1_m), frc::Translation2d(2_m, -1_m)},
-      frc::Pose2d(3_m, 0_m, 0_rad), frc::TrajectoryConfig(3_fps, 3_fps_sq));
+      frc::Pose2d{0_m, 0_m, 0_rad},
+      {frc::Translation2d{1_m, 1_m}, frc::Translation2d{2_m, -1_m}},
+      frc::Pose2d{3_m, 0_m, 0_rad}, frc::TrajectoryConfig(3_fps, 3_fps_sq));
 
   // The Ramsete Controller to follow the trajectory.
   frc::RamseteController m_ramseteController;

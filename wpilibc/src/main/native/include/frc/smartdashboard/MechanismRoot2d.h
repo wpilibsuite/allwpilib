@@ -7,7 +7,7 @@
 #include <memory>
 #include <string_view>
 
-#include <networktables/NetworkTableEntry.h>
+#include <networktables/DoubleTopic.h>
 
 #include "MechanismObject2d.h"
 
@@ -16,8 +16,12 @@ namespace frc {
 /**
  * Root Mechanism2d node.
  *
+ * A root is the anchor point of other nodes (such as ligaments).
+ *
  * Do not create objects of this class directly! Obtain pointers from the
  * Mechanism2d.GetRoot() factory method.
+ *
+ * <p>Append other nodes by using Append().
  */
 class MechanismRoot2d : private MechanismObject2d {
   friend class Mechanism2d;
@@ -44,6 +48,7 @@ class MechanismRoot2d : private MechanismObject2d {
   inline void Flush();
   double m_x;
   double m_y;
-  nt::NetworkTableEntry m_posEntry;
+  nt::DoublePublisher m_xPub;
+  nt::DoublePublisher m_yPub;
 };
 }  // namespace frc

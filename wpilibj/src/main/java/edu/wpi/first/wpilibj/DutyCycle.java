@@ -48,6 +48,7 @@ public class DutyCycle implements Sendable, AutoCloseable {
   /** Close the DutyCycle and free all resources. */
   @Override
   public void close() {
+    SendableRegistry.remove(this);
     DutyCycleJNI.free(m_handle);
   }
 
@@ -72,21 +73,19 @@ public class DutyCycle implements Sendable, AutoCloseable {
   }
 
   /**
-   * Get the raw output ratio of the duty cycle signal.
+   * Get the raw high time of the duty cycle signal.
    *
-   * <p>0 means always low, an output equal to getOutputScaleFactor() means always high.
-   *
-   * @return output ratio in raw units
+   * @return high time of last pulse in nanoseconds
    */
-  public int getOutputRaw() {
-    return DutyCycleJNI.getOutputRaw(m_handle);
+  public int getHighTimeNanoseconds() {
+    return DutyCycleJNI.getHighTime(m_handle);
   }
 
   /**
    * Get the scale factor of the output.
    *
-   * <p>An output equal to this value is always high, and then linearly scales down to 0. Divide the
-   * result of getOutputRaw by this in order to get the percentage between 0 and 1.
+   * <p>An output equal to this value is always high, and then linearly scales down to 0. Divide a
+   * raw result by this in order to get the percentage between 0 and 1. Used by DMA.
    *
    * @return the output scale factor
    */
@@ -99,7 +98,6 @@ public class DutyCycle implements Sendable, AutoCloseable {
    *
    * @return the FPGA index
    */
-  @SuppressWarnings("AbbreviationAsWordInName")
   public final int getFPGAIndex() {
     return DutyCycleJNI.getFPGAIndex(m_handle);
   }

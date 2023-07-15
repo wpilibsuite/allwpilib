@@ -11,34 +11,13 @@ namespace frc {
 template <size_t NumModules>
 SwerveDriveOdometry<NumModules>::SwerveDriveOdometry(
     SwerveDriveKinematics<NumModules> kinematics, const Rotation2d& gyroAngle,
+    const wpi::array<SwerveModulePosition, NumModules>& modulePositions,
     const Pose2d& initialPose)
-    : m_kinematics(kinematics), m_pose(initialPose) {
-  m_previousAngle = m_pose.Rotation();
-  m_gyroOffset = m_pose.Rotation() - gyroAngle;
+    : Odometry<SwerveDriveWheelSpeeds<NumModules>,
+               SwerveDriveWheelPositions<NumModules>>(
+          m_kinematicsImpl, gyroAngle, {modulePositions}, initialPose),
+      m_kinematicsImpl(kinematics) {
   wpi::math::MathSharedStore::ReportUsage(
       wpi::math::MathUsageId::kOdometry_SwerveDrive, 1);
-}
-
-template <size_t NumModules>
-template <typename... ModuleStates>
-const Pose2d& frc::SwerveDriveOdometry<NumModules>::UpdateWithTime(
-    units::second_t currentTime, const Rotation2d& gyroAngle,
-    ModuleStates&&... moduleStates) {
-  units::second_t deltaTime =
-      (m_previousTime >= 0_s) ? currentTime - m_previousTime : 0_s;
-  m_previousTime = currentTime;
-
-  auto angle = gyroAngle + m_gyroOffset;
-
-  auto [dx, dy, dtheta] = m_kinematics.ToChassisSpeeds(moduleStates...);
-  static_cast<void>(dtheta);
-
-  auto newPose = m_pose.Exp(
-      {dx * deltaTime, dy * deltaTime, (angle - m_previousAngle).Radians()});
-
-  m_previousAngle = angle;
-  m_pose = {newPose.Translation(), angle};
-
-  return m_pose;
 }
 }  // namespace frc

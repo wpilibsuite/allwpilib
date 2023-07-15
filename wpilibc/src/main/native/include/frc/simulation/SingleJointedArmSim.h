@@ -30,15 +30,13 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 1> {
    * @param armLength          The length of the arm.
    * @param minAngle           The minimum angle that the arm is capable of.
    * @param maxAngle           The maximum angle that the arm is capable of.
-   * @param mass               The mass of the arm.
-   * @param measurementStdDevs The standard deviations of the measurements.
    * @param simulateGravity    Whether gravity should be simulated or not.
+   * @param measurementStdDevs The standard deviations of the measurements.
    */
   SingleJointedArmSim(const LinearSystem<2, 1, 1>& system,
                       const DCMotor& gearbox, double gearing,
                       units::meter_t armLength, units::radian_t minAngle,
-                      units::radian_t maxAngle, units::kilogram_t mass,
-                      bool simulateGravity,
+                      units::radian_t maxAngle, bool simulateGravity,
                       const std::array<double, 1>& measurementStdDevs = {0.0});
   /**
    * Creates a simulated arm mechanism.
@@ -51,15 +49,13 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 1> {
    * @param armLength          The length of the arm.
    * @param minAngle           The minimum angle that the arm is capable of.
    * @param maxAngle           The maximum angle that the arm is capable of.
-   * @param mass               The mass of the arm.
-   * @param measurementStdDevs The standard deviation of the measurement noise.
    * @param simulateGravity    Whether gravity should be simulated or not.
+   * @param measurementStdDevs The standard deviation of the measurement noise.
    */
   SingleJointedArmSim(const DCMotor& gearbox, double gearing,
                       units::kilogram_square_meter_t moi,
                       units::meter_t armLength, units::radian_t minAngle,
-                      units::radian_t maxAngle, units::kilogram_t mass,
-                      bool simulateGravity,
+                      units::radian_t maxAngle, bool simulateGravity,
                       const std::array<double, 1>& measurementStdDevs = {0.0});
 
   /**
@@ -142,15 +138,13 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 1> {
    * @param u           The system inputs (voltage).
    * @param dt          The time difference between controller updates.
    */
-  Eigen::Matrix<double, 2, 1> UpdateX(
-      const Eigen::Matrix<double, 2, 1>& currentXhat,
-      const Eigen::Matrix<double, 1, 1>& u, units::second_t dt) override;
+  Vectord<2> UpdateX(const Vectord<2>& currentXhat, const Vectord<1>& u,
+                     units::second_t dt) override;
 
  private:
-  units::meter_t m_r;
+  units::meter_t m_armLen;
   units::radian_t m_minAngle;
   units::radian_t m_maxAngle;
-  units::kilogram_t m_mass;
   const DCMotor m_gearbox;
   double m_gearing;
   bool m_simulateGravity;

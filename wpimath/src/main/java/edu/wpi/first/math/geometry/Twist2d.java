@@ -7,12 +7,11 @@ package edu.wpi.first.math.geometry;
 import java.util.Objects;
 
 /**
- * A change in distance along arc since the last pose update. We can use ideas from differential
- * calculus to create new Pose2ds from a Twist2d and vise versa.
+ * A change in distance along a 2D arc since the last pose update. We can use ideas from
+ * differential calculus to create new Pose2d objects from a Twist2d and vice versa.
  *
  * <p>A Twist can be used to represent a difference between two poses.
  */
-@SuppressWarnings("MemberName")
 public class Twist2d {
   /** Linear "dx" component. */
   public double dx;

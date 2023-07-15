@@ -4,6 +4,8 @@
 
 package edu.wpi.first.util;
 
+import java.util.Arrays;
+
 /** This is a simple circular buffer so we don't need to "bucket brigade" copy old values. */
 public class CircularBuffer {
   private double[] m_data;
@@ -21,9 +23,7 @@ public class CircularBuffer {
    */
   public CircularBuffer(int size) {
     m_data = new double[size];
-    for (int i = 0; i < m_data.length; i++) {
-      m_data[i] = 0.0;
-    }
+    Arrays.fill(m_data, 0.0);
   }
 
   /**
@@ -31,7 +31,7 @@ public class CircularBuffer {
    *
    * @return number of elements in buffer
    */
-  double size() {
+  public int size() {
     return m_length;
   }
 
@@ -40,7 +40,7 @@ public class CircularBuffer {
    *
    * @return value at front of buffer
    */
-  double getFirst() {
+  public double getFirst() {
     return m_data[m_front];
   }
 
@@ -49,7 +49,7 @@ public class CircularBuffer {
    *
    * @return value at back of buffer
    */
-  double getLast() {
+  public double getLast() {
     // If there are no elements in the buffer, do nothing
     if (m_length == 0) {
       return 0.0;
@@ -138,7 +138,7 @@ public class CircularBuffer {
    *
    * @param size New buffer size.
    */
-  void resize(int size) {
+  public void resize(int size) {
     double[] newBuffer = new double[size];
     m_length = Math.min(m_length, size);
     for (int i = 0; i < m_length; i++) {
@@ -150,9 +150,7 @@ public class CircularBuffer {
 
   /** Sets internal buffer contents to zero. */
   public void clear() {
-    for (int i = 0; i < m_data.length; i++) {
-      m_data[i] = 0.0;
-    }
+    Arrays.fill(m_data, 0.0);
     m_front = 0;
     m_length = 0;
   }

@@ -8,11 +8,9 @@
 
 using namespace frc;
 
-static constexpr char kPosition[] = "pos";
-
 MechanismRoot2d::MechanismRoot2d(std::string_view name, double x, double y,
                                  const private_init&)
-    : MechanismObject2d(name), m_x{x}, m_y{y} {}
+    : MechanismObject2d{name}, m_x{x}, m_y{y} {}
 
 void MechanismRoot2d::SetPosition(double x, double y) {
   std::scoped_lock lock(m_mutex);
@@ -22,12 +20,16 @@ void MechanismRoot2d::SetPosition(double x, double y) {
 }
 
 void MechanismRoot2d::UpdateEntries(std::shared_ptr<nt::NetworkTable> table) {
-  m_posEntry = table->GetEntry(kPosition);
+  m_xPub = table->GetDoubleTopic("x").Publish();
+  m_yPub = table->GetDoubleTopic("y").Publish();
   Flush();
 }
 
 inline void MechanismRoot2d::Flush() {
-  if (m_posEntry) {
-    m_posEntry.SetDoubleArray({m_x, m_y});
+  if (m_xPub) {
+    m_xPub.Set(m_x);
+  }
+  if (m_yPub) {
+    m_yPub.Set(m_y);
   }
 }

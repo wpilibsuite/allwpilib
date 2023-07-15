@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
 
 class DifferentialDrivetrainSimTest {
   @Test
-  public void testConvergence() {
+  void testConvergence() {
     var motor = DCMotor.getNEO(2);
     var plant =
         LinearSystemId.createDrivetrainVelocitySystem(
@@ -62,7 +62,7 @@ class DifferentialDrivetrainSimTest {
                 .addConstraint(new DifferentialDriveKinematicsConstraint(kinematics, 1)));
 
     for (double t = 0; t < traj.getTotalTimeSeconds(); t += 0.020) {
-      var state = traj.sample(0.020);
+      var state = traj.sample(t);
       var ramseteOut = ramsete.calculate(sim.getPose(), state);
 
       var wheelSpeeds = kinematics.toWheelSpeeds(ramseteOut);
@@ -79,19 +79,24 @@ class DifferentialDrivetrainSimTest {
       groundTruthX = NumericalIntegration.rk4(sim::getDynamics, groundTruthX, voltages, 0.020);
     }
 
+    // 2 inch tolerance is OK since our ground truth is an approximation of the
+    // ODE solution using RK4 anyway
     assertEquals(
         groundTruthX.get(DifferentialDrivetrainSim.State.kX.value, 0),
-        sim.getState(DifferentialDrivetrainSim.State.kX));
+        sim.getState(DifferentialDrivetrainSim.State.kX),
+        0.05);
     assertEquals(
         groundTruthX.get(DifferentialDrivetrainSim.State.kY.value, 0),
-        sim.getState(DifferentialDrivetrainSim.State.kY));
+        sim.getState(DifferentialDrivetrainSim.State.kY),
+        0.05);
     assertEquals(
         groundTruthX.get(DifferentialDrivetrainSim.State.kHeading.value, 0),
-        sim.getState(DifferentialDrivetrainSim.State.kHeading));
+        sim.getState(DifferentialDrivetrainSim.State.kHeading),
+        0.01);
   }
 
   @Test
-  public void testCurrent() {
+  void testCurrent() {
     var motor = DCMotor.getNEO(2);
     var plant =
         LinearSystemId.createDrivetrainVelocitySystem(
@@ -121,7 +126,7 @@ class DifferentialDrivetrainSimTest {
   }
 
   @Test
-  public void testModelStability() {
+  void testModelStability() {
     var motor = DCMotor.getNEO(2);
     var plant =
         LinearSystemId.createDrivetrainVelocitySystem(

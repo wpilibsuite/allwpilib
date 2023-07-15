@@ -11,16 +11,17 @@ import edu.wpi.first.wpilibj.AnalogEncoder;
 import edu.wpi.first.wpilibj.AnalogInput;
 import org.junit.jupiter.api.Test;
 
-public class AnalogEncoderSimTest {
+class AnalogEncoderSimTest {
   @Test
-  public void testBasic() {
-    var analogInput = new AnalogInput(0);
-    var analogEncoder = new AnalogEncoder(analogInput);
-    var encoderSim = new AnalogEncoderSim(analogEncoder);
+  void testBasic() {
+    try (var analogInput = new AnalogInput(0);
+        var analogEncoder = new AnalogEncoder(analogInput)) {
+      var encoderSim = new AnalogEncoderSim(analogEncoder);
 
-    encoderSim.setPosition(Rotation2d.fromDegrees(180));
-    assertEquals(analogEncoder.get(), 0.5, 1E-8);
-    assertEquals(encoderSim.getTurns(), 0.5, 1E-8);
-    assertEquals(encoderSim.getPosition().getRadians(), Math.PI, 1E-8);
+      encoderSim.setPosition(Rotation2d.fromDegrees(180));
+      assertEquals(analogEncoder.get(), 0.5, 1E-8);
+      assertEquals(encoderSim.getTurns(), 0.5, 1E-8);
+      assertEquals(encoderSim.getPosition().getRadians(), Math.PI, 1E-8);
+    }
   }
 }

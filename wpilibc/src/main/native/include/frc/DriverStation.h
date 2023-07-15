@@ -7,7 +7,11 @@
 #include <string>
 
 #include <units/time.h>
-#include <wpi/deprecated.h>
+#include <wpi/Synchronization.h>
+
+namespace wpi::log {
+class DataLog;
+}  // namespace wpi::log
 
 namespace frc {
 
@@ -15,24 +19,15 @@ namespace frc {
  * Provide access to the network communication data to / from the Driver
  * Station.
  */
-class DriverStation {
+class DriverStation final {
  public:
   enum Alliance { kRed, kBlue, kInvalid };
   enum MatchType { kNone, kPractice, kQualification, kElimination };
 
-  /**
-   * Return a reference to the singleton DriverStation.
-   *
-   * @return Reference to the DS instance
-   * @deprecated Use the static methods
-   */
-  WPI_DEPRECATED("Use static methods")
-  static DriverStation& GetInstance();
-
   static constexpr int kJoystickPorts = 6;
 
   /**
-   * The state of one joystick button. Button indexes begin at 1.
+   * The state of one joystick button. %Button indexes begin at 1.
    *
    * @param stick  The joystick to read.
    * @param button The button index, beginning at 1.
@@ -41,7 +36,7 @@ class DriverStation {
   static bool GetStickButton(int stick, int button);
 
   /**
-   * Whether one joystick button was pressed since the last check. Button
+   * Whether one joystick button was pressed since the last check. %Button
    * indexes begin at 1.
    *
    * @param stick  The joystick to read.
@@ -51,7 +46,7 @@ class DriverStation {
   static bool GetStickButtonPressed(int stick, int button);
 
   /**
-   * Whether one joystick button was released since the last check. Button
+   * Whether one joystick button was released since the last check. %Button
    * indexes begin at 1.
    *
    * @param stick  The joystick to read.
@@ -139,6 +134,7 @@ class DriverStation {
    * Returns the types of Axes on a given joystick port.
    *
    * @param stick The joystick port number and the target axis
+   * @param axis  The analog axis value to read from the joystick.
    * @return What type of axis the axis is reporting to be
    */
   static int GetJoystickAxisType(int stick, int axis);
@@ -196,7 +192,7 @@ class DriverStation {
    *
    * @return True if the robot is being commanded to be in teleop mode
    */
-  static bool IsOperatorControl();
+  static bool IsTeleop();
 
   /**
    * Check if the DS is commanding teleop mode and if it has enabled the robot.
@@ -204,7 +200,7 @@ class DriverStation {
    * @return True if the robot is being commanded to be in teleop mode and
    * enabled.
    */
-  static bool IsOperatorControlEnabled();
+  static bool IsTeleopEnabled();
 
   /**
    * Check if the DS is commanding test mode.
@@ -214,22 +210,19 @@ class DriverStation {
   static bool IsTest();
 
   /**
+   * Check if the DS is commanding Test mode and if it has enabled the robot.
+   *
+   * @return True if the robot is being commanded to be in Test mode and
+   * enabled.
+   */
+  static bool IsTestEnabled();
+
+  /**
    * Check if the DS is attached.
    *
    * @return True if the DS is connected to the robot
    */
   static bool IsDSAttached();
-
-  /**
-   * Has a new control packet from the driver station arrived since the last
-   * time this function was called?
-   *
-   * Warning: If you call this function from more than one place at the same
-   * time, you will not get the intended behavior.
-   *
-   * @return True if the control data has been updated since the last call.
-   */
-  static bool IsNewControlData();
 
   /**
    * Is the driver station attached to a Field Management System?
@@ -241,6 +234,9 @@ class DriverStation {
 
   /**
    * Returns the game specific message provided by the FMS.
+   *
+   * If the FMS is not connected, it is set from the game data setting on the
+   * driver station.
    *
    * @return A string containing the game specific message.
    */
@@ -277,7 +273,10 @@ class DriverStation {
   static int GetReplayNumber();
 
   /**
-   * Return the alliance that the driver station says it is on.
+   * Return the alliance that the driver station says it is on from the FMS.
+   *
+   * If the FMS is not connected, it is set from the team alliance setting on
+   * the driver station.
    *
    * This could return kRed or kBlue.
    *
@@ -286,7 +285,10 @@ class DriverStation {
   static Alliance GetAlliance();
 
   /**
-   * Return the driver station location on the field.
+   * Return the driver station location from the FMS.
+   *
+   * If the FMS is not connected, it is set from the team alliance setting on
+   * the driver station.
    *
    * This could return 1, 2, or 3.
    *
@@ -295,39 +297,12 @@ class DriverStation {
   static int GetLocation();
 
   /**
-   * Wait until a new packet comes from the driver station.
+   * Wait for a DS connection.
    *
-   * This blocks on a semaphore, so the waiting is efficient.
-   *
-   * This is a good way to delay processing until there is new driver station
-   * data to act on.
-   *
-   * Checks if new control data has arrived since the last waitForData call
-   * on the current thread. If new data has not arrived, returns immediately.
+   * @param timeout timeout in seconds. 0 for infinite.
+   * @return true if connected, false if timeout
    */
-  static void WaitForData();
-
-  /**
-   * Wait until a new packet comes from the driver station, or wait for a
-   * timeout.
-   *
-   * Checks if new control data has arrived since the last waitForData call
-   * on the current thread. If new data has not arrived, returns immediately.
-   *
-   * If the timeout is less then or equal to 0, wait indefinitely.
-   *
-   * Timeout is in milliseconds
-   *
-   * This blocks on a semaphore, so the waiting is efficient.
-   *
-   * This is a good way to delay processing until there is new driver station
-   * data to act on.
-   *
-   * @param timeout Timeout
-   *
-   * @return true if new data, otherwise false
-   */
-  static bool WaitForData(units::second_t timeout);
+  static bool WaitForDsConnection(units::second_t timeout);
 
   /**
    * Return the approximate match time.
@@ -353,45 +328,10 @@ class DriverStation {
    */
   static double GetBatteryVoltage();
 
-  /**
-   * Only to be used to tell the Driver Station what code you claim to be
-   * executing for diagnostic purposes only.
-   *
-   * @param entering If true, starting disabled code; if false, leaving disabled
-   *                 code.
-   */
-  static void InDisabled(bool entering);
+  static void RefreshData();
 
-  /**
-   * Only to be used to tell the Driver Station what code you claim to be
-   * executing for diagnostic purposes only.
-   *
-   * @param entering If true, starting autonomous code; if false, leaving
-   *                 autonomous code.
-   */
-  static void InAutonomous(bool entering);
-
-  /**
-   * Only to be used to tell the Driver Station what code you claim to be
-   * executing for diagnostic purposes only.
-   *
-   * @param entering If true, starting teleop code; if false, leaving teleop
-   *                 code.
-   */
-  static void InOperatorControl(bool entering);
-
-  /**
-   * Only to be used to tell the Driver Station what code you claim to be
-   * executing for diagnostic purposes only.
-   *
-   * @param entering If true, starting test code; if false, leaving test code.
-   */
-  static void InTest(bool entering);
-
-  /**
-   * Forces WaitForData() to return immediately.
-   */
-  static void WakeupWaitForData();
+  static void ProvideRefreshedDataEventHandle(WPI_EventHandle handle);
+  static void RemoveRefreshedDataEventHandle(WPI_EventHandle handle);
 
   /**
    * Allows the user to specify whether they want joystick connection warnings
@@ -409,6 +349,14 @@ class DriverStation {
    * @return Whether joystick connection warnings are silenced.
    */
   static bool IsJoystickConnectionWarningSilenced();
+
+  /**
+   * Starts logging DriverStation data to data log. Repeated calls are ignored.
+   *
+   * @param log data log
+   * @param logJoysticks if true, log joystick data
+   */
+  static void StartDataLog(wpi::log::DataLog& log, bool logJoysticks = true);
 
  private:
   DriverStation() = default;

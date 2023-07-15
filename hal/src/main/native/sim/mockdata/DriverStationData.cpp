@@ -30,7 +30,7 @@ void DriverStationData::ResetData() {
   fmsAttached.Reset(false);
   dsAttached.Reset(true);
   allianceStationId.Reset(static_cast<HAL_AllianceStationID>(0));
-  matchTime.Reset(0.0);
+  matchTime.Reset(-1.0);
 
   {
     std::scoped_lock lock(m_joystickDataMutex);
@@ -216,8 +216,12 @@ void DriverStationData::CallNewDataCallbacks() {
   m_newDataCallbacks(&empty);
 }
 
+namespace hal {
+void NewDriverStationData();
+}  // namespace hal
+
 void DriverStationData::NotifyNewData() {
-  HAL_ReleaseDSMutex();
+  hal::NewDriverStationData();
 }
 
 void DriverStationData::SetJoystickButton(int32_t stick, int32_t button,
@@ -335,14 +339,17 @@ void DriverStationData::SetJoystickType(int32_t stick, int32_t type) {
   m_joystickDescriptorCallbacks(stick, &m_joystickData[stick].descriptor);
 }
 
-void DriverStationData::SetJoystickName(int32_t stick, const char* name) {
+void DriverStationData::SetJoystickName(int32_t stick, const char* name,
+                                        size_t size) {
   if (stick < 0 || stick >= kNumJoysticks) {
     return;
   }
   std::scoped_lock lock(m_joystickDataMutex);
-  std::strncpy(m_joystickData[stick].descriptor.name, name,
-               sizeof(m_joystickData[stick].descriptor.name) - 1);
-  *(std::end(m_joystickData[stick].descriptor.name) - 1) = '\0';
+  if (size > sizeof(m_joystickData[stick].descriptor.name) - 1) {
+    size = sizeof(m_joystickData[stick].descriptor.name) - 1;
+  }
+  std::strncpy(m_joystickData[stick].descriptor.name, name, size);
+  m_joystickData[stick].descriptor.name[size] = '\0';
   m_joystickDescriptorCallbacks(stick, &m_joystickData[stick].descriptor);
 }
 
@@ -359,19 +366,27 @@ void DriverStationData::SetJoystickAxisType(int32_t stick, int32_t axis,
   m_joystickDescriptorCallbacks(stick, &m_joystickData[stick].descriptor);
 }
 
-void DriverStationData::SetGameSpecificMessage(const char* message) {
+void DriverStationData::SetGameSpecificMessage(const char* message,
+                                               size_t size) {
   std::scoped_lock lock(m_matchInfoMutex);
+  if (size > sizeof(m_matchInfo.gameSpecificMessage) - 1) {
+    size = sizeof(m_matchInfo.gameSpecificMessage) - 1;
+  }
   std::strncpy(reinterpret_cast<char*>(m_matchInfo.gameSpecificMessage),
-               message, sizeof(m_matchInfo.gameSpecificMessage) - 1);
-  *(std::end(m_matchInfo.gameSpecificMessage) - 1) = '\0';
-  m_matchInfo.gameSpecificMessageSize = std::strlen(message);
+               message, size);
+  m_matchInfo.gameSpecificMessage[size] = '\0';
+  m_matchInfo.gameSpecificMessageSize =
+      std::strlen(reinterpret_cast<char*>(m_matchInfo.gameSpecificMessage));
   m_matchInfoCallbacks(&m_matchInfo);
 }
 
-void DriverStationData::SetEventName(const char* name) {
+void DriverStationData::SetEventName(const char* name, size_t size) {
   std::scoped_lock lock(m_matchInfoMutex);
-  std::strncpy(m_matchInfo.eventName, name, sizeof(m_matchInfo.eventName) - 1);
-  *(std::end(m_matchInfo.eventName) - 1) = '\0';
+  if (size > sizeof(m_matchInfo.eventName) - 1) {
+    size = sizeof(m_matchInfo.eventName) - 1;
+  }
+  std::strncpy(m_matchInfo.eventName, name, size);
+  m_matchInfo.eventName[size] = '\0';
   m_matchInfoCallbacks(&m_matchInfo);
 }
 
@@ -536,20 +551,20 @@ void HALSIM_SetJoystickType(int32_t stick, int32_t type) {
   SimDriverStationData->SetJoystickType(stick, type);
 }
 
-void HALSIM_SetJoystickName(int32_t stick, const char* name) {
-  SimDriverStationData->SetJoystickName(stick, name);
+void HALSIM_SetJoystickName(int32_t stick, const char* name, size_t size) {
+  SimDriverStationData->SetJoystickName(stick, name, size);
 }
 
 void HALSIM_SetJoystickAxisType(int32_t stick, int32_t axis, int32_t type) {
   SimDriverStationData->SetJoystickAxisType(stick, axis, type);
 }
 
-void HALSIM_SetGameSpecificMessage(const char* message) {
-  SimDriverStationData->SetGameSpecificMessage(message);
+void HALSIM_SetGameSpecificMessage(const char* message, size_t size) {
+  SimDriverStationData->SetGameSpecificMessage(message, size);
 }
 
-void HALSIM_SetEventName(const char* name) {
-  SimDriverStationData->SetEventName(name);
+void HALSIM_SetEventName(const char* name, size_t size) {
+  SimDriverStationData->SetEventName(name, size);
 }
 
 void HALSIM_SetMatchType(HAL_MatchType type) {

@@ -26,6 +26,10 @@ void HAL_FreeSimDevice(HAL_SimDeviceHandle handle) {
   SimSimDeviceData->FreeDevice(handle);
 }
 
+const char* HAL_GetSimDeviceName(HAL_SimDeviceHandle handle) {
+  return SimSimDeviceData->GetDeviceName(handle);
+}
+
 HAL_SimValueHandle HAL_CreateSimValue(HAL_SimDeviceHandle device,
                                       const char* name, int32_t direction,
                                       const struct HAL_Value* initialValue) {

@@ -2,17 +2,19 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <numbers>
+
 #include <frc/geometry/Translation2d.h>
 #include <frc/kinematics/MecanumDriveKinematics.h>
 #include <frc/trajectory/TrapezoidProfile.h>
 #include <units/acceleration.h>
 #include <units/angle.h>
+#include <units/angular_acceleration.h>
 #include <units/angular_velocity.h>
 #include <units/length.h>
 #include <units/time.h>
 #include <units/velocity.h>
 #include <units/voltage.h>
-#include <wpi/numbers>
 
 #pragma once
 
@@ -51,14 +53,13 @@ constexpr int kEncoderCPR = 1024;
 constexpr double kWheelDiameterMeters = 0.15;
 constexpr double kEncoderDistancePerPulse =
     // Assumes the encoders are directly mounted on the wheel shafts
-    (kWheelDiameterMeters * wpi::numbers::pi) /
+    (kWheelDiameterMeters * std::numbers::pi) /
     static_cast<double>(kEncoderCPR);
 
 // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
 // These characterization values MUST be determined either experimentally or
-// theoretically for *your* robot's drive. The RobotPy Characterization
-// Toolsuite provides a convenient tool for obtaining these values for your
-// robot.
+// theoretically for *your* robot's drive. The SysId tool provides a convenient
+// method for obtaining these values for your robot.
 constexpr auto ks = 1_V;
 constexpr auto kv = 0.8 * 1_V * 1_s / 1_m;
 constexpr auto ka = 0.15 * 1_V * 1_s * 1_s / 1_m;
@@ -71,15 +72,10 @@ constexpr double kPRearRightVel = 0.5;
 }  // namespace DriveConstants
 
 namespace AutoConstants {
-using radians_per_second_squared_t =
-    units::compound_unit<units::radians,
-                         units::inverse<units::squared<units::second>>>;
-
-constexpr auto kMaxSpeed = units::meters_per_second_t(3);
-constexpr auto kMaxAcceleration = units::meters_per_second_squared_t(3);
-constexpr auto kMaxAngularSpeed = units::radians_per_second_t(3);
-constexpr auto kMaxAngularAcceleration =
-    units::unit_t<radians_per_second_squared_t>(3);
+constexpr auto kMaxSpeed = 3_mps;
+constexpr auto kMaxAcceleration = 3_mps_sq;
+constexpr auto kMaxAngularSpeed = 3_rad_per_s;
+constexpr auto kMaxAngularAcceleration = 3_rad_per_s_sq;
 
 constexpr double kPXController = 0.5;
 constexpr double kPYController = 0.5;
@@ -91,5 +87,5 @@ extern const frc::TrapezoidProfile<units::radians>::Constraints
 }  // namespace AutoConstants
 
 namespace OIConstants {
-constexpr int kDriverControllerPort = 1;
+constexpr int kDriverControllerPort = 0;
 }  // namespace OIConstants

@@ -15,12 +15,12 @@
 #include <frc/simulation/DifferentialDrivetrainSim.h>
 #include <frc/simulation/EncoderSim.h>
 #include <frc/smartdashboard/Field2d.h>
-#include <frc2/command/SubsystemBase.h>
+#include <frc2/command/Subsystem.h>
 #include <units/voltage.h>
 
 #include "Constants.h"
 
-class DriveSubsystem : public frc2::SubsystemBase {
+class DriveSubsystem : public frc2::Subsystem {
  public:
   DriveSubsystem();
 
@@ -144,17 +144,21 @@ class DriveSubsystem : public frc2::SubsystemBase {
 
   // The left-side drive encoder
   frc::Encoder m_leftEncoder{DriveConstants::kLeftEncoderPorts[0],
-                             DriveConstants::kLeftEncoderPorts[1]};
+                             DriveConstants::kLeftEncoderPorts[1],
+                             DriveConstants::kLeftEncoderReversed};
 
   // The right-side drive encoder
   frc::Encoder m_rightEncoder{DriveConstants::kRightEncoderPorts[0],
-                              DriveConstants::kRightEncoderPorts[1]};
+                              DriveConstants::kRightEncoderPorts[1],
+                              DriveConstants::kRightEncoderReversed};
 
   // The gyro sensor
   frc::ADXRS450_Gyro m_gyro;
 
   // Odometry class for tracking robot pose
-  frc::DifferentialDriveOdometry m_odometry{m_gyro.GetRotation2d()};
+  frc::DifferentialDriveOdometry m_odometry{
+      m_gyro.GetRotation2d(), units::meter_t{m_leftEncoder.GetDistance()},
+      units::meter_t{m_rightEncoder.GetDistance()}};
 
   // These classes help simulate our drivetrain.
   frc::sim::DifferentialDrivetrainSim m_drivetrainSimulator{

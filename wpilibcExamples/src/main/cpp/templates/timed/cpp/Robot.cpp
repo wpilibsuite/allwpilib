@@ -4,8 +4,7 @@
 
 #include "Robot.h"
 
-#include <iostream>
-
+#include <fmt/core.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 
 void Robot::RobotInit() {
@@ -15,7 +14,7 @@ void Robot::RobotInit() {
 }
 
 /**
- * This function is called every robot packet, no matter the mode. Use
+ * This function is called every 20 ms, no matter the mode. Use
  * this for items like diagnostics that you want ran during disabled,
  * autonomous, teleoperated and test.
  *
@@ -39,7 +38,7 @@ void Robot::AutonomousInit() {
   m_autoSelected = m_chooser.GetSelected();
   // m_autoSelected = SmartDashboard::GetString("Auto Selector",
   //     kAutoNameDefault);
-  std::cout << "Auto selected: " << m_autoSelected << std::endl;
+  fmt::print("Auto selected: {}\n", m_autoSelected);
 
   if (m_autoSelected == kAutoNameCustom) {
     // Custom Auto goes here
@@ -67,6 +66,10 @@ void Robot::DisabledPeriodic() {}
 void Robot::TestInit() {}
 
 void Robot::TestPeriodic() {}
+
+void Robot::SimulationInit() {}
+
+void Robot::SimulationPeriodic() {}
 
 #ifndef RUNNING_FRC_TESTS
 int main() {

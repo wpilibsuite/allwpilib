@@ -1,18 +1,19 @@
 plugins {
     id 'java'
-    id "org.ysb33r.doxygen" version "0.5"
+    id "org.ysb33r.doxygen" version "0.7.0"
 }
 
-evaluationDependsOn(':wpiutil')
-evaluationDependsOn(':ntcore')
+evaluationDependsOn(':apriltag')
+evaluationDependsOn(':cameraserver')
 evaluationDependsOn(':cscore')
 evaluationDependsOn(':hal')
-evaluationDependsOn(':cameraserver')
-evaluationDependsOn(':wpimath')
+evaluationDependsOn(':ntcore')
+evaluationDependsOn(':wpilibNewCommands')
 evaluationDependsOn(':wpilibc')
 evaluationDependsOn(':wpilibj')
-evaluationDependsOn(':wpilibOldCommands')
-evaluationDependsOn(':wpilibNewCommands')
+evaluationDependsOn(':wpimath')
+evaluationDependsOn(':wpinet')
+evaluationDependsOn(':wpiutil')
 
 def baseArtifactIdCpp = 'documentation'
 def artifactGroupIdCpp = 'edu.wpi.first.wpilibc'
@@ -27,25 +28,34 @@ def outputsFolder = file("$project.buildDir/outputs")
 def cppProjectZips = []
 def cppIncludeRoots = []
 
-cppProjectZips.add(project(':hal').cppHeadersZip)
-cppProjectZips.add(project(':wpiutil').cppHeadersZip)
-cppProjectZips.add(project(':ntcore').cppHeadersZip)
-cppProjectZips.add(project(':cscore').cppHeadersZip)
+cppProjectZips.add(project(':apriltag').cppHeadersZip)
 cppProjectZips.add(project(':cameraserver').cppHeadersZip)
-cppProjectZips.add(project(':wpimath').cppHeadersZip)
-cppProjectZips.add(project(':wpilibc').cppHeadersZip)
-cppProjectZips.add(project(':wpilibOldCommands').cppHeadersZip)
+cppProjectZips.add(project(':cscore').cppHeadersZip)
+cppProjectZips.add(project(':hal').cppHeadersZip)
+cppProjectZips.add(project(':ntcore').cppHeadersZip)
 cppProjectZips.add(project(':wpilibNewCommands').cppHeadersZip)
+cppProjectZips.add(project(':wpilibc').cppHeadersZip)
+cppProjectZips.add(project(':wpimath').cppHeadersZip)
+cppProjectZips.add(project(':wpinet').cppHeadersZip)
+cppProjectZips.add(project(':wpiutil').cppHeadersZip)
 
 doxygen {
-    executables {
-        doxygen version : '1.8.18',
-        baseURI : 'https://frcmaven.wpi.edu/artifactory/generic-release-mirror/doxygen'
+    // Doxygen binaries are only provided for x86_64 platforms
+    // Other platforms will need to provide doxygen via their system
+    // See below maven and https://doxygen.nl/download.html for provided binaries
+
+    String arch = System.getProperty("os.arch");
+    if (arch.equals("x86_64") || arch.equals("amd64")) {
+        executables {
+            doxygen version : '1.9.4',
+            baseURI : 'https://frcmaven.wpi.edu/artifactory/generic-release-mirror/doxygen'
+        }
     }
 }
 
 doxygen {
     generate_html true
+    html_extra_stylesheet 'theme.css'
 
     cppProjectZips.each {
         dependsOn it
@@ -54,29 +64,120 @@ doxygen {
             cppIncludeRoots.add(it.absolutePath)
         }
     }
+    cppIncludeRoots << '../ntcore/build/generated/main/native/include/'
 
-    exclude 'Eigen/**'
-    exclude 'unsupported/**'
-    exclude 'units/**'
-    exclude 'uv.h'
-    exclude 'uv/**'
+    if (project.hasProperty('docWarningsAsErrors')) {
+        // Eigen
+        exclude 'Eigen/**'
+        exclude 'unsupported/**'
 
-    extension_mapping 'inc=C++'
-    project_name 'WPILibC++'
-    project_number wpilibVersioning.version.get()
-    javadoc_autobrief true
-    recursive true
-    quiet true
-    warnings false
-    warn_if_undocumented false
-    generate_latex false
-    use_mathjax true
-    html_timestamp true
-    generate_treeview true
+        // LLVM
+        exclude 'wpi/AlignOf.h'
+        exclude 'wpi/Casting.h'
+        exclude 'wpi/Chrono.h'
+        exclude 'wpi/Compiler.h'
+        exclude 'wpi/ConvertUTF.h'
+        exclude 'wpi/DenseMap.h'
+        exclude 'wpi/DenseMapInfo.h'
+        exclude 'wpi/Endian.h'
+        exclude 'wpi/EpochTracker.h'
+        exclude 'wpi/Errc.h'
+        exclude 'wpi/Errno.h'
+        exclude 'wpi/ErrorHandling.h'
+        exclude 'wpi/bit.h'
+        exclude 'wpi/fs.h'
+        exclude 'wpi/FunctionExtras.h'
+        exclude 'wpi/function_ref.h'
+        exclude 'wpi/Hashing.h'
+        exclude 'wpi/iterator.h'
+        exclude 'wpi/iterator_range.h'
+        exclude 'wpi/ManagedStatic.h'
+        exclude 'wpi/MapVector.h'
+        exclude 'wpi/MathExtras.h'
+        exclude 'wpi/MemAlloc.h'
+        exclude 'wpi/PointerIntPair.h'
+        exclude 'wpi/PointerLikeTypeTraits.h'
+        exclude 'wpi/PointerUnion.h'
+        exclude 'wpi/raw_os_ostream.h'
+        exclude 'wpi/raw_ostream.h'
+        exclude 'wpi/SmallPtrSet.h'
+        exclude 'wpi/SmallSet.h'
+        exclude 'wpi/SmallString.h'
+        exclude 'wpi/SmallVector.h'
+        exclude 'wpi/StringExtras.h'
+        exclude 'wpi/StringMap.h'
+        exclude 'wpi/SwapByteOrder.h'
+        exclude 'wpi/type_traits.h'
+        exclude 'wpi/VersionTuple.h'
+        exclude 'wpi/WindowsError.h'
+
+        // fmtlib
+        exclude 'fmt/**'
+
+        // libuv
+        exclude 'uv.h'
+        exclude 'uv/**'
+        exclude 'wpinet/uv/**'
+
+        // json
+        exclude 'wpi/json.h'
+
+        // memory
+        exclude 'wpi/memory/**'
+
+        // mpack
+        exclude 'wpi/mpack.h'
+
+        // units
+        exclude 'units/**'
+    }
+
+    //TODO: building memory docs causes search to break
+    exclude 'wpi/memory/**'
+
+    aliases 'effects=\\par <i>Effects:</i>^^',
+            'notes=\\par <i>Notes:</i>^^',
+            'requires=\\par <i>Requires:</i>^^',
+            'requiredbe=\\par <i>Required Behavior:</i>^^',
+            'concept{2}=<a href=\"md_doc_concepts.html#\1\">\2</a>',
+            'defaultbe=\\par <i>Default Behavior:</i>^^'
+    case_sense_names false
+    extension_mapping 'inc=C++', 'no_extension=C++'
+    extract_all true
     extract_static true
+    file_patterns '*'
     full_path_names true
+    generate_html true
+    generate_latex false
+    generate_treeview true
+    html_extra_stylesheet 'theme.css'
+    html_timestamp true
+    javadoc_autobrief true
+    project_name 'WPILibC++'
+    project_logo '../wpiutil/src/main/native/resources/wpilib-128.png'
+    project_number wpilibVersioning.version.get()
+    quiet true
+    recursive true
+    strip_code_comments false
     strip_from_inc_path cppIncludeRoots as String[]
     strip_from_path cppIncludeRoots as String[]
+    use_mathjax true
+    warnings false
+    warn_if_incomplete_doc true
+    warn_if_undocumented false
+    warn_no_paramdoc true
+
+    //enable doxygen preprocessor expansion of WPI_DEPRECATED to fix MotorController docs
+    enable_preprocessing true
+    macro_expansion true
+    expand_only_predef true
+    predefined "WPI_DEPRECATED(x)=[[deprecated(x)]]\"\\\n" +
+            "\"__cplusplus\"\\\n" +
+            "\"HAL_ENUM(name)=enum name : int32_t"
+
+    if (project.hasProperty('docWarningsAsErrors')) {
+        warn_as_error 'FAIL_ON_WARNINGS'
+    }
 }
 
 tasks.register("zipCppDocs", Zip) {
@@ -108,28 +209,43 @@ apply from: "${rootDir}/shared/opencv.gradle"
 task generateJavaDocs(type: Javadoc) {
     classpath += project(":wpimath").sourceSets.main.compileClasspath
     options.links("https://docs.oracle.com/en/java/javase/11/docs/api/")
-    options.addStringOption "tag", "pre:a:Pre-Condition"
-    options.addBooleanOption "Xdoclint:html,missing,reference,syntax", true
+    options.addStringOption("tag", "pre:a:Pre-Condition")
+    options.addBooleanOption("Xdoclint:html,missing,reference,syntax", true)
     options.addBooleanOption('html5', true)
-    dependsOn project(':wpilibj').generateJavaVersion
+    options.linkSource(true)
     dependsOn project(':hal').generateUsageReporting
+    dependsOn project(':ntcore').ntcoreGenerateJavaTypes
+    dependsOn project(':wpilibj').generateJavaVersion
     dependsOn project(':wpimath').generateNat
-    source project(':hal').sourceSets.main.java
-    source project(':wpiutil').sourceSets.main.java
-    source project(':cscore').sourceSets.main.java
-    source project(':ntcore').sourceSets.main.java
-    source project(':wpimath').sourceSets.main.java
-    source project(':wpilibj').sourceSets.main.java
+    source project(':apriltag').sourceSets.main.java
     source project(':cameraserver').sourceSets.main.java
-    source project(':wpilibOldCommands').sourceSets.main.java
+    source project(':cscore').sourceSets.main.java
+    source project(':hal').sourceSets.main.java
+    source project(':ntcore').sourceSets.main.java
     source project(':wpilibNewCommands').sourceSets.main.java
+    source project(':wpilibj').sourceSets.main.java
+    source project(':wpimath').sourceSets.main.java
+    source project(':wpinet').sourceSets.main.java
+    source project(':wpiutil').sourceSets.main.java
     source configurations.javaSource.collect { zipTree(it) }
     include '**/*.java'
     failOnError = true
-    options.encoding = 'UTF-8'
 
     title = "WPILib API ${wpilibVersioning.version.get()}"
     ext.entryPoint = "$destinationDir/index.html"
+
+    if (JavaVersion.current().isJava8Compatible() && project.hasProperty('docWarningsAsErrors')) {
+        // Treat javadoc warnings as errors.
+        //
+        // The second argument '-quiet' is a hack. The one parameter
+        // addStringOption() doesn't work, so we add '-quiet', which is added
+        // anyway by gradle. See https://github.com/gradle/gradle/issues/2354.
+        //
+        // See JDK-8200363 (https://bugs.openjdk.java.net/browse/JDK-8200363)
+        // for information about the nonstandard -Xwerror option. JDK 15+ has
+        // -Werror.
+        options.addStringOption('Xwerror', '-quiet')
+    }
 
     if (JavaVersion.current().isJava11Compatible()) {
         if (!JavaVersion.current().isJava12Compatible()) {

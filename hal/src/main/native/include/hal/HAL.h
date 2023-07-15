@@ -27,7 +27,6 @@
 #include "hal/Interrupts.h"
 #include "hal/Main.h"
 #include "hal/Notifier.h"
-#include "hal/PDP.h"
 #include "hal/PWM.h"
 #include "hal/Ports.h"
 #include "hal/Power.h"

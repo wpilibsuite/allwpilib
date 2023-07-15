@@ -6,7 +6,6 @@ package edu.wpi.first.wpilibj;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 import edu.wpi.first.wpilibj.util.Color;
@@ -20,7 +19,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 class AddressableLEDBufferTest {
   @ParameterizedTest
   @MethodSource("hsvToRgbProvider")
-  @SuppressWarnings("ParameterName")
   void hsvConvertTest(int h, int s, int v, int r, int g, int b) {
     var buffer = new AddressableLEDBuffer(1);
     buffer.setHSV(0, h, s, v);
@@ -37,16 +35,16 @@ class AddressableLEDBufferTest {
         arguments(0, 255, 255, 255, 0, 0), // Red
         arguments(60, 255, 255, 0, 255, 0), // Lime
         arguments(120, 255, 255, 0, 0, 255), // Blue
-        arguments(30, 255, 255, 254, 255, 0), // Yellow (ish)
-        arguments(90, 255, 255, 0, 254, 255), // Cyan (ish)
-        arguments(150, 255, 255, 255, 0, 254), // Magenta (ish)
+        arguments(30, 255, 255, 255, 255, 0), // Yellow
+        arguments(90, 255, 255, 0, 255, 255), // Cyan
+        arguments(150, 255, 255, 255, 0, 255), // Magenta
         arguments(0, 0, 191, 191, 191, 191), // Silver
         arguments(0, 0, 128, 128, 128, 128), // Gray
         arguments(0, 255, 128, 128, 0, 0), // Maroon
-        arguments(30, 255, 128, 127, 128, 0), // Olive (ish)
+        arguments(30, 255, 128, 128, 128, 0), // Olive
         arguments(60, 255, 128, 0, 128, 0), // Green
-        arguments(150, 255, 128, 128, 0, 127), // Purple (ish)
-        arguments(90, 255, 128, 0, 127, 128), // Teal (ish)
+        arguments(150, 255, 128, 128, 0, 128), // Purple
+        arguments(90, 255, 128, 0, 128, 128), // Teal
         arguments(120, 255, 128, 0, 0, 128) // Navy
         );
   }
@@ -63,13 +61,13 @@ class AddressableLEDBufferTest {
     buffer.setLED(2, Color.kFirstRed);
     buffer.setLED(3, Color.kFirstBlue);
 
-    assertTrue(buffer.getLED(0).equals(Color.kFirstBlue));
-    assertTrue(buffer.getLED(1).equals(Color.kDenim));
-    assertTrue(buffer.getLED(2).equals(Color.kFirstRed));
-    assertTrue(buffer.getLED(3).equals(Color.kFirstBlue));
-    assertTrue(buffer.getLED8Bit(0).equals(firstBlueColor8Bit));
-    assertTrue(buffer.getLED8Bit(1).equals(denimColor8Bit));
-    assertTrue(buffer.getLED8Bit(2).equals(firstRedColor8Bit));
-    assertTrue(buffer.getLED8Bit(3).equals(firstBlueColor8Bit));
+    assertEquals(Color.kFirstBlue, buffer.getLED(0));
+    assertEquals(Color.kDenim, buffer.getLED(1));
+    assertEquals(Color.kFirstRed, buffer.getLED(2));
+    assertEquals(Color.kFirstBlue, buffer.getLED(3));
+    assertEquals(firstBlueColor8Bit, buffer.getLED8Bit(0));
+    assertEquals(denimColor8Bit, buffer.getLED8Bit(1));
+    assertEquals(firstRedColor8Bit, buffer.getLED8Bit(2));
+    assertEquals(firstBlueColor8Bit, buffer.getLED8Bit(3));
   }
 }

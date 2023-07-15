@@ -10,7 +10,7 @@
 
 namespace wpi {
 
-TEST(Future, Then) {
+TEST(FutureTest, Then) {
   promise<bool> inPromise;
   future<int> outFuture =
       inPromise.get_future().then([](bool v) { return v ? 5 : 6; });
@@ -19,7 +19,7 @@ TEST(Future, Then) {
   ASSERT_EQ(outFuture.get(), 5);
 }
 
-TEST(Future, ThenSame) {
+TEST(FutureTest, ThenSame) {
   promise<bool> inPromise;
   future<bool> outFuture =
       inPromise.get_future().then([](bool v) { return !v; });
@@ -28,7 +28,7 @@ TEST(Future, ThenSame) {
   ASSERT_EQ(outFuture.get(), false);
 }
 
-TEST(Future, ThenFromVoid) {
+TEST(FutureTest, ThenFromVoid) {
   promise<void> inPromise;
   future<int> outFuture = inPromise.get_future().then([] { return 5; });
 
@@ -36,7 +36,7 @@ TEST(Future, ThenFromVoid) {
   ASSERT_EQ(outFuture.get(), 5);
 }
 
-TEST(Future, ThenToVoid) {
+TEST(FutureTest, ThenToVoid) {
   promise<bool> inPromise;
   future<void> outFuture = inPromise.get_future().then([](bool v) {});
 
@@ -44,7 +44,7 @@ TEST(Future, ThenToVoid) {
   ASSERT_TRUE(outFuture.is_ready());
 }
 
-TEST(Future, ThenVoidVoid) {
+TEST(FutureTest, ThenVoidVoid) {
   promise<void> inPromise;
   future<void> outFuture = inPromise.get_future().then([] {});
 
@@ -52,7 +52,7 @@ TEST(Future, ThenVoidVoid) {
   ASSERT_TRUE(outFuture.is_ready());
 }
 
-TEST(Future, Implicit) {
+TEST(FutureTest, Implicit) {
   promise<bool> inPromise;
   future<int> outFuture = inPromise.get_future();
 
@@ -60,7 +60,7 @@ TEST(Future, Implicit) {
   ASSERT_EQ(outFuture.get(), 1);
 }
 
-TEST(Future, MoveSame) {
+TEST(FutureTest, MoveSame) {
   promise<bool> inPromise;
   future<bool> outFuture1 = inPromise.get_future();
   future<bool> outFuture(std::move(outFuture1));
@@ -69,7 +69,7 @@ TEST(Future, MoveSame) {
   ASSERT_EQ(outFuture.get(), true);
 }
 
-TEST(Future, MoveVoid) {
+TEST(FutureTest, MoveVoid) {
   promise<void> inPromise;
   future<void> outFuture1 = inPromise.get_future();
   future<void> outFuture(std::move(outFuture1));

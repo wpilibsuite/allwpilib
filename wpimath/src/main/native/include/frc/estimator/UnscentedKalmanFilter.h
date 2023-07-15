@@ -6,23 +6,55 @@
 
 #include <functional>
 
+#include <wpi/SymbolExports.h>
 #include <wpi/array.h>
 
-#include "Eigen/Core"
-#include "Eigen/src/Cholesky/LDLT.h"
-#include "frc/StateSpaceUtil.h"
+#include "frc/EigenCore.h"
 #include "frc/estimator/MerweScaledSigmaPoints.h"
-#include "frc/estimator/UnscentedTransform.h"
-#include "frc/system/Discretization.h"
-#include "frc/system/NumericalIntegration.h"
-#include "frc/system/NumericalJacobian.h"
 #include "units/time.h"
 
 namespace frc {
 
+/**
+ * A Kalman filter combines predictions from a model and measurements to give an
+ * estimate of the true system state. This is useful because many states cannot
+ * be measured directly as a result of sensor noise, or because the state is
+ * "hidden".
+ *
+ * Kalman filters use a K gain matrix to determine whether to trust the model or
+ * measurements more. Kalman filter theory uses statistics to compute an optimal
+ * K gain which minimizes the sum of squares error in the state estimate. This K
+ * gain is used to correct the state estimate by some amount of the difference
+ * between the actual measurements and the measurements predicted by the model.
+ *
+ * An unscented Kalman filter uses nonlinear state and measurement models. It
+ * propagates the error covariance using sigma points chosen to approximate the
+ * true probability distribution.
+ *
+ * For more on the underlying math, read
+ * https://file.tavsys.net/control/controls-engineering-in-frc.pdf chapter 9
+ * "Stochastic control theory".
+ *
+ * <p> This class implements a square-root-form unscented Kalman filter
+ * (SR-UKF). For more information about the SR-UKF, see
+ * https://www.researchgate.net/publication/3908304.
+ *
+ * @tparam States The number of states.
+ * @tparam Inputs The number of inputs.
+ * @tparam Outputs The number of outputs.
+ */
 template <int States, int Inputs, int Outputs>
 class UnscentedKalmanFilter {
  public:
+  using StateVector = Vectord<States>;
+  using InputVector = Vectord<Inputs>;
+  using OutputVector = Vectord<Outputs>;
+
+  using StateArray = wpi::array<double, States>;
+  using OutputArray = wpi::array<double, Outputs>;
+
+  using StateMatrix = Matrixd<States, States>;
+
   /**
    * Constructs an unscented Kalman filter.
    *
@@ -34,40 +66,11 @@ class UnscentedKalmanFilter {
    * @param measurementStdDevs Standard deviations of measurements.
    * @param dt                 Nominal discretization timestep.
    */
-  UnscentedKalmanFilter(std::function<Eigen::Matrix<double, States, 1>(
-                            const Eigen::Matrix<double, States, 1>&,
-                            const Eigen::Matrix<double, Inputs, 1>&)>
-                            f,
-                        std::function<Eigen::Matrix<double, Outputs, 1>(
-                            const Eigen::Matrix<double, States, 1>&,
-                            const Eigen::Matrix<double, Inputs, 1>&)>
-                            h,
-                        const wpi::array<double, States>& stateStdDevs,
-                        const wpi::array<double, Outputs>& measurementStdDevs,
-                        units::second_t dt)
-      : m_f(f), m_h(h) {
-    m_contQ = MakeCovMatrix(stateStdDevs);
-    m_contR = MakeCovMatrix(measurementStdDevs);
-    m_meanFuncX = [](auto sigmas, auto Wm) -> Eigen::Matrix<double, States, 1> {
-      return sigmas * Wm;
-    };
-    m_meanFuncY = [](auto sigmas,
-                     auto Wc) -> Eigen::Matrix<double, Outputs, 1> {
-      return sigmas * Wc;
-    };
-    m_residualFuncX = [](auto a, auto b) -> Eigen::Matrix<double, States, 1> {
-      return a - b;
-    };
-    m_residualFuncY = [](auto a, auto b) -> Eigen::Matrix<double, Outputs, 1> {
-      return a - b;
-    };
-    m_addFuncX = [](auto a, auto b) -> Eigen::Matrix<double, States, 1> {
-      return a + b;
-    };
-    m_dt = dt;
-
-    Reset();
-  }
+  UnscentedKalmanFilter(
+      std::function<StateVector(const StateVector&, const InputVector&)> f,
+      std::function<OutputVector(const StateVector&, const InputVector&)> h,
+      const StateArray& stateStdDevs, const OutputArray& measurementStdDevs,
+      units::second_t dt);
 
   /**
    * Constructs an unscented Kalman filter with custom mean, residual, and
@@ -94,89 +97,74 @@ class UnscentedKalmanFilter {
    * @param dt                 Nominal discretization timestep.
    */
   UnscentedKalmanFilter(
-      std::function<Eigen::Matrix<double, States, 1>(
-          const Eigen::Matrix<double, States, 1>&,
-          const Eigen::Matrix<double, Inputs, 1>&)>
-          f,
-      std::function<Eigen::Matrix<double, Outputs, 1>(
-          const Eigen::Matrix<double, States, 1>&,
-          const Eigen::Matrix<double, Inputs, 1>&)>
-          h,
-      const wpi::array<double, States>& stateStdDevs,
-      const wpi::array<double, Outputs>& measurementStdDevs,
-      std::function<Eigen::Matrix<double, States, 1>(
-          const Eigen::Matrix<double, States, 2 * States + 1>&,
-          const Eigen::Matrix<double, 2 * States + 1, 1>&)>
+      std::function<StateVector(const StateVector&, const InputVector&)> f,
+      std::function<OutputVector(const StateVector&, const InputVector&)> h,
+      const StateArray& stateStdDevs, const OutputArray& measurementStdDevs,
+      std::function<StateVector(const Matrixd<States, 2 * States + 1>&,
+                                const Vectord<2 * States + 1>&)>
           meanFuncX,
-      std::function<Eigen::Matrix<double, Outputs, 1>(
-          const Eigen::Matrix<double, Outputs, 2 * States + 1>&,
-          const Eigen::Matrix<double, 2 * States + 1, 1>&)>
+      std::function<OutputVector(const Matrixd<Outputs, 2 * States + 1>&,
+                                 const Vectord<2 * States + 1>&)>
           meanFuncY,
-      std::function<Eigen::Matrix<double, States, 1>(
-          const Eigen::Matrix<double, States, 1>&,
-          const Eigen::Matrix<double, States, 1>&)>
+      std::function<StateVector(const StateVector&, const StateVector&)>
           residualFuncX,
-      std::function<Eigen::Matrix<double, Outputs, 1>(
-          const Eigen::Matrix<double, Outputs, 1>&,
-          const Eigen::Matrix<double, Outputs, 1>&)>
+      std::function<OutputVector(const OutputVector&, const OutputVector&)>
           residualFuncY,
-      std::function<Eigen::Matrix<double, States, 1>(
-          const Eigen::Matrix<double, States, 1>&,
-          const Eigen::Matrix<double, States, 1>&)>
+      std::function<StateVector(const StateVector&, const StateVector&)>
           addFuncX,
-      units::second_t dt)
-      : m_f(f),
-        m_h(h),
-        m_meanFuncX(meanFuncX),
-        m_meanFuncY(meanFuncY),
-        m_residualFuncX(residualFuncX),
-        m_residualFuncY(residualFuncY),
-        m_addFuncX(addFuncX) {
-    m_contQ = MakeCovMatrix(stateStdDevs);
-    m_contR = MakeCovMatrix(measurementStdDevs);
-    m_dt = dt;
-
-    Reset();
-  }
+      units::second_t dt);
 
   /**
-   * Returns the error covariance matrix P.
+   * Returns the square-root error covariance matrix S.
    */
-  const Eigen::Matrix<double, States, States>& P() const { return m_P; }
+  const StateMatrix& S() const { return m_S; }
 
   /**
-   * Returns an element of the error covariance matrix P.
+   * Returns an element of the square-root error covariance matrix S.
    *
-   * @param i Row of P.
-   * @param j Column of P.
+   * @param i Row of S.
+   * @param j Column of S.
    */
-  double P(int i, int j) const { return m_P(i, j); }
+  double S(int i, int j) const { return m_S(i, j); }
 
   /**
-   * Set the current error covariance matrix P.
+   * Set the current square-root error covariance matrix S.
+   *
+   * @param S The square-root error covariance matrix S.
+   */
+  void SetS(const StateMatrix& S) { m_S = S; }
+
+  /**
+   * Returns the reconstructed error covariance matrix P.
+   */
+  StateMatrix P() const { return m_S.transpose() * m_S; }
+
+  /**
+   * Set the current square-root error covariance matrix S by taking the square
+   * root of P.
    *
    * @param P The error covariance matrix P.
    */
-  void SetP(const Eigen::Matrix<double, States, States>& P) { m_P = P; }
+  void SetP(const StateMatrix& P) { m_S = P.llt().matrixU(); }
 
   /**
    * Returns the state estimate x-hat.
    */
-  const Eigen::Matrix<double, States, 1>& Xhat() const { return m_xHat; }
+  const StateVector& Xhat() const { return m_xHat; }
 
   /**
    * Returns an element of the state estimate x-hat.
    *
    * @param i Row of x-hat.
    */
-  double Xhat(int i) const { return m_xHat(i, 0); }
+  double Xhat(int i) const { return m_xHat(i); }
 
   /**
    * Set initial state estimate x-hat.
    *
    * @param xHat The state estimate x-hat.
    */
-  void SetXhat(const Eigen::Matrix<double, States, 1>& xHat) { m_xHat = xHat; }
+  void SetXhat(const StateVector& xHat) { m_xHat = xHat; }
 
   /**
    * Set an element of the initial state estimate x-hat.
@@ -184,14 +172,14 @@ class UnscentedKalmanFilter {
    * @param i     Row of x-hat.
    * @param value Value for element of x-hat.
    */
-  void SetXhat(int i, double value) { m_xHat(i, 0) = value; }
+  void SetXhat(int i, double value) { m_xHat(i) = value; }
 
   /**
    * Resets the observer.
    */
   void Reset() {
     m_xHat.setZero();
-    m_P.setZero();
+    m_S.setZero();
     m_sigmasF.setZero();
   }
 
@@ -201,32 +189,7 @@ class UnscentedKalmanFilter {
    * @param u  New control input from controller.
    * @param dt Timestep for prediction.
    */
-  void Predict(const Eigen::Matrix<double, Inputs, 1>& u, units::second_t dt) {
-    m_dt = dt;
-
-    // Discretize Q before projecting mean and covariance forward
-    Eigen::Matrix<double, States, States> contA =
-        NumericalJacobianX<States, States, Inputs>(m_f, m_xHat, u);
-    Eigen::Matrix<double, States, States> discA;
-    Eigen::Matrix<double, States, States> discQ;
-    DiscretizeAQTaylor<States>(contA, m_contQ, dt, &discA, &discQ);
-
-    Eigen::Matrix<double, States, 2 * States + 1> sigmas =
-        m_pts.SigmaPoints(m_xHat, m_P);
-
-    for (int i = 0; i < m_pts.NumSigmas(); ++i) {
-      Eigen::Matrix<double, States, 1> x =
-          sigmas.template block<States, 1>(0, i);
-      m_sigmasF.template block<States, 1>(0, i) = RK4(m_f, x, u, dt);
-    }
-
-    auto ret = UnscentedTransform<States, States>(
-        m_sigmasF, m_pts.Wm(), m_pts.Wc(), m_meanFuncX, m_residualFuncX);
-    m_xHat = std::get<0>(ret);
-    m_P = std::get<1>(ret);
-
-    m_P += discQ;
-  }
+  void Predict(const InputVector& u, units::second_t dt);
 
   /**
    * Correct the state estimate x-hat using the measurements in y.
@@ -234,8 +197,7 @@ class UnscentedKalmanFilter {
    * @param u Same control input used in the predict step.
    * @param y Measurement vector.
    */
-  void Correct(const Eigen::Matrix<double, Inputs, 1>& u,
-               const Eigen::Matrix<double, Outputs, 1>& y) {
+  void Correct(const InputVector& u, const OutputVector& y) {
     Correct<Outputs>(u, y, m_h, m_contR, m_meanFuncY, m_residualFuncY,
                      m_residualFuncX, m_addFuncX);
   }
@@ -254,30 +216,10 @@ class UnscentedKalmanFilter {
    * @param R Measurement noise covariance matrix (continuous-time).
    */
   template <int Rows>
-  void Correct(const Eigen::Matrix<double, Inputs, 1>& u,
-               const Eigen::Matrix<double, Rows, 1>& y,
-               std::function<Eigen::Matrix<double, Rows, 1>(
-                   const Eigen::Matrix<double, States, 1>&,
-                   const Eigen::Matrix<double, Inputs, 1>&)>
-                   h,
-               const Eigen::Matrix<double, Rows, Rows>& R) {
-    auto meanFuncY = [](auto sigmas,
-                        auto Wc) -> Eigen::Matrix<double, Rows, 1> {
-      return sigmas * Wc;
-    };
-    auto residualFuncX = [](auto a,
-                            auto b) -> Eigen::Matrix<double, States, 1> {
-      return a - b;
-    };
-    auto residualFuncY = [](auto a, auto b) -> Eigen::Matrix<double, Rows, 1> {
-      return a - b;
-    };
-    auto addFuncX = [](auto a, auto b) -> Eigen::Matrix<double, States, 1> {
-      return a + b;
-    };
-    Correct<Rows>(u, y, h, R, meanFuncY, residualFuncY, residualFuncX,
-                  addFuncX);
-  }
+  void Correct(
+      const InputVector& u, const Vectord<Rows>& y,
+      std::function<Vectord<Rows>(const StateVector&, const InputVector&)> h,
+      const Matrixd<Rows, Rows>& R);
 
   /**
    * Correct the state estimate x-hat using the measurements in y.
@@ -300,105 +242,49 @@ class UnscentedKalmanFilter {
    * @param addFuncX      A function that adds two state vectors.
    */
   template <int Rows>
-  void Correct(const Eigen::Matrix<double, Inputs, 1>& u,
-               const Eigen::Matrix<double, Rows, 1>& y,
-               std::function<Eigen::Matrix<double, Rows, 1>(
-                   const Eigen::Matrix<double, States, 1>&,
-                   const Eigen::Matrix<double, Inputs, 1>&)>
-                   h,
-               const Eigen::Matrix<double, Rows, Rows>& R,
-               std::function<Eigen::Matrix<double, Rows, 1>(
-                   const Eigen::Matrix<double, Rows, 2 * States + 1>&,
-                   const Eigen::Matrix<double, 2 * States + 1, 1>&)>
-                   meanFuncY,
-               std::function<Eigen::Matrix<double, Rows, 1>(
-                   const Eigen::Matrix<double, Rows, 1>&,
-                   const Eigen::Matrix<double, Rows, 1>&)>
-                   residualFuncY,
-               std::function<Eigen::Matrix<double, States, 1>(
-                   const Eigen::Matrix<double, States, 1>&,
-                   const Eigen::Matrix<double, States, 1>&)>
-                   residualFuncX,
-               std::function<Eigen::Matrix<double, States, 1>(
-                   const Eigen::Matrix<double, States, 1>&,
-                   const Eigen::Matrix<double, States, 1>)>
-                   addFuncX) {
-    const Eigen::Matrix<double, Rows, Rows> discR = DiscretizeR<Rows>(R, m_dt);
-
-    // Transform sigma points into measurement space
-    Eigen::Matrix<double, Rows, 2 * States + 1> sigmasH;
-    Eigen::Matrix<double, States, 2 * States + 1> sigmas =
-        m_pts.SigmaPoints(m_xHat, m_P);
-    for (int i = 0; i < m_pts.NumSigmas(); ++i) {
-      sigmasH.template block<Rows, 1>(0, i) =
-          h(sigmas.template block<States, 1>(0, i), u);
-    }
-
-    // Mean and covariance of prediction passed through UT
-    auto [yHat, Py] = UnscentedTransform<States, Rows>(
-        sigmasH, m_pts.Wm(), m_pts.Wc(), meanFuncY, residualFuncY);
-    Py += discR;
-
-    // Compute cross covariance of the state and the measurements
-    Eigen::Matrix<double, States, Rows> Pxy;
-    Pxy.setZero();
-    for (int i = 0; i < m_pts.NumSigmas(); ++i) {
-      Pxy +=
-          m_pts.Wc(i) *
-          (residualFuncX(m_sigmasF.template block<States, 1>(0, i), m_xHat)) *
-          (residualFuncY(sigmasH.template block<Rows, 1>(0, i), yHat))
-              .transpose();
-    }
-
-    // K = P_{xy} Py^-1
-    // K^T = P_y^T^-1 P_{xy}^T
-    // P_y^T K^T = P_{xy}^T
-    // K^T = P_y^T.solve(P_{xy}^T)
-    // K = (P_y^T.solve(P_{xy}^T)^T
-    Eigen::Matrix<double, States, Rows> K =
-        Py.transpose().ldlt().solve(Pxy.transpose()).transpose();
-
-    m_xHat = addFuncX(m_xHat, K * residualFuncY(y, yHat));
-    m_P -= K * Py * K.transpose();
-  }
+  void Correct(
+      const InputVector& u, const Vectord<Rows>& y,
+      std::function<Vectord<Rows>(const StateVector&, const InputVector&)> h,
+      const Matrixd<Rows, Rows>& R,
+      std::function<Vectord<Rows>(const Matrixd<Rows, 2 * States + 1>&,
+                                  const Vectord<2 * States + 1>&)>
+          meanFuncY,
+      std::function<Vectord<Rows>(const Vectord<Rows>&, const Vectord<Rows>&)>
+          residualFuncY,
+      std::function<StateVector(const StateVector&, const StateVector&)>
+          residualFuncX,
+      std::function<StateVector(const StateVector&, const StateVector&)>
+          addFuncX);
 
  private:
-  std::function<Eigen::Matrix<double, States, 1>(
-      const Eigen::Matrix<double, States, 1>&,
-      const Eigen::Matrix<double, Inputs, 1>&)>
-      m_f;
-  std::function<Eigen::Matrix<double, Outputs, 1>(
-      const Eigen::Matrix<double, States, 1>&,
-      const Eigen::Matrix<double, Inputs, 1>&)>
-      m_h;
-  std::function<Eigen::Matrix<double, States, 1>(
-      const Eigen::Matrix<double, States, 2 * States + 1>&,
-      const Eigen::Matrix<double, 2 * States + 1, 1>&)>
+  std::function<StateVector(const StateVector&, const InputVector&)> m_f;
+  std::function<OutputVector(const StateVector&, const InputVector&)> m_h;
+  std::function<StateVector(const Matrixd<States, 2 * States + 1>&,
+                            const Vectord<2 * States + 1>&)>
       m_meanFuncX;
-  std::function<Eigen::Matrix<double, Outputs, 1>(
-      const Eigen::Matrix<double, Outputs, 2 * States + 1>&,
-      const Eigen::Matrix<double, 2 * States + 1, 1>&)>
+  std::function<OutputVector(const Matrixd<Outputs, 2 * States + 1>&,
+                             const Vectord<2 * States + 1>&)>
       m_meanFuncY;
-  std::function<Eigen::Matrix<double, States, 1>(
-      const Eigen::Matrix<double, States, 1>&,
-      const Eigen::Matrix<double, States, 1>&)>
+  std::function<StateVector(const StateVector&, const StateVector&)>
       m_residualFuncX;
-  std::function<Eigen::Matrix<double, Outputs, 1>(
-      const Eigen::Matrix<double, Outputs, 1>&,
-      const Eigen::Matrix<double, Outputs, 1>)>
+  std::function<OutputVector(const OutputVector&, const OutputVector&)>
       m_residualFuncY;
-  std::function<Eigen::Matrix<double, States, 1>(
-      const Eigen::Matrix<double, States, 1>&,
-      const Eigen::Matrix<double, States, 1>)>
-      m_addFuncX;
-  Eigen::Matrix<double, States, 1> m_xHat;
-  Eigen::Matrix<double, States, States> m_P;
-  Eigen::Matrix<double, States, States> m_contQ;
-  Eigen::Matrix<double, Outputs, Outputs> m_contR;
-  Eigen::Matrix<double, States, 2 * States + 1> m_sigmasF;
+  std::function<StateVector(const StateVector&, const StateVector&)> m_addFuncX;
+  StateVector m_xHat;
+  StateMatrix m_S;
+  StateMatrix m_contQ;
+  Matrixd<Outputs, Outputs> m_contR;
+  Matrixd<States, 2 * States + 1> m_sigmasF;
   units::second_t m_dt;
 
   MerweScaledSigmaPoints<States> m_pts;
 };
 
+extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
+    UnscentedKalmanFilter<3, 3, 1>;
+extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
+    UnscentedKalmanFilter<5, 3, 3>;
+
 }  // namespace frc
+
+#include "UnscentedKalmanFilter.inc"

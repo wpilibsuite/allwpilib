@@ -222,7 +222,7 @@ public class Matrix<R extends Num, C extends Num> {
    *
    * <p>c<sub>i,j</sub> = a<sub>i,j</sub>*other<sub>i,j</sub>
    *
-   * @param other The other {@link Matrix} to preform element multiplication on.
+   * @param other The other {@link Matrix} to perform element multiplication on.
    * @return The element by element multiplication of "this" and other.
    */
   public final Matrix<R, C> elementTimes(Matrix<R, C> other) {
@@ -290,7 +290,7 @@ public class Matrix<R extends Num, C extends Num> {
   }
 
   /**
-   * Calculates the transpose, M^T of this matrix.
+   * Calculates the transpose, Mᵀ of this matrix.
    *
    * @return The transpose matrix.
    */
@@ -323,13 +323,39 @@ public class Matrix<R extends Num, C extends Num> {
    * <p>The matrix equation could also be written as x = A<sup>-1</sup>b. Where the pseudo inverse
    * is used if A is not square.
    *
+   * <p>Note that this method does not support solving using a QR decomposition with full-pivoting,
+   * as only column-pivoting is supported. For full-pivoting, use {@link
+   * #solveFullPivHouseholderQr}.
+   *
    * @param <C2> Columns in b.
    * @param b The right-hand side of the equation to solve.
    * @return The solution to the linear system.
    */
-  @SuppressWarnings("ParameterName")
   public final <C2 extends Num> Matrix<C, C2> solve(Matrix<R, C2> b) {
     return new Matrix<>(this.m_storage.solve(Objects.requireNonNull(b).m_storage));
+  }
+
+  /**
+   * Solves the least-squares problem Ax=B using a QR decomposition with full pivoting, where this
+   * matrix is A.
+   *
+   * @param <R2> Number of rows in B.
+   * @param <C2> Number of columns in B.
+   * @param other The B matrix.
+   * @return The solution matrix.
+   */
+  public final <R2 extends Num, C2 extends Num> Matrix<C, C2> solveFullPivHouseholderQr(
+      Matrix<R2, C2> other) {
+    Matrix<C, C2> solution = new Matrix<>(new SimpleMatrix(this.getNumCols(), other.getNumCols()));
+    WPIMathJNI.solveFullPivHouseholderQr(
+        this.getData(),
+        this.getNumRows(),
+        this.getNumCols(),
+        other.getData(),
+        other.getNumRows(),
+        other.getNumCols(),
+        solution.getData());
+    return solution;
   }
 
   /**
@@ -437,7 +463,6 @@ public class Matrix<R extends Num, C extends Num> {
    * @param b Scalar.
    * @return The element by element power of "this" and b.
    */
-  @SuppressWarnings("ParameterName")
   public final Matrix<R, C> elementPower(double b) {
     return new Matrix<>(this.m_storage.elementPower(b));
   }
@@ -450,7 +475,6 @@ public class Matrix<R extends Num, C extends Num> {
    * @param b Scalar.
    * @return The element by element power of "this" and b.
    */
-  @SuppressWarnings("ParameterName")
   public final Matrix<R, C> elementPower(int b) {
     return new Matrix<>(this.m_storage.elementPower((double) b));
   }
@@ -491,9 +515,27 @@ public class Matrix<R extends Num, C extends Num> {
     return new Matrix<>(
         this.m_storage.extractMatrix(
             startingRow,
-            Objects.requireNonNull(height).getNum() + startingRow,
+            startingRow + Objects.requireNonNull(height).getNum(),
             startingCol,
-            Objects.requireNonNull(width).getNum() + startingCol));
+            startingCol + Objects.requireNonNull(width).getNum()));
+  }
+
+  /**
+   * Extracts a matrix of a given size and start position with new underlying storage.
+   *
+   * @param <R2> Number of rows to extract.
+   * @param <C2> Number of columns to extract.
+   * @param height The number of rows of the extracted matrix.
+   * @param width The number of columns of the extracted matrix.
+   * @param startingRow The starting row of the extracted matrix.
+   * @param startingCol The starting column of the extracted matrix.
+   * @return The extracted matrix.
+   */
+  public final <R2 extends Num, C2 extends Num> Matrix<R2, C2> block(
+      int height, int width, int startingRow, int startingCol) {
+    return new Matrix<R2, C2>(
+        this.m_storage.extractMatrix(
+            startingRow, startingRow + height, startingCol, startingCol + width));
   }
 
   /**
@@ -531,10 +573,9 @@ public class Matrix<R extends Num, C extends Num> {
    * Decompose "this" matrix using Cholesky Decomposition. If the "this" matrix is zeros, it will
    * return the zero matrix.
    *
-   * @param lowerTriangular Whether or not we want to decompose to the lower triangular Cholesky
-   *     matrix.
+   * @param lowerTriangular Whether we want to decompose to the lower triangular Cholesky matrix.
    * @return The decomposed matrix.
-   * @throws RuntimeException if the matrix could not be decomposed(ie. is not positive
+   * @throws RuntimeException if the matrix could not be decomposed(i.e. is not positive
    *     semidefinite).
    */
   public Matrix<R, C> lltDecompose(boolean lowerTriangular) {
@@ -628,10 +669,10 @@ public class Matrix<R extends Num, C extends Num> {
    * same symbolic meaning they both must be either Double.NaN, Double.POSITIVE_INFINITY, or
    * Double.NEGATIVE_INFINITY.
    *
-   * <p>NOTE:It is recommend to use {@link Matrix#isEqual(Matrix, double)} over this method when
+   * <p>NOTE:It is recommended to use {@link Matrix#isEqual(Matrix, double)} over this method when
    * checking if two matrices are equal as {@link Matrix#isEqual(Matrix, double)} will return false
    * if an element is uncountable. This method should only be used when uncountable elements need to
-   * compared.
+   * be compared.
    *
    * @param other The {@link Matrix} to check against this one.
    * @param tolerance The tolerance to check equality with.
@@ -657,6 +698,20 @@ public class Matrix<R extends Num, C extends Num> {
   public boolean isEqual(Matrix<?, ?> other, double tolerance) {
     return MatrixFeatures_DDRM.isEquals(
         this.m_storage.getDDRM(), other.m_storage.getDDRM(), tolerance);
+  }
+
+  /**
+   * Performs an inplace Cholesky rank update (or downdate).
+   *
+   * <p>If this matrix contains L where A = LLᵀ before the update, it will contain L where LLᵀ = A +
+   * σvvᵀ after the update.
+   *
+   * @param v Vector to use for the update.
+   * @param sigma Sigma to use for the update.
+   * @param lowerTriangular Whether this matrix is lower triangular.
+   */
+  public void rankUpdate(Matrix<R, N1> v, double sigma, boolean lowerTriangular) {
+    WPIMathJNI.rankUpdate(this.getData(), this.getNumRows(), v.getData(), sigma, lowerTriangular);
   }
 
   @Override

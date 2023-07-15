@@ -18,7 +18,7 @@ public class FakeEncoderSource implements AutoCloseable {
   private final boolean m_allocatedOutputs;
 
   /** Thread object that allows emulation of a quadrature encoder. */
-  private class QuadEncoderThread extends Thread {
+  private static class QuadEncoderThread extends Thread {
     FakeEncoderSource m_encoder;
 
     QuadEncoderThread(FakeEncoderSource encode) {

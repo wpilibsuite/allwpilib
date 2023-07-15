@@ -6,12 +6,11 @@
 #define CSCORE_CSCORE_OO_H_
 
 #include <initializer_list>
+#include <span>
 #include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
-
-#include <wpi/span.h>
 
 #include "cscore_cpp.h"
 
@@ -140,8 +139,6 @@ class VideoSource {
   bool operator==(const VideoSource& other) const {
     return m_handle == other.m_handle;
   }
-
-  bool operator!=(const VideoSource& other) const { return !(*this == other); }
 
   /**
    * Get the kind of the source.
@@ -516,7 +513,7 @@ class HttpCamera : public VideoCamera {
    * @param urls Array of Camera URLs
    * @param kind Camera kind (e.g. kAxis)
    */
-  HttpCamera(std::string_view name, wpi::span<const std::string> urls,
+  HttpCamera(std::string_view name, std::span<const std::string> urls,
              HttpCameraKind kind = kUnknown);
 
   /**
@@ -541,7 +538,7 @@ class HttpCamera : public VideoCamera {
   /**
    * Change the URLs used to connect to the camera.
    */
-  void SetUrls(wpi::span<const std::string> urls);
+  void SetUrls(std::span<const std::string> urls);
 
   /**
    * Change the URLs used to connect to the camera.
@@ -560,7 +557,7 @@ class HttpCamera : public VideoCamera {
  */
 class AxisCamera : public HttpCamera {
   static std::string HostToUrl(std::string_view host);
-  static std::vector<std::string> HostToUrl(wpi::span<const std::string> hosts);
+  static std::vector<std::string> HostToUrl(std::span<const std::string> hosts);
   template <typename T>
   static std::vector<std::string> HostToUrl(std::initializer_list<T> hosts);
 
@@ -570,7 +567,6 @@ class AxisCamera : public HttpCamera {
    *
    * @param name Source name (arbitrary unique identifier)
    * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
-   * @param kind Camera kind (e.g. kAxis)
    */
   AxisCamera(std::string_view name, std::string_view host);
 
@@ -579,7 +575,6 @@ class AxisCamera : public HttpCamera {
    *
    * @param name Source name (arbitrary unique identifier)
    * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
-   * @param kind Camera kind (e.g. kAxis)
    */
   AxisCamera(std::string_view name, const char* host);
 
@@ -588,7 +583,6 @@ class AxisCamera : public HttpCamera {
    *
    * @param name Source name (arbitrary unique identifier)
    * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
-   * @param kind Camera kind (e.g. kAxis)
    */
   AxisCamera(std::string_view name, const std::string& host);
 
@@ -597,16 +591,14 @@ class AxisCamera : public HttpCamera {
    *
    * @param name Source name (arbitrary unique identifier)
    * @param hosts Array of Camera host IPs/DNS names
-   * @param kind Camera kind (e.g. kAxis)
    */
-  AxisCamera(std::string_view name, wpi::span<const std::string> hosts);
+  AxisCamera(std::string_view name, std::span<const std::string> hosts);
 
   /**
    * Create a source for an Axis IP camera.
    *
    * @param name Source name (arbitrary unique identifier)
    * @param hosts Array of Camera host IPs/DNS names
-   * @param kind Camera kind (e.g. kAxis)
    */
   template <typename T>
   AxisCamera(std::string_view name, std::initializer_list<T> hosts);
@@ -623,6 +615,8 @@ class ImageSource : public VideoSource {
   /**
    * Signal sinks that an error has occurred.  This should be called instead
    * of NotifyFrame when an error occurs.
+   *
+   * @param msg Notification message.
    */
   void NotifyError(std::string_view msg);
 
@@ -686,7 +680,6 @@ class ImageSource : public VideoSource {
    * Create a string property.
    *
    * @param name Property name
-   * @param defaultValue Default value
    * @param value Current value
    * @return Property
    */
@@ -700,7 +693,7 @@ class ImageSource : public VideoSource {
    * @param choices Choices
    */
   void SetEnumPropertyChoices(const VideoProperty& property,
-                              wpi::span<const std::string> choices);
+                              std::span<const std::string> choices);
 
   /**
    * Configure enum property choices.
@@ -740,8 +733,6 @@ class VideoSink {
   bool operator==(const VideoSink& other) const {
     return m_handle == other.m_handle;
   }
-
-  bool operator!=(const VideoSink& other) const { return !(*this == other); }
 
   /**
    * Get the kind of the sink.

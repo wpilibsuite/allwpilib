@@ -7,10 +7,12 @@
 #include <string>
 #include <string_view>
 
+#include <wpi/SymbolExports.h>
+
 #include "frc/trajectory/Trajectory.h"
 
 namespace frc {
-class TrajectoryUtil {
+class WPILIB_DLLEXPORT TrajectoryUtil {
  public:
   TrajectoryUtil() = delete;
 
@@ -19,13 +21,11 @@ class TrajectoryUtil {
    *
    * @param trajectory the trajectory to export
    * @param path the path of the file to export to
-   *
-   * @return The interpolated state.
    */
   static void ToPathweaverJson(const Trajectory& trajectory,
                                std::string_view path);
   /**
-   * Imports a Trajectory from a PathWeaver-style JSON file.
+   * Imports a Trajectory from a JSON file exported from PathWeaver.
    *
    * @param path The path of the json file to import from.
    *
@@ -34,21 +34,21 @@ class TrajectoryUtil {
   static Trajectory FromPathweaverJson(std::string_view path);
 
   /**
-   * Deserializes a Trajectory from PathWeaver-style JSON.
+   * Deserializes a Trajectory from JSON exported from PathWeaver.
    *
-   * @param json the string containing the serialized JSON
+   * @param trajectory the trajectory to export
    *
-   * @return the trajectory represented by the JSON
+   * @return the string containing the serialized JSON
    */
   static std::string SerializeTrajectory(const Trajectory& trajectory);
 
   /**
    * Serializes a Trajectory to PathWeaver-style JSON.
    *
-   * @param trajectory the trajectory to export
+   * @param jsonStr the string containing the serialized JSON
    *
-   * @return the string containing the serialized JSON
+   * @return the trajectory represented by the JSON
    */
-  static Trajectory DeserializeTrajectory(std::string_view json_str);
+  static Trajectory DeserializeTrajectory(std::string_view jsonStr);
 };
 }  // namespace frc

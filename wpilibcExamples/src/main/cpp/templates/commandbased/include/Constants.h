@@ -13,3 +13,9 @@
  * command-specific namespaces within this header, which can then be used where
  * they are needed.
  */
+
+namespace OperatorConstants {
+
+constexpr int kDriverControllerPort = 0;
+
+}  // namespace OperatorConstants

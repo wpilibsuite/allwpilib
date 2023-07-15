@@ -8,13 +8,14 @@ import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.util.CircularBuffer;
 import java.util.Arrays;
+import org.ejml.simple.SimpleMatrix;
 
 /**
  * This class implements a linear, digital filter. All types of FIR and IIR filters are supported.
  * Static factory methods are provided to create commonly used types of filters.
  *
- * <p>Filters are of the form: y[n] = (b0*x[n] + b1*x[n-1] + ... + bP*x[n-P]) - (a0*y[n-1] +
- * a2*y[n-2] + ... + aQ*y[n-Q])
+ * <p>Filters are of the form: y[n] = (b0 x[n] + b1 x[n-1] + ... + bP x[n-P]) - (a0 y[n-1] + a2
+ * y[n-2] + ... + aQ y[n-Q])
  *
  * <p>Where: y[n] is the output at time "n" x[n] is the input at time "n" y[n-1] is the output from
  * the LAST time step ("n-1") x[n-1] is the input from the LAST time step ("n-1") b0...bP are the
@@ -57,8 +58,8 @@ public class LinearFilter {
   /**
    * Create a linear FIR or IIR filter.
    *
-   * @param ffGains The "feed forward" or FIR gains.
-   * @param fbGains The "feed back" or IIR gains.
+   * @param ffGains The "feedforward" or FIR gains.
+   * @param fbGains The "feedback" or IIR gains.
    */
   public LinearFilter(double[] ffGains, double[] fbGains) {
     m_inputs = new CircularBuffer(ffGains.length);
@@ -71,8 +72,8 @@ public class LinearFilter {
   }
 
   /**
-   * Creates a one-pole IIR low-pass filter of the form: y[n] = (1-gain)*x[n] + gain*y[n-1] where
-   * gain = e^(-dt / T), T is the time constant in seconds.
+   * Creates a one-pole IIR low-pass filter of the form: y[n] = (1-gain) x[n] + gain y[n-1] where
+   * gain = e<sup>-dt / T</sup>, T is the time constant in seconds.
    *
    * <p>Note: T = 1 / (2 pi f) where f is the cutoff frequency in Hz, the frequency above which the
    * input starts to attenuate.
@@ -92,8 +93,8 @@ public class LinearFilter {
   }
 
   /**
-   * Creates a first-order high-pass filter of the form: y[n] = gain*x[n] + (-gain)*x[n-1] +
-   * gain*y[n-1] where gain = e^(-dt / T), T is the time constant in seconds.
+   * Creates a first-order high-pass filter of the form: y[n] = gain x[n] + (-gain) x[n-1] + gain
+   * y[n-1] where gain = e<sup>-dt / T</sup>, T is the time constant in seconds.
    *
    * <p>Note: T = 1 / (2 pi f) where f is the cutoff frequency in Hz, the frequency below which the
    * input starts to attenuate.
@@ -113,8 +114,7 @@ public class LinearFilter {
   }
 
   /**
-   * Creates a K-tap FIR moving average filter of the form: y[n] = 1/k * (x[k] + x[k-1] + ... +
-   * x[0]).
+   * Creates a K-tap FIR moving average filter of the form: y[n] = 1/k (x[k] + x[k-1] + ... + x[0]).
    *
    * <p>This filter is always stable.
    *
@@ -128,13 +128,112 @@ public class LinearFilter {
     }
 
     double[] ffGains = new double[taps];
-    for (int i = 0; i < ffGains.length; i++) {
-      ffGains[i] = 1.0 / taps;
-    }
+    Arrays.fill(ffGains, 1.0 / taps);
 
     double[] fbGains = new double[0];
 
     return new LinearFilter(ffGains, fbGains);
+  }
+
+  /**
+   * Creates a finite difference filter that computes the nth derivative of the input given the
+   * specified stencil points.
+   *
+   * <p>Stencil points are the indices of the samples to use in the finite difference. 0 is the
+   * current sample, -1 is the previous sample, -2 is the sample before that, etc. Don't use
+   * positive stencil points (samples from the future) if the LinearFilter will be used for
+   * stream-based online filtering (e.g., taking derivative of encoder samples in real-time).
+   *
+   * @param derivative The order of the derivative to compute.
+   * @param stencil List of stencil points. Its length is the number of samples to use to compute
+   *     the given derivative. This must be one more than the order of the derivative or higher.
+   * @param period The period in seconds between samples taken by the user.
+   * @return Linear filter.
+   * @throws IllegalArgumentException if derivative &lt; 1, samples &lt;= 0, or derivative &gt;=
+   *     samples.
+   */
+  public static LinearFilter finiteDifference(int derivative, int[] stencil, double period) {
+    // See
+    // https://en.wikipedia.org/wiki/Finite_difference_coefficient#Arbitrary_stencil_points
+    //
+    // For a given list of stencil points s of length n and the order of
+    // derivative d < n, the finite difference coefficients can be obtained by
+    // solving the following linear system for the vector a.
+    //
+    // [s₁⁰   ⋯  sₙ⁰ ][a₁]      [ δ₀,d ]
+    // [ ⋮    ⋱  ⋮   ][⋮ ] = d! [  ⋮   ]
+    // [s₁ⁿ⁻¹ ⋯ sₙⁿ⁻¹][aₙ]      [δₙ₋₁,d]
+    //
+    // where δᵢ,ⱼ are the Kronecker delta. The FIR gains are the elements of the
+    // vector 'a' in reverse order divided by hᵈ.
+    //
+    // The order of accuracy of the approximation is of the form O(hⁿ⁻ᵈ).
+
+    if (derivative < 1) {
+      throw new IllegalArgumentException(
+          "Order of derivative must be greater than or equal to one.");
+    }
+
+    int samples = stencil.length;
+
+    if (samples <= 0) {
+      throw new IllegalArgumentException("Number of samples must be greater than zero.");
+    }
+
+    if (derivative >= samples) {
+      throw new IllegalArgumentException(
+          "Order of derivative must be less than number of samples.");
+    }
+
+    var S = new SimpleMatrix(samples, samples);
+    for (int row = 0; row < samples; ++row) {
+      for (int col = 0; col < samples; ++col) {
+        S.set(row, col, Math.pow(stencil[col], row));
+      }
+    }
+
+    // Fill in Kronecker deltas: https://en.wikipedia.org/wiki/Kronecker_delta
+    var d = new SimpleMatrix(samples, 1);
+    for (int i = 0; i < samples; ++i) {
+      d.set(i, 0, (i == derivative) ? factorial(derivative) : 0.0);
+    }
+
+    var a = S.solve(d).divide(Math.pow(period, derivative));
+
+    // Reverse gains list
+    double[] ffGains = new double[samples];
+    for (int i = 0; i < samples; ++i) {
+      ffGains[i] = a.get(samples - i - 1, 0);
+    }
+
+    return new LinearFilter(ffGains, new double[0]);
+  }
+
+  /**
+   * Creates a backward finite difference filter that computes the nth derivative of the input given
+   * the specified number of samples.
+   *
+   * <p>For example, a first derivative filter that uses two samples and a sample period of 20 ms
+   * would be
+   *
+   * <pre><code>
+   * LinearFilter.backwardFiniteDifference(1, 2, 0.02);
+   * </code></pre>
+   *
+   * @param derivative The order of the derivative to compute.
+   * @param samples The number of samples to use to compute the given derivative. This must be one
+   *     more than the order of derivative or higher.
+   * @param period The period in seconds between samples taken by the user.
+   * @return Linear filter.
+   */
+  public static LinearFilter backwardFiniteDifference(int derivative, int samples, double period) {
+    // Generate stencil points from -(samples - 1) to 0
+    int[] stencil = new int[samples];
+    for (int i = 0; i < samples; ++i) {
+      stencil[i] = -(samples - 1) + i;
+    }
+
+    return finiteDifference(derivative, stencil, period);
   }
 
   /** Reset the filter state. */
@@ -171,5 +270,18 @@ public class LinearFilter {
     }
 
     return retVal;
+  }
+
+  /**
+   * Factorial of n.
+   *
+   * @param n Argument of which to take factorial.
+   */
+  private static int factorial(int n) {
+    if (n < 2) {
+      return 1;
+    } else {
+      return n * factorial(n - 1);
+    }
   }
 }

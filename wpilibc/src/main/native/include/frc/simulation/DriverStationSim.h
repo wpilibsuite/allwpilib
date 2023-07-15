@@ -26,7 +26,8 @@ class DriverStationSim {
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] static std::unique_ptr<CallbackStore> RegisterEnabledCallback(
+  [[nodiscard]]
+  static std::unique_ptr<CallbackStore> RegisterEnabledCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**
@@ -51,8 +52,9 @@ class DriverStationSim {
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] static std::unique_ptr<CallbackStore>
-  RegisterAutonomousCallback(NotifyCallback callback, bool initialNotify);
+  [[nodiscard]]
+  static std::unique_ptr<CallbackStore> RegisterAutonomousCallback(
+      NotifyCallback callback, bool initialNotify);
 
   /**
    * Check if the DS is in autonomous.
@@ -76,7 +78,8 @@ class DriverStationSim {
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] static std::unique_ptr<CallbackStore> RegisterTestCallback(
+  [[nodiscard]]
+  static std::unique_ptr<CallbackStore> RegisterTestCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**
@@ -101,7 +104,8 @@ class DriverStationSim {
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] static std::unique_ptr<CallbackStore> RegisterEStopCallback(
+  [[nodiscard]]
+  static std::unique_ptr<CallbackStore> RegisterEStopCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**
@@ -126,8 +130,9 @@ class DriverStationSim {
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] static std::unique_ptr<CallbackStore>
-  RegisterFmsAttachedCallback(NotifyCallback callback, bool initialNotify);
+  [[nodiscard]]
+  static std::unique_ptr<CallbackStore> RegisterFmsAttachedCallback(
+      NotifyCallback callback, bool initialNotify);
 
   /**
    * Check if the FMS is connected.
@@ -151,8 +156,9 @@ class DriverStationSim {
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] static std::unique_ptr<CallbackStore>
-  RegisterDsAttachedCallback(NotifyCallback callback, bool initialNotify);
+  [[nodiscard]]
+  static std::unique_ptr<CallbackStore> RegisterDsAttachedCallback(
+      NotifyCallback callback, bool initialNotify);
 
   /**
    * Check if the DS is attached.
@@ -176,9 +182,9 @@ class DriverStationSim {
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] static std::unique_ptr<CallbackStore>
-  RegisterAllianceStationIdCallback(NotifyCallback callback,
-                                    bool initialNotify);
+  [[nodiscard]]
+  static std::unique_ptr<CallbackStore> RegisterAllianceStationIdCallback(
+      NotifyCallback callback, bool initialNotify);
 
   /**
    * Get the alliance station ID (color + number).
@@ -202,7 +208,8 @@ class DriverStationSim {
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] static std::unique_ptr<CallbackStore> RegisterMatchTimeCallback(
+  [[nodiscard]]
+  static std::unique_ptr<CallbackStore> RegisterMatchTimeCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**
@@ -257,7 +264,7 @@ class DriverStationSim {
   static int GetJoystickRumble(int stick, int rumbleNum);
 
   /**
-   * Sets the state of one joystick button. Button indexes begin at 1.
+   * Sets the state of one joystick button. %Button indexes begin at 1.
    *
    * @param stick The joystick number
    * @param button The button index, beginning at 1
@@ -337,7 +344,7 @@ class DriverStationSim {
    * @param stick The joystick number
    * @param name The value of name
    */
-  static void SetJoystickName(int stick, const char* name);
+  static void SetJoystickName(int stick, std::string_view name);
 
   /**
    * Sets the types of Axes for a joystick.
@@ -353,14 +360,14 @@ class DriverStationSim {
    *
    * @param message the game specific message
    */
-  static void SetGameSpecificMessage(const char* message);
+  static void SetGameSpecificMessage(std::string_view message);
 
   /**
    * Sets the event name.
    *
    * @param name the event name
    */
-  static void SetEventName(const char* name);
+  static void SetEventName(std::string_view name);
 
   /**
    * Sets the match type.

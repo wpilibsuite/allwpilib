@@ -1,3 +1,8 @@
+#ifndef __STACKWALKER_H__
+#define __STACKWALKER_H__
+
+#if defined(_MSC_VER)
+
 /**********************************************************************
  *
  * StackWalker.h
@@ -32,6 +37,8 @@
  *   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * **********************************************************************/
+// #pragma once is supported starting with _MSC_VER 1000,
+// so we need not to check the version (because we only support _MSC_VER >= 1100)!
 #pragma once
 
 #include <windows.h>
@@ -105,7 +112,11 @@ public:
 
   BOOL ShowObject(LPVOID pObject);
 
+#if _MSC_VER >= 1300
+  // due to some reasons, the "STACKWALK_MAX_NAMELEN" must be declared as "public"
+  // in older compilers in order to use it... starting with VC7 we can declare it as "protected"
 protected:
+#endif
   enum
   {
     STACKWALK_MAX_NAMELEN = 1024
@@ -176,3 +187,7 @@ protected:
     c.ContextFlags = contextFlags;                                \
     RtlCaptureContext(&c);                                        \
   } while (0);
+
+#endif //defined(_MSC_VER)
+
+#endif // __STACKWALKER_H__

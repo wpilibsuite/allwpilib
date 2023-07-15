@@ -104,7 +104,7 @@ static bool RelayAnyInitialized() {
 }
 
 void RelaySimGui::Initialize() {
-  HALSimGui::halProvider.Register(
+  HALSimGui::halProvider->Register(
       "Relays", RelayAnyInitialized,
       [] { return std::make_unique<RelaysSimModel>(); },
       [](glass::Window* win, glass::Model* model) {
@@ -112,7 +112,7 @@ void RelaySimGui::Initialize() {
         win->SetDefaultPos(180, 20);
         return glass::MakeFunctionView([=] {
           glass::DisplayRelays(static_cast<RelaysSimModel*>(model),
-                               HALSimGui::halProvider.AreOutputsEnabled());
+                               HALSimGui::halProvider->AreOutputsEnabled());
         });
       });
 }

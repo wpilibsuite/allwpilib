@@ -7,7 +7,7 @@
 #include <cmath>
 #include <random>
 
-#include "Eigen/Core"
+#include "frc/EigenCore.h"
 #include "frc/controller/LinearPlantInversionFeedforward.h"
 #include "frc/controller/LinearQuadraticRegulator.h"
 #include "frc/estimator/KalmanFilter.h"
@@ -22,7 +22,7 @@ namespace frc {
 constexpr double kPositionStddev = 0.0001;
 constexpr auto kDt = 0.00505_s;
 
-class StateSpace : public testing::Test {
+class StateSpaceTest : public testing::Test {
  public:
   LinearSystem<2, 1, 1> plant = [] {
     auto motors = DCMotor::Vex775Pro(2);
@@ -45,18 +45,16 @@ class StateSpace : public testing::Test {
 
 void Update(const LinearSystem<2, 1, 1>& plant, LinearSystemLoop<2, 1, 1>& loop,
             double noise) {
-  Eigen::Matrix<double, 1, 1> y = plant.CalculateY(loop.Xhat(), loop.U()) +
-                                  Eigen::Matrix<double, 1, 1>(noise);
+  Vectord<1> y = plant.CalculateY(loop.Xhat(), loop.U()) + Vectord<1>{noise};
   loop.Correct(y);
   loop.Predict(kDt);
 }
 
-TEST_F(StateSpace, CorrectPredictLoop) {
+TEST_F(StateSpaceTest, CorrectPredictLoop) {
   std::default_random_engine generator;
   std::normal_distribution<double> dist{0.0, kPositionStddev};
 
-  Eigen::Matrix<double, 2, 1> references;
-  references << 2.0, 0.0;
+  Vectord<2> references{2.0, 0.0};
   loop.SetNextR(references);
 
   for (int i = 0; i < 1000; i++) {

@@ -10,12 +10,6 @@
 namespace frc {
 
 template <size_t NumModules>
-
-/**
- * A class that enforces constraints on the swerve drive kinematics.
- * This can be used to ensure that the trajectory is constructed so that the
- * commanded velocities of the wheels stay below a certain limit.
- */
 SwerveDriveKinematicsConstraint<NumModules>::SwerveDriveKinematicsConstraint(
     const frc::SwerveDriveKinematics<NumModules>& kinematics,
     units::meters_per_second_t maxSpeed)
@@ -30,7 +24,7 @@ SwerveDriveKinematicsConstraint<NumModules>::MaxVelocity(
   auto yVelocity = velocity * pose.Rotation().Sin();
   auto wheelSpeeds = m_kinematics.ToSwerveModuleStates(
       {xVelocity, yVelocity, velocity * curvature});
-  m_kinematics.NormalizeWheelSpeeds(&wheelSpeeds, m_maxSpeed);
+  m_kinematics.DesaturateWheelSpeeds(&wheelSpeeds, m_maxSpeed);
 
   auto normSpeeds = m_kinematics.ToChassisSpeeds(wheelSpeeds);
 

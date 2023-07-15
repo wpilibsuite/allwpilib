@@ -36,14 +36,14 @@ class AnalogTrigger : public wpi::Sendable,
    * This should be used in the case of sharing an analog channel between the
    * trigger and an analog input object.
    *
-   * @param channel The pointer to the existing AnalogInput object
+   * @param input The pointer to the existing AnalogInput object
    */
-  explicit AnalogTrigger(AnalogInput* channel);
+  explicit AnalogTrigger(AnalogInput* input);
 
   /**
    * Construct an analog trigger given a duty cycle input.
    *
-   * @param channel The pointer to the existing DutyCycle object
+   * @param dutyCycle The pointer to the existing DutyCycle object
    */
   explicit AnalogTrigger(DutyCycle* dutyCycle);
 

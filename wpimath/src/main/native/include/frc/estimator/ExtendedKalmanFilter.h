@@ -8,22 +8,49 @@
 
 #include <wpi/array.h>
 
-#include "Eigen/Core"
-#include "Eigen/src/Cholesky/LDLT.h"
-#include "drake/math/discrete_algebraic_riccati_equation.h"
-#include "frc/StateSpaceUtil.h"
-#include "frc/system/Discretization.h"
-#include "frc/system/NumericalIntegration.h"
-#include "frc/system/NumericalJacobian.h"
+#include "frc/EigenCore.h"
 #include "units/time.h"
 
 namespace frc {
 
+/**
+ * A Kalman filter combines predictions from a model and measurements to give an
+ * estimate of the true system state. This is useful because many states cannot
+ * be measured directly as a result of sensor noise, or because the state is
+ * "hidden".
+ *
+ * Kalman filters use a K gain matrix to determine whether to trust the model or
+ * measurements more. Kalman filter theory uses statistics to compute an optimal
+ * K gain which minimizes the sum of squares error in the state estimate. This K
+ * gain is used to correct the state estimate by some amount of the difference
+ * between the actual measurements and the measurements predicted by the model.
+ *
+ * An extended Kalman filter supports nonlinear state and measurement models. It
+ * propagates the error covariance by linearizing the models around the state
+ * estimate, then applying the linear Kalman filter equations.
+ *
+ * For more on the underlying math, read
+ * https://file.tavsys.net/control/controls-engineering-in-frc.pdf chapter 9
+ * "Stochastic control theory".
+ *
+ * @tparam States The number of states.
+ * @tparam Inputs The number of inputs.
+ * @tparam Outputs The number of outputs.
+ */
 template <int States, int Inputs, int Outputs>
 class ExtendedKalmanFilter {
  public:
+  using StateVector = Vectord<States>;
+  using InputVector = Vectord<Inputs>;
+  using OutputVector = Vectord<Outputs>;
+
+  using StateArray = wpi::array<double, States>;
+  using OutputArray = wpi::array<double, Outputs>;
+
+  using StateMatrix = Matrixd<States, States>;
+
   /**
-   * Constructs an Extended Kalman filter.
+   * Constructs an extended Kalman filter.
    *
    * @param f                  A vector-valued function of x and u that returns
    *                           the derivative of the state vector.
@@ -33,58 +60,14 @@ class ExtendedKalmanFilter {
    * @param measurementStdDevs Standard deviations of measurements.
    * @param dt                 Nominal discretization timestep.
    */
-  ExtendedKalmanFilter(std::function<Eigen::Matrix<double, States, 1>(
-                           const Eigen::Matrix<double, States, 1>&,
-                           const Eigen::Matrix<double, Inputs, 1>&)>
-                           f,
-                       std::function<Eigen::Matrix<double, Outputs, 1>(
-                           const Eigen::Matrix<double, States, 1>&,
-                           const Eigen::Matrix<double, Inputs, 1>&)>
-                           h,
-                       const wpi::array<double, States>& stateStdDevs,
-                       const wpi::array<double, Outputs>& measurementStdDevs,
-                       units::second_t dt)
-      : m_f(f), m_h(h) {
-    m_contQ = MakeCovMatrix(stateStdDevs);
-    m_contR = MakeCovMatrix(measurementStdDevs);
-    m_residualFuncY = [](auto a, auto b) -> Eigen::Matrix<double, Outputs, 1> {
-      return a - b;
-    };
-    m_addFuncX = [](auto a, auto b) -> Eigen::Matrix<double, States, 1> {
-      return a + b;
-    };
-    m_dt = dt;
-
-    Reset();
-
-    Eigen::Matrix<double, States, States> contA =
-        NumericalJacobianX<States, States, Inputs>(
-            m_f, m_xHat, Eigen::Matrix<double, Inputs, 1>::Zero());
-    Eigen::Matrix<double, Outputs, States> C =
-        NumericalJacobianX<Outputs, States, Inputs>(
-            m_h, m_xHat, Eigen::Matrix<double, Inputs, 1>::Zero());
-
-    Eigen::Matrix<double, States, States> discA;
-    Eigen::Matrix<double, States, States> discQ;
-    DiscretizeAQTaylor<States>(contA, m_contQ, dt, &discA, &discQ);
-
-    Eigen::Matrix<double, Outputs, Outputs> discR =
-        DiscretizeR<Outputs>(m_contR, dt);
-
-    // IsStabilizable(A^T, C^T) will tell us if the system is observable.
-    bool isObservable =
-        IsStabilizable<States, Outputs>(discA.transpose(), C.transpose());
-    if (isObservable && Outputs <= States) {
-      m_initP = drake::math::DiscreteAlgebraicRiccatiEquation(
-          discA.transpose(), C.transpose(), discQ, discR);
-    } else {
-      m_initP = Eigen::Matrix<double, States, States>::Zero();
-    }
-    m_P = m_initP;
-  }
+  ExtendedKalmanFilter(
+      std::function<StateVector(const StateVector&, const InputVector&)> f,
+      std::function<OutputVector(const StateVector&, const InputVector&)> h,
+      const StateArray& stateStdDevs, const OutputArray& measurementStdDevs,
+      units::second_t dt);
 
   /**
-   * Constructs an Extended Kalman filter.
+   * Constructs an extended Kalman filter.
    *
    * @param f                  A vector-valued function of x and u that returns
    *                           the derivative of the state vector.
@@ -97,62 +80,20 @@ class ExtendedKalmanFilter {
    * @param addFuncX           A function that adds two state vectors.
    * @param dt                 Nominal discretization timestep.
    */
-  ExtendedKalmanFilter(std::function<Eigen::Matrix<double, States, 1>(
-                           const Eigen::Matrix<double, States, 1>&,
-                           const Eigen::Matrix<double, Inputs, 1>&)>
-                           f,
-                       std::function<Eigen::Matrix<double, Outputs, 1>(
-                           const Eigen::Matrix<double, States, 1>&,
-                           const Eigen::Matrix<double, Inputs, 1>&)>
-                           h,
-                       const wpi::array<double, States>& stateStdDevs,
-                       const wpi::array<double, Outputs>& measurementStdDevs,
-                       std::function<Eigen::Matrix<double, Outputs, 1>(
-                           const Eigen::Matrix<double, Outputs, 1>&,
-                           const Eigen::Matrix<double, Outputs, 1>&)>
-                           residualFuncY,
-                       std::function<Eigen::Matrix<double, States, 1>(
-                           const Eigen::Matrix<double, States, 1>&,
-                           const Eigen::Matrix<double, States, 1>&)>
-                           addFuncX,
-                       units::second_t dt)
-      : m_f(f), m_h(h), m_residualFuncY(residualFuncY), m_addFuncX(addFuncX) {
-    m_contQ = MakeCovMatrix(stateStdDevs);
-    m_contR = MakeCovMatrix(measurementStdDevs);
-    m_dt = dt;
-
-    Reset();
-
-    Eigen::Matrix<double, States, States> contA =
-        NumericalJacobianX<States, States, Inputs>(
-            m_f, m_xHat, Eigen::Matrix<double, Inputs, 1>::Zero());
-    Eigen::Matrix<double, Outputs, States> C =
-        NumericalJacobianX<Outputs, States, Inputs>(
-            m_h, m_xHat, Eigen::Matrix<double, Inputs, 1>::Zero());
-
-    Eigen::Matrix<double, States, States> discA;
-    Eigen::Matrix<double, States, States> discQ;
-    DiscretizeAQTaylor<States>(contA, m_contQ, dt, &discA, &discQ);
-
-    Eigen::Matrix<double, Outputs, Outputs> discR =
-        DiscretizeR<Outputs>(m_contR, dt);
-
-    // IsStabilizable(A^T, C^T) will tell us if the system is observable.
-    bool isObservable =
-        IsStabilizable<States, Outputs>(discA.transpose(), C.transpose());
-    if (isObservable && Outputs <= States) {
-      m_initP = drake::math::DiscreteAlgebraicRiccatiEquation(
-          discA.transpose(), C.transpose(), discQ, discR);
-    } else {
-      m_initP = Eigen::Matrix<double, States, States>::Zero();
-    }
-    m_P = m_initP;
-  }
+  ExtendedKalmanFilter(
+      std::function<StateVector(const StateVector&, const InputVector&)> f,
+      std::function<OutputVector(const StateVector&, const InputVector&)> h,
+      const StateArray& stateStdDevs, const OutputArray& measurementStdDevs,
+      std::function<OutputVector(const OutputVector&, const OutputVector&)>
+          residualFuncY,
+      std::function<StateVector(const StateVector&, const StateVector&)>
+          addFuncX,
+      units::second_t dt);
 
   /**
    * Returns the error covariance matrix P.
    */
-  const Eigen::Matrix<double, States, States>& P() const { return m_P; }
+  const StateMatrix& P() const { return m_P; }
 
   /**
    * Returns an element of the error covariance matrix P.
@@ -167,26 +108,26 @@ class ExtendedKalmanFilter {
    *
    * @param P The error covariance matrix P.
    */
-  void SetP(const Eigen::Matrix<double, States, States>& P) { m_P = P; }
+  void SetP(const StateMatrix& P) { m_P = P; }
 
   /**
    * Returns the state estimate x-hat.
    */
-  const Eigen::Matrix<double, States, 1>& Xhat() const { return m_xHat; }
+  const StateVector& Xhat() const { return m_xHat; }
 
   /**
    * Returns an element of the state estimate x-hat.
    *
    * @param i Row of x-hat.
    */
-  double Xhat(int i) const { return m_xHat(i, 0); }
+  double Xhat(int i) const { return m_xHat(i); }
 
   /**
    * Set initial state estimate x-hat.
    *
    * @param xHat The state estimate x-hat.
    */
-  void SetXhat(const Eigen::Matrix<double, States, 1>& xHat) { m_xHat = xHat; }
+  void SetXhat(const StateVector& xHat) { m_xHat = xHat; }
 
   /**
    * Set an element of the initial state estimate x-hat.
@@ -194,7 +135,7 @@ class ExtendedKalmanFilter {
    * @param i     Row of x-hat.
    * @param value Value for element of x-hat.
    */
-  void SetXhat(int i, double value) { m_xHat(i, 0) = value; }
+  void SetXhat(int i, double value) { m_xHat(i) = value; }
 
   /**
    * Resets the observer.
@@ -210,21 +151,7 @@ class ExtendedKalmanFilter {
    * @param u  New control input from controller.
    * @param dt Timestep for prediction.
    */
-  void Predict(const Eigen::Matrix<double, Inputs, 1>& u, units::second_t dt) {
-    m_dt = dt;
-
-    // Find continuous A
-    Eigen::Matrix<double, States, States> contA =
-        NumericalJacobianX<States, States, Inputs>(m_f, m_xHat, u);
-
-    // Find discrete A and Q
-    Eigen::Matrix<double, States, States> discA;
-    Eigen::Matrix<double, States, States> discQ;
-    DiscretizeAQTaylor<States>(contA, m_contQ, dt, &discA, &discQ);
-
-    m_xHat = RK4(m_f, m_xHat, u, dt);
-    m_P = discA * m_P * discA.transpose() + discQ;
-  }
+  void Predict(const InputVector& u, units::second_t dt);
 
   /**
    * Correct the state estimate x-hat using the measurements in y.
@@ -232,27 +159,15 @@ class ExtendedKalmanFilter {
    * @param u Same control input used in the predict step.
    * @param y Measurement vector.
    */
-  void Correct(const Eigen::Matrix<double, Inputs, 1>& u,
-               const Eigen::Matrix<double, Outputs, 1>& y) {
+  void Correct(const InputVector& u, const OutputVector& y) {
     Correct<Outputs>(u, y, m_h, m_contR, m_residualFuncY, m_addFuncX);
   }
 
   template <int Rows>
-  void Correct(const Eigen::Matrix<double, Inputs, 1>& u,
-               const Eigen::Matrix<double, Rows, 1>& y,
-               std::function<Eigen::Matrix<double, Rows, 1>(
-                   const Eigen::Matrix<double, States, 1>&,
-                   const Eigen::Matrix<double, Inputs, 1>&)>
-                   h,
-               const Eigen::Matrix<double, Rows, Rows>& R) {
-    auto residualFuncY = [](auto a, auto b) -> Eigen::Matrix<double, Rows, 1> {
-      return a - b;
-    };
-    auto addFuncX = [](auto a, auto b) -> Eigen::Matrix<double, States, 1> {
-      return a + b;
-    };
-    Correct<Rows>(u, y, h, R, residualFuncY, addFuncX);
-  }
+  void Correct(
+      const InputVector& u, const Vectord<Rows>& y,
+      std::function<Vectord<Rows>(const StateVector&, const InputVector&)> h,
+      const Matrixd<Rows, Rows>& R);
 
   /**
    * Correct the state estimate x-hat using the measurements in y.
@@ -271,70 +186,30 @@ class ExtendedKalmanFilter {
    * @param addFuncX      A function that adds two state vectors.
    */
   template <int Rows>
-  void Correct(const Eigen::Matrix<double, Inputs, 1>& u,
-               const Eigen::Matrix<double, Rows, 1>& y,
-               std::function<Eigen::Matrix<double, Rows, 1>(
-                   const Eigen::Matrix<double, States, 1>&,
-                   const Eigen::Matrix<double, Inputs, 1>&)>
-                   h,
-               const Eigen::Matrix<double, Rows, Rows>& R,
-               std::function<Eigen::Matrix<double, Rows, 1>(
-                   const Eigen::Matrix<double, Rows, 1>&,
-                   const Eigen::Matrix<double, Rows, 1>&)>
-                   residualFuncY,
-               std::function<Eigen::Matrix<double, States, 1>(
-                   const Eigen::Matrix<double, States, 1>&,
-                   const Eigen::Matrix<double, States, 1>)>
-                   addFuncX) {
-    const Eigen::Matrix<double, Rows, States> C =
-        NumericalJacobianX<Rows, States, Inputs>(h, m_xHat, u);
-    const Eigen::Matrix<double, Rows, Rows> discR = DiscretizeR<Rows>(R, m_dt);
-
-    Eigen::Matrix<double, Rows, Rows> S = C * m_P * C.transpose() + discR;
-
-    // We want to put K = PC^T S^-1 into Ax = b form so we can solve it more
-    // efficiently.
-    //
-    // K = PC^T S^-1
-    // KS = PC^T
-    // (KS)^T = (PC^T)^T
-    // S^T K^T = CP^T
-    //
-    // The solution of Ax = b can be found via x = A.solve(b).
-    //
-    // K^T = S^T.solve(CP^T)
-    // K = (S^T.solve(CP^T))^T
-    Eigen::Matrix<double, States, Rows> K =
-        S.transpose().ldlt().solve(C * m_P.transpose()).transpose();
-
-    m_xHat = addFuncX(m_xHat, K * residualFuncY(y, h(m_xHat, u)));
-    m_P = (Eigen::Matrix<double, States, States>::Identity() - K * C) * m_P;
-  }
+  void Correct(
+      const InputVector& u, const Vectord<Rows>& y,
+      std::function<Vectord<Rows>(const StateVector&, const InputVector&)> h,
+      const Matrixd<Rows, Rows>& R,
+      std::function<Vectord<Rows>(const Vectord<Rows>&, const Vectord<Rows>&)>
+          residualFuncY,
+      std::function<StateVector(const StateVector&, const StateVector&)>
+          addFuncX);
 
  private:
-  std::function<Eigen::Matrix<double, States, 1>(
-      const Eigen::Matrix<double, States, 1>&,
-      const Eigen::Matrix<double, Inputs, 1>&)>
-      m_f;
-  std::function<Eigen::Matrix<double, Outputs, 1>(
-      const Eigen::Matrix<double, States, 1>&,
-      const Eigen::Matrix<double, Inputs, 1>&)>
-      m_h;
-  std::function<Eigen::Matrix<double, Outputs, 1>(
-      const Eigen::Matrix<double, Outputs, 1>&,
-      const Eigen::Matrix<double, Outputs, 1>)>
+  std::function<StateVector(const StateVector&, const InputVector&)> m_f;
+  std::function<OutputVector(const StateVector&, const InputVector&)> m_h;
+  std::function<OutputVector(const OutputVector&, const OutputVector&)>
       m_residualFuncY;
-  std::function<Eigen::Matrix<double, States, 1>(
-      const Eigen::Matrix<double, States, 1>&,
-      const Eigen::Matrix<double, States, 1>)>
-      m_addFuncX;
-  Eigen::Matrix<double, States, 1> m_xHat;
-  Eigen::Matrix<double, States, States> m_P;
-  Eigen::Matrix<double, States, States> m_contQ;
-  Eigen::Matrix<double, Outputs, Outputs> m_contR;
+  std::function<StateVector(const StateVector&, const StateVector&)> m_addFuncX;
+  StateVector m_xHat;
+  StateMatrix m_P;
+  StateMatrix m_contQ;
+  Matrixd<Outputs, Outputs> m_contR;
   units::second_t m_dt;
 
-  Eigen::Matrix<double, States, States> m_initP;
+  StateMatrix m_initP;
 };
 
 }  // namespace frc
+
+#include "ExtendedKalmanFilter.inc"

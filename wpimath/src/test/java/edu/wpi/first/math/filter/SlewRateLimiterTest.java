@@ -8,28 +8,43 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.util.WPIUtilJNI;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class SlewRateLimiterTest {
+class SlewRateLimiterTest {
+  @BeforeEach
+  void setUp() {
+    WPIUtilJNI.enableMockTime();
+    WPIUtilJNI.setMockTime(0L);
+  }
+
+  @AfterEach
+  void tearDown() {
+    WPIUtilJNI.setMockTime(0L);
+    WPIUtilJNI.disableMockTime();
+  }
+
   @Test
   void slewRateLimitTest() {
-    WPIUtilJNI.enableMockTime();
-
     var limiter = new SlewRateLimiter(1);
     WPIUtilJNI.setMockTime(1000000L);
     assertTrue(limiter.calculate(2) < 2);
-
-    WPIUtilJNI.setMockTime(0L);
   }
 
   @Test
   void slewRateNoLimitTest() {
-    WPIUtilJNI.enableMockTime();
-
     var limiter = new SlewRateLimiter(1);
     WPIUtilJNI.setMockTime(1000000L);
     assertEquals(limiter.calculate(0.5), 0.5);
+  }
 
-    WPIUtilJNI.setMockTime(0L);
+  @Test
+  void slewRatePositiveNegativeTest() {
+    var limiter = new SlewRateLimiter(1, -0.5, 0);
+    WPIUtilJNI.setMockTime(1000000L);
+    assertEquals(limiter.calculate(2), 1);
+    WPIUtilJNI.setMockTime(2000000L);
+    assertEquals(limiter.calculate(0), 0.5);
   }
 }

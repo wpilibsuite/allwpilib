@@ -14,6 +14,7 @@ class CameraSourceTest : public ::testing::Test {
 
 TEST_F(CameraSourceTest, HTTPCamera) {
   auto source = HttpCamera("axis", "http://localhost:8000");
+  cs::Shutdown();
 }
 
 }  // namespace cs

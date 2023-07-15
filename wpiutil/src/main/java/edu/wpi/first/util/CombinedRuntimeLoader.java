@@ -56,7 +56,7 @@ public final class CombinedRuntimeLoader {
    * @return List of all libraries that were extracted
    * @throws IOException Thrown if resource not found or file could not be extracted
    */
-  @SuppressWarnings({"PMD.UnnecessaryCastRule", "unchecked"})
+  @SuppressWarnings("unchecked")
   public static <T> List<String> extractLibraries(Class<T> clazz, String resourceName)
       throws IOException {
     TypeReference<HashMap<String, Object>> typeRef =
@@ -100,7 +100,11 @@ public final class CombinedRuntimeLoader {
         if (outputFile.toFile().exists()) {
           continue;
         }
-        outputFile.getParent().toFile().mkdirs();
+        var parent = outputFile.getParent();
+        if (parent == null) {
+          throw new IOException("Output file has no parent");
+        }
+        parent.toFile().mkdirs();
 
         try (var os = Files.newOutputStream(outputFile)) {
           int readBytes;

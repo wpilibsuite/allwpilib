@@ -7,7 +7,6 @@ package edu.wpi.first.wpilibj;
 import edu.wpi.first.hal.AnalogJNI;
 import edu.wpi.first.hal.ConstantsJNI;
 import edu.wpi.first.hal.DIOJNI;
-import edu.wpi.first.hal.PDPJNI;
 import edu.wpi.first.hal.PWMJNI;
 import edu.wpi.first.hal.PortsJNI;
 import edu.wpi.first.hal.RelayJNI;
@@ -31,7 +30,7 @@ public final class SensorUtil {
   public static final int kAnalogOutputChannels = PortsJNI.getNumAnalogOutputs();
 
   /** Number of solenoid channels per module. */
-  public static final int kSolenoidChannels = PortsJNI.getNumSolenoidChannels();
+  public static final int kCTRESolenoidChannels = PortsJNI.getNumCTRESolenoidChannels();
 
   /** Number of PWM channels per roboRIO. */
   public static final int kPwmChannels = PortsJNI.getNumPWMChannels();
@@ -40,13 +39,17 @@ public final class SensorUtil {
   public static final int kRelayChannels = PortsJNI.getNumRelayHeaders();
 
   /** Number of power distribution channels per PDP. */
-  public static final int kPDPChannels = PortsJNI.getNumPDPChannels();
+  public static final int kCTREPDPChannels = PortsJNI.getNumCTREPDPChannels();
 
   /** Number of power distribution modules per PDP. */
-  public static final int kPDPModules = PortsJNI.getNumPDPModules();
+  public static final int kCTREPDPModules = PortsJNI.getNumCTREPDPModules();
 
   /** Number of PCM Modules. */
-  public static final int kPCMModules = PortsJNI.getNumPCMModules();
+  public static final int kCTREPCMModules = PortsJNI.getNumCTREPCMModules();
+
+  public static final int kREVPHChannels = PortsJNI.getNumREVPHChannels();
+
+  public static final int kREVPHModules = PortsJNI.getNumREVPHModules();
 
   /**
    * Check that the digital channel number is valid. Verify that the channel number is one of the
@@ -134,36 +137,12 @@ public final class SensorUtil {
   }
 
   /**
-   * Verify that the power distribution channel number is within limits. Channel numbers are
-   * 0-based.
+   * Get the number of the default solenoid module.
    *
-   * @param channel The channel number to check.
+   * @return The number of the default solenoid module.
    */
-  public static void checkPDPChannel(final int channel) {
-    if (!PDPJNI.checkPDPChannel(channel)) {
-      StringBuilder buf = new StringBuilder();
-      buf.append("Requested PDP channel is out of range. Minimum: 0, Maximum: ")
-          .append(kPDPChannels)
-          .append(", Requested: ")
-          .append(channel);
-      throw new IllegalArgumentException(buf.toString());
-    }
-  }
-
-  /**
-   * Verify that the PDP module number is within limits. module numbers are 0-based.
-   *
-   * @param module The module number to check.
-   */
-  public static void checkPDPModule(final int module) {
-    if (!PDPJNI.checkPDPModule(module)) {
-      StringBuilder buf = new StringBuilder();
-      buf.append("Requested PDP module is out of range. Minimum: 0, Maximum: ")
-          .append(kPDPModules)
-          .append(", Requested: ")
-          .append(module);
-      throw new IllegalArgumentException(buf.toString());
-    }
+  public static int getDefaultCTREPCMModule() {
+    return 0;
   }
 
   /**
@@ -171,9 +150,8 @@ public final class SensorUtil {
    *
    * @return The number of the default solenoid module.
    */
-  @SuppressWarnings("AbbreviationAsWordInName")
-  public static int getDefaultCTREPCMModule() {
-    return 0;
+  public static int getDefaultREVPHModule() {
+    return 1;
   }
 
   private SensorUtil() {}

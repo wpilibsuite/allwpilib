@@ -9,7 +9,7 @@
 namespace frc {
 
 /**
- * Luminary Micro / Vex Robotics Jaguar Motor Controller with PWM control.
+ * Luminary Micro / Vex Robotics Jaguar Motor %Controller with PWM control.
  *
  * Note that the Jaguar uses the following bounds for PWM values. These values
  * should work reasonably well for most controllers, but if users experience

@@ -60,8 +60,8 @@ int DutyCycleSim::GetFrequency() const {
   return HALSIM_GetDutyCycleFrequency(m_index);
 }
 
-void DutyCycleSim::SetFrequency(int count) {
-  HALSIM_SetDutyCycleFrequency(m_index, count);
+void DutyCycleSim::SetFrequency(int frequency) {
+  HALSIM_SetDutyCycleFrequency(m_index, frequency);
 }
 
 std::unique_ptr<CallbackStore> DutyCycleSim::RegisterOutputCallback(
@@ -77,8 +77,8 @@ double DutyCycleSim::GetOutput() const {
   return HALSIM_GetDutyCycleOutput(m_index);
 }
 
-void DutyCycleSim::SetOutput(double period) {
-  HALSIM_SetDutyCycleOutput(m_index, period);
+void DutyCycleSim::SetOutput(double output) {
+  HALSIM_SetDutyCycleOutput(m_index, output);
 }
 
 void DutyCycleSim::ResetData() {

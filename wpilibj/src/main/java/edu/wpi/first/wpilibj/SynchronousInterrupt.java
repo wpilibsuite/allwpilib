@@ -4,12 +4,12 @@
 
 package edu.wpi.first.wpilibj;
 
-import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.hal.InterruptJNI;
 
 /**
- * Class for handling sychronous interrupts.
+ * Class for handling synchronous (blocking) interrupts.
  *
  * <p>By default, interrupts will occur on rising edge.
  *
@@ -21,14 +21,13 @@ public class SynchronousInterrupt implements AutoCloseable {
 
   private final int m_handle;
 
-  @SuppressWarnings("JavadocMethod")
+  /** Event trigger combinations for a synchronous interrupt. */
   public enum WaitResult {
     kTimeout(0x0),
     kRisingEdge(0x1),
     kFallingEdge(0x100),
     kBoth(0x101);
 
-    @SuppressWarnings("MemberName")
     public final int value;
 
     WaitResult(int value) {
@@ -36,11 +35,11 @@ public class SynchronousInterrupt implements AutoCloseable {
     }
 
     /**
-     * Create a wait result.
+     * Create a wait result enum.
      *
-     * @param rising True if a rising edge occured.
-     * @param falling True if a falling edge occured.
-     * @return A wait result.
+     * @param rising True if a rising edge occurred.
+     * @param falling True if a falling edge occurred.
+     * @return A wait result enum.
      */
     public static WaitResult getValue(boolean rising, boolean falling) {
       if (rising && falling) {
@@ -83,15 +82,15 @@ public class SynchronousInterrupt implements AutoCloseable {
   /**
    * Wait for interrupt that returns the raw result value from the hardware.
    *
-   * <p>Used by AsynchronousInterrupt. Users prefer to use waitForInterrupt.
+   * <p>Used by AsynchronousInterrupt. Users should use waitForInterrupt.
    *
    * @param timeoutSeconds The timeout in seconds. 0 or less will return immediately.
-   * @param ignorePrevious True to ignore if a previous interrupt has occured, and only wait for a
-   *     new trigger. False will consider if an interrupt has occured since the last time the
+   * @param ignorePrevious True to ignore if a previous interrupt has occurred, and only wait for a
+   *     new trigger. False will consider if an interrupt has occurred since the last time the
    *     interrupt was read.
    * @return The raw hardware interrupt result
    */
-  int waitForInterruptRaw(double timeoutSeconds, boolean ignorePrevious) {
+  long waitForInterruptRaw(double timeoutSeconds, boolean ignorePrevious) {
     return InterruptJNI.waitForInterrupt(m_handle, timeoutSeconds, ignorePrevious);
   }
 
@@ -99,17 +98,17 @@ public class SynchronousInterrupt implements AutoCloseable {
    * Wait for an interrupt.
    *
    * @param timeoutSeconds The timeout in seconds. 0 or less will return immediately.
-   * @param ignorePrevious True to ignore if a previous interrupt has occured, and only wait for a
-   *     new trigger. False will consider if an interrupt has occured since the last time the
+   * @param ignorePrevious True to ignore if a previous interrupt has occurred, and only wait for a
+   *     new trigger. False will consider if an interrupt has occurred since the last time the
    *     interrupt was read.
-   * @return Result of which edges were triggered, or if an timeout occured.
+   * @return Result of which edges were triggered, or if a timeout occurred.
    */
   public WaitResult waitForInterrupt(double timeoutSeconds, boolean ignorePrevious) {
-    int result = InterruptJNI.waitForInterrupt(m_handle, timeoutSeconds, ignorePrevious);
+    long result = InterruptJNI.waitForInterrupt(m_handle, timeoutSeconds, ignorePrevious);
 
     // Rising edge result is the interrupt bit set in the byte 0xFF
     // Falling edge result is the interrupt bit set in the byte 0xFF00
-    // Set any bit set to be true for that edge, and AND the 2 results
+    // Set any bit set to be true for that edge, and then conduct a logical AND on the 2 results
     // together to match the existing enum for all interrupts
     boolean rising = (result & 0xFF) != 0;
     boolean falling = (result & 0xFF00) != 0;
@@ -117,10 +116,10 @@ public class SynchronousInterrupt implements AutoCloseable {
   }
 
   /**
-   * Wait for an interrupt, ingoring any previously occuring interrupts.
+   * Wait for an interrupt, ignoring any previously occurring interrupts.
    *
    * @param timeoutSeconds The timeout in seconds. 0 or less will return immediately.
-   * @return Result of which edges were triggered, or if an timeout occured.
+   * @return Result of which edges were triggered, or if a timeout occurred.
    */
   public WaitResult waitForInterrupt(double timeoutSeconds) {
     return waitForInterrupt(timeoutSeconds, true);

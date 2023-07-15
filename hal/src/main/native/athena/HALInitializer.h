@@ -17,6 +17,7 @@ inline void CheckInit() {
 }
 
 extern void InitializeCTREPCM();
+extern void InitializeREVPH();
 extern void InitializeAccelerometer();
 extern void InitializeAddressableLED();
 extern void InitializeAnalogAccumulator();
@@ -41,7 +42,8 @@ extern void InitializeI2C();
 extern void InitializeInterrupts();
 extern void InitializeMain();
 extern void InitializeNotifier();
-extern void InitializePDP();
+extern void InitializeCTREPDP();
+extern void InitializeREVPDH();
 extern void InitializePorts();
 extern void InitializePower();
 extern void InitializePWM();

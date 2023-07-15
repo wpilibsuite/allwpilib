@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <numbers>
+
 #include <frc/AnalogGyro.h>
 #include <frc/Encoder.h>
 #include <frc/controller/PIDController.h>
@@ -13,16 +15,23 @@
 #include <frc/kinematics/MecanumDriveOdometry.h>
 #include <frc/kinematics/MecanumDriveWheelSpeeds.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
-#include <wpi/numbers>
 
 /**
  * Represents a mecanum drive style drivetrain.
  */
 class Drivetrain {
  public:
-  Drivetrain() { m_gyro.Reset(); }
+  Drivetrain() {
+    m_gyro.Reset();
+    // We need to invert one side of the drivetrain so that positive voltages
+    // result in both sides moving forward. Depending on how your robot's
+    // gearbox is constructed, you might have to invert the left side instead.
+    m_frontRightMotor.SetInverted(true);
+    m_backRightMotor.SetInverted(true);
+  }
 
   frc::MecanumDriveWheelSpeeds GetCurrentState() const;
+  frc::MecanumDriveWheelPositions GetCurrentWheelDistances() const;
   void SetSpeeds(const frc::MecanumDriveWheelSpeeds& wheelSpeeds);
   void Drive(units::meters_per_second_t xSpeed,
              units::meters_per_second_t ySpeed, units::radians_per_second_t rot,
@@ -32,7 +41,7 @@ class Drivetrain {
   static constexpr units::meters_per_second_t kMaxSpeed =
       3.0_mps;  // 3 meters per second
   static constexpr units::radians_per_second_t kMaxAngularSpeed{
-      wpi::numbers::pi};  // 1/2 rotation per second
+      std::numbers::pi};  // 1/2 rotation per second
 
  private:
   frc::PWMSparkMax m_frontLeftMotor{1};
@@ -61,7 +70,8 @@ class Drivetrain {
       m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation,
       m_backRightLocation};
 
-  frc::MecanumDriveOdometry m_odometry{m_kinematics, m_gyro.GetRotation2d()};
+  frc::MecanumDriveOdometry m_odometry{m_kinematics, m_gyro.GetRotation2d(),
+                                       GetCurrentWheelDistances()};
 
   // Gains are for example purposes only - must be determined for your own
   // robot!

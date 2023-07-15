@@ -34,19 +34,20 @@ public abstract class UtilityClassTest<T> {
   }
 
   @Test
-  public void singleConstructorTest() {
+  void singleConstructorTest() {
     assertEquals(1, m_clazz.getDeclaredConstructors().length, "More than one constructor defined");
   }
 
   @Test
-  public void constructorPrivateTest() {
+  void constructorPrivateTest() {
     Constructor<?> constructor = m_clazz.getDeclaredConstructors()[0];
 
     assertFalse(constructor.canAccess(null), "Constructor is not private");
   }
 
   @Test
-  public void constructorReflectionTest() {
+  @SuppressWarnings("PMD.AvoidAccessibilityAlteration")
+  void constructorReflectionTest() {
     Constructor<?> constructor = m_clazz.getDeclaredConstructors()[0];
     constructor.setAccessible(true);
     assertThrows(InvocationTargetException.class, constructor::newInstance);

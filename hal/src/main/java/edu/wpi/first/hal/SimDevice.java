@@ -32,7 +32,7 @@ public class SimDevice implements AutoCloseable {
    * Creates a simulated device.
    *
    * <p>The device name must be unique. Returns null if the device name already exists. If multiple
-   * instances of the same device are desired, recommend appending the instance/unique identifer in
+   * instances of the same device are desired, recommend appending the instance/unique identifier in
    * brackets to the base name, e.g. "device[1]".
    *
    * <p>null is returned if not in simulation.
@@ -107,19 +107,12 @@ public class SimDevice implements AutoCloseable {
   }
 
   /**
-   * Creates a value on the simulated device.
+   * Get the name of the simulated device.
    *
-   * <p>Returns null if not in simulation.
-   *
-   * @param name value name
-   * @param readonly if the value should not be written from simulation side
-   * @param initialValue initial value
-   * @return simulated value object
-   * @deprecated Use direction function instead
+   * @return the name
    */
-  @Deprecated
-  public SimValue createValue(String name, boolean readonly, HALValue initialValue) {
-    return createValue(name, readonly ? Direction.kOutput : Direction.kInput, initialValue);
+  public String getName() {
+    return SimDeviceJNI.getSimDeviceName(m_handle);
   }
 
   /**
@@ -182,22 +175,6 @@ public class SimDevice implements AutoCloseable {
    * <p>Returns null if not in simulation.
    *
    * @param name value name
-   * @param readonly if the value should not be written from simulation side
-   * @param initialValue initial value
-   * @return simulated double value object
-   * @deprecated Use direction function instead
-   */
-  @Deprecated
-  public SimDouble createDouble(String name, boolean readonly, double initialValue) {
-    return createDouble(name, readonly ? Direction.kOutput : Direction.kInput, initialValue);
-  }
-
-  /**
-   * Creates a double value on the simulated device.
-   *
-   * <p>Returns null if not in simulation.
-   *
-   * @param name value name
    * @param direction input/output/bidir (from perspective of user code)
    * @param initialValue initial value
    * @return simulated double value object
@@ -208,25 +185,6 @@ public class SimDevice implements AutoCloseable {
       return null;
     }
     return new SimDouble(handle);
-  }
-
-  /**
-   * Creates an enumerated value on the simulated device.
-   *
-   * <p>Enumerated values are always in the range 0 to numOptions-1.
-   *
-   * <p>Returns null if not in simulation.
-   *
-   * @param name value name
-   * @param readonly if the value should not be written from simulation side
-   * @param options array of option descriptions
-   * @param initialValue initial value (selection)
-   * @return simulated enum value object
-   * @deprecated Use direction function instead
-   */
-  @Deprecated
-  public SimEnum createEnum(String name, boolean readonly, String[] options, int initialValue) {
-    return createEnum(name, readonly ? Direction.kOutput : Direction.kInput, options, initialValue);
   }
 
   /**
@@ -274,22 +232,6 @@ public class SimDevice implements AutoCloseable {
       return null;
     }
     return new SimEnum(handle);
-  }
-
-  /**
-   * Creates a boolean value on the simulated device.
-   *
-   * <p>Returns null if not in simulation.
-   *
-   * @param name value name
-   * @param readonly if the value should not be written from simulation side
-   * @param initialValue initial value
-   * @return simulated boolean value object
-   * @deprecated Use direction function instead
-   */
-  @Deprecated
-  public SimBoolean createBoolean(String name, boolean readonly, boolean initialValue) {
-    return createBoolean(name, readonly ? Direction.kOutput : Direction.kInput, initialValue);
   }
 
   /**

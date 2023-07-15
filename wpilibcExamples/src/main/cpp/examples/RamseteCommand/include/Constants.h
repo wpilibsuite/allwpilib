@@ -2,14 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <numbers>
+
 #include <frc/kinematics/DifferentialDriveKinematics.h>
 #include <frc/trajectory/constraint/DifferentialDriveKinematicsConstraint.h>
 #include <units/acceleration.h>
+#include <units/angle.h>
 #include <units/length.h>
 #include <units/time.h>
 #include <units/velocity.h>
 #include <units/voltage.h>
-#include <wpi/numbers>
 
 #pragma once
 
@@ -37,11 +39,10 @@ constexpr auto kTrackwidth = 0.69_m;
 extern const frc::DifferentialDriveKinematics kDriveKinematics;
 
 constexpr int kEncoderCPR = 1024;
-constexpr double kWheelDiameterInches = 6;
-constexpr double kEncoderDistancePerPulse =
+constexpr units::meter_t kWheelDiameter = 6_in;
+constexpr auto kEncoderDistancePerPulse =
     // Assumes the encoders are directly mounted on the wheel shafts
-    (kWheelDiameterInches * wpi::numbers::pi) /
-    static_cast<double>(kEncoderCPR);
+    (kWheelDiameter * std::numbers::pi) / static_cast<double>(kEncoderCPR);
 
 // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
 // These characterization values MUST be determined either experimentally or
@@ -58,14 +59,14 @@ constexpr double kPDriveVel = 8.5;
 
 namespace AutoConstants {
 constexpr auto kMaxSpeed = 3_mps;
-constexpr auto kMaxAcceleration = 3_mps_sq;
+constexpr auto kMaxAcceleration = 1_mps_sq;
 
 // Reasonable baseline values for a RAMSETE follower in units of meters and
 // seconds
-constexpr double kRamseteB = 2;
-constexpr double kRamseteZeta = 0.7;
+constexpr auto kRamseteB = 2.0 * 1_rad * 1_rad / (1_m * 1_m);
+constexpr auto kRamseteZeta = 0.7 / 1_rad;
 }  // namespace AutoConstants
 
 namespace OIConstants {
-constexpr int kDriverControllerPort = 1;
+constexpr int kDriverControllerPort = 0;
 }  // namespace OIConstants

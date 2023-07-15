@@ -35,6 +35,9 @@ SOFTWARE.
 #include "gtest/gtest.h"
 
 #include "unit-json.h"
+
+#include <cmath>
+
 using wpi::json;
 
 TEST(JsonPointerTest, TypesCreate)

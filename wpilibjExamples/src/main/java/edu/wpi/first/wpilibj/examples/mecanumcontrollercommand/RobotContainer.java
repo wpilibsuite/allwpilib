@@ -12,7 +12,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.AutoConstants;
@@ -20,6 +19,7 @@ import edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.DriveCo
 import edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.OIConstants;
 import edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.subsystems.DriveSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.MecanumControllerCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -51,24 +51,24 @@ public class RobotContainer {
         new RunCommand(
             () ->
                 m_robotDrive.drive(
-                    m_driverController.getY(GenericHID.Hand.kLeft),
-                    m_driverController.getX(GenericHID.Hand.kRight),
-                    m_driverController.getX(GenericHID.Hand.kLeft),
+                    -m_driverController.getLeftY(),
+                    -m_driverController.getRightX(),
+                    -m_driverController.getLeftX(),
                     false),
             m_robotDrive));
   }
 
   /**
    * Use this method to define your button->command mappings. Buttons can be created by
-   * instantiating a {@link GenericHID} or one of its subclasses ({@link
+   * instantiating a {@link edu.wpi.first.wpilibj.GenericHID} or one of its subclasses ({@link
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then calling passing it to a
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
     // Drive at half speed when the right bumper is held
-    new JoystickButton(m_driverController, Button.kBumperRight.value)
-        .whenPressed(() -> m_robotDrive.setMaxOutput(0.5))
-        .whenReleased(() -> m_robotDrive.setMaxOutput(1));
+    new JoystickButton(m_driverController, Button.kRightBumper.value)
+        .onTrue(new InstantCommand(() -> m_robotDrive.setMaxOutput(0.5)))
+        .onFalse(new InstantCommand(() -> m_robotDrive.setMaxOutput(1)));
   }
 
   /**
@@ -103,7 +103,7 @@ public class RobotContainer {
             DriveConstants.kFeedforward,
             DriveConstants.kDriveKinematics,
 
-            // Position contollers
+            // Position controllers
             new PIDController(AutoConstants.kPXController, 0, 0),
             new PIDController(AutoConstants.kPYController, 0, 0),
             new ProfiledPIDController(

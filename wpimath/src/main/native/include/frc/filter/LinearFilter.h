@@ -7,12 +7,15 @@
 #include <algorithm>
 #include <cmath>
 #include <initializer_list>
+#include <span>
 #include <stdexcept>
 #include <vector>
 
+#include <wpi/array.h>
 #include <wpi/circular_buffer.h>
-#include <wpi/span.h>
 
+#include "Eigen/QR"
+#include "frc/EigenCore.h"
 #include "units/time.h"
 #include "wpimath/MathShared.h"
 
@@ -24,8 +27,8 @@ namespace frc {
  * used types of filters.
  *
  * Filters are of the form:<br>
- *  y[n] = (b0 * x[n] + b1 * x[n-1] + … + bP * x[n-P]) -
- *         (a0 * y[n-1] + a2 * y[n-2] + … + aQ * y[n-Q])
+ *  y[n] = (b0 x[n] + b1 x[n-1] + … + bP x[n-P]) -
+ *         (a0 y[n-1] + a2 y[n-2] + … + aQ y[n-Q])
  *
  * Where:<br>
  *  y[n] is the output at time "n"<br>
@@ -74,10 +77,10 @@ class LinearFilter {
   /**
    * Create a linear FIR or IIR filter.
    *
-   * @param ffGains The "feed forward" or FIR gains.
-   * @param fbGains The "feed back" or IIR gains.
+   * @param ffGains The "feedforward" or FIR gains.
+   * @param fbGains The "feedback" or IIR gains.
    */
-  LinearFilter(wpi::span<const double> ffGains, wpi::span<const double> fbGains)
+  LinearFilter(std::span<const double> ffGains, std::span<const double> fbGains)
       : m_inputs(ffGains.size()),
         m_outputs(fbGains.size()),
         m_inputGains(ffGains.begin(), ffGains.end()),
@@ -92,14 +95,14 @@ class LinearFilter {
     static int instances = 0;
     instances++;
     wpi::math::MathSharedStore::ReportUsage(
-        wpi::math::MathUsageId::kFilter_Linear, 1);
+        wpi::math::MathUsageId::kFilter_Linear, instances);
   }
 
   /**
    * Create a linear FIR or IIR filter.
    *
-   * @param ffGains The "feed forward" or FIR gains.
-   * @param fbGains The "feed back" or IIR gains.
+   * @param ffGains The "feedforward" or FIR gains.
+   * @param fbGains The "feedback" or IIR gains.
    */
   LinearFilter(std::initializer_list<double> ffGains,
                std::initializer_list<double> fbGains)
@@ -109,7 +112,7 @@ class LinearFilter {
   // Static methods to create commonly used filters
   /**
    * Creates a one-pole IIR low-pass filter of the form:<br>
-   *   y[n] = (1 - gain) * x[n] + gain * y[n-1]<br>
+   *   y[n] = (1 - gain) x[n] + gain y[n-1]<br>
    * where gain = e<sup>-dt / T</sup>, T is the time constant in seconds
    *
    * Note: T = 1 / (2 pi f) where f is the cutoff frequency in Hz, the frequency
@@ -123,13 +126,13 @@ class LinearFilter {
    */
   static LinearFilter<T> SinglePoleIIR(double timeConstant,
                                        units::second_t period) {
-    double gain = std::exp(-period.to<double>() / timeConstant);
+    double gain = std::exp(-period.value() / timeConstant);
     return LinearFilter({1.0 - gain}, {-gain});
   }
 
   /**
    * Creates a first-order high-pass filter of the form:<br>
-   *   y[n] = gain * x[n] + (-gain) * x[n-1] + gain * y[n-1]<br>
+   *   y[n] = gain x[n] + (-gain) x[n-1] + gain y[n-1]<br>
    * where gain = e<sup>-dt / T</sup>, T is the time constant in seconds
    *
    * Note: T = 1 / (2 pi f) where f is the cutoff frequency in Hz, the frequency
@@ -142,18 +145,19 @@ class LinearFilter {
    *                     user.
    */
   static LinearFilter<T> HighPass(double timeConstant, units::second_t period) {
-    double gain = std::exp(-period.to<double>() / timeConstant);
+    double gain = std::exp(-period.value() / timeConstant);
     return LinearFilter({gain, -gain}, {-gain});
   }
 
   /**
    * Creates a K-tap FIR moving average filter of the form:<br>
-   *   y[n] = 1/k * (x[k] + x[k-1] + … + x[0])
+   *   y[n] = 1/k (x[k] + x[k-1] + … + x[0])
    *
    * This filter is always stable.
    *
    * @param taps The number of samples to average over. Higher = smoother but
    *             slower
+   * @throws std::runtime_error if number of taps is less than 1.
    */
   static LinearFilter<T> MovingAverage(int taps) {
     if (taps <= 0) {
@@ -162,6 +166,101 @@ class LinearFilter {
 
     std::vector<double> gains(taps, 1.0 / taps);
     return LinearFilter(gains, {});
+  }
+
+  /**
+   * Creates a finite difference filter that computes the nth derivative of the
+   * input given the specified stencil points.
+   *
+   * Stencil points are the indices of the samples to use in the finite
+   * difference. 0 is the current sample, -1 is the previous sample, -2 is the
+   * sample before that, etc. Don't use positive stencil points (samples from
+   * the future) if the LinearFilter will be used for stream-based online
+   * filtering (e.g., taking derivative of encoder samples in real-time).
+   *
+   * @tparam Derivative The order of the derivative to compute.
+   * @tparam Samples    The number of samples to use to compute the given
+   *                    derivative. This must be one more than the order of
+   *                    the derivative or higher.
+   * @param stencil     List of stencil points.
+   * @param period      The period in seconds between samples taken by the user.
+   */
+  template <int Derivative, int Samples>
+  static LinearFilter<T> FiniteDifference(
+      const wpi::array<int, Samples> stencil, units::second_t period) {
+    // See
+    // https://en.wikipedia.org/wiki/Finite_difference_coefficient#Arbitrary_stencil_points
+    //
+    // For a given list of stencil points s of length n and the order of
+    // derivative d < n, the finite difference coefficients can be obtained by
+    // solving the following linear system for the vector a.
+    //
+    // [s₁⁰   ⋯  sₙ⁰ ][a₁]      [ δ₀,d ]
+    // [ ⋮    ⋱  ⋮   ][⋮ ] = d! [  ⋮   ]
+    // [s₁ⁿ⁻¹ ⋯ sₙⁿ⁻¹][aₙ]      [δₙ₋₁,d]
+    //
+    // where δᵢ,ⱼ are the Kronecker delta. The FIR gains are the elements of the
+    // vector a in reverse order divided by hᵈ.
+    //
+    // The order of accuracy of the approximation is of the form O(hⁿ⁻ᵈ).
+
+    static_assert(Derivative >= 1,
+                  "Order of derivative must be greater than or equal to one.");
+    static_assert(Samples > 0, "Number of samples must be greater than zero.");
+    static_assert(Derivative < Samples,
+                  "Order of derivative must be less than number of samples.");
+
+    Matrixd<Samples, Samples> S;
+    for (int row = 0; row < Samples; ++row) {
+      for (int col = 0; col < Samples; ++col) {
+        S(row, col) = std::pow(stencil[col], row);
+      }
+    }
+
+    // Fill in Kronecker deltas: https://en.wikipedia.org/wiki/Kronecker_delta
+    Vectord<Samples> d;
+    for (int i = 0; i < Samples; ++i) {
+      d(i) = (i == Derivative) ? Factorial(Derivative) : 0.0;
+    }
+
+    Vectord<Samples> a =
+        S.householderQr().solve(d) / std::pow(period.value(), Derivative);
+
+    // Reverse gains list
+    std::vector<double> ffGains;
+    for (int i = Samples - 1; i >= 0; --i) {
+      ffGains.push_back(a(i));
+    }
+
+    return LinearFilter(ffGains, {});
+  }
+
+  /**
+   * Creates a backward finite difference filter that computes the nth
+   * derivative of the input given the specified number of samples.
+   *
+   * For example, a first derivative filter that uses two samples and a sample
+   * period of 20 ms would be
+   *
+   * <pre><code>
+   * LinearFilter<double>::BackwardFiniteDifference<1, 2>(20_ms);
+   * </code></pre>
+   *
+   * @tparam Derivative The order of the derivative to compute.
+   * @tparam Samples    The number of samples to use to compute the given
+   *                    derivative. This must be one more than the order of
+   *                    derivative or higher.
+   * @param period      The period in seconds between samples taken by the user.
+   */
+  template <int Derivative, int Samples>
+  static LinearFilter<T> BackwardFiniteDifference(units::second_t period) {
+    // Generate stencil points from -(samples - 1) to 0
+    wpi::array<int, Samples> stencil{wpi::empty_array};
+    for (int i = 0; i < Samples; ++i) {
+      stencil[i] = -(Samples - 1) + i;
+    }
+
+    return FiniteDifference<Derivative, Samples>(stencil, period);
   }
 
   /**
@@ -208,6 +307,19 @@ class LinearFilter {
   wpi::circular_buffer<T> m_outputs;
   std::vector<double> m_inputGains;
   std::vector<double> m_outputGains;
+
+  /**
+   * Factorial of n.
+   *
+   * @param n Argument of which to take factorial.
+   */
+  static constexpr int Factorial(int n) {
+    if (n < 2) {
+      return 1;
+    } else {
+      return n * Factorial(n - 1);
+    }
+  }
 };
 
 }  // namespace frc

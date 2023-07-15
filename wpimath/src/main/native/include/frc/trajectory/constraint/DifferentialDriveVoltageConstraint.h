@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <wpi/SymbolExports.h>
+
 #include "frc/controller/SimpleMotorFeedforward.h"
 #include "frc/kinematics/DifferentialDriveKinematics.h"
 #include "frc/trajectory/constraint/TrajectoryConstraint.h"
@@ -17,7 +19,8 @@ namespace frc {
  * acceleration of any wheel of the robot while following the trajectory is
  * never higher than what can be achieved with the given maximum voltage.
  */
-class DifferentialDriveVoltageConstraint : public TrajectoryConstraint {
+class WPILIB_DLLEXPORT DifferentialDriveVoltageConstraint
+    : public TrajectoryConstraint {
  public:
   /**
    * Creates a new DifferentialDriveVoltageConstraint.
@@ -31,7 +34,7 @@ class DifferentialDriveVoltageConstraint : public TrajectoryConstraint {
    */
   DifferentialDriveVoltageConstraint(
       const SimpleMotorFeedforward<units::meter>& feedforward,
-      const DifferentialDriveKinematics& kinematics, units::volt_t maxVoltage);
+      DifferentialDriveKinematics kinematics, units::volt_t maxVoltage);
 
   units::meters_per_second_t MaxVelocity(
       const Pose2d& pose, units::curvature_t curvature,
@@ -41,8 +44,8 @@ class DifferentialDriveVoltageConstraint : public TrajectoryConstraint {
                             units::meters_per_second_t speed) const override;
 
  private:
-  const SimpleMotorFeedforward<units::meter>& m_feedforward;
-  const DifferentialDriveKinematics& m_kinematics;
+  SimpleMotorFeedforward<units::meter> m_feedforward;
+  DifferentialDriveKinematics m_kinematics;
   units::volt_t m_maxVoltage;
 };
 }  // namespace frc

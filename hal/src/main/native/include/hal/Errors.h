@@ -119,7 +119,7 @@
 
 #define HAL_THREAD_PRIORITY_ERROR -1152
 #define HAL_THREAD_PRIORITY_ERROR_MESSAGE \
-  "HAL: Getting or setting the priority of a thread has failed";
+  "HAL: Getting or setting the priority of a thread has failed"
 
 #define HAL_THREAD_PRIORITY_RANGE_ERROR -1153
 #define HAL_THREAD_PRIORITY_RANGE_ERROR_MESSAGE \
@@ -135,11 +135,16 @@
 #define HAL_USE_LAST_ERROR_MESSAGE \
   "HAL: Use HAL_GetLastError(status) to get last error"
 
+#define HAL_CONSOLE_OUT_ENABLED_ERROR -1157
+#define HAL_CONSOLE_OUT_ENABLED_ERROR_MESSAGE                           \
+  "HAL: Onboard serial port is requested, but Console Out is enabled. " \
+  "Disable Console Out using imaging tool"
+
 #define HAL_CAN_BUFFER_OVERRUN -35007
 #define HAL_CAN_BUFFER_OVERRUN_MESSAGE \
   "HAL: CAN Output Buffer Full. Ensure a device is attached"
 
-#define VI_ERROR_SYSTEM_ERROR_MESSAGE "HAL - VISA: System Error";
+#define VI_ERROR_SYSTEM_ERROR_MESSAGE "HAL - VISA: System Error"
 #define VI_ERROR_INV_OBJECT_MESSAGE "HAL - VISA: Invalid Object"
 #define VI_ERROR_RSRC_LOCKED_MESSAGE "HAL - VISA: Resource Locked"
 #define VI_ERROR_RSRC_NFOUND_MESSAGE "HAL - VISA: Resource Not Found"

@@ -13,7 +13,7 @@
 
 namespace wpi {
 
-std::string GetStackTrace(int offset) {
+std::string GetStackTraceDefault(int offset) {
   void* stackTrace[128];
   int stackSize = backtrace(stackTrace, 128);
   char** mangledSymbols = backtrace_symbols(stackTrace, stackSize);
