@@ -3,13 +3,15 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "frc/event/BooleanEvent.h"
+
 using namespace frc;
 
 BooleanEvent::BooleanEvent(EventLoop* loop, std::function<bool()> condition)
-    : m_loop(loop), m_condition(std::move(condition)) {
-  m_state = std::make_shared<bool>(m_condition());
+    : m_loop(loop),
+      m_condition(std::make_shared<std::function<bool()>>(condition)) {
+  m_state = std::make_shared<bool>((*m_condition)());
   m_loop->Bind(
-      [condition = m_condition, state = m_state] { *state = condition(); });
+      [condition = *m_condition, state = m_state] { *state = condition(); });
 }
 
 BooleanEvent::operator std::function<bool()>() {
@@ -17,7 +19,7 @@ BooleanEvent::operator std::function<bool()>() {
 }
 
 bool BooleanEvent::GetAsBoolean() const {
-  return m_condition();
+  return (*m_condition)();
 }
 
 void BooleanEvent::IfHigh(std::function<void()> action) {
@@ -33,16 +35,24 @@ BooleanEvent BooleanEvent::operator!() {
 }
 
 BooleanEvent BooleanEvent::operator&&(BooleanEvent rhs) {
-  if (m_loop != rhs.m_loop){
-    m_loop->Bind([&rhs] {*rhs.m_state = rhs.m_condition();});
+  if (m_loop != rhs.m_loop) {
+    m_loop->Bind([&rhs] { *rhs.m_state = (*rhs.m_condition)(); });
   }
-  return BooleanEvent(this->m_loop,
-                      [state = m_state, rhs] { return *state && rhs.m_state; });
+  return BooleanEvent(
+      this->m_loop, [state = m_state, rhs] { return *state && *rhs.m_state; });
 }
 
 BooleanEvent BooleanEvent::operator&&(std::function<bool()> rhs) {
   return BooleanEvent(this->m_loop,
                       [state = m_state, rhs] { return *state && rhs(); });
+}
+
+BooleanEvent BooleanEvent::operator||(BooleanEvent rhs) {
+  if (m_loop != rhs.m_loop) {
+    m_loop->Bind([&rhs] { *rhs.m_state = (*rhs.m_condition)(); });
+  }
+  return BooleanEvent(
+      this->m_loop, [state = m_state, rhs] { return *state || *rhs.m_state; });
 }
 
 BooleanEvent BooleanEvent::operator||(std::function<bool()> rhs) {
@@ -51,23 +61,23 @@ BooleanEvent BooleanEvent::operator||(std::function<bool()> rhs) {
 }
 
 BooleanEvent BooleanEvent::Rising() {
-  return BooleanEvent(this->m_loop,
-                      [state = m_state, m_previous = m_condition()]() mutable {
-                        bool present = *state;
-                        bool past = m_previous;
-                        m_previous = present;
-                        return !past && present;
-                      });
+  return BooleanEvent(
+      this->m_loop, [state = m_state, m_previous = (*m_condition)()]() mutable {
+        bool present = *state;
+        bool past = m_previous;
+        m_previous = present;
+        return !past && present;
+      });
 }
 
 BooleanEvent BooleanEvent::Falling() {
-  return BooleanEvent(this->m_loop,
-                      [state = m_state, m_previous = m_condition()]() mutable {
-                        bool present = *state;
-                        bool past = m_previous;
-                        m_previous = present;
-                        return past && !present;
-                      });
+  return BooleanEvent(
+      this->m_loop, [state = m_state, m_previous = (*m_condition)()]() mutable {
+        bool present = *state;
+        bool past = m_previous;
+        m_previous = present;
+        return past && !present;
+      });
 }
 
 BooleanEvent BooleanEvent::Debounce(units::second_t debounceTime,
