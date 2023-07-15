@@ -12,8 +12,8 @@ using namespace frc;
 
 TEST(BooleanEventTest, BinaryCompositions) {
   EventLoop loop;
-  std::atomic_int andCounter = 0;
-  std::atomic_int orCounter = 0;
+  int andCounter = 0;
+  int orCounter = 0;
 
   EXPECT_EQ(0, andCounter);
   EXPECT_EQ(0, orCounter);
@@ -34,15 +34,16 @@ TEST(BooleanEventTest, BinaryCompositions) {
 TEST(BooleanEventTest, BinaryCompositionLoopSemantics) {
   EventLoop loop1;
   EventLoop loop2;
+  bool boolean1 = true;
+  bool boolean2 = true;
+  int counter1 = 0;
+  int counter2 = 0;
 
-  std::atomic_int counter1 = 0;
-  std::atomic_int counter2 = 0;
-
-  (BooleanEvent(&loop1, [] { return true; }) && BooleanEvent(&loop2, [] {
-     return true;
+  (BooleanEvent(&loop1, [&] { return boolean1; }) && BooleanEvent(&loop2, [&] {
+     return boolean2;
    })).IfHigh([&] { ++counter1; });
-  (BooleanEvent(&loop2, [] { return true; }) && BooleanEvent(&loop1, [] {
-     return true;
+  (BooleanEvent(&loop2, [&] { return boolean1; }) && BooleanEvent(&loop1, [&] {
+     return boolean2;
    })).IfHigh([&] { ++counter2; });
 
   EXPECT_EQ(0, counter1);
@@ -57,12 +58,43 @@ TEST(BooleanEventTest, BinaryCompositionLoopSemantics) {
 
   EXPECT_EQ(1, counter1);
   EXPECT_EQ(1, counter2);
+
+  boolean2 = false;
+  loop1.Poll();
+
+  EXPECT_EQ(1, counter1);
+  EXPECT_EQ(1, counter2);
+}
+
+TEST(BooleanEventTest, LoopValueSemantics) {
+  EventLoop loop;
+  bool boolean1 = true;
+  bool boolean2 = true;
+  int counter1 = 0;
+  int counter2 = 0;
+
+  (BooleanEvent(&loop,
+                [&] {
+                  boolean2 = false;
+                  return boolean1;
+                }) &&
+   BooleanEvent(&loop, [&] {
+     return boolean2;
+   })).IfHigh([&] { ++counter1; });
+
+  EXPECT_EQ(0, counter1);
+  EXPECT_EQ(0, counter2);
+
+  loop.Poll();
+
+  EXPECT_EQ(0, counter1);
+  EXPECT_EQ(0, counter2);
 }
 
 TEST(BooleanEventTest, EdgeDecorators) {
   EventLoop loop;
   bool boolean = false;
-  std::atomic_int counter = 0;
+  int counter = 0;
 
   BooleanEvent(&loop, [&] { return boolean; }).Falling().IfHigh([&] {
     --counter;
@@ -97,7 +129,7 @@ TEST(BooleanEventTest, EdgeDecorators) {
 TEST(BooleanEventTest, EdgeReuse) {
   EventLoop loop;
   bool boolean = false;
-  std::atomic_int counter = 0;
+  int counter = 0;
 
   auto event = BooleanEvent(&loop, [&] { return boolean; }).Rising();
   event.IfHigh([&] { ++counter; });
@@ -132,7 +164,7 @@ TEST(BooleanEventTest, EdgeReuse) {
 TEST(BooleanEventTest, EdgeReconstruct) {
   EventLoop loop;
   bool boolean = false;
-  std::atomic_int counter = 0;
+  int counter = 0;
 
   auto event = BooleanEvent(&loop, [&] { return boolean; });
   event.Rising().IfHigh([&] { ++counter; });
@@ -167,7 +199,7 @@ TEST(BooleanEventTest, EdgeReconstruct) {
 TEST(BooleanEventTest, MidLoopBooleanChange) {
   EventLoop loop;
   bool boolean = false;
-  std::atomic_int counter = 0;
+  int counter = 0;
 
   auto event = BooleanEvent(&loop, [&] { return boolean; }).Rising();
   event.IfHigh([&] {
@@ -207,7 +239,7 @@ TEST(BooleanEventTest, EventReuse) {
   bool boolean1 = false;
   bool boolean2 = false;
   bool boolean3 = false;
-  std::atomic_int counter = 0;
+  int counter = 0;
 
   auto event1 = BooleanEvent(&loop, [&] { return boolean1; }).Rising();
   auto event2 = BooleanEvent(&loop, [&] { return boolean2; }).Rising();
@@ -233,6 +265,7 @@ TEST(BooleanEventTest, EventReuse) {
   loop.Poll();
 
   EXPECT_EQ(3, counter);
+
   loop.Poll();
 
   EXPECT_EQ(3, counter);
@@ -251,4 +284,60 @@ TEST(BooleanEventTest, EventReuse) {
   loop.Poll();
 
   EXPECT_EQ(6, counter);
+}
+
+TEST(BooleanEventTest, Negation) {
+  EventLoop loop;
+  bool boolean = false;
+  int counter = 0;
+
+  auto event = BooleanEvent(&loop, [&] { return boolean; });
+  event.IfHigh([&] { ++counter; });
+  (!event).IfHigh([&] { ++counter; });
+
+  EXPECT_EQ(0, counter);
+
+  loop.Poll();
+
+  EXPECT_EQ(1, counter);
+
+  boolean = true;
+  loop.Poll();
+
+  EXPECT_EQ(2, counter);
+
+  boolean = false;
+  loop.Poll();
+
+  EXPECT_EQ(3, counter);
+}
+
+TEST(BooleanEventTest, ConditionIsUpdated) {
+  EventLoop loop;
+  bool boolean1 = false;
+  bool boolean2 = false;
+  bool boolean3 = false;
+  int counter = 0;
+
+  auto event1 = !BooleanEvent(&loop, [&] { return boolean1; });
+  auto event2 = BooleanEvent(&loop, [&] { return boolean2; }) &&
+                BooleanEvent(&loop, [&] { return boolean3; });
+  auto event3 = BooleanEvent(&loop, [&] { return boolean2; }) ||
+                BooleanEvent(&loop, [&] { return boolean3; });
+
+  EXPECT_TRUE(event1.GetAsBoolean());
+  EXPECT_FALSE(event2.GetAsBoolean());
+  EXPECT_FALSE(event3.GetAsBoolean());
+
+  boolean1 = true;
+  boolean2 = true;
+  boolean3 = true;
+
+  EXPECT_FALSE(event1.GetAsBoolean());
+  EXPECT_TRUE(event2.GetAsBoolean());
+  EXPECT_TRUE(event3.GetAsBoolean());
+
+  boolean3 = true;
+  EXPECT_FALSE(event2.GetAsBoolean());
+  EXPECT_TRUE(event3.GetAsBoolean());
 }

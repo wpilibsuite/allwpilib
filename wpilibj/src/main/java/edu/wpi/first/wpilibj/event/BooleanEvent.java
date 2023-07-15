@@ -50,7 +50,7 @@ public class BooleanEvent implements BooleanSupplier {
    * @return true for the high state, false for the low state.
    */
   @Override
-  public final boolean getAsBoolean() {
+  public boolean getAsBoolean() {
     return m_signal.getAsBoolean();
   }
 
@@ -149,7 +149,12 @@ public class BooleanEvent implements BooleanSupplier {
    * @return the negated event
    */
   public BooleanEvent negate() {
-    return new BooleanEvent(m_loop, () -> !m_state.get());
+    return new BooleanEvent(m_loop, () -> !m_state.get()) {
+      @Override
+      public boolean getAsBoolean() {
+        return !m_signal.getAsBoolean();
+      }
+    };
   }
 
   /**
@@ -161,12 +166,18 @@ public class BooleanEvent implements BooleanSupplier {
    * @param other the event to compose with
    * @return the event that is active when both events are active
    */
+  @SuppressWarnings("PMD.CompareObjectsWithEquals")
   public BooleanEvent and(BooleanEvent other) {
     requireNonNullParam(other, "other", "and");
     if (m_loop != other.m_loop) {
-      m_loop.bind(() -> other.m_state.set(other.m_state.get()));
+      m_loop.bind(() -> other.m_state.set(other.m_signal.getAsBoolean()));
     }
-    return new BooleanEvent(m_loop, () -> m_state.get() && other.m_state.get());
+    return new BooleanEvent(m_loop, () -> m_state.get() && other.m_state.get()) {
+      @Override
+      public boolean getAsBoolean() {
+        return m_signal.getAsBoolean() && other.getAsBoolean();
+      }
+    };
   }
 
   /**
@@ -178,7 +189,12 @@ public class BooleanEvent implements BooleanSupplier {
    */
   public BooleanEvent and(BooleanSupplier other) {
     requireNonNullParam(other, "other", "and");
-    return new BooleanEvent(m_loop, () -> m_state.get() && other.getAsBoolean());
+    return new BooleanEvent(m_loop, () -> m_state.get() && other.getAsBoolean()) {
+      @Override
+      public boolean getAsBoolean() {
+        return m_signal.getAsBoolean() && other.getAsBoolean();
+      }
+    };
   }
 
   /**
@@ -190,12 +206,18 @@ public class BooleanEvent implements BooleanSupplier {
    * @param other the event to compose with
    * @return a signal that is high when either signal is high.
    */
+  @SuppressWarnings("PMD.CompareObjectsWithEquals")
   public BooleanEvent or(BooleanEvent other) {
     requireNonNullParam(other, "other", "or");
     if (m_loop != other.m_loop) {
-      m_loop.bind(() -> other.m_state.set(other.m_state.get()));
+      m_loop.bind(() -> other.m_state.set(other.m_signal.getAsBoolean()));
     }
-    return new BooleanEvent(m_loop, () -> m_state.get() || other.m_state.get());
+    return new BooleanEvent(m_loop, () -> m_state.get() || other.m_state.get()) {
+      @Override
+      public boolean getAsBoolean() {
+        return m_signal.getAsBoolean() || other.getAsBoolean();
+      }
+    };
   }
 
   /**
@@ -207,7 +229,12 @@ public class BooleanEvent implements BooleanSupplier {
    */
   public BooleanEvent or(BooleanSupplier other) {
     requireNonNullParam(other, "other", "or");
-    return new BooleanEvent(m_loop, () -> m_state.get() || other.getAsBoolean());
+    return new BooleanEvent(m_loop, () -> m_state.get() || other.getAsBoolean()) {
+      @Override
+      public boolean getAsBoolean() {
+        return m_signal.getAsBoolean() || other.getAsBoolean();
+      }
+    };
   }
 
   /**

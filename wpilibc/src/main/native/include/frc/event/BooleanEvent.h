@@ -91,6 +91,8 @@ class BooleanEvent {
    */
   BooleanEvent operator&&(std::function<bool()> rhs);
 
+  BooleanEvent operator&&(BooleanEvent rhs);
+
   /**
    * Composes this event with another event, returning a new event that is
    * active when either event is active.

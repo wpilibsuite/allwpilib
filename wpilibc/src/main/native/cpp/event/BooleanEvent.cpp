@@ -3,7 +3,6 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "frc/event/BooleanEvent.h"
-
 using namespace frc;
 
 BooleanEvent::BooleanEvent(EventLoop* loop, std::function<bool()> condition)
@@ -31,6 +30,14 @@ void BooleanEvent::IfHigh(std::function<void()> action) {
 
 BooleanEvent BooleanEvent::operator!() {
   return BooleanEvent(this->m_loop, [state = m_state] { return !*state; });
+}
+
+BooleanEvent BooleanEvent::operator&&(BooleanEvent rhs) {
+  if (m_loop != rhs.m_loop){
+    m_loop->Bind([&rhs] {*rhs.m_state = rhs.m_condition();});
+  }
+  return BooleanEvent(this->m_loop,
+                      [state = m_state, rhs] { return *state && rhs.m_state; });
 }
 
 BooleanEvent BooleanEvent::operator&&(std::function<bool()> rhs) {

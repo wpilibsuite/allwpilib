@@ -5,6 +5,8 @@
 package edu.wpi.first.wpilibj.event;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -34,16 +36,17 @@ class BooleanEventTest {
   void testBinaryCompositionLoopSemantics() {
     var loop1 = new EventLoop();
     var loop2 = new EventLoop();
-
+    var bool1 = new AtomicBoolean(true);
+    var bool2 = new AtomicBoolean(true);
     var counter1 = new AtomicInteger(0);
     var counter2 = new AtomicInteger(0);
 
-    new BooleanEvent(loop1, () -> true)
-        .and(new BooleanEvent(loop2, () -> true))
+    new BooleanEvent(loop1, bool1::get)
+        .and(new BooleanEvent(loop2, bool2::get))
         .ifHigh(counter1::incrementAndGet);
 
-    new BooleanEvent(loop2, () -> true)
-        .and(new BooleanEvent(loop1, () -> true))
+    new BooleanEvent(loop2, bool1::get)
+        .and(new BooleanEvent(loop1, bool2::get))
         .ifHigh(counter2::incrementAndGet);
 
     assertEquals(0, counter1.get());
@@ -58,14 +61,45 @@ class BooleanEventTest {
 
     assertEquals(1, counter1.get());
     assertEquals(1, counter2.get());
+
+    bool2.set(false);
+    loop1.poll();
+
+    assertEquals(1, counter1.get());
+    assertEquals(1, counter2.get());
+  }
+
+  @Test
+  void testLoopValueSemantics() {
+    var loop = new EventLoop();
+    var bool1 = new AtomicBoolean(true);
+    var bool2 = new AtomicBoolean(true);
+    var counter1 = new AtomicInteger(0);
+    var counter2 = new AtomicInteger(0);
+
+    new BooleanEvent(
+            loop,
+            () -> {
+              bool2.set(false);
+              return bool1.get();
+            })
+        .and(new BooleanEvent(loop, bool2::get))
+        .ifHigh(counter1::incrementAndGet);
+
+    assertEquals(0, counter1.get());
+    assertEquals(0, counter2.get());
+
+    loop.poll();
+
+    assertEquals(0, counter1.get());
+    assertEquals(0, counter2.get());
   }
 
   @Test
   void testEdgeDecorators() {
+    var loop = new EventLoop();
     var bool = new AtomicBoolean(false);
     var counter = new AtomicInteger(0);
-
-    var loop = new EventLoop();
 
     new BooleanEvent(loop, bool::get).falling().ifHigh(counter::decrementAndGet);
     new BooleanEvent(loop, bool::get).rising().ifHigh(counter::incrementAndGet);
@@ -228,8 +262,8 @@ class BooleanEventTest {
               bool3.set(false);
               counter.incrementAndGet();
             });
-    event1
-        .and(event3)
+    event2
+        .or(event3)
         .ifHigh(
             () -> {
               bool2.set(false);
@@ -262,6 +296,62 @@ class BooleanEventTest {
     bool2.set(true);
     loop.poll();
 
-    assertEquals(6, counter.get());
+    assertEquals(7, counter.get());
+  }
+
+  @Test
+  void testNegation() {
+    var loop = new EventLoop();
+    var bool = new AtomicBoolean(false);
+    var counter = new AtomicInteger(0);
+
+    var event = new BooleanEvent(loop, bool::get);
+    event.ifHigh(counter::incrementAndGet);
+    event.negate().ifHigh(counter::incrementAndGet);
+
+    assertEquals(0, counter.get());
+
+    loop.poll();
+
+    assertEquals(1, counter.get());
+
+    bool.set(true);
+    loop.poll();
+
+    assertEquals(2, counter.get());
+
+    bool.set(false);
+    loop.poll();
+
+    assertEquals(3, counter.get());
+  }
+
+  @Test
+  void testConditionIsUpdated() {
+    var loop = new EventLoop();
+    var bool1 = new AtomicBoolean(false);
+    var bool2 = new AtomicBoolean(false);
+    var bool3 = new AtomicBoolean(false);
+
+    var event1 = new BooleanEvent(loop, bool1::get).negate();
+    var event2 = new BooleanEvent(loop, bool2::get).and(new BooleanEvent(loop, bool3::get));
+    var event3 = new BooleanEvent(loop, bool2::get).or(new BooleanEvent(loop, bool3::get));
+
+    assertTrue(event1.getAsBoolean());
+    assertFalse(event2.getAsBoolean());
+    assertFalse(event3.getAsBoolean());
+
+    bool1.set(true);
+    bool2.set(true);
+    bool3.set(true);
+
+    assertFalse(event1.getAsBoolean());
+    assertTrue(event2.getAsBoolean());
+    assertTrue(event3.getAsBoolean());
+
+    bool3.set(false);
+
+    assertFalse(event2.getAsBoolean());
+    assertTrue(event3.getAsBoolean());
   }
 }
