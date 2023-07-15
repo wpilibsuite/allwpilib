@@ -206,9 +206,9 @@ public class BooleanEvent implements BooleanSupplier {
     if (other instanceof BooleanEvent) {
       var otherEvent = (BooleanEvent) other;
 
-      // if (m_loop != otherEvent.m_loop) {
-      //   // m_loop.bind(() -> otherEvent.m_state.set(otherEvent.m_signal.getAsBoolean()));
-      // }
+      if (m_loop != otherEvent.m_loop) {
+        m_loop.bind(() -> otherEvent.m_state.set(otherEvent.m_signal.getAsBoolean()));
+      }
       return new BooleanEvent(m_loop, () -> m_state.get() || otherEvent.m_state.get()) {
         @Override
         public boolean getAsBoolean() {
