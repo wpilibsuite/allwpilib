@@ -210,8 +210,8 @@ std::vector<QuinticHermiteSpline> SplineHelper::OptimizeCurvature(
                           Trim(bFinal.y)};
 
     // Calculate the second derivatives at the knot points.
-    frc::Matrixd<4, 1> bases{1.0, 1.0, 1.0, 1.0};
-    auto combinedA = ca.Coefficients() * bases;
+    frc::Vectord<4> bases{1.0, 1.0, 1.0, 1.0};
+    frc::Vectord<6> combinedA = ca.Coefficients() * bases;
 
     double ddxA = combinedA(4);
     double ddyA = combinedA(5);
