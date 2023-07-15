@@ -17,7 +17,7 @@ import java.util.List;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public class SequentialCommandGroup extends CommandBase {
+public class SequentialCommandGroup extends Command {
   private final List<Command> m_commands = new ArrayList<>();
   private int m_currentCommandIndex = -1;
   private boolean m_runWhenDisabled = true;

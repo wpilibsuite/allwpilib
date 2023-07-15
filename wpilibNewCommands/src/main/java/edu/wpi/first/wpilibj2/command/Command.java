@@ -7,6 +7,10 @@ package edu.wpi.first.wpilibj2.command;
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.util.function.BooleanConsumer;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
 
@@ -20,12 +24,19 @@ import java.util.function.BooleanSupplier;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public interface Command {
+public abstract class Command implements Sendable {
+  protected Set<Subsystem> m_requirements = new HashSet<>();
+
+  protected Command() {
+    String name = getClass().getName();
+    SendableRegistry.add(this, name.substring(name.lastIndexOf('.') + 1));
+  }
+
   /** The initial subroutine of a command. Called once when the command is initially scheduled. */
-  default void initialize() {}
+  public void initialize() {}
 
   /** The main body of a command. Called repeatedly while the command is scheduled. */
-  default void execute() {}
+  public void execute() {}
 
   /**
    * The action to take when the command ends. Called when either the command finishes normally, or
@@ -36,7 +47,7 @@ public interface Command {
    *
    * @param interrupted whether the command was interrupted/canceled
    */
-  default void end(boolean interrupted) {}
+  public void end(boolean interrupted) {}
 
   /**
    * Whether the command has finished. Once a command finishes, the scheduler will call its end()
@@ -44,7 +55,7 @@ public interface Command {
    *
    * @return whether the command has finished.
    */
-  default boolean isFinished() {
+  public boolean isFinished() {
     return false;
   }
 
@@ -60,7 +71,63 @@ public interface Command {
    * @return the set of subsystems that are required
    * @see InterruptionBehavior
    */
-  Set<Subsystem> getRequirements();
+  public Set<Subsystem> getRequirements() {
+    return m_requirements;
+  }
+
+  /**
+   * Adds the specified subsystems to the requirements of the command. The scheduler will prevent
+   * two commands that require the same subsystem from being scheduled simultaneously.
+   *
+   * <p>Note that the scheduler determines the requirements of a command when it is scheduled, so
+   * this method should normally be called from the command's constructor.
+   *
+   * @param requirements the requirements to add
+   */
+  public final void addRequirements(Subsystem... requirements) {
+    for (Subsystem requirement : requirements) {
+      m_requirements.add(requireNonNullParam(requirement, "requirement", "addRequirements"));
+    }
+  }
+
+  /**
+   * Gets the name of this Command.
+   *
+   * <p>By default, the simple class name is used. This can be changed with {@link
+   * #setName(String)}.
+   *
+   * @return The display name of the Command
+   */
+  public String getName() {
+    return SendableRegistry.getName(this);
+  }
+
+  /**
+   * Sets the name of this Command.
+   *
+   * @param name The display name of the Command.
+   */
+  public void setName(String name) {
+    SendableRegistry.setName(this, name);
+  }
+
+  /**
+   * Gets the subsystem name of this Command.
+   *
+   * @return Subsystem name
+   */
+  public String getSubsystem() {
+    return SendableRegistry.getSubsystem(this);
+  }
+
+  /**
+   * Sets the subsystem name of this Command.
+   *
+   * @param subsystem subsystem name
+   */
+  public void setSubsystem(String subsystem) {
+    SendableRegistry.setSubsystem(this, subsystem);
+  }
 
   /**
    * Decorates this command with a timeout. If the specified timeout is exceeded before the command
@@ -75,7 +142,7 @@ public interface Command {
    * @param seconds the timeout duration
    * @return the command with the timeout added
    */
-  default ParallelRaceGroup withTimeout(double seconds) {
+  public ParallelRaceGroup withTimeout(double seconds) {
     return raceWith(new WaitCommand(seconds));
   }
 
@@ -93,7 +160,7 @@ public interface Command {
    * @return the command with the interrupt condition added
    * @see #onlyWhile(BooleanSupplier)
    */
-  default ParallelRaceGroup until(BooleanSupplier condition) {
+  public ParallelRaceGroup until(BooleanSupplier condition) {
     return raceWith(new WaitUntilCommand(condition));
   }
 
@@ -111,7 +178,7 @@ public interface Command {
    * @return the command with the run condition added
    * @see #until(BooleanSupplier)
    */
-  default ParallelRaceGroup onlyWhile(BooleanSupplier condition) {
+  public ParallelRaceGroup onlyWhile(BooleanSupplier condition) {
     return until(() -> !condition.getAsBoolean());
   }
 
@@ -128,7 +195,7 @@ public interface Command {
    * @param requirements the required subsystems
    * @return the decorated command
    */
-  default SequentialCommandGroup beforeStarting(Runnable toRun, Subsystem... requirements) {
+  public SequentialCommandGroup beforeStarting(Runnable toRun, Subsystem... requirements) {
     return beforeStarting(new InstantCommand(toRun, requirements));
   }
 
@@ -144,7 +211,7 @@ public interface Command {
    * @param before the command to run before this one
    * @return the decorated command
    */
-  default SequentialCommandGroup beforeStarting(Command before) {
+  public SequentialCommandGroup beforeStarting(Command before) {
     return new SequentialCommandGroup(before, this);
   }
 
@@ -161,7 +228,7 @@ public interface Command {
    * @param requirements the required subsystems
    * @return the decorated command
    */
-  default SequentialCommandGroup andThen(Runnable toRun, Subsystem... requirements) {
+  public SequentialCommandGroup andThen(Runnable toRun, Subsystem... requirements) {
     return andThen(new InstantCommand(toRun, requirements));
   }
 
@@ -178,7 +245,7 @@ public interface Command {
    * @param next the commands to run next
    * @return the decorated command
    */
-  default SequentialCommandGroup andThen(Command... next) {
+  public SequentialCommandGroup andThen(Command... next) {
     SequentialCommandGroup group = new SequentialCommandGroup(this);
     group.addCommands(next);
     return group;
@@ -198,7 +265,7 @@ public interface Command {
    * @param parallel the commands to run in parallel
    * @return the decorated command
    */
-  default ParallelDeadlineGroup deadlineWith(Command... parallel) {
+  public ParallelDeadlineGroup deadlineWith(Command... parallel) {
     return new ParallelDeadlineGroup(this, parallel);
   }
 
@@ -216,7 +283,7 @@ public interface Command {
    * @param parallel the commands to run in parallel
    * @return the decorated command
    */
-  default ParallelCommandGroup alongWith(Command... parallel) {
+  public ParallelCommandGroup alongWith(Command... parallel) {
     ParallelCommandGroup group = new ParallelCommandGroup(this);
     group.addCommands(parallel);
     return group;
@@ -236,7 +303,7 @@ public interface Command {
    * @param parallel the commands to run in parallel
    * @return the decorated command
    */
-  default ParallelRaceGroup raceWith(Command... parallel) {
+  public ParallelRaceGroup raceWith(Command... parallel) {
     ParallelRaceGroup group = new ParallelRaceGroup(this);
     group.addCommands(parallel);
     return group;
@@ -254,7 +321,7 @@ public interface Command {
    *
    * @return the decorated command
    */
-  default RepeatCommand repeatedly() {
+  public RepeatCommand repeatedly() {
     return new RepeatCommand(this);
   }
 
@@ -265,7 +332,7 @@ public interface Command {
    *
    * @return the decorated command
    */
-  default ProxyCommand asProxy() {
+  public ProxyCommand asProxy() {
     return new ProxyCommand(this);
   }
 
@@ -284,7 +351,7 @@ public interface Command {
    * @return the decorated command
    * @see #onlyIf(BooleanSupplier)
    */
-  default ConditionalCommand unless(BooleanSupplier condition) {
+  public ConditionalCommand unless(BooleanSupplier condition) {
     return new ConditionalCommand(new InstantCommand(), this, condition);
   }
 
@@ -303,7 +370,7 @@ public interface Command {
    * @return the decorated command
    * @see #unless(BooleanSupplier)
    */
-  default ConditionalCommand onlyIf(BooleanSupplier condition) {
+  public ConditionalCommand onlyIf(BooleanSupplier condition) {
     return unless(() -> !condition.getAsBoolean());
   }
 
@@ -313,7 +380,7 @@ public interface Command {
    * @param doesRunWhenDisabled true to run when disabled.
    * @return the decorated command
    */
-  default WrapperCommand ignoringDisable(boolean doesRunWhenDisabled) {
+  public WrapperCommand ignoringDisable(boolean doesRunWhenDisabled) {
     return new WrapperCommand(this) {
       @Override
       public boolean runsWhenDisabled() {
@@ -328,7 +395,7 @@ public interface Command {
    * @param interruptBehavior the desired interrupt behavior
    * @return the decorated command
    */
-  default WrapperCommand withInterruptBehavior(InterruptionBehavior interruptBehavior) {
+  public WrapperCommand withInterruptBehavior(InterruptionBehavior interruptBehavior) {
     return new WrapperCommand(this) {
       @Override
       public InterruptionBehavior getInterruptionBehavior() {
@@ -345,7 +412,7 @@ public interface Command {
    *     interrupted.
    * @return the decorated command
    */
-  default WrapperCommand finallyDo(BooleanConsumer end) {
+  public WrapperCommand finallyDo(BooleanConsumer end) {
     requireNonNullParam(end, "end", "Command.finallyDo()");
     return new WrapperCommand(this) {
       @Override
@@ -363,7 +430,7 @@ public interface Command {
    * @param handler a lambda to run when the command is interrupted
    * @return the decorated command
    */
-  default WrapperCommand handleInterrupt(Runnable handler) {
+  public WrapperCommand handleInterrupt(Runnable handler) {
     requireNonNullParam(handler, "handler", "Command.handleInterrupt()");
     return finallyDo(
         interrupted -> {
@@ -374,7 +441,7 @@ public interface Command {
   }
 
   /** Schedules this command. */
-  default void schedule() {
+  public void schedule() {
     CommandScheduler.getInstance().schedule(this);
   }
 
@@ -384,7 +451,7 @@ public interface Command {
    *
    * @see CommandScheduler#cancel(Command...)
    */
-  default void cancel() {
+  public void cancel() {
     CommandScheduler.getInstance().cancel(this);
   }
 
@@ -394,7 +461,7 @@ public interface Command {
    *
    * @return Whether the command is scheduled.
    */
-  default boolean isScheduled() {
+  public boolean isScheduled() {
     return CommandScheduler.getInstance().isScheduled(this);
   }
 
@@ -404,7 +471,7 @@ public interface Command {
    * @param requirement the subsystem to inquire about
    * @return whether the subsystem is required
    */
-  default boolean hasRequirement(Subsystem requirement) {
+  public boolean hasRequirement(Subsystem requirement) {
     return getRequirements().contains(requirement);
   }
 
@@ -414,7 +481,7 @@ public interface Command {
    * @return a variant of {@link InterruptionBehavior}, defaulting to {@link
    *     InterruptionBehavior#kCancelSelf kCancelSelf}.
    */
-  default InterruptionBehavior getInterruptionBehavior() {
+  public InterruptionBehavior getInterruptionBehavior() {
     return InterruptionBehavior.kCancelSelf;
   }
 
@@ -424,25 +491,9 @@ public interface Command {
    *
    * @return whether the command should run when the robot is disabled
    */
-  default boolean runsWhenDisabled() {
+  public boolean runsWhenDisabled() {
     return false;
   }
-
-  /**
-   * Gets the name of this Command. Defaults to the simple class name if not overridden.
-   *
-   * @return The display name of the Command
-   */
-  default String getName() {
-    return this.getClass().getSimpleName();
-  }
-
-  /**
-   * Sets the name of this Command. Nullop if not overridden.
-   *
-   * @param name The display name of the Command.
-   */
-  default void setName(String name) {}
 
   /**
    * Decorates this Command with a name.
@@ -450,17 +501,42 @@ public interface Command {
    * @param name name
    * @return the decorated Command
    */
-  default WrapperCommand withName(String name) {
+  public WrapperCommand withName(String name) {
     WrapperCommand wrapper = new WrapperCommand(Command.this) {};
     wrapper.setName(name);
     return wrapper;
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("Command");
+    builder.addStringProperty(".name", this::getName, null);
+    builder.addBooleanProperty(
+        "running",
+        this::isScheduled,
+        value -> {
+          if (value) {
+            if (!isScheduled()) {
+              schedule();
+            }
+          } else {
+            if (isScheduled()) {
+              cancel();
+            }
+          }
+        });
+    builder.addBooleanProperty(
+        ".isParented", () -> CommandScheduler.getInstance().isComposed(this), null);
+    builder.addStringProperty(
+        "interruptBehavior", () -> getInterruptionBehavior().toString(), null);
+    builder.addBooleanProperty("runsWhenDisabled", this::runsWhenDisabled, null);
   }
 
   /**
    * An enum describing the command's behavior when another command with a shared requirement is
    * scheduled.
    */
-  enum InterruptionBehavior {
+  public enum InterruptionBehavior {
     /**
      * This command ends, {@link #end(boolean) end(true)} is called, and the incoming command is
      * scheduled normally.

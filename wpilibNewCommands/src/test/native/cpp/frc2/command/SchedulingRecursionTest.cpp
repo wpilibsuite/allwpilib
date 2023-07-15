@@ -14,7 +14,7 @@ class SchedulingRecursionTest
     : public CommandTestBaseWithParam<Command::InterruptionBehavior> {};
 
 class SelfCancellingCommand
-    : public CommandHelper<CommandBase, SelfCancellingCommand> {
+    : public CommandHelper<Command, SelfCancellingCommand> {
  public:
   SelfCancellingCommand(CommandScheduler* scheduler, Subsystem* requirement,
                         Command::InterruptionBehavior interruptionBehavior =
@@ -76,7 +76,7 @@ TEST_P(SchedulingRecursionTest,
   EXPECT_TRUE(hasOtherRun);
 }
 
-class CancelEndCommand : public CommandHelper<CommandBase, CancelEndCommand> {
+class CancelEndCommand : public CommandHelper<Command, CancelEndCommand> {
  public:
   CancelEndCommand(CommandScheduler* scheduler, int& counter)
       : m_scheduler(scheduler), m_counter(counter) {}

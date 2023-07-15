@@ -66,7 +66,7 @@ Command::InterruptionBehavior ConditionalCommand::GetInterruptionBehavior()
 }
 
 void ConditionalCommand::InitSendable(wpi::SendableBuilder& builder) {
-  CommandBase::InitSendable(builder);
+  Command::InitSendable(builder);
   builder.AddStringProperty(
       "onTrue", [this] { return m_onTrue->GetName(); }, nullptr);
   builder.AddStringProperty(

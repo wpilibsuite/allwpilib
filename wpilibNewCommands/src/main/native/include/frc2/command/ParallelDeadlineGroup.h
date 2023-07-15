@@ -34,7 +34,7 @@ namespace frc2 {
  * This class is provided by the NewCommands VendorDep
  */
 class ParallelDeadlineGroup
-    : public CommandHelper<CommandBase, ParallelDeadlineGroup> {
+    : public CommandHelper<Command, ParallelDeadlineGroup> {
  public:
   /**
    * Creates a new ParallelDeadlineGroup. The given commands (including the

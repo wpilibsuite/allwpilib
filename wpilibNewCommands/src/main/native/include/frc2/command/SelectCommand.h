@@ -18,7 +18,7 @@
 
 #include <wpi/sendable/SendableBuilder.h>
 
-#include "frc2/command/CommandBase.h"
+#include "frc2/command/Command.h"
 #include "frc2/command/PrintCommand.h"
 
 namespace frc2 {
@@ -35,7 +35,7 @@ namespace frc2 {
  * This class is provided by the NewCommands VendorDep
  */
 template <typename Key>
-class SelectCommand : public CommandHelper<CommandBase, SelectCommand<Key>> {
+class SelectCommand : public CommandHelper<Command, SelectCommand<Key>> {
  public:
   /**
    * Creates a new SelectCommand.
@@ -113,7 +113,7 @@ class SelectCommand : public CommandHelper<CommandBase, SelectCommand<Key>> {
   }
 
   void InitSendable(wpi::SendableBuilder& builder) override {
-    CommandBase::InitSendable(builder);
+    Command::InitSendable(builder);
 
     builder.AddStringProperty(
         "selected",

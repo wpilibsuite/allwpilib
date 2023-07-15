@@ -16,7 +16,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public abstract class ProfiledPIDSubsystem extends SubsystemBase {
+public abstract class ProfiledPIDSubsystem extends Subsystem {
   protected final ProfiledPIDController m_controller;
   protected boolean m_enabled;
 

@@ -41,7 +41,7 @@ bool ProxyCommand::IsFinished() {
 }
 
 void ProxyCommand::InitSendable(wpi::SendableBuilder& builder) {
-  CommandBase::InitSendable(builder);
+  Command::InitSendable(builder);
   builder.AddStringProperty(
       "proxied",
       [this] {

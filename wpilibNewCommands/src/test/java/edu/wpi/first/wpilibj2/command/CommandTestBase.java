@@ -23,6 +23,7 @@ public class CommandTestBase {
     CommandScheduler.getInstance().enable();
     CommandScheduler.getInstance().getActiveButtonLoop().clear();
     CommandScheduler.getInstance().clearComposedCommands();
+    CommandScheduler.getInstance().unregisterAllSubsystems();
 
     setDSEnabled(true);
   }

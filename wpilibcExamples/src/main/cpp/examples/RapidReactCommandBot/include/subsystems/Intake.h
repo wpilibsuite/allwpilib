@@ -9,11 +9,11 @@
 #include <frc/DoubleSolenoid.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc2/command/CommandPtr.h>
-#include <frc2/command/SubsystemBase.h>
+#include <frc2/command/Subsystem.h>
 
 #include "Constants.h"
 
-class Intake : public frc2::SubsystemBase {
+class Intake : public frc2::Subsystem {
  public:
   Intake() = default;
 

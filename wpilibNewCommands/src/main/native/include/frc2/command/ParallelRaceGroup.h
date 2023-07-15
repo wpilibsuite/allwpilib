@@ -32,7 +32,7 @@ namespace frc2 {
  *
  * This class is provided by the NewCommands VendorDep
  */
-class ParallelRaceGroup : public CommandHelper<CommandBase, ParallelRaceGroup> {
+class ParallelRaceGroup : public CommandHelper<Command, ParallelRaceGroup> {
  public:
   /**
    * Creates a new ParallelCommandRace. The given commands will be executed
