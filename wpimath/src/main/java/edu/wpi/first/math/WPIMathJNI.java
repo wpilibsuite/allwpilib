@@ -4,6 +4,8 @@
 
 package edu.wpi.first.math;
 
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Twist3d;
 import edu.wpi.first.util.RuntimeLoader;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -79,26 +81,70 @@ public final class WPIMathJNI {
   /**
    * Obtain a Pose3d from a (constant curvature) velocity.
    *
-   * <p>A Pose3d is represented by [t_x, t_y, t_z, q_w, q_x, q_y, q_z] and a Twist3d is represented
-   * by [dx, dy, dz, rx, ry, rz].
-   *
-   * @param start The starting Pose3d as a double array.
-   * @param twist The twist to apply as a double array.
-   * @return The new pose as a double array.
+   * @param poseX The pose's translational X component.
+   * @param poseY The pose's translational Y component.
+   * @param poseZ The pose's translational Z component.
+   * @param poseQw The pose quaternion's W component.
+   * @param poseQx The pose quaternion's X component.
+   * @param poseQy The pose quaternion's Y component.
+   * @param poseQz The pose quaternion's Z component.
+   * @param twistDx The twist's dx value.
+   * @param twistDy The twist's dy value.
+   * @param twistDz The twist's dz value.
+   * @param twistRx The twist's rx value.
+   * @param twistRy The twist's ry value.
+   * @param twistRz The twist's rz value.
+   * @return The new pose.
    */
-  public static native double[] expPose3d(double[] start, double[] twist);
+  public static native Pose3d expPose3d(
+      double poseX,
+      double poseY,
+      double poseZ,
+      double poseQw,
+      double poseQx,
+      double poseQy,
+      double poseQz,
+      double twistDx,
+      double twistDy,
+      double twistDz,
+      double twistRx,
+      double twistRy,
+      double twistRz);
 
   /**
-   * Returns a Twist3d that maps this pose to the end pose.
+   * Returns a Twist3d that maps the starting pose to the end pose.
    *
-   * <p>A Pose3d is represented by [t_x, t_y, t_z, q_w, q_x, q_y, q_z] and a Twist3d is represented
-   * by [dx, dy, dz, rx, ry, rz].
-   *
-   * @param start The starting Pose3d as a double array.
-   * @param end The ending Pose3d as a double array.
-   * @return The twist that maps start to end as a double array.
+   * @param startX The starting pose's translational X component.
+   * @param startY The starting pose's translational Y component.
+   * @param startZ The starting pose's translational Z component.
+   * @param startQw The starting pose quaternion's W component.
+   * @param startQx The starting pose quaternion's X component.
+   * @param startQy The starting pose quaternion's Y component.
+   * @param startQz The starting pose quaternion's Z component.
+   * @param endX The ending pose's translational X component.
+   * @param endY The ending pose's translational Y component.
+   * @param endZ The ending pose's translational Z component.
+   * @param endQw The ending pose quaternion's W component.
+   * @param endQx The ending pose quaternion's X component.
+   * @param endQy The ending pose quaternion's Y component.
+   * @param endQz The ending pose quaternion's Z component.
+   * @return The twist that maps start to end.
    */
-  public static native double[] logPose3d(double[] start, double[] end);
+  public static native Twist3d logPose3d(
+      double startX,
+      double startY,
+      double startZ,
+      double startQw,
+      double startQx,
+      double startQy,
+      double startQz,
+      double endX,
+      double endY,
+      double endZ,
+      double endQw,
+      double endQx,
+      double endQy,
+      double endQz);
 
   /**
    * Returns true if (A, B) is a stabilizable pair.

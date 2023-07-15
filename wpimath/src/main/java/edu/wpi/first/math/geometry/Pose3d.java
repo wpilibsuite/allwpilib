@@ -195,8 +195,21 @@ public class Pose3d implements Interpolatable<Pose3d> {
    * @return The new pose of the robot.
    */
   public Pose3d exp(Twist3d twist) {
-    return pose3dFromDoubleArray(
-        WPIMathJNI.expPose3d(pose3dToDoubleArray(this), twist3dToDoubleArray(twist)));
+    Quaternion quaternion = this.getRotation().getQuaternion();
+    return WPIMathJNI.expPose3d(
+        this.getX(),
+        this.getY(),
+        this.getZ(),
+        quaternion.getW(),
+        quaternion.getX(),
+        quaternion.getY(),
+        quaternion.getZ(),
+        twist.dx,
+        twist.dy,
+        twist.dz,
+        twist.rx,
+        twist.ry,
+        twist.rz);
   }
 
   /**
@@ -207,8 +220,23 @@ public class Pose3d implements Interpolatable<Pose3d> {
    * @return The twist that maps this to end.
    */
   public Twist3d log(Pose3d end) {
-    return twist3dFromDoubleArray(
-        WPIMathJNI.logPose3d(pose3dToDoubleArray(this), pose3dToDoubleArray(end)));
+    Quaternion thisQuaternion = this.getRotation().getQuaternion();
+    Quaternion endQuaternion = end.getRotation().getQuaternion();
+    return WPIMathJNI.logPose3d(
+        this.getX(),
+        this.getY(),
+        this.getZ(),
+        thisQuaternion.getW(),
+        thisQuaternion.getX(),
+        thisQuaternion.getY(),
+        thisQuaternion.getZ(),
+        end.getX(),
+        end.getY(),
+        end.getZ(),
+        endQuaternion.getW(),
+        endQuaternion.getX(),
+        endQuaternion.getY(),
+        endQuaternion.getZ());
   }
 
   /**
