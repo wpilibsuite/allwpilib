@@ -167,28 +167,22 @@ public class BooleanEvent implements BooleanSupplier {
    * @return the event that is active when both events are active
    */
   @SuppressWarnings("PMD.CompareObjectsWithEquals")
-  public BooleanEvent and(BooleanEvent other) {
-    requireNonNullParam(other, "other", "and");
-    if (m_loop != other.m_loop) {
-      m_loop.bind(() -> other.m_state.set(other.m_signal.getAsBoolean()));
-    }
-    return new BooleanEvent(m_loop, () -> m_state.get() && other.m_state.get()) {
-      @Override
-      public boolean getAsBoolean() {
-        return m_signal.getAsBoolean() && other.getAsBoolean();
-      }
-    };
-  }
-
-  /**
-   * Composes this event with a signal, returning a new signal that is in the high state when both
-   * signals are in the high state.
-   *
-   * @param other the signal to compose with
-   * @return the event that is active when both this event and the supplier are active
-   */
   public BooleanEvent and(BooleanSupplier other) {
     requireNonNullParam(other, "other", "and");
+    if (other instanceof BooleanEvent) {
+      var otherEvent = (BooleanEvent) other;
+
+      if (m_loop != otherEvent.m_loop) {
+        m_loop.bind(() -> otherEvent.m_state.set(otherEvent.m_signal.getAsBoolean()));
+      }
+      return new BooleanEvent(m_loop, () -> m_state.get() && otherEvent.m_state.get()) {
+        @Override
+        public boolean getAsBoolean() {
+          return m_signal.getAsBoolean() && otherEvent.m_signal.getAsBoolean();
+        }
+      };
+    }
+
     return new BooleanEvent(m_loop, () -> m_state.get() && other.getAsBoolean()) {
       @Override
       public boolean getAsBoolean() {
@@ -207,28 +201,21 @@ public class BooleanEvent implements BooleanSupplier {
    * @return a signal that is high when either signal is high.
    */
   @SuppressWarnings("PMD.CompareObjectsWithEquals")
-  public BooleanEvent or(BooleanEvent other) {
-    requireNonNullParam(other, "other", "or");
-    if (m_loop != other.m_loop) {
-      m_loop.bind(() -> other.m_state.set(other.m_signal.getAsBoolean()));
-    }
-    return new BooleanEvent(m_loop, () -> m_state.get() || other.m_state.get()) {
-      @Override
-      public boolean getAsBoolean() {
-        return m_signal.getAsBoolean() || other.getAsBoolean();
-      }
-    };
-  }
-
-  /**
-   * Composes this event with a signal, returning a new signal that is high when either signal is
-   * high.
-   *
-   * @param other the signal to compose with
-   * @return a signal that is high when either signal is high.
-   */
   public BooleanEvent or(BooleanSupplier other) {
     requireNonNullParam(other, "other", "or");
+    if (other instanceof BooleanEvent) {
+      var otherEvent = (BooleanEvent) other;
+
+      // if (m_loop != otherEvent.m_loop) {
+      //   // m_loop.bind(() -> otherEvent.m_state.set(otherEvent.m_signal.getAsBoolean()));
+      // }
+      return new BooleanEvent(m_loop, () -> m_state.get() || otherEvent.m_state.get()) {
+        @Override
+        public boolean getAsBoolean() {
+          return m_signal.getAsBoolean() || otherEvent.m_signal.getAsBoolean();
+        }
+      };
+    }
     return new BooleanEvent(m_loop, () -> m_state.get() || other.getAsBoolean()) {
       @Override
       public boolean getAsBoolean() {
