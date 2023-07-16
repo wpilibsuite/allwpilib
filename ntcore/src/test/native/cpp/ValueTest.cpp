@@ -385,8 +385,8 @@ TEST_F(ValueTest, FloatArrayComparison) {
 
   // empty
   vec = {};
-  v1 = Value::MakeDoubleArray(vec);
-  v2 = Value::MakeDoubleArray(vec);
+  v1 = Value::MakeFloatArray(vec);
+  v2 = Value::MakeFloatArray(vec);
   ASSERT_EQ(v1, v2);
 }
 
