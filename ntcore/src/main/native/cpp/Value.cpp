@@ -325,6 +325,9 @@ bool nt::operator==(const Value& lhs, const Value& rhs) {
       if (lhs.m_val.data.arr_int.size != rhs.m_val.data.arr_int.size) {
         return false;
       }
+      if (lhs.m_val.data.arr_int.arr == nullptr && rhs.m_val.data.arr_int.arr == nullptr){
+        return true;
+      }
       return std::memcmp(lhs.m_val.data.arr_int.arr, rhs.m_val.data.arr_int.arr,
                          lhs.m_val.data.arr_int.size *
                              sizeof(lhs.m_val.data.arr_int.arr[0])) == 0;
