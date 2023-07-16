@@ -6,9 +6,6 @@ package edu.wpi.first.math;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Twist3d;
 import org.junit.jupiter.api.Test;
 
 public class WPIMathJNITest {

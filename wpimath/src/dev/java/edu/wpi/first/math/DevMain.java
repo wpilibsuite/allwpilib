@@ -9,7 +9,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Twist3d;
 
 public final class DevMain {
-  public static double timePose3dExpMicros(Pose3d start, Twist3d twist, int count) {
+  private static double timePose3dExpMicros(Pose3d start, Twist3d twist, int count) {
     final long startTime = System.nanoTime();
     for (int i = 0; i < count; i++) {
       start.exp(twist);
@@ -19,7 +19,7 @@ public final class DevMain {
     return totalTimeMicros / count;
   }
 
-  public static double timePose3dLogMicros(Pose3d start, Pose3d end, int count) {
+  private static double timePose3dLogMicros(Pose3d start, Pose3d end, int count) {
     final long startTime = System.nanoTime();
     for (int i = 0; i < count; i++) {
       start.log(end);
@@ -29,7 +29,7 @@ public final class DevMain {
     return totalTimeMicros / count;
   }
 
-  public static void timeSuitePose3dExp() {
+  private static void timeSuitePose3dExp() {
     final var start = new Pose3d(1, 0, 0, new Rotation3d(0, -Math.PI / 2, 0));
     final var twist = new Twist3d(0, 0, 0, Math.PI, 0, 0);
     final int warmupCount = 100_000;
@@ -45,11 +45,12 @@ public final class DevMain {
             + "µs");
     System.out.println("  iterations per run: " + normalCount);
     for (int i = 1; i <= 5; i++) {
-      System.out.println("  run " + i + ": average " + timePose3dExpMicros(start, twist, normalCount) + "μs");
+      System.out.println(
+          "  run " + i + ": average " + timePose3dExpMicros(start, twist, normalCount) + "μs");
     }
   }
 
-  public static void timeSuitePose3dLog() {
+  private static void timeSuitePose3dLog() {
     final var start = new Pose3d(1, 0, 0, new Rotation3d(0, -Math.PI / 2, 0));
     final var end = new Pose3d(0, 1, 0, new Rotation3d(Math.PI / 2, 0, 0));
     final int warmupCount = 100_000;
@@ -65,7 +66,8 @@ public final class DevMain {
             + "µs");
     System.out.println("  iterations per run: " + normalCount);
     for (int i = 1; i <= 5; i++) {
-      System.out.println("  run " + i + ": average " + timePose3dLogMicros(start, end, normalCount) + "μs");
+      System.out.println(
+          "  run " + i + ": average " + timePose3dLogMicros(start, end, normalCount) + "μs");
     }
   }
 
