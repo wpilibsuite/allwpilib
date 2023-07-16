@@ -317,27 +317,62 @@ TEST(BooleanEventTest, ConditionIsUpdated) {
   bool boolean1 = false;
   bool boolean2 = false;
   bool boolean3 = false;
-  int counter = 0;
+  bool boolean4 = false;
+  bool boolean5 = false;
 
   auto event1 = !BooleanEvent(&loop, [&] { return boolean1; });
   auto event2 = BooleanEvent(&loop, [&] { return boolean2; }) &&
                 BooleanEvent(&loop, [&] { return boolean3; });
-  auto event3 = BooleanEvent(&loop, [&] { return boolean2; }) ||
-                BooleanEvent(&loop, [&] { return boolean3; });
+  auto event3 = BooleanEvent(&loop, [&] { return boolean4; }) ||
+                BooleanEvent(&loop, [&] { return boolean5; });
+  auto event4 = event2 && event3;
+  auto event5 = event3 || event2;
+  auto event6 = !event1;
 
   EXPECT_TRUE(event1.GetAsBoolean());
   EXPECT_FALSE(event2.GetAsBoolean());
   EXPECT_FALSE(event3.GetAsBoolean());
+  EXPECT_FALSE(event4.GetAsBoolean());
+  EXPECT_FALSE(event5.GetAsBoolean());
+  EXPECT_FALSE(event6.GetAsBoolean());
 
-  boolean1 = true;
-  boolean2 = true;
-  boolean3 = true;
+  boolean1.set(true);
+  boolean2.set(true);
+  boolean3.set(true);
 
   EXPECT_FALSE(event1.GetAsBoolean());
   EXPECT_TRUE(event2.GetAsBoolean());
-  EXPECT_TRUE(event3.GetAsBoolean());
+  EXPECT_FALSE(event3.GetAsBoolean());
+  EXPECT_FALSE(event4.GetAsBoolean());
+  EXPECT_TRUE(event5.GetAsBoolean());
+  EXPECT_TRUE(event6.GetAsBoolean());
 
-  boolean3 = true;
-  EXPECT_FALSE(event2.GetAsBoolean());
+  boolean4.set(true);
+
   EXPECT_TRUE(event3.GetAsBoolean());
+  EXPECT_TRUE(event4.GetAsBoolean());
+  EXPECT_TRUE(event5.GetAsBoolean());
+
+  boolean1.set(false);
+
+  EXPECT_TRUE(event1.GetAsBoolean());
+  EXPECT_FALSE(event6.GetAsBoolean());
+
+  boolean2.set(false);
+
+  EXPECT_FALSE(event2.GetAsBoolean());
+  EXPECT_FALSE(event4.GetAsBoolean());
+  EXPECT_TRUE(event5.GetAsBoolean());
+
+  boolean4.set(false);
+
+  EXPECT_FALSE(event3.GetAsBoolean());
+  EXPECT_FALSE(event4.GetAsBoolean());
+  EXPECT_FALSE(event5.GetAsBoolean());
+
+  boolean5.set(true);
+
+  EXPECT_TRUE(event3.GetAsBoolean());
+  EXPECT_FALSE(event4.GetAsBoolean());
+  EXPECT_TRUE(event5.GetAsBoolean());
 }

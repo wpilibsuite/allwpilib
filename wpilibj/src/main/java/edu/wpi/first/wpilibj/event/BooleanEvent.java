@@ -152,7 +152,7 @@ public class BooleanEvent implements BooleanSupplier {
     return new BooleanEvent(m_loop, () -> !m_state.get()) {
       @Override
       public boolean getAsBoolean() {
-        return !m_signal.getAsBoolean();
+        return !BooleanEvent.this.getAsBoolean();
       }
     };
   }
@@ -178,15 +178,14 @@ public class BooleanEvent implements BooleanSupplier {
       return new BooleanEvent(m_loop, () -> m_state.get() && otherEvent.m_state.get()) {
         @Override
         public boolean getAsBoolean() {
-          return m_signal.getAsBoolean() && otherEvent.m_signal.getAsBoolean();
+          return BooleanEvent.this.getAsBoolean() && otherEvent.getAsBoolean();
         }
       };
     }
-
     return new BooleanEvent(m_loop, () -> m_state.get() && other.getAsBoolean()) {
       @Override
       public boolean getAsBoolean() {
-        return m_signal.getAsBoolean() && other.getAsBoolean();
+        return BooleanEvent.this.getAsBoolean() && other.getAsBoolean();
       }
     };
   }
@@ -212,14 +211,14 @@ public class BooleanEvent implements BooleanSupplier {
       return new BooleanEvent(m_loop, () -> m_state.get() || otherEvent.m_state.get()) {
         @Override
         public boolean getAsBoolean() {
-          return m_signal.getAsBoolean() || otherEvent.m_signal.getAsBoolean();
+          return BooleanEvent.this.getAsBoolean() || otherEvent.getAsBoolean();
         }
       };
     }
     return new BooleanEvent(m_loop, () -> m_state.get() || other.getAsBoolean()) {
       @Override
       public boolean getAsBoolean() {
-        return m_signal.getAsBoolean() || other.getAsBoolean();
+        return BooleanEvent.this.getAsBoolean() || other.getAsBoolean();
       }
     };
   }
