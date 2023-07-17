@@ -11,32 +11,44 @@ import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.StringLogEntry;
 
 public final class DevMain {
-  private static double timePose3dExpMicros(
+  private static double[] timePose3dExpMicros(
       StringLogEntry discardEntry, Pose3d start, Twist3d twist, int count) {
-    long totalNanos = 0;
+    double[] times = new double[count];
     for (int i = 0; i < count; i++) {
       final long startTime = System.nanoTime();
       final var result = start.exp(twist);
       final long endTime = System.nanoTime();
-      totalNanos += endTime - startTime;
+      times[i] = (endTime - startTime) / 1000.0;
       discardEntry.append(result.toString());
     }
-    double totalTimeMicros = totalNanos / 1000.0;
-    return totalTimeMicros / count;
+    return times;
   }
 
-  private static double timePose3dLogMicros(
+  private static double[] timePose3dLogMicros(
       StringLogEntry discardEntry, Pose3d start, Pose3d end, int count) {
-    long totalNanos = 0;
+    double[] times = new double[count];
     for (int i = 0; i < count; i++) {
       final long startTime = System.nanoTime();
       final var result = start.log(end);
       final long endTime = System.nanoTime();
-      totalNanos += endTime - startTime;
+      times[i] = (endTime - startTime) / 1000.0;
       discardEntry.append(result.toString());
     }
-    double totalTimeMicros = totalNanos / 1000.0;
-    return totalTimeMicros / count;
+    return times;
+  }
+
+  private static String summarizeMicros(double[] times) {
+    double total = 0;
+    for (double time : times) {
+      total += time;
+    }
+    double mean = total / times.length;
+    double sumsOfSquares = 0;
+    for (double time : times) {
+      sumsOfSquares += (time - mean) * (time - mean);
+    }
+    double stdDev = Math.sqrt(sumsOfSquares / times.length);
+    return "mean " + mean + "µs, std dev " + stdDev + "µs";
   }
 
   private static void timeSuitePose3dExp(StringLogEntry discardEntry) {
@@ -50,17 +62,15 @@ public final class DevMain {
     System.out.println(
         "  warm up ("
             + warmupCount
-            + " iterations): average "
-            + timePose3dExpMicros(discardEntry, start, twist, warmupCount)
-            + "µs");
+            + " iterations): "
+            + summarizeMicros(timePose3dExpMicros(discardEntry, start, twist, warmupCount)));
     System.out.println("  iterations per run: " + normalCount);
     for (int i = 1; i <= 5; i++) {
       System.out.println(
           "  run "
               + i
-              + ": average "
-              + timePose3dExpMicros(discardEntry, start, twist, normalCount)
-              + "μs");
+              + ": "
+              + summarizeMicros(timePose3dExpMicros(discardEntry, start, twist, normalCount)));
     }
   }
 
@@ -75,17 +85,15 @@ public final class DevMain {
     System.out.println(
         "  warm up ("
             + warmupCount
-            + " iterations): average "
-            + timePose3dLogMicros(discardEntry, start, end, warmupCount)
-            + "µs");
+            + " iterations): "
+            + summarizeMicros(timePose3dLogMicros(discardEntry, start, end, warmupCount)));
     System.out.println("  iterations per run: " + normalCount);
     for (int i = 1; i <= 5; i++) {
       System.out.println(
           "  run "
               + i
-              + ": average "
-              + timePose3dLogMicros(discardEntry, start, end, normalCount)
-              + "μs");
+              + ": "
+              + summarizeMicros(timePose3dLogMicros(discardEntry, start, end, normalCount)));
     }
   }
 
