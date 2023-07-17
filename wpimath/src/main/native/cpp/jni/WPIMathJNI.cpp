@@ -58,97 +58,6 @@ bool IsStabilizable(const Eigen::Ref<const Eigen::MatrixXd>& A,
 
 }  // namespace
 
-static JClass pose3dCls;
-static JClass quaternionCls;
-static JClass rotation3dCls;
-static JClass translation3dCls;
-static JClass twist3dCls;
-
-static const JClassInit classes[] = {
-    {"edu/wpi/first/math/geometry/Pose3d", &pose3dCls},
-    {"edu/wpi/first/math/geometry/Quaternion", &quaternionCls},
-    {"edu/wpi/first/math/geometry/Rotation3d", &rotation3dCls},
-    {"edu/wpi/first/math/geometry/Translation3d", &translation3dCls},
-    {"edu/wpi/first/math/geometry/Twist3d", &twist3dCls}};
-
-extern "C" {
-
-JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
-  JNIEnv* env;
-  if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
-    return JNI_ERR;
-  }
-
-  for (auto& c : classes) {
-    *c.cls = JClass(env, c.name);
-    if (!*c.cls) {
-      return JNI_ERR;
-    }
-  }
-
-  return JNI_VERSION_1_6;
-}
-
-JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
-  JNIEnv* env;
-  if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
-    return;
-  }
-
-  for (auto& c : classes) {
-    c.cls->free(env);
-  }
-}
-
-}  // extern "C"
-
-jobject MakeJObject(JNIEnv* env, const frc::Pose3d& pose) {
-  static jmethodID quaternionCtor = nullptr;
-  static jmethodID rotation3dCtor = nullptr;
-  static jmethodID pose3dCtor = nullptr;
-  static jmethodID translation3dCtor = nullptr;
-  static bool loaded = false;
-  if (!loaded) {
-    quaternionCtor = env->GetMethodID(quaternionCls, "<init>", "(DDDD)V");
-    rotation3dCtor = env->GetMethodID(
-        rotation3dCls, "<init>", "(Ledu/wpi/first/math/geometry/Quaternion;)V");
-    pose3dCtor =
-        env->GetMethodID(pose3dCls, "<init>",
-                         "(Ledu/wpi/first/math/geometry/Translation3d;Ledu/wpi/"
-                         "first/math/geometry/Rotation3d;)V");
-    translation3dCtor = env->GetMethodID(translation3dCls, "<init>", "(DDD)V");
-    loaded = true;
-  }
-
-  const frc::Quaternion& quaternion = pose.Rotation().GetQuaternion();
-
-  jobject jTranslation =
-      env->NewObject(translation3dCls, translation3dCtor, pose.X().value(),
-                     pose.Y().value(), pose.Z().value());
-  jobject jQuaternion =
-      env->NewObject(quaternionCls, quaternionCtor, quaternion.W(),
-                     quaternion.X(), quaternion.Y(), quaternion.Z());
-  jobject jRotation =
-      env->NewObject(rotation3dCls, rotation3dCtor, jQuaternion);
-  jobject jPose =
-      env->NewObject(pose3dCls, pose3dCtor, jTranslation, jRotation);
-
-  return jPose;
-}
-
-jobject MakeJObject(JNIEnv* env, const frc::Twist3d& twist) {
-  static jmethodID twist3dCtor = nullptr;
-  if (!twist3dCtor) {
-    twist3dCtor = env->GetMethodID(twist3dCls, "<init>", "(DDDDDD)V");
-  }
-
-  jobject jTwist = env->NewObject(
-      twist3dCls, twist3dCtor, twist.dx.value(), twist.dy.value(),
-      twist.dz.value(), twist.rx.value(), twist.ry.value(), twist.rz.value());
-
-  return jTwist;
-}
-
 std::vector<double> GetElementsFromTrajectory(
     const frc::Trajectory& trajectory) {
   std::vector<double> elements;
@@ -282,9 +191,9 @@ Java_edu_wpi_first_math_WPIMathJNI_pow
 /*
  * Class:     edu_wpi_first_math_WPIMathJNI
  * Method:    expPose3d
- * Signature: (DDDDDDDDDDDDD)Ljava/lang/Object;
+ * Signature: (DDDDDDDDDDDDD)[D
  */
-JNIEXPORT jobject JNICALL
+JNIEXPORT jdoubleArray JNICALL
 Java_edu_wpi_first_math_WPIMathJNI_expPose3d
   (JNIEnv* env, jclass, jdouble poseX, jdouble poseY, jdouble poseZ,
    jdouble poseQw, jdouble poseQx, jdouble poseQy, jdouble poseQz,
@@ -300,15 +209,27 @@ Java_edu_wpi_first_math_WPIMathJNI_expPose3d
 
   frc::Pose3d result = pose.Exp(twist);
 
-  return MakeJObject(env, result);
+  jdoubleArray resultArray = env->NewDoubleArray(7);
+  jdouble* nativeResultArray =
+      env->GetDoubleArrayElements(resultArray, nullptr);
+  const frc::Quaternion& resultQuaternion = result.Rotation().GetQuaternion();
+  nativeResultArray[0] = result.X().value();
+  nativeResultArray[1] = result.Y().value();
+  nativeResultArray[2] = result.Z().value();
+  nativeResultArray[3] = resultQuaternion.W();
+  nativeResultArray[4] = resultQuaternion.X();
+  nativeResultArray[5] = resultQuaternion.Y();
+  nativeResultArray[6] = resultQuaternion.Z();
+  env->ReleaseDoubleArrayElements(resultArray, nativeResultArray, 0);
+  return resultArray;
 }
 
 /*
  * Class:     edu_wpi_first_math_WPIMathJNI
  * Method:    logPose3d
- * Signature: (DDDDDDDDDDDDDD)Ljava/lang/Object;
+ * Signature: (DDDDDDDDDDDDDD)[D
  */
-JNIEXPORT jobject JNICALL
+JNIEXPORT jdoubleArray JNICALL
 Java_edu_wpi_first_math_WPIMathJNI_logPose3d
   (JNIEnv* env, jclass, jdouble startX, jdouble startY, jdouble startZ,
    jdouble startQw, jdouble startQx, jdouble startQy, jdouble startQz,
@@ -324,7 +245,17 @@ Java_edu_wpi_first_math_WPIMathJNI_logPose3d
 
   frc::Twist3d result = startPose.Log(endPose);
 
-  return MakeJObject(env, result);
+  jdoubleArray resultArray = env->NewDoubleArray(6);
+  jdouble* nativeResultArray =
+      env->GetDoubleArrayElements(resultArray, nullptr);
+  nativeResultArray[0] = result.dx.value();
+  nativeResultArray[1] = result.dy.value();
+  nativeResultArray[2] = result.dz.value();
+  nativeResultArray[3] = result.rx.value();
+  nativeResultArray[4] = result.ry.value();
+  nativeResultArray[5] = result.rz.value();
+  env->ReleaseDoubleArrayElements(resultArray, nativeResultArray, 0);
+  return resultArray;
 }
 
 /*

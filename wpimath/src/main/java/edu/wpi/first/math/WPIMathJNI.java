@@ -4,8 +4,6 @@
 
 package edu.wpi.first.math;
 
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Twist3d;
 import edu.wpi.first.util.RuntimeLoader;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -81,6 +79,8 @@ public final class WPIMathJNI {
   /**
    * Obtain a Pose3d from a (constant curvature) velocity.
    *
+   * <p>The double array returned is of the form [dx, dy, dz, qx, qy, qz].
+   *
    * @param poseX The pose's translational X component.
    * @param poseY The pose's translational Y component.
    * @param poseZ The pose's translational Z component.
@@ -94,9 +94,9 @@ public final class WPIMathJNI {
    * @param twistRx The twist's rx value.
    * @param twistRy The twist's ry value.
    * @param twistRz The twist's rz value.
-   * @return The new pose.
+   * @return The new pose as a double array.
    */
-  public static native Pose3d expPose3d(
+  public static native double[] expPose3d(
       double poseX,
       double poseY,
       double poseZ,
@@ -114,6 +114,8 @@ public final class WPIMathJNI {
   /**
    * Returns a Twist3d that maps the starting pose to the end pose.
    *
+   * <p>The double array returned is of the form [dx, dy, dz, rx, ry, rz].
+   *
    * @param startX The starting pose's translational X component.
    * @param startY The starting pose's translational Y component.
    * @param startZ The starting pose's translational Z component.
@@ -128,9 +130,9 @@ public final class WPIMathJNI {
    * @param endQx The ending pose quaternion's X component.
    * @param endQy The ending pose quaternion's Y component.
    * @param endQz The ending pose quaternion's Z component.
-   * @return The twist that maps start to end.
+   * @return The twist that maps start to end as a double array.
    */
-  public static native Twist3d logPose3d(
+  public static native double[] logPose3d(
       double startX,
       double startY,
       double startZ,

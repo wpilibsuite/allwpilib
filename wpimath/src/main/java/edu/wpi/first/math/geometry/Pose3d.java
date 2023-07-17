@@ -196,20 +196,27 @@ public class Pose3d implements Interpolatable<Pose3d> {
    */
   public Pose3d exp(Twist3d twist) {
     var quaternion = this.getRotation().getQuaternion();
-    return WPIMathJNI.expPose3d(
-        this.getX(),
-        this.getY(),
-        this.getZ(),
-        quaternion.getW(),
-        quaternion.getX(),
-        quaternion.getY(),
-        quaternion.getZ(),
-        twist.dx,
-        twist.dy,
-        twist.dz,
-        twist.rx,
-        twist.ry,
-        twist.rz);
+    double[] resultArray =
+        WPIMathJNI.expPose3d(
+            this.getX(),
+            this.getY(),
+            this.getZ(),
+            quaternion.getW(),
+            quaternion.getX(),
+            quaternion.getY(),
+            quaternion.getZ(),
+            twist.dx,
+            twist.dy,
+            twist.dz,
+            twist.rx,
+            twist.ry,
+            twist.rz);
+    return new Pose3d(
+        resultArray[0],
+        resultArray[1],
+        resultArray[2],
+        new Rotation3d(
+            new Quaternion(resultArray[3], resultArray[4], resultArray[5], resultArray[6])));
   }
 
   /**
@@ -222,21 +229,29 @@ public class Pose3d implements Interpolatable<Pose3d> {
   public Twist3d log(Pose3d end) {
     var thisQuaternion = this.getRotation().getQuaternion();
     var endQuaternion = end.getRotation().getQuaternion();
-    return WPIMathJNI.logPose3d(
-        this.getX(),
-        this.getY(),
-        this.getZ(),
-        thisQuaternion.getW(),
-        thisQuaternion.getX(),
-        thisQuaternion.getY(),
-        thisQuaternion.getZ(),
-        end.getX(),
-        end.getY(),
-        end.getZ(),
-        endQuaternion.getW(),
-        endQuaternion.getX(),
-        endQuaternion.getY(),
-        endQuaternion.getZ());
+    double[] resultArray =
+        WPIMathJNI.logPose3d(
+            this.getX(),
+            this.getY(),
+            this.getZ(),
+            thisQuaternion.getW(),
+            thisQuaternion.getX(),
+            thisQuaternion.getY(),
+            thisQuaternion.getZ(),
+            end.getX(),
+            end.getY(),
+            end.getZ(),
+            endQuaternion.getW(),
+            endQuaternion.getX(),
+            endQuaternion.getY(),
+            endQuaternion.getZ());
+    return new Twist3d(
+        resultArray[0],
+        resultArray[1],
+        resultArray[2],
+        resultArray[3],
+        resultArray[4],
+        resultArray[5]);
   }
 
   /**
