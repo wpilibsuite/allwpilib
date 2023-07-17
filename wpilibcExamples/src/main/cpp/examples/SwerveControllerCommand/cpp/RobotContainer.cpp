@@ -40,7 +40,8 @@ RobotContainer::RobotContainer() {
             // max speed forwards], converting them to actual units.
             m_driverController.GetLeftY() * AutoConstants::kMaxSpeed,
             m_driverController.GetLeftX() * AutoConstants::kMaxSpeed,
-            m_driverController.GetRightX() * AutoConstants::kMaxAngularSpeed, false);
+            m_driverController.GetRightX() * AutoConstants::kMaxAngularSpeed,
+            false);
       },
       {&m_drive}));
 }
