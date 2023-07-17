@@ -34,10 +34,9 @@ RobotContainer::RobotContainer() {
   // Turning is controlled by the X axis of the right stick.
   m_drive.SetDefaultCommand(frc2::RunCommand(
       [this] {
-        m_drive.Drive(
-            units::meters_per_second_t{m_driverController.GetLeftY()},
-            units::meters_per_second_t{m_driverController.GetLeftX()},
-            units::radians_per_second_t{m_driverController.GetRightX()}, false);
+        m_drive.Drive(m_driverController.GetLeftY() * kMaxSpeed,
+            m_driverController.GetLeftX() * kMaxSpeed,
+            m_driverController.GetRightX() * kMaxAngularSpeed, false);
       },
       {&m_drive}));
 }
