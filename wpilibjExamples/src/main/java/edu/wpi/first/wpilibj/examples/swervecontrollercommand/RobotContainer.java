@@ -15,6 +15,7 @@ import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.examples.swervecontrollercommand.Constants.AutoConstants;
 import edu.wpi.first.wpilibj.examples.swervecontrollercommand.Constants.DriveConstants;
+import edu.wpi.first.wpilibj.examples.swervecontrollercommand.Constants.ModuleConstants;
 import edu.wpi.first.wpilibj.examples.swervecontrollercommand.Constants.OIConstants;
 import edu.wpi.first.wpilibj.examples.swervecontrollercommand.subsystems.DriveSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -48,9 +49,11 @@ public class RobotContainer {
         new RunCommand(
             () ->
                 m_robotDrive.drive(
-                    m_driverController.getLeftY(),
-                    m_driverController.getLeftX(),
-                    m_driverController.getRightX(),
+                    // Multiply by max speed to map the joystick unitless inputs to actual units.
+                    // This will map the [-1, 1] to [max speed backwards, max speed forwards], converting them to actual units.
+                    m_driverController.getLeftY() * DriveConstants.kMaxSpeedMetersPerSecond,
+                    m_driverController.getLeftX() * DriveConstants.kMaxSpeedMetersPerSecond,
+                    m_driverController.getRightX() * ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond,
                     false),
             m_robotDrive));
   }
