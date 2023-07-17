@@ -212,7 +212,7 @@ Java_edu_wpi_first_math_WPIMathJNI_expPose3d
   jdoubleArray resultArray = env->NewDoubleArray(7);
   jdouble* nativeResultArray =
       env->GetDoubleArrayElements(resultArray, nullptr);
-  const frc::Quaternion& resultQuaternion = result.Rotation().GetQuaternion();
+  const auto& resultQuaternion = result.Rotation().GetQuaternion();
   nativeResultArray[0] = result.X().value();
   nativeResultArray[1] = result.Y().value();
   nativeResultArray[2] = result.Z().value();
