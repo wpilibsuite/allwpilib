@@ -35,8 +35,8 @@ RobotContainer::RobotContainer() {
   m_drive.SetDefaultCommand(frc2::RunCommand(
       [this] {
         m_drive.Drive(m_driverController.GetLeftY() * kMaxSpeed,
-            m_driverController.GetLeftX() * kMaxSpeed,
-            m_driverController.GetRightX() * kMaxAngularSpeed, false);
+                      m_driverController.GetLeftX() * kMaxSpeed,
+                      m_driverController.GetRightX() * kMaxAngularSpeed, false);
       },
       {&m_drive}));
 }

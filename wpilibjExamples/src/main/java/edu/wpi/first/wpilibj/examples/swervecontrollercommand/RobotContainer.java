@@ -50,10 +50,12 @@ public class RobotContainer {
             () ->
                 m_robotDrive.drive(
                     // Multiply by max speed to map the joystick unitless inputs to actual units.
-                    // This will map the [-1, 1] to [max speed backwards, max speed forwards], converting them to actual units.
+                    // This will map the [-1, 1] to [max speed backwards, max speed forwards],
+                    // converting them to actual units.
                     m_driverController.getLeftY() * DriveConstants.kMaxSpeedMetersPerSecond,
                     m_driverController.getLeftX() * DriveConstants.kMaxSpeedMetersPerSecond,
-                    m_driverController.getRightX() * ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond,
+                    m_driverController.getRightX()
+                        * ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond,
                     false),
             m_robotDrive));
   }
