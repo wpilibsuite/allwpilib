@@ -40,7 +40,7 @@ void RobotContainer::ConfigureButtonBindings() {
       frc2::TrapezoidProfileCommand<units::meters>(
           frc::TrapezoidProfile<units::meters>(
               // Limit the max acceleration and velocity
-              {DriveConstants::kMaxSpeed, DriveConstants::kMaxAcceleration}, ),
+              {DriveConstants::kMaxSpeed, DriveConstants::kMaxAcceleration}),
           // Pipe the profile state to the drive
           [this](auto setpointState) {
             m_drive.SetDriveStates(setpointState, setpointState);

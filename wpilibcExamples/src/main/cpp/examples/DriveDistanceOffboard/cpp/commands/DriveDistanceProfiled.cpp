@@ -19,7 +19,7 @@ DriveDistanceProfiled::DriveDistanceProfiled(units::meter_t distance,
             drive->SetDriveStates(setpointState, setpointState);
           },
           // End at desired position in meters; implicitly starts at 0
-          [] {
+          [distance] {
             return frc::TrapezoidProfile<units::meters>::State{distance, 0_mps};
           },
           [] { return frc::TrapezoidProfile<units::meters>::State{}; },

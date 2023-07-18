@@ -77,7 +77,7 @@ class TrapezoidProfile {
    *
    * @param constraints The constraints on the profile, like maximum velocity.
    */
-  TrapezoidProfile(Constraints constraints); // NOLINT
+  TrapezoidProfile(Constraints constraints);  // NOLINT
 
   TrapezoidProfile(const TrapezoidProfile&) = default;
   TrapezoidProfile& operator=(const TrapezoidProfile&) = default;
