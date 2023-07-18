@@ -86,7 +86,8 @@ class Robot : public frc::TimedRobot {
   frc::PWMSparkMax m_motor{kMotorPort};
   frc::XboxController m_joystick{kJoystickPort};
 
-  frc::TrapezoidProfile<units::radians> m_profile{{45_deg_per_s, 90_deg_per_s / 1_s}};
+  frc::TrapezoidProfile<units::radians> m_profile{
+      {45_deg_per_s, 90_deg_per_s / 1_s}};
 
   frc::TrapezoidProfile<units::radians>::State m_lastProfiledReference;
 
