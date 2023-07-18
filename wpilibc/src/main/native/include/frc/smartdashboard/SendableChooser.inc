@@ -102,7 +102,7 @@ void SendableChooser<T>::InitSendable(nt::NTSendableBuilder& builder) {
       nullptr);
   builder.AddStringProperty(kSelected, nullptr,
                             [=, this](std::string_view val) {
-                              T choice;
+                              T choice{};
                               std::function<void(T)> listener;
                               {
                                 std::scoped_lock lock(m_mutex);
