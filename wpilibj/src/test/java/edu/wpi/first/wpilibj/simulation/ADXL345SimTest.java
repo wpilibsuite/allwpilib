@@ -11,14 +11,13 @@ import edu.wpi.first.wpilibj.ADXL345_I2C;
 import edu.wpi.first.wpilibj.ADXL345_SPI;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.SPI;
-import edu.wpi.first.wpilibj.interfaces.Accelerometer;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 class ADXL345SimTest {
   @ParameterizedTest
-  @EnumSource(Accelerometer.Range.class)
-  void testInitI2C(Accelerometer.Range range) {
+  @EnumSource(ADXL345_I2C.Range.class)
+  void testInitI2C(ADXL345_I2C.Range range) {
     HAL.initialize(500, 0);
 
     try (ADXL345_I2C accel = new ADXL345_I2C(I2C.Port.kMXP, range)) {
@@ -40,8 +39,8 @@ class ADXL345SimTest {
   }
 
   @ParameterizedTest
-  @EnumSource(Accelerometer.Range.class)
-  void testInitSPi(Accelerometer.Range range) {
+  @EnumSource(ADXL345_SPI.Range.class)
+  void testInitSPi(ADXL345_SPI.Range range) {
     HAL.initialize(500, 0);
 
     try (ADXL345_SPI accel = new ADXL345_SPI(SPI.Port.kMXP, range)) {
