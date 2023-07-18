@@ -31,7 +31,7 @@ template <class T>
   requires std::copy_constructible<T> && std::default_initializable<T>
 class SendableChooser : public SendableChooserBase {
   wpi::StringMap<T> m_choices;
-
+  std::function<void(T)> m_listener = [](T val) {val;};
   template <class U>
   static U _unwrap_smart_ptr(const U& value);
 
@@ -81,6 +81,8 @@ class SendableChooser : public SendableChooserBase {
    * @return The option selected
    */
   auto GetSelected() -> decltype(_unwrap_smart_ptr(m_choices[""]));
+
+  void OnChange(std::function<void(T)>);
 
   void InitSendable(nt::NTSendableBuilder& builder) override;
 };

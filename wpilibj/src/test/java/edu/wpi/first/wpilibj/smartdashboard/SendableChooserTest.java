@@ -7,6 +7,8 @@ package edu.wpi.first.wpilibj.smartdashboard;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import edu.wpi.first.networktables.NetworkTableInstance;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -61,6 +63,23 @@ class SendableChooserTest {
       }
 
       assertNull(chooser.getSelected());
+    }
+  }
+
+  @Test
+  void testChangeListener() {
+    try (var chooser = new SendableChooser<Integer>()) {
+      for (int i = 1; i <= 3; i++) {
+        chooser.addOption(String.valueOf(i), i);
+      }
+      AtomicInteger currentVal = new AtomicInteger();
+      chooser.onChange(val -> currentVal.set(val));
+
+      SmartDashboard.putData("chooser", chooser);
+      SmartDashboard.updateValues();
+      SmartDashboard.putString("chooser/selected", "3");
+      SmartDashboard.updateValues();
+      assertEquals(3, currentVal.get());
     }
   }
 

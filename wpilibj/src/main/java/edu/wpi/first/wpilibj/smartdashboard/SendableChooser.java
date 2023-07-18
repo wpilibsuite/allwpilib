@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Consumer;
 
 /**
  * The {@link SendableChooser} class is a useful tool for presenting a selection of options to the
@@ -48,6 +49,8 @@ public class SendableChooser<V> implements NTSendable, AutoCloseable {
 
   private String m_defaultChoice = "";
   private final int m_instance;
+  private String m_previousVal;
+  private Consumer<V> m_listener = val -> {};
   private static final AtomicInteger s_instances = new AtomicInteger();
 
   /** Instantiates a {@link SendableChooser}. */
@@ -114,6 +117,15 @@ public class SendableChooser<V> implements NTSendable, AutoCloseable {
     }
   }
 
+  /**
+   * Bind a 
+   * @param listener
+   */
+  public void onChange(Consumer<V> listener) {
+    requireNonNullParam(listener, "listener", "onChange");
+    m_listener = listener;
+  }
+
   private String m_selected;
   private final List<StringPublisher> m_activePubs = new ArrayList<>();
   private final ReentrantLock m_mutex = new ReentrantLock();
@@ -154,6 +166,10 @@ public class SendableChooser<V> implements NTSendable, AutoCloseable {
           m_mutex.lock();
           try {
             m_selected = val;
+            if (!m_selected.equals(m_previousVal)) {
+              m_listener.accept(getSelected());
+            }
+            m_previousVal = val;
             for (StringPublisher pub : m_activePubs) {
               pub.set(val);
             }

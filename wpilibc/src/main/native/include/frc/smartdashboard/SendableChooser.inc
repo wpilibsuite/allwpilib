@@ -50,6 +50,12 @@ auto SendableChooser<T>::GetSelected()
 
 template <class T>
   requires std::copy_constructible<T> && std::default_initializable<T>
+void SendableChooser<T>::OnChange(std::function<void(T)> listener) {
+  m_listener = listener;
+}
+
+template <class T>
+  requires std::copy_constructible<T> && std::default_initializable<T>
 void SendableChooser<T>::InitSendable(nt::NTSendableBuilder& builder) {
   builder.SetSmartDashboardType("String Chooser");
   {
@@ -98,6 +104,10 @@ void SendableChooser<T>::InitSendable(nt::NTSendableBuilder& builder) {
                               std::scoped_lock lock(m_mutex);
                               m_haveSelected = true;
                               m_selected = val;
+                              if (m_previousVal != val) {
+                                m_listener(GetSelected());
+                              }
+                              m_previousVal = val;
                               for (auto& pub : m_activePubs) {
                                 pub.Set(val);
                               }
