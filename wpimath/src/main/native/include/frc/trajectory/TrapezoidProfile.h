@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <wpi/deprecated.h>
+
 #include "units/time.h"
 #include "wpimath/MathShared.h"
 
@@ -79,10 +81,40 @@ class TrapezoidProfile {
    */
   TrapezoidProfile(Constraints constraints);  // NOLINT
 
+  /**
+   * Construct a TrapezoidProfile.
+   *
+   * @param constraints The constraints on the profile, like maximum velocity.
+   * @param goal        The desired state when the profile is complete.
+   * @param initial     The initial state (usually the current state).
+   * @deprecated Pass the desired and current state into calculate instead of
+   * constructing a new TrapezoidProfile with the desired and current state
+   */
+  WPI_DEPRECATED(
+      "Pass the desired and current state into calculate instead of "
+      "constructing a new TrapezoidProfile with the desired and current "
+      "state")
+  TrapezoidProfile(Constraints constraints, State goal,
+                   State initial = State{Distance_t{0}, Velocity_t{0}});
+
   TrapezoidProfile(const TrapezoidProfile&) = default;
   TrapezoidProfile& operator=(const TrapezoidProfile&) = default;
   TrapezoidProfile(TrapezoidProfile&&) = default;
   TrapezoidProfile& operator=(TrapezoidProfile&&) = default;
+
+  /**
+   * Calculate the correct position and velocity for the profile at a time t
+   * where the beginning of the profile was at time t = 0.
+   *
+   * @param t The time since the beginning of the profile.
+   * @deprecated Pass the desired and current state into calculate instead of
+   * constructing a new TrapezoidProfile with the desired and current state
+   */
+  [[deprecated(
+      "Pass the desired and current state into calculate instead of "
+      "constructing a new TrapezoidProfile with the desired and current "
+      "state")]]
+  State Calculate(units::second_t t) const;
 
   /**
    * Calculate the correct position and velocity for the profile at a time t
@@ -141,7 +173,9 @@ class TrapezoidProfile {
   int m_direction;
 
   Constraints m_constraints;
-  State m_initial;
+  State m_current;
+  State m_goal;   // TODO: remove
+  bool m_newAPI;  // TODO: remove
 
   units::second_t m_endAccel;
   units::second_t m_endFullSpeed;
