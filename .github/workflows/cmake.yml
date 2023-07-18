@@ -16,7 +16,7 @@ jobs:
             name: Linux
             container: wpilib/roborio-cross-ubuntu:2023-22.04
             flags: ""
-          - os: macOS-11
+          - os: macOS-12
             name: macOS
             container: ""
             flags: "-DWITH_JAVA=OFF"

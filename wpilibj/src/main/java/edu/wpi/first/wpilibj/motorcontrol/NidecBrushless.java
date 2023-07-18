@@ -67,7 +67,7 @@ public class NidecBrushless extends MotorSafety
     if (!m_disabled) {
       m_speed = speed;
       m_dio.updateDutyCycle(0.5 + 0.5 * (m_isInverted ? -speed : speed));
-      m_pwm.setRaw(0xffff);
+      m_pwm.setAlwaysHighMode();
     }
 
     feed();

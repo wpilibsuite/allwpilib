@@ -185,7 +185,7 @@ void HAL_AddDMAAveragedAnalogInput(HAL_DMAHandle handle,
                                    int32_t* status);
 
 /**
- * Adds acuumulator data of an analog input to be collected by DMA.
+ * Adds accumulator data of an analog input to be collected by DMA.
  *
  * This can only be called if DMA is not started.
  *

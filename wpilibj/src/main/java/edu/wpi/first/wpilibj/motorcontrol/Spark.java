@@ -35,7 +35,7 @@ public class Spark extends PWMMotorController {
   public Spark(final int channel) {
     super("Spark", channel);
 
-    m_pwm.setBounds(2.003, 1.55, 1.50, 1.46, 0.999);
+    m_pwm.setBoundsMicroseconds(2003, 1550, 1500, 1460, 999);
     m_pwm.setPeriodMultiplier(PWM.PeriodMultiplier.k1X);
     m_pwm.setSpeed(0.0);
     m_pwm.setZeroLatch();

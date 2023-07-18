@@ -85,7 +85,7 @@ bool DeploySession::ChangeTeamNumber(const std::string& macAddress,
             session.Execute(fmt::format(
                 "/usr/local/natinst/bin/nirtcfg "
                 "--file=/etc/natinst/share/ni-rt.ini --set "
-                "section=systemsettings,token=host_name,value=roborio-{"
+                "section=systemsettings,token=host_name,value=roboRIO-{"
                 "}-FRC ; sync",
                 teamNumber));
           } catch (const SshSession::SshException& e) {

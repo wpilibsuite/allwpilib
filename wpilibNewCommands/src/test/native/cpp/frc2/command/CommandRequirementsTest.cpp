@@ -12,7 +12,6 @@
 #include "frc2/command/ParallelCommandGroup.h"
 #include "frc2/command/ParallelDeadlineGroup.h"
 #include "frc2/command/ParallelRaceGroup.h"
-#include "frc2/command/SelectCommand.h"
 #include "frc2/command/SequentialCommandGroup.h"
 
 using namespace frc2;

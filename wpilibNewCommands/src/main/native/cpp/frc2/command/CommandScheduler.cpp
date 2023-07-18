@@ -107,10 +107,6 @@ frc::EventLoop* CommandScheduler::GetDefaultButtonLoop() const {
   return &(m_impl->defaultButtonLoop);
 }
 
-void CommandScheduler::ClearButtons() {
-  m_impl->activeButtonLoop->Clear();
-}
-
 void CommandScheduler::Schedule(Command* command) {
   if (m_impl->inRunLoop) {
     m_impl->toSchedule.emplace_back(command);
@@ -293,6 +289,10 @@ void CommandScheduler::UnregisterSubsystem(
   for (auto* subsystem : subsystems) {
     UnregisterSubsystem(subsystem);
   }
+}
+
+void CommandScheduler::UnregisterAllSubsystems() {
+  m_impl->subsystems.clear();
 }
 
 void CommandScheduler::SetDefaultCommand(Subsystem* subsystem,

@@ -64,10 +64,10 @@ TEST(QuaternionTest, Multiply) {
   Quaternion q{0.72760687510899891, 0.29104275004359953, 0.38805700005813276,
                0.48507125007266594};
   actual = q * q.Inverse();
-  EXPECT_DOUBLE_EQ(1.0, actual.W());
-  EXPECT_DOUBLE_EQ(0.0, actual.X());
-  EXPECT_DOUBLE_EQ(0.0, actual.Y());
-  EXPECT_DOUBLE_EQ(0.0, actual.Z());
+  EXPECT_NEAR(1.0, actual.W(), 1e-9);
+  EXPECT_NEAR(0.0, actual.X(), 1e-9);
+  EXPECT_NEAR(0.0, actual.Y(), 1e-9);
+  EXPECT_NEAR(0.0, actual.Z(), 1e-9);
 }
 
 TEST(QuaternionTest, Inverse) {

@@ -1,19 +1,18 @@
-From ad60aa8e1c03cc5f0c88159d37f63b0c063927c7 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 26 Apr 2022 15:28:52 -0400
-Subject: [PATCH 6/9] Style / comments cleanup
+Subject: [PATCH 06/10] Style / comments cleanup
 
 ---
  src/fs-poll.c     | 1 +
  src/unix/core.c   | 1 +
- src/unix/thread.c | 3 +--
  src/uv-common.c   | 1 +
  src/win/process.c | 1 -
  src/win/winsock.c | 1 +
- 6 files changed, 5 insertions(+), 3 deletions(-)
+ 5 files changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/src/fs-poll.c b/src/fs-poll.c
-index 5a39daed..1a7ca70d 100644
+index 5a39daed095502b2db34f23fcaf0ab04f31f96ff..1a7ca70d62c71f6eaef2b9985796cc46a6438869 100644
 --- a/src/fs-poll.c
 +++ b/src/fs-poll.c
 @@ -34,6 +34,7 @@
@@ -25,10 +24,10 @@ index 5a39daed..1a7ca70d 100644
    uv_fs_poll_t* parent_handle;
    int busy_polling;
 diff --git a/src/unix/core.c b/src/unix/core.c
-index 223c5513..4c23f608 100644
+index 268fc9652f437eb0d0cda2a9e0b06b9e91eb9742..f53adc156a7c454c492abaeac29d90be436785fc 100644
 --- a/src/unix/core.c
 +++ b/src/unix/core.c
-@@ -544,6 +544,7 @@ int uv__accept(int sockfd) {
+@@ -575,6 +575,7 @@ int uv__accept(int sockfd) {
    return peerfd;
  }
  
@@ -36,39 +35,11 @@ index 223c5513..4c23f608 100644
  #if defined(__APPLE__)
  #pragma GCC diagnostic push
  #pragma GCC diagnostic ignored "-Wdollar-in-identifier-extension"
-diff --git a/src/unix/thread.c b/src/unix/thread.c
-index 64726bd6..392a0715 100644
---- a/src/unix/thread.c
-+++ b/src/unix/thread.c
-@@ -85,7 +85,6 @@ error2:
-   return rc;
- }
- 
--
- int uv_barrier_wait(uv_barrier_t* barrier) {
-   struct _uv_barrier* b;
-   int last;
-@@ -94,6 +93,7 @@ int uv_barrier_wait(uv_barrier_t* barrier) {
-     return UV_EINVAL;
- 
-   b = barrier->b;
-+  /* Lock the mutex*/
-   uv_mutex_lock(&b->mutex);
- 
-   if (++b->in == b->threshold) {
-@@ -113,7 +113,6 @@ int uv_barrier_wait(uv_barrier_t* barrier) {
-   return last;
- }
- 
--
- void uv_barrier_destroy(uv_barrier_t* barrier) {
-   struct _uv_barrier* b;
- 
 diff --git a/src/uv-common.c b/src/uv-common.c
-index 49026c03..c9a32c03 100644
+index cd10b36b4a393e325ea03b93eb9897193ca9800b..bfcc3ef10f4fd7763221638947da6e02e7a17c33 100644
 --- a/src/uv-common.c
 +++ b/src/uv-common.c
-@@ -758,6 +758,7 @@ void uv__fs_readdir_cleanup(uv_fs_t* req) {
+@@ -799,6 +799,7 @@ void uv__fs_readdir_cleanup(uv_fs_t* req) {
    }
  }
  
@@ -77,7 +48,7 @@ index 49026c03..c9a32c03 100644
  # pragma clang diagnostic push
  # pragma clang diagnostic ignored "-Wvarargs"
 diff --git a/src/win/process.c b/src/win/process.c
-index a49016f6..8e7835a5 100644
+index 2b1b46259959867482079962d0ea44246a42e7cb..18816d3b1e8c863f8ca74fe0104de1aecd0ae3fa 100644
 --- a/src/win/process.c
 +++ b/src/win/process.c
 @@ -35,7 +35,6 @@
@@ -89,7 +60,7 @@ index a49016f6..8e7835a5 100644
  
  
 diff --git a/src/win/winsock.c b/src/win/winsock.c
-index 7843e9f1..cda82bc3 100644
+index 7843e9f13321c32419cebaacde82d30f471e11d7..cda82bc33c2c6e3dbfa9d978b5b40476228452bd 100644
 --- a/src/win/winsock.c
 +++ b/src/win/winsock.c
 @@ -25,6 +25,7 @@

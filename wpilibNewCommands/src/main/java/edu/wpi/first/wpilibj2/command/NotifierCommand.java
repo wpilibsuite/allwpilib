@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.Notifier;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public class NotifierCommand extends CommandBase {
+public class NotifierCommand extends Command {
   protected final Notifier m_notifier;
   protected final double m_period;
 

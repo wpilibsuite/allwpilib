@@ -12,10 +12,10 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.examples.frisbeebot.Constants.ShooterConstants;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
-import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 
-public class Shooter extends SubsystemBase {
+public class Shooter extends Subsystem {
   private final PWMSparkMax m_shooterMotor = new PWMSparkMax(ShooterConstants.kShooterMotorPort);
   private final PWMSparkMax m_feederMotor = new PWMSparkMax(ShooterConstants.kFeederMotorPort);
   private final Encoder m_shooterEncoder =
@@ -50,7 +50,7 @@ public class Shooter extends SubsystemBase {
    *
    * @param setpointRotationsPerSecond The desired shooter velocity
    */
-  public CommandBase shootCommand(double setpointRotationsPerSecond) {
+  public Command shootCommand(double setpointRotationsPerSecond) {
     return parallel(
             // Run the shooter flywheel at the desired setpoint using feedforward and feedback
             run(

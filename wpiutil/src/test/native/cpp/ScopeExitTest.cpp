@@ -23,6 +23,7 @@ TEST(ScopeExitTest, Release) {
   {
     wpi::scope_exit exit1{[&] { ++exitCount; }};
     wpi::scope_exit exit2 = std::move(exit1);
+    // NOLINTNEXTLINE(clang-analyzer-cplusplus.Move)
     wpi::scope_exit exit3 = std::move(exit1);
     EXPECT_EQ(0, exitCount);
   }

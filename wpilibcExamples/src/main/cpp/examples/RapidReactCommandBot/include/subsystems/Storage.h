@@ -7,15 +7,16 @@
 #include <frc/DigitalInput.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc2/command/CommandPtr.h>
-#include <frc2/command/SubsystemBase.h>
+#include <frc2/command/Subsystem.h>
 
 #include "Constants.h"
 
-class Storage : frc2::SubsystemBase {
+class Storage : frc2::Subsystem {
  public:
   Storage();
   /** Returns a command that runs the storage motor indefinitely. */
-  [[nodiscard]] frc2::CommandPtr RunCommand();
+  [[nodiscard]]
+  frc2::CommandPtr RunCommand();
 
   /** Whether the ball storage is full. */
   bool IsFull() const;

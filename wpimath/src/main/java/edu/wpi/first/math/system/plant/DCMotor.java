@@ -21,10 +21,10 @@ public class DCMotor {
    * Constructs a DC motor.
    *
    * @param nominalVoltageVolts Voltage at which the motor constants were measured.
-   * @param stallTorqueNewtonMeters Current draw when stalled.
-   * @param stallCurrentAmps Current draw when stalled.
-   * @param freeCurrentAmps Current draw under no load.
-   * @param freeSpeedRadPerSec Angular velocity under no load.
+   * @param stallTorqueNewtonMeters Torque when stalled in Newton-meters.
+   * @param stallCurrentAmps Current draw when stalled in amps.
+   * @param freeCurrentAmps Current draw under no load in amps.
+   * @param freeSpeedRadPerSec Angular velocity under no load in radians per second.
    * @param numMotors Number of motors in a gearbox.
    */
   public DCMotor(

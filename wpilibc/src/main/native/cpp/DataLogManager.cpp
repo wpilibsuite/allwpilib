@@ -4,6 +4,8 @@
 
 #include "frc/DataLogManager.h"
 
+#include <frc/Errors.h>
+
 #include <algorithm>
 #include <ctime>
 #include <random>
@@ -129,6 +131,8 @@ void Thread::Main() {
         }
         auto size = entry.file_size();
         if (fs::remove(entry.path(), ec)) {
+          FRC_ReportError(warn::Warning, "DataLogManager: Deleted {}",
+                          entry.path().string());
           freeSpace += size;
           if (freeSpace >= kFreeSpaceThreshold) {
             break;
@@ -138,6 +142,13 @@ void Thread::Main() {
                      entry.path().string());
         }
       }
+    } else if (freeSpace < 2 * kFreeSpaceThreshold) {
+      FRC_ReportError(
+          warn::Warning,
+          "DataLogManager: Log storage device has {} MB of free space "
+          "remaining! Logs will get deleted below {} MB of free space. "
+          "Consider deleting logs off the storage device.",
+          freeSpace / 1000000, kFreeSpaceThreshold / 1000000);
     }
   }
 

@@ -1,6 +1,6 @@
 ext {
     nativeName = 'wpilibNewCommands'
-    devMain = 'edu.wpi.first.wpilibj.commands.DevMain'
+    devMain = 'edu.wpi.first.wpilibj2.commands.DevMain'
 }
 
 evaluationDependsOn(':ntcore')
@@ -21,13 +21,6 @@ dependencies {
     implementation project(':hal')
     implementation project(':wpimath')
     implementation project(':wpilibj')
-    devImplementation project(':wpiutil')
-    devImplementation project(':wpinet')
-    devImplementation project(':ntcore')
-    devImplementation project(':cscore')
-    devImplementation project(':hal')
-    devImplementation project(':wpimath')
-    devImplementation project(':wpilibj')
     testImplementation 'org.mockito:mockito-core:4.1.0'
 }
 

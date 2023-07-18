@@ -1,18 +1,18 @@
-From 907608f09061ab272b0a127330b1b24e28d50a9f Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Thu, 5 May 2022 18:09:45 -0400
-Subject: [PATCH 15/28] Delete numbers from MathExtras
+Subject: [PATCH 15/30] Delete numbers from MathExtras
 
 ---
  llvm/include/llvm/Support/MathExtras.h | 36 --------------------------
  1 file changed, 36 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
-index fac12dd0e..e8f1f2aca 100644
+index 062ed2f4057820547cc6bfc4c91e7a13ceaa2f8a..cc0c1cbd1c8bb523bce720b9783afad7f602c88c 100644
 --- a/llvm/include/llvm/Support/MathExtras.h
 +++ b/llvm/include/llvm/Support/MathExtras.h
-@@ -50,42 +50,6 @@ enum ZeroBehavior {
-   ZB_Width
+@@ -32,42 +32,6 @@ enum ZeroBehavior {
+   ZB_Max
  };
  
 -/// Mathematical constants.
@@ -51,6 +51,6 @@ index fac12dd0e..e8f1f2aca 100644
 -                phif        = 1.61803399F; // (0x1.9e377aP+0) https://oeis.org/A001622
 -} // namespace numbers
 -
- namespace detail {
- template <typename T, std::size_t SizeOfT> struct TrailingZerosCounter {
-   static unsigned count(T Val, ZeroBehavior) {
+ /// Count number of 0's from the least significant bit to the most
+ ///   stopping at the first 1.
+ ///

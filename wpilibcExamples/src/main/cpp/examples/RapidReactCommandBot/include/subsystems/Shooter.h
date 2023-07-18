@@ -11,13 +11,13 @@
 #include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc2/command/CommandPtr.h>
-#include <frc2/command/SubsystemBase.h>
+#include <frc2/command/Subsystem.h>
 #include <units/angle.h>
 #include <units/angular_velocity.h>
 
 #include "Constants.h"
 
-class Shooter : public frc2::SubsystemBase {
+class Shooter : public frc2::Subsystem {
  public:
   Shooter();
 
@@ -28,8 +28,8 @@ class Shooter : public frc2::SubsystemBase {
    *
    * @param setpointRotationsPerSecond The desired shooter velocity
    */
-  [[nodiscard]] frc2::CommandPtr ShootCommand(
-      units::turns_per_second_t setpoint);
+  [[nodiscard]]
+  frc2::CommandPtr ShootCommand(units::turns_per_second_t setpoint);
 
  private:
   frc::PWMSparkMax m_shooterMotor{ShooterConstants::kShooterMotorPort};

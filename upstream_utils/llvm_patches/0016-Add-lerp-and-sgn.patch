@@ -1,17 +1,17 @@
-From 9ef10e5b331d00d7d5822afdb70c1f2d9981d772 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 22:50:24 -0400
-Subject: [PATCH 16/28] Add lerp and sgn
+Subject: [PATCH 16/30] Add lerp and sgn
 
 ---
  llvm/include/llvm/Support/MathExtras.h | 20 ++++++++++++++++++++
  1 file changed, 20 insertions(+)
 
 diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
-index e8f1f2aca..8116c58bd 100644
+index cc0c1cbd1c8bb523bce720b9783afad7f602c88c..fe9c5136f9f2f687577a0b1ecce69262568a9c3c 100644
 --- a/llvm/include/llvm/Support/MathExtras.h
 +++ b/llvm/include/llvm/Support/MathExtras.h
-@@ -930,6 +930,26 @@ std::enable_if_t<std::is_signed<T>::value, T> MulOverflow(T X, T Y, T &Result) {
+@@ -744,6 +744,26 @@ std::enable_if_t<std::is_signed<T>::value, T> MulOverflow(T X, T Y, T &Result) {
      return UX > (static_cast<U>((std::numeric_limits<T>::max)())) / UY;
  }
  

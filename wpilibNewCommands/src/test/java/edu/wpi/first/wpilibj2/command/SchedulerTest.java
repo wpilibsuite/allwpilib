@@ -44,12 +44,40 @@ class SchedulerTest extends CommandTestBase {
   }
 
   @Test
+  void registerSubsystemTest() {
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      AtomicInteger counter = new AtomicInteger(0);
+      Subsystem system =
+          new Subsystem() {
+            @Override
+            public void periodic() {
+              counter.incrementAndGet();
+            }
+          };
+
+      assertDoesNotThrow(() -> scheduler.registerSubsystem(system));
+
+      scheduler.run();
+      assertEquals(1, counter.get());
+    }
+  }
+
+  @Test
   void unregisterSubsystemTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
-      Subsystem system = new SubsystemBase() {};
-
+      AtomicInteger counter = new AtomicInteger(0);
+      Subsystem system =
+          new Subsystem() {
+            @Override
+            public void periodic() {
+              counter.incrementAndGet();
+            }
+          };
       scheduler.registerSubsystem(system);
       assertDoesNotThrow(() -> scheduler.unregisterSubsystem(system));
+
+      scheduler.run();
+      assertEquals(0, counter.get());
     }
   }
 

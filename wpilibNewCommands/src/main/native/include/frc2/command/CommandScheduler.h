@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <concepts>
 #include <initializer_list>
 #include <memory>
 #include <span>
@@ -15,7 +16,6 @@
 #include <networktables/NTSendable.h>
 #include <units/time.h>
 #include <wpi/FunctionExtras.h>
-#include <wpi/deprecated.h>
 #include <wpi/sendable/SendableHelper.h>
 
 namespace frc2 {
@@ -76,12 +76,6 @@ class CommandScheduler final : public nt::NTSendable,
    * buttons.
    */
   frc::EventLoop* GetDefaultButtonLoop() const;
-
-  /**
-   * Removes all button bindings from the scheduler.
-   */
-  WPI_DEPRECATED("Call Clear on the EventLoop instance directly!")
-  void ClearButtons();
 
   /**
    * Schedules a command for execution. Does nothing if the command is already
@@ -165,6 +159,13 @@ class CommandScheduler final : public nt::NTSendable,
   void UnregisterSubsystem(std::span<Subsystem* const> subsystems);
 
   /**
+   * Un-registers all registered Subsystems with the scheduler. All currently
+   * registered subsystems will no longer have their periodic block called, and
+   * will not have their default command scheduled.
+   */
+  void UnregisterAllSubsystems();
+
+  /**
    * Sets the default command for a subsystem.  Registers that subsystem if it
    * is not already registered.  Default commands will run whenever there is no
    * other command currently scheduled that requires the subsystem.  Default
@@ -175,16 +176,14 @@ class CommandScheduler final : public nt::NTSendable,
    * @param subsystem      the subsystem whose default command will be set
    * @param defaultCommand the default command to associate with the subsystem
    */
-  template <class T, typename = std::enable_if_t<std::is_base_of_v<
-                         Command, std::remove_reference_t<T>>>>
+  template <std::derived_from<Command> T>
   void SetDefaultCommand(Subsystem* subsystem, T&& defaultCommand) {
     if (!defaultCommand.HasRequirement(subsystem)) {
       throw FRC_MakeError(frc::err::CommandIllegalUse,
                           "Default commands must require their subsystem!");
     }
-    SetDefaultCommandImpl(subsystem,
-                          std::make_unique<std::remove_reference_t<T>>(
-                              std::forward<T>(defaultCommand)));
+    SetDefaultCommandImpl(subsystem, std::make_unique<std::decay_t<T>>(
+                                         std::forward<T>(defaultCommand)));
   }
 
   /**

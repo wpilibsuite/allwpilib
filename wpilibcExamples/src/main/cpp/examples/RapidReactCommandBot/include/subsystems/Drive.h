@@ -11,12 +11,12 @@
 #include <frc/motorcontrol/MotorControllerGroup.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc2/command/CommandPtr.h>
-#include <frc2/command/SubsystemBase.h>
+#include <frc2/command/Subsystem.h>
 #include <units/length.h>
 
 #include "Constants.h"
 
-class Drive : public frc2::SubsystemBase {
+class Drive : public frc2::Subsystem {
  public:
   Drive();
   /**
@@ -25,8 +25,9 @@ class Drive : public frc2::SubsystemBase {
    * @param fwd the commanded forward movement
    * @param rot the commanded rotation
    */
-  [[nodiscard]] frc2::CommandPtr ArcadeDriveCommand(
-      std::function<double()> fwd, std::function<double()> rot);
+  [[nodiscard]]
+  frc2::CommandPtr ArcadeDriveCommand(std::function<double()> fwd,
+                                      std::function<double()> rot);
 
   /**
    * Returns a command that drives the robot forward a specified distance at a
@@ -35,8 +36,8 @@ class Drive : public frc2::SubsystemBase {
    * @param distance The distance to drive forward in meters
    * @param speed The fraction of max speed at which to drive
    */
-  [[nodiscard]] frc2::CommandPtr DriveDistanceCommand(units::meter_t distance,
-                                                      double speed);
+  [[nodiscard]]
+  frc2::CommandPtr DriveDistanceCommand(units::meter_t distance, double speed);
 
  private:
   frc::PWMSparkMax m_leftLeader{DriveConstants::kLeftMotor1Port};

@@ -1,18 +1,18 @@
-From a172c93df929ac6c9f783fd5af1e4df3604c4c66 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 19:16:51 -0400
-Subject: [PATCH 22/28] Remove unused functions
+Subject: [PATCH 22/30] Remove unused functions
 
 ---
  llvm/include/llvm/Support/DJB.h         |  3 -
  llvm/include/llvm/Support/raw_ostream.h |  5 +-
  llvm/lib/Support/ErrorHandling.cpp      | 16 -----
- llvm/lib/Support/raw_ostream.cpp        | 49 +++++++--------
+ llvm/lib/Support/raw_ostream.cpp        | 47 +++++++-------
  llvm/unittests/ADT/SmallStringTest.cpp  | 81 -------------------------
- 5 files changed, 23 insertions(+), 131 deletions(-)
+ 5 files changed, 23 insertions(+), 129 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/DJB.h b/llvm/include/llvm/Support/DJB.h
-index 8737cd144..67b0ae91b 100644
+index 8737cd144c37f9041a781a74e9f2b43384e85761..67b0ae91b4b1401374d7d39d859daaf30da17ee2 100644
 --- a/llvm/include/llvm/Support/DJB.h
 +++ b/llvm/include/llvm/Support/DJB.h
 @@ -24,9 +24,6 @@ inline uint32_t djbHash(std::string_view Buffer, uint32_t H = 5381) {
@@ -26,10 +26,10 @@ index 8737cd144..67b0ae91b 100644
  
  #endif // LLVM_SUPPORT_DJB_H
 diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
-index 256bcec25..9b3a87e1b 100644
+index 582b731b0495ad2a38911ef1f9fe6d2aec58aea1..3edc33b9dcc94a2ef68d52bc0af178121447acaa 100644
 --- a/llvm/include/llvm/Support/raw_ostream.h
 +++ b/llvm/include/llvm/Support/raw_ostream.h
-@@ -71,7 +71,6 @@ private:
+@@ -70,7 +70,6 @@ private:
    /// for a \see write_impl() call to handle the data which has been put into
    /// this buffer.
    char *OutBufStart, *OutBufEnd, *OutBufCur;
@@ -37,7 +37,7 @@ index 256bcec25..9b3a87e1b 100644
  
    /// Optional stream this stream is tied to. If this stream is written to, the
    /// tied-to stream will be flushed first.
-@@ -304,9 +303,9 @@ public:
+@@ -317,9 +316,9 @@ public:
  
    // Enable or disable colors. Once enable_colors(false) is called,
    // changeColor() has no effect until enable_colors(true) is called.
@@ -50,10 +50,10 @@ index 256bcec25..9b3a87e1b 100644
    /// Tie this stream to the specified stream. Replaces any existing tied-to
    /// stream. Specifying a nullptr unties the stream.
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index 8de7b726d..bc08199a1 100644
+index 54137a331ca9e752b02c0f16ae996094a6f2fafa..e253d6f7a5ca3aee75823efdb9717dcd93fff5dc 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
-@@ -178,22 +178,6 @@ void llvm::llvm_unreachable_internal(const char *msg, const char *file,
+@@ -181,22 +181,6 @@ void llvm::llvm_unreachable_internal(const char *msg, const char *file,
  #endif
  }
  
@@ -77,10 +77,10 @@ index 8de7b726d..bc08199a1 100644
  
  #include <winerror.h>
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index 878a3a5e9..632b52235 100644
+index 4769d34a14f3f2cbaaa4df50ea7111fe9fa2792f..f9928ac969932b6baea60a80750477d78b6a5b02 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
-@@ -167,16 +167,6 @@ raw_ostream &raw_ostream::write_escaped(std::string_view Str,
+@@ -175,16 +175,6 @@ raw_ostream &raw_ostream::write_escaped(std::string_view Str,
    return *this;
  }
  
@@ -97,7 +97,7 @@ index 878a3a5e9..632b52235 100644
  void raw_ostream::flush_nonempty() {
    assert(OutBufCur > OutBufStart && "Invalid call to flush_nonempty.");
    size_t Length = OutBufCur - OutBufStart;
-@@ -321,15 +311,22 @@ static int getFD(std::string_view Filename, std::error_code &EC,
+@@ -327,15 +317,22 @@ static int getFD(std::string_view Filename, std::error_code &EC,
    if (Filename == "-") {
      EC = std::error_code();
      // Change stdout's text/binary mode based on the Flags.
@@ -125,7 +125,7 @@ index 878a3a5e9..632b52235 100644
    if (EC)
      return -1;
  
-@@ -389,12 +386,8 @@ raw_fd_ostream::raw_fd_ostream(int fd, bool shouldClose, bool unbuffered,
+@@ -395,12 +392,8 @@ raw_fd_ostream::raw_fd_ostream(int fd, bool shouldClose, bool unbuffered,
  
    // Get the starting position.
    off_t loc = ::lseek(FD, 0, SEEK_CUR);
@@ -139,7 +139,7 @@ index 878a3a5e9..632b52235 100644
  #else
    SupportsSeeking = !EC && loc != (off_t)-1;
  #endif
-@@ -407,10 +400,8 @@ raw_fd_ostream::raw_fd_ostream(int fd, bool shouldClose, bool unbuffered,
+@@ -413,10 +406,8 @@ raw_fd_ostream::raw_fd_ostream(int fd, bool shouldClose, bool unbuffered,
  raw_fd_ostream::~raw_fd_ostream() {
    if (FD >= 0) {
      flush();
@@ -152,7 +152,7 @@ index 878a3a5e9..632b52235 100644
    }
  
  #ifdef __MINGW32__
-@@ -505,7 +496,11 @@ void raw_fd_ostream::write_impl(const char *Ptr, size_t Size) {
+@@ -511,7 +502,11 @@ void raw_fd_ostream::write_impl(const char *Ptr, size_t Size) {
  
    do {
      size_t ChunkSize = std::min(Size, MaxWriteSize);
@@ -164,7 +164,7 @@ index 878a3a5e9..632b52235 100644
  
      if (ret < 0) {
        // If it's a recoverable error, swallow it and retry the write.
-@@ -540,8 +535,8 @@ void raw_fd_ostream::close() {
+@@ -554,8 +549,8 @@ void raw_fd_ostream::close() {
    assert(ShouldClose);
    ShouldClose = false;
    flush();
@@ -175,17 +175,8 @@ index 878a3a5e9..632b52235 100644
    FD = -1;
  }
  
-@@ -550,8 +545,6 @@ uint64_t raw_fd_ostream::seek(uint64_t off) {
-   flush();
- #ifdef _WIN32
-   pos = ::_lseeki64(FD, off, SEEK_SET);
--#elif defined(HAVE_LSEEK64)
--  pos = ::lseek64(FD, off, SEEK_SET);
- #else
-   pos = ::lseek(FD, off, SEEK_SET);
- #endif
 diff --git a/llvm/unittests/ADT/SmallStringTest.cpp b/llvm/unittests/ADT/SmallStringTest.cpp
-index bee3875d1..87600ea47 100644
+index 6cf14700b34739420cd3dc4ff8a4c16ce162f715..87600ea4704bc98acab9085d16cfafd3d586714e 100644
 --- a/llvm/unittests/ADT/SmallStringTest.cpp
 +++ b/llvm/unittests/ADT/SmallStringTest.cpp
 @@ -129,23 +129,6 @@ TEST_F(SmallStringTest, StdStringConversion) {
@@ -239,12 +230,12 @@ index bee3875d1..87600ea47 100644
 -}
 -
 -TEST_F(SmallStringTest, Comparisons) {
--  EXPECT_EQ(-1, SmallString<10>("aab").compare("aad"));
+-  EXPECT_GT( 0, SmallString<10>("aab").compare("aad"));
 -  EXPECT_EQ( 0, SmallString<10>("aab").compare("aab"));
--  EXPECT_EQ( 1, SmallString<10>("aab").compare("aaa"));
--  EXPECT_EQ(-1, SmallString<10>("aab").compare("aabb"));
--  EXPECT_EQ( 1, SmallString<10>("aab").compare("aa"));
--  EXPECT_EQ( 1, SmallString<10>("\xFF").compare("\1"));
+-  EXPECT_LT( 0, SmallString<10>("aab").compare("aaa"));
+-  EXPECT_GT( 0, SmallString<10>("aab").compare("aabb"));
+-  EXPECT_LT( 0, SmallString<10>("aab").compare("aa"));
+-  EXPECT_LT( 0, SmallString<10>("\xFF").compare("\1"));
 -
 -  EXPECT_EQ(-1, SmallString<10>("AaB").compare_insensitive("aAd"));
 -  EXPECT_EQ( 0, SmallString<10>("AaB").compare_insensitive("aab"));

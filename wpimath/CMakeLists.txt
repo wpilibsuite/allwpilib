@@ -89,8 +89,7 @@ if (WITH_JAVA)
 
 endif()
 
-file(GLOB_RECURSE wpimath_native_src src/main/native/cpp/*.cpp
-                                     src/main/native/thirdparty/drake/src/*.cpp)
+file(GLOB_RECURSE wpimath_native_src src/main/native/cpp/*.cpp)
 list(REMOVE_ITEM wpimath_native_src ${wpimath_jni_src})
 
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS FALSE)
@@ -117,10 +116,6 @@ else()
     find_package(Eigen3 CONFIG REQUIRED)
     target_link_libraries (wpimath Eigen3::Eigen)
 endif()
-
-install(DIRECTORY src/main/native/thirdparty/drake/include/ DESTINATION "${include_dest}/wpimath")
-target_include_directories(wpimath SYSTEM PUBLIC
-                           $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/drake/include>)
 
 install(DIRECTORY src/main/native/thirdparty/gcem/include/ DESTINATION "${include_dest}/wpimath")
 target_include_directories(wpimath SYSTEM PUBLIC

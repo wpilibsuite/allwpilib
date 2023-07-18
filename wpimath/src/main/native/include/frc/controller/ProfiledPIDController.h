@@ -107,6 +107,18 @@ class ProfiledPIDController
   void SetD(double Kd) { m_controller.SetD(Kd); }
 
   /**
+   * Sets the IZone range. When the absolute value of the position error is
+   * greater than IZone, the total accumulated error will reset to zero,
+   * disabling integral gain until the absolute value of the position error is
+   * less than IZone. This is used to prevent integral windup. Must be
+   * non-negative. Passing a value of zero will effectively disable integral
+   * gain. Passing a value of infinity disables IZone functionality.
+   *
+   * @param iZone Maximum magnitude of error to allow integral control.
+   */
+  void SetIZone(double iZone) { m_controller.SetIZone(iZone); }
+
+  /**
    * Gets the proportional coefficient.
    *
    * @return proportional coefficient
@@ -126,6 +138,13 @@ class ProfiledPIDController
    * @return differential coefficient
    */
   double GetD() const { return m_controller.GetD(); }
+
+  /**
+   * Get the IZone range.
+   *
+   * @return Maximum magnitude of error to allow integral control.
+   */
+  double GetIZone() const { return m_controller.GetIZone(); }
 
   /**
    * Gets the period of this controller.
@@ -184,6 +203,12 @@ class ProfiledPIDController
    * @param constraints Velocity and acceleration constraints for goal.
    */
   void SetConstraints(Constraints constraints) { m_constraints = constraints; }
+
+  /**
+   * Get the velocity and acceleration constraints for this controller.
+   * @return Velocity and acceleration constraints.
+   */
+  Constraints GetConstraints() { return m_constraints; }
 
   /**
    * Returns the current setpoint of the ProfiledPIDController.
@@ -371,6 +396,9 @@ class ProfiledPIDController
         "i", [this] { return GetI(); }, [this](double value) { SetI(value); });
     builder.AddDoubleProperty(
         "d", [this] { return GetD(); }, [this](double value) { SetD(value); });
+    builder.AddDoubleProperty(
+        "izone", [this] { return GetIZone(); },
+        [this](double value) { SetIZone(value); });
     builder.AddDoubleProperty(
         "goal", [this] { return GetGoal().position.value(); },
         [this](double value) { SetGoal(Distance_t{value}); });

@@ -4,7 +4,7 @@
 
 #include "glass/Storage.h"
 
-#include <type_traits>
+#include <concepts>
 
 #include <imgui.h>
 #include <wpi/StringExtras.h>
@@ -14,7 +14,7 @@ using namespace glass;
 
 template <typename To>
 bool ConvertFromString(To* out, std::string_view str) {
-  if constexpr (std::is_same_v<To, bool>) {
+  if constexpr (std::same_as<To, bool>) {
     if (str == "true") {
       *out = true;
     } else if (str == "false") {
@@ -24,7 +24,7 @@ bool ConvertFromString(To* out, std::string_view str) {
     } else {
       return false;
     }
-  } else if constexpr (std::is_floating_point_v<To>) {
+  } else if constexpr (std::floating_point<To>) {
     if (auto val = wpi::parse_float<To>(str)) {
       *out = val.value();
     } else {

@@ -146,10 +146,10 @@ void HAL_WriteAddressableLEDData(HAL_AddressableLEDHandle handle,
 }
 
 void HAL_SetAddressableLEDBitTiming(HAL_AddressableLEDHandle handle,
-                                    int32_t lowTime0NanoSeconds,
                                     int32_t highTime0NanoSeconds,
-                                    int32_t lowTime1NanoSeconds,
+                                    int32_t lowTime0NanoSeconds,
                                     int32_t highTime1NanoSeconds,
+                                    int32_t lowTime1NanoSeconds,
                                     int32_t* status) {}
 
 void HAL_SetAddressableLEDSyncTime(HAL_AddressableLEDHandle handle,

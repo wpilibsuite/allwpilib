@@ -72,7 +72,7 @@ int main(void) {
   }
 
   // Set PWM config to standard servo speeds
-  HAL_SetPWMConfig(pwmPort, 2.0, 1.501, 1.5, 1.499, 1.0, &status);
+  HAL_SetPWMConfigMicroseconds(pwmPort, 2000, 1501, 1500, 1499, 1000, &status);
 
   // Create an Input
   status = 0;
