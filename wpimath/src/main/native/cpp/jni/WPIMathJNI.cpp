@@ -209,19 +209,11 @@ Java_edu_wpi_first_math_WPIMathJNI_expPose3d
 
   frc::Pose3d result = pose.Exp(twist);
 
-  jdoubleArray resultArray = env->NewDoubleArray(7);
-  jdouble* nativeResultArray =
-      env->GetDoubleArrayElements(resultArray, nullptr);
   const auto& resultQuaternion = result.Rotation().GetQuaternion();
-  nativeResultArray[0] = result.X().value();
-  nativeResultArray[1] = result.Y().value();
-  nativeResultArray[2] = result.Z().value();
-  nativeResultArray[3] = resultQuaternion.W();
-  nativeResultArray[4] = resultQuaternion.X();
-  nativeResultArray[5] = resultQuaternion.Y();
-  nativeResultArray[6] = resultQuaternion.Z();
-  env->ReleaseDoubleArrayElements(resultArray, nativeResultArray, 0);
-  return resultArray;
+  return MakeJDoubleArray(
+      env, {{result.X().value(), result.Y().value(), result.Z().value(),
+             resultQuaternion.W(), resultQuaternion.X(), resultQuaternion.Y(),
+             resultQuaternion.Z()}});
 }
 
 /*
@@ -245,17 +237,9 @@ Java_edu_wpi_first_math_WPIMathJNI_logPose3d
 
   frc::Twist3d result = startPose.Log(endPose);
 
-  jdoubleArray resultArray = env->NewDoubleArray(6);
-  jdouble* nativeResultArray =
-      env->GetDoubleArrayElements(resultArray, nullptr);
-  nativeResultArray[0] = result.dx.value();
-  nativeResultArray[1] = result.dy.value();
-  nativeResultArray[2] = result.dz.value();
-  nativeResultArray[3] = result.rx.value();
-  nativeResultArray[4] = result.ry.value();
-  nativeResultArray[5] = result.rz.value();
-  env->ReleaseDoubleArrayElements(resultArray, nativeResultArray, 0);
-  return resultArray;
+  return MakeJDoubleArray(
+      env, {{result.dx.value(), result.dy.value(), result.dz.value(),
+             result.rx.value(), result.ry.value(), result.rz.value()}});
 }
 
 /*
