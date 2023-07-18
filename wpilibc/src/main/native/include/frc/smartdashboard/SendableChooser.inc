@@ -51,6 +51,7 @@ auto SendableChooser<T>::GetSelected()
 template <class T>
   requires std::copy_constructible<T> && std::default_initializable<T>
 void SendableChooser<T>::OnChange(std::function<void(T)> listener) {
+  std::scoped_lock lock(m_mutex);
   m_listener = listener;
 }
 
@@ -101,6 +102,8 @@ void SendableChooser<T>::InitSendable(nt::NTSendableBuilder& builder) {
       nullptr);
   builder.AddStringProperty(kSelected, nullptr,
                             [=, this](std::string_view val) {
+                              T choice;
+                              std::function<void(T)> listener;
                               {
                                 std::scoped_lock lock(m_mutex);
                                 m_haveSelected = true;
@@ -108,13 +111,15 @@ void SendableChooser<T>::InitSendable(nt::NTSendableBuilder& builder) {
                                 for (auto& pub : m_activePubs) {
                                   pub.Set(val);
                                 }
+                                if (m_previousVal != val && m_listener) {
+                                  choice = m_choices[val];
+                                  listener = m_listener;
+                                }
+                                m_previousVal = val;
                               }
-                              if (m_previousVal != val && m_listener) {
-                                auto choice = m_choices[val];
-                                auto listener = m_listener;
+                              if (listener) {
                                 listener(choice);
                               }
-                              m_previousVal = val;
                             });
 }
 

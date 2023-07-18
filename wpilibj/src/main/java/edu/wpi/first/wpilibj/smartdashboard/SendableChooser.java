@@ -125,7 +125,9 @@ public class SendableChooser<V> implements NTSendable, AutoCloseable {
    */
   public void onChange(Consumer<V> listener) {
     requireNonNullParam(listener, "listener", "onChange");
+    m_mutex.lock();
     m_listener = listener;
+    m_mutex.unlock();
   }
 
   private String m_selected;
@@ -165,13 +167,17 @@ public class SendableChooser<V> implements NTSendable, AutoCloseable {
         SELECTED,
         null,
         val -> {
+          V choice;
+          Consumer<V> listener;
           m_mutex.lock();
           try {
             m_selected = val;
             if (!m_selected.equals(m_previousVal) && m_listener != null) {
-              m_mutex.unlock();
-              m_listener.accept(m_map.get(val));
-              m_mutex.lock();
+              choice = m_map.get(val);
+              listener = m_listener;
+            } else {
+              choice = null;
+              listener = null;
             }
             m_previousVal = val;
             for (StringPublisher pub : m_activePubs) {
@@ -179,6 +185,9 @@ public class SendableChooser<V> implements NTSendable, AutoCloseable {
             }
           } finally {
             m_mutex.unlock();
+          }
+          if (listener != null) {
+            listener.accept(choice);
           }
         });
   }
