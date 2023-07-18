@@ -5,6 +5,8 @@
 #ifndef CSCORE_CSCORE_CV_H_
 #define CSCORE_CSCORE_CV_H_
 
+#include <functional>
+
 #include "cscore_c.h"
 
 #ifdef CSCORE_CSCORE_RAW_CV_H_
