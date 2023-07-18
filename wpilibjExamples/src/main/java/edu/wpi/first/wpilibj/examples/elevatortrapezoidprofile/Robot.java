@@ -33,17 +33,16 @@ public class Robot extends TimedRobot {
     if (m_joystick.getRawButtonPressed(2)) {
       m_goal = new TrapezoidProfile.State(5, 0);
     } else if (m_joystick.getRawButtonPressed(3)) {
-      m_goal = new TrapezoidProfile.State(0, 0);
+      m_goal = new TrapezoidProfile.State();
     }
 
     // Create a motion profile with the given maximum velocity and maximum
-    // acceleration constraints for the next setpoint, the desired goal, and the
-    // current setpoint.
-    var profile = new TrapezoidProfile(m_constraints, m_goal, m_setpoint);
+    // acceleration constraints for the next setpoint.
+    var profile = new TrapezoidProfile(m_constraints);
 
     // Retrieve the profiled setpoint for the next timestep. This setpoint moves
     // toward the goal while obeying the constraints.
-    m_setpoint = profile.calculate(kDt);
+    m_setpoint = profile.calculate(kDt, m_goal, m_setpoint);
 
     // Send setpoint to offboard controller PID
     m_motor.setSetpoint(

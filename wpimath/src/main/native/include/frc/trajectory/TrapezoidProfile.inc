@@ -11,12 +11,16 @@
 
 namespace frc {
 template <class Distance>
-TrapezoidProfile<Distance>::TrapezoidProfile(Constraints constraints,
-                                             State goal, State initial)
-    : m_direction{ShouldFlipAcceleration(initial, goal) ? -1 : 1},
-      m_constraints(constraints),
-      m_initial(Direct(initial)),
-      m_goal(Direct(goal)) {
+TrapezoidProfile<Distance>::TrapezoidProfile(Constraints constraints)
+    : m_constraints(constraints) {}
+
+template <class Distance>
+typename TrapezoidProfile<Distance>::State
+TrapezoidProfile<Distance>::Calculate(units::second_t t, State goal,
+                                      State current) {
+  m_direction = ShouldFlipAcceleration(current, goal) ? -1 : 1;
+  m_initial = Direct(current);
+  goal = Direct(goal);
   if (m_initial.velocity > m_constraints.maxVelocity) {
     m_initial.velocity = m_constraints.maxVelocity;
   }
@@ -29,7 +33,7 @@ TrapezoidProfile<Distance>::TrapezoidProfile(Constraints constraints,
   Distance_t cutoffDistBegin =
       cutoffBegin * cutoffBegin * m_constraints.maxAcceleration / 2.0;
 
-  units::second_t cutoffEnd = m_goal.velocity / m_constraints.maxAcceleration;
+  units::second_t cutoffEnd = goal.velocity / m_constraints.maxAcceleration;
   Distance_t cutoffDistEnd =
       cutoffEnd * cutoffEnd * m_constraints.maxAcceleration / 2.0;
 
@@ -37,7 +41,7 @@ TrapezoidProfile<Distance>::TrapezoidProfile(Constraints constraints,
   // of a truncated one
 
   Distance_t fullTrapezoidDist =
-      cutoffDistBegin + (m_goal.position - m_initial.position) + cutoffDistEnd;
+      cutoffDistBegin + (goal.position - m_initial.position) + cutoffDistEnd;
   units::second_t accelerationTime =
       m_constraints.maxVelocity / m_constraints.maxAcceleration;
 
@@ -55,11 +59,6 @@ TrapezoidProfile<Distance>::TrapezoidProfile(Constraints constraints,
   m_endAccel = accelerationTime - cutoffBegin;
   m_endFullSpeed = m_endAccel + fullSpeedDist / m_constraints.maxVelocity;
   m_endDeccel = m_endFullSpeed + accelerationTime - cutoffEnd;
-}
-
-template <class Distance>
-typename TrapezoidProfile<Distance>::State
-TrapezoidProfile<Distance>::Calculate(units::second_t t) const {
   State result = m_initial;
 
   if (t < m_endAccel) {
@@ -74,14 +73,14 @@ TrapezoidProfile<Distance>::Calculate(units::second_t t) const {
                        m_constraints.maxVelocity * (t - m_endAccel);
   } else if (t <= m_endDeccel) {
     result.velocity =
-        m_goal.velocity + (m_endDeccel - t) * m_constraints.maxAcceleration;
+        goal.velocity + (m_endDeccel - t) * m_constraints.maxAcceleration;
     units::second_t timeLeft = m_endDeccel - t;
     result.position =
-        m_goal.position -
-        (m_goal.velocity + timeLeft * m_constraints.maxAcceleration / 2.0) *
+        goal.position -
+        (goal.velocity + timeLeft * m_constraints.maxAcceleration / 2.0) *
             timeLeft;
   } else {
-    result = m_goal;
+    result = goal;
   }
 
   return Direct(result);

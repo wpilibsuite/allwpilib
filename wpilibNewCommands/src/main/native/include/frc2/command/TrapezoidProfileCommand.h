@@ -39,12 +39,19 @@ class TrapezoidProfileCommand
    *
    * @param profile      The motion profile to execute.
    * @param output       The consumer for the profile output.
+   * @param goal The supplier for the desired state
+   * @param currentState The current state
    * @param requirements The list of requirements.
    */
   TrapezoidProfileCommand(frc::TrapezoidProfile<Distance> profile,
                           std::function<void(State)> output,
+                          std::function<State()> goal,
+                          std::function<State()> currentState,
                           std::initializer_list<Subsystem*> requirements)
-      : m_profile(profile), m_output(output) {
+      : m_profile(profile),
+        m_output(output),
+        m_goal(goal),
+        m_currentState(currentState) {
     this->AddRequirements(requirements);
   }
 
@@ -58,14 +65,21 @@ class TrapezoidProfileCommand
    */
   TrapezoidProfileCommand(frc::TrapezoidProfile<Distance> profile,
                           std::function<void(State)> output,
+                          std::function<State()> goal,
+                          std::function<State()> currentState,
                           std::span<Subsystem* const> requirements = {})
-      : m_profile(profile), m_output(output) {
+      : m_profile(profile),
+        m_output(output),
+        m_goal(goal),
+        m_currentState(currentState) {
     this->AddRequirements(requirements);
   }
 
   void Initialize() override { m_timer.Restart(); }
 
-  void Execute() override { m_output(m_profile.Calculate(m_timer.Get())); }
+  void Execute() override {
+    m_output(m_profile.Calculate(m_timer.Get(), m_goal(), m_currentState()));
+  }
 
   void End(bool interrupted) override { m_timer.Stop(); }
 
@@ -76,6 +90,8 @@ class TrapezoidProfileCommand
  private:
   frc::TrapezoidProfile<Distance> m_profile;
   std::function<void(State)> m_output;
+  std::function<State()> m_goal;
+  std::function<State()> m_currentState;
 
   frc::Timer m_timer;
 };

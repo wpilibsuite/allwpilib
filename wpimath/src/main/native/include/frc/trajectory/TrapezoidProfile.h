@@ -21,13 +21,14 @@ namespace frc {
  * @code{.cpp}
  * TrapezoidProfile::Constraints constraints{kMaxV, kMaxA};
  * double previousProfiledReference = initialReference;
+ * TrapezoidProfile profile{constraints};
  * @endcode
  *
  * Run on update:
  * @code{.cpp}
- * TrapezoidProfile profile{constraints, unprofiledReference,
- *                          previousProfiledReference};
- * previousProfiledReference = profile.Calculate(timeSincePreviousUpdate);
+ * previousProfiledReference = profile.Calculate(timeSincePreviousUpdate,
+ *                                               unprofiledReference,
+ *                                               previousProfiledReference);
  * @endcode
  *
  * where `unprofiledReference` is free to change between calls. Note that when
@@ -75,11 +76,8 @@ class TrapezoidProfile {
    * Construct a TrapezoidProfile.
    *
    * @param constraints The constraints on the profile, like maximum velocity.
-   * @param goal        The desired state when the profile is complete.
-   * @param initial     The initial state (usually the current state).
    */
-  TrapezoidProfile(Constraints constraints, State goal,
-                   State initial = State{Distance_t{0}, Velocity_t{0}});
+  TrapezoidProfile(Constraints constraints);
 
   TrapezoidProfile(const TrapezoidProfile&) = default;
   TrapezoidProfile& operator=(const TrapezoidProfile&) = default;
@@ -91,8 +89,10 @@ class TrapezoidProfile {
    * where the beginning of the profile was at time t = 0.
    *
    * @param t The time since the beginning of the profile.
+   * @param goal        The desired state when the profile is complete.
+   * @param current     The initial state (usually the current state).
    */
-  State Calculate(units::second_t t) const;
+  State Calculate(units::second_t t, State goal, State current);
 
   /**
    * Returns the time left until a target distance in the profile is reached.
@@ -142,7 +142,6 @@ class TrapezoidProfile {
 
   Constraints m_constraints;
   State m_initial;
-  State m_goal;
 
   units::second_t m_endAccel;
   units::second_t m_endFullSpeed;
