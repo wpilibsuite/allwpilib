@@ -118,8 +118,10 @@ public class SendableChooser<V> implements NTSendable, AutoCloseable {
   }
 
   /**
-   * Bind a 
-   * @param listener
+   * Bind a listener that's called when the selected value changes. Only one listener can be bound.
+   * Calling this function will replace the previous listener.
+   *
+   * @param listener The function to call that accepts the new value
    */
   public void onChange(Consumer<V> listener) {
     requireNonNullParam(listener, "listener", "onChange");
@@ -167,7 +169,9 @@ public class SendableChooser<V> implements NTSendable, AutoCloseable {
           try {
             m_selected = val;
             if (!m_selected.equals(m_previousVal)) {
-              m_listener.accept(getSelected());
+              m_mutex.unlock();
+              m_listener.accept(m_map.get(val));
+              m_mutex.lock();
             }
             m_previousVal = val;
             for (StringPublisher pub : m_activePubs) {

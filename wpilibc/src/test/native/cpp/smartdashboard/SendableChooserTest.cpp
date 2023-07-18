@@ -63,17 +63,13 @@ TEST(SendableChooserTest, ChangeListener) {
     chooser.AddOption(std::to_string(i), i);
   }
   int currentVal = 0;
-  chooser.OnChange([&] (int val) {for (size_t i = 0; i < val; i++)
-  {
-    currentVal++;
-  }
-  });
-  
+  chooser.OnChange([&](int val) { currentVal = val; });
+
   frc::SmartDashboard::PutData("chooser", &chooser);
   frc::SmartDashboard::UpdateValues();
   frc::SmartDashboard::PutString("chooser/selected", "3");
   frc::SmartDashboard::UpdateValues();
-  
+
   EXPECT_EQ(3, currentVal);
 }
 

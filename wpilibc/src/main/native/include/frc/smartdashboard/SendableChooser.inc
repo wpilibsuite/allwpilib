@@ -105,7 +105,8 @@ void SendableChooser<T>::InitSendable(nt::NTSendableBuilder& builder) {
                               m_haveSelected = true;
                               m_selected = val;
                               if (m_previousVal != val) {
-                                m_listener(GetSelected());
+                                auto listener = m_listener;
+                                listener(m_choices[val]);
                               }
                               m_previousVal = val;
                               for (auto& pub : m_activePubs) {
