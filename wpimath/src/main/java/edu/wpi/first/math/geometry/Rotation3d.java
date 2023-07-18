@@ -308,8 +308,15 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
     final var y = m_q.getY();
     final var z = m_q.getZ();
 
-    // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Quaternion_to_Euler_angles_(in_3-2-1_sequence)_conversion
-    return Math.atan2(2.0 * (w * x + y * z), 1.0 - 2.0 * (x * x + y * y));
+    // wpimath/algorithms.md
+    final var cxcy = 1.0 - 2.0 * (x * x + y * y);
+    final var sxcy = 2.0 * (w * x + y * z);
+    final var cy_sq = cxcy * cxcy + sxcy * sxcy;
+    if (cy_sq > 1e-20) {
+      return Math.atan2(sxcy, cxcy);
+    } else {
+      return 0.0;
+    }
   }
 
   /**
@@ -343,8 +350,15 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
     final var y = m_q.getY();
     final var z = m_q.getZ();
 
-    // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Quaternion_to_Euler_angles_(in_3-2-1_sequence)_conversion
-    return Math.atan2(2.0 * (w * z + x * y), 1.0 - 2.0 * (y * y + z * z));
+    // wpimath/algorithms.md
+    final var cycz = 1.0 - 2.0 * (y * y + z * z);
+    final var cysz = 2.0 * (w * z + x * y);
+    final var cy_sq = cycz * cycz + cysz * cysz;
+    if (cy_sq > 1e-20) {
+      return Math.atan2(cysz, cycz);
+    } else {
+      return Math.atan2(2.0 * w * z, w * w - z * z);
+    }
   }
 
   /**
