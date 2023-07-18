@@ -161,8 +161,6 @@ public class ADXL345_SPI implements NTSendable, AutoCloseable {
       case k16G:
         value = 3;
         break;
-      default:
-        throw new IllegalArgumentException(range + " unsupported");
     }
 
     // Specify the data format to read

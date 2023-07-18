@@ -165,8 +165,6 @@ public class ADXL345_I2C implements NTSendable, AutoCloseable {
       case k16G:
         value = 3;
         break;
-      default:
-        throw new IllegalArgumentException(range + " unsupported range type");
     }
 
     // Specify the data format to read
