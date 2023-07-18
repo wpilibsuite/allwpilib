@@ -53,6 +53,7 @@ class Arm {
       kMinAngle,
       kMaxAngle,
       true,
+      0_deg,
       {kArmEncoderDistPerPulse}};
   frc::sim::EncoderSim m_encoderSim{m_encoder};
 
