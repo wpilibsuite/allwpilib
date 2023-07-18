@@ -63,6 +63,8 @@ public class BuiltInAccelerometer implements Sendable, AutoCloseable {
       case k8G:
         AccelerometerJNI.setAccelerometerRange(2);
         break;
+      default:
+        throw new IllegalArgumentException("Missing case for range type " + range);
     }
 
     AccelerometerJNI.setAccelerometerActive(true);

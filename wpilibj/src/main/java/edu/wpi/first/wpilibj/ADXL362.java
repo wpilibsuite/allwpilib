@@ -183,6 +183,8 @@ public class ADXL362 implements NTSendable, AutoCloseable {
         value = kFilterCtl_Range8G;
         m_gsPerLSB = 0.004;
         break;
+      default:
+        throw new IllegalArgumentException("Missing case for range type " + range);
     }
 
     // Specify the data format to read

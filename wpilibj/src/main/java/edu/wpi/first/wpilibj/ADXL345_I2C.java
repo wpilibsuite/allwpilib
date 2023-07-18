@@ -151,7 +151,6 @@ public class ADXL345_I2C implements NTSendable, AutoCloseable {
    */
   public void setRange(Range range) {
     final byte value;
-
     switch (range) {
       case k2G:
         value = 0;
@@ -165,6 +164,8 @@ public class ADXL345_I2C implements NTSendable, AutoCloseable {
       case k16G:
         value = 3;
         break;
+      default:
+        throw new IllegalArgumentException("Missing case for range type " + range);
     }
 
     // Specify the data format to read
