@@ -16,7 +16,7 @@ TEST(ChassisSpeedsTest, FieldRelativeConstruction) {
   EXPECT_NEAR(0.5, chassisSpeeds.omega.value(), kEpsilon);
 }
 
-TEST(ChassisSpeedsTest, Sum) {
+TEST(ChassisSpeedsTest, Plus) {
   const frc::ChassisSpeeds left{1.0_mps, 0.5_mps, 0.75_rad_per_s};
   const frc::ChassisSpeeds right{2.0_mps, 1.5_mps, 0.25_rad_per_s};
 
@@ -27,7 +27,7 @@ TEST(ChassisSpeedsTest, Sum) {
   EXPECT_NEAR(1.0, result.omega.value(), kEpsilon);
 }
 
-TEST(ChassisSpeedsTest, Difference) {
+TEST(ChassisSpeedsTest, Minus) {
   const frc::ChassisSpeeds left{1.0_mps, 0.5_mps, 0.75_rad_per_s};
   const frc::ChassisSpeeds right{2.0_mps, 0.5_mps, 0.25_rad_per_s};
 

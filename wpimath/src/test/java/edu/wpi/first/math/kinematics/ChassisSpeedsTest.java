@@ -61,7 +61,7 @@ class ChassisSpeedsTest {
   }
 
   @Test
-  void testTimes() {
+  void testMultiplication() {
     final var chassisSpeeds = (new ChassisSpeeds(1.0, 0.5, 0.75)).times(2.0);
 
     assertAll(
@@ -71,7 +71,7 @@ class ChassisSpeedsTest {
   }
 
   @Test
-  void testDiv() {
+  void testDivision() {
     final var chassisSpeeds = (new ChassisSpeeds(1.0, 0.5, 0.75)).div(2.0);
 
     assertAll(
