@@ -31,7 +31,7 @@ template <class T>
   requires std::copy_constructible<T> && std::default_initializable<T>
 class SendableChooser : public SendableChooserBase {
   wpi::StringMap<T> m_choices;
-  std::function<void(T)> m_listener = [](T val) { val; };
+  std::function<void(T)> m_listener;
   template <class U>
   static U _unwrap_smart_ptr(const U& value);
 

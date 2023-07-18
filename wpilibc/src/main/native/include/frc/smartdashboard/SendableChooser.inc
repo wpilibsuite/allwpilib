@@ -101,17 +101,20 @@ void SendableChooser<T>::InitSendable(nt::NTSendableBuilder& builder) {
       nullptr);
   builder.AddStringProperty(kSelected, nullptr,
                             [=, this](std::string_view val) {
-                              std::scoped_lock lock(m_mutex);
-                              m_haveSelected = true;
-                              m_selected = val;
-                              if (m_previousVal != val) {
+                              {
+                                std::scoped_lock lock(m_mutex);
+                                m_haveSelected = true;
+                                m_selected = val;
+                                for (auto& pub : m_activePubs) {
+                                  pub.Set(val);
+                                }
+                              }
+                              if (m_previousVal != val && m_listener) {
+                                auto choice = m_choices[val];
                                 auto listener = m_listener;
-                                listener(m_choices[val]);
+                                listener(choice);
                               }
                               m_previousVal = val;
-                              for (auto& pub : m_activePubs) {
-                                pub.Set(val);
-                              }
                             });
 }
 

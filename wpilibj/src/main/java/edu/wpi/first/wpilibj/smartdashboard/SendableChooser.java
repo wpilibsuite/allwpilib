@@ -50,7 +50,7 @@ public class SendableChooser<V> implements NTSendable, AutoCloseable {
   private String m_defaultChoice = "";
   private final int m_instance;
   private String m_previousVal;
-  private Consumer<V> m_listener = val -> {};
+  private Consumer<V> m_listener;
   private static final AtomicInteger s_instances = new AtomicInteger();
 
   /** Instantiates a {@link SendableChooser}. */
@@ -168,7 +168,7 @@ public class SendableChooser<V> implements NTSendable, AutoCloseable {
           m_mutex.lock();
           try {
             m_selected = val;
-            if (!m_selected.equals(m_previousVal)) {
+            if (!m_selected.equals(m_previousVal) && m_listener != null) {
               m_mutex.unlock();
               m_listener.accept(m_map.get(val));
               m_mutex.lock();
