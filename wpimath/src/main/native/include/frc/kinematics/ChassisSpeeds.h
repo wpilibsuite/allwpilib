@@ -6,6 +6,7 @@
 
 #include <wpi/SymbolExports.h>
 
+#include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
 #include "units/angular_velocity.h"
 #include "units/velocity.h"
@@ -37,6 +38,55 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
    * Represents the angular velocity of the robot frame. (CCW is +)
    */
   units::radians_per_second_t omega = 0_rad_per_s;
+
+  /**
+   * Converts from a chassis speed for a discrete timestep into chassis speed
+   * for continuous time.
+   *
+   * The difference between applying a chassis speed for a discrete timestep vs.
+   * continuously is that applying for a discrete timestep is just scaling the
+   * velocity components by the time and adding, while when applying
+   * continuously the changes to the heading affect the direction the
+   * translational components are applied to relative to the field.
+   *
+   * @param vx Forward velocity.
+   * @param vy Sideways velocity.
+   * @param omega Angular velocity.
+   * @param dt The duration of the timestep the speeds should be applied for.
+   *
+   * @return ChassisSpeeds that can be applied continuously to produce the
+   * discrete ChassisSpeeds.
+   */
+  static ChassisSpeeds FromDiscreteSpeeds(units::meters_per_second_t vx,
+                                          units::meters_per_second_t vy,
+                                          units::radians_per_second_t omega,
+                                          units::second_t dt) {
+    Pose2d desiredDeltaPose{vx * dt, vy * dt, omega * dt};
+    auto twist = Pose2d{}.Log(desiredDeltaPose);
+    return {twist.dx / dt, twist.dy / dt, twist.dtheta / dt};
+  }
+
+  /**
+   * Converts from a chassis speed for a discrete timestep into chassis speed
+   * for continuous time.
+   *
+   * The difference between applying a chassis speed for a discrete timestep vs.
+   * continuously is that applying for a discrete timestep is just scaling the
+   * velocity components by the time and adding, while when applying
+   * continuously the changes to the heading affect the direction the
+   * translational components are applied to relative to the field.
+   *
+   * @param discreteSpeeds The speeds for a discrete timestep.
+   * @param dt The duration of the timestep the speeds should be applied for.
+   *
+   * @return ChassisSpeeds that can be applied continuously to produce the
+   * discrete ChassisSpeeds.
+   */
+  static ChassisSpeeds FromDiscreteSpeeds(const ChassisSpeeds& discreteSpeeds,
+                                          units::second_t dt) {
+    return FromDiscreteSpeeds(discreteSpeeds.vx, discreteSpeeds.vy,
+                              discreteSpeeds.omega, dt);
+  }
 
   /**
    * Converts a user provided field-relative set of speeds into a robot-relative

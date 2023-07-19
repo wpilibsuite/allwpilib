@@ -4,6 +4,7 @@
 
 package edu.wpi.first.math.kinematics;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 /**
@@ -41,6 +42,54 @@ public class ChassisSpeeds {
     this.vxMetersPerSecond = vxMetersPerSecond;
     this.vyMetersPerSecond = vyMetersPerSecond;
     this.omegaRadiansPerSecond = omegaRadiansPerSecond;
+  }
+
+  /**
+   * Converts from a chassis speed for a discrete timestep into chassis speed for continuous time.
+   *
+   * <p>The difference between applying a chassis speed for a discrete timestep vs. continuously is
+   * that applying for a discrete timestep is just scaling the velocity components by the time and
+   * adding, while when applying continuously the changes to the heading affect the direction the
+   * translational components are applied to relative to the field.
+   *
+   * @param vxMetersPerSecond Forward velocity.
+   * @param vyMetersPerSecond Sideways velocity.
+   * @param omegaRadiansPerSecond Angular velocity.
+   * @param dtSeconds The duration of the timestep the speeds should be applied for.
+   * @return ChassisSpeeds that can be applied continuously to produce the discrete chassis speeds.
+   */
+  public static ChassisSpeeds fromDiscreteSpeeds(
+      double vxMetersPerSecond,
+      double vyMetersPerSecond,
+      double omegaRadiansPerSecond,
+      double dtSeconds) {
+    var desiredDeltaPose =
+        new Pose2d(
+            vxMetersPerSecond * dtSeconds,
+            vyMetersPerSecond * dtSeconds,
+            new Rotation2d(omegaRadiansPerSecond * dtSeconds));
+    var twist = new Pose2d().log(desiredDeltaPose);
+    return new ChassisSpeeds(twist.dx / dtSeconds, twist.dy / dtSeconds, twist.dtheta / dtSeconds);
+  }
+
+  /**
+   * Converts from a chassis speed for a discrete timestep into chassis speed for continuous time.
+   *
+   * <p>The difference between applying a chassis speed for a discrete timestep vs. continuously is
+   * that applying for a discrete timestep is just scaling the velocity components by the time and
+   * adding, while when applying continuously the changes to the heading affect the direction the
+   * translational components are applied to relative to the field.
+   *
+   * @param discreteSpeeds The speeds for a discrete timestep.
+   * @param dtSeconds The duration of the timestep the speeds should be applied for.
+   * @return ChassisSpeeds that can be applied continuously to produce the discrete chassis speeds.
+   */
+  public static ChassisSpeeds fromDiscreteSpeeds(ChassisSpeeds discreteSpeeds, double dtSeconds) {
+    return fromDiscreteSpeeds(
+        discreteSpeeds.vxMetersPerSecond,
+        discreteSpeeds.vyMetersPerSecond,
+        discreteSpeeds.omegaRadiansPerSecond,
+        dtSeconds);
   }
 
   /**
