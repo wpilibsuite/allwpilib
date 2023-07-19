@@ -10,6 +10,7 @@
 #endif
 
 #include <concepts>
+#include <functional>
 #include <memory>
 #include <string>
 #include <unordered_map>
