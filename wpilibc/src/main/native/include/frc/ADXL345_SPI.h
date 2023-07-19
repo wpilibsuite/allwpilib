@@ -18,7 +18,7 @@ namespace frc {
  * This class allows access to an Analog Devices ADXL345 3-axis accelerometer
  * via SPI. This class assumes the sensor is wired in 4-wire SPI mode.
  */
-class ADXL345_SPI : public wpi::Sendable,
+class ADXL345_SPI : public nt::NTSendable,
                     public wpi::SendableHelper<ADXL345_SPI> {
  public:
   enum Range { kRange_2G = 0, kRange_4G = 1, kRange_8G = 2, kRange_16G = 3 };

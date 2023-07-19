@@ -17,7 +17,7 @@ namespace frc {
  *
  * This class allows access to an Analog Devices ADXL362 3-axis accelerometer.
  */
-class ADXL362 : public wpi::Sendable, public wpi::SendableHelper<ADXL362> {
+class ADXL362 : public nt::NTSendable, public wpi::SendableHelper<ADXL362> {
  public:
   enum Range { kRange_2G = 0, kRange_4G = 1, kRange_8G = 2 };
 

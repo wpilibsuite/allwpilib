@@ -23,7 +23,7 @@ namespace frc {
  * href="https://docs.wpilib.org/en/stable/docs/yearly-overview/known-issues.html#onboard-i2c-causing-system-lockups">
  * WPILib Known Issues</a> page for details.
  */
-class ADXL345_I2C : public wpi::Sendable,
+class ADXL345_I2C : public nt::NTSendable,
                     public wpi::SendableHelper<ADXL345_I2C> {
  public:
   enum Range { kRange_2G = 0, kRange_4G = 1, kRange_8G = 2, kRange_16G = 3 };
