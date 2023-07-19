@@ -53,6 +53,7 @@ class TrapezoidProfileCommand
         m_goal(goal),
         m_currentState(currentState) {
     this->AddRequirements(requirements);
+    m_newAPI = true;
   }
 
   /**
@@ -75,6 +76,49 @@ class TrapezoidProfileCommand
         m_goal(goal),
         m_currentState(currentState) {
     this->AddRequirements(requirements);
+    m_newAPI = true;
+  }
+
+  /**
+   * Creates a new TrapezoidProfileCommand that will execute the given
+   * TrapezoidalProfile. Output will be piped to the provided consumer function.
+   *
+   * @param profile      The motion profile to execute.
+   * @param output       The consumer for the profile output.
+   * @param requirements The list of requirements.
+   * @deprecated The new constructor allows you to pass in a supplier for
+   * desired and current state. This allows you to change goals at runtime.
+   */
+  WPI_DEPRECATED(
+      "The new constructor allows you to pass in a supplier for desired and "
+      "current state. This allows you to change goals at runtime.")
+  TrapezoidProfileCommand(frc::TrapezoidProfile<Distance> profile,
+                          std::function<void(State)> output,
+                          std::initializer_list<Subsystem*> requirements)
+      : m_profile(profile), m_output(output) {
+    this->AddRequirements(requirements);
+    m_newAPI = false;
+  }
+
+  /**
+   * Creates a new TrapezoidProfileCommand that will execute the given
+   * TrapezoidalProfile. Output will be piped to the provided consumer function.
+   *
+   * @param profile      The motion profile to execute.
+   * @param output       The consumer for the profile output.
+   * @param requirements The list of requirements.
+   * @deprecated The new constructor allows you to pass in a supplier for
+   * desired and current state. This allows you to change goals at runtime.
+   */
+  WPI_DEPRECATED(
+      "The new constructor allows you to pass in a supplier for desired and "
+      "current state. This allows you to change goals at runtime.")
+  TrapezoidProfileCommand(frc::TrapezoidProfile<Distance> profile,
+                          std::function<void(State)> output,
+                          std::span<Subsystem* const> requirements = {})
+      : m_profile(profile), m_output(output) {
+    this->AddRequirements(requirements);
+    m_newAPI = false;
   }
 
   void Initialize() override { m_timer.Restart(); }
@@ -94,7 +138,7 @@ class TrapezoidProfileCommand
   std::function<void(State)> m_output;
   std::function<State()> m_goal;
   std::function<State()> m_currentState;
-
+  bool m_newAPI;  // TODO: Remove
   frc::Timer m_timer;
 };
 

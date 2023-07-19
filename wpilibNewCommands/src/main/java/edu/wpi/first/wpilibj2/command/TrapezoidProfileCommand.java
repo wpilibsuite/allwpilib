@@ -22,7 +22,7 @@ public class TrapezoidProfileCommand extends Command {
   private final Consumer<State> m_output;
   private final Supplier<State> m_goal;
   private final Supplier<State> m_currentState;
-
+  private final boolean m_newAPI; // TODO: Remove
   private final Timer m_timer = new Timer();
 
   /**
@@ -45,6 +45,28 @@ public class TrapezoidProfileCommand extends Command {
     m_output = requireNonNullParam(output, "output", "TrapezoidProfileCommand");
     m_goal = goal;
     m_currentState = currentState;
+    m_newAPI = true;
+    addRequirements(requirements);
+  }
+
+  /**
+   * Creates a new TrapezoidProfileCommand that will execute the given {@link TrapezoidProfile}.
+   * Output will be piped to the provided consumer function.
+   *
+   * @param profile The motion profile to execute.
+   * @param output The consumer for the profile output.
+   * @param requirements The subsystems required by this command.
+   * @deprecated The new constructor allows you to pass in a supplier for desired and current state.
+   *     This allows you to change goals at runtime.
+   */
+  @Deprecated(since = "2024", forRemoval = true)
+  public TrapezoidProfileCommand(
+      TrapezoidProfile profile, Consumer<State> output, Subsystem... requirements) {
+    m_profile = requireNonNullParam(profile, "profile", "TrapezoidProfileCommand");
+    m_output = requireNonNullParam(output, "output", "TrapezoidProfileCommand");
+    m_newAPI = false;
+    m_goal = null;
+    m_currentState = null;
     addRequirements(requirements);
   }
 
@@ -54,8 +76,13 @@ public class TrapezoidProfileCommand extends Command {
   }
 
   @Override
+  @SuppressWarnings("removal")
   public void execute() {
-    m_output.accept(m_profile.calculate(m_timer.get(), m_goal.get(), m_currentState.get()));
+    if (m_newAPI) {
+      m_output.accept(m_profile.calculate(m_timer.get(), m_goal.get(), m_currentState.get()));
+    } else {
+      m_output.accept(m_profile.calculate(m_timer.get()));
+    }
   }
 
   @Override
