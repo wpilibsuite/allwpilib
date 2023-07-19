@@ -317,6 +317,9 @@ bool nt::operator==(const Value& lhs, const Value& rhs) {
       if (lhs.m_val.data.arr_boolean.size != rhs.m_val.data.arr_boolean.size) {
         return false;
       }
+      if (lhs.m_val.data.arr_boolean.size == 0) {
+        return true;
+      }
       return std::memcmp(lhs.m_val.data.arr_boolean.arr,
                          rhs.m_val.data.arr_boolean.arr,
                          lhs.m_val.data.arr_boolean.size *
@@ -325,12 +328,18 @@ bool nt::operator==(const Value& lhs, const Value& rhs) {
       if (lhs.m_val.data.arr_int.size != rhs.m_val.data.arr_int.size) {
         return false;
       }
+      if (lhs.m_val.data.arr_int.size == 0) {
+        return true;
+      }
       return std::memcmp(lhs.m_val.data.arr_int.arr, rhs.m_val.data.arr_int.arr,
                          lhs.m_val.data.arr_int.size *
                              sizeof(lhs.m_val.data.arr_int.arr[0])) == 0;
     case NT_FLOAT_ARRAY:
       if (lhs.m_val.data.arr_float.size != rhs.m_val.data.arr_float.size) {
         return false;
+      }
+      if (lhs.m_val.data.arr_float.size == 0) {
+        return true;
       }
       return std::memcmp(lhs.m_val.data.arr_float.arr,
                          rhs.m_val.data.arr_float.arr,
@@ -340,11 +349,17 @@ bool nt::operator==(const Value& lhs, const Value& rhs) {
       if (lhs.m_val.data.arr_double.size != rhs.m_val.data.arr_double.size) {
         return false;
       }
+      if (lhs.m_val.data.arr_double.size == 0) {
+        return true;
+      }
       return std::memcmp(lhs.m_val.data.arr_double.arr,
                          rhs.m_val.data.arr_double.arr,
                          lhs.m_val.data.arr_double.size *
                              sizeof(lhs.m_val.data.arr_double.arr[0])) == 0;
     case NT_STRING_ARRAY:
+      if (lhs.m_val.data.arr_string.size == 0) {
+        return true;
+      }
       return static_cast<StringArrayStorage*>(lhs.m_storage.get())->strings ==
              static_cast<StringArrayStorage*>(rhs.m_storage.get())->strings;
     default:

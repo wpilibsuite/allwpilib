@@ -5,6 +5,7 @@
 #pragma once
 
 #include <concepts>
+#include <functional>
 #include <initializer_list>
 #include <memory>
 #include <span>
@@ -76,12 +77,6 @@ class CommandScheduler final : public nt::NTSendable,
    * buttons.
    */
   frc::EventLoop* GetDefaultButtonLoop() const;
-
-  /**
-   * Removes all button bindings from the scheduler.
-   */
-  [[deprecated("Call Clear on the EventLoop instance directly!")]]
-  void ClearButtons();
 
   /**
    * Schedules a command for execution. Does nothing if the command is already
@@ -163,6 +158,13 @@ class CommandScheduler final : public nt::NTSendable,
 
   void UnregisterSubsystem(std::initializer_list<Subsystem*> subsystems);
   void UnregisterSubsystem(std::span<Subsystem* const> subsystems);
+
+  /**
+   * Un-registers all registered Subsystems with the scheduler. All currently
+   * registered subsystems will no longer have their periodic block called, and
+   * will not have their default command scheduled.
+   */
+  void UnregisterAllSubsystems();
 
   /**
    * Sets the default command for a subsystem.  Registers that subsystem if it

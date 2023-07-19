@@ -13,6 +13,7 @@
 #include <units/time.h>
 #include <wpi/Demangle.h>
 #include <wpi/SmallSet.h>
+#include <wpi/sendable/Sendable.h>
 
 #include "frc2/command/Subsystem.h"
 
@@ -22,8 +23,6 @@ template <typename T>
 std::string GetTypeName(const T& type) {
   return wpi::Demangle(typeid(type).name());
 }
-
-class PerpetualCommand;
 
 /**
  * A state machine representing a complete action to be performed by the robot.
@@ -43,10 +42,9 @@ class PerpetualCommand;
  * @see CommandScheduler
  * @see CommandHelper
  */
-class Command {
+class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
  public:
-  Command() = default;
-  virtual ~Command();
+  ~Command() override;
 
   Command(const Command&) = default;
   Command& operator=(const Command& rhs);
@@ -94,7 +92,91 @@ class Command {
    * @return the set of subsystems that are required
    * @see InterruptionBehavior
    */
-  virtual wpi::SmallSet<Subsystem*, 4> GetRequirements() const = 0;
+  virtual wpi::SmallSet<Subsystem*, 4> GetRequirements() const;
+
+  /**
+   * Adds the specified Subsystem requirements to the command.
+   *
+   * The scheduler will prevent two commands that require the same subsystem
+   * from being scheduled simultaneously.
+   *
+   * Note that the scheduler determines the requirements of a command when it
+   * is scheduled, so this method should normally be called from the command's
+   * constructor.
+   *
+   * @param requirements the Subsystem requirements to add
+   */
+  void AddRequirements(std::initializer_list<Subsystem*> requirements);
+
+  /**
+   * Adds the specified Subsystem requirements to the command.
+   *
+   * The scheduler will prevent two commands that require the same subsystem
+   * from being scheduled simultaneously.
+   *
+   * Note that the scheduler determines the requirements of a command when it
+   * is scheduled, so this method should normally be called from the command's
+   * constructor.
+   *
+   * @param requirements the Subsystem requirements to add
+   */
+  void AddRequirements(std::span<Subsystem* const> requirements);
+
+  /**
+   * Adds the specified Subsystem requirements to the command.
+   *
+   * The scheduler will prevent two commands that require the same subsystem
+   * from being scheduled simultaneously.
+   *
+   * Note that the scheduler determines the requirements of a command when it
+   * is scheduled, so this method should normally be called from the command's
+   * constructor.
+   *
+   * @param requirements the Subsystem requirements to add
+   */
+  void AddRequirements(wpi::SmallSet<Subsystem*, 4> requirements);
+
+  /**
+   * Adds the specified Subsystem requirement to the command.
+   *
+   * The scheduler will prevent two commands that require the same subsystem
+   * from being scheduled simultaneously.
+   *
+   * Note that the scheduler determines the requirements of a command when it
+   * is scheduled, so this method should normally be called from the command's
+   * constructor.
+   *
+   * @param requirement the Subsystem requirement to add
+   */
+  void AddRequirements(Subsystem* requirement);
+
+  /**
+   * Gets the name of this Command.
+   *
+   * @return Name
+   */
+  std::string GetName() const;
+
+  /**
+   * Sets the name of this Command.
+   *
+   * @param name name
+   */
+  void SetName(std::string_view name);
+
+  /**
+   * Gets the subsystem name of this Command.
+   *
+   * @return Subsystem name
+   */
+  std::string GetSubsystem() const;
+
+  /**
+   * Sets the subsystem name of this Command.
+   *
+   * @param subsystem subsystem name
+   */
+  void SetSubsystem(std::string_view subsystem);
 
   /**
    * An enum describing the command's behavior when another command with a
@@ -148,18 +230,6 @@ class Command {
   CommandPtr OnlyWhile(std::function<bool()> condition) &&;
 
   /**
-   * Decorates this command with an interrupt condition.  If the specified
-   * condition becomes true before the command finishes normally, the command
-   * will be interrupted and un-scheduled.
-   *
-   * @param condition the interrupt condition
-   * @return the command with the interrupt condition added
-   * @deprecated Replace with Until()
-   */
-  [[deprecated("Replace with Until()")]] [[nodiscard]]
-  CommandPtr WithInterrupt(std::function<bool()> condition) &&;
-
-  /**
    * Decorates this command with a runnable to run before this command starts.
    *
    * @param toRun the Runnable to run
@@ -202,26 +272,6 @@ class Command {
   [[nodiscard]]
   CommandPtr AndThen(std::function<void()> toRun,
                      std::span<Subsystem* const> requirements = {}) &&;
-
-  /**
-   * Decorates this command to run perpetually, ignoring its ordinary end
-   * conditions.  The decorated command can still be interrupted or canceled.
-   *
-   * @return the decorated command
-   * @deprecated PerpetualCommand violates the assumption that execute() doesn't
-get called after isFinished() returns true -- an assumption that should be
-valid. This was unsafe/undefined behavior from the start, and RepeatCommand
-provides an easy way to achieve similar end results with slightly different (and
-safe) semantics.
-   */
-  [[deprecated(
-      "PerpetualCommand violates the assumption that execute() doesn't get "
-      "called after isFinished() returns true -- an assumption that should be "
-      "valid."
-      "This was unsafe/undefined behavior from the start, and RepeatCommand "
-      "provides an easy way to achieve similar end results with slightly "
-      "different (and safe) semantics.")]]
-  PerpetualCommand Perpetually() &&;
 
   /**
    * Decorates this command to run repeatedly, restarting it when it ends, until
@@ -362,25 +412,6 @@ safe) semantics.
   void SetComposed(bool isComposed);
 
   /**
-   * Whether the command is currently grouped in a command group.  Used as extra
-   * insurance to prevent accidental independent use of grouped commands.
-   *
-   * @deprecated Moved to IsComposed()
-   */
-  [[deprecated("Moved to IsComposed()")]]
-  bool IsGrouped() const;
-
-  /**
-   * Sets whether the command is currently grouped in a command group.  Can be
-   * used to "reclaim" a command if a group is no longer going to use it.  NOT
-   * ADVISED!
-   *
-   * @deprecated Moved to SetComposed()
-   */
-  [[deprecated("Moved to SetComposed()")]]
-  void SetGrouped(bool grouped);
-
-  /**
    * Whether the given command should run when the robot is disabled.  Override
    * to return true if the command should run when disabled.
    *
@@ -399,27 +430,18 @@ safe) semantics.
   }
 
   /**
-   * Gets the name of this Command. Defaults to the simple class name if not
-   * overridden.
-   *
-   * @return The display name of the Command
-   */
-  virtual std::string GetName() const;
-
-  /**
-   * Sets the name of this Command. Nullop if not overridden.
-   *
-   * @param name The display name of the Command.
-   */
-  virtual void SetName(std::string_view name);
-
-  /**
    * Transfers ownership of this command to a unique pointer.  Used for
    * decorator methods.
    */
   virtual CommandPtr ToPtr() && = 0;
 
+  void InitSendable(wpi::SendableBuilder& builder) override;
+
  protected:
+  Command();
+
+  wpi::SmallSet<Subsystem*, 4> m_requirements;
+
   /**
    * Transfers ownership of this command to a unique pointer.  Used for
    * decorator methods.

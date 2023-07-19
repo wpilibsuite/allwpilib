@@ -19,7 +19,7 @@ import edu.wpi.first.util.sendable.SendableBuilder;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public class RepeatCommand extends CommandBase {
+public class RepeatCommand extends Command {
   protected final Command m_command;
   private boolean m_ended;
 

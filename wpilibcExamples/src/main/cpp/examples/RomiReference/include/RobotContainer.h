@@ -8,7 +8,7 @@
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc2/command/Command.h>
 #include <frc2/command/CommandPtr.h>
-#include <frc2/command/button/Button.h>
+#include <frc2/command/button/Trigger.h>
 
 #include "Constants.h"
 #include "commands/AutonomousDistance.h"

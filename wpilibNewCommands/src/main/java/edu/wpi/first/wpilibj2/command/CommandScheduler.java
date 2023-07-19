@@ -152,27 +152,6 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
   }
 
   /**
-   * Adds a button binding to the scheduler, which will be polled to schedule commands.
-   *
-   * @param button The button to add
-   * @deprecated Use {@link edu.wpi.first.wpilibj2.command.button.Trigger}
-   */
-  @Deprecated(since = "2023")
-  public void addButton(Runnable button) {
-    m_activeButtonLoop.bind(requireNonNullParam(button, "button", "addButton"));
-  }
-
-  /**
-   * Removes all button bindings from the scheduler.
-   *
-   * @deprecated call {@link EventLoop#clear()} on {@link #getActiveButtonLoop()} directly instead.
-   */
-  @Deprecated(since = "2023")
-  public void clearButtons() {
-    m_activeButtonLoop.clear();
-  }
-
-  /**
    * Initializes a given command, adds its requirements to the list, and performs the init actions.
    *
    * @param command The command to initialize
@@ -381,6 +360,15 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
    */
   public void unregisterSubsystem(Subsystem... subsystems) {
     m_subsystems.keySet().removeAll(Set.of(subsystems));
+  }
+
+  /**
+   * Un-registers all registered Subsystems with the scheduler. All currently registered subsystems
+   * will no longer have their periodic block called, and will not have their default command
+   * scheduled.
+   */
+  public void unregisterAllSubsystems() {
+    m_subsystems.clear();
   }
 
   /**

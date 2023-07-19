@@ -5,10 +5,10 @@
 package edu.wpi.first.wpilibj.examples.romireference.commands;
 
 import edu.wpi.first.wpilibj.examples.romireference.subsystems.Drivetrain;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import java.util.function.Supplier;
 
-public class ArcadeDrive extends CommandBase {
+public class ArcadeDrive extends Command {
   private final Drivetrain m_drivetrain;
   private final Supplier<Double> m_xaxisSpeedSupplier;
   private final Supplier<Double> m_zaxisRotateSupplier;

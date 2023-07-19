@@ -4,7 +4,12 @@
 
 package edu.wpi.first.wpilibj.interfaces;
 
-/** Interface for 3-axis accelerometers. */
+/**
+ * Interface for 3-axis accelerometers.
+ *
+ * @deprecated This interface is being removed with no replacement.
+ */
+@Deprecated(since = "2024", forRemoval = true)
 public interface Accelerometer {
   enum Range {
     k2G,

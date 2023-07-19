@@ -23,7 +23,7 @@ class Drivetrain {
 
   void Drive(units::meters_per_second_t xSpeed,
              units::meters_per_second_t ySpeed, units::radians_per_second_t rot,
-             bool fieldRelative);
+             bool fieldRelative, units::second_t period);
   void UpdateOdometry();
 
   static constexpr auto kMaxSpeed = 3.0_mps;  // 3 meters per second

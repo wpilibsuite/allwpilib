@@ -5,6 +5,7 @@
 #pragma once
 
 #include <algorithm>
+#include <functional>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -46,6 +47,13 @@ auto SendableChooser<T>::GetSelected()
   } else {
     return _unwrap_smart_ptr(m_choices[selected]);
   }
+}
+
+template <class T>
+  requires std::copy_constructible<T> && std::default_initializable<T>
+void SendableChooser<T>::OnChange(std::function<void(T)> listener) {
+  std::scoped_lock lock(m_mutex);
+  m_listener = listener;
 }
 
 template <class T>
@@ -95,11 +103,23 @@ void SendableChooser<T>::InitSendable(nt::NTSendableBuilder& builder) {
       nullptr);
   builder.AddStringProperty(kSelected, nullptr,
                             [=, this](std::string_view val) {
-                              std::scoped_lock lock(m_mutex);
-                              m_haveSelected = true;
-                              m_selected = val;
-                              for (auto& pub : m_activePubs) {
-                                pub.Set(val);
+                              T choice{};
+                              std::function<void(T)> listener;
+                              {
+                                std::scoped_lock lock(m_mutex);
+                                m_haveSelected = true;
+                                m_selected = val;
+                                for (auto& pub : m_activePubs) {
+                                  pub.Set(val);
+                                }
+                                if (m_previousVal != val && m_listener) {
+                                  choice = m_choices[val];
+                                  listener = m_listener;
+                                }
+                                m_previousVal = val;
+                              }
+                              if (listener) {
+                                listener(choice);
                               }
                             });
 }

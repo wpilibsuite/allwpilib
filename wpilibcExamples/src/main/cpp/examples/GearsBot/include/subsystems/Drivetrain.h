@@ -10,7 +10,7 @@
 #include <frc/drive/DifferentialDrive.h>
 #include <frc/motorcontrol/MotorControllerGroup.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
-#include <frc2/command/SubsystemBase.h>
+#include <frc2/command/Subsystem.h>
 
 namespace frc {
 class Joystick;
@@ -21,7 +21,7 @@ class Joystick;
  * the robots chassis. These include four drive motors, a left and right encoder
  * and a gyro.
  */
-class Drivetrain : public frc2::SubsystemBase {
+class Drivetrain : public frc2::Subsystem {
  public:
   Drivetrain();
 

@@ -21,7 +21,7 @@ class CommandSendableButtonTest extends CommandTestBase {
   private AtomicInteger m_schedule;
   private AtomicInteger m_cancel;
   private BooleanPublisher m_publish;
-  private CommandBase m_command;
+  private Command m_command;
 
   @BeforeEach
   void setUp() {

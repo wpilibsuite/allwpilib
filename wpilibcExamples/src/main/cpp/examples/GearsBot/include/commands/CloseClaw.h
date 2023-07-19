@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <frc2/command/CommandBase.h>
+#include <frc2/command/Command.h>
 #include <frc2/command/CommandHelper.h>
 
 #include "subsystems/Claw.h"
@@ -12,7 +12,7 @@
 /**
  * Closes the claw until the limit switch is tripped.
  */
-class CloseClaw : public frc2::CommandHelper<frc2::CommandBase, CloseClaw> {
+class CloseClaw : public frc2::CommandHelper<frc2::Command, CloseClaw> {
  public:
   explicit CloseClaw(Claw& claw);
   void Initialize() override;

@@ -15,7 +15,7 @@ import java.util.function.Supplier;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public class ProxyCommand extends CommandBase {
+public class ProxyCommand extends Command {
   private final Supplier<Command> m_supplier;
   private Command m_command;
 

@@ -19,7 +19,7 @@ import java.util.function.BooleanSupplier;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public class ConditionalCommand extends CommandBase {
+public class ConditionalCommand extends Command {
   private final Command m_onTrue;
   private final Command m_onFalse;
   private final BooleanSupplier m_condition;

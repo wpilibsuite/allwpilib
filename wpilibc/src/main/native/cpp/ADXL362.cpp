@@ -93,7 +93,6 @@ void ADXL362::SetRange(Range range) {
       m_gsPerLSB = 0.002;
       break;
     case kRange_8G:
-    case kRange_16G:  // 16G not supported; treat as 8G
       m_gsPerLSB = 0.004;
       break;
   }

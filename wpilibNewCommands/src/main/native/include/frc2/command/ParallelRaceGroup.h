@@ -17,7 +17,7 @@
 
 #include <wpi/DecayedDerivedFrom.h>
 
-#include "frc2/command/CommandGroupBase.h"
+#include "frc2/command/CommandBase.h"
 #include "frc2/command/CommandHelper.h"
 
 namespace frc2 {
@@ -32,8 +32,7 @@ namespace frc2 {
  *
  * This class is provided by the NewCommands VendorDep
  */
-class ParallelRaceGroup
-    : public CommandHelper<CommandGroupBase, ParallelRaceGroup> {
+class ParallelRaceGroup : public CommandHelper<Command, ParallelRaceGroup> {
  public:
   /**
    * Creates a new ParallelCommandRace. The given commands will be executed
@@ -57,6 +56,11 @@ class ParallelRaceGroup
   // Prevent template expansion from emulating copy ctor
   ParallelRaceGroup(ParallelRaceGroup&) = delete;
 
+  /**
+   * Adds the given commands to the group.
+   *
+   * @param commands Commands to add to the group.
+   */
   template <wpi::DecayedDerivedFrom<Command>... Commands>
   void AddCommands(Commands&&... commands) {
     std::vector<std::unique_ptr<Command>> foo;
@@ -79,7 +83,7 @@ class ParallelRaceGroup
   Command::InterruptionBehavior GetInterruptionBehavior() const override;
 
  private:
-  void AddCommands(std::vector<std::unique_ptr<Command>>&& commands) final;
+  void AddCommands(std::vector<std::unique_ptr<Command>>&& commands);
 
   std::vector<std::unique_ptr<Command>> m_commands;
   bool m_runWhenDisabled{true};

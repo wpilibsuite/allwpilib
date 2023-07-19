@@ -96,6 +96,10 @@ sourceSets {
     dev
 }
 
+configurations {
+    devImplementation.extendsFrom(implementation)
+}
+
 tasks.withType(JavaCompile).configureEach {
     options.compilerArgs = [
         '--release',
