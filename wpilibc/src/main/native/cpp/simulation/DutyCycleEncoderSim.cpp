@@ -48,10 +48,6 @@ double DutyCycleEncoderSim::GetDistancePerRotation() {
   return m_simDistancePerRotation.Get();
 }
 
-void DutyCycleEncoderSim::SetDistancePerRotation(double distancePerRotation) {
-  m_simDistancePerRotation.Set(distancePerRotation);
-}
-
 bool DutyCycleEncoderSim::IsConnected() {
   return m_simIsConnected.Get();
 }

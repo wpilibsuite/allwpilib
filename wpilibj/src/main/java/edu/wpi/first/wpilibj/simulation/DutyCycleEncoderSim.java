@@ -101,16 +101,6 @@ public class DutyCycleEncoderSim {
   }
 
   /**
-   * Set the distance per rotation for this encoder.
-   *
-   * @param distancePerRotation The scale factor that will be used to convert rotation to useful
-   *     units.
-   */
-  public void setDistancePerRotation(double distancePerRotation) {
-    m_simDistancePerRotation.set(distancePerRotation);
-  }
-
-  /**
    * Get if the encoder is connected.
    *
    * @return true if the encoder is connected.

@@ -219,9 +219,6 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
    * @return The scale factor that will be used to convert rotation to useful units.
    */
   public double getDistancePerRotation() {
-    if (m_simDistancePerRotation != null) {
-      return m_simDistancePerRotation.get();
-    }
     return m_distancePerRotation;
   }
 
@@ -251,7 +248,6 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
     }
     if (m_simPosition != null) {
       m_simPosition.set(0);
-      m_simAbsolutePosition.set(0);
     }
     m_positionOffset = getAbsolutePosition();
   }

@@ -38,7 +38,7 @@ TEST(DutyCycleEncoderSimTest, SetDistancePerRotation) {
   DutyCycleEncoder enc{0};
   DutyCycleEncoderSim sim(enc);
   sim.Set(units::turn_t{1.5});
-  sim.SetDistancePerRotation(42);
+  enc.SetDistancePerRotation(42);
   EXPECT_EQ(63, enc.GetDistance());
 }
 

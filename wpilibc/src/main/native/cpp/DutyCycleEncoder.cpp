@@ -149,9 +149,6 @@ void DutyCycleEncoder::SetDistancePerRotation(double distancePerRotation) {
 }
 
 double DutyCycleEncoder::GetDistancePerRotation() const {
-  if (m_simDistancePerRotation) {
-    return m_simDistancePerRotation.Get();
-  }
   return m_distancePerRotation;
 }
 
@@ -169,7 +166,6 @@ void DutyCycleEncoder::Reset() {
   }
   if (m_simPosition) {
     m_simPosition.Set(0);
-    m_simAbsolutePosition.Set(0);
   }
   m_positionOffset = GetAbsolutePosition();
 }

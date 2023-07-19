@@ -42,7 +42,7 @@ class DutyCycleEncoderSimTest {
     try (DutyCycleEncoder encoder = new DutyCycleEncoder(0)) {
       DutyCycleEncoderSim sim = new DutyCycleEncoderSim(encoder);
       sim.set(1.5);
-      sim.setDistancePerRotation(42);
+      encoder.setDistancePerRotation(42);
       assertEquals(63.0, encoder.getDistance());
     }
   }
