@@ -48,7 +48,7 @@ class CommandScheduler::Impl {
   // every command.
   wpi::SmallVector<Action, 4> initActions;
   wpi::SmallVector<Action, 4> executeActions;
-  wpi::SmallVector<Action, 4> interruptActions;
+  wpi::SmallVector<InterruptAction, 4> interruptActions;
   wpi::SmallVector<Action, 4> finishActions;
 
   // Flag and queues for avoiding concurrent modification if commands are
@@ -56,7 +56,7 @@ class CommandScheduler::Impl {
 
   bool inRunLoop = false;
   wpi::SmallVector<Command*, 4> toSchedule;
-  wpi::SmallVector<Command*, 4> toCancel;
+  wpi::SmallVector<std::pair<Command*, std::optional<Command*>>, 4> toCancel;
 };
 
 template <typename TMap, typename TKey>
@@ -138,7 +138,7 @@ void CommandScheduler::Schedule(Command* command) {
   if (isDisjoint || allInterruptible) {
     if (allInterruptible) {
       for (auto&& cmdToCancel : intersection) {
-        Cancel(cmdToCancel);
+        Cancel(cmdToCancel, std::make_optional(command));
       }
     }
     m_impl->scheduledCommands.insert(command);
@@ -196,7 +196,7 @@ void CommandScheduler::Run() {
   // Run scheduled commands, remove finished commands.
   for (Command* command : m_impl->scheduledCommands) {
     if (!command->RunsWhenDisabled() && frc::RobotState::IsDisabled()) {
-      Cancel(command);
+      Cancel(command, std::nullopt);
       continue;
     }
 
@@ -226,8 +226,8 @@ void CommandScheduler::Run() {
     Schedule(command);
   }
 
-  for (auto&& command : m_impl->toCancel) {
-    Cancel(command);
+  for (auto&& cancelData : m_impl->toCancel) {
+    Cancel(cancelData.first, cancelData.second);
   }
 
   m_impl->toSchedule.clear();
@@ -319,13 +319,14 @@ Command* CommandScheduler::GetDefaultCommand(const Subsystem* subsystem) const {
   }
 }
 
-void CommandScheduler::Cancel(Command* command) {
+void CommandScheduler::Cancel(Command* command,
+                              std::optional<Command*> interruptor) {
   if (!m_impl) {
     return;
   }
 
   if (m_impl->inRunLoop) {
-    m_impl->toCancel.emplace_back(command);
+    m_impl->toCancel.emplace_back(command, interruptor);
     return;
   }
 
@@ -341,9 +342,13 @@ void CommandScheduler::Cancel(Command* command) {
   }
   command->End(true);
   for (auto&& action : m_impl->interruptActions) {
-    action(*command);
+    action(*command, interruptor);
   }
   m_watchdog.AddEpoch(command->GetName() + ".End(true)");
+}
+
+void CommandScheduler::Cancel(Command* command) {
+  Cancel(command, std::nullopt);
 }
 
 void CommandScheduler::Cancel(const CommandPtr& command) {
@@ -424,6 +429,14 @@ void CommandScheduler::OnCommandExecute(Action action) {
 }
 
 void CommandScheduler::OnCommandInterrupt(Action action) {
+  m_impl->interruptActions.emplace_back(
+      [action = std::move(action)](const Command& command,
+                                   const std::optional<Command*>& interruptor) {
+        action(command);
+      });
+}
+
+void CommandScheduler::OnCommandInterrupt(InterruptAction action) {
   m_impl->interruptActions.emplace_back(std::move(action));
 }
 
