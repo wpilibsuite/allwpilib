@@ -33,14 +33,12 @@ class Robot : public frc::TimedRobot {
     }
 
     // Create a motion profile with the given maximum velocity and maximum
-    // acceleration constraints for the next setpoint, the desired goal, and the
-    // current setpoint.
-    frc::TrapezoidProfile<units::meters> profile{m_constraints, m_goal,
-                                                 m_setpoint};
+    // acceleration constraints for the next setpoint.
+    frc::TrapezoidProfile<units::meters> profile{m_constraints};
 
     // Retrieve the profiled setpoint for the next timestep. This setpoint moves
     // toward the goal while obeying the constraints.
-    m_setpoint = profile.Calculate(kDt);
+    m_setpoint = profile.Calculate(kDt, m_goal, m_setpoint);
 
     // Send setpoint to offboard controller PID
     m_motor.SetSetpoint(ExampleSmartMotorController::PIDMode::kPosition,

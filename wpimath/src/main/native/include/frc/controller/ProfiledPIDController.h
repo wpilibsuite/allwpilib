@@ -317,8 +317,8 @@ class ProfiledPIDController
       m_setpoint.position = setpointMinDistance + measurement;
     }
 
-    frc::TrapezoidProfile<Distance> profile{m_constraints, m_goal, m_setpoint};
-    m_setpoint = profile.Calculate(GetPeriod());
+    frc::TrapezoidProfile<Distance> profile{m_constraints};
+    m_setpoint = profile.Calculate(GetPeriod(), m_goal, m_setpoint);
     return m_controller.Calculate(measurement.value(),
                                   m_setpoint.position.value());
   }
