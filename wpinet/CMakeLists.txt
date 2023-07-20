@@ -108,10 +108,7 @@ set(uv_darwin_src
 )
 
 set(uv_linux_src
-    src/main/native/thirdparty/libuv/src/unix/epoll.cpp
-    src/main/native/thirdparty/libuv/src/unix/linux-core.cpp
-    src/main/native/thirdparty/libuv/src/unix/linux-inotify.cpp
-    src/main/native/thirdparty/libuv/src/unix/linux-syscalls.cpp
+    src/main/native/thirdparty/libuv/src/unix/linux.cpp
     src/main/native/thirdparty/libuv/src/unix/procfs-exepath.cpp
     src/main/native/thirdparty/libuv/src/unix/proctitle.cpp
     src/main/native/thirdparty/libuv/src/unix/random-sysctl-linux.cpp

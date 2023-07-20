@@ -14,7 +14,7 @@ namespace frc::sim {
 TEST(ADXL362SimTest, SetAttributes) {
   HAL_Initialize(500, 0);
 
-  ADXL362 accel(SPI::kMXP, Accelerometer::kRange_2G);
+  ADXL362 accel(SPI::kMXP, ADXL362::kRange_2G);
   ADXL362Sim sim(accel);
 
   EXPECT_EQ(0, accel.GetX());

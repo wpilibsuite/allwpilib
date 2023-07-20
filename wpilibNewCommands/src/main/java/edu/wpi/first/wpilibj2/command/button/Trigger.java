@@ -56,7 +56,7 @@ public class Trigger implements BooleanSupplier {
    * @return this trigger, so calls can be chained
    */
   public Trigger onTrue(Command command) {
-    requireNonNullParam(command, "command", "onRising");
+    requireNonNullParam(command, "command", "onTrue");
     m_loop.bind(
         new Runnable() {
           private boolean m_pressedLast = m_condition.getAsBoolean();
@@ -82,7 +82,7 @@ public class Trigger implements BooleanSupplier {
    * @return this trigger, so calls can be chained
    */
   public Trigger onFalse(Command command) {
-    requireNonNullParam(command, "command", "onFalling");
+    requireNonNullParam(command, "command", "onFalse");
     m_loop.bind(
         new Runnable() {
           private boolean m_pressedLast = m_condition.getAsBoolean();
@@ -112,7 +112,7 @@ public class Trigger implements BooleanSupplier {
    * @return this trigger, so calls can be chained
    */
   public Trigger whileTrue(Command command) {
-    requireNonNullParam(command, "command", "whileHigh");
+    requireNonNullParam(command, "command", "whileTrue");
     m_loop.bind(
         new Runnable() {
           private boolean m_pressedLast = m_condition.getAsBoolean();
@@ -144,7 +144,7 @@ public class Trigger implements BooleanSupplier {
    * @return this trigger, so calls can be chained
    */
   public Trigger whileFalse(Command command) {
-    requireNonNullParam(command, "command", "whileLow");
+    requireNonNullParam(command, "command", "whileFalse");
     m_loop.bind(
         new Runnable() {
           private boolean m_pressedLast = m_condition.getAsBoolean();
@@ -172,7 +172,7 @@ public class Trigger implements BooleanSupplier {
    * @return this trigger, so calls can be chained
    */
   public Trigger toggleOnTrue(Command command) {
-    requireNonNullParam(command, "command", "toggleOnRising");
+    requireNonNullParam(command, "command", "toggleOnTrue");
     m_loop.bind(
         new Runnable() {
           private boolean m_pressedLast = m_condition.getAsBoolean();
@@ -202,7 +202,7 @@ public class Trigger implements BooleanSupplier {
    * @return this trigger, so calls can be chained
    */
   public Trigger toggleOnFalse(Command command) {
-    requireNonNullParam(command, "command", "toggleOnFalling");
+    requireNonNullParam(command, "command", "toggleOnFalse");
     m_loop.bind(
         new Runnable() {
           private boolean m_pressedLast = m_condition.getAsBoolean();

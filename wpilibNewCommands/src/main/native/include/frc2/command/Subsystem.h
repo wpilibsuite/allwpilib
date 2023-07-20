@@ -5,6 +5,7 @@
 #pragma once
 
 #include <concepts>
+#include <functional>
 #include <string>
 #include <utility>
 
