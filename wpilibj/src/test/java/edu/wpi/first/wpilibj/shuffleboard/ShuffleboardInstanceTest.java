@@ -131,11 +131,10 @@ class ShuffleboardInstanceTest {
   void testDuplicateSelectTabs() {
     int listener = 0;
     AtomicInteger counter = new AtomicInteger();
-    try {
-      StringSubscriber subscriber =
-          m_ntInstance
-              .getStringTopic("/Shuffleboard/.metadata/Selected")
-              .subscribe("", PubSubOption.keepDuplicates(true));
+    try (StringSubscriber subscriber =
+        m_ntInstance
+            .getStringTopic("/Shuffleboard/.metadata/Selected")
+            .subscribe("", PubSubOption.keepDuplicates(true)); ) {
       listener =
           m_ntInstance.addListener(
               subscriber,
