@@ -56,7 +56,8 @@ class CommandScheduler::Impl {
 
   bool inRunLoop = false;
   wpi::SmallVector<Command*, 4> toSchedule;
-  wpi::SmallVector<std::pair<Command*, std::optional<Command*>>, 4> toCancel;
+  wpi::SmallVector<Command*, 4> toCancelCommands;
+  wpi::SmallVector<std::optional<Command*>, 4> toCancelInterruptors;
 };
 
 template <typename TMap, typename TKey>
@@ -226,12 +227,13 @@ void CommandScheduler::Run() {
     Schedule(command);
   }
 
-  for (auto&& cancelData : m_impl->toCancel) {
-    Cancel(cancelData.first, cancelData.second);
+  for (size_t i = 0; i < m_impl->toCancelCommands.size(); i++) {
+    Cancel(m_impl->toCancelCommands[i], m_impl->toCancelInterruptors[i]);
   }
 
   m_impl->toSchedule.clear();
-  m_impl->toCancel.clear();
+  m_impl->toCancelCommands.clear();
+  m_impl->toCancelInterruptors.clear();
 
   // Add default commands for un-required registered subsystems.
   for (auto&& subsystem : m_impl->subsystems) {
@@ -326,7 +328,8 @@ void CommandScheduler::Cancel(Command* command,
   }
 
   if (m_impl->inRunLoop) {
-    m_impl->toCancel.emplace_back(command, interruptor);
+    m_impl->toCancelCommands.emplace_back(command);
+    m_impl->toCancelInterruptors.emplace_back(interruptor);
     return;
   }
 

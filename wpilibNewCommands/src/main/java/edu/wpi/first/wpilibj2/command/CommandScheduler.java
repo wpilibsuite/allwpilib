@@ -44,16 +44,6 @@ import java.util.function.Consumer;
  * <p>This class is provided by the NewCommands VendorDep
  */
 public final class CommandScheduler implements Sendable, AutoCloseable {
-  private static class CancelData {
-    public final Command m_command;
-    public final Optional<Command> m_interruptor;
-
-    CancelData(Command command, Optional<Command> interruptor) {
-      m_command = command;
-      m_interruptor = interruptor;
-    }
-  }
-
   /** The Singleton Instance. */
   private static CommandScheduler instance;
 
@@ -68,6 +58,8 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
     }
     return instance;
   }
+
+  private static final Optional<Command> kNoInterruptor = Optional.empty();
 
   private final Set<Command> m_composedCommands = Collections.newSetFromMap(new WeakHashMap<>());
 
@@ -98,7 +90,8 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
   // scheduled/canceled during run
   private boolean m_inRunLoop;
   private final Set<Command> m_toSchedule = new LinkedHashSet<>();
-  private final List<CancelData> m_toCancel = new ArrayList<>();
+  private final List<Command> m_toCancelCommands = new ArrayList<>();
+  private final List<Optional<Command>> m_toCancelInterruptors = new ArrayList<>();
 
   private final Watchdog m_watchdog = new Watchdog(TimedRobot.kDefaultPeriod, () -> {});
 
@@ -285,7 +278,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
       if (!command.runsWhenDisabled() && RobotState.isDisabled()) {
         command.end(true);
         for (BiConsumer<Command, Optional<Command>> action : m_interruptActions) {
-          action.accept(command, Optional.empty());
+          action.accept(command, kNoInterruptor);
         }
         m_requirements.keySet().removeAll(command.getRequirements());
         iterator.remove();
@@ -316,12 +309,13 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
       schedule(command);
     }
 
-    for (CancelData cancelData : m_toCancel) {
-      cancel(cancelData.m_command, cancelData.m_interruptor);
+    for (int i = 0; i < m_toCancelCommands.size(); i++) {
+      cancel(m_toCancelCommands.get(i), m_toCancelInterruptors.get(i));
     }
 
     m_toSchedule.clear();
-    m_toCancel.clear();
+    m_toCancelCommands.clear();
+    m_toCancelInterruptors.clear();
 
     // Add default commands for un-required registered subsystems.
     for (Map.Entry<Subsystem, Command> subsystemCommand : m_subsystems.entrySet()) {
@@ -453,7 +447,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
    */
   public void cancel(Command... commands) {
     for (Command command : commands) {
-      cancel(command, Optional.empty());
+      cancel(command, kNoInterruptor);
     }
   }
 
@@ -473,7 +467,8 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
       return;
     }
     if (m_inRunLoop) {
-      m_toCancel.add(new CancelData(command, interruptor));
+      m_toCancelCommands.add(command);
+      m_toCancelInterruptors.add(interruptor);
       return;
     }
     if (!isScheduled(command)) {
