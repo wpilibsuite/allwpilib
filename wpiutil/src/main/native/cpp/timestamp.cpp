@@ -111,16 +111,14 @@ uint64_t wpi::NowDefault() {
 
 static std::atomic<uint64_t (*)()> now_impl{wpi::NowDefault};
 
+void wpi::impl::SetupNowRio() {
 #ifdef __FRC_ROBORIO__
-namespace wpi {
-void SetupNowRio() {
   if (!global) {
     int32_t status = 0;
     global.reset(fpga::tGlobal::create(&status));
   }
-}
-}  // namespace wpi
 #endif
+}
 
 void wpi::SetNowImpl(uint64_t (*func)(void)) {
   now_impl = func ? func : NowDefault;
@@ -169,6 +167,10 @@ uint64_t wpi::GetSystemTime() {
 }
 
 extern "C" {
+
+void WPI_Impl_SetupNowRio(void) {
+  return wpi::impl::SetupNowRio();
+}
 
 uint64_t WPI_NowDefault(void) {
   return wpi::NowDefault();
