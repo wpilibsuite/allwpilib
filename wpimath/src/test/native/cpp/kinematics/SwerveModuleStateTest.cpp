@@ -56,3 +56,50 @@ TEST(SwerveModuleStateTest, Inequality) {
   EXPECT_NE(state1, state2);
   EXPECT_NE(state1, state3);
 }
+
+TEST(SwerveModuleStateTest, Plus) {
+  const frc::SwerveModuleState left{1.0_mps, 90_deg};
+  const frc::SwerveModuleState right{2.0_mps, 90_deg};
+
+  const frc::SwerveModuleState result = left + right;
+
+  EXPECT_EQ(3.0, result.speed.value());
+  EXPECT_EQ(90, result.angle.Degrees().value());
+}
+
+TEST(SwerveModuleStateTest, Minus) {
+  const frc::SwerveModuleState left{1.0_mps, 90_deg};
+  const frc::SwerveModuleState right{2.0_mps, 90_deg};
+
+  const frc::SwerveModuleState result = left - right;
+
+  EXPECT_EQ(-1.0, result.speed.value());
+  EXPECT_EQ(90, result.angle.Degrees().value());
+}
+
+TEST(SwerveModuleStateTest, UnaryMinus) {
+  const frc::SwerveModuleState speeds{1.0_mps, 90_deg};
+
+  const frc::SwerveModuleState result = -speeds;
+
+  EXPECT_EQ(-1.0, result.speed.value());
+  EXPECT_EQ(90, result.angle.Degrees().value());
+}
+
+TEST(SwerveModuleStateTest, Multiplication) {
+  const frc::SwerveModuleState speeds{1.0_mps, 90_deg};
+
+  const frc::SwerveModuleState result = speeds * 2;
+
+  EXPECT_EQ(2.0, result.speed.value());
+  EXPECT_EQ(90, result.angle.Degrees().value());
+}
+
+TEST(SwerveModuleStateTest, Division) {
+  const frc::SwerveModuleState speeds{1.0_mps, 90_deg};
+
+  const frc::SwerveModuleState result = speeds / 2;
+
+  EXPECT_EQ(0.5, result.speed.value());
+  EXPECT_EQ(90, result.angle.Degrees().value());
+}

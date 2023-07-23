@@ -155,7 +155,7 @@ public class ChassisSpeeds {
   }
 
   /**
-   * Subtracts the other ChassisSpeeds from the other ChassisSpeeds and returns the difference.
+   * Subtracts the other ChassisSpeeds from the current ChassisSpeeds and returns the difference.
    *
    * <p>For example, ChassisSpeeds{5.0, 4.0, 2.0} - ChassisSpeeds{1.0, 2.0, 1.0} =
    * ChassisSpeeds{4.0, 2.0, 1.0}
@@ -198,8 +198,8 @@ public class ChassisSpeeds {
    *
    * <p>For example, ChassisSpeeds{2.0, 2.5, 1.0} / 2 = ChassisSpeeds{1.0, 1.25, 0.5}
    *
-   * @param scalar The scalar to multiply by.
-   * @return The reference to the new mutated object.
+   * @param scalar The scalar to divide by.
+   * @return The scaled ChassisSpeeds.
    */
   public ChassisSpeeds div(double scalar) {
     return new ChassisSpeeds(
