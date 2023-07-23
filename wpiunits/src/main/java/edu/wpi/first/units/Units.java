@@ -107,12 +107,17 @@ public final class Units {
           .symbol("°F")
           .make();
 
-  // Standard feedforward units for kV and kA (kS and kG are just volts, which is already defined earlier)
-  public static final Per<Voltage, Velocity<Distance>> VoltsPerMeterPerSecond = Volts.per(MetersPerSecond);
-  public static final Per<Voltage, Velocity<Velocity<Distance>>> VoltsPerMeterPerSecondSquared = Volts.per(MetersPerSecondPerSecond);
+  // Standard feedforward units for kV and kA.
+  // kS and kG are just volts, which is already defined earlier
+  public static final Per<Voltage, Velocity<Distance>> VoltsPerMeterPerSecond =
+      Volts.per(MetersPerSecond);
+  public static final Per<Voltage, Velocity<Velocity<Distance>>> VoltsPerMeterPerSecondSquared =
+      Volts.per(MetersPerSecondPerSecond);
 
-  public static final Per<Voltage, Velocity<Angle>> VoltsPerRadianPerSecond = Volts.per(RadiansPerSecond);
-  public static final Per<Voltage, Velocity<Velocity<Angle>>> VoltsPerRadianPerSecondSquared = Volts.per(RadiansPerSecond.per(Second));
+  public static final Per<Voltage, Velocity<Angle>> VoltsPerRadianPerSecond =
+      Volts.per(RadiansPerSecond);
+  public static final Per<Voltage, Velocity<Velocity<Angle>>> VoltsPerRadianPerSecondSquared =
+      Volts.per(RadiansPerSecond.per(Second));
 
   /**
    * Creates a unit equal to a thousandth of the base unit, eg Milliseconds = Milli(Units.Seconds).

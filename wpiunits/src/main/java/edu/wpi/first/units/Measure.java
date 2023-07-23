@@ -118,14 +118,14 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
 
   /**
    * Divides this measurement by some constant divisor and returns the result. This is equivalent to
-   * {@code divide(scalar.baseUnitMagnitude())}
+   * {@code divide(divisor.baseUnitMagnitude())}
    *
    * @param divisor the dimensionless measure to divide by
    * @see #divide(double)
    * @see #times(double)
    */
-  default Measure<U> divide(Measure<Dimensionless> scalar) {
-    return divide(scalar.baseUnitMagnitude());
+  default Measure<U> divide(Measure<Dimensionless> divisor) {
+    return divide(divisor.baseUnitMagnitude());
   }
 
   /**
@@ -133,7 +133,6 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
    *
    * <pre>
    *   Meters.of(1).per(Second) // => Measure&lt;Velocity&lt;Distance&gt;&gt;
-   *   Millimeters.of(1).per(Millisecond) // => Measure&lt;Velocity&lt;Distance&gt;&gt; equivalent to the first measure
    * </pre>
    *
    * @param period the time period to divide by.
@@ -153,7 +152,6 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
    *
    * @param <U2> the type of the denominator unit
    * @param denominator the denominator unit being divided by
-   *
    * @return the relational measure
    */
   default <U2 extends Unit<U2>> Measure<Per<U, U2>> per(U2 denominator) {
@@ -161,12 +159,22 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
     return newUnit.of(magnitude());
   }
 
-  /** Adds another measure to this one. The resulting measure has the same unit as this one. */
+  /**
+   * Adds another measure to this one. The resulting measure has the same unit as this one.
+   *
+   * @param other the measure to add to this one
+   * @return a new measure containing the result
+   */
   default Measure<U> plus(Measure<U> other) {
     return unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }
 
-  /** Subtracts another measure from this one. The resulting measure has the same unit as this one. */
+  /**
+   * Subtracts another measure from this one. The resulting measure has the same unit as this one.
+   *
+   * @param other the measure to subtract from this one
+   * @return a new measure containing the result
+   */
   default Measure<U> minus(Measure<U> other) {
     return unit().ofBaseUnits(baseUnitMagnitude() - other.baseUnitMagnitude());
   }
@@ -204,7 +212,6 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
    * @param varianceThreshold the acceptable variance threshold, in terms of an acceptable +/- error
    *     range multiplier. Checking if a value is within 10% means a value of 0.1 should be passed;
    *     checking if a value is within 1% means a value of 0.01 should be passed, and so on.
-   *
    * @return true if this unit is near the other measure, otherwise false
    */
   default boolean isNear(Measure<?> other, double varianceThreshold) {

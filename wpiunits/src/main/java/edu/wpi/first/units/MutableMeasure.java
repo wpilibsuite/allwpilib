@@ -180,8 +180,8 @@ public final class MutableMeasure<U extends Unit<U>> implements Measure<U> {
   // Math
 
   /**
-   * Adds another measurement to this one. This will mutate the object instead of
-   * generating a new measurement object.
+   * Adds another measurement to this one. This will mutate the object instead of generating a new
+   * measurement object.
    *
    * @param other the measurement to add
    * @return this measure
@@ -191,10 +191,9 @@ public final class MutableMeasure<U extends Unit<U>> implements Measure<U> {
   }
 
   /**
-   * Adds another measurement to this one. This will mutate the object instead of
-   * generating a new measurement object. This is a denormalized version of
-   * {@link #mut_plus(Measure)} to avoid having to wrap raw numbers in a {@code Measure} object
-   * and pay for an object allocation.
+   * Adds another measurement to this one. This will mutate the object instead of generating a new
+   * measurement object. This is a denormalized version of {@link #mut_plus(Measure)} to avoid
+   * having to wrap raw numbers in a {@code Measure} object and pay for an object allocation.
    *
    * @param magnitude the magnitude of the other measurement.
    * @param unit the unit of the other measurement
@@ -206,8 +205,8 @@ public final class MutableMeasure<U extends Unit<U>> implements Measure<U> {
   }
 
   /**
-   * Subtracts another measurement to this one. This will mutate the object instead of
-   * generating a new measurement object.
+   * Subtracts another measurement to this one. This will mutate the object instead of generating a
+   * new measurement object.
    *
    * @param other the measurement to add
    * @return this measure
@@ -217,10 +216,9 @@ public final class MutableMeasure<U extends Unit<U>> implements Measure<U> {
   }
 
   /**
-   * Subtracts another measurement to this one. This will mutate the object instead of
-   * generating a new measurement object. This is a denormalized version of
-   * {@link #mut_minus(Measure)} to avoid having to wrap raw numbers in a {@code Measure} object
-   * and pay for an object allocation.
+   * Subtracts another measurement to this one. This will mutate the object instead of generating a
+   * new measurement object. This is a denormalized version of {@link #mut_minus(Measure)} to avoid
+   * having to wrap raw numbers in a {@code Measure} object and pay for an object allocation.
    *
    * @param magnitude the magnitude of the other measurement.
    * @return this measure
