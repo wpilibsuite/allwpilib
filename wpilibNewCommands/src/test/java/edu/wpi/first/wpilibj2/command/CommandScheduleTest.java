@@ -121,8 +121,8 @@ class CommandScheduleTest extends CommandTestBase {
 
   @Test
   void smartDashboardCancelTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      var inst = NetworkTableInstance.create();
+    try (CommandScheduler scheduler = new CommandScheduler();
+        var inst = NetworkTableInstance.create()) {
       SmartDashboard.setNetworkTableInstance(inst);
       SmartDashboard.putData("Scheduler", scheduler);
       SmartDashboard.updateValues();
@@ -139,7 +139,6 @@ class CommandScheduleTest extends CommandTestBase {
       SmartDashboard.updateValues();
       scheduler.run();
       assertFalse(scheduler.isScheduled(mockCommand));
-      inst.close();
     }
   }
 }
