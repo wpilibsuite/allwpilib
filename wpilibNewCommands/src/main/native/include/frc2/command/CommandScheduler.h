@@ -14,9 +14,9 @@
 #include <frc/Errors.h>
 #include <frc/Watchdog.h>
 #include <frc/event/EventLoop.h>
-#include <networktables/NTSendable.h>
 #include <units/time.h>
 #include <wpi/FunctionExtras.h>
+#include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
 namespace frc2 {
@@ -33,7 +33,7 @@ class Subsystem;
  *
  * This class is provided by the NewCommands VendorDep
  */
-class CommandScheduler final : public nt::NTSendable,
+class CommandScheduler final : public wpi::Sendable,
                                public wpi::SendableHelper<CommandScheduler> {
  public:
   /**
@@ -388,7 +388,7 @@ class CommandScheduler final : public nt::NTSendable,
    */
   void RequireUngrouped(std::initializer_list<const Command*> commands);
 
-  void InitSendable(nt::NTSendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   // Constructor; private as this is a singleton
