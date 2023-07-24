@@ -80,7 +80,7 @@ public class DCMotor {
 
   /**
    * Returns the angular speed produced by the motor at a given torque and input voltage.
-   * 
+   *
    * @param torqueNm The torque produced by the motor.
    * @param voltageInputVolts The voltage applied to the motor.
    * @return The speed of the motor.
@@ -236,7 +236,7 @@ public class DCMotor {
    */
   public static DCMotor getFalcon500Foc(int numMotors) {
     return new DCMotor(
-      12, 5.84, 304, 1.5, Units.rotationsPerMinuteToRadiansPerSecond(6080.0), numMotors);
+        12, 5.84, 304, 1.5, Units.rotationsPerMinuteToRadiansPerSecond(6080.0), numMotors);
   }
 
   /**
