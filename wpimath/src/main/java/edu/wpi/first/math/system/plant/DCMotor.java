@@ -21,10 +21,10 @@ public class DCMotor {
    * Constructs a DC motor.
    *
    * @param nominalVoltageVolts Voltage at which the motor constants were measured.
-   * @param stallTorqueNewtonMeters Torque when stalled in Newton-meters.
-   * @param stallCurrentAmps Current draw when stalled in amps.
-   * @param freeCurrentAmps Current draw under no load in amps.
-   * @param freeSpeedRadPerSec Angular velocity under no load in radians per second.
+   * @param stallTorqueNewtonMeters Torque when stalled.
+   * @param stallCurrentAmps Current draw when stalled.
+   * @param freeCurrentAmps Current draw under no load.
+   * @param freeSpeedRadPerSec Angular velocity under no load.
    * @param numMotors Number of motors in a gearbox.
    */
   public DCMotor(
@@ -49,8 +49,8 @@ public class DCMotor {
   /**
    * Estimate the current being drawn by this motor.
    *
-   * @param speedRadiansPerSec The speed of the motor.
-   * @param voltageInputVolts The input voltage.
+   * @param speedRadiansPerSec The current angular velocity of the motor.
+   * @param voltageInputVolts The voltage being applied to the motor.
    * @return The estimated current.
    */
   public double getCurrent(double speedRadiansPerSec, double voltageInputVolts) {
@@ -71,7 +71,7 @@ public class DCMotor {
    * Calculate the voltage provided to the motor at a given torque and angular velocity.
    *
    * @param torqueNm The torque produced by the motor.
-   * @param speedRadiansPerSec The speed of the motor.
+   * @param speedRadiansPerSec The current angular velocity of the motor.
    * @return The voltage of the motor.
    */
   public double getVoltage(double torqueNm, double speedRadiansPerSec) {
@@ -79,8 +79,9 @@ public class DCMotor {
   }
 
   /**
-   * Calculate the speed of the motor at a given torque and input voltage.
-   *
+   * Returns the angular speed produced by the motor at a given torque and input
+   * voltage.
+   * 
    * @param torqueNm The torque produced by the motor.
    * @param voltageInputVolts The voltage applied to the motor.
    * @return The speed of the motor.
@@ -225,6 +226,17 @@ public class DCMotor {
   public static DCMotor getFalcon500(int numMotors) {
     return new DCMotor(
         12, 4.69, 257, 1.5, Units.rotationsPerMinuteToRadiansPerSecond(6380.0), numMotors);
+  }
+
+  /**
+   * Return a gearbox of Falcon 500 motors with FOC (Field Orientated Control)
+   * enabled.
+   *
+   * @param numMotors Number of motors in the gearbox.
+   * @return A gearbox of Falcon 500 FOC enabled motors.
+   */
+  public static DCMotor getFalcon500Foc(int numMotors) {
+    return new DCMotor(12, 5.84, 304, 1.5, Units.rotationsPerMinuteToRadiansPerSecond(6080.0), numMotors);
   }
 
   /**

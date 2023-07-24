@@ -97,7 +97,7 @@ class WPILIB_DLLEXPORT DCMotor {
   }
 
   /**
-   * Returns the speed produced by the motor at a given torque and input
+   * Returns the angular speed produced by the motor at a given torque and input
    * voltage.
    *
    * @param torque        The torque produced by the motor.
@@ -193,6 +193,14 @@ class WPILIB_DLLEXPORT DCMotor {
    */
   static constexpr DCMotor Falcon500(int numMotors = 1) {
     return DCMotor(12_V, 4.69_Nm, 257_A, 1.5_A, 6380_rpm, numMotors);
+  }
+
+  /**
+   * Return a gearbox of Falcon 500 motors with FOC (Field Orientated Control)
+   * enabled.
+   */
+  static constexpr DCMotor Falcon500FOC(int numMotors = 1) {
+    return DCMotor(12_V, 5.84_Nm, 304_A, 1.5_A, 6080_rpm, numMotors);
   }
 
   /**
