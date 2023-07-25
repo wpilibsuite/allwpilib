@@ -92,6 +92,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
   private final Set<Command> m_toSchedule = new LinkedHashSet<>();
   private final List<Command> m_toCancelCommands = new ArrayList<>();
   private final List<Optional<Command>> m_toCancelInterruptors = new ArrayList<>();
+  private final Set<Command> m_endingCommands = new LinkedHashSet<>();
 
   private final Watchdog m_watchdog = new Watchdog(TimedRobot.kDefaultPeriod, () -> {});
 
@@ -271,18 +272,13 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
     m_watchdog.addEpoch("buttons.run()");
 
     m_inRunLoop = true;
+    boolean isDisabled = RobotState.isDisabled();
     // Run scheduled commands, remove finished commands.
     for (Iterator<Command> iterator = m_scheduledCommands.iterator(); iterator.hasNext(); ) {
       Command command = iterator.next();
 
-      if (!command.runsWhenDisabled() && RobotState.isDisabled()) {
-        command.end(true);
-        for (BiConsumer<Command, Optional<Command>> action : m_interruptActions) {
-          action.accept(command, kNoInterruptor);
-        }
-        m_requirements.keySet().removeAll(command.getRequirements());
-        iterator.remove();
-        m_watchdog.addEpoch(command.getName() + ".end(true)");
+      if (isDisabled && !command.runsWhenDisabled()) {
+        cancel(command);
         continue;
       }
 
@@ -292,10 +288,12 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
       }
       m_watchdog.addEpoch(command.getName() + ".execute()");
       if (command.isFinished()) {
+        m_endingCommands.add(command);
         command.end(false);
         for (Consumer<Command> action : m_finishActions) {
           action.accept(command);
         }
+        m_endingCommands.remove(command);
         iterator.remove();
 
         m_requirements.keySet().removeAll(command.getRequirements());
@@ -466,6 +464,9 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
       DriverStation.reportWarning("Tried to cancel a null command", true);
       return;
     }
+    if (m_endingCommands.contains(command)) {
+      return;
+    }
     if (m_inRunLoop) {
       m_toCancelCommands.add(command);
       m_toCancelInterruptors.add(interruptor);
@@ -475,12 +476,14 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
       return;
     }
 
-    m_scheduledCommands.remove(command);
-    m_requirements.keySet().removeAll(command.getRequirements());
+    m_endingCommands.add(command);
     command.end(true);
     for (BiConsumer<Command, Optional<Command>> action : m_interruptActions) {
       action.accept(command, interruptor);
     }
+    m_endingCommands.remove(command);
+    m_scheduledCommands.remove(command);
+    m_requirements.keySet().removeAll(command.getRequirements());
     m_watchdog.addEpoch(command.getName() + ".end(true)");
   }
 
