@@ -516,8 +516,9 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
     setNewDataSem(nullptr);
   });
 
-  nFPGA::nRoboRIO_FPGANamespace::g_currentTargetClass =
-      nLoadOut::getTargetClass();
+  // Setup WPI_Now to use FPGA timestamp
+  // this also sets nFPGA::nRoboRIO_FPGANamespace::g_currentTargetClass
+  wpi::impl::SetupNowRio();
 
   int32_t status = 0;
   global.reset(tGlobal::create(&status));
@@ -542,9 +543,6 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   if (status != 0) {
     return false;
   }
-
-  // Setup WPI_Now to use FPGA timestamp
-  wpi::impl::SetupNowRio();
 
   hal::WaitForInitialPacket();
 

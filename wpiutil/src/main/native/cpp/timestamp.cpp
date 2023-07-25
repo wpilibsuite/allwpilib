@@ -12,7 +12,9 @@
 #pragma GCC diagnostic ignored "-Wpedantic"
 #pragma GCC diagnostic ignored "-Wignored-qualifiers"
 #include <FRC_FPGA_ChipObject/RoboRIO_FRC_ChipObject_Aliases.h>
+#include <FRC_FPGA_ChipObject/nRoboRIO_FPGANamespace/nInterfaceGlobals.h>
 #include <FRC_FPGA_ChipObject/nRoboRIO_FPGANamespace/tGlobal.h>
+#include <FRC_NetworkCommunication/LoadOut.h>
 #pragma GCC diagnostic pop
 namespace fpga {
 using namespace nFPGA;
@@ -114,6 +116,8 @@ static std::atomic<uint64_t (*)()> now_impl{wpi::NowDefault};
 void wpi::impl::SetupNowRio() {
 #ifdef __FRC_ROBORIO__
   if (!global) {
+    nFPGA::nRoboRIO_FPGANamespace::g_currentTargetClass =
+        nLoadOut::getTargetClass();
     int32_t status = 0;
     global.reset(fpga::tGlobal::create(&status));
   }
