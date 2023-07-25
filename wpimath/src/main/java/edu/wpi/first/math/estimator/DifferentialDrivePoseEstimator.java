@@ -82,7 +82,6 @@ public class DifferentialDrivePoseEstimator extends PoseEstimator<DifferentialDr
       Matrix<N3, N1> stateStdDevs,
       Matrix<N3, N1> visionMeasurementStdDevs) {
     super(
-        kinematics,
         new DifferentialDriveOdometry(
             gyroAngle, leftDistanceMeters, rightDistanceMeters, initialPoseMeters),
         stateStdDevs,

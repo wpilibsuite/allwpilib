@@ -10,17 +10,14 @@ import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Twist2d;
-import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
-import edu.wpi.first.math.kinematics.Kinematics;
 import edu.wpi.first.math.kinematics.Odometry;
 import edu.wpi.first.math.kinematics.WheelPositions;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 
 /**
  * This class wraps {@link Odometry} to fuse latency-compensated vision measurements with encoder
@@ -36,14 +33,15 @@ import java.util.Objects;
  * never call it then this class will behave exactly like regular encoder odometry.
  */
 public class PoseEstimator<T extends WheelPositions<T>> {
-  private final Kinematics<?, T> m_kinematics;
   private final Odometry<T> m_odometry;
   private final Matrix<N3, N1> m_q = new Matrix<>(Nat.N3(), Nat.N1());
   private final Matrix<N3, N3> m_visionK = new Matrix<>(Nat.N3(), Nat.N3());
 
   private static final double kBufferDuration = 1.5;
-  private final TimeInterpolatableBuffer<InterpolationRecord> m_poseBuffer =
+  private final TimeInterpolatableBuffer<Pose2d> m_poseBuffer =
       TimeInterpolatableBuffer.createBuffer(kBufferDuration);
+
+  private Pose2d m_poseEstimate;
 
   /**
    * Constructs a PoseEstimator.
@@ -58,12 +56,12 @@ public class PoseEstimator<T extends WheelPositions<T>> {
    *     the vision pose measurement less.
    */
   public PoseEstimator(
-      Kinematics<?, T> kinematics,
       Odometry<T> odometry,
       Matrix<N3, N1> stateStdDevs,
       Matrix<N3, N1> visionMeasurementStdDevs) {
-    m_kinematics = kinematics;
     m_odometry = odometry;
+
+    m_poseEstimate = odometry.getPoseMeters();
 
     for (int i = 0; i < 3; ++i) {
       m_q.set(i, 0, stateStdDevs.get(i, 0) * stateStdDevs.get(i, 0));
@@ -112,6 +110,7 @@ public class PoseEstimator<T extends WheelPositions<T>> {
     // Reset state estimate and error covariance
     m_odometry.resetPosition(gyroAngle, wheelPositions, poseMeters);
     m_poseBuffer.clear();
+    m_poseEstimate = m_odometry.getPoseMeters();
   }
 
   /**
@@ -120,7 +119,7 @@ public class PoseEstimator<T extends WheelPositions<T>> {
    * @return The estimated robot pose in meters.
    */
   public Pose2d getEstimatedPosition() {
-    return m_odometry.getPoseMeters();
+    return m_poseEstimate;
   }
 
   /**
@@ -160,35 +159,30 @@ public class PoseEstimator<T extends WheelPositions<T>> {
       return;
     }
 
-    // Step 2: Measure the twist between the odometry pose and the vision pose.
-    var twist = sample.get().poseMeters.log(visionRobotPoseMeters);
+    // Step 2: Record the odometry updates that have occurred since the vision measurement
+    var odometry_backtrack = new Transform2d(m_odometry.getPoseMeters(), sample.get());
+    var odometry_forward = new Transform2d(sample.get(), m_odometry.getPoseMeters());
 
-    // Step 3: We should not trust the twist entirely, so instead we scale this twist by a Kalman
+    // Step 3: Revert said odometry updates to get a state estimate from when the vision
+    // measurement occurred.
+    var old_estimate = m_poseEstimate.plus(odometry_backtrack);
+
+    // Step 4: Measure the twist between the odometry pose and the vision pose.
+    var twist = old_estimate.log(visionRobotPoseMeters);
+
+    // Step 5: We should not trust the twist entirely, so instead we scale this twist by a Kalman
     // gain matrix representing how much we trust vision measurements compared to our current pose.
     var k_times_twist = m_visionK.times(VecBuilder.fill(twist.dx, twist.dy, twist.dtheta));
 
-    // Step 4: Convert back to Twist2d.
+    // Step 6: Convert back to Twist2d.
     var scaledTwist =
-        new Twist2d(k_times_twist.get(0, 0), k_times_twist.get(1, 0), k_times_twist.get(2, 0));
+        new Twist2d(
+            k_times_twist.get(0, 0),
+            k_times_twist.get(1, 0),
+            k_times_twist.get(2, 0));
 
-    // Step 5: Reset Odometry to state at sample with vision adjustment.
-    m_odometry.resetPosition(
-        sample.get().gyroAngle,
-        sample.get().wheelPositions,
-        sample.get().poseMeters.exp(scaledTwist));
-
-    // Step 6: Record the current pose to allow multiple measurements from the same timestamp
-    m_poseBuffer.addSample(
-        timestampSeconds,
-        new InterpolationRecord(
-            getEstimatedPosition(), sample.get().gyroAngle, sample.get().wheelPositions));
-
-    // Step 7: Replay odometry inputs between sample time and latest recorded sample to update the
-    // pose buffer and correct odometry.
-    for (Map.Entry<Double, InterpolationRecord> entry :
-        m_poseBuffer.getInternalBuffer().tailMap(timestampSeconds).entrySet()) {
-      updateWithTime(entry.getKey(), entry.getValue().gyroAngle, entry.getValue().wheelPositions);
-    }
+    // Step 7: Apply this adjustment to the old estimate, then replay odometry updates.
+    m_poseEstimate = old_estimate.exp(scaledTwist).plus(odometry_forward);
   }
 
   /**
@@ -247,90 +241,13 @@ public class PoseEstimator<T extends WheelPositions<T>> {
    * @return The estimated pose of the robot in meters.
    */
   public Pose2d updateWithTime(double currentTimeSeconds, Rotation2d gyroAngle, T wheelPositions) {
-    m_odometry.update(gyroAngle, wheelPositions);
+    var lastOdom = m_odometry.getPoseMeters();
+    var currOdom = m_odometry.update(gyroAngle, wheelPositions);
     m_poseBuffer.addSample(
-        currentTimeSeconds,
-        new InterpolationRecord(getEstimatedPosition(), gyroAngle, wheelPositions.copy()));
+        currentTimeSeconds, currOdom);
+
+    m_poseEstimate = m_poseEstimate.exp(lastOdom.log(currOdom));
 
     return getEstimatedPosition();
-  }
-
-  /**
-   * Represents an odometry record. The record contains the inputs provided as well as the pose that
-   * was observed based on these inputs, as well as the previous record and its inputs.
-   */
-  private class InterpolationRecord implements Interpolatable<InterpolationRecord> {
-    // The pose observed given the current sensor inputs and the previous pose.
-    private final Pose2d poseMeters;
-
-    // The current gyro angle.
-    private final Rotation2d gyroAngle;
-
-    // The current encoder readings.
-    private final T wheelPositions;
-
-    /**
-     * Constructs an Interpolation Record with the specified parameters.
-     *
-     * @param poseMeters The pose observed given the current sensor inputs and the previous pose.
-     * @param gyro The current gyro angle.
-     * @param wheelPositions The current encoder readings.
-     */
-    private InterpolationRecord(Pose2d poseMeters, Rotation2d gyro, T wheelPositions) {
-      this.poseMeters = poseMeters;
-      this.gyroAngle = gyro;
-      this.wheelPositions = wheelPositions;
-    }
-
-    /**
-     * Return the interpolated record. This object is assumed to be the starting position, or lower
-     * bound.
-     *
-     * @param endValue The upper bound, or end.
-     * @param t How far between the lower and upper bound we are. This should be bounded in [0, 1].
-     * @return The interpolated value.
-     */
-    @Override
-    public InterpolationRecord interpolate(InterpolationRecord endValue, double t) {
-      if (t < 0) {
-        return this;
-      } else if (t >= 1) {
-        return endValue;
-      } else {
-        // Find the new wheel distances.
-        var wheelLerp = wheelPositions.interpolate(endValue.wheelPositions, t);
-
-        // Find the distance travelled between this measurement and the interpolated measurement.
-        var wheelDelta = wheelLerp.minus(wheelPositions);
-
-        // Find the new gyro angle.
-        var gyroLerp = gyroAngle.interpolate(endValue.gyroAngle, t);
-
-        // Create a twist to represent this change based on the interpolated sensor inputs.
-        Twist2d twist = m_kinematics.toTwist2d(wheelDelta);
-        twist.dtheta = gyroLerp.minus(gyroAngle).getRadians();
-
-        return new InterpolationRecord(poseMeters.exp(twist), gyroLerp, wheelLerp);
-      }
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-      if (this == obj) {
-        return true;
-      }
-      if (!(obj instanceof PoseEstimator.InterpolationRecord)) {
-        return false;
-      }
-      var record = (PoseEstimator<?>.InterpolationRecord) obj;
-      return Objects.equals(gyroAngle, record.gyroAngle)
-          && Objects.equals(wheelPositions, record.wheelPositions)
-          && Objects.equals(poseMeters, record.poseMeters);
-    }
-
-    @Override
-    public int hashCode() {
-      return Objects.hash(gyroAngle, wheelPositions, poseMeters);
-    }
   }
 }
