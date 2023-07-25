@@ -228,8 +228,7 @@ public class DCMotor {
   }
 
   /**
-   * Return a gearbox of Falcon 500 motors with FOC (Field Orientated Control)
-   * enabled.
+   * Return a gearbox of Falcon 500 motors with FOC (Field Orientated Control) enabled.
    *
    * @param numMotors Number of motors in the gearbox.
    * @return A gearbox of Falcon 500 FOC enabled motors.
