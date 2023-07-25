@@ -227,7 +227,6 @@ public class DCMotor {
         12, 4.69, 257, 1.5, Units.rotationsPerMinuteToRadiansPerSecond(6380.0), numMotors);
   }
 
-  // https://store.ctr-electronics.com/falcon-500-powered-by-talon-fx/
   /**
    * Return a gearbox of Falcon 500 motors with FOC (Field-Oriented Control) enabled.
    *
@@ -235,6 +234,7 @@ public class DCMotor {
    * @return A gearbox of Falcon 500 FOC enabled motors.
    */
   public static DCMotor getFalcon500Foc(int numMotors) {
+    // https://store.ctr-electronics.com/falcon-500-powered-by-talon-fx/
     return new DCMotor(
         12, 5.84, 304, 1.5, Units.rotationsPerMinuteToRadiansPerSecond(6080.0), numMotors);
   }

@@ -195,12 +195,12 @@ class WPILIB_DLLEXPORT DCMotor {
     return DCMotor(12_V, 4.69_Nm, 257_A, 1.5_A, 6380_rpm, numMotors);
   }
 
-  // https://store.ctr-electronics.com/falcon-500-powered-by-talon-fx/
   /**
    * Return a gearbox of Falcon 500 motors with FOC (Field-Oriented Control)
    * enabled.
    */
   static constexpr DCMotor Falcon500FOC(int numMotors = 1) {
+    // https://store.ctr-electronics.com/falcon-500-powered-by-talon-fx/
     return DCMotor(12_V, 5.84_Nm, 304_A, 1.5_A, 6080_rpm, numMotors);
   }
 
