@@ -196,7 +196,7 @@ class WPILIB_DLLEXPORT DCMotor {
   }
 
   /**
-   * Return a gearbox of Falcon 500 motors with FOC (Field Orientated Control)
+   * Return a gearbox of Falcon 500 motors with FOC (Field-Oriented Control)
    * enabled.
    */
   static constexpr DCMotor Falcon500FOC(int numMotors = 1) {
