@@ -7,7 +7,7 @@ include(FetchContent)
 FetchContent_Declare(
     apriltaglib
     GIT_REPOSITORY  https://github.com/wpilibsuite/apriltag.git
-    GIT_TAG         ad31e33d20f9782b7239cb15cde57c56c91383ad
+    GIT_TAG         2f35517c63cdcbade1aff0dbba5262e615827494
 )
 
 # Don't use apriltag's CMakeLists.txt due to conflicting naming and JNI
