@@ -119,77 +119,77 @@ class WPILIB_DLLEXPORT DCMotor {
   }
 
   /**
-   * Returns instance of CIM.
+   * Returns a gearbox of CIM motors.
    */
   static constexpr DCMotor CIM(int numMotors = 1) {
     return DCMotor(12_V, 2.42_Nm, 133_A, 2.7_A, 5310_rpm, numMotors);
   }
 
   /**
-   * Returns instance of MiniCIM.
+   * Returns a gearbox of MiniCIM motors.
    */
   static constexpr DCMotor MiniCIM(int numMotors = 1) {
     return DCMotor(12_V, 1.41_Nm, 89_A, 3_A, 5840_rpm, numMotors);
   }
 
   /**
-   * Returns instance of Bag motor.
+   * Returns a gearbox of Bag motor motors.
    */
   static constexpr DCMotor Bag(int numMotors = 1) {
     return DCMotor(12_V, 0.43_Nm, 53_A, 1.8_A, 13180_rpm, numMotors);
   }
 
   /**
-   * Returns instance of Vex 775 Pro.
+   * Returns a gearbox of Vex 775 Pro motors.
    */
   static constexpr DCMotor Vex775Pro(int numMotors = 1) {
     return DCMotor(12_V, 0.71_Nm, 134_A, 0.7_A, 18730_rpm, numMotors);
   }
 
   /**
-   * Returns instance of Andymark RS 775-125.
+   * Returns a gearbox of Andymark RS 775-125 motors.
    */
   static constexpr DCMotor RS775_125(int numMotors = 1) {
     return DCMotor(12_V, 0.28_Nm, 18_A, 1.6_A, 5800_rpm, numMotors);
   }
 
   /**
-   * Returns instance of Banebots RS 775.
+   * Returns a gearbox of Banebots RS 775 motors.
    */
   static constexpr DCMotor BanebotsRS775(int numMotors = 1) {
     return DCMotor(12_V, 0.72_Nm, 97_A, 2.7_A, 13050_rpm, numMotors);
   }
 
   /**
-   * Returns instance of Andymark 9015.
+   * Returns a gearbox of Andymark 9015 motors.
    */
   static constexpr DCMotor Andymark9015(int numMotors = 1) {
     return DCMotor(12_V, 0.36_Nm, 71_A, 3.7_A, 14270_rpm, numMotors);
   }
 
   /**
-   * Returns instance of Banebots RS 550.
+   * Returns a gearbox of Banebots RS 550 motors.
    */
   static constexpr DCMotor BanebotsRS550(int numMotors = 1) {
     return DCMotor(12_V, 0.38_Nm, 84_A, 0.4_A, 19000_rpm, numMotors);
   }
 
   /**
-   * Returns instance of NEO brushless motor.
+   * Returns a gearbox of NEO brushless motors.
    */
   static constexpr DCMotor NEO(int numMotors = 1) {
     return DCMotor(12_V, 2.6_Nm, 105_A, 1.8_A, 5676_rpm, numMotors);
   }
 
   /**
-   * Returns instance of NEO 550 brushless motor.
+   * Returns a gearbox of NEO 550 brushless motors.
    */
   static constexpr DCMotor NEO550(int numMotors = 1) {
     return DCMotor(12_V, 0.97_Nm, 100_A, 1.4_A, 11000_rpm, numMotors);
   }
 
   /**
-   * Returns instance of Falcon 500 brushless motor.
+   * Returns a gearbox of Falcon 500 brushless motors.
    */
   static constexpr DCMotor Falcon500(int numMotors = 1) {
     return DCMotor(12_V, 4.69_Nm, 257_A, 1.5_A, 6380_rpm, numMotors);

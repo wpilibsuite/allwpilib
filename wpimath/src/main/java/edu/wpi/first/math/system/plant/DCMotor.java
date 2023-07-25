@@ -47,7 +47,7 @@ public class DCMotor {
   }
 
   /**
-   * Estimate the current being drawn by this motor.
+   * Calculate current drawn by motor with given speed and input voltage.
    *
    * @param speedRadiansPerSec The current angular velocity of the motor.
    * @param voltageInputVolts The voltage being applied to the motor.
@@ -58,17 +58,17 @@ public class DCMotor {
   }
 
   /**
-   * Calculate the torque produced by the motor for a given current.
+   * Calculate torque produced by the motor with a given current.
    *
    * @param currentAmpere The current drawn by the motor.
-   * @return The torque produced.
+   * @return The torque output.
    */
   public double getTorque(double currentAmpere) {
     return currentAmpere * KtNMPerAmp;
   }
 
   /**
-   * Calculate the voltage provided to the motor at a given torque and angular velocity.
+   * Calculate the voltage provided to the motor for a given torque and angular velocity.
    *
    * @param torqueNm The torque produced by the motor.
    * @param speedRadiansPerSec The current angular velocity of the motor.
@@ -79,11 +79,11 @@ public class DCMotor {
   }
 
   /**
-   * Returns the angular speed produced by the motor at a given torque and input voltage.
+   * Calculates the angular speed produced by the motor at a given torque and input voltage.
    *
    * @param torqueNm The torque produced by the motor.
    * @param voltageInputVolts The voltage applied to the motor.
-   * @return The speed of the motor.
+   * @return The angular speed of the motor.
    */
   public double getSpeed(double torqueNm, double voltageInputVolts) {
     return voltageInputVolts * KvRadPerSecPerVolt
