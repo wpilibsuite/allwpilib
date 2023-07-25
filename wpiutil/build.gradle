@@ -138,6 +138,12 @@ ext {
             }
         }
     }
+
+    exeSplitSetup = {
+        if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+            nativeUtils.useRequiredLibrary(it, 'ni_link_libraries', 'ni_runtime_libraries')
+        }
+    }
 }
 
 def examplesMap = [:];
@@ -231,6 +237,9 @@ model {
                 targetBuildTypes 'debug'
                 binaries.all {
                     lib library: 'wpiutil', linkage: 'shared'
+                    if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                        nativeUtils.useRequiredLibrary(it, 'ni_link_libraries', 'ni_runtime_libraries')
+                    }
                 }
                 sources {
                     cpp {
@@ -241,6 +250,17 @@ model {
                     }
                 }
             }
+        }
+    }
+}
+
+model {
+    binaries {
+        all {
+            if (!(it instanceof NativeBinarySpec)) return
+                if (it.component.name != 'wpiutil' && it.component.name != 'wpiutilBase') return
+                if (it.targetPlatform.name != nativeUtils.wpi.platforms.roborio) return
+                nativeUtils.useRequiredLibrary(it, 'ni_link_libraries')
         }
     }
 }
