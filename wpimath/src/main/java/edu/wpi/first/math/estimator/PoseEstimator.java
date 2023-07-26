@@ -18,6 +18,7 @@ import edu.wpi.first.math.kinematics.WheelPositions;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 /**
  * This class wraps {@link Odometry} to fuse latency-compensated vision measurements with encoder
@@ -56,9 +57,7 @@ public class PoseEstimator<T extends WheelPositions<T>> {
    *     the vision pose measurement less.
    */
   public PoseEstimator(
-      Odometry<T> odometry,
-      Matrix<N3, N1> stateStdDevs,
-      Matrix<N3, N1> visionMeasurementStdDevs) {
+      Odometry<T> odometry, Matrix<N3, N1> stateStdDevs, Matrix<N3, N1> visionMeasurementStdDevs) {
     m_odometry = odometry;
 
     m_poseEstimate = odometry.getPoseMeters();
@@ -122,6 +121,12 @@ public class PoseEstimator<T extends WheelPositions<T>> {
     return m_poseEstimate;
   }
 
+  public Optional<Pose2d> sampleAt(double timestamp) {
+    return m_poseBuffer
+        .getSample(timestamp)
+        .map(sample -> sample.exp(m_odometry.getPoseMeters().log(m_poseEstimate)));
+  }
+
   /**
    * Adds a vision measurement to the Kalman Filter. This will correct the odometry pose estimate
    * while still accounting for measurement noise.
@@ -176,10 +181,7 @@ public class PoseEstimator<T extends WheelPositions<T>> {
 
     // Step 6: Convert back to Twist2d.
     var scaledTwist =
-        new Twist2d(
-            k_times_twist.get(0, 0),
-            k_times_twist.get(1, 0),
-            k_times_twist.get(2, 0));
+        new Twist2d(k_times_twist.get(0, 0), k_times_twist.get(1, 0), k_times_twist.get(2, 0));
 
     // Step 7: Apply this adjustment to the old estimate, then replay odometry updates.
     m_poseEstimate = old_estimate.exp(scaledTwist).plus(odometry_forward);
@@ -243,8 +245,7 @@ public class PoseEstimator<T extends WheelPositions<T>> {
   public Pose2d updateWithTime(double currentTimeSeconds, Rotation2d gyroAngle, T wheelPositions) {
     var lastOdom = m_odometry.getPoseMeters();
     var currOdom = m_odometry.update(gyroAngle, wheelPositions);
-    m_poseBuffer.addSample(
-        currentTimeSeconds, currOdom);
+    m_poseBuffer.addSample(currentTimeSeconds, currOdom);
 
     m_poseEstimate = m_poseEstimate.exp(lastOdom.log(currOdom));
 
