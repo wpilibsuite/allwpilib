@@ -27,10 +27,10 @@ public class Robot extends TimedRobot {
     driveWithJoystick(true);
   }
 
-	@Override
-	public void simulationPeriodic() {
-		m_swerve.simulationPeriodic();
-	}
+  @Override
+  public void simulationPeriodic() {
+    m_swerve.simulationPeriodic();
+  }
 
   private void driveWithJoystick(boolean fieldRelative) {
     // Get the x speed. We are inverting this because Xbox controllers return
@@ -51,8 +51,8 @@ public class Robot extends TimedRobot {
     m_swerve.drive(xSpeed, ySpeed, rot, fieldRelative, getPeriod());
   }
 
-	@Override
-	public void robotPeriodic() {
-		m_swerve.periodic();
-	}
+  @Override
+  public void robotPeriodic() {
+    m_swerve.periodic();
+  }
 }
