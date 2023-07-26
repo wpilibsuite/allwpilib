@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -41,6 +42,7 @@ public class Drivetrain {
           m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation);
 
 	private final Field2d m_fieldSim = new Field2d();
+	private Pose2d m_poseSim = new Pose2d();
 	private final Field2d m_fieldApproximation = new Field2d();
 
   /* Here we use SwerveDrivePoseEstimator so that we can fuse odometry readings. The numbers used
@@ -90,13 +92,13 @@ public class Drivetrain {
     m_backLeft.setDesiredState(swerveModuleStates[2]);
     m_backRight.setDesiredState(swerveModuleStates[3]);
 
-		Transform2d delta = new Transform2d(
-			new Translation2d(ySpeed * periodSeconds, xSpeed * periodSeconds),
-			new Rotation2d()
+		Twist2d deltaTwist2d = new Twist2d(
+			ySpeed * periodSeconds,
+			xSpeed * periodSeconds,
+			rot * periodSeconds
 		);
 
-		m_fieldSim.setRobotPose(m_fieldSim.getRobotPose().transformBy(delta));
-		// m_fieldSim.setRobotPose(m_poseEstimator.getEstimatedPosition());
+		m_poseSim = m_poseSim.exp(deltaTwist2d);
   }
 
   /** Updates the field relative position of the robot. */
@@ -123,5 +125,9 @@ public class Drivetrain {
 		
 		// m_fieldSim.setRobotPose(m_kinematics);
 		// m_fieldApproximation.setRobotPose(m_poseEstimator.getEstimatedPosition());
+	}
+
+	public void simulationPeriodic() {
+		m_fieldSim.setRobotPose(m_poseSim);
 	}
 }
