@@ -93,8 +93,8 @@ public class Drivetrain {
     m_backRight.setDesiredState(swerveModuleStates[3]);
 
 		Twist2d deltaTwist2d = new Twist2d(
-			ySpeed * periodSeconds,
 			xSpeed * periodSeconds,
+			ySpeed * periodSeconds,
 			rot * periodSeconds
 		);
 
