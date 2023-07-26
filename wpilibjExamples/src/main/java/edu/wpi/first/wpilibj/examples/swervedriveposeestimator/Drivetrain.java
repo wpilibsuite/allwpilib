@@ -14,6 +14,8 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /** Represents a swerve drive style drivetrain. */
 public class Drivetrain {
@@ -36,6 +38,9 @@ public class Drivetrain {
       new SwerveDriveKinematics(
           m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation);
 
+	private final Field2d m_fieldSim = new Field2d();
+	private final Field2d m_fieldApproximation = new Field2d();
+
   /* Here we use SwerveDrivePoseEstimator so that we can fuse odometry readings. The numbers used
   below are robot specific, and should be tuned. */
   private final SwerveDrivePoseEstimator m_poseEstimator =
@@ -54,6 +59,9 @@ public class Drivetrain {
 
   public Drivetrain() {
     m_gyro.reset();
+
+		SmartDashboard.putData("Field", m_fieldSim);
+    SmartDashboard.putData("FieldEstimation", m_fieldApproximation);
   }
 
   /**
@@ -99,4 +107,10 @@ public class Drivetrain {
             m_poseEstimator.getEstimatedPosition()),
         Timer.getFPGATimestamp() - 0.3);
   }
+
+	public void periodic() {
+		updateOdometry();
+		m_fieldSim.setRobotPose(m_poseEstimator.getEstimatedPosition());
+		m_fieldApproximation.setRobotPose(m_poseEstimator.getEstimatedPosition());
+	}
 }
