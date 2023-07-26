@@ -7,6 +7,8 @@ package edu.wpi.first.wpilibj.examples.swervedriveposeestimator;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -87,6 +89,14 @@ public class Drivetrain {
     m_frontRight.setDesiredState(swerveModuleStates[1]);
     m_backLeft.setDesiredState(swerveModuleStates[2]);
     m_backRight.setDesiredState(swerveModuleStates[3]);
+
+		Transform2d delta = new Transform2d(
+			new Translation2d(ySpeed * periodSeconds, xSpeed * periodSeconds),
+			new Rotation2d()
+		);
+
+		m_fieldSim.setRobotPose(m_fieldSim.getRobotPose().transformBy(delta));
+		// m_fieldSim.setRobotPose(m_poseEstimator.getEstimatedPosition());
   }
 
   /** Updates the field relative position of the robot. */
@@ -110,7 +120,8 @@ public class Drivetrain {
 
 	public void periodic() {
 		updateOdometry();
-		m_fieldSim.setRobotPose(m_poseEstimator.getEstimatedPosition());
-		m_fieldApproximation.setRobotPose(m_poseEstimator.getEstimatedPosition());
+		
+		// m_fieldSim.setRobotPose(m_kinematics);
+		// m_fieldApproximation.setRobotPose(m_poseEstimator.getEstimatedPosition());
 	}
 }
