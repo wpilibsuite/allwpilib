@@ -87,7 +87,7 @@ int main(void) {
     return 1;
   }
 
-  WPI_EventHandle eventHandle = WPI_CreateEvent(1, 0);
+  WPI_EventHandle eventHandle = WPI_CreateEvent(0, 0);
   HAL_ProvideNewDataEventHandle(eventHandle);
 
   while (1) {
@@ -98,6 +98,8 @@ int main(void) {
       // Do something here on no packet
       continue;
     }
+
+    HAL_RefreshDSData();
 
     enum DriverStationMode dsMode = getDSMode();
     switch (dsMode) {
