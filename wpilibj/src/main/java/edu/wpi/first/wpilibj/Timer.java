@@ -52,6 +52,12 @@ public class Timer {
     }
   }
 
+  /**
+   * Pause the thread for a specified time in seconds. In sim, this function utilizes the simulation
+   * timing.
+   *
+   * @param seconds Length of time to pause, in seconds.
+   */
   public static void delaySim(final double seconds) {
     HALUtil.waitMicroseconds((long) (seconds * 1e6));
   }

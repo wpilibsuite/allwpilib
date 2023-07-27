@@ -20,6 +20,12 @@ namespace frc {
  */
 void Wait(units::second_t seconds);
 
+/**
+ * Pause the thread for a specified time. In sim, this function utilizes the
+ * simulation timing.
+ *
+ * @param seconds Length of time to pause.
+ */
 void WaitSim(units::microsecond_t seconds);
 
 /**

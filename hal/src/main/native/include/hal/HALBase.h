@@ -175,6 +175,10 @@ uint64_t HAL_ExpandFPGATime(uint32_t unexpandedLower, int32_t* status);
 /**
  * Blocks the current thread for the given amount of time in microseconds,
  * utilizing the appropriate clock for the current platform.
+ *
+ * In simulation, this utilizes the simulation timing.
+ *
+ * @param waitMicros Time to wait, in microseconds.
  */
 void HAL_WaitMicroseconds(uint64_t waitMicros);
 

@@ -68,6 +68,14 @@ public final class HALUtil extends JNIWrapper {
    */
   public static native long getFPGATime();
 
+  /**
+   * Blocks the current thread for the given amount of time in microseconds,
+   * utilizing the appropriate clock for the current platform.
+   *
+   * In simulation, this utilizes the simulation timing.
+   *
+   * @param waitMicros Time to wait, in microseconds.
+   */
   public static native void waitMicroseconds(long waitTime);
 
   /**
