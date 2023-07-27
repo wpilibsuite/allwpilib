@@ -136,9 +136,10 @@ double HAL_GetBrownoutVoltage(int32_t* status) {
   return brownout / 4.0;
 }
 
-int16_t HAL_ReadCPUTemp(int32_t* status) {
+int16_t HAL_GetCPUTemp(int32_t* status) {
   initializePower(status);
   //TODO figure out what this outputs
+  //Outputs ~2600 at idle...no way to compare against true chip temperature
   return power->readOnChipTemperature(status);
 }
 
