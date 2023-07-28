@@ -289,6 +289,15 @@ public final class RobotController {
   }
 
   /**
+   * Get the current CPU temperature in degrees Celsius.
+   *
+   * @return current CPU temperature in degrees Celsius
+   */
+  public static double getCPUTemp() {
+    return PowerJNI.getCPUTemp();
+  }
+
+  /**
    * Get the current status of the CAN bus.
    *
    * @return The status of the CAN bus

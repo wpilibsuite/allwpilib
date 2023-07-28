@@ -58,7 +58,7 @@ class RoboRioData {
   SimDataValue<int32_t, HAL_MakeInt, GetUserFaults3V3Name> userFaults3V3{0};
   SimDataValue<double, HAL_MakeDouble, GetBrownoutVoltageName> brownoutVoltage{
       6.75};
-  SimDataValue<int32_t, HAL_MakeInt, GetCPUTempName> cpuTemp{16};
+  SimDataValue<double, HAL_MakeDouble, GetCPUTempName> cpuTemp{100};
 
   int32_t RegisterSerialNumberCallback(HAL_RoboRioStringCallback callback,
                                        void* param, HAL_Bool initialNotify);

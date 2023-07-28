@@ -8,6 +8,7 @@
 
 #include <string>
 
+#include <units/temperature.h>
 #include <units/voltage.h>
 
 namespace frc {
@@ -251,6 +252,13 @@ class RobotController {
    * @param brownoutVoltage The brownout voltage
    */
   static void SetBrownoutVoltage(units::volt_t brownoutVoltage);
+
+  /**
+   * Get the current CPU temperature.
+   *
+   * @return current CPU temperature
+   */
+  static units::celsius_t GetCPUTemp();
 
   /**
    * Get the current status of the CAN bus.

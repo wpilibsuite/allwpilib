@@ -65,7 +65,7 @@ void HAL_SetBrownoutVoltage(double voltage, int32_t* status) {
 double HAL_GetBrownoutVoltage(int32_t* status) {
   return SimRoboRioData->brownoutVoltage;
 }
-int16_t HAL_GetCPUTemp(int32_t* status) {
+double HAL_GetCPUTemp(int32_t* status) {
   return SimRoboRioData->cpuTemp;
 }
 }  // extern "C"

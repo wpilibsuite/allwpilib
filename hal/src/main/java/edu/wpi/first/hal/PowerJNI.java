@@ -160,4 +160,11 @@ public class PowerJNI extends JNIWrapper {
    * @see "HAL_GetBrownoutVoltage"
    */
   public static native double getBrownoutVoltage();
+
+  /**
+   * Get the current CPU temperature in degrees Celsius.
+   *
+   * @return current CPU temperature in degrees Celsius
+   */
+  public static native double getCPUTemp();
 }

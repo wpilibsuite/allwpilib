@@ -293,4 +293,19 @@ Java_edu_wpi_first_hal_PowerJNI_getBrownoutVoltage
   return val;
 }
 
+/*
+ * Class:     edu_wpi_first_hal_PowerJNI
+ * Method:    getCPUTemp
+ * Signature: ()D
+ */
+JNIEXPORT jdouble JNICALL
+Java_edu_wpi_first_hal_PowerJNI_getCPUTemp
+  (JNIEnv* env, jclass)
+{
+  int32_t status = 0;
+  double val = HAL_GetCPUTemp(&status);
+  CheckStatus(env, status);
+  return val;
+}
+
 }  // extern "C"

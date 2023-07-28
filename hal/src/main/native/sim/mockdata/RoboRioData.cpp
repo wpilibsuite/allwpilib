@@ -32,7 +32,7 @@ void RoboRioData::ResetData() {
   userFaults5V.Reset(0);
   userFaults3V3.Reset(0);
   brownoutVoltage.Reset(6.75);
-  cpuTemp.Reset(16);
+  cpuTemp.Reset(100);
   m_serialNumber = "";
   m_comments = "";
 }

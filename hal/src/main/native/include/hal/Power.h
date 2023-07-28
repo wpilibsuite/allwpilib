@@ -173,7 +173,13 @@ double HAL_GetBrownoutVoltage(int32_t* status);
  */
 void HAL_SetBrownoutVoltage(double voltage, int32_t* status);
 
-int16_t HAL_GetCPUTemp(int32_t* status);
+/**
+ * Get the current CPU temperature in degrees Celsius
+ *
+ * @param[out] status the error code, or 0 for success
+ * @return current CPU temperature in degrees Celsius
+ */
+double HAL_GetCPUTemp(int32_t* status);
 
 #ifdef __cplusplus
 }  // extern "C"

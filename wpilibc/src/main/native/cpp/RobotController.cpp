@@ -212,6 +212,13 @@ void RobotController::SetBrownoutVoltage(units::volt_t brownoutVoltage) {
   FRC_CheckErrorStatus(status, "SetBrownoutVoltage");
 }
 
+units::celsius_t RobotController::GetCPUTemp() {
+  int32_t status = 0;
+  double retVal = HAL_GetCPUTemp(&status);
+  FRC_CheckErrorStatus(status, "GetCPUTemp");
+  return units::celsius_t{retVal};
+}
+
 CANStatus RobotController::GetCANStatus() {
   int32_t status = 0;
   float percentBusUtilization = 0;
