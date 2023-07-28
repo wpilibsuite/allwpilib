@@ -74,6 +74,20 @@ Java_edu_wpi_first_hal_PowerJNI_getUserCurrent6V
 
 /*
  * Class:     edu_wpi_first_hal_PowerJNI
+ * Method:    setUserEnabled6V
+ * Signature: (Z)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_PowerJNI_setUserEnabled6V
+  (JNIEnv* env, jclass, jboolean enabled)
+{
+  int32_t status = 0;
+  HAL_SetUserRailEnabled6V(enabled, &status);
+  CheckStatus(env, status);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_PowerJNI
  * Method:    getUserActive6V
  * Signature: ()Z
  */
@@ -134,6 +148,20 @@ Java_edu_wpi_first_hal_PowerJNI_getUserCurrent5V
 
 /*
  * Class:     edu_wpi_first_hal_PowerJNI
+ * Method:    setUserEnabled5V
+ * Signature: (Z)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_PowerJNI_setUserEnabled5V
+  (JNIEnv* env, jclass, jboolean enabled)
+{
+  int32_t status = 0;
+  HAL_SetUserRailEnabled5V(enabled, &status);
+  CheckStatus(env, status);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_PowerJNI
  * Method:    getUserActive5V
  * Signature: ()Z
  */
@@ -190,6 +218,20 @@ Java_edu_wpi_first_hal_PowerJNI_getUserCurrent3V3
   double val = HAL_GetUserCurrent3V3(&status);
   CheckStatus(env, status);
   return val;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_PowerJNI
+ * Method:    setUserEnabled3V3
+ * Signature: (Z)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_PowerJNI_setUserEnabled3V3
+  (JNIEnv* env, jclass, jboolean enabled)
+{
+  int32_t status = 0;
+  HAL_SetUserRailEnabled3V3(enabled, &status);
+  CheckStatus(env, status);
 }
 
 /*

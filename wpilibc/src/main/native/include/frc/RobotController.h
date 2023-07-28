@@ -136,9 +136,16 @@ class RobotController {
   static double GetCurrent3V3();
 
   /**
-   * Get the enabled state of the 3.3V rail. The rail may be disabled due to a
-   * controller brownout, a short circuit on the rail, or controller
-   * over-voltage.
+   * Enables or disables the 3.3V rail.
+   *
+   * @param enabled whether to enable the 3.3V rail.
+   */
+  static void SetEnabled3V3(bool enabled);
+
+  /**
+   * Get the enabled state of the 3.3V rail. The rail may be disabled due to
+   * calling SetEnabled3V3(), a controller brownout, a short circuit on the
+   * rail, or controller over-voltage.
    *
    * @return The controller 3.3V rail enabled value. True for enabled.
    */
@@ -167,9 +174,16 @@ class RobotController {
   static double GetCurrent5V();
 
   /**
-   * Get the enabled state of the 5V rail. The rail may be disabled due to a
-   * controller brownout, a short circuit on the rail, or controller
-   * over-voltage.
+   * Enables or disables the 5V rail.
+   *
+   * @param enabled whether to enable the 5V rail.
+   */
+  static void SetEnabled5V(bool enabled);
+
+  /**
+   * Get the enabled state of the 5V rail. The rail may be disabled due to
+   * calling SetEnabled5V(), a controller brownout, a short circuit on the rail,
+   * or controller over-voltage.
    *
    * @return The controller 5V rail enabled value. True for enabled.
    */
@@ -198,9 +212,16 @@ class RobotController {
   static double GetCurrent6V();
 
   /**
-   * Get the enabled state of the 6V rail. The rail may be disabled due to a
-   * controller brownout, a short circuit on the rail, or controller
-   * over-voltage.
+   * Enables or disables the 6V rail.
+   *
+   * @param enabled whether to enable the 6V rail.
+   */
+  static void SetEnabled6V(bool enabled);
+
+  /**
+   * Get the enabled state of the 6V rail. The rail may be disabled due to
+   * calling SetEnabled6V(), a controller brownout, a short circuit on the rail,
+   * or controller over-voltage.
    *
    * @return The controller 6V rail enabled value. True for enabled.
    */
