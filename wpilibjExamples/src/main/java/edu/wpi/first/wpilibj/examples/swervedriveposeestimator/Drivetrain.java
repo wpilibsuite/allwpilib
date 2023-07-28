@@ -7,8 +7,6 @@ package edu.wpi.first.wpilibj.examples.swervedriveposeestimator;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -41,9 +39,9 @@ public class Drivetrain {
       new SwerveDriveKinematics(
           m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation);
 
-	private final Field2d m_fieldSim = new Field2d();
-	private Pose2d m_poseSim = new Pose2d();
-	private final Field2d m_fieldApproximation = new Field2d();
+  private final Field2d m_fieldSim = new Field2d();
+  private Pose2d m_poseSim = new Pose2d();
+  private final Field2d m_fieldApproximation = new Field2d();
 
   /* Here we use SwerveDrivePoseEstimator so that we can fuse odometry readings. The numbers used
   below are robot specific, and should be tuned. */
@@ -64,7 +62,7 @@ public class Drivetrain {
   public Drivetrain() {
     m_gyro.reset();
 
-		SmartDashboard.putData("Field", m_fieldSim);
+    SmartDashboard.putData("Field", m_fieldSim);
     SmartDashboard.putData("FieldEstimation", m_fieldApproximation);
   }
 
@@ -92,13 +90,10 @@ public class Drivetrain {
     m_backLeft.setDesiredState(swerveModuleStates[2]);
     m_backRight.setDesiredState(swerveModuleStates[3]);
 
-		Twist2d deltaTwist2d = new Twist2d(
-			xSpeed * periodSeconds,
-			ySpeed * periodSeconds,
-			rot * periodSeconds
-		);
+    Twist2d deltaTwist2d =
+        new Twist2d(xSpeed * periodSeconds, ySpeed * periodSeconds, rot * periodSeconds);
 
-		m_poseSim = m_poseSim.exp(deltaTwist2d);
+    m_poseSim = m_poseSim.exp(deltaTwist2d);
   }
 
   /** Updates the field relative position of the robot. */
