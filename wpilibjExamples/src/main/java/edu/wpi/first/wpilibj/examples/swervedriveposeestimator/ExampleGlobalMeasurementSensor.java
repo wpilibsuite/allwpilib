@@ -23,7 +23,7 @@ public final class ExampleGlobalMeasurementSensor {
    */
   public static Pose2d getEstimatedGlobalPose(Pose2d estimatedRobotPose) {
     var rand =
-        StateSpaceUtil.makeWhiteNoiseVector(VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30)));
+        StateSpaceUtil.makeWhiteNoiseVector(VecBuilder.fill(0.1, 0.1, 0.1));
     return new Pose2d(
         estimatedRobotPose.getX() + rand.get(0, 0),
         estimatedRobotPose.getY() + rand.get(1, 0),

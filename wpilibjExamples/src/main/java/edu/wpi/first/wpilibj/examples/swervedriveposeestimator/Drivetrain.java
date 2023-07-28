@@ -122,12 +122,10 @@ public class Drivetrain {
 
 	public void periodic() {
 		updateOdometry();
-		
-		// m_fieldSim.setRobotPose(m_kinematics);
-		m_fieldApproximation.setRobotPose(m_poseEstimator.getEstimatedPosition());
 	}
-
+	
 	public void simulationPeriodic() {
 		m_fieldSim.setRobotPose(m_poseSim);
+		m_fieldApproximation.setRobotPose(m_poseEstimator.getEstimatedPosition());
 	}
 }
