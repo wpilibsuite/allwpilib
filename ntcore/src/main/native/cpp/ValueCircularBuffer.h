@@ -4,13 +4,14 @@
 
 #pragma once
 
+#include <utility>
 #include <vector>
 
 #include <wpi/circular_buffer.h>
 
+#include "Value_internal.h"
 #include "networktables/NetworkTableValue.h"
 #include "ntcore_cpp_types.h"
-#include "Value_internal.h"
 
 namespace nt {
 

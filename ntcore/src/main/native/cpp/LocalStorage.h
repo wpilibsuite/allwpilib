@@ -14,11 +14,11 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/json.h>
-#include <wpi/mutex.h>
 #include <wpi/DenseMap.h>
 #include <wpi/StringMap.h>
 #include <wpi/Synchronization.h>
+#include <wpi/json.h>
+#include <wpi/mutex.h>
 
 #include "Handle.h"
 #include "HandleMap.h"
