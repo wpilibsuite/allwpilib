@@ -63,7 +63,7 @@ void ClientImpl::ProcessIncomingBinary(uint64_t curTimeMs,
     Value value;
     std::string error;
     if (!WireDecodeBinary(&data, &id, &value, &error, -m_serverTimeOffsetUs)) {
-      ERROR("binary decode error: {}", error);
+      ERR("binary decode error: {}", error);
       break;  // FIXME
     }
     DEBUG4("BinaryMessage({})", id);
@@ -71,8 +71,8 @@ void ClientImpl::ProcessIncomingBinary(uint64_t curTimeMs,
     // handle RTT ping response
     if (id == -1) {
       if (!value.IsInteger()) {
-        WARNING("RTT ping response with non-integer type {}",
-                static_cast<int>(value.type()));
+        WARN("RTT ping response with non-integer type {}",
+             static_cast<int>(value.type()));
         continue;
       }
       DEBUG4("RTT ping response time {} value {}", value.time(),
@@ -93,7 +93,7 @@ void ClientImpl::ProcessIncomingBinary(uint64_t curTimeMs,
     // otherwise it's a value message, get the local topic handle for it
     auto topicIt = m_topicMap.find(id);
     if (topicIt == m_topicMap.end()) {
-      WARNING("received unknown id {}", id);
+      WARN("received unknown id {}", id);
       continue;
     }
 

@@ -150,7 +150,7 @@ void ServerImpl::ClientData4Base::ClientPublish(int64_t pubuid,
   auto [publisherIt, isNew] = m_publishers.try_emplace(
       pubuid, std::make_unique<PublisherData>(this, topic, pubuid));
   if (!isNew) {
-    WARNING("client {} duplicate publish of pubuid {}", m_id, pubuid);
+    WARN("client {} duplicate publish of pubuid {}", m_id, pubuid);
   }
 
   // add publisher to topic
@@ -196,7 +196,7 @@ void ServerImpl::ClientData4Base::ClientSetProperties(std::string_view name,
   auto topicIt = m_server.m_nameTopics.find(name);
   if (topicIt == m_server.m_nameTopics.end() ||
       !topicIt->second->IsPublished()) {
-    WARNING(
+    WARN(
         "server ignoring SetProperties({}) from client {} on unpublished topic "
         "'{}'; publish or set a value first",
         update.dump(), m_id, name);
@@ -204,9 +204,8 @@ void ServerImpl::ClientData4Base::ClientSetProperties(std::string_view name,
   }
   auto topic = topicIt->second;
   if (topic->special) {
-    WARNING(
-        "server ignoring SetProperties({}) from client {} on meta topic '{}'",
-        update.dump(), m_id, name);
+    WARN("server ignoring SetProperties({}) from client {} on meta topic '{}'",
+         update.dump(), m_id, name);
     return;  // nothing to do
   }
   m_server.SetProperties(nullptr, topic, update);
@@ -343,7 +342,7 @@ void ServerImpl::ClientData4Base::ClientSetValue(int64_t pubuid,
   DEBUG4("ClientSetValue({}, {})", m_id, pubuid);
   auto publisherIt = m_publishers.find(pubuid);
   if (publisherIt == m_publishers.end()) {
-    WARNING("unrecognized client {} pubuid {}, ignoring set", m_id, pubuid);
+    WARN("unrecognized client {} pubuid {}, ignoring set", m_id, pubuid);
     return;  // ignore unrecognized pubuids
   }
   auto topic = publisherIt->getSecond().get()->topic;
@@ -906,7 +905,7 @@ void ServerImpl::ClientData3::EntryAssign(std::string_view name,
   auto topic = m_server.CreateTopic(this, name, typeStr, properties);
   TopicData3* topic3 = GetTopic3(topic);
   if (topic3->published || topic3->sentAssign) {
-    WARNING("ignoring client {} duplicate publish of '{}'", m_id, name);
+    WARN("ignoring client {} duplicate publish of '{}'", m_id, name);
     return;
   }
   ++topic3->seqNum;
@@ -1621,8 +1620,8 @@ ServerImpl::TopicData* ServerImpl::CreateTopic(ClientData* client,
   if (topic) {
     if (typeStr != topic->typeStr) {
       if (client) {
-        WARNING("client {} publish '{}' conflicting type '{}' (currently '{}')",
-                client->GetName(), name, typeStr, topic->typeStr);
+        WARN("client {} publish '{}' conflicting type '{}' (currently '{}')",
+             client->GetName(), name, typeStr, topic->typeStr);
       }
     }
   } else {

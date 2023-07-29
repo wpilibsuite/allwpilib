@@ -468,8 +468,7 @@ LocalStorage::PublisherData* LocalStorage::Impl::AddLocalPublisher(
     } else if (properties.is_object()) {
       topic->properties = properties;
     } else {
-      WARNING("ignoring non-object properties when publishing '{}'",
-              topic->name);
+      WARN("ignoring non-object properties when publishing '{}'", topic->name);
       topic->properties = wpi::json::object();
     }
 
@@ -643,8 +642,7 @@ void LocalStorage::Impl::AddListenerImpl(NT_Listener listenerHandle,
                                          TopicData* topic,
                                          unsigned int eventMask) {
   if (topic->localSubscribers.size() >= kMaxSubscribers) {
-    ERROR(
-        "reached maximum number of subscribers to '{}', ignoring listener add",
+    ERR("reached maximum number of subscribers to '{}', ignoring listener add",
         topic->name);
     return;
   }
@@ -668,8 +666,8 @@ void LocalStorage::Impl::AddListenerImpl(NT_Listener listenerHandle,
 
   if ((eventMask & NT_EVENT_TOPIC) != 0) {
     if (topic->listeners.size() >= kMaxListeners) {
-      ERROR("reached maximum number of listeners to '{}', not adding listener",
-            topic->name);
+      ERR("reached maximum number of listeners to '{}', not adding listener",
+          topic->name);
       return;
     }
 
@@ -690,8 +688,8 @@ void LocalStorage::Impl::AddListenerImpl(NT_Listener listenerHandle,
 
   if ((eventMask & NT_EVENT_VALUE_ALL) != 0) {
     if (subscriber->valueListeners.size() >= kMaxListeners) {
-      ERROR("reached maximum number of listeners to '{}', not adding listener",
-            topic->name);
+      ERR("reached maximum number of listeners to '{}', not adding listener",
+          topic->name);
       return;
     }
     m_listenerStorage.Activate(
@@ -740,7 +738,7 @@ void LocalStorage::Impl::AddListenerImpl(NT_Listener listenerHandle,
 
   if ((eventMask & NT_EVENT_TOPIC) != 0) {
     if (m_topicPrefixListeners.size() >= kMaxListeners) {
-      ERROR("reached maximum number of listeners, not adding listener");
+      ERR("reached maximum number of listeners, not adding listener");
       return;
     }
 
@@ -766,7 +764,7 @@ void LocalStorage::Impl::AddListenerImpl(NT_Listener listenerHandle,
 
   if ((eventMask & NT_EVENT_VALUE_ALL) != 0) {
     if (subscriber->valueListeners.size() >= kMaxListeners) {
-      ERROR("reached maximum number of listeners, not adding listener");
+      ERR("reached maximum number of listeners, not adding listener");
       return;
     }
 
@@ -866,8 +864,8 @@ LocalStorage::PublisherData* LocalStorage::Impl::PublishEntry(EntryData* entry,
              entry->subscriber->config.typeStr != typeStr) {
     if (!IsNumericCompatible(type, entry->subscriber->config.type)) {
       // don't allow dynamically changing the type of an entry
-      ERROR("cannot publish entry {} as type {}, previously subscribed as {}",
-            entry->topic->name, typeStr, entry->subscriber->config.typeStr);
+      ERR("cannot publish entry {} as type {}, previously subscribed as {}",
+          entry->topic->name, typeStr, entry->subscriber->config.typeStr);
       return nullptr;
     }
   }

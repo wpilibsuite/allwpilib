@@ -328,7 +328,7 @@ void NetworkServer::LoadPersistent() {
   is.readinto(m_persistentData, size);
   DEBUG4("read data: {}", m_persistentData);
   if (is.has_error()) {
-    WARNING("error reading persistent file");
+    WARN("error reading persistent file");
     return;
   }
 }
@@ -368,7 +368,7 @@ void NetworkServer::Init() {
   }
   auto errs = m_serverImpl.LoadPersistent(m_persistentData);
   if (!errs.empty()) {
-    WARNING("error reading persistent file: {}", errs);
+    WARN("error reading persistent file: {}", errs);
   }
 
   // set up timers
