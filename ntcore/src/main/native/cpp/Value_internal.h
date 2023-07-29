@@ -223,20 +223,20 @@ static_assert(NumericArrayType<double[]>);
 static_assert(!NumericArrayType<bool[]>);
 
 template <NumericType T>
-inline TypeInfo<T>::Value GetNumericAs(const Value& value) {
+inline typename TypeInfo<T>::Value GetNumericAs(const Value& value) {
   if (value.IsInteger()) {
-    return static_cast<TypeInfo<T>::Value>(value.GetInteger());
+    return static_cast<typename TypeInfo<T>::Value>(value.GetInteger());
   } else if (value.IsFloat()) {
-    return static_cast<TypeInfo<T>::Value>(value.GetFloat());
+    return static_cast<typename TypeInfo<T>::Value>(value.GetFloat());
   } else if (value.IsDouble()) {
-    return static_cast<TypeInfo<T>::Value>(value.GetDouble());
+    return static_cast<typename TypeInfo<T>::Value>(value.GetDouble());
   } else {
     return {};
   }
 }
 
 template <NumericArrayType T>
-TypeInfo<T>::Value GetNumericArrayAs(const Value& value) {
+typename TypeInfo<T>::Value GetNumericArrayAs(const Value& value) {
   if (value.IsIntegerArray()) {
     auto arr = value.GetIntegerArray();
     return {arr.begin(), arr.end()};
@@ -343,7 +343,7 @@ inline Value MakeValue(typename TypeInfo<T>::Value&& value, int64_t time) {
 }
 
 template <ValidType T>
-inline TypeInfo<T>::Value CopyValue(typename TypeInfo<T>::View value) {
+inline typename TypeInfo<T>::Value CopyValue(typename TypeInfo<T>::View value) {
   if constexpr (ArrayType<T> || IsNTType<T, NT_RAW>) {
     return {value.begin(), value.end()};
   } else if constexpr (IsNTType<T, NT_STRING>) {
@@ -354,7 +354,7 @@ inline TypeInfo<T>::Value CopyValue(typename TypeInfo<T>::View value) {
 }
 
 template <SmallArrayType T>
-inline TypeInfo<T>::SmallRet CopyValue(
+inline typename TypeInfo<T>::SmallRet CopyValue(
     typename TypeInfo<T>::View arr,
     wpi::SmallVectorImpl<typename TypeInfo<T>::SmallElem>& buf) {
   buf.assign(arr.begin(), arr.end());
@@ -362,7 +362,7 @@ inline TypeInfo<T>::SmallRet CopyValue(
 }
 
 template <ValidType T, bool ConvertNumeric>
-inline TypeInfo<T>::Value GetValueCopy(const Value& value) {
+inline typename TypeInfo<T>::Value GetValueCopy(const Value& value) {
   if constexpr (ConvertNumeric && NumericType<T>) {
     return GetNumericAs<T>(value);
   } else if constexpr (ConvertNumeric && NumericArrayType<T>) {
