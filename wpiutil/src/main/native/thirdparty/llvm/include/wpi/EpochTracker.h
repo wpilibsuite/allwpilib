@@ -22,6 +22,7 @@
 namespace wpi {
 
 #ifndef NDEBUG //ifndef LLVM_ENABLE_ABI_BREAKING_CHECKS
+#define LLVM_DEBUGEPOCHBASE_HANDLEBASE_EMPTYBASE
 
 /// A base class for data structure classes wishing to make iterators
 /// ("handles") pointing into themselves fail-fast.  When building without
@@ -77,6 +78,11 @@ public:
 };
 
 #else
+#ifdef _MSC_VER
+#define LLVM_DEBUGEPOCHBASE_HANDLEBASE_EMPTYBASE __declspec(empty_bases)
+#else
+#define LLVM_DEBUGEPOCHBASE_HANDLEBASE_EMPTYBASE
+#endif // _MSC_VER
 
 class DebugEpochBase {
 public:

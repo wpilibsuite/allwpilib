@@ -11,8 +11,9 @@
 //===----------------------------------------------------------------------===//
 
 #include "wpi/StringMap.h"
-#include "wpi/DJB.h"
 #include "wpi/MathExtras.h"
+#include "wpi/ReverseIteration.h"
+#include "wpi/xxhash.h"
 
 using namespace wpi;
 
@@ -84,7 +85,9 @@ unsigned StringMapImpl::LookupBucketFor(std::string_view Name) {
   // Hash table unallocated so far?
   if (NumBuckets == 0)
     init(16);
-  unsigned FullHashValue = djbHash(Name, 0);
+  unsigned FullHashValue = xxh3_64bits(Name);
+  if (shouldReverseIterate())
+    FullHashValue = ~FullHashValue;
   unsigned BucketNo = FullHashValue & (NumBuckets - 1);
   unsigned *HashTable = getHashTable(TheTable, NumBuckets);
 
@@ -139,7 +142,9 @@ unsigned StringMapImpl::LookupBucketFor(std::string_view Name) {
 int StringMapImpl::FindKey(std::string_view Key) const {
   if (NumBuckets == 0)
     return -1; // Really empty table?
-  unsigned FullHashValue = djbHash(Key, 0);
+  unsigned FullHashValue = xxh3_64bits(Key);
+  if (shouldReverseIterate())
+    FullHashValue = ~FullHashValue;
   unsigned BucketNo = FullHashValue & (NumBuckets - 1);
   unsigned *HashTable = getHashTable(TheTable, NumBuckets);
 
