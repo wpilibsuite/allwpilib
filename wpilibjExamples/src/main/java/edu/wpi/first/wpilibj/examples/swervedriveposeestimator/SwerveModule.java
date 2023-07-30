@@ -14,6 +14,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
+import edu.wpi.first.wpilibj.simulation.EncoderSim;
 
 public class SwerveModule {
   private static final double kWheelRadius = 0.0508;
@@ -28,6 +29,12 @@ public class SwerveModule {
 
   private final Encoder m_driveEncoder;
   private final Encoder m_turningEncoder;
+
+	private final EncoderSim m_driveEncoderSim;
+	private final EncoderSim m_turningEncoderSim;
+
+	// private final double m_driveEncoderDistancePerPulse = 2 * Math.PI * kWheelRadius / kEncoderResolution;
+	private double m_lastAzimuth = 0;
 
   // Gains are for example purposes only - must be determined for your own robot!
   private final PIDController m_drivePIDController = new PIDController(1, 0, 0);
@@ -67,6 +74,9 @@ public class SwerveModule {
 
     m_driveEncoder = new Encoder(driveEncoderChannelA, driveEncoderChannelB);
     m_turningEncoder = new Encoder(turningEncoderChannelA, turningEncoderChannelB);
+
+		m_driveEncoderSim = new EncoderSim(m_driveEncoder);
+		m_turningEncoderSim = new EncoderSim(m_turningEncoder);
 
     // Set the distance per pulse for the drive encoder. We can simply use the
     // distance traveled for one rotation of the wheel divided by the encoder
@@ -128,5 +138,13 @@ public class SwerveModule {
 
     m_driveMotor.setVoltage(driveOutput + driveFeedforward);
     m_turningMotor.setVoltage(turnOutput + turnFeedforward);
+
+		m_lastAzimuth = m_turningEncoder.getDistance();
+
+		m_driveEncoderSim.setDistance(m_driveEncoderSim.getDistance() + desiredState.speedMetersPerSecond * 0.02);
+		m_driveEncoderSim.setRate(desiredState.speedMetersPerSecond);
+
+		m_turningEncoderSim.setDistance(desiredState.angle.getRadians());
+		m_turningEncoderSim.setRate(m_turningEncoderSim.getDistance() - m_lastAzimuth);
   }
 }
