@@ -31,6 +31,19 @@ struct StringArrayStorage {
   std::vector<std::string> strings;
   std::vector<NT_String> ntStrings;
 };
+
+template <typename T>
+inline std::shared_ptr<T[]> AllocateArray(size_t nelem) {
+#if __cpp_lib_shared_ptr_arrays >= 201707L
+#if __cpp_lib_smart_ptr_for_overwrite >= 202002L
+  return std::make_shared_for_overwrite<T[]>(nelem);
+#else
+  auto data = std::make_shared<T[]>(nelem);
+#endif
+#else
+  return std::shared_ptr<T[]>{new T[nelem]};
+#endif
+}
 }  // namespace
 
 void StringArrayStorage::InitNtStrings() {
@@ -71,20 +84,20 @@ Value::Value(NT_Type type, int64_t time, int64_t serverTime,
 
 Value Value::MakeBooleanArray(std::span<const bool> value, int64_t time) {
   Value val{NT_BOOLEAN_ARRAY, time, private_init{}};
-  auto data = std::make_shared<std::vector<int>>(value.begin(), value.end());
-  // data->reserve(value.size());
-  // std::copy(value.begin(), value.end(), *data);
-  val.m_val.data.arr_boolean.arr = data->data();
-  val.m_val.data.arr_boolean.size = data->size();
+  auto data = AllocateArray<int>(value.size());
+  std::copy(value.begin(), value.end(), data.get());
+  val.m_val.data.arr_boolean.arr = data.get();
+  val.m_val.data.arr_boolean.size = value.size();
   val.m_storage = std::move(data);
   return val;
 }
 
 Value Value::MakeBooleanArray(std::span<const int> value, int64_t time) {
   Value val{NT_BOOLEAN_ARRAY, time, private_init{}};
-  auto data = std::make_shared<std::vector<int>>(value.begin(), value.end());
-  val.m_val.data.arr_boolean.arr = data->data();
-  val.m_val.data.arr_boolean.size = data->size();
+  auto data = AllocateArray<int>(value.size());
+  std::copy(value.begin(), value.end(), data.get());
+  val.m_val.data.arr_boolean.arr = data.get();
+  val.m_val.data.arr_boolean.size = value.size();
   val.m_storage = std::move(data);
   return val;
 }
@@ -100,10 +113,10 @@ Value Value::MakeBooleanArray(std::vector<int>&& value, int64_t time) {
 
 Value Value::MakeIntegerArray(std::span<const int64_t> value, int64_t time) {
   Value val{NT_INTEGER_ARRAY, time, private_init{}};
-  auto data =
-      std::make_shared<std::vector<int64_t>>(value.begin(), value.end());
-  val.m_val.data.arr_int.arr = data->data();
-  val.m_val.data.arr_int.size = data->size();
+  auto data = AllocateArray<int64_t>(value.size());
+  std::copy(value.begin(), value.end(), data.get());
+  val.m_val.data.arr_int.arr = data.get();
+  val.m_val.data.arr_int.size = value.size();
   val.m_storage = std::move(data);
   return val;
 }
@@ -119,9 +132,10 @@ Value Value::MakeIntegerArray(std::vector<int64_t>&& value, int64_t time) {
 
 Value Value::MakeFloatArray(std::span<const float> value, int64_t time) {
   Value val{NT_FLOAT_ARRAY, time, private_init{}};
-  auto data = std::make_shared<std::vector<float>>(value.begin(), value.end());
-  val.m_val.data.arr_float.arr = data->data();
-  val.m_val.data.arr_float.size = data->size();
+  auto data = AllocateArray<float>(value.size());
+  std::copy(value.begin(), value.end(), data.get());
+  val.m_val.data.arr_float.arr = data.get();
+  val.m_val.data.arr_float.size = value.size();
   val.m_storage = std::move(data);
   return val;
 }
@@ -137,9 +151,10 @@ Value Value::MakeFloatArray(std::vector<float>&& value, int64_t time) {
 
 Value Value::MakeDoubleArray(std::span<const double> value, int64_t time) {
   Value val{NT_DOUBLE_ARRAY, time, private_init{}};
-  auto data = std::make_shared<std::vector<double>>(value.begin(), value.end());
-  val.m_val.data.arr_double.arr = data->data();
-  val.m_val.data.arr_double.size = data->size();
+  auto data = AllocateArray<double>(value.size());
+  std::copy(value.begin(), value.end(), data.get());
+  val.m_val.data.arr_double.arr = data.get();
+  val.m_val.data.arr_double.size = value.size();
   val.m_storage = std::move(data);
   return val;
 }
