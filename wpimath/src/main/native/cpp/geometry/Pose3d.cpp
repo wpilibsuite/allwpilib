@@ -60,6 +60,10 @@ Pose3d Pose3d::operator/(double scalar) const {
   return *this * (1.0 / scalar);
 }
 
+Pose3d Pose3d::RotateBy(const Rotation3d& other) const {
+  return {m_translation.RotateBy(other), m_rotation.RotateBy(other)};
+}
+
 Pose3d Pose3d::TransformBy(const Transform3d& other) const {
   return {m_translation + (other.Translation().RotateBy(m_rotation)),
           other.Rotation() + m_rotation};
