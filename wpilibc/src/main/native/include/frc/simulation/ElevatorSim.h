@@ -23,6 +23,8 @@ class ElevatorSim : public LinearSystemSim<2, 1, 1> {
    * Constructs a simulated elevator mechanism.
    *
    * @param plant              The linear system that represents the elevator.
+   *                           This system can be created with
+   *                           LinearSystemId::ElevatorSystem().
    * @param gearbox            The type of and number of motors in your
    *                           elevator gearbox.
    * @param gearing            The gearing of the elevator (numbers greater

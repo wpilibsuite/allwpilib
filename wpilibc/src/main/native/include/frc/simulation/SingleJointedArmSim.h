@@ -23,7 +23,9 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 1> {
   /**
    * Creates a simulated arm mechanism.
    *
-   * @param system             The system representing this arm.
+   * @param system             The system representing this arm. This system can
+   *                           be created with
+   *                           LinearSystemId::SingleJointedArmSystem().
    * @param gearbox            The type and number of motors on the arm gearbox.
    * @param gearing            The gear ratio of the arm (numbers greater than 1
    *                           represent reductions).
