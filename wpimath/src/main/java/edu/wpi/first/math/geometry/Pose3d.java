@@ -151,8 +151,7 @@ public class Pose3d implements Interpolatable<Pose3d> {
   }
 
   /**
-   * Transforms the pose by the given transformation and returns the new pose. See + operator for
-   * the matrix multiplication performed.
+   * Transforms the pose by the given transformation and returns the new pose.
    *
    * @param other The transform to transform the pose by.
    * @return The transformed pose.

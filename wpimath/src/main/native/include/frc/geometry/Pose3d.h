@@ -132,7 +132,6 @@ class WPILIB_DLLEXPORT Pose3d {
 
   /**
    * Transforms the pose by the given transformation and returns the new pose.
-   * See + operator for the matrix multiplication performed.
    *
    * @param other The transform to transform the pose by.
    *
