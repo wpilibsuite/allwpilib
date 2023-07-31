@@ -75,6 +75,10 @@ public class LTVUnicycleController {
   /**
    * Constructs a linear time-varying unicycle controller.
    *
+   * <p>See
+   * https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-intro.html#lqr-tuning
+   * for how to select the tolerances.
+   *
    * @param qelems The maximum desired error tolerance for each state.
    * @param relems The maximum desired control effort for each input.
    * @param dt Discretization timestep in seconds.
@@ -85,6 +89,10 @@ public class LTVUnicycleController {
 
   /**
    * Constructs a linear time-varying unicycle controller.
+   *
+   * <p>See
+   * https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-intro.html#lqr-tuning
+   * for how to select the tolerances.
    *
    * @param qelems The maximum desired error tolerance for each state.
    * @param relems The maximum desired control effort for each input.
