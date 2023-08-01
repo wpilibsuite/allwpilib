@@ -20,14 +20,14 @@
 class Robot : public frc::TimedRobot {
  public:
   /**
-   * Controls flywheel to a set speed (rad/s) controlled by a joystick
+   * Controls flywheel to a set speed (RPM) controlled by a joystick.
    */
   void TeleopPeriodic() override {
     // Scale setpoint value between 0 and maxSetpointValue
-    units::radians_per_second_t setpoint = units::math::max(
-        0_rad_per_s, m_joystick.GetRawAxis(0) * kMaxSetpointValue);
+    units::radians_per_second_t setpoint =
+        units::math::max(0_rpm, m_joystick.GetRawAxis(0) * kMaxSetpointValue);
 
-    // Set setpoint and measurement of the bang bang controller
+    // Set setpoint and measurement of the bang-bang controller
     units::volt_t bangOutput =
         m_bangBangControler.Calculate(m_encoder.GetRate(), setpoint.value()) *
         12_V;
@@ -40,7 +40,7 @@ class Robot : public frc::TimedRobot {
   }
 
   void RobotInit() override {
-    // Add bang bang controler to SmartDashboard and networktables.
+    // Add bang-bang controler to SmartDashboard and networktables.
     frc::SmartDashboard::PutData("BangBangControler", &m_bangBangControler);
   }
 
@@ -50,8 +50,9 @@ class Robot : public frc::TimedRobot {
   void SimulationPeriodic() override {
     // To update our simulation, we set motor voltage inputs, update the
     // simulation, and write the simulated velocities to our simulated encoder
-    m_flywheelSim.SetInputVoltage(units::volt_t{m_flywheelMotor.Get()} *
-                                  frc::RobotController::GetInputVoltage());
+    m_flywheelSim.SetInputVoltage(
+        m_flywheelMotor.Get() *
+        units::volt_t{frc::RobotController::GetInputVoltage()});
     m_flywheelSim.Update(0.02_s);
     m_encoderSim.SetRate(m_flywheelSim.GetAngularVelocity().value());
   }
@@ -62,7 +63,7 @@ class Robot : public frc::TimedRobot {
   static constexpr int kEncoderBChannel = 1;
 
   // Max setpoint for joystick control
-  static constexpr units::radians_per_second_t kMaxSetpointValue{630.0};
+  static constexpr units::radians_per_second_t kMaxSetpointValue = 6000_rpm;
 
   // Joystick to control setpoint
   frc::Joystick m_joystick{0};
@@ -75,10 +76,9 @@ class Robot : public frc::TimedRobot {
   // Gains are for example purposes only - must be determined for your own
   // robot!
   static constexpr units::volt_t kFlywheelKs = 0.0001_V;
-  static constexpr decltype(1_V / 1_rad_per_s) kFlywheelKv =
-      0.000195_V / 1_rad_per_s;
+  static constexpr decltype(1_V / 1_rad_per_s) kFlywheelKv = 0.000195_V / 1_rpm;
   static constexpr decltype(1_V / 1_rad_per_s_sq) kFlywheelKa =
-      0.0003_V / 1_rad_per_s_sq;
+      0.0003_V / 1_rev_per_m_per_s;
   frc::SimpleMotorFeedforward<units::radians> m_feedforward{
       kFlywheelKs, kFlywheelKv, kFlywheelKa};
 

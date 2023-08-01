@@ -26,8 +26,8 @@ public class Robot extends TimedRobot {
   private static final int kEncoderAChannel = 0;
   private static final int kEncoderBChannel = 1;
 
-  // Max setpoint for joystick control
-  private static final double kMaxSetpointValue = 6000;
+  // Max setpoint for joystick control in RPM
+  private static final double kMaxSetpointValue = 6000.0;
 
   // Joystick to control setpoint
   private final Joystick m_joystick = new Joystick(0);
@@ -38,9 +38,9 @@ public class Robot extends TimedRobot {
   private final BangBangController m_bangBangControler = new BangBangController();
 
   // Gains are for example purposes only - must be determined for your own robot!
-  public static final double kFlywheelKs = 0.0001;
-  public static final double kFlywheelKv = 0.000195;
-  public static final double kFlywheelKa = 0.0003;
+  public static final double kFlywheelKs = 0.0001; // V
+  public static final double kFlywheelKv = 0.000195; // V/RPM
+  public static final double kFlywheelKa = 0.0003; // V/(RPM/s)
   private final SimpleMotorFeedforward m_feedforward =
       new SimpleMotorFeedforward(kFlywheelKs, kFlywheelKv, kFlywheelKa);
 
@@ -60,16 +60,21 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
-    // Add bang bang controler to SmartDashboard and networktables.
+    // Add bang-bang controler to SmartDashboard and networktables.
     SmartDashboard.putData(m_bangBangControler);
   }
 
+  /** Controls flywheel to a set speed (RPM) controlled by a joystick. */
   @Override
   public void teleopPeriodic() {
     // Scale setpoint value between 0 and maxSetpointValue
-    double setpoint = Math.max(0, m_joystick.getRawAxis(0) * kMaxSetpointValue);
+    double setpoint =
+        Math.max(
+            0.0,
+            m_joystick.getRawAxis(0)
+                * Units.rotationsPerMinuteToRadiansPerSecond(kMaxSetpointValue));
 
-    // Set setpoint and measurement of the bang bang controller
+    // Set setpoint and measurement of the bang-bang controller
     double bangOutput = m_bangBangControler.calculate(m_encoder.getRate(), setpoint) * 12.0;
 
     // Controls a motor with the output of the BangBang controller and a
@@ -85,6 +90,6 @@ public class Robot extends TimedRobot {
     // simulation, and write the simulated velocities to our simulated encoder
     m_flywheelSim.setInputVoltage(m_flywheelMotor.get() * RobotController.getInputVoltage());
     m_flywheelSim.update(0.02);
-    m_encoderSim.setRate(m_flywheelSim.getAngularVelocityRPM());
+    m_encoderSim.setRate(m_flywheelSim.getAngularVelocityRadPerSec());
   }
 }
