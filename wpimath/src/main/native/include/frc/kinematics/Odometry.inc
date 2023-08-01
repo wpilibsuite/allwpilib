@@ -24,9 +24,7 @@ const Pose2d& Odometry<WheelSpeeds, WheelPositions>::Update(
     const Rotation2d& gyroAngle, const WheelPositions& wheelPositions) {
   auto angle = gyroAngle + m_gyroOffset;
 
-  auto wheelDeltas = wheelPositions - m_previousWheelPositions;
-
-  auto twist = m_kinematics.ToTwist2d(wheelDeltas);
+  auto twist = m_kinematics.ToTwist2d(m_previousWheelPositions, wheelPositions);
   twist.dtheta = (angle - m_previousAngle).Radians();
 
   auto newPose = m_pose.Exp(twist);

@@ -50,6 +50,21 @@ ChassisSpeeds MecanumDriveKinematics::ToChassisSpeeds(
 }
 
 Twist2d MecanumDriveKinematics::ToTwist2d(
+    const MecanumDriveWheelPositions& start,
+    const MecanumDriveWheelPositions& end) const {
+  Vectord<4> wheelDeltasVector{
+      end.frontLeft.value() - start.frontLeft.value(),
+      end.frontRight.value() - start.frontRight.value(),
+      end.rearLeft.value() - start.rearLeft.value(),
+      end.rearRight.value() - start.rearRight.value()};
+
+  Eigen::Vector3d twistVector = m_forwardKinematics.solve(wheelDeltasVector);
+
+  return {units::meter_t{twistVector(0)},  // NOLINT
+          units::meter_t{twistVector(1)}, units::radian_t{twistVector(2)}};
+}
+
+Twist2d MecanumDriveKinematics::ToTwist2d(
     const MecanumDriveWheelPositions& wheelDeltas) const {
   Vectord<4> wheelDeltasVector{
       wheelDeltas.frontLeft.value(), wheelDeltas.frontRight.value(),

@@ -63,8 +63,9 @@ public class DifferentialDriveKinematics
   }
 
   @Override
-  public Twist2d toTwist2d(DifferentialDriveWheelPositions wheelDeltas) {
-    return toTwist2d(wheelDeltas.leftMeters, wheelDeltas.rightMeters);
+  public Twist2d toTwist2d(
+      DifferentialDriveWheelPositions start, DifferentialDriveWheelPositions end) {
+    return toTwist2d(end.leftMeters - start.leftMeters, end.rightMeters - start.rightMeters);
   }
 
   /**

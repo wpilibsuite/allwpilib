@@ -123,6 +123,9 @@ class WPILIB_DLLEXPORT MecanumDriveKinematics
   ChassisSpeeds ToChassisSpeeds(
       const MecanumDriveWheelSpeeds& wheelSpeeds) const override;
 
+  Twist2d ToTwist2d(const MecanumDriveWheelPositions& start,
+                    const MecanumDriveWheelPositions& end) const override;
+
   /**
    * Performs forward kinematics to return the resulting Twist2d from the
    * given wheel position deltas. This method is often used for odometry --
@@ -133,8 +136,7 @@ class WPILIB_DLLEXPORT MecanumDriveKinematics
    *
    * @return The resulting chassis speed.
    */
-  Twist2d ToTwist2d(
-      const MecanumDriveWheelPositions& wheelDeltas) const override;
+  Twist2d ToTwist2d(const MecanumDriveWheelPositions& wheelDeltas) const;
 
  private:
   mutable Matrixd<4, 3> m_inverseKinematics;

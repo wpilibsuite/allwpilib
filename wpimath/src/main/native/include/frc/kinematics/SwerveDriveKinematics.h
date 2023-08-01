@@ -234,8 +234,16 @@ class SwerveDriveKinematics
       wpi::array<SwerveModulePosition, NumModules> moduleDeltas) const;
 
   Twist2d ToTwist2d(
-      const SwerveDriveWheelPositions<NumModules>& wheelDeltas) const override {
-    return ToTwist2d(wheelDeltas.positions);
+      const SwerveDriveWheelPositions<NumModules>& start,
+      const SwerveDriveWheelPositions<NumModules>& end) const override {
+    auto result =
+        wpi::array<SwerveModulePosition, NumModules>(wpi::empty_array);
+    for (size_t i = 0; i < NumModules; i++) {
+      auto startModule = start.positions[i];
+      auto endModule = end.positions[i];
+      result[i] = {endModule.distance - startModule.distance, endModule.angle};
+    }
+    return ToTwist2d(result);
   }
 
   /**

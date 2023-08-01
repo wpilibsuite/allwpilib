@@ -47,14 +47,16 @@ class WPILIB_DLLEXPORT Kinematics {
 
   /**
    * Performs forward kinematics to return the resulting Twist2d from the given
-   * wheel deltas. This method is often used for odometry -- determining the
-   * robot's position on the field using changes in the distance driven by each
-   * wheel on the robot.
+   * change in wheel positions. This method is often used for odometry --
+   * determining the robot's position on the field using changes in the distance
+   * driven by each wheel on the robot.
    *
-   * @param wheelDeltas The distances driven by each wheel.
+   * @param start The starting distances driven by the wheels.
+   * @param end The ending distances driven by the wheels.
    *
    * @return The resulting Twist2d in the robot's movement.
    */
-  virtual Twist2d ToTwist2d(const WheelPositions& wheelDeltas) const = 0;
+  virtual Twist2d ToTwist2d(const WheelPositions& start,
+                            const WheelPositions& end) const = 0;
 };
 }  // namespace frc

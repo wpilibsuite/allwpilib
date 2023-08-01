@@ -128,7 +128,6 @@ Pose2d PoseEstimator<WheelSpeeds, WheelPositions>::UpdateWithTime(
     const WheelPositions& wheelPositions) {
   m_odometry.Update(gyroAngle, wheelPositions);
 
-  // Copy?
   WheelPositions internalWheelPositions = wheelPositions;
 
   m_poseBuffer.AddSample(
@@ -151,16 +150,12 @@ PoseEstimator<WheelSpeeds, WheelPositions>::InterpolationRecord::Interpolate(
     WheelPositions wheels_lerp =
         this->wheelPositions.Interpolate(endValue.wheelPositions, i);
 
-    // Find the distance between this measurement and the
-    // interpolated measurement.
-    WheelPositions wheels_delta = wheels_lerp - this->wheelPositions;
-
     // Find the new gyro angle.
     auto gyro = wpi::Lerp(this->gyroAngle, endValue.gyroAngle, i);
 
-    // Create a twist to represent this changed based on the interpolated
+    // Create a twist to represent the change based on the interpolated
     // sensor inputs.
-    auto twist = kinematics.ToTwist2d(wheels_delta);
+    auto twist = kinematics.ToTwist2d(this->wheelPositions, wheels_lerp);
     twist.dtheta = (gyro - gyroAngle).Radians();
 
     return {pose.Exp(twist), gyro, wheels_lerp};
