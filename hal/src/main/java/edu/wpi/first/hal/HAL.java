@@ -4,26 +4,75 @@
 
 package edu.wpi.first.hal;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * JNI Wrapper for HAL<br>
- * .
+ * JNI Wrapper for Hardware Abstraction Layer (HAL).
+ *
+ * @see "hal/HALBase.h"
+ * @see "hal/Main.h"
+ * @see "hal/FRCUsageReporting.h"
  */
-@SuppressWarnings({"AbbreviationAsWordInName", "MethodName"})
 public final class HAL extends JNIWrapper {
-  public static native void waitForDSData();
-
+  /**
+   * Call this to start up HAL. This is required for robot programs.
+   *
+   * <p>This must be called before any other HAL functions. Failure to do so will result in
+   * undefined behavior, and likely segmentation faults. This means that any statically initialized
+   * variables in a program MUST call this function in their constructors if they want to use other
+   * HAL calls.
+   *
+   * <p>The common parameters are 500 for timeout and 0 for mode.
+   *
+   * <p>This function is safe to call from any thread, and as many times as you wish. It internally
+   * guards from any reentrancy.
+   *
+   * <p>The applicable modes are: 0: Try to kill an existing HAL from another program, if not
+   * successful, error. 1: Force kill a HAL from another program. 2: Just warn if another hal exists
+   * and cannot be killed. Will likely result in undefined behavior.
+   *
+   * @param timeout the initialization timeout (ms)
+   * @param mode the initialization mode (see remarks)
+   * @return true if initialization was successful, otherwise false.
+   * @see "HAL_Initialize"
+   */
   public static native boolean initialize(int timeout, int mode);
 
+  /**
+   * Call this to shut down HAL.
+   *
+   * <p>This must be called at termination of the robot program to avoid potential segmentation
+   * faults with simulation extensions at exit.
+   *
+   * @see "HAL_Shutdown"
+   */
   public static native void shutdown();
 
+  /**
+   * Returns true if HAL_SetMain() has been called.
+   *
+   * @return True if HAL_SetMain() has been called, false otherwise.
+   * @see "HAL_HasMain"
+   */
   public static native boolean hasMain();
 
+  /**
+   * Runs the main function provided to HAL_SetMain().
+   *
+   * <p>If HAL_SetMain() has not been called, simply sleeps until exitMain() is called.
+   *
+   * @see "HAL_RunMain"
+   */
   public static native void runMain();
 
+  /**
+   * Causes HAL_RunMain() to exit.
+   *
+   * <p>If HAL_SetMain() has been called, this calls the exit function provided to that function.
+   *
+   * @see "HAL_ExitMain"
+   */
   public static native void exitMain();
 
   private static native void simPeriodicBeforeNative();
@@ -117,20 +166,81 @@ public final class HAL extends JNIWrapper {
     }
   }
 
-  public static native void observeUserProgramStarting();
+  /**
+   * Gets if the system is in a browned out state.
+   *
+   * @return true if the system is in a low voltage brown out, false otherwise
+   * @see "HAL_GetBrownedOut"
+   */
+  public static native boolean getBrownedOut();
 
-  public static native void observeUserProgramDisabled();
+  /**
+   * Gets if the system outputs are currently active.
+   *
+   * @return true if the system outputs are active, false if disabled
+   * @see "HAL_GetSystemActive"
+   */
+  public static native boolean getSystemActive();
 
-  public static native void observeUserProgramAutonomous();
+  /**
+   * Gets the current state of the Robot Signal Light (RSL).
+   *
+   * @return The current state of the RSL- true if on, false if off
+   * @see "HAL_GetRSLState"
+   */
+  public static native boolean getRSLState();
 
-  public static native void observeUserProgramTeleop();
+  /**
+   * Gets a port handle for a specific channel and module.
+   *
+   * <p>This is expected to be used for PCMs, as the roboRIO does not work with modules anymore.
+   *
+   * <p>The created handle does not need to be freed.
+   *
+   * @param module the module number
+   * @param channel the channel number
+   * @return the created port
+   * @see "HAL_GetPortWithModule"
+   */
+  public static native int getPortWithModule(byte module, byte channel);
 
-  public static native void observeUserProgramTest();
+  /**
+   * Gets a port handle for a specific channel.
+   *
+   * <p>The created handle does not need to be freed.
+   *
+   * @param channel the channel number
+   * @return the created port
+   * @see "HAL_GetPort"
+   */
+  public static native int getPort(byte channel);
 
+  /**
+   * Report the usage of a resource of interest.
+   *
+   * <p>Original signature: <code>uint32_t report(tResourceType, uint8_t, uint8_t, const
+   * char*)</code>
+   *
+   * @param resource one of the values in the tResourceType above.
+   * @param instanceNumber an index that identifies the resource instance.
+   * @see "HAL_Report"
+   */
   public static void report(int resource, int instanceNumber) {
     report(resource, instanceNumber, 0, "");
   }
 
+  /**
+   * Report the usage of a resource of interest.
+   *
+   * <p>Original signature: <code>uint32_t report(tResourceType, uint8_t, uint8_t, const
+   * char*)</code>
+   *
+   * @param resource one of the values in the tResourceType above.
+   * @param instanceNumber an index that identifies the resource instance.
+   * @param context an optional additional context number for some cases (such as module number).
+   *     Set to 0 to omit.
+   * @see "HAL_Report"
+   */
   public static void report(int resource, int instanceNumber, int context) {
     report(resource, instanceNumber, context, "");
   }
@@ -141,103 +251,18 @@ public final class HAL extends JNIWrapper {
    * <p>Original signature: <code>uint32_t report(tResourceType, uint8_t, uint8_t, const
    * char*)</code>
    *
-   * @param resource one of the values in the tResourceType above (max value 51).
+   * @param resource one of the values in the tResourceType above.
    * @param instanceNumber an index that identifies the resource instance.
    * @param context an optional additional context number for some cases (such as module number).
    *     Set to 0 to omit.
    * @param feature a string to be included describing features in use on a specific resource.
    *     Setting the same resource more than once allows you to change the feature string.
-   * @return TODO
+   * @return the index of the added value in NetComm
+   * @see "HAL_Report"
    */
-  public static native int report(int resource, int instanceNumber, int context, String feature);
-
-  public static native int nativeGetControlWord();
-
-  @SuppressWarnings("MissingJavadocMethod")
-  public static void getControlWord(ControlWord controlWord) {
-    int word = nativeGetControlWord();
-    controlWord.update(
-        (word & 1) != 0,
-        ((word >> 1) & 1) != 0,
-        ((word >> 2) & 1) != 0,
-        ((word >> 3) & 1) != 0,
-        ((word >> 4) & 1) != 0,
-        ((word >> 5) & 1) != 0);
+  public static int report(int resource, int instanceNumber, int context, String feature) {
+    return DriverStationJNI.report(resource, instanceNumber, context, feature);
   }
-
-  private static native int nativeGetAllianceStation();
-
-  @SuppressWarnings("MissingJavadocMethod")
-  public static AllianceStationID getAllianceStation() {
-    switch (nativeGetAllianceStation()) {
-      case 0:
-        return AllianceStationID.Red1;
-      case 1:
-        return AllianceStationID.Red2;
-      case 2:
-        return AllianceStationID.Red3;
-      case 3:
-        return AllianceStationID.Blue1;
-      case 4:
-        return AllianceStationID.Blue2;
-      case 5:
-        return AllianceStationID.Blue3;
-      default:
-        return null;
-    }
-  }
-
-  @SuppressWarnings("MissingJavadocMethod")
-  public static native boolean isNewControlData();
-
-  @SuppressWarnings("MissingJavadocMethod")
-  public static native void releaseDSMutex();
-
-  @SuppressWarnings("MissingJavadocMethod")
-  public static native boolean waitForDSDataTimeout(double timeout);
-
-  public static final int kMaxJoystickAxes = 12;
-  public static final int kMaxJoystickPOVs = 12;
-
-  public static native short getJoystickAxes(byte joystickNum, float[] axesArray);
-
-  public static native short getJoystickPOVs(byte joystickNum, short[] povsArray);
-
-  public static native int getJoystickButtons(byte joystickNum, ByteBuffer count);
-
-  public static native int setJoystickOutputs(
-      byte joystickNum, int outputs, short leftRumble, short rightRumble);
-
-  public static native int getJoystickIsXbox(byte joystickNum);
-
-  public static native int getJoystickType(byte joystickNum);
-
-  public static native String getJoystickName(byte joystickNum);
-
-  public static native int getJoystickAxisType(byte joystickNum, byte axis);
-
-  public static native double getMatchTime();
-
-  public static native boolean getSystemActive();
-
-  public static native boolean getBrownedOut();
-
-  public static native int getMatchInfo(MatchInfoData info);
-
-  public static native int sendError(
-      boolean isError,
-      int errorCode,
-      boolean isLVCode,
-      String details,
-      String location,
-      String callStack,
-      boolean printMsg);
-
-  public static native int sendConsoleLine(String line);
-
-  public static native int getPortWithModule(byte module, byte channel);
-
-  public static native int getPort(byte channel);
 
   private HAL() {}
 }

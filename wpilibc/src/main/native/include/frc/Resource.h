@@ -17,7 +17,7 @@ namespace frc {
 /**
  * The Resource class is a convenient way to track allocated resources.
  *
- * It tracks them as indicies in the range [0 .. elements - 1]. E.g. the library
+ * It tracks them as indices in the range [0 .. elements - 1]. E.g. the library
  * uses this to track hardware channel allocation.
  *
  * The Resource class does not allocate the hardware channels or other
@@ -46,7 +46,7 @@ class Resource {
    * Allocate storage for a new instance of Resource.
    *
    * Allocate a bool array of values that will get initialized to indicate that
-   * no resources have been allocated yet. The indicies of the resources are
+   * no resources have been allocated yet. The indices of the resources are
    * [0 .. elements - 1].
    */
   explicit Resource(uint32_t size);

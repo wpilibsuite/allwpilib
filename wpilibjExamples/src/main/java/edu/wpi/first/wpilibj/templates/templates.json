@@ -1,7 +1,7 @@
 [
   {
     "name": "Command Robot",
-    "description": "Command style",
+    "description": "Command-based, with explanatory comments and example code.",
     "tags": [
       "Command"
     ],
@@ -11,8 +11,20 @@
     "commandversion": 2
   },
   {
+    "name": "Command Robot Skeleton (Advanced)",
+    "description": "Skeleton (stub) code for Command-based, without explanatory comments and example code.",
+    "tags": [
+      "Command",
+      "Skeleton"
+    ],
+    "foldername": "commandbasedskeleton",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
     "name": "Timed Robot",
-    "description": "Timed style",
+    "description": "Timed style, with explanatory comments and example code.",
     "tags": [
       "Timed"
     ],
@@ -23,7 +35,7 @@
   },
   {
     "name": "Timed Skeleton (Advanced)",
-    "description": "Skeleton (stub) code for TimedRobot",
+    "description": "Skeleton (stub) code for TimedRobot, without explanatory comments and example code.",
     "tags": [
       "Timed",
       "Skeleton"
@@ -35,7 +47,7 @@
   },
   {
     "name": "RobotBase Skeleton (Advanced)",
-    "description": "Skeleton (stub) code for RobotBase",
+    "description": "Skeleton (stub) code for RobotBase - Not recommended for competition use",
     "tags": [
       "RobotBase",
       "Skeleton"

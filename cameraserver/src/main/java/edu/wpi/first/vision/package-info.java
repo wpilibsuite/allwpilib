@@ -9,7 +9,7 @@
  * <p>An example use case for grabbing a yellow tote from 2015 in autonomous: <br>
  *
  * <pre><code>
- * public class Robot extends IterativeRobot
+ * public class Robot extends TimedRobot
  *     implements VisionRunner.Listener&lt;MyFindTotePipeline&gt; {
  *
  *      // A USB camera connected to the roboRIO.

@@ -9,6 +9,8 @@
 #error "Cannot include both cscore_cv.h and cscore_raw_cv.h in the same file"
 #endif
 
+#include <functional>
+
 #include <opencv2/core/mat.hpp>
 
 #include "cscore_raw.h"
@@ -111,7 +113,8 @@ class RawCvSink : public RawSink {
    *         message); the frame time is in the same time base as wpi::Now(),
    *         and is in 1 us increments.
    */
-  [[nodiscard]] uint64_t GrabFrame(cv::Mat& image, double timeout = 0.225);
+  [[nodiscard]]
+  uint64_t GrabFrame(cv::Mat& image, double timeout = 0.225);
 
   /**
    * Wait for the next frame and get the image.  May block forever.
@@ -121,7 +124,8 @@ class RawCvSink : public RawSink {
    *         message); the frame time is in the same time base as wpi::Now(),
    *         and is in 1 us increments.
    */
-  [[nodiscard]] uint64_t GrabFrameNoTimeout(cv::Mat& image);
+  [[nodiscard]]
+  uint64_t GrabFrameNoTimeout(cv::Mat& image);
 
   /**
    * Wait for the next frame and get the image.
@@ -132,8 +136,8 @@ class RawCvSink : public RawSink {
    *         message); the frame time is in the same time base as wpi::Now(),
    *         and is in 1 us increments.
    */
-  [[nodiscard]] uint64_t GrabFrameDirect(cv::Mat& image,
-                                         double timeout = 0.225);
+  [[nodiscard]]
+  uint64_t GrabFrameDirect(cv::Mat& image, double timeout = 0.225);
 
   /**
    * Wait for the next frame and get the image.  May block forever.
@@ -143,7 +147,8 @@ class RawCvSink : public RawSink {
    *         message); the frame time is in the same time base as wpi::Now(),
    *         and is in 1 us increments.
    */
-  [[nodiscard]] uint64_t GrabFrameNoTimeoutDirect(cv::Mat& image);
+  [[nodiscard]]
+  uint64_t GrabFrameNoTimeoutDirect(cv::Mat& image);
 
  private:
   RawFrame rawFrame;

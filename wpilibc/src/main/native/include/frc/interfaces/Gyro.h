@@ -12,8 +12,11 @@ namespace frc {
 
 /**
  * Interface for yaw rate gyros.
+ *
+ * @deprecated This interface is being removed with no replacement.
  */
-class Gyro {
+class [[deprecated(
+    "This interface is being removed with no replacement.")]] Gyro {
  public:
   Gyro() = default;
   virtual ~Gyro() = default;
@@ -77,7 +80,7 @@ class Gyro {
    *         based on integration of the returned rate from the gyro.
    */
   virtual Rotation2d GetRotation2d() const {
-    return Rotation2d{units::degree_t{-GetAngle()}};
+    return units::degree_t{-GetAngle()};
   }
 };
 

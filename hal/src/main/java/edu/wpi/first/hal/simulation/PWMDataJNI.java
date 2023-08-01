@@ -16,14 +16,14 @@ public class PWMDataJNI extends JNIWrapper {
 
   public static native void setInitialized(int index, boolean initialized);
 
-  public static native int registerRawValueCallback(
+  public static native int registerPulseMicrosecondCallback(
       int index, NotifyCallback callback, boolean initialNotify);
 
-  public static native void cancelRawValueCallback(int index, int uid);
+  public static native void cancelPulseMicrosecondCallback(int index, int uid);
 
-  public static native int getRawValue(int index);
+  public static native int getPulseMicrosecond(int index);
 
-  public static native void setRawValue(int index, int rawValue);
+  public static native void setPulseMicrosecond(int index, int microsecondPulseTime);
 
   public static native int registerSpeedCallback(
       int index, NotifyCallback callback, boolean initialNotify);

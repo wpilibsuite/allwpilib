@@ -23,7 +23,9 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
   /**
    * Creates a simulated DC motor mechanism.
    *
-   * @param plant The linear system that represents the DC motor.
+   * @param plant The linear system representing the DC motor. This system can be created with
+   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createDCMotorSystem(DCMotor, double,
+   *     double)}.
    * @param gearbox The type of and number of motors in the DC motor gearbox.
    * @param gearing The gearing of the DC motor (numbers greater than 1 represent reductions).
    */
@@ -36,7 +38,7 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
   /**
    * Creates a simulated DC motor mechanism.
    *
-   * @param plant The linear system that represents the DC motor.
+   * @param plant The linear system representing the DC motor. This system can be created with
    * @param gearbox The type of and number of motors in the DC motor gearbox.
    * @param gearing The gearing of the DC motor (numbers greater than 1 represent reductions).
    * @param measurementStdDevs The standard deviations of the measurements.
@@ -59,7 +61,6 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
    * @param jKgMetersSquared The moment of inertia of the DC motor. If this is unknown, use the
    *     {@link #DCMotorSim(LinearSystem, DCMotor, double, Matrix)} constructor.
    */
-  @SuppressWarnings("ParameterName")
   public DCMotorSim(DCMotor gearbox, double gearing, double jKgMetersSquared) {
     super(LinearSystemId.createDCMotorSystem(gearbox, jKgMetersSquared, gearing));
     m_gearbox = gearbox;
@@ -75,7 +76,6 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
    *     {@link #DCMotorSim(LinearSystem, DCMotor, double, Matrix)} constructor.
    * @param measurementStdDevs The standard deviations of the measurements.
    */
-  @SuppressWarnings("ParameterName")
   public DCMotorSim(
       DCMotor gearbox, double gearing, double jKgMetersSquared, Matrix<N2, N1> measurementStdDevs) {
     super(

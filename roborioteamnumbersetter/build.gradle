@@ -1,6 +1,6 @@
 import org.gradle.internal.os.OperatingSystem
 
-if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxraspbian') && !project.hasProperty('onlylinuxaarch64bionic')) {
+if (!project.hasProperty('onlylinuxathena')) {
 
     description = "roboRIO Team Number Setter"
 
@@ -24,19 +24,8 @@ if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxra
     def wpilibVersionFileInput = file("src/main/generate/WPILibVersion.cpp.in")
     def wpilibVersionFileOutput = file("$buildDir/generated/main/cpp/WPILibVersion.cpp")
 
-    nativeUtils {
-        nativeDependencyContainer {
-            libssh(getNativeDependencyTypeClass('WPIStaticMavenDependency')) {
-                groupId = "edu.wpi.first.thirdparty.frc2022"
-                artifactId = "libssh"
-                headerClassifier = "headers"
-                sourceClassifier = "sources"
-                ext = "zip"
-                version = '0.95-1'
-                targetPlatforms.addAll(nativeUtils.wpi.platforms.desktopPlatforms)
-            }
-        }
-    }
+    apply from: "${rootDir}/shared/libssh.gradle"
+    apply from: "${rootDir}/shared/imgui.gradle"
 
     task generateCppVersion() {
         description = 'Generates the wpilib version class'
@@ -107,15 +96,16 @@ if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxra
                     }
                 }
                 binaries.all {
-                    if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio || it.targetPlatform.name == nativeUtils.wpi.platforms.raspbian || it.targetPlatform.name == nativeUtils.wpi.platforms.aarch64bionic) {
+                    if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                         it.buildable = false
                         return
                     }
                     it.cppCompiler.define("LIBSSH_STATIC")
                     lib project: ':glass', library: 'glass', linkage: 'static'
+                    lib project: ':wpinet', library: 'wpinet', linkage: 'static'
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
                     lib project: ':wpigui', library: 'wpigui', linkage: 'static'
-                    nativeUtils.useRequiredLibrary(it, 'imgui_static', 'libssh')
+                    nativeUtils.useRequiredLibrary(it, 'imgui', 'libssh')
                     if (it.targetPlatform.operatingSystem.isWindows()) {
                         it.linker.args << 'Gdi32.lib' << 'Shell32.lib' << 'd3d11.lib' << 'd3dcompiler.lib'
                         it.linker.args << 'ws2_32.lib' << 'advapi32.lib' << 'crypt32.lib' << 'user32.lib'
@@ -124,6 +114,9 @@ if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxra
                         it.linker.args << '-framework' << 'Kerberos'
                     } else {
                         it.linker.args << '-lX11'
+                        if (it.targetPlatform.name.startsWith('linuxarm')) {
+                            it.linker.args << '-lGL'
+                        }
                     }
                 }
             }

@@ -6,7 +6,7 @@
 
 #include <frc/controller/PIDController.h>
 
-#include "frc2/command/SubsystemBase.h"
+#include "frc2/command/Subsystem.h"
 
 namespace frc2 {
 /**
@@ -17,7 +17,7 @@ namespace frc2 {
  *
  * @see PIDController
  */
-class PIDSubsystem : public SubsystemBase {
+class PIDSubsystem : public Subsystem {
  public:
   /**
    * Creates a new PIDSubsystem.
@@ -85,8 +85,5 @@ class PIDSubsystem : public SubsystemBase {
    * @param setpoint the setpoint of the PIDController (for feedforward)
    */
   virtual void UseOutput(double output, double setpoint) = 0;
-
- private:
-  double m_setpoint{0};
 };
 }  // namespace frc2

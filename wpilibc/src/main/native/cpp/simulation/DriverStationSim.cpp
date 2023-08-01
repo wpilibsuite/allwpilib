@@ -7,6 +7,7 @@
 #include <memory>
 #include <utility>
 
+#include <hal/DriverStation.h>
 #include <hal/simulation/DriverStationData.h>
 #include <hal/simulation/MockHooks.h>
 
@@ -154,8 +155,12 @@ void DriverStationSim::SetMatchTime(double matchTime) {
 }
 
 void DriverStationSim::NotifyNewData() {
+  wpi::Event waitEvent{true};
+  HAL_ProvideNewDataEventHandle(waitEvent.GetHandle());
   HALSIM_NotifyDriverStationNewData();
-  DriverStation::WaitForData();
+  wpi::WaitForObject(waitEvent.GetHandle());
+  HAL_RemoveNewDataEventHandle(waitEvent.GetHandle());
+  frc::DriverStation::RefreshData();
 }
 
 void DriverStationSim::SetSendError(bool shouldSend) {
@@ -229,20 +234,20 @@ void DriverStationSim::SetJoystickType(int stick, int type) {
   HALSIM_SetJoystickType(stick, type);
 }
 
-void DriverStationSim::SetJoystickName(int stick, const char* name) {
-  HALSIM_SetJoystickName(stick, name);
+void DriverStationSim::SetJoystickName(int stick, std::string_view name) {
+  HALSIM_SetJoystickName(stick, name.data(), name.size());
 }
 
 void DriverStationSim::SetJoystickAxisType(int stick, int axis, int type) {
   HALSIM_SetJoystickAxisType(stick, axis, type);
 }
 
-void DriverStationSim::SetGameSpecificMessage(const char* message) {
-  HALSIM_SetGameSpecificMessage(message);
+void DriverStationSim::SetGameSpecificMessage(std::string_view message) {
+  HALSIM_SetGameSpecificMessage(message.data(), message.size());
 }
 
-void DriverStationSim::SetEventName(const char* name) {
-  HALSIM_SetEventName(name);
+void DriverStationSim::SetEventName(std::string_view name) {
+  HALSIM_SetEventName(name.data(), name.size());
 }
 
 void DriverStationSim::SetMatchType(DriverStation::MatchType type) {

@@ -29,9 +29,11 @@ def main():
     dirname, _ = os.path.split(os.path.abspath(__file__))
     cmake_binary_dir = sys.argv[1]
 
-    env = Environment(loader=FileSystemLoader(f"{dirname}/src/generate"),
-                      autoescape=False,
-                      keep_trailing_newline=True)
+    env = Environment(
+        loader=FileSystemLoader(f"{dirname}/src/generate"),
+        autoescape=False,
+        keep_trailing_newline=True,
+    )
 
     template = env.get_template("GenericNumber.java.jinja")
     rootPath = f"{cmake_binary_dir}/generated/main/java/edu/wpi/first/math/numbers"

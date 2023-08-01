@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <stdint.h>
+
 #include <functional>
 #include <string>
 #include <string_view>
@@ -200,5 +202,7 @@ void PushID(int int_id);
 void PopID();
 
 bool PopupEditName(const char* label, std::string* name);
+
+bool ItemEditName(std::string* name);
 
 }  // namespace glass

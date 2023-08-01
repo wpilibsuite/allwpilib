@@ -14,8 +14,11 @@
 namespace frc {
 
 /**
- * This base class runs a watchdog timer and calls the subclass's StopMotor()
- * function if the timeout expires.
+ * The Motor Safety feature acts as a watchdog timer for an individual motor. It
+ * operates by maintaining a timer that tracks how long it has been since the
+ * feed() method has been called for that actuator. Code in the Driver Station
+ * class initiates a comparison of these timers to the timeout values for any
+ * actuator with safety enabled every 5 received packets (100ms nominal).
  *
  * The subclass should call Feed() whenever the motor value is updated.
  */

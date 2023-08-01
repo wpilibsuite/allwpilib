@@ -7,20 +7,21 @@ package edu.wpi.first.wpilibj2.command;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.Test;
 
 class WaitUntilCommandTest extends CommandTestBase {
   @Test
   void waitUntilTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
-      ConditionHolder condition = new ConditionHolder();
+      AtomicBoolean condition = new AtomicBoolean();
 
-      Command command = new WaitUntilCommand(condition::getCondition);
+      Command command = new WaitUntilCommand(condition::get);
 
       scheduler.schedule(command);
       scheduler.run();
       assertTrue(scheduler.isScheduled(command));
-      condition.setCondition(true);
+      condition.set(true);
       scheduler.run();
       assertFalse(scheduler.isScheduled(command));
     }

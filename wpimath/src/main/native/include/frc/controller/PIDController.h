@@ -74,6 +74,18 @@ class WPILIB_DLLEXPORT PIDController
   void SetD(double Kd);
 
   /**
+   * Sets the IZone range. When the absolute value of the position error is
+   * greater than IZone, the total accumulated error will reset to zero,
+   * disabling integral gain until the absolute value of the position error is
+   * less than IZone. This is used to prevent integral windup. Must be
+   * non-negative. Passing a value of zero will effectively disable integral
+   * gain. Passing a value of infinity disables IZone functionality.
+   *
+   * @param iZone Maximum magnitude of error to allow integral control.
+   */
+  void SetIZone(double iZone);
+
+  /**
    * Gets the proportional coefficient.
    *
    * @return proportional coefficient
@@ -95,11 +107,32 @@ class WPILIB_DLLEXPORT PIDController
   double GetD() const;
 
   /**
+   * Get the IZone range.
+   *
+   * @return Maximum magnitude of error to allow integral control.
+   */
+  double GetIZone() const;
+
+  /**
    * Gets the period of this controller.
    *
    * @return The period of the controller.
    */
   units::second_t GetPeriod() const;
+
+  /**
+   * Gets the position tolerance of this controller.
+   *
+   * @return The position tolerance of the controller.
+   */
+  double GetPositionTolerance() const;
+
+  /**
+   * Gets the velocity tolerance of this controller.
+   *
+   * @return The velocity tolerance of the controller.
+   */
+  double GetVelocityTolerance() const;
 
   /**
    * Sets the setpoint for the PIDController.
@@ -207,6 +240,9 @@ class WPILIB_DLLEXPORT PIDController
   // Factor for "derivative" control
   double m_Kd;
 
+  // The error range where "integral" control applies
+  double m_iZone = std::numeric_limits<double>::infinity();
+
   // The period (in seconds) of the control loop running this controller
   units::second_t m_period;
 
@@ -238,6 +274,9 @@ class WPILIB_DLLEXPORT PIDController
 
   double m_setpoint = 0;
   double m_measurement = 0;
+
+  bool m_haveSetpoint = false;
+  bool m_haveMeasurement = false;
 };
 
 }  // namespace frc2

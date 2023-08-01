@@ -15,15 +15,15 @@ using namespace frc;
 
 DifferentialDriveVoltageConstraint::DifferentialDriveVoltageConstraint(
     const SimpleMotorFeedforward<units::meter>& feedforward,
-    const DifferentialDriveKinematics& kinematics, units::volt_t maxVoltage)
+    DifferentialDriveKinematics kinematics, units::volt_t maxVoltage)
     : m_feedforward(feedforward),
-      m_kinematics(kinematics),
+      m_kinematics(std::move(kinematics)),
       m_maxVoltage(maxVoltage) {}
 
 units::meters_per_second_t DifferentialDriveVoltageConstraint::MaxVelocity(
     const Pose2d& pose, units::curvature_t curvature,
     units::meters_per_second_t velocity) const {
-  return units::meters_per_second_t(std::numeric_limits<double>::max());
+  return units::meters_per_second_t{std::numeric_limits<double>::max()};
 }
 
 TrajectoryConstraint::MinMax
@@ -33,8 +33,8 @@ DifferentialDriveVoltageConstraint::MinMaxAcceleration(
   auto wheelSpeeds =
       m_kinematics.ToWheelSpeeds({speed, 0_mps, speed * curvature});
 
-  auto maxWheelSpeed = std::max(wheelSpeeds.left, wheelSpeeds.right);
-  auto minWheelSpeed = std::min(wheelSpeeds.left, wheelSpeeds.right);
+  auto maxWheelSpeed = (std::max)(wheelSpeeds.left, wheelSpeeds.right);
+  auto minWheelSpeed = (std::min)(wheelSpeeds.left, wheelSpeeds.right);
 
   // Calculate maximum/minimum possible accelerations from motor dynamics
   // and max/min wheel speeds

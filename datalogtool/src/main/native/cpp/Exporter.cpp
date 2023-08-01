@@ -107,7 +107,7 @@ static void RebuildEntryTree() {
 
     // get to leaf
     auto nodes = &gEntryTree;
-    for (auto part : wpi::drop_back(wpi::span{parts.begin(), parts.end()})) {
+    for (auto part : wpi::drop_back(std::span{parts.begin(), parts.end()})) {
       auto it =
           std::find_if(nodes->begin(), nodes->end(),
                        [&](const auto& node) { return node.name == part; });
@@ -466,7 +466,8 @@ static void ValueToCsv(wpi::raw_ostream& os, const Entry& entry,
       fmt::print(os, "{}", val);
       return;
     }
-  } else if (entry.type == "int64") {
+  } else if (entry.type == "int64" || entry.type == "int") {
+    // support "int" for compatibility with old NT4 datalogs
     int64_t val;
     if (record.GetInteger(&val)) {
       fmt::print(os, "{}", val);
@@ -483,6 +484,12 @@ static void ValueToCsv(wpi::raw_ostream& os, const Entry& entry,
     bool val;
     if (record.GetBoolean(&val)) {
       fmt::print(os, "{}", val);
+      return;
+    }
+  } else if (entry.type == "boolean[]") {
+    std::vector<int> val;
+    if (record.GetBooleanArray(&val)) {
+      fmt::print(os, "{}", fmt::join(val, ";"));
       return;
     }
   } else if (entry.type == "double[]") {

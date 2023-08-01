@@ -5,11 +5,10 @@
 
 import array
 import struct
+import msgpack
 from typing import List, SupportsBytes
 
-__all__ = [
-    "StartRecordData", "MetadataRecordData", "DataLogRecord", "DataLogReader"
-]
+__all__ = ["StartRecordData", "MetadataRecordData", "DataLogRecord", "DataLogReader"]
 
 floatStruct = struct.Struct("<f")
 doubleStruct = struct.Struct("<d")
@@ -66,16 +65,25 @@ class DataLogRecord:
         return self.data[0]
 
     def isStart(self) -> bool:
-        return (self.entry == 0 and len(self.data) >= 17 and
-                self._getControlType() == kControlStart)
+        return (
+            self.entry == 0
+            and len(self.data) >= 17
+            and self._getControlType() == kControlStart
+        )
 
     def isFinish(self) -> bool:
-        return (self.entry == 0 and len(self.data) == 5 and
-                self._getControlType() == kControlFinish)
+        return (
+            self.entry == 0
+            and len(self.data) == 5
+            and self._getControlType() == kControlFinish
+        )
 
     def isSetMetadata(self) -> bool:
-        return (self.entry == 0 and len(self.data) >= 9 and
-                self._getControlType() == kControlSetMetadata)
+        return (
+            self.entry == 0
+            and len(self.data) >= 9
+            and self._getControlType() == kControlSetMetadata
+        )
 
     def getStartData(self) -> StartRecordData:
         if not self.isStart():
@@ -121,6 +129,9 @@ class DataLogRecord:
     def getString(self) -> str:
         return str(self.data, encoding="utf-8")
 
+    def getMsgPack(self):
+        return msgpack.unpackb(self.data)
+
     def getBooleanArray(self) -> List[bool]:
         return [x != 0 for x in self.data]
 
@@ -146,24 +157,24 @@ class DataLogRecord:
         return arr
 
     def getStringArray(self) -> List[str]:
-        size = int.from_bytes(self.data[0:4], byteorder="little", signed=False)
+        size = int.from_bytes(self.data[:4], byteorder="little", signed=False)
         if size > ((len(self.data) - 4) / 4):
             raise TypeError("not a string array")
         arr = []
         pos = 4
-        for i in range(size):
+        for _ in range(size):
             val, pos = self._readInnerString(pos)
             arr.append(val)
         return arr
 
-    def _readInnerString(self, pos: int) -> str:
-        size = int.from_bytes(self.data[pos:pos + 4],
-                              byteorder="little",
-                              signed=False)
+    def _readInnerString(self, pos: int) -> tuple[str, int]:
+        size = int.from_bytes(
+            self.data[pos : pos + 4], byteorder="little", signed=False
+        )
         end = pos + 4 + size
         if end > len(self.data):
             raise TypeError("invalid string size")
-        return str(self.data[pos + 4:end], encoding="utf-8"), end
+        return str(self.data[pos + 4 : end], encoding="utf-8"), end
 
 
 class DataLogIterator:
@@ -193,13 +204,14 @@ class DataLogIterator:
             raise StopIteration
         entry = self._readVarInt(self.pos + 1, entryLen)
         size = self._readVarInt(self.pos + 1 + entryLen, sizeLen)
-        timestamp = self._readVarInt(self.pos + 1 + entryLen + sizeLen,
-                                     timestampLen)
+        timestamp = self._readVarInt(self.pos + 1 + entryLen + sizeLen, timestampLen)
         if len(self.buf) < (self.pos + headerLen + size):
             raise StopIteration
         record = DataLogRecord(
-            entry, timestamp,
-            self.buf[self.pos + headerLen:self.pos + headerLen + size])
+            entry,
+            timestamp,
+            self.buf[self.pos + headerLen : self.pos + headerLen + size],
+        )
         self.pos += headerLen + size
         return record
 
@@ -215,8 +227,11 @@ class DataLogReader:
 
     def isValid(self) -> bool:
         """Returns true if the data log is valid (e.g. has a valid header)."""
-        return (len(self.buf) >= 12 and self.buf[0:6] == b"WPILOG" and
-                self.getVersion() >= 0x0100)
+        return (
+            len(self.buf) >= 12
+            and self.buf[:6] == b"WPILOG"
+            and self.getVersion() >= 0x0100
+        )
 
     def getVersion(self) -> int:
         """Gets the data log version. Returns 0 if data log is invalid.
@@ -235,12 +250,12 @@ class DataLogReader:
         if len(self.buf) < 12:
             return ""
         size = int.from_bytes(self.buf[8:12], byteorder="little", signed=False)
-        return str(self.buf[12:12 + size], encoding="utf-8")
+        return str(self.buf[12 : 12 + size], encoding="utf-8")
 
     def __iter__(self) -> DataLogIterator:
-        extraHeaderSize = int.from_bytes(self.buf[8:12],
-                                         byteorder="little",
-                                         signed=False)
+        extraHeaderSize = int.from_bytes(
+            self.buf[8:12], byteorder="little", signed=False
+        )
         return DataLogIterator(self.buf, 12 + extraHeaderSize)
 
 
@@ -287,9 +302,7 @@ if __name__ == "__main__":
             elif record.isSetMetadata():
                 try:
                     data = record.getSetMetadataData()
-                    print(
-                        f"SetMetadata({data.entry}, '{data.metadata}') [{timestamp}]"
-                    )
+                    print(f"SetMetadata({data.entry}, '{data.metadata}') [{timestamp}]")
                     if data.entry not in entries:
                         print("...ID not found")
                 except TypeError as e:
@@ -298,18 +311,16 @@ if __name__ == "__main__":
                 print("Unrecognized control record")
             else:
                 print(f"Data({record.entry}, size={len(record.data)}) ", end="")
-                entry = entries.get(record.entry, None)
+                entry = entries.get(record.entry)
                 if entry is None:
                     print("<ID not found>")
                     continue
-                print(
-                    f"<name='{entry.name}', type='{entry.type}'> [{timestamp}]")
+                print(f"<name='{entry.name}', type='{entry.type}'> [{timestamp}]")
 
                 try:
                     # handle systemTime specially
                     if entry.name == "systemTime" and entry.type == "int64":
-                        dt = datetime.fromtimestamp(record.getInteger() /
-                                                    1000000)
+                        dt = datetime.fromtimestamp(record.getInteger() / 1000000)
                         print("  {:%Y-%m-%d %H:%M:%S.%f}".format(dt))
                         continue
 
@@ -317,8 +328,10 @@ if __name__ == "__main__":
                         print(f"  {record.getDouble()}")
                     elif entry.type == "int64":
                         print(f"  {record.getInteger()}")
-                    elif entry.type == "string" or entry.type == "json":
+                    elif entry.type in ("string", "json"):
                         print(f"  '{record.getString()}'")
+                    elif entry.type == "msgpack":
+                        print(f"  '{record.getMsgPack()}'")
                     elif entry.type == "boolean":
                         print(f"  {record.getBoolean()}")
                     elif entry.type == "boolean[]":

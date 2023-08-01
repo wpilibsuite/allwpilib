@@ -22,7 +22,7 @@ extern "C" {
  * Initializes the analog output port using the given port object.
  *
  * @param[in] portHandle handle to the port
- * @param[in] allocationLocation the location where the allocation is occuring
+ * @param[in] allocationLocation the location where the allocation is occurring
  *                               (can be null)
  * @param[out] status Error status variable. 0 on success.
  * @return the created analog output handle
@@ -58,7 +58,7 @@ double HAL_GetAnalogOutput(HAL_AnalogOutputHandle analogOutputHandle,
                            int32_t* status);
 
 /**
- * Checks that the analog output channel number is value.
+ * Checks that the analog output channel number is valid.
  *
  * Verifies that the analog channel number is one of the legal channel numbers.
  * Channel numbers are 0-based.

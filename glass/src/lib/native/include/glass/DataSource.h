@@ -6,7 +6,6 @@
 
 #include <stdint.h>
 
-#include <atomic>
 #include <string>
 #include <string_view>
 
@@ -38,11 +37,22 @@ class DataSource {
   void SetDigital(bool digital) { m_digital = digital; }
   bool IsDigital() const { return m_digital; }
 
-  void SetValue(double value, uint64_t time = 0) {
+  void SetValue(double value, int64_t time = 0) {
+    std::scoped_lock lock{m_valueMutex};
     m_value = value;
+    m_valueTime = time;
     valueChanged(value, time);
   }
-  double GetValue() const { return m_value; }
+
+  double GetValue() const {
+    std::scoped_lock lock{m_valueMutex};
+    return m_value;
+  }
+
+  int64_t GetValueTime() const {
+    std::scoped_lock lock{m_valueMutex};
+    return m_valueTime;
+  }
 
   // drag source helpers
   void LabelText(const char* label, const char* fmt, ...) const IM_FMTARGS(3);
@@ -59,7 +69,7 @@ class DataSource {
                 ImGuiInputTextFlags flags = 0) const;
   void EmitDrag(ImGuiDragDropFlags flags = 0) const;
 
-  wpi::sig::SignalBase<wpi::spinlock, double, uint64_t> valueChanged;
+  wpi::sig::SignalBase<wpi::spinlock, double, int64_t> valueChanged;
 
   static DataSource* Find(std::string_view id);
 
@@ -69,7 +79,9 @@ class DataSource {
   std::string m_id;
   std::string& m_name;
   bool m_digital = false;
-  std::atomic<double> m_value = 0;
+  mutable wpi::spinlock m_valueMutex;
+  double m_value = 0;
+  int64_t m_valueTime = 0;
 };
 
 }  // namespace glass

@@ -5,6 +5,7 @@
 #include "CommandTestBase.h"
 #include "frc2/command/InstantCommand.h"
 #include "frc2/command/RunCommand.h"
+#include "frc2/command/StartEndCommand.h"
 
 using namespace frc2;
 class SchedulerTest : public CommandTestBase {};
@@ -42,14 +43,30 @@ TEST_F(SchedulerTest, SchedulerLambdaInterrupt) {
   EXPECT_EQ(counter, 1);
 }
 
+TEST_F(SchedulerTest, RegisterSubsystem) {
+  CommandScheduler scheduler = GetScheduler();
+
+  int counter = 0;
+  TestSubsystem system{[&counter] { counter++; }};
+
+  EXPECT_NO_FATAL_FAILURE(scheduler.RegisterSubsystem(&system));
+
+  scheduler.Run();
+  EXPECT_EQ(counter, 1);
+}
+
 TEST_F(SchedulerTest, UnregisterSubsystem) {
   CommandScheduler scheduler = GetScheduler();
 
-  TestSubsystem system;
+  int counter = 0;
+  TestSubsystem system{[&counter] { counter++; }};
 
   scheduler.RegisterSubsystem(&system);
 
   EXPECT_NO_FATAL_FAILURE(scheduler.UnregisterSubsystem(&system));
+
+  scheduler.Run();
+  ASSERT_EQ(counter, 0);
 }
 
 TEST_F(SchedulerTest, SchedulerCancelAll) {
@@ -68,4 +85,17 @@ TEST_F(SchedulerTest, SchedulerCancelAll) {
   scheduler.CancelAll();
 
   EXPECT_EQ(counter, 2);
+}
+
+TEST_F(SchedulerTest, ScheduleScheduledNoOp) {
+  CommandScheduler scheduler = GetScheduler();
+
+  int counter = 0;
+
+  StartEndCommand command([&counter] { counter++; }, [] {});
+
+  scheduler.Schedule(&command);
+  scheduler.Schedule(&command);
+
+  EXPECT_EQ(counter, 1);
 }

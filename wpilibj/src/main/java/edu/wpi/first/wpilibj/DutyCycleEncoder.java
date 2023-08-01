@@ -200,14 +200,17 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
 
   /**
    * Set the distance per rotation of the encoder. This sets the multiplier used to determine the
-   * distance driven based on the rotation value from the encoder. Set this value based on the how
-   * far the mechanism travels in 1 rotation of the encoder, and factor in gearing reductions
-   * following the encoder shaft. This distance can be in any units you like, linear or angular.
+   * distance driven based on the rotation value from the encoder. Set this value based on how far
+   * the mechanism travels in 1 rotation of the encoder, and factor in gearing reductions following
+   * the encoder shaft. This distance can be in any units you like, linear or angular.
    *
    * @param distancePerRotation the distance per rotation of the encoder
    */
   public void setDistancePerRotation(double distancePerRotation) {
     m_distancePerRotation = distancePerRotation;
+    if (m_simDistancePerRotation != null) {
+      m_simDistancePerRotation.set(distancePerRotation);
+    }
   }
 
   /**
@@ -243,7 +246,10 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
     if (m_counter != null) {
       m_counter.reset();
     }
-    m_positionOffset = m_dutyCycle.getOutput();
+    if (m_simPosition != null) {
+      m_simPosition.set(0);
+    }
+    m_positionOffset = getAbsolutePosition();
   }
 
   /**
@@ -299,7 +305,6 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
    *
    * @return the FPGA index
    */
-  @SuppressWarnings("AbbreviationAsWordInName")
   public int getFPGAIndex() {
     return m_dutyCycle.getFPGAIndex();
   }

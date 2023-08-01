@@ -40,9 +40,9 @@ class RelaySim {
    * @param initialNotify whether to run the callback with the initial state
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore>
-  RegisterInitializedForwardCallback(NotifyCallback callback,
-                                     bool initialNotify);
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterInitializedForwardCallback(
+      NotifyCallback callback, bool initialNotify);
 
   /**
    * Check whether the forward direction has been initialized.
@@ -65,9 +65,9 @@ class RelaySim {
    * @param initialNotify whether to run the callback with the initial state
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore>
-  RegisterInitializedReverseCallback(NotifyCallback callback,
-                                     bool initialNotify);
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterInitializedReverseCallback(
+      NotifyCallback callback, bool initialNotify);
 
   /**
    * Check whether the reverse direction has been initialized.
@@ -90,7 +90,8 @@ class RelaySim {
    * @param initialNotify whether to run the callback with the initial state
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterForwardCallback(
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterForwardCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**
@@ -114,7 +115,8 @@ class RelaySim {
    * @param initialNotify whether to run the callback with the initial state
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterReverseCallback(
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterReverseCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**

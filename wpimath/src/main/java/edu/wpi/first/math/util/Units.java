@@ -91,7 +91,7 @@ public final class Units {
    * Converts given degrees to rotations.
    *
    * @param degrees The degrees to convert.
-   * @return rotations Converted from radians.
+   * @return rotations Converted from degrees.
    */
   public static double degreesToRotations(double degrees) {
     return degrees / 360;

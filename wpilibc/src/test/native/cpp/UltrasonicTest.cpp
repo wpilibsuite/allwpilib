@@ -6,7 +6,7 @@
 #include "frc/simulation/UltrasonicSim.h"
 #include "gtest/gtest.h"
 
-namespace frc {
+using namespace frc;
 
 TEST(UltrasonicTest, SimDevices) {
   Ultrasonic ultrasonic{0, 1};
@@ -23,4 +23,19 @@ TEST(UltrasonicTest, SimDevices) {
   EXPECT_EQ(0, ultrasonic.GetRange().value());
 }
 
-}  // namespace frc
+TEST(UltrasonicTest, AutomaticModeToggle) {
+  frc::Ultrasonic ultrasonic{0, 1};
+  EXPECT_NO_THROW({
+    frc::Ultrasonic::SetAutomaticMode(true);
+    frc::Ultrasonic::SetAutomaticMode(false);
+    frc::Ultrasonic::SetAutomaticMode(true);
+  });
+}
+
+TEST(UltrasonicTest, AutomaticModeOnWithZeroInstances) {
+  EXPECT_NO_THROW({ frc::Ultrasonic::SetAutomaticMode(true); });
+}
+
+TEST(UltrasonicTest, AutomaticModeOffWithZeroInstances) {
+  EXPECT_NO_THROW({ frc::Ultrasonic::SetAutomaticMode(false); });
+}

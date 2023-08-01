@@ -5,8 +5,10 @@
 package edu.wpi.first.wpilibj.simulation;
 
 import edu.wpi.first.hal.AllianceStationID;
+import edu.wpi.first.hal.DriverStationJNI;
 import edu.wpi.first.hal.simulation.DriverStationDataJNI;
 import edu.wpi.first.hal.simulation.NotifyCallback;
+import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.DriverStation;
 
 /** Class to control a simulated driver station. */
@@ -138,7 +140,6 @@ public final class DriverStationSim {
    *
    * @param eStop true to activate
    */
-  @SuppressWarnings("ParameterName")
   public static void setEStop(boolean eStop) {
     DriverStationDataJNI.setEStop(eStop);
   }
@@ -228,20 +229,22 @@ public final class DriverStationSim {
    */
   public static AllianceStationID getAllianceStationId() {
     switch (DriverStationDataJNI.getAllianceStationId()) {
-      case 0:
+      case DriverStationJNI.kUnknownAllianceStation:
+        return AllianceStationID.Unknown;
+      case DriverStationJNI.kRed1AllianceStation:
         return AllianceStationID.Red1;
-      case 1:
+      case DriverStationJNI.kRed2AllianceStation:
         return AllianceStationID.Red2;
-      case 2:
+      case DriverStationJNI.kRed3AllianceStation:
         return AllianceStationID.Red3;
-      case 3:
+      case DriverStationJNI.kBlue1AllianceStation:
         return AllianceStationID.Blue1;
-      case 4:
+      case DriverStationJNI.kBlue2AllianceStation:
         return AllianceStationID.Blue2;
-      case 5:
+      case DriverStationJNI.kBlue3AllianceStation:
         return AllianceStationID.Blue3;
       default:
-        return null;
+        return AllianceStationID.Unknown;
     }
   }
 
@@ -253,23 +256,26 @@ public final class DriverStationSim {
   public static void setAllianceStationId(AllianceStationID allianceStationId) {
     int allianceStation;
     switch (allianceStationId) {
+      case Unknown:
+        allianceStation = DriverStationJNI.kUnknownAllianceStation;
+        break;
       case Red1:
-        allianceStation = 0;
+        allianceStation = DriverStationJNI.kRed1AllianceStation;
         break;
       case Red2:
-        allianceStation = 1;
+        allianceStation = DriverStationJNI.kRed2AllianceStation;
         break;
       case Red3:
-        allianceStation = 2;
+        allianceStation = DriverStationJNI.kRed3AllianceStation;
         break;
       case Blue1:
-        allianceStation = 3;
+        allianceStation = DriverStationJNI.kBlue1AllianceStation;
         break;
       case Blue2:
-        allianceStation = 4;
+        allianceStation = DriverStationJNI.kBlue2AllianceStation;
         break;
       case Blue3:
-        allianceStation = 5;
+        allianceStation = DriverStationJNI.kBlue3AllianceStation;
         break;
       default:
         return;
@@ -311,8 +317,17 @@ public final class DriverStationSim {
 
   /** Updates DriverStation data so that new values are visible to the user program. */
   public static void notifyNewData() {
+    int handle = WPIUtilJNI.createEvent(false, false);
+    DriverStationJNI.provideNewDataEventHandle(handle);
     DriverStationDataJNI.notifyNewData();
-    DriverStation.waitForData();
+    try {
+      WPIUtilJNI.waitForObject(handle);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+    DriverStationJNI.removeNewDataEventHandle(handle);
+    WPIUtilJNI.destroyEvent(handle);
+    DriverStation.refreshData();
   }
 
   /**

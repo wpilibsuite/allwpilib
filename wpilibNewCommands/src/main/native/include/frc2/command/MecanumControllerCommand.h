@@ -6,6 +6,7 @@
 #include <functional>
 #include <initializer_list>
 #include <memory>
+#include <span>
 
 #include <frc/Timer.h>
 #include <frc/controller/HolonomicDriveController.h>
@@ -21,9 +22,8 @@
 #include <units/length.h>
 #include <units/velocity.h>
 #include <units/voltage.h>
-#include <wpi/span.h>
 
-#include "CommandBase.h"
+#include "Command.h"
 #include "CommandHelper.h"
 
 #pragma once
@@ -51,7 +51,7 @@ namespace frc2 {
  * This class is provided by the NewCommands VendorDep
  */
 class MecanumControllerCommand
-    : public CommandHelper<CommandBase, MecanumControllerCommand> {
+    : public CommandHelper<Command, MecanumControllerCommand> {
  public:
   /**
    * Constructs a new MecanumControllerCommand that when executed will follow
@@ -206,7 +206,7 @@ class MecanumControllerCommand
       std::function<void(units::volt_t, units::volt_t, units::volt_t,
                          units::volt_t)>
           output,
-      wpi::span<Subsystem* const> requirements = {});
+      std::span<Subsystem* const> requirements = {});
 
   /**
    * Constructs a new MecanumControllerCommand that when executed will follow
@@ -259,7 +259,7 @@ class MecanumControllerCommand
       std::function<void(units::volt_t, units::volt_t, units::volt_t,
                          units::volt_t)>
           output,
-      wpi::span<Subsystem* const> requirements = {});
+      std::span<Subsystem* const> requirements = {});
 
   /**
    * Constructs a new MecanumControllerCommand that when executed will follow
@@ -268,7 +268,7 @@ class MecanumControllerCommand
    *
    * <p>Note: The controllers will *not* set the outputVolts to zero upon
    * completion of the path - this is left to the user, since it is not
-   * appropriate for paths with non-stationary end-states.
+   * appropriate for paths with nonstationary end-states.
    *
    * @param trajectory       The trajectory to follow.
    * @param pose             A function that supplies the robot pose - use one
@@ -306,7 +306,7 @@ class MecanumControllerCommand
    *
    * <p>Note: The controllers will *not* set the outputVolts to zero upon
    * completion of the path - this is left to the user, since it is not
-   * appropriate for paths with non-stationary end-states.
+   * appropriate for paths with nonstationary end-states.
    *
    * <p>Note 2: The final rotation of the robot will be set to the rotation of
    * the final pose in the trajectory. The robot will not follow the rotations
@@ -346,7 +346,7 @@ class MecanumControllerCommand
    *
    * <p>Note: The controllers will *not* set the outputVolts to zero upon
    * completion of the path - this is left to the user, since it is not
-   * appropriate for paths with non-stationary end-states.
+   * appropriate for paths with nonstationary end-states.
    *
    * @param trajectory       The trajectory to follow.
    * @param pose             A function that supplies the robot pose - use one
@@ -375,7 +375,7 @@ class MecanumControllerCommand
                          units::meters_per_second_t,
                          units::meters_per_second_t)>
           output,
-      wpi::span<Subsystem* const> requirements = {});
+      std::span<Subsystem* const> requirements = {});
 
   /**
    * Constructs a new MecanumControllerCommand that when executed will follow
@@ -384,7 +384,7 @@ class MecanumControllerCommand
    *
    * <p>Note: The controllers will *not* set the outputVolts to zero upon
    * completion of the path - this is left to the user, since it is not
-   * appropriate for paths with non-stationary end-states.
+   * appropriate for paths with nonstationary end-states.
    *
    * <p>Note2: The final rotation of the robot will be set to the rotation of
    * the final pose in the trajectory. The robot will not follow the rotations
@@ -415,7 +415,7 @@ class MecanumControllerCommand
                          units::meters_per_second_t,
                          units::meters_per_second_t)>
           output,
-      wpi::span<Subsystem* const> requirements = {});
+      std::span<Subsystem* const> requirements = {});
 
   void Initialize() override;
 

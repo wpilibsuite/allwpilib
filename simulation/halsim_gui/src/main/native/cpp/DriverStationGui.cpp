@@ -254,8 +254,8 @@ class FMSSimModel : public glass::FMSModel {
   void SetAutonomous(bool val) override {
     HALSIM_SetDriverStationAutonomous(val);
   }
-  void SetGameSpecificMessage(const char* val) override {
-    HALSIM_SetGameSpecificMessage(val);
+  void SetGameSpecificMessage(std::string_view val) override {
+    HALSIM_SetGameSpecificMessage(val.data(), val.size());
   }
 
   void Update() override;
@@ -487,7 +487,7 @@ void GlfwSystemJoystick::GetData(HALJoystickData* data, bool mapGamepad) const {
     }
   } else {
     std::memcpy(data->axes.axes, sysAxes,
-                data->axes.count * sizeof(&data->axes.axes[0]));
+                data->axes.count * sizeof(data->axes.axes[0]));
   }
 
   data->povs.count = data->desc.povCount;

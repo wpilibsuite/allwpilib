@@ -14,10 +14,11 @@ package edu.wpi.first.wpilibj;
 // import java.lang.FdLibm.Pow;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.SimBoolean;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDouble;
-import edu.wpi.first.networktables.NTSendable;
-import edu.wpi.first.networktables.NTSendableBuilder;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -50,7 +51,7 @@ import java.nio.ByteOrder;
   "PMD.EmptyIfStmt",
   "PMD.EmptyStatementNotInLoop"
 })
-public class ADIS16470_IMU implements AutoCloseable, NTSendable {
+public class ADIS16470_IMU implements AutoCloseable, Sendable {
   /* ADIS16470 Register Map Declaration */
   private static final int FLASH_CNT = 0x00; // Flash memory write count
   private static final int DIAG_STAT = 0x02; // Diagnostic and operational status
@@ -250,8 +251,10 @@ public class ADIS16470_IMU implements AutoCloseable, NTSendable {
   private DigitalInput m_reset_in;
   private DigitalOutput m_status_led;
   private Thread m_acquire_task;
+  private boolean m_connected;
 
   private SimDevice m_simDevice;
+  private SimBoolean m_simConnected;
   private SimDouble m_simGyroAngleX;
   private SimDouble m_simGyroAngleY;
   private SimDouble m_simGyroAngleZ;
@@ -293,6 +296,7 @@ public class ADIS16470_IMU implements AutoCloseable, NTSendable {
 
     m_simDevice = SimDevice.create("Gyro:ADIS16470", port.value);
     if (m_simDevice != null) {
+      m_simConnected = m_simDevice.createBoolean("connected", SimDevice.Direction.kInput, true);
       m_simGyroAngleX = m_simDevice.createDouble("gyro_angle_x", SimDevice.Direction.kInput, 0.0);
       m_simGyroAngleY = m_simDevice.createDouble("gyro_angle_y", SimDevice.Direction.kInput, 0.0);
       m_simGyroAngleZ = m_simDevice.createDouble("gyro_angle_z", SimDevice.Direction.kInput, 0.0);
@@ -361,6 +365,14 @@ public class ADIS16470_IMU implements AutoCloseable, NTSendable {
 
     // Report usage and post data to DS
     HAL.report(tResourceType.kResourceType_ADIS16470, 0);
+    m_connected = true;
+  }
+
+  public boolean isConnected() {
+    if (m_simConnected != null) {
+      return m_simConnected.get();
+    }
+    return m_connected;
   }
 
   /**
@@ -392,8 +404,7 @@ public class ADIS16470_IMU implements AutoCloseable, NTSendable {
    * @return
    */
   private static int toInt(int... buf) {
-    return (int)
-        ((buf[0] & 0xFF) << 24 | (buf[1] & 0xFF) << 16 | (buf[2] & 0xFF) << 8 | (buf[3] & 0xFF));
+    return (buf[0] & 0xFF) << 24 | (buf[1] & 0xFF) << 16 | (buf[2] & 0xFF) << 8 | (buf[3] & 0xFF);
   }
 
   /**
@@ -439,9 +450,7 @@ public class ADIS16470_IMU implements AutoCloseable, NTSendable {
       System.out.println("Setting up a new SPI port.");
       m_spi = new SPI(m_spi_port);
       m_spi.setClockRate(2000000);
-      m_spi.setMSBFirst();
-      m_spi.setSampleDataOnTrailingEdge();
-      m_spi.setClockActiveLow();
+      m_spi.setMode(SPI.Mode.kMode3);
       m_spi.setChipSelectActiveLow();
       readRegister(PROD_ID); // Dummy read
 
@@ -466,7 +475,9 @@ public class ADIS16470_IMU implements AutoCloseable, NTSendable {
     }
   }
 
-  /** @return */
+  /**
+   * @return
+   */
   boolean switchToAutoSPI() {
     // No SPI port has been set up. Go set one up first.
     if (m_spi == null) {
@@ -500,7 +511,7 @@ public class ADIS16470_IMU implements AutoCloseable, NTSendable {
     }
     // Configure auto stall time
     m_spi.configureAutoStall(5, 1000, 1);
-    // Kick off auto SPI (Note: Device configration impossible after auto SPI is
+    // Kick off auto SPI (Note: Device configuration impossible after auto SPI is
     // activated)
     // DR High = Data good (data capture should be triggered on the rising edge)
     m_spi.startAutoTrigger(m_auto_interrupt, true, false);
@@ -556,7 +567,7 @@ public class ADIS16470_IMU implements AutoCloseable, NTSendable {
       return 2;
     }
     if (m_reg > 1999) {
-      DriverStation.reportError("Attemted to write an invalid deimation value.", false);
+      DriverStation.reportError("Attempted to write an invalid deimation value.", false);
       m_reg = 1999;
     }
     m_scaled_sample_rate = (((m_reg + 1.0) / 2000.0) * 1000000.0);
@@ -639,7 +650,6 @@ public class ADIS16470_IMU implements AutoCloseable, NTSendable {
     m_spi.write(buf, 2);
   }
 
-  /** {@inheritDoc} */
   public void reset() {
     synchronized (this) {
       m_integ_angle = 0.0;
@@ -918,7 +928,9 @@ public class ADIS16470_IMU implements AutoCloseable, NTSendable {
     return compAngle;
   }
 
-  /** @return Yaw axis angle in degrees (CCW positive) */
+  /**
+   * @return Yaw axis angle in degrees (CCW positive)
+   */
   public synchronized double getAngle() {
     switch (m_yaw_axis) {
       case kX:
@@ -940,7 +952,9 @@ public class ADIS16470_IMU implements AutoCloseable, NTSendable {
     return m_integ_angle;
   }
 
-  /** @return Yaw axis angular rate in degrees per second (CCW positive) */
+  /**
+   * @return Yaw axis angular rate in degrees per second (CCW positive)
+   */
   public synchronized double getRate() {
     if (m_yaw_axis == IMUAxis.kX) {
       if (m_simGyroRateX != null) {
@@ -962,42 +976,58 @@ public class ADIS16470_IMU implements AutoCloseable, NTSendable {
     }
   }
 
-  /** @return Yaw Axis */
+  /**
+   * @return Yaw Axis
+   */
   public IMUAxis getYawAxis() {
     return m_yaw_axis;
   }
 
-  /** @return current acceleration in the X axis */
+  /**
+   * @return current acceleration in the X axis
+   */
   public synchronized double getAccelX() {
     return m_accel_x * 9.81;
   }
 
-  /** @return current acceleration in the Y axis */
+  /**
+   * @return current acceleration in the Y axis
+   */
   public synchronized double getAccelY() {
     return m_accel_y * 9.81;
   }
 
-  /** @return current acceleration in the Z axis */
+  /**
+   * @return current acceleration in the Z axis
+   */
   public synchronized double getAccelZ() {
     return m_accel_z * 9.81;
   }
 
-  /** @return X axis complementary angle */
+  /**
+   * @return X-axis complementary angle
+   */
   public synchronized double getXComplementaryAngle() {
     return m_compAngleX;
   }
 
-  /** @return Y axis complementary angle */
+  /**
+   * @return Y-axis complementary angle
+   */
   public synchronized double getYComplementaryAngle() {
     return m_compAngleY;
   }
 
-  /** @return X axis filtered acceleration angle */
+  /**
+   * @return X-axis filtered acceleration angle
+   */
   public synchronized double getXFilteredAccelAngle() {
     return m_accelAngleX;
   }
 
-  /** @return Y axis filtered acceleration angle */
+  /**
+   * @return Y-axis filtered acceleration angle
+   */
   public synchronized double getYFilteredAccelAngle() {
     return m_accelAngleY;
   }
@@ -1012,7 +1042,7 @@ public class ADIS16470_IMU implements AutoCloseable, NTSendable {
   }
 
   @Override
-  public void initSendable(NTSendableBuilder builder) {
+  public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Gyro");
     builder.addDoubleProperty("Value", this::getAngle, null);
   }

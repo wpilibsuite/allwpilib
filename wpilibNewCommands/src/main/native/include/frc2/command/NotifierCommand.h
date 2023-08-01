@@ -6,12 +6,12 @@
 
 #include <functional>
 #include <initializer_list>
+#include <span>
 
 #include <frc/Notifier.h>
 #include <units/time.h>
-#include <wpi/span.h>
 
-#include "frc2/command/CommandBase.h"
+#include "frc2/command/Command.h"
 #include "frc2/command/CommandHelper.h"
 
 namespace frc2 {
@@ -27,7 +27,7 @@ namespace frc2 {
  *
  * This class is provided by the NewCommands VendorDep
  */
-class NotifierCommand : public CommandHelper<CommandBase, NotifierCommand> {
+class NotifierCommand : public CommandHelper<Command, NotifierCommand> {
  public:
   /**
    * Creates a new NotifierCommand.
@@ -47,7 +47,7 @@ class NotifierCommand : public CommandHelper<CommandBase, NotifierCommand> {
    * @param requirements the subsystems required by this command
    */
   NotifierCommand(std::function<void()> toRun, units::second_t period,
-                  wpi::span<Subsystem* const> requirements = {});
+                  std::span<Subsystem* const> requirements = {});
 
   NotifierCommand(NotifierCommand&& other);
 

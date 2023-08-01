@@ -4,7 +4,12 @@
 
 package edu.wpi.first.wpilibj.interfaces;
 
-/** Interface for 3-axis accelerometers. */
+/**
+ * Interface for 3-axis accelerometers.
+ *
+ * @deprecated This interface is being removed with no replacement.
+ */
+@Deprecated(since = "2024", forRemoval = true)
 public interface Accelerometer {
   enum Range {
     k2G,
@@ -22,16 +27,16 @@ public interface Accelerometer {
   void setRange(Range range);
 
   /**
-   * Common interface for getting the x axis acceleration.
+   * Common interface for getting the x-axis acceleration.
    *
-   * @return The acceleration along the x axis in g-forces
+   * @return The acceleration along the x-axis in g-forces
    */
   double getX();
 
   /**
-   * Common interface for getting the y axis acceleration.
+   * Common interface for getting the y-axis acceleration.
    *
-   * @return The acceleration along the y axis in g-forces
+   * @return The acceleration along the y-axis in g-forces
    */
   double getY();
 

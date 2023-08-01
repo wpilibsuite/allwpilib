@@ -1,0 +1,24 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Sat, 29 Oct 2022 12:16:36 -0400
+Subject: [PATCH 2/4] Update amalgamation script
+
+---
+ tools/amalgamate.sh | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tools/amalgamate.sh b/tools/amalgamate.sh
+index 2e24e278e54bbc52967bfe1f8970f4f8d4b238d5..4dfe999ee49ee67fd394e948b0bb3133d6acdbdc 100755
+--- a/tools/amalgamate.sh
++++ b/tools/amalgamate.sh
+@@ -74,8 +74,8 @@ echo -e "#endif\n" >> $HEADER
+ 
+ # assemble source
+ echo -e "#define MPACK_INTERNAL 1" >> $SOURCE
+-echo -e "#define MPACK_EMIT_INLINE_DEFS 1\n" >> $SOURCE
+-echo -e "#include \"mpack.h\"\n" >> $SOURCE
++echo -e "#define MPACK_EMIT_INLINE_DEFS 0\n" >> $SOURCE
++echo -e "#include \"wpi/mpack.h\"\n" >> $SOURCE
+ for f in $SOURCES; do
+     echo -e "\n/* $f.c */" >> $SOURCE
+     sed -e 's@^#include ".*@/* & */@' -e '0,/^ \*\/$/d' src/$f >> $SOURCE

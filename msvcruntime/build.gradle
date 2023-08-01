@@ -16,33 +16,32 @@ if (OperatingSystem.current().isWindows()) {
 
     def vsLocator = gradle.services.get(VisualStudioLocator)
 
-    def vsLocation = vsLocator.locateAllComponents().first()
+    def vsLocationResult = vsLocator.locateComponent(null)
+
+    if (!vsLocationResult.available) {
+        return
+    }
+
+    def vsLocation = vsLocationResult.component
 
     def visualCppVersion = vsLocation.visualCpp.version
 
     def vsDirectory = vsLocation.visualStudioDir
 
-    def runtimeLocation = file("$vsDirectory\\VC\\Redist\\MSVC")
+    def defaultRedistFile = file("$vsDirectory\\VC\\Auxiliary\\Build\\Microsoft.VCRedistVersion.default.txt")
 
-    def runtimeVerNumber = null
-
-    runtimeLocation.eachFile {
-        def verNumber =  VersionNumber.parse(it.name)
-        if (verNumber.major == visualCppVersion.major && verNumber.minor == visualCppVersion.minor) {
-            runtimeVerNumber = verNumber
-        }
+    if (!defaultRedistFile.exists()) {
+        logger.warn("Version file for VS Compiler not found")
+        logger.warn("Expected at $defaultRedistFile")
+        return
     }
 
-    if (runtimeVerNumber != null) {
-        runtimeLocation = file("$runtimeLocation\\$runtimeVerNumber")
+    // TODO Remove VersionNumber
+    def expectedVersion = VersionNumber.parse(defaultRedistFile.text.trim())
 
-        def x86Folder = null
+    def runtimeLocation = file("$vsDirectory\\VC\\Redist\\MSVC\\$expectedVersion")
 
-        file("$runtimeLocation\\x86").eachFile {
-            if (it.name.endsWith('.CRT')) {
-                x86Folder = it
-            }
-        }
+    if (runtimeLocation.exists()) {
 
         def x64Folder = null
 
@@ -52,33 +51,22 @@ if (OperatingSystem.current().isWindows()) {
             }
         }
 
-        def x86ZipTask = tasks.create('x86RuntimeZip', Zip) {
-            destinationDirectory = outputsFolder
-            archiveBaseName = zipBaseName
-            classifier = 'x86'
-
-            from x86Folder
-        }
-
         def x64ZipTask = tasks.create('x64RuntimeZip', Zip) {
             destinationDirectory = outputsFolder
             archiveBaseName = zipBaseName
-            classifier = 'x64'
+            archiveClassifier = 'x64'
 
             from x64Folder
         }
 
-        addTaskToCopyAllOutputs(x86ZipTask)
         addTaskToCopyAllOutputs(x64ZipTask)
 
-        build.dependsOn x86ZipTask
         build.dependsOn x64ZipTask
 
         publishing {
             publications {
 
                 runtime(MavenPublication) {
-                    artifact x86ZipTask
                     artifact x64ZipTask
 
                     artifactId = "${baseArtifactId}"
@@ -87,5 +75,7 @@ if (OperatingSystem.current().isWindows()) {
                 }
             }
         }
+    } else if (project.hasProperty('buildServer')) {
+        throw new GradleException("Must find a runtime in CI. Expected at $runtimeLocation")
     }
 }

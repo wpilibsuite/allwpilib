@@ -5,10 +5,17 @@
 #include "Drivetrain.h"
 
 frc::MecanumDriveWheelSpeeds Drivetrain::GetCurrentState() const {
-  return {units::meters_per_second_t(m_frontLeftEncoder.GetRate()),
-          units::meters_per_second_t(m_frontRightEncoder.GetRate()),
-          units::meters_per_second_t(m_backLeftEncoder.GetRate()),
-          units::meters_per_second_t(m_backRightEncoder.GetRate())};
+  return {units::meters_per_second_t{m_frontLeftEncoder.GetRate()},
+          units::meters_per_second_t{m_frontRightEncoder.GetRate()},
+          units::meters_per_second_t{m_backLeftEncoder.GetRate()},
+          units::meters_per_second_t{m_backRightEncoder.GetRate()}};
+}
+
+frc::MecanumDriveWheelPositions Drivetrain::GetCurrentWheelDistances() const {
+  return {units::meter_t{m_frontLeftEncoder.GetDistance()},
+          units::meter_t{m_frontRightEncoder.GetDistance()},
+          units::meter_t{m_backLeftEncoder.GetDistance()},
+          units::meter_t{m_backRightEncoder.GetDistance()}};
 }
 
 void Drivetrain::SetSpeeds(const frc::MecanumDriveWheelSpeeds& wheelSpeeds) {
@@ -42,15 +49,18 @@ void Drivetrain::SetSpeeds(const frc::MecanumDriveWheelSpeeds& wheelSpeeds) {
 
 void Drivetrain::Drive(units::meters_per_second_t xSpeed,
                        units::meters_per_second_t ySpeed,
-                       units::radians_per_second_t rot, bool fieldRelative) {
-  auto wheelSpeeds = m_kinematics.ToWheelSpeeds(
-      fieldRelative ? frc::ChassisSpeeds::FromFieldRelativeSpeeds(
-                          xSpeed, ySpeed, rot, m_gyro.GetRotation2d())
-                    : frc::ChassisSpeeds{xSpeed, ySpeed, rot});
+                       units::radians_per_second_t rot, bool fieldRelative,
+                       units::second_t period) {
+  auto wheelSpeeds =
+      m_kinematics.ToWheelSpeeds(frc::ChassisSpeeds::FromDiscreteSpeeds(
+          fieldRelative ? frc::ChassisSpeeds::FromFieldRelativeSpeeds(
+                              xSpeed, ySpeed, rot, m_gyro.GetRotation2d())
+                        : frc::ChassisSpeeds{xSpeed, ySpeed, rot},
+          period));
   wheelSpeeds.Desaturate(kMaxSpeed);
   SetSpeeds(wheelSpeeds);
 }
 
 void Drivetrain::UpdateOdometry() {
-  m_odometry.Update(m_gyro.GetRotation2d(), GetCurrentState());
+  m_odometry.Update(m_gyro.GetRotation2d(), GetCurrentWheelDistances());
 }

@@ -249,10 +249,14 @@ void glass::DisplayMechanism2D(Mechanism2DModel* model,
 }
 
 void Mechanism2DView::Display() {
-  if (ImGui::BeginPopupContextItem()) {
-    DisplayMechanism2DSettings(m_model);
-    ImGui::EndPopup();
-  }
   DisplayMechanism2D(m_model, ImGui::GetWindowContentRegionMax() -
                                   ImGui::GetWindowContentRegionMin());
+}
+
+void Mechanism2DView::Settings() {
+  DisplayMechanism2DSettings(m_model);
+}
+
+bool Mechanism2DView::HasSettings() {
+  return true;
 }

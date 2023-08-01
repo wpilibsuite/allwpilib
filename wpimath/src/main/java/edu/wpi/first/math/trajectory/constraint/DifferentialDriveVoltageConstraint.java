@@ -111,7 +111,7 @@ public class DifferentialDriveVoltageConstraint implements TrajectoryConstraint 
                       / 2);
     }
 
-    // When turning about a point inside of the wheelbase (i.e. radius less than half
+    // When turning about a point inside the wheelbase (i.e. radius less than half
     // the trackwidth), the inner wheel's direction changes, but the magnitude remains
     // the same.  The formula above changes sign for the inner wheel when this happens.
     // We can accurately account for this by simply negating the inner wheel.

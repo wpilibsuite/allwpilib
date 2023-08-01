@@ -4,12 +4,15 @@
 
 package edu.wpi.first.wpilibj;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.wpilibj.simulation.UltrasonicSim;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class UltrasonicTest {
   @Test
@@ -27,5 +30,24 @@ class UltrasonicTest {
       assertFalse(ultrasonic.isRangeValid());
       assertEquals(0, ultrasonic.getRangeInches());
     }
+  }
+
+  @Test
+  void automaticModeToggle() {
+    try (@SuppressWarnings("unused")
+        Ultrasonic ultrasonic = new Ultrasonic(0, 1)) {
+      assertDoesNotThrow(
+          () -> {
+            Ultrasonic.setAutomaticMode(true);
+            Ultrasonic.setAutomaticMode(false);
+            Ultrasonic.setAutomaticMode(true);
+          });
+    }
+  }
+
+  @ValueSource(booleans = {true, false})
+  @ParameterizedTest
+  void automaticModeWithZeroInstances(boolean enabling) {
+    assertDoesNotThrow(() -> Ultrasonic.setAutomaticMode(enabling));
   }
 }

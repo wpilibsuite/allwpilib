@@ -14,12 +14,12 @@
 using namespace frc;
 using namespace frc::sim;
 
-REVPHSim::REVPHSim() : m_index{SensorUtil::GetDefaultREVPHModule()} {}
+REVPHSim::REVPHSim() : PneumaticsBaseSim{SensorUtil::GetDefaultREVPHModule()} {}
 
-REVPHSim::REVPHSim(int module) : m_index{module} {}
+REVPHSim::REVPHSim(int module) : PneumaticsBaseSim{module} {}
 
 REVPHSim::REVPHSim(const PneumaticsBase& pneumatics)
-    : m_index{pneumatics.GetModuleNumber()} {}
+    : PneumaticsBaseSim{pneumatics} {}
 
 std::unique_ptr<CallbackStore> REVPHSim::RegisterInitializedCallback(
     NotifyCallback callback, bool initialNotify) {

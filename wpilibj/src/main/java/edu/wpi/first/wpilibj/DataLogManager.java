@@ -6,6 +6,7 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.WPIUtilJNI;
+import edu.wpi.first.util.concurrent.Event;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.IntegerLogEntry;
 import edu.wpi.first.util.datalog.StringLogEntry;
@@ -188,7 +189,6 @@ public final class DataLogManager {
     }
   }
 
-  @SuppressWarnings("PMD.EmptyCatchBlock")
   private static String makeLogDir(String dir) {
     if (!dir.isEmpty()) {
       return dir;
@@ -257,6 +257,7 @@ public final class DataLogManager {
             }
             long length = file.length();
             if (file.delete()) {
+              DriverStation.reportWarning("DataLogManager: Deleted " + file.getName(), false);
               freeSpace += length;
               if (freeSpace >= kFreeSpaceThreshold) {
                 break;
@@ -266,6 +267,15 @@ public final class DataLogManager {
             }
           }
         }
+      } else if (freeSpace < 2 * kFreeSpaceThreshold) {
+        DriverStation.reportWarning(
+            "DataLogManager: Log storage device has "
+                + freeSpace / 1000000
+                + " MB of free space remaining! Logs will get deleted below "
+                + kFreeSpaceThreshold / 1000000
+                + " MB of free space."
+                + "Consider deleting logs off the storage device.",
+            false);
       }
     }
 
@@ -280,12 +290,19 @@ public final class DataLogManager {
         new IntegerLogEntry(
             m_log, "systemTime", "{\"source\":\"DataLogManager\",\"format\":\"time_t_us\"}");
 
+    Event newDataEvent = new Event();
+    DriverStation.provideRefreshedDataEventHandle(newDataEvent.getHandle());
     while (!Thread.interrupted()) {
-      boolean newData = DriverStation.waitForData(0.25);
+      boolean timedOut;
+      try {
+        timedOut = WPIUtilJNI.waitForObjectTimeout(newDataEvent.getHandle(), 0.25);
+      } catch (InterruptedException e) {
+        break;
+      }
       if (Thread.interrupted()) {
         break;
       }
-      if (!newData) {
+      if (timedOut) {
         timeoutCount++;
         // pause logging after being disconnected for 10 seconds
         if (timeoutCount > 40 && !paused) {
@@ -309,7 +326,7 @@ public final class DataLogManager {
         } else {
           dsAttachCount = 0;
         }
-        if (dsAttachCount > 50) { // 1 second
+        if (dsAttachCount > 300) { // 6 seconds
           LocalDateTime now = LocalDateTime.now(m_utc);
           if (now.getYear() > 2000) {
             // assume local clock is now synchronized to DS, so rename based on
@@ -329,7 +346,7 @@ public final class DataLogManager {
         } else {
           fmsAttachCount = 0;
         }
-        if (fmsAttachCount > 100) { // 2 seconds
+        if (fmsAttachCount > 250) { // 5 seconds
           // match info comes through TCP, so we need to double-check we've
           // actually received it
           DriverStation.MatchType matchType = DriverStation.getMatchType();
@@ -372,5 +389,6 @@ public final class DataLogManager {
         sysTimeEntry.append(WPIUtilJNI.getSystemTime(), WPIUtilJNI.now());
       }
     }
+    newDataEvent.close();
   }
 }

@@ -15,16 +15,17 @@ class SingleJointedArmSimTest {
   SingleJointedArmSim m_sim =
       new SingleJointedArmSim(
           DCMotor.getVex775Pro(2),
-          100,
+          300,
           3.0,
-          Units.inchesToMeters(19.0 / 2.0),
+          Units.inchesToMeters(30.0),
           -Math.PI,
           0.0,
-          10.0 / 2.2,
-          true);
+          true,
+          Math.PI / 2.0);
 
   @Test
   void testArmDisabled() {
+    // Reset Arm angle to 0
     m_sim.setState(VecBuilder.fill(0.0, 0.0));
 
     for (int i = 0; i < 12 / 0.02; i++) {

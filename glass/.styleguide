@@ -22,8 +22,10 @@ includeOtherLibs {
   ^GLFW
   ^cscore
   ^fmt/
+  ^fields/
   ^frc/
   ^imgui
+  ^networktables/
   ^ntcore
   ^wpi/
   ^wpigui

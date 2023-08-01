@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
@@ -17,7 +17,7 @@ import java.util.function.Consumer;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public class FunctionalCommand extends CommandBase {
+public class FunctionalCommand extends Command {
   protected final Runnable m_onInit;
   protected final Runnable m_onExecute;
   protected final Consumer<Boolean> m_onEnd;

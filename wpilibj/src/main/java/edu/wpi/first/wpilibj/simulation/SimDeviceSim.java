@@ -24,7 +24,7 @@ public class SimDeviceSim {
    * @param name name of the SimDevice
    */
   public SimDeviceSim(String name) {
-    m_handle = SimDeviceDataJNI.getSimDeviceHandle(name);
+    this(SimDeviceDataJNI.getSimDeviceHandle(name));
   }
 
   /**
@@ -46,6 +46,24 @@ public class SimDeviceSim {
    */
   public SimDeviceSim(String name, int index, int channel) {
     this(name + "[" + index + "," + channel + "]");
+  }
+
+  /**
+   * Constructs a SimDeviceSim.
+   *
+   * @param handle the low level handle for the corresponding SimDevice
+   */
+  public SimDeviceSim(int handle) {
+    m_handle = handle;
+  }
+
+  /**
+   * Get the name of this object.
+   *
+   * @return name
+   */
+  public String getName() {
+    return SimDeviceDataJNI.getSimDeviceName(m_handle);
   }
 
   /**

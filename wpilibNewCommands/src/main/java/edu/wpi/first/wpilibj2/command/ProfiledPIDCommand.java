@@ -5,7 +5,7 @@
 package edu.wpi.first.wpilibj2.command;
 
 import static edu.wpi.first.math.trajectory.TrapezoidProfile.State;
-import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import java.util.Set;
@@ -20,7 +20,7 @@ import java.util.function.Supplier;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public class ProfiledPIDCommand extends CommandBase {
+public class ProfiledPIDCommand extends Command {
   protected final ProfiledPIDController m_controller;
   protected DoubleSupplier m_measurement;
   protected Supplier<State> m_goal;

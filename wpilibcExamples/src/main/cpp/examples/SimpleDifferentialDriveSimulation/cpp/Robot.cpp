@@ -14,20 +14,15 @@
 class Robot : public frc::TimedRobot {
  public:
   void RobotInit() override {
-    // Flush NetworkTables every loop. This ensures that robot pose and other
-    // values are sent during every iteration.
-    SetNetworkTablesFlushEnabled(true);
-
     m_trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
-        frc::Pose2d(2_m, 2_m, 0_rad), {}, frc::Pose2d(6_m, 4_m, 0_rad),
+        frc::Pose2d{2_m, 2_m, 0_rad}, {}, frc::Pose2d{6_m, 4_m, 0_rad},
         frc::TrajectoryConfig(2_mps, 2_mps_sq));
   }
 
   void RobotPeriodic() override { m_drive.Periodic(); }
 
   void AutonomousInit() override {
-    m_timer.Reset();
-    m_timer.Start();
+    m_timer.Restart();
     m_drive.ResetOdometry(m_trajectory.InitialPose());
   }
 

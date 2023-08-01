@@ -57,6 +57,10 @@ static std::vector<std::pair<void*, void (*)(void*)>> gOnShutdown;
 static SimPeriodicCallbackRegistry gSimPeriodicBefore;
 static SimPeriodicCallbackRegistry gSimPeriodicAfter;
 
+namespace hal {
+void InitializeDriverStation();
+}  // namespace hal
+
 namespace hal::init {
 void InitializeHAL() {
   InitializeAccelerometerData();
@@ -276,6 +280,14 @@ int64_t HAL_GetFPGARevision(int32_t* status) {
   return 0;  // TODO: Find a better number to return;
 }
 
+size_t HAL_GetSerialNumber(char* buffer, size_t size) {
+  return HALSIM_GetRoboRioSerialNumber(buffer, size);
+}
+
+size_t HAL_GetComments(char* buffer, size_t size) {
+  return HALSIM_GetRoboRioComments(buffer, size);
+}
+
 uint64_t HAL_GetFPGATime(int32_t* status) {
   return hal::GetFPGATime();
 }
@@ -316,6 +328,10 @@ HAL_Bool HAL_GetBrownedOut(int32_t* status) {
   return false;  // Figure out if we need to detect a brownout condition
 }
 
+HAL_Bool HAL_GetRSLState(int32_t* status) {
+  return false;
+}
+
 HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   static std::atomic_bool initialized{false};
   static wpi::mutex initializeMutex;
@@ -335,7 +351,7 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   hal::init::HAL_IsInitialized.store(true);
 
   hal::RestartTiming();
-  HAL_InitializeDriverStation();
+  hal::InitializeDriverStation();
 
   initialized = true;
 

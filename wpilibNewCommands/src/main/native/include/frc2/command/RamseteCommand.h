@@ -7,6 +7,7 @@
 #include <functional>
 #include <initializer_list>
 #include <memory>
+#include <span>
 
 #include <frc/Timer.h>
 #include <frc/controller/PIDController.h>
@@ -17,9 +18,8 @@
 #include <frc/trajectory/Trajectory.h>
 #include <units/length.h>
 #include <units/voltage.h>
-#include <wpi/span.h>
 
-#include "frc2/command/CommandBase.h"
+#include "frc2/command/Command.h"
 #include "frc2/command/CommandHelper.h"
 
 namespace frc2 {
@@ -42,7 +42,7 @@ namespace frc2 {
  * @see RamseteController
  * @see Trajectory
  */
-class RamseteCommand : public CommandHelper<CommandBase, RamseteCommand> {
+class RamseteCommand : public CommandHelper<Command, RamseteCommand> {
  public:
   /**
    * Constructs a new RamseteCommand that, when executed, will follow the
@@ -116,7 +116,7 @@ class RamseteCommand : public CommandHelper<CommandBase, RamseteCommand> {
                  frc2::PIDController leftController,
                  frc2::PIDController rightController,
                  std::function<void(units::volt_t, units::volt_t)> output,
-                 wpi::span<Subsystem* const> requirements = {});
+                 std::span<Subsystem* const> requirements = {});
 
   /**
    * Constructs a new RamseteCommand that, when executed, will follow the
@@ -164,7 +164,7 @@ class RamseteCommand : public CommandHelper<CommandBase, RamseteCommand> {
                  std::function<void(units::meters_per_second_t,
                                     units::meters_per_second_t)>
                      output,
-                 wpi::span<Subsystem* const> requirements = {});
+                 std::span<Subsystem* const> requirements = {});
 
   void Initialize() override;
 
@@ -173,6 +173,8 @@ class RamseteCommand : public CommandHelper<CommandBase, RamseteCommand> {
   void End(bool interrupted) override;
 
   bool IsFinished() override;
+
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   frc::Trajectory m_trajectory;

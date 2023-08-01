@@ -4,51 +4,60 @@
 
 package edu.wpi.first.wpilibj2.command;
 
+import edu.wpi.first.util.sendable.SendableBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A CommandGroups that runs a list of commands in sequence.
+ * A command composition that runs a list of commands in sequence.
  *
- * <p>As a rule, CommandGroups require the union of the requirements of their component commands.
+ * <p>The rules for command compositions apply: command instances that are passed to it cannot be
+ * added to any other composition or scheduled individually, and the composition requires all
+ * subsystems its components require.
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public class SequentialCommandGroup extends CommandGroupBase {
+public class SequentialCommandGroup extends Command {
   private final List<Command> m_commands = new ArrayList<>();
   private int m_currentCommandIndex = -1;
   private boolean m_runWhenDisabled = true;
+  private InterruptionBehavior m_interruptBehavior = InterruptionBehavior.kCancelIncoming;
 
   /**
    * Creates a new SequentialCommandGroup. The given commands will be run sequentially, with the
-   * CommandGroup finishing when the last command finishes.
+   * composition finishing when the last command finishes.
    *
-   * @param commands the commands to include in this group.
+   * @param commands the commands to include in this composition.
    */
   public SequentialCommandGroup(Command... commands) {
     addCommands(commands);
   }
 
-  @Override
+  /**
+   * Adds the given commands to the group.
+   *
+   * @param commands Commands to add, in order of execution.
+   */
   public final void addCommands(Command... commands) {
-    requireUngrouped(commands);
-
     if (m_currentCommandIndex != -1) {
       throw new IllegalStateException(
-          "Commands cannot be added to a CommandGroup while the group is running");
+          "Commands cannot be added to a composition while it's running");
     }
 
-    registerGroupedCommands(commands);
+    CommandScheduler.getInstance().registerComposedCommands(commands);
 
     for (Command command : commands) {
       m_commands.add(command);
       m_requirements.addAll(command.getRequirements());
       m_runWhenDisabled &= command.runsWhenDisabled();
+      if (command.getInterruptionBehavior() == InterruptionBehavior.kCancelSelf) {
+        m_interruptBehavior = InterruptionBehavior.kCancelSelf;
+      }
     }
   }
 
   @Override
-  public void initialize() {
+  public final void initialize() {
     m_currentCommandIndex = 0;
 
     if (!m_commands.isEmpty()) {
@@ -57,7 +66,7 @@ public class SequentialCommandGroup extends CommandGroupBase {
   }
 
   @Override
-  public void execute() {
+  public final void execute() {
     if (m_commands.isEmpty()) {
       return;
     }
@@ -75,7 +84,7 @@ public class SequentialCommandGroup extends CommandGroupBase {
   }
 
   @Override
-  public void end(boolean interrupted) {
+  public final void end(boolean interrupted) {
     if (interrupted
         && !m_commands.isEmpty()
         && m_currentCommandIndex > -1
@@ -86,7 +95,7 @@ public class SequentialCommandGroup extends CommandGroupBase {
   }
 
   @Override
-  public boolean isFinished() {
+  public final boolean isFinished() {
     return m_currentCommandIndex == m_commands.size();
   }
 
@@ -96,26 +105,14 @@ public class SequentialCommandGroup extends CommandGroupBase {
   }
 
   @Override
-  public SequentialCommandGroup beforeStarting(Command before) {
-    // store all the commands
-    var commands = new ArrayList<Command>();
-    commands.add(before);
-    commands.addAll(m_commands);
-
-    // reset current state
-    commands.forEach(CommandGroupBase::clearGroupedCommand);
-    m_commands.clear();
-    m_requirements.clear();
-    m_runWhenDisabled = true;
-
-    // add them back
-    addCommands(commands.toArray(Command[]::new));
-    return this;
+  public InterruptionBehavior getInterruptionBehavior() {
+    return m_interruptBehavior;
   }
 
   @Override
-  public SequentialCommandGroup andThen(Command... next) {
-    addCommands(next);
-    return this;
+  public void initSendable(SendableBuilder builder) {
+    super.initSendable(builder);
+
+    builder.addIntegerProperty("index", () -> m_currentCommandIndex, null);
   }
 }

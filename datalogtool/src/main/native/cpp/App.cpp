@@ -104,6 +104,8 @@ static void DisplayMainMenu() {
     ImGui::Text("v%s", GetWPILibVersion());
     ImGui::Separator();
     ImGui::Text("Save location: %s", glass::GetStorageDir().c_str());
+    ImGui::Text("%.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate,
+                ImGui::GetIO().Framerate);
     if (ImGui::Button("Close")) {
       ImGui::CloseCurrentPopup();
     }

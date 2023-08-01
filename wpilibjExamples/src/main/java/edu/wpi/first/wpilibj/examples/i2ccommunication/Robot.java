@@ -6,16 +6,19 @@ package edu.wpi.first.wpilibj.examples.i2ccommunication;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.I2C.Port;
 import edu.wpi.first.wpilibj.TimedRobot;
+import java.util.Optional;
 
 /**
  * This is a sample program demonstrating how to communicate to a light controller from the robot
  * code using the roboRIO's I2C port.
  */
 public class Robot extends TimedRobot {
-  private static int kDeviceAddress = 4;
+  static final Port kPort = Port.kOnboard;
+  private static final int kDeviceAddress = 4;
 
-  private static I2C m_arduino = new I2C(I2C.Port.kOnboard, kDeviceAddress);
+  private final I2C m_arduino = new I2C(kPort, kDeviceAddress);
 
   private void writeString(String input) {
     // Creates a char array from the input string
@@ -30,7 +33,7 @@ public class Robot extends TimedRobot {
     }
 
     // Writes bytes over I2C
-    m_arduino.transaction(data, data.length, null, 0);
+    m_arduino.transaction(data, data.length, new byte[] {}, 0);
   }
 
   @Override
@@ -46,12 +49,25 @@ public class Robot extends TimedRobot {
     // alliance, enabled in teleop mode, with 43 seconds left in the match.
     StringBuilder stateMessage = new StringBuilder(6);
 
+    String allianceString = "U";
+    Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
+    if (alliance.isPresent()) {
+      allianceString = alliance.get() == DriverStation.Alliance.Red ? "R" : "B";
+    }
+
     stateMessage
-        .append(DriverStation.getAlliance() == DriverStation.Alliance.Red ? "R" : "B")
+        .append(allianceString)
         .append(DriverStation.isEnabled() ? "E" : "D")
         .append(DriverStation.isAutonomous() ? "A" : "T")
         .append(String.format("%03d", (int) DriverStation.getMatchTime()));
 
     writeString(stateMessage.toString());
+  }
+
+  /** Close all resources. */
+  @Override
+  public void close() {
+    m_arduino.close();
+    super.close();
   }
 }

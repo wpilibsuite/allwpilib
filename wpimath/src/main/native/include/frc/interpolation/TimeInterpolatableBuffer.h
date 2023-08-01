@@ -4,9 +4,11 @@
 
 #pragma once
 
+#include <algorithm>
 #include <array>
 #include <functional>
 #include <map>
+#include <optional>
 #include <utility>
 #include <vector>
 
@@ -66,11 +68,26 @@ class TimeInterpolatableBuffer {
     if (m_pastSnapshots.size() == 0 || time > m_pastSnapshots.back().first) {
       m_pastSnapshots.emplace_back(time, sample);
     } else {
-      m_pastSnapshots.insert(
-          std::upper_bound(
-              m_pastSnapshots.begin(), m_pastSnapshots.end(), time,
-              [](auto t, const auto& pair) { return t < pair.first; }),
-          std::pair(time, sample));
+      auto first_after = std::upper_bound(
+          m_pastSnapshots.begin(), m_pastSnapshots.end(), time,
+          [](auto t, const auto& pair) { return t < pair.first; });
+
+      // Don't access this before ensuring first_after isn't first.
+      auto last_not_greater_than = first_after - 1;
+
+      if (first_after == m_pastSnapshots.begin() ||
+          last_not_greater_than == m_pastSnapshots.begin() ||
+          last_not_greater_than->first < time) {
+        // Two cases handled together:
+        // 1. All entries come after the sample
+        // 2. Some entries come before the sample, but none are recorded with
+        // the same time
+        m_pastSnapshots.insert(first_after, std::pair(time, sample));
+      } else {
+        // Final case:
+        // 3. An entry exists with the same recorded time.
+        last_not_greater_than->second = sample;
+      }
     }
     while (time - m_pastSnapshots[0].first > m_historySize) {
       m_pastSnapshots.erase(m_pastSnapshots.begin());
@@ -81,12 +98,16 @@ class TimeInterpolatableBuffer {
   void Clear() { m_pastSnapshots.clear(); }
 
   /**
-   * Sample the buffer at the given time. If there are no elements in the
-   * buffer, calling this function results in undefined behavior.
+   * Sample the buffer at the given time. If the buffer is empty, an empty
+   * optional is returned.
    *
    * @param time The time at which to sample the buffer.
    */
-  T Sample(units::second_t time) {
+  std::optional<T> Sample(units::second_t time) {
+    if (m_pastSnapshots.empty()) {
+      return {};
+    }
+
     // We will perform a binary search to find the index of the element in the
     // vector that has a timestamp that is equal to or greater than the vision
     // measurement timestamp.
@@ -106,12 +127,24 @@ class TimeInterpolatableBuffer {
         m_pastSnapshots.begin(), m_pastSnapshots.end(), time,
         [](const auto& pair, auto t) { return t > pair.first; });
 
+    if (upper_bound == m_pastSnapshots.begin()) {
+      return upper_bound->second;
+    }
+
     auto lower_bound = upper_bound - 1;
 
     double t = ((time - lower_bound->first) /
                 (upper_bound->first - lower_bound->first));
 
     return m_interpolatingFunc(lower_bound->second, upper_bound->second, t);
+  }
+
+  /**
+   * Grant access to the internal sample buffer. Used in Pose Estimation to
+   * replay odometry inputs stored within this buffer.
+   */
+  std::vector<std::pair<units::second_t, T>>& GetInternalBuffer() {
+    return m_pastSnapshots;
   }
 
  private:

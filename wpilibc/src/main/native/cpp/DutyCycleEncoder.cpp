@@ -105,7 +105,7 @@ units::turn_t DutyCycleEncoder::Get() const {
   }
 
   FRC_ReportError(
-      warn::Warning, "{}",
+      warn::Warning,
       "Failed to read DutyCycle Encoder. Potential Speed Overrun. Returning "
       "last value");
   return m_lastPosition;
@@ -164,7 +164,10 @@ void DutyCycleEncoder::Reset() {
   if (m_counter) {
     m_counter->Reset();
   }
-  m_positionOffset = m_dutyCycle->GetOutput();
+  if (m_simPosition) {
+    m_simPosition.Set(0);
+  }
+  m_positionOffset = GetAbsolutePosition();
 }
 
 bool DutyCycleEncoder::IsConnected() const {

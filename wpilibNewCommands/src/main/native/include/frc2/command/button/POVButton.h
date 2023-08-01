@@ -3,9 +3,10 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #pragma once
+
 #include <frc/GenericHID.h>
 
-#include "Button.h"
+#include "Trigger.h"
 
 namespace frc2 {
 /**
@@ -16,7 +17,7 @@ namespace frc2 {
  *
  * @see Trigger
  */
-class POVButton : public Button {
+class POVButton : public Trigger {
  public:
   /**
    * Creates a POVButton that commands can be bound to.
@@ -26,7 +27,7 @@ class POVButton : public Button {
    * @param povNumber The number of the POV on the joystick.
    */
   POVButton(frc::GenericHID* joystick, int angle, int povNumber = 0)
-      : Button([joystick, angle, povNumber] {
+      : Trigger([joystick, angle, povNumber] {
           return joystick->GetPOV(povNumber) == angle;
         }) {}
 };

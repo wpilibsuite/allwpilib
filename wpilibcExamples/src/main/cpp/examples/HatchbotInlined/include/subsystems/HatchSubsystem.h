@@ -6,11 +6,12 @@
 
 #include <frc/DoubleSolenoid.h>
 #include <frc/PneumaticsControlModule.h>
-#include <frc2/command/SubsystemBase.h>
+#include <frc2/command/CommandPtr.h>
+#include <frc2/command/Subsystem.h>
 
 #include "Constants.h"
 
-class HatchSubsystem : public frc2::SubsystemBase {
+class HatchSubsystem : public frc2::Subsystem {
  public:
   HatchSubsystem();
 
@@ -19,12 +20,14 @@ class HatchSubsystem : public frc2::SubsystemBase {
   /**
    * Grabs the hatch.
    */
-  void GrabHatch();
+  frc2::CommandPtr GrabHatchCommand();
 
   /**
    * Releases the hatch.
    */
-  void ReleaseHatch();
+  frc2::CommandPtr ReleaseHatchCommand();
+
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   // Components (e.g. motor controllers and sensors) should generally be

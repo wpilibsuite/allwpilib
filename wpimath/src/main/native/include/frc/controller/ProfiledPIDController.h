@@ -22,7 +22,7 @@
 namespace frc {
 namespace detail {
 WPILIB_DLLEXPORT
-void ReportProfiledPIDController();
+int IncrementAndGetProfiledPIDControllerInstances();
 }  // namespace detail
 
 /**
@@ -59,7 +59,10 @@ class ProfiledPIDController
   ProfiledPIDController(double Kp, double Ki, double Kd,
                         Constraints constraints, units::second_t period = 20_ms)
       : m_controller(Kp, Ki, Kd, period), m_constraints(constraints) {
-    detail::ReportProfiledPIDController();
+    int instances = detail::IncrementAndGetProfiledPIDControllerInstances();
+    wpi::math::MathSharedStore::ReportUsage(
+        wpi::math::MathUsageId::kController_ProfiledPIDController, instances);
+    wpi::SendableRegistry::Add(this, "ProfiledPIDController", instances);
   }
 
   ~ProfiledPIDController() override = default;
@@ -104,6 +107,18 @@ class ProfiledPIDController
   void SetD(double Kd) { m_controller.SetD(Kd); }
 
   /**
+   * Sets the IZone range. When the absolute value of the position error is
+   * greater than IZone, the total accumulated error will reset to zero,
+   * disabling integral gain until the absolute value of the position error is
+   * less than IZone. This is used to prevent integral windup. Must be
+   * non-negative. Passing a value of zero will effectively disable integral
+   * gain. Passing a value of infinity disables IZone functionality.
+   *
+   * @param iZone Maximum magnitude of error to allow integral control.
+   */
+  void SetIZone(double iZone) { m_controller.SetIZone(iZone); }
+
+  /**
    * Gets the proportional coefficient.
    *
    * @return proportional coefficient
@@ -125,11 +140,36 @@ class ProfiledPIDController
   double GetD() const { return m_controller.GetD(); }
 
   /**
+   * Get the IZone range.
+   *
+   * @return Maximum magnitude of error to allow integral control.
+   */
+  double GetIZone() const { return m_controller.GetIZone(); }
+
+  /**
    * Gets the period of this controller.
    *
    * @return The period of the controller.
    */
   units::second_t GetPeriod() const { return m_controller.GetPeriod(); }
+
+  /**
+   * Gets the position tolerance of this controller.
+   *
+   * @return The position tolerance of the controller.
+   */
+  double GetPositionTolerance() const {
+    return m_controller.GetPositionTolerance();
+  }
+
+  /**
+   * Gets the velocity tolerance of this controller.
+   *
+   * @return The velocity tolerance of the controller.
+   */
+  double GetVelocityTolerance() const {
+    return m_controller.GetVelocityTolerance();
+  }
 
   /**
    * Sets the goal for the ProfiledPIDController.
@@ -143,7 +183,7 @@ class ProfiledPIDController
    *
    * @param goal The desired unprofiled setpoint.
    */
-  void SetGoal(Distance_t goal) { m_goal = {goal, Velocity_t(0)}; }
+  void SetGoal(Distance_t goal) { m_goal = {goal, Velocity_t{0}}; }
 
   /**
    * Gets the goal for the ProfiledPIDController.
@@ -163,6 +203,12 @@ class ProfiledPIDController
    * @param constraints Velocity and acceleration constraints for goal.
    */
   void SetConstraints(Constraints constraints) { m_constraints = constraints; }
+
+  /**
+   * Get the velocity and acceleration constraints for this controller.
+   * @return Velocity and acceleration constraints.
+   */
+  Constraints GetConstraints() { return m_constraints; }
 
   /**
    * Returns the current setpoint of the ProfiledPIDController.
@@ -225,8 +271,8 @@ class ProfiledPIDController
    * @param velocityTolerance Velocity error which is tolerable.
    */
   void SetTolerance(Distance_t positionTolerance,
-                    Velocity_t velocityTolerance =
-                        Velocity_t(std::numeric_limits<double>::infinity())) {
+                    Velocity_t velocityTolerance = Velocity_t{
+                        std::numeric_limits<double>::infinity()}) {
     m_controller.SetTolerance(positionTolerance.value(),
                               velocityTolerance.value());
   }
@@ -237,14 +283,14 @@ class ProfiledPIDController
    * @return The error.
    */
   Distance_t GetPositionError() const {
-    return Distance_t(m_controller.GetPositionError());
+    return Distance_t{m_controller.GetPositionError()};
   }
 
   /**
    * Returns the change in error per second.
    */
   Velocity_t GetVelocityError() const {
-    return Velocity_t(m_controller.GetVelocityError());
+    return Velocity_t{m_controller.GetVelocityError()};
   }
 
   /**
@@ -271,8 +317,8 @@ class ProfiledPIDController
       m_setpoint.position = setpointMinDistance + measurement;
     }
 
-    frc::TrapezoidProfile<Distance> profile{m_constraints, m_goal, m_setpoint};
-    m_setpoint = profile.Calculate(GetPeriod());
+    frc::TrapezoidProfile<Distance> profile{m_constraints};
+    m_setpoint = profile.Calculate(GetPeriod(), m_goal, m_setpoint);
     return m_controller.Calculate(measurement.value(),
                                   m_setpoint.position.value());
   }
@@ -339,7 +385,7 @@ class ProfiledPIDController
    * velocity is assumed to be zero.
    */
   void Reset(Distance_t measuredPosition) {
-    Reset(measuredPosition, Velocity_t(0));
+    Reset(measuredPosition, Velocity_t{0});
   }
 
   void InitSendable(wpi::SendableBuilder& builder) override {
@@ -350,6 +396,9 @@ class ProfiledPIDController
         "i", [this] { return GetI(); }, [this](double value) { SetI(value); });
     builder.AddDoubleProperty(
         "d", [this] { return GetD(); }, [this](double value) { SetD(value); });
+    builder.AddDoubleProperty(
+        "izone", [this] { return GetIZone(); },
+        [this](double value) { SetIZone(value); });
     builder.AddDoubleProperty(
         "goal", [this] { return GetGoal().position.value(); },
         [this](double value) { SetGoal(Distance_t{value}); });

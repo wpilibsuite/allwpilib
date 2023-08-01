@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj.simulation.testutils.DoubleCallback;
 import edu.wpi.first.wpilibj.simulation.testutils.EnumCallback;
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings("AbbreviationAsWordInName")
 class REVPHSimTest {
   @Test
   void testInitialization() {

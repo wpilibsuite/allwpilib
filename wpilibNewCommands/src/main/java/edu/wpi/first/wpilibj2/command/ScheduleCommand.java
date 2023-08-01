@@ -8,12 +8,12 @@ import java.util.Set;
 
 /**
  * Schedules the given commands when this command is initialized. Useful for forking off from
- * CommandGroups. Note that if run from a CommandGroup, the group will not know about the status of
- * the scheduled commands, and will treat this command as finishing instantly.
+ * CommandGroups. Note that if run from a composition, the composition will not know about the
+ * status of the scheduled commands, and will treat this command as finishing instantly.
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public class ScheduleCommand extends CommandBase {
+public class ScheduleCommand extends Command {
   private final Set<Command> m_toSchedule;
 
   /**

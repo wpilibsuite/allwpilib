@@ -35,7 +35,7 @@ DESTINATION_TEST_RESULTS=none
 LOCAL_TEST_RESULTS=none
 
 
-# Begin searching for options from the second paramater on
+# Begin searching for options from the second parameter on
 PARAM_ARGS=${@:2}
 
 if [[ "$1" = java ]]; then

@@ -9,7 +9,7 @@
 
 namespace wpi {
 
-// Binary insortion into vector; std::log(n) efficiency.
+// Binary insertion into vector; std::log(n) efficiency.
 template <typename T>
 typename std::vector<T>::iterator insert_sorted(std::vector<T>& vec,
                                                 T const& item) {

@@ -5,7 +5,7 @@
 #pragma once
 #include <frc/GenericHID.h>
 
-#include "Button.h"
+#include "Trigger.h"
 
 namespace frc2 {
 /**
@@ -16,16 +16,16 @@ namespace frc2 {
  *
  * @see Trigger
  */
-class JoystickButton : public Button {
+class JoystickButton : public Trigger {
  public:
   /**
    * Creates a JoystickButton that commands can be bound to.
    *
    * @param joystick The joystick on which the button is located.
-   * @param buttonNumber The number of the button on the joystic.
+   * @param buttonNumber The number of the button on the joystick.
    */
   explicit JoystickButton(frc::GenericHID* joystick, int buttonNumber)
-      : Button([joystick, buttonNumber] {
+      : Trigger([joystick, buttonNumber] {
           return joystick->GetRawButton(buttonNumber);
         }) {}
 };

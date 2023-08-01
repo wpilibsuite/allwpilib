@@ -8,6 +8,8 @@
 #include "wpi/ConvertUTF.h"
 #include "wpi/SmallString.h"
 
+#if defined(_MSC_VER)
+
 namespace {
 class StackTraceWalker : public StackWalker {
  public:
@@ -21,13 +23,7 @@ class StackTraceWalker : public StackWalker {
 }  // namespace
 
 void StackTraceWalker::OnOutput(LPCTSTR szText) {
-#ifdef _UNICODE
-  wpi::SmallString<128> utf8;
-  wpi::sys::windows::UTF16ToUTF8(szText, wcslen(szText), utf8);
-  m_output.append(utf8.data(), utf8.size());
-#else
   m_output.append(szText);
-#endif
 }
 
 namespace wpi {
@@ -40,3 +36,5 @@ std::string GetStackTraceDefault(int offset) {
 }
 
 }  // namespace wpi
+
+#endif  // defined(_MSC_VER)

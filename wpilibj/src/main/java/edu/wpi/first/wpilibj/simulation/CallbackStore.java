@@ -93,16 +93,4 @@ public class CallbackStore implements AutoCloseable {
     }
     m_cancelType = -1;
   }
-
-  @SuppressWarnings({"NoFinalizer", "deprecation"})
-  @Override
-  protected void finalize() throws Throwable {
-    try {
-      if (m_cancelType >= 0) {
-        close(); // close open files
-      }
-    } finally {
-      super.finalize();
-    }
-  }
 }

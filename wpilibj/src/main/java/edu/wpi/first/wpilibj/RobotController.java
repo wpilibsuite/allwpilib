@@ -21,7 +21,6 @@ public final class RobotController {
    *
    * @return FPGA Version number.
    */
-  @SuppressWarnings("AbbreviationAsWordInName")
   public static int getFPGAVersion() {
     return HALUtil.getFPGAVersion();
   }
@@ -33,9 +32,29 @@ public final class RobotController {
    *
    * @return FPGA Revision number.
    */
-  @SuppressWarnings("AbbreviationAsWordInName")
   public static long getFPGARevision() {
     return (long) HALUtil.getFPGARevision();
+  }
+
+  /**
+   * Return the serial number of the roboRIO.
+   *
+   * @return The serial number of the roboRIO.
+   */
+  public static String getSerialNumber() {
+    return HALUtil.getSerialNumber();
+  }
+
+  /**
+   * Return the comments from the roboRIO web interface.
+   *
+   * <p>The comments string is cached after the first call to this function on the RoboRIO - restart
+   * the robot code to reload the comments string after changing it in the web interface.
+   *
+   * @return the comments from the roboRIO web interface.
+   */
+  public static String getComments() {
+    return HALUtil.getComments();
   }
 
   /**
@@ -82,6 +101,15 @@ public final class RobotController {
    */
   public static boolean isBrownedOut() {
     return HAL.getBrownedOut();
+  }
+
+  /**
+   * Gets the current state of the Robot Signal Light (RSL).
+   *
+   * @return The current state of the RSL- true if on, false if off
+   */
+  public static boolean getRSLState() {
+    return HAL.getRSLState();
   }
 
   /**

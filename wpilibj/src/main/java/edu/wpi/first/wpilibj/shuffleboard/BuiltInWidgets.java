@@ -4,15 +4,13 @@
 
 package edu.wpi.first.wpilibj.shuffleboard;
 
-import edu.wpi.first.wpilibj.interfaces.Accelerometer.Range;
-
 /**
  * The types of the widgets bundled with Shuffleboard.
  *
  * <p>For example, setting a number to be displayed with a slider:
  *
  * <pre>{@code
- * NetworkTableEntry example = Shuffleboard.getTab("My Tab")
+ * GenericEntry example = Shuffleboard.getTab("My Tab")
  *   .add("My Number", 0)
  *   .withWidget(BuiltInWidgets.kNumberSlider)
  *   .withProperties(Map.of("min", 0, "max", 1))
@@ -284,9 +282,8 @@ public enum BuiltInWidgets implements WidgetType {
    * Supported types:
    *
    * <ul>
-   *   <li>{@link edu.wpi.first.wpilibj.command.Command}
-   *   <li>{@link edu.wpi.first.wpilibj.command.CommandGroup}
-   *   <li>Any custom subclass of {@code Command} or {@code CommandGroup}
+   *   <li>{@link edu.wpi.first.wpilibj2.command.Command}
+   *   <li>Any custom subclass of {@code Command}
    * </ul>
    *
    * <br>
@@ -300,7 +297,7 @@ public enum BuiltInWidgets implements WidgetType {
    * Supported types:
    *
    * <ul>
-   *   <li>{@link edu.wpi.first.wpilibj.command.PIDCommand}
+   *   <li>{@link edu.wpi.first.wpilibj2.command.PIDCommand}
    *   <li>Any custom subclass of {@code PIDCommand}
    * </ul>
    *
@@ -314,7 +311,7 @@ public enum BuiltInWidgets implements WidgetType {
    * Supported types:
    *
    * <ul>
-   *   <li>{@link edu.wpi.first.wpilibj.PIDController}
+   *   <li>{@link edu.wpi.first.math.controller.PIDController}
    * </ul>
    *
    * <br>
@@ -363,7 +360,6 @@ public enum BuiltInWidgets implements WidgetType {
    *
    * <table>
    * <tr><th>Name</th><th>Type</th><th>Default Value</th><th>Notes</th></tr>
-   * <tr><td>Range</td><td>{@link Range}</td><td>k16G</td><td>The accelerometer range</td></tr>
    * <tr><td>Show value</td><td>Boolean</td><td>true</td>
    * <td>Show or hide the acceleration values</td></tr>
    * <tr><td>Precision</td><td>Number</td><td>2</td>
@@ -474,7 +470,7 @@ public enum BuiltInWidgets implements WidgetType {
    */
   kCameraStream("Camera Stream"),
   /**
-   * Displays a field2d object.<br>
+   * Displays a Field2d object.<br>
    * Supported types:
    *
    * <ul>

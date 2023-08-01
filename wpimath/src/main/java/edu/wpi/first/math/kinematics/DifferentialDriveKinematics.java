@@ -6,6 +6,7 @@ package edu.wpi.first.math.kinematics;
 
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
+import edu.wpi.first.math.geometry.Twist2d;
 
 /**
  * Helper class that converts a chassis velocity (dx and dtheta components) to left and right wheel
@@ -15,8 +16,8 @@ import edu.wpi.first.math.MathUsageId;
  * whereas forward kinematics converts left and right component velocities into a linear and angular
  * chassis speed.
  */
-@SuppressWarnings("MemberName")
-public class DifferentialDriveKinematics {
+public class DifferentialDriveKinematics
+    implements Kinematics<DifferentialDriveWheelSpeeds, DifferentialDriveWheelPositions> {
   public final double trackWidthMeters;
 
   /**
@@ -37,6 +38,7 @@ public class DifferentialDriveKinematics {
    * @param wheelSpeeds The left and right velocities.
    * @return The chassis speed.
    */
+  @Override
   public ChassisSpeeds toChassisSpeeds(DifferentialDriveWheelSpeeds wheelSpeeds) {
     return new ChassisSpeeds(
         (wheelSpeeds.leftMetersPerSecond + wheelSpeeds.rightMetersPerSecond) / 2,
@@ -51,11 +53,33 @@ public class DifferentialDriveKinematics {
    *     chassis' speed.
    * @return The left and right velocities.
    */
+  @Override
   public DifferentialDriveWheelSpeeds toWheelSpeeds(ChassisSpeeds chassisSpeeds) {
     return new DifferentialDriveWheelSpeeds(
         chassisSpeeds.vxMetersPerSecond
             - trackWidthMeters / 2 * chassisSpeeds.omegaRadiansPerSecond,
         chassisSpeeds.vxMetersPerSecond
             + trackWidthMeters / 2 * chassisSpeeds.omegaRadiansPerSecond);
+  }
+
+  @Override
+  public Twist2d toTwist2d(DifferentialDriveWheelPositions wheelDeltas) {
+    return toTwist2d(wheelDeltas.leftMeters, wheelDeltas.rightMeters);
+  }
+
+  /**
+   * Performs forward kinematics to return the resulting Twist2d from the given left and right side
+   * distance deltas. This method is often used for odometry -- determining the robot's position on
+   * the field using changes in the distance driven by each wheel on the robot.
+   *
+   * @param leftDistanceMeters The distance measured by the left side encoder.
+   * @param rightDistanceMeters The distance measured by the right side encoder.
+   * @return The resulting Twist2d.
+   */
+  public Twist2d toTwist2d(double leftDistanceMeters, double rightDistanceMeters) {
+    return new Twist2d(
+        (leftDistanceMeters + rightDistanceMeters) / 2,
+        0,
+        (rightDistanceMeters - leftDistanceMeters) / trackWidthMeters);
   }
 }

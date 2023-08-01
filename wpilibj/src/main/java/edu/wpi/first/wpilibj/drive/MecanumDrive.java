@@ -4,16 +4,18 @@
 
 package edu.wpi.first.wpilibj.drive;
 
-import static java.util.Objects.requireNonNull;
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
-import edu.wpi.first.wpilibj.SpeedController;
+import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 
 /**
  * A class for driving Mecanum drive platforms.
@@ -36,9 +38,10 @@ import edu.wpi.first.wpilibj.SpeedController;
  * <p>Each drive() function provides different inverse kinematic relations for a Mecanum drive
  * robot.
  *
- * <p>The positive Y axis points ahead, the positive X axis points right, and the positive Z axis
- * points down. Rotations follow the right-hand rule, so clockwise rotation around the Z axis is
- * positive.
+ * <p>This library uses the NWU axes convention (North-West-Up as external reference in the world
+ * frame). The positive X axis points ahead, the positive Y axis points to the left, and the
+ * positive Z axis points up. Rotations follow the right-hand rule, so counterclockwise rotation
+ * around the Z axis is positive.
  *
  * <p>Note: the axis conventions used in this class differ from DifferentialDrive. This may change
  * in a future year's WPILib release.
@@ -47,22 +50,16 @@ import edu.wpi.first.wpilibj.SpeedController;
  * be set to 0, and larger values will be scaled so that the full range is still used. This deadband
  * value can be changed with {@link #setDeadband}.
  *
- * <p>RobotDrive porting guide: <br>
- * {@link #driveCartesian(double, double, double, double)} is equivalent to RobotDrive's
- * mecanumDrive_Cartesian(double, double, double, double) if a deadband of 0 is used, and the ySpeed
- * and gyroAngle values are inverted compared to RobotDrive (eg driveCartesian(xSpeed, -ySpeed,
- * zRotation, -gyroAngle). <br>
- * {@link #drivePolar(double, double, double)} is equivalent to RobotDrive's
- * mecanumDrive_Polar(double, double, double)} if a deadband of 0 is used.
+ * <p>{@link edu.wpi.first.wpilibj.MotorSafety} is enabled by default. The driveCartesian or
+ * drivePolar methods should be called periodically to avoid Motor Safety timeouts.
  */
-@SuppressWarnings("removal")
 public class MecanumDrive extends RobotDriveBase implements Sendable, AutoCloseable {
   private static int instances;
 
-  private final SpeedController m_frontLeftMotor;
-  private final SpeedController m_rearLeftMotor;
-  private final SpeedController m_frontRightMotor;
-  private final SpeedController m_rearRightMotor;
+  private final MotorController m_frontLeftMotor;
+  private final MotorController m_rearLeftMotor;
+  private final MotorController m_frontRightMotor;
+  private final MotorController m_rearRightMotor;
 
   private boolean m_reported;
 
@@ -108,14 +105,14 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
    * @param rearRightMotor The motor on the rear-right corner.
    */
   public MecanumDrive(
-      SpeedController frontLeftMotor,
-      SpeedController rearLeftMotor,
-      SpeedController frontRightMotor,
-      SpeedController rearRightMotor) {
-    requireNonNull(frontLeftMotor, "Front-left motor cannot be null");
-    requireNonNull(rearLeftMotor, "Rear-left motor cannot be null");
-    requireNonNull(frontRightMotor, "Front-right motor cannot be null");
-    requireNonNull(rearRightMotor, "Rear-right motor cannot be null");
+      MotorController frontLeftMotor,
+      MotorController rearLeftMotor,
+      MotorController frontRightMotor,
+      MotorController rearRightMotor) {
+    requireNonNullParam(frontLeftMotor, "frontLeftMotor", "MecanumDrive");
+    requireNonNullParam(rearLeftMotor, "rearLeftMotor", "MecanumDrive");
+    requireNonNullParam(frontRightMotor, "frontRightMotor", "MecanumDrive");
+    requireNonNullParam(rearRightMotor, "rearRightMotor", "MecanumDrive");
 
     m_frontLeftMotor = frontLeftMotor;
     m_rearLeftMotor = rearLeftMotor;
@@ -137,44 +134,42 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
   /**
    * Drive method for Mecanum platform.
    *
-   * <p>Angles are measured clockwise from the positive X axis. The robot's speed is independent
-   * from its angle or rotation rate.
+   * <p>Angles are measured counterclockwise from the positive X axis. The robot's speed is
+   * independent of its angle or rotation rate.
    *
-   * @param ySpeed The robot's speed along the Y axis [-1.0..1.0]. Forward is positive.
-   * @param xSpeed The robot's speed along the X axis [-1.0..1.0]. Right is positive.
-   * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Clockwise is
+   * @param xSpeed The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
+   * @param ySpeed The robot's speed along the Y axis [-1.0..1.0]. Left is positive.
+   * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Counterclockwise is
    *     positive.
    */
-  @SuppressWarnings("ParameterName")
-  public void driveCartesian(double ySpeed, double xSpeed, double zRotation) {
-    driveCartesian(ySpeed, xSpeed, zRotation, 0.0);
+  public void driveCartesian(double xSpeed, double ySpeed, double zRotation) {
+    driveCartesian(xSpeed, ySpeed, zRotation, new Rotation2d());
   }
 
   /**
    * Drive method for Mecanum platform.
    *
-   * <p>Angles are measured clockwise from the positive X axis. The robot's speed is independent
-   * from its angle or rotation rate.
+   * <p>Angles are measured counterclockwise from the positive X axis. The robot's speed is
+   * independent of its angle or rotation rate.
    *
-   * @param ySpeed The robot's speed along the Y axis [-1.0..1.0]. Forward is positive.
-   * @param xSpeed The robot's speed along the X axis [-1.0..1.0]. Right is positive.
-   * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Clockwise is
+   * @param xSpeed The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
+   * @param ySpeed The robot's speed along the Y axis [-1.0..1.0]. Left is positive.
+   * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Counterclockwise is
    *     positive.
-   * @param gyroAngle The current angle reading from the gyro in degrees around the Z axis. Use this
-   *     to implement field-oriented controls.
+   * @param gyroAngle The gyro heading around the Z axis. Use this to implement field-oriented
+   *     controls.
    */
-  @SuppressWarnings("ParameterName")
-  public void driveCartesian(double ySpeed, double xSpeed, double zRotation, double gyroAngle) {
+  public void driveCartesian(double xSpeed, double ySpeed, double zRotation, Rotation2d gyroAngle) {
     if (!m_reported) {
       HAL.report(
           tResourceType.kResourceType_RobotDrive, tInstances.kRobotDrive2_MecanumCartesian, 4);
       m_reported = true;
     }
 
-    ySpeed = MathUtil.applyDeadband(ySpeed, m_deadband);
     xSpeed = MathUtil.applyDeadband(xSpeed, m_deadband);
+    ySpeed = MathUtil.applyDeadband(ySpeed, m_deadband);
 
-    var speeds = driveCartesianIK(ySpeed, xSpeed, zRotation, gyroAngle);
+    var speeds = driveCartesianIK(xSpeed, ySpeed, zRotation, gyroAngle);
 
     m_frontLeftMotor.set(speeds.frontLeft * m_maxOutput);
     m_frontRightMotor.set(speeds.frontRight * m_maxOutput);
@@ -187,74 +182,67 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
   /**
    * Drive method for Mecanum platform.
    *
-   * <p>Angles are measured counter-clockwise from straight ahead. The speed at which the robot
-   * drives (translation) is independent from its angle or rotation rate.
+   * <p>Angles are measured counterclockwise from straight ahead. The speed at which the robot
+   * drives (translation) is independent of its angle or rotation rate.
    *
    * @param magnitude The robot's speed at a given angle [-1.0..1.0]. Forward is positive.
-   * @param angle The angle around the Z axis at which the robot drives in degrees [-180..180].
-   * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Clockwise is
+   * @param angle The gyro heading around the Z axis at which the robot drives.
+   * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Counterclockwise is
    *     positive.
    */
-  @SuppressWarnings("ParameterName")
-  public void drivePolar(double magnitude, double angle, double zRotation) {
+  public void drivePolar(double magnitude, Rotation2d angle, double zRotation) {
     if (!m_reported) {
       HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDrive2_MecanumPolar, 4);
       m_reported = true;
     }
 
     driveCartesian(
-        magnitude * Math.cos(angle * (Math.PI / 180.0)),
-        magnitude * Math.sin(angle * (Math.PI / 180.0)),
-        zRotation,
-        0.0);
+        magnitude * angle.getCos(), magnitude * angle.getSin(), zRotation, new Rotation2d());
   }
 
   /**
    * Cartesian inverse kinematics for Mecanum platform.
    *
-   * <p>Angles are measured clockwise from the positive X axis. The robot's speed is independent
-   * from its angle or rotation rate.
+   * <p>Angles are measured counterclockwise from the positive X axis. The robot's speed is
+   * independent of its angle or rotation rate.
    *
-   * @param ySpeed The robot's speed along the Y axis [-1.0..1.0]. Forward is positive.
-   * @param xSpeed The robot's speed along the X axis [-1.0..1.0]. Right is positive.
-   * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Clockwise is
+   * @param xSpeed The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
+   * @param ySpeed The robot's speed along the Y axis [-1.0..1.0]. Left is positive.
+   * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Counterclockwise is
    *     positive.
    * @return Wheel speeds [-1.0..1.0].
    */
-  @SuppressWarnings("ParameterName")
-  public static WheelSpeeds driveCartesianIK(double ySpeed, double xSpeed, double zRotation) {
-    return driveCartesianIK(ySpeed, xSpeed, zRotation, 0.0);
+  public static WheelSpeeds driveCartesianIK(double xSpeed, double ySpeed, double zRotation) {
+    return driveCartesianIK(xSpeed, ySpeed, zRotation, new Rotation2d());
   }
 
   /**
    * Cartesian inverse kinematics for Mecanum platform.
    *
-   * <p>Angles are measured clockwise from the positive X axis. The robot's speed is independent
-   * from its angle or rotation rate.
+   * <p>Angles are measured clockwise from the positive X axis. The robot's speed is independent of
+   * its angle or rotation rate.
    *
-   * @param ySpeed The robot's speed along the Y axis [-1.0..1.0]. Forward is positive.
-   * @param xSpeed The robot's speed along the X axis [-1.0..1.0]. Right is positive.
-   * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Clockwise is
+   * @param xSpeed The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
+   * @param ySpeed The robot's speed along the Y axis [-1.0..1.0]. Left is positive.
+   * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Counterclockwise is
    *     positive.
-   * @param gyroAngle The current angle reading from the gyro in degrees around the Z axis. Use this
-   *     to implement field-oriented controls.
+   * @param gyroAngle The gyro heading around the Z axis. Use this to implement field-oriented
+   *     controls.
    * @return Wheel speeds [-1.0..1.0].
    */
-  @SuppressWarnings("ParameterName")
   public static WheelSpeeds driveCartesianIK(
-      double ySpeed, double xSpeed, double zRotation, double gyroAngle) {
-    ySpeed = MathUtil.clamp(ySpeed, -1.0, 1.0);
+      double xSpeed, double ySpeed, double zRotation, Rotation2d gyroAngle) {
     xSpeed = MathUtil.clamp(xSpeed, -1.0, 1.0);
+    ySpeed = MathUtil.clamp(ySpeed, -1.0, 1.0);
 
     // Compensate for gyro angle.
-    Vector2d input = new Vector2d(ySpeed, xSpeed);
-    input.rotate(-gyroAngle);
+    var input = new Translation2d(xSpeed, ySpeed).rotateBy(gyroAngle.unaryMinus());
 
     double[] wheelSpeeds = new double[4];
-    wheelSpeeds[MotorType.kFrontLeft.value] = input.x + input.y + zRotation;
-    wheelSpeeds[MotorType.kFrontRight.value] = input.x - input.y - zRotation;
-    wheelSpeeds[MotorType.kRearLeft.value] = input.x - input.y + zRotation;
-    wheelSpeeds[MotorType.kRearRight.value] = input.x + input.y - zRotation;
+    wheelSpeeds[MotorType.kFrontLeft.value] = input.getX() + input.getY() + zRotation;
+    wheelSpeeds[MotorType.kFrontRight.value] = input.getX() - input.getY() - zRotation;
+    wheelSpeeds[MotorType.kRearLeft.value] = input.getX() - input.getY() + zRotation;
+    wheelSpeeds[MotorType.kRearRight.value] = input.getX() + input.getY() - zRotation;
 
     normalize(wheelSpeeds);
 
@@ -287,13 +275,9 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
     builder.addDoubleProperty(
         "Front Left Motor Speed", m_frontLeftMotor::get, m_frontLeftMotor::set);
     builder.addDoubleProperty(
-        "Front Right Motor Speed",
-        () -> m_frontRightMotor.get(),
-        value -> m_frontRightMotor.set(value));
+        "Front Right Motor Speed", m_frontRightMotor::get, m_frontRightMotor::set);
     builder.addDoubleProperty("Rear Left Motor Speed", m_rearLeftMotor::get, m_rearLeftMotor::set);
     builder.addDoubleProperty(
-        "Rear Right Motor Speed",
-        () -> m_rearRightMotor.get(),
-        value -> m_rearRightMotor.set(value));
+        "Rear Right Motor Speed", m_rearRightMotor::get, m_rearRightMotor::set);
   }
 }

@@ -12,6 +12,7 @@ using namespace frc;
 
 void PWMMotorController::Set(double speed) {
   m_pwm.SetSpeed(m_isInverted ? -speed : speed);
+  Feed();
 }
 
 double PWMMotorController::Get() const {
@@ -31,7 +32,8 @@ void PWMMotorController::Disable() {
 }
 
 void PWMMotorController::StopMotor() {
-  Disable();
+  // Don't use Set(0) as that will feed the watch kitty
+  m_pwm.SetSpeed(0);
 }
 
 std::string PWMMotorController::GetDescription() const {
@@ -54,7 +56,8 @@ PWMMotorController::PWMMotorController(std::string_view name, int channel)
 void PWMMotorController::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Motor Controller");
   builder.SetActuator(true);
-  builder.SetSafeState([=] { Disable(); });
+  builder.SetSafeState([=, this] { Disable(); });
   builder.AddDoubleProperty(
-      "Value", [=] { return Get(); }, [=](double value) { Set(value); });
+      "Value", [=, this] { return Get(); },
+      [=, this](double value) { Set(value); });
 }

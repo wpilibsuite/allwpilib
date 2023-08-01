@@ -57,9 +57,8 @@ void BufferCallbackStore::performCallback(const char* name, uint8_t* buffer,
     std::fflush(stdout);
   }
 
-  auto toCallbackArr = MakeJByteArray(
-      env, std::string_view{reinterpret_cast<const char*>(buffer),
-                            static_cast<size_t>(length)});
+  auto toCallbackArr =
+      MakeJByteArray(env, {buffer, static_cast<size_t>(length)});
 
   env->CallVoidMethod(m_call, sim::GetBufferCallback(), MakeJString(env, name),
                       toCallbackArr, static_cast<jint>(length));
@@ -124,6 +123,9 @@ SIM_JniHandle sim::AllocateBufferCallback(
 void sim::FreeBufferCallback(JNIEnv* env, SIM_JniHandle handle, jint index,
                              FreeBufferCallbackFunc freeCallback) {
   auto callback = callbackHandles->Free(handle);
+  if (callback == nullptr) {
+    return;
+  }
   freeCallback(index, callback->getCallbackId());
   callback->free(env);
 }

@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
@@ -38,8 +38,7 @@ import java.util.function.Supplier;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-@SuppressWarnings("MemberName")
-public class MecanumControllerCommand extends CommandBase {
+public class MecanumControllerCommand extends Command {
   private final Timer m_timer = new Timer();
   private final boolean m_usePID;
   private final Trajectory m_trajectory;
@@ -87,7 +86,6 @@ public class MecanumControllerCommand extends CommandBase {
    *     voltages.
    * @param requirements The subsystems to require.
    */
-  @SuppressWarnings("ParameterName")
   public MecanumControllerCommand(
       Trajectory trajectory,
       Supplier<Pose2d> pose,
@@ -119,11 +117,7 @@ public class MecanumControllerCommand extends CommandBase {
     m_desiredRotation =
         requireNonNullParam(desiredRotation, "desiredRotation", "MecanumControllerCommand");
 
-    m_maxWheelVelocityMetersPerSecond =
-        requireNonNullParam(
-            maxWheelVelocityMetersPerSecond,
-            "maxWheelVelocityMetersPerSecond",
-            "MecanumControllerCommand");
+    m_maxWheelVelocityMetersPerSecond = maxWheelVelocityMetersPerSecond;
 
     m_frontLeftController =
         requireNonNullParam(frontLeftController, "frontLeftController", "MecanumControllerCommand");
@@ -179,7 +173,6 @@ public class MecanumControllerCommand extends CommandBase {
    *     voltages.
    * @param requirements The subsystems to require.
    */
-  @SuppressWarnings("ParameterName")
   public MecanumControllerCommand(
       Trajectory trajectory,
       Supplier<Pose2d> pose,
@@ -221,7 +214,7 @@ public class MecanumControllerCommand extends CommandBase {
    * trajectory. The user should implement a velocity PID on the desired output wheel velocities.
    *
    * <p>Note: The controllers will *not* set the outputVolts to zero upon completion of the path -
-   * this is left to the user, since it is not appropriate for paths with non-stationary end-states.
+   * this is left to the user, since it is not appropriate for paths with nonstationary end-states.
    *
    * @param trajectory The trajectory to follow.
    * @param pose A function that supplies the robot pose - use one of the odometry classes to
@@ -236,7 +229,6 @@ public class MecanumControllerCommand extends CommandBase {
    * @param outputWheelSpeeds A MecanumDriveWheelSpeeds object containing the output wheel speeds.
    * @param requirements The subsystems to require.
    */
-  @SuppressWarnings("ParameterName")
   public MecanumControllerCommand(
       Trajectory trajectory,
       Supplier<Pose2d> pose,
@@ -262,11 +254,7 @@ public class MecanumControllerCommand extends CommandBase {
     m_desiredRotation =
         requireNonNullParam(desiredRotation, "desiredRotation", "MecanumControllerCommand");
 
-    m_maxWheelVelocityMetersPerSecond =
-        requireNonNullParam(
-            maxWheelVelocityMetersPerSecond,
-            "maxWheelVelocityMetersPerSecond",
-            "MecanumControllerCommand");
+    m_maxWheelVelocityMetersPerSecond = maxWheelVelocityMetersPerSecond;
 
     m_frontLeftController = null;
     m_rearLeftController = null;
@@ -290,7 +278,7 @@ public class MecanumControllerCommand extends CommandBase {
    * trajectory. The user should implement a velocity PID on the desired output wheel velocities.
    *
    * <p>Note: The controllers will *not* set the outputVolts to zero upon completion of the path -
-   * this is left to the user, since it is not appropriate for paths with non-stationary end-states.
+   * this is left to the user, since it is not appropriate for paths with nonstationary end-states.
    *
    * <p>Note 2: The final rotation of the robot will be set to the rotation of the final pose in the
    * trajectory. The robot will not follow the rotations from the poses at each timestep. If
@@ -308,7 +296,6 @@ public class MecanumControllerCommand extends CommandBase {
    * @param outputWheelSpeeds A MecanumDriveWheelSpeeds object containing the output wheel speeds.
    * @param requirements The subsystems to require.
    */
-  @SuppressWarnings("ParameterName")
   public MecanumControllerCommand(
       Trajectory trajectory,
       Supplier<Pose2d> pose,
@@ -345,12 +332,10 @@ public class MecanumControllerCommand extends CommandBase {
     m_prevSpeeds =
         m_kinematics.toWheelSpeeds(new ChassisSpeeds(initialXVelocity, initialYVelocity, 0.0));
 
-    m_timer.reset();
-    m_timer.start();
+    m_timer.restart();
   }
 
   @Override
-  @SuppressWarnings("LocalVariableName")
   public void execute() {
     double curTime = m_timer.get();
     double dt = curTime - m_prevTime;

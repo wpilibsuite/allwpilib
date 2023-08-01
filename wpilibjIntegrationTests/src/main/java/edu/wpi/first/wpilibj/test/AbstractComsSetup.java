@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj.test;
 
+import edu.wpi.first.hal.DriverStationJNI;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.MockDS;
@@ -40,7 +41,7 @@ public abstract class AbstractComsSetup {
       try {
         // Set some implementations so that the static methods work properly
         HAL.initialize(500, 0);
-        HAL.observeUserProgramStarting();
+        DriverStationJNI.observeUserProgramStarting();
         DriverStation.getAlliance();
 
         ds = new MockDS();
@@ -56,6 +57,7 @@ public abstract class AbstractComsSetup {
 
       // Wait until the robot is enabled before starting the tests
       int enableCounter = 0;
+      DriverStation.refreshData();
       while (!DriverStation.isEnabled()) {
         if (enableCounter > 50) {
           // Robot did not enable properly after 5 seconds.
@@ -69,6 +71,7 @@ public abstract class AbstractComsSetup {
           ex.printStackTrace();
         }
         TestBench.out().println("Waiting for enable: " + enableCounter++);
+        DriverStation.refreshData();
       }
       TestBench.out().println();
 

@@ -17,7 +17,6 @@ public class Timer {
    *
    * @return Robot running time in seconds.
    */
-  @SuppressWarnings("AbbreviationAsWordInName")
   public static double getFPGATimestamp() {
     return RobotController.getFPGATime() / 1000000.0;
   }
@@ -55,7 +54,7 @@ public class Timer {
   private double m_accumulatedTime;
   private boolean m_running;
 
-  @SuppressWarnings("MissingJavadocMethod")
+  /** Timer constructor. */
   public Timer() {
     reset();
   }
@@ -102,6 +101,19 @@ public class Timer {
   }
 
   /**
+   * Restart the timer by stopping the timer, if it is not already stopped, resetting the
+   * accumulated time, then starting the timer again. If you want an event to periodically reoccur
+   * at some time interval from the start time, consider using advanceIfElapsed() instead.
+   */
+  public void restart() {
+    if (m_running) {
+      stop();
+    }
+    reset();
+    start();
+  }
+
+  /**
    * Stop the timer. This computes the time as of now and clears the running flag, causing all
    * subsequent time requests to be read from the accumulated time rather than looking at the system
    * clock.
@@ -119,20 +131,6 @@ public class Timer {
    */
   public boolean hasElapsed(double seconds) {
     return get() >= seconds;
-  }
-
-  /**
-   * Check if the period specified has passed and if it has, advance the start time by that period.
-   * This is useful to decide if it's time to do periodic work without drifting later by the time it
-   * took to get around to checking.
-   *
-   * @param period The period to check for (in seconds).
-   * @return Whether the period has passed.
-   * @deprecated Use advanceIfElapsed() instead.
-   */
-  @Deprecated(since = "2022", forRemoval = true)
-  public boolean hasPeriodPassed(double period) {
-    return advanceIfElapsed(period);
   }
 
   /**

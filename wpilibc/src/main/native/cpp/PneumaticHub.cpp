@@ -4,6 +4,8 @@
 
 #include "frc/PneumaticHub.h"
 
+#include <array>
+
 #include <fmt/format.h>
 #include <hal/REVPH.h>
 #include <wpi/NullDeleter.h>
@@ -15,7 +17,6 @@
 #include "frc/RobotBase.h"
 #include "frc/SensorUtil.h"
 #include "frc/Solenoid.h"
-#include "frc/fmt/Units.h"
 
 using namespace frc;
 
@@ -146,7 +147,7 @@ void PneumaticHub::EnableCompressorAnalog(
     units::pounds_per_square_inch_t minPressure,
     units::pounds_per_square_inch_t maxPressure) {
   if (minPressure >= maxPressure) {
-    throw FRC_MakeError(err::InvalidParameter, "{}",
+    throw FRC_MakeError(err::InvalidParameter,
                         "maxPressure must be greater than minPresure");
   }
   if (minPressure < 0_psi || minPressure > 120_psi) {
@@ -159,9 +160,14 @@ void PneumaticHub::EnableCompressorAnalog(
                         "maxPressure must be between 0 and 120 PSI, got {}",
                         maxPressure);
   }
-  int32_t status = 0;
+
+  // Send the voltage as it would be if the 5V rail was at exactly 5V.
+  // The firmware will compensate for the real 5V rail voltage, which
+  // can fluctuate somewhat over time.
   units::volt_t minAnalogVoltage = PSIToVolts(minPressure, 5_V);
   units::volt_t maxAnalogVoltage = PSIToVolts(maxPressure, 5_V);
+
+  int32_t status = 0;
   HAL_SetREVPHClosedLoopControlAnalog(m_handle, minAnalogVoltage.value(),
                                       maxAnalogVoltage.value(), &status);
   FRC_ReportError(status, "Module {}", m_module);
@@ -171,7 +177,7 @@ void PneumaticHub::EnableCompressorHybrid(
     units::pounds_per_square_inch_t minPressure,
     units::pounds_per_square_inch_t maxPressure) {
   if (minPressure >= maxPressure) {
-    throw FRC_MakeError(err::InvalidParameter, "{}",
+    throw FRC_MakeError(err::InvalidParameter,
                         "maxPressure must be greater than minPresure");
   }
   if (minPressure < 0_psi || minPressure > 120_psi) {
@@ -184,9 +190,14 @@ void PneumaticHub::EnableCompressorHybrid(
                         "maxPressure must be between 0 and 120 PSI, got {}",
                         maxPressure);
   }
-  int32_t status = 0;
+
+  // Send the voltage as it would be if the 5V rail was at exactly 5V.
+  // The firmware will compensate for the real 5V rail voltage, which
+  // can fluctuate somewhat over time.
   units::volt_t minAnalogVoltage = PSIToVolts(minPressure, 5_V);
   units::volt_t maxAnalogVoltage = PSIToVolts(maxPressure, 5_V);
+
+  int32_t status = 0;
   HAL_SetREVPHClosedLoopControlHybrid(m_handle, minAnalogVoltage.value(),
                                       maxAnalogVoltage.value(), &status);
   FRC_ReportError(status, "Module {}", m_module);

@@ -8,49 +8,55 @@
 
 #include <wpi/jni_util.h>
 
+#include "Eigen/Cholesky"
 #include "Eigen/Core"
 #include "Eigen/Eigenvalues"
 #include "Eigen/QR"
-#include "drake/math/discrete_algebraic_riccati_equation.h"
 #include "edu_wpi_first_math_WPIMathJNI.h"
+#include "frc/DARE.h"
+#include "frc/geometry/Pose3d.h"
 #include "frc/trajectory/TrajectoryUtil.h"
 #include "unsupported/Eigen/MatrixFunctions"
 
 using namespace wpi::java;
+
+namespace {
 
 /**
  * Returns true if (A, B) is a stabilizable pair.
  *
  * (A, B) is stabilizable if and only if the uncontrollable eigenvalues of A, if
  * any, have absolute values less than one, where an eigenvalue is
- * uncontrollable if rank(λI - A, B) < n where n is the number of states.
+ * uncontrollable if rank([λI - A, B]) < n where n is the number of states.
  *
  * @param A System matrix.
  * @param B Input matrix.
  */
-bool check_stabilizable(const Eigen::Ref<const Eigen::MatrixXd>& A,
-                        const Eigen::Ref<const Eigen::MatrixXd>& B) {
-  int states = B.rows();
-  int inputs = B.cols();
-  Eigen::EigenSolver<Eigen::MatrixXd> es{A};
-  for (int i = 0; i < states; ++i) {
+bool IsStabilizable(const Eigen::Ref<const Eigen::MatrixXd>& A,
+                    const Eigen::Ref<const Eigen::MatrixXd>& B) {
+  Eigen::EigenSolver<Eigen::MatrixXd> es{A, false};
+
+  for (int i = 0; i < A.rows(); ++i) {
     if (es.eigenvalues()[i].real() * es.eigenvalues()[i].real() +
             es.eigenvalues()[i].imag() * es.eigenvalues()[i].imag() <
         1) {
       continue;
     }
 
-    Eigen::MatrixXcd E{states, states + inputs};
-    E << es.eigenvalues()[i] * Eigen::MatrixXcd::Identity(states, states) - A,
+    Eigen::MatrixXcd E{A.rows(), A.rows() + B.cols()};
+    E << es.eigenvalues()[i] * Eigen::MatrixXcd::Identity(A.rows(), A.rows()) -
+             A,
         B;
+
     Eigen::ColPivHouseholderQR<Eigen::MatrixXcd> qr{E};
-    if (qr.rank() < states) {
+    if (qr.rank() < A.rows()) {
       return false;
     }
   }
-
   return true;
 }
+
+}  // namespace
 
 std::vector<double> GetElementsFromTrajectory(
     const frc::Trajectory& trajectory) {
@@ -70,7 +76,7 @@ std::vector<double> GetElementsFromTrajectory(
   return elements;
 }
 
-frc::Trajectory CreateTrajectoryFromElements(wpi::span<const double> elements) {
+frc::Trajectory CreateTrajectoryFromElements(std::span<const double> elements) {
   // Make sure that the elements have the correct length.
   assert(elements.size() % 7 == 0);
 
@@ -96,11 +102,11 @@ extern "C" {
 
 /*
  * Class:     edu_wpi_first_math_WPIMathJNI
- * Method:    discreteAlgebraicRiccatiEquation
+ * Method:    dare
  * Signature: ([D[D[D[DII[D)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_math_WPIMathJNI_discreteAlgebraicRiccatiEquation
+Java_edu_wpi_first_math_WPIMathJNI_dare
   (JNIEnv* env, jclass, jdoubleArray A, jdoubleArray B, jdoubleArray Q,
    jdoubleArray R, jint states, jint inputs, jdoubleArray S)
 {
@@ -123,8 +129,7 @@ Java_edu_wpi_first_math_WPIMathJNI_discreteAlgebraicRiccatiEquation
       Rmat{nativeR, inputs, inputs};
 
   try {
-    Eigen::MatrixXd result =
-        drake::math::DiscreteAlgebraicRiccatiEquation(Amat, Bmat, Qmat, Rmat);
+    Eigen::MatrixXd result = frc::DARE(Amat, Bmat, Qmat, Rmat);
 
     env->ReleaseDoubleArrayElements(A, nativeA, 0);
     env->ReleaseDoubleArrayElements(B, nativeB, 0);
@@ -185,6 +190,60 @@ Java_edu_wpi_first_math_WPIMathJNI_pow
 
 /*
  * Class:     edu_wpi_first_math_WPIMathJNI
+ * Method:    expPose3d
+ * Signature: (DDDDDDDDDDDDD)[D
+ */
+JNIEXPORT jdoubleArray JNICALL
+Java_edu_wpi_first_math_WPIMathJNI_expPose3d
+  (JNIEnv* env, jclass, jdouble poseX, jdouble poseY, jdouble poseZ,
+   jdouble poseQw, jdouble poseQx, jdouble poseQy, jdouble poseQz,
+   jdouble twistDx, jdouble twistDy, jdouble twistDz, jdouble twistRx,
+   jdouble twistRy, jdouble twistRz)
+{
+  frc::Pose3d pose{
+      units::meter_t{poseX}, units::meter_t{poseY}, units::meter_t{poseZ},
+      frc::Rotation3d{frc::Quaternion{poseQw, poseQx, poseQy, poseQz}}};
+  frc::Twist3d twist{units::meter_t{twistDx},  units::meter_t{twistDy},
+                     units::meter_t{twistDz},  units::radian_t{twistRx},
+                     units::radian_t{twistRy}, units::radian_t{twistRz}};
+
+  frc::Pose3d result = pose.Exp(twist);
+
+  const auto& resultQuaternion = result.Rotation().GetQuaternion();
+  return MakeJDoubleArray(
+      env, {{result.X().value(), result.Y().value(), result.Z().value(),
+             resultQuaternion.W(), resultQuaternion.X(), resultQuaternion.Y(),
+             resultQuaternion.Z()}});
+}
+
+/*
+ * Class:     edu_wpi_first_math_WPIMathJNI
+ * Method:    logPose3d
+ * Signature: (DDDDDDDDDDDDDD)[D
+ */
+JNIEXPORT jdoubleArray JNICALL
+Java_edu_wpi_first_math_WPIMathJNI_logPose3d
+  (JNIEnv* env, jclass, jdouble startX, jdouble startY, jdouble startZ,
+   jdouble startQw, jdouble startQx, jdouble startQy, jdouble startQz,
+   jdouble endX, jdouble endY, jdouble endZ, jdouble endQw, jdouble endQx,
+   jdouble endQy, jdouble endQz)
+{
+  frc::Pose3d startPose{
+      units::meter_t{startX}, units::meter_t{startY}, units::meter_t{startZ},
+      frc::Rotation3d{frc::Quaternion{startQw, startQx, startQy, startQz}}};
+  frc::Pose3d endPose{
+      units::meter_t{endX}, units::meter_t{endY}, units::meter_t{endZ},
+      frc::Rotation3d{frc::Quaternion{endQw, endQx, endQy, endQz}}};
+
+  frc::Twist3d result = startPose.Log(endPose);
+
+  return MakeJDoubleArray(
+      env, {{result.dx.value(), result.dy.value(), result.dz.value(),
+             result.rx.value(), result.ry.value(), result.rz.value()}});
+}
+
+/*
+ * Class:     edu_wpi_first_math_WPIMathJNI
  * Method:    isStabilizable
  * Signature: (II[D[D)Z
  */
@@ -204,7 +263,7 @@ Java_edu_wpi_first_math_WPIMathJNI_isStabilizable
       Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>
       B{nativeB, states, inputs};
 
-  bool isStabilizable = check_stabilizable(A, B);
+  bool isStabilizable = IsStabilizable(A, B);
 
   env->ReleaseDoubleArrayElements(aSrc, nativeA, 0);
   env->ReleaseDoubleArrayElements(bSrc, nativeB, 0);
@@ -305,6 +364,62 @@ Java_edu_wpi_first_math_WPIMathJNI_serializeTrajectory
     }
     return nullptr;
   }
+}
+
+/*
+ * Class:     edu_wpi_first_math_WPIMathJNI
+ * Method:    rankUpdate
+ * Signature: ([DI[DDZ)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_math_WPIMathJNI_rankUpdate
+  (JNIEnv* env, jclass, jdoubleArray mat, jint rows, jdoubleArray vec,
+   jdouble sigma, jboolean lowerTriangular)
+{
+  jdouble* matBody = env->GetDoubleArrayElements(mat, nullptr);
+  jdouble* vecBody = env->GetDoubleArrayElements(vec, nullptr);
+
+  Eigen::Map<
+      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>
+      L{matBody, rows, rows};
+  Eigen::Map<Eigen::Vector<double, Eigen::Dynamic>> v{vecBody, rows};
+
+  if (lowerTriangular == JNI_TRUE) {
+    Eigen::internal::llt_inplace<double, Eigen::Lower>::rankUpdate(L, v, sigma);
+  } else {
+    Eigen::internal::llt_inplace<double, Eigen::Upper>::rankUpdate(L, v, sigma);
+  }
+
+  env->ReleaseDoubleArrayElements(mat, matBody, 0);
+  env->ReleaseDoubleArrayElements(vec, vecBody, 0);
+}
+
+/*
+ * Class:     edu_wpi_first_math_WPIMathJNI
+ * Method:    solveFullPivHouseholderQr
+ * Signature: ([DII[DII[D)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_math_WPIMathJNI_solveFullPivHouseholderQr
+  (JNIEnv* env, jclass, jdoubleArray A, jint Arows, jint Acols, jdoubleArray B,
+   jint Brows, jint Bcols, jdoubleArray dst)
+{
+  jdouble* nativeA = env->GetDoubleArrayElements(A, nullptr);
+  jdouble* nativeB = env->GetDoubleArrayElements(B, nullptr);
+
+  Eigen::Map<
+      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>
+      Amat{nativeA, Arows, Acols};
+  Eigen::Map<
+      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>
+      Bmat{nativeB, Brows, Bcols};
+
+  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> Xmat =
+      Amat.fullPivHouseholderQr().solve(Bmat);
+
+  env->ReleaseDoubleArrayElements(A, nativeA, 0);
+  env->ReleaseDoubleArrayElements(B, nativeB, 0);
+  env->SetDoubleArrayRegion(dst, 0, Brows * Bcols, Xmat.data());
 }
 
 }  // extern "C"

@@ -2,8 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef NTCORE_NETWORKTABLES_NETWORKTABLEENTRY_INC_
-#define NTCORE_NETWORKTABLES_NETWORKTABLEENTRY_INC_
+#pragma once
 
 #include <memory>
 #include <string>
@@ -11,6 +10,8 @@
 #include <vector>
 
 #include "networktables/NetworkTableEntry.h"
+#include "ntcore_cpp.h"
+#include "ntcore_cpp_types.h"
 
 namespace nt {
 
@@ -39,307 +40,208 @@ inline unsigned int NetworkTableEntry::GetFlags() const {
   return GetEntryFlags(m_handle);
 }
 
-inline uint64_t NetworkTableEntry::GetLastChange() const {
+inline int64_t NetworkTableEntry::GetLastChange() const {
   return GetEntryLastChange(m_handle);
 }
 
-inline EntryInfo NetworkTableEntry::GetInfo() const {
-  return GetEntryInfo(m_handle);
-}
-
-inline std::shared_ptr<Value> NetworkTableEntry::GetValue() const {
+inline Value NetworkTableEntry::GetValue() const {
   return GetEntryValue(m_handle);
 }
 
 inline bool NetworkTableEntry::GetBoolean(bool defaultValue) const {
-  auto value = GetEntryValue(m_handle);
-  if (!value || value->type() != NT_BOOLEAN) {
-    return defaultValue;
-  }
-  return value->GetBoolean();
+  return nt::GetBoolean(m_handle, defaultValue);
+}
+
+inline int64_t NetworkTableEntry::GetInteger(int64_t defaultValue) const {
+  return nt::GetInteger(m_handle, defaultValue);
+}
+
+inline float NetworkTableEntry::GetFloat(float defaultValue) const {
+  return nt::GetFloat(m_handle, defaultValue);
 }
 
 inline double NetworkTableEntry::GetDouble(double defaultValue) const {
-  auto value = GetEntryValue(m_handle);
-  if (!value || value->type() != NT_DOUBLE) {
-    return defaultValue;
-  }
-  return value->GetDouble();
+  return nt::GetDouble(m_handle, defaultValue);
 }
 
 inline std::string NetworkTableEntry::GetString(
     std::string_view defaultValue) const {
-  auto value = GetEntryValue(m_handle);
-  if (!value || value->type() != NT_STRING) {
-    return std::string{defaultValue};
-  }
-  return std::string{value->GetString()};
+  return nt::GetString(m_handle, defaultValue);
 }
 
-inline std::string NetworkTableEntry::GetRaw(
-    std::string_view defaultValue) const {
-  auto value = GetEntryValue(m_handle);
-  if (!value || value->type() != NT_RAW) {
-    return std::string{defaultValue};
-  }
-  return std::string{value->GetRaw()};
+inline std::vector<uint8_t> NetworkTableEntry::GetRaw(
+    std::span<const uint8_t> defaultValue) const {
+  return nt::GetRaw(m_handle, defaultValue);
 }
 
 inline std::vector<int> NetworkTableEntry::GetBooleanArray(
-    wpi::span<const int> defaultValue) const {
-  auto value = GetEntryValue(m_handle);
-  if (!value || value->type() != NT_BOOLEAN_ARRAY) {
-    return {defaultValue.begin(), defaultValue.end()};
-  }
-  auto arr = value->GetBooleanArray();
-  return {arr.begin(), arr.end()};
+    std::span<const int> defaultValue) const {
+  return nt::GetBooleanArray(m_handle, defaultValue);
 }
 
-inline std::vector<int> NetworkTableEntry::GetBooleanArray(
-    std::initializer_list<int> defaultValue) const {
-  return GetBooleanArray({defaultValue.begin(), defaultValue.end()});
+inline std::vector<int64_t> NetworkTableEntry::GetIntegerArray(
+    std::span<const int64_t> defaultValue) const {
+  return nt::GetIntegerArray(m_handle, defaultValue);
 }
 
-inline std::vector<double> NetworkTableEntry::GetDoubleArray(
-    wpi::span<const double> defaultValue) const {
-  auto value = GetEntryValue(m_handle);
-  if (!value || value->type() != NT_DOUBLE_ARRAY) {
-    return {defaultValue.begin(), defaultValue.end()};
-  }
-  auto arr = value->GetDoubleArray();
-  return {arr.begin(), arr.end()};
+inline std::vector<float> NetworkTableEntry::GetFloatArray(
+    std::span<const float> defaultValue) const {
+  return nt::GetFloatArray(m_handle, defaultValue);
 }
 
 inline std::vector<double> NetworkTableEntry::GetDoubleArray(
-    std::initializer_list<double> defaultValue) const {
-  return GetDoubleArray({defaultValue.begin(), defaultValue.end()});
+    std::span<const double> defaultValue) const {
+  return nt::GetDoubleArray(m_handle, defaultValue);
 }
 
 inline std::vector<std::string> NetworkTableEntry::GetStringArray(
-    wpi::span<const std::string> defaultValue) const {
-  auto value = GetEntryValue(m_handle);
-  if (!value || value->type() != NT_STRING_ARRAY) {
-    return {defaultValue.begin(), defaultValue.end()};
-  }
-  auto arr = value->GetStringArray();
-  return {arr.begin(), arr.end()};
+    std::span<const std::string> defaultValue) const {
+  return nt::GetStringArray(m_handle, defaultValue);
 }
 
-inline std::vector<std::string> NetworkTableEntry::GetStringArray(
-    std::initializer_list<std::string> defaultValue) const {
-  return GetStringArray({defaultValue.begin(), defaultValue.end()});
+inline std::vector<NetworkTableValue> NetworkTableEntry::ReadQueue() {
+  return nt::ReadQueueValue(m_handle);
 }
 
-inline bool NetworkTableEntry::SetDefaultValue(std::shared_ptr<Value> value) {
-  return SetDefaultEntryValue(m_handle, value);
+inline bool NetworkTableEntry::SetDefaultValue(const Value& defaultValue) {
+  return SetDefaultEntryValue(m_handle, defaultValue);
 }
 
 inline bool NetworkTableEntry::SetDefaultBoolean(bool defaultValue) {
-  return SetDefaultEntryValue(m_handle, Value::MakeBoolean(defaultValue));
+  return nt::SetDefaultBoolean(m_handle, defaultValue);
+}
+
+inline bool NetworkTableEntry::SetDefaultInteger(int64_t defaultValue) {
+  return nt::SetDefaultInteger(m_handle, defaultValue);
+}
+
+inline bool NetworkTableEntry::SetDefaultFloat(float defaultValue) {
+  return nt::SetDefaultFloat(m_handle, defaultValue);
 }
 
 inline bool NetworkTableEntry::SetDefaultDouble(double defaultValue) {
-  return SetDefaultEntryValue(m_handle, Value::MakeDouble(defaultValue));
+  return nt::SetDefaultDouble(m_handle, defaultValue);
 }
 
 inline bool NetworkTableEntry::SetDefaultString(std::string_view defaultValue) {
-  return SetDefaultEntryValue(m_handle, Value::MakeString(defaultValue));
+  return nt::SetDefaultString(m_handle, defaultValue);
 }
 
-inline bool NetworkTableEntry::SetDefaultRaw(std::string_view defaultValue) {
-  return SetDefaultEntryValue(m_handle, Value::MakeRaw(defaultValue));
-}
-
-inline bool NetworkTableEntry::SetDefaultBooleanArray(
-    wpi::span<const int> defaultValue) {
-  return SetDefaultEntryValue(m_handle, Value::MakeBooleanArray(defaultValue));
+inline bool NetworkTableEntry::SetDefaultRaw(
+    std::span<const uint8_t> defaultValue) {
+  return nt::SetDefaultRaw(m_handle, defaultValue);
 }
 
 inline bool NetworkTableEntry::SetDefaultBooleanArray(
-    std::initializer_list<int> defaultValue) {
-  return SetDefaultEntryValue(m_handle, Value::MakeBooleanArray(defaultValue));
+    std::span<const int> defaultValue) {
+  return nt::SetDefaultBooleanArray(m_handle, defaultValue);
+}
+
+inline bool NetworkTableEntry::SetDefaultIntegerArray(
+    std::span<const int64_t> defaultValue) {
+  return nt::SetDefaultIntegerArray(m_handle, defaultValue);
+}
+
+inline bool NetworkTableEntry::SetDefaultFloatArray(
+    std::span<const float> defaultValue) {
+  return nt::SetDefaultFloatArray(m_handle, defaultValue);
 }
 
 inline bool NetworkTableEntry::SetDefaultDoubleArray(
-    wpi::span<const double> defaultValue) {
-  return SetDefaultEntryValue(m_handle, Value::MakeDoubleArray(defaultValue));
-}
-
-inline bool NetworkTableEntry::SetDefaultDoubleArray(
-    std::initializer_list<double> value) {
-  return SetDefaultEntryValue(m_handle, Value::MakeDoubleArray(value));
+    std::span<const double> defaultValue) {
+  return nt::SetDefaultDoubleArray(m_handle, defaultValue);
 }
 
 inline bool NetworkTableEntry::SetDefaultStringArray(
-    wpi::span<const std::string> defaultValue) {
-  return SetDefaultEntryValue(m_handle, Value::MakeStringArray(defaultValue));
+    std::span<const std::string> defaultValue) {
+  return nt::SetDefaultStringArray(m_handle, defaultValue);
 }
 
-inline bool NetworkTableEntry::SetDefaultStringArray(
-    std::initializer_list<std::string> defaultValue) {
-  return SetDefaultEntryValue(m_handle, Value::MakeStringArray(defaultValue));
-}
-
-inline bool NetworkTableEntry::SetValue(std::shared_ptr<Value> value) {
+inline bool NetworkTableEntry::SetValue(const Value& value) {
   return SetEntryValue(m_handle, value);
 }
 
-inline bool NetworkTableEntry::SetBoolean(bool value) {
-  return SetEntryValue(m_handle, Value::MakeBoolean(value));
+inline bool NetworkTableEntry::SetBoolean(bool value, int64_t time) {
+  return nt::SetBoolean(m_handle, value, time);
 }
 
-inline bool NetworkTableEntry::SetDouble(double value) {
-  return SetEntryValue(m_handle, Value::MakeDouble(value));
+inline bool NetworkTableEntry::SetInteger(int64_t value, int64_t time) {
+  return nt::SetInteger(m_handle, value, time);
 }
 
-inline bool NetworkTableEntry::SetString(std::string_view value) {
-  return SetEntryValue(m_handle, Value::MakeString(value));
+inline bool NetworkTableEntry::SetFloat(float value, int64_t time) {
+  return nt::SetFloat(m_handle, value, time);
 }
 
-inline bool NetworkTableEntry::SetRaw(std::string_view value) {
-  return SetEntryValue(m_handle, Value::MakeRaw(value));
+inline bool NetworkTableEntry::SetDouble(double value, int64_t time) {
+  return nt::SetDouble(m_handle, value, time);
 }
 
-inline bool NetworkTableEntry::SetBooleanArray(wpi::span<const bool> value) {
-  return SetEntryValue(m_handle, Value::MakeBooleanArray(value));
+inline bool NetworkTableEntry::SetString(std::string_view value, int64_t time) {
+  return nt::SetString(m_handle, value, time);
 }
 
-inline bool NetworkTableEntry::SetBooleanArray(
-    std::initializer_list<bool> value) {
-  return SetEntryValue(m_handle, Value::MakeBooleanArray(value));
+inline bool NetworkTableEntry::SetRaw(std::span<const uint8_t> value,
+                                      int64_t time) {
+  return nt::SetRaw(m_handle, value, time);
 }
 
-inline bool NetworkTableEntry::SetBooleanArray(wpi::span<const int> value) {
-  return SetEntryValue(m_handle, Value::MakeBooleanArray(value));
+inline bool NetworkTableEntry::SetBooleanArray(std::span<const bool> value,
+                                               int64_t time) {
+  return SetEntryValue(m_handle, Value::MakeBooleanArray(value, time));
 }
 
-inline bool NetworkTableEntry::SetBooleanArray(
-    std::initializer_list<int> value) {
-  return SetEntryValue(m_handle, Value::MakeBooleanArray(value));
+inline bool NetworkTableEntry::SetBooleanArray(std::span<const int> value,
+                                               int64_t time) {
+  return nt::SetBooleanArray(m_handle, value, time);
 }
 
-inline bool NetworkTableEntry::SetDoubleArray(wpi::span<const double> value) {
-  return SetEntryValue(m_handle, Value::MakeDoubleArray(value));
+inline bool NetworkTableEntry::SetIntegerArray(std::span<const int64_t> value,
+                                               int64_t time) {
+  return nt::SetIntegerArray(m_handle, value, time);
 }
 
-inline bool NetworkTableEntry::SetDoubleArray(
-    std::initializer_list<double> value) {
-  return SetEntryValue(m_handle, Value::MakeDoubleArray(value));
+inline bool NetworkTableEntry::SetFloatArray(std::span<const float> value,
+                                             int64_t time) {
+  return nt::SetFloatArray(m_handle, value, time);
+}
+
+inline bool NetworkTableEntry::SetDoubleArray(std::span<const double> value,
+                                              int64_t time) {
+  return nt::SetDoubleArray(m_handle, value, time);
 }
 
 inline bool NetworkTableEntry::SetStringArray(
-    wpi::span<const std::string> value) {
-  return SetEntryValue(m_handle, Value::MakeStringArray(value));
-}
-
-inline bool NetworkTableEntry::SetStringArray(
-    std::initializer_list<std::string> value) {
-  return SetEntryValue(m_handle, Value::MakeStringArray(value));
-}
-
-inline void NetworkTableEntry::ForceSetValue(std::shared_ptr<Value> value) {
-  SetEntryTypeValue(m_handle, value);
-}
-
-inline void NetworkTableEntry::ForceSetBoolean(bool value) {
-  SetEntryTypeValue(m_handle, Value::MakeBoolean(value));
-}
-
-inline void NetworkTableEntry::ForceSetDouble(double value) {
-  SetEntryTypeValue(m_handle, Value::MakeDouble(value));
-}
-
-inline void NetworkTableEntry::ForceSetString(std::string_view value) {
-  SetEntryTypeValue(m_handle, Value::MakeString(value));
-}
-
-inline void NetworkTableEntry::ForceSetRaw(std::string_view value) {
-  SetEntryTypeValue(m_handle, Value::MakeRaw(value));
-}
-
-inline void NetworkTableEntry::ForceSetBooleanArray(
-    wpi::span<const bool> value) {
-  SetEntryTypeValue(m_handle, Value::MakeBooleanArray(value));
-}
-
-inline void NetworkTableEntry::ForceSetBooleanArray(
-    std::initializer_list<bool> value) {
-  SetEntryTypeValue(m_handle, Value::MakeBooleanArray(value));
-}
-
-inline void NetworkTableEntry::ForceSetBooleanArray(
-    wpi::span<const int> value) {
-  SetEntryTypeValue(m_handle, Value::MakeBooleanArray(value));
-}
-
-inline void NetworkTableEntry::ForceSetBooleanArray(
-    std::initializer_list<int> value) {
-  SetEntryTypeValue(m_handle, Value::MakeBooleanArray(value));
-}
-
-inline void NetworkTableEntry::ForceSetDoubleArray(
-    wpi::span<const double> value) {
-  SetEntryTypeValue(m_handle, Value::MakeDoubleArray(value));
-}
-
-inline void NetworkTableEntry::ForceSetDoubleArray(
-    std::initializer_list<double> value) {
-  SetEntryTypeValue(m_handle, Value::MakeDoubleArray(value));
-}
-
-inline void NetworkTableEntry::ForceSetStringArray(
-    wpi::span<const std::string> value) {
-  SetEntryTypeValue(m_handle, Value::MakeStringArray(value));
-}
-
-inline void NetworkTableEntry::ForceSetStringArray(
-    std::initializer_list<std::string> value) {
-  SetEntryTypeValue(m_handle, Value::MakeStringArray(value));
+    std::span<const std::string> value, int64_t time) {
+  return nt::SetStringArray(m_handle, value, time);
 }
 
 inline void NetworkTableEntry::SetFlags(unsigned int flags) {
-  SetEntryFlags(m_handle, GetFlags() | flags);
+  SetEntryFlags(m_handle, GetEntryFlags(m_handle) | flags);
 }
 
 inline void NetworkTableEntry::ClearFlags(unsigned int flags) {
-  SetEntryFlags(m_handle, GetFlags() & ~flags);
+  SetEntryFlags(m_handle, GetEntryFlags(m_handle) & ~flags);
 }
 
 inline void NetworkTableEntry::SetPersistent() {
-  SetFlags(kPersistent);
+  nt::SetTopicPersistent(nt::GetTopicFromHandle(m_handle), true);
 }
 
 inline void NetworkTableEntry::ClearPersistent() {
-  ClearFlags(kPersistent);
+  nt::SetTopicPersistent(nt::GetTopicFromHandle(m_handle), false);
 }
 
 inline bool NetworkTableEntry::IsPersistent() const {
-  return (GetFlags() & kPersistent) != 0;
+  return nt::GetTopicPersistent(nt::GetTopicFromHandle(m_handle));
+}
+
+inline void NetworkTableEntry::Unpublish() {
+  return nt::Unpublish(m_handle);
 }
 
 inline void NetworkTableEntry::Delete() {
-  DeleteEntry(m_handle);
-}
-
-inline void NetworkTableEntry::CreateRpc(
-    std::function<void(const RpcAnswer& answer)> callback) {
-  ::nt::CreateRpc(m_handle, std::string_view("\0", 1), callback);
-}
-
-inline RpcCall NetworkTableEntry::CallRpc(std::string_view params) {
-  return RpcCall{m_handle, ::nt::CallRpc(m_handle, params)};
-}
-
-inline NT_EntryListener NetworkTableEntry::AddListener(
-    std::function<void(const EntryNotification& event)> callback,
-    unsigned int flags) const {
-  return AddEntryListener(m_handle, callback, flags);
-}
-
-inline void NetworkTableEntry::RemoveListener(NT_EntryListener entry_listener) {
-  RemoveEntryListener(entry_listener);
+  Unpublish();
 }
 
 }  // namespace nt
-
-#endif  // NTCORE_NETWORKTABLES_NETWORKTABLEENTRY_INC_

@@ -14,7 +14,9 @@ import edu.wpi.first.hal.HALUtil;
 import edu.wpi.first.math.MathShared;
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
+import edu.wpi.first.networktables.MultiSubscriber;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.util.WPILibVersion;
@@ -27,16 +29,20 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
 /**
- * Implement a Robot Program framework. The RobotBase class is intended to be subclassed by a user
- * creating a robot program. Overridden autonomous() and operatorControl() methods are called at the
- * appropriate time as the match proceeds. In the current implementation, the Autonomous code will
- * run to completion before the OperatorControl code could start. In the future the Autonomous code
- * might be spawned as a task, then killed at the end of the Autonomous period.
+ * Implement a Robot Program framework. The RobotBase class is intended to be subclassed to create a
+ * robot program. The user must implement {@link #startCompetition()}, which will be called once and
+ * is not expected to exit. The user must also implement {@link #endCompetition()}, which signals to
+ * the code in {@link #startCompetition()} that it should exit.
+ *
+ * <p>It is not recommended to subclass this class directly - instead subclass IterativeRobotBase or
+ * TimedRobot.
  */
 public abstract class RobotBase implements AutoCloseable {
   /** The ID of the main Java thread. */
   // This is usually 1, but it is best to make sure
   private static long m_threadId = -1;
+
+  private final MultiSubscriber m_suball;
 
   private static void setupCameraServerShared() {
     CameraServerShared shared =
@@ -125,29 +131,48 @@ public abstract class RobotBase implements AutoCloseable {
                 break;
             }
           }
+
+          @Override
+          public double getTimestamp() {
+            return WPIUtilJNI.now() * 1.0e-6;
+          }
         });
   }
 
   /**
-   * Constructor for a generic robot program. User code should be placed in the constructor that
-   * runs before the Autonomous or Operator Control period starts. The constructor will run to
-   * completion before Autonomous is entered.
+   * Constructor for a generic robot program. User code can be placed in the constructor that runs
+   * before the Autonomous or Operator Control period starts. The constructor will run to completion
+   * before Autonomous is entered.
    *
    * <p>This must be used to ensure that the communications code starts. In the future it would be
-   * nice to put this code into it's own task that loads on boot so ensure that it runs.
+   * nice to put this code into its own task that loads on boot so ensure that it runs.
    */
   protected RobotBase() {
     final NetworkTableInstance inst = NetworkTableInstance.getDefault();
     m_threadId = Thread.currentThread().getId();
     setupCameraServerShared();
     setupMathShared();
-    inst.setNetworkIdentity("Robot");
+    // subscribe to "" to force persistent values to propagate to local
+    m_suball = new MultiSubscriber(inst, new String[] {""});
     if (isReal()) {
-      inst.startServer("/home/lvuser/networktables.ini");
+      inst.startServer("/home/lvuser/networktables.json");
     } else {
       inst.startServer();
     }
-    inst.getTable("LiveWindow").getSubTable(".status").getEntry("LW Enabled").setBoolean(false);
+
+    // wait for the NT server to actually start
+    try {
+      int count = 0;
+      while (inst.getNetworkMode().contains(NetworkTableInstance.NetworkMode.kStarting)) {
+        Thread.sleep(10);
+        count++;
+        if (count > 100) {
+          throw new InterruptedException();
+        }
+      }
+    } catch (InterruptedException ex) {
+      System.err.println("timed out while waiting for NT server to start");
+    }
 
     LiveWindow.setEnabled(false);
     Shuffleboard.disableActuatorWidgets();
@@ -158,7 +183,9 @@ public abstract class RobotBase implements AutoCloseable {
   }
 
   @Override
-  public void close() {}
+  public void close() {
+    m_suball.close();
+  }
 
   /**
    * Get the current runtime type.
@@ -191,7 +218,7 @@ public abstract class RobotBase implements AutoCloseable {
   /**
    * Determine if the Robot is currently disabled.
    *
-   * @return True if the Robot is currently disabled by the field controls.
+   * @return True if the Robot is currently disabled by the Driver Station.
    */
   public boolean isDisabled() {
     return DriverStation.isDisabled();
@@ -200,14 +227,14 @@ public abstract class RobotBase implements AutoCloseable {
   /**
    * Determine if the Robot is currently enabled.
    *
-   * @return True if the Robot is currently enabled by the field controls.
+   * @return True if the Robot is currently enabled by the Driver Station.
    */
   public boolean isEnabled() {
     return DriverStation.isEnabled();
   }
 
   /**
-   * Determine if the robot is currently in Autonomous mode as determined by the field controls.
+   * Determine if the robot is currently in Autonomous mode as determined by the Driver Station.
    *
    * @return True if the robot is currently operating Autonomously.
    */
@@ -216,8 +243,8 @@ public abstract class RobotBase implements AutoCloseable {
   }
 
   /**
-   * Determine if the robot is current in Autonomous mode and enabled as determined by the field
-   * controls.
+   * Determine if the robot is currently in Autonomous mode and enabled as determined by the Driver
+   * Station.
    *
    * @return True if the robot is currently operating autonomously while enabled.
    */
@@ -226,7 +253,7 @@ public abstract class RobotBase implements AutoCloseable {
   }
 
   /**
-   * Determine if the robot is currently in Test mode as determined by the driver station.
+   * Determine if the robot is currently in Test mode as determined by the Driver Station.
    *
    * @return True if the robot is currently operating in Test mode.
    */
@@ -235,20 +262,17 @@ public abstract class RobotBase implements AutoCloseable {
   }
 
   /**
-   * Determine if the robot is currently in Operator Control mode as determined by the field
-   * controls.
+   * Determine if the robot is current in Test mode and enabled as determined by the Driver Station.
    *
-   * @return True if the robot is currently operating in Tele-Op mode.
-   * @deprecated Use isTeleop() instead.
+   * @return True if the robot is currently operating in Test mode while enabled.
    */
-  @Deprecated(since = "2022", forRemoval = true)
-  public boolean isOperatorControl() {
-    return DriverStation.isTeleop();
+  public boolean isTestEnabled() {
+    return DriverStation.isTestEnabled();
   }
 
   /**
-   * Determine if the robot is currently in Operator Control mode as determined by the field
-   * controls.
+   * Determine if the robot is currently in Operator Control mode as determined by the Driver
+   * Station.
    *
    * @return True if the robot is currently operating in Tele-Op mode.
    */
@@ -257,20 +281,8 @@ public abstract class RobotBase implements AutoCloseable {
   }
 
   /**
-   * Determine if the robot is current in Operator Control mode and enabled as determined by the
-   * field controls.
-   *
-   * @return True if the robot is currently operating in Tele-Op mode while enabled.
-   * @deprecated Use isTeleopEnabled() instead.
-   */
-  @Deprecated(since = "2022", forRemoval = true)
-  public boolean isOperatorControlEnabled() {
-    return DriverStation.isTeleopEnabled();
-  }
-
-  /**
-   * Determine if the robot is current in Operator Control mode and enabled as determined by the
-   * field controls.
+   * Determine if the robot is currently in Operator Control mode and enabled as determined by the
+   * Driver Station.
    *
    * @return True if the robot is currently operating in Tele-Op mode while enabled.
    */
@@ -279,41 +291,19 @@ public abstract class RobotBase implements AutoCloseable {
   }
 
   /**
-   * Indicates if new data is available from the driver station.
-   *
-   * @return Has new data arrived over the network since the last time this function was called?
+   * Start the main robot code. This function will be called once and should not exit until
+   * signalled by {@link #endCompetition()}
    */
-  public boolean isNewDataAvailable() {
-    return DriverStation.isNewControlData();
-  }
-
-  /** Provide an alternate "main loop" via startCompetition(). */
   public abstract void startCompetition();
 
-  /** Ends the main loop in startCompetition(). */
+  /** Ends the main loop in {@link #startCompetition()}. */
   public abstract void endCompetition();
-
-  @SuppressWarnings("MissingJavadocMethod")
-  public static boolean getBooleanProperty(String name, boolean defaultValue) {
-    String propVal = System.getProperty(name);
-    if (propVal == null) {
-      return defaultValue;
-    }
-    if ("false".equalsIgnoreCase(propVal)) {
-      return false;
-    } else if ("true".equalsIgnoreCase(propVal)) {
-      return true;
-    } else {
-      throw new IllegalStateException(propVal);
-    }
-  }
 
   private static final ReentrantLock m_runMutex = new ReentrantLock();
   private static RobotBase m_robotCopy;
   private static boolean m_suppressExitWarning;
 
   /** Run the robot main loop. */
-  @SuppressWarnings({"PMD.AvoidCatchingThrowable", "PMD.AvoidReassigningCatchVariables"})
   private static <T extends RobotBase> void runRobot(Supplier<T> robotSupplier) {
     System.out.println("********** Robot program starting **********");
 
@@ -424,6 +414,9 @@ public abstract class RobotBase implements AutoCloseable {
     if (!HAL.initialize(500, 0)) {
       throw new IllegalStateException("Failed to initialize. Terminating");
     }
+
+    // Force refresh DS data
+    DriverStation.refreshData();
 
     // Call a CameraServer JNI function to force OpenCV native library loading
     // Needed because all the OpenCV JNI functions don't have built in loading

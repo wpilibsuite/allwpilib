@@ -4,10 +4,11 @@
 
 #pragma once
 
+#include <optional>
 #include <string>
 
 #include <units/time.h>
-#include <wpi/deprecated.h>
+#include <wpi/Synchronization.h>
 
 namespace wpi::log {
 class DataLog;
@@ -19,19 +20,10 @@ namespace frc {
  * Provide access to the network communication data to / from the Driver
  * Station.
  */
-class DriverStation {
+class DriverStation final {
  public:
-  enum Alliance { kRed, kBlue, kInvalid };
+  enum Alliance { kRed, kBlue };
   enum MatchType { kNone, kPractice, kQualification, kElimination };
-
-  /**
-   * Return a reference to the singleton DriverStation.
-   *
-   * @return Reference to the DS instance
-   * @deprecated Use the static methods
-   */
-  WPI_DEPRECATED("Use static methods")
-  static DriverStation& GetInstance();
 
   static constexpr int kJoystickPorts = 6;
 
@@ -200,27 +192,8 @@ class DriverStation {
    * Check if the DS is commanding teleop mode.
    *
    * @return True if the robot is being commanded to be in teleop mode
-   * @deprecated Use IsTeleop() instead.
-   */
-  WPI_DEPRECATED("Use IsTeleop() instead")
-  static bool IsOperatorControl();
-
-  /**
-   * Check if the DS is commanding teleop mode.
-   *
-   * @return True if the robot is being commanded to be in teleop mode
    */
   static bool IsTeleop();
-
-  /**
-   * Check if the DS is commanding teleop mode and if it has enabled the robot.
-   *
-   * @return True if the robot is being commanded to be in teleop mode and
-   * enabled.
-   * @deprecated Use IsTeleopEnabled() instead.
-   */
-  WPI_DEPRECATED("Use IsTeleopEnabled() instead")
-  static bool IsOperatorControlEnabled();
 
   /**
    * Check if the DS is commanding teleop mode and if it has enabled the robot.
@@ -238,22 +211,19 @@ class DriverStation {
   static bool IsTest();
 
   /**
+   * Check if the DS is commanding Test mode and if it has enabled the robot.
+   *
+   * @return True if the robot is being commanded to be in Test mode and
+   * enabled.
+   */
+  static bool IsTestEnabled();
+
+  /**
    * Check if the DS is attached.
    *
    * @return True if the DS is connected to the robot
    */
   static bool IsDSAttached();
-
-  /**
-   * Has a new control packet from the driver station arrived since the last
-   * time this function was called?
-   *
-   * Warning: If you call this function from more than one place at the same
-   * time, you will not get the intended behavior.
-   *
-   * @return True if the control data has been updated since the last call.
-   */
-  static bool IsNewControlData();
 
   /**
    * Is the driver station attached to a Field Management System?
@@ -265,6 +235,9 @@ class DriverStation {
 
   /**
    * Returns the game specific message provided by the FMS.
+   *
+   * If the FMS is not connected, it is set from the game data setting on the
+   * driver station.
    *
    * @return A string containing the game specific message.
    */
@@ -301,57 +274,36 @@ class DriverStation {
   static int GetReplayNumber();
 
   /**
-   * Return the alliance that the driver station says it is on.
+   * Return the alliance that the driver station says it is on from the FMS.
+   *
+   * If the FMS is not connected, it is set from the team alliance setting on
+   * the driver station.
    *
    * This could return kRed or kBlue.
    *
    * @return The Alliance enum (kRed, kBlue or kInvalid)
    */
-  static Alliance GetAlliance();
+  static std::optional<Alliance> GetAlliance();
 
   /**
-   * Return the driver station location on the field.
+   * Return the driver station location from the FMS.
+   *
+   * If the FMS is not connected, it is set from the team alliance setting on
+   * the driver station.
    *
    * This could return 1, 2, or 3.
    *
    * @return The location of the driver station (1-3, 0 for invalid)
    */
-  static int GetLocation();
+  static std::optional<int> GetLocation();
 
   /**
-   * Wait until a new packet comes from the driver station.
+   * Wait for a DS connection.
    *
-   * This blocks on a semaphore, so the waiting is efficient.
-   *
-   * This is a good way to delay processing until there is new driver station
-   * data to act on.
-   *
-   * Checks if new control data has arrived since the last waitForData call
-   * on the current thread. If new data has not arrived, returns immediately.
+   * @param timeout timeout in seconds. 0 for infinite.
+   * @return true if connected, false if timeout
    */
-  static void WaitForData();
-
-  /**
-   * Wait until a new packet comes from the driver station, or wait for a
-   * timeout.
-   *
-   * Checks if new control data has arrived since the last waitForData call
-   * on the current thread. If new data has not arrived, returns immediately.
-   *
-   * If the timeout is less then or equal to 0, wait indefinitely.
-   *
-   * Timeout is in milliseconds
-   *
-   * This blocks on a semaphore, so the waiting is efficient.
-   *
-   * This is a good way to delay processing until there is new driver station
-   * data to act on.
-   *
-   * @param timeout Timeout
-   *
-   * @return true if new data, otherwise false
-   */
-  static bool WaitForData(units::second_t timeout);
+  static bool WaitForDsConnection(units::second_t timeout);
 
   /**
    * Return the approximate match time.
@@ -377,56 +329,10 @@ class DriverStation {
    */
   static double GetBatteryVoltage();
 
-  /**
-   * Only to be used to tell the Driver Station what code you claim to be
-   * executing for diagnostic purposes only.
-   *
-   * @param entering If true, starting disabled code; if false, leaving disabled
-   *                 code.
-   */
-  static void InDisabled(bool entering);
+  static void RefreshData();
 
-  /**
-   * Only to be used to tell the Driver Station what code you claim to be
-   * executing for diagnostic purposes only.
-   *
-   * @param entering If true, starting autonomous code; if false, leaving
-   *                 autonomous code.
-   */
-  static void InAutonomous(bool entering);
-
-  /**
-   * Only to be used to tell the Driver Station what code you claim to be
-   * executing for diagnostic purposes only.
-   *
-   * @param entering If true, starting teleop code; if false, leaving teleop
-   *                 code.
-   * @deprecated Use InTeleop() instead.
-   */
-  WPI_DEPRECATED("Use InTeleop() instead")
-  static void InOperatorControl(bool entering);
-
-  /**
-   * Only to be used to tell the Driver Station what code you claim to be
-   * executing for diagnostic purposes only.
-   *
-   * @param entering If true, starting teleop code; if false, leaving teleop
-   *                 code.
-   */
-  static void InTeleop(bool entering);
-
-  /**
-   * Only to be used to tell the Driver Station what code you claim to be
-   * executing for diagnostic purposes only.
-   *
-   * @param entering If true, starting test code; if false, leaving test code.
-   */
-  static void InTest(bool entering);
-
-  /**
-   * Forces WaitForData() to return immediately.
-   */
-  static void WakeupWaitForData();
+  static void ProvideRefreshedDataEventHandle(WPI_EventHandle handle);
+  static void RemoveRefreshedDataEventHandle(WPI_EventHandle handle);
 
   /**
    * Allows the user to specify whether they want joystick connection warnings

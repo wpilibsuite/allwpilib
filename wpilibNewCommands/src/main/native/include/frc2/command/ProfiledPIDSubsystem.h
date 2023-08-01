@@ -7,7 +7,7 @@
 #include <frc/controller/ProfiledPIDController.h>
 #include <units/time.h>
 
-#include "frc2/command/SubsystemBase.h"
+#include "frc2/command/Subsystem.h"
 
 namespace frc2 {
 /**
@@ -19,7 +19,7 @@ namespace frc2 {
  * @see ProfiledPIDController
  */
 template <class Distance>
-class ProfiledPIDSubsystem : public SubsystemBase {
+class ProfiledPIDSubsystem : public Subsystem {
   using Distance_t = units::unit_t<Distance>;
   using Velocity =
       units::compound_unit<Distance, units::inverse<units::seconds>>;
@@ -41,7 +41,7 @@ class ProfiledPIDSubsystem : public SubsystemBase {
 
   void Periodic() override {
     if (m_enabled) {
-      UseOutput(m_controller.Calculate(GetMeasurement(), m_goal),
+      UseOutput(m_controller.Calculate(GetMeasurement()),
                 m_controller.GetSetpoint());
     }
   }
@@ -51,14 +51,14 @@ class ProfiledPIDSubsystem : public SubsystemBase {
    *
    * @param goal The goal state for the subsystem's motion profile.
    */
-  void SetGoal(State goal) { m_goal = goal; }
+  void SetGoal(State goal) { m_controller.SetGoal(goal); }
 
   /**
    * Sets the goal state for the subsystem.  Goal velocity assumed to be zero.
    *
    * @param goal The goal position for the subsystem's motion profile.
    */
-  void SetGoal(Distance_t goal) { m_goal = State{goal, Velocity_t(0)}; }
+  void SetGoal(Distance_t goal) { SetGoal(State{goal, Velocity_t(0)}); }
 
   /**
    * Enables the PID control. Resets the controller.
@@ -110,8 +110,5 @@ class ProfiledPIDSubsystem : public SubsystemBase {
    * feedforward
    */
   virtual void UseOutput(double output, State setpoint) = 0;
-
- private:
-  State m_goal;
 };
 }  // namespace frc2

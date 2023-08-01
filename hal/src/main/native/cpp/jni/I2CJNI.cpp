@@ -64,6 +64,16 @@ Java_edu_wpi_first_hal_I2CJNI_i2CTransactionB
   (JNIEnv* env, jclass, jint port, jbyte address, jbyteArray dataToSend,
    jbyte sendSize, jbyteArray dataReceived, jbyte receiveSize)
 {
+  if (sendSize < 0) {
+    ThrowIllegalArgumentException(env, "I2CJNI.i2cTransactionB() sendSize < 0");
+    return 0;
+  }
+  if (receiveSize < 0) {
+    ThrowIllegalArgumentException(env,
+                                  "I2CJNI.i2cTransactionB() receiveSize < 0");
+    return 0;
+  }
+
   wpi::SmallVector<uint8_t, 128> recvBuf;
   recvBuf.resize(receiveSize);
   jint returnValue =
@@ -142,6 +152,11 @@ Java_edu_wpi_first_hal_I2CJNI_i2CReadB
   (JNIEnv* env, jclass, jint port, jbyte address, jbyteArray dataReceived,
    jbyte receiveSize)
 {
+  if (receiveSize < 0) {
+    ThrowIllegalArgumentException(env, "I2CJNI.i2cReadB() receiveSize < 0");
+    return 0;
+  }
+
   wpi::SmallVector<uint8_t, 128> recvBuf;
   recvBuf.resize(receiveSize);
   jint returnValue = HAL_ReadI2C(static_cast<HAL_I2CPort>(port), address,

@@ -4,6 +4,7 @@
 
 #include <memory>
 #include <string_view>
+#include <unordered_map>
 
 #ifndef _WIN32
 #include <arpa/inet.h>
@@ -19,13 +20,11 @@
 #include <imgui.h>
 #include <libssh/libssh.h>
 #include <wpi/Logger.h>
+#include <wpi/SmallString.h>
 #include <wpi/fs.h>
+#include <wpinet/MulticastServiceResolver.h>
 #include <wpigui.h>
-#include <unordered_map>
-#include <mutex>
-#include "wpi/SmallString.h"
 #include "DeploySession.h"
-#include "wpi/MulticastServiceResolver.h"
 
 namespace gui = wpi::gui;
 
@@ -128,6 +127,8 @@ static void DisplayGui() {
                 static_cast<int>(multicastResolver->HasImplementation()));
     ImGui::Separator();
     ImGui::Text("Save location: %s", glass::GetStorageDir().c_str());
+    ImGui::Text("%.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate,
+                ImGui::GetIO().Framerate);
     if (ImGui::Button("Close")) {
       ImGui::CloseCurrentPopup();
     }

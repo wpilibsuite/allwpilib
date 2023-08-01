@@ -16,16 +16,16 @@ PIDSubsystem::PIDSubsystem(PIDController controller, double initialPosition)
 
 void PIDSubsystem::Periodic() {
   if (m_enabled) {
-    UseOutput(m_controller.Calculate(GetMeasurement(), m_setpoint), m_setpoint);
+    UseOutput(m_controller.Calculate(GetMeasurement()), GetSetpoint());
   }
 }
 
 void PIDSubsystem::SetSetpoint(double setpoint) {
-  m_setpoint = setpoint;
+  m_controller.SetSetpoint(setpoint);
 }
 
 double PIDSubsystem::GetSetpoint() const {
-  return m_setpoint;
+  return m_controller.GetSetpoint();
 }
 
 void PIDSubsystem::Enable() {

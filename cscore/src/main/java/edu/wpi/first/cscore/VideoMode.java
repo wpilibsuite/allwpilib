@@ -4,7 +4,10 @@
 
 package edu.wpi.first.cscore;
 
+import java.util.Objects;
+
 /** Video mode. */
+@SuppressWarnings("MemberName")
 public class VideoMode {
   public enum PixelFormat {
     kUnknown(0),
@@ -12,7 +15,9 @@ public class VideoMode {
     kYUYV(2),
     kRGB565(3),
     kBGR(4),
-    kGray(5);
+    kGray(5),
+    kY16(6),
+    kUYVY(7);
 
     private final int value;
 
@@ -62,18 +67,38 @@ public class VideoMode {
   }
 
   /** Pixel format. */
-  @SuppressWarnings("MemberName")
   public PixelFormat pixelFormat;
 
   /** Width in pixels. */
-  @SuppressWarnings("MemberName")
   public int width;
 
   /** Height in pixels. */
-  @SuppressWarnings("MemberName")
   public int height;
 
   /** Frames per second. */
-  @SuppressWarnings("MemberName")
   public int fps;
+
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+    }
+    if (other == null) {
+      return false;
+    }
+    if (getClass() != other.getClass()) {
+      return false;
+    }
+    VideoMode mode = (VideoMode) other;
+
+    return pixelFormat == mode.pixelFormat
+        && width == mode.width
+        && height == mode.height
+        && fps == mode.fps;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(pixelFormat, width, height, fps);
+  }
 }

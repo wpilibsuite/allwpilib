@@ -4,22 +4,21 @@
 
 package edu.wpi.first.hal;
 
+@SuppressWarnings("MemberName")
 public class CANData {
-  @SuppressWarnings("MemberName")
+  /** Contents of the CAN frame. */
   public final byte[] data = new byte[8];
-
-  @SuppressWarnings("MemberName")
+  /** Length of the frame in bytes. */
   public int length;
-
-  @SuppressWarnings("MemberName")
+  /** CAN frame timestamp in milliseconds. */
   public long timestamp;
 
   /**
    * API used from JNI to set the data.
    *
    * @param length Length of packet in bytes.
-   * @param timestamp CAN frame timestamp in microseconds.
-   * @return Buffer containing CAN frame.
+   * @param timestamp CAN frame timestamp in milliseconds.
+   * @return Buffer to place CAN frame data in.
    */
   @SuppressWarnings("PMD.MethodReturnsInternalArray")
   public byte[] setData(int length, long timestamp) {

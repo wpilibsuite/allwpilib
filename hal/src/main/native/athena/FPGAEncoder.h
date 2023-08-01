@@ -37,7 +37,7 @@ int32_t HAL_GetFPGAEncoder(HAL_FPGAEncoderHandle fpgaEncoderHandle,
 /**
  * Returns the period of the most recent pulse.
  * Returns the period of the most recent Encoder pulse in seconds.
- * This method compenstates for the decoding type.
+ * This method compensates for the decoding type.
  *
  * @deprecated Use GetRate() in favor of this method.  This returns unscaled
  * periods and GetRate() scales using value from SetDistancePerPulse().

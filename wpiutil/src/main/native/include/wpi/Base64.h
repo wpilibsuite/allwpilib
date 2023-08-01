@@ -5,12 +5,13 @@
 #ifndef WPIUTIL_WPI_BASE64_H_
 #define WPIUTIL_WPI_BASE64_H_
 
+#include <stdint.h>
+
 #include <cstddef>
+#include <span>
 #include <string>
 #include <string_view>
 #include <vector>
-
-#include "wpi/span.h"
 
 namespace wpi {
 template <typename T>
@@ -26,8 +27,8 @@ std::string_view Base64Decode(std::string_view encoded, size_t* num_read,
 
 size_t Base64Decode(std::string_view encoded, std::vector<uint8_t>* plain);
 
-span<uint8_t> Base64Decode(std::string_view encoded, size_t* num_read,
-                           SmallVectorImpl<uint8_t>& buf);
+std::span<uint8_t> Base64Decode(std::string_view encoded, size_t* num_read,
+                                SmallVectorImpl<uint8_t>& buf);
 
 void Base64Encode(raw_ostream& os, std::string_view plain);
 
@@ -36,11 +37,11 @@ void Base64Encode(std::string_view plain, std::string* encoded);
 std::string_view Base64Encode(std::string_view plain,
                               SmallVectorImpl<char>& buf);
 
-void Base64Encode(raw_ostream& os, span<const uint8_t> plain);
+void Base64Encode(raw_ostream& os, std::span<const uint8_t> plain);
 
-void Base64Encode(span<const uint8_t> plain, std::string* encoded);
+void Base64Encode(std::span<const uint8_t> plain, std::string* encoded);
 
-std::string_view Base64Encode(span<const uint8_t> plain,
+std::string_view Base64Encode(std::span<const uint8_t> plain,
                               SmallVectorImpl<char>& buf);
 
 }  // namespace wpi

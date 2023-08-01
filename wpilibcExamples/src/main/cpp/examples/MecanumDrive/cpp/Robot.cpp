@@ -21,11 +21,11 @@ class Robot : public frc::TimedRobot {
   }
 
   void TeleopPeriodic() override {
-    /* Use the joystick X axis for lateral movement, Y axis for forward
+    /* Use the joystick Y axis for forward movement, X axis for lateral
      * movement, and Z axis for rotation.
      */
-    m_robotDrive.DriveCartesian(-m_stick.GetY(), m_stick.GetX(),
-                                m_stick.GetZ());
+    m_robotDrive.DriveCartesian(-m_stick.GetY(), -m_stick.GetX(),
+                                -m_stick.GetZ());
   }
 
  private:

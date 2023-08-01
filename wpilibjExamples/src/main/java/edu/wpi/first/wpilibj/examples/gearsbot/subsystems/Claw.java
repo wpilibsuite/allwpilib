@@ -5,17 +5,18 @@
 package edu.wpi.first.wpilibj.examples.gearsbot.subsystems;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.examples.gearsbot.Constants.ClawConstants;
 import edu.wpi.first.wpilibj.motorcontrol.Victor;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 
 /**
  * The claw subsystem is a simple system with a motor for opening and closing. If using stronger
  * motors, you should probably use a sensor so that the motors don't stall.
  */
-public class Claw extends SubsystemBase {
-  private final Victor m_motor = new Victor(7);
-  private final DigitalInput m_contact = new DigitalInput(5);
+public class Claw extends Subsystem {
+  private final Victor m_motor = new Victor(ClawConstants.kMotorPort);
+  private final DigitalInput m_contact = new DigitalInput(ClawConstants.kContactPort);
 
   /** Create a new claw subsystem. */
   public Claw() {

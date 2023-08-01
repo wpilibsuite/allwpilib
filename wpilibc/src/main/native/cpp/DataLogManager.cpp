@@ -4,6 +4,8 @@
 
 #include "frc/DataLogManager.h"
 
+#include <frc/Errors.h>
+
 #include <algorithm>
 #include <ctime>
 #include <random>
@@ -26,6 +28,7 @@ namespace {
 
 struct Thread final : public wpi::SafeThread {
   Thread(std::string_view dir, std::string_view filename, double period);
+  ~Thread() override;
 
   void Main() final;
 
@@ -94,6 +97,10 @@ Thread::Thread(std::string_view dir, std::string_view filename, double period)
   StartNTLog();
 }
 
+Thread::~Thread() {
+  StopNTLog();
+}
+
 void Thread::Main() {
   // based on free disk space, scan for "old" FRC_*.wpilog files and remove
   {
@@ -124,6 +131,8 @@ void Thread::Main() {
         }
         auto size = entry.file_size();
         if (fs::remove(entry.path(), ec)) {
+          FRC_ReportError(warn::Warning, "DataLogManager: Deleted {}",
+                          entry.path().string());
           freeSpace += size;
           if (freeSpace >= kFreeSpaceThreshold) {
             break;
@@ -133,6 +142,13 @@ void Thread::Main() {
                      entry.path().string());
         }
       }
+    } else if (freeSpace < 2 * kFreeSpaceThreshold) {
+      FRC_ReportError(
+          warn::Warning,
+          "DataLogManager: Log storage device has {} MB of free space "
+          "remaining! Logs will get deleted below {} MB of free space. "
+          "Consider deleting logs off the storage device.",
+          freeSpace / 1000000, kFreeSpaceThreshold / 1000000);
     }
   }
 
@@ -147,8 +163,13 @@ void Thread::Main() {
       m_log, "systemTime",
       "{\"source\":\"DataLogManager\",\"format\":\"time_t_us\"}"};
 
+  wpi::Event newDataEvent;
+  DriverStation::ProvideRefreshedDataEventHandle(newDataEvent.GetHandle());
+
   for (;;) {
-    bool newData = DriverStation::WaitForData(0.25_s);
+    bool timedOut = false;
+    bool newData =
+        wpi::WaitForObject(newDataEvent.GetHandle(), 0.25, &timedOut);
     if (!m_active) {
       break;
     }
@@ -176,7 +197,7 @@ void Thread::Main() {
       } else {
         dsAttachCount = 0;
       }
-      if (dsAttachCount > 50) {  // 1 second
+      if (dsAttachCount > 300) {  // 6 seconds
         std::time_t now = std::time(nullptr);
         auto tm = std::gmtime(&now);
         if (tm->tm_year > 100) {
@@ -197,7 +218,7 @@ void Thread::Main() {
       } else {
         fmsAttachCount = 0;
       }
-      if (fmsAttachCount > 100) {  // 2 seconds
+      if (fmsAttachCount > 250) {  // 5 seconds
         // match info comes through TCP, so we need to double-check we've
         // actually received it
         auto matchType = DriverStation::GetMatchType();
@@ -236,6 +257,7 @@ void Thread::Main() {
       sysTimeEntry.Append(wpi::GetSystemTime(), wpi::Now());
     }
   }
+  DriverStation::RemoveRefreshedDataEventHandle(newDataEvent.GetHandle());
 }
 
 void Thread::StartNTLog() {

@@ -30,7 +30,7 @@ void NidecBrushless::Set(double speed) {
   if (!m_disabled) {
     m_speed = speed;
     m_dio.UpdateDutyCycle(0.5 + 0.5 * (m_isInverted ? -speed : speed));
-    m_pwm.SetRaw(0xffff);
+    m_pwm.SetAlwaysHighMode();
   }
   Feed();
 }
@@ -73,7 +73,8 @@ int NidecBrushless::GetChannel() const {
 void NidecBrushless::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Nidec Brushless");
   builder.SetActuator(true);
-  builder.SetSafeState([=] { StopMotor(); });
+  builder.SetSafeState([=, this] { StopMotor(); });
   builder.AddDoubleProperty(
-      "Value", [=] { return Get(); }, [=](double value) { Set(value); });
+      "Value", [=, this] { return Get(); },
+      [=, this](double value) { Set(value); });
 }

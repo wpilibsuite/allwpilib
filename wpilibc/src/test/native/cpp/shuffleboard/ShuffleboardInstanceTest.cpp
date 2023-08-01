@@ -7,6 +7,8 @@
 #include <string_view>
 
 #include <networktables/NetworkTableInstance.h>
+#include <networktables/NetworkTableListener.h>
+#include <networktables/StringTopic.h>
 
 #include "frc/shuffleboard/ShuffleboardInstance.h"
 #include "gtest/gtest.h"
@@ -31,8 +33,8 @@ TEST(ShuffleboardInstanceTest, PathFluent) {
                    .WithWidget("Text View")
                    .GetEntry();
 
-  EXPECT_EQ("string", entry.GetString("")) << "Wrong entry value";
-  EXPECT_EQ("/Shuffleboard/Tab Title/List/Data", entry.GetName())
+  EXPECT_EQ("string", entry->GetString("")) << "Wrong entry value";
+  EXPECT_EQ("/Shuffleboard/Tab Title/List/Data", entry->GetTopic().GetName())
       << "Entry path generated incorrectly";
 }
 
@@ -48,9 +50,9 @@ TEST(ShuffleboardInstanceTest, NestedLayoutsFluent) {
                    .Add("Value", "string")
                    .GetEntry();
 
-  EXPECT_EQ("string", entry.GetString("")) << "Wrong entry value";
+  EXPECT_EQ("string", entry->GetString("")) << "Wrong entry value";
   EXPECT_EQ("/Shuffleboard/Tab/First/Second/Third/Fourth/Value",
-            entry.GetName())
+            entry->GetTopic().GetName())
       << "Entry path generated incorrectly";
 }
 
@@ -66,9 +68,9 @@ TEST(ShuffleboardInstanceTest, NestedLayoutsOop) {
   frc::SimpleWidget& widget = fourth.Add("Value", "string");
   auto entry = widget.GetEntry();
 
-  EXPECT_EQ("string", entry.GetString("")) << "Wrong entry value";
+  EXPECT_EQ("string", entry->GetString("")) << "Wrong entry value";
   EXPECT_EQ("/Shuffleboard/Tab/First/Second/Third/Fourth/Value",
-            entry.GetName())
+            entry->GetTopic().GetName())
       << "Entry path generated incorrectly";
 }
 
@@ -97,12 +99,33 @@ TEST(ShuffleboardInstanceTest, NestedActuatorWidgetsAreDisabled) {
   // Note: we use the unsafe `GetBoolean()` method because if the value is NOT
   // a boolean, or if it is not present, then something has clearly gone very,
   // very wrong
-  bool controllable = controllableEntry.GetValue()->GetBoolean();
+  bool controllable = controllableEntry.GetValue().GetBoolean();
   // Sanity check
   EXPECT_TRUE(controllable)
       << "The nested actuator widget should be enabled by default";
   shuffleboardInst.DisableActuatorWidgets();
-  controllable = controllableEntry.GetValue()->GetBoolean();
+  controllable = controllableEntry.GetValue().GetBoolean();
   EXPECT_FALSE(controllable)
       << "The nested actuator widget should have been disabled";
+}
+
+TEST(ShuffleboardInstanceTest, DuplicateSelectTabs) {
+  NTWrapper ntInst;
+  frc::detail::ShuffleboardInstance shuffleboardInst{ntInst.inst};
+  std::atomic_int counter = 0;
+  auto subscriber =
+      ntInst.inst.GetStringTopic("/Shuffleboard/.metadata/Selected")
+          .Subscribe("", {.keepDuplicates = true});
+  ntInst.inst.AddListener(
+      subscriber, nt::EventFlags::kValueAll | nt::EventFlags::kImmediate,
+      [&counter](auto& event) { counter++; });
+
+  // There shouldn't be anything there
+  EXPECT_EQ(0, counter);
+
+  shuffleboardInst.SelectTab("tab1");
+  shuffleboardInst.SelectTab("tab1");
+  EXPECT_TRUE(ntInst.inst.WaitForListenerQueue(1.0))
+      << "Listener queue timed out!";
+  EXPECT_EQ(2, counter);
 }

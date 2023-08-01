@@ -22,7 +22,7 @@ public class MockDS {
     data[5] = 0x00; // red 1 station
   }
 
-  @SuppressWarnings("MissingJavadocMethod")
+  /** Start the mock DS thread. */
   public void start() {
     m_thread =
         new Thread(
@@ -67,7 +67,7 @@ public class MockDS {
     m_thread.start();
   }
 
-  @SuppressWarnings("MissingJavadocMethod")
+  /** Stop the mock DS thread. */
   public void stop() {
     if (m_thread == null) {
       return;

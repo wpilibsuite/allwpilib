@@ -90,7 +90,7 @@ public final class TrajectoryParameterizer {
       // acceleration, since acceleration limits may be a function of velocity.
       while (true) {
         // Enforce global max velocity and max reachable velocity by global
-        // acceleration limit. vf = std::sqrt(vi^2 + 2*a*d).
+        // acceleration limit. v_f = √(v_i² + 2ad).
         constrainedState.maxVelocityMetersPerSecond =
             Math.min(
                 maxVelocityMetersPerSecond,
@@ -164,7 +164,7 @@ public final class TrajectoryParameterizer {
 
       while (true) {
         // Enforce max velocity limit (reverse)
-        // vf = std::sqrt(vi^2 + 2*a*d), where vi = successor.
+        // v_f = √(v_i² + 2ad), where v_i = successor.
         double newMaxVelocity =
             Math.sqrt(
                 successor.maxVelocityMetersPerSecond * successor.maxVelocityMetersPerSecond
@@ -271,11 +271,7 @@ public final class TrajectoryParameterizer {
       if (minMaxAccel.minAccelerationMetersPerSecondSq
           > minMaxAccel.maxAccelerationMetersPerSecondSq) {
         throw new TrajectoryGenerationException(
-            "The constraint's min acceleration "
-                + "was greater than its max acceleration.\n Offending Constraint: "
-                + constraint.getClass().getName()
-                + "\n If the offending constraint was packaged with WPILib, please file a bug"
-                + " report.");
+            "Infeasible trajectory constraint: " + constraint.getClass().getName() + "\n");
       }
 
       state.minAccelerationMetersPerSecondSq =
@@ -294,7 +290,6 @@ public final class TrajectoryParameterizer {
     }
   }
 
-  @SuppressWarnings("MemberName")
   private static class ConstrainedState {
     PoseWithCurvature pose;
     double distanceMeters;
@@ -320,7 +315,6 @@ public final class TrajectoryParameterizer {
     }
   }
 
-  @SuppressWarnings("serial")
   public static class TrajectoryGenerationException extends RuntimeException {
     public TrajectoryGenerationException(String message) {
       super(message);

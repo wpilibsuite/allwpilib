@@ -4,12 +4,11 @@
 
 #pragma once
 
+#ifdef __cplusplus
 #include <climits>  // NOLINT
 
-#ifdef __cplusplus
 #include <initializer_list>
-
-#include "wpi/span.h"
+#include <span>
 #endif
 
 /**
@@ -43,8 +42,8 @@ constexpr int kHandleTypeEvent = 1;
 constexpr int kHandleTypeSemaphore = 2;
 constexpr int kHandleTypeCSBase = 3;
 constexpr int kHandleTypeNTBase = 16;
-constexpr int kHandleTypeHALBase = 32;
-constexpr int kHandleTypeUserBase = 64;
+constexpr int kHandleTypeHALBase = 48;
+constexpr int kHandleTypeUserBase = 80;
 /** @} */
 
 /**
@@ -149,8 +148,8 @@ bool WaitForObject(WPI_Handle handle, double timeout, bool* timedOut);
  *        least the size of the handles input array
  * @return array of signaled handles (points into signaled array)
  */
-wpi::span<WPI_Handle> WaitForObjects(wpi::span<const WPI_Handle> handles,
-                                     wpi::span<WPI_Handle> signaled);
+std::span<WPI_Handle> WaitForObjects(std::span<const WPI_Handle> handles,
+                                     std::span<WPI_Handle> signaled);
 
 /**
  * Waits for one or more handles to be signaled.
@@ -163,9 +162,9 @@ wpi::span<WPI_Handle> WaitForObjects(wpi::span<const WPI_Handle> handles,
  *        least the size of the handles input array
  * @return array of signaled handles (points into signaled array)
  */
-inline wpi::span<WPI_Handle> WaitForObjects(
-    std::initializer_list<WPI_Handle> handles, wpi::span<WPI_Handle> signaled) {
-  return WaitForObjects(wpi::span{handles.begin(), handles.size()}, signaled);
+inline std::span<WPI_Handle> WaitForObjects(
+    std::initializer_list<WPI_Handle> handles, std::span<WPI_Handle> signaled) {
+  return WaitForObjects(std::span{handles.begin(), handles.size()}, signaled);
 }
 
 /**
@@ -182,8 +181,8 @@ inline wpi::span<WPI_Handle> WaitForObjects(
  *        handle being signaled; set to false otherwise (output)
  * @return array of signaled handles (points into signaled array)
  */
-wpi::span<WPI_Handle> WaitForObjects(wpi::span<const WPI_Handle> handles,
-                                     wpi::span<WPI_Handle> signaled,
+std::span<WPI_Handle> WaitForObjects(std::span<const WPI_Handle> handles,
+                                     std::span<WPI_Handle> signaled,
                                      double timeout, bool* timedOut);
 /**
  * Waits for one or more handles to be signaled, with timeout.
@@ -199,10 +198,10 @@ wpi::span<WPI_Handle> WaitForObjects(wpi::span<const WPI_Handle> handles,
  *        handle being signaled; set to false otherwise (output)
  * @return array of signaled handles (points into signaled array)
  */
-inline wpi::span<WPI_Handle> WaitForObjects(
-    std::initializer_list<WPI_Handle> handles, wpi::span<WPI_Handle> signaled,
+inline std::span<WPI_Handle> WaitForObjects(
+    std::initializer_list<WPI_Handle> handles, std::span<WPI_Handle> signaled,
     double timeout, bool* timedOut) {
-  return WaitForObjects(wpi::span{handles.begin(), handles.size()}, signaled,
+  return WaitForObjects(std::span{handles.begin(), handles.size()}, signaled,
                         timeout, timedOut);
 }
 
@@ -210,10 +209,9 @@ inline wpi::span<WPI_Handle> WaitForObjects(
  * Sets up signaling for an arbitrary handle.  With this function, any handle
  * can operate like an event handle.
  *
- * @param handle handle
+ * @param handle Event handle
  * @param manualReset true for manual reset, false for automatic reset
  * @param initialState true to make the handle initially in signaled state
- * @return Event handle
  */
 void CreateSignalObject(WPI_Handle handle, bool manualReset = false,
                         bool initialState = false);

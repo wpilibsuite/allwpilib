@@ -64,7 +64,7 @@ class PWMMotorController : public MotorController,
   /**
    * Optionally eliminate the deadband from a motor controller.
    *
-   * @param eliminateDeadband If true, set the motor curve on the speed
+   * @param eliminateDeadband If true, set the motor curve on the motor
    *                          controller to eliminate the deadband in the middle
    *                          of the range. Otherwise, keep the full range
    *                          without modifying any values.

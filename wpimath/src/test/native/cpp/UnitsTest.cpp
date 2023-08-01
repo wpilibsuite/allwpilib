@@ -1420,6 +1420,7 @@ TEST_F(UnitContainer, cout) {
 }
 #endif
 
+#if __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
 TEST_F(UnitContainer, fmtlib) {
   testing::internal::CaptureStdout();
   fmt::print("{}", degree_t(349.87));
@@ -1500,6 +1501,7 @@ TEST_F(UnitContainer, fmtlib) {
   EXPECT_STREQ("5.670367e-08 kg s^-3 K^-4", output.c_str());
 #endif
 }
+#endif
 
 TEST_F(UnitContainer, to_string) {
   foot_t a(3.5);
@@ -3063,14 +3065,17 @@ TEST_F(Constexpr, construction) {
   constexpr meter_t result0(0);
   constexpr auto result1 = make_unit<meter_t>(1);
   constexpr auto result2 = meter_t(2);
+  constexpr auto result3 = -3_m;
 
   EXPECT_EQ(meter_t(0), result0);
   EXPECT_EQ(meter_t(1), result1);
   EXPECT_EQ(meter_t(2), result2);
+  EXPECT_EQ(meter_t(-3), result3);
 
   EXPECT_TRUE(noexcept(result0));
   EXPECT_TRUE(noexcept(result1));
   EXPECT_TRUE(noexcept(result2));
+  EXPECT_TRUE(noexcept(result3));
 }
 
 TEST_F(Constexpr, constants) {

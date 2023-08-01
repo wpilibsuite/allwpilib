@@ -53,11 +53,12 @@ struct PlotSeriesRef {
 };
 
 class PlotSeries {
-  explicit PlotSeries(Storage& storage, int yAxis = 0);
+  explicit PlotSeries(Storage& storage);
 
  public:
   PlotSeries(Storage& storage, std::string_view id);
-  PlotSeries(Storage& storage, DataSource* source, int yAxis = 0);
+  PlotSeries(Storage& storage, DataSource* source);
+  PlotSeries(Storage& storage, DataSource* source, int yAxis);
 
   const std::string& GetId() const { return m_id; }
 
@@ -83,7 +84,7 @@ class PlotSeries {
     return m_digital.GetValue() == kDigital ||
            (m_digital.GetValue() == kAuto && m_source && m_source->IsDigital());
   }
-  void AppendValue(double value, uint64_t time);
+  void AppendValue(double value, int64_t time);
 
   // source linkage
   DataSource* m_source = nullptr;
@@ -149,7 +150,6 @@ class Plot {
   bool& m_legendHorizontal;
   int& m_legendLocation;
   bool& m_crosshairs;
-  bool& m_antialiased;
   bool& m_mousePosition;
   bool& m_yAxis2;
   bool& m_yAxis3;
@@ -182,6 +182,8 @@ class PlotView : public View {
   PlotView(PlotProvider* provider, Storage& storage);
 
   void Display() override;
+  void Settings() override;
+  bool HasSettings() override;
 
   void MovePlot(PlotView* fromView, size_t fromIndex, size_t toIndex);
 
@@ -196,7 +198,7 @@ class PlotView : public View {
 
 }  // namespace
 
-PlotSeries::PlotSeries(Storage& storage, int yAxis)
+PlotSeries::PlotSeries(Storage& storage)
     : m_id{storage.GetString("id")},
       m_name{storage.GetString("name")},
       m_yAxis{storage.GetInt("yAxis", 0)},
@@ -209,12 +211,10 @@ PlotSeries::PlotSeries(Storage& storage, int yAxis)
       m_digital{
           storage.GetString("digital"), kAuto, {"Auto", "Digital", "Analog"}},
       m_digitalBitHeight{storage.GetInt("digitalBitHeight", 8)},
-      m_digitalBitGap{storage.GetInt("digitalBitGap", 4)} {
-  m_yAxis = yAxis;
-}
+      m_digitalBitGap{storage.GetInt("digitalBitGap", 4)} {}
 
 PlotSeries::PlotSeries(Storage& storage, std::string_view id)
-    : PlotSeries{storage, 0} {
+    : PlotSeries{storage} {
   m_id = id;
   if (DataSource* source = DataSource::Find(id)) {
     SetSource(source);
@@ -223,10 +223,15 @@ PlotSeries::PlotSeries(Storage& storage, std::string_view id)
   CheckSource();
 }
 
-PlotSeries::PlotSeries(Storage& storage, DataSource* source, int yAxis)
-    : PlotSeries{storage, yAxis} {
+PlotSeries::PlotSeries(Storage& storage, DataSource* source)
+    : PlotSeries{storage} {
   SetSource(source);
   m_id = source->GetId();
+}
+
+PlotSeries::PlotSeries(Storage& storage, DataSource* source, int yAxis)
+    : PlotSeries{storage, source} {
+  m_yAxis = yAxis;
 }
 
 void PlotSeries::CheckSource() {
@@ -249,10 +254,10 @@ void PlotSeries::SetSource(DataSource* source) {
   AppendValue(source->GetValue(), 0);
 
   m_newValueConn = source->valueChanged.connect_connection(
-      [this](double value, uint64_t time) { AppendValue(value, time); });
+      [this](double value, int64_t time) { AppendValue(value, time); });
 }
 
-void PlotSeries::AppendValue(double value, uint64_t timeUs) {
+void PlotSeries::AppendValue(double value, int64_t timeUs) {
   double time = (timeUs != 0 ? timeUs : wpi::Now()) * 1.0e-6;
   if (IsDigital()) {
     if (m_size < kMaxSize) {
@@ -327,7 +332,7 @@ PlotSeries::Action PlotSeries::EmitPlot(PlotView& view, double now, size_t i,
     int offset;
   };
   GetterData getterData = {now, GetZeroTime() * 1.0e-6, m_data, size, offset};
-  auto getter = [](void* data, int idx) {
+  auto getter = [](int idx, void* data) {
     auto d = static_cast<GetterData*>(data);
     if (idx == d->size) {
       return ImPlotPoint{
@@ -487,7 +492,6 @@ Plot::Plot(Storage& storage)
       m_legendLocation{
           storage.GetInt("legendLocation", ImPlotLocation_NorthWest)},
       m_crosshairs{storage.GetBool("crosshairs", false)},
-      m_antialiased{storage.GetBool("antialiased", false)},
       m_mousePosition{storage.GetBool("mousePosition", true)},
       m_yAxis2{storage.GetBool("yaxis2", false)},
       m_yAxis3{storage.GetBool("yaxis3", false)},
@@ -573,7 +577,6 @@ void Plot::EmitPlot(PlotView& view, double now, bool paused, size_t i) {
                 static_cast<int>(i));
   ImPlotFlags plotFlags = (m_legend ? 0 : ImPlotFlags_NoLegend) |
                           (m_crosshairs ? ImPlotFlags_Crosshairs : 0) |
-                          (m_antialiased ? ImPlotFlags_AntiAliased : 0) |
                           (m_mousePosition ? 0 : ImPlotFlags_NoMouseText);
 
   if (ImPlot::BeginPlot(label, ImVec2(-1, m_height), plotFlags)) {
@@ -608,7 +611,6 @@ void Plot::EmitPlot(PlotView& view, double now, bool paused, size_t i) {
           (m_axis[i].lockMin ? ImPlotAxisFlags_LockMin : 0) |
           (m_axis[i].lockMax ? ImPlotAxisFlags_LockMax : 0) |
           (m_axis[i].autoFit ? ImPlotAxisFlags_AutoFit : 0) |
-          (m_axis[i].logScale ? ImPlotAxisFlags_AutoFit : 0) |
           (m_axis[i].invert ? ImPlotAxisFlags_Invert : 0) |
           (m_axis[i].opposite ? ImPlotAxisFlags_Opposite : 0) |
           (m_axis[i].gridLines ? 0 : ImPlotAxisFlags_NoGridLines) |
@@ -620,6 +622,9 @@ void Plot::EmitPlot(PlotView& view, double now, bool paused, size_t i) {
       ImPlot::SetupAxisLimits(
           ImAxis_Y1 + i, m_axis[i].min, m_axis[i].max,
           m_axis[i].apply ? ImGuiCond_Always : ImGuiCond_Once);
+      ImPlot::SetupAxisScale(ImAxis_Y1 + i, m_axis[i].logScale
+                                                ? ImPlotScale_Log10
+                                                : ImPlotScale_Linear);
       m_axis[i].apply = false;
     }
 
@@ -656,7 +661,6 @@ void Plot::EmitPlot(PlotView& view, double now, bool paused, size_t i) {
     // copy plot settings back to storage
     m_legend = (plot->Flags & ImPlotFlags_NoLegend) == 0;
     m_crosshairs = (plot->Flags & ImPlotFlags_Crosshairs) != 0;
-    m_antialiased = (plot->Flags & ImPlotFlags_AntiAliased) != 0;
     m_legendOutside =
         (plot->Items.Legend.Flags & ImPlotLegendFlags_Outside) != 0;
     m_legendHorizontal =
@@ -671,12 +675,12 @@ void Plot::EmitPlot(PlotView& view, double now, bool paused, size_t i) {
       m_axis[i].lockMin = (flags & ImPlotAxisFlags_LockMin) != 0;
       m_axis[i].lockMax = (flags & ImPlotAxisFlags_LockMax) != 0;
       m_axis[i].autoFit = (flags & ImPlotAxisFlags_AutoFit) != 0;
-      m_axis[i].logScale = (flags & ImPlotAxisFlags_LogScale) != 0;
       m_axis[i].invert = (flags & ImPlotAxisFlags_Invert) != 0;
       m_axis[i].opposite = (flags & ImPlotAxisFlags_Opposite) != 0;
       m_axis[i].gridLines = (flags & ImPlotAxisFlags_NoGridLines) == 0;
       m_axis[i].tickMarks = (flags & ImPlotAxisFlags_NoTickMarks) == 0;
       m_axis[i].tickLabels = (flags & ImPlotAxisFlags_NoTickLabels) == 0;
+      m_axis[i].logScale = plot->Axes[ImAxis_Y1 + i].Scale == ImPlotScale_Log10;
     }
   }
 }
@@ -765,71 +769,6 @@ PlotView::PlotView(PlotProvider* provider, Storage& storage)
 }
 
 void PlotView::Display() {
-  if (ImGui::BeginPopupContextItem()) {
-    if (ImGui::Button("Add plot")) {
-      m_plotsStorage.emplace_back(std::make_unique<Storage>());
-      m_plots.emplace_back(std::make_unique<Plot>(*m_plotsStorage.back()));
-    }
-
-    for (size_t i = 0; i < m_plots.size(); ++i) {
-      auto& plot = m_plots[i];
-      ImGui::PushID(i);
-
-      char name[64];
-      if (!plot->GetName().empty()) {
-        std::snprintf(name, sizeof(name), "%s", plot->GetName().c_str());
-      } else {
-        std::snprintf(name, sizeof(name), "Plot %d", static_cast<int>(i));
-      }
-
-      char label[90];
-      std::snprintf(label, sizeof(label), "%s###header%d", name,
-                    static_cast<int>(i));
-
-      bool open = ImGui::CollapsingHeader(label);
-
-      // DND source and target for Plot
-      if (ImGui::BeginDragDropSource()) {
-        PlotSeriesRef ref = {this, i, 0};
-        ImGui::SetDragDropPayload("Plot", &ref, sizeof(ref));
-        ImGui::TextUnformatted(name);
-        ImGui::EndDragDropSource();
-      }
-      plot->DragDropTarget(*this, i, false);
-
-      if (open) {
-        if (ImGui::Button("Move Up")) {
-          if (i > 0) {
-            std::swap(m_plotsStorage[i - 1], m_plotsStorage[i]);
-            std::swap(m_plots[i - 1], plot);
-          }
-        }
-
-        ImGui::SameLine();
-        if (ImGui::Button("Move Down")) {
-          if (i < (m_plots.size() - 1)) {
-            std::swap(m_plotsStorage[i], m_plotsStorage[i + 1]);
-            std::swap(plot, m_plots[i + 1]);
-          }
-        }
-
-        ImGui::SameLine();
-        if (ImGui::Button("Delete")) {
-          m_plotsStorage.erase(m_plotsStorage.begin() + i);
-          m_plots.erase(m_plots.begin() + i);
-          ImGui::PopID();
-          continue;
-        }
-
-        plot->EmitSettings(i);
-      }
-
-      ImGui::PopID();
-    }
-
-    ImGui::EndPopup();
-  }
-
   if (m_plots.empty()) {
     if (ImGui::Button("Add plot")) {
       m_plotsStorage.emplace_back(std::make_unique<Storage>());
@@ -966,6 +905,73 @@ PlotProvider::PlotProvider(Storage& storage) : WindowManager{storage} {
   });
 }
 
+void PlotView::Settings() {
+  if (ImGui::Button("Add plot")) {
+    m_plotsStorage.emplace_back(std::make_unique<Storage>());
+    m_plots.emplace_back(std::make_unique<Plot>(*m_plotsStorage.back()));
+  }
+
+  for (size_t i = 0; i < m_plots.size(); ++i) {
+    auto& plot = m_plots[i];
+    ImGui::PushID(i);
+
+    char name[64];
+    if (!plot->GetName().empty()) {
+      std::snprintf(name, sizeof(name), "%s", plot->GetName().c_str());
+    } else {
+      std::snprintf(name, sizeof(name), "Plot %d", static_cast<int>(i));
+    }
+
+    char label[90];
+    std::snprintf(label, sizeof(label), "%s###header%d", name,
+                  static_cast<int>(i));
+
+    bool open = ImGui::CollapsingHeader(label);
+
+    // DND source and target for Plot
+    if (ImGui::BeginDragDropSource()) {
+      PlotSeriesRef ref = {this, i, 0};
+      ImGui::SetDragDropPayload("Plot", &ref, sizeof(ref));
+      ImGui::TextUnformatted(name);
+      ImGui::EndDragDropSource();
+    }
+    plot->DragDropTarget(*this, i, false);
+
+    if (open) {
+      if (ImGui::Button("Move Up")) {
+        if (i > 0) {
+          std::swap(m_plotsStorage[i - 1], m_plotsStorage[i]);
+          std::swap(m_plots[i - 1], plot);
+        }
+      }
+
+      ImGui::SameLine();
+      if (ImGui::Button("Move Down")) {
+        if (i < (m_plots.size() - 1)) {
+          std::swap(m_plotsStorage[i], m_plotsStorage[i + 1]);
+          std::swap(plot, m_plots[i + 1]);
+        }
+      }
+
+      ImGui::SameLine();
+      if (ImGui::Button("Delete")) {
+        m_plotsStorage.erase(m_plotsStorage.begin() + i);
+        m_plots.erase(m_plots.begin() + i);
+        ImGui::PopID();
+        continue;
+      }
+
+      plot->EmitSettings(i);
+    }
+
+    ImGui::PopID();
+  }
+}
+
+bool PlotView::HasSettings() {
+  return true;
+}
+
 PlotProvider::~PlotProvider() = default;
 
 void PlotProvider::DisplayMenu() {
@@ -989,7 +995,7 @@ void PlotProvider::DisplayMenu() {
     for (size_t i = 0; i <= numWindows; ++i) {
       std::snprintf(id, sizeof(id), "Plot <%d>", static_cast<int>(i));
       bool match = false;
-      for (size_t j = i; j < numWindows; ++j) {
+      for (size_t j = 0; j < numWindows; ++j) {
         if (m_windows[j]->GetId() == id) {
           match = true;
           break;

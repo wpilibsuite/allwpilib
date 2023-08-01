@@ -7,11 +7,10 @@
 #include <stdint.h>
 
 #include <memory>
+#include <span>
 
 #include <hal/SPITypes.h>
 #include <units/time.h>
-#include <wpi/deprecated.h>
-#include <wpi/span.h>
 
 namespace frc {
 
@@ -27,6 +26,14 @@ class DigitalSource;
 class SPI {
  public:
   enum Port { kOnboardCS0 = 0, kOnboardCS1, kOnboardCS2, kOnboardCS3, kMXP };
+  enum Mode {
+    kMode0 = HAL_SPI_kMode0, /*!< Clock idle low, data sampled on rising edge */
+    kMode1 =
+        HAL_SPI_kMode1, /*!< Clock idle low, data sampled on falling edge */
+    kMode2 =
+        HAL_SPI_kMode2, /*!< Clock idle high, data sampled on falling edge */
+    kMode3 = HAL_SPI_kMode3 /*!< Clock idle high, data sampled on rising edge */
+  };
 
   /**
    * Constructor
@@ -53,60 +60,19 @@ class SPI {
   void SetClockRate(int hz);
 
   /**
-   * Configure the order that bits are sent and received on the wire
-   * to be most significant bit first.
-   */
-  void SetMSBFirst();
-
-  /**
-   * Configure the order that bits are sent and received on the wire
-   * to be least significant bit first.
-   */
-  void SetLSBFirst();
-
-  /**
-   * Configure that the data is stable on the leading edge and the data
-   * changes on the trailing edge.
-   */
-  void SetSampleDataOnLeadingEdge();
-
-  /**
-   * Configure that the data is stable on the trailing edge and the data
-   * changes on the leading edge.
-   */
-  void SetSampleDataOnTrailingEdge();
-
-  /**
-   * Configure that the data is stable on the falling edge and the data
-   * changes on the rising edge.
+   * Sets the mode for the SPI device.
    *
-   * @deprecated Use SetSampleDataOnTrailingEdge() instead.
+   * <p>Mode 0 is Clock idle low, data sampled on rising edge
    *
-   */
-  WPI_DEPRECATED("Use SetSampleDataOnTrailingEdge instead.")
-  void SetSampleDataOnFalling();
-
-  /**
-   * Configure that the data is stable on the rising edge and the data
-   * changes on the falling edge.
+   * <p>Mode 1 is Clock idle low, data sampled on falling edge
    *
-   * @deprecated Use SetSampleDataOnLeadingEdge() instead.
+   * <p>Mode 2 is Clock idle high, data sampled on falling edge
    *
+   * <p>Mode 3 is Clock idle high, data sampled on rising edge
+   *
+   * @param mode The mode to set.
    */
-  WPI_DEPRECATED("Use SetSampleDataOnLeadingEdge instead")
-  void SetSampleDataOnRising();
-
-  /**
-   * Configure the clock output line to be active low.
-   * This is sometimes called clock polarity high or clock idle high.
-   */
-  void SetClockActiveLow();
-
-  /**
-   * Configure the clock output line to be active high.
-   * This is sometimes called clock polarity low or clock idle low.
-   */
-  void SetClockActiveHigh();
+  void SetMode(Mode mode);
 
   /**
    * Configure the chip select line to be active high.
@@ -177,7 +143,7 @@ class SPI {
    * @param dataToSend data to send (maximum 16 bytes)
    * @param zeroSize number of zeros to send after the data
    */
-  void SetAutoTransmitData(wpi::span<const uint8_t> dataToSend, int zeroSize);
+  void SetAutoTransmitData(std::span<const uint8_t> dataToSend, int zeroSize);
 
   /**
    * Start running the automatic SPI transfer engine at a periodic rate.
@@ -188,19 +154,6 @@ class SPI {
    * @param period period between transfers (us resolution)
    */
   void StartAutoRate(units::second_t period);
-
-  /**
-   * Start running the automatic SPI transfer engine at a periodic rate.
-   *
-   * InitAuto() and SetAutoTransmitData() must be called before calling this
-   * function.
-   *
-   * @deprecated use unit-safe StartAutoRate(units::second_t period) instead.
-   *
-   * @param period period between transfers, in seconds (us resolution)
-   */
-  WPI_DEPRECATED("Use StartAutoRate with unit-safety instead")
-  void StartAutoRate(double period);
 
   /**
    * Start running the automatic SPI transfer engine when a trigger occurs.
@@ -285,31 +238,6 @@ class SPI {
   void InitAccumulator(units::second_t period, int cmd, int xferSize,
                        int validMask, int validValue, int dataShift,
                        int dataSize, bool isSigned, bool bigEndian);
-
-  /**
-   * Initialize the accumulator.
-   *
-   * @deprecated Use unit-safe version instead.
-   *             InitAccumulator(units::second_t period, int cmd, int <!--
-   * -->         xferSize, int validMask, int validValue, int dataShift, <!--
-   * -->         int dataSize, bool isSigned, bool bigEndian)
-   *
-   * @param period     Time between reads
-   * @param cmd        SPI command to send to request data
-   * @param xferSize   SPI transfer size, in bytes
-   * @param validMask  Mask to apply to received data for validity checking
-   * @param validValue After valid_mask is applied, required matching value for
-   *                   validity checking
-   * @param dataShift  Bit shift to apply to received data to get actual data
-   *                   value
-   * @param dataSize   Size (in bits) of data field
-   * @param isSigned   Is data field signed?
-   * @param bigEndian  Is device big endian?
-   */
-  WPI_DEPRECATED("Use InitAccumulator with unit-safety instead")
-  void InitAccumulator(double period, int cmd, int xferSize, int validMask,
-                       int validValue, int dataShift, int dataSize,
-                       bool isSigned, bool bigEndian);
 
   /**
    * Frees the accumulator.
@@ -404,9 +332,7 @@ class SPI {
 
  protected:
   hal::SPIPort m_port;
-  bool m_msbFirst = false;          // Default little-endian
-  bool m_sampleOnTrailing = false;  // Default data updated on falling edge
-  bool m_clockIdleHigh = false;     // Default clock active high
+  HAL_SPIMode m_mode = HAL_SPIMode::HAL_SPI_kMode0;
 
  private:
   void Init();

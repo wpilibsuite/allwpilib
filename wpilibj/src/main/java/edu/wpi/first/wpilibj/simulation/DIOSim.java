@@ -32,7 +32,7 @@ public class DIOSim {
   }
 
   /**
-   * Constructs from an digital I/O channel number.
+   * Constructs from a digital I/O channel number.
    *
    * @param channel Channel number
    */

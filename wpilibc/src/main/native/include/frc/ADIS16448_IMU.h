@@ -20,7 +20,6 @@
 #include <thread>
 
 #include <hal/SimDevice.h>
-#include <networktables/NTSendable.h>
 #include <units/acceleration.h>
 #include <units/angle.h>
 #include <units/angular_velocity.h>
@@ -29,6 +28,7 @@
 #include <units/temperature.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
+#include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
 #include "frc/DigitalInput.h"
@@ -53,7 +53,7 @@ namespace frc {
  * the RoboRIO MXP port.
  */
 
-class ADIS16448_IMU : public nt::NTSendable,
+class ADIS16448_IMU : public wpi::Sendable,
                       public wpi::SendableHelper<ADIS16448_IMU> {
  public:
   /* ADIS16448 Calibration Time Enum Class */
@@ -205,6 +205,8 @@ class ADIS16448_IMU : public nt::NTSendable,
 
   int SetYawAxis(IMUAxis yaw_axis);
 
+  bool IsConnected() const;
+
   int ConfigDecRate(uint16_t DecimationRate);
 
   /**
@@ -214,7 +216,7 @@ class ADIS16448_IMU : public nt::NTSendable,
    */
   int GetPort() const;
 
-  void InitSendable(nt::NTSendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   /** @brief ADIS16448 Register Map Declaration */
@@ -284,6 +286,10 @@ class ADIS16448_IMU : public nt::NTSendable,
     double gyro_rate_y = 0.0;
     double gyro_rate_z = 0.0;
   };
+
+  /** @brief Internal Resources **/
+  DigitalInput* m_reset_in;
+  DigitalOutput* m_status_led;
 
   bool SwitchToStandardSPI();
 
@@ -357,10 +363,12 @@ class ADIS16448_IMU : public nt::NTSendable,
   CalibrationTime m_calibration_time{0};
   SPI* m_spi = nullptr;
   DigitalInput* m_auto_interrupt = nullptr;
+  bool m_connected{false};
 
   std::thread m_acquire_task;
 
   hal::SimDevice m_simDevice;
+  hal::SimBoolean m_simConnected;
   hal::SimDouble m_simGyroAngleX;
   hal::SimDouble m_simGyroAngleY;
   hal::SimDouble m_simGyroAngleZ;

@@ -18,6 +18,18 @@ using namespace hal;
 using namespace wpi::java;
 
 extern "C" {
+
+/*
+ * Class:     edu_wpi_first_hal_CANAPIJNI
+ * Method:    getCANPacketBaseTime
+ * Signature: ()J
+ */
+JNIEXPORT jlong JNICALL
+Java_edu_wpi_first_hal_CANAPIJNI_getCANPacketBaseTime
+  (JNIEnv*, jclass)
+{
+  return HAL_GetCANPacketBaseTime();
+}
 /*
  * Class:     edu_wpi_first_hal_CANAPIJNI
  * Method:    initializeCAN

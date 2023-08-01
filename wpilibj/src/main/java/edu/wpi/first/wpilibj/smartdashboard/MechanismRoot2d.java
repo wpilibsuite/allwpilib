@@ -4,8 +4,8 @@
 
 package edu.wpi.first.wpilibj.smartdashboard;
 
+import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,14 +19,14 @@ import java.util.Map;
  *
  * <p>Append other nodes by using {@link #append(MechanismObject2d)}.
  */
-public final class MechanismRoot2d {
+public final class MechanismRoot2d implements AutoCloseable {
   private final String m_name;
   private NetworkTable m_table;
   private final Map<String, MechanismObject2d> m_objects = new HashMap<>(1);
   private double m_x;
-  private NetworkTableEntry m_xEntry;
+  private DoublePublisher m_xPub;
   private double m_y;
-  private NetworkTableEntry m_yEntry;
+  private DoublePublisher m_yPub;
 
   /**
    * Package-private constructor for roots.
@@ -39,6 +39,19 @@ public final class MechanismRoot2d {
     m_name = name;
     m_x = x;
     m_y = y;
+  }
+
+  @Override
+  public void close() {
+    if (m_xPub != null) {
+      m_xPub.close();
+    }
+    if (m_yPub != null) {
+      m_yPub.close();
+    }
+    for (MechanismObject2d obj : m_objects.values()) {
+      obj.close();
+    }
   }
 
   /**
@@ -75,8 +88,14 @@ public final class MechanismRoot2d {
 
   synchronized void update(NetworkTable table) {
     m_table = table;
-    m_xEntry = m_table.getEntry("x");
-    m_yEntry = m_table.getEntry("y");
+    if (m_xPub != null) {
+      m_xPub.close();
+    }
+    m_xPub = m_table.getDoubleTopic("x").publish();
+    if (m_yPub != null) {
+      m_yPub.close();
+    }
+    m_yPub = m_table.getDoubleTopic("y").publish();
     flush();
     for (MechanismObject2d obj : m_objects.values()) {
       obj.update(m_table.getSubTable(obj.getName()));
@@ -88,11 +107,11 @@ public final class MechanismRoot2d {
   }
 
   private void flush() {
-    if (m_xEntry != null) {
-      m_xEntry.setDouble(m_x);
+    if (m_xPub != null) {
+      m_xPub.set(m_x);
     }
-    if (m_yEntry != null) {
-      m_yEntry.setDouble(m_y);
+    if (m_yPub != null) {
+      m_yPub.set(m_y);
     }
   }
 }

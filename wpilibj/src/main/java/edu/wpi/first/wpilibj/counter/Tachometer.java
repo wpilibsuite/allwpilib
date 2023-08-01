@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj.counter;
 
-import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.hal.CounterJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
@@ -52,7 +52,7 @@ public class Tachometer implements Sendable, AutoCloseable {
   }
 
   @Override
-  public void close() throws Exception {
+  public void close() {
     SendableRegistry.remove(this);
     CounterJNI.freeCounter(m_handle);
     CounterJNI.suppressUnused(m_source);
@@ -77,7 +77,7 @@ public class Tachometer implements Sendable, AutoCloseable {
     if (period == 0) {
       return 0;
     }
-    return period;
+    return 1 / period;
   }
 
   /**

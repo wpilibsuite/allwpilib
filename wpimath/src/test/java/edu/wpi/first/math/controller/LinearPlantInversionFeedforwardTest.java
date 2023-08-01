@@ -14,7 +14,6 @@ import edu.wpi.first.math.numbers.N2;
 import org.junit.jupiter.api.Test;
 
 class LinearPlantInversionFeedforwardTest {
-  @SuppressWarnings("LocalVariableName")
   @Test
   void testCalculate() {
     Matrix<N2, N2> A = Matrix.mat(Nat.N2(), Nat.N2()).fill(1, 0, 0, 1);

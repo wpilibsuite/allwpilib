@@ -80,12 +80,15 @@ public class DigitalOutput extends DigitalSource implements Sendable {
   }
 
   /**
-   * Generate a single pulse. There can only be a single pulse going at any time.
+   * Output a single pulse on the digital output line.
    *
-   * @param pulseLength The length of the pulse.
+   * <p>Send a single pulse on the digital output line where the pulse duration is specified in
+   * seconds. Maximum of 65535 microseconds.
+   *
+   * @param pulseLengthSeconds The pulse length in seconds
    */
-  public void pulse(final double pulseLength) {
-    DIOJNI.pulse(m_handle, pulseLength);
+  public void pulse(final double pulseLengthSeconds) {
+    DIOJNI.pulse(m_handle, pulseLengthSeconds);
   }
 
   /**
@@ -111,11 +114,31 @@ public class DigitalOutput extends DigitalSource implements Sendable {
   }
 
   /**
+   * Enable a PWM PPS (Pulse Per Second) Output on this line.
+   *
+   * <p>Allocate one of the 6 DO PWM generator resources.
+   *
+   * <p>Supply the duty-cycle to output.
+   *
+   * <p>The resolution of the duty cycle is 8-bit.
+   *
+   * @param dutyCycle The duty-cycle to start generating. [0..1]
+   */
+  public void enablePPS(double dutyCycle) {
+    if (m_pwmGenerator != invalidPwmGenerator) {
+      return;
+    }
+    m_pwmGenerator = DIOJNI.allocateDigitalPWM();
+    DIOJNI.setDigitalPWMPPS(m_pwmGenerator, dutyCycle);
+    DIOJNI.setDigitalPWMOutputChannel(m_pwmGenerator, m_channel);
+  }
+
+  /**
    * Enable a PWM Output on this line.
    *
    * <p>Allocate one of the 6 DO PWM generator resources.
    *
-   * <p>Supply the initial duty-cycle to output so as to avoid a glitch when first starting.
+   * <p>Supply the initial duty-cycle to output in order to avoid a glitch when first starting.
    *
    * <p>The resolution of the duty cycle is 8-bit for low frequencies (1kHz or less) but is reduced
    * the higher the frequency of the PWM signal is.

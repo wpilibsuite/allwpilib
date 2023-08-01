@@ -16,7 +16,7 @@ import java.util.Map;
  *
  * @see Mechanism2d
  */
-public abstract class MechanismObject2d {
+public abstract class MechanismObject2d implements AutoCloseable {
   /** Relative to parent. */
   private final String m_name;
 
@@ -30,6 +30,13 @@ public abstract class MechanismObject2d {
    */
   protected MechanismObject2d(String name) {
     m_name = name;
+  }
+
+  @Override
+  public void close() {
+    for (MechanismObject2d obj : m_objects.values()) {
+      obj.close();
+    }
   }
 
   /**

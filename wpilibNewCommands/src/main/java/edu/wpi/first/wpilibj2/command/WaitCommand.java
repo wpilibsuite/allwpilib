@@ -4,16 +4,16 @@
 
 package edu.wpi.first.wpilibj2.command;
 
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.Timer;
 
 /**
- * A command that does nothing but takes a specified amount of time to finish. Useful for
- * CommandGroups. Can also be subclassed to make a command with an internal timer.
+ * A command that does nothing but takes a specified amount of time to finish.
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public class WaitCommand extends CommandBase {
+public class WaitCommand extends Command {
   protected Timer m_timer = new Timer();
   private final double m_duration;
 
@@ -29,8 +29,7 @@ public class WaitCommand extends CommandBase {
 
   @Override
   public void initialize() {
-    m_timer.reset();
-    m_timer.start();
+    m_timer.restart();
   }
 
   @Override
@@ -46,5 +45,11 @@ public class WaitCommand extends CommandBase {
   @Override
   public boolean runsWhenDisabled() {
     return true;
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    super.initSendable(builder);
+    builder.addDoubleProperty("duration", () -> m_duration, null);
   }
 }

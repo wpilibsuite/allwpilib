@@ -5,17 +5,14 @@
 package edu.wpi.first.wpilibj.motorcontrol;
 
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.SpeedController;
 
 /** Interface for motor controlling devices. */
-@SuppressWarnings("removal")
-public interface MotorController extends SpeedController {
+public interface MotorController {
   /**
    * Common interface for setting the speed of a motor controller.
    *
    * @param speed The speed to set. Value should be between -1.0 and 1.0.
    */
-  @Override
   void set(double speed);
 
   /**
@@ -29,7 +26,6 @@ public interface MotorController extends SpeedController {
    *
    * @param outputVolts The voltage to output.
    */
-  @Override
   default void setVoltage(double outputVolts) {
     set(outputVolts / RobotController.getBatteryVoltage());
   }
@@ -39,7 +35,6 @@ public interface MotorController extends SpeedController {
    *
    * @return The current set speed. Value is between -1.0 and 1.0.
    */
-  @Override
   double get();
 
   /**
@@ -47,7 +42,6 @@ public interface MotorController extends SpeedController {
    *
    * @param isInverted The state of inversion true is inverted.
    */
-  @Override
   void setInverted(boolean isInverted);
 
   /**
@@ -55,17 +49,14 @@ public interface MotorController extends SpeedController {
    *
    * @return isInverted The state of the inversion true is inverted.
    */
-  @Override
   boolean getInverted();
 
   /** Disable the motor controller. */
-  @Override
   void disable();
 
   /**
    * Stops motor movement. Motor can be moved again by calling set without having to re-enable the
    * motor.
    */
-  @Override
   void stopMotor();
 }

@@ -31,6 +31,7 @@ class MotorControllerGroup : public wpi::Sendable,
   MotorControllerGroup& operator=(MotorControllerGroup&&) = default;
 
   void Set(double speed) override;
+  void SetVoltage(units::volt_t output) override;
   double Get() const override;
   void SetInverted(bool isInverted) override;
   bool GetInverted() const override;

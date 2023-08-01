@@ -5,7 +5,6 @@
 #pragma once
 
 #include <units/time.h>
-#include <wpi/deprecated.h>
 
 namespace frc {
 
@@ -78,6 +77,14 @@ class Timer {
   void Start();
 
   /**
+   * Restart the timer by stopping the timer, if it is not already stopped,
+   * resetting the accumulated time, then starting the timer again. If you
+   * want an event to periodically reoccur at some time interval from the
+   * start time, consider using AdvanceIfElapsed() instead.
+   */
+  void Restart();
+
+  /**
    * Stop the timer.
    *
    * This computes the time as of now and clears the running flag, causing all
@@ -93,18 +100,6 @@ class Timer {
    * @return       True if the period has passed.
    */
   bool HasElapsed(units::second_t period) const;
-
-  /**
-   * Check if the period specified has passed and if it has, advance the start
-   * time by that period. This is useful to decide if it's time to do periodic
-   * work without drifting later by the time it took to get around to checking.
-   *
-   * @param period The period to check for.
-   * @return       True if the period has passed.
-   * @deprecated Use AdvanceIfElapsed() instead.
-   */
-  WPI_DEPRECATED("Use AdvanceIfElapsed() instead.")
-  bool HasPeriodPassed(units::second_t period);
 
   /**
    * Check if the period specified has passed and if it has, advance the start

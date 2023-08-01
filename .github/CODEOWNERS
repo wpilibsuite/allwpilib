@@ -29,8 +29,6 @@
 
 /wpilibNewCommands/  @wpilibsuite/commandbased
 
-/wpilibOldCommands/  @wpilibsuite/commandbased
-
 /wpilibcExamples/  @wpilibsuite/wpilib @wpilibsuite/documentation
 
 /wpilibjExamples/  @wpilibsuite/wpilib @wpilibsuite/documentation

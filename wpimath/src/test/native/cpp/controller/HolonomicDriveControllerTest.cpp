@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <wpi/numbers>
+#include <numbers>
 
 #include "frc/MathUtil.h"
 #include "frc/controller/HolonomicDriveController.h"
@@ -16,7 +16,7 @@
   EXPECT_LE(units::math::abs(val1 - val2), eps)
 
 static constexpr units::meter_t kTolerance{1 / 12.0};
-static constexpr units::radian_t kAngularTolerance{2.0 * wpi::numbers::pi /
+static constexpr units::radian_t kAngularTolerance{2.0 * std::numbers::pi /
                                                    180.0};
 
 TEST(HolonomicDriveControllerTest, ReachesReference) {
@@ -25,10 +25,10 @@ TEST(HolonomicDriveControllerTest, ReachesReference) {
       frc::ProfiledPIDController<units::radian>{
           1.0, 0.0, 0.0,
           frc::TrapezoidProfile<units::radian>::Constraints{
-              units::radians_per_second_t{2.0 * wpi::numbers::pi},
-              units::radians_per_second_squared_t{wpi::numbers::pi}}}};
+              units::radians_per_second_t{2.0 * std::numbers::pi},
+              units::radians_per_second_squared_t{std::numbers::pi}}}};
 
-  frc::Pose2d robotPose{2.7_m, 23_m, frc::Rotation2d{0_deg}};
+  frc::Pose2d robotPose{2.7_m, 23_m, 0_deg};
 
   auto waypoints = std::vector{frc::Pose2d{2.75_m, 22.521_m, 0_rad},
                                frc::Pose2d{24.73_m, 19.68_m, 5.846_rad}};
@@ -60,7 +60,7 @@ TEST(HolonomicDriveControllerTest, DoesNotRotateUnnecessarily) {
               4_rad_per_s, 2_rad_per_s / 1_s}}};
 
   frc::ChassisSpeeds speeds = controller.Calculate(
-      frc::Pose2d(0_m, 0_m, 1.57_rad), frc::Pose2d(), 0_mps, 1.57_rad);
+      frc::Pose2d{0_m, 0_m, 1.57_rad}, frc::Pose2d{}, 0_mps, 1.57_rad);
 
   EXPECT_EQ(0, speeds.omega.value());
 }

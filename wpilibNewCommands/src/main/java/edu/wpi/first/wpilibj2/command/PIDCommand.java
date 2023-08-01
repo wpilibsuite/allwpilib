@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.math.controller.PIDController;
 import java.util.Set;
@@ -18,7 +18,7 @@ import java.util.function.DoubleSupplier;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public class PIDCommand extends CommandBase {
+public class PIDCommand extends Command {
   protected final PIDController m_controller;
   protected DoubleSupplier m_measurement;
   protected DoubleSupplier m_setpoint;

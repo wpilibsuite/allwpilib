@@ -23,7 +23,7 @@ extern "C" {
  *
  * @param[in] portHandle         the port handle to create from
  * @param[in] input              true for input, false for output
- * @param[in] allocationLocation the location where the allocation is occuring
+ * @param[in] allocationLocation the location where the allocation is occurring
  *                               (can be null)
  * @param[out] status            Error status variable. 0 on success.
  * @return the created digital handle
@@ -37,7 +37,7 @@ HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
  * Checks if a DIO channel is valid.
  *
  * @param channel the channel number to check
- * @return true if the channel is correct, otherwise false
+ * @return true if the channel is valid, otherwise false
  */
 HAL_Bool HAL_CheckDIOChannel(int32_t channel);
 
@@ -77,7 +77,7 @@ void HAL_FreeDigitalPWM(HAL_DigitalPWMHandle pwmGenerator, int32_t* status);
  *
  * The valid range is from 0.6 Hz to 19 kHz.
  *
- *  The frequency resolution is logarithmic.
+ * The frequency resolution is logarithmic.
  *
  * @param[in] rate the frequency to output all digital output PWM signals
  * @param[out] status Error status variable. 0 on success.
@@ -93,6 +93,16 @@ void HAL_SetDigitalPWMRate(double rate, int32_t* status);
  */
 void HAL_SetDigitalPWMDutyCycle(HAL_DigitalPWMHandle pwmGenerator,
                                 double dutyCycle, int32_t* status);
+
+/**
+ * Configures the digital PWM to be a PPS signal with specified duty cycle.
+ *
+ * @param[in] pwmGenerator the digital PWM handle
+ * @param[in] dutyCycle    the percent duty cycle to output [0..1]
+ * @param[out] status      Error status variable. 0 on success.
+ */
+void HAL_SetDigitalPWMPPS(HAL_DigitalPWMHandle pwmGenerator, double dutyCycle,
+                          int32_t* status);
 
 /**
  * Configures which DO channel the PWM signal is output on.
@@ -150,11 +160,24 @@ HAL_Bool HAL_GetDIODirection(HAL_DigitalHandle dioPortHandle, int32_t* status);
  * single pulse going at any time.
  *
  * @param[in] dioPortHandle the digital port handle
- * @param[in] pulseLength   the active length of the pulse (in seconds)
+ * @param[in] pulseLengthSeconds   the active length of the pulse (in seconds)
  * @param[out] status       Error status variable. 0 on success.
  */
-void HAL_Pulse(HAL_DigitalHandle dioPortHandle, double pulseLength,
+void HAL_Pulse(HAL_DigitalHandle dioPortHandle, double pulseLengthSeconds,
                int32_t* status);
+
+/**
+ * Generates a single digital pulse on multiple channels.
+ *
+ * Write a pulse to the channels enabled by the mask. There can only be a
+ * single pulse going at any time.
+ *
+ * @param[in] channelMask the channel mask
+ * @param[in] pulseLengthSeconds   the active length of the pulse (in seconds)
+ * @param[out] status       Error status variable. 0 on success.
+ */
+void HAL_PulseMultiple(uint32_t channelMask, double pulseLengthSeconds,
+                       int32_t* status);
 
 /**
  * Checks a DIO line to see if it is currently generating a pulse.
@@ -204,7 +227,7 @@ int32_t HAL_GetFilterSelect(HAL_DigitalHandle dioPortHandle, int32_t* status);
  *
  * Sets the filter period in FPGA cycles.  Even though there are 2 different
  * filter index domains (MXP vs HDR), ignore that distinction for now since it
- * compilicates the interface.  That can be changed later.
+ * complicates the interface.  That can be changed later.
  *
  * @param[in] filterIndex the filter index, 0 - 2
  * @param[in] value       the number of cycles that the signal must not
@@ -218,11 +241,12 @@ void HAL_SetFilterPeriod(int32_t filterIndex, int64_t value, int32_t* status);
  *
  * Gets the filter period in FPGA cycles.  Even though there are 2 different
  * filter index domains (MXP vs HDR), ignore that distinction for now since it
- * compilicates the interface.  Set status to NiFpga_Status_SoftwareFault if the
- * filter values miss-match.
+ * complicates the interface.  Set status to NiFpga_Status_SoftwareFault if the
+ * filter values mismatch.
  *
  * @param[in] filterIndex the filter index, 0 - 2
  * @param[out] status     Error status variable. 0 on success.
+ * @return                The number of FPGA cycles of the filter period.
  */
 int64_t HAL_GetFilterPeriod(int32_t filterIndex, int32_t* status);
 #ifdef __cplusplus

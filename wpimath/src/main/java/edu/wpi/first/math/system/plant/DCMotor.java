@@ -8,35 +8,20 @@ import edu.wpi.first.math.util.Units;
 
 /** Holds the constants for a DC motor. */
 public class DCMotor {
-  @SuppressWarnings("MemberName")
   public final double nominalVoltageVolts;
-
-  @SuppressWarnings("MemberName")
   public final double stallTorqueNewtonMeters;
-
-  @SuppressWarnings("MemberName")
   public final double stallCurrentAmps;
-
-  @SuppressWarnings("MemberName")
   public final double freeCurrentAmps;
-
-  @SuppressWarnings("MemberName")
   public final double freeSpeedRadPerSec;
-
-  @SuppressWarnings("MemberName")
   public final double rOhms;
-
-  @SuppressWarnings("MemberName")
   public final double KvRadPerSecPerVolt;
-
-  @SuppressWarnings("MemberName")
   public final double KtNMPerAmp;
 
   /**
    * Constructs a DC motor.
    *
    * @param nominalVoltageVolts Voltage at which the motor constants were measured.
-   * @param stallTorqueNewtonMeters Current draw when stalled.
+   * @param stallTorqueNewtonMeters Torque when stalled.
    * @param stallCurrentAmps Current draw when stalled.
    * @param freeCurrentAmps Current draw under no load.
    * @param freeSpeedRadPerSec Angular velocity under no load.
@@ -62,14 +47,63 @@ public class DCMotor {
   }
 
   /**
-   * Estimate the current being drawn by this motor.
+   * Calculate current drawn by motor with given speed and input voltage.
    *
-   * @param speedRadiansPerSec The speed of the rotor.
-   * @param voltageInputVolts The input voltage.
+   * @param speedRadiansPerSec The current angular velocity of the motor.
+   * @param voltageInputVolts The voltage being applied to the motor.
    * @return The estimated current.
    */
   public double getCurrent(double speedRadiansPerSec, double voltageInputVolts) {
     return -1.0 / KvRadPerSecPerVolt / rOhms * speedRadiansPerSec + 1.0 / rOhms * voltageInputVolts;
+  }
+
+  /**
+   * Calculate torque produced by the motor with a given current.
+   *
+   * @param currentAmpere The current drawn by the motor.
+   * @return The torque output.
+   */
+  public double getTorque(double currentAmpere) {
+    return currentAmpere * KtNMPerAmp;
+  }
+
+  /**
+   * Calculate the voltage provided to the motor for a given torque and angular velocity.
+   *
+   * @param torqueNm The torque produced by the motor.
+   * @param speedRadiansPerSec The current angular velocity of the motor.
+   * @return The voltage of the motor.
+   */
+  public double getVoltage(double torqueNm, double speedRadiansPerSec) {
+    return 1.0 / KvRadPerSecPerVolt * speedRadiansPerSec + 1.0 / KtNMPerAmp * rOhms * torqueNm;
+  }
+
+  /**
+   * Calculates the angular speed produced by the motor at a given torque and input voltage.
+   *
+   * @param torqueNm The torque produced by the motor.
+   * @param voltageInputVolts The voltage applied to the motor.
+   * @return The angular speed of the motor.
+   */
+  public double getSpeed(double torqueNm, double voltageInputVolts) {
+    return voltageInputVolts * KvRadPerSecPerVolt
+        - 1.0 / KtNMPerAmp * torqueNm * rOhms * KvRadPerSecPerVolt;
+  }
+
+  /**
+   * Returns a copy of this motor with the given gearbox reduction applied.
+   *
+   * @param gearboxReduction The gearbox reduction.
+   * @return A motor with the gearbox reduction applied.
+   */
+  public DCMotor withReduction(double gearboxReduction) {
+    return new DCMotor(
+        nominalVoltageVolts,
+        stallTorqueNewtonMeters * gearboxReduction,
+        stallCurrentAmps,
+        freeCurrentAmps,
+        freeSpeedRadPerSec / gearboxReduction,
+        1);
   }
 
   /**
@@ -191,6 +225,18 @@ public class DCMotor {
   public static DCMotor getFalcon500(int numMotors) {
     return new DCMotor(
         12, 4.69, 257, 1.5, Units.rotationsPerMinuteToRadiansPerSecond(6380.0), numMotors);
+  }
+
+  /**
+   * Return a gearbox of Falcon 500 motors with FOC (Field-Oriented Control) enabled.
+   *
+   * @param numMotors Number of motors in the gearbox.
+   * @return A gearbox of Falcon 500 FOC enabled motors.
+   */
+  public static DCMotor getFalcon500Foc(int numMotors) {
+    // https://store.ctr-electronics.com/falcon-500-powered-by-talon-fx/
+    return new DCMotor(
+        12, 5.84, 304, 1.5, Units.rotationsPerMinuteToRadiansPerSecond(6080.0), numMotors);
   }
 
   /**

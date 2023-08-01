@@ -40,7 +40,6 @@ class LinearSystemLoopTest {
   private final LinearSystemLoop<N2, N1, N1> m_loop =
       new LinearSystemLoop<>(m_plant, m_controller, m_observer, 12, 0.00505);
 
-  @SuppressWarnings("LocalVariableName")
   private static void updateTwoState(
       LinearSystem<N2, N1, N1> plant, LinearSystemLoop<N2, N1, N1> loop, double noise) {
     Matrix<N1, N1> y = plant.calculateY(loop.getXHat(), loop.getU()).plus(VecBuilder.fill(noise));
@@ -50,7 +49,6 @@ class LinearSystemLoopTest {
   }
 
   @Test
-  @SuppressWarnings("LocalVariableName")
   void testStateSpaceEnabled() {
     m_loop.reset(VecBuilder.fill(0, 0));
     Matrix<N2, N1> references = VecBuilder.fill(2.0, 0.0);
@@ -60,12 +58,12 @@ class LinearSystemLoopTest {
     TrapezoidProfile profile;
     TrapezoidProfile.State state;
     for (int i = 0; i < 1000; i++) {
-      profile =
-          new TrapezoidProfile(
-              constraints,
+      profile = new TrapezoidProfile(constraints);
+      state =
+          profile.calculate(
+              kDt,
               new TrapezoidProfile.State(m_loop.getXHat(0), m_loop.getXHat(1)),
               new TrapezoidProfile.State(references.get(0, 0), references.get(1, 0)));
-      state = profile.calculate(kDt);
       m_loop.setNextR(VecBuilder.fill(state.position, state.velocity));
 
       updateTwoState(m_plant, m_loop, (random.nextGaussian()) * kPositionStddev);
@@ -79,7 +77,6 @@ class LinearSystemLoopTest {
   }
 
   @Test
-  @SuppressWarnings("LocalVariableName")
   void testFlywheelEnabled() {
     LinearSystem<N1, N1, N1> plant =
         LinearSystemId.createFlywheelSystem(DCMotor.getNEO(2), 0.00289, 1.0);

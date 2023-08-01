@@ -81,7 +81,7 @@ class WPILIB_DLLEXPORT TrajectoryParameterizer {
    * the trajectory, max velocity, min acceleration and max acceleration.
    */
   struct ConstrainedState {
-    PoseWithCurvature pose = {Pose2d(), units::curvature_t(0.0)};
+    PoseWithCurvature pose = {Pose2d{}, units::curvature_t{0.0}};
     units::meter_t distance = 0_m;
     units::meters_per_second_t maxVelocity = 0_mps;
     units::meters_per_second_squared_t minAcceleration = 0_mps_sq;

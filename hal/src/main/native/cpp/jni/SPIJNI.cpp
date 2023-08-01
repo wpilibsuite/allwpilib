@@ -15,6 +15,27 @@
 using namespace hal;
 using namespace wpi::java;
 
+static_assert(HAL_SPIPort::HAL_SPI_kInvalid ==
+              edu_wpi_first_hal_SPIJNI_INVALID_PORT);
+static_assert(HAL_SPIPort::HAL_SPI_kOnboardCS0 ==
+              edu_wpi_first_hal_SPIJNI_ONBOARD_CS0_PORT);
+static_assert(HAL_SPIPort::HAL_SPI_kOnboardCS1 ==
+              edu_wpi_first_hal_SPIJNI_ONBOARD_CS1_PORT);
+static_assert(HAL_SPIPort::HAL_SPI_kOnboardCS2 ==
+              edu_wpi_first_hal_SPIJNI_ONBOARD_CS2_PORT);
+static_assert(HAL_SPIPort::HAL_SPI_kOnboardCS3 ==
+              edu_wpi_first_hal_SPIJNI_ONBOARD_CS3_PORT);
+static_assert(HAL_SPIPort::HAL_SPI_kMXP == edu_wpi_first_hal_SPIJNI_MXP_PORT);
+
+static_assert(HAL_SPIMode::HAL_SPI_kMode0 ==
+              edu_wpi_first_hal_SPIJNI_SPI_MODE0);
+static_assert(HAL_SPIMode::HAL_SPI_kMode1 ==
+              edu_wpi_first_hal_SPIJNI_SPI_MODE1);
+static_assert(HAL_SPIMode::HAL_SPI_kMode2 ==
+              edu_wpi_first_hal_SPIJNI_SPI_MODE2);
+static_assert(HAL_SPIMode::HAL_SPI_kMode3 ==
+              edu_wpi_first_hal_SPIJNI_SPI_MODE3);
+
 extern "C" {
 
 /*
@@ -63,6 +84,11 @@ Java_edu_wpi_first_hal_SPIJNI_spiTransactionB
   (JNIEnv* env, jclass, jint port, jbyteArray dataToSend,
    jbyteArray dataReceived, jbyte size)
 {
+  if (size < 0) {
+    ThrowIllegalArgumentException(env, "SPIJNI.spiTransactionB() size < 0");
+    return 0;
+  }
+
   wpi::SmallVector<uint8_t, 128> recvBuf;
   recvBuf.resize(size);
   jint retVal =
@@ -120,6 +146,11 @@ Java_edu_wpi_first_hal_SPIJNI_spiRead
   (JNIEnv* env, jclass, jint port, jboolean initiate, jobject dataReceived,
    jbyte size)
 {
+  if (size < 0) {
+    ThrowIllegalArgumentException(env, "SPIJNI.spiRead() size < 0");
+    return 0;
+  }
+
   uint8_t* dataReceivedPtr =
       reinterpret_cast<uint8_t*>(env->GetDirectBufferAddress(dataReceived));
   jint retVal;
@@ -145,6 +176,11 @@ Java_edu_wpi_first_hal_SPIJNI_spiReadB
   (JNIEnv* env, jclass, jint port, jboolean initiate, jbyteArray dataReceived,
    jbyte size)
 {
+  if (size < 0) {
+    ThrowIllegalArgumentException(env, "SPIJNI.spiReadB() size < 0");
+    return 0;
+  }
+
   jint retVal;
   wpi::SmallVector<uint8_t, 128> recvBuf;
   recvBuf.resize(size);
@@ -187,16 +223,27 @@ Java_edu_wpi_first_hal_SPIJNI_spiSetSpeed
 
 /*
  * Class:     edu_wpi_first_hal_SPIJNI
- * Method:    spiSetOpts
- * Signature: (IIII)V
+ * Method:    spiSetMode
+ * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_SPIJNI_spiSetOpts
-  (JNIEnv*, jclass, jint port, jint msb_first, jint sample_on_trailing,
-   jint clk_idle_high)
+Java_edu_wpi_first_hal_SPIJNI_spiSetMode
+  (JNIEnv*, jclass, jint port, jint mode)
 {
-  HAL_SetSPIOpts(static_cast<HAL_SPIPort>(port), msb_first, sample_on_trailing,
-                 clk_idle_high);
+  HAL_SetSPIMode(static_cast<HAL_SPIPort>(port),
+                 static_cast<HAL_SPIMode>(mode));
+}
+
+/*
+ * Class:     edu_wpi_first_hal_SPIJNI
+ * Method:    spiGetMode
+ * Signature: (I)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_SPIJNI_spiGetMode
+  (JNIEnv*, jclass, jint port)
+{
+  return static_cast<jint>(HAL_GetSPIMode(static_cast<HAL_SPIPort>(port)));
 }
 
 /*
@@ -361,6 +408,12 @@ Java_edu_wpi_first_hal_SPIJNI_spiReadAutoReceivedData__I_3IID
   (JNIEnv* env, jclass, jint port, jintArray buffer, jint numToRead,
    jdouble timeout)
 {
+  if (numToRead < 0) {
+    ThrowIllegalArgumentException(
+        env, "SPIJNI.spiReadAutoReceivedData() numToRead < 0");
+    return 0;
+  }
+
   wpi::SmallVector<uint32_t, 128> recvBuf;
   recvBuf.resize(numToRead);
   int32_t status = 0;

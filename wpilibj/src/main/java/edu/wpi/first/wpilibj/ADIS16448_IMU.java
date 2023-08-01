@@ -15,10 +15,11 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.SimBoolean;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDouble;
-import edu.wpi.first.networktables.NTSendable;
-import edu.wpi.first.networktables.NTSendableBuilder;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 
 // CHECKSTYLE.OFF: TypeName
 // CHECKSTYLE.OFF: MemberName
@@ -49,7 +50,7 @@ import edu.wpi.first.networktables.NTSendableBuilder;
   "PMD.EmptyIfStmt",
   "PMD.EmptyStatementNotInLoop"
 })
-public class ADIS16448_IMU implements AutoCloseable, NTSendable {
+public class ADIS16448_IMU implements AutoCloseable, Sendable {
   /** ADIS16448 Register Map Declaration */
   private static final int FLASH_CNT = 0x00; // Flash memory write count
 
@@ -183,8 +184,10 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
   private DigitalInput m_reset_in;
   private DigitalOutput m_status_led;
   private Thread m_acquire_task;
+  private boolean m_connected;
 
   private SimDevice m_simDevice;
+  private SimBoolean m_simConnected;
   private SimDouble m_simGyroAngleX;
   private SimDouble m_simGyroAngleY;
   private SimDouble m_simGyroAngleZ;
@@ -262,6 +265,7 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
 
     m_simDevice = SimDevice.create("Gyro:ADIS16448", port.value);
     if (m_simDevice != null) {
+      m_simConnected = m_simDevice.createBoolean("connected", SimDevice.Direction.kInput, true);
       m_simGyroAngleX = m_simDevice.createDouble("gyro_angle_x", SimDevice.Direction.kInput, 0.0);
       m_simGyroAngleY = m_simDevice.createDouble("gyro_angle_y", SimDevice.Direction.kInput, 0.0);
       m_simGyroAngleZ = m_simDevice.createDouble("gyro_angle_z", SimDevice.Direction.kInput, 0.0);
@@ -314,7 +318,7 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
       calibrate();
       // Reset accumulated offsets
       reset();
-      // Tell the acquire loop that we're done starting up
+      // Indicate to the acquire loop that we're done starting up
       m_start_up_mode = false;
       // Let the user know the IMU was initiallized successfully
       DriverStation.reportWarning("ADIS16448 IMU Successfully Initialized!", false);
@@ -324,6 +328,14 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
 
     // Report usage and post data to DS
     HAL.report(tResourceType.kResourceType_ADIS16448, 0);
+    m_connected = true;
+  }
+
+  public boolean isConnected() {
+    if (m_simConnected != null) {
+      return m_simConnected.get();
+    }
+    return m_connected;
   }
 
   /** */
@@ -351,8 +363,7 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
 
   /** */
   private static int toInt(int... buf) {
-    return (int)
-        ((buf[0] & 0xFF) << 24 | (buf[1] & 0xFF) << 16 | (buf[2] & 0xFF) << 8 | (buf[3] & 0xFF));
+    return (buf[0] & 0xFF) << 24 | (buf[1] & 0xFF) << 16 | (buf[2] & 0xFF) << 8 | (buf[3] & 0xFF);
   }
 
   /** */
@@ -396,9 +407,7 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
       System.out.println("Setting up a new SPI port.");
       m_spi = new SPI(m_spi_port);
       m_spi.setClockRate(1000000);
-      m_spi.setMSBFirst();
-      m_spi.setSampleDataOnTrailingEdge();
-      m_spi.setClockActiveLow();
+      m_spi.setMode(SPI.Mode.kMode3);
       m_spi.setChipSelectActiveLow();
       readRegister(PROD_ID); // Dummy read
 
@@ -446,7 +455,7 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
     m_spi.setAutoTransmitData(new byte[] {GLOB_CMD}, 27);
     // Configure auto stall time
     m_spi.configureAutoStall(100, 1000, 255);
-    // Kick off auto SPI (Note: Device configration impossible after auto SPI is
+    // Kick off auto SPI (Note: Device configuration impossible after auto SPI is
     // activated)
     m_spi.startAutoTrigger(m_auto_interrupt, true, false);
 
@@ -482,12 +491,12 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
     /* Check max */
     if (m_decRate > 9) {
       DriverStation.reportError(
-          "Attemted to write an invalid decimation value. Capping at 9", false);
+          "Attempted to write an invalid decimation value. Capping at 9", false);
       m_decRate = 9;
     }
     if (m_decRate < 0) {
       DriverStation.reportError(
-          "Attemted to write an invalid decimation value. Capping at 0", false);
+          "Attempted to write an invalid decimation value. Capping at 0", false);
       m_decRate = 0;
     }
 
@@ -541,7 +550,7 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
       m_offset_data_gyro_rate_x = new double[size];
       m_offset_data_gyro_rate_y = new double[size];
       m_offset_data_gyro_rate_z = new double[size];
-      // Set acculumate count to 0
+      // Set accumulate count to 0
       m_accum_count = 0;
     }
   }
@@ -614,7 +623,6 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
     m_spi.write(buf, 2);
   }
 
-  /** {@inheritDoc} */
   public void reset() {
     synchronized (this) {
       m_integ_gyro_angle_x = 0.0;
@@ -943,7 +951,9 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
     return compAngle;
   }
 
-  /** @return Yaw axis angle in degrees (CCW positive) */
+  /**
+   * @return Yaw axis angle in degrees (CCW positive)
+   */
   public synchronized double getAngle() {
     switch (m_yaw_axis) {
       case kX:
@@ -957,7 +967,9 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
     }
   }
 
-  /** @return Yaw axis angular rate in degrees per second (CCW positive) */
+  /**
+   * @return Yaw axis angular rate in degrees per second (CCW positive)
+   */
   public synchronized double getRate() {
     switch (m_yaw_axis) {
       case kX:
@@ -971,12 +983,16 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
     }
   }
 
-  /** @return Yaw Axis */
+  /**
+   * @return Yaw Axis
+   */
   public IMUAxis getYawAxis() {
     return m_yaw_axis;
   }
 
-  /** @return accumulated gyro angle in the X axis in degrees */
+  /**
+   * @return accumulated gyro angle in the X axis in degrees
+   */
   public synchronized double getGyroAngleX() {
     if (m_simGyroAngleX != null) {
       return m_simGyroAngleX.get();
@@ -984,7 +1000,9 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
     return m_integ_gyro_angle_x;
   }
 
-  /** @return accumulated gyro angle in the Y axis in degrees */
+  /**
+   * @return accumulated gyro angle in the Y axis in degrees
+   */
   public synchronized double getGyroAngleY() {
     if (m_simGyroAngleY != null) {
       return m_simGyroAngleY.get();
@@ -992,7 +1010,9 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
     return m_integ_gyro_angle_y;
   }
 
-  /** @return accumulated gyro angle in the Z axis in degrees */
+  /**
+   * @return accumulated gyro angle in the Z axis in degrees
+   */
   public synchronized double getGyroAngleZ() {
     if (m_simGyroAngleZ != null) {
       return m_simGyroAngleZ.get();
@@ -1000,7 +1020,9 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
     return m_integ_gyro_angle_z;
   }
 
-  /** @return gyro angular rate in the X axis in degrees per second */
+  /**
+   * @return gyro angular rate in the X axis in degrees per second
+   */
   public synchronized double getGyroRateX() {
     if (m_simGyroRateX != null) {
       return m_simGyroRateX.get();
@@ -1008,7 +1030,9 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
     return m_gyro_rate_x;
   }
 
-  /** @return gyro angular rate in the Y axis in degrees per second */
+  /**
+   * @return gyro angular rate in the Y axis in degrees per second
+   */
   public synchronized double getGyroRateY() {
     if (m_simGyroRateY != null) {
       return m_simGyroRateY.get();
@@ -1016,7 +1040,9 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
     return m_gyro_rate_y;
   }
 
-  /** @return gyro angular rate in the Z axis in degrees per second */
+  /**
+   * @return gyro angular rate in the Z axis in degrees per second
+   */
   public synchronized double getGyroRateZ() {
     if (m_simGyroRateZ != null) {
       return m_simGyroRateZ.get();
@@ -1024,7 +1050,9 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
     return m_gyro_rate_z;
   }
 
-  /** @return urrent acceleration in the X axis in meters per second squared */
+  /**
+   * @return urrent acceleration in the X axis in meters per second squared
+   */
   public synchronized double getAccelX() {
     if (m_simAccelX != null) {
       return m_simAccelX.get();
@@ -1032,7 +1060,9 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
     return m_accel_x * 9.81;
   }
 
-  /** @return current acceleration in the Y axis in meters per second squared */
+  /**
+   * @return current acceleration in the Y axis in meters per second squared
+   */
   public synchronized double getAccelY() {
     if (m_simAccelY != null) {
       return m_simAccelY.get();
@@ -1040,7 +1070,9 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
     return m_accel_y * 9.81;
   }
 
-  /** @return current acceleration in the Z axis in meters per second squared */
+  /**
+   * @return current acceleration in the Z axis in meters per second squared
+   */
   public synchronized double getAccelZ() {
     if (m_simAccelZ != null) {
       return m_simAccelZ.get();
@@ -1048,51 +1080,69 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
     return m_accel_z * 9.81;
   }
 
-  /** @return Magnetic field strength in the X axis in Tesla */
+  /**
+   * @return Magnetic field strength in the X axis in Tesla
+   */
   public synchronized double getMagneticFieldX() {
     // mG to T
     return m_mag_x * 1e-7;
   }
 
-  /** @return Magnetic field strength in the Y axis in Tesla */
+  /**
+   * @return Magnetic field strength in the Y axis in Tesla
+   */
   public synchronized double getMagneticFieldY() {
     // mG to T
     return m_mag_y * 1e-7;
   }
 
-  /** @return Magnetic field strength in the Z axis in Tesla */
+  /**
+   * @return Magnetic field strength in the Z axis in Tesla
+   */
   public synchronized double getMagneticFieldZ() {
     // mG to T
     return m_mag_z * 1e-7;
   }
 
-  /** @return X axis complementary angle in degrees */
+  /**
+   * @return X-axis complementary angle in degrees
+   */
   public synchronized double getXComplementaryAngle() {
     return m_compAngleX;
   }
 
-  /** @return Y axis complementary angle in degrees */
+  /**
+   * @return Y-axis complementary angle in degrees
+   */
   public synchronized double getYComplementaryAngle() {
     return m_compAngleY;
   }
 
-  /** @return X axis filtered acceleration angle in degrees */
+  /**
+   * @return X-axis filtered acceleration angle in degrees
+   */
   public synchronized double getXFilteredAccelAngle() {
     return m_accelAngleX;
   }
 
-  /** @return Y axis filtered acceleration angle in degrees */
+  /**
+   * @return Y-axis filtered acceleration angle in degrees
+   */
   public synchronized double getYFilteredAccelAngle() {
     return m_accelAngleY;
   }
 
-  /** @return Barometric Pressure in PSI */
+  /**
+   * @return Barometric Pressure in PSI
+   */
   public synchronized double getBarometricPressure() {
-    // mbar to PSI
+    // mbar to PSI conversion
     return m_baro * 0.0145;
   }
 
-  /** @return Temperature in degrees Celsius */
+  /**
+   * @return Temperature in degrees Celsius
+   */
   public synchronized double getTemperature() {
     return m_temp;
   }
@@ -1107,7 +1157,7 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
   }
 
   @Override
-  public void initSendable(NTSendableBuilder builder) {
+  public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Gyro");
     builder.addDoubleProperty("Value", this::getAngle, null);
   }

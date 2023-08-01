@@ -6,7 +6,6 @@ package edu.wpi.first.hal.simulation;
 
 import edu.wpi.first.hal.JNIWrapper;
 
-@SuppressWarnings("AbbreviationAsWordInName")
 public class CTREPCMDataJNI extends JNIWrapper {
   public static native int registerInitializedCallback(
       int index, NotifyCallback callback, boolean initialNotify);

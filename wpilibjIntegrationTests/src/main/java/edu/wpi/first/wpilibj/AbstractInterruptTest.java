@@ -52,7 +52,7 @@ public abstract class AbstractInterruptTest extends AbstractComsSetup {
   abstract void setInterruptLow();
 
   @Test(timeout = 1000)
-  public void testSingleInterruptsTriggering() throws Exception {
+  public void testSingleInterruptsTriggering() {
     // Given
     // final InterruptCounter counter = new InterruptCounter();
     // TestInterruptHandlerFunction function = new

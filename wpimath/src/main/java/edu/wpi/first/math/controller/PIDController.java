@@ -24,6 +24,9 @@ public class PIDController implements Sendable, AutoCloseable {
   // Factor for "derivative" control
   private double m_kd;
 
+  // The error range where "integral" control applies
+  private double m_iZone = Double.POSITIVE_INFINITY;
+
   // The period (in seconds) of the loop that calls the controller
   private final double m_period;
 
@@ -35,7 +38,7 @@ public class PIDController implements Sendable, AutoCloseable {
 
   private double m_minimumInput;
 
-  // Do the endpoints wrap around? eg. Absolute encoder
+  // Do the endpoints wrap around? e.g. Absolute encoder
   private boolean m_continuous;
 
   // The error at the time of the most recent call to calculate()
@@ -54,6 +57,9 @@ public class PIDController implements Sendable, AutoCloseable {
 
   private double m_setpoint;
   private double m_measurement;
+
+  private boolean m_haveMeasurement;
+  private boolean m_haveSetpoint;
 
   /**
    * Allocates a PIDController with the given constants for kp, ki, and kd and a default period of
@@ -139,6 +145,22 @@ public class PIDController implements Sendable, AutoCloseable {
   }
 
   /**
+   * Sets the IZone range. When the absolute value of the position error is greater than IZone, the
+   * total accumulated error will reset to zero, disabling integral gain until the absolute value of
+   * the position error is less than IZone. This is used to prevent integral windup. Must be
+   * non-negative. Passing a value of zero will effectively disable integral gain. Passing a value
+   * of {@link Double#POSITIVE_INFINITY} disables IZone functionality.
+   *
+   * @param iZone Maximum magnitude of error to allow integral control.
+   */
+  public void setIZone(double iZone) {
+    if (iZone < 0) {
+      throw new IllegalArgumentException("IZone must be a non-negative number!");
+    }
+    m_iZone = iZone;
+  }
+
+  /**
    * Get the Proportional coefficient.
    *
    * @return proportional coefficient
@@ -166,6 +188,15 @@ public class PIDController implements Sendable, AutoCloseable {
   }
 
   /**
+   * Get the IZone range.
+   *
+   * @return Maximum magnitude of error to allow integral control.
+   */
+  public double getIZone() {
+    return m_iZone;
+  }
+
+  /**
    * Returns the period of this controller.
    *
    * @return the period of the controller.
@@ -175,12 +206,40 @@ public class PIDController implements Sendable, AutoCloseable {
   }
 
   /**
+   * Returns the position tolerance of this controller.
+   *
+   * @return the position tolerance of the controller.
+   */
+  public double getPositionTolerance() {
+    return m_positionTolerance;
+  }
+
+  /**
+   * Returns the velocity tolerance of this controller.
+   *
+   * @return the velocity tolerance of the controller.
+   */
+  public double getVelocityTolerance() {
+    return m_velocityTolerance;
+  }
+
+  /**
    * Sets the setpoint for the PIDController.
    *
    * @param setpoint The desired setpoint.
    */
   public void setSetpoint(double setpoint) {
     m_setpoint = setpoint;
+    m_haveSetpoint = true;
+
+    if (m_continuous) {
+      double errorBound = (m_maximumInput - m_minimumInput) / 2.0;
+      m_positionError = MathUtil.inputModulus(m_setpoint - m_measurement, -errorBound, errorBound);
+    } else {
+      m_positionError = m_setpoint - m_measurement;
+    }
+
+    m_velocityError = (m_positionError - m_prevError) / m_period;
   }
 
   /**
@@ -200,18 +259,10 @@ public class PIDController implements Sendable, AutoCloseable {
    * @return Whether the error is within the acceptable bounds.
    */
   public boolean atSetpoint() {
-    double positionError;
-    if (m_continuous) {
-      double errorBound = (m_maximumInput - m_minimumInput) / 2.0;
-      positionError = MathUtil.inputModulus(m_setpoint - m_measurement, -errorBound, errorBound);
-    } else {
-      positionError = m_setpoint - m_measurement;
-    }
-
-    double velocityError = (positionError - m_prevError) / m_period;
-
-    return Math.abs(positionError) < m_positionTolerance
-        && Math.abs(velocityError) < m_velocityTolerance;
+    return m_haveMeasurement
+        && m_haveSetpoint
+        && Math.abs(m_positionError) < m_positionTolerance
+        && Math.abs(m_velocityError) < m_velocityTolerance;
   }
 
   /**
@@ -303,8 +354,8 @@ public class PIDController implements Sendable, AutoCloseable {
    * @return The next controller output.
    */
   public double calculate(double measurement, double setpoint) {
-    // Set setpoint to provided value
-    setSetpoint(setpoint);
+    m_setpoint = setpoint;
+    m_haveSetpoint = true;
     return calculate(measurement);
   }
 
@@ -317,17 +368,21 @@ public class PIDController implements Sendable, AutoCloseable {
   public double calculate(double measurement) {
     m_measurement = measurement;
     m_prevError = m_positionError;
+    m_haveMeasurement = true;
 
     if (m_continuous) {
       double errorBound = (m_maximumInput - m_minimumInput) / 2.0;
       m_positionError = MathUtil.inputModulus(m_setpoint - m_measurement, -errorBound, errorBound);
     } else {
-      m_positionError = m_setpoint - measurement;
+      m_positionError = m_setpoint - m_measurement;
     }
 
     m_velocityError = (m_positionError - m_prevError) / m_period;
 
-    if (m_ki != 0) {
+    // If the absolute value of the position error is greater than IZone, reset the total error
+    if (Math.abs(m_positionError) > m_iZone) {
+      m_totalError = 0;
+    } else if (m_ki != 0) {
       m_totalError =
           MathUtil.clamp(
               m_totalError + m_positionError * m_period,
@@ -340,8 +395,11 @@ public class PIDController implements Sendable, AutoCloseable {
 
   /** Resets the previous error and the integral term. */
   public void reset() {
+    m_positionError = 0;
     m_prevError = 0;
     m_totalError = 0;
+    m_velocityError = 0;
+    m_haveMeasurement = false;
   }
 
   @Override
@@ -350,6 +408,7 @@ public class PIDController implements Sendable, AutoCloseable {
     builder.addDoubleProperty("p", this::getP, this::setP);
     builder.addDoubleProperty("i", this::getI, this::setI);
     builder.addDoubleProperty("d", this::getD, this::setD);
+    builder.addDoubleProperty("izone", this::getIZone, this::setIZone);
     builder.addDoubleProperty("setpoint", this::getSetpoint, this::setSetpoint);
   }
 }

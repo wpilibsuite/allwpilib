@@ -2,10 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <numbers>
+
 #include <frc/Encoder.h>
 #include <frc/TimedRobot.h>
 #include <frc/XboxController.h>
-#include <frc/controller/LinearPlantInversionFeedforward.h>
 #include <frc/controller/LinearQuadraticRegulator.h>
 #include <frc/drive/DifferentialDrive.h>
 #include <frc/estimator/KalmanFilter.h>
@@ -16,7 +17,6 @@
 #include <frc/trajectory/TrapezoidProfile.h>
 #include <units/angle.h>
 #include <units/moment_of_inertia.h>
-#include <wpi/numbers>
 
 /**
  * This is a sample program to demonstrate how to use a state-space controller
@@ -64,8 +64,8 @@ class Robot : public frc::TimedRobot {
       // qelms. Velocity error tolerance, in radians and radians per second.
       // Decrease this to more heavily penalize state excursion, or make the
       // controller behave more aggressively.
-      {1.0 * 2.0 * wpi::numbers::pi / 360.0,
-       10.0 * 2.0 * wpi::numbers::pi / 360.0},
+      {1.0 * 2.0 * std::numbers::pi / 360.0,
+       10.0 * 2.0 * std::numbers::pi / 360.0},
       // relms. Control effort (voltage) tolerance. Decrease this to more
       // heavily penalize control effort, or make the controller less
       // aggressive. 12 is a good starting point because that is the
@@ -86,24 +86,23 @@ class Robot : public frc::TimedRobot {
   frc::PWMSparkMax m_motor{kMotorPort};
   frc::XboxController m_joystick{kJoystickPort};
 
-  frc::TrapezoidProfile<units::radians>::Constraints m_constraints{
-      45_deg_per_s, 90_deg_per_s / 1_s};
+  frc::TrapezoidProfile<units::radians> m_profile{
+      {45_deg_per_s, 90_deg_per_s / 1_s}};
 
   frc::TrapezoidProfile<units::radians>::State m_lastProfiledReference;
 
  public:
   void RobotInit() override {
     // We go 2 pi radians per 4096 clicks.
-    m_encoder.SetDistancePerPulse(2.0 * wpi::numbers::pi / 4096.0);
+    m_encoder.SetDistancePerPulse(2.0 * std::numbers::pi / 4096.0);
   }
 
   void TeleopInit() override {
-    m_loop.Reset(
-        Eigen::Vector<double, 2>{m_encoder.GetDistance(), m_encoder.GetRate()});
+    m_loop.Reset(frc::Vectord<2>{m_encoder.GetDistance(), m_encoder.GetRate()});
 
     m_lastProfiledReference = {
-        units::radian_t(m_encoder.GetDistance()),
-        units::radians_per_second_t(m_encoder.GetRate())};
+        units::radian_t{m_encoder.GetDistance()},
+        units::radians_per_second_t{m_encoder.GetRate()}};
   }
 
   void TeleopPeriodic() override {
@@ -118,16 +117,13 @@ class Robot : public frc::TimedRobot {
       goal = {kLoweredPosition, 0_rad_per_s};
     }
     m_lastProfiledReference =
-        (frc::TrapezoidProfile<units::radians>(m_constraints, goal,
-                                               m_lastProfiledReference))
-            .Calculate(20_ms);
+        m_profile.Calculate(20_ms, goal, m_lastProfiledReference);
 
-    m_loop.SetNextR(
-        Eigen::Vector<double, 2>{m_lastProfiledReference.position.value(),
-                                 m_lastProfiledReference.velocity.value()});
+    m_loop.SetNextR(frc::Vectord<2>{m_lastProfiledReference.position.value(),
+                                    m_lastProfiledReference.velocity.value()});
 
     // Correct our Kalman filter's state vector estimate with encoder data.
-    m_loop.Correct(Eigen::Vector<double, 1>{m_encoder.GetDistance()});
+    m_loop.Correct(frc::Vectord<1>{m_encoder.GetDistance()});
 
     // Update our LQR to generate new voltage commands and use the voltages to
     // predict the next state with out Kalman filter.
@@ -136,7 +132,7 @@ class Robot : public frc::TimedRobot {
     // Send the new calculated voltage to the motors.
     // voltage = duty cycle * battery voltage, so
     // duty cycle = voltage / battery voltage
-    m_motor.SetVoltage(units::volt_t(m_loop.U(0)));
+    m_motor.SetVoltage(units::volt_t{m_loop.U(0)});
   }
 };
 

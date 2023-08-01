@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 
@@ -14,9 +14,9 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public abstract class TrapezoidProfileSubsystem extends SubsystemBase {
+public abstract class TrapezoidProfileSubsystem extends Subsystem {
   private final double m_period;
-  private final TrapezoidProfile.Constraints m_constraints;
+  private final TrapezoidProfile m_profile;
 
   private TrapezoidProfile.State m_state;
   private TrapezoidProfile.State m_goal;
@@ -33,7 +33,8 @@ public abstract class TrapezoidProfileSubsystem extends SubsystemBase {
    */
   public TrapezoidProfileSubsystem(
       TrapezoidProfile.Constraints constraints, double initialPosition, double period) {
-    m_constraints = requireNonNullParam(constraints, "constraints", "TrapezoidProfileSubsystem");
+    requireNonNullParam(constraints, "constraints", "TrapezoidProfileSubsystem");
+    m_profile = new TrapezoidProfile(constraints);
     m_state = new TrapezoidProfile.State(initialPosition, 0);
     setGoal(initialPosition);
     m_period = period;
@@ -62,8 +63,7 @@ public abstract class TrapezoidProfileSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    var profile = new TrapezoidProfile(m_constraints, m_goal, m_state);
-    m_state = profile.calculate(m_period);
+    m_state = m_profile.calculate(m_period, m_goal, m_state);
     if (m_enabled) {
       useState(m_state);
     }

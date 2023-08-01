@@ -12,10 +12,10 @@
 #include <fmt/core.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
-#include <wpi/uv/Error.h>
-#include <wpi/uv/GetAddrInfo.h>
-#include <wpi/uv/Work.h>
-#include <wpi/uv/util.h>
+#include <wpinet/uv/Error.h>
+#include <wpinet/uv/GetAddrInfo.h>
+#include <wpinet/uv/Work.h>
+#include <wpinet/uv/util.h>
 
 #include "SshSession.h"
 
@@ -79,13 +79,13 @@ bool DeploySession::ChangeTeamNumber(const std::string& macAddress,
           session.Open();
           DEBUG("SSH connection to {} was successful.", ip);
 
-          SUCCESS("{}", "roboRIO Connected!");
+          SUCCESS("roboRIO Connected!");
 
           try {
             session.Execute(fmt::format(
                 "/usr/local/natinst/bin/nirtcfg "
                 "--file=/etc/natinst/share/ni-rt.ini --set "
-                "section=systemsettings,token=host_name,value=roborio-{"
+                "section=systemsettings,token=host_name,value=roboRIO-{"
                 "}-FRC ; sync",
                 teamNumber));
           } catch (const SshSession::SshException& e) {
@@ -123,7 +123,7 @@ bool DeploySession::Reboot(const std::string& macAddress,
           session.Open();
           DEBUG("SSH connection to {} was successful.", ip);
 
-          SUCCESS("{}", "roboRIO Connected!");
+          SUCCESS("roboRIO Connected!");
 
           try {
             session.Execute(fmt::format("sync ; shutdown -r now"));
@@ -162,7 +162,7 @@ bool DeploySession::Blink(const std::string& macAddress,
           session.Open();
           DEBUG("SSH connection to {} was successful.", ip);
 
-          SUCCESS("{}", "roboRIO Connected!");
+          SUCCESS("roboRIO Connected!");
 
           try {
             session.Execute(fmt::format(
