@@ -59,6 +59,10 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
   /**
    * Constructs an extended Kalman filter.
    *
+   * <p>See
+   * https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-observers.html#process-and-measurement-noise-covariance-matrices
+   * for how to select the standard deviations.
+   *
    * @param states a Nat representing the number of states.
    * @param inputs a Nat representing the number of inputs.
    * @param outputs a Nat representing the number of outputs.
@@ -92,6 +96,10 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
 
   /**
    * Constructs an extended Kalman filter.
+   *
+   * <p>See
+   * https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-observers.html#process-and-measurement-noise-covariance-matrices
+   * for how to select the standard deviations.
    *
    * @param states a Nat representing the number of states.
    * @param inputs a Nat representing the number of inputs.
