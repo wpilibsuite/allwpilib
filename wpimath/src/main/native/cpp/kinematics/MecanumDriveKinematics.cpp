@@ -60,8 +60,8 @@ Twist2d MecanumDriveKinematics::ToTwist2d(
 
   Eigen::Vector3d twistVector = m_forwardKinematics.solve(wheelDeltasVector);
 
-  return {units::meter_t{twistVector(0)},  // NOLINT
-          units::meter_t{twistVector(1)}, units::radian_t{twistVector(2)}};
+  return {units::meter_t{twistVector(0)}, units::meter_t{twistVector(1)},
+          units::radian_t{twistVector(2)}};
 }
 
 Twist2d MecanumDriveKinematics::ToTwist2d(
@@ -72,8 +72,8 @@ Twist2d MecanumDriveKinematics::ToTwist2d(
 
   Eigen::Vector3d twistVector = m_forwardKinematics.solve(wheelDeltasVector);
 
-  return {units::meter_t{twistVector(0)},  // NOLINT
-          units::meter_t{twistVector(1)}, units::radian_t{twistVector(2)}};
+  return {units::meter_t{twistVector(0)}, units::meter_t{twistVector(1)},
+          units::radian_t{twistVector(2)}};
 }
 
 void MecanumDriveKinematics::SetInverseKinematics(Translation2d fl,
