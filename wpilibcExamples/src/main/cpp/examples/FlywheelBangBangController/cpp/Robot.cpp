@@ -11,6 +11,7 @@
 #include <frc/simulation/EncoderSim.h>
 #include <frc/simulation/FlywheelSim.h>
 #include <frc/smartdashboard/SmartDashboard.h>
+#include <units/moment_of_inertia.h>
 
 /**
  * This is a sample program to demonstrate the use of a BangBangController with
@@ -25,22 +26,26 @@ class Robot : public frc::TimedRobot {
     // Scale setpoint value between 0 and maxSetpointValue
     units::radians_per_second_t setpoint = units::math::max(
         0_rad_per_s, m_joystick.GetRawAxis(0) * kMaxSetpointValue);
+
     // Set setpoint and measurement of the bang bang controller
-    double bangOutput =
-        m_bangBangControler.Calculate(m_encoder.GetRate(), setpoint.value());
+    units::volt_t bangOutput =
+        m_bangBangControler.Calculate(m_encoder.GetRate(), setpoint.value()) *
+        12_V;
 
     // Controls a motor with the output of the BangBang controller and a
-    // feedforward Shrinks the feedforward slightly to avoid overspeeding the
-    // shooter
-    double feedf = m_feedforward.Calculate(setpoint).value();
-    m_flywheelMotor.Set(bangOutput + 0.9 * feedf);
+    // feedforward. The feedforward is reduced slightly to avoid overspeeding
+    // the shooter.
+    m_flywheelMotor.SetVoltage(bangOutput +
+                               0.9 * m_feedforward.Calculate(setpoint));
   }
 
   void RobotInit() override {
     // Add bang bang controler to SmartDashboard and networktables.
     frc::SmartDashboard::PutData("BangBangControler", &m_bangBangControler);
   }
-  /** Update our simulation. This should be run every robot loop in simulation.
+
+  /**
+   * Update our simulation. This should be run every robot loop in simulation.
    */
   void SimulationPeriodic() override {
     // To update our simulation, we set motor voltage inputs, update the
@@ -56,25 +61,39 @@ class Robot : public frc::TimedRobot {
   static constexpr int kEncoderAChannel = 0;
   static constexpr int kEncoderBChannel = 1;
 
+  // Max setpoint for joystick control
   static constexpr units::radians_per_second_t kMaxSetpointValue{630.0};
+
+  // Joystick to control setpoint
+  frc::Joystick m_joystick{0};
 
   frc::PWMSparkMax m_flywheelMotor{kMotorPort};
   frc::Encoder m_encoder{kEncoderAChannel, kEncoderBChannel};
+
   frc::BangBangController m_bangBangControler;
+
   // Gains are for example purposes only - must be determined for your own
   // robot!
+  static constexpr units::volt_t kFlywheelKs = 0.0001_V;
+  static constexpr decltype(1_V / 1_rad_per_s) kFlywheelKv =
+      0.000195_V / 1_rad_per_s;
+  static constexpr decltype(1_V / 1_rad_per_s_sq) kFlywheelKa =
+      0.0003_V / 1_rad_per_s_sq;
   frc::SimpleMotorFeedforward<units::radians> m_feedforward{
-      0.000954_V, 0.00186_V / 1_rad_per_s, 0.00286_V / 1_rad_per_s_sq};
-  frc::Joystick m_joystick{0};  // Joystick to control setpoint
+      kFlywheelKs, kFlywheelKv, kFlywheelKa};
 
   // Simulation classes help us simulate our robot
 
   // Reduction between motors and encoder, as output over input. If the flywheel
   // spins slower than the motors, this number should be greater than one.
   static constexpr double kFlywheelGearing = 1.0;
-  frc::sim::FlywheelSim m_flywheelSim{
-      frc::DCMotor::NEO(1), kFlywheelGearing,
-      0.5 * 1.5_lb * units::math::pow<2>(4_in)};  // 1/2*M*R^2
+
+  // 1/2 MR²
+  static constexpr units::kilogram_square_meter_t kFlywheelMomentOfInertia =
+      0.5 * 1.5_lb * 4_in * 4_in;
+
+  frc::sim::FlywheelSim m_flywheelSim{frc::DCMotor::NEO(1), kFlywheelGearing,
+                                      kFlywheelMomentOfInertia};
   frc::sim::EncoderSim m_encoderSim{m_encoder};
 };
 

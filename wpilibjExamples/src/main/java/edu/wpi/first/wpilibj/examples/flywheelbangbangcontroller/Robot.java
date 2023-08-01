@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
@@ -27,10 +26,15 @@ public class Robot extends TimedRobot {
   private static final int kEncoderAChannel = 0;
   private static final int kEncoderBChannel = 1;
 
-  private final MotorController m_flywheelMotor = new PWMSparkMax(kMotorPort);
+  // Max setpoint for joystick control
+  private static final double kMaxSetpointValue = 6000;
+
+  // Joystick to control setpoint
+  private final Joystick m_joystick = new Joystick(0);
+
+  private final PWMSparkMax m_flywheelMotor = new PWMSparkMax(kMotorPort);
   private final Encoder m_encoder = new Encoder(kEncoderAChannel, kEncoderBChannel);
 
-  // Create Bang Bang controler
   private final BangBangController m_bangBangControler = new BangBangController();
 
   // Gains are for example purposes only - must be determined for your own robot!
@@ -40,17 +44,15 @@ public class Robot extends TimedRobot {
   private final SimpleMotorFeedforward m_feedforward =
       new SimpleMotorFeedforward(kFlywheelKs, kFlywheelKv, kFlywheelKa);
 
-  private final Joystick m_joystick = new Joystick(0); // Joystick to control setpoint
-  private static final double kMaxSetpointValue = 6000; // Max value for joystick control
-
   // Simulation classes help us simulate our robot
-
-  private static final double kFlywheelMomentOfInertia =
-      0.5 * Units.lbsToKilograms(1.5) * Math.pow(Units.inchesToMeters(4), 2); // 1/2*M*R^2
 
   // Reduction between motors and encoder, as output over input. If the flywheel
   // spins slower than the motors, this number should be greater than one.
   private static final double kFlywheelGearing = 1.0;
+
+  // 1/2 MR²
+  private static final double kFlywheelMomentOfInertia =
+      0.5 * Units.lbsToKilograms(1.5) * Math.pow(Units.inchesToMeters(4), 2);
 
   private final FlywheelSim m_flywheelSim =
       new FlywheelSim(DCMotor.getNEO(1), kFlywheelGearing, kFlywheelMomentOfInertia);
@@ -68,11 +70,12 @@ public class Robot extends TimedRobot {
     double setpoint = Math.max(0, m_joystick.getRawAxis(0) * kMaxSetpointValue);
 
     // Set setpoint and measurement of the bang bang controller
-    double bangOutput = m_bangBangControler.calculate(m_encoder.getRate(), setpoint);
+    double bangOutput = m_bangBangControler.calculate(m_encoder.getRate(), setpoint) * 12.0;
 
-    // Controls a motor with the output of the BangBang controller and a feedforward
-    // Shrinks the feedforward slightly to avoid overspeeding the shooter
-    m_flywheelMotor.set(bangOutput + 0.9 * m_feedforward.calculate(setpoint));
+    // Controls a motor with the output of the BangBang controller and a
+    // feedforward. The feedforward is reduced slightly to avoid overspeeding
+    // the shooter.
+    m_flywheelMotor.setVoltage(bangOutput + 0.9 * m_feedforward.calculate(setpoint));
   }
 
   /** Update our simulation. This should be run every robot loop in simulation. */
