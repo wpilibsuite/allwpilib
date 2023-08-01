@@ -6,10 +6,10 @@
 
 #include <wpi/SymbolExports.h>
 
-#include "Pose2d.h"
-#include "Transform3d.h"
-#include "Translation3d.h"
-#include "Twist3d.h"
+#include "frc/geometry/Pose2d.h"
+#include "frc/geometry/Transform3d.h"
+#include "frc/geometry/Translation3d.h"
+#include "frc/geometry/Twist3d.h"
 
 namespace wpi {
 class json;

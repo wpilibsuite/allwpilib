@@ -9,9 +9,9 @@
 
 #include <wpi/SymbolExports.h>
 
-#include "Transform2d.h"
-#include "Translation2d.h"
-#include "Twist2d.h"
+#include "frc/geometry/Transform2d.h"
+#include "frc/geometry/Translation2d.h"
+#include "frc/geometry/Twist2d.h"
 
 namespace wpi {
 class json;
@@ -206,4 +206,4 @@ void from_json(const wpi::json& json, Pose2d& pose);
 
 }  // namespace frc
 
-#include "Pose2d.inc"
+#include "frc/geometry/Pose2d.inc"
