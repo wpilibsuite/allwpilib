@@ -123,6 +123,15 @@ class WPILIB_DLLEXPORT Pose2d {
   constexpr Pose2d operator/(double scalar) const;
 
   /**
+   * Rotates the pose around the origin and returns the new pose.
+   *
+   * @param other The rotation to transform the pose by.
+   *
+   * @return The rotated pose.
+   */
+  constexpr Pose2d RotateBy(const Rotation2d& other) const;
+
+  /**
    * Transforms the pose by the given transformation and returns the new pose.
    * See + operator for the matrix multiplication performed.
    *

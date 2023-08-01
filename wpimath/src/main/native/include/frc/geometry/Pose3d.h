@@ -131,6 +131,15 @@ class WPILIB_DLLEXPORT Pose3d {
   Pose3d operator/(double scalar) const;
 
   /**
+   * Rotates the pose around the origin and returns the new pose.
+   *
+   * @param other The rotation to transform the pose by.
+   *
+   * @return The rotated pose.
+   */
+  Pose3d RotateBy(const Rotation3d& other) const;
+
+  /**
    * Transforms the pose by the given transformation and returns the new pose.
    *
    * @param other The transform to transform the pose by.

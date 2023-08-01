@@ -18,6 +18,38 @@ class Pose3dTest {
   private static final double kEpsilon = 1E-9;
 
   @Test
+  void testRotateBy() {
+    final double x = 1.0;
+    final double y = 2.0;
+    var initial =
+        new Pose3d(
+            new Translation3d(x, y, 0.0),
+            new Rotation3d(
+                Units.degreesToRadians(0.0),
+                Units.degreesToRadians(0.0),
+                Units.degreesToRadians(45.0)));
+
+    double yaw = Units.degreesToRadians(5.0);
+    var rotation = new Rotation3d(Units.degreesToRadians(0.0), Units.degreesToRadians(0.0), yaw);
+    var rotated = initial.rotateBy(rotation);
+
+    // Translation is rotated by CCW rotation matrix
+    double c = Math.cos(yaw);
+    double s = Math.sin(yaw);
+    assertAll(
+        () -> assertEquals(c * x - s * y, rotated.getX(), kEpsilon),
+        () -> assertEquals(s * x + c * y, rotated.getY(), kEpsilon),
+        () -> assertEquals(0.0, rotated.getZ(), kEpsilon),
+        () -> assertEquals(0.0, rotated.getRotation().getX(), kEpsilon),
+        () -> assertEquals(0.0, rotated.getRotation().getY(), kEpsilon),
+        () ->
+            assertEquals(
+                initial.getRotation().getZ() + rotation.getZ(),
+                rotated.getRotation().getZ(),
+                kEpsilon));
+  }
+
+  @Test
   void testTransformByRotations() {
     var initialPose =
         new Pose3d(
