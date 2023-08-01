@@ -35,9 +35,9 @@ public interface Kinematics<S, P> {
   S toWheelSpeeds(ChassisSpeeds chassisSpeeds);
 
   /**
-   * Performs forward kinematics to return the resulting Twist2d from the given change in wheel positions.
-   * This method is often used for odometry -- determining the robot's position on the field using
-   * changes in the distance driven by each wheel on the robot.
+   * Performs forward kinematics to return the resulting Twist2d from the given change in wheel
+   * positions. This method is often used for odometry -- determining the robot's position on the
+   * field using changes in the distance driven by each wheel on the robot.
    *
    * @param start The starting distances driven by the wheels.
    * @param end The ending distances driven by the wheels.
