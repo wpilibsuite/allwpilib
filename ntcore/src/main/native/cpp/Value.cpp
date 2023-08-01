@@ -38,7 +38,7 @@ inline std::shared_ptr<T[]> AllocateArray(size_t nelem) {
 #if __cpp_lib_smart_ptr_for_overwrite >= 202002L
   return std::make_shared_for_overwrite<T[]>(nelem);
 #else
-  auto data = std::make_shared<T[]>(nelem);
+  return std::make_shared<T[]>(nelem);
 #endif
 #else
   return std::shared_ptr<T[]>{new T[nelem]};
