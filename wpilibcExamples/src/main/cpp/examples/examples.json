@@ -875,7 +875,7 @@
       "Sensors",
       "Joystick"
     ],
-    "foldername": "flywheelbangbangcontroller",
+    "foldername": "FlywheelBangBangController",
     "gradlebase": "cpp",
     "commandversion": 2
   }
