@@ -35,20 +35,6 @@ struct WPILIB_DLLEXPORT SwerveModulePosition {
    */
   bool operator==(const SwerveModulePosition& other) const;
 
-  /**
-   * Calculates the difference between two swerve module positions. The
-   * difference has a length equal to the difference in lengths and an angle
-   * equal to the ending angle (this module position's angle). This is suitable
-   * for representing a module's motion between two timesteps, because the final
-   * angle describes the direction the module moved.
-   *
-   * @param other The other swerve module position to subtract.
-   * @return The difference.
-   */
-  SwerveModulePosition operator-(const SwerveModulePosition& other) const {
-    return {distance - other.distance, angle};
-  }
-
   SwerveModulePosition Interpolate(const SwerveModulePosition& endValue,
                                    double t) const {
     return {wpi::Lerp(distance, endValue.distance, t),

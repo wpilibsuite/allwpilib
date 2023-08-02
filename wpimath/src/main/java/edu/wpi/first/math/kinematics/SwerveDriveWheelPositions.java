@@ -6,7 +6,6 @@ package edu.wpi.first.math.kinematics;
 
 import java.util.Arrays;
 import java.util.Objects;
-import java.util.function.BinaryOperator;
 
 public class SwerveDriveWheelPositions implements WheelPositions<SwerveDriveWheelPositions> {
   public SwerveModulePosition[] positions;
@@ -43,30 +42,20 @@ public class SwerveDriveWheelPositions implements WheelPositions<SwerveDriveWhee
     return String.format("SwerveDriveWheelPositions(%s)", Arrays.toString(positions));
   }
 
-  private SwerveDriveWheelPositions generate(
-      SwerveDriveWheelPositions other, BinaryOperator<SwerveModulePosition> generator) {
-    if (other.positions.length != positions.length) {
-      throw new IllegalArgumentException("Inconsistent number of modules!");
-    }
-    var newPositions = new SwerveModulePosition[positions.length];
-    for (int i = 0; i < positions.length; i++) {
-      newPositions[i] = generator.apply(positions[i], other.positions[i]);
-    }
-    return new SwerveDriveWheelPositions(newPositions);
-  }
-
   @Override
   public SwerveDriveWheelPositions copy() {
     return new SwerveDriveWheelPositions(positions);
   }
 
   @Override
-  public SwerveDriveWheelPositions minus(SwerveDriveWheelPositions other) {
-    return generate(other, (a, b) -> a.minus(b));
-  }
-
-  @Override
   public SwerveDriveWheelPositions interpolate(SwerveDriveWheelPositions endValue, double t) {
-    return generate(endValue, (a, b) -> a.interpolate(b, t));
+    if (endValue.positions.length != positions.length) {
+      throw new IllegalArgumentException("Inconsistent number of modules!");
+    }
+    var newPositions = new SwerveModulePosition[positions.length];
+    for (int i = 0; i < positions.length; i++) {
+      newPositions[i] = positions[i].interpolate(endValue.positions[i], t);
+    }
+    return new SwerveDriveWheelPositions(newPositions);
   }
 }

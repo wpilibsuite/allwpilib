@@ -13,12 +13,4 @@ public interface WheelPositions<T extends WheelPositions<T>> extends Interpolata
    * @return A copy.
    */
   T copy();
-
-  /**
-   * Returns a representation of how the wheels moved from other to this.
-   *
-   * @param other The other instance to compare to.
-   * @return The representation of how the wheels moved from other to this.
-   */
-  T minus(T other);
 }
