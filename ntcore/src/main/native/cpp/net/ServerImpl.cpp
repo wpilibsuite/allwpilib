@@ -304,11 +304,15 @@ class ClientData3 final : public ClientData, private net3::MessageHandler3 {
 };
 
 struct TopicData {
-  TopicData(std::string_view name, std::string_view typeStr)
-      : name{name}, typeStr{typeStr} {}
-  TopicData(std::string_view name, std::string_view typeStr,
-            wpi::json properties)
-      : name{name}, typeStr{typeStr}, properties(std::move(properties)) {
+  TopicData(wpi::Logger& logger, std::string_view name,
+            std::string_view typeStr)
+      : m_logger{logger}, name{name}, typeStr{typeStr} {}
+  TopicData(wpi::Logger& logger, std::string_view name,
+            std::string_view typeStr, wpi::json properties)
+      : m_logger{logger},
+        name{name},
+        typeStr{typeStr},
+        properties(std::move(properties)) {
     RefreshProperties();
   }
 
@@ -321,6 +325,7 @@ struct TopicData {
   void RefreshProperties();
   bool SetFlags(unsigned int flags_);
 
+  wpi::Logger& m_logger;
   std::string name;
   unsigned int id;
   Value lastValue;
@@ -329,6 +334,7 @@ struct TopicData {
   wpi::json properties = wpi::json::object();
   bool persistent{false};
   bool retained{false};
+  bool valueTransient{false};
   bool special{false};
   NT_Topic localHandle{0};
 
@@ -1285,6 +1291,8 @@ void ClientData3::EntryAssign(std::string_view name, unsigned int id,
   auto typeStr = TypeToString(value.type());
   wpi::json properties = wpi::json::object();
   properties["retained"] = true;  // treat all NT3 published topics as retained
+  properties["valueTransient"] =
+      false;  // treat all NT3 published topics as not value-transient
   if ((flags & NT_PERSISTENT) != 0) {
     properties["persistent"] = true;
   }
@@ -1463,6 +1471,7 @@ bool TopicData::SetProperties(const wpi::json& update) {
 void TopicData::RefreshProperties() {
   persistent = false;
   retained = false;
+  valueTransient = false;
 
   auto persistentIt = properties.find("persistent");
   if (persistentIt != properties.end()) {
@@ -1477,6 +1486,18 @@ void TopicData::RefreshProperties() {
       retained = *val;
     }
   }
+
+  auto valueTransientIt = properties.find("valueTransient");
+  if (valueTransientIt != properties.end()) {
+    if (auto val = valueTransientIt->get_ptr<bool*>()) {
+      valueTransient = *val;
+    }
+  }
+
+  if (valueTransient && persistent) {
+    WARNING("topic {}: value transient property disables persistent storage",
+            name);
+  }
 }
 
 bool TopicData::SetFlags(unsigned int flags_) {
@@ -1489,6 +1510,28 @@ bool TopicData::SetFlags(unsigned int flags_) {
     updated = persistent;
     persistent = false;
     properties.erase("persistent");
+  }
+  if ((flags_ & NT_RETAINED) != 0) {
+    updated |= !retained;
+    retained = true;
+    properties["retained"] = true;
+  } else {
+    updated |= retained;
+    retained = false;
+    properties.erase("retained");
+  }
+  if ((flags_ & NT_VALUETRANSIENT) != 0) {
+    updated |= !valueTransient;
+    valueTransient = true;
+    properties["valueTransient"] = true;
+  } else {
+    updated |= valueTransient;
+    valueTransient = false;
+    properties.erase("valueTransient");
+  }
+  if (valueTransient && persistent) {
+    WARNING("topic {}: value transient property disables persistent storage",
+            name);
   }
   return updated;
 }
@@ -2013,7 +2056,7 @@ TopicData* SImpl::CreateTopic(ClientData* client, std::string_view name,
   } else {
     // new topic
     unsigned int id = m_topics.emplace_back(
-        std::make_unique<TopicData>(name, typeStr, properties));
+        std::make_unique<TopicData>(m_logger, name, typeStr, properties));
     topic = m_topics[id].get();
     topic->id = id;
     topic->special = special;
@@ -2126,8 +2169,10 @@ void SImpl::SetFlags(ClientData* client, TopicData* topic, unsigned int flags) {
 
 void SImpl::SetValue(ClientData* client, TopicData* topic, const Value& value) {
   // update retained value if from same client or timestamp newer
-  if (!topic->lastValue || topic->lastValueClient == client ||
-      topic->lastValue.time() == 0 || value.time() >= topic->lastValue.time()) {
+  if (!topic->valueTransient &&
+      (!topic->lastValue || topic->lastValueClient == client ||
+       topic->lastValue.time() == 0 ||
+       value.time() >= topic->lastValue.time())) {
     DEBUG4("updating '{}' last value (time was {} is {})", topic->name,
            topic->lastValue.time(), value.time());
     topic->lastValue = value;

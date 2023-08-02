@@ -295,6 +295,14 @@ NT_Bool NT_GetTopicRetained(NT_Topic topic) {
   return nt::GetTopicRetained(topic);
 }
 
+void NT_SetTopicValueTransient(NT_Topic topic, NT_Bool value) {
+  nt::SetTopicValueTransient(topic, value);
+}
+
+NT_Bool NT_GetTopicValueTransient(NT_Topic topic) {
+  return nt::GetTopicValueTransient(topic);
+}
+
 NT_Bool NT_GetTopicExists(NT_Handle handle) {
   return nt::GetTopicExists(handle);
 }

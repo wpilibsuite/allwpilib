@@ -46,6 +46,14 @@ inline bool Topic::IsRetained() const {
   return ::nt::GetTopicRetained(m_handle);
 }
 
+inline void Topic::SetValueTransient(bool valueTransient) {
+  ::nt::SetTopicValueTransient(m_handle, valueTransient);
+}
+
+inline bool Topic::IsValueTransient() const {
+  return ::nt::GetTopicValueTransient(m_handle);
+}
+
 inline bool Topic::Exists() const {
   return nt::GetTopicExists(m_handle);
 }

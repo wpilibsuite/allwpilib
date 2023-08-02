@@ -63,7 +63,11 @@ enum NT_Type {
 };
 
 /** NetworkTables entry flags. */
-enum NT_EntryFlags { NT_PERSISTENT = 0x01, NT_RETAINED = 0x02 };
+enum NT_EntryFlags {
+  NT_PERSISTENT = 0x01,
+  NT_RETAINED = 0x02,
+  NT_VALUETRANSIENT = 0x04
+};
 
 /** NetworkTables logging levels. */
 enum NT_LogLevel {
@@ -682,6 +686,25 @@ void NT_SetTopicRetained(NT_Topic topic, NT_Bool value);
  * @return retained property value
  */
 NT_Bool NT_GetTopicRetained(NT_Topic topic);
+
+/**
+ * Sets the value transient property of a topic.  If true, the server will not
+ * store the latest value, causing subscribers to only receive value updates
+ * (not the initial value when they begin subscribing) and preventing persistent
+ * storage.
+ *
+ * @param topic topic handle
+ * @param value True for value transient, false for not value transient
+ */
+void NT_SetTopicValueTransient(NT_Topic topic, NT_Bool value);
+
+/**
+ * Gets the value transient property of a topic.
+ *
+ * @param topic topic handle
+ * @return value transient property value
+ */
+NT_Bool NT_GetTopicValueTransient(NT_Topic topic);
 
 /**
  * Determine if topic exists (e.g. has at least one publisher).

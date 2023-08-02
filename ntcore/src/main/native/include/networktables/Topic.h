@@ -105,6 +105,23 @@ class Topic {
   bool IsRetained() const;
 
   /**
+   * Prevent the server from storing the latest value, making subscribers only
+   * receive value updates (not the initial value when they being subscribing)
+   * and preventing presistent storage.
+   *
+   * @param valueTransient True for value transient, false for not value
+   * transient.
+   */
+  void SetValueTransient(bool valueTransient);
+
+  /**
+   * Returns whether the topic's last value is not stored by the server.
+   *
+   * @return True if the topic is value transient.
+   */
+  bool IsValueTransient() const;
+
+  /**
    * Determines if the topic is currently being published.
    *
    * @return True if the topic exists, false otherwise.

@@ -118,6 +118,25 @@ public class Topic {
   }
 
   /**
+   * Prevent the server from storing the latest value, making subscribers only receive value updates
+   * (not the initial value when they begin subscribing) and preventing persistent storage.
+   *
+   * @param valueTransient True for value transient, false for not value transient.
+   */
+  public void setValueTransient(boolean valueTransient) {
+    NetworkTablesJNI.setTopicValueTransient(m_handle, valueTransient);
+  }
+
+  /**
+   * Returns whether the topic's last value is not stored by the server.
+   *
+   * @return True if the topic is value transient.
+   */
+  public boolean isValueTransient() {
+    return NetworkTablesJNI.getTopicValueTransient(m_handle);
+  }
+
+  /**
    * Determines if the topic is currently being published.
    *
    * @return True if the topic exists, false otherwise.

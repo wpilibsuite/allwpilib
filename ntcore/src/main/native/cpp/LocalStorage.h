@@ -75,6 +75,10 @@ class LocalStorage final : public net::ILocalStorage {
 
   bool GetTopicRetained(NT_Topic topic);
 
+  void SetTopicValueTransient(NT_Topic topic, bool value);
+
+  bool GetTopicValueTransient(NT_Topic topic);
+
   bool GetTopicExists(NT_Handle handle);
 
   wpi::json GetTopicProperty(NT_Topic topic, std::string_view name);

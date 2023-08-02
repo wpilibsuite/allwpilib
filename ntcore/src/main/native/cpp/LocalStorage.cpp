@@ -293,6 +293,7 @@ struct LSImpl {
   void SetFlags(TopicData* topic, unsigned int flags);
   void SetPersistent(TopicData* topic, bool value);
   void SetRetained(TopicData* topic, bool value);
+  void SetTransient(TopicData* topic, bool value);
   void SetProperties(TopicData* topic, const wpi::json& update,
                      bool sendNetwork);
   void PropertiesUpdated(TopicData* topic, const wpi::json& update,
@@ -568,6 +569,13 @@ void LSImpl::SetFlags(TopicData* topic, unsigned int flags) {
     topic->properties.erase("retained");
     update["retained"] = wpi::json();
   }
+  if ((flags & NT_VALUETRANSIENT) != 0) {
+    topic->properties["valueTransient"] = true;
+    update["valueTransient"] = true;
+  } else {
+    topic->properties.erase("valueTransient");
+    update["valueTransient"] = wpi::json();
+  }
   topic->flags = flags;
   if (!update.empty()) {
     PropertiesUpdated(topic, update, NT_EVENT_NONE, true, false);
@@ -598,6 +606,20 @@ void LSImpl::SetRetained(TopicData* topic, bool value) {
     topic->flags &= ~NT_RETAINED;
     topic->properties.erase("retained");
     update["retained"] = wpi::json();
+  }
+  PropertiesUpdated(topic, update, NT_EVENT_NONE, true, false);
+}
+
+void LSImpl::SetTransient(TopicData* topic, bool value) {
+  wpi::json update = wpi::json::object();
+  if (value) {
+    topic->flags |= NT_VALUETRANSIENT;
+    topic->properties["valueTransient"] = true;
+    update["valueTransient"] = true;
+  } else {
+    topic->flags &= ~NT_VALUETRANSIENT;
+    topic->properties.erase("valueTransient");
+    update["valueTransient"] = wpi::json();
   }
   PropertiesUpdated(topic, update, NT_EVENT_NONE, true, false);
 }
@@ -644,6 +666,22 @@ void LSImpl::PropertiesUpdated(TopicData* topic, const wpi::json& update,
           topic->flags &= ~NT_RETAINED;
         }
       }
+    }
+    it = topic->properties.find("valueTransient");
+    if (it != topic->properties.end()) {
+      if (auto val = it->get_ptr<bool*>()) {
+        if (*val) {
+          topic->flags |= NT_VALUETRANSIENT;
+        } else {
+          topic->flags &= ~NT_VALUETRANSIENT;
+        }
+      }
+    }
+
+    if ((topic->flags & NT_VALUETRANSIENT) != 0 &&
+        (topic->flags & NT_PERSISTENT) != 0) {
+      WARNING("topic {}: value transient property disables persistent storage",
+              topic->name);
     }
   }
 
@@ -1587,6 +1625,22 @@ bool LocalStorage::GetTopicRetained(NT_Topic topicHandle) {
   std::scoped_lock lock{m_mutex};
   if (auto topic = m_impl->m_topics.Get(topicHandle)) {
     return (topic->flags & NT_RETAINED) != 0;
+  } else {
+    return false;
+  }
+}
+
+void LocalStorage::SetTopicValueTransient(NT_Topic topicHandle, bool value) {
+  std::scoped_lock lock{m_mutex};
+  if (auto topic = m_impl->m_topics.Get(topicHandle)) {
+    m_impl->SetTransient(topic, value);
+  }
+}
+
+bool LocalStorage::GetTopicValueTransient(NT_Topic topicHandle) {
+  std::scoped_lock lock{m_mutex};
+  if (auto topic = m_impl->m_topics.Get(topicHandle)) {
+    return (topic->flags & NT_VALUETRANSIENT) != 0;
   } else {
     return false;
   }

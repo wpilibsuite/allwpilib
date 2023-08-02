@@ -681,6 +681,25 @@ void SetTopicRetained(NT_Topic topic, bool value);
 bool GetTopicRetained(NT_Topic topic);
 
 /**
+ * Sets the value transient property of a topic.  If true, the server will not
+ * store the latest value, causing subscribers to only receive value updates
+ * (not the initial value when they begin subscribing) and preventing persistent
+ * storage.
+ *
+ * @param topic topic handle
+ * @param value True for value transient, false for not value transient
+ */
+void SetTopicValueTransient(NT_Topic topic, bool value);
+
+/**
+ * Gets the value transient property of a topic.
+ *
+ * @param topic topic handle
+ * @return value transient property value
+ */
+bool GetTopicValueTransient(NT_Topic topic);
+
+/**
  * Determine if topic exists (e.g. has at least one publisher).
  *
  * @param handle Topic, entry, or subscriber handle.
