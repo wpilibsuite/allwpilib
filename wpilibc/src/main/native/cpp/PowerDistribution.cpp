@@ -4,17 +4,21 @@
 
 #include "frc/PowerDistribution.h"
 
+#include <utility>
 #include <vector>
 
 #include <fmt/format.h>
 #include <hal/FRCUsageReporting.h>
 #include <hal/Ports.h>
 #include <hal/PowerDistribution.h>
+#include <units/current.h>
+#include <units/impedance.h>
 #include <wpi/StackTrace.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/Errors.h"
+#include "frc/ResistanceCalculator.h"
 
 static_assert(static_cast<HAL_PowerDistributionType>(
                   frc::PowerDistribution::ModuleType::kCTRE) ==
@@ -27,7 +31,8 @@ static_assert(frc::PowerDistribution::kDefaultModule ==
 
 using namespace frc;
 
-PowerDistribution::PowerDistribution() {
+PowerDistribution::PowerDistribution()
+    : m_totalResistanceNotifier([this] { UpdateResistance(); }) {
   auto stack = wpi::GetStackTrace(1);
 
   int32_t status = 0;
@@ -48,9 +53,12 @@ PowerDistribution::PowerDistribution() {
                HALUsageReporting::kPDP_REV);
   }
   wpi::SendableRegistry::AddLW(this, "PowerDistribution", m_module);
+
+  m_totalResistanceNotifier.StartPeriodic(PowerDistribution::kUpdatePeriod);
 }
 
-PowerDistribution::PowerDistribution(int module, ModuleType moduleType) {
+PowerDistribution::PowerDistribution(int module, ModuleType moduleType)
+    : m_totalResistanceNotifier([this] { UpdateResistance(); }) {
   auto stack = wpi::GetStackTrace(1);
 
   int32_t status = 0;
@@ -69,6 +77,25 @@ PowerDistribution::PowerDistribution(int module, ModuleType moduleType) {
                HALUsageReporting::kPDP_REV);
   }
   wpi::SendableRegistry::AddLW(this, "PowerDistribution", m_module);
+
+  m_totalResistanceNotifier.StartPeriodic(PowerDistribution::kUpdatePeriod);
+}
+
+PowerDistribution::PowerDistribution(PowerDistribution&& other)
+    : m_handle(std::move(other.m_handle)),
+      m_module(other.m_module),
+      m_totalResistanceCalculator(std::move(other.m_totalResistanceCalculator)),
+      m_totalResistanceNotifier(std::move(other.m_totalResistanceNotifier)) {
+  m_totalResistance.store(other.m_totalResistance.load());
+}
+
+PowerDistribution& PowerDistribution::operator=(PowerDistribution&& other) {
+  m_handle = std::move(other.m_handle);
+  m_module = other.m_module;
+  m_totalResistanceCalculator = std::move(other.m_totalResistanceCalculator);
+  m_totalResistanceNotifier = std::move(other.m_totalResistanceNotifier);
+  m_totalResistance.store(other.m_totalResistance.load());
+  return *this;
 }
 
 int PowerDistribution::GetNumChannels() const {
@@ -323,6 +350,10 @@ PowerDistribution::StickyFaults PowerDistribution::GetStickyFaults() const {
   return stickyFaults;
 }
 
+units::ohm_t PowerDistribution::GetTotalResistance() const {
+  return m_totalResistance.load();
+}
+
 void PowerDistribution::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("PowerDistribution");
   int numChannels = GetNumChannels();
@@ -360,4 +391,14 @@ void PowerDistribution::InitSendable(wpi::SendableBuilder& builder) {
         int32_t lStatus = 0;
         HAL_SetPowerDistributionSwitchableChannel(m_handle, value, &lStatus);
       });
+  builder.AddDoubleProperty(
+      "TotalResistance", [this] { return GetTotalResistance().value(); },
+      nullptr);
+}
+
+void PowerDistribution::UpdateResistance() {
+  if (auto resistance = m_totalResistanceCalculator.Calculate(
+          units::ampere_t(GetTotalCurrent()), units::volt_t(GetVoltage()))) {
+    m_totalResistance.store(resistance.value());
+  }
 }
