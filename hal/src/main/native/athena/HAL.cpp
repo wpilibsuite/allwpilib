@@ -28,6 +28,7 @@
 #include "FPGACalls.h"
 #include "HALInitializer.h"
 #include "HALInternal.h"
+#include "HMB.h"
 #include "hal/ChipObject.h"
 #include "hal/DriverStation.h"
 #include "hal/Errors.h"
@@ -45,6 +46,8 @@ static uint64_t dsStartTime;
 static char roboRioCommentsString[64];
 static size_t roboRioCommentsStringSize;
 static bool roboRioCommentsStringInitialized;
+
+static volatile uint32_t* hmbBuffer;
 
 using namespace hal;
 
@@ -351,25 +354,29 @@ size_t HAL_GetComments(char* buffer, size_t size) {
 
 uint64_t HAL_GetFPGATime(int32_t* status) {
   hal::init::CheckInit();
-  if (!global) {
+  if (!hmbBuffer) {
     *status = NiFpga_Status_ResourceNotInitialized;
     return 0;
   }
-  *status = 0;
-  uint64_t upper1 = global->readLocalTimeUpper(status);
-  uint32_t lower = global->readLocalTime(status);
-  uint64_t upper2 = global->readLocalTimeUpper(status);
-  if (*status != 0) {
-    return 0;
-  }
+
+  asm("dmb");
+  uint64_t upper1 = hmbBuffer[HAL_HMB_TIMESTAMP_UPPER];
+  asm("dmb");
+  uint32_t lower = hmbBuffer[HAL_HMB_TIMESTAMP_LOWER];
+  asm("dmb");
+  uint64_t upper2 = hmbBuffer[HAL_HMB_TIMESTAMP_UPPER];
+
   if (upper1 != upper2) {
     // Rolled over between the lower call, reread lower
-    lower = global->readLocalTime(status);
-    if (*status != 0) {
-      return 0;
-    }
+    asm("dmb");
+    lower = hmbBuffer[HAL_HMB_TIMESTAMP_LOWER];
   }
-  return (upper2 << 32) + lower;
+  // 5 is added here because the time to write from the FPGA
+  // to the HMB buffer is longer then the time to read
+  // from the time register. This would cause register based
+  // timestamps to be ahead of HMB timestamps, which could
+  // be very bad.
+  return (upper2 << 32) + lower + 5;
 }
 
 uint64_t HAL_ExpandFPGATime(uint32_t unexpandedLower, int32_t* status) {
@@ -521,6 +528,13 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   wpi::impl::SetupNowRio();
 
   int32_t status = 0;
+
+  HAL_InitializeHMB(&status);
+  if (status != 0) {
+    return false;
+  }
+  hmbBuffer = HAL_GetHMBBuffer();
+
   global.reset(tGlobal::create(&status));
   watchdog.reset(tSysWatchdog::create(&status));
 
