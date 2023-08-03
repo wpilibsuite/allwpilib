@@ -4,9 +4,16 @@
 
 #pragma once
 
+#include <atomic>
+
 #include <hal/Types.h>
+#include <units/impedance.h>
+#include <units/time.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
+
+#include "frc/Notifier.h"
+#include "frc/ResistanceCalculator.h"
 
 namespace frc {
 
@@ -18,6 +25,7 @@ class PowerDistribution : public wpi::Sendable,
                           public wpi::SendableHelper<PowerDistribution> {
  public:
   static constexpr int kDefaultModule = -1;
+  static constexpr units::second_t kUpdatePeriod = 25_ms;
   enum class ModuleType { kCTRE = 1, kRev = 2 };
 
   /**
@@ -37,8 +45,8 @@ class PowerDistribution : public wpi::Sendable,
   PowerDistribution(int module, ModuleType moduleType);
 
   ~PowerDistribution() override;
-  PowerDistribution(PowerDistribution&&) = default;
-  PowerDistribution& operator=(PowerDistribution&&) = default;
+  PowerDistribution(PowerDistribution&&);
+  PowerDistribution& operator=(PowerDistribution&&);
 
   /**
    * Query the input voltage of the PDP/PDH.
@@ -119,6 +127,13 @@ class PowerDistribution : public wpi::Sendable,
    * @param enabled Whether to turn the PDH switchable channel on or off
    */
   void SetSwitchableChannel(bool enabled);
+
+  /**
+   * Get the robot's total resistance.
+   *
+   * @return The robot total resistance, in Ohms.
+   */
+  units::ohm_t GetTotalResistance() const;
 
   struct Version {
     uint32_t FirmwareMajor;
@@ -220,6 +235,14 @@ class PowerDistribution : public wpi::Sendable,
  private:
   hal::Handle<HAL_PowerDistributionHandle> m_handle;
   int m_module;
+  ResistanceCalculator m_totalResistanceCalculator;
+  std::atomic<units::ohm_t> m_totalResistance;
+  frc::Notifier m_totalResistanceNotifier;
+
+  /**
+   * Calculate new total resistance.
+   */
+  void UpdateResistance();
 };
 
 }  // namespace frc
