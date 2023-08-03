@@ -30,9 +30,15 @@ public class Trajectory {
    * Constructs a trajectory from a vector of states.
    *
    * @param states A vector of states.
+   * @throws IllegalArgumentException if the vector of states is empty.
    */
   public Trajectory(final List<State> states) {
     m_states = states;
+
+    if (m_states.isEmpty()) {
+      throw new IllegalArgumentException("Trajectory manually created with no states.");
+    }
+
     m_totalTimeSeconds = m_states.get(m_states.size() - 1).timeSeconds;
   }
 
@@ -92,8 +98,13 @@ public class Trajectory {
    *
    * @param timeSeconds The point in time since the beginning of the trajectory to sample.
    * @return The state at that point in time.
+   * @throws IllegalStateException if the trajectory has no states.
    */
   public State sample(double timeSeconds) {
+    if (m_states.isEmpty()) {
+      throw new IllegalStateException("Trajectory cannot be sampled if it has no states.");
+    }
+
     if (timeSeconds <= m_states.get(0).timeSeconds) {
       return m_states.get(0);
     }
