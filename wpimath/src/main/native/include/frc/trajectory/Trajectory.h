@@ -66,6 +66,8 @@ class WPILIB_DLLEXPORT Trajectory {
 
   /**
    * Constructs a trajectory from a vector of states.
+   *
+   * @throws std::invalid_argument if the vector of states is empty.
    */
   explicit Trajectory(const std::vector<State>& states);
 
@@ -77,6 +79,7 @@ class WPILIB_DLLEXPORT Trajectory {
 
   /**
    * Return the states of the trajectory.
+   *
    * @return The states of the trajectory.
    */
   const std::vector<State>& States() const { return m_states; }
@@ -86,6 +89,7 @@ class WPILIB_DLLEXPORT Trajectory {
    *
    * @param t The point in time since the beginning of the trajectory to sample.
    * @return The state at that point in time.
+   * @throws std::invalid_argument if the trajectory has no states.
    */
   State Sample(units::second_t t) const;
 
