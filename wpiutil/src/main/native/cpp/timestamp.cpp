@@ -41,6 +41,9 @@ using namespace nRoboRIO_FPGANamespace;
 
 namespace {
 static constexpr const char hmbName[] = "HMB_0_RAM";
+static constexpr int timestampLowerOffset = 0xF0;
+static constexpr int timestampUpperOffset = 0xF1;
+static constexpr int hmbTimestampOffset = 5; // 5 us offset
 using NiFpga_CloseHmbFunc = NiFpga_Status (*)(const NiFpga_Session session,
                                               const char* memoryName);
 using NiFpga_OpenHmbFunc = NiFpga_Status (*)(const NiFpga_Session session,
@@ -55,7 +58,7 @@ struct HMBHolder {
     }
   }
   explicit operator bool() const { return hmb != nullptr; }
-  void configure() {
+  void Configure() {
     nFPGA::nRoboRIO_FPGANamespace::g_currentTargetClass =
         nLoadOut::getTargetClass();
     int32_t status = 0;
@@ -88,10 +91,10 @@ struct HMBHolder {
       hmb = nullptr;
     }
   }
-  std::unique_ptr<fpga::tHMB> hmb{nullptr};
-  void* niFpga;
-  NiFpga_CloseHmbFunc closeHmb;
-  volatile uint32_t* hmbBuffer;
+  std::unique_ptr<fpga::tHMB> hmb;
+  void* niFpga = nullptr;
+  NiFpga_CloseHmbFunc closeHmb = nullptr;
+  volatile uint32_t* hmbBuffer = nullptr;
 };
 static HMBHolder hmb;
 }  // namespace
@@ -174,7 +177,7 @@ static std::atomic<uint64_t (*)()> now_impl{wpi::NowDefault};
 void wpi::impl::SetupNowRio() {
 #ifdef __FRC_ROBORIO__
   if (!hmb) {
-    hmb.configure();
+    hmb.Configure();
   }
 #endif
 }
@@ -197,21 +200,21 @@ uint64_t wpi::Now() {
   asm("dmb");
   uint64_t upper1 = hmb.hmbBuffer[241];
   asm("dmb");
-  uint32_t lower = hmb.hmbBuffer[240];
+  uint32_t lower = hmb.hmbBuffer[timestampLowerOffset];
   asm("dmb");
   uint64_t upper2 = hmb.hmbBuffer[241];
 
   if (upper1 != upper2) {
     // Rolled over between the lower call, reread lower
     asm("dmb");
-    lower = hmb.hmbBuffer[240];
+    lower = hmb.hmbBuffer[timestampLowerOffset];
   }
   // 5 is added here because the time to write from the FPGA
   // to the HMB buffer is longer then the time to read
   // from the time register. This would cause register based
   // timestamps to be ahead of HMB timestamps, which could
   // be very bad.
-  return (upper2 << 32) + lower + 5;
+  return (upper2 << 32) + lower + hmbTimestampOffset;
 #else
   return (now_impl.load())();
 #endif

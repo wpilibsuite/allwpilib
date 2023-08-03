@@ -376,7 +376,7 @@ uint64_t HAL_GetFPGATime(int32_t* status) {
   // from the time register. This would cause register based
   // timestamps to be ahead of HMB timestamps, which could
   // be very bad.
-  return (upper2 << 32) + lower + 5;
+  return (upper2 << 32) + lower + HAL_HMB_TIMESTAMP_OFFSET;
 }
 
 uint64_t HAL_ExpandFPGATime(uint32_t unexpandedLower, int32_t* status) {
