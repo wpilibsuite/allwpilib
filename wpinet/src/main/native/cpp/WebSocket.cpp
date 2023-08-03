@@ -573,6 +573,19 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
             if (!fin) {
               return Fail(1002, "cannot fragment control frames");
             }
+            // If the connection is open, send a Pong in response
+            if (m_state == OPEN) {
+              SmallVector<uv::Buffer, 4> bufs;
+              {
+                raw_uv_ostream os{bufs, 4096};
+                os << m_payload;
+              }
+              SendPong(bufs, [](auto bufs, uv::Error) {
+                for (auto&& buf : bufs) {
+                  buf.Deallocate();
+                }
+              });
+            }
             ping(m_payload);
             break;
           case kOpPong:
