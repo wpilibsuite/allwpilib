@@ -98,11 +98,11 @@ public class Trajectory {
    *
    * @param timeSeconds The point in time since the beginning of the trajectory to sample.
    * @return The state at that point in time.
-   * @throws IllegalArgumentException if the trajectory has no states.
+   * @throws IllegalStateException if the trajectory has no states.
    */
   public State sample(double timeSeconds) {
     if (m_states.isEmpty()) {
-      throw new IllegalArgumentException("Trajectory cannot be sampled if it has no states.");
+      throw new IllegalStateException("Trajectory cannot be sampled if it has no states.");
     }
 
     if (timeSeconds <= m_states.get(0).timeSeconds) {
