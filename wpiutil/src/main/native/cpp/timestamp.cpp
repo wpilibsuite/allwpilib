@@ -54,7 +54,7 @@ struct HMBHolder {
       dlclose(niFpga);
     }
   }
-  operator bool() { return hmb != nullptr; };
+  explicit operator bool() const { return hmb != nullptr; }
   void configure() {
     nFPGA::nRoboRIO_FPGANamespace::g_currentTargetClass =
         nLoadOut::getTargetClass();
