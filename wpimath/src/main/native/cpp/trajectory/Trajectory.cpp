@@ -65,7 +65,7 @@ Trajectory::Trajectory(const std::vector<State>& states) : m_states(states) {
 
 Trajectory::State Trajectory::Sample(units::second_t t) const {
   if (m_states.empty()) {
-    throw std::invalid_argument(
+    throw std::runtime_error(
         "Trajectory cannot be sampled if it has no states.");
   }
 

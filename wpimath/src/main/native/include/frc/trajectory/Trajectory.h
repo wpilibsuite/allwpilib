@@ -89,7 +89,7 @@ class WPILIB_DLLEXPORT Trajectory {
    *
    * @param t The point in time since the beginning of the trajectory to sample.
    * @return The state at that point in time.
-   * @throws std::invalid_argument if the trajectory has no states.
+   * @throws std::runtime_error if the trajectory has no states.
    */
   State Sample(units::second_t t) const;
 
