@@ -141,6 +141,13 @@ void HALSIM_SetRoboRioComments(const char* comments, size_t size);
 void HALSIM_RegisterRoboRioAllCallbacks(HAL_NotifyCallback callback,
                                         void* param, HAL_Bool initialNotify);
 
+int32_t HALSIM_RegisterRoboRioCPUTempCallback(HAL_NotifyCallback callback,
+                                              void* param,
+                                              HAL_Bool initialNotify);
+void HALSIM_CancelRoboRioCPUTempCallback(int32_t uid);
+HAL_Bool HALSIM_GetRoboRioCPUTemp(void);
+void HALSIM_SetRoboRioUserCPUTemp(HAL_Bool userActive3V3);
+
 #ifdef __cplusplus
 }  // extern "C"
 #endif
