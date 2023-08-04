@@ -17,6 +17,21 @@ class MathUtilTest extends UtilityClassTest<MathUtil> {
   }
 
   @Test
+  void testClamp() {
+    // int
+    assertEquals(5, MathUtil.clamp(10, 1, 5));
+
+    // double
+    assertEquals(5.5, MathUtil.clamp(10.5, 1.5, 5.5));
+
+    // negative int
+    assertEquals(-5, MathUtil.clamp(-10, -5, -1));
+
+    // negative double
+    assertEquals(-5.5, MathUtil.clamp(-10.5, -5.5, -1.5));
+  }
+
+  @Test
   void testApplyDeadbandUnityScale() {
     // < 0
     assertEquals(-1.0, MathUtil.applyDeadband(-1.0, 0.02));
@@ -94,6 +109,17 @@ class MathUtilTest extends UtilityClassTest<MathUtil> {
     assertEquals(MathUtil.angleModulus(-5 * Math.PI), Math.PI);
     assertEquals(MathUtil.angleModulus(Math.PI / 2), Math.PI / 2);
     assertEquals(MathUtil.angleModulus(-Math.PI / 2), -Math.PI / 2);
+  }
+
+  @Test
+  void testInterpolate() {
+    assertEquals(50, MathUtil.interpolate(0, 100, 0.5));
+    assertEquals(-50, MathUtil.interpolate(0, -100, 0.5));
+    assertEquals(0, MathUtil.interpolate(-50, 50, 0.5));
+    assertEquals(-25, MathUtil.interpolate(-50, 50, 0.25));
+    assertEquals(25, MathUtil.interpolate(-50, 50, 0.75));
+
+    assertEquals(0, MathUtil.interpolate(0, -100, -0.5));
   }
 
   @Test
