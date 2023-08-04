@@ -8,8 +8,8 @@
 
 #ifdef __cplusplus
 #include <initializer_list>
-
-#include <wpi/span.h>
+#include <span>
+#include <string>
 #endif
 
 #include "hal/Types.h"
@@ -47,7 +47,7 @@ extern "C" {
  *
  * The device name must be unique.  0 is returned if the device name already
  * exists.  If multiple instances of the same device are desired, recommend
- * appending the instance/unique identifer in brackets to the base name,
+ * appending the instance/unique identifier in brackets to the base name,
  * e.g. "device[1]".
  *
  * 0 is returned if not in simulation.
@@ -66,6 +66,14 @@ HAL_SimDeviceHandle HAL_CreateSimDevice(const char* name);
  * @param handle simulated device handle
  */
 void HAL_FreeSimDevice(HAL_SimDeviceHandle handle);
+
+/**
+ * Get the name of a simulated device
+ *
+ * @param handle simulated device handle
+ * @return name of the simulated device
+ */
+const char* HAL_GetSimDeviceName(HAL_SimDeviceHandle handle);
 
 /**
  * Creates a value on a simulated device.
@@ -401,7 +409,7 @@ class SimValue {
   /**
    * Wraps a simulated value handle as returned by HAL_CreateSimValue().
    *
-   * @param handle simulated value handle
+   * @param val simulated value handle
    */
   /*implicit*/ SimValue(HAL_SimValueHandle val)  // NOLINT
       : m_handle(val) {}
@@ -453,7 +461,7 @@ class SimInt : public SimValue {
   /**
    * Wraps a simulated value handle as returned by HAL_CreateSimValueInt().
    *
-   * @param handle simulated value handle
+   * @param val simulated value handle
    */
   /*implicit*/ SimInt(HAL_SimValueHandle val)  // NOLINT
       : SimValue(val) {}
@@ -494,7 +502,7 @@ class SimLong : public SimValue {
   /**
    * Wraps a simulated value handle as returned by HAL_CreateSimValueLong().
    *
-   * @param handle simulated value handle
+   * @param val simulated value handle
    */
   /*implicit*/ SimLong(HAL_SimValueHandle val)  // NOLINT
       : SimValue(val) {}
@@ -535,7 +543,7 @@ class SimDouble : public SimValue {
   /**
    * Wraps a simulated value handle as returned by HAL_CreateSimValueDouble().
    *
-   * @param handle simulated value handle
+   * @param val simulated value handle
    */
   /*implicit*/ SimDouble(HAL_SimValueHandle val)  // NOLINT
       : SimValue(val) {}
@@ -576,7 +584,7 @@ class SimEnum : public SimValue {
   /**
    * Wraps a simulated value handle as returned by HAL_CreateSimValueEnum().
    *
-   * @param handle simulated value handle
+   * @param val simulated value handle
    */
   /*implicit*/ SimEnum(HAL_SimValueHandle val)  // NOLINT
       : SimValue(val) {}
@@ -610,7 +618,7 @@ class SimBoolean : public SimValue {
   /**
    * Wraps a simulated value handle as returned by HAL_CreateSimValueBoolean().
    *
-   * @param handle simulated value handle
+   * @param val simulated value handle
    */
   /*implicit*/ SimBoolean(HAL_SimValueHandle val)  // NOLINT
       : SimValue(val) {}
@@ -655,7 +663,7 @@ class SimDevice {
    *
    * The device name must be unique.  Returns null if the device name
    * already exists.  If multiple instances of the same device are desired,
-   * recommend appending the instance/unique identifer in brackets to the base
+   * recommend appending the instance/unique identifier in brackets to the base
    * name, e.g. "device[1]".
    *
    * If not in simulation, results in an "empty" object that evaluates to false
@@ -731,6 +739,15 @@ class SimDevice {
    * @return internal handle
    */
   operator HAL_SimDeviceHandle() const { return m_handle; }  // NOLINT
+
+  /**
+   * Get the name of the simulated device.
+   *
+   * @return name
+   */
+  std::string GetName() const {
+    return std::string(HAL_GetSimDeviceName(m_handle));
+  }
 
   /**
    * Creates a value on the simulated device.
@@ -832,7 +849,7 @@ class SimDevice {
    * @return simulated enum value object
    */
   SimEnum CreateEnum(const char* name, int32_t direction,
-                     wpi::span<const char* const> options,
+                     std::span<const char* const> options,
                      int32_t initialValue) {
     return HAL_CreateSimValueEnum(m_handle, name, direction, options.size(),
                                   const_cast<const char**>(options.data()),
@@ -885,8 +902,8 @@ class SimDevice {
    * @return simulated enum value object
    */
   SimEnum CreateEnumDouble(const char* name, int32_t direction,
-                           wpi::span<const char* const> options,
-                           wpi::span<const double> optionValues,
+                           std::span<const char* const> options,
+                           std::span<const double> optionValues,
                            int32_t initialValue) {
     if (options.size() != optionValues.size()) {
       return {};

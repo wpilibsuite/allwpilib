@@ -10,17 +10,23 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.hal.SimEnum;
+import edu.wpi.first.networktables.DoublePublisher;
+import edu.wpi.first.networktables.DoubleTopic;
 import edu.wpi.first.networktables.NTSendable;
 import edu.wpi.first.networktables.NTSendableBuilder;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.util.sendable.SendableRegistry;
-import edu.wpi.first.wpilibj.interfaces.Accelerometer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-/** ADXL345 I2C Accelerometer. */
+/**
+ * ADXL345 I2C Accelerometer.
+ *
+ * <p>The Onboard I2C port is subject to system lockups. See <a
+ * href="https://docs.wpilib.org/en/stable/docs/yearly-overview/known-issues.html#onboard-i2c-causing-system-lockups">
+ * WPILib Known Issues</a> page for details.
+ */
 @SuppressWarnings({"TypeName", "PMD.UnusedPrivateField"})
-public class ADXL345_I2C implements Accelerometer, NTSendable, AutoCloseable {
+public class ADXL345_I2C implements NTSendable, AutoCloseable {
   private static final byte kAddress = 0x1D;
   private static final byte kPowerCtlRegister = 0x2D;
   private static final byte kDataFormatRegister = 0x31;
@@ -37,13 +43,19 @@ public class ADXL345_I2C implements Accelerometer, NTSendable, AutoCloseable {
   private static final byte kDataFormat_FullRes = 0x08;
   private static final byte kDataFormat_Justify = 0x04;
 
+  public enum Range {
+    k2G,
+    k4G,
+    k8G,
+    k16G
+  }
+
   public enum Axes {
     kX((byte) 0x00),
     kY((byte) 0x02),
     kZ((byte) 0x04);
 
     /** The integer value representing this enumeration. */
-    @SuppressWarnings("MemberName")
     public final byte value;
 
     Axes(byte value) {
@@ -131,10 +143,14 @@ public class ADXL345_I2C implements Accelerometer, NTSendable, AutoCloseable {
     }
   }
 
-  @Override
+  /**
+   * Set the measuring range of the accelerometer.
+   *
+   * @param range The maximum acceleration, positive or negative, that the accelerometer will
+   *     measure.
+   */
   public void setRange(Range range) {
     final byte value;
-
     switch (range) {
       case k2G:
         value = 0;
@@ -149,7 +165,7 @@ public class ADXL345_I2C implements Accelerometer, NTSendable, AutoCloseable {
         value = 3;
         break;
       default:
-        throw new IllegalArgumentException(range + " unsupported range type");
+        throw new IllegalArgumentException("Missing case for range type " + range);
     }
 
     // Specify the data format to read
@@ -160,17 +176,29 @@ public class ADXL345_I2C implements Accelerometer, NTSendable, AutoCloseable {
     }
   }
 
-  @Override
+  /**
+   * Returns the acceleration along the X axis in g-forces.
+   *
+   * @return The acceleration along the X axis in g-forces.
+   */
   public double getX() {
     return getAcceleration(Axes.kX);
   }
 
-  @Override
+  /**
+   * Returns the acceleration along the Y axis in g-forces.
+   *
+   * @return The acceleration along the Y axis in g-forces.
+   */
   public double getY() {
     return getAcceleration(Axes.kY);
   }
 
-  @Override
+  /**
+   * Returns the acceleration along the Z axis in g-forces.
+   *
+   * @return The acceleration along the Z axis in g-forces.
+   */
   public double getZ() {
     return getAcceleration(Axes.kZ);
   }
@@ -226,15 +254,18 @@ public class ADXL345_I2C implements Accelerometer, NTSendable, AutoCloseable {
   @Override
   public void initSendable(NTSendableBuilder builder) {
     builder.setSmartDashboardType("3AxisAccelerometer");
-    NetworkTableEntry entryX = builder.getEntry("X");
-    NetworkTableEntry entryY = builder.getEntry("Y");
-    NetworkTableEntry entryZ = builder.getEntry("Z");
+    DoublePublisher pubX = new DoubleTopic(builder.getTopic("X")).publish();
+    DoublePublisher pubY = new DoubleTopic(builder.getTopic("Y")).publish();
+    DoublePublisher pubZ = new DoubleTopic(builder.getTopic("Z")).publish();
+    builder.addCloseable(pubX);
+    builder.addCloseable(pubY);
+    builder.addCloseable(pubZ);
     builder.setUpdateTable(
         () -> {
           AllAxes data = getAccelerations();
-          entryX.setDouble(data.XAxis);
-          entryY.setDouble(data.YAxis);
-          entryZ.setDouble(data.ZAxis);
+          pubX.set(data.XAxis);
+          pubY.set(data.YAxis);
+          pubZ.set(data.ZAxis);
         });
   }
 }

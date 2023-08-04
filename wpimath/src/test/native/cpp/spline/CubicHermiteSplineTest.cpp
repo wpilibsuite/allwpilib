@@ -3,7 +3,6 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <chrono>
-#include <iostream>
 #include <vector>
 
 #include "frc/geometry/Pose2d.h"
@@ -53,27 +52,26 @@ class CubicHermiteSplineTest : public ::testing::Test {
 
       // Make sure the twist is under the tolerance defined by the Spline class.
       auto twist = p0.first.Log(p1.first);
-      EXPECT_LT(std::abs(twist.dx.to<double>()),
-                SplineParameterizer::kMaxDx.to<double>());
-      EXPECT_LT(std::abs(twist.dy.to<double>()),
-                SplineParameterizer::kMaxDy.to<double>());
-      EXPECT_LT(std::abs(twist.dtheta.to<double>()),
-                SplineParameterizer::kMaxDtheta.to<double>());
+      EXPECT_LT(std::abs(twist.dx.value()),
+                SplineParameterizer::kMaxDx.value());
+      EXPECT_LT(std::abs(twist.dy.value()),
+                SplineParameterizer::kMaxDy.value());
+      EXPECT_LT(std::abs(twist.dtheta.value()),
+                SplineParameterizer::kMaxDtheta.value());
     }
 
     // Check first point.
-    EXPECT_NEAR(poses.front().first.X().to<double>(), a.X().to<double>(), 1E-9);
-    EXPECT_NEAR(poses.front().first.Y().to<double>(), a.Y().to<double>(), 1E-9);
-    EXPECT_NEAR(poses.front().first.Rotation().Radians().to<double>(),
-                a.Rotation().Radians().to<double>(), 1E-9);
+    EXPECT_NEAR(poses.front().first.X().value(), a.X().value(), 1E-9);
+    EXPECT_NEAR(poses.front().first.Y().value(), a.Y().value(), 1E-9);
+    EXPECT_NEAR(poses.front().first.Rotation().Radians().value(),
+                a.Rotation().Radians().value(), 1E-9);
 
     // Check interior waypoints
     bool interiorsGood = true;
     for (auto& waypoint : waypoints) {
       bool found = false;
       for (auto& state : poses) {
-        if (std::abs(
-                waypoint.Distance(state.first.Translation()).to<double>()) <
+        if (std::abs(waypoint.Distance(state.first.Translation()).value()) <
             1E-9) {
           found = true;
         }
@@ -84,10 +82,10 @@ class CubicHermiteSplineTest : public ::testing::Test {
     EXPECT_TRUE(interiorsGood);
 
     // Check last point.
-    EXPECT_NEAR(poses.back().first.X().to<double>(), b.X().to<double>(), 1E-9);
-    EXPECT_NEAR(poses.back().first.Y().to<double>(), b.Y().to<double>(), 1E-9);
-    EXPECT_NEAR(poses.back().first.Rotation().Radians().to<double>(),
-                b.Rotation().Radians().to<double>(), 1E-9);
+    EXPECT_NEAR(poses.back().first.X().value(), b.X().value(), 1E-9);
+    EXPECT_NEAR(poses.back().first.Y().value(), b.Y().value(), 1E-9);
+    EXPECT_NEAR(poses.back().first.Rotation().Radians().value(),
+                b.Rotation().Radians().value(), 1E-9);
 
     static_cast<void>(duration);
   }
@@ -95,31 +93,29 @@ class CubicHermiteSplineTest : public ::testing::Test {
 }  // namespace frc
 
 TEST_F(CubicHermiteSplineTest, StraightLine) {
-  Run(Pose2d(), std::vector<Translation2d>(), Pose2d(3_m, 0_m, Rotation2d()));
+  Run(Pose2d{}, std::vector<Translation2d>(), Pose2d{3_m, 0_m, 0_deg});
 }
 
 TEST_F(CubicHermiteSplineTest, SCurve) {
-  Pose2d start{0_m, 0_m, Rotation2d(90_deg)};
-  std::vector<Translation2d> waypoints{Translation2d(1_m, 1_m),
-                                       Translation2d(2_m, -1_m)};
-  Pose2d end{3_m, 0_m, Rotation2d{90_deg}};
+  Pose2d start{0_m, 0_m, 90_deg};
+  std::vector<Translation2d> waypoints{Translation2d{1_m, 1_m},
+                                       Translation2d{2_m, -1_m}};
+  Pose2d end{3_m, 0_m, 90_deg};
   Run(start, waypoints, end);
 }
 
 TEST_F(CubicHermiteSplineTest, OneInterior) {
   Pose2d start{0_m, 0_m, 0_rad};
-  std::vector<Translation2d> waypoints{Translation2d(2_m, 0_m)};
+  std::vector<Translation2d> waypoints{Translation2d{2_m, 0_m}};
   Pose2d end{4_m, 0_m, 0_rad};
   Run(start, waypoints, end);
 }
 
 TEST_F(CubicHermiteSplineTest, ThrowsOnMalformed) {
-  EXPECT_THROW(
-      Run(Pose2d{0_m, 0_m, Rotation2d(0_deg)}, std::vector<Translation2d>{},
-          Pose2d{1_m, 0_m, Rotation2d(180_deg)}),
-      SplineParameterizer::MalformedSplineException);
-  EXPECT_THROW(
-      Run(Pose2d{10_m, 10_m, Rotation2d(90_deg)}, std::vector<Translation2d>{},
-          Pose2d{10_m, 11_m, Rotation2d(-90_deg)}),
-      SplineParameterizer::MalformedSplineException);
+  EXPECT_THROW(Run(Pose2d{0_m, 0_m, 0_deg}, std::vector<Translation2d>{},
+                   Pose2d{1_m, 0_m, 180_deg}),
+               SplineParameterizer::MalformedSplineException);
+  EXPECT_THROW(Run(Pose2d{10_m, 10_m, 90_deg}, std::vector<Translation2d>{},
+                   Pose2d{10_m, 11_m, -90_deg}),
+               SplineParameterizer::MalformedSplineException);
 }

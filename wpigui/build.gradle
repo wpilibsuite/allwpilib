@@ -1,6 +1,6 @@
 import org.gradle.internal.os.OperatingSystem
 
-if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxraspbian') && !project.hasProperty('onlylinuxaarch64bionic')) {
+if (!project.hasProperty('onlylinuxathena')) {
 
     apply plugin: 'cpp'
     if (OperatingSystem.current().isMacOsX()) {
@@ -14,22 +14,10 @@ if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxra
     }
 
     apply from: "${rootDir}/shared/config.gradle"
+    apply from: "${rootDir}/shared/imgui.gradle"
 
     nativeUtils.exportsConfigs {
         wpigui {
-            x86ExcludeSymbols = [
-                '_CT??_R0?AV_System_error',
-                '_CT??_R0?AVexception',
-                '_CT??_R0?AVfailure',
-                '_CT??_R0?AVruntime_error',
-                '_CT??_R0?AVsystem_error',
-                '_CTA5?AVfailure',
-                '_TI5?AVfailure',
-                '_CT??_R0?AVout_of_range',
-                '_CTA3?AVout_of_range',
-                '_TI3?AVout_of_range',
-                '_CT??_R0?AVbad_cast'
-            ]
             x64ExcludeSymbols = [
                 '_CT??_R0?AV_System_error',
                 '_CT??_R0?AVexception',
@@ -61,9 +49,8 @@ if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxra
                     }
                 }
                 binaries.all {
-                    nativeUtils.useRequiredLibrary(it, 'imgui_static')
-                    lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                    if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio || it.targetPlatform.name == nativeUtils.wpi.platforms.raspbian || it.targetPlatform.name == nativeUtils.wpi.platforms.aarch64bionic) {
+                    nativeUtils.useRequiredLibrary(it, 'imgui')
+                    if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                         it.buildable = false
                         return
                     }
@@ -85,9 +72,18 @@ if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxra
                                 }
                             }
                         }
+                    } else if (it.targetPlatform.name.startsWith('linuxarm')) {
+                        it.sources {
+                            wpiguiUnixGl2Cpp(CppSourceSet) {
+                                source {
+                                    srcDirs 'src/main/native/opengl2'
+                                    include '*.cpp'
+                                }
+                            }
+                        }
                     } else {
                         it.sources {
-                            wpiguiUnixCpp(CppSourceSet) {
+                            wpiguiUnixGl3Cpp(CppSourceSet) {
                                 source {
                                     srcDirs 'src/main/native/opengl3'
                                     include '*.cpp'
@@ -119,14 +115,13 @@ if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxra
                 }
                 binaries.all {
                     lib library: 'wpigui'
-                    nativeUtils.useRequiredLibrary(it, 'imgui_static')
-                    lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                    nativeUtils.useRequiredLibrary(it, 'imgui')
                 }
             }
         }
         binaries {
             all {
-                if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio || it.targetPlatform.name == nativeUtils.wpi.platforms.raspbian || it.targetPlatform.name == nativeUtils.wpi.platforms.aarch64bionic) {
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                     it.buildable = false
                     return
                 }
@@ -136,6 +131,9 @@ if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxra
                     it.linker.args << '-framework' << 'Metal' << '-framework' << 'MetalKit' << '-framework' << 'Cocoa' << '-framework' << 'IOKit' << '-framework' << 'CoreFoundation' << '-framework' << 'CoreVideo' << '-framework' << 'QuartzCore'
                 } else {
                     it.linker.args << '-lX11'
+                    if (it.targetPlatform.name.startsWith('linuxarm')) {
+                        it.linker.args << '-lGL'
+                    }
                 }
             }
             withType(SharedLibraryBinarySpec) {

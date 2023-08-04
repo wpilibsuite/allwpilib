@@ -20,7 +20,9 @@ class FlywheelSim : public LinearSystemSim<1, 1, 1> {
   /**
    * Creates a simulated flywheel mechanism.
    *
-   * @param plant              The linear system representing the flywheel.
+   * @param plant              The linear system representing the flywheel. This
+   *                           system can be created with
+   *                           LinearSystemId::FlywheelSystem().
    * @param gearbox            The type of and number of motors in the flywheel
    *                           gearbox.
    * @param gearing            The gearing of the flywheel (numbers greater than

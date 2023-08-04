@@ -15,6 +15,10 @@ namespace frc {
  *
  * This class is intended to be used by sensor (and other I2C device) drivers.
  * It probably should not be used directly.
+ *
+ * The Onboard I2C port is subject to system lockups. See <a
+ * href="https://docs.wpilib.org/en/stable/docs/yearly-overview/known-issues.html#onboard-i2c-causing-system-lockups">
+ * WPILib Known Issues</a> page for details.
  */
 class I2C {
  public:
@@ -98,7 +102,7 @@ class I2C {
    *
    * @param registerAddress The register to read first in the transaction.
    * @param count           The number of bytes to read in the transaction.
-   * @param buffer          A pointer to the array of bytes to store the data
+   * @param data            A pointer to the array of bytes to store the data
    *                        read from the device.
    * @return Transfer Aborted... false for success, true for aborted.
    */

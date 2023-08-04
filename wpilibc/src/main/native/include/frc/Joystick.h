@@ -6,6 +6,8 @@
 
 #include <array>
 
+#include <units/angle.h>
+
 #include "frc/GenericHID.h"
 
 namespace frc {
@@ -54,7 +56,6 @@ class Joystick : public GenericHID {
   /**
    * Set the channel associated with the Y axis.
    *
-   * @param axis    The axis to set the channel for.
    * @param channel The channel to set the axis to.
    */
   void SetYChannel(int channel);
@@ -62,7 +63,6 @@ class Joystick : public GenericHID {
   /**
    * Set the channel associated with the Z axis.
    *
-   * @param axis    The axis to set the channel for.
    * @param channel The channel to set the axis to.
    */
   void SetZChannel(int channel);
@@ -70,7 +70,6 @@ class Joystick : public GenericHID {
   /**
    * Set the channel associated with the twist axis.
    *
-   * @param axis    The axis to set the channel for.
    * @param channel The channel to set the axis to.
    */
   void SetTwistChannel(int channel);
@@ -78,7 +77,6 @@ class Joystick : public GenericHID {
   /**
    * Set the channel associated with the throttle axis.
    *
-   * @param axis    The axis to set the channel for.
    * @param channel The channel to set the axis to.
    */
   void SetThrottleChannel(int channel);
@@ -177,6 +175,15 @@ class Joystick : public GenericHID {
   bool GetTriggerReleased();
 
   /**
+   * Constructs an event instance around the trigger button's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the trigger button's digital signal
+   * attached to the given loop.
+   */
+  BooleanEvent Trigger(EventLoop* loop) const;
+
+  /**
    * Read the state of the top button on the joystick.
    *
    * Look up which button has been assigned to the top and read its state.
@@ -200,6 +207,15 @@ class Joystick : public GenericHID {
   bool GetTopReleased();
 
   /**
+   * Constructs an event instance around the top button's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the top button's digital signal
+   * attached to the given loop.
+   */
+  BooleanEvent Top(EventLoop* loop) const;
+
+  /**
    * Get the magnitude of the direction vector formed by the joystick's
    * current position relative to its origin.
    *
@@ -212,7 +228,9 @@ class Joystick : public GenericHID {
    * in radians.
    *
    * @return The direction of the vector in radians
+   * @deprecated Use GetDirection() instead.
    */
+  [[deprecated("Use GetDirection() instead.")]]
   double GetDirectionRadians() const;
 
   /**
@@ -220,8 +238,17 @@ class Joystick : public GenericHID {
    * in degrees.
    *
    * @return The direction of the vector in degrees
+   * @deprecated Use GetDirection() instead.
    */
+  [[deprecated("Use GetDirection() instead.")]]
   double GetDirectionDegrees() const;
+
+  /**
+   * Get the direction of the vector formed by the joystick and its origin.
+   *
+   * @return The direction of the vector.
+   */
+  units::radian_t GetDirection() const;
 
  private:
   enum Axis { kX, kY, kZ, kTwist, kThrottle, kNumAxes };

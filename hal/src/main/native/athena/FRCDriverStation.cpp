@@ -13,39 +13,66 @@
 #include <FRC_NetworkCommunication/FRCComm.h>
 #include <FRC_NetworkCommunication/NetCommRPCProxy_Occur.h>
 #include <fmt/format.h>
+#include <wpi/EventVector.h>
 #include <wpi/SafeThread.h>
+#include <wpi/SmallVector.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
 
+#include "HALInitializer.h"
 #include "hal/DriverStation.h"
+#include "hal/Errors.h"
 
 static_assert(sizeof(int32_t) >= sizeof(int),
               "FRC_NetworkComm status variable is larger than 32 bits");
 
+namespace {
 struct HAL_JoystickAxesInt {
   int16_t count;
   int16_t axes[HAL_kMaxJoystickAxes];
 };
+}  // namespace
 
-static constexpr int kJoystickPorts = 6;
+namespace {
+struct JoystickDataCache {
+  JoystickDataCache() { std::memset(this, 0, sizeof(*this)); }
+  void Update();
+
+  HAL_JoystickAxes axes[HAL_kMaxJoysticks];
+  HAL_JoystickPOVs povs[HAL_kMaxJoysticks];
+  HAL_JoystickButtons buttons[HAL_kMaxJoysticks];
+  HAL_AllianceStationID allianceStation;
+  float matchTime;
+  HAL_ControlWord controlWord;
+};
+static_assert(std::is_standard_layout_v<JoystickDataCache>);
+// static_assert(std::is_trivial_v<JoystickDataCache>);
+
+struct FRCDriverStation {
+  wpi::EventVector newDataEvents;
+};
+}  // namespace
+
+static ::FRCDriverStation* driverStation;
 
 // Message and Data variables
 static wpi::mutex msgMutex;
 
 static int32_t HAL_GetJoystickAxesInternal(int32_t joystickNum,
                                            HAL_JoystickAxes* axes) {
-  HAL_JoystickAxesInt axesInt;
+  HAL_JoystickAxesInt netcommAxes;
 
   int retVal = FRC_NetworkCommunication_getJoystickAxes(
-      joystickNum, reinterpret_cast<JoystickAxes_t*>(&axesInt),
+      joystickNum, reinterpret_cast<JoystickAxes_t*>(&netcommAxes),
       HAL_kMaxJoystickAxes);
 
   // copy integer values to double values
-  axes->count = axesInt.count;
+  axes->count = netcommAxes.count;
   // current scaling is -128 to 127, can easily be patched in the future by
   // changing this function.
-  for (int32_t i = 0; i < axesInt.count; i++) {
-    int8_t value = axesInt.axes[i];
+  for (int32_t i = 0; i < netcommAxes.count; i++) {
+    int8_t value = netcommAxes.axes[i];
+    axes->raw[i] = value;
     if (value < 0) {
       axes->axes[i] = value / 128.0;
     } else {
@@ -68,16 +95,44 @@ static int32_t HAL_GetJoystickButtonsInternal(int32_t joystickNum,
   return FRC_NetworkCommunication_getJoystickButtons(
       joystickNum, &buttons->buttons, &buttons->count);
 }
+
+void JoystickDataCache::Update() {
+  for (int i = 0; i < HAL_kMaxJoysticks; i++) {
+    HAL_GetJoystickAxesInternal(i, &axes[i]);
+    HAL_GetJoystickPOVsInternal(i, &povs[i]);
+    HAL_GetJoystickButtonsInternal(i, &buttons[i]);
+  }
+  FRC_NetworkCommunication_getAllianceStation(
+      reinterpret_cast<AllianceStationID_t*>(&allianceStation));
+  FRC_NetworkCommunication_getMatchTime(&matchTime);
+  FRC_NetworkCommunication_getControlWord(
+      reinterpret_cast<ControlWord_t*>(&controlWord));
+}
+
+#define CHECK_JOYSTICK_NUMBER(stickNum)                  \
+  if ((stickNum) < 0 || (stickNum) >= HAL_kMaxJoysticks) \
+  return PARAMETER_OUT_OF_RANGE
+
+static HAL_ControlWord newestControlWord;
+static JoystickDataCache caches[3];
+static JoystickDataCache* currentRead = &caches[0];
+static JoystickDataCache* currentReadLocal = &caches[0];
+static std::atomic<JoystickDataCache*> currentCache{nullptr};
+static JoystickDataCache* lastGiven = &caches[1];
+static JoystickDataCache* cacheToUpdate = &caches[2];
+
+static wpi::mutex cacheMutex;
+
 /**
- * Retrieve the Joystick Descriptor for particular slot
- * @param desc [out] descriptor (data transfer object) to fill in.  desc is
- * filled in regardless of success. In other words, if descriptor is not
- * available, desc is filled in with default values matching the init-values in
- * Java and C++ Driverstation for when caller requests a too-large joystick
- * index.
+ * Retrieve the Joystick Descriptor for particular slot.
  *
+ * @param[out] desc descriptor (data transfer object) to fill in. desc is filled
+ *                  in regardless of success. In other words, if descriptor is
+ *                  not available, desc is filled in with default values
+ *                  matching the init-values in Java and C++ Driverstation for
+ *                  when caller requests a too-large joystick index.
  * @return error code reported from Network Comm back-end.  Zero is good,
- * nonzero is bad.
+ *         nonzero is bad.
  */
 static int32_t HAL_GetJoystickDescriptorInternal(int32_t joystickNum,
                                                  HAL_JoystickDescriptor* desc) {
@@ -102,17 +157,16 @@ static int32_t HAL_GetJoystickDescriptorInternal(int32_t joystickNum,
   return retval;
 }
 
-static int32_t HAL_GetControlWordInternal(HAL_ControlWord* controlWord) {
-  std::memset(controlWord, 0, sizeof(HAL_ControlWord));
-  return FRC_NetworkCommunication_getControlWord(
-      reinterpret_cast<ControlWord_t*>(controlWord));
-}
-
 static int32_t HAL_GetMatchInfoInternal(HAL_MatchInfo* info) {
   MatchType_t matchType = MatchType_t::kMatchType_none;
+  info->gameSpecificMessageSize = sizeof(info->gameSpecificMessage);
   int status = FRC_NetworkCommunication_getMatchInfo(
       info->eventName, &matchType, &info->matchNumber, &info->replayNumber,
       info->gameSpecificMessage, &info->gameSpecificMessageSize);
+
+  if (info->gameSpecificMessageSize > sizeof(info->gameSpecificMessage)) {
+    info->gameSpecificMessageSize = 0;
+  }
 
   info->matchType = static_cast<HAL_MatchType>(matchType);
 
@@ -121,18 +175,54 @@ static int32_t HAL_GetMatchInfoInternal(HAL_MatchInfo* info) {
   return status;
 }
 
-static wpi::mutex* newDSDataAvailableMutex;
-static wpi::condition_variable* newDSDataAvailableCond;
-static int newDSDataAvailableCounter{0};
+namespace {
+struct TcpCache {
+  TcpCache() { std::memset(this, 0, sizeof(*this)); }
+  void Update(uint32_t mask);
+  void CloneTo(TcpCache* other) { std::memcpy(other, this, sizeof(*this)); }
+
+  HAL_MatchInfo matchInfo;
+  HAL_JoystickDescriptor descriptors[HAL_kMaxJoysticks];
+};
+static_assert(std::is_standard_layout_v<TcpCache>);
+}  // namespace
+
+static std::atomic_uint32_t tcpMask{0xFFFFFFFF};
+static TcpCache tcpCache;
+static TcpCache tcpCurrent;
+static wpi::mutex tcpCacheMutex;
+
+constexpr uint32_t combinedMatchInfoMask = kTcpRecvMask_MatchInfoOld |
+                                           kTcpRecvMask_MatchInfo |
+                                           kTcpRecvMask_GameSpecific;
+
+void TcpCache::Update(uint32_t mask) {
+  if ((mask & combinedMatchInfoMask) != 0) {
+    HAL_GetMatchInfoInternal(&matchInfo);
+  }
+  for (int i = 0; i < HAL_kMaxJoysticks; i++) {
+    if ((mask & (1 << i)) != 0) {
+      HAL_GetJoystickDescriptorInternal(i, &descriptors[i]);
+    }
+  }
+}
 
 namespace hal::init {
 void InitializeFRCDriverStation() {
-  static wpi::mutex newMutex;
-  newDSDataAvailableMutex = &newMutex;
-  static wpi::condition_variable newCond;
-  newDSDataAvailableCond = &newCond;
+  std::memset(&newestControlWord, 0, sizeof(newestControlWord));
+  static FRCDriverStation ds;
+  driverStation = &ds;
 }
 }  // namespace hal::init
+
+namespace hal {
+static void DefaultPrintErrorImpl(const char* line, size_t size) {
+  std::fwrite(line, size, 1, stderr);
+}
+}  // namespace hal
+
+static std::atomic<void (*)(const char* line, size_t size)> gPrintErrorImpl{
+    hal::DefaultPrintErrorImpl};
 
 extern "C" {
 
@@ -211,7 +301,8 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
       if (callStack && callStack[0] != '\0') {
         fmt::format_to(fmt::appender{buf}, "{}\n", callStack);
       }
-      std::fwrite(buf.data(), buf.size(), 1, stderr);
+      auto printError = gPrintErrorImpl.load();
+      printError(buf.data(), buf.size());
     }
     if (i == KEEP_MSGS) {
       // replace the oldest one
@@ -230,6 +321,10 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
   return retval;
 }
 
+void HAL_SetPrintErrorImpl(void (*func)(const char* line, size_t size)) {
+  gPrintErrorImpl.store(func ? func : hal::DefaultPrintErrorImpl);
+}
+
 int32_t HAL_SendConsoleLine(const char* line) {
   std::string_view lineRef{line};
   if (lineRef.size() <= 65535) {
@@ -243,36 +338,58 @@ int32_t HAL_SendConsoleLine(const char* line) {
 }
 
 int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {
-  return HAL_GetControlWordInternal(controlWord);
+  std::scoped_lock lock{cacheMutex};
+  *controlWord = newestControlWord;
+  return 0;
 }
 
 int32_t HAL_GetJoystickAxes(int32_t joystickNum, HAL_JoystickAxes* axes) {
-  return HAL_GetJoystickAxesInternal(joystickNum, axes);
+  CHECK_JOYSTICK_NUMBER(joystickNum);
+  std::scoped_lock lock{cacheMutex};
+  *axes = currentRead->axes[joystickNum];
+  return 0;
 }
 
 int32_t HAL_GetJoystickPOVs(int32_t joystickNum, HAL_JoystickPOVs* povs) {
-  return HAL_GetJoystickPOVsInternal(joystickNum, povs);
+  CHECK_JOYSTICK_NUMBER(joystickNum);
+  std::scoped_lock lock{cacheMutex};
+  *povs = currentRead->povs[joystickNum];
+  return 0;
 }
 
 int32_t HAL_GetJoystickButtons(int32_t joystickNum,
                                HAL_JoystickButtons* buttons) {
-  return HAL_GetJoystickButtonsInternal(joystickNum, buttons);
+  CHECK_JOYSTICK_NUMBER(joystickNum);
+  std::scoped_lock lock{cacheMutex};
+  *buttons = currentRead->buttons[joystickNum];
+  return 0;
+}
+
+void HAL_GetAllJoystickData(HAL_JoystickAxes* axes, HAL_JoystickPOVs* povs,
+                            HAL_JoystickButtons* buttons) {
+  std::scoped_lock lock{cacheMutex};
+  std::memcpy(axes, currentRead->axes, sizeof(currentRead->axes));
+  std::memcpy(povs, currentRead->povs, sizeof(currentRead->povs));
+  std::memcpy(buttons, currentRead->buttons, sizeof(currentRead->buttons));
 }
 
 int32_t HAL_GetJoystickDescriptor(int32_t joystickNum,
                                   HAL_JoystickDescriptor* desc) {
-  return HAL_GetJoystickDescriptorInternal(joystickNum, desc);
+  CHECK_JOYSTICK_NUMBER(joystickNum);
+  std::scoped_lock lock{tcpCacheMutex};
+  *desc = tcpCurrent.descriptors[joystickNum];
+  return 0;
 }
 
 int32_t HAL_GetMatchInfo(HAL_MatchInfo* info) {
-  return HAL_GetMatchInfoInternal(info);
+  std::scoped_lock lock{tcpCacheMutex};
+  *info = tcpCurrent.matchInfo;
+  return 0;
 }
 
 HAL_AllianceStationID HAL_GetAllianceStation(int32_t* status) {
-  HAL_AllianceStationID allianceStation;
-  *status = FRC_NetworkCommunication_getAllianceStation(
-      reinterpret_cast<AllianceStationID_t*>(&allianceStation));
-  return allianceStation;
+  std::scoped_lock lock{cacheMutex};
+  return currentRead->allianceStation;
 }
 
 HAL_Bool HAL_GetJoystickIsXbox(int32_t joystickNum) {
@@ -322,14 +439,14 @@ int32_t HAL_GetJoystickAxisType(int32_t joystickNum, int32_t axis) {
 
 int32_t HAL_SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
                                int32_t leftRumble, int32_t rightRumble) {
+  CHECK_JOYSTICK_NUMBER(joystickNum);
   return FRC_NetworkCommunication_setJoystickOutputs(joystickNum, outputs,
                                                      leftRumble, rightRumble);
 }
 
 double HAL_GetMatchTime(int32_t* status) {
-  float matchTime;
-  *status = FRC_NetworkCommunication_getMatchTime(&matchTime);
-  return matchTime;
+  std::scoped_lock lock{cacheMutex};
+  return currentRead->matchTime;
 }
 
 void HAL_ObserveUserProgramStarting(void) {
@@ -352,103 +469,109 @@ void HAL_ObserveUserProgramTest(void) {
   FRC_NetworkCommunication_observeUserProgramTest();
 }
 
-static int& GetThreadLocalLastCount() {
-  // There is a rollover error condition here. At Packet# = n * (uintmax), this
-  // will return false when instead it should return true. However, this at a
-  // 20ms rate occurs once every 2.7 years of DS connected runtime, so not
-  // worth the cycles to check.
-  thread_local int lastCount{0};
-  return lastCount;
-}
-
-HAL_Bool HAL_IsNewControlData(void) {
-  std::scoped_lock lock{*newDSDataAvailableMutex};
-  int& lastCount = GetThreadLocalLastCount();
-  int currentCount = newDSDataAvailableCounter;
-  if (lastCount == currentCount) {
-    return false;
-  }
-  lastCount = currentCount;
-  return true;
-}
-
-void HAL_WaitForDSData(void) {
-  HAL_WaitForDSDataTimeout(0);
-}
-
-HAL_Bool HAL_WaitForDSDataTimeout(double timeout) {
-  std::unique_lock lock{*newDSDataAvailableMutex};
-  int& lastCount = GetThreadLocalLastCount();
-  int currentCount = newDSDataAvailableCounter;
-  if (lastCount != currentCount) {
-    lastCount = currentCount;
-    return true;
-  }
-  auto timeoutTime =
-      std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
-
-  while (newDSDataAvailableCounter == currentCount) {
-    if (timeout > 0) {
-      auto timedOut = newDSDataAvailableCond->wait_until(lock, timeoutTime);
-      if (timedOut == std::cv_status::timeout) {
-        return false;
-      }
-    } else {
-      newDSDataAvailableCond->wait(lock);
-    }
-  }
-  lastCount = newDSDataAvailableCounter;
-  return true;
-}
-
 // Constant number to be used for our occur handle
 constexpr int32_t refNumber = 42;
+constexpr int32_t tcpRefNumber = 94;
 
-static void newDataOccur(uint32_t refNum) {
-  // Since we could get other values, require our specific handle
-  // to signal our threads
-  if (refNum != refNumber) {
-    return;
-  }
-  std::scoped_lock lock{*newDSDataAvailableMutex};
-  // Notify all threads
-  ++newDSDataAvailableCounter;
-  newDSDataAvailableCond->notify_all();
+static void tcpOccur(void) {
+  uint32_t mask = FRC_NetworkCommunication_getNewTcpRecvMask();
+  tcpMask.fetch_or(mask);
 }
 
-/*
- * Call this to initialize the driver station communication. This will properly
- * handle multiple calls. However note that this CANNOT be called from a library
- * that interfaces with LabVIEW.
- */
-void HAL_InitializeDriverStation(void) {
-  static std::atomic_bool initialized{false};
-  static wpi::mutex initializeMutex;
-  // Initial check, as if it's true initialization has finished
-  if (initialized) {
-    return;
+static void udpOccur(void) {
+  cacheToUpdate->Update();
+
+  JoystickDataCache* given = cacheToUpdate;
+  JoystickDataCache* prev = currentCache.exchange(cacheToUpdate);
+  if (prev == nullptr) {
+    cacheToUpdate = currentReadLocal;
+    currentReadLocal = lastGiven;
+  } else {
+    // Current read local does not update
+    cacheToUpdate = prev;
+  }
+  lastGiven = given;
+
+  driverStation->newDataEvents.Wakeup();
+}
+
+static void newDataOccur(uint32_t refNum) {
+  switch (refNum) {
+    case refNumber:
+      udpOccur();
+      break;
+
+    case tcpRefNumber:
+      tcpOccur();
+      break;
+
+    default:
+      std::printf("Unknown occur %u\n", refNum);
+      break;
+  }
+}
+
+HAL_Bool HAL_RefreshDSData(void) {
+  HAL_ControlWord controlWord;
+  std::memset(&controlWord, 0, sizeof(controlWord));
+  FRC_NetworkCommunication_getControlWord(
+      reinterpret_cast<ControlWord_t*>(&controlWord));
+  JoystickDataCache* prev;
+  {
+    std::scoped_lock lock{cacheMutex};
+    prev = currentCache.exchange(nullptr);
+    if (prev != nullptr) {
+      currentRead = prev;
+    }
+    // If newest state shows we have a DS attached, just use the
+    // control word out of the cache, As it will be the one in sync
+    // with the data. Otherwise use the state that shows disconnected.
+    if (controlWord.dsAttached) {
+      newestControlWord = currentRead->controlWord;
+    } else {
+      newestControlWord = controlWord;
+    }
   }
 
-  std::scoped_lock lock(initializeMutex);
-  // Second check in case another thread was waiting
-  if (initialized) {
-    return;
+  uint32_t mask = tcpMask.exchange(0);
+  if (mask != 0) {
+    tcpCache.Update(mask);
+    std::scoped_lock tcpLock(tcpCacheMutex);
+    tcpCache.CloneTo(&tcpCurrent);
   }
+  return prev != nullptr;
+}
 
+void HAL_ProvideNewDataEventHandle(WPI_EventHandle handle) {
+  hal::init::CheckInit();
+  driverStation->newDataEvents.Add(handle);
+}
+
+void HAL_RemoveNewDataEventHandle(WPI_EventHandle handle) {
+  driverStation->newDataEvents.Remove(handle);
+}
+
+HAL_Bool HAL_GetOutputsEnabled(void) {
+  return FRC_NetworkCommunication_getWatchdogActive();
+}
+
+}  // extern "C"
+
+namespace hal {
+void InitializeDriverStation() {
   // Set up the occur function internally with NetComm
   NetCommRPCProxy_SetOccurFuncPointer(newDataOccur);
   // Set up our occur reference number
   setNewDataOccurRef(refNumber);
-
-  initialized = true;
+  FRC_NetworkCommunication_setNewTcpDataOccurRef(tcpRefNumber);
 }
 
-/*
- * Releases the DS Mutex to allow proper shutdown of any threads that are
- * waiting on it.
- */
-void HAL_ReleaseDSMutex(void) {
-  newDataOccur(refNumber);
+void WaitForInitialPacket() {
+  wpi::Event waitForInitEvent;
+  driverStation->newDataEvents.Add(waitForInitEvent.GetHandle());
+  bool timed_out = false;
+  wpi::WaitForObject(waitForInitEvent.GetHandle(), 0.1, &timed_out);
+  // Don't care what the result is, just want to give it a chance.
+  driverStation->newDataEvents.Remove(waitForInitEvent.GetHandle());
 }
-
-}  // extern "C"
+}  // namespace hal

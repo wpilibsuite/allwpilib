@@ -20,4 +20,11 @@ public interface MathShared {
    * @param count the usage count
    */
   void reportUsage(MathUsageId id, int count);
+
+  /**
+   * Get the current time.
+   *
+   * @return Time in seconds
+   */
+  double getTimestamp();
 }

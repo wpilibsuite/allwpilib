@@ -175,10 +175,10 @@ std::string Relay::GetDescription() const {
 void Relay::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Relay");
   builder.SetActuator(true);
-  builder.SetSafeState([=] { Set(kOff); });
+  builder.SetSafeState([=, this] { Set(kOff); });
   builder.AddSmallStringProperty(
       "Value",
-      [=](wpi::SmallVectorImpl<char>& buf) -> std::string_view {
+      [=, this](wpi::SmallVectorImpl<char>& buf) -> std::string_view {
         switch (Get()) {
           case kOn:
             return "On";
@@ -190,7 +190,7 @@ void Relay::InitSendable(wpi::SendableBuilder& builder) {
             return "Off";
         }
       },
-      [=](std::string_view value) {
+      [=, this](std::string_view value) {
         if (value == "Off") {
           Set(kOff);
         } else if (value == "Forward") {

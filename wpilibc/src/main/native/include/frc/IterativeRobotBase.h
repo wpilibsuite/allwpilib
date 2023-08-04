@@ -5,7 +5,6 @@
 #pragma once
 
 #include <units/time.h>
-#include <wpi/deprecated.h>
 
 #include "frc/RobotBase.h"
 #include "frc/Watchdog.h"
@@ -23,6 +22,9 @@ namespace frc {
  * loop, StartCompetition(), at the appropriate times:
  *
  * RobotInit() -- provide for initialization at robot power-on
+ *
+ * DriverStationConnected() -- provide for initialization the first time the DS
+ * is connected
  *
  * Init() functions -- each of the following functions is called once when the
  * appropriate mode is entered:
@@ -67,6 +69,14 @@ class IterativeRobotBase : public RobotBase {
    * ready, causing the robot to be bypassed in a match.
    */
   virtual void RobotInit();
+
+  /**
+   * Code that needs to know the DS state should go here.
+   *
+   * Users should override this method for initialization that needs to occur
+   * after the DS is connected, such as needing the alliance information.
+   */
+  virtual void DriverStationConnected();
 
   /**
    * Robot-wide simulation initialization code should go here.
@@ -196,27 +206,29 @@ class IterativeRobotBase : public RobotBase {
 
   /**
    * Enables or disables flushing NetworkTables every loop iteration.
-   * By default, this is disabled.
+   * By default, this is enabled.
    *
    * @param enabled True to enable, false to disable
    */
   void SetNetworkTablesFlushEnabled(bool enabled);
 
   /**
+   * Sets whether LiveWindow operation is enabled during test mode.
+   *
+   * @param testLW True to enable, false to disable. Defaults to true.
+   * @throws if called in test mode.
+   */
+  void EnableLiveWindowInTest(bool testLW);
+
+  /**
+   * Whether LiveWindow operation is enabled during test mode.
+   */
+  bool IsLiveWindowEnabledInTest();
+
+  /**
    * Gets time period between calls to Periodic() functions.
    */
   units::second_t GetPeriod() const;
-
-  /**
-   * Constructor for IterativeRobotBase.
-   *
-   * @param period Period in seconds.
-   *
-   * @deprecated Use IterativeRobotBase(units::second_t period) with unit-safety
-   * instead
-   */
-  WPI_DEPRECATED("Use constructor with unit-safety instead.")
-  explicit IterativeRobotBase(double period);
 
   /**
    * Constructor for IterativeRobotBase.
@@ -239,7 +251,9 @@ class IterativeRobotBase : public RobotBase {
   Mode m_lastMode = Mode::kNone;
   units::second_t m_period;
   Watchdog m_watchdog;
-  bool m_ntFlushEnabled = false;
+  bool m_ntFlushEnabled = true;
+  bool m_lwEnabledInTest = true;
+  bool m_calledDsConnected = false;
 
   void PrintLoopOverrunMessage();
 };

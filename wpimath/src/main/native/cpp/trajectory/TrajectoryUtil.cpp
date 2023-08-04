@@ -47,7 +47,7 @@ std::string TrajectoryUtil::SerializeTrajectory(const Trajectory& trajectory) {
   return json.dump();
 }
 
-Trajectory TrajectoryUtil::DeserializeTrajectory(std::string_view json_str) {
-  wpi::json json = wpi::json::parse(json_str);
+Trajectory TrajectoryUtil::DeserializeTrajectory(std::string_view jsonStr) {
+  wpi::json json = wpi::json::parse(jsonStr);
   return Trajectory{json.get<std::vector<Trajectory::State>>()};
 }

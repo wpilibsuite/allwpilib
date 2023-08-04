@@ -6,6 +6,8 @@
 
 #include <stdint.h>
 
+#include <string>
+
 #include <units/voltage.h>
 
 namespace frc {
@@ -41,6 +43,24 @@ class RobotController {
    * @return FPGA Revision number.
    */
   static int64_t GetFPGARevision();
+
+  /**
+   * Return the serial number of the roboRIO.
+   *
+   * @return The serial number of the roboRIO.
+   */
+  static std::string GetSerialNumber();
+
+  /**
+   * Return the comments from the roboRIO web interface.
+   *
+   * The comments string is cached after the first call to this function on the
+   * RoboRIO - restart the robot code to reload the comments string after
+   * changing it in the web interface.
+   *
+   * @return The comments from the roboRIO web interface.
+   */
+  static std::string GetComments();
 
   /**
    * Read the microsecond-resolution timer on the FPGA.
@@ -80,6 +100,12 @@ class RobotController {
    * @return True if the system is browned out
    */
   static bool IsBrownedOut();
+
+  /**
+   * Gets the current state of the Robot Signal Light (RSL)
+   * @return The current state of the RSL- true if on, false if off
+   */
+  static bool GetRSLState();
 
   /**
    * Get the input voltage to the robot controller.
@@ -188,6 +214,28 @@ class RobotController {
    */
   static int GetFaultCount6V();
 
+  /**
+   * Get the current brownout voltage setting.
+   *
+   * @return The brownout voltage
+   */
+  static units::volt_t GetBrownoutVoltage();
+
+  /**
+   * Set the voltage the roboRIO will brownout and disable all outputs.
+   *
+   * Note that this only does anything on the roboRIO 2.
+   * On the roboRIO it is a no-op.
+   *
+   * @param brownoutVoltage The brownout voltage
+   */
+  static void SetBrownoutVoltage(units::volt_t brownoutVoltage);
+
+  /**
+   * Get the current status of the CAN bus.
+   *
+   * @return The status of the CAN bus
+   */
   static CANStatus GetCANStatus();
 };
 

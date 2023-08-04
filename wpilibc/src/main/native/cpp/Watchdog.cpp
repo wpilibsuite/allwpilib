@@ -47,10 +47,10 @@ class Watchdog::Impl {
 Watchdog::Impl::Impl() {
   int32_t status = 0;
   m_notifier = HAL_InitializeNotifier(&status);
-  FRC_CheckErrorStatus(status, "{}", "starting watchdog notifier");
+  FRC_CheckErrorStatus(status, "starting watchdog notifier");
   HAL_SetNotifierName(m_notifier, "Watchdog", &status);
 
-  m_thread = std::thread([=] { Main(); });
+  m_thread = std::thread([=, this] { Main(); });
 }
 
 Watchdog::Impl::~Impl() {
@@ -58,7 +58,7 @@ Watchdog::Impl::~Impl() {
   // atomically set handle to 0, then clean
   HAL_NotifierHandle handle = m_notifier.exchange(0);
   HAL_StopNotifier(handle, &status);
-  FRC_ReportError(status, "{}", "stopping watchdog notifier");
+  FRC_ReportError(status, "stopping watchdog notifier");
 
   // Join the thread to ensure the handler has exited.
   if (m_thread.joinable()) {
@@ -80,11 +80,11 @@ void Watchdog::Impl::UpdateAlarm() {
   } else {
     HAL_UpdateNotifierAlarm(
         notifier,
-        static_cast<uint64_t>(m_watchdogs.top()->m_expirationTime.to<double>() *
+        static_cast<uint64_t>(m_watchdogs.top()->m_expirationTime.value() *
                               1e6),
         &status);
   }
-  FRC_CheckErrorStatus(status, "{}", "updating watchdog notifier alarm");
+  FRC_CheckErrorStatus(status, "updating watchdog notifier alarm");
 }
 
 void Watchdog::Impl::Main() {
@@ -114,7 +114,7 @@ void Watchdog::Impl::Main() {
       watchdog->m_lastTimeoutPrintTime = now;
       if (!watchdog->m_suppressTimeoutMessage) {
         FRC_ReportError(warn::Warning, "Watchdog not fed within {:.6f}s",
-                        watchdog->m_timeout.to<double>());
+                        watchdog->m_timeout.value());
       }
     }
 

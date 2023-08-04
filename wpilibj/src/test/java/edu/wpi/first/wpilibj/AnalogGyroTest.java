@@ -12,7 +12,7 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.simulation.AnalogGyroSim;
 import org.junit.jupiter.api.Test;
 
-public class AnalogGyroTest {
+class AnalogGyroTest {
   @Test
   void testInitializeWithAnalogInput() {
     HAL.initialize(500, 0);

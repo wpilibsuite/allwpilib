@@ -43,7 +43,7 @@ TEST(AnalogGyroSimTest, SetAngle) {
   sim.SetAngle(kTestAngle);
   EXPECT_EQ(kTestAngle, sim.GetAngle());
   EXPECT_EQ(kTestAngle, gyro.GetAngle());
-  EXPECT_EQ(-kTestAngle, gyro.GetRotation2d().Degrees().to<double>());
+  EXPECT_EQ(-kTestAngle, gyro.GetRotation2d().Degrees().value());
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_EQ(kTestAngle, callback.GetLastValue());
 }

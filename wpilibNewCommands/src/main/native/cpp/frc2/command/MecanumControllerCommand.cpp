@@ -7,7 +7,6 @@
 #include <utility>
 
 using namespace frc2;
-using namespace units;
 
 MecanumControllerCommand::MecanumControllerCommand(
     frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
@@ -81,9 +80,6 @@ MecanumControllerCommand::MecanumControllerCommand(
       m_outputVolts(std::move(output)),
       m_usePID(true) {
   AddRequirements(requirements);
-  m_desiredRotation = [&] {
-    return m_trajectory.States().back().pose.Rotation();
-  };
 }
 
 MecanumControllerCommand::MecanumControllerCommand(
@@ -102,7 +98,7 @@ MecanumControllerCommand::MecanumControllerCommand(
     std::function<void(units::volt_t, units::volt_t, units::volt_t,
                        units::volt_t)>
         output,
-    wpi::span<Subsystem* const> requirements)
+    std::span<Subsystem* const> requirements)
     : m_trajectory(std::move(trajectory)),
       m_pose(std::move(pose)),
       m_feedforward(feedforward),
@@ -139,7 +135,7 @@ MecanumControllerCommand::MecanumControllerCommand(
     std::function<void(units::volt_t, units::volt_t, units::volt_t,
                        units::volt_t)>
         output,
-    wpi::span<Subsystem* const> requirements)
+    std::span<Subsystem* const> requirements)
     : m_trajectory(std::move(trajectory)),
       m_pose(std::move(pose)),
       m_feedforward(feedforward),
@@ -158,9 +154,6 @@ MecanumControllerCommand::MecanumControllerCommand(
       m_outputVolts(std::move(output)),
       m_usePID(true) {
   AddRequirements(requirements);
-  m_desiredRotation = [&] {
-    return m_trajectory.States().back().pose.Rotation();
-  };
 }
 
 MecanumControllerCommand::MecanumControllerCommand(
@@ -203,9 +196,6 @@ MecanumControllerCommand::MecanumControllerCommand(
       m_outputVel(std::move(output)),
       m_usePID(false) {
   AddRequirements(requirements);
-  m_desiredRotation = [&] {
-    return m_trajectory.States().back().pose.Rotation();
-  };
 }
 
 MecanumControllerCommand::MecanumControllerCommand(
@@ -218,7 +208,7 @@ MecanumControllerCommand::MecanumControllerCommand(
     std::function<void(units::meters_per_second_t, units::meters_per_second_t,
                        units::meters_per_second_t, units::meters_per_second_t)>
         output,
-    wpi::span<Subsystem* const> requirements)
+    std::span<Subsystem* const> requirements)
     : m_trajectory(std::move(trajectory)),
       m_pose(std::move(pose)),
       m_kinematics(kinematics),
@@ -239,7 +229,7 @@ MecanumControllerCommand::MecanumControllerCommand(
     std::function<void(units::meters_per_second_t, units::meters_per_second_t,
                        units::meters_per_second_t, units::meters_per_second_t)>
         output,
-    wpi::span<Subsystem* const> requirements)
+    std::span<Subsystem* const> requirements)
     : m_trajectory(std::move(trajectory)),
       m_pose(std::move(pose)),
       m_kinematics(kinematics),
@@ -248,12 +238,14 @@ MecanumControllerCommand::MecanumControllerCommand(
       m_outputVel(std::move(output)),
       m_usePID(false) {
   AddRequirements(requirements);
-  m_desiredRotation = [&] {
-    return m_trajectory.States().back().pose.Rotation();
-  };
 }
 
 void MecanumControllerCommand::Initialize() {
+  if (m_desiredRotation == nullptr) {
+    m_desiredRotation = [&] {
+      return m_trajectory.States().back().pose.Rotation();
+    };
+  }
   m_prevTime = 0_s;
   auto initialState = m_trajectory.Sample(0_s);
 
@@ -265,8 +257,7 @@ void MecanumControllerCommand::Initialize() {
   m_prevSpeeds = m_kinematics.ToWheelSpeeds(
       frc::ChassisSpeeds{initialXVelocity, initialYVelocity, 0_rad_per_s});
 
-  m_timer.Reset();
-  m_timer.Start();
+  m_timer.Restart();
   if (m_usePID) {
     m_frontLeftController->Reset();
     m_rearLeftController->Reset();
@@ -276,7 +267,7 @@ void MecanumControllerCommand::Initialize() {
 }
 
 void MecanumControllerCommand::Execute() {
-  auto curTime = second_t(m_timer.Get());
+  auto curTime = m_timer.Get();
   auto dt = curTime - m_prevTime;
 
   auto m_desiredState = m_trajectory.Sample(curTime);
@@ -285,7 +276,7 @@ void MecanumControllerCommand::Execute() {
       m_controller.Calculate(m_pose(), m_desiredState, m_desiredRotation());
   auto targetWheelSpeeds = m_kinematics.ToWheelSpeeds(targetChassisSpeeds);
 
-  targetWheelSpeeds.Normalize(m_maxWheelVelocity);
+  targetWheelSpeeds.Desaturate(m_maxWheelVelocity);
 
   auto frontLeftSpeedSetpoint = targetWheelSpeeds.frontLeft;
   auto rearLeftSpeedSetpoint = targetWheelSpeeds.rearLeft;
@@ -309,21 +300,21 @@ void MecanumControllerCommand::Execute() {
         rearRightSpeedSetpoint,
         (rearRightSpeedSetpoint - m_prevSpeeds.rearRight) / dt);
 
-    auto frontLeftOutput = volt_t(m_frontLeftController->Calculate(
-                               m_currentWheelSpeeds().frontLeft.to<double>(),
-                               frontLeftSpeedSetpoint.to<double>())) +
+    auto frontLeftOutput = units::volt_t{m_frontLeftController->Calculate(
+                               m_currentWheelSpeeds().frontLeft.value(),
+                               frontLeftSpeedSetpoint.value())} +
                            frontLeftFeedforward;
-    auto rearLeftOutput = volt_t(m_rearLeftController->Calculate(
-                              m_currentWheelSpeeds().rearLeft.to<double>(),
-                              rearLeftSpeedSetpoint.to<double>())) +
+    auto rearLeftOutput = units::volt_t{m_rearLeftController->Calculate(
+                              m_currentWheelSpeeds().rearLeft.value(),
+                              rearLeftSpeedSetpoint.value())} +
                           rearLeftFeedforward;
-    auto frontRightOutput = volt_t(m_frontRightController->Calculate(
-                                m_currentWheelSpeeds().frontRight.to<double>(),
-                                frontRightSpeedSetpoint.to<double>())) +
+    auto frontRightOutput = units::volt_t{m_frontRightController->Calculate(
+                                m_currentWheelSpeeds().frontRight.value(),
+                                frontRightSpeedSetpoint.value())} +
                             frontRightFeedforward;
-    auto rearRightOutput = volt_t(m_rearRightController->Calculate(
-                               m_currentWheelSpeeds().rearRight.to<double>(),
-                               rearRightSpeedSetpoint.to<double>())) +
+    auto rearRightOutput = units::volt_t{m_rearRightController->Calculate(
+                               m_currentWheelSpeeds().rearRight.value(),
+                               rearRightSpeedSetpoint.value())} +
                            rearRightFeedforward;
 
     m_outputVolts(frontLeftOutput, rearLeftOutput, frontRightOutput,

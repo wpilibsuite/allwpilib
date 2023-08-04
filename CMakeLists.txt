@@ -6,10 +6,16 @@ FATAL: In-source builds are not allowed.
 ")
 endif()
 
+if ("${CMAKE_HOST_SYSTEM_NAME}" STREQUAL "Windows")
+    set(CMAKE_SYSTEM_VERSION 10.0.18362.0 CACHE STRING INTERNAL FORCE)
+    set(CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION 10.0.18362.0 CACHE STRING INTERNAL FORCE)
+endif()
 
-project(allwpilib)
 cmake_minimum_required(VERSION 3.3.0)
+project(allwpilib)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
+
+message(STATUS "Platform version: ${CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION}")
 
 set(WPILIB_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
@@ -30,25 +36,25 @@ SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
 # (but later on when installing)
 SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 
-SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/wpilib/lib")
+SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 
 # add the automatically determined parts of the RPATH
 # which point to directories outside the build tree to the install RPATH
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 # the RPATH to be used when installing, but only if it's not a system directory
-LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/wpilib/lib" isSystemDir)
+LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
 IF("${isSystemDir}" STREQUAL "-1")
-   SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/wpilib/lib")
+   SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 ENDIF("${isSystemDir}" STREQUAL "-1")
 
 # Options for building certain parts of the repo. Everything is built by default.
 option(BUILD_SHARED_LIBS "Build with shared libs (needed for JNI)" ON)
 option(WITH_JAVA "Include java and JNI in the build" ON)
 option(WITH_CSCORE "Build cscore (needs OpenCV)" ON)
+option(WITH_NTCORE "Build ntcore" ON)
 option(WITH_WPIMATH "Build wpimath" ON)
 option(WITH_WPILIB "Build hal, wpilibc/j, and myRobot (needs OpenCV)" ON)
-option(WITH_OLD_COMMANDS "Build old commands" OFF)
 option(WITH_EXAMPLES "Build examples" OFF)
 option(WITH_TESTS "Build unit tests (requires internet connection)" ON)
 option(WITH_GUI "Build GUI items" ON)
@@ -58,10 +64,10 @@ option(WITH_SIMULATION_MODULES "Build simulation modules" ON)
 option(WITH_EXTERNAL_HAL "Use a separately built HAL" OFF)
 set(EXTERNAL_HAL_FILE "" CACHE FILEPATH "Location to look for an external HAL CMake File")
 
-# Options for using a package manager (vcpkg) for certain dependencies.
-option(USE_VCPKG_FMTLIB "Use vcpkg fmtlib" OFF)
-option(USE_VCPKG_LIBUV "Use vcpkg libuv" OFF)
-option(USE_VCPKG_EIGEN "Use vcpkg eigen" OFF)
+# Options for using a package manager (e.g., vcpkg) for certain dependencies.
+option(USE_SYSTEM_FMTLIB "Use system fmtlib" OFF)
+option(USE_SYSTEM_LIBUV "Use system libuv" OFF)
+option(USE_SYSTEM_EIGEN "Use system eigen" OFF)
 
 # Options for installation.
 option(WITH_FLAT_INSTALL "Use a flat install directory" OFF)
@@ -112,6 +118,34 @@ FATAL: Cannot build simulation modules with wpilib disabled.
 ")
 endif()
 
+if (NOT WITH_NTCORE AND WITH_CSCORE)
+    message(FATAL_ERROR "
+FATAL: Cannot build cameraserver without ntcore.
+       Enable ntcore by setting WITH_NTCORE=ON
+")
+endif()
+
+if (NOT WITH_NTCORE AND WITH_GUI)
+    message(FATAL_ERROR "
+FATAL: Cannot build GUI modules without ntcore.
+       Enable ntcore by setting WITH_NTCORE=ON
+")
+endif()
+
+if (NOT WITH_NTCORE AND WITH_SIMULATION_MODULES)
+    message(FATAL_ERROR "
+FATAL: Cannot build simulation modules without ntcore.
+       Enable ntcore by setting WITH_NTCORE=ON
+")
+endif()
+
+if (NOT WITH_NTCORE AND WITH_WPILIB)
+    message(FATAL_ERROR "
+FATAL: Cannot build wpilib without ntcore.
+       Enable ntcore by setting WITH_NTCORE=ON
+")
+endif()
+
 if (NOT WITH_WPIMATH AND WITH_WPILIB)
     message(FATAL_ERROR "
 FATAL: Cannot build wpilib without wpimath.
@@ -119,18 +153,11 @@ FATAL: Cannot build wpilib without wpimath.
 ")
 endif()
 
-if (NOT WITH_OLD_COMMANDS AND WITH_EXAMPLES)
-    message(FATAL_ERROR "
-FATAL: Cannot build examples with old commands disabled.
-       Enable old commands by setting WITH_OLD_COMMANDS=ON
-")
-endif()
-
-set( wpilib_dest wpilib)
-set( include_dest wpilib/include )
-set( main_lib_dest wpilib/lib )
-set( java_lib_dest wpilib/java )
-set( jni_lib_dest wpilib/jni )
+set( wpilib_dest "")
+set( include_dest include )
+set( main_lib_dest lib )
+set( java_lib_dest java )
+set( jni_lib_dest jni )
 
 if (WITH_FLAT_INSTALL)
     set (wpilib_config_dir ${wpilib_dest})
@@ -138,16 +165,21 @@ else()
     set (wpilib_config_dir share/wpilib)
 endif()
 
-if (USE_VCPKG_LIBUV)
-set (LIBUV_VCPKG_REPLACE "find_package(unofficial-libuv CONFIG)")
+if (USE_SYSTEM_LIBUV)
+set (LIBUV_SYSTEM_REPLACE "
+find_dependency(libuv CONFIG)
+")
 endif()
 
-if (USE_VCPKG_EIGEN)
-set (EIGEN_VCPKG_REPLACE "find_package(Eigen3 CONFIG)")
+if (USE_SYSTEM_EIGEN)
+set (EIGEN_SYSTEM_REPLACE "find_package(Eigen3 CONFIG)")
 endif()
+
+find_package(LIBSSH 0.7.1)
 
 if (WITH_FLAT_INSTALL)
 set(WPIUTIL_DEP_REPLACE "include($\{SELF_DIR\}/wpiutil-config.cmake)")
+set(WPINET_DEP_REPLACE "include($\{SELF_DIR\}/wpinet-config.cmake)")
 set(NTCORE_DEP_REPLACE "include($\{SELF_DIR\}/ntcore-config.cmake)")
 set(CSCORE_DEP_REPLACE_IMPL "include(\${SELF_DIR}/cscore-config.cmake)")
 set(CAMERASERVER_DEP_REPLACE_IMPL "include(\${SELF_DIR}/cameraserver-config.cmake)")
@@ -155,9 +187,9 @@ set(HAL_DEP_REPLACE_IMPL "include(\${SELF_DIR}/hal-config.cmake)")
 set(WPIMATH_DEP_REPLACE "include($\{SELF_DIR\}/wpimath-config.cmake)")
 set(WPILIBC_DEP_REPLACE_IMPL "include(\${SELF_DIR}/wpilibc-config.cmake)")
 set(WPILIBNEWCOMMANDS_DEP_REPLACE "include(\${SELF_DIR}/wpilibNewcommands-config.cmake)")
-set(WPILIBOLDCOMMANDS_DEP_REPLACE "include(\${SELF_DIR}/wpilibOldcommands-config.cmake)")
 else()
 set(WPIUTIL_DEP_REPLACE "find_dependency(wpiutil)")
+set(WPINET_DEP_REPLACE "find_dependency(wpinet)")
 set(NTCORE_DEP_REPLACE "find_dependency(ntcore)")
 set(CSCORE_DEP_REPLACE_IMPL "find_dependency(cscore)")
 set(CAMERASERVER_DEP_REPLACE_IMPL "find_dependency(cameraserver)")
@@ -165,7 +197,6 @@ set(HAL_DEP_REPLACE_IMPL "find_dependency(hal)")
 set(WPIMATH_DEP_REPLACE "find_dependency(wpimath)")
 set(WPILIBC_DEP_REPLACE_IMPL "find_dependency(wpilibc)")
 set(WPILIBNEWCOMMANDS_DEP_REPLACE "find_dependency(wpilibNewCommands)")
-set(WPILIBOLDCOMMANDS_DEP_REPLACE "find_dependency(wpilibOldCommands)")
 endif()
 
 set(FILENAME_DEP_REPLACE "get_filename_component(SELF_DIR \"$\{CMAKE_CURRENT_LIST_FILE\}\" PATH)")
@@ -247,17 +278,26 @@ if (WITH_TESTS)
 endif()
 
 add_subdirectory(wpiutil)
-add_subdirectory(ntcore)
+
+if (WITH_NTCORE)
+    add_subdirectory(wpinet)
+    add_subdirectory(ntcore)
+endif()
 
 if (WITH_WPIMATH)
     add_subdirectory(wpimath)
 endif()
 
 if (WITH_GUI)
+    add_subdirectory(fieldImages)
     add_subdirectory(imgui)
     add_subdirectory(wpigui)
     add_subdirectory(glass)
     add_subdirectory(outlineviewer)
+    if (LIBSSH_FOUND)
+        add_subdirectory(roborioteamnumbersetter)
+        add_subdirectory(datalogtool)
+    endif()
 endif()
 
 if (WITH_WPILIB OR WITH_SIMULATION_MODULES)
@@ -270,19 +310,18 @@ if (WITH_CSCORE)
     set(CAMERASERVER_DEP_REPLACE ${CAMERASERVER_DEP_REPLACE_IMPL})
     add_subdirectory(cscore)
     add_subdirectory(cameraserver)
-    if (WITH_WPILIB)
-        set(WPILIBC_DEP_REPLACE ${WPILIBC_DEP_REPLACE_IMPL})
-        add_subdirectory(wpilibj)
-        add_subdirectory(wpilibc)
-        add_subdirectory(wpilibNewCommands)
-        if (WITH_OLD_COMMANDS)
-            add_subdirectory(wpilibOldCommands)
-        endif()
-        if (WITH_EXAMPLES)
-            add_subdirectory(wpilibcExamples)
-        endif()
-        add_subdirectory(myRobot)
+endif()
+
+if (WITH_WPILIB)
+    set(WPILIBC_DEP_REPLACE ${WPILIBC_DEP_REPLACE_IMPL})
+    add_subdirectory(apriltag)
+    add_subdirectory(wpilibj)
+    add_subdirectory(wpilibc)
+    add_subdirectory(wpilibNewCommands)
+    if (WITH_EXAMPLES)
+        add_subdirectory(wpilibcExamples)
     endif()
+    add_subdirectory(myRobot)
 endif()
 
 if (WITH_SIMULATION_MODULES AND NOT WITH_EXTERNAL_HAL)

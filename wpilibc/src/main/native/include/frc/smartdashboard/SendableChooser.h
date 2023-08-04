@@ -4,11 +4,12 @@
 
 #pragma once
 
+#include <concepts>
+#include <functional>
 #include <memory>
 #include <string_view>
 
 #include <wpi/StringMap.h>
-#include <wpi/deprecated.h>
 
 #include "frc/smartdashboard/SendableChooserBase.h"
 
@@ -28,9 +29,10 @@ namespace frc {
  * @see SmartDashboard
  */
 template <class T>
+  requires std::copy_constructible<T> && std::default_initializable<T>
 class SendableChooser : public SendableChooserBase {
   wpi::StringMap<T> m_choices;
-
+  std::function<void(T)> m_listener;
   template <class U>
   static U _unwrap_smart_ptr(const U& value);
 
@@ -69,36 +71,6 @@ class SendableChooser : public SendableChooserBase {
   void SetDefaultOption(std::string_view name, T object);
 
   /**
-   * Adds the given object to the list of options.
-   *
-   * On the SmartDashboard on the desktop, the object will appear as the given
-   * name.
-   *
-   * @deprecated use AddOption(std::string_view name, T object) instead.
-   *
-   * @param name   the name of the option
-   * @param object the option
-   */
-  WPI_DEPRECATED("use AddOption() instead")
-  void AddObject(std::string_view name, T object) { AddOption(name, object); }
-
-  /**
-   * Add the given object to the list of options and marks it as the default.
-   *
-   * Functionally, this is very close to AddOption() except that it will use
-   * this as the default option if none other is explicitly selected.
-   *
-   * @deprecated use SetDefaultOption(std::string_view name, T object) instead.
-   *
-   * @param name   the name of the option
-   * @param object the option
-   */
-  WPI_DEPRECATED("use SetDefaultOption() instead")
-  void AddDefault(std::string_view name, T object) {
-    SetDefaultOption(name, object);
-  }
-
-  /**
    * Returns a copy of the selected option (a raw pointer U* if T =
    * std::unique_ptr<U> or a std::weak_ptr<U> if T = std::shared_ptr<U>).
    *
@@ -110,6 +82,14 @@ class SendableChooser : public SendableChooserBase {
    * @return The option selected
    */
   auto GetSelected() -> decltype(_unwrap_smart_ptr(m_choices[""]));
+
+  /**
+   * Bind a listener that's called when the selected value changes.
+   * Only one listener can be bound. Calling this function will replace the
+   * previous listener.
+   * @param listener The function to call that accepts the new value
+   */
+  void OnChange(std::function<void(T)>);
 
   void InitSendable(nt::NTSendableBuilder& builder) override;
 };

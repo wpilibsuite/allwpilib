@@ -68,10 +68,17 @@ typedef HAL_Handle HAL_CTREPCMHandle;
 
 typedef HAL_Handle HAL_REVPDHHandle;
 
+typedef HAL_Handle HAL_REVPHHandle;
+
 typedef int32_t HAL_Bool;
 
 #ifdef __cplusplus
 #define HAL_ENUM(name) enum name : int32_t
+#elif defined(__clang__)
+#define HAL_ENUM(name)    \
+  enum name : int32_t;    \
+  typedef enum name name; \
+  enum name : int32_t
 #else
 #define HAL_ENUM(name)  \
   typedef int32_t name; \

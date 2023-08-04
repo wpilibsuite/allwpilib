@@ -4,7 +4,7 @@
 
 #include "subsystems/Drivetrain.h"
 
-#include <wpi/numbers>
+#include <numbers>
 
 #include "Constants.h"
 
@@ -20,10 +20,10 @@ Drivetrain::Drivetrain() {
   // gearbox is constructed, you might have to invert the left side instead.
   m_rightMotor.SetInverted(true);
 
-  m_leftEncoder.SetDistancePerPulse(
-      wpi::numbers::pi * kWheelDiameter.to<double>() / kCountsPerRevolution);
-  m_rightEncoder.SetDistancePerPulse(
-      wpi::numbers::pi * kWheelDiameter.to<double>() / kCountsPerRevolution);
+  m_leftEncoder.SetDistancePerPulse(std::numbers::pi * kWheelDiameter.value() /
+                                    kCountsPerRevolution);
+  m_rightEncoder.SetDistancePerPulse(std::numbers::pi * kWheelDiameter.value() /
+                                     kCountsPerRevolution);
   ResetEncoders();
 }
 
@@ -49,11 +49,11 @@ int Drivetrain::GetRightEncoderCount() {
 }
 
 units::meter_t Drivetrain::GetLeftDistance() {
-  return units::meter_t(m_leftEncoder.GetDistance());
+  return units::meter_t{m_leftEncoder.GetDistance()};
 }
 
 units::meter_t Drivetrain::GetRightDistance() {
-  return units::meter_t(m_rightEncoder.GetDistance());
+  return units::meter_t{m_rightEncoder.GetDistance()};
 }
 
 units::meter_t Drivetrain::GetAverageDistance() {

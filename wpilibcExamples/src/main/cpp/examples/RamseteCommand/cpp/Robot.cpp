@@ -10,7 +10,7 @@
 void Robot::RobotInit() {}
 
 /**
- * This function is called every robot packet, no matter the mode. Use
+ * This function is called every 20 ms, no matter the mode. Use
  * this for items like diagnostics that you want to run during disabled,
  * autonomous, teleoperated and test.
  *
@@ -37,7 +37,7 @@ void Robot::DisabledPeriodic() {}
 void Robot::AutonomousInit() {
   m_autonomousCommand = m_container.GetAutonomousCommand();
 
-  if (m_autonomousCommand != nullptr) {
+  if (m_autonomousCommand) {
     m_autonomousCommand->Schedule();
   }
 }
@@ -49,9 +49,9 @@ void Robot::TeleopInit() {
   // teleop starts running. If you want the autonomous to
   // continue until interrupted by another command, remove
   // this line or comment it out.
-  if (m_autonomousCommand != nullptr) {
+  if (m_autonomousCommand) {
     m_autonomousCommand->Cancel();
-    m_autonomousCommand = nullptr;
+    m_autonomousCommand.reset();
   }
 }
 

@@ -18,6 +18,6 @@
 class Autonomous
     : public frc2::CommandHelper<frc2::SequentialCommandGroup, Autonomous> {
  public:
-  Autonomous(Claw* claw, Wrist* wrist, Elevator* elevator,
-             Drivetrain* drivetrain);
+  Autonomous(Claw& claw, Wrist& wrist, Elevator& elevator,
+             Drivetrain& drivetrain);
 };

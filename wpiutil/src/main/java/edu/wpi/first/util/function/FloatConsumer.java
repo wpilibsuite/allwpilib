@@ -7,7 +7,7 @@ package edu.wpi.first.util.function;
 /**
  * Represents an operation that accepts a single float-valued argument and returns no result. This
  * is the primitive type specialization of {@link java.util.function.Consumer} for float. Unlike
- * most other functional interfaces, BooleanConsumer is expected to operate via side-effects.
+ * most other functional interfaces, BooleanConsumer is expected to operate via side effects.
  *
  * <p>This is a functional interface whose functional method is {@link #accept(float)}.
  */

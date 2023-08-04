@@ -67,9 +67,7 @@ public class FakeCounterFixture implements ITestFixture {
    * @see edu.wpi.first.wpilibj.fixtures.ITestFixture#setup()
    */
   @Override
-  public boolean setup() {
-    return true;
-  }
+  public void setup() {}
 
   /*
    * (non-Javadoc)
@@ -77,9 +75,8 @@ public class FakeCounterFixture implements ITestFixture {
    * @see edu.wpi.first.wpilibj.fixtures.ITestFixture#reset()
    */
   @Override
-  public boolean reset() {
+  public void reset() {
     m_counter.reset();
-    return true;
   }
 
   /*
@@ -88,7 +85,7 @@ public class FakeCounterFixture implements ITestFixture {
    * @see edu.wpi.first.wpilibj.fixtures.ITestFixture#teardown()
    */
   @Override
-  public boolean teardown() {
+  public void teardown() {
     logger.log(Level.FINE, "Beginning teardown");
     m_counter.close();
     m_source.close();
@@ -96,6 +93,5 @@ public class FakeCounterFixture implements ITestFixture {
       m_dio.teardown();
       m_allocated = false;
     }
-    return true;
   }
 }

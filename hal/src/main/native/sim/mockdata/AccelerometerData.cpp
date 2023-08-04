@@ -9,7 +9,7 @@ using namespace hal;
 
 namespace hal::init {
 void InitializeAccelerometerData() {
-  static AccelerometerData sad[1];
+  static AccelerometerData sad[kAccelerometers];
   ::hal::SimAccelerometerData = sad;
 }
 }  // namespace hal::init

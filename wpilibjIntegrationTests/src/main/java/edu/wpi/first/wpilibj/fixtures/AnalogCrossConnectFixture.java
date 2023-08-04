@@ -34,10 +34,9 @@ public abstract class AnalogCrossConnectFixture implements ITestFixture {
    * @see edu.wpi.first.wpilibj.fixtures.ITestFixture#setup()
    */
   @Override
-  public boolean setup() {
+  public void setup() {
     initialize();
     m_output.setVoltage(0);
-    return true;
   }
 
   /*
@@ -46,9 +45,8 @@ public abstract class AnalogCrossConnectFixture implements ITestFixture {
    * @see edu.wpi.first.wpilibj.fixtures.ITestFixture#reset()
    */
   @Override
-  public boolean reset() {
+  public void reset() {
     initialize();
-    return true;
   }
 
   /*
@@ -57,10 +55,9 @@ public abstract class AnalogCrossConnectFixture implements ITestFixture {
    * @see edu.wpi.first.wpilibj.fixtures.ITestFixture#teardown()
    */
   @Override
-  public boolean teardown() {
+  public void teardown() {
     m_input.close();
     m_output.close();
-    return true;
   }
 
   /** Analog Output. */

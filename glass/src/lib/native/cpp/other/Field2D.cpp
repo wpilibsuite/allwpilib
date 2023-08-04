@@ -11,6 +11,7 @@
 #include <string_view>
 #include <utility>
 
+#include <fields/fields.h>
 #include <fmt/format.h>
 #include <frc/geometry/Pose2d.h>
 #include <frc/geometry/Rotation2d.h>
@@ -32,6 +33,9 @@
 #include <wpigui.h>
 
 #include "glass/Context.h"
+#include "glass/Storage.h"
+#include "glass/support/ColorSetting.h"
+#include "glass/support/EnumSetting.h"
 
 using namespace glass;
 
@@ -90,7 +94,7 @@ class PopupState {
 
   SelectedTargetInfo* GetTarget() { return &m_target; }
   FieldObjectModel* GetInsertModel() { return m_insertModel; }
-  wpi::span<const frc::Pose2d> GetInsertPoses() const { return m_insertPoses; }
+  std::span<const frc::Pose2d> GetInsertPoses() const { return m_insertPoses; }
 
   void Display(Field2DModel* model, const FieldFrameData& ffd);
 
@@ -110,16 +114,18 @@ class PopupState {
 struct DisplayOptions {
   explicit DisplayOptions(const gui::Texture& texture) : texture{texture} {}
 
-  enum Style { kBoxImage = 0, kLine, kLineClosed, kTrack };
+  enum Style { kBoxImage = 0, kLine, kLineClosed, kTrack, kHidden };
 
   static constexpr Style kDefaultStyle = kBoxImage;
   static constexpr float kDefaultWeight = 4.0f;
+  static constexpr float kDefaultColorFloat[] = {255, 0, 0, 255};
   static constexpr ImU32 kDefaultColor = IM_COL32(255, 0, 0, 255);
   static constexpr auto kDefaultWidth = 0.6858_m;
   static constexpr auto kDefaultLength = 0.8204_m;
   static constexpr bool kDefaultArrows = true;
   static constexpr int kDefaultArrowSize = 50;
   static constexpr float kDefaultArrowWeight = 4.0f;
+  static constexpr float kDefaultArrowColorFloat[] = {0, 255, 0, 255};
   static constexpr ImU32 kDefaultArrowColor = IM_COL32(0, 255, 0, 255);
   static constexpr bool kDefaultSelectable = true;
 
@@ -180,37 +186,37 @@ class PoseFrameData {
 
 class ObjectInfo {
  public:
-  ObjectInfo();
+  explicit ObjectInfo(Storage& storage);
 
   DisplayOptions GetDisplayOptions() const;
   void DisplaySettings();
-  void DrawLine(ImDrawList* drawList, wpi::span<const ImVec2> points) const;
+  void DrawLine(ImDrawList* drawList, std::span<const ImVec2> points) const;
 
   void LoadImage();
   const gui::Texture& GetTexture() const { return m_texture; }
 
  private:
   void Reset();
-  bool LoadImageImpl(const char* fn);
+  bool LoadImageImpl(const std::string& fn);
 
   std::unique_ptr<pfd::open_file> m_fileOpener;
 
   // in meters
-  float* m_pWidth;
-  float* m_pLength;
+  float& m_width;
+  float& m_length;
 
-  int* m_pStyle;  // DisplayOptions::Style
-  float* m_pWeight;
-  int* m_pColor;
+  EnumSetting m_style;  // DisplayOptions::Style
+  float& m_weight;
+  ColorSetting m_color;
 
-  bool* m_pArrows;
-  int* m_pArrowSize;
-  float* m_pArrowWeight;
-  int* m_pArrowColor;
+  bool& m_arrows;
+  int& m_arrowSize;
+  float& m_arrowWeight;
+  ColorSetting m_arrowColor;
 
-  bool* m_pSelectable;
+  bool& m_selectable;
 
-  std::string* m_pFilename;
+  std::string& m_filename;
   gui::Texture m_texture;
 };
 
@@ -219,7 +225,7 @@ class FieldInfo {
   static constexpr auto kDefaultWidth = 15.98_m;
   static constexpr auto kDefaultHeight = 8.21_m;
 
-  FieldInfo();
+  explicit FieldInfo(Storage& storage);
 
   void DisplaySettings();
 
@@ -231,25 +237,27 @@ class FieldInfo {
 
  private:
   void Reset();
-  bool LoadImageImpl(const char* fn);
-  void LoadJson(std::string_view jsonfile);
+  bool LoadImageImpl(const std::string& fn);
+  bool LoadJson(wpi::raw_istream& is, std::string_view filename);
+  void LoadJsonFile(std::string_view jsonfile);
 
   std::unique_ptr<pfd::open_file> m_fileOpener;
 
-  std::string* m_pFilename;
+  std::string& m_builtin;
+  std::string& m_filename;
   gui::Texture m_texture;
 
   // in meters
-  float* m_pWidth;
-  float* m_pHeight;
+  float& m_width;
+  float& m_height;
 
   // in image pixels
   int m_imageWidth;
   int m_imageHeight;
-  int* m_pTop;
-  int* m_pLeft;
-  int* m_pBottom;
-  int* m_pRight;
+  int& m_top;
+  int& m_left;
+  int& m_bottom;
+  int& m_right;
 };
 
 }  // namespace
@@ -261,17 +269,17 @@ static DisplayUnits gDisplayUnits = kDisplayMeters;
 static double ConvertDisplayLength(units::meter_t v) {
   switch (gDisplayUnits) {
     case kDisplayFeet:
-      return v.convert<units::feet>().to<double>();
+      return v.convert<units::feet>().value();
     case kDisplayInches:
-      return v.convert<units::inches>().to<double>();
+      return v.convert<units::inches>().value();
     case kDisplayMeters:
     default:
-      return v.to<double>();
+      return v.value();
   }
 }
 
 static double ConvertDisplayAngle(units::degree_t v) {
-  return v.to<double>();
+  return v.value();
 }
 
 static bool InputLength(const char* label, units::meter_t* v, double step = 0.0,
@@ -334,19 +342,36 @@ static bool InputPose(frc::Pose2d* pose) {
   return changed;
 }
 
-FieldInfo::FieldInfo() {
-  auto& storage = GetStorage();
-  m_pFilename = storage.GetStringRef("image");
-  m_pTop = storage.GetIntRef("top", 0);
-  m_pLeft = storage.GetIntRef("left", 0);
-  m_pBottom = storage.GetIntRef("bottom", -1);
-  m_pRight = storage.GetIntRef("right", -1);
-  m_pWidth = storage.GetFloatRef("width", kDefaultWidth.to<float>());
-  m_pHeight = storage.GetFloatRef("height", kDefaultHeight.to<float>());
-}
+FieldInfo::FieldInfo(Storage& storage)
+    : m_builtin{storage.GetString("builtin")},
+      m_filename{storage.GetString("image")},
+      m_width{storage.GetFloat("width", kDefaultWidth.to<float>())},
+      m_height{storage.GetFloat("height", kDefaultHeight.to<float>())},
+      m_top{storage.GetInt("top", 0)},
+      m_left{storage.GetInt("left", 0)},
+      m_bottom{storage.GetInt("bottom", -1)},
+      m_right{storage.GetInt("right", -1)} {}
 
 void FieldInfo::DisplaySettings() {
-  if (ImGui::Button("Choose image...")) {
+  ImGui::SetNextItemWidth(ImGui::GetFontSize() * 10);
+  if (ImGui::BeginCombo("Image",
+                        m_builtin.empty() ? "Custom" : m_builtin.c_str())) {
+    if (ImGui::Selectable("Custom", m_builtin.empty())) {
+      Reset();
+    }
+    for (auto&& field : fields::GetFields()) {
+      bool selected = field.name == m_builtin;
+      if (ImGui::Selectable(field.name, selected)) {
+        Reset();
+        m_builtin = field.name;
+      }
+      if (selected) {
+        ImGui::SetItemDefaultFocus();
+      }
+    }
+    ImGui::EndCombo();
+  }
+  if (m_builtin.empty() && ImGui::Button("Load image...")) {
     m_fileOpener = std::make_unique<pfd::open_file>(
         "Choose field image", "",
         std::vector<std::string>{"Image File",
@@ -357,23 +382,24 @@ void FieldInfo::DisplaySettings() {
   if (ImGui::Button("Reset image")) {
     Reset();
   }
-  InputFloatLength("Field Width", m_pWidth);
-  InputFloatLength("Field Height", m_pHeight);
-  // ImGui::InputInt("Field Top", m_pTop);
-  // ImGui::InputInt("Field Left", m_pLeft);
-  // ImGui::InputInt("Field Right", m_pRight);
-  // ImGui::InputInt("Field Bottom", m_pBottom);
+  InputFloatLength("Field Width", &m_width);
+  InputFloatLength("Field Height", &m_height);
+  // ImGui::InputInt("Field Top", &m_top);
+  // ImGui::InputInt("Field Left", &m_left);
+  // ImGui::InputInt("Field Right", &m_right);
+  // ImGui::InputInt("Field Bottom", &m_bottom);
 }
 
 void FieldInfo::Reset() {
   m_texture = gui::Texture{};
-  m_pFilename->clear();
+  m_builtin.clear();
+  m_filename.clear();
   m_imageWidth = 0;
   m_imageHeight = 0;
-  *m_pTop = 0;
-  *m_pLeft = 0;
-  *m_pBottom = -1;
-  *m_pRight = -1;
+  m_top = 0;
+  m_left = 0;
+  m_bottom = -1;
+  m_right = -1;
 }
 
 void FieldInfo::LoadImage() {
@@ -381,44 +407,58 @@ void FieldInfo::LoadImage() {
     auto result = m_fileOpener->result();
     if (!result.empty()) {
       if (wpi::ends_with(result[0], ".json")) {
-        LoadJson(result[0]);
+        LoadJsonFile(result[0]);
       } else {
         LoadImageImpl(result[0].c_str());
-        *m_pTop = 0;
-        *m_pLeft = 0;
-        *m_pBottom = -1;
-        *m_pRight = -1;
+        m_top = 0;
+        m_left = 0;
+        m_bottom = -1;
+        m_right = -1;
       }
     }
     m_fileOpener.reset();
   }
-  if (!m_texture && !m_pFilename->empty()) {
-    if (!LoadImageImpl(m_pFilename->c_str())) {
-      m_pFilename->clear();
+  if (!m_texture) {
+    if (!m_builtin.empty()) {
+      for (auto&& field : fields::GetFields()) {
+        if (field.name == m_builtin) {
+          auto jsonstr = field.getJson();
+          wpi::raw_mem_istream is{jsonstr.data(), jsonstr.size()};
+          auto imagedata = field.getImage();
+          auto texture = gui::Texture::CreateFromImage(
+              reinterpret_cast<const unsigned char*>(imagedata.data()),
+              imagedata.size());
+          if (texture && LoadJson(is, {})) {
+            m_texture = std::move(texture);
+            m_imageWidth = m_texture.GetWidth();
+            m_imageHeight = m_texture.GetHeight();
+          } else {
+            m_builtin.clear();
+          }
+        }
+      }
+    } else if (!m_filename.empty()) {
+      if (!LoadImageImpl(m_filename)) {
+        m_filename.clear();
+      }
     }
   }
 }
 
-void FieldInfo::LoadJson(std::string_view jsonfile) {
-  std::error_code ec;
-  wpi::raw_fd_istream f(jsonfile, ec);
-  if (ec) {
-    std::fputs("GUI: could not open field JSON file\n", stderr);
-    return;
-  }
-
+bool FieldInfo::LoadJson(wpi::raw_istream& is, std::string_view filename) {
   // parse file
   wpi::json j;
   try {
-    j = wpi::json::parse(f);
+    j = wpi::json::parse(is);
   } catch (const wpi::json::parse_error& e) {
     fmt::print(stderr, "GUI: JSON: could not parse: {}\n", e.what());
+    return false;
   }
 
   // top level must be an object
   if (!j.is_object()) {
     std::fputs("GUI: JSON: does not contain a top object\n", stderr);
-    return;
+    return false;
   }
 
   // image filename
@@ -427,7 +467,7 @@ void FieldInfo::LoadJson(std::string_view jsonfile) {
     image = j.at("field-image").get<std::string>();
   } catch (const wpi::json::exception& e) {
     fmt::print(stderr, "GUI: JSON: could not read field-image: {}\n", e.what());
-    return;
+    return false;
   }
 
   // corners
@@ -440,7 +480,7 @@ void FieldInfo::LoadJson(std::string_view jsonfile) {
   } catch (const wpi::json::exception& e) {
     fmt::print(stderr, "GUI: JSON: could not read field-corners: {}\n",
                e.what());
-    return;
+    return false;
   }
 
   // size
@@ -451,7 +491,7 @@ void FieldInfo::LoadJson(std::string_view jsonfile) {
     height = j.at("field-size").at(1).get<float>();
   } catch (const wpi::json::exception& e) {
     fmt::print(stderr, "GUI: JSON: could not read field-size: {}\n", e.what());
-    return;
+    return false;
   }
 
   // units for size
@@ -460,7 +500,7 @@ void FieldInfo::LoadJson(std::string_view jsonfile) {
     unit = j.at("field-unit").get<std::string>();
   } catch (const wpi::json::exception& e) {
     fmt::print(stderr, "GUI: JSON: could not read field-unit: {}\n", e.what());
-    return;
+    return false;
   }
 
   // convert size units to meters
@@ -469,27 +509,40 @@ void FieldInfo::LoadJson(std::string_view jsonfile) {
     height = units::convert<units::feet, units::meters>(height);
   }
 
-  // the image filename is relative to the json file
-  auto pathname = fs::path{jsonfile}.replace_filename(image).string();
+  if (!filename.empty()) {
+    // the image filename is relative to the json file
+    auto pathname = fs::path{filename}.replace_filename(image).string();
 
-  // load field image
-  if (!LoadImageImpl(pathname.c_str())) {
-    return;
+    // load field image
+    if (!LoadImageImpl(pathname.c_str())) {
+      return false;
+    }
+    m_filename = pathname;
   }
 
   // save to field info
-  *m_pFilename = pathname;
-  *m_pTop = top;
-  *m_pLeft = left;
-  *m_pBottom = bottom;
-  *m_pRight = right;
-  *m_pWidth = width;
-  *m_pHeight = height;
+  m_top = top;
+  m_left = left;
+  m_bottom = bottom;
+  m_right = right;
+  m_width = width;
+  m_height = height;
+  return true;
 }
 
-bool FieldInfo::LoadImageImpl(const char* fn) {
+void FieldInfo::LoadJsonFile(std::string_view jsonfile) {
+  std::error_code ec;
+  wpi::raw_fd_istream f(jsonfile, ec);
+  if (ec) {
+    std::fputs("GUI: could not open field JSON file\n", stderr);
+    return;
+  }
+  LoadJson(f, jsonfile);
+}
+
+bool FieldInfo::LoadImageImpl(const std::string& fn) {
   fmt::print("GUI: loading field image '{}'\n", fn);
-  auto texture = gui::Texture::CreateFromFile(fn);
+  auto texture = gui::Texture::CreateFromFile(fn.c_str());
   if (!texture) {
     std::puts("GUI: could not read field image");
     return false;
@@ -497,7 +550,7 @@ bool FieldInfo::LoadImageImpl(const char* fn) {
   m_texture = std::move(texture);
   m_imageWidth = m_texture.GetWidth();
   m_imageHeight = m_texture.GetHeight();
-  *m_pFilename = fn;
+  m_filename = fn;
   return true;
 }
 
@@ -512,19 +565,19 @@ FieldFrameData FieldInfo::GetFrameData(ImVec2 min, ImVec2 max) const {
   ffd.imageMax = max;
 
   // size down the box by the image corners (if any)
-  if (*m_pBottom > 0 && *m_pRight > 0) {
-    min.x += *m_pLeft * (max.x - min.x) / m_imageWidth;
-    min.y += *m_pTop * (max.y - min.y) / m_imageHeight;
-    max.x -= (m_imageWidth - *m_pRight) * (max.x - min.x) / m_imageWidth;
-    max.y -= (m_imageHeight - *m_pBottom) * (max.y - min.y) / m_imageHeight;
+  if (m_bottom > 0 && m_right > 0) {
+    min.x += m_left * (max.x - min.x) / m_imageWidth;
+    min.y += m_top * (max.y - min.y) / m_imageHeight;
+    max.x -= (m_imageWidth - m_right) * (max.x - min.x) / m_imageWidth;
+    max.y -= (m_imageHeight - m_bottom) * (max.y - min.y) / m_imageHeight;
   }
 
   // draw the field "active area" as a yellow boundary box
-  gui::MaxFit(&min, &max, *m_pWidth, *m_pHeight);
+  gui::MaxFit(&min, &max, m_width, m_height);
 
   ffd.min = min;
   ffd.max = max;
-  ffd.scale = (max.x - min.x) / *m_pWidth;
+  ffd.scale = (max.x - min.x) / m_width;
   return ffd;
 }
 
@@ -537,48 +590,47 @@ void FieldInfo::Draw(ImDrawList* drawList, const FieldFrameData& ffd) const {
   drawList->AddRect(ffd.min, ffd.max, IM_COL32(255, 255, 0, 255));
 }
 
-ObjectInfo::ObjectInfo() {
-  auto& storage = GetStorage();
-  m_pFilename = storage.GetStringRef("image");
-  m_pWidth =
-      storage.GetFloatRef("width", DisplayOptions::kDefaultWidth.to<float>());
-  m_pLength =
-      storage.GetFloatRef("length", DisplayOptions::kDefaultLength.to<float>());
-  m_pStyle = storage.GetIntRef("style", DisplayOptions::kDefaultStyle);
-  m_pWeight = storage.GetFloatRef("weight", DisplayOptions::kDefaultWeight);
-  m_pColor = storage.GetIntRef("color", DisplayOptions::kDefaultColor);
-  m_pArrows = storage.GetBoolRef("arrows", DisplayOptions::kDefaultArrows);
-  m_pArrowSize =
-      storage.GetIntRef("arrowSize", DisplayOptions::kDefaultArrowSize);
-  m_pArrowWeight =
-      storage.GetFloatRef("arrowWeight", DisplayOptions::kDefaultArrowWeight);
-  m_pArrowColor =
-      storage.GetIntRef("arrowColor", DisplayOptions::kDefaultArrowColor);
-  m_pSelectable =
-      storage.GetBoolRef("selectable", DisplayOptions::kDefaultSelectable);
-}
+ObjectInfo::ObjectInfo(Storage& storage)
+    : m_width{storage.GetFloat("width",
+                               DisplayOptions::kDefaultWidth.to<float>())},
+      m_length{storage.GetFloat("length",
+                                DisplayOptions::kDefaultLength.to<float>())},
+      m_style{storage.GetString("style"),
+              DisplayOptions::kDefaultStyle,
+              {"Box/Image", "Line", "Line (Closed)", "Track", "Hidden"}},
+      m_weight{storage.GetFloat("weight", DisplayOptions::kDefaultWeight)},
+      m_color{
+          storage.GetFloatArray("color", DisplayOptions::kDefaultColorFloat)},
+      m_arrows{storage.GetBool("arrows", DisplayOptions::kDefaultArrows)},
+      m_arrowSize{
+          storage.GetInt("arrowSize", DisplayOptions::kDefaultArrowSize)},
+      m_arrowWeight{
+          storage.GetFloat("arrowWeight", DisplayOptions::kDefaultArrowWeight)},
+      m_arrowColor{storage.GetFloatArray(
+          "arrowColor", DisplayOptions::kDefaultArrowColorFloat)},
+      m_selectable{
+          storage.GetBool("selectable", DisplayOptions::kDefaultSelectable)},
+      m_filename{storage.GetString("image")} {}
 
 DisplayOptions ObjectInfo::GetDisplayOptions() const {
   DisplayOptions rv{m_texture};
-  rv.style = static_cast<DisplayOptions::Style>(*m_pStyle);
-  rv.weight = *m_pWeight;
-  rv.color = *m_pColor;
-  rv.width = units::meter_t{*m_pWidth};
-  rv.length = units::meter_t{*m_pLength};
-  rv.arrows = *m_pArrows;
-  rv.arrowSize = *m_pArrowSize;
-  rv.arrowWeight = *m_pArrowWeight;
-  rv.arrowColor = *m_pArrowColor;
-  rv.selectable = *m_pSelectable;
+  rv.style = static_cast<DisplayOptions::Style>(m_style.GetValue());
+  rv.weight = m_weight;
+  rv.color = ImGui::ColorConvertFloat4ToU32(m_color.GetColor());
+  rv.width = units::meter_t{m_width};
+  rv.length = units::meter_t{m_length};
+  rv.arrows = m_arrows;
+  rv.arrowSize = m_arrowSize;
+  rv.arrowWeight = m_arrowWeight;
+  rv.arrowColor = ImGui::ColorConvertFloat4ToU32(m_arrowColor.GetColor());
+  rv.selectable = m_selectable;
   return rv;
 }
 
 void ObjectInfo::DisplaySettings() {
-  static const char* styleChoices[] = {"Box/Image", "Line", "Line (Closed)",
-                                       "Track"};
   ImGui::SetNextItemWidth(ImGui::GetFontSize() * 8);
-  ImGui::Combo("Style", m_pStyle, styleChoices, IM_ARRAYSIZE(styleChoices));
-  switch (*m_pStyle) {
+  m_style.Combo("Style");
+  switch (m_style.GetValue()) {
     case DisplayOptions::kBoxImage:
       if (ImGui::Button("Choose image...")) {
         m_fileOpener = std::make_unique<pfd::open_file>(
@@ -591,47 +643,41 @@ void ObjectInfo::DisplaySettings() {
       if (ImGui::Button("Reset image")) {
         Reset();
       }
-      InputFloatLength("Width", m_pWidth);
-      InputFloatLength("Length", m_pLength);
+      InputFloatLength("Width", &m_width);
+      InputFloatLength("Length", &m_length);
       break;
     case DisplayOptions::kTrack:
-      InputFloatLength("Width", m_pWidth);
+      InputFloatLength("Width", &m_width);
       break;
     default:
       break;
   }
 
-  ImGui::InputFloat("Line Weight", m_pWeight);
-  ImColor col(*m_pColor);
-  if (ImGui::ColorEdit3("Line Color", &col.Value.x,
-                        ImGuiColorEditFlags_NoInputs)) {
-    *m_pColor = col;
-  }
-  ImGui::Checkbox("Arrows", m_pArrows);
-  if (*m_pArrows) {
-    ImGui::SliderInt("Arrow Size", m_pArrowSize, 0, 100, "%d%%",
+  ImGui::InputFloat("Line Weight", &m_weight);
+  m_color.ColorEdit3("Line Color", ImGuiColorEditFlags_NoInputs);
+  ImGui::Checkbox("Arrows", &m_arrows);
+  if (m_arrows) {
+    ImGui::SliderInt("Arrow Size", &m_arrowSize, 0, 100, "%d%%",
                      ImGuiSliderFlags_AlwaysClamp);
-    ImGui::InputFloat("Arrow Weight", m_pArrowWeight);
-    ImColor col(*m_pArrowColor);
-    if (ImGui::ColorEdit3("Arrow Color", &col.Value.x,
-                          ImGuiColorEditFlags_NoInputs)) {
-      *m_pArrowColor = col;
-    }
+    ImGui::InputFloat("Arrow Weight", &m_arrowWeight);
+    m_arrowColor.ColorEdit3("Arrow Color", ImGuiColorEditFlags_NoInputs);
   }
 
-  ImGui::Checkbox("Selectable", m_pSelectable);
+  ImGui::Checkbox("Selectable", &m_selectable);
 }
 
 void ObjectInfo::DrawLine(ImDrawList* drawList,
-                          wpi::span<const ImVec2> points) const {
+                          std::span<const ImVec2> points) const {
   if (points.empty()) {
     return;
   }
 
   if (points.size() == 1) {
-    drawList->AddCircleFilled(points.front(), *m_pWeight, *m_pWeight);
+    drawList->AddCircleFilled(points.front(), m_weight, m_weight);
     return;
   }
+
+  ImU32 color = ImGui::ColorConvertFloat4ToU32(m_color.GetColor());
 
   // PolyLine doesn't handle acute angles well; workaround from
   // https://github.com/ocornut/imgui/issues/3366
@@ -651,18 +697,18 @@ void ObjectInfo::DrawLine(ImDrawList* drawList,
       ++nlin;
     }
 
-    drawList->AddPolyline(&points[i], nlin, *m_pColor, false, *m_pWeight);
+    drawList->AddPolyline(&points[i], nlin, color, false, m_weight);
     i += nlin - 1;
   }
 
-  if (points.size() > 2 && *m_pStyle == DisplayOptions::kLineClosed) {
-    drawList->AddLine(points.back(), points.front(), *m_pColor, *m_pWeight);
+  if (points.size() > 2 && m_style.GetValue() == DisplayOptions::kLineClosed) {
+    drawList->AddLine(points.back(), points.front(), color, m_weight);
   }
 }
 
 void ObjectInfo::Reset() {
   m_texture = gui::Texture{};
-  m_pFilename->clear();
+  m_filename.clear();
 }
 
 void ObjectInfo::LoadImage() {
@@ -673,22 +719,22 @@ void ObjectInfo::LoadImage() {
     }
     m_fileOpener.reset();
   }
-  if (!m_texture && !m_pFilename->empty()) {
-    if (!LoadImageImpl(m_pFilename->c_str())) {
-      m_pFilename->clear();
+  if (!m_texture && !m_filename.empty()) {
+    if (!LoadImageImpl(m_filename)) {
+      m_filename.clear();
     }
   }
 }
 
-bool ObjectInfo::LoadImageImpl(const char* fn) {
+bool ObjectInfo::LoadImageImpl(const std::string& fn) {
   fmt::print("GUI: loading object image '{}'\n", fn);
-  auto texture = gui::Texture::CreateFromFile(fn);
+  auto texture = gui::Texture::CreateFromFile(fn.c_str());
   if (!texture) {
     std::fputs("GUI: could not read object image\n", stderr);
     return false;
   }
   m_texture = std::move(texture);
-  *m_pFilename = fn;
+  m_filename = fn;
   return true;
 }
 
@@ -844,6 +890,8 @@ void PoseFrameData::Draw(ImDrawList* drawList, std::vector<ImVec2>* center,
       left->emplace_back(m_corners[4]);
       right->emplace_back(m_corners[5]);
       break;
+    case DisplayOptions::kHidden:
+      break;
   }
 
   if (m_displayOptions.arrows) {
@@ -857,15 +905,16 @@ void glass::DisplayField2DSettings(Field2DModel* model) {
   auto& storage = GetStorage();
   auto field = storage.GetData<FieldInfo>();
   if (!field) {
-    storage.SetData(std::make_shared<FieldInfo>());
+    storage.SetData(std::make_shared<FieldInfo>(storage));
     field = storage.GetData<FieldInfo>();
   }
 
-  static const char* unitNames[] = {"meters", "feet", "inches"};
-  int* pDisplayUnits = GetStorage().GetIntRef("units", kDisplayMeters);
+  EnumSetting displayUnits{GetStorage().GetString("units"),
+                           kDisplayMeters,
+                           {"meters", "feet", "inches"}};
   ImGui::SetNextItemWidth(ImGui::GetFontSize() * 8);
-  ImGui::Combo("Units", pDisplayUnits, unitNames, IM_ARRAYSIZE(unitNames));
-  gDisplayUnits = static_cast<DisplayUnits>(*pDisplayUnits);
+  displayUnits.Combo("Units");
+  gDisplayUnits = static_cast<DisplayUnits>(displayUnits.GetValue());
 
   ImGui::PushItemWidth(ImGui::GetFontSize() * 4);
   if (ImGui::CollapsingHeader("Field")) {
@@ -881,7 +930,7 @@ void glass::DisplayField2DSettings(Field2DModel* model) {
     PushID(name);
     auto& objRef = field->m_objects[name];
     if (!objRef) {
-      objRef = std::make_unique<ObjectInfo>();
+      objRef = std::make_unique<ObjectInfo>(GetStorage());
     }
     auto obj = objRef.get();
 
@@ -1025,7 +1074,7 @@ void FieldDisplay::DisplayObject(FieldObjectModel& model,
   PushID(name);
   auto& objRef = m_field->m_objects[name];
   if (!objRef) {
-    objRef = std::make_unique<ObjectInfo>();
+    objRef = std::make_unique<ObjectInfo>(GetStorage());
   }
   auto obj = objRef.get();
   obj->LoadImage();
@@ -1205,7 +1254,7 @@ void glass::DisplayField2D(Field2DModel* model, const ImVec2& contentSize) {
   auto& storage = GetStorage();
   auto field = storage.GetData<FieldInfo>();
   if (!field) {
-    storage.SetData(std::make_shared<FieldInfo>());
+    storage.SetData(std::make_shared<FieldInfo>(storage));
     field = storage.GetData<FieldInfo>();
   }
 
@@ -1218,10 +1267,14 @@ void glass::DisplayField2D(Field2DModel* model, const ImVec2& contentSize) {
 }
 
 void Field2DView::Display() {
-  if (ImGui::BeginPopupContextItem()) {
-    DisplayField2DSettings(m_model);
-    ImGui::EndPopup();
-  }
   DisplayField2D(m_model, ImGui::GetWindowContentRegionMax() -
                               ImGui::GetWindowContentRegionMin());
+}
+
+void Field2DView::Settings() {
+  DisplayField2DSettings(m_model);
+}
+
+bool Field2DView::HasSettings() {
+  return true;
 }

@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 // Copyright (c) 2016 Nic Holthaus
 //
@@ -78,13 +75,12 @@
 	#include <iostream>
 	#include <locale>
 	#include <string>
-#else
+#endif
+#if __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
 	#include <locale>
 	#include <string>
 	#include <fmt/format.h>
 #endif
-
-#include <wpi/SymbolExports.h>
 
 //------------------------------
 //	STRING FORMATTER
@@ -180,7 +176,7 @@ namespace units
  * @param		abbrev - abbreviated unit name, e.g. 'm'
  * @note		When UNIT_LIB_ENABLE_IOSTREAM isn't defined, the macro does not generate any code
  */
-#if !defined(UNIT_LIB_ENABLE_IOSTREAM)
+#if __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
 	#define UNIT_ADD_IO(namespaceName, nameSingular, abbrev)\
 	}\
 	template <>\
@@ -205,7 +201,8 @@ namespace units
 			return units::detail::to_string(obj()) + std::string(" "#abbrev);\
 		}\
 	}
-#else
+#endif
+#if defined(UNIT_LIB_ENABLE_IOSTREAM)
 	#define UNIT_ADD_IO(namespaceName, nameSingular, abbrev)\
 	namespace namespaceName\
 	{\
@@ -366,6 +363,7 @@ template<> inline constexpr const char* abbreviation(const namespaceName::nameSi
 	namespace traits\
 	{\
 		template<typename... T> struct is_ ## unitCategory ## _unit : std::integral_constant<bool, units::all_true<units::traits::detail::is_ ## unitCategory ## _unit_impl<std::decay_t<T>>::value...>::value> {};\
+		template<typename... T> inline constexpr bool is_ ## unitCategory ## _unit_v = is_ ## unitCategory ## _unit<T...>::value;\
 	}
 #else
 #define UNIT_ADD_IS_UNIT_CATEGORY_TRAIT(unitCategory)\
@@ -375,6 +373,8 @@ template<> inline constexpr const char* abbreviation(const namespaceName::nameSi
 			struct is_ ## unitCategory ## _unit : std::integral_constant<bool, units::traits::detail::is_ ## unitCategory ## _unit_impl<typename std::decay<T1>::type>::value &&\
 				units::traits::detail::is_ ## unitCategory ## _unit_impl<typename std::decay<T2>::type>::value &&\
 				units::traits::detail::is_ ## unitCategory ## _unit_impl<typename std::decay<T3>::type>::value>{};\
+			template<typename T1, typename T2 = T1, typename T3 = T1>\
+			inline constexpr bool is_ ## unitCategory ## _unit_v = is_ ## unitCategory ## _unit<T1, T2, T3>::value;\
 	}
 #endif
 
@@ -463,13 +463,19 @@ namespace units
 	//----------------------------------
 
 	/**
+	 * @defgroup 	Units Unit API
+	*/
+
+	/**
 	 * @defgroup	UnitContainers Unit Containers
+	 * @ingroup		Units
 	 * @brief		Defines a series of classes which contain dimensioned values. Unit containers
 	 *				store a value, and support various arithmetic operations.
 	 */
 
 	/**
 	 * @defgroup	UnitTypes Unit Types
+	 * @ingroup		Units
 	 * @brief		Defines a series of classes which represent units. These types are tags used by
 	 *				the conversion function, to create compound units, or to create `unit_t` types.
 	 *				By themselves, they are not containers and have no stored value.
@@ -477,6 +483,7 @@ namespace units
 
 	/**
 	 * @defgroup	UnitManipulators Unit Manipulators
+	 * @ingroup		Units
 	 * @brief		Defines a series of classes used to manipulate unit types, such as `inverse<>`, `squared<>`, and metric prefixes.
 	 *				Unit manipulators can be chained together, e.g. `inverse<squared<pico<time::seconds>>>` to
 	 *				represent picoseconds^-2.
@@ -484,6 +491,7 @@ namespace units
 
 	 /**
 	  * @defgroup	CompileTimeUnitManipulators Compile-time Unit Manipulators
+	  * @ingroup	Units
 	  * @brief		Defines a series of classes used to manipulate `unit_value_t` types at compile-time, such as `unit_value_add<>`, `unit_value_sqrt<>`, etc.
 	  *				Compile-time manipulators can be chained together, e.g. `unit_value_sqrt<unit_value_add<unit_value_power<a, 2>, unit_value_power<b, 2>>>` to
 	  *				represent `c = sqrt(a^2 + b^2).
@@ -491,17 +499,20 @@ namespace units
 
 	 /**
 	 * @defgroup	UnitMath Unit Math
+	 * @ingroup		Units
 	 * @brief		Defines a collection of unit-enabled, strongly-typed versions of `<cmath>` functions.
 	 * @details		Includes most c++11 extensions.
 	 */
 
 	/**
 	 * @defgroup	Conversion Explicit Conversion
+	 * @ingroup		Units
 	 * @brief		Functions used to convert values of one logical type to another.
 	 */
 
 	/**
 	 * @defgroup	TypeTraits Type Traits
+	 * @ingroup		Units
 	 * @brief		Defines a series of classes to obtain unit type information at compile-time.
 	 */
 
@@ -589,6 +600,8 @@ namespace units
 			has_num<T>::value &&
 			has_den<T>::value>
 		{};
+		template<class T>
+		inline constexpr bool is_ratio_v = is_ratio<T>::value;
 	}
 
 	//------------------------------
@@ -613,6 +626,8 @@ namespace units
 	 */
 	template<bool... Args>
 	struct all_true : std::is_same<units::bool_pack<true, Args...>, units::bool_pack<Args..., true>> {};
+	template<bool... Args>
+	inline constexpr bool all_true_t_v = all_true<Args...>::type::value;
 	/** @endcond */	// DOXYGEN IGNORE
 
 	/**
@@ -713,6 +728,8 @@ namespace units
 		 */
 		template<class T>
 		struct is_unit : std::is_base_of<units::detail::_unit, T>::type {};
+		template<class T>
+		inline constexpr bool is_unit_v = is_unit<T>::value;
 	}
 
 	/** @} */ // end of TypeTraits
@@ -863,7 +880,7 @@ namespace units
 	 *				- A `std::ratio` defining the conversion factor to the base unit type. (e.g. `std::ratio<1,12>` for inches to feet)
 	 *				- A base unit that the unit is derived from (or a unit category. Must be of type `unit` or `base_unit`)
 	 *				- An exponent representing factors of PI required by the conversion. (e.g. `std::ratio<-1>` for a radians to degrees conversion)
-	 *				- a ratio representing a datum translation required for the conversion (e.g. `std::ratio<32>` for a farenheit to celsius conversion)
+	 *				- a ratio representing a datum translation required for the conversion (e.g. `std::ratio<32>` for a fahrenheit to celsius conversion)
 	 *
 	 *				Typically, a specific unit, like `meters`, would be implemented as a type alias
 	 *				of `unit`, i.e. `using meters = unit<std::ratio<1>, units::category::length_unit`, or
@@ -1388,7 +1405,7 @@ namespace units
 	 *					error. This value should be chosen to be as high as possible before
 	 *					integer overflow errors occur in the compiler.
 	 * @note		USE WITH CAUTION. The is an approximate value. In general, squared<sqrt<meter>> != meter,
-	 *				i.e. the operation is not reversible, and it will result in propogated approximations.
+	 *				i.e. the operation is not reversible, and it will result in propagated approximations.
 	 *				Use only when absolutely necessary.
 	 */
 	template<class U, std::intmax_t Eps = 10000000000>
@@ -1521,6 +1538,8 @@ namespace units
 		template<class U1, class U2>
 		struct is_convertible_unit : std::is_same <traits::base_unit_of<typename units::traits::unit_traits<U1>::base_unit_type>,
 			base_unit_of<typename units::traits::unit_traits<U2>::base_unit_type >> {};
+		template<class U1, class U2>
+		inline constexpr bool is_convertible_unit_v = is_convertible_unit<U1, U2>::value;
 	}
 
 	//------------------------------
@@ -1714,6 +1733,8 @@ namespace units
 		 */
 		template<class T, class Ret>
 		struct has_value_member : traits::detail::has_value_member_impl<T, Ret>::type {};
+		template<class T, class Ret>
+		inline constexpr bool has_value_member_v = has_value_member<T, Ret>::value;
 	}
 	/** @endcond */	// END DOXYGEN IGNORE
 
@@ -1748,7 +1769,7 @@ namespace units
 #ifdef FOR_DOXYGEN_PURPOSOES_ONLY
 		/**
 		* @ingroup		TypeTraits
-		* @brief		Trait for accessing the publically defined types of `units::unit_t`
+		* @brief		Trait for accessing the publicly defined types of `units::unit_t`
 		* @details		The units library determines certain properties of the unit_t types passed to them
 		*				and what they represent by using the members of the corresponding unit_t_traits instantiation.
 		*/
@@ -1778,7 +1799,7 @@ namespace units
 
 		/**
 		 * @ingroup		TypeTraits
-		 * @brief		Trait for accessing the publically defined types of `units::unit_t`
+		 * @brief		Trait for accessing the publicly defined types of `units::unit_t`
 		 * @details
 		 */
 		template<typename T>
@@ -1852,6 +1873,8 @@ namespace units
 		 */
 		template<class T>
 		struct is_unit_t : std::is_base_of<units::detail::_unit_t, T>::type {};
+		template<class T>
+		inline constexpr bool is_unit_t_v = is_unit_t<T>::value;
 	}
 
 	/**
@@ -2313,7 +2336,7 @@ namespace units
 
 	// unary addition: +T
 	template<class Units, typename T, template<typename> class NonLinearScale>
-	inline unit_t<Units, T, NonLinearScale> operator+(const unit_t<Units, T, NonLinearScale>& u) noexcept
+	constexpr inline unit_t<Units, T, NonLinearScale> operator+(const unit_t<Units, T, NonLinearScale>& u) noexcept
 	{
 		return u;
 	}
@@ -2337,7 +2360,7 @@ namespace units
 
 	// unary addition: -T
 	template<class Units, typename T, template<typename> class NonLinearScale>
-	inline unit_t<Units, T, NonLinearScale> operator-(const unit_t<Units, T, NonLinearScale>& u) noexcept
+	constexpr inline unit_t<Units, T, NonLinearScale> operator-(const unit_t<Units, T, NonLinearScale>& u) noexcept
 	{
 		return unit_t<Units, T, NonLinearScale>(-u());
 	}
@@ -2401,12 +2424,16 @@ namespace units
 #if !defined(_MSC_VER) || _MSC_VER > 1800	// bug in VS2013 prevents this from working
 		template<typename... T>
 		struct has_linear_scale : std::integral_constant<bool, units::all_true<std::is_base_of<units::linear_scale<typename units::traits::unit_t_traits<T>::underlying_type>, T>::value...>::value > {};
+		template<typename... T>
+		inline constexpr bool has_linear_scale_v = has_linear_scale<T...>::value;
 #else
 		template<typename T1, typename T2 = T1, typename T3 = T1>
 		struct has_linear_scale : std::integral_constant<bool,
 			std::is_base_of<units::linear_scale<typename units::traits::unit_t_traits<T1>::underlying_type>, T1>::value &&
 			std::is_base_of<units::linear_scale<typename units::traits::unit_t_traits<T2>::underlying_type>, T2>::value &&
 			std::is_base_of<units::linear_scale<typename units::traits::unit_t_traits<T3>::underlying_type>, T3>::value> {};
+		template<typename T1, typename T2 = T1, typename T3 = T1>
+		inline constexpr bool has_linear_scale_v = has_linear_scale<T1, T2, T3>::value;
 #endif
 
 		/**
@@ -2419,12 +2446,16 @@ namespace units
 #if !defined(_MSC_VER) || _MSC_VER > 1800	// bug in VS2013 prevents this from working
 		template<typename... T>
 		struct has_decibel_scale : std::integral_constant<bool,	units::all_true<std::is_base_of<units::decibel_scale<typename units::traits::unit_t_traits<T>::underlying_type>, T>::value...>::value> {};
+		template<typename... T>
+		inline constexpr bool has_decibel_scale_v = has_decibel_scale<T...>::value;
 #else
 		template<typename T1, typename T2 = T1, typename T3 = T1>
 		struct has_decibel_scale : std::integral_constant<bool,
 			std::is_base_of<units::decibel_scale<typename units::traits::unit_t_traits<T1>::underlying_type>, T1>::value &&
 			std::is_base_of<units::decibel_scale<typename units::traits::unit_t_traits<T2>::underlying_type>, T2>::value &&
 			std::is_base_of<units::decibel_scale<typename units::traits::unit_t_traits<T2>::underlying_type>, T3>::value> {};
+		template<typename T1, typename T2 = T1, typename T3 = T1>
+		inline constexpr bool has_decibel_scale_v = has_decibel_scale<T1, T2, T3>::value;
 #endif
 
 		/**
@@ -2439,6 +2470,8 @@ namespace units
 		struct is_same_scale : std::integral_constant<bool,
 			std::is_same<typename units::traits::unit_t_traits<T1>::non_linear_scale_type, typename units::traits::unit_t_traits<T2>::non_linear_scale_type>::value>
 		{};
+		template<typename T1, typename T2>
+		inline constexpr bool is_same_scale_v = is_same_scale<T1, T2>::value;
 	}
 
 	//----------------------------------
@@ -2844,13 +2877,16 @@ namespace units
 	namespace dimensionless
 	{
 		typedef unit_t<scalar, UNIT_LIB_DEFAULT_TYPE, decibel_scale> dB_t;
-#if defined(UNIT_LIB_ENABLE_IOSTREAM)
-		inline std::ostream& operator<<(std::ostream& os, const dB_t& obj) { os << obj() << " dB"; return os; }
 		typedef dB_t dBi_t;
 	}
-#else
+#if defined(UNIT_LIB_ENABLE_IOSTREAM)
+	namespace dimensionless
+	{
+		inline std::ostream& operator<<(std::ostream& os, const dB_t& obj) { os << obj() << " dB"; return os; }
+	}
+#endif
 }
-}
+#if __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
 template <>
 struct fmt::formatter<units::dimensionless::dB_t> : fmt::formatter<double>
 {
@@ -2863,13 +2899,9 @@ struct fmt::formatter<units::dimensionless::dB_t> : fmt::formatter<double>
 		return fmt::format_to(out, " dB");
 	}
 };
-
-namespace units {
-namespace dimensionless {
-		typedef dB_t dBi_t;
-	}
 #endif
 
+namespace units {
 	//------------------------------
 	//	DECIBEL ARITHMETIC
 	//------------------------------
@@ -2951,7 +2983,7 @@ namespace dimensionless {
 #ifdef FOR_DOXYGEN_PURPOSES_ONLY
 		/**
 		* @ingroup		TypeTraits
-		* @brief		Trait for accessing the publically defined types of `units::unit_value_t_traits`
+		* @brief		Trait for accessing the publicly defined types of `units::unit_value_t_traits`
 		* @details		The units library determines certain properties of the `unit_value_t` types passed to
 		*				them and what they represent by using the members of the corresponding `unit_value_t_traits`
 		*				instantiation.
@@ -2978,7 +3010,7 @@ namespace dimensionless {
 
 		/**
 		 * @ingroup		TypeTraits
-		 * @brief		Trait for accessing the publically defined types of `units::unit_value_t_traits`
+		 * @brief		Trait for accessing the publicly defined types of `units::unit_value_t_traits`
 		 * @details
 		 */
 		template<typename T>
@@ -3033,6 +3065,8 @@ namespace dimensionless {
 		struct is_unit_value_t : std::integral_constant<bool,
 			std::is_base_of<units::detail::_unit_value_t<Units>, T>::value>
 		{};
+		template<typename T, typename Units = typename traits::unit_value_t_traits<T>::unit_type>
+		inline constexpr bool is_unit_value_t_v = is_unit_value_t<T, Units>::value;
 
 		/**
 		 * @ingroup		TypeTraits
@@ -3045,6 +3079,8 @@ namespace dimensionless {
 		{
 			static_assert(is_base_unit<Category>::value, "Template parameter `Category` must be a `base_unit` type.");
 		};
+		template<typename Category, typename T>
+		inline constexpr bool is_unit_value_t_category_v = is_unit_value_t_category<Category, T>::value;
 	}
 
 	/** @cond */	// DOXYGEN IGNORE
@@ -3415,4 +3451,6 @@ namespace units::literals {}
 using namespace units::literals;
 #endif  // UNIT_HAS_LITERAL_SUPPORT
 
-#include "frc/fmt/Units.h"
+#if __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
+#include "units/formatter.h"
+#endif

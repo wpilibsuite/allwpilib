@@ -8,6 +8,7 @@
 
 #include "frc/DriverStation.h"
 #include "frc/Errors.h"
+#include "frc/event/BooleanEvent.h"
 
 using namespace frc;
 
@@ -30,12 +31,76 @@ bool GenericHID::GetRawButtonReleased(int button) {
   return DriverStation::GetStickButtonReleased(m_port, button);
 }
 
+BooleanEvent GenericHID::Button(int button, EventLoop* loop) const {
+  return BooleanEvent(loop,
+                      [this, button]() { return this->GetRawButton(button); });
+}
+
 double GenericHID::GetRawAxis(int axis) const {
   return DriverStation::GetStickAxis(m_port, axis);
 }
 
 int GenericHID::GetPOV(int pov) const {
   return DriverStation::GetStickPOV(m_port, pov);
+}
+
+BooleanEvent GenericHID::POV(int angle, EventLoop* loop) const {
+  return POV(0, angle, loop);
+}
+
+BooleanEvent GenericHID::POV(int pov, int angle, EventLoop* loop) const {
+  return BooleanEvent(
+      loop, [this, pov, angle] { return this->GetPOV(pov) == angle; });
+}
+
+BooleanEvent GenericHID::POVUp(EventLoop* loop) const {
+  return POV(0, loop);
+}
+
+BooleanEvent GenericHID::POVUpRight(EventLoop* loop) const {
+  return POV(45, loop);
+}
+
+BooleanEvent GenericHID::POVRight(EventLoop* loop) const {
+  return POV(90, loop);
+}
+
+BooleanEvent GenericHID::POVDownRight(EventLoop* loop) const {
+  return POV(135, loop);
+}
+
+BooleanEvent GenericHID::POVDown(EventLoop* loop) const {
+  return POV(180, loop);
+}
+
+BooleanEvent GenericHID::POVDownLeft(EventLoop* loop) const {
+  return POV(225, loop);
+}
+
+BooleanEvent GenericHID::POVLeft(EventLoop* loop) const {
+  return POV(270, loop);
+}
+
+BooleanEvent GenericHID::POVUpLeft(EventLoop* loop) const {
+  return POV(315, loop);
+}
+
+BooleanEvent GenericHID::POVCenter(EventLoop* loop) const {
+  return POV(360, loop);
+}
+
+BooleanEvent GenericHID::AxisLessThan(int axis, double threshold,
+                                      EventLoop* loop) const {
+  return BooleanEvent(loop, [this, axis, threshold]() {
+    return this->GetRawAxis(axis) < threshold;
+  });
+}
+
+BooleanEvent GenericHID::AxisGreaterThan(int axis, double threshold,
+                                         EventLoop* loop) const {
+  return BooleanEvent(loop, [this, axis, threshold]() {
+    return this->GetRawAxis(axis) > threshold;
+  });
 }
 
 int GenericHID::GetAxisCount() const {
@@ -83,15 +148,17 @@ void GenericHID::SetOutputs(int value) {
 }
 
 void GenericHID::SetRumble(RumbleType type, double value) {
-  if (value < 0) {
-    value = 0;
-  } else if (value > 1) {
-    value = 1;
-  }
+  value = std::clamp(value, 0.0, 1.0);
+  double rumbleValue = value * 65535;
+
   if (type == kLeftRumble) {
-    m_leftRumble = value * 65535;
+    m_leftRumble = rumbleValue;
+  } else if (type == kRightRumble) {
+    m_rightRumble = rumbleValue;
   } else {
-    m_rightRumble = value * 65535;
+    m_leftRumble = rumbleValue;
+    m_rightRumble = rumbleValue;
   }
+
   HAL_SetJoystickOutputs(m_port, m_outputs, m_leftRumble, m_rightRumble);
 }

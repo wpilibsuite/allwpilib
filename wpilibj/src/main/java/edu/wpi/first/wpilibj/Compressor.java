@@ -33,30 +33,16 @@ public class Compressor implements Sendable, AutoCloseable {
    */
   public Compressor(int module, PneumaticsModuleType moduleType) {
     m_module = PneumaticsBase.getForType(module, moduleType);
-    boolean allocatedCompressor = false;
-    boolean successfulCompletion = false;
 
-    try {
-      if (!m_module.reserveCompressor()) {
-        throw new AllocationException("Compressor already allocated");
-      }
-
-      allocatedCompressor = true;
-
-      m_module.setClosedLoopControl(true);
-
-      HAL.report(tResourceType.kResourceType_Compressor, module + 1);
-      SendableRegistry.addLW(this, "Compressor", module);
-      successfulCompletion = true;
-
-    } finally {
-      if (!successfulCompletion) {
-        if (allocatedCompressor) {
-          m_module.unreserveCompressor();
-        }
-        m_module.close();
-      }
+    if (!m_module.reserveCompressor()) {
+      m_module.close();
+      throw new AllocationException("Compressor already allocated");
     }
+
+    m_module.enableCompressorDigital();
+
+    HAL.report(tResourceType.kResourceType_Compressor, module + 1);
+    SendableRegistry.addLW(this, "Compressor", module);
   }
 
   /**
@@ -77,78 +63,147 @@ public class Compressor implements Sendable, AutoCloseable {
   }
 
   /**
-   * Start the compressor running in closed loop control mode.
-   *
-   * <p>Use the method in cases where you would like to manually stop and start the compressor for
-   * applications such as conserving battery or making sure that the compressor motor doesn't start
-   * during critical operations.
-   */
-  public void start() {
-    setClosedLoopControl(true);
-  }
-
-  /**
-   * Stop the compressor from running in closed loop control mode.
-   *
-   * <p>Use the method in cases where you would like to manually stop and start the compressor for
-   * applications such as conserving battery or making sure that the compressor motor doesn't start
-   * during critical operations.
-   */
-  public void stop() {
-    setClosedLoopControl(false);
-  }
-
-  /**
-   * Get the status of the compressor.
+   * Get the status of the compressor. To (re)enable the compressor use enableDigital() or
+   * enableAnalog(...).
    *
    * @return true if the compressor is on
+   * @deprecated To avoid confusion in thinking this (re)enables the compressor use IsEnabled().
    */
+  @Deprecated(since = "2023", forRemoval = true)
   public boolean enabled() {
+    return isEnabled();
+  }
+
+  /**
+   * Returns whether the compressor is active or not.
+   *
+   * @return true if the compressor is on - otherwise false.
+   */
+  public boolean isEnabled() {
     return m_module.getCompressor();
   }
 
   /**
-   * Get the pressure switch value.
+   * Returns the state of the pressure switch.
    *
-   * @return true if the pressure is low
+   * @return True if pressure switch indicates that the system is not full, otherwise false.
    */
   public boolean getPressureSwitchValue() {
     return m_module.getPressureSwitch();
   }
 
   /**
-   * Get the current being used by the compressor.
+   * Get the current drawn by the compressor.
    *
-   * @return current consumed by the compressor in amps
+   * @return Current drawn by the compressor in amps.
    */
-  public double getCompressorCurrent() {
+  public double getCurrent() {
     return m_module.getCompressorCurrent();
   }
 
   /**
-   * Set the PCM in closed loop control mode.
+   * If supported by the device, returns the analog input voltage (on channel 0).
    *
-   * @param on if true sets the compressor to be in closed loop control mode (default)
+   * <p>This function is only supported by the REV PH. On CTRE PCM, this will return 0.
+   *
+   * @return The analog input voltage, in volts.
    */
-  public void setClosedLoopControl(boolean on) {
-    m_module.setClosedLoopControl(on);
+  public double getAnalogVoltage() {
+    return m_module.getAnalogVoltage(0);
   }
 
   /**
-   * Gets the current operating mode of the PCM.
+   * If supported by the device, returns the pressure (in PSI) read by the analog pressure sensor
+   * (on channel 0).
    *
-   * @return true if compressor is operating on closed-loop mode
+   * <p>This function is only supported by the REV PH with the REV Analog Pressure Sensor. On CTRE
+   * PCM, this will return 0.
+   *
+   * @return The pressure (in PSI) read by the analog pressure sensor.
    */
-  public boolean getClosedLoopControl() {
-    return m_module.getClosedLoopControl();
+  public double getPressure() {
+    return m_module.getPressure(0);
+  }
+
+  /** Disable the compressor. */
+  public void disable() {
+    m_module.disableCompressor();
+  }
+
+  /**
+   * Enables the compressor in digital mode using the digital pressure switch. The compressor will
+   * turn on when the pressure switch indicates that the system is not full, and will turn off when
+   * the pressure switch indicates that the system is full.
+   */
+  public void enableDigital() {
+    m_module.enableCompressorDigital();
+  }
+
+  /**
+   * If supported by the device, enables the compressor in analog mode. This mode uses an analog
+   * pressure sensor connected to analog channel 0 to cycle the compressor. The compressor will turn
+   * on when the pressure drops below {@code minPressure} and will turn off when the pressure
+   * reaches {@code maxPressure}. This mode is only supported by the REV PH with the REV Analog
+   * Pressure Sensor connected to analog channel 0.
+   *
+   * <p>On CTRE PCM, this will enable digital control.
+   *
+   * @param minPressure The minimum pressure in PSI. The compressor will turn on when the pressure
+   *     drops below this value.
+   * @param maxPressure The maximum pressure in PSI. The compressor will turn off when the pressure
+   *     reaches this value.
+   */
+  public void enableAnalog(double minPressure, double maxPressure) {
+    m_module.enableCompressorAnalog(minPressure, maxPressure);
+  }
+
+  /**
+   * If supported by the device, enables the compressor in hybrid mode. This mode uses both a
+   * digital pressure switch and an analog pressure sensor connected to analog channel 0 to cycle
+   * the compressor. This mode is only supported by the REV PH with the REV Analog Pressure Sensor
+   * connected to analog channel 0.
+   *
+   * <p>The compressor will turn on when <i>both</i>:
+   *
+   * <ul>
+   *   <li>The digital pressure switch indicates the system is not full AND
+   *   <li>The analog pressure sensor indicates that the pressure in the system is below the
+   *       specified minimum pressure.
+   * </ul>
+   *
+   * <p>The compressor will turn off when <i>either</i>:
+   *
+   * <ul>
+   *   <li>The digital pressure switch is disconnected or indicates that the system is full OR
+   *   <li>The pressure detected by the analog sensor is greater than the specified maximum
+   *       pressure.
+   * </ul>
+   *
+   * <p>On CTRE PCM, this will enable digital control.
+   *
+   * @param minPressure The minimum pressure in PSI. The compressor will turn on when the pressure
+   *     drops below this value and the pressure switch indicates that the system is not full.
+   * @param maxPressure The maximum pressure in PSI. The compressor will turn off when the pressure
+   *     reaches this value or the pressure switch is disconnected or indicates that the system is
+   *     full.
+   */
+  public void enableHybrid(double minPressure, double maxPressure) {
+    m_module.enableCompressorHybrid(minPressure, maxPressure);
+  }
+
+  /**
+   * Returns the active compressor configuration.
+   *
+   * @return The active compressor configuration.
+   */
+  public CompressorConfigType getConfigType() {
+    return m_module.getCompressorConfigType();
   }
 
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Compressor");
-    builder.addBooleanProperty(
-        "Closed Loop Control", this::getClosedLoopControl, this::setClosedLoopControl);
-    builder.addBooleanProperty("Enabled", this::enabled, null);
+    builder.addBooleanProperty("Enabled", this::isEnabled, null);
     builder.addBooleanProperty("Pressure switch", this::getPressureSwitchValue, null);
   }
 }

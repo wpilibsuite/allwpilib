@@ -5,6 +5,7 @@
 #include "frc/ADXL362.h"
 
 #include <hal/FRCUsageReporting.h>
+#include <networktables/DoubleTopic.h>
 #include <networktables/NTSendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 
@@ -43,9 +44,7 @@ ADXL362::ADXL362(SPI::Port port, Range range)
   }
 
   m_spi.SetClockRate(3000000);
-  m_spi.SetMSBFirst();
-  m_spi.SetSampleDataOnTrailingEdge();
-  m_spi.SetClockActiveLow();
+  m_spi.SetMode(frc::SPI::Mode::kMode3);
   m_spi.SetChipSelectActiveLow();
 
   uint8_t commands[3];
@@ -56,7 +55,7 @@ ADXL362::ADXL362(SPI::Port port, Range range)
     commands[2] = 0;
     m_spi.Transaction(commands, commands, 3);
     if (commands[2] != 0xF2) {
-      FRC_ReportError(err::Error, "{}", "could not find ADXL362");
+      FRC_ReportError(err::Error, "could not find ADXL362");
       m_gsPerLSB = 0.0;
       return;
     }
@@ -94,7 +93,6 @@ void ADXL362::SetRange(Range range) {
       m_gsPerLSB = 0.002;
       break;
     case kRange_8G:
-    case kRange_16G:  // 16G not supported; treat as 8G
       m_gsPerLSB = 0.004;
       break;
   }
@@ -184,13 +182,13 @@ ADXL362::AllAxes ADXL362::GetAccelerations() {
 
 void ADXL362::InitSendable(nt::NTSendableBuilder& builder) {
   builder.SetSmartDashboardType("3AxisAccelerometer");
-  auto x = builder.GetEntry("X").GetHandle();
-  auto y = builder.GetEntry("Y").GetHandle();
-  auto z = builder.GetEntry("Z").GetHandle();
-  builder.SetUpdateTable([=] {
-    auto data = GetAccelerations();
-    nt::NetworkTableEntry(x).SetDouble(data.XAxis);
-    nt::NetworkTableEntry(y).SetDouble(data.YAxis);
-    nt::NetworkTableEntry(z).SetDouble(data.ZAxis);
-  });
+  builder.SetUpdateTable(
+      [this, x = nt::DoubleTopic{builder.GetTopic("X")}.Publish(),
+       y = nt::DoubleTopic{builder.GetTopic("Y")}.Publish(),
+       z = nt::DoubleTopic{builder.GetTopic("Z")}.Publish()]() mutable {
+        auto data = GetAccelerations();
+        x.Set(data.XAxis);
+        y.Set(data.YAxis);
+        z.Set(data.ZAxis);
+      });
 }

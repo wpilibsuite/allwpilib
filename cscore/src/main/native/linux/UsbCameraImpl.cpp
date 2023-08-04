@@ -82,6 +82,10 @@ static VideoMode::PixelFormat ToPixelFormat(__u32 pixelFormat) {
       return VideoMode::kBGR;
     case V4L2_PIX_FMT_GREY:
       return VideoMode::kGray;
+    case V4L2_PIX_FMT_Y16:
+      return VideoMode::kY16;
+    case V4L2_PIX_FMT_UYVY:
+      return VideoMode::kUYVY;
     default:
       return VideoMode::kUnknown;
   }
@@ -100,6 +104,10 @@ static __u32 FromPixelFormat(VideoMode::PixelFormat pixelFormat) {
       return V4L2_PIX_FMT_BGR24;
     case VideoMode::kGray:
       return V4L2_PIX_FMT_GREY;
+    case VideoMode::kY16:
+      return V4L2_PIX_FMT_Y16;
+    case VideoMode::kUYVY:
+      return V4L2_PIX_FMT_UYVY;
     default:
       return 0;
   }
@@ -107,7 +115,7 @@ static __u32 FromPixelFormat(VideoMode::PixelFormat pixelFormat) {
 
 static bool IsPercentageProperty(std::string_view name) {
   if (wpi::starts_with(name, "raw_")) {
-    name = name.substr(4);
+    name = wpi::substr(name, 4);
   }
   return name == "brightness" || name == "contrast" || name == "saturation" ||
          name == "hue" || name == "sharpness" || name == "gain" ||
@@ -140,6 +148,12 @@ int UsbCameraImpl::RawToPercentage(const UsbCameraProperty& rawProp,
     }
     return 100;
   }
+  // Arducam OV9281 exposure setting quirk
+  if (m_ov9281_exposure && rawProp.name == "raw_exposure_absolute" &&
+      rawProp.minimum == 1 && rawProp.maximum == 5000) {
+    // real range is 1-75
+    return 100.0 * (rawValue - 1) / (75 - 1);
+  }
   return 100.0 * (rawValue - rawProp.minimum) /
          (rawProp.maximum - rawProp.minimum);
 }
@@ -158,6 +172,12 @@ int UsbCameraImpl::PercentageToRaw(const UsbCameraProperty& rawProp,
       ndx = nelems - 1;
     }
     return quirkLifeCamHd3000[ndx];
+  }
+  // Arducam OV9281 exposure setting quirk
+  if (m_ov9281_exposure && rawProp.name == "raw_exposure_absolute" &&
+      rawProp.minimum == 1 && rawProp.maximum == 5000) {
+    // real range is 1-75
+    return 1 + (75 - 1) * (percentValue / 100.0);
   }
   return rawProp.minimum +
          (rawProp.maximum - rawProp.minimum) * (percentValue / 100.0);
@@ -181,13 +201,13 @@ static bool GetVendorProduct(int dev, int* vendor, int* product) {
   }
   std::string_view readStr{readBuf};
   if (auto v = wpi::parse_integer<int>(
-          readStr.substr(readStr.find('v')).substr(1, 4), 16)) {
+          wpi::substr(wpi::substr(readStr, readStr.find('v')), 1, 4), 16)) {
     *vendor = v.value();
   } else {
     return false;
   }
   if (auto v = wpi::parse_integer<int>(
-          readStr.substr(readStr.find('p')).substr(1, 4), 16)) {
+          wpi::substr(wpi::substr(readStr, readStr.find('p')), 1, 4), 16)) {
     *product = v.value();
   } else {
     return false;
@@ -236,8 +256,8 @@ static bool GetDescriptionIoctl(const char* cpath, std::string* desc) {
   std::optional<int> vendor;
   std::optional<int> product;
   if (wpi::starts_with(card, "UVC Camera (") &&
-      (vendor = wpi::parse_integer<int>(card.substr(12, 4), 16)) &&
-      (product = wpi::parse_integer<int>(card.substr(17, 4), 16))) {
+      (vendor = wpi::parse_integer<int>(wpi::substr(card, 12, 4), 16)) &&
+      (product = wpi::parse_integer<int>(wpi::substr(card, 17, 4), 16))) {
     std::string card2 = GetUsbNameFromId(vendor.value(), product.value());
     if (!card2.empty()) {
       *desc = std::move(card2);
@@ -283,7 +303,7 @@ static int GetDeviceNum(const char* cpath) {
   if (!wpi::starts_with(fn, "video")) {
     return -1;
   }
-  if (auto dev = wpi::parse_integer<int>(fn.substr(5), 10)) {
+  if (auto dev = wpi::parse_integer<int>(wpi::substr(fn, 5), 10)) {
     return dev.value();
   }
   return -1;
@@ -454,7 +474,7 @@ void UsbCameraImpl::CameraThreadMain() {
 
     // Handle notify events
     if (notify_fd >= 0 && FD_ISSET(notify_fd, &readfds)) {
-      SDEBUG4("{}", "notify event");
+      SDEBUG4("notify event");
       struct inotify_event event;
       do {
         // Read the event structure
@@ -483,7 +503,7 @@ void UsbCameraImpl::CameraThreadMain() {
 
     // Handle commands
     if (command_fd >= 0 && FD_ISSET(command_fd, &readfds)) {
-      SDEBUG4("{}", "got command");
+      SDEBUG4("got command");
       // Read it to clear
       eventfd_t val;
       eventfd_read(command_fd, &val);
@@ -493,7 +513,7 @@ void UsbCameraImpl::CameraThreadMain() {
 
     // Handle frames
     if (m_streaming && fd >= 0 && FD_ISSET(fd, &readfds)) {
-      SDEBUG4("{}", "grabbing image");
+      SDEBUG4("grabbing image");
 
       // Dequeue buffer
       struct v4l2_buffer buf;
@@ -501,7 +521,7 @@ void UsbCameraImpl::CameraThreadMain() {
       buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
       buf.memory = V4L2_MEMORY_MMAP;
       if (DoIoctl(fd, VIDIOC_DQBUF, &buf) != 0) {
-        SWARNING("{}", "could not dequeue buffer");
+        SWARNING("could not dequeue buffer");
         wasStreaming = m_streaming;
         DeviceStreamOff();
         DeviceDisconnect();
@@ -525,7 +545,7 @@ void UsbCameraImpl::CameraThreadMain() {
         bool good = true;
         if (m_mode.pixelFormat == VideoMode::kMJPEG &&
             !GetJpegSize(image, &width, &height)) {
-          SWARNING("{}", "invalid JPEG image received from camera");
+          SWARNING("invalid JPEG image received from camera");
           good = false;
         }
         if (good) {
@@ -536,7 +556,7 @@ void UsbCameraImpl::CameraThreadMain() {
 
       // Requeue buffer
       if (DoIoctl(fd, VIDIOC_QBUF, &buf) != 0) {
-        SWARNING("{}", "could not requeue buffer");
+        SWARNING("could not requeue buffer");
         wasStreaming = m_streaming;
         DeviceStreamOff();
         DeviceDisconnect();
@@ -579,7 +599,7 @@ void UsbCameraImpl::DeviceConnect() {
   }
 
   // Try to open the device
-  SDEBUG3("{}", "opening device");
+  SDEBUG3("opening device");
   int fd = open(m_path.c_str(), O_RDWR);
   if (fd < 0) {
     return;
@@ -587,7 +607,7 @@ void UsbCameraImpl::DeviceConnect() {
   m_fd = fd;
 
   // Get capabilities
-  SDEBUG3("{}", "getting capabilities");
+  SDEBUG3("getting capabilities");
   struct v4l2_capability vcap;
   std::memset(&vcap, 0, sizeof(vcap));
   if (DoIoctl(fd, VIDIOC_QUERYCAP, &vcap) >= 0) {
@@ -599,18 +619,18 @@ void UsbCameraImpl::DeviceConnect() {
 
   // Get or restore video mode
   if (!m_properties_cached) {
-    SDEBUG3("{}", "caching properties");
+    SDEBUG3("caching properties");
     DeviceCacheProperties();
     DeviceCacheVideoModes();
     DeviceCacheMode();
     m_properties_cached = true;
   } else {
-    SDEBUG3("{}", "restoring video mode");
+    SDEBUG3("restoring video mode");
     DeviceSetMode();
     DeviceSetFPS();
 
     // Restore settings
-    SDEBUG3("{}", "restoring settings");
+    SDEBUG3("restoring settings");
     std::unique_lock lock2(m_mutex);
     for (size_t i = 0; i < m_propertyData.size(); ++i) {
       const auto prop =
@@ -625,21 +645,21 @@ void UsbCameraImpl::DeviceConnect() {
   }
 
   // Request buffers
-  SDEBUG3("{}", "allocating buffers");
+  SDEBUG3("allocating buffers");
   struct v4l2_requestbuffers rb;
   std::memset(&rb, 0, sizeof(rb));
   rb.count = kNumBuffers;
   rb.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
   rb.memory = V4L2_MEMORY_MMAP;
   if (DoIoctl(fd, VIDIOC_REQBUFS, &rb) != 0) {
-    SWARNING("{}", "could not allocate buffers");
+    SWARNING("could not allocate buffers");
     close(fd);
     m_fd = -1;
     return;
   }
 
   // Map buffers
-  SDEBUG3("{}", "mapping buffers");
+  SDEBUG3("mapping buffers");
   for (int i = 0; i < kNumBuffers; ++i) {
     struct v4l2_buffer buf;
     std::memset(&buf, 0, sizeof(buf));
@@ -689,7 +709,7 @@ bool UsbCameraImpl::DeviceStreamOn() {
   }
 
   // Queue buffers
-  SDEBUG3("{}", "queuing buffers");
+  SDEBUG3("queuing buffers");
   for (int i = 0; i < kNumBuffers; ++i) {
     struct v4l2_buffer buf;
     std::memset(&buf, 0, sizeof(buf));
@@ -708,7 +728,6 @@ bool UsbCameraImpl::DeviceStreamOn() {
     if (errno == ENOSPC) {
       // indicates too much USB bandwidth requested
       SERROR(
-          "{}",
           "could not start streaming due to USB bandwidth limitations; try a "
           "lower resolution or a different pixel format (VIDIOC_STREAMON: "
           "No space left on device)");
@@ -718,7 +737,7 @@ bool UsbCameraImpl::DeviceStreamOn() {
     }
     return false;
   }
-  SDEBUG4("{}", "enabled streaming");
+  SDEBUG4("enabled streaming");
   m_streaming = true;
   return true;
 }
@@ -735,7 +754,7 @@ bool UsbCameraImpl::DeviceStreamOff() {
   if (DoIoctl(fd, VIDIOC_STREAMOFF, &type) != 0) {
     return false;
   }
-  SDEBUG4("{}", "disabled streaming");
+  SDEBUG4("disabled streaming");
   m_streaming = false;
   return true;
 }
@@ -1000,7 +1019,7 @@ void UsbCameraImpl::DeviceCacheMode() {
 #endif
   vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
   if (DoIoctl(fd, VIDIOC_G_FMT, &vfmt) != 0) {
-    SERROR("{}", "could not read current video mode");
+    SERROR("could not read current video mode");
     std::scoped_lock lock(m_mutex);
     m_mode = VideoMode{VideoMode::kMJPEG, 320, 240, 30};
     return;
@@ -1385,6 +1404,7 @@ void UsbCameraImpl::SetQuirks() {
   std::string_view desc = GetDescription(descbuf);
   m_lifecam_exposure = wpi::ends_with(desc, "LifeCam HD-3000") ||
                        wpi::ends_with(desc, "LifeCam Cinema (TM)");
+  m_ov9281_exposure = wpi::contains(desc, "OV9281");
   m_picamera = wpi::ends_with(desc, "mmal service");
 
   int deviceNum = GetDeviceNum(m_path.c_str());
@@ -1635,7 +1655,8 @@ std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
       }
 
       unsigned int dev = 0;
-      if (auto v = wpi::parse_integer<unsigned int>(fname.substr(5), 10)) {
+      if (auto v =
+              wpi::parse_integer<unsigned int>(wpi::substr(fname, 5), 10)) {
         dev = v.value();
       } else {
         continue;
@@ -1667,7 +1688,7 @@ std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
     ::closedir(dp);
   } else {
     // *status = ;
-    WPI_ERROR(Instance::GetInstance().logger, "{}", "Could not open /dev");
+    WPI_ERROR(Instance::GetInstance().logger, "Could not open /dev");
     return retval;
   }
 
@@ -1686,7 +1707,8 @@ std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
             std::string fname = fs::path{target}.filename();
             std::optional<unsigned int> dev;
             if (wpi::starts_with(fname, "video") &&
-                (dev = wpi::parse_integer<unsigned int>(fname.substr(5), 10)) &&
+                (dev = wpi::parse_integer<unsigned int>(wpi::substr(fname, 5),
+                                                        10)) &&
                 dev.value() < retval.size()) {
               retval[dev.value()].otherPaths.emplace_back(path.str());
             }

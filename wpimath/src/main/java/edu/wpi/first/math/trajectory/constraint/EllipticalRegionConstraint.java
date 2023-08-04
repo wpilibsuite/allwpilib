@@ -23,7 +23,6 @@ public class EllipticalRegionConstraint implements TrajectoryConstraint {
    * @param rotation The rotation to apply to all radii around the origin.
    * @param constraint The constraint to enforce when the robot is within the region.
    */
-  @SuppressWarnings("ParameterName")
   public EllipticalRegionConstraint(
       Translation2d center,
       double xWidth,
@@ -65,11 +64,16 @@ public class EllipticalRegionConstraint implements TrajectoryConstraint {
    * @return Whether the robot pose is within the constraint region.
    */
   public boolean isPoseInRegion(Pose2d robotPose) {
-    // The region (disk) bounded by the ellipse is given by the equation:
-    // ((x-h)^2)/Rx^2) + ((y-k)^2)/Ry^2) <= 1
+    // The region bounded by the ellipse is given by the equation:
+    //
+    // (x−h)²/Rx² + (y−k)²/Ry² ≤ 1
+    //
+    // Multiply by Rx²Ry² for efficiency reasons:
+    //
+    // (x−h)²Ry² + (y−k)²Rx² ≤ Rx²Ry²
+    //
     // If the inequality is satisfied, then it is inside the ellipse; otherwise
     // it is outside the ellipse.
-    // Both sides have been multiplied by Rx^2 * Ry^2 for efficiency reasons.
     return Math.pow(robotPose.getX() - m_center.getX(), 2) * Math.pow(m_radii.getY(), 2)
             + Math.pow(robotPose.getY() - m_center.getY(), 2) * Math.pow(m_radii.getX(), 2)
         <= Math.pow(m_radii.getX(), 2) * Math.pow(m_radii.getY(), 2);

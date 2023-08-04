@@ -34,8 +34,10 @@ void HAL_CloseSPI(HAL_SPIPort port) {
   SimSPIData[port].initialized = false;
 }
 void HAL_SetSPISpeed(HAL_SPIPort port, int32_t speed) {}
-void HAL_SetSPIOpts(HAL_SPIPort port, HAL_Bool msbFirst,
-                    HAL_Bool sampleOnTrailing, HAL_Bool clkIdleHigh) {}
+void HAL_SetSPIMode(HAL_SPIPort port, HAL_SPIMode mode) {}
+HAL_SPIMode HAL_GetSPIMode(HAL_SPIPort port) {
+  return HAL_SPI_kMode0;
+}
 void HAL_SetSPIChipSelectActiveHigh(HAL_SPIPort port, int32_t* status) {}
 void HAL_SetSPIChipSelectActiveLow(HAL_SPIPort port, int32_t* status) {}
 int32_t HAL_GetSPIHandle(HAL_SPIPort port) {

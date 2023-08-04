@@ -42,6 +42,11 @@ public class TestSuite extends AbstractTestSuite {
       Logger.getAnonymousLogger().severe("Could not load default logging.properties file");
       Logger.getAnonymousLogger().severe(ex.getMessage());
     }
+    try {
+      inputStream.close();
+    } catch (IOException e) {
+      throw new RuntimeException(e.getMessage());
+    }
 
     TestBench.out().println("Starting Tests");
   }
@@ -172,11 +177,11 @@ public class TestSuite extends AbstractTestSuite {
     for (String s : args) {
       if (Pattern.matches(METHOD_NAME_FILTER + ".*", s)) {
         methodFilter = true;
-        methodRegex = new String(s).replace(METHOD_NAME_FILTER, "");
+        methodRegex = s.replace(METHOD_NAME_FILTER, "");
       }
       if (Pattern.matches(METHOD_REPEAT_FILTER + ".*", s)) {
         try {
-          repeatCount = Integer.parseInt(new String(s).replace(METHOD_REPEAT_FILTER, ""));
+          repeatCount = Integer.parseInt(s.replace(METHOD_REPEAT_FILTER, ""));
         } catch (NumberFormatException ex) {
           displayInvalidUsage(
               "The argument passed to the repeat rule was not a valid integer.", args);

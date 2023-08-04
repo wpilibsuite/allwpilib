@@ -16,8 +16,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
-import edu.wpi.first.math.numbers.N4;
-import edu.wpi.first.math.numbers.N6;
+import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.numbers.N5;
 import edu.wpi.first.math.system.Discretization;
 import edu.wpi.first.math.system.NumericalIntegration;
 import edu.wpi.first.math.system.NumericalJacobian;
@@ -25,114 +25,114 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-public class UnscentedKalmanFilterTest {
-  @SuppressWarnings({"LocalVariableName", "ParameterName"})
-  public static Matrix<N6, N1> getDynamics(Matrix<N6, N1> x, Matrix<N2, N1> u) {
+class UnscentedKalmanFilterTest {
+  private static Matrix<N5, N1> getDynamics(Matrix<N5, N1> x, Matrix<N2, N1> u) {
     var motors = DCMotor.getCIM(2);
 
-    var gHigh = 7.08;
-    var rb = 0.8382 / 2.0;
-    var r = 0.0746125;
-    var m = 63.503;
-    var J = 5.6;
+    // var gLow = 15.32;    // Low gear ratio
+    var gHigh = 7.08; // High gear ratio
+    var rb = 0.8382 / 2.0; // Robot radius
+    var r = 0.0746125; // Wheel radius
+    var m = 63.503; // Robot mass
+    var J = 5.6; // Robot moment of inertia
 
     var C1 =
         -Math.pow(gHigh, 2)
             * motors.KtNMPerAmp
             / (motors.KvRadPerSecPerVolt * motors.rOhms * r * r);
     var C2 = gHigh * motors.KtNMPerAmp / (motors.rOhms * r);
+    var k1 = 1.0 / m + Math.pow(rb, 2) / J;
+    var k2 = 1.0 / m - Math.pow(rb, 2) / J;
 
-    var c = x.get(2, 0);
-    var s = x.get(3, 0);
-    var vl = x.get(4, 0);
-    var vr = x.get(5, 0);
-
+    var vl = x.get(3, 0);
+    var vr = x.get(4, 0);
     var Vl = u.get(0, 0);
     var Vr = u.get(1, 0);
 
-    var k1 = 1.0 / m + rb * rb / J;
-    var k2 = 1.0 / m - rb * rb / J;
-
-    var xvel = (vl + vr) / 2;
-    var w = (vr - vl) / (2.0 * rb);
-
+    var v = 0.5 * (vl + vr);
     return VecBuilder.fill(
-        xvel * c,
-        xvel * s,
-        -s * w,
-        c * w,
-        k1 * ((C1 * vl) + (C2 * Vl)) + k2 * ((C1 * vr) + (C2 * Vr)),
-        k2 * ((C1 * vl) + (C2 * Vl)) + k1 * ((C1 * vr) + (C2 * Vr)));
+        v * Math.cos(x.get(2, 0)),
+        v * Math.sin(x.get(2, 0)),
+        (vr - vl) / (2.0 * rb),
+        k1 * (C1 * vl + C2 * Vl) + k2 * (C1 * vr + C2 * Vr),
+        k2 * (C1 * vl + C2 * Vl) + k1 * (C1 * vr + C2 * Vr));
   }
 
-  @SuppressWarnings("ParameterName")
-  public static Matrix<N4, N1> getLocalMeasurementModel(Matrix<N6, N1> x, Matrix<N2, N1> u) {
-    return VecBuilder.fill(x.get(2, 0), x.get(3, 0), x.get(4, 0), x.get(5, 0));
+  @SuppressWarnings("PMD.UnusedFormalParameter")
+  private static Matrix<N3, N1> getLocalMeasurementModel(Matrix<N5, N1> x, Matrix<N2, N1> u) {
+    return VecBuilder.fill(x.get(2, 0), x.get(3, 0), x.get(4, 0));
   }
 
-  @SuppressWarnings("ParameterName")
-  public static Matrix<N6, N1> getGlobalMeasurementModel(Matrix<N6, N1> x, Matrix<N2, N1> u) {
+  @SuppressWarnings("PMD.UnusedFormalParameter")
+  private static Matrix<N5, N1> getGlobalMeasurementModel(Matrix<N5, N1> x, Matrix<N2, N1> u) {
     return x.copy();
   }
 
   @Test
-  @SuppressWarnings("LocalVariableName")
-  public void testInit() {
+  void testInit() {
+    var dtSeconds = 0.005;
     assertDoesNotThrow(
         () -> {
-          UnscentedKalmanFilter<N6, N2, N4> observer =
+          UnscentedKalmanFilter<N5, N2, N3> observer =
               new UnscentedKalmanFilter<>(
-                  Nat.N6(),
-                  Nat.N4(),
+                  Nat.N5(),
+                  Nat.N3(),
                   UnscentedKalmanFilterTest::getDynamics,
                   UnscentedKalmanFilterTest::getLocalMeasurementModel,
-                  VecBuilder.fill(0.5, 0.5, 0.7, 0.7, 1.0, 1.0),
-                  VecBuilder.fill(0.001, 0.001, 0.5, 0.5),
-                  0.00505);
+                  VecBuilder.fill(0.5, 0.5, 10.0, 1.0, 1.0),
+                  VecBuilder.fill(0.0001, 0.01, 0.01),
+                  AngleStatistics.angleMean(2),
+                  AngleStatistics.angleMean(0),
+                  AngleStatistics.angleResidual(2),
+                  AngleStatistics.angleResidual(0),
+                  AngleStatistics.angleAdd(2),
+                  dtSeconds);
 
           var u = VecBuilder.fill(12.0, 12.0);
-          observer.predict(u, 0.00505);
+          observer.predict(u, dtSeconds);
 
           var localY = getLocalMeasurementModel(observer.getXhat(), u);
           observer.correct(u, localY);
+
+          var globalY = getGlobalMeasurementModel(observer.getXhat(), u);
+          var R =
+              StateSpaceUtil.makeCovarianceMatrix(
+                  Nat.N5(), VecBuilder.fill(0.01, 0.01, 0.0001, 0.01, 0.01));
+          observer.correct(
+              Nat.N5(),
+              u,
+              globalY,
+              UnscentedKalmanFilterTest::getGlobalMeasurementModel,
+              R,
+              AngleStatistics.angleMean(2),
+              AngleStatistics.angleResidual(2),
+              AngleStatistics.angleResidual(2),
+              AngleStatistics.angleAdd(2));
         });
   }
 
-  @SuppressWarnings("LocalVariableName")
   @Test
-  public void testConvergence() {
-    double dtSeconds = 0.00505;
+  void testConvergence() {
+    double dtSeconds = 0.005;
     double rbMeters = 0.8382 / 2.0; // Robot radius
 
-    List<Double> trajXs = new ArrayList<>();
-    List<Double> trajYs = new ArrayList<>();
-
-    List<Double> observerXs = new ArrayList<>();
-    List<Double> observerYs = new ArrayList<>();
-    List<Double> observerC = new ArrayList<>();
-    List<Double> observerS = new ArrayList<>();
-    List<Double> observervl = new ArrayList<>();
-    List<Double> observervr = new ArrayList<>();
-
-    List<Double> inputVl = new ArrayList<>();
-    List<Double> inputVr = new ArrayList<>();
-
-    List<Double> timeData = new ArrayList<>();
-    List<Matrix<?, ?>> rdots = new ArrayList<>();
-
-    UnscentedKalmanFilter<N6, N2, N4> observer =
+    UnscentedKalmanFilter<N5, N2, N3> observer =
         new UnscentedKalmanFilter<>(
-            Nat.N6(),
-            Nat.N4(),
+            Nat.N5(),
+            Nat.N3(),
             UnscentedKalmanFilterTest::getDynamics,
             UnscentedKalmanFilterTest::getLocalMeasurementModel,
-            VecBuilder.fill(0.5, 0.5, 0.7, 0.7, 1.0, 1.0),
-            VecBuilder.fill(0.001, 0.001, 0.5, 0.5),
+            VecBuilder.fill(0.5, 0.5, 10.0, 1.0, 1.0),
+            VecBuilder.fill(0.0001, 0.5, 0.5),
+            AngleStatistics.angleMean(2),
+            AngleStatistics.angleMean(0),
+            AngleStatistics.angleResidual(2),
+            AngleStatistics.angleResidual(0),
+            AngleStatistics.angleAdd(2),
             dtSeconds);
 
     List<Pose2d> waypoints =
@@ -142,75 +142,52 @@ public class UnscentedKalmanFilterTest {
     var trajectory =
         TrajectoryGenerator.generateTrajectory(waypoints, new TrajectoryConfig(8.8, 0.1));
 
-    Matrix<N6, N1> nextR;
+    Matrix<N5, N1> r = new Matrix<>(Nat.N5(), Nat.N1());
     Matrix<N2, N1> u = new Matrix<>(Nat.N2(), Nat.N1());
 
     var B =
         NumericalJacobian.numericalJacobianU(
-            Nat.N6(),
+            Nat.N5(),
             Nat.N2(),
             UnscentedKalmanFilterTest::getDynamics,
-            new Matrix<>(Nat.N6(), Nat.N1()),
-            u);
+            new Matrix<>(Nat.N5(), Nat.N1()),
+            new Matrix<>(Nat.N2(), Nat.N1()));
 
-    observer.setXhat(VecBuilder.fill(2.75, 22.521, 1.0, 0.0, 0.0, 0.0)); // TODO not hard code this
-
-    var ref = trajectory.sample(0.0);
-
-    Matrix<N6, N1> r =
+    observer.setXhat(
         VecBuilder.fill(
-            ref.poseMeters.getTranslation().getX(),
-            ref.poseMeters.getTranslation().getY(),
-            ref.poseMeters.getRotation().getCos(),
-            ref.poseMeters.getRotation().getSin(),
-            ref.velocityMetersPerSecond * (1 - (ref.curvatureRadPerMeter * rbMeters)),
-            ref.velocityMetersPerSecond * (1 + (ref.curvatureRadPerMeter * rbMeters)));
-    nextR = r.copy();
+            trajectory.getInitialPose().getTranslation().getX(),
+            trajectory.getInitialPose().getTranslation().getY(),
+            trajectory.getInitialPose().getRotation().getRadians(),
+            0.0,
+            0.0));
 
     var trueXhat = observer.getXhat();
 
     double totalTime = trajectory.getTotalTimeSeconds();
     for (int i = 0; i < (totalTime / dtSeconds); i++) {
-      ref = trajectory.sample(dtSeconds * i);
+      var ref = trajectory.sample(dtSeconds * i);
       double vl = ref.velocityMetersPerSecond * (1 - (ref.curvatureRadPerMeter * rbMeters));
       double vr = ref.velocityMetersPerSecond * (1 + (ref.curvatureRadPerMeter * rbMeters));
 
-      nextR.set(0, 0, ref.poseMeters.getTranslation().getX());
-      nextR.set(1, 0, ref.poseMeters.getTranslation().getY());
-      nextR.set(2, 0, ref.poseMeters.getRotation().getCos());
-      nextR.set(3, 0, ref.poseMeters.getRotation().getSin());
-      nextR.set(4, 0, vl);
-      nextR.set(5, 0, vr);
+      var nextR =
+          VecBuilder.fill(
+              ref.poseMeters.getTranslation().getX(),
+              ref.poseMeters.getTranslation().getY(),
+              ref.poseMeters.getRotation().getRadians(),
+              vl,
+              vr);
 
-      Matrix<N4, N1> localY = getLocalMeasurementModel(trueXhat, new Matrix<>(Nat.N2(), Nat.N1()));
-      var noiseStdDev = VecBuilder.fill(0.001, 0.001, 0.5, 0.5);
+      Matrix<N3, N1> localY = getLocalMeasurementModel(trueXhat, new Matrix<>(Nat.N2(), Nat.N1()));
+      var noiseStdDev = VecBuilder.fill(0.0001, 0.5, 0.5);
 
       observer.correct(u, localY.plus(StateSpaceUtil.makeWhiteNoiseVector(noiseStdDev)));
 
       var rdot = nextR.minus(r).div(dtSeconds);
       u = new Matrix<>(B.solve(rdot.minus(getDynamics(r, new Matrix<>(Nat.N2(), Nat.N1())))));
 
-      rdots.add(rdot);
-
-      trajXs.add(ref.poseMeters.getTranslation().getX());
-      trajYs.add(ref.poseMeters.getTranslation().getY());
-
-      observerXs.add(observer.getXhat().get(0, 0));
-      observerYs.add(observer.getXhat().get(1, 0));
-
-      observerC.add(observer.getXhat(2));
-      observerS.add(observer.getXhat(3));
-
-      observervl.add(observer.getXhat(4));
-      observervr.add(observer.getXhat(5));
-
-      inputVl.add(u.get(0, 0));
-      inputVr.add(u.get(1, 0));
-
-      timeData.add(i * dtSeconds);
+      observer.predict(u, dtSeconds);
 
       r = nextR;
-      observer.predict(u, dtSeconds);
       trueXhat =
           NumericalIntegration.rk4(UnscentedKalmanFilterTest::getDynamics, trueXhat, u, dtSeconds);
     }
@@ -219,77 +196,32 @@ public class UnscentedKalmanFilterTest {
     observer.correct(u, localY);
 
     var globalY = getGlobalMeasurementModel(trueXhat, u);
-    var R = StateSpaceUtil.makeCostMatrix(VecBuilder.fill(0.01, 0.01, 0.0001, 0.0001, 0.5, 0.5));
+    var R =
+        StateSpaceUtil.makeCovarianceMatrix(
+            Nat.N5(), VecBuilder.fill(0.01, 0.01, 0.0001, 0.5, 0.5));
     observer.correct(
-        Nat.N6(),
+        Nat.N5(),
         u,
         globalY,
         UnscentedKalmanFilterTest::getGlobalMeasurementModel,
         R,
-        (sigmas, weights) -> sigmas.times(Matrix.changeBoundsUnchecked(weights)),
-        Matrix::minus,
-        Matrix::minus,
-        Matrix::plus);
+        AngleStatistics.angleMean(2),
+        AngleStatistics.angleResidual(2),
+        AngleStatistics.angleResidual(2),
+        AngleStatistics.angleAdd(2));
 
     final var finalPosition = trajectory.sample(trajectory.getTotalTimeSeconds());
 
-    //     var chartBuilder = new XYChartBuilder();
-    //     chartBuilder.title = "The Magic of Sensor Fusion, now with a "
-    //           + observer.getClass().getSimpleName();
-    //     var xyPosChart = chartBuilder.build();
-
-    //     xyPosChart.setXAxisTitle("X pos, meters");
-    //     xyPosChart.setYAxisTitle("Y pos, meters");
-    //     xyPosChart.addSeries("Trajectory", trajXs, trajYs);
-    //     xyPosChart.addSeries("xHat", observerXs, observerYs);
-
-    //     var stateChart = new XYChartBuilder()
-    //           .title("States (x-hat)").build();
-    //     stateChart.addSeries("Cos", timeData, observerC);
-    //     stateChart.addSeries("Sin", timeData, observerS);
-    //     stateChart.addSeries("vl, m/s", timeData, observervl);
-    //     stateChart.addSeries("vr, m/s", timeData, observervr);
-
-    //     var inputChart = new XYChartBuilder().title("Inputs").build();
-    //     inputChart.addSeries("Left voltage", timeData, inputVl);
-    //     inputChart.addSeries("Right voltage", timeData, inputVr);
-
-    //     var rdotChart = new XYChartBuilder().title("Rdot").build();
-    //     rdotChart.addSeries("xdot, or vx", timeData, rdots.stream().map(it -> it.get(0, 0))
-    //           .collect(Collectors.toList()));
-    //     rdotChart.addSeries("ydot, or vy", timeData, rdots.stream().map(it -> it.get(1, 0))
-    //           .collect(Collectors.toList()));
-    //     rdotChart.addSeries("cos dot", timeData, rdots.stream().map(it -> it.get(2, 0))
-    //           .collect(Collectors.toList()));
-    //     rdotChart.addSeries("sin dot", timeData, rdots.stream().map(it -> it.get(3, 0))
-    //           .collect(Collectors.toList()));
-    //     rdotChart.addSeries("vl dot, or al", timeData, rdots.stream().map(it -> it.get(4, 0))
-    //           .collect(Collectors.toList()));
-    //     rdotChart.addSeries("vr dot, or ar", timeData, rdots.stream().map(it -> it.get(5, 0))
-    //           .collect(Collectors.toList()));
-
-    //     List<XYChart> charts = new ArrayList<>();
-    //     charts.add(xyPosChart);
-    //     charts.add(stateChart);
-    //     charts.add(inputChart);
-    //     charts.add(rdotChart);
-    //     new SwingWrapper<>(charts).displayChartMatrix();
-    //     try {
-    //       Thread.sleep(1000000000);
-    //     } catch (InterruptedException ex) {
-    //       ex.printStackTrace();
-    //     }
-
-    assertEquals(finalPosition.poseMeters.getTranslation().getX(), observer.getXhat(0), 0.25);
-    assertEquals(finalPosition.poseMeters.getTranslation().getY(), observer.getXhat(1), 0.25);
-    assertEquals(finalPosition.poseMeters.getRotation().getRadians(), observer.getXhat(2), 1.0);
-    assertEquals(0.0, observer.getXhat(3), 1.0);
-    assertEquals(0.0, observer.getXhat(4), 1.0);
+    assertEquals(finalPosition.poseMeters.getTranslation().getX(), observer.getXhat(0), 0.055);
+    assertEquals(finalPosition.poseMeters.getTranslation().getY(), observer.getXhat(1), 0.15);
+    assertEquals(
+        finalPosition.poseMeters.getRotation().getRadians(), observer.getXhat(2), 0.000005);
+    assertEquals(0.0, observer.getXhat(3), 0.1);
+    assertEquals(0.0, observer.getXhat(4), 0.1);
   }
 
   @Test
-  @SuppressWarnings({"LocalVariableName", "ParameterName"})
-  public void testLinearUKF() {
+  void testLinearUKF() {
     var dt = 0.020;
     var plant = LinearSystemId.identifyVelocitySystem(0.02, 0.006);
     var observer =
@@ -302,12 +234,6 @@ public class UnscentedKalmanFilterTest {
             VecBuilder.fill(1.0),
             dt);
 
-    var time = new ArrayList<Double>();
-    var refData = new ArrayList<Double>();
-    var xhat = new ArrayList<Double>();
-    var udata = new ArrayList<Double>();
-    var xdotData = new ArrayList<Double>();
-
     var discABPair = Discretization.discretizeAB(plant.getA(), plant.getB(), dt);
     var discA = discABPair.getFirst();
     var discB = discABPair.getSecond();
@@ -315,128 +241,32 @@ public class UnscentedKalmanFilterTest {
     Matrix<N1, N1> ref = VecBuilder.fill(100);
     Matrix<N1, N1> u = VecBuilder.fill(0);
 
-    Matrix<N1, N1> xdot;
     for (int i = 0; i < (2.0 / dt); i++) {
       observer.predict(u, dt);
 
       u = discB.solve(ref.minus(discA.times(ref)));
-
-      xdot = plant.getA().times(observer.getXhat()).plus(plant.getB().times(u));
-
-      time.add(i * dt);
-      refData.add(ref.get(0, 0));
-      xhat.add(observer.getXhat(0));
-      udata.add(u.get(0, 0));
-      xdotData.add(xdot.get(0, 0));
     }
-
-    //    var chartBuilder = new XYChartBuilder();
-    //    chartBuilder.title = "The Magic of Sensor Fusion";
-    //    var chart = chartBuilder.build();
-
-    //    chart.addSeries("Ref", time, refData);
-    //    chart.addSeries("xHat", time, xhat);
-    //    chart.addSeries("input", time, udata);
-    ////    chart.addSeries("xdot", time, xdotData);
-
-    //    new SwingWrapper<>(chart).displayChart();
-    //    try {
-    //      Thread.sleep(1000000000);
-    //    } catch (InterruptedException e) {
-    //    }
 
     assertEquals(ref.get(0, 0), observer.getXhat(0), 5);
   }
 
   @Test
-  public void testUnscentedTransform() {
-    // From FilterPy
-    var ret =
-        UnscentedKalmanFilter.unscentedTransform(
-            Nat.N4(),
-            Nat.N4(),
-            Matrix.mat(Nat.N4(), Nat.N9())
-                .fill(
-                    -0.9,
-                    -0.822540333075852,
-                    -0.8922540333075852,
-                    -0.9,
-                    -0.9,
-                    -0.9774596669241481,
-                    -0.9077459666924148,
-                    -0.9,
-                    -0.9,
-                    1.0,
-                    1.0,
-                    1.077459666924148,
-                    1.0,
-                    1.0,
-                    1.0,
-                    0.9225403330758519,
-                    1.0,
-                    1.0,
-                    -0.9,
-                    -0.9,
-                    -0.9,
-                    -0.822540333075852,
-                    -0.8922540333075852,
-                    -0.9,
-                    -0.9,
-                    -0.9774596669241481,
-                    -0.9077459666924148,
-                    1.0,
-                    1.0,
-                    1.0,
-                    1.0,
-                    1.077459666924148,
-                    1.0,
-                    1.0,
-                    1.0,
-                    0.9225403330758519),
-            VecBuilder.fill(
-                -132.33333333,
-                16.66666667,
-                16.66666667,
-                16.66666667,
-                16.66666667,
-                16.66666667,
-                16.66666667,
-                16.66666667,
-                16.66666667),
-            VecBuilder.fill(
-                -129.34333333,
-                16.66666667,
-                16.66666667,
-                16.66666667,
-                16.66666667,
-                16.66666667,
-                16.66666667,
-                16.66666667,
-                16.66666667),
-            (sigmas, weights) -> sigmas.times(Matrix.changeBoundsUnchecked(weights)),
-            Matrix::minus);
+  void testRoundTripP() {
+    var dtSeconds = 0.005;
 
-    assertTrue(VecBuilder.fill(-0.9, 1, -0.9, 1).isEqual(ret.getFirst(), 1E-5));
+    var observer =
+        new UnscentedKalmanFilter<>(
+            Nat.N2(),
+            Nat.N2(),
+            (x, u) -> x,
+            (x, u) -> x,
+            VecBuilder.fill(0.0, 0.0),
+            VecBuilder.fill(0.0, 0.0),
+            dtSeconds);
 
-    assertTrue(
-        Matrix.mat(Nat.N4(), Nat.N4())
-            .fill(
-                2.02000002e-01,
-                2.00000500e-02,
-                -2.69044710e-29,
-                -4.59511477e-29,
-                2.00000500e-02,
-                2.00001000e-01,
-                -2.98781068e-29,
-                -5.12759588e-29,
-                -2.73372625e-29,
-                -3.09882635e-29,
-                2.02000002e-01,
-                2.00000500e-02,
-                -4.67065917e-29,
-                -5.10705197e-29,
-                2.00000500e-02,
-                2.00001000e-01)
-            .isEqual(ret.getSecond(), 1E-5));
+    var P = Matrix.mat(Nat.N2(), Nat.N2()).fill(2.0, 1.0, 1.0, 2.0);
+    observer.setP(P);
+
+    assertTrue(observer.getP().isEqual(P, 1e-9));
   }
 }

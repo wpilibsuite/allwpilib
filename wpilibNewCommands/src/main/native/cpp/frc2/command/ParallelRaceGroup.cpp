@@ -43,26 +43,33 @@ bool ParallelRaceGroup::RunsWhenDisabled() const {
   return m_runWhenDisabled;
 }
 
+Command::InterruptionBehavior ParallelRaceGroup::GetInterruptionBehavior()
+    const {
+  return m_interruptBehavior;
+}
+
 void ParallelRaceGroup::AddCommands(
     std::vector<std::unique_ptr<Command>>&& commands) {
-  if (!RequireUngrouped(commands)) {
-    return;
-  }
+  CommandScheduler::GetInstance().RequireUngrouped(commands);
 
   if (isRunning) {
-    throw FRC_MakeError(frc::err::CommandIllegalUse, "{}",
+    throw FRC_MakeError(frc::err::CommandIllegalUse,
                         "Commands cannot be added to a CommandGroup "
                         "while the group is running");
   }
 
   for (auto&& command : commands) {
     if (RequirementsDisjoint(this, command.get())) {
-      command->SetGrouped(true);
+      command->SetComposed(true);
       AddRequirements(command->GetRequirements());
       m_runWhenDisabled &= command->RunsWhenDisabled();
+      if (command->GetInterruptionBehavior() ==
+          Command::InterruptionBehavior::kCancelSelf) {
+        m_interruptBehavior = Command::InterruptionBehavior::kCancelSelf;
+      }
       m_commands.emplace_back(std::move(command));
     } else {
-      throw FRC_MakeError(frc::err::CommandIllegalUse, "{}",
+      throw FRC_MakeError(frc::err::CommandIllegalUse,
                           "Multiple commands in a parallel group cannot "
                           "require the same subsystems");
     }

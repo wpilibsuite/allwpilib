@@ -14,7 +14,6 @@ import edu.wpi.first.math.numbers.N2;
 import org.junit.jupiter.api.Test;
 
 class ControlAffinePlantInversionFeedforwardTest {
-  @SuppressWarnings("LocalVariableName")
   @Test
   void testCalculate() {
     ControlAffinePlantInversionFeedforward<N2, N1> feedforward =
@@ -25,7 +24,6 @@ class ControlAffinePlantInversionFeedforwardTest {
         48.0, feedforward.calculate(VecBuilder.fill(2, 2), VecBuilder.fill(3, 3)).get(0, 0), 1e-6);
   }
 
-  @SuppressWarnings("LocalVariableName")
   @Test
   void testCalculateState() {
     ControlAffinePlantInversionFeedforward<N2, N1> feedforward =
@@ -36,25 +34,14 @@ class ControlAffinePlantInversionFeedforwardTest {
         48.0, feedforward.calculate(VecBuilder.fill(2, 2), VecBuilder.fill(3, 3)).get(0, 0), 1e-6);
   }
 
-  @SuppressWarnings("ParameterName")
   protected Matrix<N2, N1> getDynamics(Matrix<N2, N1> x, Matrix<N1, N1> u) {
-    var result = new Matrix<>(Nat.N2(), Nat.N1());
-
-    result =
-        Matrix.mat(Nat.N2(), Nat.N2())
-            .fill(1.000, 0, 0, 1.000)
-            .times(x)
-            .plus(VecBuilder.fill(0, 1).times(u));
-
-    return result;
+    return Matrix.mat(Nat.N2(), Nat.N2())
+        .fill(1.000, 0, 0, 1.000)
+        .times(x)
+        .plus(VecBuilder.fill(0, 1).times(u));
   }
 
-  @SuppressWarnings("ParameterName")
   protected Matrix<N2, N1> getStateDynamics(Matrix<N2, N1> x) {
-    var result = new Matrix<>(Nat.N2(), Nat.N1());
-
-    result = Matrix.mat(Nat.N2(), Nat.N2()).fill(1.000, 0, 0, 1.000).times(x);
-
-    return result;
+    return Matrix.mat(Nat.N2(), Nat.N2()).fill(1.000, 0, 0, 1.000).times(x);
   }
 }

@@ -10,6 +10,7 @@
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
+#include "frc/CompressorConfigType.h"
 #include "frc/PneumaticsBase.h"
 #include "frc/PneumaticsModuleType.h"
 #include "frc/SensorUtil.h"
@@ -57,55 +58,131 @@ class Compressor : public wpi::Sendable,
   Compressor& operator=(Compressor&&) = default;
 
   /**
-   * Starts closed-loop control. Note that closed loop control is enabled by
-   * default.
-   */
-  void Start();
-
-  /**
-   * Stops closed-loop control. Note that closed loop control is enabled by
-   * default.
-   */
-  void Stop();
-
-  /**
    * Check if compressor output is active.
+   * To (re)enable the compressor use EnableDigital() or EnableAnalog(...).
    *
-   * @return true if the compressor is on
+   * @return true if the compressor is on.
+   * @deprecated To avoid confusion in thinking this (re)enables the compressor
+   * use IsEnabled().
    */
+  [[deprecated(
+      "To avoid confusion in thinking this (re)enables the compressor use "
+      "IsEnabled()")]]
   bool Enabled() const;
 
   /**
-   * Check if the pressure switch is triggered.
+   * Returns whether the compressor is active or not.
    *
-   * @return true if pressure is low
+   * @return true if the compressor is on - otherwise false.
+   */
+  bool IsEnabled() const;
+
+  /**
+   * Returns the state of the pressure switch.
+   *
+   * @return True if pressure switch indicates that the system is not full,
+   * otherwise false.
    */
   bool GetPressureSwitchValue() const;
 
   /**
-   * Query how much current the compressor is drawing.
+   * Get the current drawn by the compressor.
    *
-   * @return The current through the compressor, in amps
+   * @return Current drawn by the compressor.
    */
-  double GetCompressorCurrent() const;
+  units::ampere_t GetCurrent() const;
 
   /**
-   * Enables or disables automatically turning the compressor on when the
-   * pressure is low.
+   * If supported by the device, returns the analog input voltage (on channel
+   * 0).
    *
-   * @param on Set to true to enable closed loop control of the compressor.
-   *           False to disable.
+   * This function is only supported by the REV PH. On CTRE PCM, this will
+   * return 0.
+   *
+   * @return The analog input voltage, in volts.
    */
-  void SetClosedLoopControl(bool on);
+  units::volt_t GetAnalogVoltage() const;
 
   /**
-   * Returns true if the compressor will automatically turn on when the
-   * pressure is low.
+   * If supported by the device, returns the pressure read by the analog
+   * pressure sensor (on channel 0).
    *
-   * @return True if closed loop control of the compressor is enabled. False if
-   *         disabled.
+   * This function is only supported by the REV PH with the REV Analog Pressure
+   * Sensor. On CTRE PCM, this will return 0.
+   *
+   * @return The pressure read by the analog pressure sensor.
    */
-  bool GetClosedLoopControl() const;
+  units::pounds_per_square_inch_t GetPressure() const;
+
+  /**
+   * Disable the compressor.
+   */
+  void Disable();
+
+  /**
+   * Enables the compressor in digital mode using the digital pressure switch.
+   * The compressor will turn on when the pressure switch indicates that the
+   * system is not full, and will turn off when the pressure switch indicates
+   * that the system is full.
+   */
+  void EnableDigital();
+
+  /**
+   * If supported by the device, enables the compressor in analog mode. This
+   * mode uses an analog pressure sensor connected to analog channel 0 to cycle
+   * the compressor. The compressor will turn on when the pressure drops below
+   * {@code minPressure} and will turn off when the pressure reaches {@code
+   * maxPressure}. This mode is only supported by the REV PH with the REV Analog
+   * Pressure Sensor connected to analog channel 0.
+   *
+   * On CTRE PCM, this will enable digital control.
+   *
+   * @param minPressure The minimum pressure. The compressor will turn on when
+   * the pressure drops below this value.
+   * @param maxPressure The maximum pressure. The compressor will turn off when
+   * the pressure reaches this value.
+   */
+  void EnableAnalog(units::pounds_per_square_inch_t minPressure,
+                    units::pounds_per_square_inch_t maxPressure);
+
+  /**
+   * If supported by the device, enables the compressor in hybrid mode. This
+   * mode uses both a digital pressure switch and an analog pressure sensor
+   * connected to analog channel 0 to cycle the compressor. This mode is only
+   * supported by the REV PH with the REV Analog Pressure Sensor connected to
+   * analog channel 0.
+   *
+   * The compressor will turn on when \a both:
+   *
+   * - The digital pressure switch indicates the system is not full AND
+   * - The analog pressure sensor indicates that the pressure in the system
+   * is below the specified minimum pressure.
+   *
+   * The compressor will turn off when \a either:
+   *
+   * - The digital pressure switch is disconnected or indicates that the system
+   * is full OR
+   * - The pressure detected by the analog sensor is greater than the specified
+   * maximum pressure.
+   *
+   * On CTRE PCM, this will enable digital control.
+   *
+   * @param minPressure The minimum pressure. The compressor will turn on
+   * when the pressure drops below this value and the pressure switch indicates
+   * that the system is not full.
+   * @param maxPressure The maximum pressure. The compressor will turn
+   * off when the pressure reaches this value or the pressure switch is
+   * disconnected or indicates that the system is full.
+   */
+  void EnableHybrid(units::pounds_per_square_inch_t minPressure,
+                    units::pounds_per_square_inch_t maxPressure);
+
+  /**
+   * Returns the active compressor configuration.
+   *
+   * @return The active compressor configuration.
+   */
+  CompressorConfigType GetConfigType() const;
 
   void InitSendable(wpi::SendableBuilder& builder) override;
 

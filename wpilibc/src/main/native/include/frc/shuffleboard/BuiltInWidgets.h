@@ -280,7 +280,7 @@ enum class BuiltInWidgets {
    * <br>Custom properties:
    * <table>
    * <tr><th>Name</th><th>Type</th><th>Default Value</th><th>Notes</th></tr>
-   * <tr><td>Range</td><td>{@link Range}</td><td>k16G</td><td>The accelerometer
+   * <tr><td>Range</td><td>Range</td><td>k16G</td><td>The accelerometer
    * range</td></tr> <tr><td>Show value</td><td>Boolean</td><td>true</td>
    * <td>Show or hide the acceleration values</td></tr>
    * <tr><td>Precision</td><td>Number</td><td>2</td>
@@ -370,7 +370,16 @@ enum class BuiltInWidgets {
    * </td></tr>
    * </table>
    */
-  kCameraStream
+  kCameraStream,
+  /**
+   * Displays a field2d object.<br>
+   * Supported types:
+   *
+   * <ul>
+   *   <li>Field2d
+   * </ul>
+   */
+  kField,
 };
 
 }  // namespace frc

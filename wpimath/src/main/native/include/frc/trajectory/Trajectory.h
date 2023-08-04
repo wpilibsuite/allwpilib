@@ -48,19 +48,8 @@ class WPILIB_DLLEXPORT Trajectory {
 
     /**
      * Checks equality between this State and another object.
-     *
-     * @param other The other object.
-     * @return Whether the two objects are equal.
      */
-    bool operator==(const State& other) const;
-
-    /**
-     * Checks inequality between this State and another object.
-     *
-     * @param other The other object.
-     * @return Whether the two objects are not equal.
-     */
-    bool operator!=(const State& other) const;
+    bool operator==(const State&) const = default;
 
     /**
      * Interpolates between two States.
@@ -77,6 +66,8 @@ class WPILIB_DLLEXPORT Trajectory {
 
   /**
    * Constructs a trajectory from a vector of states.
+   *
+   * @throws std::invalid_argument if the vector of states is empty.
    */
   explicit Trajectory(const std::vector<State>& states);
 
@@ -88,6 +79,7 @@ class WPILIB_DLLEXPORT Trajectory {
 
   /**
    * Return the states of the trajectory.
+   *
    * @return The states of the trajectory.
    */
   const std::vector<State>& States() const { return m_states; }
@@ -97,6 +89,7 @@ class WPILIB_DLLEXPORT Trajectory {
    *
    * @param t The point in time since the beginning of the trajectory to sample.
    * @return The state at that point in time.
+   * @throws std::runtime_error if the trajectory has no states.
    */
   State Sample(units::second_t t) const;
 
@@ -140,37 +133,12 @@ class WPILIB_DLLEXPORT Trajectory {
 
   /**
    * Checks equality between this Trajectory and another object.
-   *
-   * @param other The other object.
-   * @return Whether the two objects are equal.
    */
-  bool operator==(const Trajectory& other) const;
-
-  /**
-   * Checks inequality between this Trajectory and another object.
-   *
-   * @param other The other object.
-   * @return Whether the two objects are inequal.
-   */
-  bool operator!=(const Trajectory& other) const;
+  bool operator==(const Trajectory&) const = default;
 
  private:
   std::vector<State> m_states;
   units::second_t m_totalTime = 0_s;
-
-  /**
-   * Linearly interpolates between two values.
-   *
-   * @param startValue The start value.
-   * @param endValue The end value.
-   * @param t The fraction for interpolation.
-   *
-   * @return The interpolated value.
-   */
-  template <typename T>
-  static T Lerp(const T& startValue, const T& endValue, const double t) {
-    return startValue + (endValue - startValue) * t;
-  }
 };
 
 WPILIB_DLLEXPORT

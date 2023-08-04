@@ -41,35 +41,22 @@ public class Solenoid implements Sendable, AutoCloseable {
    */
   public Solenoid(final int module, final PneumaticsModuleType moduleType, final int channel) {
     m_module = PneumaticsBase.getForType(module, moduleType);
-    boolean allocatedSolenoids = false;
-    boolean successfulCompletion = false;
 
     m_mask = 1 << channel;
     m_channel = channel;
 
-    try {
-      if (!m_module.checkSolenoidChannel(channel)) {
-        throw new IllegalArgumentException("Channel " + channel + " out of range");
-      }
-
-      if (m_module.checkAndReserveSolenoids(m_mask) != 0) {
-        throw new AllocationException("Solenoid already allocated");
-      }
-
-      allocatedSolenoids = true;
-
-      HAL.report(tResourceType.kResourceType_Solenoid, channel + 1, m_module.getModuleNumber() + 1);
-      SendableRegistry.addLW(this, "Solenoid", m_module.getModuleNumber(), channel);
-      successfulCompletion = true;
-
-    } finally {
-      if (!successfulCompletion) {
-        if (allocatedSolenoids) {
-          m_module.unreserveSolenoids(m_mask);
-        }
-        m_module.close();
-      }
+    if (!m_module.checkSolenoidChannel(channel)) {
+      m_module.close();
+      throw new IllegalArgumentException("Channel " + channel + " out of range");
     }
+
+    if (m_module.checkAndReserveSolenoids(m_mask) != 0) {
+      m_module.close();
+      throw new AllocationException("Solenoid already allocated");
+    }
+
+    HAL.report(tResourceType.kResourceType_Solenoid, channel + 1, m_module.getModuleNumber() + 1);
+    SendableRegistry.addLW(this, "Solenoid", m_module.getModuleNumber(), channel);
   }
 
   @Override
@@ -130,11 +117,16 @@ public class Solenoid implements Sendable, AutoCloseable {
   }
 
   /**
-   * Set the pulse duration in the PCM. This is used in conjunction with the startPulse method to
-   * allow the PCM to control the timing of a pulse. The timing can be controlled in 0.01 second
-   * increments.
+   * Set the pulse duration in the pneumatics module. This is used in conjunction with the
+   * startPulse method to allow the pneumatics module to control the timing of a pulse.
    *
-   * @param durationSeconds The duration of the pulse, from 0.01 to 2.55 seconds.
+   * <p>On the PCM, the timing can be controlled in 0.01 second increments, with a maximum of 2.55
+   * seconds.
+   *
+   * <p>On the PH, the timing can be controlled in 0.001 second increments, with a maximum of 65.534
+   * seconds.
+   *
+   * @param durationSeconds The duration of the pulse in seconds.
    * @see #startPulse()
    */
   public void setPulseDuration(double durationSeconds) {
@@ -143,7 +135,7 @@ public class Solenoid implements Sendable, AutoCloseable {
   }
 
   /**
-   * Trigger the PCM to generate a pulse of the duration set in setPulseDuration.
+   * Trigger the pneumatics module to generate a pulse of the duration set in setPulseDuration.
    *
    * @see #setPulseDuration(double)
    */

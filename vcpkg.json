@@ -1,0 +1,7 @@
+{
+  "name": "main",
+  "version-string": "latest",
+  "dependencies": [
+    "opencv"
+  ]
+}

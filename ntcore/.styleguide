@@ -30,4 +30,5 @@ includeOtherLibs {
   ^fmt/
   ^support/
   ^wpi/
+  ^wpinet/
 }

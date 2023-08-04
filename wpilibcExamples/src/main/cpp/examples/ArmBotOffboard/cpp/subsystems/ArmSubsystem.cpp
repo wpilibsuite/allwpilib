@@ -13,7 +13,7 @@ ArmSubsystem::ArmSubsystem()
     : frc2::TrapezoidProfileSubsystem<units::radians>(
           {kMaxVelocity, kMaxAcceleration}, kArmOffset),
       m_motor(kMotorPort),
-      m_feedforward(kS, kCos, kV, kA) {
+      m_feedforward(kS, kG, kV, kA) {
   m_motor.SetPID(kP, 0, 0);
 }
 
@@ -23,5 +23,9 @@ void ArmSubsystem::UseState(State setpoint) {
       m_feedforward.Calculate(setpoint.position, setpoint.velocity);
   // Add the feedforward to the PID output to get the motor output
   m_motor.SetSetpoint(ExampleSmartMotorController::PIDMode::kPosition,
-                      setpoint.position.to<double>(), feedforward / 12_V);
+                      setpoint.position.value(), feedforward / 12_V);
+}
+
+frc2::CommandPtr ArmSubsystem::SetArmGoalCommand(units::radian_t goal) {
+  return frc2::cmd::RunOnce([this, goal] { this->SetGoal(goal); }, {this});
 }

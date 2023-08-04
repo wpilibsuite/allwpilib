@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj;
 
-import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.hal.AnalogJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
@@ -22,11 +22,11 @@ import edu.wpi.first.util.sendable.SendableBuilder;
  * upper limit, then the output is true. If the analog value is in between, then the trigger output
  * state maintains its most recent value.
  *
- * <p>The InWindow output indicates whether or not the analog signal is inside the range defined by
- * the limits.
+ * <p>The InWindow output indicates whether the analog signal is inside the range defined by the
+ * limits.
  *
  * <p>The RisingPulse and FallingPulse outputs detect an instantaneous transition from above the
- * upper limit to below the lower limit, and vise versa. These pulses represent a rollover condition
+ * upper limit to below the lower limit, and vice versa. These pulses represent a rollover condition
  * of a sensor and can be routed to an up / down counter or to interrupts. Because the outputs
  * generate a pulse, they cannot be read directly. To help ensure that a rollover condition is not
  * missed, there is an average rejection filter available that operates on the upper 8 bits of a 12
@@ -40,7 +40,6 @@ import edu.wpi.first.util.sendable.SendableBuilder;
  */
 public class AnalogTriggerOutput extends DigitalSource implements Sendable {
   /** Exceptions dealing with improper operation of the Analog trigger output. */
-  @SuppressWarnings("serial")
   public static class AnalogTriggerOutputException extends RuntimeException {
     /**
      * Create a new exception with the given message.

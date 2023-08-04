@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj;
 
-import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -17,6 +17,10 @@ import java.nio.ByteBuffer;
  *
  * <p>This class is intended to be used by sensor (and other I2C device) drivers. It probably should
  * not be used directly.
+ *
+ * <p>The Onboard I2C port is subject to system lockups. See <a
+ * href="https://docs.wpilib.org/en/stable/docs/yearly-overview/known-issues.html#onboard-i2c-causing-system-lockups">
+ * WPILib Known Issues</a> page for details.
  */
 public class I2C implements AutoCloseable {
   public enum Port {
@@ -42,6 +46,12 @@ public class I2C implements AutoCloseable {
   public I2C(Port port, int deviceAddress) {
     m_port = port.value;
     m_deviceAddress = deviceAddress;
+
+    if (port == I2C.Port.kOnboard) {
+      DriverStation.reportWarning(
+          "Onboard I2C port is subject to system lockups. See Known Issues page for details",
+          false);
+    }
 
     I2CJNI.i2CInitialize((byte) port.value);
 
@@ -106,7 +116,6 @@ public class I2C implements AutoCloseable {
    * @param receiveSize Number of bytes to read from the device.
    * @return Transfer Aborted... false for success, true for aborted.
    */
-  @SuppressWarnings("ByteBufferBackingArray")
   public synchronized boolean transaction(
       ByteBuffer dataToSend, int sendSize, ByteBuffer dataReceived, int receiveSize) {
     if (dataToSend.hasArray() && dataReceived.hasArray()) {
@@ -201,7 +210,6 @@ public class I2C implements AutoCloseable {
    * @param size The number of data bytes to write.
    * @return Transfer Aborted... false for success, true for aborted.
    */
-  @SuppressWarnings("ByteBufferBackingArray")
   public synchronized boolean writeBulk(ByteBuffer data, int size) {
     if (data.hasArray()) {
       return writeBulk(data.array(), size);
@@ -256,7 +264,6 @@ public class I2C implements AutoCloseable {
    * @param buffer A buffer to store the data read from the device.
    * @return Transfer Aborted... false for success, true for aborted.
    */
-  @SuppressWarnings("ByteBufferBackingArray")
   public boolean read(int registerAddress, int count, ByteBuffer buffer) {
     if (count < 1) {
       throw new BoundaryException("Value must be at least 1, " + count + " given");
@@ -313,7 +320,6 @@ public class I2C implements AutoCloseable {
    * @param count The number of bytes to read in the transaction.
    * @return Transfer Aborted... false for success, true for aborted.
    */
-  @SuppressWarnings("ByteBufferBackingArray")
   public boolean readOnly(ByteBuffer buffer, int count) {
     if (count < 1) {
       throw new BoundaryException("Value must be at least 1, " + count + " given");

@@ -9,7 +9,7 @@ using namespace hal;
 
 namespace hal::init {
 void InitializeSPIAccelerometerData() {
-  static SPIAccelerometerData ssad[5];
+  static SPIAccelerometerData ssad[kSPIAccelerometers];
   ::hal::SimSPIAccelerometerData = ssad;
 }
 }  // namespace hal::init

@@ -61,24 +61,23 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   }
 
   @Override
-  public int compareTo(Watchdog rhs) {
-    // Elements with sooner expiration times are sorted as lesser. The head of
-    // Java's PriorityQueue is the least element.
-    return Double.compare(m_expirationTimeSeconds, rhs.m_expirationTimeSeconds);
-  }
-
-  @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof Watchdog)) {
-      return false;
+    if (obj instanceof Watchdog) {
+      return Double.compare(m_expirationTimeSeconds, ((Watchdog) obj).m_expirationTimeSeconds) == 0;
     }
-    Watchdog oth = (Watchdog) obj;
-    return oth.m_expirationTimeSeconds == m_expirationTimeSeconds;
+    return false;
   }
 
   @Override
   public int hashCode() {
     return Double.hashCode(m_expirationTimeSeconds);
+  }
+
+  @Override
+  public int compareTo(Watchdog rhs) {
+    // Elements with sooner expiration times are sorted as lesser. The head of
+    // Java's PriorityQueue is the least element.
+    return Double.compare(m_expirationTimeSeconds, rhs.m_expirationTimeSeconds);
   }
 
   /**
@@ -209,7 +208,6 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
     m_suppressTimeoutMessage = suppress;
   }
 
-  @SuppressWarnings("resource")
   private static void updateAlarm() {
     if (m_watchdogs.size() == 0) {
       NotifierJNI.cancelNotifierAlarm(m_notifier);
@@ -226,7 +224,6 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
     return inst;
   }
 
-  @SuppressWarnings("PMD.AvoidDeeplyNestedIfStmts")
   private static void schedulerFunc() {
     while (!Thread.currentThread().isInterrupted()) {
       long curTime = NotifierJNI.waitForNotifierAlarm(m_notifier);

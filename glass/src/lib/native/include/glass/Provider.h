@@ -19,6 +19,8 @@
 
 namespace glass {
 
+class Storage;
+
 namespace detail {
 struct ProviderFunctions {
   using Exists = std::function<bool()>;
@@ -49,9 +51,9 @@ class Provider : public WindowManager {
   /**
    * Constructor.
    *
-   * @param iniName Group name to use in ini file
+   * @param storage Storage
    */
-  explicit Provider(std::string_view iniName) : WindowManager{iniName} {}
+  explicit Provider(Storage& storage) : WindowManager{storage} {}
 
   Provider(const Provider&) = delete;
   Provider& operator=(const Provider&) = delete;
@@ -133,6 +135,7 @@ class Provider : public WindowManager {
     ModelEntry* modelEntry;
     ViewExistsFunc exists;
     CreateViewFunc createView;
+    bool showDefault = false;
     Window* window = nullptr;
   };
 

@@ -18,41 +18,44 @@ using namespace frc::sim;
 SingleJointedArmSim::SingleJointedArmSim(
     const LinearSystem<2, 1, 1>& system, const DCMotor& gearbox, double gearing,
     units::meter_t armLength, units::radian_t minAngle,
-    units::radian_t maxAngle, units::kilogram_t mass, bool simulateGravity,
+    units::radian_t maxAngle, bool simulateGravity,
+    units::radian_t startingAngle,
     const std::array<double, 1>& measurementStdDevs)
     : LinearSystemSim<2, 1, 1>(system, measurementStdDevs),
-      m_r(armLength),
+      m_armLen(armLength),
       m_minAngle(minAngle),
       m_maxAngle(maxAngle),
-      m_mass(mass),
       m_gearbox(gearbox),
       m_gearing(gearing),
-      m_simulateGravity(simulateGravity) {}
+      m_simulateGravity(simulateGravity) {
+  SetState(frc::Vectord<2>{startingAngle, 0.0});
+}
 
 SingleJointedArmSim::SingleJointedArmSim(
     const DCMotor& gearbox, double gearing, units::kilogram_square_meter_t moi,
     units::meter_t armLength, units::radian_t minAngle,
-    units::radian_t maxAngle, units::kilogram_t mass, bool simulateGravity,
+    units::radian_t maxAngle, bool simulateGravity,
+    units::radian_t startingAngle,
     const std::array<double, 1>& measurementStdDevs)
     : SingleJointedArmSim(
           LinearSystemId::SingleJointedArmSystem(gearbox, moi, gearing),
-          gearbox, gearing, armLength, minAngle, maxAngle, mass,
-          simulateGravity, measurementStdDevs) {}
+          gearbox, gearing, armLength, minAngle, maxAngle, simulateGravity,
+          startingAngle, measurementStdDevs) {}
 
 bool SingleJointedArmSim::WouldHitLowerLimit(units::radian_t armAngle) const {
-  return armAngle < m_minAngle;
+  return armAngle <= m_minAngle;
 }
 
 bool SingleJointedArmSim::WouldHitUpperLimit(units::radian_t armAngle) const {
-  return armAngle > m_maxAngle;
+  return armAngle >= m_maxAngle;
 }
 
 bool SingleJointedArmSim::HasHitLowerLimit() const {
-  return WouldHitLowerLimit(units::radian_t(m_y(0)));
+  return WouldHitLowerLimit(units::radian_t{m_y(0)});
 }
 
 bool SingleJointedArmSim::HasHitUpperLimit() const {
-  return WouldHitUpperLimit(units::radian_t(m_y(0)));
+  return WouldHitUpperLimit(units::radian_t{m_y(0)});
 }
 
 units::radian_t SingleJointedArmSim::GetAngle() const {
@@ -72,41 +75,53 @@ units::ampere_t SingleJointedArmSim::GetCurrentDraw() const {
 }
 
 void SingleJointedArmSim::SetInputVoltage(units::volt_t voltage) {
-  SetInput(Eigen::Vector<double, 1>{voltage.to<double>()});
+  SetInput(Vectord<1>{voltage.value()});
 }
 
-Eigen::Vector<double, 2> SingleJointedArmSim::UpdateX(
-    const Eigen::Vector<double, 2>& currentXhat,
-    const Eigen::Vector<double, 1>& u, units::second_t dt) {
-  // Horizontal case:
-  // Torque = F * r = I * alpha
-  // alpha = F * r / I
-  // Since F = mg,
-  // alpha = m * g * r / I
-  // Finally, multiply RHS by cos(theta) to account for the arm angle
-  // This acceleration is added to the linear system dynamics x-dot = Ax + Bu
-  // We therefore find that f(x, u) = Ax + Bu + [[0] [m * g * r / I *
-  // std::cos(theta)]]
+Vectord<2> SingleJointedArmSim::UpdateX(const Vectord<2>& currentXhat,
+                                        const Vectord<1>& u,
+                                        units::second_t dt) {
+  // The torque on the arm is given by τ = F⋅r, where F is the force applied by
+  // gravity and r the distance from pivot to center of mass. Recall from
+  // dynamics that the sum of torques for a rigid body is τ = J⋅α, were τ is
+  // torque on the arm, J is the mass-moment of inertia about the pivot axis,
+  // and α is the angular acceleration in rad/s². Rearranging yields: α = F⋅r/J
+  //
+  // We substitute in F = m⋅g⋅cos(θ), where θ is the angle from horizontal:
+  //
+  //   α = (m⋅g⋅cos(θ))⋅r/J
+  //
+  // Multiply RHS by cos(θ) to account for the arm angle. Further, we know the
+  // arm mass-moment of inertia J of our arm is given by J=1/3 mL², modeled as a
+  // rod rotating about it's end, where L is the overall rod length. The mass
+  // distribution is assumed to be uniform. Substitute r=L/2 to find:
+  //
+  //   α = (m⋅g⋅cos(θ))⋅r/(1/3 mL²)
+  //   α = (m⋅g⋅cos(θ))⋅(L/2)/(1/3 mL²)
+  //   α = 3/2⋅g⋅cos(θ)/L
+  //
+  // This acceleration is next added to the linear system dynamics ẋ=Ax+Bu
+  //
+  //   f(x, u) = Ax + Bu + [0  α]ᵀ
+  //   f(x, u) = Ax + Bu + [0  3/2⋅g⋅cos(θ)/L]ᵀ
 
-  Eigen::Vector<double, 2> updatedXhat = RKDP(
-      [&](const auto& x, const auto& u) -> Eigen::Vector<double, 2> {
-        Eigen::Vector<double, 2> xdot = m_plant.A() * x + m_plant.B() * u;
+  Vectord<2> updatedXhat = RKDP(
+      [&](const auto& x, const auto& u) -> Vectord<2> {
+        Vectord<2> xdot = m_plant.A() * x + m_plant.B() * u;
 
         if (m_simulateGravity) {
-          xdot += Eigen::Vector<double, 2>{
-              0.0, (m_mass * m_r * -9.8 * 3.0 / (m_mass * m_r * m_r) *
-                    std::cos(x(0)))
-                       .template to<double>()};
+          xdot += Vectord<2>{
+              0.0, (3.0 / 2.0 * -9.8 / m_armLen * std::cos(x(0))).value()};
         }
         return xdot;
       },
       currentXhat, u, dt);
 
   // Check for collisions.
-  if (WouldHitLowerLimit(units::radian_t(updatedXhat(0)))) {
-    return Eigen::Vector<double, 2>{m_minAngle.to<double>(), 0.0};
-  } else if (WouldHitUpperLimit(units::radian_t(updatedXhat(0)))) {
-    return Eigen::Vector<double, 2>{m_maxAngle.to<double>(), 0.0};
+  if (WouldHitLowerLimit(units::radian_t{updatedXhat(0)})) {
+    return Vectord<2>{m_minAngle.value(), 0.0};
+  } else if (WouldHitUpperLimit(units::radian_t{updatedXhat(0)})) {
+    return Vectord<2>{m_maxAngle.value(), 0.0};
   }
   return updatedXhat;
 }

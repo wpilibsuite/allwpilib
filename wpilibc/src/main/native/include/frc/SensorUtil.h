@@ -22,6 +22,13 @@ class SensorUtil final {
   static int GetDefaultCTREPCMModule();
 
   /**
+   * Get the number of the default solenoid module.
+   *
+   * @return The number of the default solenoid module.
+   */
+  static int GetDefaultREVPHModule();
+
+  /**
    * Check that the digital channel number is valid.
    *
    * Verify that the channel number is one of the legal channel numbers. Channel

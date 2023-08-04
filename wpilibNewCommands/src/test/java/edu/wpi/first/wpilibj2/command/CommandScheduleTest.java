@@ -11,6 +11,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.junit.jupiter.api.Test;
 
 class CommandScheduleTest extends CommandTestBase {
@@ -66,7 +68,7 @@ class CommandScheduleTest extends CommandTestBase {
       MockCommandHolder command3Holder = new MockCommandHolder(true);
       Command command3 = command3Holder.getMock();
 
-      scheduler.schedule(true, command1, command2, command3);
+      scheduler.schedule(command1, command2, command3);
       assertTrue(scheduler.isScheduled(command1, command2, command3));
       scheduler.run();
       assertTrue(scheduler.isScheduled(command1, command2, command3));
@@ -114,6 +116,29 @@ class CommandScheduleTest extends CommandTestBase {
       Command mockCommand = holder.getMock();
 
       assertDoesNotThrow(() -> scheduler.cancel(mockCommand));
+    }
+  }
+
+  @Test
+  void smartDashboardCancelTest() {
+    try (CommandScheduler scheduler = new CommandScheduler();
+        var inst = NetworkTableInstance.create()) {
+      SmartDashboard.setNetworkTableInstance(inst);
+      SmartDashboard.putData("Scheduler", scheduler);
+      SmartDashboard.updateValues();
+
+      MockCommandHolder holder = new MockCommandHolder(true);
+      Command mockCommand = holder.getMock();
+      scheduler.schedule(mockCommand);
+      scheduler.run();
+      SmartDashboard.updateValues();
+      assertTrue(scheduler.isScheduled(mockCommand));
+
+      var table = inst.getTable("SmartDashboard");
+      table.getEntry("Scheduler/Cancel").setIntegerArray(new long[] {mockCommand.hashCode()});
+      SmartDashboard.updateValues();
+      scheduler.run();
+      assertFalse(scheduler.isScheduled(mockCommand));
     }
   }
 }

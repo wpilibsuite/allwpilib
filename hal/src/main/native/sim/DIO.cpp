@@ -127,15 +127,30 @@ void HAL_SetDigitalPWMRate(double rate, int32_t* status) {
   // higher freq.
   // TODO: Round in the linear rate domain.
   // uint8_t pwmPeriodPower = static_cast<uint8_t>(
-  //    std::log(1.0 / (kExpectedLoopTiming * 0.25E-6 * rate)) /
-  //        std::log(2.0) +
-  //    0.5);
+  //     std::log2(1.0 / (kExpectedLoopTiming * 0.25E-6 * rate)) + 0.5);
   // TODO(THAD) : Add a case to set this in the simulator
   // digitalSystem->writePWMPeriodPower(pwmPeriodPower, status);
 }
 
 void HAL_SetDigitalPWMDutyCycle(HAL_DigitalPWMHandle pwmGenerator,
                                 double dutyCycle, int32_t* status) {
+  auto port = digitalPWMHandles->Get(pwmGenerator);
+  if (port == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+  int32_t id = *port;
+  if (dutyCycle > 1.0) {
+    dutyCycle = 1.0;
+  }
+  if (dutyCycle < 0.0) {
+    dutyCycle = 0.0;
+  }
+  SimDigitalPWMData[id].dutyCycle = dutyCycle;
+}
+
+void HAL_SetDigitalPWMPPS(HAL_DigitalPWMHandle pwmGenerator, double dutyCycle,
+                          int32_t* status) {
   auto port = digitalPWMHandles->Get(pwmGenerator);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -225,13 +240,18 @@ HAL_Bool HAL_GetDIODirection(HAL_DigitalHandle dioPortHandle, int32_t* status) {
   return value;
 }
 
-void HAL_Pulse(HAL_DigitalHandle dioPortHandle, double pulseLength,
+void HAL_Pulse(HAL_DigitalHandle dioPortHandle, double pulseLengthSeconds,
                int32_t* status) {
   auto port = digitalChannelHandles->Get(dioPortHandle, HAL_HandleEnum::DIO);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
   }
+  // TODO (Thad) Add this
+}
+
+void HAL_PulseMultiple(uint32_t channelMask, double pulseLengthSeconds,
+                       int32_t* status) {
   // TODO (Thad) Add this
 }
 

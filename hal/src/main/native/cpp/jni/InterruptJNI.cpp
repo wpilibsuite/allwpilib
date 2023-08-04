@@ -50,16 +50,35 @@ Java_edu_wpi_first_hal_InterruptJNI_cleanInterrupts
 /*
  * Class:     edu_wpi_first_hal_InterruptJNI
  * Method:    waitForInterrupt
- * Signature: (IDZ)I
+ * Signature: (IDZ)J
  */
-JNIEXPORT jint JNICALL
+JNIEXPORT jlong JNICALL
 Java_edu_wpi_first_hal_InterruptJNI_waitForInterrupt
   (JNIEnv* env, jclass, jint interruptHandle, jdouble timeout,
    jboolean ignorePrevious)
 {
   int32_t status = 0;
-  int32_t result = HAL_WaitForInterrupt((HAL_InterruptHandle)interruptHandle,
+  int64_t result = HAL_WaitForInterrupt((HAL_InterruptHandle)interruptHandle,
                                         timeout, ignorePrevious, &status);
+
+  CheckStatus(env, status);
+  return result;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_InterruptJNI
+ * Method:    waitForMultipleInterrupts
+ * Signature: (IJDZ)J
+ */
+JNIEXPORT jlong JNICALL
+Java_edu_wpi_first_hal_InterruptJNI_waitForMultipleInterrupts
+  (JNIEnv* env, jclass, jint interruptHandle, jlong mask, jdouble timeout,
+   jboolean ignorePrevious)
+{
+  int32_t status = 0;
+  int64_t result =
+      HAL_WaitForMultipleInterrupts((HAL_InterruptHandle)interruptHandle, mask,
+                                    timeout, ignorePrevious, &status);
 
   CheckStatus(env, status);
   return result;

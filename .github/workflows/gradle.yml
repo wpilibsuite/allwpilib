@@ -2,66 +2,99 @@ name: Gradle
 
 on: [pull_request, push]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build-docker:
     strategy:
       fail-fast: false
       matrix:
         include:
-          - container: wpilib/roborio-cross-ubuntu:2022-18.04
+          - container: wpilib/roborio-cross-ubuntu:2023-22.04
             artifact-name: Athena
             build-options: "-Ponlylinuxathena"
-          - container: wpilib/raspbian-cross-ubuntu:10-18.04
-            artifact-name: Raspbian
-            build-options: "-Ponlylinuxraspbian"
-          - container: wpilib/aarch64-cross-ubuntu:bionic-18.04
-            artifact-name: Aarch64
-            build-options: "-Ponlylinuxaarch64bionic"
-          - container: wpilib/ubuntu-base:18.04
+          - container: wpilib/raspbian-cross-ubuntu:bullseye-22.04
+            artifact-name: Arm32
+            build-options: "-Ponlylinuxarm32"
+          - container: wpilib/aarch64-cross-ubuntu:bullseye-22.04
+            artifact-name: Arm64
+            build-options: "-Ponlylinuxarm64"
+          - container: wpilib/ubuntu-base:22.04
             artifact-name: Linux
-            build-options: "-Dorg.gradle.jvmargs=-Xmx2g"
+            build-options: "-Ponlylinuxx86-64"
     name: "Build - ${{ matrix.artifact-name }}"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     container: ${{ matrix.container }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Set release environment variable
         run: echo "EXTRA_GRADLE_ARGS=-PreleaseMode" >> $GITHUB_ENV
         if: startsWith(github.ref, 'refs/tags/v')
       - name: Build with Gradle
-        run: ./gradlew build -PbuildServer -PskipJavaFormat ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
-      - uses: actions/upload-artifact@v2
+        run: ./gradlew build --build-cache -PbuildServer -PskipJavaFormat ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
+        env:
+          ARTIFACTORY_PUBLISH_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
+          ARTIFACTORY_PUBLISH_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
+      - uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.artifact-name }}
           path: build/allOutputs
 
   build-host:
     env:
-      MACOSX_DEPLOYMENT_TARGET: 10.14
+      MACOSX_DEPLOYMENT_TARGET: 11
     strategy:
       fail-fast: false
       matrix:
         include:
-          - os: windows-latest
-            artifact-name: Win64
+          - os: windows-2022
+            artifact-name: Win64Debug
             architecture: x64
-          - os: windows-latest
-            artifact-name: Win32
-            architecture: x86
-          - os: macos-latest
+            task: "build"
+            build-options: "-PciDebugOnly --max-workers 1"
+            outputs: "build/allOutputs"
+          - os: windows-2022
+            artifact-name: Win64Release
+            architecture: x64
+            build-options: "-PciReleaseOnly --max-workers 1"
+            task: "copyAllOutputs"
+            outputs: "build/allOutputs"
+          # - os: windows-2022
+          #   artifact-name: WinArm64Debug
+          #   architecture: x64
+          #   task: "build"
+          #   build-options: "-PciDebugOnly -Pbuildwinarm64 -Ponlywindowsarm64 --max-workers 1"
+          #   outputs: "build/allOutputs"
+          # - os: windows-2022
+          #   artifact-name: WinArm64Release
+          #   architecture: x64
+          #   build-options: "-PciReleaseOnly -Pbuildwinarm64 -Ponlywindowsarm64 --max-workers 1"
+          #   task: "copyAllOutputs"
+          #   outputs: "build/allOutputs"
+          - os: macOS-12
             artifact-name: macOS
             architecture: x64
+            task: "build"
+            outputs: "build/allOutputs"
+          - os: windows-2022
+            artifact-name: Win32
+            architecture: x86
+            task: ":ntcoreffi:build"
+            outputs: "ntcoreffi/build/outputs"
     name: "Build - ${{ matrix.artifact-name }}"
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - uses: actions/setup-java@v1
+      - uses: actions/setup-java@v3
         with:
-          java-version: 11
+          distribution: 'zulu'
+          java-version: 17
           architecture: ${{ matrix.architecture }}
       - name: Import Developer ID Certificate
         uses: wpilibsuite/import-signing-certificate@v1
@@ -81,36 +114,44 @@ jobs:
         run: echo "EXTRA_GRADLE_ARGS=-PreleaseMode" >> $GITHUB_ENV
         shell: bash
         if: startsWith(github.ref, 'refs/tags/v')
+      - name: Set Java Heap Size
+        run: sed -i 's/-Xmx2g/-Xmx1g/g' gradle.properties
+        if: matrix.artifact-name == 'Win32'
       - name: Build with Gradle
-        run: ./gradlew build -PbuildServer -PskipJavaFormat ${{ env.EXTRA_GRADLE_ARGS }}
+        run: ./gradlew ${{ matrix.task }} --build-cache -PbuildServer -PskipJavaFormat ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
+        env:
+          ARTIFACTORY_PUBLISH_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
+          ARTIFACTORY_PUBLISH_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
       - name: Sign Libraries with Developer ID
-        run: ./gradlew build -PbuildServer -PskipJavaFormat -PdeveloperID=${{ secrets.APPLE_DEVELOPER_ID }} ${{ env.EXTRA_GRADLE_ARGS }}
+        run: ./gradlew copyAllOutputs --build-cache -PbuildServer -PskipJavaFormat -PdeveloperID=${{ secrets.APPLE_DEVELOPER_ID }} ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
         if: |
           matrix.artifact-name == 'macOS' && (github.repository_owner == 'wpilibsuite' &&
           (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')))
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.artifact-name }}
-          path: build/allOutputs
+          path: ${{ matrix.outputs }}
 
   build-documentation:
     name: "Build - Documentation"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - uses: actions/setup-java@v1
+      - uses: actions/setup-java@v3
         with:
+          distribution: 'zulu'
           java-version: 13
-      - name: Install libclang-9
-        run: sudo apt update && sudo apt install -y libclang-cpp9 libclang1-9
       - name: Set release environment variable
         run: echo "EXTRA_GRADLE_ARGS=-PreleaseMode" >> $GITHUB_ENV
         if: startsWith(github.ref, 'refs/tags/v')
       - name: Build with Gradle
-        run: ./gradlew docs:zipDocs -PbuildServer ${{ env.EXTRA_GRADLE_ARGS }}
-      - uses: actions/upload-artifact@v2
+        run: ./gradlew docs:zipDocs --build-cache -PbuildServer ${{ env.EXTRA_GRADLE_ARGS }}
+        env:
+          ARTIFACTORY_PUBLISH_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
+          ARTIFACTORY_PUBLISH_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
+      - uses: actions/upload-artifact@v3
         with:
           name: Documentation
           path: docs/build/outputs
@@ -118,12 +159,12 @@ jobs:
   combine:
     name: Combine
     needs: [build-docker, build-host, build-documentation]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           repository: wpilibsuite/build-tools
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           path: combiner/products/build/allOutputs
       - name: Flatten Artifacts
@@ -132,8 +173,9 @@ jobs:
         run: |
           cat combiner/products/build/allOutputs/version.txt
           test -s combiner/products/build/allOutputs/version.txt
-      - uses: actions/setup-java@v1
+      - uses: actions/setup-java@v3
         with:
+          distribution: 'zulu'
           java-version: 11
       - name: Combine
         if: |
@@ -158,7 +200,7 @@ jobs:
           RUN_AZURE_ARTIFACTORY_RELEASE: "TRUE"
           ARTIFACTORY_PUBLISH_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
           ARTIFACTORY_PUBLISH_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: Maven
           path: ~/releases

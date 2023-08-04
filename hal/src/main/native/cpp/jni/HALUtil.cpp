@@ -46,22 +46,29 @@ static JException canMessageNotFoundExCls;
 static JException canMessageNotAllowedExCls;
 static JException canNotInitializedExCls;
 static JException uncleanStatusExCls;
+static JClass powerDistributionVersionCls;
 static JClass pwmConfigDataResultCls;
 static JClass canStatusCls;
 static JClass matchInfoDataCls;
 static JClass accumulatorResultCls;
 static JClass canDataCls;
+static JClass canStreamMessageCls;
 static JClass halValueCls;
 static JClass baseStoreCls;
+static JClass revPHVersionCls;
 
 static const JClassInit classes[] = {
+    {"edu/wpi/first/hal/PowerDistributionVersion",
+     &powerDistributionVersionCls},
     {"edu/wpi/first/hal/PWMConfigDataResult", &pwmConfigDataResultCls},
     {"edu/wpi/first/hal/can/CANStatus", &canStatusCls},
     {"edu/wpi/first/hal/MatchInfoData", &matchInfoDataCls},
     {"edu/wpi/first/hal/AccumulatorResult", &accumulatorResultCls},
     {"edu/wpi/first/hal/CANData", &canDataCls},
+    {"edu/wpi/first/hal/CANStreamMessage", &canStreamMessageCls},
     {"edu/wpi/first/hal/HALValue", &halValueCls},
-    {"edu/wpi/first/hal/DMAJNISample$BaseStore", &baseStoreCls}};
+    {"edu/wpi/first/hal/DMAJNISample$BaseStore", &baseStoreCls},
+    {"edu/wpi/first/hal/REVPHVersion", &revPHVersionCls}};
 
 static const JExceptionInit exceptions[] = {
     {"java/lang/IllegalArgumentException", &illegalArgExCls},
@@ -238,6 +245,19 @@ jobject CreatePWMConfigDataResult(JNIEnv* env, int32_t maxPwm,
       static_cast<jint>(deadbandMinPwm), static_cast<jint>(minPwm));
 }
 
+jobject CreateREVPHVersion(JNIEnv* env, uint32_t firmwareMajor,
+                           uint32_t firmwareMinor, uint32_t firmwareFix,
+                           uint32_t hardwareMinor, uint32_t hardwareMajor,
+                           uint32_t uniqueId) {
+  static jmethodID constructor =
+      env->GetMethodID(revPHVersionCls, "<init>", "(IIIIII)V");
+  return env->NewObject(
+      revPHVersionCls, constructor, static_cast<jint>(firmwareMajor),
+      static_cast<jint>(firmwareMinor), static_cast<jint>(firmwareFix),
+      static_cast<jint>(hardwareMinor), static_cast<jint>(hardwareMajor),
+      static_cast<jint>(uniqueId));
+}
+
 void SetCanStatusObject(JNIEnv* env, jobject canStatus,
                         float percentBusUtilization, uint32_t busOffCount,
                         uint32_t txFullCount, uint32_t receiveErrorCount,
@@ -285,6 +305,18 @@ jbyteArray SetCANDataObject(JNIEnv* env, jobject canData, int32_t length,
   return retVal;
 }
 
+jbyteArray SetCANStreamObject(JNIEnv* env, jobject canStreamData,
+                              int32_t length, uint32_t messageID,
+                              uint64_t timestamp) {
+  static jmethodID func =
+      env->GetMethodID(canStreamMessageCls, "setStreamData", "(IIJ)[B");
+
+  jbyteArray retVal = static_cast<jbyteArray>(env->CallObjectMethod(
+      canStreamData, func, static_cast<jint>(length),
+      static_cast<jint>(messageID), static_cast<jlong>(timestamp)));
+  return retVal;
+}
+
 jobject CreateHALValue(JNIEnv* env, const HAL_Value& value) {
   static jmethodID fromNative = env->GetStaticMethodID(
       halValueCls, "fromNative", "(IJD)Ledu/wpi/first/hal/HALValue;");
@@ -316,6 +348,21 @@ jobject CreateHALValue(JNIEnv* env, const HAL_Value& value) {
 jobject CreateDMABaseStore(JNIEnv* env, jint valueType, jint index) {
   static jmethodID ctor = env->GetMethodID(baseStoreCls, "<init>", "(II)V");
   return env->NewObject(baseStoreCls, ctor, valueType, index);
+}
+
+jobject CreatePowerDistributionVersion(JNIEnv* env, uint32_t firmwareMajor,
+                                       uint32_t firmwareMinor,
+                                       uint32_t firmwareFix,
+                                       uint32_t hardwareMinor,
+                                       uint32_t hardwareMajor,
+                                       uint32_t uniqueId) {
+  static jmethodID constructor =
+      env->GetMethodID(powerDistributionVersionCls, "<init>", "(IIIIII)V");
+  return env->NewObject(
+      powerDistributionVersionCls, constructor,
+      static_cast<jint>(firmwareMajor), static_cast<jint>(firmwareMinor),
+      static_cast<jint>(firmwareFix), static_cast<jint>(hardwareMinor),
+      static_cast<jint>(hardwareMajor), static_cast<jint>(uniqueId));
 }
 
 JavaVM* GetJVM() {
@@ -407,6 +454,34 @@ Java_edu_wpi_first_hal_HALUtil_getFPGARevision
   jint returnValue = HAL_GetFPGARevision(&status);
   CheckStatus(env, status);
   return returnValue;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_HALUtil
+ * Method:    getSerialNumber
+ * Signature: ()Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL
+Java_edu_wpi_first_hal_HALUtil_getSerialNumber
+  (JNIEnv* env, jclass)
+{
+  char serialNum[9];
+  size_t len = HAL_GetSerialNumber(serialNum, sizeof(serialNum));
+  return MakeJString(env, std::string_view(serialNum, len));
+}
+
+/*
+ * Class:     edu_wpi_first_hal_HALUtil
+ * Method:    getComments
+ * Signature: ()Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL
+Java_edu_wpi_first_hal_HALUtil_getComments
+  (JNIEnv* env, jclass)
+{
+  char comments[65];
+  size_t len = HAL_GetComments(comments, sizeof(comments));
+  return MakeJString(env, std::string_view(comments, len));
 }
 
 /*

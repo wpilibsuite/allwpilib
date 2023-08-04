@@ -17,9 +17,11 @@ import edu.wpi.first.wpilibj.examples.hatchbottraditional.commands.HalveDriveSpe
 import edu.wpi.first.wpilibj.examples.hatchbottraditional.commands.ReleaseHatch;
 import edu.wpi.first.wpilibj.examples.hatchbottraditional.subsystems.DriveSubsystem;
 import edu.wpi.first.wpilibj.examples.hatchbottraditional.subsystems.HatchSubsystem;
+import edu.wpi.first.wpilibj.shuffleboard.EventImportance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 /**
@@ -60,7 +62,9 @@ public class RobotContainer {
         // A split-stick arcade command, with forward/backward controlled by the left
         // hand, and turning controlled by the right.
         new DefaultDrive(
-            m_robotDrive, m_driverController::getLeftY, m_driverController::getRightX));
+            m_robotDrive,
+            () -> -m_driverController.getLeftY(),
+            () -> -m_driverController.getRightX()));
 
     // Add commands to the autonomous command chooser
     m_chooser.setDefaultOption("Simple Auto", m_simpleAuto);
@@ -68,6 +72,31 @@ public class RobotContainer {
 
     // Put the chooser on the dashboard
     Shuffleboard.getTab("Autonomous").add(m_chooser);
+    // Put subsystems to dashboard.
+    Shuffleboard.getTab("Drivetrain").add(m_robotDrive);
+    Shuffleboard.getTab("HatchSubsystem").add(m_hatchSubsystem);
+
+    // Log Shuffleboard events for command initialize, execute, finish, interrupt
+    CommandScheduler.getInstance()
+        .onCommandInitialize(
+            command ->
+                Shuffleboard.addEventMarker(
+                    "Command initialized", command.getName(), EventImportance.kNormal));
+    CommandScheduler.getInstance()
+        .onCommandExecute(
+            command ->
+                Shuffleboard.addEventMarker(
+                    "Command executed", command.getName(), EventImportance.kNormal));
+    CommandScheduler.getInstance()
+        .onCommandFinish(
+            command ->
+                Shuffleboard.addEventMarker(
+                    "Command finished", command.getName(), EventImportance.kNormal));
+    CommandScheduler.getInstance()
+        .onCommandInterrupt(
+            command ->
+                Shuffleboard.addEventMarker(
+                    "Command interrupted", command.getName(), EventImportance.kNormal));
   }
 
   /**
@@ -78,14 +107,13 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // Grab the hatch when the 'A' button is pressed.
-    new JoystickButton(m_driverController, Button.kA.value)
-        .whenPressed(new GrabHatch(m_hatchSubsystem));
+    new JoystickButton(m_driverController, Button.kA.value).onTrue(new GrabHatch(m_hatchSubsystem));
     // Release the hatch when the 'B' button is pressed.
     new JoystickButton(m_driverController, Button.kB.value)
-        .whenPressed(new ReleaseHatch(m_hatchSubsystem));
+        .onTrue(new ReleaseHatch(m_hatchSubsystem));
     // While holding the shoulder button, drive at half speed
     new JoystickButton(m_driverController, Button.kRightBumper.value)
-        .whenHeld(new HalveDriveSpeed(m_robotDrive));
+        .whileTrue(new HalveDriveSpeed(m_robotDrive));
   }
 
   /**

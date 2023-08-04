@@ -18,8 +18,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 class XboxControllerTest {
   @ParameterizedTest
   @EnumSource(value = XboxController.Button.class)
-  @SuppressWarnings({"VariableDeclarationUsageDistance"})
-  public void testButtons(XboxController.Button button)
+  void testButtons(XboxController.Button button)
       throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
     HAL.initialize(500, 0);
     XboxController joy = new XboxController(2);
@@ -32,10 +31,10 @@ class XboxControllerTest {
     String joyPressedMethodName = "get" + buttonName + "Pressed";
     String joyReleasedMethodName = "get" + buttonName + "Released";
 
-    Method simSetMethod = joysim.getClass().getMethod(simSetMethodName, boolean.class);
-    Method joyGetMethod = joy.getClass().getMethod(joyGetMethodName);
-    Method joyPressedMethod = joy.getClass().getMethod(joyPressedMethodName);
-    Method joyReleasedMethod = joy.getClass().getMethod(joyReleasedMethodName);
+    final Method simSetMethod = joysim.getClass().getMethod(simSetMethodName, boolean.class);
+    final Method joyGetMethod = joy.getClass().getMethod(joyGetMethodName);
+    final Method joyPressedMethod = joy.getClass().getMethod(joyPressedMethodName);
+    final Method joyReleasedMethod = joy.getClass().getMethod(joyReleasedMethodName);
 
     simSetMethod.invoke(joysim, false);
     joysim.notifyNewData();
@@ -59,8 +58,7 @@ class XboxControllerTest {
 
   @ParameterizedTest
   @EnumSource(value = XboxController.Axis.class)
-  @SuppressWarnings({"VariableDeclarationUsageDistance"})
-  public void testAxes(XboxController.Axis axis)
+  void testAxes(XboxController.Axis axis)
       throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
     HAL.initialize(500, 0);
     XboxController joy = new XboxController(2);

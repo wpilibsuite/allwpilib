@@ -14,11 +14,11 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.numbers.N2;
 import org.junit.jupiter.api.Test;
 
-public class DiscretizationTest {
+class DiscretizationTest {
   // Check that for a simple second-order system that we can easily analyze
   // analytically,
   @Test
-  public void testDiscretizeA() {
+  void testDiscretizeA() {
     final var contA = new MatBuilder<>(Nat.N2(), Nat.N2()).fill(0, 1, 0, 0);
     final var x0 = VecBuilder.fill(1, 1);
 
@@ -36,7 +36,7 @@ public class DiscretizationTest {
   // Check that for a simple second-order system that we can easily analyze
   // analytically,
   @Test
-  public void testDiscretizeAB() {
+  void testDiscretizeAB() {
     final var contA = new MatBuilder<>(Nat.N2(), Nat.N2()).fill(0, 1, 0, 0);
     final var contB = new MatBuilder<>(Nat.N2(), Nat.N1()).fill(0, 1);
 
@@ -58,16 +58,19 @@ public class DiscretizationTest {
     assertEquals(x1Truth, x1Discrete);
   }
 
-  //                                             dt
-  // Test that the discrete approximation of Q ≈ ∫ e^(Aτ) Q e^(Aᵀτ) dτ
-  //                                             0
+  //                                               T
+  // Test that the discrete approximation of Q_d ≈ ∫ e^(Aτ) Q e^(Aᵀτ) dτ
+  //                                               0
   @Test
-  public void testDiscretizeSlowModelAQ() {
+  void testDiscretizeSlowModelAQ() {
     final var contA = new MatBuilder<>(Nat.N2(), Nat.N2()).fill(0, 1, 0, 0);
     final var contQ = new MatBuilder<>(Nat.N2(), Nat.N2()).fill(1, 0, 0, 1);
 
     final double dt = 1.0;
 
+    //       T
+    // Q_d = ∫ e^(Aτ) Q e^(Aᵀτ) dτ
+    //       0
     final var discQIntegrated =
         RungeKuttaTimeVarying.rungeKuttaTimeVarying(
             (Double t, Matrix<N2, N2> x) ->
@@ -87,16 +90,19 @@ public class DiscretizationTest {
             + discQIntegrated);
   }
 
-  //                                             dt
-  // Test that the discrete approximation of Q ≈ ∫ e^(Aτ) Q e^(Aᵀτ) dτ
-  //                                             0
+  //                                               T
+  // Test that the discrete approximation of Q_d ≈ ∫ e^(Aτ) Q e^(Aᵀτ) dτ
+  //                                               0
   @Test
-  public void testDiscretizeFastModelAQ() {
+  void testDiscretizeFastModelAQ() {
     final var contA = new MatBuilder<>(Nat.N2(), Nat.N2()).fill(0, 1, 0, -1406.29);
     final var contQ = new MatBuilder<>(Nat.N2(), Nat.N2()).fill(0.0025, 0, 0, 1);
 
     final var dt = 0.005;
 
+    //       T
+    // Q_d = ∫ e^(Aτ) Q e^(Aᵀτ) dτ
+    //       0
     final var discQIntegrated =
         RungeKuttaTimeVarying.rungeKuttaTimeVarying(
             (Double t, Matrix<N2, N2> x) ->
@@ -118,7 +124,7 @@ public class DiscretizationTest {
 
   // Test that the Taylor series discretization produces nearly identical results.
   @Test
-  public void testDiscretizeSlowModelAQTaylor() {
+  void testDiscretizeSlowModelAQTaylor() {
     final var contA = new MatBuilder<>(Nat.N2(), Nat.N2()).fill(0, 1, 0, 0);
     final var contQ = new MatBuilder<>(Nat.N2(), Nat.N2()).fill(1, 0, 0, 1);
 
@@ -130,6 +136,9 @@ public class DiscretizationTest {
       assertTrue(esCont.getEigenvalue(i).real >= 0);
     }
 
+    //       T
+    // Q_d = ∫ e^(Aτ) Q e^(Aᵀτ) dτ
+    //       0
     final var discQIntegrated =
         RungeKuttaTimeVarying.rungeKuttaTimeVarying(
             (Double t, Matrix<N2, N2> x) ->
@@ -161,7 +170,7 @@ public class DiscretizationTest {
 
   // Test that the Taylor series discretization produces nearly identical results.
   @Test
-  public void testDiscretizeFastModelAQTaylor() {
+  void testDiscretizeFastModelAQTaylor() {
     final var contA = new MatBuilder<>(Nat.N2(), Nat.N2()).fill(0, 1, 0, -1500);
     final var contQ = new MatBuilder<>(Nat.N2(), Nat.N2()).fill(0.0025, 0, 0, 1);
 
@@ -173,6 +182,9 @@ public class DiscretizationTest {
       assertTrue(esCont.getEigenvalue(i).real >= 0);
     }
 
+    //       T
+    // Q_d = ∫ e^(Aτ) Q e^(Aᵀτ) dτ
+    //       0
     final var discQIntegrated =
         RungeKuttaTimeVarying.rungeKuttaTimeVarying(
             (Double t, Matrix<N2, N2> x) ->
@@ -204,7 +216,7 @@ public class DiscretizationTest {
 
   // Test that DiscretizeR() works
   @Test
-  public void testDiscretizeR() {
+  void testDiscretizeR() {
     var contR = Matrix.mat(Nat.N2(), Nat.N2()).fill(2.0, 0.0, 0.0, 1.0);
     var discRTruth = Matrix.mat(Nat.N2(), Nat.N2()).fill(4.0, 0.0, 0.0, 2.0);
 

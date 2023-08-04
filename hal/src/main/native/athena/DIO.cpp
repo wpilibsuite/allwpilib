@@ -133,8 +133,9 @@ HAL_Bool HAL_CheckDIOChannel(int32_t channel) {
 void HAL_FreeDIOPort(HAL_DigitalHandle dioPortHandle) {
   auto port = digitalChannelHandles->Get(dioPortHandle, HAL_HandleEnum::DIO);
   // no status, so no need to check for a proper free.
-  if (port == nullptr)
+  if (port == nullptr) {
     return;
+  }
   digitalChannelHandles->Free(dioPortHandle, HAL_HandleEnum::DIO);
 
   // Wait for no other object to hold this handle.
@@ -199,8 +200,7 @@ void HAL_SetDigitalPWMRate(double rate, int32_t* status) {
   if (*status != 0) {
     return;
   }
-  uint16_t pwmPeriodPower =
-      std::lround(std::log(1.0 / (16 * 1.0E-6 * rate)) / std::log(2.0));
+  uint16_t pwmPeriodPower = std::lround(std::log2(1.0 / (16 * 1.0E-6 * rate)));
   digitalSystem->writePWMPeriodPower(pwmPeriodPower, status);
 }
 
@@ -230,12 +230,38 @@ void HAL_SetDigitalPWMDutyCycle(HAL_DigitalPWMHandle pwmGenerator,
       // frequencies.
       rawDutyCycle = rawDutyCycle / std::pow(2.0, 4 - pwmPeriodPower);
     }
-    if (id < 4)
+    if (id < 4) {
       digitalSystem->writePWMDutyCycleA(id, static_cast<uint8_t>(rawDutyCycle),
                                         status);
-    else
+    } else {
       digitalSystem->writePWMDutyCycleB(
           id - 4, static_cast<uint8_t>(rawDutyCycle), status);
+    }
+  }
+}
+
+void HAL_SetDigitalPWMPPS(HAL_DigitalPWMHandle pwmGenerator, double dutyCycle,
+                          int32_t* status) {
+  auto port = digitalPWMHandles->Get(pwmGenerator);
+  if (port == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+  int32_t id = *port;
+  digitalSystem->writePWMPeriodPower(0xffff, status);
+  double rawDutyCycle = 31.0 * dutyCycle;
+  if (rawDutyCycle > 30.5) {
+    rawDutyCycle = 30.5;
+  }
+  {
+    std::scoped_lock lock(digitalPwmMutex);
+    if (id < 4) {
+      digitalSystem->writePWMDutyCycleA(id, static_cast<uint8_t>(rawDutyCycle),
+                                        status);
+    } else {
+      digitalSystem->writePWMDutyCycleB(
+          id - 4, static_cast<uint8_t>(rawDutyCycle), status);
+    }
   }
 }
 
@@ -407,13 +433,24 @@ HAL_Bool HAL_GetDIODirection(HAL_DigitalHandle dioPortHandle, int32_t* status) {
   }
 }
 
-void HAL_Pulse(HAL_DigitalHandle dioPortHandle, double pulseLength,
+void HAL_Pulse(HAL_DigitalHandle dioPortHandle, double pulseLengthSeconds,
                int32_t* status) {
   auto port = digitalChannelHandles->Get(dioPortHandle, HAL_HandleEnum::DIO);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
   }
+
+  uint32_t pulseLengthMicroseconds =
+      static_cast<uint32_t>(pulseLengthSeconds * 1e6);
+
+  if (pulseLengthMicroseconds <= 0 || pulseLengthMicroseconds > 0xFFFF) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    hal::SetLastError(status,
+                      "Length must be between 1 and 65535 microseconds");
+    return;
+  }
+
   tDIO::tPulse pulse;
 
   if (port->channel >= kNumDigitalHeaders + kNumDigitalMXPChannels) {
@@ -425,9 +462,29 @@ void HAL_Pulse(HAL_DigitalHandle dioPortHandle, double pulseLength,
   }
 
   digitalSystem->writePulseLength(
-      static_cast<uint16_t>(1.0e9 * pulseLength /
-                            (pwmSystem->readLoopTiming(status) * 25)),
-      status);
+      static_cast<uint16_t>(pulseLengthMicroseconds), status);
+  digitalSystem->writePulse(pulse, status);
+}
+
+void HAL_PulseMultiple(uint32_t channelMask, double pulseLengthSeconds,
+                       int32_t* status) {
+  uint32_t pulseLengthMicroseconds =
+      static_cast<uint32_t>(pulseLengthSeconds * 1e6);
+
+  if (pulseLengthMicroseconds <= 0 || pulseLengthMicroseconds > 0xFFFF) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    hal::SetLastError(status,
+                      "Length must be between 1 and 65535 microseconds");
+    return;
+  }
+
+  tDIO::tPulse pulse;
+  pulse.Headers = channelMask & 0x2FF;
+  pulse.MXP = (channelMask & 0xFFFF) >> 10;
+  pulse.SPIPort = (channelMask & 0x1F) >> 26;
+
+  digitalSystem->writePulseLength(
+      static_cast<uint16_t>(pulseLengthMicroseconds), status);
   digitalSystem->writePulse(pulse, status);
 }
 

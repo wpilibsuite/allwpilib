@@ -9,8 +9,6 @@
 #include "hal/simulation/SimDataValue.h"
 
 namespace hal {
-constexpr int32_t kNumPDSimModules = hal::kNumREVPDHModules;
-constexpr int32_t kNumPDSimChannels = hal::kNumREVPDHChannels;
 
 class PowerDistributionData {
   HAL_SIMDATAVALUE_DEFINE_NAME(Initialized)

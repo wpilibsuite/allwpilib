@@ -4,11 +4,14 @@
 
 #include <jni.h>
 
+#include <wpi/jni_util.h>
+
 #include "CallbackStore.h"
 #include "edu_wpi_first_hal_simulation_RoboRioDataJNI.h"
 #include "hal/simulation/RoboRioData.h"
 
 using namespace hal;
+using namespace wpi::java;
 
 extern "C" {
 
@@ -772,6 +775,112 @@ Java_edu_wpi_first_hal_simulation_RoboRioDataJNI_setUserFaults3V3
   (JNIEnv*, jclass, jint value)
 {
   HALSIM_SetRoboRioUserFaults3V3(value);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_RoboRioDataJNI
+ * Method:    registerBrownoutVoltageCallback
+ * Signature: (Ljava/lang/Object;Z)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_simulation_RoboRioDataJNI_registerBrownoutVoltageCallback
+  (JNIEnv* env, jclass, jobject callback, jboolean initialNotify)
+{
+  return sim::AllocateCallbackNoIndex(
+      env, callback, initialNotify,
+      &HALSIM_RegisterRoboRioBrownoutVoltageCallback);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_RoboRioDataJNI
+ * Method:    cancelBrownoutVoltageCallback
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_RoboRioDataJNI_cancelBrownoutVoltageCallback
+  (JNIEnv* env, jclass, jint handle)
+{
+  return sim::FreeCallbackNoIndex(env, handle,
+                                  &HALSIM_CancelRoboRioBrownoutVoltageCallback);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_RoboRioDataJNI
+ * Method:    getBrownoutVoltage
+ * Signature: ()D
+ */
+JNIEXPORT jdouble JNICALL
+Java_edu_wpi_first_hal_simulation_RoboRioDataJNI_getBrownoutVoltage
+  (JNIEnv*, jclass)
+{
+  return HALSIM_GetRoboRioBrownoutVoltage();
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_RoboRioDataJNI
+ * Method:    setBrownoutVoltage
+ * Signature: (D)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_RoboRioDataJNI_setBrownoutVoltage
+  (JNIEnv*, jclass, jdouble value)
+{
+  HALSIM_SetRoboRioBrownoutVoltage(value);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_RoboRioDataJNI
+ * Method:    getSerialNumber
+ * Signature: ()Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL
+Java_edu_wpi_first_hal_simulation_RoboRioDataJNI_getSerialNumber
+  (JNIEnv* env, jclass)
+{
+  char serialNum[9];
+  size_t len = HALSIM_GetRoboRioSerialNumber(serialNum, sizeof(serialNum));
+  return MakeJString(env, std::string_view(serialNum, len));
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_RoboRioDataJNI
+ * Method:    setSerialNumber
+ * Signature: (Ljava/lang/String;)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_RoboRioDataJNI_setSerialNumber
+  (JNIEnv* env, jclass, jstring serialNumber)
+{
+  JStringRef serialNumberJString{env, serialNumber};
+  HALSIM_SetRoboRioSerialNumber(serialNumberJString.c_str(),
+                                serialNumberJString.size());
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_RoboRioDataJNI
+ * Method:    getComments
+ * Signature: ()Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL
+Java_edu_wpi_first_hal_simulation_RoboRioDataJNI_getComments
+  (JNIEnv* env, jclass)
+{
+  char comments[65];
+  size_t len = HALSIM_GetRoboRioComments(comments, sizeof(comments));
+  return MakeJString(env, std::string_view(comments, len));
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_RoboRioDataJNI
+ * Method:    setComments
+ * Signature: (Ljava/lang/String;)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_RoboRioDataJNI_setComments
+  (JNIEnv* env, jclass, jstring comments)
+{
+  JStringRef commentsJString{env, comments};
+  HALSIM_SetRoboRioComments(commentsJString.c_str(), commentsJString.size());
 }
 
 /*

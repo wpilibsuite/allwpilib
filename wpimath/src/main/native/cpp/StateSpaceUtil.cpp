@@ -6,33 +6,31 @@
 
 namespace frc {
 
-Eigen::Vector<double, 3> PoseTo3dVector(const Pose2d& pose) {
-  return Eigen::Vector<double, 3>{pose.Translation().X().to<double>(),
-                                  pose.Translation().Y().to<double>(),
-                                  pose.Rotation().Radians().to<double>()};
+Vectord<3> PoseTo3dVector(const Pose2d& pose) {
+  return Vectord<3>{pose.Translation().X().value(),
+                    pose.Translation().Y().value(),
+                    pose.Rotation().Radians().value()};
 }
 
-Eigen::Vector<double, 4> PoseTo4dVector(const Pose2d& pose) {
-  return Eigen::Vector<double, 4>{pose.Translation().X().to<double>(),
-                                  pose.Translation().Y().to<double>(),
-                                  pose.Rotation().Cos(), pose.Rotation().Sin()};
+Vectord<4> PoseTo4dVector(const Pose2d& pose) {
+  return Vectord<4>{pose.Translation().X().value(),
+                    pose.Translation().Y().value(), pose.Rotation().Cos(),
+                    pose.Rotation().Sin()};
 }
 
 template <>
-bool IsStabilizable<1, 1>(const Eigen::Matrix<double, 1, 1>& A,
-                          const Eigen::Matrix<double, 1, 1>& B) {
+bool IsStabilizable<1, 1>(const Matrixd<1, 1>& A, const Matrixd<1, 1>& B) {
   return detail::IsStabilizableImpl<1, 1>(A, B);
 }
 
 template <>
-bool IsStabilizable<2, 1>(const Eigen::Matrix<double, 2, 2>& A,
-                          const Eigen::Matrix<double, 2, 1>& B) {
+bool IsStabilizable<2, 1>(const Matrixd<2, 2>& A, const Matrixd<2, 1>& B) {
   return detail::IsStabilizableImpl<2, 1>(A, B);
 }
 
-Eigen::Vector<double, 3> PoseToVector(const Pose2d& pose) {
-  return Eigen::Vector<double, 3>{pose.X().to<double>(), pose.Y().to<double>(),
-                                  pose.Rotation().Radians().to<double>()};
+Vectord<3> PoseToVector(const Pose2d& pose) {
+  return Vectord<3>{pose.X().value(), pose.Y().value(),
+                    pose.Rotation().Radians().value()};
 }
 
 }  // namespace frc

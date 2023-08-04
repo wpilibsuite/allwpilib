@@ -39,10 +39,10 @@ Ultrasonic::Ultrasonic(DigitalOutput* pingChannel, DigitalInput* echoChannel)
       m_echoChannel(echoChannel, wpi::NullDeleter<DigitalInput>()),
       m_counter(m_echoChannel) {
   if (!pingChannel) {
-    throw FRC_MakeError(err::NullParameter, "{}", "pingChannel");
+    throw FRC_MakeError(err::NullParameter, "pingChannel");
   }
   if (!echoChannel) {
-    throw FRC_MakeError(err::NullParameter, "{}", "echoChannel");
+    throw FRC_MakeError(err::NullParameter, "echoChannel");
   }
   Initialize();
 }
@@ -85,10 +85,7 @@ int Ultrasonic::GetEchoChannel() const {
 }
 
 void Ultrasonic::Ping() {
-  if (m_automaticEnabled) {
-    throw FRC_MakeError(err::IncompatibleMode, "{}",
-                        "cannot call Ping() in automatic mode");
-  }
+  SetAutomaticMode(false);  // turn off automatic round-robin if pinging
 
   // Reset the counter to zero (invalid data now)
   m_counter.Reset();
@@ -120,11 +117,6 @@ void Ultrasonic::SetAutomaticMode(bool enabling) {
     }
 
     m_thread = std::thread(&Ultrasonic::UltrasonicChecker);
-
-    // TODO: Currently, lvuser does not have permissions to set task priorities.
-    // Until that is the case, uncommenting this will break user code that calls
-    // Ultrasonic::SetAutomicMode().
-    // m_task.SetPriority(kPriority);
   } else {
     // Wait for background task to stop running
     if (m_thread.joinable()) {
@@ -143,7 +135,7 @@ void Ultrasonic::SetAutomaticMode(bool enabling) {
 units::meter_t Ultrasonic::GetRange() const {
   if (IsRangeValid()) {
     if (m_simRange) {
-      return units::meter_t{m_simRange.Get()};
+      return units::inch_t{m_simRange.Get()};
     }
     return m_counter.GetPeriod() * kSpeedOfSound / 2.0;
   } else {
@@ -162,7 +154,8 @@ void Ultrasonic::SetEnabled(bool enable) {
 void Ultrasonic::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Ultrasonic");
   builder.AddDoubleProperty(
-      "Value", [=] { return units::inch_t{GetRange()}.to<double>(); }, nullptr);
+      "Value", [=, this] { return units::inch_t{GetRange()}.value(); },
+      nullptr);
 }
 
 void Ultrasonic::Initialize() {

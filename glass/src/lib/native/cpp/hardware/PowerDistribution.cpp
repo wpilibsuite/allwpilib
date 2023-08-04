@@ -11,7 +11,7 @@
 
 #include "glass/Context.h"
 #include "glass/DataSource.h"
-#include "glass/support/IniSaverInfo.h"
+#include "glass/support/NameSetting.h"
 
 using namespace glass;
 
@@ -19,16 +19,16 @@ static float DisplayChannel(PowerDistributionModel& pdp, int channel) {
   float width = 0;
   if (auto currentData = pdp.GetCurrentData(channel)) {
     ImGui::PushID(channel);
-    auto& leftInfo = currentData->GetNameInfo();
+    NameSetting leftName{currentData->GetName()};
     char name[64];
-    leftInfo.GetLabel(name, sizeof(name), "", channel);
+    leftName.GetLabel(name, sizeof(name), "", channel);
     double val = currentData->GetValue();
     ImGui::SetNextItemWidth(ImGui::GetFontSize() * 4);
     if (currentData->InputDouble(name, &val, 0, 0, "%.3f")) {
       pdp.SetCurrent(channel, val);
     }
     width = ImGui::GetItemRectSize().x;
-    leftInfo.PopupEditName(channel);
+    leftName.PopupEditName(channel);
     ImGui::PopID();
   }
   return width;

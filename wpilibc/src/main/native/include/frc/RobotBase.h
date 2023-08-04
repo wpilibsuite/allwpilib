@@ -11,7 +11,6 @@
 #include <hal/HALBase.h>
 #include <hal/Main.h>
 #include <wpi/condition_variable.h>
-#include <wpi/deprecated.h>
 #include <wpi/mutex.h>
 
 #include "frc/Errors.h"
@@ -22,6 +21,9 @@ namespace frc {
 int RunHALInitialization();
 
 namespace impl {
+#ifndef __FRC_ROBORIO__
+void ResetMotorSafety();
+#endif
 
 template <class Robot>
 void RunRobot(wpi::mutex& m, Robot** robot) {
@@ -35,7 +37,7 @@ void RunRobot(wpi::mutex& m, Robot** robot) {
   } catch (const frc::RuntimeError& e) {
     e.Report();
     FRC_ReportError(
-        err::Error, "{}",
+        err::Error,
         "The robot program quit unexpectedly."
         " This is usually due to a code error.\n"
         "  The above stacktrace can help determine where the error occurred.\n"
@@ -104,34 +106,37 @@ int StartRobot() {
     impl::RunRobot<Robot>(m, &robot);
   }
 
+#ifndef __FRC_ROBORIO__
+  frc::impl::ResetMotorSafety();
+#endif
   HAL_Shutdown();
 
   return 0;
 }
 
 /**
- * Implement a Robot Program framework.
+ * Implement a Robot Program framework. The RobotBase class is intended to be
+ * subclassed to create a robot program. The user must implement
+ * StartCompetition() which will be called once and is not expected to exit. The
+ * user must also implement EndCompetition(), which signals to the code in
+ * StartCompetition() that it should exit.
  *
- * The RobotBase class is intended to be subclassed by a user creating a robot
- * program. Overridden Autonomous() and OperatorControl() methods are called at
- * the appropriate time as the match proceeds. In the current implementation,
- * the Autonomous code will run to completion before the OperatorControl code
- * could start. In the future the Autonomous code might be spawned as a task,
- * then killed at the end of the Autonomous period.
+ * It is not recommended to subclass this class directly - instead subclass
+ * IterativeRobotBase or TimedRobot.
  */
 class RobotBase {
  public:
   /**
    * Determine if the Robot is currently enabled.
    *
-   * @return True if the Robot is currently enabled by the field controls.
+   * @return True if the Robot is currently enabled by the Driver Station.
    */
   bool IsEnabled() const;
 
   /**
    * Determine if the Robot is currently disabled.
    *
-   * @return True if the Robot is currently disabled by the field controls.
+   * @return True if the Robot is currently disabled by the Driver Station.
    */
   bool IsDisabled() const;
 
@@ -139,7 +144,7 @@ class RobotBase {
    * Determine if the robot is currently in Autonomous mode.
    *
    * @return True if the robot is currently operating Autonomously as determined
-   *         by the field controls.
+   *         by the Driver Station.
    */
   bool IsAutonomous() const;
 
@@ -147,7 +152,7 @@ class RobotBase {
    * Determine if the robot is currently in Autonomous mode and enabled.
    *
    * @return True if the robot us currently operating Autonomously while enabled
-   * as determined by the field controls.
+   * as determined by the Driver Station.
    */
   bool IsAutonomousEnabled() const;
 
@@ -155,17 +160,7 @@ class RobotBase {
    * Determine if the robot is currently in Operator Control mode.
    *
    * @return True if the robot is currently operating in Tele-Op mode as
-   *         determined by the field controls.
-   * @deprecated Use IsTeleop() instead.
-   */
-  WPI_DEPRECATED("Use IsTeleop() instead")
-  bool IsOperatorControl() const;
-
-  /**
-   * Determine if the robot is currently in Operator Control mode.
-   *
-   * @return True if the robot is currently operating in Tele-Op mode as
-   *         determined by the field controls.
+   *         determined by the Driver Station.
    */
   bool IsTeleop() const;
 
@@ -173,43 +168,38 @@ class RobotBase {
    * Determine if the robot is current in Operator Control mode and enabled.
    *
    * @return True if the robot is currently operating in Tele-Op mode while
-   *         enabled as determined by the field-controls.
-   * @deprecated Use IsTeleopEnabled() instead.
-   */
-  WPI_DEPRECATED("Use IsTeleopEnabled() instead")
-  bool IsOperatorControlEnabled() const;
-
-  /**
-   * Determine if the robot is current in Operator Control mode and enabled.
-   *
-   * @return True if the robot is currently operating in Tele-Op mode while
-   * wnabled as determined by the field-controls.
+   * enabled as determined by the Driver Station.
    */
   bool IsTeleopEnabled() const;
 
   /**
    * Determine if the robot is currently in Test mode.
    *
-   * @return True if the robot is currently running tests as determined by the
-   *         field controls.
+   * @return True if the robot is currently running in Test mode as determined
+   * by the Driver Station.
    */
   bool IsTest() const;
 
   /**
-   * Indicates if new data is available from the driver station.
+   * Determine if the robot is current in Test mode and enabled.
    *
-   * @return Has new data arrived over the network since the last time this
-   *         function was called?
+   * @return True if the robot is currently operating in Test mode while
+   * enabled as determined by the Driver Station.
    */
-  bool IsNewDataAvailable() const;
+  bool IsTestEnabled() const;
 
   /**
    * Gets the ID of the main robot thread.
    */
   static std::thread::id GetThreadId();
 
+  /**
+   * Start the main robot code. This function will be called once and should not
+   * exit until signalled by EndCompetition()
+   */
   virtual void StartCompetition() = 0;
 
+  /** Ends the main loop in StartCompetition(). */
   virtual void EndCompetition() = 0;
 
   /**
@@ -242,7 +232,7 @@ class RobotBase {
   /**
    * Constructor for a generic robot program.
    *
-   * User code should be placed in the constructor that runs before the
+   * User code can be placed in the constructor that runs before the
    * Autonomous or Operator Control period starts. The constructor will run to
    * completion before Autonomous is entered.
    *

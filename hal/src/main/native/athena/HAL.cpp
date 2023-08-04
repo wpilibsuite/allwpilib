@@ -18,9 +18,14 @@
 #include <FRC_NetworkCommunication/LoadOut.h>
 #include <FRC_NetworkCommunication/UsageReporting.h>
 #include <fmt/format.h>
+#include <wpi/MemoryBuffer.h>
+#include <wpi/SmallString.h>
+#include <wpi/StringExtras.h>
+#include <wpi/fs.h>
 #include <wpi/mutex.h>
 #include <wpi/timestamp.h>
 
+#include "FPGACalls.h"
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "hal/ChipObject.h"
@@ -28,19 +33,28 @@
 #include "hal/Errors.h"
 #include "hal/Notifier.h"
 #include "hal/handles/HandlesInternal.h"
+#include "hal/roborio/InterruptManager.h"
 #include "visa/visa.h"
 
 using namespace hal;
 
 static std::unique_ptr<tGlobal> global;
 static std::unique_ptr<tSysWatchdog> watchdog;
+static uint64_t dsStartTime;
+
+static char roboRioCommentsString[64];
+static size_t roboRioCommentsStringSize;
+static bool roboRioCommentsStringInitialized;
 
 using namespace hal;
 
 namespace hal {
+void InitializeDriverStation();
+void WaitForInitialPacket();
 namespace init {
 void InitializeHAL() {
   InitializeCTREPCM();
+  InitializeREVPH();
   InitializeAddressableLED();
   InitializeAccelerometer();
   InitializeAnalogAccumulator();
@@ -77,6 +91,7 @@ void InitializeHAL() {
 }  // namespace init
 
 void ReleaseFPGAInterrupt(int32_t interruptNumber) {
+  hal::init::CheckInit();
   if (!global) {
     return;
   }
@@ -85,6 +100,11 @@ void ReleaseFPGAInterrupt(int32_t interruptNumber) {
                                     &status);
   global->strobeInterruptForceOnce(&status);
 }
+
+uint64_t GetDSInitializeTime() {
+  return dsStartTime;
+}
+
 }  // namespace hal
 
 extern "C" {
@@ -226,20 +246,21 @@ const char* HAL_GetErrorMessage(int32_t code) {
       return HAL_INVALID_DMA_ADDITION_MESSAGE;
     case HAL_USE_LAST_ERROR:
       return HAL_USE_LAST_ERROR_MESSAGE;
+    case HAL_CONSOLE_OUT_ENABLED_ERROR:
+      return HAL_CONSOLE_OUT_ENABLED_ERROR_MESSAGE;
     default:
       return "Unknown error status";
   }
 }
 
+static HAL_RuntimeType runtimeType = HAL_Runtime_RoboRIO;
+
 HAL_RuntimeType HAL_GetRuntimeType(void) {
-  nLoadOut::tTargetClass targetClass = nLoadOut::getTargetClass();
-  if (targetClass == nLoadOut::kTargetClass_RoboRIO2) {
-    return HAL_Runtime_RoboRIO2;
-  }
-  return HAL_Runtime_RoboRIO;
+  return runtimeType;
 }
 
 int32_t HAL_GetFPGAVersion(int32_t* status) {
+  hal::init::CheckInit();
   if (!global) {
     *status = NiFpga_Status_ResourceNotInitialized;
     return 0;
@@ -248,6 +269,7 @@ int32_t HAL_GetFPGAVersion(int32_t* status) {
 }
 
 int64_t HAL_GetFPGARevision(int32_t* status) {
+  hal::init::CheckInit();
   if (!global) {
     *status = NiFpga_Status_ResourceNotInitialized;
     return 0;
@@ -255,7 +277,80 @@ int64_t HAL_GetFPGARevision(int32_t* status) {
   return global->readRevision(status);
 }
 
+size_t HAL_GetSerialNumber(char* buffer, size_t size) {
+  const char* serialNum = std::getenv("serialnum");
+  if (serialNum) {
+    std::strncpy(buffer, serialNum, size);
+    buffer[size - 1] = '\0';
+    return std::strlen(buffer);
+  } else {
+    if (size > 0) {
+      buffer[0] = '\0';
+    }
+    return 0;
+  }
+}
+
+void InitializeRoboRioComments(void) {
+  if (!roboRioCommentsStringInitialized) {
+    std::error_code ec;
+    std::unique_ptr<wpi::MemoryBuffer> fileBuffer =
+        wpi::MemoryBuffer::GetFile("/etc/machine-info", ec);
+
+    std::string_view fileContents;
+    if (fileBuffer && !ec) {
+      fileContents =
+          std::string_view(reinterpret_cast<const char*>(fileBuffer->begin()),
+                           fileBuffer->size());
+    } else {
+      roboRioCommentsStringSize = 0;
+      roboRioCommentsStringInitialized = true;
+      return;
+    }
+    std::string_view searchString = "PRETTY_HOSTNAME=\"";
+
+    size_t start = fileContents.find(searchString);
+    if (start == std::string_view::npos) {
+      roboRioCommentsStringSize = 0;
+      roboRioCommentsStringInitialized = true;
+      return;
+    }
+    start += searchString.size();
+    std::string_view escapedComments =
+        wpi::slice(fileContents, start, fileContents.size());
+    wpi::SmallString<64> buf;
+    auto [unescapedComments, rem] = wpi::UnescapeCString(escapedComments, buf);
+    unescapedComments.copy(roboRioCommentsString,
+                           sizeof(roboRioCommentsString));
+
+    if (unescapedComments.size() > sizeof(roboRioCommentsString)) {
+      roboRioCommentsStringSize = sizeof(roboRioCommentsString);
+    } else {
+      roboRioCommentsStringSize = unescapedComments.size();
+    }
+    roboRioCommentsStringInitialized = true;
+  }
+}
+
+size_t HAL_GetComments(char* buffer, size_t size) {
+  if (!roboRioCommentsStringInitialized) {
+    InitializeRoboRioComments();
+  }
+  size_t toCopy = size;
+  if (size > roboRioCommentsStringSize) {
+    toCopy = roboRioCommentsStringSize;
+  }
+  std::memcpy(buffer, roboRioCommentsString, toCopy);
+  if (toCopy < size) {
+    buffer[toCopy] = '\0';
+  } else {
+    buffer[toCopy - 1] = '\0';
+  }
+  return toCopy;
+}
+
 uint64_t HAL_GetFPGATime(int32_t* status) {
+  hal::init::CheckInit();
   if (!global) {
     *status = NiFpga_Status_ResourceNotInitialized;
     return 0;
@@ -277,10 +372,10 @@ uint64_t HAL_GetFPGATime(int32_t* status) {
   return (upper2 << 32) + lower;
 }
 
-uint64_t HAL_ExpandFPGATime(uint32_t unexpanded_lower, int32_t* status) {
+uint64_t HAL_ExpandFPGATime(uint32_t unexpandedLower, int32_t* status) {
   // Capture the current FPGA time.  This will give us the upper half of the
   // clock.
-  uint64_t fpga_time = HAL_GetFPGATime(status);
+  uint64_t fpgaTime = HAL_GetFPGATime(status);
   if (*status != 0) {
     return 0;
   }
@@ -290,18 +385,19 @@ uint64_t HAL_ExpandFPGATime(uint32_t unexpanded_lower, int32_t* status) {
   // be.
 
   // Break it into lower and upper portions.
-  uint32_t lower = fpga_time & 0xffffffffull;
-  uint64_t upper = (fpga_time >> 32) & 0xffffffff;
+  uint32_t lower = fpgaTime & 0xffffffffull;
+  uint64_t upper = (fpgaTime >> 32) & 0xffffffff;
 
   // The time was sampled *before* the current time, so roll it back.
-  if (lower < unexpanded_lower) {
+  if (lower < unexpandedLower) {
     --upper;
   }
 
-  return (upper << 32) + static_cast<uint64_t>(unexpanded_lower);
+  return (upper << 32) + static_cast<uint64_t>(unexpandedLower);
 }
 
 HAL_Bool HAL_GetFPGAButton(int32_t* status) {
+  hal::init::CheckInit();
   if (!global) {
     *status = NiFpga_Status_ResourceNotInitialized;
     return false;
@@ -310,6 +406,7 @@ HAL_Bool HAL_GetFPGAButton(int32_t* status) {
 }
 
 HAL_Bool HAL_GetSystemActive(int32_t* status) {
+  hal::init::CheckInit();
   if (!watchdog) {
     *status = NiFpga_Status_ResourceNotInitialized;
     return false;
@@ -318,11 +415,21 @@ HAL_Bool HAL_GetSystemActive(int32_t* status) {
 }
 
 HAL_Bool HAL_GetBrownedOut(int32_t* status) {
+  hal::init::CheckInit();
   if (!watchdog) {
     *status = NiFpga_Status_ResourceNotInitialized;
     return false;
   }
   return !(watchdog->readStatus_PowerAlive(status));
+}
+
+HAL_Bool HAL_GetRSLState(int32_t* status) {
+  hal::init::CheckInit();
+  if (!global) {
+    *status = NiFpga_Status_ResourceNotInitialized;
+    return false;
+  }
+  return global->readLEDs_RSL(status);
 }
 
 static bool killExistingProgram(int timeout, int mode) {
@@ -383,6 +490,11 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
     return true;
   }
 
+  int fpgaInit = hal::init::InitializeFPGA();
+  if (fpgaInit != HAL_SUCCESS) {
+    return false;
+  }
+
   hal::init::InitializeHAL();
 
   hal::init::HAL_IsInitialized.store(true);
@@ -404,8 +516,9 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
     setNewDataSem(nullptr);
   });
 
-  nFPGA::nRoboRIO_FPGANamespace::g_currentTargetClass =
-      nLoadOut::getTargetClass();
+  // Setup WPI_Now to use FPGA timestamp
+  // this also sets nFPGA::nRoboRIO_FPGANamespace::g_currentTargetClass
+  wpi::impl::SetupNowRio();
 
   int32_t status = 0;
   global.reset(tGlobal::create(&status));
@@ -415,22 +528,23 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
     return false;
   }
 
-  HAL_InitializeDriverStation();
+  nLoadOut::tTargetClass targetClass = nLoadOut::getTargetClass();
+  if (targetClass == nLoadOut::kTargetClass_RoboRIO2) {
+    runtimeType = HAL_Runtime_RoboRIO2;
+  } else {
+    runtimeType = HAL_Runtime_RoboRIO;
+  }
 
-  // Set WPI_Now to use FPGA timestamp
-  wpi::SetNowImpl([]() -> uint64_t {
-    int32_t status = 0;
-    uint64_t rv = HAL_GetFPGATime(&status);
-    if (status != 0) {
-      fmt::print(stderr,
-                 "Call to HAL_GetFPGATime failed in wpi::Now() with status {}. "
-                 "Initialization might have failed. Time will not be correct\n",
-                 status);
-      std::fflush(stderr);
-      return 0u;
-    }
-    return rv;
-  });
+  InterruptManager::Initialize(global->getSystemInterface());
+
+  hal::InitializeDriverStation();
+
+  dsStartTime = HAL_GetFPGATime(&status);
+  if (status != 0) {
+    return false;
+  }
+
+  hal::WaitForInitialPacket();
 
   initialized = true;
   return true;

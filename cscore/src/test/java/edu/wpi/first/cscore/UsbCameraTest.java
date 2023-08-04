@@ -21,10 +21,10 @@ import org.junit.jupiter.api.condition.OS;
 class UsbCameraTest {
   @Nested
   @EnabledOnOs(OS.LINUX)
-  class ConnectVerbose {
+  static class ConnectVerbose {
     @Test
     void setConnectVerboseEnabledTest() {
-      try (UsbCamera camera = new UsbCamera("Nonexistant Camera", getNonexistentCameraDev())) {
+      try (UsbCamera camera = new UsbCamera("Nonexistent Camera", getNonexistentCameraDev())) {
         camera.setConnectVerbose(1);
 
         CompletableFuture<String> result = new CompletableFuture<>();
@@ -38,7 +38,7 @@ class UsbCameraTest {
 
     @Test
     void setConnectVerboseDisabledTest() {
-      try (UsbCamera camera = new UsbCamera("Nonexistant Camera", getNonexistentCameraDev())) {
+      try (UsbCamera camera = new UsbCamera("Nonexistent Camera", getNonexistentCameraDev())) {
         camera.setConnectVerbose(0);
 
         CompletableFuture<String> result = new CompletableFuture<>();

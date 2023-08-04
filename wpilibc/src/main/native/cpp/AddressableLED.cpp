@@ -51,9 +51,9 @@ void AddressableLED::SetLength(int length) {
 static_assert(sizeof(AddressableLED::LEDData) == sizeof(HAL_AddressableLEDData),
               "LED Structs MUST be the same size");
 
-void AddressableLED::SetData(wpi::span<const LEDData> ledData) {
+void AddressableLED::SetData(std::span<const LEDData> ledData) {
   int32_t status = 0;
-  HAL_WriteAddressableLEDData(m_handle, ledData.begin(), ledData.size(),
+  HAL_WriteAddressableLEDData(m_handle, ledData.data(), ledData.size(),
                               &status);
   FRC_CheckErrorStatus(status, "Port {}", m_port);
 }
@@ -65,14 +65,14 @@ void AddressableLED::SetData(std::initializer_list<LEDData> ledData) {
   FRC_CheckErrorStatus(status, "Port {}", m_port);
 }
 
-void AddressableLED::SetBitTiming(units::nanosecond_t lowTime0,
-                                  units::nanosecond_t highTime0,
-                                  units::nanosecond_t lowTime1,
-                                  units::nanosecond_t highTime1) {
+void AddressableLED::SetBitTiming(units::nanosecond_t highTime0,
+                                  units::nanosecond_t lowTime0,
+                                  units::nanosecond_t highTime1,
+                                  units::nanosecond_t lowTime1) {
   int32_t status = 0;
   HAL_SetAddressableLEDBitTiming(
-      m_handle, lowTime0.to<int32_t>(), highTime0.to<int32_t>(),
-      lowTime1.to<int32_t>(), highTime1.to<int32_t>(), &status);
+      m_handle, highTime0.to<int32_t>(), lowTime0.to<int32_t>(),
+      highTime1.to<int32_t>(), lowTime1.to<int32_t>(), &status);
   FRC_CheckErrorStatus(status, "Port {}", m_port);
 }
 

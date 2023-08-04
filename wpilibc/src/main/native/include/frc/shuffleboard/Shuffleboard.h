@@ -147,7 +147,7 @@ class Shuffleboard final {
    * Clears the custom name format for recording files. New recordings will use
    * the default format.
    *
-   * @see #setRecordingFileNameFormat(String)
+   * @see SetRecordingFileNameFormat(std::string_view)
    */
   static void ClearRecordingFileNameFormat();
 

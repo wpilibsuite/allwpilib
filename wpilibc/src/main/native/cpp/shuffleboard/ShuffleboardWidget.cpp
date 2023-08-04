@@ -20,7 +20,7 @@ static constexpr const char* widgetStrings[] = {
     "ComboBox Chooser",
     "Split Button Chooser",
     "Encoder",
-    "Speed Controller",
+    "Motor Controller",
     "Command",
     "PID Command",
     "PID Controller",
@@ -31,6 +31,7 @@ static constexpr const char* widgetStrings[] = {
     "Differential Drivebase",
     "Mecanum Drivebase",
     "Camera Stream",
+    "Field",
 };
 
 const char* detail::GetStringForWidgetType(BuiltInWidgets type) {

@@ -8,15 +8,17 @@
 
 #include <units/time.h>
 
-#include "frc2/command/CommandBase.h"
+#include "frc2/command/Command.h"
 #include "frc2/command/CommandHelper.h"
 
 namespace frc2 {
 /**
  * A command that does nothing but ends after a specified match time or
  * condition.  Useful for CommandGroups.
+ *
+ * This class is provided by the NewCommands VendorDep
  */
-class WaitUntilCommand : public CommandHelper<CommandBase, WaitUntilCommand> {
+class WaitUntilCommand : public CommandHelper<Command, WaitUntilCommand> {
  public:
   /**
    * Creates a new WaitUntilCommand that ends after a given condition becomes

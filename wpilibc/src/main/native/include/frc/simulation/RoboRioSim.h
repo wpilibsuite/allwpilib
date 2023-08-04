@@ -5,6 +5,7 @@
 #pragma once
 
 #include <memory>
+#include <string>
 
 #include <units/current.h>
 #include <units/voltage.h>
@@ -25,8 +26,9 @@ class RoboRioSim {
    * @param initialNotify whether to run the callback with the initial state
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] static std::unique_ptr<CallbackStore>
-  RegisterFPGAButtonCallback(NotifyCallback callback, bool initialNotify);
+  [[nodiscard]]
+  static std::unique_ptr<CallbackStore> RegisterFPGAButtonCallback(
+      NotifyCallback callback, bool initialNotify);
 
   /**
    * Query the state of the FPGA button.
@@ -38,7 +40,7 @@ class RoboRioSim {
   /**
    * Define the state of the FPGA button.
    *
-   * @param fpgaButton the new state
+   * @param fPGAButton the new state
    */
   static void SetFPGAButton(bool fPGAButton);
 
@@ -49,8 +51,9 @@ class RoboRioSim {
    * @param initialNotify whether to call the callback with the initial state
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] static std::unique_ptr<CallbackStore>
-  RegisterVInVoltageCallback(NotifyCallback callback, bool initialNotify);
+  [[nodiscard]]
+  static std::unique_ptr<CallbackStore> RegisterVInVoltageCallback(
+      NotifyCallback callback, bool initialNotify);
 
   /**
    * Measure the Vin voltage.
@@ -74,8 +77,9 @@ class RoboRioSim {
    *                      initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] static std::unique_ptr<CallbackStore>
-  RegisterVInCurrentCallback(NotifyCallback callback, bool initialNotify);
+  [[nodiscard]]
+  static std::unique_ptr<CallbackStore> RegisterVInCurrentCallback(
+      NotifyCallback callback, bool initialNotify);
 
   /**
    * Measure the Vin current.
@@ -99,8 +103,9 @@ class RoboRioSim {
    *                      initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] static std::unique_ptr<CallbackStore>
-  RegisterUserVoltage6VCallback(NotifyCallback callback, bool initialNotify);
+  [[nodiscard]]
+  static std::unique_ptr<CallbackStore> RegisterUserVoltage6VCallback(
+      NotifyCallback callback, bool initialNotify);
 
   /**
    * Measure the 6V rail voltage.
@@ -124,8 +129,9 @@ class RoboRioSim {
    *                      initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] static std::unique_ptr<CallbackStore>
-  RegisterUserCurrent6VCallback(NotifyCallback callback, bool initialNotify);
+  [[nodiscard]]
+  static std::unique_ptr<CallbackStore> RegisterUserCurrent6VCallback(
+      NotifyCallback callback, bool initialNotify);
 
   /**
    * Measure the 6V rail current.
@@ -149,8 +155,9 @@ class RoboRioSim {
    *                      initial state
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] static std::unique_ptr<CallbackStore>
-  RegisterUserActive6VCallback(NotifyCallback callback, bool initialNotify);
+  [[nodiscard]]
+  static std::unique_ptr<CallbackStore> RegisterUserActive6VCallback(
+      NotifyCallback callback, bool initialNotify);
 
   /**
    * Get the 6V rail active state.
@@ -174,8 +181,9 @@ class RoboRioSim {
    *                      initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] static std::unique_ptr<CallbackStore>
-  RegisterUserVoltage5VCallback(NotifyCallback callback, bool initialNotify);
+  [[nodiscard]]
+  static std::unique_ptr<CallbackStore> RegisterUserVoltage5VCallback(
+      NotifyCallback callback, bool initialNotify);
 
   /**
    * Measure the 5V rail voltage.
@@ -199,8 +207,9 @@ class RoboRioSim {
    *                      initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] static std::unique_ptr<CallbackStore>
-  RegisterUserCurrent5VCallback(NotifyCallback callback, bool initialNotify);
+  [[nodiscard]]
+  static std::unique_ptr<CallbackStore> RegisterUserCurrent5VCallback(
+      NotifyCallback callback, bool initialNotify);
 
   /**
    * Measure the 5V rail current.
@@ -224,8 +233,9 @@ class RoboRioSim {
    *                      initial state
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] static std::unique_ptr<CallbackStore>
-  RegisterUserActive5VCallback(NotifyCallback callback, bool initialNotify);
+  [[nodiscard]]
+  static std::unique_ptr<CallbackStore> RegisterUserActive5VCallback(
+      NotifyCallback callback, bool initialNotify);
 
   /**
    * Get the 5V rail active state.
@@ -249,8 +259,9 @@ class RoboRioSim {
    *                      initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] static std::unique_ptr<CallbackStore>
-  RegisterUserVoltage3V3Callback(NotifyCallback callback, bool initialNotify);
+  [[nodiscard]]
+  static std::unique_ptr<CallbackStore> RegisterUserVoltage3V3Callback(
+      NotifyCallback callback, bool initialNotify);
 
   /**
    * Measure the 3.3V rail voltage.
@@ -274,8 +285,9 @@ class RoboRioSim {
    *                      initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] static std::unique_ptr<CallbackStore>
-  RegisterUserCurrent3V3Callback(NotifyCallback callback, bool initialNotify);
+  [[nodiscard]]
+  static std::unique_ptr<CallbackStore> RegisterUserCurrent3V3Callback(
+      NotifyCallback callback, bool initialNotify);
 
   /**
    * Measure the 3.3V rail current.
@@ -299,8 +311,9 @@ class RoboRioSim {
    *                      initial state
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] static std::unique_ptr<CallbackStore>
-  RegisterUserActive3V3Callback(NotifyCallback callback, bool initialNotify);
+  [[nodiscard]]
+  static std::unique_ptr<CallbackStore> RegisterUserActive3V3Callback(
+      NotifyCallback callback, bool initialNotify);
 
   /**
    * Get the 3.3V rail active state.
@@ -325,8 +338,9 @@ class RoboRioSim {
    *                      initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] static std::unique_ptr<CallbackStore>
-  RegisterUserFaults6VCallback(NotifyCallback callback, bool initialNotify);
+  [[nodiscard]]
+  static std::unique_ptr<CallbackStore> RegisterUserFaults6VCallback(
+      NotifyCallback callback, bool initialNotify);
 
   /**
    * Get the 6V rail number of faults.
@@ -351,8 +365,9 @@ class RoboRioSim {
    *                      initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] static std::unique_ptr<CallbackStore>
-  RegisterUserFaults5VCallback(NotifyCallback callback, bool initialNotify);
+  [[nodiscard]]
+  static std::unique_ptr<CallbackStore> RegisterUserFaults5VCallback(
+      NotifyCallback callback, bool initialNotify);
 
   /**
    * Get the 5V rail number of faults.
@@ -377,8 +392,9 @@ class RoboRioSim {
    *                      initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] static std::unique_ptr<CallbackStore>
-  RegisterUserFaults3V3Callback(NotifyCallback callback, bool initialNotify);
+  [[nodiscard]]
+  static std::unique_ptr<CallbackStore> RegisterUserFaults3V3Callback(
+      NotifyCallback callback, bool initialNotify);
 
   /**
    * Get the 3.3V rail number of faults.
@@ -393,6 +409,59 @@ class RoboRioSim {
    * @param userFaults3V3 number of faults
    */
   static void SetUserFaults3V3(int userFaults3V3);
+
+  /**
+   * Register a callback to be run whenever the brownout voltage changes.
+   *
+   * @param callback the callback
+   * @param initialNotify whether to call the callback with the initial state
+   * @return the CallbackStore object associated with this callback
+   */
+  [[nodiscard]]
+  static std::unique_ptr<CallbackStore> RegisterBrownoutVoltageCallback(
+      NotifyCallback callback, bool initialNotify);
+
+  /**
+   * Measure the brownout voltage.
+   *
+   * @return the brownout voltage
+   */
+  static units::volt_t GetBrownoutVoltage();
+
+  /**
+   * Define the brownout voltage.
+   *
+   * @param brownoutVoltage the new voltage
+   */
+  static void SetBrownoutVoltage(units::volt_t brownoutVoltage);
+
+  /**
+   * Get the serial number.
+   *
+   * @return The serial number.
+   */
+  static std::string GetSerialNumber();
+
+  /**
+   * Set the serial number.
+   *
+   * @param serialNumber The serial number.
+   */
+  static void SetSerialNumber(std::string_view serialNumber);
+
+  /**
+   * Get the comments.
+   *
+   * @return The comments.
+   */
+  static std::string GetComments();
+
+  /**
+   * Set the comments.
+   *
+   * @param comments The comments.
+   */
+  static void SetComments(std::string_view comments);
 
   /**
    * Reset all simulation data.

@@ -25,8 +25,9 @@ class SPIAccelerometerSim {
    * @param initialNotify whether to run the callback with the initial state
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterActiveCallback(
-      NotifyCallback callback, bool initialNotify);
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterActiveCallback(NotifyCallback callback,
+                                                        bool initialNotify);
 
   /**
    * Check whether the accelerometer is active.
@@ -49,8 +50,9 @@ class SPIAccelerometerSim {
    * @param initialNotify whether to call the callback with the initial state
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterRangeCallback(
-      NotifyCallback callback, bool initialNotify);
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterRangeCallback(NotifyCallback callback,
+                                                       bool initialNotify);
 
   /**
    * Check the range of this accelerometer.
@@ -73,8 +75,9 @@ class SPIAccelerometerSim {
    * @param initialNotify whether to call the callback with the initial state
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterXCallback(
-      NotifyCallback callback, bool initialNotify);
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterXCallback(NotifyCallback callback,
+                                                   bool initialNotify);
 
   /**
    * Measure the X axis value.
@@ -97,8 +100,9 @@ class SPIAccelerometerSim {
    * @param initialNotify whether to call the callback with the initial state
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterYCallback(
-      NotifyCallback callback, bool initialNotify);
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterYCallback(NotifyCallback callback,
+                                                   bool initialNotify);
 
   /**
    * Measure the Y axis value.
@@ -121,8 +125,9 @@ class SPIAccelerometerSim {
    * @param initialNotify whether to call the callback with the initial state
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterZCallback(
-      NotifyCallback callback, bool initialNotify);
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterZCallback(NotifyCallback callback,
+                                                   bool initialNotify);
 
   /**
    * Measure the Z axis value.

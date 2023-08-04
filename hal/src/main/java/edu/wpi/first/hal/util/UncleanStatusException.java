@@ -5,7 +5,6 @@
 package edu.wpi.first.hal.util;
 
 /** Exception for bad status codes from the chip object. */
-@SuppressWarnings("serial")
 public final class UncleanStatusException extends IllegalStateException {
   private final int m_statusCode;
 

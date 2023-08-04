@@ -24,7 +24,7 @@ void Claw::Stop() {
   m_motor.Set(0);
 }
 
-bool Claw::IsGripping() {
+bool Claw::IsGripping() const {
   return m_contact.Get();
 }
 

@@ -16,14 +16,14 @@ DriveSubsystem::DriveSubsystem()
   // Set the distance per pulse for the encoders
   m_leftEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
   m_rightEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
+  // We need to invert one side of the drivetrain so that positive voltages
+  // result in both sides moving forward. Depending on how your robot's
+  // gearbox is constructed, you might have to invert the left side instead.
+  m_rightMotors.SetInverted(true);
 }
 
 void DriveSubsystem::Periodic() {
   // Implementation of subsystem periodic method goes here.
-}
-
-void DriveSubsystem::ArcadeDrive(double fwd, double rot) {
-  m_drive.ArcadeDrive(fwd, rot);
 }
 
 void DriveSubsystem::ResetEncoders() {
@@ -43,6 +43,16 @@ frc::Encoder& DriveSubsystem::GetRightEncoder() {
   return m_rightEncoder;
 }
 
-void DriveSubsystem::SetMaxOutput(double maxOutput) {
-  m_drive.SetMaxOutput(maxOutput);
+frc2::CommandPtr DriveSubsystem::SetMaxOutputCommand(double maxOutput) {
+  return frc2::cmd::RunOnce(
+      [this, maxOutput] { m_drive.SetMaxOutput(maxOutput); });
+}
+
+frc2::CommandPtr DriveSubsystem::ArcadeDriveCommand(
+    std::function<double()> fwd, std::function<double()> rot) {
+  return frc2::cmd::Run(
+      [this, fwd = std::move(fwd), rot = std::move(rot)] {
+        m_drive.ArcadeDrive(fwd(), rot());
+      },
+      {this});
 }

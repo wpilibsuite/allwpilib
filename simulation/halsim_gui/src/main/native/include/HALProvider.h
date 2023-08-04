@@ -15,9 +15,15 @@
 
 namespace halsimgui {
 
-class HALProvider : public glass::Provider<> {
+class HALProvider : private glass::Provider<> {
  public:
-  explicit HALProvider(std::string_view iniName) : Provider{iniName} {}
+  explicit HALProvider(glass::Storage& storage);
+
+  using Provider::GlobalInit;
+  using Provider::Register;
+  using Provider::RegisterModel;
+  using Provider::RegisterView;
+  using Provider::ShowDefault;
 
   void DisplayMenu() override;
 
@@ -38,8 +44,6 @@ class HALProvider : public glass::Provider<> {
   static bool AreOutputsEnabled() { return !AreOutputsDisabled(); }
 
  private:
-  void Update() override;
-
   void Show(ViewEntry* entry, glass::Window* window) override;
 };
 

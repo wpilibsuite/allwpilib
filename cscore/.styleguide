@@ -13,6 +13,10 @@ cppSrcFileInclude {
   \.cpp$
 }
 
+modifiableFileExclude {
+  objcpp
+}
+
 licenseUpdateExclude {
   src/main/native/cpp/default_init_allocator\.h$
 }
@@ -36,4 +40,5 @@ includeOtherLibs {
   ^support/
   ^tcpsockets/
   ^wpi/
+  ^wpinet/
 }

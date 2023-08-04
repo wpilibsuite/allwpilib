@@ -170,9 +170,9 @@ TEST_F(DIOLoopTest, SynchronousInterruptWorks) {
   frc::Timer timer;
   timer.Start();
   interrupt.WaitForInterrupt(kSynchronousInterruptTime + 1_s);
-  auto time = timer.Get().to<double>();
+  auto time = timer.Get().value();
   if (thr.joinable())
     thr.join();
-  EXPECT_NEAR(kSynchronousInterruptTime.to<double>(), time,
-              kSynchronousInterruptTimeTolerance.to<double>());
+  EXPECT_NEAR(kSynchronousInterruptTime.value(), time,
+              kSynchronousInterruptTimeTolerance.value());
 }

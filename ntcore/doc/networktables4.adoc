@@ -1,0 +1,819 @@
+= Network Tables Protocol Specification, Version 4.0
+WPILib Developers <wpilib@wpi.edu>
+Protocol Revision 4.0, 2/14/2021
+:toc:
+:toc-placement: preamble
+:sectanchors:
+
+A pub/sub WebSockets protocol based on NetworkTables concepts.
+
+[[motivation]]
+== Motivation
+
+Currently in NetworkTables there is no way to synchronize user value updates and NT update sweeps, and if user value updates occur more frequently than NT update sweeps, the intermediate values are lost.  This prevents NetworkTables from being a viable transport layer for seeing all value changes (e.g. for plotting) at rates higher than the NetworkTables update rate (e.g. for capturing high frequency PID changes).  While custom code can work around the second issue, it is more difficult to work around the first issue (unless full timestamps are also sent).
+
+Adding built-in support for capturing and communicating all timestamped data value changes with minimal additional user code changes will make it much easier for inexperienced teams to get high resolution, accurate data to dashboard displays with the minimal possible bandwidth and airtime usage.  Assuming the dashboard performs record and playback of NT updates, this also meets the desire to provide teams a robust data capture and playback mechanism.
+
+Migration to a pub/sub style protocol layer where the client can request only its desired topics and the frequency in which it wants to receive value changes provides some mitigation for increased network utilization due to other changes.
+
+Using WebSockets (RFC 6455) as the transport layer along with JSON and MessagePack data encoding enables browser-based dashboards and other web technologies to easily access the protocol and minimizes the amount of custom wire protocol implementation required.  Support for this protocol can easily be added in parallel to the existing NetworkTables protocol stack in order to maintain compatibility with older clients/servers and facilitate a gradual transition.
+
+[[references]]
+== References
+
+[[rfc6455,RFC6455,WebSocket]]
+* RFC 6455, The WebSocket Protocol, https://tools.ietf.org/html/rfc6455
+
+[[rfc7159,RFC7159,JSON]]
+* RFC 7159, The JavaScript Object Notation (JSON) Data Interchange Format, https://tools.ietf.org/html/rfc7159
+
+[[messagepack]]
+* MessagePack, MessagePack Specification, https://github.com/msgpack/msgpack/blob/master/spec.md
+
+[[networktables3]]
+* <<networktables3.adoc#, Network Tables Protocol Specification, Version 3.0>>
+
+[[cristians-algorithm]]
+* Cristian's algorithm, https://en.wikipedia.org/wiki/Cristian%27s_algorithm
+
+[[design]]
+== Design
+
+Both text and binary <<WebSocket,WebSocket>> frames are used for transport.  Text frames are <<JSON,JSON>>, and binary frames are <<messagepack,MessagePack>>.  JSON is used for control messages for human readability and ease of debugging.  MessagePack is used only for time and space efficient encoding of values, and the MessagePack subset used in this protocol is small enough that a custom encoder/decoder can be easily implemented for languages that lack good MessagePack libraries.
+
+Consistent with pub/sub nomenclature, this spec uses the term "topic" for what was called an "entry" or "key" in the <<networktables3,NT 3.0 spec>>.
+
+MessagePack messages use numeric IDs for topics to reduce data size; these IDs have a 1:1 mapping to a full topic name (a string).  This mapping is communicated via the JSON <<msg-announce>>.
+
+[[topic-names]]
+=== Topic Names
+
+Topic have UTF-8 string names.  Names starting with `$` are reserved for use by the server (see <<meta-topics>>).  Otherwise names are unrestricted, but convention is for them to start with `/` and be `/`-separated (without consecutive `//`) to make a Unix-path-like structure.
+
+[[timestamps]]
+=== Timestamps
+
+All MessagePack messages are timestamped.  Timestamps are specified in unsigned integer microseconds--for robot programs, microseconds are preferred as the FPGA provides time in microseconds, and integers result in a more compact wire encoding (in typical robot use, integer microseconds timestamps will be half the size of double timestamps until about T=70 minutes, and in the worst case will be no larger).
+
+Timestamps in messages always use the server time base.  The server time base is synchronized across the network by the means described in this section (an implementation of <<cristians-algorithm, Cristian's algorithm>>).
+
+Implementations should expose the actual timestamps for messages as well as provide methods to convert from server time base to local time to facilitate applications that prefer the server time base (e.g. a dashboard showing robot events might prefer to use server time instead of wall clock time).
+
+The topic ID of -1 is reserved for timestamp communication.  Clients shall periodically (e.g. every few seconds) send, in a manner that minimizes transmission delays, a MessagePack message with ID of -1, a timestamp of 0, and an implementation-selected type and data value (typically int or float 64) containing its (the client's) current local time.
+
+When the server receives an -1 ID message from a client, it shall respond to the client, in a manner that minimizes transmission delays, with a MessagePack message with ID=-1, a timestamp of its (the server's) current local time (in microseconds), and the client-provided data value.
+
+When the client receives an -1 ID message from the server, it shall compute the round trip time (RTT) from the delta between the message's data value and the current local time.  If the RTT is less than that from previous measurements, the client shall use the timestamp in the message plus ½ the RTT as the server time equivalent to the current local time, and use this equivalence to compute server time base timestamps from local time for future messages.
+
+Due to the fact there can be multiple publishers for a single topic and unpredictable network delays / clock drift, there is no global total order for timestamps either globally or on a per-topic basis.  While single publishers for real-time data will be the norm, and in that case the timestamps will usually be in order, applications that use timestamps need to be able to handle out-of-order timestamps.
+
+[[reconnection]]
+=== Caching and Reconnection Handling
+
+Servers shall keep a retained value for each topic for the purposes of <<msg-subscribe>> requests; the retained value shall be the value in the largest timestamp (greater-than or equal-to) message received for that topic.  This retained value is deleted if the topic is deleted (e.g. there are no more publishers).
+
+Clients may similarly keep a retained value for each topic for ease of use by user code.  If this is done, this retained value shall be updated by both locally published values and received messages for that topic with greater-than/equal-to timestamps, and the retained value shall be deleted when a <<msg-unannounce>> is received.
+
+Clients should support a "set default" operation for a topic.  This is a "weak" value update that publishes a value with a timestamp of 0 (thereby not causing the retained value of the server or other clients to be updated if they have a current value update with a timestamp > 0).  Typically the "set default" operation should also result in the retained property being set on the topic.
+
+Clients may accept application commands to publish and subscribe while disconnected.  If a client does so, in addition to maintaining a retained value as described above, it must keep track for each application-published topic whether any of the locally published values were "strong" (via a "set" operation), or all of them were "weak" (via a "set default" operation).  While disconnected, there is no reference clock; "strong" timestamps shall be set to 1 and "weak" timestamps shall be set to 0.
+
+When the client disconnects, the client shall delete any topics that are not published by the application and do not have the retained or persistent properties set.  The client shall also reset the application-published retained value timestamps to 0 and 1 as per the previous paragraph.
+
+When the connection to the server is established (either reconnect or initial connection), the client shall publish and send _only_ the retained values to the server that are in application-published topics (those with timestamps of 0 and 1, per above).  Only the values with timestamp 0 may be sent immediately upon reconnection.  The values with timestamp 1 must wait until the client clock is synchronized with the server clock; the timestamps for these values when sent to the server must be either the current server time or, if possible, an estimation of server time when the values were actually written.
+
+Note: the previous paragraphs enable offline, multi-publisher operation under network/server reboot conditions without creating zombie topics, assuming clients use "set default" and the retained property appropriately.  This is achieved mainly via the use of timestamps 0 and 1 to enable tie breaks such that normally-set values (timestamp X) are used in preference to retained values (timestamp 1), and retained values are used in preference to weakly set values (timestamp 0).  An example use case is as follows:
+
+* Server starts
+* Dashboard client connects
+* Coprocessor client connects
+* Coprocessor client publishes configuration topic, sends an initial value using "set default", and subscribes to the topic (to detect configuration changes)
+* Dashboard client sees configuration topic published and subscribes to it
+* Dashboard user changes configuration value--dashboard client publishes to the topic and sends the user value
+* Coprocessor receives the user value and updates its retained value
+* **Server reboots** (this also disconnects the dashboard and coprocessor clients)
+* If the dashboard reconnects first:
+** The user value was published and cached (retained value) on the dashboard client, so the dashboard client re-publishes and sends the cached data with timestamp 1.
+** The coprocessor client reconnects later.  It also published and cached, but it only ever called "set default" and sends the cached data (which is also the user value) with timestamp 0.  It receives the retained value from the server with timestamp 1, and updates locally.
+** The server propagates the timestamp 0 message, but since it has a retained value with timestamp 1, as do other clients, the retained value is not updated and the user value remains active.
+* If the coprocessor reconnects first:
+** The coprocessor client only ever called "set default", so it sends the cached data (the user-set value) with timestamp 0.
+** If the dashboard never reconnects, no new values are published, so the user-set value is active
+** If the dashboard reconnects, it sends a message with timestamp 1 ("strong" set).  This propagates but does not change the value (it's the same user-set as before).
+* If the dashboard updates the value while offline, it's still a "strong set" and wins the tie
+
+A second use case:
+
+* Server starts
+* Dashboard client connects
+* Dashboard client publishes configuration value with the retained property set, and publishes an initial value
+* Dashboard client disconnects.  The topic is *not* deleted on the server because the retained property is set.
+* Coprocessor client connects
+* Server sends announce message for topic and sends retained value (with timestamp 1)
+* Coprocessor client publishes, uses "set default", and subscribes to the topic.  Since "set default" uses a timestamp of 0, it loses to the retained value with timestamp 1, and the coprocessor subscriber will see the value previously set by the dashboard.
+* Dashboard client reconnects
+
+[[server]]
+=== Server Behavior
+
+Topic IDs may be common across all client connections or be connection-specific.  If they are common, the server needs to be careful regarding topic ID reuse due to deleted topics, as the protocol provides no way to change a client topic ID.  Requests (e.g. <<msg-subscribe,`subscribe`>> or <<msg-publish,`publish`>>) are always specific to a single client connection.
+
+The server shall keep a publisher count for each topic.  Persistent and retained topics have an additional implicit publisher.  When the publisher count reaches zero (which only happens for non-persistent and non-retained topics), the server shall delete the topic (including its retained value).  When a client connection is lost, the server shall handle that as an implicit <<msg-unpublish,`unpublish`>> for all topics currently published by that client.
+
+The server may operate in-process to an application (e.g. a robot program).  In this case, the application operationally behaves like a client (e.g. it sends publish requests and receives topic announcements), but of course does not need to estimate delta time, create JSON/MessagePack messages, etc, as all of the necessary operations can be performed programmatically within the same process.
+
+[[client]]
+=== Client Behavior
+
+Clients are responsible for keeping server connections established (e.g. via retries when a connection is lost).  Topic IDs must be treated as connection-specific; if the connection to the server is lost, the client is responsible for sending new <<msg-publish,`publish`>> and <<msg-subscribe,`subscribe`>> messages as required for the application when a new connection is established, and not using old topic IDs, but rather waiting for new <<msg-announce,`announce`>> messages to be received.
+
+Except for offline-published values with timestamps of 0, the client shall not send any other published values to the server until its clock is synchronized with the server per the <<timestamps>> section.
+
+Clients may publish a value at any time following clock synchronization.  Clients may subscribe to meta-topics to determine whether or not to publish a value change (e.g. based on whether there are any subscribers, or based on specific <<sub-options>>).
+
+[[meta-topics]]
+=== Server-Published Meta Topics
+
+The server shall publish a standard set of topics with information about server state.  Clients may subscribe to these topics for diagnostics purposes or to determine when to publish value changes.  These topics are hidden--they are not announced to subscribers to an empty prefix, only to subscribers that have subscribed to `"$"` or  longer prefixes.
+
+[cols="1,1,2", options="header"]
+|===
+|Topic Name|Data Type|Description
+|<<meta-clients,`$clients`>>|`msgpack`|Connected clients
+|<<meta-client-sub,`$clientsub$<client>`>>|`msgpack`|Client `<client>` subscriptions
+|<<meta-server-sub,`$serversub`>>|`msgpack`|Server subscriptions
+|<<meta-sub,`$sub$<topic>`>>|`msgpack`|Subscriptions to `<topic>`
+|<<meta-client-pub,`$clientpub$<client>`>>|`msgpack`|Client `<client>` publishers
+|<<meta-server-pub,`$serverpub`>>|`msgpack`|Server publishers
+|<<meta-pub,`$pub$<topic>`>>|`msgpack`|Publishers to `<topic>`
+|===
+
+[[meta-clients]]
+==== Connected Clients (`$clients`)
+
+The server shall update this topic when a client connects or disconnects.
+
+The MessagePack contents shall be an array of maps.  Each map in the array shall have the following contents:
+
+[cols="1,1,2,6",options="header"]
+|===
+|Key
+|Value type
+|Description
+|Notes
+
+|`id`
+|String
+|Client name
+|
+
+|`conn`
+|String
+|Connection info
+|Connection information about the client; typically host:port
+|===
+
+[[meta-client-sub]]
+==== Client Subscriptions (`$clientsub$<client>`)
+
+The server shall update this topic when the corresponding client subscribes or unsubscribes to any topic.
+
+The MessagePack contents shall be an array of maps.  Each map in the array shall have the following contents:
+
+[cols="1,2,2,6",options="header"]
+|===
+|Key
+|Value type
+|Description
+|Notes
+
+|`uid`
+|Integer
+|Subscription UID
+|A client-generated unique identifier for this subscription.
+
+|`topics`
+|Array of String
+|Array of topic names or prefixes
+|One or more topic names or prefixes (if the `prefix` option is true) that messages are sent for.
+
+|`options`
+|Map
+|Options
+|<<sub-options>>
+|===
+
+[[meta-server-sub]]
+==== Server Subscriptions (`$serversub`)
+
+Same as `$clientsub`, except it's updated when the server subscribes or unsubscribes to any topic.
+
+[[meta-sub]]
+==== Subscriptions (`$sub$<topic>`)
+
+The server shall update this topic when a client subscribes or unsubscribes to `<topic>`.
+
+The MessagePack contents shall be an array of maps.  Each map in the array shall have the following contents:
+
+[cols="1,2,2,6",options="header"]
+|===
+|Key
+|Value type
+|Description
+|Notes
+
+|`client`
+|String
+|Client name
+|Empty string for server subscriptions.
+
+|`subuid`
+|Integer
+|Subscription UID
+|A client-generated unique identifier for this subscription.
+
+|`options`
+|Map
+|Options
+|<<sub-options>>
+|===
+
+[[meta-client-pub]]
+==== Client Publishers (`$clientpub$<client>`)
+
+The server shall update this topic when the corresponding client publishes or unpublishes any topic.
+
+The MessagePack contents shall be an array of maps.  Each map in the array shall have the following contents:
+
+[cols="1,2,2,6",options="header"]
+|===
+|Key
+|Value type
+|Description
+|Notes
+
+|`uid`
+|Integer
+|Publisher UID
+|A client-generated unique identifier for this publisher.
+
+|`topic`
+|String
+|Topic name
+|
+|===
+
+[[meta-server-pub]]
+==== Server Publishers (`$serverpub`)
+
+Same as `$clientpub`, except it's updated when the server publishes or unpublishes any topic.
+
+[[meta-pub]]
+==== Publishers (`$pub$<topic>`)
+
+The server shall update this topic when a client publishes or unpublishes to `<topic>`.
+
+The MessagePack contents shall be an array of maps.  Each map in the array shall have the following contents:
+
+[cols="1,2,2,6",options="header"]
+|===
+|Key
+|Value type
+|Description
+|Notes
+
+|`client`
+|String
+|Client name
+|Empty string for server publishers.
+
+|`pubuid`
+|Integer
+|Publisher UID
+|A client-generated unique identifier for this publisher.
+|===
+
+[[websockets-config]]
+== WebSockets Protocol Configuration
+
+Both clients and servers shall support unsecure connections (`ws:`) and may support secure connections (`wss:`).  In a trusted network environment (e.g. a robot network), clients that support secure connections should fall back to an unsecure connection if a secure connection is not available.
+
+Servers shall support a resource name of `/nt/<name>`, where `<name>` is an arbitrary string representing the client name.  The client name does not need to be unique; multiple connections to the same name are allowed; the server shall ensure the name is unique (for the purposes of meta-topics) by appending a '@' and a unique number (if necessary).  To support this, the name provided by the client should not contain an embedded '@'.  Clients should provide a way to specify the resource name (in particular, the client name portion).
+
+Both clients and servers shall support/use subprotocol `networktables.first.wpi.edu` for this protocol. Clients and servers shall terminate the connection in accordance with the WebSocket protocol unless both sides support this subprotocol.
+
+The unsecure standard server port number shall be 5810, the secure standard port number shall be 5811.
+
+[[data-types]]
+== Supported Data Types
+
+The following data types are supported.  Note: implementations may map integer and float to double internally.  Any data type string not in the table below shall be handled in the binary protocol as data type 5 (binary); some specific binary examples are included in the table below.
+
+[cols="1,1,1,1,4",options="header"]
+|===
+|Data type|MessagePack format family|NT 3 data type|Data Type string
+|Notes
+
+|0|bool|Boolean|`boolean`
+|
+
+|1|float 64|Number (double)|`double`
+|
+
+|2|int|Number (double)|`int`
+.2+|Current NetworkTables protocol and user APIs only support double-precision float numeric values; implementations may choose to upgrade APIs to support integer and/or single-precision float values.
+
+|3|float 32|Number (double)|`float`
+
+.2+|4
+.2+|str
+.2+|String
+|`string`
+|
+
+|`json`
+|JSON data (e.g. structured data)
+
+.4+|5
+.4+|bin
+.4+|Raw
+|`raw`
+|Raw data, no specified format
+
+|`rpc`
+|For backwards compatibility with NT 3.0
+
+|`msgpack`
+|Nested MessagePack data (e.g. structured data)
+
+|`protobuf`
+|Google Protocol Buffers data (structured).  Uses property `protobuf` to communicate the data description.
+
+|16|array of all bool|Boolean Array|`boolean[]`
+|All elements of the array must be boolean
+
+|17|array of all float 64|Number Array|`double[]`
+|All elements of the array must be double-precision floats
+
+|18|array of all int|Number Array|`int[]`
+|All elements of the array must be integers.  See note on Number
+
+|19|array of all float 32|Number Array|`float[]`
+|All elements of the array must be single-precision floats.  See note on Number
+
+|20|array of all str|String Array|`string[]`
+|All elements of the array must be text strings
+|===
+
+[[properties]]
+== Properties
+
+Each published topic may also have properties associated to it.  Properties are represented in the protocol as JSON and thus property values may be any JSON type.  Property keys must be strings.  The following properties have a defined meaning in this spec.  Servers shall support arbitrary properties being set outside of this set.  Clients shall ignore properties they do not recognize.  Properties are initially set on publish and may be changed (by any client) using <<msg-setproperties>>.
+
+[cols="1,1,1,6",options="header"]
+|===
+|Property|Type|Description|Notes
+|`persistent`|boolean|Persistent Flag|If true, the last set value will be periodically saved to persistent storage on the server and be restored during server startup.  Topics with this property set to true will not be deleted by the server when the last publisher stops publishing.
+|`retained`|boolean|Retained Flag|Topics with this property set to true will not be deleted by the server when the last publisher stops publishing.
+|===
+
+[[sub-options]]
+== Subscription Options
+
+Each subscription may have options set.  The following options have a defined meaning in this spec.  Servers shall preserve arbitrary options, as servers and clients may support arbitrary options outside of this set.  Options are set using <<msg-subscribe>> and cannot be changed.
+
+[cols="1,1,2,6",options="header"]
+|===
+|Key
+|Value type
+|Description
+|Notes
+
+|`periodic` (optional)
+|Number
+|Periodic sweep time (in seconds)
+|How frequently the server should send changes.  The server may send more frequently than this (e.g. use a combined minimum period for all values) or apply a restricted range to this value. The default if unspecified is 100 ms (same as NT 3.0).
+
+|`all` (optional)
+|Boolean
+|All Changes Flag
+|If true, the server should send all value changes over the wire.  If false, only the most recent value is sent (same as NT 3.0 behavior).  If not specified, defaults to false.
+
+|`topicsonly` (optional)
+|Boolean
+|No Value Changes Flag
+|If true, the server should not send any value changes over the wire regardless of other options.  This is useful for only getting topic announcements.  If false, value changes are sent in accordance with other options.  If not specified, defaults to false.
+
+|`prefix` (optional)
+|Boolean
+|Prefix Flag
+|If true, any topic starting with the name in the subscription `topics` list is subscribed to, not just exact matches.  If not specified, defaults to false.
+|===
+
+[[text-frames]]
+== Text Data Frames
+
+Each WebSockets text data frame shall consist of a list of <<JSON,JSON>> objects ("JSON messages").
+
+Each JSON message shall be a JSON object with two keys: a `method` key containing a lowercase string value describing the type of message as per the following table, and a `params` key containing the message parameters as a JSON object.  The contents of the params object depends on the method; see the sections for each message for details.
+
+Clients and servers shall ignore JSON messages that:
+
+* are not objects
+* have no `method` key or `params` key
+* have a `method` value that is not a string
+* have a `params` value that is not an object
+* have a `method` value that is not listed in the below table
+
+[cols="1,2,2,3",options="header"]
+|===
+|Method
+|Description
+|Direction
+|Response
+
+4+|Publish Messages (Client to Server)
+
+|<<msg-publish,`publish`>>
+|Publish Request
+|Client to Server
+|<<msg-announce,`announce`>>
+
+|<<msg-unpublish,`unpublish`>>
+|Publish Release
+|Client to Server
+|<<msg-unannounce,`unannounce`>> (if topic deleted)
+
+|<<msg-setproperties,`setproperties`>>
+|Set Properties
+|Client to Server
+|<<msg-properties,`properties`>>
+
+4+|Value/Subscription Messages (Client to Server)
+
+|<<msg-subscribe,`subscribe`>>
+|Subscribe
+|Client to Server
+|<<binary-frames,MessagePack messages>> (once topic is announced)
+
+|<<msg-unsubscribe,`unsubscribe`>>
+|Unsubscribe
+|Client to Server
+|---
+
+4+|Announcement Messages (Server to Client)
+
+|<<msg-announce,`announce`>>
+|Topic Announcement
+|Server to Client
+|---
+
+|<<msg-unannounce,`unannounce`>>
+|Topic Removed
+|Server to Client
+|---
+
+|<<msg-properties,`properties`>>
+|Properties Update
+|Server to Client
+|---
+|===
+
+[[publish-messages]]
+=== Publish Messages (Client to Server)
+
+[[msg-publish]]
+==== Publish Request Message (`publish`)
+
+Sent from a client to the server to indicate the client wants to start publishing values at the given topic.  The server shall respond with a <<msg-announce>>, even if the topic was previously announced.  The client can start publishing data values via MessagePack messages immediately after sending this message, but the messages will be ignored by the server if the publisher data type does not match the topic data type.
+
+The `publish` JSON message shall contain the following parameters:
+
+[cols="1,1,2,6",options="header"]
+|===
+|Key
+|Value type
+|Description
+|Notes
+
+|`name`
+|String
+|Publish name
+|The topic name being published
+
+|`pubuid`
+|Integer
+|Publisher UID
+|A client-generated unique identifier for this publisher.  Use the same UID later to unpublish.  This is also the identifier that the client will use in MessagePack messages for this topic.
+
+|`type`
+|String
+|Type of data
+|The requested data type (as a string).
+
+If the topic is newly created (e.g. there are no other publishers) this sets the value type.  If the topic was previously published, this is ignored.  The <<msg-announce,`announce`>> message contains the actual topic value type that the client shall use when publishing values.
+
+Implementations should indicate an error if the user tries to publish an incompatible type to that already set for the topic.
+
+|`properties`
+|Map
+|Properties
+|Initial topic properties.
+
+If the topic is newly created (e.g. there are no other publishers) this sets the topic properties.  If the topic was previously published, this is ignored.  The <<msg-announce,`announce`>> message contains the actual topic properties.  Clients can use the <<msg-setproperties,`setproperties`>> message to change properties after topic creation.
+|===
+
+[[msg-unpublish]]
+==== Publish Release Message (`unpublish`)
+
+Sent from a client to the server to indicate the client wants to stop publishing values for the given topic and publisher.  The client should stop publishing data value updates via binary MessagePack messages for this publisher prior to sending this message.
+
+When there are no remaining publishers for a non-persistent topic, the server shall delete the topic and send a <<msg-unannounce>> to all clients who have been sent a previous <<msg-announce>> for the topic.
+
+The `unpublish` JSON message shall contain the following parameters:
+
+[cols="1,1,2,6",options="header"]
+|===
+|Key
+|Value type
+|Description
+|Notes
+
+|`pubuid`
+|Integer
+|Publisher UID
+|The same unique identifier passed to the <<msg-publish,`publish`>> message
+|===
+
+[[msg-setproperties]]
+==== Set Properties Message (`setproperties`)
+
+Sent from a client to the server to change properties (see <<properties>>) for a given topic.  The server will send a corresponding <<msg-properties>> to all subscribers to the topic (if the topic is published).  This message shall be ignored by the server if the topic is not published.
+
+The `setproperties` JSON message shall contain the following parameters:
+
+[cols="1,2,4",options="header"]
+|===
+|Key
+|Value type
+|Description
+
+|`name`
+|String
+|Topic name
+
+|`update`
+|Map
+|Properties to update
+|===
+
+If a property is not included in the update map, its value is not changed.  If a property is provided in the update map with a value of null, the property is deleted.
+
+[[subscription-messages]]
+=== Value/Subscription Messages (Client to Server)
+
+[[msg-subscribe]]
+==== Subscribe Message (`subscribe`)
+
+Sent from a client to the server to indicate the client wants to subscribe to value changes for the specified topics / groups of topics.  The server shall send MessagePack messages containing the current values for any existing topics upon receipt, and continue sending MessagePack messages for future value changes.  If a topic does not yet exist, no message is sent until it is created (via a publish), at which point a <<msg-announce>> will be sent and MessagePack messages will automatically follow as they are published.
+
+Subscriptions may overlap; only one MessagePack message is sent per value change regardless of the number of subscriptions.  Sending a `subscribe` message with the same subscription UID as a previous `subscribe` message results in updating the subscription (replacing the array of identifiers and updating any specified options).
+
+The `subscribe` JSON message shall contain the following parameters:
+
+[cols="1,2,2,6",options="header"]
+|===
+|Key
+|Value type
+|Description
+|Notes
+
+|`topics`
+|Array of String
+|Array of topic names or prefixes
+|One or more topic names or prefixes (if the `prefix` option is true) to start receiving messages for.
+
+|`subuid`
+|Integer
+|Subscription UID
+|A client-generated unique identifier for this subscription.  Use the same UID later to unsubscribe.
+
+|`options`
+|Map
+|Options
+|<<sub-options>>
+|===
+
+[[msg-unsubscribe]]
+==== Unsubscribe Message (`unsubscribe`)
+
+Sent from a client to the server to indicate the client wants to stop subscribing to messages for the given subscription.
+
+The `unsubscribe` JSON message shall contain the following parameters:
+
+[cols="1,1,2,6",options="header"]
+|===
+|Key
+|Value type
+|Description
+|Notes
+
+|`subuid`
+|Integer
+|Subscription UID
+|The same unique identifier passed to the <<msg-subscribe,`subscribe`>> message
+|===
+
+[[announcement-messages]]
+=== Announcement Messages (Server to Client)
+
+[[msg-announce]]
+==== Topic Announcement Message (`announce`)
+
+The server shall send this message for each of the following conditions:
+
+- To all clients subscribed to a matching prefix when a topic is created
+
+- To a client in response to an <<msg-publish>> from that client
+
+The `announce` JSON message shall contain the following parameters:
+
+[cols="1,2,2,6",options="header"]
+|===
+|Key
+|Value type
+|Description
+|Notes
+
+|`name`
+|String
+|Topic name
+|
+
+|`id`
+|Integer
+|Topic ID
+|The identifier that the server will use in MessagePack messages for this topic
+
+|`type`
+|String
+|Data type
+|The data type for the topic (as a string)
+
+|`pubuid` (optional)
+|Integer
+|Publisher UID
+|If this message was sent in response to a <<msg-publish,`publish`>> message, the Publisher UID provided in that message.  Otherwise absent.
+
+|`properties`
+|Map
+|Properties
+|Topic <<properties>>
+|===
+
+[[msg-unannounce]]
+==== Topic Removed Message (`unannounce`)
+
+The server shall send this message when a previously announced (via a <<msg-announce>>) topic is deleted.
+
+The `unannounce` JSON message shall contain the following parameters:
+
+[cols="1,1,2,6",options="header"]
+|===
+|Key
+|Value type
+|Description
+|Notes
+
+|`name`
+|String
+|Topic name
+|
+
+|`id`
+|Integer
+|Topic ID
+|The identifier that the server was using for value updates
+|===
+
+[[msg-properties]]
+==== Properties Update Message (`properties`)
+
+The server shall send this message when a previously announced (via a <<msg-announce>>) topic has its properties changed (via <<msg-setproperties>>).
+
+The `properties` JSON message shall contain the following parameters:
+
+[cols="1,1,2,6",options="header"]
+|===
+|Key
+|Value type
+|Description
+|Notes
+
+|`name`
+|String
+|Topic name
+|
+
+|`ack`
+|Boolean
+|Acknowledgement
+|True if this message is in response to a <<msg-setproperties,`setproperties`>> message from the same client.  Otherwise absent.
+
+|`update`
+|Map
+|Properties to update (from <<msg-setproperties,`setproperties`>>)
+|===
+
+The client shall handle the `update` value as follows.  If a property is not included in the update map, its value is not changed.  If a property is provided in the update map with a value of null, the property is deleted.
+
+[[binary-frames]]
+== Binary Data Frames
+
+Each WebSockets binary data frame shall consist of a <<messagepack,MessagePack>> data stream with one or more complete MessagePack arrays ("MessagePack messages").  MessagePack messages shall not span across WebSockets data frames.  It is up to implementations to decide how many MessagePack messages to put into each transmitted WebSockets data frame (as there is an efficiency/latency tradeoff).
+
+Each MessagePack message shall be a MessagePack array with 4 elements.  Implementations can either ignore other types of messages (e.g. non-arrays, other numbers of elements) or terminate the connection (allowing this enables use of simplified decoder implementations).
+
+Messages shall consist of (in this order):
+
+* Topic/Publisher ID: unsigned integer, or -1 (RTT measurement)
+* Timestamp: integer microseconds
+* Data type: unsigned integer
+* Data value (see below)
+
+Topic IDs are used for server to client messages.  Topic IDs shall be assigned via JSON <<msg-announce,`announce`>> messages.  Client implementations shall ignore messages with topic IDs they do not recognize.  Server implementations shall not send messages with topic IDs that were not assigned previously with a JSON message.
+
+Publisher IDs are used for client to server messages.  Publisher IDs shall be assigned by the client and be communicated to the server via JSON <<msg-publish,`publish`>> messages.  Server implementations shall ignore messages with publisher IDs they do not recognize.  Client implementations shall not send messages with publisher IDs that were not assigned previously with a JSON message.
+
+Implementations must ignore messages with data values they cannot decode (either by ignoring the message or by terminating the connection), and shall send messages with data values consistent with the above table.
+
+An example double value update would be 17 bytes:
+
+`94` (array with 4 elements)
+
+`32` (topic/publisher ID=50)
+
+`D2 07 27 0E 00` (timestamp of exactly 2 minutes in integer microseconds)
+
+`01` (data type: double-precision float)
+
+`CB 3F BF 97 24 74 53 8E F3` (double value of 0.1234)
+
+For comparison, a double value update in NT 3.0 is 14 bytes (and does not contain a timestamp).
+
+[[drawbacks]]
+== Drawbacks
+
+[[drawback-api]]
+=== API Changes
+
+While the server (robot) APIs can have minimal to no changes, the current NetworkTables API doesn’t directly map to a pub/sub approach, except for the listener API.  A new API will be required to take full advantage of the features of this protocol.  One big advantage of the current APIs is that the client and server APIs are the same, so if we update the client API it should work on the server as well.
+
+[[drawback-tcp]]
+=== TCP Only
+
+Everything is sent via the WebSockets pipe, which can result in latency spikes due to TCP retransmissions, even for timestamp updates.  Should there be a send-via-UDP option?  Web technologies generally can’t use UDP but this feature could be useful for other use cases.  However, adding this would add significant complexity and might be better left to MQTT or other full-stack alternatives.
+
+[[drawback-client-server]]
+=== No peer-to-peer client connections
+
+This protocol continues the previous NT approach of having all traffic go through the central NT server, rather than supporting direct peer to peer connections.  This adds latency but simplifies the overall protocol design and makes it possible to have clients that can’t set up servers (e.g. web browsers).
+
+[[alternatives]]
+== Alternatives
+
+[[alt-do-nothing]]
+=== Do nothing
+
+The major features in this proposal (accessibility to web technologies and timestamping and sending all changes) would not be made available to users.  Users would continue to need to deal with these issues manually or by using third-party workarounds.
+
+[[alt-raw-protocol]]
+=== Update the raw NetworkTables protocol (without using WebSockets)
+
+This does not provide one of the major benefits to moving to a WebSockets protocol, which is easy to use by browsers.  While current workarounds like pynetworktables2js exist, a protocol revision which does not address this need feels shortsighted.
+
+[[alt-encapsulation]]
+=== Encapsulate the current NT 3.0 protocol in WebSockets
+
+While this makes the current protocol more easily accessible to web technologies, the current protocol does not have integrated support for timestamping or sending all changes.  It also requires substantially more custom decoder implementation work than MessagePack, and does not offer human-readable control messages.
+
+[[alt-mqtt]]
+=== Use MQTT or another existing protocol
+
+MQTT requires running a separate server from the robot program, and the robot program to be a client to it (unlike NT, it has no means of doing value updates within the server itself).  MQTT natively does not use WebSockets (it’s a custom wire protocol like the current NetworkTables), although there is a WebSockets variant.  MQTT is a significantly more complicated protocol with support for things like full QOS.
+
+[[trades]]
+== Trades
+
+[[trade-json-updates]]
+=== JSON option for value updates (rejected)
+
+This was considered, but rejected for two reasons: encoding overhead and spec/implementation effort.  In benchmarking on desktop systems, JSON was 25% the speed of MessagePack when encoding doubles (due to text conversion), and in typical robot use, this overhead would largely land on the robot controller, which also has the fewest resources.  In addition, requiring implementation of both JSON and MessagePack encoding nearly doubles the amount of encode/decode implementation effort, particularly as JSON does not have good binary data support and would require Base64 or something similar to encode binary data as a string.
+
+[[trade-timestamp]]
+=== Timestamp format
+
+The spec uses integer microseconds.  This seems to be a reasonable enough resolution for FRC use and is common with the FPGA clock resolution.
+
+[[unresolved-questions]]
+== Unresolved Questions

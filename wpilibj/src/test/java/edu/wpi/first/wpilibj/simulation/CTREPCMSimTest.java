@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.wpilibj.CompressorConfigType;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsControlModule;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
@@ -17,7 +18,6 @@ import edu.wpi.first.wpilibj.simulation.testutils.BooleanCallback;
 import edu.wpi.first.wpilibj.simulation.testutils.DoubleCallback;
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings("AbbreviationAsWordInName")
 class CTREPCMSimTest {
   @Test
   void testInitialization() {
@@ -109,7 +109,7 @@ class CTREPCMSimTest {
   }
 
   @Test
-  void setClosedLoopEnabled() {
+  void setEnableDigital() {
     HAL.initialize(500, 0);
 
     CTREPCMSim sim = new CTREPCMSim(0);
@@ -117,12 +117,12 @@ class CTREPCMSimTest {
 
     try (PneumaticsControlModule pcm = new PneumaticsControlModule(0);
         CallbackStore cb = sim.registerClosedLoopEnabledCallback(callback, false)) {
-      pcm.setClosedLoopControl(false);
-      assertFalse(pcm.getClosedLoopControl());
+      pcm.disableCompressor();
+      assertEquals(pcm.getCompressorConfigType(), CompressorConfigType.Disabled);
 
-      pcm.setClosedLoopControl(true);
+      pcm.enableCompressorDigital();
       assertTrue(sim.getClosedLoopEnabled());
-      assertTrue(pcm.getClosedLoopControl());
+      assertEquals(pcm.getCompressorConfigType(), CompressorConfigType.Digital);
       assertTrue(callback.wasTriggered());
       assertTrue(callback.getSetValue());
     }

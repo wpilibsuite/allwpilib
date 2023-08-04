@@ -18,6 +18,16 @@ namespace hal {
  * outside of the UnsafeManipulateDIO callback.
  */
 struct DIOSetProxy {
+  DIOSetProxy(tDIO::tOutputEnable setOutputDirReg,
+              tDIO::tOutputEnable unsetOutputDirReg,
+              tDIO::tDO setOutputStateReg, tDIO::tDO unsetOutputStateReg,
+              tDIO* dio)
+      : m_setOutputDirReg{setOutputDirReg},
+        m_unsetOutputDirReg{unsetOutputDirReg},
+        m_setOutputStateReg{setOutputStateReg},
+        m_unsetOutputStateReg{unsetOutputStateReg},
+        m_dio{dio} {}
+
   DIOSetProxy(const DIOSetProxy&) = delete;
   DIOSetProxy(DIOSetProxy&&) = delete;
   DIOSetProxy& operator=(const DIOSetProxy&) = delete;
@@ -53,14 +63,14 @@ int32_t ComputeDigitalMask(HAL_DigitalHandle handle, int32_t* status);
 
 /**
  * Unsafe digital output set function
- * This function can be used to perform fast and determinstically set digital
- * outputs. This function holds the DIO lock, so calling anyting other then
+ * This function can be used to perform fast and deterministically set digital
+ * outputs. This function holds the DIO lock, so calling anything other then
  * functions on the Proxy object passed as a parameter can deadlock your
  * program.
  *
- * @param handle the HAL digital handle of the pin to toggle.
- * @param status status check
- * @param func   A functor taking a ref to a DIOSetProxy object.
+ * @param[in] handle the HAL digital handle of the pin to toggle.
+ * @param[out] status status check
+ * @param[in] func   A functor taking a ref to a DIOSetProxy object.
  */
 template <typename Functor>
 void UnsafeManipulateDIO(HAL_DigitalHandle handle, int32_t* status,

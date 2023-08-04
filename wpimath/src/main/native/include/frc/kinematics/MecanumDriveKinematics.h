@@ -6,10 +6,13 @@
 
 #include <wpi/SymbolExports.h>
 
-#include "Eigen/Core"
 #include "Eigen/QR"
+#include "frc/EigenCore.h"
 #include "frc/geometry/Translation2d.h"
+#include "frc/geometry/Twist2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
+#include "frc/kinematics/Kinematics.h"
+#include "frc/kinematics/MecanumDriveWheelPositions.h"
 #include "frc/kinematics/MecanumDriveWheelSpeeds.h"
 #include "wpimath/MathShared.h"
 
@@ -37,7 +40,8 @@ namespace frc {
  * Forward kinematics is also used for odometry -- determining the position of
  * the robot on the field using encoders and a gyro.
  */
-class WPILIB_DLLEXPORT MecanumDriveKinematics {
+class WPILIB_DLLEXPORT MecanumDriveKinematics
+    : public Kinematics<MecanumDriveWheelSpeeds, MecanumDriveWheelPositions> {
  public:
   /**
    * Constructs a mecanum drive kinematics object.
@@ -99,7 +103,12 @@ class WPILIB_DLLEXPORT MecanumDriveKinematics {
    */
   MecanumDriveWheelSpeeds ToWheelSpeeds(
       const ChassisSpeeds& chassisSpeeds,
-      const Translation2d& centerOfRotation = Translation2d()) const;
+      const Translation2d& centerOfRotation) const;
+
+  MecanumDriveWheelSpeeds ToWheelSpeeds(
+      const ChassisSpeeds& chassisSpeeds) const override {
+    return ToWheelSpeeds(chassisSpeeds, {});
+  }
 
   /**
    * Performs forward kinematics to return the resulting chassis state from the
@@ -112,11 +121,26 @@ class WPILIB_DLLEXPORT MecanumDriveKinematics {
    * @return The resulting chassis speed.
    */
   ChassisSpeeds ToChassisSpeeds(
-      const MecanumDriveWheelSpeeds& wheelSpeeds) const;
+      const MecanumDriveWheelSpeeds& wheelSpeeds) const override;
+
+  Twist2d ToTwist2d(const MecanumDriveWheelPositions& start,
+                    const MecanumDriveWheelPositions& end) const override;
+
+  /**
+   * Performs forward kinematics to return the resulting Twist2d from the
+   * given wheel position deltas. This method is often used for odometry --
+   * determining the robot's position on the field using data from the
+   * distance driven by each wheel on the robot.
+   *
+   * @param wheelDeltas The change in distance driven by each wheel.
+   *
+   * @return The resulting chassis speed.
+   */
+  Twist2d ToTwist2d(const MecanumDriveWheelPositions& wheelDeltas) const;
 
  private:
-  mutable Eigen::Matrix<double, 4, 3> m_inverseKinematics;
-  Eigen::HouseholderQR<Eigen::Matrix<double, 4, 3>> m_forwardKinematics;
+  mutable Matrixd<4, 3> m_inverseKinematics;
+  Eigen::HouseholderQR<Matrixd<4, 3>> m_forwardKinematics;
   Translation2d m_frontLeftWheel;
   Translation2d m_frontRightWheel;
   Translation2d m_rearLeftWheel;

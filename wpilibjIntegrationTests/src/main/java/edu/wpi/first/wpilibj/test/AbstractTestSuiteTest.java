@@ -35,7 +35,7 @@ public class AbstractTestSuiteTest {
     ExampleSubSuite.class,
     EmptySuite.class
   })
-  class TestForAbstractTestSuite extends AbstractTestSuite {}
+  static class TestForAbstractTestSuite extends AbstractTestSuite {}
 
   TestForAbstractTestSuite m_testSuite;
 
@@ -122,8 +122,7 @@ class FirstSubSuiteTest {
   public static final String METHODNAME = "aTestMethod";
 
   @Test
-  @SuppressWarnings("MethodName")
-  public void aTestMethod() {}
+  public void testMethod() {}
 }
 
 @SuppressWarnings("OneTopLevelClass")

@@ -2,7 +2,7 @@ if (!project.hasProperty('skipJavaFormat')) {
     apply plugin: 'checkstyle'
 
     checkstyle {
-        toolVersion = "8.38"
+        toolVersion = "10.1"
         configDirectory = file("${project.rootDir}/styleguide")
         config = resources.text.fromFile(new File(configDirectory.get().getAsFile(), "checkstyle.xml"))
     }
@@ -10,11 +10,72 @@ if (!project.hasProperty('skipJavaFormat')) {
     apply plugin: 'pmd'
 
     pmd {
-        toolVersion = '6.7.0'
+        toolVersion = '6.44.0'
         consoleOutput = true
         reportsDir = file("$project.buildDir/reports/pmd")
         ruleSetFiles = files(new File(rootDir, "styleguide/pmd-ruleset.xml"))
         ruleSets = []
+    }
+
+    apply plugin: 'com.diffplug.spotless'
+
+    spotless {
+        java {
+            target fileTree('.') {
+                include '**/*.java'
+                exclude '**/build/**', '**/build-*/**', '**/bin/**'
+            }
+            toggleOffOn()
+            googleJavaFormat()
+            removeUnusedImports()
+            trimTrailingWhitespace()
+            endWithNewline()
+        }
+        groovyGradle {
+            target fileTree('.') {
+                include '**/*.gradle'
+                exclude '**/build/**', '**/build-*/**', '**/bin/**'
+            }
+            greclipse()
+            indentWithSpaces(4)
+            trimTrailingWhitespace()
+            endWithNewline()
+        }
+        json {
+            target fileTree('.') {
+                include '**/*.json'
+                exclude '**/build/**', '**/build-*/**', '**/bin/**'
+            }
+            gson()
+              .indentWithSpaces(2)
+        }
+        format 'xml', {
+            target fileTree('.') {
+                include '**/*.xml'
+                exclude '**/build/**', '**/build-*/**', '**/bin/**'
+            }
+            eclipseWtp('xml')
+            trimTrailingWhitespace()
+            indentWithSpaces(2)
+            endWithNewline()
+        }
+        format 'misc', {
+            target fileTree('.') {
+                include '**/*.md', '**/.gitignore'
+                exclude '**/build/**', '**/build-*/**', '**/bin/**'
+            }
+            trimTrailingWhitespace()
+            indentWithSpaces(2)
+            endWithNewline()
+        }
+    }
+
+    apply plugin: 'com.github.spotbugs'
+
+    spotbugs {
+        ignoreFailures = false
+        effort = 'max'
+        excludeFilter = file("${project.rootDir}/styleguide/spotbugs-exclude.xml")
     }
 }
 
@@ -22,3 +83,4 @@ task javaFormat {
     dependsOn(tasks.withType(Checkstyle))
     dependsOn(tasks.withType(Pmd))
 }
+javaFormat.dependsOn 'spotlessApply'

@@ -12,7 +12,7 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.simulation.DIOSim;
 import org.junit.jupiter.api.Test;
 
-public class DigitalOutputTest {
+class DigitalOutputTest {
   @Test
   void testDefaultFunctions() {
     try (DigitalOutput output = new DigitalOutput(0)) {

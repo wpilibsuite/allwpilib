@@ -7,6 +7,7 @@
 #include <utility>
 
 #include <fmt/format.h>
+#include <hal/DriverStation.h>
 #include <hal/FRCUsageReporting.h>
 #include <hal/Notifier.h>
 #include <hal/Threads.h>
@@ -18,14 +19,14 @@ using namespace frc;
 
 Notifier::Notifier(std::function<void()> handler) {
   if (!handler) {
-    throw FRC_MakeError(err::NullParameter, "{}", "handler");
+    throw FRC_MakeError(err::NullParameter, "handler");
   }
   m_handler = handler;
   int32_t status = 0;
   m_notifier = HAL_InitializeNotifier(&status);
-  FRC_CheckErrorStatus(status, "{}", "InitializeNotifier");
+  FRC_CheckErrorStatus(status, "InitializeNotifier");
 
-  m_thread = std::thread([=] {
+  m_thread = std::thread([=, this] {
     for (;;) {
       int32_t status = 0;
       HAL_NotifierHandle notifier = m_notifier.load();
@@ -60,14 +61,14 @@ Notifier::Notifier(std::function<void()> handler) {
 
 Notifier::Notifier(int priority, std::function<void()> handler) {
   if (!handler) {
-    throw FRC_MakeError(err::NullParameter, "{}", "handler");
+    throw FRC_MakeError(err::NullParameter, "handler");
   }
   m_handler = handler;
   int32_t status = 0;
   m_notifier = HAL_InitializeNotifier(&status);
-  FRC_CheckErrorStatus(status, "{}", "InitializeNotifier");
+  FRC_CheckErrorStatus(status, "InitializeNotifier");
 
-  m_thread = std::thread([=] {
+  m_thread = std::thread([=, this] {
     int32_t status = 0;
     HAL_SetCurrentThreadPriority(true, priority, &status);
     for (;;) {
@@ -95,7 +96,21 @@ Notifier::Notifier(int priority, std::function<void()> handler) {
 
       // call callback
       if (handler) {
-        handler();
+        try {
+          handler();
+        } catch (const frc::RuntimeError& e) {
+          e.Report();
+          FRC_ReportError(
+              err::Error,
+              "Error in Notifier thread."
+              "  The above stacktrace can help determine where the error "
+              "occurred.\n"
+              "  See https://wpilib.org/stacktrace for more information.\n");
+          throw;
+        } catch (const std::exception& e) {
+          HAL_SendError(1, err::Error, 0, e.what(), "", "", 1);
+          throw;
+        }
       }
     }
   });
@@ -106,7 +121,7 @@ Notifier::~Notifier() {
   // atomically set handle to 0, then clean
   HAL_NotifierHandle handle = m_notifier.exchange(0);
   HAL_StopNotifier(handle, &status);
-  FRC_ReportError(status, "{}", "StopNotifier");
+  FRC_ReportError(status, "StopNotifier");
 
   // Join the thread to ensure the handler has exited.
   if (m_thread.joinable()) {
@@ -172,7 +187,7 @@ void Notifier::Stop() {
   m_periodic = false;
   int32_t status = 0;
   HAL_CancelNotifierAlarm(m_notifier, &status);
-  FRC_CheckErrorStatus(status, "{}", "CancelNotifierAlarm");
+  FRC_CheckErrorStatus(status, "CancelNotifierAlarm");
 }
 
 void Notifier::UpdateAlarm(uint64_t triggerTime) {
@@ -183,7 +198,7 @@ void Notifier::UpdateAlarm(uint64_t triggerTime) {
     return;
   }
   HAL_UpdateNotifierAlarm(notifier, triggerTime, &status);
-  FRC_CheckErrorStatus(status, "{}", "UpdateNotifierAlarm");
+  FRC_CheckErrorStatus(status, "UpdateNotifierAlarm");
 }
 
 void Notifier::UpdateAlarm() {

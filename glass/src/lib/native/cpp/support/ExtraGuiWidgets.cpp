@@ -4,6 +4,8 @@
 
 #include "glass/support/ExtraGuiWidgets.h"
 
+#include <imgui.h>
+
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui_internal.h>
 
@@ -160,18 +162,60 @@ bool DeleteButton(ImGuiID id, const ImVec2& pos) {
 bool HeaderDeleteButton(const char* label) {
   ImGuiWindow* window = ImGui::GetCurrentWindow();
   ImGuiContext& g = *GImGui;
-  ImGuiLastItemDataBackup last_item_backup;
+  ImGuiLastItemData last_item_backup = g.LastItemData;
   ImGuiID id = window->GetID(label);
   float button_size = g.FontSize;
-  float button_x = ImMax(window->DC.LastItemRect.Min.x,
-                         window->DC.LastItemRect.Max.x -
-                             g.Style.FramePadding.x * 2.0f - button_size);
-  float button_y = window->DC.LastItemRect.Min.y;
+  float button_x = ImMax(
+      g.LastItemData.Rect.Min.x,
+      g.LastItemData.Rect.Max.x - g.Style.FramePadding.x * 2.0f - button_size);
+  float button_y = g.LastItemData.Rect.Min.y;
   bool rv = DeleteButton(
       window->GetID(reinterpret_cast<void*>(static_cast<intptr_t>(id) + 1)),
       ImVec2(button_x, button_y));
-  last_item_backup.Restore();
+  g.LastItemData = last_item_backup;
   return rv;
+}
+
+bool HamburgerButton(const ImGuiID id, const ImVec2 position) {
+  const ImGuiStyle& style = ImGui::GetStyle();
+
+  ImGuiWindow* window = ImGui::GetCurrentWindow();
+
+  // Frame padding on both sides, then one character in the middle
+  const ImRect bb{
+      position, position + ImVec2(ImGui::GetFontSize(), ImGui::GetFontSize()) +
+                    style.FramePadding * 2.0f};
+
+  ImGui::ItemAdd(bb, id);
+
+  bool hovered, held;
+  bool pressed = ImGui::ButtonBehavior(bb, id, &hovered, &held);
+
+  const ImU32 bgCol =
+      ImGui::GetColorU32(held ? ImGuiCol_ButtonActive : ImGuiCol_ButtonHovered);
+  const ImVec2 center = bb.GetCenter();
+  if (hovered) {
+    window->DrawList->AddCircleFilled(
+        center, ImMax(2.0f, ImGui::GetFontSize() * 0.5f + 1.0f), bgCol, 12);
+  }
+
+  const ImU32 fgCol = ImGui::GetColorU32(ImGuiCol_Text);
+
+  const float halfLineWidth = ImGui::GetFontSize() * 0.5 * 0.7071;
+  const float halfTotalHeight = halfLineWidth * 0.875;
+  ImVec2 lineStart = {center.x - halfLineWidth, center.y - halfTotalHeight};
+  ImVec2 lineEnd = {center.x + halfLineWidth, center.y - halfTotalHeight};
+
+  ImVec2 increment = {0.0, halfTotalHeight};
+
+  for (int i = 0; i < 3; i++) {
+    window->DrawList->AddLine(lineStart, lineEnd, fgCol);
+
+    lineStart += increment;
+    lineEnd += increment;
+  }
+
+  return pressed;
 }
 
 }  // namespace glass

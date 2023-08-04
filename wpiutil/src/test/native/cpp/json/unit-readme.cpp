@@ -200,7 +200,7 @@ TEST(JsonReadmeTest, OtherContainer)
 {
     std::vector<int> c_vector {1, 2, 3, 4};
     json j_vec(c_vector);
-    json j_vec2(wpi::span<const int>(c_vector.data(), c_vector.size()));
+    json j_vec2(std::span<const int>(c_vector.data(), c_vector.size()));
     // [1, 2, 3, 4]
 
     std::deque<float> c_deque {1.2f, 2.3f, 3.4f, 5.6f};

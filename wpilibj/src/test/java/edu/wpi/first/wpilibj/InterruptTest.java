@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 
-public class InterruptTest {
+class InterruptTest {
   @Test
   void testAsynchronousInterrupt() {
     AtomicBoolean hasFired = new AtomicBoolean(false);

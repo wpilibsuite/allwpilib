@@ -42,6 +42,9 @@ model {
                 cpp {
                     source {
                         srcDirs 'src/main/native/cpp'
+                        if (project.hasProperty('generatedSources')) {
+                            srcDir generatedSources
+                        }
                         include '**/*.cpp'
                         exclude '**/jni/**/*.cpp'
                     }
@@ -101,15 +104,22 @@ model {
                 baseName = nativeName + 'jni'
             }
 
+            if (project.hasProperty('skipJniSymbols')) {
+                checkSkipSymbols = skipJniSymbols
+            }
+
             enableCheckTask !project.hasProperty('skipJniCheck')
             javaCompileTasks << compileJava
             jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.roborio)
-            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.raspbian)
-            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.aarch64bionic)
+            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.linuxarm32)
+            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.linuxarm64)
             sources {
                 cpp {
                     source {
                         srcDirs 'src/main/native/cpp'
+                        if (project.hasProperty('generatedSources')) {
+                            srcDir generatedSources
+                        }
                         include '**/jni/**/*.cpp'
                     }
                     exportedHeaders {
@@ -142,15 +152,22 @@ model {
                 baseName = nativeName + 'jni'
             }
 
+            if (project.hasProperty('skipJniSymbols')) {
+                checkSkipSymbols = skipJniSymbols
+            }
+
             enableCheckTask !project.hasProperty('skipJniCheck')
             javaCompileTasks << compileJava
             jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.roborio)
-            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.raspbian)
-            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.aarch64bionic)
+            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.linuxarm32)
+            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.linuxarm64)
             sources {
                 cpp {
                     source {
                         srcDirs 'src/main/native/cpp'
+                        if (project.hasProperty('generatedSources')) {
+                            srcDir generatedSources
+                        }
                         include '**/jni/**/*.cpp'
                     }
                     exportedHeaders {
@@ -181,7 +198,6 @@ model {
             targetBuildTypes 'debug'
             sources {
                 cpp {
-
                     source {
                         srcDirs 'src/dev/native/cpp'
                         include '**/*.cpp'
@@ -200,9 +216,12 @@ model {
                 if (!project.hasProperty('noWpiutil')) {
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                     lib project: ':wpiutil', library: 'wpiutilJNIShared', linkage: 'shared'
+                    if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                        nativeUtils.useRequiredLibrary(it, 'ni_link_libraries', 'ni_runtime_libraries')
+                    }
                 }
-                if (nativeName == 'hal' && it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
-                    nativeUtils.useRequiredLibrary(it, 'ni_link_libraries', 'ni_runtime_libraries')
+                if (project.hasProperty('exeSplitSetup')) {
+                    exeSplitSetup(it)
                 }
             }
         }
@@ -236,9 +255,12 @@ model {
             lib library: nativeName, linkage: 'shared'
             if (!project.hasProperty('noWpiutil')) {
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                if (nativeName == 'hal' && it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                     nativeUtils.useRequiredLibrary(it, 'ni_link_libraries', 'ni_runtime_libraries')
                 }
+            }
+            if (project.hasProperty('exeSplitSetup')) {
+                exeSplitSetup(it)
             }
         }
     }
@@ -270,10 +292,12 @@ model {
 
                                 test.systemProperty 'java.library.path', filePath
                                 test.environment 'LD_LIBRARY_PATH', filePath
+                                test.environment 'DYLD_LIBRARY_PATH', filePath
                                 test.workingDir filePath
                                 run.dependsOn it.tasks.install
                                 run.systemProperty 'java.library.path', filePath
                                 run.environment 'LD_LIBRARY_PATH', filePath
+                                run.environment 'DYLD_LIBRARY_PATH', filePath
                                 run.workingDir filePath
 
                                 found = true

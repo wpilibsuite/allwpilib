@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
@@ -14,8 +14,10 @@ import java.util.function.Consumer;
  * the constructor. Useful for inline definitions of complex commands - note, however, that if a
  * command is beyond a certain complexity it is usually better practice to write a proper class for
  * it than to inline it.
+ *
+ * <p>This class is provided by the NewCommands VendorDep
  */
-public class FunctionalCommand extends CommandBase {
+public class FunctionalCommand extends Command {
   protected final Runnable m_onInit;
   protected final Runnable m_onExecute;
   protected final Consumer<Boolean> m_onEnd;

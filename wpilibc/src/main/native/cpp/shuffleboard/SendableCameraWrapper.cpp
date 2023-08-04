@@ -8,19 +8,19 @@
 #include <memory>
 #include <string>
 
-#include <wpi/DenseMap.h>
+#include <wpi/StringMap.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 
 namespace frc {
 namespace detail {
 std::shared_ptr<SendableCameraWrapper>& GetSendableCameraWrapper(
-    CS_Source source) {
-  static wpi::DenseMap<int, std::shared_ptr<SendableCameraWrapper>> wrappers;
-  return wrappers[static_cast<int>(source)];
+    std::string_view cameraName) {
+  static wpi::StringMap<std::shared_ptr<SendableCameraWrapper>> wrappers;
+  return wrappers[cameraName];
 }
 
-void AddToSendableRegistry(wpi::Sendable* sendable, std::string name) {
+void AddToSendableRegistry(wpi::Sendable* sendable, std::string_view name) {
   wpi::SendableRegistry::Add(sendable, name);
 }
 }  // namespace detail

@@ -9,8 +9,11 @@
 
 using namespace frc::sim;
 
-UltrasonicSim::UltrasonicSim(const frc::Ultrasonic& ultrasonic) {
-  frc::sim::SimDeviceSim deviceSim{"Ultrasonic", ultrasonic.GetEchoChannel()};
+UltrasonicSim::UltrasonicSim(const frc::Ultrasonic& ultrasonic)
+    : UltrasonicSim(0, ultrasonic.GetEchoChannel()) {}
+
+UltrasonicSim::UltrasonicSim(int ping, int echo) {
+  frc::sim::SimDeviceSim deviceSim{"Ultrasonic", echo};
   m_simRangeValid = deviceSim.GetBoolean("Range Valid");
   m_simRange = deviceSim.GetDouble("Range (in)");
 }
@@ -19,6 +22,6 @@ void UltrasonicSim::SetRangeValid(bool isValid) {
   m_simRangeValid.Set(isValid);
 }
 
-void UltrasonicSim::SetRange(units::meter_t range) {
-  m_simRange.Set(range.to<double>());
+void UltrasonicSim::SetRange(units::inch_t range) {
+  m_simRange.Set(range.value());
 }

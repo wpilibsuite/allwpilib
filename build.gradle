@@ -2,25 +2,28 @@ import edu.wpi.first.toolchain.*
 
 buildscript {
     repositories {
-        mavenCentral()
+        maven {
+            url = 'https://frcmaven.wpi.edu/artifactory/ex-mvn'
+        }
     }
     dependencies {
-        classpath 'com.hubspot.jinjava:jinjava:2.5.8'
+        classpath 'com.hubspot.jinjava:jinjava:2.6.0'
     }
 }
 
 plugins {
     id 'base'
-    id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '4.1.0'
+    id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '2023.0.1'
     id 'edu.wpi.first.wpilib.repositories.WPILibRepositoriesPlugin' version '2020.2'
     id 'edu.wpi.first.NativeUtils' apply false
-    id 'edu.wpi.first.GradleJni' version '1.0.0'
-    id 'edu.wpi.first.GradleVsCode' version '1.0.0'
+    id 'edu.wpi.first.GradleJni' version '1.1.0'
+    id 'edu.wpi.first.GradleVsCode'
     id 'idea'
     id 'visual-studio'
-    id 'net.ltgt.errorprone' version '1.1.1' apply false
-    id 'com.github.johnrengelman.shadow' version '5.2.0' apply false
-    id 'com.diffplug.spotless' version '5.5.0'
+    id 'net.ltgt.errorprone' version '3.1.0' apply false
+    id 'com.github.johnrengelman.shadow' version '8.1.1' apply false
+    id 'com.diffplug.spotless' version '6.18.0' apply false
+    id 'com.github.spotbugs' version '5.0.14' apply false
 }
 
 wpilibVersioning.buildServerMode = project.hasProperty('buildServer')
@@ -28,7 +31,9 @@ wpilibVersioning.releaseMode = project.hasProperty('releaseMode')
 
 allprojects {
     repositories {
-        mavenCentral()
+        maven {
+        url = 'https://frcmaven.wpi.edu/artifactory/ex-mvn'
+    }
     }
     if (project.hasProperty('releaseMode')) {
         wpilibRepositories.addAllReleaseRepositories(it)
@@ -82,10 +87,15 @@ task copyAllOutputs(type: Copy) {
 build.dependsOn copyAllOutputs
 copyAllOutputs.dependsOn outputVersions
 
+def copyReleaseOnly = project.hasProperty('ciReleaseOnly')
+
 ext.addTaskToCopyAllOutputs = { task ->
+    if (copyReleaseOnly && task.name.contains('debug')) {
+        return
+    }
     copyAllOutputs.dependsOn task
-    copyAllOutputs.inputs.file task.archivePath
-    copyAllOutputs.from task.archivePath
+    copyAllOutputs.inputs.file task.archiveFile
+    copyAllOutputs.from task.archiveFile
 }
 
 subprojects {
@@ -96,6 +106,11 @@ subprojects {
 
     plugins.withType(NativeComponentPlugin) {
         subproj.apply plugin: MultiBuilds
+    }
+
+    plugins.withType(JavaPlugin) {
+        sourceCompatibility = 11
+        targetCompatibility = 11
     }
 
     apply from: "${rootDir}/shared/java/javastyle.gradle"
@@ -109,6 +124,10 @@ subprojects {
         }
     }
 
+    tasks.withType(JavaCompile) {
+        options.compilerArgs.add '-XDstringConcat=inline'
+    }
+
     // Enables UTF-8 support in Javadoc
     tasks.withType(Javadoc) {
         options.addStringOption("charset", "utf-8")
@@ -117,8 +136,10 @@ subprojects {
     }
 
     // Sign outputs with Developer ID
-    if (project.hasProperty("developerID")) {
-        tasks.withType(AbstractLinkTask) { task ->
+    tasks.withType(AbstractLinkTask) { task ->
+        task.inputs.property "HasDeveloperId", project.hasProperty("developerID")
+
+        if (project.hasProperty("developerID")) {
             // Don't sign any executables because codesign complains
             // about relative rpath.
             if (!(task instanceof LinkExecutable)) {
@@ -145,52 +166,6 @@ ext.getCurrentArch = {
     return NativePlatforms.desktop
 }
 
-spotless {
-    if (project.hasProperty('skipJavaFormat')) {
-        enforceCheck false
-    }
-    java {
-        target fileTree('.') {
-            include '**/*.java'
-            exclude '**/build/**', '**/build-*/**'
-        }
-        toggleOffOn()
-        googleJavaFormat()
-        removeUnusedImports()
-        trimTrailingWhitespace()
-        endWithNewline()
-    }
-    groovyGradle {
-        target fileTree('.') {
-            include '**/*.gradle'
-            exclude '**/build/**', '**/build-*/**'
-        }
-        greclipse()
-        indentWithSpaces(4)
-        trimTrailingWhitespace()
-        endWithNewline()
-    }
-    format 'xml', {
-        target fileTree('.') {
-            include '**/*.xml'
-            exclude '**/build/**', '**/build-*/**'
-        }
-        eclipseWtp('xml')
-        trimTrailingWhitespace()
-        indentWithSpaces(2)
-        endWithNewline()
-    }
-    format 'misc', {
-        target fileTree('.') {
-            include '**/*.md', '**/.gitignore'
-            exclude '**/build/**', '**/build-*/**'
-        }
-        trimTrailingWhitespace()
-        indentWithSpaces(2)
-        endWithNewline()
-    }
-}
-
 wrapper {
-    gradleVersion = '7.1.1'
+    gradleVersion = '8.1'
 }

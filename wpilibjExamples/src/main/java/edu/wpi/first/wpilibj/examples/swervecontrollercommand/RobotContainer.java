@@ -15,6 +15,7 @@ import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.examples.swervecontrollercommand.Constants.AutoConstants;
 import edu.wpi.first.wpilibj.examples.swervecontrollercommand.Constants.DriveConstants;
+import edu.wpi.first.wpilibj.examples.swervecontrollercommand.Constants.ModuleConstants;
 import edu.wpi.first.wpilibj.examples.swervecontrollercommand.Constants.OIConstants;
 import edu.wpi.first.wpilibj.examples.swervecontrollercommand.subsystems.DriveSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -42,16 +43,19 @@ public class RobotContainer {
     configureButtonBindings();
 
     // Configure default commands
-    // Set the default drive command to split-stick arcade drive
     m_robotDrive.setDefaultCommand(
-        // A split-stick arcade command, with forward/backward controlled by the left
-        // hand, and turning controlled by the right.
+        // The left stick controls translation of the robot.
+        // Turning is controlled by the X axis of the right stick.
         new RunCommand(
             () ->
                 m_robotDrive.drive(
-                    m_driverController.getLeftY(),
-                    m_driverController.getRightX(),
-                    m_driverController.getLeftX(),
+                    // Multiply by max speed to map the joystick unitless inputs to actual units.
+                    // This will map the [-1, 1] to [max speed backwards, max speed forwards],
+                    // converting them to actual units.
+                    m_driverController.getLeftY() * DriveConstants.kMaxSpeedMetersPerSecond,
+                    m_driverController.getLeftX() * DriveConstants.kMaxSpeedMetersPerSecond,
+                    m_driverController.getRightX()
+                        * ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond,
                     false),
             m_robotDrive));
   }

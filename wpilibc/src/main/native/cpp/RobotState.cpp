@@ -20,10 +20,6 @@ bool RobotState::IsEStopped() {
   return DriverStation::IsEStopped();
 }
 
-bool RobotState::IsOperatorControl() {
-  return IsTeleop();
-}
-
 bool RobotState::IsTeleop() {
   return DriverStation::IsTeleop();
 }

@@ -44,7 +44,7 @@ class VisionRunnerBase {
    *
    * <p>This method is exposed to allow teams to add additional functionality or
    * have their own ways to run the pipeline. Most teams, however, should just
-   * use {@link #runForever} in its own thread using a std::thread.</p>
+   * use RunForever() in its own thread using a std::thread.</p>
    */
   void RunOnce();
 

@@ -414,6 +414,56 @@ Java_edu_wpi_first_hal_simulation_EncoderDataJNI_setSamplesToAverage
 
 /*
  * Class:     edu_wpi_first_hal_simulation_EncoderDataJNI
+ * Method:    registerDistancePerPulseCallback
+ * Signature: (ILjava/lang/Object;Z)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_simulation_EncoderDataJNI_registerDistancePerPulseCallback
+  (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
+{
+  return sim::AllocateCallback(env, index, callback, initialNotify,
+                               &HALSIM_RegisterEncoderDistancePerPulseCallback);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_EncoderDataJNI
+ * Method:    cancelDistancePerPulseCallback
+ * Signature: (II)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_EncoderDataJNI_cancelDistancePerPulseCallback
+  (JNIEnv* env, jclass, jint index, jint handle)
+{
+  return sim::FreeCallback(env, handle, index,
+                           &HALSIM_CancelEncoderDistancePerPulseCallback);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_EncoderDataJNI
+ * Method:    getDistancePerPulse
+ * Signature: (I)D
+ */
+JNIEXPORT jdouble JNICALL
+Java_edu_wpi_first_hal_simulation_EncoderDataJNI_getDistancePerPulse
+  (JNIEnv*, jclass, jint index)
+{
+  return HALSIM_GetEncoderDistancePerPulse(index);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_EncoderDataJNI
+ * Method:    setDistancePerPulse
+ * Signature: (ID)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_EncoderDataJNI_setDistancePerPulse
+  (JNIEnv*, jclass, jint index, jdouble value)
+{
+  HALSIM_SetEncoderDistancePerPulse(index, value);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_EncoderDataJNI
  * Method:    setDistance
  * Signature: (ID)V
  */

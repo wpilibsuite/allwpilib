@@ -8,34 +8,13 @@
 
 #include <wpi/json.h>
 
+#include "frc/MathUtil.h"
+
 using namespace frc;
-
-Pose2d::Pose2d(Translation2d translation, Rotation2d rotation)
-    : m_translation(translation), m_rotation(rotation) {}
-
-Pose2d::Pose2d(units::meter_t x, units::meter_t y, Rotation2d rotation)
-    : m_translation(x, y), m_rotation(rotation) {}
-
-Pose2d Pose2d::operator+(const Transform2d& other) const {
-  return TransformBy(other);
-}
 
 Transform2d Pose2d::operator-(const Pose2d& other) const {
   const auto pose = this->RelativeTo(other);
-  return Transform2d(pose.Translation(), pose.Rotation());
-}
-
-bool Pose2d::operator==(const Pose2d& other) const {
-  return m_translation == other.m_translation && m_rotation == other.m_rotation;
-}
-
-bool Pose2d::operator!=(const Pose2d& other) const {
-  return !operator==(other);
-}
-
-Pose2d Pose2d::TransformBy(const Transform2d& other) const {
-  return {m_translation + (other.Translation().RotateBy(m_rotation)),
-          m_rotation + other.Rotation()};
+  return Transform2d{pose.Translation(), pose.Rotation()};
 }
 
 Pose2d Pose2d::RelativeTo(const Pose2d& other) const {
@@ -46,7 +25,7 @@ Pose2d Pose2d::RelativeTo(const Pose2d& other) const {
 Pose2d Pose2d::Exp(const Twist2d& twist) const {
   const auto dx = twist.dx;
   const auto dy = twist.dy;
-  const auto dtheta = twist.dtheta.to<double>();
+  const auto dtheta = twist.dtheta.value();
 
   const auto sinTheta = std::sin(dtheta);
   const auto cosTheta = std::cos(dtheta);
@@ -68,7 +47,7 @@ Pose2d Pose2d::Exp(const Twist2d& twist) const {
 
 Twist2d Pose2d::Log(const Pose2d& end) const {
   const auto transform = end.RelativeTo(*this);
-  const auto dtheta = transform.Rotation().Radians().to<double>();
+  const auto dtheta = transform.Rotation().Radians().value();
   const auto halfDtheta = dtheta / 2.0;
 
   const auto cosMinusOne = transform.Rotation().Cos() - 1;
@@ -87,7 +66,37 @@ Twist2d Pose2d::Log(const Pose2d& end) const {
           {halfThetaByTanOfHalfDtheta, -halfDtheta}) *
       std::hypot(halfThetaByTanOfHalfDtheta, halfDtheta);
 
-  return {translationPart.X(), translationPart.Y(), units::radian_t(dtheta)};
+  return {translationPart.X(), translationPart.Y(), units::radian_t{dtheta}};
+}
+
+Pose2d Pose2d::Nearest(std::span<const Pose2d> poses) const {
+  return *std::min_element(
+      poses.begin(), poses.end(), [this](const Pose2d& a, const Pose2d& b) {
+        auto aDistance = this->Translation().Distance(a.Translation());
+        auto bDistance = this->Translation().Distance(b.Translation());
+
+        // If the distances are equal sort by difference in rotation
+        if (aDistance == bDistance) {
+          return std::abs((this->Rotation() - a.Rotation()).Radians().value()) <
+                 std::abs((this->Rotation() - b.Rotation()).Radians().value());
+        }
+        return aDistance < bDistance;
+      });
+}
+
+Pose2d Pose2d::Nearest(std::initializer_list<Pose2d> poses) const {
+  return *std::min_element(
+      poses.begin(), poses.end(), [this](const Pose2d& a, const Pose2d& b) {
+        auto aDistance = this->Translation().Distance(a.Translation());
+        auto bDistance = this->Translation().Distance(b.Translation());
+
+        // If the distances are equal sort by difference in rotation
+        if (aDistance == bDistance) {
+          return std::abs((this->Rotation() - a.Rotation()).Radians().value()) <
+                 std::abs((this->Rotation() - b.Rotation()).Radians().value());
+        }
+        return aDistance < bDistance;
+      });
 }
 
 void frc::to_json(wpi::json& json, const Pose2d& pose) {

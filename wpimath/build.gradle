@@ -14,7 +14,10 @@ ext {
 apply from: "${rootDir}/shared/jni/setupBuild.gradle"
 
 cppHeadersZip {
-    from('src/main/native/eigeninclude') {
+    from('src/main/native/thirdparty/eigen/include') {
+        into '/'
+    }
+    from('src/main/native/thirdparty/gcem/include') {
         into '/'
     }
 }
@@ -24,7 +27,9 @@ model {
         all {
             it.sources.each {
                 it.exportedHeaders {
-                    srcDirs 'src/main/native/include', 'src/main/native/eigeninclude'
+                    srcDirs 'src/main/native/include',
+                            'src/main/native/thirdparty/eigen/include',
+                            'src/main/native/thirdparty/gcem/include'
                 }
             }
         }
@@ -32,10 +37,10 @@ model {
 }
 
 dependencies {
-    api "org.ejml:ejml-simple:0.38"
-    api "com.fasterxml.jackson.core:jackson-annotations:2.10.0"
-    api "com.fasterxml.jackson.core:jackson-core:2.10.0"
-    api "com.fasterxml.jackson.core:jackson-databind:2.10.0"
+    api "org.ejml:ejml-simple:0.41"
+    api "com.fasterxml.jackson.core:jackson-annotations:2.12.4"
+    api "com.fasterxml.jackson.core:jackson-core:2.12.4"
+    api "com.fasterxml.jackson.core:jackson-databind:2.12.4"
 }
 
 def wpilibNumberFileInput = file("src/generate/GenericNumber.java.jinja")
@@ -100,3 +105,25 @@ task generateNat() {
 sourceSets.main.java.srcDir "${buildDir}/generated/java"
 compileJava.dependsOn generateNumbers
 compileJava.dependsOn generateNat
+
+task unitsHeaders(type: Zip) {
+    destinationDirectory = file("$buildDir/outputs")
+    archiveBaseName = zipBaseName
+    archiveClassifier = "units"
+
+    from(licenseFile) {
+        into '/'
+    }
+
+    ext.includeDirs = [
+        project.file('src/main/native/include/units')
+    ]
+
+    ext.includeDirs.each {
+        from(it) {
+            into '/units'
+        }
+    }
+}
+
+addTaskToCopyAllOutputs(unitsHeaders)

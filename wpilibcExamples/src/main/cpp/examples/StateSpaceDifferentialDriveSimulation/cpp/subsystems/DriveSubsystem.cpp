@@ -30,8 +30,8 @@ DriveSubsystem::DriveSubsystem() {
 void DriveSubsystem::Periodic() {
   // Implementation of subsystem periodic method goes here.
   m_odometry.Update(m_gyro.GetRotation2d(),
-                    units::meter_t(m_leftEncoder.GetDistance()),
-                    units::meter_t(m_rightEncoder.GetDistance()));
+                    units::meter_t{m_leftEncoder.GetDistance()},
+                    units::meter_t{m_rightEncoder.GetDistance()});
   m_fieldSim.SetRobotPose(m_odometry.GetPose());
 }
 
@@ -42,18 +42,15 @@ void DriveSubsystem::SimulationPeriodic() {
   // voltages make the right side move forward.
   m_drivetrainSimulator.SetInputs(units::volt_t{m_leftMotors.Get()} *
                                       frc::RobotController::GetInputVoltage(),
-                                  units::volt_t{-m_rightMotors.Get()} *
+                                  units::volt_t{m_rightMotors.Get()} *
                                       frc::RobotController::GetInputVoltage());
   m_drivetrainSimulator.Update(20_ms);
 
-  m_leftEncoderSim.SetDistance(
-      m_drivetrainSimulator.GetLeftPosition().to<double>());
-  m_leftEncoderSim.SetRate(
-      m_drivetrainSimulator.GetLeftVelocity().to<double>());
+  m_leftEncoderSim.SetDistance(m_drivetrainSimulator.GetLeftPosition().value());
+  m_leftEncoderSim.SetRate(m_drivetrainSimulator.GetLeftVelocity().value());
   m_rightEncoderSim.SetDistance(
-      m_drivetrainSimulator.GetRightPosition().to<double>());
-  m_rightEncoderSim.SetRate(
-      m_drivetrainSimulator.GetRightVelocity().to<double>());
+      m_drivetrainSimulator.GetRightPosition().value());
+  m_rightEncoderSim.SetRate(m_drivetrainSimulator.GetRightVelocity().value());
   m_gyroSim.SetAngle(-m_drivetrainSimulator.GetHeading().Degrees());
 }
 
@@ -67,7 +64,7 @@ void DriveSubsystem::ArcadeDrive(double fwd, double rot) {
 
 void DriveSubsystem::TankDriveVolts(units::volt_t left, units::volt_t right) {
   m_leftMotors.SetVoltage(left);
-  m_rightMotors.SetVoltage(-right);
+  m_rightMotors.SetVoltage(right);
   m_drive.Feed();
 }
 
@@ -105,12 +102,14 @@ frc::Pose2d DriveSubsystem::GetPose() {
 }
 
 frc::DifferentialDriveWheelSpeeds DriveSubsystem::GetWheelSpeeds() {
-  return {units::meters_per_second_t(m_leftEncoder.GetRate()),
-          units::meters_per_second_t(m_rightEncoder.GetRate())};
+  return {units::meters_per_second_t{m_leftEncoder.GetRate()},
+          units::meters_per_second_t{m_rightEncoder.GetRate()}};
 }
 
 void DriveSubsystem::ResetOdometry(frc::Pose2d pose) {
   ResetEncoders();
   m_drivetrainSimulator.SetPose(pose);
-  m_odometry.ResetPosition(pose, m_gyro.GetRotation2d());
+  m_odometry.ResetPosition(m_gyro.GetRotation2d(),
+                           units::meter_t{m_leftEncoder.GetDistance()},
+                           units::meter_t{m_rightEncoder.GetDistance()}, pose);
 }

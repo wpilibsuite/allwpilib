@@ -12,8 +12,6 @@
 
 using namespace frc;
 
-static constexpr double kEpsilon = 1E-9;
-
 TEST(Transform2dTest, Inverse) {
   const Pose2d initial{1_m, 2_m, 45_deg};
   const Transform2d transform{{5_m, 0_m}, 5_deg};
@@ -21,12 +19,7 @@ TEST(Transform2dTest, Inverse) {
   auto transformed = initial + transform;
   auto untransformed = transformed + transform.Inverse();
 
-  EXPECT_NEAR(initial.X().to<double>(), untransformed.X().to<double>(),
-              kEpsilon);
-  EXPECT_NEAR(initial.Y().to<double>(), untransformed.Y().to<double>(),
-              kEpsilon);
-  EXPECT_NEAR(initial.Rotation().Degrees().to<double>(),
-              untransformed.Rotation().Degrees().to<double>(), kEpsilon);
+  EXPECT_EQ(initial, untransformed);
 }
 
 TEST(Transform2dTest, Composition) {
@@ -37,10 +30,23 @@ TEST(Transform2dTest, Composition) {
   auto transformedSeparate = initial + transform1 + transform2;
   auto transformedCombined = initial + (transform1 + transform2);
 
-  EXPECT_NEAR(transformedSeparate.X().to<double>(),
-              transformedCombined.X().to<double>(), kEpsilon);
-  EXPECT_NEAR(transformedSeparate.Y().to<double>(),
-              transformedCombined.Y().to<double>(), kEpsilon);
-  EXPECT_NEAR(transformedSeparate.Rotation().Degrees().to<double>(),
-              transformedCombined.Rotation().Degrees().to<double>(), kEpsilon);
+  EXPECT_EQ(transformedSeparate, transformedCombined);
+}
+
+TEST(Transform2dTest, Constexpr) {
+  constexpr Transform2d defaultCtor;
+  constexpr Transform2d translationRotationCtor{Translation2d{},
+                                                Rotation2d{10_deg}};
+  constexpr auto multiplied = translationRotationCtor * 5;
+  constexpr auto divided = translationRotationCtor / 2;
+
+  static_assert(defaultCtor.Translation().X() == 0_m);
+  static_assert(translationRotationCtor.X() == 0_m);
+  static_assert(translationRotationCtor.Y() == 0_m);
+  static_assert(multiplied.Rotation().Degrees() == 50_deg);
+  static_assert(translationRotationCtor.Inverse().Rotation().Degrees() ==
+                (-10_deg));
+  static_assert(translationRotationCtor.Inverse().X() == 0_m);
+  static_assert(translationRotationCtor.Inverse().Y() == 0_m);
+  static_assert(divided.Rotation().Degrees() == 5_deg);
 }

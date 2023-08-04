@@ -25,8 +25,8 @@ TEST(ADXRS450GyroSimTest, SetAttributes) {
   sim.SetAngle(TEST_ANGLE);
   sim.SetRate(TEST_RATE);
 
-  EXPECT_EQ(TEST_ANGLE.to<double>(), gyro.GetAngle());
-  EXPECT_EQ(TEST_RATE.to<double>(), gyro.GetRate());
+  EXPECT_EQ(TEST_ANGLE.value(), gyro.GetAngle());
+  EXPECT_EQ(TEST_RATE.value(), gyro.GetRate());
 
   gyro.Reset();
   EXPECT_EQ(0, gyro.GetAngle());

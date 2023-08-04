@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <numbers>
+
 #include <frc/Joystick.h>
 #include <frc/TimedRobot.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
@@ -11,7 +13,6 @@
 #include <units/time.h>
 #include <units/velocity.h>
 #include <units/voltage.h>
-#include <wpi/numbers>
 
 #include "ExampleSmartMotorController.h"
 
@@ -31,19 +32,13 @@ class Robot : public frc::TimedRobot {
       m_goal = {0_m, 0_mps};
     }
 
-    // Create a motion profile with the given maximum velocity and maximum
-    // acceleration constraints for the next setpoint, the desired goal, and the
-    // current setpoint.
-    frc::TrapezoidProfile<units::meters> profile{m_constraints, m_goal,
-                                                 m_setpoint};
-
     // Retrieve the profiled setpoint for the next timestep. This setpoint moves
     // toward the goal while obeying the constraints.
-    m_setpoint = profile.Calculate(kDt);
+    m_setpoint = m_profile.Calculate(kDt, m_goal, m_setpoint);
 
     // Send setpoint to offboard controller PID
     m_motor.SetSetpoint(ExampleSmartMotorController::PIDMode::kPosition,
-                        m_setpoint.position.to<double>(),
+                        m_setpoint.position.value(),
                         m_feedforward.Calculate(m_setpoint.velocity) / 12_V);
   }
 
@@ -54,8 +49,9 @@ class Robot : public frc::TimedRobot {
       // Note: These gains are fake, and will have to be tuned for your robot.
       1_V, 1.5_V * 1_s / 1_m};
 
-  frc::TrapezoidProfile<units::meters>::Constraints m_constraints{1.75_mps,
-                                                                  0.75_mps_sq};
+  // Create a motion profile with the given maximum velocity and maximum
+  // acceleration constraints for the next setpoint.
+  frc::TrapezoidProfile<units::meters> m_profile{{1.75_mps, 0.75_mps_sq}};
   frc::TrapezoidProfile<units::meters>::State m_goal;
   frc::TrapezoidProfile<units::meters>::State m_setpoint;
 };

@@ -5,6 +5,7 @@
 #include "frc/simulation/EncoderSim.h"  // NOLINT(build/include_order)
 
 #include <hal/HAL.h>
+#include <wpi/deprecated.h>
 
 #include "callback_helpers/TestCallbackHelpers.h"
 #include "frc/Encoder.h"
@@ -91,7 +92,9 @@ TEST(EncoderSimTest, Period) {
   auto cb = sim.RegisterPeriodCallback(callback.GetCallback(), false);
   sim.SetPeriod(123.456);
   EXPECT_EQ(123.456, sim.GetPeriod());
-  EXPECT_EQ(123.456, encoder.GetPeriod().to<double>());
+  WPI_IGNORE_DEPRECATED
+  EXPECT_EQ(123.456, encoder.GetPeriod().value());
+  WPI_UNIGNORE_DEPRECATED
   EXPECT_EQ(kDefaultDistancePerPulse / 123.456, encoder.GetRate());
 
   EXPECT_TRUE(callback.WasTriggered());
@@ -110,7 +113,9 @@ TEST(EncoderSimTest, SetMaxPeriod) {
   DoubleCallback callback;
   auto cb = sim.RegisterMaxPeriodCallback(callback.GetCallback(), false);
 
+  WPI_IGNORE_DEPRECATED
   encoder.SetMaxPeriod(units::second_t{123.456});
+  WPI_UNIGNORE_DEPRECATED
   EXPECT_EQ(123.456, sim.GetMaxPeriod());
 
   EXPECT_TRUE(callback.WasTriggered());
@@ -194,7 +199,7 @@ TEST(EncoderSimTest, SetDistancePerPulse) {
   DoubleCallback callback;
   auto cb = sim.RegisterDistancePerPulseCallback(callback.GetCallback(), false);
 
-  encoder.SetDistancePerPulse(.03405);
+  sim.SetDistancePerPulse(.03405);
   EXPECT_EQ(.03405, sim.GetDistancePerPulse());
   EXPECT_EQ(.03405, encoder.GetDistancePerPulse());
   EXPECT_TRUE(callback.WasTriggered());

@@ -19,17 +19,15 @@ struct SavedSettings {
   bool loadedWidthHeight = false;
   int width;
   int height;
-  int maximized = 0;
+  bool maximized = false;
   int xPos = -1;
   int yPos = -1;
   int userScale = 2;
   int style = 0;
+  int fps = 120;
 };
 
-struct Font {
-  static constexpr int kScaledLevels = 9;
-  ImFont* scaled[kScaledLevels];
-};
+constexpr int kFontScaledLevels = 9;
 
 struct Context : public SavedSettings {
   std::atomic_bool exit{false};
@@ -37,9 +35,13 @@ struct Context : public SavedSettings {
   std::string title;
   int defaultWidth;
   int defaultHeight;
+  bool isPlatformRendering{false};
 
   GLFWwindow* window = nullptr;
 
+  std::function<void()> loadSettings;
+  std::function<void()> loadIniSettings;
+  std::function<void(bool exiting)> saveSettings;
   std::vector<std::function<void()>> initializers;
   std::vector<std::function<void(float scale)>> windowScalers;
   std::vector<std::pair<
@@ -52,12 +54,14 @@ struct Context : public SavedSettings {
   std::vector<std::function<void()>> lateExecutors;
 
   int fontScale = 2;  // updated by main loop
-  std::vector<Font> fonts;
+  std::vector<ImFont*> fonts;
 
   std::vector<GLFWimage> icons;
 
   std::string iniPath = "imgui.ini";
   bool resetOnExit = false;
+
+  bool reloadFonts = false;  // reload fonts in next PlatformRenderFrame()
 };
 
 extern Context* gContext;

@@ -21,7 +21,6 @@ public final class RoboRioSim {
    * @return the {@link CallbackStore} object associated with this callback. Save a reference to
    *     this object so GC doesn't cancel the callback.
    */
-  @SuppressWarnings("AbbreviationAsWordInName")
   public static CallbackStore registerFPGAButtonCallback(
       NotifyCallback callback, boolean initialNotify) {
     int uid = RoboRioDataJNI.registerFPGAButtonCallback(callback, initialNotify);
@@ -33,7 +32,6 @@ public final class RoboRioSim {
    *
    * @return the FPGA button state
    */
-  @SuppressWarnings("AbbreviationAsWordInName")
   public static boolean getFPGAButton() {
     return RoboRioDataJNI.getFPGAButton();
   }
@@ -43,7 +41,6 @@ public final class RoboRioSim {
    *
    * @param fpgaButton the new state
    */
-  @SuppressWarnings("AbbreviationAsWordInName")
   public static void setFPGAButton(boolean fpgaButton) {
     RoboRioDataJNI.setFPGAButton(fpgaButton);
   }
@@ -76,7 +73,6 @@ public final class RoboRioSim {
    *
    * @param vInVoltage the new voltage
    */
-  @SuppressWarnings("ParameterName")
   public static void setVInVoltage(double vInVoltage) {
     RoboRioDataJNI.setVInVoltage(vInVoltage);
   }
@@ -109,7 +105,6 @@ public final class RoboRioSim {
    *
    * @param vInCurrent the new current
    */
-  @SuppressWarnings("ParameterName")
   public static void setVInCurrent(double vInCurrent) {
     RoboRioDataJNI.setVInCurrent(vInCurrent);
   }
@@ -496,6 +491,74 @@ public final class RoboRioSim {
    */
   public static void setUserFaults3V3(int userFaults3V3) {
     RoboRioDataJNI.setUserFaults3V3(userFaults3V3);
+  }
+
+  /**
+   * Register a callback to be run whenever the Brownout voltage changes.
+   *
+   * @param callback the callback
+   * @param initialNotify whether to call the callback with the initial state
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
+   */
+  public static CallbackStore registerBrownoutVoltageCallback(
+      NotifyCallback callback, boolean initialNotify) {
+    int uid = RoboRioDataJNI.registerBrownoutVoltageCallback(callback, initialNotify);
+    return new CallbackStore(uid, RoboRioDataJNI::cancelBrownoutVoltageCallback);
+  }
+
+  /**
+   * Measure the Brownout voltage.
+   *
+   * @return the Brownout voltage
+   */
+  public static double getBrownoutVoltage() {
+    return RoboRioDataJNI.getBrownoutVoltage();
+  }
+
+  /**
+   * Define the Brownout voltage.
+   *
+   * @param vInVoltage the new voltage
+   */
+  public static void setBrownoutVoltage(double vInVoltage) {
+    RoboRioDataJNI.setBrownoutVoltage(vInVoltage);
+  }
+
+  /**
+   * Get the serial number.
+   *
+   * @return The serial number.
+   */
+  public static String getSerialNumber() {
+    return RoboRioDataJNI.getSerialNumber();
+  }
+
+  /**
+   * Set the serial number.
+   *
+   * @param serialNumber The serial number.
+   */
+  public static void setSerialNumber(String serialNumber) {
+    RoboRioDataJNI.setSerialNumber(serialNumber);
+  }
+
+  /**
+   * Get the comments string.
+   *
+   * @return The comments string.
+   */
+  public static String getComments() {
+    return RoboRioDataJNI.getComments();
+  }
+
+  /**
+   * Set the comments string.
+   *
+   * @param comments The comments string.
+   */
+  public static void setComments(String comments) {
+    RoboRioDataJNI.setComments(comments);
   }
 
   /** Reset all simulation data. */

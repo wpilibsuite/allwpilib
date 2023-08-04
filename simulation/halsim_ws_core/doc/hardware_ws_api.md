@@ -219,7 +219,7 @@ Joystick data is an input to the robot program and should be updated for each in
 
 [``"PWM"``]:#pwm-output-pwm
 
-PWMs may be used to control either speed controllers or servos.  Typically only one of either ``"<speed"`` (for a speed controller) or ``"<position"`` (for a servo) is used for a given PWM.
+PWMs may be used to control either motor controllers or servos.  Typically only one of either ``"<speed"`` (for a motor controller) or ``"<position"`` (for a servo) is used for a given PWM.
 
 | Data Key        | Type    | Description                                |
 | --------------- | ------- | ------------------------------------------ |

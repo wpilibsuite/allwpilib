@@ -52,12 +52,12 @@ const char* GetErrorMessage(int32_t* code);
  * Reports an error to the driver station (using HAL_SendError).
  * Generally the FRC_ReportError wrapper macro should be used instead.
  *
- * @param status error code
- * @param fileName source file name
- * @param lineNumber source line number
- * @param funcName source function name
- * @param format error message format
- * @param args error message format args
+ * @param[out] status error code
+ * @param[in]  fileName source file name
+ * @param[in]  lineNumber source line number
+ * @param[in]  funcName source function name
+ * @param[in]  format error message format
+ * @param[in]  args error message format args
  */
 void ReportErrorV(int32_t status, const char* fileName, int lineNumber,
                   const char* funcName, fmt::string_view format,
@@ -67,18 +67,19 @@ void ReportErrorV(int32_t status, const char* fileName, int lineNumber,
  * Reports an error to the driver station (using HAL_SendError).
  * Generally the FRC_ReportError wrapper macro should be used instead.
  *
- * @param status error code
- * @param fileName source file name
- * @param lineNumber source line number
- * @param funcName source function name
- * @param format error message format
- * @param args error message format args
+ * @param[out] status error code
+ * @param[in]  fileName source file name
+ * @param[in]  lineNumber source line number
+ * @param[in]  funcName source function name
+ * @param[in]  format error message format
+ * @param[in]  args error message format args
  */
-template <typename S, typename... Args>
+template <typename... Args>
 inline void ReportError(int32_t status, const char* fileName, int lineNumber,
-                        const char* funcName, const S& format, Args&&... args) {
+                        const char* funcName, fmt::string_view format,
+                        Args&&... args) {
   ReportErrorV(status, fileName, lineNumber, funcName, format,
-               fmt::make_args_checked<Args...>(format, args...));
+               fmt::make_format_args(args...));
 }
 
 /**
@@ -86,26 +87,26 @@ inline void ReportError(int32_t status, const char* fileName, int lineNumber,
  * by the caller. Generally the FRC_MakeError wrapper macro should be used
  * instead.
  *
- * @param status error code
- * @param message error message details
- * @param fileName source file name
- * @param lineNumber source line number
- * @param funcName source function name
+ * @param[out] status error code
+ * @param[in]  fileName source file name
+ * @param[in]  lineNumber source line number
+ * @param[in]  funcName source function name
+ * @param[in]  format error message format
+ * @param[in]  args error message format args
  * @return runtime error object
  */
-[[nodiscard]] RuntimeError MakeErrorV(int32_t status, const char* fileName,
-                                      int lineNumber, const char* funcName,
-                                      fmt::string_view format,
-                                      fmt::format_args args);
+[[nodiscard]]
+RuntimeError MakeErrorV(int32_t status, const char* fileName, int lineNumber,
+                        const char* funcName, fmt::string_view format,
+                        fmt::format_args args);
 
-template <typename S, typename... Args>
-[[nodiscard]] inline RuntimeError MakeError(int32_t status,
-                                            const char* fileName,
-                                            int lineNumber,
-                                            const char* funcName,
-                                            const S& format, Args&&... args) {
+template <typename... Args>
+[[nodiscard]]
+inline RuntimeError MakeError(int32_t status, const char* fileName,
+                              int lineNumber, const char* funcName,
+                              fmt::string_view format, Args&&... args) {
   return MakeErrorV(status, fileName, lineNumber, funcName, format,
-                    fmt::make_args_checked<Args...>(format, args...));
+                    fmt::make_format_args(args...));
 }
 
 namespace err {
@@ -121,56 +122,63 @@ namespace warn {
 }  // namespace warn
 }  // namespace frc
 
+// C++20 relaxed the number of arguments to variadics, but Apple Clang's
+// warnings haven't caught up yet: https://stackoverflow.com/a/67996331
+#ifdef __clang__
+#pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
+#endif
+
 /**
  * Reports an error to the driver station (using HAL_SendError).
  *
- * @param status error code
- * @param format error message format
+ * @param[out] status error code
+ * @param[in]  format error message format
  */
-#define FRC_ReportError(status, format, ...)                       \
-  do {                                                             \
-    if ((status) != 0) {                                           \
-      ::frc::ReportError(status, __FILE__, __LINE__, __FUNCTION__, \
-                         FMT_STRING(format), __VA_ARGS__);         \
-    }                                                              \
+#define FRC_ReportError(status, format, ...)                             \
+  do {                                                                   \
+    if ((status) != 0) {                                                 \
+      ::frc::ReportError(status, __FILE__, __LINE__, __FUNCTION__,       \
+                         FMT_STRING(format) __VA_OPT__(, ) __VA_ARGS__); \
+    }                                                                    \
   } while (0)
 
 /**
  * Makes a runtime error exception object. This object should be thrown
  * by the caller.
  *
- * @param status error code
- * @param format error message format
+ * @param[out] status error code
+ * @param[in]  format error message format
  * @return runtime error object
  */
 #define FRC_MakeError(status, format, ...)                   \
   ::frc::MakeError(status, __FILE__, __LINE__, __FUNCTION__, \
-                   FMT_STRING(format), __VA_ARGS__)
+                   FMT_STRING(format) __VA_OPT__(, ) __VA_ARGS__)
 
 /**
  * Checks a status code and depending on its value, either throws a
  * RuntimeError exception, calls ReportError, or does nothing (if no error).
  *
- * @param status error code
- * @param format error message format
+ * @param[out] status error code
+ * @param[in]  format error message format
  */
-#define FRC_CheckErrorStatus(status, format, ...)                      \
-  do {                                                                 \
-    if ((status) < 0) {                                                \
-      throw ::frc::MakeError(status, __FILE__, __LINE__, __FUNCTION__, \
-                             FMT_STRING(format), __VA_ARGS__);         \
-    } else if ((status) > 0) {                                         \
-      ::frc::ReportError(status, __FILE__, __LINE__, __FUNCTION__,     \
-                         FMT_STRING(format), __VA_ARGS__);             \
-    }                                                                  \
+#define FRC_CheckErrorStatus(status, format, ...)                            \
+  do {                                                                       \
+    if ((status) < 0) {                                                      \
+      throw ::frc::MakeError(status, __FILE__, __LINE__, __FUNCTION__,       \
+                             FMT_STRING(format) __VA_OPT__(, ) __VA_ARGS__); \
+    } else if ((status) > 0) {                                               \
+      ::frc::ReportError(status, __FILE__, __LINE__, __FUNCTION__,           \
+                         FMT_STRING(format) __VA_OPT__(, ) __VA_ARGS__);     \
+    }                                                                        \
   } while (0)
 
 #define FRC_AssertMessage(condition, format, ...)                            \
   do {                                                                       \
     if (!(condition)) {                                                      \
       throw ::frc::MakeError(err::AssertionFailure, __FILE__, __LINE__,      \
-                             __FUNCTION__, FMT_STRING(format), __VA_ARGS__); \
+                             __FUNCTION__,                                   \
+                             FMT_STRING(format) __VA_OPT__(, ) __VA_ARGS__); \
     }                                                                        \
   } while (0)
 
-#define FRC_Assert(condition) FRC_AssertMessage(condition, "{}", #condition)
+#define FRC_Assert(condition) FRC_AssertMessage(condition, #condition)

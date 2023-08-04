@@ -2,11 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <numbers>
+
 #include <frc/DriverStation.h>
 #include <frc/Encoder.h>
 #include <frc/TimedRobot.h>
 #include <frc/XboxController.h>
-#include <frc/controller/LinearPlantInversionFeedforward.h>
 #include <frc/controller/LinearQuadraticRegulator.h>
 #include <frc/drive/DifferentialDrive.h>
 #include <frc/estimator/KalmanFilter.h>
@@ -14,7 +15,6 @@
 #include <frc/system/LinearSystemLoop.h>
 #include <frc/system/plant/DCMotor.h>
 #include <frc/system/plant/LinearSystemId.h>
-#include <wpi/numbers>
 
 /**
  * This is a sample program to demonstrate how to use a state-space controller
@@ -82,11 +82,11 @@ class Robot : public frc::TimedRobot {
  public:
   void RobotInit() override {
     // We go 2 pi radians per 4096 clicks.
-    m_encoder.SetDistancePerPulse(2.0 * wpi::numbers::pi / 4096.0);
+    m_encoder.SetDistancePerPulse(2.0 * std::numbers::pi / 4096.0);
   }
 
   void TeleopInit() override {
-    m_loop.Reset(Eigen::Vector<double, 1>{m_encoder.GetRate()});
+    m_loop.Reset(frc::Vectord<1>{m_encoder.GetRate()});
   }
 
   void TeleopPeriodic() override {
@@ -94,14 +94,14 @@ class Robot : public frc::TimedRobot {
     // setpoint of a PID controller.
     if (m_joystick.GetRightBumper()) {
       // We pressed the bumper, so let's set our next reference
-      m_loop.SetNextR(Eigen::Vector<double, 1>{kSpinup.to<double>()});
+      m_loop.SetNextR(frc::Vectord<1>{kSpinup.value()});
     } else {
       // We released the bumper, so let's spin down
-      m_loop.SetNextR(Eigen::Vector<double, 1>{0.0});
+      m_loop.SetNextR(frc::Vectord<1>{0.0});
     }
 
     // Correct our Kalman filter's state vector estimate with encoder data.
-    m_loop.Correct(Eigen::Vector<double, 1>{m_encoder.GetRate()});
+    m_loop.Correct(frc::Vectord<1>{m_encoder.GetRate()});
 
     // Update our LQR to generate new voltage commands and use the voltages to
     // predict the next state with out Kalman filter.
@@ -110,7 +110,7 @@ class Robot : public frc::TimedRobot {
     // Send the new calculated voltage to the motors.
     // voltage = duty cycle * battery voltage, so
     // duty cycle = voltage / battery voltage
-    m_motor.SetVoltage(units::volt_t(m_loop.U(0)));
+    m_motor.SetVoltage(units::volt_t{m_loop.U(0)});
   }
 };
 

@@ -56,4 +56,10 @@ HAL_Bool HAL_GetUserActive3V3(int32_t* status) {
 int32_t HAL_GetUserCurrentFaults3V3(int32_t* status) {
   return SimRoboRioData->userFaults3V3;
 }
+void HAL_SetBrownoutVoltage(double voltage, int32_t* status) {
+  SimRoboRioData->brownoutVoltage = voltage;
+}
+double HAL_GetBrownoutVoltage(int32_t* status) {
+  return SimRoboRioData->brownoutVoltage;
+}
 }  // extern "C"

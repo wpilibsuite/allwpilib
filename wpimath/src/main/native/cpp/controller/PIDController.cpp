@@ -21,10 +21,10 @@ PIDController::PIDController(double Kp, double Ki, double Kd,
   if (period <= 0_s) {
     wpi::math::MathSharedStore::ReportError(
         "Controller period must be a non-zero positive number, got {}!",
-        period.to<double>());
+        period.value());
     m_period = 20_ms;
     wpi::math::MathSharedStore::ReportWarning(
-        "{}", "Controller period defaulted to 20ms.");
+        "Controller period defaulted to 20ms.");
   }
   static int instances = 0;
   instances++;
@@ -52,6 +52,14 @@ void PIDController::SetD(double Kd) {
   m_Kd = Kd;
 }
 
+void PIDController::SetIZone(double iZone) {
+  if (iZone < 0) {
+    wpi::math::MathSharedStore::ReportError(
+        "IZone must be a non-negative number, got {}!", iZone);
+  }
+  m_iZone = iZone;
+}
+
 double PIDController::GetP() const {
   return m_Kp;
 }
@@ -64,12 +72,35 @@ double PIDController::GetD() const {
   return m_Kd;
 }
 
+double PIDController::GetIZone() const {
+  return m_iZone;
+}
+
 units::second_t PIDController::GetPeriod() const {
-  return units::second_t(m_period);
+  return m_period;
+}
+
+double PIDController::GetPositionTolerance() const {
+  return m_positionTolerance;
+}
+
+double PIDController::GetVelocityTolerance() const {
+  return m_velocityTolerance;
 }
 
 void PIDController::SetSetpoint(double setpoint) {
   m_setpoint = setpoint;
+  m_haveSetpoint = true;
+
+  if (m_continuous) {
+    double errorBound = (m_maximumInput - m_minimumInput) / 2.0;
+    m_positionError =
+        frc::InputModulus(m_setpoint - m_measurement, -errorBound, errorBound);
+  } else {
+    m_positionError = m_setpoint - m_measurement;
+  }
+
+  m_velocityError = (m_positionError - m_prevError) / m_period.value();
 }
 
 double PIDController::GetSetpoint() const {
@@ -77,19 +108,9 @@ double PIDController::GetSetpoint() const {
 }
 
 bool PIDController::AtSetpoint() const {
-  double positionError;
-  if (m_continuous) {
-    double errorBound = (m_maximumInput - m_minimumInput) / 2.0;
-    positionError =
-        frc::InputModulus(m_setpoint - m_measurement, -errorBound, errorBound);
-  } else {
-    positionError = m_setpoint - m_measurement;
-  }
-
-  double velocityError = (positionError - m_prevError) / m_period.to<double>();
-
-  return std::abs(positionError) < m_positionTolerance &&
-         std::abs(velocityError) < m_velocityTolerance;
+  return m_haveMeasurement && m_haveSetpoint &&
+         std::abs(m_positionError) < m_positionTolerance &&
+         std::abs(m_velocityError) < m_velocityTolerance;
 }
 
 void PIDController::EnableContinuousInput(double minimumInput,
@@ -130,20 +151,25 @@ double PIDController::GetVelocityError() const {
 double PIDController::Calculate(double measurement) {
   m_measurement = measurement;
   m_prevError = m_positionError;
+  m_haveMeasurement = true;
 
   if (m_continuous) {
     double errorBound = (m_maximumInput - m_minimumInput) / 2.0;
     m_positionError =
         frc::InputModulus(m_setpoint - m_measurement, -errorBound, errorBound);
   } else {
-    m_positionError = m_setpoint - measurement;
+    m_positionError = m_setpoint - m_measurement;
   }
 
-  m_velocityError = (m_positionError - m_prevError) / m_period.to<double>();
+  m_velocityError = (m_positionError - m_prevError) / m_period.value();
 
-  if (m_Ki != 0) {
+  // If the absolute value of the position error is outside of IZone, reset the
+  // total error
+  if (std::abs(m_positionError) > m_iZone) {
+    m_totalError = 0;
+  } else if (m_Ki != 0) {
     m_totalError =
-        std::clamp(m_totalError + m_positionError * m_period.to<double>(),
+        std::clamp(m_totalError + m_positionError * m_period.value(),
                    m_minimumIntegral / m_Ki, m_maximumIntegral / m_Ki);
   }
 
@@ -151,14 +177,17 @@ double PIDController::Calculate(double measurement) {
 }
 
 double PIDController::Calculate(double measurement, double setpoint) {
-  // Set setpoint to provided value
-  SetSetpoint(setpoint);
+  m_setpoint = setpoint;
+  m_haveSetpoint = true;
   return Calculate(measurement);
 }
 
 void PIDController::Reset() {
+  m_positionError = 0;
   m_prevError = 0;
   m_totalError = 0;
+  m_velocityError = 0;
+  m_haveMeasurement = false;
 }
 
 void PIDController::InitSendable(wpi::SendableBuilder& builder) {
@@ -169,6 +198,9 @@ void PIDController::InitSendable(wpi::SendableBuilder& builder) {
       "i", [this] { return GetI(); }, [this](double value) { SetI(value); });
   builder.AddDoubleProperty(
       "d", [this] { return GetD(); }, [this](double value) { SetD(value); });
+  builder.AddDoubleProperty(
+      "izone", [this] { return GetIZone(); },
+      [this](double value) { SetIZone(value); });
   builder.AddDoubleProperty(
       "setpoint", [this] { return GetSetpoint(); },
       [this](double value) { SetSetpoint(value); });

@@ -8,9 +8,9 @@ void Drivetrain::SetSpeeds(const frc::DifferentialDriveWheelSpeeds& speeds) {
   const auto leftFeedforward = m_feedforward.Calculate(speeds.left);
   const auto rightFeedforward = m_feedforward.Calculate(speeds.right);
   const double leftOutput = m_leftPIDController.Calculate(
-      m_leftEncoder.GetRate(), speeds.left.to<double>());
+      m_leftEncoder.GetRate(), speeds.left.value());
   const double rightOutput = m_rightPIDController.Calculate(
-      m_rightEncoder.GetRate(), speeds.right.to<double>());
+      m_rightEncoder.GetRate(), speeds.right.value());
 
   m_leftGroup.SetVoltage(units::volt_t{leftOutput} + leftFeedforward);
   m_rightGroup.SetVoltage(units::volt_t{rightOutput} + rightFeedforward);
@@ -23,12 +23,14 @@ void Drivetrain::Drive(units::meters_per_second_t xSpeed,
 
 void Drivetrain::UpdateOdometry() {
   m_odometry.Update(m_gyro.GetRotation2d(),
-                    units::meter_t(m_leftEncoder.GetDistance()),
-                    units::meter_t(m_rightEncoder.GetDistance()));
+                    units::meter_t{m_leftEncoder.GetDistance()},
+                    units::meter_t{m_rightEncoder.GetDistance()});
 }
 
 void Drivetrain::ResetOdometry(const frc::Pose2d& pose) {
-  m_odometry.ResetPosition(pose, m_gyro.GetRotation2d());
+  m_odometry.ResetPosition(m_gyro.GetRotation2d(),
+                           units::meter_t{m_leftEncoder.GetDistance()},
+                           units::meter_t{m_rightEncoder.GetDistance()}, pose);
 }
 
 frc::Pose2d Drivetrain::GetPose() const {

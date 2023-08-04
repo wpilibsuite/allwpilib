@@ -3,64 +3,74 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <cmath>
-
-#include <wpi/numbers>
+#include <numbers>
 
 #include "frc/geometry/Pose2d.h"
 #include "gtest/gtest.h"
 
 using namespace frc;
 
-static constexpr double kEpsilon = 1E-9;
-
 TEST(Twist2dTest, Straight) {
-  const Twist2d straight{5.0_m, 0.0_m, 0.0_rad};
-  const auto straightPose = Pose2d().Exp(straight);
+  const Twist2d straight{5_m, 0_m, 0_rad};
+  const auto straightPose = Pose2d{}.Exp(straight);
 
-  EXPECT_NEAR(straightPose.X().to<double>(), 5.0, kEpsilon);
-  EXPECT_NEAR(straightPose.Y().to<double>(), 0.0, kEpsilon);
-  EXPECT_NEAR(straightPose.Rotation().Radians().to<double>(), 0.0, kEpsilon);
+  EXPECT_DOUBLE_EQ(5.0, straightPose.X().value());
+  EXPECT_DOUBLE_EQ(0.0, straightPose.Y().value());
+  EXPECT_DOUBLE_EQ(0.0, straightPose.Rotation().Radians().value());
 }
 
 TEST(Twist2dTest, QuarterCircle) {
-  const Twist2d quarterCircle{5.0_m / 2.0 * wpi::numbers::pi, 0_m,
-                              units::radian_t(wpi::numbers::pi / 2.0)};
-  const auto quarterCirclePose = Pose2d().Exp(quarterCircle);
+  const Twist2d quarterCircle{5_m / 2.0 * std::numbers::pi, 0_m,
+                              units::radian_t{std::numbers::pi / 2.0}};
+  const auto quarterCirclePose = Pose2d{}.Exp(quarterCircle);
 
-  EXPECT_NEAR(quarterCirclePose.X().to<double>(), 5.0, kEpsilon);
-  EXPECT_NEAR(quarterCirclePose.Y().to<double>(), 5.0, kEpsilon);
-  EXPECT_NEAR(quarterCirclePose.Rotation().Degrees().to<double>(), 90.0,
-              kEpsilon);
+  EXPECT_DOUBLE_EQ(5.0, quarterCirclePose.X().value());
+  EXPECT_DOUBLE_EQ(5.0, quarterCirclePose.Y().value());
+  EXPECT_DOUBLE_EQ(90.0, quarterCirclePose.Rotation().Degrees().value());
 }
 
 TEST(Twist2dTest, DiagonalNoDtheta) {
-  const Twist2d diagonal{2.0_m, 2.0_m, 0.0_deg};
-  const auto diagonalPose = Pose2d().Exp(diagonal);
+  const Twist2d diagonal{2_m, 2_m, 0_deg};
+  const auto diagonalPose = Pose2d{}.Exp(diagonal);
 
-  EXPECT_NEAR(diagonalPose.X().to<double>(), 2.0, kEpsilon);
-  EXPECT_NEAR(diagonalPose.Y().to<double>(), 2.0, kEpsilon);
-  EXPECT_NEAR(diagonalPose.Rotation().Degrees().to<double>(), 0.0, kEpsilon);
+  EXPECT_DOUBLE_EQ(2.0, diagonalPose.X().value());
+  EXPECT_DOUBLE_EQ(2.0, diagonalPose.Y().value());
+  EXPECT_DOUBLE_EQ(0.0, diagonalPose.Rotation().Degrees().value());
 }
 
 TEST(Twist2dTest, Equality) {
-  const Twist2d one{5.0_m, 1.0_m, 3.0_rad};
-  const Twist2d two{5.0_m, 1.0_m, 3.0_rad};
+  const Twist2d one{5_m, 1_m, 3_rad};
+  const Twist2d two{5_m, 1_m, 3_rad};
   EXPECT_TRUE(one == two);
 }
 
 TEST(Twist2dTest, Inequality) {
-  const Twist2d one{5.0_m, 1.0_m, 3.0_rad};
-  const Twist2d two{5.0_m, 1.2_m, 3.0_rad};
+  const Twist2d one{5_m, 1_m, 3_rad};
+  const Twist2d two{5_m, 1.2_m, 3_rad};
   EXPECT_TRUE(one != two);
 }
 
 TEST(Twist2dTest, Pose2dLog) {
-  const Pose2d end{5_m, 5_m, Rotation2d(90_deg)};
-  const Pose2d start{};
+  const Pose2d end{5_m, 5_m, 90_deg};
+  const Pose2d start;
 
   const auto twist = start.Log(end);
 
-  EXPECT_NEAR(twist.dx.to<double>(), 5 / 2.0 * wpi::numbers::pi, kEpsilon);
-  EXPECT_NEAR(twist.dy.to<double>(), 0.0, kEpsilon);
-  EXPECT_NEAR(twist.dtheta.to<double>(), wpi::numbers::pi / 2.0, kEpsilon);
+  Twist2d expected{units::meter_t{5.0 / 2.0 * std::numbers::pi}, 0_m,
+                   units::radian_t{std::numbers::pi / 2.0}};
+  EXPECT_EQ(expected, twist);
+
+  // Make sure computed twist gives back original end pose
+  const auto reapplied = start.Exp(twist);
+  EXPECT_EQ(end, reapplied);
+}
+
+TEST(Twist2dTest, Constexpr) {
+  constexpr Twist2d defaultCtor;
+  constexpr Twist2d componentCtor{1_m, 2_m, 3_rad};
+  constexpr auto multiplied = componentCtor * 2;
+
+  static_assert(defaultCtor.dx == 0_m);
+  static_assert(componentCtor.dy == 2_m);
+  static_assert(multiplied.dtheta == 6_rad);
 }

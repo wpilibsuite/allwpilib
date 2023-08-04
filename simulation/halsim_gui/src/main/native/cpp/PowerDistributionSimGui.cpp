@@ -124,7 +124,7 @@ static bool PowerDistributionsAnyInitialized() {
 }
 
 void PowerDistributionSimGui::Initialize() {
-  HALSimGui::halProvider.Register(
+  HALSimGui::halProvider->Register(
       "PowerDistributions", PowerDistributionsAnyInitialized,
       [] { return std::make_unique<PowerDistributionsSimModel>(); },
       [](glass::Window* win, glass::Model* model) {

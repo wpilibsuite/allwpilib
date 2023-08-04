@@ -4,11 +4,11 @@
 
 package edu.wpi.first.wpilibj.templates.robotbaseskeleton;
 
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.DriverStationJNI;
+import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.internal.DriverStationModeThread;
 
 /**
  * The VM is configured to automatically run this class. If you change the name of this class or the
@@ -31,44 +31,65 @@ public class Robot extends RobotBase {
   public void startCompetition() {
     robotInit();
 
+    DriverStationModeThread modeThread = new DriverStationModeThread();
+
+    int event = WPIUtilJNI.createEvent(false, false);
+
+    DriverStation.provideRefreshedDataEventHandle(event);
+
     // Tell the DS that the robot is ready to be enabled
-    HAL.observeUserProgramStarting();
+    DriverStationJNI.observeUserProgramStarting();
 
     while (!Thread.currentThread().isInterrupted() && !m_exit) {
       if (isDisabled()) {
-        DriverStation.inDisabled(true);
+        modeThread.inDisabled(true);
         disabled();
-        DriverStation.inDisabled(false);
+        modeThread.inDisabled(false);
         while (isDisabled()) {
-          DriverStation.waitForData();
+          try {
+            WPIUtilJNI.waitForObject(event);
+          } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+          }
         }
       } else if (isAutonomous()) {
-        DriverStation.inAutonomous(true);
+        modeThread.inAutonomous(true);
         autonomous();
-        DriverStation.inAutonomous(false);
+        modeThread.inAutonomous(false);
         while (isAutonomousEnabled()) {
-          DriverStation.waitForData();
+          try {
+            WPIUtilJNI.waitForObject(event);
+          } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+          }
         }
       } else if (isTest()) {
-        LiveWindow.setEnabled(true);
-        Shuffleboard.enableActuatorWidgets();
-        DriverStation.inTest(true);
+        modeThread.inTest(true);
         test();
-        DriverStation.inTest(false);
+        modeThread.inTest(false);
         while (isTest() && isEnabled()) {
-          DriverStation.waitForData();
+          try {
+            WPIUtilJNI.waitForObject(event);
+          } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+          }
         }
-        LiveWindow.setEnabled(false);
-        Shuffleboard.disableActuatorWidgets();
       } else {
-        DriverStation.inTeleop(true);
+        modeThread.inTeleop(true);
         teleop();
-        DriverStation.inTeleop(false);
+        modeThread.inTeleop(false);
         while (isTeleopEnabled()) {
-          DriverStation.waitForData();
+          try {
+            WPIUtilJNI.waitForObject(event);
+          } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+          }
         }
       }
     }
+
+    DriverStation.removeRefreshedDataEventHandle(event);
+    modeThread.close();
   }
 
   @Override

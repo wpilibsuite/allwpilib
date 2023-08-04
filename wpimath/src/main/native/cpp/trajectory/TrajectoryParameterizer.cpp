@@ -62,7 +62,7 @@ Trajectory TrajectoryParameterizer::TimeParameterizeTrajectory(
     // acceleration, since acceleration limits may be a function of velocity.
     while (true) {
       // Enforce global max velocity and max reachable velocity by global
-      // acceleration limit. vf = std::sqrt(vi^2 + 2*a*d).
+      // acceleration limit. v_f = √(v_i² + 2ad).
 
       constrainedState.maxVelocity = units::math::min(
           maxVelocity,
@@ -85,7 +85,7 @@ Trajectory TrajectoryParameterizer::TimeParameterizeTrajectory(
       // Now enforce all acceleration limits.
       EnforceAccelerationLimits(reversed, constraints, &constrainedState);
 
-      if (ds.to<double>() < kEpsilon) {
+      if (ds.value() < kEpsilon) {
         break;
       }
 
@@ -126,7 +126,7 @@ Trajectory TrajectoryParameterizer::TimeParameterizeTrajectory(
 
     while (true) {
       // Enforce max velocity limit (reverse)
-      // vf = std::sqrt(vi^2 + 2*a*d), where vi = successor.
+      // v_f = √(v_i² + 2ad), where v_i = successor.
       units::meters_per_second_t newMaxVelocity =
           units::math::sqrt(successor.maxVelocity * successor.maxVelocity +
                             successor.minAcceleration * ds * 2.0);
@@ -141,7 +141,7 @@ Trajectory TrajectoryParameterizer::TimeParameterizeTrajectory(
       // Check all acceleration constraints with the new max velocity.
       EnforceAccelerationLimits(reversed, constraints, &constrainedState);
 
-      if (ds.to<double>() > -kEpsilon) {
+      if (ds.value() > -kEpsilon) {
         break;
       }
 
@@ -187,10 +187,10 @@ Trajectory TrajectoryParameterizer::TimeParameterizeTrajectory(
     if (i > 0) {
       states.at(i - 1).acceleration = reversed ? -accel : accel;
       if (units::math::abs(accel) > 1E-6_mps_sq) {
-        // v_f = v_0 + a * t
+        // v_f = v_0 + at
         dt = (state.maxVelocity - v) / accel;
       } else if (units::math::abs(v) > 1E-6_mps) {
-        // delta_x = v * t
+        // delta_x = vt
         dt = ds / v;
       } else {
         throw std::runtime_error(fmt::format(
@@ -223,10 +223,9 @@ void TrajectoryParameterizer::EnforceAccelerationLimits(
 
     if (minMaxAccel.minAcceleration > minMaxAccel.maxAcceleration) {
       throw std::runtime_error(
-          "The constraint's min acceleration was greater than its max "
-          "acceleration. To debug this, remove all constraints from the config "
-          "and add each one individually. If the offending constraint was "
-          "packaged with WPILib, please file a bug report.");
+          "There was an infeasible trajectory constraint. To determine which "
+          "one, remove all constraints from the TrajectoryConfig and add them "
+          "back one-by-one.");
     }
 
     state->minAcceleration = units::math::max(

@@ -7,12 +7,13 @@
 #include <functional>
 #include <initializer_list>
 #include <memory>
+#include <span>
 #include <string>
 
 #include <units/time.h>
 #include <wpi/Demangle.h>
 #include <wpi/SmallSet.h>
-#include <wpi/span.h>
+#include <wpi/sendable/Sendable.h>
 
 #include "frc2/command/Subsystem.h"
 
@@ -23,32 +24,27 @@ std::string GetTypeName(const T& type) {
   return wpi::Demangle(typeid(type).name());
 }
 
-class ParallelCommandGroup;
-class ParallelRaceGroup;
-class ParallelDeadlineGroup;
-class SequentialCommandGroup;
-class PerpetualCommand;
-class ProxyScheduleCommand;
-
 /**
  * A state machine representing a complete action to be performed by the robot.
  * Commands are run by the CommandScheduler, and can be composed into
  * CommandGroups to allow users to build complicated multi-step actions without
  * the need to roll the state machine logic themselves.
  *
- * <p>Commands are run synchronously from the main robot loop; no multithreading
- * is used, unless specified explicitly from the command implementation.
+ * <p>Commands are run synchronously from the main robot loop; no
+ * multithreading is used, unless specified explicitly from the command
+ * implementation.
  *
  * <p>Note: ALWAYS create a subclass by extending CommandHelper<Base, Subclass>,
  * or decorators will not function!
  *
+ * This class is provided by the NewCommands VendorDep
+ *
  * @see CommandScheduler
  * @see CommandHelper
  */
-class Command {
+class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
  public:
-  Command() = default;
-  virtual ~Command();
+  ~Command() override;
 
   Command(const Command&) = default;
   Command& operator=(const Command& rhs);
@@ -84,41 +80,154 @@ class Command {
   virtual bool IsFinished() { return false; }
 
   /**
-   * Specifies the set of subsystems used by this command.  Two commands cannot
-   * use the same subsystem at the same time.  If the command is scheduled as
-   * interruptible and another command is scheduled that shares a requirement,
-   * the command will be interrupted.  Else, the command will not be scheduled.
-   * If no subsystems are required, return an empty set.
+   * Specifies the set of subsystems used by this command. Two commands cannot
+   * use the same subsystem at the same time. If another command is scheduled
+   * that shares a requirement, GetInterruptionBehavior() will be checked and
+   * followed. If no subsystems are required, return an empty set.
    *
    * <p>Note: it is recommended that user implementations contain the
    * requirements as a field, and return that field here, rather than allocating
    * a new set every time this is called.
    *
    * @return the set of subsystems that are required
+   * @see InterruptionBehavior
    */
-  virtual wpi::SmallSet<Subsystem*, 4> GetRequirements() const = 0;
+  virtual wpi::SmallSet<Subsystem*, 4> GetRequirements() const;
 
   /**
-   * Decorates this command with a timeout.  If the specified timeout is
+   * Adds the specified Subsystem requirements to the command.
+   *
+   * The scheduler will prevent two commands that require the same subsystem
+   * from being scheduled simultaneously.
+   *
+   * Note that the scheduler determines the requirements of a command when it
+   * is scheduled, so this method should normally be called from the command's
+   * constructor.
+   *
+   * @param requirements the Subsystem requirements to add
+   */
+  void AddRequirements(std::initializer_list<Subsystem*> requirements);
+
+  /**
+   * Adds the specified Subsystem requirements to the command.
+   *
+   * The scheduler will prevent two commands that require the same subsystem
+   * from being scheduled simultaneously.
+   *
+   * Note that the scheduler determines the requirements of a command when it
+   * is scheduled, so this method should normally be called from the command's
+   * constructor.
+   *
+   * @param requirements the Subsystem requirements to add
+   */
+  void AddRequirements(std::span<Subsystem* const> requirements);
+
+  /**
+   * Adds the specified Subsystem requirements to the command.
+   *
+   * The scheduler will prevent two commands that require the same subsystem
+   * from being scheduled simultaneously.
+   *
+   * Note that the scheduler determines the requirements of a command when it
+   * is scheduled, so this method should normally be called from the command's
+   * constructor.
+   *
+   * @param requirements the Subsystem requirements to add
+   */
+  void AddRequirements(wpi::SmallSet<Subsystem*, 4> requirements);
+
+  /**
+   * Adds the specified Subsystem requirement to the command.
+   *
+   * The scheduler will prevent two commands that require the same subsystem
+   * from being scheduled simultaneously.
+   *
+   * Note that the scheduler determines the requirements of a command when it
+   * is scheduled, so this method should normally be called from the command's
+   * constructor.
+   *
+   * @param requirement the Subsystem requirement to add
+   */
+  void AddRequirements(Subsystem* requirement);
+
+  /**
+   * Gets the name of this Command.
+   *
+   * @return Name
+   */
+  std::string GetName() const;
+
+  /**
+   * Sets the name of this Command.
+   *
+   * @param name name
+   */
+  void SetName(std::string_view name);
+
+  /**
+   * Gets the subsystem name of this Command.
+   *
+   * @return Subsystem name
+   */
+  std::string GetSubsystem() const;
+
+  /**
+   * Sets the subsystem name of this Command.
+   *
+   * @param subsystem subsystem name
+   */
+  void SetSubsystem(std::string_view subsystem);
+
+  /**
+   * An enum describing the command's behavior when another command with a
+   * shared requirement is scheduled.
+   */
+  enum class InterruptionBehavior {
+    /**
+     * This command ends, End(true) is called, and the incoming command is
+     * scheduled normally.
+     *
+     * <p>This is the default behavior.
+     */
+    kCancelSelf,
+    /** This command continues, and the incoming command is not scheduled. */
+    kCancelIncoming
+  };
+
+  friend class CommandPtr;
+
+  /**
+   * Decorates this command with a timeout. If the specified timeout is
    * exceeded before the command finishes normally, the command will be
-   * interrupted and un-scheduled.  Note that the timeout only applies to the
-   * command returned by this method; the calling command is not itself changed.
+   * interrupted and un-scheduled.
    *
    * @param duration the timeout duration
    * @return the command with the timeout added
    */
-  virtual ParallelRaceGroup WithTimeout(units::second_t duration) &&;
+  [[nodiscard]]
+  CommandPtr WithTimeout(units::second_t duration) &&;
 
   /**
-   * Decorates this command with an interrupt condition.  If the specified
+   * Decorates this command with an interrupt condition. If the specified
    * condition becomes true before the command finishes normally, the command
-   * will be interrupted and un-scheduled. Note that this only applies to the
-   * command returned by this method; the calling command is not itself changed.
+   * will be interrupted and un-scheduled.
    *
    * @param condition the interrupt condition
    * @return the command with the interrupt condition added
    */
-  virtual ParallelRaceGroup WithInterrupt(std::function<bool()> condition) &&;
+  [[nodiscard]]
+  CommandPtr Until(std::function<bool()> condition) &&;
+
+  /**
+   * Decorates this command with a run condition. If the specified condition
+   * becomes false before the command finishes normally, the command will be
+   * interrupted and un-scheduled.
+   *
+   * @param condition the run condition
+   * @return the command with the run condition added
+   */
+  [[nodiscard]]
+  CommandPtr OnlyWhile(std::function<bool()> condition) &&;
 
   /**
    * Decorates this command with a runnable to run before this command starts.
@@ -127,9 +236,9 @@ class Command {
    * @param requirements the required subsystems
    * @return the decorated command
    */
-  virtual SequentialCommandGroup BeforeStarting(
-      std::function<void()> toRun,
-      std::initializer_list<Subsystem*> requirements) &&;
+  [[nodiscard]]
+  CommandPtr BeforeStarting(std::function<void()> toRun,
+                            std::initializer_list<Subsystem*> requirements) &&;
 
   /**
    * Decorates this command with a runnable to run before this command starts.
@@ -138,9 +247,9 @@ class Command {
    * @param requirements the required subsystems
    * @return the decorated command
    */
-  virtual SequentialCommandGroup BeforeStarting(
-      std::function<void()> toRun,
-      wpi::span<Subsystem* const> requirements = {}) &&;
+  [[nodiscard]]
+  CommandPtr BeforeStarting(std::function<void()> toRun,
+                            std::span<Subsystem* const> requirements = {}) &&;
 
   /**
    * Decorates this command with a runnable to run after the command finishes.
@@ -149,9 +258,9 @@ class Command {
    * @param requirements the required subsystems
    * @return the decorated command
    */
-  virtual SequentialCommandGroup AndThen(
-      std::function<void()> toRun,
-      std::initializer_list<Subsystem*> requirements) &&;
+  [[nodiscard]]
+  CommandPtr AndThen(std::function<void()> toRun,
+                     std::initializer_list<Subsystem*> requirements) &&;
 
   /**
    * Decorates this command with a runnable to run after the command finishes.
@@ -160,62 +269,129 @@ class Command {
    * @param requirements the required subsystems
    * @return the decorated command
    */
-  virtual SequentialCommandGroup AndThen(
-      std::function<void()> toRun,
-      wpi::span<Subsystem* const> requirements = {}) &&;
+  [[nodiscard]]
+  CommandPtr AndThen(std::function<void()> toRun,
+                     std::span<Subsystem* const> requirements = {}) &&;
 
   /**
-   * Decorates this command to run perpetually, ignoring its ordinary end
-   * conditions.  The decorated command can still be interrupted or canceled.
+   * Decorates this command to run repeatedly, restarting it when it ends, until
+   * this command is interrupted. The decorated command can still be canceled.
    *
    * @return the decorated command
    */
-  virtual PerpetualCommand Perpetually() &&;
+  [[nodiscard]]
+  CommandPtr Repeatedly() &&;
 
   /**
    * Decorates this command to run "by proxy" by wrapping it in a
-   * ProxyScheduleCommand. This is useful for "forking off" from command groups
+   * ProxyCommand. This is useful for "forking off" from command groups
    * when the user does not wish to extend the command's requirements to the
    * entire command group.
    *
+   * <p>This overload transfers command ownership to the returned CommandPtr.
+   *
    * @return the decorated command
    */
-  virtual ProxyScheduleCommand AsProxy();
+  [[nodiscard]]
+  CommandPtr AsProxy() &&;
+
+  /**
+   * Decorates this command to only run if this condition is not met. If the
+   * command is already running and the condition changes to true, the command
+   * will not stop running. The requirements of this command will be kept for
+   * the new conditional command.
+   *
+   * @param condition the condition that will prevent the command from running
+   * @return the decorated command
+   */
+  [[nodiscard]]
+  CommandPtr Unless(std::function<bool()> condition) &&;
+
+  /**
+   * Decorates this command to only run if this condition is met. If the command
+   * is already running and the condition changes to false, the command will not
+   * stop running. The requirements of this command will be kept for the new
+   * conditional command.
+   *
+   * @param condition the condition that will allow the command to run
+   * @return the decorated command
+   */
+  [[nodiscard]]
+  CommandPtr OnlyIf(std::function<bool()> condition) &&;
+
+  /**
+   * Decorates this command to run or stop when disabled.
+   *
+   * @param doesRunWhenDisabled true to run when disabled.
+   * @return the decorated command
+   */
+  [[nodiscard]]
+  CommandPtr IgnoringDisable(bool doesRunWhenDisabled) &&;
+
+  /**
+   * Decorates this command to have a different interrupt behavior.
+   *
+   * @param interruptBehavior the desired interrupt behavior
+   * @return the decorated command
+   */
+  [[nodiscard]]
+  CommandPtr WithInterruptBehavior(
+      Command::InterruptionBehavior interruptBehavior) &&;
+
+  /**
+   * Decorates this command with a lambda to call on interrupt or end, following
+   * the command's inherent Command::End(bool) method.
+   *
+   * @param end a lambda accepting a boolean parameter specifying whether the
+   * command was interrupted.
+   * @return the decorated command
+   */
+  [[nodiscard]]
+  CommandPtr FinallyDo(std::function<void(bool)> end) &&;
+
+  /**
+   * Decorates this command with a lambda to call on interrupt, following the
+   * command's inherent Command::End(bool) method.
+   *
+   * @param handler a lambda to run when the command is interrupted
+   * @return the decorated command
+   */
+  [[nodiscard]]
+  CommandPtr HandleInterrupt(std::function<void()> handler) &&;
+
+  /**
+   * Decorates this Command with a name.
+   *
+   * @param name name
+   * @return the decorated Command
+   */
+  [[nodiscard]]
+  CommandPtr WithName(std::string_view name) &&;
 
   /**
    * Schedules this command.
-   *
-   * @param interruptible whether this command can be interrupted by another
-   * command that shares one of its requirements
    */
-  void Schedule(bool interruptible);
+  void Schedule();
 
   /**
-   * Schedules this command, defaulting to interruptible.
-   */
-  void Schedule() { Schedule(true); }
-
-  /**
-   * Cancels this command.  Will call the command's interrupted() method.
-   * Commands will be canceled even if they are not marked as interruptible.
+   * Cancels this command. Will call End(true). Commands will be canceled
+   * regardless of interruption behavior.
    */
   void Cancel();
 
   /**
-   * Whether or not the command is currently scheduled.  Note that this does not
-   * detect whether the command is being run by a CommandGroup, only whether it
-   * is directly being run by the scheduler.
+   * Whether or not the command is currently scheduled. Note that this does not
+   * detect whether the command is in a composition, only whether it is directly
+   * being run by the scheduler.
    *
    * @return Whether the command is scheduled.
    */
   bool IsScheduled() const;
 
   /**
-   * Whether the command requires a given subsystem.  Named "hasRequirement"
-   * rather than "requires" to avoid confusion with
-   * {@link
-   * edu.wpi.first.wpilibj.command.Command#requires(edu.wpi.first.wpilibj.command.Subsystem)}
-   *  - this may be able to be changed in a few years.
+   * Whether the command requires a given subsystem.  Named "HasRequirement"
+   * rather than "requires" to avoid confusion with Command::Requires(Subsystem)
+   * -- this may be able to be changed in a few years.
    *
    * @param requirement the subsystem to inquire about
    * @return whether the subsystem is required
@@ -226,14 +402,14 @@ class Command {
    * Whether the command is currently grouped in a command group.  Used as extra
    * insurance to prevent accidental independent use of grouped commands.
    */
-  bool IsGrouped() const;
+  bool IsComposed() const;
 
   /**
-   * Sets whether the command is currently grouped in a command group.  Can be
-   * used to "reclaim" a command if a group is no longer going to use it.  NOT
-   * ADVISED!
+   * Sets whether the command is currently composed in a command composition.
+   * Can be used to "reclaim" a command if a composition is no longer going to
+   * use it.  NOT ADVISED!
    */
-  void SetGrouped(bool grouped);
+  void SetComposed(bool isComposed);
 
   /**
    * Whether the given command should run when the robot is disabled.  Override
@@ -243,16 +419,36 @@ class Command {
    */
   virtual bool RunsWhenDisabled() const { return false; }
 
-  virtual std::string GetName() const;
+  /**
+   * How the command behaves when another command with a shared requirement is
+   * scheduled.
+   *
+   * @return a variant of InterruptionBehavior, defaulting to kCancelSelf.
+   */
+  virtual InterruptionBehavior GetInterruptionBehavior() const {
+    return InterruptionBehavior::kCancelSelf;
+  }
+
+  /**
+   * Transfers ownership of this command to a unique pointer.  Used for
+   * decorator methods.
+   */
+  virtual CommandPtr ToPtr() && = 0;
+
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  protected:
+  Command();
+
+  wpi::SmallSet<Subsystem*, 4> m_requirements;
+
   /**
    * Transfers ownership of this command to a unique pointer.  Used for
    * decorator methods.
    */
   virtual std::unique_ptr<Command> TransferOwnership() && = 0;
 
-  bool m_isGrouped = false;
+  bool m_isComposed = false;
 };
 
 /**

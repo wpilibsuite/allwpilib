@@ -7,6 +7,7 @@ package edu.wpi.first.wpilibj.examples.swervecontrollercommand;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.TimedRobot;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -48,6 +49,9 @@ public final class Constants {
     public static final boolean kFrontRightDriveEncoderReversed = false;
     public static final boolean kRearRightDriveEncoderReversed = true;
 
+    // If you call DriveSubsystem.drive() with a different period make sure to update this.
+    public static final double kDrivePeriod = TimedRobot.kDefaultPeriod;
+
     public static final double kTrackWidth = 0.5;
     // Distance between centers of right and left wheels on robot
     public static final double kWheelBase = 0.7;
@@ -64,8 +68,7 @@ public final class Constants {
     // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
     // These characterization values MUST be determined either experimentally or theoretically
     // for *your* robot's drive.
-    // The RobotPy Characterization Toolsuite provides a convenient tool for obtaining these
-    // values for your robot.
+    // The SysId tool provides a convenient method for obtaining these values for your robot.
     public static final double ksVolts = 1;
     public static final double kvVoltSecondsPerMeter = 0.8;
     public static final double kaVoltSecondsSquaredPerMeter = 0.15;
@@ -106,7 +109,7 @@ public final class Constants {
     public static final double kPYController = 1;
     public static final double kPThetaController = 1;
 
-    // Constraint for the motion profilied robot angle controller
+    // Constraint for the motion profiled robot angle controller
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
         new TrapezoidProfile.Constraints(
             kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);

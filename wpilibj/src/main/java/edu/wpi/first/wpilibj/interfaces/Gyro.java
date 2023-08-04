@@ -6,7 +6,12 @@ package edu.wpi.first.wpilibj.interfaces;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 
-/** Interface for yaw rate gyros. */
+/**
+ * Interface for yaw rate gyros.
+ *
+ * @deprecated This interface is being removed with no replacement.
+ */
+@Deprecated(since = "2024", forRemoval = true)
 public interface Gyro extends AutoCloseable {
   /**
    * Calibrate the gyro. It's important to make sure that the robot is not moving while the
@@ -17,7 +22,7 @@ public interface Gyro extends AutoCloseable {
 
   /**
    * Reset the gyro. Resets the gyro to a heading of zero. This can be used if there is significant
-   * drift in the gyro and it needs to be recalibrated after it has been running.
+   * drift in the gyro, and it needs to be recalibrated after it has been running.
    */
   void reset();
 

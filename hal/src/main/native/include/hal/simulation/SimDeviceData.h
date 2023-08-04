@@ -58,10 +58,11 @@ int32_t HALSIM_RegisterSimValueChangedCallback(HAL_SimValueHandle handle,
 void HALSIM_CancelSimValueChangedCallback(int32_t uid);
 
 /**
- * Register a callback for HAL_SimValueReset().  The callback is called with
- * the old value.
+ * Register a callback for HAL_SimValueReset(). The callback is called with the
+ * old value.
  *
  * @param handle simulated value handle
+ * @param param parameter for callback
  * @param callback callback
  * @param initialNotify ignored (present for consistency)
  */

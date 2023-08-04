@@ -19,7 +19,8 @@ SendableChooserBase::SendableChooserBase(SendableChooserBase&& oth)
       m_defaultChoice(std::move(oth.m_defaultChoice)),
       m_selected(std::move(oth.m_selected)),
       m_haveSelected(std::move(oth.m_haveSelected)),
-      m_activeEntries(std::move(oth.m_activeEntries)),
+      m_instancePubs(std::move(oth.m_instancePubs)),
+      m_activePubs(std::move(oth.m_activePubs)),
       m_instance(std::move(oth.m_instance)) {}
 
 SendableChooserBase& SendableChooserBase::operator=(SendableChooserBase&& oth) {
@@ -28,7 +29,8 @@ SendableChooserBase& SendableChooserBase::operator=(SendableChooserBase&& oth) {
   m_defaultChoice = std::move(oth.m_defaultChoice);
   m_selected = std::move(oth.m_selected);
   m_haveSelected = std::move(oth.m_haveSelected);
-  m_activeEntries = std::move(oth.m_activeEntries);
+  m_instancePubs = std::move(oth.m_instancePubs);
+  m_activePubs = std::move(oth.m_activePubs);
   m_instance = std::move(oth.m_instance);
   return *this;
 }

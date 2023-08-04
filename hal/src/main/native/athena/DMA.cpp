@@ -130,8 +130,9 @@ void HAL_FreeDMA(HAL_DMAHandle handle) {
   auto dma = dmaHandles->Get(handle);
   dmaHandles->Free(handle);
 
-  if (!dma)
+  if (!dma) {
     return;
+  }
 
   int32_t status = 0;
   if (dma->manager) {
@@ -709,6 +710,9 @@ void HAL_StopDMA(HAL_DMAHandle handle, int32_t* status) {
 
 void* HAL_GetDMADirectPointer(HAL_DMAHandle handle) {
   auto dma = dmaHandles->Get(handle);
+  if (dma == nullptr) {
+    return nullptr;
+  }
   return dma.get();
 }
 

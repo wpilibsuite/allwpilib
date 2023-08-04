@@ -43,26 +43,6 @@
 
 #endif  // _WIN32
 
-#if defined(__APPLE__)
-#include <Availability.h>
-#endif
-#if ((defined(_MSVC_LANG) && _MSVC_LANG >= 201703L) \
-     || (defined(__cplusplus) && __cplusplus >= 201703L)) \
-    && defined(__has_include)
-#if __has_include(<filesystem>) \
-    && (!defined(__MAC_OS_X_VERSION_MIN_REQUIRED) \
-        || __MAC_OS_X_VERSION_MIN_REQUIRED >= 101500) \
-    && (defined(__clang__) || !defined(__GNUC__) || __GNUC__ >= 10 \
-        || (__GNUC__ >= 9 && __GNUC_MINOR__ >= 1))
-#define GHC_USE_STD_FS
-#endif
-#endif
-#ifndef GHC_USE_STD_FS
-// #define GHC_WIN_DISABLE_WSTRING_STORAGE_TYPE
-#define GHC_FILESYSTEM_IMPLEMENTATION
-#include "wpi/ghc/filesystem.hpp"
-#endif
-
 #include "wpi/Errno.h"
 #include "wpi/ErrorHandling.h"
 #include "wpi/WindowsError.h"
@@ -82,17 +62,6 @@ namespace fs {
 const file_t kInvalidFile = INVALID_HANDLE_VALUE;
 
 static DWORD nativeDisposition(CreationDisposition Disp, OpenFlags Flags) {
-  // This is a compatibility hack.  Really we should respect the creation
-  // disposition, but a lot of old code relied on the implicit assumption that
-  // OF_Append implied it would open an existing file.  Since the disposition is
-  // now explicit and defaults to CD_CreateAlways, this assumption would cause
-  // any usage of OF_Append to append to a new file, even if the file already
-  // existed.  A better solution might have two new creation dispositions:
-  // CD_AppendAlways and CD_AppendNew.  This would also address the problem of
-  // OF_Append being used on a read-only descriptor, which doesn't make sense.
-  if (Flags & OF_Append)
-    return OPEN_ALWAYS;
-
   switch (Disp) {
     case CD_CreateAlways:
       return CREATE_ALWAYS;
@@ -249,12 +218,6 @@ static int nativeOpenFlags(CreationDisposition Disp, OpenFlags Flags,
     Result |= O_WRONLY;
   } else if (Access == (FA_Read | FA_Write)) {
     Result |= O_RDWR;
-  }
-
-  // This is for compatibility with old code that assumed F_Append implied
-  // would open an existing file.  See Windows/Path.inc for a longer comment.
-  if (Flags & F_Append) {
-    Disp = CD_OpenAlways;
   }
 
   if (Disp == CD_CreateNew) {

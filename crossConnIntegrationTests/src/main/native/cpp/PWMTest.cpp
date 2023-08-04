@@ -32,8 +32,8 @@ void TestTimingDMA(int squelch, std::pair<int, int> param) {
   ASSERT_EQ(0, status);
 
   // Ensure our PWM is disabled, and set up properly
-  HAL_SetPWMRaw(pwmHandle, 0, &status);
-  HAL_SetPWMConfig(pwmHandle, 2.0, 1.0, 1.0, 0, 0, &status);
+  HAL_SetPWMPulseTimeMicroseconds(pwmHandle, 0, &status);
+  HAL_SetPWMConfigMicroseconds(pwmHandle, 2000, 1000, 1000, 0, 0, &status);
   HAL_SetPWMPeriodScale(pwmHandle, squelch, &status);
 
   unsigned int checkPeriod = 0;
@@ -100,8 +100,9 @@ void TestTimingDMA(int squelch, std::pair<int, int> param) {
       auto value = HAL_GetDMASampleDigitalSource(&dmaSamples[startIndex],
                                                  dioHandle, &status);
       ASSERT_EQ(0, status);
-      if (value)
+      if (value) {
         break;
+      }
       startIndex++;
     }
     ASSERT_LT(startIndex, 6);
@@ -162,8 +163,8 @@ void TestTiming(int squelch, std::pair<int, int> param) {
   ASSERT_NE(pwmHandle, HAL_kInvalidHandle);
 
   // Ensure our PWM is disabled, and set up properly
-  HAL_SetPWMRaw(pwmHandle, 0, &status);
-  HAL_SetPWMConfig(pwmHandle, 2.0, 1.0, 1.0, 0, 0, &status);
+  HAL_SetPWMPulseTimeMicroseconds(pwmHandle, 0, &status);
+  HAL_SetPWMConfigMicroseconds(pwmHandle, 2000, 1000, 1000, 0, 0, &status);
   HAL_SetPWMPeriodScale(pwmHandle, squelch, &status);
 
   unsigned int checkPeriod = 0;
@@ -250,7 +251,7 @@ void TestTiming(int squelch, std::pair<int, int> param) {
       }
     }
 
-    HAL_SetPWMRaw(pwmHandle, 0, &status);
+    HAL_SetPWMPulseTimeMicroseconds(pwmHandle, 0, &status);
 
     // Ensure our interrupts have the proper counts
     ASSERT_EQ(interruptData.risingStamps.size(),

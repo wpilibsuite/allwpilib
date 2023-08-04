@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj;
 
-import static java.util.Objects.requireNonNull;
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -79,7 +79,7 @@ public class Ultrasonic implements Sendable, AutoCloseable {
   /**
    * Initialize the Ultrasonic Sensor. This is the common code that initializes the ultrasonic
    * sensor given that there are two digital I/O channels allocated. If the system was running in
-   * automatic mode (round robin) when the new sensor is added, it is stopped, the sensor is added,
+   * automatic mode (round-robin) when the new sensor is added, it is stopped, the sensor is added,
    * then automatic mode is restored.
    */
   private synchronized void initialize() {
@@ -89,9 +89,6 @@ public class Ultrasonic implements Sendable, AutoCloseable {
       m_simRange = m_simDevice.createDouble("Range (in)", Direction.kInput, 0.0);
       m_pingChannel.setSimDevice(m_simDevice);
       m_echoChannel.setSimDevice(m_simDevice);
-    }
-    if (m_task == null) {
-      m_task = new UltrasonicChecker();
     }
     final boolean originalMode = m_automaticEnabled;
     setAutomaticMode(false); // kill task when adding a new sensor
@@ -103,7 +100,7 @@ public class Ultrasonic implements Sendable, AutoCloseable {
     m_counter.setMaxPeriod(1.0);
     m_counter.setSemiPeriodMode(true);
     m_counter.reset();
-    m_enabled = true; // make it available for round robin scheduling
+    m_enabled = true; // make it available for round-robin scheduling
     setAutomaticMode(originalMode);
 
     m_instances++;
@@ -116,7 +113,7 @@ public class Ultrasonic implements Sendable, AutoCloseable {
   }
 
   /**
-   * Create an instance of the Ultrasonic Sensor. This is designed to supchannel the Daventech SRF04
+   * Create an instance of the Ultrasonic Sensor. This is designed to support the Daventech SRF04
    * and Vex ultrasonic sensors.
    *
    * @param pingChannel The digital output channel that sends the pulse to initiate the sensor
@@ -142,8 +139,8 @@ public class Ultrasonic implements Sendable, AutoCloseable {
    * @param echoChannel The digital input object that times the return pulse to determine the range.
    */
   public Ultrasonic(DigitalOutput pingChannel, DigitalInput echoChannel) {
-    requireNonNull(pingChannel, "Provided ping channel was null");
-    requireNonNull(echoChannel, "Provided echo channel was null");
+    requireNonNullParam(pingChannel, "pingChannel", "Ultrasonic");
+    requireNonNullParam(echoChannel, "echoChannel", "Ultrasonic");
 
     m_allocatedChannels = false;
     m_pingChannel = pingChannel;
@@ -153,7 +150,7 @@ public class Ultrasonic implements Sendable, AutoCloseable {
 
   /**
    * Destructor for the ultrasonic sensor. Delete the instance of the ultrasonic sensor by freeing
-   * the allocated digital channels. If the system was in automatic mode (round robin), then it is
+   * the allocated digital channels. If the system was in automatic mode (round-robin), then it is
    * stopped, then started again after this sensor is removed (provided this wasn't the last
    * sensor).
    */
@@ -194,15 +191,15 @@ public class Ultrasonic implements Sendable, AutoCloseable {
   /**
    * Turn Automatic mode on/off for all sensors.
    *
-   * <p>When in Automatic mode, all sensors will fire in round robin, waiting a set time between
+   * <p>When in Automatic mode, all sensors will fire in round-robin, waiting a set time between
    * each sensor.
    *
-   * @param enabling Set to true if round robin scheduling should start for all the ultrasonic
+   * @param enabling Set to true if round-robin scheduling should start for all the ultrasonic
    *     sensors. This scheduling method assures that the sensors are non-interfering because no two
    *     sensors fire at the same time. If another scheduling algorithm is preferred, it can be
    *     implemented by pinging the sensors manually and waiting for the results to come back.
    */
-  public static void setAutomaticMode(boolean enabling) {
+  public static synchronized void setAutomaticMode(boolean enabling) {
     if (enabling == m_automaticEnabled) {
       return; // ignore the case of no change
     }
@@ -217,14 +214,18 @@ public class Ultrasonic implements Sendable, AutoCloseable {
       }
 
       // Start round robin task
+      m_task = new UltrasonicChecker();
       m_task.start();
     } else {
-      // Wait for background task to stop running
-      try {
-        m_task.join();
-      } catch (InterruptedException ex) {
-        Thread.currentThread().interrupt();
-        ex.printStackTrace();
+      if (m_task != null) {
+        // Wait for background task to stop running
+        try {
+          m_task.join();
+          m_task = null;
+        } catch (InterruptedException ex) {
+          Thread.currentThread().interrupt();
+          ex.printStackTrace();
+        }
       }
 
       /* Clear all the counters (data now invalid) since automatic mode is
@@ -239,12 +240,12 @@ public class Ultrasonic implements Sendable, AutoCloseable {
 
   /**
    * Single ping to ultrasonic sensor. Send out a single ping to the ultrasonic sensor. This only
-   * works if automatic (round robin) mode is disabled. A single ping is sent out, and the counter
+   * works if automatic (round-robin) mode is disabled. A single ping is sent out, and the counter
    * should count the semi-period when it comes in. The counter is reset to make the current value
    * invalid.
    */
   public void ping() {
-    setAutomaticMode(false); // turn off automatic round robin if pinging
+    setAutomaticMode(false); // turn off automatic round-robin if pinging
     // single sensor
     m_counter.reset(); // reset the counter to zero (invalid data now)
     // do the ping to start getting a single range

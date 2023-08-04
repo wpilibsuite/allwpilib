@@ -35,8 +35,7 @@ public abstract class TiltPanCameraFixture implements ITestFixture {
   public TiltPanCameraFixture() {}
 
   @Override
-  public boolean setup() {
-    boolean wasSetup = false;
+  public void setup() {
     if (!m_initialized) {
       m_initialized = true;
       m_tilt = giveTilt();
@@ -48,17 +47,14 @@ public abstract class TiltPanCameraFixture implements ITestFixture {
       logger.fine("Initializing the gyro");
       m_gyro = giveGyro();
       m_gyro.reset();
-      wasSetup = true;
     }
-    return wasSetup;
   }
 
   @Override
-  public boolean reset() {
+  public void reset() {
     if (m_gyro != null) {
       m_gyro.reset();
     }
-    return true;
   }
 
   public Servo getTilt() {
@@ -89,7 +85,7 @@ public abstract class TiltPanCameraFixture implements ITestFixture {
   }
 
   @Override
-  public boolean teardown() {
+  public void teardown() {
     m_tilt.close();
     m_tilt = null;
     m_pan.close();
@@ -102,6 +98,5 @@ public abstract class TiltPanCameraFixture implements ITestFixture {
       m_gyroParam.close();
       m_gyroParam = null;
     }
-    return true;
   }
 }

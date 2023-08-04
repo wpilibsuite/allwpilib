@@ -46,7 +46,7 @@ class Robot : public frc::TimedRobot {
     const auto rot = -m_rotLimiter.Calculate(m_controller.GetRightX()) *
                      Drivetrain::kMaxAngularSpeed;
 
-    m_swerve.Drive(xSpeed, ySpeed, rot, fieldRelative);
+    m_swerve.Drive(xSpeed, ySpeed, rot, fieldRelative, GetPeriod());
   }
 };
 

@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.simulation.AnalogInputSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import org.junit.jupiter.api.Test;
 
-public class AnalogPotentiometerTest {
+class AnalogPotentiometerTest {
   @Test
   void testInitializeWithAnalogInput() {
     HAL.initialize(500, 0);

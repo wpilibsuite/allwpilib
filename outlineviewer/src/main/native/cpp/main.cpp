@@ -11,7 +11,9 @@
 #include <wpigui.h>
 
 #include "glass/Context.h"
+#include "glass/MainMenuBar.h"
 #include "glass/Model.h"
+#include "glass/Storage.h"
 #include "glass/networktables/NetworkTables.h"
 #include "glass/networktables/NetworkTablesSettings.h"
 #include "glass/other/Log.h"
@@ -34,51 +36,48 @@ static std::unique_ptr<glass::NetworkTablesModel> gModel;
 static std::unique_ptr<glass::NetworkTablesSettings> gSettings;
 static glass::LogData gLog;
 static glass::NetworkTablesFlagsSettings gFlagsSettings;
+static glass::MainMenuBar gMainMenu;
 
 static void NtInitialize() {
-  // update window title when connection status changes
   auto inst = nt::GetDefaultInstance();
-  auto poller = nt::CreateConnectionListenerPoller(inst);
-  nt::AddPolledConnectionListener(poller, true);
+  auto poller = nt::CreateListenerPoller(inst);
+  nt::AddPolledListener(
+      poller, inst,
+      NT_EVENT_CONNECTION | NT_EVENT_IMMEDIATE | NT_EVENT_LOGMESSAGE);
   gui::AddEarlyExecute([inst, poller] {
     auto win = gui::GetSystemWindow();
     if (!win) {
       return;
     }
-    bool timedOut;
-    for (auto&& event : nt::PollConnectionListener(poller, 0, &timedOut)) {
-      if ((nt::GetNetworkMode(inst) & NT_NET_MODE_SERVER) != 0) {
-        // for server mode, just print number of clients connected
-        glfwSetWindowTitle(win,
-                           fmt::format("OutlineViewer - {} Clients Connected",
-                                       nt::GetConnections(inst).size())
-                               .c_str());
-      } else if (event.connected) {
-        glfwSetWindowTitle(win, fmt::format("OutlineViewer - Connected ({})",
-                                            event.conn.remote_ip)
-                                    .c_str());
-      } else {
-        glfwSetWindowTitle(win, "OutlineViewer - DISCONNECTED");
+    for (auto&& event : nt::ReadListenerQueue(poller)) {
+      if (auto connInfo = event.GetConnectionInfo()) {
+        // update window title when connection status changes
+        if ((nt::GetNetworkMode(inst) & NT_NET_MODE_SERVER) != 0) {
+          // for server mode, just print number of clients connected
+          glfwSetWindowTitle(win,
+                             fmt::format("OutlineViewer - {} Clients Connected",
+                                         nt::GetConnections(inst).size())
+                                 .c_str());
+        } else if ((event.flags & NT_EVENT_CONNECTED) != 0) {
+          glfwSetWindowTitle(win, fmt::format("OutlineViewer - Connected ({})",
+                                              connInfo->remote_ip)
+                                      .c_str());
+        } else {
+          glfwSetWindowTitle(win, "OutlineViewer - DISCONNECTED");
+        }
+      } else if (auto msg = event.GetLogMessage()) {
+        // handle NetworkTables log messages
+        const char* level = "";
+        if (msg->level >= NT_LOG_CRITICAL) {
+          level = "CRITICAL: ";
+        } else if (msg->level >= NT_LOG_ERROR) {
+          level = "ERROR: ";
+        } else if (msg->level >= NT_LOG_WARNING) {
+          level = "WARNING: ";
+        }
+        gLog.Append(fmt::format("{}{} ({}:{})\n", level, msg->message,
+                                msg->filename, msg->line));
       }
-    }
-  });
-
-  // handle NetworkTables log messages
-  auto logPoller = nt::CreateLoggerPoller(inst);
-  nt::AddPolledLogger(logPoller, NT_LOG_INFO, 100);
-  gui::AddEarlyExecute([logPoller] {
-    bool timedOut;
-    for (auto&& msg : nt::PollLogger(logPoller, 0, &timedOut)) {
-      const char* level = "";
-      if (msg.level >= NT_LOG_CRITICAL) {
-        level = "CRITICAL: ";
-      } else if (msg.level >= NT_LOG_ERROR) {
-        level = "ERROR: ";
-      } else if (msg.level >= NT_LOG_WARNING) {
-        level = "WARNING: ";
-      }
-      gLog.Append(fmt::format("{}{} ({}:{})\n", level, msg.message,
-                              msg.filename, msg.line));
     }
   });
 
@@ -87,7 +86,9 @@ static void NtInitialize() {
   gui::AddEarlyExecute([] { gModel->Update(); });
 
   // NetworkTables settings window
-  gSettings = std::make_unique<glass::NetworkTablesSettings>();
+  gSettings = std::make_unique<glass::NetworkTablesSettings>(
+      "outlineviewer",
+      glass::GetStorageRoot().GetChild("NetworkTables Settings"));
   gui::AddEarlyExecute([] { gSettings->Update(); });
 }
 
@@ -114,9 +115,11 @@ static void DisplayGui() {
 
   // main menu
   ImGui::BeginMenuBar();
+  gMainMenu.WorkspaceMenu();
   gui::EmitViewMenu();
   if (ImGui::BeginMenu("View")) {
     gFlagsSettings.DisplayMenu();
+    glass::DisplayNetworkTablesAddMenu(gModel.get());
     ImGui::EndMenu();
   }
 
@@ -179,6 +182,10 @@ static void DisplayGui() {
     ImGui::Text("OutlineViewer");
     ImGui::Separator();
     ImGui::Text("v%s", GetWPILibVersion());
+    ImGui::Separator();
+    ImGui::Text("Save location: %s", glass::GetStorageDir().c_str());
+    ImGui::Text("%.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate,
+                ImGui::GetIO().Framerate);
     if (ImGui::Button("Close")) {
       ImGui::CloseCurrentPopup();
     }
@@ -186,6 +193,8 @@ static void DisplayGui() {
   }
 
   // display table view
+  glass::DisplayNetworkTablesInfo(gModel.get());
+  ImGui::Separator();
   glass::DisplayNetworkTables(gModel.get(), gFlagsSettings.GetFlags());
 
   ImGui::End();
@@ -194,9 +203,16 @@ static void DisplayGui() {
 #ifdef _WIN32
 int __stdcall WinMain(void* hInstance, void* hPrevInstance, char* pCmdLine,
                       int nCmdShow) {
+  int argc = __argc;
+  char** argv = __argv;
 #else
-int main() {
+int main(int argc, char** argv) {
 #endif
+  std::string_view saveDir;
+  if (argc == 2) {
+    saveDir = argv[1];
+  }
+
   gui::CreateContext();
   glass::CreateContext();
 
@@ -208,7 +224,10 @@ int main() {
   gui::AddIcon(ov::GetResource_ov_256_png());
   gui::AddIcon(ov::GetResource_ov_512_png());
 
-  gui::ConfigurePlatformSaveFile("outlineviewer.ini");
+  glass::SetStorageName("outlineviewer");
+  glass::SetStorageDir(saveDir.empty() ? gui::GetPlatformSaveFileDir()
+                                       : saveDir);
+
   gui::AddInit(NtInitialize);
 
   gui::AddLateExecute(DisplayGui);
@@ -221,4 +240,6 @@ int main() {
 
   glass::DestroyContext();
   gui::DestroyContext();
+
+  return 0;
 }

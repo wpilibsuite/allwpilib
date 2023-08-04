@@ -272,4 +272,30 @@ Java_edu_wpi_first_hal_PortsJNI_getNumREVPDHChannels
   jint value = HAL_GetNumREVPDHChannels();
   return value;
 }
+
+/*
+ * Class:     edu_wpi_first_hal_PortsJNI
+ * Method:    getNumREVPHModules
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_PortsJNI_getNumREVPHModules
+  (JNIEnv* env, jclass)
+{
+  jint value = HAL_GetNumREVPHModules();
+  return value;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_PortsJNI
+ * Method:    getNumREVPHChannels
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_PortsJNI_getNumREVPHChannels
+  (JNIEnv* env, jclass)
+{
+  jint value = HAL_GetNumREVPHChannels();
+  return value;
+}
 }  // extern "C"

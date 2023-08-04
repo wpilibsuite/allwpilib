@@ -36,25 +36,31 @@ DriveSubsystem::DriveSubsystem()
           kRearRightDriveEncoderPorts,    kRearRightTurningEncoderPorts,
           kRearRightDriveEncoderReversed, kRearRightTurningEncoderReversed},
 
-      m_odometry{kDriveKinematics, m_gyro.GetRotation2d(), frc::Pose2d()} {}
+      m_odometry{kDriveKinematics,
+                 m_gyro.GetRotation2d(),
+                 {m_frontLeft.GetPosition(), m_frontRight.GetPosition(),
+                  m_rearLeft.GetPosition(), m_rearRight.GetPosition()},
+                 frc::Pose2d{}} {}
 
 void DriveSubsystem::Periodic() {
   // Implementation of subsystem periodic method goes here.
-  m_odometry.Update(m_gyro.GetRotation2d(), m_frontLeft.GetState(),
-                    m_rearLeft.GetState(), m_frontRight.GetState(),
-                    m_rearRight.GetState());
+  m_odometry.Update(m_gyro.GetRotation2d(),
+                    {m_frontLeft.GetPosition(), m_rearLeft.GetPosition(),
+                     m_frontRight.GetPosition(), m_rearRight.GetPosition()});
 }
 
 void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
                            units::meters_per_second_t ySpeed,
-                           units::radians_per_second_t rot,
-                           bool fieldRelative) {
+                           units::radians_per_second_t rot, bool fieldRelative,
+                           units::second_t period) {
   auto states = kDriveKinematics.ToSwerveModuleStates(
-      fieldRelative ? frc::ChassisSpeeds::FromFieldRelativeSpeeds(
-                          xSpeed, ySpeed, rot, m_gyro.GetRotation2d())
-                    : frc::ChassisSpeeds{xSpeed, ySpeed, rot});
+      frc::ChassisSpeeds::FromDiscreteSpeeds(
+          fieldRelative ? frc::ChassisSpeeds::FromFieldRelativeSpeeds(
+                              xSpeed, ySpeed, rot, m_gyro.GetRotation2d())
+                        : frc::ChassisSpeeds{xSpeed, ySpeed, rot},
+          period));
 
-  kDriveKinematics.NormalizeWheelSpeeds(&states, AutoConstants::kMaxSpeed);
+  kDriveKinematics.DesaturateWheelSpeeds(&states, AutoConstants::kMaxSpeed);
 
   auto [fl, fr, bl, br] = states;
 
@@ -66,11 +72,11 @@ void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
 
 void DriveSubsystem::SetModuleStates(
     wpi::array<frc::SwerveModuleState, 4> desiredStates) {
-  kDriveKinematics.NormalizeWheelSpeeds(&desiredStates,
-                                        AutoConstants::kMaxSpeed);
+  kDriveKinematics.DesaturateWheelSpeeds(&desiredStates,
+                                         AutoConstants::kMaxSpeed);
   m_frontLeft.SetDesiredState(desiredStates[0]);
-  m_rearLeft.SetDesiredState(desiredStates[1]);
-  m_frontRight.SetDesiredState(desiredStates[2]);
+  m_frontRight.SetDesiredState(desiredStates[1]);
+  m_rearLeft.SetDesiredState(desiredStates[2]);
   m_rearRight.SetDesiredState(desiredStates[3]);
 }
 
@@ -98,6 +104,9 @@ frc::Pose2d DriveSubsystem::GetPose() {
 }
 
 void DriveSubsystem::ResetOdometry(frc::Pose2d pose) {
-  m_odometry.ResetPosition(pose,
-                           frc::Rotation2d(units::degree_t(GetHeading())));
+  m_odometry.ResetPosition(
+      GetHeading(),
+      {m_frontLeft.GetPosition(), m_frontRight.GetPosition(),
+       m_rearLeft.GetPosition(), m_rearRight.GetPosition()},
+      pose);
 }

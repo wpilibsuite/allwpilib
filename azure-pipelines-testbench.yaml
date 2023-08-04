@@ -12,10 +12,10 @@ stages:
       - job: IntegrationTests
         displayName: Integration Tests
         pool:
-          vmImage: "Ubuntu 16.04"
+          vmImage: 'ubuntu-latest'
 
         container:
-          image: wpilib/roborio-cross-ubuntu:2022-18.04
+          image: wpilib/roborio-cross-ubuntu:2023-22.04
 
         timeoutInMinutes: 0
 
@@ -29,7 +29,7 @@ stages:
               publishJUnitResults: false
               testResultsFiles: "**/TEST-*.xml"
               tasks: "copyWpilibJIntegrationTestJarToOutput copyWpilibCTestLibrariesToOutput"
-              options: "-Ponlylinuxathena -PbuildServer"
+              options: "-Ponlylinuxathena -PbuildServer -PskipJavaFormat"
 
           - task: PublishPipelineArtifact@0
             inputs:
@@ -38,6 +38,7 @@ stages:
 
   - stage: TestBench
     displayName: Test Bench
+    condition: false
     jobs:
       - job: Cpp
         displayName: C++

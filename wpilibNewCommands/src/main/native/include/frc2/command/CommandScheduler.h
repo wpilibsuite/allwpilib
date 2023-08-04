@@ -4,20 +4,24 @@
 
 #pragma once
 
+#include <concepts>
+#include <functional>
 #include <initializer_list>
 #include <memory>
+#include <span>
 #include <utility>
 
 #include <frc/Errors.h>
 #include <frc/Watchdog.h>
-#include <networktables/NTSendable.h>
+#include <frc/event/EventLoop.h>
 #include <units/time.h>
 #include <wpi/FunctionExtras.h>
+#include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
-#include <wpi/span.h>
 
 namespace frc2 {
 class Command;
+class CommandPtr;
 class Subsystem;
 
 /**
@@ -26,8 +30,10 @@ class Subsystem;
  * commands synchronously from the main loop.  Subsystems should be registered
  * with the scheduler using RegisterSubsystem() in order for their Periodic()
  * methods to be called and for their default commands to be scheduled.
+ *
+ * This class is provided by the NewCommands VendorDep
  */
-class CommandScheduler final : public nt::NTSendable,
+class CommandScheduler final : public wpi::Sendable,
                                public wpi::SendableHelper<CommandScheduler> {
  public:
   /**
@@ -50,73 +56,61 @@ class CommandScheduler final : public nt::NTSendable,
   void SetPeriod(units::second_t period);
 
   /**
-   * Adds a button binding to the scheduler, which will be polled to schedule
-   * commands.
+   * Get the active button poll.
    *
-   * @param button The button to add
+   * @return a reference to the current {@link frc::EventLoop} object polling
+   * buttons.
    */
-  void AddButton(wpi::unique_function<void()> button);
+  frc::EventLoop* GetActiveButtonLoop() const;
 
   /**
-   * Removes all button bindings from the scheduler.
+   * Replace the button poll with another one.
+   *
+   * @param loop the new button polling loop object.
    */
-  void ClearButtons();
+  void SetActiveButtonLoop(frc::EventLoop* loop);
 
   /**
-   * Schedules a command for execution.  Does nothing if the command is already
+   * Get the default button poll.
+   *
+   * @return a reference to the default {@link frc::EventLoop} object polling
+   * buttons.
+   */
+  frc::EventLoop* GetDefaultButtonLoop() const;
+
+  /**
+   * Schedules a command for execution. Does nothing if the command is already
+   * scheduled. If a command's requirements are not available, it will only be
+   * started if all the commands currently using those requirements are
+   * interruptible. If this is the case, they will be interrupted and the
+   * command will be scheduled.
+   *
+   * @param command the command to schedule
+   */
+  void Schedule(const CommandPtr& command);
+
+  /**
+   * Schedules a command for execution. Does nothing if the command is already
    * scheduled. If a command's requirements are not available, it will only be
    * started if all the commands currently using those requirements have been
-   * scheduled as interruptible.  If this is the case, they will be interrupted
+   * scheduled as interruptible. If this is the case, they will be interrupted
    * and the command will be scheduled.
-   *
-   * @param interruptible whether this command can be interrupted
-   * @param command       the command to schedule
-   */
-  void Schedule(bool interruptible, Command* command);
-
-  /**
-   * Schedules a command for execution, with interruptible defaulted to true.
-   * Does nothing if the command is already scheduled.
    *
    * @param command the command to schedule
    */
   void Schedule(Command* command);
 
   /**
-   * Schedules multiple commands for execution.  Does nothing if the command is
-   * already scheduled. If a command's requirements are not available, it will
-   * only be started if all the commands currently using those requirements have
-   * been scheduled as interruptible.  If this is the case, they will be
-   * interrupted and the command will be scheduled.
-   *
-   * @param interruptible whether the commands should be interruptible
-   * @param commands      the commands to schedule
-   */
-  void Schedule(bool interruptible, wpi::span<Command* const> commands);
-
-  /**
-   * Schedules multiple commands for execution.  Does nothing if the command is
-   * already scheduled. If a command's requirements are not available, it will
-   * only be started if all the commands currently using those requirements have
-   * been scheduled as interruptible.  If this is the case, they will be
-   * interrupted and the command will be scheduled.
-   *
-   * @param interruptible whether the commands should be interruptible
-   * @param commands      the commands to schedule
-   */
-  void Schedule(bool interruptible, std::initializer_list<Command*> commands);
-
-  /**
-   * Schedules multiple commands for execution, with interruptible defaulted to
-   * true.  Does nothing if the command is already scheduled.
+   * Schedules multiple commands for execution. Does nothing for commands
+   * already scheduled.
    *
    * @param commands the commands to schedule
    */
-  void Schedule(wpi::span<Command* const> commands);
+  void Schedule(std::span<Command* const> commands);
 
   /**
-   * Schedules multiple commands for execution, with interruptible defaulted to
-   * true.  Does nothing if the command is already scheduled.
+   * Schedules multiple commands for execution. Does nothing for commands
+   * already scheduled.
    *
    * @param commands the commands to schedule
    */
@@ -160,10 +154,17 @@ class CommandScheduler final : public nt::NTSendable,
   void UnregisterSubsystem(Subsystem* subsystem);
 
   void RegisterSubsystem(std::initializer_list<Subsystem*> subsystems);
-  void RegisterSubsystem(wpi::span<Subsystem* const> subsystems);
+  void RegisterSubsystem(std::span<Subsystem* const> subsystems);
 
   void UnregisterSubsystem(std::initializer_list<Subsystem*> subsystems);
-  void UnregisterSubsystem(wpi::span<Subsystem* const> subsystems);
+  void UnregisterSubsystem(std::span<Subsystem* const> subsystems);
+
+  /**
+   * Un-registers all registered Subsystems with the scheduler. All currently
+   * registered subsystems will no longer have their periodic block called, and
+   * will not have their default command scheduled.
+   */
+  void UnregisterAllSubsystems();
 
   /**
    * Sets the default command for a subsystem.  Registers that subsystem if it
@@ -176,21 +177,37 @@ class CommandScheduler final : public nt::NTSendable,
    * @param subsystem      the subsystem whose default command will be set
    * @param defaultCommand the default command to associate with the subsystem
    */
-  template <class T, typename = std::enable_if_t<std::is_base_of_v<
-                         Command, std::remove_reference_t<T>>>>
+  template <std::derived_from<Command> T>
   void SetDefaultCommand(Subsystem* subsystem, T&& defaultCommand) {
     if (!defaultCommand.HasRequirement(subsystem)) {
-      throw FRC_MakeError(frc::err::CommandIllegalUse, "{}",
+      throw FRC_MakeError(frc::err::CommandIllegalUse,
                           "Default commands must require their subsystem!");
     }
-    if (defaultCommand.IsFinished()) {
-      throw FRC_MakeError(frc::err::CommandIllegalUse, "{}",
-                          "Default commands should not end!");
-    }
-    SetDefaultCommandImpl(subsystem,
-                          std::make_unique<std::remove_reference_t<T>>(
-                              std::forward<T>(defaultCommand)));
+    SetDefaultCommandImpl(subsystem, std::make_unique<std::decay_t<T>>(
+                                         std::forward<T>(defaultCommand)));
   }
+
+  /**
+   * Sets the default command for a subsystem.  Registers that subsystem if it
+   * is not already registered.  Default commands will run whenever there is no
+   * other command currently scheduled that requires the subsystem.  Default
+   * commands should be written to never end (i.e. their IsFinished() method
+   * should return false), as they would simply be re-scheduled if they do.
+   * Default commands must also require their subsystem.
+   *
+   * @param subsystem      the subsystem whose default command will be set
+   * @param defaultCommand the default command to associate with the subsystem
+   */
+  void SetDefaultCommand(Subsystem* subsystem, CommandPtr&& defaultCommand);
+
+  /**
+   * Removes the default command for a subsystem. The current default command
+   * will run until another command is scheduled that requires the subsystem, at
+   * which point the current default command will not be re-scheduled.
+   *
+   * @param subsystem the subsystem whose default command will be removed
+   */
+  void RemoveDefaultCommand(Subsystem* subsystem);
 
   /**
    * Gets the default command associated with this subsystem.  Null if this
@@ -209,7 +226,7 @@ class CommandScheduler final : public nt::NTSendable,
    * <p>Commands will be canceled even if they are not scheduled as
    * interruptible.
    *
-   * @param commands the commands to cancel
+   * @param command the command to cancel
    */
   void Cancel(Command* command);
 
@@ -221,9 +238,21 @@ class CommandScheduler final : public nt::NTSendable,
    * <p>Commands will be canceled even if they are not scheduled as
    * interruptible.
    *
+   * @param command the command to cancel
+   */
+  void Cancel(const CommandPtr& command);
+
+  /**
+   * Cancels commands. The scheduler will only call Command::End()
+   * method of the canceled command with true, indicating they were
+   * canceled (as opposed to finishing normally).
+   *
+   * <p>Commands will be canceled even if they are not scheduled as
+   * interruptible.
+   *
    * @param commands the commands to cancel
    */
-  void Cancel(wpi::span<Command* const> commands);
+  void Cancel(std::span<Command* const> commands);
 
   /**
    * Cancels commands. The scheduler will only call Command::End()
@@ -243,17 +272,6 @@ class CommandScheduler final : public nt::NTSendable,
   void CancelAll();
 
   /**
-   * Returns the time since a given command was scheduled.  Note that this only
-   * works on commands that are directly scheduled by the scheduler; it will not
-   * work on commands inside of commandgroups, as the scheduler does not see
-   * them.
-   *
-   * @param command the command to query
-   * @return the time since the command was scheduled
-   */
-  units::second_t TimeSinceScheduled(const Command* command) const;
-
-  /**
    * Whether the given commands are running.  Note that this only works on
    * commands that are directly scheduled by the scheduler; it will not work on
    * commands inside of CommandGroups, as the scheduler does not see them.
@@ -261,7 +279,7 @@ class CommandScheduler final : public nt::NTSendable,
    * @param commands the command to query
    * @return whether the command is currently scheduled
    */
-  bool IsScheduled(wpi::span<const Command* const> commands) const;
+  bool IsScheduled(std::span<const Command* const> commands) const;
 
   /**
    * Whether the given commands are running.  Note that this only works on
@@ -278,10 +296,20 @@ class CommandScheduler final : public nt::NTSendable,
    * that are directly scheduled by the scheduler; it will not work on commands
    * inside of CommandGroups, as the scheduler does not see them.
    *
-   * @param commands the command to query
+   * @param command the command to query
    * @return whether the command is currently scheduled
    */
   bool IsScheduled(const Command* command) const;
+
+  /**
+   * Whether a given command is running.  Note that this only works on commands
+   * that are directly scheduled by the scheduler; it will not work on commands
+   * inside of CommandGroups, as the scheduler does not see them.
+   *
+   * @param command the command to query
+   * @return whether the command is currently scheduled
+   */
+  bool IsScheduled(const CommandPtr& command) const;
 
   /**
    * Returns the command currently requiring a given subsystem.  Null if no
@@ -332,7 +360,35 @@ class CommandScheduler final : public nt::NTSendable,
    */
   void OnCommandFinish(Action action);
 
-  void InitSendable(nt::NTSendableBuilder& builder) override;
+  /**
+   * Requires that the specified command hasn't been already added to a
+   * composition.
+   *
+   * @param command The command to check
+   * @throws if the given commands have already been composed.
+   */
+  void RequireUngrouped(const Command* command);
+
+  /**
+   * Requires that the specified commands not have been already added to a
+   * composition.
+   *
+   * @param commands The commands to check
+   * @throws if the given commands have already been composed.
+   */
+  void RequireUngrouped(std::span<const std::unique_ptr<Command>> commands);
+
+  /**
+   * Requires that the specified commands not have been already added to a
+   * composition.
+   *
+   * @param commands The commands to check
+   * @throws IllegalArgumentException if the given commands have already been
+   * composed.
+   */
+  void RequireUngrouped(std::initializer_list<const Command*> commands);
+
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   // Constructor; private as this is a singleton
@@ -347,5 +403,8 @@ class CommandScheduler final : public nt::NTSendable,
   frc::Watchdog m_watchdog;
 
   friend class CommandTestBase;
+
+  template <typename T>
+  friend class CommandTestBaseWithParam;
 };
 }  // namespace frc2

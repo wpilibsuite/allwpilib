@@ -30,7 +30,7 @@ constexpr int32_t kExpectedLoopTiming = 40;
  *   reliably down to 10.0 ms; starting at about 8.5ms, the servo sometimes hums
  *   and get hot; by 5.0ms the hum is nearly continuous
  * - 10ms periods work well for Victor 884
- * - 5ms periods allows higher update rates for Luminary Micro Jaguar speed
+ * - 5ms periods allows higher update rates for Luminary Micro Jaguar motor
  *   controllers. Due to the shipping firmware on the Jaguar, we can't run the
  *   update period less than 5.05 ms.
  *
@@ -39,14 +39,6 @@ constexpr int32_t kExpectedLoopTiming = 40;
  * devices.
  */
 constexpr float kDefaultPwmPeriod = 5.05f;
-/**
- * kDefaultPwmCenter is the PWM range center in ms
- */
-constexpr float kDefaultPwmCenter = 1.5f;
-/**
- * kDefaultPWMStepsDown is the number of PWM steps below the centerpoint
- */
-constexpr int32_t kDefaultPwmStepsDown = 1000;
 constexpr int32_t kPwmDisabled = 0;
 
 struct DigitalPort {

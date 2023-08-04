@@ -18,13 +18,11 @@ import edu.wpi.first.math.system.LinearSystemLoop;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 import org.junit.jupiter.api.Test;
 
-public class LinearSystemLoopTest {
-  public static final double kDt = 0.00505;
+class LinearSystemLoopTest {
+  private static final double kDt = 0.00505;
   private static final double kPositionStddev = 0.0001;
   private static final Random random = new Random();
 
@@ -42,7 +40,6 @@ public class LinearSystemLoopTest {
   private final LinearSystemLoop<N2, N1, N1> m_loop =
       new LinearSystemLoop<>(m_plant, m_controller, m_observer, 12, 0.00505);
 
-  @SuppressWarnings("LocalVariableName")
   private static void updateTwoState(
       LinearSystem<N2, N1, N1> plant, LinearSystemLoop<N2, N1, N1> loop, double noise) {
     Matrix<N1, N1> y = plant.calculateY(loop.getXHat(), loop.getU()).plus(VecBuilder.fill(noise));
@@ -52,8 +49,7 @@ public class LinearSystemLoopTest {
   }
 
   @Test
-  @SuppressWarnings("LocalVariableName")
-  public void testStateSpaceEnabled() {
+  void testStateSpaceEnabled() {
     m_loop.reset(VecBuilder.fill(0, 0));
     Matrix<N2, N1> references = VecBuilder.fill(2.0, 0.0);
     var constraints = new TrapezoidProfile.Constraints(4, 3);
@@ -62,12 +58,12 @@ public class LinearSystemLoopTest {
     TrapezoidProfile profile;
     TrapezoidProfile.State state;
     for (int i = 0; i < 1000; i++) {
-      profile =
-          new TrapezoidProfile(
-              constraints,
+      profile = new TrapezoidProfile(constraints);
+      state =
+          profile.calculate(
+              kDt,
               new TrapezoidProfile.State(m_loop.getXHat(0), m_loop.getXHat(1)),
               new TrapezoidProfile.State(references.get(0, 0), references.get(1, 0)));
-      state = profile.calculate(kDt);
       m_loop.setNextR(VecBuilder.fill(state.position, state.velocity));
 
       updateTwoState(m_plant, m_loop, (random.nextGaussian()) * kPositionStddev);
@@ -81,8 +77,7 @@ public class LinearSystemLoopTest {
   }
 
   @Test
-  @SuppressWarnings("LocalVariableName")
-  public void testFlywheelEnabled() {
+  void testFlywheelEnabled() {
     LinearSystem<N1, N1, N1> plant =
         LinearSystemId.createFlywheelSystem(DCMotor.getNEO(2), 0.00289, 1.0);
     KalmanFilter<N1, N1, N1> observer =
@@ -103,12 +98,6 @@ public class LinearSystemLoopTest {
 
     loop.setNextR(references);
 
-    List<Double> timeData = new ArrayList<>();
-    List<Double> xHat = new ArrayList<>();
-    List<Double> volt = new ArrayList<>();
-    List<Double> reference = new ArrayList<>();
-    List<Double> error = new ArrayList<>();
-
     var time = 0.0;
     while (time < 10) {
       if (time > 10) {
@@ -128,26 +117,8 @@ public class LinearSystemLoopTest {
 
       assertTrue(u >= -12.1 && u <= 12.1, "U out of bounds! Got " + u);
 
-      xHat.add(loop.getXHat(0) / 2d / Math.PI * 60);
-      volt.add(u);
-      timeData.add(time);
-      reference.add(references.get(0, 0) / 2d / Math.PI * 60);
-      error.add(loop.getError(0) / 2d / Math.PI * 60);
       time += kDt;
     }
-
-    //    XYChart bigChart = new XYChartBuilder().build();
-    //    bigChart.addSeries("Xhat, RPM", timeData, xHat);
-    //    bigChart.addSeries("Reference, RPM", timeData, reference);
-    //    bigChart.addSeries("Error, RPM", timeData, error);
-
-    //    XYChart smolChart = new XYChartBuilder().build();
-    //    smolChart.addSeries("Volts, V", timeData, volt);
-
-    //  try {
-    //      new SwingWrapper<>(List.of(bigChart, smolChart)).displayChartMatrix();
-    //      Thread.sleep(10000000);
-    //    } catch (InterruptedException e) { e.printStackTrace(); }
 
     assertEquals(0.0, loop.getError(0), 0.1);
   }

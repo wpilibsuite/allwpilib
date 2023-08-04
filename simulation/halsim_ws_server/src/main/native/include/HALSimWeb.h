@@ -7,13 +7,15 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <string_view>
 
 #include <WSBaseProvider.h>
 #include <WSProviderContainer.h>
 #include <WSProvider_SimDevice.h>
-#include <wpi/uv/Async.h>
-#include <wpi/uv/Loop.h>
-#include <wpi/uv/Tcp.h>
+#include <wpi/StringMap.h>
+#include <wpinet/uv/Async.h>
+#include <wpinet/uv/Loop.h>
+#include <wpinet/uv/Tcp.h>
 
 namespace wpi {
 class json;
@@ -40,6 +42,8 @@ class HALSimWeb : public std::enable_shared_from_this<HALSimWeb> {
 
   // network -> sim
   void OnNetValueChanged(const wpi::json& msg);
+
+  bool CanSendMessage(std::string_view type);
 
   const std::string& GetWebrootSys() const { return m_webroot_sys; }
   const std::string& GetWebrootUser() const { return m_webroot_user; }
@@ -69,6 +73,9 @@ class HALSimWeb : public std::enable_shared_from_this<HALSimWeb> {
 
   std::string m_uri;
   int m_port;
+
+  bool m_useMsgFiltering;
+  wpi::StringMap<bool> m_msgFilters;
 };
 
 }  // namespace wpilibws

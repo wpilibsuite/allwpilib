@@ -45,7 +45,7 @@ int32_t HAL_GetNumAnalogInputs(void);
 int32_t HAL_GetNumAnalogOutputs(void);
 
 /**
- * Gets the number of analog counters in the current system.
+ * Gets the number of counters in the current system.
  *
  * @return the number of counters
  */
@@ -155,6 +155,20 @@ int32_t HAL_GetNumREVPDHModules(void);
  * @return the number of PDH channels
  */
 int32_t HAL_GetNumREVPDHChannels(void);
+
+/**
+ * Gets the number of PH modules in the current system.
+ *
+ * @return the number of PH modules
+ */
+int32_t HAL_GetNumREVPHModules(void);
+
+/**
+ * Gets the number of PH channels in the current system.
+ *
+ * @return the number of PH channels
+ */
+int32_t HAL_GetNumREVPHChannels(void);
 
 /**
  * Gets the number of duty cycle inputs in the current system.

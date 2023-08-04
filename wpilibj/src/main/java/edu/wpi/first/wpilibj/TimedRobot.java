@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.hal.DriverStationJNI;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -19,7 +20,7 @@ import java.util.PriorityQueue;
  */
 public class TimedRobot extends IterativeRobotBase {
   @SuppressWarnings("MemberName")
-  class Callback implements Comparable<Callback> {
+  static class Callback implements Comparable<Callback> {
     public Runnable func;
     public double period;
     public double expirationTime;
@@ -41,6 +42,19 @@ public class TimedRobot extends IterativeRobotBase {
               + Math.floor((Timer.getFPGATimestamp() - startTimeSeconds) / this.period)
                   * this.period
               + this.period;
+    }
+
+    @Override
+    public boolean equals(Object rhs) {
+      if (rhs instanceof Callback) {
+        return Double.compare(expirationTime, ((Callback) rhs).expirationTime) == 0;
+      }
+      return false;
+    }
+
+    @Override
+    public int hashCode() {
+      return Double.hashCode(expirationTime);
     }
 
     @Override
@@ -81,15 +95,13 @@ public class TimedRobot extends IterativeRobotBase {
   }
 
   @Override
-  @SuppressWarnings("NoFinalizer")
-  protected void finalize() {
+  public void close() {
     NotifierJNI.stopNotifier(m_notifier);
     NotifierJNI.cleanNotifier(m_notifier);
   }
 
   /** Provide an alternate "main loop" via startCompetition(). */
   @Override
-  @SuppressWarnings("UnsafeFinalization")
   public void startCompetition() {
     robotInit();
 
@@ -99,7 +111,7 @@ public class TimedRobot extends IterativeRobotBase {
 
     // Tell the DS that the robot is ready to be enabled
     System.out.println("********** Robot program startup complete **********");
-    HAL.observeUserProgramStarting();
+    DriverStationJNI.observeUserProgramStarting();
 
     // Loop forever, calling the appropriate mode-dependent function
     while (true) {

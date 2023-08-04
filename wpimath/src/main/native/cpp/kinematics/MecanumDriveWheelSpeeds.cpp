@@ -12,7 +12,7 @@
 
 using namespace frc;
 
-void MecanumDriveWheelSpeeds::Normalize(
+void MecanumDriveWheelSpeeds::Desaturate(
     units::meters_per_second_t attainableMaxSpeed) {
   std::array<units::meters_per_second_t, 4> wheelSpeeds{frontLeft, frontRight,
                                                         rearLeft, rearRight};

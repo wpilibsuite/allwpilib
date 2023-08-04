@@ -19,7 +19,7 @@ void AnalogEncoderSim::SetPosition(frc::Rotation2d angle) {
 }
 
 void AnalogEncoderSim::SetTurns(units::turn_t turns) {
-  m_positionSim.Set(turns.to<double>());
+  m_positionSim.Set(turns.value());
 }
 
 units::turn_t AnalogEncoderSim::GetTurns() {
@@ -27,6 +27,5 @@ units::turn_t AnalogEncoderSim::GetTurns() {
 }
 
 frc::Rotation2d AnalogEncoderSim::GetPosition() {
-  units::radian_t rads = GetTurns();
-  return frc::Rotation2d{rads};
+  return units::radian_t{GetTurns()};
 }

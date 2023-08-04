@@ -5,7 +5,7 @@
 package edu.wpi.first.wpilibj2.command;
 
 import static edu.wpi.first.math.trajectory.TrapezoidProfile.State;
-import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -13,12 +13,12 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 /**
  * A subsystem that uses a {@link ProfiledPIDController} to control an output. The controller is run
  * synchronously from the subsystem's periodic() method.
+ *
+ * <p>This class is provided by the NewCommands VendorDep
  */
-public abstract class ProfiledPIDSubsystem extends SubsystemBase {
+public abstract class ProfiledPIDSubsystem extends Subsystem {
   protected final ProfiledPIDController m_controller;
   protected boolean m_enabled;
-
-  private TrapezoidProfile.State m_goal;
 
   /**
    * Creates a new ProfiledPIDSubsystem.
@@ -43,7 +43,7 @@ public abstract class ProfiledPIDSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     if (m_enabled) {
-      useOutput(m_controller.calculate(getMeasurement(), m_goal), m_controller.getSetpoint());
+      useOutput(m_controller.calculate(getMeasurement()), m_controller.getSetpoint());
     }
   }
 
@@ -57,7 +57,7 @@ public abstract class ProfiledPIDSubsystem extends SubsystemBase {
    * @param goal The goal state for the subsystem's motion profile.
    */
   public void setGoal(TrapezoidProfile.State goal) {
-    m_goal = goal;
+    m_controller.setGoal(goal);
   }
 
   /**

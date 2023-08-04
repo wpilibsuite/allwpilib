@@ -18,10 +18,8 @@ public interface ITestFixture {
   /**
    * Performs any required setup for this fixture, ensuring that all fixture elements are ready for
    * testing.
-   *
-   * @return True if the fixture is ready for testing
    */
-  boolean setup();
+  void setup();
 
   /**
    * Resets the fixture back to test start state. This should be called by the test class in the
@@ -29,16 +27,12 @@ public interface ITestFixture {
    * ITestFixture#setup()} as that is called once, before the class is constructed, so it may need
    * to start sensors. This method should not have to start anything, just reset sensors and ensure
    * that motors are stopped.
-   *
-   * @return True if the fixture is ready for testing
    */
-  boolean reset();
+  void reset();
 
   /**
    * Performs any required teardown after use of the fixture, ensuring that future tests will not
    * run into conflicts.
-   *
-   * @return True if the teardown succeeded
    */
-  boolean teardown();
+  void teardown();
 }

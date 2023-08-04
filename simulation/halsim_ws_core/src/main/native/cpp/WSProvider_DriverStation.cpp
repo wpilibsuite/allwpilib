@@ -84,6 +84,9 @@ void HALSimWSProviderDriverStation::RegisterCallbacks() {
           case HAL_AllianceStationID_kBlue3:
             station = "blue3";
             break;
+          case HAL_AllianceStationID_kUnknown:
+            station = "unknown";
+            break;
         }
         static_cast<HALSimWSProviderDriverStation*>(param)->ProcessHalCallback(
             {{">station", station}});
@@ -166,8 +169,8 @@ void HALSimWSProviderDriverStation::OnNetValueChanged(const wpi::json& json) {
     HALSIM_SetDriverStationMatchTime(it.value());
   }
   if ((it = json.find(">game_data")) != json.end()) {
-    HALSIM_SetGameSpecificMessage(
-        it.value().get_ref<const std::string&>().c_str());
+    std::string message = it.value().get_ref<const std::string&>();
+    HALSIM_SetGameSpecificMessage(message.c_str(), message.length());
   }
 
   // Only notify usercode if we get the new data message

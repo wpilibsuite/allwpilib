@@ -133,17 +133,4 @@ public abstract class ImageSource extends VideoSource {
   public void setEnumPropertyChoices(VideoProperty property, String[] choices) {
     CameraServerJNI.setSourceEnumPropertyChoices(m_handle, property.m_handle, choices);
   }
-
-  /**
-   * Configure enum property choices.
-   *
-   * @param property Property
-   * @param choices Choices
-   * @deprecated Use {@code setEnumPropertyChoices} instead.
-   */
-  @Deprecated
-  @SuppressWarnings("MethodName")
-  public void SetEnumPropertyChoices(VideoProperty property, String[] choices) {
-    setEnumPropertyChoices(property, choices);
-  }
 }

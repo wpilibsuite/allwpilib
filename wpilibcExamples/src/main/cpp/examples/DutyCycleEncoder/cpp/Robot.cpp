@@ -31,7 +31,7 @@ class Robot : public frc::TimedRobot {
 
     frc::SmartDashboard::PutBoolean("Connected", connected);
     frc::SmartDashboard::PutNumber("Frequency", frequency);
-    frc::SmartDashboard::PutNumber("Output", output.to<double>());
+    frc::SmartDashboard::PutNumber("Output", output.value());
     frc::SmartDashboard::PutNumber("Distance", distance);
   }
 };

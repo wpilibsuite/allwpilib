@@ -2,64 +2,55 @@ name: CMake
 
 on: [pull_request, push]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     strategy:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-latest
+          - os: ubuntu-22.04
             name: Linux
-            container: wpilib/roborio-cross-ubuntu:2022-20.04
+            container: wpilib/roborio-cross-ubuntu:2023-22.04
             flags: ""
-          - os: macos-latest
+          - os: macOS-12
             name: macOS
             container: ""
             flags: "-DWITH_JAVA=OFF"
+
     name: "Build - ${{ matrix.name }}"
     runs-on: ${{ matrix.os }}
     container: ${{ matrix.container }}
     steps:
-      - uses: actions/checkout@v2
-      - name: Install Dependencies
-        run: |
-          if [ "$RUNNER_OS" == "macOS" ]; then
-            brew install opencv
-          fi
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v2
+      - uses: actions/checkout@v3
+
+      - name: Install dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libopencv-dev libopencv4.5-java python-is-python3
+
+      - name: Install opencv (macOS)
+        run: brew install opencv
+        if: runner.os == 'macOS'
+
+      - name: Set up Python 3.8 (macOS)
+        if: runner.os == 'macOS'
+        uses: actions/setup-python@v4
         with:
           python-version: 3.8
+
       - name: Install jinja
         run: python -m pip install jinja2
+
       - name: configure
         run: mkdir build && cd build && cmake ${{ matrix.flags }} ..
+
       - name: build
         working-directory: build
-        run: cmake --build . -j$(nproc)
+        run: cmake --build . --parallel $(nproc)
+
       - name: test
         working-directory: build
         run: ctest --output-on-failure
-
-  build-vcpkg:
-    name: "Build - Windows"
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Prepare vcpkg
-        uses: lukka/run-vcpkg@v7
-        with:
-          vcpkgArguments: opencv
-          vcpkgDirectory: ${{ runner.workspace }}/vcpkg
-          vcpkgTriplet: x64-windows
-          vcpkgGitCommitId: d781bd9ca77ac3dc2f13d88169021d48459c665f # HEAD on 2021-07-25
-      - name: Configure & Build
-        uses: lukka/run-cmake@v3
-        with:
-          buildDirectory: ${{ runner.workspace }}/build
-          cmakeAppendedArgs: -DWITH_JAVA=OFF
-          cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
-          useVcpkgToolchainFile: true
-      - name: Run Tests
-        run: ctest -C "Debug" --output-on-failure
-        working-directory: ${{ runner.workspace }}/build

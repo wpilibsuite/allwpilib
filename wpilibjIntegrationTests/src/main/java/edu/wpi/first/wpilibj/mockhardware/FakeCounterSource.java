@@ -16,7 +16,7 @@ public class FakeCounterSource implements AutoCloseable {
   private boolean m_allocated;
 
   /** Thread object that allows emulation of an encoder. */
-  private class EncoderThread extends Thread {
+  private static class EncoderThread extends Thread {
     FakeCounterSource m_encoder;
 
     EncoderThread(FakeCounterSource encode) {
@@ -72,7 +72,7 @@ public class FakeCounterSource implements AutoCloseable {
     }
   }
 
-  /** Common initailization code. */
+  /** Common initialization code. */
   private void initEncoder() {
     m_milliSec = 1;
     m_task = new EncoderThread(this);
@@ -95,7 +95,7 @@ public class FakeCounterSource implements AutoCloseable {
     Timer.delay(0.01);
   }
 
-  /** Starts and completes a task set - does not return until thred has finished its operations. */
+  /** Starts and completes a task set - does not return until thread has finished its operations. */
   public void execute() {
     start();
     complete();

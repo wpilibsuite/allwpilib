@@ -60,8 +60,7 @@ class ShuffleboardWidget : public ShuffleboardComponent<Derived> {
    * widget type will be used. This method should only be used to use a widget
    * that does not come built into Shuffleboard (i.e. one that comes with a
    * custom or third-party plugin). To use a widget that is built into
-   * Shuffleboard, use {@link #withWidget(WidgetType)} and {@link
-   * BuiltInWidgets}.
+   * Shuffleboard, use WithWidget(WidgetType) and BuiltInWidgets.
    *
    * @param widgetType the type of the widget used to display the data
    * @return this widget object

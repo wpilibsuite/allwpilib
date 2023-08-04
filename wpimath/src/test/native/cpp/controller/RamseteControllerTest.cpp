@@ -12,12 +12,13 @@
   EXPECT_LE(units::math::abs(val1 - val2), eps)
 
 static constexpr units::meter_t kTolerance{1 / 12.0};
-static constexpr units::radian_t kAngularTolerance{2.0 * wpi::numbers::pi /
+static constexpr units::radian_t kAngularTolerance{2.0 * std::numbers::pi /
                                                    180.0};
 
 TEST(RamseteControllerTest, ReachesReference) {
-  frc::RamseteController controller{2.0, 0.7};
-  frc::Pose2d robotPose{2.7_m, 23_m, frc::Rotation2d{0_deg}};
+  frc::RamseteController controller{2.0 * 1_rad * 1_rad / (1_m * 1_m),
+                                    0.7 / 1_rad};
+  frc::Pose2d robotPose{2.7_m, 23_m, 0_deg};
 
   auto waypoints = std::vector{frc::Pose2d{2.75_m, 22.521_m, 0_rad},
                                frc::Pose2d{24.73_m, 19.68_m, 5.846_rad}};
@@ -26,7 +27,7 @@ TEST(RamseteControllerTest, ReachesReference) {
 
   constexpr auto kDt = 0.02_s;
   auto totalTime = trajectory.TotalTime();
-  for (size_t i = 0; i < (totalTime / kDt).to<double>(); ++i) {
+  for (size_t i = 0; i < (totalTime / kDt).value(); ++i) {
     auto state = trajectory.Sample(kDt * i);
     auto [vx, vy, omega] = controller.Calculate(robotPose, state);
     static_cast<void>(vy);

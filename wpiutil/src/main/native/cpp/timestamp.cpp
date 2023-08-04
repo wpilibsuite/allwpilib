@@ -6,6 +6,23 @@
 
 #include <atomic>
 
+#ifdef __FRC_ROBORIO__
+#include <stdint.h>
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
+#pragma GCC diagnostic ignored "-Wignored-qualifiers"
+#include <FRC_FPGA_ChipObject/RoboRIO_FRC_ChipObject_Aliases.h>
+#include <FRC_FPGA_ChipObject/nRoboRIO_FPGANamespace/nInterfaceGlobals.h>
+#include <FRC_FPGA_ChipObject/nRoboRIO_FPGANamespace/tGlobal.h>
+#include <FRC_NetworkCommunication/LoadOut.h>
+#pragma GCC diagnostic pop
+namespace fpga {
+using namespace nFPGA;
+using namespace nRoboRIO_FPGANamespace;
+}  // namespace fpga
+#include <memory>
+#endif
+
 #ifdef _WIN32
 #include <windows.h>
 
@@ -15,8 +32,16 @@
 #include <chrono>
 #endif
 
+#include <cstdio>
+
+#include "fmt/format.h"
+
+#ifdef __FRC_ROBORIO__
+static std::unique_ptr<fpga::tGlobal> global;
+#endif
+
 // offset in microseconds
-static uint64_t zerotime() noexcept {
+static uint64_t time_since_epoch() noexcept {
 #ifdef _WIN32
   FILETIME ft;
   uint64_t tmpres = 0;
@@ -35,7 +60,7 @@ static uint64_t zerotime() noexcept {
 #else
   // 1-us intervals
   return std::chrono::duration_cast<std::chrono::microseconds>(
-             std::chrono::high_resolution_clock::now().time_since_epoch())
+             std::chrono::system_clock::now().time_since_epoch())
       .count();
 #endif
 }
@@ -66,7 +91,7 @@ static uint64_t update_frequency() {
 }
 #endif
 
-static const uint64_t zerotime_val = zerotime();
+static const uint64_t zerotime_val = time_since_epoch();
 static const uint64_t offset_val = timestamp();
 #ifdef _WIN32
 static const uint64_t frequency_val = update_frequency();
@@ -88,15 +113,68 @@ uint64_t wpi::NowDefault() {
 
 static std::atomic<uint64_t (*)()> now_impl{wpi::NowDefault};
 
+void wpi::impl::SetupNowRio() {
+#ifdef __FRC_ROBORIO__
+  if (!global) {
+    nFPGA::nRoboRIO_FPGANamespace::g_currentTargetClass =
+        nLoadOut::getTargetClass();
+    int32_t status = 0;
+    global.reset(fpga::tGlobal::create(&status));
+  }
+#endif
+}
+
 void wpi::SetNowImpl(uint64_t (*func)(void)) {
   now_impl = func ? func : NowDefault;
 }
 
 uint64_t wpi::Now() {
+#ifdef __FRC_ROBORIO__
+  // Same code as HAL_GetFPGATime()
+  if (!global) {
+    std::fputs(
+        "FPGA not yet configured in wpi::Now(). Time will not be correct",
+        stderr);
+    std::fflush(stderr);
+    return 0;
+  }
+  int32_t status = 0;
+  uint64_t upper1 = global->readLocalTimeUpper(&status);
+  uint32_t lower = global->readLocalTime(&status);
+  uint64_t upper2 = global->readLocalTimeUpper(&status);
+  if (status != 0) {
+    goto err;
+  }
+  if (upper1 != upper2) {
+    // Rolled over between the lower call, reread lower
+    lower = global->readLocalTime(&status);
+    if (status != 0) {
+      goto err;
+    }
+  }
+  return (upper2 << 32) + lower;
+
+err:
+  fmt::print(stderr,
+             "Call to FPGA failed in wpi::Now() with status {}. "
+             "Initialization might have failed. Time will not be correct\n",
+             status);
+  std::fflush(stderr);
+  return 0;
+#else
   return (now_impl.load())();
+#endif
+}
+
+uint64_t wpi::GetSystemTime() {
+  return time_since_epoch();
 }
 
 extern "C" {
+
+void WPI_Impl_SetupNowRio(void) {
+  return wpi::impl::SetupNowRio();
+}
 
 uint64_t WPI_NowDefault(void) {
   return wpi::NowDefault();
@@ -108,6 +186,10 @@ void WPI_SetNowImpl(uint64_t (*func)(void)) {
 
 uint64_t WPI_Now(void) {
   return wpi::Now();
+}
+
+uint64_t WPI_GetSystemTime(void) {
+  return wpi::GetSystemTime();
 }
 
 }  // extern "C"

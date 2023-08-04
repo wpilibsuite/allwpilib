@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <functional>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -12,7 +13,7 @@
 #include <hal/SimDevice.h>
 #include <hal/simulation/SimDeviceData.h>
 #include <wpi/StringMap.h>
-#include <wpi/uv/AsyncFunction.h>
+#include <wpinet/uv/AsyncFunction.h>
 
 #include "WSBaseProvider.h"
 #include "WSProviderContainer.h"

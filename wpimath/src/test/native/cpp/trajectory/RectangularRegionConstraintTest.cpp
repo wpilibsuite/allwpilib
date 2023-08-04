@@ -47,7 +47,6 @@ TEST(RectangularRegionConstraintTest, IsPoseInRegion) {
                                                frc::Translation2d{5_ft, 27_ft},
                                                maxVelConstraint);
 
-  EXPECT_FALSE(regionConstraint.IsPoseInRegion(Pose2d()));
-  EXPECT_TRUE(
-      regionConstraint.IsPoseInRegion(Pose2d(3_ft, 14.5_ft, Rotation2d())));
+  EXPECT_FALSE(regionConstraint.IsPoseInRegion(Pose2d{}));
+  EXPECT_TRUE(regionConstraint.IsPoseInRegion(Pose2d{3_ft, 14.5_ft, 0_deg}));
 }

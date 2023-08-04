@@ -4,6 +4,8 @@
 
 #include "frc/IterativeRobotBase.h"
 
+#include <frc/DriverStation.h>
+
 #include <fmt/format.h>
 #include <hal/DriverStation.h>
 #include <networktables/NetworkTableInstance.h>
@@ -16,14 +18,13 @@
 
 using namespace frc;
 
-IterativeRobotBase::IterativeRobotBase(double period)
-    : IterativeRobotBase(units::second_t(period)) {}
-
 IterativeRobotBase::IterativeRobotBase(units::second_t period)
     : m_period(period),
       m_watchdog(period, [this] { PrintLoopOverrunMessage(); }) {}
 
 void IterativeRobotBase::RobotInit() {}
+
+void IterativeRobotBase::DriverStationConnected() {}
 
 void IterativeRobotBase::SimulationInit() {}
 
@@ -95,11 +96,24 @@ void IterativeRobotBase::SetNetworkTablesFlushEnabled(bool enabled) {
   m_ntFlushEnabled = enabled;
 }
 
+void IterativeRobotBase::EnableLiveWindowInTest(bool testLW) {
+  if (IsTestEnabled()) {
+    throw FRC_MakeError(err::IncompatibleMode,
+                        "Can't configure test mode while in test mode!");
+  }
+  m_lwEnabledInTest = testLW;
+}
+
+bool IterativeRobotBase::IsLiveWindowEnabledInTest() {
+  return m_lwEnabledInTest;
+}
+
 units::second_t IterativeRobotBase::GetPeriod() const {
   return m_period;
 }
 
 void IterativeRobotBase::LoopFunc() {
+  DriverStation::RefreshData();
   m_watchdog.Reset();
 
   // Get current mode
@@ -115,6 +129,11 @@ void IterativeRobotBase::LoopFunc() {
     mode = Mode::kTest;
   }
 
+  if (!m_calledDsConnected && word.IsDSAttached()) {
+    m_calledDsConnected = true;
+    DriverStationConnected();
+  }
+
   // If mode changed, call mode exit and entry functions
   if (m_lastMode != mode) {
     // Call last mode's exit function
@@ -125,8 +144,10 @@ void IterativeRobotBase::LoopFunc() {
     } else if (m_lastMode == Mode::kTeleop) {
       TeleopExit();
     } else if (m_lastMode == Mode::kTest) {
-      LiveWindow::SetEnabled(false);
-      Shuffleboard::DisableActuatorWidgets();
+      if (m_lwEnabledInTest) {
+        LiveWindow::SetEnabled(false);
+        Shuffleboard::DisableActuatorWidgets();
+      }
       TestExit();
     }
 
@@ -141,8 +162,10 @@ void IterativeRobotBase::LoopFunc() {
       TeleopInit();
       m_watchdog.AddEpoch("TeleopInit()");
     } else if (mode == Mode::kTest) {
-      LiveWindow::SetEnabled(true);
-      Shuffleboard::EnableActuatorWidgets();
+      if (m_lwEnabledInTest) {
+        LiveWindow::SetEnabled(true);
+        Shuffleboard::EnableActuatorWidgets();
+      }
       TestInit();
       m_watchdog.AddEpoch("TestInit()");
     }
@@ -190,7 +213,7 @@ void IterativeRobotBase::LoopFunc() {
 
   // Flush NetworkTables
   if (m_ntFlushEnabled) {
-    nt::NetworkTableInstance::GetDefault().Flush();
+    nt::NetworkTableInstance::GetDefault().FlushLocal();
   }
 
   // Warn on loop time overruns
@@ -200,6 +223,5 @@ void IterativeRobotBase::LoopFunc() {
 }
 
 void IterativeRobotBase::PrintLoopOverrunMessage() {
-  FRC_ReportError(err::Error, "Loop time of {:.6f}s overrun",
-                  m_period.to<double>());
+  FRC_ReportError(err::Error, "Loop time of {:.6f}s overrun", m_period.value());
 }
