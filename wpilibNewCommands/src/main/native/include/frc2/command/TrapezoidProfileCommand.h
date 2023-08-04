@@ -47,30 +47,7 @@ class TrapezoidProfileCommand
                           std::function<void(State)> output,
                           std::function<State()> goal,
                           std::function<State()> currentState,
-                          std::initializer_list<Subsystem*> requirements)
-      : m_profile(profile),
-        m_output(output),
-        m_goal(goal),
-        m_currentState(currentState) {
-    this->AddRequirements(requirements);
-    m_newAPI = true;
-  }
-
-  /**
-   * Creates a new TrapezoidProfileCommand that will execute the given
-   * TrapezoidalProfile. Output will be piped to the provided consumer function.
-   *
-   * @param profile      The motion profile to execute.
-   * @param output       The consumer for the profile output.
-   * @param goal The supplier for the desired state
-   * @param currentState The current state
-   * @param requirements The list of requirements.
-   */
-  TrapezoidProfileCommand(frc::TrapezoidProfile<Distance> profile,
-                          std::function<void(State)> output,
-                          std::function<State()> goal,
-                          std::function<State()> currentState,
-                          std::span<Subsystem* const> requirements = {})
+                          Requirements requirements = {})
       : m_profile(profile),
         m_output(output),
         m_goal(goal),
@@ -94,28 +71,7 @@ class TrapezoidProfileCommand
       "current state. This allows you to change goals at runtime.")
   TrapezoidProfileCommand(frc::TrapezoidProfile<Distance> profile,
                           std::function<void(State)> output,
-                          std::initializer_list<Subsystem*> requirements)
-      : m_profile(profile), m_output(output) {
-    this->AddRequirements(requirements);
-    m_newAPI = false;
-  }
-
-  /**
-   * Creates a new TrapezoidProfileCommand that will execute the given
-   * TrapezoidalProfile. Output will be piped to the provided consumer function.
-   *
-   * @param profile      The motion profile to execute.
-   * @param output       The consumer for the profile output.
-   * @param requirements The list of requirements.
-   * @deprecated The new constructor allows you to pass in a supplier for
-   * desired and current state. This allows you to change goals at runtime.
-   */
-  WPI_DEPRECATED(
-      "The new constructor allows you to pass in a supplier for desired and "
-      "current state. This allows you to change goals at runtime.")
-  TrapezoidProfileCommand(frc::TrapezoidProfile<Distance> profile,
-                          std::function<void(State)> output,
-                          std::span<Subsystem* const> requirements = {})
+                          Requirements requirements = {})
       : m_profile(profile), m_output(output) {
     this->AddRequirements(requirements);
     m_newAPI = false;

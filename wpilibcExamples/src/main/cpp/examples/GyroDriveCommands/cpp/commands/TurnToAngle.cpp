@@ -25,7 +25,7 @@ TurnToAngle::TurnToAngle(units::degree_t target, DriveSubsystem* drive)
   // reference
   m_controller.SetTolerance(kTurnTolerance.value(), kTurnRateTolerance.value());
 
-  AddRequirements({drive});
+  AddRequirements(drive);
 }
 
 bool TurnToAngle::IsFinished() {

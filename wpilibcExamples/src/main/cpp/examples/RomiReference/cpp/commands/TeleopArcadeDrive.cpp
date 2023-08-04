@@ -12,7 +12,7 @@ TeleopArcadeDrive::TeleopArcadeDrive(
     : m_drive{subsystem},
       m_xaxisSpeedSupplier{xaxisSpeedSupplier},
       m_zaxisRotateSupplier{zaxisRotateSuppplier} {
-  AddRequirements({subsystem});
+  AddRequirements(subsystem);
 }
 
 void TeleopArcadeDrive::Execute() {

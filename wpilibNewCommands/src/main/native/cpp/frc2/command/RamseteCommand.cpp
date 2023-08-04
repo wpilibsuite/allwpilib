@@ -18,29 +18,7 @@ RamseteCommand::RamseteCommand(
     std::function<frc::DifferentialDriveWheelSpeeds()> wheelSpeeds,
     frc::PIDController leftController, frc::PIDController rightController,
     std::function<void(units::volt_t, units::volt_t)> output,
-    std::initializer_list<Subsystem*> requirements)
-    : m_trajectory(std::move(trajectory)),
-      m_pose(std::move(pose)),
-      m_controller(controller),
-      m_feedforward(feedforward),
-      m_kinematics(std::move(kinematics)),
-      m_speeds(std::move(wheelSpeeds)),
-      m_leftController(std::make_unique<frc::PIDController>(leftController)),
-      m_rightController(std::make_unique<frc::PIDController>(rightController)),
-      m_outputVolts(std::move(output)),
-      m_usePID(true) {
-  AddRequirements(requirements);
-}
-
-RamseteCommand::RamseteCommand(
-    frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
-    frc::RamseteController controller,
-    frc::SimpleMotorFeedforward<units::meters> feedforward,
-    frc::DifferentialDriveKinematics kinematics,
-    std::function<frc::DifferentialDriveWheelSpeeds()> wheelSpeeds,
-    frc::PIDController leftController, frc::PIDController rightController,
-    std::function<void(units::volt_t, units::volt_t)> output,
-    std::span<Subsystem* const> requirements)
+    Requirements requirements)
     : m_trajectory(std::move(trajectory)),
       m_pose(std::move(pose)),
       m_controller(controller),
@@ -60,23 +38,7 @@ RamseteCommand::RamseteCommand(
     frc::DifferentialDriveKinematics kinematics,
     std::function<void(units::meters_per_second_t, units::meters_per_second_t)>
         output,
-    std::initializer_list<Subsystem*> requirements)
-    : m_trajectory(std::move(trajectory)),
-      m_pose(std::move(pose)),
-      m_controller(controller),
-      m_kinematics(std::move(kinematics)),
-      m_outputVel(std::move(output)),
-      m_usePID(false) {
-  AddRequirements(requirements);
-}
-
-RamseteCommand::RamseteCommand(
-    frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
-    frc::RamseteController controller,
-    frc::DifferentialDriveKinematics kinematics,
-    std::function<void(units::meters_per_second_t, units::meters_per_second_t)>
-        output,
-    std::span<Subsystem* const> requirements)
+    Requirements requirements)
     : m_trajectory(std::move(trajectory)),
       m_pose(std::move(pose)),
       m_controller(controller),

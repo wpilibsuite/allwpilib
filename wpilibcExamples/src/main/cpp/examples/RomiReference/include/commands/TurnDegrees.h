@@ -15,7 +15,7 @@ class TurnDegrees : public frc2::CommandHelper<frc2::Command, TurnDegrees> {
  public:
   TurnDegrees(double speed, units::degree_t angle, Drivetrain* drive)
       : m_speed(speed), m_angle(angle), m_drive(drive) {
-    AddRequirements({m_drive});
+    AddRequirements(m_drive);
   }
 
   void Initialize() override;

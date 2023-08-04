@@ -29,18 +29,8 @@ class RunCommand : public CommandHelper<FunctionalCommand, RunCommand> {
    * @param toRun        the Runnable to run
    * @param requirements the subsystems to require
    */
-  RunCommand(std::function<void()> toRun,
-             std::initializer_list<Subsystem*> requirements);
-
-  /**
-   * Creates a new RunCommand.  The Runnable will be run continuously until the
-   * command ends.  Does not run when disabled.
-   *
-   * @param toRun        the Runnable to run
-   * @param requirements the subsystems to require
-   */
   explicit RunCommand(std::function<void()> toRun,
-                      std::span<Subsystem* const> requirements = {});
+                      Requirements requirements = {});
 
   RunCommand(RunCommand&& other) = default;
 
