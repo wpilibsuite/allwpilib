@@ -11,7 +11,7 @@
 
 using namespace hal;
 
-static volatile uint32_t* hmbBuffer;
+static volatile HAL_HMBData* hmbBuffer;
 static size_t hmbBufferSize;
 static constexpr const char hmbName[] = "HMB_0_RAM";
 static std::unique_ptr<tHMB> hmb;
@@ -38,7 +38,7 @@ void HAL_InitializeHMB(int32_t* status) {
 
   *status = hal::HAL_NiFpga_OpenHmb(
       hmb->getSystemInterface()->getHandle(), hmbName, &hmbBufferSize,
-      reinterpret_cast<void**>(const_cast<uint32_t**>(&hmbBuffer)));
+      reinterpret_cast<void**>(const_cast<HAL_HMBData**>(&hmbBuffer)));
 
   if (*status != 0) {
     return;
@@ -56,7 +56,7 @@ void HAL_InitializeHMB(int32_t* status) {
   hmb->writeConfig(cfg, status);
 }
 
-volatile uint32_t* HAL_GetHMBBuffer(void) {
+volatile HAL_HMBData* HAL_GetHMBBuffer(void) {
   return hmbBuffer;
 }
 }  // extern "C"

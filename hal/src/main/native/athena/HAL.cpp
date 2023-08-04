@@ -47,7 +47,7 @@ static char roboRioCommentsString[64];
 static size_t roboRioCommentsStringSize;
 static bool roboRioCommentsStringInitialized;
 
-static volatile uint32_t* hmbBuffer;
+static volatile HAL_HMBData* hmbBuffer;
 
 using namespace hal;
 
@@ -360,16 +360,16 @@ uint64_t HAL_GetFPGATime(int32_t* status) {
   }
 
   asm("dmb");
-  uint64_t upper1 = hmbBuffer[HAL_HMB_TIMESTAMP_UPPER];
+  uint64_t upper1 = hmbBuffer->Timestamp.Upper;
   asm("dmb");
-  uint32_t lower = hmbBuffer[HAL_HMB_TIMESTAMP_LOWER];
+  uint32_t lower = hmbBuffer->Timestamp.Lower;
   asm("dmb");
-  uint64_t upper2 = hmbBuffer[HAL_HMB_TIMESTAMP_UPPER];
+  uint64_t upper2 = hmbBuffer->Timestamp.Upper;
 
   if (upper1 != upper2) {
     // Rolled over between the lower call, reread lower
     asm("dmb");
-    lower = hmbBuffer[HAL_HMB_TIMESTAMP_LOWER];
+    lower = hmbBuffer->Timestamp.Lower;
   }
   // 5 is added here because the time to write from the FPGA
   // to the HMB buffer is longer then the time to read
