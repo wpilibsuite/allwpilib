@@ -439,7 +439,7 @@ public final class NetworkTable {
   }
 
   /**
-   * Get the path of the NetworkTable.
+   * Get the path of the NetworkTable. Does not include the trailing "/".
    *
    * @return The path of the NetworkTable.
    */

@@ -265,6 +265,12 @@ class SendableBuilder {
       std::function<void(std::span<const uint8_t>)> setter) = 0;
 
   /**
+   * Gets the path where properties will be published.
+   * @return The path
+   */
+  virtual std::string_view GetPath() const = 0;
+
+  /**
    * Gets the kind of backend being used.
    *
    * @return Backend kind

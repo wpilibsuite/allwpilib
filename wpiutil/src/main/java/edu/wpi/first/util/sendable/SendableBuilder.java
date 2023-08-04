@@ -148,6 +148,12 @@ public interface SendableBuilder extends AutoCloseable {
       String key, String typeString, Supplier<byte[]> getter, Consumer<byte[]> setter);
 
   /**
+   * Gets the path where properties will be published.
+   * @return The path
+   */
+  String getPath();
+
+  /**
    * Gets the kind of backend being used.
    *
    * @return Backend kind

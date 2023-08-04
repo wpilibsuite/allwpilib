@@ -115,6 +115,10 @@ void SendableBuilderImpl::SetUpdateTable(wpi::unique_function<void()> func) {
   m_updateTables.emplace_back(std::move(func));
 }
 
+std::string_view SendableBuilderImpl::GetPath() const {
+  return m_table->GetPath();
+}
+
 nt::Topic SendableBuilderImpl::GetTopic(std::string_view key) {
   return m_table->GetTopic(key);
 }

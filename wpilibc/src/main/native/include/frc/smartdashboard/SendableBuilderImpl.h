@@ -37,6 +37,12 @@ class SendableBuilderImpl : public nt::NTSendableBuilder {
   void SetTable(std::shared_ptr<nt::NetworkTable> table);
 
   /**
+   * Gets the path where properties will be published.
+   * @return The path
+   */
+  std::string_view GetPath() const override;
+
+  /**
    * Get the network table.
    * @return The network table
    */

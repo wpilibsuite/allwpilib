@@ -153,6 +153,11 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     return m_table;
   }
 
+  @Override
+  public String getPath() {
+      return m_table.getPath();
+  }
+
   /**
    * Return whether this sendable has an associated table.
    *
