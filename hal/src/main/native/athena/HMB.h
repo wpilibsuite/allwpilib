@@ -17,4 +17,4 @@ extern "C" {
 void HAL_InitializeHMB(int32_t* status);
 
 volatile uint32_t* HAL_GetHMBBuffer(void);
-}
+}  // extern "C"

@@ -4,9 +4,10 @@
 
 #include "HMB.h"
 
+#include <memory>
+
 #include "FPGACalls.h"
 #include "hal/ChipObject.h"
-#include <memory>
 
 using namespace hal;
 
@@ -54,4 +55,4 @@ void HAL_InitializeHMB(int32_t* status) {
 volatile uint32_t* HAL_GetHMBBuffer(void) {
   return hmbBuffer;
 }
-}
+}  // extern "C"
