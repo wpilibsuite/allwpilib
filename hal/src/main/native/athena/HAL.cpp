@@ -48,6 +48,7 @@ static size_t roboRioCommentsStringSize;
 static bool roboRioCommentsStringInitialized;
 
 static const volatile HAL_HMBData* hmbBuffer;
+#define HAL_HMB_TIMESTAMP_OFFSET 5
 
 using namespace hal;
 
