@@ -35,6 +35,14 @@ void HAL_InitializeHMB(int32_t* status) {
     return;
   }
 
+  *status = hal::HAL_NiFpga_OpenHmb(
+      hmb->getSystemInterface()->getHandle(), hmbName, &hmbBufferSize,
+      reinterpret_cast<void**>(const_cast<uint32_t**>(&hmbBuffer)));
+
+  if (*status != 0) {
+    return;
+  }
+
   auto cfg = hmb->readConfig(status);
   cfg.Enables_Timestamp = 1;
   cfg.Enables_DI = 1;
@@ -45,10 +53,6 @@ void HAL_InitializeHMB(int32_t* status) {
   cfg.Enables_Counters_Low = 1;
   cfg.Enables_Counters_High = 1;
   hmb->writeConfig(cfg, status);
-
-  *status = hal::HAL_NiFpga_OpenHmb(
-      hmb->getSystemInterface()->getHandle(), hmbName, &hmbBufferSize,
-      reinterpret_cast<void**>(const_cast<uint32_t**>(&hmbBuffer)));
 }
 
 volatile uint32_t* HAL_GetHMBBuffer(void) {

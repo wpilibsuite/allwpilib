@@ -43,7 +43,7 @@ namespace {
 static constexpr const char hmbName[] = "HMB_0_RAM";
 static constexpr int timestampLowerOffset = 0xF0;
 static constexpr int timestampUpperOffset = 0xF1;
-static constexpr int hmbTimestampOffset = 5; // 5 us offset
+static constexpr int hmbTimestampOffset = 5;  // 5 us offset
 using NiFpga_CloseHmbFunc = NiFpga_Status (*)(const NiFpga_Session session,
                                               const char* memoryName);
 using NiFpga_OpenHmbFunc = NiFpga_Status (*)(const NiFpga_Session session,
@@ -63,9 +63,6 @@ struct HMBHolder {
         nLoadOut::getTargetClass();
     int32_t status = 0;
     hmb.reset(fpga::tHMB::create(&status));
-    auto cfg = hmb->readConfig(&status);
-    cfg.Enables_Timestamp = 1;
-    hmb->writeConfig(cfg, &status);
     niFpga = dlopen("libNiFpga.so", RTLD_LAZY);
     if (!niFpga) {
       hmb = nullptr;
@@ -89,7 +86,11 @@ struct HMBHolder {
       closeHmb = nullptr;
       dlclose(niFpga);
       hmb = nullptr;
+      return;
     }
+    auto cfg = hmb->readConfig(&status);
+    cfg.Enables_Timestamp = 1;
+    hmb->writeConfig(cfg, &status);
   }
   std::unique_ptr<fpga::tHMB> hmb;
   void* niFpga = nullptr;
