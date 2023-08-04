@@ -12,7 +12,6 @@
 #include <fmt/format.h>
 #include <wpi/DenseMap.h>
 #include <wpi/StringMap.h>
-#include <wpi/json.h>
 #include <wpi/timestamp.h>
 
 #include "Handle.h"
@@ -20,10 +19,6 @@
 #include "Types_internal.h"
 #include "net/Message.h"
 #include "net/NetworkInterface.h"
-#include "net3/Message3.h"
-#include "net3/SequenceNumber.h"
-#include "net3/WireConnection3.h"
-#include "net3/WireDecoder3.h"
 #include "net3/WireEncoder3.h"
 #include "networktables/NetworkTableValue.h"
 
@@ -36,145 +31,7 @@ static constexpr uint32_t kMinPeriodMs = 5;
 // transmission before we close the connection
 static constexpr uint32_t kWireMaxNotReadyUs = 1000000;
 
-namespace {
-
-struct Entry;
-
-struct PublisherData {
-  explicit PublisherData(Entry* entry) : entry{entry} {}
-
-  Entry* entry;
-  NT_Publisher handle;
-  PubSubOptionsImpl options;
-  // in options as double, but copy here as integer; rounded to the nearest
-  // 10 ms
-  uint32_t periodMs;
-  uint64_t nextSendMs{0};
-  std::vector<Value> outValues;  // outgoing values
-};
-
-// data for each entry
-struct Entry {
-  explicit Entry(std::string_view name_) : name(name_) {}
-  bool IsPersistent() const { return (flags & NT_PERSISTENT) != 0; }
-  wpi::json SetFlags(unsigned int flags_);
-
-  std::string name;
-
-  std::string typeStr;
-  NT_Type type{NT_UNASSIGNED};
-
-  wpi::json properties = wpi::json::object();
-
-  // The current value and flags
-  Value value;
-  unsigned int flags{0};
-
-  // Unique ID used in network messages; this is 0xffff until assigned
-  // by the server.
-  unsigned int id{0xffff};
-
-  // Sequence number for update resolution
-  SequenceNumber seqNum;
-
-  // Local topic handle
-  NT_Topic topic{0};
-
-  // Local publishers
-  std::vector<PublisherData*> publishers;
-};
-
-class CImpl : public MessageHandler3 {
- public:
-  CImpl(uint64_t curTimeMs, int inst, WireConnection3& wire,
-        wpi::Logger& logger,
-        std::function<void(uint32_t repeatMs)> setPeriodic);
-
-  void ProcessIncoming(std::span<const uint8_t> data);
-  void HandleLocal(std::span<const net::ClientMessage> msgs);
-  void SendPeriodic(uint64_t curTimeMs, bool initial, bool flush);
-  void SendValue(Writer& out, Entry* entry, const Value& value);
-  bool CheckNetworkReady(uint64_t curTimeMs);
-
-  // Outgoing handlers
-  void Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
-               std::string_view name, std::string_view typeStr,
-               const wpi::json& properties, const PubSubOptionsImpl& options);
-  void Unpublish(NT_Publisher pubHandle, NT_Topic topicHandle);
-  void SetProperties(NT_Topic topicHandle, std::string_view name,
-                     const wpi::json& update);
-  void SetValue(NT_Publisher pubHandle, const Value& value);
-
-  // MessageHandler interface
-  void KeepAlive() final;
-  void ServerHelloDone() final;
-  void ClientHelloDone() final;
-  void ClearEntries() final;
-  void ProtoUnsup(unsigned int proto_rev) final;
-  void ClientHello(std::string_view self_id, unsigned int proto_rev) final;
-  void ServerHello(unsigned int flags, std::string_view self_id) final;
-  void EntryAssign(std::string_view name, unsigned int id, unsigned int seq_num,
-                   const Value& value, unsigned int flags) final;
-  void EntryUpdate(unsigned int id, unsigned int seq_num,
-                   const Value& value) final;
-  void FlagsUpdate(unsigned int id, unsigned int flags) final;
-  void EntryDelete(unsigned int id) final;
-  void ExecuteRpc(unsigned int id, unsigned int uid,
-                  std::span<const uint8_t> params) final {}
-  void RpcResponse(unsigned int id, unsigned int uid,
-                   std::span<const uint8_t> result) final {}
-
-  enum State {
-    kStateInitial,
-    kStateHelloSent,
-    kStateInitialAssignments,
-    kStateRunning
-  };
-
-  int m_inst;
-  WireConnection3& m_wire;
-  wpi::Logger& m_logger;
-  net::LocalInterface* m_local{nullptr};
-  std::function<void(uint32_t repeatMs)> m_setPeriodic;
-  uint64_t m_initTimeMs;
-
-  // periodic sweep handling
-  static constexpr uint32_t kKeepAliveIntervalMs = 1000;
-  uint32_t m_periodMs{kKeepAliveIntervalMs + 10};
-  uint64_t m_lastSendMs{0};
-  uint64_t m_nextKeepAliveTimeMs;
-
-  // indexed by publisher index
-  std::vector<std::unique_ptr<PublisherData>> m_publishers;
-
-  State m_state{kStateInitial};
-  WireDecoder3 m_decoder;
-  std::string m_remoteId;
-  std::function<void()> m_handshakeSucceeded;
-
-  std::vector<std::pair<unsigned int, unsigned int>> m_outgoingFlags;
-
-  using NameMap = wpi::StringMap<std::unique_ptr<Entry>>;
-  using IdMap = std::vector<Entry*>;
-
-  NameMap m_nameMap;
-  IdMap m_idMap;
-
-  Entry* GetOrNewEntry(std::string_view name) {
-    auto& entry = m_nameMap[name];
-    if (!entry) {
-      entry = std::make_unique<Entry>(name);
-    }
-    return entry.get();
-  }
-  Entry* LookupId(unsigned int id) {
-    return id < m_idMap.size() ? m_idMap[id] : nullptr;
-  }
-};
-
-}  // namespace
-
-wpi::json Entry::SetFlags(unsigned int flags_) {
+wpi::json ClientImpl3::Entry::SetFlags(unsigned int flags_) {
   bool wasPersistent = IsPersistent();
   flags = flags_;
   bool isPersistent = IsPersistent();
@@ -189,25 +46,28 @@ wpi::json Entry::SetFlags(unsigned int flags_) {
   }
 }
 
-CImpl::CImpl(uint64_t curTimeMs, int inst, WireConnection3& wire,
-             wpi::Logger& logger,
-             std::function<void(uint32_t repeatMs)> setPeriodic)
-    : m_inst{inst},
-      m_wire{wire},
+ClientImpl3::ClientImpl3(uint64_t curTimeMs, int inst, WireConnection3& wire,
+                         wpi::Logger& logger,
+                         std::function<void(uint32_t repeatMs)> setPeriodic)
+    : m_wire{wire},
       m_logger{logger},
       m_setPeriodic{std::move(setPeriodic)},
       m_initTimeMs{curTimeMs},
       m_nextKeepAliveTimeMs{curTimeMs + kKeepAliveIntervalMs},
       m_decoder{*this} {}
 
-void CImpl::ProcessIncoming(std::span<const uint8_t> data) {
+ClientImpl3::~ClientImpl3() {
+  DEBUG4("NT3 ClientImpl destroyed");
+}
+
+void ClientImpl3::ProcessIncoming(std::span<const uint8_t> data) {
   DEBUG4("received {} bytes", data.size());
   if (!m_decoder.Execute(&data)) {
     m_wire.Disconnect(m_decoder.GetError());
   }
 }
 
-void CImpl::HandleLocal(std::span<const net::ClientMessage> msgs) {
+void ClientImpl3::HandleLocal(std::span<const net::ClientMessage> msgs) {
   for (const auto& elem : msgs) {  // NOLINT
     // common case is value
     if (auto msg = std::get_if<net::ClientValueMsg>(&elem.contents)) {
@@ -223,7 +83,7 @@ void CImpl::HandleLocal(std::span<const net::ClientMessage> msgs) {
   }
 }
 
-void CImpl::SendPeriodic(uint64_t curTimeMs, bool initial, bool flush) {
+void ClientImpl3::DoSendPeriodic(uint64_t curTimeMs, bool initial, bool flush) {
   DEBUG4("SendPeriodic({})", curTimeMs);
 
   // rate limit sends
@@ -283,7 +143,7 @@ void CImpl::SendPeriodic(uint64_t curTimeMs, bool initial, bool flush) {
   m_lastSendMs = curTimeMs;
 }
 
-void CImpl::SendValue(Writer& out, Entry* entry, const Value& value) {
+void ClientImpl3::SendValue(Writer& out, Entry* entry, const Value& value) {
   DEBUG4("sending value for '{}', seqnum {}", entry->name,
          entry->seqNum.value());
 
@@ -302,7 +162,7 @@ void CImpl::SendValue(Writer& out, Entry* entry, const Value& value) {
   }
 }
 
-bool CImpl::CheckNetworkReady(uint64_t curTimeMs) {
+bool ClientImpl3::CheckNetworkReady(uint64_t curTimeMs) {
   if (!m_wire.Ready()) {
     uint64_t lastFlushTime = m_wire.GetLastFlushTime();
     uint64_t now = wpi::Now();
@@ -314,10 +174,10 @@ bool CImpl::CheckNetworkReady(uint64_t curTimeMs) {
   return true;
 }
 
-void CImpl::Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
-                    std::string_view name, std::string_view typeStr,
-                    const wpi::json& properties,
-                    const PubSubOptionsImpl& options) {
+void ClientImpl3::Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
+                          std::string_view name, std::string_view typeStr,
+                          const wpi::json& properties,
+                          const PubSubOptionsImpl& options) {
   DEBUG4("Publish('{}', '{}')", name, typeStr);
   unsigned int index = Handle{pubHandle}.GetIndex();
   if (index >= m_publishers.size()) {
@@ -342,7 +202,7 @@ void CImpl::Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
   m_setPeriodic(m_periodMs);
 }
 
-void CImpl::Unpublish(NT_Publisher pubHandle, NT_Topic topicHandle) {
+void ClientImpl3::Unpublish(NT_Publisher pubHandle, NT_Topic topicHandle) {
   DEBUG4("Unpublish({}, {})", pubHandle, topicHandle);
   unsigned int index = Handle{pubHandle}.GetIndex();
   if (index >= m_publishers.size()) {
@@ -365,8 +225,8 @@ void CImpl::Unpublish(NT_Publisher pubHandle, NT_Topic topicHandle) {
   m_setPeriodic(m_periodMs);
 }
 
-void CImpl::SetProperties(NT_Topic topicHandle, std::string_view name,
-                          const wpi::json& update) {
+void ClientImpl3::SetProperties(NT_Topic topicHandle, std::string_view name,
+                                const wpi::json& update) {
   DEBUG4("SetProperties({}, {}, {})", topicHandle, name, update.dump());
   auto entry = GetOrNewEntry(name);
   bool updated = false;
@@ -388,7 +248,7 @@ void CImpl::SetProperties(NT_Topic topicHandle, std::string_view name,
   }
 }
 
-void CImpl::SetValue(NT_Publisher pubHandle, const Value& value) {
+void ClientImpl3::SetValue(NT_Publisher pubHandle, const Value& value) {
   DEBUG4("SetValue({})", pubHandle);
   unsigned int index = Handle{pubHandle}.GetIndex();
   assert(index < m_publishers.size() && m_publishers[index]);
@@ -404,7 +264,7 @@ void CImpl::SetValue(NT_Publisher pubHandle, const Value& value) {
   }
 }
 
-void CImpl::KeepAlive() {
+void ClientImpl3::KeepAlive() {
   DEBUG4("KeepAlive()");
   if (m_state != kStateRunning && m_state != kStateInitialAssignments) {
     m_decoder.SetError("received unexpected KeepAlive message");
@@ -413,7 +273,7 @@ void CImpl::KeepAlive() {
   // ignore
 }
 
-void CImpl::ServerHelloDone() {
+void ClientImpl3::ServerHelloDone() {
   DEBUG4("ServerHelloDone()");
   if (m_state != kStateInitialAssignments) {
     m_decoder.SetError("received unexpected ServerHelloDone message");
@@ -421,28 +281,29 @@ void CImpl::ServerHelloDone() {
   }
 
   // send initial assignments
-  SendPeriodic(m_initTimeMs, true, true);
+  DoSendPeriodic(m_initTimeMs, true, true);
 
   m_state = kStateRunning;
   m_setPeriodic(m_periodMs);
 }
 
-void CImpl::ClientHelloDone() {
+void ClientImpl3::ClientHelloDone() {
   DEBUG4("ClientHelloDone()");
   m_decoder.SetError("received unexpected ClientHelloDone message");
 }
 
-void CImpl::ProtoUnsup(unsigned int proto_rev) {
+void ClientImpl3::ProtoUnsup(unsigned int proto_rev) {
   DEBUG4("ProtoUnsup({})", proto_rev);
   m_decoder.SetError(fmt::format("received ProtoUnsup(version={})", proto_rev));
 }
 
-void CImpl::ClientHello(std::string_view self_id, unsigned int proto_rev) {
+void ClientImpl3::ClientHello(std::string_view self_id,
+                              unsigned int proto_rev) {
   DEBUG4("ClientHello({}, {})", self_id, proto_rev);
   m_decoder.SetError("received unexpected ClientHello message");
 }
 
-void CImpl::ServerHello(unsigned int flags, std::string_view self_id) {
+void ClientImpl3::ServerHello(unsigned int flags, std::string_view self_id) {
   DEBUG4("ServerHello({}, {})", flags, self_id);
   if (m_state != kStateHelloSent) {
     m_decoder.SetError("received unexpected ServerHello message");
@@ -454,9 +315,9 @@ void CImpl::ServerHello(unsigned int flags, std::string_view self_id) {
   m_handshakeSucceeded = nullptr;  // no longer required
 }
 
-void CImpl::EntryAssign(std::string_view name, unsigned int id,
-                        unsigned int seq_num, const Value& value,
-                        unsigned int flags) {
+void ClientImpl3::EntryAssign(std::string_view name, unsigned int id,
+                              unsigned int seq_num, const Value& value,
+                              unsigned int flags) {
   DEBUG4("EntryAssign({}, {}, {}, value, {})", name, id, seq_num, flags);
   if (m_state != kStateInitialAssignments && m_state != kStateRunning) {
     m_decoder.SetError("received unexpected EntryAssign message");
@@ -513,8 +374,8 @@ void CImpl::EntryAssign(std::string_view name, unsigned int id,
   }
 }
 
-void CImpl::EntryUpdate(unsigned int id, unsigned int seq_num,
-                        const Value& value) {
+void ClientImpl3::EntryUpdate(unsigned int id, unsigned int seq_num,
+                              const Value& value) {
   DEBUG4("EntryUpdate({}, {}, value)", id, seq_num);
   if (m_state != kStateRunning) {
     m_decoder.SetError("received EntryUpdate message before ServerHelloDone");
@@ -528,7 +389,7 @@ void CImpl::EntryUpdate(unsigned int id, unsigned int seq_num,
   }
 }
 
-void CImpl::FlagsUpdate(unsigned int id, unsigned int flags) {
+void ClientImpl3::FlagsUpdate(unsigned int id, unsigned int flags) {
   DEBUG4("FlagsUpdate({}, {})", id, flags);
   if (m_state != kStateRunning) {
     m_decoder.SetError("received FlagsUpdate message before ServerHelloDone");
@@ -548,7 +409,7 @@ void CImpl::FlagsUpdate(unsigned int id, unsigned int flags) {
       m_outgoingFlags.end());
 }
 
-void CImpl::EntryDelete(unsigned int id) {
+void ClientImpl3::EntryDelete(unsigned int id) {
   DEBUG4("EntryDelete({})", id);
   if (m_state != kStateRunning) {
     m_decoder.SetError("received EntryDelete message before ServerHelloDone");
@@ -573,7 +434,7 @@ void CImpl::EntryDelete(unsigned int id) {
       m_outgoingFlags.end());
 }
 
-void CImpl::ClearEntries() {
+void ClientImpl3::ClearEntries() {
   DEBUG4("ClearEntries()");
   if (m_state != kStateRunning) {
     m_decoder.SetError("received ClearEntries message before ServerHelloDone");
@@ -597,47 +458,14 @@ void CImpl::ClearEntries() {
   m_outgoingFlags.resize(0);
 }
 
-class ClientImpl3::Impl final : public CImpl {
- public:
-  Impl(uint64_t curTimeMs, int inst, WireConnection3& wire, wpi::Logger& logger,
-       std::function<void(uint32_t repeatMs)> setPeriodic)
-      : CImpl{curTimeMs, inst, wire, logger, std::move(setPeriodic)} {}
-};
-
-ClientImpl3::ClientImpl3(uint64_t curTimeMs, int inst, WireConnection3& wire,
-                         wpi::Logger& logger,
-                         std::function<void(uint32_t repeatMs)> setPeriodic)
-    : m_impl{std::make_unique<Impl>(curTimeMs, inst, wire, logger,
-                                    std::move(setPeriodic))} {}
-
-ClientImpl3::~ClientImpl3() {
-  WPI_DEBUG4(m_impl->m_logger, "NT3 ClientImpl destroyed");
-}
-
 void ClientImpl3::Start(std::string_view selfId,
                         std::function<void()> succeeded) {
-  if (m_impl->m_state != CImpl::kStateInitial) {
+  if (m_state != kStateInitial) {
     return;
   }
-  m_impl->m_handshakeSucceeded = std::move(succeeded);
-  auto writer = m_impl->m_wire.Send();
+  m_handshakeSucceeded = std::move(succeeded);
+  auto writer = m_wire.Send();
   WireEncodeClientHello(writer.stream(), selfId, 0x0300);
-  m_impl->m_wire.Flush();
-  m_impl->m_state = CImpl::kStateHelloSent;
-}
-
-void ClientImpl3::ProcessIncoming(std::span<const uint8_t> data) {
-  m_impl->ProcessIncoming(data);
-}
-
-void ClientImpl3::HandleLocal(std::span<const net::ClientMessage> msgs) {
-  m_impl->HandleLocal(msgs);
-}
-
-void ClientImpl3::SendPeriodic(uint64_t curTimeMs, bool flush) {
-  m_impl->SendPeriodic(curTimeMs, false, flush);
-}
-
-void ClientImpl3::SetLocal(net::LocalInterface* local) {
-  m_impl->m_local = local;
+  m_wire.Flush();
+  m_state = kStateHelloSent;
 }

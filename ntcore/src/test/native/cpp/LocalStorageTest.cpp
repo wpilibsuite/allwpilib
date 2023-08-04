@@ -162,7 +162,7 @@ TEST_F(LocalStorageTest, SubscribeNoTypeLocalPubPost) {
   EXPECT_EQ(value.GetBoolean(), true);
   EXPECT_EQ(value.time(), 5);
 
-  auto vals = storage.ReadQueueBoolean(sub);
+  auto vals = storage.ReadQueue<bool>(sub);
   ASSERT_EQ(vals.size(), 1u);
   EXPECT_EQ(vals[0].value, true);
   EXPECT_EQ(vals[0].time, 5);
@@ -171,7 +171,7 @@ TEST_F(LocalStorageTest, SubscribeNoTypeLocalPubPost) {
   EXPECT_CALL(network, SetValue(pub, val));
   storage.SetEntryValue(pub, val);
 
-  auto vals2 = storage.ReadQueueInteger(sub);  // mismatched type
+  auto vals2 = storage.ReadQueue<int64_t>(sub);  // mismatched type
   ASSERT_TRUE(vals2.empty());
 }
 
@@ -221,7 +221,7 @@ TEST_F(LocalStorageTest, EntryNoTypeLocalSet) {
   EXPECT_EQ(value.GetBoolean(), true);
   EXPECT_EQ(value.time(), 5);
 
-  auto vals = storage.ReadQueueBoolean(entry);
+  auto vals = storage.ReadQueue<bool>(entry);
   ASSERT_EQ(vals.size(), 1u);
   EXPECT_EQ(vals[0].value, true);
   EXPECT_EQ(vals[0].time, 5);
@@ -231,7 +231,7 @@ TEST_F(LocalStorageTest, EntryNoTypeLocalSet) {
   EXPECT_CALL(network, SetValue(_, val));
   EXPECT_TRUE(storage.SetEntryValue(entry, val));
 
-  auto vals2 = storage.ReadQueueInteger(entry);  // mismatched type
+  auto vals2 = storage.ReadQueue<int64_t>(entry);  // mismatched type
   ASSERT_TRUE(vals2.empty());
 
   // cannot change type; won't generate network message
@@ -241,7 +241,7 @@ TEST_F(LocalStorageTest, EntryNoTypeLocalSet) {
   EXPECT_EQ(storage.GetTopicType(fooTopic), NT_BOOLEAN);
   EXPECT_EQ(storage.GetTopicTypeString(fooTopic), "boolean");
 
-  auto vals3 = storage.ReadQueueInteger(entry);  // mismatched type
+  auto vals3 = storage.ReadQueue<int64_t>(entry);  // mismatched type
   ASSERT_TRUE(vals3.empty());
 }
 
@@ -266,7 +266,7 @@ TEST_F(LocalStorageTest, PubUnpubPub) {
   EXPECT_EQ(storage.GetTopicTypeString(fooTopic), "boolean");
   EXPECT_TRUE(storage.GetTopicExists(fooTopic));
 
-  EXPECT_TRUE(storage.ReadQueueInteger(sub).empty());
+  EXPECT_TRUE(storage.ReadQueue<int64_t>(sub).empty());
 
   EXPECT_CALL(network, Unpublish(pub, fooTopic));
   storage.Unpublish(pub);
@@ -288,7 +288,7 @@ TEST_F(LocalStorageTest, PubUnpubPub) {
   EXPECT_EQ(storage.GetTopicTypeString(fooTopic), "int");
   EXPECT_TRUE(storage.GetTopicExists(fooTopic));
 
-  EXPECT_EQ(storage.ReadQueueInteger(sub).size(), 1u);
+  EXPECT_EQ(storage.ReadQueue<int64_t>(sub).size(), 1u);
 }
 
 TEST_F(LocalStorageTest, LocalPubConflict) {
@@ -535,7 +535,7 @@ TEST_F(LocalStorageDuplicatesTest, Defaults) {
   SetValues(false);
 
   // verify 2nd update was dropped locally
-  auto values = storage.ReadQueueDouble(sub);
+  auto values = storage.ReadQueue<double>(sub);
   ASSERT_EQ(values.size(), 2u);
   ASSERT_EQ(values[0].value, val1.GetDouble());
   ASSERT_EQ(values[0].time, val1.time());
@@ -552,7 +552,7 @@ TEST_F(LocalStorageDuplicatesTest, KeepPub) {
   SetValues(true);
 
   // verify only 2 updates were received locally
-  auto values = storage.ReadQueueDouble(sub);
+  auto values = storage.ReadQueue<double>(sub);
   ASSERT_EQ(values.size(), 2u);
 }
 
@@ -565,7 +565,7 @@ TEST_F(LocalStorageDuplicatesTest, KeepSub) {
   SetValues(false);
 
   // verify 2 updates were received locally
-  auto values = storage.ReadQueueDouble(sub);
+  auto values = storage.ReadQueue<double>(sub);
   ASSERT_EQ(values.size(), 2u);
 }
 
@@ -579,7 +579,7 @@ TEST_F(LocalStorageDuplicatesTest, KeepPubSub) {
   SetValues(true);
 
   // verify all 3 updates were received locally
-  auto values = storage.ReadQueueDouble(sub);
+  auto values = storage.ReadQueue<double>(sub);
   ASSERT_EQ(values.size(), 3u);
 }
 
@@ -595,7 +595,7 @@ TEST_F(LocalStorageDuplicatesTest, FromNetworkDefault) {
   storage.NetworkSetValue(topic, val3);
 
   // verify 2nd update was dropped for local subscriber
-  auto values = storage.ReadQueueDouble(sub);
+  auto values = storage.ReadQueue<double>(sub);
   ASSERT_EQ(values.size(), 2u);
   ASSERT_EQ(values[0].value, val1.GetDouble());
   ASSERT_EQ(values[0].time, val1.time());
@@ -615,7 +615,7 @@ TEST_F(LocalStorageDuplicatesTest, FromNetworkKeepPub) {
   storage.NetworkSetValue(topic, val3);
 
   // verify 2nd update was dropped for local subscriber
-  auto values = storage.ReadQueueDouble(sub);
+  auto values = storage.ReadQueue<double>(sub);
   ASSERT_EQ(values.size(), 2u);
   ASSERT_EQ(values[0].value, val1.GetDouble());
   ASSERT_EQ(values[0].time, val1.time());
@@ -634,7 +634,7 @@ TEST_F(LocalStorageDuplicatesTest, FromNetworkKeepSub) {
   storage.NetworkSetValue(topic, val3);
 
   // verify 2nd update was received by local subscriber
-  auto values = storage.ReadQueueDouble(sub);
+  auto values = storage.ReadQueue<double>(sub);
   ASSERT_EQ(values.size(), 3u);
   ASSERT_EQ(values[0].value, val1.GetDouble());
   ASSERT_EQ(values[0].time, val1.time());
@@ -656,7 +656,7 @@ TEST_F(LocalStorageDuplicatesTest, FromNetworkKeepPubSub) {
   storage.NetworkSetValue(topic, val3);
 
   // verify 2nd update was received by local subscriber
-  auto values = storage.ReadQueueDouble(sub);
+  auto values = storage.ReadQueue<double>(sub);
   ASSERT_EQ(values.size(), 3u);
   ASSERT_EQ(values[0].value, val1.GetDouble());
   ASSERT_EQ(values[0].time, val1.time());
@@ -778,13 +778,13 @@ TEST_F(LocalStorageNumberVariantsTest, GetAtomic) {
 
   for (auto&& subentry : subentries) {
     SCOPED_TRACE(subentry.name);
-    EXPECT_THAT(storage.GetAtomicDouble(subentry.subentry, 0),
+    EXPECT_THAT(storage.GetAtomic<double>(subentry.subentry, 0),
                 TSEq<TimestampedDouble>(1.0, 50));
-    EXPECT_THAT(storage.GetAtomicInteger(subentry.subentry, 0),
+    EXPECT_THAT(storage.GetAtomic<int64_t>(subentry.subentry, 0),
                 TSEq<TimestampedInteger>(1, 50));
-    EXPECT_THAT(storage.GetAtomicFloat(subentry.subentry, 0),
+    EXPECT_THAT(storage.GetAtomic<float>(subentry.subentry, 0),
                 TSEq<TimestampedFloat>(1.0, 50));
-    EXPECT_THAT(storage.GetAtomicBoolean(subentry.subentry, false),
+    EXPECT_THAT(storage.GetAtomic<bool>(subentry.subentry, false),
                 TSEq<TimestampedBoolean>(false, 0));
   }
 }
@@ -807,15 +807,15 @@ TEST_F(LocalStorageNumberVariantsTest, GetAtomicArray) {
   for (auto&& subentry : subentries) {
     SCOPED_TRACE(subentry.name);
     double doubleVal = 1.0;
-    EXPECT_THAT(storage.GetAtomicDoubleArray(subentry.subentry, {}),
+    EXPECT_THAT(storage.GetAtomic<double[]>(subentry.subentry, {}),
                 TSSpanEq<TimestampedDoubleArray>(std::span{&doubleVal, 1}, 50));
     int64_t intVal = 1;
-    EXPECT_THAT(storage.GetAtomicIntegerArray(subentry.subentry, {}),
+    EXPECT_THAT(storage.GetAtomic<int64_t[]>(subentry.subentry, {}),
                 TSSpanEq<TimestampedIntegerArray>(std::span{&intVal, 1}, 50));
     float floatVal = 1.0;
-    EXPECT_THAT(storage.GetAtomicFloatArray(subentry.subentry, {}),
+    EXPECT_THAT(storage.GetAtomic<float[]>(subentry.subentry, {}),
                 TSSpanEq<TimestampedFloatArray>(std::span{&floatVal, 1}, 50));
-    EXPECT_THAT(storage.GetAtomicBooleanArray(subentry.subentry, {}),
+    EXPECT_THAT(storage.GetAtomic<bool[]>(subentry.subentry, {}),
                 TSSpanEq<TimestampedBooleanArray>(std::span<int>{}, 0));
   }
 }
@@ -831,9 +831,9 @@ TEST_F(LocalStorageNumberVariantsTest, ReadQueue) {
   for (auto&& subentry : subentries) {
     SCOPED_TRACE(subentry.name);
     if (subentry.type == NT_BOOLEAN) {
-      EXPECT_THAT(storage.ReadQueueDouble(subentry.subentry), IsEmpty());
+      EXPECT_THAT(storage.ReadQueue<double>(subentry.subentry), IsEmpty());
     } else {
-      EXPECT_THAT(storage.ReadQueueDouble(subentry.subentry),
+      EXPECT_THAT(storage.ReadQueue<double>(subentry.subentry),
                   ElementsAre(TSEq<TimestampedDouble>(1.0, 50)));
     }
   }
@@ -842,9 +842,9 @@ TEST_F(LocalStorageNumberVariantsTest, ReadQueue) {
   for (auto&& subentry : subentries) {
     SCOPED_TRACE(subentry.name);
     if (subentry.type == NT_BOOLEAN) {
-      EXPECT_THAT(storage.ReadQueueInteger(subentry.subentry), IsEmpty());
+      EXPECT_THAT(storage.ReadQueue<int64_t>(subentry.subentry), IsEmpty());
     } else {
-      EXPECT_THAT(storage.ReadQueueInteger(subentry.subentry),
+      EXPECT_THAT(storage.ReadQueue<int64_t>(subentry.subentry),
                   ElementsAre(TSEq<TimestampedInteger>(2, 50)));
     }
   }
@@ -853,9 +853,9 @@ TEST_F(LocalStorageNumberVariantsTest, ReadQueue) {
   for (auto&& subentry : subentries) {
     SCOPED_TRACE(subentry.name);
     if (subentry.type == NT_BOOLEAN) {
-      EXPECT_THAT(storage.ReadQueueFloat(subentry.subentry), IsEmpty());
+      EXPECT_THAT(storage.ReadQueue<float>(subentry.subentry), IsEmpty());
     } else {
-      EXPECT_THAT(storage.ReadQueueFloat(subentry.subentry),
+      EXPECT_THAT(storage.ReadQueue<float>(subentry.subentry),
                   ElementsAre(TSEq<TimestampedFloat>(3.0, 50)));
     }
   }
@@ -863,7 +863,7 @@ TEST_F(LocalStorageNumberVariantsTest, ReadQueue) {
   storage.SetEntryValue(pub, Value::MakeDouble(4.0, 50));
   for (auto&& subentry : subentries) {
     SCOPED_TRACE(subentry.name);
-    EXPECT_THAT(storage.ReadQueueBoolean(subentry.subentry), IsEmpty());
+    EXPECT_THAT(storage.ReadQueue<bool>(subentry.subentry), IsEmpty());
   }
 }
 
@@ -930,19 +930,19 @@ TEST_F(LocalStorageTest, ReadQueueLocalRemote) {
   // local set
   EXPECT_CALL(network, SetValue(_, _));
   storage.SetEntryValue(pub, Value::MakeDouble(1.0, 50));
-  EXPECT_THAT(storage.ReadQueueDouble(subBoth),
+  EXPECT_THAT(storage.ReadQueue<double>(subBoth),
               ElementsAre(TSEq<TimestampedDouble>(1.0, 50)));
-  EXPECT_THAT(storage.ReadQueueDouble(subLocal),
+  EXPECT_THAT(storage.ReadQueue<double>(subLocal),
               ElementsAre(TSEq<TimestampedDouble>(1.0, 50)));
-  EXPECT_THAT(storage.ReadQueueDouble(subRemote), IsEmpty());
+  EXPECT_THAT(storage.ReadQueue<double>(subRemote), IsEmpty());
 
   // network set
   storage.NetworkSetValue(remoteTopic, Value::MakeDouble(2.0, 60));
-  EXPECT_THAT(storage.ReadQueueDouble(subBoth),
+  EXPECT_THAT(storage.ReadQueue<double>(subBoth),
               ElementsAre(TSEq<TimestampedDouble>(2.0, 60)));
-  EXPECT_THAT(storage.ReadQueueDouble(subRemote),
+  EXPECT_THAT(storage.ReadQueue<double>(subRemote),
               ElementsAre(TSEq<TimestampedDouble>(2.0, 60)));
-  EXPECT_THAT(storage.ReadQueueDouble(subLocal), IsEmpty());
+  EXPECT_THAT(storage.ReadQueue<double>(subLocal), IsEmpty());
 }
 
 TEST_F(LocalStorageTest, SubExcludePub) {
@@ -959,15 +959,15 @@ TEST_F(LocalStorageTest, SubExcludePub) {
   // local set
   EXPECT_CALL(network, SetValue(_, _));
   storage.SetEntryValue(pub, Value::MakeDouble(1.0, 50));
-  EXPECT_THAT(storage.ReadQueueDouble(subActive),
+  EXPECT_THAT(storage.ReadQueue<double>(subActive),
               ElementsAre(TSEq<TimestampedDouble>(1.0, 50)));
-  EXPECT_THAT(storage.ReadQueueDouble(subExclude), IsEmpty());
+  EXPECT_THAT(storage.ReadQueue<double>(subExclude), IsEmpty());
 
   // network set
   storage.NetworkSetValue(remoteTopic, Value::MakeDouble(2.0, 60));
-  EXPECT_THAT(storage.ReadQueueDouble(subActive),
+  EXPECT_THAT(storage.ReadQueue<double>(subActive),
               ElementsAre(TSEq<TimestampedDouble>(2.0, 60)));
-  EXPECT_THAT(storage.ReadQueueDouble(subExclude),
+  EXPECT_THAT(storage.ReadQueue<double>(subExclude),
               ElementsAre(TSEq<TimestampedDouble>(2.0, 60)));
 }
 
@@ -983,11 +983,11 @@ TEST_F(LocalStorageTest, EntryExcludeSelf) {
   EXPECT_CALL(network, Publish(_, _, _, _, _, _));
   EXPECT_CALL(network, SetValue(_, _));
   storage.SetEntryValue(entry, Value::MakeDouble(1.0, 50));
-  EXPECT_THAT(storage.ReadQueueDouble(entry), IsEmpty());
+  EXPECT_THAT(storage.ReadQueue<double>(entry), IsEmpty());
 
   // network set
   storage.NetworkSetValue(remoteTopic, Value::MakeDouble(2.0, 60));
-  EXPECT_THAT(storage.ReadQueueDouble(entry),
+  EXPECT_THAT(storage.ReadQueue<double>(entry),
               ElementsAre(TSEq<TimestampedDouble>(2.0, 60)));
 }
 
@@ -1006,11 +1006,11 @@ TEST_F(LocalStorageTest, ReadQueueInitialLocal) {
   auto subRemote =
       storage.Subscribe(fooTopic, NT_DOUBLE, "double", {.disableLocal = true});
 
-  EXPECT_THAT(storage.ReadQueueDouble(subBoth),
+  EXPECT_THAT(storage.ReadQueue<double>(subBoth),
               ElementsAre(TSEq<TimestampedDouble>(1.0, 50)));
-  EXPECT_THAT(storage.ReadQueueDouble(subLocal),
+  EXPECT_THAT(storage.ReadQueue<double>(subLocal),
               ElementsAre(TSEq<TimestampedDouble>(1.0, 50)));
-  EXPECT_THAT(storage.ReadQueueDouble(subRemote), IsEmpty());
+  EXPECT_THAT(storage.ReadQueue<double>(subRemote), IsEmpty());
 }
 
 TEST_F(LocalStorageTest, ReadQueueInitialRemote) {
@@ -1028,11 +1028,11 @@ TEST_F(LocalStorageTest, ReadQueueInitialRemote) {
       storage.Subscribe(fooTopic, NT_DOUBLE, "double", {.disableLocal = true});
 
   // network set
-  EXPECT_THAT(storage.ReadQueueDouble(subBoth),
+  EXPECT_THAT(storage.ReadQueue<double>(subBoth),
               ElementsAre(TSEq<TimestampedDouble>(2.0, 60)));
-  EXPECT_THAT(storage.ReadQueueDouble(subRemote),
+  EXPECT_THAT(storage.ReadQueue<double>(subRemote),
               ElementsAre(TSEq<TimestampedDouble>(2.0, 60)));
-  EXPECT_THAT(storage.ReadQueueDouble(subLocal), IsEmpty());
+  EXPECT_THAT(storage.ReadQueue<double>(subLocal), IsEmpty());
 }
 
 }  // namespace nt

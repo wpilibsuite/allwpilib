@@ -149,6 +149,15 @@ public final class RobotController {
   }
 
   /**
+   * Enables or disables the 3.3V rail.
+   *
+   * @param enabled whether to enable the 3.3V rail.
+   */
+  public static void setEnabled3V3(boolean enabled) {
+    PowerJNI.setUserEnabled3V3(enabled);
+  }
+
+  /**
    * Get the enabled state of the 3.3V rail. The rail may be disabled due to a controller brownout,
    * a short circuit on the rail, or controller over-voltage.
    *
@@ -183,6 +192,15 @@ public final class RobotController {
    */
   public static double getCurrent5V() {
     return PowerJNI.getUserCurrent5V();
+  }
+
+  /**
+   * Enables or disables the 5V rail.
+   *
+   * @param enabled whether to enable the 5V rail.
+   */
+  public static void setEnabled5V(boolean enabled) {
+    PowerJNI.setUserEnabled5V(enabled);
   }
 
   /**
@@ -223,6 +241,15 @@ public final class RobotController {
   }
 
   /**
+   * Enables or disables the 6V rail.
+   *
+   * @param enabled whether to enable the 6V rail.
+   */
+  public static void setEnabled6V(boolean enabled) {
+    PowerJNI.setUserEnabled6V(enabled);
+  }
+
+  /**
    * Get the enabled state of the 6V rail. The rail may be disabled due to a controller brownout, a
    * short circuit on the rail, or controller over-voltage.
    *
@@ -259,6 +286,15 @@ public final class RobotController {
    */
   public static void setBrownoutVoltage(double brownoutVoltage) {
     PowerJNI.setBrownoutVoltage(brownoutVoltage);
+  }
+
+  /**
+   * Get the current CPU temperature in degrees Celsius.
+   *
+   * @return current CPU temperature in degrees Celsius
+   */
+  public static double getCPUTemp() {
+    return PowerJNI.getCPUTemp();
   }
 
   /**

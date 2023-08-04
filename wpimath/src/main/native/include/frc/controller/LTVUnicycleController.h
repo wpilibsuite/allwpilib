@@ -53,7 +53,7 @@ class WPILIB_DLLEXPORT LTVUnicycleController {
    * @param dt     Discretization timestep.
    * @param maxVelocity The maximum velocity for the controller gain lookup
    *                    table.
-   * @throws std::domain_error if maxVelocity &lt;= 0.
+   * @throws std::domain_error if maxVelocity <= 0 m/s or >= 15 m/s.
    */
   LTVUnicycleController(const wpi::array<double, 3>& Qelems,
                         const wpi::array<double, 2>& Relems, units::second_t dt,
