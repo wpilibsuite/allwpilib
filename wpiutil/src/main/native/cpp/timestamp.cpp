@@ -21,6 +21,7 @@ using namespace nFPGA;
 using namespace nRoboRIO_FPGANamespace;
 }  // namespace fpga
 #include <memory>
+
 #include "dlfcn.h"
 #endif
 
@@ -38,7 +39,6 @@ using namespace nRoboRIO_FPGANamespace;
 #include "fmt/format.h"
 
 #ifdef __FRC_ROBORIO__
-
 namespace {
 static constexpr const char hmbName[] = "HMB_0_RAM";
 static constexpr int timestampLowerOffset = 0xF0;
@@ -99,7 +99,6 @@ struct HMBHolder {
 };
 static HMBHolder hmb;
 }  // namespace
-
 #endif
 
 // offset in microseconds
