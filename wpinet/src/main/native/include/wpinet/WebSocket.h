@@ -460,7 +460,8 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
   sig::Signal<std::span<const uint8_t>, bool> binary;
 
   /**
-   * Ping event.  Emitted when a ping message is received.
+   * Ping event.  Emitted when a ping message is received.  A pong message is
+   * automatically sent in response, so this is simply a notification.
    */
   sig::Signal<std::span<const uint8_t>> ping;
 
