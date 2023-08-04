@@ -197,58 +197,38 @@ HAL_Bool HAL_IsPulsing(HAL_DigitalHandle dioPortHandle, int32_t* status);
 HAL_Bool HAL_IsAnyPulsing(int32_t* status);
 
 /**
- * Writes the filter index from the FPGA.
+ * Sets the filter frequency on a digital input.
  *
- * Set the filter index used to filter out short pulses.
- *
- * @param[in] dioPortHandle the digital port handle
- * @param[in] filterIndex   the filter index (Must be in the range 0 - 3, where
- *                          0 means "none" and 1 - 3 means filter # filterIndex
- *                          - 1)
- * @param[out] status       Error status variable. 0 on success.
- */
-void HAL_SetFilterSelect(HAL_DigitalHandle dioPortHandle, int32_t filterIndex,
-                         int32_t* status);
-
-/**
- * Reads the filter index from the FPGA.
- *
- * Gets the filter index used to filter out short pulses.
+ * Sets the filter frequency in hertz.
  *
  * @param[in] dioPortHandle the digital port handle
+ * @param[in] value         the frequency below which the signal must not
+ *                          be counted as a transition.
  * @param[out] status       Error status variable. 0 on success.
- * @return filterIndex  the filter index (Must be in the range 0 - 3, where 0
- *                      means "none" and 1 - 3 means filter # filterIndex - 1)
  */
-int32_t HAL_GetFilterSelect(HAL_DigitalHandle dioPortHandle, int32_t* status);
+void HAL_SetFilterFrequency(HAL_DigitalHandle dioPortHandle,
+                            double frequencyHerte, int32_t* status);
 
 /**
- * Sets the filter period for the specified filter index.
+ * Gets the filter frequency for the specified filter.
  *
- * Sets the filter period in FPGA cycles.  Even though there are 2 different
- * filter index domains (MXP vs HDR), ignore that distinction for now since it
- * complicates the interface.  That can be changed later.
+ * Gets the filter period in FPGA cycles.  Set status to
+ * NiFpga_Status_SoftwareFault if the filter values mismatch.
  *
- * @param[in] filterIndex the filter index, 0 - 2
- * @param[in] value       the number of cycles that the signal must not
- *                        transition to be counted as a transition.
- * @param[out] status     Error status variable. 0 on success.
+ * @param[in] dioPortHandle the digital port handle
+ * @param[out] status       Error status variable. 0 on success.
+ * @return                  The frequency of the filter in hertz.
  */
-void HAL_SetFilterPeriod(int32_t filterIndex, int64_t value, int32_t* status);
+double HAL_GetFilterFrequency(HAL_DigitalHandle dioPortHandle, int32_t* status);
 
 /**
- * Gets the filter period for the specified filter index.
+ * Removes a DIO from being filtered.
  *
- * Gets the filter period in FPGA cycles.  Even though there are 2 different
- * filter index domains (MXP vs HDR), ignore that distinction for now since it
- * complicates the interface.  Set status to NiFpga_Status_SoftwareFault if the
- * filter values mismatch.
- *
- * @param[in] filterIndex the filter index, 0 - 2
- * @param[out] status     Error status variable. 0 on success.
- * @return                The number of FPGA cycles of the filter period.
+ * @param dioPortHandle the digital port handle
+ * @param status        Error status variable. 0 on success.
  */
-int64_t HAL_GetFilterPeriod(int32_t filterIndex, int32_t* status);
+void HAL_DisableFilter(HAL_DigitalHandle dioPortHandle, int32_t* status);
+
 #ifdef __cplusplus
 }  // extern "C"
 #endif
