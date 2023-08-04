@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <functional>
+
 #include <wpi/SymbolExports.h>
 
 #include "frc/EigenCore.h"

@@ -44,12 +44,16 @@ class WPILIB_DLLEXPORT LTVUnicycleController {
   /**
    * Constructs a linear time-varying unicycle controller.
    *
+   * See
+   * https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-intro.html#lqr-tuning
+   * for how to select the tolerances.
+   *
    * @param Qelems The maximum desired error tolerance for each state.
    * @param Relems The maximum desired control effort for each input.
    * @param dt     Discretization timestep.
    * @param maxVelocity The maximum velocity for the controller gain lookup
    *                    table.
-   * @throws std::domain_error if maxVelocity &lt;= 0.
+   * @throws std::domain_error if maxVelocity <= 0 m/s or >= 15 m/s.
    */
   LTVUnicycleController(const wpi::array<double, 3>& Qelems,
                         const wpi::array<double, 2>& Relems, units::second_t dt,

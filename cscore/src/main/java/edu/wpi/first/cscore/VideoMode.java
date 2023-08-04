@@ -4,6 +4,8 @@
 
 package edu.wpi.first.cscore;
 
+import java.util.Objects;
+
 /** Video mode. */
 @SuppressWarnings("MemberName")
 public class VideoMode {
@@ -75,4 +77,28 @@ public class VideoMode {
 
   /** Frames per second. */
   public int fps;
+
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+    }
+    if (other == null) {
+      return false;
+    }
+    if (getClass() != other.getClass()) {
+      return false;
+    }
+    VideoMode mode = (VideoMode) other;
+
+    return pixelFormat == mode.pixelFormat
+        && width == mode.width
+        && height == mode.height
+        && fps == mode.fps;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(pixelFormat, width, height, fps);
+  }
 }

@@ -6,7 +6,6 @@ package edu.wpi.first.wpilibj;
 
 import static org.junit.Assert.assertEquals;
 
-import edu.wpi.first.wpilibj.interfaces.Accelerometer;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 import java.util.Arrays;
 import java.util.Collection;
@@ -23,7 +22,7 @@ public class BuiltInAccelerometerTest extends AbstractComsSetup {
   private static final double kAccelerationTolerance = 0.1;
   private final BuiltInAccelerometer m_accelerometer;
 
-  public BuiltInAccelerometerTest(Accelerometer.Range range) {
+  public BuiltInAccelerometerTest(BuiltInAccelerometer.Range range) {
     m_accelerometer = new BuiltInAccelerometer(range);
   }
 
@@ -38,10 +37,12 @@ public class BuiltInAccelerometerTest extends AbstractComsSetup {
 
   /** Test with all valid ranges to make sure unpacking is always done correctly. */
   @Parameters
-  public static Collection<Accelerometer.Range[]> generateData() {
+  public static Collection<BuiltInAccelerometer.Range[]> generateData() {
     return Arrays.asList(
-        new Accelerometer.Range[][] {
-          {Accelerometer.Range.k2G}, {Accelerometer.Range.k4G}, {Accelerometer.Range.k8G}
+        new BuiltInAccelerometer.Range[][] {
+          {BuiltInAccelerometer.Range.k2G},
+          {BuiltInAccelerometer.Range.k4G},
+          {BuiltInAccelerometer.Range.k8G}
         });
   }
 

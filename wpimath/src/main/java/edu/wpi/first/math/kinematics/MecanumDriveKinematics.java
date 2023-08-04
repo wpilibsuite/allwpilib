@@ -30,7 +30,8 @@ import org.ejml.simple.SimpleMatrix;
  * <p>Forward kinematics is also used for odometry -- determining the position of the robot on the
  * field using encoders and a gyro.
  */
-public class MecanumDriveKinematics {
+public class MecanumDriveKinematics
+    implements Kinematics<MecanumDriveWheelSpeeds, MecanumDriveWheelPositions> {
   private final SimpleMatrix m_inverseKinematics;
   private final SimpleMatrix m_forwardKinematics;
 
@@ -125,6 +126,7 @@ public class MecanumDriveKinematics {
    * @param chassisSpeeds The desired chassis speed.
    * @return The wheel speeds.
    */
+  @Override
   public MecanumDriveWheelSpeeds toWheelSpeeds(ChassisSpeeds chassisSpeeds) {
     return toWheelSpeeds(chassisSpeeds, new Translation2d());
   }
@@ -137,6 +139,7 @@ public class MecanumDriveKinematics {
    * @param wheelSpeeds The current mecanum drive wheel speeds.
    * @return The resulting chassis speed.
    */
+  @Override
   public ChassisSpeeds toChassisSpeeds(MecanumDriveWheelSpeeds wheelSpeeds) {
     var wheelSpeedsVector = new SimpleMatrix(4, 1);
     wheelSpeedsVector.setColumn(
@@ -152,6 +155,20 @@ public class MecanumDriveKinematics {
         chassisSpeedsVector.get(0, 0),
         chassisSpeedsVector.get(1, 0),
         chassisSpeedsVector.get(2, 0));
+  }
+
+  @Override
+  public Twist2d toTwist2d(MecanumDriveWheelPositions start, MecanumDriveWheelPositions end) {
+    var wheelDeltasVector = new SimpleMatrix(4, 1);
+    wheelDeltasVector.setColumn(
+        0,
+        0,
+        end.frontLeftMeters - start.frontLeftMeters,
+        end.frontRightMeters - start.frontRightMeters,
+        end.rearLeftMeters - start.rearLeftMeters,
+        end.rearRightMeters - start.rearRightMeters);
+    var twist = m_forwardKinematics.mult(wheelDeltasVector);
+    return new Twist2d(twist.get(0, 0), twist.get(1, 0), twist.get(2, 0));
   }
 
   /**
@@ -172,7 +189,6 @@ public class MecanumDriveKinematics {
         wheelDeltas.rearLeftMeters,
         wheelDeltas.rearRightMeters);
     var twist = m_forwardKinematics.mult(wheelDeltasVector);
-
     return new Twist2d(twist.get(0, 0), twist.get(1, 0), twist.get(2, 0));
   }
 

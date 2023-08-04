@@ -23,7 +23,7 @@ RamseteCommand::RamseteCommand(
       m_pose(std::move(pose)),
       m_controller(controller),
       m_feedforward(feedforward),
-      m_kinematics(kinematics),
+      m_kinematics(std::move(kinematics)),
       m_speeds(std::move(wheelSpeeds)),
       m_leftController(std::make_unique<frc2::PIDController>(leftController)),
       m_rightController(std::make_unique<frc2::PIDController>(rightController)),
@@ -45,7 +45,7 @@ RamseteCommand::RamseteCommand(
       m_pose(std::move(pose)),
       m_controller(controller),
       m_feedforward(feedforward),
-      m_kinematics(kinematics),
+      m_kinematics(std::move(kinematics)),
       m_speeds(std::move(wheelSpeeds)),
       m_leftController(std::make_unique<frc2::PIDController>(leftController)),
       m_rightController(std::make_unique<frc2::PIDController>(rightController)),
@@ -64,7 +64,7 @@ RamseteCommand::RamseteCommand(
     : m_trajectory(std::move(trajectory)),
       m_pose(std::move(pose)),
       m_controller(controller),
-      m_kinematics(kinematics),
+      m_kinematics(std::move(kinematics)),
       m_outputVel(std::move(output)),
       m_usePID(false) {
   AddRequirements(requirements);
@@ -80,7 +80,7 @@ RamseteCommand::RamseteCommand(
     : m_trajectory(std::move(trajectory)),
       m_pose(std::move(pose)),
       m_controller(controller),
-      m_kinematics(kinematics),
+      m_kinematics(std::move(kinematics)),
       m_outputVel(std::move(output)),
       m_usePID(false) {
   AddRequirements(requirements);
@@ -161,7 +161,7 @@ bool RamseteCommand::IsFinished() {
 }
 
 void RamseteCommand::InitSendable(wpi::SendableBuilder& builder) {
-  CommandBase::InitSendable(builder);
+  Command::InitSendable(builder);
   builder.AddDoubleProperty(
       "leftVelocity", [this] { return m_prevSpeeds.left.value(); }, nullptr);
   builder.AddDoubleProperty(

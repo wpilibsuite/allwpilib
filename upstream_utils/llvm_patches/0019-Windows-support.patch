@@ -1,15 +1,16 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 20:22:38 -0400
-Subject: [PATCH 19/28] Windows support
+Subject: [PATCH 19/30] Windows support
 
 ---
  .../llvm/Support/Windows/WindowsSupport.h     | 45 +++++----
  llvm/lib/Support/ConvertUTF.cpp               | 95 +++++++++++++++++++
- 2 files changed, 124 insertions(+), 16 deletions(-)
+ llvm/lib/Support/raw_ostream.cpp              |  1 -
+ 3 files changed, 124 insertions(+), 17 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/Windows/WindowsSupport.h b/llvm/include/llvm/Support/Windows/WindowsSupport.h
-index 180803fbd3104ddf32c183684f226954c4fb8b0e..31120cfa0e8cafa8d4f332bf2374a88a3418f748 100644
+index aabdb2f14668a990329b57f5454a0d7db73e12ce..2ac474092a62d488da1ec7f07a1cd10b0781d938 100644
 --- a/llvm/include/llvm/Support/Windows/WindowsSupport.h
 +++ b/llvm/include/llvm/Support/Windows/WindowsSupport.h
 @@ -35,8 +35,6 @@
@@ -67,9 +68,9 @@ index 180803fbd3104ddf32c183684f226954c4fb8b0e..31120cfa0e8cafa8d4f332bf2374a88a
 +  return GetWindowsOSVersion() >= llvm::VersionTuple(6, 2, 0, 0);
 +}
  
- /// Returns the Windows version as Major.Minor.0.BuildNumber. Uses
- /// RtlGetVersion or GetVersionEx under the hood depending on what is available.
-@@ -228,19 +254,6 @@ inline FILETIME toFILETIME(TimePoint<> TP) {
+ /// Determines if the program is running on Windows 11 or Windows Server 2022.
+ bool RunningWindows11OrGreater();
+@@ -231,19 +257,6 @@ inline FILETIME toFILETIME(TimePoint<> TP) {
    return Time;
  }
  
@@ -90,10 +91,10 @@ index 180803fbd3104ddf32c183684f226954c4fb8b0e..31120cfa0e8cafa8d4f332bf2374a88a
  } // end namespace llvm.
  
 diff --git a/llvm/lib/Support/ConvertUTF.cpp b/llvm/lib/Support/ConvertUTF.cpp
-index e24a918c5c898206dc8b401c6214e4e9c652e9a9..c906ded91dfeaa07b782e1eccc28643d5497cb94 100644
+index bc04c5ab5113563fb82d7b3b168985369b611f4b..57eb64a6017a6964ab14b40b8c6b3563cd41ffac 100644
 --- a/llvm/lib/Support/ConvertUTF.cpp
 +++ b/llvm/lib/Support/ConvertUTF.cpp
-@@ -51,6 +51,11 @@
+@@ -67,6 +67,11 @@
  #endif
  #include <assert.h>
  
@@ -105,7 +106,7 @@ index e24a918c5c898206dc8b401c6214e4e9c652e9a9..c906ded91dfeaa07b782e1eccc28643d
  /*
   * This code extensively uses fall-through switches.
   * Keep the compiler from warning about that.
-@@ -733,6 +738,96 @@ ConversionResult ConvertUTF8toUTF32(const UTF8 **sourceStart,
+@@ -759,6 +764,96 @@ ConversionResult ConvertUTF8toUTF32(const UTF8 **sourceStart,
  
     --------------------------------------------------------------------- */
  
@@ -202,3 +203,15 @@ index e24a918c5c898206dc8b401c6214e4e9c652e9a9..c906ded91dfeaa07b782e1eccc28643d
  } // namespace llvm
  
  ConvertUTF_RESTORE_WARNINGS
+diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
+index 3b7d8d6db5f0df31e18b91be716a4fd21e7e3549..4769d34a14f3f2cbaaa4df50ea7111fe9fa2792f 100644
+--- a/llvm/lib/Support/raw_ostream.cpp
++++ b/llvm/lib/Support/raw_ostream.cpp
+@@ -534,7 +534,6 @@ void raw_fd_ostream::write_impl(const char *Ptr, size_t Size) {
+       DWORD WinLastError = GetLastError();
+       if (WinLastError == ERROR_BROKEN_PIPE ||
+           (WinLastError == ERROR_NO_DATA && errno == EINVAL)) {
+-        llvm::sys::CallOneShotPipeSignalHandler();
+         errno = EPIPE;
+       }
+ #endif

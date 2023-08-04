@@ -1,17 +1,17 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:13:55 -0400
-Subject: [PATCH 04/28] Change unique_function storage size
+Subject: [PATCH 04/30] Change unique_function storage size
 
 ---
  llvm/include/llvm/ADT/FunctionExtras.h | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/FunctionExtras.h b/llvm/include/llvm/ADT/FunctionExtras.h
-index 5a37417ddde5ddf116dd63939c41064330d539d2..8a9d78f41f540f51559c11c1f9f40645165796e5 100644
+index 8f04277cdf0e5b3d3b0be4a307cf0e4fada810fd..ba145bf783775042ff4a2d4be4bb048f16db669d 100644
 --- a/llvm/include/llvm/ADT/FunctionExtras.h
 +++ b/llvm/include/llvm/ADT/FunctionExtras.h
-@@ -78,7 +78,7 @@ using EnableIfCallable = std::enable_if_t<llvm::disjunction<
+@@ -78,7 +78,7 @@ using EnableIfCallable = std::enable_if_t<std::disjunction<
  
  template <typename ReturnT, typename... ParamTs> class UniqueFunctionBase {
  protected:
@@ -28,4 +28,4 @@ index 5a37417ddde5ddf116dd63939c41064330d539d2..8a9d78f41f540f51559c11c1f9f40645
 +    // provide four pointers worth of storage here.
      // This is mutable as an inlined `const unique_function<void() const>` may
      // still modify its own mutable members.
-     mutable
+     mutable std::aligned_storage_t<InlineStorageSize, alignof(void *)>

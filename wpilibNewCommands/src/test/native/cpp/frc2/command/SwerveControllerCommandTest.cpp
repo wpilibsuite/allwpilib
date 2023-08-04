@@ -18,6 +18,7 @@
 #include <frc/simulation/SimHooks.h>
 #include <frc/trajectory/TrajectoryGenerator.h>
 
+#include "CommandTestBase.h"
 #include "gtest/gtest.h"
 
 #define EXPECT_NEAR_UNITS(val1, val2, eps) \
@@ -72,7 +73,7 @@ class SwerveControllerCommandTest : public ::testing::Test {
 };
 
 TEST_F(SwerveControllerCommandTest, ReachesReference) {
-  frc2::Subsystem subsystem;
+  frc2::TestSubsystem subsystem;
 
   auto waypoints =
       std::vector{frc::Pose2d{0_m, 0_m, 0_rad}, frc::Pose2d{1_m, 5_m, 3_rad}};

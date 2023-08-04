@@ -12,7 +12,7 @@
 #include <frc/controller/ProfiledPIDController.h>
 #include <units/time.h>
 
-#include "frc2/command/CommandBase.h"
+#include "frc2/command/Command.h"
 #include "frc2/command/CommandHelper.h"
 
 namespace frc2 {
@@ -28,7 +28,7 @@ namespace frc2 {
  */
 template <class Distance>
 class ProfiledPIDCommand
-    : public CommandHelper<CommandBase, ProfiledPIDCommand<Distance>> {
+    : public CommandHelper<Command, ProfiledPIDCommand<Distance>> {
   using Distance_t = units::unit_t<Distance>;
   using Velocity =
       units::compound_unit<Distance, units::inverse<units::seconds>>;

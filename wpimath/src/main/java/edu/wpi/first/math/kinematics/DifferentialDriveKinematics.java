@@ -16,7 +16,8 @@ import edu.wpi.first.math.geometry.Twist2d;
  * whereas forward kinematics converts left and right component velocities into a linear and angular
  * chassis speed.
  */
-public class DifferentialDriveKinematics {
+public class DifferentialDriveKinematics
+    implements Kinematics<DifferentialDriveWheelSpeeds, DifferentialDriveWheelPositions> {
   public final double trackWidthMeters;
 
   /**
@@ -37,6 +38,7 @@ public class DifferentialDriveKinematics {
    * @param wheelSpeeds The left and right velocities.
    * @return The chassis speed.
    */
+  @Override
   public ChassisSpeeds toChassisSpeeds(DifferentialDriveWheelSpeeds wheelSpeeds) {
     return new ChassisSpeeds(
         (wheelSpeeds.leftMetersPerSecond + wheelSpeeds.rightMetersPerSecond) / 2,
@@ -51,12 +53,19 @@ public class DifferentialDriveKinematics {
    *     chassis' speed.
    * @return The left and right velocities.
    */
+  @Override
   public DifferentialDriveWheelSpeeds toWheelSpeeds(ChassisSpeeds chassisSpeeds) {
     return new DifferentialDriveWheelSpeeds(
         chassisSpeeds.vxMetersPerSecond
             - trackWidthMeters / 2 * chassisSpeeds.omegaRadiansPerSecond,
         chassisSpeeds.vxMetersPerSecond
             + trackWidthMeters / 2 * chassisSpeeds.omegaRadiansPerSecond);
+  }
+
+  @Override
+  public Twist2d toTwist2d(
+      DifferentialDriveWheelPositions start, DifferentialDriveWheelPositions end) {
+    return toTwist2d(end.leftMeters - start.leftMeters, end.rightMeters - start.rightMeters);
   }
 
   /**

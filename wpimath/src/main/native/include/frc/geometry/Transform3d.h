@@ -6,7 +6,7 @@
 
 #include <wpi/SymbolExports.h>
 
-#include "Translation3d.h"
+#include "frc/geometry/Translation3d.h"
 
 namespace frc {
 

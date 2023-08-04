@@ -145,4 +145,47 @@ public final class MathUtil {
   public static double interpolate(double startValue, double endValue, double t) {
     return startValue + (endValue - startValue) * MathUtil.clamp(t, 0, 1);
   }
+
+  /**
+   * Checks if the given value matches an expected value within a certain tolerance.
+   *
+   * @param expected The expected value
+   * @param actual The actual value
+   * @param tolerance The allowed difference between the actual and the expected value
+   * @return Whether or not the actual value is within the allowed tolerance
+   */
+  public static boolean isNear(double expected, double actual, double tolerance) {
+    if (tolerance < 0) {
+      throw new IllegalArgumentException("Tolerance must be a non-negative number!");
+    }
+    return Math.abs(expected - actual) < tolerance;
+  }
+
+  /**
+   * Checks if the given value matches an expected value within a certain tolerance. Supports
+   * continuous input for cases like absolute encoders.
+   *
+   * <p>Continuous input means that the min and max value are considered to be the same point, and
+   * tolerances can be checked across them. A common example would be for absolute encoders: calling
+   * isNear(2, 359, 5, 0, 360) returns true because 359 is 1 away from 360 (which is treated as the
+   * same as 0) and 2 is 2 away from 0, adding up to an error of 3 degrees, which is within the
+   * given tolerance of 5.
+   *
+   * @param expected The expected value
+   * @param actual The actual value
+   * @param tolerance The allowed difference between the actual and the expected value
+   * @param min Smallest value before wrapping around to the largest value
+   * @param max Largest value before wrapping around to the smallest value
+   * @return Whether or not the actual value is within the allowed tolerance
+   */
+  public static boolean isNear(
+      double expected, double actual, double tolerance, double min, double max) {
+    if (tolerance < 0) {
+      throw new IllegalArgumentException("Tolerance must be a non-negative number!");
+    }
+    // Max error is exactly halfway between the min and max
+    double errorBound = (max - min) / 2.0;
+    double error = MathUtil.inputModulus(expected - actual, -errorBound, errorBound);
+    return Math.abs(error) < tolerance;
+  }
 }

@@ -246,6 +246,9 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
     if (m_counter != null) {
       m_counter.reset();
     }
+    if (m_simPosition != null) {
+      m_simPosition.set(0);
+    }
     m_positionOffset = getAbsolutePosition();
   }
 

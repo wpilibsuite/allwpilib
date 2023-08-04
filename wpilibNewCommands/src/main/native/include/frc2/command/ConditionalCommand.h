@@ -4,13 +4,12 @@
 
 #pragma once
 
+#include <concepts>
 #include <functional>
 #include <memory>
 #include <utility>
 
-#include <wpi/concepts.h>
-
-#include "frc2/command/CommandBase.h"
+#include "frc2/command/Command.h"
 #include "frc2/command/CommandHelper.h"
 
 namespace frc2 {
@@ -27,8 +26,7 @@ namespace frc2 {
  *
  * @see ScheduleCommand
  */
-class ConditionalCommand
-    : public CommandHelper<CommandBase, ConditionalCommand> {
+class ConditionalCommand : public CommandHelper<Command, ConditionalCommand> {
  public:
   /**
    * Creates a new ConditionalCommand.
@@ -72,6 +70,8 @@ class ConditionalCommand
   bool IsFinished() override;
 
   bool RunsWhenDisabled() const override;
+
+  InterruptionBehavior GetInterruptionBehavior() const override;
 
   void InitSendable(wpi::SendableBuilder& builder) override;
 

@@ -108,10 +108,7 @@ set(uv_darwin_src
 )
 
 set(uv_linux_src
-    src/main/native/thirdparty/libuv/src/unix/epoll.cpp
-    src/main/native/thirdparty/libuv/src/unix/linux-core.cpp
-    src/main/native/thirdparty/libuv/src/unix/linux-inotify.cpp
-    src/main/native/thirdparty/libuv/src/unix/linux-syscalls.cpp
+    src/main/native/thirdparty/libuv/src/unix/linux.cpp
     src/main/native/thirdparty/libuv/src/unix/procfs-exepath.cpp
     src/main/native/thirdparty/libuv/src/unix/proctitle.cpp
     src/main/native/thirdparty/libuv/src/unix/random-sysctl-linux.cpp
@@ -149,9 +146,8 @@ if (NOT USE_SYSTEM_LIBUV)
         endif()
     endif()
 else()
-    find_package(PkgConfig REQUIRED)
-    pkg_check_modules(libuv REQUIRED IMPORTED_TARGET libuv)
-    target_link_libraries(wpinet PUBLIC PkgConfig::libuv)
+    find_package(libuv CONFIG REQUIRED)
+    target_link_libraries(wpinet PUBLIC $<IF:$<TARGET_EXISTS:libuv::uv_a>,libuv::uv_a,libuv::uv>)
 endif()
 
 if (MSVC)

@@ -23,6 +23,8 @@ class ElevatorSim : public LinearSystemSim<2, 1, 1> {
    * Constructs a simulated elevator mechanism.
    *
    * @param plant              The linear system that represents the elevator.
+   *                           This system can be created with
+   *                           LinearSystemId::ElevatorSystem().
    * @param gearbox            The type of and number of motors in your
    *                           elevator gearbox.
    * @param gearing            The gearing of the elevator (numbers greater
@@ -32,12 +34,13 @@ class ElevatorSim : public LinearSystemSim<2, 1, 1> {
    * @param minHeight          The minimum allowed height of the elevator.
    * @param maxHeight          The maximum allowed height of the elevator.
    * @param simulateGravity    Whether gravity should be simulated or not.
+   * @param startingHeight     The starting height of the elevator.
    * @param measurementStdDevs The standard deviation of the measurements.
    */
   ElevatorSim(const LinearSystem<2, 1, 1>& plant, const DCMotor& gearbox,
               double gearing, units::meter_t drumRadius,
               units::meter_t minHeight, units::meter_t maxHeight,
-              bool simulateGravity,
+              bool simulateGravity, units::meter_t startingHeight,
               const std::array<double, 1>& measurementStdDevs = {0.0});
 
   /**
@@ -53,12 +56,13 @@ class ElevatorSim : public LinearSystemSim<2, 1, 1> {
    * @param minHeight          The minimum allowed height of the elevator.
    * @param maxHeight          The maximum allowed height of the elevator.
    * @param simulateGravity    Whether gravity should be simulated or not.
+   * @param startingHeight     The starting height of the elevator.
    * @param measurementStdDevs The standard deviation of the measurements.
    */
   ElevatorSim(const DCMotor& gearbox, double gearing,
               units::kilogram_t carriageMass, units::meter_t drumRadius,
               units::meter_t minHeight, units::meter_t maxHeight,
-              bool simulateGravity,
+              bool simulateGravity, units::meter_t startingHeight,
               const std::array<double, 1>& measurementStdDevs = {0.0});
 
   /**

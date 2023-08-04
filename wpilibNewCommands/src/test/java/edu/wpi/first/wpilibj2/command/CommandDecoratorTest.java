@@ -200,23 +200,6 @@ class CommandDecoratorTest extends CommandTestBase {
     }
   }
 
-  @SuppressWarnings("removal") // Command.perpetually()
-  @Test
-  void perpetuallyTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      Command command = new InstantCommand();
-
-      Command perpetual = command.perpetually();
-
-      scheduler.schedule(perpetual);
-      scheduler.run();
-      scheduler.run();
-      scheduler.run();
-
-      assertTrue(scheduler.isScheduled(perpetual));
-    }
-  }
-
   @Test
   void unlessTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {

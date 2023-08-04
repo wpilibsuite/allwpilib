@@ -9,15 +9,15 @@
 #pragma warning(disable : 4521)
 #endif
 
+#include <concepts>
 #include <memory>
 #include <type_traits>
 #include <utility>
 #include <vector>
 
 #include <wpi/DecayedDerivedFrom.h>
-#include <wpi/concepts.h>
 
-#include "frc2/command/CommandGroupBase.h"
+#include "frc2/command/CommandBase.h"
 #include "frc2/command/CommandHelper.h"
 
 namespace frc2 {
@@ -33,7 +33,7 @@ namespace frc2 {
  * This class is provided by the NewCommands VendorDep
  */
 class ParallelCommandGroup
-    : public CommandHelper<CommandGroupBase, ParallelCommandGroup> {
+    : public CommandHelper<Command, ParallelCommandGroup> {
  public:
   /**
    * Creates a new ParallelCommandGroup. The given commands will be executed
@@ -67,6 +67,11 @@ class ParallelCommandGroup
   // Prevent template expansion from emulating copy ctor
   ParallelCommandGroup(ParallelCommandGroup&) = delete;
 
+  /**
+   * Adds the given commands to the group.
+   *
+   * @param commands Commands to add to the group.
+   */
   template <wpi::DecayedDerivedFrom<Command>... Commands>
   void AddCommands(Commands&&... commands) {
     std::vector<std::unique_ptr<Command>> foo;
@@ -89,7 +94,7 @@ class ParallelCommandGroup
   Command::InterruptionBehavior GetInterruptionBehavior() const override;
 
  private:
-  void AddCommands(std::vector<std::unique_ptr<Command>>&& commands) final;
+  void AddCommands(std::vector<std::unique_ptr<Command>>&& commands);
 
   std::vector<std::pair<std::unique_ptr<Command>, bool>> m_commands;
   bool m_runWhenDisabled{true};

@@ -463,13 +463,19 @@ namespace units
 	//----------------------------------
 
 	/**
+	 * @defgroup 	Units Unit API
+	*/
+
+	/**
 	 * @defgroup	UnitContainers Unit Containers
+	 * @ingroup		Units
 	 * @brief		Defines a series of classes which contain dimensioned values. Unit containers
 	 *				store a value, and support various arithmetic operations.
 	 */
 
 	/**
 	 * @defgroup	UnitTypes Unit Types
+	 * @ingroup		Units
 	 * @brief		Defines a series of classes which represent units. These types are tags used by
 	 *				the conversion function, to create compound units, or to create `unit_t` types.
 	 *				By themselves, they are not containers and have no stored value.
@@ -477,6 +483,7 @@ namespace units
 
 	/**
 	 * @defgroup	UnitManipulators Unit Manipulators
+	 * @ingroup		Units
 	 * @brief		Defines a series of classes used to manipulate unit types, such as `inverse<>`, `squared<>`, and metric prefixes.
 	 *				Unit manipulators can be chained together, e.g. `inverse<squared<pico<time::seconds>>>` to
 	 *				represent picoseconds^-2.
@@ -484,6 +491,7 @@ namespace units
 
 	 /**
 	  * @defgroup	CompileTimeUnitManipulators Compile-time Unit Manipulators
+	  * @ingroup	Units
 	  * @brief		Defines a series of classes used to manipulate `unit_value_t` types at compile-time, such as `unit_value_add<>`, `unit_value_sqrt<>`, etc.
 	  *				Compile-time manipulators can be chained together, e.g. `unit_value_sqrt<unit_value_add<unit_value_power<a, 2>, unit_value_power<b, 2>>>` to
 	  *				represent `c = sqrt(a^2 + b^2).
@@ -491,17 +499,20 @@ namespace units
 
 	 /**
 	 * @defgroup	UnitMath Unit Math
+	 * @ingroup		Units
 	 * @brief		Defines a collection of unit-enabled, strongly-typed versions of `<cmath>` functions.
 	 * @details		Includes most c++11 extensions.
 	 */
 
 	/**
 	 * @defgroup	Conversion Explicit Conversion
+	 * @ingroup		Units
 	 * @brief		Functions used to convert values of one logical type to another.
 	 */
 
 	/**
 	 * @defgroup	TypeTraits Type Traits
+	 * @ingroup		Units
 	 * @brief		Defines a series of classes to obtain unit type information at compile-time.
 	 */
 

@@ -4,6 +4,8 @@
 
 package edu.wpi.first.util.datalog;
 
+import java.nio.ByteBuffer;
+
 /**
  * A data log. The log file is created immediately upon construction with a temporary filename. The
  * file may be renamed at any time using the setFilename() function.
@@ -191,11 +193,49 @@ public final class DataLog implements AutoCloseable {
    * Appends a raw record to the log.
    *
    * @param entry Entry index, as returned by start()
-   * @param data Byte array to record
+   * @param data Byte array to record; will send entire array contents
    * @param timestamp Time stamp (0 to indicate now)
    */
   public void appendRaw(int entry, byte[] data, long timestamp) {
-    DataLogJNI.appendRaw(m_impl, entry, data, timestamp);
+    appendRaw(entry, data, 0, data.length, timestamp);
+  }
+
+  /**
+   * Appends a record to the log.
+   *
+   * @param entry Entry index, as returned by start()
+   * @param data Byte array to record
+   * @param start Start position of data (in byte array)
+   * @param len Length of data (must be less than or equal to data.length - start)
+   * @param timestamp Time stamp (0 to indicate now)
+   */
+  public void appendRaw(int entry, byte[] data, int start, int len, long timestamp) {
+    DataLogJNI.appendRaw(m_impl, entry, data, start, len, timestamp);
+  }
+
+  /**
+   * Appends a record to the log.
+   *
+   * @param entry Entry index, as returned by start()
+   * @param data Buffer to record; will send from data.position() to data.limit()
+   * @param timestamp Time stamp (0 to indicate now)
+   */
+  public void appendRaw(int entry, ByteBuffer data, long timestamp) {
+    int pos = data.position();
+    appendRaw(entry, data, pos, data.limit() - pos, timestamp);
+  }
+
+  /**
+   * Appends a record to the log.
+   *
+   * @param entry Entry index, as returned by start()
+   * @param data Buffer to record
+   * @param start Start position of data (in buffer)
+   * @param len Length of data (must be less than or equal to data.capacity() - start)
+   * @param timestamp Time stamp (0 to indicate now)
+   */
+  public void appendRaw(int entry, ByteBuffer data, int start, int len, long timestamp) {
+    DataLogJNI.appendRaw(m_impl, entry, data, start, len, timestamp);
   }
 
   @Override

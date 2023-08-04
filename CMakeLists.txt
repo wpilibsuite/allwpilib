@@ -167,8 +167,7 @@ endif()
 
 if (USE_SYSTEM_LIBUV)
 set (LIBUV_SYSTEM_REPLACE "
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(libuv REQUIRED IMPORTED_TARGET libuv)
+find_dependency(libuv CONFIG)
 ")
 endif()
 

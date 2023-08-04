@@ -8,6 +8,7 @@
 #include <stdint.h>
 #include <uv.h>
 
+#include <concepts>
 #include <functional>
 #include <memory>
 #include <thread>
@@ -15,7 +16,6 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/concepts.h>
 #include <wpi/future.h>
 #include <wpi/mutex.h>
 

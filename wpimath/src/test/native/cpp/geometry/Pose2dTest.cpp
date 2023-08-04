@@ -10,6 +10,24 @@
 
 using namespace frc;
 
+TEST(Pose2dTest, RotateBy) {
+  constexpr auto x = 1_m;
+  constexpr auto y = 2_m;
+  const Pose2d initial{x, y, 45_deg};
+
+  const Rotation2d rotation{5_deg};
+  const auto rotated = initial.RotateBy(rotation);
+
+  // Translation is rotated by CCW rotation matrix
+  double c = rotation.Cos();
+  double s = rotation.Sin();
+  EXPECT_DOUBLE_EQ(c * x.value() - s * y.value(), rotated.X().value());
+  EXPECT_DOUBLE_EQ(s * x.value() + c * y.value(), rotated.Y().value());
+  EXPECT_DOUBLE_EQ(
+      initial.Rotation().Degrees().value() + rotation.Degrees().value(),
+      rotated.Rotation().Degrees().value());
+}
+
 TEST(Pose2dTest, TransformBy) {
   const Pose2d initial{1_m, 2_m, 45_deg};
   const Transform2d transform{Translation2d{5_m, 0_m}, 5_deg};
@@ -27,9 +45,9 @@ TEST(Pose2dTest, RelativeTo) {
 
   const auto finalRelativeToInitial = final.RelativeTo(initial);
 
-  EXPECT_DOUBLE_EQ(5.0 * std::sqrt(2.0), finalRelativeToInitial.X().value());
+  EXPECT_NEAR(5.0 * std::sqrt(2.0), finalRelativeToInitial.X().value(), 1e-9);
   EXPECT_NEAR(0.0, finalRelativeToInitial.Y().value(), 1e-9);
-  EXPECT_DOUBLE_EQ(0.0, finalRelativeToInitial.Rotation().Degrees().value());
+  EXPECT_NEAR(0.0, finalRelativeToInitial.Rotation().Degrees().value(), 1e-9);
 }
 
 TEST(Pose2dTest, Equality) {
@@ -50,9 +68,9 @@ TEST(Pose2dTest, Minus) {
 
   const auto transform = final - initial;
 
-  EXPECT_DOUBLE_EQ(5.0 * std::sqrt(2.0), transform.X().value());
+  EXPECT_NEAR(5.0 * std::sqrt(2.0), transform.X().value(), 1e-9);
   EXPECT_NEAR(0.0, transform.Y().value(), 1e-9);
-  EXPECT_DOUBLE_EQ(0.0, transform.Rotation().Degrees().value());
+  EXPECT_NEAR(0.0, transform.Rotation().Degrees().value(), 1e-9);
 }
 
 TEST(Pose2dTest, Nearest) {

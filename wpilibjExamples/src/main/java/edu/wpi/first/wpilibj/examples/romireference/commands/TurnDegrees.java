@@ -5,9 +5,9 @@
 package edu.wpi.first.wpilibj.examples.romireference.commands;
 
 import edu.wpi.first.wpilibj.examples.romireference.subsystems.Drivetrain;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 
-public class TurnDegrees extends CommandBase {
+public class TurnDegrees extends Command {
   private final Drivetrain m_drive;
   private final double m_degrees;
   private final double m_speed;

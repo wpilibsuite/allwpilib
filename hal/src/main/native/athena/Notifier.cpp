@@ -128,8 +128,9 @@ static void notifierThreadMain() {
 
 static void cleanupNotifierAtExit() {
   int32_t status = 0;
-  if (notifierAlarm)
+  if (notifierAlarm) {
     notifierAlarm->writeEnable(false, &status);
+  }
   notifierAlarm = nullptr;
   notifierRunning = false;
   hal::ReleaseFPGAInterrupt(kTimerInterruptNumber);
@@ -236,8 +237,9 @@ void HAL_CleanNotifier(HAL_NotifierHandle notifierHandle, int32_t* status) {
     // here (the atomic fetch_sub will prevent multiple parallel entries
     // into this function)
 
-    if (notifierAlarm)
+    if (notifierAlarm) {
       notifierAlarm->writeEnable(false, status);
+    }
     notifierRunning = false;
     hal::ReleaseFPGAInterrupt(kTimerInterruptNumber);
     if (notifierThread.joinable()) {
@@ -272,8 +274,9 @@ void HAL_UpdateNotifierAlarm(HAL_NotifierHandle notifierHandle,
     notifierAlarm->writeTriggerTime(static_cast<uint32_t>(closestTrigger),
                                     status);
     // Enable the alarm.
-    if (!wasActive)
+    if (!wasActive) {
       notifierAlarm->writeEnable(true, status);
+    }
   }
 }
 

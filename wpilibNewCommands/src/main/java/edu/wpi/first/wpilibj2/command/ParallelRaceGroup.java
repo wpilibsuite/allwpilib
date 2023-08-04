@@ -18,8 +18,7 @@ import java.util.Set;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-@SuppressWarnings("removal")
-public class ParallelRaceGroup extends CommandGroupBase {
+public class ParallelRaceGroup extends Command {
   private final Set<Command> m_commands = new HashSet<>();
   private boolean m_runWhenDisabled = true;
   private boolean m_finished = true;
@@ -36,7 +35,11 @@ public class ParallelRaceGroup extends CommandGroupBase {
     addCommands(commands);
   }
 
-  @Override
+  /**
+   * Adds the given commands to the group.
+   *
+   * @param commands Commands to add to the group.
+   */
   public final void addCommands(Command... commands) {
     if (!m_finished) {
       throw new IllegalStateException(

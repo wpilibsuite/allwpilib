@@ -32,13 +32,30 @@ import org.ejml.simple.SimpleMatrix;
  * <p>Forward kinematics is also used for odometry -- determining the position of the robot on the
  * field using encoders and a gyro.
  */
-public class SwerveDriveKinematics {
+public class SwerveDriveKinematics
+    implements Kinematics<SwerveDriveKinematics.SwerveDriveWheelStates, SwerveDriveWheelPositions> {
+  public static class SwerveDriveWheelStates {
+    public SwerveModuleState[] states;
+
+    /**
+     * Creates a new SwerveDriveWheelStates instance.
+     *
+     * @param states The swerve module states. This will be deeply copied.
+     */
+    public SwerveDriveWheelStates(SwerveModuleState[] states) {
+      this.states = new SwerveModuleState[states.length];
+      for (int i = 0; i < states.length; i++) {
+        this.states[i] = new SwerveModuleState(states[i].speedMetersPerSecond, states[i].angle);
+      }
+    }
+  }
+
   private final SimpleMatrix m_inverseKinematics;
   private final SimpleMatrix m_forwardKinematics;
 
   private final int m_numModules;
   private final Translation2d[] m_modules;
-  private SwerveModuleState[] m_moduleStates;
+  private Rotation2d[] m_moduleHeadings;
   private Translation2d m_prevCoR = new Translation2d();
 
   /**
@@ -57,8 +74,8 @@ public class SwerveDriveKinematics {
     }
     m_numModules = moduleTranslationsMeters.length;
     m_modules = Arrays.copyOf(moduleTranslationsMeters, m_numModules);
-    m_moduleStates = new SwerveModuleState[m_numModules];
-    Arrays.fill(m_moduleStates, new SwerveModuleState());
+    m_moduleHeadings = new Rotation2d[m_numModules];
+    Arrays.fill(m_moduleHeadings, new Rotation2d());
     m_inverseKinematics = new SimpleMatrix(m_numModules * 2, 3);
 
     for (int i = 0; i < m_numModules; i++) {
@@ -68,6 +85,21 @@ public class SwerveDriveKinematics {
     m_forwardKinematics = m_inverseKinematics.pseudoInverse();
 
     MathSharedStore.reportUsage(MathUsageId.kKinematics_SwerveDrive, 1);
+  }
+
+  /**
+   * Reset the internal swerve module headings.
+   *
+   * @param moduleHeadings The swerve module headings. The order of the module headings should be
+   *     same as passed into the constructor of this class.
+   */
+  public void resetHeadings(Rotation2d... moduleHeadings) {
+    if (moduleHeadings.length != m_numModules) {
+      throw new IllegalArgumentException(
+          "Number of headings is not consistent with number of module locations provided in "
+              + "constructor");
+    }
+    m_moduleHeadings = Arrays.copyOf(moduleHeadings, 4);
   }
 
   /**
@@ -91,19 +123,18 @@ public class SwerveDriveKinematics {
    *     attainable max velocity. Use the {@link #desaturateWheelSpeeds(SwerveModuleState[], double)
    *     DesaturateWheelSpeeds} function to rectify this issue.
    */
-  @SuppressWarnings("PMD.MethodReturnsInternalArray")
   public SwerveModuleState[] toSwerveModuleStates(
       ChassisSpeeds chassisSpeeds, Translation2d centerOfRotationMeters) {
+    var moduleStates = new SwerveModuleState[m_numModules];
+
     if (chassisSpeeds.vxMetersPerSecond == 0.0
         && chassisSpeeds.vyMetersPerSecond == 0.0
         && chassisSpeeds.omegaRadiansPerSecond == 0.0) {
-      SwerveModuleState[] newStates = new SwerveModuleState[m_numModules];
       for (int i = 0; i < m_numModules; i++) {
-        newStates[i] = new SwerveModuleState(0.0, m_moduleStates[i].angle);
+        moduleStates[i] = new SwerveModuleState(0.0, m_moduleHeadings[i]);
       }
 
-      m_moduleStates = newStates;
-      return m_moduleStates;
+      return moduleStates;
     }
 
     if (!centerOfRotationMeters.equals(m_prevCoR)) {
@@ -134,7 +165,6 @@ public class SwerveDriveKinematics {
 
     var moduleStatesMatrix = m_inverseKinematics.mult(chassisSpeedsVector);
 
-    m_moduleStates = new SwerveModuleState[m_numModules];
     for (int i = 0; i < m_numModules; i++) {
       double x = moduleStatesMatrix.get(i * 2, 0);
       double y = moduleStatesMatrix.get(i * 2 + 1, 0);
@@ -142,10 +172,11 @@ public class SwerveDriveKinematics {
       double speed = Math.hypot(x, y);
       Rotation2d angle = new Rotation2d(x, y);
 
-      m_moduleStates[i] = new SwerveModuleState(speed, angle);
+      moduleStates[i] = new SwerveModuleState(speed, angle);
+      m_moduleHeadings[i] = angle;
     }
 
-    return m_moduleStates;
+    return moduleStates;
   }
 
   /**
@@ -157,6 +188,11 @@ public class SwerveDriveKinematics {
    */
   public SwerveModuleState[] toSwerveModuleStates(ChassisSpeeds chassisSpeeds) {
     return toSwerveModuleStates(chassisSpeeds, new Translation2d());
+  }
+
+  @Override
+  public SwerveDriveWheelStates toWheelSpeeds(ChassisSpeeds chassisSpeeds) {
+    return new SwerveDriveWheelStates(toSwerveModuleStates(chassisSpeeds));
   }
 
   /**
@@ -190,6 +226,11 @@ public class SwerveDriveKinematics {
         chassisSpeedsVector.get(2, 0));
   }
 
+  @Override
+  public ChassisSpeeds toChassisSpeeds(SwerveDriveWheelStates wheelStates) {
+    return toChassisSpeeds(wheelStates.states);
+  }
+
   /**
    * Performs forward kinematics to return the resulting chassis state from the given module states.
    * This method is often used for odometry -- determining the robot's position on the field using
@@ -217,6 +258,22 @@ public class SwerveDriveKinematics {
     var chassisDeltaVector = m_forwardKinematics.mult(moduleDeltaMatrix);
     return new Twist2d(
         chassisDeltaVector.get(0, 0), chassisDeltaVector.get(1, 0), chassisDeltaVector.get(2, 0));
+  }
+
+  @Override
+  public Twist2d toTwist2d(SwerveDriveWheelPositions start, SwerveDriveWheelPositions end) {
+    if (start.positions.length != end.positions.length) {
+      throw new IllegalArgumentException("Inconsistent number of modules!");
+    }
+    var newPositions = new SwerveModulePosition[start.positions.length];
+    for (int i = 0; i < start.positions.length; i++) {
+      var startModule = start.positions[i];
+      var endModule = end.positions[i];
+      newPositions[i] =
+          new SwerveModulePosition(
+              endModule.distanceMeters - startModule.distanceMeters, endModule.angle);
+    }
+    return toTwist2d(newPositions);
   }
 
   /**
@@ -256,7 +313,7 @@ public class SwerveDriveKinematics {
    *
    * @param moduleStates Reference to array of module states. The array will be mutated with the
    *     normalized speeds!
-   * @param currentChassisSpeed The current speed of the robot
+   * @param desiredChassisSpeed The desired speed of the robot
    * @param attainableMaxModuleSpeedMetersPerSecond The absolute max speed that a module can reach
    * @param attainableMaxTranslationalSpeedMetersPerSecond The absolute max speed that your robot
    *     can reach while translating
@@ -265,7 +322,7 @@ public class SwerveDriveKinematics {
    */
   public static void desaturateWheelSpeeds(
       SwerveModuleState[] moduleStates,
-      ChassisSpeeds currentChassisSpeed,
+      ChassisSpeeds desiredChassisSpeed,
       double attainableMaxModuleSpeedMetersPerSecond,
       double attainableMaxTranslationalSpeedMetersPerSecond,
       double attainableMaxRotationalVelocityRadiansPerSecond) {
@@ -280,10 +337,10 @@ public class SwerveDriveKinematics {
       return;
     }
     double translationalK =
-        Math.hypot(currentChassisSpeed.vxMetersPerSecond, currentChassisSpeed.vyMetersPerSecond)
+        Math.hypot(desiredChassisSpeed.vxMetersPerSecond, desiredChassisSpeed.vyMetersPerSecond)
             / attainableMaxTranslationalSpeedMetersPerSecond;
     double rotationalK =
-        Math.abs(currentChassisSpeed.omegaRadiansPerSecond)
+        Math.abs(desiredChassisSpeed.omegaRadiansPerSecond)
             / attainableMaxRotationalVelocityRadiansPerSecond;
     double k = Math.max(translationalK, rotationalK);
     double scale = Math.min(k * attainableMaxModuleSpeedMetersPerSecond / realMaxSpeed, 1);

@@ -43,6 +43,10 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
   /**
    * Constructs a state-space observer with the given plant.
    *
+   * <p>See
+   * https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-observers.html#process-and-measurement-noise-covariance-matrices
+   * for how to select the standard deviations.
+   *
    * @param states A Nat representing the states of the system.
    * @param outputs A Nat representing the outputs of the system.
    * @param plant The plant used for the prediction step.
