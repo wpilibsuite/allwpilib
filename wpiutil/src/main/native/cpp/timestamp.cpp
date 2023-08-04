@@ -198,11 +198,11 @@ uint64_t wpi::Now() {
   }
 
   asm("dmb");
-  uint64_t upper1 = hmb.hmbBuffer[241];
+  uint64_t upper1 = hmb.hmbBuffer[timestampUpperOffset];
   asm("dmb");
   uint32_t lower = hmb.hmbBuffer[timestampLowerOffset];
   asm("dmb");
-  uint64_t upper2 = hmb.hmbBuffer[241];
+  uint64_t upper2 = hmb.hmbBuffer[timestampUpperOffset];
 
   if (upper1 != upper2) {
     // Rolled over between the lower call, reread lower
