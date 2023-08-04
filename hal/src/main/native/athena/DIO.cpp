@@ -142,6 +142,10 @@ HAL_Bool HAL_CheckDIOChannel(int32_t channel) {
 }
 
 void HAL_FreeDIOPort(HAL_DigitalHandle dioPortHandle) {
+  int32_t status = 0;
+  HAL_DisableFilter(dioPortHandle, &status);
+  status = 0;
+
   auto port = digitalChannelHandles->Get(dioPortHandle, HAL_HandleEnum::DIO);
   // no status, so no need to check for a proper free.
   if (port == nullptr) {
@@ -161,7 +165,6 @@ void HAL_FreeDIOPort(HAL_DigitalHandle dioPortHandle) {
     std::this_thread::yield();
   }
 
-  int32_t status = 0;
   std::scoped_lock lock(digitalDIOMutex);
   if (port->channel >= kNumDigitalHeaders + kNumDigitalMXPChannels) {
     // Unset the SPI flag

@@ -269,32 +269,18 @@ HAL_Bool HAL_IsAnyPulsing(int32_t* status) {
   return false;  // TODO(Thad) Figure this out
 }
 
-void HAL_SetFilterSelect(HAL_DigitalHandle dioPortHandle, int32_t filterIndex,
-                         int32_t* status) {
-  auto port = digitalChannelHandles->Get(dioPortHandle, HAL_HandleEnum::DIO);
-  if (port == nullptr) {
-    *status = HAL_HANDLE_ERROR;
-    return;
-  }
-
+void HAL_SetFilterFrequency(HAL_DigitalHandle dioPortHandle,
+                            double frequencyHertz, int32_t* status) {
   // TODO(Thad) Figure this out
 }
 
-int32_t HAL_GetFilterSelect(HAL_DigitalHandle dioPortHandle, int32_t* status) {
-  auto port = digitalChannelHandles->Get(dioPortHandle, HAL_HandleEnum::DIO);
-  if (port == nullptr) {
-    *status = HAL_HANDLE_ERROR;
-    return 0;
-  }
-  return 0;
+double HAL_GetFilterFrequency(HAL_DigitalHandle dioPortHandle,
+                              int32_t* status) {
   // TODO(Thad) Figure this out
+  return 0.0;
 }
 
-void HAL_SetFilterPeriod(int32_t filterIndex, int64_t value, int32_t* status) {
-  // TODO(Thad) figure this out
-}
-
-int64_t HAL_GetFilterPeriod(int32_t filterIndex, int32_t* status) {
-  return 0;  // TODO(Thad) figure this out
+void HAL_DisableFilter(HAL_DigitalHandle dioPortHandle, int32_t* status) {
+  // TODO(Thad) Figure this out
 }
 }  // extern "C"

@@ -12,68 +12,41 @@ using namespace hal;
 
 extern "C" {
 
-/*
+  /*
  * Class:     edu_wpi_first_hal_DigitalGlitchFilterJNI
- * Method:    setFilterSelect
- * Signature: (II)V
+ * Method:    setFilterFrequency
+ * Signature: (ID)V
  */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_DigitalGlitchFilterJNI_setFilterSelect
-  (JNIEnv* env, jclass, jint id, jint filter_index)
-{
-  int32_t status = 0;
-
-  HAL_SetFilterSelect(static_cast<HAL_DigitalHandle>(id), filter_index,
-                      &status);
-  CheckStatus(env, status);
-}
+JNIEXPORT void JNICALL Java_edu_wpi_first_hal_DigitalGlitchFilterJNI_setFilterFrequency
+  (JNIEnv * env, jclass, jint dioPortHandle, jdouble frequencyHertz) {
+    int32_t status = 0;
+    HAL_SetFilterFrequency(dioPortHandle, frequencyHertz, &status);
+    CheckStatus(env, status);
+  }
 
 /*
  * Class:     edu_wpi_first_hal_DigitalGlitchFilterJNI
- * Method:    getFilterSelect
- * Signature: (I)I
+ * Method:    getFilterFrequency
+ * Signature: (I)D
  */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_DigitalGlitchFilterJNI_getFilterSelect
-  (JNIEnv* env, jclass, jint id)
-{
-  int32_t status = 0;
-
-  jint result =
-      HAL_GetFilterSelect(static_cast<HAL_DigitalHandle>(id), &status);
-  CheckStatus(env, status);
-  return result;
-}
+JNIEXPORT jdouble JNICALL Java_edu_wpi_first_hal_DigitalGlitchFilterJNI_getFilterFrequency
+  (JNIEnv * env, jclass, jint dioPortHandle) {
+    int32_t status = 0;
+    double result = HAL_GetFilterFrequency(dioPortHandle, &status);
+    CheckStatus(env, status);
+    return result;
+  }
 
 /*
  * Class:     edu_wpi_first_hal_DigitalGlitchFilterJNI
- * Method:    setFilterPeriod
- * Signature: (II)V
+ * Method:    disableFilter
+ * Signature: (I)V
  */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_DigitalGlitchFilterJNI_setFilterPeriod
-  (JNIEnv* env, jclass, jint filter_index, jint fpga_cycles)
-{
-  int32_t status = 0;
-
-  HAL_SetFilterPeriod(filter_index, fpga_cycles, &status);
-  CheckStatus(env, status);
-}
-
-/*
- * Class:     edu_wpi_first_hal_DigitalGlitchFilterJNI
- * Method:    getFilterPeriod
- * Signature: (I)I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_DigitalGlitchFilterJNI_getFilterPeriod
-  (JNIEnv* env, jclass, jint filter_index)
-{
-  int32_t status = 0;
-
-  jint result = HAL_GetFilterPeriod(filter_index, &status);
-  CheckStatus(env, status);
-  return result;
-}
+JNIEXPORT void JNICALL Java_edu_wpi_first_hal_DigitalGlitchFilterJNI_disableFilter
+  (JNIEnv * env, jclass, jint dioPortHandle) {
+    int32_t status = 0;
+    HAL_DisableFilter(dioPortHandle, &status);
+    CheckStatus(env, status);
+  }
 
 }  // extern "C"

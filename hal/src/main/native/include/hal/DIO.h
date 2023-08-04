@@ -201,13 +201,13 @@ HAL_Bool HAL_IsAnyPulsing(int32_t* status);
  *
  * Sets the filter frequency in hertz.
  *
- * @param[in] dioPortHandle the digital port handle
- * @param[in] value         the frequency below which the signal must not
- *                          be counted as a transition.
- * @param[out] status       Error status variable. 0 on success.
+ * @param[in] dioPortHandle     the digital port handle
+ * @param[in] frequencyHertz    the frequency below which the signal must not
+ *                              be counted as a transition.
+ * @param[out] status           Error status variable. 0 on success.
  */
 void HAL_SetFilterFrequency(HAL_DigitalHandle dioPortHandle,
-                            double frequencyHerte, int32_t* status);
+                            double frequencyHertz, int32_t* status);
 
 /**
  * Gets the filter frequency for the specified filter.
@@ -224,8 +224,8 @@ double HAL_GetFilterFrequency(HAL_DigitalHandle dioPortHandle, int32_t* status);
 /**
  * Removes a DIO from being filtered.
  *
- * @param dioPortHandle the digital port handle
- * @param status        Error status variable. 0 on success.
+ * @param[in] dioPortHandle the digital port handle
+ * @param[out] status       Error status variable. 0 on success.
  */
 void HAL_DisableFilter(HAL_DigitalHandle dioPortHandle, int32_t* status);
 
