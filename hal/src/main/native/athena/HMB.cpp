@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "HMB.h"
+#include "hal/roborio/HMB.h"
 
 #include <memory>
 
@@ -51,12 +51,25 @@ void HAL_InitializeHMB(int32_t* status) {
   cfg.Enables_PWM_MXP = 1;
   cfg.Enables_AI0_Low = 1;
   cfg.Enables_AI0_High = 1;
+  cfg.Enables_AnalogTriggers = 1;
   cfg.Enables_Counters_Low = 1;
+  cfg.Enables_CounterTimers_Low = 1;
   cfg.Enables_Counters_High = 1;
+  cfg.Enables_CounterTimers_High = 1;
+  cfg.Enables_Encoders_Low = 1;
+  cfg.Enables_EncoderTimers_Low = 1;
+  cfg.Enables_Encoders_High = 1;
+  cfg.Enables_EncoderTimers_High = 1;
+  cfg.Enables_Interrupts = 1;
+  cfg.Enables_PWM = 1;
+  cfg.Enables_DutyCycle_High = 1;
+  cfg.Enables_DutyCycle_Low = 1;
+  cfg.Enables_PWM_MXP = 1;
+  cfg.Enables_Relay_DO_AO = 1;
   hmb->writeConfig(cfg, status);
 }
 
-volatile HAL_HMBData* HAL_GetHMBBuffer(void) {
+const volatile HAL_HMBData* HAL_GetHMBBuffer(void) {
   return hmbBuffer;
 }
 }  // extern "C"

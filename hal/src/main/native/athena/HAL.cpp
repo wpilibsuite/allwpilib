@@ -28,12 +28,12 @@
 #include "FPGACalls.h"
 #include "HALInitializer.h"
 #include "HALInternal.h"
-#include "HMB.h"
 #include "hal/ChipObject.h"
 #include "hal/DriverStation.h"
 #include "hal/Errors.h"
 #include "hal/Notifier.h"
 #include "hal/handles/HandlesInternal.h"
+#include "hal/roborio/HMB.h"
 #include "hal/roborio/InterruptManager.h"
 #include "visa/visa.h"
 
@@ -47,7 +47,7 @@ static char roboRioCommentsString[64];
 static size_t roboRioCommentsStringSize;
 static bool roboRioCommentsStringInitialized;
 
-static volatile HAL_HMBData* hmbBuffer;
+static const volatile HAL_HMBData* hmbBuffer;
 
 using namespace hal;
 

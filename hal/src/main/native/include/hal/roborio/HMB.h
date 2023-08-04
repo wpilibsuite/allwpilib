@@ -37,13 +37,12 @@ struct HAL_HMBData {
   } AveragedAnalogInputs;
   struct Accumulator0 {
     uint64_t Value;
-    uint32_t Offset;
-    uint32_t Reserved;
-    uint32_t Reserved2[12];
+    uint32_t Count;
+    uint32_t Reserved[13];
   } Accumulator0;
   struct Accumulator1 {
     uint64_t Value;
-    uint32_t Offset;
+    uint32_t Count;
     uint32_t Reserved[13];
   } Accumulator1;
   struct DI {
@@ -52,35 +51,73 @@ struct HAL_HMBData {
     uint32_t Reserved[14];
   } DI;
   struct AnalogTriggers {
-    uint32_t Reserved[16];
+    struct Trigger {
+      uint8_t InHysteresis0 : 1;
+      uint8_t OverLimit0 : 1;
+      uint8_t Rising0 : 1;
+      uint8_t Falling0 : 1;
+      uint8_t InHysteresis1 : 1;
+      uint8_t OverLimit1 : 1;
+      uint8_t Rising1 : 1;
+      uint8_t Falling1 : 1;
+    } Trigger[4];
+    uint32_t Reserved[15];
   } AnalogTriggers;
   struct Counters {
-    uint32_t Reserved[16];
+    struct Counter {
+      uint32_t Direction : 1;
+      int32_t Value : 31;
+    } Counter[8];
+    uint32_t Reserved[8];
   } Counters;
   struct CounterTimers {
-    uint32_t Reserved[16];
+    struct Timer {
+      uint32_t Period : 23;
+      int32_t Count : 8;
+      uint32_t Stalled : 1;
+    } Timer[8];
+    uint32_t Reserved[8];
   } CounterTimers;
   struct Encoders {
-    uint32_t Reserved[16];
+    struct Encoder {
+      uint32_t Direction : 1;
+      int32_t Value : 31;
+    } Encoder[8];
+    uint32_t Reserved[8];
   } Encoders;
   struct EncoderTimers {
-    uint32_t Reserved[16];
+    struct Timer {
+      uint32_t Period : 23;
+      int32_t Count : 8;
+      uint32_t Stalled : 1;
+    } Timer[8];
+    uint32_t Reserved[8];
   } EncoderTimers;
   struct DutyCycle {
     uint32_t Reserved[16];
   } DutyCycle;
   struct Interrupts {
-    uint32_t Reserved[16];
+    struct Interrupt {
+      uint32_t FallingTimestamp;
+      uint32_t RisingTimestamp;
+    } Interrupt[8];
   } Interrupts;
   struct PWM {
-    uint32_t Reserved[32];
+    uint32_t Headers[10];
+    uint32_t Reserved[6];
+    uint32_t MXP[10];
+    uint32_t Reserved2[6];
   } PWM;
   struct RelayDOAO {
-    uint32_t Reserved[16];
+    uint32_t Relays;
+    uint32_t Reserved;
+    uint32_t AO[2];
+    uint32_t Reserved2[12];
   } RelayDOAO;
   struct Timestamp {
     uint32_t Lower;
     uint32_t Upper;
+    uint32_t Reserved[14];
   } Timestamp;
 };
 
@@ -88,5 +125,5 @@ extern "C" {
 
 void HAL_InitializeHMB(int32_t* status);
 
-volatile HAL_HMBData* HAL_GetHMBBuffer(void);
+const volatile HAL_HMBData* HAL_GetHMBBuffer(void);
 }  // extern "C"
