@@ -9,7 +9,7 @@
 
 #include <wpi/SymbolExports.h>
 
-#include "Rotation2d.h"
+#include "frc/geometry/Rotation2d.h"
 #include "units/length.h"
 
 namespace wpi {
@@ -201,4 +201,4 @@ void from_json(const wpi::json& json, Translation2d& state);
 
 }  // namespace frc
 
-#include "Translation2d.inc"
+#include "frc/geometry/Translation2d.inc"

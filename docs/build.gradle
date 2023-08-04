@@ -13,6 +13,7 @@ evaluationDependsOn(':wpilibc')
 evaluationDependsOn(':wpilibj')
 evaluationDependsOn(':wpimath')
 evaluationDependsOn(':wpinet')
+evaluationDependsOn(':wpiunits')
 evaluationDependsOn(':wpiutil')
 
 def baseArtifactIdCpp = 'documentation'

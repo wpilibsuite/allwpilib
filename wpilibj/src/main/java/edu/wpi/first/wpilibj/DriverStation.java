@@ -22,6 +22,9 @@ import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.FloatArrayLogEntry;
 import edu.wpi.first.util.datalog.IntegerArrayLogEntry;
 import java.nio.ByteBuffer;
+import java.util.Map;
+import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.concurrent.locks.ReentrantLock;
 
 /** Provide access to the network communication data to / from the Driver Station. */
@@ -67,8 +70,7 @@ public final class DriverStation {
   /** The robot alliance that the robot is a part of. */
   public enum Alliance {
     Red,
-    Blue,
-    Invalid
+    Blue
   }
 
   public enum MatchType {
@@ -1086,6 +1088,26 @@ public final class DriverStation {
     }
   }
 
+  private static Map<AllianceStationID, Optional<Alliance>> m_allianceMap =
+      Map.of(
+          AllianceStationID.Unknown, Optional.empty(),
+          AllianceStationID.Red1, Optional.of(Alliance.Red),
+          AllianceStationID.Red2, Optional.of(Alliance.Red),
+          AllianceStationID.Red3, Optional.of(Alliance.Red),
+          AllianceStationID.Blue1, Optional.of(Alliance.Blue),
+          AllianceStationID.Blue2, Optional.of(Alliance.Blue),
+          AllianceStationID.Blue3, Optional.of(Alliance.Blue));
+
+  private static Map<AllianceStationID, OptionalInt> m_stationMap =
+      Map.of(
+          AllianceStationID.Unknown, OptionalInt.empty(),
+          AllianceStationID.Red1, OptionalInt.of(1),
+          AllianceStationID.Red2, OptionalInt.of(2),
+          AllianceStationID.Red3, OptionalInt.of(3),
+          AllianceStationID.Blue1, OptionalInt.of(1),
+          AllianceStationID.Blue2, OptionalInt.of(2),
+          AllianceStationID.Blue3, OptionalInt.of(3));
+
   /**
    * Get the current alliance from the FMS.
    *
@@ -1093,26 +1115,13 @@ public final class DriverStation {
    *
    * @return the current alliance
    */
-  public static Alliance getAlliance() {
+  public static Optional<Alliance> getAlliance() {
     AllianceStationID allianceStationID = DriverStationJNI.getAllianceStation();
     if (allianceStationID == null) {
-      return Alliance.Invalid;
+      allianceStationID = AllianceStationID.Unknown;
     }
 
-    switch (allianceStationID) {
-      case Red1:
-      case Red2:
-      case Red3:
-        return Alliance.Red;
-
-      case Blue1:
-      case Blue2:
-      case Blue3:
-        return Alliance.Blue;
-
-      default:
-        return Alliance.Invalid;
-    }
+    return m_allianceMap.get(allianceStationID);
   }
 
   /**
@@ -1122,27 +1131,25 @@ public final class DriverStation {
    *
    * @return the location of the team's driver station controls: 1, 2, or 3
    */
-  public static int getLocation() {
+  public static OptionalInt getLocation() {
     AllianceStationID allianceStationID = DriverStationJNI.getAllianceStation();
     if (allianceStationID == null) {
-      return 0;
+      allianceStationID = AllianceStationID.Unknown;
     }
-    switch (allianceStationID) {
-      case Red1:
-      case Blue1:
-        return 1;
 
-      case Red2:
-      case Blue2:
-        return 2;
+    return m_stationMap.get(allianceStationID);
+  }
 
-      case Blue3:
-      case Red3:
-        return 3;
-
-      default:
-        return 0;
-    }
+  /**
+   * Gets the raw alliance station of the teams driver station.
+   *
+   * <p>This returns the raw low level value. Prefer getLocation or getAlliance unless necessary for
+   * performance.
+   *
+   * @return The raw alliance station id.
+   */
+  public static AllianceStationID getRawAllianceStation() {
+    return DriverStationJNI.getAllianceStation();
   }
 
   /**

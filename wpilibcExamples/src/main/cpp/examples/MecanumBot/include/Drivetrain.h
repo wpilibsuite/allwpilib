@@ -35,7 +35,7 @@ class Drivetrain {
   void SetSpeeds(const frc::MecanumDriveWheelSpeeds& wheelSpeeds);
   void Drive(units::meters_per_second_t xSpeed,
              units::meters_per_second_t ySpeed, units::radians_per_second_t rot,
-             bool fieldRelative);
+             bool fieldRelative, units::second_t period);
   void UpdateOdometry();
 
   static constexpr units::meters_per_second_t kMaxSpeed =

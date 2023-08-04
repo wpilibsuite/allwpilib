@@ -40,7 +40,10 @@ LTVUnicycleController::LTVUnicycleController(
     const wpi::array<double, 3>& Qelems, const wpi::array<double, 2>& Relems,
     units::second_t dt, units::meters_per_second_t maxVelocity) {
   if (maxVelocity <= 0_mps) {
-    throw std::domain_error("Max velocity must be greater than zero.");
+    throw std::domain_error("Max velocity must be greater than 0 m/s.");
+  }
+  if (maxVelocity >= 15_mps) {
+    throw std::domain_error("Max velocity must be less than 15 m/s.");
   }
 
   // The change in global pose for a unicycle is defined by the following three

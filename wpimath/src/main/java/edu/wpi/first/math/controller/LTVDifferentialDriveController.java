@@ -55,13 +55,18 @@ public class LTVDifferentialDriveController {
   /**
    * Constructs a linear time-varying differential drive controller.
    *
+   * <p>See
+   * https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-intro.html#lqr-tuning
+   * for how to select the tolerances.
+   *
    * @param plant The differential drive velocity plant.
    * @param trackwidth The distance between the differential drive's left and right wheels in
    *     meters.
    * @param qelems The maximum desired error tolerance for each state.
    * @param relems The maximum desired control effort for each input.
    * @param dt Discretization timestep in seconds.
-   * @throws IllegalArgumentException if max velocity of plant with 12 V input &lt;= 0.
+   * @throws IllegalArgumentException if max velocity of plant with 12 V input &lt;= 0 m/s or &gt;=
+   *     15 m/s.
    */
   public LTVDifferentialDriveController(
       LinearSystem<N2, N2, N2> plant,
@@ -130,7 +135,11 @@ public class LTVDifferentialDriveController {
 
     if (maxV <= 0.0) {
       throw new IllegalArgumentException(
-          "Max velocity of plant with 12 V input must be greater than zero.");
+          "Max velocity of plant with 12 V input must be greater than 0 m/s.");
+    }
+    if (maxV >= 15.0) {
+      throw new IllegalArgumentException(
+          "Max velocity of plant with 12 V input must be less than 15 m/s.");
     }
 
     for (double velocity = -maxV; velocity < maxV; velocity += 0.01) {

@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <optional>
 #include <string>
 
 #include <units/time.h>
@@ -21,7 +22,7 @@ namespace frc {
  */
 class DriverStation final {
  public:
-  enum Alliance { kRed, kBlue, kInvalid };
+  enum Alliance { kRed, kBlue };
   enum MatchType { kNone, kPractice, kQualification, kElimination };
 
   static constexpr int kJoystickPorts = 6;
@@ -282,7 +283,7 @@ class DriverStation final {
    *
    * @return The Alliance enum (kRed, kBlue or kInvalid)
    */
-  static Alliance GetAlliance();
+  static std::optional<Alliance> GetAlliance();
 
   /**
    * Return the driver station location from the FMS.
@@ -294,7 +295,7 @@ class DriverStation final {
    *
    * @return The location of the driver station (1-3, 0 for invalid)
    */
-  static int GetLocation();
+  static std::optional<int> GetLocation();
 
   /**
    * Wait for a DS connection.

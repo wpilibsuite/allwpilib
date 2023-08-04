@@ -13,6 +13,41 @@
 
 using namespace frc;
 
+TEST(Rotation3dTest, GimbalLockAccuracy) {
+  auto rot1 = Rotation3d{0_rad, 0_rad, units::radian_t{std::numbers::pi / 2}};
+  auto rot2 = Rotation3d{units::radian_t{std::numbers::pi}, 0_rad, 0_rad};
+  auto rot3 = Rotation3d{-units::radian_t{std::numbers::pi / 2}, 0_rad, 0_rad};
+  const auto result1 = rot1 + rot2 + rot3;
+  const auto expected1 =
+      Rotation3d{0_rad, -units::radian_t{std::numbers::pi / 2},
+                 units::radian_t{std::numbers::pi / 2}};
+  EXPECT_EQ(expected1, result1);
+  EXPECT_DOUBLE_EQ(std::numbers::pi / 2, (result1.X() + result1.Z()).value());
+  EXPECT_DOUBLE_EQ(-std::numbers::pi / 2, result1.Y().value());
+
+  rot1 = Rotation3d{0_rad, 0_rad, units::radian_t{std::numbers::pi / 2}};
+  rot2 = Rotation3d{units::radian_t{-std::numbers::pi}, 0_rad, 0_rad};
+  rot3 = Rotation3d{units::radian_t{std::numbers::pi / 2}, 0_rad, 0_rad};
+  const auto result2 = rot1 + rot2 + rot3;
+  const auto expected2 =
+      Rotation3d{0_rad, units::radian_t{std::numbers::pi / 2},
+                 units::radian_t{std::numbers::pi / 2}};
+  EXPECT_EQ(expected2, result2);
+  EXPECT_DOUBLE_EQ(std::numbers::pi / 2, (result2.Z() - result2.X()).value());
+  EXPECT_DOUBLE_EQ(std::numbers::pi / 2, result2.Y().value());
+
+  rot1 = Rotation3d{0_rad, 0_rad, units::radian_t{std::numbers::pi / 2}};
+  rot2 = Rotation3d{0_rad, units::radian_t{std::numbers::pi / 3}, 0_rad};
+  rot3 = Rotation3d{-units::radian_t{std::numbers::pi / 2}, 0_rad, 0_rad};
+  const auto result3 = rot1 + rot2 + rot3;
+  const auto expected3 =
+      Rotation3d{0_rad, units::radian_t{std::numbers::pi / 2},
+                 units::radian_t{std::numbers::pi / 6}};
+  EXPECT_EQ(expected3, result3);
+  EXPECT_DOUBLE_EQ(std::numbers::pi / 6, (result3.Z() - result3.X()).value());
+  EXPECT_DOUBLE_EQ(std::numbers::pi / 2, result3.Y().value());
+}
+
 TEST(Rotation3dTest, InitAxisAngleAndRollPitchYaw) {
   const Eigen::Vector3d xAxis{1.0, 0.0, 0.0};
   const Rotation3d rot1{xAxis, units::radian_t{std::numbers::pi / 3}};

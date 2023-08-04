@@ -75,6 +75,10 @@ public class LTVUnicycleController {
   /**
    * Constructs a linear time-varying unicycle controller.
    *
+   * <p>See
+   * https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-intro.html#lqr-tuning
+   * for how to select the tolerances.
+   *
    * @param qelems The maximum desired error tolerance for each state.
    * @param relems The maximum desired control effort for each input.
    * @param dt Discretization timestep in seconds.
@@ -86,17 +90,24 @@ public class LTVUnicycleController {
   /**
    * Constructs a linear time-varying unicycle controller.
    *
+   * <p>See
+   * https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-intro.html#lqr-tuning
+   * for how to select the tolerances.
+   *
    * @param qelems The maximum desired error tolerance for each state.
    * @param relems The maximum desired control effort for each input.
    * @param dt Discretization timestep in seconds.
    * @param maxVelocity The maximum velocity in meters per second for the controller gain lookup
    *     table. The default is 9 m/s.
-   * @throws IllegalArgumentException if maxVelocity &lt;= 0.
+   * @throws IllegalArgumentException if maxVelocity &lt;= 0 m/s or &gt;= 15 m/s.
    */
   public LTVUnicycleController(
       Vector<N3> qelems, Vector<N2> relems, double dt, double maxVelocity) {
     if (maxVelocity <= 0.0) {
-      throw new IllegalArgumentException("Max velocity must be greater than zero.");
+      throw new IllegalArgumentException("Max velocity must be greater than 0 m/s.");
+    }
+    if (maxVelocity >= 15.0) {
+      throw new IllegalArgumentException("Max velocity must be less than 15 m/s.");
     }
 
     // The change in global pose for a unicycle is defined by the following

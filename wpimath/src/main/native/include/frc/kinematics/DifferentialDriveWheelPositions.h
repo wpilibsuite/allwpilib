@@ -42,11 +42,6 @@ struct WPILIB_DLLEXPORT DifferentialDriveWheelPositions {
    */
   bool operator!=(const DifferentialDriveWheelPositions& other) const = default;
 
-  DifferentialDriveWheelPositions operator-(
-      const DifferentialDriveWheelPositions& other) const {
-    return {left - other.left, right - other.right};
-  }
-
   DifferentialDriveWheelPositions Interpolate(
       const DifferentialDriveWheelPositions& endValue, double t) const {
     return {wpi::Lerp(left, endValue.left, t),

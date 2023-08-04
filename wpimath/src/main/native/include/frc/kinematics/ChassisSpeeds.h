@@ -6,6 +6,7 @@
 
 #include <wpi/SymbolExports.h>
 
+#include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
 #include "units/angular_velocity.h"
 #include "units/velocity.h"
@@ -37,6 +38,55 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
    * Represents the angular velocity of the robot frame. (CCW is +)
    */
   units::radians_per_second_t omega = 0_rad_per_s;
+
+  /**
+   * Converts from a chassis speed for a discrete timestep into chassis speed
+   * for continuous time.
+   *
+   * The difference between applying a chassis speed for a discrete timestep vs.
+   * continuously is that applying for a discrete timestep is just scaling the
+   * velocity components by the time and adding, while when applying
+   * continuously the changes to the heading affect the direction the
+   * translational components are applied to relative to the field.
+   *
+   * @param vx Forward velocity.
+   * @param vy Sideways velocity.
+   * @param omega Angular velocity.
+   * @param dt The duration of the timestep the speeds should be applied for.
+   *
+   * @return ChassisSpeeds that can be applied continuously to produce the
+   * discrete ChassisSpeeds.
+   */
+  static ChassisSpeeds FromDiscreteSpeeds(units::meters_per_second_t vx,
+                                          units::meters_per_second_t vy,
+                                          units::radians_per_second_t omega,
+                                          units::second_t dt) {
+    Pose2d desiredDeltaPose{vx * dt, vy * dt, omega * dt};
+    auto twist = Pose2d{}.Log(desiredDeltaPose);
+    return {twist.dx / dt, twist.dy / dt, twist.dtheta / dt};
+  }
+
+  /**
+   * Converts from a chassis speed for a discrete timestep into chassis speed
+   * for continuous time.
+   *
+   * The difference between applying a chassis speed for a discrete timestep vs.
+   * continuously is that applying for a discrete timestep is just scaling the
+   * velocity components by the time and adding, while when applying
+   * continuously the changes to the heading affect the direction the
+   * translational components are applied to relative to the field.
+   *
+   * @param discreteSpeeds The speeds for a discrete timestep.
+   * @param dt The duration of the timestep the speeds should be applied for.
+   *
+   * @return ChassisSpeeds that can be applied continuously to produce the
+   * discrete ChassisSpeeds.
+   */
+  static ChassisSpeeds FromDiscreteSpeeds(const ChassisSpeeds& discreteSpeeds,
+                                          units::second_t dt) {
+    return FromDiscreteSpeeds(discreteSpeeds.vx, discreteSpeeds.vy,
+                              discreteSpeeds.omega, dt);
+  }
 
   /**
    * Converts a user provided field-relative set of speeds into a robot-relative
@@ -80,6 +130,71 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
     return FromFieldRelativeSpeeds(fieldRelativeSpeeds.vx,
                                    fieldRelativeSpeeds.vy,
                                    fieldRelativeSpeeds.omega, robotAngle);
+  }
+
+  /**
+   * Adds two ChassisSpeeds and returns the sum.
+   *
+   * <p>For example, ChassisSpeeds{1.0, 0.5, 1.5} + ChassisSpeeds{2.0, 1.5, 0.5}
+   * = ChassisSpeeds{3.0, 2.0, 2.0}
+   *
+   * @param other The ChassisSpeeds to add.
+   *
+   * @return The sum of the ChassisSpeeds.
+   */
+  constexpr ChassisSpeeds operator+(const ChassisSpeeds& other) const {
+    return {vx + other.vx, vy + other.vy, omega + other.omega};
+  }
+
+  /**
+   * Subtracts the other ChassisSpeeds from the other ChassisSpeeds and returns
+   * the difference.
+   *
+   * <p>For example, ChassisSpeeds{5.0, 4.0, 2.0} - ChassisSpeeds{1.0, 2.0, 1.0}
+   * = ChassisSpeeds{4.0, 2.0, 1.0}
+   *
+   * @param other The ChassisSpeeds to subtract.
+   *
+   * @return The difference between the two ChassisSpeeds.
+   */
+  constexpr ChassisSpeeds operator-(const ChassisSpeeds& other) const {
+    return *this + -other;
+  }
+
+  /**
+   * Returns the inverse of the current ChassisSpeeds.
+   * This is equivalent to negating all components of the ChassisSpeeds.
+   *
+   * @return The inverse of the current ChassisSpeeds.
+   */
+  constexpr ChassisSpeeds operator-() const { return {-vx, -vy, -omega}; }
+
+  /**
+   * Multiplies the ChassisSpeeds by a scalar and returns the new ChassisSpeeds.
+   *
+   * <p>For example, ChassisSpeeds{2.0, 2.5, 1.0} * 2
+   * = ChassisSpeeds{4.0, 5.0, 1.0}
+   *
+   * @param scalar The scalar to multiply by.
+   *
+   * @return The scaled ChassisSpeeds.
+   */
+  constexpr ChassisSpeeds operator*(double scalar) const {
+    return {scalar * vx, scalar * vy, scalar * omega};
+  }
+
+  /**
+   * Divides the ChassisSpeeds by a scalar and returns the new ChassisSpeeds.
+   *
+   * <p>For example, ChassisSpeeds{2.0, 2.5, 1.0} / 2
+   * = ChassisSpeeds{1.0, 1.25, 0.5}
+   *
+   * @param scalar The scalar to multiply by.
+   *
+   * @return The reference to the new mutated object.
+   */
+  constexpr ChassisSpeeds operator/(double scalar) const {
+    return operator*(1.0 / scalar);
   }
 };
 }  // namespace frc
