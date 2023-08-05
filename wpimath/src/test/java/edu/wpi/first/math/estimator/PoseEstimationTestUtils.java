@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package edu.wpi.first.math.estimator;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -8,8 +12,8 @@ import edu.wpi.first.math.kinematics.WheelPositions;
 
 public class PoseEstimationTestUtils {
   /**
-   * This class is intended for use as "drivetrain-agnostic" kinematics. 
-   * Odometry measurements are akin to Poses, while their difference is akin to Twists.
+   * This class is intended for use as "drivetrain-agnostic" kinematics. Odometry measurements are
+   * akin to Poses, while their difference is akin to Twists.
    */
   protected static class SE2KinematicPrimitive implements WheelPositions<SE2KinematicPrimitive> {
     private Pose2d pose;

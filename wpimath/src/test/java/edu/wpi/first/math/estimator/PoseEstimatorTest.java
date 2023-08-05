@@ -27,7 +27,6 @@ import java.util.TreeMap;
 import org.junit.jupiter.api.Test;
 
 class PoseEstimatorTest {
-
   private final Vector<N3> stateStdDevs = VecBuilder.fill(0.05, 0.05, 0.05);
   private final Vector<N3> stateNoiseStdDevs = stateStdDevs.div(50);
   private final Vector<N3> visionStdDevs = VecBuilder.fill(0.2, 0.2, 0.2);
@@ -132,7 +131,6 @@ class PoseEstimatorTest {
       final boolean checkError,
       final Vector<N3> stateStdDevs,
       final Vector<N3> visionStdDevs) {
-
     estimator.resetPosition(
         trajectory.getInitialPose().getRotation(),
         new SE2KinematicPrimitive(trajectory.getInitialPose()),
