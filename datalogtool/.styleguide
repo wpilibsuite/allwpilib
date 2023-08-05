@@ -23,6 +23,7 @@ includeOtherLibs {
   ^fmt/
   ^glass/
   ^imgui
+  ^libssh/
   ^portable-file-dialog
   ^wpi/
   ^wpigui
