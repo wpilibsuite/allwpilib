@@ -47,7 +47,6 @@ public class PoseEstimator<T extends WheelPositions<T>> {
   /**
    * Constructs a PoseEstimator.
    *
-   * @param kinematics A correctly-configured kinematics object for your drivetrain.
    * @param odometry A correctly-configured odometry object for your drivetrain.
    * @param stateStdDevs Standard deviations of the pose estimate (x position in meters, y position
    *     in meters, and heading in radians). Increase these numbers to trust your state estimate
@@ -121,6 +120,12 @@ public class PoseEstimator<T extends WheelPositions<T>> {
     return m_poseEstimate;
   }
 
+  /**
+   * Return the pose at a given timestamp, if one exists.
+   *
+   * @param timestamp The pose's timestamp in seconds.
+   * @return Rhe pose at a given timestamp, if one exists.
+   */
   public Optional<Pose2d> sampleAt(double timestamp) {
     return m_poseBuffer
         .getSample(timestamp)
