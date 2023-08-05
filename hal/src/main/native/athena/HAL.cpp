@@ -33,6 +33,7 @@
 #include "hal/Errors.h"
 #include "hal/Notifier.h"
 #include "hal/handles/HandlesInternal.h"
+#include "hal/roborio/HMB.h"
 #include "hal/roborio/InterruptManager.h"
 #include "visa/visa.h"
 
@@ -45,6 +46,9 @@ static uint64_t dsStartTime;
 static char roboRioCommentsString[64];
 static size_t roboRioCommentsStringSize;
 static bool roboRioCommentsStringInitialized;
+
+static const volatile HAL_HMBData* hmbBuffer;
+#define HAL_HMB_TIMESTAMP_OFFSET 5
 
 using namespace hal;
 
@@ -351,25 +355,29 @@ size_t HAL_GetComments(char* buffer, size_t size) {
 
 uint64_t HAL_GetFPGATime(int32_t* status) {
   hal::init::CheckInit();
-  if (!global) {
+  if (!hmbBuffer) {
     *status = NiFpga_Status_ResourceNotInitialized;
     return 0;
   }
-  *status = 0;
-  uint64_t upper1 = global->readLocalTimeUpper(status);
-  uint32_t lower = global->readLocalTime(status);
-  uint64_t upper2 = global->readLocalTimeUpper(status);
-  if (*status != 0) {
-    return 0;
-  }
+
+  asm("dmb");
+  uint64_t upper1 = hmbBuffer->Timestamp.Upper;
+  asm("dmb");
+  uint32_t lower = hmbBuffer->Timestamp.Lower;
+  asm("dmb");
+  uint64_t upper2 = hmbBuffer->Timestamp.Upper;
+
   if (upper1 != upper2) {
     // Rolled over between the lower call, reread lower
-    lower = global->readLocalTime(status);
-    if (*status != 0) {
-      return 0;
-    }
+    asm("dmb");
+    lower = hmbBuffer->Timestamp.Lower;
   }
-  return (upper2 << 32) + lower;
+  // 5 is added here because the time to write from the FPGA
+  // to the HMB buffer is longer then the time to read
+  // from the time register. This would cause register based
+  // timestamps to be ahead of HMB timestamps, which could
+  // be very bad.
+  return (upper2 << 32) + lower + HAL_HMB_TIMESTAMP_OFFSET;
 }
 
 uint64_t HAL_ExpandFPGATime(uint32_t unexpandedLower, int32_t* status) {
@@ -516,10 +524,18 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
     setNewDataSem(nullptr);
   });
 
-  nFPGA::nRoboRIO_FPGANamespace::g_currentTargetClass =
-      nLoadOut::getTargetClass();
+  // Setup WPI_Now to use FPGA timestamp
+  // this also sets nFPGA::nRoboRIO_FPGANamespace::g_currentTargetClass
+  wpi::impl::SetupNowRio();
 
   int32_t status = 0;
+
+  HAL_InitializeHMB(&status);
+  if (status != 0) {
+    return false;
+  }
+  hmbBuffer = HAL_GetHMBBuffer();
+
   global.reset(tGlobal::create(&status));
   watchdog.reset(tSysWatchdog::create(&status));
 
@@ -542,21 +558,6 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   if (status != 0) {
     return false;
   }
-
-  // Set WPI_Now to use FPGA timestamp
-  wpi::SetNowImpl([]() -> uint64_t {
-    int32_t status = 0;
-    uint64_t rv = HAL_GetFPGATime(&status);
-    if (status != 0) {
-      fmt::print(stderr,
-                 "Call to HAL_GetFPGATime failed in wpi::Now() with status {}. "
-                 "Initialization might have failed. Time will not be correct\n",
-                 status);
-      std::fflush(stderr);
-      return 0u;
-    }
-    return rv;
-  });
 
   hal::WaitForInitialPacket();
 

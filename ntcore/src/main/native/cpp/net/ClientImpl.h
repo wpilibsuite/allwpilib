@@ -13,8 +13,12 @@
 #include <string_view>
 #include <vector>
 
+#include <wpi/DenseMap.h>
+
 #include "NetworkInterface.h"
+#include "PubSubOptions.h"
 #include "WireConnection.h"
+#include "WireDecoder.h"
 
 namespace wpi {
 class Logger;
@@ -30,14 +34,13 @@ namespace nt::net {
 struct ClientMessage;
 class WireConnection;
 
-class ClientImpl {
+class ClientImpl final : private ServerMessageHandler {
  public:
   ClientImpl(
       uint64_t curTimeMs, int inst, WireConnection& wire, wpi::Logger& logger,
       std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
           timeSyncUpdated,
       std::function<void(uint32_t repeatMs)> setPeriodic);
-  ~ClientImpl();
 
   void ProcessIncomingText(std::string_view data);
   void ProcessIncomingBinary(uint64_t curTimeMs, std::span<const uint8_t> data);
@@ -46,12 +49,67 @@ class ClientImpl {
   void SendControl(uint64_t curTimeMs);
   void SendValues(uint64_t curTimeMs, bool flush);
 
-  void SetLocal(LocalInterface* local);
+  void SetLocal(LocalInterface* local) { m_local = local; }
   void SendInitial();
 
  private:
-  class Impl;
-  std::unique_ptr<Impl> m_impl;
+  struct PublisherData {
+    NT_Publisher handle;
+    PubSubOptionsImpl options;
+    // in options as double, but copy here as integer; rounded to the nearest
+    // 10 ms
+    uint32_t periodMs;
+    uint64_t nextSendMs{0};
+    std::vector<Value> outValues;  // outgoing values
+  };
+
+  bool DoSendControl(uint64_t curTimeMs);
+  void DoSendValues(uint64_t curTimeMs, bool flush);
+  void SendInitialValues();
+  bool CheckNetworkReady(uint64_t curTimeMs);
+
+  // ServerMessageHandler interface
+  void ServerAnnounce(std::string_view name, int64_t id,
+                      std::string_view typeStr, const wpi::json& properties,
+                      std::optional<int64_t> pubuid) final;
+  void ServerUnannounce(std::string_view name, int64_t id) final;
+  void ServerPropertiesUpdate(std::string_view name, const wpi::json& update,
+                              bool ack) final;
+
+  void Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
+               std::string_view name, std::string_view typeStr,
+               const wpi::json& properties, const PubSubOptionsImpl& options);
+  bool Unpublish(NT_Publisher pubHandle, NT_Topic topicHandle);
+  void SetValue(NT_Publisher pubHandle, const Value& value);
+
+  int m_inst;
+  WireConnection& m_wire;
+  wpi::Logger& m_logger;
+  LocalInterface* m_local{nullptr};
+  std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
+      m_timeSyncUpdated;
+  std::function<void(uint32_t repeatMs)> m_setPeriodic;
+
+  // indexed by publisher index
+  std::vector<std::unique_ptr<PublisherData>> m_publishers;
+
+  // indexed by server-provided topic id
+  wpi::DenseMap<int64_t, NT_Topic> m_topicMap;
+
+  // timestamp handling
+  static constexpr uint32_t kPingIntervalMs = 3000;
+  uint64_t m_nextPingTimeMs{0};
+  uint64_t m_pongTimeMs{0};
+  uint32_t m_rtt2Us{UINT32_MAX};
+  bool m_haveTimeOffset{false};
+  int64_t m_serverTimeOffsetUs{0};
+
+  // periodic sweep handling
+  uint32_t m_periodMs{kPingIntervalMs + 10};
+  uint64_t m_lastSendMs{0};
+
+  // outgoing queue
+  std::vector<ClientMessage> m_outgoing;
 };
 
 }  // namespace nt::net

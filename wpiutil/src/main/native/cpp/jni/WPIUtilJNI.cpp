@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "WPIUtilJNI.h"
+
 #include <jni.h>
 
 #include "edu_wpi_first_util_WPIUtilJNI.h"
@@ -15,7 +17,28 @@ using namespace wpi::java;
 static bool mockTimeEnabled = false;
 static uint64_t mockNow = 0;
 
+static JException illegalArgEx;
+static JException indexOobEx;
 static JException interruptedEx;
+static JException nullPointerEx;
+
+static const JExceptionInit exceptions[] = {
+    {"java/lang/IllegalArgumentException", &illegalArgEx},
+    {"java/lang/IndexOutOfBoundsException", &indexOobEx},
+    {"java/lang/InterruptedException", &interruptedEx},
+    {"java/lang/NullPointerException", &nullPointerEx}};
+
+void wpi::ThrowIllegalArgumentException(JNIEnv* env, std::string_view msg) {
+  illegalArgEx.Throw(env, msg);
+}
+
+void wpi::ThrowIndexOobException(JNIEnv* env, std::string_view msg) {
+  indexOobEx.Throw(env, msg);
+}
+
+void wpi::ThrowNullPointerException(JNIEnv* env, std::string_view msg) {
+  nullPointerEx.Throw(env, msg);
+}
 
 extern "C" {
 
@@ -25,9 +48,11 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
     return JNI_ERR;
   }
 
-  interruptedEx = JException(env, "java/lang/InterruptedException");
-  if (!interruptedEx) {
-    return JNI_ERR;
+  for (auto& c : exceptions) {
+    *c.cls = JException(env, c.name);
+    if (!*c.cls) {
+      return JNI_ERR;
+    }
   }
 
   return JNI_VERSION_1_6;
@@ -39,7 +64,9 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
     return;
   }
 
-  interruptedEx.free(env);
+  for (auto& c : exceptions) {
+    c.cls->free(env);
+  }
 }
 
 /*

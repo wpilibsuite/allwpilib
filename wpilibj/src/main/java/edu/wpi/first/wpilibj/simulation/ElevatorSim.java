@@ -37,7 +37,9 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
   /**
    * Creates a simulated elevator mechanism.
    *
-   * @param plant The linear system that represents the elevator.
+   * @param plant The linear system that represents the elevator. This system can be created with
+   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createElevatorSystem(DCMotor, double,
+   *     double, double)}.
    * @param gearbox The type of and number of motors in the elevator gearbox.
    * @param gearing The gearing of the elevator (numbers greater than 1 represent reductions).
    * @param drumRadiusMeters The radius of the drum that the elevator spool is wrapped around.
@@ -72,7 +74,9 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
   /**
    * Creates a simulated elevator mechanism.
    *
-   * @param plant The linear system that represents the elevator.
+   * @param plant The linear system that represents the elevator. This system can be created with
+   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createElevatorSystem(DCMotor, double,
+   *     double, double)}.
    * @param gearbox The type of and number of motors in the elevator gearbox.
    * @param gearing The gearing of the elevator (numbers greater than 1 represent reductions).
    * @param drumRadiusMeters The radius of the drum that the elevator spool is wrapped around.

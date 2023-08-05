@@ -343,8 +343,8 @@ public class ProfiledPIDController implements Sendable {
       m_setpoint.position = setpointMinDistance + measurement;
     }
 
-    var profile = new TrapezoidProfile(m_constraints, m_goal, m_setpoint);
-    m_setpoint = profile.calculate(getPeriod());
+    var profile = new TrapezoidProfile(m_constraints);
+    m_setpoint = profile.calculate(getPeriod(), m_goal, m_setpoint);
     return m_controller.calculate(measurement, m_setpoint.position);
   }
 

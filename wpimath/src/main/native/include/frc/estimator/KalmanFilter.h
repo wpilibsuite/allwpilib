@@ -46,6 +46,10 @@ class KalmanFilter {
   /**
    * Constructs a state-space observer with the given plant.
    *
+   * See
+   * https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-observers.html#process-and-measurement-noise-covariance-matrices
+   * for how to select the standard deviations.
+   *
    * @param plant              The plant used for the prediction step.
    * @param stateStdDevs       Standard deviations of model states.
    * @param measurementStdDevs Standard deviations of measurements.

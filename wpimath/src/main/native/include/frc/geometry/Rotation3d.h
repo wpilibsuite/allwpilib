@@ -6,9 +6,9 @@
 
 #include <wpi/SymbolExports.h>
 
-#include "Quaternion.h"
-#include "Rotation2d.h"
 #include "frc/EigenCore.h"
+#include "frc/geometry/Quaternion.h"
+#include "frc/geometry/Rotation2d.h"
 #include "units/angle.h"
 
 namespace wpi {

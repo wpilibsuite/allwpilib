@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <optional>
 #include <string>
 
 #include <units/time.h>
@@ -21,7 +22,7 @@ namespace frc {
  */
 class DriverStation final {
  public:
-  enum Alliance { kRed, kBlue, kInvalid };
+  enum Alliance { kRed, kBlue };
   enum MatchType { kNone, kPractice, kQualification, kElimination };
 
   static constexpr int kJoystickPorts = 6;
@@ -282,7 +283,7 @@ class DriverStation final {
    *
    * @return The Alliance enum (kRed, kBlue or kInvalid)
    */
-  static Alliance GetAlliance();
+  static std::optional<Alliance> GetAlliance();
 
   /**
    * Return the driver station location from the FMS.
@@ -294,7 +295,7 @@ class DriverStation final {
    *
    * @return The location of the driver station (1-3, 0 for invalid)
    */
-  static int GetLocation();
+  static std::optional<int> GetLocation();
 
   /**
    * Wait for a DS connection.
@@ -305,21 +306,26 @@ class DriverStation final {
   static bool WaitForDsConnection(units::second_t timeout);
 
   /**
-   * Return the approximate match time.
-   *
-   * The FMS does not send an official match time to the robots, but does send
-   * an approximate match time. The value will count down the time remaining in
-   * the current period (auto or teleop).
-   *
+   * Return the approximate match time. The FMS does not send an official match
+   * time to the robots, but does send an approximate match time. The value will
+   * count down the time remaining in the current period (auto or teleop).
    * Warning: This is not an official time (so it cannot be used to dispute ref
    * calls or guarantee that a function will trigger before the match ends).
    *
-   * The Practice Match function of the DS approximates the behavior seen on
-   * the field.
+   * <p>When connected to the real field, this number only changes in full
+   * integer increments, and always counts down.
    *
-   * @return Time remaining in current match period (auto or teleop)
+   * <p>When the DS is in practice mode, this number is a floating point number,
+   * and counts down.
+   *
+   * <p>When the DS is in teleop or autonomous mode, this number is a floating
+   * point number, and counts up.
+   *
+   * <p>Simulation matches DS behavior without an FMS connected.
+   *
+   * @return Time remaining in current match period (auto or teleop) in seconds
    */
-  static double GetMatchTime();
+  static units::second_t GetMatchTime();
 
   /**
    * Read the battery voltage.

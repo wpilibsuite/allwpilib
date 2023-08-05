@@ -1,21 +1,21 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Tue, 24 May 2022 01:24:31 -0400
-Subject: [PATCH 3/3] Add advapi pragma
+From: Thad House <thadhouse1@gmail.com>
+Date: Sat, 22 Jul 2023 13:03:13 -0700
+Subject: [PATCH] Add advapi pragma
 
 ---
  Main/StackWalker/StackWalker.cpp | 1 +
  1 file changed, 1 insertion(+)
 
 diff --git a/Main/StackWalker/StackWalker.cpp b/Main/StackWalker/StackWalker.cpp
-index 48c7c57c439dd8feb7ea88fda17d68a4bbbb3d68..6f0fbf28a61f13b796edee56c37737bf14f5a933 100644
+index 89545f8612d0d099d48fcf4184a2f2a30cf8577f..b2bcbaa447c5db1a3bcc155fb317ebc8a8050e79 100644
 --- a/Main/StackWalker/StackWalker.cpp
 +++ b/Main/StackWalker/StackWalker.cpp
-@@ -88,6 +88,7 @@
- #include <stdlib.h>
- #include <tchar.h>
+@@ -91,6 +91,7 @@
+ #include <new>
+
  #pragma comment(lib, "version.lib") // for "VerQueryValue"
 +#pragma comment(lib, "Advapi32.lib") // for "GetUserName"
+
  #pragma warning(disable : 4826)
- 
- #ifdef UNICODE
+ #if _MSC_VER >= 1900

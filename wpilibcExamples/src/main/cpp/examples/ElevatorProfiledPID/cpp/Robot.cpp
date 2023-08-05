@@ -7,6 +7,7 @@
 #include <frc/Encoder.h>
 #include <frc/Joystick.h>
 #include <frc/TimedRobot.h>
+#include <frc/controller/ElevatorFeedforward.h>
 #include <frc/controller/ProfiledPIDController.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc/trajectory/TrapezoidProfile.h>
@@ -14,6 +15,7 @@
 #include <units/length.h>
 #include <units/time.h>
 #include <units/velocity.h>
+#include <units/voltage.h>
 
 class Robot : public frc::TimedRobot {
  public:
@@ -31,21 +33,34 @@ class Robot : public frc::TimedRobot {
     }
 
     // Run controller and update motor output
-    m_motor.Set(
-        m_controller.Calculate(units::meter_t{m_encoder.GetDistance()}));
+    m_motor.SetVoltage(
+        units::volt_t{
+            m_controller.Calculate(units::meter_t{m_encoder.GetDistance()})} +
+        m_feedforward.Calculate(m_controller.GetSetpoint().velocity));
   }
 
  private:
+  static constexpr units::meters_per_second_t kMaxVelocity = 1.75_mps;
+  static constexpr units::meters_per_second_squared_t kMaxAcceleration =
+      0.75_mps_sq;
+  static constexpr double kP = 1.3;
+  static constexpr double kI = 0.0;
+  static constexpr double kD = 0.7;
+  static constexpr units::volt_t kS = 1.1_V;
+  static constexpr units::volt_t kG = 1.2_V;
+  static constexpr auto kV = 1.3_V / 1_mps;
+
   frc::Joystick m_joystick{1};
   frc::Encoder m_encoder{1, 2};
   frc::PWMSparkMax m_motor{1};
 
   // Create a PID controller whose setpoint's change is subject to maximum
   // velocity and acceleration constraints.
-  frc::TrapezoidProfile<units::meters>::Constraints m_constraints{1.75_mps,
-                                                                  0.75_mps_sq};
-  frc::ProfiledPIDController<units::meters> m_controller{1.3, 0.0, 0.7,
+  frc::TrapezoidProfile<units::meters>::Constraints m_constraints{
+      kMaxVelocity, kMaxAcceleration};
+  frc::ProfiledPIDController<units::meters> m_controller{kP, kI, kD,
                                                          m_constraints, kDt};
+  frc::ElevatorFeedforward m_feedforward{kS, kG, kV};
 };
 
 #ifndef RUNNING_FRC_TESTS

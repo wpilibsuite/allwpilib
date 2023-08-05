@@ -36,7 +36,9 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
   /**
    * Creates a simulated arm mechanism.
    *
-   * @param plant The linear system that represents the arm.
+   * @param plant The linear system that represents the arm. This system can be created with {@link
+   *     edu.wpi.first.math.system.plant.LinearSystemId#createSingleJointedArmSystem(DCMotor,
+   *     double, double)}.
    * @param gearbox The type of and number of motors in the arm gearbox.
    * @param gearing The gearing of the arm (numbers greater than 1 represent reductions).
    * @param armLengthMeters The length of the arm.
@@ -70,7 +72,9 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
   /**
    * Creates a simulated arm mechanism.
    *
-   * @param plant The linear system that represents the arm.
+   * @param plant The linear system that represents the arm. This system can be created with {@link
+   *     edu.wpi.first.math.system.plant.LinearSystemId#createSingleJointedArmSystem(DCMotor,
+   *     double, double)}.
    * @param gearbox The type of and number of motors in the arm gearbox.
    * @param gearing The gearing of the arm (numbers greater than 1 represent reductions).
    * @param armLengthMeters The length of the arm.

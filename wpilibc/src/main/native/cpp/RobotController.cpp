@@ -111,6 +111,12 @@ double RobotController::GetCurrent3V3() {
   return retVal;
 }
 
+void RobotController::SetEnabled3V3(bool enabled) {
+  int32_t status = 0;
+  HAL_SetUserRailEnabled3V3(enabled, &status);
+  FRC_CheckErrorStatus(status, "SetEnabled3V3");
+}
+
 bool RobotController::GetEnabled3V3() {
   int32_t status = 0;
   bool retVal = HAL_GetUserActive3V3(&status);
@@ -137,6 +143,12 @@ double RobotController::GetCurrent5V() {
   double retVal = HAL_GetUserCurrent5V(&status);
   FRC_CheckErrorStatus(status, "GetCurrent5V");
   return retVal;
+}
+
+void RobotController::SetEnabled5V(bool enabled) {
+  int32_t status = 0;
+  HAL_SetUserRailEnabled5V(enabled, &status);
+  FRC_CheckErrorStatus(status, "SetEnabled5V");
 }
 
 bool RobotController::GetEnabled5V() {
@@ -167,6 +179,12 @@ double RobotController::GetCurrent6V() {
   return retVal;
 }
 
+void RobotController::SetEnabled6V(bool enabled) {
+  int32_t status = 0;
+  HAL_SetUserRailEnabled6V(enabled, &status);
+  FRC_CheckErrorStatus(status, "SetEnabled6V");
+}
+
 bool RobotController::GetEnabled6V() {
   int32_t status = 0;
   bool retVal = HAL_GetUserActive6V(&status);
@@ -192,6 +210,13 @@ void RobotController::SetBrownoutVoltage(units::volt_t brownoutVoltage) {
   int32_t status = 0;
   HAL_SetBrownoutVoltage(brownoutVoltage.value(), &status);
   FRC_CheckErrorStatus(status, "SetBrownoutVoltage");
+}
+
+units::celsius_t RobotController::GetCPUTemp() {
+  int32_t status = 0;
+  double retVal = HAL_GetCPUTemp(&status);
+  FRC_CheckErrorStatus(status, "GetCPUTemp");
+  return units::celsius_t{retVal};
 }
 
 CANStatus RobotController::GetCANStatus() {

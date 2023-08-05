@@ -81,11 +81,9 @@ public class Odometry<T extends WheelPositions<T>> {
    * @return The new pose of the robot.
    */
   public Pose2d update(Rotation2d gyroAngle, T wheelPositions) {
-    T wheelDeltas = wheelPositions.minus(m_previousWheelPositions);
-
     var angle = gyroAngle.plus(m_gyroOffset);
 
-    var twist = m_kinematics.toTwist2d(wheelDeltas);
+    var twist = m_kinematics.toTwist2d(m_previousWheelPositions, wheelPositions);
     twist.dtheta = angle.minus(m_previousAngle).getRadians();
 
     var newPose = m_poseMeters.exp(twist);

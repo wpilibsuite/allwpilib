@@ -147,6 +147,26 @@ public final class MathUtil {
   }
 
   /**
+   * Return where within interpolation range [0, 1] q is between startValue and endValue.
+   *
+   * @param startValue Lower part of interpolation range.
+   * @param endValue Upper part of interpolation range.
+   * @param q Query.
+   * @return Interpolant in range [0, 1].
+   */
+  public static double inverseInterpolate(double startValue, double endValue, double q) {
+    double totalRange = endValue - startValue;
+    if (totalRange <= 0) {
+      return 0.0;
+    }
+    double queryToStart = q - startValue;
+    if (queryToStart <= 0) {
+      return 0.0;
+    }
+    return queryToStart / totalRange;
+  }
+
+  /**
    * Checks if the given value matches an expected value within a certain tolerance.
    *
    * @param expected The expected value
