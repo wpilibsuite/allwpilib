@@ -10,7 +10,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableRegistry;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -32,6 +32,8 @@ public final class SmartDashboard {
   @SuppressWarnings("PMD.UseConcurrentHashMap")
   private static final Map<String, Sendable> tablesToData = new HashMap<>();
 
+  /** Links {@link Sendable} objects to their builders. */
+  private static final Map<Sendable, SendableBuilderImpl> dataToBuilders = new HashMap<>();
   /** The executor for listener tasks; calls listener tasks synchronously from main thread. */
   private static final ListenerExecutor listenerExecutor = new ListenerExecutor();
 
@@ -60,17 +62,24 @@ public final class SmartDashboard {
    *
    * @param key the key
    * @param data the value
-   * @throws IllegalArgumentException If key is null
+   * @throws NullPointerException If key or value is null
    */
   @SuppressWarnings("PMD.CompareObjectsWithEquals")
   public static synchronized void putData(String key, Sendable data) {
     Sendable sddata = tablesToData.get(key);
     if (sddata == null || sddata != data) {
       tablesToData.put(key, data);
+      SendableBuilderImpl oldBuilder = dataToBuilders.get(sddata);
+      if (oldBuilder != null) {
+        oldBuilder.close();
+        dataToBuilders.remove(sddata);
+      }
       NetworkTable dataTable = table.getSubTable(key);
       SendableBuilderImpl builder = new SendableBuilderImpl();
       builder.setTable(dataTable);
-      SendableRegistry.publish(data, builder);
+      dataToBuilders.put(data, builder);
+      data.initSendable(builder);
+      builder.update();
       builder.startListeners();
       dataTable.getEntry(".name").setString(key);
     }
@@ -82,12 +91,25 @@ public final class SmartDashboard {
    * equal to the original key.
    *
    * @param value the value
-   * @throws IllegalArgumentException If key is null
+   * @throws NullPointerException If key is null
    */
   public static void putData(Sendable value) {
-    String name = SendableRegistry.getName(value);
+    String name = LiveWindow.getName(value);
     if (!name.isEmpty()) {
       putData(name, value);
+    }
+  }
+
+  /**
+   * Stops publishing the Sendable mapped to this key.
+   *
+   * @param key The key where the Sendable is published
+   */
+  public static synchronized void unpublishData(String key) {
+    Sendable data = tablesToData.get(key);
+    if (data != null) {
+      dataToBuilders.get(data).close();
+      tablesToData.remove(key);
     }
   }
 
@@ -504,7 +526,7 @@ public final class SmartDashboard {
     // Execute posted listener tasks
     listenerExecutor.runListenerTasks();
     for (Sendable data : tablesToData.values()) {
-      SendableRegistry.update(data);
+      dataToBuilders.get(data).update();
     }
   }
 }

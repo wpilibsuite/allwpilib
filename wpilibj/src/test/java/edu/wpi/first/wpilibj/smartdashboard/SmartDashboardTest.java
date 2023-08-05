@@ -9,6 +9,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.UtilityClassTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -121,5 +123,59 @@ class SmartDashboardTest extends UtilityClassTest<SmartDashboard> {
     assertThrows(
         NullPointerException.class,
         () -> SmartDashboard.putString("KEY_SHOULD_NOT_BE_STORED", null));
+  }
+
+  @Test
+  void putSendableTest() {
+    class MockSendable implements Sendable {
+      public long value;
+
+      @Override
+      public void initSendable(SendableBuilder builder) {
+        builder.addIntegerProperty(
+            "int",
+            () -> value,
+            val -> {
+              value = val;
+            });
+      }
+    }
+
+    final var entry = m_table.getEntry("Test/int");
+    MockSendable sendable = new MockSendable();
+    assertEquals(0, sendable.value);
+    SmartDashboard.putData("Test", sendable);
+    SmartDashboard.updateValues();
+    entry.setInteger(1);
+    SmartDashboard.updateValues();
+    assertEquals(1, sendable.value);
+    sendable.value = 2;
+    SmartDashboard.updateValues();
+    assertEquals(2, sendable.value);
+    assertEquals(2, entry.getInteger(0));
+    SmartDashboard.unpublishData("Test");
+    SmartDashboard.updateValues();
+    sendable.value = 3;
+    SmartDashboard.updateValues();
+    assertEquals(3, sendable.value);
+    assertEquals(2, entry.getInteger(0));
+  }
+
+  @Test
+  void putSendableNullKeyTest() {
+    assertThrows(
+        NullPointerException.class,
+        () ->
+            SmartDashboard.putData(
+                null,
+                new Sendable() {
+                  @Override
+                  public void initSendable(SendableBuilder builder) {}
+                }));
+  }
+
+  @Test
+  void putSendableNullDataTest() {
+    assertThrows(NullPointerException.class, () -> SmartDashboard.putData("Test", null));
   }
 }

@@ -7,8 +7,11 @@
 #include <hal/FRCUsageReporting.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>
+#include <wpi/DenseMap.h>
 #include <wpi/StringMap.h>
+#include <wpi/UidVector.h>
 #include <wpi/mutex.h>
+#include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/Errors.h"
@@ -25,6 +28,10 @@ struct Instance {
   std::shared_ptr<nt::NetworkTable> table =
       nt::NetworkTableInstance::GetDefault().GetTable("SmartDashboard");
   wpi::StringMap<wpi::SendableRegistry::UID> tablesToData;
+  wpi::DenseMap<wpi::SendableRegistry::UID, wpi::Sendable*> uidToSendables;
+  wpi::DenseMap<wpi::SendableRegistry::UID,
+                std::unique_ptr<frc::SendableBuilderImpl>>
+      dataToBuilders;
   wpi::mutex tablesToDataMutex;
 };
 }  // namespace
@@ -81,14 +88,18 @@ void SmartDashboard::PutData(std::string_view key, wpi::Sendable* data) {
   auto& inst = GetInstance();
   std::scoped_lock lock(inst.tablesToDataMutex);
   auto& uid = inst.tablesToData[key];
-  wpi::Sendable* sddata = wpi::SendableRegistry::GetSendable(uid);
+  wpi::Sendable* sddata = inst.uidToSendables[uid];
   if (sddata != data) {
-    uid = wpi::SendableRegistry::GetUniqueId(data);
+    uid =
+        static_cast<wpi::SendableRegistry::UID>(inst.uidToSendables.size() + 1);
+    inst.uidToSendables[uid] = data;
     auto dataTable = inst.table->GetSubTable(key);
     auto builder = std::make_unique<SendableBuilderImpl>();
     auto builderPtr = builder.get();
     builderPtr->SetTable(dataTable);
-    wpi::SendableRegistry::Publish(uid, std::move(builder));
+    inst.dataToBuilders[uid] = std::move(builder);
+    data->InitSendable(*builderPtr);
+    builderPtr->Update();
     builderPtr->StartListeners();
     dataTable->GetEntry(".name").SetString(key);
   }
@@ -239,7 +250,7 @@ void SmartDashboard::UpdateValues() {
   auto& inst = GetInstance();
   inst.listenerExecutor.RunListenerTasks();
   std::scoped_lock lock(inst.tablesToDataMutex);
-  for (auto& i : inst.tablesToData) {
-    wpi::SendableRegistry::Update(i.getValue());
+  for (auto& i : inst.dataToBuilders) {
+    i.second->Update();
   }
 }
