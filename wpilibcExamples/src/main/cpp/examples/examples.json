@@ -865,5 +865,17 @@
     "foldername": "SwerveDrivePoseEstimator",
     "gradlebase": "cpp",
     "commandversion": 2
+  },
+  {
+    "name": "Flywheel BangBangController",
+    "description": "A sample program to demonstrate the use of a BangBangController with a flywheel to control RPM",
+    "tags": [
+      "Flywheel",
+      "Simulation",
+      "Joystick"
+    ],
+    "foldername": "FlywheelBangBangController",
+    "gradlebase": "cpp",
+    "commandversion": 2
   }
 ]
