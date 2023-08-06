@@ -1348,6 +1348,54 @@ void NT_SetNow(int64_t timestamp);
 /** @} */
 
 /**
+ * @defgroup ntcore_data_logger_cfunc Data Logger Functions
+ * @{
+ */
+
+/**
+ * Starts logging entry changes to a DataLog.
+ *
+ * @param inst instance handle
+ * @param log data log object; lifetime must extend until StopEntryDataLog is
+ *            called or the instance is destroyed
+ * @param prefix only store entries with names that start with this prefix;
+ *               the prefix is not included in the data log entry name
+ * @param logPrefix prefix to add to data log entry names
+ * @return Data logger handle
+ */
+NT_DataLogger NT_StartEntryDataLog(NT_Inst inst, struct WPI_DataLog* log,
+                                   const char* prefix, const char* logPrefix);
+
+/**
+ * Stops logging entry changes to a DataLog.
+ *
+ * @param logger data logger handle
+ */
+void NT_StopEntryDataLog(NT_DataLogger logger);
+
+/**
+ * Starts logging connection changes to a DataLog.
+ *
+ * @param inst instance handle
+ * @param log data log object; lifetime must extend until StopConnectionDataLog
+ *            is called or the instance is destroyed
+ * @param name data log entry name
+ * @return Data logger handle
+ */
+NT_ConnectionDataLogger NT_StartConnectionDataLog(NT_Inst inst,
+                                                  struct WPI_DataLog* log,
+                                                  const char* name);
+
+/**
+ * Stops logging connection changes to a DataLog.
+ *
+ * @param logger data logger handle
+ */
+void NT_StopConnectionDataLog(NT_ConnectionDataLogger logger);
+
+/** @} */
+
+/**
  * @defgroup ntcore_logger_cfunc Logger Functions
  * @{
  */
