@@ -76,7 +76,7 @@ jobs:
         run: python -m pip install jinja2
 
       - name: configure
-        run: mkdir build && cd build && cmake -DWITH_JAVA=OFF -DCMAKE_TOOLCHAIN_FILE=${{ runner.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_INSTALL_OPTIONS=--clean-after-build ..
+        run: cmake -S . -B build -DWITH_JAVA=OFF -DCMAKE_TOOLCHAIN_FILE=${{ runner.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_INSTALL_OPTIONS=--clean-after-build
 
       - name: build
         working-directory: build
