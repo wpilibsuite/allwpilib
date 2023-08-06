@@ -217,6 +217,7 @@ WPI_DestroyEvent
 WPI_DestroySemaphore
 WPI_DestroySignalObject
 WPI_GetSystemTime
+WPI_Impl_SetupNowRio
 WPI_Now
 WPI_NowDefault
 WPI_ReleaseSemaphore
