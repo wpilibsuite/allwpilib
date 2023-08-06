@@ -133,7 +133,7 @@ class WPILIB_DLLEXPORT Pose3d {
   /**
    * Rotates the pose around the origin and returns the new pose.
    *
-   * @param other The rotation to transform the pose by.
+   * @param other The extrinsic rotation to transform the pose by.
    *
    * @return The rotated pose.
    */
@@ -141,6 +141,9 @@ class WPILIB_DLLEXPORT Pose3d {
 
   /**
    * Transforms the pose by the given transformation and returns the new pose.
+   * The transform is applied relative to the pose's frame. Note that this
+   * differs from Pose3d::RotateBy(const Rotation3d&), which is applied relative
+   * to the global frame and around the origin.
    *
    * @param other The transform to transform the pose by.
    *
