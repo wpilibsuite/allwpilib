@@ -28,7 +28,9 @@ public final class SendableRegistry {
 
     @Override
     public void close() throws Exception {
-      m_builder.close();
+      for (SendableBuilder builder : m_builders) {
+        builder.close();
+      }
       for (AutoCloseable data : m_data) {
         if (data != null) {
           data.close();
@@ -37,7 +39,7 @@ public final class SendableRegistry {
     }
 
     WeakReference<Sendable> m_sendable;
-    SendableBuilder m_builder;
+    List<SendableBuilder> m_builders = new ArrayList<>();
     String m_name;
     String m_subsystem = "Ungrouped";
     WeakReference<Sendable> m_parent;
@@ -142,14 +144,7 @@ public final class SendableRegistry {
   public static synchronized void addLW(Sendable sendable, String name) {
     Component comp = getOrAdd(sendable);
     if (liveWindowFactory != null) {
-      if (comp.m_builder != null) {
-        try {
-          comp.m_builder.close();
-        } catch (Exception e) {
-          // ignore
-        }
-      }
-      comp.m_builder = liveWindowFactory.get();
+      comp.m_builders.add(liveWindowFactory.get());
     }
     comp.m_liveWindow = true;
     comp.m_name = name;
@@ -165,14 +160,7 @@ public final class SendableRegistry {
   public static synchronized void addLW(Sendable sendable, String moduleType, int channel) {
     Component comp = getOrAdd(sendable);
     if (liveWindowFactory != null) {
-      if (comp.m_builder != null) {
-        try {
-          comp.m_builder.close();
-        } catch (Exception e) {
-          // ignore
-        }
-      }
-      comp.m_builder = liveWindowFactory.get();
+      comp.m_builders.add(liveWindowFactory.get());
     }
     comp.m_liveWindow = true;
     comp.setName(moduleType, channel);
@@ -190,14 +178,7 @@ public final class SendableRegistry {
       Sendable sendable, String moduleType, int moduleNumber, int channel) {
     Component comp = getOrAdd(sendable);
     if (liveWindowFactory != null) {
-      if (comp.m_builder != null) {
-        try {
-          comp.m_builder.close();
-        } catch (Exception e) {
-          // ignore
-        }
-      }
-      comp.m_builder = liveWindowFactory.get();
+      comp.m_builders.add(liveWindowFactory.get());
     }
     comp.m_liveWindow = true;
     comp.setName(moduleType, moduleNumber, channel);
@@ -213,14 +194,7 @@ public final class SendableRegistry {
   public static synchronized void addLW(Sendable sendable, String subsystem, String name) {
     Component comp = getOrAdd(sendable);
     if (liveWindowFactory != null) {
-      if (comp.m_builder != null) {
-        try {
-          comp.m_builder.close();
-        } catch (Exception e) {
-          // ignore
-        }
-      }
-      comp.m_builder = liveWindowFactory.get();
+      comp.m_builders.add(liveWindowFactory.get());
     }
     comp.m_liveWindow = true;
     comp.m_name = name;
@@ -462,16 +436,11 @@ public final class SendableRegistry {
    */
   public static synchronized void publish(Sendable sendable, SendableBuilder builder) {
     Component comp = getOrAdd(sendable);
-    if (comp.m_builder != null) {
-      try {
-        comp.m_builder.close();
-      } catch (Exception e) {
-        // ignore
-      }
+    comp.m_builders.add(builder);
+    for (SendableBuilder compBuilder : comp.m_builders) {
+      sendable.initSendable(compBuilder);
+      compBuilder.update();
     }
-    comp.m_builder = builder; // clear any current builder
-    sendable.initSendable(comp.m_builder);
-    comp.m_builder.update();
   }
 
   /**
@@ -481,8 +450,11 @@ public final class SendableRegistry {
    */
   public static synchronized void update(Sendable sendable) {
     Component comp = components.get(sendable);
-    if (comp != null && comp.m_builder != null) {
-      comp.m_builder.update();
+    if (comp != null && comp.m_builders != null) {
+      for (SendableBuilder compBuilder : comp.m_builders) {
+        sendable.initSendable(compBuilder);
+        compBuilder.update();
+      }
     }
   }
 
@@ -505,7 +477,7 @@ public final class SendableRegistry {
     public AutoCloseable data;
 
     /** Sendable builder for the sendable. */
-    public SendableBuilder builder;
+    public List<SendableBuilder> builders;
   }
 
   // As foreachLiveWindow is single threaded, cache the components it
@@ -526,7 +498,7 @@ public final class SendableRegistry {
     foreachComponents.clear();
     foreachComponents.addAll(components.values());
     for (Component comp : foreachComponents) {
-      if (comp.m_builder == null || comp.m_sendable == null) {
+      if (comp.m_builders == null || comp.m_sendable == null) {
         continue;
       }
       cbdata.sendable = comp.m_sendable.get();
@@ -543,7 +515,7 @@ public final class SendableRegistry {
         } else {
           cbdata.data = null;
         }
-        cbdata.builder = comp.m_builder;
+        cbdata.builders = comp.m_builders;
         try {
           callback.accept(cbdata);
         } catch (Throwable throwable) {

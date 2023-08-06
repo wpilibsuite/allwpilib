@@ -8,7 +8,6 @@
 
 #include "fmt/format.h"
 #include "wpi/DenseMap.h"
-#include "wpi/SmallVector.h"
 #include "wpi/UidVector.h"
 #include "wpi/mutex.h"
 #include "wpi/sendable/Sendable.h"
@@ -19,7 +18,7 @@ using namespace wpi;
 namespace {
 struct Component {
   Sendable* sendable = nullptr;
-  std::unique_ptr<SendableBuilder> builder;
+  wpi::SmallVector<std::unique_ptr<SendableBuilder>> builders;
   std::string name;
   std::string subsystem = "Ungrouped";
   Sendable* parent = nullptr;
@@ -125,7 +124,7 @@ void SendableRegistry::AddLW(Sendable* sendable, std::string_view name) {
   auto& comp = inst.GetOrAdd(sendable);
   comp.sendable = sendable;
   if (inst.liveWindowFactory) {
-    comp.builder = inst.liveWindowFactory();
+    comp.builders.emplace_back(inst.liveWindowFactory());
   }
   comp.liveWindow = true;
   comp.name = name;
@@ -138,7 +137,7 @@ void SendableRegistry::AddLW(Sendable* sendable, std::string_view moduleType,
   auto& comp = inst.GetOrAdd(sendable);
   comp.sendable = sendable;
   if (inst.liveWindowFactory) {
-    comp.builder = inst.liveWindowFactory();
+    comp.builders.emplace_back(inst.liveWindowFactory());
   }
   comp.liveWindow = true;
   comp.SetName(moduleType, channel);
@@ -151,7 +150,7 @@ void SendableRegistry::AddLW(Sendable* sendable, std::string_view moduleType,
   auto& comp = inst.GetOrAdd(sendable);
   comp.sendable = sendable;
   if (inst.liveWindowFactory) {
-    comp.builder = inst.liveWindowFactory();
+    comp.builders.emplace_back(inst.liveWindowFactory());
   }
   comp.liveWindow = true;
   comp.SetName(moduleType, moduleNumber, channel);
@@ -164,7 +163,7 @@ void SendableRegistry::AddLW(Sendable* sendable, std::string_view subsystem,
   auto& comp = inst.GetOrAdd(sendable);
   comp.sendable = sendable;
   if (inst.liveWindowFactory) {
-    comp.builder = inst.liveWindowFactory();
+    comp.builders.emplace_back(inst.liveWindowFactory());
   }
   comp.liveWindow = true;
   comp.name = name;
@@ -216,10 +215,12 @@ void SendableRegistry::Move(Sendable* to, Sendable* from) {
   inst.componentMap[to] = compUid;
   auto& comp = *inst.components[compUid - 1];
   comp.sendable = to;
-  if (comp.builder && comp.builder->IsPublished()) {
-    // rebuild builder, as lambda captures can point to "from"
-    comp.builder->ClearProperties();
-    to->InitSendable(*comp.builder);
+  for (auto& builder : comp.builders) {
+    if (builder && builder->IsPublished()) {
+      // rebuild builder, as lambda captures can point to "from"
+      builder->ClearProperties();
+      to->InitSendable(*builder);
+    }
   }
   // update any parent pointers
   for (auto&& comp : inst.components) {
@@ -404,9 +405,11 @@ void SendableRegistry::Publish(UID sendableUid,
     return;
   }
   auto& comp = *inst.components[sendableUid - 1];
-  comp.builder = std::move(builder);  // clear any current builder
-  comp.sendable->InitSendable(*comp.builder);
-  comp.builder->Update();
+  comp.builders.emplace_back(std::move(builder));
+  for (auto& builder : comp.builders) {
+    comp.sendable->InitSendable(*builder);
+    builder->Update();
+  }
 }
 
 void SendableRegistry::Update(UID sendableUid) {
@@ -419,8 +422,10 @@ void SendableRegistry::Update(UID sendableUid) {
       !inst.components[sendableUid - 1]) {
     return;
   }
-  if (inst.components[sendableUid - 1]->builder) {
-    inst.components[sendableUid - 1]->builder->Update();
+  for (auto& builder : inst.components[sendableUid - 1]->builders) {
+    if (builder) {
+      builder->Update();
+    }
   }
 }
 
@@ -434,13 +439,13 @@ void SendableRegistry::ForeachLiveWindow(
     components.emplace_back(comp.get());
   }
   for (auto comp : components) {
-    if (comp && comp->builder && comp->sendable && comp->liveWindow) {
+    if (comp && !comp->builders.empty() && comp->sendable && comp->liveWindow) {
       if (static_cast<size_t>(dataHandle) >= comp->data.size()) {
         comp->data.resize(dataHandle + 1);
       }
       CallbackData cbdata{comp->sendable,         comp->name,
                           comp->subsystem,        comp->parent,
-                          comp->data[dataHandle], *comp->builder};
+                          comp->data[dataHandle], comp->builders};
       callback(cbdata);
     }
   }

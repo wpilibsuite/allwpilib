@@ -149,8 +149,10 @@ void LiveWindow::SetEnabled(bool enabled) {
   } else {
     wpi::SendableRegistry::ForeachLiveWindow(
         inst.dataHandle, [&](auto& cbdata) {
-          static_cast<SendableBuilderImpl&>(cbdata.builder)
-              .StopLiveWindowMode();
+          for (auto& builder : cbdata.builders) {
+            static_cast<SendableBuilderImpl*>(builder.get())
+                ->StopLiveWindowMode();
+          }
         });
     if (inst.disabled) {
       inst.disabled();
@@ -205,8 +207,11 @@ void LiveWindow::UpdateValuesUnsafe() {
       }
       comp.namePub = nt::StringTopic{table->GetTopic(".name")}.Publish();
       comp.namePub.Set(cbdata.name);
-      static_cast<SendableBuilderImpl&>(cbdata.builder).SetTable(table);
-      cbdata.sendable->InitSendable(cbdata.builder);
+      for (auto& builder : cbdata.builders) {
+        auto builderPtr = static_cast<SendableBuilderImpl*>(builder.get());
+        builderPtr->SetTable(table);
+        cbdata.sendable->InitSendable(*builderPtr);
+      }
       comp.typePub = nt::StringTopic{ssTable->GetTopic(".type")}.Publish();
       comp.typePub.Set("LW Subsystem");
 
@@ -214,9 +219,13 @@ void LiveWindow::UpdateValuesUnsafe() {
     }
 
     if (inst.startLiveWindow) {
-      static_cast<SendableBuilderImpl&>(cbdata.builder).StartLiveWindowMode();
+      for (auto& builder : cbdata.builders) {
+        static_cast<SendableBuilderImpl*>(builder.get())->StartLiveWindowMode();
+      }
     }
-    cbdata.builder.Update();
+    for (auto& builder : cbdata.builders) {
+      static_cast<SendableBuilderImpl*>(builder.get())->Update();
+    }
   });
 
   inst.startLiveWindow = false;

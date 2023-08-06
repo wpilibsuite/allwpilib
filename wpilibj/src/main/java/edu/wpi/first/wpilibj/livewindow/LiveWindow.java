@@ -10,6 +10,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.networktables.StringTopic;
 import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilderImpl;
 
@@ -107,7 +108,9 @@ public final class LiveWindow {
         SendableRegistry.foreachLiveWindow(
             dataHandle,
             cbdata -> {
-              ((SendableBuilderImpl) cbdata.builder).stopLiveWindowMode();
+              for (SendableBuilder builder : cbdata.builders) {
+                ((SendableBuilderImpl) builder).stopLiveWindowMode();
+              }
             });
         if (disabledListener != null) {
           disabledListener.run();
@@ -210,8 +213,10 @@ public final class LiveWindow {
             }
             component.m_namePub = new StringTopic(table.getTopic(".name")).publish();
             component.m_namePub.set(cbdata.name);
-            ((SendableBuilderImpl) cbdata.builder).setTable(table);
-            cbdata.sendable.initSendable(cbdata.builder);
+            for (SendableBuilder builder : cbdata.builders) {
+              ((SendableBuilderImpl) builder).setTable(table);
+              cbdata.sendable.initSendable(builder);
+            }
             component.m_typePub = new StringTopic(ssTable.getTopic(".type")).publish();
             component.m_typePub.set("LW Subsystem");
 
@@ -219,9 +224,13 @@ public final class LiveWindow {
           }
 
           if (startLiveWindow) {
-            ((SendableBuilderImpl) cbdata.builder).startLiveWindowMode();
+            for (SendableBuilder builder : cbdata.builders) {
+              ((SendableBuilderImpl) builder).startLiveWindowMode();
+            }
           }
-          cbdata.builder.update();
+          for (SendableBuilder builder : cbdata.builders) {
+            ((SendableBuilderImpl) builder).update();
+          }
         });
 
     startLiveWindow = false;

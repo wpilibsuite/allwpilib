@@ -9,6 +9,7 @@
 #include <string>
 #include <string_view>
 
+#include "wpi/SmallVector.h"
 #include "wpi/function_ref.h"
 
 namespace wpi {
@@ -302,20 +303,21 @@ class SendableRegistry final {
   struct CallbackData {
     CallbackData(Sendable* sendable_, std::string_view name_,
                  std::string_view subsystem_, wpi::Sendable* parent_,
-                 std::shared_ptr<void>& data_, SendableBuilder& builder_)
+                 std::shared_ptr<void>& data_,
+                 wpi::SmallVector<std::unique_ptr<SendableBuilder>>& builders_)
         : sendable(sendable_),
           name(name_),
           subsystem(subsystem_),
           parent(parent_),
           data(data_),
-          builder(builder_) {}
+          builders(builders_) {}
 
     Sendable* sendable;
     std::string_view name;
     std::string_view subsystem;
     Sendable* parent;
     std::shared_ptr<void>& data;
-    SendableBuilder& builder;
+    wpi::SmallVector<std::unique_ptr<SendableBuilder>>& builders;
   };
 
   /**
