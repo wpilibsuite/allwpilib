@@ -19,6 +19,7 @@ import java.util.WeakHashMap;
 /**
  * The LiveWindow class is the public interface for putting sensors and actuators on the LiveWindow.
  */
+@SuppressWarnings("PMD.AvoidCatchingGenericException")
 public final class LiveWindow {
   private static class Component implements AutoCloseable {
     Component() {}
@@ -209,7 +210,7 @@ public final class LiveWindow {
     }
     return comp != null;
   }
-  
+
   /**
    * Determines if an object is in LiveWindow.
    *
@@ -317,6 +318,18 @@ public final class LiveWindow {
     if (comp != null) {
       comp.m_subsystem = subsystem;
     }
+  }
+
+  public static synchronized void setEnabledListener(Runnable runnable) {
+    enabledListener = runnable;
+  }
+
+  public static synchronized void setDisabledListener(Runnable runnable) {
+    disabledListener = runnable;
+  }
+
+  public static synchronized boolean isEnabled() {
+    return liveWindowEnabled;
   }
 
   /**
