@@ -7,7 +7,6 @@
 #include <stdint.h>
 
 #ifdef __cplusplus
-
 #include <functional>
 #include <initializer_list>
 #include <memory>
@@ -21,7 +20,6 @@
 #include "wpi/StringMap.h"
 #include "wpi/condition_variable.h"
 #include "wpi/mutex.h"
-
 #endif  // __cplusplus
 
 /**
