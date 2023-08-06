@@ -398,7 +398,7 @@ void LiveWindow::UpdateValuesUnsafe() {
           ->StartLiveWindowMode();
     }
     comp->builder->Update();
-  };
+  }
 
   inst.startLiveWindow = false;
 }
