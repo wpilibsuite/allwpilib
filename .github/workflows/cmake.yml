@@ -56,8 +56,6 @@ jobs:
         run: ctest --output-on-failure
 
   build-windows:
-    env:
-      VCPKG_DEFAULT_TRIPLET: x64-windows-release
     name: "Build - Windows"
     runs-on: windows-2019
     steps:
@@ -76,7 +74,7 @@ jobs:
         run: python -m pip install jinja2
 
       - name: configure
-        run: cmake -S . -B build -DWITH_JAVA=OFF -DCMAKE_TOOLCHAIN_FILE=${{ runner.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_INSTALL_OPTIONS=--clean-after-build
+        run: cmake -S . -B build -DWITH_JAVA=OFF -DCMAKE_TOOLCHAIN_FILE=${{ runner.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_INSTALL_OPTIONS=--clean-after-build -DVCPKG_TARGET_TRIPLET=x64-windows-static -DVCPKG_HOST_TRIPLET=x64-windows-static
 
       - name: build
         working-directory: build
