@@ -5,7 +5,8 @@
 #pragma once
 
 #include <functional>
-
+#include <string>
+#include <string_view>
 namespace wpi {
 class Sendable;
 }  // namespace wpi
@@ -18,6 +19,155 @@ namespace frc {
  */
 class LiveWindow final {
  public:
+   using UID = size_t;
+  /**
+   * Adds an object to LiveWindow.
+   *
+   * @param sendable Object to add
+   * @param name Component name
+   */
+  static void AddLW(wpi::Sendable* sendable, std::string_view name);
+
+  /**
+   * Adds an object to LiveWindow.
+   *
+   * @param sendable     Object to add
+   * @param moduleType   A string that defines the module name in the label for
+   *                     the value
+   * @param channel      The channel number the device is plugged into
+   */
+  static void AddLW(wpi::Sendable* sendable, std::string_view moduleType,
+                    int channel);
+
+  /**
+   * Adds an object to LiveWindow.
+   *
+   * @param sendable     Object to add
+   * @param moduleType   A string that defines the module name in the label for
+   *                     the value
+   * @param moduleNumber The number of the particular module type
+   * @param channel      The channel number the device is plugged into
+   */
+  static void AddLW(wpi::Sendable* sendable, std::string_view moduleType,
+                    int moduleNumber, int channel);
+
+  /**
+   * Adds an object to LiveWindow.
+   *
+   * @param sendable Object to add
+   * @param subsystem Subsystem name
+   * @param name Component name
+   */
+  static void AddLW(wpi::Sendable* sendable, std::string_view subsystem,
+                    std::string_view name);
+
+  /**
+   * Adds a child object to an object.  Adds the child object to LiveWindow
+   * if it's not already present.
+   *
+   * @param parent Parent object
+   * @param child Child object
+   */
+  static void AddChild(wpi::Sendable* parent, wpi::Sendable* child);
+
+  /**
+   * Adds a child object to an object.  Adds the child object to LiveWindow
+   * if it's not already present.
+   *
+   * @param parent Parent object
+   * @param child Child object
+   */
+  static void AddChild(wpi::Sendable* parent, void* child);
+
+  /**
+   * Removes an object from LiveWindow.
+   *
+   * @param sendable Object to remove
+   * @return True if the object was removed; false if it was not present
+   */
+  static bool Remove(wpi::Sendable* sendable);
+
+  /**
+   * Moves an object in LiveWindow (for use in move constructors/assignments).
+   *
+   * @param to New object
+   * @param from Old object
+   */
+  static void Move(wpi::Sendable* to, wpi::Sendable* from);
+
+  /**
+   * Determines if an object is in LiveWindow.
+   *
+   * @param sendable object to check
+   * @return True if in LiveWindow, false if not.
+   */
+  static bool Contains(const wpi::Sendable* sendable);
+
+  /**
+   * Gets the name of an object.
+   *
+   * @param sendable Object
+   * @return Name (empty if object is not in LiveWindow)
+   */
+  static std::string GetName(const wpi::Sendable* sendable);
+
+  /**
+   * Sets the name of an object.
+   *
+   * @param sendable Object
+   * @param name Name
+   */
+  static void SetName(wpi::Sendable* sendable, std::string_view name);
+
+  /**
+   * Sets the name of an object with a channel number.
+   *
+   * @param sendable   Object
+   * @param moduleType A string that defines the module name in the label for
+   *                   the value
+   * @param channel    The channel number the device is plugged into
+   */
+  static void SetName(wpi::Sendable* sendable, std::string_view moduleType,
+                      int channel);
+
+  /**
+   * Sets the name of an object with a module and channel number.
+   *
+   * @param sendable     Object
+   * @param moduleType   A string that defines the module name in the label for
+   *                     the value
+   * @param moduleNumber The number of the particular module type
+   * @param channel      The channel number the device is plugged into
+   */
+  static void SetName(wpi::Sendable* sendable, std::string_view moduleType,
+                      int moduleNumber, int channel);
+
+  /**
+   * Sets both the subsystem name and device name of an object.
+   *
+   * @param sendable Object
+   * @param subsystem Subsystem name
+   * @param name Device name
+   */
+  static void SetName(wpi::Sendable* sendable, std::string_view subsystem,
+                      std::string_view name);
+
+  /**
+   * Gets the subsystem name of an object.
+   *
+   * @param sendable Object
+   * @return Subsystem name (empty if object is not in LiveWindow)
+   */
+  static std::string GetSubsystem(const wpi::Sendable* sendable);
+
+  /**
+   * Sets the subsystem name of an object.
+   *
+   * @param sendable Object
+   * @param subsystem Subsystem name
+   */
+  static void SetSubsystem(wpi::Sendable* sendable, std::string_view subsystem);
+
   /**
    * Set function to be called when LiveWindow is enabled.
    *
