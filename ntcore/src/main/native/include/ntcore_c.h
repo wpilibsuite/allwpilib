@@ -16,6 +16,8 @@
 extern "C" {
 #endif
 
+struct WPI_DataLog;
+
 /**
  * @defgroup ntcore_c_api ntcore C API
  *
