@@ -42,7 +42,7 @@ target_include_directories(wpilibNewCommands PUBLIC
 install(TARGETS wpilibNewCommands EXPORT wpilibNewCommands DESTINATION "${main_lib_dest}")
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpilibNewCommands")
 
-if (MSVC OR FLAT_INSTALL_WPILIB)
+if (FLAT_INSTALL_WPILIB)
      set(wpilibNewCommands_config_dir ${wpilib_dest})
  else()
      set(wpilibNewCommands_config_dir share/wpilibNewCommands)
