@@ -815,7 +815,160 @@ void DataLog::AppendStringArray(int entry,
   }
   uint8_t* buf = StartRecord(entry, timestamp, size, 4);
   wpi::support::endian::write32le(buf, arr.size());
-  for (auto sv : arr) {
+  for (auto&& sv : arr) {
     AppendStringImpl(sv);
   }
 }
+
+void DataLog::AppendStringArray(int entry,
+                                std::span<const WPI_DataLog_String> arr,
+                                int64_t timestamp) {
+  if (entry <= 0) {
+    return;
+  }
+  // storage: 4-byte array length, each string prefixed by 4-byte length
+  // calculate total size
+  size_t size = 4;
+  for (auto&& str : arr) {
+    size += 4 + str.len;
+  }
+  std::scoped_lock lock{m_mutex};
+  if (m_paused) {
+    return;
+  }
+  uint8_t* buf = StartRecord(entry, timestamp, size, 4);
+  wpi::support::endian::write32le(buf, arr.size());
+  for (auto&& sv : arr) {
+    AppendStringImpl(sv.str);
+  }
+}
+
+extern "C" {
+
+struct WPI_DataLog* WPI_DataLog_Create(const char* dir, const char* filename,
+                                       double period, const char* extraHeader) {
+  return reinterpret_cast<WPI_DataLog*>(
+      new DataLog{dir, filename, period, extraHeader});
+}
+
+struct WPI_DataLog* WPI_DataLog_Create_Func(
+    void (*write)(void* ptr, const uint8_t* data, size_t len), void* ptr,
+    double period, const char* extraHeader) {
+  return reinterpret_cast<WPI_DataLog*>(
+      new DataLog{[=](auto data) { write(ptr, data.data(), data.size()); },
+                  period, extraHeader});
+}
+
+void WPI_DataLog_Release(struct WPI_DataLog* datalog) {
+  delete reinterpret_cast<DataLog*>(datalog);
+}
+
+void WPI_DataLog_SetFilename(struct WPI_DataLog* datalog,
+                             const char* filename) {
+  reinterpret_cast<DataLog*>(datalog)->SetFilename(filename);
+}
+
+void WPI_DataLog_Flush(struct WPI_DataLog* datalog) {
+  reinterpret_cast<DataLog*>(datalog)->Flush();
+}
+
+void WPI_DataLog_Pause(struct WPI_DataLog* datalog) {
+  reinterpret_cast<DataLog*>(datalog)->Pause();
+}
+
+void WPI_DataLog_Resume(struct WPI_DataLog* datalog) {
+  reinterpret_cast<DataLog*>(datalog)->Resume();
+}
+
+int WPI_DataLog_Start(struct WPI_DataLog* datalog, const char* name,
+                      const char* type, const char* metadata,
+                      int64_t timestamp) {
+  return reinterpret_cast<DataLog*>(datalog)->Start(name, type, metadata,
+                                                    timestamp);
+}
+
+void WPI_DataLog_Finish(struct WPI_DataLog* datalog, int entry,
+                        int64_t timestamp) {
+  reinterpret_cast<DataLog*>(datalog)->Finish(entry, timestamp);
+}
+
+void WPI_DataLog_SetMetadata(struct WPI_DataLog* datalog, int entry,
+                             const char* metadata, int64_t timestamp) {
+  reinterpret_cast<DataLog*>(datalog)->SetMetadata(entry, metadata, timestamp);
+}
+
+void WPI_DataLog_AppendRaw(struct WPI_DataLog* datalog, int entry,
+                           const uint8_t* data, size_t len, int64_t timestamp) {
+  reinterpret_cast<DataLog*>(datalog)->AppendRaw(entry, {data, len}, timestamp);
+}
+
+void WPI_DataLog_AppendBoolean(struct WPI_DataLog* datalog, int entry,
+                               int value, int64_t timestamp) {
+  reinterpret_cast<DataLog*>(datalog)->AppendBoolean(entry, value, timestamp);
+}
+
+void WPI_DataLog_AppendInteger(struct WPI_DataLog* datalog, int entry,
+                               int64_t value, int64_t timestamp) {
+  reinterpret_cast<DataLog*>(datalog)->AppendInteger(entry, value, timestamp);
+}
+
+void WPI_DataLog_AppendFloat(struct WPI_DataLog* datalog, int entry,
+                             float value, int64_t timestamp) {
+  reinterpret_cast<DataLog*>(datalog)->AppendFloat(entry, value, timestamp);
+}
+
+void WPI_DataLog_AppendDouble(struct WPI_DataLog* datalog, int entry,
+                              double value, int64_t timestamp) {
+  reinterpret_cast<DataLog*>(datalog)->AppendDouble(entry, value, timestamp);
+}
+
+void WPI_DataLog_AppendString(struct WPI_DataLog* datalog, int entry,
+                              const char* value, size_t len,
+                              int64_t timestamp) {
+  reinterpret_cast<DataLog*>(datalog)->AppendString(entry, {value, len},
+                                                    timestamp);
+}
+
+void WPI_DataLog_AppendBooleanArray(struct WPI_DataLog* datalog, int entry,
+                                    const int* arr, size_t len,
+                                    int64_t timestamp) {
+  reinterpret_cast<DataLog*>(datalog)->AppendBooleanArray(entry, {arr, len},
+                                                          timestamp);
+}
+
+void WPI_DataLog_AppendBooleanArrayByte(struct WPI_DataLog* datalog, int entry,
+                                        const uint8_t* arr, size_t len,
+                                        int64_t timestamp) {
+  reinterpret_cast<DataLog*>(datalog)->AppendBooleanArray(entry, {arr, len},
+                                                          timestamp);
+}
+
+void WPI_DataLog_AppendIntegerArray(struct WPI_DataLog* datalog, int entry,
+                                    const int64_t* arr, size_t len,
+                                    int64_t timestamp) {
+  reinterpret_cast<DataLog*>(datalog)->AppendIntegerArray(entry, {arr, len},
+                                                          timestamp);
+}
+
+void WPI_DataLog_AppendFloatArray(struct WPI_DataLog* datalog, int entry,
+                                  const float* arr, size_t len,
+                                  int64_t timestamp) {
+  reinterpret_cast<DataLog*>(datalog)->AppendFloatArray(entry, {arr, len},
+                                                        timestamp);
+}
+
+void WPI_DataLog_AppendDoubleArray(struct WPI_DataLog* datalog, int entry,
+                                   const double* arr, size_t len,
+                                   int64_t timestamp) {
+  reinterpret_cast<DataLog*>(datalog)->AppendDoubleArray(entry, {arr, len},
+                                                         timestamp);
+}
+
+void WPI_DataLog_AppendStringArray(struct WPI_DataLog* datalog, int entry,
+                                   const WPI_DataLog_String* arr, size_t len,
+                                   int64_t timestamp) {
+  reinterpret_cast<DataLog*>(datalog)->AppendStringArray(entry, {arr, len},
+                                                         timestamp);
+}
+
+}  // extern "C"
