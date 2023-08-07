@@ -15,7 +15,7 @@ BooleanEvent::BooleanEvent(EventLoop* loop, std::function<bool()> condition)
 }
 
 BooleanEvent::operator std::function<bool()>() {
-  return [state = m_state] { return *state; };
+  return *m_condition;
 }
 
 bool BooleanEvent::GetAsBoolean() const {

@@ -45,13 +45,13 @@ public class BooleanEvent implements BooleanSupplier {
   }
 
   /**
-   * Check the state of this signal (high or low).
+   * Check the state of this signal (high or low) as of the last loop poll.
    *
-   * @return true for the high state, false for the low state.
+   * @return true for the high state, false for the low state. Also false if not polled.
    */
   @Override
   public boolean getAsBoolean() {
-    return m_signal.getAsBoolean();
+    return m_state.get();
   }
 
   /**
@@ -149,12 +149,7 @@ public class BooleanEvent implements BooleanSupplier {
    * @return the negated event
    */
   public BooleanEvent negate() {
-    return new BooleanEvent(m_loop, () -> !m_state.get()) {
-      @Override
-      public boolean getAsBoolean() {
-        return !BooleanEvent.this.getAsBoolean();
-      }
-    };
+    return new BooleanEvent(m_loop, () -> !m_state.get());
   }
 
   /**
@@ -171,23 +166,12 @@ public class BooleanEvent implements BooleanSupplier {
     requireNonNullParam(other, "other", "and");
     if (other instanceof BooleanEvent) {
       var otherEvent = (BooleanEvent) other;
-
       if (m_loop != otherEvent.m_loop) {
         m_loop.bind(() -> otherEvent.m_state.set(otherEvent.m_signal.getAsBoolean()));
       }
-      return new BooleanEvent(m_loop, () -> m_state.get() && otherEvent.m_state.get()) {
-        @Override
-        public boolean getAsBoolean() {
-          return BooleanEvent.this.getAsBoolean() && otherEvent.getAsBoolean();
-        }
-      };
+      return new BooleanEvent(m_loop, () -> m_state.get() && otherEvent.m_state.get());
     }
-    return new BooleanEvent(m_loop, () -> m_state.get() && other.getAsBoolean()) {
-      @Override
-      public boolean getAsBoolean() {
-        return BooleanEvent.this.getAsBoolean() && other.getAsBoolean();
-      }
-    };
+    return new BooleanEvent(m_loop, () -> m_state.get() && other.getAsBoolean());
   }
 
   /**
@@ -204,23 +188,12 @@ public class BooleanEvent implements BooleanSupplier {
     requireNonNullParam(other, "other", "or");
     if (other instanceof BooleanEvent) {
       var otherEvent = (BooleanEvent) other;
-
       if (m_loop != otherEvent.m_loop) {
         m_loop.bind(() -> otherEvent.m_state.set(otherEvent.m_signal.getAsBoolean()));
       }
-      return new BooleanEvent(m_loop, () -> m_state.get() || otherEvent.m_state.get()) {
-        @Override
-        public boolean getAsBoolean() {
-          return BooleanEvent.this.getAsBoolean() || otherEvent.getAsBoolean();
-        }
-      };
+      return new BooleanEvent(m_loop, () -> m_state.get() || otherEvent.m_state.get());
     }
-    return new BooleanEvent(m_loop, () -> m_state.get() || other.getAsBoolean()) {
-      @Override
-      public boolean getAsBoolean() {
-        return BooleanEvent.this.getAsBoolean() || other.getAsBoolean();
-      }
-    };
+    return new BooleanEvent(m_loop, () -> m_state.get() || other.getAsBoolean());
   }
 
   /**

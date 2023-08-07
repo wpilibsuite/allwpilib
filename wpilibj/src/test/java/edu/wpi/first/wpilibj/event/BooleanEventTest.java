@@ -5,8 +5,6 @@
 package edu.wpi.first.wpilibj.event;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -361,117 +359,5 @@ class BooleanEventTest {
     loop.poll();
 
     assertEquals(3, counter.get());
-  }
-
-  @Test
-  void testConditionIsUpdated() {
-    var loop = new EventLoop();
-    var bool1 = new AtomicBoolean(false);
-    var bool2 = new AtomicBoolean(false);
-    var bool3 = new AtomicBoolean(false);
-    var bool4 = new AtomicBoolean(false);
-    var bool5 = new AtomicBoolean(false);
-
-    var event1 = new BooleanEvent(loop, bool1::get).negate();
-    var event2 = new BooleanEvent(loop, bool2::get).and(new BooleanEvent(loop, bool3::get));
-    var event3 = new BooleanEvent(loop, bool4::get).or(new BooleanEvent(loop, bool5::get));
-    var event4 = event2.and(event3);
-    var event5 = event3.or(event2);
-    var event6 = event1.negate();
-
-    assertTrue(event1.getAsBoolean());
-    assertFalse(event2.getAsBoolean());
-    assertFalse(event3.getAsBoolean());
-    assertFalse(event4.getAsBoolean());
-    assertFalse(event5.getAsBoolean());
-    assertFalse(event6.getAsBoolean());
-
-    bool1.set(true);
-    bool2.set(true);
-    bool3.set(true);
-
-    assertFalse(event1.getAsBoolean());
-    assertTrue(event2.getAsBoolean());
-    assertFalse(event3.getAsBoolean());
-    assertFalse(event4.getAsBoolean());
-    assertTrue(event5.getAsBoolean());
-    assertTrue(event6.getAsBoolean());
-
-    bool4.set(true);
-
-    assertTrue(event3.getAsBoolean());
-    assertTrue(event4.getAsBoolean());
-    assertTrue(event5.getAsBoolean());
-
-    bool1.set(false);
-
-    assertTrue(event1.getAsBoolean());
-    assertFalse(event6.getAsBoolean());
-
-    bool2.set(false);
-
-    assertFalse(event2.getAsBoolean());
-    assertFalse(event4.getAsBoolean());
-    assertTrue(event5.getAsBoolean());
-
-    bool4.set(false);
-
-    assertFalse(event3.getAsBoolean());
-    assertFalse(event4.getAsBoolean());
-    assertFalse(event5.getAsBoolean());
-
-    bool5.set(true);
-
-    assertTrue(event3.getAsBoolean());
-    assertFalse(event4.getAsBoolean());
-    assertTrue(event5.getAsBoolean());
-  }
-
-  @Test
-  void testConditionIsUpdatedWithSuppliers() {
-    var loop = new EventLoop();
-    var bool1 = new AtomicBoolean(false);
-    var bool2 = new AtomicBoolean(false);
-    var bool3 = new AtomicBoolean(false);
-    var bool4 = new AtomicBoolean(false);
-    var bool5 = new AtomicBoolean(false);
-    var bool6 = new AtomicBoolean(false);
-
-    var event1 = new BooleanEvent(loop, bool1::get).and(bool2::get);
-    var event2 = new BooleanEvent(loop, bool3::get).or(bool4::get);
-    var event3 = event1.and(bool5::get);
-    var event4 = event2.or(bool6::get);
-
-    assertFalse(event1.getAsBoolean());
-    assertFalse(event2.getAsBoolean());
-    assertFalse(event3.getAsBoolean());
-    assertFalse(event4.getAsBoolean());
-
-    bool1.set(true);
-    bool2.set(true);
-    bool3.set(true);
-
-    assertTrue(event1.getAsBoolean());
-    assertTrue(event2.getAsBoolean());
-    assertFalse(event3.getAsBoolean());
-    assertTrue(event4.getAsBoolean());
-
-    bool5.set(true);
-
-    assertTrue(event3.getAsBoolean());
-
-    bool1.set(false);
-    bool2.set(false);
-    bool3.set(false);
-    bool5.set(false);
-
-    assertFalse(event1.getAsBoolean());
-    assertFalse(event2.getAsBoolean());
-    assertFalse(event3.getAsBoolean());
-    assertFalse(event3.getAsBoolean());
-
-    bool6.set(true);
-
-    assertTrue(event4.getAsBoolean());
   }
 }

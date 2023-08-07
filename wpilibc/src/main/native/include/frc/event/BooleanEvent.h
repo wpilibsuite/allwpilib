@@ -40,9 +40,9 @@ class BooleanEvent {
   BooleanEvent(EventLoop* loop, std::function<bool()> condition);
 
   /**
-   * Check whether this event is active or not.
+   * Check whether this event is active or not as of the last loop poll.
    *
-   * @return true if active.
+   * @return true if active, false if not active or not polled.
    */
   bool GetAsBoolean() const;
 
