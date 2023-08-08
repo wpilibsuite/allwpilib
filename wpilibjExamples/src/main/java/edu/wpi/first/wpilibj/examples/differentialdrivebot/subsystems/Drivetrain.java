@@ -19,14 +19,15 @@ import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 
 /** Represents a differential drive style drivetrain. */
 public class Drivetrain {
-
   private final MotorController m_leftLeader = new PWMSparkMax(DriveConstants.kLeftMotor1Port);
   private final MotorController m_leftFollower = new PWMSparkMax(DriveConstants.kLeftMotor2Port);
   private final MotorController m_rightLeader = new PWMSparkMax(DriveConstants.kRightMotor1Port);
   private final MotorController m_rightFollower = new PWMSparkMax(DriveConstants.kRightMotor2Port);
 
-  private final Encoder m_leftEncoder = new Encoder(DriveConstants.kLeftEncoderPorts[0], DriveConstants.kLeftEncoderPorts[1]);
-  private final Encoder m_rightEncoder = new Encoder(DriveConstants.kRightEncoderPorts[0], DriveConstants.kRightEncoderPorts[1]);
+  private final Encoder m_leftEncoder =
+      new Encoder(DriveConstants.kLeftEncoderPorts[0], DriveConstants.kLeftEncoderPorts[1]);
+  private final Encoder m_rightEncoder =
+      new Encoder(DriveConstants.kRightEncoderPorts[0], DriveConstants.kRightEncoderPorts[1]);
 
   private final MotorControllerGroup m_leftGroup =
       new MotorControllerGroup(m_leftLeader, m_leftFollower);
@@ -35,8 +36,10 @@ public class Drivetrain {
 
   private final AnalogGyro m_gyro = new AnalogGyro(DriveConstants.kGyroPort);
 
-  private final PIDController m_leftPIDController = new PIDController(DriveConstants.kLeftVelP, 0, 0);
-  private final PIDController m_rightPIDController = new PIDController(DriveConstants.kRightVelP, 0, 0);
+  private final PIDController m_leftPIDController =
+      new PIDController(DriveConstants.kLeftVelP, 0, 0);
+  private final PIDController m_rightPIDController =
+      new PIDController(DriveConstants.kRightVelP, 0, 0);
 
   private final DifferentialDriveKinematics m_kinematics =
       new DifferentialDriveKinematics(DriveConstants.kTrackWidth);
@@ -44,7 +47,8 @@ public class Drivetrain {
   private final DifferentialDriveOdometry m_odometry;
 
   // Gains are for example purposes only - must be determined for your own robot!
-  private final SimpleMotorFeedforward m_feedforward = new SimpleMotorFeedforward(DriveConstants.kFeedforwardS, DriveConstants.kFeedforwardV);
+  private final SimpleMotorFeedforward m_feedforward =
+      new SimpleMotorFeedforward(DriveConstants.kFeedforwardS, DriveConstants.kFeedforwardV);
 
   /**
    * Constructs a differential drive object. Sets the encoder distance per pulse and resets the
@@ -61,8 +65,10 @@ public class Drivetrain {
     // Set the distance per pulse for the drive encoders. We can simply use the
     // distance traveled for one rotation of the wheel divided by the encoder
     // resolution.
-    m_leftEncoder.setDistancePerPulse(2 * Math.PI * DriveConstants.kWheelRadius / DriveConstants.kEncoderResolution);
-    m_rightEncoder.setDistancePerPulse(2 * Math.PI * DriveConstants.kWheelRadius / DriveConstants.kEncoderResolution);
+    m_leftEncoder.setDistancePerPulse(
+        2 * Math.PI * DriveConstants.kWheelRadius / DriveConstants.kEncoderResolution);
+    m_rightEncoder.setDistancePerPulse(
+        2 * Math.PI * DriveConstants.kWheelRadius / DriveConstants.kEncoderResolution);
 
     m_leftEncoder.reset();
     m_rightEncoder.reset();
