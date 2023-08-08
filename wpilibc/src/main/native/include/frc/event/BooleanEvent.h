@@ -69,7 +69,7 @@ class BooleanEvent {
                [](EventLoop* loop, std::function<bool()> condition) {
                  return T(loop, condition);
                }) {
-    return ctor(m_loop, m_condition);
+    return ctor(m_loop, *m_condition);
   }
 
   /**
@@ -91,6 +91,15 @@ class BooleanEvent {
    */
   BooleanEvent operator&&(BooleanEvent rhs);
 
+  /**
+   * Composes this event with another event, returning a new event that is
+   * active when both events are active.
+   *
+   * <p>The new event will use this event's polling loop.
+   *
+   * @param rhs the event to compose with
+   * @return the event that is active when both events are active
+   */
   BooleanEvent operator&&(std::function<bool()> rhs);
 
   /**
@@ -104,6 +113,15 @@ class BooleanEvent {
    */
   BooleanEvent operator||(BooleanEvent rhs);
 
+  /**
+   * Composes this event with another event, returning a new event that is
+   * active when either event is active.
+   *
+   * <p>The new event will use this event's polling loop.
+   *
+   * @param rhs the event to compose with
+   * @return the event that is active when either event is active
+   */
   BooleanEvent operator||(std::function<bool()> rhs);
 
   /**
