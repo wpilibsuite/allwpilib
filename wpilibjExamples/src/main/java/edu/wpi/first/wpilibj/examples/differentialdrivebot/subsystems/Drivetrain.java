@@ -12,44 +12,39 @@ import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.examples.differentialdrivebot.Constants.DriveConstants;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 
 /** Represents a differential drive style drivetrain. */
 public class Drivetrain {
-  public static final double kMaxSpeed = 3.0; // meters per second
-  public static final double kMaxAngularSpeed = 2 * Math.PI; // one rotation per second
 
-  private static final double kTrackWidth = 0.381 * 2; // meters
-  private static final double kWheelRadius = 0.0508; // meters
-  private static final int kEncoderResolution = 4096;
+  private final MotorController m_leftLeader = new PWMSparkMax(DriveConstants.kLeftMotor1Port);
+  private final MotorController m_leftFollower = new PWMSparkMax(DriveConstants.kLeftMotor2Port);
+  private final MotorController m_rightLeader = new PWMSparkMax(DriveConstants.kRightMotor1Port);
+  private final MotorController m_rightFollower = new PWMSparkMax(DriveConstants.kRightMotor2Port);
 
-  private final MotorController m_leftLeader = new PWMSparkMax(1);
-  private final MotorController m_leftFollower = new PWMSparkMax(2);
-  private final MotorController m_rightLeader = new PWMSparkMax(3);
-  private final MotorController m_rightFollower = new PWMSparkMax(4);
-
-  private final Encoder m_leftEncoder = new Encoder(0, 1);
-  private final Encoder m_rightEncoder = new Encoder(2, 3);
+  private final Encoder m_leftEncoder = new Encoder(DriveConstants.kLeftEncoderPorts[0], DriveConstants.kLeftEncoderPorts[1]);
+  private final Encoder m_rightEncoder = new Encoder(DriveConstants.kRightEncoderPorts[0], DriveConstants.kRightEncoderPorts[1]);
 
   private final MotorControllerGroup m_leftGroup =
       new MotorControllerGroup(m_leftLeader, m_leftFollower);
   private final MotorControllerGroup m_rightGroup =
       new MotorControllerGroup(m_rightLeader, m_rightFollower);
 
-  private final AnalogGyro m_gyro = new AnalogGyro(0);
+  private final AnalogGyro m_gyro = new AnalogGyro(DriveConstants.kGyroPort);
 
-  private final PIDController m_leftPIDController = new PIDController(1, 0, 0);
-  private final PIDController m_rightPIDController = new PIDController(1, 0, 0);
+  private final PIDController m_leftPIDController = new PIDController(DriveConstants.kLeftVelP, 0, 0);
+  private final PIDController m_rightPIDController = new PIDController(DriveConstants.kRightVelP, 0, 0);
 
   private final DifferentialDriveKinematics m_kinematics =
-      new DifferentialDriveKinematics(kTrackWidth);
+      new DifferentialDriveKinematics(DriveConstants.kTrackWidth);
 
   private final DifferentialDriveOdometry m_odometry;
 
   // Gains are for example purposes only - must be determined for your own robot!
-  private final SimpleMotorFeedforward m_feedforward = new SimpleMotorFeedforward(1, 3);
+  private final SimpleMotorFeedforward m_feedforward = new SimpleMotorFeedforward(DriveConstants.kFeedforwardS, DriveConstants.kFeedforwardV);
 
   /**
    * Constructs a differential drive object. Sets the encoder distance per pulse and resets the
@@ -66,8 +61,8 @@ public class Drivetrain {
     // Set the distance per pulse for the drive encoders. We can simply use the
     // distance traveled for one rotation of the wheel divided by the encoder
     // resolution.
-    m_leftEncoder.setDistancePerPulse(2 * Math.PI * kWheelRadius / kEncoderResolution);
-    m_rightEncoder.setDistancePerPulse(2 * Math.PI * kWheelRadius / kEncoderResolution);
+    m_leftEncoder.setDistancePerPulse(2 * Math.PI * DriveConstants.kWheelRadius / DriveConstants.kEncoderResolution);
+    m_rightEncoder.setDistancePerPulse(2 * Math.PI * DriveConstants.kWheelRadius / DriveConstants.kEncoderResolution);
 
     m_leftEncoder.reset();
     m_rightEncoder.reset();
