@@ -120,7 +120,7 @@ public class PowerDistributionFaults {
       return true;
     }
   }
-  
+
   /**
    * Constructs from a bitfield.
    *

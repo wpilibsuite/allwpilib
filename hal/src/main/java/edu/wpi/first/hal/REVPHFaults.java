@@ -51,6 +51,51 @@ public class REVPHFaults {
   public final boolean HardwareFault;
 
   /**
+   * Gets whether there is a fault at a specified channel.
+   * @param channelIndex Index to check for faults.
+   * @return If there is a fault at the specified index. If the index
+   * does not map to an actual channel, returns 1.
+  */
+  public final boolean getChannelFaultsAtIndex(int channelIndex) {
+    switch (channelIndex) {
+      case 0:
+        return Channel0Fault;
+      case 1:
+        return Channel1Fault;
+      case 2:
+        return Channel2Fault;
+      case 3:
+        return Channel3Fault;
+      case 4:
+        return Channel4Fault;
+      case 5:
+        return Channel5Fault;
+      case 6:
+        return Channel6Fault;
+      case 7:
+        return Channel7Fault;
+      case 8:
+        return Channel8Fault;
+      case 9:
+        return Channel9Fault;
+      case 10:
+        return Channel10Fault;
+      case 11:
+        return Channel11Fault;
+      case 12:
+        return Channel12Fault;
+      case 13:
+        return Channel13Fault;
+      case 14:
+        return Channel14Fault;
+      case 15:
+        return Channel15Fault;
+      default:
+        return true;
+    }
+  }
+
+  /**
    * Called from HAL to construct.
    *
    * @param faults the fault bitfields

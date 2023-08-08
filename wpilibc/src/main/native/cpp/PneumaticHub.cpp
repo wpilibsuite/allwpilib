@@ -339,6 +339,46 @@ PneumaticHub::StickyFaults PneumaticHub::GetStickyFaults() const {
   return stickyFaults;
 }
 
+uint32_t PneumaticHub::Faults::getChannelFaultAtIndex(
+    uint32_t channelIndex) const {
+  switch (channelIndex) {
+    case 0:
+      return this->Channel0Fault;
+    case 1:
+      return this->Channel1Fault;
+    case 2:
+      return this->Channel2Fault;
+    case 3:
+      return this->Channel3Fault;
+    case 4:
+      return this->Channel4Fault;
+    case 5:
+      return this->Channel5Fault;
+    case 6:
+      return this->Channel6Fault;
+    case 7:
+      return this->Channel7Fault;
+    case 8:
+      return this->Channel8Fault;
+    case 9:
+      return this->Channel9Fault;
+    case 10:
+      return this->Channel10Fault;
+    case 11:
+      return this->Channel11Fault;
+    case 12:
+      return this->Channel12Fault;
+    case 13:
+      return this->Channel13Fault;
+    case 14:
+      return this->Channel14Fault;
+    case 15:
+      return this->Channel15Fault;
+    default:
+      return 1;
+  }
+}
+
 void PneumaticHub::ClearStickyFaults() {
   int32_t status = 0;
   HAL_ClearREVPHStickyFaults(m_handle, &status);

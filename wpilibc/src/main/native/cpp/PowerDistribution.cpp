@@ -172,115 +172,115 @@ PowerDistribution::Faults PowerDistribution::GetFaults() const {
   return faults;
 }
 
-uint32_t PowerDistribution::Faults::getBreakerFaultAtChannel(uint32_t channelIndex) const {
-  switch (channelIndex)
-  {
-  case 0:
-    return this->Channel0BreakerFault;
-  case 1:
-    return this->Channel11BreakerFault;
-  case 2:
-    return this->Channel2BreakerFault;
-  case 3:
-    return this->Channel3BreakerFault;
-  case 4:
-    return this->Channel4BreakerFault;
-  case 5:
-    return this->Channel5BreakerFault;
-  case 6:
-    return this->Channel6BreakerFault;
-  case 7:
-    return this->Channel7BreakerFault;
-  case 8:
-    return this->Channel8BreakerFault;
-  case 9:
-    return this->Channel9BreakerFault;
-  case 10:
-    return this->Channel10BreakerFault;
-  case 11:
-    return this->Channel11BreakerFault;
-  case 12:
-    return this->Channel12BreakerFault;
-  case 13:
-    return this->Channel13BreakerFault;
-  case 14:
-    return this->Channel14BreakerFault;
-  case 15:
-    return this->Channel15BreakerFault;
-  case 16:
-    return this->Channel16BreakerFault;
-  case 17:
-    return this->Channel17BreakerFault;
-  case 18:
-    return this->Channel18BreakerFault;
-  case 19:
-    return this->Channel19BreakerFault;
-  case 20:
-    return this->Channel20BreakerFault;
-  case 21:
-    return this->Channel21BreakerFault;
-  case 22:
-    return this->Channel22BreakerFault;
-  case 23:
-    return this->Channel23BreakerFault;
-  default:
-    return 1;
+uint32_t PowerDistribution::Faults::getBreakerFaultAtChannel(
+    uint32_t channelIndex) const {
+  switch (channelIndex) {
+    case 0:
+      return this->Channel0BreakerFault;
+    case 1:
+      return this->Channel11BreakerFault;
+    case 2:
+      return this->Channel2BreakerFault;
+    case 3:
+      return this->Channel3BreakerFault;
+    case 4:
+      return this->Channel4BreakerFault;
+    case 5:
+      return this->Channel5BreakerFault;
+    case 6:
+      return this->Channel6BreakerFault;
+    case 7:
+      return this->Channel7BreakerFault;
+    case 8:
+      return this->Channel8BreakerFault;
+    case 9:
+      return this->Channel9BreakerFault;
+    case 10:
+      return this->Channel10BreakerFault;
+    case 11:
+      return this->Channel11BreakerFault;
+    case 12:
+      return this->Channel12BreakerFault;
+    case 13:
+      return this->Channel13BreakerFault;
+    case 14:
+      return this->Channel14BreakerFault;
+    case 15:
+      return this->Channel15BreakerFault;
+    case 16:
+      return this->Channel16BreakerFault;
+    case 17:
+      return this->Channel17BreakerFault;
+    case 18:
+      return this->Channel18BreakerFault;
+    case 19:
+      return this->Channel19BreakerFault;
+    case 20:
+      return this->Channel20BreakerFault;
+    case 21:
+      return this->Channel21BreakerFault;
+    case 22:
+      return this->Channel22BreakerFault;
+    case 23:
+      return this->Channel23BreakerFault;
+    default:
+      return 1;
   }
 }
 
-uint32_t PowerDistribution::StickyFaults::getBreakerFaultAtChannel(uint32_t channelIndex) const {
-  switch (channelIndex)
-  {
-  case 0:
-    return this->Channel0BreakerFault;
-  case 1:
-    return this->Channel11BreakerFault;
-  case 2:
-    return this->Channel2BreakerFault;
-  case 3:
-    return this->Channel3BreakerFault;
-  case 4:
-    return this->Channel4BreakerFault;
-  case 5:
-    return this->Channel5BreakerFault;
-  case 6:
-    return this->Channel6BreakerFault;
-  case 7:
-    return this->Channel7BreakerFault;
-  case 8:
-    return this->Channel8BreakerFault;
-  case 9:
-    return this->Channel9BreakerFault;
-  case 10:
-    return this->Channel10BreakerFault;
-  case 11:
-    return this->Channel11BreakerFault;
-  case 12:
-    return this->Channel12BreakerFault;
-  case 13:
-    return this->Channel13BreakerFault;
-  case 14:
-    return this->Channel14BreakerFault;
-  case 15:
-    return this->Channel15BreakerFault;
-  case 16:
-    return this->Channel16BreakerFault;
-  case 17:
-    return this->Channel17BreakerFault;
-  case 18:
-    return this->Channel18BreakerFault;
-  case 19:
-    return this->Channel19BreakerFault;
-  case 20:
-    return this->Channel20BreakerFault;
-  case 21:
-    return this->Channel21BreakerFault;
-  case 22:
-    return this->Channel22BreakerFault;
-  case 23:
-    return this->Channel23BreakerFault;
-  default:
-    return 1;
+uint32_t PowerDistribution::StickyFaults::getBreakerFaultAtChannel(
+    uint32_t channelIndex) const {
+  switch (channelIndex) {
+    case 0:
+      return this->Channel0BreakerFault;
+    case 1:
+      return this->Channel11BreakerFault;
+    case 2:
+      return this->Channel2BreakerFault;
+    case 3:
+      return this->Channel3BreakerFault;
+    case 4:
+      return this->Channel4BreakerFault;
+    case 5:
+      return this->Channel5BreakerFault;
+    case 6:
+      return this->Channel6BreakerFault;
+    case 7:
+      return this->Channel7BreakerFault;
+    case 8:
+      return this->Channel8BreakerFault;
+    case 9:
+      return this->Channel9BreakerFault;
+    case 10:
+      return this->Channel10BreakerFault;
+    case 11:
+      return this->Channel11BreakerFault;
+    case 12:
+      return this->Channel12BreakerFault;
+    case 13:
+      return this->Channel13BreakerFault;
+    case 14:
+      return this->Channel14BreakerFault;
+    case 15:
+      return this->Channel15BreakerFault;
+    case 16:
+      return this->Channel16BreakerFault;
+    case 17:
+      return this->Channel17BreakerFault;
+    case 18:
+      return this->Channel18BreakerFault;
+    case 19:
+      return this->Channel19BreakerFault;
+    case 20:
+      return this->Channel20BreakerFault;
+    case 21:
+      return this->Channel21BreakerFault;
+    case 22:
+      return this->Channel22BreakerFault;
+    case 23:
+      return this->Channel23BreakerFault;
+    default:
+      return 1;
   }
 }
 

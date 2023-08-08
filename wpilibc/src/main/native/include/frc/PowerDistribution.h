@@ -163,8 +163,9 @@ class PowerDistribution : public wpi::Sendable,
     /**
      * Gets whether there is a breaker fault at a specified channel.
      * @param channelIndex Index to check for faults.
-     * @return If there is a breaker fault at the specified index. If the index does not map to an actual channel, returns 1.
-    */
+     * @return If there is a breaker fault at the specified index. If the index
+     * does not map to an actual channel, returns 1.
+     */
     uint32_t getBreakerFaultAtChannel(uint32_t channelIndex) const;
   };
 
@@ -203,8 +204,9 @@ class PowerDistribution : public wpi::Sendable,
     /**
      * Gets whether there is a sticky breaker fault at a specified channel.
      * @param channelIndex Index to check for sticky faults.
-     * @return If there is a sticky breaker fault at the specified index. If the index does not map to an actual channel, returns 1.
-    */
+     * @return If there is a sticky breaker fault at the specified index. If the
+     * index does not map to an actual channel, returns 1.
+     */
     uint32_t getBreakerFaultAtChannel(uint32_t channelIndex) const;
   };
 

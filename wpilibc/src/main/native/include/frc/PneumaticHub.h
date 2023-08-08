@@ -157,6 +157,14 @@ class PneumaticHub : public PneumaticsBase {
     uint32_t Brownout : 1;
     uint32_t CanWarning : 1;
     uint32_t HardwareFault : 1;
+
+    /**
+     * Gets whether there is a fault at a specified channel.
+     * @param channelIndex Index to check for faults.
+     * @return If there is a fault at the specified index. If the index
+     * does not map to an actual channel, returns 1.
+     */
+    uint32_t getChannelFaultAtIndex(uint32_t channelIndex) const;
   };
 
   /**
