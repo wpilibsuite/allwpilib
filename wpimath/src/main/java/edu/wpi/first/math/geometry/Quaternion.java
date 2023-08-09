@@ -16,13 +16,20 @@ import java.util.Objects;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Quaternion {
-  private final double m_r;
-  private final Vector<N3> m_v;
+  // Scalar r in versor form
+  private final double m_w;
+
+  // Vector v in versor form
+  private final double m_x;
+  private final double m_y;
+  private final double m_z;
 
   /** Constructs a quaternion with a default angle of 0 degrees. */
   public Quaternion() {
-    m_r = 1.0;
-    m_v = VecBuilder.fill(0.0, 0.0, 0.0);
+    m_w = 1.0;
+    m_x = 0.0;
+    m_y = 0.0;
+    m_z = 0.0;
   }
 
   /**
@@ -39,8 +46,10 @@ public class Quaternion {
       @JsonProperty(required = true, value = "X") double x,
       @JsonProperty(required = true, value = "Y") double y,
       @JsonProperty(required = true, value = "Z") double z) {
-    m_r = w;
-    m_v = VecBuilder.fill(x, y, z);
+    m_w = w;
+    m_x = x;
+    m_y = y;
+    m_z = z;
   }
 
   /**
@@ -51,28 +60,29 @@ public class Quaternion {
    */
   public Quaternion times(Quaternion other) {
     // https://en.wikipedia.org/wiki/Quaternion#Scalar_and_vector_parts
-    final var r1 = m_r;
-    final var v1 = m_v;
-    final var r2 = other.m_r;
-    final var v2 = other.m_v;
+    final var r1 = m_w;
+    final var r2 = other.m_w;
+
+    // v₁ ⋅ v₂
+    double dot = m_x * other.m_x + m_y * other.m_y + m_z * other.m_z;
 
     // v₁ x v₂
-    var cross =
-        VecBuilder.fill(
-            v1.get(1, 0) * v2.get(2, 0) - v2.get(1, 0) * v1.get(2, 0),
-            v2.get(0, 0) * v1.get(2, 0) - v1.get(0, 0) * v2.get(2, 0),
-            v1.get(0, 0) * v2.get(1, 0) - v2.get(0, 0) * v1.get(1, 0));
+    double cross_x = m_y * other.m_z - other.m_y * m_z;
+    double cross_y = other.m_x * m_z - m_x * other.m_z;
+    double cross_z = m_x * other.m_y - other.m_x * m_y;
 
-    // v = r₁v₂ + r₂v₁ + v₁ x v₂
-    final var v = v2.times(r1).plus(v1.times(r2)).plus(cross);
-
-    return new Quaternion(r1 * r2 - v1.dot(v2), v.get(0, 0), v.get(1, 0), v.get(2, 0));
+    return new Quaternion(
+        // r = r₁r₂ − v₁ ⋅ v₂
+        r1 * r2 - dot,
+        // v = r₁v₂ + r₂v₁ + v₁ x v₂
+        r1 * other.m_x + r2 * m_x + cross_x,
+        r1 * other.m_y + r2 * m_y + cross_y,
+        r1 * other.m_z + r2 * m_z + cross_z);
   }
 
   @Override
   public String toString() {
-    return String.format(
-        "Quaternion(%s, %s, %s, %s)", m_r, m_v.get(0, 0), m_v.get(1, 0), m_v.get(2, 0));
+    return String.format("Quaternion(%s, %s, %s, %s)", getW(), getX(), getY(), getZ());
   }
 
   /**
@@ -86,14 +96,19 @@ public class Quaternion {
     if (obj instanceof Quaternion) {
       var other = (Quaternion) obj;
 
-      return Math.abs(m_r * other.m_r + m_v.dot(other.m_v)) > 1.0 - 1E-9;
+      return Math.abs(
+              getW() * other.getW()
+                  + getX() * other.getX()
+                  + getY() * other.getY()
+                  + getZ() * other.getZ())
+          > 1.0 - 1E-9;
     }
     return false;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(m_r, m_v);
+    return Objects.hash(m_w, m_x, m_y, m_z);
   }
 
   /**
@@ -102,7 +117,7 @@ public class Quaternion {
    * @return The inverse quaternion.
    */
   public Quaternion inverse() {
-    return new Quaternion(m_r, -m_v.get(0, 0), -m_v.get(1, 0), -m_v.get(2, 0));
+    return new Quaternion(getW(), -getX(), -getY(), -getZ());
   }
 
   /**
@@ -126,7 +141,7 @@ public class Quaternion {
    */
   @JsonProperty(value = "W")
   public double getW() {
-    return m_r;
+    return m_w;
   }
 
   /**
@@ -136,7 +151,7 @@ public class Quaternion {
    */
   @JsonProperty(value = "X")
   public double getX() {
-    return m_v.get(0, 0);
+    return m_x;
   }
 
   /**
@@ -146,7 +161,7 @@ public class Quaternion {
    */
   @JsonProperty(value = "Y")
   public double getY() {
-    return m_v.get(1, 0);
+    return m_y;
   }
 
   /**
@@ -156,7 +171,7 @@ public class Quaternion {
    */
   @JsonProperty(value = "Z")
   public double getZ() {
-    return m_v.get(2, 0);
+    return m_z;
   }
 
   /**
@@ -171,15 +186,18 @@ public class Quaternion {
     // Sound State Representation through Encapsulation of Manifolds"
     //
     // https://arxiv.org/pdf/1107.1119.pdf
-    double norm = m_v.norm();
+    double norm = Math.sqrt(getX() * getX() + getY() * getY() + getZ() * getZ());
 
     if (norm < 1e-9) {
-      return m_v.times(2.0 / getW() - 2.0 / 3.0 * norm * norm / (getW() * getW() * getW()));
+      double coeff = 2.0 / getW() - 2.0 / 3.0 * norm * norm / (getW() * getW() * getW());
+      return VecBuilder.fill(coeff * getX(), coeff * getY(), coeff * getZ());
     } else {
       if (getW() < 0.0) {
-        return m_v.times(2.0 * Math.atan2(-norm, -getW()) / norm);
+        double coeff = 2.0 * Math.atan2(-norm, -getW()) / norm;
+        return VecBuilder.fill(coeff * getX(), coeff * getY(), coeff * getZ());
       } else {
-        return m_v.times(2.0 * Math.atan2(norm, getW()) / norm);
+        double coeff = 2.0 * Math.atan2(norm, getW()) / norm;
+        return VecBuilder.fill(coeff * getX(), coeff * getY(), coeff * getZ());
       }
     }
   }
