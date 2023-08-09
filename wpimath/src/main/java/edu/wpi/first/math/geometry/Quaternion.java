@@ -188,17 +188,17 @@ public class Quaternion {
     // https://arxiv.org/pdf/1107.1119.pdf
     double norm = Math.sqrt(getX() * getX() + getY() * getY() + getZ() * getZ());
 
+    double coeff;
     if (norm < 1e-9) {
-      double coeff = 2.0 / getW() - 2.0 / 3.0 * norm * norm / (getW() * getW() * getW());
-      return VecBuilder.fill(coeff * getX(), coeff * getY(), coeff * getZ());
+      coeff = 2.0 / getW() - 2.0 / 3.0 * norm * norm / (getW() * getW() * getW());
     } else {
       if (getW() < 0.0) {
-        double coeff = 2.0 * Math.atan2(-norm, -getW()) / norm;
-        return VecBuilder.fill(coeff * getX(), coeff * getY(), coeff * getZ());
+        coeff = 2.0 * Math.atan2(-norm, -getW()) / norm;
       } else {
-        double coeff = 2.0 * Math.atan2(norm, getW()) / norm;
-        return VecBuilder.fill(coeff * getX(), coeff * getY(), coeff * getZ());
+        coeff = 2.0 * Math.atan2(norm, getW()) / norm;
       }
     }
+
+    return VecBuilder.fill(coeff * getX(), coeff * getY(), coeff * getZ());
   }
 }
