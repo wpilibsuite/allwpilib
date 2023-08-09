@@ -53,9 +53,39 @@ public final class WPIMathJNI {
    * @param states Number of states in A matrix.
    * @param inputs Number of inputs in B matrix.
    * @param S Array storage for DARE solution.
+   * @throws IllegalArgumentException if Q isn't symmetric positive semidefinite.
+   * @throws IllegalArgumentException if R isn't symmetric positive definite.
+   * @throws IllegalArgumentException if the (A, B) pair isn't stabilizable.
+   * @throws IllegalArgumentException if the (A, C) pair where Q = CᵀC isn't detectable.
    */
-  public static native void dare(
+  public static native void dareABQR(
       double[] A, double[] B, double[] Q, double[] R, int states, int inputs, double[] S);
+
+  /**
+   * Solves the discrete alegebraic Riccati equation.
+   *
+   * @param A Array containing elements of A in row-major order.
+   * @param B Array containing elements of B in row-major order.
+   * @param Q Array containing elements of Q in row-major order.
+   * @param R Array containing elements of R in row-major order.
+   * @param N Array containing elements of N in row-major order.
+   * @param states Number of states in A matrix.
+   * @param inputs Number of inputs in B matrix.
+   * @param S Array storage for DARE solution.
+   * @throws IllegalArgumentException if Q − NR⁻¹Nᵀ isn't symmetric positive semidefinite.
+   * @throws IllegalArgumentException if R isn't symmetric positive definite.
+   * @throws IllegalArgumentException if the (A, B) pair isn't stabilizable.
+   * @throws IllegalArgumentException if the (A, C) pair where Q = CᵀC isn't detectable.
+   */
+  public static native void dareABQRN(
+      double[] A,
+      double[] B,
+      double[] Q,
+      double[] R,
+      double[] N,
+      int states,
+      int inputs,
+      double[] S);
 
   /**
    * Computes the matrix exp.

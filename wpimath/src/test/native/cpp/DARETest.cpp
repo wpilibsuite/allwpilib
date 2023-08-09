@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <stdexcept>
+
 #include <fmt/core.h>
 
 #include "Eigen/Core"
@@ -71,7 +73,6 @@ void ExpectDARESolution(const Eigen::Ref<const Eigen::MatrixXd>& A,
   ExpectMatrixEqual(Y, Eigen::MatrixXd::Zero(X.rows(), X.cols()), 1e-10);
 }
 
-// NOLINTNEXTLINE(google-readability-avoid-underscore-in-googletest-name)
 TEST(DARETest, NonInvertibleA_ABQR) {
   // Example 2 of "On the Numerical Solution of the Discrete-Time Algebraic
   // Riccati Equation"
@@ -91,7 +92,6 @@ TEST(DARETest, NonInvertibleA_ABQR) {
   ExpectDARESolution(A, B, Q, R, X);
 }
 
-// NOLINTNEXTLINE(google-readability-avoid-underscore-in-googletest-name)
 TEST(DARETest, NonInvertibleA_ABQRN) {
   // Example 2 of "On the Numerical Solution of the Discrete-Time Algebraic
   // Riccati Equation"
@@ -117,7 +117,6 @@ TEST(DARETest, NonInvertibleA_ABQRN) {
   ExpectDARESolution(A, B, Q, R, N, X);
 }
 
-// NOLINTNEXTLINE(google-readability-avoid-underscore-in-googletest-name)
 TEST(DARETest, InvertibleA_ABQR) {
   Eigen::MatrixXd A{2, 2};
   A << 1, 1, 0, 1;
@@ -134,7 +133,6 @@ TEST(DARETest, InvertibleA_ABQR) {
   ExpectDARESolution(A, B, Q, R, X);
 }
 
-// NOLINTNEXTLINE(google-readability-avoid-underscore-in-googletest-name)
 TEST(DARETest, InvertibleA_ABQRN) {
   Eigen::MatrixXd A{2, 2};
   A << 1, 1, 0, 1;
@@ -157,7 +155,6 @@ TEST(DARETest, InvertibleA_ABQRN) {
   ExpectDARESolution(A, B, Q, R, N, X);
 }
 
-// NOLINTNEXTLINE(google-readability-avoid-underscore-in-googletest-name)
 TEST(DARETest, FirstGeneralizedEigenvalueOfSTIsStable_ABQR) {
   // The first generalized eigenvalue of (S, T) is stable
 
@@ -176,7 +173,6 @@ TEST(DARETest, FirstGeneralizedEigenvalueOfSTIsStable_ABQR) {
   ExpectDARESolution(A, B, Q, R, X);
 }
 
-// NOLINTNEXTLINE(google-readability-avoid-underscore-in-googletest-name)
 TEST(DARETest, FirstGeneralizedEigenvalueOfSTIsStable_ABQRN) {
   // The first generalized eigenvalue of (S, T) is stable
 
@@ -201,7 +197,6 @@ TEST(DARETest, FirstGeneralizedEigenvalueOfSTIsStable_ABQRN) {
   ExpectDARESolution(A, B, Q, R, N, X);
 }
 
-// NOLINTNEXTLINE(google-readability-avoid-underscore-in-googletest-name)
 TEST(DARETest, IdentitySystem_ABQR) {
   const Eigen::MatrixXd A{Eigen::Matrix2d::Identity()};
   const Eigen::MatrixXd B{Eigen::Matrix2d::Identity()};
@@ -214,7 +209,6 @@ TEST(DARETest, IdentitySystem_ABQR) {
   ExpectDARESolution(A, B, Q, R, X);
 }
 
-// NOLINTNEXTLINE(google-readability-avoid-underscore-in-googletest-name)
 TEST(DARETest, IdentitySystem_ABQRN) {
   const Eigen::MatrixXd A{Eigen::Matrix2d::Identity()};
   const Eigen::MatrixXd B{Eigen::Matrix2d::Identity()};
@@ -226,4 +220,111 @@ TEST(DARETest, IdentitySystem_ABQRN) {
   ExpectMatrixEqual(X, X.transpose(), 1e-10);
   ExpectPositiveSemidefinite(X);
   ExpectDARESolution(A, B, Q, R, N, X);
+}
+
+TEST(DARETest, MoreInputsThanStates_ABQR) {
+  const Eigen::MatrixXd A{Eigen::Matrix2d::Identity()};
+  const Eigen::MatrixXd B{{1.0, 0.0, 0.0}, {0.0, 0.5, 0.3}};
+  const Eigen::MatrixXd Q{Eigen::Matrix2d::Identity()};
+  const Eigen::MatrixXd R{Eigen::Matrix3d::Identity()};
+
+  Eigen::MatrixXd X = frc::DARE(A, B, Q, R);
+  ExpectMatrixEqual(X, X.transpose(), 1e-10);
+  ExpectPositiveSemidefinite(X);
+  ExpectDARESolution(A, B, Q, R, X);
+}
+
+TEST(DARETest, MoreInputsThanStates_ABQRN) {
+  const Eigen::MatrixXd A{Eigen::Matrix2d::Identity()};
+  const Eigen::MatrixXd B{{1.0, 0.0, 0.0}, {0.0, 0.5, 0.3}};
+  const Eigen::MatrixXd Q{Eigen::Matrix2d::Identity()};
+  const Eigen::MatrixXd R{Eigen::Matrix3d::Identity()};
+  const Eigen::MatrixXd N{{1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}};
+
+  Eigen::MatrixXd X = frc::DARE(A, B, Q, R, N);
+  ExpectMatrixEqual(X, X.transpose(), 1e-10);
+  ExpectPositiveSemidefinite(X);
+  ExpectDARESolution(A, B, Q, R, N, X);
+}
+
+TEST(DARETest, QNotSymmetricPositiveSemidefinite_ABQR) {
+  const Eigen::MatrixXd A{Eigen::Matrix2d::Identity()};
+  const Eigen::MatrixXd B{Eigen::Matrix2d::Identity()};
+  const Eigen::MatrixXd Q{-Eigen::Matrix2d::Identity()};
+  const Eigen::MatrixXd R{Eigen::Matrix2d::Identity()};
+
+  EXPECT_THROW(frc::DARE(A, B, Q, R), std::invalid_argument);
+}
+
+TEST(DARETest, QNotSymmetricPositiveSemidefinite_ABQRN) {
+  const Eigen::MatrixXd A{Eigen::Matrix2d::Identity()};
+  const Eigen::MatrixXd B{Eigen::Matrix2d::Identity()};
+  const Eigen::MatrixXd Q{Eigen::Matrix2d::Identity()};
+  const Eigen::MatrixXd R{Eigen::Matrix2d::Identity()};
+  const Eigen::MatrixXd N{2.0 * Eigen::Matrix2d::Identity()};
+
+  EXPECT_THROW(frc::DARE(A, B, Q, R, N), std::invalid_argument);
+}
+
+TEST(DARETest, RNotSymmetricPositiveDefinite_ABQR) {
+  const Eigen::MatrixXd A{Eigen::Matrix2d::Identity()};
+  const Eigen::MatrixXd B{Eigen::Matrix2d::Identity()};
+  const Eigen::MatrixXd Q{Eigen::Matrix2d::Identity()};
+
+  const Eigen::MatrixXd R1{Eigen::Matrix2d::Zero()};
+  EXPECT_THROW(frc::DARE(A, B, Q, R1), std::invalid_argument);
+
+  const Eigen::MatrixXd R2{-Eigen::Matrix2d::Identity()};
+  EXPECT_THROW(frc::DARE(A, B, Q, R2), std::invalid_argument);
+}
+
+TEST(DARETest, RNotSymmetricPositiveDefinite_ABQRN) {
+  const Eigen::MatrixXd A{Eigen::Matrix2d::Identity()};
+  const Eigen::MatrixXd B{Eigen::Matrix2d::Identity()};
+  const Eigen::MatrixXd Q{Eigen::Matrix2d::Identity()};
+  const Eigen::MatrixXd N{Eigen::Matrix2d::Identity()};
+
+  const Eigen::MatrixXd R1{Eigen::Matrix2d::Zero()};
+  EXPECT_THROW(frc::DARE(A, B, Q, R1, N), std::invalid_argument);
+
+  const Eigen::MatrixXd R2{-Eigen::Matrix2d::Identity()};
+  EXPECT_THROW(frc::DARE(A, B, Q, R2, N), std::invalid_argument);
+}
+
+TEST(DARETest, ABNotStabilizable_ABQR) {
+  const Eigen::MatrixXd A{Eigen::Matrix2d::Identity()};
+  const Eigen::MatrixXd B{Eigen::Matrix2d::Zero()};
+  const Eigen::MatrixXd Q{Eigen::Matrix2d::Identity()};
+  const Eigen::MatrixXd R{Eigen::Matrix2d::Identity()};
+
+  EXPECT_THROW(frc::DARE(A, B, Q, R), std::invalid_argument);
+}
+
+TEST(DARETest, ABNotStabilizable_ABQRN) {
+  const Eigen::MatrixXd A{Eigen::Matrix2d::Identity()};
+  const Eigen::MatrixXd B{Eigen::Matrix2d::Zero()};
+  const Eigen::MatrixXd Q{Eigen::Matrix2d::Identity()};
+  const Eigen::MatrixXd R{Eigen::Matrix2d::Identity()};
+  const Eigen::MatrixXd N{Eigen::Matrix2d::Identity()};
+
+  EXPECT_THROW(frc::DARE(A, B, Q, R, N), std::invalid_argument);
+}
+
+TEST(DARETest, ACNotDetectable_ABQR) {
+  const Eigen::MatrixXd A{Eigen::Matrix2d::Identity()};
+  const Eigen::MatrixXd B{Eigen::Matrix2d::Identity()};
+  const Eigen::MatrixXd Q{Eigen::Matrix2d::Zero()};
+  const Eigen::MatrixXd R{Eigen::Matrix2d::Identity()};
+
+  EXPECT_THROW(frc::DARE(A, B, Q, R), std::invalid_argument);
+}
+
+TEST(DARETest, ACNotDetectable_ABQRN) {
+  const Eigen::MatrixXd A{Eigen::Matrix2d::Identity()};
+  const Eigen::MatrixXd B{Eigen::Matrix2d::Identity()};
+  const Eigen::MatrixXd Q{Eigen::Matrix2d::Zero()};
+  const Eigen::MatrixXd R{Eigen::Matrix2d::Identity()};
+  const Eigen::MatrixXd N{Eigen::Matrix2d::Zero()};
+
+  EXPECT_THROW(frc::DARE(A, B, Q, R, N), std::invalid_argument);
 }

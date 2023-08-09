@@ -5,6 +5,7 @@
 #include <jni.h>
 
 #include <exception>
+#include <stdexcept>
 
 #include <wpi/jni_util.h>
 
@@ -102,11 +103,11 @@ extern "C" {
 
 /*
  * Class:     edu_wpi_first_math_WPIMathJNI
- * Method:    dare
+ * Method:    dareABQR
  * Signature: ([D[D[D[DII[D)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_math_WPIMathJNI_dare
+Java_edu_wpi_first_math_WPIMathJNI_dareABQR
   (JNIEnv* env, jclass, jdoubleArray A, jdoubleArray B, jdoubleArray Q,
    jdoubleArray R, jint states, jint inputs, jdoubleArray S)
 {
@@ -137,8 +138,58 @@ Java_edu_wpi_first_math_WPIMathJNI_dare
     env->ReleaseDoubleArrayElements(R, nativeR, 0);
 
     env->SetDoubleArrayRegion(S, 0, states * states, result.data());
-  } catch (const std::runtime_error& e) {
-    jclass cls = env->FindClass("java/lang/RuntimeException");
+  } catch (const std::invalid_argument& e) {
+    jclass cls = env->FindClass("java/lang/IllegalArgumentException");
+    if (cls) {
+      env->ThrowNew(cls, e.what());
+    }
+  }
+}
+
+/*
+ * Class:     edu_wpi_first_math_WPIMathJNI
+ * Method:    dareABQRN
+ * Signature: ([D[D[D[D[DII[D)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_math_WPIMathJNI_dareABQRN
+  (JNIEnv* env, jclass, jdoubleArray A, jdoubleArray B, jdoubleArray Q,
+   jdoubleArray R, jdoubleArray N, jint states, jint inputs, jdoubleArray S)
+{
+  jdouble* nativeA = env->GetDoubleArrayElements(A, nullptr);
+  jdouble* nativeB = env->GetDoubleArrayElements(B, nullptr);
+  jdouble* nativeQ = env->GetDoubleArrayElements(Q, nullptr);
+  jdouble* nativeR = env->GetDoubleArrayElements(R, nullptr);
+  jdouble* nativeN = env->GetDoubleArrayElements(N, nullptr);
+
+  Eigen::Map<
+      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>
+      Amat{nativeA, states, states};
+  Eigen::Map<
+      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>
+      Bmat{nativeB, states, inputs};
+  Eigen::Map<
+      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>
+      Qmat{nativeQ, states, states};
+  Eigen::Map<
+      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>
+      Rmat{nativeR, inputs, inputs};
+  Eigen::Map<
+      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>
+      Nmat{nativeN, states, inputs};
+
+  try {
+    Eigen::MatrixXd result = frc::DARE(Amat, Bmat, Qmat, Rmat, Nmat);
+
+    env->ReleaseDoubleArrayElements(A, nativeA, 0);
+    env->ReleaseDoubleArrayElements(B, nativeB, 0);
+    env->ReleaseDoubleArrayElements(Q, nativeQ, 0);
+    env->ReleaseDoubleArrayElements(R, nativeR, 0);
+    env->ReleaseDoubleArrayElements(N, nativeN, 0);
+
+    env->SetDoubleArrayRegion(S, 0, states * states, result.data());
+  } catch (const std::invalid_argument& e) {
+    jclass cls = env->FindClass("java/lang/IllegalArgumentException");
     if (cls) {
       env->ThrowNew(cls, e.what());
     }

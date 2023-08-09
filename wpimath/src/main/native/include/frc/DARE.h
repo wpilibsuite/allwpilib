@@ -11,7 +11,6 @@
 namespace frc {
 
 /**
- *
  * Computes the unique stabilizing solution X to the discrete-time algebraic
  * Riccati equation:
  *
@@ -21,8 +20,6 @@ namespace frc {
  * @param B The input matrix.
  * @param Q The state cost matrix.
  * @param R The input cost matrix.
- * @throws std::invalid_argument if number of inputs is greater than number of
- *   states.
  * @throws std::invalid_argument if Q isn't symmetric positive semidefinite.
  * @throws std::invalid_argument if R isn't symmetric positive definite.
  * @throws std::invalid_argument if the (A, B) pair isn't stabilizable.
@@ -73,8 +70,6 @@ J = Σ [uₖ] [0 R][uₖ] ΔT
 @param Q The state cost matrix.
 @param R The input cost matrix.
 @param N The state-input cross cost matrix.
-@throws std::invalid_argument if number of inputs is greater than number of
-  states.
 @throws std::invalid_argument if Q − NR⁻¹Nᵀ isn't symmetric positive
   semidefinite.
 @throws std::invalid_argument if R isn't symmetric positive definite.
