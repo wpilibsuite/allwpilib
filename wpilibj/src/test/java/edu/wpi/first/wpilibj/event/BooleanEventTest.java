@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BooleanSupplier;
 import org.junit.jupiter.api.Test;
 
 class BooleanEventTest {
@@ -29,79 +28,6 @@ class BooleanEventTest {
 
     assertEquals(0, andCounter.get());
     assertEquals(1, orCounter.get());
-  }
-
-  @Test
-  void testBinaryCompositionLoopSemantics() {
-    var loop1 = new EventLoop();
-    var loop2 = new EventLoop();
-    var bool1 = new AtomicBoolean(true);
-    var bool2 = new AtomicBoolean(true);
-    var counter1 = new AtomicInteger(0);
-    var counter2 = new AtomicInteger(0);
-
-    new BooleanEvent(loop1, bool1::get)
-        .and(new BooleanEvent(loop2, bool2::get))
-        .ifHigh(counter1::incrementAndGet);
-
-    new BooleanEvent(loop2, bool1::get)
-        .and(new BooleanEvent(loop1, bool2::get))
-        .ifHigh(counter2::incrementAndGet);
-
-    assertEquals(0, counter1.get());
-    assertEquals(0, counter2.get());
-
-    loop1.poll();
-
-    assertEquals(1, counter1.get());
-    assertEquals(0, counter2.get());
-
-    loop2.poll();
-
-    assertEquals(1, counter1.get());
-    assertEquals(1, counter2.get());
-
-    bool2.set(false);
-    loop1.poll();
-
-    assertEquals(1, counter1.get());
-    assertEquals(1, counter2.get());
-  }
-
-  @Test
-  void testDowncastBehavior() {
-    var loop1 = new EventLoop();
-    var loop2 = new EventLoop();
-    var bool1 = new AtomicBoolean(true);
-    var bool2 = new AtomicBoolean(true);
-    var counter1 = new AtomicInteger(0);
-    var counter2 = new AtomicInteger(0);
-
-    BooleanSupplier event1 = new BooleanEvent(loop2, bool2::get);
-    BooleanSupplier event2 = new BooleanEvent(loop1, bool2::get);
-
-    new BooleanEvent(loop1, bool1::get).and(event1).ifHigh(counter1::incrementAndGet);
-
-    new BooleanEvent(loop2, bool1::get).and(event2).ifHigh(counter2::incrementAndGet);
-
-    assertEquals(0, counter1.get());
-    assertEquals(0, counter2.get());
-
-    loop1.poll();
-
-    assertEquals(1, counter1.get());
-    assertEquals(0, counter2.get());
-
-    loop2.poll();
-
-    assertEquals(1, counter1.get());
-    assertEquals(1, counter2.get());
-
-    bool2.set(false);
-    loop1.poll();
-
-    assertEquals(1, counter1.get());
-    assertEquals(1, counter2.get());
   }
 
   @Test

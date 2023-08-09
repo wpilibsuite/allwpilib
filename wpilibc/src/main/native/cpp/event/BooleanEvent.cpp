@@ -15,11 +15,11 @@ BooleanEvent::BooleanEvent(EventLoop* loop, std::function<bool()> condition)
 }
 
 BooleanEvent::operator std::function<bool()>() {
-  return *m_condition;
+  return [state = m_state] { return *state; };
 }
 
 bool BooleanEvent::GetAsBoolean() const {
-  return (*m_condition)();
+  return *m_state;
 }
 
 void BooleanEvent::IfHigh(std::function<void()> action) {
@@ -34,25 +34,9 @@ BooleanEvent BooleanEvent::operator!() {
   return BooleanEvent(this->m_loop, [state = m_state] { return !*state; });
 }
 
-BooleanEvent BooleanEvent::operator&&(BooleanEvent rhs) {
-  if (m_loop != rhs.m_loop) {
-    m_loop->Bind([&rhs] { *rhs.m_state = (*rhs.m_condition)(); });
-  }
-  return BooleanEvent(
-      this->m_loop, [state = m_state, rhs] { return *state && *rhs.m_state; });
-}
-
 BooleanEvent BooleanEvent::operator&&(std::function<bool()> rhs) {
   return BooleanEvent(this->m_loop,
                       [state = m_state, rhs] { return *state && rhs(); });
-}
-
-BooleanEvent BooleanEvent::operator||(BooleanEvent rhs) {
-  if (m_loop != rhs.m_loop) {
-    m_loop->Bind([&rhs] { *rhs.m_state = (*rhs.m_condition)(); });
-  }
-  return BooleanEvent(
-      this->m_loop, [state = m_state, rhs] { return *state || *rhs.m_state; });
 }
 
 BooleanEvent BooleanEvent::operator||(std::function<bool()> rhs) {

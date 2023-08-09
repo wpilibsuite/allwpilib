@@ -156,7 +156,7 @@ public class BooleanEvent implements BooleanSupplier {
    * Composes this event with another event, returning a new signal that is in the high state when
    * both signals are in the high state.
    *
-   * <p>The new event will use this event's polling loop.
+   * <p>The events must use the same event loop.
    *
    * @param other the event to compose with
    * @return the event that is active when both events are active
@@ -164,13 +164,6 @@ public class BooleanEvent implements BooleanSupplier {
   @SuppressWarnings("PMD.CompareObjectsWithEquals")
   public BooleanEvent and(BooleanSupplier other) {
     requireNonNullParam(other, "other", "and");
-    if (other instanceof BooleanEvent) {
-      var otherEvent = (BooleanEvent) other;
-      if (m_loop != otherEvent.m_loop) {
-        m_loop.bind(() -> otherEvent.m_state.set(otherEvent.m_signal.getAsBoolean()));
-      }
-      return new BooleanEvent(m_loop, () -> m_state.get() && otherEvent.m_state.get());
-    }
     return new BooleanEvent(m_loop, () -> m_state.get() && other.getAsBoolean());
   }
 
@@ -178,7 +171,7 @@ public class BooleanEvent implements BooleanSupplier {
    * Composes this event with another event, returning a new signal that is high when either signal
    * is high.
    *
-   * <p>The new event will use this event's polling loop.
+   * <p>The events must use the same event loop.
    *
    * @param other the event to compose with
    * @return a signal that is high when either signal is high.
@@ -186,13 +179,6 @@ public class BooleanEvent implements BooleanSupplier {
   @SuppressWarnings("PMD.CompareObjectsWithEquals")
   public BooleanEvent or(BooleanSupplier other) {
     requireNonNullParam(other, "other", "or");
-    if (other instanceof BooleanEvent) {
-      var otherEvent = (BooleanEvent) other;
-      if (m_loop != otherEvent.m_loop) {
-        m_loop.bind(() -> otherEvent.m_state.set(otherEvent.m_signal.getAsBoolean()));
-      }
-      return new BooleanEvent(m_loop, () -> m_state.get() || otherEvent.m_state.get());
-    }
     return new BooleanEvent(m_loop, () -> m_state.get() || other.getAsBoolean());
   }
 
