@@ -64,6 +64,7 @@ public final class MechanismRoot2d extends MechanismObject2d {
     flush();
   }
 
+  @Override
   protected synchronized void updateEntries(NetworkTable table) {
     if (m_xPub != null) {
       m_xPub.close();
