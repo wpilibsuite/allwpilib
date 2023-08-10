@@ -85,5 +85,4 @@ public final class MechanismRoot2d extends MechanismObject2d {
       m_yPub.set(m_y);
     }
   }
-
 }
