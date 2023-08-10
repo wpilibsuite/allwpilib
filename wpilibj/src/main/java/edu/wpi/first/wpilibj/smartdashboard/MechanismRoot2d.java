@@ -6,8 +6,6 @@ package edu.wpi.first.wpilibj.smartdashboard;
 
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTable;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Root Mechanism2d node.
@@ -20,7 +18,6 @@ import java.util.Map;
  * <p>Append other nodes by using {@link #append(MechanismObject2d)}.
  */
 public final class MechanismRoot2d extends MechanismObject2d {
-  private final Map<String, MechanismObject2d> m_objects = new HashMap<>(1);
   private double m_x;
   private DoublePublisher m_xPub;
   private double m_y;
@@ -41,14 +38,12 @@ public final class MechanismRoot2d extends MechanismObject2d {
 
   @Override
   public void close() {
+    super.close();
     if (m_xPub != null) {
       m_xPub.close();
     }
     if (m_yPub != null) {
       m_yPub.close();
-    }
-    for (MechanismObject2d obj : m_objects.values()) {
-      obj.close();
     }
   }
 
