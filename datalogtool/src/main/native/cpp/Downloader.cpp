@@ -41,6 +41,10 @@ Downloader::~Downloader() {
   }
   m_cv.notify_all();
   m_thread.join();
+
+  if (m_localDirSelector) {
+    m_localDirSelector->kill();
+  }
 }
 
 void Downloader::DisplayConnect() {

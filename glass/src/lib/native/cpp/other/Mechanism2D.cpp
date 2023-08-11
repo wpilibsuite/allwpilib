@@ -63,6 +63,7 @@ struct FrameData {
 class BackgroundInfo {
  public:
   explicit BackgroundInfo(Storage& storage);
+  ~BackgroundInfo();
 
   void DisplaySettings();
 
@@ -89,6 +90,12 @@ class BackgroundInfo {
 
 BackgroundInfo::BackgroundInfo(Storage& storage)
     : m_filename{storage.GetString("image")} {}
+
+BackgroundInfo::~BackgroundInfo() {
+  if (m_fileOpener) {
+    m_fileOpener->kill();
+  }
+}
 
 void BackgroundInfo::DisplaySettings() {
   if (ImGui::Button("Choose image...")) {
