@@ -82,6 +82,30 @@
     "commandversion": 2
   },
   {
+    "name": "XRP - Command Robot",
+    "description": "XRP - Command style",
+    "tags": [
+      "Command",
+      "XRP"
+    ],
+    "foldername": "xrpcommandbased",
+    "gradlebase": "javaxrp",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "XRP - Timed Robot",
+    "description": "XRP - Timed style",
+    "tags": [
+      "Timed",
+      "XRP"
+    ],
+    "foldername": "xrptimed",
+    "gradlebase": "javaxrp",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
     "name": "Educational Robot",
     "description": "Educational Robot - Not for competition use",
     "tags": [
@@ -101,6 +125,18 @@
     ],
     "foldername": "romieducational",
     "gradlebase": "javaromi",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "XRP - Educational Robot",
+    "description": "XRP - Educational Robot",
+    "tags": [
+      "Educational",
+      "XRP"
+    ],
+    "foldername": "xrpeducational",
+    "gradlebase": "javaxrp",
     "mainclass": "Main",
     "commandversion": 2
   }

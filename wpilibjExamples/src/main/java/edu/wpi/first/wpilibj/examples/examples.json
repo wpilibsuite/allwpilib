@@ -894,6 +894,21 @@
     "commandversion": 2
   },
   {
+    "name": "XRP Reference",
+    "description": "An example command-based robot program that can be used with the XRP reference robot design.",
+    "tags": [
+      "XRP",
+      "Command-based",
+      "Differential Drive",
+      "Digital Input",
+      "Joystick"
+    ],
+    "foldername": "xrpreference",
+    "gradlebase": "javaxrp",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
     "name": "Digital Communication Sample",
     "description": "Communicates with external devices (such as an Arduino) using the roboRIO's DIO.",
     "tags": [
