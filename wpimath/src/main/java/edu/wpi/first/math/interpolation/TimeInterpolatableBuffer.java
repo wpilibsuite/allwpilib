@@ -19,11 +19,10 @@ import java.util.TreeMap;
  */
 public final class TimeInterpolatableBuffer<T> {
   private final double m_historySize;
-  private final InterpolateFunction<T> m_interpolatingFunc;
+  private final Interpolator<T> m_interpolatingFunc;
   private final NavigableMap<Double, T> m_pastSnapshots = new TreeMap<>();
 
-  private TimeInterpolatableBuffer(
-      InterpolateFunction<T> interpolateFunction, double historySizeSeconds) {
+  private TimeInterpolatableBuffer(Interpolator<T> interpolateFunction, double historySizeSeconds) {
     this.m_historySize = historySizeSeconds;
     this.m_interpolatingFunc = interpolateFunction;
   }
@@ -37,7 +36,7 @@ public final class TimeInterpolatableBuffer<T> {
    * @return The new TimeInterpolatableBuffer.
    */
   public static <T> TimeInterpolatableBuffer<T> createBuffer(
-      InterpolateFunction<T> interpolateFunction, double historySizeSeconds) {
+      Interpolator<T> interpolateFunction, double historySizeSeconds) {
     return new TimeInterpolatableBuffer<>(interpolateFunction, historySizeSeconds);
   }
 
@@ -142,18 +141,5 @@ public final class TimeInterpolatableBuffer<T> {
    */
   public NavigableMap<Double, T> getInternalBuffer() {
     return m_pastSnapshots;
-  }
-
-  public interface InterpolateFunction<T> {
-    /**
-     * Return the interpolated value. This object is assumed to be the starting position, or lower
-     * bound.
-     *
-     * @param start The lower bound, or start.
-     * @param end The upper bound, or end.
-     * @param t How far between the lower and upper bound we are. This should be bounded in [0, 1].
-     * @return The interpolated value.
-     */
-    T interpolate(T start, T end, double t);
   }
 }

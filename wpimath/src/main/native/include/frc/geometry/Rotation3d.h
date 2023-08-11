@@ -138,7 +138,11 @@ class WPILIB_DLLEXPORT Rotation3d {
   bool operator==(const Rotation3d&) const = default;
 
   /**
-   * Adds the new rotation to the current rotation.
+   * Adds the new rotation to the current rotation. The other rotation is
+   * applied intrinsically, which means that it rotates around the axes after
+   * applying this rotation. For example, Rotation3d{90_deg, 0, 0}.RotateBy(
+   * Rotation3d{0, 90_deg, 0}) rotates by 90 degrees around the +X axis and then
+   * by 90 degrees around the new +Y axis (which has been moved to the +Z axis).
    *
    * @param other The rotation to rotate by.
    *

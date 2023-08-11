@@ -68,7 +68,11 @@ LTVDifferentialDriveController::LTVDifferentialDriveController(
 
   if (maxV <= 0_mps) {
     throw std::domain_error(
-        "Max velocity of plant with 12 V input must be greater than zero.");
+        "Max velocity of plant with 12 V input must be greater than 0 m/s.");
+  }
+  if (maxV >= 15_mps) {
+    throw std::domain_error(
+        "Max velocity of plant with 12 V input must be less than 15 m/s.");
   }
 
   for (auto velocity = -maxV; velocity < maxV; velocity += 0.01_mps) {

@@ -6,7 +6,7 @@ package edu.wpi.first.math.geometry;
 
 import java.util.Objects;
 
-/** Represents a transformation for a Pose2d. */
+/** Represents a transformation for a Pose2d in the pose's frame. */
 public class Transform2d {
   private final Translation2d m_translation;
   private final Rotation2d m_rotation;

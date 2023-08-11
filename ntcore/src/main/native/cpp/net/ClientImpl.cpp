@@ -10,7 +10,6 @@
 #include <variant>
 
 #include <fmt/format.h>
-#include <wpi/DenseMap.h>
 #include <wpi/Logger.h>
 #include <wpi/raw_ostream.h>
 #include <wpi/timestamp.h>
@@ -19,9 +18,7 @@
 #include "Log.h"
 #include "Message.h"
 #include "NetworkInterface.h"
-#include "PubSubOptions.h"
 #include "WireConnection.h"
-#include "WireDecoder.h"
 #include "WireEncoder.h"
 #include "networktables/NetworkTableValue.h"
 
@@ -34,79 +31,7 @@ static constexpr uint32_t kMinPeriodMs = 5;
 // transmission before we close the connection
 static constexpr uint32_t kWireMaxNotReadyUs = 1000000;
 
-namespace {
-
-struct PublisherData {
-  NT_Publisher handle;
-  PubSubOptionsImpl options;
-  // in options as double, but copy here as integer; rounded to the nearest
-  // 10 ms
-  uint32_t periodMs;
-  uint64_t nextSendMs{0};
-  std::vector<Value> outValues;  // outgoing values
-};
-
-class CImpl : public ServerMessageHandler {
- public:
-  CImpl(uint64_t curTimeMs, int inst, WireConnection& wire, wpi::Logger& logger,
-        std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
-            timeSyncUpdated,
-        std::function<void(uint32_t repeatMs)> setPeriodic);
-
-  void ProcessIncomingBinary(uint64_t curTimeMs, std::span<const uint8_t> data);
-  void HandleLocal(std::vector<ClientMessage>&& msgs);
-  bool SendControl(uint64_t curTimeMs);
-  void SendValues(uint64_t curTimeMs, bool flush);
-  void SendInitialValues();
-  bool CheckNetworkReady(uint64_t curTimeMs);
-
-  // ServerMessageHandler interface
-  void ServerAnnounce(std::string_view name, int64_t id,
-                      std::string_view typeStr, const wpi::json& properties,
-                      std::optional<int64_t> pubuid) final;
-  void ServerUnannounce(std::string_view name, int64_t id) final;
-  void ServerPropertiesUpdate(std::string_view name, const wpi::json& update,
-                              bool ack) final;
-
-  void Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
-               std::string_view name, std::string_view typeStr,
-               const wpi::json& properties, const PubSubOptionsImpl& options);
-  bool Unpublish(NT_Publisher pubHandle, NT_Topic topicHandle);
-  void SetValue(NT_Publisher pubHandle, const Value& value);
-
-  int m_inst;
-  WireConnection& m_wire;
-  wpi::Logger& m_logger;
-  LocalInterface* m_local{nullptr};
-  std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
-      m_timeSyncUpdated;
-  std::function<void(uint32_t repeatMs)> m_setPeriodic;
-
-  // indexed by publisher index
-  std::vector<std::unique_ptr<PublisherData>> m_publishers;
-
-  // indexed by server-provided topic id
-  wpi::DenseMap<int64_t, NT_Topic> m_topicMap;
-
-  // timestamp handling
-  static constexpr uint32_t kPingIntervalMs = 3000;
-  uint64_t m_nextPingTimeMs{0};
-  uint64_t m_pongTimeMs{0};
-  uint32_t m_rtt2Us{UINT32_MAX};
-  bool m_haveTimeOffset{false};
-  int64_t m_serverTimeOffsetUs{0};
-
-  // periodic sweep handling
-  uint32_t m_periodMs{kPingIntervalMs + 10};
-  uint64_t m_lastSendMs{0};
-
-  // outgoing queue
-  std::vector<ClientMessage> m_outgoing;
-};
-
-}  // namespace
-
-CImpl::CImpl(
+ClientImpl::ClientImpl(
     uint64_t curTimeMs, int inst, WireConnection& wire, wpi::Logger& logger,
     std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
         timeSyncUpdated,
@@ -126,8 +51,8 @@ CImpl::CImpl(
   m_setPeriodic(m_periodMs);
 }
 
-void CImpl::ProcessIncomingBinary(uint64_t curTimeMs,
-                                  std::span<const uint8_t> data) {
+void ClientImpl::ProcessIncomingBinary(uint64_t curTimeMs,
+                                       std::span<const uint8_t> data) {
   for (;;) {
     if (data.empty()) {
       break;
@@ -138,7 +63,7 @@ void CImpl::ProcessIncomingBinary(uint64_t curTimeMs,
     Value value;
     std::string error;
     if (!WireDecodeBinary(&data, &id, &value, &error, -m_serverTimeOffsetUs)) {
-      ERROR("binary decode error: {}", error);
+      ERR("binary decode error: {}", error);
       break;  // FIXME
     }
     DEBUG4("BinaryMessage({})", id);
@@ -146,8 +71,8 @@ void CImpl::ProcessIncomingBinary(uint64_t curTimeMs,
     // handle RTT ping response
     if (id == -1) {
       if (!value.IsInteger()) {
-        WARNING("RTT ping response with non-integer type {}",
-                static_cast<int>(value.type()));
+        WARN("RTT ping response with non-integer type {}",
+             static_cast<int>(value.type()));
         continue;
       }
       DEBUG4("RTT ping response time {} value {}", value.time(),
@@ -168,7 +93,7 @@ void CImpl::ProcessIncomingBinary(uint64_t curTimeMs,
     // otherwise it's a value message, get the local topic handle for it
     auto topicIt = m_topicMap.find(id);
     if (topicIt == m_topicMap.end()) {
-      WARNING("received unknown id {}", id);
+      WARN("received unknown id {}", id);
       continue;
     }
 
@@ -179,7 +104,7 @@ void CImpl::ProcessIncomingBinary(uint64_t curTimeMs,
   }
 }
 
-void CImpl::HandleLocal(std::vector<ClientMessage>&& msgs) {
+void ClientImpl::HandleLocal(std::vector<ClientMessage>&& msgs) {
   DEBUG4("HandleLocal()");
   for (auto&& elem : msgs) {
     // common case is value
@@ -200,7 +125,7 @@ void CImpl::HandleLocal(std::vector<ClientMessage>&& msgs) {
   }
 }
 
-bool CImpl::SendControl(uint64_t curTimeMs) {
+bool ClientImpl::DoSendControl(uint64_t curTimeMs) {
   DEBUG4("SendControl({})", curTimeMs);
 
   // rate limit sends
@@ -246,7 +171,7 @@ bool CImpl::SendControl(uint64_t curTimeMs) {
   return true;
 }
 
-void CImpl::SendValues(uint64_t curTimeMs, bool flush) {
+void ClientImpl::DoSendValues(uint64_t curTimeMs, bool flush) {
   DEBUG4("SendValues({})", curTimeMs);
 
   // can't send value updates until we have a RTT
@@ -255,7 +180,7 @@ void CImpl::SendValues(uint64_t curTimeMs, bool flush) {
   }
 
   // ensure all control messages are sent ahead of value updates
-  if (!SendControl(curTimeMs)) {
+  if (!DoSendControl(curTimeMs)) {
     return;
   }
 
@@ -291,11 +216,11 @@ void CImpl::SendValues(uint64_t curTimeMs, bool flush) {
   }
 }
 
-void CImpl::SendInitialValues() {
+void ClientImpl::SendInitialValues() {
   DEBUG4("SendInitialValues()");
 
   // ensure all control messages are sent ahead of value updates
-  if (!SendControl(0)) {
+  if (!DoSendControl(0)) {
     return;
   }
 
@@ -321,7 +246,7 @@ void CImpl::SendInitialValues() {
   }
 }
 
-bool CImpl::CheckNetworkReady(uint64_t curTimeMs) {
+bool ClientImpl::CheckNetworkReady(uint64_t curTimeMs) {
   if (!m_wire.Ready()) {
     uint64_t lastFlushTime = m_wire.GetLastFlushTime();
     uint64_t now = wpi::Now();
@@ -333,10 +258,10 @@ bool CImpl::CheckNetworkReady(uint64_t curTimeMs) {
   return true;
 }
 
-void CImpl::Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
-                    std::string_view name, std::string_view typeStr,
-                    const wpi::json& properties,
-                    const PubSubOptionsImpl& options) {
+void ClientImpl::Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
+                         std::string_view name, std::string_view typeStr,
+                         const wpi::json& properties,
+                         const PubSubOptionsImpl& options) {
   unsigned int index = Handle{pubHandle}.GetIndex();
   if (index >= m_publishers.size()) {
     m_publishers.resize(index + 1);
@@ -360,7 +285,7 @@ void CImpl::Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
   m_setPeriodic(m_periodMs);
 }
 
-bool CImpl::Unpublish(NT_Publisher pubHandle, NT_Topic topicHandle) {
+bool ClientImpl::Unpublish(NT_Publisher pubHandle, NT_Topic topicHandle) {
   unsigned int index = Handle{pubHandle}.GetIndex();
   if (index >= m_publishers.size()) {
     return false;
@@ -400,7 +325,7 @@ bool CImpl::Unpublish(NT_Publisher pubHandle, NT_Topic topicHandle) {
   return doSend;
 }
 
-void CImpl::SetValue(NT_Publisher pubHandle, const Value& value) {
+void ClientImpl::SetValue(NT_Publisher pubHandle, const Value& value) {
   DEBUG4("SetValue({}, time={}, server_time={}, st_off={})", pubHandle,
          value.time(), value.server_time(), m_serverTimeOffsetUs);
   unsigned int index = Handle{pubHandle}.GetIndex();
@@ -415,10 +340,10 @@ void CImpl::SetValue(NT_Publisher pubHandle, const Value& value) {
   }
 }
 
-void CImpl::ServerAnnounce(std::string_view name, int64_t id,
-                           std::string_view typeStr,
-                           const wpi::json& properties,
-                           std::optional<int64_t> pubuid) {
+void ClientImpl::ServerAnnounce(std::string_view name, int64_t id,
+                                std::string_view typeStr,
+                                const wpi::json& properties,
+                                std::optional<int64_t> pubuid) {
   DEBUG4("ServerAnnounce({}, {}, {})", name, id, typeStr);
   assert(m_local);
   NT_Publisher pubHandle{0};
@@ -429,76 +354,38 @@ void CImpl::ServerAnnounce(std::string_view name, int64_t id,
       m_local->NetworkAnnounce(name, typeStr, properties, pubHandle);
 }
 
-void CImpl::ServerUnannounce(std::string_view name, int64_t id) {
+void ClientImpl::ServerUnannounce(std::string_view name, int64_t id) {
   DEBUG4("ServerUnannounce({}, {})", name, id);
   assert(m_local);
   m_local->NetworkUnannounce(name);
   m_topicMap.erase(id);
 }
 
-void CImpl::ServerPropertiesUpdate(std::string_view name,
-                                   const wpi::json& update, bool ack) {
+void ClientImpl::ServerPropertiesUpdate(std::string_view name,
+                                        const wpi::json& update, bool ack) {
   DEBUG4("ServerProperties({}, {}, {})", name, update.dump(), ack);
   assert(m_local);
   m_local->NetworkPropertiesUpdate(name, update, ack);
 }
 
-class ClientImpl::Impl final : public CImpl {
- public:
-  Impl(uint64_t curTimeMs, int inst, WireConnection& wire, wpi::Logger& logger,
-       std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
-           timeSyncUpdated,
-       std::function<void(uint32_t repeatMs)> setPeriodic)
-      : CImpl{curTimeMs,
-              inst,
-              wire,
-              logger,
-              std::move(timeSyncUpdated),
-              std::move(setPeriodic)} {}
-};
-
-ClientImpl::ClientImpl(
-    uint64_t curTimeMs, int inst, WireConnection& wire, wpi::Logger& logger,
-    std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
-        timeSyncUpdated,
-    std::function<void(uint32_t repeatMs)> setPeriodic)
-    : m_impl{std::make_unique<Impl>(curTimeMs, inst, wire, logger,
-                                    std::move(timeSyncUpdated),
-                                    std::move(setPeriodic))} {}
-
-ClientImpl::~ClientImpl() = default;
-
 void ClientImpl::ProcessIncomingText(std::string_view data) {
-  if (!m_impl->m_local) {
+  if (!m_local) {
     return;
   }
-  WireDecodeText(data, *m_impl, m_impl->m_logger);
-}
-
-void ClientImpl::ProcessIncomingBinary(uint64_t curTimeMs,
-                                       std::span<const uint8_t> data) {
-  m_impl->ProcessIncomingBinary(curTimeMs, data);
-}
-
-void ClientImpl::HandleLocal(std::vector<ClientMessage>&& msgs) {
-  m_impl->HandleLocal(std::move(msgs));
+  WireDecodeText(data, *this, m_logger);
 }
 
 void ClientImpl::SendControl(uint64_t curTimeMs) {
-  m_impl->SendControl(curTimeMs);
-  m_impl->m_wire.Flush();
+  DoSendControl(curTimeMs);
+  m_wire.Flush();
 }
 
 void ClientImpl::SendValues(uint64_t curTimeMs, bool flush) {
-  m_impl->SendValues(curTimeMs, flush);
-  m_impl->m_wire.Flush();
-}
-
-void ClientImpl::SetLocal(LocalInterface* local) {
-  m_impl->m_local = local;
+  DoSendValues(curTimeMs, flush);
+  m_wire.Flush();
 }
 
 void ClientImpl::SendInitial() {
-  m_impl->SendInitialValues();
-  m_impl->m_wire.Flush();
+  SendInitialValues();
+  m_wire.Flush();
 }

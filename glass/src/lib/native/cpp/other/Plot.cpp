@@ -135,6 +135,8 @@ class Plot {
     }
   }
 
+  void SetColor(const ImVec4& color) { m_backgroundColor.SetColor(color); }
+
  private:
   void EmitSettingsLimits(int axis);
   void DragDropAccept(PlotView& view, size_t i, int yAxis);
@@ -143,6 +145,9 @@ class Plot {
 
   std::string& m_name;
   bool& m_visible;
+  static constexpr float kDefaultBackgroundColor[4] = {0.0, 0.0, 0.0,
+                                                       IMPLOT_AUTO};
+  ColorSetting m_backgroundColor;
   bool& m_showPause;
   bool& m_lockPrevX;
   bool& m_legend;
@@ -484,6 +489,8 @@ Plot::Plot(Storage& storage)
     : m_seriesStorage{storage.GetChildArray("series")},
       m_name{storage.GetString("name")},
       m_visible{storage.GetBool("visible", true)},
+      m_backgroundColor{
+          storage.GetFloatArray("backgroundColor", kDefaultBackgroundColor)},
       m_showPause{storage.GetBool("showPause", true)},
       m_lockPrevX{storage.GetBool("lockPrevX", false)},
       m_legend{storage.GetBool("legend", true)},
@@ -580,6 +587,11 @@ void Plot::EmitPlot(PlotView& view, double now, bool paused, size_t i) {
                           (m_mousePosition ? 0 : ImPlotFlags_NoMouseText);
 
   if (ImPlot::BeginPlot(label, ImVec2(-1, m_height), plotFlags)) {
+    if (m_backgroundColor.GetColorFloat()[3] == IMPLOT_AUTO) {
+      SetColor(ImGui::GetStyleColorVec4(ImGuiCol_WindowBg));
+    }
+    ImPlot::PushStyleColor(ImPlotCol_PlotBg, m_backgroundColor.GetColor());
+
     // setup legend
     if (m_legend) {
       ImPlotLegendFlags legendFlags =
@@ -656,6 +668,8 @@ void Plot::EmitPlot(PlotView& view, double now, bool paused, size_t i) {
     m_xaxisRange = ImPlot::GetPlotLimits().X;
 
     ImPlotPlot* plot = ImPlot::GetCurrentPlot();
+
+    ImPlot::PopStyleColor();
     ImPlot::EndPlot();
 
     // copy plot settings back to storage
@@ -715,6 +729,12 @@ void Plot::EmitSettings(size_t i) {
   ImGui::Text("Edit plot name:");
   ImGui::InputText("##editname", &m_name);
   ImGui::Checkbox("Visible", &m_visible);
+  m_backgroundColor.ColorEdit3("Background color",
+                               ImGuiColorEditFlags_NoInputs);
+  ImGui::SameLine();
+  if (ImGui::Button("Default")) {
+    SetColor(ImGui::GetStyleColorVec4(ImGuiCol_WindowBg));
+  }
   ImGui::Checkbox("Show Pause Button", &m_showPause);
   if (i != 0) {
     ImGui::Checkbox("Lock X-axis to previous plot", &m_lockPrevX);
