@@ -14,15 +14,6 @@
 
 using namespace glass;
 
-MainMenuBar::~MainMenuBar() {
-  if (m_openFolder) {
-    m_openFolder->kill();
-  }
-  if (m_saveFolder) {
-    m_saveFolder->kill();
-  }
-}
-
 void MainMenuBar::AddMainMenu(std::function<void()> menu) {
   if (menu) {
     m_menus.emplace_back(std::move(menu));

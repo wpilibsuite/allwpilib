@@ -702,6 +702,12 @@ HANDLE internal::platform::new_style_context::create()
 
 // dialog implementation
 
+internal::dialog::~dialog() {
+    if (m_async->m_running) {
+        kill();
+    }
+}
+
 bool internal::dialog::ready(int timeout /* = default_wait_timeout */) const
 {
     return m_async->ready(timeout);

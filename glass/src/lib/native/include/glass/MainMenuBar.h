@@ -17,8 +17,6 @@ namespace glass {
  */
 class MainMenuBar {
  public:
-  ~MainMenuBar();
-
   /**
    * Displays the main menu bar.  Should be added to GUI LateExecute.
    */

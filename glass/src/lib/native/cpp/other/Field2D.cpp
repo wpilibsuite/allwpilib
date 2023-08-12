@@ -187,7 +187,6 @@ class PoseFrameData {
 class ObjectInfo {
  public:
   explicit ObjectInfo(Storage& storage);
-  ~ObjectInfo();
 
   DisplayOptions GetDisplayOptions() const;
   void DisplaySettings();
@@ -227,7 +226,6 @@ class FieldInfo {
   static constexpr auto kDefaultHeight = 8.21_m;
 
   explicit FieldInfo(Storage& storage);
-  ~FieldInfo();
 
   void DisplaySettings();
 
@@ -390,12 +388,6 @@ void FieldInfo::DisplaySettings() {
   // ImGui::InputInt("Field Left", &m_left);
   // ImGui::InputInt("Field Right", &m_right);
   // ImGui::InputInt("Field Bottom", &m_bottom);
-}
-
-FieldInfo::~FieldInfo() {
-  if (m_fileOpener) {
-    m_fileOpener->kill();
-  }
 }
 
 void FieldInfo::Reset() {
@@ -619,12 +611,6 @@ ObjectInfo::ObjectInfo(Storage& storage)
       m_selectable{
           storage.GetBool("selectable", DisplayOptions::kDefaultSelectable)},
       m_filename{storage.GetString("image")} {}
-
-ObjectInfo::~ObjectInfo() {
-  if (m_fileOpener) {
-    m_fileOpener->kill();
-  }
-}
 
 DisplayOptions ObjectInfo::GetDisplayOptions() const {
   DisplayOptions rv{m_texture};
