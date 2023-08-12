@@ -69,6 +69,7 @@ Transform3d CoordinateSystem::Convert(const Transform3d& transform,
                                       const CoordinateSystem& from,
                                       const CoordinateSystem& to) {
   const auto coordRot = from.m_rotation - to.m_rotation;
-  return Transform3d{Convert(transform.Translation(), from, to),
-                     (-coordRot).RotateBy(transform.Rotation().RotateBy(coordRot))};
+  return Transform3d{
+      Convert(transform.Translation(), from, to),
+      (-coordRot).RotateBy(transform.Rotation().RotateBy(coordRot))};
 }
