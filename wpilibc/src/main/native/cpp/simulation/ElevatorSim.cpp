@@ -25,8 +25,7 @@ ElevatorSim::ElevatorSim(const LinearSystem<2, 1, 1>& plant,
       m_maxHeight(maxHeight),
       m_gearing(gearing),
       m_simulateGravity(simulateGravity) {
-  SetState(
-      frc::Vectord<2>{std::clamp(startingHeight, minHeight, maxHeight), 0.0});
+  SetState(startingHeight, 0_mps);
 }
 
 ElevatorSim::ElevatorSim(const DCMotor& gearbox, double gearing,
@@ -39,6 +38,12 @@ ElevatorSim::ElevatorSim(const DCMotor& gearbox, double gearing,
                                                  drumRadius, gearing),
                   gearbox, gearing, drumRadius, minHeight, maxHeight,
                   simulateGravity, startingHeight, measurementStdDevs) {}
+
+void ElevatorSim::SetState(units::meter_t position,
+                           units::meters_per_second_t velocity) {
+  SetState(
+      Vectord<2>{std::clamp(position, m_minHeight, m_maxHeight), velocity});
+}
 
 bool ElevatorSim::WouldHitLowerLimit(units::meter_t elevatorHeight) const {
   return elevatorHeight <= m_minHeight;

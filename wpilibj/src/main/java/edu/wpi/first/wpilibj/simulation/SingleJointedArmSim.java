@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj.simulation;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.numbers.N1;
@@ -66,7 +67,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
     m_maxAngle = maxAngleRads;
     m_simulateGravity = simulateGravity;
 
-    setState(VecBuilder.fill(startingAngleRads, 0));
+    setState(startingAngleRads, 0.0);
   }
 
   /**
@@ -170,6 +171,18 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
         simulateGravity,
         startingAngleRads,
         measurementStdDevs);
+  }
+
+  /**
+   * Sets the arm's state. The new angle will be limited between the minimum and maximum allowed
+   * limits.
+   *
+   * @param angleRadians The new angle.
+   * @param velocityRadPerSec The new angular velocity.
+   */
+  void setState(double angleRadians, double velocityRadPerSec) {
+    setState(
+        VecBuilder.fill(MathUtil.clamp(angleRadians, m_minAngle, m_maxAngle), velocityRadPerSec));
   }
 
   /**

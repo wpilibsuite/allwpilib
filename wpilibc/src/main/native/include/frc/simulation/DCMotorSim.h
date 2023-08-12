@@ -48,6 +48,17 @@ class DCMotorSim : public LinearSystemSim<2, 1, 2> {
              units::kilogram_square_meter_t moi,
              const std::array<double, 2>& measurementStdDevs = {0.0, 0.0});
 
+  using LinearSystemSim::SetState;
+
+  /**
+   * Sets the state of the DC motor.
+   *
+   * @param angularPosition The new position
+   * @param angularVelocity The new velocity
+   */
+  void SetState(units::radian_t angularPosition,
+                units::radians_per_second_t angularVelocity);
+
   /**
    * Returns the DC motor position.
    *
