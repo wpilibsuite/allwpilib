@@ -16,8 +16,8 @@ class DARETest extends UtilityClassTest<DARE> {
   }
 
   public static void assertMatrixEqual(SimpleMatrix A, SimpleMatrix B) {
-    for (int i = 0; i < A.numRows(); i++) {
-      for (int j = 0; j < A.numCols(); j++) {
+    for (int i = 0; i < A.getNumRows(); i++) {
+      for (int j = 0; j < A.getNumCols(); j++) {
         assertEquals(A.get(i, j), B.get(i, j), 1e-4);
       }
     }
@@ -35,7 +35,7 @@ class DARETest extends UtilityClassTest<DARE> {
                     .mult((B.transpose().mult(X).mult(B).plus(R)).invert())
                     .mult(B.transpose().mult(X).mult(A)))
             .plus(Q);
-    assertMatrixEqual(new SimpleMatrix(Y.numRows(), Y.numCols()), Y);
+    assertMatrixEqual(new SimpleMatrix(Y.getNumRows(), Y.getNumCols()), Y);
   }
 
   void assertDARESolution(
@@ -55,7 +55,7 @@ class DARETest extends UtilityClassTest<DARE> {
                     .mult((B.transpose().mult(X).mult(B).plus(R)).invert())
                     .mult(B.transpose().mult(X).mult(A).plus(N.transpose())))
             .plus(Q);
-    assertMatrixEqual(new SimpleMatrix(Y.numRows(), Y.numCols()), Y);
+    assertMatrixEqual(new SimpleMatrix(Y.getNumRows(), Y.getNumCols()), Y);
   }
 
   @Test

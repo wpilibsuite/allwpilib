@@ -21,14 +21,14 @@ public final class DARE {
    * @return Solution of DARE.
    */
   public static SimpleMatrix dare(SimpleMatrix A, SimpleMatrix B, SimpleMatrix Q, SimpleMatrix R) {
-    var S = new SimpleMatrix(A.numRows(), A.numCols());
+    var S = new SimpleMatrix(A.getNumRows(), A.getNumCols());
     WPIMathJNI.dare(
         A.getDDRM().getData(),
         B.getDDRM().getData(),
         Q.getDDRM().getData(),
         R.getDDRM().getData(),
-        A.numCols(),
-        B.numCols(),
+        A.getNumCols(),
+        B.getNumCols(),
         S.getDDRM().getData());
     return S;
   }
@@ -70,14 +70,14 @@ public final class DARE {
     var scrA = A.minus(B.mult(R.solve(N.transpose())));
     var scrQ = Q.minus(N.mult(R.solve(N.transpose())));
 
-    var S = new SimpleMatrix(A.numRows(), A.numCols());
+    var S = new SimpleMatrix(A.getNumRows(), A.getNumCols());
     WPIMathJNI.dare(
         scrA.getDDRM().getData(),
         B.getDDRM().getData(),
         scrQ.getDDRM().getData(),
         R.getDDRM().getData(),
-        A.numCols(),
-        B.numCols(),
+        A.getNumCols(),
+        B.getNumCols(),
         S.getDDRM().getData());
     return S;
   }
