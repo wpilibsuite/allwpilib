@@ -83,4 +83,90 @@ Eigen::MatrixXd DARE(const Eigen::Ref<const Eigen::MatrixXd>& A,
                      const Eigen::Ref<const Eigen::MatrixXd>& R,
                      const Eigen::Ref<const Eigen::MatrixXd>& N);
 
+namespace internal {
+
+/**
+ * Computes the unique stabilizing solution X to the discrete-time algebraic
+ * Riccati equation:
+ *
+ *   AᵀXA − X − AᵀXB(BᵀXB + R)⁻¹BᵀXA + Q = 0
+ *
+ * This internal function skips expensive precondition checks for increased
+ * performance. The solver may hang if any of the following occur:
+ * <ul>
+ *   <li>Q isn't symmetric positive semidefinite</li>
+ *   <li>R isn't symmetric positive definite</li>
+ *   <li>The (A, B) pair isn't stabilizable</li>
+ *   <li>The (A, C) pair where Q = CᵀC isn't detectable</li>
+ * </ul>
+ * Only use this function if you're sure the preconditions are met.
+ *
+ * @param A The system matrix.
+ * @param B The input matrix.
+ * @param Q The state cost matrix.
+ * @param R The input cost matrix.
+ */
+WPILIB_DLLEXPORT
+Eigen::MatrixXd DARE(const Eigen::Ref<const Eigen::MatrixXd>& A,
+                     const Eigen::Ref<const Eigen::MatrixXd>& B,
+                     const Eigen::Ref<const Eigen::MatrixXd>& Q,
+                     const Eigen::Ref<const Eigen::MatrixXd>& R);
+
+/**
+Computes the unique stabilizing solution X to the discrete-time algebraic
+Riccati equation:
+
+  AᵀXA − X − (AᵀXB + N)(BᵀXB + R)⁻¹(BᵀXA + Nᵀ) + Q = 0
+
+This overload of the DARE is useful for finding the control law uₖ that
+minimizes the following cost function subject to xₖ₊₁ = Axₖ + Buₖ.
+
+@verbatim
+    ∞ [xₖ]ᵀ[Q  N][xₖ]
+J = Σ [uₖ] [Nᵀ R][uₖ] ΔT
+   k=0
+@endverbatim
+
+This is a more general form of the following. The linear-quadratic regulator
+is the feedback control law uₖ that minimizes the following cost function
+subject to xₖ₊₁ = Axₖ + Buₖ:
+
+@verbatim
+    ∞
+J = Σ (xₖᵀQxₖ + uₖᵀRuₖ) ΔT
+   k=0
+@endverbatim
+
+This can be refactored as:
+
+@verbatim
+    ∞ [xₖ]ᵀ[Q 0][xₖ]
+J = Σ [uₖ] [0 R][uₖ] ΔT
+   k=0
+@endverbatim
+
+This internal function skips expensive precondition checks for increased
+performance. The solver may hang if any of the following occur:
+<ul>
+  <li>Q − NR⁻¹Nᵀ isn't symmetric positive semidefinite</li>
+  <li>R isn't symmetric positive definite</li>
+  <li>The (A, B) pair isn't stabilizable</li>
+  <li>The (A, C) pair where Q = CᵀC isn't detectable</li>
+</ul>
+Only use this function if you're sure the preconditions are met.
+
+@param A The system matrix.
+@param B The input matrix.
+@param Q The state cost matrix.
+@param R The input cost matrix.
+@param N The state-input cross cost matrix.
+*/
+WPILIB_DLLEXPORT
+Eigen::MatrixXd DARE(const Eigen::Ref<const Eigen::MatrixXd>& A,
+                     const Eigen::Ref<const Eigen::MatrixXd>& B,
+                     const Eigen::Ref<const Eigen::MatrixXd>& Q,
+                     const Eigen::Ref<const Eigen::MatrixXd>& R,
+                     const Eigen::Ref<const Eigen::MatrixXd>& N);
+
+}  // namespace internal
 }  // namespace frc

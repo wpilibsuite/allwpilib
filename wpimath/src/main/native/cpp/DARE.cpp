@@ -122,14 +122,6 @@ Eigen::MatrixXd DARE(const Eigen::Ref<const Eigen::MatrixXd>& A,
     throw std::invalid_argument(msg);
   }
 
-  // Require R be positive definite
-  auto R_llt = R.llt();
-  if (R_llt.info() != Eigen::Success) {
-    std::string msg = fmt::format("R isn't positive definite!\n\nR =\n{}\n",
-                                  Eigen::MatrixXd{R});
-    throw std::invalid_argument(msg);
-  }
-
   // Require (A, B) pair be stabilizable
   if (!IsStabilizable(A, B)) {
     std::string msg =
@@ -150,6 +142,57 @@ Eigen::MatrixXd DARE(const Eigen::Ref<const Eigen::MatrixXd>& A,
           Eigen::MatrixXd{A}, Eigen::MatrixXd{Q});
       throw std::invalid_argument(msg);
     }
+  }
+
+  return internal::DARE(A, B, Q, R);
+}
+
+Eigen::MatrixXd DARE(const Eigen::Ref<const Eigen::MatrixXd>& A,
+                     const Eigen::Ref<const Eigen::MatrixXd>& B,
+                     const Eigen::Ref<const Eigen::MatrixXd>& Q,
+                     const Eigen::Ref<const Eigen::MatrixXd>& R,
+                     const Eigen::Ref<const Eigen::MatrixXd>& N) {
+  // These are unused if assertions aren't compiled in
+  [[maybe_unused]] int states = A.rows();
+  [[maybe_unused]] int inputs = B.cols();
+
+  // Check argument dimensions
+  assert(N.rows() == states && N.cols() == inputs);
+
+  auto R_llt = R.llt();
+  if (R_llt.info() != Eigen::Success) {
+    std::string msg = fmt::format("R isn't positive definite!\n\nR =\n{}\n",
+                                  Eigen::MatrixXd{R});
+    throw std::invalid_argument(msg);
+  }
+
+  // This is a change of variables to make the DARE that includes Q, R, and N
+  // cost matrices fit the form of the DARE that includes only Q and R cost
+  // matrices.
+  //
+  // This is equivalent to solving the original DARE:
+  //
+  //   A₂ᵀXA₂ − X − A₂ᵀXB(BᵀXB + R)⁻¹BᵀXA₂ + Q₂ = 0
+  //
+  // where A₂ and Q₂ are a change of variables:
+  //
+  //   A₂ = A − BR⁻¹Nᵀ and Q₂ = Q − NR⁻¹Nᵀ
+  return DARE(A - B * R_llt.solve(N.transpose()), B,
+              Q - N * R_llt.solve(N.transpose()), R);
+}
+
+namespace internal {
+
+Eigen::MatrixXd DARE(const Eigen::Ref<const Eigen::MatrixXd>& A,
+                     const Eigen::Ref<const Eigen::MatrixXd>& B,
+                     const Eigen::Ref<const Eigen::MatrixXd>& Q,
+                     const Eigen::Ref<const Eigen::MatrixXd>& R) {
+  // Require R be positive definite
+  auto R_llt = R.llt();
+  if (R_llt.info() != Eigen::Success) {
+    std::string msg = fmt::format("R isn't positive definite!\n\nR =\n{}\n",
+                                  Eigen::MatrixXd{R});
+    throw std::invalid_argument(msg);
   }
 
   // Implements the SDA algorithm on page 5 of [1].
@@ -215,13 +258,6 @@ Eigen::MatrixXd DARE(const Eigen::Ref<const Eigen::MatrixXd>& A,
                      const Eigen::Ref<const Eigen::MatrixXd>& Q,
                      const Eigen::Ref<const Eigen::MatrixXd>& R,
                      const Eigen::Ref<const Eigen::MatrixXd>& N) {
-  // These are unused if assertions aren't compiled in
-  [[maybe_unused]] int states = A.rows();
-  [[maybe_unused]] int inputs = B.cols();
-
-  // Check argument dimensions
-  assert(N.rows() == states && N.cols() == inputs);
-
   auto R_llt = R.llt();
   if (R_llt.info() != Eigen::Success) {
     std::string msg = fmt::format("R isn't positive definite!\n\nR =\n{}\n",
@@ -240,8 +276,9 @@ Eigen::MatrixXd DARE(const Eigen::Ref<const Eigen::MatrixXd>& A,
   // where A₂ and Q₂ are a change of variables:
   //
   //   A₂ = A − BR⁻¹Nᵀ and Q₂ = Q − NR⁻¹Nᵀ
-  return DARE(A - B * R_llt.solve(N.transpose()), B,
-              Q - N * R_llt.solve(N.transpose()), R);
+  return internal::DARE(A - B * R_llt.solve(N.transpose()), B,
+                        Q - N * R_llt.solve(N.transpose()), R);
 }
 
+}  // namespace internal
 }  // namespace frc
