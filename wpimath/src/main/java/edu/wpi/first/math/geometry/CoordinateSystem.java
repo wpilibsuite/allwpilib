@@ -98,7 +98,8 @@ public class CoordinateSystem {
    */
   public static Rotation3d convert(
       Rotation3d rotation, CoordinateSystem from, CoordinateSystem to) {
-    return rotation.rotateBy(from.m_rotation.minus(to.m_rotation));
+        var coordRot = from.m_rotation.minus(to.m_rotation);
+        return coordRot.unaryMinus().plus(rotation.rotateBy(coordRot));
   }
 
   /**
