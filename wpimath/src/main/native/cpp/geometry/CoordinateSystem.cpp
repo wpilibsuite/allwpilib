@@ -55,8 +55,7 @@ Translation3d CoordinateSystem::Convert(const Translation3d& translation,
 Rotation3d CoordinateSystem::Convert(const Rotation3d& rotation,
                                      const CoordinateSystem& from,
                                      const CoordinateSystem& to) {
-  const auto coordRot = from.m_rotation - to.m_rotation;
-  return (-coordRot).RotateBy(rotation.RotateBy(coordRot));
+  return rotation.RotateBy(from.m_rotation - to.m_rotation);
 }
 
 Pose3d CoordinateSystem::Convert(const Pose3d& pose,
@@ -69,6 +68,7 @@ Pose3d CoordinateSystem::Convert(const Pose3d& pose,
 Transform3d CoordinateSystem::Convert(const Transform3d& transform,
                                       const CoordinateSystem& from,
                                       const CoordinateSystem& to) {
+  const auto coordRot = from.m_rotation - to.m_rotation;
   return Transform3d{Convert(transform.Translation(), from, to),
-                     Convert(transform.Rotation(), from, to)};
+                     (-coordRot).RotateBy(transform.Rotation().RotateBy(coordRot))};
 }
