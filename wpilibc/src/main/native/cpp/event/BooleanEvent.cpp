@@ -11,8 +11,7 @@ BooleanEvent::BooleanEvent(EventLoop* loop, std::function<bool()> condition)
       m_condition(std::make_shared<std::function<bool()>>(condition)) {
   m_state = std::make_shared<bool>((*m_condition)());
   m_loop->Bind(
-      // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
-      [condition = *m_condition, state = m_state] { *state = condition(); });
+      [condition = m_condition, state = m_state] { *state = (*condition)(); });
 }
 
 BooleanEvent::operator std::function<bool()>() {
