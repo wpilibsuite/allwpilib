@@ -7,8 +7,6 @@
 #include <stdexcept>
 #include <string>
 
-#include <wpi/SymbolExports.h>
-
 #include "Eigen/Cholesky"
 #include "Eigen/Core"
 #include "Eigen/LU"
@@ -24,7 +22,70 @@
 
 namespace frc {
 
-namespace internal {
+namespace detail {
+
+/**
+ * Checks the preconditions of A, B, and Q for the DARE solver.
+ *
+ * @tparam States Number of states.
+ * @tparam Inputs Number of inputs.
+ * @param A The system matrix.
+ * @param B The input matrix.
+ * @param Q The state cost matrix.
+ * @throws std::invalid_argument if Q isn't symmetric positive semidefinite.
+ * @throws std::invalid_argument if the (A, B) pair isn't stabilizable.
+ * @throws std::invalid_argument if the (A, C) pair where Q = CᵀC isn't
+ *   detectable.
+ */
+template <int States, int Inputs>
+void CheckDARE_ABQ(const Eigen::Matrix<double, States, States>& A,
+                   const Eigen::Matrix<double, States, Inputs>& B,
+                   const Eigen::Matrix<double, States, States>& Q) {
+  // Require Q be symmetric
+  if ((Q - Q.transpose()).norm() > 1e-10) {
+    std::string msg = fmt::format("Q isn't symmetric!\n\nQ =\n{}\n", Q);
+    throw std::invalid_argument(msg);
+  }
+
+  // Require Q be positive semidefinite
+  //
+  // If Q is a symmetric matrix with a decomposition LDLᵀ, the number of
+  // positive, negative, and zero diagonal entries in D equals the number of
+  // positive, negative, and zero eigenvalues respectively in Q (see
+  // https://en.wikipedia.org/wiki/Sylvester's_law_of_inertia).
+  //
+  // Therefore, D having no negative diagonal entries is sufficient to prove Q
+  // is positive semidefinite.
+  auto Q_ldlt = Q.ldlt();
+  if (Q_ldlt.info() != Eigen::Success ||
+      (Q_ldlt.vectorD().array() < 0.0).any()) {
+    std::string msg =
+        fmt::format("Q isn't positive semidefinite!\n\nQ =\n{}\n", Q);
+    throw std::invalid_argument(msg);
+  }
+
+  // Require (A, B) pair be stabilizable
+  if (!IsStabilizable<States, Inputs>(A, B)) {
+    std::string msg = fmt::format(
+        "The (A, B) pair isn't stabilizable!\n\nA =\n{}\nB =\n{}\n", A, B);
+    throw std::invalid_argument(msg);
+  }
+
+  // Require (A, C) pair be detectable where Q = CᵀC
+  {
+    Eigen::Matrix<double, States, States> C =
+        Eigen::Matrix<double, States, States>{Q_ldlt.matrixL()} *
+        Q_ldlt.vectorD().cwiseSqrt().asDiagonal();
+
+    if (!IsDetectable<States, States>(A, C)) {
+      std::string msg = fmt::format(
+          "The (A, C) pair where Q = CᵀC isn't detectable!\n\nA =\n{}\nQ "
+          "=\n{}\n",
+          A, Q);
+      throw std::invalid_argument(msg);
+    }
+  }
+}
 
 /**
  * Computes the unique stabilizing solution X to the discrete-time algebraic
@@ -47,22 +108,15 @@ namespace internal {
  * @param A The system matrix.
  * @param B The input matrix.
  * @param Q The state cost matrix.
- * @param R The input cost matrix.
+ * @param R_llt The LLT decomposition of the input cost matrix.
  */
 template <int States, int Inputs>
 Eigen::Matrix<double, States, States> DARE(
     const Eigen::Matrix<double, States, States>& A,
     const Eigen::Matrix<double, States, Inputs>& B,
     const Eigen::Matrix<double, States, States>& Q,
-    const Eigen::Matrix<double, Inputs, Inputs>& R) {
+    const Eigen::LLT<Eigen::Matrix<double, Inputs, Inputs>>& R_llt) {
   using StateMatrix = Eigen::Matrix<double, States, States>;
-
-  // Require R be positive definite
-  auto R_llt = R.llt();
-  if (R_llt.info() != Eigen::Success) {
-    std::string msg = fmt::format("R isn't positive definite!\n\nR =\n{}\n", R);
-    throw std::invalid_argument(msg);
-  }
 
   // Implements the SDA algorithm on page 5 of [1].
 
@@ -169,7 +223,7 @@ Only use this function if you're sure the preconditions are met.
 @param A The system matrix.
 @param B The input matrix.
 @param Q The state cost matrix.
-@param R The input cost matrix.
+@param R_llt The LLT decomposition of the input cost matrix.
 @param N The state-input cross cost matrix.
 */
 template <int States, int Inputs>
@@ -177,14 +231,8 @@ Eigen::Matrix<double, States, States> DARE(
     const Eigen::Matrix<double, States, States>& A,
     const Eigen::Matrix<double, States, Inputs>& B,
     const Eigen::Matrix<double, States, States>& Q,
-    const Eigen::Matrix<double, Inputs, Inputs>& R,
+    const Eigen::LLT<Eigen::Matrix<double, Inputs, Inputs>>& R_llt,
     const Eigen::Matrix<double, Inputs, Inputs>& N) {
-  auto R_llt = R.llt();
-  if (R_llt.info() != Eigen::Success) {
-    std::string msg = fmt::format("R isn't positive definite!\n\nR =\n{}\n", R);
-    throw std::invalid_argument(msg);
-  }
-
   // This is a change of variables to make the DARE that includes Q, R, and N
   // cost matrices fit the form of the DARE that includes only Q and R cost
   // matrices.
@@ -196,11 +244,12 @@ Eigen::Matrix<double, States, States> DARE(
   // where A₂ and Q₂ are a change of variables:
   //
   //   A₂ = A − BR⁻¹Nᵀ and Q₂ = Q − NR⁻¹Nᵀ
-  return internal::DARE<States, Inputs>(A - B * R_llt.solve(N.transpose()), B,
-                                        Q - N * R_llt.solve(N.transpose()), R);
+  return detail::DARE<States, Inputs>(A - B * R_llt.solve(N.transpose()), B,
+                                      Q - N * R_llt.solve(N.transpose()),
+                                      R_llt);
 }
 
-}  // namespace internal
+}  // namespace detail
 
 /**
  * Computes the unique stabilizing solution X to the discrete-time algebraic
@@ -226,58 +275,22 @@ Eigen::Matrix<double, States, States> DARE(
     const Eigen::Matrix<double, States, Inputs>& B,
     const Eigen::Matrix<double, States, States>& Q,
     const Eigen::Matrix<double, Inputs, Inputs>& R) {
-  // Require Q be symmetric
-  if ((Q - Q.transpose()).norm() > 1e-10) {
-    std::string msg = fmt::format("Q isn't symmetric!\n\nQ =\n{}\n", Q);
-    throw std::invalid_argument(msg);
-  }
-
-  // Require Q be positive semidefinite
-  //
-  // If Q is a symmetric matrix with a decomposition LDLᵀ, the number of
-  // positive, negative, and zero diagonal entries in D equals the number of
-  // positive, negative, and zero eigenvalues respectively in Q (see
-  // https://en.wikipedia.org/wiki/Sylvester's_law_of_inertia).
-  //
-  // Therefore, D having no negative diagonal entries is sufficient to prove Q
-  // is positive semidefinite.
-  auto Q_ldlt = Q.ldlt();
-  if (Q_ldlt.info() != Eigen::Success ||
-      (Q_ldlt.vectorD().array() < 0.0).any()) {
-    std::string msg =
-        fmt::format("Q isn't positive semidefinite!\n\nQ =\n{}\n", Q);
-    throw std::invalid_argument(msg);
-  }
-
   // Require R be symmetric
   if ((R - R.transpose()).norm() > 1e-10) {
     std::string msg = fmt::format("R isn't symmetric!\n\nR =\n{}\n", R);
     throw std::invalid_argument(msg);
   }
 
-  // Require (A, B) pair be stabilizable
-  if (!IsStabilizable<States, Inputs>(A, B)) {
-    std::string msg = fmt::format(
-        "The (A, B) pair isn't stabilizable!\n\nA =\n{}\nB =\n{}\n", A, B);
+  // Require R be positive definite
+  auto R_llt = R.llt();
+  if (R_llt.info() != Eigen::Success) {
+    std::string msg = fmt::format("R isn't positive definite!\n\nR =\n{}\n", R);
     throw std::invalid_argument(msg);
   }
 
-  // Require (A, C) pair be detectable where Q = CᵀC
-  {
-    Eigen::Matrix<double, States, States> C =
-        Eigen::Matrix<double, States, States>{Q_ldlt.matrixL()} *
-        Q_ldlt.vectorD().cwiseSqrt().asDiagonal();
+  detail::CheckDARE_ABQ<States, Inputs>(A, B, Q);
 
-    if (!IsDetectable<States, States>(A, C)) {
-      std::string msg = fmt::format(
-          "The (A, C) pair where Q = CᵀC isn't detectable!\n\nA =\n{}\nQ "
-          "=\n{}\n",
-          A, Q);
-      throw std::invalid_argument(msg);
-    }
-  }
-
-  return internal::DARE<States, Inputs>(A, B, Q, R);
+  return detail::DARE<States, Inputs>(A, B, Q, R_llt);
 }
 
 /**
@@ -333,6 +346,13 @@ Eigen::Matrix<double, States, States> DARE(
     const Eigen::Matrix<double, States, States>& Q,
     const Eigen::Matrix<double, Inputs, Inputs>& R,
     const Eigen::Matrix<double, States, Inputs>& N) {
+  // Require R be symmetric
+  if ((R - R.transpose()).norm() > 1e-10) {
+    std::string msg = fmt::format("R isn't symmetric!\n\nR =\n{}\n", R);
+    throw std::invalid_argument(msg);
+  }
+
+  // Require R be positive definite
   auto R_llt = R.llt();
   if (R_llt.info() != Eigen::Success) {
     std::string msg = fmt::format("R isn't positive definite!\n\nR =\n{}\n", R);
@@ -350,8 +370,14 @@ Eigen::Matrix<double, States, States> DARE(
   // where A₂ and Q₂ are a change of variables:
   //
   //   A₂ = A − BR⁻¹Nᵀ and Q₂ = Q − NR⁻¹Nᵀ
-  return DARE<States, Inputs>(A - B * R_llt.solve(N.transpose()), B,
-                              Q - N * R_llt.solve(N.transpose()), R);
+  Eigen::Matrix<double, States, States> A_2 =
+      A - B * R_llt.solve(N.transpose());
+  Eigen::Matrix<double, States, States> Q_2 =
+      Q - N * R_llt.solve(N.transpose());
+
+  detail::CheckDARE_ABQ<States, Inputs>(A_2, B, Q_2);
+
+  return detail::DARE<States, Inputs>(A_2, B, Q_2, R_llt);
 }
 
 }  // namespace frc
