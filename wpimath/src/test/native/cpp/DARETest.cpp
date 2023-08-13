@@ -86,7 +86,7 @@ TEST(DARETest, NonInvertibleA_ABQR) {
   Eigen::MatrixXd R{1, 1};
   R << 0.25;
 
-  Eigen::MatrixXd X = frc::DARE(A, B, Q, R);
+  Eigen::MatrixXd X = frc::DARE<4, 1>(A, B, Q, R);
   ExpectMatrixEqual(X, X.transpose(), 1e-10);
   ExpectPositiveSemidefinite(X);
   ExpectDARESolution(A, B, Q, R, X);
@@ -111,7 +111,7 @@ TEST(DARETest, NonInvertibleA_ABQRN) {
   R = B.transpose() * Q * B + R;
   Eigen::MatrixXd N = (A - Aref).transpose() * Q * B;
 
-  Eigen::MatrixXd X = frc::DARE(A, B, Q, R, N);
+  Eigen::MatrixXd X = frc::DARE<4, 1>(A, B, Q, R, N);
   ExpectMatrixEqual(X, X.transpose(), 1e-10);
   ExpectPositiveSemidefinite(X);
   ExpectDARESolution(A, B, Q, R, N, X);
@@ -127,7 +127,7 @@ TEST(DARETest, InvertibleA_ABQR) {
   Eigen::MatrixXd R{1, 1};
   R << 0.3;
 
-  Eigen::MatrixXd X = frc::DARE(A, B, Q, R);
+  Eigen::MatrixXd X = frc::DARE<2, 1>(A, B, Q, R);
   ExpectMatrixEqual(X, X.transpose(), 1e-10);
   ExpectPositiveSemidefinite(X);
   ExpectDARESolution(A, B, Q, R, X);
@@ -149,7 +149,7 @@ TEST(DARETest, InvertibleA_ABQRN) {
   R = B.transpose() * Q * B + R;
   Eigen::MatrixXd N = (A - Aref).transpose() * Q * B;
 
-  Eigen::MatrixXd X = frc::DARE(A, B, Q, R, N);
+  Eigen::MatrixXd X = frc::DARE<2, 1>(A, B, Q, R, N);
   ExpectMatrixEqual(X, X.transpose(), 1e-10);
   ExpectPositiveSemidefinite(X);
   ExpectDARESolution(A, B, Q, R, N, X);
@@ -167,7 +167,7 @@ TEST(DARETest, FirstGeneralizedEigenvalueOfSTIsStable_ABQR) {
   Eigen::MatrixXd R{1, 1};
   R << 1;
 
-  Eigen::MatrixXd X = frc::DARE(A, B, Q, R);
+  Eigen::MatrixXd X = frc::DARE<2, 1>(A, B, Q, R);
   ExpectMatrixEqual(X, X.transpose(), 1e-10);
   ExpectPositiveSemidefinite(X);
   ExpectDARESolution(A, B, Q, R, X);
@@ -191,7 +191,7 @@ TEST(DARETest, FirstGeneralizedEigenvalueOfSTIsStable_ABQRN) {
   R = B.transpose() * Q * B + R;
   Eigen::MatrixXd N = (A - Aref).transpose() * Q * B;
 
-  Eigen::MatrixXd X = frc::DARE(A, B, Q, R, N);
+  Eigen::MatrixXd X = frc::DARE<2, 1>(A, B, Q, R, N);
   ExpectMatrixEqual(X, X.transpose(), 1e-10);
   ExpectPositiveSemidefinite(X);
   ExpectDARESolution(A, B, Q, R, N, X);
@@ -203,7 +203,7 @@ TEST(DARETest, IdentitySystem_ABQR) {
   const Eigen::MatrixXd Q{Eigen::Matrix2d::Identity()};
   const Eigen::MatrixXd R{Eigen::Matrix2d::Identity()};
 
-  Eigen::MatrixXd X = frc::DARE(A, B, Q, R);
+  Eigen::MatrixXd X = frc::DARE<2, 2>(A, B, Q, R);
   ExpectMatrixEqual(X, X.transpose(), 1e-10);
   ExpectPositiveSemidefinite(X);
   ExpectDARESolution(A, B, Q, R, X);
@@ -216,7 +216,7 @@ TEST(DARETest, IdentitySystem_ABQRN) {
   const Eigen::MatrixXd R{Eigen::Matrix2d::Identity()};
   const Eigen::MatrixXd N{Eigen::Matrix2d::Identity()};
 
-  Eigen::MatrixXd X = frc::DARE(A, B, Q, R, N);
+  Eigen::MatrixXd X = frc::DARE<2, 2>(A, B, Q, R, N);
   ExpectMatrixEqual(X, X.transpose(), 1e-10);
   ExpectPositiveSemidefinite(X);
   ExpectDARESolution(A, B, Q, R, N, X);
@@ -228,7 +228,7 @@ TEST(DARETest, MoreInputsThanStates_ABQR) {
   const Eigen::MatrixXd Q{Eigen::Matrix2d::Identity()};
   const Eigen::MatrixXd R{Eigen::Matrix3d::Identity()};
 
-  Eigen::MatrixXd X = frc::DARE(A, B, Q, R);
+  Eigen::MatrixXd X = frc::DARE<2, 3>(A, B, Q, R);
   ExpectMatrixEqual(X, X.transpose(), 1e-10);
   ExpectPositiveSemidefinite(X);
   ExpectDARESolution(A, B, Q, R, X);
@@ -241,7 +241,7 @@ TEST(DARETest, MoreInputsThanStates_ABQRN) {
   const Eigen::MatrixXd R{Eigen::Matrix3d::Identity()};
   const Eigen::MatrixXd N{{1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}};
 
-  Eigen::MatrixXd X = frc::DARE(A, B, Q, R, N);
+  Eigen::MatrixXd X = frc::DARE<2, 3>(A, B, Q, R, N);
   ExpectMatrixEqual(X, X.transpose(), 1e-10);
   ExpectPositiveSemidefinite(X);
   ExpectDARESolution(A, B, Q, R, N, X);
@@ -253,7 +253,7 @@ TEST(DARETest, QNotSymmetricPositiveSemidefinite_ABQR) {
   const Eigen::MatrixXd Q{-Eigen::Matrix2d::Identity()};
   const Eigen::MatrixXd R{Eigen::Matrix2d::Identity()};
 
-  EXPECT_THROW(frc::DARE(A, B, Q, R), std::invalid_argument);
+  EXPECT_THROW((frc::DARE<2, 2>(A, B, Q, R)), std::invalid_argument);
 }
 
 TEST(DARETest, QNotSymmetricPositiveSemidefinite_ABQRN) {
@@ -263,7 +263,7 @@ TEST(DARETest, QNotSymmetricPositiveSemidefinite_ABQRN) {
   const Eigen::MatrixXd R{Eigen::Matrix2d::Identity()};
   const Eigen::MatrixXd N{2.0 * Eigen::Matrix2d::Identity()};
 
-  EXPECT_THROW(frc::DARE(A, B, Q, R, N), std::invalid_argument);
+  EXPECT_THROW((frc::DARE<2, 2>(A, B, Q, R, N)), std::invalid_argument);
 }
 
 TEST(DARETest, RNotSymmetricPositiveDefinite_ABQR) {
@@ -272,10 +272,10 @@ TEST(DARETest, RNotSymmetricPositiveDefinite_ABQR) {
   const Eigen::MatrixXd Q{Eigen::Matrix2d::Identity()};
 
   const Eigen::MatrixXd R1{Eigen::Matrix2d::Zero()};
-  EXPECT_THROW(frc::DARE(A, B, Q, R1), std::invalid_argument);
+  EXPECT_THROW((frc::DARE<2, 2>(A, B, Q, R1)), std::invalid_argument);
 
   const Eigen::MatrixXd R2{-Eigen::Matrix2d::Identity()};
-  EXPECT_THROW(frc::DARE(A, B, Q, R2), std::invalid_argument);
+  EXPECT_THROW((frc::DARE<2, 2>(A, B, Q, R2)), std::invalid_argument);
 }
 
 TEST(DARETest, RNotSymmetricPositiveDefinite_ABQRN) {
@@ -285,10 +285,10 @@ TEST(DARETest, RNotSymmetricPositiveDefinite_ABQRN) {
   const Eigen::MatrixXd N{Eigen::Matrix2d::Identity()};
 
   const Eigen::MatrixXd R1{Eigen::Matrix2d::Zero()};
-  EXPECT_THROW(frc::DARE(A, B, Q, R1, N), std::invalid_argument);
+  EXPECT_THROW((frc::DARE<2, 2>(A, B, Q, R1, N)), std::invalid_argument);
 
   const Eigen::MatrixXd R2{-Eigen::Matrix2d::Identity()};
-  EXPECT_THROW(frc::DARE(A, B, Q, R2, N), std::invalid_argument);
+  EXPECT_THROW((frc::DARE<2, 2>(A, B, Q, R2, N)), std::invalid_argument);
 }
 
 TEST(DARETest, ABNotStabilizable_ABQR) {
@@ -297,7 +297,7 @@ TEST(DARETest, ABNotStabilizable_ABQR) {
   const Eigen::MatrixXd Q{Eigen::Matrix2d::Identity()};
   const Eigen::MatrixXd R{Eigen::Matrix2d::Identity()};
 
-  EXPECT_THROW(frc::DARE(A, B, Q, R), std::invalid_argument);
+  EXPECT_THROW((frc::DARE<2, 2>(A, B, Q, R)), std::invalid_argument);
 }
 
 TEST(DARETest, ABNotStabilizable_ABQRN) {
@@ -307,7 +307,7 @@ TEST(DARETest, ABNotStabilizable_ABQRN) {
   const Eigen::MatrixXd R{Eigen::Matrix2d::Identity()};
   const Eigen::MatrixXd N{Eigen::Matrix2d::Identity()};
 
-  EXPECT_THROW(frc::DARE(A, B, Q, R, N), std::invalid_argument);
+  EXPECT_THROW((frc::DARE<2, 2>(A, B, Q, R, N)), std::invalid_argument);
 }
 
 TEST(DARETest, ACNotDetectable_ABQR) {
@@ -316,7 +316,7 @@ TEST(DARETest, ACNotDetectable_ABQR) {
   const Eigen::MatrixXd Q{Eigen::Matrix2d::Zero()};
   const Eigen::MatrixXd R{Eigen::Matrix2d::Identity()};
 
-  EXPECT_THROW(frc::DARE(A, B, Q, R), std::invalid_argument);
+  EXPECT_THROW((frc::DARE<2, 2>(A, B, Q, R)), std::invalid_argument);
 }
 
 TEST(DARETest, ACNotDetectable_ABQRN) {
@@ -326,5 +326,5 @@ TEST(DARETest, ACNotDetectable_ABQRN) {
   const Eigen::MatrixXd R{Eigen::Matrix2d::Identity()};
   const Eigen::MatrixXd N{Eigen::Matrix2d::Zero()};
 
-  EXPECT_THROW(frc::DARE(A, B, Q, R, N), std::invalid_argument);
+  EXPECT_THROW((frc::DARE<2, 2>(A, B, Q, R, N)), std::invalid_argument);
 }

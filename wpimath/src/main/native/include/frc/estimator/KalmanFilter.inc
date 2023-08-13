@@ -48,7 +48,7 @@ KalmanFilter<States, Inputs, Outputs>::KalmanFilter(
   }
 
   Matrixd<States, States> P =
-      DARE(discA.transpose(), C.transpose(), discQ, discR);
+      DARE<States, Outputs>(discA.transpose(), C.transpose(), discQ, discR);
 
   // S = CPCᵀ + R
   Matrixd<Outputs, Outputs> S = C * P * C.transpose() + discR;
