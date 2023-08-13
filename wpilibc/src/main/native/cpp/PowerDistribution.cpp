@@ -225,7 +225,7 @@ bool PowerDistribution::Faults::GetBreakerFaultAtChannel(
       return this->Channel23BreakerFault != 0;
     default:
       throw FRC_MakeError(err::ChannelIndexOutOfRange,
-                          "Power distribution fault channel out of bounds!")
+                          "Power distribution fault channel out of bounds!");
   }
 }
 
@@ -282,7 +282,7 @@ bool PowerDistribution::StickyFaults::GetBreakerFaultAtChannel(
       return this->Channel23BreakerFault != 0;
     default:
       throw FRC_MakeError(err::ChannelIndexOutOfRange,
-                          "Power distribution fault channel out of bounds!")
+                          "Power distribution fault channel out of bounds!");
   }
 }
 
