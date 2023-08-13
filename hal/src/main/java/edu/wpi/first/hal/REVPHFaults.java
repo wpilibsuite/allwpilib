@@ -52,10 +52,11 @@ public class REVPHFaults {
 
   /**
    * Gets whether there is a fault at a specified channel.
+   *
    * @param channelIndex Index to check for faults.
-   * @return If there is a fault at the specified index. If the index
-   * does not map to an actual channel, returns 1.
-  */
+   * @return If there is a fault at the specified index. If the index does not map to an actual
+   *     channel, returns 1.
+   */
   public final boolean getChannelFaultsAtIndex(int channelIndex) {
     switch (channelIndex) {
       case 0:
@@ -91,7 +92,7 @@ public class REVPHFaults {
       case 15:
         return Channel15Fault;
       default:
-        return true;
+        throw new IndexOutOfBoundsException("Pneumatics fault channel out of bounds!");
     }
   }
 

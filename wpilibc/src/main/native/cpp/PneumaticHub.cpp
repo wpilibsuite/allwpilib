@@ -339,43 +339,43 @@ PneumaticHub::StickyFaults PneumaticHub::GetStickyFaults() const {
   return stickyFaults;
 }
 
-uint32_t PneumaticHub::Faults::getChannelFaultAtIndex(
-    uint32_t channelIndex) const {
+bool PneumaticHub::Faults::GetChannelFaultAtIndex(uint32_t channelIndex) const {
   switch (channelIndex) {
     case 0:
-      return this->Channel0Fault;
+      return this->Channel0Fault != 0;
     case 1:
-      return this->Channel1Fault;
+      return this->Channel1Fault != 0;
     case 2:
-      return this->Channel2Fault;
+      return this->Channel2Fault != 0;
     case 3:
-      return this->Channel3Fault;
+      return this->Channel3Fault != 0;
     case 4:
-      return this->Channel4Fault;
+      return this->Channel4Fault != 0;
     case 5:
-      return this->Channel5Fault;
+      return this->Channel5Fault != 0;
     case 6:
-      return this->Channel6Fault;
+      return this->Channel6Fault != 0;
     case 7:
-      return this->Channel7Fault;
+      return this->Channel7Fault != 0;
     case 8:
-      return this->Channel8Fault;
+      return this->Channel8Fault != 0;
     case 9:
-      return this->Channel9Fault;
+      return this->Channel9Fault != 0;
     case 10:
-      return this->Channel10Fault;
+      return this->Channel10Fault != 0;
     case 11:
-      return this->Channel11Fault;
+      return this->Channel11Fault != 0;
     case 12:
-      return this->Channel12Fault;
+      return this->Channel12Fault != 0;
     case 13:
-      return this->Channel13Fault;
+      return this->Channel13Fault != 0;
     case 14:
-      return this->Channel14Fault;
+      return this->Channel14Fault != 0;
     case 15:
-      return this->Channel15Fault;
+      return this->Channel15Fault != 0;
     default:
-      return 1;
+      throw FRC_MakeError(err::ChannelIndexOutOfRange,
+                          "Pneumatics fault channel out of bounds!");
   }
 }
 

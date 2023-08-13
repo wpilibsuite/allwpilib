@@ -164,7 +164,7 @@ class PneumaticHub : public PneumaticsBase {
      * @return If there is a fault at the specified index. If the index
      * does not map to an actual channel, returns 1.
      */
-    uint32_t getChannelFaultAtIndex(uint32_t channelIndex) const;
+    bool GetChannelFaultAtIndex(uint32_t channelIndex) const;
   };
 
   /**

@@ -62,62 +62,63 @@ public class PowerDistributionFaults {
 
   /**
    * Gets whether there is a breaker fault at a specified channel.
+   *
    * @param channelIndex Index to check for faults.
-   * @return If there is a breaker fault at the specified index. If the index does not map to an actual channel, returns true.
-  */
+   * @return If there is a breaker fault at the specified index. If the index does not map to an
+   *     actual channel, returns true.
+   */
   public final boolean getBreakerFaultAtChannel(int channelIndex) {
-    switch (channelIndex)
-    {
-    case 0:
-      return Channel0BreakerFault;
-    case 1:
-      return Channel11BreakerFault;
-    case 2:
-      return Channel2BreakerFault;
-    case 3:
-      return Channel3BreakerFault;
-    case 4:
-      return Channel4BreakerFault;
-    case 5:
-      return Channel5BreakerFault;
-    case 6:
-      return Channel6BreakerFault;
-    case 7:
-      return Channel7BreakerFault;
-    case 8:
-      return Channel8BreakerFault;
-    case 9:
-      return Channel9BreakerFault;
-    case 10:
-      return Channel10BreakerFault;
-    case 11:
-      return Channel11BreakerFault;
-    case 12:
-      return Channel12BreakerFault;
-    case 13:
-      return Channel13BreakerFault;
-    case 14:
-      return Channel14BreakerFault;
-    case 15:
-      return Channel15BreakerFault;
-    case 16:
-      return Channel16BreakerFault;
-    case 17:
-      return Channel17BreakerFault;
-    case 18:
-      return Channel18BreakerFault;
-    case 19:
-      return Channel19BreakerFault;
-    case 20:
-      return Channel20BreakerFault;
-    case 21:
-      return Channel21BreakerFault;
-    case 22:
-      return Channel22BreakerFault;
-    case 23:
-      return Channel23BreakerFault;
-    default:
-      return true;
+    switch (channelIndex) {
+      case 0:
+        return Channel0BreakerFault;
+      case 1:
+        return Channel1BreakerFault;
+      case 2:
+        return Channel2BreakerFault;
+      case 3:
+        return Channel3BreakerFault;
+      case 4:
+        return Channel4BreakerFault;
+      case 5:
+        return Channel5BreakerFault;
+      case 6:
+        return Channel6BreakerFault;
+      case 7:
+        return Channel7BreakerFault;
+      case 8:
+        return Channel8BreakerFault;
+      case 9:
+        return Channel9BreakerFault;
+      case 10:
+        return Channel10BreakerFault;
+      case 11:
+        return Channel11BreakerFault;
+      case 12:
+        return Channel12BreakerFault;
+      case 13:
+        return Channel13BreakerFault;
+      case 14:
+        return Channel14BreakerFault;
+      case 15:
+        return Channel15BreakerFault;
+      case 16:
+        return Channel16BreakerFault;
+      case 17:
+        return Channel17BreakerFault;
+      case 18:
+        return Channel18BreakerFault;
+      case 19:
+        return Channel19BreakerFault;
+      case 20:
+        return Channel20BreakerFault;
+      case 21:
+        return Channel21BreakerFault;
+      case 22:
+        return Channel22BreakerFault;
+      case 23:
+        return Channel23BreakerFault;
+      default:
+        throw new IndexOutOfBoundsException("Power distribution fault channel out of bounds!");
     }
   }
 

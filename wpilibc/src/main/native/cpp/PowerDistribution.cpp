@@ -172,115 +172,117 @@ PowerDistribution::Faults PowerDistribution::GetFaults() const {
   return faults;
 }
 
-uint32_t PowerDistribution::Faults::getBreakerFaultAtChannel(
+bool PowerDistribution::Faults::GetBreakerFaultAtChannel(
     uint32_t channelIndex) const {
   switch (channelIndex) {
     case 0:
       return this->Channel0BreakerFault;
     case 1:
-      return this->Channel11BreakerFault;
+      return this->Channel1BreakerFault != 0;
     case 2:
-      return this->Channel2BreakerFault;
+      return this->Channel2BreakerFault != 0;
     case 3:
-      return this->Channel3BreakerFault;
+      return this->Channel3BreakerFault != 0;
     case 4:
-      return this->Channel4BreakerFault;
+      return this->Channel4BreakerFault != 0;
     case 5:
-      return this->Channel5BreakerFault;
+      return this->Channel5BreakerFault != 0;
     case 6:
-      return this->Channel6BreakerFault;
+      return this->Channel6BreakerFault != 0;
     case 7:
-      return this->Channel7BreakerFault;
+      return this->Channel7BreakerFault != 0;
     case 8:
-      return this->Channel8BreakerFault;
+      return this->Channel8BreakerFault != 0;
     case 9:
-      return this->Channel9BreakerFault;
+      return this->Channel9BreakerFault != 0;
     case 10:
-      return this->Channel10BreakerFault;
+      return this->Channel10BreakerFault != 0;
     case 11:
-      return this->Channel11BreakerFault;
+      return this->Channel11BreakerFault != 0;
     case 12:
-      return this->Channel12BreakerFault;
+      return this->Channel12BreakerFault != 0;
     case 13:
-      return this->Channel13BreakerFault;
+      return this->Channel13BreakerFault != 0;
     case 14:
-      return this->Channel14BreakerFault;
+      return this->Channel14BreakerFault != 0;
     case 15:
-      return this->Channel15BreakerFault;
+      return this->Channel15BreakerFault != 0;
     case 16:
-      return this->Channel16BreakerFault;
+      return this->Channel16BreakerFault != 0;
     case 17:
-      return this->Channel17BreakerFault;
+      return this->Channel17BreakerFault != 0;
     case 18:
-      return this->Channel18BreakerFault;
+      return this->Channel18BreakerFault != 0;
     case 19:
-      return this->Channel19BreakerFault;
+      return this->Channel19BreakerFault != 0;
     case 20:
-      return this->Channel20BreakerFault;
+      return this->Channel20BreakerFault != 0;
     case 21:
-      return this->Channel21BreakerFault;
+      return this->Channel21BreakerFault != 0;
     case 22:
-      return this->Channel22BreakerFault;
+      return this->Channel22BreakerFault != 0;
     case 23:
-      return this->Channel23BreakerFault;
+      return this->Channel23BreakerFault != 0;
     default:
-      return 1;
+      throw FRC_MakeError(err::ChannelIndexOutOfRange,
+                          "Power distribution fault channel out of bounds!")
   }
 }
 
-uint32_t PowerDistribution::StickyFaults::getBreakerFaultAtChannel(
+bool PowerDistribution::StickyFaults::GetBreakerFaultAtChannel(
     uint32_t channelIndex) const {
   switch (channelIndex) {
     case 0:
       return this->Channel0BreakerFault;
     case 1:
-      return this->Channel11BreakerFault;
+      return this->Channel1BreakerFault != 0;
     case 2:
-      return this->Channel2BreakerFault;
+      return this->Channel2BreakerFault != 0;
     case 3:
-      return this->Channel3BreakerFault;
+      return this->Channel3BreakerFault != 0;
     case 4:
-      return this->Channel4BreakerFault;
+      return this->Channel4BreakerFault != 0;
     case 5:
-      return this->Channel5BreakerFault;
+      return this->Channel5BreakerFault != 0;
     case 6:
-      return this->Channel6BreakerFault;
+      return this->Channel6BreakerFault != 0;
     case 7:
-      return this->Channel7BreakerFault;
+      return this->Channel7BreakerFault != 0;
     case 8:
-      return this->Channel8BreakerFault;
+      return this->Channel8BreakerFault != 0;
     case 9:
-      return this->Channel9BreakerFault;
+      return this->Channel9BreakerFault != 0;
     case 10:
-      return this->Channel10BreakerFault;
+      return this->Channel10BreakerFault != 0;
     case 11:
-      return this->Channel11BreakerFault;
+      return this->Channel11BreakerFault != 0;
     case 12:
-      return this->Channel12BreakerFault;
+      return this->Channel12BreakerFault != 0;
     case 13:
-      return this->Channel13BreakerFault;
+      return this->Channel13BreakerFault != 0;
     case 14:
-      return this->Channel14BreakerFault;
+      return this->Channel14BreakerFault != 0;
     case 15:
-      return this->Channel15BreakerFault;
+      return this->Channel15BreakerFault != 0;
     case 16:
-      return this->Channel16BreakerFault;
+      return this->Channel16BreakerFault != 0;
     case 17:
-      return this->Channel17BreakerFault;
+      return this->Channel17BreakerFault != 0;
     case 18:
-      return this->Channel18BreakerFault;
+      return this->Channel18BreakerFault != 0;
     case 19:
-      return this->Channel19BreakerFault;
+      return this->Channel19BreakerFault != 0;
     case 20:
-      return this->Channel20BreakerFault;
+      return this->Channel20BreakerFault != 0;
     case 21:
-      return this->Channel21BreakerFault;
+      return this->Channel21BreakerFault != 0;
     case 22:
-      return this->Channel22BreakerFault;
+      return this->Channel22BreakerFault != 0;
     case 23:
-      return this->Channel23BreakerFault;
+      return this->Channel23BreakerFault != 0;
     default:
-      return 1;
+      throw FRC_MakeError(err::ChannelIndexOutOfRange,
+                          "Power distribution fault channel out of bounds!")
   }
 }
 
