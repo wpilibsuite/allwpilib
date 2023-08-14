@@ -4,10 +4,10 @@
 
 package edu.wpi.first.wpilibj;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 
 import edu.wpi.first.hal.can.CANMessageNotFoundException;
 import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;

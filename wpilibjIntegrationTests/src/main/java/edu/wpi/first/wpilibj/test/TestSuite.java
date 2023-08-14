@@ -296,11 +296,11 @@ public class TestSuite extends AbstractTestSuite {
         displayInvalidUsage("None of the arguments passed to the filter matched.", args);
         return null;
       }
-      printLoadedTests(testClasses.toArray(new Class[0]));
+      printLoadedTests(testClasses.toArray(Class[]::new));
       MultipleResult results = new MultipleResult();
       // Runs tests multiple times if the repeat rule is used
       for (int i = 0; i < repeatCount; i++) {
-        Result result = (new JUnitCore()).run(testClasses.toArray(new Class[0]));
+        Result result = (new JUnitCore()).run(testClasses.toArray(Class[]::new));
         // Store the given results in one cohesive result
         results.addResult(result);
       }
