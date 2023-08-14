@@ -51,7 +51,7 @@ LinearQuadraticRegulator<States, Inputs>::LinearQuadraticRegulator(
     throw std::invalid_argument(msg);
   }
 
-  Matrixd<States, States> S = DARE(discA, discB, Q, R);
+  Matrixd<States, States> S = DARE<States, Inputs>(discA, discB, Q, R);
 
   // K = (BᵀSB + R)⁻¹BᵀSA
   m_K = (discB.transpose() * S * discB + R)
@@ -70,7 +70,7 @@ LinearQuadraticRegulator<States, Inputs>::LinearQuadraticRegulator(
   Matrixd<States, Inputs> discB;
   DiscretizeAB<States, Inputs>(A, B, dt, &discA, &discB);
 
-  Matrixd<States, States> S = DARE(discA, discB, Q, R, N);
+  Matrixd<States, States> S = DARE<States, Inputs>(discA, discB, Q, R, N);
 
   // K = (BᵀSB + R)⁻¹(BᵀSA + Nᵀ)
   m_K = (discB.transpose() * S * discB + R)

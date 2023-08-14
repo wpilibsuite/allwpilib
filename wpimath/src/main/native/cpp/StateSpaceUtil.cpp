@@ -28,6 +28,12 @@ bool IsStabilizable<2, 1>(const Matrixd<2, 2>& A, const Matrixd<2, 1>& B) {
   return detail::IsStabilizableImpl<2, 1>(A, B);
 }
 
+template <>
+bool IsStabilizable<Eigen::Dynamic, Eigen::Dynamic>(const Eigen::MatrixXd& A,
+                                                    const Eigen::MatrixXd& B) {
+  return detail::IsStabilizableImpl<Eigen::Dynamic, Eigen::Dynamic>(A, B);
+}
+
 Vectord<3> PoseToVector(const Pose2d& pose) {
   return Vectord<3>{pose.X().value(), pose.Y().value(),
                     pose.Rotation().Radians().value()};
