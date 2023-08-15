@@ -7,7 +7,6 @@
 #include <functional>
 
 #include "Eigen/Eigenvalues"
-#include "Eigen/src/Core/util/Constants.h"
 #include "frc/EigenCore.h"
 #include "frc/system/Discretization.h"
 #include "frc/system/NumericalIntegration.h"
