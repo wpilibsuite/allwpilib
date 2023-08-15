@@ -67,7 +67,8 @@ public class Transform2d {
   }
 
   /**
-   * Composes two transformations.
+   * Composes two transformations. The second transform is applied relative to the orientation of
+   * the first.
    *
    * @param other The transform to compose with this one.
    * @return The composition of the two transformations.
