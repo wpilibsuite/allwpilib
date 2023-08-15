@@ -436,11 +436,9 @@ public final class SendableRegistry {
    */
   public static synchronized void publish(Sendable sendable, SendableBuilder builder) {
     Component comp = getOrAdd(sendable);
+    sendable.initSendable(builder);
+    builder.update();
     comp.m_builders.add(builder);
-    for (SendableBuilder compBuilder : comp.m_builders) {
-      sendable.initSendable(compBuilder);
-      compBuilder.update();
-    }
   }
 
   /**
@@ -452,7 +450,6 @@ public final class SendableRegistry {
     Component comp = components.get(sendable);
     if (comp != null && comp.m_builders != null) {
       for (SendableBuilder compBuilder : comp.m_builders) {
-        sendable.initSendable(compBuilder);
         compBuilder.update();
       }
     }

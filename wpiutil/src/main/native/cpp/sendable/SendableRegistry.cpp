@@ -405,11 +405,9 @@ void SendableRegistry::Publish(UID sendableUid,
     return;
   }
   auto& comp = *inst.components[sendableUid - 1];
+  comp.sendable->InitSendable(*builder);
+  builder->Update();
   comp.builders.emplace_back(std::move(builder));
-  for (auto& builder : comp.builders) {
-    comp.sendable->InitSendable(*builder);
-    builder->Update();
-  }
 }
 
 void SendableRegistry::Update(UID sendableUid) {
