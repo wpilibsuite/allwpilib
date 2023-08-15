@@ -278,13 +278,14 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
   }
 
   /**
-   * Adds the new rotation to the current rotation. The other rotation is applied intrinsically,
-   * which means that it rotates around the axes after applying this rotation. For example, {@code
-   * new Rotation3d(Units.degreesToRadians(90), 0, 0).rotateBy(new Rotation3d(0,
-   * Units.degreesToRadians(90), 0))} rotates by 90 degrees around the +X axis and then by 90
-   * degrees around the new +Y axis (which has been moved to the +Z axis).
+   * Adds the new rotation to the current rotation. The other rotation is applied extrinsically,
+   * which means that it rotates around the global axes. For example, {@code new
+   * Rotation3d(Units.degreesToRadians(90), 0, 0).rotateBy(new Rotation3d(0,
+   * Units.degreesToRadians(45), 0))} rotates by 90 degrees around the +X axis and then by 45
+   * degrees around the global +Y axis. (This is equivalent to {@code new
+   * Rotation3d(Units.degreesToRadians(90), Units.degreesToRadians(45), 0)})
    *
-   * @param other The intrinsic rotation to rotate by.
+   * @param other The extrinsic rotation to rotate by.
    * @return The new rotated Rotation3d.
    */
   public Rotation3d rotateBy(Rotation3d other) {
