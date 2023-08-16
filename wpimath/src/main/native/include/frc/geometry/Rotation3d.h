@@ -139,12 +139,12 @@ class WPILIB_DLLEXPORT Rotation3d {
 
   /**
    * Adds the new rotation to the current rotation. The other rotation is
-   * applied intrinsically, which means that it rotates around the axes after
-   * applying this rotation. For example, Rotation3d{90_deg, 0, 0}.RotateBy(
-   * Rotation3d{0, 90_deg, 0}) rotates by 90 degrees around the +X axis and then
-   * by 90 degrees around the new +Y axis (which has been moved to the +Z axis).
+   * applied extrinsically, which means that it rotates around the global axes.
+   * For example, Rotation3d{90_deg, 0, 0}.RotateBy(Rotation3d{0, 45_deg, 0})
+   * rotates by 90 degrees around the +X axis and then by 45 degrees around the
+   * global +Y axis. (This is equivalent to Rotation3d{90_deg, 45_deg, 0})
    *
-   * @param other The rotation to rotate by.
+   * @param other The extrinsic rotation to rotate by.
    *
    * @return The new rotated Rotation3d.
    */

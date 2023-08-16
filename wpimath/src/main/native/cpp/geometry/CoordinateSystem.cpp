@@ -68,6 +68,8 @@ Pose3d CoordinateSystem::Convert(const Pose3d& pose,
 Transform3d CoordinateSystem::Convert(const Transform3d& transform,
                                       const CoordinateSystem& from,
                                       const CoordinateSystem& to) {
-  return Transform3d{Convert(transform.Translation(), from, to),
-                     Convert(transform.Rotation(), from, to)};
+  const auto coordRot = from.m_rotation - to.m_rotation;
+  return Transform3d{
+      Convert(transform.Translation(), from, to),
+      (-coordRot).RotateBy(transform.Rotation().RotateBy(coordRot))};
 }

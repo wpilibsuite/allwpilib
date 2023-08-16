@@ -50,6 +50,8 @@ def tagList = [
         "Command-based",
         // Romi
         "Romi",
+        // XRP
+        "XRP",
         // Extremely simple programs showcasing a single hardware API
         "Hardware",
         // Full robot, with multiple mechanisms

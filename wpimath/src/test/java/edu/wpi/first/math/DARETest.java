@@ -5,6 +5,7 @@
 package edu.wpi.first.math;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import edu.wpi.first.wpilibj.UtilityClassTest;
 import org.ejml.simple.SimpleMatrix;
@@ -16,8 +17,8 @@ class DARETest extends UtilityClassTest<DARE> {
   }
 
   public static void assertMatrixEqual(SimpleMatrix A, SimpleMatrix B) {
-    for (int i = 0; i < A.numRows(); i++) {
-      for (int j = 0; j < A.numCols(); j++) {
+    for (int i = 0; i < A.getNumRows(); i++) {
+      for (int j = 0; j < A.getNumCols(); j++) {
         assertEquals(A.get(i, j), B.get(i, j), 1e-4);
       }
     }
@@ -35,7 +36,7 @@ class DARETest extends UtilityClassTest<DARE> {
                     .mult((B.transpose().mult(X).mult(B).plus(R)).invert())
                     .mult(B.transpose().mult(X).mult(A)))
             .plus(Q);
-    assertMatrixEqual(new SimpleMatrix(Y.numRows(), Y.numCols()), Y);
+    assertMatrixEqual(new SimpleMatrix(Y.getNumRows(), Y.getNumCols()), Y);
   }
 
   void assertDARESolution(
@@ -55,7 +56,7 @@ class DARETest extends UtilityClassTest<DARE> {
                     .mult((B.transpose().mult(X).mult(B).plus(R)).invert())
                     .mult(B.transpose().mult(X).mult(A).plus(N.transpose())))
             .plus(Q);
-    assertMatrixEqual(new SimpleMatrix(Y.numRows(), Y.numCols()), Y);
+    assertMatrixEqual(new SimpleMatrix(Y.getNumRows(), Y.getNumCols()), Y);
   }
 
   @Test
@@ -186,5 +187,120 @@ class DARETest extends UtilityClassTest<DARE> {
     var X = DARE.dare(A, B, Q, R, N);
     assertMatrixEqual(X, X.transpose());
     assertDARESolution(A, B, Q, R, N, X);
+  }
+
+  @Test
+  void testMoreInputsThanStates_ABQR() {
+    var A = SimpleMatrix.identity(2);
+    var B = new SimpleMatrix(2, 3, true, new double[] {1, 0, 0, 0, 0.5, 0.3});
+    var Q = SimpleMatrix.identity(2);
+    var R = SimpleMatrix.identity(3);
+
+    var X = DARE.dare(A, B, Q, R);
+    assertMatrixEqual(X, X.transpose());
+    assertDARESolution(A, B, Q, R, X);
+  }
+
+  @Test
+  void testMoreInputsThanStates_ABQRN() {
+    var A = SimpleMatrix.identity(2);
+    var B = new SimpleMatrix(2, 3, true, new double[] {1, 0, 0, 0, 0.5, 0.3});
+    var Q = SimpleMatrix.identity(2);
+    var R = SimpleMatrix.identity(3);
+    var N = new SimpleMatrix(2, 3, true, new double[] {1, 0, 0, 0, 1, 0});
+
+    var X = DARE.dare(A, B, Q, R, N);
+    assertMatrixEqual(X, X.transpose());
+    assertDARESolution(A, B, Q, R, N, X);
+  }
+
+  @Test
+  void testQNotSymmetricPositiveSemidefinite_ABQR() {
+    var A = SimpleMatrix.identity(2);
+    var B = SimpleMatrix.identity(2);
+    var Q = SimpleMatrix.diag(-1.0, -1.0);
+    var R = SimpleMatrix.identity(2);
+
+    assertThrows(IllegalArgumentException.class, () -> DARE.dare(A, B, Q, R));
+  }
+
+  @Test
+  void testQNotSymmetricPositiveSemidefinite_ABQRN() {
+    var A = SimpleMatrix.identity(2);
+    var B = SimpleMatrix.identity(2);
+    var Q = SimpleMatrix.identity(2);
+    var R = SimpleMatrix.diag(-1.0, -1.0);
+    var N = SimpleMatrix.diag(2.0, 2.0);
+
+    assertThrows(IllegalArgumentException.class, () -> DARE.dare(A, B, Q, R, N));
+  }
+
+  @Test
+  void testRNotSymmetricPositiveDefinite_ABQR() {
+    var A = SimpleMatrix.identity(2);
+    var B = SimpleMatrix.identity(2);
+    var Q = SimpleMatrix.identity(2);
+
+    var R1 = new SimpleMatrix(2, 2);
+    assertThrows(IllegalArgumentException.class, () -> DARE.dare(A, B, Q, R1));
+
+    var R2 = SimpleMatrix.diag(-1.0, -1.0);
+    assertThrows(IllegalArgumentException.class, () -> DARE.dare(A, B, Q, R2));
+  }
+
+  @Test
+  void testRNotSymmetricPositiveDefinite_ABQRN() {
+    var A = SimpleMatrix.identity(2);
+    var B = SimpleMatrix.identity(2);
+    var Q = SimpleMatrix.identity(2);
+    var N = SimpleMatrix.identity(2);
+
+    var R1 = new SimpleMatrix(2, 2);
+    assertThrows(IllegalArgumentException.class, () -> DARE.dare(A, B, Q, R1, N));
+
+    var R2 = SimpleMatrix.diag(-1.0, -1.0);
+    assertThrows(IllegalArgumentException.class, () -> DARE.dare(A, B, Q, R2, N));
+  }
+
+  @Test
+  void testABNotStabilizable_ABQR() {
+    var A = SimpleMatrix.identity(2);
+    var B = new SimpleMatrix(2, 2);
+    var Q = SimpleMatrix.identity(2);
+    var R = SimpleMatrix.identity(2);
+
+    assertThrows(IllegalArgumentException.class, () -> DARE.dare(A, B, Q, R));
+  }
+
+  @Test
+  void testABNotStabilizable_ABQRN() {
+    var A = SimpleMatrix.identity(2);
+    var B = new SimpleMatrix(2, 2);
+    var Q = SimpleMatrix.identity(2);
+    var R = SimpleMatrix.identity(2);
+    var N = SimpleMatrix.identity(2);
+
+    assertThrows(IllegalArgumentException.class, () -> DARE.dare(A, B, Q, R, N));
+  }
+
+  @Test
+  void testACNotDetectable_ABQR() {
+    var A = SimpleMatrix.identity(2);
+    var B = SimpleMatrix.identity(2);
+    var Q = new SimpleMatrix(2, 2);
+    var R = SimpleMatrix.identity(2);
+
+    assertThrows(IllegalArgumentException.class, () -> DARE.dare(A, B, Q, R));
+  }
+
+  @Test
+  void testACNotDetectable_ABQRN() {
+    var A = SimpleMatrix.identity(2);
+    var B = SimpleMatrix.identity(2);
+    var Q = new SimpleMatrix(2, 2);
+    var R = SimpleMatrix.identity(2);
+    var N = new SimpleMatrix(2, 2);
+
+    assertThrows(IllegalArgumentException.class, () -> DARE.dare(A, B, Q, R, N));
   }
 }

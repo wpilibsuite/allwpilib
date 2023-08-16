@@ -84,7 +84,10 @@ class WPILIB_DLLEXPORT Quaternion {
   Eigen::Vector3d ToRotationVector() const;
 
  private:
+  // Scalar r in versor form
   double m_r = 1.0;
+
+  // Vector v in versor form
   Eigen::Vector3d m_v{0.0, 0.0, 0.0};
 };
 

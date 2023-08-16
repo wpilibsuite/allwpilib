@@ -80,7 +80,7 @@ public class Matrix<R extends Num, C extends Num> {
    * @return The number of columns, according to the internal storage.
    */
   public final int getNumCols() {
-    return this.m_storage.numCols();
+    return this.m_storage.getNumCols();
   }
 
   /**
@@ -89,7 +89,7 @@ public class Matrix<R extends Num, C extends Num> {
    * @return The number of rows, according to the internal storage.
    */
   public final int getNumRows() {
-    return this.m_storage.numRows();
+    return this.m_storage.getNumRows();
   }
 
   /**
@@ -582,7 +582,7 @@ public class Matrix<R extends Num, C extends Num> {
     SimpleMatrix temp = m_storage.copy();
 
     CholeskyDecomposition_F64<DMatrixRMaj> chol =
-        DecompositionFactory_DDRM.chol(temp.numRows(), lowerTriangular);
+        DecompositionFactory_DDRM.chol(temp.getNumRows(), lowerTriangular);
     if (!chol.decompose(temp.getMatrix())) {
       // check that the input is not all zeros -- if they are, we special case and return all
       // zeros.
@@ -592,7 +592,7 @@ public class Matrix<R extends Num, C extends Num> {
         isZeros &= Math.abs(matDatum) < 1e-6;
       }
       if (isZeros) {
-        return new Matrix<>(new SimpleMatrix(temp.numRows(), temp.numCols()));
+        return new Matrix<>(new SimpleMatrix(temp.getNumRows(), temp.getNumCols()));
       }
 
       throw new RuntimeException(

@@ -14,6 +14,8 @@ import edu.wpi.first.math.numbers.N6;
 import edu.wpi.first.math.numbers.N7;
 import edu.wpi.first.math.numbers.N8;
 import edu.wpi.first.math.numbers.N9;
+import java.util.Objects;
+import org.ejml.simple.SimpleMatrix;
 
 /**
  * A specialization of {@link MatBuilder} for constructing vectors (Nx1 matrices).
@@ -26,7 +28,15 @@ public class VecBuilder<N extends Num> extends MatBuilder<N, N1> {
   }
 
   private Vector<N> fillVec(double... data) {
-    return new Vector<>(fill(data));
+    if (Objects.requireNonNull(data).length != this.m_rows.getNum()) {
+      throw new IllegalArgumentException(
+          "Invalid vector data provided. Wanted "
+              + this.m_rows.getNum()
+              + " vector, but got "
+              + data.length
+              + " elements");
+    }
+    return new Vector<>(new SimpleMatrix(this.m_rows.getNum(), 1, true, data));
   }
 
   /**

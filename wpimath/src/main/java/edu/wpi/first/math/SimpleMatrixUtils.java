@@ -68,7 +68,7 @@ public final class SimpleMatrixUtils {
 
   private static Pair<SimpleMatrix, SimpleMatrix> pade3(SimpleMatrix A) {
     double[] b = new double[] {120, 60, 12, 1};
-    SimpleMatrix ident = eye(A.numRows(), A.numCols());
+    SimpleMatrix ident = eye(A.getNumRows(), A.getNumCols());
 
     SimpleMatrix A2 = A.mult(A);
     SimpleMatrix U = A.mult(A2.mult(ident.scale(b[1]).plus(b[3])));
@@ -78,7 +78,7 @@ public final class SimpleMatrixUtils {
 
   private static Pair<SimpleMatrix, SimpleMatrix> pade5(SimpleMatrix A) {
     double[] b = new double[] {30240, 15120, 3360, 420, 30, 1};
-    SimpleMatrix ident = eye(A.numRows(), A.numCols());
+    SimpleMatrix ident = eye(A.getNumRows(), A.getNumCols());
     SimpleMatrix A2 = A.mult(A);
     SimpleMatrix A4 = A2.mult(A2);
 
@@ -90,7 +90,7 @@ public final class SimpleMatrixUtils {
 
   private static Pair<SimpleMatrix, SimpleMatrix> pade7(SimpleMatrix A) {
     double[] b = new double[] {17297280, 8648640, 1995840, 277200, 25200, 1512, 56, 1};
-    SimpleMatrix ident = eye(A.numRows(), A.numCols());
+    SimpleMatrix ident = eye(A.getNumRows(), A.getNumCols());
     SimpleMatrix A2 = A.mult(A);
     SimpleMatrix A4 = A2.mult(A2);
     SimpleMatrix A6 = A4.mult(A2);
@@ -108,7 +108,7 @@ public final class SimpleMatrixUtils {
         new double[] {
           17643225600.0, 8821612800.0, 2075673600, 302702400, 30270240, 2162160, 110880, 3960, 90, 1
         };
-    SimpleMatrix ident = eye(A.numRows(), A.numCols());
+    SimpleMatrix ident = eye(A.getNumRows(), A.getNumCols());
     SimpleMatrix A2 = A.mult(A);
     SimpleMatrix A4 = A2.mult(A2);
     SimpleMatrix A6 = A4.mult(A2);
@@ -149,7 +149,7 @@ public final class SimpleMatrixUtils {
           182,
           1
         };
-    SimpleMatrix ident = eye(A.numRows(), A.numCols());
+    SimpleMatrix ident = eye(A.getNumRows(), A.getNumCols());
 
     SimpleMatrix A2 = A.mult(A);
     SimpleMatrix A4 = A2.mult(A2);
@@ -213,7 +213,7 @@ public final class SimpleMatrixUtils {
     SimpleMatrix temp = src.copy();
 
     CholeskyDecomposition_F64<DMatrixRMaj> chol =
-        DecompositionFactory_DDRM.chol(temp.numRows(), lowerTriangular);
+        DecompositionFactory_DDRM.chol(temp.getNumRows(), lowerTriangular);
     if (!chol.decompose(temp.getMatrix())) {
       // check that the input is not all zeros -- if they are, we special case and return all
       // zeros.
@@ -223,7 +223,7 @@ public final class SimpleMatrixUtils {
         isZeros &= Math.abs(matDatum) < 1e-6;
       }
       if (isZeros) {
-        return new SimpleMatrix(temp.numRows(), temp.numCols());
+        return new SimpleMatrix(temp.getNumRows(), temp.getNumCols());
       }
 
       throw new RuntimeException("Cholesky decomposition failed! Input matrix:\n" + src.toString());
@@ -239,8 +239,8 @@ public final class SimpleMatrixUtils {
    * @return the exponential of A.
    */
   public static SimpleMatrix exp(SimpleMatrix A) {
-    SimpleMatrix toReturn = new SimpleMatrix(A.numRows(), A.numRows());
-    WPIMathJNI.exp(A.getDDRM().getData(), A.numRows(), toReturn.getDDRM().getData());
+    SimpleMatrix toReturn = new SimpleMatrix(A.getNumRows(), A.getNumRows());
+    WPIMathJNI.exp(A.getDDRM().getData(), A.getNumRows(), toReturn.getDDRM().getData());
     return toReturn;
   }
 }

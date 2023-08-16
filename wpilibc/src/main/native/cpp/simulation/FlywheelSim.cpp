@@ -24,6 +24,10 @@ FlywheelSim::FlywheelSim(const DCMotor& gearbox, double gearing,
     : FlywheelSim(LinearSystemId::FlywheelSystem(gearbox, moi, gearing),
                   gearbox, gearing, measurementStdDevs) {}
 
+void FlywheelSim::SetState(units::radians_per_second_t velocity) {
+  LinearSystemSim::SetState(Vectord<1>{velocity.value()});
+}
+
 units::radians_per_second_t FlywheelSim::GetAngularVelocity() const {
   return units::radians_per_second_t{GetOutput(0)};
 }

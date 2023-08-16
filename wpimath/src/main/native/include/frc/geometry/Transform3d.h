@@ -99,7 +99,8 @@ class WPILIB_DLLEXPORT Transform3d {
   Transform3d operator/(double scalar) const { return *this * (1.0 / scalar); }
 
   /**
-   * Composes two transformations.
+   * Composes two transformations. The second transform is applied relative to
+   * the orientation of the first.
    *
    * @param other The transform to compose with this one.
    * @return The composition of the two transformations.

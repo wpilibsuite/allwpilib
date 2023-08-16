@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj.simulation;
 
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -82,6 +83,15 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
         measurementStdDevs);
     m_gearbox = gearbox;
     m_gearing = gearing;
+  }
+
+  /**
+   * Sets the flywheel's state.
+   *
+   * @param velocityRadPerSec The new velocity in radians per second.
+   */
+  public void setState(double velocityRadPerSec) {
+    setState(VecBuilder.fill(velocityRadPerSec));
   }
 
   /**
