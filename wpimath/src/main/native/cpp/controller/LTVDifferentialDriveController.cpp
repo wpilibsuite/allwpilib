@@ -66,6 +66,7 @@ LTVDifferentialDriveController::LTVDifferentialDriveController(
   // Ax = -Bu
   // x = -A⁻¹Bu
   units::meters_per_second_t maxV{
+      // NOLINTNEXTLINE(clang-analyzer-unix.Malloc)
       -plant.A().householderQr().solve(plant.B() * Vectord<2>{12.0, 12.0})(0)};
 
   if (maxV <= 0_mps) {
