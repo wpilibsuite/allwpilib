@@ -161,7 +161,6 @@ public class BooleanEvent implements BooleanSupplier {
    * @param other the event to compose with
    * @return the event that is active when both events are active
    */
-  @SuppressWarnings("PMD.CompareObjectsWithEquals")
   public BooleanEvent and(BooleanSupplier other) {
     requireNonNullParam(other, "other", "and");
     return new BooleanEvent(m_loop, () -> m_state.get() && other.getAsBoolean());
@@ -176,7 +175,6 @@ public class BooleanEvent implements BooleanSupplier {
    * @param other the event to compose with
    * @return a signal that is high when either signal is high.
    */
-  @SuppressWarnings("PMD.CompareObjectsWithEquals")
   public BooleanEvent or(BooleanSupplier other) {
     requireNonNullParam(other, "other", "or");
     return new BooleanEvent(m_loop, () -> m_state.get() || other.getAsBoolean());
