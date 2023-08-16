@@ -168,15 +168,14 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_math_WPIMathJNI_exp
   (JNIEnv* env, jclass, jdoubleArray src, jint rows, jdoubleArray dst)
 {
-  jdouble* arrayBody = env->GetDoubleArrayElements(src, nullptr);
+  JDoubleArrayRef arrayBody{env, src};
 
-  Eigen::Map<
-      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>
-      Amat{arrayBody, rows, rows};
+  Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
+                                 Eigen::RowMajor>>
+      Amat{arrayBody.array().data(), rows, rows};
   Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> Aexp =
       Amat.exp();
 
-  env->ReleaseDoubleArrayElements(src, arrayBody, 0);
   env->SetDoubleArrayRegion(dst, 0, rows * rows, Aexp.data());
 }
 
@@ -190,15 +189,14 @@ Java_edu_wpi_first_math_WPIMathJNI_pow
   (JNIEnv* env, jclass, jdoubleArray src, jint rows, jdouble exponent,
    jdoubleArray dst)
 {
-  jdouble* arrayBody = env->GetDoubleArrayElements(src, nullptr);
+  JDoubleArrayRef arrayBody{env, src};
 
-  Eigen::Map<
-      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>
-      Amat{arrayBody, rows, rows};  // NOLINT
+  Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
+                                 Eigen::RowMajor>>
+      Amat{arrayBody.array().data(), rows, rows};  // NOLINT
   Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> Apow =
       Amat.pow(exponent);
 
-  env->ReleaseDoubleArrayElements(src, arrayBody, 0);
   env->SetDoubleArrayRegion(dst, 0, rows * rows, Apow.data());
 }
 
@@ -266,22 +264,19 @@ Java_edu_wpi_first_math_WPIMathJNI_isStabilizable
   (JNIEnv* env, jclass, jint states, jint inputs, jdoubleArray aSrc,
    jdoubleArray bSrc)
 {
-  jdouble* nativeA = env->GetDoubleArrayElements(aSrc, nullptr);
-  jdouble* nativeB = env->GetDoubleArrayElements(bSrc, nullptr);
+  JDoubleArrayRef nativeA{env, aSrc};
+  JDoubleArrayRef nativeB{env, bSrc};
 
-  Eigen::Map<
-      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>
-      A{nativeA, states, states};
+  Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
+                                 Eigen::RowMajor>>
+      A{nativeA.array().data(), states, states};
 
-  Eigen::Map<
-      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>
-      B{nativeB, states, inputs};
+  Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
+                                 Eigen::RowMajor>>
+      B{nativeB.array().data(), states, inputs};
 
   bool isStabilizable =
       frc::IsStabilizable<Eigen::Dynamic, Eigen::Dynamic>(A, B);
-
-  env->ReleaseDoubleArrayElements(aSrc, nativeA, 0);
-  env->ReleaseDoubleArrayElements(bSrc, nativeB, 0);
 
   return isStabilizable;
 }
@@ -391,13 +386,15 @@ Java_edu_wpi_first_math_WPIMathJNI_rankUpdate
   (JNIEnv* env, jclass, jdoubleArray mat, jint rows, jdoubleArray vec,
    jdouble sigma, jboolean lowerTriangular)
 {
+  // TODO: Replace with JSpan<jdouble> matBody{env, mat} when that exists
   jdouble* matBody = env->GetDoubleArrayElements(mat, nullptr);
-  jdouble* vecBody = env->GetDoubleArrayElements(vec, nullptr);
+  JDoubleArrayRef vecBody{env, vec};
 
   Eigen::Map<
       Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>
       L{matBody, rows, rows};
-  Eigen::Map<Eigen::Vector<double, Eigen::Dynamic>> v{vecBody, rows};
+  Eigen::Map<const Eigen::Vector<double, Eigen::Dynamic>> v{
+      vecBody.array().data(), rows};
 
   if (lowerTriangular == JNI_TRUE) {
     Eigen::internal::llt_inplace<double, Eigen::Lower>::rankUpdate(L, v, sigma);
@@ -405,8 +402,8 @@ Java_edu_wpi_first_math_WPIMathJNI_rankUpdate
     Eigen::internal::llt_inplace<double, Eigen::Upper>::rankUpdate(L, v, sigma);
   }
 
+  // TODO: Remove this after JSpan transition
   env->ReleaseDoubleArrayElements(mat, matBody, 0);
-  env->ReleaseDoubleArrayElements(vec, vecBody, 0);
 }
 
 /*
@@ -419,21 +416,19 @@ Java_edu_wpi_first_math_WPIMathJNI_solveFullPivHouseholderQr
   (JNIEnv* env, jclass, jdoubleArray A, jint Arows, jint Acols, jdoubleArray B,
    jint Brows, jint Bcols, jdoubleArray dst)
 {
-  jdouble* nativeA = env->GetDoubleArrayElements(A, nullptr);
-  jdouble* nativeB = env->GetDoubleArrayElements(B, nullptr);
+  JDoubleArrayRef nativeA{env, A};
+  JDoubleArrayRef nativeB{env, B};
 
-  Eigen::Map<
-      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>
-      Amat{nativeA, Arows, Acols};
-  Eigen::Map<
-      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>
-      Bmat{nativeB, Brows, Bcols};
+  Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
+                                 Eigen::RowMajor>>
+      Amat{nativeA.array().data(), Arows, Acols};
+  Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
+                                 Eigen::RowMajor>>
+      Bmat{nativeB.array().data(), Brows, Bcols};
 
   Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> Xmat =
       Amat.fullPivHouseholderQr().solve(Bmat);
 
-  env->ReleaseDoubleArrayElements(A, nativeA, 0);
-  env->ReleaseDoubleArrayElements(B, nativeB, 0);
   env->SetDoubleArrayRegion(dst, 0, Brows * Bcols, Xmat.data());
 }
 
