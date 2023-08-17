@@ -4,6 +4,7 @@
 
 package edu.wpi.first.math.controller;
 
+import edu.wpi.first.math.DARE;
 import edu.wpi.first.math.InterpolatingMatrixTreeMap;
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Matrix;
@@ -15,6 +16,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.system.Discretization;
 import edu.wpi.first.math.trajectory.Trajectory;
 
 /**
@@ -152,11 +154,26 @@ public class LTVUnicycleController {
       // The DARE is ill-conditioned if the velocity is close to zero, so don't
       // let the system stop.
       if (Math.abs(velocity) < 1e-4) {
-        m_table.put(velocity, new Matrix<>(Nat.N2(), Nat.N3()));
+        A.set(State.kY.value, State.kHeading.value, 1e-4);
       } else {
         A.set(State.kY.value, State.kHeading.value, velocity);
-        m_table.put(velocity, new LinearQuadraticRegulator<N3, N2, N3>(A, B, Q, R, dt).getK());
       }
+
+      var discABPair = Discretization.discretizeAB(A, B, dt);
+      var discA = discABPair.getFirst();
+      var discB = discABPair.getSecond();
+
+      var S = DARE.dareDetail(discA, discB, Q, R);
+
+      // K = (BᵀSB + R)⁻¹BᵀSA
+      m_table.put(
+          velocity,
+          discB
+              .transpose()
+              .times(S)
+              .times(discB)
+              .plus(R)
+              .solve(discB.transpose().times(S).times(discA)));
     }
   }
 
