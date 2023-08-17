@@ -23,12 +23,30 @@ import edu.wpi.first.util.sendable.SendableRegistry;
  * <p>This class is provided by the NewCommands VendorDep
  */
 public abstract class Subsystem implements Sendable {
+  /** Whether the subsystem is enabled. */
+  private boolean m_enabled;
+
+  /** The default command. */
+  private Command m_defaultCommand;
+
   /** Constructor. */
   public Subsystem() {
+    this(true);
+  }
+
+  /**
+   * Constructor.
+   *
+   * @param enabled Whether to enable the subsystem
+   */
+  public Subsystem(boolean enabled) {
     String name = this.getClass().getSimpleName();
     name = name.substring(name.lastIndexOf('.') + 1);
     SendableRegistry.addLW(this, name, name);
-    CommandScheduler.getInstance().registerSubsystem(this);
+    m_enabled = enabled;
+    if (enabled) {
+      CommandScheduler.getInstance().registerSubsystem(this);
+    }
   }
 
   /**
@@ -46,6 +64,20 @@ public abstract class Subsystem implements Sendable {
    */
   public void simulationPeriodic() {}
 
+  /** Enables the subsystem. */
+  public void enable() {
+    register();
+    if (m_defaultCommand != null) {
+      setDefaultCommand(m_defaultCommand);
+    }
+  }
+
+  /** Disables the subsystem. */
+  public void disable() {
+    m_enabled = false;
+    CommandScheduler.getInstance().unregisterSubsystem(this);
+  }
+
   /**
    * Sets the default {@link Command} of the subsystem. The default command will be automatically
    * scheduled when no other commands are scheduled that require the subsystem. Default commands
@@ -56,7 +88,10 @@ public abstract class Subsystem implements Sendable {
    * @param defaultCommand the default command to associate with this subsystem
    */
   public void setDefaultCommand(Command defaultCommand) {
-    CommandScheduler.getInstance().setDefaultCommand(this, defaultCommand);
+    if (m_enabled) {
+      CommandScheduler.getInstance().setDefaultCommand(this, defaultCommand);
+    }
+    m_defaultCommand = defaultCommand;
   }
 
   /**
@@ -64,7 +99,10 @@ public abstract class Subsystem implements Sendable {
    * is currently running.
    */
   public void removeDefaultCommand() {
-    CommandScheduler.getInstance().removeDefaultCommand(this);
+    if (m_enabled) {
+      CommandScheduler.getInstance().removeDefaultCommand(this);
+    }
+    m_defaultCommand = null;
   }
 
   /**
@@ -74,17 +112,17 @@ public abstract class Subsystem implements Sendable {
    * @return the default command associated with this subsystem
    */
   public Command getDefaultCommand() {
-    return CommandScheduler.getInstance().getDefaultCommand(this);
+    return m_defaultCommand;
   }
 
   /**
    * Returns the command currently running on this subsystem. Returns null if no command is
-   * currently scheduled that requires this subsystem.
+   * currently scheduled that requires this subsystem or if the subsystem is disabled.
    *
    * @return the scheduled command currently requiring this subsystem
    */
   public Command getCurrentCommand() {
-    return CommandScheduler.getInstance().requiring(this);
+    return m_enabled ? CommandScheduler.getInstance().requiring(this) : null;
   }
 
   /**
@@ -128,6 +166,7 @@ public abstract class Subsystem implements Sendable {
    * Subsystem#periodic()} method to be called when the scheduler runs.
    */
   public void register() {
+    m_enabled = true;
     CommandScheduler.getInstance().registerSubsystem(this);
   }
 
