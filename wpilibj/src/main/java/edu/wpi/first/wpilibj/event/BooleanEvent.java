@@ -47,10 +47,11 @@ public class BooleanEvent implements BooleanSupplier {
   /**
    * Check the state of this signal (high or low) as of the last loop poll.
    *
-   * @return true for the high state, false for the low state. Also false if not polled.
+   * @return true for the high state, false for the low state. If the event was never polled, it
+   *     returns the state at event construction.
    */
   @Override
-  public boolean getAsBoolean() {
+  public final boolean getAsBoolean() {
     return m_state.get();
   }
 
@@ -156,7 +157,8 @@ public class BooleanEvent implements BooleanSupplier {
    * Composes this event with another event, returning a new signal that is in the high state when
    * both signals are in the high state.
    *
-   * <p>The events must use the same event loop.
+   * <p>The events must use the same event loop. If the events use different event loops, the
+   * composed signal won't update until both loops are polled.
    *
    * @param other the event to compose with
    * @return the event that is active when both events are active
@@ -170,7 +172,8 @@ public class BooleanEvent implements BooleanSupplier {
    * Composes this event with another event, returning a new signal that is high when either signal
    * is high.
    *
-   * <p>The events must use the same event loop.
+   * <p>The events must use the same event loop. If the events use different event loops, the
+   * composed signal won't update until both loops are polled.
    *
    * @param other the event to compose with
    * @return a signal that is high when either signal is high.
@@ -190,6 +193,6 @@ public class BooleanEvent implements BooleanSupplier {
    * @return an instance of the subclass.
    */
   public <T extends BooleanSupplier> T castTo(BiFunction<EventLoop, BooleanSupplier, T> ctor) {
-    return ctor.apply(m_loop, m_signal);
+    return ctor.apply(m_loop, m_state::get);
   }
 }
