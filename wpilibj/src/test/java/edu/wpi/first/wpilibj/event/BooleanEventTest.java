@@ -30,8 +30,14 @@ class BooleanEventTest {
     assertEquals(1, orCounter.get());
   }
 
+  /**
+   * When a BooleanEvent is constructed, an action is bound to the event loop to update an internal
+   * state variable. This state variable is checked during loop polls to determine whether or not to
+   * execute an action. If a condition is changed during the loop poll but before the state variable
+   * gets updated, the changed condition is used for the state variable.
+   */
   @Test
-  void testLoopValueSemantics() {
+  void testEventConstructionOrdering() {
     var loop = new EventLoop();
     var bool1 = new AtomicBoolean(true);
     var bool2 = new AtomicBoolean(true);
@@ -88,6 +94,7 @@ class BooleanEventTest {
     assertEquals(0, counter.get());
   }
 
+  /** Tests that binding actions to the same edge event will result in all actions executing. */
   @Test
   void testEdgeReuse() {
     var loop = new EventLoop();
@@ -124,6 +131,7 @@ class BooleanEventTest {
     assertEquals(4, counter.get());
   }
 
+  /** Tests that all actions execute on separate edge events constructed from the original event. */
   @Test
   void testEdgeReconstruct() {
     var loop = new EventLoop();
@@ -160,6 +168,10 @@ class BooleanEventTest {
     assertEquals(4, counter.get());
   }
 
+  /**
+   * Tests that all actions bound to an event will still execute even if the signal is changed
+   * during the loop poll.
+   */
   @Test
   void testMidLoopBooleanChange() {
     var loop = new EventLoop();
@@ -200,6 +212,10 @@ class BooleanEventTest {
     assertEquals(4, counter.get());
   }
 
+  /**
+   * Tests that all actions bound to composed events will still execute even if the signal is
+   * changed during the loop poll.
+   */
   @Test
   void testEventReuse() {
     var loop = new EventLoop();
@@ -266,9 +282,7 @@ class BooleanEventTest {
     var bool = new AtomicBoolean(false);
     var counter = new AtomicInteger(0);
 
-    var event = new BooleanEvent(loop, bool::get);
-    event.ifHigh(counter::incrementAndGet);
-    event.negate().ifHigh(counter::incrementAndGet);
+    new BooleanEvent(loop, bool::get).negate().ifHigh(counter::incrementAndGet);
 
     assertEquals(0, counter.get());
 
@@ -279,11 +293,16 @@ class BooleanEventTest {
     bool.set(true);
     loop.poll();
 
-    assertEquals(2, counter.get());
+    assertEquals(1, counter.get());
 
     bool.set(false);
     loop.poll();
 
-    assertEquals(3, counter.get());
+    assertEquals(2, counter.get());
+
+    bool.set(true);
+    loop.poll();
+
+    assertEquals(2, counter.get());
   }
 }

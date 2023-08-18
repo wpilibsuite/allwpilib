@@ -31,7 +31,14 @@ TEST(BooleanEventTest, BinaryCompositions) {
   EXPECT_EQ(1, orCounter);
 }
 
-TEST(BooleanEventTest, LoopValueSemantics) {
+/**
+ * When a BooleanEvent is constructed, an action is bound to the event loop to
+ * update an internal state variable. This state variable is checked during loop
+ * polls to determine whether or not to execute an action. If a condition is
+ * changed during the loop poll but before the state variable gets updated, the
+ * changed condition is used for the state variable.
+ */
+TEST(BooleanEventTest, EventConstructionOrdering) {
   EventLoop loop;
   bool boolean1 = true;
   bool boolean2 = true;
@@ -91,6 +98,10 @@ TEST(BooleanEventTest, EdgeDecorators) {
   EXPECT_EQ(0, counter);
 }
 
+/**
+ * Tests that binding actions to the same edge event will result in all actions
+ * executing.
+ */
 TEST(BooleanEventTest, EdgeReuse) {
   EventLoop loop;
   bool boolean = false;
@@ -126,6 +137,10 @@ TEST(BooleanEventTest, EdgeReuse) {
   EXPECT_EQ(4, counter);
 }
 
+/**
+ * Tests that all actions execute on separate edge events constructed from the
+ * original event.
+ */
 TEST(BooleanEventTest, EdgeReconstruct) {
   EventLoop loop;
   bool boolean = false;
@@ -161,6 +176,8 @@ TEST(BooleanEventTest, EdgeReconstruct) {
   EXPECT_EQ(4, counter);
 }
 
+/** Tests that all actions bound to an event will still execute even if the
+ * signal is changed during the loop poll */
 TEST(BooleanEventTest, MidLoopBooleanChange) {
   EventLoop loop;
   bool boolean = false;
@@ -199,6 +216,10 @@ TEST(BooleanEventTest, MidLoopBooleanChange) {
   EXPECT_EQ(4, counter);
 }
 
+/**
+ * Tests that all actions bound to composed events will still execute even if
+ * the signal is changed during the loop poll.
+ */
 TEST(BooleanEventTest, EventReuse) {
   EventLoop loop;
   bool boolean1 = false;
@@ -256,9 +277,7 @@ TEST(BooleanEventTest, Negation) {
   bool boolean = false;
   int counter = 0;
 
-  auto event = BooleanEvent(&loop, [&] { return boolean; });
-  event.IfHigh([&] { ++counter; });
-  (!event).IfHigh([&] { ++counter; });
+  (!BooleanEvent(&loop, [&] { return boolean; })).IfHigh([&] { ++counter; });
 
   EXPECT_EQ(0, counter);
 
@@ -269,9 +288,14 @@ TEST(BooleanEventTest, Negation) {
   boolean = true;
   loop.Poll();
 
-  EXPECT_EQ(2, counter);
+  EXPECT_EQ(1, counter);
 
   boolean = false;
+  loop.Poll();
+
+  EXPECT_EQ(2, counter);
+
+  boolean = true;
   loop.Poll();
 
   EXPECT_EQ(3, counter);
