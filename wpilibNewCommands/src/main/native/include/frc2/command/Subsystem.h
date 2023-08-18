@@ -37,6 +37,9 @@ class CommandPtr;
  * @see CommandScheduler
  */
 class Subsystem : public wpi::Sendable, public wpi::SendableHelper<Subsystem> {
+  bool m_enabled;
+  CommandPtr* m_defaultCommand;
+
  public:
   ~Subsystem() override;
 
@@ -56,6 +59,16 @@ class Subsystem : public wpi::Sendable, public wpi::SendableHelper<Subsystem> {
    * sensor readings.
    */
   virtual void SimulationPeriodic();
+
+  /**
+  * Enables the subsystem
+  */
+  virtual void Enable();
+
+  /**
+  * Disables the subsystem
+  */
+  virtual void Disable();
 
   /**
    * Sets the default Command of the subsystem.  The default command will be
@@ -99,7 +112,8 @@ class Subsystem : public wpi::Sendable, public wpi::SendableHelper<Subsystem> {
 
   /**
    * Returns the command currently running on this subsystem.  Returns null if
-   * no command is currently scheduled that requires this subsystem.
+   * no command is currently scheduled that requires this subsystem or if the
+   * subsystem is disabled.
    *
    * @return the scheduled command currently requiring this subsystem
    */
@@ -190,5 +204,6 @@ class Subsystem : public wpi::Sendable, public wpi::SendableHelper<Subsystem> {
 
  protected:
   Subsystem();
+  Subsystem(bool enabled);
 };
 }  // namespace frc2

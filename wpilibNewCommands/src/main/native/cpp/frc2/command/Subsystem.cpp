@@ -9,34 +9,61 @@
 
 using namespace frc2;
 
-Subsystem::Subsystem() {
+Subsystem::Subsystem() : Subsystem::Subsystem(true) {}
+
+Subsystem::Subsystem(bool enabled) {
   wpi::SendableRegistry::AddLW(this, GetTypeName(*this));
-  CommandScheduler::GetInstance().RegisterSubsystem({this});
+  m_enabled = enabled;
+  m_defaultCommand = nullptr;
+  if (enabled) {
+    CommandScheduler::GetInstance().RegisterSubsystem({this});
+  }
 }
 
 Subsystem::~Subsystem() {
-  CommandScheduler::GetInstance().UnregisterSubsystem(this);
+  if (m_enabled) {
+    CommandScheduler::GetInstance().UnregisterSubsystem(this);
+  }
 }
 
 void Subsystem::Periodic() {}
 
 void Subsystem::SimulationPeriodic() {}
 
+void Subsystem::Enable() {
+  m_enabled = true;
+  Register();
+  if (m_defaultCommand != nullptr) {
+    SetDefaultCommand(std::move(*m_defaultCommand));
+  }
+}
+
+void Subsystem::Disable() {
+  m_enabled = false;
+  CommandScheduler::GetInstance().UnregisterSubsystem(this);
+}
+
 void Subsystem::SetDefaultCommand(CommandPtr&& defaultCommand) {
-  CommandScheduler::GetInstance().SetDefaultCommand(this,
+  *m_defaultCommand = std::move(defaultCommand);
+  if (m_enabled) {
+    CommandScheduler::GetInstance().SetDefaultCommand(this,
                                                     std::move(defaultCommand));
+  }
 }
 
 void Subsystem::RemoveDefaultCommand() {
-  CommandScheduler::GetInstance().RemoveDefaultCommand(this);
+  if (m_enabled) {
+		CommandScheduler::GetInstance().RemoveDefaultCommand(this);
+	}
+  m_defaultCommand = nullptr;
 }
 
 Command* Subsystem::GetDefaultCommand() const {
-  return CommandScheduler::GetInstance().GetDefaultCommand(this);
+  return m_defaultCommand->get();
 }
 
 Command* Subsystem::GetCurrentCommand() const {
-  return CommandScheduler::GetInstance().Requiring(this);
+  return m_enabled ? CommandScheduler::GetInstance().Requiring(this) : nullptr;
 }
 
 std::string Subsystem::GetName() const {
