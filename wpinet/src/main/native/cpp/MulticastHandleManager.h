@@ -21,7 +21,7 @@ struct MulticastHandleManager {
   wpi::DenseMap<size_t, std::unique_ptr<wpi::MulticastServiceAnnouncer>>
       announcers;
 #ifdef _WIN32
-  ~MulticastHandleManager() noexcept;
+  ~MulticastHandleManager();
 #endif
 };
 
