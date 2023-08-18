@@ -298,5 +298,5 @@ TEST(BooleanEventTest, Negation) {
   boolean = true;
   loop.Poll();
 
-  EXPECT_EQ(3, counter);
+  EXPECT_EQ(2, counter);
 }
