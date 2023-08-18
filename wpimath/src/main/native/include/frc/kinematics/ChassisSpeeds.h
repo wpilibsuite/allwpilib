@@ -15,9 +15,8 @@ namespace frc {
 /**
  * Represents the speed of a robot chassis. Although this struct contains
  * similar members compared to a Twist2d, they do NOT represent the same thing.
- * Whereas a Twist2d represents a change in pose w.r.t to the robot frame of
- * reference, this ChassisSpeeds struct represents a velocity w.r.t to the robot
- * frame of reference.
+ * Whereas a Twist2d represents a change in pose, a ChassisSpeeds represents a
+ * robot's velocity.
  *
  * A strictly non-holonomic drivetrain, such as a differential drive, should
  * never have a dy component because it can never move sideways. Holonomic
@@ -25,12 +24,12 @@ namespace frc {
  */
 struct WPILIB_DLLEXPORT ChassisSpeeds {
   /**
-   * Represents forward velocity w.r.t the robot frame of reference. (Fwd is +)
+   * Represents forward velocity. (Fwd is +)
    */
   units::meters_per_second_t vx = 0_mps;
 
   /**
-   * Represents strafe velocity w.r.t the robot frame of reference. (Left is +)
+   * Represents strafe velocity. (Left is +)
    */
   units::meters_per_second_t vy = 0_mps;
 
