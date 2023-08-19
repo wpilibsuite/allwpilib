@@ -324,6 +324,22 @@ class JSpanBase {
     return {m_elements, m_size};
   }
 
+  const T* begin() const { return m_elements; }
+
+  T* begin()
+    requires(!std::is_const_v<T>)
+  {
+    return m_elements;
+  }
+
+  const T* end() const { return m_elements + m_size; }
+
+  T* end()
+    requires(!std::is_const_v<T>)
+  {
+    return m_elements + m_size;
+  }
+
   bool is_valid() const { return m_valid && m_elements != nullptr; }
 
   explicit operator bool() const { return is_valid(); }
