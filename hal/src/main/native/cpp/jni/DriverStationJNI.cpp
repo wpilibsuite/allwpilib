@@ -261,7 +261,6 @@ Java_edu_wpi_first_hal_DriverStationJNI_getAllJoystickData
   static_assert(sizeof(jPovs[0]) == sizeof(povs[0].povs[0]));
 
   for (size_t i = 0; i < HAL_kMaxJoysticks; i++) {
-    // Problem spot
     std::memcpy(&jAxes[i * HAL_kMaxJoystickAxes], axes[i].axes,
                 sizeof(axes[i].axes));
     std::memcpy(&jRawAxes[i * HAL_kMaxJoystickAxes], axes[i].raw,
