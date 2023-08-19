@@ -218,7 +218,7 @@ WPI_JNI_ARRAYHELPER(jdouble, Double)
  *
  * @tparam T The element type of the array (e.g., jdouble).
  * @tparam IsCritical If true, Get/ReleasePrimitiveArrayCritical will be used
- * instead of Get/Release<PrimitiveType>ArrayElements.
+ * instead of Get/Release\<PrimitiveType\>ArrayElements.
  * @tparam Size The number of elements in the span.
  */
 template <typename T, bool IsCritical, size_t Size = std::dynamic_extent>
