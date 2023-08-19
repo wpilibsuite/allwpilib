@@ -204,6 +204,18 @@ public final class Commands {
     return new ParallelDeadlineGroup(deadline, commands);
   }
 
+  /**
+   * Constructs a command that does nothing until interrupted
+   *
+   * @param requirements subsystems the action requires
+   * @return the command
+   * @see IdleCommand
+   */
+  public static Command idle(Subsystem... requirements) {
+    return new IdleCommand(requirements);
+  }
+
+
   private Commands() {
     throw new UnsupportedOperationException("This is a utility class");
   }
