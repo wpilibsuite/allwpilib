@@ -371,14 +371,12 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_appendIntegerArray
   JLongArrayRef jarr{env, value};
   if constexpr (sizeof(jlong) == sizeof(int64_t)) {
     reinterpret_cast<DataLog*>(impl)->AppendIntegerArray(
-        entry,
-        {reinterpret_cast<const int64_t*>(jarr.array().data()),
-         jarr.array().size()},
+        entry, {reinterpret_cast<const int64_t*>(jarr.data()), jarr.size()},
         timestamp);
   } else {
     wpi::SmallVector<int64_t, 16> arr;
     arr.reserve(jarr.size());
-    for (auto v : jarr.array()) {
+    for (auto v : jarr) {
       arr.push_back(v);
     }
     reinterpret_cast<DataLog*>(impl)->AppendIntegerArray(entry, arr, timestamp);

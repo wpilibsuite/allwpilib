@@ -29,8 +29,8 @@ Java_edu_wpi_first_hal_can_CANJNI_FRCNetCommCANSessionMuxSendMessage
   JByteArrayRef dataArray{env, data};
 
   const uint8_t* dataBuffer =
-      reinterpret_cast<const uint8_t*>(dataArray.array().data());
-  uint8_t dataSize = dataArray.array().size();
+      reinterpret_cast<const uint8_t*>(dataArray.data());
+  uint8_t dataSize = dataArray.size();
 
   int32_t status = 0;
   HAL_CAN_SendMessage(messageID, dataBuffer, dataSize, periodMs, &status);

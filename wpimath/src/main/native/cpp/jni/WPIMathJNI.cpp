@@ -79,16 +79,16 @@ Java_edu_wpi_first_math_WPIMathJNI_dareDetailABQR
 
   Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
                                  Eigen::RowMajor>>
-      Amat{nativeA.array().data(), states, states};
+      Amat{nativeA.data(), states, states};
   Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
                                  Eigen::RowMajor>>
-      Bmat{nativeB.array().data(), states, inputs};
+      Bmat{nativeB.data(), states, inputs};
   Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
                                  Eigen::RowMajor>>
-      Qmat{nativeQ.array().data(), states, states};
+      Qmat{nativeQ.data(), states, states};
   Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
                                  Eigen::RowMajor>>
-      Rmat{nativeR.array().data(), inputs, inputs};
+      Rmat{nativeR.data(), inputs, inputs};
 
   Eigen::MatrixXd RmatCopy{Rmat};
   auto R_llt = RmatCopy.llt();
@@ -117,19 +117,19 @@ Java_edu_wpi_first_math_WPIMathJNI_dareDetailABQRN
 
   Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
                                  Eigen::RowMajor>>
-      Amat{nativeA.array().data(), states, states};
+      Amat{nativeA.data(), states, states};
   Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
                                  Eigen::RowMajor>>
-      Bmat{nativeB.array().data(), states, inputs};
+      Bmat{nativeB.data(), states, inputs};
   Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
                                  Eigen::RowMajor>>
-      Qmat{nativeQ.array().data(), states, states};
+      Qmat{nativeQ.data(), states, states};
   Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
                                  Eigen::RowMajor>>
-      Rmat{nativeR.array().data(), inputs, inputs};
+      Rmat{nativeR.data(), inputs, inputs};
   Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
                                  Eigen::RowMajor>>
-      Nmat{nativeN.array().data(), states, inputs};
+      Nmat{nativeN.data(), states, inputs};
 
   Eigen::MatrixXd Rcopy{Rmat};
   auto R_llt = Rcopy.llt();
@@ -157,16 +157,16 @@ Java_edu_wpi_first_math_WPIMathJNI_dareABQR
 
   Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
                                  Eigen::RowMajor>>
-      Amat{nativeA.array().data(), states, states};
+      Amat{nativeA.data(), states, states};
   Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
                                  Eigen::RowMajor>>
-      Bmat{nativeB.array().data(), states, inputs};
+      Bmat{nativeB.data(), states, inputs};
   Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
                                  Eigen::RowMajor>>
-      Qmat{nativeQ.array().data(), states, states};
+      Qmat{nativeQ.data(), states, states};
   Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
                                  Eigen::RowMajor>>
-      Rmat{nativeR.array().data(), inputs, inputs};
+      Rmat{nativeR.data(), inputs, inputs};
 
   try {
     Eigen::MatrixXd result =
@@ -199,19 +199,19 @@ Java_edu_wpi_first_math_WPIMathJNI_dareABQRN
 
   Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
                                  Eigen::RowMajor>>
-      Amat{nativeA.array().data(), states, states};
+      Amat{nativeA.data(), states, states};
   Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
                                  Eigen::RowMajor>>
-      Bmat{nativeB.array().data(), states, inputs};
+      Bmat{nativeB.data(), states, inputs};
   Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
                                  Eigen::RowMajor>>
-      Qmat{nativeQ.array().data(), states, states};
+      Qmat{nativeQ.data(), states, states};
   Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
                                  Eigen::RowMajor>>
-      Rmat{nativeR.array().data(), inputs, inputs};
+      Rmat{nativeR.data(), inputs, inputs};
   Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
                                  Eigen::RowMajor>>
-      Nmat{nativeN.array().data(), states, inputs};
+      Nmat{nativeN.data(), states, inputs};
 
   try {
     Eigen::MatrixXd result =
@@ -239,7 +239,7 @@ Java_edu_wpi_first_math_WPIMathJNI_exp
 
   Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
                                  Eigen::RowMajor>>
-      Amat{arrayBody.array().data(), rows, rows};
+      Amat{arrayBody.data(), rows, rows};
   Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> Aexp =
       Amat.exp();
 
@@ -260,7 +260,7 @@ Java_edu_wpi_first_math_WPIMathJNI_pow
 
   Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
                                  Eigen::RowMajor>>
-      Amat{arrayBody.array().data(), rows, rows};  // NOLINT
+      Amat{arrayBody.data(), rows, rows};  // NOLINT
   Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> Apow =
       Amat.pow(exponent);
 
@@ -336,11 +336,11 @@ Java_edu_wpi_first_math_WPIMathJNI_isStabilizable
 
   Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
                                  Eigen::RowMajor>>
-      A{nativeA.array().data(), states, states};
+      A{nativeA.data(), states, states};
 
   Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
                                  Eigen::RowMajor>>
-      B{nativeB.array().data(), states, inputs};
+      B{nativeB.data(), states, inputs};
 
   bool isStabilizable =
       frc::IsStabilizable<Eigen::Dynamic, Eigen::Dynamic>(A, B);
@@ -459,8 +459,8 @@ Java_edu_wpi_first_math_WPIMathJNI_rankUpdate
   Eigen::Map<
       Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>
       L{matBody.data(), rows, rows};
-  Eigen::Map<const Eigen::Vector<double, Eigen::Dynamic>> v{
-      vecBody.array().data(), rows};
+  Eigen::Map<const Eigen::Vector<double, Eigen::Dynamic>> v{vecBody.data(),
+                                                            rows};
 
   if (lowerTriangular == JNI_TRUE) {
     Eigen::internal::llt_inplace<double, Eigen::Lower>::rankUpdate(L, v, sigma);
@@ -484,10 +484,10 @@ Java_edu_wpi_first_math_WPIMathJNI_solveFullPivHouseholderQr
 
   Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
                                  Eigen::RowMajor>>
-      Amat{nativeA.array().data(), Arows, Acols};
+      Amat{nativeA.data(), Arows, Acols};
   Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
                                  Eigen::RowMajor>>
-      Bmat{nativeB.array().data(), Brows, Bcols};
+      Bmat{nativeB.data(), Brows, Bcols};
 
   Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> Xmat =
       Amat.fullPivHouseholderQr().solve(Bmat);

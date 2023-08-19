@@ -91,11 +91,10 @@ Java_edu_wpi_first_hal_SPIJNI_spiTransactionB
 
   wpi::SmallVector<uint8_t, 128> recvBuf;
   recvBuf.resize(size);
-  jint retVal =
-      HAL_TransactionSPI(static_cast<HAL_SPIPort>(port),
-                         reinterpret_cast<const uint8_t*>(
-                             JByteArrayRef(env, dataToSend).array().data()),
-                         recvBuf.data(), size);
+  jint retVal = HAL_TransactionSPI(
+      static_cast<HAL_SPIPort>(port),
+      reinterpret_cast<const uint8_t*>(JByteArrayRef(env, dataToSend).data()),
+      recvBuf.data(), size);
   env->SetByteArrayRegion(dataReceived, 0, size,
                           reinterpret_cast<const jbyte*>(recvBuf.data()));
   return retVal;
@@ -129,10 +128,10 @@ JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_SPIJNI_spiWriteB
   (JNIEnv* env, jclass, jint port, jbyteArray dataToSend, jbyte size)
 {
-  jint retVal = HAL_WriteSPI(static_cast<HAL_SPIPort>(port),
-                             reinterpret_cast<const uint8_t*>(
-                                 JByteArrayRef(env, dataToSend).array().data()),
-                             size);
+  jint retVal = HAL_WriteSPI(
+      static_cast<HAL_SPIPort>(port),
+      reinterpret_cast<const uint8_t*>(JByteArrayRef(env, dataToSend).data()),
+      size);
   return retVal;
 }
 
@@ -358,10 +357,9 @@ Java_edu_wpi_first_hal_SPIJNI_spiSetAutoTransmitData
 {
   JByteArrayRef jarr(env, dataToSend);
   int32_t status = 0;
-  HAL_SetSPIAutoTransmitData(
-      static_cast<HAL_SPIPort>(port),
-      reinterpret_cast<const uint8_t*>(jarr.array().data()),
-      jarr.array().size(), zeroSize, &status);
+  HAL_SetSPIAutoTransmitData(static_cast<HAL_SPIPort>(port),
+                             reinterpret_cast<const uint8_t*>(jarr.data()),
+                             jarr.size(), zeroSize, &status);
   CheckStatus(env, status);
 }
 

@@ -72,10 +72,9 @@ Java_edu_wpi_first_hal_CANAPIJNI_writeCANPacket
 {
   auto halHandle = static_cast<HAL_CANHandle>(handle);
   JByteArrayRef arr{env, data};
-  auto arrRef = arr.array();
   int32_t status = 0;
-  HAL_WriteCANPacket(halHandle, reinterpret_cast<const uint8_t*>(arrRef.data()),
-                     arrRef.size(), apiId, &status);
+  HAL_WriteCANPacket(halHandle, reinterpret_cast<const uint8_t*>(arr.data()),
+                     arr.size(), apiId, &status);
   CheckStatus(env, status);
 }
 
@@ -91,11 +90,10 @@ Java_edu_wpi_first_hal_CANAPIJNI_writeCANPacketRepeating
 {
   auto halHandle = static_cast<HAL_CANHandle>(handle);
   JByteArrayRef arr{env, data};
-  auto arrRef = arr.array();
   int32_t status = 0;
   HAL_WriteCANPacketRepeating(halHandle,
-                              reinterpret_cast<const uint8_t*>(arrRef.data()),
-                              arrRef.size(), apiId, timeoutMs, &status);
+                              reinterpret_cast<const uint8_t*>(arr.data()),
+                              arr.size(), apiId, timeoutMs, &status);
   CheckStatus(env, status);
 }
 
@@ -125,10 +123,9 @@ Java_edu_wpi_first_hal_CANAPIJNI_writeCANPacketNoThrow
 {
   auto halHandle = static_cast<HAL_CANHandle>(handle);
   JByteArrayRef arr{env, data};
-  auto arrRef = arr.array();
   int32_t status = 0;
-  HAL_WriteCANPacket(halHandle, reinterpret_cast<const uint8_t*>(arrRef.data()),
-                     arrRef.size(), apiId, &status);
+  HAL_WriteCANPacket(halHandle, reinterpret_cast<const uint8_t*>(arr.data()),
+                     arr.size(), apiId, &status);
   return status;
 }
 
@@ -144,11 +141,10 @@ Java_edu_wpi_first_hal_CANAPIJNI_writeCANPacketRepeatingNoThrow
 {
   auto halHandle = static_cast<HAL_CANHandle>(handle);
   JByteArrayRef arr{env, data};
-  auto arrRef = arr.array();
   int32_t status = 0;
   HAL_WriteCANPacketRepeating(halHandle,
-                              reinterpret_cast<const uint8_t*>(arrRef.data()),
-                              arrRef.size(), apiId, timeoutMs, &status);
+                              reinterpret_cast<const uint8_t*>(arr.data()),
+                              arr.size(), apiId, timeoutMs, &status);
   return status;
 }
 

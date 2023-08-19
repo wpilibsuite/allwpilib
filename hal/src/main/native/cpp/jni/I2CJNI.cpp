@@ -76,11 +76,10 @@ Java_edu_wpi_first_hal_I2CJNI_i2CTransactionB
 
   wpi::SmallVector<uint8_t, 128> recvBuf;
   recvBuf.resize(receiveSize);
-  jint returnValue =
-      HAL_TransactionI2C(static_cast<HAL_I2CPort>(port), address,
-                         reinterpret_cast<const uint8_t*>(
-                             JByteArrayRef(env, dataToSend).array().data()),
-                         sendSize, recvBuf.data(), receiveSize);
+  jint returnValue = HAL_TransactionI2C(
+      static_cast<HAL_I2CPort>(port), address,
+      reinterpret_cast<const uint8_t*>(JByteArrayRef(env, dataToSend).data()),
+      sendSize, recvBuf.data(), receiveSize);
   env->SetByteArrayRegion(dataReceived, 0, receiveSize,
                           reinterpret_cast<const jbyte*>(recvBuf.data()));
   return returnValue;
@@ -117,11 +116,10 @@ Java_edu_wpi_first_hal_I2CJNI_i2CWriteB
   (JNIEnv* env, jclass, jint port, jbyte address, jbyteArray dataToSend,
    jbyte sendSize)
 {
-  jint returnValue =
-      HAL_WriteI2C(static_cast<HAL_I2CPort>(port), address,
-                   reinterpret_cast<const uint8_t*>(
-                       JByteArrayRef(env, dataToSend).array().data()),
-                   sendSize);
+  jint returnValue = HAL_WriteI2C(
+      static_cast<HAL_I2CPort>(port), address,
+      reinterpret_cast<const uint8_t*>(JByteArrayRef(env, dataToSend).data()),
+      sendSize);
   return returnValue;
 }
 

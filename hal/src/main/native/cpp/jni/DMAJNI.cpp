@@ -13,6 +13,7 @@
 #include "hal/handles/HandlesInternal.h"
 
 using namespace hal;
+using namespace wpi::java;
 
 namespace hal {
 bool GetEncoderBaseHandle(HAL_EncoderHandle handle,
@@ -314,7 +315,7 @@ Java_edu_wpi_first_hal_DMAJNI_readDMA
   env->SetIntArrayRegion(buf, 0, dmaSample.captureSize,
                          reinterpret_cast<jint*>(dmaSample.readBuffer));
 
-  wpi::java::CriticalJSpan<jint> nativeArr{env, store};
+  CriticalJSpan<jint> nativeArr{env, store};
 
   std::copy_n(
       dmaSample.channelOffsets,

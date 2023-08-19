@@ -279,7 +279,7 @@ Java_edu_wpi_first_util_WPIUtilJNI_waitForObjects
   wpi::SmallVector<WPI_Handle, 8> signaledBuf;
   signaledBuf.resize(handlesArr.size());
   std::span<const WPI_Handle> handlesArr2{
-      reinterpret_cast<const WPI_Handle*>(handlesArr.array().data()),
+      reinterpret_cast<const WPI_Handle*>(handlesArr.data()),
       handlesArr.size()};
 
   auto signaled = wpi::WaitForObjects(handlesArr2, signaledBuf);
@@ -303,7 +303,7 @@ Java_edu_wpi_first_util_WPIUtilJNI_waitForObjectsTimeout
   wpi::SmallVector<WPI_Handle, 8> signaledBuf;
   signaledBuf.resize(handlesArr.size());
   std::span<const WPI_Handle> handlesArr2{
-      reinterpret_cast<const WPI_Handle*>(handlesArr.array().data()),
+      reinterpret_cast<const WPI_Handle*>(handlesArr.data()),
       handlesArr.size()};
 
   bool timedOut;
