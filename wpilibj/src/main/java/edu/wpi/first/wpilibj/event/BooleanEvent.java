@@ -28,8 +28,9 @@ public class BooleanEvent implements BooleanSupplier {
 
   /** Condition. */
   private final BooleanSupplier m_signal;
+
   /** The state of the condition in the current loop poll. Nightmare to manage. */
-  private AtomicBoolean m_state = new AtomicBoolean(false);
+  private final AtomicBoolean m_state = new AtomicBoolean(false);
 
   /**
    * Creates a new event with the given signal determining whether it is active.
