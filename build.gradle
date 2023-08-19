@@ -7,7 +7,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.hubspot.jinjava:jinjava:2.6.0'
+        classpath 'com.hubspot.jinjava:jinjava:2.7.1'
     }
 }
 
@@ -22,8 +22,8 @@ plugins {
     id 'visual-studio'
     id 'net.ltgt.errorprone' version '3.1.0' apply false
     id 'com.github.johnrengelman.shadow' version '8.1.1' apply false
-    id 'com.diffplug.spotless' version '6.18.0' apply false
-    id 'com.github.spotbugs' version '5.0.14' apply false
+    id 'com.diffplug.spotless' version '6.20.0' apply false
+    id 'com.github.spotbugs' version '5.1.3' apply false
 }
 
 wpilibVersioning.buildServerMode = project.hasProperty('buildServer')

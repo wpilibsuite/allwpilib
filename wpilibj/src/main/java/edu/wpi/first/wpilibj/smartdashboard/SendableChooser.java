@@ -36,14 +36,19 @@ import java.util.function.Consumer;
 public class SendableChooser<V> implements NTSendable, AutoCloseable {
   /** The key for the default value. */
   private static final String DEFAULT = "default";
+
   /** The key for the selected option. */
   private static final String SELECTED = "selected";
+
   /** The key for the active option. */
   private static final String ACTIVE = "active";
+
   /** The key for the option array. */
   private static final String OPTIONS = "options";
+
   /** The key for the instance number. */
   private static final String INSTANCE = ".instance";
+
   /** A map linking strings to the objects they represent. */
   private final Map<String, V> m_map = new LinkedHashMap<>();
 
