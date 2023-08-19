@@ -237,7 +237,7 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_appendRawBuffer
     wpi::ThrowIndexOobException(env, "length must be >= 0");
     return;
   }
-  JByteArrayRef cvalue{env, value, start + length};
+  JByteArrayRef cvalue{env, value, static_cast<size_t>(start + length)};
   if (!cvalue) {
     wpi::ThrowIllegalArgumentException(env,
                                        "value must be a native ByteBuffer");

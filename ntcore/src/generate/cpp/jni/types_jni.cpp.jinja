@@ -243,7 +243,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setRawBuffer
     indexOobEx.Throw(env, "len must be >= 0");
     return false;
   }
-  JByteArrayRef cvalue{env, value, start + len};
+  JByteArrayRef cvalue{env, value, static_cast<size_t>(start + len)};
   if (!cvalue) {
     illegalArgEx.Throw(env, "value must be a native ByteBuffer");
     return false;
@@ -339,7 +339,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setDefaultRawBuffer
     indexOobEx.Throw(env, "len must be >= 0");
     return false;
   }
-  JByteArrayRef cvalue{env, defaultValue, start + len};
+  JByteArrayRef cvalue{env, defaultValue, static_cast<size_t>(start + len)};
   if (!cvalue) {
     illegalArgEx.Throw(env, "value must be a native ByteBuffer");
     return false;

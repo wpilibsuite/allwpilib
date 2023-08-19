@@ -251,16 +251,17 @@ Java_edu_wpi_first_hal_DriverStationJNI_getAllJoystickData
 
   HAL_GetAllJoystickData(axes, povs, buttons);
 
-  CriticalJFloatArrayRef jAxes(env, axesArray);
-  CriticalJByteArrayRef jRawAxes(env, rawAxesArray);
-  CriticalJShortArrayRef jPovs(env, povsArray);
-  CriticalJLongArrayRef jButtons(env, buttonsAndMetadataArray);
+  CriticalJSpan<jfloat> jAxes(env, axesArray);
+  CriticalJSpan<jbyte> jRawAxes(env, rawAxesArray);
+  CriticalJSpan<jshort> jPovs(env, povsArray);
+  CriticalJSpan<jlong> jButtons(env, buttonsAndMetadataArray);
 
   static_assert(sizeof(jAxes[0]) == sizeof(axes[0].axes[0]));
   static_assert(sizeof(jRawAxes[0]) == sizeof(axes[0].raw[0]));
   static_assert(sizeof(jPovs[0]) == sizeof(povs[0].povs[0]));
 
   for (size_t i = 0; i < HAL_kMaxJoysticks; i++) {
+    // Problem spot
     std::memcpy(&jAxes[i * HAL_kMaxJoystickAxes], axes[i].axes,
                 sizeof(axes[i].axes));
     std::memcpy(&jRawAxes[i * HAL_kMaxJoystickAxes], axes[i].raw,
