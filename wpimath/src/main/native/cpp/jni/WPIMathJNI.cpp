@@ -453,13 +453,12 @@ Java_edu_wpi_first_math_WPIMathJNI_rankUpdate
   (JNIEnv* env, jclass, jdoubleArray mat, jint rows, jdoubleArray vec,
    jdouble sigma, jboolean lowerTriangular)
 {
-  // TODO: Replace with JSpan<jdouble> matBody{env, mat} when that exists
-  jdouble* matBody = env->GetDoubleArrayElements(mat, nullptr);
+  JSpan<jdouble> matBody{env, mat};
   JDoubleArrayRef vecBody{env, vec};
 
   Eigen::Map<
       Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>
-      L{matBody, rows, rows};
+      L{matBody.data(), rows, rows};
   Eigen::Map<const Eigen::Vector<double, Eigen::Dynamic>> v{
       vecBody.array().data(), rows};
 
@@ -468,9 +467,6 @@ Java_edu_wpi_first_math_WPIMathJNI_rankUpdate
   } else {
     Eigen::internal::llt_inplace<double, Eigen::Upper>::rankUpdate(L, v, sigma);
   }
-
-  // TODO: Remove this after JSpan transition
-  env->ReleaseDoubleArrayElements(mat, matBody, 0);
 }
 
 /*

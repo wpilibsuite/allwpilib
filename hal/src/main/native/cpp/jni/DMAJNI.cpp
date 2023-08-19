@@ -5,6 +5,8 @@
 #include <algorithm>
 #include <cstring>
 
+#include <wpi/jni_util.h>
+
 #include "HALUtil.h"
 #include "edu_wpi_first_hal_DMAJNI.h"
 #include "hal/DMA.h"
@@ -312,19 +314,16 @@ Java_edu_wpi_first_hal_DMAJNI_readDMA
   env->SetIntArrayRegion(buf, 0, dmaSample.captureSize,
                          reinterpret_cast<jint*>(dmaSample.readBuffer));
 
-  int32_t* nativeArr =
-      static_cast<int32_t*>(env->GetPrimitiveArrayCritical(store, nullptr));
+  wpi::java::CriticalJSpan<jint> nativeArr{env, store};
 
   std::copy_n(
       dmaSample.channelOffsets,
       sizeof(dmaSample.channelOffsets) / sizeof(dmaSample.channelOffsets[0]),
-      nativeArr);
+      nativeArr.data());
   nativeArr[22] = static_cast<int32_t>(dmaSample.captureSize);
   nativeArr[23] = static_cast<int32_t>(dmaSample.triggerChannels);
   nativeArr[24] = remaining;
   nativeArr[25] = readStatus;
-
-  env->ReleasePrimitiveArrayCritical(store, nativeArr, JNI_ABORT);
 
   return dmaSample.timeStamp;
 }
