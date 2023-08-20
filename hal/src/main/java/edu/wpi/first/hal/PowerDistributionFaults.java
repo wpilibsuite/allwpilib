@@ -63,13 +63,13 @@ public class PowerDistributionFaults {
   /**
    * Gets whether there is a breaker fault at a specified channel.
    *
-   * @param channelIndex Index to check for faults.
-   * @return If there is a breaker fault at the specified index.
-   * @throws IndexOutOfBoundsException if the provided channelIndex is outside of the range
-   *     supported by the hardware.
+   * @param channel Channel to check for faults.
+   * @return If there is a breaker fault.
+   * @throws IndexOutOfBoundsException if the provided channel is outside of the range supported by
+   *     the hardware.
    */
-  public final boolean getBreakerFaultAtChannel(int channelIndex) {
-    switch (channelIndex) {
+  public final boolean getBreakerFault(int channel) {
+    switch (channel) {
       case 0:
         return Channel0BreakerFault;
       case 1:

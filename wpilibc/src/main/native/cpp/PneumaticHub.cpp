@@ -339,8 +339,8 @@ PneumaticHub::StickyFaults PneumaticHub::GetStickyFaults() const {
   return stickyFaults;
 }
 
-bool PneumaticHub::Faults::GetChannelFaultAtIndex(int channelIndex) const {
-  switch (channelIndex) {
+bool PneumaticHub::Faults::GetChannelFault(int channel) const {
+  switch (channel) {
     case 0:
       return this->Channel0Fault != 0;
     case 1:
