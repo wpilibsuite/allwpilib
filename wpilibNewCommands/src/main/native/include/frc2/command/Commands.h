@@ -31,6 +31,15 @@ namespace cmd {
 [[nodiscard]]
 CommandPtr None();
 
+  /**
+   * Constructs a command that does nothing until interrupted.
+   *
+   * @param requirements subsystems the action requires
+   * @return the command
+   */
+CommandPtr Idle(std::span<Subsystem* const> requirements = {});
+
+
 // Action Commands
 
 /**
