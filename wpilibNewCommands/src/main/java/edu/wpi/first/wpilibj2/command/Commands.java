@@ -25,6 +25,16 @@ public final class Commands {
     return new InstantCommand();
   }
 
+  /**
+   * Constructs a command that does nothing until interrupted.
+   *
+   * @param requirements subsystems the action requires
+   * @return the command
+   */
+  public static Command idle(Subsystem... requirements) {
+    return new RunCommand(() -> {}, requirements);
+  }
+
   // Action Commands
 
   /**
@@ -113,16 +123,6 @@ public final class Commands {
    */
   public static Command waitUntil(BooleanSupplier condition) {
     return new WaitUntilCommand(condition);
-  }
-
-  /**
-   * Constructs a command that does nothing until interrupted
-   *
-   * @param requirements subsystems the action requires
-   * @return the command
-   */
-  public static Command idle(Subsystem... requirements) {
-    return new RunCommand(()-> {}, requirements);
   }
 
   // Selector Commands
