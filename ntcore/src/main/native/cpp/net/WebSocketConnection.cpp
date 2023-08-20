@@ -16,6 +16,7 @@ using namespace nt::net;
 static constexpr size_t kAllocSize = 4096;
 static constexpr size_t kTextFrameRolloverSize = 4096;
 static constexpr size_t kBinaryFrameRolloverSize = 8192;
+static constexpr size_t kMaxPoolSize = 16;
 
 WebSocketConnection::WebSocketConnection(wpi::WebSocket& ws)
     : m_ws{ws},
@@ -53,7 +54,13 @@ void WebSocketConnection::Flush() {
   ++m_sendsActive;
   m_ws.SendFrames(m_ws_frames, [selfweak = weak_from_this()](auto bufs, auto) {
     if (auto self = selfweak.lock()) {
-      self->m_buf_pool.insert(self->m_buf_pool.end(), bufs.begin(), bufs.end());
+      size_t numToPool =
+          (std::min)(bufs.size(), kMaxPoolSize - self->m_buf_pool.size());
+      self->m_buf_pool.insert(self->m_buf_pool.end(), bufs.begin(),
+                              bufs.begin() + numToPool);
+      for (auto&& buf : bufs.subspan(numToPool)) {
+        buf.Deallocate();
+      }
       if (self->m_sendsActive > 0) {
         --self->m_sendsActive;
       }
