@@ -28,11 +28,10 @@ public final class Commands {
   /**
    * Constructs a command that does nothing until interrupted.
    *
-   * @param requirements subsystems the action requires
    * @return the command
    */
-  public static Command idle(Subsystem... requirements) {
-    return run(()-> {}, requirements);
+  public static Command idle() {
+    return run(()-> {});
   }
 
   // Action Commands

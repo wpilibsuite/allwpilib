@@ -24,8 +24,8 @@ CommandPtr cmd::None() {
   return InstantCommand().ToPtr();
 }
 
-CommandPtr cmd::Idle(std::initializer_list<Subsystem*> requirements) {
-    return Run([] {}, requirements);
+CommandPtr cmd::Idle() {
+    return Run([] {});
 }
 
 CommandPtr cmd::RunOnce(std::function<void()> action,
