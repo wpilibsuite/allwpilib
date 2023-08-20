@@ -32,7 +32,7 @@ public final class Commands {
    * @return the command
    */
   public static Command idle(Subsystem... requirements) {
-    return new RunCommand(() -> {}, requirements);
+    return run(()-> {}, requirements);
   }
 
   // Action Commands
