@@ -201,6 +201,6 @@ set_property(TARGET netconsoleTee PROPERTY FOLDER "examples")
 
 if (WITH_TESTS)
     wpilib_add_test(wpinet src/test/native/cpp)
-    target_include_directories(wpinet_test PRIVATE src/test/native/include)
-    target_link_libraries(wpinet_test wpinet ${LIBUTIL} gmock_main)
+    target_include_directories(wpinet_test PRIVATE src/test/native/include src/main/native/cpp)
+    target_link_libraries(wpinet_test wpinet ${LIBUTIL} gmock_main wpiutil_testlib)
 endif()
