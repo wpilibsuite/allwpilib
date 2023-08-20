@@ -39,7 +39,6 @@ CommandPtr None();
    */
 CommandPtr Idle(std::span<Subsystem* const> requirements = {});
 
-
 // Action Commands
 
 /**
