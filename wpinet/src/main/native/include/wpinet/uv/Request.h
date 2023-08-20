@@ -130,11 +130,11 @@ template <typename T, typename U>
 class RequestImpl : public Request {
  public:
   std::shared_ptr<T> shared_from_this() {
-    return std::static_pointer_cast<T>(this->shared_from_this());
+    return std::static_pointer_cast<T>(Request::shared_from_this());
   }
 
   std::shared_ptr<const T> shared_from_this() const {
-    return std::static_pointer_cast<const T>(this->shared_from_this());
+    return std::static_pointer_cast<const T>(Request::shared_from_this());
   }
 
   /**
