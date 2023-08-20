@@ -161,10 +161,11 @@ class PneumaticHub : public PneumaticsBase {
     /**
      * Gets whether there is a fault at a specified channel.
      * @param channelIndex Index to check for faults.
-     * @return If there is a fault at the specified index. If the index
-     * does not map to an actual channel, returns 1.
+     * @return If there is a fault at the specified index.
+     * @throws A ChannelOutOfIndex error if the given int is outside of the
+     * range supported by the hardware.
      */
-    bool GetChannelFaultAtIndex(uint32_t channelIndex) const;
+    bool GetChannelFaultAtIndex(int channelIndex) const;
   };
 
   /**

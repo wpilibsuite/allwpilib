@@ -173,7 +173,7 @@ PowerDistribution::Faults PowerDistribution::GetFaults() const {
 }
 
 bool PowerDistribution::Faults::GetBreakerFaultAtChannel(
-    uint32_t channelIndex) const {
+    int channelIndex) const {
   switch (channelIndex) {
     case 0:
       return this->Channel0BreakerFault;
@@ -230,7 +230,7 @@ bool PowerDistribution::Faults::GetBreakerFaultAtChannel(
 }
 
 bool PowerDistribution::StickyFaults::GetBreakerFaultAtChannel(
-    uint32_t channelIndex) const {
+    int channelIndex) const {
   switch (channelIndex) {
     case 0:
       return this->Channel0BreakerFault;

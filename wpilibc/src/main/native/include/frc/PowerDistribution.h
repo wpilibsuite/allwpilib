@@ -163,10 +163,11 @@ class PowerDistribution : public wpi::Sendable,
     /**
      * Gets whether there is a breaker fault at a specified channel.
      * @param channelIndex Index to check for faults.
-     * @return If there is a breaker fault at the specified index. If the index
-     * does not map to an actual channel, returns 1.
+     * @return If there is a breaker fault at the specified index.
+     * @throws A ChannelOutOfIndex error if the given int is outside of the
+     * range supported by the hardware.
      */
-    bool GetBreakerFaultAtChannel(uint32_t channelIndex) const;
+    bool GetBreakerFaultAtChannel(int channelIndex) const;
   };
 
   Faults GetFaults() const;
@@ -204,10 +205,11 @@ class PowerDistribution : public wpi::Sendable,
     /**
      * Gets whether there is a sticky breaker fault at a specified channel.
      * @param channelIndex Index to check for sticky faults.
-     * @return If there is a sticky breaker fault at the specified index. If the
-     * index does not map to an actual channel, returns 1.
+     * @return If there is a sticky breaker fault at the specified index.
+     * @throws A ChannelOutOfIndex error if the given int is outside of the
+     * range supported by the hardware.
      */
-    bool GetBreakerFaultAtChannel(uint32_t channelIndex) const;
+    bool GetBreakerFaultAtChannel(int channelIndex) const;
   };
 
   StickyFaults GetStickyFaults() const;
