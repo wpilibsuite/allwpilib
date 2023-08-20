@@ -25,7 +25,7 @@ CommandPtr cmd::None() {
 }
 
 CommandPtr cmd::Idle() {
-    return Run([] {});
+  return Run([] {});
 }
 
 CommandPtr cmd::RunOnce(std::function<void()> action,

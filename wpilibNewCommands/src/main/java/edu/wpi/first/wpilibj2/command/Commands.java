@@ -31,7 +31,7 @@ public final class Commands {
    * @return the command
    */
   public static Command idle() {
-    return run(()-> {});
+    return run(() -> {});
   }
 
   // Action Commands
