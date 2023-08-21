@@ -178,14 +178,11 @@ class JStringRef {
 namespace detail {
 
 template <typename T>
-struct ArrayHelper {
-  static constexpr bool is_defined = false;
-};
+struct ArrayHelper {};
 
 #define WPI_JNI_ARRAYHELPER(T, F)                                             \
   template <>                                                                 \
   struct ArrayHelper<T> {                                                     \
-    static constexpr bool is_defined = true;                                  \
     using jarray_type = T##Array;                                             \
     static T* GetArrayElements(JNIEnv* env, jarray_type jarr) {               \
       return env->Get##F##ArrayElements(jarr, nullptr);                       \
@@ -206,6 +203,10 @@ WPI_JNI_ARRAYHELPER(jdouble, Double)
 
 #undef WPI_JNI_ARRAYHELPER
 
+// If parameterized with an invalid type, constraint won't be satisfied
+template <typename T>
+constexpr bool is_defined = true;
+
 /**
  * Helper class for working with JNI arrays.
  *
@@ -222,7 +223,7 @@ WPI_JNI_ARRAYHELPER(jdouble, Double)
  * @tparam Size The number of elements in the span.
  */
 template <typename T, bool IsCritical, size_t Size = std::dynamic_extent>
-  requires ArrayHelper<std::remove_cv_t<T>>::is_defined
+  requires is_defined<typename ArrayHelper<std::remove_cv_t<T>>::jarray_type>
 class JSpanBase {
   using ArrHelper = ArrayHelper<std::remove_cv_t<T>>;
   using jarray_type = typename ArrHelper::jarray_type;
