@@ -36,6 +36,7 @@ CommandPtr None();
  *
  * @return the command
  */
+[[nodiscard]]
 CommandPtr Idle();
 
 // Action Commands
