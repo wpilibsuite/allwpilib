@@ -504,7 +504,7 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_estimatePoseHomography
     nullPointerEx.Throw(env, "homography cannot be null");
     return nullptr;
   }
-  JDoubleArrayRef harr{env, homography};
+  JSpan<const jdouble, 9> harr{env, homography};
   if (harr.size() != 9) {
     illegalArgEx.Throw(env, "homography array must be size 9");
     return nullptr;
@@ -530,7 +530,7 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_estimatePoseOrthogonalIteration
     nullPointerEx.Throw(env, "homography cannot be null");
     return nullptr;
   }
-  JDoubleArrayRef harr{env, homography};
+  JSpan<const jdouble, 9> harr{env, homography};
   if (harr.size() != 9) {
     illegalArgEx.Throw(env, "homography array must be size 9");
     return nullptr;
@@ -541,7 +541,7 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_estimatePoseOrthogonalIteration
     nullPointerEx.Throw(env, "corners cannot be null");
     return nullptr;
   }
-  JDoubleArrayRef carr{env, corners};
+  JSpan<const jdouble, 8> carr{env, corners};
   if (carr.size() != 8) {
     illegalArgEx.Throw(env, "corners array must be size 8");
     return nullptr;
@@ -568,7 +568,7 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_estimatePose
     nullPointerEx.Throw(env, "homography cannot be null");
     return nullptr;
   }
-  JDoubleArrayRef harr{env, homography};
+  JSpan<const jdouble, 9> harr{env, homography};
   if (harr.size() != 9) {
     illegalArgEx.Throw(env, "homography array must be size 9");
     return nullptr;
@@ -579,7 +579,7 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_estimatePose
     nullPointerEx.Throw(env, "corners cannot be null");
     return nullptr;
   }
-  JDoubleArrayRef carr{env, corners};
+  JSpan<const jdouble, 8> carr{env, corners};
   if (carr.size() != 8) {
     illegalArgEx.Throw(env, "corners array must be size 8");
     return nullptr;

@@ -443,20 +443,6 @@ using JSpan = detail::JSpanBase<T, false, Extent>;
 template <typename T, size_t Extent = std::dynamic_extent>
 using CriticalJSpan = detail::JSpanBase<T, true, Extent>;
 
-#define WPI_JNI_JARRAYREF(T, F)          \
-  using J##F##ArrayRef = JSpan<const T>; \
-  using CriticalJ##F##ArrayRef = CriticalJSpan<const T>;
-
-WPI_JNI_JARRAYREF(jboolean, Boolean)
-WPI_JNI_JARRAYREF(jbyte, Byte)
-WPI_JNI_JARRAYREF(jshort, Short)
-WPI_JNI_JARRAYREF(jint, Int)
-WPI_JNI_JARRAYREF(jlong, Long)
-WPI_JNI_JARRAYREF(jfloat, Float)
-WPI_JNI_JARRAYREF(jdouble, Double)
-
-#undef WPI_JNI_JARRAYREF
-
 //
 // Conversions from C++ to Java objects
 //

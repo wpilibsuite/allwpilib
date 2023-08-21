@@ -72,10 +72,10 @@ Java_edu_wpi_first_math_WPIMathJNI_dareDetailABQR
   (JNIEnv* env, jclass, jdoubleArray A, jdoubleArray B, jdoubleArray Q,
    jdoubleArray R, jint states, jint inputs, jdoubleArray S)
 {
-  JDoubleArrayRef nativeA{env, A};
-  JDoubleArrayRef nativeB{env, B};
-  JDoubleArrayRef nativeQ{env, Q};
-  JDoubleArrayRef nativeR{env, R};
+  JSpan<const jdouble> nativeA{env, A};
+  JSpan<const jdouble> nativeB{env, B};
+  JSpan<const jdouble> nativeQ{env, Q};
+  JSpan<const jdouble> nativeR{env, R};
 
   Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
                                  Eigen::RowMajor>>
@@ -109,11 +109,11 @@ Java_edu_wpi_first_math_WPIMathJNI_dareDetailABQRN
   (JNIEnv* env, jclass, jdoubleArray A, jdoubleArray B, jdoubleArray Q,
    jdoubleArray R, jdoubleArray N, jint states, jint inputs, jdoubleArray S)
 {
-  JDoubleArrayRef nativeA{env, A};
-  JDoubleArrayRef nativeB{env, B};
-  JDoubleArrayRef nativeQ{env, Q};
-  JDoubleArrayRef nativeR{env, R};
-  JDoubleArrayRef nativeN{env, N};
+  JSpan<const jdouble> nativeA{env, A};
+  JSpan<const jdouble> nativeB{env, B};
+  JSpan<const jdouble> nativeQ{env, Q};
+  JSpan<const jdouble> nativeR{env, R};
+  JSpan<const jdouble> nativeN{env, N};
 
   Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
                                  Eigen::RowMajor>>
@@ -150,10 +150,10 @@ Java_edu_wpi_first_math_WPIMathJNI_dareABQR
   (JNIEnv* env, jclass, jdoubleArray A, jdoubleArray B, jdoubleArray Q,
    jdoubleArray R, jint states, jint inputs, jdoubleArray S)
 {
-  JDoubleArrayRef nativeA{env, A};
-  JDoubleArrayRef nativeB{env, B};
-  JDoubleArrayRef nativeQ{env, Q};
-  JDoubleArrayRef nativeR{env, R};
+  JSpan<const jdouble> nativeA{env, A};
+  JSpan<const jdouble> nativeB{env, B};
+  JSpan<const jdouble> nativeQ{env, Q};
+  JSpan<const jdouble> nativeR{env, R};
 
   Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
                                  Eigen::RowMajor>>
@@ -191,11 +191,11 @@ Java_edu_wpi_first_math_WPIMathJNI_dareABQRN
   (JNIEnv* env, jclass, jdoubleArray A, jdoubleArray B, jdoubleArray Q,
    jdoubleArray R, jdoubleArray N, jint states, jint inputs, jdoubleArray S)
 {
-  JDoubleArrayRef nativeA{env, A};
-  JDoubleArrayRef nativeB{env, B};
-  JDoubleArrayRef nativeQ{env, Q};
-  JDoubleArrayRef nativeR{env, R};
-  JDoubleArrayRef nativeN{env, N};
+  JSpan<const jdouble> nativeA{env, A};
+  JSpan<const jdouble> nativeB{env, B};
+  JSpan<const jdouble> nativeQ{env, Q};
+  JSpan<const jdouble> nativeR{env, R};
+  JSpan<const jdouble> nativeN{env, N};
 
   Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
                                  Eigen::RowMajor>>
@@ -235,7 +235,7 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_math_WPIMathJNI_exp
   (JNIEnv* env, jclass, jdoubleArray src, jint rows, jdoubleArray dst)
 {
-  JDoubleArrayRef arrayBody{env, src};
+  JSpan<const jdouble> arrayBody{env, src};
 
   Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
                                  Eigen::RowMajor>>
@@ -256,7 +256,7 @@ Java_edu_wpi_first_math_WPIMathJNI_pow
   (JNIEnv* env, jclass, jdoubleArray src, jint rows, jdouble exponent,
    jdoubleArray dst)
 {
-  JDoubleArrayRef arrayBody{env, src};
+  JSpan<const jdouble> arrayBody{env, src};
 
   Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
                                  Eigen::RowMajor>>
@@ -331,8 +331,8 @@ Java_edu_wpi_first_math_WPIMathJNI_isStabilizable
   (JNIEnv* env, jclass, jint states, jint inputs, jdoubleArray aSrc,
    jdoubleArray bSrc)
 {
-  JDoubleArrayRef nativeA{env, aSrc};
-  JDoubleArrayRef nativeB{env, bSrc};
+  JSpan<const jdouble> nativeA{env, aSrc};
+  JSpan<const jdouble> nativeB{env, bSrc};
 
   Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
                                  Eigen::RowMajor>>
@@ -382,7 +382,7 @@ Java_edu_wpi_first_math_WPIMathJNI_toPathweaverJson
 {
   try {
     auto trajectory =
-        CreateTrajectoryFromElements(JDoubleArrayRef{env, elements});
+        CreateTrajectoryFromElements(JSpan<const jdouble>{env, elements});
     frc::TrajectoryUtil::ToPathweaverJson(trajectory,
                                           JStringRef{env, path}.c_str());
   } catch (std::exception& e) {
@@ -429,7 +429,7 @@ Java_edu_wpi_first_math_WPIMathJNI_serializeTrajectory
 {
   try {
     auto trajectory =
-        CreateTrajectoryFromElements(JDoubleArrayRef{env, elements});
+        CreateTrajectoryFromElements(JSpan<const jdouble>{env, elements});
     return MakeJString(env,
                        frc::TrajectoryUtil::SerializeTrajectory(trajectory));
   } catch (std::exception& e) {
@@ -454,7 +454,7 @@ Java_edu_wpi_first_math_WPIMathJNI_rankUpdate
    jdouble sigma, jboolean lowerTriangular)
 {
   JSpan<jdouble> matBody{env, mat};
-  JDoubleArrayRef vecBody{env, vec};
+  JSpan<const jdouble> vecBody{env, vec};
 
   Eigen::Map<
       Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>
@@ -479,8 +479,8 @@ Java_edu_wpi_first_math_WPIMathJNI_solveFullPivHouseholderQr
   (JNIEnv* env, jclass, jdoubleArray A, jint Arows, jint Acols, jdoubleArray B,
    jint Brows, jint Bcols, jdoubleArray dst)
 {
-  JDoubleArrayRef nativeA{env, A};
-  JDoubleArrayRef nativeB{env, B};
+  JSpan<const jdouble> nativeA{env, A};
+  JSpan<const jdouble> nativeB{env, B};
 
   Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
                                  Eigen::RowMajor>>

@@ -263,7 +263,7 @@ Java_edu_wpi_first_hal_SerialPortJNI_serialWrite
   int32_t status = 0;
   jint retVal = HAL_WriteSerial(
       static_cast<HAL_SerialPortHandle>(handle),
-      reinterpret_cast<const char*>(JByteArrayRef(env, dataToSend).data()),
+      reinterpret_cast<const char*>(JSpan<const jbyte>(env, dataToSend).data()),
       size, &status);
   CheckStatus(env, status);
   return retVal;

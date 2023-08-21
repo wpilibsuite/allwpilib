@@ -26,7 +26,7 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_can_CANJNI_FRCNetCommCANSessionMuxSendMessage
   (JNIEnv* env, jclass, jint messageID, jbyteArray data, jint periodMs)
 {
-  JByteArrayRef dataArray{env, data};
+  JSpan<const jbyte> dataArray{env, data};
 
   const uint8_t* dataBuffer =
       reinterpret_cast<const uint8_t*>(dataArray.data());

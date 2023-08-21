@@ -71,7 +71,7 @@ Java_edu_wpi_first_hal_CANAPIJNI_writeCANPacket
   (JNIEnv* env, jclass, jint handle, jbyteArray data, jint apiId)
 {
   auto halHandle = static_cast<HAL_CANHandle>(handle);
-  JByteArrayRef arr{env, data};
+  JSpan<const jbyte> arr{env, data};
   int32_t status = 0;
   HAL_WriteCANPacket(halHandle, reinterpret_cast<const uint8_t*>(arr.data()),
                      arr.size(), apiId, &status);
@@ -89,7 +89,7 @@ Java_edu_wpi_first_hal_CANAPIJNI_writeCANPacketRepeating
    jint timeoutMs)
 {
   auto halHandle = static_cast<HAL_CANHandle>(handle);
-  JByteArrayRef arr{env, data};
+  JSpan<const jbyte> arr{env, data};
   int32_t status = 0;
   HAL_WriteCANPacketRepeating(halHandle,
                               reinterpret_cast<const uint8_t*>(arr.data()),
@@ -122,7 +122,7 @@ Java_edu_wpi_first_hal_CANAPIJNI_writeCANPacketNoThrow
   (JNIEnv* env, jclass, jint handle, jbyteArray data, jint apiId)
 {
   auto halHandle = static_cast<HAL_CANHandle>(handle);
-  JByteArrayRef arr{env, data};
+  JSpan<const jbyte> arr{env, data};
   int32_t status = 0;
   HAL_WriteCANPacket(halHandle, reinterpret_cast<const uint8_t*>(arr.data()),
                      arr.size(), apiId, &status);
@@ -140,7 +140,7 @@ Java_edu_wpi_first_hal_CANAPIJNI_writeCANPacketRepeatingNoThrow
    jint timeoutMs)
 {
   auto halHandle = static_cast<HAL_CANHandle>(handle);
-  JByteArrayRef arr{env, data};
+  JSpan<const jbyte> arr{env, data};
   int32_t status = 0;
   HAL_WriteCANPacketRepeating(halHandle,
                               reinterpret_cast<const uint8_t*>(arr.data()),

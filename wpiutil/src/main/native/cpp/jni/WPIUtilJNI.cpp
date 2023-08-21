@@ -275,7 +275,7 @@ JNIEXPORT jintArray JNICALL
 Java_edu_wpi_first_util_WPIUtilJNI_waitForObjects
   (JNIEnv* env, jclass, jintArray handles)
 {
-  JIntArrayRef handlesArr{env, handles};
+  JSpan<const jint> handlesArr{env, handles};
   wpi::SmallVector<WPI_Handle, 8> signaledBuf;
   signaledBuf.resize(handlesArr.size());
   std::span<const WPI_Handle> handlesArr2{
@@ -299,7 +299,7 @@ JNIEXPORT jintArray JNICALL
 Java_edu_wpi_first_util_WPIUtilJNI_waitForObjectsTimeout
   (JNIEnv* env, jclass, jintArray handles, jdouble timeout)
 {
-  JIntArrayRef handlesArr{env, handles};
+  JSpan<const jint> handlesArr{env, handles};
   wpi::SmallVector<WPI_Handle, 8> signaledBuf;
   signaledBuf.resize(handlesArr.size());
   std::span<const WPI_Handle> handlesArr2{

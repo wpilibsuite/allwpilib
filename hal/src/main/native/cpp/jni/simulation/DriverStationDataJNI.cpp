@@ -436,7 +436,7 @@ Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickAxes
 {
   HAL_JoystickAxes axes;
   {
-    wpi::java::JFloatArrayRef jArrayRef(env, axesArray);
+    JSpan<const jfloat> jArrayRef(env, axesArray);
     auto arrayRef = jArrayRef.array();
     auto arraySize = arrayRef.size();
     int maxCount =
@@ -461,7 +461,7 @@ Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickPOVs
 {
   HAL_JoystickPOVs povs;
   {
-    wpi::java::JShortArrayRef jArrayRef(env, povsArray);
+    JSpan<const jshort> jArrayRef(env, povsArray);
     auto arrayRef = jArrayRef.array();
     auto arraySize = arrayRef.size();
     int maxCount =
