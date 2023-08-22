@@ -207,6 +207,25 @@ WPI_JNI_ARRAYHELPER(jdouble, Double)
 template <typename T>
 constexpr bool is_defined = true;
 
+template <typename CvSrc, typename Dest>
+struct copy_cv {
+ private:
+  using U0 = std::remove_cv_t<Dest>;
+  using U1 = std::conditional_t<std::is_const_v<CvSrc>, const U0, U0>;
+  using U2 = std::conditional_t<std::is_volatile_v<CvSrc>, volatile U1, U1>;
+
+ public:
+  using type = U2;
+};
+
+template <typename CvSrc, typename Dest>
+using copy_cv_t = typename copy_cv<CvSrc, Dest>::type;
+
+template <typename From, typename To>
+constexpr bool is_qualification_convertible_v =
+    !(std::is_const_v<From> && !std::is_const_v<To>)&&!(
+        std::is_volatile_v<From> && !std::is_volatile_v<To>);
+
 /**
  * Helper class for working with JNI arrays.
  *
@@ -301,57 +320,24 @@ class JSpanBase {
     }
   }
 
-  operator std::span<const T>() const { return array(); }
+  operator std::span<T>() const { return array(); }
 
-  operator std::span<T>()
-    requires(!std::is_const_v<T>)
-  {
-    return array();
-  }
-
-  std::span<const T> array() const {
+  std::span<T> array() const {
     if (!m_elements) {
       return {};
     }
     return {m_elements, m_size};
   }
 
-  std::span<T> array()
-    requires(!std::is_const_v<T>)
-  {
-    if (!m_elements) {
-      return {};
-    }
-    return {m_elements, m_size};
-  }
+  T* begin() const { return m_elements; }
 
-  const T* begin() const { return m_elements; }
-
-  T* begin()
-    requires(!std::is_const_v<T>)
-  {
-    return m_elements;
-  }
-
-  const T* end() const { return m_elements + m_size; }
-
-  T* end()
-    requires(!std::is_const_v<T>)
-  {
-    return m_elements + m_size;
-  }
+  T* end() const { return m_elements + m_size; }
 
   bool is_valid() const { return m_valid && m_elements != nullptr; }
 
   explicit operator bool() const { return is_valid(); }
 
-  const T* data() const { return m_elements; }
-
-  T* data()
-    requires(!std::is_const_v<T>)
-  {
-    return m_elements;
-  }
+  T* data() const { return m_elements; }
 
   size_t size() const { return m_size; }
 
@@ -381,7 +367,7 @@ class JSpanBase {
     return {reinterpret_cast<const char*>(arr.data()), arr.size()};
   }
 
-  std::span<const uint8_t> uarray() const
+  std::span<copy_cv_t<T, uint8_t>> uarray() const
     requires std::is_same_v<std::remove_cv_t<T>, jbyte>
   {
     auto arr = array();
@@ -391,34 +377,13 @@ class JSpanBase {
     return {reinterpret_cast<const uint8_t*>(arr.data()), arr.size()};
   }
 
-  std::span<uint8_t> uarray()
-    requires(std::is_same_v<std::remove_cv_t<T>, jbyte> && !std::is_const_v<T>)
-  {
-    auto arr = array();
-    if (arr.empty()) {
-      return {};
-    }
-    return {reinterpret_cast<uint8_t*>(arr.data()), arr.size()};
-  }
-
   // Support both "long long" and "long" on 64-bit systems
 
   template <typename U>
-    requires(sizeof(U) == sizeof(jlong) && std::integral<U>)
-  operator std::span<const U>() const
+    requires(sizeof(U) == sizeof(jlong) && std::integral<U> &&
+             is_qualification_convertible_v<T, U>)
+  operator std::span<U>() const
     requires std::is_same_v<std::remove_cv_t<T>, jlong>
-  {
-    auto arr = array();
-    if (arr.empty()) {
-      return {};
-    }
-    return {reinterpret_cast<const U*>(arr.data()), arr.size()};
-  }
-
-  template <typename U>
-    requires(sizeof(U) == sizeof(jlong) && std::integral<U>)
-  operator std::span<U>()
-    requires(std::is_same_v<std::remove_cv_t<T>, jlong> && !std::is_const_v<T>)
   {
     auto arr = array();
     if (arr.empty()) {
