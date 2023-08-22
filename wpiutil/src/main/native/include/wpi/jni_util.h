@@ -203,9 +203,9 @@ WPI_JNI_ARRAYHELPER(jdouble, Double)
 
 #undef WPI_JNI_ARRAYHELPER
 
-// If parameterized with an invalid type, constraint won't be satisfied
 template <typename T>
-constexpr bool is_defined = true;
+concept JArrayType =
+    requires { typename ArrayHelper<std::remove_cv_t<T>>::jarray_type; };
 
 template <typename CvSrc, typename Dest>
 struct copy_cv {
@@ -241,8 +241,7 @@ constexpr bool is_qualification_convertible_v =
  * instead of Get/Release\<PrimitiveType\>ArrayElements.
  * @tparam Size The number of elements in the span.
  */
-template <typename T, bool IsCritical, size_t Size = std::dynamic_extent>
-  requires is_defined<typename ArrayHelper<std::remove_cv_t<T>>::jarray_type>
+template <JArrayType T, bool IsCritical, size_t Size = std::dynamic_extent>
 class JSpanBase {
   using ArrHelper = ArrayHelper<std::remove_cv_t<T>>;
   using jarray_type = typename ArrHelper::jarray_type;
