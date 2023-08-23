@@ -22,7 +22,7 @@ import edu.wpi.first.math.trajectory.Trajectory;
 
 /**
  * The linear time-varying differential drive controller has a similar form to the LQR, but the
- * model used to compute the controller gain is the nonlinear differnetial drive model linearized
+ * model used to compute the controller gain is the nonlinear differential drive model linearized
  * around the drivetrain's current state. We precompute gains for important places in our
  * state-space, then interpolate between them with a lookup table to save computational resources.
  *
