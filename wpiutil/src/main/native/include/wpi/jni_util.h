@@ -319,13 +319,18 @@ class JSpanBase {
     }
   }
 
-  operator std::span<T>() const { return array(); }
+  operator std::span<T, Size>() const { return array(); }
 
-  std::span<T> array() const {
-    if (!m_elements) {
-      return {};
+  std::span<T, Size> array() const {
+    // If Size is dynamic_extent, can return empty span
+    // Unfortunately, sized spans will return a span over nullptr if m_elements
+    // is nullptr
+    if constexpr (Size == std::dynamic_extent) {
+      if (!m_elements) {
+        return {};
+      }
     }
-    return {m_elements, m_size};
+    return std::span<T, Size>{m_elements, m_size};
   }
 
   T* begin() const { return m_elements; }
@@ -366,7 +371,7 @@ class JSpanBase {
     return {reinterpret_cast<const char*>(arr.data()), arr.size()};
   }
 
-  std::span<copy_cv_t<T, uint8_t>> uarray() const
+  std::span<copy_cv_t<T, uint8_t>, Size> uarray() const
     requires std::is_same_v<std::remove_cv_t<T>, jbyte>
   {
     auto arr = array();
@@ -381,7 +386,7 @@ class JSpanBase {
   template <typename U>
     requires(sizeof(U) == sizeof(jlong) && std::integral<U> &&
              is_qualification_convertible_v<T, U>)
-  operator std::span<U>() const
+  operator std::span<U, Size>() const
     requires std::is_same_v<std::remove_cv_t<T>, jlong>
   {
     auto arr = array();

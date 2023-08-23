@@ -511,8 +511,7 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_estimatePoseHomography
   }
 
   AprilTagPoseEstimator estimator({units::meter_t{tagSize}, fx, fy, cx, cy});
-  return MakeJObject(
-      env, estimator.EstimateHomography(std::span<const double, 9>{harr}));
+  return MakeJObject(env, estimator.EstimateHomography(harr));
 }
 
 /*
@@ -548,9 +547,8 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_estimatePoseOrthogonalIteration
   }
 
   AprilTagPoseEstimator estimator({units::meter_t{tagSize}, fx, fy, cx, cy});
-  return MakeJObject(env, estimator.EstimateOrthogonalIteration(
-                              std::span<const double, 9>{harr},
-                              std::span<const double, 8>{carr}, nIters));
+  return MakeJObject(env,
+                     estimator.EstimateOrthogonalIteration(harr, carr, nIters));
 }
 
 /*
@@ -586,8 +584,7 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_estimatePose
   }
 
   AprilTagPoseEstimator estimator({units::meter_t{tagSize}, fx, fy, cx, cy});
-  return MakeJObject(env, estimator.Estimate(std::span<const double, 9>{harr},
-                                             std::span<const double, 8>{carr}));
+  return MakeJObject(env, estimator.Estimate(harr, carr));
 }
 
 }  // extern "C"
