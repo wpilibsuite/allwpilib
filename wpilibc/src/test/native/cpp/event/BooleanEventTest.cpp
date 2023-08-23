@@ -31,6 +31,78 @@ TEST(BooleanEventTest, BinaryCompositions) {
   EXPECT_EQ(1, orCounter);
 }
 
+TEST(BooleanEventTest, BinaryCompositionLoopSemantics) {
+  EventLoop loop1;
+  EventLoop loop2;
+  bool boolean1 = true;
+  bool boolean2 = true;
+  int counter1 = 0;
+  int counter2 = 0;
+
+  (BooleanEvent(&loop1, [&] { return boolean1; }) && BooleanEvent(&loop2, [&] {
+     return boolean2;
+   })).IfHigh([&] { ++counter1; });
+  (BooleanEvent(&loop2, [&] { return boolean1; }) && BooleanEvent(&loop1, [&] {
+     return boolean2;
+   })).IfHigh([&] { ++counter2; });
+
+  EXPECT_EQ(0, counter1);
+  EXPECT_EQ(0, counter2);
+
+  loop1.Poll();
+
+  EXPECT_EQ(1, counter1);
+  EXPECT_EQ(0, counter2);
+
+  loop2.Poll();
+
+  EXPECT_EQ(1, counter1);
+  EXPECT_EQ(1, counter2);
+
+  boolean2 = false;
+  loop1.Poll();
+
+  EXPECT_EQ(2, counter1);
+  EXPECT_EQ(1, counter2);
+
+  loop2.Poll();
+
+  EXPECT_EQ(2, counter1);
+  EXPECT_EQ(1, counter2);
+
+  loop1.Poll();
+
+  EXPECT_EQ(2, counter1);
+  EXPECT_EQ(1, counter2);
+
+  boolean2 = true;
+  loop2.Poll();
+
+  EXPECT_EQ(2, counter1);
+  EXPECT_EQ(1, counter2);
+
+  loop1.Poll();
+
+  EXPECT_EQ(3, counter1);
+  EXPECT_EQ(1, counter2);
+
+  boolean1 = false;
+  loop2.Poll();
+
+  EXPECT_EQ(3, counter1);
+  EXPECT_EQ(1, counter2);
+
+  loop1.Poll();
+
+  EXPECT_EQ(3, counter1);
+  EXPECT_EQ(1, counter2);
+
+  loop2.Poll();
+
+  EXPECT_EQ(3, counter1);
+  EXPECT_EQ(1, counter2);
+}
+
 /**
  * When a BooleanEvent is constructed, an action is bound to the event loop to
  * update an internal state variable. This state variable is checked during loop
