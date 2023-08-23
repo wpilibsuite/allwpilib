@@ -81,25 +81,25 @@ class BooleanEventTest {
 
     assertEquals(2, counter1.get());
     assertEquals(1, counter2.get());
-    
+
     loop1.poll();
 
     assertEquals(3, counter1.get());
     assertEquals(1, counter2.get());
-    
+
     bool1.set(false);
     loop2.poll();
-    
+
     assertEquals(3, counter1.get());
     assertEquals(1, counter2.get());
-    
+
     loop1.poll();
-    
+
     assertEquals(3, counter1.get());
     assertEquals(1, counter2.get());
-    
+
     loop2.poll();
-    
+
     assertEquals(3, counter1.get());
     assertEquals(1, counter2.get());
   }
