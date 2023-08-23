@@ -213,67 +213,106 @@ class BooleanEventTest {
   }
 
   /**
-   * Tests that all actions bound to composed events will still execute even if the signal is
-   * changed during the loop poll.
+   * Tests that all actions bound to composed events will still execute even if the composed signal
+   * changes during the loop poll. Also tests that composed edge events only execute on edges (two
+   * rising edge events composed with and() should only execute when both signals are on the rising
+   * edge)
    */
   @Test
-  void testEventReuse() {
+  void testMidLoopBooleanChangeWithComposedEvents() {
     var loop = new EventLoop();
     var bool1 = new AtomicBoolean(false);
     var bool2 = new AtomicBoolean(false);
     var bool3 = new AtomicBoolean(false);
+    var bool4 = new AtomicBoolean(false);
     var counter = new AtomicInteger(0);
 
     var event1 = new BooleanEvent(loop, bool1::get).rising();
     var event2 = new BooleanEvent(loop, bool2::get).rising();
     var event3 = new BooleanEvent(loop, bool3::get).rising();
+    var event4 = new BooleanEvent(loop, bool4::get).rising();
     event1.ifHigh(
         () -> {
-          bool1.set(false);
+          // Executes only when Bool 1 is on rising edge
+          bool2.set(false);
           counter.incrementAndGet();
         });
+    event3
+        .or(event4)
+        .ifHigh(
+            // Executes only when Bool 3 or 4 are on rising edge
+            () -> {
+              bool1.set(false);
+              counter.incrementAndGet();
+            });
     event1
         .and(event2)
         .ifHigh(
+            // Executes only when Bool 1 and 2 are on rising edge
             () -> {
               bool3.set(false);
+              bool4.set(false);
               counter.incrementAndGet();
             });
-    event2
-        .or(event3)
-        .ifHigh(
-            () -> {
-              bool2.set(false);
-              counter.incrementAndGet();
-            });
-
     assertEquals(0, counter.get());
 
     bool1.set(true);
     bool2.set(true);
     bool3.set(true);
-    loop.poll();
+    bool4.set(true);
+    loop.poll(); // All three actions execute, incrementing the counter three times and setting all
+    // booleans to false
 
     assertEquals(3, counter.get());
 
-    loop.poll();
+    loop.poll(); // Nothing should happen since everything was set to false
 
     assertEquals(3, counter.get());
 
     bool1.set(true);
-    loop.poll();
+    loop.poll(); // Bool 1 is on rising edge, increments counter once
 
     assertEquals(4, counter.get());
 
-    loop.poll();
+    loop.poll(); // Nothing should happen, Bool 1 is true, but not on rising edge
+
+    assertEquals(4, counter.get());
+
+    bool2.set(true);
+    loop.poll(); // Nothing should happen, Bool 2 is on rising edge, but Bool 1 isn't
+
+    assertEquals(4, counter.get());
+
+    bool1.set(false);
+    bool2.set(false);
+    loop.poll(); // Nothing should happen
 
     assertEquals(4, counter.get());
 
     bool1.set(true);
     bool2.set(true);
-    loop.poll();
+    loop.poll(); // Bool 1 and 2 are on rising edge, so counter is incremented twice, and Bool 2 is
+    // reset to false
+
+    assertEquals(6, counter.get());
+
+    bool3.set(true);
+    loop.poll(); // Bool 3 is on rising edge, increments counter once
 
     assertEquals(7, counter.get());
+
+    loop.poll(); // Nothing should happen, Bool 3 isn't on rising edge
+
+    assertEquals(7, counter.get());
+
+    bool4.set(true);
+    loop.poll(); // Bool 4 is on rising edge, increments counter once
+
+    assertEquals(8, counter.get());
+
+    loop.poll(); // Nothing should happen, Bool 4 isn't on rising edge
+
+    assertEquals(8, counter.get());
   }
 
   @Test

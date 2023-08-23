@@ -218,28 +218,36 @@ TEST(BooleanEventTest, MidLoopBooleanChange) {
 
 /**
  * Tests that all actions bound to composed events will still execute even if
- * the signal is changed during the loop poll.
+ * the composed signal changes during the loop poll. Also tests that composed
+ * edge events only execute on edges (two rising edge events composed with and()
+ * should only execute when both signals are on the rising edge)
  */
-TEST(BooleanEventTest, EventReuse) {
+TEST(BooleanEventTest, MidLoopBooleanChangeWithComposedEvents) {
   EventLoop loop;
   bool boolean1 = false;
   bool boolean2 = false;
   bool boolean3 = false;
+  bool boolean4 = false;
   int counter = 0;
 
   auto event1 = BooleanEvent(&loop, [&] { return boolean1; }).Rising();
   auto event2 = BooleanEvent(&loop, [&] { return boolean2; }).Rising();
   auto event3 = BooleanEvent(&loop, [&] { return boolean3; }).Rising();
+  auto event4 = BooleanEvent(&loop, [&] { return boolean4; }).Rising();
   event1.IfHigh([&] {
+    // Executes only when Bool 1 is on rising edge
+    boolean2 = false;
+    ++counter;
+  });
+  (event3 || event4).IfHigh([&] {
+    // Executes only when Bool 3 or 4 are on rising edge
     boolean1 = false;
     ++counter;
   });
   (event1 && event2).IfHigh([&] {
+    // Executes only when Bool 1 and 2 are on rising edge
     boolean3 = false;
-    ++counter;
-  });
-  (event1 && event3).IfHigh([&] {
-    boolean2 = false;
+    boolean4 = false;
     ++counter;
   });
 
@@ -248,28 +256,61 @@ TEST(BooleanEventTest, EventReuse) {
   boolean1 = true;
   boolean2 = true;
   boolean3 = true;
-  loop.Poll();
+  boolean4 = true;
+  loop.Poll();  // All three actions execute, incrementing the counter three
+                // times and setting all booleans to false
 
   EXPECT_EQ(3, counter);
 
-  loop.Poll();
+  loop.Poll();  // Nothing should happen since everything was set to false
 
   EXPECT_EQ(3, counter);
 
   boolean1 = true;
-  loop.Poll();
+  loop.Poll();  // Bool 1 is on rising edge, increments counter once
 
   EXPECT_EQ(4, counter);
 
-  loop.Poll();
+  loop.Poll();  // Nothing should happen, Bool 1 is true, but not on rising edge
+
+  EXPECT_EQ(4, counter);
+
+  boolean2 = true;
+  loop.Poll();  // Nothing should happen, Bool 2 is on rising edge, but Bool 1
+                // isn't
+
+  EXPECT_EQ(4, counter);
+  boolean1 = false;
+  boolean2 = false;
+  loop.Poll();  // Nothing should happen
 
   EXPECT_EQ(4, counter);
 
   boolean1 = true;
   boolean2 = true;
-  loop.Poll();
+  loop.Poll();  // Bool 1 and 2 are on rising edge, so counter is incremented
+                // twice, and Bool 2 is
+  // reset to false
 
   EXPECT_EQ(6, counter);
+
+  boolean3 = true;
+  loop.Poll();  // Bool 3 is on rising edge, increments counter once
+
+  EXPECT_EQ(7, counter);
+
+  loop.Poll();  // Nothing should happen, Bool 3 isn't on rising edge
+
+  EXPECT_EQ(7, counter);
+
+  boolean4 = true;
+  loop.Poll();  // Bool 4 is on rising edge, increments counter once
+
+  EXPECT_EQ(8, counter);
+
+  loop.Poll();  // Nothing should happen, Bool 4 isn't on rising edge
+
+  EXPECT_EQ(8, counter);
 }
 
 TEST(BooleanEventTest, Negation) {
