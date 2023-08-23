@@ -22,9 +22,16 @@ import edu.wpi.first.math.trajectory.Trajectory;
 
 /**
  * The linear time-varying differential drive controller has a similar form to the LQR, but the
- * model used to compute the controller gain is the nonlinear model linearized around the
- * drivetrain's current state. We precomputed gains for important places in our state-space, then
- * interpolated between them with a LUT to save computational resources.
+ * model used to compute the controller gain is the nonlinear differnetial drive model linearized
+ * around the drivetrain's current state. We precompute gains for important places in our
+ * state-space, then interpolate between them with a lookup table to save computational resources.
+ *
+ * <p>This controller has a flat hierarchy with pose and wheel velocity references and voltage
+ * outputs. This is different from a Ramsete controller's nested hierarchy where the top-level
+ * controller has a pose reference and chassis velocity command outputs, and the low-level
+ * controller has wheel velocity references and voltage outputs. Flat hierarchies are easier to tune
+ * in one shot. Furthermore, this controller is more optimal in the "least-squares error" sense than
+ * a controller based on Ramsete.
  *
  * <p>See section 8.7 in Controls Engineering in FRC for a derivation of the control law we used
  * shown in theorem 8.7.4.

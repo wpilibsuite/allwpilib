@@ -20,8 +20,11 @@ namespace frc {
 
 /**
  * The linear time-varying unicycle controller has a similar form to the LQR,
- * but the model used to compute the controller gain is the nonlinear model
- * linearized around the drivetrain's current state.
+ * but the model used to compute the controller gain is the nonlinear unicycle
+ * model linearized around the drivetrain's current state.
+ *
+ * This controller is a roughly drop-in replacement for RamseteController with
+ * more optimal feedback gains in the "least-squares error" sense.
  *
  * See section 8.9 in Controls Engineering in FRC for a derivation of the
  * control law we used shown in theorem 8.9.1.

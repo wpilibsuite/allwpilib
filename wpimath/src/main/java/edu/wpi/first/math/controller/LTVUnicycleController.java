@@ -21,8 +21,11 @@ import edu.wpi.first.math.trajectory.Trajectory;
 
 /**
  * The linear time-varying unicycle controller has a similar form to the LQR, but the model used to
- * compute the controller gain is the nonlinear model linearized around the drivetrain's current
- * state.
+ * compute the controller gain is the nonlinear unicycle model linearized around the drivetrain's
+ * current state.
+ *
+ * <p>This controller is a roughly drop-in replacement for {@link RamseteController} with more
+ * optimal feedback gains in the "least-squares error" sense.
  *
  * <p>See section 8.9 in Controls Engineering in FRC for a derivation of the control law we used
  * shown in theorem 8.9.1.
