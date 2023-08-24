@@ -1262,7 +1262,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setServer__I_3Ljava_lang_Strin
                        "serverNames and ports arrays must be the same size");
     return;
   }
-  jint* portInts = env->GetIntArrayElements(ports, nullptr);
+  JSpan<const jint> portInts{env, ports};
   if (!portInts) {
     return;
   }
@@ -1282,7 +1282,6 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setServer__I_3Ljava_lang_Strin
     servers.emplace_back(
         std::make_pair(std::string_view{names.back()}, portInts[i]));
   }
-  env->ReleaseIntArrayElements(ports, portInts, JNI_ABORT);
   nt::SetServer(inst, servers);
 }
 
