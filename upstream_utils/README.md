@@ -22,7 +22,7 @@ The example below will update a hypothetical library called `lib` to the tag
 
 Start in the `upstream_utils` folder. Restore the original repo.
 ```bash
-./update_lib.py
+./update_<lib>.py
 ```
 
 Navigate to the repo.
@@ -60,9 +60,10 @@ cd allwpilib/upstream_utils
 ```
 
 Modify the version number in the call to `setup_upstream_repo()` in
-`update_lib.py`, then  rerun `update_lib.py` to reimport the thirdparty files.
+`update_<lib>.py`, then  rerun `update_<lib>.py` to reimport the thirdparty
+files.
 ```bash
-./update_lib.py
+./update_<lib>.py
 ```
 
 ## Adding patch to thirdparty library
@@ -102,8 +103,8 @@ Navigate back to `upstream_utils`.
 cd allwpilib/upstream_utils
 ```
 
-Update the list of patch files in `update_lib.py`, then rerun `update_lib.py` to
-reimport the thirdparty files.
+Update the list of patch files in `update_<lib>.py`, then rerun
+`update_<lib>.py` to reimport the thirdparty files.
 ```bash
 ./update_<lib>.py
 ```
