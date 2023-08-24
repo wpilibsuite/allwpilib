@@ -45,6 +45,7 @@ if (!project.hasProperty('skipJavaFormat')) {
             target fileTree('.') {
                 include '**/*.json'
                 exclude '**/build/**', '**/build-*/**', '**/bin/**'
+                exclude '**/simgui-ds.json', '**/simgui-window.json', '**/simgui.json', '**/networktables.json'
             }
             gson()
               .indentWithSpaces(2)
