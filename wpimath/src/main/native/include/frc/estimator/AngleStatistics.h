@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <functional>
 #include <numbers>
 
 #include "frc/EigenCore.h"

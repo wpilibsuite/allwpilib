@@ -11,13 +11,13 @@
 #include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc2/command/CommandPtr.h>
-#include <frc2/command/SubsystemBase.h>
+#include <frc2/command/Subsystem.h>
 #include <units/angle.h>
 #include <units/angular_velocity.h>
 
 #include "Constants.h"
 
-class Shooter : public frc2::SubsystemBase {
+class Shooter : public frc2::Subsystem {
  public:
   Shooter();
 

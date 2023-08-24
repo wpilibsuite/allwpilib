@@ -180,4 +180,10 @@ void PWM::InitSendable(wpi::SendableBuilder& builder) {
   builder.AddDoubleProperty(
       "Value", [=, this] { return GetPulseTime().value(); },
       [=, this](double value) { SetPulseTime(units::millisecond_t{value}); });
+  builder.AddDoubleProperty(
+      "Speed", [=, this] { return GetSpeed(); },
+      [=, this](double value) { SetSpeed(value); });
+  builder.AddDoubleProperty(
+      "Position", [=, this] { return GetPosition(); },
+      [=, this](double value) { SetPosition(value); });
 }

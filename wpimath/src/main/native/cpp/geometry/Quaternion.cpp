@@ -26,15 +26,18 @@ Quaternion Quaternion::operator*(const Quaternion& other) const {
   // v = r₁v₂ + r₂v₁ + v₁ x v₂
   Eigen::Vector3d v = r1 * v2 + r2 * v1 + cross;
 
-  return Quaternion{r1 * r2 - v1.dot(v2), v(0), v(1), v(2)};
+  return Quaternion{// r = r₁r₂ − v₁ ⋅ v₂
+                    r1 * r2 - v1.dot(v2),
+                    // v = r₁v₂ + r₂v₁ + v₁ x v₂
+                    v(0), v(1), v(2)};
 }
 
 bool Quaternion::operator==(const Quaternion& other) const {
-  return std::abs(m_r * other.m_r + m_v.dot(other.m_v)) > 1.0 - 1E-9;
+  return std::abs(W() * other.W() + m_v.dot(other.m_v)) > 1.0 - 1E-9;
 }
 
 Quaternion Quaternion::Inverse() const {
-  return Quaternion{m_r, -m_v(0), -m_v(1), -m_v(2)};
+  return Quaternion{W(), -X(), -Y(), -Z()};
 }
 
 Quaternion Quaternion::Normalize() const {

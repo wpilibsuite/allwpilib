@@ -74,6 +74,9 @@ TEST_P(AllianceTest, Alliance) {
     case HAL_AllianceStationID_kRed3:
       expected = 'R';
       break;
+    case HAL_AllianceStationID_kUnknown:
+      expected = 'U';
+      break;
   }
   EXPECT_EQ(expected, gString.at(0));
 }
@@ -83,7 +86,8 @@ INSTANTIATE_TEST_SUITE_P(
     testing::Values<HAL_AllianceStationID>(
         HAL_AllianceStationID_kRed1, HAL_AllianceStationID_kRed2,
         HAL_AllianceStationID_kRed3, HAL_AllianceStationID_kBlue1,
-        HAL_AllianceStationID_kBlue2, HAL_AllianceStationID_kBlue3),
+        HAL_AllianceStationID_kBlue2, HAL_AllianceStationID_kBlue3,
+        HAL_AllianceStationID_kUnknown),
     [](const testing::TestParamInfo<AllianceTest::ParamType>& info) {
       switch (info.param) {
         case HAL_AllianceStationID_kBlue1:
@@ -98,6 +102,8 @@ INSTANTIATE_TEST_SUITE_P(
           return std::string{"Red2"};
         case HAL_AllianceStationID_kRed3:
           return std::string{"Red3"};
+        case HAL_AllianceStationID_kUnknown:
+          return std::string{"Unknown"};
       }
       return std::string{"Error"};
     });

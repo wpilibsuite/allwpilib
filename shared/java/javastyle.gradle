@@ -2,7 +2,7 @@ if (!project.hasProperty('skipJavaFormat')) {
     apply plugin: 'checkstyle'
 
     checkstyle {
-        toolVersion = "10.1"
+        toolVersion = "10.12.2"
         configDirectory = file("${project.rootDir}/styleguide")
         config = resources.text.fromFile(new File(configDirectory.get().getAsFile(), "checkstyle.xml"))
     }
@@ -10,7 +10,7 @@ if (!project.hasProperty('skipJavaFormat')) {
     apply plugin: 'pmd'
 
     pmd {
-        toolVersion = '6.44.0'
+        toolVersion = '6.55.0'
         consoleOutput = true
         reportsDir = file("$project.buildDir/reports/pmd")
         ruleSetFiles = files(new File(rootDir, "styleguide/pmd-ruleset.xml"))
@@ -45,6 +45,7 @@ if (!project.hasProperty('skipJavaFormat')) {
             target fileTree('.') {
                 include '**/*.json'
                 exclude '**/build/**', '**/build-*/**', '**/bin/**'
+                exclude '**/simgui-ds.json', '**/simgui-window.json', '**/simgui.json', '**/networktables.json'
             }
             gson()
               .indentWithSpaces(2)

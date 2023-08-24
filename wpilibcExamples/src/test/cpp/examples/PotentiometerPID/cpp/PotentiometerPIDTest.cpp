@@ -38,7 +38,8 @@ class PotentiometerPIDTest : public testing::Test {
                                       kElevatorDrumRadius,
                                       0.0_m,
                                       Robot::kFullHeight,
-                                      true};
+                                      true,
+                                      0.0_m};
   frc::sim::PWMSim m_motorSim{Robot::kMotorChannel};
   frc::sim::AnalogInputSim m_analogSim{Robot::kPotChannel};
   frc::sim::JoystickSim m_joystickSim{Robot::kJoystickChannel};

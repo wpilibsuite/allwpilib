@@ -72,7 +72,7 @@ template <typename CallableT, typename ThisT>
 using EnableUnlessSameType =
     std::enable_if_t<!std::is_same<remove_cvref_t<CallableT>, ThisT>::value>;
 template <typename CallableT, typename Ret, typename... Params>
-using EnableIfCallable = std::enable_if_t<wpi::disjunction<
+using EnableIfCallable = std::enable_if_t<std::disjunction<
     std::is_void<Ret>,
     std::is_same<decltype(std::declval<CallableT>()(std::declval<Params>()...)),
                  Ret>,
@@ -106,11 +106,11 @@ protected:
   template <typename T> struct AdjustedParamTBase {
     static_assert(!std::is_reference<T>::value,
                   "references should be handled by template specialization");
-    using type = typename std::conditional<
+    using type = std::conditional_t<
         wpi::is_trivially_copy_constructible<T>::value &&
             wpi::is_trivially_move_constructible<T>::value &&
             IsSizeLessThanThresholdT<T>::value,
-        T, T &>::type;
+        T, T &>;
   };
 
   // This specialization ensures that 'AdjustedParam<V<T>&>' or
@@ -167,9 +167,8 @@ protected:
     // provide four pointers worth of storage here.
     // This is mutable as an inlined `const unique_function<void() const>` may
     // still modify its own mutable members.
-    mutable
-        typename std::aligned_storage<InlineStorageSize, alignof(void *)>::type
-            InlineStorage;
+    mutable std::aligned_storage_t<InlineStorageSize, alignof(void *)>
+        InlineStorage;
   } StorageUnion;
 
   // A compressed pointer to either our dispatching callback or our table of

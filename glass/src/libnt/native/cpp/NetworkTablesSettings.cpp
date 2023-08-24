@@ -141,22 +141,44 @@ bool NetworkTablesSettings::Display() {
     case 1:
     case 2: {
       ImGui::InputText("Team/IP", &m_serverTeam);
+      if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal)) {
+        ImGui::SetTooltip("Team number or IP/MDNS address of server");
+      }
       int* port = m_mode.GetValue() == 1 ? &m_port4 : &m_port3;
       if (ImGui::InputInt("Port", port)) {
         LimitPortRange(port);
+      }
+      if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal)) {
+        ImGui::SetTooltip("TCP Port - leave this at the default");
       }
       ImGui::SameLine();
       if (ImGui::SmallButton("Default")) {
         *port = m_mode.GetValue() == 1 ? NT_DEFAULT_PORT4 : NT_DEFAULT_PORT3;
       }
       ImGui::InputText("Network Identity", &m_clientName);
+      if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal)) {
+        ImGui::SetTooltip(
+            "Arbitrary name used to identify clients on the network. Must not "
+            "be blank.");
+      }
       ImGui::Checkbox("Get Address from DS", &m_dsClient);
+      if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal)) {
+        ImGui::SetTooltip("Attempt to fetch server IP from Driver Station");
+      }
       break;
     }
     case 3:
       ImGui::InputText("Listen Address", &m_listenAddress);
+      if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal)) {
+        ImGui::SetTooltip(
+            "Address for server to listen on. Leave blank to listen on all "
+            "interfaces.");
+      }
       if (ImGui::InputInt("NT3 port", &m_port3)) {
         LimitPortRange(&m_port3);
+      }
+      if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal)) {
+        ImGui::SetTooltip("TCP Port for NT3. Leave at default if unsure.");
       }
       ImGui::SameLine();
       if (ImGui::SmallButton("Default##default3")) {
@@ -165,11 +187,17 @@ bool NetworkTablesSettings::Display() {
       if (ImGui::InputInt("NT4 port", &m_port4)) {
         LimitPortRange(&m_port4);
       }
+      if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal)) {
+        ImGui::SetTooltip("TCP Port for NT4. Leave at default if unsure.");
+      }
       ImGui::SameLine();
       if (ImGui::SmallButton("Default##default4")) {
         m_port4 = NT_DEFAULT_PORT4;
       }
       ImGui::InputText("Persistent Filename", &m_persistentFilename);
+      if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal)) {
+        ImGui::SetTooltip("File for storage of persistent entries");
+      }
       break;
     default:
       break;

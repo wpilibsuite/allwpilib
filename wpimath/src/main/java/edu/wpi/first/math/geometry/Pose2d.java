@@ -139,6 +139,16 @@ public class Pose2d implements Interpolatable<Pose2d> {
   }
 
   /**
+   * Rotates the pose around the origin and returns the new pose.
+   *
+   * @param other The rotation to transform the pose by.
+   * @return The transformed pose.
+   */
+  public Pose2d rotateBy(Rotation2d other) {
+    return new Pose2d(m_translation.rotateBy(other), m_rotation.rotateBy(other));
+  }
+
+  /**
    * Transforms the pose by the given transformation and returns the new pose. See + operator for
    * the matrix multiplication performed.
    *

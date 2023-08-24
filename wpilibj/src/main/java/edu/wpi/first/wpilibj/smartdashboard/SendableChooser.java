@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Consumer;
 
 /**
  * The {@link SendableChooser} class is a useful tool for presenting a selection of options to the
@@ -35,19 +36,26 @@ import java.util.concurrent.locks.ReentrantLock;
 public class SendableChooser<V> implements NTSendable, AutoCloseable {
   /** The key for the default value. */
   private static final String DEFAULT = "default";
+
   /** The key for the selected option. */
   private static final String SELECTED = "selected";
+
   /** The key for the active option. */
   private static final String ACTIVE = "active";
+
   /** The key for the option array. */
   private static final String OPTIONS = "options";
+
   /** The key for the instance number. */
   private static final String INSTANCE = ".instance";
+
   /** A map linking strings to the objects they represent. */
   private final Map<String, V> m_map = new LinkedHashMap<>();
 
   private String m_defaultChoice = "";
   private final int m_instance;
+  private String m_previousVal;
+  private Consumer<V> m_listener;
   private static final AtomicInteger s_instances = new AtomicInteger();
 
   /** Instantiates a {@link SendableChooser}. */
@@ -114,6 +122,19 @@ public class SendableChooser<V> implements NTSendable, AutoCloseable {
     }
   }
 
+  /**
+   * Bind a listener that's called when the selected value changes. Only one listener can be bound.
+   * Calling this function will replace the previous listener.
+   *
+   * @param listener The function to call that accepts the new value
+   */
+  public void onChange(Consumer<V> listener) {
+    requireNonNullParam(listener, "listener", "onChange");
+    m_mutex.lock();
+    m_listener = listener;
+    m_mutex.unlock();
+  }
+
   private String m_selected;
   private final List<StringPublisher> m_activePubs = new ArrayList<>();
   private final ReentrantLock m_mutex = new ReentrantLock();
@@ -151,14 +172,27 @@ public class SendableChooser<V> implements NTSendable, AutoCloseable {
         SELECTED,
         null,
         val -> {
+          V choice;
+          Consumer<V> listener;
           m_mutex.lock();
           try {
             m_selected = val;
+            if (!m_selected.equals(m_previousVal) && m_listener != null) {
+              choice = m_map.get(val);
+              listener = m_listener;
+            } else {
+              choice = null;
+              listener = null;
+            }
+            m_previousVal = val;
             for (StringPublisher pub : m_activePubs) {
               pub.set(val);
             }
           } finally {
             m_mutex.unlock();
+          }
+          if (listener != null) {
+            listener.accept(choice);
           }
         });
   }

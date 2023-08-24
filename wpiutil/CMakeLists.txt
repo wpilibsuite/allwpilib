@@ -14,18 +14,18 @@ if (WITH_JAVA)
   include(UseJava)
   set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
 
-  if(NOT EXISTS "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/jackson/jackson-core-2.12.4.jar")
+  if(NOT EXISTS "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/jackson/jackson-core-2.15.2.jar")
         set(BASE_URL "https://search.maven.org/remotecontent?filepath=")
         set(JAR_ROOT "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/jackson")
 
         message(STATUS "Downloading Jackson jarfiles...")
 
-        file(DOWNLOAD "${BASE_URL}com/fasterxml/jackson/core/jackson-core/2.12.4/jackson-core-2.12.4.jar"
-            "${JAR_ROOT}/jackson-core-2.12.4.jar")
-        file(DOWNLOAD "${BASE_URL}com/fasterxml/jackson/core/jackson-databind/2.12.4/jackson-databind-2.12.4.jar"
-            "${JAR_ROOT}/jackson-databind-2.12.4.jar")
-        file(DOWNLOAD "${BASE_URL}com/fasterxml/jackson/core/jackson-annotations/2.12.4/jackson-annotations-2.12.4.jar"
-            "${JAR_ROOT}/jackson-annotations-2.12.4.jar")
+        file(DOWNLOAD "${BASE_URL}com/fasterxml/jackson/core/jackson-core/2.15.2/jackson-core-2.15.2.jar"
+            "${JAR_ROOT}/jackson-core-2.15.2.jar")
+        file(DOWNLOAD "${BASE_URL}com/fasterxml/jackson/core/jackson-databind/2.15.2/jackson-databind-2.15.2.jar"
+            "${JAR_ROOT}/jackson-databind-2.15.2.jar")
+        file(DOWNLOAD "${BASE_URL}com/fasterxml/jackson/core/jackson-annotations/2.15.2/jackson-annotations-2.15.2.jar"
+            "${JAR_ROOT}/jackson-annotations-2.15.2.jar")
 
         message(STATUS "All files downloaded.")
     endif()
@@ -100,14 +100,14 @@ file(GLOB_RECURSE wpiutil_windows_src src/main/native/windows/*.cpp)
 file(GLOB fmtlib_native_src src/main/native/thirdparty/fmtlib/src/*.cpp)
 file(GLOB_RECURSE memory_native_src src/main/native/thirdparty/memory/src/*.cpp)
 
-add_library(wpiutil ${wpiutil_native_src} ${fmtlib_native_src} ${memory_native_src} ${wpiutil_resources_src})
+add_library(wpiutil ${wpiutil_native_src} ${memory_native_src} ${wpiutil_resources_src})
 set_target_properties(wpiutil PROPERTIES DEBUG_POSTFIX "d")
 
 set_property(TARGET wpiutil PROPERTY FOLDER "libraries")
 
 target_compile_features(wpiutil PUBLIC cxx_std_20)
 if (MSVC)
-    target_compile_options(wpiutil PUBLIC /permissive- /Zc:throwingNew /MP /bigobj)
+    target_compile_options(wpiutil PUBLIC /permissive- /Zc:preprocessor /Zc:throwingNew /MP /bigobj)
     target_compile_definitions(wpiutil PRIVATE -D_CRT_SECURE_NO_WARNINGS)
 endif()
 wpilib_target_warnings(wpiutil)

@@ -14,30 +14,18 @@
 #include <vector>
 
 #include <wpi/Base64.h>
-#include <wpi/DenseMap.h>
 #include <wpi/MessagePack.h>
 #include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
-#include <wpi/StringMap.h>
-#include <wpi/UidVector.h>
-#include <wpi/json.h>
 #include <wpi/json_serializer.h>
 #include <wpi/raw_ostream.h>
 #include <wpi/timestamp.h>
 
 #include "IConnectionList.h"
 #include "Log.h"
-#include "Message.h"
 #include "NetworkInterface.h"
-#include "PubSubOptions.h"
 #include "Types_internal.h"
-#include "WireConnection.h"
-#include "WireDecoder.h"
-#include "WireEncoder.h"
-#include "net3/Message3.h"
-#include "net3/SequenceNumber.h"
 #include "net3/WireConnection3.h"
-#include "net3/WireDecoder3.h"
 #include "net3/WireEncoder3.h"
 #include "networktables/NetworkTableValue.h"
 #include "ntcore_c.h"
@@ -46,396 +34,11 @@ using namespace nt;
 using namespace nt::net;
 using namespace mpack;
 
-static constexpr uint32_t kMinPeriodMs = 5;
-
 // maximum amount of time the wire can be not ready to send another
 // transmission before we close the connection
 static constexpr uint32_t kWireMaxNotReadyUs = 1000000;
 
 namespace {
-
-// Utility wrapper for making a set-like vector
-template <typename T>
-class VectorSet : public std::vector<T> {
- public:
-  using iterator = typename std::vector<T>::iterator;
-  void Add(T value) { this->push_back(value); }
-  // returns true if element was present
-  bool Remove(T value) {
-    auto removeIt = std::remove(this->begin(), this->end(), value);
-    if (removeIt == this->end()) {
-      return false;
-    }
-    this->erase(removeIt, this->end());
-    return true;
-  }
-};
-
-struct PublisherData;
-struct SubscriberData;
-struct TopicData;
-class SImpl;
-
-class ClientData {
- public:
-  ClientData(std::string_view name, std::string_view connInfo, bool local,
-             ServerImpl::SetPeriodicFunc setPeriodic, SImpl& server, int id,
-             wpi::Logger& logger)
-      : m_name{name},
-        m_connInfo{connInfo},
-        m_local{local},
-        m_setPeriodic{std::move(setPeriodic)},
-        m_server{server},
-        m_id{id},
-        m_logger{logger} {}
-  virtual ~ClientData() = default;
-
-  virtual void ProcessIncomingText(std::string_view data) = 0;
-  virtual void ProcessIncomingBinary(std::span<const uint8_t> data) = 0;
-
-  enum SendMode { kSendDisabled = 0, kSendAll, kSendNormal, kSendImmNoFlush };
-
-  virtual void SendValue(TopicData* topic, const Value& value,
-                         SendMode mode) = 0;
-  virtual void SendAnnounce(TopicData* topic,
-                            std::optional<int64_t> pubuid) = 0;
-  virtual void SendUnannounce(TopicData* topic) = 0;
-  virtual void SendPropertiesUpdate(TopicData* topic, const wpi::json& update,
-                                    bool ack) = 0;
-  virtual void SendOutgoing(uint64_t curTimeMs) = 0;
-  virtual void Flush() = 0;
-
-  void UpdateMetaClientPub();
-  void UpdateMetaClientSub();
-
-  std::span<SubscriberData*> GetSubscribers(
-      std::string_view name, bool special,
-      wpi::SmallVectorImpl<SubscriberData*>& buf);
-
-  std::string_view GetName() const { return m_name; }
-  int GetId() const { return m_id; }
-
- protected:
-  std::string m_name;
-  std::string m_connInfo;
-  bool m_local;  // local to machine
-  ServerImpl::SetPeriodicFunc m_setPeriodic;
-  // TODO: make this per-topic?
-  uint32_t m_periodMs{UINT32_MAX};
-  uint64_t m_lastSendMs{0};
-  SImpl& m_server;
-  int m_id;
-
-  wpi::Logger& m_logger;
-
-  wpi::DenseMap<int64_t, std::unique_ptr<PublisherData>> m_publishers;
-  wpi::DenseMap<int64_t, std::unique_ptr<SubscriberData>> m_subscribers;
-
- public:
-  // meta topics
-  TopicData* m_metaPub = nullptr;
-  TopicData* m_metaSub = nullptr;
-};
-
-class ClientData4Base : public ClientData, protected ClientMessageHandler {
- public:
-  ClientData4Base(std::string_view name, std::string_view connInfo, bool local,
-                  ServerImpl::SetPeriodicFunc setPeriodic, SImpl& server,
-                  int id, wpi::Logger& logger)
-      : ClientData{name, connInfo, local, setPeriodic, server, id, logger} {}
-
- protected:
-  // ClientMessageHandler interface
-  void ClientPublish(int64_t pubuid, std::string_view name,
-                     std::string_view typeStr,
-                     const wpi::json& properties) final;
-  void ClientUnpublish(int64_t pubuid) final;
-  void ClientSetProperties(std::string_view name,
-                           const wpi::json& update) final;
-  void ClientSubscribe(int64_t subuid, std::span<const std::string> topicNames,
-                       const PubSubOptionsImpl& options) final;
-  void ClientUnsubscribe(int64_t subuid) final;
-
-  void ClientSetValue(int64_t pubuid, const Value& value);
-
-  wpi::DenseMap<TopicData*, bool> m_announceSent;
-};
-
-class ClientDataLocal final : public ClientData4Base {
- public:
-  ClientDataLocal(SImpl& server, int id, wpi::Logger& logger)
-      : ClientData4Base{"", "", true, [](uint32_t) {}, server, id, logger} {}
-
-  void ProcessIncomingText(std::string_view data) final {}
-  void ProcessIncomingBinary(std::span<const uint8_t> data) final {}
-
-  void SendValue(TopicData* topic, const Value& value, SendMode mode) final;
-  void SendAnnounce(TopicData* topic, std::optional<int64_t> pubuid) final;
-  void SendUnannounce(TopicData* topic) final;
-  void SendPropertiesUpdate(TopicData* topic, const wpi::json& update,
-                            bool ack) final;
-  void SendOutgoing(uint64_t curTimeMs) final {}
-  void Flush() final {}
-
-  void HandleLocal(std::span<const ClientMessage> msgs);
-};
-
-class ClientData4 final : public ClientData4Base {
- public:
-  ClientData4(std::string_view name, std::string_view connInfo, bool local,
-              WireConnection& wire, ServerImpl::SetPeriodicFunc setPeriodic,
-              SImpl& server, int id, wpi::Logger& logger)
-      : ClientData4Base{name, connInfo, local, setPeriodic, server, id, logger},
-        m_wire{wire} {}
-
-  void ProcessIncomingText(std::string_view data) final;
-  void ProcessIncomingBinary(std::span<const uint8_t> data) final;
-
-  void SendValue(TopicData* topic, const Value& value, SendMode mode) final;
-  void SendAnnounce(TopicData* topic, std::optional<int64_t> pubuid) final;
-  void SendUnannounce(TopicData* topic) final;
-  void SendPropertiesUpdate(TopicData* topic, const wpi::json& update,
-                            bool ack) final;
-  void SendOutgoing(uint64_t curTimeMs) final;
-
-  void Flush() final;
-
- public:
-  WireConnection& m_wire;
-
- private:
-  std::vector<ServerMessage> m_outgoing;
-  wpi::DenseMap<NT_Topic, size_t> m_outgoingValueMap;
-
-  bool WriteBinary(int64_t id, int64_t time, const Value& value) {
-    return WireEncodeBinary(SendBinary().Add(), id, time, value);
-  }
-
-  TextWriter& SendText() {
-    m_outBinary.reset();  // ensure proper interleaving of text and binary
-    if (!m_outText) {
-      m_outText = m_wire.SendText();
-    }
-    return *m_outText;
-  }
-
-  BinaryWriter& SendBinary() {
-    m_outText.reset();  // ensure proper interleaving of text and binary
-    if (!m_outBinary) {
-      m_outBinary = m_wire.SendBinary();
-    }
-    return *m_outBinary;
-  }
-
-  // valid when we are actively writing to this client
-  std::optional<TextWriter> m_outText;
-  std::optional<BinaryWriter> m_outBinary;
-};
-
-class ClientData3 final : public ClientData, private net3::MessageHandler3 {
- public:
-  ClientData3(std::string_view connInfo, bool local,
-              net3::WireConnection3& wire, ServerImpl::Connected3Func connected,
-              ServerImpl::SetPeriodicFunc setPeriodic, SImpl& server, int id,
-              wpi::Logger& logger)
-      : ClientData{"", connInfo, local, setPeriodic, server, id, logger},
-        m_connected{std::move(connected)},
-        m_wire{wire},
-        m_decoder{*this} {}
-
-  void ProcessIncomingText(std::string_view data) final {}
-  void ProcessIncomingBinary(std::span<const uint8_t> data) final;
-
-  void SendValue(TopicData* topic, const Value& value, SendMode mode) final;
-  void SendAnnounce(TopicData* topic, std::optional<int64_t> pubuid) final;
-  void SendUnannounce(TopicData* topic) final;
-  void SendPropertiesUpdate(TopicData* topic, const wpi::json& update,
-                            bool ack) final;
-  void SendOutgoing(uint64_t curTimeMs) final;
-
-  void Flush() final { m_wire.Flush(); }
-
- private:
-  // MessageHandler3 interface
-  void KeepAlive() final;
-  void ServerHelloDone() final;
-  void ClientHelloDone() final;
-  void ClearEntries() final;
-  void ProtoUnsup(unsigned int proto_rev) final;
-  void ClientHello(std::string_view self_id, unsigned int proto_rev) final;
-  void ServerHello(unsigned int flags, std::string_view self_id) final;
-  void EntryAssign(std::string_view name, unsigned int id, unsigned int seq_num,
-                   const Value& value, unsigned int flags) final;
-  void EntryUpdate(unsigned int id, unsigned int seq_num,
-                   const Value& value) final;
-  void FlagsUpdate(unsigned int id, unsigned int flags) final;
-  void EntryDelete(unsigned int id) final;
-  void ExecuteRpc(unsigned int id, unsigned int uid,
-                  std::span<const uint8_t> params) final {}
-  void RpcResponse(unsigned int id, unsigned int uid,
-                   std::span<const uint8_t> result) final {}
-
-  ServerImpl::Connected3Func m_connected;
-  net3::WireConnection3& m_wire;
-
-  enum State { kStateInitial, kStateServerHelloComplete, kStateRunning };
-  State m_state{kStateInitial};
-  net3::WireDecoder3 m_decoder;
-
-  std::vector<net3::Message3> m_outgoing;
-  wpi::DenseMap<NT_Topic, size_t> m_outgoingValueMap;
-  int64_t m_nextPubUid{1};
-
-  struct TopicData3 {
-    explicit TopicData3(TopicData* topic) { UpdateFlags(topic); }
-
-    unsigned int flags{0};
-    net3::SequenceNumber seqNum;
-    bool sentAssign{false};
-    bool published{false};
-    int64_t pubuid{0};
-
-    bool UpdateFlags(TopicData* topic);
-  };
-  wpi::DenseMap<TopicData*, TopicData3> m_topics3;
-  TopicData3* GetTopic3(TopicData* topic) {
-    return &m_topics3.try_emplace(topic, topic).first->second;
-  }
-};
-
-struct TopicData {
-  TopicData(std::string_view name, std::string_view typeStr)
-      : name{name}, typeStr{typeStr} {}
-  TopicData(std::string_view name, std::string_view typeStr,
-            wpi::json properties)
-      : name{name}, typeStr{typeStr}, properties(std::move(properties)) {
-    RefreshProperties();
-  }
-
-  bool IsPublished() const {
-    return persistent || retained || !publishers.empty();
-  }
-
-  // returns true if properties changed
-  bool SetProperties(const wpi::json& update);
-  void RefreshProperties();
-  bool SetFlags(unsigned int flags_);
-
-  std::string name;
-  unsigned int id;
-  Value lastValue;
-  ClientData* lastValueClient = nullptr;
-  std::string typeStr;
-  wpi::json properties = wpi::json::object();
-  bool persistent{false};
-  bool retained{false};
-  bool special{false};
-  NT_Topic localHandle{0};
-
-  VectorSet<PublisherData*> publishers;
-  VectorSet<SubscriberData*> subscribers;
-
-  // meta topics
-  TopicData* metaPub = nullptr;
-  TopicData* metaSub = nullptr;
-};
-
-struct PublisherData {
-  PublisherData(ClientData* client, TopicData* topic, int64_t pubuid)
-      : client{client}, topic{topic}, pubuid{pubuid} {}
-
-  ClientData* client;
-  TopicData* topic;
-  int64_t pubuid;
-};
-
-struct SubscriberData {
-  SubscriberData(ClientData* client, std::span<const std::string> topicNames,
-                 int64_t subuid, const PubSubOptionsImpl& options)
-      : client{client},
-        topicNames{topicNames.begin(), topicNames.end()},
-        subuid{subuid},
-        options{options},
-        periodMs(std::lround(options.periodicMs / 10.0) * 10) {
-    if (periodMs < kMinPeriodMs) {
-      periodMs = kMinPeriodMs;
-    }
-  }
-
-  void Update(std::span<const std::string> topicNames_,
-              const PubSubOptionsImpl& options_) {
-    topicNames = {topicNames_.begin(), topicNames_.end()};
-    options = options_;
-    periodMs = std::lround(options_.periodicMs / 10.0) * 10;
-    if (periodMs < kMinPeriodMs) {
-      periodMs = kMinPeriodMs;
-    }
-  }
-
-  bool Matches(std::string_view name, bool special);
-
-  ClientData* client;
-  std::vector<std::string> topicNames;
-  int64_t subuid;
-  PubSubOptionsImpl options;
-  // in options as double, but copy here as integer; rounded to the nearest
-  // 10 ms
-  uint32_t periodMs;
-};
-
-class SImpl {
- public:
-  explicit SImpl(wpi::Logger& logger);
-
-  wpi::Logger& m_logger;
-  LocalInterface* m_local{nullptr};
-  bool m_controlReady{false};
-
-  ClientDataLocal* m_localClient;
-  std::vector<std::unique_ptr<ClientData>> m_clients;
-  wpi::UidVector<std::unique_ptr<TopicData>, 16> m_topics;
-  wpi::StringMap<TopicData*> m_nameTopics;
-  bool m_persistentChanged{false};
-
-  // global meta topics (other meta topics are linked to from the specific
-  // client or topic)
-  TopicData* m_metaClients;
-
-  // ServerImpl interface
-  std::pair<std::string, int> AddClient(
-      std::string_view name, std::string_view connInfo, bool local,
-      WireConnection& wire, ServerImpl::SetPeriodicFunc setPeriodic);
-  int AddClient3(std::string_view connInfo, bool local,
-                 net3::WireConnection3& wire,
-                 ServerImpl::Connected3Func connected,
-                 ServerImpl::SetPeriodicFunc setPeriodic);
-  void RemoveClient(int clientId);
-
-  bool PersistentChanged();
-  void DumpPersistent(wpi::raw_ostream& os);
-  std::string LoadPersistent(std::string_view in);
-
-  // helper functions
-  TopicData* CreateTopic(ClientData* client, std::string_view name,
-                         std::string_view typeStr, const wpi::json& properties,
-                         bool special = false);
-  TopicData* CreateMetaTopic(std::string_view name);
-  void DeleteTopic(TopicData* topic);
-  void SetProperties(ClientData* client, TopicData* topic,
-                     const wpi::json& update);
-  void SetFlags(ClientData* client, TopicData* topic, unsigned int flags);
-  void SetValue(ClientData* client, TopicData* topic, const Value& value);
-
-  // update meta topic values from data structures
-  void UpdateMetaClients(const std::vector<ConnectionInfo>& conns);
-  void UpdateMetaTopicPub(TopicData* topic);
-  void UpdateMetaTopicSub(TopicData* topic);
-
- private:
-  void PropertiesChanged(ClientData* client, TopicData* topic,
-                         const wpi::json& update);
-};
-
 struct Writer : public mpack_writer_t {
   Writer() {
     mpack_writer_init(this, buf, sizeof(buf));
@@ -477,7 +80,7 @@ static void WriteOptions(mpack_writer_t& w, const PubSubOptionsImpl& options) {
   mpack_finish_map(&w);
 }
 
-void ClientData::UpdateMetaClientPub() {
+void ServerImpl::ClientData::UpdateMetaClientPub() {
   if (!m_metaPub) {
     return;
   }
@@ -497,7 +100,7 @@ void ClientData::UpdateMetaClientPub() {
   }
 }
 
-void ClientData::UpdateMetaClientSub() {
+void ServerImpl::ClientData::UpdateMetaClientSub() {
   if (!m_metaSub) {
     return;
   }
@@ -523,7 +126,7 @@ void ClientData::UpdateMetaClientSub() {
   }
 }
 
-std::span<SubscriberData*> ClientData::GetSubscribers(
+std::span<ServerImpl::SubscriberData*> ServerImpl::ClientData::GetSubscribers(
     std::string_view name, bool special,
     wpi::SmallVectorImpl<SubscriberData*>& buf) {
   buf.resize(0);
@@ -536,9 +139,10 @@ std::span<SubscriberData*> ClientData::GetSubscribers(
   return {buf.data(), buf.size()};
 }
 
-void ClientData4Base::ClientPublish(int64_t pubuid, std::string_view name,
-                                    std::string_view typeStr,
-                                    const wpi::json& properties) {
+void ServerImpl::ClientData4Base::ClientPublish(int64_t pubuid,
+                                                std::string_view name,
+                                                std::string_view typeStr,
+                                                const wpi::json& properties) {
   DEBUG3("ClientPublish({}, {}, {}, {})", m_id, name, pubuid, typeStr);
   auto topic = m_server.CreateTopic(this, name, typeStr, properties);
 
@@ -546,7 +150,7 @@ void ClientData4Base::ClientPublish(int64_t pubuid, std::string_view name,
   auto [publisherIt, isNew] = m_publishers.try_emplace(
       pubuid, std::make_unique<PublisherData>(this, topic, pubuid));
   if (!isNew) {
-    WARNING("client {} duplicate publish of pubuid {}", m_id, pubuid);
+    WARN("client {} duplicate publish of pubuid {}", m_id, pubuid);
   }
 
   // add publisher to topic
@@ -561,7 +165,7 @@ void ClientData4Base::ClientPublish(int64_t pubuid, std::string_view name,
   SendAnnounce(topic, pubuid);
 }
 
-void ClientData4Base::ClientUnpublish(int64_t pubuid) {
+void ServerImpl::ClientData4Base::ClientUnpublish(int64_t pubuid) {
   DEBUG3("ClientUnpublish({}, {})", m_id, pubuid);
   auto publisherIt = m_publishers.find(pubuid);
   if (publisherIt == m_publishers.end()) {
@@ -586,13 +190,13 @@ void ClientData4Base::ClientUnpublish(int64_t pubuid) {
   }
 }
 
-void ClientData4Base::ClientSetProperties(std::string_view name,
-                                          const wpi::json& update) {
+void ServerImpl::ClientData4Base::ClientSetProperties(std::string_view name,
+                                                      const wpi::json& update) {
   DEBUG4("ClientSetProperties({}, {}, {})", m_id, name, update.dump());
   auto topicIt = m_server.m_nameTopics.find(name);
   if (topicIt == m_server.m_nameTopics.end() ||
       !topicIt->second->IsPublished()) {
-    WARNING(
+    WARN(
         "server ignoring SetProperties({}) from client {} on unpublished topic "
         "'{}'; publish or set a value first",
         update.dump(), m_id, name);
@@ -600,17 +204,16 @@ void ClientData4Base::ClientSetProperties(std::string_view name,
   }
   auto topic = topicIt->second;
   if (topic->special) {
-    WARNING(
-        "server ignoring SetProperties({}) from client {} on meta topic '{}'",
-        update.dump(), m_id, name);
+    WARN("server ignoring SetProperties({}) from client {} on meta topic '{}'",
+         update.dump(), m_id, name);
     return;  // nothing to do
   }
   m_server.SetProperties(nullptr, topic, update);
 }
 
-void ClientData4Base::ClientSubscribe(int64_t subuid,
-                                      std::span<const std::string> topicNames,
-                                      const PubSubOptionsImpl& options) {
+void ServerImpl::ClientData4Base::ClientSubscribe(
+    int64_t subuid, std::span<const std::string> topicNames,
+    const PubSubOptionsImpl& options) {
   DEBUG4("ClientSubscribe({}, ({}), {})", m_id, fmt::join(topicNames, ","),
          subuid);
   auto& sub = m_subscribers[subuid];
@@ -700,7 +303,7 @@ void ClientData4Base::ClientSubscribe(int64_t subuid,
   Flush();
 }
 
-void ClientData4Base::ClientUnsubscribe(int64_t subuid) {
+void ServerImpl::ClientData4Base::ClientUnsubscribe(int64_t subuid) {
   DEBUG3("ClientUnsubscribe({}, {})", m_id, subuid);
   auto subIt = m_subscribers.find(subuid);
   if (subIt == m_subscribers.end() || !subIt->getSecond()) {
@@ -734,26 +337,27 @@ void ClientData4Base::ClientUnsubscribe(int64_t subuid) {
   m_setPeriodic(m_periodMs);
 }
 
-void ClientData4Base::ClientSetValue(int64_t pubuid, const Value& value) {
+void ServerImpl::ClientData4Base::ClientSetValue(int64_t pubuid,
+                                                 const Value& value) {
   DEBUG4("ClientSetValue({}, {})", m_id, pubuid);
   auto publisherIt = m_publishers.find(pubuid);
   if (publisherIt == m_publishers.end()) {
-    WARNING("unrecognized client {} pubuid {}, ignoring set", m_id, pubuid);
+    WARN("unrecognized client {} pubuid {}, ignoring set", m_id, pubuid);
     return;  // ignore unrecognized pubuids
   }
   auto topic = publisherIt->getSecond().get()->topic;
   m_server.SetValue(this, topic, value);
 }
 
-void ClientDataLocal::SendValue(TopicData* topic, const Value& value,
-                                SendMode mode) {
+void ServerImpl::ClientDataLocal::SendValue(TopicData* topic,
+                                            const Value& value, SendMode mode) {
   if (m_server.m_local) {
     m_server.m_local->NetworkSetValue(topic->localHandle, value);
   }
 }
 
-void ClientDataLocal::SendAnnounce(TopicData* topic,
-                                   std::optional<int64_t> pubuid) {
+void ServerImpl::ClientDataLocal::SendAnnounce(TopicData* topic,
+                                               std::optional<int64_t> pubuid) {
   if (m_server.m_local) {
     auto& sent = m_announceSent[topic];
     if (sent) {
@@ -766,7 +370,7 @@ void ClientDataLocal::SendAnnounce(TopicData* topic,
   }
 }
 
-void ClientDataLocal::SendUnannounce(TopicData* topic) {
+void ServerImpl::ClientDataLocal::SendUnannounce(TopicData* topic) {
   if (m_server.m_local) {
     auto& sent = m_announceSent[topic];
     if (!sent) {
@@ -777,8 +381,9 @@ void ClientDataLocal::SendUnannounce(TopicData* topic) {
   }
 }
 
-void ClientDataLocal::SendPropertiesUpdate(TopicData* topic,
-                                           const wpi::json& update, bool ack) {
+void ServerImpl::ClientDataLocal::SendPropertiesUpdate(TopicData* topic,
+                                                       const wpi::json& update,
+                                                       bool ack) {
   if (m_server.m_local) {
     if (!m_announceSent.lookup(topic)) {
       return;
@@ -787,7 +392,8 @@ void ClientDataLocal::SendPropertiesUpdate(TopicData* topic,
   }
 }
 
-void ClientDataLocal::HandleLocal(std::span<const ClientMessage> msgs) {
+void ServerImpl::ClientDataLocal::HandleLocal(
+    std::span<const ClientMessage> msgs) {
   DEBUG4("HandleLocal()");
   // just map as a normal client into client=0 calls
   for (const auto& elem : msgs) {  // NOLINT
@@ -808,11 +414,12 @@ void ClientDataLocal::HandleLocal(std::span<const ClientMessage> msgs) {
   }
 }
 
-void ClientData4::ProcessIncomingText(std::string_view data) {
+void ServerImpl::ClientData4::ProcessIncomingText(std::string_view data) {
   WireDecodeText(data, *this, m_logger);
 }
 
-void ClientData4::ProcessIncomingBinary(std::span<const uint8_t> data) {
+void ServerImpl::ClientData4::ProcessIncomingBinary(
+    std::span<const uint8_t> data) {
   for (;;) {
     if (data.empty()) {
       break;
@@ -844,8 +451,8 @@ void ClientData4::ProcessIncomingBinary(std::span<const uint8_t> data) {
   }
 }
 
-void ClientData4::SendValue(TopicData* topic, const Value& value,
-                            SendMode mode) {
+void ServerImpl::ClientData4::SendValue(TopicData* topic, const Value& value,
+                                        SendMode mode) {
   if (m_local) {
     mode = ClientData::kSendImmNoFlush;  // always send local immediately
   }
@@ -881,8 +488,8 @@ void ClientData4::SendValue(TopicData* topic, const Value& value,
   }
 }
 
-void ClientData4::SendAnnounce(TopicData* topic,
-                               std::optional<int64_t> pubuid) {
+void ServerImpl::ClientData4::SendAnnounce(TopicData* topic,
+                                           std::optional<int64_t> pubuid) {
   auto& sent = m_announceSent[topic];
   if (sent) {
     return;
@@ -900,7 +507,7 @@ void ClientData4::SendAnnounce(TopicData* topic,
   }
 }
 
-void ClientData4::SendUnannounce(TopicData* topic) {
+void ServerImpl::ClientData4::SendUnannounce(TopicData* topic) {
   auto& sent = m_announceSent[topic];
   if (!sent) {
     return;
@@ -917,8 +524,9 @@ void ClientData4::SendUnannounce(TopicData* topic) {
   }
 }
 
-void ClientData4::SendPropertiesUpdate(TopicData* topic,
-                                       const wpi::json& update, bool ack) {
+void ServerImpl::ClientData4::SendPropertiesUpdate(TopicData* topic,
+                                                   const wpi::json& update,
+                                                   bool ack) {
   if (!m_announceSent.lookup(topic)) {
     return;
   }
@@ -933,7 +541,7 @@ void ClientData4::SendPropertiesUpdate(TopicData* topic,
   }
 }
 
-void ClientData4::SendOutgoing(uint64_t curTimeMs) {
+void ServerImpl::ClientData4::SendOutgoing(uint64_t curTimeMs) {
   if (m_outgoing.empty()) {
     return;  // nothing to do
   }
@@ -964,27 +572,28 @@ void ClientData4::SendOutgoing(uint64_t curTimeMs) {
   m_lastSendMs = curTimeMs;
 }
 
-void ClientData4::Flush() {
+void ServerImpl::ClientData4::Flush() {
   m_outText.reset();
   m_outBinary.reset();
   m_wire.Flush();
 }
 
-bool ClientData3::TopicData3::UpdateFlags(TopicData* topic) {
+bool ServerImpl::ClientData3::TopicData3::UpdateFlags(TopicData* topic) {
   unsigned int newFlags = topic->persistent ? NT_PERSISTENT : 0;
   bool updated = flags != newFlags;
   flags = newFlags;
   return updated;
 }
 
-void ClientData3::ProcessIncomingBinary(std::span<const uint8_t> data) {
+void ServerImpl::ClientData3::ProcessIncomingBinary(
+    std::span<const uint8_t> data) {
   if (!m_decoder.Execute(&data)) {
     m_wire.Disconnect(m_decoder.GetError());
   }
 }
 
-void ClientData3::SendValue(TopicData* topic, const Value& value,
-                            SendMode mode) {
+void ServerImpl::ClientData3::SendValue(TopicData* topic, const Value& value,
+                                        SendMode mode) {
   if (m_state != kStateRunning) {
     if (mode == kSendImmNoFlush) {
       mode = kSendAll;
@@ -1048,8 +657,8 @@ void ClientData3::SendValue(TopicData* topic, const Value& value,
   }
 }
 
-void ClientData3::SendAnnounce(TopicData* topic,
-                               std::optional<int64_t> pubuid) {
+void ServerImpl::ClientData3::SendAnnounce(TopicData* topic,
+                                           std::optional<int64_t> pubuid) {
   // ignore if we've not yet built the subscriber
   if (m_subscribers.empty()) {
     return;
@@ -1065,7 +674,7 @@ void ClientData3::SendAnnounce(TopicData* topic,
   // will get sent when the first value is sent (by SendValue).
 }
 
-void ClientData3::SendUnannounce(TopicData* topic) {
+void ServerImpl::ClientData3::SendUnannounce(TopicData* topic) {
   auto it = m_topics3.find(topic);
   if (it == m_topics3.end()) {
     return;  // never sent to client
@@ -1085,8 +694,9 @@ void ClientData3::SendUnannounce(TopicData* topic) {
   }
 }
 
-void ClientData3::SendPropertiesUpdate(TopicData* topic,
-                                       const wpi::json& update, bool ack) {
+void ServerImpl::ClientData3::SendPropertiesUpdate(TopicData* topic,
+                                                   const wpi::json& update,
+                                                   bool ack) {
   if (ack) {
     return;  // we don't ack in NT3
   }
@@ -1110,7 +720,7 @@ void ClientData3::SendPropertiesUpdate(TopicData* topic,
   }
 }
 
-void ClientData3::SendOutgoing(uint64_t curTimeMs) {
+void ServerImpl::ClientData3::SendOutgoing(uint64_t curTimeMs) {
   if (m_outgoing.empty() || m_state != kStateRunning) {
     return;  // nothing to do
   }
@@ -1138,7 +748,7 @@ void ClientData3::SendOutgoing(uint64_t curTimeMs) {
   m_lastSendMs = curTimeMs;
 }
 
-void ClientData3::KeepAlive() {
+void ServerImpl::ClientData3::KeepAlive() {
   DEBUG4("KeepAlive({})", m_id);
   if (m_state != kStateRunning) {
     m_decoder.SetError("received unexpected KeepAlive message");
@@ -1147,12 +757,12 @@ void ClientData3::KeepAlive() {
   // ignore
 }
 
-void ClientData3::ServerHelloDone() {
+void ServerImpl::ClientData3::ServerHelloDone() {
   DEBUG4("ServerHelloDone({})", m_id);
   m_decoder.SetError("received unexpected ServerHelloDone message");
 }
 
-void ClientData3::ClientHelloDone() {
+void ServerImpl::ClientData3::ClientHelloDone() {
   DEBUG4("ClientHelloDone({})", m_id);
   if (m_state != kStateServerHelloComplete) {
     m_decoder.SetError("received unexpected ClientHelloDone message");
@@ -1161,7 +771,7 @@ void ClientData3::ClientHelloDone() {
   m_state = kStateRunning;
 }
 
-void ClientData3::ClearEntries() {
+void ServerImpl::ClientData3::ClearEntries() {
   DEBUG4("ClearEntries({})", m_id);
   if (m_state != kStateRunning) {
     m_decoder.SetError("received unexpected ClearEntries message");
@@ -1196,13 +806,13 @@ void ClientData3::ClearEntries() {
   }
 }
 
-void ClientData3::ProtoUnsup(unsigned int proto_rev) {
+void ServerImpl::ClientData3::ProtoUnsup(unsigned int proto_rev) {
   DEBUG4("ProtoUnsup({})", m_id);
   m_decoder.SetError("received unexpected ProtoUnsup message");
 }
 
-void ClientData3::ClientHello(std::string_view self_id,
-                              unsigned int proto_rev) {
+void ServerImpl::ClientData3::ClientHello(std::string_view self_id,
+                                          unsigned int proto_rev) {
   DEBUG4("ClientHello({}, '{}', {:04x})", m_id, self_id, proto_rev);
   if (m_state != kStateInitial) {
     m_decoder.SetError("received unexpected ClientHello message");
@@ -1266,14 +876,16 @@ void ClientData3::ClientHello(std::string_view self_id,
   UpdateMetaClientSub();
 }
 
-void ClientData3::ServerHello(unsigned int flags, std::string_view self_id) {
+void ServerImpl::ClientData3::ServerHello(unsigned int flags,
+                                          std::string_view self_id) {
   DEBUG4("ServerHello({}, {}, {})", m_id, flags, self_id);
   m_decoder.SetError("received unexpected ServerHello message");
 }
 
-void ClientData3::EntryAssign(std::string_view name, unsigned int id,
-                              unsigned int seq_num, const Value& value,
-                              unsigned int flags) {
+void ServerImpl::ClientData3::EntryAssign(std::string_view name,
+                                          unsigned int id, unsigned int seq_num,
+                                          const Value& value,
+                                          unsigned int flags) {
   DEBUG4("EntryAssign({}, {}, {}, {}, {})", m_id, id, seq_num,
          static_cast<int>(value.type()), flags);
   if (id != 0xffff) {
@@ -1293,7 +905,7 @@ void ClientData3::EntryAssign(std::string_view name, unsigned int id,
   auto topic = m_server.CreateTopic(this, name, typeStr, properties);
   TopicData3* topic3 = GetTopic3(topic);
   if (topic3->published || topic3->sentAssign) {
-    WARNING("ignoring client {} duplicate publish of '{}'", m_id, name);
+    WARN("ignoring client {} duplicate publish of '{}'", m_id, name);
     return;
   }
   ++topic3->seqNum;
@@ -1330,8 +942,8 @@ void ClientData3::EntryAssign(std::string_view name, unsigned int id,
   }
 }
 
-void ClientData3::EntryUpdate(unsigned int id, unsigned int seq_num,
-                              const Value& value) {
+void ServerImpl::ClientData3::EntryUpdate(unsigned int id, unsigned int seq_num,
+                                          const Value& value) {
   DEBUG4("EntryUpdate({}, {}, {}, {})", m_id, id, seq_num,
          static_cast<int>(value.type()));
   if (m_state != kStateRunning) {
@@ -1372,7 +984,7 @@ void ClientData3::EntryUpdate(unsigned int id, unsigned int seq_num,
   m_server.SetValue(this, topic, value);
 }
 
-void ClientData3::FlagsUpdate(unsigned int id, unsigned int flags) {
+void ServerImpl::ClientData3::FlagsUpdate(unsigned int id, unsigned int flags) {
   DEBUG4("FlagsUpdate({}, {}, {})", m_id, id, flags);
   if (m_state != kStateRunning) {
     m_decoder.SetError("received unexpected FlagsUpdate message");
@@ -1394,7 +1006,7 @@ void ClientData3::FlagsUpdate(unsigned int id, unsigned int flags) {
   m_server.SetFlags(this, topic, flags);
 }
 
-void ClientData3::EntryDelete(unsigned int id) {
+void ServerImpl::ClientData3::EntryDelete(unsigned int id) {
   DEBUG4("EntryDelete({}, {})", m_id, id);
   if (m_state != kStateRunning) {
     m_decoder.SetError("received unexpected EntryDelete message");
@@ -1441,7 +1053,7 @@ void ClientData3::EntryDelete(unsigned int id) {
   m_server.SetProperties(this, topic, {{"retained", false}});
 }
 
-bool TopicData::SetProperties(const wpi::json& update) {
+bool ServerImpl::TopicData::SetProperties(const wpi::json& update) {
   if (!update.is_object()) {
     return false;
   }
@@ -1460,7 +1072,7 @@ bool TopicData::SetProperties(const wpi::json& update) {
   return updated;
 }
 
-void TopicData::RefreshProperties() {
+void ServerImpl::TopicData::RefreshProperties() {
   persistent = false;
   retained = false;
 
@@ -1479,7 +1091,7 @@ void TopicData::RefreshProperties() {
   }
 }
 
-bool TopicData::SetFlags(unsigned int flags_) {
+bool ServerImpl::TopicData::SetFlags(unsigned int flags_) {
   bool updated;
   if ((flags_ & NT_PERSISTENT) != 0) {
     updated = !persistent;
@@ -1493,7 +1105,7 @@ bool TopicData::SetFlags(unsigned int flags_) {
   return updated;
 }
 
-bool SubscriberData::Matches(std::string_view name, bool special) {
+bool ServerImpl::SubscriberData::Matches(std::string_view name, bool special) {
   for (auto&& topicName : topicNames) {
     if ((!options.prefixMatch && name == topicName) ||
         (options.prefixMatch && (!special || !topicName.empty()) &&
@@ -1504,13 +1116,13 @@ bool SubscriberData::Matches(std::string_view name, bool special) {
   return false;
 }
 
-SImpl::SImpl(wpi::Logger& logger) : m_logger{logger} {
+ServerImpl::ServerImpl(wpi::Logger& logger) : m_logger{logger} {
   // local is client 0
   m_clients.emplace_back(std::make_unique<ClientDataLocal>(*this, 0, logger));
   m_localClient = static_cast<ClientDataLocal*>(m_clients.back().get());
 }
 
-std::pair<std::string, int> SImpl::AddClient(
+std::pair<std::string, int> ServerImpl::AddClient(
     std::string_view name, std::string_view connInfo, bool local,
     WireConnection& wire, ServerImpl::SetPeriodicFunc setPeriodic) {
   if (name.empty()) {
@@ -1553,10 +1165,10 @@ std::pair<std::string, int> SImpl::AddClient(
   return {std::move(dedupName), index};
 }
 
-int SImpl::AddClient3(std::string_view connInfo, bool local,
-                      net3::WireConnection3& wire,
-                      ServerImpl::Connected3Func connected,
-                      ServerImpl::SetPeriodicFunc setPeriodic) {
+int ServerImpl::AddClient3(std::string_view connInfo, bool local,
+                           net3::WireConnection3& wire,
+                           ServerImpl::Connected3Func connected,
+                           ServerImpl::SetPeriodicFunc setPeriodic) {
   size_t index = m_clients.size();
   // find an empty slot; we can't check for duplicates until we get a hello.
   // just do a linear search as number of clients is typically small (<10)
@@ -1578,7 +1190,7 @@ int SImpl::AddClient3(std::string_view connInfo, bool local,
   return index;
 }
 
-void SImpl::RemoveClient(int clientId) {
+void ServerImpl::RemoveClient(int clientId) {
   DEBUG3("RemoveClient({})", clientId);
   auto& client = m_clients[clientId];
 
@@ -1620,7 +1232,7 @@ void SImpl::RemoveClient(int clientId) {
   client.reset();
 }
 
-bool SImpl::PersistentChanged() {
+bool ServerImpl::PersistentChanged() {
   bool rv = m_persistentChanged;
   m_persistentChanged = false;
   return rv;
@@ -1738,7 +1350,7 @@ static void DumpValue(wpi::raw_ostream& os, const Value& value,
   }
 }
 
-void SImpl::DumpPersistent(wpi::raw_ostream& os) {
+void ServerImpl::DumpPersistent(wpi::raw_ostream& os) {
   wpi::json::serializer s{os, ' ', 16};
   os << "[\n";
   bool first = true;
@@ -1778,7 +1390,7 @@ static std::string* ObjGetString(wpi::json::object_t& obj, std::string_view key,
   return val;
 }
 
-std::string SImpl::LoadPersistent(std::string_view in) {
+std::string ServerImpl::LoadPersistent(std::string_view in) {
   if (in.empty()) {
     return {};
   }
@@ -1999,15 +1611,17 @@ std::string SImpl::LoadPersistent(std::string_view in) {
   return allerrors;
 }
 
-TopicData* SImpl::CreateTopic(ClientData* client, std::string_view name,
-                              std::string_view typeStr,
-                              const wpi::json& properties, bool special) {
+ServerImpl::TopicData* ServerImpl::CreateTopic(ClientData* client,
+                                               std::string_view name,
+                                               std::string_view typeStr,
+                                               const wpi::json& properties,
+                                               bool special) {
   auto& topic = m_nameTopics[name];
   if (topic) {
     if (typeStr != topic->typeStr) {
       if (client) {
-        WARNING("client {} publish '{}' conflicting type '{}' (currently '{}')",
-                client->GetName(), name, typeStr, topic->typeStr);
+        WARN("client {} publish '{}' conflicting type '{}' (currently '{}')",
+             client->GetName(), name, typeStr, topic->typeStr);
       }
     }
   } else {
@@ -2056,11 +1670,11 @@ TopicData* SImpl::CreateTopic(ClientData* client, std::string_view name,
   return topic;
 }
 
-TopicData* SImpl::CreateMetaTopic(std::string_view name) {
+ServerImpl::TopicData* ServerImpl::CreateMetaTopic(std::string_view name) {
   return CreateTopic(nullptr, name, "msgpack", {{"retained", true}}, true);
 }
 
-void SImpl::DeleteTopic(TopicData* topic) {
+void ServerImpl::DeleteTopic(TopicData* topic) {
   if (!topic) {
     return;
   }
@@ -2093,8 +1707,8 @@ void SImpl::DeleteTopic(TopicData* topic) {
   m_topics.erase(topic->id);
 }
 
-void SImpl::SetProperties(ClientData* client, TopicData* topic,
-                          const wpi::json& update) {
+void ServerImpl::SetProperties(ClientData* client, TopicData* topic,
+                               const wpi::json& update) {
   DEBUG4("SetProperties({}, {}, {})", client ? client->GetId() : -1,
          topic->name, update.dump());
   bool wasPersistent = topic->persistent;
@@ -2107,7 +1721,8 @@ void SImpl::SetProperties(ClientData* client, TopicData* topic,
   }
 }
 
-void SImpl::SetFlags(ClientData* client, TopicData* topic, unsigned int flags) {
+void ServerImpl::SetFlags(ClientData* client, TopicData* topic,
+                          unsigned int flags) {
   bool wasPersistent = topic->persistent;
   if (topic->SetFlags(flags)) {
     // update persistentChanged flag
@@ -2124,7 +1739,8 @@ void SImpl::SetFlags(ClientData* client, TopicData* topic, unsigned int flags) {
   }
 }
 
-void SImpl::SetValue(ClientData* client, TopicData* topic, const Value& value) {
+void ServerImpl::SetValue(ClientData* client, TopicData* topic,
+                          const Value& value) {
   // update retained value if from same client or timestamp newer
   if (!topic->lastValue || topic->lastValueClient == client ||
       topic->lastValue.time() == 0 || value.time() >= topic->lastValue.time()) {
@@ -2169,7 +1785,7 @@ void SImpl::SetValue(ClientData* client, TopicData* topic, const Value& value) {
   }
 }
 
-void SImpl::UpdateMetaClients(const std::vector<ConnectionInfo>& conns) {
+void ServerImpl::UpdateMetaClients(const std::vector<ConnectionInfo>& conns) {
   Writer w;
   mpack_start_array(&w, conns.size());
   for (auto&& conn : conns) {
@@ -2190,7 +1806,7 @@ void SImpl::UpdateMetaClients(const std::vector<ConnectionInfo>& conns) {
   }
 }
 
-void SImpl::UpdateMetaTopicPub(TopicData* topic) {
+void ServerImpl::UpdateMetaTopicPub(TopicData* topic) {
   if (!topic->metaPub) {
     return;
   }
@@ -2214,7 +1830,7 @@ void SImpl::UpdateMetaTopicPub(TopicData* topic) {
   }
 }
 
-void SImpl::UpdateMetaTopicSub(TopicData* topic) {
+void ServerImpl::UpdateMetaTopicSub(TopicData* topic) {
   if (!topic->metaSub) {
     return;
   }
@@ -2240,8 +1856,8 @@ void SImpl::UpdateMetaTopicSub(TopicData* topic) {
   }
 }
 
-void SImpl::PropertiesChanged(ClientData* client, TopicData* topic,
-                              const wpi::json& update) {
+void ServerImpl::PropertiesChanged(ClientData* client, TopicData* topic,
+                                   const wpi::json& update) {
   // removing some properties can result in the topic being unpublished
   if (!topic->IsPublished()) {
     DeleteTopic(topic);
@@ -2263,23 +1879,13 @@ void SImpl::PropertiesChanged(ClientData* client, TopicData* topic,
   }
 }
 
-class ServerImpl::Impl final : public SImpl {
- public:
-  explicit Impl(wpi::Logger& logger) : SImpl{logger} {}
-};
-
-ServerImpl::ServerImpl(wpi::Logger& logger)
-    : m_impl{std::make_unique<Impl>(logger)} {}
-
-ServerImpl::~ServerImpl() = default;
-
 void ServerImpl::SendControl(uint64_t curTimeMs) {
-  if (!m_impl->m_controlReady) {
+  if (!m_controlReady) {
     return;
   }
-  m_impl->m_controlReady = false;
+  m_controlReady = false;
 
-  for (auto&& client : m_impl->m_clients) {
+  for (auto&& client : m_clients) {
     if (client) {
       // to ensure ordering, just send everything
       client->SendOutgoing(curTimeMs);
@@ -2289,7 +1895,7 @@ void ServerImpl::SendControl(uint64_t curTimeMs) {
 }
 
 void ServerImpl::SendValues(int clientId, uint64_t curTimeMs) {
-  if (auto client = m_impl->m_clients[clientId].get()) {
+  if (auto client = m_clients[clientId].get()) {
     client->SendOutgoing(curTimeMs);
     client->Flush();
   }
@@ -2297,70 +1903,42 @@ void ServerImpl::SendValues(int clientId, uint64_t curTimeMs) {
 
 void ServerImpl::HandleLocal(std::span<const ClientMessage> msgs) {
   // just map as a normal client into client=0 calls
-  m_impl->m_localClient->HandleLocal(msgs);
+  m_localClient->HandleLocal(msgs);
 }
 
 void ServerImpl::SetLocal(LocalInterface* local) {
-  WPI_DEBUG4(m_impl->m_logger, "SetLocal()");
-  m_impl->m_local = local;
+  DEBUG4("SetLocal()");
+  m_local = local;
 
   // create server meta topics
-  m_impl->m_metaClients = m_impl->CreateMetaTopic("$clients");
+  m_metaClients = CreateMetaTopic("$clients");
 
   // create local client meta topics
-  m_impl->m_localClient->m_metaPub = m_impl->CreateMetaTopic("$serverpub");
-  m_impl->m_localClient->m_metaSub = m_impl->CreateMetaTopic("$serversub");
+  m_localClient->m_metaPub = CreateMetaTopic("$serverpub");
+  m_localClient->m_metaSub = CreateMetaTopic("$serversub");
 
   // update meta topics
-  m_impl->m_localClient->UpdateMetaClientPub();
-  m_impl->m_localClient->UpdateMetaClientSub();
+  m_localClient->UpdateMetaClientPub();
+  m_localClient->UpdateMetaClientSub();
 }
 
 void ServerImpl::ProcessIncomingText(int clientId, std::string_view data) {
-  m_impl->m_clients[clientId]->ProcessIncomingText(data);
+  m_clients[clientId]->ProcessIncomingText(data);
 }
 
 void ServerImpl::ProcessIncomingBinary(int clientId,
                                        std::span<const uint8_t> data) {
-  m_impl->m_clients[clientId]->ProcessIncomingBinary(data);
-}
-
-std::pair<std::string, int> ServerImpl::AddClient(std::string_view name,
-                                                  std::string_view connInfo,
-                                                  bool local,
-                                                  WireConnection& wire,
-                                                  SetPeriodicFunc setPeriodic) {
-  return m_impl->AddClient(name, connInfo, local, wire, std::move(setPeriodic));
-}
-
-int ServerImpl::AddClient3(std::string_view connInfo, bool local,
-                           net3::WireConnection3& wire,
-                           Connected3Func connected,
-                           SetPeriodicFunc setPeriodic) {
-  return m_impl->AddClient3(connInfo, local, wire, std::move(connected),
-                            std::move(setPeriodic));
-}
-
-void ServerImpl::RemoveClient(int clientId) {
-  m_impl->RemoveClient(clientId);
+  m_clients[clientId]->ProcessIncomingBinary(data);
 }
 
 void ServerImpl::ConnectionsChanged(const std::vector<ConnectionInfo>& conns) {
-  m_impl->UpdateMetaClients(conns);
-}
-
-bool ServerImpl::PersistentChanged() {
-  return m_impl->PersistentChanged();
+  UpdateMetaClients(conns);
 }
 
 std::string ServerImpl::DumpPersistent() {
   std::string rv;
   wpi::raw_string_ostream os{rv};
-  m_impl->DumpPersistent(os);
+  DumpPersistent(os);
   os.flush();
   return rv;
-}
-
-std::string ServerImpl::LoadPersistent(std::string_view in) {
-  return m_impl->LoadPersistent(in);
 }

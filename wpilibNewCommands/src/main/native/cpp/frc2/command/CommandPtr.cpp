@@ -236,12 +236,12 @@ CommandPtr CommandPtr::WithName(std::string_view name) && {
   return std::move(wrapper).ToPtr();
 }
 
-CommandBase* CommandPtr::get() const& {
+Command* CommandPtr::get() const& {
   AssertValid();
   return m_ptr.get();
 }
 
-std::unique_ptr<CommandBase> CommandPtr::Unwrap() && {
+std::unique_ptr<Command> CommandPtr::Unwrap() && {
   AssertValid();
   return std::move(m_ptr);
 }

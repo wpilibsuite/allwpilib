@@ -28,7 +28,7 @@ def run_global_replacements(wpiutil_llvm_files):
 
         # Fix uses of span
         content = content.replace("span", "std::span")
-        content = content.replace('include "wpi/std::span.h"', "include <span>")
+        content = content.replace("include <std::span>", "include <span>")
         if wpi_file.endswith("ConvertUTFWrapper.cpp"):
             content = content.replace(
                 "const UTF16 *Src = reinterpret_cast<const UTF16 *>(SrcBytes.begin());",
@@ -37,6 +37,14 @@ def run_global_replacements(wpiutil_llvm_files):
             content = content.replace(
                 "const UTF16 *SrcEnd = reinterpret_cast<const UTF16 *>(SrcBytes.end());",
                 "const UTF16 *SrcEnd = reinterpret_cast<const UTF16 *>(&*SrcBytes.begin() + SrcBytes.size());",
+            )
+            content = content.replace(
+                "const UTF32 *Src = reinterpret_cast<const UTF32 *>(SrcBytes.begin());",
+                "const UTF32 *Src = reinterpret_cast<const UTF32 *>(&*SrcBytes.begin());",
+            )
+            content = content.replace(
+                "const UTF32 *SrcEnd = reinterpret_cast<const UTF32 *>(SrcBytes.end());",
+                "const UTF32 *SrcEnd = reinterpret_cast<const UTF32 *>(&*SrcBytes.begin() + SrcBytes.size());",
             )
 
         # Remove unused headers
@@ -163,7 +171,7 @@ def overwrite_tests(wpiutil_root, llvm_root):
 
 
 def main():
-    upstream_root = clone_repo("https://github.com/llvm/llvm-project", "llvmorg-14.0.6")
+    upstream_root = clone_repo("https://github.com/llvm/llvm-project", "llvmorg-16.0.6")
     wpilib_root = get_repo_root()
     wpiutil = os.path.join(wpilib_root, "wpiutil")
 
@@ -198,7 +206,8 @@ def main():
         "0026-constexpr-endian-byte-swap.patch",
         "0027-Copy-type-traits-from-STLExtras.h-into-PointerUnion..patch",
         "0028-Remove-StringMap-test-for-llvm-sort.patch",
-        "0029-Fix-docs-typo-in-SmallVector.patch",
+        "0029-Unused-variable-in-release-mode.patch",
+        "0030-Use-C-20-bit-header.patch",
     ]:
         git_am(
             os.path.join(wpilib_root, "upstream_utils/llvm_patches", f),

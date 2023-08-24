@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "WPIUtilJNI.h"
+
 #include <jni.h>
 
 #include "edu_wpi_first_util_WPIUtilJNI.h"
@@ -15,7 +17,28 @@ using namespace wpi::java;
 static bool mockTimeEnabled = false;
 static uint64_t mockNow = 0;
 
+static JException illegalArgEx;
+static JException indexOobEx;
 static JException interruptedEx;
+static JException nullPointerEx;
+
+static const JExceptionInit exceptions[] = {
+    {"java/lang/IllegalArgumentException", &illegalArgEx},
+    {"java/lang/IndexOutOfBoundsException", &indexOobEx},
+    {"java/lang/InterruptedException", &interruptedEx},
+    {"java/lang/NullPointerException", &nullPointerEx}};
+
+void wpi::ThrowIllegalArgumentException(JNIEnv* env, std::string_view msg) {
+  illegalArgEx.Throw(env, msg);
+}
+
+void wpi::ThrowIndexOobException(JNIEnv* env, std::string_view msg) {
+  indexOobEx.Throw(env, msg);
+}
+
+void wpi::ThrowNullPointerException(JNIEnv* env, std::string_view msg) {
+  nullPointerEx.Throw(env, msg);
+}
 
 extern "C" {
 
@@ -25,9 +48,11 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
     return JNI_ERR;
   }
 
-  interruptedEx = JException(env, "java/lang/InterruptedException");
-  if (!interruptedEx) {
-    return JNI_ERR;
+  for (auto& c : exceptions) {
+    *c.cls = JException(env, c.name);
+    if (!*c.cls) {
+      return JNI_ERR;
+    }
   }
 
   return JNI_VERSION_1_6;
@@ -39,7 +64,9 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
     return;
   }
 
-  interruptedEx.free(env);
+  for (auto& c : exceptions) {
+    c.cls->free(env);
+  }
 }
 
 /*
@@ -248,11 +275,11 @@ JNIEXPORT jintArray JNICALL
 Java_edu_wpi_first_util_WPIUtilJNI_waitForObjects
   (JNIEnv* env, jclass, jintArray handles)
 {
-  JIntArrayRef handlesArr{env, handles};
+  JSpan<const jint> handlesArr{env, handles};
   wpi::SmallVector<WPI_Handle, 8> signaledBuf;
   signaledBuf.resize(handlesArr.size());
   std::span<const WPI_Handle> handlesArr2{
-      reinterpret_cast<const WPI_Handle*>(handlesArr.array().data()),
+      reinterpret_cast<const WPI_Handle*>(handlesArr.data()),
       handlesArr.size()};
 
   auto signaled = wpi::WaitForObjects(handlesArr2, signaledBuf);
@@ -272,11 +299,11 @@ JNIEXPORT jintArray JNICALL
 Java_edu_wpi_first_util_WPIUtilJNI_waitForObjectsTimeout
   (JNIEnv* env, jclass, jintArray handles, jdouble timeout)
 {
-  JIntArrayRef handlesArr{env, handles};
+  JSpan<const jint> handlesArr{env, handles};
   wpi::SmallVector<WPI_Handle, 8> signaledBuf;
   signaledBuf.resize(handlesArr.size());
   std::span<const WPI_Handle> handlesArr2{
-      reinterpret_cast<const WPI_Handle*>(handlesArr.array().data()),
+      reinterpret_cast<const WPI_Handle*>(handlesArr.data()),
       handlesArr.size()};
 
   bool timedOut;

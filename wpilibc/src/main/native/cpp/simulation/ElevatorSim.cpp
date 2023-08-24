@@ -16,6 +16,7 @@ ElevatorSim::ElevatorSim(const LinearSystem<2, 1, 1>& plant,
                          const DCMotor& gearbox, double gearing,
                          units::meter_t drumRadius, units::meter_t minHeight,
                          units::meter_t maxHeight, bool simulateGravity,
+                         units::meter_t startingHeight,
                          const std::array<double, 1>& measurementStdDevs)
     : LinearSystemSim(plant, measurementStdDevs),
       m_gearbox(gearbox),
@@ -23,22 +24,26 @@ ElevatorSim::ElevatorSim(const LinearSystem<2, 1, 1>& plant,
       m_minHeight(minHeight),
       m_maxHeight(maxHeight),
       m_gearing(gearing),
-      m_simulateGravity(simulateGravity) {}
+      m_simulateGravity(simulateGravity) {
+  SetState(startingHeight, 0_mps);
+}
 
 ElevatorSim::ElevatorSim(const DCMotor& gearbox, double gearing,
                          units::kilogram_t carriageMass,
                          units::meter_t drumRadius, units::meter_t minHeight,
                          units::meter_t maxHeight, bool simulateGravity,
+                         units::meter_t startingHeight,
                          const std::array<double, 1>& measurementStdDevs)
-    : LinearSystemSim(LinearSystemId::ElevatorSystem(gearbox, carriageMass,
-                                                     drumRadius, gearing),
-                      measurementStdDevs),
-      m_gearbox(gearbox),
-      m_drumRadius(drumRadius),
-      m_minHeight(minHeight),
-      m_maxHeight(maxHeight),
-      m_gearing(gearing),
-      m_simulateGravity(simulateGravity) {}
+    : ElevatorSim(LinearSystemId::ElevatorSystem(gearbox, carriageMass,
+                                                 drumRadius, gearing),
+                  gearbox, gearing, drumRadius, minHeight, maxHeight,
+                  simulateGravity, startingHeight, measurementStdDevs) {}
+
+void ElevatorSim::SetState(units::meter_t position,
+                           units::meters_per_second_t velocity) {
+  SetState(
+      Vectord<2>{std::clamp(position, m_minHeight, m_maxHeight), velocity});
+}
 
 bool ElevatorSim::WouldHitLowerLimit(units::meter_t elevatorHeight) const {
   return elevatorHeight <= m_minHeight;

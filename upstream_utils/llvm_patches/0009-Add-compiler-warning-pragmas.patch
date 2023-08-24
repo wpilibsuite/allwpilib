@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 13:34:07 -0400
-Subject: [PATCH 09/29] Add compiler warning pragmas
+Subject: [PATCH 09/30] Add compiler warning pragmas
 
 ---
  llvm/include/llvm/ADT/FunctionExtras.h | 11 +++++++++++
@@ -17,7 +17,7 @@ Subject: [PATCH 09/29] Add compiler warning pragmas
  10 files changed, 72 insertions(+), 4 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/FunctionExtras.h b/llvm/include/llvm/ADT/FunctionExtras.h
-index 8a9d78f41f540f51559c11c1f9f40645165796e5..3efa73587071b12af07398a4879e7b38c114867f 100644
+index ba145bf783775042ff4a2d4be4bb048f16db669d..07f9632bb871b1915b3016348d58938e738b3331 100644
 --- a/llvm/include/llvm/ADT/FunctionExtras.h
 +++ b/llvm/include/llvm/ADT/FunctionExtras.h
 @@ -55,6 +55,13 @@ namespace llvm {
@@ -34,7 +34,7 @@ index 8a9d78f41f540f51559c11c1f9f40645165796e5..3efa73587071b12af07398a4879e7b38
  namespace detail {
  
  template <typename T>
-@@ -411,6 +418,10 @@ public:
+@@ -410,6 +417,10 @@ public:
    }
  };
  
@@ -46,10 +46,10 @@ index 8a9d78f41f540f51559c11c1f9f40645165796e5..3efa73587071b12af07398a4879e7b38
  
  #endif // LLVM_ADT_FUNCTIONEXTRAS_H
 diff --git a/llvm/include/llvm/ADT/Hashing.h b/llvm/include/llvm/ADT/Hashing.h
-index 74a87a3d8dbbd1b13604fac694ad0294c53ee11c..47ff1b2bcbc14bf522abb66a1728123581c148d8 100644
+index 463a8d572aa17c415b0ca160b7580862aa9ae197..13e79a12a4f8449c764c9fcf85194bcc2b52b74a 100644
 --- a/llvm/include/llvm/ADT/Hashing.h
 +++ b/llvm/include/llvm/ADT/Hashing.h
-@@ -55,6 +55,11 @@
+@@ -56,6 +56,11 @@
  #include <tuple>
  #include <utility>
  
@@ -61,7 +61,7 @@ index 74a87a3d8dbbd1b13604fac694ad0294c53ee11c..47ff1b2bcbc14bf522abb66a17281235
  namespace llvm {
  template <typename T, typename Enable> struct DenseMapInfo;
  
-@@ -687,4 +692,8 @@ template <> struct DenseMapInfo<hash_code, void> {
+@@ -678,4 +683,8 @@ template <> struct DenseMapInfo<hash_code, void> {
  
  } // namespace llvm
  
@@ -71,7 +71,7 @@ index 74a87a3d8dbbd1b13604fac694ad0294c53ee11c..47ff1b2bcbc14bf522abb66a17281235
 +
  #endif
 diff --git a/llvm/include/llvm/ADT/SmallVector.h b/llvm/include/llvm/ADT/SmallVector.h
-index 8686f7bb5407611979e8cecfe9da292d3a4b4160..1e311ea56fd1d35505ca6740922c713d97636f09 100644
+index 4a93f4c1d8102fc322ebde9c3c697877a1b9048a..70c77618b307acfee816006d54eeddc422ab619b 100644
 --- a/llvm/include/llvm/ADT/SmallVector.h
 +++ b/llvm/include/llvm/ADT/SmallVector.h
 @@ -14,6 +14,14 @@
@@ -90,10 +90,10 @@ index 8686f7bb5407611979e8cecfe9da292d3a4b4160..1e311ea56fd1d35505ca6740922c713d
  #include "llvm/Support/type_traits.h"
  #include <algorithm>
 diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
-index da843ef79ff9fd1e2b702763fcdc6f33771bef94..fac12dd0e4c6316ff4887542dd59adc954f099e4 100644
+index 45840976a09a733b69dee4070f2f9f8339455da2..062ed2f4057820547cc6bfc4c91e7a13ceaa2f8a 100644
 --- a/llvm/include/llvm/Support/MathExtras.h
 +++ b/llvm/include/llvm/Support/MathExtras.h
-@@ -435,6 +435,11 @@ inline uint64_t maxUIntN(uint64_t N) {
+@@ -268,6 +268,11 @@ inline uint64_t maxUIntN(uint64_t N) {
    return UINT64_MAX >> (64 - N);
  }
  
@@ -105,7 +105,7 @@ index da843ef79ff9fd1e2b702763fcdc6f33771bef94..fac12dd0e4c6316ff4887542dd59adc9
  /// Gets the minimum value for a N-bit signed integer.
  inline int64_t minIntN(int64_t N) {
    assert(N > 0 && N <= 64 && "integer width out of range");
-@@ -442,6 +447,10 @@ inline int64_t minIntN(int64_t N) {
+@@ -275,6 +280,10 @@ inline int64_t minIntN(int64_t N) {
    return UINT64_C(1) + ~(UINT64_C(1) << (N - 1));
  }
  
@@ -146,7 +146,7 @@ index d6012bd5a6985d8405136039aa85931605cd8a40..01007deb89bba625b1b3ad3e703d0c16
 +
  #endif
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index e4c318eb8265c588f1d84dd1abeafc7fd0d055de..ee01a95220806c500d2c0149e9f1e667ea8bf28b 100644
+index ce3ffa575995b9f00f8d569176c7aeae7892d30d..a2778407119ccd73031b22a5a091e21923905aa9 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
 @@ -10,6 +10,10 @@
@@ -158,10 +158,10 @@ index e4c318eb8265c588f1d84dd1abeafc7fd0d055de..ee01a95220806c500d2c0149e9f1e667
 +#endif
 +
  #include "llvm/Support/raw_ostream.h"
- #include "llvm/ADT/STLArrayExtras.h"
  #include "llvm/ADT/StringExtras.h"
+ #include "llvm/Config/config.h"
 diff --git a/llvm/unittests/ADT/DenseMapTest.cpp b/llvm/unittests/ADT/DenseMapTest.cpp
-index e505b19070bfdc9af45e0c2ae017e6ea50d81c98..9fe83a45d751719b9f99d57f8f5e983824d108f0 100644
+index ab575dfe920e314489025bb68e6113f6227fe41f..d83ba0009c8a70e64a4e3a43a7f3b58663711b87 100644
 --- a/llvm/unittests/ADT/DenseMapTest.cpp
 +++ b/llvm/unittests/ADT/DenseMapTest.cpp
 @@ -6,6 +6,10 @@
@@ -173,8 +173,8 @@ index e505b19070bfdc9af45e0c2ae017e6ea50d81c98..9fe83a45d751719b9f99d57f8f5e9838
 +#endif
 +
  #include "llvm/ADT/DenseMap.h"
- #include "gtest/gtest.h"
- #include <map>
+ #include "llvm/ADT/DenseMapInfo.h"
+ #include "gmock/gmock.h"
 diff --git a/llvm/unittests/ADT/MapVectorTest.cpp b/llvm/unittests/ADT/MapVectorTest.cpp
 index 552f9956bdc2c6148f2e338b02074b7c479994a9..20ebcd753bcce0112f6a2d96ea23ccb6662996bb 100644
 --- a/llvm/unittests/ADT/MapVectorTest.cpp
@@ -194,11 +194,11 @@ index 552f9956bdc2c6148f2e338b02074b7c479994a9..20ebcd753bcce0112f6a2d96ea23ccb6
  #include "llvm/ADT/iterator_range.h"
  #include "gtest/gtest.h"
 diff --git a/llvm/unittests/ADT/SmallVectorTest.cpp b/llvm/unittests/ADT/SmallVectorTest.cpp
-index fe827546aef2c26b8c5372b2643e84d60683a19a..0e68bad6c4d70737d42fdf385512d117ca7aac4c 100644
+index e1090e6f605696f60a82d1708605ddd45f4e15f8..26ef3aee0bebf351c148a3ce9eaada24d365f603 100644
 --- a/llvm/unittests/ADT/SmallVectorTest.cpp
 +++ b/llvm/unittests/ADT/SmallVectorTest.cpp
 @@ -17,6 +17,10 @@
- #include <list>
+ #include <span>
  #include <stdarg.h>
  
 +#if defined(__GNUC__)

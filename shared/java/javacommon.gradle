@@ -81,7 +81,7 @@ test {
     finalizedBy jacocoTestReport
 }
 
-if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxarm32') || project.hasProperty('onlylinuxarm64')) {
+if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxarm32') || project.hasProperty('onlylinuxarm64') || project.hasProperty('onlywindowsarm64')) {
     test.enabled = false
 }
 
@@ -94,6 +94,10 @@ repositories {
 
 sourceSets {
     dev
+}
+
+configurations {
+    devImplementation.extendsFrom(implementation)
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -112,9 +116,9 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
-    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.8.2'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.10.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.0'
 
     devImplementation sourceSets.main.output
 }
@@ -128,7 +132,7 @@ task run(type: JavaExec) {
 build.dependsOn devClasses
 
 jacoco {
-    toolVersion = "0.8.8"
+    toolVersion = "0.8.10"
 }
 
 jacocoTestReport {

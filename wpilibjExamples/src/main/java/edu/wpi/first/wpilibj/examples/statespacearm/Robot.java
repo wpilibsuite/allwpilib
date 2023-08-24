@@ -41,10 +41,11 @@ public class Robot extends TimedRobot {
   // the motors, this number should be greater than one.
   private static final double kArmGearing = 10.0;
 
-  private final TrapezoidProfile.Constraints m_constraints =
-      new TrapezoidProfile.Constraints(
-          Units.degreesToRadians(45),
-          Units.degreesToRadians(90)); // Max arm speed and acceleration.
+  private final TrapezoidProfile m_profile =
+      new TrapezoidProfile(
+          new TrapezoidProfile.Constraints(
+              Units.degreesToRadians(45),
+              Units.degreesToRadians(90))); // Max arm speed and acceleration.
   private TrapezoidProfile.State m_lastProfiledReference = new TrapezoidProfile.State();
 
   // The plant holds a state-space model of our arm. This system has the following properties:
@@ -125,10 +126,8 @@ public class Robot extends TimedRobot {
       goal = new TrapezoidProfile.State(kLoweredPosition, 0.0);
     }
     // Step our TrapezoidalProfile forward 20ms and set it as our next reference
-    m_lastProfiledReference =
-        (new TrapezoidProfile(m_constraints, goal, m_lastProfiledReference)).calculate(0.020);
+    m_lastProfiledReference = m_profile.calculate(0.020, goal, m_lastProfiledReference);
     m_loop.setNextR(m_lastProfiledReference.position, m_lastProfiledReference.velocity);
-
     // Correct our Kalman filter's state vector estimate with encoder data.
     m_loop.correct(VecBuilder.fill(m_encoder.getDistance()));
 

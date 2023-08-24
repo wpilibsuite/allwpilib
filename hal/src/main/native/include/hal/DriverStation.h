@@ -181,20 +181,25 @@ int32_t HAL_SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
                                int32_t leftRumble, int32_t rightRumble);
 
 /**
- * Returns the approximate match time.
- *
- * The FMS does not send an official match time to the robots, but does send
- * an approximate match time. The value will count down the time remaining in
- * the current period (auto or teleop).
- *
+ * Return the approximate match time. The FMS does not send an official match
+ * time to the robots, but does send an approximate match time. The value will
+ * count down the time remaining in the current period (auto or teleop).
  * Warning: This is not an official time (so it cannot be used to dispute ref
  * calls or guarantee that a function will trigger before the match ends).
  *
- * The Practice Match function of the DS approximates the behavior seen on
- * the field.
+ * <p>When connected to the real field, this number only changes in full integer
+ * increments, and always counts down.
+ *
+ * <p>When the DS is in practice mode, this number is a floating point number,
+ * and counts down.
+ *
+ * <p>When the DS is in teleop or autonomous mode, this number is a floating
+ * point number, and counts up.
+ *
+ * <p>Simulation matches DS behavior without an FMS connected.
  *
  * @param[out] status the error code, or 0 for success
- * @return time remaining in current match period (auto or teleop)
+ * @return Time remaining in current match period (auto or teleop) in seconds
  */
 double HAL_GetMatchTime(int32_t* status);
 

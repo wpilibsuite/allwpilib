@@ -8,11 +8,11 @@ import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 
 /** Subsystem for managing the compressor, pressure sensor, etc. */
-public class Pneumatics extends SubsystemBase {
+public class Pneumatics extends Subsystem {
   // External analog pressure sensor
   // product-specific voltage->pressure conversion, see product manual
   // in this case, 250(V/5)-25
@@ -48,7 +48,7 @@ public class Pneumatics extends SubsystemBase {
    *
    * @return command
    */
-  public CommandBase disableCompressorCommand() {
+  public Command disableCompressorCommand() {
     return startEnd(
             () -> {
               // Disable closed-loop mode on the compressor.

@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Mon, 9 May 2022 00:04:30 -0400
-Subject: [PATCH 24/29] Use SmallVector for UTF conversion
+Subject: [PATCH 24/30] Use SmallVector for UTF conversion
 
 ---
  llvm/include/llvm/Support/ConvertUTF.h    |  6 +++---
@@ -10,10 +10,10 @@ Subject: [PATCH 24/29] Use SmallVector for UTF conversion
  3 files changed, 17 insertions(+), 17 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/ConvertUTF.h b/llvm/include/llvm/Support/ConvertUTF.h
-index b085c8a179e8767a258f9feafc8d1111828f10b1..c82947006afb3f8b41c0369352de63fd62be574b 100644
+index 72321022beb373945f7935ed72944fd68eb7d02f..5c8b966ce296699a0315d72cdfdcdb5af3d1d0b0 100644
 --- a/llvm/include/llvm/Support/ConvertUTF.h
 +++ b/llvm/include/llvm/Support/ConvertUTF.h
-@@ -213,7 +213,7 @@ bool ConvertUTF8toWide(const char *Source, std::wstring &Result);
+@@ -233,7 +233,7 @@ bool ConvertUTF8toWide(const char *Source, std::wstring &Result);
  * Converts a std::wstring to a UTF-8 encoded std::string.
  * \return true on success.
  */
@@ -22,7 +22,7 @@ index b085c8a179e8767a258f9feafc8d1111828f10b1..c82947006afb3f8b41c0369352de63fd
  
  
  /**
-@@ -268,7 +268,7 @@ bool hasUTF16ByteOrderMark(span<const char> SrcBytes);
+@@ -288,7 +288,7 @@ bool hasUTF16ByteOrderMark(span<const char> SrcBytes);
   * \param [out] Out Converted UTF-8 is stored here on success.
   * \returns true on success
   */
@@ -31,7 +31,7 @@ index b085c8a179e8767a258f9feafc8d1111828f10b1..c82947006afb3f8b41c0369352de63fd
  
  /**
  * Converts a UTF16 string into a UTF8 std::string.
-@@ -277,7 +277,7 @@ bool convertUTF16ToUTF8String(span<const char> SrcBytes, std::string &Out);
+@@ -297,7 +297,7 @@ bool convertUTF16ToUTF8String(span<const char> SrcBytes, std::string &Out);
  * \param [out] Out Converted UTF-8 is stored here on success.
  * \returns true on success
  */
@@ -39,13 +39,13 @@ index b085c8a179e8767a258f9feafc8d1111828f10b1..c82947006afb3f8b41c0369352de63fd
 +bool convertUTF16ToUTF8String(span<const UTF16> Src, SmallVectorImpl<char> &Out);
  
  /**
-  * Converts a UTF-8 string into a UTF-16 string with native endianness.
+  * Converts a stream of raw bytes assumed to be UTF32 into a UTF8 std::string.
 diff --git a/llvm/lib/Support/ConvertUTFWrapper.cpp b/llvm/lib/Support/ConvertUTFWrapper.cpp
-index cff30f16ca907959843dd58ff30f58ead333f17f..d3689d92a45a289aaca30c47790a5e46c484344c 100644
+index 195071cc697070af2a75207fced50d49bae46c23..d13d876d6c5c830bede6ed90ff2cfa6236a79504 100644
 --- a/llvm/lib/Support/ConvertUTFWrapper.cpp
 +++ b/llvm/lib/Support/ConvertUTFWrapper.cpp
-@@ -84,7 +84,7 @@ bool hasUTF16ByteOrderMark(span<const char> S) {
-            (S[0] == '\xfe' && S[1] == '\xff')));
+@@ -82,7 +82,7 @@ bool hasUTF16ByteOrderMark(span<const char> S) {
+                             (S[0] == '\xfe' && S[1] == '\xff')));
  }
  
 -bool convertUTF16ToUTF8String(span<const char> SrcBytes, std::string &Out) {
@@ -53,16 +53,16 @@ index cff30f16ca907959843dd58ff30f58ead333f17f..d3689d92a45a289aaca30c47790a5e46
    assert(Out.empty());
  
    // Error out on an uneven byte count.
-@@ -135,7 +135,7 @@ bool convertUTF16ToUTF8String(span<const char> SrcBytes, std::string &Out) {
+@@ -133,7 +133,7 @@ bool convertUTF16ToUTF8String(span<const char> SrcBytes, std::string &Out) {
    return true;
  }
  
--bool convertUTF16ToUTF8String(span<const UTF16> Src, std::string &Out)
-+bool convertUTF16ToUTF8String(span<const UTF16> Src, SmallVectorImpl<char> &Out)
- {
+-bool convertUTF16ToUTF8String(span<const UTF16> Src, std::string &Out) {
++bool convertUTF16ToUTF8String(span<const UTF16> Src, SmallVectorImpl<char> &Out) {
    return convertUTF16ToUTF8String(
        span<const char>(reinterpret_cast<const char *>(Src.data()),
-@@ -213,7 +213,7 @@ bool ConvertUTF8toWide(const char *Source, std::wstring &Result) {
+                            Src.size() * sizeof(UTF16)),
+@@ -269,7 +269,7 @@ bool ConvertUTF8toWide(const char *Source, std::wstring &Result) {
    return ConvertUTF8toWide(std::string_view(Source), Result);
  }
  
@@ -72,10 +72,10 @@ index cff30f16ca907959843dd58ff30f58ead333f17f..d3689d92a45a289aaca30c47790a5e46
      const UTF8 *Start = reinterpret_cast<const UTF8 *>(Source.data());
      const UTF8 *End =
 diff --git a/llvm/unittests/Support/ConvertUTFTest.cpp b/llvm/unittests/Support/ConvertUTFTest.cpp
-index 2fee8ad5c01294988457002517dcb8d983cac23d..7d7650b1c077af7baed2b408584e857602bc329a 100644
+index 77e70a46d3621ecfaed923d87256184addfda721..eb17a06c4369c9486c57b61f519a7429d9ef3d80 100644
 --- a/llvm/unittests/Support/ConvertUTFTest.cpp
 +++ b/llvm/unittests/Support/ConvertUTFTest.cpp
-@@ -19,22 +19,22 @@ TEST(ConvertUTFTest, ConvertUTF16LittleEndianToUTF8String) {
+@@ -19,11 +19,11 @@ TEST(ConvertUTFTest, ConvertUTF16LittleEndianToUTF8String) {
    // Src is the look of disapproval.
    alignas(UTF16) static const char Src[] = "\xff\xfe\xa0\x0c_\x00\xa0\x0c";
    span<const char> Ref(Src, sizeof(Src) - 1);
@@ -88,7 +88,8 @@ index 2fee8ad5c01294988457002517dcb8d983cac23d..7d7650b1c077af7baed2b408584e8576
 +  EXPECT_EQ(Expected, std::string{Result});
  }
  
- TEST(ConvertUTFTest, ConvertUTF16BigEndianToUTF8String) {
+ TEST(ConvertUTFTest, ConvertUTF32LittleEndianToUTF8String) {
+@@ -42,11 +42,11 @@ TEST(ConvertUTFTest, ConvertUTF16BigEndianToUTF8String) {
    // Src is the look of disapproval.
    alignas(UTF16) static const char Src[] = "\xfe\xff\x0c\xa0\x00_\x0c\xa0";
    span<const char> Ref(Src, sizeof(Src) - 1);
@@ -101,8 +102,8 @@ index 2fee8ad5c01294988457002517dcb8d983cac23d..7d7650b1c077af7baed2b408584e8576
 +  EXPECT_EQ(Expected, std::string{Result});
  }
  
- TEST(ConvertUTFTest, ConvertUTF8ToUTF16String) {
-@@ -51,16 +51,16 @@ TEST(ConvertUTFTest, ConvertUTF8ToUTF16String) {
+ TEST(ConvertUTFTest, ConvertUTF32BigEndianToUTF8String) {
+@@ -75,17 +75,17 @@ TEST(ConvertUTFTest, ConvertUTF8ToUTF16String) {
  }
  
  TEST(ConvertUTFTest, OddLengthInput) {
@@ -115,14 +116,15 @@ index 2fee8ad5c01294988457002517dcb8d983cac23d..7d7650b1c077af7baed2b408584e8576
  TEST(ConvertUTFTest, Empty) {
 -  std::string Result;
 +  SmallString<20> Result;
-   bool Success = convertUTF16ToUTF8String(span<const char>(), Result);
+   bool Success =
+       convertUTF16ToUTF8String(span<const char>(), Result);
    EXPECT_TRUE(Success);
 -  EXPECT_TRUE(Result.empty());
 +  EXPECT_TRUE(std::string{Result}.empty());
  }
  
  TEST(ConvertUTFTest, HasUTF16BOM) {
-@@ -83,11 +83,11 @@ TEST(ConvertUTFTest, UTF16WrappersForConvertUTF16ToUTF8String) {
+@@ -108,11 +108,11 @@ TEST(ConvertUTFTest, UTF16WrappersForConvertUTF16ToUTF8String) {
    // Src is the look of disapproval.
    alignas(UTF16) static const char Src[] = "\xff\xfe\xa0\x0c_\x00\xa0\x0c";
    span<const UTF16> SrcRef((const UTF16 *)Src, 4);
@@ -136,7 +138,7 @@ index 2fee8ad5c01294988457002517dcb8d983cac23d..7d7650b1c077af7baed2b408584e8576
  }
  
  TEST(ConvertUTFTest, ConvertUTF8toWide) {
-@@ -107,11 +107,11 @@ TEST(ConvertUTFTest, ConvertUTF8toWide) {
+@@ -132,11 +132,11 @@ TEST(ConvertUTFTest, ConvertUTF8toWide) {
  TEST(ConvertUTFTest, convertWideToUTF8) {
    // Src is the look of disapproval.
    static const wchar_t Src[] = L"\x0ca0_\x0ca0";

@@ -81,11 +81,6 @@ if (NOT CMAKE_BUILD_TYPE)
     set (CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING "" FORCE)
 endif()
 
-# We always want flat install with MSVC.
-if (MSVC)
-  set(WITH_FLAT_INSTALL ON)
-endif()
-
 if (WITH_JAVA AND NOT BUILD_SHARED_LIBS)
     message(FATAL_ERROR "
 FATAL: Cannot build static libs with Java enabled.
@@ -167,8 +162,7 @@ endif()
 
 if (USE_SYSTEM_LIBUV)
 set (LIBUV_SYSTEM_REPLACE "
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(libuv REQUIRED IMPORTED_TARGET libuv)
+find_dependency(libuv CONFIG)
 ")
 endif()
 

@@ -58,6 +58,10 @@ class UnscentedKalmanFilter {
   /**
    * Constructs an unscented Kalman filter.
    *
+   * See
+   * https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-observers.html#process-and-measurement-noise-covariance-matrices
+   * for how to select the standard deviations.
+   *
    * @param f                  A vector-valued function of x and u that returns
    *                           the derivative of the state vector.
    * @param h                  A vector-valued function of x and u that returns
@@ -77,6 +81,10 @@ class UnscentedKalmanFilter {
    * addition functions. Using custom functions for arithmetic can be useful if
    * you have angles in the state or measurements, because they allow you to
    * correctly account for the modular nature of angle arithmetic.
+   *
+   * See
+   * https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-observers.html#process-and-measurement-noise-covariance-matrices
+   * for how to select the standard deviations.
    *
    * @param f                  A vector-valued function of x and u that returns
    *                           the derivative of the state vector.

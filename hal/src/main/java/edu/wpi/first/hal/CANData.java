@@ -8,8 +8,10 @@ package edu.wpi.first.hal;
 public class CANData {
   /** Contents of the CAN frame. */
   public final byte[] data = new byte[8];
+
   /** Length of the frame in bytes. */
   public int length;
+
   /** CAN frame timestamp in milliseconds. */
   public long timestamp;
 

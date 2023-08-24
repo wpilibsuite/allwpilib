@@ -61,19 +61,19 @@ public:
 
   IntType getInt() const { return (IntType)Info::getInt(Value); }
 
-  void setPointer(PointerTy PtrVal) LLVM_LVALUE_FUNCTION {
+  void setPointer(PointerTy PtrVal) & {
     Value = Info::updatePointer(Value, PtrVal);
   }
 
-  void setInt(IntType IntVal) LLVM_LVALUE_FUNCTION {
+  void setInt(IntType IntVal) & {
     Value = Info::updateInt(Value, static_cast<intptr_t>(IntVal));
   }
 
-  void initWithPointer(PointerTy PtrVal) LLVM_LVALUE_FUNCTION {
+  void initWithPointer(PointerTy PtrVal) & {
     Value = Info::updatePointer(0, PtrVal);
   }
 
-  void setPointerAndInt(PointerTy PtrVal, IntType IntVal) LLVM_LVALUE_FUNCTION {
+  void setPointerAndInt(PointerTy PtrVal, IntType IntVal) & {
     Value = Info::updateInt(Info::updatePointer(0, PtrVal),
                             static_cast<intptr_t>(IntVal));
   }
@@ -91,7 +91,7 @@ public:
 
   void *getOpaqueValue() const { return reinterpret_cast<void *>(Value); }
 
-  void setFromOpaqueValue(void *Val) LLVM_LVALUE_FUNCTION {
+  void setFromOpaqueValue(void *Val) & {
     Value = reinterpret_cast<intptr_t>(Val);
   }
 
@@ -127,7 +127,6 @@ public:
     return Value >= RHS.Value;
   }
 };
-
 
 template <typename PointerT, unsigned IntBits, typename PtrTraits>
 struct PointerIntPairInfo {
@@ -228,6 +227,32 @@ struct PointerLikeTypeTraits<
       PtrTraits::NumLowBitsAvailable - IntBits;
 };
 
+// Allow structured bindings on PointerIntPair.
+template <std::size_t I, typename PointerTy, unsigned IntBits, typename IntType,
+          typename PtrTraits, typename Info>
+decltype(auto)
+get(const PointerIntPair<PointerTy, IntBits, IntType, PtrTraits, Info> &Pair) {
+  static_assert(I < 2);
+  if constexpr (I == 0)
+    return Pair.getPointer();
+  else
+    return Pair.getInt();
+}
+
 } // end namespace wpi
+
+namespace std {
+template <typename PointerTy, unsigned IntBits, typename IntType,
+          typename PtrTraits, typename Info>
+struct tuple_size<
+    wpi::PointerIntPair<PointerTy, IntBits, IntType, PtrTraits, Info>>
+    : std::integral_constant<std::size_t, 2> {};
+
+template <std::size_t I, typename PointerTy, unsigned IntBits, typename IntType,
+          typename PtrTraits, typename Info>
+struct tuple_element<
+    I, wpi::PointerIntPair<PointerTy, IntBits, IntType, PtrTraits, Info>>
+    : std::conditional<I == 0, PointerTy, IntType> {};
+} // namespace std
 
 #endif // WPIUTIL_WPI_POINTERINTPAIR_H

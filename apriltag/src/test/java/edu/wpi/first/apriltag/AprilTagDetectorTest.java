@@ -157,7 +157,7 @@ class AprilTagDetectorTest {
 
       var estimator =
           new AprilTagPoseEstimator(new AprilTagPoseEstimator.Config(0.2, 500, 500, 320, 240));
-      AprilTagPoseEstimate est = estimator.estimateOrthogonalIteration(results[0], 50);
+      AprilTagPoseEstimate est = estimator.estimateOrthogonalIteration(results[0], 200);
       assertEquals(new Transform3d(), est.pose2);
       Transform3d pose = estimator.estimate(results[0]);
       assertEquals(est.pose1, pose);
@@ -189,7 +189,7 @@ class AprilTagDetectorTest {
           new AprilTagPoseEstimator(
               new AprilTagPoseEstimator.Config(
                   0.2, 500, 500, image.cols() / 2.0, image.rows() / 2.0));
-      AprilTagPoseEstimate est = estimator.estimateOrthogonalIteration(results[0], 50);
+      AprilTagPoseEstimate est = estimator.estimateOrthogonalIteration(results[0], 200);
 
       assertEquals(Units.degreesToRadians(45), est.pose1.getRotation().getX(), 0.1);
       assertEquals(Units.degreesToRadians(0), est.pose1.getRotation().getY(), 0.1);
@@ -222,7 +222,7 @@ class AprilTagDetectorTest {
           new AprilTagPoseEstimator(
               new AprilTagPoseEstimator.Config(
                   0.2, 500, 500, image.cols() / 2.0, image.rows() / 2.0));
-      AprilTagPoseEstimate est = estimator.estimateOrthogonalIteration(results[0], 50);
+      AprilTagPoseEstimate est = estimator.estimateOrthogonalIteration(results[0], 200);
 
       assertEquals(Units.degreesToRadians(0), est.pose1.getRotation().getX(), 0.1);
       assertEquals(Units.degreesToRadians(45), est.pose1.getRotation().getY(), 0.1);
@@ -252,7 +252,7 @@ class AprilTagDetectorTest {
           new AprilTagPoseEstimator(
               new AprilTagPoseEstimator.Config(
                   0.2, 500, 500, image.cols() / 2.0, image.rows() / 2.0));
-      AprilTagPoseEstimate est = estimator.estimateOrthogonalIteration(results[0], 50);
+      AprilTagPoseEstimate est = estimator.estimateOrthogonalIteration(results[0], 200);
 
       assertEquals(Units.degreesToRadians(0), est.pose1.getRotation().getX(), 0.1);
       assertEquals(Units.degreesToRadians(0), est.pose1.getRotation().getY(), 0.1);

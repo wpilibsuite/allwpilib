@@ -58,24 +58,37 @@ bool IsStabilizableImpl(const Matrixd<States, States>& A,
                         const Matrixd<States, Inputs>& B) {
   Eigen::EigenSolver<Matrixd<States, States>> es{A, false};
 
-  for (int i = 0; i < States; ++i) {
+  for (int i = 0; i < A.rows(); ++i) {
     if (es.eigenvalues()[i].real() * es.eigenvalues()[i].real() +
             es.eigenvalues()[i].imag() * es.eigenvalues()[i].imag() <
         1) {
       continue;
     }
 
-    Eigen::Matrix<std::complex<double>, States, States + Inputs> E;
-    E << es.eigenvalues()[i] * Eigen::Matrix<std::complex<double>, States,
-                                             States>::Identity() -
-             A,
-        B;
+    if constexpr (States != Eigen::Dynamic && Inputs != Eigen::Dynamic) {
+      Eigen::Matrix<std::complex<double>, States, States + Inputs> E;
+      E << es.eigenvalues()[i] * Eigen::Matrix<std::complex<double>, States,
+                                               States>::Identity() -
+               A,
+          B;
 
-    Eigen::ColPivHouseholderQR<
-        Eigen::Matrix<std::complex<double>, States, States + Inputs>>
-        qr{E};
-    if (qr.rank() < States) {
-      return false;
+      Eigen::ColPivHouseholderQR<
+          Eigen::Matrix<std::complex<double>, States, States + Inputs>>
+          qr{E};
+      if (qr.rank() < States) {
+        return false;
+      }
+    } else {
+      Eigen::MatrixXcd E{A.rows(), A.rows() + B.cols()};
+      E << es.eigenvalues()[i] *
+                   Eigen::MatrixXcd::Identity(A.rows(), A.rows()) -
+               A,
+          B;
+
+      Eigen::ColPivHouseholderQR<Eigen::MatrixXcd> qr{E};
+      if (qr.rank() < A.rows()) {
+        return false;
+      }
     }
   }
   return true;
@@ -273,6 +286,12 @@ WPILIB_DLLEXPORT bool IsStabilizable<1, 1>(const Matrixd<1, 1>& A,
 template <>
 WPILIB_DLLEXPORT bool IsStabilizable<2, 1>(const Matrixd<2, 2>& A,
                                            const Matrixd<2, 1>& B);
+
+// Template specializations are used here to make common state-input pairs
+// compile faster.
+template <>
+WPILIB_DLLEXPORT bool IsStabilizable<Eigen::Dynamic, Eigen::Dynamic>(
+    const Eigen::MatrixXd& A, const Eigen::MatrixXd& B);
 
 /**
  * Converts a Pose2d into a vector of [x, y, theta].

@@ -15,6 +15,28 @@ class Pose2dTest {
   private static final double kEpsilon = 1E-9;
 
   @Test
+  void testRotateBy() {
+    final double x = 1.0;
+    final double y = 2.0;
+    var initial = new Pose2d(new Translation2d(x, y), Rotation2d.fromDegrees(45.0));
+
+    var rotation = Rotation2d.fromDegrees(5.0);
+    var rotated = initial.rotateBy(rotation);
+
+    // Translation is rotated by CCW rotation matrix
+    double c = rotation.getCos();
+    double s = rotation.getSin();
+    assertAll(
+        () -> assertEquals(c * x - s * y, rotated.getX(), kEpsilon),
+        () -> assertEquals(s * x + c * y, rotated.getY(), kEpsilon),
+        () ->
+            assertEquals(
+                initial.getRotation().getDegrees() + rotation.getDegrees(),
+                rotated.getRotation().getDegrees(),
+                kEpsilon));
+  }
+
+  @Test
   void testTransformBy() {
     var initial = new Pose2d(new Translation2d(1.0, 2.0), Rotation2d.fromDegrees(45.0));
     var transformation = new Transform2d(new Translation2d(5.0, 0.0), Rotation2d.fromDegrees(5.0));

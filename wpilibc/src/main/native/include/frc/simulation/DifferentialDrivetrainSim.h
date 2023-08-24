@@ -19,7 +19,7 @@ namespace frc::sim {
 class DifferentialDrivetrainSim {
  public:
   /**
-   * Create a SimDrivetrain.
+   * Creates a simulated differential drivetrain.
    *
    * @param plant The LinearSystem representing the robot's drivetrain. This
    *              system can be created with
@@ -46,7 +46,7 @@ class DifferentialDrivetrainSim {
       const std::array<double, 7>& measurementStdDevs = {});
 
   /**
-   * Create a SimDrivetrain.
+   * Creates a simulated differential drivetrain.
    *
    * @param driveMotor  A DCMotor representing the left side of the drivetrain.
    * @param gearing     The gearing on the drive between motor and wheel, as

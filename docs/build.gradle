@@ -13,6 +13,7 @@ evaluationDependsOn(':wpilibc')
 evaluationDependsOn(':wpilibj')
 evaluationDependsOn(':wpimath')
 evaluationDependsOn(':wpinet')
+evaluationDependsOn(':wpiunits')
 evaluationDependsOn(':wpiutil')
 
 def baseArtifactIdCpp = 'documentation'
@@ -67,15 +68,13 @@ doxygen {
     cppIncludeRoots << '../ntcore/build/generated/main/native/include/'
 
     if (project.hasProperty('docWarningsAsErrors')) {
-        // Drake
-        exclude 'drake/common/**'
-
         // Eigen
         exclude 'Eigen/**'
         exclude 'unsupported/**'
 
         // LLVM
         exclude 'wpi/AlignOf.h'
+        exclude 'wpi/Casting.h'
         exclude 'wpi/Chrono.h'
         exclude 'wpi/Compiler.h'
         exclude 'wpi/ConvertUTF.h'
@@ -86,6 +85,7 @@ doxygen {
         exclude 'wpi/Errc.h'
         exclude 'wpi/Errno.h'
         exclude 'wpi/ErrorHandling.h'
+        exclude 'wpi/bit.h'
         exclude 'wpi/fs.h'
         exclude 'wpi/FunctionExtras.h'
         exclude 'wpi/function_ref.h'

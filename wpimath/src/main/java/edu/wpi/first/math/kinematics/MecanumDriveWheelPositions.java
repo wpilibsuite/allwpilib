@@ -74,15 +74,6 @@ public class MecanumDriveWheelPositions implements WheelPositions<MecanumDriveWh
   }
 
   @Override
-  public MecanumDriveWheelPositions minus(MecanumDriveWheelPositions other) {
-    return new MecanumDriveWheelPositions(
-        this.frontLeftMeters - other.frontLeftMeters,
-        this.frontRightMeters - other.frontRightMeters,
-        this.rearLeftMeters - other.rearLeftMeters,
-        this.rearRightMeters - other.rearRightMeters);
-  }
-
-  @Override
   public MecanumDriveWheelPositions interpolate(MecanumDriveWheelPositions endValue, double t) {
     return new MecanumDriveWheelPositions(
         MathUtil.interpolate(this.frontLeftMeters, endValue.frontLeftMeters, t),

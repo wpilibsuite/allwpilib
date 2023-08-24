@@ -18,14 +18,18 @@ void Robot::RobotPeriodic() {
   //
   // For example, "RET043" would indicate that the robot is on the red
   // alliance, enabled in teleop mode, with 43 seconds left in the match.
-  auto string = fmt::format(
-      "{}{}{}{:03}",
-      frc::DriverStation::GetAlliance() == frc::DriverStation::Alliance::kRed
-          ? "R"
-          : "B",
-      frc::DriverStation::IsEnabled() ? "E" : "D",
-      frc::DriverStation::IsAutonomous() ? "A" : "T",
-      static_cast<int>(frc::Timer::GetMatchTime().value()));
+
+  std::string allianceString = "U";
+  auto alliance = frc::DriverStation::GetAlliance();
+  if (alliance.has_value()) {
+    allianceString = alliance == frc::DriverStation::Alliance::kRed ? "R" : "B";
+  }
+
+  auto string =
+      fmt::format("{}{}{}{:03}", allianceString,
+                  frc::DriverStation::IsEnabled() ? "E" : "D",
+                  frc::DriverStation::IsAutonomous() ? "A" : "T",
+                  static_cast<int>(frc::Timer::GetMatchTime().value()));
 
   arduino.WriteBulk(reinterpret_cast<uint8_t*>(string.data()), string.size());
 }

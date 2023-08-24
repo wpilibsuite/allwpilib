@@ -158,6 +158,27 @@ public class MecanumDriveKinematics
   }
 
   @Override
+  public Twist2d toTwist2d(MecanumDriveWheelPositions start, MecanumDriveWheelPositions end) {
+    var wheelDeltasVector = new SimpleMatrix(4, 1);
+    wheelDeltasVector.setColumn(
+        0,
+        0,
+        end.frontLeftMeters - start.frontLeftMeters,
+        end.frontRightMeters - start.frontRightMeters,
+        end.rearLeftMeters - start.rearLeftMeters,
+        end.rearRightMeters - start.rearRightMeters);
+    var twist = m_forwardKinematics.mult(wheelDeltasVector);
+    return new Twist2d(twist.get(0, 0), twist.get(1, 0), twist.get(2, 0));
+  }
+
+  /**
+   * Performs forward kinematics to return the resulting Twist2d from the given wheel deltas. This
+   * method is often used for odometry -- determining the robot's position on the field using
+   * changes in the distance driven by each wheel on the robot.
+   *
+   * @param wheelDeltas The distances driven by each wheel.
+   * @return The resulting Twist2d.
+   */
   public Twist2d toTwist2d(MecanumDriveWheelPositions wheelDeltas) {
     var wheelDeltasVector = new SimpleMatrix(4, 1);
     wheelDeltasVector.setColumn(
@@ -168,7 +189,6 @@ public class MecanumDriveKinematics
         wheelDeltas.rearLeftMeters,
         wheelDeltas.rearRightMeters);
     var twist = m_forwardKinematics.mult(wheelDeltasVector);
-
     return new Twist2d(twist.get(0, 0), twist.get(1, 0), twist.get(2, 0));
   }
 

@@ -17,8 +17,8 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SimBoolean;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDouble;
-import edu.wpi.first.networktables.NTSendable;
-import edu.wpi.first.networktables.NTSendableBuilder;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -51,7 +51,7 @@ import java.nio.ByteOrder;
   "PMD.EmptyIfStmt",
   "PMD.EmptyStatementNotInLoop"
 })
-public class ADIS16470_IMU implements AutoCloseable, NTSendable {
+public class ADIS16470_IMU implements AutoCloseable, Sendable {
   /* ADIS16470 Register Map Declaration */
   private static final int FLASH_CNT = 0x00; // Flash memory write count
   private static final int DIAG_STAT = 0x02; // Diagnostic and operational status
@@ -1042,7 +1042,7 @@ public class ADIS16470_IMU implements AutoCloseable, NTSendable {
   }
 
   @Override
-  public void initSendable(NTSendableBuilder builder) {
+  public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Gyro");
     builder.addDoubleProperty("Value", this::getAngle, null);
   }

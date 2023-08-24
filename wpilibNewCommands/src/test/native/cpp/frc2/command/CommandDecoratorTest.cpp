@@ -9,7 +9,6 @@
 #include "frc2/command/FunctionalCommand.h"
 #include "frc2/command/InstantCommand.h"
 #include "frc2/command/ParallelRaceGroup.h"
-#include "frc2/command/PerpetualCommand.h"
 #include "frc2/command/RunCommand.h"
 #include "frc2/command/SequentialCommandGroup.h"
 
@@ -120,21 +119,6 @@ TEST_F(CommandDecoratorTest, AndThen) {
 
   EXPECT_FALSE(scheduler.IsScheduled(command));
   EXPECT_TRUE(finished);
-}
-
-TEST_F(CommandDecoratorTest, Perpetually) {
-  CommandScheduler scheduler = GetScheduler();
-
-  WPI_IGNORE_DEPRECATED
-  auto command = InstantCommand([] {}, {}).Perpetually();
-  WPI_UNIGNORE_DEPRECATED
-
-  scheduler.Schedule(&command);
-
-  scheduler.Run();
-  scheduler.Run();
-
-  EXPECT_TRUE(scheduler.IsScheduled(&command));
 }
 
 TEST_F(CommandDecoratorTest, Unless) {

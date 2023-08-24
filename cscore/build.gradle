@@ -215,6 +215,9 @@ model {
                                     it.linker.args << '-lGL'
                                 }
                             }
+                            if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                                nativeUtils.useRequiredLibrary(it, 'ni_link_libraries', 'ni_runtime_libraries')
+                            }
                         }
                         sources {
                             cpp {
@@ -233,6 +236,9 @@ model {
                         lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                         lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                         lib library: 'cscore', linkage: 'shared'
+                        if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                            nativeUtils.useRequiredLibrary(it, 'ni_link_libraries', 'ni_runtime_libraries')
+                        }
                     }
                     sources {
                         cpp {
