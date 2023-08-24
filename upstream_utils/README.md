@@ -77,7 +77,7 @@ Start in the `upstream_utils` folder. Restore the original repo.
 
 Navigate to the repo.
 ```bash
-cd /tmp/lib
+cd /tmp/<lib>
 ```
 
 Make a commit with the desired changes.
