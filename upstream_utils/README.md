@@ -69,7 +69,7 @@ cd allwpilib/upstream_utils
 ```
 
 Modify the version number in the call to `setup_upstream_repo()` in
-`update_<lib>.py`, then  rerun `update_<lib>.py` to reimport the thirdparty
+`update_<lib>.py`, then rerun `update_<lib>.py` to reimport the thirdparty
 files.
 ```bash
 ./update_<lib>.py
