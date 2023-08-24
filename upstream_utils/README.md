@@ -90,7 +90,7 @@ Generate patch files.
 ```bash
 git format-patch 2.0..HEAD --zero-commit --abbrev=40 --no-signature
 ```
-where `2.0` is replaced with the version specified in `update_lib.py`.
+where `2.0` is replaced with the version specified in `update_<lib>.py`.
 
 Move the patch files to `upstream_utils`.
 ```
