@@ -105,5 +105,5 @@ cd allwpilib/upstream_utils
 Update the list of patch files in `update_lib.py`, then rerun `update_lib.py` to
 reimport the thirdparty files.
 ```bash
-./update_lib.py
+./update_<lib>.py
 ```
