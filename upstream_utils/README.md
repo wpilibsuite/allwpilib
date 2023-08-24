@@ -72,7 +72,7 @@ The example below will add a new patch file to a hypothetical library called
 
 Start in the `upstream_utils` folder. Restore the original repo.
 ```bash
-./update_lib.py
+./update_<lib>.py
 ```
 
 Navigate to the repo.
