@@ -68,7 +68,7 @@ Modify the version number in the call to `setup_upstream_repo()` in
 ## Adding patch to thirdparty library
 
 The example below will add a new patch file to a hypothetical library called
-`lib`.
+`lib` (Replace `<lib>` with `llvm`, `fmt`, `eigen`, ... in the following steps).
 
 Start in the `upstream_utils` folder. Restore the original repo.
 ```bash
