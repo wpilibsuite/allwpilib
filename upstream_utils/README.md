@@ -94,7 +94,7 @@ where `2.0` is replaced with the version specified in `update_lib.py`.
 
 Move the patch files to `upstream_utils`.
 ```
-mv *.patch allwpilib/upstream_utils/lib_patches
+mv *.patch allwpilib/upstream_utils/<lib>_patches
 ```
 
 Navigate back to `upstream_utils`.
