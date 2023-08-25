@@ -125,8 +125,8 @@ class BooleanEventTest {
         .and(new BooleanEvent(loop2, bool2::get))
         .ifHigh(counter1::incrementAndGet);
 
-    new BooleanEvent(loop2, bool1::get)
-        .and(new BooleanEvent(loop1, bool2::get))
+    new BooleanEvent(loop2, bool2::get)
+        .and(new BooleanEvent(loop1, bool1::get))
         .ifHigh(counter2::incrementAndGet);
 
     assertEquals(0, counter1.get());
@@ -149,7 +149,8 @@ class BooleanEventTest {
     assertEquals(2, counter1.get());
     assertEquals(1, counter2.get());
 
-    loop2.poll(); // 2nd event executes, Bool 2 is now false because loop 1 updated it, does nothing
+    loop2.poll(); // 2nd event executes, Bool 2 is now false because this loop updated it, does
+    // nothing
 
     assertEquals(2, counter1.get());
     assertEquals(1, counter2.get());
@@ -160,34 +161,34 @@ class BooleanEventTest {
     assertEquals(1, counter2.get());
 
     bool2.set(true);
-    loop2
-        .poll(); // 2nd event executes, Bool 2 is still false because loop 1 hasn't updated it, does
-    // nothing
+    loop2.poll(); // 2nd event executes, Bool 2 is true because this loop updated it, increments
+    // counter
 
     assertEquals(2, counter1.get());
-    assertEquals(1, counter2.get());
+    assertEquals(2, counter2.get());
 
     loop1
         .poll(); // 1st event executes, Bool 2 is true because loop 2 updated it, increments counter
 
     assertEquals(3, counter1.get());
-    assertEquals(1, counter2.get());
+    assertEquals(2, counter2.get());
 
     bool1.set(false);
-    loop2.poll(); // 2nd event executes, Bool 1 is false because this loop updated it, does nothing
+    loop2.poll(); // 2nd event executes, Bool 1 is still true because loop 1 hasn't updated it,
+    // increments counter
 
     assertEquals(3, counter1.get());
-    assertEquals(1, counter2.get());
+    assertEquals(3, counter2.get());
 
     loop1.poll(); // 1st event executes, Bool 1 is false because this loop updated it, does nothing
 
     assertEquals(3, counter1.get());
-    assertEquals(1, counter2.get());
+    assertEquals(3, counter2.get());
 
     loop2.poll(); // All bools are updated at this point, nothing should happen
 
     assertEquals(3, counter1.get());
-    assertEquals(1, counter2.get());
+    assertEquals(3, counter2.get());
   }
 
   /** Tests the order of actions bound to an event loop. */

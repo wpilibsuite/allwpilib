@@ -125,8 +125,8 @@ TEST(BooleanEventTest, BinaryCompositionLoopSemantics) {
   (BooleanEvent(&loop1, [&] { return boolean1; }) && BooleanEvent(&loop2, [&] {
      return boolean2;
    })).IfHigh([&] { ++counter1; });
-  (BooleanEvent(&loop2, [&] { return boolean1; }) && BooleanEvent(&loop1, [&] {
-     return boolean2;
+  (BooleanEvent(&loop2, [&] { return boolean2; }) && BooleanEvent(&loop1, [&] {
+     return boolean1;
    })).IfHigh([&] { ++counter2; });
 
   EXPECT_EQ(0, counter1);
@@ -151,7 +151,7 @@ TEST(BooleanEventTest, BinaryCompositionLoopSemantics) {
   EXPECT_EQ(2, counter1);
   EXPECT_EQ(1, counter2);
 
-  loop2.Poll();  // 2nd event executes, Bool 2 is now false because loop 1
+  loop2.Poll();  // 2nd event executes, Bool 2 is now false because this loop
                  // updated it, does nothing
 
   EXPECT_EQ(2, counter1);
@@ -163,35 +163,35 @@ TEST(BooleanEventTest, BinaryCompositionLoopSemantics) {
   EXPECT_EQ(1, counter2);
 
   boolean2 = true;
-  loop2.Poll();  // 2nd event executes, Bool 2 is still false because loop 1
-                 // hasn't updated it, does nothing
+  loop2.Poll();  // 2nd event executes, Bool 2 is true because this loop updated
+                 // it, increments counter
 
   EXPECT_EQ(2, counter1);
-  EXPECT_EQ(1, counter2);
+  EXPECT_EQ(2, counter2);
 
   loop1.Poll();  // 1st event executes, Bool 2 is true because loop 2 updated
                  // it, increments counter
 
   EXPECT_EQ(3, counter1);
-  EXPECT_EQ(1, counter2);
+  EXPECT_EQ(2, counter2);
 
   boolean1 = false;
-  loop2.Poll();  // 2nd event executes, Bool 1 is false because this loop
-                 // updated it, does nothing
+  loop2.Poll();  // 2nd event executes, Bool 1 is still true because loop 1
+                 // hasn't updated it, increments counter
 
   EXPECT_EQ(3, counter1);
-  EXPECT_EQ(1, counter2);
+  EXPECT_EQ(3, counter2);
 
   loop1.Poll();  // 1st event executes, Bool 1 is false because this loop
                  // updated it, does nothing
 
   EXPECT_EQ(3, counter1);
-  EXPECT_EQ(1, counter2);
+  EXPECT_EQ(3, counter2);
 
   loop2.Poll();  // All bools are updated at this point, nothing should happen
 
   EXPECT_EQ(3, counter1);
-  EXPECT_EQ(1, counter2);
+  EXPECT_EQ(3, counter2);
 }
 
 /** Tests the order of actions bound to an event loop. */
