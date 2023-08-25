@@ -27,6 +27,9 @@ public class SelectCommand extends Command {
   private boolean m_runsWhenDisabled = true;
   private InterruptionBehavior m_interruptBehavior = InterruptionBehavior.kCancelIncoming;
 
+  private final Command m_defaultCommand =
+      new PrintCommand("SelectCommand selector value does not correspond to any command!");
+
   /**
    * Creates a new SelectCommand.
    *
@@ -52,8 +55,7 @@ public class SelectCommand extends Command {
   @Override
   public void initialize() {
     if (!m_commands.containsKey(m_selector.get())) {
-      m_selectedCommand =
-          new PrintCommand("SelectCommand selector value does not correspond to any command!");
+      m_selectedCommand = m_defaultCommand;
     } else {
       m_selectedCommand = m_commands.get(m_selector.get());
     }
