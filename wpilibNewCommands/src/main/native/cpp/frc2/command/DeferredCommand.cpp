@@ -50,7 +50,7 @@ void DeferredCommand::InitSendable(wpi::SendableBuilder& builder) {
   builder.AddStringProperty(
       "deferred",
       [this] {
-        if (m_command) {
+        if (m_command != &m_nullCommand) {
           return m_command->GetName();
         } else {
           return std::string{"null"};

@@ -68,6 +68,6 @@ public class DeferredCommand extends Command {
   public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);
     builder.addStringProperty(
-        "deferred", () -> m_command == null ? "null" : m_command.getName(), null);
+        "deferred", () -> m_command == m_nullCommand ? "null" : m_command.getName(), null);
   }
 }
