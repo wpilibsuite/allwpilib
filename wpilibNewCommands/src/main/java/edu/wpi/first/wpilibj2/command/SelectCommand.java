@@ -11,8 +11,8 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 /**
- * A command composition that runs one of a selection of commands, either using a selector and a key
- * to command mapping, or a supplier that returns the command directly at runtime.
+ * A command composition that runs one of a selection of commands using a selector and a key to
+ * command mapping.
  *
  * <p>The rules for command compositions apply: command instances that are passed to it cannot be
  * added to any other composition or scheduled individually, and the composition requires all
