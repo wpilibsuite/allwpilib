@@ -56,6 +56,7 @@ class SelectCommand : public CommandHelper<Command, SelectCommand<Key>> {
 
     for (auto&& command : foo) {
       CommandScheduler::GetInstance().RequireUngrouped(command.second.get());
+      command.second.get()->SetComposed(true);
     }
 
     for (auto&& command : foo) {
@@ -75,6 +76,7 @@ class SelectCommand : public CommandHelper<Command, SelectCommand<Key>> {
       : m_selector{std::move(selector)} {
     for (auto&& command : commands) {
       CommandScheduler::GetInstance().RequireUngrouped(command.second.get());
+      command.second.get()->SetComposed(true);
     }
 
     for (auto&& command : commands) {
