@@ -9,8 +9,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 
 /**
  * Represents the speed of a robot chassis. Although this class contains similar members compared to
- * a Twist2d, they do NOT represent the same thing. Whereas a Twist2d represents a change in pose, a
- * ChassisSpeeds represents a robot's velocity.
+ * a Twist2d, they do NOT represent the same thing. Whereas a Twist2d represents a change in pose
+ * w.r.t to the robot frame of reference, a ChassisSpeeds object represents a robot's velocity.
  *
  * <p>A strictly non-holonomic drivetrain, such as a differential drive, should never have a dy
  * component because it can never move sideways. Holonomic drivetrains such as swerve and mecanum

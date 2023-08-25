@@ -15,8 +15,8 @@ namespace frc {
 /**
  * Represents the speed of a robot chassis. Although this struct contains
  * similar members compared to a Twist2d, they do NOT represent the same thing.
- * Whereas a Twist2d represents a change in pose, a ChassisSpeeds represents a
- * robot's velocity.
+ * Whereas a Twist2d represents a change in pose w.r.t to the robot frame of
+ * reference, a ChassisSpeeds struct represents a robot's velocity.
  *
  * A strictly non-holonomic drivetrain, such as a differential drive, should
  * never have a dy component because it can never move sideways. Holonomic
