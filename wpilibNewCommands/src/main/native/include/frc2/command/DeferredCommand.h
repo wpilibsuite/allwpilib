@@ -11,7 +11,7 @@
 
 #include "frc2/command/Command.h"
 #include "frc2/command/CommandHelper.h"
-#include "frc2/command/SetUtilities.h"
+#include "frc2/command/PrintCommand.h"
 
 namespace frc2 {
 /**
@@ -64,8 +64,8 @@ class DeferredCommand : public CommandHelper<Command, DeferredCommand> {
   void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
+  PrintCommand m_nullCommand{"[DeferredCommand] Supplied command was null!"};
   wpi::unique_function<Command*()> m_supplier;
-  Command* m_command;
-  void ResetInternalCommand();
+  Command* m_command{&m_nullCommand};
 };
 }  // namespace frc2

@@ -14,23 +14,21 @@ DeferredCommand::DeferredCommand(wpi::unique_function<Command*()> supplier,
                                  std::span<Subsystem* const> requirements)
     : m_supplier{std::move(supplier)} {
   AddRequirements(requirements);
-  ResetInternalCommand();
 }
 
 DeferredCommand::DeferredCommand(wpi::unique_function<Command*()> supplier,
                                  std::initializer_list<Subsystem*> requirements)
     : m_supplier{std::move(supplier)} {
   AddRequirements(requirements);
-  ResetInternalCommand();
 }
 
 void DeferredCommand::Initialize() {
   auto cmd = m_supplier();
   if (cmd != nullptr) {
     m_command = cmd;
+    CommandScheduler::GetInstance().RequireUngrouped(m_command);
+    m_command->SetComposed(true);
   }
-  CommandScheduler::GetInstance().RequireUngrouped(m_command);
-  m_command->SetComposed(true);
   m_command->Initialize();
 }
 
@@ -40,6 +38,7 @@ void DeferredCommand::Execute() {
 
 void DeferredCommand::End(bool interrupted) {
   m_command->End(interrupted);
+  m_command = &m_nullCommand;
 }
 
 bool DeferredCommand::IsFinished() {
@@ -58,8 +57,4 @@ void DeferredCommand::InitSendable(wpi::SendableBuilder& builder) {
         }
       },
       nullptr);
-}
-
-void DeferredCommand::ResetInternalCommand() {
-  m_command = new PrintCommand("[DeferredCommand] Supplied command was null!");
 }
