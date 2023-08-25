@@ -49,7 +49,7 @@ bool DeferredCommand::IsFinished() {
 void DeferredCommand::InitSendable(wpi::SendableBuilder& builder) {
   Command::InitSendable(builder);
   builder.AddStringProperty(
-      "proxied",
+      "deferred",
       [this] {
         if (m_command) {
           return m_command->GetName();
