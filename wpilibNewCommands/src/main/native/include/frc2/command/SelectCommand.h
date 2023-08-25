@@ -139,14 +139,16 @@ class SelectCommand : public CommandHelper<Command, SelectCommand<Key>> {
   bool m_runsWhenDisabled = true;
   Command::InterruptionBehavior m_interruptBehavior{
       Command::InterruptionBehavior::kCancelIncoming};
+
+  PrintCommand m_defaultCommand{
+      "SelectCommand selector value does not correspond to any command!"};
 };
 
 template <typename T>
 void SelectCommand<T>::Initialize() {
   auto find = m_commands.find(m_selector());
   if (find == m_commands.end()) {
-    m_selectedCommand = new PrintCommand(
-        "SelectCommand selector value does not correspond to any command!");
+    m_selectedCommand = &m_defaultCommand;
   } else {
     m_selectedCommand = find->second.get();
   }
