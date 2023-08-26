@@ -30,9 +30,7 @@ def main():
 
     # Copy gcem include files into allwpilib
     include_files = walk_cwd_and_copy_if(
-        lambda dp, f: dp.endswith("include")
-        or dp.endswith("gcem_incl")
-        or dp.endswith("quadrature"),
+        lambda dp, f: dp.startswith("./include"),
         os.path.join(wpimath, "src/main/native/thirdparty/gcem"),
     )
 

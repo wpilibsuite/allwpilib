@@ -45,7 +45,7 @@ def main():
     ]
 
     include_files = walk_cwd_and_copy_if(
-        lambda dp, f: "include" in dp and f not in include_ignorelist,
+        lambda dp, f: dp.startswith("./include") and f not in include_ignorelist,
         os.path.join(wpinet, "src/main/native/thirdparty/libuv"),
     )
 
@@ -66,7 +66,7 @@ def main():
         "sysinfo-memory.c",
     ]
     src_files = walk_cwd_and_copy_if(
-        lambda dp, f: "src" in dp and "docs" not in dp and f not in src_ignorelist,
+        lambda dp, f: dp.startswith("./src") and f not in src_ignorelist,
         os.path.join(wpinet, "src/main/native/thirdparty/libuv"),
     )
 
