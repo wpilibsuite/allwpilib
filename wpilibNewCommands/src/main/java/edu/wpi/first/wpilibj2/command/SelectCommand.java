@@ -40,6 +40,7 @@ public class SelectCommand extends Command {
     m_commands = requireNonNullParam(commands, "commands", "SelectCommand");
     m_selector = requireNonNullParam(selector, "selector", "SelectCommand");
 
+    CommandScheduler.getInstance().registerComposedCommands(m_defaultCommand);
     CommandScheduler.getInstance()
         .registerComposedCommands(commands.values().toArray(new Command[] {}));
 
@@ -54,11 +55,7 @@ public class SelectCommand extends Command {
 
   @Override
   public void initialize() {
-    if (!m_commands.containsKey(m_selector.get())) {
-      m_selectedCommand = m_defaultCommand;
-    } else {
-      m_selectedCommand = m_commands.get(m_selector.get());
-    }
+    m_selectedCommand = m_commands.getOrDefault(m_selector.get(), m_defaultCommand);
     m_selectedCommand.initialize();
   }
 

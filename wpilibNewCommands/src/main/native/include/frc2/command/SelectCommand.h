@@ -54,6 +54,7 @@ class SelectCommand : public CommandHelper<Command, SelectCommand<Key>> {
          std::make_unique<std::decay_t<Commands>>(std::move(commands.second))),
      ...);
 
+    m_defaultCommand.SetComposed(true);
     for (auto&& command : foo) {
       CommandScheduler::GetInstance().RequireUngrouped(command.second.get());
       command.second.get()->SetComposed(true);
@@ -74,6 +75,7 @@ class SelectCommand : public CommandHelper<Command, SelectCommand<Key>> {
       std::function<Key()> selector,
       std::vector<std::pair<Key, std::unique_ptr<Command>>>&& commands)
       : m_selector{std::move(selector)} {
+    m_defaultCommand.SetComposed(true);
     for (auto&& command : commands) {
       CommandScheduler::GetInstance().RequireUngrouped(command.second.get());
       command.second.get()->SetComposed(true);
