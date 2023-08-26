@@ -46,7 +46,7 @@ BooleanEvent BooleanEvent::operator||(std::function<bool()> rhs) {
 
 BooleanEvent BooleanEvent::Rising() {
   return BooleanEvent(this->m_loop,
-                      [state = m_state, m_previous = m_condition()]() mutable {
+                      [state = m_state, m_previous = *m_state]() mutable {
                         bool present = *state;
                         bool past = m_previous;
                         m_previous = present;
@@ -56,7 +56,7 @@ BooleanEvent BooleanEvent::Rising() {
 
 BooleanEvent BooleanEvent::Falling() {
   return BooleanEvent(this->m_loop,
-                      [state = m_state, m_previous = m_condition()]() mutable {
+                      [state = m_state, m_previous = *m_state]() mutable {
                         bool present = *state;
                         bool past = m_previous;
                         m_previous = present;
