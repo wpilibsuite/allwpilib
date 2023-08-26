@@ -1,6 +1,6 @@
 /*################################################################################
   ##
-  ##   Copyright (C) 2016-2022 Keith O'Hara
+  ##   Copyright (C) 2016-2023 Keith O'Hara
   ##
   ##   This file is part of the GCE-Math C++ library.
   ##
@@ -37,16 +37,37 @@ noexcept
     return( abs(xn - x/xn) / (T(1) + xn) < GCLIM<T>::min() ? \
             // if
                 xn :
-            count < GCEM_SQRT_MAX_ITER ? \
             // else
-                sqrt_recur(x, T(0.5)*(xn + x/xn), count+1) :
-                xn );
+                count < GCEM_SQRT_MAX_ITER ? \
+                // if
+                    sqrt_recur(x, T(0.5)*(xn + x/xn), count+1) :
+                // else
+                    xn );
 }
 
 template<typename T>
 constexpr
 T
-sqrt_check(const T x, const T m_val)
+sqrt_simplify(const T x, const T m_val)
+noexcept
+{
+    return( x > T(1e+08) ? \
+                sqrt_simplify(x / T(1e+08), T(1e+04) * m_val) :
+            x > T(1e+06) ? \
+                sqrt_simplify(x / T(1e+06), T(1e+03) * m_val) :
+            x > T(1e+04) ? \
+                sqrt_simplify(x / T(1e+04), T(1e+02) * m_val) :
+            x > T(100) ? \
+                sqrt_simplify(x / T(100), T(10) * m_val) :
+            x > T(4) ? \
+                sqrt_simplify(x / T(4), T(2) * m_val) :
+                m_val * sqrt_recur(x, x / T(2), 0) );
+}
+
+template<typename T>
+constexpr
+T
+sqrt_check(const T x)
 noexcept
 {
     return( is_nan(x) ? \
@@ -63,9 +84,7 @@ noexcept
             GCLIM<T>::min() > abs(T(1) - x) ? \
                 x :
             // else
-            x > T(4) ? \
-                sqrt_check(x/T(4), T(2)*m_val) :
-                m_val * sqrt_recur(x, x/T(2), 0) );
+            sqrt_simplify(x, T(1)) );
 }
 
 }
@@ -84,7 +103,7 @@ return_t<T>
 sqrt(const T x)
 noexcept
 {
-    return internal::sqrt_check( static_cast<return_t<T>>(x), return_t<T>(1) );
+    return internal::sqrt_check( static_cast<return_t<T>>(x) );
 }
 
 #endif
