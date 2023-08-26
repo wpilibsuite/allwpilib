@@ -11,9 +11,12 @@ if ("${CMAKE_HOST_SYSTEM_NAME}" STREQUAL "Windows")
     set(CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION 10.0.18362.0 CACHE STRING INTERNAL FORCE)
 endif()
 
-cmake_minimum_required(VERSION 3.3.0)
+cmake_minimum_required(VERSION 3.11)
 project(allwpilib)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
+
+# Make timestamps of extracted files from FetchContent the time of extraction
+cmake_policy(SET CMP0135 NEW)
 
 message(STATUS "Platform version: ${CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION}")
 
