@@ -22,6 +22,26 @@ DeferredCommand::DeferredCommand(wpi::unique_function<Command*()> supplier,
   AddRequirements(requirements);
 }
 
+DeferredCommand::DeferredCommand(wpi::unique_function<CommandPtr()> supplier,
+                                 std::span<Subsystem* const> requirements)
+    : DeferredCommand(
+          [lambdaSupplier = std::move(supplier),
+           holder = std::optional<CommandPtr>{}]() mutable {
+            holder = lambdaSupplier();
+            return holder->get();
+          },
+          requirements) {}
+
+DeferredCommand::DeferredCommand(wpi::unique_function<CommandPtr()> supplier,
+                                 std::initializer_list<Subsystem*> requirements)
+    : DeferredCommand(
+          [lambdaSupplier = std::move(supplier),
+           holder = std::optional<CommandPtr>{}]() mutable {
+            holder = lambdaSupplier();
+            return holder->get();
+          },
+          requirements) {}
+
 void DeferredCommand::Initialize() {
   auto cmd = m_supplier();
   if (cmd != nullptr) {

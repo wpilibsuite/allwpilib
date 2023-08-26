@@ -93,6 +93,16 @@ CommandPtr cmd::Defer(wpi::unique_function<Command*()> supplier,
   return DeferredCommand(std::move(supplier), requirements).ToPtr();
 }
 
+CommandPtr cmd::Defer(wpi::unique_function<CommandPtr()> supplier,
+                      std::span<Subsystem* const> requirements) {
+  return DeferredCommand(std::move(supplier), requirements).ToPtr();
+}
+
+CommandPtr cmd::Defer(wpi::unique_function<CommandPtr()> supplier,
+                      std::initializer_list<Subsystem*> requirements) {
+  return DeferredCommand(std::move(supplier), requirements).ToPtr();
+}
+
 CommandPtr cmd::Sequence(std::vector<CommandPtr>&& commands) {
   return SequentialCommandGroup(CommandPtr::UnwrapVector(std::move(commands)))
       .ToPtr();
