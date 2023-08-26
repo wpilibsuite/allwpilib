@@ -12,19 +12,19 @@ ProxyCommand::ProxyCommand(wpi::unique_function<Command*()> supplier)
     : m_supplier(std::move(supplier)) {}
 
 ProxyCommand::ProxyCommand(wpi::unique_function<CommandPtr()> supplier)
-    : m_supplier([supplier = std::move(supplier),
-                  holder = std::optional<CommandPtr>{}]() mutable {
+    : ProxyCommand([supplier = std::move(supplier),
+                    holder = std::optional<CommandPtr>{}]() mutable {
         holder = supplier();
         return holder->get();
       }) {}
 
 ProxyCommand::ProxyCommand(Command* command)
-    : m_supplier([command] { return command; }) {
+    : ProxyCommand([command] { return command; }) {
   SetName(std::string{"Proxy("}.append(command->GetName()).append(")"));
 }
 
 ProxyCommand::ProxyCommand(std::unique_ptr<Command> command)
-    : m_supplier([command = std::move(command)] { return command.get(); }) {}
+    : ProxyCommand([command = std::move(command)] { return command.get(); }) {}
 
 void ProxyCommand::Initialize() {
   m_command = m_supplier();
