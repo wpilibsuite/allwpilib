@@ -4,7 +4,8 @@
 
 #include <cstring>
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
+
 #include "hal/HAL.h"
 #include "hal/simulation/DriverStationData.h"
 

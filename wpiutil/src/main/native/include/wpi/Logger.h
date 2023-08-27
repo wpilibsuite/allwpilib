@@ -8,7 +8,7 @@
 #include <functional>
 #include <utility>
 
-#include "fmt/format.h"
+#include <fmt/format.h>
 
 namespace wpi {
 

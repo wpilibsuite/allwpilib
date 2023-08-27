@@ -7,13 +7,14 @@
 #include <tuple>
 #include <utility>
 
+#include <gtest/gtest.h>
+
 #include "frc/StateSpaceUtil.h"
 #include "frc/estimator/DifferentialDrivePoseEstimator.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
 #include "frc/kinematics/DifferentialDriveKinematics.h"
 #include "frc/trajectory/TrajectoryGenerator.h"
-#include "gtest/gtest.h"
 #include "units/angle.h"
 #include "units/length.h"
 #include "units/time.h"

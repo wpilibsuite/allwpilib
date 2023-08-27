@@ -8,8 +8,9 @@
 #include <mutex>
 #include <thread>
 
-#include "fmt/core.h"
-#include "gtest/gtest.h"
+#include <fmt/core.h>
+#include <gtest/gtest.h>
+
 #include "wpi/mutex.h"
 
 static std::mutex std_mutex;

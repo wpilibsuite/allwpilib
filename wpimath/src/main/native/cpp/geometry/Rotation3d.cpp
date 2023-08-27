@@ -7,11 +7,11 @@
 #include <cmath>
 #include <numbers>
 
+#include <Eigen/Core>
+#include <Eigen/LU>
+#include <Eigen/QR>
 #include <wpi/json.h>
 
-#include "Eigen/Core"
-#include "Eigen/LU"
-#include "Eigen/QR"
 #include "frc/fmt/Eigen.h"
 #include "units/math.h"
 #include "wpimath/MathShared.h"

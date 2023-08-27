@@ -5,11 +5,11 @@
 #include <cmath>
 #include <numbers>
 
+#include <gtest/gtest.h>
 #include <wpi/MathExtras.h>
 
 #include "frc/EigenCore.h"
 #include "frc/geometry/Rotation3d.h"
-#include "gtest/gtest.h"
 
 using namespace frc;
 

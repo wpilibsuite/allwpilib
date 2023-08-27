@@ -8,13 +8,13 @@
 #include <tuple>
 
 #include <fmt/format.h>
+#include <gtest/gtest.h>
 #include <wpi/timestamp.h>
 
 #include "frc/estimator/SwerveDrivePoseEstimator.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/kinematics/SwerveDriveKinematics.h"
 #include "frc/trajectory/TrajectoryGenerator.h"
-#include "gtest/gtest.h"
 
 void testFollowTrajectory(
     const frc::SwerveDriveKinematics<4>& kinematics,

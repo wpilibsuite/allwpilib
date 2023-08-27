@@ -7,7 +7,8 @@
 #include <chrono>
 #include <cmath>
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
+
 #include "units/acceleration.h"
 #include "units/length.h"
 #include "units/math.h"

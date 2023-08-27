@@ -4,10 +4,11 @@
 
 #include <numbers>
 
+#include <gtest/gtest.h>
+
 #include "frc/MathUtil.h"
 #include "frc/controller/HolonomicDriveController.h"
 #include "frc/trajectory/TrajectoryGenerator.h"
-#include "gtest/gtest.h"
 #include "units/angular_acceleration.h"
 #include "units/math.h"
 #include "units/time.h"

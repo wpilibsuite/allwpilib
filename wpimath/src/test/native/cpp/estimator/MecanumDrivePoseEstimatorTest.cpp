@@ -6,11 +6,12 @@
 #include <random>
 #include <tuple>
 
+#include <gtest/gtest.h>
+
 #include "frc/estimator/MecanumDrivePoseEstimator.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/kinematics/MecanumDriveKinematics.h"
 #include "frc/trajectory/TrajectoryGenerator.h"
-#include "gtest/gtest.h"
 
 void testFollowTrajectory(
     const frc::MecanumDriveKinematics& kinematics,

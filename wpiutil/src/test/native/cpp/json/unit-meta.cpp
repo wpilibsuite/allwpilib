@@ -32,9 +32,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE  OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "gtest/gtest.h"
-
 #include "unit-json.h"
+
+#include <gtest/gtest.h>
+
 using wpi::json;
 
 TEST(JsonVersionTest, Meta)

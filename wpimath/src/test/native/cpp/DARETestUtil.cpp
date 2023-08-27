@@ -4,11 +4,11 @@
 
 #include "DARETestUtil.h"
 
+#include <Eigen/Eigenvalues>
 #include <fmt/core.h>
+#include <gtest/gtest.h>
 
-#include "Eigen/Eigenvalues"
 #include "frc/fmt/Eigen.h"
-#include "gtest/gtest.h"
 
 void ExpectMatrixEqual(const Eigen::MatrixXd& lhs, const Eigen::MatrixXd& rhs,
                        double tolerance) {

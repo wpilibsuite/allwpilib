@@ -4,11 +4,11 @@
 
 #include "frc/simulation/DutyCycleEncoderSim.h"  // NOLINT(build/include_order)
 
+#include <gtest/gtest.h>
 #include <hal/HAL.h>
 
 #include "callback_helpers/TestCallbackHelpers.h"
 #include "frc/DutyCycleEncoder.h"
-#include "gtest/gtest.h"
 
 namespace frc::sim {
 

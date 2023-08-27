@@ -17,6 +17,7 @@ includeOtherLibs {
   ^cscore
   ^fmt/
   ^frc/
+  ^gtest/
   ^hal/
   ^imgui
   ^mockdata/

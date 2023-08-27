@@ -5,9 +5,10 @@
 #include <algorithm>
 #include <string_view>
 
+#include <gtest/gtest.h>
+
 #include "TestPrinters.h"
 #include "Value_internal.h"
-#include "gtest/gtest.h"
 #include "networktables/NetworkTableValue.h"
 
 using namespace std::string_view_literals;

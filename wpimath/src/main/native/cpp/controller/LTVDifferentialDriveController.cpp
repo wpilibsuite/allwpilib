@@ -7,7 +7,8 @@
 #include <cmath>
 #include <stdexcept>
 
-#include "Eigen/Cholesky"
+#include <Eigen/Cholesky>
+
 #include "frc/DARE.h"
 #include "frc/MathUtil.h"
 #include "frc/StateSpaceUtil.h"
