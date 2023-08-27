@@ -130,6 +130,7 @@ void testFollowTrajectory(
               0.15);
 
   if (checkError) {
+    // NOLINTNEXTLINE(bugprone-integer-division)
     EXPECT_LT(errorSum / (trajectory.TotalTime() / dt), 0.051);
     EXPECT_LT(maxError, 0.2);
   }
