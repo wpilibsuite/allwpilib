@@ -90,7 +90,7 @@ public final class DARE {
    * <ul>
    *   <li>Q − NR⁻¹Nᵀ isn't symmetric positive semidefinite
    *   <li>R isn't symmetric positive definite
-   *   <li>The (A, B) pair isn't stabilizable
+   *   <li>The (A − BR⁻¹Nᵀ, B) pair isn't stabilizable
    *   <li>The (A, C) pair where Q = CᵀC isn't detectable
    * </ul>
    *
@@ -199,7 +199,7 @@ public final class DARE {
    * @return Solution of DARE.
    * @throws IllegalArgumentException if Q − NR⁻¹Nᵀ isn't symmetric positive semidefinite.
    * @throws IllegalArgumentException if R isn't symmetric positive definite.
-   * @throws IllegalArgumentException if the (A, B) pair isn't stabilizable.
+   * @throws IllegalArgumentException if the (A − BR⁻¹Nᵀ, B) pair isn't stabilizable.
    * @throws IllegalArgumentException if the (A, C) pair where Q = CᵀC isn't detectable.
    */
   public static <States extends Num, Inputs extends Num> Matrix<States, States> dare(
