@@ -38,13 +38,13 @@ public final class MechanismRoot2d extends MechanismObject2d {
 
   @Override
   public void close() {
-    super.close();
     if (m_xPub != null) {
       m_xPub.close();
     }
     if (m_yPub != null) {
       m_yPub.close();
     }
+    super.close();
   }
 
   /**
