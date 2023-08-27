@@ -55,11 +55,7 @@ if (WITH_JAVA)
   target_link_libraries(wpiutiljni PRIVATE wpiutil_jni_headers)
   add_dependencies(wpiutiljni wpiutil_jar)
 
-  if (MSVC)
-    install(TARGETS wpiutiljni RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)
-  endif()
-
-  install(TARGETS wpiutiljni EXPORT wpiutiljni DESTINATION "${main_lib_dest}")
+  install(TARGETS wpiutiljni EXPORT wpiutiljni)
 
 endif()
 
@@ -161,11 +157,7 @@ target_include_directories(wpiutil PUBLIC
                             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
                             $<INSTALL_INTERFACE:${include_dest}/wpiutil>)
 
-install(TARGETS wpiutil EXPORT wpiutil DESTINATION "${main_lib_dest}")
-
-if (WITH_JAVA AND MSVC)
-    install(TARGETS wpiutil RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)
-endif()
+install(TARGETS wpiutil EXPORT wpiutil)
 
 if (WITH_FLAT_INSTALL)
     set (wpiutil_config_dir ${wpilib_dest})

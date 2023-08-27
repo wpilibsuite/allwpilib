@@ -22,7 +22,7 @@ target_include_directories(libglass PUBLIC
                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/lib/native/include>
                            $<INSTALL_INTERFACE:${include_dest}/glass>)
 
-install(TARGETS libglass EXPORT libglass DESTINATION "${main_lib_dest}")
+install(TARGETS libglass EXPORT libglass)
 install(DIRECTORY src/lib/native/include/ DESTINATION "${include_dest}/glass")
 
 #
@@ -43,7 +43,7 @@ target_include_directories(libglassnt PUBLIC
                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/libnt/native/include>
                            $<INSTALL_INTERFACE:${include_dest}/glass>)
 
-install(TARGETS libglassnt EXPORT libglassnt DESTINATION "${main_lib_dest}")
+install(TARGETS libglassnt EXPORT libglassnt)
 install(DIRECTORY src/libnt/native/include/ DESTINATION "${include_dest}/glass")
 
 #

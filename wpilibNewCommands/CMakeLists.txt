@@ -39,7 +39,7 @@ target_include_directories(wpilibNewCommands PUBLIC
                             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
                             $<INSTALL_INTERFACE:${include_dest}/wpilibNewCommands>)
 
-install(TARGETS wpilibNewCommands EXPORT wpilibNewCommands DESTINATION "${main_lib_dest}")
+install(TARGETS wpilibNewCommands EXPORT wpilibNewCommands)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpilibNewCommands")
 
 if (FLAT_INSTALL_WPILIB)

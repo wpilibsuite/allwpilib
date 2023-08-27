@@ -153,7 +153,6 @@ endif()
 
 set( wpilib_dest "")
 set( include_dest include )
-set( main_lib_dest lib )
 set( java_lib_dest java )
 set( jni_lib_dest jni )
 
