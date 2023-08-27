@@ -11,9 +11,12 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 /**
- * Runs the given command when this command is initialized, and ends when it ends. Useful for
- * performing runtime tasks before creating a new command. If this command is interrupted, it will
- * cancel the command.
+ * Runs the command returned by the supplier when this command is initialized, and ends when it
+ * ends. Useful for performing runtime tasks before creating a new command. If this command is
+ * interrupted, it will cancel the command.
+ *
+ * <p>Note that the supplier <i>must</i> create a new Command each call. For selecting one of a
+ * preallocated set of commands, use {@link SelectCommand}.
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
