@@ -136,4 +136,16 @@ public interface Subsystem {
   default Command runEnd(Runnable run, Runnable end) {
     return Commands.runEnd(run, end, this);
   }
+
+  /**
+   * Constructs a {@link DeferredCommand} with the provided supplier. This subsystem is added as a
+   * requirement.
+   *
+   * @param supplier the command supplier.
+   * @return the command.
+   * @see DeferredCommand
+   */
+  default Command defer(Supplier<Command> supplier) {
+    return Commands.defer(supplier, Set.of(this));
+  }
 }

@@ -150,5 +150,25 @@ class Subsystem {
    */
   [[nodiscard]]
   CommandPtr RunEnd(std::function<void()> run, std::function<void()> end);
+
+  /**
+   * Constructs a DeferredCommand with the provided supplier. This subsystem is
+   * added as a requirement.
+   *
+   * @param supplier the command supplier.
+   * @return the command.
+   */
+  [[nodiscard]]
+  CommandPtr Defer(wpi::unique_function<Command*()> supplier);
+
+  /**
+   * Constructs a DeferredCommand with the provided supplier. This subsystem is
+   * added as a requirement.
+   *
+   * @param supplier the command supplier.
+   * @return the command.
+   */
+  [[nodiscard]]
+  CommandPtr Defer(wpi::unique_function<CommandPtr()> supplier);
 };
 }  // namespace frc2
