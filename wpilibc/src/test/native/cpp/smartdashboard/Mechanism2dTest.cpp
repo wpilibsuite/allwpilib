@@ -7,8 +7,6 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc/util/Color8Bit.h>
 
-#include <string>
-
 #include <networktables/NetworkTableInstance.h>
 #include <units/angle.h>
 
