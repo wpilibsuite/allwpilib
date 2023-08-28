@@ -1,6 +1,5 @@
-// Copyright (C) 2015-2021 Müller <jonathanmueller.dev@gmail.com>
-// This file is subject to the license terms in the LICENSE file
-// found in the top-level directory of this distribution.
+// Copyright (C) 2015-2023 Jonathan Müller and foonathan/memory contributors
+// SPDX-License-Identifier: Zlib
 
 #ifndef WPI_MEMORY_MEMORY_POOL_COLLECTION_HPP_INCLUDED
 #define WPI_MEMORY_MEMORY_POOL_COLLECTION_HPP_INCLUDED
@@ -76,8 +75,7 @@ namespace wpi
             /// the size of the initial memory block and other constructor arguments for the \concept{concept_blockallocator,BlockAllocator}.
             /// The \c BucketDistribution controls how many free lists are created,
             /// but unlike in \ref memory_pool all free lists are initially empty and the first memory block queued.
-            /// \requires \c max_node_size must be a valid \concept{concept_node,node} size
-            /// and \c block_size must be non-zero.
+            /// \requires \c block_size must be non-zero and \c max_node_size must be a valid \concept{concept_node,node} size and smaller than \c block_size divided by the number of pools.
             template <typename... Args>
             memory_pool_collection(std::size_t max_node_size, std::size_t block_size,
                                    Args&&... args)
@@ -85,6 +83,7 @@ namespace wpi
               stack_(allocate_block()),
               pools_(stack_, block_end(), max_node_size)
             {
+                detail::check_allocation_size<bad_node_size>(max_node_size, def_capacity(), info());
             }
 
             /// \effects Destroys the \ref memory_pool_collection by returning all memory blocks,
@@ -107,9 +106,9 @@ namespace wpi
             memory_pool_collection& operator=(memory_pool_collection&& other) noexcept
             {
                 leak_checker::operator=(detail::move(other));
-                arena_                = detail::move(other.arena_);
-                stack_                = detail::move(other.stack_);
-                pools_                = detail::move(other.pools_);
+                arena_ = detail::move(other.arena_);
+                stack_ = detail::move(other.stack_);
+                pools_ = detail::move(other.pools_);
                 return *this;
             }
             /// @}
