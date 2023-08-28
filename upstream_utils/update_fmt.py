@@ -35,13 +35,13 @@ def main():
 
     # Copy fmt source files into allwpilib
     src_files = walk_cwd_and_copy_if(
-        lambda dp, f: dp.endswith("src") and f.endswith(".cc") and f != "fmt.cc",
+        lambda dp, f: dp.startswith("./src") and f.endswith(".cc") and f != "fmt.cc",
         os.path.join(wpiutil, "src/main/native/thirdparty/fmtlib"),
     )
 
     # Copy fmt header files into allwpilib
     include_files = walk_cwd_and_copy_if(
-        lambda dp, f: dp.endswith("include/fmt"),
+        lambda dp, f: dp.startswith("./include/fmt"),
         os.path.join(wpiutil, "src/main/native/thirdparty/fmtlib"),
     )
 
