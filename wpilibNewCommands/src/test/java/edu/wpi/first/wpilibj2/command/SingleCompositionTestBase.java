@@ -10,12 +10,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-public interface SingleCompositionTestBase<T extends Command> {
-  T composeSingle(Command member);
+public abstract class SingleCompositionTestBase<T extends Command> extends CommandTestBase {
+  abstract T composeSingle(Command member);
 
   @EnumSource(Command.InterruptionBehavior.class)
   @ParameterizedTest
-  default void interruptible(Command.InterruptionBehavior interruptionBehavior) {
+  void interruptible(Command.InterruptionBehavior interruptionBehavior) {
     var command =
         composeSingle(
             new WaitUntilCommand(() -> false).withInterruptBehavior(interruptionBehavior));
@@ -24,7 +24,7 @@ public interface SingleCompositionTestBase<T extends Command> {
 
   @ValueSource(booleans = {true, false})
   @ParameterizedTest
-  default void runWhenDisabled(boolean runsWhenDisabled) {
+  void runWhenDisabled(boolean runsWhenDisabled) {
     var command =
         composeSingle(new WaitUntilCommand(() -> false).ignoringDisable(runsWhenDisabled));
     assertEquals(runsWhenDisabled, command.runsWhenDisabled());

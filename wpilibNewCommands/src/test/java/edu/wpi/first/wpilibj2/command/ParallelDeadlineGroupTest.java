@@ -14,8 +14,7 @@ import static org.mockito.internal.verification.VerificationModeFactory.times;
 import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 
-class ParallelDeadlineGroupTest extends CommandTestBase
-    implements MultiCompositionTestBase<ParallelDeadlineGroup> {
+class ParallelDeadlineGroupTest extends MultiCompositionTestBase<ParallelDeadlineGroup> {
   @Test
   void parallelDeadlineScheduleTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
