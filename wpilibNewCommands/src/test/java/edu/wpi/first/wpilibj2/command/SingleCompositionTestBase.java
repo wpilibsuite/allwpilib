@@ -32,6 +32,7 @@ public abstract class SingleCompositionTestBase<T extends Command> extends Comma
     assertEquals(runsWhenDisabled, command.runsWhenDisabled());
   }
 
+  @SuppressWarnings("unused")
   @Test
   void commandInOtherCompositionTest() {
     var command = new InstantCommand();
@@ -39,6 +40,7 @@ public abstract class SingleCompositionTestBase<T extends Command> extends Comma
     assertThrows(IllegalArgumentException.class, () -> composeSingle(command));
   }
 
+  @SuppressWarnings("unused")
   @Test
   void commandInMultipleCompositionsTest() {
     var command = new InstantCommand();
@@ -46,6 +48,7 @@ public abstract class SingleCompositionTestBase<T extends Command> extends Comma
     assertThrows(IllegalArgumentException.class, () -> composeSingle(command));
   }
 
+  @SuppressWarnings("unused")
   @Test
   void composeThenScheduleTest() {
     var command = new InstantCommand();
