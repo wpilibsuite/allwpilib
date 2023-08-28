@@ -55,12 +55,7 @@ if (WITH_JAVA)
 
   file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java ${WPILIB_BINARY_DIR}/wpimath/generated/*.java)
 
-  if(${CMAKE_VERSION} VERSION_LESS "3.11.0")
-    set(CMAKE_JAVA_COMPILE_FLAGS "-h" "${CMAKE_CURRENT_BINARY_DIR}/jniheaders")
-    add_jar(wpimath_jar ${JAVA_SOURCES} INCLUDE_JARS ${EJML_JARS} wpiutil_jar OUTPUT_NAME wpimath)
-  else()
-    add_jar(wpimath_jar ${JAVA_SOURCES} INCLUDE_JARS ${EJML_JARS} wpiutil_jar OUTPUT_NAME wpimath GENERATE_NATIVE_HEADERS wpimath_jni_headers)
-  endif()
+  add_jar(wpimath_jar ${JAVA_SOURCES} INCLUDE_JARS ${EJML_JARS} wpiutil_jar OUTPUT_NAME wpimath GENERATE_NATIVE_HEADERS wpimath_jni_headers)
 
   get_property(WPIMATH_JAR_FILE TARGET wpimath_jar PROPERTY JAR_FILE)
   install(FILES ${WPIMATH_JAR_FILE} DESTINATION "${java_lib_dest}")
@@ -73,12 +68,7 @@ if (WITH_JAVA)
 
   set_property(TARGET wpimathjni PROPERTY FOLDER "libraries")
 
-  if(${CMAKE_VERSION} VERSION_LESS "3.11.0")
-    target_include_directories(wpimathjni PRIVATE ${JNI_INCLUDE_DIRS})
-    target_include_directories(wpimathjni PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/jniheaders")
-  else()
-    target_link_libraries(wpimathjni PRIVATE wpimath_jni_headers)
-  endif()
+  target_link_libraries(wpimathjni PRIVATE wpimath_jni_headers)
   add_dependencies(wpimathjni wpimath_jar)
 
   if (MSVC)

@@ -18,12 +18,7 @@ if (WITH_JAVA)
 
   file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
 
-  if(${CMAKE_VERSION} VERSION_LESS "3.11.0")
-    set(CMAKE_JAVA_COMPILE_FLAGS "-h" "${CMAKE_CURRENT_BINARY_DIR}/jniheaders")
-    add_jar(wpinet_jar ${JAVA_SOURCES} INCLUDE_JARS wpiutil_jar OUTPUT_NAME wpinet)
-  else()
-    add_jar(wpinet_jar ${JAVA_SOURCES} INCLUDE_JARS wpiutil_jar OUTPUT_NAME wpinet GENERATE_NATIVE_HEADERS wpinet_jni_headers)
-  endif()
+  add_jar(wpinet_jar ${JAVA_SOURCES} INCLUDE_JARS wpiutil_jar OUTPUT_NAME wpinet GENERATE_NATIVE_HEADERS wpinet_jni_headers)
 
   get_property(WPINET_JAR_FILE TARGET wpinet_jar PROPERTY JAR_FILE)
   install(FILES ${WPINET_JAR_FILE} DESTINATION "${java_lib_dest}")
@@ -36,12 +31,7 @@ if (WITH_JAVA)
 
   set_property(TARGET wpinetjni PROPERTY FOLDER "libraries")
 
-  if(${CMAKE_VERSION} VERSION_LESS "3.11.0")
-    target_include_directories(wpinetjni PRIVATE ${JNI_INCLUDE_DIRS})
-    target_include_directories(wpinetjni PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/jniheaders")
-  else()
-    target_link_libraries(wpinetjni PRIVATE wpinet_jni_headers)
-  endif()
+  target_link_libraries(wpinetjni PRIVATE wpinet_jni_headers)
   add_dependencies(wpinetjni wpinet_jar)
 
   if (MSVC)
