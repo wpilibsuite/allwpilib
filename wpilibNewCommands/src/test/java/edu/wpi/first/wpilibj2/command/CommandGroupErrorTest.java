@@ -7,6 +7,7 @@ package edu.wpi.first.wpilibj2.command;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
 
 class CommandGroupErrorTest extends CommandTestBase {
@@ -43,5 +44,16 @@ class CommandGroupErrorTest extends CommandTestBase {
     assertThrows(IllegalArgumentException.class, () -> command.withTimeout(10));
     CommandScheduler.getInstance().removeComposedCommand(command);
     assertDoesNotThrow(() -> command.withTimeout(10));
+  }
+
+  @Test
+  void scheduledThenComposedTest() {
+    Command command = new RunCommand(() -> {});
+    CommandScheduler.getInstance().schedule(command);
+    CommandScheduler.getInstance().run();
+
+    AtomicReference<Command> composition = new AtomicReference<>(new InstantCommand());
+    assertThrows(
+        IllegalArgumentException.class, () -> composition.set(new ParallelCommandGroup(command)));
   }
 }

@@ -477,6 +477,29 @@ void CommandScheduler::RequireUngrouped(
   }
 }
 
+void CommandScheduler::RequireUngroupedAndUnscheduled(const Command* command) {
+  if (IsScheduled(command)) {
+    throw FRC_MakeError(frc::err::CommandIllegalUse,
+                        "Commands that have been scheduled individually may "
+                        "not be added to another composition!");
+  }
+  RequireUngrouped(command);
+}
+
+void CommandScheduler::RequireUngroupedAndUnscheduled(
+    std::span<const std::unique_ptr<Command>> commands) {
+  for (auto&& command : commands) {
+    RequireUngroupedAndUnscheduled(command.get());
+  }
+}
+
+void CommandScheduler::RequireUngroupedAndUnscheduled(
+    std::initializer_list<const Command*> commands) {
+  for (auto&& command : commands) {
+    RequireUngroupedAndUnscheduled(command);
+  }
+}
+
 void CommandScheduler::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Scheduler");
   builder.AddStringArrayProperty(
