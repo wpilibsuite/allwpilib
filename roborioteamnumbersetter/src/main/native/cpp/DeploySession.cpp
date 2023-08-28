@@ -73,11 +73,11 @@ bool DeploySession::ChangeTeamNumber(const std::string& macAddress,
         in_addr addr;
         addr.s_addr = ipAddress;
         wpi::uv::AddrToName(addr, &ip);
-        DEBUG("Trying to establish SSH connection to {}.", ip);
+        DEBUG("Trying to establish SSH connection to {}.", ip.str());
         try {
           SshSession session{ip.str(), kPort, kUsername, kPassword, m_logger};
           session.Open();
-          DEBUG("SSH connection to {} was successful.", ip);
+          DEBUG("SSH connection to {} was successful.", ip.str());
 
           SUCCESS("roboRIO Connected!");
 
@@ -93,7 +93,7 @@ bool DeploySession::ChangeTeamNumber(const std::string& macAddress,
             throw e;
           }
         } catch (const SshSession::SshException& e) {
-          DEBUG("SSH connection to {} failed with {}.", ip, e.what());
+          DEBUG("SSH connection to {} failed with {}.", ip.str(), e.what());
           throw e;
         }
         return 0;
@@ -117,11 +117,11 @@ bool DeploySession::Reboot(const std::string& macAddress,
         in_addr addr;
         addr.s_addr = ipAddress;
         wpi::uv::AddrToName(addr, &ip);
-        DEBUG("Trying to establish SSH connection to {}.", ip);
+        DEBUG("Trying to establish SSH connection to {}.", ip.str());
         try {
           SshSession session{ip.str(), kPort, kUsername, kPassword, m_logger};
           session.Open();
-          DEBUG("SSH connection to {} was successful.", ip);
+          DEBUG("SSH connection to {} was successful.", ip.str());
 
           SUCCESS("roboRIO Connected!");
 
@@ -132,7 +132,7 @@ bool DeploySession::Reboot(const std::string& macAddress,
             throw e;
           }
         } catch (const SshSession::SshException& e) {
-          DEBUG("SSH connection to {} failed with {}.", ip, e.what());
+          DEBUG("SSH connection to {} failed with {}.", ip.str(), e.what());
           throw e;
         }
         return 0;
@@ -156,11 +156,11 @@ bool DeploySession::Blink(const std::string& macAddress,
         in_addr addr;
         addr.s_addr = ipAddress;
         wpi::uv::AddrToName(addr, &ip);
-        DEBUG("Trying to establish SSH connection to {}.", ip);
+        DEBUG("Trying to establish SSH connection to {}.", ip.str());
         try {
           SshSession session{ip.str(), kPort, kUsername, kPassword, m_logger};
           session.Open();
-          DEBUG("SSH connection to {} was successful.", ip);
+          DEBUG("SSH connection to {} was successful.", ip.str());
 
           SUCCESS("roboRIO Connected!");
 
@@ -175,7 +175,7 @@ bool DeploySession::Blink(const std::string& macAddress,
             throw e;
           }
         } catch (const SshSession::SshException& e) {
-          DEBUG("SSH connection to {} failed with {}.", ip, e.what());
+          DEBUG("SSH connection to {} failed with {}.", ip.str(), e.what());
           throw e;
         }
         return 0;
