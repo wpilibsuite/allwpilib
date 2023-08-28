@@ -6,8 +6,9 @@
 
 #include <jni.h>
 
+#include <fmt/format.h>
+
 #include "edu_wpi_first_util_WPIUtilJNI.h"
-#include "fmt/format.h"
 #include "wpi/Synchronization.h"
 #include "wpi/jni_util.h"
 #include "wpi/timestamp.h"

@@ -7,7 +7,8 @@
 #include <array>
 #include <functional>
 
-#include "Eigen/QR"
+#include <Eigen/QR>
+
 #include "frc/EigenCore.h"
 #include "frc/system/Discretization.h"
 #include "frc/system/LinearSystem.h"

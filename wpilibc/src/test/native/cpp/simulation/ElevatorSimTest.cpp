@@ -2,6 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <gtest/gtest.h>
 #include <units/math.h>
 #include <units/time.h>
 
@@ -14,7 +15,6 @@
 #include "frc/system/NumericalIntegration.h"
 #include "frc/system/plant/DCMotor.h"
 #include "frc/system/plant/LinearSystemId.h"
-#include "gtest/gtest.h"
 
 #define EXPECT_NEAR_UNITS(val1, val2, eps) \
   EXPECT_LE(units::math::abs(val1 - val2), eps)

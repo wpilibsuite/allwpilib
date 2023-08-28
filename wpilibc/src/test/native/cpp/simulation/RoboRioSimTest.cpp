@@ -4,12 +4,12 @@
 
 #include "frc/simulation/RoboRioSim.h"  // NOLINT(build/include_order)
 
+#include <gtest/gtest.h>
 #include <hal/HAL.h>
 #include <hal/HALBase.h>
 
 #include "callback_helpers/TestCallbackHelpers.h"
 #include "frc/RobotController.h"
-#include "gtest/gtest.h"
 
 namespace frc::sim {
 

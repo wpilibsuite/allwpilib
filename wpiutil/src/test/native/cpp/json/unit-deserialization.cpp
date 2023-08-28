@@ -32,13 +32,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE  OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "gtest/gtest.h"
-
 #include "unit-json.h"
-#include "wpi/raw_istream.h"
-using wpi::json;
 
 #include <valarray>
+
+#include <gtest/gtest.h>
+
+#include "wpi/raw_istream.h"
+
+using wpi::json;
 
 TEST(JsonDeserializationTest, SuccessfulStream)
 {

@@ -4,10 +4,11 @@
 
 #include <vector>
 
+#include <gtest/gtest.h>
+
 #include "frc/kinematics/DifferentialDriveKinematics.h"
 #include "frc/trajectory/constraint/MaxVelocityConstraint.h"
 #include "frc/trajectory/constraint/RectangularRegionConstraint.h"
-#include "gtest/gtest.h"
 #include "trajectory/TestTrajectory.h"
 #include "units/acceleration.h"
 #include "units/length.h"

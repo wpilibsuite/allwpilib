@@ -9,6 +9,8 @@
 #include <string_view>
 #include <vector>
 
+#include <gtest/gtest.h>
+
 #include "../MockLogger.h"
 #include "../PubSubOptionsMatcher.h"
 #include "../SpanMatcher.h"
@@ -18,7 +20,6 @@
 #include "MockNetworkInterface.h"
 #include "MockWireConnection.h"
 #include "gmock/gmock.h"
-#include "gtest/gtest.h"
 #include "net/Message.h"
 #include "net/ServerImpl.h"
 #include "net/WireEncoder.h"

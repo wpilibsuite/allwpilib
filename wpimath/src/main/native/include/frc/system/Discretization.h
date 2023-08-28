@@ -4,9 +4,10 @@
 
 #pragma once
 
+#include <unsupported/Eigen/MatrixFunctions>
+
 #include "frc/EigenCore.h"
 #include "units/time.h"
-#include "unsupported/Eigen/MatrixFunctions"
 
 namespace frc {
 

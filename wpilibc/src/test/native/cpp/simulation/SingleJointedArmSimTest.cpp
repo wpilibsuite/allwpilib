@@ -4,8 +4,9 @@
 
 #include <numbers>
 
+#include <gtest/gtest.h>
+
 #include "frc/simulation/SingleJointedArmSim.h"
-#include "gtest/gtest.h"
 
 TEST(SingleJointedArmTest, Disabled) {
   frc::sim::SingleJointedArmSim sim(frc::DCMotor::Vex775Pro(2), 300, 3_kg_sq_m,

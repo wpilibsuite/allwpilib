@@ -4,9 +4,10 @@
 
 #include <jni.h>
 
+#include <fmt/format.h>
+
 #include "WPIUtilJNI.h"
 #include "edu_wpi_first_util_datalog_DataLogJNI.h"
-#include "fmt/format.h"
 #include "wpi/DataLog.h"
 #include "wpi/jni_util.h"
 

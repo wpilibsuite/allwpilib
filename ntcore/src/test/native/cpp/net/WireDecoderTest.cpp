@@ -2,6 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <gtest/gtest.h>
 #include <wpi/SmallString.h>
 #include <wpi/raw_ostream.h>
 
@@ -9,7 +10,6 @@
 #include "../TestPrinters.h"
 #include "Handle.h"
 #include "gmock/gmock.h"
-#include "gtest/gtest.h"
 #include "net/Message.h"
 #include "net/WireDecoder.h"
 #include "networktables/NetworkTableValue.h"

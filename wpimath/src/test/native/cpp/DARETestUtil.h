@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "Eigen/Core"
+#include <Eigen/Core>
 
 void ExpectMatrixEqual(const Eigen::MatrixXd& lhs, const Eigen::MatrixXd& rhs,
                        double tolerance);

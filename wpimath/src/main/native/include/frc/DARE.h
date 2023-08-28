@@ -7,9 +7,10 @@
 #include <stdexcept>
 #include <string>
 
-#include "Eigen/Cholesky"
-#include "Eigen/Core"
-#include "Eigen/LU"
+#include <Eigen/Cholesky>
+#include <Eigen/Core>
+#include <Eigen/LU>
+
 #include "frc/StateSpaceUtil.h"
 #include "frc/fmt/Eigen.h"
 

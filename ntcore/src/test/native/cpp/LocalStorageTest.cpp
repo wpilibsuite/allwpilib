@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <gtest/gtest.h>
+
 #include "LocalStorage.h"
 #include "MockListenerStorage.h"
 #include "MockLogger.h"
@@ -10,7 +12,6 @@
 #include "TestPrinters.h"
 #include "ValueMatcher.h"
 #include "gmock/gmock.h"
-#include "gtest/gtest.h"
 #include "net/MockNetworkInterface.h"
 #include "ntcore_c.h"
 #include "ntcore_cpp.h"
