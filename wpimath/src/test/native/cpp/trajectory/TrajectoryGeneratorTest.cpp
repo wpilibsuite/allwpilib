@@ -4,11 +4,12 @@
 
 #include <vector>
 
+#include <gtest/gtest.h>
+
 #include "frc/trajectory/Trajectory.h"
 #include "frc/trajectory/TrajectoryGenerator.h"
 #include "frc/trajectory/constraint/CentripetalAccelerationConstraint.h"
 #include "frc/trajectory/constraint/TrajectoryConstraint.h"
-#include "gtest/gtest.h"
 #include "trajectory/TestTrajectory.h"
 #include "units/math.h"
 

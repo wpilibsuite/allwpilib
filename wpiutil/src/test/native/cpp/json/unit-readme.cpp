@@ -32,10 +32,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE  OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "gtest/gtest.h"
-
 #include "unit-json.h"
-using wpi::json;
 
 #include <array>
 #include <deque>
@@ -45,7 +42,11 @@ using wpi::json;
 #include <unordered_map>
 #include <unordered_set>
 
+#include <gtest/gtest.h>
+
 #include "wpi/raw_ostream.h"
+
+using wpi::json;
 
 TEST(JsonReadmeTest, Basic)
 {

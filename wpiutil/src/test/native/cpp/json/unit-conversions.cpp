@@ -32,11 +32,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE  OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "gtest/gtest.h"
-
 #include "unit-json.h"
-using wpi::json;
-using wpi::JsonTest;
 
 #include <cmath>
 #include <deque>
@@ -45,6 +41,11 @@ using wpi::JsonTest;
 #include <map>
 #include <unordered_map>
 #include <unordered_set>
+
+#include <gtest/gtest.h>
+
+using wpi::json;
+using wpi::JsonTest;
 
 template <typename T>
 class JsonGetObjectTest : public ::testing::Test {

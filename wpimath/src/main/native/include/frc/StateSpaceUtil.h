@@ -10,11 +10,11 @@
 #include <limits>
 #include <random>
 
+#include <Eigen/Eigenvalues>
+#include <Eigen/QR>
 #include <wpi/SymbolExports.h>
 #include <wpi/deprecated.h>
 
-#include "Eigen/Eigenvalues"
-#include "Eigen/QR"
 #include "frc/EigenCore.h"
 #include "frc/geometry/Pose2d.h"
 

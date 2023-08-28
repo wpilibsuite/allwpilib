@@ -6,8 +6,9 @@
 
 #include <jni.h>
 
+#include <fmt/format.h>
+
 #include "edu_wpi_first_util_WPIUtilJNI.h"
-#include "fmt/format.h"
 #include "wpi/Synchronization.h"
 #include "wpi/jni_util.h"
 #include "wpi/timestamp.h"
@@ -78,7 +79,7 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_util_WPIUtilJNI_writeStderr
   (JNIEnv* env, jclass, jstring str)
 {
-  fmt::print(stderr, "{}", JStringRef{env, str});
+  fmt::print(stderr, "{}", JStringRef{env, str}.str());
 }
 
 /*

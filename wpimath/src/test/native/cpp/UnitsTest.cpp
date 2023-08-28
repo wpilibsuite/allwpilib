@@ -7,7 +7,8 @@
 #include <string>
 #include <type_traits>
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
+
 #include "units/acceleration.h"
 #include "units/angle.h"
 #include "units/angular_acceleration.h"

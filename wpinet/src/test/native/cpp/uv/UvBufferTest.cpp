@@ -4,7 +4,7 @@
 
 #include "wpinet/uv/Buffer.h"  // NOLINT(build/include_order)
 
-#include "gtest/gtest.h"  // NOLINT(build/include_order)
+#include <gtest/gtest.h>
 
 namespace wpi::uv {
 

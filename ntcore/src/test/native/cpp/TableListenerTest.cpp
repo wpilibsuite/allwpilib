@@ -4,9 +4,10 @@
 
 #include <memory>
 
+#include <gtest/gtest.h>
+
 #include "TestPrinters.h"
 #include "gmock/gmock.h"
-#include "gtest/gtest.h"
 #include "networktables/DoubleTopic.h"
 #include "networktables/NetworkTableInstance.h"
 #include "ntcore_cpp.h"

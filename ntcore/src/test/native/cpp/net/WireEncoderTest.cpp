@@ -7,6 +7,7 @@
 #include <string_view>
 #include <vector>
 
+#include <gtest/gtest.h>
 #include <wpi/json.h>
 #include <wpi/raw_ostream.h>
 
@@ -15,7 +16,6 @@
 #include "Handle.h"
 #include "PubSubOptions.h"
 #include "gmock/gmock-matchers.h"
-#include "gtest/gtest.h"
 #include "net/Message.h"
 #include "net/WireEncoder.h"
 #include "networktables/NetworkTableValue.h"

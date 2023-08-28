@@ -4,13 +4,13 @@
 
 #include "frc/PowerDistribution.h"  // NOLINT(build/include_order)
 
+#include <gtest/gtest.h>
 #include <hal/Ports.h>
 #include <units/time.h>
 
 #include "TestBench.h"
 #include "frc/Timer.h"
 #include "frc/motorcontrol/Talon.h"
-#include "gtest/gtest.h"
 
 static constexpr auto kMotorTime = 0.25_s;
 

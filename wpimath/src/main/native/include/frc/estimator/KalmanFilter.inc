@@ -10,7 +10,8 @@
 #include <stdexcept>
 #include <string>
 
-#include "Eigen/Cholesky"
+#include <Eigen/Cholesky>
+
 #include "frc/DARE.h"
 #include "frc/StateSpaceUtil.h"
 #include "frc/estimator/KalmanFilter.h"

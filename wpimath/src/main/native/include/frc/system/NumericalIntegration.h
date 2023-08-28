@@ -9,7 +9,8 @@
 #include <algorithm>
 #include <array>
 
-#include "Eigen/Core"
+#include <Eigen/Core>
+
 #include "units/time.h"
 
 namespace frc {

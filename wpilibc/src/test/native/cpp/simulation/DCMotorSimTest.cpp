@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <gtest/gtest.h>
+
 #include "frc/Encoder.h"
 #include "frc/RobotController.h"
 #include "frc/controller/PIDController.h"
@@ -10,7 +12,6 @@
 #include "frc/simulation/DCMotorSim.h"
 #include "frc/simulation/EncoderSim.h"
 #include "frc/simulation/RoboRioSim.h"
-#include "gtest/gtest.h"
 
 TEST(DCMotorSimTest, VoltageSteadyState) {
   frc::DCMotor gearbox = frc::DCMotor::NEO(1);

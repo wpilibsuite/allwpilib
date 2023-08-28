@@ -6,7 +6,8 @@
 
 #include <stdexcept>
 
-#include "Eigen/Cholesky"
+#include <Eigen/Cholesky>
+
 #include "frc/DARE.h"
 #include "frc/StateSpaceUtil.h"
 #include "frc/system/Discretization.h"

@@ -4,12 +4,13 @@
 
 #include <stdexcept>
 
+#include <Eigen/Core>
+#include <gtest/gtest.h>
+
 #include "DARETestUtil.h"
-#include "Eigen/Core"
 #include "frc/DARE.h"
 #include "frc/EigenCore.h"
 #include "frc/fmt/Eigen.h"
-#include "gtest/gtest.h"
 
 // 2x1
 extern template Eigen::Matrix<double, 2, 2> frc::DARE<2, 1>(

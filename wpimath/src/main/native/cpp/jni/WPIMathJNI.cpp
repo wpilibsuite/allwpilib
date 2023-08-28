@@ -7,16 +7,16 @@
 #include <exception>
 #include <stdexcept>
 
+#include <Eigen/Cholesky>
+#include <Eigen/Core>
+#include <Eigen/QR>
+#include <unsupported/Eigen/MatrixFunctions>
 #include <wpi/jni_util.h>
 
-#include "Eigen/Cholesky"
-#include "Eigen/Core"
-#include "Eigen/QR"
 #include "edu_wpi_first_math_WPIMathJNI.h"
 #include "frc/DARE.h"
 #include "frc/geometry/Pose3d.h"
 #include "frc/trajectory/TrajectoryUtil.h"
-#include "unsupported/Eigen/MatrixFunctions"
 
 using namespace wpi::java;
 

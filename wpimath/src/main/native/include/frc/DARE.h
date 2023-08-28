@@ -7,9 +7,10 @@
 #include <stdexcept>
 #include <string>
 
-#include "Eigen/Cholesky"
-#include "Eigen/Core"
-#include "Eigen/LU"
+#include <Eigen/Cholesky>
+#include <Eigen/Core>
+#include <Eigen/LU>
+
 #include "frc/StateSpaceUtil.h"
 #include "frc/fmt/Eigen.h"
 
@@ -213,7 +214,7 @@ performance. The solver may hang if any of the following occur:
 <ul>
   <li>Q − NR⁻¹Nᵀ isn't symmetric positive semidefinite</li>
   <li>R isn't symmetric positive definite</li>
-  <li>The (A, B) pair isn't stabilizable</li>
+  <li>The (A − BR⁻¹Nᵀ, B) pair isn't stabilizable</li>
   <li>The (A, C) pair where Q = CᵀC isn't detectable</li>
 </ul>
 Only use this function if you're sure the preconditions are met.
@@ -336,7 +337,7 @@ J = Σ [uₖ] [0 R][uₖ] ΔT
 @throws std::invalid_argument if Q − NR⁻¹Nᵀ isn't symmetric positive
   semidefinite.
 @throws std::invalid_argument if R isn't symmetric positive definite.
-@throws std::invalid_argument if the (A, B) pair isn't stabilizable.
+@throws std::invalid_argument if the (A − BR⁻¹Nᵀ, B) pair isn't stabilizable.
 @throws std::invalid_argument if the (A, C) pair where Q = CᵀC isn't detectable.
 */
 template <int States, int Inputs>

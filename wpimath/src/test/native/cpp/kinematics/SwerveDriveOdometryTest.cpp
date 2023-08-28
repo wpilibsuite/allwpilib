@@ -5,12 +5,13 @@
 #include <limits>
 #include <random>
 
+#include <gtest/gtest.h>
+
 #include "frc/kinematics/SwerveDriveKinematics.h"
 #include "frc/kinematics/SwerveDriveOdometry.h"
 #include "frc/trajectory/Trajectory.h"
 #include "frc/trajectory/TrajectoryConfig.h"
 #include "frc/trajectory/TrajectoryGenerator.h"
-#include "gtest/gtest.h"
 
 using namespace frc;
 

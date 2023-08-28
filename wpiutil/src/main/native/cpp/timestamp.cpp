@@ -36,7 +36,7 @@ using namespace nRoboRIO_FPGANamespace;
 
 #include <cstdio>
 
-#include "fmt/format.h"
+#include <fmt/format.h>
 
 #ifdef __FRC_ROBORIO__
 namespace {

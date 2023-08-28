@@ -410,7 +410,8 @@ void LocalStorage::Impl::NetworkAnnounce(TopicData* topic,
 }
 
 void LocalStorage::Impl::RemoveNetworkPublisher(TopicData* topic) {
-  DEBUG4("LS RemoveNetworkPublisher({}, {})", topic->handle, topic->name);
+  DEBUG4("LS RemoveNetworkPublisher({}, {})", topic->handle.GetHandle(),
+         topic->name);
   // this acts as an unpublish
   bool didExist = topic->Exists();
   topic->onNetwork = false;

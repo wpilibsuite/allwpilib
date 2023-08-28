@@ -26,7 +26,8 @@
 #include <random>
 #include <vector>
 
-#include "fmt/format.h"
+#include <fmt/format.h>
+
 #include "wpi/Endian.h"
 #include "wpi/Logger.h"
 #include "wpi/MathExtras.h"

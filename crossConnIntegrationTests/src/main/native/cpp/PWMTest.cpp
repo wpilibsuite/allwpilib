@@ -5,6 +5,7 @@
 #include <atomic>
 #include <thread>
 
+#include <gtest/gtest.h>
 #include <hal/DMA.h>
 #include <hal/HAL.h>
 #include <wpi/SmallVector.h>
@@ -13,7 +14,6 @@
 
 #include "CrossConnects.h"
 #include "LifetimeWrappers.h"
-#include "gtest/gtest.h"
 
 using namespace hlt;
 

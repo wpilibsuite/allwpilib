@@ -4,13 +4,13 @@
 
 #include <numbers>
 
+#include <gtest/gtest.h>
 #include <hal/HAL.h>
 #include <units/math.h>
 
 #include "frc/AnalogEncoder.h"
 #include "frc/AnalogInput.h"
 #include "frc/simulation/AnalogEncoderSim.h"
-#include "gtest/gtest.h"
 
 #define EXPECT_NEAR_UNITS(val1, val2, eps) \
   EXPECT_LE(units::math::abs(val1 - val2), eps)
