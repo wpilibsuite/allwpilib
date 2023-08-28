@@ -4,9 +4,10 @@
 
 #include <atomic>
 
+#include <gtest/gtest.h>
+
 #include "frc/event/BooleanEvent.h"
 #include "frc/event/EventLoop.h"
-#include "gtest/gtest.h"
 
 using namespace frc;
 
