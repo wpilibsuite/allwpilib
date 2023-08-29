@@ -2,8 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <gtest/gtest.h>
+
 #include "frc/kinematics/MecanumDriveWheelSpeeds.h"
-#include "gtest/gtest.h"
 
 TEST(MecanumDriveWheelSpeedsTest, Plus) {
   const frc::MecanumDriveWheelSpeeds left{1.0_mps, 0.5_mps, 2.0_mps, 1.5_mps};
