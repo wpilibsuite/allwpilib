@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "units/angle.h"
+#include "units/angular_velocity.h"
 #include "units/base.h"
 #include "units/time.h"
 
