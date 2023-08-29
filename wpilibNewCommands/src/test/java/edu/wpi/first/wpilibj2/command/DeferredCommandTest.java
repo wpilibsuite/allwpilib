@@ -25,7 +25,7 @@ class DeferredCommandTest extends CommandTestBase {
   @ValueSource(booleans = {true, false})
   void deferredFunctionsTest(boolean interrupted) {
     MockCommandHolder innerCommand = new MockCommandHolder(false);
-    DeferredCommand command = new DeferredCommand(() -> innerCommand.getMock(), Set.of());
+    DeferredCommand command = new DeferredCommand(innerCommand::getMock, Set.of());
 
     command.initialize();
     verify(innerCommand.getMock()).initialize();
@@ -66,16 +66,20 @@ class DeferredCommandTest extends CommandTestBase {
   @Test
   void deferredRequirementsTest() {
     Subsystem subsystem = new Subsystem() {};
-    DeferredCommand command = new DeferredCommand(() -> Commands.none(), Set.of(subsystem));
+    DeferredCommand command = new DeferredCommand(Commands::none, Set.of(subsystem));
 
     assertTrue(command.getRequirements().contains(subsystem));
   }
 
   @Test
   void deferredNullCommandTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      DeferredCommand command = new DeferredCommand(() -> null, Set.of());
-      assertDoesNotThrow(() -> scheduler.schedule(command));
-    }
+    DeferredCommand command = new DeferredCommand(() -> null, Set.of());
+    assertDoesNotThrow(
+        () -> {
+          command.initialize();
+          command.execute();
+          command.isFinished();
+          command.end(false);
+        });
   }
 }
