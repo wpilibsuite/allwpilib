@@ -25,6 +25,15 @@ public final class Commands {
     return new InstantCommand();
   }
 
+  /**
+   * Constructs a command that does nothing until interrupted.
+   *
+   * @return the command
+   */
+  public static Command idle() {
+    return run(() -> {});
+  }
+
   // Action Commands
 
   /**

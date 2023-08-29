@@ -31,6 +31,14 @@ namespace cmd {
 [[nodiscard]]
 CommandPtr None();
 
+/**
+ * Constructs a command that does nothing until interrupted.
+ *
+ * @return the command
+ */
+[[nodiscard]]
+CommandPtr Idle();
+
 // Action Commands
 
 /**
