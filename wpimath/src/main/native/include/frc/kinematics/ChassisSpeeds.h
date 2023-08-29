@@ -24,12 +24,12 @@ namespace frc {
  */
 struct WPILIB_DLLEXPORT ChassisSpeeds {
   /**
-   * Represents forward velocity. (Fwd is +)
+   * Velocity along the x-axis. (Fwd is +)
    */
   units::meters_per_second_t vx = 0_mps;
 
   /**
-   * Represents strafe velocity. (Left is +)
+   * Velocity along the y-axis. (Left is +)
    */
   units::meters_per_second_t vy = 0_mps;
 

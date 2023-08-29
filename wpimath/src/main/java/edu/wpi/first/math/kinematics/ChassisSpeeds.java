@@ -17,10 +17,10 @@ import edu.wpi.first.math.geometry.Rotation2d;
  * will often have all three components.
  */
 public class ChassisSpeeds {
-  /** Represents forward velocity. (Fwd is +) */
+  /** Velocity along the x-axis. (Fwd is +) */
   public double vxMetersPerSecond;
 
-  /** Represents sideways velocity. (Left is +) */
+  /** Velocity along the y-axis. (Left is +) */
   public double vyMetersPerSecond;
 
   /** Represents the angular velocity of the robot frame. (CCW is +) */
