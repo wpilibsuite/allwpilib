@@ -52,8 +52,8 @@
 
 using namespace units::acceleration;
 using namespace units::angle;
-using namespace units::angular_jerk;
 using namespace units::angular_acceleration;
+using namespace units::angular_jerk;
 using namespace units::angular_velocity;
 using namespace units::area;
 using namespace units::capacitance;
