@@ -32,6 +32,15 @@ class ProxyCommand : public CommandHelper<Command, ProxyCommand> {
   explicit ProxyCommand(wpi::unique_function<Command*()> supplier);
 
   /**
+   * Creates a new ProxyCommand that schedules the supplied command when
+   * initialized, and ends when it is no longer scheduled. Useful for lazily
+   * creating commands at runtime.
+   *
+   * @param supplier the command supplier
+   */
+  explicit ProxyCommand(wpi::unique_function<CommandPtr()> supplier);
+
+  /**
    * Creates a new ProxyCommand that schedules the given command when
    * initialized, and ends when it is no longer scheduled.
    *
@@ -55,8 +64,6 @@ class ProxyCommand : public CommandHelper<Command, ProxyCommand> {
   void Initialize() override;
 
   void End(bool interrupted) override;
-
-  void Execute() override;
 
   bool IsFinished() override;
 
