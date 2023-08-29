@@ -15,6 +15,8 @@
 #include <utility>
 #include <vector>
 
+#include <fmt/core.h>
+
 #include "wpi/ConvertUTF.h"
 #include "wpi/SafeThread.h"
 #include "wpi/SmallString.h"
@@ -158,8 +160,8 @@ class JStringRef {
         env->ReleaseStringCritical(str, chars);
       }
     } else {
-      errs() << "JStringRef was passed a null pointer at \n"
-             << GetJavaStackTrace(env);
+      fmt::print(stderr, "JStringRef was passed a null pointer at\n",
+                 GetJavaStackTrace(env));
     }
     // Ensure str is null-terminated.
     m_str.push_back('\0');
@@ -281,8 +283,8 @@ class JSpanBase {
         m_elements{static_cast<std::remove_cv_t<T>*>(
             bb ? env->GetDirectBufferAddress(bb) : nullptr)} {
     if (!bb) {
-      errs() << "JSpan was passed a null pointer at \n"
-             << GetJavaStackTrace(env);
+      fmt::print(stderr, "JSpan was passed a null pointer at\n",
+                 GetJavaStackTrace(env));
     }
   }
 
@@ -300,8 +302,8 @@ class JSpanBase {
         m_elements = ArrHelper::GetArrayElements(env, jarr);
       }
     } else {
-      errs() << "JSpan was passed a null pointer at \n"
-             << GetJavaStackTrace(env);
+      fmt::print(stderr, "JSpan was passed a null pointer at\n",
+                 GetJavaStackTrace(env));
     }
   }
 
