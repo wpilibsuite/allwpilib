@@ -84,6 +84,31 @@ model {
                         def applicationPath = binary.executable.file
                         def icon = file("$project.projectDir/src/app/native/mac/glass.icns")
 
+                        // Create the ZIP.
+                        def task = project.tasks.create("copyGlassExecutable" + binary.targetPlatform.operatingSystem.name + binary.targetPlatform.architecture.name, Zip) {
+                            description("Copies the Glass executable to the outputs directory.")
+                            destinationDirectory = outputsFolder
+
+                            archiveBaseName = '_M_' + zipBaseName
+                            duplicatesStrategy = 'exclude'
+                            archiveClassifier = nativeUtils.getPublishClassifier(binary)
+
+                            from(licenseFile) {
+                                into '/'
+                            }
+
+                            from(applicationPath)
+
+                            if (binary.targetPlatform.operatingSystem.isWindows()) {
+                                def exePath = binary.executable.file.absolutePath
+                                exePath = exePath.substring(0, exePath.length() - 4)
+                                def pdbPath = new File(exePath + '.pdb')
+                                from(pdbPath)
+                            }
+
+                            into(nativeUtils.getPlatformPath(binary))
+                        }
+
                         if (binary.targetPlatform.operatingSystem.isMacOsX()) {
                             // Create the macOS bundle.
                             def bundleTask = project.tasks.create("bundleGlassOsxApp" + binary.targetPlatform.architecture.name, Copy) {
@@ -129,33 +154,6 @@ model {
                             bundleTask.dependsOn binary.tasks.link
                             task.dependsOn(bundleTask)
                         }
-
-                        // Create the ZIP.
-                        def task = project.tasks.create("copyGlassExecutable" + binary.targetPlatform.operatingSystem.name + binary.targetPlatform.architecture.name, Zip) {
-                            description("Copies the Glass executable to the outputs directory.")
-                            destinationDirectory = outputsFolder
-
-                            archiveBaseName = '_M_' + zipBaseName
-                            duplicatesStrategy = 'exclude'
-                            archiveClassifier = nativeUtils.getPublishClassifier(binary)
-
-                            from(licenseFile) {
-                                into '/'
-                            }
-
-                            from(applicationPath)
-
-                            if (binary.targetPlatform.operatingSystem.isWindows()) {
-                                def exePath = binary.executable.file.absolutePath
-                                exePath = exePath.substring(0, exePath.length() - 4)
-                                def pdbPath = new File(exePath + '.pdb')
-                                from(pdbPath)
-                            }
-
-                            into(nativeUtils.getPlatformPath(binary))
-                        }
-
-
 
                         task.dependsOn binary.tasks.link
                         glassAppTaskList.add(task)
