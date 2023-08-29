@@ -61,6 +61,9 @@ model {
                 project(':ntcore').addNtcoreDependency(binary, 'static')
                 lib project: ':wpinet', library: 'wpinet', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                    nativeUtils.useRequiredLibrary(it, 'ni_link_libraries')
+                }
             }
         }
     }
