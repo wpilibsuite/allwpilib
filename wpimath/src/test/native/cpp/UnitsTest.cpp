@@ -13,6 +13,7 @@
 #include "units/angle.h"
 #include "units/angular_acceleration.h"
 #include "units/angular_velocity.h"
+#include "units/angular_jerk.h"
 #include "units/area.h"
 #include "units/capacitance.h"
 #include "units/charge.h"
