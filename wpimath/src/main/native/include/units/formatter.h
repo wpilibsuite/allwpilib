@@ -4,41 +4,41 @@
 
 #pragma once
 
+#include <type_traits>
+
 #include <fmt/format.h>
 
 #include "units/base.h"
 
+// FIXME: Replace enable_if with requires clause and remove <type_traits>
+// include once using GCC >= 12. GCC 11 incorrectly emits a struct redefinition
+// error because it doesn't use the requires clause to disambiguate.
+
 /**
  * Formatter for unit types.
- *
- * @tparam Units Unit tag for which type of units the `unit_t` represents (e.g.
- *               meters).
- * @tparam T Underlying type of the storage. Defaults to double.
- * @tparam NonLinearScale Optional scale class for the units. Defaults to linear
- *                        (i.e. does not scale the unit value). Examples of
- *                        non-linear scales could be logarithmic, decibel, or
- *                        richter scales. Non-linear scales must adhere to the
- *                        non-linear-scale concept.
  */
-template <class Units, typename T, template <typename> class NonLinearScale>
-struct fmt::formatter<units::unit_t<Units, T, NonLinearScale>>
-    : fmt::formatter<double> {
+template <typename Unit, typename CharT>
+struct fmt::formatter<Unit, CharT,
+                      std::enable_if_t<units::traits::is_unit_t_v<Unit>>> {
+  constexpr auto parse(fmt::format_parse_context& ctx) {
+    return m_underlying.parse(ctx);
+  }
+
   /**
    * Writes out a formatted unit.
    *
    * @param obj Unit instance.
    * @param ctx Format string context.
    */
-  auto format(const units::unit_t<Units, T, NonLinearScale>& obj,
-              fmt::format_context& ctx) const {
+  auto format(const Unit& obj, fmt::format_context& ctx) const {
+    using Units = typename Unit::unit_type;
     using BaseUnits =
         units::unit<std::ratio<1>,
                     typename units::traits::unit_traits<Units>::base_unit_type>;
 
     auto out = ctx.out();
 
-    out = fmt::formatter<double>::format(
-        units::convert<Units, BaseUnits>(obj()), ctx);
+    out = m_underlying.format(units::convert<Units, BaseUnits>(obj()), ctx);
 
     if constexpr (units::traits::unit_traits<
                       Units>::base_unit_type::meter_ratio::num != 0) {
@@ -213,4 +213,7 @@ struct fmt::formatter<units::unit_t<Units, T, NonLinearScale>>
 
     return out;
   }
+
+ private:
+  fmt::formatter<typename Unit::underlying_type, CharT> m_underlying;
 };

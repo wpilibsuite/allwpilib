@@ -4,7 +4,12 @@ include(SubDirList)
 include(CompileWarnings)
 include(AddTest)
 
-file(GLOB wpimath_jni_src src/main/native/cpp/jni/WPIMathJNI.cpp)
+file(GLOB wpimath_jni_src src/main/native/cpp/jni/WPIMathJNI_DARE.cpp
+                          src/main/native/cpp/jni/WPIMathJNI_Eigen.cpp
+                          src/main/native/cpp/jni/WPIMathJNI_Exceptions.cpp
+                          src/main/native/cpp/jni/WPIMathJNI_Pose3d.cpp
+                          src/main/native/cpp/jni/WPIMathJNI_StateSpaceUtil.cpp
+                          src/main/native/cpp/jni/WPIMathJNI_Trajectory.cpp)
 
 # Java bindings
 if (WITH_JAVA)
