@@ -7,10 +7,9 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc/util/Color8Bit.h>
 
+#include <gtest/gtest.h>
 #include <networktables/NetworkTableInstance.h>
 #include <units/angle.h>
-
-#include "gtest/gtest.h"
 
 class Mechanism2dTest;
 
