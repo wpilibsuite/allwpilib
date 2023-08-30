@@ -23,8 +23,10 @@ ProxyCommand::ProxyCommand(Command* command)
   SetName(std::string{"Proxy("}.append(command->GetName()).append(")"));
 }
 
-ProxyCommand::ProxyCommand(std::unique_ptr<Command> command)
-    : ProxyCommand([command = std::move(command)] { return command.get(); }) {}
+ProxyCommand::ProxyCommand(std::unique_ptr<Command> command) {
+  SetName(std::string{"Proxy("}.append(command->GetName()).append(")"));
+  m_supplier = [command = std::move(command)] { return command.get(); };
+}
 
 void ProxyCommand::Initialize() {
   m_command = m_supplier();
