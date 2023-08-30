@@ -21,11 +21,11 @@ if (WITH_JAVA)
 
         message(STATUS "Downloading Jackson jarfiles...")
 
-        DOWNLOAD_AND_CHECK("${BASE_URL}com/fasterxml/jackson/core/jackson-core/2.15.2/jackson-core-2.15.2.jar"
+        download_and_check("${BASE_URL}com/fasterxml/jackson/core/jackson-core/2.15.2/jackson-core-2.15.2.jar"
             "${JAR_ROOT}/jackson-core-2.15.2.jar")
-        DOWNLOAD_AND_CHECK("${BASE_URL}com/fasterxml/jackson/core/jackson-databind/2.15.2/jackson-databind-2.15.2.jar"
+        download_and_check("${BASE_URL}com/fasterxml/jackson/core/jackson-databind/2.15.2/jackson-databind-2.15.2.jar"
             "${JAR_ROOT}/jackson-databind-2.15.2.jar")
-        DOWNLOAD_AND_CHECK("${BASE_URL}com/fasterxml/jackson/core/jackson-annotations/2.15.2/jackson-annotations-2.15.2.jar"
+        download_and_check("${BASE_URL}com/fasterxml/jackson/core/jackson-annotations/2.15.2/jackson-annotations-2.15.2.jar"
             "${JAR_ROOT}/jackson-annotations-2.15.2.jar")
 
         message(STATUS "All files downloaded.")
