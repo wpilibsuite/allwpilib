@@ -52,7 +52,7 @@ if (NOT MSVC AND NOT APPLE)
     endif()
 endif()
 
-GENERATE_RESOURCES(src/main/native/resources generated/main/cpp WPI wpi wpinet_resources_src)
+generate_resources(src/main/native/resources generated/main/cpp WPI wpi wpinet_resources_src)
 
 file(GLOB_RECURSE wpinet_native_src src/main/native/cpp/*.cpp src/main/native/thirdparty/tcpsockets/cpp/*.cpp)
 list(REMOVE_ITEM wpinet_native_src ${wpinet_jni_src})
@@ -177,7 +177,7 @@ configure_file(wpinet-config.cmake.in ${WPILIB_BINARY_DIR}/wpinet-config.cmake )
 install(FILES ${WPILIB_BINARY_DIR}/wpinet-config.cmake DESTINATION ${wpinet_config_dir})
 install(EXPORT wpinet DESTINATION ${wpinet_config_dir})
 
-SUBDIR_LIST(wpinet_examples "${CMAKE_CURRENT_SOURCE_DIR}/examples")
+subdir_list(wpinet_examples "${CMAKE_CURRENT_SOURCE_DIR}/examples")
 foreach(example ${wpinet_examples})
     file(GLOB wpinet_example_src examples/${example}/*.cpp)
     if(wpinet_example_src)
