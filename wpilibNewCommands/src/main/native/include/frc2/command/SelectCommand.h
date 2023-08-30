@@ -54,8 +54,10 @@ class SelectCommand : public CommandHelper<Command, SelectCommand<Key>> {
          std::make_unique<std::decay_t<Commands>>(std::move(commands.second))),
      ...);
 
+    m_defaultCommand.SetComposed(true);
     for (auto&& command : foo) {
       CommandScheduler::GetInstance().RequireUngrouped(command.second.get());
+      command.second.get()->SetComposed(true);
     }
 
     for (auto&& command : foo) {
@@ -73,8 +75,10 @@ class SelectCommand : public CommandHelper<Command, SelectCommand<Key>> {
       std::function<Key()> selector,
       std::vector<std::pair<Key, std::unique_ptr<Command>>>&& commands)
       : m_selector{std::move(selector)} {
+    m_defaultCommand.SetComposed(true);
     for (auto&& command : commands) {
       CommandScheduler::GetInstance().RequireUngrouped(command.second.get());
+      command.second.get()->SetComposed(true);
     }
 
     for (auto&& command : commands) {
@@ -139,14 +143,16 @@ class SelectCommand : public CommandHelper<Command, SelectCommand<Key>> {
   bool m_runsWhenDisabled = true;
   Command::InterruptionBehavior m_interruptBehavior{
       Command::InterruptionBehavior::kCancelIncoming};
+
+  PrintCommand m_defaultCommand{
+      "SelectCommand selector value does not correspond to any command!"};
 };
 
 template <typename T>
 void SelectCommand<T>::Initialize() {
   auto find = m_commands.find(m_selector());
   if (find == m_commands.end()) {
-    m_selectedCommand = new PrintCommand(
-        "SelectCommand selector value does not correspond to any command!");
+    m_selectedCommand = &m_defaultCommand;
   } else {
     m_selectedCommand = find->second.get();
   }
