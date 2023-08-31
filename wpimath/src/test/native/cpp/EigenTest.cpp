@@ -30,17 +30,17 @@ TEST(EigenTest, Multiplication) {
 }
 
 TEST(EigenTest, Transpose) {
-  frc::Vectord<3> vec{1, 2, 3};
+  Eigen::Vector3d vec{1, 2, 3};
 
   const auto transpose = vec.transpose();
 
-  Eigen::RowVector<double, 3> expectedTranspose{1, 2, 3};
+  Eigen::RowVector3d expectedTranspose{1, 2, 3};
 
   EXPECT_TRUE(expectedTranspose.isApprox(transpose));
 }
 
 TEST(EigenTest, Inverse) {
-  frc::Matrixd<3, 3> mat{{1.0, 3.0, 2.0}, {5.0, 2.0, 1.5}, {0.0, 1.3, 2.5}};
+  Eigen::Matrix3d mat{{1.0, 3.0, 2.0}, {5.0, 2.0, 1.5}, {0.0, 1.3, 2.5}};
 
   const auto inverse = mat.inverse();
   const auto identity = Eigen::MatrixXd::Identity(3, 3);

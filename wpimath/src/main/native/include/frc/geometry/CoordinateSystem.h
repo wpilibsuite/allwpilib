@@ -6,7 +6,6 @@
 
 #include <wpi/SymbolExports.h>
 
-#include "frc/EigenCore.h"
 #include "frc/geometry/CoordinateAxis.h"
 #include "frc/geometry/Pose3d.h"
 #include "frc/geometry/Rotation3d.h"

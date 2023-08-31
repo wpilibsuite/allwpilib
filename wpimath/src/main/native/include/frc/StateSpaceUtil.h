@@ -226,7 +226,7 @@ Vectord<N> MakeWhiteNoiseVector(const std::array<double, N>& stdDevs) {
  * @return The vector.
  */
 WPILIB_DLLEXPORT
-Vectord<3> PoseTo3dVector(const Pose2d& pose);
+Eigen::Vector3d PoseTo3dVector(const Pose2d& pose);
 
 /**
  * Converts a Pose2d into a vector of [x, y, std::cos(theta), std::sin(theta)].
@@ -236,7 +236,7 @@ Vectord<3> PoseTo3dVector(const Pose2d& pose);
  * @return The vector.
  */
 WPILIB_DLLEXPORT
-Vectord<4> PoseTo4dVector(const Pose2d& pose);
+Eigen::Vector4d PoseTo4dVector(const Pose2d& pose);
 
 /**
  * Returns true if (A, B) is a stabilizable pair.
@@ -301,7 +301,7 @@ WPILIB_DLLEXPORT bool IsStabilizable<Eigen::Dynamic, Eigen::Dynamic>(
  * @return The vector.
  */
 WPILIB_DLLEXPORT
-Vectord<3> PoseToVector(const Pose2d& pose);
+Eigen::Vector3d PoseToVector(const Pose2d& pose);
 
 /**
  * Clamps input vector between system's minimum and maximum allowable input.

@@ -4,9 +4,9 @@
 
 #pragma once
 
+#include <Eigen/Core>
 #include <wpi/SymbolExports.h>
 
-#include "frc/EigenCore.h"
 #include "frc/geometry/Quaternion.h"
 #include "frc/geometry/Rotation2d.h"
 #include "units/angle.h"
@@ -57,7 +57,7 @@ class WPILIB_DLLEXPORT Rotation3d {
    * @param axis The rotation axis.
    * @param angle The rotation around the axis.
    */
-  Rotation3d(const Vectord<3>& axis, units::radian_t angle);
+  Rotation3d(const Eigen::Vector3d& axis, units::radian_t angle);
 
   /**
    * Constructs a Rotation3d with the given rotation vector representation. This
@@ -86,7 +86,7 @@ class WPILIB_DLLEXPORT Rotation3d {
    * @param initial The initial vector.
    * @param final The final vector.
    */
-  Rotation3d(const Vectord<3>& initial, const Vectord<3>& final);
+  Rotation3d(const Eigen::Vector3d& initial, const Eigen::Vector3d& final);
 
   /**
    * Adds two rotations together.
@@ -173,7 +173,7 @@ class WPILIB_DLLEXPORT Rotation3d {
   /**
    * Returns the axis in the axis-angle representation of this rotation.
    */
-  Vectord<3> Axis() const;
+  Eigen::Vector3d Axis() const;
 
   /**
    * Returns the angle in the axis-angle representation of this rotation.
