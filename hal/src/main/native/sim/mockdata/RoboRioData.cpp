@@ -32,7 +32,7 @@ void RoboRioData::ResetData() {
   userFaults5V.Reset(0);
   userFaults3V3.Reset(0);
   brownoutVoltage.Reset(6.75);
-  cpuTemp.Reset(100);
+  cpuTemp.Reset(45.0);
   m_serialNumber = "";
   m_comments = "";
 }
@@ -133,7 +133,7 @@ DEFINE_CAPI(int32_t, UserFaults6V, userFaults6V)
 DEFINE_CAPI(int32_t, UserFaults5V, userFaults5V)
 DEFINE_CAPI(int32_t, UserFaults3V3, userFaults3V3)
 DEFINE_CAPI(double, BrownoutVoltage, brownoutVoltage)
-DEFINE_CAPI(int32_t, CPUTemp, cpuTemp)
+DEFINE_CAPI(double, CPUTemp, cpuTemp)
 
 int32_t HALSIM_RegisterRoboRioSerialNumberCallback(
     HAL_RoboRioStringCallback callback, void* param, HAL_Bool initialNotify) {

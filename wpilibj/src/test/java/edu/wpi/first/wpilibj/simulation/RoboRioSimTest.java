@@ -210,6 +210,23 @@ class RoboRioSimTest {
   }
 
   @Test
+  void testCPUTemp() {
+    RoboRioSim.resetData();
+
+    DoubleCallback callback = new DoubleCallback();
+
+    try (CallbackStore cb = RoboRioSim.registerCPUTempCallback(callback, false)) {
+      final double kCPUTemp = 100.0;
+
+      RoboRioSim.setCPUTemp(kCPUTemp);
+      assertTrue(callback.wasTriggered());
+      assertEquals(kCPUTemp, callback.getSetValue());
+      assertEquals(kCPUTemp, RoboRioSim.getCPUTemp());
+      assertEquals(kCPUTemp, RobotController.getCPUTemp());
+    }
+  }
+
+  @Test
   void testSerialNumber() {
     RoboRioSim.resetData();
 

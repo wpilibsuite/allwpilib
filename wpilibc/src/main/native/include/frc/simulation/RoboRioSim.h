@@ -8,6 +8,7 @@
 #include <string>
 
 #include <units/current.h>
+#include <units/temperature.h>
 #include <units/voltage.h>
 
 #include "frc/simulation/CallbackStore.h"
@@ -434,6 +435,31 @@ class RoboRioSim {
    * @param brownoutVoltage the new voltage
    */
   static void SetBrownoutVoltage(units::volt_t brownoutVoltage);
+
+  /**
+   * Register a callback to be run whenever the cpu temp changes.
+   *
+   * @param callback the callback
+   * @param initialNotify whether to call the callback with the initial state
+   * @return the CallbackStore object associated with this callback
+   */
+  [[nodiscard]]
+  static std::unique_ptr<CallbackStore> RegisterCPUTempCallback(
+      NotifyCallback callback, bool initialNotify);
+
+  /**
+   * Get the cpu temp.
+   *
+   * @return the cpu temp.
+   */
+  static units::celsius_t GetCPUTemp();
+
+  /**
+   * Define the cpu temp.
+   *
+   * @param cpuTemp the new cpu temp.
+   */
+  static void SetCPUTemp(units::celsius_t cpuTemp);
 
   /**
    * Get the serial number.
