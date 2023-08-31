@@ -3,6 +3,7 @@ project(wpimath)
 include(SubDirList)
 include(CompileWarnings)
 include(AddTest)
+include(DownloadAndCheck)
 
 file(GLOB wpimath_jni_src src/main/native/cpp/jni/WPIMathJNI_DARE.cpp
                           src/main/native/cpp/jni/WPIMathJNI_Eigen.cpp
@@ -24,19 +25,19 @@ if (WITH_JAVA)
 
       message(STATUS "Downloading EJML jarfiles...")
 
-      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-cdense/0.42/ejml-cdense-0.42.jar"
+      download_and_check("${BASE_URL}org/ejml/ejml-cdense/0.42/ejml-cdense-0.42.jar"
           "${JAR_ROOT}/ejml-cdense-0.42.jar")
-      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-core/0.42/ejml-core-0.42.jar"
+      download_and_check("${BASE_URL}org/ejml/ejml-core/0.42/ejml-core-0.42.jar"
           "${JAR_ROOT}/ejml-core-0.42.jar")
-      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-ddense/0.42/ejml-ddense-0.42.jar"
+      download_and_check("${BASE_URL}org/ejml/ejml-ddense/0.42/ejml-ddense-0.42.jar"
           "${JAR_ROOT}/ejml-ddense-0.42.jar")
-      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-dsparse/0.42/ejml-dsparse-0.42.jar"
+      download_and_check("${BASE_URL}org/ejml/ejml-dsparse/0.42/ejml-dsparse-0.42.jar"
           "${JAR_ROOT}/ejml-dsparse-0.42.jar")
-      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-fdense/0.42/ejml-fdense-0.42.jar"
+      download_and_check("${BASE_URL}org/ejml/ejml-fdense/0.42/ejml-fdense-0.42.jar"
           "${JAR_ROOT}/ejml-fdense-0.42.jar")
-      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-simple/0.42/ejml-simple-0.42.jar"
+      download_and_check("${BASE_URL}org/ejml/ejml-simple/0.42/ejml-simple-0.42.jar"
           "${JAR_ROOT}/ejml-simple-0.42.jar")
-      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-zdense/0.42/ejml-zdense-0.42.jar"
+      download_and_check("${BASE_URL}org/ejml/ejml-zdense/0.42/ejml-zdense-0.42.jar"
           "${JAR_ROOT}/ejml-zdense-0.42.jar")
 
       message(STATUS "All files downloaded.")
