@@ -5,10 +5,10 @@
 #include <cmath>
 #include <numbers>
 
+#include <Eigen/Core>
 #include <gtest/gtest.h>
 #include <wpi/MathExtras.h>
 
-#include "frc/EigenCore.h"
 #include "frc/geometry/Rotation3d.h"
 
 using namespace frc;
@@ -73,25 +73,25 @@ TEST(Rotation3dTest, InitAxisAngleAndRollPitchYaw) {
 
 TEST(Rotation3dTest, InitRotationMatrix) {
   // No rotation
-  const Matrixd<3, 3> R1 = Matrixd<3, 3>::Identity();
+  const Eigen::Matrix3d R1 = Eigen::Matrix3d::Identity();
   const Rotation3d rot1{R1};
   EXPECT_EQ(Rotation3d{}, rot1);
 
   // 90 degree CCW rotation around z-axis
-  Matrixd<3, 3> R2;
-  R2.block<3, 1>(0, 0) = Vectord<3>{0.0, 1.0, 0.0};
-  R2.block<3, 1>(0, 1) = Vectord<3>{-1.0, 0.0, 0.0};
-  R2.block<3, 1>(0, 2) = Vectord<3>{0.0, 0.0, 1.0};
+  Eigen::Matrix3d R2;
+  R2.block<3, 1>(0, 0) = Eigen::Vector3d{0.0, 1.0, 0.0};
+  R2.block<3, 1>(0, 1) = Eigen::Vector3d{-1.0, 0.0, 0.0};
+  R2.block<3, 1>(0, 2) = Eigen::Vector3d{0.0, 0.0, 1.0};
   const Rotation3d rot2{R2};
   const Rotation3d expected2{0_deg, 0_deg, 90_deg};
   EXPECT_EQ(expected2, rot2);
 
   // Matrix that isn't orthogonal
-  const Matrixd<3, 3> R3{{1.0, 0.0, 0.0}, {1.0, 0.0, 0.0}, {1.0, 0.0, 0.0}};
+  const Eigen::Matrix3d R3{{1.0, 0.0, 0.0}, {1.0, 0.0, 0.0}, {1.0, 0.0, 0.0}};
   EXPECT_THROW(Rotation3d{R3}, std::domain_error);
 
   // Matrix that's orthogonal but not special orthogonal
-  const Matrixd<3, 3> R4 = Matrixd<3, 3>::Identity() * 2.0;
+  const Eigen::Matrix3d R4 = Eigen::Matrix3d::Identity() * 2.0;
   EXPECT_THROW(Rotation3d{R4}, std::domain_error);
 }
 

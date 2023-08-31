@@ -6,6 +6,7 @@
 
 #include <gtest/gtest.h>
 
+#include "frc/EigenCore.h"
 #include "frc/system/RungeKuttaTimeVarying.h"
 
 namespace {
