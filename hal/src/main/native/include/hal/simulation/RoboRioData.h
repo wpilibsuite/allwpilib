@@ -145,8 +145,8 @@ int32_t HALSIM_RegisterRoboRioCPUTempCallback(HAL_NotifyCallback callback,
                                               void* param,
                                               HAL_Bool initialNotify);
 void HALSIM_CancelRoboRioCPUTempCallback(int32_t uid);
-HAL_Bool HALSIM_GetRoboRioCPUTemp(void);
-void HALSIM_SetRoboRioUserCPUTemp(HAL_Bool userActive3V3);
+double HALSIM_GetRoboRioCPUTemp(void);
+void HALSIM_SetRoboRioCPUTemp(double cpuTemp);
 
 #ifdef __cplusplus
 }  // extern "C"
