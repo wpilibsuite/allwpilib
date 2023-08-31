@@ -526,6 +526,38 @@ public final class RoboRioSim {
   }
 
   /**
+   * Register a callback to be run whenever the cpu temp changes.
+   *
+   * @param callback the callback
+   * @param initialNotify whether to call the callback with the initial state
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
+   */
+  public static CallbackStore registerCPUTempCallback(
+      NotifyCallback callback, boolean initialNotify) {
+    int uid = RoboRioDataJNI.registerCPUTempCallback(callback, initialNotify);
+    return new CallbackStore(uid, RoboRioDataJNI::cancelCPUTempCallback);
+  }
+
+  /**
+   * Get the cpu temp.
+   *
+   * @return the cpu temp.
+   */
+  public static double getCPUTemp() {
+    return RoboRioDataJNI.getCPUTemp();
+  }
+
+  /**
+   * Set the cpu temp.
+   *
+   * @param cpuTemp the new cpu temp.
+   */
+  public static void setCPUTemp(double cpuTemp) {
+    RoboRioDataJNI.setCPUTemp(cpuTemp);
+  }
+
+  /**
    * Get the serial number.
    *
    * @return The serial number.

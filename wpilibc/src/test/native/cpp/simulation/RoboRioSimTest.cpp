@@ -207,6 +207,21 @@ TEST(RoboRioSimTest, Set3V3) {
   EXPECT_EQ(kTestFaults, RobotController::GetFaultCount3V3());
 }
 
+TEST(RoboRioSimTest, SetCPUTemp) {
+  RoboRioSim::ResetData();
+
+  DoubleCallback callback;
+  auto cbHandle =
+      RoboRioSim::RegisterCPUTempCallback(callback.GetCallback(), false);
+  constexpr double kCPUTemp = 100.0;
+
+  RoboRioSim::SetCPUTemp(units::celsius_t{kCPUTemp});
+  EXPECT_TRUE(callback.WasTriggered());
+  EXPECT_EQ(kCPUTemp, callback.GetLastValue());
+  EXPECT_EQ(kCPUTemp, RoboRioSim::GetCPUTemp().value());
+  EXPECT_EQ(kCPUTemp, RobotController::GetCPUTemp().value());
+}
+
 TEST(RoboRioSimTest, SetSerialNumber) {
   const std::string kSerialNum = "Hello";
 
