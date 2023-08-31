@@ -301,6 +301,23 @@ void RoboRioSim::SetCPUTemp(units::celsius_t cpuTemp) {
   HALSIM_SetRoboRioCPUTemp(cpuTemp.value());
 }
 
+std::unique_ptr<CallbackStore> RoboRioSim::RegisterTeamNumberCallback(
+    NotifyCallback callback, bool initialNotify) {
+  auto store = std::make_unique<CallbackStore>(
+      -1, callback, &HALSIM_CancelRoboRioTeamNumberCallback);
+  store->SetUid(HALSIM_RegisterRoboRioTeamNumberCallback(
+      &CallbackStoreThunk, store.get(), initialNotify));
+  return store;
+}
+
+int32_t RoboRioSim::GetTeamNumber() {
+  return HALSIM_GetRoboRioTeamNumber();
+}
+
+void RoboRioSim::SetTeamNumber(int32_t teamNumber) {
+  HALSIM_SetRoboRioTeamNumber(teamNumber);
+}
+
 std::string RoboRioSim::GetSerialNumber() {
   char serialNum[9];
   size_t len = HALSIM_GetRoboRioSerialNumber(serialNum, sizeof(serialNum));

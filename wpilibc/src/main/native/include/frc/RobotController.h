@@ -64,6 +64,16 @@ class RobotController {
   static std::string GetComments();
 
   /**
+   * Returns the team number configured for the robot controller.
+   *
+   * The team number is cached after the first call to this function on the
+   * RoboRIO - restart the robot code to reload the team number.
+   *
+   * @return team number, or 0 if not found.
+   */
+  static int32_t GetTeamNumber();
+
+  /**
    * Read the microsecond-resolution timer on the FPGA.
    *
    * @return The current time in microseconds according to the FPGA (since FPGA

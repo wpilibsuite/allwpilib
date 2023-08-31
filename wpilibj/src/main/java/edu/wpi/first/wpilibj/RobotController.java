@@ -58,6 +58,18 @@ public final class RobotController {
   }
 
   /**
+   * Returns the team number configured for the robot controller.
+   *
+   * <p>The team number is cached after the first call to this function on the RoboRIO - restart the
+   * robot code to reload the team number.
+   *
+   * @return team number, or 0 if not found.
+   */
+  public static int getTeamNumber() {
+    return HALUtil.getTeamNumber();
+  }
+
+  /**
    * Read the microsecond timer from the FPGA.
    *
    * @return The current time in microseconds according to the FPGA.

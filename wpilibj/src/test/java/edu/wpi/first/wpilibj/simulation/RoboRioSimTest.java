@@ -227,6 +227,23 @@ class RoboRioSimTest {
   }
 
   @Test
+  void testTeamNumber() {
+    RoboRioSim.resetData();
+
+    IntCallback callback = new IntCallback();
+
+    try (CallbackStore cb = RoboRioSim.registerTeamNumberCallback(callback, false)) {
+      final int kTeamNumber = 9999;
+
+      RoboRioSim.setTeamNumber(kTeamNumber);
+      assertTrue(callback.wasTriggered());
+      assertEquals(kTeamNumber, callback.getSetValue());
+      assertEquals(kTeamNumber, RoboRioSim.getTeamNumber());
+      assertEquals(kTeamNumber, RobotController.getTeamNumber());
+    }
+  }
+
+  @Test
   void testSerialNumber() {
     RoboRioSim.resetData();
 

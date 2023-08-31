@@ -558,6 +558,38 @@ public final class RoboRioSim {
   }
 
   /**
+   * Register a callback to be run whenever the team number changes.
+   *
+   * @param callback the callback
+   * @param initialNotify whether to call the callback with the initial state
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
+   */
+  public static CallbackStore registerTeamNumberCallback(
+      NotifyCallback callback, boolean initialNotify) {
+    int uid = RoboRioDataJNI.registerTeamNumberCallback(callback, initialNotify);
+    return new CallbackStore(uid, RoboRioDataJNI::cancelTeamNumberCallback);
+  }
+
+  /**
+   * Get the team number.
+   *
+   * @return the team number.
+   */
+  public static int getTeamNumber() {
+    return RoboRioDataJNI.getTeamNumber();
+  }
+
+  /**
+   * Set the team number.
+   *
+   * @param teamNumber the new team number.
+   */
+  public static void setTeamNumber(int teamNumber) {
+    RoboRioDataJNI.setTeamNumber(teamNumber);
+  }
+
+  /**
    * Get the serial number.
    *
    * @return The serial number.
