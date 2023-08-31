@@ -53,7 +53,7 @@ configure_file(cscore-config.cmake.in ${WPILIB_BINARY_DIR}/cscore-config.cmake )
 install(FILES ${WPILIB_BINARY_DIR}/cscore-config.cmake DESTINATION ${cscore_config_dir})
 install(EXPORT cscore DESTINATION ${cscore_config_dir})
 
-SUBDIR_LIST(cscore_examples "${CMAKE_CURRENT_SOURCE_DIR}/examples")
+subdir_list(cscore_examples "${CMAKE_CURRENT_SOURCE_DIR}/examples")
 foreach(example ${cscore_examples})
     file(GLOB cscore_example_src examples/${example}/*.cpp)
     unset(add_libs)

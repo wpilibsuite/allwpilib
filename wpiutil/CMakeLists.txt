@@ -76,7 +76,7 @@ if (NOT MSVC AND NOT APPLE AND NOT ANDROID)
     endif()
 endif()
 
-GENERATE_RESOURCES(src/main/native/resources generated/main/cpp WPI wpi wpiutil_resources_src)
+generate_resources(src/main/native/resources generated/main/cpp WPI wpi wpiutil_resources_src)
 
 file(GLOB_RECURSE wpiutil_native_src src/main/native/cpp/*.cpp
                                      src/main/native/thirdparty/json/cpp/*.cpp
@@ -178,7 +178,7 @@ configure_file(wpiutil-config.cmake.in ${WPILIB_BINARY_DIR}/wpiutil-config.cmake
 install(FILES ${WPILIB_BINARY_DIR}/wpiutil-config.cmake DESTINATION ${wpiutil_config_dir})
 install(EXPORT wpiutil DESTINATION ${wpiutil_config_dir})
 
-SUBDIR_LIST(wpiutil_examples "${CMAKE_CURRENT_SOURCE_DIR}/examples")
+subdir_list(wpiutil_examples "${CMAKE_CURRENT_SOURCE_DIR}/examples")
 foreach(example ${wpiutil_examples})
     file(GLOB wpiutil_example_src examples/${example}/*.cpp)
     if(wpiutil_example_src)
