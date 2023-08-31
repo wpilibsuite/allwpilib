@@ -58,6 +58,14 @@ public final class DARE {
    *
    * <p>AᵀXA − X − (AᵀXB + N)(BᵀXB + R)⁻¹(BᵀXA + Nᵀ) + Q = 0
    *
+   * <p>This is equivalent to solving the original DARE:
+   *
+   * <p>A₂ᵀXA₂ − X − A₂ᵀXB(BᵀXB + R)⁻¹BᵀXA₂ + Q₂ = 0
+   *
+   * <p>where A₂ and Q₂ are a change of variables:
+   *
+   * <p>A₂ = A − BR⁻¹Nᵀ and Q₂ = Q − NR⁻¹Nᵀ
+   *
    * <p>This overload of the DARE is useful for finding the control law uₖ that minimizes the
    * following cost function subject to xₖ₊₁ = Axₖ + Buₖ.
    *
@@ -88,10 +96,10 @@ public final class DARE {
    * solver may hang if any of the following occur:
    *
    * <ul>
-   *   <li>Q − NR⁻¹Nᵀ isn't symmetric positive semidefinite
+   *   <li>Q₂ isn't symmetric positive semidefinite
    *   <li>R isn't symmetric positive definite
-   *   <li>The (A − BR⁻¹Nᵀ, B) pair isn't stabilizable
-   *   <li>The (A, C) pair where Q = CᵀC isn't detectable
+   *   <li>The (A₂, B) pair isn't stabilizable
+   *   <li>The (A₂, C) pair where Q₂ = CᵀC isn't detectable
    * </ul>
    *
    * <p>Only use this function if you're sure the preconditions are met.
@@ -163,6 +171,14 @@ public final class DARE {
    *
    * <p>AᵀXA − X − (AᵀXB + N)(BᵀXB + R)⁻¹(BᵀXA + Nᵀ) + Q = 0
    *
+   * <p>This is equivalent to solving the original DARE:
+   *
+   * <p>A₂ᵀXA₂ − X − A₂ᵀXB(BᵀXB + R)⁻¹BᵀXA₂ + Q₂ = 0
+   *
+   * <p>where A₂ and Q₂ are a change of variables:
+   *
+   * <p>A₂ = A − BR⁻¹Nᵀ and Q₂ = Q − NR⁻¹Nᵀ
+   *
    * <p>This overload of the DARE is useful for finding the control law uₖ that minimizes the
    * following cost function subject to xₖ₊₁ = Axₖ + Buₖ.
    *
@@ -197,10 +213,10 @@ public final class DARE {
    * @param R Input cost matrix.
    * @param N State-input cross-term cost matrix.
    * @return Solution of DARE.
-   * @throws IllegalArgumentException if Q − NR⁻¹Nᵀ isn't symmetric positive semidefinite.
+   * @throws IllegalArgumentException if Q₂ isn't symmetric positive semidefinite.
    * @throws IllegalArgumentException if R isn't symmetric positive definite.
-   * @throws IllegalArgumentException if the (A − BR⁻¹Nᵀ, B) pair isn't stabilizable.
-   * @throws IllegalArgumentException if the (A, C) pair where Q = CᵀC isn't detectable.
+   * @throws IllegalArgumentException if the (A₂, B) pair isn't stabilizable.
+   * @throws IllegalArgumentException if the (A₂, C) pair where Q₂ = CᵀC isn't detectable.
    */
   public static <States extends Num, Inputs extends Num> Matrix<States, States> dare(
       Matrix<States, States> A,
