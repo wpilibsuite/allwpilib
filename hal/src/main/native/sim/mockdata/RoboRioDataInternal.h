@@ -31,6 +31,7 @@ class RoboRioData {
   HAL_SIMDATAVALUE_DEFINE_NAME(UserFaults3V3)
   HAL_SIMDATAVALUE_DEFINE_NAME(BrownoutVoltage)
   HAL_SIMDATAVALUE_DEFINE_NAME(CPUTemp)
+  HAL_SIMDATAVALUE_DEFINE_NAME(TeamNumber)
 
   HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(SerialNumber)
   HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(Comments);
@@ -59,6 +60,7 @@ class RoboRioData {
   SimDataValue<double, HAL_MakeDouble, GetBrownoutVoltageName> brownoutVoltage{
       6.75};
   SimDataValue<double, HAL_MakeDouble, GetCPUTempName> cpuTemp{45.0};
+  SimDataValue<int32_t, HAL_MakeInt, GetTeamNumberName> teamNumber{0};
 
   int32_t RegisterSerialNumberCallback(HAL_RoboRioStringCallback callback,
                                        void* param, HAL_Bool initialNotify);

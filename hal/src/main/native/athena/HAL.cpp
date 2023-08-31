@@ -47,6 +47,8 @@ static char roboRioCommentsString[64];
 static size_t roboRioCommentsStringSize;
 static bool roboRioCommentsStringInitialized;
 
+static int32_t teamNumber = -1;
+
 static const volatile HAL_HMBData* hmbBuffer;
 #define HAL_HMB_TIMESTAMP_OFFSET 5
 
@@ -351,6 +353,50 @@ size_t HAL_GetComments(char* buffer, size_t size) {
     buffer[toCopy - 1] = '\0';
   }
   return toCopy;
+}
+
+void InitializeTeamNumber(void) {
+  auto handle = popen(
+      "/usr/local/natinst/bin/nirtcfg --file=/etc/natinst/share/ni-rt.ini "
+      "--get section=systemsettings,token=host_name",
+      "r");
+
+  if (!handle) {
+    teamNumber = 0;
+    return;
+  }
+
+  std::string result;
+  std::array<char, std::string::traits_type::length("roboRIO-00000-FRC")>
+      buffer;
+
+  do {
+    size_t count =
+        std::fread(buffer.data(), sizeof(buffer[0]), buffer.size(), handle);
+    result.append(buffer.data(), count);
+  } while (!(std::feof(handle) || std::ferror(handle)));
+
+  pclose(handle);
+  auto start = result.find('-') + 1;
+  auto end = result.find('-', start);
+
+  if (start == std::string::npos || end == std::string::npos) {
+    teamNumber = 0;
+    return;
+  }
+
+  try {
+    teamNumber = std::stoi(result.substr(start, end - start));
+  } catch (...) {
+    teamNumber = 0;
+  }
+}
+
+int32_t HAL_GetTeamNumber(void) {
+  if (teamNumber == -1) {
+    InitializeTeamNumber();
+  }
+  return teamNumber;
 }
 
 uint64_t HAL_GetFPGATime(int32_t* status) {
