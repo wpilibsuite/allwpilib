@@ -356,29 +356,17 @@ size_t HAL_GetComments(char* buffer, size_t size) {
 }
 
 void InitializeTeamNumber(void) {
-  auto handle = popen(
-      "/usr/local/natinst/bin/nirtcfg --file=/etc/natinst/share/ni-rt.ini "
-      "--get section=systemsettings,token=host_name",
-      "r");
-
-  if (!handle) {
+  char hostnameBuf[25];
+  auto status = gethostname(hostnameBuf, sizeof(hostnameBuf));
+  if (status != 0) {
     teamNumber = 0;
     return;
   }
 
-  std::string result;
-  std::array<char, std::string::traits_type::length("roboRIO-00000-FRC")>
-      buffer;
+  std::string hostname{hostnameBuf, sizeof(hostnameBuf)};
 
-  do {
-    size_t count =
-        std::fread(buffer.data(), sizeof(buffer[0]), buffer.size(), handle);
-    result.append(buffer.data(), count);
-  } while (!(std::feof(handle) || std::ferror(handle)));
-
-  pclose(handle);
-  auto start = result.find('-') + 1;
-  auto end = result.find('-', start);
+  auto start = hostname.find('-') + 1;
+  auto end = hostname.find('-', start);
 
   if (start == std::string::npos || end == std::string::npos) {
     teamNumber = 0;
@@ -386,7 +374,7 @@ void InitializeTeamNumber(void) {
   }
 
   try {
-    teamNumber = std::stoi(result.substr(start, end - start));
+    teamNumber = std::stoi(hostname.substr(start, end - start));
   } catch (...) {
     teamNumber = 0;
   }
