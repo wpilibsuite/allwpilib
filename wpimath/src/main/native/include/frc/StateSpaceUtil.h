@@ -59,9 +59,7 @@ bool IsStabilizableImpl(const Matrixd<States, States>& A,
   Eigen::EigenSolver<Matrixd<States, States>> es{A, false};
 
   for (int i = 0; i < A.rows(); ++i) {
-    if (es.eigenvalues()[i].real() * es.eigenvalues()[i].real() +
-            es.eigenvalues()[i].imag() * es.eigenvalues()[i].imag() <
-        1) {
+    if (std::norm(es.eigenvalues()[i]) < 1) {
       continue;
     }
 
