@@ -363,21 +363,19 @@ void InitializeTeamNumber(void) {
     return;
   }
 
-  std::string hostname{hostnameBuf, sizeof(hostnameBuf)};
+  std::string_view hostname{hostnameBuf, sizeof(hostnameBuf)};
 
-  auto start = hostname.find('-') + 1;
-  auto end = hostname.find('-', start);
-
-  if (start == std::string::npos || end == std::string::npos) {
+  // hostname is frc-{TEAM}-roborio
+  // Split string around '-' (max of 2 splits), take the second element of the
+  // resulting array.
+  wpi::SmallVector<std::string_view> elements;
+  wpi::split(hostname, elements, "-", 2);
+  if (elements.size() < 3) {
     teamNumber = 0;
     return;
   }
 
-  try {
-    teamNumber = std::stoi(hostname.substr(start, end - start));
-  } catch (...) {
-    teamNumber = 0;
-  }
+  teamNumber = wpi::parse_integer<int32_t>(elements[1], 10).value_or(0);
 }
 
 int32_t HAL_GetTeamNumber(void) {
