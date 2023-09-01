@@ -53,6 +53,26 @@ public class Quaternion {
   }
 
   /**
+   * Adds another quaternion to this quaternion entrywise.
+   * 
+   * @param other The other quaternion.
+   * @return The quaternion sum.
+   */
+  public Quaternion plus(Quaternion other) {
+    return new Quaternion(getW() + other.getW(), getX() + other.getX(), getY() + other.getY(), getZ() + other.getZ());
+  }
+
+  /**
+   * Multiplies with a scalar.
+   * 
+   * @param scalar The value to scale each component by.
+   * @return The scaled quaternion.
+   */
+  public Quaternion times(double scalar) {
+    return new Quaternion(getW() * scalar, getX() * scalar, getY() * scalar, getZ() * scalar);
+  }
+
+  /**
    * Multiply with another quaternion.
    *
    * @param other The other quaternion.
@@ -110,6 +130,15 @@ public class Quaternion {
   public int hashCode() {
     return Objects.hash(m_w, m_x, m_y, m_z);
   }
+  
+  /**
+   * Returns the conjugate of the quaternion.
+   * 
+   * @return The conjugate quaternion.
+   */
+  public Quaternion conjugate() {
+    return new Quaternion(getW(), -getX(), -getY(), -getZ());
+  }
 
   /**
    * Returns the inverse of the quaternion.
@@ -117,7 +146,17 @@ public class Quaternion {
    * @return The inverse quaternion.
    */
   public Quaternion inverse() {
-    return new Quaternion(getW(), -getX(), -getY(), -getZ());
+    var norm = norm();
+    return conjugate().times(1 / (norm * norm));
+  }
+
+  /**
+   * Calculates the L2 norm of the quaternion.
+   * 
+   * @return The L2 norm.
+   */
+  public double norm() {
+    return Math.sqrt(getW() * getW() + getX() * getX() + getY() * getY() + getZ() * getZ());
   }
 
   /**
@@ -126,12 +165,77 @@ public class Quaternion {
    * @return The normalized quaternion.
    */
   public Quaternion normalize() {
-    double norm = Math.sqrt(getW() * getW() + getX() * getX() + getY() * getY() + getZ() * getZ());
+    double norm = norm();
     if (norm == 0.0) {
       return new Quaternion();
     } else {
       return new Quaternion(getW() / norm, getX() / norm, getY() / norm, getZ() / norm);
     }
+  }
+
+  /**
+   * Matrix exponential of a quaternion
+   * source: https://en.wikipedia.org/wiki/Quaternion#Exponential,_logarithm,_and_power_functions
+   *
+   * @return The Matrix exponential of this quaternion.
+   */
+  public Quaternion exp(Quaternion adjustment) {
+    return adjustment._exp().times(this);
+  }
+
+  private Quaternion _exp() {
+    // q = s(scalar) + v(vector)
+    // exp(s)
+    var scalar = Math.exp(m_w);
+
+    // ||v||
+    var axial_magnitude = Math.sqrt(getX() * getX() + getY() * getY() + getZ() * getZ());
+    // cos(||v||)
+    var cosine = Math.cos(axial_magnitude);
+    // sin(||v||)
+    var sine = Math.sin(axial_magnitude);
+    
+    // exp(s) * (cos(||v||) + v / ||v|| * sin(||v||))
+    return new Quaternion(
+        cosine, 
+        getX() / axial_magnitude * sine, 
+        getY() / axial_magnitude * sine, 
+        getZ() / axial_magnitude * sine)
+      .times(scalar);
+  }
+
+  /**
+   * Inverse Matrix exponential (logarithm) of a quaternion
+   * source: https://en.wikipedia.org/wiki/Quaternion#Exponential,_logarithm,_and_power_functions
+   * 
+   * <p> For unit quaternions, this is equivalent to @see Quaternion#toRotationVector(). <p>
+   * 
+   * @return The logarithm of this quaternion.
+   */
+  public Quaternion log(Quaternion end) {
+    return end.times(inverse())._log();
+  }
+
+  private Quaternion _log() {
+    // q = s(scalar) + v(vector)
+
+    // ||q||
+    var norm = norm();
+
+    // ln(||q||)
+    var scalar = Math.log(norm);
+
+    // ||v||
+    var axial_magnitude = Math.sqrt(getX() * getX() + getY() * getY() + getZ() * getZ());
+    // acos(s/||q||) / ||v||
+    var axial_scalar = Math.acos(getW() / norm) / axial_magnitude;
+
+    // ln(||q||) + v / ||v|| * acos(s / ||q||)
+    return new Quaternion(
+        scalar, 
+        getX() * axial_scalar, 
+        getY() * axial_scalar, 
+        getZ() * axial_scalar);
   }
 
   /**

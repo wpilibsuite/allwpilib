@@ -48,6 +48,32 @@ class QuaternionTest {
   }
 
   @Test
+  void testAddition() {
+    var q = new Quaternion(0.1, 0.2, 0.3, 0.4);
+    var p = new Quaternion(0.5, 0.6, 0.7, 0.8);
+
+    var sum = q.plus(p);
+
+    assertEquals(q.getW() + p.getW(), sum.getW());
+    assertEquals(q.getX() + p.getX(), sum.getX());
+    assertEquals(q.getY() + p.getY(), sum.getY());
+    assertEquals(q.getZ() + p.getZ(), sum.getZ());
+  }
+
+  @Test
+  void testScalarMultiplication() {
+    var q = new Quaternion(0.1, 0.2, 0.3, 0.4);
+    var scalar = 2;
+
+    var product = q.times(scalar);
+
+    assertEquals(q.getW() * scalar, product.getW());
+    assertEquals(q.getX() * scalar, product.getX());
+    assertEquals(q.getY() * scalar, product.getY());
+    assertEquals(q.getZ() * scalar, product.getZ());
+  }
+
+  @Test
   void testTimes() {
     // 90° CCW rotations around each axis
     double c = Math.cos(Units.degreesToRadians(90.0) / 2.0);
@@ -77,13 +103,35 @@ class QuaternionTest {
   }
 
   @Test
-  void testInverse() {
+  void testConjugate() {
     var q = new Quaternion(0.75, 0.3, 0.4, 0.5);
-    var inv = q.inverse();
+    var inv = q.conjugate();
 
     assertEquals(q.getW(), inv.getW());
     assertEquals(-q.getX(), inv.getX());
     assertEquals(-q.getY(), inv.getY());
     assertEquals(-q.getZ(), inv.getZ());
+  }
+
+  @Test
+  void testInverse() {
+    var q = new Quaternion(0.75, 0.3, 0.4, 0.5);
+    var inv = q.inverse();
+    var norm = q.norm();
+
+    assertEquals(q.getW() / (norm * norm), inv.getW());
+    assertEquals(-q.getX() / (norm * norm), inv.getX());
+    assertEquals(-q.getY() / (norm * norm), inv.getY());
+    assertEquals(-q.getZ() / (norm * norm), inv.getZ());
+  }
+
+  @Test
+  void testExponential() {
+
+  }
+
+  @Test
+  void testLogarithm() {
+    
   }
 }
