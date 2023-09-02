@@ -47,6 +47,8 @@ static char roboRioCommentsString[64];
 static size_t roboRioCommentsStringSize;
 static bool roboRioCommentsStringInitialized;
 
+static int32_t teamNumber = -1;
+
 static const volatile HAL_HMBData* hmbBuffer;
 #define HAL_HMB_TIMESTAMP_OFFSET 5
 
@@ -351,6 +353,36 @@ size_t HAL_GetComments(char* buffer, size_t size) {
     buffer[toCopy - 1] = '\0';
   }
   return toCopy;
+}
+
+void InitializeTeamNumber(void) {
+  char hostnameBuf[25];
+  auto status = gethostname(hostnameBuf, sizeof(hostnameBuf));
+  if (status != 0) {
+    teamNumber = 0;
+    return;
+  }
+
+  std::string_view hostname{hostnameBuf, sizeof(hostnameBuf)};
+
+  // hostname is frc-{TEAM}-roborio
+  // Split string around '-' (max of 2 splits), take the second element of the
+  // resulting array.
+  wpi::SmallVector<std::string_view> elements;
+  wpi::split(hostname, elements, "-", 2);
+  if (elements.size() < 3) {
+    teamNumber = 0;
+    return;
+  }
+
+  teamNumber = wpi::parse_integer<int32_t>(elements[1], 10).value_or(0);
+}
+
+int32_t HAL_GetTeamNumber(void) {
+  if (teamNumber == -1) {
+    InitializeTeamNumber();
+  }
+  return teamNumber;
 }
 
 uint64_t HAL_GetFPGATime(int32_t* status) {
