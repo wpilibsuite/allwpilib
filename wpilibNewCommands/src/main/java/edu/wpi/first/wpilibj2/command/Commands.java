@@ -100,6 +100,18 @@ public final class Commands {
     return new PrintCommand(message);
   }
 
+  /**
+   * Constructs a command that schedules the supplied command when initialized, and ends when it is
+   * no longer scheduled.
+   *
+   * @param supplier the command supplier
+   * @return the command
+   * @see ProxyCommand
+   */
+  public static Command proxy(Supplier<Command> supplier) {
+    return new ProxyCommand(supplier);
+  }
+
   // Idling Commands
 
   /**
