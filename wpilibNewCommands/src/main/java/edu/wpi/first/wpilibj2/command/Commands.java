@@ -6,6 +6,8 @@ package edu.wpi.first.wpilibj2.command;
 
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
@@ -151,6 +153,18 @@ public final class Commands {
     return new SelectCommand(commands, selector);
   }
 
+  // Command Groups
+
+  /**
+   * Maps a list by proxying all of its elements using {@link Command#asProxy()}.
+   * 
+   * @param commands a list of commands
+   * @return a list of proxied commands
+   */
+  public static Command[] proxyAll(Command... commands) {
+    return Arrays.stream(commands).map(Command::asProxy).toArray(Command[]::new);
+  }
+
   /**
    * Runs a group of commands in series, one after the other.
    *
@@ -159,10 +173,20 @@ public final class Commands {
    * @see SequentialCommandGroup
    */
   public static Command sequence(Command... commands) {
-    return new SequentialCommandGroup(commands);
+    return sequence(true, commands);
   }
 
-  // Command Groups
+  /**
+   * Runs a group of commands in series, one after the other.
+   *
+   * @param requireUnion whether the group should require the union of its member commands' requirements
+   * @param commands the commands to include
+   * @return the command group
+   * @see SequentialCommandGroup
+   */
+  public static Command sequence(boolean requireUnion, Command... commands) {
+    return new SequentialCommandGroup(requireUnion ? commands : proxyAll(commands));
+  }
 
   /**
    * Runs a group of commands in series, one after the other. Once the last command ends, the group
@@ -185,7 +209,19 @@ public final class Commands {
    * @see ParallelCommandGroup
    */
   public static Command parallel(Command... commands) {
-    return new ParallelCommandGroup(commands);
+    return parallel(true, commands);
+  }
+
+  /**
+   * Runs a group of commands at the same time. Ends once all commands in the group finish.
+   *
+   * @param requireUnion whether the group should require the union of its member commands' requirements
+   * @param commands the commands to include
+   * @return the command
+   * @see ParallelCommandGroup
+   */
+  public static Command parallel(boolean requireUnion, Command... commands) {
+    return new ParallelCommandGroup(requireUnion ? commands : proxyAll(commands));
   }
 
   /**
@@ -197,7 +233,20 @@ public final class Commands {
    * @see ParallelRaceGroup
    */
   public static Command race(Command... commands) {
-    return new ParallelRaceGroup(commands);
+    return race(true, commands);
+  }
+
+  /**
+   * Runs a group of commands at the same time. Ends once any command in the group finishes, and
+   * cancels the others.
+   *
+   * @param requireUnion whether the group should require the union of its member commands' requirements
+   * @param commands the commands to include
+   * @return the command group
+   * @see ParallelRaceGroup
+   */
+  public static Command race(boolean requireUnion, Command... commands) {
+    return new ParallelRaceGroup(requireUnion ? commands : proxyAll(commands));
   }
 
   /**
@@ -210,7 +259,21 @@ public final class Commands {
    * @see ParallelDeadlineGroup
    */
   public static Command deadline(Command deadline, Command... commands) {
-    return new ParallelDeadlineGroup(deadline, commands);
+    return deadline(true, deadline, commands);
+  }
+
+  /**
+   * Runs a group of commands at the same time. Ends once a specific command finishes, and cancels
+   * the others.
+   *
+   * @param requireUnion whether the group should require the union of its member commands' requirements, excluding the deadline command
+   * @param deadline the deadline command
+   * @param commands the commands to include
+   * @return the command group
+   * @see ParallelDeadlineGroup
+   */
+  public static Command deadline(boolean requireUnion, Command deadline, Command... commands) {
+    return new ParallelDeadlineGroup(deadline, requireUnion ? commands : proxyAll(commands));
   }
 
   private Commands() {

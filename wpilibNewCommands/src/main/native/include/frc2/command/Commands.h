@@ -204,6 +204,9 @@ std::vector<CommandPtr> MakeVector(Args&&... args) {
 
 }  // namespace impl
 
+[[nodiscard]]
+std::vector<CommandPtr> ProxyAll(std::vector<CommandPtr>&& commands);
+
 /**
  * Runs a group of commands in series, one after the other.
  */

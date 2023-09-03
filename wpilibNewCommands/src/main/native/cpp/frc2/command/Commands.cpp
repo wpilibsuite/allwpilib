@@ -101,7 +101,14 @@ CommandPtr cmd::Either(CommandPtr&& onTrue, CommandPtr&& onFalse,
       .ToPtr();
 }
 
-CommandPtr cmd::Sequence(std::vector<CommandPtr>&& commands) {
+std::vector<CommandPtr> cmd::ProxyAll(std::vector<CommandPtr>&& commands) {
+  auto unwrapped = CommandPtr::UnwrapVector(std::move(commands));
+  std::vector<std::unique_ptr<frc2::Command>> out(commands.size());
+  std::transform(unwrapped.begin(), unwrapped.end(), out, Command::AsProxy);
+  return out.ToPtr();
+}
+
+CommandPtr cmd::Sequence(bool requireUnion = false, std::vector<CommandPtr>&& commands) {
   return SequentialCommandGroup(CommandPtr::UnwrapVector(std::move(commands)))
       .ToPtr();
 }
