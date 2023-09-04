@@ -73,10 +73,13 @@ void CheckDARE_ABQ(const Eigen::Matrix<double, States, States>& A,
   }
 
   // Require (A, C) pair be detectable where Q = CᵀC
+  //
+  // Q = CᵀC = LDLᵀ
+  // C = √(D)Lᵀ
   {
     Eigen::Matrix<double, States, States> C =
-        Eigen::Matrix<double, States, States>{Q_ldlt.matrixL()} *
-        Q_ldlt.vectorD().cwiseSqrt().asDiagonal();
+        Q_ldlt.vectorD().cwiseSqrt().asDiagonal() *
+        Eigen::Matrix<double, States, States>{Q_ldlt.matrixL().transpose()};
 
     if (!IsDetectable<States, States>(A, C)) {
       std::string msg = fmt::format(
