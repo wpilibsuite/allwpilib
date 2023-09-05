@@ -670,7 +670,6 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
     for (var command : commands) {
       requireNotComposedOrScheduled(command);
     }
-    requireNotComposed(commands);
   }
 
   /**
