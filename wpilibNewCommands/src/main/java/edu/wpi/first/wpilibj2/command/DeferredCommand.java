@@ -34,7 +34,8 @@ public class DeferredCommand extends Command {
    *
    * @param supplier The command supplier
    * @param requirements The command requirements. This is a {@link Set} to prevent accidental
-   *     omission of command requirements.
+   *     omission of command requirements. Use {@link Set#of()} to easily construct a requirement
+   *     set.
    */
   public DeferredCommand(Supplier<Command> supplier, Set<Subsystem> requirements) {
     m_supplier = requireNonNullParam(supplier, "supplier", "DeferredCommand");
