@@ -25,6 +25,7 @@
 #include "Log.h"
 #include "NetworkInterface.h"
 #include "Types_internal.h"
+#include "net/WireEncoder.h"
 #include "net3/WireConnection3.h"
 #include "net3/WireEncoder3.h"
 #include "networktables/NetworkTableValue.h"
@@ -80,6 +81,76 @@ static void WriteOptions(mpack_writer_t& w, const PubSubOptionsImpl& options) {
   mpack_finish_map(&w);
 }
 
+void ServerImpl::PublisherData::UpdateMeta() {
+  {
+    Writer w;
+    mpack_start_map(&w, 2);
+    mpack_write_str(&w, "uid");
+    mpack_write_int(&w, pubuid);
+    mpack_write_str(&w, "topic");
+    mpack_write_str(&w, topic->name);
+    mpack_finish_map(&w);
+    if (mpack_writer_destroy(&w) == mpack_ok) {
+      metaClient = std::move(w.bytes);
+    }
+  }
+  {
+    Writer w;
+    mpack_start_map(&w, 2);
+    mpack_write_str(&w, "client");
+    if (client) {
+      mpack_write_str(&w, client->GetName());
+    } else {
+      mpack_write_str(&w, "");
+    }
+    mpack_write_str(&w, "pubuid");
+    mpack_write_int(&w, pubuid);
+    mpack_finish_map(&w);
+    if (mpack_writer_destroy(&w) == mpack_ok) {
+      metaTopic = std::move(w.bytes);
+    }
+  }
+}
+
+void ServerImpl::SubscriberData::UpdateMeta() {
+  {
+    Writer w;
+    mpack_start_map(&w, 3);
+    mpack_write_str(&w, "uid");
+    mpack_write_int(&w, subuid);
+    mpack_write_str(&w, "topics");
+    mpack_start_array(&w, topicNames.size());
+    for (auto&& name : topicNames) {
+      mpack_write_str(&w, name);
+    }
+    mpack_finish_array(&w);
+    mpack_write_str(&w, "options");
+    WriteOptions(w, options);
+    mpack_finish_map(&w);
+    if (mpack_writer_destroy(&w) == mpack_ok) {
+      metaClient = std::move(w.bytes);
+    }
+  }
+  {
+    Writer w;
+    mpack_start_map(&w, 3);
+    mpack_write_str(&w, "client");
+    if (client) {
+      mpack_write_str(&w, client->GetName());
+    } else {
+      mpack_write_str(&w, "");
+    }
+    mpack_write_str(&w, "subuid");
+    mpack_write_int(&w, subuid);
+    mpack_write_str(&w, "options");
+    WriteOptions(w, options);
+    mpack_finish_map(&w);
+    if (mpack_writer_destroy(&w) == mpack_ok) {
+      metaTopic = std::move(w.bytes);
+    }
+  }
+}
+
 void ServerImpl::ClientData::UpdateMetaClientPub() {
   if (!m_metaPub) {
     return;
@@ -87,12 +158,9 @@ void ServerImpl::ClientData::UpdateMetaClientPub() {
   Writer w;
   mpack_start_array(&w, m_publishers.size());
   for (auto&& pub : m_publishers) {
-    mpack_start_map(&w, 2);
-    mpack_write_str(&w, "uid");
-    mpack_write_int(&w, pub.first);
-    mpack_write_str(&w, "topic");
-    mpack_write_str(&w, pub.second->topic->name);
-    mpack_finish_map(&w);
+    mpack_write_object_bytes(
+        &w, reinterpret_cast<const char*>(pub.second->metaClient.data()),
+        pub.second->metaClient.size());
   }
   mpack_finish_array(&w);
   if (mpack_writer_destroy(&w) == mpack_ok) {
@@ -107,18 +175,9 @@ void ServerImpl::ClientData::UpdateMetaClientSub() {
   Writer w;
   mpack_start_array(&w, m_subscribers.size());
   for (auto&& sub : m_subscribers) {
-    mpack_start_map(&w, 3);
-    mpack_write_str(&w, "uid");
-    mpack_write_int(&w, sub.first);
-    mpack_write_str(&w, "topics");
-    mpack_start_array(&w, sub.second->topicNames.size());
-    for (auto&& name : sub.second->topicNames) {
-      mpack_write_str(&w, name);
-    }
-    mpack_finish_array(&w);
-    mpack_write_str(&w, "options");
-    WriteOptions(w, sub.second->options);
-    mpack_finish_map(&w);
+    mpack_write_object_bytes(
+        &w, reinterpret_cast<const char*>(sub.second->metaClient.data()),
+        sub.second->metaClient.size());
   }
   mpack_finish_array(&w);
   if (mpack_writer_destroy(&w) == mpack_ok) {
@@ -154,11 +213,10 @@ void ServerImpl::ClientData4Base::ClientPublish(int64_t pubuid,
   }
 
   // add publisher to topic
-  topic->publishers.Add(publisherIt->getSecond().get());
+  topic->AddPublisher(this, publisherIt->getSecond().get());
 
   // update meta data
   m_server.UpdateMetaTopicPub(topic);
-  UpdateMetaClientPub();
 
   // respond with announce with pubuid to client
   DEBUG4("client {}: announce {} pubuid {}", m_id, topic->name, pubuid);
@@ -175,14 +233,13 @@ void ServerImpl::ClientData4Base::ClientUnpublish(int64_t pubuid) {
   auto topic = publisher->topic;
 
   // remove publisher from topic
-  topic->publishers.Remove(publisher);
+  topic->RemovePublisher(this, publisher);
 
   // remove publisher from client
   m_publishers.erase(publisherIt);
 
   // update meta data
   m_server.UpdateMetaTopicPub(topic);
-  UpdateMetaClientPub();
 
   // delete topic if no longer published
   if (!topic->IsPublished()) {
@@ -234,14 +291,7 @@ void ServerImpl::ClientData4Base::ClientSubscribe(
 
   // update periodic sender (if not local)
   if (!m_local) {
-    if (m_periodMs == UINT32_MAX) {
-      m_periodMs = sub->periodMs;
-    } else {
-      m_periodMs = std::gcd(m_periodMs, sub->periodMs);
-    }
-    if (m_periodMs < kMinPeriodMs) {
-      m_periodMs = kMinPeriodMs;
-    }
+    m_periodMs = UpdatePeriodCalc(m_periodMs, sub->periodMs);
     m_setPeriodic(m_periodMs);
   }
 
@@ -252,30 +302,28 @@ void ServerImpl::ClientData4Base::ClientSubscribe(
   std::vector<TopicData*> dataToSend;
   dataToSend.reserve(m_server.m_topics.size());
   for (auto&& topic : m_server.m_topics) {
-    bool removed = false;
-    if (replace) {
-      removed = topic->subscribers.Remove(sub.get());
-    }
+    auto tcdIt = topic->clients.find(this);
+    bool removed = tcdIt != topic->clients.end() && replace &&
+                   tcdIt->second.subscribers.erase(sub.get());
 
     // is client already subscribed?
-    bool wasSubscribed = false;
-    bool wasSubscribedValue = false;
-    for (auto subscriber : topic->subscribers) {
-      if (subscriber->client == this) {
-        wasSubscribed = true;
-        if (!subscriber->options.topicsOnly) {
-          wasSubscribedValue = true;
-        }
-      }
-    }
+    bool wasSubscribed =
+        tcdIt != topic->clients.end() && !tcdIt->second.subscribers.empty();
+    bool wasSubscribedValue =
+        wasSubscribed ? tcdIt->second.sendMode != ValueSendMode::kDisabled
+                      : false;
 
     bool added = false;
     if (sub->Matches(topic->name, topic->special)) {
-      topic->subscribers.Add(sub.get());
+      if (tcdIt == topic->clients.end()) {
+        tcdIt = topic->clients.try_emplace(this).first;
+      }
+      tcdIt->second.AddSubscriber(sub.get());
       added = true;
     }
 
     if (added ^ removed) {
+      UpdatePeriod(tcdIt->second, topic.get());
       m_server.UpdateMetaTopicSub(topic.get());
     }
 
@@ -294,13 +342,8 @@ void ServerImpl::ClientData4Base::ClientSubscribe(
 
   for (auto topic : dataToSend) {
     DEBUG4("send last value for {} to client {}", topic->name, m_id);
-    SendValue(topic, topic->lastValue, kSendAll);
+    SendValue(topic, topic->lastValue, ValueSendMode::kAll);
   }
-
-  // update meta data
-  UpdateMetaClientSub();
-
-  Flush();
 }
 
 void ServerImpl::ClientData4Base::ClientUnsubscribe(int64_t subuid) {
@@ -313,28 +356,24 @@ void ServerImpl::ClientData4Base::ClientUnsubscribe(int64_t subuid) {
 
   // remove from topics
   for (auto&& topic : m_server.m_topics) {
-    if (topic->subscribers.Remove(sub)) {
-      m_server.UpdateMetaTopicSub(topic.get());
+    auto tcdIt = topic->clients.find(this);
+    if (tcdIt != topic->clients.end()) {
+      if (tcdIt->second.subscribers.erase(sub)) {
+        UpdatePeriod(tcdIt->second, topic.get());
+        m_server.UpdateMetaTopicSub(topic.get());
+      }
     }
   }
 
   // delete it from client (future value sets will be ignored)
   m_subscribers.erase(subIt);
-  UpdateMetaClientSub();
 
-  // loop over all publishers to update period
-  m_periodMs = UINT32_MAX;
-  for (auto&& sub : m_subscribers) {
-    if (m_periodMs == UINT32_MAX) {
-      m_periodMs = sub.getSecond()->periodMs;
-    } else {
-      m_periodMs = std::gcd(m_periodMs, sub.getSecond()->periodMs);
-    }
+  // loop over all subscribers to update period
+  if (!m_local) {
+    m_periodMs = CalculatePeriod(
+        m_subscribers, [](auto& x) { return x.getSecond()->periodMs; });
+    m_setPeriodic(m_periodMs);
   }
-  if (m_periodMs < kMinPeriodMs) {
-    m_periodMs = kMinPeriodMs;
-  }
-  m_setPeriodic(m_periodMs);
 }
 
 void ServerImpl::ClientData4Base::ClientSetValue(int64_t pubuid,
@@ -350,7 +389,8 @@ void ServerImpl::ClientData4Base::ClientSetValue(int64_t pubuid,
 }
 
 void ServerImpl::ClientDataLocal::SendValue(TopicData* topic,
-                                            const Value& value, SendMode mode) {
+                                            const Value& value,
+                                            ValueSendMode mode) {
   if (m_server.m_local) {
     m_server.m_local->NetworkSetValue(topic->localHandle, value);
   }
@@ -395,27 +435,45 @@ void ServerImpl::ClientDataLocal::SendPropertiesUpdate(TopicData* topic,
 void ServerImpl::ClientDataLocal::HandleLocal(
     std::span<const ClientMessage> msgs) {
   DEBUG4("HandleLocal()");
+  if (msgs.empty()) {
+    return;
+  }
   // just map as a normal client into client=0 calls
+  bool updatepub = false;
+  bool updatesub = false;
   for (const auto& elem : msgs) {  // NOLINT
     // common case is value, so check that first
     if (auto msg = std::get_if<ClientValueMsg>(&elem.contents)) {
       ClientSetValue(msg->pubHandle, msg->value);
     } else if (auto msg = std::get_if<PublishMsg>(&elem.contents)) {
       ClientPublish(msg->pubHandle, msg->name, msg->typeStr, msg->properties);
+      updatepub = true;
     } else if (auto msg = std::get_if<UnpublishMsg>(&elem.contents)) {
       ClientUnpublish(msg->pubHandle);
+      updatepub = true;
     } else if (auto msg = std::get_if<SetPropertiesMsg>(&elem.contents)) {
       ClientSetProperties(msg->name, msg->update);
     } else if (auto msg = std::get_if<SubscribeMsg>(&elem.contents)) {
       ClientSubscribe(msg->subHandle, msg->topicNames, msg->options);
+      updatesub = true;
     } else if (auto msg = std::get_if<UnsubscribeMsg>(&elem.contents)) {
       ClientUnsubscribe(msg->subHandle);
+      updatesub = true;
     }
+  }
+  if (updatepub) {
+    UpdateMetaClientPub();
+  }
+  if (updatesub) {
+    UpdateMetaClientSub();
   }
 }
 
 void ServerImpl::ClientData4::ProcessIncomingText(std::string_view data) {
-  WireDecodeText(data, *this, m_logger);
+  if (WireDecodeText(data, *this, m_logger)) {
+    UpdateMetaClientPub();
+    UpdateMetaClientSub();
+  }
 }
 
 void ServerImpl::ClientData4::ProcessIncomingBinary(
@@ -438,11 +496,8 @@ void ServerImpl::ClientData4::ProcessIncomingBinary(
     if (pubuid == -1) {
       auto now = wpi::Now();
       DEBUG4("RTT ping from {}, responding with time={}", m_id, now);
-      {
-        auto out = m_wire.SendBinary();
-        WireEncodeBinary(out.Add(), -1, now, value);
-      }
-      m_wire.Flush();
+      m_wire.SendBinary(
+          [&](auto& os) { WireEncodeBinary(os, -1, now, value); });
       continue;
     }
 
@@ -452,40 +507,8 @@ void ServerImpl::ClientData4::ProcessIncomingBinary(
 }
 
 void ServerImpl::ClientData4::SendValue(TopicData* topic, const Value& value,
-                                        SendMode mode) {
-  if (m_local) {
-    mode = ClientData::kSendImmNoFlush;  // always send local immediately
-  }
-  switch (mode) {
-    case ClientData::kSendDisabled:  // do nothing
-      break;
-    case ClientData::kSendImmNoFlush:  // send immediately
-      WriteBinary(topic->id, value.time(), value);
-      if (m_local) {
-        Flush();
-      }
-      break;
-    case ClientData::kSendAll:  // append to outgoing
-      m_outgoingValueMap[topic->id] = m_outgoing.size();
-      m_outgoing.emplace_back(ServerMessage{ServerValueMsg{topic->id, value}});
-      break;
-    case ClientData::kSendNormal: {
-      // replace, or append if not present
-      auto [it, added] =
-          m_outgoingValueMap.try_emplace(topic->id, m_outgoing.size());
-      if (!added && it->second < m_outgoing.size()) {
-        if (auto m =
-                std::get_if<ServerValueMsg>(&m_outgoing[it->second].contents)) {
-          if (m->topic == topic->id) {  // should always be true
-            m->value = value;
-            break;
-          }
-        }
-      }
-      m_outgoing.emplace_back(ServerMessage{ServerValueMsg{topic->id, value}});
-      break;
-    }
-  }
+                                        ValueSendMode mode) {
+  m_outgoing.SendValue(Handle(0, topic->id, Handle::kTopic), value, mode);
 }
 
 void ServerImpl::ClientData4::SendAnnounce(TopicData* topic,
@@ -497,14 +520,18 @@ void ServerImpl::ClientData4::SendAnnounce(TopicData* topic,
   sent = true;
 
   if (m_local) {
-    WireEncodeAnnounce(SendText().Add(), topic->name, topic->id, topic->typeStr,
-                       topic->properties, pubuid);
-    Flush();
-  } else {
-    m_outgoing.emplace_back(ServerMessage{AnnounceMsg{
-        topic->name, topic->id, topic->typeStr, pubuid, topic->properties}});
-    m_server.m_controlReady = true;
+    int unsent = m_wire.WriteText([&](auto& os) {
+      WireEncodeAnnounce(os, topic->name, topic->id, topic->typeStr,
+                         topic->properties, pubuid);
+    });
+    if (unsent == 0 && m_wire.Flush() == 0) {
+      return;
+    }
   }
+  m_outgoing.SendMessage(Handle(0, topic->id, Handle::kTopic),
+                         AnnounceMsg{topic->name, topic->id, topic->typeStr,
+                                     pubuid, topic->properties});
+  m_server.m_controlReady = true;
 }
 
 void ServerImpl::ClientData4::SendUnannounce(TopicData* topic) {
@@ -515,13 +542,15 @@ void ServerImpl::ClientData4::SendUnannounce(TopicData* topic) {
   sent = false;
 
   if (m_local) {
-    WireEncodeUnannounce(SendText().Add(), topic->name, topic->id);
-    Flush();
-  } else {
-    m_outgoing.emplace_back(
-        ServerMessage{UnannounceMsg{topic->name, topic->id}});
-    m_server.m_controlReady = true;
+    int unsent = m_wire.WriteText(
+        [&](auto& os) { WireEncodeUnannounce(os, topic->name, topic->id); });
+    if (unsent == 0 && m_wire.Flush() == 0) {
+      return;
+    }
   }
+  m_outgoing.SendMessage(Handle(0, topic->id, Handle::kTopic),
+                         UnannounceMsg{topic->name, topic->id});
+  m_server.m_controlReady = true;
 }
 
 void ServerImpl::ClientData4::SendPropertiesUpdate(TopicData* topic,
@@ -532,50 +561,25 @@ void ServerImpl::ClientData4::SendPropertiesUpdate(TopicData* topic,
   }
 
   if (m_local) {
-    WireEncodePropertiesUpdate(SendText().Add(), topic->name, update, ack);
-    Flush();
-  } else {
-    m_outgoing.emplace_back(
-        ServerMessage{PropertiesUpdateMsg{topic->name, update, ack}});
-    m_server.m_controlReady = true;
-  }
-}
-
-void ServerImpl::ClientData4::SendOutgoing(uint64_t curTimeMs) {
-  if (m_outgoing.empty()) {
-    return;  // nothing to do
-  }
-
-  // rate limit frequency of transmissions
-  if (curTimeMs < (m_lastSendMs + kMinPeriodMs)) {
-    return;
-  }
-
-  if (!m_wire.Ready()) {
-    uint64_t lastFlushTime = m_wire.GetLastFlushTime();
-    uint64_t now = wpi::Now();
-    if (lastFlushTime != 0 && now > (lastFlushTime + kWireMaxNotReadyUs)) {
-      m_wire.Disconnect("transmit stalled");
-    }
-    return;
-  }
-
-  for (auto&& msg : m_outgoing) {
-    if (auto m = std::get_if<ServerValueMsg>(&msg.contents)) {
-      WriteBinary(m->topic, m->value.time(), m->value);
-    } else {
-      WireEncodeText(SendText().Add(), msg);
+    int unsent = m_wire.WriteText([&](auto& os) {
+      WireEncodePropertiesUpdate(os, topic->name, update, ack);
+    });
+    if (unsent == 0 && m_wire.Flush() == 0) {
+      return;
     }
   }
-  m_outgoing.resize(0);
-  m_outgoingValueMap.clear();
-  m_lastSendMs = curTimeMs;
+  m_outgoing.SendMessage(Handle(0, topic->id, Handle::kTopic),
+                         PropertiesUpdateMsg{topic->name, update, ack});
+  m_server.m_controlReady = true;
 }
 
-void ServerImpl::ClientData4::Flush() {
-  m_outText.reset();
-  m_outBinary.reset();
-  m_wire.Flush();
+void ServerImpl::ClientData4::SendOutgoing(uint64_t curTimeMs, bool flush) {
+  if (m_wire.GetVersion() >= 0x0401) {
+    if (!m_ping.Send(curTimeMs)) {
+      return;
+    }
+  }
+  m_outgoing.SendOutgoing(curTimeMs, flush);
 }
 
 bool ServerImpl::ClientData3::TopicData3::UpdateFlags(TopicData* topic) {
@@ -593,21 +597,21 @@ void ServerImpl::ClientData3::ProcessIncomingBinary(
 }
 
 void ServerImpl::ClientData3::SendValue(TopicData* topic, const Value& value,
-                                        SendMode mode) {
+                                        ValueSendMode mode) {
   if (m_state != kStateRunning) {
-    if (mode == kSendImmNoFlush) {
-      mode = kSendAll;
+    if (mode == ValueSendMode::kImm) {
+      mode = ValueSendMode::kAll;
     }
   } else if (m_local) {
-    mode = ClientData::kSendImmNoFlush;  // always send local immediately
+    mode = ValueSendMode::kImm;  // always send local immediately
   }
   TopicData3* topic3 = GetTopic3(topic);
   bool added = false;
 
   switch (mode) {
-    case ClientData::kSendDisabled:  // do nothing
+    case ValueSendMode::kDisabled:  // do nothing
       break;
-    case ClientData::kSendImmNoFlush:  // send immediately and flush
+    case ValueSendMode::kImm:  // send immediately
       ++topic3->seqNum;
       if (topic3->sentAssign) {
         net3::WireEncodeEntryUpdate(m_wire.Send().stream(), topic->id,
@@ -622,7 +626,7 @@ void ServerImpl::ClientData3::SendValue(TopicData* topic, const Value& value,
         Flush();
       }
       break;
-    case ClientData::kSendNormal: {
+    case ValueSendMode::kNormal: {
       // replace, or append if not present
       wpi::DenseMap<NT_Topic, size_t>::iterator it;
       std::tie(it, added) =
@@ -639,7 +643,7 @@ void ServerImpl::ClientData3::SendValue(TopicData* topic, const Value& value,
       }
     }
       // fallthrough
-    case ClientData::kSendAll:  // append to outgoing
+    case ValueSendMode::kAll:  // append to outgoing
       if (!added) {
         m_outgoingValueMap[topic->id] = m_outgoing.size();
       }
@@ -666,7 +670,7 @@ void ServerImpl::ClientData3::SendAnnounce(TopicData* topic,
 
   // subscribe to all non-special topics
   if (!topic->special) {
-    topic->subscribers.Add(m_subscribers[0].get());
+    topic->clients[this].AddSubscriber(m_subscribers[0].get());
     m_server.UpdateMetaTopicSub(topic);
   }
 
@@ -720,7 +724,7 @@ void ServerImpl::ClientData3::SendPropertiesUpdate(TopicData* topic,
   }
 }
 
-void ServerImpl::ClientData3::SendOutgoing(uint64_t curTimeMs) {
+void ServerImpl::ClientData3::SendOutgoing(uint64_t curTimeMs, bool flush) {
   if (m_outgoing.empty() || m_state != kStateRunning) {
     return;  // nothing to do
   }
@@ -743,6 +747,7 @@ void ServerImpl::ClientData3::SendOutgoing(uint64_t curTimeMs) {
   for (auto&& msg : m_outgoing) {
     net3::WireEncode(out.stream(), msg);
   }
+  m_wire.Flush();
   m_outgoing.resize(0);
   m_outgoingValueMap.clear();
   m_lastSendMs = curTimeMs;
@@ -790,7 +795,7 @@ void ServerImpl::ClientData3::ClearEntries() {
       auto publisherIt = m_publishers.find(topic3it.second.pubuid);
       if (publisherIt != m_publishers.end()) {
         // remove publisher from topic
-        topic->publishers.Remove(publisherIt->second.get());
+        topic->RemovePublisher(this, publisherIt->second.get());
 
         // remove publisher from client
         m_publishers.erase(publisherIt);
@@ -841,10 +846,7 @@ void ServerImpl::ClientData3::ClientHello(std::string_view self_id,
   options.prefixMatch = true;
   sub = std::make_unique<SubscriberData>(
       this, std::span<const std::string>{{prefix}}, 0, options);
-  m_periodMs = std::gcd(m_periodMs, sub->periodMs);
-  if (m_periodMs < kMinPeriodMs) {
-    m_periodMs = kMinPeriodMs;
-  }
+  m_periodMs = UpdatePeriodCalc(m_periodMs, sub->periodMs);
   m_setPeriodic(m_periodMs);
 
   {
@@ -855,7 +857,7 @@ void ServerImpl::ClientData3::ClientHello(std::string_view self_id,
           topic->lastValue) {
         DEBUG4("client {}: initial announce of '{}' (id {})", m_id, topic->name,
                topic->id);
-        topic->subscribers.Add(sub.get());
+        topic->clients[this].AddSubscriber(sub.get());
         m_server.UpdateMetaTopicSub(topic.get());
 
         TopicData3* topic3 = GetTopic3(topic.get());
@@ -922,7 +924,7 @@ void ServerImpl::ClientData3::EntryAssign(std::string_view name,
   }
 
   // add publisher to topic
-  topic->publishers.Add(publisherIt->getSecond().get());
+  topic->AddPublisher(this, publisherIt->getSecond().get());
 
   // update meta data
   m_server.UpdateMetaTopicPub(topic);
@@ -972,7 +974,7 @@ void ServerImpl::ClientData3::EntryUpdate(unsigned int id, unsigned int seq_num,
         std::make_unique<PublisherData>(this, topic, topic3->pubuid));
     if (isNew) {
       // add publisher to topic
-      topic->publishers.Add(publisherIt->getSecond().get());
+      topic->AddPublisher(this, publisherIt->getSecond().get());
 
       // update meta data
       m_server.UpdateMetaTopicPub(topic);
@@ -1037,7 +1039,7 @@ void ServerImpl::ClientData3::EntryDelete(unsigned int id) {
       auto publisherIt = m_publishers.find(topic3it->second.pubuid);
       if (publisherIt != m_publishers.end()) {
         // remove publisher from topic
-        topic->publishers.Remove(publisherIt->second.get());
+        topic->RemovePublisher(this, publisherIt->second.get());
 
         // remove publisher from client
         m_publishers.erase(publisherIt);
@@ -1159,8 +1161,6 @@ std::pair<std::string, int> ServerImpl::AddClient(
   clientData->UpdateMetaClientPub();
   clientData->UpdateMetaClientSub();
 
-  wire.Flush();
-
   DEBUG3("AddClient('{}', '{}') -> {}", name, connInfo, index);
   return {std::move(dedupName), index};
 }
@@ -1197,17 +1197,14 @@ void ServerImpl::RemoveClient(int clientId) {
   // remove all publishers and subscribers for this client
   wpi::SmallVector<TopicData*, 16> toDelete;
   for (auto&& topic : m_topics) {
-    auto pubRemove =
-        std::remove_if(topic->publishers.begin(), topic->publishers.end(),
-                       [&](auto&& e) { return e->client == client.get(); });
-    bool pubChanged = pubRemove != topic->publishers.end();
-    topic->publishers.erase(pubRemove, topic->publishers.end());
-
-    auto subRemove =
-        std::remove_if(topic->subscribers.begin(), topic->subscribers.end(),
-                       [&](auto&& e) { return e->client == client.get(); });
-    bool subChanged = subRemove != topic->subscribers.end();
-    topic->subscribers.erase(subRemove, topic->subscribers.end());
+    bool pubChanged = false;
+    bool subChanged = false;
+    auto tcdIt = topic->clients.find(client.get());
+    if (tcdIt != topic->clients.end()) {
+      pubChanged = !tcdIt->second.publishers.empty();
+      subChanged = !tcdIt->second.subscribers.empty();
+      topic->clients.erase(tcdIt);
+    }
 
     if (!topic->IsPublished()) {
       toDelete.push_back(topic.get());
@@ -1641,13 +1638,15 @@ ServerImpl::TopicData* ServerImpl::CreateTopic(ClientData* client,
       wpi::SmallVector<SubscriberData*, 16> subscribersBuf;
       auto subscribers =
           aClient->GetSubscribers(name, topic->special, subscribersBuf);
-      for (auto subscriber : subscribers) {
-        topic->subscribers.Add(subscriber);
-      }
 
       // don't announce to this client if no subscribers
       if (subscribers.empty()) {
         continue;
+      }
+
+      auto& tcd = topic->clients[aClient.get()];
+      for (auto subscriber : subscribers) {
+        tcd.AddSubscriber(subscriber);
       }
 
       if (aClient.get() == client) {
@@ -1688,17 +1687,9 @@ void ServerImpl::DeleteTopic(TopicData* topic) {
   }
 
   // unannounce to all subscribers
-  wpi::SmallVector<bool, 16> clients;
-  clients.resize(m_clients.size());
-  for (auto&& sub : topic->subscribers) {
-    clients[sub->client->GetId()] = true;
-  }
-  for (size_t i = 0, iend = clients.size(); i < iend; ++i) {
-    if (!clients[i]) {
-      continue;
-    }
-    if (auto aClient = m_clients[i].get()) {
-      aClient->SendUnannounce(topic);
+  for (auto&& tcd : topic->clients) {
+    if (!tcd.second.subscribers.empty()) {
+      tcd.first->SendUnannounce(topic);
     }
   }
 
@@ -1755,32 +1746,9 @@ void ServerImpl::SetValue(ClientData* client, TopicData* topic,
     }
   }
 
-  // propagate to subscribers; as each client may have multiple subscribers,
-  // but we only want to send the value once, first map to clients and then
-  // take action based on union of subscriptions
-
-  // indexed by clientId
-  wpi::SmallVector<ClientData::SendMode, 16> toSend;
-  toSend.resize(m_clients.size());
-
-  for (auto&& subscriber : topic->subscribers) {
-    int id = subscriber->client->GetId();
-    if (subscriber->options.topicsOnly) {
-      continue;
-    } else if (subscriber->options.sendAll) {
-      toSend[id] = ClientData::kSendAll;
-    } else if (toSend[id] != ClientData::kSendAll) {
-      toSend[id] = ClientData::kSendNormal;
-    }
-  }
-
-  for (size_t i = 0, iend = toSend.size(); i < iend; ++i) {
-    auto aClient = m_clients[i].get();
-    if (!aClient || client == aClient) {
-      continue;  // don't echo back
-    }
-    if (toSend[i] != ClientData::kSendDisabled) {
-      aClient->SendValue(topic, value, toSend[i]);
+  for (auto&& tcd : topic->clients) {
+    if (tcd.second.sendMode != ValueSendMode::kDisabled) {
+      tcd.first->SendValue(topic, value, tcd.second.sendMode);
     }
   }
 }
@@ -1811,18 +1779,17 @@ void ServerImpl::UpdateMetaTopicPub(TopicData* topic) {
     return;
   }
   Writer w;
-  mpack_start_array(&w, topic->publishers.size());
-  for (auto&& pub : topic->publishers) {
-    mpack_start_map(&w, 2);
-    mpack_write_str(&w, "client");
-    if (pub->client) {
-      mpack_write_str(&w, pub->client->GetName());
-    } else {
-      mpack_write_str(&w, "");
+  uint32_t count = 0;
+  for (auto&& tcd : topic->clients) {
+    count += tcd.second.publishers.size();
+  }
+  mpack_start_array(&w, count);
+  for (auto&& tcd : topic->clients) {
+    for (auto&& pub : tcd.second.publishers) {
+      mpack_write_object_bytes(
+          &w, reinterpret_cast<const char*>(pub->metaTopic.data()),
+          pub->metaTopic.size());
     }
-    mpack_write_str(&w, "pubuid");
-    mpack_write_int(&w, pub->pubuid);
-    mpack_finish_map(&w);
   }
   mpack_finish_array(&w);
   if (mpack_writer_destroy(&w) == mpack_ok) {
@@ -1835,20 +1802,17 @@ void ServerImpl::UpdateMetaTopicSub(TopicData* topic) {
     return;
   }
   Writer w;
-  mpack_start_array(&w, topic->subscribers.size());
-  for (auto&& sub : topic->subscribers) {
-    mpack_start_map(&w, 3);
-    mpack_write_str(&w, "client");
-    if (sub->client) {
-      mpack_write_str(&w, sub->client->GetName());
-    } else {
-      mpack_write_str(&w, "");
+  uint32_t count = 0;
+  for (auto&& tcd : topic->clients) {
+    count += tcd.second.subscribers.size();
+  }
+  mpack_start_array(&w, count);
+  for (auto&& tcd : topic->clients) {
+    for (auto&& sub : tcd.second.subscribers) {
+      mpack_write_object_bytes(
+          &w, reinterpret_cast<const char*>(sub->metaTopic.data()),
+          sub->metaTopic.size());
     }
-    mpack_write_str(&w, "subuid");
-    mpack_write_int(&w, sub->subuid);
-    mpack_write_str(&w, "options");
-    WriteOptions(w, sub->options);
-    mpack_finish_map(&w);
   }
   mpack_finish_array(&w);
   if (mpack_writer_destroy(&w) == mpack_ok) {
@@ -1863,41 +1827,23 @@ void ServerImpl::PropertiesChanged(ClientData* client, TopicData* topic,
     DeleteTopic(topic);
   } else {
     // send updated announcement to all subscribers
-    wpi::SmallVector<bool, 16> clients;
-    clients.resize(m_clients.size());
-    for (auto&& sub : topic->subscribers) {
-      clients[sub->client->GetId()] = true;
-    }
-    for (size_t i = 0, iend = clients.size(); i < iend; ++i) {
-      if (!clients[i]) {
-        continue;
-      }
-      if (auto aClient = m_clients[i].get()) {
-        aClient->SendPropertiesUpdate(topic, update, aClient == client);
-      }
+    for (auto&& tcd : topic->clients) {
+      tcd.first->SendPropertiesUpdate(topic, update, tcd.first == client);
     }
   }
 }
 
-void ServerImpl::SendControl(uint64_t curTimeMs) {
-  if (!m_controlReady) {
-    return;
-  }
-  m_controlReady = false;
-
+void ServerImpl::SendAllOutgoing(uint64_t curTimeMs, bool flush) {
   for (auto&& client : m_clients) {
     if (client) {
-      // to ensure ordering, just send everything
-      client->SendOutgoing(curTimeMs);
-      client->Flush();
+      client->SendOutgoing(curTimeMs, flush);
     }
   }
 }
 
-void ServerImpl::SendValues(int clientId, uint64_t curTimeMs) {
+void ServerImpl::SendOutgoing(int clientId, uint64_t curTimeMs) {
   if (auto client = m_clients[clientId].get()) {
-    client->SendOutgoing(curTimeMs);
-    client->Flush();
+    client->SendOutgoing(curTimeMs, false);
   }
 }
 
