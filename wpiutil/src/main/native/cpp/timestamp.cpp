@@ -92,6 +92,16 @@ struct HMBHolder {
     cfg.Enables_Timestamp = 1;
     hmb->writeConfig(cfg, &status);
   }
+  void Reset() {
+    if (hmb) {
+      closeHmb(hmb->getSystemInterface()->getHandle(), hmbName);
+      dlclose(niFpga);
+      hmb = nullptr;
+      niFpga = nullptr;
+      closeHmb = nullptr;
+      hmbBuffer = nullptr;
+    }
+  }
   std::unique_ptr<fpga::tHMB> hmb;
   void* niFpga = nullptr;
   NiFpga_CloseHmbFunc closeHmb = nullptr;
@@ -184,7 +194,7 @@ void wpi::impl::SetupNowRio() {
 
 void wpi::impl::ShutdownNowRio() {
 #ifdef __FRC_ROBORIO__
-  hmb = HMBHolder{};
+  hmb.Reset();
 #endif
 }
 
