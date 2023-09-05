@@ -19,6 +19,12 @@ extern "C" {
 void WPI_Impl_SetupNowRio(void);
 
 /**
+ * De-initialize the on-Rio Now() implementation. No effect on non-Rio
+ * platforms.
+ */
+void WPI_Impl_ShutdownNowRio(void);
+
+/**
  * The default implementation used for Now().
  * In general this is the time returned by the operating system.
  * @return Time in microseconds.
@@ -62,6 +68,12 @@ namespace impl {
  * thus should generally not be called by user code.
  */
 void SetupNowRio();
+
+/**
+ * De-initialize the on-Rio Now() implementation. No effect on non-Rio
+ * platforms.
+ */
+void ShutdownNowRio();
 }  // namespace impl
 
 /**

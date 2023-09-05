@@ -182,6 +182,12 @@ void wpi::impl::SetupNowRio() {
 #endif
 }
 
+void wpi::impl::ShutdownNowRio() {
+#ifdef __FRC_ROBORIO__
+  hmb = HMBHolder{};
+#endif
+}
+
 void wpi::SetNowImpl(uint64_t (*func)(void)) {
   now_impl = func ? func : NowDefault;
 }
@@ -228,6 +234,10 @@ extern "C" {
 
 void WPI_Impl_SetupNowRio(void) {
   return wpi::impl::SetupNowRio();
+}
+
+void WPI_Impl_ShutdownNowRio(void) {
+  return wpi::impl::ShutdownNowRio();
 }
 
 uint64_t WPI_NowDefault(void) {
