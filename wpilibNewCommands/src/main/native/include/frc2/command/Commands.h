@@ -144,7 +144,7 @@ CommandPtr Print(std::string_view msg);
  * @param supplier the command supplier
  */
 [[nodiscard]]
-CommandPtr Proxy(wpi::unique_function<Command*()> supplier);
+CommandPtr DeferredProxy(wpi::unique_function<Command*()> supplier);
 
 /**
  * Constructs a command that schedules the supplied command when initialized,
@@ -153,7 +153,7 @@ CommandPtr Proxy(wpi::unique_function<Command*()> supplier);
  * @param supplier the command supplier
  */
 [[nodiscard]]
-CommandPtr Proxy(wpi::unique_function<CommandPtr()> supplier);
+CommandPtr DeferredProxy(wpi::unique_function<CommandPtr()> supplier);
 
 // Idling Commands
 

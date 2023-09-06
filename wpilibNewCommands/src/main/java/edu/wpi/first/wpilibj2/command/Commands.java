@@ -108,7 +108,7 @@ public final class Commands {
    * @return the command
    * @see ProxyCommand
    */
-  public static Command proxy(Supplier<Command> supplier) {
+  public static Command deferredProxy(Supplier<Command> supplier) {
     return new ProxyCommand(supplier);
   }
 

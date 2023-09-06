@@ -87,11 +87,11 @@ CommandPtr cmd::Print(std::string_view msg) {
   return PrintCommand(msg).ToPtr();
 }
 
-CommandPtr cmd::Proxy(wpi::unique_function<Command*()> supplier) {
+CommandPtr cmd::DeferredProxy(wpi::unique_function<Command*()> supplier) {
   return ProxyCommand(std::move(supplier)).ToPtr();
 }
 
-CommandPtr cmd::Proxy(wpi::unique_function<CommandPtr()> supplier) {
+CommandPtr cmd::DeferredProxy(wpi::unique_function<CommandPtr()> supplier) {
   return ProxyCommand(std::move(supplier)).ToPtr();
 }
 
