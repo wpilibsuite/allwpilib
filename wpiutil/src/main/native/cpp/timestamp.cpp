@@ -94,7 +94,7 @@ struct HMBHolder {
   }
   void Reset() {
     if (hmb) {
-      std::unique_ptr<fgpa::tHMB> oldHmb;
+      std::unique_ptr<fpga::tHMB> oldHmb;
       oldHmb.swap(hmb);
       closeHmb(oldHmb->getSystemInterface()->getHandle(), hmbName);
       closeHmb = nullptr;
