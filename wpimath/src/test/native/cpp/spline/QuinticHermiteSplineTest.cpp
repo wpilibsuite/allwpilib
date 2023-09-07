@@ -4,12 +4,13 @@
 
 #include <chrono>
 
+#include <gtest/gtest.h>
+
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
 #include "frc/spline/QuinticHermiteSpline.h"
 #include "frc/spline/SplineHelper.h"
 #include "frc/spline/SplineParameterizer.h"
-#include "gtest/gtest.h"
 #include "units/angle.h"
 #include "units/length.h"
 

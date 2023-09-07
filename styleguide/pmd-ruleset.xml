@@ -64,7 +64,6 @@
     <exclude name="AvoidCatchingThrowable" />
     <exclude name="AvoidDuplicateLiterals" />
     <exclude name="AvoidLiteralsInIfCondition" />
-    <exclude name="BeanMembersShouldSerialize" />
     <exclude name="CloseResource" />
     <exclude name="ConstructorCallsOverridableMethod" />
     <exclude name="DataflowAnomalyAnalysis" />
@@ -74,6 +73,7 @@
     <exclude name="FinalizeDoesNotCallSuperFinalize" />
     <exclude name="JUnitSpelling" />
     <exclude name="MissingSerialVersionUID" />
+    <exclude name="NonSerializableClass" />
     <exclude name="NullAssignment" />
   </rule>
 

@@ -4,8 +4,9 @@
 
 #include <numbers>
 
+#include <gtest/gtest.h>
+
 #include "frc/geometry/Quaternion.h"
-#include "gtest/gtest.h"
 #include "units/angle.h"
 #include "units/math.h"
 

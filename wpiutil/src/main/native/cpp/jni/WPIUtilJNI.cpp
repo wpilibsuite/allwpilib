@@ -6,8 +6,9 @@
 
 #include <jni.h>
 
+#include <fmt/format.h>
+
 #include "edu_wpi_first_util_WPIUtilJNI.h"
-#include "fmt/format.h"
 #include "wpi/Synchronization.h"
 #include "wpi/jni_util.h"
 #include "wpi/timestamp.h"
@@ -78,7 +79,7 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_util_WPIUtilJNI_writeStderr
   (JNIEnv* env, jclass, jstring str)
 {
-  fmt::print(stderr, "{}", JStringRef{env, str});
+  fmt::print(stderr, "{}", JStringRef{env, str}.str());
 }
 
 /*
@@ -275,11 +276,11 @@ JNIEXPORT jintArray JNICALL
 Java_edu_wpi_first_util_WPIUtilJNI_waitForObjects
   (JNIEnv* env, jclass, jintArray handles)
 {
-  JIntArrayRef handlesArr{env, handles};
+  JSpan<const jint> handlesArr{env, handles};
   wpi::SmallVector<WPI_Handle, 8> signaledBuf;
   signaledBuf.resize(handlesArr.size());
   std::span<const WPI_Handle> handlesArr2{
-      reinterpret_cast<const WPI_Handle*>(handlesArr.array().data()),
+      reinterpret_cast<const WPI_Handle*>(handlesArr.data()),
       handlesArr.size()};
 
   auto signaled = wpi::WaitForObjects(handlesArr2, signaledBuf);
@@ -299,11 +300,11 @@ JNIEXPORT jintArray JNICALL
 Java_edu_wpi_first_util_WPIUtilJNI_waitForObjectsTimeout
   (JNIEnv* env, jclass, jintArray handles, jdouble timeout)
 {
-  JIntArrayRef handlesArr{env, handles};
+  JSpan<const jint> handlesArr{env, handles};
   wpi::SmallVector<WPI_Handle, 8> signaledBuf;
   signaledBuf.resize(handlesArr.size());
   std::span<const WPI_Handle> handlesArr2{
-      reinterpret_cast<const WPI_Handle*>(handlesArr.array().data()),
+      reinterpret_cast<const WPI_Handle*>(handlesArr.data()),
       handlesArr.size()};
 
   bool timedOut;

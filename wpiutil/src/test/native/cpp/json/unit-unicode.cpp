@@ -32,16 +32,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE  OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "gtest/gtest.h"
-
 #include "unit-json.h"
-using wpi::json;
 
-#include "fmt/format.h"
+#include <fstream>
+
+#include <fmt/format.h>
+#include <gtest/gtest.h>
+
 #include "wpi/StringExtras.h"
 #include "wpi/raw_ostream.h"
 
-#include <fstream>
+using wpi::json;
 
 // create and check a JSON string with up to four UTF-8 bytes
 ::testing::AssertionResult check_utf8string(bool success_expected, int byte1, int byte2 = -1, int byte3 = -1, int byte4 = -1)

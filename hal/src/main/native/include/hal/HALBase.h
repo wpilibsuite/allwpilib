@@ -93,6 +93,12 @@ size_t HAL_GetSerialNumber(char* buffer, size_t size);
 size_t HAL_GetComments(char* buffer, size_t size);
 
 /**
+ * Returns the team number configured for the robot controller.
+ * @return team number, or 0 if not found.
+ */
+int32_t HAL_GetTeamNumber(void);
+
+/**
  * Returns the runtime type of the HAL.
  *
  * @return HAL Runtime Type

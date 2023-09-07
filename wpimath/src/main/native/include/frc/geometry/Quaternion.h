@@ -4,9 +4,8 @@
 
 #pragma once
 
+#include <Eigen/Core>
 #include <wpi/SymbolExports.h>
-
-#include "frc/EigenCore.h"
 
 namespace wpi {
 class json;

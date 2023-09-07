@@ -17,9 +17,9 @@
 #include <frc/kinematics/SwerveModuleState.h>
 #include <frc/simulation/SimHooks.h>
 #include <frc/trajectory/TrajectoryGenerator.h>
+#include <gtest/gtest.h>
 
 #include "CommandTestBase.h"
-#include "gtest/gtest.h"
 
 #define EXPECT_NEAR_UNITS(val1, val2, eps) \
   EXPECT_LE(units::math::abs(val1 - val2), eps)

@@ -24,10 +24,12 @@ import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Rotation3d implements Interpolatable<Rotation3d> {
-  private Quaternion m_q = new Quaternion();
+  private final Quaternion m_q;
 
   /** Constructs a Rotation3d with a default angle of 0 degrees. */
-  public Rotation3d() {}
+  public Rotation3d() {
+    m_q = new Quaternion();
+  }
 
   /**
    * Constructs a Rotation3d from a quaternion.
@@ -93,6 +95,7 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
   public Rotation3d(Vector<N3> axis, double angleRadians) {
     double norm = axis.norm();
     if (norm == 0.0) {
+      m_q = new Quaternion();
       return;
     }
 
@@ -186,6 +189,7 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
     if (dotNorm > 1.0 - 1E-9) {
       // If the dot product is 1, the two vectors point in the same direction so
       // there's no rotation. The default initialization of m_q will work.
+      m_q = new Quaternion();
       return;
     } else if (dotNorm < -1.0 + 1E-9) {
       // If the dot product is -1, the two vectors point in opposite directions

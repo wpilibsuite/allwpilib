@@ -70,7 +70,7 @@ if (WITH_JAVA)
 
 endif()
 
-GENERATE_RESOURCES(src/main/native/resources/edu/wpi/first/apriltag generated/main/cpp APRILTAG frc apriltag_resources_src)
+generate_resources(src/main/native/resources/edu/wpi/first/apriltag generated/main/cpp APRILTAG frc apriltag_resources_src)
 
 file(GLOB apriltag_native_src src/main/native/cpp/*.cpp)
 

@@ -8,20 +8,19 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 /**
- * Represents the speed of a robot chassis. Although this struct contains similar members compared
- * to a Twist2d, they do NOT represent the same thing. Whereas a Twist2d represents a change in pose
- * w.r.t to the robot frame of reference, this ChassisSpeeds struct represents a velocity w.r.t to
- * the robot frame of reference.
+ * Represents the speed of a robot chassis. Although this class contains similar members compared to
+ * a Twist2d, they do NOT represent the same thing. Whereas a Twist2d represents a change in pose
+ * w.r.t to the robot frame of reference, a ChassisSpeeds object represents a robot's velocity.
  *
  * <p>A strictly non-holonomic drivetrain, such as a differential drive, should never have a dy
  * component because it can never move sideways. Holonomic drivetrains such as swerve and mecanum
  * will often have all three components.
  */
 public class ChassisSpeeds {
-  /** Represents forward velocity w.r.t the robot frame of reference. (Fwd is +) */
+  /** Velocity along the x-axis. (Fwd is +) */
   public double vxMetersPerSecond;
 
-  /** Represents sideways velocity w.r.t the robot frame of reference. (Left is +) */
+  /** Velocity along the y-axis. (Left is +) */
   public double vyMetersPerSecond;
 
   /** Represents the angular velocity of the robot frame. (CCW is +) */
@@ -155,7 +154,7 @@ public class ChassisSpeeds {
   }
 
   /**
-   * Subtracts the other ChassisSpeeds from the other ChassisSpeeds and returns the difference.
+   * Subtracts the other ChassisSpeeds from the current ChassisSpeeds and returns the difference.
    *
    * <p>For example, ChassisSpeeds{5.0, 4.0, 2.0} - ChassisSpeeds{1.0, 2.0, 1.0} =
    * ChassisSpeeds{4.0, 2.0, 1.0}
@@ -198,8 +197,8 @@ public class ChassisSpeeds {
    *
    * <p>For example, ChassisSpeeds{2.0, 2.5, 1.0} / 2 = ChassisSpeeds{1.0, 1.25, 0.5}
    *
-   * @param scalar The scalar to multiply by.
-   * @return The reference to the new mutated object.
+   * @param scalar The scalar to divide by.
+   * @return The scaled ChassisSpeeds.
    */
   public ChassisSpeeds div(double scalar) {
     return new ChassisSpeeds(

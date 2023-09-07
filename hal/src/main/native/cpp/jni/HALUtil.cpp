@@ -486,6 +486,18 @@ Java_edu_wpi_first_hal_HALUtil_getComments
 
 /*
  * Class:     edu_wpi_first_hal_HALUtil
+ * Method:    getTeamNumber
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_HALUtil_getTeamNumber
+  (JNIEnv* env, jclass)
+{
+  return HAL_GetTeamNumber();
+}
+
+/*
+ * Class:     edu_wpi_first_hal_HALUtil
  * Method:    getFPGATime
  * Signature: ()J
  */

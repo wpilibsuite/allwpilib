@@ -9,13 +9,12 @@
 #include <utility>
 
 #include <frc/simulation/DriverStationSim.h>
+#include <gtest/gtest.h>
 
 #include "frc2/command/CommandHelper.h"
 #include "frc2/command/CommandScheduler.h"
-#include "frc2/command/SetUtilities.h"
 #include "frc2/command/Subsystem.h"
 #include "gmock/gmock.h"
-#include "gtest/gtest.h"
 #include "make_vector.h"
 
 namespace frc2 {

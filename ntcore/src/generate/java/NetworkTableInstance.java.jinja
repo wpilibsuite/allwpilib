@@ -553,7 +553,7 @@ public final class NetworkTableInstance implements AutoCloseable {
     }
   }
 
-  private ListenerStorage m_listeners = new ListenerStorage(this);
+  private final ListenerStorage m_listeners = new ListenerStorage(this);
 
   /**
    * Remove a connection listener.

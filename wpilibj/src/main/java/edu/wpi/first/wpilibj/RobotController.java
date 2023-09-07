@@ -58,6 +58,15 @@ public final class RobotController {
   }
 
   /**
+   * Returns the team number configured for the robot controller.
+   *
+   * @return team number, or 0 if not found.
+   */
+  public static int getTeamNumber() {
+    return HALUtil.getTeamNumber();
+  }
+
+  /**
    * Read the microsecond timer from the FPGA.
    *
    * @return The current time in microseconds according to the FPGA.

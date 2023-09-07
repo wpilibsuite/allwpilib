@@ -4,10 +4,10 @@
 
 #pragma once
 
+#include <Eigen/Core>
 #include <wpi/SymbolExports.h>
 #include <wpi/array.h>
 
-#include "frc/EigenCore.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
 #include "frc/interpolation/TimeInterpolatableBuffer.h"

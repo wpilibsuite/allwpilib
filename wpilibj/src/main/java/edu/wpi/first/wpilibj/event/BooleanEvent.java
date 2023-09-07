@@ -24,6 +24,7 @@ import java.util.function.BooleanSupplier;
 public class BooleanEvent implements BooleanSupplier {
   /** Poller loop. */
   protected final EventLoop m_loop;
+
   /** Condition. */
   private final BooleanSupplier m_signal;
 

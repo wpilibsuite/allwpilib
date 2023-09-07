@@ -5,9 +5,9 @@
 #include <vector>
 
 #include <fmt/format.h>
+#include <gtest/gtest.h>
 
 #include "frc/fmt/Eigen.h"
-#include "gtest/gtest.h"
 #include "units/velocity.h"
 
 TEST(FormatterTest, Eigen) {

@@ -4,12 +4,12 @@
 
 #include "frc/simulation/BuiltInAccelerometerSim.h"  // NOLINT(build/include_order)
 
+#include <gtest/gtest.h>
 #include <hal/Accelerometer.h>
 #include <hal/HAL.h>
 
 #include "callback_helpers/TestCallbackHelpers.h"
 #include "frc/BuiltInAccelerometer.h"
-#include "gtest/gtest.h"
 
 namespace frc::sim {
 

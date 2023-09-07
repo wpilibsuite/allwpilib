@@ -4,9 +4,10 @@
 
 #include <numbers>
 
+#include <gtest/gtest.h>
+
 #include "frc/geometry/Translation2d.h"
 #include "frc/kinematics/MecanumDriveKinematics.h"
-#include "gtest/gtest.h"
 #include "units/angular_velocity.h"
 
 using namespace frc;

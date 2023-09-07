@@ -85,12 +85,7 @@ if (WITH_JAVA)
         src/main/java/*.java)
     set(CMAKE_JNI_TARGET true)
 
-    if(${CMAKE_VERSION} VERSION_LESS "3.11.0")
-        set(CMAKE_JAVA_COMPILE_FLAGS "-h" "${CMAKE_CURRENT_BINARY_DIR}/jniheaders")
-        add_jar(hal_jar ${JAVA_SOURCES} INCLUDE_JARS wpiutil_jar OUTPUT_NAME wpiHal)
-    else()
-        add_jar(hal_jar ${JAVA_SOURCES} INCLUDE_JARS wpiutil_jar OUTPUT_NAME wpiHal GENERATE_NATIVE_HEADERS hal_jni_headers)
-    endif()
+    add_jar(hal_jar ${JAVA_SOURCES} INCLUDE_JARS wpiutil_jar OUTPUT_NAME wpiHal GENERATE_NATIVE_HEADERS hal_jni_headers)
 
     get_property(HAL_JAR_FILE TARGET hal_jar PROPERTY JAR_FILE)
     install(FILES ${HAL_JAR_FILE} DESTINATION "${java_lib_dest}")
@@ -110,12 +105,7 @@ if (WITH_JAVA)
 
     set_property(TARGET haljni PROPERTY FOLDER "libraries")
 
-    if(${CMAKE_VERSION} VERSION_LESS "3.11.0")
-        target_include_directories(haljni PRIVATE ${JNI_INCLUDE_DIRS})
-        target_include_directories(haljni PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/jniheaders")
-    else()
-        target_link_libraries(haljni PRIVATE hal_jni_headers)
-    endif()
+    target_link_libraries(haljni PRIVATE hal_jni_headers)
     add_dependencies(haljni hal_jar)
 
     if (MSVC)

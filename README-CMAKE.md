@@ -93,7 +93,7 @@ Using the libraries from C++ is the easiest way to use the built libraries.
 To do so, create a new folder to contain your project. Add the following code below to a `CMakeLists.txt` file in that directory.
 
 ```
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.11)
 project(vision_app) # Project Name Here
 
 find_package(wpilib REQUIRED)

@@ -9,7 +9,8 @@
 #include <span>
 #include <vector>
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
+
 #include "wpinet/uv/Loop.h"
 #include "wpinet/uv/Pipe.h"
 #include "wpinet/uv/Timer.h"

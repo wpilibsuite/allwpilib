@@ -44,8 +44,10 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
 
   /** The 'a' source. */
   protected DigitalSource m_aSource; // the A phase of the quad encoder
+
   /** The 'b' source. */
   protected DigitalSource m_bSource; // the B phase of the quad encoder
+
   /** The index source. */
   protected DigitalSource m_indexSource; // Index on some encoders
 
