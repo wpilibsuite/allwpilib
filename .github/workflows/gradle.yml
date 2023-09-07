@@ -22,8 +22,11 @@ jobs:
             artifact-name: Arm64
             build-options: "-Ponlylinuxarm64"
           - container: wpilib/ubuntu-base:22.04
-            artifact-name: Linux
-            build-options: "-Ponlylinuxx86-64"
+            artifact-name: LinuxDebug
+            build-options: "-Ponlylinuxx86-64 -PciDebugOnly"
+          - container: wpilib/ubuntu-base:22.04
+            artifact-name: LinuxRelease
+            build-options: "-Ponlylinuxx86-64 -PciReleaseOnly"
     name: "Build - ${{ matrix.artifact-name }}"
     runs-on: ubuntu-22.04
     container: ${{ matrix.container }}
