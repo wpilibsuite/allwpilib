@@ -94,12 +94,14 @@ struct HMBHolder {
   }
   void Reset() {
     if (hmb) {
-      closeHmb(hmb->getSystemInterface()->getHandle(), hmbName);
-      dlclose(niFpga);
-      hmb = nullptr;
-      niFpga = nullptr;
+      std::unique_ptr<fgpa::tHMB> oldHmb;
+      oldHmb.swap(hmb);
+      closeHmb(oldHmb->getSystemInterface()->getHandle(), hmbName);
       closeHmb = nullptr;
       hmbBuffer = nullptr;
+      oldHmb.reset();
+      dlclose(niFpga);
+      niFpga = nullptr;
     }
   }
   std::unique_ptr<fpga::tHMB> hmb;
