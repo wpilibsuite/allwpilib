@@ -79,4 +79,3 @@ jobs:
       - name: build
         working-directory: build
         run: cmake --build . --parallel $(nproc) --config Release
-
