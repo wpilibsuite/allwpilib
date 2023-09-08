@@ -65,7 +65,7 @@ class MultiBuilds implements Plugin<Project> {
       }
       binaries.withType(GoogleTestTestSuiteBinarySpec) { oSpec ->
         GoogleTestTestSuiteBinarySpec spec = (GoogleTestTestSuiteBinarySpec) oSpec
-        if (spec.buildType.name == 'release') {
+        if (spec.buildType.name == 'debug') {
           Rules.setBuildableFalseDynamically(spec)
         }
       }
