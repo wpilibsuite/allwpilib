@@ -205,7 +205,11 @@ public final class DataLogManager {
         // ignored
       }
     }
-
+    if (RobotBase.getRuntimeType() == RuntimeType.kRoboRIO) {
+      DriverStation.reportWarning(
+          "DataLogManager: Logging to RoboRIO 1 internal storage is not recommended! Plug in a FAT32 formatted flash drive!",
+          false);
+    }
     return Filesystem.getOperatingDirectory().getAbsolutePath();
   }
 
