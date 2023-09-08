@@ -16,20 +16,23 @@ class ChassisSpeedsTest {
   private static final double kEpsilon = 1E-9;
 
   @Test
-  void testVeeringCorrection() {
-    final var duration = 1.0; // duration of observation
-    final var dt = 0.01; // time increment for simulation
+  void testDiscretize() {
     final var target = new ChassisSpeeds(1.0, 0.0, 0.5);
-    final var speeds = ChassisSpeeds.fromDiscreteSpeeds(target, duration);
+    final var duration = 1.0;
+    final var dt = 0.01;
+
+    final var speeds = ChassisSpeeds.discretize(target, duration);
     final var twist =
         new Twist2d(
             speeds.vxMetersPerSecond * dt,
             speeds.vyMetersPerSecond * dt,
             speeds.omegaRadiansPerSecond * dt);
+
     var pose = new Pose2d();
     for (double time = 0; time < duration; time += dt) {
       pose = pose.exp(twist);
     }
+
     final var result = pose; // For lambda capture
     assertAll(
         () -> assertEquals(target.vxMetersPerSecond * duration, result.getX(), kEpsilon),
@@ -42,7 +45,7 @@ class ChassisSpeedsTest {
   }
 
   @Test
-  void testFieldRelativeConstruction() {
+  void testFromFieldRelativeSpeeds() {
     final var chassisSpeeds =
         ChassisSpeeds.fromFieldRelativeSpeeds(1.0, 0.0, 0.5, Rotation2d.fromDegrees(-90.0));
 
