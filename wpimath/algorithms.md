@@ -93,7 +93,7 @@ For q ≠ 0 and r = 0,
 
 We'll use the extrinsic X-Y-Z rotation order for Euler angles. The direction of rotation is CCW looking into the positive axis. If you point your right thumb along the positive axis direction, your fingers curl in the direction of rotation.
 
-The angles are `a_x` around the X-axis, `a_y` around the Y-axis, and `a_z` around the Z-axis, with the following constraints:
+The angles are a\_x around the X-axis, a\_y around the Y-axis, and a\_z around the Z-axis, with the following constraints:
 
 ```
   -π ≤ a_x ≤ π
@@ -117,7 +117,7 @@ The quaternion imaginary numbers are defined as follows:
 
 ### Quaternion representation of axis rotations
 
-We will take it as given that a rotation by `θ` radians around a normalized vector `v` is represented with the quaternion `cos(θ/2) + sin(θ/2) (v_x î + v_y ĵ + v_z k̂)`.
+We will take it as given that a rotation by θ radians around a normalized vector v is represented with the quaternion cos(θ/2) + sin(θ/2) (v\_x î + v\_y ĵ + v\_z k̂).
 
 ### Derivation
 
@@ -144,7 +144,7 @@ We can calculate the quaternion corresponding to a set of Euler angles by applyi
       + (c_x c_y s_z - s_x s_y c_z) k̂
 ```
 
-Letting `q = q_w + q_x î + q_y ĵ + q_z k̂`, we can extract the components of the quaternion:
+Letting q = q\_w + q\_x î + q\_y ĵ + q\_z k̂, we can extract the components of the quaternion:
 
 ```
   q_w = c_x c_y c_z + s_x s_y s_z
@@ -153,9 +153,9 @@ Letting `q = q_w + q_x î + q_y ĵ + q_z k̂`, we can extract the components o
   q_z = c_x c_y s_z - s_x s_y c_z
 ```
 
-### Solving for `a_y`
+### Solving for a\_y
 
-Solving for `sin(a_y)`:
+Solving for sin(a\_y):
 
 ```
   sin(a_y) = 2 c_y s_y
@@ -173,16 +173,16 @@ Solving for `sin(a_y)`:
   sin(a_y) = 2 (q_w q_y - q_x q_z)
 ```
 
-Then solving for `a_y`:
+Then solving for a\_y:
 
 ```
   a_y = sin⁻¹(sin(a_y))
   a_y = sin⁻¹(2 (q_w q_y - q_x q_z))
 ```
 
-### Solving for `a_x` and `a_z`
+### Solving for a\_x and a\_z
 
-Solving for `cos(a_x) cos(a_y)`:
+Solving for cos(a\_x) cos(a\_y):
 
 ```
   cos(a_x) cos(a_y) = (cos²(a_x/2) - sin²(a_x/2))(cos²(a_y/2) - sin²(a_y/2))
@@ -202,7 +202,7 @@ Solving for `cos(a_x) cos(a_y)`:
   cos(a_x) cos(a_y) = 1 - 2 (q_x² + q_y²)
 ```
 
-Solving for `sin(a_x) cos(a_y)`:
+Solving for sin(a\_x) cos(a\_y):
 
 ```
   sin(a_x) cos(a_y) = (2 cos(a_x/2) sin(a_x/2))(cos²(a_y/2) - sin²(a_y/2))
@@ -221,7 +221,7 @@ Solving for `sin(a_x) cos(a_y)`:
   sin(a_x) cos(a_y) = 2 (q_w q_x + q_y q_z)
 ```
 
-Similarly, solving for `cos(a_z) cos(a_y)`:
+Similarly, solving for cos(a\_z) cos(a\_y):
 
 ```
   cos(a_z) cos(a_y) = (cos²(a_z/2) - sin²(a_z/2))(cos²(a_y/2) - sin²(a_y/2))
@@ -241,7 +241,7 @@ Similarly, solving for `cos(a_z) cos(a_y)`:
   cos(a_z) cos(a_y) = 1 - 2 (q_y² + q_z²)
 ```
 
-Similarly, solving for `sin(a_z) cos(a_y)`:
+Similarly, solving for sin(a\_z) cos(a\_y):
 
 ```
   sin(a_z) cos(a_y) = (2 cos(a_z/2) sin(a_z/2))(cos²(a_y/2) - sin²(a_y/2))
@@ -260,14 +260,14 @@ Similarly, solving for `sin(a_z) cos(a_y)`:
   sin(a_z) cos(a_y) = 2 (q_w q_z + q_x q_y)
 ```
 
-Solving for `a_x` and `a_z`:
+Solving for a\_x and a\_z:
 
 ```
   a_x = atan2(sin(a_x), cos(a_x))
   a_z = atan2(sin(a_z), cos(a_z))
 ```
 
-If `cos(a_y) > 0`:
+If cos(a\_y) > 0:
 
 ```
   a_x = atan2(sin(a_x) cos(a_y), cos(a_x) cos(a_y))
@@ -276,7 +276,7 @@ If `cos(a_y) > 0`:
   a_z = atan2(2 (q_w q_z + q_x q_y), 1 - 2 (q_y² + q_z²))
 ```
 
-Because `-π/2 ≤ a_y ≤ π/2`, `cos(a_y) ≥ 0`. Therefore, the only remaining case is `cos(a_y) = 0`, whose only solutions in that range are `a_y = ±π/2`.
+Because -π/2 ≤ a\_y ≤ π/2, cos(a\_y) ≥ 0. Therefore, the only remaining case is cos(a\_y) = 0, whose only solutions in that range are a\_y = ±π/2.
 
 ```
   a_y = ±π/2
@@ -308,7 +308,7 @@ Plugging into the quaternion components:
   q_z = √2/2 sin(a_z/2 ∓ a_x/2)
 ```
 
-In either case only the sum or the difference between `a_x` and `a_z` can be determined. We'll pick the solution where `a_x = 0`.
+In either case only the sum or the difference between a\_x and a\_z can be determined. We'll pick the solution where a\_x = 0.
 
 ```
   q_w = √2/2 cos(a_z/2 ∓ 0)
@@ -328,9 +328,9 @@ In either case only the sum or the difference between `a_x` and `a_z` can be det
   a_z = atan2(2 q_w q_z, q_w² - q_z²)
 ```
 
-### Determining if `cos(a_y) ≈ 0`
+### Determining if cos(a\_y) ≈ 0
 
-When calculating `a_x`:
+When calculating a\_x:
 
 ```
   cos(a_y) ≈ 0
@@ -339,9 +339,9 @@ When calculating `a_x`:
   (cos(a_x) cos(a_y))² + (sin(a_x) cos(a_y))² ≈ 0
 ```
 
-Note that this reuses the `cos(a_x) cos(a_y)` and `sin(a_x) cos(a_y)` terms needed to calculate `a_x`.
+Note that this reuses the cos(a\_x) cos(a\_y) and sin(a\_x) cos(a\_y) terms needed to calculate a\_x.
 
-When calculating `a_z`:
+When calculating a\_z:
 
 ```
   cos(a_y) ≈ 0
@@ -350,4 +350,4 @@ When calculating `a_z`:
   (cos(a_y) cos(a_z))² + (cos(a_y) sin(a_z))² ≈ 0
 ```
 
-Note that this reuses the `cos(a_y) cos(a_z)` and `cos(a_y) sin(a_z)` terms needed to calculate `a_z`.
+Note that this reuses the cos(a\_y) cos(a\_z) and cos(a\_y) sin(a\_z) terms needed to calculate a\_z.
