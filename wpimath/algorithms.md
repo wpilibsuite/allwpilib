@@ -140,7 +140,7 @@ We can calculate the quaternion corresponding to a set of Euler angles by applyi
   q = (c_y c_z - s_y s_z î + s_y c_z ĵ + c_y s_z k̂)(c_x + s_x î)
     = (c_x c_y c_z + s_x s_y s_z)
       + (s_x c_y c_z - c_x s_y s_z) î
-      + (s_x c_y s_z + c_x s_y c_z) ĵ
+      + (c_x s_y c_z + s_x c_y s_z) ĵ
       + (c_x c_y s_z - s_x s_y c_z) k̂
 ```
 
@@ -193,12 +193,12 @@ Solving for `cos(a_x) cos(a_y)`:
   cos(a_x) cos(a_y) = c_x² + s_x² - 2 (c_x² s_y² + s_x² c_y²)
   cos(a_x) cos(a_y) = 1 - 2 (c_x² s_y² + s_x² c_y²)
   cos(a_x) cos(a_y) = 1 - 2 (c_x² s_y² c_z² + c_x² s_y² s_z²
-                         + s_x² c_y² c_z² + s_x² c_y² s_z²)
+                           + s_x² c_y² c_z² + s_x² c_y² s_z²)
   cos(a_x) cos(a_y) = 1 - 2 (s_x² c_y² c_z² + c_x² s_y² s_z²
-                         + c_x² s_y² c_z² + s_x² c_y² s_z²)
-  cos(a_x) cos(a_y) = 1 - 2 (s_x² c_y² c_z² - 2 c_x s_x c_y s_y c_z s_z + s_x² s_y² s_z²
-                         + c_x² s_y² c_z² + 2 c_x s_x c_y s_y c_z s_z + s_x² c_y² s_z²)
-  cos(a_x) cos(a_y) = 1 - 2 ((s_x c_y c_z - s_x s_y s_z)² + (c_x s_y c_z + s_x c_y s_z)²)
+                           + c_x² s_y² c_z² + s_x² c_y² s_z²)
+  cos(a_x) cos(a_y) = 1 - 2 (s_x² c_y² c_z² - 2 c_x s_x c_y s_y c_z s_z + c_x² s_y² s_z²
+                           + c_x² s_y² c_z² + 2 c_x s_x c_y s_y c_z s_z + s_x² c_y² s_z²)
+  cos(a_x) cos(a_y) = 1 - 2 ((s_x c_y c_z - c_x s_y s_z)² + (c_x s_y c_z + s_x c_y s_z)²)
   cos(a_x) cos(a_y) = 1 - 2 (q_x² + q_y²)
 ```
 
@@ -209,13 +209,15 @@ Solving for `sin(a_x) cos(a_y)`:
   sin(a_x) cos(a_y) = (2 c_x s_x)(c_y² - s_y²)
   sin(a_x) cos(a_y) = 2 (c_x s_x c_y² - c_x s_x s_y²)
   sin(a_x) cos(a_y) = 2 (c_x s_x c_y² c_z² + c_x s_x c_y² s_z²
-                     - c_x s_x s_y² c_z² - c_x s_x s_y² s_z²)
+                       - c_x s_x s_y² c_z² - c_x s_x s_y² s_z²)
+  sin(a_x) cos(a_y) = 2 (c_s s_x c_y² c_z² - c_x s_x s_y² s_z²
+                       - c_x s_x s_y² c_z² + c_x s_x c_y² s_z²)
   sin(a_x) cos(a_y) = 2 (c_x s_x c_y² c_z² - c_x² c_y s_y c_z s_z
-                     + s_x² c_y s_y c_z s_z - c_x s_x s_y² s_z²
-                     + c_x² c_y s_y c_z s_z - c_x s_x s_y² c_z²
-                     + c_x s_x c_y² s_z² - s_x² c_y s_y c_z s_z)
+                       + s_x² c_y s_y c_z s_z - c_x s_x s_y² s_z²
+                       + c_x² c_y s_y c_z s_z - c_x s_x s_y² c_z²
+                       + c_x s_x c_y² s_z² - s_x² c_y s_y c_z s_z)
   sin(a_x) cos(a_y) = 2 ((c_x c_y c_z + s_x s_y s_z)(s_x c_y c_z - c_x s_y s_z)
-                     + (c_x s_y c_z + s_x c_y s_z)(c_x c_y s_z - s_x s_y c_z))
+                       + (c_x s_y c_z + s_x c_y s_z)(c_x c_y s_z - s_x s_y c_z))
   sin(a_x) cos(a_y) = 2 (q_w q_x + q_y q_z)
 ```
 
@@ -230,11 +232,11 @@ Similarly, solving for `cos(a_z) cos(a_y)`:
   cos(a_z) cos(a_y) = c_y² + s_y² - 2 (c_y² s_z² + s_y² c_z²)
   cos(a_z) cos(a_y) = 1 - 2 (c_y² s_z² + s_y² c_z²)
   cos(a_z) cos(a_y) = 1 - 2 (c_x² c_y² s_z² + s_x² c_y² s_z²
-                         + c_x² s_y² c_z² + s_x² s_y² c_z²)
+                           + c_x² s_y² c_z² + s_x² s_y² c_z²)
   cos(a_z) cos(a_y) = 1 - 2 (c_x² s_y² c_z² + s_x² c_y² s_z²
-                         + c_x² c_y² s_z² + s_x² s_y² c_z²)
+                           + c_x² c_y² s_z² + s_x² s_y² c_z²)
   cos(a_z) cos(a_y) = 1 - 2 (c_x² s_y² c_z² + 2 c_x s_x c_y s_y c_z s_z + s_x² c_y² s_z²
-                         + c_x² c_y² s_z² - 2 c_x s_x c_y s_y c_z s_z + s_x² s_y² c_z²)
+                           + c_x² c_y² s_z² - 2 c_x s_x c_y s_y c_z s_z + s_x² s_y² c_z²)
   cos(a_z) cos(a_y) = 1 - 2 ((c_x s_y c_z + s_x c_y s_z)² + (c_x c_y s_z - s_x s_y c_z)²)
   cos(a_z) cos(a_y) = 1 - 2 (q_y² + q_z²)
 ```
@@ -246,13 +248,15 @@ Similarly, solving for `sin(a_z) cos(a_y)`:
   sin(a_z) cos(a_y) = (2 c_z s_z)(c_y² - s_y²)
   sin(a_z) cos(a_y) = 2 (c_y² c_z s_z - s_y² c_z s_z)
   sin(a_z) cos(a_y) = 2 (c_x² c_y² c_z s_z + s_x² c_y² c_z s_z
-                     - c_x² s_y² c_z s_z - s_x² s_y² c_z s_z)
+                       - c_x² s_y² c_z s_z - s_x² s_y² c_z s_z)
+  sin(a_z) cos(a_y) = 2 (c_x² c_y² c_z s_z - s_x² s_y² c_z s_z
+                       + s_x² c_y² c_z s_z - c_x² s_y² c_z s_z)
   sin(a_z) cos(a_y) = 2 (c_x² c_y² c_z s_z - c_x s_x c_y s_y c_z²
-                     + c_x s_x c_y s_y s_z² - s_x² s_y² c_z s_z
-                     + c_x s_x c_y s_y c_z² + s_x² c_y² c_z s_z
-                     - c_x² s_y² c_z s_z - c_x s_x c_y s_y s_z²)
+                       + c_x s_x c_y s_y s_z² - s_x² s_y² c_z s_z
+                       + c_x s_x c_y s_y c_z² + s_x² c_y² c_z s_z
+                       - c_x² s_y² c_z s_z - c_x s_x c_y s_y s_z²)
   sin(a_z) cos(a_y) = 2 ((c_x c_y c_z + s_x s_y s_z)(c_x c_y s_z - s_x s_y c_z)
-                     + (s_x c_y c_z - c_x s_y s_z)(c_x s_y c_z + s_x c_y s_z))
+                       + (s_x c_y c_z - c_x s_y s_z)(c_x s_y c_z + s_x c_y s_z))
   sin(a_z) cos(a_y) = 2 (q_w q_z + q_x q_y)
 ```
 
