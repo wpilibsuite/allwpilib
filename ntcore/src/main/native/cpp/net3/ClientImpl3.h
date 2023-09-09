@@ -14,6 +14,7 @@
 #include <utility>
 #include <vector>
 
+#include <wpi/StringMap.h>
 #include <wpi/json.h>
 
 #include "PubSubOptions.h"
