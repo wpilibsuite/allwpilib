@@ -39,52 +39,54 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
   units::radians_per_second_t omega = 0_rad_per_s;
 
   /**
-   * Converts from a chassis speed for a discrete timestep into chassis speed
-   * for continuous time.
+   * Disretizes a continuous-time chassis speed.
    *
-   * The difference between applying a chassis speed for a discrete timestep vs.
-   * continuously is that applying for a discrete timestep is just scaling the
-   * velocity components by the time and adding, while when applying
-   * continuously the changes to the heading affect the direction the
-   * translational components are applied to relative to the field.
+   * This function converts a continous-time chassis speed into a discrete-time
+   * one such that when the discrete-time chassis speed is applied for one
+   * timestep, the robot moves as if the velocity components are independent
+   * (i.e., the robot moves v_x * dt along the x-axis, v_y * dt along the
+   * y-axis, and omega * dt around the z-axis).
+   *
+   * This is useful for compensating for translational skew when translating and
+   * rotating a swerve drivetrain.
    *
    * @param vx Forward velocity.
    * @param vy Sideways velocity.
    * @param omega Angular velocity.
    * @param dt The duration of the timestep the speeds should be applied for.
    *
-   * @return ChassisSpeeds that can be applied continuously to produce the
-   * discrete ChassisSpeeds.
+   * @return Discretized ChassisSpeeds.
    */
-  static ChassisSpeeds FromDiscreteSpeeds(units::meters_per_second_t vx,
-                                          units::meters_per_second_t vy,
-                                          units::radians_per_second_t omega,
-                                          units::second_t dt) {
+  static ChassisSpeeds Discretize(units::meters_per_second_t vx,
+                                  units::meters_per_second_t vy,
+                                  units::radians_per_second_t omega,
+                                  units::second_t dt) {
     Pose2d desiredDeltaPose{vx * dt, vy * dt, omega * dt};
     auto twist = Pose2d{}.Log(desiredDeltaPose);
     return {twist.dx / dt, twist.dy / dt, twist.dtheta / dt};
   }
 
   /**
-   * Converts from a chassis speed for a discrete timestep into chassis speed
-   * for continuous time.
+   * Disretizes a continuous-time chassis speed.
    *
-   * The difference between applying a chassis speed for a discrete timestep vs.
-   * continuously is that applying for a discrete timestep is just scaling the
-   * velocity components by the time and adding, while when applying
-   * continuously the changes to the heading affect the direction the
-   * translational components are applied to relative to the field.
+   * This function converts a continous-time chassis speed into a discrete-time
+   * one such that when the discrete-time chassis speed is applied for one
+   * timestep, the robot moves as if the velocity components are independent
+   * (i.e., the robot moves v_x * dt along the x-axis, v_y * dt along the
+   * y-axis, and omega * dt around the z-axis).
    *
-   * @param discreteSpeeds The speeds for a discrete timestep.
+   * This is useful for compensating for translational skew when translating and
+   * rotating a swerve drivetrain.
+   *
+   * @param continuousSpeeds The continuous speeds.
    * @param dt The duration of the timestep the speeds should be applied for.
    *
-   * @return ChassisSpeeds that can be applied continuously to produce the
-   * discrete ChassisSpeeds.
+   * @return Discretized ChassisSpeeds.
    */
-  static ChassisSpeeds FromDiscreteSpeeds(const ChassisSpeeds& discreteSpeeds,
-                                          units::second_t dt) {
-    return FromDiscreteSpeeds(discreteSpeeds.vx, discreteSpeeds.vy,
-                              discreteSpeeds.omega, dt);
+  static ChassisSpeeds Discretize(const ChassisSpeeds& continuousSpeeds,
+                                  units::second_t dt) {
+    return Discretize(continuousSpeeds.vx, continuousSpeeds.vy,
+                      continuousSpeeds.omega, dt);
   }
 
   /**
