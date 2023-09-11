@@ -1,5 +1,4 @@
 include(CMakeFindDependencyMacro)
- @FILENAME_DEP_REPLACE@
  @WPIUTIL_DEP_REPLACE@
  @NTCORE_DEP_REPLACE@
  @CSCORE_DEP_REPLACE@
@@ -8,4 +7,5 @@ include(CMakeFindDependencyMacro)
  @WPILIBC_DEP_REPLACE@
  @WPIMATH_DEP_REPLACE@
 
+ @FILENAME_DEP_REPLACE@
  include(${SELF_DIR}/wpilibNewCommands.cmake)
