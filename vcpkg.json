@@ -2,6 +2,9 @@
   "name": "main",
   "version-string": "latest",
   "dependencies": [
-    "opencv"
+    "opencv",
+    "eigen3",
+    "fmt",
+    "libuv"
   ]
 }
