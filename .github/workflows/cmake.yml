@@ -60,6 +60,7 @@ jobs:
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@v3
+      - uses: ilammy/msvc-dev-cmd@v1
 
       - name: Install CMake
         uses: lukka/get-cmake@v3.23.0
