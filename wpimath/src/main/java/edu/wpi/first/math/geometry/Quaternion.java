@@ -10,8 +10,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.numbers.N3;
 import java.util.Objects;
+import java.util.Random;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
@@ -174,16 +176,34 @@ public class Quaternion {
   }
 
   /**
+   * Rational power of a quaternion
+   * 
+   * @param t the power to raise this quaternion to.
+   * @return The quaternion power
+   */
+  public Quaternion pow(double t) {
+    // q^t = e^(ln(q^t)) = e^(t * ln(q))
+    return this.log().times(t).exp();
+  }
+  
+  /**
+   * Matrix exponential of a quaternion
+   * 
+   * @param adjustment the "Twist" that will be applied to this quaternion.
+   *
+   * @return The quaternion product of exp(adjustment) * this
+   */
+  public Quaternion exp(Quaternion adjustment) {
+    return adjustment.exp().times(this);
+  }
+
+  /**
    * Matrix exponential of a quaternion
    * source: https://en.wikipedia.org/wiki/Quaternion#Exponential,_logarithm,_and_power_functions
    *
    * @return The Matrix exponential of this quaternion.
    */
-  public Quaternion exp(Quaternion adjustment) {
-    return adjustment._exp().times(this);
-  }
-
-  private Quaternion _exp() {
+  public Quaternion exp() {
     // q = s(scalar) + v(vector)
     // exp(s)
     var scalar = Math.exp(m_w);
@@ -205,18 +225,25 @@ public class Quaternion {
   }
 
   /**
-   * Inverse Matrix exponential (logarithm) of a quaternion
-   * source: https://en.wikipedia.org/wiki/Quaternion#Exponential,_logarithm,_and_power_functions
+   * Inverse Matrix exponential (logarithm) of a quaternion.
+   * 
+   * @param end The quaternion to map this quaternion onto.
+   * @return The "Twist" that maps this quaternion to the argument.
+   */
+  public Quaternion log(Quaternion end) {
+    return end.times(this.inverse()).log();
+  }
+
+  /**
+   * Inverse Matrix exponential (logarithm) of a quaternion.
+   * 
+   * <p> source: https://en.wikipedia.org/wiki/Quaternion#Exponential,_logarithm,_and_power_functions <p>
    * 
    * <p> For unit quaternions, this is equivalent to @see Quaternion#toRotationVector(). <p>
    * 
    * @return The logarithm of this quaternion.
    */
-  public Quaternion log(Quaternion end) {
-    return end.times(inverse())._log();
-  }
-
-  private Quaternion _log() {
+  public Quaternion log() {
     // q = s(scalar) + v(vector)
 
     // ||q||
