@@ -11,6 +11,33 @@ using namespace frc;
 Quaternion::Quaternion(double w, double x, double y, double z)
     : m_r{w}, m_v{x, y, z} {}
 
+Quaternion Quaternion::operator+(const Quaternion& other) const {
+  return Quaternion{
+    m_r + other.m_r,
+    m_v(0) + other.m_v(0),
+    m_v(1) + other.m_v(1),
+    m_v(2) + other.m_v(2),
+  };
+}
+
+Quaternion Quaternion::operator*(const double other) const {
+ return Quaternion{
+  m_r * other,
+  m_v(0) * other,
+  m_v(1) * other,
+  m_v(2) * other,
+ };
+}
+
+Quaternion Quaternion::operator/(const double other) const {
+ return Quaternion{
+  m_r / other,
+  m_v(0) / other,
+  m_v(1) / other,
+  m_v(2) / other,
+ };
+}
+
 Quaternion Quaternion::operator*(const Quaternion& other) const {
   // https://en.wikipedia.org/wiki/Quaternion#Scalar_and_vector_parts
   const auto& r1 = m_r;
@@ -36,17 +63,75 @@ bool Quaternion::operator==(const Quaternion& other) const {
   return std::abs(W() * other.W() + m_v.dot(other.m_v)) > 1.0 - 1E-9;
 }
 
-Quaternion Quaternion::Inverse() const {
+Quaternion Quaternion::Conjugate() const {
   return Quaternion{W(), -X(), -Y(), -Z()};
 }
 
+Quaternion Quaternion::Inverse() const {
+  double norm = Norm();
+  return Quaternion{W(), -X(), -Y(), -Z()} / (norm * norm);
+}
+
+double Quaternion::Norm() const {
+  return std::sqrt(W() * W() + m_v.dot(m_v));
+}
+
 Quaternion Quaternion::Normalize() const {
-  double norm = std::sqrt(W() * W() + X() * X() + Y() * Y() + Z() * Z());
+  double norm = Norm();
   if (norm == 0.0) {
     return Quaternion{};
   } else {
-    return Quaternion{W() / norm, X() / norm, Y() / norm, Z() / norm};
+    return Quaternion{W(), X(), Y(), Z()} / norm;
   }
+}
+
+Quaternion Quaternion::operator^(const double other) const {
+  return (Log() * other).Exp();
+}
+
+Quaternion Quaternion::Exp(const Quaternion& other) const {
+  return other.Exp() * *this;
+}
+
+Quaternion Quaternion::Exp() const {
+  // q = s(scalar) + v(vector)
+
+  //exp(s)
+  double scalar = std::exp(m_r);
+
+  // ||v||
+  double axial_magnitude = std::sqrt(X() * X() + Y() * Y() + Z() * Z());
+  // cos(||v||)
+  double cosine = std::cos(axial_magnitude);
+
+  double axial_scalar;
+
+  if (axial_magnitude < 1e-9) {
+    // Taylor series of sin(x) near x=0: 1 - x^2 / 6 + x^4 / 120 + O(n^6)
+    axial_scalar = 1 - std::pow(axial_magnitude, 2) / 6 + std::pow(axial_magnitude, 4) / 120;
+  } else {
+    axial_scalar = std::sin(axial_magnitude) / axial_magnitude;
+  }
+
+  // exp(s) * (cos(||v||) + v * sin(||v||) / ||v||)
+  return Quaternion(
+    cosine,
+    X() * axial_scalar,
+    Y() * axial_scalar,
+    Z() * axial_scalar
+  ) * scalar;
+}
+
+Quaternion Quaternion::Log(const Quaternion& other) const {
+  return (other * Inverse()).Log();
+}
+
+Quaternion Quaternion::Exp() const {
+  double scalar = std::log(Norm());
+
+  Eigen::Vector3d rvec = Normalize().ToRotationVector();
+
+  return Quaternion{scalar, rvec(0), rvec(1), rvec(2)};
 }
 
 double Quaternion::W() const {
