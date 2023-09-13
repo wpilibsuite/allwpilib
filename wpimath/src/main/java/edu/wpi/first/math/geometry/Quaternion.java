@@ -212,15 +212,22 @@ public class Quaternion {
     var axial_magnitude = Math.sqrt(getX() * getX() + getY() * getY() + getZ() * getZ());
     // cos(||v||)
     var cosine = Math.cos(axial_magnitude);
-    // sin(||v||)
-    var sine = Math.sin(axial_magnitude);
+
+    double axial_scalar;
+
+    if (axial_magnitude < 1e-9) {
+      // Taylor series of sin(x) near x=0: 1 - x^2 / 6 + x^4 / 120 + O(n^6)
+      axial_scalar = 1 - Math.pow(axial_magnitude, 2) / 6 + Math.pow(axial_magnitude, 4) / 120;
+    } else {
+      axial_scalar = Math.sin(axial_magnitude) / axial_magnitude;
+    }
     
-    // exp(s) * (cos(||v||) + v / ||v|| * sin(||v||))
+    // exp(s) * (cos(||v||) + v * sin(||v||) / ||v||)
     return new Quaternion(
         cosine, 
-        getX() / axial_magnitude * sine, 
-        getY() / axial_magnitude * sine, 
-        getZ() / axial_magnitude * sine)
+        getX() * axial_scalar, 
+        getY() * axial_scalar, 
+        getZ() * axial_scalar)
       .times(scalar);
   }
 
@@ -235,7 +242,7 @@ public class Quaternion {
   }
 
   /**
-   * Inverse Matrix exponential (logarithm) of a quaternion.
+   * The Log operator of a general quaternion.
    * 
    * <p> source: https://en.wikipedia.org/wiki/Quaternion#Exponential,_logarithm,_and_power_functions <p>
    * 
@@ -252,17 +259,9 @@ public class Quaternion {
     // ln(||q||)
     var scalar = Math.log(norm);
 
-    // ||v||
-    var axial_magnitude = Math.sqrt(getX() * getX() + getY() * getY() + getZ() * getZ());
-    // acos(s/||q||) / ||v||
-    var axial_scalar = Math.acos(getW() / norm) / axial_magnitude;
+    var rvec = normalize().toRotationVector();
 
-    // ln(||q||) + v / ||v|| * acos(s / ||q||)
-    return new Quaternion(
-        scalar, 
-        getX() * axial_scalar, 
-        getY() * axial_scalar, 
-        getZ() * axial_scalar);
+    return new Quaternion(scalar, rvec.get(0, 0), rvec.get(1, 0), rvec.get(2, 0));
   }
 
   /**
