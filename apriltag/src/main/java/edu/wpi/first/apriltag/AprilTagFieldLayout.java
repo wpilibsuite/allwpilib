@@ -200,7 +200,7 @@ public class AprilTagFieldLayout {
    */
   public static AprilTagFieldLayout loadFromResource(String resourcePath) throws IOException {
     InputStream stream = AprilTagFieldLayout.class.getResourceAsStream(resourcePath);
-    if(stream == null) {
+    if (stream == null) {
       // Class.getResourceAsStream() returns null if the resource does not exist.
       throw new IOException("Could not locate resource: " + resourcePath);
     }

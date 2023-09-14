@@ -32,7 +32,8 @@ public enum AprilTagFields {
     try {
       return AprilTagFieldLayout.loadFromResource(m_resourceFile);
     } catch (IOException e) {
-      throw new UncheckedIOException("Could not load AprilTagFieldLayout from " + m_resourceFile, e);
+      throw new UncheckedIOException(
+          "Could not load AprilTagFieldLayout from " + m_resourceFile, e);
     }
   }
 }
