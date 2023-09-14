@@ -97,8 +97,8 @@ void Stream::Write(std::span<const Buffer> bufs,
                if (status < 0) {
                  h.ReportError(status);
                }
+               auto ptr = h.Release();  // one-shot, but finish() may Keep()
                h.finish(Error(status));
-               h.Release();  // this is always a one-shot
              })) {
     req->Keep();
   }

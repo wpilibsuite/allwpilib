@@ -92,8 +92,12 @@ class Request : public std::enable_shared_from_this<Request> {
    *
    * Derived classes can override this method for different memory management
    * approaches (e.g. pooled storage of requests).
+   *
+   * @return Previous shared pointer
    */
-  virtual void Release() noexcept { m_self.reset(); }
+  virtual std::shared_ptr<Request> Release() noexcept {
+    return std::move(m_self);
+  }
 
   /**
    * Error callback.  By default, this is set up to report errors to the handle
