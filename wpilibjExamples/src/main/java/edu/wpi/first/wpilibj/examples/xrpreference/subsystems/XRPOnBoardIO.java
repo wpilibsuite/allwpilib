@@ -6,13 +6,13 @@ package edu.wpi.first.wpilibj.examples.xrpreference.subsystems;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DigitalOutput;
-import edu.wpi.first.wpilibj2.command.Subsystem;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /**
  * This class represents the onboard IO of the XRP Reference Robot. This includes the USER
  * pushbutton and LED
  */
-public class XRPOnBoardIO extends Subsystem {
+public class XRPOnBoardIO extends SubsystemBase {
   private final DigitalInput m_button = new DigitalInput(0);
   private final DigitalOutput m_led = new DigitalOutput(1);
 

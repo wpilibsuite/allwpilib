@@ -21,6 +21,7 @@
 
 #include "frc/DriverStation.h"
 #include "frc/Filesystem.h"
+#include "frc/RobotBase.h"
 
 using namespace frc;
 
@@ -68,6 +69,11 @@ static std::string MakeLogDir(std::string_view dir) {
   if (!ec && fs::is_directory(s) &&
       (s.permissions() & fs::perms::others_write) != fs::perms::none) {
     return std::string{usbDir};
+  }
+  if (frc::RobotBase::GetRuntimeType() == kRoboRIO) {
+    FRC_ReportError(warn::Warning,
+                    "DataLogManager: Logging to RoboRIO 1 internal storage is "
+                    "not recommended! Plug in a FAT32 formatted flash drive!");
   }
 #endif
   return frc::filesystem::GetOperatingDirectory();
