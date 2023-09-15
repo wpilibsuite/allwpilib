@@ -13,13 +13,13 @@
 
 #include "frc2/command/CommandHelper.h"
 #include "frc2/command/CommandScheduler.h"
-#include "frc2/command/Subsystem.h"
+#include "frc2/command/SubsystemBase.h"
 #include "gmock/gmock.h"
 #include "make_vector.h"
 
 namespace frc2 {
 
-class TestSubsystem : public Subsystem {
+class TestSubsystem : public SubsystemBase {
  public:
   explicit TestSubsystem(std::function<void()> periodic = [] {})
       : m_periodic{periodic} {}

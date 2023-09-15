@@ -4,7 +4,11 @@
 
 #pragma once
 
-#include <wpi/deprecated.h>
+#include <string>
+#include <string_view>
+
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
 
 #include "frc2/command/Subsystem.h"
 
@@ -18,9 +22,50 @@ namespace frc2 {
  * @deprecated All functionality provided by SubsystemBase has been merged into
  * Subsystem. Use Subsystem instead.
  */
-class [[deprecated("Use Subsystem instead")]] SubsystemBase : public Subsystem {
+class SubsystemBase : public Subsystem,
+                      public wpi::Sendable,
+                      public wpi::SendableHelper<SubsystemBase> {
+ public:
+  void InitSendable(wpi::SendableBuilder& builder) override;
+
+  /**
+   * Gets the name of this Subsystem.
+   *
+   * @return Name
+   */
+  std::string GetName() const;
+
+  /**
+   * Sets the name of this Subsystem.
+   *
+   * @param name name
+   */
+  void SetName(std::string_view name);
+
+  /**
+   * Gets the subsystem name of this Subsystem.
+   *
+   * @return Subsystem name
+   */
+  std::string GetSubsystem() const;
+
+  /**
+   * Sets the subsystem name of this Subsystem.
+   *
+   * @param name subsystem name
+   */
+  void SetSubsystem(std::string_view name);
+
+  /**
+   * Associate a Sendable with this Subsystem.
+   * Also update the child's name.
+   *
+   * @param name name to give child
+   * @param child sendable
+   */
+  void AddChild(std::string name, wpi::Sendable* child);
+
  protected:
-  WPI_DEPRECATED("Use Subsystem instead")
   SubsystemBase();
 };
 }  // namespace frc2
