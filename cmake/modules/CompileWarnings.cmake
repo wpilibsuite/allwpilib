@@ -12,4 +12,9 @@ macro(wpilib_target_warnings target)
     elseif(UNIX AND APPLE)
         target_compile_options(${target} PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-Wno-deprecated-anon-enum-enum-conversion>)
     endif()
+
+    # Compress debug info with GCC
+    if (${CMAKE_BUILD_TYPE} STREQUAL "Debug" AND ${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
+      target_compile_options(${target} PRIVATE -gz)
+    endif()
 endmacro()

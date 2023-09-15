@@ -43,6 +43,13 @@ nativeUtils.platformConfigs.each {
     }
 }
 
+// Compress debug info on Linux
+nativeUtils.platformConfigs.each {
+  if (it.name.contains('linux')) {
+    it.cppCompiler.debugArgs.add("-gz")
+  }
+}
+
 // NativeUtils adds the following OpenCV warning suppression for Linux, but not
 // for macOS
 // https://github.com/opencv/opencv/issues/20269
