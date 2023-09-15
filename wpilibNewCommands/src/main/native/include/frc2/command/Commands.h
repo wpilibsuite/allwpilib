@@ -137,24 +137,6 @@ CommandPtr RunEnd(std::function<void()> run, std::function<void()> end,
 [[nodiscard]]
 CommandPtr Print(std::string_view msg);
 
-/**
- * Constructs a command that schedules the supplied command when initialized,
- * and ends when it is no longer scheduled
- *
- * @param supplier the command supplier
- */
-[[nodiscard]]
-CommandPtr DeferredProxy(wpi::unique_function<Command*()> supplier);
-
-/**
- * Constructs a command that schedules the supplied command when initialized,
- * and ends when it is no longer scheduled
- *
- * @param supplier the command supplier
- */
-[[nodiscard]]
-CommandPtr DeferredProxy(wpi::unique_function<CommandPtr()> supplier);
-
 // Idling Commands
 
 /**
@@ -204,6 +186,24 @@ CommandPtr Select(std::function<Key()> selector,
 
   return SelectCommand(std::move(selector), std::move(vec)).ToPtr();
 }
+
+/**
+ * Constructs a command that schedules the supplied command when initialized,
+ * and ends when it is no longer scheduled
+ *
+ * @param supplier the command supplier
+ */
+[[nodiscard]]
+CommandPtr DeferredProxy(wpi::unique_function<Command*()> supplier);
+
+/**
+ * Constructs a command that schedules the supplied command when initialized,
+ * and ends when it is no longer scheduled
+ *
+ * @param supplier the command supplier
+ */
+[[nodiscard]]
+CommandPtr DeferredProxy(wpi::unique_function<CommandPtr()> supplier);
 
 // Command Groups
 

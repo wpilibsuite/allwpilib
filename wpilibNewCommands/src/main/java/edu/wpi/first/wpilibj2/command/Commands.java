@@ -100,18 +100,6 @@ public final class Commands {
     return new PrintCommand(message);
   }
 
-  /**
-   * Constructs a command that schedules the supplied command when initialized, and ends when it is
-   * no longer scheduled.
-   *
-   * @param supplier the command supplier
-   * @return the command
-   * @see ProxyCommand
-   */
-  public static Command deferredProxy(Supplier<Command> supplier) {
-    return new ProxyCommand(supplier);
-  }
-
   // Idling Commands
 
   /**
@@ -164,6 +152,20 @@ public final class Commands {
   }
 
   /**
+   * Constructs a command that schedules the supplied command when initialized, and ends when it is
+   * no longer scheduled.
+   *
+   * @param supplier the command supplier
+   * @return the command
+   * @see ProxyCommand
+   */
+  public static Command deferredProxy(Supplier<Command> supplier) {
+    return new ProxyCommand(supplier);
+  }
+
+  // Command Groups
+
+  /**
    * Runs a group of commands in series, one after the other.
    *
    * @param commands the commands to include
@@ -173,8 +175,6 @@ public final class Commands {
   public static Command sequence(Command... commands) {
     return new SequentialCommandGroup(commands);
   }
-
-  // Command Groups
 
   /**
    * Runs a group of commands in series, one after the other. Once the last command ends, the group
