@@ -95,7 +95,6 @@ class Notifier {
    * Change the callback function.
    *
    * @param callback The callback function.
-   * @deprecated Use SetCallback() instead.
    */
   void SetCallback(std::function<void()> callback);
 
