@@ -25,7 +25,7 @@ class SchedulingRecursionTest extends CommandTestBase {
   void cancelFromInitialize(InterruptionBehavior interruptionBehavior) {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicBoolean hasOtherRun = new AtomicBoolean();
-      Subsystem requirement = new Subsystem() {};
+      Subsystem requirement = new SubsystemBase() {};
       Command selfCancels =
           new Command() {
             {
@@ -62,7 +62,7 @@ class SchedulingRecursionTest extends CommandTestBase {
   void defaultCommandGetsRescheduledAfterSelfCanceling(InterruptionBehavior interruptionBehavior) {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicBoolean hasOtherRun = new AtomicBoolean();
-      Subsystem requirement = new Subsystem() {};
+      Subsystem requirement = new SubsystemBase() {};
       Command selfCancels =
           new Command() {
             {
@@ -119,7 +119,7 @@ class SchedulingRecursionTest extends CommandTestBase {
   void scheduleFromEndCancel() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicInteger counter = new AtomicInteger();
-      Subsystem requirement = new Subsystem() {};
+      Subsystem requirement = new SubsystemBase() {};
       InstantCommand other = new InstantCommand(() -> {}, requirement);
       Command selfCancels =
           new Command() {
@@ -146,7 +146,7 @@ class SchedulingRecursionTest extends CommandTestBase {
   void scheduleFromEndInterrupt() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicInteger counter = new AtomicInteger();
-      Subsystem requirement = new Subsystem() {};
+      Subsystem requirement = new SubsystemBase() {};
       InstantCommand other = new InstantCommand(() -> {}, requirement);
       Command selfCancels =
           new Command() {
@@ -175,7 +175,7 @@ class SchedulingRecursionTest extends CommandTestBase {
   void scheduleInitializeFromDefaultCommand(InterruptionBehavior interruptionBehavior) {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicInteger counter = new AtomicInteger();
-      Subsystem requirement = new Subsystem() {};
+      Subsystem requirement = new SubsystemBase() {};
       Command other =
           new InstantCommand(() -> {}, requirement).withInterruptBehavior(interruptionBehavior);
       Command defaultCommand =
