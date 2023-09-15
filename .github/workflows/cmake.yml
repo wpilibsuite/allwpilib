@@ -29,10 +29,10 @@ jobs:
 
       - name: Install dependencies (Linux)
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y libopencv-dev libopencv4.5-java python-is-python3
+        run: sudo apt-get update && sudo apt-get install -y libopencv-dev libopencv4.5-java python-is-python3 ninja-build
 
       - name: Install opencv (macOS)
-        run: brew install opencv
+        run: brew install opencv ninja
         if: runner.os == 'macOS'
 
       - name: Set up Python 3.8 (macOS)
@@ -45,11 +45,11 @@ jobs:
         run: python -m pip install jinja2
 
       - name: configure
-        run: mkdir build && cd build && cmake ${{ matrix.flags }} ..
+        run: cmake -S . -B build -G "Ninja" ${{ matrix.flags }}
 
       - name: build
         working-directory: build
-        run: cmake --build . --parallel $(nproc)
+        run: cmake --build .
 
       - name: test
         working-directory: build
