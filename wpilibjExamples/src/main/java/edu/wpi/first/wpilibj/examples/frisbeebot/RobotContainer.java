@@ -4,13 +4,13 @@
 
 package edu.wpi.first.wpilibj.examples.frisbeebot;
 
+import edu.wpi.first.command2.Command;
+import edu.wpi.first.command2.Commands;
+import edu.wpi.first.command2.button.CommandXboxController;
 import edu.wpi.first.wpilibj.examples.frisbeebot.Constants.AutoConstants;
 import edu.wpi.first.wpilibj.examples.frisbeebot.Constants.OIConstants;
 import edu.wpi.first.wpilibj.examples.frisbeebot.subsystems.DriveSubsystem;
 import edu.wpi.first.wpilibj.examples.frisbeebot.subsystems.ShooterSubsystem;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -71,9 +71,8 @@ public class RobotContainer {
 
   /**
    * Use this method to define your button->command mappings. Buttons can be created via the button
-   * factories on {@link edu.wpi.first.wpilibj2.command.button.CommandGenericHID} or one of its
-   * subclasses ({@link edu.wpi.first.wpilibj2.command.button.CommandJoystick} or {@link
-   * CommandXboxController}).
+   * factories on {@link edu.wpi.first.command2.button.CommandGenericHID} or one of its subclasses
+   * ({@link edu.wpi.first.command2.button.CommandJoystick} or {@link CommandXboxController}).
    */
   private void configureButtonBindings() {
     // Configure your button bindings here

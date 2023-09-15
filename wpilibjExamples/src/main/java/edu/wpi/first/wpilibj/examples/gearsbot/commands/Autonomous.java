@@ -4,13 +4,13 @@
 
 package edu.wpi.first.wpilibj.examples.gearsbot.commands;
 
+import edu.wpi.first.command2.Commands;
+import edu.wpi.first.command2.SequentialCommandGroup;
 import edu.wpi.first.wpilibj.examples.gearsbot.Constants.AutoConstants;
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Claw;
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Drivetrain;
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Elevator;
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Wrist;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 /** The main autonomous command to pickup and deliver the soda to the box. */
 public class Autonomous extends SequentialCommandGroup {

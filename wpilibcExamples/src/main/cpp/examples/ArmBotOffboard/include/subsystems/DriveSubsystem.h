@@ -7,15 +7,15 @@
 #include <functional>
 
 #include <frc/Encoder.h>
+#include <frc/command2/Commands.h>
+#include <frc/command2/SubsystemBase.h>
 #include <frc/drive/DifferentialDrive.h>
 #include <frc/motorcontrol/MotorControllerGroup.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
-#include <frc2/command/Commands.h>
-#include <frc2/command/SubsystemBase.h>
 
 #include "Constants.h"
 
-class DriveSubsystem : public frc2::SubsystemBase {
+class DriveSubsystem : public frc::SubsystemBase {
  public:
   DriveSubsystem();
 
@@ -58,10 +58,10 @@ class DriveSubsystem : public frc2::SubsystemBase {
    *
    * @param maxOutput the maximum output to which the drive will be constrained
    */
-  frc2::CommandPtr SetMaxOutputCommand(double maxOutput);
+  frc::CommandPtr SetMaxOutputCommand(double maxOutput);
 
-  frc2::CommandPtr ArcadeDriveCommand(std::function<double()> fwd,
-                                      std::function<double()> rot);
+  frc::CommandPtr ArcadeDriveCommand(std::function<double()> fwd,
+                                     std::function<double()> rot);
 
  private:
   // Components (e.g. motor controllers and sensors) should generally be

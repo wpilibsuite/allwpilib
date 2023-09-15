@@ -4,13 +4,13 @@
 
 package edu.wpi.first.wpilibj.templates.commandbased;
 
+import edu.wpi.first.command2.Command;
+import edu.wpi.first.command2.button.CommandXboxController;
+import edu.wpi.first.command2.button.Trigger;
 import edu.wpi.first.wpilibj.templates.commandbased.Constants.OperatorConstants;
 import edu.wpi.first.wpilibj.templates.commandbased.commands.Autos;
 import edu.wpi.first.wpilibj.templates.commandbased.commands.ExampleCommand;
 import edu.wpi.first.wpilibj.templates.commandbased.subsystems.ExampleSubsystem;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -36,10 +36,9 @@ public class RobotContainer {
    * Use this method to define your trigger->command mappings. Triggers can be created via the
    * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary
    * predicate, or via the named factories in {@link
-   * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for {@link
-   * CommandXboxController Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
-   * PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
-   * joysticks}.
+   * edu.wpi.first.command2.button.CommandGenericHID}'s subclasses for {@link CommandXboxController
+   * Xbox}/{@link edu.wpi.first.command2.button.CommandPS4Controller PS4} controllers or {@link
+   * edu.wpi.first.command2.button.CommandJoystick Flight joysticks}.
    */
   private void configureBindings() {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`

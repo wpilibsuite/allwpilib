@@ -7,24 +7,24 @@
 #include <functional>
 
 #include <frc/DoubleSolenoid.h>
+#include <frc/command2/CommandPtr.h>
+#include <frc/command2/SubsystemBase.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
-#include <frc2/command/CommandPtr.h>
-#include <frc2/command/SubsystemBase.h>
 
 #include "Constants.h"
 
-class Intake : public frc2::SubsystemBase {
+class Intake : public frc::SubsystemBase {
  public:
   Intake() = default;
 
   /** Returns a command that deploys the intake, and then runs the intake motor
    * indefinitely. */
   [[nodiscard]]
-  frc2::CommandPtr IntakeCommand();
+  frc::CommandPtr IntakeCommand();
 
   /** Returns a command that turns off and retracts the intake. */
   [[nodiscard]]
-  frc2::CommandPtr RetractCommand();
+  frc::CommandPtr RetractCommand();
 
  private:
   frc::PWMSparkMax m_motor{IntakeConstants::kMotorPort};

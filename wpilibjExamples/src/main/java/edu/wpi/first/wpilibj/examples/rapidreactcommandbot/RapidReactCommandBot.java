@@ -4,8 +4,11 @@
 
 package edu.wpi.first.wpilibj.examples.rapidreactcommandbot;
 
-import static edu.wpi.first.wpilibj2.command.Commands.parallel;
+import static edu.wpi.first.command2.Commands.parallel;
 
+import edu.wpi.first.command2.Command;
+import edu.wpi.first.command2.button.CommandXboxController;
+import edu.wpi.first.command2.button.Trigger;
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.Constants.AutoConstants;
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.Constants.OIConstants;
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.Constants.ShooterConstants;
@@ -14,9 +17,6 @@ import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.subsystems.Intake;
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.subsystems.Pneumatics;
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.subsystems.Shooter;
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.subsystems.Storage;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a

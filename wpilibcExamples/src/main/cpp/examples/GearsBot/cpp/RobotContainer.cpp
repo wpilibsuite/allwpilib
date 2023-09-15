@@ -4,8 +4,8 @@
 
 #include "RobotContainer.h"
 
+#include <frc/command2/button/JoystickButton.h>
 #include <frc/smartdashboard/SmartDashboard.h>
-#include <frc2/command/button/JoystickButton.h>
 
 #include "commands/CloseClaw.h"
 #include "commands/OpenClaw.h"
@@ -32,23 +32,23 @@ RobotContainer::RobotContainer()
 
 void RobotContainer::ConfigureButtonBindings() {
   // Configure your button bindings here
-  frc2::JoystickButton(&m_joy, 5).OnTrue(
+  frc::JoystickButton(&m_joy, 5).OnTrue(
       SetElevatorSetpoint(0.25, m_elevator).ToPtr());
-  frc2::JoystickButton(&m_joy, 6).OnTrue(CloseClaw(m_claw).ToPtr());
-  frc2::JoystickButton(&m_joy, 7).OnTrue(
+  frc::JoystickButton(&m_joy, 6).OnTrue(CloseClaw(m_claw).ToPtr());
+  frc::JoystickButton(&m_joy, 7).OnTrue(
       SetElevatorSetpoint(0.0, m_elevator).ToPtr());
-  frc2::JoystickButton(&m_joy, 8).OnTrue(OpenClaw(m_claw).ToPtr());
-  frc2::JoystickButton(&m_joy, 9).OnTrue(
+  frc::JoystickButton(&m_joy, 8).OnTrue(OpenClaw(m_claw).ToPtr());
+  frc::JoystickButton(&m_joy, 9).OnTrue(
       Autonomous(m_claw, m_wrist, m_elevator, m_drivetrain).ToPtr());
-  frc2::JoystickButton(&m_joy, 10)
+  frc::JoystickButton(&m_joy, 10)
       .OnTrue(Pickup(m_claw, m_wrist, m_elevator).ToPtr());
-  frc2::JoystickButton(&m_joy, 11)
+  frc::JoystickButton(&m_joy, 11)
       .OnTrue(Place(m_claw, m_wrist, m_elevator).ToPtr());
-  frc2::JoystickButton(&m_joy, 12)
+  frc::JoystickButton(&m_joy, 12)
       .OnTrue(PrepareToPickup(m_claw, m_wrist, m_elevator).ToPtr());
 }
 
-frc2::Command* RobotContainer::GetAutonomousCommand() {
+frc::Command* RobotContainer::GetAutonomousCommand() {
   // An example command will be run in autonomous
   return &m_autonomousCommand;
 }

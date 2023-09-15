@@ -4,12 +4,12 @@
 
 #include "RobotContainer.h"
 
+#include <frc/command2/Commands.h>
+#include <frc/command2/PIDCommand.h>
+#include <frc/command2/ParallelRaceGroup.h>
+#include <frc/command2/RunCommand.h>
+#include <frc/command2/button/JoystickButton.h>
 #include <frc/shuffleboard/Shuffleboard.h>
-#include <frc2/command/Commands.h>
-#include <frc2/command/PIDCommand.h>
-#include <frc2/command/ParallelRaceGroup.h>
-#include <frc2/command/RunCommand.h>
-#include <frc2/command/button/JoystickButton.h>
 
 RobotContainer::RobotContainer() {
   // Initialize all of your commands and subsystems here
@@ -18,7 +18,7 @@ RobotContainer::RobotContainer() {
   ConfigureButtonBindings();
 
   // Set up default drive command
-  m_drive.SetDefaultCommand(frc2::RunCommand(
+  m_drive.SetDefaultCommand(frc::RunCommand(
       [this] {
         m_drive.ArcadeDrive(-m_driverController.GetLeftY(),
                             -m_driverController.GetRightX());
@@ -32,9 +32,9 @@ void RobotContainer::ConfigureButtonBindings() {
   // Assorted commands to be bound to buttons
 
   // Stabilize robot to drive straight with gyro when L1 is held
-  frc2::JoystickButton(&m_driverController, frc::PS4Controller::Button::kL1)
+  frc::JoystickButton(&m_driverController, frc::PS4Controller::Button::kL1)
       .WhileTrue(
-          frc2::PIDCommand(
+          frc::PIDCommand(
               frc::PIDController{dc::kStabilizationP, dc::kStabilizationI,
                                  dc::kStabilizationD},
               // Close the loop on the turn rate
@@ -50,21 +50,21 @@ void RobotContainer::ConfigureButtonBindings() {
               .ToPtr());
 
   // Turn to 90 degrees when the 'Cross' button is pressed
-  frc2::JoystickButton(&m_driverController, frc::PS4Controller::Button::kCross)
+  frc::JoystickButton(&m_driverController, frc::PS4Controller::Button::kCross)
       .OnTrue(TurnToAngle{90_deg, &m_drive}.WithTimeout(5_s));
 
   // Turn to -90 degrees with a profile when the 'Square' button is pressed,
   // with a 5 second timeout
-  frc2::JoystickButton(&m_driverController, frc::PS4Controller::Button::kSquare)
+  frc::JoystickButton(&m_driverController, frc::PS4Controller::Button::kSquare)
       .OnTrue(TurnToAngle{90_deg, &m_drive}.WithTimeout(5_s));
 
   // While holding R1, drive at half speed
-  frc2::JoystickButton(&m_driverController, frc::PS4Controller::Button::kR1)
-      .OnTrue(frc2::cmd::RunOnce([this] { m_drive.SetMaxOutput(0.5); }, {}))
-      .OnFalse(frc2::cmd::RunOnce([this] { m_drive.SetMaxOutput(1); }, {}));
+  frc::JoystickButton(&m_driverController, frc::PS4Controller::Button::kR1)
+      .OnTrue(frc::cmd::RunOnce([this] { m_drive.SetMaxOutput(0.5); }, {}))
+      .OnFalse(frc::cmd::RunOnce([this] { m_drive.SetMaxOutput(1); }, {}));
 }
 
-frc2::Command* RobotContainer::GetAutonomousCommand() {
+frc::Command* RobotContainer::GetAutonomousCommand() {
   // no auto
   return nullptr;
 }

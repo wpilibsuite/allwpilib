@@ -6,16 +6,16 @@
 
 #include <utility>
 
+#include <frc/command2/InstantCommand.h>
+#include <frc/command2/MecanumControllerCommand.h>
+#include <frc/command2/SequentialCommandGroup.h>
+#include <frc/command2/button/JoystickButton.h>
 #include <frc/controller/PIDController.h>
 #include <frc/geometry/Translation2d.h>
 #include <frc/shuffleboard/Shuffleboard.h>
 #include <frc/trajectory/Trajectory.h>
 #include <frc/trajectory/TrajectoryGenerator.h>
 #include <frc/trajectory/constraint/MecanumDriveKinematicsConstraint.h>
-#include <frc2/command/InstantCommand.h>
-#include <frc2/command/MecanumControllerCommand.h>
-#include <frc2/command/SequentialCommandGroup.h>
-#include <frc2/command/button/JoystickButton.h>
 
 #include "Constants.h"
 
@@ -28,7 +28,7 @@ RobotContainer::RobotContainer() {
   ConfigureButtonBindings();
 
   // Set up default drive command
-  m_drive.SetDefaultCommand(frc2::RunCommand(
+  m_drive.SetDefaultCommand(frc::RunCommand(
       [this] {
         m_drive.Drive(-m_driverController.GetLeftY(),
                       -m_driverController.GetRightX(),
@@ -41,13 +41,13 @@ void RobotContainer::ConfigureButtonBindings() {
   // Configure your button bindings here
 
   // While holding the shoulder button, drive at half speed
-  frc2::JoystickButton(&m_driverController,
-                       frc::XboxController::Button::kRightBumper)
+  frc::JoystickButton(&m_driverController,
+                      frc::XboxController::Button::kRightBumper)
       .OnTrue(&m_driveHalfSpeed)
       .OnFalse(&m_driveFullSpeed);
 }
 
-frc2::Command* RobotContainer::GetAutonomousCommand() {
+frc::Command* RobotContainer::GetAutonomousCommand() {
   // Set up config for trajectory
   frc::TrajectoryConfig config(AutoConstants::kMaxSpeed,
                                AutoConstants::kMaxAcceleration);
@@ -65,7 +65,7 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
       // Pass the config
       config);
 
-  frc2::MecanumControllerCommand mecanumControllerCommand(
+  frc::MecanumControllerCommand mecanumControllerCommand(
       exampleTrajectory, [this]() { return m_drive.GetPose(); },
 
       frc::SimpleMotorFeedforward<units::meters>(ks, kv, ka),
@@ -106,7 +106,7 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
   m_drive.ResetOdometry(exampleTrajectory.InitialPose());
 
   // no auto
-  return new frc2::SequentialCommandGroup(
+  return new frc::SequentialCommandGroup(
       std::move(mecanumControllerCommand),
-      frc2::InstantCommand([this]() { m_drive.Drive(0, 0, 0, false); }, {}));
+      frc::InstantCommand([this]() { m_drive.Drive(0, 0, 0, false); }, {}));
 }

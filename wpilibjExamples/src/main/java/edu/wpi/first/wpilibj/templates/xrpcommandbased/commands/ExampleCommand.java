@@ -4,8 +4,8 @@
 
 package edu.wpi.first.wpilibj.templates.xrpcommandbased.commands;
 
+import edu.wpi.first.command2.Command;
 import edu.wpi.first.wpilibj.templates.xrpcommandbased.subsystems.XRPDrivetrain;
-import edu.wpi.first.wpilibj2.command.Command;
 
 /** An example command that uses an example subsystem. */
 public class ExampleCommand extends Command {

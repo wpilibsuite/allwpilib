@@ -4,8 +4,8 @@
 
 package edu.wpi.first.wpilibj.examples.romireference.commands;
 
+import edu.wpi.first.command2.Command;
 import edu.wpi.first.wpilibj.examples.romireference.subsystems.Drivetrain;
-import edu.wpi.first.wpilibj2.command.Command;
 
 public class DriveDistance extends Command {
   private final Drivetrain m_drive;

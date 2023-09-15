@@ -13,7 +13,7 @@ RobotContainer::RobotContainer() {
   ConfigureButtonBindings();
 
   // Set up default drive command
-  m_drive.SetDefaultCommand(frc2::cmd::Run(
+  m_drive.SetDefaultCommand(frc::cmd::Run(
       [this] {
         m_drive.ArcadeDrive(-m_driverController.GetLeftY(),
                             -m_driverController.GetRightX());
@@ -37,7 +37,7 @@ void RobotContainer::ConfigureButtonBindings() {
   // Do the same thing as above when the 'B' button is pressed, but defined
   // inline
   m_driverController.B().OnTrue(
-      frc2::TrapezoidProfileCommand<units::meters>(
+      frc::TrapezoidProfileCommand<units::meters>(
           frc::TrapezoidProfile<units::meters>(
               // Limit the max acceleration and velocity
               {DriveConstants::kMaxSpeed, DriveConstants::kMaxAcceleration}),
@@ -56,11 +56,11 @@ void RobotContainer::ConfigureButtonBindings() {
           // Convert to CommandPtr
           .ToPtr()
           .BeforeStarting(
-              frc2::cmd::RunOnce([this]() { m_drive.ResetEncoders(); }, {}))
+              frc::cmd::RunOnce([this]() { m_drive.ResetEncoders(); }, {}))
           .WithTimeout(10_s));
 }
 
-frc2::Command* RobotContainer::GetAutonomousCommand() {
+frc::Command* RobotContainer::GetAutonomousCommand() {
   // Runs the chosen command in autonomous
   return nullptr;
 }

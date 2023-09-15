@@ -4,10 +4,10 @@
 
 #include "Robot.h"
 
+#include <frc/command2/CommandScheduler.h>
 #include <frc/simulation/BatterySim.h>
 #include <frc/simulation/RoboRioSim.h>
 #include <frc/smartdashboard/SmartDashboard.h>
-#include <frc2/command/CommandScheduler.h>
 
 void Robot::RobotInit() {}
 
@@ -20,7 +20,7 @@ void Robot::RobotInit() {}
  * LiveWindow and SmartDashboard integrated updating.
  */
 void Robot::RobotPeriodic() {
-  frc2::CommandScheduler::GetInstance().Run();
+  frc::CommandScheduler::GetInstance().Run();
 }
 
 /**
@@ -29,7 +29,7 @@ void Robot::RobotPeriodic() {
  * robot is disabled.
  */
 void Robot::DisabledInit() {
-  frc2::CommandScheduler::GetInstance().CancelAll();
+  frc::CommandScheduler::GetInstance().CancelAll();
   m_container.ZeroAllOutputs();
 }
 

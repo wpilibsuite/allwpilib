@@ -4,8 +4,8 @@
 
 package edu.wpi.first.wpilibj.commands.pidcommand;
 
+import edu.wpi.first.command2.PIDCommand;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj2.command.PIDCommand;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:

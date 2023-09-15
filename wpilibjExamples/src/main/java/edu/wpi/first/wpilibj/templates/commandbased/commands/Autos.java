@@ -4,9 +4,9 @@
 
 package edu.wpi.first.wpilibj.templates.commandbased.commands;
 
+import edu.wpi.first.command2.Command;
+import edu.wpi.first.command2.Commands;
 import edu.wpi.first.wpilibj.templates.commandbased.subsystems.ExampleSubsystem;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 
 public final class Autos {
   /** Example static factory for an autonomous command. */

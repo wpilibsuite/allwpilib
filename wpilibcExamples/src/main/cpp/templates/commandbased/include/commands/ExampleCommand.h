@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <frc2/command/Command.h>
-#include <frc2/command/CommandHelper.h>
+#include <frc/command2/Command.h>
+#include <frc/command2/CommandHelper.h>
 
 #include "subsystems/ExampleSubsystem.h"
 
@@ -16,8 +16,7 @@
  * directly; this is crucially important, or else the decorator functions in
  * Command will *not* work!
  */
-class ExampleCommand
-    : public frc2::CommandHelper<frc2::Command, ExampleCommand> {
+class ExampleCommand : public frc::CommandHelper<frc::Command, ExampleCommand> {
  public:
   /**
    * Creates a new ExampleCommand.

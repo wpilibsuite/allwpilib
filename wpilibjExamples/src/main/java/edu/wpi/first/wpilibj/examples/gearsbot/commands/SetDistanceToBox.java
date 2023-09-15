@@ -4,9 +4,9 @@
 
 package edu.wpi.first.wpilibj.examples.gearsbot.commands;
 
+import edu.wpi.first.command2.PIDCommand;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Drivetrain;
-import edu.wpi.first.wpilibj2.command.PIDCommand;
 
 /**
  * Drive until the robot is the given distance away from the box. Uses a local PID controller to run

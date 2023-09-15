@@ -4,12 +4,12 @@
 
 package edu.wpi.first.wpilibj.examples.xrpreference.subsystems;
 
+import edu.wpi.first.command2.SubsystemBase;
 import edu.wpi.first.wpilibj.BuiltInAccelerometer;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.examples.xrpreference.devices.XRPMotor;
 import edu.wpi.first.wpilibj.examples.xrpreference.sensors.XRPGyro;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Drivetrain extends SubsystemBase {
   private static final double kGearRatio =

@@ -4,10 +4,10 @@
 
 package edu.wpi.first.wpilibj.examples.statespacedifferentialdrivesimulation;
 
+import edu.wpi.first.command2.CommandScheduler;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 /**
  * This is a sample program to demonstrate the use of state-space classes in robot simulation. This

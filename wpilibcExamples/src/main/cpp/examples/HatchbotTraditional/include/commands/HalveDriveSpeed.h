@@ -4,13 +4,13 @@
 
 #pragma once
 
-#include <frc2/command/Command.h>
-#include <frc2/command/CommandHelper.h>
+#include <frc/command2/Command.h>
+#include <frc/command2/CommandHelper.h>
 
 #include "subsystems/DriveSubsystem.h"
 
 class HalveDriveSpeed
-    : public frc2::CommandHelper<frc2::Command, HalveDriveSpeed> {
+    : public frc::CommandHelper<frc::Command, HalveDriveSpeed> {
  public:
   explicit HalveDriveSpeed(DriveSubsystem* subsystem);
 

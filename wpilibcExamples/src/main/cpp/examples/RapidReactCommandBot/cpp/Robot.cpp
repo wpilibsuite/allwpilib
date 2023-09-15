@@ -15,7 +15,7 @@ void Robot::RobotPeriodic() {
   // finished or interrupted commands, and running subsystem Periodic() methods.
   // This must be called from the robot's periodic block in order for anything
   // in the Command-based framework to work.
-  frc2::CommandScheduler::GetInstance().Run();
+  frc::CommandScheduler::GetInstance().Run();
 }
 
 void Robot::DisabledInit() {}
@@ -46,7 +46,7 @@ void Robot::TeleopPeriodic() {}
 
 void Robot::TestInit() {
   // Cancels all running commands at the start of test mode.
-  frc2::CommandScheduler::GetInstance().CancelAll();
+  frc::CommandScheduler::GetInstance().CancelAll();
 }
 
 void Robot::TestPeriodic() {}

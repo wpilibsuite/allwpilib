@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <frc2/command/CommandPtr.h>
-#include <frc2/command/button/CommandXboxController.h>
+#include <frc/command2/CommandPtr.h>
+#include <frc/command2/button/CommandXboxController.h>
 
 #include "Constants.h"
 #include "subsystems/Drive.h"
@@ -29,7 +29,7 @@ class RapidReactCommandBot {
    *
    * <p>Should be called during Robot::RobotInit().
    *
-   * <p>Event binding methods are available on the frc2::Trigger class.
+   * <p>Event binding methods are available on the frc::Trigger class.
    */
   void ConfigureBindings();
 
@@ -38,7 +38,7 @@ class RapidReactCommandBot {
    *
    * <p>Scheduled during Robot::AutonomousInit().
    */
-  frc2::CommandPtr GetAutonomousCommand();
+  frc::CommandPtr GetAutonomousCommand();
 
  private:
   // The robot's subsystems
@@ -49,6 +49,6 @@ class RapidReactCommandBot {
   Pneumatics m_pneumatics;
 
   // The driver's controller
-  frc2::CommandXboxController m_driverController{
+  frc::CommandXboxController m_driverController{
       OIConstants::kDriverControllerPort};
 };

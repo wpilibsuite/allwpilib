@@ -4,8 +4,8 @@
 
 package edu.wpi.first.wpilibj.examples.xrpreference.commands;
 
+import edu.wpi.first.command2.SequentialCommandGroup;
 import edu.wpi.first.wpilibj.examples.xrpreference.subsystems.Drivetrain;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 public class AutonomousDistance extends SequentialCommandGroup {
   /**

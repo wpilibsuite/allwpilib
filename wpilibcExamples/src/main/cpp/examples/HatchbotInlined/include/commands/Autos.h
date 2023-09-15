@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <frc2/command/CommandPtr.h>
+#include <frc/command2/CommandPtr.h>
 
 #include "subsystems/DriveSubsystem.h"
 #include "subsystems/HatchSubsystem.h"
@@ -15,12 +15,12 @@ namespace autos {
 /**
  * A simple auto that drives forward, then stops.
  */
-frc2::CommandPtr SimpleAuto(DriveSubsystem* drive);
+frc::CommandPtr SimpleAuto(DriveSubsystem* drive);
 
 /**
  * A complex auto command that drives forward, releases a hatch, and then drives
  * backward.
  */
-frc2::CommandPtr ComplexAuto(DriveSubsystem* drive, HatchSubsystem* hatch);
+frc::CommandPtr ComplexAuto(DriveSubsystem* drive, HatchSubsystem* hatch);
 
 }  // namespace autos

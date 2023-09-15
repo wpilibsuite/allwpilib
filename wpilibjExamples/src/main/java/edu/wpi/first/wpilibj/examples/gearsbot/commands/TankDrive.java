@@ -4,8 +4,8 @@
 
 package edu.wpi.first.wpilibj.examples.gearsbot.commands;
 
+import edu.wpi.first.command2.Command;
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Drivetrain;
-import edu.wpi.first.wpilibj2.command.Command;
 import java.util.function.DoubleSupplier;
 
 /** Have the robot drive tank style. */

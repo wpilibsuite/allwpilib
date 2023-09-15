@@ -10,7 +10,7 @@ using namespace ArmConstants;
 using State = frc::TrapezoidProfile<units::radians>::State;
 
 ArmSubsystem::ArmSubsystem()
-    : frc2::TrapezoidProfileSubsystem<units::radians>(
+    : frc::TrapezoidProfileSubsystem<units::radians>(
           {kMaxVelocity, kMaxAcceleration}, kArmOffset),
       m_motor(kMotorPort),
       m_feedforward(kS, kG, kV, kA) {
@@ -26,6 +26,6 @@ void ArmSubsystem::UseState(State setpoint) {
                       setpoint.position.value(), feedforward / 12_V);
 }
 
-frc2::CommandPtr ArmSubsystem::SetArmGoalCommand(units::radian_t goal) {
-  return frc2::cmd::RunOnce([this, goal] { this->SetGoal(goal); }, {this});
+frc::CommandPtr ArmSubsystem::SetArmGoalCommand(units::radian_t goal) {
+  return frc::cmd::RunOnce([this, goal] { this->SetGoal(goal); }, {this});
 }

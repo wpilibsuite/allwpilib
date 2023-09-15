@@ -5,18 +5,18 @@
 #pragma once
 
 #include <frc/DigitalInput.h>
+#include <frc/command2/CommandPtr.h>
+#include <frc/command2/SubsystemBase.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
-#include <frc2/command/CommandPtr.h>
-#include <frc2/command/SubsystemBase.h>
 
 #include "Constants.h"
 
-class Storage : frc2::SubsystemBase {
+class Storage : frc::SubsystemBase {
  public:
   Storage();
   /** Returns a command that runs the storage motor indefinitely. */
   [[nodiscard]]
-  frc2::CommandPtr RunCommand();
+  frc::CommandPtr RunCommand();
 
   /** Whether the ball storage is full. */
   bool IsFull() const;

@@ -6,7 +6,7 @@
 
 Pneumatics::Pneumatics() {}
 
-frc2::CommandPtr Pneumatics::DisableCompressorCommand() {
+frc::CommandPtr Pneumatics::DisableCompressorCommand() {
   return StartEnd(
       [&] {
         // Disable closed-loop mode on the compressor.

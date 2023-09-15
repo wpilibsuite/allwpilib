@@ -5,13 +5,13 @@
 #pragma once
 
 #include <frc/Timer.h>
-#include <frc2/command/Command.h>
-#include <frc2/command/CommandHelper.h>
+#include <frc/command2/Command.h>
+#include <frc/command2/CommandHelper.h>
 #include <units/time.h>
 
 #include "subsystems/Drivetrain.h"
 
-class DriveTime : public frc2::CommandHelper<frc2::Command, DriveTime> {
+class DriveTime : public frc::CommandHelper<frc::Command, DriveTime> {
  public:
   DriveTime(double speed, units::second_t time, Drivetrain* drive)
       : m_speed(speed), m_duration(time), m_drive(drive) {

@@ -4,6 +4,11 @@
 
 package edu.wpi.first.wpilibj.examples.mecanumcontrollercommand;
 
+import edu.wpi.first.command2.Command;
+import edu.wpi.first.command2.InstantCommand;
+import edu.wpi.first.command2.MecanumControllerCommand;
+import edu.wpi.first.command2.RunCommand;
+import edu.wpi.first.command2.button.JoystickButton;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -18,11 +23,6 @@ import edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.AutoCon
 import edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.DriveConstants;
 import edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.OIConstants;
 import edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.subsystems.DriveSubsystem;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.MecanumControllerCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import java.util.List;
 
 /*

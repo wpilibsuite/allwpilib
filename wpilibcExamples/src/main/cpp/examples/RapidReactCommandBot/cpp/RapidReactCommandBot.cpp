@@ -4,22 +4,22 @@
 
 #include "RapidReactCommandBot.h"
 
-#include <frc2/command/Command.h>
-#include <frc2/command/Commands.h>
-#include <frc2/command/button/Trigger.h>
+#include <frc/command2/Command.h>
+#include <frc/command2/Commands.h>
+#include <frc/command2/button/Trigger.h>
 
 #include "Constants.h"
 
 void RapidReactCommandBot::ConfigureBindings() {
   // Automatically run the storage motor whenever the ball storage is not full,
   // and turn it off whenever it fills.
-  frc2::Trigger([this] {
+  frc::Trigger([this] {
     return m_storage.IsFull();
   }).WhileFalse(m_storage.RunCommand());
 
   // Automatically disable and retract the intake whenever the ball storage is
   // full.
-  frc2::Trigger([this] {
+  frc::Trigger([this] {
     return m_storage.IsFull();
   }).OnTrue(m_intake.RetractCommand());
 
@@ -35,7 +35,7 @@ void RapidReactCommandBot::ConfigureBindings() {
 
   // Fire the shooter with the A button
   m_driverController.A().OnTrue(
-      frc2::cmd::Parallel(
+      frc::cmd::Parallel(
           m_shooter.ShootCommand(ShooterConstants::kShooterTarget),
           m_storage.RunCommand())
           // Since we composed this inline we should give it a name
@@ -46,7 +46,7 @@ void RapidReactCommandBot::ConfigureBindings() {
       m_pneumatics.DisableCompressorCommand());
 }
 
-frc2::CommandPtr RapidReactCommandBot::GetAutonomousCommand() {
+frc::CommandPtr RapidReactCommandBot::GetAutonomousCommand() {
   return m_drive
       .DriveDistanceCommand(AutoConstants::kDriveDistance,
                             AutoConstants::kDriveSpeed)

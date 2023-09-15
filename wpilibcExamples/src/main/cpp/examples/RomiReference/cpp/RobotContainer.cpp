@@ -4,8 +4,8 @@
 
 #include "RobotContainer.h"
 
+#include <frc/command2/Commands.h>
 #include <frc/smartdashboard/SmartDashboard.h>
-#include <frc2/command/Commands.h>
 
 #include "commands/TeleopArcadeDrive.h"
 
@@ -21,8 +21,8 @@ void RobotContainer::ConfigureButtonBindings() {
       [this] { return -m_controller.GetRawAxis(2); }));
 
   // Example of how to use the onboard IO
-  m_onboardButtonA.OnTrue(frc2::cmd::Print("Button A Pressed"))
-      .OnFalse(frc2::cmd::Print("Button A Released"));
+  m_onboardButtonA.OnTrue(frc::cmd::Print("Button A Pressed"))
+      .OnFalse(frc::cmd::Print("Button A Released"));
 
   // Setup SmartDashboard options.
   m_chooser.SetDefaultOption("Auto Routine Distance", &m_autoDistance);
@@ -30,6 +30,6 @@ void RobotContainer::ConfigureButtonBindings() {
   frc::SmartDashboard::PutData("Auto Selector", &m_chooser);
 }
 
-frc2::Command* RobotContainer::GetAutonomousCommand() {
+frc::Command* RobotContainer::GetAutonomousCommand() {
   return m_chooser.GetSelected();
 }

@@ -4,8 +4,8 @@
 
 package edu.wpi.first.wpilibj.templates.commandbasedskeleton;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.command2.Command;
+import edu.wpi.first.command2.Commands;
 
 public class RobotContainer {
   public RobotContainer() {

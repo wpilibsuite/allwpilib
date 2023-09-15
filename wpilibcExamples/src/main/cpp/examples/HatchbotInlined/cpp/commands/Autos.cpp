@@ -4,15 +4,15 @@
 
 #include "commands/Autos.h"
 
-#include <frc2/command/Commands.h>
-#include <frc2/command/FunctionalCommand.h>
+#include <frc/command2/Commands.h>
+#include <frc/command2/FunctionalCommand.h>
 
 #include "Constants.h"
 
 using namespace AutoConstants;
 
-frc2::CommandPtr autos::SimpleAuto(DriveSubsystem* drive) {
-  return frc2::FunctionalCommand(
+frc::CommandPtr autos::SimpleAuto(DriveSubsystem* drive) {
+  return frc::FunctionalCommand(
              // Reset encoders on command start
              [drive] { drive->ResetEncoders(); },
              // Drive forward while the command is executing
@@ -30,11 +30,11 @@ frc2::CommandPtr autos::SimpleAuto(DriveSubsystem* drive) {
       .ToPtr();
 }
 
-frc2::CommandPtr autos::ComplexAuto(DriveSubsystem* drive,
-                                    HatchSubsystem* hatch) {
-  return frc2::cmd::Sequence(
+frc::CommandPtr autos::ComplexAuto(DriveSubsystem* drive,
+                                   HatchSubsystem* hatch) {
+  return frc::cmd::Sequence(
       // Drive forward the specified distance
-      frc2::FunctionalCommand(
+      frc::FunctionalCommand(
           // Reset encoders on command start
           [drive] { drive->ResetEncoders(); },
           // Drive forward while the command is executing
@@ -54,7 +54,7 @@ frc2::CommandPtr autos::ComplexAuto(DriveSubsystem* drive,
       hatch->ReleaseHatchCommand(),
       // Drive backward the specified distance
       // Drive forward the specified distance
-      frc2::FunctionalCommand(
+      frc::FunctionalCommand(
           // Reset encoders on command start
           [drive] { drive->ResetEncoders(); },
           // Drive backward while the command is executing

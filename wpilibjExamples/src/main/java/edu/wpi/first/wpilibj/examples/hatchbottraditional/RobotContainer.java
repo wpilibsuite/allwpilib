@@ -6,6 +6,9 @@ package edu.wpi.first.wpilibj.examples.hatchbottraditional;
 
 import static edu.wpi.first.wpilibj.XboxController.Button;
 
+import edu.wpi.first.command2.Command;
+import edu.wpi.first.command2.CommandScheduler;
+import edu.wpi.first.command2.button.JoystickButton;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.examples.hatchbottraditional.Constants.AutoConstants;
 import edu.wpi.first.wpilibj.examples.hatchbottraditional.Constants.OIConstants;
@@ -20,9 +23,6 @@ import edu.wpi.first.wpilibj.examples.hatchbottraditional.subsystems.HatchSubsys
 import edu.wpi.first.wpilibj.shuffleboard.EventImportance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -103,7 +103,7 @@ public class RobotContainer {
    * Use this method to define your button->command mappings. Buttons can be created by
    * instantiating a {@link edu.wpi.first.wpilibj.GenericHID} or one of its subclasses ({@link
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
-   * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
+   * edu.wpi.first.command2.button.JoystickButton}.
    */
   private void configureButtonBindings() {
     // Grab the hatch when the 'A' button is pressed.

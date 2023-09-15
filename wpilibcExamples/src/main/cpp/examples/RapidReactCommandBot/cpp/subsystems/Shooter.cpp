@@ -4,7 +4,7 @@
 
 #include "subsystems/Shooter.h"
 
-#include <frc2/command/Commands.h>
+#include <frc/command2/Commands.h>
 
 Shooter::Shooter() {
   m_shooterFeedback.SetTolerance(ShooterConstants::kShooterTolerance.value());
@@ -19,8 +19,8 @@ Shooter::Shooter() {
                         .WithName("Idle"));
 }
 
-frc2::CommandPtr Shooter::ShootCommand(units::turns_per_second_t setpoint) {
-  return frc2::cmd::Parallel(
+frc::CommandPtr Shooter::ShootCommand(units::turns_per_second_t setpoint) {
+  return frc::cmd::Parallel(
              // Run the shooter flywheel at the desired setpoint using
              // feedforward and feedback
              Run([this, setpoint] {
@@ -31,7 +31,7 @@ frc2::CommandPtr Shooter::ShootCommand(units::turns_per_second_t setpoint) {
              }),
              // Wait until the shooter has reached the setpoint, and then
              // run the feeder
-             frc2::cmd::WaitUntil([this] {
+             frc::cmd::WaitUntil([this] {
                return m_shooterFeedback.AtSetpoint();
              }).AndThen([this] { m_feederMotor.Set(1.0); }))
       .WithName("Shoot");

@@ -4,12 +4,12 @@
 
 #include "Robot.h"
 
-#include <frc2/command/CommandScheduler.h>
+#include <frc/command2/CommandScheduler.h>
 
 void Robot::RobotInit() {}
 
 void Robot::RobotPeriodic() {
-  frc2::CommandScheduler::GetInstance().Run();
+  frc::CommandScheduler::GetInstance().Run();
 }
 
 void Robot::DisabledInit() {}
@@ -41,7 +41,7 @@ void Robot::TeleopPeriodic() {}
 void Robot::TeleopExit() {}
 
 void Robot::TestInit() {
-  frc2::CommandScheduler::GetInstance().CancelAll();
+  frc::CommandScheduler::GetInstance().CancelAll();
 }
 
 void Robot::TestPeriodic() {}

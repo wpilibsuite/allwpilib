@@ -4,17 +4,17 @@
 
 #pragma once
 
-#include <frc2/command/CommandPtr.h>
-#include <frc2/command/SubsystemBase.h>
+#include <frc/command2/CommandPtr.h>
+#include <frc/command2/SubsystemBase.h>
 
-class ExampleSubsystem : public frc2::SubsystemBase {
+class ExampleSubsystem : public frc::SubsystemBase {
  public:
   ExampleSubsystem();
 
   /**
    * Example command factory method.
    */
-  frc2::CommandPtr ExampleMethodCommand();
+  frc::CommandPtr ExampleMethodCommand();
 
   /**
    * An example method querying a boolean state of the subsystem (for example, a

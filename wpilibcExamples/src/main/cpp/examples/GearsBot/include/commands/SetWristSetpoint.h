@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <frc2/command/Command.h>
-#include <frc2/command/CommandHelper.h>
+#include <frc/command2/Command.h>
+#include <frc/command2/CommandHelper.h>
 
 #include "subsystems/Wrist.h"
 
@@ -15,7 +15,7 @@
  * Other commands using the wrist should make sure they disable PID!
  */
 class SetWristSetpoint
-    : public frc2::CommandHelper<frc2::Command, SetWristSetpoint> {
+    : public frc::CommandHelper<frc::Command, SetWristSetpoint> {
  public:
   explicit SetWristSetpoint(double setpoint, Wrist& wrist);
   void Initialize() override;

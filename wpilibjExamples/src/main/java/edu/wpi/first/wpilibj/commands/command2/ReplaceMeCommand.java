@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj.commands.command2;
 
-import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.command2.Command;
 
 public class ReplaceMeCommand extends Command {
   /** Creates a new ReplaceMeCommand. */

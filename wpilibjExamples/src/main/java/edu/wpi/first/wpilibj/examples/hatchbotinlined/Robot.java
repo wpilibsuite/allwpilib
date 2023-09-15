@@ -4,11 +4,11 @@
 
 package edu.wpi.first.wpilibj.examples.hatchbotinlined;
 
+import edu.wpi.first.command2.Command;
+import edu.wpi.first.command2.CommandScheduler;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to

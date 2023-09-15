@@ -6,8 +6,8 @@
 
 #include <frc/DataLogManager.h>
 #include <frc/DriverStation.h>
+#include <frc/command2/CommandScheduler.h>
 #include <frc/smartdashboard/SmartDashboard.h>
-#include <frc2/command/CommandScheduler.h>
 
 void Robot::RobotInit() {
   // Start recording to data log
@@ -27,7 +27,7 @@ void Robot::RobotInit() {
  * LiveWindow and SmartDashboard integrated updating.
  */
 void Robot::RobotPeriodic() {
-  frc2::CommandScheduler::GetInstance().Run();
+  frc::CommandScheduler::GetInstance().Run();
 }
 
 /**

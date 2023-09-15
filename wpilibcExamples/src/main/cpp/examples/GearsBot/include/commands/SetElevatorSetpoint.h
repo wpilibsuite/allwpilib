@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <frc2/command/Command.h>
-#include <frc2/command/CommandHelper.h>
+#include <frc/command2/Command.h>
+#include <frc/command2/CommandHelper.h>
 
 #include "subsystems/Elevator.h"
 
@@ -17,7 +17,7 @@
  * commands using the elevator should make sure they disable PID!
  */
 class SetElevatorSetpoint
-    : public frc2::CommandHelper<frc2::Command, SetElevatorSetpoint> {
+    : public frc::CommandHelper<frc::Command, SetElevatorSetpoint> {
  public:
   explicit SetElevatorSetpoint(double setpoint, Elevator& elevator);
   void Initialize() override;

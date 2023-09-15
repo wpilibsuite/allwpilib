@@ -4,11 +4,11 @@
 
 package edu.wpi.first.wpilibj.examples.gearsbot.subsystems;
 
+import edu.wpi.first.command2.SubsystemBase;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.examples.gearsbot.Constants.ClawConstants;
 import edu.wpi.first.wpilibj.motorcontrol.Victor;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /**
  * The claw subsystem is a simple system with a motor for opening and closing. If using stronger

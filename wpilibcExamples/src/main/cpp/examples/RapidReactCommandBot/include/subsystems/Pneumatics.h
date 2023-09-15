@@ -7,18 +7,18 @@
 #include <frc/AnalogPotentiometer.h>
 #include <frc/Compressor.h>
 #include <frc/PneumaticsControlModule.h>
-#include <frc2/command/CommandPtr.h>
-#include <frc2/command/SubsystemBase.h>
+#include <frc/command2/CommandPtr.h>
+#include <frc/command2/SubsystemBase.h>
 #include <units/pressure.h>
 
 #include "Constants.h"
 
-class Pneumatics : frc2::SubsystemBase {
+class Pneumatics : frc::SubsystemBase {
  public:
   Pneumatics();
   /** Returns a command that disables the compressor indefinitely. */
   [[nodiscard]]
-  frc2::CommandPtr DisableCompressorCommand();
+  frc::CommandPtr DisableCompressorCommand();
 
   /**
    * Query the analog pressure sensor.

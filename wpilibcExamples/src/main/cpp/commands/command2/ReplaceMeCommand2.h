@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <frc2/command/Command.h>
-#include <frc2/command/CommandHelper.h>
+#include <frc/command2/Command.h>
+#include <frc/command2/CommandHelper.h>
 
 /**
  * An example command.
@@ -15,7 +15,7 @@
  * Command will *not* work!
  */
 class ReplaceMeCommand2
-    : public frc2::CommandHelper<frc2::Command, ReplaceMeCommand2> {
+    : public frc::CommandHelper<frc::Command, ReplaceMeCommand2> {
  public:
   ReplaceMeCommand2();
 

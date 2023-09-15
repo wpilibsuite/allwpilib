@@ -6,7 +6,7 @@
 
 #include <utility>
 
-#include <frc2/command/Commands.h>
+#include <frc/command2/Commands.h>
 
 Drive::Drive() {
   // We need to invert one side of the drivetrain so that positive voltages
@@ -19,16 +19,16 @@ Drive::Drive() {
   m_rightEncoder.SetDistancePerPulse(DriveConstants::kEncoderDistancePerPulse);
 }
 
-frc2::CommandPtr Drive::ArcadeDriveCommand(std::function<double()> fwd,
-                                           std::function<double()> rot) {
+frc::CommandPtr Drive::ArcadeDriveCommand(std::function<double()> fwd,
+                                          std::function<double()> rot) {
   return Run([this, fwd = std::move(fwd), rot = std::move(rot)] {
            m_drive.ArcadeDrive(fwd(), rot());
          })
       .WithName("ArcadeDrive");
 }
 
-frc2::CommandPtr Drive::DriveDistanceCommand(units::meter_t distance,
-                                             double speed) {
+frc::CommandPtr Drive::DriveDistanceCommand(units::meter_t distance,
+                                            double speed) {
   return RunOnce([this] {
            // Reset encoders at the start of the command
            m_leftEncoder.Reset();

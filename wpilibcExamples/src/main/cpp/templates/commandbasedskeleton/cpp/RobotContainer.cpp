@@ -4,7 +4,7 @@
 
 #include "RobotContainer.h"
 
-#include <frc2/command/Commands.h>
+#include <frc/command2/Commands.h>
 
 RobotContainer::RobotContainer() {
   ConfigureBindings();
@@ -12,6 +12,6 @@ RobotContainer::RobotContainer() {
 
 void RobotContainer::ConfigureBindings() {}
 
-frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
-  return frc2::cmd::Print("No autonomous command configured");
+frc::CommandPtr RobotContainer::GetAutonomousCommand() {
+  return frc::cmd::Print("No autonomous command configured");
 }

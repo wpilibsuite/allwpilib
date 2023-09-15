@@ -12,13 +12,13 @@ HatchSubsystem::HatchSubsystem()
     : m_hatchSolenoid{frc::PneumaticsModuleType::CTREPCM,
                       kHatchSolenoidPorts[0], kHatchSolenoidPorts[1]} {}
 
-frc2::CommandPtr HatchSubsystem::GrabHatchCommand() {
+frc::CommandPtr HatchSubsystem::GrabHatchCommand() {
   // implicitly require `this`
   return this->RunOnce(
       [this] { m_hatchSolenoid.Set(frc::DoubleSolenoid::kForward); });
 }
 
-frc2::CommandPtr HatchSubsystem::ReleaseHatchCommand() {
+frc::CommandPtr HatchSubsystem::ReleaseHatchCommand() {
   // implicitly require `this`
   return this->RunOnce(
       [this] { m_hatchSolenoid.Set(frc::DoubleSolenoid::kReverse); });

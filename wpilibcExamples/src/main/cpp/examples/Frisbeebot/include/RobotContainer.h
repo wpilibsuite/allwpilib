@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <frc2/command/Command.h>
-#include <frc2/command/CommandPtr.h>
-#include <frc2/command/Commands.h>
-#include <frc2/command/button/CommandXboxController.h>
+#include <frc/command2/Command.h>
+#include <frc/command2/CommandPtr.h>
+#include <frc/command2/Commands.h>
+#include <frc/command2/button/CommandXboxController.h>
 
 #include "Constants.h"
 #include "subsystems/DriveSubsystem.h"
@@ -27,11 +27,11 @@ class RobotContainer {
   RobotContainer();
 
   // The chooser for the autonomous routines
-  frc2::Command* GetAutonomousCommand();
+  frc::Command* GetAutonomousCommand();
 
  private:
   // The driver's controller
-  frc2::CommandXboxController m_driverController{
+  frc::CommandXboxController m_driverController{
       OIConstants::kDriverControllerPort};
 
   // The robot's subsystems
@@ -42,28 +42,28 @@ class RobotContainer {
   // (These variables will still be valid after binding, because we don't move
   // ownership)
 
-  frc2::CommandPtr m_spinUpShooter =
-      frc2::cmd::RunOnce([this] { m_shooter.Enable(); }, {&m_shooter});
+  frc::CommandPtr m_spinUpShooter =
+      frc::cmd::RunOnce([this] { m_shooter.Enable(); }, {&m_shooter});
 
-  frc2::CommandPtr m_stopShooter =
-      frc2::cmd::RunOnce([this] { m_shooter.Disable(); }, {&m_shooter});
+  frc::CommandPtr m_stopShooter =
+      frc::cmd::RunOnce([this] { m_shooter.Disable(); }, {&m_shooter});
 
   // An autonomous routine that shoots the loaded frisbees
-  frc2::CommandPtr m_autonomousCommand =
-      frc2::cmd::Sequence(
+  frc::CommandPtr m_autonomousCommand =
+      frc::cmd::Sequence(
           // Start the command by spinning up the shooter...
-          frc2::cmd::RunOnce([this] { m_shooter.Enable(); }, {&m_shooter}),
+          frc::cmd::RunOnce([this] { m_shooter.Enable(); }, {&m_shooter}),
           // Wait until the shooter is at speed before feeding the frisbees
-          frc2::cmd::WaitUntil([this] { return m_shooter.AtSetpoint(); }),
+          frc::cmd::WaitUntil([this] { return m_shooter.AtSetpoint(); }),
           // Start running the feeder
-          frc2::cmd::RunOnce([this] { m_shooter.RunFeeder(); }, {&m_shooter}),
+          frc::cmd::RunOnce([this] { m_shooter.RunFeeder(); }, {&m_shooter}),
           // Shoot for the specified time
-          frc2::cmd::Wait(ac::kAutoShootTimeSeconds))
+          frc::cmd::Wait(ac::kAutoShootTimeSeconds))
           // Add a timeout (will end the command if, for instance, the shooter
           // never gets up to speed)
           .WithTimeout(ac::kAutoTimeoutSeconds)
           // When the command ends, turn off the shooter and the feeder
-          .AndThen(frc2::cmd::RunOnce([this] {
+          .AndThen(frc::cmd::RunOnce([this] {
             m_shooter.Disable();
             m_shooter.StopFeeder();
           }));

@@ -4,8 +4,8 @@
 
 #include "RobotContainer.h"
 
+#include <frc/command2/button/JoystickButton.h>
 #include <frc/shuffleboard/Shuffleboard.h>
-#include <frc2/command/button/JoystickButton.h>
 
 #include "commands/DefaultDrive.h"
 #include "commands/GrabHatch.h"
@@ -26,26 +26,26 @@ RobotContainer::RobotContainer() {
   frc::Shuffleboard::GetTab("HatchSubsystem").Add(m_hatch);
 
   // Log Shuffleboard events for command initialize, execute, finish, interrupt
-  frc2::CommandScheduler::GetInstance().OnCommandInitialize(
-      [](const frc2::Command& command) {
+  frc::CommandScheduler::GetInstance().OnCommandInitialize(
+      [](const frc::Command& command) {
         frc::Shuffleboard::AddEventMarker(
             "Command initialized", command.GetName(),
             frc::ShuffleboardEventImportance::kNormal);
       });
-  frc2::CommandScheduler::GetInstance().OnCommandExecute(
-      [](const frc2::Command& command) {
+  frc::CommandScheduler::GetInstance().OnCommandExecute(
+      [](const frc::Command& command) {
         frc::Shuffleboard::AddEventMarker(
             "Command executed", command.GetName(),
             frc::ShuffleboardEventImportance::kNormal);
       });
-  frc2::CommandScheduler::GetInstance().OnCommandFinish(
-      [](const frc2::Command& command) {
+  frc::CommandScheduler::GetInstance().OnCommandFinish(
+      [](const frc::Command& command) {
         frc::Shuffleboard::AddEventMarker(
             "Command finished", command.GetName(),
             frc::ShuffleboardEventImportance::kNormal);
       });
-  frc2::CommandScheduler::GetInstance().OnCommandInterrupt(
-      [](const frc2::Command& command) {
+  frc::CommandScheduler::GetInstance().OnCommandInterrupt(
+      [](const frc::Command& command) {
         frc::Shuffleboard::AddEventMarker(
             "Command interrupted", command.GetName(),
             frc::ShuffleboardEventImportance::kNormal);
@@ -67,18 +67,18 @@ void RobotContainer::ConfigureButtonBindings() {
   // the scheduler thus, no memory leaks!
 
   // Grab the hatch when the 'A' button is pressed.
-  frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kA)
+  frc::JoystickButton(&m_driverController, frc::XboxController::Button::kA)
       .OnTrue(GrabHatch(&m_hatch).ToPtr());
   // Release the hatch when the 'B' button is pressed.
-  frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kB)
+  frc::JoystickButton(&m_driverController, frc::XboxController::Button::kB)
       .OnTrue(ReleaseHatch(&m_hatch).ToPtr());
   // While holding the shoulder button, drive at half speed
-  frc2::JoystickButton(&m_driverController,
-                       frc::XboxController::Button::kRightBumper)
+  frc::JoystickButton(&m_driverController,
+                      frc::XboxController::Button::kRightBumper)
       .WhileTrue(HalveDriveSpeed(&m_drive).ToPtr());
 }
 
-frc2::Command* RobotContainer::GetAutonomousCommand() {
+frc::Command* RobotContainer::GetAutonomousCommand() {
   // Runs the chosen command in autonomous
   return m_chooser.GetSelected();
 }

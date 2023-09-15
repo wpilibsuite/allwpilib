@@ -21,26 +21,26 @@ RobotContainer::RobotContainer() {
   frc::Shuffleboard::GetTab("HatchSubsystem").Add(m_hatch);
 
   // Log Shuffleboard events for command initialize, execute, finish, interrupt
-  frc2::CommandScheduler::GetInstance().OnCommandInitialize(
-      [](const frc2::Command& command) {
+  frc::CommandScheduler::GetInstance().OnCommandInitialize(
+      [](const frc::Command& command) {
         frc::Shuffleboard::AddEventMarker(
             "Command initialized", command.GetName(),
             frc::ShuffleboardEventImportance::kNormal);
       });
-  frc2::CommandScheduler::GetInstance().OnCommandExecute(
-      [](const frc2::Command& command) {
+  frc::CommandScheduler::GetInstance().OnCommandExecute(
+      [](const frc::Command& command) {
         frc::Shuffleboard::AddEventMarker(
             "Command executed", command.GetName(),
             frc::ShuffleboardEventImportance::kNormal);
       });
-  frc2::CommandScheduler::GetInstance().OnCommandFinish(
-      [](const frc2::Command& command) {
+  frc::CommandScheduler::GetInstance().OnCommandFinish(
+      [](const frc::Command& command) {
         frc::Shuffleboard::AddEventMarker(
             "Command finished", command.GetName(),
             frc::ShuffleboardEventImportance::kNormal);
       });
-  frc2::CommandScheduler::GetInstance().OnCommandInterrupt(
-      [](const frc2::Command& command) {
+  frc::CommandScheduler::GetInstance().OnCommandInterrupt(
+      [](const frc::Command& command) {
         frc::Shuffleboard::AddEventMarker(
             "Command interrupted", command.GetName(),
             frc::ShuffleboardEventImportance::kNormal);
@@ -50,7 +50,7 @@ RobotContainer::RobotContainer() {
   ConfigureButtonBindings();
 
   // Set up default drive command
-  m_drive.SetDefaultCommand(frc2::cmd::Run(
+  m_drive.SetDefaultCommand(frc::cmd::Run(
       [this] {
         m_drive.ArcadeDrive(-m_driverController.GetLeftY(),
                             -m_driverController.GetRightX());
@@ -67,11 +67,11 @@ void RobotContainer::ConfigureButtonBindings() {
   m_driverController.Square().OnTrue(m_hatch.ReleaseHatchCommand());
   // While holding R1, drive at half speed
   m_driverController.R1()
-      .OnTrue(frc2::cmd::RunOnce([this] { m_drive.SetMaxOutput(0.5); }, {}))
-      .OnFalse(frc2::cmd::RunOnce([this] { m_drive.SetMaxOutput(1.0); }, {}));
+      .OnTrue(frc::cmd::RunOnce([this] { m_drive.SetMaxOutput(0.5); }, {}))
+      .OnFalse(frc::cmd::RunOnce([this] { m_drive.SetMaxOutput(1.0); }, {}));
 }
 
-frc2::Command* RobotContainer::GetAutonomousCommand() {
+frc::Command* RobotContainer::GetAutonomousCommand() {
   // Runs the chosen command in autonomous
   return m_chooser.GetSelected();
 }

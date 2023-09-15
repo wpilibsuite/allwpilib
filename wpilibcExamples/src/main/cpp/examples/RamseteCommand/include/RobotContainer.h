@@ -5,10 +5,10 @@
 #pragma once
 
 #include <frc/XboxController.h>
+#include <frc/command2/CommandPtr.h>
+#include <frc/command2/InstantCommand.h>
 #include <frc/controller/PIDController.h>
 #include <frc/smartdashboard/SendableChooser.h>
-#include <frc2/command/CommandPtr.h>
-#include <frc2/command/InstantCommand.h>
 
 #include "Constants.h"
 #include "subsystems/DriveSubsystem.h"
@@ -24,7 +24,7 @@ class RobotContainer {
  public:
   RobotContainer();
 
-  frc2::CommandPtr GetAutonomousCommand();
+  frc::CommandPtr GetAutonomousCommand();
 
  private:
   // The driver's controller
@@ -36,10 +36,9 @@ class RobotContainer {
   DriveSubsystem m_drive;
 
   // RobotContainer-owned commands
-  frc2::InstantCommand m_driveHalfSpeed{[this] { m_drive.SetMaxOutput(0.5); },
-                                        {}};
-  frc2::InstantCommand m_driveFullSpeed{[this] { m_drive.SetMaxOutput(1); },
-                                        {}};
+  frc::InstantCommand m_driveHalfSpeed{[this] { m_drive.SetMaxOutput(0.5); },
+                                       {}};
+  frc::InstantCommand m_driveFullSpeed{[this] { m_drive.SetMaxOutput(1); }, {}};
 
   void ConfigureButtonBindings();
 };

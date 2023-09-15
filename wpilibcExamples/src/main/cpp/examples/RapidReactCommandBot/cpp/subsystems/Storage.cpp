@@ -9,7 +9,7 @@ Storage::Storage() {
       RunOnce([this] { m_motor.Disable(); }).AndThen([] {}).WithName("Idle"));
 }
 
-frc2::CommandPtr Storage::RunCommand() {
+frc::CommandPtr Storage::RunCommand() {
   return Run([this] { m_motor.Set(1.0); }).WithName("Run");
 }
 

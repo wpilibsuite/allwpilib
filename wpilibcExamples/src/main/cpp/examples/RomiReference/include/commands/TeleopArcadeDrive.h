@@ -6,13 +6,13 @@
 
 #include <functional>
 
-#include <frc2/command/Command.h>
-#include <frc2/command/CommandHelper.h>
+#include <frc/command2/Command.h>
+#include <frc/command2/CommandHelper.h>
 
 #include "subsystems/Drivetrain.h"
 
 class TeleopArcadeDrive
-    : public frc2::CommandHelper<frc2::Command, TeleopArcadeDrive> {
+    : public frc::CommandHelper<frc::Command, TeleopArcadeDrive> {
  public:
   TeleopArcadeDrive(Drivetrain* subsystem,
                     std::function<double()> xaxisSpeedSupplier,

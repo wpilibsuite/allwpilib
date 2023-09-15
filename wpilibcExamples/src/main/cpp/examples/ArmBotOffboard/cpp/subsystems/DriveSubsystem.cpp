@@ -43,14 +43,14 @@ frc::Encoder& DriveSubsystem::GetRightEncoder() {
   return m_rightEncoder;
 }
 
-frc2::CommandPtr DriveSubsystem::SetMaxOutputCommand(double maxOutput) {
-  return frc2::cmd::RunOnce(
+frc::CommandPtr DriveSubsystem::SetMaxOutputCommand(double maxOutput) {
+  return frc::cmd::RunOnce(
       [this, maxOutput] { m_drive.SetMaxOutput(maxOutput); });
 }
 
-frc2::CommandPtr DriveSubsystem::ArcadeDriveCommand(
+frc::CommandPtr DriveSubsystem::ArcadeDriveCommand(
     std::function<double()> fwd, std::function<double()> rot) {
-  return frc2::cmd::Run(
+  return frc::cmd::Run(
       [this, fwd = std::move(fwd), rot = std::move(rot)] {
         m_drive.ArcadeDrive(fwd(), rot());
       },

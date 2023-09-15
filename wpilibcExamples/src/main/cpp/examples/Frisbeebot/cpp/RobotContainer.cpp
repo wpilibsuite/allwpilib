@@ -11,7 +11,7 @@ RobotContainer::RobotContainer() {
   ConfigureButtonBindings();
 
   // Set up default drive command
-  m_drive.SetDefaultCommand(frc2::cmd::Run(
+  m_drive.SetDefaultCommand(frc::cmd::Run(
       [this] {
         m_drive.ArcadeDrive(-m_driverController.GetLeftY(),
                             -m_driverController.GetRightX());
@@ -34,17 +34,17 @@ void RobotContainer::ConfigureButtonBindings() {
   // Note that we won't be able to access these commands after moving them!
 
   // Shoots if the shooter wheel has reached the target speed
-  frc2::CommandPtr shoot = frc2::cmd::Either(
+  frc::CommandPtr shoot = frc::cmd::Either(
       // Run the feeder
-      frc2::cmd::RunOnce([this] { m_shooter.RunFeeder(); }, {&m_shooter}),
+      frc::cmd::RunOnce([this] { m_shooter.RunFeeder(); }, {&m_shooter}),
       // Do nothing
-      frc2::cmd::None(),
+      frc::cmd::None(),
       // Determine which of the above to do based on whether the shooter has
       // reached the desired speed
       [this] { return m_shooter.AtSetpoint(); });
 
-  frc2::CommandPtr stopFeeder =
-      frc2::cmd::RunOnce([this] { m_shooter.StopFeeder(); }, {&m_shooter});
+  frc::CommandPtr stopFeeder =
+      frc::cmd::RunOnce([this] { m_shooter.StopFeeder(); }, {&m_shooter});
 
   // Shoot when the 'X' button is pressed
   m_driverController.X()
@@ -56,11 +56,11 @@ void RobotContainer::ConfigureButtonBindings() {
 
   // While holding the shoulder button, drive at half speed
   m_driverController.RightBumper()
-      .OnTrue(frc2::cmd::RunOnce([this] { m_drive.SetMaxOutput(0.5); }, {}))
-      .OnFalse(frc2::cmd::RunOnce([this] { m_drive.SetMaxOutput(1); }, {}));
+      .OnTrue(frc::cmd::RunOnce([this] { m_drive.SetMaxOutput(0.5); }, {}))
+      .OnFalse(frc::cmd::RunOnce([this] { m_drive.SetMaxOutput(1); }, {}));
 }
 
-frc2::Command* RobotContainer::GetAutonomousCommand() {
+frc::Command* RobotContainer::GetAutonomousCommand() {
   // Runs the chosen command in autonomous
   return m_autonomousCommand.get();
 }

@@ -6,12 +6,12 @@
 
 #include <frc/DoubleSolenoid.h>
 #include <frc/PneumaticsControlModule.h>
-#include <frc2/command/CommandPtr.h>
-#include <frc2/command/SubsystemBase.h>
+#include <frc/command2/CommandPtr.h>
+#include <frc/command2/SubsystemBase.h>
 
 #include "Constants.h"
 
-class HatchSubsystem : public frc2::SubsystemBase {
+class HatchSubsystem : public frc::SubsystemBase {
  public:
   HatchSubsystem();
 
@@ -20,12 +20,12 @@ class HatchSubsystem : public frc2::SubsystemBase {
   /**
    * Grabs the hatch.
    */
-  frc2::CommandPtr GrabHatchCommand();
+  frc::CommandPtr GrabHatchCommand();
 
   /**
    * Releases the hatch.
    */
-  frc2::CommandPtr ReleaseHatchCommand();
+  frc::CommandPtr ReleaseHatchCommand();
 
   void InitSendable(wpi::SendableBuilder& builder) override;
 

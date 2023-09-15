@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <frc2/command/Command.h>
-#include <frc2/command/button/CommandXboxController.h>
+#include <frc/command2/Command.h>
+#include <frc/command2/button/CommandXboxController.h>
 
 #include "Constants.h"
 #include "subsystems/ArmSubsystem.h"
@@ -28,11 +28,11 @@ class RobotContainer {
    */
   void DisablePIDSubsystems();
 
-  frc2::Command* GetAutonomousCommand();
+  frc::Command* GetAutonomousCommand();
 
  private:
   // The driver's controller
-  frc2::CommandXboxController m_driverController{
+  frc::CommandXboxController m_driverController{
       OIConstants::kDriverControllerPort};
 
   // The robot's subsystems and commands are defined here...

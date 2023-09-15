@@ -7,17 +7,17 @@
 #include <functional>
 
 #include <frc/Encoder.h>
+#include <frc/command2/CommandPtr.h>
+#include <frc/command2/SubsystemBase.h>
 #include <frc/controller/PIDController.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
-#include <frc2/command/CommandPtr.h>
-#include <frc2/command/SubsystemBase.h>
 #include <units/angle.h>
 #include <units/angular_velocity.h>
 
 #include "Constants.h"
 
-class Shooter : public frc2::SubsystemBase {
+class Shooter : public frc::SubsystemBase {
  public:
   Shooter();
 
@@ -29,7 +29,7 @@ class Shooter : public frc2::SubsystemBase {
    * @param setpointRotationsPerSecond The desired shooter velocity
    */
   [[nodiscard]]
-  frc2::CommandPtr ShootCommand(units::turns_per_second_t setpoint);
+  frc::CommandPtr ShootCommand(units::turns_per_second_t setpoint);
 
  private:
   frc::PWMSparkMax m_shooterMotor{ShooterConstants::kShooterMotorPort};

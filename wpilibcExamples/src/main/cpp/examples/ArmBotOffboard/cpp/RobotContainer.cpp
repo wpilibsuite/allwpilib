@@ -34,6 +34,6 @@ void RobotContainer::ConfigureButtonBindings() {
       .OnFalse(m_drive.SetMaxOutputCommand(1.0));
 }
 
-frc2::Command* RobotContainer::GetAutonomousCommand() {
+frc::Command* RobotContainer::GetAutonomousCommand() {
   return nullptr;
 }
