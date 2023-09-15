@@ -7,11 +7,11 @@
 #include <frc/DigitalInput.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc2/command/CommandPtr.h>
-#include <frc2/command/Subsystem.h>
+#include <frc2/command/SubsystemBase.h>
 
 #include "Constants.h"
 
-class Storage : frc2::Subsystem {
+class Storage : frc2::SubsystemBase {
  public:
   Storage();
   /** Returns a command that runs the storage motor indefinitely. */
