@@ -334,18 +334,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     Property<BooleanPublisher, BooleanSubscriber> property = new Property<>();
     BooleanTopic topic = m_table.getBooleanTopic(key);
     property.m_pub = topic.publish();
-    property.m_updateNetwork =
-        new TimedConsumer<>() {
-          BooleanPublisher m_prevPub;
-
-          @Override
-          public void accept(BooleanPublisher pub, long time) {
-            if (m_prevPub != pub) {
-              pub.set(value, time);
-            }
-            m_prevPub = pub;
-          }
-        };
+    property.m_pub.set(value);
     m_properties.add(property);
   }
 
@@ -381,18 +370,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     Property<IntegerPublisher, IntegerSubscriber> property = new Property<>();
     IntegerTopic topic = m_table.getIntegerTopic(key);
     property.m_pub = topic.publish();
-    property.m_updateNetwork =
-        new TimedConsumer<>() {
-          IntegerPublisher m_prevPub;
-
-          @Override
-          public void accept(IntegerPublisher pub, long time) {
-            if (m_prevPub != pub) {
-              pub.set(value, time);
-            }
-            m_prevPub = pub;
-          }
-        };
+    property.m_pub.set(value);
     m_properties.add(property);
   }
 
@@ -428,18 +406,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     Property<FloatPublisher, FloatSubscriber> property = new Property<>();
     FloatTopic topic = m_table.getFloatTopic(key);
     property.m_pub = topic.publish();
-    property.m_updateNetwork =
-        new TimedConsumer<>() {
-          FloatPublisher m_prevPub;
-
-          @Override
-          public void accept(FloatPublisher pub, long time) {
-            if (m_prevPub != pub) {
-              pub.set(value, time);
-            }
-            m_prevPub = pub;
-          }
-        };
+    property.m_pub.set(value);
     m_properties.add(property);
   }
 
@@ -475,18 +442,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     Property<DoublePublisher, DoubleSubscriber> property = new Property<>();
     DoubleTopic topic = m_table.getDoubleTopic(key);
     property.m_pub = topic.publish();
-    property.m_updateNetwork =
-        new TimedConsumer<>() {
-          DoublePublisher m_prevPub;
-
-          @Override
-          public void accept(DoublePublisher pub, long time) {
-            if (m_prevPub != pub) {
-              pub.set(value, time);
-            }
-            m_prevPub = pub;
-          }
-        };
+    property.m_pub.set(value);
     m_properties.add(property);
   }
 
@@ -522,18 +478,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     Property<StringPublisher, StringSubscriber> property = new Property<>();
     StringTopic topic = m_table.getStringTopic(key);
     property.m_pub = topic.publish();
-    property.m_updateNetwork =
-        new TimedConsumer<>() {
-          StringPublisher m_prevPub;
-
-          @Override
-          public void accept(StringPublisher pub, long time) {
-            if (m_prevPub != pub) {
-              pub.set(value, time);
-            }
-            m_prevPub = pub;
-          }
-        };
+    property.m_pub.set(value);
     m_properties.add(property);
   }
 
@@ -571,18 +516,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     Property<BooleanArrayPublisher, BooleanArraySubscriber> property = new Property<>();
     BooleanArrayTopic topic = m_table.getBooleanArrayTopic(key);
     property.m_pub = topic.publish();
-    property.m_updateNetwork =
-        new TimedConsumer<>() {
-          BooleanArrayPublisher m_prevPub;
-
-          @Override
-          public void accept(BooleanArrayPublisher pub, long time) {
-            if (m_prevPub != pub) {
-              pub.set(value, time);
-            }
-            m_prevPub = pub;
-          }
-        };
+    property.m_pub.set(value);
     m_properties.add(property);
   }
 
@@ -620,18 +554,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     Property<IntegerArrayPublisher, IntegerArraySubscriber> property = new Property<>();
     IntegerArrayTopic topic = m_table.getIntegerArrayTopic(key);
     property.m_pub = topic.publish();
-    property.m_updateNetwork =
-        new TimedConsumer<>() {
-          IntegerArrayPublisher m_prevPub;
-
-          @Override
-          public void accept(IntegerArrayPublisher pub, long time) {
-            if (m_prevPub != pub) {
-              pub.set(value, time);
-            }
-            m_prevPub = pub;
-          }
-        };
+    property.m_pub.set(value);
     m_properties.add(property);
   }
 
@@ -669,18 +592,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     Property<FloatArrayPublisher, FloatArraySubscriber> property = new Property<>();
     FloatArrayTopic topic = m_table.getFloatArrayTopic(key);
     property.m_pub = topic.publish();
-    property.m_updateNetwork =
-        new TimedConsumer<>() {
-          FloatArrayPublisher m_prevPub;
-
-          @Override
-          public void accept(FloatArrayPublisher pub, long time) {
-            if (m_prevPub != pub) {
-              pub.set(value, time);
-            }
-            m_prevPub = pub;
-          }
-        };
+    property.m_pub.set(value);
     m_properties.add(property);
   }
 
@@ -718,18 +630,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     Property<DoubleArrayPublisher, DoubleArraySubscriber> property = new Property<>();
     DoubleArrayTopic topic = m_table.getDoubleArrayTopic(key);
     property.m_pub = topic.publish();
-    property.m_updateNetwork =
-        new TimedConsumer<>() {
-          DoubleArrayPublisher m_prevPub;
-
-          @Override
-          public void accept(DoubleArrayPublisher pub, long time) {
-            if (m_prevPub != pub) {
-              pub.set(value, time);
-            }
-            m_prevPub = pub;
-          }
-        };
+    property.m_pub.set(value);
     m_properties.add(property);
   }
 
@@ -767,18 +668,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     Property<StringArrayPublisher, StringArraySubscriber> property = new Property<>();
     StringArrayTopic topic = m_table.getStringArrayTopic(key);
     property.m_pub = topic.publish();
-    property.m_updateNetwork =
-        new TimedConsumer<>() {
-          StringArrayPublisher m_prevPub;
-
-          @Override
-          public void accept(StringArrayPublisher pub, long time) {
-            if (m_prevPub != pub) {
-              pub.set(value, time);
-            }
-            m_prevPub = pub;
-          }
-        };
+    property.m_pub.set(value);
     m_properties.add(property);
   }
 
@@ -817,18 +707,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     Property<RawPublisher, RawSubscriber> property = new Property<>();
     RawTopic topic = m_table.getRawTopic(key);
     property.m_pub = topic.publish(typestring);
-    property.m_updateNetwork =
-        new TimedConsumer<>() {
-          RawPublisher m_prevPub;
-
-          @Override
-          public void accept(RawPublisher pub, long time) {
-            if (m_prevPub != pub) {
-              pub.set(value, time);
-            }
-            m_prevPub = pub;
-          }
-        };
+    property.m_pub.set(value);
     m_properties.add(property);
   }
 }

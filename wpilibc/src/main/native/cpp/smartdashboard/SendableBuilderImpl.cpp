@@ -145,13 +145,7 @@ template <typename Topic, typename Value>
 void SendableBuilderImpl::PublishConstImpl(Topic topic, Value value) {
   auto prop = std::make_unique<PropertyImpl<Topic>>();
   prop->pub = topic.Publish();
-  prop->updateNetwork = [value, prevPub = NT_Publisher{}](
-                            auto& pub, int64_t time) mutable {
-    if (prevPub != pub.GetHandle()) {
-      pub.Set(value, time);
-    }
-    prevPub = pub.GetHandle();
-  };
+  prop->pub.Set(value)
   m_properties.emplace_back(std::move(prop));
 }
 
