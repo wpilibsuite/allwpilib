@@ -222,7 +222,7 @@ void SendableBuilderImpl::AddBooleanArrayProperty(
 }
 
 void SendableBuilderImpl::PublishConstBooleanArray(std::string_view key,
-                                                   std::vector<int> value) {
+                                                   std::span<const int> value) {
   PublishConstImpl(m_table->GetBooleanArrayTopic(key), value);
 }
 
@@ -234,7 +234,7 @@ void SendableBuilderImpl::AddIntegerArrayProperty(
 }
 
 void SendableBuilderImpl::PublishConstIntegerArray(std::string_view key,
-                                                   std::vector<int64_t> value) {
+                                                   std::span<const int64_t> value) {
   PublishConstImpl(m_table->GetIntegerArrayTopic(key), value);
 }
 
@@ -246,7 +246,7 @@ void SendableBuilderImpl::AddFloatArrayProperty(
 }
 
 void SendableBuilderImpl::PublishConstFloatArray(std::string_view key,
-                                                 std::vector<float> value) {
+                                                 std::span<const float> value) {
   PublishConstImpl(m_table->GetFloatArrayTopic(key), value);
 }
 
@@ -258,7 +258,7 @@ void SendableBuilderImpl::AddDoubleArrayProperty(
 }
 
 void SendableBuilderImpl::PublishConstDoubleArray(std::string_view key,
-                                                  std::vector<double> value) {
+                                                  std::span<const double> value) {
   PublishConstImpl(m_table->GetDoubleArrayTopic(key), value);
 }
 
@@ -270,7 +270,7 @@ void SendableBuilderImpl::AddStringArrayProperty(
 }
 
 void SendableBuilderImpl::PublishConstStringArray(
-    std::string_view key, std::vector<std::string> value) {
+    std::string_view key, std::span<const std::string> value) {
   PublishConstImpl(m_table->GetStringArrayTopic(key), value);
 }
 
@@ -300,7 +300,7 @@ void SendableBuilderImpl::AddRawProperty(
 
 void SendableBuilderImpl::PublishConstRaw(std::string_view key,
                                           std::string_view typeString,
-                                          std::vector<uint8_t> value) {
+                                          std::span<const uint8_t> value) {
   auto topic = m_table->GetRawTopic(key);
   auto prop = std::make_unique<PropertyImpl<nt::RawTopic>>();
   prop->pub = topic.Publish(typeString);

@@ -161,7 +161,7 @@ class SendableBuilder {
    * @param value   the value
    */
   virtual void PublishConstBooleanArray(std::string_view key,
-                                        std::vector<int> value) = 0;
+                                        std::span<const int> value) = 0;
 
   /**
    * Add an integer array property.
@@ -181,7 +181,7 @@ class SendableBuilder {
    * @param value   the value
    */
   virtual void PublishConstIntegerArray(std::string_view key,
-                                        std::vector<int64_t> value) = 0;
+                                        std::span<const int64_t> value) = 0;
 
   /**
    * Add a float array property.
@@ -201,7 +201,7 @@ class SendableBuilder {
    * @param value   the value
    */
   virtual void PublishConstFloatArray(std::string_view key,
-                                      std::vector<float> value) = 0;
+                                      std::span<const float> value) = 0;
 
   /**
    * Add a double array property.
@@ -221,7 +221,7 @@ class SendableBuilder {
    * @param value   the value
    */
   virtual void PublishConstDoubleArray(std::string_view key,
-                                       std::vector<double> value) = 0;
+                                       std::span<const double> value) = 0;
 
   /**
    * Add a string array property.
@@ -241,7 +241,7 @@ class SendableBuilder {
    * @param value   the value
    */
   virtual void PublishConstStringArray(std::string_view key,
-                                       std::vector<std::string> value) = 0;
+                                       std::span<const std::string> value) = 0;
 
   /**
    * Add a raw property.
@@ -265,7 +265,7 @@ class SendableBuilder {
    */
   virtual void PublishConstRaw(std::string_view key,
                                std::string_view typeString,
-                               std::vector<uint8_t> value) = 0;
+                               std::span<const uint8_t> value) = 0;
 
   /**
    * Add a string property (SmallString form).

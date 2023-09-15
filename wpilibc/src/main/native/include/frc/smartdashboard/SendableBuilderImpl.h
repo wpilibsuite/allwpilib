@@ -124,35 +124,35 @@ class SendableBuilderImpl : public nt::NTSendableBuilder {
       std::function<void(std::span<const int>)> setter) override;
 
   void PublishConstBooleanArray(std::string_view key,
-                                std::vector<int> value) override;
+                                std::span<const int> value) override;
 
   void AddIntegerArrayProperty(
       std::string_view key, std::function<std::vector<int64_t>()> getter,
       std::function<void(std::span<const int64_t>)> setter) override;
 
   void PublishConstIntegerArray(std::string_view key,
-                                std::vector<int64_t> value) override;
+                                std::span<const int64_t> value) override;
 
   void AddFloatArrayProperty(
       std::string_view key, std::function<std::vector<float>()> getter,
       std::function<void(std::span<const float>)> setter) override;
 
   void PublishConstFloatArray(std::string_view key,
-                              std::vector<float> value) override;
+                              std::span<const float> value) override;
 
   void AddDoubleArrayProperty(
       std::string_view key, std::function<std::vector<double>()> getter,
       std::function<void(std::span<const double>)> setter) override;
 
   void PublishConstDoubleArray(std::string_view key,
-                               std::vector<double> value) override;
+                               std::span<const double> value) override;
 
   void AddStringArrayProperty(
       std::string_view key, std::function<std::vector<std::string>()> getter,
       std::function<void(std::span<const std::string>)> setter) override;
 
   void PublishConstStringArray(std::string_view key,
-                               std::vector<std::string> value) override;
+                               std::span<const std::string> value) override;
 
   void AddRawProperty(
       std::string_view key, std::string_view typeString,
@@ -160,7 +160,7 @@ class SendableBuilderImpl : public nt::NTSendableBuilder {
       std::function<void(std::span<const uint8_t>)> setter) override;
 
   void PublishConstRaw(std::string_view key, std::string_view typeString,
-                       std::vector<uint8_t> value) override;
+                       std::span<const uint8_t> value) override;
 
   void AddSmallStringProperty(
       std::string_view key,
