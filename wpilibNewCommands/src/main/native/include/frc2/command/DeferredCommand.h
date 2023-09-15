@@ -38,8 +38,8 @@ class DeferredCommand : public CommandHelper<Command, DeferredCommand> {
    * @param requirements The command requirements.
    *
    */
-  explicit DeferredCommand(wpi::unique_function<Command*()> supplier,
-                           std::span<Subsystem* const> requirements);
+  DeferredCommand(wpi::unique_function<Command*()> supplier,
+                  std::span<Subsystem* const> requirements);
 
   /**
    * Creates a new DeferredCommand that runs the supplied command when
@@ -52,8 +52,8 @@ class DeferredCommand : public CommandHelper<Command, DeferredCommand> {
    * @param requirements The command requirements.
    *
    */
-  explicit DeferredCommand(wpi::unique_function<Command*()> supplier,
-                           std::initializer_list<Subsystem*> requirements);
+  DeferredCommand(wpi::unique_function<Command*()> supplier,
+                  std::initializer_list<Subsystem*> requirements);
 
   /**
    * Creates a new DeferredCommand that runs the supplied command when
@@ -66,8 +66,8 @@ class DeferredCommand : public CommandHelper<Command, DeferredCommand> {
    * @param requirements The command requirements.
    *
    */
-  explicit DeferredCommand(wpi::unique_function<CommandPtr()> supplier,
-                           std::span<Subsystem* const> requirements);
+  DeferredCommand(wpi::unique_function<CommandPtr()> supplier,
+                  std::span<Subsystem* const> requirements);
 
   /**
    * Creates a new DeferredCommand that runs the supplied command when
@@ -80,8 +80,8 @@ class DeferredCommand : public CommandHelper<Command, DeferredCommand> {
    * @param requirements The command requirements.
    *
    */
-  explicit DeferredCommand(wpi::unique_function<CommandPtr()> supplier,
-                           std::initializer_list<Subsystem*> requirements);
+  DeferredCommand(wpi::unique_function<CommandPtr()> supplier,
+                  std::initializer_list<Subsystem*> requirements);
 
   DeferredCommand(DeferredCommand&& other) = default;
 
