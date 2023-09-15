@@ -629,7 +629,7 @@ class Value final {
   friend bool operator==(const Value& lhs, const Value& rhs);
 
  private:
-  NT_Value m_val;
+  NT_Value m_val = {};
   std::shared_ptr<void> m_storage;
 };
 
