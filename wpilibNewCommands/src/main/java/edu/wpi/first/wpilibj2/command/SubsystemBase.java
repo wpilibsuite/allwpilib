@@ -13,9 +13,6 @@ import edu.wpi.first.util.sendable.SendableRegistry;
  * method for setting the default command.
  *
  * <p>This class is provided by the NewCommands VendorDep
- *
- * @deprecated All functionality provided by {@link SubsystemBase} has been merged into {@link
- *     Subsystem}. Use {@link Subsystem} instead.
  */
 public abstract class SubsystemBase implements Subsystem, Sendable {
   /** Constructor. */
