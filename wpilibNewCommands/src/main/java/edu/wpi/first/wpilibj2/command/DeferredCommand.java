@@ -11,9 +11,9 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 /**
- * Runs the command returned by the supplier when this command is initialized, and ends when it
- * ends. Useful for performing runtime tasks before creating a new command. If this command is
- * interrupted, it will cancel the command.
+ * Defers Command construction to runtime. Runs the command returned by the supplier when this
+ * command is initialized, and ends when it ends. Useful for performing runtime tasks before
+ * creating a new command. If this command is interrupted, it will cancel the command.
  *
  * <p>Note that the supplier <i>must</i> create a new Command each call. For selecting one of a
  * preallocated set of commands, use {@link SelectCommand}.
@@ -72,6 +72,6 @@ public class DeferredCommand extends Command {
   public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);
     builder.addStringProperty(
-        "deferred", () -> m_command.equals(m_nullCommand) ? "null" : m_command.getName(), null);
+        "deferred", () -> m_command == m_nullCommand ? "null" : m_command.getName(), null);
   }
 }
