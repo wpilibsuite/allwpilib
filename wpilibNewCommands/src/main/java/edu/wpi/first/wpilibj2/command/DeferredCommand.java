@@ -69,6 +69,7 @@ public class DeferredCommand extends Command {
   }
 
   @Override
+  @SuppressWarnings("PMD.CompareObjectsWithEquals")
   public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);
     builder.addStringProperty(
