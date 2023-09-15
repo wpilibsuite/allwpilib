@@ -24,7 +24,7 @@ frc::MecanumDriveWheelPositions Drivetrain::GetCurrentDistances() const {
 
 void Drivetrain::SetSpeeds(const frc::MecanumDriveWheelSpeeds& wheelSpeeds) {
   std::function<void(units::meters_per_second_t, const frc::Encoder&,
-                     frc2::PIDController&, frc::PWMSparkMax&)>
+                     frc::PIDController&, frc::PWMSparkMax&)>
       calcAndSetSpeeds = [&m_feedforward = m_feedforward](
                              units::meters_per_second_t speed,
                              const auto& encoder, auto& controller,

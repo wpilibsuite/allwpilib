@@ -71,8 +71,8 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
       frc::SimpleMotorFeedforward<units::meters>(ks, kv, ka),
       DriveConstants::kDriveKinematics,
 
-      frc2::PIDController{AutoConstants::kPXController, 0, 0},
-      frc2::PIDController{AutoConstants::kPYController, 0, 0},
+      frc::PIDController{AutoConstants::kPXController, 0, 0},
+      frc::PIDController{AutoConstants::kPYController, 0, 0},
       frc::ProfiledPIDController<units::radians>(
           AutoConstants::kPThetaController, 0, 0,
           AutoConstants::kThetaControllerConstraints),
@@ -89,10 +89,10 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
                 m_drive.GetRearRightEncoder().GetRate()}};
       },
 
-      frc2::PIDController{DriveConstants::kPFrontLeftVel, 0, 0},
-      frc2::PIDController{DriveConstants::kPRearLeftVel, 0, 0},
-      frc2::PIDController{DriveConstants::kPFrontRightVel, 0, 0},
-      frc2::PIDController{DriveConstants::kPRearRightVel, 0, 0},
+      frc::PIDController{DriveConstants::kPFrontLeftVel, 0, 0},
+      frc::PIDController{DriveConstants::kPRearLeftVel, 0, 0},
+      frc::PIDController{DriveConstants::kPFrontRightVel, 0, 0},
+      frc::PIDController{DriveConstants::kPRearRightVel, 0, 0},
 
       [this](units::volt_t frontLeft, units::volt_t rearLeft,
              units::volt_t frontRight, units::volt_t rearRight) {

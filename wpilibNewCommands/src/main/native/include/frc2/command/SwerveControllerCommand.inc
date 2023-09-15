@@ -16,7 +16,7 @@ template <size_t NumModules>
 SwerveControllerCommand<NumModules>::SwerveControllerCommand(
     frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
     frc::SwerveDriveKinematics<NumModules> kinematics,
-    frc2::PIDController xController, frc2::PIDController yController,
+    frc::PIDController xController, frc::PIDController yController,
     frc::ProfiledPIDController<units::radians> thetaController,
     std::function<frc::Rotation2d()> desiredRotation,
     std::function<void(std::array<frc::SwerveModuleState, NumModules>)> output,
@@ -34,7 +34,7 @@ template <size_t NumModules>
 SwerveControllerCommand<NumModules>::SwerveControllerCommand(
     frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
     frc::SwerveDriveKinematics<NumModules> kinematics,
-    frc2::PIDController xController, frc2::PIDController yController,
+    frc::PIDController xController, frc::PIDController yController,
     frc::ProfiledPIDController<units::radians> thetaController,
     std::function<void(std::array<frc::SwerveModuleState, NumModules>)> output,
     std::initializer_list<Subsystem*> requirements)
@@ -50,7 +50,7 @@ template <size_t NumModules>
 SwerveControllerCommand<NumModules>::SwerveControllerCommand(
     frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
     frc::SwerveDriveKinematics<NumModules> kinematics,
-    frc2::PIDController xController, frc2::PIDController yController,
+    frc::PIDController xController, frc::PIDController yController,
     frc::ProfiledPIDController<units::radians> thetaController,
     std::function<frc::Rotation2d()> desiredRotation,
     std::function<void(std::array<frc::SwerveModuleState, NumModules>)> output,
@@ -68,7 +68,7 @@ template <size_t NumModules>
 SwerveControllerCommand<NumModules>::SwerveControllerCommand(
     frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
     frc::SwerveDriveKinematics<NumModules> kinematics,
-    frc2::PIDController xController, frc2::PIDController yController,
+    frc::PIDController xController, frc::PIDController yController,
     frc::ProfiledPIDController<units::radians> thetaController,
     std::function<void(std::array<frc::SwerveModuleState, NumModules>)> output,
     std::span<Subsystem* const> requirements)

@@ -13,7 +13,7 @@
 #include "frc/MathUtil.h"
 #include "wpimath/MathShared.h"
 
-using namespace frc2;
+using namespace frc;
 
 PIDController::PIDController(double Kp, double Ki, double Kd,
                              units::second_t period)
@@ -95,7 +95,7 @@ void PIDController::SetSetpoint(double setpoint) {
   if (m_continuous) {
     double errorBound = (m_maximumInput - m_minimumInput) / 2.0;
     m_positionError =
-        frc::InputModulus(m_setpoint - m_measurement, -errorBound, errorBound);
+        InputModulus(m_setpoint - m_measurement, -errorBound, errorBound);
   } else {
     m_positionError = m_setpoint - m_measurement;
   }
@@ -156,7 +156,7 @@ double PIDController::Calculate(double measurement) {
   if (m_continuous) {
     double errorBound = (m_maximumInput - m_minimumInput) / 2.0;
     m_positionError =
-        frc::InputModulus(m_setpoint - m_measurement, -errorBound, errorBound);
+        InputModulus(m_setpoint - m_measurement, -errorBound, errorBound);
   } else {
     m_positionError = m_setpoint - m_measurement;
   }

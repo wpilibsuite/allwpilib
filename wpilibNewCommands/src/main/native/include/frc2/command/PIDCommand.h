@@ -36,7 +36,7 @@ class PIDCommand : public CommandHelper<Command, PIDCommand> {
    * @param useOutput         the controller's output
    * @param requirements      the subsystems required by this command
    */
-  PIDCommand(PIDController controller,
+  PIDCommand(frc::PIDController controller,
              std::function<double()> measurementSource,
              std::function<double()> setpointSource,
              std::function<void(double)> useOutput,
@@ -52,7 +52,7 @@ class PIDCommand : public CommandHelper<Command, PIDCommand> {
    * @param useOutput         the controller's output
    * @param requirements      the subsystems required by this command
    */
-  PIDCommand(PIDController controller,
+  PIDCommand(frc::PIDController controller,
              std::function<double()> measurementSource,
              std::function<double()> setpointSource,
              std::function<void(double)> useOutput,
@@ -68,7 +68,7 @@ class PIDCommand : public CommandHelper<Command, PIDCommand> {
    * @param useOutput         the controller's output
    * @param requirements      the subsystems required by this command
    */
-  PIDCommand(PIDController controller,
+  PIDCommand(frc::PIDController controller,
              std::function<double()> measurementSource, double setpoint,
              std::function<void(double)> useOutput,
              std::initializer_list<Subsystem*> requirements);
@@ -83,7 +83,7 @@ class PIDCommand : public CommandHelper<Command, PIDCommand> {
    * @param useOutput         the controller's output
    * @param requirements      the subsystems required by this command
    */
-  PIDCommand(PIDController controller,
+  PIDCommand(frc::PIDController controller,
              std::function<double()> measurementSource, double setpoint,
              std::function<void(double)> useOutput,
              std::span<Subsystem* const> requirements = {});
@@ -103,10 +103,10 @@ class PIDCommand : public CommandHelper<Command, PIDCommand> {
    *
    * @return The PIDController
    */
-  PIDController& GetController();
+  frc::PIDController& GetController();
 
  protected:
-  PIDController m_controller;
+  frc::PIDController m_controller;
   std::function<double()> m_measurement;
   std::function<double()> m_setpoint;
   std::function<void(double)> m_useOutput;
