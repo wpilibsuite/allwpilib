@@ -22,7 +22,7 @@ The WPILib -> XRP protocol is binary-based to save on bandwidth due to hardware 
 
 The control byte is used to indicate the current `enabled` state of the WPILib robot code. When this is set to `1`, the robot is enabled, and when it is set to `0` it is disabled.
 
-Messages originating from the XRP do not need to set the control byte.
+Messages originating from the XRP have an unspecified value for the control byte.
 
 ### Tagged Data
 

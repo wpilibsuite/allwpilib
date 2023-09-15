@@ -13,18 +13,18 @@ using namespace wpilibxrp;
 XRP::XRP()
     : m_gyro_name{"XRPGyro"}, m_wpilib_update_func([](const wpi::json&) {}) {
   // Set up the inputs and outputs
-  m_motor_outputs.emplace(std::make_pair(0, 0.0f));
-  m_motor_outputs.emplace(std::make_pair(1, 0.0f));
-  m_motor_outputs.emplace(std::make_pair(2, 0.0f));
-  m_motor_outputs.emplace(std::make_pair(3, 0.0f));
+  m_motor_outputs.emplace(0, 0.0f);
+  m_motor_outputs.emplace(1, 0.0f);
+  m_motor_outputs.emplace(2, 0.0f);
+  m_motor_outputs.emplace(3, 0.0f);
 
-  m_servo_outputs.emplace(std::make_pair(4, 0.5f));
-  m_servo_outputs.emplace(std::make_pair(5, 0.5f));
+  m_servo_outputs.emplace(4, 0.5f);
+  m_servo_outputs.emplace(5, 0.5f);
 
-  m_encoder_inputs.emplace(std::make_pair(0, 0));
-  m_encoder_inputs.emplace(std::make_pair(1, 0));
-  m_encoder_inputs.emplace(std::make_pair(2, 0));
-  m_encoder_inputs.emplace(std::make_pair(3, 0));
+  m_encoder_inputs.emplace(1, 0);
+  m_encoder_inputs.emplace(2, 0);
+  m_encoder_inputs.emplace(0, 0);
+  m_encoder_inputs.emplace(3, 0);
 }
 
 void XRP::HandleWPILibUpdate(const wpi::json& data) {
@@ -67,7 +67,12 @@ void XRP::HandleXRPUpdate(std::span<const uint8_t> packet) {
   while (!packet.empty()) {
     auto tagLength = packet[0];
     auto tagPacket = packet.subspan(0, tagLength + 1);
+
     // NOTE: tagPacket contains the size and tag bytes as well
+    // Verify that the packet is indeed the right size
+    if (tagPacket.size() != static_cast<size_t>(tagLength + 1)) {
+      break;
+    }
 
     switch (packet[1]) {
       case XRP_TAG_GYRO:
@@ -158,14 +163,14 @@ void XRP::HandleDIOSimValueChanged(const wpi::json& data) {
 
   if (dioData.find("<init") != dioData.end() && dioData["<init"]) {
     // All DIOs are initialized as inputs by default
-    m_digital_inputs.emplace(std::make_pair(deviceId, false));
+    m_digital_inputs.emplace(deviceId, false);
   }
 
   if (dioData.find("<input") != dioData.end() && dioData["<input"] == false) {
     // We're registering an output device
     // Remove from the digital inputs list (if present)
     m_digital_inputs.erase(deviceId);
-    m_digital_outputs.emplace(std::make_pair(deviceId, false));
+    m_digital_outputs.emplace(deviceId, false);
   }
 
   if (dioData.find("<>value") != dioData.end() &&
@@ -203,13 +208,13 @@ void XRP::HandleEncoderSimValueChanged(const wpi::json& data) {
     int chB = encData["<channel_b"];
 
     if ((chA == 4 && chB == 5) || (chA == 5 && chB == 4)) {
-      m_encoder_channel_map.emplace(std::make_pair(0, deviceId));
+      m_encoder_channel_map.emplace(0, deviceId);
     } else if ((chA == 6 && chB == 7) || (chA == 7 && chB == 6)) {
-      m_encoder_channel_map.emplace(std::make_pair(1, deviceId));
+      m_encoder_channel_map.emplace(1, deviceId);
     } else if ((chA == 8 && chB == 9) || (chA == 9 && chB == 8)) {
-      m_encoder_channel_map.emplace(std::make_pair(2, deviceId));
+      m_encoder_channel_map.emplace(2, deviceId);
     } else if ((chA == 10 && chB == 11) || (chA == 11 && chB == 10)) {
-      m_encoder_channel_map.emplace(std::make_pair(3, deviceId));
+      m_encoder_channel_map.emplace(3, deviceId);
     }
   }
 }
