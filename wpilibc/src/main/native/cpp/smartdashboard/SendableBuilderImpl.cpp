@@ -145,8 +145,7 @@ template <typename Topic, typename Value>
 void SendableBuilderImpl::PublishConstImpl(Topic topic, Value value) {
   auto prop = std::make_unique<PropertyImpl<Topic>>();
   prop->pub = topic.Publish();
-  prop->pub.Set(value)
-  m_properties.emplace_back(std::move(prop));
+  prop->pub.Set(value) m_properties.emplace_back(std::move(prop));
 }
 
 void SendableBuilderImpl::AddBooleanProperty(std::string_view key,
