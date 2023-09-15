@@ -233,8 +233,8 @@ void SendableBuilderImpl::AddIntegerArrayProperty(
                   std::move(setter));
 }
 
-void SendableBuilderImpl::PublishConstIntegerArray(std::string_view key,
-                                                   std::span<const int64_t> value) {
+void SendableBuilderImpl::PublishConstIntegerArray(
+    std::string_view key, std::span<const int64_t> value) {
   PublishConstImpl(m_table->GetIntegerArrayTopic(key), value);
 }
 
@@ -257,8 +257,8 @@ void SendableBuilderImpl::AddDoubleArrayProperty(
                   std::move(setter));
 }
 
-void SendableBuilderImpl::PublishConstDoubleArray(std::string_view key,
-                                                  std::span<const double> value) {
+void SendableBuilderImpl::PublishConstDoubleArray(
+    std::string_view key, std::span<const double> value) {
   PublishConstImpl(m_table->GetDoubleArrayTopic(key), value);
 }
 
