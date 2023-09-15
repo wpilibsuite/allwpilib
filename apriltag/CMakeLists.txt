@@ -84,7 +84,7 @@ wpilib_target_warnings(apriltag)
 if (MSVC)
   target_compile_options(apriltag PRIVATE /wd4018)
 else()
-  target_compile_options(apriltag PRIVATE -Wno-sign-compare -Wno-gnu-zero-variadic-macro-arguments)
+  target_compile_options(apriltag PRIVATE -Wno-sign-compare -Wno-gnu-zero-variadic-macro-arguments -Wno-type-limits)
 endif()
 
 target_link_libraries(apriltag wpimath)
