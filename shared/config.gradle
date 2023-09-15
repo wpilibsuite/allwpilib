@@ -46,7 +46,7 @@ nativeUtils.platformConfigs.each {
 // Compress debug info on Linux
 nativeUtils.platformConfigs.each {
   if (it.name.contains('linux')) {
-    it.cppCompiler.debugArgs.add("-gz")
+    it.cppCompiler.debugArgs.add("-gz=zlib")
   }
 }
 
