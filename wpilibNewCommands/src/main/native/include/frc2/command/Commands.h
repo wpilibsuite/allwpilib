@@ -188,8 +188,9 @@ CommandPtr Select(std::function<Key()> selector,
 }
 
 /**
- * Constructs a command that schedules the supplied command when initialized,
- * and ends when it is no longer scheduled
+ * Constructs a command that schedules the command returned from the supplier
+ * when initialized, and ends when it is no longer scheduled. The supplier is
+ * called when the command is initialized.
  *
  * @param supplier the command supplier
  */
@@ -197,8 +198,9 @@ CommandPtr Select(std::function<Key()> selector,
 CommandPtr DeferredProxy(wpi::unique_function<Command*()> supplier);
 
 /**
- * Constructs a command that schedules the supplied command when initialized,
- * and ends when it is no longer scheduled
+ * Constructs a command that schedules the command returned from the supplier
+ * when initialized, and ends when it is no longer scheduled. The supplier is
+ * called when the command is initialized.
  *
  * @param supplier the command supplier
  */

@@ -152,8 +152,9 @@ public final class Commands {
   }
 
   /**
-   * Constructs a command that schedules the supplied command when initialized, and ends when it is
-   * no longer scheduled.
+   * Constructs a command that schedules the command returned from the supplier when initialized,
+   * and ends when it is no longer scheduled. The supplier is called when the command is
+   * initialized.
    *
    * @param supplier the command supplier
    * @return the command
