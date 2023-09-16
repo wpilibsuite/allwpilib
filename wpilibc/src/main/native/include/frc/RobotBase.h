@@ -227,7 +227,13 @@ class RobotBase {
    *
    * @return If the robot is running in simulation.
    */
-  static constexpr bool IsSimulation() { return !IsReal(); }
+  static constexpr bool IsSimulation() {
+#ifdef __FRC_ROBORIO__
+    return false;
+#else
+    return true;
+#endif
+  }
 
   /**
    * Constructor for a generic robot program.
