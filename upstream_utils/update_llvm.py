@@ -208,6 +208,7 @@ def main():
         "0028-Remove-StringMap-test-for-llvm-sort.patch",
         "0029-Unused-variable-in-release-mode.patch",
         "0030-Use-C-20-bit-header.patch",
+        "0031-Replace-deprecated-std-aligned_storage_t.patch",
     ]:
         git_am(
             os.path.join(wpilib_root, "upstream_utils/llvm_patches", f),
