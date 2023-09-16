@@ -216,8 +216,10 @@ public class Quaternion {
     double axial_scalar;
 
     if (axial_magnitude < 1e-9) {
-      // Taylor series of sin(x) near x=0: 1 - x^2 / 6 + x^4 / 120 + O(n^6)
-      axial_scalar = 1 - Math.pow(axial_magnitude, 2) / 6 + Math.pow(axial_magnitude, 4) / 120;
+      // Taylor series of sin(x) / x near x=0: 1 - x^2 / 6 + x^4 / 120 + O(n^6)
+      var axial_magnitude_sq = axial_magnitude * axial_magnitude;
+      var axial_magnitude_sq_sq = axial_magnitude_sq * axial_magnitude_sq;
+      axial_scalar = 1 - axial_magnitude_sq / 6 + axial_magnitude_sq_sq / 120;
     } else {
       axial_scalar = Math.sin(axial_magnitude) / axial_magnitude;
     }
@@ -251,12 +253,8 @@ public class Quaternion {
    * @return The logarithm of this quaternion.
    */
   public Quaternion log() {
-    // q = s(scalar) + v(vector)
-
-    // ||q||
     var norm = norm();
 
-    // ln(||q||)
     var scalar = Math.log(norm);
 
     var rvec = normalize().toRotationVector();
