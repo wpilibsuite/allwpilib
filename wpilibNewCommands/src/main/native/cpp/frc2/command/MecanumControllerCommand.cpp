@@ -11,16 +11,16 @@ using namespace frc2;
 MecanumControllerCommand::MecanumControllerCommand(
     frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
     frc::SimpleMotorFeedforward<units::meters> feedforward,
-    frc::MecanumDriveKinematics kinematics, frc2::PIDController xController,
-    frc2::PIDController yController,
+    frc::MecanumDriveKinematics kinematics, frc::PIDController xController,
+    frc::PIDController yController,
     frc::ProfiledPIDController<units::radians> thetaController,
     std::function<frc::Rotation2d()> desiredRotation,
     units::meters_per_second_t maxWheelVelocity,
     std::function<frc::MecanumDriveWheelSpeeds()> currentWheelSpeeds,
-    frc2::PIDController frontLeftController,
-    frc2::PIDController rearLeftController,
-    frc2::PIDController frontRightController,
-    frc2::PIDController rearRightController,
+    frc::PIDController frontLeftController,
+    frc::PIDController rearLeftController,
+    frc::PIDController frontRightController,
+    frc::PIDController rearRightController,
     std::function<void(units::volt_t, units::volt_t, units::volt_t,
                        units::volt_t)>
         output,
@@ -33,13 +33,13 @@ MecanumControllerCommand::MecanumControllerCommand(
       m_desiredRotation(std::move(desiredRotation)),
       m_maxWheelVelocity(maxWheelVelocity),
       m_frontLeftController(
-          std::make_unique<frc2::PIDController>(frontLeftController)),
+          std::make_unique<frc::PIDController>(frontLeftController)),
       m_rearLeftController(
-          std::make_unique<frc2::PIDController>(rearLeftController)),
+          std::make_unique<frc::PIDController>(rearLeftController)),
       m_frontRightController(
-          std::make_unique<frc2::PIDController>(frontRightController)),
+          std::make_unique<frc::PIDController>(frontRightController)),
       m_rearRightController(
-          std::make_unique<frc2::PIDController>(rearRightController)),
+          std::make_unique<frc::PIDController>(rearRightController)),
       m_currentWheelSpeeds(std::move(currentWheelSpeeds)),
       m_outputVolts(std::move(output)),
       m_usePID(true) {
@@ -49,15 +49,15 @@ MecanumControllerCommand::MecanumControllerCommand(
 MecanumControllerCommand::MecanumControllerCommand(
     frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
     frc::SimpleMotorFeedforward<units::meters> feedforward,
-    frc::MecanumDriveKinematics kinematics, frc2::PIDController xController,
-    frc2::PIDController yController,
+    frc::MecanumDriveKinematics kinematics, frc::PIDController xController,
+    frc::PIDController yController,
     frc::ProfiledPIDController<units::radians> thetaController,
     units::meters_per_second_t maxWheelVelocity,
     std::function<frc::MecanumDriveWheelSpeeds()> currentWheelSpeeds,
-    frc2::PIDController frontLeftController,
-    frc2::PIDController rearLeftController,
-    frc2::PIDController frontRightController,
-    frc2::PIDController rearRightController,
+    frc::PIDController frontLeftController,
+    frc::PIDController rearLeftController,
+    frc::PIDController frontRightController,
+    frc::PIDController rearRightController,
     std::function<void(units::volt_t, units::volt_t, units::volt_t,
                        units::volt_t)>
         output,
@@ -69,13 +69,13 @@ MecanumControllerCommand::MecanumControllerCommand(
       m_controller(xController, yController, thetaController),
       m_maxWheelVelocity(maxWheelVelocity),
       m_frontLeftController(
-          std::make_unique<frc2::PIDController>(frontLeftController)),
+          std::make_unique<frc::PIDController>(frontLeftController)),
       m_rearLeftController(
-          std::make_unique<frc2::PIDController>(rearLeftController)),
+          std::make_unique<frc::PIDController>(rearLeftController)),
       m_frontRightController(
-          std::make_unique<frc2::PIDController>(frontRightController)),
+          std::make_unique<frc::PIDController>(frontRightController)),
       m_rearRightController(
-          std::make_unique<frc2::PIDController>(rearRightController)),
+          std::make_unique<frc::PIDController>(rearRightController)),
       m_currentWheelSpeeds(std::move(currentWheelSpeeds)),
       m_outputVolts(std::move(output)),
       m_usePID(true) {
@@ -85,16 +85,16 @@ MecanumControllerCommand::MecanumControllerCommand(
 MecanumControllerCommand::MecanumControllerCommand(
     frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
     frc::SimpleMotorFeedforward<units::meters> feedforward,
-    frc::MecanumDriveKinematics kinematics, frc2::PIDController xController,
-    frc2::PIDController yController,
+    frc::MecanumDriveKinematics kinematics, frc::PIDController xController,
+    frc::PIDController yController,
     frc::ProfiledPIDController<units::radians> thetaController,
     std::function<frc::Rotation2d()> desiredRotation,
     units::meters_per_second_t maxWheelVelocity,
     std::function<frc::MecanumDriveWheelSpeeds()> currentWheelSpeeds,
-    frc2::PIDController frontLeftController,
-    frc2::PIDController rearLeftController,
-    frc2::PIDController frontRightController,
-    frc2::PIDController rearRightController,
+    frc::PIDController frontLeftController,
+    frc::PIDController rearLeftController,
+    frc::PIDController frontRightController,
+    frc::PIDController rearRightController,
     std::function<void(units::volt_t, units::volt_t, units::volt_t,
                        units::volt_t)>
         output,
@@ -107,13 +107,13 @@ MecanumControllerCommand::MecanumControllerCommand(
       m_desiredRotation(std::move(desiredRotation)),
       m_maxWheelVelocity(maxWheelVelocity),
       m_frontLeftController(
-          std::make_unique<frc2::PIDController>(frontLeftController)),
+          std::make_unique<frc::PIDController>(frontLeftController)),
       m_rearLeftController(
-          std::make_unique<frc2::PIDController>(rearLeftController)),
+          std::make_unique<frc::PIDController>(rearLeftController)),
       m_frontRightController(
-          std::make_unique<frc2::PIDController>(frontRightController)),
+          std::make_unique<frc::PIDController>(frontRightController)),
       m_rearRightController(
-          std::make_unique<frc2::PIDController>(rearRightController)),
+          std::make_unique<frc::PIDController>(rearRightController)),
       m_currentWheelSpeeds(std::move(currentWheelSpeeds)),
       m_outputVolts(std::move(output)),
       m_usePID(true) {
@@ -123,15 +123,15 @@ MecanumControllerCommand::MecanumControllerCommand(
 MecanumControllerCommand::MecanumControllerCommand(
     frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
     frc::SimpleMotorFeedforward<units::meters> feedforward,
-    frc::MecanumDriveKinematics kinematics, frc2::PIDController xController,
-    frc2::PIDController yController,
+    frc::MecanumDriveKinematics kinematics, frc::PIDController xController,
+    frc::PIDController yController,
     frc::ProfiledPIDController<units::radians> thetaController,
     units::meters_per_second_t maxWheelVelocity,
     std::function<frc::MecanumDriveWheelSpeeds()> currentWheelSpeeds,
-    frc2::PIDController frontLeftController,
-    frc2::PIDController rearLeftController,
-    frc2::PIDController frontRightController,
-    frc2::PIDController rearRightController,
+    frc::PIDController frontLeftController,
+    frc::PIDController rearLeftController,
+    frc::PIDController frontRightController,
+    frc::PIDController rearRightController,
     std::function<void(units::volt_t, units::volt_t, units::volt_t,
                        units::volt_t)>
         output,
@@ -143,13 +143,13 @@ MecanumControllerCommand::MecanumControllerCommand(
       m_controller(xController, yController, thetaController),
       m_maxWheelVelocity(maxWheelVelocity),
       m_frontLeftController(
-          std::make_unique<frc2::PIDController>(frontLeftController)),
+          std::make_unique<frc::PIDController>(frontLeftController)),
       m_rearLeftController(
-          std::make_unique<frc2::PIDController>(rearLeftController)),
+          std::make_unique<frc::PIDController>(rearLeftController)),
       m_frontRightController(
-          std::make_unique<frc2::PIDController>(frontRightController)),
+          std::make_unique<frc::PIDController>(frontRightController)),
       m_rearRightController(
-          std::make_unique<frc2::PIDController>(rearRightController)),
+          std::make_unique<frc::PIDController>(rearRightController)),
       m_currentWheelSpeeds(std::move(currentWheelSpeeds)),
       m_outputVolts(std::move(output)),
       m_usePID(true) {
@@ -158,8 +158,8 @@ MecanumControllerCommand::MecanumControllerCommand(
 
 MecanumControllerCommand::MecanumControllerCommand(
     frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
-    frc::MecanumDriveKinematics kinematics, frc2::PIDController xController,
-    frc2::PIDController yController,
+    frc::MecanumDriveKinematics kinematics, frc::PIDController xController,
+    frc::PIDController yController,
     frc::ProfiledPIDController<units::radians> thetaController,
     std::function<frc::Rotation2d()> desiredRotation,
     units::meters_per_second_t maxWheelVelocity,
@@ -180,8 +180,8 @@ MecanumControllerCommand::MecanumControllerCommand(
 
 MecanumControllerCommand::MecanumControllerCommand(
     frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
-    frc::MecanumDriveKinematics kinematics, frc2::PIDController xController,
-    frc2::PIDController yController,
+    frc::MecanumDriveKinematics kinematics, frc::PIDController xController,
+    frc::PIDController yController,
     frc::ProfiledPIDController<units::radians> thetaController,
     units::meters_per_second_t maxWheelVelocity,
     std::function<void(units::meters_per_second_t, units::meters_per_second_t,
@@ -200,8 +200,8 @@ MecanumControllerCommand::MecanumControllerCommand(
 
 MecanumControllerCommand::MecanumControllerCommand(
     frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
-    frc::MecanumDriveKinematics kinematics, frc2::PIDController xController,
-    frc2::PIDController yController,
+    frc::MecanumDriveKinematics kinematics, frc::PIDController xController,
+    frc::PIDController yController,
     frc::ProfiledPIDController<units::radians> thetaController,
     std::function<frc::Rotation2d()> desiredRotation,
     units::meters_per_second_t maxWheelVelocity,
@@ -222,8 +222,8 @@ MecanumControllerCommand::MecanumControllerCommand(
 
 MecanumControllerCommand::MecanumControllerCommand(
     frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
-    frc::MecanumDriveKinematics kinematics, frc2::PIDController xController,
-    frc2::PIDController yController,
+    frc::MecanumDriveKinematics kinematics, frc::PIDController xController,
+    frc::PIDController yController,
     frc::ProfiledPIDController<units::radians> thetaController,
     units::meters_per_second_t maxWheelVelocity,
     std::function<void(units::meters_per_second_t, units::meters_per_second_t,

@@ -85,7 +85,7 @@ TEST_F(SwerveControllerCommandTest, ReachesReference) {
   auto command = frc2::SwerveControllerCommand<4>(
       trajectory, [&]() { return getRobotPose(); }, m_kinematics,
 
-      frc2::PIDController(0.6, 0, 0), frc2::PIDController(0.6, 0, 0),
+      frc::PIDController(0.6, 0, 0), frc::PIDController(0.6, 0, 0),
       m_rotController,
       [&](auto moduleStates) { m_moduleStates = moduleStates; }, {&subsystem});
 

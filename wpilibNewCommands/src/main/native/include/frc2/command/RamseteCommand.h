@@ -76,8 +76,8 @@ class RamseteCommand : public CommandHelper<Command, RamseteCommand> {
                  frc::SimpleMotorFeedforward<units::meters> feedforward,
                  frc::DifferentialDriveKinematics kinematics,
                  std::function<frc::DifferentialDriveWheelSpeeds()> wheelSpeeds,
-                 frc2::PIDController leftController,
-                 frc2::PIDController rightController,
+                 frc::PIDController leftController,
+                 frc::PIDController rightController,
                  std::function<void(units::volt_t, units::volt_t)> output,
                  std::initializer_list<Subsystem*> requirements);
 
@@ -113,8 +113,8 @@ class RamseteCommand : public CommandHelper<Command, RamseteCommand> {
                  frc::SimpleMotorFeedforward<units::meters> feedforward,
                  frc::DifferentialDriveKinematics kinematics,
                  std::function<frc::DifferentialDriveWheelSpeeds()> wheelSpeeds,
-                 frc2::PIDController leftController,
-                 frc2::PIDController rightController,
+                 frc::PIDController leftController,
+                 frc::PIDController rightController,
                  std::function<void(units::volt_t, units::volt_t)> output,
                  std::span<Subsystem* const> requirements = {});
 
@@ -183,8 +183,8 @@ class RamseteCommand : public CommandHelper<Command, RamseteCommand> {
   frc::SimpleMotorFeedforward<units::meters> m_feedforward;
   frc::DifferentialDriveKinematics m_kinematics;
   std::function<frc::DifferentialDriveWheelSpeeds()> m_speeds;
-  std::unique_ptr<frc2::PIDController> m_leftController;
-  std::unique_ptr<frc2::PIDController> m_rightController;
+  std::unique_ptr<frc::PIDController> m_leftController;
+  std::unique_ptr<frc::PIDController> m_rightController;
   std::function<void(units::volt_t, units::volt_t)> m_outputVolts;
   std::function<void(units::meters_per_second_t, units::meters_per_second_t)>
       m_outputVel;

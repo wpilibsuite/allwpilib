@@ -89,7 +89,7 @@ class SwerveControllerCommand
   SwerveControllerCommand(
       frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
       frc::SwerveDriveKinematics<NumModules> kinematics,
-      frc2::PIDController xController, frc2::PIDController yController,
+      frc::PIDController xController, frc::PIDController yController,
       frc::ProfiledPIDController<units::radians> thetaController,
       std::function<frc::Rotation2d()> desiredRotation,
       std::function<void(std::array<frc::SwerveModuleState, NumModules>)>
@@ -128,7 +128,7 @@ class SwerveControllerCommand
   SwerveControllerCommand(
       frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
       frc::SwerveDriveKinematics<NumModules> kinematics,
-      frc2::PIDController xController, frc2::PIDController yController,
+      frc::PIDController xController, frc::PIDController yController,
       frc::ProfiledPIDController<units::radians> thetaController,
       std::function<void(std::array<frc::SwerveModuleState, NumModules>)>
           output,
@@ -164,7 +164,7 @@ class SwerveControllerCommand
   SwerveControllerCommand(
       frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
       frc::SwerveDriveKinematics<NumModules> kinematics,
-      frc2::PIDController xController, frc2::PIDController yController,
+      frc::PIDController xController, frc::PIDController yController,
       frc::ProfiledPIDController<units::radians> thetaController,
       std::function<frc::Rotation2d()> desiredRotation,
       std::function<void(std::array<frc::SwerveModuleState, NumModules>)>
@@ -203,7 +203,7 @@ class SwerveControllerCommand
   SwerveControllerCommand(
       frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
       frc::SwerveDriveKinematics<NumModules> kinematics,
-      frc2::PIDController xController, frc2::PIDController yController,
+      frc::PIDController xController, frc::PIDController yController,
       frc::ProfiledPIDController<units::radians> thetaController,
       std::function<void(std::array<frc::SwerveModuleState, NumModules>)>
           output,
