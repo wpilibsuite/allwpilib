@@ -13,15 +13,18 @@ import edu.wpi.first.wpilibj.simulation.PWMSim;
 /** Simulation controller for the intake subsystem. */
 public class IntakeSim {
   private final PWMSim m_motor = new PWMSim(IntakeConstants.kMotorPort);
-  private final DoubleSolenoidSim m_piston = new DoubleSolenoidSim(PneumaticsModuleType.CTREPCM, 
-                      IntakeConstants.kSolenoidPorts[0], IntakeConstants.kSolenoidPorts[1]);
+  private final DoubleSolenoidSim m_piston =
+      new DoubleSolenoidSim(
+          PneumaticsModuleType.CTREPCM,
+          IntakeConstants.kSolenoidPorts[0],
+          IntakeConstants.kSolenoidPorts[1]);
 
   /** Call this to advance the simulation by 20 ms. */
   public void simulationPeriodic() {}
 
   /**
    * Get the duty cycle commanded to the intake motor.
-   * 
+   *
    * @return currently-commanded duty cycle
    */
   public double getMotor() {
@@ -30,7 +33,7 @@ public class IntakeSim {
 
   /**
    * Is the intake currently deployed.
-   * 
+   *
    * @return true if deployed.
    */
   public boolean isDeployed() {

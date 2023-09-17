@@ -16,7 +16,7 @@ class IntakeTest : public testing::Test {
   }
 
  protected:
-  Intake intake;   // real subsystem
+  Intake intake;  // real subsystem
   IntakeSim sim;  // simulation controller
 };
 

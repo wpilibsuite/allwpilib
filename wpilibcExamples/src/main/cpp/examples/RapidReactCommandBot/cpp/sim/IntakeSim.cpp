@@ -4,7 +4,6 @@
 
 #include "sim/IntakeSim.h"
 
-
 void IntakeSim::SimulationPeriodic() {}
 
 double IntakeSim::GetMotor() const {
