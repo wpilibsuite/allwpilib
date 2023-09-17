@@ -75,16 +75,6 @@ public class Quaternion {
   }
 
   /**
-   * Multiplies with a scalar.
-   *
-   * @param scalar The value to scale each component by.
-   * @return The scaled quaternion.
-   */
-  public Quaternion times(double scalar) {
-    return new Quaternion(getW() * scalar, getX() * scalar, getY() * scalar, getZ() * scalar);
-  }
-
-  /**
    * Divides by a scalar.
    *
    * @param scalar The value to scale each component by.
@@ -92,6 +82,16 @@ public class Quaternion {
    */
   public Quaternion divide(double scalar) {
     return new Quaternion(getW() / scalar, getX() / scalar, getY() / scalar, getZ() / scalar);
+  }
+
+  /**
+   * Multiplies with a scalar.
+   *
+   * @param scalar The value to scale each component by.
+   * @return The scaled quaternion.
+   */
+  public Quaternion times(double scalar) {
+    return new Quaternion(getW() * scalar, getX() * scalar, getY() * scalar, getZ() * scalar);
   }
 
   /**
@@ -196,7 +196,7 @@ public class Quaternion {
   }
 
   /**
-   * Rational power of a quaternion
+   * Rational power of a quaternion.
    *
    * @param t the power to raise this quaternion to.
    * @return The quaternion power
@@ -207,7 +207,7 @@ public class Quaternion {
   }
 
   /**
-   * Matrix exponential of a quaternion
+   * Matrix exponential of a quaternion.
    *
    * @param adjustment the "Twist" that will be applied to this quaternion.
    * @return The quaternion product of exp(adjustment) * this
@@ -217,7 +217,7 @@ public class Quaternion {
   }
 
   /**
-   * Matrix exponential of a quaternion
+   * Matrix exponential of a quaternion.
    *
    * <p>source: https://en.wikipedia.org/wiki/Quaternion#Exponential,_logarithm,_and_power_functions
    *

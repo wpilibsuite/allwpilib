@@ -179,13 +179,16 @@ class QuaternionTest {
 
     var zero = new Quaternion(0, 0, 0, 0);
     var one = new Quaternion();
-    var i = new Quaternion(0, 1, 0, 0);
-    var j = new Quaternion(0, 0, 1, 0);
-    var k = new Quaternion(0, 0, 0, 1);
 
     QuaternionEquals(zero, one.log());
+
+    var i = new Quaternion(0, 1, 0, 0);
     QuaternionEquals(i.times(Math.PI / 2), i.log());
+
+    var j = new Quaternion(0, 0, 1, 0);
     QuaternionEquals(j.times(Math.PI / 2), j.log());
+
+    var k = new Quaternion(0, 0, 0, 1);
     QuaternionEquals(k.times(Math.PI / 2), k.log());
     QuaternionEquals(i.times(Math.PI), one.times(-1).log());
   }
