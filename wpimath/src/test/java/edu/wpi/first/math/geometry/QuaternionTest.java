@@ -61,6 +61,19 @@ class QuaternionTest {
   }
 
   @Test
+  void testSubtraction() {
+    var q = new Quaternion(0.1, 0.2, 0.3, 0.4);
+    var p = new Quaternion(0.5, 0.6, 0.7, 0.8);
+
+    var sum = q.minus(p);
+
+    assertEquals(q.getW() - p.getW(), sum.getW());
+    assertEquals(q.getX() - p.getX(), sum.getX());
+    assertEquals(q.getY() - p.getY(), sum.getY());
+    assertEquals(q.getZ() - p.getZ(), sum.getZ());
+  }
+
+  @Test
   void testScalarMultiplication() {
     var q = new Quaternion(0.1, 0.2, 0.3, 0.4);
     var scalar = 2;
@@ -71,6 +84,19 @@ class QuaternionTest {
     assertEquals(q.getX() * scalar, product.getX());
     assertEquals(q.getY() * scalar, product.getY());
     assertEquals(q.getZ() * scalar, product.getZ());
+  }
+
+  @Test
+  void testScalarDivision() {
+    var q = new Quaternion(0.1, 0.2, 0.3, 0.4);
+    var scalar = 2;
+
+    var product = q.divide(scalar);
+
+    assertEquals(q.getW() / scalar, product.getW());
+    assertEquals(q.getX() / scalar, product.getX());
+    assertEquals(q.getY() / scalar, product.getY());
+    assertEquals(q.getZ() / scalar, product.getZ());
   }
 
   @Test

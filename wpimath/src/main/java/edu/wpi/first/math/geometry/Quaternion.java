@@ -64,6 +64,17 @@ public class Quaternion {
   }
 
   /**
+   * Subtracts another quaternion from this quaternion entrywise.
+   *
+   * @param other The other quaternion.
+   * @return The quaternion sum.
+   */
+  public Quaternion minus(Quaternion other) {
+    return new Quaternion(
+        getW() - other.getW(), getX() - other.getX(), getY() - other.getY(), getZ() - other.getZ());
+  }
+
+  /**
    * Multiplies with a scalar.
    *
    * @param scalar The value to scale each component by.
@@ -71,6 +82,16 @@ public class Quaternion {
    */
   public Quaternion times(double scalar) {
     return new Quaternion(getW() * scalar, getX() * scalar, getY() * scalar, getZ() * scalar);
+  }
+
+  /**
+   * Divides by a scalar.
+   *
+   * @param scalar The value to scale each component by.
+   * @return The scaled quaternion.
+   */
+  public Quaternion divide(double scalar) {
+    return new Quaternion(getW() / scalar, getX() / scalar, getY() / scalar, getZ() / scalar);
   }
 
   /**
@@ -197,8 +218,8 @@ public class Quaternion {
 
   /**
    * Matrix exponential of a quaternion
-   * 
-   * <p> source: https://en.wikipedia.org/wiki/Quaternion#Exponential,_logarithm,_and_power_functions
+   *
+   * <p>source: https://en.wikipedia.org/wiki/Quaternion#Exponential,_logarithm,_and_power_functions
    *
    * @return The Matrix exponential of this quaternion.
    */
