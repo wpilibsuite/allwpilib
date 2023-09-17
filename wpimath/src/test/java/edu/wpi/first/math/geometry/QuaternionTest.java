@@ -65,12 +65,12 @@ class QuaternionTest {
     var q = new Quaternion(0.1, 0.2, 0.3, 0.4);
     var p = new Quaternion(0.5, 0.6, 0.7, 0.8);
 
-    var sum = q.minus(p);
+    var difference = q.minus(p);
 
-    assertEquals(q.getW() - p.getW(), sum.getW());
-    assertEquals(q.getX() - p.getX(), sum.getX());
-    assertEquals(q.getY() - p.getY(), sum.getY());
-    assertEquals(q.getZ() - p.getZ(), sum.getZ());
+    assertEquals(q.getW() - p.getW(), difference.getW());
+    assertEquals(q.getX() - p.getX(), difference.getX());
+    assertEquals(q.getY() - p.getY(), difference.getY());
+    assertEquals(q.getZ() - p.getZ(), difference.getZ());
   }
 
   @Test
@@ -194,8 +194,9 @@ class QuaternionTest {
   void testLogarithmIsInverseOfExponential() {
     var q = new Quaternion(1.1, 2.2, 3.3, 4.4);
 
-    // These operations are order-dependent: ln(exp(SO(3))) is not congruent to exp(ln(SO(3))).
-    // The correct order of operations is the latter, exp(ln(SO(3)))
+    // These operations are order-dependent: ln(exp(q)) is congruent
+    // but not necessarily equal to exp(ln(q)) due to the multi-valued nature of the complex
+    // logarithm.
 
     var q_log_exp = q.log().exp();
 
