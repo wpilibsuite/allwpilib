@@ -98,7 +98,7 @@ class WPILIB_DLLEXPORT Quaternion {
    * 
    * @param t the power to raise this quaternion to.
    */
-  Quaternion Pow(const double other) const;
+  Quaternion Pow(const double t) const;
 
   /**
    * Matrix exponential of a quaternion.
@@ -115,14 +115,14 @@ class WPILIB_DLLEXPORT Quaternion {
   Quaternion Exp() const;
 
   /**
-   * Inverse Matrix exponential (logarithm) of a quaternion.
+   * Log operator of a quaternion.
    * 
-   * @param end The quaternion to map this quaternion onto
+   * @param other The quaternion to map this quaternion onto
    */
   Quaternion Log(const Quaternion& other) const;
 
   /**
-   * Inverse Matrix exponential (logarithm) of a quaternion.
+   * Log operator of a quaternion.
    * 
    * source: https://en.wikipedia.org/wiki/Quaternion#Exponential,_logarithm,_and_power_functions
    */
