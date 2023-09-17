@@ -11,6 +11,7 @@
 
 #include "RapidReactCommandBot.h"
 #include "sim/DriveSim.h"
+#include "sim/IntakeSim.h"
 #include "sim/ShooterSim.h"
 
 class Robot : public frc::TimedRobot {
@@ -33,4 +34,5 @@ class Robot : public frc::TimedRobot {
 
   DriveSim m_driveSim;
   ShooterSim m_shooterSim;
+  IntakeSim m_intakeSim;
 };

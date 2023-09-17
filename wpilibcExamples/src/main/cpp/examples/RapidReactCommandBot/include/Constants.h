@@ -45,6 +45,8 @@ constexpr auto kaAngular = 0.3 * 1_V / 1_mps_sq;
 namespace IntakeConstants {
 constexpr int kMotorPort = 6;
 constexpr int kSolenoidPorts[]{0, 1};
+
+constexpr double kIntakeDutyCycle = 1.0;
 }  // namespace IntakeConstants
 
 namespace StorageConstants {

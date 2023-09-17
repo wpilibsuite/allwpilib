@@ -4,9 +4,9 @@
 
 package edu.wpi.first.wpilibj.examples.rapidreactcommandbot;
 
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.sim.DriveSim;
+import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.sim.IntakeSim;
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.sim.ShooterSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -23,6 +23,7 @@ public class Robot extends TimedRobot {
   private final RapidReactCommandBot m_robot = new RapidReactCommandBot();
   private ShooterSim m_shooterSim;
   private DriveSim m_driveSim;
+  private IntakeSim m_intakeSim;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -32,18 +33,19 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     // Configure default commands and condition bindings on robot startup
     m_robot.configureBindings();
-    DriverStation.silenceJoystickConnectionWarning(true);
   }
 
   @Override
   public void simulationInit() {
     m_shooterSim = new ShooterSim();
     m_driveSim = new DriveSim();
+    m_intakeSim = new IntakeSim();
   }
 
   @Override
   public void simulationPeriodic() {
     m_driveSim.simulationPeriodic();
+    m_intakeSim.simulationPeriodic();
     m_shooterSim.simulationPeriodic();
   }
 

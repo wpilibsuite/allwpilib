@@ -6,7 +6,7 @@
 
 frc2::CommandPtr Intake::IntakeCommand() {
   return RunOnce([this] { m_piston.Set(frc::DoubleSolenoid::kForward); })
-      .AndThen(Run([this] { m_motor.Set(1.0); }))
+      .AndThen(Run([this] { m_motor.Set(IntakeConstants::kIntakeDutyCycle); }))
       .WithName("Intake");
 }
 

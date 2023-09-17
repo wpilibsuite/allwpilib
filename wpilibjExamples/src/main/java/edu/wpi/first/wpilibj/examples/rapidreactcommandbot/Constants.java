@@ -80,6 +80,8 @@ public final class Constants {
   public static final class IntakeConstants {
     public static final int kMotorPort = 6;
     public static final int[] kSolenoidPorts = {2, 3};
+
+    public static final double kIntakeDutyCycle = 1.0;
   }
 
   public static final class StorageConstants {
