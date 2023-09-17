@@ -4,6 +4,10 @@ This article contains instructions on building projects using a development buil
 
 **Note:** This only applies to Java/C++ teams.
 
+## WARNING!
+
+**There are no stability or compatibility guarantees for builds outside of [tagged releases](https://github.com/wpilibsuite/allwpilib/releases). Changes may not be fully documented. Use them at your own risk!**
+
 ## Development Build
 
 Development builds are the per-commit build hosted every time a commit is pushed to the [allwpilib](https://github.com/wpilibsuite/allwpilib/) repository. These builds are then hosted on [artifactory](https://frcmaven.wpi.edu/artifactory/webapp/#/home).
