@@ -52,6 +52,8 @@ inline constexpr double kIntakeDutyCycle = 1.0;
 namespace StorageConstants {
 inline constexpr int kMotorPort = 7;
 inline constexpr int kBallSensorPort = 6;
+
+inline constexpr double kStorageDutyCycle = 1.0;
 }  // namespace StorageConstants
 
 namespace ShooterConstants {

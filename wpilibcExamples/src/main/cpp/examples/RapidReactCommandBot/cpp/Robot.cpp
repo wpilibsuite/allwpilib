@@ -22,6 +22,7 @@ void Robot::SimulationPeriodic() {
   m_driveSim.SimulationPeriodic();
   m_shooterSim.SimulationPeriodic();
   m_intakeSim.SimulationPeriodic();
+  m_storageSim.SimulationPeriodic();
 }
 
 void Robot::DisabledInit() {}
