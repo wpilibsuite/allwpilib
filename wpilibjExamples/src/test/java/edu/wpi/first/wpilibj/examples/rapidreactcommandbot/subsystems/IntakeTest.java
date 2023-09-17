@@ -45,6 +45,8 @@ class IntakeTest {
 
     CommandScheduler.getInstance().run();
     m_sim.simulationPeriodic();
+    CommandScheduler.getInstance().run();
+    m_sim.simulationPeriodic();
 
     assertEquals(IntakeConstants.kIntakeDutyCycle, m_sim.getMotor(), 1e-6);
     assertTrue(m_sim.isDeployed());
@@ -59,6 +61,8 @@ class IntakeTest {
 
     command.schedule();
 
+    CommandScheduler.getInstance().run();
+    m_sim.simulationPeriodic();
     CommandScheduler.getInstance().run();
     m_sim.simulationPeriodic();
 

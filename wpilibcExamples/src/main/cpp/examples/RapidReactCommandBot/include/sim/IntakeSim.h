@@ -32,6 +32,6 @@ class IntakeSim {
  private:
   frc::sim::PWMSim m_motor{IntakeConstants::kMotorPort};
   frc::sim::DoubleSolenoidSim m_piston{frc::PneumaticsModuleType::CTREPCM,
-                               IntakeConstants::kSolenoidPorts[0],
-                               IntakeConstants::kSolenoidPorts[1]};
+                                       IntakeConstants::kSolenoidPorts[0],
+                                       IntakeConstants::kSolenoidPorts[1]};
 };

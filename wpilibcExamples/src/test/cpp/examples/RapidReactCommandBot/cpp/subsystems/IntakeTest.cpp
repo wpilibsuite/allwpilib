@@ -16,7 +16,7 @@ class IntakeTest : public testing::Test {
   }
 
  protected:
-  Intake intake;   // real subsystem
+  Intake intake;  // real subsystem
   IntakeSim sim;  // simulation controller
 };
 
@@ -28,6 +28,8 @@ TEST_F(IntakeTest, IntakeCommand) {
 
   commandHolder.Schedule();
 
+  frc2::CommandScheduler::GetInstance().Run();
+  sim.SimulationPeriodic();
   frc2::CommandScheduler::GetInstance().Run();
   sim.SimulationPeriodic();
 
@@ -43,6 +45,8 @@ TEST_F(IntakeTest, RetractCommand) {
 
   commandHolder.Schedule();
 
+  frc2::CommandScheduler::GetInstance().Run();
+  sim.SimulationPeriodic();
   frc2::CommandScheduler::GetInstance().Run();
   sim.SimulationPeriodic();
 
