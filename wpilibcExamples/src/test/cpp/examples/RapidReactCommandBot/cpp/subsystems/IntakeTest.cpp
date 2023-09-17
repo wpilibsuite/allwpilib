@@ -30,6 +30,8 @@ TEST_F(IntakeTest, IntakeCommand) {
 
   frc2::CommandScheduler::GetInstance().Run();
   sim.SimulationPeriodic();
+  frc2::CommandScheduler::GetInstance().Run();
+  sim.SimulationPeriodic();
 
   EXPECT_NEAR(IntakeConstants::kIntakeDutyCycle, sim.GetMotor(), 1e-6);
   EXPECT_TRUE(sim.IsDeployed());
@@ -43,6 +45,8 @@ TEST_F(IntakeTest, RetractCommand) {
 
   commandHolder.Schedule();
 
+  frc2::CommandScheduler::GetInstance().Run();
+  sim.SimulationPeriodic();
   frc2::CommandScheduler::GetInstance().Run();
   sim.SimulationPeriodic();
 
