@@ -146,28 +146,35 @@ TEST(QuaternionTest, Inverse) {
 TEST(QuaternionTest, Norm) {
   Quaternion q{3, 4, 12, 84};
   auto norm = q.Norm();
-  
+
   EXPECT_NEAR(85, norm, 1e-9);
 }
 
-#define QUATERNION_NEAR(p, q) {EXPECT_NEAR(p.W(), q.W(), 1e-9); EXPECT_NEAR(p.X(), q.X(), 1e-9); EXPECT_NEAR(p.Y(), q.Y(), 1e-9); EXPECT_NEAR(p.Z(), q.Z(), 1e-9);}
+#define QUATERNION_NEAR(p, q)        \
+  {                                  \
+    EXPECT_NEAR(p.W(), q.W(), 1e-9); \
+    EXPECT_NEAR(p.X(), q.X(), 1e-9); \
+    EXPECT_NEAR(p.Y(), q.Y(), 1e-9); \
+    EXPECT_NEAR(p.Z(), q.Z(), 1e-9); \
+  }
 
 TEST(QuaternionTest, Exponential) {
   Quaternion q{1.1, 2.2, 3.3, 4.4};
-  Quaternion expect{2.81211398529184, -0.392521193481878, -0.588781790222817, -0.785042386963756};
+  Quaternion expect{2.81211398529184, -0.392521193481878, -0.588781790222817,
+                    -0.785042386963756};
 
   auto q_exp = q.Exp();
-  
+
   QUATERNION_NEAR(expect, q_exp);
 }
 
-
 TEST(QuaternionTest, Logarithm) {
   Quaternion q{1.1, 2.2, 3.3, 4.4};
-  Quaternion expect{1.7959088706354, 0.515190292664085, 0.772785438996128, 1.03038058532817};
+  Quaternion expect{1.7959088706354, 0.515190292664085, 0.772785438996128,
+                    1.03038058532817};
 
   auto q_log = q.Log();
-  
+
   QUATERNION_NEAR(expect, q_log);
 
   Quaternion zero{0, 0, 0, 0};
@@ -183,14 +190,15 @@ TEST(QuaternionTest, Logarithm) {
   QUATERNION_NEAR((i * std::numbers::pi), ((one * -1).Log()));
 }
 
-
 TEST(QuaternionTest, LogarithmAndExponentialInverse) {
   Quaternion q{1.1, 2.2, 3.3, 4.4};
 
-  // These operations are order-dependent: ln(exp(q)) is congruent but not necessarily equal to exp(ln(q)) due to the multi-valued nature of the complex logarithm.
+  // These operations are order-dependent: ln(exp(q)) is congruent but not
+  // necessarily equal to exp(ln(q)) due to the multi-valued nature of the
+  // complex logarithm.
 
   auto q_log_exp = q.Log().Exp();
-  
+
   QUATERNION_NEAR(q, q_log_exp);
 
   Quaternion start{1, 2, 3, 4};

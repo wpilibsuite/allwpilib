@@ -32,28 +32,28 @@ class WPILIB_DLLEXPORT Quaternion {
 
   /**
    * Adds with another quaternion.
-   * 
+   *
    * @param other the other quaternion
    */
   Quaternion operator+(const Quaternion& other) const;
 
   /**
    * Subtracts another quaternion.
-   * 
+   *
    * @param other the other quaternion
    */
   Quaternion operator-(const Quaternion& other) const;
 
   /**
    * Multiples with a scalar value.
-   * 
+   *
    * @param other the scalar value
    */
   Quaternion operator*(const double other) const;
 
   /**
    * Divides by a scalar value.
-   * 
+   *
    * @param other the scalar value
    */
   Quaternion operator/(const double other) const;
@@ -95,36 +95,38 @@ class WPILIB_DLLEXPORT Quaternion {
 
   /**
    * Calculates this quaternion raised to a power.
-   * 
+   *
    * @param t the power to raise this quaternion to.
    */
   Quaternion Pow(const double t) const;
 
   /**
    * Matrix exponential of a quaternion.
-   * 
+   *
    * @param other the "Twist" that will be applied to this quaternion.
    */
   Quaternion Exp(const Quaternion& other) const;
 
   /**
    * Matrix exponential of a quaternion.
-   * 
-   * source: https://en.wikipedia.org/wiki/Quaternion#Exponential,_logarithm,_and_power_functions
+   *
+   * source:
+   * https://en.wikipedia.org/wiki/Quaternion#Exponential,_logarithm,_and_power_functions
    */
   Quaternion Exp() const;
 
   /**
    * Log operator of a quaternion.
-   * 
+   *
    * @param other The quaternion to map this quaternion onto
    */
   Quaternion Log(const Quaternion& other) const;
 
   /**
    * Log operator of a quaternion.
-   * 
-   * source: https://en.wikipedia.org/wiki/Quaternion#Exponential,_logarithm,_and_power_functions
+   *
+   * source:
+   * https://en.wikipedia.org/wiki/Quaternion#Exponential,_logarithm,_and_power_functions
    */
   Quaternion Log() const;
 

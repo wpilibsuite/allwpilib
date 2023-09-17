@@ -13,38 +13,38 @@ Quaternion::Quaternion(double w, double x, double y, double z)
 
 Quaternion Quaternion::operator+(const Quaternion& other) const {
   return Quaternion{
-    m_r + other.m_r,
-    m_v(0) + other.m_v(0),
-    m_v(1) + other.m_v(1),
-    m_v(2) + other.m_v(2),
+      m_r + other.m_r,
+      m_v(0) + other.m_v(0),
+      m_v(1) + other.m_v(1),
+      m_v(2) + other.m_v(2),
   };
 }
 
 Quaternion Quaternion::operator-(const Quaternion& other) const {
   return Quaternion{
-    m_r - other.m_r,
-    m_v(0) - other.m_v(0),
-    m_v(1) - other.m_v(1),
-    m_v(2) - other.m_v(2),
+      m_r - other.m_r,
+      m_v(0) - other.m_v(0),
+      m_v(1) - other.m_v(1),
+      m_v(2) - other.m_v(2),
   };
 }
 
 Quaternion Quaternion::operator*(const double other) const {
- return Quaternion{
-  m_r * other,
-  m_v(0) * other,
-  m_v(1) * other,
-  m_v(2) * other,
- };
+  return Quaternion{
+      m_r * other,
+      m_v(0) * other,
+      m_v(1) * other,
+      m_v(2) * other,
+  };
 }
 
 Quaternion Quaternion::operator/(const double other) const {
- return Quaternion{
-  m_r / other,
-  m_v(0) / other,
-  m_v(1) / other,
-  m_v(2) / other,
- };
+  return Quaternion{
+      m_r / other,
+      m_v(0) / other,
+      m_v(1) / other,
+      m_v(2) / other,
+  };
 }
 
 Quaternion Quaternion::operator*(const Quaternion& other) const {
@@ -105,30 +105,27 @@ Quaternion Quaternion::Exp(const Quaternion& other) const {
 Quaternion Quaternion::Exp() const {
   // q = s(scalar) + v(vector)
 
-  //exp(s)
+  // std::exp(s)
   double scalar = std::exp(m_r);
 
   // ||v||
   double axial_magnitude = std::sqrt(X() * X() + Y() * Y() + Z() * Z());
-  // cos(||v||)
+  // std::cos(||v||)
   double cosine = std::cos(axial_magnitude);
 
   double axial_scalar;
 
   if (axial_magnitude < 1e-9) {
     // Taylor series of sin(x) near x=0: 1 - x^2 / 6 + x^4 / 120 + O(n^6)
-    axial_scalar = 1 - std::pow(axial_magnitude, 2) / 6 + std::pow(axial_magnitude, 4) / 120;
+    axial_scalar = 1 - std::pow(axial_magnitude, 2) / 6 +
+                   std::pow(axial_magnitude, 4) / 120;
   } else {
     axial_scalar = std::sin(axial_magnitude) / axial_magnitude;
   }
 
-  // exp(s) * (cos(||v||) + v * sin(||v||) / ||v||)
-  return Quaternion(
-    cosine * scalar,
-    X() * axial_scalar * scalar,
-    Y() * axial_scalar * scalar,
-    Z() * axial_scalar * scalar
-  );
+  // std::exp(s) * (std::cos(||v||) + v * std::sin(||v||) / ||v||)
+  return Quaternion(cosine * scalar, X() * axial_scalar * scalar,
+                    Y() * axial_scalar * scalar, Z() * axial_scalar * scalar);
 }
 
 Quaternion Quaternion::Log(const Quaternion& other) const {
