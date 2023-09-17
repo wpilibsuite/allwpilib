@@ -20,6 +20,15 @@ Quaternion Quaternion::operator+(const Quaternion& other) const {
   };
 }
 
+Quaternion Quaternion::operator-(const Quaternion& other) const {
+  return Quaternion{
+    m_r - other.m_r,
+    m_v(0) - other.m_v(0),
+    m_v(1) - other.m_v(1),
+    m_v(2) - other.m_v(2),
+  };
+}
+
 Quaternion Quaternion::operator*(const double other) const {
  return Quaternion{
   m_r * other,
@@ -85,7 +94,7 @@ Quaternion Quaternion::Normalize() const {
   }
 }
 
-Quaternion Quaternion::operator^(const double other) const {
+Quaternion Quaternion::Pow(const double other) const {
   return (Log() * other).Exp();
 }
 
@@ -115,18 +124,18 @@ Quaternion Quaternion::Exp() const {
 
   // exp(s) * (cos(||v||) + v * sin(||v||) / ||v||)
   return Quaternion(
-    cosine,
-    X() * axial_scalar,
-    Y() * axial_scalar,
-    Z() * axial_scalar
-  ) * scalar;
+    cosine * scalar,
+    X() * axial_scalar * scalar,
+    Y() * axial_scalar * scalar,
+    Z() * axial_scalar * scalar
+  );
 }
 
 Quaternion Quaternion::Log(const Quaternion& other) const {
   return (other * Inverse()).Log();
 }
 
-Quaternion Quaternion::Exp() const {
+Quaternion Quaternion::Log() const {
   double scalar = std::log(Norm());
 
   Eigen::Vector3d rvec = Normalize().ToRotationVector();

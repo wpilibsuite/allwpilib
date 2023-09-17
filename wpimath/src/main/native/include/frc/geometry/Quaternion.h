@@ -38,13 +38,20 @@ class WPILIB_DLLEXPORT Quaternion {
   Quaternion operator+(const Quaternion& other) const;
 
   /**
+   * Subtracts another quaternion.
+   * 
+   * @param other the other quaternion
+   */
+  Quaternion operator-(const Quaternion& other) const;
+
+  /**
    * Multiples with a scalar value.
    * 
    * @param other the scalar value
    */
   Quaternion operator*(const double other) const;
 
-    /**
+  /**
    * Divides by a scalar value.
    * 
    * @param other the scalar value
@@ -91,7 +98,7 @@ class WPILIB_DLLEXPORT Quaternion {
    * 
    * @param t the power to raise this quaternion to.
    */
-  Quaternion operator^(const double other) const;
+  Quaternion Pow(const double other) const;
 
   /**
    * Matrix exponential of a quaternion.
