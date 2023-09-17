@@ -236,7 +236,7 @@ public class Quaternion {
     double axial_scalar;
 
     if (axial_magnitude < 1e-9) {
-      // Taylor series of sin(x) / x near x=0: 1 - x^2 / 6 + x^4 / 120 + O(n^6)
+      // Taylor series of sin(x)/x near x=0: 1 − x²/6 + x⁴/120 + O(n⁶)
       var axial_magnitude_sq = axial_magnitude * axial_magnitude;
       var axial_magnitude_sq_sq = axial_magnitude_sq * axial_magnitude_sq;
       axial_scalar = 1 - axial_magnitude_sq / 6 + axial_magnitude_sq_sq / 120;

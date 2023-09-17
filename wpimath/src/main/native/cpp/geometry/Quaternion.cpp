@@ -116,9 +116,10 @@ Quaternion Quaternion::Exp() const {
   double axial_scalar;
 
   if (axial_magnitude < 1e-9) {
-    // Taylor series of sin(x) near x=0: 1 - x^2 / 6 + x^4 / 120 + O(n^6)
-    axial_scalar = 1 - std::pow(axial_magnitude, 2) / 6 +
-                   std::pow(axial_magnitude, 4) / 120;
+    // Taylor series of sin(x)/x near x=0: 1 − x²/6 + x⁴/120 + O(n⁶)
+    double axial_magnitude_sq = axial_magnitude * axial_magnitude;
+    double axial_magnitude_sq_sq = axial_magnitude_sq * axial_magnitude_sq;
+    axial_scalar = 1 - axial_magnitude_sq / 6 + axial_magnitude_sq_sq / 120;
   } else {
     axial_scalar = std::sin(axial_magnitude) / axial_magnitude;
   }
