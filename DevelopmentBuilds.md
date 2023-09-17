@@ -6,7 +6,6 @@ This article contains instructions on building projects using a development buil
 
 > [!WARNING]
 > **There are no stability or compatibility guarantees for builds outside of [tagged releases](https://github.com/wpilibsuite/allwpilib/releases). Changes may not be fully documented. Use them at your own risk!**
-**There are no stability or compatibility guarantees for builds outside of [tagged releases](https://github.com/wpilibsuite/allwpilib/releases). Changes may not be fully documented. Use them at your own risk!**
 >
 > Development builds may be non-functional between the end of the season and the start of beta testing. Development builds are also likely to be incompatible with vendor libraries during this time.
 
