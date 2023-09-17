@@ -4,12 +4,9 @@
 
 #include "Robot.h"
 
-#include <frc/DriverStation.h>
-
 void Robot::RobotInit() {
   // Configure default commands and condition bindings on robot startup
   m_robot.ConfigureBindings();
-  frc::DriverStation::SilenceJoystickConnectionWarning(true);
 }
 
 void Robot::RobotPeriodic() {
@@ -24,6 +21,7 @@ void Robot::RobotPeriodic() {
 void Robot::SimulationPeriodic() {
   m_driveSim.SimulationPeriodic();
   m_shooterSim.SimulationPeriodic();
+  m_intakeSim.SimulationPeriodic();
 }
 
 void Robot::DisabledInit() {}

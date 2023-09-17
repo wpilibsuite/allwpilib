@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Intake extends SubsystemBase {
+public class Intake extends SubsystemBase implements AutoCloseable {
   private final PWMSparkMax m_motor = new PWMSparkMax(IntakeConstants.kMotorPort);
 
   // Double solenoid connected to two channels of a PCM with the default CAN ID
@@ -25,7 +25,7 @@ public class Intake extends SubsystemBase {
   /** Returns a command that deploys the intake, and then runs the intake motor indefinitely. */
   public Command intakeCommand() {
     return runOnce(() -> m_pistons.set(DoubleSolenoid.Value.kForward))
-        .andThen(run(() -> m_motor.set(1.0)))
+        .andThen(run(() -> m_motor.set(IntakeConstants.kIntakeDutyCycle)))
         .withName("Intake");
   }
 
@@ -37,5 +37,11 @@ public class Intake extends SubsystemBase {
               m_pistons.set(DoubleSolenoid.Value.kReverse);
             })
         .withName("Retract");
+  }
+
+  @Override
+  public void close() {
+    m_motor.close();
+    m_pistons.close();
   }
 }
