@@ -736,8 +736,8 @@ std::pair<std::string_view, std::string_view> UnescapeCString(
  * @param args The format string arguments.
  */
 template <class OutputIt, class... Args>
-void format_to_n_c_str(OutputIt out, std::iter_difference_t<OutputIt> n,
-                       fmt::format_string<Args...> fmt, Args&&... args) {
+inline void format_to_n_c_str(OutputIt out, std::iter_difference_t<OutputIt> n,
+                              fmt::format_string<Args...> fmt, Args&&... args) {
   const auto result =
       fmt::format_to_n(out, n - 1, fmt, std::forward<Args>(args)...);
   *result.out = '\0';
