@@ -40,12 +40,8 @@ target_link_libraries(cameraserver PUBLIC ntcore cscore wpiutil ${OpenCV_LIBS})
 
 set_property(TARGET cameraserver PROPERTY FOLDER "libraries")
 
-install(TARGETS cameraserver EXPORT cameraserver DESTINATION "${main_lib_dest}")
+install(TARGETS cameraserver EXPORT cameraserver)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/cameraserver")
-
-if (WITH_JAVA AND MSVC)
-    install(TARGETS cameraserver RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)
-endif()
 
 if (WITH_FLAT_INSTALL)
     set (cameraserver_config_dir ${wpilib_dest})

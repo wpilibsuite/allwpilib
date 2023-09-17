@@ -34,11 +34,7 @@ if (WITH_JAVA)
   target_link_libraries(wpinetjni PRIVATE wpinet_jni_headers)
   add_dependencies(wpinetjni wpinet_jar)
 
-  if (MSVC)
-    install(TARGETS wpinetjni RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)
-  endif()
-
-  install(TARGETS wpinetjni EXPORT wpinetjni DESTINATION "${main_lib_dest}")
+  install(TARGETS wpinetjni EXPORT wpinetjni)
 
 endif()
 
@@ -161,11 +157,7 @@ target_include_directories(wpinet PUBLIC
                             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
                             $<INSTALL_INTERFACE:${include_dest}/wpinet>)
 
-install(TARGETS wpinet EXPORT wpinet DESTINATION "${main_lib_dest}")
-
-if (WITH_JAVA AND MSVC)
-    install(TARGETS wpinet RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)
-endif()
+install(TARGETS wpinet EXPORT wpinet)
 
 if (WITH_FLAT_INSTALL)
     set (wpinet_config_dir ${wpilib_dest})

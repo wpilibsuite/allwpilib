@@ -62,11 +62,7 @@ if (WITH_JAVA)
   target_link_libraries(apriltagjni PRIVATE apriltag_jni_headers)
   add_dependencies(apriltagjni apriltag_jar)
 
-  if (MSVC)
-    install(TARGETS apriltagjni RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)
-  endif()
-
-  install(TARGETS apriltagjni EXPORT apriltagjni DESTINATION "${main_lib_dest}")
+  install(TARGETS apriltagjni EXPORT apriltagjni)
 
 endif()
 
@@ -94,12 +90,8 @@ target_include_directories(apriltag PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
   $<INSTALL_INTERFACE:${include_dest}/apriltag>)
 
-install(TARGETS apriltag EXPORT apriltag DESTINATION "${main_lib_dest}")
+install(TARGETS apriltag EXPORT apriltag)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/apriltag")
-
-if (WITH_JAVA AND MSVC)
-    install(TARGETS apriltag RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)
-endif()
 
 if (WITH_FLAT_INSTALL)
     set (apriltag_config_dir ${wpilib_dest})

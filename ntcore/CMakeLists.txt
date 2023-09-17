@@ -33,7 +33,7 @@ target_link_libraries(ntcore PUBLIC wpinet wpiutil)
 
 set_property(TARGET ntcore PROPERTY FOLDER "libraries")
 
-install(TARGETS ntcore EXPORT ntcore DESTINATION "${main_lib_dest}")
+install(TARGETS ntcore EXPORT ntcore)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/ntcore")
 install(DIRECTORY ${WPILIB_BINARY_DIR}/ntcore/generated/main/native/include/ DESTINATION "${include_dest}/ntcore")
 
@@ -81,7 +81,7 @@ if (WITH_JAVA)
     target_link_libraries(ntcorejni PRIVATE ntcore_jni_headers)
     add_dependencies(ntcorejni ntcore_jar)
 
-    install(TARGETS ntcorejni EXPORT ntcorejni DESTINATION "${main_lib_dest}")
+    install(TARGETS ntcorejni EXPORT ntcorejni)
 
 endif()
 

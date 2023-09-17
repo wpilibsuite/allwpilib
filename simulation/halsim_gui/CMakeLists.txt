@@ -16,4 +16,4 @@ target_include_directories(halsim_gui PRIVATE src/main/native/include)
 
 set_property(TARGET halsim_gui PROPERTY FOLDER "libraries")
 
-install(TARGETS halsim_gui EXPORT halsim_gui DESTINATION "${main_lib_dest}")
+install(TARGETS halsim_gui EXPORT halsim_gui)
