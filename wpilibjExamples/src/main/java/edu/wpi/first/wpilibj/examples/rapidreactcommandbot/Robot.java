@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.sim.DriveSim;
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.sim.IntakeSim;
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.sim.ShooterSim;
+import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.sim.StorageSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -22,6 +23,7 @@ public class Robot extends TimedRobot {
 
   private final RapidReactCommandBot m_robot = new RapidReactCommandBot();
   private ShooterSim m_shooterSim;
+  private StorageSim m_storageSim;
   private DriveSim m_driveSim;
   private IntakeSim m_intakeSim;
 
@@ -38,6 +40,7 @@ public class Robot extends TimedRobot {
   @Override
   public void simulationInit() {
     m_shooterSim = new ShooterSim();
+    m_storageSim = new StorageSim();
     m_driveSim = new DriveSim();
     m_intakeSim = new IntakeSim();
   }
@@ -47,6 +50,7 @@ public class Robot extends TimedRobot {
     m_driveSim.simulationPeriodic();
     m_intakeSim.simulationPeriodic();
     m_shooterSim.simulationPeriodic();
+    m_storageSim.simulationPeriodic();
   }
 
   /**

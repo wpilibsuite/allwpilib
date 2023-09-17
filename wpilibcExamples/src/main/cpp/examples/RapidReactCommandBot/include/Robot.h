@@ -13,6 +13,7 @@
 #include "sim/DriveSim.h"
 #include "sim/IntakeSim.h"
 #include "sim/ShooterSim.h"
+#include "sim/StorageSim.h"
 
 class Robot : public frc::TimedRobot {
  public:
@@ -34,5 +35,6 @@ class Robot : public frc::TimedRobot {
 
   DriveSim m_driveSim;
   ShooterSim m_shooterSim;
+  StorageSim m_storageSim;
   IntakeSim m_intakeSim;
 };
