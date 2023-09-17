@@ -6,8 +6,8 @@
 
 #include <algorithm>
 
-#include <fmt/format.h>
 #include <imgui.h>
+#include <wpi/StringExtras.h>
 
 #include "glass/Context.h"
 #include "glass/DataSource.h"
@@ -36,9 +36,7 @@ static float DisplayChannel(PowerDistributionModel& pdp, int channel) {
 
 void glass::DisplayPowerDistribution(PowerDistributionModel* model, int index) {
   char name[128];
-  const auto result =
-      fmt::format_to_n(name, sizeof(name) - 1, "PowerDistribution[{}]", index);
-  *result.out = '\0';
+  wpi::format_to_n_c_str(name, sizeof(name), "PowerDistribution[{}]", index);
 
   if (CollapsingHeader(name)) {
     // temperature

@@ -36,7 +36,7 @@
 
 #include <cerrno>
 
-#include <fmt/format.h>
+#include <wpi/StringExtras.h>
 
 using namespace wpi;
 
@@ -87,10 +87,8 @@ size_t TCPStream::send(const char* buffer, size_t len, Error* err) {
   }
   if (!result) {
     char Buffer[128];
-    const auto result =
-        fmt::format_to_n(Buffer, sizeof(Buffer) - 1,
-                         "Send() failed: WSA error={}\n", WSAGetLastError());
-    *result.out = '\0';
+    wpi::format_to_n_c_str(Buffer, sizeof(Buffer),
+                           "Send() failed: WSA error={}\n", WSAGetLastError());
 
     OutputDebugStringA(Buffer);
     *err = kConnectionReset;

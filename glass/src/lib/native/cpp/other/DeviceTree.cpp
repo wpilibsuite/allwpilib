@@ -6,8 +6,8 @@
 
 #include <cinttypes>
 
-#include <fmt/format.h>
 #include <imgui.h>
+#include <wpi/StringExtras.h>
 
 #include "glass/Context.h"
 #include "glass/ContextInternal.h"
@@ -55,13 +55,9 @@ bool glass::BeginDevice(const char* id, ImGuiTreeNodeFlags flags) {
   std::string& name = GetStorage().GetString("name");
   char label[128];
   if (name.empty()) {
-    const auto result =
-        fmt::format_to_n(label, sizeof(label) - 1, "{}###header", id);
-    *result.out = '\0';
+    wpi::format_to_n_c_str(label, sizeof(label), "{}###header", id);
   } else {
-    const auto result =
-        fmt::format_to_n(label, sizeof(label) - 1, "{}###header", name);
-    *result.out = '\0';
+    wpi::format_to_n_c_str(label, sizeof(label), "{}###header", name);
   }
 
   bool open = CollapsingHeader(label, flags);

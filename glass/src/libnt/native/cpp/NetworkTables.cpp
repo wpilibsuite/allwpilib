@@ -1181,13 +1181,10 @@ static void EmitValueTree(
     if (!child.valueChildren.empty()) {
       char label[64];
       if (child.valueChildrenMap) {
-        const auto result = fmt::format_to_n(label, sizeof(label) - 1,
-                                             "{{...}}##v_{}", child.name);
-        *result.out = '\0';
+        wpi::format_to_n_c_str(label, sizeof(label), "{{...}}##v_{}",
+                               child.name);
       } else {
-        const auto result = fmt::format_to_n(label, sizeof(label) - 1,
-                                             "[...]##v_{}", child.name);
-        *result.out = '\0';
+        wpi::format_to_n_c_str(label, sizeof(label), "[...]##v_{}", child.name);
       }
 
       if (TreeNodeEx(label, ImGuiTreeNodeFlags_SpanFullWidth)) {
@@ -1218,13 +1215,11 @@ static void EmitEntry(NetworkTablesModel* model,
 
     char label[64];
     if (entry.valueChildrenMap) {
-      const auto result = fmt::format_to_n(
-          label, sizeof(label) - 1, "{{...}}##v_{}", entry.info.name.c_str());
-      *result.out = '\0';
+      wpi::format_to_n_c_str(label, sizeof(label), "{{...}}##v_{}",
+                             entry.info.name.c_str());
     } else {
-      const auto result = fmt::format_to_n(
-          label, sizeof(label) - 1, "[...]##v_{}", entry.info.name.c_str());
-      *result.out = '\0';
+      wpi::format_to_n_c_str(label, sizeof(label), "[...]##v_{}",
+                             entry.info.name.c_str());
     }
 
     valueChildrenOpen =

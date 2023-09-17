@@ -4,8 +4,8 @@
 
 #include "glass/MainMenuBar.h"
 
-#include <fmt/format.h>
 #include <imgui.h>
+#include <wpi/StringExtras.h>
 #include <wpigui.h>
 
 #include "glass/Context.h"
@@ -51,10 +51,9 @@ void MainMenuBar::Display() {
 
 #if 0
   char str[64];
-  const auto result = fmt::format_to_n(
-      str, sizeof(str) - 1, "{:.3f} ms/frame ({:.1f} FPS)",
-      1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-  *result.out = '\0';
+  wpi::format_to_n_c_str(str, sizeof(str), "{:.3f} ms/frame ({:.1f} FPS)",
+                         1000.0f / ImGui::GetIO().Framerate,
+                         ImGui::GetIO().Framerate);
 
   ImGui::SameLine(ImGui::GetWindowWidth() - ImGui::CalcTextSize(str).x - 10);
   ImGui::Text("%s", str);

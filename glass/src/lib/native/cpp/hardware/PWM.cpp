@@ -4,8 +4,8 @@
 
 #include "glass/hardware/PWM.h"
 
-#include <fmt/format.h>
 #include <imgui.h>
+#include <wpi/StringExtras.h>
 
 #include "glass/Context.h"
 #include "glass/DataSource.h"
@@ -23,13 +23,9 @@ void glass::DisplayPWM(PWMModel* model, int index, bool outputsEnabled) {
   std::string& name = GetStorage().GetString("name");
   char label[128];
   if (!name.empty()) {
-    const auto result = fmt::format_to_n(label, sizeof(label) - 1,
-                                         "{} [{}]###name", name, index);
-    *result.out = '\0';
+    wpi::format_to_n_c_str(label, sizeof(label), "{} [{}]###name", name, index);
   } else {
-    const auto result =
-        fmt::format_to_n(label, sizeof(label) - 1, "PWM[{}]###name", index);
-    *result.out = '\0';
+    wpi::format_to_n_c_str(label, sizeof(label), "PWM[{}]###name", index);
   }
 
   int led = model->GetAddressableLED();

@@ -4,8 +4,8 @@
 
 #include <cstring>
 
-#include <fmt/format.h>
 #include <gtest/gtest.h>
+#include <wpi/StringExtras.h>
 
 #include "hal/HAL.h"
 #include "hal/simulation/DriverStationData.h"
@@ -121,19 +121,9 @@ TEST(DriverStationTest, EventInfo) {
   constexpr std::string_view eventName = "UnitTest";
   constexpr std::string_view gameData = "Insert game specific info here :D";
   HAL_MatchInfo info;
-
-  {
-    const auto result =
-        fmt::format_to_n(info.eventName, sizeof(info.eventName) - 1, eventName);
-    *result.out = '\0';
-  }
-  {
-    const auto result =
-        fmt::format_to_n(reinterpret_cast<char*>(info.gameSpecificMessage),
-                         sizeof(info.gameSpecificMessage) - 1, gameData);
-    *result.out = '\0';
-  }
-
+  wpi::format_to_n_c_str(info.eventName, sizeof(info.eventName), eventName);
+  wpi::format_to_n_c_str(reinterpret_cast<char*>(info.gameSpecificMessage),
+                         sizeof(info.gameSpecificMessage), gameData);
   info.gameSpecificMessageSize = gameData.size();
   info.matchNumber = 5;
   info.matchType = HAL_MatchType::HAL_kMatchType_qualification;

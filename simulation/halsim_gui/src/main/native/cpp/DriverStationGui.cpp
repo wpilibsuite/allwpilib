@@ -555,16 +555,8 @@ KeyboardJoystick::KeyboardJoystick(glass::Storage& storage, int index)
       m_axisStorage{storage.GetChildArray("axisConfig")},
       m_buttonKey{storage.GetIntArray("buttonKeys")},
       m_povStorage{storage.GetChildArray("povConfig")} {
-  {
-    const auto result =
-        fmt::format_to_n(m_name, sizeof(m_name) - 1, "Keyboard {}", index);
-    *result.out = '\0';
-  }
-  {
-    const auto result =
-        fmt::format_to_n(m_guid, sizeof(m_guid) - 1, "Keyboard{}", index);
-    *result.out = '\0';
-  }
+  wpi::format_to_n_c_str(m_name, sizeof(m_name), "Keyboard {}", index);
+  wpi::format_to_n_c_str(m_guid, sizeof(m_guid), "Keyboard{}", index);
 
   // init axes
   for (auto&& axisConfig : m_axisStorage) {
@@ -598,13 +590,10 @@ void KeyboardJoystick::EditKey(const char* label, int* key) {
 
   char editLabel[32];
   if (s_keyEdit == key) {
-    const auto result = fmt::format_to_n(editLabel, sizeof(editLabel) - 1,
-                                         "(press key)###edit");
-    *result.out = '\0';
+    wpi::format_to_n_c_str(editLabel, sizeof(editLabel), "(press key)###edit");
   } else {
-    const auto result = fmt::format_to_n(editLabel, sizeof(editLabel) - 1,
-                                         "{}###edit", GetKeyName(*key));
-    *result.out = '\0';
+    wpi::format_to_n_c_str(editLabel, sizeof(editLabel), "{}###edit",
+                           GetKeyName(*key));
   }
 
   if (ImGui::SmallButton(editLabel)) {
@@ -650,9 +639,7 @@ void KeyboardJoystick::SettingsDisplay() {
       m_axisConfig.emplace_back(*m_axisStorage.back());
     }
     for (int i = 0; i < m_axisCount; ++i) {
-      const auto result =
-          fmt::format_to_n(label, sizeof(label) - 1, "Axis {}", i);
-      *result.out = '\0';
+      wpi::format_to_n_c_str(label, sizeof(label), "Axis {}", i);
 
       if (ImGui::TreeNodeEx(label, ImGuiTreeNodeFlags_DefaultOpen)) {
         EditKey("Increase", &m_axisConfig[i].incKey);
@@ -686,9 +673,7 @@ void KeyboardJoystick::SettingsDisplay() {
       m_buttonKey.emplace_back(-1);
     }
     for (int i = 0; i < m_buttonCount; ++i) {
-      const auto result =
-          fmt::format_to_n(label, sizeof(label) - 1, "Button {}", i + 1);
-      *result.out = '\0';
+      wpi::format_to_n_c_str(label, sizeof(label), "Button {}", i + 1);
 
       EditKey(label, &m_buttonKey[i]);
     }
@@ -711,9 +696,7 @@ void KeyboardJoystick::SettingsDisplay() {
       m_povConfig.emplace_back(*m_povStorage.back());
     }
     for (int i = 0; i < m_povCount; ++i) {
-      const auto result =
-          fmt::format_to_n(label, sizeof(label) - 1, "POV {}", i);
-      *result.out = '\0';
+      wpi::format_to_n_c_str(label, sizeof(label), "POV {}", i);
 
       if (ImGui::TreeNodeEx(label, ImGuiTreeNodeFlags_DefaultOpen)) {
         EditKey("  0 deg", &m_povConfig[i].key0);
@@ -1200,9 +1183,7 @@ bool FMSSimModel::IsReadOnly() {
 
 static void DisplaySystemJoystick(SystemJoystick& joy, int i) {
   char label[64];
-  const auto result =
-      fmt::format_to_n(label, sizeof(label) - 1, "{}: {}", i, joy.GetName());
-  *result.out = '\0';
+  wpi::format_to_n_c_str(label, sizeof(label), "{}: {}", i, joy.GetName());
 
   // highlight if any buttons pressed
   bool anyButtonPressed = joy.IsAnyButtonPressed();
@@ -1236,9 +1217,7 @@ static void DisplaySystemJoysticks() {
     DisplaySystemJoystick(*joy, i + GLFW_JOYSTICK_LAST + 1);
     if (ImGui::BeginPopupContextItem()) {
       char buf[64];
-      const auto result =
-          fmt::format_to_n(buf, sizeof(buf) - 1, "{} Settings", joy->GetName());
-      *result.out = '\0';
+      wpi::format_to_n_c_str(buf, sizeof(buf), "{} Settings", joy->GetName());
 
       if (ImGui::MenuItem(buf)) {
         if (auto win = DriverStationGui::dsManager->GetWindow(buf)) {
@@ -1324,9 +1303,7 @@ static void DisplayJoysticks() {
       for (int j = 0; j < joy.data.axes.count; ++j) {
         if (source && source->axes[j]) {
           char label[64];
-          const auto result =
-              fmt::format_to_n(label, sizeof(label) - 1, "Axis[{}]", j);
-          *result.out = '\0';
+          wpi::format_to_n_c_str(label, sizeof(label), "Axis[{}]", j);
 
           ImGui::Selectable(label);
           source->axes[j]->EmitDrag();
@@ -1340,9 +1317,7 @@ static void DisplayJoysticks() {
       for (int j = 0; j < joy.data.povs.count; ++j) {
         if (source && source->povs[j]) {
           char label[64];
-          const auto result =
-              fmt::format_to_n(label, sizeof(label) - 1, "POVs[{}]", j);
-          *result.out = '\0';
+          wpi::format_to_n_c_str(label, sizeof(label), "POVs[{}]", j);
 
           ImGui::Selectable(label);
           source->povs[j]->EmitDrag();
@@ -1443,9 +1418,8 @@ void DriverStationGui::GlobalInit() {
     int i = 0;
     for (auto&& joy : gKeyboardJoysticks) {
       char label[64];
-      const auto result = fmt::format_to_n(label, sizeof(label) - 1,
-                                           "{} Settings", joy->GetName());
-      *result.out = '\0';
+      wpi::format_to_n_c_str(label, sizeof(label), "{} Settings",
+                             joy->GetName());
 
       if (auto win = dsManager->AddWindow(
               label, [j = joy.get()] { j->SettingsDisplay(); },

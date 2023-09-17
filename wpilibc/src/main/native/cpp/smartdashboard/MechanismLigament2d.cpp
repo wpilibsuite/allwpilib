@@ -4,7 +4,7 @@
 
 #include "frc/smartdashboard/MechanismLigament2d.h"
 
-#include <fmt/format.h>
+#include <wpi/StringExtras.h>
 
 using namespace frc;
 
@@ -37,10 +37,8 @@ void MechanismLigament2d::UpdateEntries(
 void MechanismLigament2d::SetColor(const Color8Bit& color) {
   std::scoped_lock lock(m_mutex);
 
-  const auto result =
-      fmt::format_to_n(m_color, sizeof(m_color) - 1, "#{:02X}{:02X}{:02X}",
-                       color.red, color.green, color.blue);
-  *result.out = '\0';
+  wpi::format_to_n_c_str(m_color, sizeof(m_color), "#{:02X}{:02X}{:02X}",
+                         color.red, color.green, color.blue);
 
   if (m_colorEntry) {
     m_colorEntry.Set(m_color);
