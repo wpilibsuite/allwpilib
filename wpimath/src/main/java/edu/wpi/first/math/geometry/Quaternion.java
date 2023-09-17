@@ -10,10 +10,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
-import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.numbers.N3;
 import java.util.Objects;
-import java.util.Random;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
@@ -56,17 +54,18 @@ public class Quaternion {
 
   /**
    * Adds another quaternion to this quaternion entrywise.
-   * 
+   *
    * @param other The other quaternion.
    * @return The quaternion sum.
    */
   public Quaternion plus(Quaternion other) {
-    return new Quaternion(getW() + other.getW(), getX() + other.getX(), getY() + other.getY(), getZ() + other.getZ());
+    return new Quaternion(
+        getW() + other.getW(), getX() + other.getX(), getY() + other.getY(), getZ() + other.getZ());
   }
 
   /**
    * Multiplies with a scalar.
-   * 
+   *
    * @param scalar The value to scale each component by.
    * @return The scaled quaternion.
    */
@@ -132,10 +131,10 @@ public class Quaternion {
   public int hashCode() {
     return Objects.hash(m_w, m_x, m_y, m_z);
   }
-  
+
   /**
    * Returns the conjugate of the quaternion.
-   * 
+   *
    * @return The conjugate quaternion.
    */
   public Quaternion conjugate() {
@@ -154,7 +153,7 @@ public class Quaternion {
 
   /**
    * Calculates the L2 norm of the quaternion.
-   * 
+   *
    * @return The L2 norm.
    */
   public double norm() {
@@ -177,7 +176,7 @@ public class Quaternion {
 
   /**
    * Rational power of a quaternion
-   * 
+   *
    * @param t the power to raise this quaternion to.
    * @return The quaternion power
    */
@@ -185,12 +184,11 @@ public class Quaternion {
     // q^t = e^(ln(q^t)) = e^(t * ln(q))
     return this.log().times(t).exp();
   }
-  
+
   /**
    * Matrix exponential of a quaternion
-   * 
-   * @param adjustment the "Twist" that will be applied to this quaternion.
    *
+   * @param adjustment the "Twist" that will be applied to this quaternion.
    * @return The quaternion product of exp(adjustment) * this
    */
   public Quaternion exp(Quaternion adjustment) {
@@ -199,7 +197,8 @@ public class Quaternion {
 
   /**
    * Matrix exponential of a quaternion
-   * source: https://en.wikipedia.org/wiki/Quaternion#Exponential,_logarithm,_and_power_functions
+   * 
+   * <p> source: https://en.wikipedia.org/wiki/Quaternion#Exponential,_logarithm,_and_power_functions
    *
    * @return The Matrix exponential of this quaternion.
    */
@@ -223,19 +222,18 @@ public class Quaternion {
     } else {
       axial_scalar = Math.sin(axial_magnitude) / axial_magnitude;
     }
-    
+
     // exp(s) * (cos(||v||) + v * sin(||v||) / ||v||)
     return new Quaternion(
-        cosine, 
-        getX() * axial_scalar, 
-        getY() * axial_scalar, 
-        getZ() * axial_scalar)
-      .times(scalar);
+        cosine * scalar,
+        getX() * axial_scalar * scalar,
+        getY() * axial_scalar * scalar,
+        getZ() * axial_scalar * scalar);
   }
 
   /**
-   * Inverse Matrix exponential (logarithm) of a quaternion.
-   * 
+   * Log operator of a quaternion.
+   *
    * @param end The quaternion to map this quaternion onto.
    * @return The "Twist" that maps this quaternion to the argument.
    */
@@ -245,21 +243,31 @@ public class Quaternion {
 
   /**
    * The Log operator of a general quaternion.
-   * 
-   * <p> source: https://en.wikipedia.org/wiki/Quaternion#Exponential,_logarithm,_and_power_functions <p>
-   * 
-   * <p> For unit quaternions, this is equivalent to @see Quaternion#toRotationVector(). <p>
-   * 
+   *
+   * <p>source: https://github.com/moble/quaternionic/blob/main/quaternionic/algebra.py#L233
+   *
+   * <p>For unit quaternions, this is equivalent to @see Quaternion#toRotationVector().
+   *
    * @return The logarithm of this quaternion.
    */
   public Quaternion log() {
-    var norm = norm();
-
-    var scalar = Math.log(norm);
-
-    var rvec = normalize().toRotationVector();
-
-    return new Quaternion(scalar, rvec.get(0, 0), rvec.get(1, 0), rvec.get(2, 0));
+    var vnorm = Math.sqrt(getX() * getX() + getY() * getY() + getZ() * getZ());
+    if (vnorm <= 1e-9 * Math.abs(getW())) {
+      if (getW() < 0) {
+        if (Math.abs(getW() + 1) > 1e-9) {
+          return new Quaternion(Math.log(-getW()), Math.PI, 0, 0);
+        } else {
+          return new Quaternion(0, Math.PI, 0, 0);
+        }
+      } else {
+        return new Quaternion(Math.log(getW()), 0, 0, 0);
+      }
+    } else {
+      var v = Math.atan2(vnorm, getW());
+      var f = v / vnorm;
+      return new Quaternion(
+          Math.log(getW() * getW() + vnorm * vnorm) / 2.0, f * getX(), f * getY(), f * getZ());
+    }
   }
 
   /**

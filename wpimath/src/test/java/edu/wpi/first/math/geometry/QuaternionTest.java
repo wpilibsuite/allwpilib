@@ -119,19 +119,79 @@ class QuaternionTest {
     var inv = q.inverse();
     var norm = q.norm();
 
-    assertEquals(q.getW() / (norm * norm), inv.getW());
-    assertEquals(-q.getX() / (norm * norm), inv.getX());
-    assertEquals(-q.getY() / (norm * norm), inv.getY());
-    assertEquals(-q.getZ() / (norm * norm), inv.getZ());
+    assertEquals(q.getW() / (norm * norm), inv.getW(), 1e-10);
+    assertEquals(-q.getX() / (norm * norm), inv.getX(), 1e-10);
+    assertEquals(-q.getY() / (norm * norm), inv.getY(), 1e-10);
+    assertEquals(-q.getZ() / (norm * norm), inv.getZ(), 1e-10);
+  }
+
+  @Test
+  void testNorm() {
+    var q = new Quaternion(3, 4, 12, 84);
+
+    // pythagorean triples (3, 4, 5), (5, 12, 13), (13, 84, 85)
+    assertEquals(q.norm(), 85, 1e-10);
   }
 
   @Test
   void testExponential() {
+    var q = new Quaternion(1.1, 2.2, 3.3, 4.4);
+    var q_exp =
+        new Quaternion(
+            2.81211398529184, -0.392521193481878, -0.588781790222817, -0.785042386963756);
 
+    QuaternionEquals(q_exp, q.exp());
   }
 
   @Test
   void testLogarithm() {
-    
+    var q = new Quaternion(1.1, 2.2, 3.3, 4.4);
+    var q_log =
+        new Quaternion(1.7959088706354, 0.515190292664085, 0.772785438996128, 1.03038058532817);
+
+    QuaternionEquals(q_log, q.log());
+
+    var zero = new Quaternion(0, 0, 0, 0);
+    var one = new Quaternion();
+    var i = new Quaternion(0, 1, 0, 0);
+    var j = new Quaternion(0, 0, 1, 0);
+    var k = new Quaternion(0, 0, 0, 1);
+
+    QuaternionEquals(zero, one.log());
+    QuaternionEquals(i.times(Math.PI / 2), i.log());
+    QuaternionEquals(j.times(Math.PI / 2), j.log());
+    QuaternionEquals(k.times(Math.PI / 2), k.log());
+    QuaternionEquals(i.times(Math.PI), one.times(-1).log());
+  }
+
+  @Test
+  void testLogarithmIsInverseOfExponential() {
+    var q = new Quaternion(1.1, 2.2, 3.3, 4.4);
+
+    // These operations are order-dependent: ln(exp(SO(3))) is not congruent to exp(ln(SO(3))).
+    // The correct order of operations is the latter, exp(ln(SO(3)))
+
+    var q_log_exp = q.log().exp();
+
+    QuaternionEquals(q, q_log_exp);
+
+    var start = new Quaternion(1, 2, 3, 4);
+    var expect = new Quaternion(5, 6, 7, 8);
+
+    var twist = start.log(expect);
+    var actual = start.exp(twist);
+
+    QuaternionEquals(expect, actual);
+  }
+
+  private void QuaternionEquals(Quaternion expect, Quaternion test) {
+    QuaternionEquals(expect, test, 1e-10);
+  }
+
+  private void QuaternionEquals(Quaternion expect, Quaternion test, double threshold) {
+    assertEquals(expect.getW(), test.getW(), threshold);
+    assertEquals(expect.getX(), test.getX(), threshold);
+    assertEquals(expect.getY(), test.getY(), threshold);
+    assertEquals(expect.getZ(), test.getZ(), threshold);
   }
 }
