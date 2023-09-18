@@ -278,7 +278,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
       Command command = iterator.next();
 
       if (isDisabled && !command.runsWhenDisabled()) {
-        cancel(command);
+        cancel(command, kNoInterruptor);
         continue;
       }
 
