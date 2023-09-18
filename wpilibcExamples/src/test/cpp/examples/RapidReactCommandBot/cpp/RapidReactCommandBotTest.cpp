@@ -7,9 +7,9 @@
 
 #include <frc/simulation/DriverStationSim.h>
 #include <frc/simulation/SimHooks.h>
-#include <hal/simulation/MockHooks.h>
 #include <frc/simulation/XboxControllerSim.h>
 #include <gtest/gtest.h>
+#include <hal/simulation/MockHooks.h>
 #include <units/angle.h>
 #include <units/length.h>
 #include <units/mass.h>
@@ -29,7 +29,8 @@ class RapidReactCommandBotTest : public testing::Test {
   ShooterSim m_shooterSim;
   StorageSim m_storageSim;
   IntakeSim m_intakeSim;
-  frc::sim::XboxControllerSim m_driverController{OIConstants::kDriverControllerPort};
+  frc::sim::XboxControllerSim m_driverController{
+      OIConstants::kDriverControllerPort};
 
  public:
   void SetUp() override {
@@ -78,7 +79,8 @@ TEST_F(RapidReactCommandBotTest, StorageFullTriggers) {
     // When empty, storage should run.
     m_storageSim.SetIsFull(false);
     frc::sim::StepTiming(60_ms);
-    EXPECT_NEAR(StorageConstants::kStorageDutyCycle, m_storageSim.GetMotor(), 1e-6);
+    EXPECT_NEAR(StorageConstants::kStorageDutyCycle, m_storageSim.GetMotor(),
+                1e-6);
   }
 
   {
@@ -91,7 +93,8 @@ TEST_F(RapidReactCommandBotTest, StorageFullTriggers) {
     frc::sim::StepTiming(60_ms);
     // Intake should be running
     EXPECT_TRUE(m_intakeSim.IsDeployed());
-    EXPECT_NEAR(IntakeConstants::kIntakeDutyCycle, m_intakeSim.GetMotor(), 1e-6);
+    EXPECT_NEAR(IntakeConstants::kIntakeDutyCycle, m_intakeSim.GetMotor(),
+                1e-6);
 
     // Storage is full
     m_storageSim.SetIsFull(true);

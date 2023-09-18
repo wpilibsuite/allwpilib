@@ -30,6 +30,7 @@ class RapidReactCommandBotTest {
   private Robot m_robot;
   private Thread m_thread;
 
+  @SuppressWarnings("PMD.SingularField")
   private ShooterSim m_shooterSim;
   private StorageSim m_storageSim;
   private DriveSim m_driveSim;
