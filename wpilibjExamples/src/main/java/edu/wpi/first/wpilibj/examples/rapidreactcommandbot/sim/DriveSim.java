@@ -43,4 +43,40 @@ public class DriveSim {
     m_leftEncoder.setDistance(m_drive.getLeftPositionMeters());
     m_rightEncoder.setDistance(-m_drive.getRightPositionMeters());
   }
+
+  /**
+   * Get the distance traveled by the left side of the drivetrain.
+   *
+   * @return distance in meters
+   */
+  public double getLeftDistance() {
+    return m_leftEncoder.getDistance();
+  }
+
+  /**
+   * Get the distance traveled by the right side of the drivetrain.
+   *
+   * @return distance in meters
+   */
+  public double getRightDistance() {
+    return m_rightEncoder.getDistance();
+  }
+
+  /**
+   * Get the duty cycle commanded to the left side of the drivetrain.
+   *
+   * @return duty cycle
+   */
+  public double getLeftDutyCycle() {
+    return m_leftLeader.getSpeed();
+  }
+
+  /**
+   * Get the duty cycle commanded to the right side of the drivetrain.
+   *
+   * @return duty cycle
+   */
+  public double getRightDutyCycle() {
+    return m_rightLeader.getSpeed();
+  }
 }

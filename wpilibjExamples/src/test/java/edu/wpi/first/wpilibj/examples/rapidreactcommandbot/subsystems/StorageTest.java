@@ -25,9 +25,10 @@ class StorageTest {
 
   @AfterEach
   void tearDown() {
+    CommandScheduler.getInstance().cancelAll();
+    CommandScheduler.getInstance().unregisterAllSubsystems();
     m_storage.close();
     m_sim.reset();
-    CommandScheduler.getInstance().cancelAll();
   }
 
   Storage m_storage; // real subsystem

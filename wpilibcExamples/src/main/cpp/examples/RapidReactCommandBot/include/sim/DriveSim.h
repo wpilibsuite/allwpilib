@@ -24,6 +24,26 @@ class DriveSim {
    */
   void SimulationPeriodic();
 
+  /**
+   * Get the duty cycle commanded to the left side of the drivetrain.
+   */
+  double GetLeftDutyCycle() const;
+
+  /**
+   * Get the duty cycle commanded to the right side of the drivetrain.
+   */
+  double GetRightDutyCycle() const;
+
+  /**
+   * Get the distance traveled by the left side of the drivetrain.
+   */
+  units::meter_t GetLeftDistance() const;
+
+  /**
+   * Get the distance traveled by the right side of the drivetrain.
+   */
+  units::meter_t GetRightDistance() const;
+
  private:
   frc::sim::PWMSim m_leftLeader{DriveConstants::kLeftMotor1Port};
   frc::sim::PWMSim m_leftFollower{DriveConstants::kLeftMotor2Port};
