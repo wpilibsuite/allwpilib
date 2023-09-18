@@ -6,7 +6,7 @@ package edu.wpi.first.wpilibj.templates.xrpeducational;
 
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.templates.xrpeducational.devices.XRPMotor;
+import edu.wpi.first.wpilibj.xrp.XRPMotor;
 
 public class XRPDrivetrain {
   private static final double kGearRatio =

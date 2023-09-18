@@ -891,7 +891,10 @@
     "foldername": "romireference",
     "gradlebase": "javaromi",
     "mainclass": "Main",
-    "commandversion": 2
+    "commandversion": 2,
+    "extravendordeps": [
+      "romi"
+    ]
   },
   {
     "name": "XRP Reference",
@@ -906,7 +909,10 @@
     "foldername": "xrpreference",
     "gradlebase": "javaxrp",
     "mainclass": "Main",
-    "commandversion": 2
+    "commandversion": 2,
+    "extravendordeps": [
+      "xrp"
+    ]
   },
   {
     "name": "Digital Communication Sample",

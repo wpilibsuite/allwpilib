@@ -82,7 +82,10 @@
     ],
     "foldername": "commandbased",
     "gradlebase": "cppromi",
-    "commandversion": 2
+    "commandversion": 2,
+    "extravendordeps": [
+      "romi"
+    ]
   },
   {
     "name": "Romi - Timed Robot",
@@ -93,6 +96,9 @@
     ],
     "foldername": "timed",
     "gradlebase": "cppromi",
-    "commandversion": 2
+    "commandversion": 2,
+    "extravendordeps": [
+      "romi"
+    ]
   }
 ]

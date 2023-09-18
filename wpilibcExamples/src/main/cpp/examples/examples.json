@@ -686,7 +686,10 @@
     ],
     "foldername": "RomiReference",
     "gradlebase": "cppromi",
-    "commandversion": 2
+    "commandversion": 2,
+    "extravendordeps": [
+      "romi"
+    ]
   },
   {
     "name": "StateSpaceFlywheel",
