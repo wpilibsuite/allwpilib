@@ -9,8 +9,8 @@
 #include <vector>
 
 #include <gtest/gtest.h>
-#include <wpi/raw_ostream.h>
 #include <wpi/SpanMatcher.h>
+#include <wpi/raw_ostream.h>
 
 #include "../TestPrinters.h"
 #include "net3/Message3.h"
