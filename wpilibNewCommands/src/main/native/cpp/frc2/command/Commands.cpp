@@ -5,6 +5,7 @@
 #include "frc2/command/Commands.h"
 
 #include "frc2/command/ConditionalCommand.h"
+#include "frc2/command/DeferredCommand.h"
 #include "frc2/command/FunctionalCommand.h"
 #include "frc2/command/InstantCommand.h"
 #include "frc2/command/ParallelCommandGroup.h"
@@ -80,6 +81,16 @@ CommandPtr cmd::Either(CommandPtr&& onTrue, CommandPtr&& onFalse,
   return ConditionalCommand(std::move(onTrue).Unwrap(),
                             std::move(onFalse).Unwrap(), std::move(selector))
       .ToPtr();
+}
+
+CommandPtr cmd::Defer(wpi::unique_function<Command*()> supplier,
+                      std::span<Subsystem* const> requirements) {
+  return DeferredCommand(std::move(supplier), requirements).ToPtr();
+}
+
+CommandPtr cmd::Defer(wpi::unique_function<Command*()> supplier,
+                      std::initializer_list<Subsystem*> requirements) {
+  return DeferredCommand(std::move(supplier), requirements).ToPtr();
 }
 
 CommandPtr cmd::Sequence(std::vector<CommandPtr>&& commands) {

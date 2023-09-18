@@ -8,6 +8,8 @@
 #include <functional>
 #include <utility>
 
+#include <wpi/FunctionExtras.h>
+
 #include "frc2/command/CommandScheduler.h"
 
 namespace frc2 {
