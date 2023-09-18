@@ -28,8 +28,10 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.WeakHashMap;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
@@ -57,6 +59,8 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
     return instance;
   }
 
+  private static final Optional<Command> kNoInterruptor = Optional.empty();
+
   private final Set<Command> m_composedCommands = Collections.newSetFromMap(new WeakHashMap<>());
 
   // A set of the currently-running commands.
@@ -79,14 +83,15 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
   // Lists of user-supplied actions to be executed on scheduling events for every command.
   private final List<Consumer<Command>> m_initActions = new ArrayList<>();
   private final List<Consumer<Command>> m_executeActions = new ArrayList<>();
-  private final List<Consumer<Command>> m_interruptActions = new ArrayList<>();
+  private final List<BiConsumer<Command, Optional<Command>>> m_interruptActions = new ArrayList<>();
   private final List<Consumer<Command>> m_finishActions = new ArrayList<>();
 
   // Flag and queues for avoiding ConcurrentModificationException if commands are
   // scheduled/canceled during run
   private boolean m_inRunLoop;
   private final Set<Command> m_toSchedule = new LinkedHashSet<>();
-  private final List<Command> m_toCancel = new ArrayList<>();
+  private final List<Command> m_toCancelCommands = new ArrayList<>();
+  private final List<Optional<Command>> m_toCancelInterruptors = new ArrayList<>();
 
   private final Watchdog m_watchdog = new Watchdog(TimedRobot.kDefaultPeriod, () -> {});
 
@@ -211,7 +216,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
       for (Subsystem requirement : requirements) {
         Command requiring = requiring(requirement);
         if (requiring != null) {
-          cancel(requiring);
+          cancel(requiring, Optional.of(command));
         }
       }
       initCommand(command, requirements);
@@ -272,8 +277,8 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
 
       if (!command.runsWhenDisabled() && RobotState.isDisabled()) {
         command.end(true);
-        for (Consumer<Command> action : m_interruptActions) {
-          action.accept(command);
+        for (BiConsumer<Command, Optional<Command>> action : m_interruptActions) {
+          action.accept(command, kNoInterruptor);
         }
         m_requirements.keySet().removeAll(command.getRequirements());
         iterator.remove();
@@ -304,12 +309,13 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
       schedule(command);
     }
 
-    for (Command command : m_toCancel) {
-      cancel(command);
+    for (int i = 0; i < m_toCancelCommands.size(); i++) {
+      cancel(m_toCancelCommands.get(i), m_toCancelInterruptors.get(i));
     }
 
     m_toSchedule.clear();
-    m_toCancel.clear();
+    m_toCancelCommands.clear();
+    m_toCancelInterruptors.clear();
 
     // Add default commands for un-required registered subsystems.
     for (Map.Entry<Subsystem, Command> subsystemCommand : m_subsystems.entrySet()) {
@@ -440,28 +446,42 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
    * @param commands the commands to cancel
    */
   public void cancel(Command... commands) {
+    for (Command command : commands) {
+      cancel(command, kNoInterruptor);
+    }
+  }
+
+  /**
+   * Cancels a command. The scheduler will only call {@link Command#end(boolean)} method of the
+   * canceled command with {@code true}, indicating they were canceled (as opposed to finishing
+   * normally).
+   *
+   * <p>Commands will be canceled regardless of {@link InterruptionBehavior interruption behavior}.
+   *
+   * @param command the command to cancel
+   * @param interruptor the interrupting command, if any
+   */
+  private void cancel(Command command, Optional<Command> interruptor) {
+    if (command == null) {
+      DriverStation.reportWarning("Tried to cancel a null command", true);
+      return;
+    }
     if (m_inRunLoop) {
-      m_toCancel.addAll(List.of(commands));
+      m_toCancelCommands.add(command);
+      m_toCancelInterruptors.add(interruptor);
+      return;
+    }
+    if (!isScheduled(command)) {
       return;
     }
 
-    for (Command command : commands) {
-      if (command == null) {
-        DriverStation.reportWarning("Tried to cancel a null command", true);
-        continue;
-      }
-      if (!isScheduled(command)) {
-        continue;
-      }
-
-      m_scheduledCommands.remove(command);
-      m_requirements.keySet().removeAll(command.getRequirements());
-      command.end(true);
-      for (Consumer<Command> action : m_interruptActions) {
-        action.accept(command);
-      }
-      m_watchdog.addEpoch(command.getName() + ".end(true)");
+    m_scheduledCommands.remove(command);
+    m_requirements.keySet().removeAll(command.getRequirements());
+    command.end(true);
+    for (BiConsumer<Command, Optional<Command>> action : m_interruptActions) {
+      action.accept(command, interruptor);
     }
+    m_watchdog.addEpoch(command.getName() + ".end(true)");
   }
 
   /** Cancels all commands that are currently scheduled. */
@@ -528,6 +548,19 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
    * @param action the action to perform
    */
   public void onCommandInterrupt(Consumer<Command> action) {
+    requireNonNullParam(action, "action", "onCommandInterrupt");
+    m_interruptActions.add((command, interruptor) -> action.accept(command));
+  }
+
+  /**
+   * Adds an action to perform on the interruption of any command by the scheduler. The action
+   * receives the interrupted command and an Optional containing the interrupting command, or
+   * Optional.empty() if it was not canceled by a command (e.g., by {@link
+   * CommandScheduler#cancel}).
+   *
+   * @param action the action to perform
+   */
+  public void onCommandInterrupt(BiConsumer<Command, Optional<Command>> action) {
     m_interruptActions.add(requireNonNullParam(action, "action", "onCommandInterrupt"));
   }
 
