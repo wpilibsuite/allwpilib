@@ -10,8 +10,8 @@
 
 #include <gtest/gtest.h>
 #include <wpi/raw_ostream.h>
+#include <wpi/SpanMatcher.h>
 
-#include "../SpanMatcher.h"
 #include "../TestPrinters.h"
 #include "net3/Message3.h"
 #include "net3/WireEncoder3.h"

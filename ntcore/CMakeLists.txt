@@ -90,6 +90,6 @@ target_link_libraries(ntcoredev ntcore)
 
 if (WITH_TESTS)
     wpilib_add_test(ntcore src/test/native/cpp)
-    target_include_directories(ntcore_test PRIVATE src/main/native/cpp)
+    target_include_directories(ntcore_test PRIVATE src/main/native/cpp ../wpiutil/src/test/native/include)
     target_link_libraries(ntcore_test ntcore gmock_main)
 endif()
