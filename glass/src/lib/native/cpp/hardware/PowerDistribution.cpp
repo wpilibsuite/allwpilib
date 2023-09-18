@@ -5,9 +5,9 @@
 #include "glass/hardware/PowerDistribution.h"
 
 #include <algorithm>
-#include <cstdio>
 
 #include <imgui.h>
+#include <wpi/StringExtras.h>
 
 #include "glass/Context.h"
 #include "glass/DataSource.h"
@@ -36,7 +36,8 @@ static float DisplayChannel(PowerDistributionModel& pdp, int channel) {
 
 void glass::DisplayPowerDistribution(PowerDistributionModel* model, int index) {
   char name[128];
-  std::snprintf(name, sizeof(name), "PowerDistribution[%d]", index);
+  wpi::format_to_n_c_str(name, sizeof(name), "PowerDistribution[{}]", index);
+
   if (CollapsingHeader(name)) {
     // temperature
     if (auto tempData = model->GetTemperatureData()) {
