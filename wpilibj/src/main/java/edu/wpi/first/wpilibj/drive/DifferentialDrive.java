@@ -142,6 +142,7 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
 
   @Override
   public void close() {
+    super.close();
     SendableRegistry.remove(this);
   }
 

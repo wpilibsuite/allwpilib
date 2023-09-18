@@ -18,7 +18,7 @@ import java.util.Set;
  *
  * <p>The subclass should call feed() whenever the motor value is updated.
  */
-public abstract class MotorSafety {
+public abstract class MotorSafety implements AutoCloseable {
   private static final double kDefaultSafetyExpiration = 0.1;
 
   private double m_expiration = kDefaultSafetyExpiration;
@@ -188,4 +188,16 @@ public abstract class MotorSafety {
   public abstract void stopMotor();
 
   public abstract String getDescription();
+
+  @Override
+  public void close() {
+    synchronized (m_listMutex) {
+      m_instanceList.remove(this);
+      // If this was the last object, shut down the monitor thread
+      if (m_instanceList.isEmpty()) {
+        m_safetyThread.interrupt();
+        m_safetyThread = null;
+      }
+    }
+  }
 }
