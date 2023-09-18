@@ -17,7 +17,7 @@
     {
       "groupId": "edu.wpi.first.romiVendordep",
       "artifactId": "romiVendordep-cpp",
-      "version": "vendordep",
+      "version": "wpilib",
       "libName": "romiVendordep",
       "headerClassifier": "headers",
       "sourcesClassifier": "sources",

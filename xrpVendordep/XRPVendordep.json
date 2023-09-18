@@ -17,7 +17,7 @@
     {
       "groupId": "edu.wpi.first.xrpVendordep",
       "artifactId": "xrpVendordep-cpp",
-      "version": "vendordep",
+      "version": "wpilib",
       "libName": "xrpVendordep",
       "headerClassifier": "headers",
       "sourcesClassifier": "sources",
