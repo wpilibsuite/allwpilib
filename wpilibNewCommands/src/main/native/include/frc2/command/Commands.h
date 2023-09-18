@@ -142,6 +142,26 @@ CommandPtr Select(std::function<Key()> selector,
   return SelectCommand(std::move(selector), std::move(vec)).ToPtr();
 }
 
+/**
+ * Constructs a command that schedules the command returned from the supplier
+ * when initialized, and ends when it is no longer scheduled. The supplier is
+ * called when the command is initialized.
+ *
+ * @param supplier the command supplier
+ */
+[[nodiscard]]
+CommandPtr DeferredProxy(wpi::unique_function<Command*()> supplier);
+
+/**
+ * Constructs a command that schedules the command returned from the supplier
+ * when initialized, and ends when it is no longer scheduled. The supplier is
+ * called when the command is initialized.
+ *
+ * @param supplier the command supplier
+ */
+[[nodiscard]]
+CommandPtr DeferredProxy(wpi::unique_function<CommandPtr()> supplier);
+
 // Command Groups
 
 namespace impl {

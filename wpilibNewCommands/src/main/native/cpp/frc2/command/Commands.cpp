@@ -11,6 +11,7 @@
 #include "frc2/command/ParallelDeadlineGroup.h"
 #include "frc2/command/ParallelRaceGroup.h"
 #include "frc2/command/PrintCommand.h"
+#include "frc2/command/ProxyCommand.h"
 #include "frc2/command/RunCommand.h"
 #include "frc2/command/SequentialCommandGroup.h"
 #include "frc2/command/WaitCommand.h"
@@ -56,6 +57,14 @@ CommandPtr cmd::RunEnd(std::function<void()> run, std::function<void()> end,
 
 CommandPtr cmd::Print(std::string_view msg) {
   return PrintCommand(msg).ToPtr();
+}
+
+CommandPtr cmd::DeferredProxy(wpi::unique_function<Command*()> supplier) {
+  return ProxyCommand(std::move(supplier)).ToPtr();
+}
+
+CommandPtr cmd::DeferredProxy(wpi::unique_function<CommandPtr()> supplier) {
+  return ProxyCommand(std::move(supplier)).ToPtr();
 }
 
 CommandPtr cmd::Wait(units::second_t duration) {
