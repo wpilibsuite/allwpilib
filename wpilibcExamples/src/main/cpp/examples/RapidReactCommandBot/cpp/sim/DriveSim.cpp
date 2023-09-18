@@ -26,3 +26,19 @@ void DriveSim::SimulationPeriodic() {
   m_leftEncoder.SetDistance(m_drive.GetLeftPosition().value());
   m_rightEncoder.SetDistance(-m_drive.GetRightPosition().value());
 }
+
+double DriveSim::GetLeftDutyCycle() const {
+  return m_leftLeader.GetSpeed();
+}
+
+double DriveSim::GetRightDutyCycle() const {
+  return m_rightLeader.GetSpeed();
+}
+
+units::meter_t DriveSim::GetLeftDistance() const {
+  return units::meter_t{m_leftEncoder.GetDistance()};
+}
+
+units::meter_t DriveSim::GetRightDistance() const {
+  return units::meter_t{m_rightEncoder.GetDistance()};
+}

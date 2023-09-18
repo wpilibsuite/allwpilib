@@ -32,6 +32,8 @@ TEST_F(DriveTest, DriveDistance) {
   for (size_t i = 0; i < 150; i++) {
     frc2::CommandScheduler::GetInstance().Run();
     sim.SimulationPeriodic();
+    EXPECT_NEAR(AutoConstants::kDriveSpeed, sim.GetLeftDutyCycle(), 1e-6);
+    EXPECT_NEAR(AutoConstants::kDriveSpeed, sim.GetRightDutyCycle(), 1e-6);
   }
   EXPECT_NEAR(AutoConstants::kDriveDistance.value(),
               drive.GetLeftEncoder().value(), 0.2);
