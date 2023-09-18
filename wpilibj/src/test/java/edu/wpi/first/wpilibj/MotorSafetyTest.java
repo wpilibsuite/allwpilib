@@ -4,17 +4,18 @@
 
 package edu.wpi.first.wpilibj;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj.simulation.SimHooks;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.ResourceLock;
-
-import java.util.concurrent.atomic.AtomicInteger;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @ResourceLock("timing")
 class MotorSafetyTest {
@@ -25,20 +26,22 @@ class MotorSafetyTest {
   void setUp() {
     HAL.initialize(500, 0);
     m_counter = new AtomicInteger();
-    m_motorSafety = new MotorSafety() {
-      {
-        this.setSafetyEnabled(true);
-      }
-      @Override
-      public void stopMotor() {
-        m_counter.incrementAndGet();
-      }
+    m_motorSafety =
+        new MotorSafety() {
+          {
+            this.setSafetyEnabled(true);
+          }
 
-      @Override
-      public String getDescription() {
-        return "test";
-      }
-    };
+          @Override
+          public void stopMotor() {
+            m_counter.incrementAndGet();
+          }
+
+          @Override
+          public String getDescription() {
+            return "test";
+          }
+        };
   }
 
   @AfterEach
@@ -83,4 +86,3 @@ class MotorSafetyTest {
     }
   }
 }
-

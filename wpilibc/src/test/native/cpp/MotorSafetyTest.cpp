@@ -4,27 +4,24 @@
 
 #include "frc/MotorSafety.h"  // NOLINT(build/include_order)
 
+#include <thread>
+
 #include <gtest/gtest.h>
+
 #include "frc/simulation/DriverStationSim.h"
 #include "frc/simulation/SimHooks.h"
 
 using namespace frc;
 
 class MockMotorSafety : public MotorSafety {
-public:
-  MockMotorSafety() {
-    SetSafetyEnabled(true);
-  }
+ public:
+  MockMotorSafety() { SetSafetyEnabled(true); }
 
   int counter{0};
 
-  void StopMotor() override {
-    counter++;
-  }
+  void StopMotor() override { counter++; }
 
-  std::string GetDescription() const override {
-    return "test";
-  }
+  std::string GetDescription() const override { return "test"; }
 };
 
 TEST(MotorSafetyTest, Monitor) {
@@ -42,6 +39,8 @@ TEST(MotorSafetyTest, Monitor) {
     frc::sim::StepTiming(0.02_s);
     frc::sim::DriverStationSim::NotifyNewData();
   }
+
+  std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
   EXPECT_FALSE(motorSafety.IsAlive());
   EXPECT_EQ(1, motorSafety.counter);
