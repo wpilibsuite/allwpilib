@@ -5,7 +5,7 @@
 #include "commands/ReleaseHatch.h"
 
 ReleaseHatch::ReleaseHatch(HatchSubsystem* subsystem) : m_hatch(subsystem) {
-  AddRequirements({subsystem});
+  AddRequirements(subsystem);
 }
 
 void ReleaseHatch::Initialize() {

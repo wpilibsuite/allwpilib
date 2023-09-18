@@ -29,36 +29,16 @@ CommandPtr cmd::Idle() {
 }
 
 CommandPtr cmd::RunOnce(std::function<void()> action,
-                        std::initializer_list<Subsystem*> requirements) {
+                        Requirements requirements) {
   return InstantCommand(std::move(action), requirements).ToPtr();
 }
 
-CommandPtr cmd::RunOnce(std::function<void()> action,
-                        std::span<Subsystem* const> requirements) {
-  return InstantCommand(std::move(action), requirements).ToPtr();
-}
-
-CommandPtr cmd::Run(std::function<void()> action,
-                    std::initializer_list<Subsystem*> requirements) {
-  return RunCommand(std::move(action), requirements).ToPtr();
-}
-
-CommandPtr cmd::Run(std::function<void()> action,
-                    std::span<Subsystem* const> requirements) {
+CommandPtr cmd::Run(std::function<void()> action, Requirements requirements) {
   return RunCommand(std::move(action), requirements).ToPtr();
 }
 
 CommandPtr cmd::StartEnd(std::function<void()> start, std::function<void()> end,
-                         std::initializer_list<Subsystem*> requirements) {
-  return FunctionalCommand(
-             std::move(start), [] {},
-             [end = std::move(end)](bool interrupted) { end(); },
-             [] { return false; }, requirements)
-      .ToPtr();
-}
-
-CommandPtr cmd::StartEnd(std::function<void()> start, std::function<void()> end,
-                         std::span<Subsystem* const> requirements) {
+                         Requirements requirements) {
   return FunctionalCommand(
              std::move(start), [] {},
              [end = std::move(end)](bool interrupted) { end(); },
@@ -67,15 +47,7 @@ CommandPtr cmd::StartEnd(std::function<void()> start, std::function<void()> end,
 }
 
 CommandPtr cmd::RunEnd(std::function<void()> run, std::function<void()> end,
-                       std::initializer_list<Subsystem*> requirements) {
-  return FunctionalCommand([] {}, std::move(run),
-                           [end = std::move(end)](bool interrupted) { end(); },
-                           [] { return false; }, requirements)
-      .ToPtr();
-}
-
-CommandPtr cmd::RunEnd(std::function<void()> run, std::function<void()> end,
-                       std::span<Subsystem* const> requirements) {
+                       Requirements requirements) {
   return FunctionalCommand([] {}, std::move(run),
                            [end = std::move(end)](bool interrupted) { end(); },
                            [] { return false; }, requirements)
