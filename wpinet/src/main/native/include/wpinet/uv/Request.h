@@ -9,6 +9,7 @@
 
 #include <functional>
 #include <memory>
+#include <utility>
 
 #include "wpinet/uv/Error.h"
 
