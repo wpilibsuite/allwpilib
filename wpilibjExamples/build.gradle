@@ -11,20 +11,6 @@ ext {
 
 apply from: "${rootDir}/shared/opencv.gradle"
 
-test {
-    useJUnitPlatform()
-    systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
-    testLogging {
-        events "failed"
-        exceptionFormat "full"
-    }
-    finalizedBy jacocoTestReport
-}
-
-if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxarm32') || project.hasProperty('onlylinuxarm64') || project.hasProperty('onlywindowsarm64')) {
-    test.enabled = false
-}
-
 dependencies {
     implementation project(':wpilibj')
     implementation project(':apriltag')
@@ -197,6 +183,10 @@ model {
                                         includeTestsMatching("edu.wpi.first.wpilibj.examples.${entry.foldername}.*")
                                         setFailOnNoMatchingTests(false)
                                     }
+                                    test.filter {
+                                        excludeTestsMatching("edu.wpi.first.wpilibj.examples.${entry.foldername}.*")
+                                        setFailOnNoMatchingTests(false)
+                                    }
                                     testTask.classpath = sourceSets.test.runtimeClasspath
                                     testTask.dependsOn it.tasks.install
 
@@ -209,6 +199,11 @@ model {
                                     testTask.environment 'LD_LIBRARY_PATH', filePath
                                     testTask.environment 'DYLD_LIBRARY_PATH', filePath
                                     testTask.workingDir filePath
+
+                                    if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxarm32') || project.hasProperty('onlylinuxarm64') || project.hasProperty('onlywindowsarm64')) {
+                                        testTask.enabled = false
+                                    }
+                                    test.dependsOn(testTask)
                                 }
                             }
 
