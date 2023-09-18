@@ -13,8 +13,9 @@
 #include <utility>
 #include <vector>
 
-#include "TestPrinters.h"
-#include "gmock/gmock.h"
+#include <gmock/gmock.h>
+
+#include "wpi/TestPrinters.h"
 
 namespace wpi {
 

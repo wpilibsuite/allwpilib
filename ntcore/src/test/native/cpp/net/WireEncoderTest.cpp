@@ -8,10 +8,10 @@
 #include <vector>
 
 #include <gtest/gtest.h>
+#include <wpi/SpanMatcher.h>
 #include <wpi/json.h>
 #include <wpi/raw_ostream.h>
 
-#include "../SpanMatcher.h"
 #include "../TestPrinters.h"
 #include "Handle.h"
 #include "PubSubOptions.h"
