@@ -471,6 +471,49 @@ TEST_F(WebSocketServerTest, ReceiveFragmentSeparate) {
   ASSERT_EQ(gotCallback, 3);
 }
 
+// Control frames can happen in the middle of a fragmented message
+TEST_F(WebSocketServerTest, ReceiveFragmentWithControl) {
+  int gotCallback = 0;
+  int gotPongCallback = 0;
+
+  std::vector<uint8_t> data(4, 0x03);
+  std::vector<uint8_t> data2(4, 0x04);
+  std::vector<uint8_t> data3(4, 0x05);
+  std::vector<uint8_t> data4(4, 0x06);
+  std::vector<uint8_t> combData{data};
+  combData.insert(combData.end(), data2.begin(), data2.end());
+  combData.insert(combData.end(), data4.begin(), data4.end());
+
+  setupWebSocket = [&] {
+    ws->binary.connect([&](auto inData, bool fin) {
+      ASSERT_TRUE(gotPongCallback);
+      ++gotCallback;
+      ws->Terminate();
+      ASSERT_TRUE(fin);
+      std::vector<uint8_t> recvData{inData.begin(), inData.end()};
+      ASSERT_EQ(combData, recvData);
+    });
+    ws->pong.connect([&](auto inData) {
+      ASSERT_FALSE(gotCallback);
+      ++gotPongCallback;
+    });
+  };
+
+  auto message = BuildMessage(0x02, false, true, data);
+  auto message2 = BuildMessage(0x00, false, true, data2);
+  auto message3 = BuildMessage(0x0a, true, true, data3);
+  auto message4 = BuildMessage(0x00, true, true, data4);
+  resp.headersComplete.connect([&](bool) {
+    clientPipe->Write({{message}, {message2}, {message3}, {message4}},
+                      [&](auto bufs, uv::Error) {});
+  });
+
+  loop->Run();
+
+  ASSERT_EQ(gotCallback, 1);
+  ASSERT_EQ(gotPongCallback, 1);
+}
+
 //
 // Maximum message size is limited.
 //
