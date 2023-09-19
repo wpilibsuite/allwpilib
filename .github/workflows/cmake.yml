@@ -15,11 +15,11 @@ jobs:
           - os: ubuntu-22.04
             name: Linux
             container: wpilib/roborio-cross-ubuntu:2023-22.04
-            flags: "-DWITH_EXAMPLES=ON"
+            flags: "-DCMAKE_BUILD_TYPE=Release -DWITH_EXAMPLES=ON"
           - os: macOS-12
             name: macOS
             container: ""
-            flags: "-DWITH_JAVA=OFF -DWITH_EXAMPLES=ON"
+            flags: "-DCMAKE_BUILD_TYPE=Release -DWITH_JAVA=OFF -DWITH_EXAMPLES=ON"
 
     name: "Build - ${{ matrix.name }}"
     runs-on: ${{ matrix.os }}
@@ -75,7 +75,7 @@ jobs:
         run: python -m pip install jinja2
 
       - name: configure
-        run: cmake -S . -B build -G "Ninja Multi-Config"  -DWITH_JAVA=OFF -DWITH_EXAMPLES=ON -DWITH_TESTS=OFF -DUSE_SYSTEM_FMTLIB=ON -DUSE_SYSTEM_LIBUV=ON -DUSE_SYSTEM_EIGEN=ON -DCMAKE_TOOLCHAIN_FILE=${{ runner.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_INSTALL_OPTIONS=--clean-after-build -DVCPKG_TARGET_TRIPLET=x64-windows-release -DVCPKG_HOST_TRIPLET=x64-windows-release
+        run: cmake -S . -B build -G "Ninja Multi-Config"  -DCMAKE_BUILD_TYPE=Release -DWITH_JAVA=OFF -DWITH_EXAMPLES=ON -DWITH_TESTS=OFF -DUSE_SYSTEM_FMTLIB=ON -DUSE_SYSTEM_LIBUV=ON -DUSE_SYSTEM_EIGEN=ON -DCMAKE_TOOLCHAIN_FILE=${{ runner.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_INSTALL_OPTIONS=--clean-after-build -DVCPKG_TARGET_TRIPLET=x64-windows-release -DVCPKG_HOST_TRIPLET=x64-windows-release
 
       - name: build
         working-directory: build
