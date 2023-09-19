@@ -13,6 +13,12 @@ macro(wpilib_target_warnings target)
         target_compile_options(${target} PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-Wno-deprecated-anon-enum-enum-conversion>)
     endif()
 
+    # Suppress warning "enumeration types with a fixed underlying type are a
+    # Clang extension"
+    if(APPLE)
+      target_compile_options(${target} PRIVATE $<$<COMPILE_LANGUAGE:C>:-Wno-fixed-enum-extension>)
+    endif()
+
     # Compress debug info with GCC
     if ((${CMAKE_BUILD_TYPE} STREQUAL "Debug" OR
          ${CMAKE_BUILD_TYPE} STREQUAL "RelWithDebInfo") AND
