@@ -17,6 +17,8 @@
 #include <variant>
 #include <vector>
 
+#include <wpi/json_fwd.h>
+
 #include "networktables/NetworkTableValue.h"
 #include "ntcore_c.h"
 #include "ntcore_cpp_types.h"
@@ -24,7 +26,6 @@
 namespace wpi {
 template <typename T>
 class SmallVectorImpl;
-class json;
 }  // namespace wpi
 
 namespace wpi::log {

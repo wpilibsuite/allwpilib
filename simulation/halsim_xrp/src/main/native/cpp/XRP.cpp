@@ -7,6 +7,7 @@
 #include <fmt/format.h>
 #include <wpi/Endian.h>
 #include <wpi/MathExtras.h>
+#include <wpi/json.h>
 
 using namespace wpilibxrp;
 

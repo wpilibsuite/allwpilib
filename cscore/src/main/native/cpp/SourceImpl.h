@@ -14,6 +14,7 @@
 
 #include <wpi/Logger.h>
 #include <wpi/condition_variable.h>
+#include <wpi/json_fwd.h>
 #include <wpi/mutex.h>
 
 #include "Frame.h"
@@ -21,10 +22,6 @@
 #include "Image.h"
 #include "PropertyContainer.h"
 #include "cscore_cpp.h"
-
-namespace wpi {
-class json;
-}  // namespace wpi
 
 namespace cs {
 

@@ -6,10 +6,7 @@
 
 #include <Eigen/Core>
 #include <wpi/SymbolExports.h>
-
-namespace wpi {
-class json;
-}  // namespace wpi
+#include <wpi/json_fwd.h>
 
 namespace frc {
 

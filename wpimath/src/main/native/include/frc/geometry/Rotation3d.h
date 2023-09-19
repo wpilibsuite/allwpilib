@@ -6,14 +6,11 @@
 
 #include <Eigen/Core>
 #include <wpi/SymbolExports.h>
+#include <wpi/json_fwd.h>
 
 #include "frc/geometry/Quaternion.h"
 #include "frc/geometry/Rotation2d.h"
 #include "units/angle.h"
-
-namespace wpi {
-class json;
-}  // namespace wpi
 
 namespace frc {
 
