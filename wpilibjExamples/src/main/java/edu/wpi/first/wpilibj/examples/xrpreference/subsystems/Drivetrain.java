@@ -7,8 +7,8 @@ package edu.wpi.first.wpilibj.examples.xrpreference.subsystems;
 import edu.wpi.first.wpilibj.BuiltInAccelerometer;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.examples.xrpreference.devices.XRPMotor;
-import edu.wpi.first.wpilibj.examples.xrpreference.sensors.XRPGyro;
+import edu.wpi.first.wpilibj.xrp.XRPGyro;
+import edu.wpi.first.wpilibj.xrp.XRPMotor;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Drivetrain extends SubsystemBase {
