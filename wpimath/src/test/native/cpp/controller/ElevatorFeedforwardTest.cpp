@@ -11,14 +11,12 @@
 #include "units/length.h"
 #include "units/time.h"
 
-namespace frc {
+static constexpr auto Ks = 0.5_V;
+static constexpr auto Kv = 1.5_V * 1_s / 1_m;
+static constexpr auto Ka = 2_V * 1_s * 1_s / 1_m;
+static constexpr auto Kg = 1_V;
 
 TEST(ElevatorFeedforwardTest, Calculate) {
-  auto Ks = 0.5_V;
-  auto Kv = 1.5_V * 1_s / 1_m;
-  auto Ka = 2_V * 1_s * 1_s / 1_m;
-  auto Kg = 1_V;
-
   frc::ElevatorFeedforward elevatorFF{Ks, Kg, Kv, Ka};
   EXPECT_NEAR(elevatorFF.Calculate(0_m / 1_s).value(), Kg.value(), 0.002);
   EXPECT_NEAR(elevatorFF.Calculate(2_m / 1_s).value(), 4.5, 0.002);
@@ -29,11 +27,6 @@ TEST(ElevatorFeedforwardTest, Calculate) {
 }
 
 TEST(ElevatorFeedforwardTest, AchievableVelocity) {
-  auto Ks = 0.5_V;
-  auto Kv = 1.5_V * 1_s / 1_m;
-  auto Ka = 2_V * 1_s * 1_s / 1_m;
-  auto Kg = 1_V;
-
   frc::ElevatorFeedforward elevatorFF{Ks, Kg, Kv, Ka};
   EXPECT_NEAR(elevatorFF.MaxAchievableVelocity(11_V, 1_m / 1_s / 1_s).value(),
               5, 0.002);
@@ -42,12 +35,7 @@ TEST(ElevatorFeedforwardTest, AchievableVelocity) {
 }
 
 TEST(ElevatorFeedforwardTest, AchievableAcceleration) {
-  auto Ks = 0.5_V;
-  auto Kv = 1.5_V * 1_s / 1_m;
-  auto Ka = 2_V * 1_s * 1_s / 1_m;
-  auto Kg = 1_V;
-
-  frc::ElevatorFeedforward elevatorFF{Ks, Kg, Kv, Ka};  //
+  frc::ElevatorFeedforward elevatorFF{Ks, Kg, Kv, Ka};
   EXPECT_NEAR(elevatorFF.MaxAchievableAcceleration(12_V, 2_m / 1_s).value(),
               3.75, 0.002);
   EXPECT_NEAR(elevatorFF.MaxAchievableAcceleration(12_V, -2_m / 1_s).value(),
@@ -57,5 +45,3 @@ TEST(ElevatorFeedforwardTest, AchievableAcceleration) {
   EXPECT_NEAR(elevatorFF.MinAchievableAcceleration(12_V, -2_m / 1_s).value(),
               -4.75, 0.002);
 }
-
-}  // namespace frc
