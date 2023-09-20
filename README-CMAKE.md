@@ -12,6 +12,7 @@ WPILib is normally built with Gradle, however for some systems, such as Linux ba
 * halsim
 * wpigui
 * wpimath
+* wpilibNewCommands
 
 By default, all libraries except for the HAL and WPILib get built with a default CMake setup. The libraries are built as shared libraries, and include the JNI libraries as well as building the Java JARs.
 
