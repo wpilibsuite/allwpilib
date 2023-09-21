@@ -20,6 +20,11 @@
 
 namespace nt {
 
+#if __GNUC__ >= 13
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
+
 /**
  * A network table entry value.
  * @ingroup ntcore_cpp_api
@@ -641,8 +646,12 @@ class Value final {
  private:
   NT_Value m_val = {};
   std::shared_ptr<void> m_storage;
-  size_t m_size;
+  size_t m_size = 0;
 };
+
+#if __GNUC__ >= 13
+#pragma GCC diagnostic pop
+#endif
 
 bool operator==(const Value& lhs, const Value& rhs);
 

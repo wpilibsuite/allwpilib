@@ -396,7 +396,14 @@ TEST_F(WebSocketServerTest, ReceiveFragment) {
   std::vector<uint8_t> data2(4, 0x04);
   std::vector<uint8_t> data3(4, 0x05);
   std::vector<uint8_t> combData{data};
+#if __GNUC__ == 11
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-overread"
+#endif  // __GNUC__ == 11
   combData.insert(combData.end(), data2.begin(), data2.end());
+#if __GNUC__ == 11
+#pragma GCC diagnostic pop
+#endif  // __GNUC__ == 11
   combData.insert(combData.end(), data3.begin(), data3.end());
 
   setupWebSocket = [&] {
@@ -481,7 +488,14 @@ TEST_F(WebSocketServerTest, ReceiveFragmentWithControl) {
   std::vector<uint8_t> data3(4, 0x05);
   std::vector<uint8_t> data4(4, 0x06);
   std::vector<uint8_t> combData{data};
+#if __GNUC__ == 11
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-overread"
+#endif  // __GNUC__ == 11
   combData.insert(combData.end(), data2.begin(), data2.end());
+#if __GNUC__ == 11
+#pragma GCC diagnostic pop
+#endif  // __GNUC__ == 11
   combData.insert(combData.end(), data4.begin(), data4.end());
 
   setupWebSocket = [&] {

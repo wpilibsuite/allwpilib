@@ -18,20 +18,24 @@ SwerveModule::SwerveModule(int driveMotorChannel, int turningMotorChannel,
     : m_driveMotor(driveMotorChannel),
       m_turningMotor(turningMotorChannel),
       m_driveEncoder(driveEncoderPorts[0], driveEncoderPorts[1]),
-      m_turningEncoder(turningEncoderPorts[0], turningEncoderPorts[1]),
-      m_reverseDriveEncoder(driveEncoderReversed),
-      m_reverseTurningEncoder(turningEncoderReversed) {
+      m_turningEncoder(turningEncoderPorts[0], turningEncoderPorts[1]) {
   // Set the distance per pulse for the drive encoder. We can simply use the
   // distance traveled for one rotation of the wheel divided by the encoder
   // resolution.
   m_driveEncoder.SetDistancePerPulse(
       ModuleConstants::kDriveEncoderDistancePerPulse);
 
+  // Set whether drive encoder should be reversed or not
+  m_driveEncoder.SetReverseDirection(driveEncoderReversed);
+
   // Set the distance (in this case, angle) per pulse for the turning encoder.
   // This is the the angle through an entire rotation (2 * std::numbers::pi)
   // divided by the encoder resolution.
   m_turningEncoder.SetDistancePerPulse(
       ModuleConstants::kTurningEncoderDistancePerPulse);
+
+  // Set whether turning encoder should be reversed or not
+  m_turningEncoder.SetReverseDirection(turningEncoderReversed);
 
   // Limit the PID Controller's input range between -pi and pi and set the input
   // to be continuous.
