@@ -9,10 +9,10 @@
 #include <string_view>
 
 #include <fmt/format.h>
+#include <wpi/MemoryBuffer.h>
 #include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
 #include <wpi/fs.h>
-#include <wpi/raw_istream.h>
 #include <wpinet/MimeTypes.h>
 #include <wpinet/UrlParser.h>
 #include <wpinet/raw_uv_ostream.h>
@@ -125,8 +125,9 @@ void HALSimHttpConnection::SendFileResponse(int code, std::string_view codeText,
   }
 
   // open file
-  wpi::raw_fd_istream is{filename, ec, true};
-  if (ec) {
+  std::unique_ptr<wpi::MemoryBuffer> fileBuffer =
+      wpi::MemoryBuffer::GetFile(filename, ec);
+  if (fileBuffer == nullptr || ec) {
     MySendError(404, "error opening file");
     return;
   }
@@ -142,16 +143,7 @@ void HALSimHttpConnection::SendFileResponse(int code, std::string_view codeText,
   wpi::SmallVector<uv::Buffer, 4> bodyData;
   wpi::raw_uv_ostream bodyOs{bodyData, 4096};
 
-  std::string fileBuf;
-  size_t oldSize = 0;
-
-  while (fileBuf.size() < size) {
-    oldSize = fileBuf.size();
-    fileBuf.resize(oldSize + 1);
-    is.read(&(*fileBuf.begin()) + oldSize, 1);
-  }
-
-  bodyOs << fileBuf;
+  bodyOs << fileBuffer->GetBuffer();
 
   SendData(bodyOs.bufs(), false);
   if (!m_keepAlive) {

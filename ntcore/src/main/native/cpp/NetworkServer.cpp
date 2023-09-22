@@ -11,11 +11,11 @@
 #include <system_error>
 #include <vector>
 
+#include <wpi/MemoryBuffer.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
 #include <wpi/fs.h>
 #include <wpi/mutex.h>
-#include <wpi/raw_istream.h>
 #include <wpi/raw_ostream.h>
 #include <wpinet/HttpUtil.h>
 #include <wpinet/HttpWebSocketServerConnection.h>
@@ -310,9 +310,9 @@ void NetworkServer::HandleLocal() {
 
 void NetworkServer::LoadPersistent() {
   std::error_code ec;
-  auto size = fs::file_size(m_persistentFilename, ec);
-  wpi::raw_fd_istream is{m_persistentFilename, ec};
-  if (ec.value() != 0) {
+  std::unique_ptr<wpi::MemoryBuffer> fileBuffer =
+      wpi::MemoryBuffer::GetFile(m_persistentFilename, ec);
+  if (fileBuffer == nullptr || ec.value() != 0) {
     INFO(
         "could not open persistent file '{}': {} "
         "(this can be ignored if you aren't expecting persistent values)",
@@ -325,12 +325,8 @@ void NetworkServer::LoadPersistent() {
     }
     return;
   }
-  is.readinto(m_persistentData, size);
+  m_persistentData = std::string{fileBuffer->begin(), fileBuffer->end()};
   DEBUG4("read data: {}", m_persistentData);
-  if (is.has_error()) {
-    WARN("error reading persistent file");
-    return;
-  }
 }
 
 void NetworkServer::SavePersistent(std::string_view filename,
