@@ -18,13 +18,13 @@ class XRPReflectanceSensor {
 
   /**
    * Return the reflectance value of the left sensor.
-   * Value ranges from 0.0 (white) to 1.0 (black) 
+   * Value ranges from 0.0 (white) to 1.0 (black)
    */
   double GetLeftReflectanceValue();
 
   /**
    * Return the reflectance value of the right sensor.
-   * Value ranges from 0.0 (white) to 1.0 (black) 
+   * Value ranges from 0.0 (white) to 1.0 (black)
    */
   double GetRightReflectanceValue();
 
