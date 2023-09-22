@@ -165,6 +165,7 @@ public class Quaternion {
   /**
    * Returns the elementwise product of two quaternions.
    *
+   * @param other The other quaternion.
    * @return The dot product of two quaternions.
    */
   public double dot(final Quaternion other) {
@@ -352,6 +353,7 @@ public class Quaternion {
    *
    * <p>source: wpimath/algorithms.md
    *
+   * @param rvec The rotation vector.
    * @return The quaternion representation of this rotation vector.
    */
   public static Quaternion fromRotationVector(Vector<N3> rvec) {
