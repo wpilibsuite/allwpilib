@@ -116,8 +116,9 @@ class WPILIB_DLLEXPORT Quaternion {
    * Matrix exponential of a quaternion.
    *
    * source: wpimath/algorithms.md
-   * 
-   *  If this quaternion is in 𝖘𝖔(3) and you are looking for an element of SO(3), use FromRotationVector
+   *
+   *  If this quaternion is in 𝖘𝖔(3) and you are looking for an element of
+   * SO(3), use FromRotationVector
    */
   Quaternion Exp() const;
 
@@ -133,7 +134,8 @@ class WPILIB_DLLEXPORT Quaternion {
    *
    * source:  wpimath/algorithms.md
    *
-   * If this quaternion is in SO(3) and you are looking for an element of 𝖘𝖔(3), use ToRotationVector
+   * If this quaternion is in SO(3) and you are looking for an element of 𝖘𝖔(3),
+   * use ToRotationVector
    */
   Quaternion Log() const;
 
@@ -168,10 +170,10 @@ class WPILIB_DLLEXPORT Quaternion {
    * Returns the quaternion representation of this rotation vector.
    *
    * This is also the exp operator of 𝖘𝖔(3).
-   * 
+   *
    * source: wpimath/algorithms.md
    */
-  static Quaternion FromRotationVector(const Eigen::Vector3d &rvec);
+  static Quaternion FromRotationVector(const Eigen::Vector3d& rvec);
 
  private:
   // Scalar r in versor form

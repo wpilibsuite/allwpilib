@@ -352,7 +352,7 @@ When calculating a\_z:
 
 Note that this reuses the cos(a\_y) cos(a\_z) and cos(a\_y) sin(a\_z) terms needed to calculate a\_z.
 
-## Quaternion Exponential 
+## Quaternion Exponential
 
 We will take it as given that a quaternion has scalar and vector components `𝑞 = s + 𝑣⃗`, with vector component 𝑣⃗ consisting of a unit vector and magnitude `𝑣⃗ = θ * v̂`.
 
@@ -389,7 +389,7 @@ We will take it as a given that for a given quaternion of the form `𝑞 = s + �
 
 Additionally, `exp(log(𝑞)) = q` for a given value of `log(𝑞)`. There are multiple solutions to `log(𝑞)` caused by the imaginary axes in 𝑣⃗, discussed here: https://en.wikipedia.org/wiki/Complex_logarithm
 
-We will demonstrate the principal solution of `log(𝑞)` satisfying `exp(log(𝑞)) = q`. 
+We will demonstrate the principal solution of `log(𝑞)` satisfying `exp(log(𝑞)) = q`.
 This being `log(𝑞) = log(||𝑞||) + atan2(θ, s) / θ * 𝑣⃗`, is the principal solution to `log(𝑞)` because the function `atan2(θ, s)` returns the principal value corresponding to its arguments.
 
 Proof: `log(𝑞) = log(||𝑞||) + atan2(θ, s) / θ * 𝑣⃗` satisfies `exp(log(𝑞)) = q`.
@@ -455,5 +455,5 @@ s = cos(θ / 2)
 r̂ = 𝑣⃗ / ||𝑣⃗||
 
 𝑟⃗ = θ * r̂
-𝑟⃗ = 2 * atan2(||𝑣⃗||, s) / ||𝑣⃗|| * 𝑣⃗ 
+𝑟⃗ = 2 * atan2(||𝑣⃗||, s) / ||𝑣⃗|| * 𝑣⃗
 ```
