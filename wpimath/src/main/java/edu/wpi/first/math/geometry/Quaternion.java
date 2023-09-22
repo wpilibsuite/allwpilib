@@ -251,7 +251,7 @@ public class Quaternion {
       // Taylor series of sin(θ) / θ near θ = 0: 1 − θ²/6 + θ⁴/120 + O(n⁶)
       var axial_magnitude_sq = axial_magnitude * axial_magnitude;
       var axial_magnitude_sq_sq = axial_magnitude_sq * axial_magnitude_sq;
-      axial_scalar = 1 - axial_magnitude_sq / 6 + axial_magnitude_sq_sq / 120;
+      axial_scalar = 1.0 - axial_magnitude_sq / 6.0 + axial_magnitude_sq_sq / 120.0;
     } else {
       axial_scalar = Math.sin(axial_magnitude) / axial_magnitude;
     }
@@ -365,7 +365,7 @@ public class Quaternion {
 
     if (theta < 1e-9) {
       // taylor series expansion of sin(θ/2) / θ = 1/2 - θ²/48 + O(θ⁴)
-      axial_scalar = 1 / 2 - theta * theta / 48;
+      axial_scalar = 1.0 / 2.0 - theta * theta / 48.0;
     } else {
       axial_scalar = Math.sin(theta / 2) / theta;
     }
