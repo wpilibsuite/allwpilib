@@ -208,4 +208,21 @@ TEST(QuaternionTest, LogarithmAndExponentialInverse) {
   QUATERNION_NEAR(expect, actual);
 }
 
+TEST(QuaternionTest, DotProduct) {
+    Quaternion q{1.1, 2.2, 3.3, 4.4};
+    Quaternion p{5.5, 6.6, 7.7, 8.8};
+
+    EXPECT_NEAR(
+        q.W() * p.W() + q.X() * p.X() + q.Y() * p.Y() + q.Z() * p.Z(),
+        q.Dot(p), 1e-9);
+}
+
+TEST(QuaternionTest, DotProductAsEquality) {
+    Quaternion q{1.1, 2.2, 3.3, 4.4};
+    auto q_conj = q.Conjugate();
+
+    EXPECT_NEAR(q.Dot(q), q.Norm() * q.Norm(), 1e-9);
+    EXPECT_GT(std::abs(q.Dot(q_conj) - q.Norm() * q_conj.Norm()), 1e-9);
+}
+
 #undef QUATERNION_NEAR

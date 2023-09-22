@@ -368,7 +368,7 @@ public class Quaternion {
       axial_scalar = Math.sin(theta / 2) / theta;
     }
 
-    return Quaternion(
+    return new Quaternion(
         cos,
         axial_scalar * rvec.get(0, 0),
         axial_scalar * rvec.get(1, 0),
