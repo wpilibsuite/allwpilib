@@ -77,9 +77,13 @@ jobs:
       - name: configure
         run: cmake -S . -B build -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DWITH_JAVA=OFF -DWITH_EXAMPLES=ON -DUSE_SYSTEM_FMTLIB=ON -DUSE_SYSTEM_LIBUV=ON -DUSE_SYSTEM_EIGEN=ON -DCMAKE_TOOLCHAIN_FILE=${{ runner.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_INSTALL_OPTIONS=--clean-after-build -DVCPKG_TARGET_TRIPLET=x64-windows-release -DVCPKG_HOST_TRIPLET=x64-windows-release
 
+      - name: build wpimath
+        working-directory: build
+        run: cmake --build . --parallel 1 --target wpimath/all
       - name: build
         working-directory: build
-        run: cmake --build . --parallel 1
+        run: cmake --build . --parallel $(nproc)
+
       - name: test
         working-directory: build
         run: ctest --output-on-failure
