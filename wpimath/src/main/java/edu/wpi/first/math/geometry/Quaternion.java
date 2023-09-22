@@ -365,7 +365,7 @@ public class Quaternion {
 
     if (theta < 1e-9) {
       // taylor series expansion of sin(θ/2) / θ = 1/2 - θ²/48 + O(θ⁴)
-      axial_scalar = 1 / 2 - theta * theta / 48;
+      axial_scalar = 1.0 / 2.0 - theta * theta / 48.0;
     } else {
       axial_scalar = Math.sin(theta / 2) / theta;
     }
