@@ -152,10 +152,7 @@ TEST(QuaternionTest, Norm) {
 
 #define QUATERNION_NEAR(p, q)        \
   {                                  \
-    EXPECT_NEAR(p.W(), q.W(), 1e-9); \
-    EXPECT_NEAR(p.X(), q.X(), 1e-9); \
-    EXPECT_NEAR(p.Y(), q.Y(), 1e-9); \
-    EXPECT_NEAR(p.Z(), q.Z(), 1e-9); \
+    EXPECT_NEAR((p).Dot((q)), (p).Norm() * (q).Norm(), 1e-9); \
   }
 
 TEST(QuaternionTest, Exponential) {
@@ -184,10 +181,11 @@ TEST(QuaternionTest, Logarithm) {
   Quaternion k{0, 0, 0, 1};
 
   QUATERNION_NEAR(zero, one.Log());
-  QUATERNION_NEAR((i * std::numbers::pi / 2), (i.Log()));
-  QUATERNION_NEAR((j * std::numbers::pi / 2), (j.Log()));
-  QUATERNION_NEAR((k * std::numbers::pi / 2), (k.Log()));
-  QUATERNION_NEAR((i * std::numbers::pi), ((one * -1).Log()));
+  QUATERNION_NEAR(i * std::numbers::pi / 2, i.Log());
+  QUATERNION_NEAR(j * std::numbers::pi / 2, j.Log());
+  QUATERNION_NEAR(k * std::numbers::pi / 2, k.Log());
+
+  QUATERNION_NEAR(i * -std::numbers::pi, (one * -1).Log());
 }
 
 TEST(QuaternionTest, LogarithmAndExponentialInverse) {

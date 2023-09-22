@@ -190,7 +190,7 @@ class QuaternionTest {
 
     var k = new Quaternion(0, 0, 0, 1);
     QuaternionEquals(k.times(Math.PI / 2), k.log());
-    QuaternionEquals(i.times(Math.PI), one.times(-1).log());
+    QuaternionEquals(i.times(-Math.PI), one.times(-1).log());
   }
 
   @Test

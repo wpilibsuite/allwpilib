@@ -67,7 +67,7 @@ public class Quaternion {
    * Subtracts another quaternion from this quaternion entrywise.
    *
    * @param other The other quaternion.
-   * @return The quaternion sum.
+   * @return The quaternion difference.
    */
   public Quaternion minus(Quaternion other) {
     return new Quaternion(
@@ -163,13 +163,22 @@ public class Quaternion {
   }
 
   /**
+   * Returns the elementwise product of two quaternions.
+   * 
+   * @return The dot product of two quaternions.
+   */
+  public double dot(final Quaternion other) {
+    return getW() * other.getW() + getX() * other.getX() + getY() * other.getY() + getZ() * other.getZ();
+  }
+
+  /**
    * Returns the inverse of the quaternion.
    *
    * @return The inverse quaternion.
    */
   public Quaternion inverse() {
     var norm = norm();
-    return conjugate().times(1 / (norm * norm));
+    return conjugate().divide(norm * norm);
   }
 
   /**
@@ -178,7 +187,7 @@ public class Quaternion {
    * @return The L2 norm.
    */
   public double norm() {
-    return Math.sqrt(getW() * getW() + getX() * getX() + getY() * getY() + getZ() * getZ());
+    return Math.sqrt(dot(this));
   }
 
   /**
@@ -219,24 +228,22 @@ public class Quaternion {
   /**
    * Matrix exponential of a quaternion.
    *
-   * <p>source: https://en.wikipedia.org/wiki/Quaternion#Exponential,_logarithm,_and_power_functions
+   * <p>source: wpimath/algorithms.md
+   * 
+   * <p> If this quaternion is in 𝖘𝖔(3) and you are looking for an element of SO(3), use {@link fromRotationVector}
    *
    * @return The Matrix exponential of this quaternion.
    */
   public Quaternion exp() {
-    // q = s(scalar) + v(vector)
-    // exp(s)
-    var scalar = Math.exp(m_w);
+    var scalar = Math.exp(getW());
 
-    // ||v||
     var axial_magnitude = Math.sqrt(getX() * getX() + getY() * getY() + getZ() * getZ());
-    // cos(||v||)
     var cosine = Math.cos(axial_magnitude);
 
     double axial_scalar;
 
     if (axial_magnitude < 1e-9) {
-      // Taylor series of sin(x)/x near x=0: 1 − x²/6 + x⁴/120 + O(n⁶)
+      // Taylor series of sin(θ) / θ near θ = 0: 1 − θ²/6 + θ⁴/120 + O(n⁶)
       var axial_magnitude_sq = axial_magnitude * axial_magnitude;
       var axial_magnitude_sq_sq = axial_magnitude_sq * axial_magnitude_sq;
       axial_scalar = 1 - axial_magnitude_sq / 6 + axial_magnitude_sq_sq / 120;
@@ -244,7 +251,6 @@ public class Quaternion {
       axial_scalar = Math.sin(axial_magnitude) / axial_magnitude;
     }
 
-    // exp(s) * (cos(||v||) + v * sin(||v||) / ||v||)
     return new Quaternion(
         cosine * scalar,
         getX() * axial_scalar * scalar,
@@ -265,30 +271,33 @@ public class Quaternion {
   /**
    * The Log operator of a general quaternion.
    *
-   * <p>source: https://github.com/moble/quaternionic/blob/main/quaternionic/algebra.py#L233
+   * <p>source:  wpimath/algorithms.md
    *
-   * <p>For unit quaternions, this is equivalent to @see Quaternion#toRotationVector().
+   * <p>If this quaternion is in SO(3) and you are looking for an element of 𝖘𝖔(3), use {@link toRotationVector}
    *
    * @return The logarithm of this quaternion.
    */
   public Quaternion log() {
-    var vnorm = Math.sqrt(getX() * getX() + getY() * getY() + getZ() * getZ());
-    if (vnorm <= 1e-9 * Math.abs(getW())) {
-      if (getW() < 0) {
-        if (Math.abs(getW() + 1) > 1e-9) {
-          return new Quaternion(Math.log(-getW()), Math.PI, 0, 0);
-        } else {
-          return new Quaternion(0, Math.PI, 0, 0);
-        }
-      } else {
-        return new Quaternion(Math.log(getW()), 0, 0, 0);
-      }
-    } else {
-      var v = Math.atan2(vnorm, getW());
-      var f = v / vnorm;
-      return new Quaternion(
-          Math.log(getW() * getW() + vnorm * vnorm) / 2.0, f * getX(), f * getY(), f * getZ());
+    var scalar = Math.log(norm());
+
+    var v_norm = Math.sqrt(getX() * getX() + getY() * getY() + getZ() * getZ());
+
+    var s_norm = getW() / norm();
+
+    if (Math.abs(s_norm + 1) < 1e-9) {
+      return new Quaternion(scalar, -Math.PI, 0, 0);
     }
+
+    double v_scalar;
+
+    if (v_norm < 1e-9) {
+      // Taylor series expansion of atan2(y / x) / y around y = 0 => 1/x - y²/3*x³ + O(y⁴)
+      v_scalar = 1.0 / getW() -1.0 / 3.0 * v_norm * v_norm / (getW() * getW() * getW());
+    } else {
+      v_scalar = Math.atan2(v_norm, getW()) / v_norm;
+    }
+
+    return new Quaternion(scalar, v_scalar * getX(), v_scalar * getY(), v_scalar * getZ());
   }
 
   /**
@@ -329,6 +338,32 @@ public class Quaternion {
   @JsonProperty(value = "Z")
   public double getZ() {
     return m_z;
+  }
+
+  /**
+   * Returns the quaternion representation of this rotation vector.
+   *
+   * <p>This is also the exp operator of 𝖘𝖔(3).
+   * 
+   * <p>source: wpimath/algorithms.md
+   *
+   * @return The quaternion representation of this rotation vector.
+   */
+  public static Quaternion fromRotationVector(Vector<N3> rvec) {
+    double theta = rvec.norm();
+
+    double cos = Math.cos(theta / 2);
+
+    double axial_scalar;
+
+    if (theta < 1e-9) {
+      // taylor series expansion of sin(θ/2) / θ = 1/2 - θ²/48 + O(θ⁴)
+      axial_scalar = 1/2 - theta * theta / 48;
+    } else {
+      axial_scalar = Math.sin(theta / 2) / theta;
+    }
+
+    return Quaternion(cos, axial_scalar * rvec.get(0, 0), axial_scalar * rvec.get(1, 0), axial_scalar * rvec.get(2, 0));
   }
 
   /**
