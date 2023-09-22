@@ -120,7 +120,7 @@ Quaternion Quaternion::Exp() const {
     // Taylor series of sin(x)/x near x=0: 1 − x²/6 + x⁴/120 + O(n⁶)
     double axial_magnitude_sq = axial_magnitude * axial_magnitude;
     double axial_magnitude_sq_sq = axial_magnitude_sq * axial_magnitude_sq;
-    axial_scalar = 1 - axial_magnitude_sq / 6 + axial_magnitude_sq_sq / 120;
+    axial_scalar = 1.0 - axial_magnitude_sq / 6.0 + axial_magnitude_sq_sq / 120.0;
   } else {
     axial_scalar = std::sin(axial_magnitude) / axial_magnitude;
   }
@@ -207,7 +207,7 @@ Quaternion Quaternion::FromRotationVector(const Eigen::Vector3d& rvec) {
   if (theta < 1e-9) {
     // taylor series expansion of sin(θ/2) / θ around θ = 0 = 1/2 - θ²/48 +
     // O(θ⁴)
-    axial_scalar = 1 / 2 - theta * theta / 48;
+    axial_scalar = 1.0 / 2.0 - theta * theta / 48.0;
   } else {
     axial_scalar = std::sin(theta / 2) / theta;
   }
