@@ -73,7 +73,7 @@ std::optional<uint64_t> WireDecoder3::SimpleValueReader::Read64(
 std::optional<double> WireDecoder3::SimpleValueReader::ReadDouble(
     std::span<const uint8_t>* in) {
   if (auto val = Read64(in)) {
-    return wpi::BitsToDouble(val.value());
+    return wpi::bit_cast<double>(val.value());
   } else {
     return std::nullopt;
   }
