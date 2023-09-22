@@ -12,6 +12,7 @@
 #include <HALSimBaseWebSocketConnection.h>
 #include <WSProviderContainer.h>
 #include <WSProvider_SimDevice.h>
+#include <wpi/json_fwd.h>
 #include <wpinet/uv/Async.h>
 #include <wpinet/uv/Buffer.h>
 #include <wpinet/uv/Loop.h>
@@ -19,10 +20,6 @@
 #include <wpinet/uv/Udp.h>
 
 #include "XRP.h"
-
-namespace wpi {
-class json;
-}  // namespace wpi
 
 namespace wpilibxrp {
 

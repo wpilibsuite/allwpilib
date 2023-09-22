@@ -11,9 +11,10 @@
 #include <string>
 #include <string_view>
 
+#include <wpi/json_fwd.h>
+
 namespace wpi {
 class Logger;
-class json;
 }  // namespace wpi
 
 namespace nt {

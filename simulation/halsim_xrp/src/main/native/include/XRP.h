@@ -9,7 +9,7 @@
 #include <span>
 #include <string>
 
-#include <wpi/json.h>
+#include <wpi/json_fwd.h>
 #include <wpinet/raw_uv_ostream.h>
 
 #define XRP_TAG_MOTOR 0x12

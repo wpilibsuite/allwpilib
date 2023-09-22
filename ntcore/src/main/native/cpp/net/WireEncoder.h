@@ -9,8 +9,9 @@
 #include <string>
 #include <string_view>
 
+#include <wpi/json_fwd.h>
+
 namespace wpi {
-class json;
 class raw_ostream;
 }  // namespace wpi
 
