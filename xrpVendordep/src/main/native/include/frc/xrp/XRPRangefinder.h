@@ -6,6 +6,8 @@
 
 #include <frc/AnalogInput.h>
 
+#include <units/length.h>
+
 namespace frc {
 
 /**
@@ -17,10 +19,15 @@ class XRPRangefinder {
   XRPRangefinder() {}
 
   /**
+   * Return the measured distance in meters (from the units library)
+   */
+  units::meter_t GetDistance();
+
+  /**
    * Return the measured distance in metres. Distances further
    * than 4 metres will be reported as 4 metres.
    */
-  double GetDistanceMetres();
+  double GetDistanceMeters();
 
   /**
    * Return the measured distance in inches.
