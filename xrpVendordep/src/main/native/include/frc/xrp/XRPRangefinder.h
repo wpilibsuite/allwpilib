@@ -16,8 +16,6 @@ namespace frc {
  */
 class XRPRangefinder {
  public:
-  XRPRangefinder() = default;
-
   /**
    * Return the measured distance in meters. Distances further than 4 meters
    * will be reported as 4 meters.

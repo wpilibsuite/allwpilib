@@ -14,8 +14,6 @@ namespace frc {
  */
 class XRPReflectanceSensor {
  public:
-  XRPReflectanceSensor() = default;
-
   /**
    * Return the reflectance value of the left sensor.
    * Value ranges from 0.0 (white) to 1.0 (black)
