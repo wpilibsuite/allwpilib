@@ -164,11 +164,14 @@ public class Quaternion {
 
   /**
    * Returns the elementwise product of two quaternions.
-   * 
+   *
    * @return The dot product of two quaternions.
    */
   public double dot(final Quaternion other) {
-    return getW() * other.getW() + getX() * other.getX() + getY() * other.getY() + getZ() * other.getZ();
+    return getW() * other.getW()
+        + getX() * other.getX()
+        + getY() * other.getY()
+        + getZ() * other.getZ();
   }
 
   /**
@@ -229,8 +232,9 @@ public class Quaternion {
    * Matrix exponential of a quaternion.
    *
    * <p>source: wpimath/algorithms.md
-   * 
-   * <p> If this quaternion is in 𝖘𝖔(3) and you are looking for an element of SO(3), use {@link fromRotationVector}
+   *
+   * <p>If this quaternion is in 𝖘𝖔(3) and you are looking for an element of SO(3), use {@link
+   * fromRotationVector}
    *
    * @return The Matrix exponential of this quaternion.
    */
@@ -271,9 +275,10 @@ public class Quaternion {
   /**
    * The Log operator of a general quaternion.
    *
-   * <p>source:  wpimath/algorithms.md
+   * <p>source: wpimath/algorithms.md
    *
-   * <p>If this quaternion is in SO(3) and you are looking for an element of 𝖘𝖔(3), use {@link toRotationVector}
+   * <p>If this quaternion is in SO(3) and you are looking for an element of 𝖘𝖔(3), use {@link
+   * toRotationVector}
    *
    * @return The logarithm of this quaternion.
    */
@@ -292,7 +297,7 @@ public class Quaternion {
 
     if (v_norm < 1e-9) {
       // Taylor series expansion of atan2(y / x) / y around y = 0 => 1/x - y²/3*x³ + O(y⁴)
-      v_scalar = 1.0 / getW() -1.0 / 3.0 * v_norm * v_norm / (getW() * getW() * getW());
+      v_scalar = 1.0 / getW() - 1.0 / 3.0 * v_norm * v_norm / (getW() * getW() * getW());
     } else {
       v_scalar = Math.atan2(v_norm, getW()) / v_norm;
     }
@@ -344,7 +349,7 @@ public class Quaternion {
    * Returns the quaternion representation of this rotation vector.
    *
    * <p>This is also the exp operator of 𝖘𝖔(3).
-   * 
+   *
    * <p>source: wpimath/algorithms.md
    *
    * @return The quaternion representation of this rotation vector.
@@ -358,12 +363,16 @@ public class Quaternion {
 
     if (theta < 1e-9) {
       // taylor series expansion of sin(θ/2) / θ = 1/2 - θ²/48 + O(θ⁴)
-      axial_scalar = 1/2 - theta * theta / 48;
+      axial_scalar = 1 / 2 - theta * theta / 48;
     } else {
       axial_scalar = Math.sin(theta / 2) / theta;
     }
 
-    return Quaternion(cos, axial_scalar * rvec.get(0, 0), axial_scalar * rvec.get(1, 0), axial_scalar * rvec.get(2, 0));
+    return Quaternion(
+        cos,
+        axial_scalar * rvec.get(0, 0),
+        axial_scalar * rvec.get(1, 0),
+        axial_scalar * rvec.get(2, 0));
   }
 
   /**
