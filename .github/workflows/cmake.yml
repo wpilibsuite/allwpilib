@@ -80,3 +80,6 @@ jobs:
       - name: build
         working-directory: build
         run: cmake --build . --parallel 1
+      - name: test
+        working-directory: build
+        run: ctest --output-on-failure
