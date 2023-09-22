@@ -6,14 +6,6 @@
 
 using namespace frc;
 
-units::meter_t XRPRangefinder::GetDistance() {
-  return units::meter_t{GetDistanceMeters()};
-}
-
-double XRPRangefinder::GetDistanceMeters() {
-  return (m_rangefinder.GetVoltage() / 5.0) * 4.0;
-}
-
-double XRPRangefinder::GetDistanceInches() {
-  return GetDistanceMeters() * 39.3701;
+units::meter_t XRPRangefinder::GetDistance() const {
+  return units::meter_t{m_rangefinder.GetVoltage() / 5.0 * 4.0};
 }

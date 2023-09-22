@@ -16,23 +16,13 @@ namespace frc {
  */
 class XRPRangefinder {
  public:
-  XRPRangefinder() {}
+  XRPRangefinder() = default;
 
   /**
-   * Return the measured distance in meters (from the units library)
+   * Return the measured distance in meters. Distances further than 4 meters
+   * will be reported as 4 meters.
    */
-  units::meter_t GetDistance();
-
-  /**
-   * Return the measured distance in metres. Distances further
-   * than 4 metres will be reported as 4 metres.
-   */
-  double GetDistanceMeters();
-
-  /**
-   * Return the measured distance in inches.
-   */
-  double GetDistanceInches();
+  units::meter_t GetDistance() const;
 
  private:
   frc::AnalogInput m_rangefinder{2};

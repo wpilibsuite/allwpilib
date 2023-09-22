@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj.xrp;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.AnalogInput;
 
 /** This class represents the ultrasonic rangefinder on an XRP robot. */
@@ -11,11 +12,11 @@ public class XRPRangefinder {
   private final AnalogInput m_rangefinder = new AnalogInput(2);
 
   /**
-   * Get the measured distance in metres. Distance further than 4m will be reported as 4m.
+   * Get the measured distance in meters. Distance further than 4m will be reported as 4m.
    *
-   * @return distance in metres
+   * @return distance in meters
    */
-  public double getDistanceMetres() {
+  public double getDistanceMeters() {
     return (m_rangefinder.getVoltage() / 5.0) * 4.0;
   }
 
@@ -25,6 +26,6 @@ public class XRPRangefinder {
    * @return distance in inches
    */
   public double getDistanceInches() {
-    return getDistanceMetres() * 39.3701;
+    return Units.metersToInches(getDistanceMeters());
   }
 }

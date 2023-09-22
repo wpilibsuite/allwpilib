@@ -6,10 +6,10 @@
 
 using namespace frc;
 
-double XRPReflectanceSensor::GetLeftReflectanceValue() {
+double XRPReflectanceSensor::GetLeftReflectanceValue() const {
   return m_leftSensor.GetVoltage() / 5.0;
 }
 
-double XRPReflectanceSensor::GetRightReflectanceValue() {
+double XRPReflectanceSensor::GetRightReflectanceValue() const {
   return m_rightSensor.GetVoltage() / 5.0;
 }
