@@ -10,10 +10,10 @@
 
 #include <fmt/core.h>
 #include <networktables/NetworkTableInstance.h>
+#include <wpi/MemoryBuffer.h>
 #include <wpi/StringExtras.h>
 #include <wpi/fmt/raw_ostream.h>
 #include <wpi/json.h>
-#include <wpi/raw_istream.h>
 #include <wpi/raw_ostream.h>
 
 #include "cameraserver/CameraServer.h"
@@ -95,8 +95,9 @@ bool ReadCameraConfig(const wpi::json& config) {
 bool ReadConfig() {
   // open config file
   std::error_code ec;
-  wpi::raw_fd_istream is(configFile, ec);
-  if (ec) {
+  std::unique_ptr<wpi::MemoryBuffer> fileBuffer =
+      wpi::MemoryBuffer::GetFile(configFile, ec);
+  if (fileBuffer == nullptr || ec) {
     fmt::print(stderr, "could not open '{}': {}\n", configFile, ec.message());
     return false;
   }
@@ -104,7 +105,7 @@ bool ReadConfig() {
   // parse file
   wpi::json j;
   try {
-    j = wpi::json::parse(is);
+    j = wpi::json::parse({fileBuffer->begin(), fileBuffer->end()});
   } catch (const wpi::json::parse_error& e) {
     fmt::print(stderr, "config error in '{}': byte {}: {}\n", configFile,
                e.byte, e.what());
