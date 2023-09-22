@@ -19,6 +19,7 @@ endif()
 
 add_executable(outlineviewer ${outlineviewer_src} ${outlineviewer_resources_src} ${outlineviewer_rc} ${APP_ICON_MACOSX})
 wpilib_link_macos_gui(outlineviewer)
+wpilib_target_warnings(outlineviewer)
 target_link_libraries(outlineviewer libglassnt libglass)
 
 if (WIN32)
