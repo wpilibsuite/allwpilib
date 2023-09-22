@@ -65,6 +65,7 @@ endif()
 
 add_executable(glass ${glass_src} ${glass_resources_src} ${glass_rc} ${APP_ICON_MACOSX})
 wpilib_link_macos_gui(glass)
+wpilib_target_warnings(glass)
 target_link_libraries(glass libglassnt libglass)
 
 if (WIN32)

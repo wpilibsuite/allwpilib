@@ -86,6 +86,7 @@ if (WITH_JAVA)
 endif()
 
 add_executable(ntcoredev src/dev/native/cpp/main.cpp)
+wpilib_target_warnings(ntcoredev)
 target_link_libraries(ntcoredev ntcore)
 
 if (WITH_TESTS)

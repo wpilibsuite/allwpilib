@@ -35,6 +35,7 @@ endif()
 
 add_executable(wpiguidev src/dev/native/cpp/main.cpp)
 wpilib_link_macos_gui(wpiguidev)
+wpilib_target_warnings(wpiguidev)
 target_link_libraries(wpiguidev wpigui)
 
 install(TARGETS wpigui EXPORT wpigui)
