@@ -41,6 +41,10 @@ std::string RobotController::GetComments() {
   return std::string(comments, len);
 }
 
+int32_t RobotController::GetTeamNumber() {
+  return HAL_GetTeamNumber();
+}
+
 uint64_t RobotController::GetFPGATime() {
   int32_t status = 0;
   uint64_t time = HAL_GetFPGATime(&status);

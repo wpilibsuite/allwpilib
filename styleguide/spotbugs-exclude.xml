@@ -117,6 +117,14 @@
     <Class name="edu.wpi.first.wpilibj.templates.timed.Robot" />
   </Match>
   <Match>
+    <Bug pattern="UC_USELESS_VOID_METHOD" />
+    <Class name="edu.wpi.first.wpilibj.templates.timeslice.Robot" />
+  </Match>
+  <Match>
+    <Bug pattern="UC_USELESS_VOID_METHOD" />
+    <Class name="edu.wpi.first.wpilibj.templates.timesliceskeleton.Robot" />
+  </Match>
+  <Match>
     <Bug pattern="URF_UNREAD_FIELD" />
     <Class name="edu.wpi.first.wpilibj.ADIS16448_IMU" />
   </Match>

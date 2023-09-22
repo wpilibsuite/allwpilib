@@ -54,7 +54,7 @@ TEST_P(AllianceTest, Alliance) {
 
   frc::sim::StepTiming(20_ms);
 
-  bool isRed;
+  bool isRed = false;
   switch (alliance) {
     case HAL_AllianceStationID_kBlue1:
     case HAL_AllianceStationID_kBlue2:

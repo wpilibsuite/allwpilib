@@ -8,12 +8,12 @@
 #include <frc/Compressor.h>
 #include <frc/PneumaticsControlModule.h>
 #include <frc2/command/CommandPtr.h>
-#include <frc2/command/Subsystem.h>
+#include <frc2/command/SubsystemBase.h>
 #include <units/pressure.h>
 
 #include "Constants.h"
 
-class Pneumatics : frc2::Subsystem {
+class Pneumatics : frc2::SubsystemBase {
  public:
   Pneumatics();
   /** Returns a command that disables the compressor indefinitely. */

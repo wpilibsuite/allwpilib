@@ -152,6 +152,21 @@ public final class Commands {
   }
 
   /**
+   * Constructs a command that schedules the command returned from the supplier when initialized,
+   * and ends when it is no longer scheduled. The supplier is called when the command is
+   * initialized.
+   *
+   * @param supplier the command supplier
+   * @return the command
+   * @see ProxyCommand
+   */
+  public static Command deferredProxy(Supplier<Command> supplier) {
+    return new ProxyCommand(supplier);
+  }
+
+  // Command Groups
+
+  /**
    * Runs a group of commands in series, one after the other.
    *
    * @param commands the commands to include
@@ -161,8 +176,6 @@ public final class Commands {
   public static Command sequence(Command... commands) {
     return new SequentialCommandGroup(commands);
   }
-
-  // Command Groups
 
   /**
    * Runs a group of commands in series, one after the other. Once the last command ends, the group

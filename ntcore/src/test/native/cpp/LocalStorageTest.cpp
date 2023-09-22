@@ -3,12 +3,12 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
+#include <wpi/SpanMatcher.h>
 
 #include "LocalStorage.h"
 #include "MockListenerStorage.h"
 #include "MockLogger.h"
 #include "PubSubOptionsMatcher.h"
-#include "SpanMatcher.h"
 #include "TestPrinters.h"
 #include "ValueMatcher.h"
 #include "gmock/gmock.h"

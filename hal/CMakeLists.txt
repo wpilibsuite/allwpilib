@@ -55,7 +55,7 @@ target_link_libraries(hal PUBLIC wpiutil)
 
 set_property(TARGET hal PROPERTY FOLDER "libraries")
 
-install(TARGETS hal EXPORT hal DESTINATION "${main_lib_dest}")
+install(TARGETS hal EXPORT hal)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/hal")
 install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/gen/ DESTINATION "${include_dest}/hal")
 
@@ -108,11 +108,7 @@ if (WITH_JAVA)
     target_link_libraries(haljni PRIVATE hal_jni_headers)
     add_dependencies(haljni hal_jar)
 
-    if (MSVC)
-        install(TARGETS haljni RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)
-    endif()
-
-    install(TARGETS haljni EXPORT haljni DESTINATION "${main_lib_dest}")
+    install(TARGETS haljni EXPORT haljni)
 
 endif()
 

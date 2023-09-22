@@ -15,6 +15,7 @@
 #include <wpi/SmallSet.h>
 #include <wpi/sendable/Sendable.h>
 
+#include "frc2/command/Requirements.h"
 #include "frc2/command/Subsystem.h"
 
 namespace frc2 {
@@ -104,23 +105,15 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
    * is scheduled, so this method should normally be called from the command's
    * constructor.
    *
-   * @param requirements the Subsystem requirements to add
+   * While this overload can be used with {@code AddRequirements({&subsystem1,
+   * &subsystem2})}, {@code AddRequirements({&subsystem})} selects the {@code
+   * AddRequirements(Subsystem*)} overload, which will function identically but
+   * may cause warnings about redundant braces.
+   *
+   * @param requirements the Subsystem requirements to add, which can be
+   * implicitly constructed from an initializer list or a span
    */
-  void AddRequirements(std::initializer_list<Subsystem*> requirements);
-
-  /**
-   * Adds the specified Subsystem requirements to the command.
-   *
-   * The scheduler will prevent two commands that require the same subsystem
-   * from being scheduled simultaneously.
-   *
-   * Note that the scheduler determines the requirements of a command when it
-   * is scheduled, so this method should normally be called from the command's
-   * constructor.
-   *
-   * @param requirements the Subsystem requirements to add
-   */
-  void AddRequirements(std::span<Subsystem* const> requirements);
+  void AddRequirements(Requirements requirements);
 
   /**
    * Adds the specified Subsystem requirements to the command.
@@ -238,18 +231,7 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
    */
   [[nodiscard]]
   CommandPtr BeforeStarting(std::function<void()> toRun,
-                            std::initializer_list<Subsystem*> requirements) &&;
-
-  /**
-   * Decorates this command with a runnable to run before this command starts.
-   *
-   * @param toRun the Runnable to run
-   * @param requirements the required subsystems
-   * @return the decorated command
-   */
-  [[nodiscard]]
-  CommandPtr BeforeStarting(std::function<void()> toRun,
-                            std::span<Subsystem* const> requirements = {}) &&;
+                            Requirements requirements = {}) &&;
 
   /**
    * Decorates this command with a runnable to run after the command finishes.
@@ -260,18 +242,7 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
    */
   [[nodiscard]]
   CommandPtr AndThen(std::function<void()> toRun,
-                     std::initializer_list<Subsystem*> requirements) &&;
-
-  /**
-   * Decorates this command with a runnable to run after the command finishes.
-   *
-   * @param toRun the Runnable to run
-   * @param requirements the required subsystems
-   * @return the decorated command
-   */
-  [[nodiscard]]
-  CommandPtr AndThen(std::function<void()> toRun,
-                     std::span<Subsystem* const> requirements = {}) &&;
+                     Requirements requirements = {}) &&;
 
   /**
    * Decorates this command to run repeatedly, restarting it when it ends, until

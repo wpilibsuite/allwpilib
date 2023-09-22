@@ -68,7 +68,7 @@ public abstract class MechanismObject2d implements AutoCloseable {
   }
 
   /**
-   * Update all entries with new ones from a new table.
+   * Update this object's entries with new ones from a new table.
    *
    * @param table the new table.
    */

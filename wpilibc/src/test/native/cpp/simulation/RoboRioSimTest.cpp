@@ -222,6 +222,21 @@ TEST(RoboRioSimTest, SetCPUTemp) {
   EXPECT_EQ(kCPUTemp, RobotController::GetCPUTemp().value());
 }
 
+TEST(RoboRioSimTest, SetTeamNumber) {
+  RoboRioSim::ResetData();
+
+  IntCallback callback;
+  auto cbHandle =
+      RoboRioSim::RegisterTeamNumberCallback(callback.GetCallback(), false);
+  constexpr int kTeamNumber = 9999;
+
+  RoboRioSim::SetTeamNumber(kTeamNumber);
+  EXPECT_TRUE(callback.WasTriggered());
+  EXPECT_EQ(kTeamNumber, callback.GetLastValue());
+  EXPECT_EQ(kTeamNumber, RoboRioSim::GetTeamNumber());
+  EXPECT_EQ(kTeamNumber, RobotController::GetTeamNumber());
+}
+
 TEST(RoboRioSimTest, SetSerialNumber) {
   const std::string kSerialNum = "Hello";
 

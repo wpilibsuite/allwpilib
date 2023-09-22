@@ -12,10 +12,10 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.examples.hatchbotinlined.Constants.HatchConstants;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Subsystem;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /** A hatch mechanism actuated by a single {@link edu.wpi.first.wpilibj.DoubleSolenoid}. */
-public class HatchSubsystem extends Subsystem {
+public class HatchSubsystem extends SubsystemBase {
   private final DoubleSolenoid m_hatchSolenoid =
       new DoubleSolenoid(
           PneumaticsModuleType.CTREPCM,

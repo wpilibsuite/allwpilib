@@ -24,12 +24,12 @@
 #include <portable-file-dialogs.h>
 #include <units/angle.h>
 #include <units/length.h>
+#include <wpi/MemoryBuffer.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
 #include <wpi/StringMap.h>
 #include <wpi/fs.h>
 #include <wpi/json.h>
-#include <wpi/raw_istream.h>
 #include <wpigui.h>
 
 #include "glass/Context.h"
@@ -238,7 +238,7 @@ class FieldInfo {
  private:
   void Reset();
   bool LoadImageImpl(const std::string& fn);
-  bool LoadJson(wpi::raw_istream& is, std::string_view filename);
+  bool LoadJson(std::span<const char> is, std::string_view filename);
   void LoadJsonFile(std::string_view jsonfile);
 
   std::unique_ptr<pfd::open_file> m_fileOpener;
@@ -423,12 +423,11 @@ void FieldInfo::LoadImage() {
       for (auto&& field : fields::GetFields()) {
         if (field.name == m_builtin) {
           auto jsonstr = field.getJson();
-          wpi::raw_mem_istream is{jsonstr.data(), jsonstr.size()};
           auto imagedata = field.getImage();
           auto texture = gui::Texture::CreateFromImage(
               reinterpret_cast<const unsigned char*>(imagedata.data()),
               imagedata.size());
-          if (texture && LoadJson(is, {})) {
+          if (texture && LoadJson({jsonstr.data(), jsonstr.size()}, {})) {
             m_texture = std::move(texture);
             m_imageWidth = m_texture.GetWidth();
             m_imageHeight = m_texture.GetHeight();
@@ -445,11 +444,11 @@ void FieldInfo::LoadImage() {
   }
 }
 
-bool FieldInfo::LoadJson(wpi::raw_istream& is, std::string_view filename) {
+bool FieldInfo::LoadJson(std::span<const char> is, std::string_view filename) {
   // parse file
   wpi::json j;
   try {
-    j = wpi::json::parse(is);
+    j = wpi::json::parse({is.data(), is.size()});
   } catch (const wpi::json::parse_error& e) {
     fmt::print(stderr, "GUI: JSON: could not parse: {}\n", e.what());
     return false;
@@ -532,12 +531,15 @@ bool FieldInfo::LoadJson(wpi::raw_istream& is, std::string_view filename) {
 
 void FieldInfo::LoadJsonFile(std::string_view jsonfile) {
   std::error_code ec;
-  wpi::raw_fd_istream f(jsonfile, ec);
-  if (ec) {
+  std::unique_ptr<wpi::MemoryBuffer> fileBuffer =
+      wpi::MemoryBuffer::GetFile(jsonfile, ec);
+  if (fileBuffer == nullptr || ec) {
     std::fputs("GUI: could not open field JSON file\n", stderr);
     return;
   }
-  LoadJson(f, jsonfile);
+  LoadJson(
+      {reinterpret_cast<const char*>(fileBuffer->begin()), fileBuffer->size()},
+      jsonfile);
 }
 
 bool FieldInfo::LoadImageImpl(const std::string& fn) {

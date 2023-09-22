@@ -44,20 +44,23 @@ public class ChassisSpeeds {
   }
 
   /**
-   * Converts from a chassis speed for a discrete timestep into chassis speed for continuous time.
+   * Discretizes a continuous-time chassis speed.
    *
-   * <p>The difference between applying a chassis speed for a discrete timestep vs. continuously is
-   * that applying for a discrete timestep is just scaling the velocity components by the time and
-   * adding, while when applying continuously the changes to the heading affect the direction the
-   * translational components are applied to relative to the field.
+   * <p>This function converts a continous-time chassis speed into a discrete-time one such that
+   * when the discrete-time chassis speed is applied for one timestep, the robot moves as if the
+   * velocity components are independent (i.e., the robot moves v_x * dt along the x-axis, v_y * dt
+   * along the y-axis, and omega * dt around the z-axis).
+   *
+   * <p>This is useful for compensating for translational skew when translating and rotating a
+   * swerve drivetrain.
    *
    * @param vxMetersPerSecond Forward velocity.
    * @param vyMetersPerSecond Sideways velocity.
    * @param omegaRadiansPerSecond Angular velocity.
    * @param dtSeconds The duration of the timestep the speeds should be applied for.
-   * @return ChassisSpeeds that can be applied continuously to produce the discrete chassis speeds.
+   * @return Discretized ChassisSpeeds.
    */
-  public static ChassisSpeeds fromDiscreteSpeeds(
+  public static ChassisSpeeds discretize(
       double vxMetersPerSecond,
       double vyMetersPerSecond,
       double omegaRadiansPerSecond,
@@ -72,22 +75,25 @@ public class ChassisSpeeds {
   }
 
   /**
-   * Converts from a chassis speed for a discrete timestep into chassis speed for continuous time.
+   * Discretizes a continuous-time chassis speed.
    *
-   * <p>The difference between applying a chassis speed for a discrete timestep vs. continuously is
-   * that applying for a discrete timestep is just scaling the velocity components by the time and
-   * adding, while when applying continuously the changes to the heading affect the direction the
-   * translational components are applied to relative to the field.
+   * <p>This function converts a continous-time chassis speed into a discrete-time one such that
+   * when the discrete-time chassis speed is applied for one timestep, the robot moves as if the
+   * velocity components are independent (i.e., the robot moves v_x * dt along the x-axis, v_y * dt
+   * along the y-axis, and omega * dt around the z-axis).
    *
-   * @param discreteSpeeds The speeds for a discrete timestep.
+   * <p>This is useful for compensating for translational skew when translating and rotating a
+   * swerve drivetrain.
+   *
+   * @param continuousSpeeds The continuous speeds.
    * @param dtSeconds The duration of the timestep the speeds should be applied for.
-   * @return ChassisSpeeds that can be applied continuously to produce the discrete chassis speeds.
+   * @return Discretized ChassisSpeeds.
    */
-  public static ChassisSpeeds fromDiscreteSpeeds(ChassisSpeeds discreteSpeeds, double dtSeconds) {
-    return fromDiscreteSpeeds(
-        discreteSpeeds.vxMetersPerSecond,
-        discreteSpeeds.vyMetersPerSecond,
-        discreteSpeeds.omegaRadiansPerSecond,
+  public static ChassisSpeeds discretize(ChassisSpeeds continuousSpeeds, double dtSeconds) {
+    return discretize(
+        continuousSpeeds.vxMetersPerSecond,
+        continuousSpeeds.vyMetersPerSecond,
+        continuousSpeeds.omegaRadiansPerSecond,
         dtSeconds);
   }
 

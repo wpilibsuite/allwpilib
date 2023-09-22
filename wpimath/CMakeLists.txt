@@ -77,11 +77,7 @@ if (WITH_JAVA)
   target_link_libraries(wpimathjni PRIVATE wpimath_jni_headers)
   add_dependencies(wpimathjni wpimath_jar)
 
-  if (MSVC)
-    install(TARGETS wpimathjni RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)
-  endif()
-
-  install(TARGETS wpimathjni EXPORT wpimathjni DESTINATION "${main_lib_dest}")
+  install(TARGETS wpimathjni EXPORT wpimathjni)
 
 endif()
 
@@ -122,11 +118,7 @@ target_include_directories(wpimath PUBLIC
                             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
                             $<INSTALL_INTERFACE:${include_dest}/wpimath>)
 
-install(TARGETS wpimath EXPORT wpimath DESTINATION "${main_lib_dest}")
-
-if (WITH_JAVA AND MSVC)
-    install(TARGETS wpimath RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)
-endif()
+install(TARGETS wpimath EXPORT wpimath)
 
 if (WITH_FLAT_INSTALL)
     set (wpimath_config_dir ${wpilib_dest})

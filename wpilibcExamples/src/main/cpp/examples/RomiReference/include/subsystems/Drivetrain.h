@@ -8,12 +8,11 @@
 #include <frc/Encoder.h>
 #include <frc/drive/DifferentialDrive.h>
 #include <frc/motorcontrol/Spark.h>
-#include <frc2/command/Subsystem.h>
+#include <frc/romi/RomiGyro.h>
+#include <frc2/command/SubsystemBase.h>
 #include <units/length.h>
 
-#include "sensors/RomiGyro.h"
-
-class Drivetrain : public frc2::Subsystem {
+class Drivetrain : public frc2::SubsystemBase {
  public:
   static constexpr double kCountsPerRevolution = 1440.0;
   static constexpr units::meter_t kWheelDiameter = 70_mm;
@@ -117,6 +116,6 @@ class Drivetrain : public frc2::Subsystem {
 
   frc::DifferentialDrive m_drive{m_leftMotor, m_rightMotor};
 
-  RomiGyro m_gyro;
+  frc::RomiGyro m_gyro;
   frc::BuiltInAccelerometer m_accelerometer;
 };
