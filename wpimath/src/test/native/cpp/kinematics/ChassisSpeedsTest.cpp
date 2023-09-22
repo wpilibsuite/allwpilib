@@ -8,7 +8,26 @@
 
 static constexpr double kEpsilon = 1E-9;
 
-TEST(ChassisSpeedsTest, FieldRelativeConstruction) {
+TEST(ChassisSpeedsTest, Discretize) {
+  constexpr frc::ChassisSpeeds target{1_mps, 0_mps, 0.5_rad_per_s};
+  constexpr units::second_t duration = 1_s;
+  constexpr units::second_t dt = 10_ms;
+
+  const auto speeds = frc::ChassisSpeeds::Discretize(target, duration);
+  const frc::Twist2d twist{speeds.vx * dt, speeds.vy * dt, speeds.omega * dt};
+
+  frc::Pose2d pose;
+  for (units::second_t time = 0_s; time < duration; time += dt) {
+    pose = pose.Exp(twist);
+  }
+
+  EXPECT_NEAR((target.vx * duration).value(), pose.X().value(), kEpsilon);
+  EXPECT_NEAR((target.vy * duration).value(), pose.Y().value(), kEpsilon);
+  EXPECT_NEAR((target.omega * duration).value(),
+              pose.Rotation().Radians().value(), kEpsilon);
+}
+
+TEST(ChassisSpeedsTest, FromFieldRelativeSpeeds) {
   const auto chassisSpeeds = frc::ChassisSpeeds::FromFieldRelativeSpeeds(
       1.0_mps, 0.0_mps, 0.5_rad_per_s, -90.0_deg);
 

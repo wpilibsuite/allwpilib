@@ -13,4 +13,4 @@ target_include_directories(halsim_ds_socket PRIVATE src/main/native/include)
 
 set_property(TARGET halsim_ds_socket PROPERTY FOLDER "libraries")
 
-install(TARGETS halsim_ds_socket EXPORT halsim_ds_socket DESTINATION "${main_lib_dest}")
+install(TARGETS halsim_ds_socket EXPORT halsim_ds_socket)

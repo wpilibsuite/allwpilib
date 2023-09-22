@@ -7,13 +7,12 @@
 #include <memory>
 #include <string_view>
 
-#include <libssh/libssh.h>
-
-#define IMGUI_DEFINE_MATH_OPERATORS
-
 #include <glass/Context.h>
 #include <glass/MainMenuBar.h>
 #include <glass/Storage.h>
+#include <libssh/libssh.h>
+
+#define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <wpigui.h>

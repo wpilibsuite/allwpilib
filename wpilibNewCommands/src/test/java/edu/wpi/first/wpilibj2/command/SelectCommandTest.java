@@ -75,10 +75,10 @@ class SelectCommandTest extends CommandTestBase implements MultiCompositionTestB
 
   @Test
   void selectCommandRequirementTest() {
-    Subsystem system1 = new Subsystem() {};
-    Subsystem system2 = new Subsystem() {};
-    Subsystem system3 = new Subsystem() {};
-    Subsystem system4 = new Subsystem() {};
+    Subsystem system1 = new SubsystemBase() {};
+    Subsystem system2 = new SubsystemBase() {};
+    Subsystem system3 = new SubsystemBase() {};
+    Subsystem system4 = new SubsystemBase() {};
 
     try (CommandScheduler scheduler = new CommandScheduler()) {
       MockCommandHolder command1Holder = new MockCommandHolder(true, system1, system2);

@@ -17,6 +17,11 @@
 
 namespace nt::net {
 
+#if __GNUC__ >= 13
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
+
 struct PublishMsg {
   static constexpr std::string_view kMethodStr = "publish";
   NT_Publisher pubHandle{0};
@@ -56,6 +61,10 @@ struct ClientValueMsg {
   NT_Publisher pubHandle{0};
   Value value;
 };
+
+#if __GNUC__ >= 13
+#pragma GCC diagnostic pop
+#endif
 
 struct ClientMessage {
   using Contents =

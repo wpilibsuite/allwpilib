@@ -40,7 +40,7 @@ target_link_libraries(cscore PUBLIC wpinet wpiutil ${OpenCV_LIBS})
 
 set_property(TARGET cscore PROPERTY FOLDER "libraries")
 
-install(TARGETS cscore EXPORT cscore DESTINATION "${main_lib_dest}")
+install(TARGETS cscore EXPORT cscore)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/cscore")
 
 if (WITH_FLAT_INSTALL)
@@ -129,11 +129,7 @@ if (WITH_JAVA)
     target_link_libraries(cscorejni PRIVATE cscore_jni_headers)
     add_dependencies(cscorejni cscore_jar)
 
-    if (MSVC)
-        install(TARGETS cscorejni RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)
-    endif()
-
-    install(TARGETS cscorejni EXPORT cscorejni DESTINATION "${main_lib_dest}")
+    install(TARGETS cscorejni EXPORT cscorejni)
 
 endif()
 

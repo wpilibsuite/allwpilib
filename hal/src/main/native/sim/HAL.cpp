@@ -288,6 +288,10 @@ size_t HAL_GetComments(char* buffer, size_t size) {
   return HALSIM_GetRoboRioComments(buffer, size);
 }
 
+int32_t HAL_GetTeamNumber(void) {
+  return HALSIM_GetRoboRioTeamNumber();
+}
+
 uint64_t HAL_GetFPGATime(int32_t* status) {
   return hal::GetFPGATime();
 }

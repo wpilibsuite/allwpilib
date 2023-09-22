@@ -295,7 +295,7 @@ class EncoderSim {
    *
    * @return the encoder distance
    */
-  double GetDistance();
+  double GetDistance() const;
 
   /**
    * Change the rate of the encoder.
@@ -309,7 +309,7 @@ class EncoderSim {
    *
    * @return the rate of change
    */
-  double GetRate();
+  double GetRate() const;
 
  private:
   explicit EncoderSim(int index) : m_index{index} {}

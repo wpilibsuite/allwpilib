@@ -6,18 +6,17 @@
 
 #include <algorithm>
 #include <cinttypes>
-#include <cstdio>
 #include <filesystem>
 
 #include <fmt/format.h>
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <imgui_stdlib.h>
+#include <wpi/MemoryBuffer.h>
 #include <wpi/StringExtras.h>
 #include <wpi/fs.h>
 #include <wpi/json.h>
 #include <wpi/json_serializer.h>
-#include <wpi/raw_istream.h>
 #include <wpi/raw_ostream.h>
 #include <wpi/timestamp.h>
 #include <wpigui.h>
@@ -131,14 +130,17 @@ static bool JsonToWindow(const wpi::json& jfile, const char* filename) {
 
 static bool LoadWindowStorageImpl(const std::string& filename) {
   std::error_code ec;
-  wpi::raw_fd_istream is{filename, ec};
-  if (ec) {
+  std::unique_ptr<wpi::MemoryBuffer> fileBuffer =
+      wpi::MemoryBuffer::GetFile(filename, ec);
+  if (fileBuffer == nullptr || ec) {
     ImGui::LogText("error opening %s: %s", filename.c_str(),
                    ec.message().c_str());
     return false;
   } else {
     try {
-      return JsonToWindow(wpi::json::parse(is), filename.c_str());
+      return JsonToWindow(
+          wpi::json::parse({fileBuffer->begin(), fileBuffer->end()}),
+          filename.c_str());
     } catch (wpi::json::parse_error& e) {
       ImGui::LogText("Error loading %s: %s", filename.c_str(), e.what());
       return false;
@@ -149,8 +151,9 @@ static bool LoadWindowStorageImpl(const std::string& filename) {
 static bool LoadStorageRootImpl(Context* ctx, const std::string& filename,
                                 std::string_view rootName) {
   std::error_code ec;
-  wpi::raw_fd_istream is{filename, ec};
-  if (ec) {
+  std::unique_ptr<wpi::MemoryBuffer> fileBuffer =
+      wpi::MemoryBuffer::GetFile(filename, ec);
+  if (fileBuffer == nullptr || ec) {
     ImGui::LogText("error opening %s: %s", filename.c_str(),
                    ec.message().c_str());
     return false;
@@ -162,7 +165,9 @@ static bool LoadStorageRootImpl(Context* ctx, const std::string& filename,
       createdStorage = true;
     }
     try {
-      storage->FromJson(wpi::json::parse(is), filename.c_str());
+      storage->FromJson(
+          wpi::json::parse({fileBuffer->begin(), fileBuffer->end()}),
+          filename.c_str());
     } catch (wpi::json::parse_error& e) {
       ImGui::LogText("Error loading %s: %s", filename.c_str(), e.what());
       if (createdStorage) {
@@ -533,7 +538,8 @@ void glass::PushID(const char* str_id_begin, const char* str_id_end) {
 
 void glass::PushID(int int_id) {
   char buf[16];
-  std::snprintf(buf, sizeof(buf), "%d", int_id);
+  wpi::format_to_n_c_str(buf, sizeof(buf), "{}", int_id);
+
   PushStorageStack(buf);
   ImGui::PushID(int_id);
 }

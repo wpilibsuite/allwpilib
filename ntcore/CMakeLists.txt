@@ -33,7 +33,7 @@ target_link_libraries(ntcore PUBLIC wpinet wpiutil)
 
 set_property(TARGET ntcore PROPERTY FOLDER "libraries")
 
-install(TARGETS ntcore EXPORT ntcore DESTINATION "${main_lib_dest}")
+install(TARGETS ntcore EXPORT ntcore)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/ntcore")
 install(DIRECTORY ${WPILIB_BINARY_DIR}/ntcore/generated/main/native/include/ DESTINATION "${include_dest}/ntcore")
 
@@ -81,7 +81,7 @@ if (WITH_JAVA)
     target_link_libraries(ntcorejni PRIVATE ntcore_jni_headers)
     add_dependencies(ntcorejni ntcore_jar)
 
-    install(TARGETS ntcorejni EXPORT ntcorejni DESTINATION "${main_lib_dest}")
+    install(TARGETS ntcorejni EXPORT ntcorejni)
 
 endif()
 
@@ -91,5 +91,5 @@ target_link_libraries(ntcoredev ntcore)
 if (WITH_TESTS)
     wpilib_add_test(ntcore src/test/native/cpp)
     target_include_directories(ntcore_test PRIVATE src/main/native/cpp)
-    target_link_libraries(ntcore_test ntcore gmock_main)
+    target_link_libraries(ntcore_test ntcore gmock_main wpiutil_testlib)
 endif()

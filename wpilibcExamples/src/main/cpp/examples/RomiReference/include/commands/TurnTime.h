@@ -15,7 +15,7 @@ class TurnTime : public frc2::CommandHelper<frc2::Command, TurnTime> {
  public:
   TurnTime(double speed, units::second_t time, Drivetrain* drive)
       : m_speed(speed), m_duration(time), m_drive(drive) {
-    AddRequirements({m_drive});
+    AddRequirements(m_drive);
   }
 
   void Initialize() override;

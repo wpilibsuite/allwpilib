@@ -231,11 +231,11 @@ RobotBase::RobotBase() {
   auto inst = nt::NetworkTableInstance::GetDefault();
   // subscribe to "" to force persistent values to propagate to local
   nt::SubscribeMultiple(inst.GetHandle(), {{std::string_view{}}});
-#ifdef __FRC_ROBORIO__
-  inst.StartServer("/home/lvuser/networktables.json");
-#else
-  inst.StartServer();
-#endif
+  if constexpr (!IsSimulation()) {
+    inst.StartServer("/home/lvuser/networktables.json");
+  } else {
+    inst.StartServer();
+  }
 
   // wait for the NT server to actually start
   int count = 0;
@@ -251,7 +251,7 @@ RobotBase::RobotBase() {
 
   SmartDashboard::init();
 
-  if (IsReal()) {
+  if constexpr (!IsSimulation()) {
     std::FILE* file = nullptr;
     file = std::fopen("/tmp/frc_versions/FRC_Lib_Version.ini", "w");
 

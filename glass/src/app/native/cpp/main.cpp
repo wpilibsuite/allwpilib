@@ -8,6 +8,7 @@
 #include <fmt/format.h>
 #include <imgui.h>
 #include <ntcore_cpp.h>
+#include <wpi/StringExtras.h>
 #include <wpigui.h>
 
 #include "glass/Context.h"
@@ -317,11 +318,13 @@ int main(int argc, char** argv) {
       char nameBuf[32];
       const char* name = glfwGetKeyName(*gEnterKey, 0);
       if (!name) {
-        std::snprintf(nameBuf, sizeof(nameBuf), "%d", *gEnterKey);
+        wpi::format_to_n_c_str(nameBuf, sizeof(nameBuf), "{}", *gEnterKey);
+
         name = nameBuf;
       }
-      std::snprintf(editLabel, sizeof(editLabel), "%s###edit",
-                    gKeyEdit ? "(press key)" : name);
+      wpi::format_to_n_c_str(editLabel, sizeof(editLabel), "{}###edit",
+                             gKeyEdit ? "(press key)" : name);
+
       if (ImGui::SmallButton(editLabel)) {
         gKeyEdit = true;
       }

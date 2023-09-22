@@ -13,12 +13,14 @@ FetchContent_Declare(
 FetchContent_Declare(
     imgui
     GIT_REPOSITORY  https://github.com/ocornut/imgui.git
-    GIT_TAG         3ea0fad204e994d669f79ed29dcaf61cd5cb571d
+                    # docking branch
+    GIT_TAG         64b1e448d20c9be9275af731c34b4c7bf14a8e95
 )
 FetchContent_Declare(
     implot
     GIT_REPOSITORY  https://github.com/epezent/implot.git
-    GIT_TAG         e80e42e8b4136ddb84ccfe04fa28d0c745828952
+                    # v0.16
+    GIT_TAG         18c72431f8265e2b0b5378a3a73d8a883b2175ff
 )
 FetchContent_Declare(
     fonts

@@ -462,6 +462,31 @@ class RoboRioSim {
   static void SetCPUTemp(units::celsius_t cpuTemp);
 
   /**
+   * Register a callback to be run whenever the team number changes.
+   *
+   * @param callback the callback
+   * @param initialNotify whether to call the callback with the initial state
+   * @return the CallbackStore object associated with this callback
+   */
+  [[nodiscard]]
+  static std::unique_ptr<CallbackStore> RegisterTeamNumberCallback(
+      NotifyCallback callback, bool initialNotify);
+
+  /**
+   * Get the team number.
+   *
+   * @return the team number.
+   */
+  static int32_t GetTeamNumber();
+
+  /**
+   * Set the team number.
+   *
+   * @param teamNumber the new team number.
+   */
+  static void SetTeamNumber(int32_t teamNumber);
+
+  /**
    * Get the serial number.
    *
    * @return The serial number.

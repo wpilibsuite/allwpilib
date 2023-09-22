@@ -38,7 +38,7 @@ class Error {
   const char* name() const { return uv_err_name(m_err); }
 
  private:
-  int m_err{UV_UNKNOWN};
+  int m_err{0};
 };
 
 }  // namespace wpi::uv

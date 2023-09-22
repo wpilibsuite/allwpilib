@@ -4,6 +4,7 @@
 
 package edu.wpi.first.math;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -311,5 +312,24 @@ class DARETest extends UtilityClassTest<DARE> {
     var N = new Matrix<>(Nat.N2(), Nat.N2());
 
     assertThrows(IllegalArgumentException.class, () -> DARE.dare(A, B, Q, R, N));
+  }
+
+  @Test
+  void testQDecomposition() {
+    // Ensures the decomposition of Q into CᵀC is correct
+
+    var A = new Matrix<>(Nat.N2(), Nat.N2(), new double[] {1.0, 0.0, 0.0, 0.0});
+    var B = Matrix.eye(Nat.N2());
+    var R = Matrix.eye(Nat.N2());
+
+    // (A, C₁) should be detectable pair
+    var C_1 = new Matrix<>(Nat.N2(), Nat.N2(), new double[] {0.0, 0.0, 1.0, 0.0});
+    var Q_1 = C_1.transpose().times(C_1);
+    assertDoesNotThrow(() -> DARE.dare(A, B, Q_1, R));
+
+    // (A, C₂) shouldn't be detectable pair
+    var C_2 = C_1.transpose();
+    var Q_2 = C_2.transpose().times(C_2);
+    assertThrows(IllegalArgumentException.class, () -> DARE.dare(A, B, Q_2, R));
   }
 }

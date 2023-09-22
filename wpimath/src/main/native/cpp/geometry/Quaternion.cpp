@@ -5,6 +5,7 @@
 #include "frc/geometry/Quaternion.h"
 
 #include <numbers>
+
 #include <wpi/json.h>
 
 using namespace frc;
@@ -146,13 +147,15 @@ Quaternion Quaternion::Log() const {
   double v_scalar;
 
   if (v_norm < 1e-9) {
-    // Taylor series expansion of atan2(y / x) / y around y = 0 = 1/x - y^2/3*x^3 + O(y^4)
+    // Taylor series expansion of atan2(y / x) / y around y = 0 = 1/x -
+    // y^2/3*x^3 + O(y^4)
     v_scalar = 1.0 / W() - 1.0 / 3.0 * v_norm * v_norm / (W() * W() * W());
   } else {
     v_scalar = std::atan2(v_norm, W()) / v_norm;
   }
 
-  return Quaternion{scalar, v_scalar * m_v(0), v_scalar * m_v(1), v_scalar * m_v(2)};
+  return Quaternion{scalar, v_scalar * m_v(0), v_scalar * m_v(1),
+                    v_scalar * m_v(2)};
 }
 
 double Quaternion::W() const {
@@ -189,26 +192,28 @@ Eigen::Vector3d Quaternion::ToRotationVector() const {
   }
 }
 
-Quaternion Quaternion::FromRotationVector(const Eigen::Vector3d &rvec) {
-    // 𝑣⃗ = θ * v̂
-    // v̂ = 𝑣⃗ / θ
+Quaternion Quaternion::FromRotationVector(const Eigen::Vector3d& rvec) {
+  // 𝑣⃗ = θ * v̂
+  // v̂ = 𝑣⃗ / θ
 
-    // 𝑞 = cos(θ/2) + sin(θ/2) * v̂
-    // 𝑞 = cos(θ/2) + sin(θ/2) / θ * 𝑣⃗
-  
+  // 𝑞 = std::cos(θ/2) + std::sin(θ/2) * v̂
+  // 𝑞 = std::cos(θ/2) + std::sin(θ/2) / θ * 𝑣⃗
+
   double theta = rvec.norm();
   double cos = std::cos(theta / 2);
 
   double axial_scalar;
 
   if (theta < 1e-9) {
-    // taylor series expansion of sin(θ/2) / θ around θ = 0 = 1/2 - θ²/48 + O(θ⁴)
-    axial_scalar = 1/2 - theta * theta / 48;
+    // taylor series expansion of sin(θ/2) / θ around θ = 0 = 1/2 - θ²/48 +
+    // O(θ⁴)
+    axial_scalar = 1 / 2 - theta * theta / 48;
   } else {
     axial_scalar = std::sin(theta / 2) / theta;
   }
 
-  return Quaternion{cos, axial_scalar * rvec(0), axial_scalar * rvec(1), axial_scalar * rvec(2)};
+  return Quaternion{cos, axial_scalar * rvec(0), axial_scalar * rvec(1),
+                    axial_scalar * rvec(2)};
 }
 
 void frc::to_json(wpi::json& json, const Quaternion& quaternion) {
