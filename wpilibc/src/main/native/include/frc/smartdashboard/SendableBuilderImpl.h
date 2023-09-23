@@ -117,7 +117,8 @@ class SendableBuilderImpl : public nt::NTSendableBuilder {
                          std::function<std::string()> getter,
                          std::function<void(std::string_view)> setter) override;
 
-  void PublishConstString(std::string_view key, std::string_view value) override;
+  void PublishConstString(std::string_view key,
+                          std::string_view value) override;
 
   void AddBooleanArrayProperty(
       std::string_view key, std::function<std::vector<int>()> getter,

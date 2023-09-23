@@ -141,7 +141,8 @@ class SendableBuilder {
    * @param key     property name
    * @param value   the value
    */
-  virtual void PublishConstString(std::string_view key, std::string_view value) = 0;
+  virtual void PublishConstString(std::string_view key,
+                                  std::string_view value) = 0;
 
   /**
    * Add a boolean array property.
