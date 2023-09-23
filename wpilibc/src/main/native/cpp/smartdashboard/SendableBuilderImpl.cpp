@@ -204,7 +204,7 @@ void SendableBuilderImpl::AddStringProperty(
 }
 
 void SendableBuilderImpl::PublishConstString(std::string_view key,
-                                             std::string value) {
+                                             std::string_view value) {
   PublishConstImpl(m_table->GetStringTopic(key), value);
 }
 
