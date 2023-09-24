@@ -116,7 +116,8 @@ static void DisplayGui() {
   ImGui::SetNextWindowPos(ImVec2(0, 0));
   int width, height;
   glfwGetWindowSize(gui::GetSystemWindow(), &width, &height);
-  ImGui::SetNextWindowSize(ImVec2(width, height));
+  ImGui::SetNextWindowSize(
+      ImVec2(static_cast<float>(width), static_cast<float>(height)));
 
   ImGui::Begin("Entries", nullptr,
                ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_MenuBar |
