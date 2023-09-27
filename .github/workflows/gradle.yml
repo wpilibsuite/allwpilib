@@ -36,7 +36,7 @@ jobs:
       - name: Build with Gradle
         uses: addnab/docker-run-action@v3
         with:
-          image: ${{ container }}
+          image: ${{ matrix.container }}
           options: -v "${{ github.workspace }}:/work" -w "/work" -e "ARTIFACTORY_PUBLISH_USERNAME=${{ secrets.ARTIFACTORY_USERNAME }}" -e "ARTIFACTORY_PUBLISH_PASSWORD=${{ secrets.ARTIFACTORY_PASSWORD }}"
           run: ./gradlew build --build-cache -PbuildServer -PskipJavaFormat ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
       - uses: actions/upload-artifact@v3
