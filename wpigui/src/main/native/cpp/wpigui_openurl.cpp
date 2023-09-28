@@ -23,6 +23,10 @@ void wpi::gui::OpenURL(const std::string& url) {
 #else
   static constexpr const char* opencmd = "xdg-open";
 #endif
-  execlp(opencmd, opencmd, url.c_str(), static_cast<const char*>(nullptr));
+  // If we forked into the child process, run execlp(), which replaces the
+  // current process image
+  if (fork() == 0) {
+    execlp(opencmd, opencmd, url.c_str(), static_cast<const char*>(nullptr));
+  }
 #endif
 }
