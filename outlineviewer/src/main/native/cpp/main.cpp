@@ -6,17 +6,16 @@
 
 #include <GLFW/glfw3.h>
 #include <fmt/format.h>
+#include <glass/Context.h>
+#include <glass/MainMenuBar.h>
+#include <glass/Model.h>
+#include <glass/Storage.h>
+#include <glass/networktables/NetworkTables.h>
+#include <glass/networktables/NetworkTablesSettings.h>
+#include <glass/other/Log.h>
 #include <imgui.h>
 #include <ntcore_cpp.h>
 #include <wpigui.h>
-
-#include "glass/Context.h"
-#include "glass/MainMenuBar.h"
-#include "glass/Model.h"
-#include "glass/Storage.h"
-#include "glass/networktables/NetworkTables.h"
-#include "glass/networktables/NetworkTablesSettings.h"
-#include "glass/other/Log.h"
 
 namespace gui = wpi::gui;
 
