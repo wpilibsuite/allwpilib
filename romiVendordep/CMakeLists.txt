@@ -22,8 +22,6 @@ if (WITH_JAVA)
   else()
       set (romiVendordep_config_dir share/romiVendordep)
   endif()
-
-  install(FILES romiVendordep-config.cmake DESTINATION ${romiVendordep_config_dir})
 endif()
 
 file(GLOB_RECURSE romiVendordep_native_src src/main/native/cpp/*.cpp)

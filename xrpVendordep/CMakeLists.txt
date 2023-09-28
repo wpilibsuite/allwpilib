@@ -22,8 +22,6 @@ if (WITH_JAVA)
   else()
       set (xrpVendordep_config_dir share/xrpVendordep)
   endif()
-
-  install(FILES xrpVendordep-config.cmake DESTINATION ${xrpVendordep_config_dir})
 endif()
 
 file(GLOB_RECURSE xrpVendordep_native_src src/main/native/cpp/*.cpp)
