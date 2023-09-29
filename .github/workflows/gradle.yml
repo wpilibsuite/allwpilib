@@ -27,13 +27,7 @@ jobs:
     name: "Build - ${{ matrix.artifact-name }}"
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: Set release environment variable
-        run: echo "EXTRA_GRADLE_ARGS=-PreleaseMode" >> $GITHUB_ENV
-        if: startsWith(github.ref, 'refs/tags/v')
-      - name: Free Disk Space (Ubuntu)
+      - name: Free Disk Space
         uses: jlumbroso/free-disk-space@main
         with:
           tool-cache: false
@@ -43,6 +37,12 @@ jobs:
           large-packages: false
           docker-images: false
           swap-storage: false
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Set release environment variable
+        run: echo "EXTRA_GRADLE_ARGS=-PreleaseMode" >> $GITHUB_ENV
+        if: startsWith(github.ref, 'refs/tags/v')
       - name: Check disk free space
         run: df .
       - name: Build with Gradle
