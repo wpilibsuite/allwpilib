@@ -130,7 +130,6 @@ static void DisplayGui() {
   bool settings = false;
   bool log = false;
   bool about = false;
-  bool docs = false;
 
   // main menu
   ImGui::BeginMenuBar();
@@ -162,7 +161,9 @@ static void DisplayGui() {
 
   if (ImGui::BeginMenu("Docs")) {
     if (ImGui::MenuItem("Online documentation")) {
-      docs = true;
+      wpi::gui::OpenURL(
+          "https://docs.wpilib.org/en/stable/docs/software/wpilib-tools/"
+          "outlineviewer/");
     }
     ImGui::EndMenu();
   }
@@ -216,12 +217,6 @@ static void DisplayGui() {
       ImGui::CloseCurrentPopup();
     }
     ImGui::EndPopup();
-  }
-
-  if (docs) {
-    wpi::gui::OpenURL(
-        "https://docs.wpilib.org/en/stable/docs/software/wpilib-tools/"
-        "outlineviewer/");
   }
 
   // display table view

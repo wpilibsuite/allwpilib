@@ -93,10 +93,11 @@ static void DisplayMainMenu() {
     ImGui::EndMenu();
   }
 
-  bool docs = false;
   if (ImGui::BeginMenu("Docs")) {
     if (ImGui::MenuItem("Online documentation")) {
-      docs = true;
+      wpi::gui::OpenURL(
+          "https://docs.wpilib.org/en/stable/docs/software/telemetry/"
+          "datalog.html");
     }
     ImGui::EndMenu();
   }
@@ -118,12 +119,6 @@ static void DisplayMainMenu() {
       ImGui::CloseCurrentPopup();
     }
     ImGui::EndPopup();
-  }
-
-  if (docs) {
-    wpi::gui::OpenURL(
-        "https://docs.wpilib.org/en/stable/docs/software/telemetry/"
-        "datalog.html");
   }
 }
 

@@ -50,7 +50,6 @@ static std::unique_ptr<glass::Window> gNetworkTablesLogWindow;
 
 static glass::MainMenuBar gMainMenu;
 static bool gAbout = false;
-static bool gDocs = false;
 static bool gSetEnterKey = false;
 static bool gKeyEdit = false;
 static int* gEnterKey;
@@ -287,7 +286,9 @@ int main(int argc, char** argv) {
 
     if (ImGui::BeginMenu("Docs")) {
       if (ImGui::MenuItem("Online documentation")) {
-        gDocs = true;
+        wpi::gui::OpenURL(
+            "https://docs.wpilib.org/en/stable/docs/software/dashboards/"
+            "glass/");
       }
       ImGui::EndMenu();
     }
@@ -310,12 +311,6 @@ int main(int argc, char** argv) {
         ImGui::CloseCurrentPopup();
       }
       ImGui::EndPopup();
-    }
-
-    if (gDocs) {
-      wpi::gui::OpenURL(
-          "https://docs.wpilib.org/en/stable/docs/software/dashboards/glass/");
-      gDocs = false;
     }
 
     if (gSetEnterKey) {
