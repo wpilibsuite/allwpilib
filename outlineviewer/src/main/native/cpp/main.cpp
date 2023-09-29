@@ -16,6 +16,7 @@
 #include <imgui.h>
 #include <ntcore_cpp.h>
 #include <wpigui.h>
+#include <wpigui_openurl.h>
 
 namespace gui = wpi::gui;
 
@@ -129,6 +130,7 @@ static void DisplayGui() {
   bool settings = false;
   bool log = false;
   bool about = false;
+  bool docs = false;
 
   // main menu
   ImGui::BeginMenuBar();
@@ -154,6 +156,13 @@ static void DisplayGui() {
     ImGui::Separator();
     if (ImGui::MenuItem("About")) {
       about = true;
+    }
+    ImGui::EndMenu();
+  }
+
+  if (ImGui::BeginMenu("Docs")) {
+    if (ImGui::MenuItem("Online documentation")) {
+      docs = true;
     }
     ImGui::EndMenu();
   }
@@ -207,6 +216,12 @@ static void DisplayGui() {
       ImGui::CloseCurrentPopup();
     }
     ImGui::EndPopup();
+  }
+
+  if (docs) {
+    wpi::gui::OpenURL(
+        "https://docs.wpilib.org/en/stable/docs/software/wpilib-tools/"
+        "outlineviewer/");
   }
 
   // display table view

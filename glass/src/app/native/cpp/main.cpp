@@ -10,6 +10,7 @@
 #include <ntcore_cpp.h>
 #include <wpi/StringExtras.h>
 #include <wpigui.h>
+#include <wpigui_openurl.h>
 
 #include "glass/Context.h"
 #include "glass/MainMenuBar.h"
@@ -49,6 +50,7 @@ static std::unique_ptr<glass::Window> gNetworkTablesLogWindow;
 
 static glass::MainMenuBar gMainMenu;
 static bool gAbout = false;
+static bool gDocs = false;
 static bool gSetEnterKey = false;
 static bool gKeyEdit = false;
 static int* gEnterKey;
@@ -282,6 +284,13 @@ int main(int argc, char** argv) {
       }
       ImGui::EndMenu();
     }
+
+    if (ImGui::BeginMenu("Docs")) {
+      if (ImGui::MenuItem("Online documentation")) {
+        gDocs = true;
+      }
+      ImGui::EndMenu();
+    }
   });
 
   gui::AddLateExecute([] {
@@ -301,6 +310,12 @@ int main(int argc, char** argv) {
         ImGui::CloseCurrentPopup();
       }
       ImGui::EndPopup();
+    }
+
+    if (gDocs) {
+      wpi::gui::OpenURL(
+          "https://docs.wpilib.org/en/stable/docs/software/dashboards/glass/");
+      gDocs = false;
     }
 
     if (gSetEnterKey) {
