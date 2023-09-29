@@ -33,12 +33,24 @@ jobs:
       - name: Set release environment variable
         run: echo "EXTRA_GRADLE_ARGS=-PreleaseMode" >> $GITHUB_ENV
         if: startsWith(github.ref, 'refs/tags/v')
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: false
+          docker-images: false
+          swap-storage: false
+      - name: Check disk free space
+        run: df .
       - name: Build with Gradle
         uses: addnab/docker-run-action@v3
         with:
           image: ${{ matrix.container }}
           options: -v ${{ github.workspace }}:/work -w /work -e ARTIFACTORY_PUBLISH_USERNAME=${{ secrets.ARTIFACTORY_USERNAME }} -e ARTIFACTORY_PUBLISH_PASSWORD=${{ secrets.ARTIFACTORY_PASSWORD }}
-          run: ./gradlew build --build-cache -PbuildServer -PskipJavaFormat ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
+          run: df . && ./gradlew build --build-cache -PbuildServer -PskipJavaFormat ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
       - uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.artifact-name }}
