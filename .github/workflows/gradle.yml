@@ -109,9 +109,6 @@ jobs:
           distribution: 'zulu'
           java-version: 17
           architecture: ${{ matrix.architecture }}
-      - name: Check disk free space
-        run: wmic logicaldisk get caption, freespace
-        if: matrix.os == 'windows-2022'
       - name: Import Developer ID Certificate
         uses: wpilibsuite/import-signing-certificate@v1
         with:
@@ -133,6 +130,11 @@ jobs:
       - name: Set Java Heap Size
         run: sed -i 's/-Xmx2g/-Xmx1g/g' gradle.properties
         if: matrix.artifact-name == 'Win32'
+      - name: Configure build directory (Windows)
+        run: |
+          mkdir C:/build
+          echo 'allprojects { buildDir = "C:/build" }' >> build.gradle
+        if: matrix.os == 'windows-2022'
       - name: Build with Gradle
         run: ./gradlew ${{ matrix.task }} --build-cache -PbuildServer -PskipJavaFormat ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
         env:
