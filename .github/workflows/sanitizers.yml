@@ -35,10 +35,14 @@ jobs:
         uses: hendrikmuhs/ccache-action@v1.2
         with:
           key: ${{ matrix.name }}
-          verbose: 1
+          verbose: 2
 
       - name: Configure ccache
-        run: ccache --set-config=sloppiness=include_file_ctime,include_file_mtime
+        run: |
+          ccache --set-config=sloppiness=include_file_ctime,include_file_mtime
+          ccache --set-config=hash_dir=false
+          ccache --set-config=stats_log=ccache-stats.log
+          ccache -p
 
       - name: Install jinja
         run: python -m pip install jinja2
@@ -55,3 +59,6 @@ jobs:
       - name: test
         working-directory: build
         run: ${{ matrix.ctest-env }} ctest --output-on-failure ${{ matrix.ctest-flags }}
+
+      - name: ccache stats log
+        run: ccache --show-log-stats
