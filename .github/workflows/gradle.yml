@@ -136,7 +136,7 @@ jobs:
       - name: Configure build directory (Windows)
         run: |
           mkdir ${{ matrix.build-dir }}
-          Copy-Item *.* -Destination ${{ matrix.build-dir }} -Recurse
+          Copy-Item -Path . -Destination ${{ matrix.build-dir }} -Recurse
         if: matrix.os == 'windows-2022'
       - name: Check disk free space (Windows)
         run: wmic logicaldisk get caption, freespace
