@@ -134,7 +134,7 @@ jobs:
         run: sed -i 's/-Xmx2g/-Xmx1g/g' gradle.properties
         if: matrix.artifact-name == 'Win32'
       - name: Configure build directory (Windows)
-        run: xcopy . ${{ matrix.build-dir }} /i /s /e /h
+        run: xcopy . ${{ matrix.build-dir }} /i /s /e /h /q
         if: matrix.os == 'windows-2022'
       - name: Check disk free space (Windows)
         run: wmic logicaldisk get caption, freespace
