@@ -472,6 +472,12 @@ HAL_Bool HAL_GetRSLState(int32_t* status) {
   return global->readLEDs_RSL(status);
 }
 
+HAL_Bool HAL_GetWallClockValid(int32_t* status) {
+  uint8_t timeWasSet = 0;
+  *status = FRC_NetworkCommunication_getTimeWasSet(&timeWasSet);
+  return timeWasSet != 0;
+}
+
 static bool killExistingProgram(int timeout, int mode) {
   // Kill any previous robot programs
   std::fstream fs;

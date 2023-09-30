@@ -153,6 +153,21 @@ Java_edu_wpi_first_hal_HAL_getRSLState
 
 /*
  * Class:     edu_wpi_first_hal_HAL
+ * Method:    getWallClockValid
+ * Signature: ()Z
+ */
+JNIEXPORT jboolean JNICALL
+Java_edu_wpi_first_hal_HAL_getWallClockValid
+  (JNIEnv* env, jclass)
+{
+  int32_t status = 0;
+  bool val = HAL_GetWallClockValid(&status);
+  CheckStatus(env, status);
+  return val;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_HAL
  * Method:    getPortWithModule
  * Signature: (BB)I
  */

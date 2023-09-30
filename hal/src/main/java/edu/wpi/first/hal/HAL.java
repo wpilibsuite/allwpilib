@@ -191,6 +191,14 @@ public final class HAL extends JNIWrapper {
   public static native boolean getRSLState();
 
   /**
+   * Gets if the wall clock (date/time) is valid.
+   *
+   * @return True if the wall clock is valid, false otherwise
+   * @see "HAL_GetWallClockValid"
+   */
+  public static native boolean getWallClockValid();
+
+  /**
    * Gets a port handle for a specific channel and module.
    *
    * <p>This is expected to be used for PCMs, as the roboRIO does not work with modules anymore.

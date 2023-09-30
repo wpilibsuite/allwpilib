@@ -187,6 +187,14 @@ uint64_t HAL_ExpandFPGATime(uint32_t unexpandedLower, int32_t* status);
 HAL_Bool HAL_GetRSLState(int32_t* status);
 
 /**
+ * Gets if the wall clock (date/time) is valid.
+ *
+ * @param[out] status the error code, or 0 for success
+ * @return True if the wall clock is valid, false otherwise
+ */
+HAL_Bool HAL_GetWallClockValid(int32_t* status);
+
+/**
  * Call this to start up HAL. This is required for robot programs.
  *
  * This must be called before any other HAL functions. Failure to do so will
