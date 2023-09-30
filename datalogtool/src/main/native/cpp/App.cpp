@@ -16,6 +16,7 @@
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <wpigui.h>
+#include <wpigui_openurl.h>
 
 #include "Downloader.h"
 #include "Exporter.h"
@@ -88,6 +89,15 @@ static void DisplayMainMenu() {
   if (ImGui::BeginMenu("Info")) {
     if (ImGui::MenuItem("About")) {
       about = true;
+    }
+    ImGui::EndMenu();
+  }
+
+  if (ImGui::BeginMenu("Docs")) {
+    if (ImGui::MenuItem("Online documentation")) {
+      wpi::gui::OpenURL(
+          "https://docs.wpilib.org/en/stable/docs/software/telemetry/"
+          "datalog.html");
     }
     ImGui::EndMenu();
   }
