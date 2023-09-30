@@ -22,6 +22,7 @@
 #include "frc/DriverStation.h"
 #include "frc/Filesystem.h"
 #include "frc/RobotBase.h"
+#include "frc/RobotController.h"
 
 using namespace frc;
 
@@ -203,12 +204,10 @@ void Thread::Main() {
       } else {
         dsAttachCount = 0;
       }
-      if (dsAttachCount > 300) {  // 6 seconds
-        std::time_t now = std::time(nullptr);
-        auto tm = std::gmtime(&now);
-        if (tm->tm_year > 100) {
-          // assume local clock is now synchronized to DS, so rename based on
-          // local time
+      if (dsAttachCount > 50) {  // 1 second
+        if (RobotController::IsSystemTimeValid()) {
+          std::time_t now = std::time(nullptr);
+          auto tm = std::gmtime(&now);
           m_log.SetFilename(fmt::format("FRC_{:%Y%m%d_%H%M%S}.wpilog", *tm));
           dsRenamed = true;
         } else {
@@ -260,7 +259,9 @@ void Thread::Main() {
     ++sysTimeCount;
     if (sysTimeCount >= 250) {
       sysTimeCount = 0;
-      sysTimeEntry.Append(wpi::GetSystemTime(), wpi::Now());
+      if (RobotController::IsSystemTimeValid()) {
+        sysTimeEntry.Append(wpi::GetSystemTime(), wpi::Now());
+      }
     }
   }
   DriverStation::RemoveRefreshedDataEventHandle(newDataEvent.GetHandle());
