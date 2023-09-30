@@ -63,7 +63,7 @@ jobs:
       - uses: ilammy/msvc-dev-cmd@v1
 
       - name: Install CMake
-        uses: lukka/get-cmake@v3.23.0
+        uses: lukka/get-cmake@v3.27.6
 
       - name: Run vcpkg
         uses: lukka/run-vcpkg@v11.1
