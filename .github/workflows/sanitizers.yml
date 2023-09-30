@@ -53,8 +53,3 @@ jobs:
       - name: test
         working-directory: build
         run: ${{ matrix.ctest-env }} ctest --output-on-failure ${{ matrix.ctest-flags }}
-        env:
-          SCCACHE_GHA_ENABLED: "true"
-
-      - name: sccache stats log
-        run: ${SCCACHE_PATH} --show-stats
