@@ -331,11 +331,9 @@ public final class DataLogManager {
         } else {
           dsAttachCount = 0;
         }
-        if (dsAttachCount > 300) { // 6 seconds
-          LocalDateTime now = LocalDateTime.now(m_utc);
-          if (now.getYear() > 2000) {
-            // assume local clock is now synchronized to DS, so rename based on
-            // local time
+        if (dsAttachCount > 50) { // 1 second
+          if (RobotController.isSystemTimeValid()) {
+            LocalDateTime now = LocalDateTime.now(m_utc);
             m_log.setFilename("FRC_" + m_timeFormatter.format(now) + ".wpilog");
             dsRenamed = true;
           } else {
@@ -391,7 +389,9 @@ public final class DataLogManager {
       sysTimeCount++;
       if (sysTimeCount >= 250) {
         sysTimeCount = 0;
-        sysTimeEntry.append(WPIUtilJNI.getSystemTime(), WPIUtilJNI.now());
+        if (RobotController.isSystemTimeValid()) {
+          sysTimeEntry.append(WPIUtilJNI.getSystemTime(), WPIUtilJNI.now());
+        }
       }
     }
     newDataEvent.close();
