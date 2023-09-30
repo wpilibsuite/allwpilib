@@ -87,6 +87,13 @@ bool RobotController::GetRSLState() {
   return retVal;
 }
 
+bool RobotController::IsWallClockValid() {
+  int32_t status = 0;
+  bool retVal = HAL_GetWallClockValid(&status);
+  FRC_CheckErrorStatus(status, "IsWallClockValid");
+  return retVal;
+}
+
 double RobotController::GetInputVoltage() {
   int32_t status = 0;
   double retVal = HAL_GetVinVoltage(&status);

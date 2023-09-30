@@ -122,6 +122,15 @@ public final class RobotController {
   }
 
   /**
+   * Gets if the wall clock (date/time) is valid.
+   *
+   * @return True if the wall clock is valid, false otherwise
+   */
+  public static boolean isWallClockValid() {
+    return HAL.getWallClockValid();
+  }
+
+  /**
    * Get the input voltage to the robot controller.
    *
    * @return The controller input voltage value in Volts

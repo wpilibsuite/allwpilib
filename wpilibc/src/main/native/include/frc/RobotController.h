@@ -116,6 +116,13 @@ class RobotController {
   static bool GetRSLState();
 
   /**
+   * Gets if the wall clock (date/time) is valid.
+   *
+   * @return True if the wall clock is valid, false otherwise
+   */
+  static bool IsWallClockValid();
+
+  /**
    * Get the input voltage to the robot controller.
    *
    * @return The controller input voltage value in Volts
