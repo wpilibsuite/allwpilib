@@ -153,15 +153,15 @@ Java_edu_wpi_first_hal_HAL_getRSLState
 
 /*
  * Class:     edu_wpi_first_hal_HAL
- * Method:    getWallClockValid
+ * Method:    getSystemTimeValid
  * Signature: ()Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_HAL_getWallClockValid
+Java_edu_wpi_first_hal_HAL_getSystemTimeValid
   (JNIEnv* env, jclass)
 {
   int32_t status = 0;
-  bool val = HAL_GetWallClockValid(&status);
+  bool val = HAL_GetSystemTimeValid(&status);
   CheckStatus(env, status);
   return val;
 }

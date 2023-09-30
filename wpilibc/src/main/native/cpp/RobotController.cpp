@@ -87,10 +87,10 @@ bool RobotController::GetRSLState() {
   return retVal;
 }
 
-bool RobotController::IsWallClockValid() {
+bool RobotController::IsSystemTimeValid() {
   int32_t status = 0;
-  bool retVal = HAL_GetWallClockValid(&status);
-  FRC_CheckErrorStatus(status, "IsWallClockValid");
+  bool retVal = HAL_GetSystemTimeValid(&status);
+  FRC_CheckErrorStatus(status, "IsSystemTimeValid");
   return retVal;
 }
 

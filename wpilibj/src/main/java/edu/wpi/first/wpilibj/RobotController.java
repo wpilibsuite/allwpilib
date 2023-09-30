@@ -122,12 +122,12 @@ public final class RobotController {
   }
 
   /**
-   * Gets if the wall clock (date/time) is valid.
+   * Gets if the system time is valid.
    *
-   * @return True if the wall clock is valid, false otherwise
+   * @return True if the system time is valid, false otherwise
    */
-  public static boolean isWallClockValid() {
-    return HAL.getWallClockValid();
+  public static boolean isSystemTimeValid() {
+    return HAL.getSystemTimeValid();
   }
 
   /**

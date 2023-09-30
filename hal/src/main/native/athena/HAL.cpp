@@ -472,7 +472,7 @@ HAL_Bool HAL_GetRSLState(int32_t* status) {
   return global->readLEDs_RSL(status);
 }
 
-HAL_Bool HAL_GetWallClockValid(int32_t* status) {
+HAL_Bool HAL_GetSystemTimeValid(int32_t* status) {
   uint8_t timeWasSet = 0;
   *status = FRC_NetworkCommunication_getTimeWasSet(&timeWasSet);
   return timeWasSet != 0;

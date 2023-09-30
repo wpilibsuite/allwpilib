@@ -336,7 +336,7 @@ HAL_Bool HAL_GetRSLState(int32_t* status) {
   return false;
 }
 
-HAL_Bool HAL_GetWallClockValid(int32_t* status) {
+HAL_Bool HAL_GetSystemTimeValid(int32_t* status) {
   return true;
 }
 
