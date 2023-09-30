@@ -87,6 +87,13 @@ bool RobotController::GetRSLState() {
   return retVal;
 }
 
+bool RobotController::IsSystemTimeValid() {
+  int32_t status = 0;
+  bool retVal = HAL_GetSystemTimeValid(&status);
+  FRC_CheckErrorStatus(status, "IsSystemTimeValid");
+  return retVal;
+}
+
 double RobotController::GetInputVoltage() {
   int32_t status = 0;
   double retVal = HAL_GetVinVoltage(&status);

@@ -15,7 +15,7 @@ nativeUtils {
         configureDependencies {
             opencvYear = "frc2023"
             googleTestYear = "frc2023"
-            niLibVersion = "2024.1.0"
+            niLibVersion = "2024.1.1"
             opencvVersion = "4.6.0-5"
             googleTestVersion = "1.12.1-2"
         }

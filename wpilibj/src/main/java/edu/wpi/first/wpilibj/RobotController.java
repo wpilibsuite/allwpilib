@@ -122,6 +122,15 @@ public final class RobotController {
   }
 
   /**
+   * Gets if the system time is valid.
+   *
+   * @return True if the system time is valid, false otherwise
+   */
+  public static boolean isSystemTimeValid() {
+    return HAL.getSystemTimeValid();
+  }
+
+  /**
    * Get the input voltage to the robot controller.
    *
    * @return The controller input voltage value in Volts
