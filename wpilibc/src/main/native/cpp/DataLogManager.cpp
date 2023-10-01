@@ -111,7 +111,7 @@ Thread::~Thread() {
 void Thread::Main() {
   // based on free disk space, scan for "old" FRC_*.wpilog files and remove
   {
-    uintmax_t freeSpace = fs::space(m_logDir).free;
+    uintmax_t freeSpace = fs::space(m_logDir).available;
     if (freeSpace < kFreeSpaceThreshold) {
       // Delete oldest FRC_*.wpilog files (ignore FRC_TBD_*.wpilog as we just
       // created one)
