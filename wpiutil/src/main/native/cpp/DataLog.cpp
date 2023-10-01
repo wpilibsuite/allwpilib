@@ -37,6 +37,8 @@
 using namespace wpi::log;
 
 static constexpr size_t kBlockSize = 16 * 1024;
+static constexpr size_t kMaxBufferCount = 1024 * 1024 / kBlockSize;
+static constexpr size_t kMaxFreeCount = 256 * 1024 / kBlockSize;
 static constexpr size_t kRecordMaxHeaderSize = 17;
 
 template <typename T>
@@ -354,7 +356,9 @@ void DataLog::WriterThreadMain(std::string_view dir) {
       // release buffers back to free list
       for (auto&& buf : toWrite) {
         buf.Clear();
-        m_free.emplace_back(std::move(buf));
+        if (m_free.size() < kMaxFreeCount) {
+          [[likely]] m_free.emplace_back(std::move(buf));
+        }
       }
       toWrite.resize(0);
     }
@@ -413,7 +417,9 @@ void DataLog::WriterThreadMain(
       // release buffers back to free list
       for (auto&& buf : toWrite) {
         buf.Clear();
-        m_free.emplace_back(std::move(buf));
+        if (m_free.size() < kMaxFreeCount) {
+          [[likely]] m_free.emplace_back(std::move(buf));
+        }
       }
       toWrite.resize(0);
     }
@@ -492,6 +498,13 @@ uint8_t* DataLog::Reserve(size_t size) {
   assert(size <= kBlockSize);
   if (m_outgoing.empty() || size > m_outgoing.back().GetRemaining()) {
     if (m_free.empty()) {
+      if (m_outgoing.size() >= kMaxBufferCount) {
+        [[unlikely]] WPI_ERROR(
+            m_msglog,
+            "outgoing buffers exceeded threshold, pausing logging--"
+            "consider flushing to disk more frequently (smaller period)");
+        m_paused = true;
+      }
       m_outgoing.emplace_back();
     } else {
       m_outgoing.emplace_back(std::move(m_free.back()));
