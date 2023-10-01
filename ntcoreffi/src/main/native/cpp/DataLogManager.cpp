@@ -18,8 +18,8 @@
 #include <wpi/timestamp.h>
 
 #ifdef __FRC_ROBORIO__
-#include <FRC_NetworkCommunication/LoadOut.h>
 #include <FRC_NetworkCommunication/FRCComm.h>
+#include <FRC_NetworkCommunication/LoadOut.h>
 #endif
 
 using namespace wpi;
@@ -29,7 +29,7 @@ namespace {
 
 namespace warn {
 static constexpr int Warning = 16;
-}
+}  // namespace warn
 
 namespace frc {
 void ReportErrorV(int32_t status, const char* fileName, int lineNumber,
