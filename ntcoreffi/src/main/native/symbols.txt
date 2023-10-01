@@ -1,3 +1,9 @@
+DLM_GetLog
+DLM_GetLogDir
+DLM_Log
+DLM_LogNetworkTables
+DLM_SignalNewDSDataOccur
+DLM_Start
 NT_AddListener
 NT_AddListenerMultiple
 NT_AddListenerSingle

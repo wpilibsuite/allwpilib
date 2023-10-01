@@ -2,9 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/DataLogManager.h"
-
-#include <frc/Errors.h>
+#include "DataLogManager.h"
 
 #include <algorithm>
 #include <ctime>
@@ -19,14 +17,169 @@
 #include <wpi/fs.h>
 #include <wpi/timestamp.h>
 
-#include "frc/DriverStation.h"
-#include "frc/Filesystem.h"
-#include "frc/RobotBase.h"
-#include "frc/RobotController.h"
+#ifdef __FRC_ROBORIO__
+#include <FRC_NetworkCommunication/FRCComm.h>
+#include <FRC_NetworkCommunication/LoadOut.h>
+#endif
 
-using namespace frc;
+using namespace wpi;
 
+/** Shims to keep the code as similar as possible to wpilibc */
 namespace {
+
+namespace warn {
+static constexpr int Warning = 16;
+}  // namespace warn
+
+namespace frc {
+void ReportErrorV(int32_t status, const char* fileName, int lineNumber,
+                  const char* funcName, fmt::string_view format,
+                  fmt::format_args args) {
+#ifdef __FRC_ROBORIO__
+  if (status == 0) {
+    return;
+  }
+  fmt::memory_buffer out;
+  fmt::format_to(fmt::appender{out}, "Warning: ");
+  fmt::vformat_to(fmt::appender{out}, format, args);
+  out.push_back('\0');
+  FRC_NetworkCommunication_sendError(status < 0, status, 0, out.data(),
+                                     "DataLogManager", "");
+#endif
+}
+
+template <typename... Args>
+inline void ReportError(int32_t status, const char* fileName, int lineNumber,
+                        const char* funcName, fmt::string_view format,
+                        Args&&... args) {
+  ReportErrorV(status, fileName, lineNumber, funcName, format,
+               fmt::make_format_args(args...));
+}
+}  // namespace frc
+
+#define FRC_ReportError(status, format, ...)                             \
+  do {                                                                   \
+    if ((status) != 0) {                                                 \
+      ::frc::ReportError(status, __FILE__, __LINE__, __FUNCTION__,       \
+                         FMT_STRING(format) __VA_OPT__(, ) __VA_ARGS__); \
+    }                                                                    \
+  } while (0)
+
+namespace RobotController {
+inline bool IsSystemTimeValid() {
+#ifdef __FRC_ROBORIO__
+  uint8_t timeWasSet = 0;
+  FRC_NetworkCommunication_getTimeWasSet(&timeWasSet);
+  return timeWasSet != 0;
+#else
+  return true;
+#endif
+}
+}  // namespace RobotController
+
+namespace filesystem {
+inline std::string GetOperatingDirectory() {
+#ifdef __FRC_ROBORIO__
+  return "/home/lvuser";
+#else
+  return fs::current_path().string();
+#endif
+}
+}  // namespace filesystem
+
+namespace DriverStation {
+#ifdef __FRC_ROBORIO__
+using MatchType = MatchType_t;
+constexpr int kNone = kMatchType_none;
+constexpr int kPractice = kMatchType_practice;
+constexpr int kQualification = kMatchType_qualification;
+constexpr int kElimination = kMatchType_elimination;
+char gEventName[128];
+MatchType_t gMatchType;
+uint16_t gMatchNumber;
+uint8_t gReplayNumber;
+uint8_t gGameSpecificMessage[16];
+uint16_t gGameSpecificMessageSize;
+#else
+enum MatchType { kNone, kPractice, kQualification, kElimination };
+#endif
+
+inline void UpdateMatchInfo() {
+#ifdef __FRC_ROBORIO__
+  gGameSpecificMessageSize = sizeof(gGameSpecificMessage);
+  FRC_NetworkCommunication_getMatchInfo(gEventName, &gMatchType, &gMatchNumber,
+                                        &gReplayNumber, gGameSpecificMessage,
+                                        &gGameSpecificMessageSize);
+#endif
+}
+
+inline MatchType GetMatchType() {
+#ifdef __FRC_ROBORIO__
+  return gMatchType;
+#else
+  return kNone;
+#endif
+}
+
+inline std::string_view GetEventName() {
+#ifdef __FRC_ROBORIO__
+  return gEventName;
+#else
+  return "";
+#endif
+}
+
+inline uint16_t GetMatchNumber() {
+#ifdef __FRC_ROBORIO__
+  return gMatchNumber;
+#else
+  return 0;
+#endif
+}
+
+inline bool IsDSAttached() {
+#ifdef __FRC_ROBORIO__
+  struct ControlWord_t cw;
+  FRC_NetworkCommunication_getControlWord(&cw);
+  return cw.dsAttached;
+#else
+  return true;
+#endif
+}
+
+inline bool IsFMSAttached() {
+#ifdef __FRC_ROBORIO__
+  struct ControlWord_t cw;
+  FRC_NetworkCommunication_getControlWord(&cw);
+  return cw.fmsAttached;
+#else
+  return false;
+#endif
+}
+
+WPI_EventHandle gNewDataEvent;
+
+inline void ProvideRefreshedDataEventHandle(WPI_EventHandle event) {
+  gNewDataEvent = event;
+}
+
+inline void RemoveRefreshedDataEventHandle(WPI_EventHandle event) {}
+
+}  // namespace DriverStation
+
+#ifdef __FRC_ROBORIO__
+static constexpr int kRoboRIO = 0;
+namespace RobotBase {
+inline int GetRuntimeType() {
+  nLoadOut::tTargetClass targetClass = nLoadOut::getTargetClass();
+  if (targetClass == nLoadOut::kTargetClass_RoboRIO2) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+}  // namespace RobotBase
+#endif
 
 struct Thread final : public wpi::SafeThread {
   Thread(std::string_view dir, std::string_view filename, double period);
@@ -226,6 +379,7 @@ void Thread::Main() {
       if (fmsAttachCount > 250) {  // 5 seconds
         // match info comes through TCP, so we need to double-check we've
         // actually received it
+        DriverStation::UpdateMatchInfo();
         auto matchType = DriverStation::GetMatchType();
         if (matchType != DriverStation::kNone) {
           // rename per match info
@@ -325,7 +479,7 @@ wpi::log::DataLog& DataLogManager::GetLog() {
   return GetInstance().owner.GetThread()->m_log;
 }
 
-std::string DataLogManager::GetLogDir() {
+std::string_view DataLogManager::GetLogDir() {
   return GetInstance().owner.GetThread()->m_logDir;
 }
 
@@ -338,3 +492,35 @@ void DataLogManager::LogNetworkTables(bool enabled) {
     }
   }
 }
+
+void DataLogManager::SignalNewDSDataOccur() {
+  wpi::SetSignalObject(DriverStation::gNewDataEvent);
+}
+
+extern "C" {
+
+void DLM_Start(const char* dir, const char* filename, double period) {
+  DataLogManager::Start(dir, filename, period);
+}
+
+void DLM_Log(const char* message) {
+  DataLogManager::Log(message);
+}
+
+WPI_DataLog* DLM_GetLog(void) {
+  return reinterpret_cast<WPI_DataLog*>(&DataLogManager::GetLog());
+}
+
+const char* DLM_GetLogDir(void) {
+  return DataLogManager::GetLogDir().data();
+}
+
+void DLM_LogNetworkTables(int enabled) {
+  DataLogManager::LogNetworkTables(enabled);
+}
+
+void DLM_SignalNewDSDataOccur(void) {
+  DataLogManager::SignalNewDSDataOccur();
+}
+
+}  // extern "C"
