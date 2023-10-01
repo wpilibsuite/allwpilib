@@ -54,10 +54,7 @@ class ExponentialProfile {
   class Constraints {
    public:
     Constraints(Input_t maxInput_, A_t A_, B_t B_)
-        : maxInput{maxInput_}, A{A_}, B{B_} {
-      wpi::math::MathSharedStore::ReportUsage(
-          wpi::math::MathUsageId::kTrajectory_ExponentialProfile, 1);
-    }
+        : maxInput{maxInput_}, A{A_}, B{B_} {}
     Input_t maxInput{0};
     A_t A{0};
     B_t B{0};
@@ -126,15 +123,32 @@ class ExponentialProfile {
    */
   bool ShouldFlipInput() const;
 
+  /**
+   * Returns the velocity at which the profile reverses input.
+   */
   Velocity_t SolveForInflectionVelocity(const Input_t &input) const;
 
+  /**
+   * Returns the velocity of the profile at the given input time and signed input.
+   */
   Velocity_t VelocityAtTime(const units::second_t& time, const Input_t& input) const;
+
+  /**
+   * Returns the position of the profile at the given input time and signed input.
+   */
   Distance_t DistanceAtTime(const units::second_t& time, const Input_t& input) const;
 
+  /**
+   * Solve the Phase-space equation x1(v, U) where x1 is the trajectory taken from (x0, v0) with a given signed input.
+   */
   Distance_t DistanceForVelocityOnForwardPass(const Velocity_t& velocity, const Input_t &input) const;
+
+  /**
+   * Solve the Phase-space equation x2(v, U) where x1 is the trajectory taken from (xf, vf) with a given signed input.
+   */
   Distance_t DistanceForVelocityOnBackwardPass(const Velocity_t& velocity, const Input_t &input) const;
 
-  // The direction of the profile, either 1 for forwards or -1 for inverted
+  // The direction of the profile, either 1 for forward or -1 for reversed
   int m_direction;
 
   Constraints m_constraints;
