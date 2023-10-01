@@ -7,7 +7,9 @@
 #ifdef __cplusplus
 #include <string>
 #include <string_view>
+#endif  // __cplusplus
 
+#ifdef __cplusplus
 namespace wpi::log {
 class DataLog;
 }  // namespace wpi::log
