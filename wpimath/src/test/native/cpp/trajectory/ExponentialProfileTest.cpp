@@ -6,6 +6,8 @@
 
 #include <chrono>
 #include <cmath>
+#include <vector>
+#include <tuple>
 
 #include "gtest/gtest.h"
 #include "units/acceleration.h"
@@ -20,7 +22,7 @@ static constexpr auto kV = 2.5673_V / 1_mps;
 static constexpr auto kA = 2.5673_V / 1_mps_sq;
 
 #define EXPECT_NEAR_UNITS(val1, val2, eps) \
-  EXPECT_LE(units::math::abs(val1 - val2), eps)
+  EXPECT_LE(units::math::abs(val1 - val2) / eps, 1)
 
 #define EXPECT_LT_OR_NEAR_UNITS(val1, val2, eps) \
   if (val1 <= val2) {                            \
@@ -92,7 +94,7 @@ TEST(ExponentialProfileTest, SwitchGoalInMiddle) {
   frc::ExponentialProfile<units::meter, units::volts>::State goal{-10_m, 0_mps};
   frc::ExponentialProfile<units::meter, units::volts>::State state;
 
-  for (int i = 0; i < 200; ++i) {
+  for (int i = 0; i < 20; ++i) {
     frc::ExponentialProfile<units::meter, units::volts> profile{constraints, goal, state};
     state = profile.Calculate(kDt);
   }
@@ -106,36 +108,58 @@ TEST(ExponentialProfileTest, SwitchGoalInMiddle) {
   EXPECT_EQ(state, goal);
 }
 
-// Checks to make sure that it hits top speed
+// Checks to make sure that it hits top speed on long trajectories
 TEST(ExponentialProfileTest, TopSpeed) {
   frc::ExponentialProfile<units::meter, units::volts>::Constraints constraints{12_V, -kV/kA, 1/kA};
   frc::ExponentialProfile<units::meter, units::volts>::State goal{40_m, 0_mps};
   frc::ExponentialProfile<units::meter, units::volts>::State state;
 
-  for (int i = 0; i < 200; ++i) {
-    frc::ExponentialProfile<units::meter, units::volts> profile{constraints, goal, state};
-    state = profile.Calculate(kDt);
-  }
-  EXPECT_NEAR_UNITS(constraints.maxInput / kV, state.velocity, 10e-5_mps);
+  units::meters_per_second_t maxSpeed = 0_mps;
 
   for (int i = 0; i < 2000; ++i) {
     frc::ExponentialProfile<units::meter, units::volts> profile{constraints, goal, state};
     state = profile.Calculate(kDt);
+    maxSpeed = units::math::max(state.velocity, maxSpeed);
   }
+  EXPECT_NEAR_UNITS(constraints.maxInput / kV, maxSpeed, 1e-5_mps);
   EXPECT_EQ(state, goal);
 }
 
-// TEST(ExponentialProfileTest, TimingToCurrent) {
-//   frc::ExponentialProfile<units::meter, units::volts>::Constraints constraints{12_V, -kV/kA, 1/kA};
-//   frc::ExponentialProfile<units::meter, units::volts>::State goal{10_m, 0_mps};
-//   frc::ExponentialProfile<units::meter, units::volts>::State state;
+TEST(ExponentialProfileTest, TestHeuristic) {
+  frc::ExponentialProfile<units::meter, units::volts>::Constraints constraints{12_V, -kV/kA, 1/kA};
+  std::vector<
+    std::tuple<
+      frc::ExponentialProfile<units::meter, units::volts>::State,
+      frc::ExponentialProfile<units::meter, units::volts>::State,
+      frc::ExponentialProfile<units::meter, units::volts>::State>> testCases {
+    {{0_m, -4_mps}, {0.75_m, -4_mps}, {1.3758_m, 4.4304_mps}},
+    {{0_m, -4_mps}, {1.4103_m, 4_mps}, {1.3758_m, 4.4304_mps}},
+    {{0.6603_m, 4_mps}, {0.75_m, -4_mps}, {1.3758_m, 4.4304_mps}},
+    {{0.6603_m, 4_mps}, {1.4103_m, 4_mps}, {1.3758_m, 4.4304_mps}},
 
-//   for (int i = 0; i < 400; i++) {
-//     frc::ExponentialProfile<units::meter, units::volts> profile{constraints, goal, state};
-//     state = profile.Calculate(kDt);
-//     EXPECT_NEAR_UNITS(profile.TimeLeftUntil(state.position), 0_s, 2e-2_s);
-//   }
-// }
+    {{0_m, -4_mps}, {0.5_m, -2_mps}, {0.4367_m, 3.7217_mps}},
+    {{0_m, -4_mps}, {0.546_m, 2_mps}, {0.4367_m, 3.7217_mps}},
+    {{0.6603_m, 4_mps}, {0.5_m, -2_mps}, {0.5560_m, -2.9616_mps}},
+    {{0.6603_m, 4_mps}, {0.546_m, 2_mps}, {0.5560_m, -2.9616_mps}},
+
+    {{0_m, -4_mps}, {-0.75_m, -4_mps}, {-0.7156_m, -4.4304_mps}},
+    {{0_m, -4_mps}, {-0.0897_m, 4_mps}, {-0.7156_m, -4.4304_mps}},
+    {{0.6603_m, 4_mps}, {-0.75_m, -4_mps}, {-0.7156_m, -4.4304_mps}},
+    {{0.6603_m, 4_mps}, {-0.0897_m, 4_mps}, {-0.7156_m, -4.4304_mps}},
+
+    {{0_m, -4_mps}, {-0.5_m, -4.5_mps}, {1.095_m, 4.314_mps}},
+    {{0_m, -4_mps}, {1.0795_m, 4.5_mps}, {-0.5122_m, -4.351_mps}},
+    {{0.6603_m, 4_mps}, {-0.5_m, -4.5_mps}, {1.095_m, 4.314_mps}},
+    {{0.6603_m, 4_mps}, {1.0795_m, 4.5_mps}, {-0.5122_m, -4.351_mps}},
+  };
+
+  for (auto &testCase : testCases) {
+    frc::ExponentialProfile<units::meter, units::volts> profile{constraints, std::get<1>(testCase), std::get<0>(testCase)};
+    auto state = profile.InflectionState();
+    EXPECT_NEAR_UNITS(std::get<2>(testCase).position, state.position, 1e-3_m);
+    EXPECT_NEAR_UNITS(std::get<2>(testCase).velocity, state.velocity, 1e-3_mps);
+  }
+}
 
 // TEST(ExponentialProfileTest, TimingToGoal) {
 //   using units::unit_cast;
