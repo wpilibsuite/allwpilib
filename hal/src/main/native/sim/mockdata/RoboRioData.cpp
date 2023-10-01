@@ -34,6 +34,8 @@ void RoboRioData::ResetData() {
   brownoutVoltage.Reset(6.75);
   cpuTemp.Reset(45.0);
   teamNumber.Reset(0);
+  networkRxBytes.Reset(0);
+  networkTxBytes.Reset(0);
   m_serialNumber = "";
   m_comments = "";
 }
@@ -135,6 +137,8 @@ DEFINE_CAPI(int32_t, UserFaults5V, userFaults5V)
 DEFINE_CAPI(int32_t, UserFaults3V3, userFaults3V3)
 DEFINE_CAPI(double, BrownoutVoltage, brownoutVoltage)
 DEFINE_CAPI(double, CPUTemp, cpuTemp)
+DEFINE_CAPI(int32_t, NetworkRxBytes, networkRxBytes)
+DEFINE_CAPI(int32_t, NetworkTxBytes, networkTxBytes)
 DEFINE_CAPI(int32_t, TeamNumber, teamNumber)
 
 int32_t HALSIM_RegisterRoboRioSerialNumberCallback(

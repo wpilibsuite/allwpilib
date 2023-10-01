@@ -558,6 +558,70 @@ public final class RoboRioSim {
   }
 
   /**
+   * Register a callback to be run whenever the network rx bytes changes.
+   *
+   * @param callback the callback
+   * @param initialNotify whether to call the callback with the initial state
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
+   */
+  public static CallbackStore registerNetworkRxBytesCallback(
+      NotifyCallback callback, boolean initialNotify) {
+    int uid = RoboRioDataJNI.registerNetworkRxBytesCallback(callback, initialNotify);
+    return new CallbackStore(uid, RoboRioDataJNI::cancelNetworkRxBytesCallback);
+  }
+
+  /**
+   * Get the network rx bytes.
+   *
+   * @return the network rx bytes.
+   */
+  public static int getNetworkRxBytes() {
+    return RoboRioDataJNI.getNetworkRxBytes();
+  }
+
+  /**
+   * Set the network rx bytes.
+   *
+   * @param networkRxBytes the new network rx bytes.
+   */
+  public static void setNetworkRxBytes(int networkRxBytes) {
+    RoboRioDataJNI.setNetworkRxBytes(networkRxBytes);
+  }
+
+  /**
+   * Register a callback to be run whenever the network tx bytes changes.
+   *
+   * @param callback the callback
+   * @param initialNotify whether to call the callback with the initial state
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
+   */
+  public static CallbackStore registerNetworkTxBytesCallback(
+      NotifyCallback callback, boolean initialNotify) {
+    int uid = RoboRioDataJNI.registerNetworkTxBytesCallback(callback, initialNotify);
+    return new CallbackStore(uid, RoboRioDataJNI::cancelNetworkTxBytesCallback);
+  }
+
+  /**
+   * Get the network tx bytes.
+   *
+   * @return the network tx bytes.
+   */
+  public static int getNetworkTxBytes() {
+    return RoboRioDataJNI.getNetworkTxBytes();
+  }
+
+  /**
+   * Set the network tx bytes.
+   *
+   * @param networkTxBytes the new network tx bytes.
+   */
+  public static void setNetworkTxBytes(int networkTxBytes) {
+    RoboRioDataJNI.setNetworkTxBytes(networkTxBytes);
+  }
+
+  /**
    * Register a callback to be run whenever the team number changes.
    *
    * @param callback the callback

@@ -880,6 +880,107 @@ Java_edu_wpi_first_hal_simulation_RoboRioDataJNI_setCPUTemp
 
 /*
  * Class:     edu_wpi_first_hal_simulation_RoboRioDataJNI
+ * Method:    registerNetworkRxBytesCallback
+ * Signature: (Ljava/lang/Object;Z)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_simulation_RoboRioDataJNI_registerNetworkRxBytesCallback
+  (JNIEnv* env, jclass, jobject callback, jboolean initialNotify)
+{
+  return sim::AllocateCallbackNoIndex(
+      env, callback, initialNotify,
+      &HALSIM_RegisterRoboRioNetworkRxBytesCallback);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_RoboRioDataJNI
+ * Method:    cancelNetworkRxBytesCallback
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_RoboRioDataJNI_cancelNetworkRxBytesCallback
+  (JNIEnv* env, jclass, jint handle)
+{
+  return sim::FreeCallbackNoIndex(env, handle,
+                                  &HALSIM_CancelRoboRioNetworkRxBytesCallback);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_RoboRioDataJNI
+ * Method:    getNetworkRxBytes
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_simulation_RoboRioDataJNI_getNetworkRxBytes
+  (JNIEnv*, jclass)
+{
+  return HALSIM_GetRoboRioNetworkRxBytes();
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_RoboRioDataJNI
+ * Method:    setNetworkRxBytes
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_RoboRioDataJNI_setNetworkRxBytes
+  (JNIEnv*, jclass, jint value)
+{
+  HALSIM_SetRoboRioNetworkRxBytes(value);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_RoboRioDataJNI
+ * Method:    registerNetworkTxBytesCallback
+ * Signature: (Ljava/lang/Object;Z)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_simulation_RoboRioDataJNI_registerNetworkTxBytesCallback
+  (JNIEnv* env, jclass, jobject callback, jboolean initialNotify)
+{
+  return sim::AllocateCallbackNoIndex(
+      env, callback, initialNotify,
+      &HALSIM_RegisterRoboRioNetworkTxBytesCallback);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_RoboRioDataJNI
+ * Method:    cancelNetworkTxBytesCallback
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_RoboRioDataJNI_cancelNetworkTxBytesCallback
+  (JNIEnv* env, jclass, jint handle)
+{
+  return sim::FreeCallbackNoIndex(env, handle,
+                                  &HALSIM_CancelRoboRioNetworkTxBytesCallback);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_RoboRioDataJNI
+ * Method:    getNetworkTxBytes
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_simulation_RoboRioDataJNI_getNetworkTxBytes
+  (JNIEnv*, jclass)
+{
+  return HALSIM_GetRoboRioNetworkTxBytes();
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_RoboRioDataJNI
+ * Method:    setNetworkTxBytes
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_RoboRioDataJNI_setNetworkTxBytes
+  (JNIEnv*, jclass, jint value)
+{
+  HALSIM_SetRoboRioNetworkTxBytes(value);
+}
+/*
+ * Class:     edu_wpi_first_hal_simulation_RoboRioDataJNI
  * Method:    registerTeamNumberCallback
  * Signature: (Ljava/lang/Object;Z)I
  */

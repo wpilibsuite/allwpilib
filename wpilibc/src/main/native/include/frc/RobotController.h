@@ -21,6 +21,11 @@ struct CANStatus {
   int transmitErrorCount;
 };
 
+struct NetworkStatus {
+  int32_t rxBytes;
+  int32_t txBytes;
+};
+
 class RobotController {
  public:
   RobotController() = delete;
@@ -273,6 +278,13 @@ class RobotController {
    * @return The status of the CAN bus
    */
   static CANStatus GetCANStatus();
+
+  /**
+   * Get the current status of the network interface.
+   *
+   * @return The network status
+   */
+  static NetworkStatus GetNetworkStatus();
 };
 
 }  // namespace frc

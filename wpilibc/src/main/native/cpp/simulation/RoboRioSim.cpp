@@ -301,6 +301,40 @@ void RoboRioSim::SetCPUTemp(units::celsius_t cpuTemp) {
   HALSIM_SetRoboRioCPUTemp(cpuTemp.value());
 }
 
+std::unique_ptr<CallbackStore> RoboRioSim::RegisterNetworkRxBytesCallback(
+    NotifyCallback callback, bool initialNotify) {
+  auto store = std::make_unique<CallbackStore>(
+      -1, callback, &HALSIM_CancelRoboRioNetworkRxBytesCallback);
+  store->SetUid(HALSIM_RegisterRoboRioNetworkRxBytesCallback(
+      &CallbackStoreThunk, store.get(), initialNotify));
+  return store;
+}
+
+int32_t RoboRioSim::GetNetworkRxBytes() {
+  return HALSIM_GetRoboRioNetworkRxBytes();
+}
+
+void RoboRioSim::SetNetworkRxBytes(int32_t networkRxBytes) {
+  HALSIM_SetRoboRioNetworkRxBytes(networkRxBytes);
+}
+
+std::unique_ptr<CallbackStore> RoboRioSim::RegisterNetworkTxBytesCallback(
+    NotifyCallback callback, bool initialNotify) {
+  auto store = std::make_unique<CallbackStore>(
+      -1, callback, &HALSIM_CancelRoboRioNetworkTxBytesCallback);
+  store->SetUid(HALSIM_RegisterRoboRioNetworkTxBytesCallback(
+      &CallbackStoreThunk, store.get(), initialNotify));
+  return store;
+}
+
+int32_t RoboRioSim::GetNetworkTxBytes() {
+  return HALSIM_GetRoboRioNetworkTxBytes();
+}
+
+void RoboRioSim::SetNetworkTxBytes(int32_t networkTxBytes) {
+  HALSIM_SetRoboRioNetworkTxBytes(networkTxBytes);
+}
+
 std::unique_ptr<CallbackStore> RoboRioSim::RegisterTeamNumberCallback(
     NotifyCallback callback, bool initialNotify) {
   auto store = std::make_unique<CallbackStore>(

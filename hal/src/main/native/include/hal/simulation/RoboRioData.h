@@ -155,6 +155,18 @@ void HALSIM_CancelRoboRioCPUTempCallback(int32_t uid);
 double HALSIM_GetRoboRioCPUTemp(void);
 void HALSIM_SetRoboRioCPUTemp(double cpuTemp);
 
+int32_t HALSIM_RegisterRoboRioNetworkRxBytesCallback(
+    HAL_NotifyCallback callback, void* param, HAL_Bool initialNotify);
+void HALSIM_CancelRoboRioNetworkRxBytesCallback(int32_t uid);
+int32_t HALSIM_GetRoboRioNetworkRxBytes(void);
+void HALSIM_SetRoboRioNetworkRxBytes(int32_t rxBytes);
+
+int32_t HALSIM_RegisterRoboRioNetworkTxBytesCallback(
+    HAL_NotifyCallback callback, void* param, HAL_Bool initialNotify);
+void HALSIM_CancelRoboRioNetworkTxBytesCallback(int32_t uid);
+int32_t HALSIM_GetRoboRioNetworkTxBytes(void);
+void HALSIM_SetRoboRioNetworkTxBytes(int32_t txBytes);
+
 #ifdef __cplusplus
 }  // extern "C"
 #endif

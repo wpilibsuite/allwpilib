@@ -8,7 +8,10 @@
 
 #include <hal/CAN.h>
 #include <hal/HALBase.h>
+#include <hal/NetworkUsage.h>
 #include <hal/Power.h>
+#include <wpi/MemoryBuffer.h>
+#include <wpi/StringExtras.h>
 
 #include "frc/Errors.h"
 
@@ -236,4 +239,13 @@ CANStatus RobotController::GetCANStatus() {
   return {percentBusUtilization, static_cast<int>(busOffCount),
           static_cast<int>(txFullCount), static_cast<int>(receiveErrorCount),
           static_cast<int>(transmitErrorCount)};
+}
+
+NetworkStatus RobotController::GetNetworkStatus() {
+  int32_t status = 0;
+  int32_t rxBytes = 0;
+  int32_t txBytes = 0;
+  HAL_GetNetworkStatus(&rxBytes, &txBytes, &status);
+  FRC_CheckErrorStatus(status, "GetNetworkStatus");
+  return NetworkStatus{.rxBytes = rxBytes, .txBytes = txBytes};
 }

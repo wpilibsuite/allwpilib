@@ -9,6 +9,7 @@ import edu.wpi.first.hal.HALUtil;
 import edu.wpi.first.hal.PowerJNI;
 import edu.wpi.first.hal.can.CANJNI;
 import edu.wpi.first.hal.can.CANStatus;
+import edu.wpi.first.hal.communication.NetworkStatus;
 
 /** Contains functions for roboRIO functionality. */
 public final class RobotController {
@@ -314,6 +315,17 @@ public final class RobotController {
   public static CANStatus getCANStatus() {
     CANStatus status = new CANStatus();
     CANJNI.getCANStatus(status);
+    return status;
+  }
+
+  /**
+   * Get the current usage data of the network interface.
+   *
+   * @return Current usage data of the network interface.
+   */
+  public static NetworkStatus getNetworkStatus() {
+    NetworkStatus status = new NetworkStatus();
+    HALUtil.getNetworkStatus(status);
     return status;
   }
 }

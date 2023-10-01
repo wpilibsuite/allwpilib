@@ -20,6 +20,7 @@
 #include "hal/DriverStation.h"
 #include "hal/Errors.h"
 #include "hal/HAL.h"
+#include "hal/NetworkUsage.h"
 
 using namespace wpi::java;
 
@@ -49,6 +50,7 @@ static JException uncleanStatusExCls;
 static JClass powerDistributionVersionCls;
 static JClass pwmConfigDataResultCls;
 static JClass canStatusCls;
+static JClass networkStatusCls;
 static JClass matchInfoDataCls;
 static JClass accumulatorResultCls;
 static JClass canDataCls;
@@ -62,6 +64,7 @@ static const JClassInit classes[] = {
      &powerDistributionVersionCls},
     {"edu/wpi/first/hal/PWMConfigDataResult", &pwmConfigDataResultCls},
     {"edu/wpi/first/hal/can/CANStatus", &canStatusCls},
+    {"edu/wpi/first/hal/communication/NetworkStatus", &networkStatusCls},
     {"edu/wpi/first/hal/MatchInfoData", &matchInfoDataCls},
     {"edu/wpi/first/hal/AccumulatorResult", &accumulatorResultCls},
     {"edu/wpi/first/hal/CANData", &canDataCls},
@@ -269,6 +272,14 @@ void SetCanStatusObject(JNIEnv* env, jobject canStatus,
       static_cast<jint>(busOffCount), static_cast<jint>(txFullCount),
       static_cast<jint>(receiveErrorCount),
       static_cast<jint>(transmitErrorCount));
+}
+
+void SetNetworkStatusObject(JNIEnv* env, jobject networkStatus, int32_t rxBytes,
+                            int32_t txBytes) {
+  static jmethodID func =
+      env->GetMethodID(networkStatusCls, "setStatus", "(II)V");
+  env->CallVoidMethod(networkStatus, func, static_cast<jint>(rxBytes),
+                      static_cast<jint>(txBytes));
 }
 
 void SetMatchInfoObject(JNIEnv* env, jobject matchStatus,
@@ -494,6 +505,23 @@ Java_edu_wpi_first_hal_HALUtil_getTeamNumber
   (JNIEnv* env, jclass)
 {
   return HAL_GetTeamNumber();
+}
+
+/*
+ * Class:     edu_wpi_first_hal_HALUtil
+ * Method:    getNetworkStatus
+ * Signature: (Ljava/lang/Object;)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_HALUtil_getNetworkStatus
+  (JNIEnv* env, jclass, jobject networkStatus)
+{
+  int32_t status = 0;
+  int32_t rxBytes = 0;
+  int32_t txBytes = 0;
+  HAL_GetNetworkStatus(&rxBytes, &txBytes, &status);
+  CheckStatus(env, status);
+  SetNetworkStatusObject(env, networkStatus, rxBytes, txBytes);
 }
 
 /*

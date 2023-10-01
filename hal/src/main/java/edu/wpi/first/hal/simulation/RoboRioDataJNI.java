@@ -159,6 +159,24 @@ public class RoboRioDataJNI extends JNIWrapper {
 
   public static native void setCPUTemp(double cpuTemp);
 
+  public static native int registerNetworkRxBytesCallback(
+      NotifyCallback callback, boolean initialNotify);
+
+  public static native void cancelNetworkRxBytesCallback(int uid);
+
+  public static native int getNetworkRxBytes();
+
+  public static native void setNetworkRxBytes(int networkRxBytes);
+
+  public static native int registerNetworkTxBytesCallback(
+      NotifyCallback callback, boolean initialNotify);
+
+  public static native void cancelNetworkTxBytesCallback(int uid);
+
+  public static native int getNetworkTxBytes();
+
+  public static native void setNetworkTxBytes(int networkTxBytes);
+
   public static native int registerTeamNumberCallback(
       NotifyCallback callback, boolean initialNotify);
 

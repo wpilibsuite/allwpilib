@@ -140,6 +140,13 @@
   "HAL: Onboard serial port is requested, but Console Out is enabled. " \
   "Disable Console Out using imaging tool"
 
+#define HAL_PROC_NET_OPEN_ERROR -1158
+#define HAL_PROC_NET_OPEN_ERROR_MESSAGE "HAL: Failed to open /proc/net/dev!"
+
+#define HAL_PROC_NET_PARSE_ERROR -1159
+#define HAL_PROC_NET_PARSE_ERROR_MESSAGE \
+  "HAL: Failed to parse network usage from /proc/net/dev!"
+
 #define HAL_CAN_BUFFER_OVERRUN -35007
 #define HAL_CAN_BUFFER_OVERRUN_MESSAGE \
   "HAL: CAN Output Buffer Full. Ensure a device is attached"

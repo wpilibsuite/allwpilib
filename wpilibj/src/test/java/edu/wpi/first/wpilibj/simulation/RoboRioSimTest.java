@@ -244,6 +244,40 @@ class RoboRioSimTest {
   }
 
   @Test
+  void testNetworkRxBytes() {
+    RoboRioSim.resetData();
+
+    IntCallback callback = new IntCallback();
+
+    try (CallbackStore cb = RoboRioSim.registerNetworkRxBytesCallback(callback, false)) {
+      final int kRxBytes = 9999;
+
+      RoboRioSim.setNetworkRxBytes(kRxBytes);
+      assertTrue(callback.wasTriggered());
+      assertEquals(kRxBytes, callback.getSetValue());
+      assertEquals(kRxBytes, RoboRioSim.getNetworkRxBytes());
+      assertEquals(kRxBytes, RobotController.getNetworkStatus().rxBytes);
+    }
+  }
+
+  @Test
+  void testNetworkTxBytes() {
+    RoboRioSim.resetData();
+
+    IntCallback callback = new IntCallback();
+
+    try (CallbackStore cb = RoboRioSim.registerNetworkTxBytesCallback(callback, false)) {
+      final int kTxBytes = 9999;
+
+      RoboRioSim.setNetworkTxBytes(kTxBytes);
+      assertTrue(callback.wasTriggered());
+      assertEquals(kTxBytes, callback.getSetValue());
+      assertEquals(kTxBytes, RoboRioSim.getNetworkTxBytes());
+      assertEquals(kTxBytes, RobotController.getNetworkStatus().txBytes);
+    }
+  }
+
+  @Test
   void testSerialNumber() {
     RoboRioSim.resetData();
 

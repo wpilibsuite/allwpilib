@@ -4,6 +4,8 @@
 
 package edu.wpi.first.hal;
 
+import edu.wpi.first.hal.communication.NetworkStatus;
+
 /**
  * Hardware Abstraction Layer (HAL) Utilities JNI Functions.
  *
@@ -68,6 +70,14 @@ public final class HALUtil extends JNIWrapper {
    * @see "HAL_GetTeamNumber"
    */
   public static native int getTeamNumber();
+
+  /**
+   * Updates the given {@link NetworkStatus} object with the latest network usage data.
+   *
+   * @param networkStatus object to be filled with the latest data.
+   * @see "HAL_GetNetworkStatus"
+   */
+  public static native void getNetworkStatus(NetworkStatus networkStatus);
 
   /**
    * Reads the microsecond-resolution timer on the FPGA.

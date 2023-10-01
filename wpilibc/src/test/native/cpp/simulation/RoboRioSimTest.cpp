@@ -222,6 +222,36 @@ TEST(RoboRioSimTest, SetCPUTemp) {
   EXPECT_EQ(kCPUTemp, RobotController::GetCPUTemp().value());
 }
 
+TEST(RoboRioSimTest, SetNetworkRxBytes) {
+  RoboRioSim::ResetData();
+
+  IntCallback callback;
+  auto cbHandle =
+      RoboRioSim::RegisterNetworkRxBytesCallback(callback.GetCallback(), false);
+  constexpr int kNetworkRxBytes = 9999;
+
+  RoboRioSim::SetNetworkRxBytes(kNetworkRxBytes);
+  EXPECT_TRUE(callback.WasTriggered());
+  EXPECT_EQ(kNetworkRxBytes, callback.GetLastValue());
+  EXPECT_EQ(kNetworkRxBytes, RoboRioSim::GetNetworkRxBytes());
+  EXPECT_EQ(kNetworkRxBytes, RobotController::GetNetworkStatus().rxBytes);
+}
+
+TEST(RoboRioSimTest, SetNetworkTxBytes) {
+  RoboRioSim::ResetData();
+
+  IntCallback callback;
+  auto cbHandle =
+      RoboRioSim::RegisterNetworkTxBytesCallback(callback.GetCallback(), false);
+  constexpr int kNetworkTxBytes = 9999;
+
+  RoboRioSim::SetNetworkTxBytes(kNetworkTxBytes);
+  EXPECT_TRUE(callback.WasTriggered());
+  EXPECT_EQ(kNetworkTxBytes, callback.GetLastValue());
+  EXPECT_EQ(kNetworkTxBytes, RoboRioSim::GetNetworkTxBytes());
+  EXPECT_EQ(kNetworkTxBytes, RobotController::GetNetworkStatus().txBytes);
+}
+
 TEST(RoboRioSimTest, SetTeamNumber) {
   RoboRioSim::ResetData();
 
