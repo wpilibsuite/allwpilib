@@ -8,9 +8,6 @@
 #include <ctime>
 #include <random>
 
-#ifdef __FRC_ROBORIO__
-#include <FRC_NetworkCommunication/FRCComm.h>
-#endif
 #include <fmt/chrono.h>
 #include <fmt/format.h>
 #include <networktables/NetworkTableInstance.h>
@@ -19,6 +16,11 @@
 #include <wpi/StringExtras.h>
 #include <wpi/fs.h>
 #include <wpi/timestamp.h>
+
+#ifdef __FRC_ROBORIO__
+#include <FRC_NetworkCommunication/LoadOut.h>
+#include <FRC_NetworkCommunication/FRCComm.h>
+#endif
 
 using namespace wpi;
 
@@ -97,15 +99,17 @@ MatchType_t gMatchType;
 uint16_t gMatchNumber;
 uint8_t gReplayNumber;
 uint8_t gGameSpecificMessage[16];
+uint16_t gGameSpecificMessageSize;
 #else
 enum MatchType { kNone, kPractice, kQualification, kElimination };
 #endif
 
 inline void UpdateMatchInfo() {
 #ifdef __FRC_ROBORIO__
+  gGameSpecificMessageSize = sizeof(gGameSpecificMessage);
   FRC_NetworkCommunication_getMatchInfo(gEventName, &gMatchType, &gMatchNumber,
                                         &gReplayNumber, gGameSpecificMessage,
-                                        sizeof(gGameSpecificMessage));
+                                        &gGameSpecificMessageSize);
 #endif
 }
 
@@ -162,6 +166,22 @@ inline void ProvideRefreshedDataEventHandle(WPI_EventHandle event) {
 inline void RemoveRefreshedDataEventHandle(WPI_EventHandle event) {}
 
 }  // namespace DriverStation
+
+static constexpr int kRoboRIO = 0;
+namespace RobotBase {
+inline int GetRuntimeType() {
+#ifdef __FRC_ROBORIO__
+  nLoadOut::tTargetClass targetClass = nLoadOut::getTargetClass();
+  if (targetClass == nLoadOut::kTargetClass_RoboRIO2) {
+    return 1;
+  } else {
+    return 0;
+  }
+#else
+  return 2;
+#endif
+}
+}  // namespace RobotBase
 
 struct Thread final : public wpi::SafeThread {
   Thread(std::string_view dir, std::string_view filename, double period);
