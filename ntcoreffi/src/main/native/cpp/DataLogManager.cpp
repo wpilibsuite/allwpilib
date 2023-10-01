@@ -167,21 +167,19 @@ inline void RemoveRefreshedDataEventHandle(WPI_EventHandle event) {}
 
 }  // namespace DriverStation
 
+#ifdef __FRC_ROBORIO__
 static constexpr int kRoboRIO = 0;
 namespace RobotBase {
 inline int GetRuntimeType() {
-#ifdef __FRC_ROBORIO__
   nLoadOut::tTargetClass targetClass = nLoadOut::getTargetClass();
   if (targetClass == nLoadOut::kTargetClass_RoboRIO2) {
     return 1;
   } else {
     return 0;
   }
-#else
-  return 2;
-#endif
 }
 }  // namespace RobotBase
+#endif
 
 struct Thread final : public wpi::SafeThread {
   Thread(std::string_view dir, std::string_view filename, double period);
