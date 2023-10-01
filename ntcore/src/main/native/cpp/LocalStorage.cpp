@@ -1450,13 +1450,12 @@ NT_DataLogger LocalStorage::StartDataLog(wpi::log::DataLog& log,
     }
     topic->datalogs.emplace_back(log, datalogger->Start(topic.get(), now),
                                  datalogger->handle);
+    topic->datalogType = topic->type;
 
     // log current value, if any
-    if (!topic->lastValue) {
-      continue;
+    if (topic->lastValue) {
+      topic->datalogs.back().Append(topic->lastValue);
     }
-    topic->datalogType = topic->type;
-    topic->datalogs.back().Append(topic->lastValue);
   }
 
   return datalogger->handle;
