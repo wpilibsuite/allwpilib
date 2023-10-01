@@ -396,6 +396,9 @@ void DataLog::WriterThreadMain(std::string_view dir) {
         ::fsync(f);
 #endif
         lock.lock();
+        if (blocked) {
+          [[unlikely]] m_paused = true;
+        }
       }
 
       // release buffers back to free list
