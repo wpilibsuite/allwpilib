@@ -67,24 +67,24 @@ public class ElevatorFeedforward {
    * @return The computed feedforward.
    */
   public double calculate(double currentVelocity, double nextVelocity, double dtSeconds) {
-  // dx/dt = Ax + Bu + c
-  // dx/dt = Ax + B(u + B⁺c)
-  // xₖ₊₁ = eᴬᵀxₖ + A⁻¹(eᴬᵀ - I)B(uₖ + B⁺cₖ)
-  // xₖ₊₁ = A_d xₖ + B_d (uₖ + B⁺cₖ)
-  // xₖ₊₁ = A_d xₖ + B_duₖ + B_d B⁺cₖ
+    // dx/dt = Ax + Bu + c
+    // dx/dt = Ax + B(u + B⁺c)
+    // xₖ₊₁ = eᴬᵀxₖ + A⁻¹(eᴬᵀ - I)B(uₖ + B⁺cₖ)
+    // xₖ₊₁ = A_d xₖ + B_d (uₖ + B⁺cₖ)
+    // xₖ₊₁ = A_d xₖ + B_duₖ + B_d B⁺cₖ
 
-  // Solve for uₖ.
+    // Solve for uₖ.
 
-  // B_duₖ = xₖ₊₁ − A_d xₖ − B_d B⁺cₖ
-  // uₖ = B_d⁺(xₖ₊₁ − A_d xₖ − B_d B⁺cₖ)
-  // uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) − B⁺cₖ
+    // B_duₖ = xₖ₊₁ − A_d xₖ − B_d B⁺cₖ
+    // uₖ = B_d⁺(xₖ₊₁ − A_d xₖ − B_d B⁺cₖ)
+    // uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) − B⁺cₖ
 
-  // For an elevator with the model dx/dt = -Kv/Ka x + 1/Ka u - Kg/Ka - Ks/Ka sgn(x),
-  // A = -Kv/Ka, B = 1/Ka, and c = -(Kg/Ka + Ks/Ka).
+    // For an elevator with the model dx/dt = -Kv/Ka x + 1/Ka u - Kg/Ka - Ks/Ka sgn(x),
+    // A = -Kv/Ka, B = 1/Ka, and c = -(Kg/Ka + Ks/Ka).
 
-  // uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) − Ka(-(Kg/Ka + Ks/Ka))
-  // uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + Ka(Kg/Ka + Ks/Ka)
-  // uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + Kg + Ks
+    // uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) − Ka(-(Kg/Ka + Ks/Ka))
+    // uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + Ka(Kg/Ka + Ks/Ka)
+    // uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + Kg + Ks
     var plant = LinearSystemId.identifyVelocitySystem(this.kv, this.ka);
     var feedforward = new LinearPlantInversionFeedforward<>(plant, dtSeconds);
 
