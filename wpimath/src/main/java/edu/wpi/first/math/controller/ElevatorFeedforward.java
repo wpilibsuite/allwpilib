@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.math.controller;
+
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.system.plant.LinearSystemId;
@@ -58,7 +59,7 @@ public class ElevatorFeedforward {
 
   /**
    * Calculates the feedforward from the gains and setpoints.
-   *
+   * <p>
    * Note this method is inaccurate when the velocity crosses 0.
    *
    * @param currentVelocity The current velocity setpoint.
