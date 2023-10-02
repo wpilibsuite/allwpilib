@@ -51,10 +51,6 @@ jobs:
           run: df . && rm -f semicolon_delimited_script && ./gradlew build --build-cache -PbuildServer -PskipJavaFormat ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
       - name: Check free disk space
         run: df .
-      - name: git status
-        run: git status
-      - name: print version
-        run: cat build/allOutputs/version.txt
       - uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.artifact-name }}
@@ -158,10 +154,6 @@ jobs:
       - name: Check disk free space (Windows)
         run: wmic logicaldisk get caption, freespace
         if: matrix.os == 'windows-2022'
-      - name: git status
-        run: git status
-      - name: print version
-        run: cat build/allOutputs/version.txt
       - uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.artifact-name }}
