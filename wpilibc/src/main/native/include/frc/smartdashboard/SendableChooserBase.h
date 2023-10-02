@@ -7,9 +7,6 @@
 #include <atomic>
 #include <string>
 
-#include <networktables/IntegerTopic.h>
-#include <networktables/StringTopic.h>
-#include <wpi/SmallVector.h>
 #include <wpi/mutex.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
