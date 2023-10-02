@@ -12,7 +12,7 @@
 
 #include "Constants.h"
 
-class Storage : frc2::SubsystemBase {
+class Storage : public frc2::SubsystemBase {
  public:
   Storage();
   /** Returns a command that runs the storage motor indefinitely. */
