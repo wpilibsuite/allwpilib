@@ -298,13 +298,7 @@ void SendableBuilderImpl::PublishConstRaw(std::string_view key,
   auto topic = m_table->GetRawTopic(key);
   auto prop = std::make_unique<PropertyImpl<nt::RawTopic>>();
   prop->pub = topic.Publish(typeString);
-  prop->updateNetwork = [value, prevPub = NT_Publisher{}](
-                            auto& pub, int64_t time) mutable {
-    if (prevPub != pub.GetHandle()) {
-      pub.Set(value, time);
-    }
-    prevPub = pub.GetHandle();
-  };
+  prop->pub.Set(value);
   m_properties.emplace_back(std::move(prop));
 }
 
