@@ -58,6 +58,7 @@ public class ElevatorFeedforward {
 
     /**
    * Calculates the feedforward from the gains and setpoints.
+   * Note this method ignores the error that occurs when the velocity crosses 0.
    *
    * @param currentVelocity The current velocity setpoint.
    * @param nextVelocity The next velocity setpoint.
