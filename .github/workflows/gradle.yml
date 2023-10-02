@@ -48,13 +48,11 @@ jobs:
         with:
           image: ${{ matrix.container }}
           options: -v ${{ github.workspace }}:/work -w /work -e ARTIFACTORY_PUBLISH_USERNAME=${{ secrets.ARTIFACTORY_USERNAME }} -e ARTIFACTORY_PUBLISH_PASSWORD=${{ secrets.ARTIFACTORY_PASSWORD }}
-          run: df . && ./gradlew build --build-cache -PbuildServer -PskipJavaFormat ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
+          run: df . && rm -f semicolon_delimited_script && ./gradlew build --build-cache -PbuildServer -PskipJavaFormat ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
       - name: Check free disk space
         run: df .
       - name: git status
         run: git status
-      - name: git describe
-        run: git describe --dirty
       - name: print version
         run: cat build/allOutputs/version.txt
       - uses: actions/upload-artifact@v3
@@ -162,8 +160,6 @@ jobs:
         if: matrix.os == 'windows-2022'
       - name: git status
         run: git status
-      - name: git describe
-        run: git describe --dirty
       - name: print version
         run: cat build/allOutputs/version.txt
       - uses: actions/upload-artifact@v3
@@ -190,12 +186,6 @@ jobs:
         env:
           ARTIFACTORY_PUBLISH_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
           ARTIFACTORY_PUBLISH_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
-      - name: git status
-        run: git status
-      - name: git describe
-        run: git describe --dirty
-      - name: print version
-        run: cat build/allOutputs/version.txt
       - uses: actions/upload-artifact@v3
         with:
           name: Documentation
