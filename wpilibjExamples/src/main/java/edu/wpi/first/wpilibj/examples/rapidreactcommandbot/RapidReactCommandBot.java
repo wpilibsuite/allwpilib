@@ -94,5 +94,6 @@ public class RapidReactCommandBot implements AutoCloseable {
     m_intake.close();
     m_storage.close();
     m_shooter.close();
+    m_pneumatics.close();
   }
 }
