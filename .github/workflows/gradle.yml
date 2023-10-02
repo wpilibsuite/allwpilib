@@ -54,7 +54,9 @@ jobs:
       - name: git status
         run: git status
       - name: git describe
-        run: git describe
+        run: git describe --dirty
+      - name: print version
+        run: cat build/allOutputs/version.txt
       - uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.artifact-name }}
@@ -161,7 +163,9 @@ jobs:
       - name: git status
         run: git status
       - name: git describe
-        run: git describe
+        run: git describe --dirty
+      - name: print version
+        run: cat build/allOutputs/version.txt
       - uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.artifact-name }}
@@ -189,7 +193,9 @@ jobs:
       - name: git status
         run: git status
       - name: git describe
-        run: git describe
+        run: git describe --dirty
+      - name: print version
+        run: cat build/allOutputs/version.txt
       - uses: actions/upload-artifact@v3
         with:
           name: Documentation
