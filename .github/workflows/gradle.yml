@@ -51,6 +51,10 @@ jobs:
           run: df . && ./gradlew build --build-cache -PbuildServer -PskipJavaFormat ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
       - name: Check free disk space
         run: df .
+      - name: git status
+        run: git status
+      - name: git describe
+        run: git describe
       - uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.artifact-name }}
@@ -154,6 +158,10 @@ jobs:
       - name: Check disk free space (Windows)
         run: wmic logicaldisk get caption, freespace
         if: matrix.os == 'windows-2022'
+      - name: git status
+        run: git status
+      - name: git describe
+        run: git describe
       - uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.artifact-name }}
@@ -178,6 +186,10 @@ jobs:
         env:
           ARTIFACTORY_PUBLISH_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
           ARTIFACTORY_PUBLISH_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
+      - name: git status
+        run: git status
+      - name: git describe
+        run: git describe
       - uses: actions/upload-artifact@v3
         with:
           name: Documentation
