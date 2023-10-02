@@ -5,14 +5,13 @@
 #pragma once
 
 #include <functional>
-#include <initializer_list>
-#include <span>
 
 #include <frc/Timer.h>
 #include <frc/trajectory/TrapezoidProfile.h>
 
 #include "frc2/command/Command.h"
 #include "frc2/command/CommandHelper.h"
+#include "frc2/command/Requirements.h"
 
 namespace frc2 {
 /**
