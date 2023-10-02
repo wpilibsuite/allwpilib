@@ -149,17 +149,7 @@ CommandPtr Select(std::function<Key()> selector,
  */
 [[nodiscard]]
 CommandPtr Defer(wpi::unique_function<Command*()> supplier,
-                 std::span<Subsystem* const> requirements);
-
-/**
- * Runs the command supplied by the supplier.
- *
- * @param supplier the command supplier
- * @param requirements the set of requirements for this command
- */
-[[nodiscard]]
-CommandPtr Defer(wpi::unique_function<Command*()> supplier,
-                 std::initializer_list<Subsystem*> requirements);
+                 Requirements requirements);
 
 /**
  * Runs the command supplied by the supplier.
@@ -169,17 +159,7 @@ CommandPtr Defer(wpi::unique_function<Command*()> supplier,
  */
 [[nodiscard]]
 CommandPtr Defer(wpi::unique_function<CommandPtr()> supplier,
-                 std::span<Subsystem* const> requirements);
-
-/**
- * Runs the command supplied by the supplier.
- *
- * @param supplier the command supplier
- * @param requirements the set of requirements for this command
- */
-[[nodiscard]]
-CommandPtr Defer(wpi::unique_function<CommandPtr()> supplier,
-                 std::initializer_list<Subsystem*> requirements);
+                 Requirements requirements);
 
 /**
  * Constructs a command that schedules the command returned from the supplier

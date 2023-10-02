@@ -12,6 +12,7 @@
 #include "frc2/command/Command.h"
 #include "frc2/command/CommandHelper.h"
 #include "frc2/command/PrintCommand.h"
+#include "frc2/command/Requirements.h"
 
 namespace frc2 {
 /**
@@ -39,21 +40,7 @@ class DeferredCommand : public CommandHelper<Command, DeferredCommand> {
    *
    */
   DeferredCommand(wpi::unique_function<Command*()> supplier,
-                  std::span<Subsystem* const> requirements);
-
-  /**
-   * Creates a new DeferredCommand that runs the supplied command when
-   * initialized, and ends when it ends. Useful for lazily
-   * creating commands at runtime. The supplier will be called each time this
-   * command is initialized. The supplier <i>must</i> create a new Command each
-   * call.
-   *
-   * @param supplier The command supplier
-   * @param requirements The command requirements.
-   *
-   */
-  DeferredCommand(wpi::unique_function<Command*()> supplier,
-                  std::initializer_list<Subsystem*> requirements);
+                  Requirements requirements);
 
   /**
    * Creates a new DeferredCommand that runs the supplied command when
@@ -67,21 +54,7 @@ class DeferredCommand : public CommandHelper<Command, DeferredCommand> {
    *
    */
   DeferredCommand(wpi::unique_function<CommandPtr()> supplier,
-                  std::span<Subsystem* const> requirements);
-
-  /**
-   * Creates a new DeferredCommand that runs the supplied command when
-   * initialized, and ends when it ends. Useful for lazily
-   * creating commands at runtime. The supplier will be called each time this
-   * command is initialized. The supplier <i>must</i> create a new Command each
-   * call.
-   *
-   * @param supplier The command supplier
-   * @param requirements The command requirements.
-   *
-   */
-  DeferredCommand(wpi::unique_function<CommandPtr()> supplier,
-                  std::initializer_list<Subsystem*> requirements);
+                  Requirements requirements);
 
   DeferredCommand(DeferredCommand&& other) = default;
 

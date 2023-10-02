@@ -84,22 +84,12 @@ CommandPtr cmd::Either(CommandPtr&& onTrue, CommandPtr&& onFalse,
 }
 
 CommandPtr cmd::Defer(wpi::unique_function<Command*()> supplier,
-                      std::span<Subsystem* const> requirements) {
-  return DeferredCommand(std::move(supplier), requirements).ToPtr();
-}
-
-CommandPtr cmd::Defer(wpi::unique_function<Command*()> supplier,
-                      std::initializer_list<Subsystem*> requirements) {
+                      Requirements requirements) {
   return DeferredCommand(std::move(supplier), requirements).ToPtr();
 }
 
 CommandPtr cmd::Defer(wpi::unique_function<CommandPtr()> supplier,
-                      std::span<Subsystem* const> requirements) {
-  return DeferredCommand(std::move(supplier), requirements).ToPtr();
-}
-
-CommandPtr cmd::Defer(wpi::unique_function<CommandPtr()> supplier,
-                      std::initializer_list<Subsystem*> requirements) {
+                      Requirements requirements) {
   return DeferredCommand(std::move(supplier), requirements).ToPtr();
 }
 

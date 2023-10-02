@@ -11,29 +11,13 @@
 using namespace frc2;
 
 DeferredCommand::DeferredCommand(wpi::unique_function<Command*()> supplier,
-                                 std::span<Subsystem* const> requirements)
-    : m_supplier{std::move(supplier)} {
-  AddRequirements(requirements);
-}
-
-DeferredCommand::DeferredCommand(wpi::unique_function<Command*()> supplier,
-                                 std::initializer_list<Subsystem*> requirements)
+                                 Requirements requirements)
     : m_supplier{std::move(supplier)} {
   AddRequirements(requirements);
 }
 
 DeferredCommand::DeferredCommand(wpi::unique_function<CommandPtr()> supplier,
-                                 std::span<Subsystem* const> requirements)
-    : DeferredCommand(
-          [lambdaSupplier = std::move(supplier),
-           holder = std::optional<CommandPtr>{}]() mutable {
-            holder = lambdaSupplier();
-            return holder->get();
-          },
-          requirements) {}
-
-DeferredCommand::DeferredCommand(wpi::unique_function<CommandPtr()> supplier,
-                                 std::initializer_list<Subsystem*> requirements)
+                                 Requirements requirements)
     : DeferredCommand(
           [lambdaSupplier = std::move(supplier),
            holder = std::optional<CommandPtr>{}]() mutable {
