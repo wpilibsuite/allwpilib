@@ -65,6 +65,7 @@ public class ElevatorFeedforward {
    * @param dtSeconds Time between velocity setpoints in seconds.
    * @return The computed feedforward.
    */
+  public double calculate(double currentVelocity, double nextVelocity, double dtSeconds) {
   // dx/dt = Ax + Bu + c
   // dx/dt = Ax + B(u + B⁺c)
   // xₖ₊₁ = eᴬᵀxₖ + A⁻¹(eᴬᵀ - I)B(uₖ + B⁺cₖ)
@@ -83,7 +84,6 @@ public class ElevatorFeedforward {
   // uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) − Ka(-(Kg/Ka + Ks/Ka))
   // uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + Ka(Kg/Ka + Ks/Ka)
   // uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + Kg + Ks
-  public double calculate(double currentVelocity, double nextVelocity, double dtSeconds) {
     var plant = LinearSystemId.identifyVelocitySystem(this.kv, this.ka);
     var feedforward = new LinearPlantInversionFeedforward<>(plant, dtSeconds);
 
