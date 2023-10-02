@@ -22,8 +22,6 @@ if (WITH_JAVA)
   else()
       set (wpilibNewCommands_config_dir share/wpilibNewCommands)
   endif()
-
-  install(FILES ${WPILIB_BINARY_DIR}/wpilibNewCommands-config.cmake DESTINATION ${wpilibNewCommands_config_dir})
 endif()
 
 file(GLOB_RECURSE wpilibNewCommands_native_src src/main/native/cpp/*.cpp)
