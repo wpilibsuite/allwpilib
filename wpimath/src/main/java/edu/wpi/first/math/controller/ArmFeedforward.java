@@ -4,8 +4,14 @@
 
 package edu.wpi.first.math.controller;
 
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.system.plant.LinearSystemId;
+
 /**
- * A helper class that computes feedforward outputs for a simple arm (modeled as a motor acting
+ * A helper class that computes feedforward outputs for a simple arm (modeled as
+ * a motor acting
  * against the force of gravity on a beam suspended at an angle).
  */
 public class ArmFeedforward {
@@ -15,7 +21,8 @@ public class ArmFeedforward {
   public final double ka;
 
   /**
-   * Creates a new ArmFeedforward with the specified gains. Units of the gain values will dictate
+   * Creates a new ArmFeedforward with the specified gains. Units of the gain
+   * values will dictate
    * units of the computed feedforward.
    *
    * @param ks The static gain.
@@ -31,7 +38,8 @@ public class ArmFeedforward {
   }
 
   /**
-   * Creates a new ArmFeedforward with the specified gains. Acceleration gain is defaulted to zero.
+   * Creates a new ArmFeedforward with the specified gains. Acceleration gain is
+   * defaulted to zero.
    * Units of the gain values will dictate units of the computed feedforward.
    *
    * @param ks The static gain.
@@ -45,10 +53,13 @@ public class ArmFeedforward {
   /**
    * Calculates the feedforward from the gains and setpoints.
    *
-   * @param positionRadians The position (angle) setpoint. This angle should be measured from the
-   *     horizontal (i.e. if the provided angle is 0, the arm should be parallel with the floor). If
-   *     your encoder does not follow this convention, an offset should be added.
-   * @param velocityRadPerSec The velocity setpoint.
+   * @param positionRadians       The position (angle) setpoint. This angle should
+   *                              be measured from the
+   *                              horizontal (i.e. if the provided angle is 0, the
+   *                              arm should be parallel with the floor). If
+   *                              your encoder does not follow this convention, an
+   *                              offset should be added.
+   * @param velocityRadPerSec     The velocity setpoint.
    * @param accelRadPerSecSquared The acceleration setpoint.
    * @return The computed feedforward.
    */
@@ -61,13 +72,45 @@ public class ArmFeedforward {
   }
 
   /**
-   * Calculates the feedforward from the gains and velocity setpoint (acceleration is assumed to be
+   * Calculates the feedforward from the gains and setpoints.
+   *
+   * @param positionRadians          The position (angle) setpoint. This angle
+   *                                 should be
+   *                                 measured from the
+   *                                 horizontal (i.e. if the provided angle is 0,
+   *                                 the arm
+   *                                 should be parallel with the floor). If
+   *                                 your encoder does not follow this convention,
+   *                                 an
+   *                                 offset should be added.
+   * @param currentVelocityRadPerSec The current velocity setpoint.
+   * @param nextVelocityRadPerSec    The next velocity setpoint.
+   * @param dtSeconds                Time between velocity setpoints in seconds.
+   * @return The computed feedforward.
+   */
+  public double calculate(double positionRadians, double currentVelocityRadPerSec, double nextVelocityRadPerSec, double dtSeconds) {
+    var plant = LinearSystemId.identifyVelocitySystem(this.kv, this.ka);
+    var feedforward = new LinearPlantInversionFeedforward<>(plant, dtSeconds);
+
+    var r = Matrix.mat(Nat.N1(), Nat.N1()).fill(currentVelocityRadPerSec);
+    var nextR = Matrix.mat(Nat.N1(), Nat.N1()).fill(nextVelocityRadPerSec);
+
+    return ks * Math.signum(currentVelocityRadPerSec) + kg * Math.cos(positionRadians)
+        + feedforward.calculate(r, nextR).get(0, 0);
+  }
+
+  /**
+   * Calculates the feedforward from the gains and velocity setpoint (acceleration
+   * is assumed to be
    * zero).
    *
-   * @param positionRadians The position (angle) setpoint. This angle should be measured from the
-   *     horizontal (i.e. if the provided angle is 0, the arm should be parallel with the floor). If
-   *     your encoder does not follow this convention, an offset should be added.
-   * @param velocity The velocity setpoint.
+   * @param positionRadians The position (angle) setpoint. This angle should be
+   *                        measured from the
+   *                        horizontal (i.e. if the provided angle is 0, the arm
+   *                        should be parallel with the floor). If
+   *                        your encoder does not follow this convention, an
+   *                        offset should be added.
+   * @param velocity        The velocity setpoint.
    * @return The computed feedforward.
    */
   public double calculate(double positionRadians, double velocity) {
@@ -78,15 +121,20 @@ public class ArmFeedforward {
   // formulas for the methods below:
 
   /**
-   * Calculates the maximum achievable velocity given a maximum voltage supply, a position, and an
-   * acceleration. Useful for ensuring that velocity and acceleration constraints for a trapezoidal
-   * profile are simultaneously achievable - enter the acceleration constraint, and this will give
+   * Calculates the maximum achievable velocity given a maximum voltage supply, a
+   * position, and an
+   * acceleration. Useful for ensuring that velocity and acceleration constraints
+   * for a trapezoidal
+   * profile are simultaneously achievable - enter the acceleration constraint,
+   * and this will give
    * you a simultaneously-achievable velocity constraint.
    *
-   * @param maxVoltage The maximum voltage that can be supplied to the arm.
-   * @param angle The angle of the arm. This angle should be measured from the horizontal (i.e. if
-   *     the provided angle is 0, the arm should be parallel with the floor). If your encoder does
-   *     not follow this convention, an offset should be added.
+   * @param maxVoltage   The maximum voltage that can be supplied to the arm.
+   * @param angle        The angle of the arm. This angle should be measured from
+   *                     the horizontal (i.e. if
+   *                     the provided angle is 0, the arm should be parallel with
+   *                     the floor). If your encoder does
+   *                     not follow this convention, an offset should be added.
    * @param acceleration The acceleration of the arm.
    * @return The maximum possible velocity at the given acceleration and angle.
    */
@@ -96,15 +144,20 @@ public class ArmFeedforward {
   }
 
   /**
-   * Calculates the minimum achievable velocity given a maximum voltage supply, a position, and an
-   * acceleration. Useful for ensuring that velocity and acceleration constraints for a trapezoidal
-   * profile are simultaneously achievable - enter the acceleration constraint, and this will give
+   * Calculates the minimum achievable velocity given a maximum voltage supply, a
+   * position, and an
+   * acceleration. Useful for ensuring that velocity and acceleration constraints
+   * for a trapezoidal
+   * profile are simultaneously achievable - enter the acceleration constraint,
+   * and this will give
    * you a simultaneously-achievable velocity constraint.
    *
-   * @param maxVoltage The maximum voltage that can be supplied to the arm.
-   * @param angle The angle of the arm. This angle should be measured from the horizontal (i.e. if
-   *     the provided angle is 0, the arm should be parallel with the floor). If your encoder does
-   *     not follow this convention, an offset should be added.
+   * @param maxVoltage   The maximum voltage that can be supplied to the arm.
+   * @param angle        The angle of the arm. This angle should be measured from
+   *                     the horizontal (i.e. if
+   *                     the provided angle is 0, the arm should be parallel with
+   *                     the floor). If your encoder does
+   *                     not follow this convention, an offset should be added.
    * @param acceleration The acceleration of the arm.
    * @return The minimum possible velocity at the given acceleration and angle.
    */
@@ -114,16 +167,21 @@ public class ArmFeedforward {
   }
 
   /**
-   * Calculates the maximum achievable acceleration given a maximum voltage supply, a position, and
-   * a velocity. Useful for ensuring that velocity and acceleration constraints for a trapezoidal
-   * profile are simultaneously achievable - enter the velocity constraint, and this will give you a
+   * Calculates the maximum achievable acceleration given a maximum voltage
+   * supply, a position, and
+   * a velocity. Useful for ensuring that velocity and acceleration constraints
+   * for a trapezoidal
+   * profile are simultaneously achievable - enter the velocity constraint, and
+   * this will give you a
    * simultaneously-achievable acceleration constraint.
    *
    * @param maxVoltage The maximum voltage that can be supplied to the arm.
-   * @param angle The angle of the arm. This angle should be measured from the horizontal (i.e. if
-   *     the provided angle is 0, the arm should be parallel with the floor). If your encoder does
-   *     not follow this convention, an offset should be added.
-   * @param velocity The velocity of the arm.
+   * @param angle      The angle of the arm. This angle should be measured from
+   *                   the horizontal (i.e. if
+   *                   the provided angle is 0, the arm should be parallel with
+   *                   the floor). If your encoder does
+   *                   not follow this convention, an offset should be added.
+   * @param velocity   The velocity of the arm.
    * @return The maximum possible acceleration at the given velocity.
    */
   public double maxAchievableAcceleration(double maxVoltage, double angle, double velocity) {
@@ -131,16 +189,21 @@ public class ArmFeedforward {
   }
 
   /**
-   * Calculates the minimum achievable acceleration given a maximum voltage supply, a position, and
-   * a velocity. Useful for ensuring that velocity and acceleration constraints for a trapezoidal
-   * profile are simultaneously achievable - enter the velocity constraint, and this will give you a
+   * Calculates the minimum achievable acceleration given a maximum voltage
+   * supply, a position, and
+   * a velocity. Useful for ensuring that velocity and acceleration constraints
+   * for a trapezoidal
+   * profile are simultaneously achievable - enter the velocity constraint, and
+   * this will give you a
    * simultaneously-achievable acceleration constraint.
    *
    * @param maxVoltage The maximum voltage that can be supplied to the arm.
-   * @param angle The angle of the arm. This angle should be measured from the horizontal (i.e. if
-   *     the provided angle is 0, the arm should be parallel with the floor). If your encoder does
-   *     not follow this convention, an offset should be added.
-   * @param velocity The velocity of the arm.
+   * @param angle      The angle of the arm. This angle should be measured from
+   *                   the horizontal (i.e. if
+   *                   the provided angle is 0, the arm should be parallel with
+   *                   the floor). If your encoder does
+   *                   not follow this convention, an offset should be added.
+   * @param velocity   The velocity of the arm.
    * @return The minimum possible acceleration at the given velocity.
    */
   public double minAchievableAcceleration(double maxVoltage, double angle, double velocity) {
