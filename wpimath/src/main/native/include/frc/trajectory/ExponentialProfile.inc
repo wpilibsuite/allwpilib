@@ -16,17 +16,37 @@ ExponentialProfile<Distance, Input>::ExponentialProfile(Constraints constraints,
     : m_constraints(constraints),
       m_initial(initial),
       m_goal(goal),
-      m_direction{ShouldFlipInput() ? -1 : 1} {
+      m_direction{ShouldFlipInput(constraints, goal, initial) ? -1 : 1} {
   auto A = m_constraints.A;
   auto B = m_constraints.B;
   auto U = m_direction * m_constraints.maxInput;
 
+  if (m_initial == m_goal) {
+    m_inflectionTime = 0_s;
+    m_totalTime = 0_s;
+    m_inflectionPoint = m_initial;
+
+    return;
+  }
+
   auto inflectionV = SolveForInflectionVelocity(U);
+  auto inflectionP = ComputeDistanceInPhaseSpace(inflectionV, -U, m_goal, m_constraints);
 
-  auto inflectionP = DistanceForVelocityOnBackwardPass(inflectionV, U);
+  auto inflectionT_forward = ComputeTimeFromVelocity(inflectionV, U, m_initial.velocity, constraints);
 
-  auto inflectionT_forward = units::math::log((A * inflectionV + B * U)/(A * m_initial.velocity + B * U)) / A;
-  auto inflectionT_backward = units::math::log((A * inflectionV - B * U)/(A * m_goal.velocity - B * U)) / A;
+  if (std::isinf(inflectionT_forward.value())) {
+    // A singularity occurrs at A * v_i = B * U
+    // we know that we can get _really_ close though and still have stable calculation
+    // so we first start by getting really close
+    auto solvableV = inflectionV - Velocity_t(1e-9) * m_direction;
+    auto t_to_solvable_v = ComputeTimeFromVelocity(solvableV, U, m_initial.velocity, constraints);
+    auto x_at_solvable_v = ComputeDistanceInPhaseSpace(solvableV, U, m_initial, m_constraints);
+
+    // and then claim that the remaining distance is covered by the max velocity.
+    inflectionT_forward = t_to_solvable_v + (inflectionP - x_at_solvable_v) / (-B * U / A);
+  }
+
+  auto inflectionT_backward = ComputeTimeFromVelocity(inflectionV, -U, m_goal.velocity, constraints);
 
   m_inflectionTime = inflectionT_forward;
   m_totalTime = inflectionT_forward - inflectionT_backward;
@@ -35,36 +55,53 @@ ExponentialProfile<Distance, Input>::ExponentialProfile(Constraints constraints,
 
 template <class Distance, class Input>
 bool
-ExponentialProfile<Distance, Input>::ShouldFlipInput() const {
-  auto x_forward = DistanceForVelocityOnForwardPass(m_goal.velocity, m_constraints.maxInput);
-  auto x_reverse = DistanceForVelocityOnForwardPass(m_goal.velocity, -m_constraints.maxInput);
+ExponentialProfile<Distance, Input>::ShouldFlipInput(const Constraints &constraints, const State &goal, const State &initial) {
+  auto A = constraints.A;
+  auto B = constraints.B;
+  auto U = constraints.maxInput;
 
-  auto a = m_initial.velocity >= Velocity_t(0);
-  auto b = m_goal.velocity >= Velocity_t(0);
-  auto c = m_goal.position >= x_reverse;
-  auto d = m_goal.position >= x_forward;
+  auto x0 = initial.position;
+  auto v0 = initial.velocity;
+  auto xf = goal.position;
+  auto vf = goal.velocity;
 
-  return (b && c && !d) || (!c && !d) || (a && !c); 
+  auto x_forward = ComputeDistanceInPhaseSpace(vf, U, initial, constraints);
+  auto x_reverse = ComputeDistanceInPhaseSpace(vf, -U, initial, constraints);
+
+  if (v0 >= -B / A * U) {
+    return xf < x_reverse;
+  } 
+  
+  if (v0 <= B / A * U) {
+    return xf < x_forward;
+  }
+
+  auto a = v0 >= Velocity_t(0);
+  auto b = vf >= Velocity_t(0);
+  auto c = xf >= x_forward;
+  auto d = xf >= x_reverse;
+
+  return (a && !d) || (b && !c) || (!c && !d);
 }
 
 template <class Distance, class Input>
 typename ExponentialProfile<Distance, Input>::Distance_t
-ExponentialProfile<Distance, Input>::DistanceForVelocityOnForwardPass(const Velocity_t& velocity, const Input_t &input) const {
-  auto A = m_constraints.A;
-  auto B = m_constraints.B;
+ExponentialProfile<Distance, Input>::ComputeDistanceInPhaseSpace(const Velocity_t& velocity, const Input_t &input, const State &initial, const Constraints &constraints) {
+  auto A = constraints.A;
+  auto B = constraints.B;
   auto U = input;
 
-  return m_initial.position + (velocity - m_initial.velocity) / A + B * U / (A * A) * units::math::log((A * m_initial.velocity + B * U) / (A * velocity + B * U));
+  return initial.position + (velocity - initial.velocity) / A - B * U / (A * A) * units::math::log((A * velocity + B * U) / (A * initial.velocity + B * U));
 }
 
 template <class Distance, class Input>
-typename ExponentialProfile<Distance, Input>::Distance_t
-ExponentialProfile<Distance, Input>::DistanceForVelocityOnBackwardPass(const Velocity_t& velocity, const Input_t &input) const {
-  auto A = m_constraints.A;
-  auto B = m_constraints.B;
+units::second_t
+ExponentialProfile<Distance, Input>::ComputeTimeFromVelocity(const Velocity_t& velocity, const Input_t &input, const Velocity_t &initial, const Constraints &constraints) {
+  auto A = constraints.A;
+  auto B = constraints.B;
   auto U = input;
 
-  return m_goal.position + (velocity - m_goal.velocity) / A - B * U / (A * A) * units::math::log((A * m_goal.velocity - B * U) / (A * velocity - B * U));
+  return units::math::log((A * velocity + B * U)/(A * initial + B * U)) / A;
 }
 
 template <class Distance, class Input>
@@ -74,21 +111,18 @@ ExponentialProfile<Distance, Input>::SolveForInflectionVelocity(const Input_t &i
   auto B = m_constraints.B;
   auto U = input;
 
-  auto U_dir = units::math::sqrt(U * U) / U;
+  auto U_dir = U / units::math::abs(U);
 
   auto position_delta = m_goal.position - m_initial.position;
   auto velocity_delta = m_goal.velocity - m_initial.velocity;
 
-  auto A_over_B = m_constraints.A / m_constraints.B;
-  auto A_over_B_sq = A_over_B * A_over_B;
+  auto scalar = (A * m_initial.velocity + B * U) * (A * m_goal.velocity - B * U);
+  auto power = -A / B / U * (A * position_delta - velocity_delta);
 
-  auto scalar = A_over_B_sq * m_initial.velocity * m_goal.velocity + A_over_B * U * velocity_delta - U*U;
-  auto power = A_over_B / U * (velocity_delta - A * position_delta);
+  auto a = -A * A;
+  auto c = B*B*U*U + scalar * units::math::exp(power);
 
-  auto a = A_over_B_sq;
-  auto c = - U*U - scalar * units::math::exp(power);
-
-  return Velocity_t((U_dir * units::math::sqrt(-c) / a).value()); 
+  return U_dir * units::math::sqrt(-c/a);
 }
 
 template <class Distance, class Input>
@@ -103,11 +137,11 @@ ExponentialProfile<Distance, Input>::DistanceAtTime(const units::second_t& time,
   }
 
   if (time < m_inflectionTime) {
-    return m_initial.position + (- B * U * time + (m_initial.velocity + B / A * U) * (units::math::exp(A * time) - 1)) / A;
+    return m_initial.position + (-B * U * time + (m_initial.velocity + B * U / A) * (units::math::exp(A * time) - 1)) / A;
   }
 
   if (time < m_totalTime) {
-    return m_goal.position + (B * U * time + (m_goal.velocity - B / A * U) * (units::math::exp(A * time) - 1)) / A;
+    return m_goal.position + (B * U * (time - m_totalTime) + (m_goal.velocity - B * U / A) * (units::math::exp(A * (time - m_totalTime)) - 1)) / A;
   }
 
   return m_goal.position;
@@ -129,7 +163,7 @@ ExponentialProfile<Distance, Input>::VelocityAtTime(const units::second_t& time,
   }
 
   if (time < m_totalTime) {
-    return (m_goal.velocity - B * U / A) * units::math::exp(A * time) + B * U / A;
+    return (m_goal.velocity - B * U / A) * units::math::exp(A * (time - m_totalTime)) + B * U / A;
   }
 
   return m_goal.velocity;
@@ -139,5 +173,15 @@ template <class Distance, class Input>
 typename ExponentialProfile<Distance, Input>::State
 ExponentialProfile<Distance, Input>::Calculate(const units::second_t &t) const {
   return State{DistanceAtTime(t, m_direction * m_constraints.maxInput), VelocityAtTime(t, m_direction * m_constraints.maxInput)};
+}
+
+template <class Distance, class Input>
+typename ExponentialProfile<Distance, Input>::Input_t
+ExponentialProfile<Distance, Input>::CalculateInput(const units::second_t &t) const {
+  if (t < m_inflectionTime) {
+    return m_direction * m_constraints.maxInput;
+  } else {
+    return -m_direction * m_constraints.maxInput;
+  }
 }
 }  // namespace frc

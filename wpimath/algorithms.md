@@ -396,4 +396,4 @@ This creates a decision table:
 | True  | True  | True            | False            |          -1 |
 | True  | True  | True            | True             |           1 |
 
-Which is equivalent to `-1 if BC!D + !C!D + A!C else 1`.
+Which is equivalent to `-1 if (A & ~D) | (B & ~C) | (~C & ~D) else 1`.

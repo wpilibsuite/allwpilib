@@ -1,4 +1,5 @@
 from sympy import *
+from sympy.logic.boolalg import *
 
 init_printing()
 
@@ -12,12 +13,10 @@ diffeq = Eq(x(t).diff(t, t) - A * x(t).diff(t), B * U)
 x = dsolve(diffeq).rhs
 dx = x.diff(t)
 
-x.subs([
+x = x.subs([
     (c1, solve(Eq(x.subs(t, 0), x0), c1)[0]),
     (c2, solve(Eq(dx.subs(t, 0), v0), c2)[0])
 ])
-
-c1_sub = solve(Eq(x.subs(t, 0), x))
 
 print(f"General Solution: {x}")
 
@@ -39,11 +38,11 @@ x1_ps = x1.subs(t, t1_eqn)
 
 
 # x2 is for the decelerate step
-x2 = x.subs(x.subs({
+x2 = x.subs({
     x0: xf,
     v0: vf,
     U: -U
-}))
+})
 
 dx2 = x2.diff(t)
 t2_eqn = solve(Eq(dx2, v), t)[0]
@@ -87,3 +86,9 @@ print(f"t2: {expand(simplify(t2_eqn))}")
 print(f"x1 phase space: {expand(simplify(x1.subs(t, t1_eqn)))}")
 print(f"x2 phase space: {expand(simplify(x2.subs(t, t2_eqn)))}")
 print(f"vi equality: {v_equality}")
+
+
+a, b, c, d = symbols('a, b, c, d')
+
+expression = SOPform([a, b, c, d], minterms = [0, 4, 5, 8, 10, 12, 13, 14])
+print(f"Truth Table Expression: {expression}")
