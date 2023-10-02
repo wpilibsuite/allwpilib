@@ -12,7 +12,7 @@
 #include <utility>
 #include <vector>
 
-#include <networktables/NTSendableBuilder.h>
+#include <wpi/sendable/SendableBuilder.h>
 
 #include "frc/smartdashboard/SendableChooser.h"
 
@@ -58,16 +58,9 @@ void SendableChooser<T>::OnChange(std::function<void(T)> listener) {
 
 template <class T>
   requires std::copy_constructible<T> && std::default_initializable<T>
-void SendableChooser<T>::InitSendable(nt::NTSendableBuilder& builder) {
+void SendableChooser<T>::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("String Chooser");
-  {
-    std::scoped_lock lock(m_mutex);
-    m_instancePubs.emplace_back(
-        nt::IntegerTopic{builder.GetTopic(kInstance)}.Publish());
-    m_instancePubs.back().Set(m_instance);
-    m_activePubs.emplace_back(
-        nt::StringTopic{builder.GetTopic(kActive)}.Publish());
-  }
+  builder.PublishConstInteger(kInstance, m_instance);
   builder.AddStringArrayProperty(
       kOptions,
       [=, this] {
@@ -109,9 +102,6 @@ void SendableChooser<T>::InitSendable(nt::NTSendableBuilder& builder) {
                                 std::scoped_lock lock(m_mutex);
                                 m_haveSelected = true;
                                 m_selected = val;
-                                for (auto& pub : m_activePubs) {
-                                  pub.Set(val);
-                                }
                                 if (m_previousVal != val && m_listener) {
                                   choice = m_choices[val];
                                   listener = m_listener;
