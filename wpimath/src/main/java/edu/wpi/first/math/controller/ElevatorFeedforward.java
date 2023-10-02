@@ -59,7 +59,8 @@ public class ElevatorFeedforward {
 
   /**
    * Calculates the feedforward from the gains and setpoints.
-   * Note this method is inaccurate when the velocity crosses 0.
+   *
+   * <p>Note this method is inaccurate when the velocity crosses 0.
    *
    * @param currentVelocity The current velocity setpoint.
    * @param nextVelocity The next velocity setpoint.
@@ -67,24 +68,28 @@ public class ElevatorFeedforward {
    * @return The computed feedforward.
    */
   public double calculate(double currentVelocity, double nextVelocity, double dtSeconds) {
-    // dx/dt = Ax + Bu + c
-    // dx/dt = Ax + B(u + B⁺c)
-    // xₖ₊₁ = eᴬᵀxₖ + A⁻¹(eᴬᵀ - I)B(uₖ + B⁺cₖ)
-    // xₖ₊₁ = A_d xₖ + B_d (uₖ + B⁺cₖ)
-    // xₖ₊₁ = A_d xₖ + B_duₖ + B_d B⁺cₖ
-
+    // Discretize the affine model.
+    //
+    //   dx/dt = Ax + Bu + c
+    //   dx/dt = Ax + B(u + B⁺c)
+    //   xₖ₊₁ = eᴬᵀxₖ + A⁻¹(eᴬᵀ - I)B(uₖ + B⁺cₖ)
+    //   xₖ₊₁ = A_d xₖ + B_d (uₖ + B⁺cₖ)
+    //   xₖ₊₁ = A_d xₖ + B_duₖ + B_d B⁺cₖ
+    //
     // Solve for uₖ.
-
-    // B_duₖ = xₖ₊₁ − A_d xₖ − B_d B⁺cₖ
-    // uₖ = B_d⁺(xₖ₊₁ − A_d xₖ − B_d B⁺cₖ)
-    // uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) − B⁺cₖ
-
-    // For an elevator with the model dx/dt = -Kv/Ka x + 1/Ka u - Kg/Ka - Ks/Ka sgn(x),
-    // A = -Kv/Ka, B = 1/Ka, and c = -(Kg/Ka + Ks/Ka).
-
-    // uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) − Ka(-(Kg/Ka + Ks/Ka))
-    // uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + Ka(Kg/Ka + Ks/Ka)
-    // uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + Kg + Ks
+    //
+    //   B_duₖ = xₖ₊₁ − A_d xₖ − B_d B⁺cₖ
+    //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ − B_d B⁺cₖ)
+    //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) − B⁺cₖ
+    //
+    // For an elevator with the model
+    // dx/dt = -Kv/Ka x + 1/Ka u - Kg/Ka - Ks/Ka sgn(x),
+    // A = -Kv/Ka, B = 1/Ka, and c = -(Kg/Ka + Ks/Ka sgn(x)). Substitute in B
+    // assuming sgn(x) is a constant for the duration of the step.
+    //
+    //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) − Ka(-(Kg/Ka + Ks/Ka sgn(x)))
+    //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + Ka(Kg/Ka + Ks/Ka sgn(x))
+    //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + Kg + Ks sgn(x)
     var plant = LinearSystemId.identifyVelocitySystem(this.kv, this.ka);
     var feedforward = new LinearPlantInversionFeedforward<>(plant, dtSeconds);
 
