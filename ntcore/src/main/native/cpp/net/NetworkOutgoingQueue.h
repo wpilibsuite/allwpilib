@@ -73,6 +73,8 @@ class NetworkOutgoingQueue {
 
   void SetPeriod(NT_Handle handle, uint32_t periodMs);
 
+  void EraseHandle(NT_Handle handle) { m_handleMap.erase(handle); }
+
   template <typename T>
   void SendMessage(NT_Handle handle, T&& msg) {
     m_queues[m_handleMap[handle].queueIndex].Append(handle,
@@ -206,7 +208,9 @@ void NetworkOutgoingQueue<MessageType>::SendValue(NT_Handle handle,
           static_cast<unsigned int>(info.valuePos) < queue.msgs.size()) {
         auto& elem = queue.msgs[info.valuePos];
         if (auto m = std::get_if<ValueMsg>(&elem.msg.contents)) {
-          if (elem.handle == handle) {  // should always be true
+          // double-check handle, and only replace if timestamp newer
+          if (elem.handle == handle &&
+              (m->value.time() == 0 || value.time() >= m->value.time())) {
             int delta = value.size() - m->value.size();
             m->value = value;
             m_totalSize += delta;

@@ -508,7 +508,7 @@ void ServerImpl::ClientData4::ProcessIncomingBinary(
 
 void ServerImpl::ClientData4::SendValue(TopicData* topic, const Value& value,
                                         ValueSendMode mode) {
-  m_outgoing.SendValue(Handle(0, topic->id, Handle::kTopic), value, mode);
+  m_outgoing.SendValue(topic->GetIdHandle(), value, mode);
 }
 
 void ServerImpl::ClientData4::SendAnnounce(TopicData* topic,
@@ -528,7 +528,7 @@ void ServerImpl::ClientData4::SendAnnounce(TopicData* topic,
       return;
     }
   }
-  m_outgoing.SendMessage(Handle(0, topic->id, Handle::kTopic),
+  m_outgoing.SendMessage(topic->GetIdHandle(),
                          AnnounceMsg{topic->name, topic->id, topic->typeStr,
                                      pubuid, topic->properties});
   m_server.m_controlReady = true;
@@ -548,8 +548,9 @@ void ServerImpl::ClientData4::SendUnannounce(TopicData* topic) {
       return;
     }
   }
-  m_outgoing.SendMessage(Handle(0, topic->id, Handle::kTopic),
+  m_outgoing.SendMessage(topic->GetIdHandle(),
                          UnannounceMsg{topic->name, topic->id});
+  m_outgoing.EraseHandle(topic->GetIdHandle());
   m_server.m_controlReady = true;
 }
 
@@ -568,7 +569,7 @@ void ServerImpl::ClientData4::SendPropertiesUpdate(TopicData* topic,
       return;
     }
   }
-  m_outgoing.SendMessage(Handle(0, topic->id, Handle::kTopic),
+  m_outgoing.SendMessage(topic->GetIdHandle(),
                          PropertiesUpdateMsg{topic->name, update, ack});
   m_server.m_controlReady = true;
 }
@@ -580,6 +581,14 @@ void ServerImpl::ClientData4::SendOutgoing(uint64_t curTimeMs, bool flush) {
     }
   }
   m_outgoing.SendOutgoing(curTimeMs, flush);
+}
+
+void ServerImpl::ClientData4::UpdatePeriod(TopicData::TopicClientData& tcd,
+                                           TopicData* topic) {
+  uint32_t period =
+      CalculatePeriod(tcd.subscribers, [](auto& x) { return x->periodMs; });
+  DEBUG4("updating {} period to {} ms", topic->name, period);
+  m_outgoing.SetPeriod(topic->GetIdHandle(), period);
 }
 
 bool ServerImpl::ClientData3::TopicData3::UpdateFlags(TopicData* topic) {

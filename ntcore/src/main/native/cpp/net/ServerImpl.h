@@ -21,6 +21,7 @@
 #include <wpi/UidVector.h>
 #include <wpi/json.h>
 
+#include "Handle.h"
 #include "Log.h"
 #include "Message.h"
 #include "NetworkInterface.h"
@@ -113,6 +114,8 @@ class ServerImpl final {
     bool SetProperties(const wpi::json& update);
     void RefreshProperties();
     bool SetFlags(unsigned int flags_);
+
+    NT_Handle GetIdHandle() const { return Handle(0, id, Handle::kTopic); }
 
     std::string name;
     unsigned int id;
@@ -292,12 +295,7 @@ class ServerImpl final {
 
     void Flush() final {}
 
-    void UpdatePeriod(TopicData::TopicClientData& tcd, TopicData* topic) final {
-      uint32_t period =
-          CalculatePeriod(tcd.subscribers, [](auto& x) { return x->periodMs; });
-      DEBUG4("updating {} period to {} ms", topic->name, period);
-      m_outgoing.SetPeriod(Handle(0, topic->id, Handle::kTopic), period);
-    }
+    void UpdatePeriod(TopicData::TopicClientData& tcd, TopicData* topic) final;
 
    public:
     WireConnection& m_wire;

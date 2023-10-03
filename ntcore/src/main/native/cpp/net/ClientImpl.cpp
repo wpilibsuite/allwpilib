@@ -37,9 +37,9 @@ ClientImpl::ClientImpl(
       m_timeSyncUpdated{std::move(timeSyncUpdated)},
       m_setPeriodic{std::move(setPeriodic)},
       m_ping{wire},
-      m_nextPingTimeMs{curTimeMs + wire.GetVersion() >= 0x0401
-                           ? NetworkPing::kPingIntervalMs
-                           : kRttIntervalMs},
+      m_nextPingTimeMs{curTimeMs + (wire.GetVersion() >= 0x0401
+                                        ? NetworkPing::kPingIntervalMs
+                                        : kRttIntervalMs)},
       m_outgoing{wire, false} {
   // immediately send RTT ping
   auto now = wpi::Now();
@@ -214,6 +214,9 @@ bool ClientImpl::Unpublish(NT_Publisher pubHandle, NT_Topic topicHandle) {
     }
   }
   UpdatePeriodic();
+
+  // remove from outgoing handle map
+  m_outgoing.EraseHandle(pubHandle);
 
   return doSend;
 }
