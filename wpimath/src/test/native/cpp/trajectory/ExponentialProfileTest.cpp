@@ -88,7 +88,6 @@ TEST(ExponentialProfileTest, SwitchGoalInMiddle) {
   goal = {0.0_m, 0.0_mps};
   for (int i = 0; i < 100; ++i) {
     frc::ExponentialProfile<units::meter, units::volts> profile{constraints, goal, state};
-    auto last_state = state;
     state = profile.Calculate(kDt);
   }
   EXPECT_EQ(state, goal);
@@ -102,13 +101,59 @@ TEST(ExponentialProfileTest, TopSpeed) {
 
   units::meters_per_second_t maxSpeed = 0_mps;
 
-  for (int i = 0; i < 2000; ++i) {
+  for (int i = 0; i < 900; ++i) {
     frc::ExponentialProfile<units::meter, units::volts> profile{constraints, goal, state};
     state = profile.Calculate(kDt);
     maxSpeed = units::math::max(state.velocity, maxSpeed);
   }
 
-  EXPECT_NEAR_UNITS(constraints.maxInput / kV, maxSpeed, 1e-5_mps);
+  EXPECT_NEAR_UNITS(constraints.MaxVelocity(), maxSpeed, 1e-5_mps);
+  EXPECT_EQ(state, goal);
+}
+
+// Checks to make sure that it hits top speed on long trajectories
+TEST(ExponentialProfileTest, TopSpeedBackward) {
+  frc::ExponentialProfile<units::meter, units::volts>::Constraints constraints{12_V, -kV/kA, 1/kA};
+  frc::ExponentialProfile<units::meter, units::volts>::State goal{-40_m, 0_mps};
+  frc::ExponentialProfile<units::meter, units::volts>::State state;
+
+  units::meters_per_second_t maxSpeed = 0_mps;
+
+  for (int i = 0; i < 900; ++i) {
+    frc::ExponentialProfile<units::meter, units::volts> profile{constraints, goal, state};
+    state = profile.Calculate(kDt);
+    maxSpeed = units::math::min(state.velocity, maxSpeed);
+  }
+
+  EXPECT_NEAR_UNITS(-constraints.MaxVelocity(), maxSpeed, 1e-5_mps);
+  EXPECT_EQ(state, goal);
+}
+
+// Checks to make sure that it hits top speed on long trajectories
+TEST(ExponentialProfileTest, HighInitialSpeed) {
+  frc::ExponentialProfile<units::meter, units::volts>::Constraints constraints{12_V, -kV/kA, 1/kA};
+  frc::ExponentialProfile<units::meter, units::volts>::State goal{40_m, 0_mps};
+  frc::ExponentialProfile<units::meter, units::volts>::State state{0_m, 8_mps};
+
+  for (int i = 0; i < 900; ++i) {
+    frc::ExponentialProfile<units::meter, units::volts> profile{constraints, goal, state};
+    state = profile.Calculate(kDt);
+  }
+
+  EXPECT_EQ(state, goal);
+}
+
+// Checks to make sure that it hits top speed on long trajectories
+TEST(ExponentialProfileTest, HighInitialSpeedBackward) {
+  frc::ExponentialProfile<units::meter, units::volts>::Constraints constraints{12_V, -kV/kA, 1/kA};
+  frc::ExponentialProfile<units::meter, units::volts>::State goal{-40_m, 0_mps};
+  frc::ExponentialProfile<units::meter, units::volts>::State state{0_m, -8_mps};
+
+  for (int i = 0; i < 900; ++i) {
+    frc::ExponentialProfile<units::meter, units::volts> profile{constraints, goal, state};
+    state = profile.Calculate(kDt);
+  }
+
   EXPECT_EQ(state, goal);
 }
 

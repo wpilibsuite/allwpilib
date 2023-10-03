@@ -35,16 +35,22 @@ ExponentialProfile<Distance, Input>::ExponentialProfile(Constraints constraints,
   units::second_t inflectionT_forward; 
 
   auto epsilon = Velocity_t(1e-9);
-  if (units::math::abs(m_constraints.MaxVelocity() - units::math::abs(inflectionV)) < epsilon) {
+  if (units::math::abs(m_direction * m_constraints.MaxVelocity() - inflectionV) < epsilon) {
     // A singularity occurrs at A * v_i = B * U
     // we know that we can get _really_ close though and still have stable calculation
     // so we first start by getting really close
-    auto solvableV = inflectionV - m_direction * epsilon;
+    auto solvableV = inflectionV;
+    if (units::math::abs(m_initial.velocity) > m_constraints.MaxVelocity()) {
+      solvableV += m_direction * epsilon;
+    } else {
+      solvableV -= m_direction * epsilon;
+    }
+
     auto t_to_solvable_v = ComputeTimeFromVelocity(solvableV, U, m_initial.velocity, constraints);
     auto x_at_solvable_v = ComputeDistanceInPhaseSpace(solvableV, U, m_initial, m_constraints);
 
     // and then claim that the remaining distance is covered by the max velocity.
-    inflectionT_forward = t_to_solvable_v + (inflectionP - x_at_solvable_v) / m_constraints.MaxVelocity();
+    inflectionT_forward = t_to_solvable_v + m_direction * (inflectionP - x_at_solvable_v) / m_constraints.MaxVelocity();
   } else {
     inflectionT_forward = ComputeTimeFromVelocity(inflectionV, U, m_initial.velocity, constraints);
   }
@@ -124,6 +130,11 @@ ExponentialProfile<Distance, Input>::SolveForInflectionVelocity(const Input_t &i
 
   auto a = -A * A;
   auto c = B*B*U*U + scalar * units::math::exp(power);
+
+  if (-1e-9 < c.value() && c.value() < 0) {
+    // numeric instability - the heuristic gets it right but these are small margins
+    return 0;
+  }
 
   return U_dir * units::math::sqrt(-c/a);
 }
