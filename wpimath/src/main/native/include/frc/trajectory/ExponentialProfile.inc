@@ -34,11 +34,12 @@ ExponentialProfile<Distance, Input>::ExponentialProfile(Constraints constraints,
 
   units::second_t inflectionT_forward; 
 
-  if (m_constraints.MaxVelocity() - units::math::abs(inflectionV) < 1e-9) {
+  auto epsilon = Velocity_t(1e-9);
+  if (units::math::abs(m_constraints.MaxVelocity() - units::math::abs(inflectionV)) < epsilon) {
     // A singularity occurrs at A * v_i = B * U
     // we know that we can get _really_ close though and still have stable calculation
     // so we first start by getting really close
-    auto solvableV = m_constraints.MaxVelocity() - Velocity_t(1e-9) * m_direction;
+    auto solvableV = inflectionV - m_direction * epsilon;
     auto t_to_solvable_v = ComputeTimeFromVelocity(solvableV, U, m_initial.velocity, constraints);
     auto x_at_solvable_v = ComputeDistanceInPhaseSpace(solvableV, U, m_initial, m_constraints);
 
@@ -57,7 +58,7 @@ ExponentialProfile<Distance, Input>::ExponentialProfile(Constraints constraints,
 
 template <class Distance, class Input>
 bool
-ExponentialProfile<Distance, Input>::ShouldFlipInput(const Constraints &constraints, const State &initial, const State &) {
+ExponentialProfile<Distance, Input>::ShouldFlipInput(const Constraints &constraints, const State &initial, const State &goal) {
   auto A = constraints.A;
   auto B = constraints.B;
   auto U = constraints.maxInput;

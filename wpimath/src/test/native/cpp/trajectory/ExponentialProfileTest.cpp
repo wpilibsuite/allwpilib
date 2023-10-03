@@ -81,7 +81,6 @@ TEST(ExponentialProfileTest, SwitchGoalInMiddle) {
 
   for (int i = 0; i < 50; ++i) {
     frc::ExponentialProfile<units::meter, units::volts> profile{constraints, goal, state};
-    auto last_state = state;
     state = profile.Calculate(kDt);
   }
   EXPECT_NE(state, goal);

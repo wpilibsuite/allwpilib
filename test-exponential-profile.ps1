@@ -1,0 +1,2 @@
+.\gradlew :wpimath:installWpimathTestWindowsx86-64DebugGoogleTestExe && .\wpimath\build\install\wpimathTest\windowsx86-64\debug\wpimathTest.bat --gtest_filter=ExponentialProfileTest.*
+.\gradlew :wpimath:testDesktopJava
