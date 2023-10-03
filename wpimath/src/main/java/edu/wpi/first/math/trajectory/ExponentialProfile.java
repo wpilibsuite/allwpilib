@@ -10,8 +10,8 @@ import java.util.Objects;
  * A exponential curve-shaped velocity profile.
  *
  * <p>While this class can be used for a profiled movement from start to finish, the intended usage
- * is to filter a reference's dynamics based on state-space model dynamics. To compute the
- * reference obeying this constraint, do the following.
+ * is to filter a reference's dynamics based on state-space model dynamics. To compute the reference
+ * obeying this constraint, do the following.
  *
  * <p>Initialization:
  *
@@ -60,10 +60,11 @@ public class ExponentialProfile {
     public final double B;
 
     /**
-     * Construct constraints for a TrapezoidProfile.
+     * Construct constraints for an ExponentialProfile.
      *
-     * @param maxVelocity maximum velocity
-     * @param maxAcceleration maximum acceleration
+     * @param maxInput maximum unsigned input voltage
+     * @param A The State-Space 1x1 system matrix.
+     * @param B The State-Space 1x1 input matrix.
      */
     private Constraints(double maxInput, double A, double B) {
       this.maxInput = maxInput;
@@ -71,24 +72,49 @@ public class ExponentialProfile {
       this.B = B;
     }
 
+    /**
+     * Computes the max achievable velocity for an Exponential Profile.
+     *
+     * @return The seady-state velocity achieved by this profile.
+     */
     public double maxVelocity() {
       return -maxInput * B / A;
     }
 
+    /**
+     * Construct constraints for an ExponentialProfile from characteristics.
+     *
+     * @param maxInput maximum unsigned input voltage
+     * @param kV The velocity gain.
+     * @param kA The acceleration gain.
+     */
     public static Constraints fromCharacteristics(double maxInput, double kV, double kA) {
       return new Constraints(maxInput, -kV / kA, 1.0 / kA);
     }
 
+    /**
+     * Construct constraints for an ExponentialProfile from State-Space parameters.
+     *
+     * @param maxInput maximum unsigned input voltage
+     * @param A The State-Space 1x1 system matrix.
+     * @param B The State-Space 1x1 input matrix.
+     */
     public static Constraints fromStateSpace(double maxInput, double A, double B) {
       return new Constraints(maxInput, A, B);
     }
   }
 
   public static class State {
-    public double position;
+    public final double position;
 
-    public double velocity;
+    public final double velocity;
 
+    /**
+     * Construct a state within an exponential profile
+     *
+     * @param position The position at this state.
+     * @param velocity The velocity at this state.
+     */
     public State(double position, double velocity) {
       this.position = position;
       this.velocity = velocity;
@@ -111,17 +137,44 @@ public class ExponentialProfile {
   }
 
   /**
-   * Construct a TrapezoidProfile.
+   * Construct an ExponentialProfile.
    *
-   * @param constraints The constraints on the profile, like maximum velocity.
+   * @param constraints The constraints on the profile, like maximum input.
    */
   public ExponentialProfile(Constraints constraints) {
     m_constraints = constraints;
   }
 
   /**
-   * Calculate the correct position and velocity for the profile at a time t where the beginning of
-   * the profile was at time t = 0.
+   * Calculate the correct input for the profile at a time t where the current state is at time t =
+   * 0.
+   *
+   * @param t The time since the beginning of the profile.
+   * @param current The current state.
+   * @param goal The desired state when the profile is complete.
+   * @return The input applied at time t.
+   */
+  public double calculateInput(double t, State current, State goal) {
+    var direction = shouldFlipAcceleration(current, goal) ? -1 : 1;
+    var U = direction * m_constraints.maxInput;
+
+    var inflectionPoint = calculateInflectionPoint(current, goal, U);
+    var timing = calculateProfileTiming(current, inflectionPoint, goal, U);
+
+    if (t < 0) {
+      return 0;
+    } else if (t < timing.inflectionTime) {
+      return direction * m_constraints.maxInput;
+    } else if (t < timing.totalTime) {
+      return -direction * m_constraints.maxInput;
+    } else {
+      return 0;
+    }
+  }
+
+  /**
+   * Calculate the correct position and velocity for the profile at a time t where the current state
+   * is at time t = 0.
    *
    * @param t The time since the beginning of the profile.
    * @param current The current state.
@@ -138,7 +191,8 @@ public class ExponentialProfile {
     if (t < 0) {
       return current;
     } else if (t < timing.inflectionTime) {
-      return new State(computeDistanceFromTime(t, U, current), computeVelocityFromTime(t, U, current));
+      return new State(
+          computeDistanceFromTime(t, U, current), computeVelocityFromTime(t, U, current));
     } else if (t < timing.totalTime) {
       return new State(
           computeDistanceFromTime(t - timing.totalTime, -U, goal),
@@ -149,7 +203,8 @@ public class ExponentialProfile {
   }
 
   /**
-   * Calculate the point after which the fastest way to reach the goal state is to apply input in the opposite direction.
+   * Calculate the point after which the fastest way to reach the goal state is to apply input in
+   * the opposite direction.
    *
    * @param current The current state.
    * @param goal The desired state when the profile is complete.
@@ -163,7 +218,8 @@ public class ExponentialProfile {
   }
 
   /**
-   * Calculate the point after which the fastest way to reach the goal state is to apply input in the opposite direction.
+   * Calculate the point after which the fastest way to reach the goal state is to apply input in
+   * the opposite direction.
    *
    * @param current The current state.
    * @param goal The desired state when the profile is complete.
@@ -197,8 +253,8 @@ public class ExponentialProfile {
   }
 
   /**
-   * Calculate the time it will take for this profile to reach the inflection point,
-   * and the time it will take for this profile to reach the  goal state.
+   * Calculate the time it will take for this profile to reach the inflection point, and the time it
+   * will take for this profile to reach the goal state.
    *
    * @param current The current state.
    * @param goal The desired state when the profile is complete.
@@ -213,8 +269,8 @@ public class ExponentialProfile {
   }
 
   /**
-   * Calculate the time it will take for this profile to reach the inflection point,
-   * and the time it will take for this profile to reach the  goal state.
+   * Calculate the time it will take for this profile to reach the inflection point, and the time it
+   * will take for this profile to reach the goal state.
    *
    * @param current The current state.
    * @param inflectionPoint The inflection point of this profile.
@@ -305,9 +361,10 @@ public class ExponentialProfile {
   }
 
   /**
-   * Calculate the distance reached at the same time as the given velocity when applying the given input from the initial state.
+   * Calculate the distance reached at the same time as the given velocity when applying the given
+   * input from the initial state.
    *
-   * @param velocity The velocity reached by this profile 
+   * @param velocity The velocity reached by this profile
    * @param input The signed input applied to this profile from the initial state.
    * @param initial The initial state.
    * @return The distance reached when the given velocity is reached.
@@ -323,7 +380,8 @@ public class ExponentialProfile {
   }
 
   /**
-   * Calculate the velocity at which input should be reversed in order to reach the goal state from the current state.
+   * Calculate the velocity at which input should be reversed in order to reach the goal state from
+   * the current state.
    *
    * @param input The signed input applied to this profile from the current state.
    * @param current The current state.
@@ -357,7 +415,8 @@ public class ExponentialProfile {
   /**
    * Returns true if the profile inverted.
    *
-   * <p>The profile is inverted if we should first apply negative input in order to reach the goal state.
+   * <p>The profile is inverted if we should first apply negative input in order to reach the goal
+   * state.
    *
    * @param current The initial state (usually the current state).
    * @param goal The desired state when the profile is complete.

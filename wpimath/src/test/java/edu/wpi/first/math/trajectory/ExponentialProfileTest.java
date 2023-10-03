@@ -320,7 +320,7 @@ class ExponentialProfileTest {
   @Test
   void timingToCurrent() {
     ExponentialProfile.Constraints constraints =
-  ExponentialProfile.Constraints.fromCharacteristics(12, 2.5629, 0.43277);
+        ExponentialProfile.Constraints.fromCharacteristics(12, 2.5629, 0.43277);
     ExponentialProfile.State goal = new ExponentialProfile.State(2, 0);
     ExponentialProfile.State state = new ExponentialProfile.State(0, 0);
 
@@ -334,7 +334,7 @@ class ExponentialProfileTest {
   @Test
   void timingToGoal() {
     ExponentialProfile.Constraints constraints =
-    ExponentialProfile.Constraints.fromCharacteristics(12, 2.5629, 0.43277);
+        ExponentialProfile.Constraints.fromCharacteristics(12, 2.5629, 0.43277);
     ExponentialProfile profile = new ExponentialProfile(constraints);
 
     ExponentialProfile.State goal = new ExponentialProfile.State(2, 0);
@@ -357,8 +357,8 @@ class ExponentialProfileTest {
   @Test
   void timingToNegativeGoal() {
     ExponentialProfile.Constraints constraints =
-  ExponentialProfile.Constraints.fromCharacteristics(12, 2.5629, 0.43277);
-  ExponentialProfile profile = new ExponentialProfile(constraints);
+        ExponentialProfile.Constraints.fromCharacteristics(12, 2.5629, 0.43277);
+    ExponentialProfile profile = new ExponentialProfile(constraints);
 
     ExponentialProfile.State goal = new ExponentialProfile.State(-2, 0);
     ExponentialProfile.State state = new ExponentialProfile.State(0, 0);
@@ -376,5 +376,4 @@ class ExponentialProfileTest {
       }
     }
   }
-
 }
