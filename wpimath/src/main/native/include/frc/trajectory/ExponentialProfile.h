@@ -13,9 +13,9 @@ namespace frc {
  * A Exponential-shaped velocity profile.
  *
  * While this class can be used for a profiled movement from start to finish,
- * the intended usage is to filter a reference's dynamics based on ExponentialProfile
- * velocity constraints. To compute the reference obeying this constraint, do
- * the following.
+ * the intended usage is to filter a reference's dynamics based on
+ * ExponentialProfile velocity constraints. To compute the reference obeying
+ * this constraint, do the following.
  *
  * Initialization:
  * @code{.cpp}
@@ -49,7 +49,8 @@ class ExponentialProfile {
       units::compound_unit<Velocity, units::inverse<units::seconds>>;
   using Input_t = units::unit_t<Input>;
   using A_t = units::unit_t<units::inverse<units::seconds>>;
-  using B_t = units::unit_t<units::compound_unit<Acceleration, units::inverse<Input>>>;
+  using B_t =
+      units::unit_t<units::compound_unit<Acceleration, units::inverse<Input>>>;
   using KV = units::compound_unit<Input, units::inverse<Velocity>>;
   using kV_t = units::unit_t<KV>;
   using KA = units::compound_unit<Input, units::inverse<Acceleration>>;
@@ -60,11 +61,9 @@ class ExponentialProfile {
     Constraints(Input_t maxInput_, A_t A_, B_t B_)
         : maxInput{maxInput_}, A{A_}, B{B_} {}
     Constraints(Input_t maxInput_, kV_t kV_, kA_t kA_)
-        : maxInput{maxInput_}, A{-kV_/kA_}, B{1/kA_} {}
-    Velocity_t MaxVelocity() {
-        return -maxInput * B / A;
-    }
-    
+        : maxInput{maxInput_}, A{-kV_ / kA_}, B{1 / kA_} {}
+    Velocity_t MaxVelocity() { return -maxInput * B / A; }
+
     Input_t maxInput{0};
     A_t A{0};
     B_t B{0};
@@ -80,12 +79,13 @@ class ExponentialProfile {
   /**
    * Construct a ExponentialProfile.
    *
-   * @param constraints The constraints on the profile, like maximum input and and .
+   * @param constraints The constraints on the profile, like maximum input and
+   * and .
    * @param goal        The desired state when the profile is complete.
    * @param initial     The initial state (usually the current state).
    */
   ExponentialProfile(Constraints constraints, State goal,
-                   State initial = State{Distance_t{0}, Velocity_t{0}});
+                     State initial = State{Distance_t{0}, Velocity_t{0}});
 
   ExponentialProfile(const ExponentialProfile&) = default;
   ExponentialProfile& operator=(const ExponentialProfile&) = default;
@@ -98,14 +98,15 @@ class ExponentialProfile {
    *
    * @param t The time since the beginning of the profile.
    */
-  State Calculate(const units::second_t &t) const;
+  State Calculate(const units::second_t& t) const;
 
   /**
-   * Calculate the instantaneous input to apply at time t in order to follow this profile.
+   * Calculate the instantaneous input to apply at time t in order to follow
+   * this profile.
    *
    * @param t The time since the beginning of the profile.
    */
-  Input_t CalculateInput(const units::second_t &t) const;
+  Input_t CalculateInput(const units::second_t& t) const;
 
   /**
    * Returns the total time the profile takes to reach the goal.
@@ -134,36 +135,49 @@ class ExponentialProfile {
 
  private:
   /**
-   * Returns true if the profile inverted - ie, -maxInput is applied immediately, instead of maxInput.
+   * Returns true if the profile inverted - ie, -maxInput is applied
+   * immediately, instead of maxInput.
    *
-   * The profile is inverted if goal state is more quickly achieved by starting with negative input than with positive input.
+   * The profile is inverted if goal state is more quickly achieved by starting
+   * with negative input than with positive input.
    */
-  static bool ShouldFlipInput(const Constraints &constraints, const State &goal, const State &initial);
+  static bool ShouldFlipInput(const Constraints& constraints, const State& goal,
+                              const State& initial);
 
   /**
    * Returns the velocity at which the profile reverses input.
    */
-  Velocity_t SolveForInflectionVelocity(const Input_t &input) const;
+  Velocity_t SolveForInflectionVelocity(const Input_t& input) const;
 
   /**
-   * Returns the velocity of the profile at the given input time and signed input.
+   * Returns the velocity of the profile at the given input time and signed
+   * input.
    */
-  Velocity_t VelocityAtTime(const units::second_t& time, const Input_t& input) const;
+  Velocity_t VelocityAtTime(const units::second_t& time,
+                            const Input_t& input) const;
 
   /**
-   * Returns the position of the profile at the given input time and signed input.
+   * Returns the position of the profile at the given input time and signed
+   * input.
    */
-  Distance_t DistanceAtTime(const units::second_t& time, const Input_t& input) const;
+  Distance_t DistanceAtTime(const units::second_t& time,
+                            const Input_t& input) const;
 
   /**
-   * Solve the Phase-space equation x(v, U) where x is the trajectory taken from (x0, v0) with a given signed input.
+   * Solve the Phase-space equation x(v, U) where x is the trajectory taken from
+   * (x0, v0) with a given signed input.
    */
-  static Distance_t ComputeDistanceInPhaseSpace(const Velocity_t& velocity, const Input_t &input, const State &initial, const Constraints &constraints);
+  static Distance_t ComputeDistanceInPhaseSpace(const Velocity_t& velocity,
+                                                const Input_t& input,
+                                                const State& initial,
+                                                const Constraints& constraints);
 
   /**
    * Solve the equation v(t, U) = v for t where v(0) = v0.
    */
-  static units::second_t ComputeTimeFromVelocity(const Velocity_t& velocity, const Input_t &input, const Velocity_t &initial, const Constraints &constraints);
+  static units::second_t ComputeTimeFromVelocity(
+      const Velocity_t& velocity, const Input_t& input,
+      const Velocity_t& initial, const Constraints& constraints);
 
   // The direction of the profile, either 1 for forward or -1 for reversed
   int m_direction;
@@ -175,7 +189,6 @@ class ExponentialProfile {
   units::second_t m_inflectionTime;
   State m_inflectionPoint;
   units::second_t m_totalTime;
-  
 };
 }  // namespace frc
 
