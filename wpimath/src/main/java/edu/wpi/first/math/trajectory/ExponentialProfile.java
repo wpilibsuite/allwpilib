@@ -38,7 +38,6 @@ import java.util.Objects;
  */
 public class ExponentialProfile {
   private final Constraints m_constraints;
-  public boolean debug = false;
 
   public static class ProfileTiming {
     public final double inflectionTime;
@@ -135,15 +134,6 @@ public class ExponentialProfile {
 
     var inflectionPoint = calculateInflectionPoint(current, goal, U);
     var timing = calculateProfileTiming(current, inflectionPoint, goal, U);
-
-    if (debug) {
-      System.out.printf(
-          "input:  %s, %s, %s, %s, %s, %s%n",
-          t, current.position, current.velocity, goal.position, goal.velocity, U);
-      System.out.printf(
-          "inflection: pos: %s, vel: %s%n", inflectionPoint.position, inflectionPoint.velocity);
-      System.out.printf("timing: inf: %s, total: %s%n", timing.inflectionTime, timing.totalTime);
-    }
 
     if (t < 0) {
       return current;
@@ -262,12 +252,11 @@ public class ExponentialProfile {
     var a = -A * A;
     var c = (B * B) * (U * U) + scalar * Math.exp(power);
 
-    if (debug) {
-      System.out.printf("A: %s, B: %s, U: %s%n", A, B, U);
-      System.out.printf("pos: %s, vel: %s%n", position_delta, velocity_delta);
-      System.out.printf("scalar: %s, power: %s%n", scalar, power);
-      System.out.printf("a: %s, c: %s, root(-c/a): %s%n", a, c, U_dir * Math.sqrt(-c / a));
+    if (-1e-9 < c && c < 0) {
+      // Numerical stability issue - the heuristic gets it right but c is around -1e-13
+      return 0;
     }
+
     return U_dir * Math.sqrt(-c / a);
   }
 

@@ -133,7 +133,7 @@ ExponentialProfile<Distance, Input>::SolveForInflectionVelocity(const Input_t &i
 
   if (-1e-9 < c.value() && c.value() < 0) {
     // numeric instability - the heuristic gets it right but these are small margins
-    return 0;
+    return Velocity_t(0);
   }
 
   return U_dir * units::math::sqrt(-c/a);
