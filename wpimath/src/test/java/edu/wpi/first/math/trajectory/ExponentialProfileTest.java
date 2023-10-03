@@ -217,10 +217,6 @@ class ExponentialProfileTest {
 
     ExponentialProfile profile = new ExponentialProfile(constraints);
     for (int i = 0; i < 900; ++i) {
-      if (i > 800) {
-        System.out.printf("%s, %s, %s%n", i, state.position, state.velocity);
-        // profile.debug = true;
-      }
       state = profile.calculate(kDt, goal, state);
     }
 
@@ -336,107 +332,64 @@ class ExponentialProfileTest {
     }
   }
 
-  // @Test
-  // void timingToCurrent() {
-  //   ExponentialProfile.Constraints constraints =
-  // ExponentialProfile.Constraints.fromCharacteristics(12, 2.5629, 0.43277);
-  //   ExponentialProfile.State goal = new ExponentialProfile.State(2, 0);
-  //   ExponentialProfile.State state = new ExponentialProfile.State();
+  @Test
+  void timingToCurrent() {
+    ExponentialProfile.Constraints constraints =
+  ExponentialProfile.Constraints.fromCharacteristics(12, 2.5629, 0.43277);
+    ExponentialProfile.State goal = new ExponentialProfile.State(2, 0);
+    ExponentialProfile.State state = new ExponentialProfile.State(0, 0);
 
-  //   ExponentialProfile profile = new ExponentialProfile(constraints);
-  //   for (int i = 0; i < 400; i++) {
-  //     state = profile.calculate(kDt, goal, state);
-  //     assertNear(profile.timeLeftUntil(state.position), 0, 2e-2);
-  //   }
-  // }
+    ExponentialProfile profile = new ExponentialProfile(constraints);
+    for (int i = 0; i < 400; i++) {
+      state = profile.calculate(kDt, goal, state);
+      assertNear(profile.timeLeftUntil(state, state), 0, 2e-2);
+    }
+  }
 
-  // @Test
-  // void timingToGoal() {
-  //   ExponentialProfile.Constraints constraints =
-  // ExponentialProfile.Constraints.fromCharacteristics(12, 2.5629, 0.43277);
-  //   ExponentialProfile.State goal = new ExponentialProfile.State(2, 0);
+  @Test
+  void timingToGoal() {
+    ExponentialProfile.Constraints constraints =
+    ExponentialProfile.Constraints.fromCharacteristics(12, 2.5629, 0.43277);
+    ExponentialProfile profile = new ExponentialProfile(constraints);
 
-  //   ExponentialProfile profile = new ExponentialProfile(constraints);
-  //   ExponentialProfile.State state = profile.calculate(kDt, goal, new
-  // ExponentialProfile.State());
+    ExponentialProfile.State goal = new ExponentialProfile.State(2, 0);
+    ExponentialProfile.State state = new ExponentialProfile.State(0, 0);
 
-  //   double predictedTimeLeft = profile.timeLeftUntil(goal.position);
-  //   boolean reachedGoal = false;
-  //   for (int i = 0; i < 400; i++) {
-  //     state = profile.calculate(kDt, goal, state);
-  //     if (!reachedGoal && state.equals(goal)) {
-  //       // Expected value using for loop index is just an approximation since
-  //       // the time left in the profile doesn't increase linearly at the
-  //       // endpoints
-  //       assertNear(predictedTimeLeft, i / 100.0, 0.25);
-  //       reachedGoal = true;
-  //     }
-  //   }
-  // }
+    double predictedTimeLeft = profile.timeLeftUntil(state, goal);
+    boolean reachedGoal = false;
+    for (int i = 0; i < 400; i++) {
+      state = profile.calculate(kDt, goal, state);
+      if (!reachedGoal && state.equals(goal)) {
+        // Expected value using for loop index is just an approximation since
+        // the time left in the profile doesn't increase linearly at the
+        // endpoints
+        assertNear(predictedTimeLeft, i / 100.0, 0.25);
+        reachedGoal = true;
+      }
+    }
+  }
 
-  // @Test
-  // void timingBeforeGoal() {
-  //   ExponentialProfile.Constraints constraints =
-  // ExponentialProfile.Constraints.fromCharacteristics(12, 2.5629, 0.43277);
-  //   ExponentialProfile.State goal = new ExponentialProfile.State(2, 0);
+  @Test
+  void timingToNegativeGoal() {
+    ExponentialProfile.Constraints constraints =
+  ExponentialProfile.Constraints.fromCharacteristics(12, 2.5629, 0.43277);
+  ExponentialProfile profile = new ExponentialProfile(constraints);
 
-  //   ExponentialProfile profile = new ExponentialProfile(constraints);
-  //   ExponentialProfile.State state = profile.calculate(kDt, goal, new
-  // ExponentialProfile.State());
+    ExponentialProfile.State goal = new ExponentialProfile.State(-2, 0);
+    ExponentialProfile.State state = new ExponentialProfile.State(0, 0);
 
-  //   double predictedTimeLeft = profile.timeLeftUntil(1);
-  //   boolean reachedGoal = false;
-  //   for (int i = 0; i < 400; i++) {
-  //     state = profile.calculate(kDt, goal, state);
-  //     if (!reachedGoal && Math.abs(state.velocity - 1) < 10e-5) {
-  //       assertNear(predictedTimeLeft, i / 100.0, 2e-2);
-  //       reachedGoal = true;
-  //     }
-  //   }
-  // }
+    double predictedTimeLeft = profile.timeLeftUntil(state, goal);
+    boolean reachedGoal = false;
+    for (int i = 0; i < 400; i++) {
+      state = profile.calculate(kDt, goal, state);
+      if (!reachedGoal && state.equals(goal)) {
+        // Expected value using for loop index is just an approximation since
+        // the time left in the profile doesn't increase linearly at the
+        // endpoints
+        assertNear(predictedTimeLeft, i / 100.0, 0.25);
+        reachedGoal = true;
+      }
+    }
+  }
 
-  // @Test
-  // void timingToNegativeGoal() {
-  //   ExponentialProfile.Constraints constraints =
-  // ExponentialProfile.Constraints.fromCharacteristics(12, 2.5629, 0.43277);
-  //   ExponentialProfile.State goal = new ExponentialProfile.State(-2, 0);
-
-  //   ExponentialProfile profile = new ExponentialProfile(constraints);
-  //   ExponentialProfile.State state = profile.calculate(kDt, goal, new
-  // ExponentialProfile.State());
-
-  //   double predictedTimeLeft = profile.timeLeftUntil(goal.position);
-  //   boolean reachedGoal = false;
-  //   for (int i = 0; i < 400; i++) {
-  //     state = profile.calculate(kDt, goal, state);
-  //     if (!reachedGoal && state.equals(goal)) {
-  //       // Expected value using for loop index is just an approximation since
-  //       // the time left in the profile doesn't increase linearly at the
-  //       // endpoints
-  //       assertNear(predictedTimeLeft, i / 100.0, 0.25);
-  //       reachedGoal = true;
-  //     }
-  //   }
-  // }
-
-  // @Test
-  // void timingBeforeNegativeGoal() {
-  //   ExponentialProfile.Constraints constraints =
-  // ExponentialProfile.Constraints.fromCharacteristics(12, 2.5629, 0.43277);
-  //   ExponentialProfile.State goal = new ExponentialProfile.State(-2, 0);
-
-  //   ExponentialProfile profile = new ExponentialProfile(constraints);
-  //   ExponentialProfile.State state = profile.calculate(kDt, goal, new
-  // ExponentialProfile.State());
-
-  //   double predictedTimeLeft = profile.timeLeftUntil(-1);
-  //   boolean reachedGoal = false;
-  //   for (int i = 0; i < 400; i++) {
-  //     state = profile.calculate(kDt, goal, state);
-  //     if (!reachedGoal && Math.abs(state.velocity + 1) < 10e-5) {
-  //       assertNear(predictedTimeLeft, i / 100.0, 2e-2);
-  //       reachedGoal = true;
-  //     }
-  //   }
-  // }
 }
