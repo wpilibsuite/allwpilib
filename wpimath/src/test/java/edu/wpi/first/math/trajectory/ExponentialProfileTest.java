@@ -97,6 +97,29 @@ class ExponentialProfileTest {
     assertEquals(state, goal);
   }
 
+  // Tests that decreasing the maximum velocity in the middle when it is already
+  // moving faster than the new max is handled correctly
+  @Test
+  void posContinuousUnderVelChangeBackward() {
+    ExponentialProfile.Constraints constraints =
+        ExponentialProfile.Constraints.fromCharacteristics(12, 2.5629, 0.43277);
+    ExponentialProfile profile = new ExponentialProfile(constraints);
+
+    ExponentialProfile.State goal = new ExponentialProfile.State(-10, 0);
+    ExponentialProfile.State state = new ExponentialProfile.State(0, 0);
+
+    for (int i = 0; i < 300; ++i) {
+      if (i == 150) {
+        profile =
+            new ExponentialProfile(
+                ExponentialProfile.Constraints.fromStateSpace(9, constraints.A, constraints.B));
+      }
+
+      state = profile.calculate(kDt, goal, state);
+    }
+    assertEquals(state, goal);
+  }
+
   // There is some somewhat tricky code for dealing with going backwards
   @Test
   void backwards() {
@@ -143,7 +166,7 @@ class ExponentialProfileTest {
 
     ExponentialProfile profile = new ExponentialProfile(constraints);
     double maxSpeed = 0;
-    for (int i = 0; i < 1000; ++i) {
+    for (int i = 0; i < 900; ++i) {
       state = profile.calculate(kDt, goal, state);
       maxSpeed = Math.max(maxSpeed, state.velocity);
     }
@@ -161,7 +184,7 @@ class ExponentialProfileTest {
 
     ExponentialProfile profile = new ExponentialProfile(constraints);
     double maxSpeed = 0;
-    for (int i = 0; i < 1000; ++i) {
+    for (int i = 0; i < 900; ++i) {
       state = profile.calculate(kDt, goal, state);
       maxSpeed = Math.min(maxSpeed, state.velocity);
     }
@@ -178,7 +201,7 @@ class ExponentialProfileTest {
     ExponentialProfile.State state = new ExponentialProfile.State(0, 8);
 
     ExponentialProfile profile = new ExponentialProfile(constraints);
-    for (int i = 0; i < 1000; ++i) {
+    for (int i = 0; i < 900; ++i) {
       state = profile.calculate(kDt, goal, state);
     }
 
@@ -193,10 +216,10 @@ class ExponentialProfileTest {
     ExponentialProfile.State state = new ExponentialProfile.State(0, -8);
 
     ExponentialProfile profile = new ExponentialProfile(constraints);
-    for (int i = 0; i < 1000; ++i) {
+    for (int i = 0; i < 900; ++i) {
       if (i > 800) {
         System.out.printf("%s, %s, %s%n", i, state.position, state.velocity);
-        profile.debug = true;
+        // profile.debug = true;
       }
       state = profile.calculate(kDt, goal, state);
     }

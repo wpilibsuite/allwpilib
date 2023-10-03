@@ -61,6 +61,24 @@ TEST(ExponentialProfileTest, PosContinousUnderVelChange) {
   EXPECT_EQ(state, goal);
 }
 
+// Tests that decreasing the maximum velocity in the middle when it is already
+// moving faster than the new max is handled correctly
+TEST(ExponentialProfileTest, PosContinousUnderVelChangeBackward) {
+  frc::ExponentialProfile<units::meter, units::volts>::Constraints constraints{12_V, -kV/kA, 1/kA};
+  frc::ExponentialProfile<units::meter, units::volts>::State goal{-10_m, 0_mps};
+  frc::ExponentialProfile<units::meter, units::volts>::State state{0_m, 0_mps};
+
+  for (int i = 0; i < 300; ++i) {
+    if (i == 150) {
+      constraints.maxInput = 9_V;
+    }
+
+    frc::ExponentialProfile<units::meter, units::volts> profile{constraints, goal, state};
+    state = profile.Calculate(kDt);
+  }
+  EXPECT_EQ(state, goal);
+}
+
 // There is some somewhat tricky code for dealing with going backwards
 TEST(ExponentialProfileTest, Backwards) {
   frc::ExponentialProfile<units::meter, units::volts>::Constraints constraints{12_V, -kV/kA, 1/kA};
