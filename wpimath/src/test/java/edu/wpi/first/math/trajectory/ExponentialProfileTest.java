@@ -45,21 +45,6 @@ class ExponentialProfileTest {
         () -> assertNear(val1.position, val2.position, eps));
   }
 
-  /**
-   * Asserts "val1" is less than or within "eps" of "val2".
-   *
-   * @param val1 First operand in comparison.
-   * @param val2 Second operand in comparison.
-   * @param eps Tolerance for whether values are near to each other.
-   */
-  private static void assertLessThanOrNear(double val1, double val2, double eps) {
-    if (val1 <= val2) {
-      assertLessThanOrEquals(val1, val2);
-    } else {
-      assertNear(val1, val2, eps);
-    }
-  }
-
   @Test
   void reachesGoal() {
     ExponentialProfile.Constraints constraints =
@@ -69,7 +54,7 @@ class ExponentialProfileTest {
 
     ExponentialProfile profile = new ExponentialProfile(constraints);
     for (int i = 0; i < 450; ++i) {
-      state = profile.calculate(kDt, goal, state);
+      state = profile.calculate(kDt, state, goal);
     }
     assertEquals(state, goal);
   }
@@ -92,7 +77,7 @@ class ExponentialProfileTest {
                 ExponentialProfile.Constraints.fromStateSpace(9, constraints.A, constraints.B));
       }
 
-      state = profile.calculate(kDt, goal, state);
+      state = profile.calculate(kDt, state, goal);
     }
     assertEquals(state, goal);
   }
@@ -115,7 +100,7 @@ class ExponentialProfileTest {
                 ExponentialProfile.Constraints.fromStateSpace(9, constraints.A, constraints.B));
       }
 
-      state = profile.calculate(kDt, goal, state);
+      state = profile.calculate(kDt, state, goal);
     }
     assertEquals(state, goal);
   }
@@ -131,7 +116,7 @@ class ExponentialProfileTest {
     ExponentialProfile profile = new ExponentialProfile(constraints);
 
     for (int i = 0; i < 400; ++i) {
-      state = profile.calculate(kDt, goal, state);
+      state = profile.calculate(kDt, state, goal);
     }
     assertEquals(state, goal);
   }
@@ -145,13 +130,13 @@ class ExponentialProfileTest {
 
     ExponentialProfile profile = new ExponentialProfile(constraints);
     for (int i = 0; i < 50; ++i) {
-      state = profile.calculate(kDt, goal, state);
+      state = profile.calculate(kDt, state, goal);
     }
     assertNotEquals(state, goal);
 
     goal = new ExponentialProfile.State(0.0, 0.0);
     for (int i = 0; i < 100; ++i) {
-      state = profile.calculate(kDt, goal, state);
+      state = profile.calculate(kDt, state, goal);
     }
     assertEquals(state, goal);
   }
@@ -167,7 +152,7 @@ class ExponentialProfileTest {
     ExponentialProfile profile = new ExponentialProfile(constraints);
     double maxSpeed = 0;
     for (int i = 0; i < 900; ++i) {
-      state = profile.calculate(kDt, goal, state);
+      state = profile.calculate(kDt, state, goal);
       maxSpeed = Math.max(maxSpeed, state.velocity);
     }
 
@@ -185,7 +170,7 @@ class ExponentialProfileTest {
     ExponentialProfile profile = new ExponentialProfile(constraints);
     double maxSpeed = 0;
     for (int i = 0; i < 900; ++i) {
-      state = profile.calculate(kDt, goal, state);
+      state = profile.calculate(kDt, state, goal);
       maxSpeed = Math.min(maxSpeed, state.velocity);
     }
 
@@ -202,7 +187,7 @@ class ExponentialProfileTest {
 
     ExponentialProfile profile = new ExponentialProfile(constraints);
     for (int i = 0; i < 900; ++i) {
-      state = profile.calculate(kDt, goal, state);
+      state = profile.calculate(kDt, state, goal);
     }
 
     assertEquals(state, goal);
@@ -217,7 +202,7 @@ class ExponentialProfileTest {
 
     ExponentialProfile profile = new ExponentialProfile(constraints);
     for (int i = 0; i < 900; ++i) {
-      state = profile.calculate(kDt, goal, state);
+      state = profile.calculate(kDt, state, goal);
     }
 
     assertEquals(state, goal);
@@ -341,7 +326,7 @@ class ExponentialProfileTest {
 
     ExponentialProfile profile = new ExponentialProfile(constraints);
     for (int i = 0; i < 400; i++) {
-      state = profile.calculate(kDt, goal, state);
+      state = profile.calculate(kDt, state, goal);
       assertNear(profile.timeLeftUntil(state, state), 0, 2e-2);
     }
   }
@@ -358,7 +343,7 @@ class ExponentialProfileTest {
     double predictedTimeLeft = profile.timeLeftUntil(state, goal);
     boolean reachedGoal = false;
     for (int i = 0; i < 400; i++) {
-      state = profile.calculate(kDt, goal, state);
+      state = profile.calculate(kDt, state, goal);
       if (!reachedGoal && state.equals(goal)) {
         // Expected value using for loop index is just an approximation since
         // the time left in the profile doesn't increase linearly at the
@@ -381,7 +366,7 @@ class ExponentialProfileTest {
     double predictedTimeLeft = profile.timeLeftUntil(state, goal);
     boolean reachedGoal = false;
     for (int i = 0; i < 400; i++) {
-      state = profile.calculate(kDt, goal, state);
+      state = profile.calculate(kDt, state, goal);
       if (!reachedGoal && state.equals(goal)) {
         // Expected value using for loop index is just an approximation since
         // the time left in the profile doesn't increase linearly at the
