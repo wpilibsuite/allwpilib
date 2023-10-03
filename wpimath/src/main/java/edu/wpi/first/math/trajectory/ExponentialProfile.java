@@ -7,27 +7,27 @@ package edu.wpi.first.math.trajectory;
 import java.util.Objects;
 
 /**
- * A trapezoid-shaped velocity profile.
+ * A exponential curve-shaped velocity profile.
  *
  * <p>While this class can be used for a profiled movement from start to finish, the intended usage
- * is to filter a reference's dynamics based on trapezoidal velocity constraints. To compute the
+ * is to filter a reference's dynamics based on state-space model dynamics. To compute the
  * reference obeying this constraint, do the following.
  *
  * <p>Initialization:
  *
  * <pre><code>
- * TrapezoidProfile.Constraints constraints =
- *   new TrapezoidProfile.Constraints(kMaxV, kMaxA);
- * TrapezoidProfile.State previousProfiledReference =
- *   new TrapezoidProfile.State(initialReference, 0.0);
- * TrapezoidProfile profile = new TrapezoidProfile(constraints);
+ * ExponentialProfile.Constraints constraints =
+ *   new ExponentialProfile.Constraints(kMaxV, kMaxA);
+ * ExponentialProfile.State previousProfiledReference =
+ *   new ExponentialProfile.State(initialReference, 0.0);
+ * ExponentialProfile profile = new ExponentialProfile(constraints);
  * </code></pre>
  *
  * <p>Run on update:
  *
  * <pre><code>
  * previousProfiledReference =
- * profile.calculate(timeSincePreviousUpdate, unprofiledReference, previousProfiledReference);
+ * profile.calculate(timeSincePreviousUpdate, previousProfiledReference, unprofiledReference);
  * </code></pre>
  *
  * <p>where `unprofiledReference` is free to change between calls. Note that when the unprofiled
