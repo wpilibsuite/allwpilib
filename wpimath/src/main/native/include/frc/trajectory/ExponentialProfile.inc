@@ -16,7 +16,7 @@ ExponentialProfile<Distance, Input>::ExponentialProfile(Constraints constraints,
     : m_constraints(constraints),
       m_initial(initial),
       m_goal(goal),
-      m_direction{ShouldFlipInput(constraints, goal, initial) ? -1 : 1} {
+      m_direction{ShouldFlipInput(constraints, initial, goal) ? -1 : 1} {
   auto A = m_constraints.A;
   auto B = m_constraints.B;
   auto U = m_direction * m_constraints.maxInput;
@@ -32,18 +32,20 @@ ExponentialProfile<Distance, Input>::ExponentialProfile(Constraints constraints,
   auto inflectionV = SolveForInflectionVelocity(U);
   auto inflectionP = ComputeDistanceInPhaseSpace(inflectionV, -U, m_goal, m_constraints);
 
-  auto inflectionT_forward = ComputeTimeFromVelocity(inflectionV, U, m_initial.velocity, constraints);
+  units::second_t inflectionT_forward; 
 
-  if (std::isinf(inflectionT_forward.value())) {
+  if (m_constraints.MaxVelocity() - units::math::abs(inflectionV) < 1e-9) {
     // A singularity occurrs at A * v_i = B * U
     // we know that we can get _really_ close though and still have stable calculation
     // so we first start by getting really close
-    auto solvableV = inflectionV - Velocity_t(1e-9) * m_direction;
+    auto solvableV = m_constraints.MaxVelocity() - Velocity_t(1e-9) * m_direction;
     auto t_to_solvable_v = ComputeTimeFromVelocity(solvableV, U, m_initial.velocity, constraints);
     auto x_at_solvable_v = ComputeDistanceInPhaseSpace(solvableV, U, m_initial, m_constraints);
 
     // and then claim that the remaining distance is covered by the max velocity.
-    inflectionT_forward = t_to_solvable_v + (inflectionP - x_at_solvable_v) / (-B * U / A);
+    inflectionT_forward = t_to_solvable_v + (inflectionP - x_at_solvable_v) / m_constraints.MaxVelocity();
+  } else {
+    inflectionT_forward = ComputeTimeFromVelocity(inflectionV, U, m_initial.velocity, constraints);
   }
 
   auto inflectionT_backward = ComputeTimeFromVelocity(inflectionV, -U, m_goal.velocity, constraints);
@@ -55,7 +57,7 @@ ExponentialProfile<Distance, Input>::ExponentialProfile(Constraints constraints,
 
 template <class Distance, class Input>
 bool
-ExponentialProfile<Distance, Input>::ShouldFlipInput(const Constraints &constraints, const State &goal, const State &initial) {
+ExponentialProfile<Distance, Input>::ShouldFlipInput(const Constraints &constraints, const State &initial, const State &) {
   auto A = constraints.A;
   auto B = constraints.B;
   auto U = constraints.maxInput;

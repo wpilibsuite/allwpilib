@@ -61,6 +61,10 @@ class ExponentialProfile {
         : maxInput{maxInput_}, A{A_}, B{B_} {}
     Constraints(Input_t maxInput_, kV_t kV_, kA_t kA_)
         : maxInput{maxInput_}, A{-kV_/kA_}, B{1/kA_} {}
+    Velocity_t MaxVelocity() {
+        return -maxInput * B / A;
+    }
+    
     Input_t maxInput{0};
     A_t A{0};
     B_t B{0};
@@ -130,7 +134,7 @@ class ExponentialProfile {
 
  private:
   /**
-   * Returns true if the profile inverted.
+   * Returns true if the profile inverted - ie, -maxInput is applied immediately, instead of maxInput.
    *
    * The profile is inverted if goal state is more quickly achieved by starting with negative input than with positive input.
    */
