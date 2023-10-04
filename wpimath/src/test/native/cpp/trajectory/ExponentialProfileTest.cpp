@@ -57,7 +57,8 @@ TEST(ExponentialProfileTest, PosContinousUnderVelChange) {
   for (int i = 0; i < 300; ++i) {
     if (i == 150) {
       constraints.maxInput = 9_V;
-      profile = frc::ExponentialProfile<units::meter, units::volts>{constraints};
+      profile =
+          frc::ExponentialProfile<units::meter, units::volts>{constraints};
     }
 
     state = profile.Calculate(kDt, state, goal);
@@ -77,7 +78,8 @@ TEST(ExponentialProfileTest, PosContinousUnderVelChangeBackward) {
   for (int i = 0; i < 300; ++i) {
     if (i == 150) {
       constraints.maxInput = 9_V;
-      profile = frc::ExponentialProfile<units::meter, units::volts>{constraints};
+      profile =
+          frc::ExponentialProfile<units::meter, units::volts>{constraints};
     }
 
     state = profile.Calculate(kDt, state, goal);
@@ -230,7 +232,8 @@ TEST(ExponentialProfileTest, TestHeuristic) {
       };
 
   for (auto& testCase : testCases) {
-    auto state = profile.CalculateInflectionPoint(std::get<0>(testCase), std::get<1>(testCase));
+    auto state = profile.CalculateInflectionPoint(std::get<0>(testCase),
+                                                  std::get<1>(testCase));
     EXPECT_NEAR_UNITS(std::get<2>(testCase).position / 1_m,
                       state.position / 1_m, 1e-3);
     EXPECT_NEAR_UNITS(std::get<2>(testCase).velocity / 1_mps,

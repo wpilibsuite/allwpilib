@@ -50,7 +50,7 @@ public class ExponentialProfile {
 
     /**
      * Decides if the profile is finished by time t.
-     * 
+     *
      * @param t The time since the beginning of the profile.
      * @return if the profile is finished at time t.
      */

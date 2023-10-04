@@ -25,7 +25,8 @@ namespace frc {
  *
  * Run on update:
  * @code{.cpp}
- * previousProfiledReference = profile.Calculate(timeSincePreviousUpdate, previousProfiledReference, unprofiledReference);
+ * previousProfiledReference = profile.Calculate(timeSincePreviousUpdate,
+ * previousProfiledReference, unprofiledReference);
  * @endcode
  *
  * where `unprofiledReference` is free to change between calls. Note that when
@@ -75,13 +76,13 @@ class ExponentialProfile {
   };
 
   class ProfileTiming {
-    public:
-      units::second_t inflectionTime;
-      units::second_t totalTime;
+   public:
+    units::second_t inflectionTime;
+    units::second_t totalTime;
 
-      bool IsFinished(const units::second_t &time) const {
-        return time > totalTime;
-      }
+    bool IsFinished(const units::second_t& time) const {
+      return time > totalTime;
+    }
   };
 
   /**
@@ -89,7 +90,7 @@ class ExponentialProfile {
    *
    * @param constraints The constraints on the profile, like maximum input.
    */
-  ExponentialProfile(Constraints constraints);
+  explicit ExponentialProfile(Constraints constraints);
 
   ExponentialProfile(const ExponentialProfile&) = default;
   ExponentialProfile& operator=(const ExponentialProfile&) = default;
@@ -97,73 +98,92 @@ class ExponentialProfile {
   ExponentialProfile& operator=(ExponentialProfile&&) = default;
 
   /**
-   * Calculate the correct position and velocity for the profile at a time t where the current state is at time t = 0.
+   * Calculate the correct position and velocity for the profile at a time t
+   * where the current state is at time t = 0.
    */
-  State Calculate(const units::second_t& t, const State &current, const State &goal) const;
+  State Calculate(const units::second_t& t, const State& current,
+                  const State& goal) const;
 
-  
   /**
-   * Calculate the point after which the fastest way to reach the goal state is to apply input in the opposite direction.
+   * Calculate the point after which the fastest way to reach the goal state is
+   * to apply input in the opposite direction.
    */
-  State CalculateInflectionPoint(const State& current, const State &goal) const;
+  State CalculateInflectionPoint(const State& current, const State& goal) const;
 
   /**
    * Calculate the time it will take for this profile to reach the goal state.
    */
-  units::second_t TimeLeftUntil(const State &current, const State &goal) const;
+  units::second_t TimeLeftUntil(const State& current, const State& goal) const;
 
   /**
-   * Calculate the time it will take for this profile to reach the inflection point, and the time it will take for this profile to reach the goal state.
+   * Calculate the time it will take for this profile to reach the inflection
+   * point, and the time it will take for this profile to reach the goal state.
    */
-  ProfileTiming CalculateProfileTiming(const State &current, const State &goal) const;
+  ProfileTiming CalculateProfileTiming(const State& current,
+                                       const State& goal) const;
 
  private:
   /**
-   * Calculate the point after which the fastest way to reach the goal state is to apply input in the opposite direction.
+   * Calculate the point after which the fastest way to reach the goal state is
+   * to apply input in the opposite direction.
    */
-  State CalculateInflectionPoint(const State& current, const State &goal, const Input_t &input) const;
+  State CalculateInflectionPoint(const State& current, const State& goal,
+                                 const Input_t& input) const;
 
   /**
-   * Calculate the time it will take for this profile to reach the inflection point, and the time it will take for this profile to reach the goal state.
+   * Calculate the time it will take for this profile to reach the inflection
+   * point, and the time it will take for this profile to reach the goal state.
    */
-  ProfileTiming CalculateProfileTiming(const State &current, const State &inflectionPoint, const State &goal, const Input_t &input) const;
+  ProfileTiming CalculateProfileTiming(const State& current,
+                                       const State& inflectionPoint,
+                                       const State& goal,
+                                       const Input_t& input) const;
 
   /**
-   * Calculate the velocity reached after t seconds when applying an input from the initial state.
+   * Calculate the velocity reached after t seconds when applying an input from
+   * the initial state.
    */
-  Velocity_t ComputeVelocityFromTime(const units::second_t& time, const Input_t& input, const State &initial) const;
+  Velocity_t ComputeVelocityFromTime(const units::second_t& time,
+                                     const Input_t& input,
+                                     const State& initial) const;
 
   /**
-   * Calculate the position reached after t seconds when applying an input from the initial state.
+   * Calculate the position reached after t seconds when applying an input from
+   * the initial state.
    */
   Distance_t ComputeDistanceFromTime(const units::second_t& time,
-                            const Input_t& input, const State &initial) const;
+                                     const Input_t& input,
+                                     const State& initial) const;
 
   /**
-   * Calculate the distance reached at the same time as the given velocity when applying the given input from the initial state.
+   * Calculate the distance reached at the same time as the given velocity when
+   * applying the given input from the initial state.
    */
   Distance_t ComputeDistanceFromVelocity(const Velocity_t& velocity,
-                                                const Input_t& input,
-                                                const State& initial) const;
+                                         const Input_t& input,
+                                         const State& initial) const;
 
   /**
-   * Calculate the time required to reach a specified velocity given the initial velocity.
+   * Calculate the time required to reach a specified velocity given the initial
+   * velocity.
    */
- units::second_t ComputeTimeFromVelocity(
-      const Velocity_t& velocity, const Input_t& input,
-      const Velocity_t& initial) const;
-
+  units::second_t ComputeTimeFromVelocity(const Velocity_t& velocity,
+                                          const Input_t& input,
+                                          const Velocity_t& initial) const;
 
   /**
-   * Calculate the velocity at which input should be reversed in order to reach the goal state from the current state.
+   * Calculate the velocity at which input should be reversed in order to reach
+   * the goal state from the current state.
    */
-  Velocity_t SolveForInflectionVelocity(const Input_t& input, const State &current, const State &goal) const;
+  Velocity_t SolveForInflectionVelocity(const Input_t& input,
+                                        const State& current,
+                                        const State& goal) const;
 
   /**
    * Returns true if the profile should be inverted.
    *
-   * <p>The profile is inverted if we should first apply negative input in order to reach the goal
-   * state.
+   * <p>The profile is inverted if we should first apply negative input in order
+   * to reach the goal state.
    */
   bool ShouldFlipInput(const State& current, const State& goal) const;
 
