@@ -17,7 +17,7 @@ import java.util.Objects;
  *
  * <pre><code>
  * ExponentialProfile.Constraints constraints =
- *   new ExponentialProfile.Constraints(kMaxV, kMaxA);
+ *   ExponentialProfile.Constraints.fromCharacteristics(kMaxV, kV, kA);
  * ExponentialProfile.State previousProfiledReference =
  *   new ExponentialProfile.State(initialReference, 0.0);
  * ExponentialProfile profile = new ExponentialProfile(constraints);
@@ -143,33 +143,6 @@ public class ExponentialProfile {
    */
   public ExponentialProfile(Constraints constraints) {
     m_constraints = constraints;
-  }
-
-  /**
-   * Calculate the correct input for the profile at a time t where the current state is at time t =
-   * 0.
-   *
-   * @param t The time since the beginning of the profile.
-   * @param current The current state.
-   * @param goal The desired state when the profile is complete.
-   * @return The input applied at time t.
-   */
-  public double calculateInput(double t, State current, State goal) {
-    var direction = shouldFlipInput(current, goal) ? -1 : 1;
-    var u = direction * m_constraints.maxInput;
-
-    var inflectionPoint = calculateInflectionPoint(current, goal, u);
-    var timing = calculateProfileTiming(current, inflectionPoint, goal, u);
-
-    if (t < 0) {
-      return 0;
-    } else if (t < timing.inflectionTime) {
-      return direction * m_constraints.maxInput;
-    } else if (t < timing.totalTime) {
-      return -direction * m_constraints.maxInput;
-    } else {
-      return 0;
-    }
   }
 
   /**
@@ -352,7 +325,7 @@ public class ExponentialProfile {
   }
 
   /**
-   * Calculate the time require to reach a specified velocity the initial velocity.
+   * Calculate the time required to reach a specified velocity given the initial velocity.
    *
    * @param velocity The goal velocity.
    * @param input The signed input applied to this profile from the initial state.
@@ -420,7 +393,7 @@ public class ExponentialProfile {
   }
 
   /**
-   * Returns true if the profile inverted.
+   * Returns true if the profile should be inverted.
    *
    * <p>The profile is inverted if we should first apply negative input in order to reach the goal
    * state.

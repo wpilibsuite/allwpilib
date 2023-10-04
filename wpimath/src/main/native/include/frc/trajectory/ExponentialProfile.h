@@ -19,15 +19,13 @@ namespace frc {
  *
  * Initialization:
  * @code{.cpp}
- * ExponentialProfile::Constraints constraints{kMaxV, -kV/kA, 1/kA};
- * State previousProfiledReference = initialReference;
+ * ExponentialProfile::Constraints constraints{kMaxV, kV, kA};
+ * State previousProfiledReference = {initialReference, 0_mps};
  * @endcode
  *
  * Run on update:
  * @code{.cpp}
- * ExponentialProfile profile{constraints, unprofiledReference,
- *                          previousProfiledReference};
- * previousProfiledReference = profile.Calculate(timeSincePreviousUpdate);
+ * previousProfiledReference = profile.Calculate(timeSincePreviousUpdate, previousProfiledReference, unprofiledReference);
  * @endcode
  *
  * where `unprofiledReference` is free to change between calls. Note that when
@@ -89,10 +87,7 @@ class ExponentialProfile {
   /**
    * Construct a ExponentialProfile.
    *
-   * @param constraints The constraints on the profile, like maximum input and
-   * and .
-   * @param goal        The desired state when the profile is complete.
-   * @param initial     The initial state (usually the current state).
+   * @param constraints The constraints on the profile, like maximum input.
    */
   ExponentialProfile(Constraints constraints);
 
@@ -102,59 +97,57 @@ class ExponentialProfile {
   ExponentialProfile& operator=(ExponentialProfile&&) = default;
 
   /**
-   * Calculate the instantaneous input to apply at time t in order to follow
-   * this profile.
-   */
-  Input_t CalculateInput(const units::second_t& t, const State &current, const State &goal) const;
-
-  /**
-   * Calculate the correct position and velocity for the profile at a time t
-   * where the beginning of the profile was at time t = 0.
+   * Calculate the correct position and velocity for the profile at a time t where the current state is at time t = 0.
    */
   State Calculate(const units::second_t& t, const State &current, const State &goal) const;
 
+  
   /**
-   * Calculate the correct position and velocity for the profile at a time t
-   * where the beginning of the profile was at time t = 0.
+   * Calculate the point after which the fastest way to reach the goal state is to apply input in the opposite direction.
    */
   State CalculateInflectionPoint(const State& current, const State &goal) const;
 
+  /**
+   * Calculate the time it will take for this profile to reach the goal state.
+   */
   units::second_t TimeLeftUntil(const State &current, const State &goal) const;
 
+  /**
+   * Calculate the time it will take for this profile to reach the inflection point, and the time it will take for this profile to reach the goal state.
+   */
   ProfileTiming CalculateProfileTiming(const State &current, const State &goal) const;
 
  private:
   /**
-   * Calculate the correct position and velocity for the profile at a time t
-   * where the beginning of the profile was at time t = 0.
+   * Calculate the point after which the fastest way to reach the goal state is to apply input in the opposite direction.
    */
   State CalculateInflectionPoint(const State& current, const State &goal, const Input_t &input) const;
 
+  /**
+   * Calculate the time it will take for this profile to reach the inflection point, and the time it will take for this profile to reach the goal state.
+   */
   ProfileTiming CalculateProfileTiming(const State &current, const State &inflectionPoint, const State &goal, const Input_t &input) const;
 
   /**
-   * Returns the velocity of the profile at the given input time and signed
-   * input.
+   * Calculate the velocity reached after t seconds when applying an input from the initial state.
    */
   Velocity_t ComputeVelocityFromTime(const units::second_t& time, const Input_t& input, const State &initial) const;
 
   /**
-   * Returns the position of the profile at the given input time and signed
-   * input.
+   * Calculate the position reached after t seconds when applying an input from the initial state.
    */
   Distance_t ComputeDistanceFromTime(const units::second_t& time,
                             const Input_t& input, const State &initial) const;
 
   /**
-   * Solve the Phase-space equation x(v, U) where x is the trajectory taken from
-   * (x0, v0) with a given signed input.
+   * Calculate the distance reached at the same time as the given velocity when applying the given input from the initial state.
    */
   Distance_t ComputeDistanceFromVelocity(const Velocity_t& velocity,
                                                 const Input_t& input,
                                                 const State& initial) const;
 
   /**
-   * Solve the equation v(t, U) = v for t where v(0) = v0.
+   * Calculate the time required to reach a specified velocity given the initial velocity.
    */
  units::second_t ComputeTimeFromVelocity(
       const Velocity_t& velocity, const Input_t& input,
@@ -162,16 +155,15 @@ class ExponentialProfile {
 
 
   /**
-   * Returns the velocity at which the profile reverses input.
+   * Calculate the velocity at which input should be reversed in order to reach the goal state from the current state.
    */
   Velocity_t SolveForInflectionVelocity(const Input_t& input, const State &current, const State &goal) const;
 
-    /**
-   * Returns true if the profile inverted - ie, -maxInput is applied
-   * immediately, instead of maxInput.
+  /**
+   * Returns true if the profile should be inverted.
    *
-   * The profile is inverted if goal state is more quickly achieved by starting
-   * with negative input than with positive input.
+   * <p>The profile is inverted if we should first apply negative input in order to reach the goal
+   * state.
    */
   bool ShouldFlipInput(const State& current, const State& goal) const;
 
