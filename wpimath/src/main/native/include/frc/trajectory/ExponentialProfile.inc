@@ -15,27 +15,6 @@ ExponentialProfile<Distance, Input>::ExponentialProfile(Constraints constraints)
     : m_constraints(constraints) {}
 
 template <class Distance, class Input>
-typename ExponentialProfile<Distance, Input>::Input_t
-ExponentialProfile<Distance, Input>::CalculateInput(
-    const units::second_t& t, const State &current, const State &goal) const {
-  auto direction = ShouldFlipInput(current, goal) ? -1 : 1;
-  auto u = direction * m_constraints.maxInput;
-
-  auto inflectionPoint = CalculateInflectionPoint(current, goal, u);
-  auto timing = CalculateProfileTiming(current, inflectionPoint, goal, u);
-
-  if (t < 0_s) {
-    return Input_t(0);
-  } else if (t < timing.inflectionTime) {
-    return direction * m_constraints.maxInput;
-  } else if (t < timing.totalTime) {
-    return -direction * m_constraints.maxInput;
-  } else {
-    return Input_t(0);
-  }
-}
-
-template <class Distance, class Input>
 typename ExponentialProfile<Distance, Input>::State
 ExponentialProfile<Distance, Input>::Calculate(const units::second_t& t, const State &current, const State &goal) const {
   auto direction = ShouldFlipInput(current, goal) ? -1 : 1;
@@ -222,11 +201,8 @@ ExponentialProfile<Distance, Input>::SolveForInflectionVelocity(
 template <class Distance, class Input>
 bool ExponentialProfile<Distance, Input>::ShouldFlipInput(
     const State& current, const State& goal) const {
-  auto A = m_constraints.A;
-  auto B = m_constraints.B;
   auto u = m_constraints.maxInput;
 
-  auto x0 = current.position;
   auto v0 = current.velocity;
   auto xf = goal.position;
   auto vf = goal.velocity;

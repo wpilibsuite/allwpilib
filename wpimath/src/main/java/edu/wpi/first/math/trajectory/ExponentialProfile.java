@@ -48,6 +48,12 @@ public class ExponentialProfile {
       this.totalTime = totalTime;
     }
 
+    /**
+     * Decides if the profile is finished by time t.
+     * 
+     * @param t The time since the beginning of the profile.
+     * @return if the profile is finished at time t.
+     */
     public boolean isFinished(double t) {
       return t > inflectionTime;
     }
@@ -87,6 +93,7 @@ public class ExponentialProfile {
      * @param maxInput maximum unsigned input voltage
      * @param kV The velocity gain.
      * @param kA The acceleration gain.
+     * @return The Constraints object.
      */
     public static Constraints fromCharacteristics(double maxInput, double kV, double kA) {
       return new Constraints(maxInput, -kV / kA, 1.0 / kA);
@@ -98,6 +105,7 @@ public class ExponentialProfile {
      * @param maxInput maximum unsigned input voltage
      * @param A The State-Space 1x1 system matrix.
      * @param B The State-Space 1x1 input matrix.
+     * @return The Constraints object.
      */
     public static Constraints fromStateSpace(double maxInput, double A, double B) {
       return new Constraints(maxInput, A, B);
@@ -402,11 +410,8 @@ public class ExponentialProfile {
    * @param goal The desired state when the profile is complete.
    */
   private boolean shouldFlipInput(State current, State goal) {
-    var A = m_constraints.A;
-    var B = m_constraints.B;
     var u = m_constraints.maxInput;
 
-    var x0 = current.position;
     var xf = goal.position;
     var v0 = current.velocity;
     var vf = goal.velocity;
