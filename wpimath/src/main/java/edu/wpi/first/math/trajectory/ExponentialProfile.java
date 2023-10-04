@@ -155,7 +155,7 @@ public class ExponentialProfile {
    * @return The input applied at time t.
    */
   public double calculateInput(double t, State current, State goal) {
-    var direction = shouldFlipAcceleration(current, goal) ? -1 : 1;
+    var direction = shouldFlipInput(current, goal) ? -1 : 1;
     var u = direction * m_constraints.maxInput;
 
     var inflectionPoint = calculateInflectionPoint(current, goal, u);
@@ -182,7 +182,7 @@ public class ExponentialProfile {
    * @return The position and velocity of the profile at time t.
    */
   public State calculate(double t, State current, State goal) {
-    var direction = shouldFlipAcceleration(current, goal) ? -1 : 1;
+    var direction = shouldFlipInput(current, goal) ? -1 : 1;
     var u = direction * m_constraints.maxInput;
 
     var inflectionPoint = calculateInflectionPoint(current, goal, u);
@@ -211,7 +211,7 @@ public class ExponentialProfile {
    * @return The position and velocity of the profile at the inflection point.
    */
   public State calculateInflectionPoint(State current, State goal) {
-    var direction = shouldFlipAcceleration(current, goal) ? -1 : 1;
+    var direction = shouldFlipInput(current, goal) ? -1 : 1;
     var u = direction * m_constraints.maxInput;
 
     return calculateInflectionPoint(current, goal, u);
@@ -261,7 +261,7 @@ public class ExponentialProfile {
    * @return The timing information for this profile.
    */
   public ProfileTiming calculateProfileTiming(State current, State goal) {
-    var direction = shouldFlipAcceleration(current, goal) ? -1 : 1;
+    var direction = shouldFlipInput(current, goal) ? -1 : 1;
     var u = direction * m_constraints.maxInput;
 
     var inflectionPoint = calculateInflectionPoint(current, goal, u);
@@ -428,7 +428,7 @@ public class ExponentialProfile {
    * @param current The initial state (usually the current state).
    * @param goal The desired state when the profile is complete.
    */
-  private boolean shouldFlipAcceleration(State current, State goal) {
+  private boolean shouldFlipInput(State current, State goal) {
     var A = m_constraints.A;
     var B = m_constraints.B;
     var u = m_constraints.maxInput;
