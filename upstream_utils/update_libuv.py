@@ -29,7 +29,7 @@ def main():
         "0007-Fix-Win32-warning-suppression-pragma.patch",
         "0008-Use-C-atomics.patch",
         "0009-Remove-static-from-array-indices.patch",
-        "0010-Remove-uv_clock_gettime-and-add-pragmas-for-missing-.patch",
+        "0010-Add-pragmas-for-missing-libraries-and-set-_WIN32_WIN.patch",
     ]:
         git_am(os.path.join(wpilib_root, "upstream_utils/libuv_patches", f))
 
