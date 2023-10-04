@@ -118,7 +118,7 @@ public class ExponentialProfile {
     public final double velocity;
 
     /**
-     * Construct a state within an exponential profile
+     * Construct a state within an exponential profile.
      *
      * @param position The position at this state.
      * @param velocity The velocity at this state.
@@ -409,6 +409,7 @@ public class ExponentialProfile {
    * @param current The initial state (usually the current state).
    * @param goal The desired state when the profile is complete.
    */
+  @SuppressWarnings("UnnecessaryParentheses")
   private boolean shouldFlipInput(State current, State goal) {
     var u = m_constraints.maxInput;
 

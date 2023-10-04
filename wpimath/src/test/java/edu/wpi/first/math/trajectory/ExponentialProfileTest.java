@@ -16,16 +16,6 @@ class ExponentialProfileTest {
   private static final double kDt = 0.01;
 
   /**
-   * Asserts "val1" is less than or equal to "val2".
-   *
-   * @param val1 First operand in comparison.
-   * @param val2 Second operand in comparison.
-   */
-  private static void assertLessThanOrEquals(double val1, double val2) {
-    assertTrue(val1 <= val2, val1 + " is greater than " + val2);
-  }
-
-  /**
    * Asserts "val1" is within "eps" of "val2".
    *
    * @param val1 First operand in comparison.
@@ -208,12 +198,13 @@ class ExponentialProfileTest {
     assertEquals(state, goal);
   }
 
+  @SuppressWarnings("PMD.TestClassWithoutTestCases")
   static class TestCase {
     public final ExponentialProfile.State initial;
     public final ExponentialProfile.State goal;
     public final ExponentialProfile.State inflectionPoint;
 
-    public TestCase(
+    TestCase(
         ExponentialProfile.State initial,
         ExponentialProfile.State goal,
         ExponentialProfile.State inflectionPoint) {
