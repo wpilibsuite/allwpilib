@@ -6,9 +6,7 @@
 
 #include <concepts>
 #include <functional>
-#include <initializer_list>
 #include <memory>
-#include <span>
 #include <utility>
 
 #include <frc/event/BooleanEvent.h>

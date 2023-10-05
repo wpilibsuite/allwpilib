@@ -6,15 +6,14 @@
 
 #include <concepts>
 #include <functional>
-#include <initializer_list>
 #include <memory>
-#include <span>
 #include <string>
 #include <type_traits>
 #include <utility>
 #include <vector>
 
 #include "frc2/command/CommandPtr.h"
+#include "frc2/command/Requirements.h"
 #include "frc2/command/SelectCommand.h"
 
 namespace frc2 {
