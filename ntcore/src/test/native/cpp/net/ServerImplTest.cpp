@@ -50,7 +50,7 @@ class ServerImplTest : public ::testing::Test {
 
 TEST_F(ServerImplTest, AddClient) {
   ::testing::StrictMock<net::MockWireConnection> wire;
-  EXPECT_CALL(wire, Flush());
+  // EXPECT_CALL(wire, Flush());
   MockSetPeriodicFunc setPeriodic;
   auto [name, id] = server.AddClient("test", "connInfo", false, wire,
                                      setPeriodic.AsStdFunction());
@@ -63,8 +63,8 @@ TEST_F(ServerImplTest, AddDuplicateClient) {
   ::testing::StrictMock<net::MockWireConnection> wire2;
   MockSetPeriodicFunc setPeriodic1;
   MockSetPeriodicFunc setPeriodic2;
-  EXPECT_CALL(wire1, Flush());
-  EXPECT_CALL(wire2, Flush());
+  // EXPECT_CALL(wire1, Flush());
+  // EXPECT_CALL(wire2, Flush());
 
   auto [name1, id1] = server.AddClient("test", "connInfo", false, wire1,
                                        setPeriodic1.AsStdFunction());
@@ -78,6 +78,14 @@ TEST_F(ServerImplTest, AddDuplicateClient) {
 }
 
 TEST_F(ServerImplTest, AddClient3) {}
+
+template <typename T>
+static std::string EncodeText1(const T& msg) {
+  std::string data;
+  wpi::raw_string_ostream os{data};
+  net::WireEncodeText(os, msg);
+  return data;
+}
 
 template <typename T>
 static std::string EncodeText(const T& msgs) {
@@ -94,6 +102,23 @@ static std::string EncodeText(const T& msgs) {
     net::WireEncodeText(os, msg);
   }
   os << ']';
+  return data;
+}
+
+template <typename T>
+static std::vector<uint8_t> EncodeServerBinary1(const T& msg) {
+  std::vector<uint8_t> data;
+  wpi::raw_uvector_ostream os{data};
+  if constexpr (std::same_as<T, net::ServerMessage>) {
+    if (auto m = std::get_if<net::ServerValueMsg>(&msg.contents)) {
+      net::WireEncodeBinary(os, m->topic, m->value.time(), m->value);
+    }
+  } else if constexpr (std::same_as<T, net::ClientMessage>) {
+    if (auto m = std::get_if<net::ClientValueMsg>(&msg.contents)) {
+      net::WireEncodeBinary(os, Handle{m->pubHandle}.GetIndex(),
+                            m->value.time(), m->value);
+    }
+  }
   return data;
 }
 
@@ -150,29 +175,30 @@ TEST_F(ServerImplTest, PublishLocal) {
   // subscribes
   ::testing::StrictMock<net::MockWireConnection> wire;
   MockSetPeriodicFunc setPeriodic;
+  EXPECT_CALL(wire, GetVersion()).WillRepeatedly(Return(0x0401));
   {
     ::testing::InSequence seq;
-    EXPECT_CALL(wire, Flush());                         // AddClient()
-    EXPECT_CALL(setPeriodic, Call(100));                // ClientSubscribe()
-    EXPECT_CALL(wire, Flush());                         // ClientSubscribe()
+    // EXPECT_CALL(wire, Flush()).WillOnce(Return(0));     // AddClient()
+    EXPECT_CALL(setPeriodic, Call(100));  // ClientSubscribe()
+    // EXPECT_CALL(wire, Flush()).WillOnce(Return(0));     // ClientSubscribe()
+    EXPECT_CALL(wire, GetLastPingResponse()).WillOnce(Return(0));
+    EXPECT_CALL(wire, SendPing(100));
     EXPECT_CALL(wire, Ready()).WillOnce(Return(true));  // SendControl()
-    {
-      std::vector<net::ServerMessage> smsgs;
-      smsgs.emplace_back(net::ServerMessage{net::AnnounceMsg{
-          "test", 3, "double", std::nullopt, wpi::json::object()}});
-      smsgs.emplace_back(net::ServerMessage{net::AnnounceMsg{
-          "test2", 8, "double", std::nullopt, wpi::json::object()}});
-      EXPECT_CALL(wire, Text(StrEq(EncodeText(smsgs))));  // SendControl()
-    }
-    EXPECT_CALL(wire, Flush());                         // SendControl()
+    EXPECT_CALL(
+        wire, DoWriteText(StrEq(EncodeText1(net::ServerMessage{net::AnnounceMsg{
+                  "test", 3, "double", std::nullopt, wpi::json::object()}}))))
+        .WillOnce(Return(0));
+    EXPECT_CALL(
+        wire, DoWriteText(StrEq(EncodeText1(net::ServerMessage{net::AnnounceMsg{
+                  "test2", 8, "double", std::nullopt, wpi::json::object()}}))))
+        .WillOnce(Return(0));
+    EXPECT_CALL(wire, Flush()).WillOnce(Return(0));     // SendControl()
     EXPECT_CALL(wire, Ready()).WillOnce(Return(true));  // SendControl()
-    {
-      std::vector<net::ServerMessage> smsgs;
-      smsgs.emplace_back(net::ServerMessage{net::AnnounceMsg{
-          "test3", 11, "double", std::nullopt, wpi::json::object()}});
-      EXPECT_CALL(wire, Text(StrEq(EncodeText(smsgs))));  // SendControl()
-    }
-    EXPECT_CALL(wire, Flush());  // SendControl()
+    EXPECT_CALL(
+        wire, DoWriteText(StrEq(EncodeText1(net::ServerMessage{net::AnnounceMsg{
+                  "test3", 11, "double", std::nullopt, wpi::json::object()}}))))
+        .WillOnce(Return(0));
+    EXPECT_CALL(wire, Flush()).WillOnce(Return(0));  // SendControl()
   }
   auto [name, id] = server.AddClient("test", "connInfo", false, wire,
                                      setPeriodic.AsStdFunction());
@@ -193,7 +219,7 @@ TEST_F(ServerImplTest, PublishLocal) {
     server.HandleLocal(msgs);
   }
 
-  server.SendControl(100);
+  server.SendAllOutgoing(100, false);
 
   // publish after send control
   {
@@ -203,7 +229,7 @@ TEST_F(ServerImplTest, PublishLocal) {
     server.HandleLocal(msgs);
   }
 
-  server.SendControl(200);
+  server.SendAllOutgoing(200, false);
 }
 
 TEST_F(ServerImplTest, ClientSubTopicOnlyThenValue) {
@@ -225,31 +251,28 @@ TEST_F(ServerImplTest, ClientSubTopicOnlyThenValue) {
   }
 
   ::testing::StrictMock<net::MockWireConnection> wire;
+  EXPECT_CALL(wire, GetVersion()).WillRepeatedly(Return(0x0401));
   MockSetPeriodicFunc setPeriodic;
   {
     ::testing::InSequence seq;
-    EXPECT_CALL(wire, Flush());                         // AddClient()
-    EXPECT_CALL(setPeriodic, Call(100));                // ClientSubscribe()
-    EXPECT_CALL(wire, Flush());                         // ClientSubscribe()
+    // EXPECT_CALL(wire, Flush()).WillOnce(Return(0));     // AddClient()
+    EXPECT_CALL(setPeriodic, Call(100));  // ClientSubscribe()
+    // EXPECT_CALL(wire, Flush()).WillOnce(Return(0));     // ClientSubscribe()
+    EXPECT_CALL(wire, GetLastPingResponse()).WillOnce(Return(0));
+    EXPECT_CALL(wire, SendPing(100));
     EXPECT_CALL(wire, Ready()).WillOnce(Return(true));  // SendValues()
-    {
-      std::vector<net::ServerMessage> smsgs;
-      smsgs.emplace_back(net::ServerMessage{net::AnnounceMsg{
-          "test", 3, "double", std::nullopt, wpi::json::object()}});
-      EXPECT_CALL(wire, Text(StrEq(EncodeText(smsgs))));  // SendValues()
-    }
-    EXPECT_CALL(wire, Flush());                         // SendValues()
-    EXPECT_CALL(setPeriodic, Call(100));                // ClientSubscribe()
-    EXPECT_CALL(wire, Flush());                         // ClientSubscribe()
+    EXPECT_CALL(
+        wire, DoWriteText(StrEq(EncodeText1(net::ServerMessage{net::AnnounceMsg{
+                  "test", 3, "double", std::nullopt, wpi::json::object()}}))))
+        .WillOnce(Return(0));
+    EXPECT_CALL(wire, Flush()).WillOnce(Return(0));  // SendValues()
+    EXPECT_CALL(setPeriodic, Call(100));             // ClientSubscribe()
+    // EXPECT_CALL(wire, Flush()).WillOnce(Return(0));     // ClientSubscribe()
     EXPECT_CALL(wire, Ready()).WillOnce(Return(true));  // SendValues()
-    {
-      std::vector<net::ServerMessage> smsgs;
-      smsgs.emplace_back(net::ServerMessage{
-          net::ServerValueMsg{3, Value::MakeDouble(1.0, 10)}});
-      EXPECT_CALL(
-          wire,
-          Binary(wpi::SpanEq(EncodeServerBinary(smsgs))));  // SendValues()
-    }
+    EXPECT_CALL(
+        wire, DoWriteBinary(wpi::SpanEq(EncodeServerBinary1(net::ServerMessage{
+                  net::ServerValueMsg{3, Value::MakeDouble(1.0, 10)}}))))
+        .WillOnce(Return(0));
     EXPECT_CALL(wire, Flush());  // SendValues()
   }
 
@@ -268,7 +291,7 @@ TEST_F(ServerImplTest, ClientSubTopicOnlyThenValue) {
     server.ProcessIncomingText(id, EncodeText(msgs));
   }
 
-  server.SendValues(id, 100);
+  server.SendOutgoing(id, 100);
 
   // subscribe normal; will not resend announcement, but will send value
   {
@@ -279,7 +302,7 @@ TEST_F(ServerImplTest, ClientSubTopicOnlyThenValue) {
     server.ProcessIncomingText(id, EncodeText(msgs));
   }
 
-  server.SendValues(id, 200);
+  server.SendOutgoing(id, 200);
 }
 
 TEST_F(ServerImplTest, ZeroTimestampNegativeTime) {
@@ -319,7 +342,7 @@ TEST_F(ServerImplTest, ZeroTimestampNegativeTime) {
   MockSetPeriodicFunc setPeriodic;
   {
     ::testing::InSequence seq;
-    EXPECT_CALL(wire, Flush());  // AddClient()
+    // EXPECT_CALL(wire, Flush());  // AddClient()
   }
   auto [name, id] = server.AddClient("test", "connInfo", false, wire,
                                      setPeriodic.AsStdFunction());
