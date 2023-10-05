@@ -77,18 +77,20 @@ jobs:
             task: "copyAllOutputs"
             outputs: "build/allOutputs"
             build-dir: "c:\\work"
-          # - os: windows-2022
-          #   artifact-name: WinArm64Debug
-          #   architecture: x64
-          #   task: "build"
-          #   build-options: "-PciDebugOnly -Pbuildwinarm64 -Ponlywindowsarm64 --max-workers 1"
-          #   outputs: "build/allOutputs"
-          # - os: windows-2022
-          #   artifact-name: WinArm64Release
-          #   architecture: x64
-          #   build-options: "-PciReleaseOnly -Pbuildwinarm64 -Ponlywindowsarm64 --max-workers 1"
-          #   task: "copyAllOutputs"
-          #   outputs: "build/allOutputs"
+          - os: windows-2022
+            artifact-name: WinArm64Debug
+            architecture: x64
+            task: "build"
+            build-options: "-PciDebugOnly -Pbuildwinarm64 -Ponlywindowsarm64 --max-workers 1"
+            outputs: "build/allOutputs"
+            build-dir: "c:\\work"
+          - os: windows-2022
+            artifact-name: WinArm64Release
+            architecture: x64
+            build-options: "-PciReleaseOnly -Pbuildwinarm64 -Ponlywindowsarm64 --max-workers 1"
+            task: "copyAllOutputs"
+            outputs: "build/allOutputs"
+            build-dir: "c:\\work"
           - os: macOS-12
             artifact-name: macOS
             architecture: x64

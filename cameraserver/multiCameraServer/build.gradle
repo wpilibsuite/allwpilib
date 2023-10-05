@@ -18,7 +18,9 @@ ext {
 
 apply from: "${rootDir}/shared/opencv.gradle"
 
-mainClassName = 'edu.wpi.Main'
+application {
+    mainClass = 'edu.wpi.Main'
+}
 
 apply plugin: 'com.github.johnrengelman.shadow'
 
