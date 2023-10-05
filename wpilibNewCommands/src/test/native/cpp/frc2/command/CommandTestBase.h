@@ -52,7 +52,7 @@ class MockCommand : public CommandHelper<Command, MockCommand> {
   }
 
   explicit MockCommand(Requirements requirements, bool finished = false,
-              bool runWhenDisabled = true) {
+                       bool runWhenDisabled = true) {
     m_requirements.insert(requirements.begin(), requirements.end());
     EXPECT_CALL(*this, GetRequirements())
         .WillRepeatedly(::testing::Return(m_requirements));
