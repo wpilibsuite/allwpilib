@@ -462,7 +462,7 @@ class RoboRioSim {
   static void SetCPUTemp(units::celsius_t cpuTemp);
 
   /**
-   * Register a callback to be run whenever the network rx bytes changes.
+   * Register a callback to be run whenever the RIO network rx bytes changes.
    *
    * @param callback the callback
    * @param initialNotify whether to call the callback with the initial state
@@ -473,21 +473,21 @@ class RoboRioSim {
       NotifyCallback callback, bool initialNotify);
 
   /**
-   * Get the network rx bytes.
+   * Get the RIO network rx bytes.
    *
-   * @return the network rx bytes.
+   * @return the RIO network rx bytes.
    */
   static int32_t GetNetworkRxBytes();
 
   /**
-   * Set the network rx bytes.
+   * Set the RIO network rx bytes.
    *
-   * @param networkRxBytes the new network rx bytes.
+   * @param networkRxBytes the new RIO network rx bytes.
    */
   static void SetNetworkRxBytes(int32_t networkRxBytes);
 
   /**
-   * Register a callback to be run whenever the network tx bytes changes.
+   * Register a callback to be run whenever the RIO network tx bytes changes.
    *
    * @param callback the callback
    * @param initialNotify whether to call the callback with the initial state
@@ -498,16 +498,16 @@ class RoboRioSim {
       NotifyCallback callback, bool initialNotify);
 
   /**
-   * Get the network tx bytes.
+   * Get the RIO network tx bytes.
    *
-   * @return the network tx bytes.
+   * @return the RIO network tx bytes.
    */
   static int32_t GetNetworkTxBytes();
 
   /**
-   * Set the network tx bytes.
+   * Set the RIO network tx bytes.
    *
-   * @param networkTxBytes the new network tx bytes.
+   * @param networkTxBytes the new RIO network tx bytes.
    */
   static void SetNetworkTxBytes(int32_t networkTxBytes);
 

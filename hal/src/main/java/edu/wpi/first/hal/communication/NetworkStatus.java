@@ -4,20 +4,20 @@
 
 package edu.wpi.first.hal.communication;
 
-/** Structure for holding the result of a network usage request. */
+/** Structure for holding the result of a RIO network usage request. */
 @SuppressWarnings("MemberName")
 public class NetworkStatus {
-  /** Amount of bytes received over the network interface. */
+  /** Amount of bytes received over the RIO network interface. */
   public int rxBytes;
 
-  /** Amount of bytes transmitted over the network interface. */
+  /** Amount of bytes transmitted over the RIO network interface. */
   public int txBytes;
 
   /**
    * Set network interface status.
    *
-   * @param rxBytes Amount of bytes received over the network interface.
-   * @param txBytes Amount of bytes transmitted over the network interface.
+   * @param rxBytes Amount of bytes received over the RIO network interface.
+   * @param txBytes Amount of bytes transmitted over the RIO network interface.
    */
   public void setStatus(int rxBytes, int txBytes) {
     this.rxBytes = rxBytes;
