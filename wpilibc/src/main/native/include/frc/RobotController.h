@@ -282,8 +282,9 @@ class RobotController {
   /**
    * Get the current status of the RIO network interface.
    *
-   * <p>Note that this does not measure the total data passing through the radio and won't
-   *  necessarily include data sent between other devices (such as a coprocessor) on the network.
+   * <p>Note that this does not measure the total data passing through the radio
+   * and won't necessarily include data sent between other devices (such as a
+   * coprocessor) on the network.
    *
    * @return The network status of the RIO's network interface.
    */
