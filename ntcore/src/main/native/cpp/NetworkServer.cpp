@@ -260,7 +260,6 @@ void NetworkServer::ServerConnection4::ProcessWsUpgrade() {
             m_wire->SendBinary([&](auto& os) {
               net::WireEncodeBinary(os, -1, wpi::Now(), value);
             });
-            continue;
           }
         }
       });
