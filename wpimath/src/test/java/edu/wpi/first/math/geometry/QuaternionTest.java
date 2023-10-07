@@ -199,6 +199,9 @@ class QuaternionTest {
     var k = new Quaternion(0, 0, 0, 1);
     assertEquals(k.times(Math.PI / 2), k.log());
     assertEquals(i.times(-Math.PI), one.times(-1).log());
+
+    var ln_half = Math.log(0.5);
+    assertEquals(new Quaternion(ln_half, -Math.PI, 0, 0), one.times(-0.5).log());
   }
 
   @Test

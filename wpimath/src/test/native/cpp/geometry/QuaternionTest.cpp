@@ -175,6 +175,7 @@ TEST(QuaternionTest, Logarithm) {
   Quaternion i{0, 1, 0, 0};
   Quaternion j{0, 0, 1, 0};
   Quaternion k{0, 0, 0, 1};
+  Quaternion ln_half{std::log(0.5), -std::numbers::pi, 0, 0};
 
   EXPECT_EQ(zero, one.Log());
   EXPECT_EQ(i * std::numbers::pi / 2, i.Log());
@@ -182,6 +183,7 @@ TEST(QuaternionTest, Logarithm) {
   EXPECT_EQ(k * std::numbers::pi / 2, k.Log());
 
   EXPECT_EQ(i * -std::numbers::pi, (one * -1).Log());
+  EXPECT_EQ(ln_half, (one * -0.5).Log());
 }
 
 TEST(QuaternionTest, LogarithmAndExponentialInverse) {
