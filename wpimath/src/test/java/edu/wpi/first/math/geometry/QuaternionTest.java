@@ -174,7 +174,7 @@ class QuaternionTest {
         new Quaternion(
             2.81211398529184, -0.392521193481878, -0.588781790222817, -0.785042386963756);
 
-    QuaternionEquals(q_exp, q.exp());
+    assertEquals(q_exp, q.exp());
   }
 
   @Test
@@ -183,22 +183,22 @@ class QuaternionTest {
     var q_log =
         new Quaternion(1.7959088706354, 0.515190292664085, 0.772785438996128, 1.03038058532817);
 
-    QuaternionEquals(q_log, q.log());
+    assertEquals(q_log, q.log());
 
     var zero = new Quaternion(0, 0, 0, 0);
     var one = new Quaternion();
 
-    QuaternionEquals(zero, one.log());
+    assertEquals(zero, one.log());
 
     var i = new Quaternion(0, 1, 0, 0);
-    QuaternionEquals(i.times(Math.PI / 2), i.log());
+    assertEquals(i.times(Math.PI / 2), i.log());
 
     var j = new Quaternion(0, 0, 1, 0);
-    QuaternionEquals(j.times(Math.PI / 2), j.log());
+    assertEquals(j.times(Math.PI / 2), j.log());
 
     var k = new Quaternion(0, 0, 0, 1);
-    QuaternionEquals(k.times(Math.PI / 2), k.log());
-    QuaternionEquals(i.times(-Math.PI), one.times(-1).log());
+    assertEquals(k.times(Math.PI / 2), k.log());
+    assertEquals(i.times(-Math.PI), one.times(-1).log());
   }
 
   @Test
@@ -211,7 +211,7 @@ class QuaternionTest {
 
     var q_log_exp = q.log().exp();
 
-    QuaternionEquals(q, q_log_exp);
+    assertEquals(q, q_log_exp);
 
     var start = new Quaternion(1, 2, 3, 4);
     var expect = new Quaternion(5, 6, 7, 8);
@@ -219,7 +219,7 @@ class QuaternionTest {
     var twist = start.log(expect);
     var actual = start.exp(twist);
 
-    QuaternionEquals(expect, actual);
+    assertEquals(expect, actual);
   }
 
   @Test
@@ -238,15 +238,7 @@ class QuaternionTest {
     var q_conj = q.conjugate();
 
     assertAll(
-        () -> assertEquals(q.dot(q), q.norm() * q.norm()),
-        () -> assertNotEquals(q.dot(q_conj), q.norm() * q_conj.norm()));
-  }
-
-  private void QuaternionEquals(Quaternion expect, Quaternion test) {
-    QuaternionEquals(expect, test, 1e-10);
-  }
-
-  private void QuaternionEquals(Quaternion expect, Quaternion test, double threshold) {
-    assertEquals(expect.dot(test), expect.norm() * test.norm(), threshold);
+        () -> assertEquals(q, q),
+        () -> assertNotEquals(q, q_conj));
   }
 }

@@ -138,12 +138,7 @@ public class Quaternion {
     if (obj instanceof Quaternion) {
       var other = (Quaternion) obj;
 
-      return Math.abs(
-              getW() * other.getW()
-                  + getX() * other.getX()
-                  + getY() * other.getY()
-                  + getZ() * other.getZ())
-          > 1.0 - 1E-9;
+      return Math.abs(dot(other) - norm() * other.norm()) < 1e-9;
     }
     return false;
   }

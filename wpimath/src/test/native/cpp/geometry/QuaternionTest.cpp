@@ -150,8 +150,6 @@ TEST(QuaternionTest, Norm) {
   EXPECT_NEAR(85, norm, 1e-9);
 }
 
-#define QUATERNION_NEAR(p, q) \
-  { EXPECT_NEAR((p).Dot((q)), (p).Norm() * (q).Norm(), 1e-9); }
 
 TEST(QuaternionTest, Exponential) {
   Quaternion q{1.1, 2.2, 3.3, 4.4};
@@ -160,7 +158,7 @@ TEST(QuaternionTest, Exponential) {
 
   auto q_exp = q.Exp();
 
-  QUATERNION_NEAR(expect, q_exp);
+  EXPECT_EQ(expect, q_exp);
 }
 
 TEST(QuaternionTest, Logarithm) {
@@ -170,7 +168,7 @@ TEST(QuaternionTest, Logarithm) {
 
   auto q_log = q.Log();
 
-  QUATERNION_NEAR(expect, q_log);
+  EXPECT_EQ(expect, q_log);
 
   Quaternion zero{0, 0, 0, 0};
   Quaternion one{1, 0, 0, 0};
@@ -178,12 +176,12 @@ TEST(QuaternionTest, Logarithm) {
   Quaternion j{0, 0, 1, 0};
   Quaternion k{0, 0, 0, 1};
 
-  QUATERNION_NEAR(zero, one.Log());
-  QUATERNION_NEAR(i * std::numbers::pi / 2, i.Log());
-  QUATERNION_NEAR(j * std::numbers::pi / 2, j.Log());
-  QUATERNION_NEAR(k * std::numbers::pi / 2, k.Log());
+  EXPECT_EQ(zero, one.Log());
+  EXPECT_EQ(i * std::numbers::pi / 2, i.Log());
+  EXPECT_EQ(j * std::numbers::pi / 2, j.Log());
+  EXPECT_EQ(k * std::numbers::pi / 2, k.Log());
 
-  QUATERNION_NEAR(i * -std::numbers::pi, (one * -1).Log());
+  EXPECT_EQ(i * -std::numbers::pi, (one * -1).Log());
 }
 
 TEST(QuaternionTest, LogarithmAndExponentialInverse) {
@@ -195,7 +193,7 @@ TEST(QuaternionTest, LogarithmAndExponentialInverse) {
 
   auto q_log_exp = q.Log().Exp();
 
-  QUATERNION_NEAR(q, q_log_exp);
+  EXPECT_EQ(q, q_log_exp);
 
   Quaternion start{1, 2, 3, 4};
   Quaternion expect{5, 6, 7, 8};
@@ -203,7 +201,7 @@ TEST(QuaternionTest, LogarithmAndExponentialInverse) {
   auto twist = start.Log(expect);
   auto actual = start.Exp(twist);
 
-  QUATERNION_NEAR(expect, actual);
+  EXPECT_EQ(expect, actual);
 }
 
 TEST(QuaternionTest, DotProduct) {
@@ -221,5 +219,3 @@ TEST(QuaternionTest, DotProductAsEquality) {
   EXPECT_NEAR(q.Dot(q), q.Norm() * q.Norm(), 1e-9);
   EXPECT_GT(std::abs(q.Dot(q_conj) - q.Norm() * q_conj.Norm()), 1e-9);
 }
-
-#undef QUATERNION_NEAR
