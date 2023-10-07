@@ -954,17 +954,20 @@ bool LocalStorage::Impl::SetDefaultEntryValue(NT_Handle pubsubentryHandle,
       if (topic->type == NT_UNASSIGNED) {
         topic->type = value.type();
       }
+      Value newValue;
       if (topic->type == value.type()) {
-        topic->lastValue = value;
+        newValue = value;
       } else if (IsNumericCompatible(topic->type, value.type())) {
-        topic->lastValue = ConvertNumericValue(value, topic->type);
+        newValue = ConvertNumericValue(value, topic->type);
       } else {
         return true;
       }
-      topic->lastValue.SetTime(0);
-      topic->lastValue.SetServerTime(0);
+      newValue.SetTime(0);
+      newValue.SetServerTime(0);
       if (publisher) {
-        PublishLocalValue(publisher, topic->lastValue, true);
+        PublishLocalValue(publisher, newValue, true);
+      } else {
+        topic->lastValue = newValue;
       }
       return true;
     }
