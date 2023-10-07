@@ -71,7 +71,8 @@ Quaternion Quaternion::operator*(const Quaternion& other) const {
 }
 
 bool Quaternion::operator==(const Quaternion& other) const {
-  return std::abs(Dot(other) - Norm() * other.Norm()) < 1e-9  && std::abs(Norm() - other.Norm()) < 1e-9;
+  return std::abs(Dot(other) - Norm() * other.Norm()) < 1e-9 &&
+         std::abs(Norm() - other.Norm()) < 1e-9;
 }
 
 Quaternion Quaternion::Conjugate() const {

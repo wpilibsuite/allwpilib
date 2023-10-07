@@ -240,8 +240,6 @@ class QuaternionTest {
     var q = new Quaternion(1.1, 2.2, 3.3, 4.4);
     var q_conj = q.conjugate();
 
-    assertAll(
-        () -> assertEquals(q, q),
-        () -> assertNotEquals(q, q_conj));
+    assertAll(() -> assertEquals(q, q), () -> assertNotEquals(q, q_conj));
   }
 }

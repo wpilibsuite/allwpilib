@@ -150,7 +150,6 @@ TEST(QuaternionTest, Norm) {
   EXPECT_NEAR(85, norm, 1e-9);
 }
 
-
 TEST(QuaternionTest, Exponential) {
   Quaternion q{1.1, 2.2, 3.3, 4.4};
   Quaternion expect{2.81211398529184, -0.392521193481878, -0.588781790222817,
