@@ -163,8 +163,9 @@ void NetworkOutgoingQueue<MessageType>::SetPeriod(NT_Handle handle,
   if (!created && infoIt->getSecond().queueIndex != queueIndex) {
     // need to move any items from old queue to new queue
     auto& oldMsgs = m_queues[infoIt->getSecond().queueIndex].msgs;
-    auto it = std::remove_if(oldMsgs.begin(), oldMsgs.end(),
-                             [&](const auto& e) { return e.handle == handle; });
+    auto it = std::stable_partition(
+        oldMsgs.begin(), oldMsgs.end(),
+        [&](const auto& e) { return e.handle != handle; });
     auto& newMsgs = m_queues[queueIndex].msgs;
     for (auto i = it, end = oldMsgs.end(); i != end; ++i) {
       newMsgs.emplace_back(std::move(*i));
