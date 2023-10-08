@@ -95,7 +95,7 @@ With a version 4.1 connection, both the client and the server should send period
 
 As the WebSockets protocol allows PONG responses to be sent in the middle of another message stream, WebSockets PING messages are preferred, as this allows for a shorter timeout period that is not dependent on the size of the transmitted messages. Sending a ping every 200 ms with a timeout of 1 second is recommended in this case.
 
-If using timestamp messages for aliveness checking, the client should use a timeout long enough to account for the largest expected message size (as the server can only respond after such a message has been completely transmitted). Sending a ping every 1 second with a timeout of 3 seconds is recommended in this case.
+If using timestamp messages for aliveness checking on the primary connection, the client should use a timeout long enough to account for the largest expected message size (as the server can only respond after such a message has been completely transmitted). Sending a ping every 1 second with a timeout of 3 seconds is recommended in this case. If provided by the server, the <<rtt-subprotocol>> can be used in addition to the primary connection for aliveness testing with a shorter timeout.
 
 [[reconnection]]
 === Caching and Reconnection Handling
@@ -342,6 +342,11 @@ The unsecure standard server port number shall be 5810, the secure standard port
 Combining multiple text or binary messages into a single WebSockets frame should be limited such that the WebSockets frame does not exceed the MTU unless otherwise required to fit the total binary data size.
 
 Client and server implementations should fragment WebSockets messages to roughly the network MTU in order to facilitate rapid handling of PING and PONG messages.
+
+[[rtt-subprotocol]]
+=== RTT Subprotocol
+
+Servers should provide subprotocol `rtt.networktables.first.wpi.edu` for RTT-only messages. This subprotocol provides a separate channel that can be used for RTT messages to avoid delays caused by other value transmissions. Clients that cannot send WebSocket PING messages are recommended to use this subprotocol (if available) for aliveness testing. Connections using this subprotocol do not appear in the client connections list. No text frames are used; only <<binary-frames>> with Topic ID of -1 (RTT measurement) should be sent by the client and responded to by the server.
 
 [[data-types]]
 == Supported Data Types
