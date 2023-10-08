@@ -420,7 +420,7 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
   public boolean equals(Object obj) {
     if (obj instanceof Rotation3d) {
       var other = (Rotation3d) obj;
-      return m_q.equals(other.m_q);
+      return Math.abs(Math.abs(m_q.dot(other.m_q)) - m_q.norm() * other.m_q.norm()) < 1e-9;
     }
     return false;
   }
