@@ -17,6 +17,7 @@
 #include <wpi/fs.h>
 #include <wpi/mutex.h>
 #include <wpi/raw_ostream.h>
+#include <wpi/timestamp.h>
 #include <wpinet/HttpUtil.h>
 #include <wpinet/HttpWebSocketServerConnection.h>
 #include <wpinet/UrlParser.h>
@@ -28,6 +29,8 @@
 #include "InstanceImpl.h"
 #include "Log.h"
 #include "net/WebSocketConnection.h"
+#include "net/WireDecoder.h"
+#include "net/WireEncoder.h"
 #include "net3/UvStreamConnection3.h"
 
 using namespace nt;
@@ -82,9 +85,10 @@ class NetworkServer::ServerConnection4 final
                     std::string_view addr, unsigned int port,
                     wpi::Logger& logger)
       : ServerConnection{server, addr, port, logger},
-        HttpWebSocketServerConnection(stream,
-                                      {"v4.1.networktables.first.wpi.edu",
-                                       "networktables.first.wpi.edu"}) {
+        HttpWebSocketServerConnection(
+            stream,
+            {"v4.1.networktables.first.wpi.edu", "networktables.first.wpi.edu",
+             "rtt.networktables.first.wpi.edu"}) {
     m_info.protocol_version = 0x0400;
   }
 
@@ -238,6 +242,36 @@ void NetworkServer::ServerConnection4::ProcessWsUpgrade() {
         protocol == "v4.1.networktables.first.wpi.edu" ? 0x0401 : 0x0400;
     m_wire = std::make_shared<net::WebSocketConnection>(
         *m_websocket, m_info.protocol_version);
+
+    if (protocol == "rtt.networktables.first.wpi.edu") {
+      INFO("CONNECTED RTT client (from {})", m_connInfo);
+      m_websocket->binary.connect([this](std::span<const uint8_t> data, bool) {
+        while (!data.empty()) {
+          // decode message
+          int64_t pubuid;
+          Value value;
+          std::string error;
+          if (!net::WireDecodeBinary(&data, &pubuid, &value, &error, 0)) {
+            m_wire->Disconnect(fmt::format("binary decode error: {}", error));
+            break;
+          }
+
+          // respond to RTT ping
+          if (pubuid == -1) {
+            m_wire->SendBinary([&](auto& os) {
+              net::WireEncodeBinary(os, -1, wpi::Now(), value);
+            });
+          }
+        }
+      });
+      m_websocket->closed.connect([this](uint16_t, std::string_view reason) {
+        auto realReason = m_wire->GetDisconnectReason();
+        INFO("DISCONNECTED RTT client (from {}): {}", m_connInfo,
+             realReason.empty() ? reason : realReason);
+      });
+      return;
+    }
+
     // TODO: set local flag appropriately
     std::string dedupName;
     std::tie(dedupName, m_clientId) = m_server.m_serverImpl.AddClient(
