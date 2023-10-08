@@ -6,13 +6,11 @@ package edu.wpi.first.math.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.jupiter.api.Test;
-
-import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.numbers.N1;
-
+import org.junit.jupiter.api.Test;
 
 class ElevatorFeedforwardTest {
   private static final double ks = 0.5;
@@ -40,8 +38,6 @@ class ElevatorFeedforwardTest {
         plantInversion.calculate(r, nextR).get(0, 0) + ks + kg,
         elevatorMotor.calculate(2.0, 3.0, 0.020),
         0.002);
-
-
   }
 
   @Test
