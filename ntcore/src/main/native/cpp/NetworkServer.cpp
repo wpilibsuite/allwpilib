@@ -244,6 +244,7 @@ void NetworkServer::ServerConnection4::ProcessWsUpgrade() {
         *m_websocket, m_info.protocol_version);
 
     if (protocol == "rtt.networktables.first.wpi.edu") {
+      INFO("CONNECTED RTT client (from {})", m_connInfo);
       m_websocket->binary.connect([this](std::span<const uint8_t> data, bool) {
         while (!data.empty()) {
           // decode message
@@ -262,6 +263,11 @@ void NetworkServer::ServerConnection4::ProcessWsUpgrade() {
             });
           }
         }
+      });
+      m_websocket->closed.connect([this](uint16_t, std::string_view reason) {
+        auto realReason = m_wire->GetDisconnectReason();
+        INFO("DISCONNECTED RTT client (from {}): {}", m_connInfo,
+             realReason.empty() ? reason : realReason);
       });
       return;
     }
