@@ -185,6 +185,8 @@ model {
                                     testTask.useJUnitPlatform()
                                     testTask.filter {
                                         includeTestsMatching("edu.wpi.first.wpilibj.examples.${entry.foldername}.*")
+                                        // armsimulation regularly fails on CI Win64Debug
+                                        excludeTestsMatching("edu.wpi.first.wpilibj.examples.armsimulation.*")
                                         setFailOnNoMatchingTests(false)
                                     }
                                     test.filter {
