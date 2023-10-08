@@ -15,7 +15,7 @@ jobs:
     name: "wpiformat"
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Fetch all history and metadata
         run: |
           git config --global --add safe.directory /__w/allwpilib/allwpilib
@@ -53,7 +53,7 @@ jobs:
     runs-on: ubuntu-22.04
     container: wpilib/roborio-cross-ubuntu:2023-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Fetch all history and metadata
         run: |
           git config --global --add safe.directory /__w/allwpilib/allwpilib
@@ -77,7 +77,7 @@ jobs:
     runs-on: ubuntu-22.04
     container: wpilib/ubuntu-base:22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Fetch all history and metadata
         run: |
           git config --global --add safe.directory /__w/allwpilib/allwpilib
@@ -95,7 +95,7 @@ jobs:
     name: "Documentation"
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - uses: actions/setup-java@v3
