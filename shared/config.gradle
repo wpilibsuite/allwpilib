@@ -55,13 +55,6 @@ nativeUtils.platformConfigs.each {
 // https://github.com/opencv/opencv/issues/20269
 nativeUtils.platformConfigs.osxuniversal.cppCompiler.args.add("-Wno-deprecated-anon-enum-enum-conversion")
 
-// NativeUtils uses the wrong compiler arguments for roboRIO targets, but it's
-// too late to fix NativeUtils for the 2023 season. This temporarily overwrites
-// the flags.
-nativeUtils.platformConfigs.named(nativeUtils.wpi.platforms.roborio).configure {
-    cppCompiler.args.remove('-Wno-error=deprecated-declarations')
-}
-
 nativeUtils.platformConfigs.linuxathena.linker.args.add("-Wl,--fatal-warnings")
 
 model {
