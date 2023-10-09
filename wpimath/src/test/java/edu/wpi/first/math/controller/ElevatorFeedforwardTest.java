@@ -22,21 +22,23 @@ class ElevatorFeedforwardTest {
 
   @Test
   void testCalculate() {
+    var elevatorMotor = new ElevatorFeedforward(ks, kg, kv, ka);
+
     assertEquals(1, m_elevatorFF.calculate(0), 0.002);
     assertEquals(4.5, m_elevatorFF.calculate(2), 0.002);
     assertEquals(6.5, m_elevatorFF.calculate(2, 1), 0.002);
     assertEquals(-0.5, m_elevatorFF.calculate(-2, 1), 0.002);
-    var r = VecBuilder.fill(2.0);
-    var nextR = VecBuilder.fill(3.0);
+
     var A = Matrix.mat(Nat.N1(), Nat.N1()).fill(-kv / ka);
     var B = Matrix.mat(Nat.N1(), Nat.N1()).fill(1.0 / ka);
+    final double dt = 0.02;
+    var plantInversion = new LinearPlantInversionFeedforward<N1, N1, N1>(A, B, dt);
 
-    var plantInversion = new LinearPlantInversionFeedforward<N1, N1, N1>(A, B, 0.020);
-    var elevatorMotor = new ElevatorFeedforward(ks, kg, kv, ka);
-
+    var r = VecBuilder.fill(2.0);
+    var nextR = VecBuilder.fill(3.0);
     assertEquals(
         plantInversion.calculate(r, nextR).get(0, 0) + ks + kg,
-        elevatorMotor.calculate(2.0, 3.0, 0.020),
+        elevatorMotor.calculate(2.0, 3.0, dt),
         0.002);
   }
 
