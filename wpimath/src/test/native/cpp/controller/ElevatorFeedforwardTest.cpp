@@ -33,7 +33,7 @@ TEST(ElevatorFeedforwardTest, Calculate) {
   Matrixd<1, 1> A{-Kv / Ka};
   Matrixd<1, 1> B{1.0 / Ka};
 
-  frc::LinearPlantInversionFeedforward<1, 1> plantInversion{A, B, dt};
+  frc::LinearPlantInversionFeedforward<1, 1> plantInversion{A, B, 0.020};
   frc::ElevatorFeedforward elevatorFF{Ks, Kg, Kv, Ka};  
   
   EXPECT_NEAR(plantInversion.Calculate(r, nextR)(0) + Ks.value() + Kg.value(),
