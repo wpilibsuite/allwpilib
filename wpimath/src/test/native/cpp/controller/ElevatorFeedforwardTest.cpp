@@ -27,6 +27,7 @@ TEST(ElevatorFeedforwardTest, Calculate) {
               0.002);
   EXPECT_NEAR(elevatorFF.Calculate(-2_m / 1_s, 1_m / 1_s / 1_s).value(), -0.5,
               0.002);
+  
   Vectord<1> r{2.0};
   Vectord<1> nextR{3.0};
   Matrixd<1, 1> A{-Kv / Ka};
