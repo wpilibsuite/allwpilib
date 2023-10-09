@@ -22,8 +22,6 @@ class ElevatorFeedforwardTest {
 
   @Test
   void testCalculate() {
-    var elevatorMotor = new ElevatorFeedforward(ks, kg, kv, ka);
-
     assertEquals(1, m_elevatorFF.calculate(0), 0.002);
     assertEquals(4.5, m_elevatorFF.calculate(2), 0.002);
     assertEquals(6.5, m_elevatorFF.calculate(2, 1), 0.002);
@@ -38,7 +36,7 @@ class ElevatorFeedforwardTest {
     var nextR = VecBuilder.fill(3.0);
     assertEquals(
         plantInversion.calculate(r, nextR).get(0, 0) + ks + kg,
-        elevatorMotor.calculate(2.0, 3.0, dt),
+        m_elevatorFF.calculate(2.0, 3.0, dt),
         0.002);
   }
 
