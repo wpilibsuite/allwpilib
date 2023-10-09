@@ -20,19 +20,20 @@ static constexpr auto Kg = 1_V;
 
 TEST(ElevatorFeedforwardTest, Calculate) {
 
-  Vectord<1> r{2.0};
-  Vectord<1> nextR{3.0};
 
-  Matrixd<1, 1> A{-Kv / Ka};
-  Matrixd<1, 1> B{1.0 / Ka};
-  frc::LinearPlantInversionFeedforward<1, 1> plantInversion{A, B, dt};
-  frc::ElevatorFeedforward elevatorFF{Ks, Kg, Kv, Ka};
   EXPECT_NEAR(elevatorFF.Calculate(0_m / 1_s).value(), Kg.value(), 0.002);
   EXPECT_NEAR(elevatorFF.Calculate(2_m / 1_s).value(), 4.5, 0.002);
   EXPECT_NEAR(elevatorFF.Calculate(2_m / 1_s, 1_m / 1_s / 1_s).value(), 6.5,
               0.002);
   EXPECT_NEAR(elevatorFF.Calculate(-2_m / 1_s, 1_m / 1_s / 1_s).value(), -0.5,
               0.002);
+  Vectord<1> r{2.0};
+  Vectord<1> nextR{3.0};
+
+  Matrixd<1, 1> A{-Kv / Ka};
+  Matrixd<1, 1> B{1.0 / Ka};
+  frc::LinearPlantInversionFeedforward<1, 1> plantInversion{A, B, dt};
+  frc::ElevatorFeedforward elevatorFF{Ks, Kg, Kv, Ka};  
   EXPECT_NEAR(plantInversion.Calculate(r, nextR)(0) + Ks.value() + Kg.value(),
               elevatorFF.Calculate(2_mps, 3_mps, dt).value(), 0.002);
 
