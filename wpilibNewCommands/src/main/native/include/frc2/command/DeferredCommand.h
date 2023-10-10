@@ -39,20 +39,6 @@ class DeferredCommand : public CommandHelper<Command, DeferredCommand> {
    * @param requirements The command requirements.
    *
    */
-  DeferredCommand(wpi::unique_function<Command*()> supplier,
-                  Requirements requirements);
-
-  /**
-   * Creates a new DeferredCommand that runs the supplied command when
-   * initialized, and ends when it ends. Useful for lazily
-   * creating commands at runtime. The supplier will be called each time this
-   * command is initialized. The supplier <i>must</i> create a new Command each
-   * call.
-   *
-   * @param supplier The command supplier
-   * @param requirements The command requirements.
-   *
-   */
   DeferredCommand(wpi::unique_function<CommandPtr()> supplier,
                   Requirements requirements);
 
@@ -69,8 +55,7 @@ class DeferredCommand : public CommandHelper<Command, DeferredCommand> {
   void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
-  PrintCommand m_nullCommand{"[DeferredCommand] Supplied command was null!"};
-  wpi::unique_function<Command*()> m_supplier;
-  Command* m_command{&m_nullCommand};
+  wpi::unique_function<CommandPtr()> m_supplier;
+  std::unique_ptr<Command> m_command;
 };
 }  // namespace frc2

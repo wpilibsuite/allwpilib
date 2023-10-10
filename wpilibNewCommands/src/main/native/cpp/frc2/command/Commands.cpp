@@ -83,11 +83,6 @@ CommandPtr cmd::Either(CommandPtr&& onTrue, CommandPtr&& onFalse,
       .ToPtr();
 }
 
-CommandPtr cmd::Defer(wpi::unique_function<Command*()> supplier,
-                      Requirements requirements) {
-  return DeferredCommand(std::move(supplier), requirements).ToPtr();
-}
-
 CommandPtr cmd::Defer(wpi::unique_function<CommandPtr()> supplier,
                       Requirements requirements) {
   return DeferredCommand(std::move(supplier), requirements).ToPtr();

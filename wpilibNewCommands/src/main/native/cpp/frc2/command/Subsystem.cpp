@@ -55,10 +55,6 @@ CommandPtr Subsystem::RunEnd(std::function<void()> run,
   return cmd::RunEnd(std::move(run), std::move(end), {this});
 }
 
-CommandPtr Subsystem::Defer(wpi::unique_function<Command*()> supplier) {
-  return cmd::Defer(std::move(supplier), {this});
-}
-
 CommandPtr Subsystem::Defer(wpi::unique_function<CommandPtr()> supplier) {
   return cmd::Defer(std::move(supplier), {this});
 }

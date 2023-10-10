@@ -148,16 +148,6 @@ CommandPtr Select(std::function<Key()> selector,
  * @param requirements the set of requirements for this command
  */
 [[nodiscard]]
-CommandPtr Defer(wpi::unique_function<Command*()> supplier,
-                 Requirements requirements);
-
-/**
- * Runs the command supplied by the supplier.
- *
- * @param supplier the command supplier
- * @param requirements the set of requirements for this command
- */
-[[nodiscard]]
 CommandPtr Defer(wpi::unique_function<CommandPtr()> supplier,
                  Requirements requirements);
 
