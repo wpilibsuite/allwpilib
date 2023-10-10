@@ -149,7 +149,7 @@ public class ChassisSpeeds {
    *
    * @param vxMetersPerSecond The component of speed in the x direction relative to the robot.
    *     Positive x is the robot's forward.
-   * @param vyMetersPerSecond The component of speed in the y direction relative to the field.
+   * @param vyMetersPerSecond The component of speed in the y direction relative to the robot.
    *     Positive y is the robot's left.
    * @param omegaRadiansPerSecond The angular rate of the robot.
    * @param robotAngle The angle of the robot as measured by a gyroscope. The robot's angle is
