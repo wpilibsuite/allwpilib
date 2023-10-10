@@ -134,6 +134,50 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
   }
 
   /**
+   * Converts a user provided robot-relative set of speeds into a field-relative
+   * ChassisSpeeds object.
+   *
+   * @param vx The component of speed in the x direction relative to the robot.
+   * Positive x is the robot's forward.
+   * @param vy The component of speed in the y direction relative to the robot.
+   * Positive y is to the robot's left.
+   * @param omega The angular rate of the robot.
+   * @param robotAngle The angle of the robot as measured by a gyroscope. The
+   * robot's angle is considered to be zero when it is facing directly away from
+   * your alliance station wall. Remember that this should be CCW positive.
+   *
+   * @return ChassisSpeeds object representing the speeds in the field's frame
+   * of reference.
+   */
+  static ChassisSpeeds FromRobotRelativeSpeeds(
+      units::meters_per_second_t vx, units::meters_per_second_t vy,
+      units::radians_per_second_t omega, const Rotation2d& robotAngle) {
+    return {-vx * robotAngle.Cos() - vy * robotAngle.Sin(),
+            vx * robotAngle.Sin() - vy * robotAngle.Cos(), omega};
+  }
+
+  /**
+   * Converts a user provided robot-relative ChassisSpeeds object into a
+   * field-relative ChassisSpeeds object.
+   *
+   * @param robotRelativeSpeeds The ChassisSpeeds object representing the speeds
+   *    in the robot frame of reference. Positive x is the robot's forward.
+   * Positive y is to your robot's left.
+   * @param robotAngle The angle of the robot as measured by a gyroscope. The
+   *    robot's angle is considered to be zero when it is facing directly away
+   *    from your alliance station wall. Remember that this should be CCW
+   *    positive.
+   * @return ChassisSpeeds object representing the speeds in the field's frame
+   *    of reference.
+   */
+  static ChassisSpeeds FromRobotRelativeSpeeds(
+      const ChassisSpeeds& robotRelativeSpeeds, const Rotation2d& robotAngle) {
+    return FromRobotRelativeSpeeds(robotRelativeSpeeds.vx,
+                                   robotRelativeSpeeds.vy,
+                                   robotRelativeSpeeds.omega, robotAngle);
+  }
+
+  /**
    * Adds two ChassisSpeeds and returns the sum.
    *
    * <p>For example, ChassisSpeeds{1.0, 0.5, 1.5} + ChassisSpeeds{2.0, 1.5, 0.5}
