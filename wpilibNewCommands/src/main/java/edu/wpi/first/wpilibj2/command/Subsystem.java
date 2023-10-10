@@ -4,8 +4,8 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import java.util.function.Supplier;
 import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * A robot subsystem. Subsystems are the basic unit of robot organization in the Command-based
