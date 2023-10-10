@@ -80,6 +80,10 @@
 #define PROTOBUF_EXPORT
 #endif
 
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
+#endif
 
 namespace google {
 namespace protobuf {
@@ -2433,6 +2437,10 @@ inline FileDescriptor::Syntax FileDescriptor::syntax() const {
 
 }  // namespace protobuf
 }  // namespace google
+
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
 
 #undef PROTOBUF_INTERNAL_CHECK_CLASS_SIZE
 #include <google/protobuf/port_undef.inc>

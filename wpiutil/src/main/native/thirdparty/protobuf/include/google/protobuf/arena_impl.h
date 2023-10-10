@@ -482,7 +482,7 @@ class PROTOBUF_EXPORT ThreadSafeArena {
 
   template <AllocationClient alloc_client = AllocationClient::kDefault>
   void* AllocateAligned(size_t n, const std::type_info* type) {
-    SerialArena* arena;
+    SerialArena* arena = nullptr;
     if (PROTOBUF_PREDICT_TRUE(!alloc_policy_.should_record_allocs() &&
                               GetSerialArenaFast(&arena))) {
       return arena->AllocateAligned<alloc_client>(n, AllocPolicy());
@@ -492,7 +492,7 @@ class PROTOBUF_EXPORT ThreadSafeArena {
   }
 
   void ReturnArrayMemory(void* p, size_t size) {
-    SerialArena* arena;
+    SerialArena* arena = nullptr;
     if (PROTOBUF_PREDICT_TRUE(GetSerialArenaFast(&arena))) {
       arena->ReturnArrayMemory(p, size);
     }

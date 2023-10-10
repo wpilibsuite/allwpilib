@@ -411,7 +411,7 @@ uint64_t ThreadSafeArena::Reset() {
 std::pair<void*, SerialArena::CleanupNode*>
 ThreadSafeArena::AllocateAlignedWithCleanup(size_t n,
                                             const std::type_info* type) {
-  SerialArena* arena;
+  SerialArena* arena = nullptr;
   if (PROTOBUF_PREDICT_TRUE(!alloc_policy_.should_record_allocs() &&
                             GetSerialArenaFast(&arena))) {
     return arena->AllocateAlignedWithCleanup(n, alloc_policy_.get());
@@ -421,7 +421,7 @@ ThreadSafeArena::AllocateAlignedWithCleanup(size_t n,
 }
 
 void ThreadSafeArena::AddCleanup(void* elem, void (*cleanup)(void*)) {
-  SerialArena* arena;
+  SerialArena* arena = nullptr;
   if (PROTOBUF_PREDICT_FALSE(!GetSerialArenaFast(&arena))) {
     arena = GetSerialArenaFallback(&thread_cache());
   }
@@ -433,7 +433,7 @@ void* ThreadSafeArena::AllocateAlignedFallback(size_t n,
                                                const std::type_info* type) {
   if (alloc_policy_.should_record_allocs()) {
     alloc_policy_.RecordAlloc(type, n);
-    SerialArena* arena;
+    SerialArena* arena = nullptr;
     if (PROTOBUF_PREDICT_TRUE(GetSerialArenaFast(&arena))) {
       return arena->AllocateAligned(n, alloc_policy_.get());
     }

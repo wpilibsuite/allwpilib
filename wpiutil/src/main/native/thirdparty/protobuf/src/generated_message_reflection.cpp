@@ -75,6 +75,12 @@ using google::protobuf::internal::RepeatedPtrFieldBase;
 using google::protobuf::internal::StringSpaceUsedExcludingSelfLong;
 using google::protobuf::internal::WrappedMutex;
 
+#ifdef _MSC_VER
+#pragma warning(disable : 4065)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wpedantic"
+#endif
+
 namespace google {
 namespace protobuf {
 

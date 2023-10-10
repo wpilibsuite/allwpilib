@@ -52,6 +52,10 @@
 // Must be included last.
 #include <google/protobuf/port_def.inc>
 
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
+#endif
 
 namespace google {
 namespace protobuf {
@@ -1019,6 +1023,10 @@ PROTOBUF_NODISCARD PROTOBUF_EXPORT const char* UnknownFieldParse(
 }  // namespace internal
 }  // namespace protobuf
 }  // namespace google
+
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
 
 #include <google/protobuf/port_undef.inc>
 

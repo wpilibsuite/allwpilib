@@ -43,6 +43,10 @@
 #include <google/protobuf/port_def.inc>
 // clang-format on
 
+#ifdef __GNUC__
+#pragma GCC diagnostic ignored "-Wunused-function"
+#endif
+
 namespace google {
 namespace protobuf {
 namespace internal {

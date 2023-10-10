@@ -585,12 +585,12 @@ Tokenizer::NextCommentStatus Tokenizer::TryConsumeCommentStart() {
     } else {
       // Oops, it was just a slash.  Return it.
       current_.type = TYPE_SYMBOL;
-#ifdef __GNUC__
+#if defined(__GNUC__) && !defined(__clang__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wrestrict"
 #endif
       current_.text = "/";
-#ifdef __GNUC__
+#if defined(__GNUC__) && !defined(__clang__)
 #pragma GCC diagnostic pop
 #endif
       current_.line = line_;
