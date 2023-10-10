@@ -138,9 +138,9 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
    * ChassisSpeeds object.
    *
    * @param vx The component of speed in the x direction relative to the robot.
-   * Positive x is the robot's forward.
+   * Positive x is towards the robot's front.
    * @param vy The component of speed in the y direction relative to the robot.
-   * Positive y is the robot's left.
+   * Positive y is towards the robot's left.
    * @param omega The angular rate of the robot.
    * @param robotAngle The angle of the robot as measured by a gyroscope. The
    * robot's angle is considered to be zero when it is facing directly away from
@@ -161,8 +161,8 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
    * field-relative ChassisSpeeds object.
    *
    * @param robotRelativeSpeeds The ChassisSpeeds object representing the speeds
-   *    in the robot frame of reference. Positive x is the robot's forward.
-   *    Positive y is the robot's left.
+   *    in the robot frame of reference. Positive x is the towards robot's front.
+   *    Positive y is towards the robot's left.
    * @param robotAngle The angle of the robot as measured by a gyroscope. The
    *    robot's angle is considered to be zero when it is facing directly away
    *    from your alliance station wall. Remember that this should be CCW
