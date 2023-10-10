@@ -148,14 +148,14 @@ public class ChassisSpeeds {
    * object.
    *
    * @param vxMetersPerSecond The component of speed in the x direction relative to the robot.
-   *     Positive x is your robot's forward.
+   *     Positive x is the robot's forward.
    * @param vyMetersPerSecond The component of speed in the y direction relative to the field.
-   *     Positive y is to your robot's left.
+   *     Positive y is the robot's left.
    * @param omegaRadiansPerSecond The angular rate of the robot.
    * @param robotAngle The angle of the robot as measured by a gyroscope. The robot's angle is
    *     considered to be zero when it is facing directly away from your alliance station wall.
    *     Remember that this should be CCW positive.
-   * @return ChassisSpeeds object representing the speeds in the robot's frame of reference.
+   * @return ChassisSpeeds object representing the speeds in the field's frame of reference.
    */
   public static ChassisSpeeds fromRobotRelativeSpeeds(
       double vxMetersPerSecond,
@@ -173,11 +173,11 @@ public class ChassisSpeeds {
    * ChassisSpeeds object.
    *
    * @param robotRelativeSpeeds The ChassisSpeeds object representing the speeds in the robot frame
-   *     of reference. Positive x is forward. Positive y is left.
+   *     of reference. Positive x is the robot's forward. Positive y is the robot's left.
    * @param robotAngle The angle of the robot as measured by a gyroscope. The robot's angle is
    *     considered to be zero when it is facing directly away from your alliance station wall.
    *     Remember that this should be CCW positive.
-   * @return ChassisSpeeds object representing the speeds in the robot's frame of reference.
+   * @return ChassisSpeeds object representing the speeds in the field's frame of reference.
    */
   public static ChassisSpeeds fromRobotRelativeSpeeds(
       ChassisSpeeds robotRelativeSpeeds, Rotation2d robotAngle) {
