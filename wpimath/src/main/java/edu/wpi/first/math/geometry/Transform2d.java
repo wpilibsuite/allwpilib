@@ -47,7 +47,7 @@ public class Transform2d {
    * @param y The y component of the translational component of the transform.
    * @param rotation The rotational component of the transform.
    */
-   public Transform2d(double x, double y, Rotation2d rotation) {
+  public Transform2d(double x, double y, Rotation2d rotation) {
     m_translation = new Translation2d(x, y);
     m_rotation = rotation;
   }
