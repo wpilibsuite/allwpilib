@@ -61,8 +61,8 @@ class ChassisSpeedsTest {
         ChassisSpeeds.fromRobotRelativeSpeeds(1.0, 0.0, 0.5, Rotation2d.fromDegrees(45.0));
 
     assertAll(
-        () -> assertEquals(0.7071067812, chassisSpeeds.vxMetersPerSecond, kEpsilon),
-        () -> assertEquals(0.7071067812, chassisSpeeds.vyMetersPerSecond, kEpsilon),
+        () -> assertEquals(1 / Math.sqrt(2.0), chassisSpeeds.vxMetersPerSecond, kEpsilon),
+        () -> assertEquals(1 / Math.sqrt(2.0), chassisSpeeds.vyMetersPerSecond, kEpsilon),
         () -> assertEquals(0.5, chassisSpeeds.omegaRadiansPerSecond, kEpsilon));
   }
 
