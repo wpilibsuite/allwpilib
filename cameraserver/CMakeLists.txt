@@ -28,6 +28,22 @@ if (WITH_JAVA)
 
 endif()
 
+if (WITH_JAVA_SOURCE)
+    find_package(Java REQUIRED)
+    include(UseJava)
+    file(GLOB CAMERASERVER_SOURCES src/main/java/edu/wpi/first/cameraserver/*.java)
+    file(GLOB VISION_SOURCES src/main/java/edu/wpi/first/vision/*.java)
+    add_jar(cameraserver_src_jar
+    RESOURCES NAMESPACE "edu/wpi/first/cameraserver" ${CAMERASERVER_SOURCES}
+    NAMESPACE "edu/wpi/first/vision" ${VISION_SOURCES}
+    OUTPUT_NAME cameraserver-sources)
+
+    get_property(CAMERASERVER_SRC_JAR_FILE TARGET cameraserver_src_jar PROPERTY JAR_FILE)
+    install(FILES ${CAMERASERVER_SRC_JAR_FILE} DESTINATION "${java_lib_dest}")
+
+    set_property(TARGET cameraserver_src_jar PROPERTY FOLDER "java")
+endif()
+
 file(GLOB_RECURSE
     cameraserver_native_src src/main/native/cpp/*.cpp)
 add_library(cameraserver ${cameraserver_native_src})

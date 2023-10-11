@@ -32,3 +32,36 @@ if (WITH_JAVA)
 
     install(FILES wpilibj-config.cmake DESTINATION ${wpilibj_config_dir})
 endif()
+
+if (WITH_JAVA_SOURCES)
+    find_package(Java REQUIRED)
+    include(UseJava)
+    file(GLOB WPILIBJ_SOURCES src/main/java/edu/wpi/first/wpilibj/*.java)
+    file(GLOB WPILIBJ_COUNTER_SOURCES src/main/java/edu/wpi/first/wpilibj/counter/*.java)
+    file(GLOB WPILIBJ_DRIVE_SOURCES src/main/java/edu/wpi/first/wpilibj/drive/*.java)
+    file(GLOB WPILIBJ_EVENT__SOURCES src/main/java/edu/wpi/first/wpilibj/event/*.java)
+    file(GLOB WPILIBJ_INTERFACES_SOURCES src/main/java/edu/wpi/first/wpilibj/interfaces/*.java)
+    file(GLOB WPILIBJ_MOTORCONTROL_SOURCES src/main/java/edu/wpi/first/wpilibj/motorcontrol*.java)
+    file(GLOB WPILIBJ_SHUFFLEBOARD_SOURCES src/main/java/edu/wpi/first/wpilibj/shuffleboard*.java)
+    file(GLOB WPILIBJ_SIMULATION_SOURCES src/main/java/edu/wpi/first/wpilibj/simulation*.java)
+    file(GLOB WPILIBJ_SMARTDASHBOARD_SOURCES src/main/java/edu/wpi/first/wpilibj/*.java)
+    file(GLOB WPILIBJ_UTIL_SOURCES src/main/java/edu/wpi/first/wpilibj/*.java)
+    add_jar(wpilibj_src_jar
+    RESOURCES NAMESPACE "edu/wpi/first/wpilibj" ${WPILIBJ_SOURCES}
+    NAMESPACE "edu/wpi/first/wpilibj/counter" ${WPILIBJ_COUNTER_SOURCES}
+    NAMESPACE "edu/wpi/first/wpilibj/drive" ${WPILIBJ_DRIVE_SOURCES}
+    NAMESPACE "edu/wpi/first/wpilibj/event" ${WPILIBJ_EVENT__SOURCES}
+    NAMESPACE "edu/wpi/first/wpilibj/interfaces" ${WPILIBJ_INTERFACES_SOURCES}
+    NAMESPACE "edu/wpi/first/wpilibj/internal" src/main/java/edu/wpi/first/wpilibj/internal/DriverStationModeThread.java
+    NAMESPACE "edu/wpi/first/wpilibj/livewindow" src/main/java/edu/wpi/first/wpilibj/livewindow/LiveWindow.java
+    NAMESPACE "edu/wpi/first/wpilibj/motorcontrol" ${WPILIBJ_MOTORCONTROL_SOURCES}
+    NAMESPACE "edu/wpi/first/wpilibj/shuffleboard" ${WPILIBJ_SHUFFLEBOARD_SOURCES}
+    NAMESPACE "edu/wpi/first/wpilibj/simulation" ${WPILIBJ_SIMULATION_SOURCES}
+    NAMESPACE "edu/wpi/first/wpilibj/smartdashboard" ${WPILIBJ_SMARTDASHBOARD_SOURCES}
+    NAMESPACE "edu/wpi/first/wpilibj/util" ${WPILIBJ_UTIL_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/WPILibVersion.java)
+
+    get_property(WPILIBJ_SRC_JAR_FILE TARGET wpilibj_src_jar PROPERTY JAR_FILE)
+    install(FILES ${WPILIBJ_SRC_JAR_FILE} DESTINATION "${java_lib_dest}")
+
+    set_property(TARGET wpilibj_src_jar PROPERTY FOLDER "java")
+endif()
