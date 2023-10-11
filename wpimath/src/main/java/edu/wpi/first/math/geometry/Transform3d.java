@@ -40,6 +40,18 @@ public class Transform3d {
     m_rotation = rotation;
   }
 
+  /** Constructs a transform with the given x, y, z and rotation components
+   * 
+   * @param x The x component of the translational component of the transform.
+   * @param y The y component of the translational component of the transform.
+   * @param z The z component of the translational component of the transform.
+   * @param rotation The rotational component of the transform.
+   */
+  public Transform3d(double x, double y, double z, Rotation3d rotation) {
+    m_translation = new Translation3d(x, y, z);
+    m_rotation = rotation;
+  }
+
   /** Constructs the identity transform -- maps an initial pose to itself. */
   public Transform3d() {
     m_translation = new Translation3d();
