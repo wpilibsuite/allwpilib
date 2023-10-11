@@ -108,6 +108,9 @@ public class SwerveModule {
     // Optimize the reference state to avoid spinning further than 90 degrees
     SwerveModuleState state =
         SwerveModuleState.optimize(desiredState, new Rotation2d(m_turningEncoder.getDistance()));
+        
+    state.speedMetersPerSecond *= 
+        Math.cos(m_turningEncoder.getDistance() - state.angle.getRadians());
 
     // Calculate the drive output from the drive PID controller.
     final double driveOutput =
