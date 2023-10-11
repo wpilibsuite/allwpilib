@@ -35,7 +35,7 @@ class WPILIB_DLLEXPORT Transform3d {
 
   /**
    * Constructs a transform with the given x, y, z and rotation components.
-   * 
+   *
    * @param x The x component of the translation.
    * @param y The y component of the translation.
    * @param z The z component of the translation.

@@ -34,13 +34,14 @@ class WPILIB_DLLEXPORT Transform2d {
   constexpr Transform2d(Translation2d translation, Rotation2d rotation);
 
   /**
-   * Constructs a transform with the given x, y and heading components.
-   * 
+   * Constructs a transform with the given x, y and rotation components.
+   *
    * @param x The x component of the translation.
    * @param y The y component of the translation.
    * @param rotation The rotational component of the transform.
    */
-  constexpr Transform2d(units::meter_t x, units::meter_t y, Rotation2d rotation);
+  constexpr Transform2d(units::meter_t x, units::meter_t y,
+                        Rotation2d rotation);
 
   /**
    * Constructs the identity transform -- maps an initial pose to itself.

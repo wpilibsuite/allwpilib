@@ -41,7 +41,7 @@ public class Transform3d {
   }
 
   /** Constructs a transform with the given x, y, z and rotation components
-   * 
+   *
    * @param x The x component of the translational component of the transform.
    * @param y The y component of the translational component of the transform.
    * @param z The z component of the translational component of the transform.
