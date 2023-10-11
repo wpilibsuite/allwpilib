@@ -16,6 +16,10 @@ constexpr Transform2d::Transform2d(Translation2d translation,
                                    Rotation2d rotation)
     : m_translation(std::move(translation)), m_rotation(std::move(rotation)) {}
 
+constexpr Transform2d::Transform2d(units::meter_t x, units::meter_t y,
+                                   units::degree_t heading)
+    : m_translation(x, y), m_rotation(heading)) {}
+
 constexpr Transform2d Transform2d::Inverse() const {
   // We are rotating the difference between the translations
   // using a clockwise rotation matrix. This transforms the global
