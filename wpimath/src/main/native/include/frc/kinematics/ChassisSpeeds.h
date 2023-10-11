@@ -152,8 +152,8 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
   static ChassisSpeeds FromRobotRelativeSpeeds(
       units::meters_per_second_t vx, units::meters_per_second_t vy,
       units::radians_per_second_t omega, const Rotation2d& robotAngle) {
-    return {-vx * (-robotAngle).Cos() - vy * (-robotAngle).Sin(),
-            vx * (-robotAngle).Sin() - vy * (-robotAngle).Cos(), omega};
+    return {vx * (-robotAngle).Cos() + vy * (-robotAngle).Sin(),
+            -vx * (-robotAngle).Sin() + vy * (-robotAngle).Cos(), omega};
   }
 
   /**
