@@ -24,6 +24,22 @@ if (WITH_JAVA)
   endif()
 endif()
 
+if (WITH_JAVA_SOURCE)
+  find_package(Java REQUIRED)
+  include(UseJava)
+  file(GLOB WPILIBNEWCOMMANDS_SOURCES src/main/java/edu/wpi/first/wpilibj2/command/*.java)
+  file(GLOB WPILIBNEWCOMMANDS_BUTTON_SOURCES src/main/java/edu/wpi/first/wpilibj2/command/button*.java)
+  add_jar(wpilibNewCommands_src_jar
+  RESOURCES NAMESPACE "edu/wpi/first/wpilibj2/command" ${WPILIBNEWCOMMANDS_SOURCES}
+  NAMESPACE "edu/wpi/first/wpilibj2/command/button" ${WPILIBNEWCOMMANDS_BUTTON_SOURCES}
+  OUTPUT_NAME wpilibNewCommands-sources)
+
+  get_property(WPILIBNEWCOMMANDS_SRC_JAR_FILE TARGET wpilibNewCommands_src_jar PROPERTY JAR_FILE)
+  install(FILES ${WPILIBNEWCOMMANDS_SRC_JAR_FILE} DESTINATION "${java_lib_dest}")
+
+  set_property(TARGET wpilibNewCommands_src_jar PROPERTY FOLDER "java")
+endif()
+
 file(GLOB_RECURSE wpilibNewCommands_native_src src/main/native/cpp/*.cpp)
 add_library(wpilibNewCommands ${wpilibNewCommands_native_src})
 set_target_properties(wpilibNewCommands PROPERTIES DEBUG_POSTFIX "d")
