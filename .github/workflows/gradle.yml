@@ -47,8 +47,8 @@ jobs:
         uses: addnab/docker-run-action@v3
         with:
           image: ${{ matrix.container }}
-          options: -v ${{ github.workspace }}:/work -w /work -e ARTIFACTORY_PUBLISH_USERNAME=${{ secrets.ARTIFACTORY_USERNAME }} -e ARTIFACTORY_PUBLISH_PASSWORD=${{ secrets.ARTIFACTORY_PASSWORD }} -e GITHUB_REF=$GITHUB_REF
-          run: df . && rm -f semicolon_delimited_script && ./gradlew build --build-cache -PbuildServer -PskipJavaFormat ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
+          options: -v ${{ github.workspace }}:/work -w /work -e ARTIFACTORY_PUBLISH_USERNAME -e ARTIFACTORY_PUBLISH_PASSWORD -e GITHUB_REF
+          run: df . && rm -f semicolon_delimited_script && env GITHUB_REF=$GITHUB_REF ./gradlew build --build-cache -PbuildServer -PskipJavaFormat ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
       - name: Check free disk space
         run: df .
       - uses: actions/upload-artifact@v3
