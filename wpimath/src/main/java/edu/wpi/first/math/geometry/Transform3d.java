@@ -40,8 +40,9 @@ public class Transform3d {
     m_rotation = rotation;
   }
 
-  /** 
-   * Constructs a transform with the given x, y, z and rotation components.
+  /**
+   * Constructs a transform with x, y, and z translations instead of a separate
+   * Translation3d.
    *
    * @param x The x component of the translational component of the transform.
    * @param y The y component of the translational component of the transform.
