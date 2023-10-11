@@ -17,8 +17,8 @@ constexpr Transform2d::Transform2d(Translation2d translation,
     : m_translation(std::move(translation)), m_rotation(std::move(rotation)) {}
 
 constexpr Transform2d::Transform2d(units::meter_t x, units::meter_t y,
-                                   units::degree_t heading)
-    : m_translation(x, y), m_rotation(heading)) {}
+                                   Rotation2d rotation)
+    : m_translation(x, y), m_rotation(std::move(rotation))) {}
 
 constexpr Transform2d Transform2d::Inverse() const {
   // We are rotating the difference between the translations
