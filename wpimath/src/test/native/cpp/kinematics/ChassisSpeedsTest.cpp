@@ -42,8 +42,8 @@ TEST(ChassisSpeedsTest, FromRobotRelativeSpeeds) {
   const auto chassisSpeeds = frc::ChassisSpeeds::FromRobotRelativeSpeeds(
       1.0_mps, 0.0_mps, 0.5_rad_per_s, 45.0_deg);
 
-  EXPECT_NEAR(1 / math::sqrt(2.0), chassisSpeeds.vx.value(), kEpsilon);
-  EXPECT_NEAR(1 / math::sqrt(2.0), chassisSpeeds.vy.value(), kEpsilon);
+  EXPECT_NEAR(1.0 / std::sqrt(2.0), chassisSpeeds.vx.value(), kEpsilon);
+  EXPECT_NEAR(1.0 / std::sqrt(2.0), chassisSpeeds.vy.value(), kEpsilon);
   EXPECT_NEAR(0.5, chassisSpeeds.omega.value(), kEpsilon);
 }
 
