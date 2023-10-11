@@ -77,7 +77,7 @@ if (WITH_JAVA_SOURCE)
   NAMESPACE "edu/wpi/first/util/function" ${WPIUTIL_FUNCTION_SOURCES}
   NAMESPACE "edu/wpi/first/util/sendable" ${WPIUTIL_SENDABLE_SOURCES}
   OUTPUT_NAME wpiutil-sources)
-  
+
   get_property(WPIUTIL_SRC_JAR_FILE TARGET wpiutil_src_jar PROPERTY JAR_FILE)
   install(FILES ${WPIUTIL_SRC_JAR_FILE} DESTINATION "${java_lib_dest}")
 

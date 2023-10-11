@@ -127,7 +127,7 @@ if (WITH_JAVA_SOURCE)
     NAMESPACE "edu/wpi/first/hal/simulation" ${HAL_SIMULATION_SOURCES}
     NAMESPACE "edu/wpi/first/hal/util" ${HAL_UTIL_SOURCES}
     OUTPUT_NAME wpiHal-sources)
-    
+
     get_property(HAL_SRC_JAR_FILE TARGET hal_src_jar PROPERTY JAR_FILE)
     install(FILES ${HAL_SRC_JAR_FILE} DESTINATION "${java_lib_dest}")
 

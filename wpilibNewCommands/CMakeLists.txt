@@ -33,7 +33,7 @@ if (WITH_JAVA_SOURCE)
   RESOURCES NAMESPACE "edu/wpi/first/wpilibj2/command" ${WPILIBNEWCOMMANDS_SOURCES}
   NAMESPACE "edu/wpi/first/wpilibj2/command/button" ${WPILIBNEWCOMMANDS_BUTTON_SOURCES}
   OUTPUT_NAME wpilibNewCommands-sources)
-  
+
   get_property(WPILIBNEWCOMMANDS_SRC_JAR_FILE TARGET wpilibNewCommands_src_jar PROPERTY JAR_FILE)
   install(FILES ${WPILIBNEWCOMMANDS_SRC_JAR_FILE} DESTINATION "${java_lib_dest}")
 

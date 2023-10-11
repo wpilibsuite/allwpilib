@@ -92,7 +92,7 @@ if (WITH_JAVA_SOURCE)
     add_jar(ntcore_src_jar
     RESOURCES NAMESPACE "edu/wpi/first/networktables" ${NTCORE_SOURCES}
     OUTPUT_NAME ntcore-sources)
-    
+
     get_property(NTCORE_SRC_JAR_FILE TARGET ntcore_src_jar PROPERTY JAR_FILE)
     install(FILES ${NTCORE_SRC_JAR_FILE} DESTINATION "${java_lib_dest}")
 
