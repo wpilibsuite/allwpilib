@@ -120,7 +120,7 @@ static uint64_t time_since_epoch() noexcept {
   uint64_t tmpres = 0;
   // 100-nanosecond intervals since January 1, 1601 (UTC)
   // which means 0.1 us
-  GetSystemTimeAsFileTime(&ft);
+  GetSystemTimePreciseAsFileTime(&ft);
   tmpres |= ft.dwHighDateTime;
   tmpres <<= 32;
   tmpres |= ft.dwLowDateTime;

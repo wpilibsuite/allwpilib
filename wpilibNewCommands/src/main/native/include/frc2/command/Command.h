@@ -5,9 +5,7 @@
 #pragma once
 
 #include <functional>
-#include <initializer_list>
 #include <memory>
-#include <span>
 #include <string>
 
 #include <units/time.h>

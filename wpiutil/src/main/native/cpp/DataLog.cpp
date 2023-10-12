@@ -37,7 +37,25 @@
 using namespace wpi::log;
 
 static constexpr size_t kBlockSize = 16 * 1024;
+static constexpr size_t kMaxBufferCount = 1024 * 1024 / kBlockSize;
+static constexpr size_t kMaxFreeCount = 256 * 1024 / kBlockSize;
 static constexpr size_t kRecordMaxHeaderSize = 17;
+static constexpr uintmax_t kMinFreeSpace = 5 * 1024 * 1024;
+
+static std::string FormatBytesSize(uintmax_t value) {
+  static constexpr uintmax_t kKiB = 1024;
+  static constexpr uintmax_t kMiB = kKiB * 1024;
+  static constexpr uintmax_t kGiB = kMiB * 1024;
+  if (value >= kGiB) {
+    return fmt::format("{:.1f} GiB", static_cast<double>(value) / kGiB);
+  } else if (value >= kMiB) {
+    return fmt::format("{:.1f} MiB", static_cast<double>(value) / kMiB);
+  } else if (value >= kKiB) {
+    return fmt::format("{:.1f} KiB", static_cast<double>(value) / kKiB);
+  } else {
+    return fmt::format("{} B", value);
+  }
+}
 
 template <typename T>
 static unsigned int WriteVarInt(uint8_t* buf, T val) {
@@ -254,32 +272,42 @@ void DataLog::WriterThreadMain(std::string_view dir) {
     filename = MakeRandomFilename();
   }
 
-  // try preferred filename, or randomize it a few times, before giving up
-  fs::file_t f;
-  for (int i = 0; i < 5; ++i) {
-    // open file for append
-#ifdef _WIN32
-    // WIN32 doesn't allow combination of CreateNew and Append
-    f = fs::OpenFileForWrite(dirPath / filename, ec, fs::CD_CreateNew,
-                             fs::OF_None);
-#else
-    f = fs::OpenFileForWrite(dirPath / filename, ec, fs::CD_CreateNew,
-                             fs::OF_Append);
-#endif
-    if (ec) {
-      WPI_ERROR(m_msglog, "Could not open log file '{}': {}",
-                (dirPath / filename).string(), ec.message());
-      // try again with random filename
-      filename = MakeRandomFilename();
-    } else {
-      break;
-    }
-  }
+  fs::file_t f = fs::kInvalidFile;
 
-  if (f == fs::kInvalidFile) {
-    WPI_ERROR(m_msglog, "Could not open log file, no log being saved");
+  // get free space
+  uintmax_t freeSpace = fs::space(dirPath).available;
+  if (freeSpace < kMinFreeSpace) {
+    WPI_ERROR(m_msglog,
+              "Insufficient free space ({} available), no log being saved",
+              FormatBytesSize(freeSpace));
   } else {
-    WPI_INFO(m_msglog, "Logging to '{}'", (dirPath / filename).string());
+    // try preferred filename, or randomize it a few times, before giving up
+    for (int i = 0; i < 5; ++i) {
+      // open file for append
+#ifdef _WIN32
+      // WIN32 doesn't allow combination of CreateNew and Append
+      f = fs::OpenFileForWrite(dirPath / filename, ec, fs::CD_CreateNew,
+                               fs::OF_None);
+#else
+      f = fs::OpenFileForWrite(dirPath / filename, ec, fs::CD_CreateNew,
+                               fs::OF_Append);
+#endif
+      if (ec) {
+        WPI_ERROR(m_msglog, "Could not open log file '{}': {}",
+                  (dirPath / filename).string(), ec.message());
+        // try again with random filename
+        filename = MakeRandomFilename();
+      } else {
+        break;
+      }
+    }
+
+    if (f == fs::kInvalidFile) {
+      WPI_ERROR(m_msglog, "Could not open log file, no log being saved");
+    } else {
+      WPI_INFO(m_msglog, "Logging to '{}' ({} free space)",
+               (dirPath / filename).string(), FormatBytesSize(freeSpace));
+    }
   }
 
   // write header (version 1.0)
@@ -298,6 +326,8 @@ void DataLog::WriterThreadMain(std::string_view dir) {
   }
 
   std::vector<Buffer> toWrite;
+  int freeSpaceCount = 0;
+  bool blocked = false;
 
   std::unique_lock lock{m_mutex};
   while (m_active) {
@@ -307,7 +337,7 @@ void DataLog::WriterThreadMain(std::string_view dir) {
       doFlush = true;
     }
 
-    if (!m_newFilename.empty()) {
+    if (!m_newFilename.empty() && f != fs::kInvalidFile) {
       auto newFilename = std::move(m_newFilename);
       m_newFilename.clear();
       lock.unlock();
@@ -335,10 +365,27 @@ void DataLog::WriterThreadMain(std::string_view dir) {
       // swap outgoing with empty vector
       toWrite.swap(m_outgoing);
 
-      if (f != fs::kInvalidFile) {
+      if (f != fs::kInvalidFile && !blocked) {
         lock.unlock();
+
+        // update free space every 10 flushes (in case other things are writing)
+        if (++freeSpaceCount >= 10) {
+          freeSpaceCount = 0;
+          freeSpace = fs::space(dirPath).available;
+        }
+
         // write buffers to file
         for (auto&& buf : toWrite) {
+          // stop writing when we go below the minimum free space
+          freeSpace -= buf.GetData().size();
+          if (freeSpace < kMinFreeSpace) {
+            [[unlikely]] WPI_ERROR(
+                m_msglog,
+                "Stopped logging due to low free space ({} available)",
+                FormatBytesSize(freeSpace));
+            blocked = true;
+            break;
+          }
           WriteToFile(f, buf.GetData(), filename, m_msglog);
         }
 
@@ -349,12 +396,17 @@ void DataLog::WriterThreadMain(std::string_view dir) {
         ::fsync(f);
 #endif
         lock.lock();
+        if (blocked) {
+          [[unlikely]] m_paused = true;
+        }
       }
 
       // release buffers back to free list
       for (auto&& buf : toWrite) {
         buf.Clear();
-        m_free.emplace_back(std::move(buf));
+        if (m_free.size() < kMaxFreeCount) {
+          [[likely]] m_free.emplace_back(std::move(buf));
+        }
       }
       toWrite.resize(0);
     }
@@ -413,7 +465,9 @@ void DataLog::WriterThreadMain(
       // release buffers back to free list
       for (auto&& buf : toWrite) {
         buf.Clear();
-        m_free.emplace_back(std::move(buf));
+        if (m_free.size() < kMaxFreeCount) {
+          [[likely]] m_free.emplace_back(std::move(buf));
+        }
       }
       toWrite.resize(0);
     }
@@ -492,6 +546,13 @@ uint8_t* DataLog::Reserve(size_t size) {
   assert(size <= kBlockSize);
   if (m_outgoing.empty() || size > m_outgoing.back().GetRemaining()) {
     if (m_free.empty()) {
+      if (m_outgoing.size() >= kMaxBufferCount) {
+        [[unlikely]] WPI_ERROR(
+            m_msglog,
+            "outgoing buffers exceeded threshold, pausing logging--"
+            "consider flushing to disk more frequently (smaller period)");
+        m_paused = true;
+      }
       m_outgoing.emplace_back();
     } else {
       m_outgoing.emplace_back(std::move(m_free.back()));

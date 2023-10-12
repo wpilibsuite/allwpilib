@@ -48,6 +48,15 @@ class NetworkTablesModel : public Model {
 
     /** Whether or not the children represent a map */
     bool valueChildrenMap = false;
+
+   private:
+    void UpdateDiscreteSource(std::string_view name, double value, int64_t time,
+                              bool digital = false);
+
+    template <typename T, typename MakeValue>
+    void UpdateDiscreteArray(std::string_view name, std::span<const T> arr,
+                             int64_t time, MakeValue makeValue,
+                             bool digital = false);
   };
 
   struct EntryValueTreeNode : public ValueSource {

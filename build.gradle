@@ -109,8 +109,10 @@ subprojects {
     }
 
     plugins.withType(JavaPlugin) {
-        sourceCompatibility = 11
-        targetCompatibility = 11
+        java {
+            sourceCompatibility = 11
+            targetCompatibility = 11
+        }
     }
 
     apply from: "${rootDir}/shared/java/javastyle.gradle"
@@ -168,5 +170,5 @@ ext.getCurrentArch = {
 }
 
 wrapper {
-    gradleVersion = '8.1'
+    gradleVersion = '8.4'
 }

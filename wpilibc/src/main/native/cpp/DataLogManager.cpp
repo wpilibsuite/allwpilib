@@ -22,6 +22,7 @@
 #include "frc/DriverStation.h"
 #include "frc/Filesystem.h"
 #include "frc/RobotBase.h"
+#include "frc/RobotController.h"
 
 using namespace frc;
 
@@ -70,13 +71,13 @@ static std::string MakeLogDir(std::string_view dir) {
       (s.permissions() & fs::perms::others_write) != fs::perms::none) {
     return std::string{usbDir};
   }
-  if (frc::RobotBase::GetRuntimeType() == kRoboRIO) {
+  if (RobotBase::GetRuntimeType() == kRoboRIO) {
     FRC_ReportError(warn::Warning,
                     "DataLogManager: Logging to RoboRIO 1 internal storage is "
                     "not recommended! Plug in a FAT32 formatted flash drive!");
   }
 #endif
-  return frc::filesystem::GetOperatingDirectory();
+  return filesystem::GetOperatingDirectory();
 }
 
 static std::string MakeLogFilename(std::string_view filenameOverride) {
@@ -110,7 +111,7 @@ Thread::~Thread() {
 void Thread::Main() {
   // based on free disk space, scan for "old" FRC_*.wpilog files and remove
   {
-    uintmax_t freeSpace = fs::space(m_logDir).free;
+    uintmax_t freeSpace = fs::space(m_logDir).available;
     if (freeSpace < kFreeSpaceThreshold) {
       // Delete oldest FRC_*.wpilog files (ignore FRC_TBD_*.wpilog as we just
       // created one)
@@ -203,12 +204,10 @@ void Thread::Main() {
       } else {
         dsAttachCount = 0;
       }
-      if (dsAttachCount > 300) {  // 6 seconds
-        std::time_t now = std::time(nullptr);
-        auto tm = std::gmtime(&now);
-        if (tm->tm_year > 100) {
-          // assume local clock is now synchronized to DS, so rename based on
-          // local time
+      if (dsAttachCount > 50) {  // 1 second
+        if (RobotController::IsSystemTimeValid()) {
+          std::time_t now = std::time(nullptr);
+          auto tm = std::gmtime(&now);
           m_log.SetFilename(fmt::format("FRC_{:%Y%m%d_%H%M%S}.wpilog", *tm));
           dsRenamed = true;
         } else {
@@ -260,7 +259,9 @@ void Thread::Main() {
     ++sysTimeCount;
     if (sysTimeCount >= 250) {
       sysTimeCount = 0;
-      sysTimeEntry.Append(wpi::GetSystemTime(), wpi::Now());
+      if (RobotController::IsSystemTimeValid()) {
+        sysTimeEntry.Append(wpi::GetSystemTime(), wpi::Now());
+      }
     }
   }
   DriverStation::RemoveRefreshedDataEventHandle(newDataEvent.GetHandle());

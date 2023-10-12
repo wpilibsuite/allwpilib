@@ -26,7 +26,7 @@ jobs:
             ctest-flags: ""
     name: "${{ matrix.name }}"
     runs-on: ubuntu-22.04
-    container: wpilib/roborio-cross-ubuntu:2023-22.04
+    container: wpilib/roborio-cross-ubuntu:2024-22.04
     steps:
       - name: Install Dependencies
         run: sudo apt-get update && sudo apt-get install -y libopencv-dev libopencv4.5-java python-is-python3 clang-14

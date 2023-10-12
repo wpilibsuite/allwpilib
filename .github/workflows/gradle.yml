@@ -12,7 +12,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - container: wpilib/roborio-cross-ubuntu:2023-22.04
+          - container: wpilib/roborio-cross-ubuntu:2024-22.04
             artifact-name: Athena
             build-options: "-Ponlylinuxathena"
           - container: wpilib/raspbian-cross-ubuntu:bullseye-22.04
@@ -47,8 +47,11 @@ jobs:
         uses: addnab/docker-run-action@v3
         with:
           image: ${{ matrix.container }}
-          options: -v ${{ github.workspace }}:/work -w /work -e ARTIFACTORY_PUBLISH_USERNAME=${{ secrets.ARTIFACTORY_USERNAME }} -e ARTIFACTORY_PUBLISH_PASSWORD=${{ secrets.ARTIFACTORY_PASSWORD }}
-          run: df . && ./gradlew build --build-cache -PbuildServer -PskipJavaFormat ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
+          options: -v ${{ github.workspace }}:/work -w /work -e ARTIFACTORY_PUBLISH_USERNAME -e ARTIFACTORY_PUBLISH_PASSWORD -e GITHUB_REF -e CI
+          run: df . && rm -f semicolon_delimited_script && echo $GITHUB_REF && ./gradlew build --build-cache -PbuildServer -PskipJavaFormat ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
+        env:
+          ARTIFACTORY_PUBLISH_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
+          ARTIFACTORY_PUBLISH_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
       - name: Check free disk space
         run: df .
       - uses: actions/upload-artifact@v3
@@ -77,18 +80,20 @@ jobs:
             task: "copyAllOutputs"
             outputs: "build/allOutputs"
             build-dir: "c:\\work"
-          # - os: windows-2022
-          #   artifact-name: WinArm64Debug
-          #   architecture: x64
-          #   task: "build"
-          #   build-options: "-PciDebugOnly -Pbuildwinarm64 -Ponlywindowsarm64 --max-workers 1"
-          #   outputs: "build/allOutputs"
-          # - os: windows-2022
-          #   artifact-name: WinArm64Release
-          #   architecture: x64
-          #   build-options: "-PciReleaseOnly -Pbuildwinarm64 -Ponlywindowsarm64 --max-workers 1"
-          #   task: "copyAllOutputs"
-          #   outputs: "build/allOutputs"
+          - os: windows-2022
+            artifact-name: WinArm64Debug
+            architecture: x64
+            task: "build"
+            build-options: "-PciDebugOnly -Pbuildwinarm64 -Ponlywindowsarm64 --max-workers 1"
+            outputs: "build/allOutputs"
+            build-dir: "c:\\work"
+          - os: windows-2022
+            artifact-name: WinArm64Release
+            architecture: x64
+            build-options: "-PciReleaseOnly -Pbuildwinarm64 -Ponlywindowsarm64 --max-workers 1"
+            task: "copyAllOutputs"
+            outputs: "build/allOutputs"
+            build-dir: "c:\\work"
           - os: macOS-12
             artifact-name: macOS
             architecture: x64
@@ -187,29 +192,35 @@ jobs:
     name: Combine
     needs: [build-docker, build-host, build-documentation]
     runs-on: ubuntu-22.04
-    env:
-      main_or_release: github.repository_owner == 'wpilibsuite' &&
-                       (github.ref == 'refs/heads/main' ||
-                        startsWith(github.ref, 'refs/tags/v'))
     steps:
       - uses: actions/checkout@v3
-        if: env.main_or_release == 'true'
+        if: |
+          github.repository_owner == 'wpilibsuite' &&
+          (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
         with:
           repository: wpilibsuite/build-tools
       - uses: actions/download-artifact@v3
-        if: env.main_or_release == 'true'
+        if: |
+          github.repository_owner == 'wpilibsuite' &&
+          (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
         with:
           path: combiner/products/build/allOutputs
       - name: Flatten Artifacts
-        if: env.main_or_release == 'true'
+        if: |
+          github.repository_owner == 'wpilibsuite' &&
+          (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
         run: rsync -a --delete combiner/products/build/allOutputs/*/* combiner/products/build/allOutputs/
       - name: Check version number exists
-        if: env.main_or_release == 'true'
+        if: |
+          github.repository_owner == 'wpilibsuite' &&
+          (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
         run: |
           cat combiner/products/build/allOutputs/version.txt
           test -s combiner/products/build/allOutputs/version.txt
       - uses: actions/setup-java@v3
-        if: env.main_or_release == 'true'
+        if: |
+          github.repository_owner == 'wpilibsuite' &&
+          (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
         with:
           distribution: 'zulu'
           java-version: 11
@@ -232,7 +243,9 @@ jobs:
           ARTIFACTORY_PUBLISH_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
           ARTIFACTORY_PUBLISH_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
       - uses: actions/upload-artifact@v3
-        if: env.main_or_release == 'true'
+        if: |
+          github.repository_owner == 'wpilibsuite' &&
+          (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
         with:
           name: Maven
           path: ~/releases

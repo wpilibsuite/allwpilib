@@ -22,8 +22,20 @@ if (WITH_JAVA)
   else()
       set (romiVendordep_config_dir share/romiVendordep)
   endif()
+endif()
 
-  install(FILES romiVendordep-config.cmake DESTINATION ${romiVendordep_config_dir})
+if (WITH_JAVA_SOURCE)
+  find_package(Java REQUIRED)
+  include(UseJava)
+  file(GLOB_RECURSE ROMIVENDORDEP_SOURCES src/main/java/*.java)
+  add_jar(romiVendordep_src_jar
+  RESOURCES NAMESPACE "edu/wpi/first/wpilibj/romi" ${ROMIVENDORDEP_SOURCES}
+  OUTPUT_NAME romiVendordep-sources)
+
+  get_property(ROMIVENDORDEP_SRC_JAR_FILE TARGET romiVendordep_src_jar PROPERTY JAR_FILE)
+  install(FILES ${ROMIVENDORDEP_JAR_FILE} DESTINATION "${java_lib_dest}")
+
+  set_property(TARGET romiVendordep_src_jar PROPERTY FOLDER "java")
 endif()
 
 file(GLOB_RECURSE romiVendordep_native_src src/main/native/cpp/*.cpp)

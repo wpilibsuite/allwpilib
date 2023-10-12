@@ -389,6 +389,9 @@ bool nt::operator==(const Value& lhs, const Value& rhs) {
                          lhs.m_val.data.arr_double.size *
                              sizeof(lhs.m_val.data.arr_double.arr[0])) == 0;
     case NT_STRING_ARRAY:
+      if (lhs.m_val.data.arr_string.size != rhs.m_val.data.arr_string.size) {
+        return false;
+      }
       if (lhs.m_val.data.arr_string.size == 0) {
         return true;
       }

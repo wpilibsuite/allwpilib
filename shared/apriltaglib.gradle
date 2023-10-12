@@ -1,7 +1,7 @@
 nativeUtils {
     nativeDependencyContainer {
         apriltaglib(getNativeDependencyTypeClass('WPIStaticMavenDependency')) {
-            groupId = "edu.wpi.first.thirdparty.frc2023"
+            groupId = "edu.wpi.first.thirdparty.frc2024"
             artifactId = "apriltaglib"
             headerClassifier = "headers"
             sourceClassifier = "sources"

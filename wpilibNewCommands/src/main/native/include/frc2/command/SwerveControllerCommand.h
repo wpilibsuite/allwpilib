@@ -4,9 +4,7 @@
 
 #include <cmath>
 #include <functional>
-#include <initializer_list>
 #include <memory>
-#include <span>
 
 #include <frc/Timer.h>
 #include <frc/controller/HolonomicDriveController.h>
@@ -21,8 +19,9 @@
 #include <units/time.h>
 #include <units/voltage.h>
 
-#include "Command.h"
-#include "CommandHelper.h"
+#include "frc2/command/Command.h"
+#include "frc2/command/CommandHelper.h"
+#include "frc2/command/Requirements.h"
 
 #pragma once
 

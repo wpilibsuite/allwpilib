@@ -22,8 +22,20 @@ if (WITH_JAVA)
   else()
       set (xrpVendordep_config_dir share/xrpVendordep)
   endif()
+endif()
 
-  install(FILES xrpVendordep-config.cmake DESTINATION ${xrpVendordep_config_dir})
+if (WITH_JAVA_SOURCE)
+  find_package(Java REQUIRED)
+  include(UseJava)
+  file(GLOB XRPVENDORDEP_SOURCES src/main/java/edu/wpi/first/wpilibj/xrp/*.java)
+  add_jar(xrpVendordep_src_jar
+  RESOURCES NAMESPACE "edu/wpi/first/wpilibj/xrp" ${XRPVENDORDEP_SOURCES}
+  OUTPUT_NAME xrpVendordep-sources)
+
+  get_property(xrpVendordep_src_JAR_FILE TARGET xrpVendordep_src_jar PROPERTY JAR_FILE)
+  install(FILES ${xrpVendordep_src_JAR_FILE} DESTINATION "${java_lib_dest}")
+
+  set_property(TARGET xrpVendordep_src_jar PROPERTY FOLDER "java")
 endif()
 
 file(GLOB_RECURSE xrpVendordep_native_src src/main/native/cpp/*.cpp)

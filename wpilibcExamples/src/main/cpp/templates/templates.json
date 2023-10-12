@@ -100,5 +100,33 @@
     "extravendordeps": [
       "romi"
     ]
+  },
+  {
+    "name": "XRP - Command Robot",
+    "description": "XRP - Command style",
+    "tags": [
+      "Command",
+      "XRP"
+    ],
+    "foldername": "commandbased",
+    "gradlebase": "cppxrp",
+    "commandversion": 2,
+    "extravendordeps": [
+      "xrp"
+    ]
+  },
+  {
+    "name": "XRP - Timed Robot",
+    "description": "XRP - Timed style",
+    "tags": [
+      "Timed",
+      "XRP"
+    ],
+    "foldername": "timed",
+    "gradlebase": "cppxrp",
+    "commandversion": 2,
+    "extravendordeps": [
+      "xrp"
+    ]
   }
 ]
