@@ -59,6 +59,7 @@ void SwerveModule::SetDesiredState(
   auto state = frc::SwerveModuleState::Optimize(
       referenceState, units::radian_t{m_turningEncoder.GetDistance()});
 
+  // Adjust speed using the cosine of angle error for smoother and more precise control
   state.speed *= 
       (state.angle - frc::Rotation2d{units::radian_t{m_turningEncoder.GetDistance}}).Cos
 

@@ -112,7 +112,8 @@ public class SwerveModule {
     // Optimize the reference state to avoid spinning further than 90 degrees
     SwerveModuleState state =
         SwerveModuleState.optimize(desiredState, new Rotation2d(m_turningEncoder.getDistance()));
-        
+
+    // Adjust speed using the cosine of angle error for smoother and more precise control
     state.speedMetersPerSecond *= 
         (state.angle.minus(new Rotation2d(m_turningEncoder.getDistance()))).getCos();
 
