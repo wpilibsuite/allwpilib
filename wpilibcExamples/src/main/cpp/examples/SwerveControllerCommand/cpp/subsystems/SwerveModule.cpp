@@ -60,7 +60,7 @@ void SwerveModule::SetDesiredState(
 
   // Optimize the reference state to avoid spinning further than 90 degrees
   auto state = frc::SwerveModuleState::Optimize(
-      referenceState, units::radian_t{encoderRotation});
+      referenceState, encoderRotation);
 
   // Adjust speed using the cosine of angle error for smoother and more precise
   // control
