@@ -123,5 +123,5 @@ public class VideoProperty {
   }
 
   int m_handle;
-  private final Kind m_kind;
+  private Kind m_kind;
 }

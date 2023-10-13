@@ -4,7 +4,8 @@
 
 package edu.wpi.first.networktables;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.nio.ByteBuffer;
 import org.junit.jupiter.api.AfterEach;
