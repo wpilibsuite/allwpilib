@@ -52,8 +52,8 @@ void SwerveModule::SetDesiredState(
       units::radian_t{m_turningEncoder.GetDistance()}};
 
   // Optimize the reference state to avoid spinning further than 90 degrees
-  auto state = frc::SwerveModuleState::Optimize(
-      referenceState, encoderRotation);
+  auto state =
+      frc::SwerveModuleState::Optimize(referenceState, encoderRotation);
 
   // Adjust speed using the cosine of angle error for smoother and more precise
   // control
