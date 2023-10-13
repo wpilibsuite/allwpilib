@@ -226,7 +226,7 @@ public final class SimpleMatrixUtils {
         return new SimpleMatrix(temp.getNumRows(), temp.getNumCols());
       }
 
-      throw new RuntimeException("Cholesky decomposition failed! Input matrix:\n" + src.toString());
+      throw new RuntimeException("Cholesky decomposition failed! Input matrix:\n" + src);
     }
 
     return SimpleMatrix.wrap(chol.getT(null));

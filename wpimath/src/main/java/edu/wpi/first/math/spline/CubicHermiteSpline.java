@@ -104,10 +104,8 @@ public class CubicHermiteSpline extends Spline {
               4,
               4,
               true,
-              new double[] {
-                +2.0, +1.0, -2.0, +1.0, -3.0, -2.0, +3.0, -1.0, +0.0, +1.0, +0.0, +0.0, +1.0, +0.0,
-                +0.0, +0.0
-              });
+                  +2.0, +1.0, -2.0, +1.0, -3.0, -2.0, +3.0, -1.0, +0.0, +1.0, +0.0, +0.0, +1.0, +0.0,
+                  +0.0, +0.0);
     }
     return hermiteBasis;
   }
@@ -128,9 +126,7 @@ public class CubicHermiteSpline extends Spline {
         4,
         1,
         true,
-        new double[] {
-          initialVector[0], initialVector[1],
-          finalVector[0], finalVector[1]
-        });
+            initialVector[0], initialVector[1],
+            finalVector[0], finalVector[1]);
   }
 }

@@ -206,7 +206,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
     var qrStorage = Sbar.transpose().getStorage();
 
     if (!qr.decompose(qrStorage.getDDRM())) {
-      throw new RuntimeException("QR decomposition failed! Input matrix:\n" + qrStorage.toString());
+      throw new RuntimeException("QR decomposition failed! Input matrix:\n" + qrStorage);
     }
 
     Matrix<C, C> newS = new Matrix<>(new SimpleMatrix(qr.getR(null, true)));
