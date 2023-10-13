@@ -17,8 +17,8 @@ import org.ejml.simple.SimpleMatrix;
  * <p>The feedforward is calculated as <strong> u_ff = B<sup>+</sup> (r_k+1 - A r_k) </strong>,
  * where <strong> B<sup>+</sup> </strong> is the pseudoinverse of B.
  *
- * <p>For more on the underlying math, read
- * <a href="https://file.tavsys.net/control/controls-engineering-in-frc.pdf">...</a>.
+ * <p>For more on the underlying math, read <a
+ * href="https://file.tavsys.net/control/controls-engineering-in-frc.pdf">...</a>.
  */
 public class LinearPlantInversionFeedforward<
     States extends Num, Inputs extends Num, Outputs extends Num> {

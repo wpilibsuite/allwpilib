@@ -105,8 +105,7 @@ public final class LiveWindow {
       } else {
         System.out.println("stopping live window mode.");
         SendableRegistry.foreachLiveWindow(
-            dataHandle,
-            cbdata -> ((SendableBuilderImpl) cbdata.builder).stopLiveWindowMode());
+            dataHandle, cbdata -> ((SendableBuilderImpl) cbdata.builder).stopLiveWindowMode());
         if (disabledListener != null) {
           disabledListener.run();
         }

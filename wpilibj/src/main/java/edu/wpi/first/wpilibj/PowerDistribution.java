@@ -101,7 +101,7 @@ public class PowerDistribution implements Sendable, AutoCloseable {
    * @return The current of the channel in Amperes
    */
   public double getCurrent(int channel) {
-      return PowerDistributionJNI.getChannelCurrent(m_handle, channel);
+    return PowerDistributionJNI.getChannelCurrent(m_handle, channel);
   }
 
   /**

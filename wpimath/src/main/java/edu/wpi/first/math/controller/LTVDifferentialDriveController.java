@@ -64,8 +64,8 @@ public class LTVDifferentialDriveController {
   /**
    * Constructs a linear time-varying differential drive controller.
    *
-   * <p>See
-   * <a href="https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-intro.html#lqr-tuning">...</a>
+   * <p>See <a
+   * href="https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-intro.html#lqr-tuning">...</a>
    * for how to select the tolerances.
    *
    * @param plant The differential drive velocity plant.

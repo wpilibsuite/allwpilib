@@ -56,22 +56,14 @@ public class Robot extends TimedRobot {
     // Get the pressure (in PSI) from the analog sensor connected to the PH.
     // This function is supported only on the PH!
     // On a PCM, this function will return 0.
-    tab.addDouble(
-        "PH Pressure [PSI]",
-            m_compressor::getPressure);
+    tab.addDouble("PH Pressure [PSI]", m_compressor::getPressure);
     // Get compressor current draw.
-    tab.addDouble(
-        "Compressor Current",
-            m_compressor::getCurrent);
+    tab.addDouble("Compressor Current", m_compressor::getCurrent);
     // Get whether the compressor is active.
-    tab.addBoolean(
-        "Compressor Active",
-            m_compressor::isEnabled);
+    tab.addBoolean("Compressor Active", m_compressor::isEnabled);
     // Get the digital pressure switch connected to the PCM/PH.
     // The switch is open when the pressure is over ~120 PSI.
-    tab.addBoolean(
-        "Pressure Switch",
-            m_compressor::getPressureSwitchValue);
+    tab.addBoolean("Pressure Switch", m_compressor::getPressureSwitchValue);
   }
 
   @SuppressWarnings("PMD.UnconditionalIfStatement")

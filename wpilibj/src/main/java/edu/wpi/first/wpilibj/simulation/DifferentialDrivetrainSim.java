@@ -238,9 +238,8 @@ public class DifferentialDrivetrainSim {
    */
   public double getLeftCurrentDrawAmps() {
     return m_motor.getCurrent(
-            getState(State.kLeftVelocity) * m_currentGearing / m_wheelRadiusMeters,
-            m_u.get(0, 0))
-            * Math.signum(m_u.get(0, 0));
+            getState(State.kLeftVelocity) * m_currentGearing / m_wheelRadiusMeters, m_u.get(0, 0))
+        * Math.signum(m_u.get(0, 0));
   }
 
   /**
@@ -250,9 +249,8 @@ public class DifferentialDrivetrainSim {
    */
   public double getRightCurrentDrawAmps() {
     return m_motor.getCurrent(
-            getState(State.kRightVelocity) * m_currentGearing / m_wheelRadiusMeters,
-            m_u.get(1, 0))
-            * Math.signum(m_u.get(1, 0));
+            getState(State.kRightVelocity) * m_currentGearing / m_wheelRadiusMeters, m_u.get(1, 0))
+        * Math.signum(m_u.get(1, 0));
   }
 
   /**

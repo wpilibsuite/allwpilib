@@ -546,8 +546,8 @@ public class Matrix<R extends Num, C extends Num> {
   public final <R2 extends Num, C2 extends Num> Matrix<R2, C2> block(
       int height, int width, int startingRow, int startingCol) {
     return new Matrix<>(
-            this.m_storage.extractMatrix(
-                    startingRow, startingRow + height, startingCol, startingCol + width));
+        this.m_storage.extractMatrix(
+            startingRow, startingRow + height, startingCol, startingCol + width));
   }
 
   /**
