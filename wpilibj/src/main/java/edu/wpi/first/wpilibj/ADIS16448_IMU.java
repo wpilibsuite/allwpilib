@@ -110,7 +110,7 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
 
     private int value;
 
-    private CalibrationTime(int value) {
+    CalibrationTime(int value) {
       this.value = value;
     }
   }
@@ -130,9 +130,9 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
   private IMUAxis m_yaw_axis;
 
   /* Offset data storage */
-  private double m_offset_data_gyro_rate_x[];
-  private double m_offset_data_gyro_rate_y[];
-  private double m_offset_data_gyro_rate_z[];
+  private double[] m_offset_data_gyro_rate_x;
+  private double[] m_offset_data_gyro_rate_y;
+  private double[] m_offset_data_gyro_rate_z;
 
   /* Instant raw output variables */
   private double m_gyro_rate_x = 0.0;
@@ -199,7 +199,7 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
   private SimDouble m_simAccelZ;
 
   /* CRC-16 Look-Up Table */
-  int adiscrc[] =
+  int[] adiscrc =
       new int[] {
         0x0000, 0x17CE, 0x0FDF, 0x1811, 0x1FBE, 0x0870, 0x1061, 0x07AF,
         0x1F3F, 0x08F1, 0x10E0, 0x072E, 0x0081, 0x174F, 0x0F5E, 0x1890,

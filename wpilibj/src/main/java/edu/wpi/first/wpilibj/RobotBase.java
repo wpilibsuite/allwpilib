@@ -321,7 +321,7 @@ public abstract class RobotBase implements AutoCloseable {
         robotName = elements[0].getClassName();
       }
       DriverStation.reportError(
-          "Unhandled exception instantiating robot " + robotName + " " + throwable.toString(),
+          "Unhandled exception instantiating robot " + robotName + " " + throwable,
           elements);
       DriverStation.reportError(
           "The robot program quit unexpectedly."
@@ -354,7 +354,7 @@ public abstract class RobotBase implements AutoCloseable {
         }
       } catch (IOException ex) {
         DriverStation.reportError(
-            "Could not write FRC_Lib_Version.ini: " + ex.toString(), ex.getStackTrace());
+            "Could not write FRC_Lib_Version.ini: " + ex, ex.getStackTrace());
       }
     }
 
@@ -367,7 +367,7 @@ public abstract class RobotBase implements AutoCloseable {
         throwable = cause;
       }
       DriverStation.reportError(
-          "Unhandled exception: " + throwable.toString(), throwable.getStackTrace());
+          "Unhandled exception: " + throwable, throwable.getStackTrace());
       errorOnExit = true;
     } finally {
       m_runMutex.lock();

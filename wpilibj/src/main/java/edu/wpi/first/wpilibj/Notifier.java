@@ -113,7 +113,7 @@ public class Notifier implements AutoCloseable {
                     updateAlarm();
                   } else {
                     // Need to update the alarm to cause it to wait again
-                    updateAlarm((long) -1);
+                    updateAlarm(-1);
                   }
                 } finally {
                   m_processLock.unlock();
@@ -134,7 +134,7 @@ public class Notifier implements AutoCloseable {
             error = cause;
           }
           DriverStation.reportError(
-              "Unhandled exception in Notifier thread: " + error.toString(), error.getStackTrace());
+              "Unhandled exception in Notifier thread: " + error, error.getStackTrace());
           DriverStation.reportError(
               "The Runnable for this Notifier (or methods called by it) should have handled "
                   + "the exception above.\n"

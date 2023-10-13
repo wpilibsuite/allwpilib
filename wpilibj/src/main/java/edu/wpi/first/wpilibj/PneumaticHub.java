@@ -60,7 +60,7 @@ public class PneumaticHub implements PneumaticsBase {
           }
         } catch (IOException ex) {
           DriverStation.reportError(
-              "Could not write " + fileName + ": " + ex.toString(), ex.getStackTrace());
+              "Could not write " + fileName + ": " + ex, ex.getStackTrace());
         }
       }
 

@@ -195,7 +195,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
 
     private int value;
 
-    private CalibrationTime(int value) {
+    CalibrationTime(int value) {
       this.value = value;
     }
   }
@@ -593,7 +593,6 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
     if (!switchToAutoSPI()) {
       DriverStation.reportError("Failed to configure/reconfigure auto SPI.", false);
     }
-    ;
   }
 
   /**

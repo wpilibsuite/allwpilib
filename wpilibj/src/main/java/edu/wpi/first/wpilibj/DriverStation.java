@@ -237,9 +237,10 @@ public final class DriverStation {
         needToLog = true;
       } else {
         for (int i = 0; i < count; i++) {
-          if (axes.m_axes[i] != m_prevAxes.m_axes[i]) {
-            needToLog = true;
-          }
+            if (axes.m_axes[i] != m_prevAxes.m_axes[i]) {
+                needToLog = true;
+                break;
+            }
         }
       }
       if (needToLog) {
@@ -253,9 +254,10 @@ public final class DriverStation {
         needToLog = true;
       } else {
         for (int i = 0; i < count; i++) {
-          if (povs.m_povs[i] != m_prevPOVs.m_povs[i]) {
-            needToLog = true;
-          }
+            if (povs.m_povs[i] != m_prevPOVs.m_povs[i]) {
+                needToLog = true;
+                break;
+            }
         }
       }
       if (needToLog) {
