@@ -18,7 +18,7 @@ import org.ejml.simple.SimpleMatrix;
  * where <strong> B<sup>+</sup> </strong> is the pseudoinverse of B.
  *
  * <p>For more on the underlying math, read
- * https://file.tavsys.net/control/controls-engineering-in-frc.pdf.
+ * <a href="https://file.tavsys.net/control/controls-engineering-in-frc.pdf">...</a>.
  */
 public class LinearPlantInversionFeedforward<
     States extends Num, Inputs extends Num, Outputs extends Num> {

@@ -150,7 +150,7 @@ public class SwerveDriveKinematics
             0, /* Start Data */
             0,
             1,
-            +m_modules[i].getX() - centerOfRotationMeters.getX());
+            m_modules[i].getX() - centerOfRotationMeters.getX());
       }
       m_prevCoR = centerOfRotationMeters;
     }

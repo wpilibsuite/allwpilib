@@ -18,7 +18,7 @@ import org.ejml.simple.SimpleMatrix;
  * controllable during teleop driving by making it behave like a slower or more benign drivetrain.
  *
  * <p>For more on the underlying math, read appendix B.3 in
- * https://file.tavsys.net/control/controls-engineering-in-frc.pdf.
+ * <a href="https://file.tavsys.net/control/controls-engineering-in-frc.pdf">...</a>.
  */
 public class ImplicitModelFollower<States extends Num, Inputs extends Num, Outputs extends Num> {
   // Computed controller output

@@ -31,7 +31,7 @@ import java.util.function.BiFunction;
  * Kalman filter equations.
  *
  * <p>For more on the underlying math, read
- * https://file.tavsys.net/control/controls-engineering-in-frc.pdf chapter 9 "Stochastic control
+ * <a href="https://file.tavsys.net/control/controls-engineering-in-frc.pdf">...</a> chapter 9 "Stochastic control
  * theory".
  */
 public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Outputs extends Num>
@@ -60,7 +60,7 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
    * Constructs an extended Kalman filter.
    *
    * <p>See
-   * https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-observers.html#process-and-measurement-noise-covariance-matrices
+   * <a href="https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-observers.html#process-and-measurement-noise-covariance-matrices">...</a>
    * for how to select the standard deviations.
    *
    * @param states a Nat representing the number of states.
@@ -98,7 +98,7 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
    * Constructs an extended Kalman filter.
    *
    * <p>See
-   * https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-observers.html#process-and-measurement-noise-covariance-matrices
+   * <a href="https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-observers.html#process-and-measurement-noise-covariance-matrices">...</a>
    * for how to select the standard deviations.
    *
    * @param states a Nat representing the number of states.

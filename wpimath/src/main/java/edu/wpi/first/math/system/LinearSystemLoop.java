@@ -26,7 +26,7 @@ import org.ejml.simple.SimpleMatrix;
  * because that's what comes back from the sensors).
  *
  * <p>For more on the underlying math, read
- * https://file.tavsys.net/control/controls-engineering-in-frc.pdf.
+ * <a href="https://file.tavsys.net/control/controls-engineering-in-frc.pdf">...</a>.
  */
 public class LinearSystemLoop<States extends Num, Inputs extends Num, Outputs extends Num> {
   private final LinearQuadraticRegulator<States, Inputs, Outputs> m_controller;

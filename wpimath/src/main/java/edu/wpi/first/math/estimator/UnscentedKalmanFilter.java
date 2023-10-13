@@ -32,11 +32,11 @@ import org.ejml.simple.SimpleMatrix;
  * error covariance using sigma points chosen to approximate the true probability distribution.
  *
  * <p>For more on the underlying math, read
- * https://file.tavsys.net/control/controls-engineering-in-frc.pdf chapter 9 "Stochastic control
+ * <a href="https://file.tavsys.net/control/controls-engineering-in-frc.pdf">...</a> chapter 9 "Stochastic control
  * theory".
  *
  * <p>This class implements a square-root-form unscented Kalman filter (SR-UKF). For more
- * information about the SR-UKF, see https://www.researchgate.net/publication/3908304.
+ * information about the SR-UKF, see <a href="https://www.researchgate.net/publication/3908304">...</a>.
  */
 public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outputs extends Num>
     implements KalmanTypeFilter<States, Inputs, Outputs> {
@@ -65,7 +65,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
    * Constructs an Unscented Kalman Filter.
    *
    * <p>See
-   * https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-observers.html#process-and-measurement-noise-covariance-matrices
+   * <a href="https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-observers.html#process-and-measurement-noise-covariance-matrices">...</a>
    * for how to select the standard deviations.
    *
    * @param states A Nat representing the number of states.
@@ -105,7 +105,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
    * because they allow you to correctly account for the modular nature of angle arithmetic.
    *
    * <p>See
-   * https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-observers.html#process-and-measurement-noise-covariance-matrices
+   * <a href="https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-observers.html#process-and-measurement-noise-covariance-matrices">...</a>
    * for how to select the standard deviations.
    *
    * @param states A Nat representing the number of states.
