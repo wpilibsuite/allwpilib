@@ -84,7 +84,7 @@ public class FieldObject2d implements AutoCloseable {
    */
   public synchronized void setPoses(Pose2d... poses) {
     m_poses.clear();
-      Collections.addAll(m_poses, poses);
+    Collections.addAll(m_poses, poses);
     updateEntry();
   }
 

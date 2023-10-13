@@ -427,7 +427,7 @@ void Downloader::ThreadMain() {
               continue;
             }
             lock.lock();
-          err: {}
+          err : {}
           }
           if (m_state == kDownload) {
             m_state = kDownloadDone;

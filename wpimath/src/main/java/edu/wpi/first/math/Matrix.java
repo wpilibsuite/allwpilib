@@ -607,8 +607,7 @@ public class Matrix<R extends Num, C extends Num> {
         return new Matrix<>(new SimpleMatrix(temp.getNumRows(), temp.getNumCols()));
       }
 
-      throw new RuntimeException(
-          "Cholesky decomposition failed! Input matrix:\n" + m_storage);
+      throw new RuntimeException("Cholesky decomposition failed! Input matrix:\n" + m_storage);
     }
 
     return new Matrix<>(SimpleMatrix.wrap(chol.getT(null)));

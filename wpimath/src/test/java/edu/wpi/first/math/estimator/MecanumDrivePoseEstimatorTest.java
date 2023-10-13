@@ -277,7 +277,7 @@ class MecanumDrivePoseEstimatorTest {
               measurement.getRotation().getDegrees()
                   - estimator.getEstimatedPosition().getRotation().getDegrees());
 
-        assertTrue(dx > 0.08 || dy > 0.08 || dtheta > 0.08, errorLog);
+      assertTrue(dx > 0.08 || dy > 0.08 || dtheta > 0.08, errorLog);
     }
   }
 
