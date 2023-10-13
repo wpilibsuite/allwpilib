@@ -151,7 +151,7 @@ class CubicHermiteSplineTest {
         () ->
             run(
                 new Pose2d(10, 10, Rotation2d.fromDegrees(90)),
-                Arrays.asList(new Translation2d(10, 10.5)),
+                    List.of(new Translation2d(10, 10.5)),
                 new Pose2d(10, 11, Rotation2d.fromDegrees(-90))));
   }
 }
