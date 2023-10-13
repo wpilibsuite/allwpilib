@@ -55,8 +55,9 @@ void SwerveModule::SetDesiredState(
   auto state =
       frc::SwerveModuleState::Optimize(referenceState, encoderRotation);
 
-  // Adjust speed using the cosine of angle error for smoother and more precise
-  // control
+  // Scale speed by cosine of angle error. This scales down movement
+  // perpendicular to the desired direction of travel that can occur when
+  // modules change directions. This results in smoother driving.
   state.speed *= (state.angle - encoderRotation).Cos();
 
   // Calculate the drive output from the drive PID controller.
