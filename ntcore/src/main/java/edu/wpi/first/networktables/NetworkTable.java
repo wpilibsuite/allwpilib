@@ -532,27 +532,27 @@ public final class NetworkTable {
     return m_inst.addListener(
         new String[] {m_pathWithSep},
         EnumSet.of(NetworkTableEvent.Kind.kPublish, NetworkTableEvent.Kind.kImmediate),
-        new Consumer<NetworkTableEvent>() {
-          final Set<String> m_notifiedTables = new HashSet<>();
+            new Consumer<>() {
+                final Set<String> m_notifiedTables = new HashSet<>();
 
-          @Override
-          public void accept(NetworkTableEvent event) {
-            if (event.topicInfo == null) {
-              return; // should not happen
-            }
-            String relativeKey = event.topicInfo.name.substring(prefixLen);
-            int endSubTable = relativeKey.indexOf(PATH_SEPARATOR);
-            if (endSubTable == -1) {
-              return;
-            }
-            String subTableKey = relativeKey.substring(0, endSubTable);
-            if (m_notifiedTables.contains(subTableKey)) {
-              return;
-            }
-            m_notifiedTables.add(subTableKey);
-            listener.tableCreated(parent, subTableKey, parent.getSubTable(subTableKey));
-          }
-        });
+                @Override
+                public void accept(NetworkTableEvent event) {
+                    if (event.topicInfo == null) {
+                        return; // should not happen
+                    }
+                    String relativeKey = event.topicInfo.name.substring(prefixLen);
+                    int endSubTable = relativeKey.indexOf(PATH_SEPARATOR);
+                    if (endSubTable == -1) {
+                        return;
+                    }
+                    String subTableKey = relativeKey.substring(0, endSubTable);
+                    if (m_notifiedTables.contains(subTableKey)) {
+                        return;
+                    }
+                    m_notifiedTables.add(subTableKey);
+                    listener.tableCreated(parent, subTableKey, parent.getSubTable(subTableKey));
+                }
+            });
   }
 
   /**
