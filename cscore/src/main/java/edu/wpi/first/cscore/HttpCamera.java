@@ -46,7 +46,7 @@ public class HttpCamera extends VideoCamera {
    * Create a source for a MJPEG-over-HTTP (IP) camera.
    *
    * @param name Source name (arbitrary unique identifier)
-   * @param url Camera URL (e.g. "http://10.x.y.11/video/stream.mjpg")
+   * @param url Camera URL (e.g. "<a href="http://10.x.y.11/video/stream.mjpg">...</a>")
    */
   public HttpCamera(String name, String url) {
     super(CameraServerJNI.createHttpCamera(name, url, HttpCameraKind.kUnknown.getValue()));
@@ -56,7 +56,7 @@ public class HttpCamera extends VideoCamera {
    * Create a source for a MJPEG-over-HTTP (IP) camera.
    *
    * @param name Source name (arbitrary unique identifier)
-   * @param url Camera URL (e.g. "http://10.x.y.11/video/stream.mjpg")
+   * @param url Camera URL (e.g. "<a href="http://10.x.y.11/video/stream.mjpg">...</a>")
    * @param kind Camera kind (e.g. kAxis)
    */
   public HttpCamera(String name, String url, HttpCameraKind kind) {
