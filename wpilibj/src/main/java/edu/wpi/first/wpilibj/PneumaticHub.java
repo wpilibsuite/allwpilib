@@ -114,14 +114,12 @@ public class PneumaticHub implements PneumaticsBase {
 
   /** Converts volts to PSI per the REV Analog Pressure Sensor datasheet. */
   private static double voltsToPsi(double sensorVoltage, double supplyVoltage) {
-    double pressure = 250 * (sensorVoltage / supplyVoltage) - 25;
-    return pressure;
+      return 250 * (sensorVoltage / supplyVoltage) - 25;
   }
 
   /** Converts PSI to volts per the REV Analog Pressure Sensor datasheet. */
   private static double psiToVolts(double pressure, double supplyVoltage) {
-    double voltage = supplyVoltage * (0.004 * pressure + 0.1);
-    return voltage;
+      return supplyVoltage * (0.004 * pressure + 0.1);
   }
 
   private final DataStore m_dataStore;

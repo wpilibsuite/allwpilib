@@ -193,7 +193,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
     _32s(10),
     _64s(11);
 
-    private int value;
+    private final int value;
 
     CalibrationTime(int value) {
       this.value = value;
@@ -396,7 +396,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
    * @return
    */
   private static int toShort(int... buf) {
-    return (short) (((buf[0] & 0xFF) << 8) + ((buf[1] & 0xFF) << 0));
+    return (short) (((buf[0] & 0xFF) << 8) + ((buf[1] & 0xFF)));
   }
 
   /**

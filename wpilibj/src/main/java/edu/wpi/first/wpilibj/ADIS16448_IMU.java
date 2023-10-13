@@ -108,7 +108,7 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
     _32s(10),
     _64s(11);
 
-    private int value;
+    private final int value;
 
     CalibrationTime(int value) {
       this.value = value;
@@ -358,7 +358,7 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
 
   /** */
   private static int toShort(int... buf) {
-    return (short) (((buf[0] & 0xFF) << 8) + ((buf[1] & 0xFF) << 0));
+    return (short) (((buf[0] & 0xFF) << 8) + ((buf[1] & 0xFF)));
   }
 
   /** */
@@ -481,7 +481,7 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
   }
 
   public int configDecRate(int m_decRate) {
-    int writeValue = m_decRate;
+    int writeValue;
     int readbackValue;
     if (!switchToStandardSPI()) {
       DriverStation.reportError("Failed to configure/reconfigure standard SPI.", false);

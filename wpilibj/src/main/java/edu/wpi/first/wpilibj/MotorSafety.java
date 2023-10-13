@@ -66,7 +66,7 @@ public abstract class MotorSafety {
     synchronized (m_listMutex) {
       m_instanceList.add(this);
       if (m_safetyThread == null) {
-        m_safetyThread = new Thread(() -> threadMain(), "MotorSafety Thread");
+        m_safetyThread = new Thread(MotorSafety::threadMain, "MotorSafety Thread");
         m_safetyThread.setDaemon(true);
         m_safetyThread.start();
       }

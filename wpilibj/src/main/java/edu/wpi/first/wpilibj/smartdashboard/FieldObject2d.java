@@ -71,9 +71,7 @@ public class FieldObject2d implements AutoCloseable {
    */
   public synchronized void setPoses(List<Pose2d> poses) {
     m_poses.clear();
-    for (Pose2d pose : poses) {
-      m_poses.add(pose);
-    }
+    m_poses.addAll(poses);
     updateEntry();
   }
 
@@ -108,7 +106,7 @@ public class FieldObject2d implements AutoCloseable {
    */
   public synchronized List<Pose2d> getPoses() {
     updateFromEntry();
-    return new ArrayList<Pose2d>(m_poses);
+    return new ArrayList<>(m_poses);
   }
 
   void updateEntry() {

@@ -50,7 +50,7 @@ public final class LiveWindow {
   private static Runnable disabledListener;
 
   static {
-    SendableRegistry.setLiveWindowBuilderFactory(() -> new SendableBuilderImpl());
+    SendableRegistry.setLiveWindowBuilderFactory(SendableBuilderImpl::new);
     enabledPub.set(false);
   }
 
@@ -106,9 +106,7 @@ public final class LiveWindow {
         System.out.println("stopping live window mode.");
         SendableRegistry.foreachLiveWindow(
             dataHandle,
-            cbdata -> {
-              ((SendableBuilderImpl) cbdata.builder).stopLiveWindowMode();
-            });
+            cbdata -> ((SendableBuilderImpl) cbdata.builder).stopLiveWindowMode());
         if (disabledListener != null) {
           disabledListener.run();
         }
