@@ -269,7 +269,7 @@ public class DCMotor {
    * @param numMotors Number of motors in the gearbox.
    * @return A gearbox of Kraken X60 FOC enabled motors.
    */
-  public static DCMotor getKrakenX60FOC(int numMotors) {
+  public static DCMotor getKrakenX60Foc(int numMotors) {
     // From https://store.ctr-electronics.com/announcing-kraken-x60/
     return new DCMotor(
         12, 9.37, 483, 2, Units.rotationsPerMinuteToRadiansPerSecond(5800), numMotors);
