@@ -121,7 +121,13 @@ doxygen {
         exclude 'wpinet/uv/**'
 
         // json
+        exclude 'wpi/adl_serializer.h'
+        exclude 'wpi/byte_container_with_subtype.h'
+        exclude 'wpi/detail/**'
         exclude 'wpi/json.h'
+        exclude 'wpi/json_fwd.h'
+        exclude 'wpi/ordered_map.h'
+        exclude 'wpi/thirdparty/**'
 
         // memory
         exclude 'wpi/memory/**'
