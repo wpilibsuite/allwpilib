@@ -719,7 +719,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setTopicProperty
 {
   wpi::json j;
   try {
-    j = wpi::json::parse(JStringRef{env, value});
+    j = wpi::json::parse(std::string_view{JStringRef{env, value}});
   } catch (wpi::json::parse_error& err) {
     illegalArgEx.Throw(
         env, fmt::format("could not parse value JSON: {}", err.what()));
@@ -763,7 +763,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setTopicProperties
 {
   wpi::json j;
   try {
-    j = wpi::json::parse(JStringRef{env, properties});
+    j = wpi::json::parse(std::string_view{JStringRef{env, properties}});
   } catch (wpi::json::parse_error& err) {
     illegalArgEx.Throw(
         env, fmt::format("could not parse properties JSON: {}", err.what()));
@@ -828,7 +828,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_publishEx
 {
   wpi::json j;
   try {
-    j = wpi::json::parse(JStringRef{env, properties});
+    j = wpi::json::parse(std::string_view{JStringRef{env, properties}});
   } catch (wpi::json::parse_error& err) {
     illegalArgEx.Throw(
         env, fmt::format("could not parse properties JSON: {}", err.what()));

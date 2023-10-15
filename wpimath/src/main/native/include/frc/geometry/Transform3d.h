@@ -34,6 +34,18 @@ class WPILIB_DLLEXPORT Transform3d {
   Transform3d(Translation3d translation, Rotation3d rotation);
 
   /**
+   * Constructs a transform with x, y, and z translations instead of a separate
+   * Translation3d.
+   *
+   * @param x The x component of the translational component of the transform.
+   * @param y The y component of the translational component of the transform.
+   * @param z The z component of the translational component of the transform.
+   * @param rotation The rotational component of the transform.
+   */
+  Transform3d(units::meter_t x, units::meter_t y, units::meter_t z,
+              Rotation3d rotation);
+
+  /**
    * Constructs the identity transform -- maps an initial pose to itself.
    */
   constexpr Transform3d() = default;

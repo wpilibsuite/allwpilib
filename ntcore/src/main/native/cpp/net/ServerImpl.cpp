@@ -17,7 +17,7 @@
 #include <wpi/MessagePack.h>
 #include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
-#include <wpi/json_serializer.h>
+#include <wpi/json.h>
 #include <wpi/raw_ostream.h>
 #include <wpi/timestamp.h>
 
