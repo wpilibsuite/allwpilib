@@ -6,6 +6,7 @@ package edu.wpi.first.math.kinematics;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 
 /**
  * Represents the speed of a robot chassis. Although this class contains similar members compared to
