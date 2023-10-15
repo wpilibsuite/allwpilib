@@ -16,6 +16,7 @@
 
 #include <frc/filter/LinearFilter.h>
 #include <units/time.h>
+#include <wpi/StringMap.h>
 #include <wpi/array.h>
 
 #include "sysid/analysis/AnalysisManager.h"
