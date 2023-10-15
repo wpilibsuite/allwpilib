@@ -12,6 +12,7 @@
 #include <fmt/format.h>
 #include <units/angle.h>
 #include <units/math.h>
+#include <wpi/MemoryBuffer.h>
 #include <wpi/StringExtras.h>
 #include <wpi/StringMap.h>
 #include <wpi/raw_istream.h>
@@ -451,13 +452,14 @@ AnalysisManager::AnalysisManager(std::string_view path, Settings& settings,
   {
     // Read JSON from the specified path
     std::error_code ec;
-    wpi::raw_fd_istream is{path, ec};
+    std::unique_ptr<wpi::MemoryBuffer> fileBuffer =
+        wpi::MemoryBuffer::GetFile(path, ec);
 
     if (ec) {
       throw FileReadingError(path);
     }
 
-    is >> m_json;
+    m_json = wpi::json::parse(fileBuffer->begin(), fileBuffer->end());
 
     WPI_INFO(m_logger, "Read {}", path);
   }
@@ -469,13 +471,14 @@ AnalysisManager::AnalysisManager(std::string_view path, Settings& settings,
 
     // Read JSON from the specified path
     std::error_code ec;
-    wpi::raw_fd_istream is{newPath, ec};
+    std::unique_ptr<wpi::MemoryBuffer> fileBuffer =
+        wpi::MemoryBuffer::GetFile(newPath, ec);
 
     if (ec) {
       throw FileReadingError(newPath);
     }
 
-    is >> m_json;
+    m_json = wpi::json::parse(fileBuffer->begin(), fileBuffer->end());
 
     WPI_INFO(m_logger, "Read {}", newPath);
   }

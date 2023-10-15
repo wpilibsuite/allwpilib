@@ -10,6 +10,7 @@
 #include <fmt/core.h>
 #include <fmt/format.h>
 #include <wpi/Logger.h>
+#include <wpi/MemoryBuffer.h>
 #include <wpi/fmt/raw_ostream.h>
 #include <wpi/json.h>
 #include <wpi/raw_istream.h>
@@ -34,14 +35,14 @@ static constexpr size_t kRVelCol = 8;
 
 static wpi::json GetJSON(std::string_view path, wpi::Logger& logger) {
   std::error_code ec;
-  wpi::raw_fd_istream input{path, ec};
+  std::unique_ptr<wpi::MemoryBuffer> fileBuffer =
+      wpi::MemoryBuffer::GetFile(path, ec);
 
   if (ec) {
     throw std::runtime_error(fmt::format("Unable to read: {}", path));
   }
 
-  wpi::json json;
-  input >> json;
+  wpi::json json = wpi::json::parse(fileBuffer->begin(), fileBuffer->end());
   WPI_INFO(logger, "Read frc-characterization JSON from {}", path);
   return json;
 }
