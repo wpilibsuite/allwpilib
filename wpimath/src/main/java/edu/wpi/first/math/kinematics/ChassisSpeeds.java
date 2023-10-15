@@ -116,10 +116,10 @@ public class ChassisSpeeds {
       double vyMetersPerSecond,
       double omegaRadiansPerSecond,
       Rotation2d robotAngle) {
-    return new ChassisSpeeds(
-        vxMetersPerSecond * robotAngle.getCos() + vyMetersPerSecond * robotAngle.getSin(),
-        -vxMetersPerSecond * robotAngle.getSin() + vyMetersPerSecond * robotAngle.getCos(),
-        omegaRadiansPerSecond);
+    // CW rotation into chassis frame
+    var rotated =
+        new Translation2d(vxMetersPerSecond, vyMetersPerSecond).rotateBy(robotAngle.unaryMinus());
+    return new ChassisSpeeds(rotated.getX(), rotated.getY(), omegaRadiansPerSecond);
   }
 
   /**
@@ -162,12 +162,9 @@ public class ChassisSpeeds {
       double vyMetersPerSecond,
       double omegaRadiansPerSecond,
       Rotation2d robotAngle) {
-    return new ChassisSpeeds(
-        vxMetersPerSecond * robotAngle.unaryMinus().getCos()
-            + vyMetersPerSecond * robotAngle.unaryMinus().getSin(),
-        -vxMetersPerSecond * robotAngle.unaryMinus().getSin()
-            + vyMetersPerSecond * robotAngle.unaryMinus().getCos(),
-        omegaRadiansPerSecond);
+    // CCW rotation out of chassis frame
+    var rotated = new Translation2d(vxMetersPerSecond, vyMetersPerSecond).rotateBy(robotAngle);
+    return new ChassisSpeeds(rotated.getX(), rotated.getY(), omegaRadiansPerSecond);
   }
 
   /**
