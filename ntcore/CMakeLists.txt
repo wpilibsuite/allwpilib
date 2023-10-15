@@ -85,20 +85,6 @@ if (WITH_JAVA)
 
 endif()
 
-if (WITH_JAVA_SOURCE)
-    find_package(Java REQUIRED)
-    include(UseJava)
-    file(GLOB NTCORE_SOURCES src/main/java/edu/wpi/first/networktables/*.java ${WPILIB_BINARY_DIR}/ntcore/generated/*.java)
-    add_jar(ntcore_src_jar
-    RESOURCES NAMESPACE "edu/wpi/first/networktables" ${NTCORE_SOURCES}
-    OUTPUT_NAME ntcore-sources)
-
-    get_property(NTCORE_SRC_JAR_FILE TARGET ntcore_src_jar PROPERTY JAR_FILE)
-    install(FILES ${NTCORE_SRC_JAR_FILE} DESTINATION "${java_lib_dest}")
-
-    set_property(TARGET ntcore_src_jar PROPERTY FOLDER "java")
-endif()
-
 add_executable(ntcoredev src/dev/native/cpp/main.cpp)
 wpilib_target_warnings(ntcoredev)
 target_link_libraries(ntcoredev ntcore)

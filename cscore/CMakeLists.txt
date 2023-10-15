@@ -133,22 +133,6 @@ if (WITH_JAVA)
 
 endif()
 
-if (WITH_JAVA_SOURCE)
-    find_package(Java REQUIRED)
-    include(UseJava)
-    file(GLOB CSCORE_SOURCES src/main/java/edu/wpi/first/cscore/*.java)
-    file(GLOB CSCORE_RAW_SOURCES src/main/java/edu/wpi/first/cscore/raw/*.java)
-    add_jar(cscore_src_jar
-    RESOURCES NAMESPACE "edu/wpi/first/cscore" ${CSCORE_SOURCES}
-    NAMESPACE "edu/wpi/first/cscore/raw" ${CSCORE_RAW_SOURCES}
-    OUTPUT_NAME cscore-sources)
-
-    get_property(CSCORE_SRC_JAR_FILE TARGET cscore_src_jar PROPERTY JAR_FILE)
-    install(FILES ${CSCORE_SRC_JAR_FILE} DESTINATION "${java_lib_dest}")
-
-    set_property(TARGET cscore_src_jar PROPERTY FOLDER "java")
-endif()
-
 if (WITH_TESTS)
     wpilib_add_test(cscore src/test/native/cpp)
     target_link_libraries(cscore_test cscore gmock)
