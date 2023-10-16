@@ -113,12 +113,12 @@ endif()
 if (WITH_JAVA_SOURCE)
     find_package(Java REQUIRED)
     include(UseJava)
-    file(GLOB HAL_SOURCES src/main/java/edu/wpi/first/hal/*.java)
+    file(GLOB HAL_SOURCES src/main/java/edu/wpi/first/hal/*.java ${CMAKE_CURRENT_BINARY_DIR}/FRCNetComm.java)
     file(GLOB HAL_CAN_SOURCES src/main/java/edu/wpi/first/hal/can/*.java)
     file(GLOB HAL_SIMULATION_SOURCES src/main/java/edu/wpi/first/hal/simulation/*.java)
     file(GLOB HAL_UTIL_SOURCES src/main/java/edu/wpi/first/hal/util/*.java)
     add_jar(hal_src_jar
-    RESOURCES NAMESPACE "edu/wpi/first/hal" ${HAL_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/FRCNetComm.java
+    RESOURCES NAMESPACE "edu/wpi/first/hal" ${HAL_SOURCES}
     NAMESPACE "edu/wpi/first/hal/can" ${HAL_CAN_SOURCES}
     NAMESPACE "edu/wpi/first/hal/communication" src/main/java/edu/wpi/first/hal/communication/NIRioStatus.java
     NAMESPACE "edu/wpi/first/hal/simulation" ${HAL_SIMULATION_SOURCES}
