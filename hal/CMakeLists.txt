@@ -80,12 +80,10 @@ if (WITH_JAVA)
 
     file(GLOB_RECURSE hal_shared_jni_src src/main/native/cpp/jni/*.cpp)
 
-    file(GLOB_RECURSE JAVA_SOURCES
-        ${CMAKE_CURRENT_BINARY_DIR}/FRCNetComm.java
-        src/main/java/*.java)
+    file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
     set(CMAKE_JNI_TARGET true)
 
-    add_jar(hal_jar ${JAVA_SOURCES} INCLUDE_JARS wpiutil_jar OUTPUT_NAME wpiHal GENERATE_NATIVE_HEADERS hal_jni_headers)
+    add_jar(hal_jar ${JAVA_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/FRCNetComm.java INCLUDE_JARS wpiutil_jar OUTPUT_NAME wpiHal GENERATE_NATIVE_HEADERS hal_jni_headers)
 
     get_property(HAL_JAR_FILE TARGET hal_jar PROPERTY JAR_FILE)
     install(FILES ${HAL_JAR_FILE} DESTINATION "${java_lib_dest}")
@@ -120,7 +118,7 @@ if (WITH_JAVA_SOURCE)
     file(GLOB HAL_SIMULATION_SOURCES src/main/java/edu/wpi/first/hal/simulation/*.java)
     file(GLOB HAL_UTIL_SOURCES src/main/java/edu/wpi/first/hal/util/*.java)
     add_jar(hal_src_jar
-    RESOURCES NAMESPACE "edu/wpi/first/hal" ${HAL_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/FRCNetComm.java
+    RESOURCES NAMESPACE "edu/wpi/first/hal" ${HAL_SOURCES} ${WPILIB_BINARY_DIR}/hal/FRCNetComm.java
     NAMESPACE "edu/wpi/first/hal/can" ${HAL_CAN_SOURCES}
     NAMESPACE "edu/wpi/first/hal/communication" src/main/java/edu/wpi/first/hal/communication/NIRioStatus.java
     NAMESPACE "edu/wpi/first/hal/simulation" ${HAL_SIMULATION_SOURCES}
