@@ -136,9 +136,9 @@ if (WITH_JAVA_SOURCE)
   file(GLOB WPIMATH_ESTIMATOR_SOURCES src/main/java/edu/wpi/first/math/estimator/*.java)
   file(GLOB WPIMATH_FILTER_SOURCES src/main/java/edu/wpi/first/math/filter/*.java)
   file(GLOB WPIMATH_GEOMETRY_SOURCES src/main/java/edu/wpi/first/math/geometry/*.java)
-  file(GLOB WPIMATH_INTERPOLATIoN_SOURCES src/main/java/edu/wpi/first/math/interpolation/*.java)
+  file(GLOB WPIMATH_INTERPOLATION_SOURCES src/main/java/edu/wpi/first/math/interpolation/*.java)
   file(GLOB WPIMATH_KINEMATICS_SOURCES src/main/java/edu/wpi/first/math/kinematics/*.java)
-  file(GLOB WPIMATH_NUMBERS_SOURCES ${WPILIB_BINARY_DIR}/wpimath/generated/main/java/edu/wpi/first/math/numbers)
+  file(GLOB WPIMATH_NUMBERS_SOURCES ${WPILIB_BINARY_DIR}/wpimath/generated/main/java/edu/wpi/first/math/numbers/*.java)
   file(GLOB WPIMATH_SPLINE_SOURCES src/main/java/edu/wpi/first/math/spline/*.java)
   file(GLOB WPIMATH_SYSTEM_SOURCES src/main/java/edu/wpi/first/math/system/*.java)
   file(GLOB WPIMATH_SYSTEM_PLANT_SOURCES src/main/java/edu/wpi/first/math/system/plant/*.java)
@@ -150,7 +150,7 @@ if (WITH_JAVA_SOURCE)
   NAMESPACE "edu/wpi/first/math/estimator" ${WPIMATH_ESTIMATOR_SOURCES}
   NAMESPACE "edu/wpi/first/math/filter" ${WPIMATH_FILTER_SOURCES}
   NAMESPACE "edu/wpi/first/math/geometry" ${WPIMATH_GEOMETRY_SOURCES}
-  NAMESPACE "edu/wpi/first/math/interpolation" ${WPIMATH_INTERPOLATIoN_SOURCES}
+  NAMESPACE "edu/wpi/first/math/interpolation" ${WPIMATH_INTERPOLATION_SOURCES}
   NAMESPACE "edu/wpi/first/math/kinematics" ${WPIMATH_KINEMATICS_SOURCES}
   NAMESPACE "edu/wpi/first/math/spline" ${WPIMATH_SPLINE_SOURCES}
   NAMESPACE "edu/wpi/first/math/system" ${WPIMATH_SYSTEM_SOURCES}
