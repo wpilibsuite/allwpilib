@@ -118,7 +118,7 @@ if (WITH_JAVA_SOURCE)
     file(GLOB HAL_SIMULATION_SOURCES src/main/java/edu/wpi/first/hal/simulation/*.java)
     file(GLOB HAL_UTIL_SOURCES src/main/java/edu/wpi/first/hal/util/*.java)
     add_jar(hal_src_jar
-    RESOURCES NAMESPACE "edu/wpi/first/hal" ${HAL_SOURCES} ${WPILIB_BINARY_DIR}/hal/FRCNetComm.java
+    RESOURCES NAMESPACE "edu/wpi/first/hal" ${HAL_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/FRCNetComm.java
     NAMESPACE "edu/wpi/first/hal/can" ${HAL_CAN_SOURCES}
     NAMESPACE "edu/wpi/first/hal/communication" src/main/java/edu/wpi/first/hal/communication/NIRioStatus.java
     NAMESPACE "edu/wpi/first/hal/simulation" ${HAL_SIMULATION_SOURCES}
