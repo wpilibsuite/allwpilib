@@ -45,7 +45,7 @@ if (WITH_JAVA_SOURCE)
     file(GLOB WPILIBJ_SHUFFLEBOARD_SOURCES src/main/java/edu/wpi/first/wpilibj/shuffleboard*.java)
     file(GLOB WPILIBJ_SIMULATION_SOURCES src/main/java/edu/wpi/first/wpilibj/simulation*.java)
     file(GLOB WPILIBJ_SMARTDASHBOARD_SOURCES src/main/java/edu/wpi/first/wpilibj/*.java)
-    file(GLOB WPILIBJ_UTIL_SOURCES src/main/java/edu/wpi/first/wpilibj/*.java)
+    file(GLOB WPILIBJ_UTIL_SOURCES src/main/java/edu/wpi/first/wpilibj/*.java ${CMAKE_CURRENT_BINARY_DIR}/WPILibVersion.java)
     add_jar(wpilibj_src_jar
     RESOURCES NAMESPACE "edu/wpi/first/wpilibj" ${WPILIBJ_SOURCES}
     NAMESPACE "edu/wpi/first/wpilibj/counter" ${WPILIBJ_COUNTER_SOURCES}
@@ -58,7 +58,7 @@ if (WITH_JAVA_SOURCE)
     NAMESPACE "edu/wpi/first/wpilibj/shuffleboard" ${WPILIBJ_SHUFFLEBOARD_SOURCES}
     NAMESPACE "edu/wpi/first/wpilibj/simulation" ${WPILIBJ_SIMULATION_SOURCES}
     NAMESPACE "edu/wpi/first/wpilibj/smartdashboard" ${WPILIBJ_SMARTDASHBOARD_SOURCES}
-    NAMESPACE "edu/wpi/first/wpilibj/util" ${WPILIBJ_UTIL_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/WPILibVersion.java
+    NAMESPACE "edu/wpi/first/wpilibj/util" ${WPILIBJ_UTIL_SOURCES}
     OUTPUT_NAME wpilibj-sources)
 
     get_property(WPILIBJ_SRC_JAR_FILE TARGET wpilibj_src_jar PROPERTY JAR_FILE)
