@@ -71,9 +71,9 @@ if (WITH_JAVA_SOURCE)
   include(UseJava)
   file(GLOB APRILTAG_SOURCES src/main/java/edu/wpi/first/apriltag/*.java)
   add_jar(apriltag_src_jar
-    RESOURCES NAMESPACE "edu/wpi/first/apriltag" ${APRILTAG_SOURCES}
-    NAMESPACE "edu/wpi/first/apriltag/jni" src/main/java/edu/wpi/first/apriltag/jni/AprilTagJNI.java
-    OUTPUT_NAME apriltag-sources)
+  RESOURCES NAMESPACE "edu/wpi/first/apriltag" ${APRILTAG_SOURCES}
+  NAMESPACE "edu/wpi/first/apriltag/jni" src/main/java/edu/wpi/first/apriltag/jni/AprilTagJNI.java
+  OUTPUT_NAME apriltag-sources)
 
   get_property(APRILTAG_SRC_JAR_FILE TARGET apriltag_src_jar PROPERTY JAR_FILE)
   install(FILES ${APRILTAG_SRC_JAR_FILE} DESTINATION "${java_lib_dest}")
