@@ -149,7 +149,7 @@ public final class LinearSystemId {
     }
 
     return new LinearSystem<>(
-        Matrix.mat(N2(), N2()).fill(0, 1, 0, -kV / kA),
+        Matrix.mat(Nat.N2(), Nat.N2()).fill(0, 1, 0, -kV / kA),
         VecBuilder.fill(0, 1 / kA),
         Matrix.eye(Nat.N2()),
         new Matrix<>(Nat.N2(), Nat.N1()));
