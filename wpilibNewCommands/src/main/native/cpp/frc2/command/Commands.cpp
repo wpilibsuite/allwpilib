@@ -25,8 +25,8 @@ CommandPtr cmd::None() {
   return InstantCommand().ToPtr();
 }
 
-CommandPtr cmd::Idle() {
-  return Run([] {});
+CommandPtr cmd::Idle(Requirements requirements) {
+  return Run([] {}, requirements);
 }
 
 CommandPtr cmd::RunOnce(std::function<void()> action,

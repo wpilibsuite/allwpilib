@@ -33,10 +33,11 @@ CommandPtr None();
 /**
  * Constructs a command that does nothing until interrupted.
  *
+ * @param requirements Subsystems to require
  * @return the command
  */
 [[nodiscard]]
-CommandPtr Idle();
+CommandPtr Idle(Requirements requirements = {});
 
 // Action Commands
 
