@@ -205,6 +205,8 @@ class WPILIB_DLLEXPORT LinearSystemId {
                                               units::kilogram_square_meter_t J,
                                               double G);
 
+
+
   /**
    * Create a state-space model of a DC motor system. The states of the system
    * are [angular position, angular velocity], inputs are [voltage], and outputs
@@ -237,7 +239,30 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * @throws IllegalArgumentException if kV &lt;= 0 or kA &lt;= 0.
    * @see <a href="https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
    */
-  static LinearSystem<2, 1, 2> DCMotorSystem(double kV, double kA);
+  template <typename Distance>
+    requires std::same_as<units::meter, Distance> ||
+             std::same_as<units::radian, Distance>
+  static LinearSystem<2, 1, 2> DCMotorSystem(
+      decltype(1_V / Velocity_t<Distance>(1)) kV,
+      decltype(1_V / Acceleration_t<Distance>(1)) kA){
+    if (kV <= decltype(kV){0}) {
+      throw std::domain_error("Kv must be greater than zero.");
+    }
+    if (kA <= decltype(kA){0}) {
+      throw std::domain_error("Ka must be greater than zero.");
+    }
+
+      Matrixd<2, 2> A{{0.0, 1.0}, {0.0, -kV.value() / kA.value()}};
+      Matrixd<2, 1> B{0.0, 1.0 / kA.value()};
+      Matrixd<2, 2> C{{1.0, 0.0}, {0.0, 1.0}};
+      Matrixd<1, 1> D{0.0};
+
+      return LinearSystem<2, 1, 2>(A, B, C, D);
+    }
+
+
+
+
   /**
    * Create a state-space model of differential drive drivetrain. In this model,
    * the states are [left velocity, right velocity], the inputs are [left
