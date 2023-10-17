@@ -245,7 +245,7 @@ class WPILIB_DLLEXPORT LinearSystemId {
              std::same_as<units::radian, Distance>
   static LinearSystem<2, 1, 2> DCMotorSystem(
       decltype(1_V / Velocity_t<Distance>(1)) kV,
-      decltype(1_V / Acceleration_t<Distance>(1)) kA){
+      decltype(1_V / Acceleration_t<Distance>(1)) kA) {
     if (kV <= decltype(kV){0}) {
       throw std::domain_error("Kv must be greater than zero.");
     }
@@ -253,13 +253,13 @@ class WPILIB_DLLEXPORT LinearSystemId {
       throw std::domain_error("Ka must be greater than zero.");
     }
 
-      Matrixd<2, 2> A{{0.0, 1.0}, {0.0, -kV.value() / kA.value()}};
-      Matrixd<2, 1> B{0.0, 1.0 / kA.value()};
-      Matrixd<2, 2> C{{1.0, 0.0}, {0.0, 1.0}};
-      Matrixd<1, 1> D{0.0};
+    Matrixd<2, 2> A{{0.0, 1.0}, {0.0, -kV.value() / kA.value()}};
+    Matrixd<2, 1> B{0.0, 1.0 / kA.value()};
+    Matrixd<2, 2> C{{1.0, 0.0}, {0.0, 1.0}};
+    Matrixd<1, 1> D{0.0};
 
-      return LinearSystem<2, 1, 2>(A, B, C, D);
-    }
+    return LinearSystem<2, 1, 2>(A, B, C, D);
+  }
 
 
 
