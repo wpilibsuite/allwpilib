@@ -238,6 +238,7 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * @return A LinearSystem representing the given characterized constants.
    * @throws IllegalArgumentException if kV &lt;= 0 or kA &lt;= 0.
    * @see <a href="https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
+   * 
    */
   template <typename Distance>
     requires std::same_as<units::meter, Distance> ||
