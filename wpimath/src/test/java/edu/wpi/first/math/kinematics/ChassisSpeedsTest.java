@@ -56,6 +56,17 @@ class ChassisSpeedsTest {
   }
 
   @Test
+  void testFromRobotRelativeSpeeds() {
+    final var chassisSpeeds =
+        ChassisSpeeds.fromRobotRelativeSpeeds(1.0, 0.0, 0.5, Rotation2d.fromDegrees(45.0));
+
+    assertAll(
+        () -> assertEquals(1.0 / Math.sqrt(2.0), chassisSpeeds.vxMetersPerSecond, kEpsilon),
+        () -> assertEquals(1.0 / Math.sqrt(2.0), chassisSpeeds.vyMetersPerSecond, kEpsilon),
+        () -> assertEquals(0.5, chassisSpeeds.omegaRadiansPerSecond, kEpsilon));
+  }
+
+  @Test
   void testPlus() {
     final var left = new ChassisSpeeds(1.0, 0.5, 0.75);
     final var right = new ChassisSpeeds(2.0, 1.5, 0.25);
