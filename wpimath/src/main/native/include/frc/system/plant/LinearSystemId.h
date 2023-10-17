@@ -257,7 +257,7 @@ class WPILIB_DLLEXPORT LinearSystemId {
     Matrixd<2, 2> A{{0.0, 1.0}, {0.0, -kV.value() / kA.value()}};
     Matrixd<2, 1> B{0.0, 1.0 / kA.value()};
     Matrixd<2, 2> C{{1.0, 0.0}, {0.0, 1.0}};
-    Matrixd<1, 1> D{0.0};
+    Matrixd<2, 1> D{{0.0}, {0.0}};
 
     return LinearSystem<2, 1, 2>(A, B, C, D);
   }
