@@ -261,9 +261,6 @@ class WPILIB_DLLEXPORT LinearSystemId {
     return LinearSystem<2, 1, 2>(A, B, C, D);
   }
 
-
-
-
   /**
    * Create a state-space model of differential drive drivetrain. In this model,
    * the states are [left velocity, right velocity], the inputs are [left
