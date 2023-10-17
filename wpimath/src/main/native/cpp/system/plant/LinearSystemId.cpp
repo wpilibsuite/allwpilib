@@ -155,6 +155,25 @@ LinearSystem<2, 1, 2> LinearSystemId::DCMotorSystem(
   return LinearSystem<2, 1, 2>(A, B, C, D);
 }
 
+LinearSystem<2, 1, 2> LinearSystemId::DCMotorSystem(
+    double kV, double kA) {
+  if (kV <= 0.0) {
+    throw std::domain_error("Kv must be greater than zero.");
+  }
+  if (kA <= 0.0) {
+    throw std::domain_error("Ka must be greater than zero.");
+  }
+
+  Matrixd<2, 2> A{
+      {0.0, 1.0},
+      {0.0, -kV / kA}};
+  Matrixd<2, 1> B{0.0, 1.0 / kA};
+  Matrixd<2, 2> C{{1.0, 0.0}, {0.0, 1.0}};
+  Matrixd<2, 1> D{0.0, 0.0};
+
+  return LinearSystem<2, 1, 2>(A, B, C, D);
+}
+
 LinearSystem<2, 2, 2> LinearSystemId::DrivetrainVelocitySystem(
     const DCMotor& motor, units::kilogram_t mass, units::meter_t r,
     units::meter_t rb, units::kilogram_square_meter_t J, double G) {

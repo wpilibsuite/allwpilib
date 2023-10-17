@@ -218,6 +218,26 @@ class WPILIB_DLLEXPORT LinearSystemId {
   static LinearSystem<2, 1, 2> DCMotorSystem(DCMotor motor,
                                              units::kilogram_square_meter_t J,
                                              double G);
+
+  /**
+   * Create a state-space model of a DC motor system. The states of the system are [angular
+   * position, angular velocity], inputs are [voltage], and outputs are [angular position, angular
+   * velocity].
+   *
+   * <p>The distance unit you choose MUST be an SI unit (i.e. meters or radians). You can use the
+   * {@link edu.wpi.first.math.util.Units} class for converting between unit types.
+   *
+   * <p>The parameters provided by the user are from this feedforward model:
+   *
+   * <p>u = K_v v + K_a a
+   *
+   * @param kV The velocity gain, in volts/(unit/sec)
+   * @param kA The acceleration gain, in volts/(unit/sec^2)
+   * @return A LinearSystem representing the given characterized constants.
+   * @throws IllegalArgumentException if kV &lt;= 0 or kA &lt;= 0.
+   * @see <a href="https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
+   */
+  static LinearSystem<2, 1, 2> DCMotorSystem(double kV, double kA);
   /**
    * Create a state-space model of differential drive drivetrain. In this model,
    * the states are [left velocity, right velocity], the inputs are [left
