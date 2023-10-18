@@ -9,11 +9,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class ExponentialProfileTest {
   private static final double kDt = 0.01;
+  private static final SimpleMotorFeedforward feedforward =
+      new SimpleMotorFeedforward(0, 2.5629, 0.43277);
+  private static final ExponentialProfile.Constraints constraints =
+      ExponentialProfile.Constraints.fromCharacteristics(12, 2.5629, 0.43277);
 
   /**
    * Asserts "val1" is within "eps" of "val2".
@@ -35,16 +40,26 @@ class ExponentialProfileTest {
         () -> assertNear(val1.position, val2.position, eps));
   }
 
+  private static ExponentialProfile.State checkDynamics(
+      ExponentialProfile profile, ExponentialProfile.State current, ExponentialProfile.State goal) {
+    var next = profile.calculate(kDt, current, goal);
+
+    var signal = feedforward.calculate(current.velocity, next.velocity, kDt);
+
+    assertTrue(Math.abs(signal) < constraints.maxInput + 1e-9);
+
+    return next;
+  }
+
   @Test
   void reachesGoal() {
-    ExponentialProfile.Constraints constraints =
-        ExponentialProfile.Constraints.fromCharacteristics(12, 2.5629, 0.43277);
+    ExponentialProfile profile = new ExponentialProfile(constraints);
+    
     ExponentialProfile.State goal = new ExponentialProfile.State(10, 0);
     ExponentialProfile.State state = new ExponentialProfile.State(0, 0);
 
-    ExponentialProfile profile = new ExponentialProfile(constraints);
     for (int i = 0; i < 450; ++i) {
-      state = profile.calculate(kDt, state, goal);
+      state = checkDynamics(profile, state, goal);
     }
     assertEquals(state, goal);
   }
@@ -53,8 +68,6 @@ class ExponentialProfileTest {
   // moving faster than the new max is handled correctly
   @Test
   void posContinuousUnderVelChange() {
-    ExponentialProfile.Constraints constraints =
-        ExponentialProfile.Constraints.fromCharacteristics(12, 2.5629, 0.43277);
     ExponentialProfile profile = new ExponentialProfile(constraints);
 
     ExponentialProfile.State goal = new ExponentialProfile.State(10, 0);
@@ -67,7 +80,7 @@ class ExponentialProfileTest {
                 ExponentialProfile.Constraints.fromStateSpace(9, constraints.A, constraints.B));
       }
 
-      state = profile.calculate(kDt, state, goal);
+      state = checkDynamics(profile, state, goal);
     }
     assertEquals(state, goal);
   }
@@ -76,8 +89,6 @@ class ExponentialProfileTest {
   // moving faster than the new max is handled correctly
   @Test
   void posContinuousUnderVelChangeBackward() {
-    ExponentialProfile.Constraints constraints =
-        ExponentialProfile.Constraints.fromCharacteristics(12, 2.5629, 0.43277);
     ExponentialProfile profile = new ExponentialProfile(constraints);
 
     ExponentialProfile.State goal = new ExponentialProfile.State(-10, 0);
@@ -90,7 +101,7 @@ class ExponentialProfileTest {
                 ExponentialProfile.Constraints.fromStateSpace(9, constraints.A, constraints.B));
       }
 
-      state = profile.calculate(kDt, state, goal);
+      state = checkDynamics(profile, state, goal);
     }
     assertEquals(state, goal);
   }
@@ -98,35 +109,31 @@ class ExponentialProfileTest {
   // There is some somewhat tricky code for dealing with going backwards
   @Test
   void backwards() {
-    ExponentialProfile.Constraints constraints =
-        ExponentialProfile.Constraints.fromCharacteristics(12, 2.5629, 0.43277);
     ExponentialProfile.State goal = new ExponentialProfile.State(-10, 0);
     ExponentialProfile.State state = new ExponentialProfile.State(0, 0);
 
     ExponentialProfile profile = new ExponentialProfile(constraints);
 
     for (int i = 0; i < 400; ++i) {
-      state = profile.calculate(kDt, state, goal);
+      state = checkDynamics(profile, state, goal);
     }
     assertEquals(state, goal);
   }
 
   @Test
   void switchGoalInMiddle() {
-    ExponentialProfile.Constraints constraints =
-        ExponentialProfile.Constraints.fromCharacteristics(12, 2.5629, 0.43277);
     ExponentialProfile.State goal = new ExponentialProfile.State(-10, 0);
     ExponentialProfile.State state = new ExponentialProfile.State(0, 0);
 
     ExponentialProfile profile = new ExponentialProfile(constraints);
     for (int i = 0; i < 50; ++i) {
-      state = profile.calculate(kDt, state, goal);
+      state = checkDynamics(profile, state, goal);
     }
     assertNotEquals(state, goal);
 
     goal = new ExponentialProfile.State(0.0, 0.0);
     for (int i = 0; i < 100; ++i) {
-      state = profile.calculate(kDt, state, goal);
+      state = checkDynamics(profile, state, goal);
     }
     assertEquals(state, goal);
   }
@@ -134,15 +141,13 @@ class ExponentialProfileTest {
   // Checks to make sure that it hits top speed
   @Test
   void topSpeed() {
-    ExponentialProfile.Constraints constraints =
-        ExponentialProfile.Constraints.fromCharacteristics(12, 2.5629, 0.43277);
     ExponentialProfile.State goal = new ExponentialProfile.State(40, 0);
     ExponentialProfile.State state = new ExponentialProfile.State(0, 0);
 
     ExponentialProfile profile = new ExponentialProfile(constraints);
     double maxSpeed = 0;
     for (int i = 0; i < 900; ++i) {
-      state = profile.calculate(kDt, state, goal);
+      state = checkDynamics(profile, state, goal);
       maxSpeed = Math.max(maxSpeed, state.velocity);
     }
 
@@ -152,15 +157,13 @@ class ExponentialProfileTest {
 
   @Test
   void topSpeedBackward() {
-    ExponentialProfile.Constraints constraints =
-        ExponentialProfile.Constraints.fromCharacteristics(12, 2.5629, 0.43277);
     ExponentialProfile.State goal = new ExponentialProfile.State(-40, 0);
     ExponentialProfile.State state = new ExponentialProfile.State(0, 0);
 
     ExponentialProfile profile = new ExponentialProfile(constraints);
     double maxSpeed = 0;
     for (int i = 0; i < 900; ++i) {
-      state = profile.calculate(kDt, state, goal);
+      state = checkDynamics(profile, state, goal);
       maxSpeed = Math.min(maxSpeed, state.velocity);
     }
 
@@ -170,14 +173,12 @@ class ExponentialProfileTest {
 
   @Test
   void largeInitialVelocity() {
-    ExponentialProfile.Constraints constraints =
-        ExponentialProfile.Constraints.fromCharacteristics(12, 2.5629, 0.43277);
     ExponentialProfile.State goal = new ExponentialProfile.State(40, 0);
     ExponentialProfile.State state = new ExponentialProfile.State(0, 8);
 
     ExponentialProfile profile = new ExponentialProfile(constraints);
     for (int i = 0; i < 900; ++i) {
-      state = profile.calculate(kDt, state, goal);
+      state = checkDynamics(profile, state, goal);
     }
 
     assertEquals(state, goal);
@@ -185,14 +186,12 @@ class ExponentialProfileTest {
 
   @Test
   void largeNegativeInitialVelocity() {
-    ExponentialProfile.Constraints constraints =
-        ExponentialProfile.Constraints.fromCharacteristics(12, 2.5629, 0.43277);
     ExponentialProfile.State goal = new ExponentialProfile.State(-40, 0);
     ExponentialProfile.State state = new ExponentialProfile.State(0, -8);
 
     ExponentialProfile profile = new ExponentialProfile(constraints);
     for (int i = 0; i < 900; ++i) {
-      state = profile.calculate(kDt, state, goal);
+      state = checkDynamics(profile, state, goal);
     }
 
     assertEquals(state, goal);
@@ -299,7 +298,6 @@ class ExponentialProfileTest {
                 new ExponentialProfile.State(-1, 0),
                 new ExponentialProfile.State(-0.785, -4.346)));
 
-    var constraints = ExponentialProfile.Constraints.fromCharacteristics(12, 2.5629, 0.43277);
     var profile = new ExponentialProfile(constraints);
 
     for (var testCase : testCases) {
@@ -310,22 +308,18 @@ class ExponentialProfileTest {
 
   @Test
   void timingToCurrent() {
-    ExponentialProfile.Constraints constraints =
-        ExponentialProfile.Constraints.fromCharacteristics(12, 2.5629, 0.43277);
     ExponentialProfile.State goal = new ExponentialProfile.State(2, 0);
     ExponentialProfile.State state = new ExponentialProfile.State(0, 0);
 
     ExponentialProfile profile = new ExponentialProfile(constraints);
     for (int i = 0; i < 400; i++) {
-      state = profile.calculate(kDt, state, goal);
+      state = checkDynamics(profile, state, goal);
       assertNear(profile.timeLeftUntil(state, state), 0, 2e-2);
     }
   }
 
   @Test
   void timingToGoal() {
-    ExponentialProfile.Constraints constraints =
-        ExponentialProfile.Constraints.fromCharacteristics(12, 2.5629, 0.43277);
     ExponentialProfile profile = new ExponentialProfile(constraints);
 
     ExponentialProfile.State goal = new ExponentialProfile.State(2, 0);
@@ -334,7 +328,8 @@ class ExponentialProfileTest {
     double predictedTimeLeft = profile.timeLeftUntil(state, goal);
     boolean reachedGoal = false;
     for (int i = 0; i < 400; i++) {
-      state = profile.calculate(kDt, state, goal);
+      state = checkDynamics(profile, state, goal);
+
       if (!reachedGoal && state.equals(goal)) {
         // Expected value using for loop index is just an approximation since
         // the time left in the profile doesn't increase linearly at the
@@ -347,8 +342,6 @@ class ExponentialProfileTest {
 
   @Test
   void timingToNegativeGoal() {
-    ExponentialProfile.Constraints constraints =
-        ExponentialProfile.Constraints.fromCharacteristics(12, 2.5629, 0.43277);
     ExponentialProfile profile = new ExponentialProfile(constraints);
 
     ExponentialProfile.State goal = new ExponentialProfile.State(-2, 0);
@@ -357,7 +350,8 @@ class ExponentialProfileTest {
     double predictedTimeLeft = profile.timeLeftUntil(state, goal);
     boolean reachedGoal = false;
     for (int i = 0; i < 400; i++) {
-      state = profile.calculate(kDt, state, goal);
+      state = checkDynamics(profile, state, goal);
+
       if (!reachedGoal && state.equals(goal)) {
         // Expected value using for loop index is just an approximation since
         // the time left in the profile doesn't increase linearly at the

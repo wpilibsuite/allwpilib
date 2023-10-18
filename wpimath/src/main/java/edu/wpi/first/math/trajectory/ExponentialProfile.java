@@ -276,14 +276,21 @@ public class ExponentialProfile {
     if (Math.abs(Math.signum(input) * m_constraints.maxVelocity() - inflectionPoint.velocity)
         < epsilon) {
       double solvableV = inflectionPoint.velocity;
-      if (Math.abs(current.velocity) > m_constraints.maxVelocity()) {
-        solvableV += Math.signum(u) * epsilon;
+      double t_to_solvable_v;
+      double x_at_solvable_v;
+      if (Math.abs(current.velocity - inflectionPoint.velocity) < epsilon) {
+        t_to_solvable_v = 0;
+        x_at_solvable_v = current.position;
       } else {
-        solvableV -= Math.signum(u) * epsilon;
-      }
+        if (Math.abs(current.velocity) > m_constraints.maxVelocity()) {
+          solvableV += Math.signum(u) * epsilon;
+        } else {
+          solvableV -= Math.signum(u) * epsilon;
+        }
 
-      var t_to_solvable_v = computeTimeFromVelocity(solvableV, u, current.velocity);
-      var x_at_solvable_v = computeDistanceFromVelocity(solvableV, u, current);
+        t_to_solvable_v = computeTimeFromVelocity(solvableV, u, current.velocity);
+        x_at_solvable_v = computeDistanceFromVelocity(solvableV, u, current);
+      }
 
       inflectionT_forward =
           t_to_solvable_v
