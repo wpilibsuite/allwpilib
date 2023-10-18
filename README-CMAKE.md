@@ -35,7 +35,7 @@ The following build options are available:
 * `WITH_JAVA` (ON Default)
   * This option will enable Java and JNI builds. If this is on, `WITH_SHARED_LIBS` must be on. Otherwise CMake will error.
 * `WITH_JAVA_SOURCE` (ON Default)
-  * This option will build Java source jars for each enabled Java library. This does not require `WITH_JAVA` to be on, allowing source jars to be built without the compiled jars if desired.
+  * This option will build Java source JARs for each enabled Java library. This does not require `WITH_JAVA` to be on, allowing source JARs to be built without the compiled JARs if desired.
 * `WITH_SHARED_LIBS` (ON Default)
   * This option will cause cmake to build static libraries instead of shared libraries. If this is off, `WITH_JAVA` must be off. Otherwise CMake will error.
 * `WITH_CSCORE` (ON Default)
