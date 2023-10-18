@@ -13,7 +13,7 @@ from upstream_utils import (
 
 
 def main():
-    upstream_root = clone_repo("https://github.com/ludocode/mpack", "v1.1")
+    upstream_root = clone_repo("https://github.com/ludocode/mpack", "v1.1.1")
     wpilib_root = get_repo_root()
     wpiutil = os.path.join(wpilib_root, "wpiutil")
 

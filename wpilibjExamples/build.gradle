@@ -11,20 +11,6 @@ ext {
 
 apply from: "${rootDir}/shared/opencv.gradle"
 
-test {
-    useJUnitPlatform()
-    systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
-    testLogging {
-        events "failed"
-        exceptionFormat "full"
-    }
-    finalizedBy jacocoTestReport
-}
-
-if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxarm32') || project.hasProperty('onlylinuxarm64') || project.hasProperty('onlywindowsarm64')) {
-    test.enabled = false
-}
-
 dependencies {
     implementation project(':wpilibj')
     implementation project(':apriltag')
@@ -36,14 +22,16 @@ dependencies {
     implementation project(':cscore')
     implementation project(':cameraserver')
     implementation project(':wpilibNewCommands')
+    implementation project(':romiVendordep')
+    implementation project(':xrpVendordep')
 
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
-    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.8.2'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.10.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.0'
 }
 
 jacoco {
-    toolVersion = "0.8.8"
+    toolVersion = "0.8.10"
 }
 
 jacocoTestReport {
@@ -108,6 +96,8 @@ model {
             }
             binaries.all { binary ->
                 lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'
+                lib project: ':romiVendordep', library: 'romiVendordep', linkage: 'shared'
+                lib project: ':xrpVendordep', library: 'xrpVendordep', linkage: 'shared'
                 lib project: ':apriltag', library: 'apriltag', linkage: 'shared'
                 lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
@@ -195,6 +185,14 @@ model {
                                     testTask.useJUnitPlatform()
                                     testTask.filter {
                                         includeTestsMatching("edu.wpi.first.wpilibj.examples.${entry.foldername}.*")
+                                        // armsimulation regularly fails on CI Win64Debug
+                                        if (project.hasProperty('ciDebugOnly')) {
+                                            excludeTestsMatching("edu.wpi.first.wpilibj.examples.armsimulation.*")
+                                        }
+                                        setFailOnNoMatchingTests(false)
+                                    }
+                                    test.filter {
+                                        excludeTestsMatching("edu.wpi.first.wpilibj.examples.${entry.foldername}.*")
                                         setFailOnNoMatchingTests(false)
                                     }
                                     testTask.classpath = sourceSets.test.runtimeClasspath
@@ -209,6 +207,11 @@ model {
                                     testTask.environment 'LD_LIBRARY_PATH', filePath
                                     testTask.environment 'DYLD_LIBRARY_PATH', filePath
                                     testTask.workingDir filePath
+
+                                    if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxarm32') || project.hasProperty('onlylinuxarm64') || project.hasProperty('onlywindowsarm64')) {
+                                        testTask.enabled = false
+                                    }
+                                    test.dependsOn(testTask)
                                 }
                             }
 

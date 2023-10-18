@@ -267,17 +267,6 @@ class CameraServer {
    */
   static void RemoveCamera(std::string_view name);
 
-  /**
-   * Sets the size of the image to use. Use the public kSize constants to set
-   * the correct mode, or set it directly on a camera and call the appropriate
-   * StartAutomaticCapture method.
-   *
-   * @deprecated Use SetResolution on the UsbCamera returned by
-   *             StartAutomaticCapture() instead.
-   * @param size The size to use
-   */
-  static void SetSize(int size);
-
  private:
   CameraServer() = default;
 };

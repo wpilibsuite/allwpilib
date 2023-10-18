@@ -8,7 +8,8 @@
 #include <stdexcept>
 #include <utility>
 
-#include "Eigen/QR"
+#include <Eigen/Core>
+#include <Eigen/QR>
 
 using namespace frc;
 
@@ -18,7 +19,7 @@ CoordinateSystem::CoordinateSystem(const CoordinateAxis& positiveX,
   // Construct a change of basis matrix from the source coordinate system to the
   // NWU coordinate system. Each column vector in the change of basis matrix is
   // one of the old basis vectors mapped to its representation in the new basis.
-  Matrixd<3, 3> R;
+  Eigen::Matrix3d R;
   R.block<3, 1>(0, 0) = positiveX.m_axis;
   R.block<3, 1>(0, 1) = positiveY.m_axis;
   R.block<3, 1>(0, 2) = positiveZ.m_axis;

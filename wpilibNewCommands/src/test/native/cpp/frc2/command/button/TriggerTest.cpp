@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <frc/simulation/SimHooks.h>
+#include <gtest/gtest.h>
 
 #include "../CommandTestBase.h"
 #include "frc2/command/CommandPtr.h"
@@ -11,7 +12,6 @@
 #include "frc2/command/RunCommand.h"
 #include "frc2/command/WaitUntilCommand.h"
 #include "frc2/command/button/Trigger.h"
-#include "gtest/gtest.h"
 
 using namespace frc2;
 class TriggerTest : public CommandTestBase {};

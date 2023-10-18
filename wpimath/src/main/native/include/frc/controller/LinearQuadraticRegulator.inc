@@ -7,13 +7,14 @@
 #include <stdexcept>
 #include <string>
 
-#include "Eigen/Cholesky"
+#include <Eigen/Cholesky>
+#include <unsupported/Eigen/MatrixFunctions>
+
 #include "frc/DARE.h"
 #include "frc/StateSpaceUtil.h"
 #include "frc/controller/LinearQuadraticRegulator.h"
 #include "frc/fmt/Eigen.h"
 #include "frc/system/Discretization.h"
-#include "unsupported/Eigen/MatrixFunctions"
 #include "wpimath/MathShared.h"
 
 namespace frc {

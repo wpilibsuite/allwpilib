@@ -5,8 +5,9 @@
 #include <cmath>
 #include <cstdlib>
 
+#include <gtest/gtest.h>
+
 #include "frc/geometry/Pose2d.h"
-#include "gtest/gtest.h"
 
 using namespace frc;
 

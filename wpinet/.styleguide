@@ -32,5 +32,7 @@ includeGuardRoots {
 
 includeOtherLibs {
   ^fmt/
+  ^gmock/
+  ^gtest/
   ^wpi/
 }

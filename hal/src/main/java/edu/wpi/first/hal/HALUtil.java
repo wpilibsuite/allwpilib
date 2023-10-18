@@ -62,6 +62,14 @@ public final class HALUtil extends JNIWrapper {
   public static native String getComments();
 
   /**
+   * Returns the team number configured for the robot controller.
+   *
+   * @return team number, or 0 if not found.
+   * @see "HAL_GetTeamNumber"
+   */
+  public static native int getTeamNumber();
+
+  /**
    * Reads the microsecond-resolution timer on the FPGA.
    *
    * @return The current time in microseconds according to the FPGA (since FPGA reset).

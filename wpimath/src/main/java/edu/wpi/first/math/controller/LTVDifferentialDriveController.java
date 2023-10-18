@@ -4,6 +4,7 @@
 
 package edu.wpi.first.math.controller;
 
+import edu.wpi.first.math.DARE;
 import edu.wpi.first.math.InterpolatingMatrixTreeMap;
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.MathUtil;
@@ -15,14 +16,22 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.numbers.N5;
+import edu.wpi.first.math.system.Discretization;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.trajectory.Trajectory;
 
 /**
  * The linear time-varying differential drive controller has a similar form to the LQR, but the
- * model used to compute the controller gain is the nonlinear model linearized around the
- * drivetrain's current state. We precomputed gains for important places in our state-space, then
- * interpolated between them with a LUT to save computational resources.
+ * model used to compute the controller gain is the nonlinear differential drive model linearized
+ * around the drivetrain's current state. We precompute gains for important places in our
+ * state-space, then interpolate between them with a lookup table to save computational resources.
+ *
+ * <p>This controller has a flat hierarchy with pose and wheel velocity references and voltage
+ * outputs. This is different from a Ramsete controller's nested hierarchy where the top-level
+ * controller has a pose reference and chassis velocity command outputs, and the low-level
+ * controller has wheel velocity references and voltage outputs. Flat hierarchies are easier to tune
+ * in one shot. Furthermore, this controller is more optimal in the "least-squares error" sense than
+ * a controller based on Ramsete.
  *
  * <p>See section 8.7 in Controls Engineering in FRC for a derivation of the control law we used
  * shown in theorem 8.7.4.
@@ -146,11 +155,26 @@ public class LTVDifferentialDriveController {
       // The DARE is ill-conditioned if the velocity is close to zero, so don't
       // let the system stop.
       if (Math.abs(velocity) < 1e-4) {
-        m_table.put(velocity, new Matrix<>(Nat.N2(), Nat.N5()));
+        A.set(State.kY.value, State.kHeading.value, 1e-4);
       } else {
         A.set(State.kY.value, State.kHeading.value, velocity);
-        m_table.put(velocity, new LinearQuadraticRegulator<N5, N2, N5>(A, B, Q, R, dt).getK());
       }
+
+      var discABPair = Discretization.discretizeAB(A, B, dt);
+      var discA = discABPair.getFirst();
+      var discB = discABPair.getSecond();
+
+      var S = DARE.dareDetail(discA, discB, Q, R);
+
+      // K = (BᵀSB + R)⁻¹BᵀSA
+      m_table.put(
+          velocity,
+          discB
+              .transpose()
+              .times(S)
+              .times(discB)
+              .plus(R)
+              .solve(discB.transpose().times(S).times(discA)));
     }
   }
 

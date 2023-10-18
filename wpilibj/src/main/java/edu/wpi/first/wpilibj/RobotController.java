@@ -58,6 +58,15 @@ public final class RobotController {
   }
 
   /**
+   * Returns the team number configured for the robot controller.
+   *
+   * @return team number, or 0 if not found.
+   */
+  public static int getTeamNumber() {
+    return HALUtil.getTeamNumber();
+  }
+
+  /**
    * Read the microsecond timer from the FPGA.
    *
    * @return The current time in microseconds according to the FPGA.
@@ -110,6 +119,15 @@ public final class RobotController {
    */
   public static boolean getRSLState() {
     return HAL.getRSLState();
+  }
+
+  /**
+   * Gets if the system time is valid.
+   *
+   * @return True if the system time is valid, false otherwise
+   */
+  public static boolean isSystemTimeValid() {
+    return HAL.getSystemTimeValid();
   }
 
   /**

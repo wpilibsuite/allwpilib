@@ -6,10 +6,9 @@
 
 #include <concepts>
 
+#include <Eigen/Core>
+#include <Eigen/SparseCore>
 #include <fmt/format.h>
-
-#include "Eigen/Core"
-#include "Eigen/SparseCore"
 
 /**
  * Formatter for classes derived from Eigen::MatrixBase<Derived> or

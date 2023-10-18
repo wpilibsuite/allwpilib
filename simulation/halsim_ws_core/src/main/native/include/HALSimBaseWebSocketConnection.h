@@ -6,7 +6,7 @@
 
 #include <memory>
 
-#include <wpi/json.h>
+#include <wpi/json_fwd.h>
 
 namespace wpilibws {
 

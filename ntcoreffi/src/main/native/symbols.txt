@@ -1,3 +1,9 @@
+DLM_GetLog
+DLM_GetLogDir
+DLM_Log
+DLM_LogNetworkTables
+DLM_SignalNewDSDataOccur
+DLM_Start
 NT_AddListener
 NT_AddListenerMultiple
 NT_AddListenerSingle
@@ -244,6 +250,7 @@ WPI_DestroySemaphore
 WPI_DestroySignalObject
 WPI_GetSystemTime
 WPI_Impl_SetupNowRio
+WPI_Impl_ShutdownNowRio
 WPI_Now
 WPI_NowDefault
 WPI_ReleaseSemaphore

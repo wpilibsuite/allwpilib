@@ -11,7 +11,7 @@
 using namespace ShooterConstants;
 
 ShooterSubsystem::ShooterSubsystem()
-    : PIDSubsystem{frc2::PIDController{kP, kI, kD}},
+    : PIDSubsystem{frc::PIDController{kP, kI, kD}},
       m_shooterMotor(kShooterMotorPort),
       m_feederMotor(kFeederMotorPort),
       m_shooterEncoder(kEncoderPorts[0], kEncoderPorts[1]),

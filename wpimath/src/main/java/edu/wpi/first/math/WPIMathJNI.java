@@ -43,8 +43,103 @@ public final class WPIMathJNI {
     libraryLoaded = true;
   }
 
+  // DARE wrappers
+
   /**
-   * Solves the discrete alegebraic Riccati equation.
+   * Computes the unique stabilizing solution X to the discrete-time algebraic Riccati equation.
+   *
+   * <p>AᵀXA − X − AᵀXB(BᵀXB + R)⁻¹BᵀXA + Q = 0
+   *
+   * <p>This internal function skips expensive precondition checks for increased performance. The
+   * solver may hang if any of the following occur:
+   *
+   * <ul>
+   *   <li>Q isn't symmetric positive semidefinite
+   *   <li>R isn't symmetric positive definite
+   *   <li>The (A, B) pair isn't stabilizable
+   *   <li>The (A, C) pair where Q = CᵀC isn't detectable
+   * </ul>
+   *
+   * <p>Only use this function if you're sure the preconditions are met. Solves the discrete
+   * alegebraic Riccati equation.
+   *
+   * @param A Array containing elements of A in row-major order.
+   * @param B Array containing elements of B in row-major order.
+   * @param Q Array containing elements of Q in row-major order.
+   * @param R Array containing elements of R in row-major order.
+   * @param states Number of states in A matrix.
+   * @param inputs Number of inputs in B matrix.
+   * @param S Array storage for DARE solution.
+   */
+  public static native void dareDetailABQR(
+      double[] A, double[] B, double[] Q, double[] R, int states, int inputs, double[] S);
+
+  /**
+   * Computes the unique stabilizing solution X to the discrete-time algebraic Riccati equation.
+   *
+   * <p>AᵀXA − X − (AᵀXB + N)(BᵀXB + R)⁻¹(BᵀXA + Nᵀ) + Q = 0
+   *
+   * <p>This overload of the DARE is useful for finding the control law uₖ that minimizes the
+   * following cost function subject to xₖ₊₁ = Axₖ + Buₖ.
+   *
+   * <pre>
+   *     ∞ [xₖ]ᵀ[Q  N][xₖ]
+   * J = Σ [uₖ] [Nᵀ R][uₖ] ΔT
+   *    k=0
+   * </pre>
+   *
+   * <p>This is a more general form of the following. The linear-quadratic regulator is the feedback
+   * control law uₖ that minimizes the following cost function subject to xₖ₊₁ = Axₖ + Buₖ:
+   *
+   * <pre>
+   *     ∞
+   * J = Σ (xₖᵀQxₖ + uₖᵀRuₖ) ΔT
+   *    k=0
+   * </pre>
+   *
+   * <p>This can be refactored as:
+   *
+   * <pre>
+   *     ∞ [xₖ]ᵀ[Q 0][xₖ]
+   * J = Σ [uₖ] [0 R][uₖ] ΔT
+   *    k=0
+   * </pre>
+   *
+   * <p>This internal function skips expensive precondition checks for increased performance. The
+   * solver may hang if any of the following occur:
+   *
+   * <ul>
+   *   <li>Q − NR⁻¹Nᵀ isn't symmetric positive semidefinite
+   *   <li>R isn't symmetric positive definite
+   *   <li>The (A − BR⁻¹Nᵀ, B) pair isn't stabilizable
+   *   <li>The (A, C) pair where Q = CᵀC isn't detectable
+   * </ul>
+   *
+   * <p>Only use this function if you're sure the preconditions are met.
+   *
+   * @param A Array containing elements of A in row-major order.
+   * @param B Array containing elements of B in row-major order.
+   * @param Q Array containing elements of Q in row-major order.
+   * @param R Array containing elements of R in row-major order.
+   * @param N Array containing elements of N in row-major order.
+   * @param states Number of states in A matrix.
+   * @param inputs Number of inputs in B matrix.
+   * @param S Array storage for DARE solution.
+   */
+  public static native void dareDetailABQRN(
+      double[] A,
+      double[] B,
+      double[] Q,
+      double[] R,
+      double[] N,
+      int states,
+      int inputs,
+      double[] S);
+
+  /**
+   * Computes the unique stabilizing solution X to the discrete-time algebraic Riccati equation.
+   *
+   * <p>AᵀXA − X − AᵀXB(BᵀXB + R)⁻¹BᵀXA + Q = 0
    *
    * @param A Array containing elements of A in row-major order.
    * @param B Array containing elements of B in row-major order.
@@ -62,7 +157,35 @@ public final class WPIMathJNI {
       double[] A, double[] B, double[] Q, double[] R, int states, int inputs, double[] S);
 
   /**
-   * Solves the discrete alegebraic Riccati equation.
+   * Computes the unique stabilizing solution X to the discrete-time algebraic Riccati equation.
+   *
+   * <p>AᵀXA − X − (AᵀXB + N)(BᵀXB + R)⁻¹(BᵀXA + Nᵀ) + Q = 0
+   *
+   * <p>This overload of the DARE is useful for finding the control law uₖ that minimizes the
+   * following cost function subject to xₖ₊₁ = Axₖ + Buₖ.
+   *
+   * <pre>
+   *     ∞ [xₖ]ᵀ[Q  N][xₖ]
+   * J = Σ [uₖ] [Nᵀ R][uₖ] ΔT
+   *    k=0
+   * </pre>
+   *
+   * <p>This is a more general form of the following. The linear-quadratic regulator is the feedback
+   * control law uₖ that minimizes the following cost function subject to xₖ₊₁ = Axₖ + Buₖ:
+   *
+   * <pre>
+   *     ∞
+   * J = Σ (xₖᵀQxₖ + uₖᵀRuₖ) ΔT
+   *    k=0
+   * </pre>
+   *
+   * <p>This can be refactored as:
+   *
+   * <pre>
+   *     ∞ [xₖ]ᵀ[Q 0][xₖ]
+   * J = Σ [uₖ] [0 R][uₖ] ΔT
+   *    k=0
+   * </pre>
    *
    * @param A Array containing elements of A in row-major order.
    * @param B Array containing elements of B in row-major order.
@@ -74,7 +197,7 @@ public final class WPIMathJNI {
    * @param S Array storage for DARE solution.
    * @throws IllegalArgumentException if Q − NR⁻¹Nᵀ isn't symmetric positive semidefinite.
    * @throws IllegalArgumentException if R isn't symmetric positive definite.
-   * @throws IllegalArgumentException if the (A, B) pair isn't stabilizable.
+   * @throws IllegalArgumentException if the (A − BR⁻¹Nᵀ, B) pair isn't stabilizable.
    * @throws IllegalArgumentException if the (A, C) pair where Q = CᵀC isn't detectable.
    */
   public static native void dareABQRN(
@@ -86,6 +209,8 @@ public final class WPIMathJNI {
       int states,
       int inputs,
       double[] S);
+
+  // Eigen wrappers
 
   /**
    * Computes the matrix exp.
@@ -105,6 +230,35 @@ public final class WPIMathJNI {
    * @param dst Array where the result will be stored.
    */
   public static native void pow(double[] src, int rows, double exponent, double[] dst);
+
+  /**
+   * Performs an inplace rank one update (or downdate) of an upper triangular Cholesky decomposition
+   * matrix.
+   *
+   * @param mat Array of elements of the matrix to be updated.
+   * @param lowerTriangular Whether mat is lower triangular.
+   * @param rows How many rows there are.
+   * @param vec Vector to use for the rank update.
+   * @param sigma Sigma value to use for the rank update.
+   */
+  public static native void rankUpdate(
+      double[] mat, int rows, double[] vec, double sigma, boolean lowerTriangular);
+
+  /**
+   * Solves the least-squares problem Ax=B using a QR decomposition with full pivoting.
+   *
+   * @param A Array of elements of the A matrix.
+   * @param Arows Number of rows of the A matrix.
+   * @param Acols Number of rows of the A matrix.
+   * @param B Array of elements of the B matrix.
+   * @param Brows Number of rows of the B matrix.
+   * @param Bcols Number of rows of the B matrix.
+   * @param dst Array to store solution in. If A is m-n and B is m-p, dst is n-p.
+   */
+  public static native void solveFullPivHouseholderQr(
+      double[] A, int Arows, int Acols, double[] B, int Brows, int Bcols, double[] dst);
+
+  // Pose3d wrappers
 
   /**
    * Obtain a Pose3d from a (constant curvature) velocity.
@@ -178,6 +332,8 @@ public final class WPIMathJNI {
       double endQy,
       double endQz);
 
+  // StateSpaceUtil wrappers
+
   /**
    * Returns true if (A, B) is a stabilizable pair.
    *
@@ -192,6 +348,8 @@ public final class WPIMathJNI {
    * @return If the system is stabilizable.
    */
   public static native boolean isStabilizable(int states, int inputs, double[] A, double[] B);
+
+  // Trajectory wrappers
 
   /**
    * Loads a Pathweaver JSON.
@@ -227,19 +385,6 @@ public final class WPIMathJNI {
    */
   public static native String serializeTrajectory(double[] elements);
 
-  /**
-   * Performs an inplace rank one update (or downdate) of an upper triangular Cholesky decomposition
-   * matrix.
-   *
-   * @param mat Array of elements of the matrix to be updated.
-   * @param lowerTriangular Whether mat is lower triangular.
-   * @param rows How many rows there are.
-   * @param vec Vector to use for the rank update.
-   * @param sigma Sigma value to use for the rank update.
-   */
-  public static native void rankUpdate(
-      double[] mat, int rows, double[] vec, double sigma, boolean lowerTriangular);
-
   public static class Helper {
     private static AtomicBoolean extractOnStaticLoad = new AtomicBoolean(true);
 
@@ -251,18 +396,4 @@ public final class WPIMathJNI {
       extractOnStaticLoad.set(load);
     }
   }
-
-  /**
-   * Solves the least-squares problem Ax=B using a QR decomposition with full pivoting.
-   *
-   * @param A Array of elements of the A matrix.
-   * @param Arows Number of rows of the A matrix.
-   * @param Acols Number of rows of the A matrix.
-   * @param B Array of elements of the B matrix.
-   * @param Brows Number of rows of the B matrix.
-   * @param Bcols Number of rows of the B matrix.
-   * @param dst Array to store solution in. If A is m-n and B is m-p, dst is n-p.
-   */
-  public static native void solveFullPivHouseholderQr(
-      double[] A, int Arows, int Acols, double[] B, int Brows, int Bcols, double[] dst);
 }

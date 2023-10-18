@@ -11,12 +11,13 @@
 #include <system_error>
 #include <vector>
 
+#include <wpi/MemoryBuffer.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
 #include <wpi/fs.h>
 #include <wpi/mutex.h>
-#include <wpi/raw_istream.h>
 #include <wpi/raw_ostream.h>
+#include <wpi/timestamp.h>
 #include <wpinet/HttpUtil.h>
 #include <wpinet/HttpWebSocketServerConnection.h>
 #include <wpinet/UrlParser.h>
@@ -28,6 +29,8 @@
 #include "InstanceImpl.h"
 #include "Log.h"
 #include "net/WebSocketConnection.h"
+#include "net/WireDecoder.h"
+#include "net/WireEncoder.h"
 #include "net3/UvStreamConnection3.h"
 
 using namespace nt;
@@ -50,8 +53,8 @@ class NetworkServer::ServerConnection {
   int GetClientId() const { return m_clientId; }
 
  protected:
-  void SetupPeriodicTimer();
-  void UpdatePeriodicTimer(uint32_t repeatMs);
+  void SetupOutgoingTimer();
+  void UpdateOutgoingTimer(uint32_t repeatMs);
   void ConnectionClosed();
 
   NetworkServer& m_server;
@@ -61,7 +64,7 @@ class NetworkServer::ServerConnection {
   int m_clientId;
 
  private:
-  std::shared_ptr<uv::Timer> m_sendValuesTimer;
+  std::shared_ptr<uv::Timer> m_outgoingTimer;
 };
 
 class NetworkServer::ServerConnection3 : public ServerConnection {
@@ -82,7 +85,10 @@ class NetworkServer::ServerConnection4 final
                     std::string_view addr, unsigned int port,
                     wpi::Logger& logger)
       : ServerConnection{server, addr, port, logger},
-        HttpWebSocketServerConnection(stream, {"networktables.first.wpi.edu"}) {
+        HttpWebSocketServerConnection(
+            stream,
+            {"v4.1.networktables.first.wpi.edu", "networktables.first.wpi.edu",
+             "rtt.networktables.first.wpi.edu"}) {
     m_info.protocol_version = 0x0400;
   }
 
@@ -93,30 +99,32 @@ class NetworkServer::ServerConnection4 final
   std::shared_ptr<net::WebSocketConnection> m_wire;
 };
 
-void NetworkServer::ServerConnection::SetupPeriodicTimer() {
-  m_sendValuesTimer = uv::Timer::Create(m_server.m_loop);
-  m_sendValuesTimer->timeout.connect([this] {
+void NetworkServer::ServerConnection::SetupOutgoingTimer() {
+  m_outgoingTimer = uv::Timer::Create(m_server.m_loop);
+  m_outgoingTimer->timeout.connect([this] {
     m_server.HandleLocal();
-    m_server.m_serverImpl.SendValues(m_clientId, m_server.m_loop.Now().count());
+    m_server.m_serverImpl.SendOutgoing(m_clientId,
+                                       m_server.m_loop.Now().count());
   });
 }
 
-void NetworkServer::ServerConnection::UpdatePeriodicTimer(uint32_t repeatMs) {
+void NetworkServer::ServerConnection::UpdateOutgoingTimer(uint32_t repeatMs) {
+  DEBUG4("Setting periodic timer to {}", repeatMs);
   if (repeatMs == UINT32_MAX) {
-    m_sendValuesTimer->Stop();
+    m_outgoingTimer->Stop();
   } else {
-    m_sendValuesTimer->Start(uv::Timer::Time{repeatMs},
-                             uv::Timer::Time{repeatMs});
+    m_outgoingTimer->Start(uv::Timer::Time{repeatMs},
+                           uv::Timer::Time{repeatMs});
   }
 }
 
 void NetworkServer::ServerConnection::ConnectionClosed() {
   // don't call back into m_server if it's being destroyed
-  if (!m_sendValuesTimer->IsLoopClosing()) {
+  if (!m_outgoingTimer->IsLoopClosing()) {
     m_server.m_serverImpl.RemoveClient(m_clientId);
     m_server.RemoveConnection(this);
   }
-  m_sendValuesTimer->Close();
+  m_outgoingTimer->Close();
 }
 
 NetworkServer::ServerConnection3::ServerConnection3(
@@ -136,7 +144,7 @@ NetworkServer::ServerConnection3::ServerConnection3(
         m_server.AddConnection(this, m_info);
         INFO("CONNECTED NT3 client '{}' (from {})", name, m_connInfo);
       },
-      [this](uint32_t repeatMs) { UpdatePeriodicTimer(repeatMs); });
+      [this](uint32_t repeatMs) { UpdateOutgoingTimer(repeatMs); });
 
   stream->error.connect([this](uv::Error err) {
     if (!m_wire->GetDisconnectReason().empty()) {
@@ -163,7 +171,7 @@ NetworkServer::ServerConnection3::ServerConnection3(
   });
   stream->StartRead();
 
-  SetupPeriodicTimer();
+  SetupOutgoingTimer();
 }
 
 void NetworkServer::ServerConnection4::ProcessRequest() {
@@ -228,13 +236,47 @@ void NetworkServer::ServerConnection4::ProcessWsUpgrade() {
 
   m_websocket->SetMaxMessageSize(kMaxMessageSize);
 
-  m_websocket->open.connect([this, name = std::string{name}](std::string_view) {
-    m_wire = std::make_shared<net::WebSocketConnection>(*m_websocket);
+  m_websocket->open.connect([this, name = std::string{name}](
+                                std::string_view protocol) {
+    m_info.protocol_version =
+        protocol == "v4.1.networktables.first.wpi.edu" ? 0x0401 : 0x0400;
+    m_wire = std::make_shared<net::WebSocketConnection>(
+        *m_websocket, m_info.protocol_version);
+
+    if (protocol == "rtt.networktables.first.wpi.edu") {
+      INFO("CONNECTED RTT client (from {})", m_connInfo);
+      m_websocket->binary.connect([this](std::span<const uint8_t> data, bool) {
+        while (!data.empty()) {
+          // decode message
+          int64_t pubuid;
+          Value value;
+          std::string error;
+          if (!net::WireDecodeBinary(&data, &pubuid, &value, &error, 0)) {
+            m_wire->Disconnect(fmt::format("binary decode error: {}", error));
+            break;
+          }
+
+          // respond to RTT ping
+          if (pubuid == -1) {
+            m_wire->SendBinary([&](auto& os) {
+              net::WireEncodeBinary(os, -1, wpi::Now(), value);
+            });
+          }
+        }
+      });
+      m_websocket->closed.connect([this](uint16_t, std::string_view reason) {
+        auto realReason = m_wire->GetDisconnectReason();
+        INFO("DISCONNECTED RTT client (from {}): {}", m_connInfo,
+             realReason.empty() ? reason : realReason);
+      });
+      return;
+    }
+
     // TODO: set local flag appropriately
     std::string dedupName;
     std::tie(dedupName, m_clientId) = m_server.m_serverImpl.AddClient(
         name, m_connInfo, false, *m_wire,
-        [this](uint32_t repeatMs) { UpdatePeriodicTimer(repeatMs); });
+        [this](uint32_t repeatMs) { UpdateOutgoingTimer(repeatMs); });
     INFO("CONNECTED NT4 client '{}' (from {})", dedupName, m_connInfo);
     m_info.remote_id = dedupName;
     m_server.AddConnection(this, m_info);
@@ -251,7 +293,7 @@ void NetworkServer::ServerConnection4::ProcessWsUpgrade() {
       m_server.m_serverImpl.ProcessIncomingBinary(m_clientId, data);
     });
 
-    SetupPeriodicTimer();
+    SetupOutgoingTimer();
   });
 }
 
@@ -310,9 +352,9 @@ void NetworkServer::HandleLocal() {
 
 void NetworkServer::LoadPersistent() {
   std::error_code ec;
-  auto size = fs::file_size(m_persistentFilename, ec);
-  wpi::raw_fd_istream is{m_persistentFilename, ec};
-  if (ec.value() != 0) {
+  std::unique_ptr<wpi::MemoryBuffer> fileBuffer =
+      wpi::MemoryBuffer::GetFile(m_persistentFilename, ec);
+  if (fileBuffer == nullptr || ec.value() != 0) {
     INFO(
         "could not open persistent file '{}': {} "
         "(this can be ignored if you aren't expecting persistent values)",
@@ -325,12 +367,8 @@ void NetworkServer::LoadPersistent() {
     }
     return;
   }
-  is.readinto(m_persistentData, size);
+  m_persistentData = std::string{fileBuffer->begin(), fileBuffer->end()};
   DEBUG4("read data: {}", m_persistentData);
-  if (is.has_error()) {
-    WARN("error reading persistent file");
-    return;
-  }
 }
 
 void NetworkServer::SavePersistent(std::string_view filename,
@@ -376,7 +414,7 @@ void NetworkServer::Init() {
   if (m_readLocalTimer) {
     m_readLocalTimer->timeout.connect([this] {
       HandleLocal();
-      m_serverImpl.SendControl(m_loop.Now().count());
+      m_serverImpl.SendAllOutgoing(m_loop.Now().count(), false);
     });
     m_readLocalTimer->Start(uv::Timer::Time{100}, uv::Timer::Time{100});
   }
@@ -402,9 +440,7 @@ void NetworkServer::Init() {
   if (m_flush) {
     m_flush->wakeup.connect([this] {
       HandleLocal();
-      for (auto&& conn : m_connections) {
-        m_serverImpl.SendValues(conn.conn->GetClientId(), m_loop.Now().count());
-      }
+      m_serverImpl.SendAllOutgoing(m_loop.Now().count(), true);
     });
   }
   m_flushAtomic = m_flush.get();

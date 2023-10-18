@@ -7,10 +7,10 @@
 #include <concepts>
 #include <cstddef>
 
+#include <Eigen/QR>
 #include <wpi/SymbolExports.h>
 #include <wpi/array.h>
 
-#include "Eigen/QR"
 #include "frc/EigenCore.h"
 #include "frc/geometry/Rotation2d.h"
 #include "frc/geometry/Translation2d.h"

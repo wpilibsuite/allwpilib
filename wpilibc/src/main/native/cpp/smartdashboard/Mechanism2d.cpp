@@ -4,7 +4,6 @@
 
 #include "frc/smartdashboard/Mechanism2d.h"
 
-#include <cstdio>
 #include <string_view>
 
 #include <networktables/NTSendableBuilder.h>

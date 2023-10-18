@@ -39,7 +39,7 @@ Solve for P. P, Q, and R are all diagonal, so this can be solved element-wise.
   pr⁻¹p = q
   p²r⁻¹ = q
   p² = qr
-  p = sqrt(qr)
+  p = √(qr)
 ```
 
 Now solve for the Kalman gain.
@@ -48,16 +48,16 @@ Now solve for the Kalman gain.
   K = PCᵀ(CPCᵀ + R)⁻¹
   K = P(P + R)⁻¹
   k = p(p + r)⁻¹
-  k = sqrt(qr)(sqrt(qr) + r)⁻¹
-  k = sqrt(qr)/(sqrt(qr) + r)
+  k = √(qr)(√(qr) + r)⁻¹
+  k = √(qr)/(√(qr) + r)
 ```
 
-Multiply by sqrt(q/r)/sqrt(q/r).
+Multiply by √(q/r)/√(q/r).
 
 ```
-  k = q/(q + r sqrt(q/r))
-  k = q/(q + sqrt(qr²/r))
-  k = q/(q + sqrt(qr))
+  k = q/(q + r √(q/r))
+  k = q/(q + √(qr²/r))
+  k = q/(q + √(qr))
 ```
 
 ### Corner cases
@@ -65,16 +65,16 @@ Multiply by sqrt(q/r)/sqrt(q/r).
 For q = 0 and r ≠ 0,
 
 ```
-  k = 0/(0 + sqrt(0))
+  k = 0/(0 + √0)
   k = 0/0
 ```
 
 Apply L'Hôpital's rule to k with respect to q.
 
 ```
-  k = 1/(1 + r/(2sqrt(qr)))
-  k = 2sqrt(qr)/(2sqrt(qr) + r)
-  k = 2sqrt(0)/(2sqrt(0) + r)
+  k = 1/(1 + r/(2 √(qr)))
+  k = 2 √(qr)/(2 √(qr) + r)
+  k = 2 √(0)/(2 √0 + r)
   k = 0/r
   k = 0
 ```
@@ -82,7 +82,7 @@ Apply L'Hôpital's rule to k with respect to q.
 For q ≠ 0 and r = 0,
 
 ```
-  k = q / (q + sqrt(0))
+  k = q / (q + √0)
   k = q / q
   k = 1
 ```
@@ -93,7 +93,7 @@ For q ≠ 0 and r = 0,
 
 We'll use the extrinsic X-Y-Z rotation order for Euler angles. The direction of rotation is CCW looking into the positive axis. If you point your right thumb along the positive axis direction, your fingers curl in the direction of rotation.
 
-The angles are `a_x` around the X-axis, `a_y` around the Y-axis, and `a_z` around the Z-axis, with the following constraints:
+The angles are a\_x around the X-axis, a\_y around the Y-axis, and a\_z around the Z-axis, with the following constraints:
 
 ```
   -π ≤ a_x ≤ π
@@ -117,7 +117,7 @@ The quaternion imaginary numbers are defined as follows:
 
 ### Quaternion representation of axis rotations
 
-We will take it as given that a rotation by `θ` radians around a normalized vector `v` is represented with the quaternion `cos(θ/2) + sin(θ/2) (v_x î + v_y ĵ + v_z k̂)`.
+We will take it as given that a rotation by θ radians around a normalized vector v is represented with the quaternion cos(θ/2) + sin(θ/2) (v\_x î + v\_y ĵ + v\_z k̂).
 
 ### Derivation
 
@@ -140,11 +140,11 @@ We can calculate the quaternion corresponding to a set of Euler angles by applyi
   q = (c_y c_z - s_y s_z î + s_y c_z ĵ + c_y s_z k̂)(c_x + s_x î)
     = (c_x c_y c_z + s_x s_y s_z)
       + (s_x c_y c_z - c_x s_y s_z) î
-      + (s_x c_y s_z + c_x s_y c_z) ĵ
+      + (c_x s_y c_z + s_x c_y s_z) ĵ
       + (c_x c_y s_z - s_x s_y c_z) k̂
 ```
 
-Letting `q = q_w + q_x î + q_y ĵ + q_z k̂`, we can extract the components of the quaternion:
+Letting q = q\_w + q\_x î + q\_y ĵ + q\_z k̂, we can extract the components of the quaternion:
 
 ```
   q_w = c_x c_y c_z + s_x s_y s_z
@@ -153,9 +153,9 @@ Letting `q = q_w + q_x î + q_y ĵ + q_z k̂`, we can extract the components o
   q_z = c_x c_y s_z - s_x s_y c_z
 ```
 
-### Solving for `a_y`
+### Solving for a\_y
 
-Solving for `sin(a_y)`:
+Solving for sin(a\_y):
 
 ```
   sin(a_y) = 2 c_y s_y
@@ -173,16 +173,16 @@ Solving for `sin(a_y)`:
   sin(a_y) = 2 (q_w q_y - q_x q_z)
 ```
 
-Then solving for `a_y`:
+Then solving for a\_y:
 
 ```
   a_y = sin⁻¹(sin(a_y))
   a_y = sin⁻¹(2 (q_w q_y - q_x q_z))
 ```
 
-### Solving for `a_x` and `a_z`
+### Solving for a\_x and a\_z
 
-Solving for `cos(a_x) cos(a_y)`:
+Solving for cos(a\_x) cos(a\_y):
 
 ```
   cos(a_x) cos(a_y) = (cos²(a_x/2) - sin²(a_x/2))(cos²(a_y/2) - sin²(a_y/2))
@@ -193,33 +193,35 @@ Solving for `cos(a_x) cos(a_y)`:
   cos(a_x) cos(a_y) = c_x² + s_x² - 2 (c_x² s_y² + s_x² c_y²)
   cos(a_x) cos(a_y) = 1 - 2 (c_x² s_y² + s_x² c_y²)
   cos(a_x) cos(a_y) = 1 - 2 (c_x² s_y² c_z² + c_x² s_y² s_z²
-                         + s_x² c_y² c_z² + s_x² c_y² s_z²)
+                           + s_x² c_y² c_z² + s_x² c_y² s_z²)
   cos(a_x) cos(a_y) = 1 - 2 (s_x² c_y² c_z² + c_x² s_y² s_z²
-                         + c_x² s_y² c_z² + s_x² c_y² s_z²)
-  cos(a_x) cos(a_y) = 1 - 2 (s_x² c_y² c_z² - 2 c_x s_x c_y s_y c_z s_z + s_x² s_y² s_z²
-                         + c_x² s_y² c_z² + 2 c_x s_x c_y s_y c_z s_z + s_x² c_y² s_z²)
-  cos(a_x) cos(a_y) = 1 - 2 ((s_x c_y c_z - s_x s_y s_z)² + (c_x s_y c_z + s_x c_y s_z)²)
+                           + c_x² s_y² c_z² + s_x² c_y² s_z²)
+  cos(a_x) cos(a_y) = 1 - 2 (s_x² c_y² c_z² - 2 c_x s_x c_y s_y c_z s_z + c_x² s_y² s_z²
+                           + c_x² s_y² c_z² + 2 c_x s_x c_y s_y c_z s_z + s_x² c_y² s_z²)
+  cos(a_x) cos(a_y) = 1 - 2 ((s_x c_y c_z - c_x s_y s_z)² + (c_x s_y c_z + s_x c_y s_z)²)
   cos(a_x) cos(a_y) = 1 - 2 (q_x² + q_y²)
 ```
 
-Solving for `sin(a_x) cos(a_y)`:
+Solving for sin(a\_x) cos(a\_y):
 
 ```
   sin(a_x) cos(a_y) = (2 cos(a_x/2) sin(a_x/2))(cos²(a_y/2) - sin²(a_y/2))
   sin(a_x) cos(a_y) = (2 c_x s_x)(c_y² - s_y²)
   sin(a_x) cos(a_y) = 2 (c_x s_x c_y² - c_x s_x s_y²)
   sin(a_x) cos(a_y) = 2 (c_x s_x c_y² c_z² + c_x s_x c_y² s_z²
-                     - c_x s_x s_y² c_z² - c_x s_x s_y² s_z²)
+                       - c_x s_x s_y² c_z² - c_x s_x s_y² s_z²)
+  sin(a_x) cos(a_y) = 2 (c_s s_x c_y² c_z² - c_x s_x s_y² s_z²
+                       - c_x s_x s_y² c_z² + c_x s_x c_y² s_z²)
   sin(a_x) cos(a_y) = 2 (c_x s_x c_y² c_z² - c_x² c_y s_y c_z s_z
-                     + s_x² c_y s_y c_z s_z - c_x s_x s_y² s_z²
-                     + c_x² c_y s_y c_z s_z - c_x s_x s_y² c_z²
-                     + c_x s_x c_y² s_z² - s_x² c_y s_y c_z s_z)
+                       + s_x² c_y s_y c_z s_z - c_x s_x s_y² s_z²
+                       + c_x² c_y s_y c_z s_z - c_x s_x s_y² c_z²
+                       + c_x s_x c_y² s_z² - s_x² c_y s_y c_z s_z)
   sin(a_x) cos(a_y) = 2 ((c_x c_y c_z + s_x s_y s_z)(s_x c_y c_z - c_x s_y s_z)
-                     + (c_x s_y c_z + s_x c_y s_z)(c_x c_y s_z - s_x s_y c_z))
+                       + (c_x s_y c_z + s_x c_y s_z)(c_x c_y s_z - s_x s_y c_z))
   sin(a_x) cos(a_y) = 2 (q_w q_x + q_y q_z)
 ```
 
-Similarly, solving for `cos(a_z) cos(a_y)`:
+Similarly, solving for cos(a\_z) cos(a\_y):
 
 ```
   cos(a_z) cos(a_y) = (cos²(a_z/2) - sin²(a_z/2))(cos²(a_y/2) - sin²(a_y/2))
@@ -230,40 +232,42 @@ Similarly, solving for `cos(a_z) cos(a_y)`:
   cos(a_z) cos(a_y) = c_y² + s_y² - 2 (c_y² s_z² + s_y² c_z²)
   cos(a_z) cos(a_y) = 1 - 2 (c_y² s_z² + s_y² c_z²)
   cos(a_z) cos(a_y) = 1 - 2 (c_x² c_y² s_z² + s_x² c_y² s_z²
-                         + c_x² s_y² c_z² + s_x² s_y² c_z²)
+                           + c_x² s_y² c_z² + s_x² s_y² c_z²)
   cos(a_z) cos(a_y) = 1 - 2 (c_x² s_y² c_z² + s_x² c_y² s_z²
-                         + c_x² c_y² s_z² + s_x² s_y² c_z²)
+                           + c_x² c_y² s_z² + s_x² s_y² c_z²)
   cos(a_z) cos(a_y) = 1 - 2 (c_x² s_y² c_z² + 2 c_x s_x c_y s_y c_z s_z + s_x² c_y² s_z²
-                         + c_x² c_y² s_z² - 2 c_x s_x c_y s_y c_z s_z + s_x² s_y² c_z²)
+                           + c_x² c_y² s_z² - 2 c_x s_x c_y s_y c_z s_z + s_x² s_y² c_z²)
   cos(a_z) cos(a_y) = 1 - 2 ((c_x s_y c_z + s_x c_y s_z)² + (c_x c_y s_z - s_x s_y c_z)²)
   cos(a_z) cos(a_y) = 1 - 2 (q_y² + q_z²)
 ```
 
-Similarly, solving for `sin(a_z) cos(a_y)`:
+Similarly, solving for sin(a\_z) cos(a\_y):
 
 ```
   sin(a_z) cos(a_y) = (2 cos(a_z/2) sin(a_z/2))(cos²(a_y/2) - sin²(a_y/2))
   sin(a_z) cos(a_y) = (2 c_z s_z)(c_y² - s_y²)
   sin(a_z) cos(a_y) = 2 (c_y² c_z s_z - s_y² c_z s_z)
   sin(a_z) cos(a_y) = 2 (c_x² c_y² c_z s_z + s_x² c_y² c_z s_z
-                     - c_x² s_y² c_z s_z - s_x² s_y² c_z s_z)
+                       - c_x² s_y² c_z s_z - s_x² s_y² c_z s_z)
+  sin(a_z) cos(a_y) = 2 (c_x² c_y² c_z s_z - s_x² s_y² c_z s_z
+                       + s_x² c_y² c_z s_z - c_x² s_y² c_z s_z)
   sin(a_z) cos(a_y) = 2 (c_x² c_y² c_z s_z - c_x s_x c_y s_y c_z²
-                     + c_x s_x c_y s_y s_z² - s_x² s_y² c_z s_z
-                     + c_x s_x c_y s_y c_z² + s_x² c_y² c_z s_z
-                     - c_x² s_y² c_z s_z - c_x s_x c_y s_y s_z²)
+                       + c_x s_x c_y s_y s_z² - s_x² s_y² c_z s_z
+                       + c_x s_x c_y s_y c_z² + s_x² c_y² c_z s_z
+                       - c_x² s_y² c_z s_z - c_x s_x c_y s_y s_z²)
   sin(a_z) cos(a_y) = 2 ((c_x c_y c_z + s_x s_y s_z)(c_x c_y s_z - s_x s_y c_z)
-                     + (s_x c_y c_z - c_x s_y s_z)(c_x s_y c_z + s_x c_y s_z))
+                       + (s_x c_y c_z - c_x s_y s_z)(c_x s_y c_z + s_x c_y s_z))
   sin(a_z) cos(a_y) = 2 (q_w q_z + q_x q_y)
 ```
 
-Solving for `a_x` and `a_z`:
+Solving for a\_x and a\_z:
 
 ```
   a_x = atan2(sin(a_x), cos(a_x))
   a_z = atan2(sin(a_z), cos(a_z))
 ```
 
-If `cos(a_y) > 0`:
+If cos(a\_y) > 0:
 
 ```
   a_x = atan2(sin(a_x) cos(a_y), cos(a_x) cos(a_y))
@@ -272,7 +276,7 @@ If `cos(a_y) > 0`:
   a_z = atan2(2 (q_w q_z + q_x q_y), 1 - 2 (q_y² + q_z²))
 ```
 
-Because `-π/2 ≤ a_y ≤ π/2`, `cos(a_y) ≥ 0`. Therefore, the only remaining case is `cos(a_y) = 0`, whose only solutions in that range are `a_y = ±π/2`.
+Because -π/2 ≤ a\_y ≤ π/2, cos(a\_y) ≥ 0. Therefore, the only remaining case is cos(a\_y) = 0, whose only solutions in that range are a\_y = ±π/2.
 
 ```
   a_y = ±π/2
@@ -304,7 +308,7 @@ Plugging into the quaternion components:
   q_z = √2/2 sin(a_z/2 ∓ a_x/2)
 ```
 
-In either case only the sum or the difference between `a_x` and `a_z` can be determined. We'll pick the solution where `a_x = 0`.
+In either case only the sum or the difference between a\_x and a\_z can be determined. We'll pick the solution where a\_x = 0.
 
 ```
   q_w = √2/2 cos(a_z/2 ∓ 0)
@@ -324,9 +328,9 @@ In either case only the sum or the difference between `a_x` and `a_z` can be det
   a_z = atan2(2 q_w q_z, q_w² - q_z²)
 ```
 
-### Determining if `cos(a_y) ≈ 0`
+### Determining if cos(a\_y) ≈ 0
 
-When calculating `a_x`:
+When calculating a\_x:
 
 ```
   cos(a_y) ≈ 0
@@ -335,9 +339,9 @@ When calculating `a_x`:
   (cos(a_x) cos(a_y))² + (sin(a_x) cos(a_y))² ≈ 0
 ```
 
-Note that this reuses the `cos(a_x) cos(a_y)` and `sin(a_x) cos(a_y)` terms needed to calculate `a_x`.
+Note that this reuses the cos(a\_x) cos(a\_y) and sin(a\_x) cos(a\_y) terms needed to calculate a\_x.
 
-When calculating `a_z`:
+When calculating a\_z:
 
 ```
   cos(a_y) ≈ 0
@@ -346,4 +350,110 @@ When calculating `a_z`:
   (cos(a_y) cos(a_z))² + (cos(a_y) sin(a_z))² ≈ 0
 ```
 
-Note that this reuses the `cos(a_y) cos(a_z)` and `cos(a_y) sin(a_z)` terms needed to calculate `a_z`.
+Note that this reuses the cos(a\_y) cos(a\_z) and cos(a\_y) sin(a\_z) terms needed to calculate a\_z.
+
+## Quaternion Exponential
+
+We will take it as given that a quaternion has scalar and vector components `𝑞 = s + 𝑣⃗`, with vector component 𝑣⃗ consisting of a unit vector and magnitude `𝑣⃗ = θ * v̂`.
+
+```
+𝑞 = s + 𝑣⃗
+
+𝑣⃗ = θ * v̂
+
+exp(𝑞) = exp(s + 𝑣⃗)
+exp(𝑞) = exp(s) * exp(𝑣⃗)
+exp(𝑞) = exp(s) * exp(θ * v̂)
+```
+
+Applying euler's identity:
+
+```
+exp(θ * v̂) = cos(θ) + sin(θ) * v̂
+```
+
+Gives us:
+```
+exp(𝑞) = exp(s) * [cos(θ) + sin(θ) * v̂]
+```
+
+Rearranging `𝑣⃗ = θ * v̂` we can solve for v̂: `v̂ = 𝑣⃗ / θ`
+
+```
+exp(𝑞) = exp(s) * [cos(θ) + sin(θ) / θ * 𝑣⃗]
+```
+
+## Quaternion Logarithm
+
+We will take it as a given that for a given quaternion of the form `𝑞 = s + 𝑣⃗`, we can calculate the exponential: `exp(𝑞) = exp(s) * [cos(θ) + sin(θ) / θ * 𝑣⃗]` where `θ = ||𝑣⃗||`.
+
+Additionally, `exp(log(𝑞)) = q` for a given value of `log(𝑞)`. There are multiple solutions to `log(𝑞)` caused by the imaginary axes in 𝑣⃗, discussed here: https://en.wikipedia.org/wiki/Complex_logarithm
+
+We will demonstrate the principal solution of `log(𝑞)` satisfying `exp(log(𝑞)) = q`.
+This being `log(𝑞) = log(||𝑞||) + atan2(θ, s) / θ * 𝑣⃗`, is the principal solution to `log(𝑞)` because the function `atan2(θ, s)` returns the principal value corresponding to its arguments.
+
+Proof: `log(𝑞) = log(||𝑞||) + atan2(θ, s) / θ * 𝑣⃗` satisfies `exp(log(𝑞)) = q`.
+
+```
+exp(log(𝑞)) = exp(log(||𝑞||) + atan2(θ, s) / θ * 𝑣⃗)
+
+
+exp(log(𝑞)) = exp(log(||𝑞||)) * exp(atan2(θ, s) / θ * 𝑣⃗)
+
+Substitutions:
+𝑣⃗ = θ * v̂:
+exp(log(||𝑞||)) = ||𝑞||
+exp(log(𝑞)) = ||𝑞|| * exp(atan2(θ, s) * v̂)
+
+exp(log(𝑞)) = ||𝑞|| * [cos(atan2(θ, s)) + sin(atan2(θ, s)) * v̂]
+
+Substitutions:
+cos(atan2(θ, s)) = s / √(θ² + s²)
+sin(atan2(θ, s)) = θ / √(θ² + s²)
+
+exp(log(𝑞)) = ||𝑞|| * [s / √(θ² + s²) + θ / √(θ² + s²) * v̂]
+
+√(θ² + s²) = ||𝑞||
+
+exp(log(𝑞)) = ||𝑞|| * [s / ||𝑞|| + θ / ||𝑞|| * v̂]
+exp(log(𝑞)) = s + θ * v̂
+
+exp(log(𝑞)) = s + 𝑣⃗
+
+exp(log(𝑞)) = 𝑞
+```
+
+## Unit Quaternion in SO(3) from Rotation Vector in 𝖘𝖔(3)
+
+We will take it as a given that members of 𝖘𝖔(3) take the form `𝑣⃗ = θ * v̂`, representing a rotation θ around a unit axis v̂.
+
+We additionally take it as a given that quaternions in SO(3) are of the form `𝑞 = cos(θ / 2) + sin(θ / 2) * v̂`, representing a rotation of θ around unit axis v̂.
+
+```
+θ = ||𝑣⃗||
+v̂ = 𝑣⃗ / θ
+
+𝑞 = cos(θ / 2) + sin(θ / 2) * v̂
+𝑞 = cos(||𝑣⃗|| / 2) + sin(||𝑣⃗|| / 2) / ||𝑣⃗|| * 𝑣⃗
+```
+
+## Rotation vector in 𝖘𝖔(3) from Unit Quaternion in SO(3)
+
+We will take it as a given that members of 𝖘𝖔(3) take the form  `𝑟⃗ = θ * r̂`, representing a rotation θ around a unit axis r̂.
+
+We additionally take it as a given that quaternions in SO(3) are of the form `𝑞 = s + 𝑣⃗ = cos(θ / 2) + sin(θ / 2) * v̂`, representing a rotation of θ around unit axis v̂.
+
+```
+s + 𝑣⃗ = cos(θ / 2) + sin(θ / 2) * v̂
+s = cos(θ / 2)
+𝑣⃗ = sin(θ / 2) * v̂
+||𝑣⃗|| = sin(θ / 2)
+
+θ / 2 = atan2(||𝑣⃗||, s)
+θ = 2 * atan2(||𝑣⃗||, s)
+
+r̂ = 𝑣⃗ / ||𝑣⃗||
+
+𝑟⃗ = θ * r̂
+𝑟⃗ = 2 * atan2(||𝑣⃗||, s) / ||𝑣⃗|| * 𝑣⃗
+```

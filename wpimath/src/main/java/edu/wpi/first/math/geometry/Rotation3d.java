@@ -24,10 +24,12 @@ import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Rotation3d implements Interpolatable<Rotation3d> {
-  private Quaternion m_q = new Quaternion();
+  private final Quaternion m_q;
 
   /** Constructs a Rotation3d with a default angle of 0 degrees. */
-  public Rotation3d() {}
+  public Rotation3d() {
+    m_q = new Quaternion();
+  }
 
   /**
    * Constructs a Rotation3d from a quaternion.
@@ -93,6 +95,7 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
   public Rotation3d(Vector<N3> axis, double angleRadians) {
     double norm = axis.norm();
     if (norm == 0.0) {
+      m_q = new Quaternion();
       return;
     }
 
@@ -186,6 +189,7 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
     if (dotNorm > 1.0 - 1E-9) {
       // If the dot product is 1, the two vectors point in the same direction so
       // there's no rotation. The default initialization of m_q will work.
+      m_q = new Quaternion();
       return;
     } else if (dotNorm < -1.0 + 1E-9) {
       // If the dot product is -1, the two vectors point in opposite directions
@@ -278,13 +282,14 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
   }
 
   /**
-   * Adds the new rotation to the current rotation. The other rotation is applied intrinsically,
-   * which means that it rotates around the axes after applying this rotation. For example, {@code
-   * new Rotation3d(Units.degreesToRadians(90), 0, 0).rotateBy(new Rotation3d(0,
-   * Units.degreesToRadians(90), 0))} rotates by 90 degrees around the +X axis and then by 90
-   * degrees around the new +Y axis (which has been moved to the +Z axis).
+   * Adds the new rotation to the current rotation. The other rotation is applied extrinsically,
+   * which means that it rotates around the global axes. For example, {@code new
+   * Rotation3d(Units.degreesToRadians(90), 0, 0).rotateBy(new Rotation3d(0,
+   * Units.degreesToRadians(45), 0))} rotates by 90 degrees around the +X axis and then by 45
+   * degrees around the global +Y axis. (This is equivalent to {@code new
+   * Rotation3d(Units.degreesToRadians(90), Units.degreesToRadians(45), 0)})
    *
-   * @param other The intrinsic rotation to rotate by.
+   * @param other The extrinsic rotation to rotate by.
    * @return The new rotated Rotation3d.
    */
   public Rotation3d rotateBy(Rotation3d other) {
@@ -415,7 +420,7 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
   public boolean equals(Object obj) {
     if (obj instanceof Rotation3d) {
       var other = (Rotation3d) obj;
-      return m_q.equals(other.m_q);
+      return Math.abs(Math.abs(m_q.dot(other.m_q)) - m_q.norm() * other.m_q.norm()) < 1e-9;
     }
     return false;
   }

@@ -11,7 +11,9 @@ ext {
 
 apply from: "${rootDir}/shared/opencv.gradle"
 
-mainClassName = 'edu.wpi.first.wpilibj.test.AntJunitLauncher'
+application {
+    mainClass = 'edu.wpi.first.wpilibj.test.AntJunitLauncher'
+}
 
 apply plugin: 'com.github.johnrengelman.shadow'
 

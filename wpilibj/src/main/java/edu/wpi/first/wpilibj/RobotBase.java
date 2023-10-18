@@ -74,7 +74,7 @@ public abstract class RobotBase implements AutoCloseable {
 
           @Override
           public boolean isRoboRIO() {
-            return RobotBase.isReal();
+            return !RobotBase.isSimulation();
           }
         };
 
@@ -154,7 +154,7 @@ public abstract class RobotBase implements AutoCloseable {
     setupMathShared();
     // subscribe to "" to force persistent values to propagate to local
     m_suball = new MultiSubscriber(inst, new String[] {""});
-    if (isReal()) {
+    if (!isSimulation()) {
       inst.startServer("/home/lvuser/networktables.json");
     } else {
       inst.startServer();
@@ -202,7 +202,7 @@ public abstract class RobotBase implements AutoCloseable {
    * @return If the robot is running in simulation.
    */
   public static boolean isSimulation() {
-    return !isReal();
+    return HALUtil.getHALRuntimeType() != 0;
   }
 
   /**
@@ -337,7 +337,7 @@ public abstract class RobotBase implements AutoCloseable {
     m_robotCopy = robot;
     m_runMutex.unlock();
 
-    if (isReal()) {
+    if (!isSimulation()) {
       final File file = new File("/tmp/frc_versions/FRC_Lib_Version.ini");
       try {
         if (file.exists() && !file.delete()) {

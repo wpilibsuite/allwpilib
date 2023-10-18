@@ -7,9 +7,10 @@
 #include <stdexcept>
 #include <string>
 
-#include "Eigen/Cholesky"
-#include "Eigen/Core"
-#include "Eigen/LU"
+#include <Eigen/Cholesky>
+#include <Eigen/Core>
+#include <Eigen/LU>
+
 #include "frc/StateSpaceUtil.h"
 #include "frc/fmt/Eigen.h"
 
@@ -72,10 +73,16 @@ void CheckDARE_ABQ(const Eigen::Matrix<double, States, States>& A,
   }
 
   // Require (A, C) pair be detectable where Q = CᵀC
+  //
+  // Q = CᵀC = PᵀLDLᵀP
+  // Cᵀ = PᵀL√(D)
+  // C = (PᵀL√(D))ᵀ
   {
     Eigen::Matrix<double, States, States> C =
-        Eigen::Matrix<double, States, States>{Q_ldlt.matrixL()} *
-        Q_ldlt.vectorD().cwiseSqrt().asDiagonal();
+        (Q_ldlt.transpositionsP().transpose() *
+         Eigen::Matrix<double, States, States>{Q_ldlt.matrixL()} *
+         Q_ldlt.vectorD().cwiseSqrt().asDiagonal())
+            .transpose();
 
     if (!IsDetectable<States, States>(A, C)) {
       std::string msg = fmt::format(
@@ -181,6 +188,14 @@ Riccati equation:
 
   AᵀXA − X − (AᵀXB + N)(BᵀXB + R)⁻¹(BᵀXA + Nᵀ) + Q = 0
 
+This is equivalent to solving the original DARE:
+
+  A₂ᵀXA₂ − X − A₂ᵀXB(BᵀXB + R)⁻¹BᵀXA₂ + Q₂ = 0
+
+where A₂ and Q₂ are a change of variables:
+
+  A₂ = A − BR⁻¹Nᵀ and Q₂ = Q − NR⁻¹Nᵀ
+
 This overload of the DARE is useful for finding the control law uₖ that
 minimizes the following cost function subject to xₖ₊₁ = Axₖ + Buₖ.
 
@@ -211,10 +226,10 @@ J = Σ [uₖ] [0 R][uₖ] ΔT
 This internal function skips expensive precondition checks for increased
 performance. The solver may hang if any of the following occur:
 <ul>
-  <li>Q − NR⁻¹Nᵀ isn't symmetric positive semidefinite</li>
+  <li>Q₂ isn't symmetric positive semidefinite</li>
   <li>R isn't symmetric positive definite</li>
-  <li>The (A, B) pair isn't stabilizable</li>
-  <li>The (A, C) pair where Q = CᵀC isn't detectable</li>
+  <li>The (A₂, B) pair isn't stabilizable</li>
+  <li>The (A₂, C) pair where Q₂ = CᵀC isn't detectable</li>
 </ul>
 Only use this function if you're sure the preconditions are met.
 
@@ -299,6 +314,14 @@ Riccati equation:
 
   AᵀXA − X − (AᵀXB + N)(BᵀXB + R)⁻¹(BᵀXA + Nᵀ) + Q = 0
 
+This is equivalent to solving the original DARE:
+
+  A₂ᵀXA₂ − X − A₂ᵀXB(BᵀXB + R)⁻¹BᵀXA₂ + Q₂ = 0
+
+where A₂ and Q₂ are a change of variables:
+
+  A₂ = A − BR⁻¹Nᵀ and Q₂ = Q − NR⁻¹Nᵀ
+
 This overload of the DARE is useful for finding the control law uₖ that
 minimizes the following cost function subject to xₖ₊₁ = Axₖ + Buₖ.
 
@@ -333,11 +356,11 @@ J = Σ [uₖ] [0 R][uₖ] ΔT
 @param Q The state cost matrix.
 @param R The input cost matrix.
 @param N The state-input cross cost matrix.
-@throws std::invalid_argument if Q − NR⁻¹Nᵀ isn't symmetric positive
-  semidefinite.
+@throws std::invalid_argument if Q₂ isn't symmetric positive semidefinite.
 @throws std::invalid_argument if R isn't symmetric positive definite.
-@throws std::invalid_argument if the (A, B) pair isn't stabilizable.
-@throws std::invalid_argument if the (A, C) pair where Q = CᵀC isn't detectable.
+@throws std::invalid_argument if the (A₂, B) pair isn't stabilizable.
+@throws std::invalid_argument if the (A₂, C) pair where Q₂ = CᵀC isn't
+  detectable.
 */
 template <int States, int Inputs>
 Eigen::Matrix<double, States, States> DARE(

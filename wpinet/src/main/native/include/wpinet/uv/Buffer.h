@@ -42,9 +42,22 @@ class Buffer : public uv_buf_t {
     base = const_cast<char*>(base_);
     len = static_cast<decltype(len)>(len_);
   }
+  Buffer(uint8_t* base_, size_t len_) {
+    base = reinterpret_cast<char*>(base_);
+    len = static_cast<decltype(len)>(len_);
+  }
+  Buffer(const uint8_t* base_, size_t len_) {
+    base = reinterpret_cast<char*>(const_cast<uint8_t*>(base_));
+    len = static_cast<decltype(len)>(len_);
+  }
 
   std::span<const char> data() const { return {base, len}; }
   std::span<char> data() { return {base, len}; }
+
+  std::span<const uint8_t> bytes() const {
+    return {reinterpret_cast<const uint8_t*>(base), len};
+  }
+  std::span<uint8_t> bytes() { return {reinterpret_cast<uint8_t*>(base), len}; }
 
   operator std::span<const char>() const { return data(); }  // NOLINT
   operator std::span<char>() { return data(); }              // NOLINT

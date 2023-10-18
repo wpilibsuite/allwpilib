@@ -4,6 +4,7 @@ include(SubDirList)
 include(GenResources)
 include(CompileWarnings)
 include(AddTest)
+include(DownloadAndCheck)
 
 file(GLOB wpiutil_jni_src src/main/native/cpp/jni/WPIUtilJNI.cpp src/main/native/cpp/jni/DataLogJNI.cpp)
 
@@ -14,18 +15,18 @@ if (WITH_JAVA)
   include(UseJava)
   set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
 
-  if(NOT EXISTS "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/jackson/jackson-core-2.12.4.jar")
+  if(NOT EXISTS "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/jackson/jackson-core-2.15.2.jar")
         set(BASE_URL "https://search.maven.org/remotecontent?filepath=")
         set(JAR_ROOT "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/jackson")
 
         message(STATUS "Downloading Jackson jarfiles...")
 
-        file(DOWNLOAD "${BASE_URL}com/fasterxml/jackson/core/jackson-core/2.12.4/jackson-core-2.12.4.jar"
-            "${JAR_ROOT}/jackson-core-2.12.4.jar")
-        file(DOWNLOAD "${BASE_URL}com/fasterxml/jackson/core/jackson-databind/2.12.4/jackson-databind-2.12.4.jar"
-            "${JAR_ROOT}/jackson-databind-2.12.4.jar")
-        file(DOWNLOAD "${BASE_URL}com/fasterxml/jackson/core/jackson-annotations/2.12.4/jackson-annotations-2.12.4.jar"
-            "${JAR_ROOT}/jackson-annotations-2.12.4.jar")
+        download_and_check("${BASE_URL}com/fasterxml/jackson/core/jackson-core/2.15.2/jackson-core-2.15.2.jar"
+            "${JAR_ROOT}/jackson-core-2.15.2.jar")
+        download_and_check("${BASE_URL}com/fasterxml/jackson/core/jackson-databind/2.15.2/jackson-databind-2.15.2.jar"
+            "${JAR_ROOT}/jackson-databind-2.15.2.jar")
+        download_and_check("${BASE_URL}com/fasterxml/jackson/core/jackson-annotations/2.15.2/jackson-annotations-2.15.2.jar"
+            "${JAR_ROOT}/jackson-annotations-2.15.2.jar")
 
         message(STATUS "All files downloaded.")
     endif()
@@ -39,12 +40,7 @@ if (WITH_JAVA)
 
   file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
 
-  if(${CMAKE_VERSION} VERSION_LESS "3.11.0")
-    set(CMAKE_JAVA_COMPILE_FLAGS "-h" "${CMAKE_CURRENT_BINARY_DIR}/jniheaders")
-    add_jar(wpiutil_jar ${JAVA_SOURCES} INCLUDE_JARS ${JACKSON_JARS} OUTPUT_NAME wpiutil)
-  else()
-    add_jar(wpiutil_jar ${JAVA_SOURCES} INCLUDE_JARS ${JACKSON_JARS} OUTPUT_NAME wpiutil GENERATE_NATIVE_HEADERS wpiutil_jni_headers)
-  endif()
+  add_jar(wpiutil_jar ${JAVA_SOURCES} INCLUDE_JARS ${JACKSON_JARS} OUTPUT_NAME wpiutil GENERATE_NATIVE_HEADERS wpiutil_jni_headers)
 
   get_property(WPIUTIL_JAR_FILE TARGET wpiutil_jar PROPERTY JAR_FILE)
   install(FILES ${WPIUTIL_JAR_FILE} DESTINATION "${java_lib_dest}")
@@ -57,19 +53,10 @@ if (WITH_JAVA)
 
   set_property(TARGET wpiutiljni PROPERTY FOLDER "libraries")
 
-  if(${CMAKE_VERSION} VERSION_LESS "3.11.0")
-    target_include_directories(wpiutiljni PRIVATE ${JNI_INCLUDE_DIRS})
-    target_include_directories(wpiutiljni PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/jniheaders")
-  else()
-    target_link_libraries(wpiutiljni PRIVATE wpiutil_jni_headers)
-  endif()
+  target_link_libraries(wpiutiljni PRIVATE wpiutil_jni_headers)
   add_dependencies(wpiutiljni wpiutil_jar)
 
-  if (MSVC)
-    install(TARGETS wpiutiljni RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)
-  endif()
-
-  install(TARGETS wpiutiljni EXPORT wpiutiljni DESTINATION "${main_lib_dest}")
+  install(TARGETS wpiutiljni EXPORT wpiutiljni)
 
 endif()
 
@@ -85,7 +72,7 @@ if (NOT MSVC AND NOT APPLE AND NOT ANDROID)
     endif()
 endif()
 
-GENERATE_RESOURCES(src/main/native/resources generated/main/cpp WPI wpi wpiutil_resources_src)
+generate_resources(src/main/native/resources generated/main/cpp WPI wpi wpiutil_resources_src)
 
 file(GLOB_RECURSE wpiutil_native_src src/main/native/cpp/*.cpp
                                      src/main/native/thirdparty/json/cpp/*.cpp
@@ -107,7 +94,7 @@ set_property(TARGET wpiutil PROPERTY FOLDER "libraries")
 
 target_compile_features(wpiutil PUBLIC cxx_std_20)
 if (MSVC)
-    target_compile_options(wpiutil PUBLIC /permissive- /Zc:throwingNew /MP /bigobj)
+    target_compile_options(wpiutil PUBLIC /permissive- /Zc:preprocessor /Zc:throwingNew /MP /bigobj)
     target_compile_definitions(wpiutil PRIVATE -D_CRT_SECURE_NO_WARNINGS)
 endif()
 wpilib_target_warnings(wpiutil)
@@ -127,6 +114,13 @@ if (NOT USE_SYSTEM_FMTLIB)
 else()
     find_package(fmt CONFIG REQUIRED)
     target_link_libraries(wpiutil fmt::fmt)
+    if(MSVC)
+        get_target_property(fmt_includes fmt::fmt INTERFACE_INCLUDE_DIRECTORIES)
+        foreach(dir ${fmt_includes})
+            target_compile_options(wpiutil PUBLIC /external:I "${dir}")
+        endforeach()
+        target_compile_options(wpiutil PUBLIC /external:W0)
+    endif()
 endif()
 
 if (MSVC)
@@ -171,11 +165,7 @@ target_include_directories(wpiutil PUBLIC
                             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
                             $<INSTALL_INTERFACE:${include_dest}/wpiutil>)
 
-install(TARGETS wpiutil EXPORT wpiutil DESTINATION "${main_lib_dest}")
-
-if (WITH_JAVA AND MSVC)
-    install(TARGETS wpiutil RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)
-endif()
+install(TARGETS wpiutil EXPORT wpiutil)
 
 if (WITH_FLAT_INSTALL)
     set (wpiutil_config_dir ${wpilib_dest})
@@ -187,7 +177,7 @@ configure_file(wpiutil-config.cmake.in ${WPILIB_BINARY_DIR}/wpiutil-config.cmake
 install(FILES ${WPILIB_BINARY_DIR}/wpiutil-config.cmake DESTINATION ${wpiutil_config_dir})
 install(EXPORT wpiutil DESTINATION ${wpiutil_config_dir})
 
-SUBDIR_LIST(wpiutil_examples "${CMAKE_CURRENT_SOURCE_DIR}/examples")
+subdir_list(wpiutil_examples "${CMAKE_CURRENT_SOURCE_DIR}/examples")
 foreach(example ${wpiutil_examples})
     file(GLOB wpiutil_example_src examples/${example}/*.cpp)
     if(wpiutil_example_src)
@@ -199,7 +189,10 @@ foreach(example ${wpiutil_examples})
 endforeach()
 
 if (WITH_TESTS)
+    file(GLOB_RECURSE wpiutil_testlib_src src/test/native/include/*.h)
+    add_library(wpiutil_testlib INTERFACE ${wpiutil_test_src})
+    target_include_directories(wpiutil_testlib INTERFACE src/test/native/include)
+
     wpilib_add_test(wpiutil src/test/native/cpp)
-    target_include_directories(wpiutil_test PRIVATE src/test/native/include)
-    target_link_libraries(wpiutil_test wpiutil gmock_main)
+    target_link_libraries(wpiutil_test wpiutil gmock_main wpiutil_testlib)
 endif()

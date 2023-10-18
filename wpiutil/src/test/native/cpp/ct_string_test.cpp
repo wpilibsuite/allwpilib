@@ -7,7 +7,7 @@
 #include <string>
 #include <string_view>
 
-#include "gtest/gtest.h"  // NOLINT(build/include_order)
+#include <gtest/gtest.h>
 
 TEST(CtStringTest, Concat) {
   using namespace wpi::literals;

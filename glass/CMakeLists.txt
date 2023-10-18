@@ -22,7 +22,7 @@ target_include_directories(libglass PUBLIC
                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/lib/native/include>
                            $<INSTALL_INTERFACE:${include_dest}/glass>)
 
-install(TARGETS libglass EXPORT libglass DESTINATION "${main_lib_dest}")
+install(TARGETS libglass EXPORT libglass)
 install(DIRECTORY src/lib/native/include/ DESTINATION "${include_dest}/glass")
 
 #
@@ -43,7 +43,7 @@ target_include_directories(libglassnt PUBLIC
                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/libnt/native/include>
                            $<INSTALL_INTERFACE:${include_dest}/glass>)
 
-install(TARGETS libglassnt EXPORT libglassnt DESTINATION "${main_lib_dest}")
+install(TARGETS libglassnt EXPORT libglassnt)
 install(DIRECTORY src/libnt/native/include/ DESTINATION "${include_dest}/glass")
 
 #
@@ -51,7 +51,7 @@ install(DIRECTORY src/libnt/native/include/ DESTINATION "${include_dest}/glass")
 #
 
 configure_file(src/app/generate/WPILibVersion.cpp.in WPILibVersion.cpp)
-GENERATE_RESOURCES(src/app/native/resources generated/app/cpp GLASS glass glass_resources_src)
+generate_resources(src/app/native/resources generated/app/cpp GLASS glass glass_resources_src)
 
 file(GLOB glass_src src/app/native/cpp/*.cpp ${CMAKE_CURRENT_BINARY_DIR}/WPILibVersion.cpp)
 
@@ -65,6 +65,7 @@ endif()
 
 add_executable(glass ${glass_src} ${glass_resources_src} ${glass_rc} ${APP_ICON_MACOSX})
 wpilib_link_macos_gui(glass)
+wpilib_target_warnings(glass)
 target_link_libraries(glass libglassnt libglass)
 
 if (WIN32)

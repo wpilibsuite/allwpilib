@@ -6,7 +6,7 @@
 
 #include <frc/controller/PIDController.h>
 
-#include "frc2/command/Subsystem.h"
+#include "frc2/command/SubsystemBase.h"
 
 namespace frc2 {
 /**
@@ -17,7 +17,7 @@ namespace frc2 {
  *
  * @see PIDController
  */
-class PIDSubsystem : public Subsystem {
+class PIDSubsystem : public SubsystemBase {
  public:
   /**
    * Creates a new PIDSubsystem.
@@ -25,7 +25,8 @@ class PIDSubsystem : public Subsystem {
    * @param controller the PIDController to use
    * @param initialPosition the initial setpoint of the subsystem
    */
-  explicit PIDSubsystem(PIDController controller, double initialPosition = 0);
+  explicit PIDSubsystem(frc::PIDController controller,
+                        double initialPosition = 0);
 
   void Periodic() override;
 
@@ -65,10 +66,10 @@ class PIDSubsystem : public Subsystem {
    *
    * @return The controller.
    */
-  PIDController& GetController();
+  frc::PIDController& GetController();
 
  protected:
-  PIDController m_controller;
+  frc::PIDController m_controller;
   bool m_enabled{false};
 
   /**

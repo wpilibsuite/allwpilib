@@ -42,6 +42,18 @@ public class Matrix<R extends Num, C extends Num> {
    * Constructs a new {@link Matrix} with the given storage. Caller should make sure that the
    * provided generic bounds match the shape of the provided {@link Matrix}.
    *
+   * @param rows The number of rows of the matrix.
+   * @param columns The number of columns of the matrix.
+   * @param storage The double array to back this value.
+   */
+  public Matrix(Nat<R> rows, Nat<C> columns, double[] storage) {
+    this.m_storage = new SimpleMatrix(rows.getNum(), columns.getNum(), true, storage);
+  }
+
+  /**
+   * Constructs a new {@link Matrix} with the given storage. Caller should make sure that the
+   * provided generic bounds match the shape of the provided {@link Matrix}.
+   *
    * <p>NOTE:It is not recommend to use this constructor unless the {@link SimpleMatrix} API is
    * absolutely necessary due to the desired function not being accessible through the {@link
    * Matrix} wrapper.

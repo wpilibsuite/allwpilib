@@ -40,6 +40,18 @@ public class Transform2d {
     m_rotation = rotation;
   }
 
+  /**
+   * Constructs a transform with x and y translations instead of a separate Translation2d.
+   *
+   * @param x The x component of the translational component of the transform.
+   * @param y The y component of the translational component of the transform.
+   * @param rotation The rotational component of the transform.
+   */
+  public Transform2d(double x, double y, Rotation2d rotation) {
+    m_translation = new Translation2d(x, y);
+    m_rotation = rotation;
+  }
+
   /** Constructs the identity transform -- maps an initial pose to itself. */
   public Transform2d() {
     m_translation = new Translation2d();
@@ -67,7 +79,8 @@ public class Transform2d {
   }
 
   /**
-   * Composes two transformations.
+   * Composes two transformations. The second transform is applied relative to the orientation of
+   * the first.
    *
    * @param other The transform to compose with this one.
    * @return The composition of the two transformations.

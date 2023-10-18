@@ -4,9 +4,10 @@
 
 #include <jni.h>
 
+#include <fmt/format.h>
+
 #include "WPIUtilJNI.h"
 #include "edu_wpi_first_util_datalog_DataLogJNI.h"
-#include "fmt/format.h"
 #include "wpi/DataLog.h"
 #include "wpi/jni_util.h"
 
@@ -201,7 +202,7 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_appendRaw
     wpi::ThrowIndexOobException(env, "length must be >= 0");
     return;
   }
-  CriticalJByteArrayRef cvalue{env, value};
+  CriticalJSpan<const jbyte> cvalue{env, value};
   if (static_cast<unsigned int>(start + length) > cvalue.size()) {
     wpi::ThrowIndexOobException(
         env, "start + len must be smaller than array length");
@@ -237,7 +238,7 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_appendRawBuffer
     wpi::ThrowIndexOobException(env, "length must be >= 0");
     return;
   }
-  JByteArrayRef cvalue{env, value, start + length};
+  JSpan<const jbyte> cvalue{env, value, static_cast<size_t>(start + length)};
   if (!cvalue) {
     wpi::ThrowIllegalArgumentException(env,
                                        "value must be a native ByteBuffer");
@@ -347,7 +348,7 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_appendBooleanArray
     return;
   }
   reinterpret_cast<DataLog*>(impl)->AppendBooleanArray(
-      entry, JBooleanArrayRef{env, value}, timestamp);
+      entry, JSpan<const jboolean>{env, value}, timestamp);
 }
 
 /*
@@ -368,17 +369,15 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_appendIntegerArray
     wpi::ThrowNullPointerException(env, "value is null");
     return;
   }
-  JLongArrayRef jarr{env, value};
+  JSpan<const jlong> jarr{env, value};
   if constexpr (sizeof(jlong) == sizeof(int64_t)) {
     reinterpret_cast<DataLog*>(impl)->AppendIntegerArray(
-        entry,
-        {reinterpret_cast<const int64_t*>(jarr.array().data()),
-         jarr.array().size()},
+        entry, {reinterpret_cast<const int64_t*>(jarr.data()), jarr.size()},
         timestamp);
   } else {
     wpi::SmallVector<int64_t, 16> arr;
     arr.reserve(jarr.size());
-    for (auto v : jarr.array()) {
+    for (auto v : jarr) {
       arr.push_back(v);
     }
     reinterpret_cast<DataLog*>(impl)->AppendIntegerArray(entry, arr, timestamp);
@@ -404,7 +403,7 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_appendFloatArray
     return;
   }
   reinterpret_cast<DataLog*>(impl)->AppendFloatArray(
-      entry, JFloatArrayRef{env, value}, timestamp);
+      entry, JSpan<const jfloat>{env, value}, timestamp);
 }
 
 /*
@@ -426,7 +425,7 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_appendDoubleArray
     return;
   }
   reinterpret_cast<DataLog*>(impl)->AppendDoubleArray(
-      entry, JDoubleArrayRef{env, value}, timestamp);
+      entry, JSpan<const jdouble>{env, value}, timestamp);
 }
 
 /*

@@ -41,7 +41,8 @@ DifferentialDrivetrainSim::DifferentialDrivetrainSim(
               driveMotor, mass, wheelRadius, trackWidth / 2.0, J, gearing),
           trackWidth, driveMotor, gearing, wheelRadius, measurementStdDevs) {}
 
-Vectord<2> DifferentialDrivetrainSim::ClampInput(const Vectord<2>& u) {
+Eigen::Vector2d DifferentialDrivetrainSim::ClampInput(
+    const Eigen::Vector2d& u) {
   return frc::DesaturateInputVector<2>(u,
                                        frc::RobotController::GetInputVoltage());
 }
@@ -128,7 +129,7 @@ void DifferentialDrivetrainSim::SetPose(const frc::Pose2d& pose) {
 }
 
 Vectord<7> DifferentialDrivetrainSim::Dynamics(const Vectord<7>& x,
-                                               const Vectord<2>& u) {
+                                               const Eigen::Vector2d& u) {
   // Because G² can be factored out of A, we can divide by the old ratio
   // squared and multiply by the new ratio squared to get a new drivetrain
   // model.

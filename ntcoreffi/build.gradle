@@ -1,5 +1,6 @@
 plugins {
     id 'c'
+    id 'cpp'
     id 'maven-publish'
 }
 
@@ -49,6 +50,16 @@ model {
                         srcDir generatedHeaders
                     }
                 }
+                cpp {
+                    source {
+                        srcDirs = ['src/main/native/cpp']
+                        includes = ['**/*.cpp']
+                    }
+                    exportedHeaders {
+                        srcDir 'src/main/native/include'
+                        srcDir generatedHeaders
+                    }
+                }
             }
             binaries.all { binary ->
                 if (binary instanceof StaticLibraryBinarySpec) {
@@ -61,6 +72,9 @@ model {
                 project(':ntcore').addNtcoreDependency(binary, 'static')
                 lib project: ':wpinet', library: 'wpinet', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
+                if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                    nativeUtils.useRequiredLibrary(binary, 'ni_link_libraries')
+                }
             }
         }
     }

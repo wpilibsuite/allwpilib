@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.hal;
+
 /**
  * Analog Input / Output / Accumulator / Trigger JNI Functions.
  *
@@ -19,10 +20,13 @@ public class AnalogJNI extends JNIWrapper {
   public interface AnalogTriggerType {
     /** <i>native declaration : AthenaJava\target\native\include\HAL\Analog.h:54</i> */
     int kInWindow = 0;
+
     /** <i>native declaration : AthenaJava\target\native\include\HAL\Analog.h:55</i> */
     int kState = 1;
+
     /** <i>native declaration : AthenaJava\target\native\include\HAL\Analog.h:56</i> */
     int kRisingPulse = 2;
+
     /** <i>native declaration : AthenaJava\target\native\include\HAL\Analog.h:57</i> */
     int kFallingPulse = 3;
   }
@@ -52,6 +56,7 @@ public class AnalogJNI extends JNIWrapper {
    * @see "HAL_InitializeAnalogOutputPort"
    */
   public static native int initializeAnalogOutputPort(int halPortHandle);
+
   /**
    * Frees an analog output port.
    *
@@ -206,6 +211,7 @@ public class AnalogJNI extends JNIWrapper {
    * @see "HAL_GetAnalogVoltsToValue"
    */
   public static native int getAnalogVoltsToValue(int analogPortHandle, double voltage);
+
   /**
    * Get the analog voltage from a raw value.
    *
@@ -418,6 +424,7 @@ public class AnalogJNI extends JNIWrapper {
    */
   public static native void setAnalogTriggerLimitsVoltage(
       int analogTriggerHandle, double lower, double upper);
+
   /**
    * Configures the analog trigger to use the averaged vs. raw values.
    *
@@ -433,6 +440,7 @@ public class AnalogJNI extends JNIWrapper {
    */
   public static native void setAnalogTriggerAveraged(
       int analogTriggerHandle, boolean useAveragedValue);
+
   /**
    * Configures the analog trigger to use a filtered value.
    *

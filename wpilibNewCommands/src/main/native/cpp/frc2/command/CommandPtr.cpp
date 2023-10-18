@@ -86,15 +86,7 @@ CommandPtr CommandPtr::WithInterruptBehavior(
 }
 
 CommandPtr CommandPtr::AndThen(std::function<void()> toRun,
-                               std::span<Subsystem* const> requirements) && {
-  AssertValid();
-  return std::move(*this).AndThen(CommandPtr(
-      std::make_unique<InstantCommand>(std::move(toRun), requirements)));
-}
-
-CommandPtr CommandPtr::AndThen(
-    std::function<void()> toRun,
-    std::initializer_list<Subsystem*> requirements) && {
+                               Requirements requirements) && {
   AssertValid();
   return std::move(*this).AndThen(CommandPtr(
       std::make_unique<InstantCommand>(std::move(toRun), requirements)));
@@ -109,16 +101,8 @@ CommandPtr CommandPtr::AndThen(CommandPtr&& next) && {
   return std::move(*this);
 }
 
-CommandPtr CommandPtr::BeforeStarting(
-    std::function<void()> toRun, std::span<Subsystem* const> requirements) && {
-  AssertValid();
-  return std::move(*this).BeforeStarting(CommandPtr(
-      std::make_unique<InstantCommand>(std::move(toRun), requirements)));
-}
-
-CommandPtr CommandPtr::BeforeStarting(
-    std::function<void()> toRun,
-    std::initializer_list<Subsystem*> requirements) && {
+CommandPtr CommandPtr::BeforeStarting(std::function<void()> toRun,
+                                      Requirements requirements) && {
   AssertValid();
   return std::move(*this).BeforeStarting(CommandPtr(
       std::make_unique<InstantCommand>(std::move(toRun), requirements)));
