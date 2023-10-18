@@ -202,7 +202,7 @@ public abstract class RobotBase implements AutoCloseable {
    * @return If the robot is running in simulation.
    */
   public static boolean isSimulation() {
-    return HALUtil.getHALRuntimeType() == RuntimeType.kSimulation;
+    return getRuntimeType() == RuntimeType.kSimulation;
   }
 
   /**
