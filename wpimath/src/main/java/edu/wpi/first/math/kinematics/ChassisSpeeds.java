@@ -6,6 +6,7 @@ package edu.wpi.first.math.kinematics;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 
 /**
  * Represents the speed of a robot chassis. Although this class contains similar members compared to
@@ -116,10 +117,10 @@ public class ChassisSpeeds {
       double vyMetersPerSecond,
       double omegaRadiansPerSecond,
       Rotation2d robotAngle) {
-    return new ChassisSpeeds(
-        vxMetersPerSecond * robotAngle.getCos() + vyMetersPerSecond * robotAngle.getSin(),
-        -vxMetersPerSecond * robotAngle.getSin() + vyMetersPerSecond * robotAngle.getCos(),
-        omegaRadiansPerSecond);
+    // CW rotation into chassis frame
+    var rotated =
+        new Translation2d(vxMetersPerSecond, vyMetersPerSecond).rotateBy(robotAngle.unaryMinus());
+    return new ChassisSpeeds(rotated.getX(), rotated.getY(), omegaRadiansPerSecond);
   }
 
   /**
@@ -140,6 +141,51 @@ public class ChassisSpeeds {
         fieldRelativeSpeeds.vxMetersPerSecond,
         fieldRelativeSpeeds.vyMetersPerSecond,
         fieldRelativeSpeeds.omegaRadiansPerSecond,
+        robotAngle);
+  }
+
+  /**
+   * Converts a user provided robot-relative set of speeds into a field-relative ChassisSpeeds
+   * object.
+   *
+   * @param vxMetersPerSecond The component of speed in the x direction relative to the robot.
+   *     Positive x is towards the robot's front.
+   * @param vyMetersPerSecond The component of speed in the y direction relative to the robot.
+   *     Positive y is towards the robot's left.
+   * @param omegaRadiansPerSecond The angular rate of the robot.
+   * @param robotAngle The angle of the robot as measured by a gyroscope. The robot's angle is
+   *     considered to be zero when it is facing directly away from your alliance station wall.
+   *     Remember that this should be CCW positive.
+   * @return ChassisSpeeds object representing the speeds in the field's frame of reference.
+   */
+  public static ChassisSpeeds fromRobotRelativeSpeeds(
+      double vxMetersPerSecond,
+      double vyMetersPerSecond,
+      double omegaRadiansPerSecond,
+      Rotation2d robotAngle) {
+    // CCW rotation out of chassis frame
+    var rotated = new Translation2d(vxMetersPerSecond, vyMetersPerSecond).rotateBy(robotAngle);
+    return new ChassisSpeeds(rotated.getX(), rotated.getY(), omegaRadiansPerSecond);
+  }
+
+  /**
+   * Converts a user provided robot-relative ChassisSpeeds object into a field-relative
+   * ChassisSpeeds object.
+   *
+   * @param robotRelativeSpeeds The ChassisSpeeds object representing the speeds in the robot frame
+   *     of reference. Positive x is towards the robot's front. Positive y is towards the robot's
+   *     left.
+   * @param robotAngle The angle of the robot as measured by a gyroscope. The robot's angle is
+   *     considered to be zero when it is facing directly away from your alliance station wall.
+   *     Remember that this should be CCW positive.
+   * @return ChassisSpeeds object representing the speeds in the field's frame of reference.
+   */
+  public static ChassisSpeeds fromRobotRelativeSpeeds(
+      ChassisSpeeds robotRelativeSpeeds, Rotation2d robotAngle) {
+    return fromRobotRelativeSpeeds(
+        robotRelativeSpeeds.vxMetersPerSecond,
+        robotRelativeSpeeds.vyMetersPerSecond,
+        robotRelativeSpeeds.omegaRadiansPerSecond,
         robotAngle);
   }
 
