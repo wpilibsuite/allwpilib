@@ -18,6 +18,8 @@
 #include "units/velocity.h"
 #include "units/voltage.h"
 
+#include "frc/controller/SimpleMotorFeedforward.h"
+
 static constexpr auto kDt = 10_ms;
 static constexpr auto kV = 2.5629_V / 1_mps;
 static constexpr auto kA = 0.43277_V / 1_mps_sq;
@@ -32,15 +34,30 @@ static constexpr auto kA = 0.43277_V / 1_mps_sq;
     EXPECT_NEAR_UNITS(val1, val2, eps);          \
   }
 
+frc::ExponentialProfile<units::meter, units::volts>::State CheckDynamics(
+  frc::ExponentialProfile<units::meter, units::volts> profile,
+  frc::ExponentialProfile<units::meter, units::volts>::Constraints constraints,
+  frc::SimpleMotorFeedforward<units::meter> feedforward, 
+  frc::ExponentialProfile<units::meter, units::volts>::State current,
+  frc::ExponentialProfile<units::meter, units::volts>::State goal) {
+    auto next = profile.Calculate(kDt, current, goal);
+    auto signal = feedforward.Calculate(current.velocity, next.velocity, kDt);
+
+    EXPECT_LE(units::math::abs(signal), constraints.maxInput + 1e-9_V);
+
+    return next;
+}
+
 TEST(ExponentialProfileTest, ReachesGoal) {
   frc::ExponentialProfile<units::meter, units::volts>::Constraints constraints{
       12_V, -kV / kA, 1 / kA};
   frc::ExponentialProfile<units::meter, units::volts> profile{constraints};
+  frc::SimpleMotorFeedforward<units::meter> feedforward{0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps_sq};
   frc::ExponentialProfile<units::meter, units::volts>::State goal{10_m, 0_mps};
   frc::ExponentialProfile<units::meter, units::volts>::State state{0_m, 0_mps};
 
   for (int i = 0; i < 450; ++i) {
-    state = profile.Calculate(kDt, state, goal);
+    state = CheckDynamics(profile, constraints, feedforward, state, goal);
   }
   EXPECT_EQ(state, goal);
 }
@@ -51,6 +68,7 @@ TEST(ExponentialProfileTest, PosContinousUnderVelChange) {
   frc::ExponentialProfile<units::meter, units::volts>::Constraints constraints{
       12_V, -kV / kA, 1 / kA};
   frc::ExponentialProfile<units::meter, units::volts> profile{constraints};
+  frc::SimpleMotorFeedforward<units::meter> feedforward{0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps_sq};
   frc::ExponentialProfile<units::meter, units::volts>::State goal{10_m, 0_mps};
   frc::ExponentialProfile<units::meter, units::volts>::State state{0_m, 0_mps};
 
@@ -61,7 +79,7 @@ TEST(ExponentialProfileTest, PosContinousUnderVelChange) {
           frc::ExponentialProfile<units::meter, units::volts>{constraints};
     }
 
-    state = profile.Calculate(kDt, state, goal);
+    state = CheckDynamics(profile, constraints, feedforward, state, goal);
   }
   EXPECT_EQ(state, goal);
 }
@@ -72,6 +90,7 @@ TEST(ExponentialProfileTest, PosContinousUnderVelChangeBackward) {
   frc::ExponentialProfile<units::meter, units::volts>::Constraints constraints{
       12_V, -kV / kA, 1 / kA};
   frc::ExponentialProfile<units::meter, units::volts> profile{constraints};
+  frc::SimpleMotorFeedforward<units::meter> feedforward{0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps_sq};
   frc::ExponentialProfile<units::meter, units::volts>::State goal{-10_m, 0_mps};
   frc::ExponentialProfile<units::meter, units::volts>::State state{0_m, 0_mps};
 
@@ -82,7 +101,7 @@ TEST(ExponentialProfileTest, PosContinousUnderVelChangeBackward) {
           frc::ExponentialProfile<units::meter, units::volts>{constraints};
     }
 
-    state = profile.Calculate(kDt, state, goal);
+    state = CheckDynamics(profile, constraints, feedforward, state, goal);
   }
   EXPECT_EQ(state, goal);
 }
@@ -92,11 +111,12 @@ TEST(ExponentialProfileTest, Backwards) {
   frc::ExponentialProfile<units::meter, units::volts>::Constraints constraints{
       12_V, -kV / kA, 1 / kA};
   frc::ExponentialProfile<units::meter, units::volts> profile{constraints};
+  frc::SimpleMotorFeedforward<units::meter> feedforward{0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps_sq};
   frc::ExponentialProfile<units::meter, units::volts>::State goal{-10_m, 0_mps};
   frc::ExponentialProfile<units::meter, units::volts>::State state;
 
   for (int i = 0; i < 400; ++i) {
-    state = profile.Calculate(kDt, state, goal);
+    state = CheckDynamics(profile, constraints, feedforward, state, goal);
   }
   EXPECT_EQ(state, goal);
 }
@@ -105,17 +125,18 @@ TEST(ExponentialProfileTest, SwitchGoalInMiddle) {
   frc::ExponentialProfile<units::meter, units::volts>::Constraints constraints{
       12_V, -kV / kA, 1 / kA};
   frc::ExponentialProfile<units::meter, units::volts> profile{constraints};
+  frc::SimpleMotorFeedforward<units::meter> feedforward{0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps_sq};
   frc::ExponentialProfile<units::meter, units::volts>::State goal{-10_m, 0_mps};
   frc::ExponentialProfile<units::meter, units::volts>::State state{0_m, 0_mps};
 
   for (int i = 0; i < 50; ++i) {
-    state = profile.Calculate(kDt, state, goal);
+    state = CheckDynamics(profile, constraints, feedforward, state, goal);
   }
   EXPECT_NE(state, goal);
 
   goal = {0.0_m, 0.0_mps};
   for (int i = 0; i < 100; ++i) {
-    state = profile.Calculate(kDt, state, goal);
+    state = CheckDynamics(profile, constraints, feedforward, state, goal);
   }
   EXPECT_EQ(state, goal);
 }
@@ -125,13 +146,14 @@ TEST(ExponentialProfileTest, TopSpeed) {
   frc::ExponentialProfile<units::meter, units::volts>::Constraints constraints{
       12_V, -kV / kA, 1 / kA};
   frc::ExponentialProfile<units::meter, units::volts> profile{constraints};
+  frc::SimpleMotorFeedforward<units::meter> feedforward{0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps_sq};
   frc::ExponentialProfile<units::meter, units::volts>::State goal{40_m, 0_mps};
   frc::ExponentialProfile<units::meter, units::volts>::State state;
 
   units::meters_per_second_t maxSpeed = 0_mps;
 
   for (int i = 0; i < 900; ++i) {
-    state = profile.Calculate(kDt, state, goal);
+    state = CheckDynamics(profile, constraints, feedforward, state, goal);
     maxSpeed = units::math::max(state.velocity, maxSpeed);
   }
 
@@ -144,13 +166,14 @@ TEST(ExponentialProfileTest, TopSpeedBackward) {
   frc::ExponentialProfile<units::meter, units::volts>::Constraints constraints{
       12_V, -kV / kA, 1 / kA};
   frc::ExponentialProfile<units::meter, units::volts> profile{constraints};
+  frc::SimpleMotorFeedforward<units::meter> feedforward{0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps_sq};
   frc::ExponentialProfile<units::meter, units::volts>::State goal{-40_m, 0_mps};
   frc::ExponentialProfile<units::meter, units::volts>::State state;
 
   units::meters_per_second_t maxSpeed = 0_mps;
 
   for (int i = 0; i < 900; ++i) {
-    state = profile.Calculate(kDt, state, goal);
+    state = CheckDynamics(profile, constraints, feedforward, state, goal);
     maxSpeed = units::math::min(state.velocity, maxSpeed);
   }
 
@@ -163,12 +186,12 @@ TEST(ExponentialProfileTest, HighInitialSpeed) {
   frc::ExponentialProfile<units::meter, units::volts>::Constraints constraints{
       12_V, -kV / kA, 1 / kA};
   frc::ExponentialProfile<units::meter, units::volts> profile{constraints};
-
+  frc::SimpleMotorFeedforward<units::meter> feedforward{0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps_sq};
   frc::ExponentialProfile<units::meter, units::volts>::State goal{40_m, 0_mps};
   frc::ExponentialProfile<units::meter, units::volts>::State state{0_m, 8_mps};
 
   for (int i = 0; i < 900; ++i) {
-    state = profile.Calculate(kDt, state, goal);
+    state = CheckDynamics(profile, constraints, feedforward, state, goal);
   }
 
   EXPECT_EQ(state, goal);
@@ -179,11 +202,12 @@ TEST(ExponentialProfileTest, HighInitialSpeedBackward) {
   frc::ExponentialProfile<units::meter, units::volts>::Constraints constraints{
       12_V, -kV / kA, 1 / kA};
   frc::ExponentialProfile<units::meter, units::volts> profile{constraints};
+  frc::SimpleMotorFeedforward<units::meter> feedforward{0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps_sq};
   frc::ExponentialProfile<units::meter, units::volts>::State goal{-40_m, 0_mps};
   frc::ExponentialProfile<units::meter, units::volts>::State state{0_m, -8_mps};
 
   for (int i = 0; i < 900; ++i) {
-    state = profile.Calculate(kDt, state, goal);
+    state = CheckDynamics(profile, constraints, feedforward, state, goal);
   }
 
   EXPECT_EQ(state, goal);
@@ -239,4 +263,64 @@ TEST(ExponentialProfileTest, TestHeuristic) {
     EXPECT_NEAR_UNITS(std::get<2>(testCase).velocity / 1_mps,
                       state.velocity / 1_mps, 1e-3);
   }
+}
+
+TEST(ExponentialProfileTest, TimingToCurrent) {
+  frc::ExponentialProfile<units::meter, units::volts>::Constraints constraints{
+      12_V, -kV / kA, 1 / kA};
+  frc::ExponentialProfile<units::meter, units::volts> profile{constraints};
+  frc::SimpleMotorFeedforward<units::meter> feedforward{0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps_sq};
+  frc::ExponentialProfile<units::meter, units::volts>::State goal{2_m, 0_mps};
+  frc::ExponentialProfile<units::meter, units::volts>::State state{0_m, 0_mps};
+
+  for (int i = 0; i < 900; ++i) {
+    state = CheckDynamics(profile, constraints, feedforward, state, goal);
+    EXPECT_NEAR_UNITS(profile.TimeLeftUntil(state, state), 0_s, 2e-2_s);
+  }
+
+  EXPECT_EQ(state, goal);
+}
+
+TEST(ExponentialProfileTest, TimingToGoal) {
+  frc::ExponentialProfile<units::meter, units::volts>::Constraints constraints{
+      12_V, -kV / kA, 1 / kA};
+  frc::ExponentialProfile<units::meter, units::volts> profile{constraints};
+  frc::SimpleMotorFeedforward<units::meter> feedforward{0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps_sq};
+  frc::ExponentialProfile<units::meter, units::volts>::State goal{2_m, 0_mps};
+  frc::ExponentialProfile<units::meter, units::volts>::State state{0_m, 0_mps};
+
+  auto prediction = profile.TimeLeftUntil(state, goal);
+  auto reachedGoal = false;
+
+  for (int i = 0; i < 900; ++i) {
+    state = CheckDynamics(profile, constraints, feedforward, state, goal);
+    if (!reachedGoal && state == goal) {
+      EXPECT_NEAR_UNITS(prediction, i * 0.01_s, 0.25_s);
+      reachedGoal = true;
+    }
+  }
+
+  EXPECT_EQ(state, goal);
+}
+
+TEST(ExponentialProfileTest, TimingToNegativeGoal) {
+  frc::ExponentialProfile<units::meter, units::volts>::Constraints constraints{
+      12_V, -kV / kA, 1 / kA};
+  frc::ExponentialProfile<units::meter, units::volts> profile{constraints};
+  frc::SimpleMotorFeedforward<units::meter> feedforward{0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps_sq};
+  frc::ExponentialProfile<units::meter, units::volts>::State goal{-2_m, 0_mps};
+  frc::ExponentialProfile<units::meter, units::volts>::State state{0_m, 0_mps};
+
+  auto prediction = profile.TimeLeftUntil(state, goal);
+  auto reachedGoal = false;
+
+  for (int i = 0; i < 900; ++i) {
+    state = CheckDynamics(profile, constraints, feedforward, state, goal);
+    if (!reachedGoal && state == goal) {
+      EXPECT_NEAR_UNITS(prediction, i * 0.01_s, 0.25_s);
+      reachedGoal = true;
+    }
+  }
+
+  EXPECT_EQ(state, goal);
 }

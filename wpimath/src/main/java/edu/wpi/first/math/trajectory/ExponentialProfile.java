@@ -265,13 +265,15 @@ public class ExponentialProfile {
 
     double inflectionT_forward;
 
-    // We need to handle 4 cases here:
+    // We need to handle 5 cases here:
     // - Approaching -maxVelocity from below
     // - Approaching -maxVelocity from above
     // - Approaching maxVelocity from below
     // - Approaching maxVelocity from above
-    // For cases 1 and 3, we want to subtract epsilon from the inflection point velocity
-    // For cases 2 and 4, we want to add epsilon to the inflection point velocity
+    // - At +-maxVelocity
+    // For cases 1 and 3, we want to subtract epsilon from the inflection point velocity.
+    // For cases 2 and 4, we want to add epsilon to the inflection point velocity.
+    // For case 5, we have reached inflection point velocity.
     double epsilon = 1e-9;
     if (Math.abs(Math.signum(input) * m_constraints.maxVelocity() - inflectionPoint.velocity)
         < epsilon) {

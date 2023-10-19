@@ -8,6 +8,7 @@
 
 #include "frc/trajectory/ExponentialProfile.h"
 #include "units/math.h"
+#include "fmt/core.h"
 
 namespace frc {
 template <class Distance, class Input>
@@ -94,27 +95,35 @@ ExponentialProfile<Distance, Input>::CalculateProfileTiming(
 
   units::second_t inflectionT_forward;
 
-  // We need to handle 4 cases here:
+  // We need to handle 5 cases here:
   // - Approaching -maxVelocity from below
   // - Approaching -maxVelocity from above
   // - Approaching maxVelocity from below
   // - Approaching maxVelocity from above
+  // - At +-maxVelocity
   // For cases 1 and 3, we want to subtract epsilon from the inflection point
   // velocity For cases 2 and 4, we want to add epsilon to the inflection point
-  // velocity
+  // velocity. For case 5, we have reached inflection point velocity.
   auto epsilon = Velocity_t(1e-9);
   if (units::math::abs(u_dir * m_constraints.MaxVelocity() -
                        inflectionPoint.velocity) < epsilon) {
     auto solvableV = inflectionPoint.velocity;
-    if (units::math::abs(current.velocity) > m_constraints.MaxVelocity()) {
-      solvableV += u_dir * epsilon;
+    units::second_t t_to_solvable_v;
+    Distance_t x_at_solvable_v;
+    if (units::math::abs(current.velocity - inflectionPoint.velocity) < epsilon) {
+      t_to_solvable_v = 0_s;
+      x_at_solvable_v = current.position;
     } else {
-      solvableV -= u_dir * epsilon;
-    }
+      if (units::math::abs(current.velocity) > m_constraints.MaxVelocity()) {
+        solvableV += u_dir * epsilon;
+      } else {
+        solvableV -= u_dir * epsilon;
+      }
 
-    auto t_to_solvable_v =
-        ComputeTimeFromVelocity(solvableV, u, current.velocity);
-    auto x_at_solvable_v = ComputeDistanceFromVelocity(solvableV, u, current);
+      t_to_solvable_v =
+          ComputeTimeFromVelocity(solvableV, u, current.velocity);
+      x_at_solvable_v = ComputeDistanceFromVelocity(solvableV, u, current);
+    }
 
     inflectionT_forward =
         t_to_solvable_v + u_dir * (inflectionPoint.position - x_at_solvable_v) /
