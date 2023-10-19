@@ -33,7 +33,6 @@ public class Elevator implements AutoCloseable {
           ExponentialProfile.Constraints.fromCharacteristics(
               Constants.kElevatorMaxV, Constants.kElevatorkV, Constants.kElevatorkA));
 
-  private ExponentialProfile.State m_goal = new ExponentialProfile.State(0, 0);
   private ExponentialProfile.State m_setpoint = new ExponentialProfile.State(0, 0);
 
   // Standard classes for controlling our elevator
@@ -105,9 +104,9 @@ public class Elevator implements AutoCloseable {
    * @param goal the position to maintain
    */
   public void reachGoal(double goal) {
-    m_goal = new ExponentialProfile.State(goal, 0);
+    var goalState = new ExponentialProfile.State(goal, 0);
 
-    var next = m_profile.calculate(0.020, m_setpoint, m_goal);
+    var next = m_profile.calculate(0.020, m_setpoint, goalState);
 
     // With the setpoint value we run PID control like normal
     double pidOutput = m_pidController.calculate(m_encoder.getDistance(), m_setpoint.position);
