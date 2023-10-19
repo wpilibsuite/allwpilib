@@ -818,7 +818,7 @@
     "commandversion": 2
   },
   {
-    "name": "ElevatorExponentialSimulation",
+    "name": "Elevator Exponential Profile Simulation",
     "description": "Simulate an elevator.",
     "tags": [
       "Basic Robot",

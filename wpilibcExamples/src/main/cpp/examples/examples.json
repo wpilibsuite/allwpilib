@@ -799,7 +799,7 @@
     "commandversion": 2
   },
   {
-    "name": "ElevatorExponentialSimulation",
+    "name": "Elevator Exponential Profile Simulation",
     "description": "Simulate an elevator.",
     "tags": [
       "Basic Robot",
@@ -809,7 +809,7 @@
       "Mechanism2d",
       "Profiled PID"
     ],
-    "foldername": "ElevatorSimulation",
+    "foldername": "ElevatorExponentialSimulation",
     "gradlebase": "cpp",
     "commandversion": 2
   },
