@@ -152,8 +152,11 @@ NetworkServer::ServerConnection3::ServerConnection3(
     }
     // we could be in the middle of sending data, so defer disconnect
     uv::Timer::SingleShot(
-        m_wire->GetStream().GetLoop(), uv::Timer::Time{0}, [this, err] {
-          m_wire->Disconnect(fmt::format("stream error: {}", err.name()));
+        m_wire->GetStream().GetLoop(), uv::Timer::Time{0},
+        [wire = m_wire->weak_from_this(), err] {
+          if (auto w = wire.lock()) {
+            w->Disconnect(fmt::format("stream error: {}", err.name()));
+          }
         });
     m_wire->GetStream().Shutdown([this] { m_wire->GetStream().Close(); });
   });
@@ -290,7 +293,11 @@ void NetworkServer::ServerConnection4::ProcessWsUpgrade() {
            m_connInfo, realReason.empty() ? reason : realReason);
       // we could be in the middle of sending data, so defer disconnect
       uv::Timer::SingleShot(m_websocket->GetStream().GetLoop(),
-                            uv::Timer::Time{0}, [this] { ConnectionClosed(); });
+                            uv::Timer::Time{0}, [self = weak_from_this()] {
+                              if (auto s = self.lock()) {
+                                s->ConnectionClosed();
+                              }
+                            });
     });
     m_websocket->text.connect([this](std::string_view data, bool) {
       m_server.m_serverImpl.ProcessIncomingText(m_clientId, data);
