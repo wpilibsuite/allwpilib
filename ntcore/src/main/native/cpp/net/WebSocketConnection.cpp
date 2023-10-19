@@ -186,7 +186,8 @@ int WebSocketConnection::Flush() {
   m_ws_frames.reserve(m_frames.size());
   for (auto&& frame : m_frames) {
     m_ws_frames.emplace_back(
-        frame.opcode, std::span{&m_bufs[frame.start], &m_bufs[frame.end]});
+        frame.opcode,
+        std::span{m_bufs}.subspan(frame.start, frame.end - frame.start));
   }
 
   auto unsentFrames = m_ws.TrySendFrames(
