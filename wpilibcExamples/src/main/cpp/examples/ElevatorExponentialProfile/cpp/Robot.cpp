@@ -37,9 +37,11 @@ class Robot : public frc::TimedRobot {
     auto next = m_profile.Calculate(kDt, m_goal, m_setpoint);
 
     // Send setpoint to offboard controller PID
-    m_motor.SetSetpoint(ExampleSmartMotorController::PIDMode::kPosition,
-                        m_setpoint.position.value(),
-                        m_feedforward.Calculate(m_setpoint.velocity, next.velocity, kDt) / 12_V);
+    m_motor.SetSetpoint(
+        ExampleSmartMotorController::PIDMode::kPosition,
+        m_setpoint.position.value(),
+        m_feedforward.Calculate(m_setpoint.velocity, next.velocity, kDt) /
+            12_V);
 
     m_setpoint = next;
   }
@@ -53,7 +55,8 @@ class Robot : public frc::TimedRobot {
 
   // Create a motion profile with the given maximum velocity and maximum
   // acceleration constraints for the next setpoint.
-  frc::ExponentialProfile<units::meters, units::volts> m_profile{{10_V, 1_V / 1_mps, 1_V / 1_mps_sq}};
+  frc::ExponentialProfile<units::meters, units::volts> m_profile{
+      {10_V, 1_V / 1_mps, 1_V / 1_mps_sq}};
   frc::ExponentialProfile<units::meters, units::volts>::State m_goal;
   frc::ExponentialProfile<units::meters, units::volts>::State m_setpoint;
 };

@@ -54,7 +54,7 @@ class ExponentialProfileTest {
   @Test
   void reachesGoal() {
     ExponentialProfile profile = new ExponentialProfile(constraints);
-    
+
     ExponentialProfile.State goal = new ExponentialProfile.State(10, 0);
     ExponentialProfile.State state = new ExponentialProfile.State(0, 0);
 

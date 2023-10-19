@@ -6,9 +6,10 @@
 
 #include <algorithm>
 
+#include <fmt/core.h>
+
 #include "frc/trajectory/ExponentialProfile.h"
 #include "units/math.h"
-#include "fmt/core.h"
 
 namespace frc {
 template <class Distance, class Input>
@@ -112,7 +113,8 @@ ExponentialProfile<Distance, Input>::CalculateProfileTiming(
     auto solvableV = inflectionPoint.velocity;
     units::second_t t_to_solvable_v;
     Distance_t x_at_solvable_v;
-    if (units::math::abs(current.velocity - inflectionPoint.velocity) < epsilon) {
+    if (units::math::abs(current.velocity - inflectionPoint.velocity) <
+        epsilon) {
       t_to_solvable_v = 0_s;
       x_at_solvable_v = current.position;
     } else {
@@ -122,8 +124,7 @@ ExponentialProfile<Distance, Input>::CalculateProfileTiming(
         solvableV -= u_dir * epsilon;
       }
 
-      t_to_solvable_v =
-          ComputeTimeFromVelocity(solvableV, u, current.velocity);
+      t_to_solvable_v = ComputeTimeFromVelocity(solvableV, u, current.velocity);
       x_at_solvable_v = ComputeDistanceFromVelocity(solvableV, u, current);
     }
 

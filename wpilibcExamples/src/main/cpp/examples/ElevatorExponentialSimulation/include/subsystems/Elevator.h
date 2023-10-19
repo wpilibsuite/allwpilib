@@ -5,7 +5,6 @@
 #pragma once
 
 #include <frc/Encoder.h>
-#include <frc/trajectory/ExponentialProfile.h>
 #include <frc/controller/ElevatorFeedforward.h>
 #include <frc/controller/PIDController.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
@@ -17,6 +16,7 @@
 #include <frc/smartdashboard/Mechanism2d.h>
 #include <frc/smartdashboard/MechanismLigament2d.h>
 #include <frc/smartdashboard/MechanismRoot2d.h>
+#include <frc/trajectory/ExponentialProfile.h>
 #include <units/length.h>
 
 #include "Constants.h"
@@ -35,15 +35,15 @@ class Elevator {
   frc::DCMotor m_elevatorGearbox = frc::DCMotor::NEO(2);
 
   // Standard classes for controlling our elevator
-  frc::ExponentialProfile<units::meters, units::volts>::Constraints m_constraints{
-    Constants::kElevatorMaxV,
-    Constants::kElevatorkV,
-    Constants::kElevatorkA};
+  frc::ExponentialProfile<units::meters, units::volts>::Constraints
+      m_constraints{Constants::kElevatorMaxV, Constants::kElevatorkV,
+                    Constants::kElevatorkA};
   frc::ExponentialProfile<units::meters, units::volts> m_profile{m_constraints};
   frc::ExponentialProfile<units::meters, units::volts>::State m_goal;
   frc::ExponentialProfile<units::meters, units::volts>::State m_setpoint;
 
-  frc::PIDController m_controller{Constants::kElevatorKp, Constants::kElevatorKi, Constants::kElevatorKd};
+  frc::PIDController m_controller{
+      Constants::kElevatorKp, Constants::kElevatorKi, Constants::kElevatorKd};
 
   frc::ElevatorFeedforward m_feedforward{
       Constants::kElevatorkS, Constants::kElevatorkG, Constants::kElevatorkV,

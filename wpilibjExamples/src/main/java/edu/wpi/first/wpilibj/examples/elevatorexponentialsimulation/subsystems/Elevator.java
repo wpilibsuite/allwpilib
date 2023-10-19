@@ -110,8 +110,7 @@ public class Elevator implements AutoCloseable {
     var next = m_profile.calculate(0.020, m_setpoint, m_goal);
 
     // With the setpoint value we run PID control like normal
-    double pidOutput =
-        m_pidController.calculate(m_encoder.getDistance(), m_setpoint.position);
+    double pidOutput = m_pidController.calculate(m_encoder.getDistance(), m_setpoint.position);
     double feedforwardOutput = m_feedforward.calculate(m_setpoint.velocity, next.velocity, 0.020);
 
     m_motor.setVoltage(pidOutput + feedforwardOutput);

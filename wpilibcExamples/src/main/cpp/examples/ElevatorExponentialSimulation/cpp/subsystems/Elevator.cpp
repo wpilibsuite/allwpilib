@@ -40,12 +40,15 @@ void Elevator::UpdateTelemetry() {
 }
 
 void Elevator::ReachGoal(units::meter_t goal) {
-  m_goal = frc::ExponentialProfile<units::meters, units::volts>::State{goal, 0_mps};
+  m_goal =
+      frc::ExponentialProfile<units::meters, units::volts>::State{goal, 0_mps};
 
   auto next = m_profile.Calculate(20_ms, m_setpoint, m_goal);
 
-  auto pidOutput = m_controller.Calculate(m_encoder.GetDistance(), m_setpoint.position / 1_m);
-  auto feedforwardOutput = m_feedforward.Calculate(m_setpoint.velocity, next.velocity, 20_ms);
+  auto pidOutput = m_controller.Calculate(m_encoder.GetDistance(),
+                                          m_setpoint.position / 1_m);
+  auto feedforwardOutput =
+      m_feedforward.Calculate(m_setpoint.velocity, next.velocity, 20_ms);
 
   m_motor.SetVoltage(units::volt_t{pidOutput} + feedforwardOutput);
 
