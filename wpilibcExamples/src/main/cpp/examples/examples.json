@@ -206,6 +206,20 @@
     "commandversion": 2
   },
   {
+    "name": "Elevator with exponential profiled PID",
+    "description": "Reach elevator position setpoints with exponential profiles and smart motor controller PID.",
+    "tags": [
+      "Basic Robot",
+      "Elevator",
+      "Exponential Profile",
+      "Smart Motor Controller",
+      "Joystick"
+    ],
+    "foldername": "ElevatorExponentialProfile",
+    "gradlebase": "cpp",
+    "commandversion": 2
+  },
+  {
     "name": "Elevator with trapezoid profiled PID",
     "description": "Reach elevator position setpoints with trapezoid profiles and smart motor controller PID.",
     "tags": [
@@ -771,6 +785,21 @@
   },
   {
     "name": "ElevatorSimulation",
+    "description": "Simulate an elevator.",
+    "tags": [
+      "Basic Robot",
+      "Elevator",
+      "State-Space",
+      "Simulation",
+      "Mechanism2d",
+      "Profiled PID"
+    ],
+    "foldername": "ElevatorSimulation",
+    "gradlebase": "cpp",
+    "commandversion": 2
+  },
+  {
+    "name": "ElevatorExponentialSimulation",
     "description": "Simulate an elevator.",
     "tags": [
       "Basic Robot",
