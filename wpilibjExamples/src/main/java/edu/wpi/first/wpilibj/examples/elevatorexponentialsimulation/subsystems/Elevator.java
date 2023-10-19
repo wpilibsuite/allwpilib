@@ -28,13 +28,13 @@ public class Elevator implements AutoCloseable {
   // This gearbox represents a gearbox containing 4 Vex 775pro motors.
   private final DCMotor m_elevatorGearbox = DCMotor.getNEO(2);
 
-  private final ExponentialProfile m_controller =
+  private final ExponentialProfile m_profile =
       new ExponentialProfile(
           ExponentialProfile.Constraints.fromCharacteristics(
               Constants.kElevatorMaxV, Constants.kElevatorkV, Constants.kElevatorkA));
 
-  private ExponentialProfile.State goal = new ExponentialProfile.State(0, 0);
-  private ExponentialProfile.State setpoint = new ExponentialProfile.State(0, 0);
+  private ExponentialProfile.State m_goal = new ExponentialProfile.State(0, 0);
+  private ExponentialProfile.State m_setpoint = new ExponentialProfile.State(0, 0);
 
   // Standard classes for controlling our elevator
   private final PIDController m_pidController =
@@ -105,24 +105,28 @@ public class Elevator implements AutoCloseable {
    * @param goal the position to maintain
    */
   public void reachGoal(double goal) {
-    this.goal = new ExponentialProfile.State(goal, 0);
+    m_goal = new ExponentialProfile.State(goal, 0);
 
-    var next = m_controller.calculate(0.020, setpoint, this.goal);
+    var next = m_profile.calculate(0.020, m_setpoint, m_goal);
 
     // With the setpoint value we run PID control like normal
     double pidOutput =
-        m_pidController.calculate(m_elevatorSim.getPositionMeters(), setpoint.position);
-    double feedforwardOutput = m_feedforward.calculate(setpoint.velocity, next.velocity, 0.020);
+        m_pidController.calculate(m_encoder.getDistance(), m_setpoint.position);
+    double feedforwardOutput = m_feedforward.calculate(m_setpoint.velocity, next.velocity, 0.020);
 
     m_motor.setVoltage(pidOutput + feedforwardOutput);
 
-    setpoint = next;
+    m_setpoint = next;
   }
 
   /** Stop the control loop and motor output. */
   public void stop() {
-    goal = new ExponentialProfile.State(0, 0);
     m_motor.set(0.0);
+  }
+
+  /** Reset Exponential profile to begin from current position on enable. */
+  public void reset() {
+    m_setpoint = new ExponentialProfile.State(m_encoder.getDistance(), 0);
   }
 
   /** Update telemetry, including the mechanism visualization. */
