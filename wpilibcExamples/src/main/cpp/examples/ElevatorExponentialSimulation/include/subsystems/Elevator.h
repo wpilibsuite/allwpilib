@@ -39,7 +39,6 @@ class Elevator {
       m_constraints{Constants::kElevatorMaxV, Constants::kElevatorkV,
                     Constants::kElevatorkA};
   frc::ExponentialProfile<units::meters, units::volts> m_profile{m_constraints};
-  frc::ExponentialProfile<units::meters, units::volts>::State m_goal;
   frc::ExponentialProfile<units::meters, units::volts>::State m_setpoint;
 
   frc::PIDController m_controller{
