@@ -57,10 +57,10 @@ class ExponentialProfile {
 
   class Constraints {
    public:
-    Constraints(Input_t maxInput_, A_t A_, B_t B_)
-        : maxInput{maxInput_}, A{A_}, B{B_} {}
-    Constraints(Input_t maxInput_, kV_t kV_, kA_t kA_)
-        : maxInput{maxInput_}, A{-kV_ / kA_}, B{1 / kA_} {}
+    Constraints(Input_t maxInput, A_t A, B_t B)
+        : maxInput{maxInput}, A{A}, B{B} {}
+    Constraints(Input_t maxInput, kV_t kV, kA_t kA)
+        : maxInput{maxInput}, A{-kV / kA}, B{1 / kA} {}
     Velocity_t MaxVelocity() const { return -maxInput * B / A; }
 
     Input_t maxInput{0};
