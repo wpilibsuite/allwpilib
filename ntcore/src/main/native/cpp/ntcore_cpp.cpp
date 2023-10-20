@@ -782,4 +782,19 @@ NT_Listener AddPolledLogger(NT_ListenerPoller poller, unsigned int minLevel,
   }
 }
 
+bool HasSchema(NT_Inst inst, std::string_view name) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+    return ii->localStorage.HasSchema(name);
+  } else {
+    return false;
+  }
+}
+
+void AddSchema(NT_Inst inst, std::string_view name, std::string_view type,
+               std::span<const uint8_t> schema) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+    ii->localStorage.AddSchema(name, type, schema);
+  }
+}
+
 }  // namespace nt

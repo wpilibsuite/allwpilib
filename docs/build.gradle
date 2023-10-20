@@ -142,6 +142,8 @@ doxygen {
     //TODO: building memory docs causes search to break
     exclude 'wpi/memory/**'
 
+    exclude '*.pb.h'
+
     aliases 'effects=\\par <i>Effects:</i>^^',
             'notes=\\par <i>Notes:</i>^^',
             'requires=\\par <i>Requires:</i>^^',

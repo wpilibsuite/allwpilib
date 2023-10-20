@@ -1,6 +1,7 @@
 apply plugin: 'maven-publish'
 apply plugin: 'java-library'
 apply plugin: 'jacoco'
+apply plugin: 'com.google.protobuf'
 
 def baseArtifactId = project.baseId
 def artifactGroupId = project.groupId
@@ -139,5 +140,29 @@ jacocoTestReport {
     reports {
         xml.required = true
         html.required = true
+    }
+}
+
+protobuf {
+    protoc {
+        artifact = 'com.google.protobuf:protoc:3.21.12'
+    }
+    plugins {
+        quickbuf {
+            artifact = 'us.hebi.quickbuf:protoc-gen-quickbuf:1.3.2'
+        }
+    }
+    generateProtoTasks {
+        all().configureEach { task ->
+            task.builtins {
+                cpp {}
+                remove java
+            }
+            task.plugins {
+                quickbuf {
+                    option "gen_descriptors=true"
+                }
+            }
+        }
     }
 }
