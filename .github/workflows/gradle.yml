@@ -193,6 +193,19 @@ jobs:
     needs: [build-docker, build-host, build-documentation]
     runs-on: ubuntu-22.04
     steps:
+      - name: Free Disk Space
+        if: |
+          github.repository_owner == 'wpilibsuite' &&
+          (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: false
+          docker-images: false
+          swap-storage: false
       - uses: actions/checkout@v3
         if: |
           github.repository_owner == 'wpilibsuite' &&
