@@ -15,8 +15,8 @@ public interface UnaryFunction {
    * input.
    *
    * <pre>
-   * f = x -> x + 1 // f(x) = x + 1
-   * g = x -> 2 * x // g(x) = 2x
+   * f = x -&gt; x + 1 // f(x) = x + 1
+   * g = x -&gt; 2 * x // g(x) = 2x
    *
    * h = f.pipeTo(g) // h(x) = g(f(x))
    * </pre>

@@ -31,8 +31,8 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
    * seconds. Converting to the same unit is equivalent to calling {@link #magnitude()}.
    *
    * <pre>
-   *   Meters.of(12).in(Feet) // => 39.3701
-   *   Seconds.of(15).in(Minutes) // => 0.25
+   *   Meters.of(12).in(Feet) // 39.3701
+   *   Seconds.of(15).in(Minutes) // 0.25
    * </pre>
    *
    * @param unit the unit to convert this measure to
@@ -132,7 +132,7 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
    * Creates a velocity measure by dividing this one by a time period measure.
    *
    * <pre>
-   *   Meters.of(1).per(Second) // => Measure&lt;Velocity&lt;Distance&gt;&gt;
+   *   Meters.of(1).per(Second) // Measure&lt;Velocity&lt;Distance&gt;&gt;
    * </pre>
    *
    * @param period the time period to divide by.
@@ -147,7 +147,7 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
    * Creates a relational measure equivalent to this one per some other unit.
    *
    * <pre>
-   *   Volts.of(1.05).per(Meter) // => V/m, potential PID constant
+   *   Volts.of(1.05).per(Meter) // V/m, potential PID constant
    * </pre>
    *
    * @param <U2> the type of the denominator unit
@@ -204,8 +204,8 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
    * for use for a +/- scalar, such as 0.05 for +/- 5%.
    *
    * <pre>
-   *   Inches.of(11).isNear(Inches.of(10), 0.1) // => true
-   *   Inches.of(12).isNear(Inches.of(10), 0.1) // => false
+   *   Inches.of(11).isNear(Inches.of(10), 0.1) // true
+   *   Inches.of(12).isNear(Inches.of(10), 0.1) // false
    * </pre>
    *
    * @param other the other measurement to compare against

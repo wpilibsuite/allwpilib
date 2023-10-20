@@ -85,8 +85,8 @@ public class Unit<U extends Unit<U>> {
    * this unit.
    *
    * <pre>
-   *   Inches.convertFrom(12, Feet) // => 144.0
-   *   Kilograms.convertFrom(2.2, Pounds) // => 0.9979024
+   *   Inches.convertFrom(12, Feet) // 144.0
+   *   Kilograms.convertFrom(2.2, Pounds) // 0.9979024
    * </pre>
    *
    * @param magnitude a magnitude measured in another unit
@@ -180,8 +180,8 @@ public class Unit<U extends Unit<U>> {
    * jerk, etc.
    *
    * <pre>
-   *   Meters.per(Second) // => linear velocity
-   *   Kilograms.per(Second) // => mass flow
+   *   Meters.per(Second) // linear velocity
+   *   Kilograms.per(Second) // mass flow
    *   Feet.per(Second).per(Second).of(32) // roughly 1G of acceleration
    * </pre>
    *
