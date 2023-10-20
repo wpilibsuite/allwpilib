@@ -8,7 +8,7 @@ file(GLOB wpigui_windows_src src/main/native/directx11/*.cpp)
 file(GLOB wpigui_mac_src src/main/native/metal/*.mm)
 file(GLOB wpigui_unix_src src/main/native/opengl3/*.cpp)
 
-add_library(wpigui STATIC ${wpigui_src})
+add_library(wpigui ${wpigui_src})
 set_target_properties(wpigui PROPERTIES DEBUG_POSTFIX "d")
 set_property(TARGET wpigui PROPERTY POSITION_INDEPENDENT_CODE ON)
 

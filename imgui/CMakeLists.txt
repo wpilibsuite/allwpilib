@@ -69,7 +69,7 @@ endif()
 file(GLOB imgui_sources ${imgui_SOURCE_DIR}/*.cpp ${imgui_SOURCE_DIR}/misc/cpp/*.cpp)
 file(GLOB implot_sources ${implot_SOURCE_DIR}/*.cpp)
 file(GLOB fonts_sources ${fonts_SOURCE_DIR}/src/*.cpp)
-add_library(imgui STATIC
+add_library(imgui
     ${imgui_sources}
     ${implot_sources}
     ${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.cpp
