@@ -25,8 +25,8 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
   double magnitude();
 
   /**
-   * Gets the magnitude of this measure in terms of the base unit. If the unit is the base unit
-   * for its system of measure, then the value will be equivalent to {@link #magnitude()}.
+   * Gets the magnitude of this measure in terms of the base unit. If the unit is the base unit for
+   * its system of measure, then the value will be equivalent to {@link #magnitude()}.
    *
    * @return the magnitude in terms of the base unit
    */
