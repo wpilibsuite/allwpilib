@@ -92,7 +92,7 @@ public interface UnaryFunction {
   }
 
   /**
-   * Creates a composite function h(x) such that h(x) = f(x) ^ g(x)
+   * Creates a composite function h(x) such that h(x) = f(x) ^ g(x).
    *
    * @param exponent the function to exponentiate this function's results by
    * @return the composite function f(x) ^ g(x)
