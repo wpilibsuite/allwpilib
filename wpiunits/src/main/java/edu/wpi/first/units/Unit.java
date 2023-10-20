@@ -91,6 +91,7 @@ public class Unit<U extends Unit<U>> {
    *
    * @param magnitude a magnitude measured in another unit
    * @param otherUnit the unit to convert the magnitude to
+   * @return the corresponding value in terms of this unit.
    */
   public double convertFrom(double magnitude, Unit<U> otherUnit) {
     if (this.equivalent(otherUnit)) {
@@ -125,6 +126,7 @@ public class Unit<U extends Unit<U>> {
    * <i>immutable</i> and cannot have its value modified.
    *
    * @param magnitude the magnitude of the measure to create
+   * @return the measure
    */
   public Measure<U> of(double magnitude) {
     if (magnitude == 0) {
