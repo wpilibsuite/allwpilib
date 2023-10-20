@@ -20,6 +20,8 @@ By default, all libraries except for the HAL and WPILib get built with a default
 
 The jinja2 pip package is needed to generate classes for NT4's pubsub.
 
+The protobuf library and compiler are needed for protobuf generation. The QuickBuffers protoc-gen package is also required when Java is being built.
+
 OpenCV needs to be findable by CMake. On systems like the Jetson, this is installed by default. Otherwise, you will need to build OpenCV from source and install it.
 
 If you want JNI and Java, you will need a JDK of at least version 11 installed. In addition, you need a `JAVA_HOME` environment variable set properly and set to the JDK directory.
