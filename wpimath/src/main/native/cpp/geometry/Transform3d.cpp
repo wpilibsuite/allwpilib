@@ -5,6 +5,7 @@
 #include "frc/geometry/Transform3d.h"
 
 #include "frc/geometry/Pose3d.h"
+#include "geometry3d.pb.h"
 
 using namespace frc;
 
@@ -34,4 +35,24 @@ Transform3d Transform3d::Inverse() const {
 
 Transform3d Transform3d::operator+(const Transform3d& other) const {
   return Transform3d{Pose3d{}, Pose3d{}.TransformBy(*this).TransformBy(other)};
+}
+
+google::protobuf::Message* wpi::Protobuf<frc::Transform3d>::New(
+    google::protobuf::Arena* arena) {
+  return google::protobuf::Arena::CreateMessage<
+      wpi::proto::ProtobufTransform3d>(arena);
+}
+
+frc::Transform3d wpi::Protobuf<frc::Transform3d>::Unpack(
+    const google::protobuf::Message& msg) {
+  auto m = static_cast<const wpi::proto::ProtobufTransform3d*>(&msg);
+  return Transform3d{wpi::UnpackProtobuf<frc::Translation3d>(m->translation()),
+                     wpi::UnpackProtobuf<frc::Rotation3d>(m->rotation())};
+}
+
+void wpi::Protobuf<frc::Transform3d>::Pack(google::protobuf::Message* msg,
+                                           const frc::Transform3d& value) {
+  auto m = static_cast<wpi::proto::ProtobufTransform3d*>(msg);
+  wpi::PackProtobuf(m->mutable_translation(), value.Translation());
+  wpi::PackProtobuf(m->mutable_rotation(), value.Rotation());
 }

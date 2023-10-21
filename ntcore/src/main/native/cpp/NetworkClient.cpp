@@ -242,7 +242,11 @@ void NetworkClient3::TcpConnected(uv::Tcp& tcp) {
         tcp.error.connect([this, &tcp](uv::Error err) {
           DEBUG3("NT3 TCP error {}", err.str());
           if (!tcp.IsLoopClosing()) {
-            DoDisconnect(err.str());
+            // we could be in the middle of sending data, so defer disconnect
+            uv::Timer::SingleShot(m_loop, uv::Timer::Time{0},
+                                  [this, reason = std::string{err.str()}] {
+                                    DoDisconnect(reason);
+                                  });
           }
         });
         tcp.end.connect([this, &tcp] {
@@ -412,7 +416,10 @@ void NetworkClient::WsConnected(wpi::WebSocket& ws, uv::Tcp& tcp,
   m_clientImpl->SendInitial();
   ws.closed.connect([this, &ws](uint16_t, std::string_view reason) {
     if (!ws.GetStream().IsLoopClosing()) {
-      DoDisconnect(reason);
+      // we could be in the middle of sending data, so defer disconnect
+      uv::Timer::SingleShot(
+          m_loop, uv::Timer::Time{0},
+          [this, reason = std::string{reason}] { DoDisconnect(reason); });
     }
   });
   ws.text.connect([this](std::string_view data, bool) {

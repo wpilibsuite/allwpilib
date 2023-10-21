@@ -1,0 +1,311 @@
+= WPILib Packed Struct Serialization Specification, Version 1.0
+WPILib Developers <wpilib@wpi.edu>
+Revision 1.0 (0x0100), 6/8/2023
+:toc:
+:toc-placement: preamble
+:sectanchors:
+
+A simple format and schema for serialization of packed fixed size structured data.
+
+[[motivation]]
+== Motivation
+
+Schema-based serialization formats such as Protobuf and Flatbuffers are extremely flexible and can handle data type evolution, complex nested data structures, variable size / repeated data, optional fields, etc. However, this flexibility comes at a cost in both serialized data size and processing overhead. Many simple data structures, such as screen coordinates or robot poses, are fixed in size and can be stored much more compactly and serialized/deserialized much more quickly, especially on embedded or real-time platforms.
+
+Simply storing a C-style packed structure is very compact and fast, but information about the layout of the structure and the meaning of each member must be separately communicated for introspection by other tools such as interactive dashboards for data analysis of individual structure members. The motivation for this standard layout and schema is to provide a standardized means to communicate this information and enable dynamic decoding.
+
+Python's struct module uses a character-based approach to describe data layout of structures, but has no provisions for naming each member to communicate intent/meaning.
+
+[[references]]
+== References
+
+[[c-struct-declaration]]
+* Struct declaration, https://en.cppreference.com/w/c/language/struct
+
+[[definitions]]
+== Definitions
+
+[[schema]]
+== Schema
+
+The schema is a text-based format with similar syntax to the list of variable declarations in a C structure. The C syntax is flexible, easy to parse, and matches the intent of specifying a fixed size structure.
+
+Each member of the struct is defined by a single declaration. Each declaration is either a standard declaration or a bit-field declaration. Declarations are separated by semicolons. The last declaration may optionally have a trailing semicolon. Empty declarations (e.g. two semicolons back-to-back or separated by only whitespace) are allowed but are ignored. Unlike C structures, every declaration must be separated by a semicolon; commas cannot be used to declare multiple members with the same type. Declarations may also start and end with whitespace.
+
+[[variable]]
+=== Standard Declaration
+
+Standard declarations declare a member of a certain type or a fixed-size array of that type. The structure of a standard declaration is:
+
+* optional enum specification (integer data types only)
+* optional whitespace
+* type name
+* whitespace
+* identifier name
+* optional array size, consisting of:
+  * optional whitespace
+  * `[`
+  * optional whitespace
+  * size of array
+  * optional whitespace
+  * `]`
+
+The type name may be one of these:
+
+[cols="1,1,3", options="header"]
+|===
+|Type Name|Description|Payload Data Contents
+|`bool`|boolean|single byte (0=false, 1=true)
+|`char`|character|single byte (assumed UTF-8)
+|`int8`|integer|1-byte (8-bit) signed value
+|`int16`|integer|2-byte (16-bit) signed value
+|`int32`|integer|4-byte (32-bit) signed value
+|`int64`|integer|8-byte (64-bit) signed value
+|`uint8`|unsigned integer|1-byte (8-bit) unsigned value
+|`uint16`|unsigned integer|2-byte (16-bit) unsigned value
+|`uint32`|unsigned integer|4-byte (32-bit) unsigned value
+|`uint64`|unsigned integer|8-byte (64-bit) unsigned value
+|`float` or `float32`|float|4-byte (32-bit) IEEE-754 value
+|`double` or `float64`|double|8-byte (64-bit) IEEE-754 value
+|===
+
+If it is not one of the above, the type name must be the name of another struct.
+
+Examples of valid standard declarations:
+
+* `bool value` (boolean value, 1 byte)
+* `double arr[4]` (array of 4 doubles, 32 bytes total)
+* `enum {a=1, b=2} int8 val` (enumerated value, 1 byte)
+
+[[enum]]
+==== Enum Specification
+
+Integer declarations may have an enum specification to provide meaning to specific values. Values that are not specified may be communicated, but have no specific defined meaning. The structure of an enum specification is:
+
+* optional `enum`
+* optional whitespace
+* `{`
+* zero or more enum values, consisting of:
+  * optional whitespace
+  * identifier
+  * optional whitespace
+  * `=`
+  * optional whitespace
+  * integer value
+  * optional whitespace
+  * comma (optional for last value)
+* optional whitespace
+* `}`
+
+Examples of valid enum specifications:
+
+* `enum{}`
+* `enum { a = 1 }`
+* `enum{a=1,b=2,}`
+* `{a=1}`
+
+Examples of invalid enum specifications:
+
+* `enum` (no `{}`)
+* `enum{=2}` (missing identifier)
+* `enum{a=1,b,c}` (missing values)
+
+[[]]
+=== Bit-field Declaration
+
+Bit-field declarations declare a member with an explicit width in bits. The structure of a bit-field declaration is:
+
+* optional enum specification (integer data types only)
+* optional whitespace
+* type name; must be boolean or one of the integer data types
+* whitespace
+* identifier name
+* optional whitespace
+* colon (`:`)
+* optional whitespace
+* integer number of bits; minimum 1; maximum 1 for boolean types; for integer types, maximum is the width of the type (e.g. 32 for int32)
+
+As with non-bit-field integer variable declarations, an enum can be specified for integer bit-fields (e.g. `enum {a=1, b=2} uint32 value : 2`).
+
+It is not possible to have an array of bit-fields.
+
+Examples of valid bit-field declarations:
+
+* `bool value : 1`
+* `enum{a=1,b=2}int8 value:2`
+
+Examples of invalid bit-field declarations:
+
+* `double val:2` (must be integer or boolean)
+* `int32 val[2]:2` (cannot be array)
+* `bool val:3` (bool must be 1 bit)
+* `int16 val:17` (bit field larger than storage size)
+
+[[layout]]
+== Data Layout
+
+Members are stored in the same order they appear in the schema. Individual members are stored in little-endian order. Members are not aligned to any particular boundary; no byte-level padding is present in the data.
+
+[source]
+----
+bool b;
+int16 i;
+----
+
+results in a 3-byte encoding:
+
+`bbbbbbbb iiiiiiii iiiiiiii`
+
+where the first `iiiiiiii` is the least significant byte of `i`.
+
+[[layout-array]]
+=== Array Data Layout
+
+For array members, the individual items of the array are stored consecutively with no padding between each item.
+
+[source]
+----
+int16 i[2];
+----
+
+results in a 4-byte encoding:
+
+`i0i0i0i0 i0i0i0i0 i1i1i1i1 i1i1i1i1`
+
+where `i0` is the first element of the array, `i1` is the second element.
+
+[[layout-nested-structure]]
+
+Nested structures also have no surrounding padding.
+
+Given the Inner schema
+
+[source]
+----
+int16 i;
+int8 x;
+----
+
+and an outer schema of
+
+[source]
+----
+char c;
+Inner s;
+bool b;
+----
+
+results in a 5-byte encoding:
+
+`cccccccc iiiiiiii iiiiiiii xxxxxxxx bbbbbbbb`
+
+[[layout-bit-field]]
+=== Bit-Field Data Layout
+
+Multiple adjacant bit-fields of the same integer type width are packed together to fit in the minimum number of multiples of that type. The bit-fields are packed, starting from the least significant bit, in the order they appear in the schema. Individual bit-fields must not span across multiple underlying types; if a bit-field is larger than the remaining space in the data type, a new element of that type is started and the bit-field starts from the least significant bit of the new element. Unused bits should be set to 0 during serialization and must be ignored during deserialization.
+
+Boolean bit-fields are always a single bit wide. The underlying data type is by default uint8, but if a boolean bit-field immediately follows a bit-field of another integer type (and fits), it is packed into that type.
+
+[source]
+----
+int8 a:4;
+int16 b:4;
+----
+
+results in a 3-byte encoding:
+
+`0000aaaa 0000bbbb 00000000`
+
+as the integer type widths are different, even though the bits would fit.
+
+[source]
+----
+int16 a:4;
+uint16 b:5;
+bool c:1;
+int16 d:7;
+----
+
+results in a 4-byte encoding:
+
+`bbbbaaaa 000000cb 0ddddddd 00000000`
+
+As `c` is packed into the preceding int16, and `d` is too large to fit in the remaining bits of the first type.
+
+[source]
+----
+uint8 a:4;
+int8 b:2;
+bool c:1;
+int16 d:1;
+----
+
+results in a 3-byte encoding:
+
+`0cbbaaaa 0000000d 00000000`
+
+as `d` is int16, versus the `int8` of the previous values.
+
+[source]
+----
+bool a:1;
+bool b:1;
+int8 c:2;
+----
+
+results in a 1-byte encoding:
+
+`0000ccba`
+
+as `c` is an int8.
+
+[source]
+----
+bool a:1;
+bool b:1;
+int16 c:2;
+----
+
+results in a 3-byte encoding:
+
+`000000ba 000000cc 00000000`
+
+as `c` is an int16.
+
+Bit-fields do not "look inside" of nested structures. Given Inner
+
+[source]
+----
+int8 a:1;
+----
+
+and outer
+
+[source]
+----
+int8 b:1;
+Outer s;
+int8 c:1;
+----
+
+the result is a 3-byte encoding:
+
+`0000000b 0000000a 0000000c`
+
+[[layout-character-arrays]]
+=== Character Array (String) Data Layout
+
+Character arrays, as with other arrays, must be fixed length. The text they contain should be UTF-8. If a string is shorter than the length of the character array, the string starts at the first byte of the array, and any unused bytes at the end of the array must be filled with 0.
+
+[source]
+----
+char s[4];
+----
+
+with a string of "a" results in:
+
+`01100001 00000000 00000000 00000000`
+
+with a string of "abcd" results in:
+
+`01100001 01100010 01100011 01100100`

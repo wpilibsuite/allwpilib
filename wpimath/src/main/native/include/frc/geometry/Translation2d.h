@@ -9,6 +9,8 @@
 
 #include <wpi/SymbolExports.h>
 #include <wpi/json_fwd.h>
+#include <wpi/protobuf/Protobuf.h>
+#include <wpi/struct/Struct.h>
 
 #include "frc/geometry/Rotation2d.h"
 #include "units/length.h"
@@ -197,5 +199,29 @@ WPILIB_DLLEXPORT
 void from_json(const wpi::json& json, Translation2d& state);
 
 }  // namespace frc
+
+template <>
+struct wpi::Struct<frc::Translation2d> {
+  static constexpr std::string_view kTypeString = "struct:Translation2d";
+  static constexpr size_t kSize = 16;
+  static constexpr std::string_view kSchema = "double x;double y";
+  static frc::Translation2d Unpack(std::span<const uint8_t, 16> data) {
+    return {units::meter_t{wpi::UnpackStruct<double, 0>(data)},
+            units::meter_t{wpi::UnpackStruct<double, 8>(data)}};
+  }
+  static void Pack(std::span<uint8_t, 16> data,
+                   const frc::Translation2d& value) {
+    wpi::PackStruct<0>(data, value.X().value());
+    wpi::PackStruct<8>(data, value.Y().value());
+  }
+};
+
+template <>
+struct WPILIB_DLLEXPORT wpi::Protobuf<frc::Translation2d> {
+  static google::protobuf::Message* New(google::protobuf::Arena* arena);
+  static frc::Translation2d Unpack(const google::protobuf::Message& msg);
+  static void Pack(google::protobuf::Message* msg,
+                   const frc::Translation2d& value);
+};
 
 #include "frc/geometry/Translation2d.inc"

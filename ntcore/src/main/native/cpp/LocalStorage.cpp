@@ -7,6 +7,7 @@
 #include <algorithm>
 
 #include <wpi/DataLog.h>
+#include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
 #include <wpi/json.h>
 
@@ -1479,6 +1480,41 @@ void LocalStorage::StopDataLog(NT_DataLogger logger) {
       }
     }
   }
+}
+
+bool LocalStorage::HasSchema(std::string_view name) {
+  std::scoped_lock lock{m_mutex};
+  wpi::SmallString<128> fullName{"/.schema/"};
+  fullName += name;
+  auto it = m_impl.m_schemas.find(fullName);
+  return it != m_impl.m_schemas.end();
+}
+
+void LocalStorage::AddSchema(std::string_view name, std::string_view type,
+                             std::span<const uint8_t> schema) {
+  std::scoped_lock lock{m_mutex};
+  wpi::SmallString<128> fullName{"/.schema/"};
+  fullName += name;
+  auto& pubHandle = m_impl.m_schemas[fullName];
+  if (pubHandle != 0) {
+    return;
+  }
+
+  auto topic = m_impl.GetOrCreateTopic(fullName);
+
+  if (topic->localPublishers.size() >= kMaxPublishers) {
+    WPI_ERROR(m_impl.m_logger,
+              "reached maximum number of publishers to '{}', not publishing",
+              topic->name);
+    return;
+  }
+
+  pubHandle = m_impl
+                  .AddLocalPublisher(topic, {{"retained", true}},
+                                     PubSubConfig{NT_RAW, type, {}})
+                  ->handle;
+
+  m_impl.SetDefaultEntryValue(pubHandle, Value::MakeRaw(schema));
 }
 
 void LocalStorage::Reset() {

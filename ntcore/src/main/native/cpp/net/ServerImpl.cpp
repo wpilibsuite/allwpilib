@@ -524,6 +524,9 @@ void ServerImpl::ClientData4::SendAnnounce(TopicData* topic,
       WireEncodeAnnounce(os, topic->name, topic->id, topic->typeStr,
                          topic->properties, pubuid);
     });
+    if (unsent < 0) {
+      return;  // error
+    }
     if (unsent == 0 && m_wire.Flush() == 0) {
       return;
     }
@@ -544,6 +547,9 @@ void ServerImpl::ClientData4::SendUnannounce(TopicData* topic) {
   if (m_local) {
     int unsent = m_wire.WriteText(
         [&](auto& os) { WireEncodeUnannounce(os, topic->name, topic->id); });
+    if (unsent < 0) {
+      return;  // error
+    }
     if (unsent == 0 && m_wire.Flush() == 0) {
       return;
     }
@@ -565,6 +571,9 @@ void ServerImpl::ClientData4::SendPropertiesUpdate(TopicData* topic,
     int unsent = m_wire.WriteText([&](auto& os) {
       WireEncodePropertiesUpdate(os, topic->name, update, ack);
     });
+    if (unsent < 0) {
+      return;  // error
+    }
     if (unsent == 0 && m_wire.Flush() == 0) {
       return;
     }

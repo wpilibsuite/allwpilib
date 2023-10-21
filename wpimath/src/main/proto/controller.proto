@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package wpi.proto;
+
+option java_package = "edu.wpi.first.math.proto";
+
+message ProtobufArmFeedforward {
+  double ks = 1;
+  double kg = 2;
+  double kv = 3;
+  double ka = 4;
+}
+
+message ProtobufDifferentialDriveFeedforward {
+  double kv_linear = 1;
+  double ka_linear = 2;
+  double kv_angular = 3;
+  double ka_angular = 4;
+}
+
+message ProtobufElevatorFeedforward {
+  double ks = 1;
+  double kg = 2;
+  double kv = 3;
+  double ka = 4;
+}
+
+message ProtobufSimpleMotorFeedforward {
+  double ks = 1;
+  double kv = 2;
+  double ka = 3;
+}
+
+message ProtobufDifferentialDriveWheelVoltages {
+  double left = 1;
+  double right = 2;
+}

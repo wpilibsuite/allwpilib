@@ -67,8 +67,8 @@ def tagList = [
         "SmartDashboard", "Shuffleboard", "Sendable", "DataLog",
 
         /* --- Controls --- */
-        "PID", "State-Space", "Ramsete", "Path Following", "Trajectory", "SysId",
-        "Simulation", "Trapezoid Profile", "Profiled PID", "Odometry", "LQR",
+        "Exponential Profile", "PID", "State-Space", "Ramsete", "Path Following", "Trajectory",
+        "SysId", "Simulation", "Trapezoid Profile", "Profiled PID", "Odometry", "LQR",
         "Pose Estimator",
 
         /* --- Hardware --- */

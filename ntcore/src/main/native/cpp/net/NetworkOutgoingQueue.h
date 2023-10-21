@@ -280,9 +280,15 @@ void NetworkOutgoingQueue<MessageType>::SendOutgoing(uint64_t curTimeMs,
         });
       }
     }
+    if (unsent < 0) {
+      return;  // error
+    }
     if (unsent == 0) {
       // finish writing any partial buffers
       unsent = m_wire.Flush();
+      if (unsent < 0) {
+        return;  // error
+      }
     }
     int delta = it - msgs.begin() - unsent;
     for (auto&& msg : std::span{msgs}.subspan(0, delta)) {

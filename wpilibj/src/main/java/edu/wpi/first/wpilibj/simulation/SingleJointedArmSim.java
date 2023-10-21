@@ -177,10 +177,10 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
    * Sets the arm's state. The new angle will be limited between the minimum and maximum allowed
    * limits.
    *
-   * @param angleRadians The new angle.
-   * @param velocityRadPerSec The new angular velocity.
+   * @param angleRadians The new angle in radians.
+   * @param velocityRadPerSec The new angular velocity in radians per second.
    */
-  void setState(double angleRadians, double velocityRadPerSec) {
+  public void setState(double angleRadians, double velocityRadPerSec) {
     setState(
         VecBuilder.fill(MathUtil.clamp(angleRadians, m_minAngle, m_maxAngle), velocityRadPerSec));
   }

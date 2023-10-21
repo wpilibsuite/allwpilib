@@ -176,6 +176,12 @@ endif()
 
 find_package(LIBSSH 0.7.1)
 
+find_package(Protobuf REQUIRED)
+find_program(Quickbuf_EXECUTABLE
+    NAMES protoc-gen-quickbuf
+    DOC "The Quickbuf protoc plugin"
+)
+
 if (WITH_FLAT_INSTALL)
 set(WPIUTIL_DEP_REPLACE "include($\{SELF_DIR\}/wpiutil-config.cmake)")
 set(WPINET_DEP_REPLACE "include($\{SELF_DIR\}/wpinet-config.cmake)")

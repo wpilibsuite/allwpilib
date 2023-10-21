@@ -44,7 +44,7 @@ public class Per<N extends Unit<N>, D extends Unit<D>> extends Unit<Per<N, D>> {
    * denominator with a unit of time is discouraged; use {@link Velocity} instead.
    *
    * <pre>
-   *   Per.combine(Volts, Meters) // => possible PID constant
+   *   Per.combine(Volts, Meters) // possible PID constant
    * </pre>
    *
    * <p>It's recommended to use the convenience function {@link Unit#per(Unit)} instead of calling

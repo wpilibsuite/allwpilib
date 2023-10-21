@@ -179,7 +179,13 @@ std::span<const WebSocket::Frame> TrySendFrames(
         bufs.append(it->data.begin(), it->data.end());
       }
       callback(bufs, {});
-      return {&*frameStart, &*frameEnd};
+#ifdef __clang__
+      // work around clang bug
+      return {frames.data() + (frameStart - frames.begin()),
+              frames.data() + (frameEnd - frames.begin())};
+#else
+      return {frameStart, frameEnd};
+#endif
     } else if (sentBytes < 0) {
       // error
       SmallVector<uv::Buffer, 4> bufs;
@@ -208,7 +214,13 @@ std::span<const WebSocket::Frame> TrySendFrames(
           bufs.append(it->data.begin(), it->data.end());
         }
         callback(bufs, {});
-        return {&*frameStart, &*frameEnd};
+#ifdef __clang__
+        // work around clang bug
+        return {frames.data() + (frameStart - frames.begin()),
+                frames.data() + (frameEnd - frames.begin())};
+#else
+        return {frameStart, frameEnd};
+#endif
       }
 
       // build a list of buffers to send as a normal write:
@@ -270,7 +282,13 @@ std::span<const WebSocket::Frame> TrySendFrames(
 
       WS_DEBUG("Write({})\n", writeBufs.size());
       stream.Write(writeBufs, req);
-      return {&*frameStart, &*frameEnd};
+#ifdef __clang__
+      // work around clang bug
+      return {frames.data() + (frameStart - frames.begin()),
+              frames.data() + (frameEnd - frames.begin())};
+#else
+      return {frameStart, frameEnd};
+#endif
     }
   }
 
