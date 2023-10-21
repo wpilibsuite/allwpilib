@@ -235,6 +235,7 @@ task generateJavaDocs(type: Javadoc) {
     source project(':wpilibj').sourceSets.main.java
     source project(':wpimath').sourceSets.main.java
     source project(':wpinet').sourceSets.main.java
+    source project(':wpiunits').sourceSets.main.java
     source project(':wpiutil').sourceSets.main.java
     source configurations.javaSource.collect { zipTree(it) }
     include '**/*.java'
