@@ -426,7 +426,7 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
   }
 
   // Message processing
-  while (!data.empty()) {
+  while (!data.empty() && m_state == OPEN) {
     if (m_frameSize == UINT64_MAX) {
       // Need at least two bytes to determine header length
       if (m_header.size() < 2u) {
