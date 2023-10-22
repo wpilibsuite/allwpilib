@@ -30,11 +30,11 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
   private double m_sensorMin;
   private double m_sensorMax = 1.0;
 
-  protected SimDevice m_simDevice;
-  protected SimDouble m_simPosition;
-  protected SimDouble m_simAbsolutePosition;
-  protected SimDouble m_simDistancePerRotation;
-  protected SimBoolean m_simIsConnected;
+  private SimDevice m_simDevice;
+  private SimDouble m_simPosition;
+  private SimDouble m_simAbsolutePosition;
+  private SimDouble m_simDistancePerRotation;
+  private SimBoolean m_simIsConnected;
 
   /**
    * Construct a new DutyCycleEncoder on a specific channel.

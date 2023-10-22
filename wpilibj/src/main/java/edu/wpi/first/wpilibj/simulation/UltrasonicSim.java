@@ -36,14 +36,29 @@ public class UltrasonicSim {
     m_simRange = simDevice.getDouble("Range (in)");
   }
 
+  /**
+   * Sets if the range measurement is valid.
+   *
+   * @param valid True if valid
+   */
   public void setRangeValid(boolean valid) {
     m_simRangeValid.set(valid);
   }
 
+  /**
+   * Sets the range measurement.
+   *
+   * @param inches The range in inches.
+   */
   public void setRangeInches(double inches) {
     m_simRange.set(inches);
   }
 
+  /**
+   * Sets the range measurement.
+   *
+   * @param meters The range in meters.
+   */
   public void setRangeMeters(double meters) {
     m_simRange.set(Units.metersToInches(meters));
   }

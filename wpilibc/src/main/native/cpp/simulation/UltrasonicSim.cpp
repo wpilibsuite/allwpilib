@@ -18,8 +18,8 @@ UltrasonicSim::UltrasonicSim(int ping, int echo) {
   m_simRange = deviceSim.GetDouble("Range (in)");
 }
 
-void UltrasonicSim::SetRangeValid(bool isValid) {
-  m_simRangeValid.Set(isValid);
+void UltrasonicSim::SetRangeValid(bool valid) {
+  m_simRangeValid.Set(valid);
 }
 
 void UltrasonicSim::SetRange(units::inch_t range) {

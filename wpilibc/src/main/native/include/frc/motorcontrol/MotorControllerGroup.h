@@ -27,9 +27,22 @@ class [[deprecated(
       public MotorController,
       public wpi::SendableHelper<MotorControllerGroup> {
  public:
+  /**
+   * Create a new MotorControllerGroup with the provided MotorControllers.
+   *
+   * @tparam MotorControllers The MotorController types.
+   * @param motorController The first MotorController to add
+   * @param motorControllers The MotorControllers to add
+   */
   template <class... MotorControllers>
   explicit MotorControllerGroup(MotorController& motorController,
                                 MotorControllers&... motorControllers);
+
+  /**
+   * Create a new MotorControllerGroup with the provided MotorControllers.
+   *
+   * @param motorControllers The MotorControllers to add.
+   */
   explicit MotorControllerGroup(
       std::vector<std::reference_wrapper<MotorController>>&& motorControllers);
 

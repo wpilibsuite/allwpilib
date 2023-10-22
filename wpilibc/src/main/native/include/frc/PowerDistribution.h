@@ -17,6 +17,7 @@ namespace frc {
 class PowerDistribution : public wpi::Sendable,
                           public wpi::SendableHelper<PowerDistribution> {
  public:
+  /// Default module number.
   static constexpr int kDefaultModule = -1;
 
   /**
@@ -179,6 +180,11 @@ class PowerDistribution : public wpi::Sendable,
     bool GetBreakerFault(int channel) const;
   };
 
+  /**
+   * Returns the power distribution faults.
+   *
+   * @return The power distribution faults.
+   */
   Faults GetFaults() const;
 
   struct StickyFaults {
@@ -222,6 +228,11 @@ class PowerDistribution : public wpi::Sendable,
     bool GetBreakerFault(int channel) const;
   };
 
+  /**
+   * Returns the power distribution sticky faults.
+   *
+   * @return The power distribution sticky faults.
+   */
   StickyFaults GetStickyFaults() const;
 
   void InitSendable(wpi::SendableBuilder& builder) override;

@@ -45,7 +45,18 @@ class I2C {
   I2C(I2C&&) = default;
   I2C& operator=(I2C&&) = default;
 
+  /**
+   * Returns I2C port.
+   *
+   * @return I2C port.
+   */
   Port GetPort() const;
+
+  /**
+   * Returns I2C device address.
+   *
+   * @return I2C device address.
+   */
   int GetDeviceAddress() const;
 
   /**

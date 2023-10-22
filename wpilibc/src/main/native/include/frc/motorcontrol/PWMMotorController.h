@@ -124,6 +124,7 @@ class PWMMotorController : public MotorController,
 
   void InitSendable(wpi::SendableBuilder& builder) override;
 
+  /// PWM instances for motor controller.
   PWM m_pwm;
 
  private:

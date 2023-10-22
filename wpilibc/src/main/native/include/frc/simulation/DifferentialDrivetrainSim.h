@@ -187,6 +187,13 @@ class DifferentialDrivetrainSim {
    */
   void SetPose(const frc::Pose2d& pose);
 
+  /**
+   * The differential drive dynamics function.
+   *
+   * @param x The state.
+   * @param u The input.
+   * @return The state derivative with respect to time.
+   */
   Vectord<7> Dynamics(const Vectord<7>& x, const Eigen::Vector2d& u);
 
   class State {

@@ -65,9 +65,13 @@ class MecanumDrive : public RobotDriveBase,
    * Uses normalized voltage [-1.0..1.0].
    */
   struct WheelSpeeds {
+    /// Front-left wheel speed.
     double frontLeft = 0.0;
+    /// Front-right wheel speed.
     double frontRight = 0.0;
+    /// Rear-left wheel speed.
     double rearLeft = 0.0;
+    /// Rear-right wheel speed.
     double rearRight = 0.0;
   };
 

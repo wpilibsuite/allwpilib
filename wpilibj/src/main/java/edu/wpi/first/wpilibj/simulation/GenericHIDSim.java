@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.GenericHID;
 
 /** Class to control a simulated generic joystick. */
 public class GenericHIDSim {
+  /** GenericHID port. */
   protected final int m_port;
 
   /**

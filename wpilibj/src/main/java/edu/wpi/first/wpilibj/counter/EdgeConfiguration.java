@@ -15,9 +15,11 @@ public enum EdgeConfiguration {
   /** Both rising and falling edge configuration. */
   kBoth(true, true);
 
+  /** True if triggering on rising edge. */
   @SuppressWarnings("MemberName")
   public final boolean rising;
 
+  /** True if triggering on falling edge. */
   @SuppressWarnings("MemberName")
   public final boolean falling;
 

@@ -288,6 +288,7 @@ public abstract class IterativeRobotBase extends RobotBase {
     return m_period;
   }
 
+  /** Loop function. */
   protected void loopFunc() {
     DriverStation.refreshData();
     m_watchdog.reset();

@@ -77,9 +77,16 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
    */
   @SuppressWarnings("MemberName")
   public static class WheelSpeeds {
+    /** Front-left wheel speed. */
     public double frontLeft;
+
+    /** Front-right wheel speed. */
     public double frontRight;
+
+    /** Rear-left wheel speed. */
     public double rearLeft;
+
+    /** Rear-right wheel speed. */
     public double rearRight;
 
     /** Constructs a WheelSpeeds with zeroes for all four speeds. */

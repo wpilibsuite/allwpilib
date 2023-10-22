@@ -50,6 +50,7 @@ public class StadiaController extends GenericHID {
     /** Frame button. */
     kFrame(15);
 
+    /** Button value. */
     public final int value;
 
     Button(int value) {
@@ -85,6 +86,7 @@ public class StadiaController extends GenericHID {
     /** Right Y axis. */
     kRightY(4);
 
+    /** Axis value. */
     public final int value;
 
     Axis(int value) {

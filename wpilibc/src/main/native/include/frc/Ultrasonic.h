@@ -90,6 +90,11 @@ class Ultrasonic : public wpi::Sendable,
   Ultrasonic(Ultrasonic&&) = default;
   Ultrasonic& operator=(Ultrasonic&&) = default;
 
+  /**
+   * Returns the echo channel.
+   *
+   * @return The echo channel.
+   */
   int GetEchoChannel() const;
 
   /**

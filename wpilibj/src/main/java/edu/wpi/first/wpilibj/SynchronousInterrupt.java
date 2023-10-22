@@ -32,6 +32,7 @@ public class SynchronousInterrupt implements AutoCloseable {
     /** Both rising and falling edge events. */
     kBoth(0x101);
 
+    /** WaitResult value. */
     public final int value;
 
     WaitResult(int value) {

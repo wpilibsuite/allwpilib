@@ -30,6 +30,7 @@ public class I2C implements AutoCloseable {
     /** MXP (roboRIO MXP) I2C port. */
     kMXP(1);
 
+    /** Port value. */
     public final int value;
 
     Port(int value) {
@@ -61,10 +62,20 @@ public class I2C implements AutoCloseable {
     HAL.report(tResourceType.kResourceType_I2C, deviceAddress);
   }
 
+  /**
+   * Returns I2C port.
+   *
+   * @return I2C port.
+   */
   public int getPort() {
     return m_port;
   }
 
+  /**
+   * Returns I2C device address.
+   *
+   * @return I2C device address.
+   */
   public int getDeviceAddress() {
     return m_deviceAddress;
   }

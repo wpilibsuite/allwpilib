@@ -66,6 +66,7 @@ public class GenericHID {
     /** HID1stPerson. */
     kHID1stPerson(24);
 
+    /** HIDType value. */
     public final int value;
 
     @SuppressWarnings("PMD.UseConcurrentHashMap")
@@ -81,6 +82,12 @@ public class GenericHID {
       }
     }
 
+    /**
+     * Creates an HIDType with the given value.
+     *
+     * @param value HIDType's value.
+     * @return HIDType with the given value.
+     */
     public static HIDType of(int value) {
       return map.get(value);
     }
