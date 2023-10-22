@@ -245,4 +245,7 @@ public class DMAJNI extends JNIWrapper {
    * @return The DMA sample
    */
   public static native DMAJNISample.BaseStore getSensorReadData(int handle);
+
+  /** Utility class. */
+  private DMAJNI() {}
 }

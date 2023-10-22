@@ -30,6 +30,9 @@ namespace frc {
  *
  * AddVisionMeasurement() can be called as infrequently as you want; if you
  * never call it, then this class will behave like regular encoder odometry.
+ *
+ * @tparam WheelSpeeds Wheel speeds type.
+ * @tparam WheelPositions Wheel positions type.
  */
 template <typename WheelSpeeds, WheelPositions WheelPositions>
 class WPILIB_DLLEXPORT PoseEstimator {

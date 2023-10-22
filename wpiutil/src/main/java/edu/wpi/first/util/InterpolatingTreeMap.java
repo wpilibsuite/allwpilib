@@ -10,6 +10,8 @@ import java.util.TreeMap;
  * Interpolating Tree Maps are used to get values at points that are not defined by making a guess
  * from points that are defined. This uses linear interpolation.
  *
+ * @param <K> Key type.
+ * @param <V> Value type.
  * @deprecated Use {@link edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap} instead
  */
 @Deprecated(forRemoval = true, since = "2024")

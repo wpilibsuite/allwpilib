@@ -69,6 +69,7 @@ class WrapperCommand : public CommandHelper<Command, WrapperCommand> {
   wpi::SmallSet<Subsystem*, 4> GetRequirements() const override;
 
  protected:
+  /// Command being wrapped.
   std::unique_ptr<Command> m_command;
 };
 }  // namespace frc2

@@ -27,6 +27,9 @@ import java.util.function.Function;
  *
  * <p>For more on the underlying math, read <a
  * href="https://file.tavsys.net/control/controls-engineering-in-frc.pdf">https://file.tavsys.net/control/controls-engineering-in-frc.pdf</a>.
+ *
+ * @param <States> Number of states.
+ * @param <Inputs> Number of inputs.
  */
 public class ControlAffinePlantInversionFeedforward<States extends Num, Inputs extends Num> {
   /** The current reference state. */

@@ -78,4 +78,7 @@ public class DutyCycleJNI extends JNIWrapper {
    * @see "HAL_GetDutyCycleFPGAIndex"
    */
   public static native int getFPGAIndex(int handle);
+
+  /** Utility class. */
+  private DutyCycleJNI() {}
 }

@@ -135,4 +135,7 @@ public class I2CJNI extends JNIWrapper {
    * @see "HAL_CloseI2C"
    */
   public static native void i2CClose(int port);
+
+  /** Utility class. */
+  private I2CJNI() {}
 }

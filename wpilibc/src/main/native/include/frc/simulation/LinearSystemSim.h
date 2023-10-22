@@ -23,9 +23,9 @@ namespace frc::sim {
  * voltage). Call the Update() method to update the simulation. Set simulated
  * sensor readings with the simulated positions in the GetOutput() method.
  *
- * @tparam States  The number of states of the system.
- * @tparam Inputs  The number of inputs to the system.
- * @tparam Outputs The number of outputs of the system.
+ * @tparam States  Number of states of the system.
+ * @tparam Inputs  Number of inputs to the system.
+ * @tparam Outputs Number of outputs of the system.
  */
 template <int States, int Inputs, int Outputs>
 class LinearSystemSim {

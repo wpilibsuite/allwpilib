@@ -23,9 +23,9 @@ import org.ejml.simple.SimpleMatrix;
  *
  * <p>Set simulated sensor readings with the simulated positions in {@link #getOutput()}
  *
- * @param <States> The number of states of the system.
- * @param <Inputs> The number of inputs to the system.
- * @param <Outputs> The number of outputs of the system.
+ * @param <States> Number of states of the system.
+ * @param <Inputs> Number of inputs to the system.
+ * @param <Outputs> Number of outputs of the system.
  */
 public class LinearSystemSim<States extends Num, Inputs extends Num, Outputs extends Num> {
   // The plant that represents the linear system.

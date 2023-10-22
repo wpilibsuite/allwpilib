@@ -6,6 +6,7 @@ package edu.wpi.first.hal.simulation;
 
 import edu.wpi.first.hal.JNIWrapper;
 
+/** JNI for SPI accelerometer data. */
 public class SPIAccelerometerDataJNI extends JNIWrapper {
   public static native int registerActiveCallback(
       int index, NotifyCallback callback, boolean initialNotify);
@@ -53,4 +54,7 @@ public class SPIAccelerometerDataJNI extends JNIWrapper {
   public static native void setZ(int index, double z);
 
   public static native void resetData(int index);
+
+  /** Utility class. */
+  private SPIAccelerometerDataJNI() {}
 }

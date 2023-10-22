@@ -279,4 +279,7 @@ public class CounterJNI extends JNIWrapper {
    * @see "HAL_SetCounterReverseDirection"
    */
   public static native void setCounterReverseDirection(int counterHandle, boolean reverseDirection);
+
+  /** Utility class. */
+  private CounterJNI() {}
 }

@@ -25,4 +25,7 @@ public class LEDJNI extends JNIWrapper {
    * @see "HAL_GetRadioLEDState"
    */
   public static native int getRadioLEDState();
+
+  /** Utility class. */
+  private LEDJNI() {}
 }

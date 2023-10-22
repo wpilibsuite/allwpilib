@@ -33,14 +33,14 @@ class AnalogOutput : public wpi::Sendable,
   /**
    * Set the value of the analog output.
    *
-   * @param voltage The output value in Volts, from 0.0 to +5.0
+   * @param voltage The output value in Volts, from 0.0 to +5.0.
    */
   void SetVoltage(double voltage);
 
   /**
-   * Get the voltage of the analog output
+   * Get the voltage of the analog output.
    *
-   * @return The value in Volts, from 0.0 to +5.0
+   * @return The value in Volts, from 0.0 to +5.0.
    */
   double GetVoltage() const;
 

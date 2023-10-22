@@ -126,4 +126,7 @@ public class AnalogGyroJNI extends JNIWrapper {
    * @see "HAL_GetAnalogGyroCenter"
    */
   public static native int getAnalogGyroCenter(int handle);
+
+  /** Utility class. */
+  private AnalogGyroJNI() {}
 }

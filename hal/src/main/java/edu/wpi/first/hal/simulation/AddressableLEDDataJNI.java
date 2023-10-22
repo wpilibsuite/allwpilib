@@ -6,6 +6,7 @@ package edu.wpi.first.hal.simulation;
 
 import edu.wpi.first.hal.JNIWrapper;
 
+/** JNI for addressable LED data. */
 public class AddressableLEDDataJNI extends JNIWrapper {
   public static native int registerInitializedCallback(
       int index, NotifyCallback callback, boolean initialNotify);
@@ -54,4 +55,7 @@ public class AddressableLEDDataJNI extends JNIWrapper {
   public static native void resetData(int index);
 
   public static native int findForChannel(int channel);
+
+  /** Utility class. */
+  private AddressableLEDDataJNI() {}
 }
