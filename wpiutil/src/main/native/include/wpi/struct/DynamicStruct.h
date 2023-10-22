@@ -32,18 +32,31 @@ class StructDescriptorDatabase;
  * Known data types for raw struct dynamic fields (see StructFieldDescriptor).
  */
 enum class StructFieldType {
+  /// bool.
   kBool,
+  /// char.
   kChar,
+  /// int8.
   kInt8,
+  /// int16.
   kInt16,
+  /// int32.
   kInt32,
+  /// int64.
   kInt64,
+  /// uint8.
   kUint8,
+  /// uint16.
   kUint16,
+  /// uint32.
   kUint32,
+  /// uint64.
   kUint64,
+  /// float.
   kFloat,
+  /// double.
   kDouble,
+  /// struct.
   kStruct
 };
 

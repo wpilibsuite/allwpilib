@@ -138,10 +138,33 @@ class WPILIB_DLLEXPORT MecanumDriveKinematics
    */
   Twist2d ToTwist2d(const MecanumDriveWheelPositions& wheelDeltas) const;
 
-  const Translation2d GetFrontLeftWheel() const { return m_frontLeftWheel; }
-  const Translation2d GetFrontRightWheel() const { return m_frontRightWheel; }
-  const Translation2d GetRearLeftWheel() const { return m_rearLeftWheel; }
-  const Translation2d GetRearRightWheel() const { return m_rearRightWheel; }
+  /**
+   * Returns the front-left wheel translation.
+   *
+   * @return The front-left wheel translation.
+   */
+  const Translation2d& GetFrontLeft() const { return m_frontLeftWheel; }
+
+  /**
+   * Returns the front-right wheel translation.
+   *
+   * @return The front-right wheel translation.
+   */
+  const Translation2d& GetFrontRight() const { return m_frontRightWheel; }
+
+  /**
+   * Returns the rear-left wheel translation.
+   *
+   * @return The rear-left wheel translation.
+   */
+  const Translation2d& GetRearLeft() const { return m_rearLeftWheel; }
+
+  /**
+   * Returns the rear-right wheel translation.
+   *
+   * @return The rear-right wheel translation.
+   */
+  const Translation2d& GetRearRight() const { return m_rearRightWheel; }
 
  private:
   mutable Matrixd<4, 3> m_inverseKinematics;

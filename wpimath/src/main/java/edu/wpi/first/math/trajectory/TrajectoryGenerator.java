@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.BiConsumer;
 
+/** Helper class used to generate trajectories with various constraints. */
 public final class TrajectoryGenerator {
   private static final Trajectory kDoNothingTrajectory =
       new Trajectory(List.of(new Trajectory.State()));
@@ -263,16 +264,27 @@ public final class TrajectoryGenerator {
     return splinePoints;
   }
 
-  // Work around type erasure signatures
+  /** Control vector list type that works around type erasure signatures. */
   public static class ControlVectorList extends ArrayList<Spline.ControlVector> {
-    public ControlVectorList(int initialCapacity) {
-      super(initialCapacity);
-    }
-
+    /** Default constructor. */
     public ControlVectorList() {
       super();
     }
 
+    /**
+     * Constructs a ControlVectorList.
+     *
+     * @param initialCapacity The initial list capacity.
+     */
+    public ControlVectorList(int initialCapacity) {
+      super(initialCapacity);
+    }
+
+    /**
+     * Constructs a ControlVectorList.
+     *
+     * @param collection A collection of spline control vectors.
+     */
     public ControlVectorList(Collection<? extends Spline.ControlVector> collection) {
       super(collection);
     }

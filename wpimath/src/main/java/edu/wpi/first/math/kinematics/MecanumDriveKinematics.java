@@ -48,7 +48,10 @@ public class MecanumDriveKinematics
 
   private Translation2d m_prevCoR = new Translation2d();
 
+  /** MecanumDriveKinematics protobuf for serialization. */
   public static final MecanumDriveKinematicsProto proto = new MecanumDriveKinematicsProto();
+
+  /** MecanumDriveKinematics struct for serialization. */
   public static final MecanumDriveKinematicsStruct struct = new MecanumDriveKinematicsStruct();
 
   /**
@@ -217,18 +220,38 @@ public class MecanumDriveKinematics
     m_inverseKinematics.setRow(3, 0, 1, -1, -(rr.getX() + rr.getY()));
   }
 
+  /**
+   * Returns the front-left wheel translation.
+   *
+   * @return The front-left wheel translation.
+   */
   public Translation2d getFrontLeft() {
     return m_frontLeftWheelMeters;
   }
 
+  /**
+   * Returns the front-right wheel translation.
+   *
+   * @return The front-right wheel translation.
+   */
   public Translation2d getFrontRight() {
     return m_frontRightWheelMeters;
   }
 
+  /**
+   * Returns the rear-left wheel translation.
+   *
+   * @return The rear-left wheel translation.
+   */
   public Translation2d getRearLeft() {
     return m_rearLeftWheelMeters;
   }
 
+  /**
+   * Returns the rear-right wheel translation.
+   *
+   * @return The rear-right wheel translation.
+   */
   public Translation2d getRearRight() {
     return m_rearRightWheelMeters;
   }

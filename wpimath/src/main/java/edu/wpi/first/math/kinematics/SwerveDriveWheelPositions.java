@@ -7,7 +7,9 @@ package edu.wpi.first.math.kinematics;
 import java.util.Arrays;
 import java.util.Objects;
 
+/** Represents the wheel positions for a swerve drive drivetrain. */
 public class SwerveDriveWheelPositions implements WheelPositions<SwerveDriveWheelPositions> {
+  /** The distances driven by the wheels. */
   public SwerveModulePosition[] positions;
 
   /**

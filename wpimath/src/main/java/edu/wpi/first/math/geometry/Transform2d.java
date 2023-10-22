@@ -184,6 +184,9 @@ public class Transform2d implements ProtobufSerializable, StructSerializable {
     return Objects.hash(m_translation, m_rotation);
   }
 
-  public static final Transform2dStruct struct = new Transform2dStruct();
+  /** Transform2d protobuf for serialization. */
   public static final Transform2dProto proto = new Transform2dProto();
+
+  /** Transform2d struct for serialization. */
+  public static final Transform2dStruct struct = new Transform2dStruct();
 }

@@ -139,9 +139,16 @@ class ProfiledPIDCommand
   frc::ProfiledPIDController<Distance>& GetController() { return m_controller; }
 
  protected:
+  /// Profiled PID controller.
   frc::ProfiledPIDController<Distance> m_controller;
+
+  /// Measurement getter.
   std::function<Distance_t()> m_measurement;
+
+  /// Goal getter.
   std::function<State()> m_goal;
+
+  /// Profiled PID controller output consumer.
   std::function<void(double, State)> m_useOutput;
 };
 }  // namespace frc2

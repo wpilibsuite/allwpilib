@@ -70,16 +70,38 @@ public class WPIUtilJNI {
     libraryLoaded = true;
   }
 
+  /**
+   * Write the given string to stderr.
+   *
+   * @param str String to write.
+   */
   public static native void writeStderr(String str);
 
+  /** Enable mock time. */
   public static native void enableMockTime();
 
+  /** Disable mock time. */
   public static native void disableMockTime();
 
+  /**
+   * Set mock time.
+   *
+   * @param time The desired time in microseconds.
+   */
   public static native void setMockTime(long time);
 
+  /**
+   * Returns the time.
+   *
+   * @return The time.
+   */
   public static native long now();
 
+  /**
+   * Returns the system time.
+   *
+   * @return The system time.
+   */
   public static native long getSystemTime();
 
   /**

@@ -20,6 +20,9 @@
 #include "units/voltage.h"
 
 namespace frc {
+/**
+ * Linear system ID utility functions.
+ */
 class WPILIB_DLLEXPORT LinearSystemId {
  public:
   template <typename Distance>

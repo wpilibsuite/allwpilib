@@ -17,6 +17,7 @@ import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
 
+/** Represents a quaternion. */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Quaternion implements ProtobufSerializable, StructSerializable {
@@ -405,6 +406,9 @@ public class Quaternion implements ProtobufSerializable, StructSerializable {
     return VecBuilder.fill(coeff * getX(), coeff * getY(), coeff * getZ());
   }
 
-  public static final QuaternionStruct struct = new QuaternionStruct();
+  /** Quaternion protobuf for serialization. */
   public static final QuaternionProto proto = new QuaternionProto();
+
+  /** Quaternion struct for serialization. */
+  public static final QuaternionStruct struct = new QuaternionStruct();
 }

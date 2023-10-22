@@ -39,6 +39,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * NetworkTables.
  */
 public final class CameraServer {
+  /** CameraServer base port. */
   public static final int kBasePort = 1181;
 
   private static final String kPublishName = "/CameraPublisher";

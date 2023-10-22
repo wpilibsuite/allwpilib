@@ -8,10 +8,10 @@ import edu.wpi.first.math.geometry.Pose2d;
 
 /** Represents a pair of a pose and a curvature. */
 public class PoseWithCurvature {
-  // Represents the pose.
+  /** Represents the pose. */
   public Pose2d poseMeters;
 
-  // Represents the curvature.
+  /** Represents the curvature. */
   public double curvatureRadPerMeter;
 
   /**

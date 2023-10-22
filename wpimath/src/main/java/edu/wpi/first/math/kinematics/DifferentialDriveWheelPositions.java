@@ -11,6 +11,7 @@ import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import java.util.Objects;
 
+/** Represents the wheel positions for a differential drive drivetrain. */
 public class DifferentialDriveWheelPositions
     implements WheelPositions<DifferentialDriveWheelPositions> {
   /** Distance measured by the left side. */

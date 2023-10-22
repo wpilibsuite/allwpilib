@@ -119,6 +119,7 @@ public class SteadyStateKalmanFilter<States extends Num, Inputs extends Num, Out
     reset();
   }
 
+  /** Resets the observer. */
   public final void reset() {
     m_xHat = new Matrix<>(m_states, Nat.N1());
   }

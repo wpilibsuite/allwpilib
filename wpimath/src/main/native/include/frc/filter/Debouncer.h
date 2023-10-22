@@ -17,7 +17,17 @@ namespace frc {
  */
 class WPILIB_DLLEXPORT Debouncer {
  public:
-  enum DebounceType { kRising, kFalling, kBoth };
+  /**
+   * Type of debouncing to perform.
+   */
+  enum DebounceType {
+    /// Rising edge.
+    kRising,
+    /// Falling edge.
+    kFalling,
+    /// Both rising and falling edges.
+    kBoth
+  };
 
   /**
    * Creates a new Debouncer.

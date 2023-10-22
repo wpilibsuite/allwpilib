@@ -6,6 +6,7 @@ package edu.wpi.first.math;
 
 import org.ejml.simple.SimpleMatrix;
 
+/** DARE solver utility functions. */
 public final class DARE {
   private DARE() {
     throw new UnsupportedOperationException("This is a utility class!");

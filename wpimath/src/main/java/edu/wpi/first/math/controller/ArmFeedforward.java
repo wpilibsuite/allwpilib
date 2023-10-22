@@ -14,12 +14,22 @@ import edu.wpi.first.util.struct.StructSerializable;
  * against the force of gravity on a beam suspended at an angle).
  */
 public class ArmFeedforward implements ProtobufSerializable, StructSerializable {
+  /** The static gain, in volts. */
   public final double ks;
+
+  /** The gravity gain, in volts. */
   public final double kg;
+
+  /** The velocity gain, in volt seconds per radian. */
   public final double kv;
+
+  /** The acceleration gain, in volt seconds² per radian. */
   public final double ka;
 
+  /** Arm feedforward protobuf for serialization. */
   public static final ArmFeedforwardProto proto = new ArmFeedforwardProto();
+
+  /** Arm feedforward struct for serialization. */
   public static final ArmFeedforwardStruct struct = new ArmFeedforwardStruct();
 
   /**

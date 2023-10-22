@@ -11,6 +11,7 @@ import edu.wpi.first.math.numbers.N4;
 import java.util.Random;
 import org.ejml.simple.SimpleMatrix;
 
+/** State-space utilities. */
 public final class StateSpaceUtil {
   private static Random rand = new Random();
 

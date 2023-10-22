@@ -22,8 +22,11 @@ public class DifferentialDriveWheelSpeeds implements ProtobufSerializable, Struc
   /** Speed of the right side of the robot. */
   public double rightMetersPerSecond;
 
+  /** DifferentialDriveWheelSpeeds protobuf for serialization. */
   public static final DifferentialDriveWheelSpeedsProto proto =
       new DifferentialDriveWheelSpeedsProto();
+
+  /** DifferentialDriveWheelSpeeds struct for serialization. */
   public static final DifferentialDriveWheelSpeedsStruct struct =
       new DifferentialDriveWheelSpeedsStruct();
 

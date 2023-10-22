@@ -253,6 +253,9 @@ public class Translation3d
         MathUtil.interpolate(this.getZ(), endValue.getZ(), t));
   }
 
-  public static final Translation3dStruct struct = new Translation3dStruct();
+  /** Translation3d protobuf for serialization. */
   public static final Translation3dProto proto = new Translation3dProto();
+
+  /** Translation3d struct for serialization. */
+  public static final Translation3dStruct struct = new Translation3dStruct();
 }

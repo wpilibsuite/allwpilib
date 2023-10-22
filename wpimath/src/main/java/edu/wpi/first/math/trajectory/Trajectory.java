@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
  * represent the pose, curvature, time elapsed, velocity, and acceleration at that point.
  */
 public class Trajectory implements ProtobufSerializable {
+  /** Trajectory protobuf for serialization. */
   public static final TrajectoryProto proto = new TrajectoryProto();
 
   private final double m_totalTimeSeconds;
@@ -269,28 +270,30 @@ public class Trajectory implements ProtobufSerializable {
    * represent the pose, curvature, time elapsed, velocity, and acceleration at that point.
    */
   public static class State implements ProtobufSerializable {
+    /** Trajectory.State protobuf for serialization. */
     public static final TrajectoryStateProto proto = new TrajectoryStateProto();
 
-    // The time elapsed since the beginning of the trajectory.
+    /** The time elapsed since the beginning of the trajectory. */
     @JsonProperty("time")
     public double timeSeconds;
 
-    // The speed at that point of the trajectory.
+    /** The speed at that point of the trajectory. */
     @JsonProperty("velocity")
     public double velocityMetersPerSecond;
 
-    // The acceleration at that point of the trajectory.
+    /** The acceleration at that point of the trajectory. */
     @JsonProperty("acceleration")
     public double accelerationMetersPerSecondSq;
 
-    // The pose at that point of the trajectory.
+    /** The pose at that point of the trajectory. */
     @JsonProperty("pose")
     public Pose2d poseMeters;
 
-    // The curvature at that point of the trajectory.
+    /** The curvature at that point of the trajectory. */
     @JsonProperty("curvature")
     public double curvatureRadPerMeter;
 
+    /** Default constructor. */
     public State() {
       poseMeters = new Pose2d();
     }

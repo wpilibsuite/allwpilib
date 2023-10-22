@@ -88,6 +88,7 @@ class WPILIB_DLLEXPORT DifferentialDriveKinematics
     return ToTwist2d(end.left - start.left, end.right - start.right);
   }
 
+  /// Differential drive trackwidth.
   units::meter_t trackWidth;
 };
 }  // namespace frc

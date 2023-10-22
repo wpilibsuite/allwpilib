@@ -11,6 +11,7 @@ import java.util.function.BiFunction;
 import java.util.function.DoubleFunction;
 import java.util.function.Function;
 
+/** Numerical integration utilities. */
 public final class NumericalIntegration {
   private NumericalIntegration() {
     // utility Class

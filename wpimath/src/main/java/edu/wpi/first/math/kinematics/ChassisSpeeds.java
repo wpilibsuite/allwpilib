@@ -40,7 +40,10 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
   /** Represents the angular velocity of the robot frame. (CCW is +) */
   public double omegaRadiansPerSecond;
 
+  /** ChassisSpeeds protobuf for serialization. */
   public static final ChassisSpeedsProto proto = new ChassisSpeedsProto();
+
+  /** ChassisSpeeds struct for serialization. */
   public static final ChassisSpeedsStruct struct = new ChassisSpeedsStruct();
 
   /** Constructs a ChassisSpeeds with zeros for dx, dy, and theta. */

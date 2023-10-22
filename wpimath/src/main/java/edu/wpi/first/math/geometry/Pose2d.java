@@ -326,6 +326,9 @@ public class Pose2d implements Interpolatable<Pose2d>, ProtobufSerializable, Str
     }
   }
 
-  public static final Pose2dStruct struct = new Pose2dStruct();
+  /** Pose2d protobuf for serialization. */
   public static final Pose2dProto proto = new Pose2dProto();
+
+  /** Pose2d struct for serialization. */
+  public static final Pose2dStruct struct = new Pose2dStruct();
 }

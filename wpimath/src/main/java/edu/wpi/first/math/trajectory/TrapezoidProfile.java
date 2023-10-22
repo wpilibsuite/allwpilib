@@ -54,9 +54,12 @@ public class TrapezoidProfile {
   private double m_endFullSpeed;
   private double m_endDeccel;
 
+  /** Profile constraints. */
   public static class Constraints {
+    /** Maximum velocity. */
     public final double maxVelocity;
 
+    /** Maximum acceleration. */
     public final double maxAcceleration;
 
     /**
@@ -71,24 +74,48 @@ public class TrapezoidProfile {
       MathSharedStore.reportUsage(MathUsageId.kTrajectory_TrapezoidProfile, 1);
     }
 
+    /**
+     * Construct constraints for a TrapezoidProfile.
+     *
+     * @param <U> Unit type.
+     * @param maxVelocity maximum velocity
+     * @param maxAcceleration maximum acceleration
+     */
     public <U extends Unit<U>> Constraints(
         Measure<Velocity<U>> maxVelocity, Measure<Velocity<Velocity<U>>> maxAcceleration) {
       this(maxVelocity.baseUnitMagnitude(), maxAcceleration.baseUnitMagnitude());
     }
   }
 
+  /** Profile state. */
   public static class State {
+    /** The position at this state. */
     public double position;
 
+    /** The velocity at this state. */
     public double velocity;
 
+    /** Default constructor. */
     public State() {}
 
+    /**
+     * Constructs constraints for a Trapezoid Profile.
+     *
+     * @param position The position at this state.
+     * @param velocity The velocity at this state.
+     */
     public State(double position, double velocity) {
       this.position = position;
       this.velocity = velocity;
     }
 
+    /**
+     * Constructs constraints for a Trapezoid Profile.
+     *
+     * @param <U> Unit type.
+     * @param position The position at this state.
+     * @param velocity The velocity at this state.
+     */
     public <U extends Unit<U>> State(Measure<U> position, Measure<Velocity<U>> velocity) {
       this(position.baseUnitMagnitude(), velocity.baseUnitMagnitude());
     }

@@ -14,7 +14,9 @@ import edu.wpi.first.wpilibj.Timer;
  * <p>This class is provided by the NewCommands VendorDep
  */
 public class WaitCommand extends Command {
+  /** The timer used for waiting. */
   protected Timer m_timer = new Timer();
+
   private final double m_duration;
 
   /**
