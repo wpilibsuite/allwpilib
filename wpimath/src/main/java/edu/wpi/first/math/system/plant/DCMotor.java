@@ -217,6 +217,17 @@ public class DCMotor {
   }
 
   /**
+   * Returns a gearbox of NEO Vortex brushless motors.
+   * 
+   * @param numMotors Number of motors in the gearbox.
+   * @return A gearbox of NEO Vortex motors.
+   */
+  public static DCMotor NEOVortex(int numMotors) {
+    // https://www.revrobotics.com/next-generation-spark-neo/
+    return new DCMotor(12, 3.6, 211, 3.615, Units.rotationsPerMinuteToRadiansPerSecond(6784), numMotors);
+  }
+
+  /**
    * Return a gearbox of Falcon 500 motors.
    *
    * @param numMotors Number of motors in the gearbox.
@@ -237,6 +248,28 @@ public class DCMotor {
     // https://store.ctr-electronics.com/falcon-500-powered-by-talon-fx/
     return new DCMotor(
         12, 5.84, 304, 1.5, Units.rotationsPerMinuteToRadiansPerSecond(6080.0), numMotors);
+  }
+
+  /**
+   * Return a gearbox of Kraken X60 motors with trapezoidal commutation.
+   * 
+   * @param numMotors Number of motors in the gearbox.
+   * @return A gearbox of Kraken X60 motors.
+   */
+  public static DCMotor KrakenX60(int numMotors) {
+    // https://store.ctr-electronics.com/announcing-kraken-x60/
+    return new DCMotor(12, 7.09, 366, 2, Units.rotationsPerMinuteToRadiansPerSecond(6000), numMotors);
+  }
+
+  /**
+   * Return a gearbox of Kraken X60 motors with FOC (Field-Oriented Control) enabled.
+   * 
+   * @param numMotors Number of motors in the gearbox.
+   * @return A gearbox of Kraken X60 FOC enabled motors.
+   */
+  public static DCMotor KrakenX60Foc(int numMotors) {
+    // https://store.ctr-electronics.com/announcing-kraken-x60/
+    return new DCMotor(12, 9.37, 483, 2, Units.rotationsPerMinuteToRadiansPerSecond(5800), numMotors);
   }
 
   /**
