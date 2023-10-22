@@ -300,14 +300,11 @@ public class PoseEstimator<T extends WheelPositions<T>> {
         // Find the new wheel distances.
         var wheelLerp = wheelPositions.interpolate(endValue.wheelPositions, t);
 
-        // Find the distance travelled between this measurement and the interpolated measurement.
-        var wheelDelta = wheelLerp.minus(wheelPositions);
-
         // Find the new gyro angle.
         var gyroLerp = gyroAngle.interpolate(endValue.gyroAngle, t);
 
-        // Create a twist to represent this change based on the interpolated sensor inputs.
-        Twist2d twist = m_kinematics.toTwist2d(wheelDelta);
+        // Create a twist to represent the change based on the interpolated sensor inputs.
+        Twist2d twist = m_kinematics.toTwist2d(wheelPositions, wheelLerp);
         twist.dtheta = gyroLerp.minus(gyroAngle).getRadians();
 
         return new InterpolationRecord(poseMeters.exp(twist), gyroLerp, wheelLerp);

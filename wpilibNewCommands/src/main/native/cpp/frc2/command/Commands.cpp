@@ -11,6 +11,7 @@
 #include "frc2/command/ParallelDeadlineGroup.h"
 #include "frc2/command/ParallelRaceGroup.h"
 #include "frc2/command/PrintCommand.h"
+#include "frc2/command/ProxyCommand.h"
 #include "frc2/command/RunCommand.h"
 #include "frc2/command/SequentialCommandGroup.h"
 #include "frc2/command/WaitCommand.h"
@@ -24,37 +25,21 @@ CommandPtr cmd::None() {
   return InstantCommand().ToPtr();
 }
 
-CommandPtr cmd::RunOnce(std::function<void()> action,
-                        std::initializer_list<Subsystem*> requirements) {
-  return InstantCommand(std::move(action), requirements).ToPtr();
+CommandPtr cmd::Idle(Requirements requirements) {
+  return Run([] {}, requirements);
 }
 
 CommandPtr cmd::RunOnce(std::function<void()> action,
-                        std::span<Subsystem* const> requirements) {
+                        Requirements requirements) {
   return InstantCommand(std::move(action), requirements).ToPtr();
 }
 
-CommandPtr cmd::Run(std::function<void()> action,
-                    std::initializer_list<Subsystem*> requirements) {
-  return RunCommand(std::move(action), requirements).ToPtr();
-}
-
-CommandPtr cmd::Run(std::function<void()> action,
-                    std::span<Subsystem* const> requirements) {
+CommandPtr cmd::Run(std::function<void()> action, Requirements requirements) {
   return RunCommand(std::move(action), requirements).ToPtr();
 }
 
 CommandPtr cmd::StartEnd(std::function<void()> start, std::function<void()> end,
-                         std::initializer_list<Subsystem*> requirements) {
-  return FunctionalCommand(
-             std::move(start), [] {},
-             [end = std::move(end)](bool interrupted) { end(); },
-             [] { return false; }, requirements)
-      .ToPtr();
-}
-
-CommandPtr cmd::StartEnd(std::function<void()> start, std::function<void()> end,
-                         std::span<Subsystem* const> requirements) {
+                         Requirements requirements) {
   return FunctionalCommand(
              std::move(start), [] {},
              [end = std::move(end)](bool interrupted) { end(); },
@@ -63,15 +48,7 @@ CommandPtr cmd::StartEnd(std::function<void()> start, std::function<void()> end,
 }
 
 CommandPtr cmd::RunEnd(std::function<void()> run, std::function<void()> end,
-                       std::initializer_list<Subsystem*> requirements) {
-  return FunctionalCommand([] {}, std::move(run),
-                           [end = std::move(end)](bool interrupted) { end(); },
-                           [] { return false; }, requirements)
-      .ToPtr();
-}
-
-CommandPtr cmd::RunEnd(std::function<void()> run, std::function<void()> end,
-                       std::span<Subsystem* const> requirements) {
+                       Requirements requirements) {
   return FunctionalCommand([] {}, std::move(run),
                            [end = std::move(end)](bool interrupted) { end(); },
                            [] { return false; }, requirements)
@@ -80,6 +57,14 @@ CommandPtr cmd::RunEnd(std::function<void()> run, std::function<void()> end,
 
 CommandPtr cmd::Print(std::string_view msg) {
   return PrintCommand(msg).ToPtr();
+}
+
+CommandPtr cmd::DeferredProxy(wpi::unique_function<Command*()> supplier) {
+  return ProxyCommand(std::move(supplier)).ToPtr();
+}
+
+CommandPtr cmd::DeferredProxy(wpi::unique_function<CommandPtr()> supplier) {
+  return ProxyCommand(std::move(supplier)).ToPtr();
 }
 
 CommandPtr cmd::Wait(units::second_t duration) {

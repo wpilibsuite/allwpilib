@@ -30,7 +30,7 @@ target_link_libraries(wpilibc PUBLIC hal ntcore wpimath wpiutil)
 
 set_property(TARGET wpilibc PROPERTY FOLDER "libraries")
 
-install(TARGETS wpilibc EXPORT wpilibc DESTINATION "${main_lib_dest}")
+install(TARGETS wpilibc EXPORT wpilibc)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpilibc")
 
 if (WITH_FLAT_INSTALL)

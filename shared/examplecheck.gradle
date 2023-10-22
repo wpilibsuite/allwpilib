@@ -50,6 +50,8 @@ def tagList = [
         "Command-based",
         // Romi
         "Romi",
+        // XRP
+        "XRP",
         // Extremely simple programs showcasing a single hardware API
         "Hardware",
         // Full robot, with multiple mechanisms
@@ -65,8 +67,8 @@ def tagList = [
         "SmartDashboard", "Shuffleboard", "Sendable", "DataLog",
 
         /* --- Controls --- */
-        "PID", "State-Space", "Ramsete", "Path Following", "Trajectory", "SysId",
-        "Simulation", "Trapezoid Profile", "Profiled PID", "Odometry", "LQR",
+        "Exponential Profile", "PID", "State-Space", "Ramsete", "Path Following", "Trajectory",
+        "SysId", "Simulation", "Trapezoid Profile", "Profiled PID", "Odometry", "LQR",
         "Pose Estimator",
 
         /* --- Hardware --- */

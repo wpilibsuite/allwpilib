@@ -4,13 +4,13 @@
 
 #include "frc/DriverStation.h"  // NOLINT(build/include_order)
 
+#include <gtest/gtest.h>
 #include <hal/DriverStation.h>
 #include <units/math.h>
 #include <units/time.h>
 
 #include "TestBench.h"
 #include "frc/RobotController.h"
-#include "gtest/gtest.h"
 
 #define EXPECT_NEAR_UNITS(val1, val2, eps) \
   EXPECT_LE(units::math::abs(val1 - val2), eps)

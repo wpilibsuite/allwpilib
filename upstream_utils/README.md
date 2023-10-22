@@ -22,7 +22,7 @@ The example below will update a hypothetical library called `lib` to the tag
 
 Start in the `upstream_utils` folder. Restore the original repo.
 ```bash
-./update_lib.py
+./update_<lib>.py
 ```
 
 Navigate to the repo.
@@ -63,13 +63,57 @@ Move the patch files to `upstream_utils`.
 mv *.patch allwpilib/upstream_utils/lib_patches
 ```
 
-Navigate back to `upstream_utils`
+Navigate back to `upstream_utils`.
 ```bash
 cd allwpilib/upstream_utils
 ```
 
 Modify the version number in the call to `setup_upstream_repo()` in
-`update_lib.py`, then  rerun `update_lib.py` to reimport the thirdparty files.
+`update_<lib>.py`, then rerun `update_<lib>.py` to reimport the thirdparty
+files.
 ```bash
-./update_lib.py
+./update_<lib>.py
+```
+
+## Adding patch to thirdparty library
+
+The example below will add a new patch file to a hypothetical library called
+`lib` (Replace `<lib>` with `llvm`, `fmt`, `eigen`, ... in the following steps).
+
+Start in the `upstream_utils` folder. Restore the original repo.
+```bash
+./update_<lib>.py
+```
+
+Navigate to the repo.
+```bash
+cd /tmp/<lib>
+```
+
+Make a commit with the desired changes.
+```bash
+git add ...
+git commit -m "..."
+```
+
+Generate patch files.
+```bash
+git format-patch 2.0..HEAD --zero-commit --abbrev=40 --no-signature
+```
+where `2.0` is replaced with the version specified in `update_<lib>.py`.
+
+Move the patch files to `upstream_utils`.
+```
+mv *.patch allwpilib/upstream_utils/<lib>_patches
+```
+
+Navigate back to `upstream_utils`.
+```bash
+cd allwpilib/upstream_utils
+```
+
+Update the list of patch files in `update_<lib>.py`, then rerun
+`update_<lib>.py` to reimport the thirdparty files.
+```bash
+./update_<lib>.py
 ```

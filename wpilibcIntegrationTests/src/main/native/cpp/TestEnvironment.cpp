@@ -6,11 +6,11 @@
 #include <thread>
 
 #include <fmt/core.h>
+#include <gtest/gtest.h>
 #include <hal/HAL.h>
 
 #include "frc/DriverStation.h"
 #include "frc/livewindow/LiveWindow.h"
-#include "gtest/gtest.h"
 #include "mockds/MockDS.h"
 
 using namespace std::chrono_literals;

@@ -2,6 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <gtest/gtest.h>
 #include <units/angular_acceleration.h>
 #include <units/angular_velocity.h>
 
@@ -19,14 +20,13 @@
 #include "frc/simulation/PWMSim.h"
 #include "frc/simulation/RoboRioSim.h"
 #include "frc/system/plant/LinearSystemId.h"
-#include "gtest/gtest.h"
 
 TEST(StateSpaceSimTest, FlywheelSim) {
   const frc::LinearSystem<1, 1, 1> plant =
       frc::LinearSystemId::IdentifyVelocitySystem<units::radian>(
           0.02_V / 1_rad_per_s, 0.01_V / 1_rad_per_s_sq);
   frc::sim::FlywheelSim sim{plant, frc::DCMotor::NEO(2), 1.0};
-  frc2::PIDController controller{0.2, 0.0, 0.0};
+  frc::PIDController controller{0.2, 0.0, 0.0};
   frc::SimpleMotorFeedforward<units::radian> feedforward{
       0_V, 0.02_V / 1_rad_per_s, 0.01_V / 1_rad_per_s_sq};
   frc::Encoder encoder{0, 1};

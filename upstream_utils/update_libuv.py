@@ -29,7 +29,7 @@ def main():
         "0007-Fix-Win32-warning-suppression-pragma.patch",
         "0008-Use-C-atomics.patch",
         "0009-Remove-static-from-array-indices.patch",
-        "0010-Remove-uv_clock_gettime-and-add-pragmas-for-missing-.patch",
+        "0010-Add-pragmas-for-missing-libraries-and-set-_WIN32_WIN.patch",
     ]:
         git_am(os.path.join(wpilib_root, "upstream_utils/libuv_patches", f))
 
@@ -45,7 +45,7 @@ def main():
     ]
 
     include_files = walk_cwd_and_copy_if(
-        lambda dp, f: "include" in dp and f not in include_ignorelist,
+        lambda dp, f: dp.startswith("./include") and f not in include_ignorelist,
         os.path.join(wpinet, "src/main/native/thirdparty/libuv"),
     )
 
@@ -66,7 +66,7 @@ def main():
         "sysinfo-memory.c",
     ]
     src_files = walk_cwd_and_copy_if(
-        lambda dp, f: "src" in dp and "docs" not in dp and f not in src_ignorelist,
+        lambda dp, f: dp.startswith("./src") and f not in src_ignorelist,
         os.path.join(wpinet, "src/main/native/thirdparty/libuv"),
     )
 

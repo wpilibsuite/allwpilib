@@ -57,6 +57,7 @@ import java.util.function.LongConsumer;
 import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 
+@SuppressWarnings("PMD.CompareObjectsWithEquals")
 public class SendableBuilderImpl implements NTSendableBuilder {
   @FunctionalInterface
   private interface TimedConsumer<T> {
@@ -328,6 +329,15 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     m_properties.add(property);
   }
 
+  @Override
+  public void publishConstBoolean(String key, boolean value) {
+    Property<BooleanPublisher, BooleanSubscriber> property = new Property<>();
+    BooleanTopic topic = m_table.getBooleanTopic(key);
+    property.m_pub = topic.publish();
+    property.m_pub.set(value);
+    m_properties.add(property);
+  }
+
   /**
    * Add an integer property.
    *
@@ -352,6 +362,15 @@ public class SendableBuilderImpl implements NTSendableBuilder {
             }
           };
     }
+    m_properties.add(property);
+  }
+
+  @Override
+  public void publishConstInteger(String key, long value) {
+    Property<IntegerPublisher, IntegerSubscriber> property = new Property<>();
+    IntegerTopic topic = m_table.getIntegerTopic(key);
+    property.m_pub = topic.publish();
+    property.m_pub.set(value);
     m_properties.add(property);
   }
 
@@ -382,6 +401,15 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     m_properties.add(property);
   }
 
+  @Override
+  public void publishConstFloat(String key, float value) {
+    Property<FloatPublisher, FloatSubscriber> property = new Property<>();
+    FloatTopic topic = m_table.getFloatTopic(key);
+    property.m_pub = topic.publish();
+    property.m_pub.set(value);
+    m_properties.add(property);
+  }
+
   /**
    * Add a double property.
    *
@@ -409,6 +437,15 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     m_properties.add(property);
   }
 
+  @Override
+  public void publishConstDouble(String key, double value) {
+    Property<DoublePublisher, DoubleSubscriber> property = new Property<>();
+    DoubleTopic topic = m_table.getDoubleTopic(key);
+    property.m_pub = topic.publish();
+    property.m_pub.set(value);
+    m_properties.add(property);
+  }
+
   /**
    * Add a string property.
    *
@@ -433,6 +470,15 @@ public class SendableBuilderImpl implements NTSendableBuilder {
             }
           };
     }
+    m_properties.add(property);
+  }
+
+  @Override
+  public void publishConstString(String key, String value) {
+    Property<StringPublisher, StringSubscriber> property = new Property<>();
+    StringTopic topic = m_table.getStringTopic(key);
+    property.m_pub = topic.publish();
+    property.m_pub.set(value);
     m_properties.add(property);
   }
 
@@ -465,6 +511,15 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     m_properties.add(property);
   }
 
+  @Override
+  public void publishConstBooleanArray(String key, boolean[] value) {
+    Property<BooleanArrayPublisher, BooleanArraySubscriber> property = new Property<>();
+    BooleanArrayTopic topic = m_table.getBooleanArrayTopic(key);
+    property.m_pub = topic.publish();
+    property.m_pub.set(value);
+    m_properties.add(property);
+  }
+
   /**
    * Add an integer array property.
    *
@@ -491,6 +546,15 @@ public class SendableBuilderImpl implements NTSendableBuilder {
             }
           };
     }
+    m_properties.add(property);
+  }
+
+  @Override
+  public void publishConstIntegerArray(String key, long[] value) {
+    Property<IntegerArrayPublisher, IntegerArraySubscriber> property = new Property<>();
+    IntegerArrayTopic topic = m_table.getIntegerArrayTopic(key);
+    property.m_pub = topic.publish();
+    property.m_pub.set(value);
     m_properties.add(property);
   }
 
@@ -523,6 +587,15 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     m_properties.add(property);
   }
 
+  @Override
+  public void publishConstFloatArray(String key, float[] value) {
+    Property<FloatArrayPublisher, FloatArraySubscriber> property = new Property<>();
+    FloatArrayTopic topic = m_table.getFloatArrayTopic(key);
+    property.m_pub = topic.publish();
+    property.m_pub.set(value);
+    m_properties.add(property);
+  }
+
   /**
    * Add a double array property.
    *
@@ -549,6 +622,15 @@ public class SendableBuilderImpl implements NTSendableBuilder {
             }
           };
     }
+    m_properties.add(property);
+  }
+
+  @Override
+  public void publishConstDoubleArray(String key, double[] value) {
+    Property<DoubleArrayPublisher, DoubleArraySubscriber> property = new Property<>();
+    DoubleArrayTopic topic = m_table.getDoubleArrayTopic(key);
+    property.m_pub = topic.publish();
+    property.m_pub.set(value);
     m_properties.add(property);
   }
 
@@ -581,6 +663,15 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     m_properties.add(property);
   }
 
+  @Override
+  public void publishConstStringArray(String key, String[] value) {
+    Property<StringArrayPublisher, StringArraySubscriber> property = new Property<>();
+    StringArrayTopic topic = m_table.getStringArrayTopic(key);
+    property.m_pub = topic.publish();
+    property.m_pub.set(value);
+    m_properties.add(property);
+  }
+
   /**
    * Add a raw property.
    *
@@ -608,6 +699,15 @@ public class SendableBuilderImpl implements NTSendableBuilder {
             }
           };
     }
+    m_properties.add(property);
+  }
+
+  @Override
+  public void publishConstRaw(String key, String typestring, byte[] value) {
+    Property<RawPublisher, RawSubscriber> property = new Property<>();
+    RawTopic topic = m_table.getRawTopic(key);
+    property.m_pub = topic.publish(typestring);
+    property.m_pub.set(value);
     m_properties.add(property);
   }
 }

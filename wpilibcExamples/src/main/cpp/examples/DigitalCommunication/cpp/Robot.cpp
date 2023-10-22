@@ -19,7 +19,7 @@ void Robot::RobotPeriodic() {
 
   // pull alert port high if match time remaining is between 30 and 25 seconds
   auto matchTime = frc::DriverStation::GetMatchTime();
-  m_alertOutput.Set(matchTime <= 30 && matchTime >= 25);
+  m_alertOutput.Set(matchTime <= 30_s && matchTime >= 25_s);
 }
 
 #ifndef RUNNING_FRC_TESTS

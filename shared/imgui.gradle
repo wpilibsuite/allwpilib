@@ -1,12 +1,12 @@
 nativeUtils {
     nativeDependencyContainer {
         imgui(getNativeDependencyTypeClass('WPIStaticMavenDependency')) {
-            groupId = "edu.wpi.first.thirdparty.frc2023"
+            groupId = "edu.wpi.first.thirdparty.frc2024"
             artifactId = "imgui"
             headerClassifier = "headers"
             sourceClassifier = "sources"
             ext = "zip"
-            version = '1.89.1-1'
+            version = '1.89.9-1'
             targetPlatforms.addAll(nativeUtils.wpi.platforms.allPlatforms)
         }
     }

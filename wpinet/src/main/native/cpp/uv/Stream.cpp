@@ -97,8 +97,8 @@ void Stream::Write(std::span<const Buffer> bufs,
                if (status < 0) {
                  h.ReportError(status);
                }
+               auto ptr = h.Release();  // one-shot, but finish() may Keep()
                h.finish(Error(status));
-               h.Release();  // this is always a one-shot
              })) {
     req->Keep();
   }
@@ -111,25 +111,31 @@ void Stream::Write(std::span<const Buffer> bufs,
 
 int Stream::TryWrite(std::span<const Buffer> bufs) {
   if (IsLoopClosing()) {
-    return 0;
+    return UV_ECANCELED;
   }
   int val = uv_try_write(GetRawStream(), bufs.data(), bufs.size());
+  if (val == UV_EAGAIN) {
+    return 0;
+  }
   if (val < 0) {
     this->ReportError(val);
-    return 0;
+    return val;
   }
   return val;
 }
 
 int Stream::TryWrite2(std::span<const Buffer> bufs, Stream& send) {
   if (IsLoopClosing()) {
-    return 0;
+    return UV_ECANCELED;
   }
   int val = uv_try_write2(GetRawStream(), bufs.data(), bufs.size(),
                           send.GetRawStream());
+  if (val == UV_EAGAIN) {
+    return 0;
+  }
   if (val < 0) {
     this->ReportError(val);
-    return 0;
+    return val;
   }
   return val;
 }

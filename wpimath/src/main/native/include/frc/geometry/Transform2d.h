@@ -5,15 +5,17 @@
 #pragma once
 
 #include <wpi/SymbolExports.h>
+#include <wpi/protobuf/Protobuf.h>
+#include <wpi/struct/Struct.h>
 
-#include "Translation2d.h"
+#include "frc/geometry/Translation2d.h"
 
 namespace frc {
 
 class WPILIB_DLLEXPORT Pose2d;
 
 /**
- * Represents a transformation for a Pose2d.
+ * Represents a transformation for a Pose2d in the pose's frame.
  */
 class WPILIB_DLLEXPORT Transform2d {
  public:
@@ -32,6 +34,17 @@ class WPILIB_DLLEXPORT Transform2d {
    * @param rotation Rotational component of the transform.
    */
   constexpr Transform2d(Translation2d translation, Rotation2d rotation);
+
+  /**
+   * Constructs a transform with x and y translations instead of a separate
+   * Translation2d.
+   *
+   * @param x The x component of the translational component of the transform.
+   * @param y The y component of the translational component of the transform.
+   * @param rotation The rotational component of the transform.
+   */
+  constexpr Transform2d(units::meter_t x, units::meter_t y,
+                        Rotation2d rotation);
 
   /**
    * Constructs the identity transform -- maps an initial pose to itself.
@@ -94,7 +107,8 @@ class WPILIB_DLLEXPORT Transform2d {
   }
 
   /**
-   * Composes two transformations.
+   * Composes two transformations. The second transform is applied relative to
+   * the orientation of the first.
    *
    * @param other The transform to compose with this one.
    * @return The composition of the two transformations.
@@ -112,4 +126,40 @@ class WPILIB_DLLEXPORT Transform2d {
 };
 }  // namespace frc
 
-#include "Transform2d.inc"
+template <>
+struct wpi::Struct<frc::Transform2d> {
+  static constexpr std::string_view kTypeString = "struct:Transform2d";
+  static constexpr size_t kSize = wpi::Struct<frc::Translation2d>::kSize +
+                                  wpi::Struct<frc::Rotation2d>::kSize;
+  static constexpr std::string_view kSchema =
+      "Translation2d translation;Rotation2d rotation";
+  static frc::Transform2d Unpack(std::span<const uint8_t, kSize> data) {
+    return {wpi::UnpackStruct<frc::Translation2d, 0>(data),
+            wpi::UnpackStruct<frc::Rotation2d, kRotationOff>(data)};
+  }
+  static void Pack(std::span<uint8_t, kSize> data,
+                   const frc::Transform2d& value) {
+    wpi::PackStruct<0>(data, value.Translation());
+    wpi::PackStruct<kRotationOff>(data, value.Rotation());
+  }
+  static void ForEachNested(
+      std::invocable<std::string_view, std::string_view> auto fn) {
+    wpi::ForEachStructSchema<frc::Translation2d>(fn);
+    wpi::ForEachStructSchema<frc::Rotation2d>(fn);
+  }
+
+ private:
+  static constexpr size_t kRotationOff = wpi::Struct<frc::Translation2d>::kSize;
+};
+
+static_assert(wpi::HasNestedStruct<frc::Transform2d>);
+
+template <>
+struct WPILIB_DLLEXPORT wpi::Protobuf<frc::Transform2d> {
+  static google::protobuf::Message* New(google::protobuf::Arena* arena);
+  static frc::Transform2d Unpack(const google::protobuf::Message& msg);
+  static void Pack(google::protobuf::Message* msg,
+                   const frc::Transform2d& value);
+};
+
+#include "frc/geometry/Transform2d.inc"

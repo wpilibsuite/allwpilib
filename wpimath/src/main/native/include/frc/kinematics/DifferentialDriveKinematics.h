@@ -83,9 +83,9 @@ class WPILIB_DLLEXPORT DifferentialDriveKinematics
             (rightDistance - leftDistance) / trackWidth * 1_rad};
   }
 
-  Twist2d ToTwist2d(
-      const DifferentialDriveWheelPositions& wheelDeltas) const override {
-    return ToTwist2d(wheelDeltas.left, wheelDeltas.right);
+  Twist2d ToTwist2d(const DifferentialDriveWheelPositions& start,
+                    const DifferentialDriveWheelPositions& end) const override {
+    return ToTwist2d(end.left - start.left, end.right - start.right);
   }
 
   units::meter_t trackWidth;

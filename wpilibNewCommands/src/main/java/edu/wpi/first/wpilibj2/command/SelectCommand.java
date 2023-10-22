@@ -11,8 +11,8 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 /**
- * A command composition that runs one of a selection of commands, either using a selector and a key
- * to command mapping, or a supplier that returns the command directly at runtime.
+ * A command composition that runs one of a selection of commands using a selector and a key to
+ * command mapping.
  *
  * <p>The rules for command compositions apply: command instances that are passed to it cannot be
  * added to any other composition or scheduled individually, and the composition requires all
@@ -27,6 +27,9 @@ public class SelectCommand extends Command {
   private boolean m_runsWhenDisabled = true;
   private InterruptionBehavior m_interruptBehavior = InterruptionBehavior.kCancelIncoming;
 
+  private final Command m_defaultCommand =
+      new PrintCommand("SelectCommand selector value does not correspond to any command!");
+
   /**
    * Creates a new SelectCommand.
    *
@@ -37,6 +40,7 @@ public class SelectCommand extends Command {
     m_commands = requireNonNullParam(commands, "commands", "SelectCommand");
     m_selector = requireNonNullParam(selector, "selector", "SelectCommand");
 
+    CommandScheduler.getInstance().registerComposedCommands(m_defaultCommand);
     CommandScheduler.getInstance()
         .registerComposedCommands(commands.values().toArray(new Command[] {}));
 
@@ -51,12 +55,7 @@ public class SelectCommand extends Command {
 
   @Override
   public void initialize() {
-    if (!m_commands.containsKey(m_selector.get())) {
-      m_selectedCommand =
-          new PrintCommand("SelectCommand selector value does not correspond to any command!");
-    } else {
-      m_selectedCommand = m_commands.get(m_selector.get());
-    }
+    m_selectedCommand = m_commands.getOrDefault(m_selector.get(), m_defaultCommand);
     m_selectedCommand.initialize();
   }
 

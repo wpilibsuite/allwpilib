@@ -4,9 +4,10 @@
 
 #include <atomic>
 
+#include <gtest/gtest.h>
+
 #include "frc/Notifier.h"
 #include "frc/simulation/SimHooks.h"
-#include "gtest/gtest.h"
 
 using namespace frc;
 

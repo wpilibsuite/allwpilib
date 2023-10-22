@@ -53,12 +53,6 @@ public class DifferentialDriveWheelPositions
   }
 
   @Override
-  public DifferentialDriveWheelPositions minus(DifferentialDriveWheelPositions other) {
-    return new DifferentialDriveWheelPositions(
-        this.leftMeters - other.leftMeters, this.rightMeters - other.rightMeters);
-  }
-
-  @Override
   public DifferentialDriveWheelPositions interpolate(
       DifferentialDriveWheelPositions endValue, double t) {
     return new DifferentialDriveWheelPositions(

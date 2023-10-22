@@ -14,6 +14,7 @@
 #include <vector>
 
 #include <wpi/SmallVector.h>
+#include <wpi/json_fwd.h>
 
 #include "cscore_c.h"
 
@@ -22,10 +23,6 @@
 #pragma warning(push)
 #pragma warning(disable : 26495)
 #endif
-
-namespace wpi {
-class json;
-}  // namespace wpi
 
 /** CameraServer (cscore) namespace */
 namespace cs {

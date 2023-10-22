@@ -35,10 +35,6 @@ struct WPILIB_DLLEXPORT SwerveModulePosition {
    */
   bool operator==(const SwerveModulePosition& other) const;
 
-  SwerveModulePosition operator-(const SwerveModulePosition& other) const {
-    return {distance - other.distance, angle};
-  }
-
   SwerveModulePosition Interpolate(const SwerveModulePosition& endValue,
                                    double t) const {
     return {wpi::Lerp(distance, endValue.distance, t),

@@ -24,6 +24,11 @@ DCMotorSim::DCMotorSim(const DCMotor& gearbox, double gearing,
     : DCMotorSim(LinearSystemId::DCMotorSystem(gearbox, moi, gearing), gearbox,
                  gearing, measurementStdDevs) {}
 
+void DCMotorSim::SetState(units::radian_t angularPosition,
+                          units::radians_per_second_t angularVelocity) {
+  SetState(Vectord<2>{angularPosition, angularVelocity});
+}
+
 units::radian_t DCMotorSim::GetAngularPosition() const {
   return units::radian_t{GetOutput(0)};
 }

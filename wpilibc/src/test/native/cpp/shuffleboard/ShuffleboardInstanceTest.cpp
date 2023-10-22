@@ -6,12 +6,12 @@
 
 #include <string_view>
 
+#include <gtest/gtest.h>
 #include <networktables/NetworkTableInstance.h>
 #include <networktables/NetworkTableListener.h>
 #include <networktables/StringTopic.h>
 
 #include "frc/shuffleboard/ShuffleboardInstance.h"
-#include "gtest/gtest.h"
 #include "shuffleboard/MockActuatorSendable.h"
 
 class NTWrapper {

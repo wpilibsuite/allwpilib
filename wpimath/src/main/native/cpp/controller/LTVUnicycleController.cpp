@@ -6,8 +6,11 @@
 
 #include <stdexcept>
 
+#include <Eigen/Cholesky>
+
+#include "frc/DARE.h"
 #include "frc/StateSpaceUtil.h"
-#include "frc/controller/LinearQuadraticRegulator.h"
+#include "frc/system/Discretization.h"
 #include "units/math.h"
 
 using namespace frc;
@@ -40,7 +43,10 @@ LTVUnicycleController::LTVUnicycleController(
     const wpi::array<double, 3>& Qelems, const wpi::array<double, 2>& Relems,
     units::second_t dt, units::meters_per_second_t maxVelocity) {
   if (maxVelocity <= 0_mps) {
-    throw std::domain_error("Max velocity must be greater than zero.");
+    throw std::domain_error("Max velocity must be greater than 0 m/s.");
+  }
+  if (maxVelocity >= 15_mps) {
+    throw std::domain_error("Max velocity must be less than 15 m/s.");
   }
 
   // The change in global pose for a unicycle is defined by the following three
@@ -80,17 +86,28 @@ LTVUnicycleController::LTVUnicycleController(
   Matrixd<3, 3> Q = frc::MakeCostMatrix(Qelems);
   Matrixd<2, 2> R = frc::MakeCostMatrix(Relems);
 
+  auto R_llt = R.llt();
+
   for (auto velocity = -maxVelocity; velocity < maxVelocity;
        velocity += 0.01_mps) {
     // The DARE is ill-conditioned if the velocity is close to zero, so don't
     // let the system stop.
     if (units::math::abs(velocity) < 1e-4_mps) {
-      m_table.insert(velocity, Matrixd<2, 3>::Zero());
+      A(State::kY, State::kHeading) = 1e-4;
     } else {
       A(State::kY, State::kHeading) = velocity.value();
-      m_table.insert(velocity,
-                     frc::LinearQuadraticRegulator<3, 2>{A, B, Q, R, dt}.K());
     }
+
+    Matrixd<3, 3> discA;
+    Matrixd<3, 2> discB;
+    DiscretizeAB(A, B, dt, &discA, &discB);
+
+    Matrixd<3, 3> S = detail::DARE<3, 2>(discA, discB, Q, R_llt);
+
+    // K = (BᵀSB + R)⁻¹BᵀSA
+    m_table.insert(velocity, (discB.transpose() * S * discB + R)
+                                 .llt()
+                                 .solve(discB.transpose() * S * discA));
   }
 }
 

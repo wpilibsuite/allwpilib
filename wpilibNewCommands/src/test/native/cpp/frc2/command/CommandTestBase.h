@@ -9,18 +9,18 @@
 #include <utility>
 
 #include <frc/simulation/DriverStationSim.h>
+#include <gtest/gtest.h>
 
 #include "frc2/command/CommandHelper.h"
 #include "frc2/command/CommandScheduler.h"
-#include "frc2/command/SetUtilities.h"
-#include "frc2/command/Subsystem.h"
+#include "frc2/command/Requirements.h"
+#include "frc2/command/SubsystemBase.h"
 #include "gmock/gmock.h"
-#include "gtest/gtest.h"
 #include "make_vector.h"
 
 namespace frc2 {
 
-class TestSubsystem : public Subsystem {
+class TestSubsystem : public SubsystemBase {
  public:
   explicit TestSubsystem(std::function<void()> periodic = [] {})
       : m_periodic{periodic} {}
@@ -51,8 +51,8 @@ class MockCommand : public CommandHelper<Command, MockCommand> {
         .WillRepeatedly(::testing::Return(true));
   }
 
-  MockCommand(std::initializer_list<Subsystem*> requirements,
-              bool finished = false, bool runWhenDisabled = true) {
+  explicit MockCommand(Requirements requirements, bool finished = false,
+                       bool runWhenDisabled = true) {
     m_requirements.insert(requirements.begin(), requirements.end());
     EXPECT_CALL(*this, GetRequirements())
         .WillRepeatedly(::testing::Return(m_requirements));

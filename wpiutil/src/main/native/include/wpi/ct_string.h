@@ -80,7 +80,7 @@ struct ct_string {
 template <typename Char, size_t M>
 ct_string(Char const (&s)[M]) -> ct_string<Char, std::char_traits<Char>, M - 1>;
 
-namespace literals {
+inline namespace literals {
 template <ct_string S>
 consteval auto operator""_ct_string() {
   return S;

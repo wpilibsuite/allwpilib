@@ -8,14 +8,14 @@
 #include <span>
 
 #include <wpi/SymbolExports.h>
+#include <wpi/json_fwd.h>
+#include <wpi/protobuf/Protobuf.h>
+#include <wpi/struct/Struct.h>
 
-#include "Transform2d.h"
-#include "Translation2d.h"
-#include "Twist2d.h"
-
-namespace wpi {
-class json;
-}  // namespace wpi
+#include "frc/geometry/Rotation2d.h"
+#include "frc/geometry/Transform2d.h"
+#include "frc/geometry/Translation2d.h"
+#include "frc/geometry/Twist2d.h"
 
 namespace frc {
 
@@ -123,6 +123,15 @@ class WPILIB_DLLEXPORT Pose2d {
   constexpr Pose2d operator/(double scalar) const;
 
   /**
+   * Rotates the pose around the origin and returns the new pose.
+   *
+   * @param other The rotation to transform the pose by.
+   *
+   * @return The rotated pose.
+   */
+  constexpr Pose2d RotateBy(const Rotation2d& other) const;
+
+  /**
    * Transforms the pose by the given transformation and returns the new pose.
    * See + operator for the matrix multiplication performed.
    *
@@ -206,4 +215,38 @@ void from_json(const wpi::json& json, Pose2d& pose);
 
 }  // namespace frc
 
-#include "Pose2d.inc"
+template <>
+struct wpi::Struct<frc::Pose2d> {
+  static constexpr std::string_view kTypeString = "struct:Pose2d";
+  static constexpr size_t kSize = wpi::Struct<frc::Translation2d>::kSize +
+                                  wpi::Struct<frc::Rotation2d>::kSize;
+  static constexpr std::string_view kSchema =
+      "Translation2d translation;Rotation2d rotation";
+  static frc::Pose2d Unpack(std::span<const uint8_t, kSize> data) {
+    return {wpi::UnpackStruct<frc::Translation2d, 0>(data),
+            wpi::UnpackStruct<frc::Rotation2d, kRotationOff>(data)};
+  }
+  static void Pack(std::span<uint8_t, kSize> data, const frc::Pose2d& value) {
+    wpi::PackStruct<0>(data, value.Translation());
+    wpi::PackStruct<kRotationOff>(data, value.Rotation());
+  }
+  static void ForEachNested(
+      std::invocable<std::string_view, std::string_view> auto fn) {
+    wpi::ForEachStructSchema<frc::Translation2d>(fn);
+    wpi::ForEachStructSchema<frc::Rotation2d>(fn);
+  }
+
+ private:
+  static constexpr size_t kRotationOff = wpi::Struct<frc::Translation2d>::kSize;
+};
+
+static_assert(wpi::HasNestedStruct<frc::Pose2d>);
+
+template <>
+struct WPILIB_DLLEXPORT wpi::Protobuf<frc::Pose2d> {
+  static google::protobuf::Message* New(google::protobuf::Arena* arena);
+  static frc::Pose2d Unpack(const google::protobuf::Message& msg);
+  static void Pack(google::protobuf::Message* msg, const frc::Pose2d& value);
+};
+
+#include "frc/geometry/Pose2d.inc"

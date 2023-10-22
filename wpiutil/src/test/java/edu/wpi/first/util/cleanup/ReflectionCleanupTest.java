@@ -19,6 +19,7 @@ class ReflectionCleanupTest {
     }
   }
 
+  @SuppressWarnings("PMD.TestClassWithoutTestCases")
   static class CleanupTest implements ReflectionCleanup {
     public CleanupClass m_class1 = new CleanupClass();
     public CleanupClass m_class2 = new CleanupClass();

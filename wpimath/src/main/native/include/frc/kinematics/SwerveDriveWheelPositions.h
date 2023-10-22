@@ -38,16 +38,6 @@ struct WPILIB_DLLEXPORT SwerveDriveWheelPositions {
    */
   bool operator!=(const SwerveDriveWheelPositions& other) const = default;
 
-  SwerveDriveWheelPositions<NumModules> operator-(
-      const SwerveDriveWheelPositions<NumModules>& other) const {
-    auto result =
-        wpi::array<SwerveModulePosition, NumModules>(wpi::empty_array);
-    for (size_t i = 0; i < NumModules; i++) {
-      result[i] = positions[i] - other.positions[i];
-    }
-    return {result};
-  }
-
   SwerveDriveWheelPositions<NumModules> Interpolate(
       const SwerveDriveWheelPositions<NumModules>& endValue, double t) const {
     auto result =

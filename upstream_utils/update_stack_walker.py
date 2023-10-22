@@ -38,7 +38,7 @@ def crlf_to_lf(stackwalker_dir):
 def main():
     upstream_root = clone_repo(
         "https://github.com/JochenKalmbach/StackWalker",
-        "42e7a6e056a9e7aca911a7e9e54e2e4f90bc2652",
+        "5b0df7a4db8896f6b6dc45d36e383c52577e3c6b",
         shallow=False,
     )
     wpilib_root = get_repo_root()
@@ -50,9 +50,7 @@ def main():
     # Apply patches to upstream Git repo
     os.chdir(upstream_root)
     for f in [
-        "0001-Apply-PR-35.patch",
-        "0002-Remove-_M_IX86-checks.patch",
-        "0003-Add-advapi-pragma.patch",
+        "0001-Add-advapi-pragma.patch",
     ]:
         git_am(
             os.path.join(wpilib_root, "upstream_utils/stack_walker_patches", f),

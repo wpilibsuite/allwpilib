@@ -212,7 +212,6 @@ class WPILIB_DLLEXPORT DCMotor {
     return DCMotor(12_V, 5.84_Nm, 304_A, 1.5_A, 6080_rpm, numMotors);
   }
 
-  /**
    * Return a gearbox of Kraken X60 motors with trapezoidal commutation.
    */
   static constexpr DCMotor KrakenX60(int numMotors = 1) {
@@ -235,6 +234,31 @@ class WPILIB_DLLEXPORT DCMotor {
   static constexpr DCMotor RomiBuiltIn(int numMotors = 1) {
     // From https://www.pololu.com/product/1520/specs
     return DCMotor(4.5_V, 0.1765_Nm, 1.25_A, 0.13_A, 150_rpm, numMotors);
+  }
+
+  /**
+   * Return a gearbox of Kraken X60 brushless motors.
+   */
+  static constexpr DCMotor KrakenX60(int numMotors = 1) {
+    // From https://store.ctr-electronics.com/announcing-kraken-x60/
+    return DCMotor(12_V, 7.09_Nm, 366_A, 2_A, 6000_rpm, numMotors);
+  }
+
+  /**
+   * Return a gearbox of Kraken X60 brushless motors with FOC (Field-Oriented
+   * Control) enabled.
+   */
+  static constexpr DCMotor KrakenX60FOC(int numMotors = 1) {
+    // From https://store.ctr-electronics.com/announcing-kraken-x60/
+    return DCMotor(12_V, 9.37_Nm, 483_A, 2_A, 5800_rpm, numMotors);
+  }
+
+  /**
+   * Return a gearbox of Neo Vortex brushless motors.
+   */
+  static constexpr DCMotor NeoVortex(int numMotors = 1) {
+    // From https://www.revrobotics.com/next-generation-spark-neo/
+    return DCMotor(12_V, 3.60_Nm, 211_A, 3.615_A, 6784_rpm, numMotors);
   }
 };
 

@@ -23,9 +23,17 @@ namespace frc {
 /**
  * The linear time-varying differential drive controller has a similar form to
  * the LQR, but the model used to compute the controller gain is the nonlinear
- * model linearized around the drivetrain's current state. We precomputed gains
- * for important places in our state-space, then interpolated between them with
- * a LUT to save computational resources.
+ * differential drive model linearized around the drivetrain's current state. We
+ * precompute gains for important places in our state-space, then interpolate
+ * between them with a lookup table to save computational resources.
+ *
+ * This controller has a flat hierarchy with pose and wheel velocity references
+ * and voltage outputs. This is different from a Ramsete controller's nested
+ * hierarchy where the top-level controller has a pose reference and chassis
+ * velocity command outputs, and the low-level controller has wheel velocity
+ * references and voltage outputs. Flat hierarchies are easier to tune in one
+ * shot. Furthermore, this controller is more optimal in the "least-squares
+ * error" sense than a controller based on Ramsete.
  *
  * See section 8.7 in Controls Engineering in FRC for a derivation of the
  * control law we used shown in theorem 8.7.4.
@@ -35,13 +43,18 @@ class WPILIB_DLLEXPORT LTVDifferentialDriveController {
   /**
    * Constructs a linear time-varying differential drive controller.
    *
+   * See
+   * https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-intro.html#lqr-tuning
+   * for how to select the tolerances.
+   *
    * @param plant      The differential drive velocity plant.
    * @param trackwidth The distance between the differential drive's left and
    *                   right wheels.
    * @param Qelems     The maximum desired error tolerance for each state.
    * @param Relems     The maximum desired control effort for each input.
    * @param dt         Discretization timestep.
-   * @throws std::domain_error if max velocity of plant with 12 V input <= 0.
+   * @throws std::domain_error if max velocity of plant with 12 V input <= 0 m/s
+   *     or >= 15 m/s.
    */
   LTVDifferentialDriveController(const frc::LinearSystem<2, 2, 2>& plant,
                                  units::meter_t trackwidth,

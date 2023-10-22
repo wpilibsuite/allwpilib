@@ -311,6 +311,18 @@ public class DCMotor {
   }
 
   /**
+   * Return a gearbox of Falcon 500 motors with FOC (Field-Oriented Control) enabled.
+   *
+   * @param numMotors Number of motors in the gearbox.
+   * @return A gearbox of Falcon 500 FOC enabled motors.
+   */
+  public static DCMotor getFalcon500Foc(int numMotors) {
+    // https://store.ctr-electronics.com/falcon-500-powered-by-talon-fx/
+    return new DCMotor(
+        12, 5.84, 304, 1.5, Units.rotationsPerMinuteToRadiansPerSecond(6080.0), numMotors);
+  }
+
+  /**
    * Return a gearbox of Romi/TI_RSLK MAX motors.
    *
    * @param numMotors Number of motors in the gearbox.
@@ -320,5 +332,41 @@ public class DCMotor {
     // From https://www.pololu.com/product/1520/specs
     return new DCMotor(4.5, 0.1765, 1.25, 0.13, Units.rotationsPerMinuteToRadiansPerSecond(150.0),
         numMotors);
+  }
+
+  /**
+   * Return a gearbox of Kraken X60 brushless motors.
+   *
+   * @param numMotors Number of motors in the gearbox.
+   * @return a gearbox of Kraken X60 motors.
+   */
+  public static DCMotor getKrakenX60(int numMotors) {
+    // From https://store.ctr-electronics.com/announcing-kraken-x60/
+    return new DCMotor(
+        12, 7.09, 366, 2, Units.rotationsPerMinuteToRadiansPerSecond(6000), numMotors);
+  }
+
+  /**
+   * Return a gearbox of Kraken X60 brushless motors with FOC (Field-Oriented Control) enabled.
+   *
+   * @param numMotors Number of motors in the gearbox.
+   * @return A gearbox of Kraken X60 FOC enabled motors.
+   */
+  public static DCMotor getKrakenX60Foc(int numMotors) {
+    // From https://store.ctr-electronics.com/announcing-kraken-x60/
+    return new DCMotor(
+        12, 9.37, 483, 2, Units.rotationsPerMinuteToRadiansPerSecond(5800), numMotors);
+  }
+
+  /**
+   * Return a gearbox of Neo Vortex brushless motors.
+   *
+   * @param numMotors Number of motors in the gearbox.
+   * @return a gearbox of Neo Vortex motors.
+   */
+  public static DCMotor getNeoVortex(int numMotors) {
+    // From https://www.revrobotics.com/next-generation-spark-neo/
+    return new DCMotor(
+        12, 3.60, 211, 3.6, Units.rotationsPerMinuteToRadiansPerSecond(6784), numMotors);
   }
 }

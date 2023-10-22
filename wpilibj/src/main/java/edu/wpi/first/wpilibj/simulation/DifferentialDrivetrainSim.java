@@ -52,7 +52,7 @@ public class DifferentialDrivetrainSim {
   private final LinearSystem<N2, N2, N2> m_plant;
 
   /**
-   * Create a SimDrivetrain.
+   * Creates a simulated differential drivetrain.
    *
    * @param driveMotor A {@link DCMotor} representing the left side of the drivetrain.
    * @param gearing The gearing ratio between motor and wheel, as output over input. This must be
@@ -91,10 +91,10 @@ public class DifferentialDrivetrainSim {
   }
 
   /**
-   * Create a SimDrivetrain .
+   * Creates a simulated differential drivetrain.
    *
-   * @param drivetrainPlant The {@link LinearSystem} representing the robot's drivetrain. This
-   *     system can be created with {@link
+   * @param plant The {@link LinearSystem} representing the robot's drivetrain. This system can be
+   *     created with {@link
    *     edu.wpi.first.math.system.plant.LinearSystemId#createDrivetrainVelocitySystem(DCMotor,
    *     double, double, double, double, double)} or {@link
    *     edu.wpi.first.math.system.plant.LinearSystemId#identifyDrivetrainSystem(double, double,
@@ -112,13 +112,13 @@ public class DifferentialDrivetrainSim {
    *     point.
    */
   public DifferentialDrivetrainSim(
-      LinearSystem<N2, N2, N2> drivetrainPlant,
+      LinearSystem<N2, N2, N2> plant,
       DCMotor driveMotor,
       double gearing,
       double trackWidthMeters,
       double wheelRadiusMeters,
       Matrix<N7, N1> measurementStdDevs) {
-    this.m_plant = drivetrainPlant;
+    this.m_plant = plant;
     this.m_rb = trackWidthMeters / 2.0;
     this.m_motor = driveMotor;
     this.m_originalGearing = gearing;

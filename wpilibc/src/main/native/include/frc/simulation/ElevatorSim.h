@@ -23,6 +23,8 @@ class ElevatorSim : public LinearSystemSim<2, 1, 1> {
    * Constructs a simulated elevator mechanism.
    *
    * @param plant              The linear system that represents the elevator.
+   *                           This system can be created with
+   *                           LinearSystemId::ElevatorSystem().
    * @param gearbox            The type of and number of motors in your
    *                           elevator gearbox.
    * @param gearing            The gearing of the elevator (numbers greater
@@ -62,6 +64,16 @@ class ElevatorSim : public LinearSystemSim<2, 1, 1> {
               units::meter_t minHeight, units::meter_t maxHeight,
               bool simulateGravity, units::meter_t startingHeight,
               const std::array<double, 1>& measurementStdDevs = {0.0});
+
+  using LinearSystemSim::SetState;
+
+  /**
+   * Sets the elevator's state. The new position will be limited between the
+   * minimum and maximum allowed heights.
+   * @param position The new position
+   * @param velocity The new velocity
+   */
+  void SetState(units::meter_t position, units::meters_per_second_t velocity);
 
   /**
    * Returns whether the elevator would hit the lower limit.

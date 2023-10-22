@@ -2,6 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <gtest/gtest.h>
 #include <units/current.h>
 #include <units/math.h>
 #include <units/moment_of_inertia.h>
@@ -15,7 +16,6 @@
 #include "frc/system/plant/LinearSystemId.h"
 #include "frc/trajectory/TrajectoryGenerator.h"
 #include "frc/trajectory/constraint/DifferentialDriveKinematicsConstraint.h"
-#include "gtest/gtest.h"
 
 TEST(DifferentialDrivetrainSimTest, Convergence) {
   auto motor = frc::DCMotor::NEO(2);
