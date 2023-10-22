@@ -68,6 +68,11 @@ public final class NetworkTableInstance implements AutoCloseable {
       this.value = value;
     }
 
+    /**
+     * Returns the network mode value.
+     *
+     * @return The network mode value.
+     */
     public int getValue() {
       return value;
     }

@@ -58,33 +58,139 @@ class VideoProperty {
 
   VideoProperty() = default;
 
+  /**
+   * Returns property name.
+   *
+   * @return Property name.
+   */
   std::string GetName() const;
 
+  /**
+   * Returns property kind.
+   *
+   * @return Property kind.
+   */
   Kind GetKind() const { return m_kind; }
 
+  /**
+   * Returns true if property is valid.
+   *
+   * @return True if property is valid.
+   */
   explicit operator bool() const { return m_kind != kNone; }
 
-  // Kind checkers
+  /**
+   * Returns true if property is a boolean.
+   *
+   * @return True if property is a boolean.
+   */
   bool IsBoolean() const { return m_kind == kBoolean; }
+
+  /**
+   * Returns true if property is an integer.
+   *
+   * @return True if property is an integer.
+   */
   bool IsInteger() const { return m_kind == kInteger; }
+
+  /**
+   * Returns true if property is a string.
+   *
+   * @return True if property is a string.
+   */
   bool IsString() const { return m_kind == kString; }
+
+  /**
+   * Returns true if property is an enum.
+   *
+   * @return True if property is an enum.
+   */
   bool IsEnum() const { return m_kind == kEnum; }
 
+  /**
+   * Returns property value.
+   *
+   * @return Property value.
+   */
   int Get() const;
+
+  /**
+   * Sets property value.
+   *
+   * @param value Property value.
+   */
   void Set(int value);
+
+  /**
+   * Returns property minimum value.
+   *
+   * @return Property minimum value.
+   */
   int GetMin() const;
+
+  /**
+   * Returns property maximum value.
+   *
+   * @return Property maximum value.
+   */
   int GetMax() const;
+
+  /**
+   * Returns property step size.
+   *
+   * @return Property step size.
+   */
   int GetStep() const;
+
+  /**
+   * Returns property default value.
+   *
+   * @return Property default value.
+   */
   int GetDefault() const;
 
-  // String-specific functions
+  /**
+   * Returns the string property value.
+   *
+   * <p>This function is string-specific.
+   *
+   * @return The string property value.
+   */
   std::string GetString() const;
+
+  /**
+   * Returns the string property value as a reference to the given buffer.
+   *
+   * This function is string-specific.
+   *
+   * @param buf The backing storage to which to write the property value.
+   * @return The string property value as a reference to the given buffer.
+   */
   std::string_view GetString(wpi::SmallVectorImpl<char>& buf) const;
+
+  /**
+   * Sets the string property value.
+   *
+   * This function is string-specific.
+   *
+   * @param value String property value.
+   */
   void SetString(std::string_view value);
 
-  // Enum-specific functions
+  /**
+   * Returns the possible values for the enum property value.
+   *
+   * This function is enum-specific.
+   *
+   * @return The possible values for the enum property value.
+   */
   std::vector<std::string> GetChoices() const;
 
+  /**
+   * Returns the last status.
+   *
+   * @return The last status.
+   */
   CS_Status GetLastStatus() const { return m_status; }
 
  private:
@@ -104,6 +210,9 @@ class VideoSource {
   friend class VideoSink;
 
  public:
+  /**
+   * Video source kind.
+   */
   enum Kind {
     /// Unknown video source.
     kUnknown = CS_SOURCE_UNKNOWN,
@@ -359,6 +468,8 @@ class VideoSource {
   explicit VideoSource(CS_Source handle) : m_handle(handle) {}
 
   mutable CS_Status m_status = 0;
+
+  /// Video source handle.
   CS_Source m_handle{0};
 };
 
@@ -367,11 +478,19 @@ class VideoSource {
  */
 class VideoCamera : public VideoSource {
  public:
+  /**
+   * White balance.
+   */
   enum WhiteBalance {
+    /// Fixed indoor white balance.
     kFixedIndoor = 3000,
+    /// Fixed outdoor white balance 1.
     kFixedOutdoor1 = 4000,
+    /// Fixed outdoor white balance 2.
     kFixedOutdoor2 = 5000,
+    /// Fixed fluorescent white balance 1.
     kFixedFluorescent1 = 5100,
+    /// Fixed fluorescent white balance 2.
     kFixedFlourescent2 = 5200
   };
 
@@ -479,6 +598,9 @@ class UsbCamera : public VideoCamera {
  */
 class HttpCamera : public VideoCamera {
  public:
+  /**
+   * HTTP camera kind.
+   */
   enum HttpCameraKind {
     /// Unknown camera kind.
     kUnknown = CS_HTTP_UNKNOWN,
@@ -743,8 +865,18 @@ class VideoSink {
   VideoSink& operator=(VideoSink other) noexcept;
   ~VideoSink();
 
+  /**
+   * Returns true if the VideoSink is valid.
+   *
+   * @return True if the VideoSink is valid.
+   */
   explicit operator bool() const { return m_handle != 0; }
 
+  /**
+   * Returns the VideoSink handle.
+   *
+   * @return The VideoSink handle.
+   */
   int GetHandle() const { return m_handle; }
 
   bool operator==(const VideoSink& other) const {
@@ -988,17 +1120,23 @@ class ImageSink : public VideoSink {
 class VideoEvent : public RawEvent {
  public:
   /**
-   * Get the source associated with the event (if any).
+   * Returns the source associated with the event (if any).
+   *
+   * @return The source associated with the event (if any).
    */
   VideoSource GetSource() const;
 
   /**
-   * Get the sink associated with the event (if any).
+   * Returns the sink associated with the event (if any).
+   *
+   * @return The sink associated with the event (if any).
    */
   VideoSink GetSink() const;
 
   /**
-   * Get the property associated with the event (if any).
+   * Returns the property associated with the event (if any).
+   *
+   * @return The property associated with the event (if any).
    */
   VideoProperty GetProperty() const;
 };

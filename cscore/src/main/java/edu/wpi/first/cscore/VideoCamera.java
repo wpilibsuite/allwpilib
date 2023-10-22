@@ -6,17 +6,32 @@ package edu.wpi.first.cscore;
 
 /** A source that represents a video camera. */
 public class VideoCamera extends VideoSource {
+  /** White balance. */
   public static class WhiteBalance {
+    /** Fixed indoor white balance. */
     public static final int kFixedIndoor = 3000;
+
+    /** Fixed outdoor white balance 1. */
     public static final int kFixedOutdoor1 = 4000;
+
+    /** Fixed outdoor white balance 2. */
     public static final int kFixedOutdoor2 = 5000;
+
+    /** Fixed fluorescent white balance 1. */
     public static final int kFixedFluorescent1 = 5100;
+
+    /** Fixed fluorescent white balance 2. */
     public static final int kFixedFlourescent2 = 5200;
 
     /** Default constructor. */
     public WhiteBalance() {}
   }
 
+  /**
+   * Constructs a VideoCamera.
+   *
+   * @param handle The video camera handle.
+   */
   protected VideoCamera(int handle) {
     super(handle);
   }
