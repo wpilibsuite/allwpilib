@@ -212,6 +212,7 @@ class WPILIB_DLLEXPORT DCMotor {
     return DCMotor(12_V, 5.84_Nm, 304_A, 1.5_A, 6080_rpm, numMotors);
   }
 
+  /**
    * Return a gearbox of Kraken X60 motors with trapezoidal commutation.
    */
   static constexpr DCMotor KrakenX60(int numMotors = 1) {
