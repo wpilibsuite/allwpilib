@@ -11,9 +11,6 @@
 #include <thread>
 #include <vector>
 
-#include <hal/simulation/DriverStationData.h>
-#include <hal/simulation/MockHooks.h>
-
 using namespace halsim;
 
 DSCommPacket::DSCommPacket() {

@@ -36,6 +36,7 @@ using namespace wpi::uv;
 
 static std::unique_ptr<Buffer> singleByte;
 static std::atomic<bool> gDSConnected = false;
+static std::atomic<uint64_t> gDSLastPacketTime = 0;
 
 namespace {
 struct DataStore {
@@ -97,6 +98,7 @@ static void SetupTcp(wpi::uv::Loop& loop) {
     gDSConnected = true;
 
     client->data.connect([t](Buffer& buf, size_t len) {
+      gDSLastPacketTime = hal::GetFPGATime();
       HandleTcpDataStream(buf, len, *t->GetData<DataStore>());
     });
     client->StartRead();
@@ -129,6 +131,7 @@ static void SetupUdp(wpi::uv::Loop& loop) {
   udp->received.connect([udpLocal = udp.get()](Buffer& buf, size_t len,
                                                const sockaddr& recSock,
                                                unsigned int port) {
+    gDSLastPacketTime = hal::GetFPGATime();
     auto ds = udpLocal->GetLoop()->GetData<halsim::DSCommPacket>();
     ds->DecodeUDP({reinterpret_cast<uint8_t*>(buf.base), len});
 
@@ -160,6 +163,18 @@ static void SetupEventLoop(wpi::uv::Loop& loop) {
   loop.SetData(loopData);
   SetupUdp(loop);
   SetupTcp(loop);
+  auto autoDisableTimer = Timer::Create(loop);
+  autoDisableTimer->timeout.connect([] {
+    uint64_t timeSinceLastDSPacket = hal::GetFPGATime() - GetLastDSPacketTime();
+    if (timeSinceLastDSPacket > 100000) {
+      HALSIM_SetDriverStationEnabled(0);
+    }
+  });
+  autoDisableTimer->Start(Timer::Time(100), Timer::Time(100));
+}
+
+static uint64_t GetLastDSPacketTime() {
+  return gDSLastPacketTime;
 }
 
 static std::unique_ptr<wpi::EventLoopRunner> eventLoopRunner;
