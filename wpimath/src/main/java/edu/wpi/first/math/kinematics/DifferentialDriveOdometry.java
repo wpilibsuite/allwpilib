@@ -4,10 +4,15 @@
 
 package edu.wpi.first.math.kinematics;
 
+import static edu.wpi.first.units.Units.Meters;
+
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.Measure;
 
 /**
  * Class for differential drive odometry. Odometry allows you to track the robot's position on the
@@ -45,12 +50,45 @@ public class DifferentialDriveOdometry extends Odometry<DifferentialDriveWheelPo
    * Constructs a DifferentialDriveOdometry object.
    *
    * @param gyroAngle The angle reported by the gyroscope.
+   * @param leftDistance The distance traveled by the left encoder.
+   * @param rightDistance The distance traveled by the right encoder.
+   * @param initialPoseMeters The starting position of the robot on the field.
+   */
+  public DifferentialDriveOdometry(
+      Measure<Angle> gyroAngle,
+      Measure<Distance> leftDistance,
+      Measure<Distance> rightDistance,
+      Pose2d initialPoseMeters) {
+    this(
+        new Rotation2d(gyroAngle),
+        leftDistance.in(Meters),
+        rightDistance.in(Meters),
+        initialPoseMeters
+    );
+  }
+
+  /**
+   * Constructs a DifferentialDriveOdometry object.
+   *
+   * @param gyroAngle The angle reported by the gyroscope.
    * @param leftDistanceMeters The distance traveled by the left encoder.
    * @param rightDistanceMeters The distance traveled by the right encoder.
    */
   public DifferentialDriveOdometry(
       Rotation2d gyroAngle, double leftDistanceMeters, double rightDistanceMeters) {
     this(gyroAngle, leftDistanceMeters, rightDistanceMeters, new Pose2d());
+  }
+
+  /**
+   * Constructs a DifferentialDriveOdometry object.
+   *
+   * @param gyroAngle The angle reported by the gyroscope.
+   * @param leftDistance The distance traveled by the left encoder.
+   * @param rightDistance The distance traveled by the right encoder.
+   */
+  public DifferentialDriveOdometry(
+      Measure<Angle> gyroAngle, Measure<Distance> leftDistance, Measure<Distance> rightDistance) {
+    this(gyroAngle, leftDistance, rightDistance, new Pose2d());
   }
 
   /**
@@ -73,6 +111,30 @@ public class DifferentialDriveOdometry extends Odometry<DifferentialDriveWheelPo
         gyroAngle,
         new DifferentialDriveWheelPositions(leftDistanceMeters, rightDistanceMeters),
         poseMeters);
+  }
+
+  /**
+   * Resets the robot's position on the field.
+   *
+   * <p>The gyroscope angle does not need to be reset here on the user's robot code. The library
+   * automatically takes care of offsetting the gyro angle.
+   *
+   * @param gyroAngle The angle reported by the gyroscope.
+   * @param leftDistance The distance traveled by the left encoder.
+   * @param rightDistance The distance traveled by the right encoder.
+   * @param poseMeters The position on the field that your robot is at.
+   */
+  public void resetPosition(
+      Measure<Angle> gyroAngle,
+      Measure<Distance> leftDistance,
+      Measure<Distance> rightDistance,
+      Pose2d poseMeters) {
+    resetPosition(
+        new Rotation2d(gyroAngle),
+        leftDistance.in(Meters),
+        rightDistance.in(Meters),
+        poseMeters
+    );
   }
 
   /**

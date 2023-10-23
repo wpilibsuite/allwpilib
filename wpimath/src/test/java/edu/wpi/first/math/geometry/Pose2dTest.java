@@ -8,11 +8,25 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
+import edu.wpi.first.units.Units;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class Pose2dTest {
   private static final double kEpsilon = 1E-9;
+
+  @Test
+  void testNewWithMeasures() {
+    var pose = new Pose2d(
+        Units.Inches.of(6),
+        Units.Inches.of(8),
+        Units.Degrees.of(45)
+    );
+
+    assertEquals(0.1524, pose.getX(), kEpsilon);
+    assertEquals(0.2032, pose.getY(), kEpsilon);
+    assertEquals(Math.PI / 4, pose.getRotation().getRadians(), kEpsilon);
+  }
 
   @Test
   void testRotateBy() {

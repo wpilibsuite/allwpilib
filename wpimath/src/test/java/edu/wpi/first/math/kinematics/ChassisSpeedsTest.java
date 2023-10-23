@@ -4,6 +4,8 @@
 
 package edu.wpi.first.math.kinematics;
 
+import static edu.wpi.first.units.Units.InchesPerSecond;
+import static edu.wpi.first.units.Units.RPM;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -18,6 +20,38 @@ class ChassisSpeedsTest {
   @Test
   void testDiscretize() {
     final var target = new ChassisSpeeds(1.0, 0.0, 0.5);
+    final var duration = 1.0;
+    final var dt = 0.01;
+
+    final var speeds = ChassisSpeeds.discretize(target, duration);
+    final var twist =
+        new Twist2d(
+            speeds.vxMetersPerSecond * dt,
+            speeds.vyMetersPerSecond * dt,
+            speeds.omegaRadiansPerSecond * dt);
+
+    var pose = new Pose2d();
+    for (double time = 0; time < duration; time += dt) {
+      pose = pose.exp(twist);
+    }
+
+    final var result = pose; // For lambda capture
+    assertAll(
+        () -> assertEquals(target.vxMetersPerSecond * duration, result.getX(), kEpsilon),
+        () -> assertEquals(target.vyMetersPerSecond * duration, result.getY(), kEpsilon),
+        () ->
+            assertEquals(
+                target.omegaRadiansPerSecond * duration,
+                result.getRotation().getRadians(),
+                kEpsilon));
+  }
+
+  @Test
+  void testDiscretizeMeasures() {
+    var vx = InchesPerSecond.of(14.52);
+    var vy = InchesPerSecond.zero();
+    var omega = RPM.of(0.02);
+    final var target = new ChassisSpeeds(vx, vy, omega);
     final var duration = 1.0;
     final var dt = 0.01;
 

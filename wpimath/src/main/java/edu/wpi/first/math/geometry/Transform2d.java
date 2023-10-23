@@ -4,7 +4,12 @@
 
 package edu.wpi.first.math.geometry;
 
+import static edu.wpi.first.units.Units.Meters;
+
 import edu.wpi.first.math.proto.Geometry2D.ProtobufTransform2d;
+import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.Measure;
 import edu.wpi.first.util.protobuf.Protobuf;
 import edu.wpi.first.util.struct.Struct;
 import java.nio.ByteBuffer;
@@ -55,6 +60,22 @@ public class Transform2d {
   public Transform2d(double x, double y, Rotation2d rotation) {
     m_translation = new Translation2d(x, y);
     m_rotation = rotation;
+  }
+
+  /**
+   * Constructs a transform with x and y translations instead of a separate Translation2d. The X and
+   * Y translations will be converted to and tracked as meters.
+   *
+   * @param x The x component of the translational component of the transform.
+   * @param y The y component of the translational component of the transform.
+   * @param rotation The rotational component of the transform.
+   */
+  public Transform2d(Measure<Distance> x, Measure<Distance> y, Measure<Angle> rotation) {
+    this(
+        x.in(Meters),
+        y.in(Meters),
+        new Rotation2d(rotation)
+    );
   }
 
   /** Constructs the identity transform -- maps an initial pose to itself. */
