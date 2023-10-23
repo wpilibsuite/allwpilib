@@ -8,47 +8,18 @@ import edu.wpi.first.cscore.raw.RawFrame;
 import edu.wpi.first.util.RuntimeLoader;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 public class CameraServerJNI {
   static boolean libraryLoaded = false;
-
   static RuntimeLoader<CameraServerJNI> loader = null;
 
-  public static class Helper {
-    private static AtomicBoolean extractOnStaticLoad = new AtomicBoolean(true);
-
-    public static boolean getExtractOnStaticLoad() {
-      return extractOnStaticLoad.get();
-    }
-
-    public static void setExtractOnStaticLoad(boolean load) {
-      extractOnStaticLoad.set(load);
-    }
-  }
-
-  static {
-    if (Helper.getExtractOnStaticLoad()) {
-      try {
-        loader =
-            new RuntimeLoader<>(
-                "cscorejni", RuntimeLoader.getDefaultExtractionRoot(), CameraServerJNI.class);
-        loader.loadLibrary();
-      } catch (IOException ex) {
-        ex.printStackTrace();
-        System.exit(1);
-      }
-      libraryLoaded = true;
-    }
-  }
-
   /**
-   * Force load the library.
+   * Load the library.
    *
    * @throws IOException if library load failed
    */
-  public static synchronized void forceLoad() throws IOException {
+  public static synchronized void load() throws IOException {
     if (libraryLoaded) {
       return;
     }

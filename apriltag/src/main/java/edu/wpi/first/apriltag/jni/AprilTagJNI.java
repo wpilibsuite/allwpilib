@@ -10,38 +10,25 @@ import edu.wpi.first.apriltag.AprilTagPoseEstimate;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.util.RuntimeLoader;
 import java.io.IOException;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class AprilTagJNI {
   static boolean libraryLoaded = false;
-
   static RuntimeLoader<AprilTagJNI> loader = null;
 
-  public static class Helper {
-    private static AtomicBoolean extractOnStaticLoad = new AtomicBoolean(true);
-
-    public static boolean getExtractOnStaticLoad() {
-      return extractOnStaticLoad.get();
+  /**
+   * Load the library.
+   *
+   * @throws IOException if the library load failed
+   */
+  public static synchronized void load() throws IOException {
+    if (libraryLoaded) {
+      return;
     }
-
-    public static void setExtractOnStaticLoad(boolean load) {
-      extractOnStaticLoad.set(load);
-    }
-  }
-
-  static {
-    if (Helper.getExtractOnStaticLoad()) {
-      try {
-        loader =
-            new RuntimeLoader<>(
-                "apriltagjni", RuntimeLoader.getDefaultExtractionRoot(), AprilTagJNI.class);
-        loader.loadLibrary();
-      } catch (IOException ex) {
-        ex.printStackTrace();
-        System.exit(1);
-      }
-      libraryLoaded = true;
-    }
+    loader =
+        new RuntimeLoader<>(
+            "apriltagjni", RuntimeLoader.getDefaultExtractionRoot(), AprilTagJNI.class);
+    loader.loadLibrary();
+    libraryLoaded = true;
   }
 
   public static native long createDetector();
