@@ -108,7 +108,7 @@ if (WITH_JAVA)
 
   file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java ${WPILIB_BINARY_DIR}/wpimath/generated/*.java)
 
-  add_jar(wpimath_jar ${JAVA_SOURCES} ${WPIMATH_QUICKBUF_SRCS} INCLUDE_JARS ${EJML_JARS} wpiutil_jar OUTPUT_NAME wpimath GENERATE_NATIVE_HEADERS wpimath_jni_headers)
+  add_jar(wpimath_jar ${JAVA_SOURCES} ${WPIMATH_QUICKBUF_SRCS} INCLUDE_JARS ${EJML_JARS} wpiutil_jar wpiunits_jar OUTPUT_NAME wpimath GENERATE_NATIVE_HEADERS wpimath_jni_headers)
 
   get_property(WPIMATH_JAR_FILE TARGET wpimath_jar PROPERTY JAR_FILE)
   install(FILES ${WPIMATH_JAR_FILE} DESTINATION "${java_lib_dest}")

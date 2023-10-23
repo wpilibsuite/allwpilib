@@ -10,7 +10,7 @@ if (WITH_JAVA)
   set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
 
   file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
-  add_jar(romiVendordep_jar ${JAVA_SOURCES} INCLUDE_JARS hal_jar ntcore_jar cscore_jar cameraserver_jar wpimath_jar wpiutil_jar wpilibj_jar OUTPUT_NAME romiVendordep)
+  add_jar(romiVendordep_jar ${JAVA_SOURCES} INCLUDE_JARS hal_jar ntcore_jar cscore_jar cameraserver_jar wpimath_jar wpiunits_jar wpiutil_jar wpilibj_jar OUTPUT_NAME romiVendordep)
 
   get_property(ROMIVENDORDEP_JAR_FILE TARGET romiVendordep_jar PROPERTY JAR_FILE)
   install(FILES ${ROMIVENDORDEP_JAR_FILE} DESTINATION "${java_lib_dest}")

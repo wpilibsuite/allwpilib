@@ -17,7 +17,7 @@ if (WITH_JAVA)
     file(GLOB EJML_JARS "${WPILIB_BINARY_DIR}/wpimath/thirdparty/ejml/*.jar")
     file(GLOB JACKSON_JARS "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/jackson/*.jar")
 
-    add_jar(wpilibj_jar ${JAVA_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/WPILibVersion.java INCLUDE_JARS hal_jar ntcore_jar ${EJML_JARS} ${JACKSON_JARS} ${OPENCV_JAR_FILE} cscore_jar cameraserver_jar wpimath_jar wpiutil_jar OUTPUT_NAME wpilibj)
+    add_jar(wpilibj_jar ${JAVA_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/WPILibVersion.java INCLUDE_JARS hal_jar ntcore_jar ${EJML_JARS} ${JACKSON_JARS} ${OPENCV_JAR_FILE} cscore_jar cameraserver_jar wpimath_jar wpiunits_jar wpiutil_jar OUTPUT_NAME wpilibj)
 
     get_property(WPILIBJ_JAR_FILE TARGET wpilibj_jar PROPERTY JAR_FILE)
     install(FILES ${WPILIBJ_JAR_FILE} DESTINATION "${java_lib_dest}")
