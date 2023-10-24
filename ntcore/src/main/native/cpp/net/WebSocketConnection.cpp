@@ -48,7 +48,7 @@ class WebSocketConnection::Stream final : public wpi::raw_ostream {
 };
 
 void WebSocketConnection::Stream::write_impl(const char* data, size_t len) {
-  if (len > kAllocSize) {
+  if (len >= kAllocSize) {
     // only called by raw_ostream::write() when the buffer is empty and a large
     // thing is being written; called with a length that's a multiple of the
     // alloc size
