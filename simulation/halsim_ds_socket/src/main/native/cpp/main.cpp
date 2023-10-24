@@ -176,7 +176,7 @@ static void SetupEventLoop(wpi::uv::Loop& loop) {
       HALSIM_SetDriverStationEnabled(0);
     }
   });
-  autoDisableTimer->Start(Timer::Time(100), Timer::Time(100));
+  autoDisableTimer->Start(Timer::Time(0), Timer::Time(20));
 }
 
 static std::unique_ptr<wpi::EventLoopRunner> eventLoopRunner;
