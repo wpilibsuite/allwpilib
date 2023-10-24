@@ -71,11 +71,7 @@ public class Transform2d {
    * @param rotation The rotational component of the transform.
    */
   public Transform2d(Measure<Distance> x, Measure<Distance> y, Measure<Angle> rotation) {
-    this(
-        x.in(Meters),
-        y.in(Meters),
-        new Rotation2d(rotation)
-    );
+    this(x.in(Meters), y.in(Meters), new Rotation2d(rotation));
   }
 
   /** Constructs the identity transform -- maps an initial pose to itself. */

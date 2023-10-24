@@ -18,11 +18,7 @@ class Translation3dTest {
 
   @Test
   void testNewWithMeasures() {
-    var translation = new Translation3d(
-        Inches.of(6),
-        Inches.of(8),
-        Inches.of(16)
-    );
+    var translation = new Translation3d(Inches.of(6), Inches.of(8), Inches.of(16));
 
     assertEquals(0.1524, translation.getX(), kEpsilon);
     assertEquals(0.2032, translation.getY(), kEpsilon);

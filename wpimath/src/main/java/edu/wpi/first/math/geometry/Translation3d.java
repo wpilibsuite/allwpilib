@@ -80,11 +80,7 @@ public class Translation3d implements Interpolatable<Translation3d> {
    * @param z The z component of the translation.
    */
   public Translation3d(Measure<Distance> x, Measure<Distance> y, Measure<Distance> z) {
-    this(
-        x.in(Meters),
-        y.in(Meters),
-        z.in(Meters)
-    );
+    this(x.in(Meters), y.in(Meters), z.in(Meters));
   }
 
   /**

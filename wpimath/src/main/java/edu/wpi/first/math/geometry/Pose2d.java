@@ -72,11 +72,7 @@ public class Pose2d implements Interpolatable<Pose2d> {
    * @param rotation The rotational component of the pose.
    */
   public Pose2d(Measure<Distance> x, Measure<Distance> y, Measure<Angle> rotation) {
-    this(
-        x.in(Meters),
-        y.in(Meters),
-        new Rotation2d(rotation)
-    );
+    this(x.in(Meters), y.in(Meters), new Rotation2d(rotation));
   }
 
   /**

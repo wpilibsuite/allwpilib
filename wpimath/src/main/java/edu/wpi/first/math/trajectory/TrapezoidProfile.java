@@ -72,8 +72,7 @@ public class TrapezoidProfile {
     }
 
     public <U extends Unit<U>> Constraints(
-        Measure<Velocity<U>> maxVelocity,
-        Measure<Velocity<Velocity<U>>> maxAcceleration) {
+        Measure<Velocity<U>> maxVelocity, Measure<Velocity<Velocity<U>>> maxAcceleration) {
       this(maxVelocity.baseUnitMagnitude(), maxAcceleration.baseUnitMagnitude());
     }
   }

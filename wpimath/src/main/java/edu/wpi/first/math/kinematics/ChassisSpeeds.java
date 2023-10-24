@@ -64,11 +64,7 @@ public class ChassisSpeeds {
       Measure<Velocity<Distance>> vx,
       Measure<Velocity<Distance>> vy,
       Measure<Velocity<Angle>> omega) {
-    this(
-        vx.in(MetersPerSecond),
-        vy.in(MetersPerSecond),
-        omega.in(RadiansPerSecond)
-    );
+    this(vx.in(MetersPerSecond), vy.in(MetersPerSecond), omega.in(RadiansPerSecond));
   }
 
   /**
@@ -125,11 +121,7 @@ public class ChassisSpeeds {
       Measure<Velocity<Angle>> omega,
       Measure<Time> dt) {
     return discretize(
-        vx.in(MetersPerSecond),
-        vy.in(MetersPerSecond),
-        omega.in(RadiansPerSecond),
-        dt.in(Seconds)
-    );
+        vx.in(MetersPerSecond), vy.in(MetersPerSecond), omega.in(RadiansPerSecond), dt.in(Seconds));
   }
 
   /**
@@ -184,10 +176,10 @@ public class ChassisSpeeds {
    * Converts a user provided field-relative set of speeds into a robot-relative ChassisSpeeds
    * object.
    *
-   * @param vx The component of speed in the x direction relative to the field.
-   *     Positive x is away from your alliance wall.
-   * @param vy The component of speed in the y direction relative to the field.
-   *     Positive y is to your left when standing behind the alliance wall.
+   * @param vx The component of speed in the x direction relative to the field. Positive x is away
+   *     from your alliance wall.
+   * @param vy The component of speed in the y direction relative to the field. Positive y is to
+   *     your left when standing behind the alliance wall.
    * @param omega The angular rate of the robot.
    * @param robotAngle The angle of the robot as measured by a gyroscope. The robot's angle is
    *     considered to be zero when it is facing directly away from your alliance station wall.
@@ -203,8 +195,7 @@ public class ChassisSpeeds {
         vx.in(MetersPerSecond),
         vy.in(MetersPerSecond),
         omega.in(RadiansPerSecond),
-        new Rotation2d(robotAngle)
-    );
+        new Rotation2d(robotAngle));
   }
 
   /**
@@ -256,10 +247,10 @@ public class ChassisSpeeds {
    * Converts a user provided robot-relative set of speeds into a field-relative ChassisSpeeds
    * object.
    *
-   * @param vx The component of speed in the x direction relative to the robot.
-   *     Positive x is towards the robot's front.
-   * @param vy The component of speed in the y direction relative to the robot.
-   *     Positive y is towards the robot's left.
+   * @param vx The component of speed in the x direction relative to the robot. Positive x is
+   *     towards the robot's front.
+   * @param vy The component of speed in the y direction relative to the robot. Positive y is
+   *     towards the robot's left.
    * @param omega The angular rate of the robot.
    * @param robotAngle The angle of the robot as measured by a gyroscope. The robot's angle is
    *     considered to be zero when it is facing directly away from your alliance station wall.
@@ -275,8 +266,7 @@ public class ChassisSpeeds {
         vx.in(MetersPerSecond),
         vy.in(MetersPerSecond),
         omega.in(RadiansPerSecond),
-        new Rotation2d(robotAngle)
-    );
+        new Rotation2d(robotAngle));
   }
 
   /**

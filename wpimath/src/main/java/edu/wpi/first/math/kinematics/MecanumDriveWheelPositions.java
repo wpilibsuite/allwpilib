@@ -59,12 +59,7 @@ public class MecanumDriveWheelPositions implements WheelPositions<MecanumDriveWh
       Measure<Distance> frontRight,
       Measure<Distance> rearLeft,
       Measure<Distance> rearRight) {
-    this(
-        frontLeft.in(Meters),
-        frontRight.in(Meters),
-        rearLeft.in(Meters),
-        rearRight.in(Meters)
-    );
+    this(frontLeft.in(Meters), frontRight.in(Meters), rearLeft.in(Meters), rearRight.in(Meters));
   }
 
   @Override

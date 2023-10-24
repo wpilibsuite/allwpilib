@@ -14,11 +14,7 @@ class Transform2dTest {
 
   @Test
   void testNewWithMeasures() {
-    var transform = new Transform2d(
-        Units.Inches.of(6),
-        Units.Inches.of(8),
-        Units.Degrees.of(45)
-    );
+    var transform = new Transform2d(Units.Inches.of(6), Units.Inches.of(8), Units.Degrees.of(45));
 
     assertEquals(0.1524, transform.getX(), kEpsilon);
     assertEquals(0.2032, transform.getY(), kEpsilon);

@@ -63,8 +63,7 @@ public class MecanumDriveWheelSpeeds {
         frontLeft.in(MetersPerSecond),
         frontRight.in(MetersPerSecond),
         rearLeft.in(MetersPerSecond),
-        rearRight.in(MetersPerSecond)
-    );
+        rearRight.in(MetersPerSecond));
   }
 
   /**
