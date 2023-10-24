@@ -11,8 +11,8 @@
 
 using namespace glass;
 
-static const char* stations[] = {"Invalid", "Red 1",  "Red 2",  "Red 3",
-                                 "Blue 1", "Blue 2", "Blue 3"};
+static const char* stations[] = {"Invalid", "Red 1",  "Red 2", "Red 3",
+                                 "Blue 1",  "Blue 2", "Blue 3"};
 
 void glass::DisplayFMS(FMSModel* model) {
   if (!model->Exists() || model->IsReadOnly()) {
