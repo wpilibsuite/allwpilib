@@ -12,11 +12,14 @@ using google::protobuf::Arena;
 using google::protobuf::FileDescriptorProto;
 using google::protobuf::Message;
 
-void ProtobufMessageDatabase::Add(std::string_view filename,
+bool ProtobufMessageDatabase::Add(std::string_view filename,
                                   std::span<const uint8_t> data) {
   auto& file = m_files[filename];
   if (file.complete) {
     file.complete = false;
+
+    m_factory.reset();
+    m_msgs.clear();
 
     // rebuild the pool EXCEPT for this descriptor
     m_pool = std::make_unique<google::protobuf::DescriptorPool>();
@@ -31,7 +34,6 @@ void ProtobufMessageDatabase::Add(std::string_view filename,
     }
 
     // clear messages and reset factory; Find() will recreate as needed
-    m_msgs.clear();
     m_factory = std::make_unique<google::protobuf::DynamicMessageFactory>();
   }
 
@@ -49,10 +51,11 @@ void ProtobufMessageDatabase::Add(std::string_view filename,
 
   // parse data
   if (!file.proto->ParseFromArray(data.data(), data.size())) {
-    return;
+    return false;
   }
 
   Build(filename, file);
+  return true;
 }
 
 Message* ProtobufMessageDatabase::Find(std::string_view name) const {

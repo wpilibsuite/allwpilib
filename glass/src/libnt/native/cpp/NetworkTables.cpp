@@ -895,12 +895,16 @@ void NetworkTablesModel::Update() {
                    entry->info.type_str == "proto:FileDescriptorProto") {
           // protobuf descriptor handling
           auto filename = wpi::drop_front(entry->info.name, 15);
-          m_protoDb.Add(filename, entry->value.GetRaw());
-          // loop over all protobuf entries and update (conservatively)
-          for (auto&& entryPair : m_entries) {
-            auto ts = entryPair.second->info.type_str;
-            if (wpi::starts_with(ts, "proto:")) {
-              entryPair.second->UpdateFromValue(*this);
+          if (!m_protoDb.Add(filename, entry->value.GetRaw())) {
+            fmt::print("could not decode protobuf '{}' filename '{}'\n",
+                       entry->info.name, filename);
+          } else {
+            // loop over all protobuf entries and update (conservatively)
+            for (auto&& entryPair : m_entries) {
+              auto& ts = entryPair.second->info.type_str;
+              if (wpi::starts_with(ts, "proto:")) {
+                entryPair.second->UpdateFromValue(*this);
+              }
             }
           }
         }
