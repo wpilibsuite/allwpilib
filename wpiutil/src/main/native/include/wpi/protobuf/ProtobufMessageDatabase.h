@@ -33,8 +33,9 @@ class ProtobufMessageDatabase {
    *
    * @param filename filename
    * @param data FileDescriptorProto serialized data
+   * @return False if could not parse data
    */
-  void Add(std::string_view filename, std::span<const uint8_t> data);
+  bool Add(std::string_view filename, std::span<const uint8_t> data);
 
   /**
    * Finds a message in the database by name.
