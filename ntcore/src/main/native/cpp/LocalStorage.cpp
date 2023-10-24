@@ -858,14 +858,14 @@ LocalStorage::PublisherData* LocalStorage::Impl::PublishEntry(EntryData* entry,
   if (entry->publisher) {
     return entry->publisher;
   }
-  auto typeStr = TypeToString(type);
   if (entry->subscriber->config.type == NT_UNASSIGNED) {
+    auto typeStr = TypeToString(type);
     entry->subscriber->config.type = type;
     entry->subscriber->config.typeStr = typeStr;
-  } else if (entry->subscriber->config.type != type ||
-             entry->subscriber->config.typeStr != typeStr) {
+  } else if (entry->subscriber->config.type != type) {
     if (!IsNumericCompatible(type, entry->subscriber->config.type)) {
       // don't allow dynamically changing the type of an entry
+      auto typeStr = TypeToString(type);
       ERR("cannot publish entry {} as type {}, previously subscribed as {}",
           entry->topic->name, typeStr, entry->subscriber->config.typeStr);
       return nullptr;
