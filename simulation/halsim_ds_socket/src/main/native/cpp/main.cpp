@@ -21,7 +21,6 @@
 #include <DSCommPacket.h>
 #include <fmt/format.h>
 #include <hal/Extensions.h>
-#include <hal/HAL.h>
 #include <wpinet/EventLoopRunner.h>
 #include <wpinet/raw_uv_ostream.h>
 #include <wpinet/uv/Tcp.h>
