@@ -36,7 +36,7 @@ using namespace nRoboRIO_FPGANamespace;
 
 #include <cstdio>
 
-#include "fmt/format.h"
+#include <fmt/format.h>
 
 #ifdef __FRC_ROBORIO__
 namespace {
@@ -92,6 +92,18 @@ struct HMBHolder {
     cfg.Enables_Timestamp = 1;
     hmb->writeConfig(cfg, &status);
   }
+  void Reset() {
+    if (hmb) {
+      std::unique_ptr<fpga::tHMB> oldHmb;
+      oldHmb.swap(hmb);
+      closeHmb(oldHmb->getSystemInterface()->getHandle(), hmbName);
+      closeHmb = nullptr;
+      hmbBuffer = nullptr;
+      oldHmb.reset();
+      dlclose(niFpga);
+      niFpga = nullptr;
+    }
+  }
   std::unique_ptr<fpga::tHMB> hmb;
   void* niFpga = nullptr;
   NiFpga_CloseHmbFunc closeHmb = nullptr;
@@ -108,7 +120,7 @@ static uint64_t time_since_epoch() noexcept {
   uint64_t tmpres = 0;
   // 100-nanosecond intervals since January 1, 1601 (UTC)
   // which means 0.1 us
-  GetSystemTimeAsFileTime(&ft);
+  GetSystemTimePreciseAsFileTime(&ft);
   tmpres |= ft.dwHighDateTime;
   tmpres <<= 32;
   tmpres |= ft.dwLowDateTime;
@@ -182,6 +194,12 @@ void wpi::impl::SetupNowRio() {
 #endif
 }
 
+void wpi::impl::ShutdownNowRio() {
+#ifdef __FRC_ROBORIO__
+  hmb.Reset();
+#endif
+}
+
 void wpi::SetNowImpl(uint64_t (*func)(void)) {
   now_impl = func ? func : NowDefault;
 }
@@ -228,6 +246,10 @@ extern "C" {
 
 void WPI_Impl_SetupNowRio(void) {
   return wpi::impl::SetupNowRio();
+}
+
+void WPI_Impl_ShutdownNowRio(void) {
+  return wpi::impl::ShutdownNowRio();
 }
 
 uint64_t WPI_NowDefault(void) {

@@ -102,8 +102,11 @@ void JoystickDataCache::Update() {
     HAL_GetJoystickPOVsInternal(i, &povs[i]);
     HAL_GetJoystickButtonsInternal(i, &buttons[i]);
   }
-  FRC_NetworkCommunication_getAllianceStation(
-      reinterpret_cast<AllianceStationID_t*>(&allianceStation));
+  AllianceStationID_t alliance = kAllianceStationID_red1;
+  FRC_NetworkCommunication_getAllianceStation(&alliance);
+  int allianceInt = alliance;
+  allianceInt += 1;
+  allianceStation = static_cast<HAL_AllianceStationID>(allianceInt);
   FRC_NetworkCommunication_getMatchTime(&matchTime);
   FRC_NetworkCommunication_getControlWord(
       reinterpret_cast<ControlWord_t*>(&controlWord));

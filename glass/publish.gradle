@@ -84,51 +84,8 @@ model {
                         def applicationPath = binary.executable.file
                         def icon = file("$project.projectDir/src/app/native/mac/glass.icns")
 
-                        // Create the macOS bundle.
-                        def bundleTask = project.tasks.create("bundleGlassOsxApp" + binary.targetPlatform.architecture.name, Copy) {
-                            description("Creates a macOS application bundle for Glass")
-                            from(file("$project.projectDir/Info.plist"))
-                            into(file("$project.buildDir/outputs/bundles/$binary.targetPlatform.architecture.name/Glass.app/Contents"))
-                            into("MacOS") {
-                                with copySpec {
-                                    from binary.executable.file
-                                }
-                            }
-                            into("Resources") {
-                                with copySpec {
-                                    from icon
-                                }
-                            }
-
-                            inputs.property "HasDeveloperId", project.hasProperty("developerID")
-
-                            doLast {
-                                if (project.hasProperty("developerID")) {
-                                    // Get path to binary.
-                                    exec {
-                                        workingDir rootDir
-                                        def args = [
-                                            "sh",
-                                            "-c",
-                                            "codesign --force --strict --deep " +
-                                            "--timestamp --options=runtime " +
-                                            "--verbose -s ${project.findProperty("developerID")} " +
-                                            "$project.buildDir/outputs/bundles/$binary.targetPlatform.architecture.name/Glass.app/"
-                                        ]
-                                        commandLine args
-                                    }
-                                }
-                            }
-                        }
-
-                        // Reset the application path if we are creating a bundle.
-                        if (binary.targetPlatform.operatingSystem.isMacOsX()) {
-                            applicationPath = file("$project.buildDir/outputs/bundles/$binary.targetPlatform.architecture.name")
-                            project.build.dependsOn bundleTask
-                        }
-
                         // Create the ZIP.
-                        def task = project.tasks.create("copyGlassExecutable" + binary.targetPlatform.architecture.name, Zip) {
+                        def task = project.tasks.create("copyGlassExecutable" + binary.targetPlatform.operatingSystem.name + binary.targetPlatform.architecture.name, Zip) {
                             description("Copies the Glass executable to the outputs directory.")
                             destinationDirectory = outputsFolder
 
@@ -153,6 +110,47 @@ model {
                         }
 
                         if (binary.targetPlatform.operatingSystem.isMacOsX()) {
+                            // Create the macOS bundle.
+                            def bundleTask = project.tasks.create("bundleGlassOsxApp" + binary.targetPlatform.architecture.name, Copy) {
+                                description("Creates a macOS application bundle for Glass")
+                                from(file("$project.projectDir/Info.plist"))
+                                into(file("$project.buildDir/outputs/bundles/$binary.targetPlatform.architecture.name/Glass.app/Contents"))
+                                into("MacOS") {
+                                    with copySpec {
+                                        from binary.executable.file
+                                    }
+                                }
+                                into("Resources") {
+                                    with copySpec {
+                                        from icon
+                                    }
+                                }
+
+                                inputs.property "HasDeveloperId", project.hasProperty("developerID")
+
+                                doLast {
+                                    if (project.hasProperty("developerID")) {
+                                        // Get path to binary.
+                                        exec {
+                                            workingDir rootDir
+                                            def args = [
+                                                "sh",
+                                                "-c",
+                                                "codesign --force --strict --deep " +
+                                                "--timestamp --options=runtime " +
+                                                "--verbose -s ${project.findProperty("developerID")} " +
+                                                "$project.buildDir/outputs/bundles/$binary.targetPlatform.architecture.name/Glass.app/"
+                                            ]
+                                            commandLine args
+                                        }
+                                    }
+                                }
+                            }
+
+                            // Reset the application path if we are creating a bundle.
+                            applicationPath = file("$project.buildDir/outputs/bundles/$binary.targetPlatform.architecture.name")
+                            project.build.dependsOn bundleTask
+
                             bundleTask.dependsOn binary.tasks.link
                             task.dependsOn(bundleTask)
                         }

@@ -2,22 +2,23 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <gtest/gtest.h>
+
 #include "frc/controller/PIDController.h"
-#include "gtest/gtest.h"
 
 static constexpr double kSetpoint = 50.0;
 static constexpr double kRange = 200;
 static constexpr double kTolerance = 10.0;
 
 TEST(PIDToleranceTest, InitialTolerance) {
-  frc2::PIDController controller{0.5, 0.0, 0.0};
+  frc::PIDController controller{0.5, 0.0, 0.0};
   controller.EnableContinuousInput(-kRange / 2, kRange / 2);
 
   EXPECT_FALSE(controller.AtSetpoint());
 }
 
 TEST(PIDToleranceTest, AbsoluteTolerance) {
-  frc2::PIDController controller{0.5, 0.0, 0.0};
+  frc::PIDController controller{0.5, 0.0, 0.0};
   controller.EnableContinuousInput(-kRange / 2, kRange / 2);
 
   EXPECT_FALSE(controller.AtSetpoint());

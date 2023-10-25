@@ -64,6 +64,13 @@ class RobotController {
   static std::string GetComments();
 
   /**
+   * Returns the team number configured for the robot controller.
+   *
+   * @return team number, or 0 if not found.
+   */
+  static int32_t GetTeamNumber();
+
+  /**
    * Read the microsecond-resolution timer on the FPGA.
    *
    * @return The current time in microseconds according to the FPGA (since FPGA
@@ -107,6 +114,13 @@ class RobotController {
    * @return The current state of the RSL- true if on, false if off
    */
   static bool GetRSLState();
+
+  /**
+   * Gets if the system time is valid.
+   *
+   * @return True if the system time is valid, false otherwise
+   */
+  static bool IsSystemTimeValid();
 
   /**
    * Get the input voltage to the robot controller.

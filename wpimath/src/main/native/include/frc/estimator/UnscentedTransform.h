@@ -7,7 +7,8 @@
 #include <functional>
 #include <tuple>
 
-#include "Eigen/QR"
+#include <Eigen/QR>
+
 #include "frc/EigenCore.h"
 
 namespace frc {

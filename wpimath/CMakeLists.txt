@@ -3,8 +3,57 @@ project(wpimath)
 include(SubDirList)
 include(CompileWarnings)
 include(AddTest)
+include(DownloadAndCheck)
 
-file(GLOB wpimath_jni_src src/main/native/cpp/jni/WPIMathJNI.cpp)
+file(GLOB wpimath_proto_src src/main/proto/*.proto)
+protobuf_generate_cpp(WPIMATH_PROTO_SRCS WPIMATH_PROTO_HDRS PROTOC_OUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/protobuf" PROTOS ${wpimath_proto_src})
+
+function(quickbuf_generate SRCS JAVA_PACKAGE)
+  if(NOT ARGN)
+    message(SEND_ERROR "Error: PROTOBUF_GENERATE_QUICKBUF() called without any proto files")
+    return()
+  endif()
+
+  set(_generated_srcs_all)
+  foreach(_proto ${ARGN})
+    get_filename_component(_abs_file ${_proto} ABSOLUTE)
+    get_filename_component(_abs_dir ${_abs_file} DIRECTORY)
+    get_filename_component(_basename ${_proto} NAME_WLE)
+    file(RELATIVE_PATH _rel_dir ${CMAKE_CURRENT_SOURCE_DIR} ${_abs_dir})
+
+    # convert to QuickBuffers Java case (geometry2d -> Geometry2D)
+    string(REGEX MATCHALL "[A-Za-z_]+|[0-9]+" _name_components ${_basename})
+    set(_name_components_out)
+    foreach(_part ${_name_components})
+      string(SUBSTRING ${_part} 0 1 _first_letter)
+      string(TOUPPER ${_first_letter} _first_letter)
+      string(REGEX REPLACE "^.(.*)" "${_first_letter}\\1" _part_out "${_part}")
+      list(APPEND _name_components_out ${_part_out})
+    endforeach()
+    list(JOIN _name_components_out "" _basename_title)
+
+    set(_generated_src "${CMAKE_CURRENT_BINARY_DIR}/quickbuf/${JAVA_PACKAGE}/${_basename_title}.java")
+
+    list(APPEND _generated_srcs_all ${_generated_src})
+
+    add_custom_command(
+      OUTPUT ${_generated_src}
+      COMMAND protobuf::protoc
+      ARGS --plugin=protoc-gen-quickbuf=${Quickbuf_EXECUTABLE} --quickbuf_out=gen_descriptors=true:${CMAKE_CURRENT_BINARY_DIR}/quickbuf -I${_abs_dir} ${_abs_file}
+      DEPENDS ${_abs_file} protobuf::protoc
+      COMMENT "Running quickbuf protocol buffer compiler on ${_proto}"
+      VERBATIM )
+  endforeach()
+
+  set(${SRCS} ${_generated_srcs_all} PARENT_SCOPE)
+endfunction()
+
+file(GLOB wpimath_jni_src src/main/native/cpp/jni/WPIMathJNI_DARE.cpp
+                          src/main/native/cpp/jni/WPIMathJNI_Eigen.cpp
+                          src/main/native/cpp/jni/WPIMathJNI_Exceptions.cpp
+                          src/main/native/cpp/jni/WPIMathJNI_Pose3d.cpp
+                          src/main/native/cpp/jni/WPIMathJNI_StateSpaceUtil.cpp
+                          src/main/native/cpp/jni/WPIMathJNI_Trajectory.cpp)
 
 # Java bindings
 if (WITH_JAVA)
@@ -13,34 +62,38 @@ if (WITH_JAVA)
   include(UseJava)
   set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
 
-  if(NOT EXISTS "${WPILIB_BINARY_DIR}/wpimath/thirdparty/ejml/ejml-simple-0.41.jar")
+  quickbuf_generate(WPIMATH_QUICKBUF_SRCS "edu/wpi/first/math/proto" ${wpimath_proto_src})
+
+  if(NOT EXISTS "${WPILIB_BINARY_DIR}/wpimath/thirdparty/ejml/ejml-simple-0.43.1.jar")
       set(BASE_URL "https://search.maven.org/remotecontent?filepath=")
       set(JAR_ROOT "${WPILIB_BINARY_DIR}/wpimath/thirdparty/ejml")
 
       message(STATUS "Downloading EJML jarfiles...")
 
-      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-cdense/0.41/ejml-cdense-0.41.jar"
-          "${JAR_ROOT}/ejml-cdense-0.41.jar")
-      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-core/0.41/ejml-core-0.41.jar"
-          "${JAR_ROOT}/ejml-core-0.41.jar")
-      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-ddense/0.41/ejml-ddense-0.41.jar"
-          "${JAR_ROOT}/ejml-ddense-0.41.jar")
-      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-dsparse/0.41/ejml-dsparse-0.41.jar"
-          "${JAR_ROOT}/ejml-dsparse-0.41.jar")
-      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-fdense/0.41/ejml-fdense-0.41.jar"
-          "${JAR_ROOT}/ejml-fdense-0.41.jar")
-      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-simple/0.41/ejml-simple-0.41.jar"
-          "${JAR_ROOT}/ejml-simple-0.41.jar")
-      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-zdense/0.41/ejml-zdense-0.41.jar"
-          "${JAR_ROOT}/ejml-zdense-0.41.jar")
+      download_and_check("${BASE_URL}org/ejml/ejml-cdense/0.43.1/ejml-cdense-0.43.1.jar"
+          "${JAR_ROOT}/ejml-cdense-0.43.1.jar")
+      download_and_check("${BASE_URL}org/ejml/ejml-core/0.43.1/ejml-core-0.43.1.jar"
+          "${JAR_ROOT}/ejml-core-0.43.1.jar")
+      download_and_check("${BASE_URL}org/ejml/ejml-ddense/0.43.1/ejml-ddense-0.43.1.jar"
+          "${JAR_ROOT}/ejml-ddense-0.43.1.jar")
+      download_and_check("${BASE_URL}org/ejml/ejml-dsparse/0.43.1/ejml-dsparse-0.43.1.jar"
+          "${JAR_ROOT}/ejml-dsparse-0.43.1.jar")
+      download_and_check("${BASE_URL}org/ejml/ejml-fdense/0.43.1/ejml-fdense-0.43.1.jar"
+          "${JAR_ROOT}/ejml-fdense-0.43.1.jar")
+      download_and_check("${BASE_URL}org/ejml/ejml-simple/0.43.1/ejml-simple-0.43.1.jar"
+          "${JAR_ROOT}/ejml-simple-0.43.1.jar")
+      download_and_check("${BASE_URL}org/ejml/ejml-zdense/0.43.1/ejml-zdense-0.43.1.jar"
+          "${JAR_ROOT}/ejml-zdense-0.43.1.jar")
 
       message(STATUS "All files downloaded.")
   endif()
 
   file(GLOB EJML_JARS "${WPILIB_BINARY_DIR}/wpimath/thirdparty/ejml/*.jar")
   file(GLOB JACKSON_JARS "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/jackson/*.jar")
+  file(GLOB QUICKBUF_JAR
+        ${WPILIB_BINARY_DIR}/wpiutil/thirdparty/quickbuf/*.jar)
 
-  set(CMAKE_JAVA_INCLUDE_PATH wpimath.jar ${EJML_JARS} ${JACKSON_JARS})
+  set(CMAKE_JAVA_INCLUDE_PATH wpimath.jar ${EJML_JARS} ${JACKSON_JARS} ${QUICKBUF_JAR})
 
   execute_process(COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/generate_numbers.py ${WPILIB_BINARY_DIR}/wpimath RESULT_VARIABLE generateResult)
   if(NOT (generateResult EQUAL "0"))
@@ -55,12 +108,7 @@ if (WITH_JAVA)
 
   file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java ${WPILIB_BINARY_DIR}/wpimath/generated/*.java)
 
-  if(${CMAKE_VERSION} VERSION_LESS "3.11.0")
-    set(CMAKE_JAVA_COMPILE_FLAGS "-h" "${CMAKE_CURRENT_BINARY_DIR}/jniheaders")
-    add_jar(wpimath_jar ${JAVA_SOURCES} INCLUDE_JARS ${EJML_JARS} wpiutil_jar OUTPUT_NAME wpimath)
-  else()
-    add_jar(wpimath_jar ${JAVA_SOURCES} INCLUDE_JARS ${EJML_JARS} wpiutil_jar OUTPUT_NAME wpimath GENERATE_NATIVE_HEADERS wpimath_jni_headers)
-  endif()
+  add_jar(wpimath_jar ${JAVA_SOURCES} ${WPIMATH_QUICKBUF_SRCS} INCLUDE_JARS ${EJML_JARS} wpiutil_jar OUTPUT_NAME wpimath GENERATE_NATIVE_HEADERS wpimath_jni_headers)
 
   get_property(WPIMATH_JAR_FILE TARGET wpimath_jar PROPERTY JAR_FILE)
   install(FILES ${WPIMATH_JAR_FILE} DESTINATION "${java_lib_dest}")
@@ -73,19 +121,10 @@ if (WITH_JAVA)
 
   set_property(TARGET wpimathjni PROPERTY FOLDER "libraries")
 
-  if(${CMAKE_VERSION} VERSION_LESS "3.11.0")
-    target_include_directories(wpimathjni PRIVATE ${JNI_INCLUDE_DIRS})
-    target_include_directories(wpimathjni PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/jniheaders")
-  else()
-    target_link_libraries(wpimathjni PRIVATE wpimath_jni_headers)
-  endif()
+  target_link_libraries(wpimathjni PRIVATE wpimath_jni_headers)
   add_dependencies(wpimathjni wpimath_jar)
 
-  if (MSVC)
-    install(TARGETS wpimathjni RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)
-  endif()
-
-  install(TARGETS wpimathjni EXPORT wpimathjni DESTINATION "${main_lib_dest}")
+  install(TARGETS wpimathjni EXPORT wpimathjni)
 
 endif()
 
@@ -93,7 +132,7 @@ file(GLOB_RECURSE wpimath_native_src src/main/native/cpp/*.cpp)
 list(REMOVE_ITEM wpimath_native_src ${wpimath_jni_src})
 
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS FALSE)
-add_library(wpimath ${wpimath_native_src})
+add_library(wpimath ${wpimath_native_src} ${WPIMATH_PROTO_SRCS})
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
 set_target_properties(wpimath PROPERTIES DEBUG_POSTFIX "d")
 
@@ -124,13 +163,10 @@ target_include_directories(wpimath SYSTEM PUBLIC
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpimath")
 target_include_directories(wpimath PUBLIC
                             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
+                            $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/protobuf>
                             $<INSTALL_INTERFACE:${include_dest}/wpimath>)
 
-install(TARGETS wpimath EXPORT wpimath DESTINATION "${main_lib_dest}")
-
-if (WITH_JAVA AND MSVC)
-    install(TARGETS wpimath RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)
-endif()
+install(TARGETS wpimath EXPORT wpimath)
 
 if (WITH_FLAT_INSTALL)
     set (wpimath_config_dir ${wpilib_dest})

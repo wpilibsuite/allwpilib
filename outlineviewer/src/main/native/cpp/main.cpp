@@ -6,17 +6,17 @@
 
 #include <GLFW/glfw3.h>
 #include <fmt/format.h>
+#include <glass/Context.h>
+#include <glass/MainMenuBar.h>
+#include <glass/Model.h>
+#include <glass/Storage.h>
+#include <glass/networktables/NetworkTables.h>
+#include <glass/networktables/NetworkTablesSettings.h>
+#include <glass/other/Log.h>
 #include <imgui.h>
 #include <ntcore_cpp.h>
 #include <wpigui.h>
-
-#include "glass/Context.h"
-#include "glass/MainMenuBar.h"
-#include "glass/Model.h"
-#include "glass/Storage.h"
-#include "glass/networktables/NetworkTables.h"
-#include "glass/networktables/NetworkTablesSettings.h"
-#include "glass/other/Log.h"
+#include <wpigui_openurl.h>
 
 namespace gui = wpi::gui;
 
@@ -116,7 +116,8 @@ static void DisplayGui() {
   ImGui::SetNextWindowPos(ImVec2(0, 0));
   int width, height;
   glfwGetWindowSize(gui::GetSystemWindow(), &width, &height);
-  ImGui::SetNextWindowSize(ImVec2(width, height));
+  ImGui::SetNextWindowSize(
+      ImVec2(static_cast<float>(width), static_cast<float>(height)));
 
   ImGui::Begin("Entries", nullptr,
                ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_MenuBar |
@@ -154,6 +155,15 @@ static void DisplayGui() {
     ImGui::Separator();
     if (ImGui::MenuItem("About")) {
       about = true;
+    }
+    ImGui::EndMenu();
+  }
+
+  if (ImGui::BeginMenu("Docs")) {
+    if (ImGui::MenuItem("Online documentation")) {
+      wpi::gui::OpenURL(
+          "https://docs.wpilib.org/en/stable/docs/software/wpilib-tools/"
+          "outlineviewer/");
     }
     ImGui::EndMenu();
   }

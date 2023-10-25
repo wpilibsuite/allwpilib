@@ -7,9 +7,9 @@
 
 #include <string>
 
+#include <gtest/gtest.h>
 #include <networktables/NetworkTableInstance.h>
-
-#include "gtest/gtest.h"
+#include <networktables/StringTopic.h>
 
 class SendableChooserTest : public ::testing::TestWithParam<int> {};
 

@@ -16,6 +16,8 @@
 #include <wpi/DenseMap.h>
 
 #include "NetworkInterface.h"
+#include "NetworkOutgoingQueue.h"
+#include "NetworkPing.h"
 #include "PubSubOptions.h"
 #include "WireConnection.h"
 #include "WireDecoder.h"
@@ -46,8 +48,7 @@ class ClientImpl final : private ServerMessageHandler {
   void ProcessIncomingBinary(uint64_t curTimeMs, std::span<const uint8_t> data);
   void HandleLocal(std::vector<ClientMessage>&& msgs);
 
-  void SendControl(uint64_t curTimeMs);
-  void SendValues(uint64_t curTimeMs, bool flush);
+  void SendOutgoing(uint64_t curTimeMs, bool flush);
 
   void SetLocal(LocalInterface* local) { m_local = local; }
   void SendInitial();
@@ -59,14 +60,9 @@ class ClientImpl final : private ServerMessageHandler {
     // in options as double, but copy here as integer; rounded to the nearest
     // 10 ms
     uint32_t periodMs;
-    uint64_t nextSendMs{0};
-    std::vector<Value> outValues;  // outgoing values
   };
 
-  bool DoSendControl(uint64_t curTimeMs);
-  void DoSendValues(uint64_t curTimeMs, bool flush);
-  void SendInitialValues();
-  bool CheckNetworkReady(uint64_t curTimeMs);
+  void UpdatePeriodic();
 
   // ServerMessageHandler interface
   void ServerAnnounce(std::string_view name, int64_t id,
@@ -96,20 +92,23 @@ class ClientImpl final : private ServerMessageHandler {
   // indexed by server-provided topic id
   wpi::DenseMap<int64_t, NT_Topic> m_topicMap;
 
+  // ping
+  NetworkPing m_ping;
+
   // timestamp handling
-  static constexpr uint32_t kPingIntervalMs = 3000;
+  static constexpr uint32_t kRttIntervalMs = 3000;
   uint64_t m_nextPingTimeMs{0};
   uint64_t m_pongTimeMs{0};
   uint32_t m_rtt2Us{UINT32_MAX};
   bool m_haveTimeOffset{false};
-  int64_t m_serverTimeOffsetUs{0};
 
   // periodic sweep handling
-  uint32_t m_periodMs{kPingIntervalMs + 10};
-  uint64_t m_lastSendMs{0};
+  static constexpr uint32_t kMinPeriodMs = 5;
+  static constexpr uint32_t kMaxPeriodMs = NetworkPing::kPingIntervalMs;
+  uint32_t m_periodMs{kMaxPeriodMs};
 
   // outgoing queue
-  std::vector<ClientMessage> m_outgoing;
+  NetworkOutgoingQueue<ClientMessage> m_outgoing;
 };
 
 }  // namespace nt::net

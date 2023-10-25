@@ -12,7 +12,6 @@
 #include <concepts>
 #include <limits>
 #include <memory>
-#include <span>
 #include <type_traits>
 #include <utility>
 #include <vector>

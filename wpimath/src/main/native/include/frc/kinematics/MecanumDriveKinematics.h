@@ -4,9 +4,9 @@
 
 #pragma once
 
+#include <Eigen/QR>
 #include <wpi/SymbolExports.h>
 
-#include "Eigen/QR"
 #include "frc/EigenCore.h"
 #include "frc/geometry/Translation2d.h"
 #include "frc/geometry/Twist2d.h"

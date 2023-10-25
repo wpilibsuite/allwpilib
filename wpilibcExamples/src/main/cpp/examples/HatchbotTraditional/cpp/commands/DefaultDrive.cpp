@@ -12,7 +12,7 @@ DefaultDrive::DefaultDrive(DriveSubsystem* subsystem,
     : m_drive{subsystem},
       m_forward{std::move(forward)},
       m_rotation{std::move(rotation)} {
-  AddRequirements({subsystem});
+  AddRequirements(subsystem);
 }
 
 void DefaultDrive::Execute() {

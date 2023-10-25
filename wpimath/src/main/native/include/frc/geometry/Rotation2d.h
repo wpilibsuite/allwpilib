@@ -5,12 +5,11 @@
 #pragma once
 
 #include <wpi/SymbolExports.h>
+#include <wpi/json_fwd.h>
+#include <wpi/protobuf/Protobuf.h>
+#include <wpi/struct/Struct.h>
 
 #include "units/angle.h"
-
-namespace wpi {
-class json;
-}  // namespace wpi
 
 namespace frc {
 
@@ -178,5 +177,26 @@ WPILIB_DLLEXPORT
 void from_json(const wpi::json& json, Rotation2d& rotation);
 
 }  // namespace frc
+
+template <>
+struct wpi::Struct<frc::Rotation2d> {
+  static constexpr std::string_view kTypeString = "struct:Rotation2d";
+  static constexpr size_t kSize = 8;
+  static constexpr std::string_view kSchema = "double value";
+  static frc::Rotation2d Unpack(std::span<const uint8_t, 8> data) {
+    return units::radian_t{wpi::UnpackStruct<double>(data)};
+  }
+  static void Pack(std::span<uint8_t, 8> data, const frc::Rotation2d& value) {
+    wpi::PackStruct(data, value.Radians().value());
+  }
+};
+
+template <>
+struct WPILIB_DLLEXPORT wpi::Protobuf<frc::Rotation2d> {
+  static google::protobuf::Message* New(google::protobuf::Arena* arena);
+  static frc::Rotation2d Unpack(const google::protobuf::Message& msg);
+  static void Pack(google::protobuf::Message* msg,
+                   const frc::Rotation2d& value);
+};
 
 #include "frc/geometry/Rotation2d.inc"

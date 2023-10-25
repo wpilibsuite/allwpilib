@@ -2,8 +2,6 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <gtest/gtest.h>
-
 #include <string>
 #include <thread>
 
@@ -15,6 +13,7 @@
 #include <frc/simulation/UltrasonicSim.h>
 #include <frc/system/plant/DCMotor.h>
 #include <frc/system/plant/LinearSystemId.h>
+#include <gtest/gtest.h>
 #include <hal/simulation/MockHooks.h>
 #include <units/angle.h>
 #include <units/length.h>

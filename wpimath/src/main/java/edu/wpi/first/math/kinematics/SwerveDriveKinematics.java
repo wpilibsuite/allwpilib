@@ -99,7 +99,7 @@ public class SwerveDriveKinematics
           "Number of headings is not consistent with number of module locations provided in "
               + "constructor");
     }
-    m_moduleHeadings = Arrays.copyOf(moduleHeadings, 4);
+    m_moduleHeadings = Arrays.copyOf(moduleHeadings, m_numModules);
   }
 
   /**

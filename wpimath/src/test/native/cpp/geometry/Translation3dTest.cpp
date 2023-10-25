@@ -4,8 +4,9 @@
 
 #include <cmath>
 
+#include <gtest/gtest.h>
+
 #include "frc/geometry/Translation3d.h"
-#include "gtest/gtest.h"
 
 using namespace frc;
 

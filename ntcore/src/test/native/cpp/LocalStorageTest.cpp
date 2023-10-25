@@ -2,15 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <gtest/gtest.h>
+#include <wpi/SpanMatcher.h>
+
 #include "LocalStorage.h"
 #include "MockListenerStorage.h"
 #include "MockLogger.h"
 #include "PubSubOptionsMatcher.h"
-#include "SpanMatcher.h"
 #include "TestPrinters.h"
 #include "ValueMatcher.h"
 #include "gmock/gmock.h"
-#include "gtest/gtest.h"
 #include "net/MockNetworkInterface.h"
 #include "ntcore_c.h"
 #include "ntcore_cpp.h"
@@ -253,9 +254,11 @@ TEST_F(LocalStorageTest, PubUnpubPub) {
   EXPECT_CALL(network, Publish(_, fooTopic, std::string_view{"foo"},
                                std::string_view{"boolean"}, wpi::json::object(),
                                IsDefaultPubSubOptions()));
-  EXPECT_CALL(logger, Call(NT_LOG_INFO, _, _,
-                           "local subscribe to 'foo' disabled due to type "
-                           "mismatch (wanted 'int', published as 'boolean')"));
+  EXPECT_CALL(logger,
+              Call(NT_LOG_INFO, _, _,
+                   std::string_view{
+                       "local subscribe to 'foo' disabled due to type "
+                       "mismatch (wanted 'int', published as 'boolean')"}));
   auto pub = storage.Publish(fooTopic, NT_BOOLEAN, "boolean", {}, {});
 
   auto val = Value::MakeBoolean(true, 5);
@@ -297,9 +300,11 @@ TEST_F(LocalStorageTest, LocalPubConflict) {
                                IsDefaultPubSubOptions()));
   auto pub1 = storage.Publish(fooTopic, NT_BOOLEAN, "boolean", {}, {});
 
-  EXPECT_CALL(logger, Call(NT_LOG_INFO, _, _,
-                           "local publish to 'foo' disabled due to type "
-                           "mismatch (wanted 'int', currently 'boolean')"));
+  EXPECT_CALL(
+      logger,
+      Call(NT_LOG_INFO, _, _,
+           std::string_view{"local publish to 'foo' disabled due to type "
+                            "mismatch (wanted 'int', currently 'boolean')"}));
   auto pub2 = storage.Publish(fooTopic, NT_INTEGER, "int", {}, {});
 
   EXPECT_EQ(storage.GetTopicType(fooTopic), NT_BOOLEAN);
@@ -336,9 +341,11 @@ TEST_F(LocalStorageTest, LocalSubConflict) {
 
   EXPECT_CALL(network, Subscribe(_, wpi::SpanEq({std::string{"foo"}}),
                                  IsDefaultPubSubOptions()));
-  EXPECT_CALL(logger, Call(NT_LOG_INFO, _, _,
-                           "local subscribe to 'foo' disabled due to type "
-                           "mismatch (wanted 'int', published as 'boolean')"));
+  EXPECT_CALL(logger,
+              Call(NT_LOG_INFO, _, _,
+                   std::string_view{
+                       "local subscribe to 'foo' disabled due to type "
+                       "mismatch (wanted 'int', published as 'boolean')"}));
   storage.Subscribe(fooTopic, NT_INTEGER, "int", {});
 }
 
@@ -349,9 +356,11 @@ TEST_F(LocalStorageTest, RemotePubConflict) {
 
   storage.Publish(fooTopic, NT_BOOLEAN, "boolean", {}, {});
 
-  EXPECT_CALL(logger, Call(NT_LOG_INFO, _, _,
-                           "network announce of 'foo' overriding local publish "
-                           "(was 'boolean', now 'int')"));
+  EXPECT_CALL(logger,
+              Call(NT_LOG_INFO, _, _,
+                   std::string_view{
+                       "network announce of 'foo' overriding local publish "
+                       "(was 'boolean', now 'int')"}));
 
   storage.NetworkAnnounce("foo", "int", wpi::json::object(), {});
 
@@ -475,11 +484,10 @@ TEST_F(LocalStorageTest, SetValueEmptyUntypedEntry) {
 }
 
 TEST_F(LocalStorageTest, PublishUntyped) {
-  EXPECT_CALL(
-      logger,
-      Call(
-          NT_LOG_ERROR, _, _,
-          "cannot publish 'foo' with an unassigned type or empty type string"));
+  EXPECT_CALL(logger,
+              Call(NT_LOG_ERROR, _, _,
+                   std::string_view{"cannot publish 'foo' with an unassigned "
+                                    "type or empty type string"}));
 
   EXPECT_EQ(storage.Publish(fooTopic, NT_UNASSIGNED, "", {}, {}), 0u);
 }
@@ -696,8 +704,9 @@ void LocalStorageNumberVariantsTest::CreateSubscriber(
 void LocalStorageNumberVariantsTest::CreateSubscribers() {
   EXPECT_CALL(logger,
               Call(NT_LOG_INFO, _, _,
-                   "local subscribe to 'foo' disabled due to type "
-                   "mismatch (wanted 'boolean', published as 'double')"));
+                   std::string_view{
+                       "local subscribe to 'foo' disabled due to type "
+                       "mismatch (wanted 'boolean', published as 'double')"}));
   CreateSubscriber(&sub1, "subDouble", NT_DOUBLE, "double");
   CreateSubscriber(&sub2, "subInteger", NT_INTEGER, "int");
   CreateSubscriber(&sub3, "subFloat", NT_FLOAT, "float");
@@ -707,10 +716,12 @@ void LocalStorageNumberVariantsTest::CreateSubscribers() {
 }
 
 void LocalStorageNumberVariantsTest::CreateSubscribersArray() {
-  EXPECT_CALL(logger,
-              Call(NT_LOG_INFO, _, _,
-                   "local subscribe to 'foo' disabled due to type "
-                   "mismatch (wanted 'boolean[]', published as 'double[]')"));
+  EXPECT_CALL(
+      logger,
+      Call(NT_LOG_INFO, _, _,
+           std::string_view{
+               "local subscribe to 'foo' disabled due to type "
+               "mismatch (wanted 'boolean[]', published as 'double[]')"}));
   CreateSubscriber(&sub1, "subDouble", NT_DOUBLE_ARRAY, "double[]");
   CreateSubscriber(&sub2, "subInteger", NT_INTEGER_ARRAY, "int[]");
   CreateSubscriber(&sub3, "subFloat", NT_FLOAT_ARRAY, "float[]");

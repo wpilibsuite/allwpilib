@@ -1,6 +1,5 @@
-// Copyright (C) 2015-2021 Müller <jonathanmueller.dev@gmail.com>
-// This file is subject to the license terms in the LICENSE file
-// found in the top-level directory of this distribution.
+// Copyright (C) 2015-2023 Jonathan Müller and foonathan/memory contributors
+// SPDX-License-Identifier: Zlib
 
 #include "wpi/memory/temporary_allocator.hpp"
 
@@ -216,9 +215,8 @@ temporary_stack& wpi::memory::get_temporary_stack(std::size_t initial_size)
 
 namespace
 {
-    WPI_THREAD_LOCAL alignas(
-        temporary_stack) char temporary_stack_storage[sizeof(temporary_stack)];
-    WPI_THREAD_LOCAL bool is_created = false;
+    thread_local alignas(temporary_stack) char temporary_stack_storage[sizeof(temporary_stack)];
+    thread_local bool is_created = false;
 
     temporary_stack& get() noexcept
     {

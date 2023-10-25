@@ -4,6 +4,7 @@
 
 #include "frc/Counter.h"  // NOLINT(build/include_order)
 
+#include <gtest/gtest.h>
 #include <units/time.h>
 
 #include "TestBench.h"
@@ -11,7 +12,6 @@
 #include "frc/motorcontrol/Jaguar.h"
 #include "frc/motorcontrol/Talon.h"
 #include "frc/motorcontrol/Victor.h"
-#include "gtest/gtest.h"
 
 static constexpr auto kMotorDelay = 2.5_s;
 

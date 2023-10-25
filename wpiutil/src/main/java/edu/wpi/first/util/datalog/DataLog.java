@@ -4,7 +4,14 @@
 
 package edu.wpi.first.util.datalog;
 
+import edu.wpi.first.util.WPIUtilJNI;
+import edu.wpi.first.util.protobuf.Protobuf;
+import edu.wpi.first.util.struct.Struct;
 import java.nio.ByteBuffer;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * A data log. The log file is created immediately upon construction with a temporary filename. The
@@ -102,6 +109,130 @@ public final class DataLog implements AutoCloseable {
   /** Resumes appending of data records to the log. */
   public void resume() {
     DataLogJNI.resume(m_impl);
+  }
+
+  /**
+   * Returns whether there is a data schema already registered with the given name.
+   *
+   * @param name Name (the string passed as the data type for records using this schema)
+   * @return True if schema already registered
+   */
+  public boolean hasSchema(String name) {
+    return m_schemaSet.contains(name);
+  }
+
+  /**
+   * Registers a data schema. Data schemas provide information for how a certain data type string
+   * can be decoded. The type string of a data schema indicates the type of the schema itself (e.g.
+   * "protobuf" for protobuf schemas, "struct" for struct schemas, etc). In the data log, schemas
+   * are saved just like normal records, with the name being generated from the provided name:
+   * "/.schema/name". Duplicate calls to this function with the same name are silently ignored.
+   *
+   * @param name Name (the string passed as the data type for records using this schema)
+   * @param type Type of schema (e.g. "protobuf", "struct", etc)
+   * @param schema Schema data
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  public void addSchema(String name, String type, byte[] schema, long timestamp) {
+    if (!m_schemaSet.add(name)) {
+      return;
+    }
+    DataLogJNI.addSchema(m_impl, name, type, schema, timestamp);
+  }
+
+  /**
+   * Registers a data schema. Data schemas provide information for how a certain data type string
+   * can be decoded. The type string of a data schema indicates the type of the schema itself (e.g.
+   * "protobuf" for protobuf schemas, "struct" for struct schemas, etc). In the data log, schemas
+   * are saved just like normal records, with the name being generated from the provided name:
+   * "/.schema/name". Duplicate calls to this function with the same name are silently ignored.
+   *
+   * @param name Name (the string passed as the data type for records using this schema)
+   * @param type Type of schema (e.g. "protobuf", "struct", etc)
+   * @param schema Schema data
+   */
+  public void addSchema(String name, String type, byte[] schema) {
+    addSchema(name, type, schema, 0);
+  }
+
+  /**
+   * Registers a data schema. Data schemas provide information for how a certain data type string
+   * can be decoded. The type string of a data schema indicates the type of the schema itself (e.g.
+   * "protobuf" for protobuf schemas, "struct" for struct schemas, etc). In the data log, schemas
+   * are saved just like normal records, with the name being generated from the provided name:
+   * "/.schema/name". Duplicate calls to this function with the same name are silently ignored.
+   *
+   * @param name Name (the string passed as the data type for records using this schema)
+   * @param type Type of schema (e.g. "protobuf", "struct", etc)
+   * @param schema Schema data
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  public void addSchema(String name, String type, String schema, long timestamp) {
+    if (!m_schemaSet.add(name)) {
+      return;
+    }
+    DataLogJNI.addSchemaString(m_impl, name, type, schema, timestamp);
+  }
+
+  /**
+   * Registers a data schema. Data schemas provide information for how a certain data type string
+   * can be decoded. The type string of a data schema indicates the type of the schema itself (e.g.
+   * "protobuf" for protobuf schemas, "struct" for struct schemas, etc). In the data log, schemas
+   * are saved just like normal records, with the name being generated from the provided name:
+   * "/.schema/name". Duplicate calls to this function with the same name are silently ignored.
+   *
+   * @param name Name (the string passed as the data type for records using this schema)
+   * @param type Type of schema (e.g. "protobuf", "struct", etc)
+   * @param schema Schema data
+   */
+  public void addSchema(String name, String type, String schema) {
+    addSchema(name, type, schema, 0);
+  }
+
+  /**
+   * Registers a protobuf schema. Duplicate calls to this function with the same name are silently
+   * ignored.
+   *
+   * @param proto protobuf serialization object
+   * @param timestamp Time stamp (0 to indicate now)
+   */
+  public void addSchema(Protobuf<?, ?> proto, long timestamp) {
+    final long actualTimestamp = timestamp == 0 ? WPIUtilJNI.now() : timestamp;
+    proto.forEachDescriptor(
+        this::hasSchema,
+        (typeString, schema) ->
+            addSchema(typeString, "proto:FileDescriptorProto", schema, actualTimestamp));
+  }
+
+  /**
+   * Registers a protobuf schema. Duplicate calls to this function with the same name are silently
+   * ignored.
+   *
+   * @param proto protobuf serialization object
+   */
+  public void addSchema(Protobuf<?, ?> proto) {
+    addSchema(proto, 0);
+  }
+
+  /**
+   * Registers a struct schema. Duplicate calls to this function with the same name are silently
+   * ignored.
+   *
+   * @param struct struct serialization object
+   * @param timestamp Time stamp (0 to indicate now)
+   */
+  public void addSchema(Struct<?> struct, long timestamp) {
+    addSchemaImpl(struct, timestamp == 0 ? WPIUtilJNI.now() : timestamp, new HashSet<>());
+  }
+
+  /**
+   * Registers a struct schema. Duplicate calls to this function with the same name are silently
+   * ignored.
+   *
+   * @param struct struct serialization object
+   */
+  public void addSchema(Struct<?> struct) {
+    addSchema(struct, 0);
   }
 
   /**
@@ -358,5 +489,22 @@ public final class DataLog implements AutoCloseable {
     return m_impl;
   }
 
+  private void addSchemaImpl(Struct<?> struct, long timestamp, Set<String> seen) {
+    String typeString = struct.getTypeString();
+    if (hasSchema(typeString)) {
+      return;
+    }
+    if (!seen.add(typeString)) {
+      throw new UnsupportedOperationException(typeString + ": circular reference with " + seen);
+    }
+    addSchema(typeString, "structschema", struct.getSchema(), timestamp);
+    for (Struct<?> inner : struct.getNested()) {
+      addSchemaImpl(inner, timestamp, seen);
+    }
+    seen.remove(typeString);
+  }
+
   private long m_impl;
+  private final ConcurrentMap<String, Integer> m_schemaMap = new ConcurrentHashMap<>();
+  private final Set<String> m_schemaSet = m_schemaMap.keySet();
 }

@@ -19,6 +19,7 @@ import java.util.EnumSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 class ShuffleboardInstanceTest {
@@ -127,6 +128,7 @@ class ShuffleboardInstanceTest {
     assertFalse(controllable, "The nested actuator widget should have been disabled");
   }
 
+  @Disabled("Fails often at counter assertion 'expected: <2> but was: <1>'")
   @Test
   void testDuplicateSelectTabs() {
     int listener = 0;

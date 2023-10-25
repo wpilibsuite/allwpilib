@@ -47,5 +47,5 @@ class Robot : public frc::TimedRobot {
   frc::PWMSparkMax m_left{kLeftMotorPort};
   frc::PWMSparkMax m_right{kRightMotorPort};
   frc::DifferentialDrive m_robotDrive{m_left, m_right};
-  frc2::PIDController m_pidController{kP, kI, kD};
+  frc::PIDController m_pidController{kP, kI, kD};
 };

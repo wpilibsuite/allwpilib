@@ -2,14 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <gtest/gtest.h>
-
 #include <string>
 #include <thread>
 
 #include <frc/simulation/DIOSim.h>
 #include <frc/simulation/DriverStationSim.h>
 #include <frc/simulation/SimHooks.h>
+#include <gtest/gtest.h>
 #include <units/time.h>
 
 #include "Robot.h"
@@ -55,7 +54,7 @@ TEST_P(AllianceTest, Alliance) {
 
   frc::sim::StepTiming(20_ms);
 
-  bool isRed;
+  bool isRed = false;
   switch (alliance) {
     case HAL_AllianceStationID_kBlue1:
     case HAL_AllianceStationID_kBlue2:

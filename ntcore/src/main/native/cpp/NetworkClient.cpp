@@ -125,8 +125,8 @@ void NetworkClientBase::DoDisconnect(std::string_view reason) {
   if (m_readLocalTimer) {
     m_readLocalTimer->Stop();
   }
-  if (m_sendValuesTimer) {
-    m_sendValuesTimer->Stop();
+  if (m_sendOutgoingTimer) {
+    m_sendOutgoingTimer->Stop();
   }
   m_localStorage.ClearNetwork();
   m_localQueue.ClearQueue();
@@ -150,9 +150,9 @@ NetworkClient3::NetworkClient3(int inst, std::string_view id,
         loop, kReconnectRate, m_logger,
         [this](uv::Tcp& tcp) { TcpConnected(tcp); });
 
-    m_sendValuesTimer = uv::Timer::Create(loop);
-    if (m_sendValuesTimer) {
-      m_sendValuesTimer->timeout.connect([this] {
+    m_sendOutgoingTimer = uv::Timer::Create(loop);
+    if (m_sendOutgoingTimer) {
+      m_sendOutgoingTimer->timeout.connect([this] {
         if (m_clientImpl) {
           HandleLocal();
           m_clientImpl->SendPeriodic(m_loop.Now().count(), false);
@@ -206,9 +206,9 @@ void NetworkClient3::TcpConnected(uv::Tcp& tcp) {
   auto clientImpl = std::make_shared<net3::ClientImpl3>(
       m_loop.Now().count(), m_inst, *wire, m_logger, [this](uint32_t repeatMs) {
         DEBUG4("Setting periodic timer to {}", repeatMs);
-        if (m_sendValuesTimer) {
-          m_sendValuesTimer->Start(uv::Timer::Time{repeatMs},
-                                   uv::Timer::Time{repeatMs});
+        if (m_sendOutgoingTimer) {
+          m_sendOutgoingTimer->Start(uv::Timer::Time{repeatMs},
+                                     uv::Timer::Time{repeatMs});
         }
       });
   clientImpl->Start(
@@ -242,7 +242,11 @@ void NetworkClient3::TcpConnected(uv::Tcp& tcp) {
         tcp.error.connect([this, &tcp](uv::Error err) {
           DEBUG3("NT3 TCP error {}", err.str());
           if (!tcp.IsLoopClosing()) {
-            DoDisconnect(err.str());
+            // we could be in the middle of sending data, so defer disconnect
+            uv::Timer::SingleShot(m_loop, uv::Timer::Time{0},
+                                  [this, reason = std::string{err.str()}] {
+                                    DoDisconnect(reason);
+                                  });
           }
         });
         tcp.end.connect([this, &tcp] {
@@ -302,18 +306,18 @@ NetworkClient::NetworkClient(
       m_readLocalTimer->timeout.connect([this] {
         if (m_clientImpl) {
           HandleLocal();
-          m_clientImpl->SendControl(m_loop.Now().count());
+          m_clientImpl->SendOutgoing(m_loop.Now().count(), false);
         }
       });
       m_readLocalTimer->Start(uv::Timer::Time{100}, uv::Timer::Time{100});
     }
 
-    m_sendValuesTimer = uv::Timer::Create(loop);
-    if (m_sendValuesTimer) {
-      m_sendValuesTimer->timeout.connect([this] {
+    m_sendOutgoingTimer = uv::Timer::Create(loop);
+    if (m_sendOutgoingTimer) {
+      m_sendOutgoingTimer->timeout.connect([this] {
         if (m_clientImpl) {
           HandleLocal();
-          m_clientImpl->SendValues(m_loop.Now().count(), false);
+          m_clientImpl->SendOutgoing(m_loop.Now().count(), false);
         }
       });
     }
@@ -324,7 +328,7 @@ NetworkClient::NetworkClient(
       m_flush->wakeup.connect([this] {
         if (m_clientImpl) {
           HandleLocal();
-          m_clientImpl->SendValues(m_loop.Now().count(), true);
+          m_clientImpl->SendOutgoing(m_loop.Now().count(), true);
         }
       });
     }
@@ -369,37 +373,42 @@ void NetworkClient::TcpConnected(uv::Tcp& tcp) {
   wpi::SmallString<128> idBuf;
   auto ws = wpi::WebSocket::CreateClient(
       tcp, fmt::format("/nt/{}", wpi::EscapeURI(m_id, idBuf)), "",
-      {{"networktables.first.wpi.edu"}}, options);
+      {"v4.1.networktables.first.wpi.edu", "networktables.first.wpi.edu"},
+      options);
   ws->SetMaxMessageSize(kMaxMessageSize);
-  ws->open.connect([this, &tcp, ws = ws.get()](std::string_view) {
+  ws->open.connect([this, &tcp, ws = ws.get()](std::string_view protocol) {
     if (m_connList.IsConnected()) {
       ws->Terminate(1006, "no longer needed");
       return;
     }
-    WsConnected(*ws, tcp);
+    WsConnected(*ws, tcp, protocol);
   });
 }
 
-void NetworkClient::WsConnected(wpi::WebSocket& ws, uv::Tcp& tcp) {
+void NetworkClient::WsConnected(wpi::WebSocket& ws, uv::Tcp& tcp,
+                                std::string_view protocol) {
   if (m_parallelConnect) {
     m_parallelConnect->Succeeded(tcp);
   }
 
   ConnectionInfo connInfo;
   uv::AddrToName(tcp.GetPeer(), &connInfo.remote_ip, &connInfo.remote_port);
-  connInfo.protocol_version = 0x0400;
+  connInfo.protocol_version =
+      protocol == "v4.1.networktables.first.wpi.edu" ? 0x0401 : 0x0400;
 
   INFO("CONNECTED NT4 to {} port {}", connInfo.remote_ip, connInfo.remote_port);
   m_connHandle = m_connList.AddConnection(connInfo);
 
-  m_wire = std::make_shared<net::WebSocketConnection>(ws);
+  m_wire =
+      std::make_shared<net::WebSocketConnection>(ws, connInfo.protocol_version);
+  m_wire->Start();
   m_clientImpl = std::make_unique<net::ClientImpl>(
       m_loop.Now().count(), m_inst, *m_wire, m_logger, m_timeSyncUpdated,
       [this](uint32_t repeatMs) {
         DEBUG4("Setting periodic timer to {}", repeatMs);
-        if (m_sendValuesTimer) {
-          m_sendValuesTimer->Start(uv::Timer::Time{repeatMs},
-                                   uv::Timer::Time{repeatMs});
+        if (m_sendOutgoingTimer) {
+          m_sendOutgoingTimer->Start(uv::Timer::Time{repeatMs},
+                                     uv::Timer::Time{repeatMs});
         }
       });
   m_clientImpl->SetLocal(&m_localStorage);
@@ -408,7 +417,10 @@ void NetworkClient::WsConnected(wpi::WebSocket& ws, uv::Tcp& tcp) {
   m_clientImpl->SendInitial();
   ws.closed.connect([this, &ws](uint16_t, std::string_view reason) {
     if (!ws.GetStream().IsLoopClosing()) {
-      DoDisconnect(reason);
+      // we could be in the middle of sending data, so defer disconnect
+      uv::Timer::SingleShot(
+          m_loop, uv::Timer::Time{0},
+          [this, reason = std::string{reason}] { DoDisconnect(reason); });
     }
   });
   ws.text.connect([this](std::string_view data, bool) {

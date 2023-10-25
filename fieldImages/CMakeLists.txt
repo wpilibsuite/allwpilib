@@ -22,7 +22,7 @@ if (WITH_JAVA)
 endif()
 
 
-GENERATE_RESOURCES(src/main/native/resources/edu/wpi/first/fields generated/main/cpp FIELDS fields field_images_resources_src)
+generate_resources(src/main/native/resources/edu/wpi/first/fields generated/main/cpp FIELDS fields field_images_resources_src)
 
 
 add_library(fieldImages src/main/native/cpp/fields.cpp ${field_images_resources_src})

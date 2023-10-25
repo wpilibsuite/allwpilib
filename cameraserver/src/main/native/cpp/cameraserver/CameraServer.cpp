@@ -717,22 +717,3 @@ void CameraServer::RemoveCamera(std::string_view name) {
   std::scoped_lock lock(inst.m_mutex);
   inst.m_sources.erase(name);
 }
-
-void CameraServer::SetSize(int size) {
-  auto& inst = ::GetInstance();
-  std::scoped_lock lock(inst.m_mutex);
-  if (inst.m_primarySourceName.empty()) {
-    return;
-  }
-  auto it = inst.m_sources.find(inst.m_primarySourceName);
-  if (it == inst.m_sources.end()) {
-    return;
-  }
-  if (size == kSize160x120) {
-    it->second.SetResolution(160, 120);
-  } else if (size == kSize320x240) {
-    it->second.SetResolution(320, 240);
-  } else if (size == kSize640x480) {
-    it->second.SetResolution(640, 480);
-  }
-}

@@ -5,6 +5,7 @@
 #include <frc/system/LinearSystem.h>
 #include <frc/system/plant/DCMotor.h>
 #include <frc/system/plant/LinearSystemId.h>
+
 #include <gtest/gtest.h>
 
 #include "frc/system/plant/LinearSystemId.h"

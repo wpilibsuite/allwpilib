@@ -4,10 +4,10 @@
 
 #include "frc/simulation/ADXL362Sim.h"  // NOLINT(build/include_order)
 
+#include <gtest/gtest.h>
 #include <hal/HAL.h>
 
 #include "frc/ADXL362.h"
-#include "gtest/gtest.h"
 
 namespace frc::sim {
 

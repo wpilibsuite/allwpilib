@@ -47,6 +47,15 @@ class FlywheelSim : public LinearSystemSim<1, 1, 1> {
               units::kilogram_square_meter_t moi,
               const std::array<double, 1>& measurementStdDevs = {0.0});
 
+  using LinearSystemSim::SetState;
+
+  /**
+   * Sets the flywheel's state.
+   *
+   * @param velocity The new velocity
+   */
+  void SetState(units::radians_per_second_t velocity);
+
   /**
    * Returns the flywheel velocity.
    *

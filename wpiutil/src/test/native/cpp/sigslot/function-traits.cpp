@@ -33,9 +33,9 @@ SOFTWARE.
 
 #include "wpi/Signal.h"  // NOLINT(build/include_order)
 
-#include "gtest/gtest.h"  // NOLINT(build/include_order)
-
 #include <type_traits>
+
+#include <gtest/gtest.h>
 
 using namespace wpi::sig::trait;
 
