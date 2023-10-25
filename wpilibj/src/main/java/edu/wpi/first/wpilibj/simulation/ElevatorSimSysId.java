@@ -66,7 +66,8 @@ public class ElevatorSimSysId extends ElevatorSim {
      *
      * @param kG The gravity gain , volts
      * @param kV The velocity gain, in volts/(unit/sec)
-     * @param kA The acceleration gain, in volts/(unit/sec^2)  * @param gearbox            The type of and number of motors in the elevator
+     * @param kA The acceleration gain, in volts/(unit/sec^2)  
+     * @param gearbox            The type of and number of motors in the elevator
      *                           gearbox.
      * @param gearing            The gearing of the elevator (numbers greater than 1
      *                           represent reductions).
@@ -86,7 +87,6 @@ public class ElevatorSimSysId extends ElevatorSim {
             double minHeightMeters,
             double maxHeightMeters,
             Matrix<N1, N1> measurementStdDevs) {
-
         super(
                 LinearSystemId.identifyPositionSystem(kV, kA),
                 gearbox,
