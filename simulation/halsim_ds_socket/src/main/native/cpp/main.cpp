@@ -37,7 +37,6 @@ using namespace wpi::uv;
 
 static std::unique_ptr<Buffer> singleByte;
 static std::atomic<bool> gDSConnected = false;
-static std::atomic<uint64_t> gDSLastPacketTime = 0;
 
 namespace {
 struct DataStore {
@@ -50,10 +49,6 @@ struct DataStore {
 static SimpleBufferPool<4>& GetBufferPool() {
   static SimpleBufferPool<4> bufferPool;
   return bufferPool;
-}
-
-static uint64_t GetLastDSPacketTime() {
-  return gDSLastPacketTime;
 }
 
 static void HandleTcpDataStream(Buffer& buf, size_t size, DataStore& store) {
@@ -103,7 +98,6 @@ static void SetupTcp(wpi::uv::Loop& loop) {
     gDSConnected = true;
 
     client->data.connect([t](Buffer& buf, size_t len) {
-      gDSLastPacketTime = HAL_GetFPGATime(nullptr);
       HandleTcpDataStream(buf, len, *t->GetData<DataStore>());
     });
     client->StartRead();
@@ -136,22 +130,14 @@ static void SetupUdp(wpi::uv::Loop& loop) {
   if (envTimeout) {
     timeoutMs = std::stoi(envTimeout);
   }
+  auto autoDisableTimer = Timer::Create(loop);
+  autoDisableTimer->timeout.connect([] { HALSIM_SetDriverStationEnabled(0); });
+  autoDisableTimer->Start(Timer::Time(timeoutMs));
   // UDP Receive then send
   udp->received.connect(
-      [udpLocal = udp.get(), &loop, timeoutMs](
+      [udpLocal = udp.get(), autoDisableTimer, timeoutMs](
           Buffer& buf, size_t len, const sockaddr& recSock, unsigned int port) {
-        gDSLastPacketTime = HAL_GetFPGATime(nullptr);
-        auto autoDisableTimer = Timer::Create(loop);
-        autoDisableTimer->timeout.connect([autoDisableTimer, timeoutMs] {
-          uint64_t timeSinceLastDSPacket =
-              HAL_GetFPGATime(nullptr) - GetLastDSPacketTime();
-          if (timeSinceLastDSPacket > timeoutMs * 1000) {
-            HALSIM_SetDriverStationEnabled(0);
-          }
-          autoDisableTimer->Close();
-        });
         autoDisableTimer->Start(Timer::Time(timeoutMs));
-
         auto ds = udpLocal->GetLoop()->GetData<halsim::DSCommPacket>();
         ds->DecodeUDP({reinterpret_cast<uint8_t*>(buf.base), len});
 
