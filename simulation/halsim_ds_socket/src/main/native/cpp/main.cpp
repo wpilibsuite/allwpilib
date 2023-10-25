@@ -135,7 +135,6 @@ static void SetupUdp(wpi::uv::Loop& loop) {
   auto envTimeout = std::getenv("DS_TIMEOUT_MS");
   if (envTimeout) {
     timeoutMs = std::stoi(envTimeout);
-    std::cout << timeoutMs << std::endl;
   }
   // UDP Receive then send
   udp->received.connect(
