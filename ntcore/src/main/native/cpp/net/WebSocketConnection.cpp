@@ -84,15 +84,7 @@ void WebSocketConnection::Stream::write_impl(const char* data, size_t len) {
 
 WebSocketConnection::WebSocketConnection(wpi::WebSocket& ws,
                                          unsigned int version)
-    : m_ws{ws}, m_version{version} {
-  m_ws.pong.connect([this](auto data) {
-    if (data.size() != 8) {
-      return;
-    }
-    m_lastPingResponse =
-        wpi::support::endian::read64<wpi::support::native>(data.data());
-  });
-}
+    : m_ws{ws}, m_version{version} {}
 
 WebSocketConnection::~WebSocketConnection() {
   for (auto&& buf : m_bufs) {
@@ -101,6 +93,18 @@ WebSocketConnection::~WebSocketConnection() {
   for (auto&& buf : m_buf_pool) {
     buf.Deallocate();
   }
+}
+
+void WebSocketConnection::Start() {
+  m_ws.pong.connect([selfweak = weak_from_this()](auto data) {
+    if (data.size() != 8) {
+      return;
+    }
+    if (auto self = selfweak.lock()) {
+      self->m_lastPingResponse =
+          wpi::support::endian::read64<wpi::support::native>(data.data());
+    }
+  });
 }
 
 void WebSocketConnection::SendPing(uint64_t time) {
