@@ -16,9 +16,10 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Fetch all history and metadata
         run: |
-          git fetch --prune --unshallow
           git checkout -b pr
           git branch -f main origin/main
       - name: Set up Python 3.8
@@ -53,10 +54,11 @@ jobs:
     container: wpilib/roborio-cross-ubuntu:2023-22.04
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Fetch all history and metadata
         run: |
           git config --global --add safe.directory /__w/allwpilib/allwpilib
-          git fetch --prune --unshallow
           git checkout -b pr
           git branch -f main origin/main
       - name: Set up Python 3.8
@@ -77,10 +79,11 @@ jobs:
     container: wpilib/ubuntu-base:22.04
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Fetch all history and metadata
         run: |
           git config --global --add safe.directory /__w/allwpilib/allwpilib
-          git fetch --prune --unshallow
           git checkout -b pr
           git branch -f main origin/main
       - name: Run Java format
