@@ -131,34 +131,50 @@ static void SetupUdp(wpi::uv::Loop& loop) {
     });
   });
   simLoopTimer->Start(Timer::Time{100}, Timer::Time{100});
-
+  int timeoutMs = 100;
+  auto envTimeout = std::getenv("DS_TIMEOUT_MS");
+  if (envTimeout) {
+    timeoutMs = std::stoi(envTimeout);
+    std::cout << timeoutMs << std::endl;
+  }
   // UDP Receive then send
-  udp->received.connect([udpLocal = udp.get()](Buffer& buf, size_t len,
-                                               const sockaddr& recSock,
-                                               unsigned int port) {
-    gDSLastPacketTime = HAL_GetFPGATime(nullptr);
-    auto ds = udpLocal->GetLoop()->GetData<halsim::DSCommPacket>();
-    ds->DecodeUDP({reinterpret_cast<uint8_t*>(buf.base), len});
+  udp->received.connect(
+      [udpLocal = udp.get(), &loop, timeoutMs](
+          Buffer& buf, size_t len, const sockaddr& recSock, unsigned int port) {
+        gDSLastPacketTime = HAL_GetFPGATime(nullptr);
+        auto autoDisableTimer = Timer::Create(loop);
+        autoDisableTimer->timeout.connect([autoDisableTimer, timeoutMs] {
+          uint64_t timeSinceLastDSPacket =
+              HAL_GetFPGATime(nullptr) - GetLastDSPacketTime();
+          if (timeSinceLastDSPacket > timeoutMs * 1000) {
+            HALSIM_SetDriverStationEnabled(0);
+          }
+          autoDisableTimer->Close();
+        });
+        autoDisableTimer->Start(Timer::Time(timeoutMs));
 
-    struct sockaddr_in outAddr;
-    std::memcpy(&outAddr, &recSock, sizeof(sockaddr_in));
-    outAddr.sin_family = PF_INET;
-    outAddr.sin_port = htons(1150);
+        auto ds = udpLocal->GetLoop()->GetData<halsim::DSCommPacket>();
+        ds->DecodeUDP({reinterpret_cast<uint8_t*>(buf.base), len});
 
-    wpi::SmallVector<wpi::uv::Buffer, 4> sendBufs;
-    wpi::raw_uv_ostream stream{sendBufs,
-                               [] { return GetBufferPool().Allocate(); }};
-    ds->SetupSendBuffer(stream);
+        struct sockaddr_in outAddr;
+        std::memcpy(&outAddr, &recSock, sizeof(sockaddr_in));
+        outAddr.sin_family = PF_INET;
+        outAddr.sin_port = htons(1150);
 
-    udpLocal->Send(outAddr, sendBufs, [](auto bufs, Error err) {
-      GetBufferPool().Release(bufs);
-      if (err) {
-        fmt::print(stderr, "{}\n", err.str());
-        std::fflush(stderr);
-      }
-    });
-    ds->SendUDPToHALSim();
-  });
+        wpi::SmallVector<wpi::uv::Buffer, 4> sendBufs;
+        wpi::raw_uv_ostream stream{sendBufs,
+                                   [] { return GetBufferPool().Allocate(); }};
+        ds->SetupSendBuffer(stream);
+
+        udpLocal->Send(outAddr, sendBufs, [](auto bufs, Error err) {
+          GetBufferPool().Release(bufs);
+          if (err) {
+            fmt::print(stderr, "{}\n", err.str());
+            std::fflush(stderr);
+          }
+        });
+        ds->SendUDPToHALSim();
+      });
 
   udp->StartRecv();
 }
@@ -168,15 +184,6 @@ static void SetupEventLoop(wpi::uv::Loop& loop) {
   loop.SetData(loopData);
   SetupUdp(loop);
   SetupTcp(loop);
-  auto autoDisableTimer = Timer::Create(loop);
-  autoDisableTimer->timeout.connect([] {
-    uint64_t timeSinceLastDSPacket =
-        HAL_GetFPGATime(nullptr) - GetLastDSPacketTime();
-    if (timeSinceLastDSPacket > 100000) {
-      HALSIM_SetDriverStationEnabled(0);
-    }
-  });
-  autoDisableTimer->Start(Timer::Time(0), Timer::Time(20));
 }
 
 static std::unique_ptr<wpi::EventLoopRunner> eventLoopRunner;
