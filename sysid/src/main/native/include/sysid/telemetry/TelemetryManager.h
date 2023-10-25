@@ -27,7 +27,7 @@
 
 namespace sysid {
 /**
- * This class is reponsible for collecting data from the robot and storing it
+ * This class is responsible for collecting data from the robot and storing it
  * inside a JSON.
  */
 class TelemetryManager {

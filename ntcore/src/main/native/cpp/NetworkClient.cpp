@@ -401,6 +401,7 @@ void NetworkClient::WsConnected(wpi::WebSocket& ws, uv::Tcp& tcp,
 
   m_wire =
       std::make_shared<net::WebSocketConnection>(ws, connInfo.protocol_version);
+  m_wire->Start();
   m_clientImpl = std::make_unique<net::ClientImpl>(
       m_loop.Now().count(), m_inst, *m_wire, m_logger, m_timeSyncUpdated,
       [this](uint32_t repeatMs) {

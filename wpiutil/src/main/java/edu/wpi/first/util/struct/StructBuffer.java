@@ -211,7 +211,7 @@ public final class StructBuffer<T> {
     }
     int nelem = len / m_structSize;
     @SuppressWarnings("unchecked")
-    T[] arr = (T[]) Array.newInstance(m_struct.getClass(), nelem);
+    T[] arr = (T[]) Array.newInstance(m_struct.getTypeClass(), nelem);
     for (int i = 0; i < nelem; i++) {
       arr[i] = m_struct.unpack(buf);
     }

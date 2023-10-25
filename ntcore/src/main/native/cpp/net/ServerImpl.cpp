@@ -1887,12 +1887,16 @@ void ServerImpl::SetLocal(LocalInterface* local) {
 }
 
 void ServerImpl::ProcessIncomingText(int clientId, std::string_view data) {
-  m_clients[clientId]->ProcessIncomingText(data);
+  if (auto client = m_clients[clientId].get()) {
+    client->ProcessIncomingText(data);
+  }
 }
 
 void ServerImpl::ProcessIncomingBinary(int clientId,
                                        std::span<const uint8_t> data) {
-  m_clients[clientId]->ProcessIncomingBinary(data);
+  if (auto client = m_clients[clientId].get()) {
+    client->ProcessIncomingBinary(data);
+  }
 }
 
 void ServerImpl::ConnectionsChanged(const std::vector<ConnectionInfo>& conns) {

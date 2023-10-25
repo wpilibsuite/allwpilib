@@ -327,8 +327,7 @@ model {
     }
 }
 
-apply from: "${rootDir}/shared/cppDesktopTestTask.gradle"
-apply from: "${rootDir}/shared/javaDesktopTestTask.gradle"
+apply from: "${rootDir}/shared/cppJavaDesktopTestTask.gradle"
 
 ext.getJniSpecClass = {
     return JniNativeLibrarySpec

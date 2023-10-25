@@ -209,6 +209,7 @@ def main():
         "0029-Use-C-20-bit-header.patch",
         "0030-Remove-DenseMap-GTest-printer-test.patch",
         "0031-Replace-deprecated-std-aligned_storage_t.patch",
+        "0032-Fix-compilation-of-MathExtras.h-on-Windows-with-sdl.patch",
     ]:
         git_am(
             os.path.join(wpilib_root, "upstream_utils/llvm_patches", f),
