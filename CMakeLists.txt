@@ -154,10 +154,10 @@ FATAL: Cannot build wpilib without wpimath.
 ")
 endif()
 
-if (NOT WITH_WPIUNITS AND WITH_WPIMATH)
+if (NOT WITH_WPIUNITS AND WITH_WPIMATH AND WITH_JAVA)
     message(FATAL_ERROR "
-FATAL: Cannot build wpimath without wpiunits.
-       Enable wpiunits by setting WITH_WPIUNITS=ON
+FATAL: Cannot build Java wpimath without wpiunits.
+       Enable wpiunits by setting WITH_WPIUNITS=ON or disable the Java build by setting WITH_JAVA=OFF
 ")
 endif()
 
@@ -300,7 +300,9 @@ if (WITH_NTCORE)
 endif()
 
 if (WITH_WPIMATH)
-    add_subdirectory(wpiunits)
+    if (WITH_JAVA)
+        add_subdirectory(wpiunits)
+    endif()
     add_subdirectory(wpimath)
 endif()
 
