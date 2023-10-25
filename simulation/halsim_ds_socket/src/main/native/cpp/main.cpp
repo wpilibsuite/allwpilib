@@ -124,6 +124,7 @@ static void SetupUdp(wpi::uv::Loop& loop) {
     });
   });
   simLoopTimer->Start(Timer::Time{100}, Timer::Time{100});
+  // DS Timeout
   int timeoutMs = 100;
   auto envTimeout = std::getenv("DS_TIMEOUT_MS");
   if (envTimeout) {
@@ -131,7 +132,7 @@ static void SetupUdp(wpi::uv::Loop& loop) {
   }
   auto autoDisableTimer = Timer::Create(loop);
   autoDisableTimer->timeout.connect([] { HALSIM_SetDriverStationEnabled(0); });
-  autoDisableTimer->Start(Timer::Time(timeoutMs));
+
   // UDP Receive then send
   udp->received.connect(
       [udpLocal = udp.get(), autoDisableTimer, timeoutMs](
