@@ -17,7 +17,8 @@
 #include <cstdio>
 #include <cstring>
 #include <string_view>
-
+#include <iostream>
+#include <exception>
 #include <DSCommPacket.h>
 #include <fmt/format.h>
 #include <hal/Extensions.h>
@@ -126,9 +127,12 @@ static void SetupUdp(wpi::uv::Loop& loop) {
   simLoopTimer->Start(Timer::Time{100}, Timer::Time{100});
   // DS Timeout
   int timeoutMs = 100;
-  auto envTimeout = std::getenv("DS_TIMEOUT_MS");
-  if (envTimeout) {
-    timeoutMs = std::stoi(envTimeout);
+  if (auto envTimeout = std::getenv("DS_TIMEOUT_MS")) {
+    try {
+      timeoutMs = std::stoi(envTimeout);
+    } catch (const std::exception& e) {
+      std::cerr << e.what() << '\n';
+    }
   }
   auto autoDisableTimer = Timer::Create(loop);
   autoDisableTimer->timeout.connect([] { HALSIM_SetDriverStationEnabled(0); });
