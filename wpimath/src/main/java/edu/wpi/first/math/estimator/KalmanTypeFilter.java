@@ -8,7 +8,7 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Num;
 import edu.wpi.first.math.numbers.N1;
 
-interface KalmanTypeFilter<States extends Num, Inputs extends Num, Outputs extends Num> {
+public interface KalmanTypeFilter<States extends Num, Inputs extends Num, Outputs extends Num> {
   Matrix<States, States> getP();
 
   double getP(int i, int j);
