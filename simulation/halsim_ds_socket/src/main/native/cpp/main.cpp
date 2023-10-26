@@ -16,8 +16,9 @@
 #include <atomic>
 #include <cstdio>
 #include <cstring>
-#include <string_view>
 #include <exception>
+#include <string_view>
+
 #include <DSCommPacket.h>
 #include <fmt/format.h>
 #include <hal/Extensions.h>
