@@ -18,8 +18,8 @@ bool ProtobufMessageDatabase::Add(std::string_view filename,
   if (file.complete) {
     file.complete = false;
 
-    m_factory.reset();
     m_msgs.clear();
+    m_factory.reset();
 
     // rebuild the pool EXCEPT for this descriptor
     m_pool = std::make_unique<google::protobuf::DescriptorPool>();
