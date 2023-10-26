@@ -14,7 +14,6 @@ import edu.wpi.first.math.system.NumericalIntegration;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 
-
 /** Represents a simulated elevator mechanism. */
 public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
   // Gearbox for the elevator.
