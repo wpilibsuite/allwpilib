@@ -128,6 +128,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
       double startingHeightMeters) {
     this(
       kG, 
+      gearbox, 
       gearing, 
       drumRadiusMeters, 
       minHeightMeters, 
