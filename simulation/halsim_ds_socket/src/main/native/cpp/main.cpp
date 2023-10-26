@@ -17,7 +17,6 @@
 #include <cstdio>
 #include <cstring>
 #include <string_view>
-#include <iostream>
 #include <exception>
 #include <DSCommPacket.h>
 #include <fmt/format.h>
@@ -131,7 +130,7 @@ static void SetupUdp(wpi::uv::Loop& loop) {
     try {
       timeoutMs = std::stoi(envTimeout);
     } catch (const std::exception& e) {
-      std::cerr << e.what() << '\n';
+      fmt::print(stderr, "Error parsing DS_TIMEOUT_MS: {}\n", e.what());
     }
   }
   auto autoDisableTimer = Timer::Create(loop);
