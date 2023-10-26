@@ -267,7 +267,7 @@ public class CommandXboxController extends CommandGenericHID {
    * @return a Trigger instance that is true when the left trigger's axis exceeds the provided
    *     threshold, attached to the given event loop
    */
-  public Trigger leftTrigger(EventLoop loop, double threshold) {
+  public Trigger leftTrigger(double threshold, EventLoop loop) {
     return m_hid.leftTrigger(threshold, loop).castTo(Trigger::new);
   }
 
@@ -282,7 +282,7 @@ public class CommandXboxController extends CommandGenericHID {
    *     button loop}.
    */
   public Trigger leftTrigger(double threshold) {
-    return leftTrigger(CommandScheduler.getInstance().getDefaultButtonLoop(), threshold);
+    return leftTrigger(threshold, CommandScheduler.getInstance().getDefaultButtonLoop());
   }
 
   /**
