@@ -23,20 +23,20 @@ public final class LinearSystemId {
    * @param motor The motor (or gearbox) attached to the carriage.
    * @param massKg The mass of the elevator carriage, in kilograms.
    * @param radiusMeters The radius of the elevator's driving drum, in meters.
-   * @param G The reduction between motor and drum, as a ratio of output to input.
+   * @param gearing The reduction between motor and drum, as a ratio of output to input.
    * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if massKg &lt;= 0, radiusMeters &lt;= 0, or G &lt;= 0.
+   * @throws IllegalArgumentException if massKg &lt;= 0, radiusMeters &lt;= 0, or gearing &lt;= 0.
    */
   public static LinearSystem<N2, N1, N1> createElevatorSystem(
-      DCMotor motor, double massKg, double radiusMeters, double G) {
+      DCMotor motor, double massKg, double radiusMeters, double gearing) {
     if (massKg <= 0.0) {
       throw new IllegalArgumentException("massKg must be greater than zero.");
     }
     if (radiusMeters <= 0.0) {
       throw new IllegalArgumentException("radiusMeters must be greater than zero.");
     }
-    if (G <= 0) {
-      throw new IllegalArgumentException("G must be greater than zero.");
+    if (gearing <= 0) {
+      throw new IllegalArgumentException("Gearing must be greater than zero.");
     }
 
     return new LinearSystem<>(
@@ -45,14 +45,14 @@ public final class LinearSystemId {
                 0,
                 1,
                 0,
-                -Math.pow(G, 2)
+                -Math.pow(gearing, 2)
                     * motor.KtNMPerAmp
                     / (motor.rOhms
                         * radiusMeters
                         * radiusMeters
                         * massKg
                         * motor.KvRadPerSecPerVolt)),
-        VecBuilder.fill(0, G * motor.KtNMPerAmp / (motor.rOhms * radiusMeters * massKg)),
+        VecBuilder.fill(0, gearing * motor.KtNMPerAmp / (motor.rOhms * radiusMeters * massKg)),
         Matrix.mat(Nat.N1(), Nat.N2()).fill(1, 0),
         new Matrix<>(Nat.N1(), Nat.N1()));
   }
@@ -63,26 +63,26 @@ public final class LinearSystemId {
    *
    * @param motor The motor (or gearbox) attached to the flywheel.
    * @param JKgMetersSquared The moment of inertia J of the flywheel.
-   * @param G The reduction between motor and drum, as a ratio of output to input.
+   * @param gearing The reduction between motor and drum, as a ratio of output to input.
    * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if JKgMetersSquared &lt;= 0 or G &lt;= 0.
+   * @throws IllegalArgumentException if JKgMetersSquared &lt;= 0 or gearing &lt;= 0.
    */
   public static LinearSystem<N1, N1, N1> createFlywheelSystem(
-      DCMotor motor, double JKgMetersSquared, double G) {
+      DCMotor motor, double JKgMetersSquared, double gearing) {
     if (JKgMetersSquared <= 0.0) {
       throw new IllegalArgumentException("J must be greater than zero.");
     }
-    if (G <= 0.0) {
-      throw new IllegalArgumentException("G must be greater than zero.");
+    if (gearing <= 0.0) {
+      throw new IllegalArgumentException("Gearing must be greater than zero.");
     }
 
     return new LinearSystem<>(
         VecBuilder.fill(
-            -G
-                * G
+            -gearing
+                * gearing
                 * motor.KtNMPerAmp
                 / (motor.KvRadPerSecPerVolt * motor.rOhms * JKgMetersSquared)),
-        VecBuilder.fill(G * motor.KtNMPerAmp / (motor.rOhms * JKgMetersSquared)),
+        VecBuilder.fill(gearing * motor.KtNMPerAmp / (motor.rOhms * JKgMetersSquared)),
         Matrix.eye(Nat.N1()),
         new Matrix<>(Nat.N1(), Nat.N1()));
   }
@@ -94,17 +94,17 @@ public final class LinearSystemId {
    *
    * @param motor The motor (or gearbox) attached to system.
    * @param JKgMetersSquared The moment of inertia J of the DC motor.
-   * @param G The reduction between motor and drum, as a ratio of output to input.
+   * @param gearing The reduction between motor and drum, as a ratio of output to input.
    * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if JKgMetersSquared &lt;= 0 or G &lt;= 0.
+   * @throws IllegalArgumentException if JKgMetersSquared &lt;= 0 or gearing &lt;= 0.
    */
   public static LinearSystem<N2, N1, N2> createDCMotorSystem(
-      DCMotor motor, double JKgMetersSquared, double G) {
+      DCMotor motor, double JKgMetersSquared, double gearing) {
     if (JKgMetersSquared <= 0.0) {
       throw new IllegalArgumentException("J must be greater than zero.");
     }
-    if (G <= 0.0) {
-      throw new IllegalArgumentException("G must be greater than zero.");
+    if (gearing <= 0.0) {
+      throw new IllegalArgumentException("Gearing must be greater than zero.");
     }
 
     return new LinearSystem<>(
@@ -113,11 +113,11 @@ public final class LinearSystemId {
                 0,
                 1,
                 0,
-                -G
-                    * G
+                -gearing
+                    * gearing
                     * motor.KtNMPerAmp
                     / (motor.KvRadPerSecPerVolt * motor.rOhms * JKgMetersSquared)),
-        VecBuilder.fill(0, G * motor.KtNMPerAmp / (motor.rOhms * JKgMetersSquared)),
+        VecBuilder.fill(0, gearing * motor.KtNMPerAmp / (motor.rOhms * JKgMetersSquared)),
         Matrix.eye(Nat.N2()),
         new Matrix<>(Nat.N2(), Nat.N1()));
   }
@@ -165,9 +165,9 @@ public final class LinearSystemId {
    * @param rMeters The radius of the wheels in meters.
    * @param rbMeters The radius of the base (half the track width) in meters.
    * @param JKgMetersSquared The moment of inertia of the robot.
-   * @param G The gearing reduction as output over input.
+   * @param gearing The gearing reduction as output over input.
    * @return A LinearSystem representing a differential drivetrain.
-   * @throws IllegalArgumentException if m &lt;= 0, r &lt;= 0, rb &lt;= 0, J &lt;= 0, or G &lt;= 0.
+   * @throws IllegalArgumentException if m &lt;= 0, r &lt;= 0, rb &lt;= 0, J &lt;= 0, or gearing &lt;= 0.
    */
   public static LinearSystem<N2, N2, N2> createDrivetrainVelocitySystem(
       DCMotor motor,
@@ -175,7 +175,7 @@ public final class LinearSystemId {
       double rMeters,
       double rbMeters,
       double JKgMetersSquared,
-      double G) {
+      double gearing) {
     if (massKg <= 0.0) {
       throw new IllegalArgumentException("massKg must be greater than zero.");
     }
@@ -188,13 +188,13 @@ public final class LinearSystemId {
     if (JKgMetersSquared <= 0.0) {
       throw new IllegalArgumentException("JKgMetersSquared must be greater than zero.");
     }
-    if (G <= 0.0) {
-      throw new IllegalArgumentException("G must be greater than zero.");
+    if (gearing <= 0.0) {
+      throw new IllegalArgumentException("Gearing must be greater than zero.");
     }
 
     var C1 =
-        -(G * G) * motor.KtNMPerAmp / (motor.KvRadPerSecPerVolt * motor.rOhms * rMeters * rMeters);
-    var C2 = G * motor.KtNMPerAmp / (motor.rOhms * rMeters);
+        -(gearing * gearing) * motor.KtNMPerAmp / (motor.KvRadPerSecPerVolt * motor.rOhms * rMeters * rMeters);
+    var C2 = gearing * motor.KtNMPerAmp / (motor.rOhms * rMeters);
 
     final double C3 = 1 / massKg + rbMeters * rbMeters / JKgMetersSquared;
     final double C4 = 1 / massKg - rbMeters * rbMeters / JKgMetersSquared;
@@ -212,17 +212,17 @@ public final class LinearSystemId {
    *
    * @param motor The motor (or gearbox) attached to the arm.
    * @param JKgSquaredMeters The moment of inertia J of the arm.
-   * @param G The gearing between the motor and arm, in output over input. Most of the time this
+   * @param gearing The gearing between the motor and arm, in output over input. Most of the time this
    *     will be greater than 1.
    * @return A LinearSystem representing the given characterized constants.
    */
   public static LinearSystem<N2, N1, N1> createSingleJointedArmSystem(
-      DCMotor motor, double JKgSquaredMeters, double G) {
+      DCMotor motor, double JKgSquaredMeters, double gearing) {
     if (JKgSquaredMeters <= 0.0) {
       throw new IllegalArgumentException("JKgSquaredMeters must be greater than zero.");
     }
-    if (G <= 0.0) {
-      throw new IllegalArgumentException("G must be greater than zero.");
+    if (gearing <= 0.0) {
+      throw new IllegalArgumentException("Gearing must be greater than zero.");
     }
 
     return new LinearSystem<>(
@@ -231,10 +231,10 @@ public final class LinearSystemId {
                 0,
                 1,
                 0,
-                -Math.pow(G, 2)
+                -Math.pow(gearing, 2)
                     * motor.KtNMPerAmp
                     / (motor.KvRadPerSecPerVolt * motor.rOhms * JKgSquaredMeters)),
-        VecBuilder.fill(0, G * motor.KtNMPerAmp / (motor.rOhms * JKgSquaredMeters)),
+        VecBuilder.fill(0, gearing * motor.KtNMPerAmp / (motor.rOhms * JKgSquaredMeters)),
         Matrix.mat(Nat.N1(), Nat.N2()).fill(1, 0),
         new Matrix<>(Nat.N1(), Nat.N1()));
   }
