@@ -17,7 +17,7 @@ class Pose2dTest {
 
   @Test
   void testNewWithMeasures() {
-    var pose = new Pose2d(Units.Inches.of(6), Units.Inches.of(8), Units.Degrees.of(45));
+    var pose = new Pose2d(Units.Inches.of(6), Units.Inches.of(8), Rotation2d.fromDegrees(45));
 
     assertEquals(0.1524, pose.getX(), kEpsilon);
     assertEquals(0.2032, pose.getY(), kEpsilon);
