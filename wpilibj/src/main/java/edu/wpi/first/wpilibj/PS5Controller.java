@@ -24,7 +24,7 @@ public class PS5Controller extends GenericHID {
    */
   public PS5Controller(int port) {
     super(port);
-    HAL.report(tResourceType.kResourceType_PS5Controller, port + 1);
+    // HAL.report(tResourceType.kResourceType_PS5Controller, port + 1);
   }
 
   /** Represents a digital button on a PS5Controller. */
