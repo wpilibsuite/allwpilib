@@ -143,6 +143,16 @@ CommandPtr Select(std::function<Key()> selector,
 }
 
 /**
+ * Runs the command supplied by the supplier.
+ *
+ * @param supplier the command supplier
+ * @param requirements the set of requirements for this command
+ */
+[[nodiscard]]
+CommandPtr Defer(wpi::unique_function<CommandPtr()> supplier,
+                 Requirements requirements);
+
+/**
  * Constructs a command that schedules the command returned from the supplier
  * when initialized, and ends when it is no longer scheduled. The supplier is
  * called when the command is initialized.
