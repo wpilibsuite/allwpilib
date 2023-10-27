@@ -129,7 +129,7 @@ public class PoseEstimator<T extends WheelPositions<T>> {
   public Optional<Pose2d> sampleAt(double timestamp) {
     return m_poseBuffer
         .getSample(timestamp)
-        .map(sample -> sample.exp(m_odometry.getPoseMeters().log(m_poseEstimate)));
+        .map(sample -> sample.plus(new Transform2d(m_odometry.getPoseMeters(), m_poseEstimate)));
   }
 
   /**
