@@ -7,6 +7,7 @@ package edu.wpi.first.wpilibj2.command;
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
@@ -150,6 +151,18 @@ public final class Commands {
    */
   public static Command select(Map<Object, Command> commands, Supplier<Object> selector) {
     return new SelectCommand(commands, selector);
+  }
+
+  /**
+   * Runs the command supplied by the supplier.
+   *
+   * @param supplier the command supplier
+   * @param requirements the set of requirements for this command
+   * @return the command
+   * @see DeferredCommand
+   */
+  public static Command defer(Supplier<Command> supplier, Set<Subsystem> requirements) {
+    return new DeferredCommand(supplier, requirements);
   }
 
   /**
