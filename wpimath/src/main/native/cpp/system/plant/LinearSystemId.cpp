@@ -25,7 +25,8 @@ LinearSystem<2, 1, 1> LinearSystemId::ElevatorSystem(DCMotor motor,
       {0.0, (-std::pow(gearing, 2) * motor.Kt /
              (motor.R * units::math::pow<2>(radius) * mass * motor.Kv))
                 .value()}};
-  Matrixd<2, 1> B{0.0, (gearing * motor.Kt / (motor.R * radius * mass)).value()};
+  Matrixd<2, 1> B{0.0,
+                  (gearing * motor.Kt / (motor.R * radius * mass)).value()};
   Matrixd<1, 2> C{1.0, 0.0};
   Matrixd<1, 1> D{0.0};
 
@@ -43,7 +44,8 @@ LinearSystem<2, 1, 1> LinearSystemId::SingleJointedArmSystem(
 
   Matrixd<2, 2> A{
       {0.0, 1.0},
-      {0.0, (-std::pow(gearing, 2) * motor.Kt / (motor.Kv * motor.R * J)).value()}};
+      {0.0,
+       (-std::pow(gearing, 2) * motor.Kt / (motor.Kv * motor.R * J)).value()}};
   Matrixd<2, 1> B{0.0, (gearing * motor.Kt / (motor.R * J)).value()};
   Matrixd<1, 2> C{1.0, 0.0};
   Matrixd<1, 1> D{0.0};
@@ -147,7 +149,8 @@ LinearSystem<2, 1, 2> LinearSystemId::DCMotorSystem(
 
   Matrixd<2, 2> A{
       {0.0, 1.0},
-      {0.0, (-std::pow(gearing, 2) * motor.Kt / (motor.Kv * motor.R * J)).value()}};
+      {0.0,
+       (-std::pow(gearing, 2) * motor.Kt / (motor.Kv * motor.R * J)).value()}};
   Matrixd<2, 1> B{0.0, (gearing * motor.Kt / (motor.R * J)).value()};
   Matrixd<2, 2> C{{1.0, 0.0}, {0.0, 1.0}};
   Matrixd<2, 1> D{0.0, 0.0};

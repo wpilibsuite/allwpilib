@@ -167,7 +167,8 @@ public final class LinearSystemId {
    * @param JKgMetersSquared The moment of inertia of the robot.
    * @param gearing The gearing reduction as output over input.
    * @return A LinearSystem representing a differential drivetrain.
-   * @throws IllegalArgumentException if m &lt;= 0, r &lt;= 0, rb &lt;= 0, J &lt;= 0, or gearing &lt;= 0.
+   * @throws IllegalArgumentException if m &lt;= 0, r &lt;= 0, rb &lt;= 0, J &lt;= 0, or gearing
+   *     &lt;= 0.
    */
   public static LinearSystem<N2, N2, N2> createDrivetrainVelocitySystem(
       DCMotor motor,
@@ -193,7 +194,9 @@ public final class LinearSystemId {
     }
 
     var C1 =
-        -(gearing * gearing) * motor.KtNMPerAmp / (motor.KvRadPerSecPerVolt * motor.rOhms * rMeters * rMeters);
+        -(gearing * gearing)
+            * motor.KtNMPerAmp
+            / (motor.KvRadPerSecPerVolt * motor.rOhms * rMeters * rMeters);
     var C2 = gearing * motor.KtNMPerAmp / (motor.rOhms * rMeters);
 
     final double C3 = 1 / massKg + rbMeters * rbMeters / JKgMetersSquared;
@@ -212,8 +215,8 @@ public final class LinearSystemId {
    *
    * @param motor The motor (or gearbox) attached to the arm.
    * @param JKgSquaredMeters The moment of inertia J of the arm.
-   * @param gearing The gearing between the motor and arm, in output over input. Most of the time this
-   *     will be greater than 1.
+   * @param gearing The gearing between the motor and arm, in output over input. Most of the time
+   *     this will be greater than 1.
    * @return A LinearSystem representing the given characterized constants.
    */
   public static LinearSystem<N2, N1, N1> createSingleJointedArmSystem(
