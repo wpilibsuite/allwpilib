@@ -38,12 +38,12 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * @param motor The motor (or gearbox) attached to the carriage.
    * @param mass The mass of the elevator carriage, in kilograms.
    * @param radius The radius of the elevator's driving drum, in meters.
-   * @param G Gear ratio from motor to carriage.
-   * @throws std::domain_error if mass <= 0, radius <= 0, or G <= 0.
+   * @param gearing Gear ratio from motor to carriage.
+   * @throws std::domain_error if mass <= 0, radius <= 0, or gearing <= 0.
    */
   static LinearSystem<2, 1, 1> ElevatorSystem(DCMotor motor,
                                               units::kilogram_t mass,
-                                              units::meter_t radius, double G);
+                                              units::meter_t radius, double gearing);
 
   /**
    * Create a state-space model of a single-jointed arm system.The states of the
@@ -52,11 +52,11 @@ class WPILIB_DLLEXPORT LinearSystemId {
    *
    * @param motor The motor (or gearbox) attached to the arm.
    * @param J The moment of inertia J of the arm.
-   * @param G Gear ratio from motor to arm.
-   * @throws std::domain_error if J <= 0 or G <= 0.
+   * @param gearing Gear ratio from motor to arm.
+   * @throws std::domain_error if J <= 0 or gearing <= 0.
    */
   static LinearSystem<2, 1, 1> SingleJointedArmSystem(
-      DCMotor motor, units::kilogram_square_meter_t J, double G);
+      DCMotor motor, units::kilogram_square_meter_t J, double gearing);
 
   /**
    * Create a state-space model for a 1 DOF velocity system from its kV
@@ -198,12 +198,12 @@ class WPILIB_DLLEXPORT LinearSystemId {
    *
    * @param motor The motor (or gearbox) attached to the flywheel.
    * @param J The moment of inertia J of the flywheel.
-   * @param G Gear ratio from motor to flywheel.
-   * @throws std::domain_error if J <= 0 or G <= 0.
+   * @param gearing Gear ratio from motor to flywheel.
+   * @throws std::domain_error if J <= 0 or gearing <= 0.
    */
   static LinearSystem<1, 1, 1> FlywheelSystem(DCMotor motor,
                                               units::kilogram_square_meter_t J,
-                                              double G);
+                                              double gearing);
 
   /**
    * Create a state-space model of a DC motor system. The states of the system
@@ -212,12 +212,12 @@ class WPILIB_DLLEXPORT LinearSystemId {
    *
    * @param motor The motor (or gearbox) attached to the system.
    * @param J the moment of inertia J of the DC motor.
-   * @param G Gear ratio from motor to output.
-   * @throws std::domain_error if J <= 0 or G <= 0.
+   * @param gearing Gear ratio from motor to output.
+   * @throws std::domain_error if J <= 0 or gearing <= 0.
    */
   static LinearSystem<2, 1, 2> DCMotorSystem(DCMotor motor,
                                              units::kilogram_square_meter_t J,
-                                             double G);
+                                             double gearing);
 
   /**
    * Create a state-space model of a DC motor system from its kV
@@ -271,13 +271,13 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * @param r The radius of the wheels in meters.
    * @param rb The radius of the base (half of the track width), in meters.
    * @param J The moment of inertia of the robot.
-   * @param G Gear ratio from motor to wheel.
+   * @param gearing Gear ratio from motor to wheel.
    * @throws std::domain_error if mass <= 0, r <= 0, rb <= 0, J <= 0, or
-   *         G <= 0.
+   *         gearing <= 0.
    */
   static LinearSystem<2, 2, 2> DrivetrainVelocitySystem(
       const DCMotor& motor, units::kilogram_t mass, units::meter_t r,
-      units::meter_t rb, units::kilogram_square_meter_t J, double G);
+      units::meter_t rb, units::kilogram_square_meter_t J, double gearing);
 };
 
 }  // namespace frc
