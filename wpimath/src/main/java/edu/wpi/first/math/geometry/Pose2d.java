@@ -12,7 +12,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.proto.Geometry2D.ProtobufPose2d;
-import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.util.protobuf.Protobuf;
@@ -71,8 +70,8 @@ public class Pose2d implements Interpolatable<Pose2d> {
    * @param y The y component of the translational component of the pose.
    * @param rotation The rotational component of the pose.
    */
-  public Pose2d(Measure<Distance> x, Measure<Distance> y, Measure<Angle> rotation) {
-    this(x.in(Meters), y.in(Meters), new Rotation2d(rotation));
+  public Pose2d(Measure<Distance> x, Measure<Distance> y, Rotation2d rotation) {
+    this(x.in(Meters), y.in(Meters), rotation);
   }
 
   /**

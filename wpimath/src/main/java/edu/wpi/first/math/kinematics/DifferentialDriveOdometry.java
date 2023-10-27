@@ -10,7 +10,6 @@ import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 
@@ -55,15 +54,11 @@ public class DifferentialDriveOdometry extends Odometry<DifferentialDriveWheelPo
    * @param initialPoseMeters The starting position of the robot on the field.
    */
   public DifferentialDriveOdometry(
-      Measure<Angle> gyroAngle,
+      Rotation2d gyroAngle,
       Measure<Distance> leftDistance,
       Measure<Distance> rightDistance,
       Pose2d initialPoseMeters) {
-    this(
-        new Rotation2d(gyroAngle),
-        leftDistance.in(Meters),
-        rightDistance.in(Meters),
-        initialPoseMeters);
+    this(gyroAngle, leftDistance.in(Meters), rightDistance.in(Meters), initialPoseMeters);
   }
 
   /**
@@ -86,7 +81,7 @@ public class DifferentialDriveOdometry extends Odometry<DifferentialDriveWheelPo
    * @param rightDistance The distance traveled by the right encoder.
    */
   public DifferentialDriveOdometry(
-      Measure<Angle> gyroAngle, Measure<Distance> leftDistance, Measure<Distance> rightDistance) {
+      Rotation2d gyroAngle, Measure<Distance> leftDistance, Measure<Distance> rightDistance) {
     this(gyroAngle, leftDistance, rightDistance, new Pose2d());
   }
 
@@ -124,12 +119,11 @@ public class DifferentialDriveOdometry extends Odometry<DifferentialDriveWheelPo
    * @param poseMeters The position on the field that your robot is at.
    */
   public void resetPosition(
-      Measure<Angle> gyroAngle,
+      Rotation2d gyroAngle,
       Measure<Distance> leftDistance,
       Measure<Distance> rightDistance,
       Pose2d poseMeters) {
-    resetPosition(
-        new Rotation2d(gyroAngle), leftDistance.in(Meters), rightDistance.in(Meters), poseMeters);
+    resetPosition(gyroAngle, leftDistance.in(Meters), rightDistance.in(Meters), poseMeters);
   }
 
   /**

@@ -190,12 +190,9 @@ public class ChassisSpeeds {
       Measure<Velocity<Distance>> vx,
       Measure<Velocity<Distance>> vy,
       Measure<Velocity<Angle>> omega,
-      Measure<Angle> robotAngle) {
+      Rotation2d robotAngle) {
     return fromFieldRelativeSpeeds(
-        vx.in(MetersPerSecond),
-        vy.in(MetersPerSecond),
-        omega.in(RadiansPerSecond),
-        new Rotation2d(robotAngle));
+        vx.in(MetersPerSecond), vy.in(MetersPerSecond), omega.in(RadiansPerSecond), robotAngle);
   }
 
   /**
@@ -261,12 +258,9 @@ public class ChassisSpeeds {
       Measure<Velocity<Distance>> vx,
       Measure<Velocity<Distance>> vy,
       Measure<Velocity<Angle>> omega,
-      Measure<Angle> robotAngle) {
+      Rotation2d robotAngle) {
     return fromRobotRelativeSpeeds(
-        vx.in(MetersPerSecond),
-        vy.in(MetersPerSecond),
-        omega.in(RadiansPerSecond),
-        new Rotation2d(robotAngle));
+        vx.in(MetersPerSecond), vy.in(MetersPerSecond), omega.in(RadiansPerSecond), robotAngle);
   }
 
   /**

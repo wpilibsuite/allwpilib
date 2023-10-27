@@ -9,7 +9,6 @@ import static edu.wpi.first.units.Units.Meters;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.interpolation.Interpolatable;
-import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import java.util.Objects;
@@ -43,8 +42,8 @@ public class SwerveModulePosition
    * @param distance The distance measured by the wheel of the module.
    * @param angle The angle of the module.
    */
-  public SwerveModulePosition(Measure<Distance> distance, Measure<Angle> angle) {
-    this(distance.in(Meters), new Rotation2d(angle));
+  public SwerveModulePosition(Measure<Distance> distance, Rotation2d angle) {
+    this(distance.in(Meters), angle);
   }
 
   @Override

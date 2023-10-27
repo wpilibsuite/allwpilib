@@ -7,7 +7,6 @@ package edu.wpi.first.math.kinematics;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
@@ -41,8 +40,8 @@ public class SwerveModuleState implements Comparable<SwerveModuleState> {
    * @param speed The speed of the wheel of the module.
    * @param angle The angle of the module.
    */
-  public SwerveModuleState(Measure<Velocity<Distance>> speed, Measure<Angle> angle) {
-    this(speed.in(MetersPerSecond), new Rotation2d(angle));
+  public SwerveModuleState(Measure<Velocity<Distance>> speed, Rotation2d angle) {
+    this(speed.in(MetersPerSecond), angle);
   }
 
   @Override
