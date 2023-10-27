@@ -16,7 +16,7 @@ public class PoseEstimationTestUtils {
    * akin to Poses, while their difference is akin to Twists.
    */
   protected static class SE2KinematicPrimitive implements WheelPositions<SE2KinematicPrimitive> {
-    private Pose2d pose;
+    private final Pose2d pose;
 
     public SE2KinematicPrimitive(final Pose2d pose) {
       this.pose = pose;
@@ -28,19 +28,17 @@ public class PoseEstimationTestUtils {
     }
 
     @Override
-    public SE2KinematicPrimitive minus(SE2KinematicPrimitive other) {
-      return new SE2KinematicPrimitive(new Pose2d().exp(other.pose.log(this.pose)));
-    }
+    public SE2KinematicPrimitive interpolate(SE2KinematicPrimitive end, double t) {
+      var twist = this.pose.log(end.pose);
+      var scaled = new Twist2d(twist.dx * t, twist.dy * t, twist.dtheta * t);
 
-    @Override
-    public SE2KinematicPrimitive interpolate(SE2KinematicPrimitive endValue, double t) {
-      return new SE2KinematicPrimitive(this.pose.interpolate(endValue.pose, t));
+      return new SE2KinematicPrimitive(this.pose.exp(scaled));
     }
   }
 
   protected static class SE2Kinematics
       implements Kinematics<SE2KinematicPrimitive, SE2KinematicPrimitive> {
-    private double timeConstant;
+    private final double timeConstant;
 
     public SE2Kinematics(double timeConstant) {
       this.timeConstant = timeConstant;
@@ -48,7 +46,7 @@ public class PoseEstimationTestUtils {
 
     @Override
     public ChassisSpeeds toChassisSpeeds(SE2KinematicPrimitive wheelSpeeds) {
-      var twist = toTwist2d(wheelSpeeds);
+      var twist = new Pose2d().log(wheelSpeeds.pose);
 
       return new ChassisSpeeds(
           twist.dx * timeConstant, twist.dy * timeConstant, twist.dtheta * timeConstant);
@@ -66,8 +64,8 @@ public class PoseEstimationTestUtils {
     }
 
     @Override
-    public Twist2d toTwist2d(SE2KinematicPrimitive wheelDeltas) {
-      return new Pose2d().log(wheelDeltas.pose);
+    public Twist2d toTwist2d(SE2KinematicPrimitive start, SE2KinematicPrimitive end) {
+      return start.pose.log(end.pose);
     }
   }
 }

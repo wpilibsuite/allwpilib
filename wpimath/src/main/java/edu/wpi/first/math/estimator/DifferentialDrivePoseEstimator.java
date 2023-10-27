@@ -27,6 +27,7 @@ import edu.wpi.first.math.numbers.N3;
  * <p>{@link DifferentialDrivePoseEstimator#addVisionMeasurement} can be called as infrequently as
  * you want; if you never call it then this class will behave exactly like regular encoder odometry.
  */
+@SuppressWarnings("PMD.UnusedFormalParameter")
 public class DifferentialDrivePoseEstimator extends PoseEstimator<DifferentialDriveWheelPositions> {
   /**
    * Constructs a DifferentialDrivePoseEstimator with default standard deviations for the model and

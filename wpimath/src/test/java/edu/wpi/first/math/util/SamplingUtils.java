@@ -10,7 +10,9 @@ import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.numbers.N3;
 import java.util.Random;
 
-public class SamplingUtils {
+public final class SamplingUtils {
+  private SamplingUtils() {}
+
   public static Rotation2d sampleRotation2d(Random rand, double stdev) {
     return Rotation2d.fromRadians(rand.nextGaussian() * stdev);
   }
