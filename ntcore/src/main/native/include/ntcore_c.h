@@ -1436,6 +1436,44 @@ NT_Listener NT_AddPolledLogger(NT_ListenerPoller poller, unsigned int min_level,
 /** @} */
 
 /**
+ * @defgroup ntcore_schema_cfunc Schema Functions
+ * @{
+ */
+
+/**
+ * Returns whether there is a data schema already registered with the given
+ * name. This does NOT perform a check as to whether the schema has already
+ * been published by another node on the network.
+ *
+ * @param inst instance
+ * @param name Name (the string passed as the data type for topics using this
+ *             schema)
+ * @return True if schema already registered
+ */
+NT_Bool NT_HasSchema(NT_Inst inst, const char* name);
+
+/**
+ * Registers a data schema.  Data schemas provide information for how a
+ * certain data type string can be decoded.  The type string of a data schema
+ * indicates the type of the schema itself (e.g. "protobuf" for protobuf
+ * schemas, "struct" for struct schemas, etc). In NetworkTables, schemas are
+ * published just like normal topics, with the name being generated from the
+ * provided name: "/.schema/<name>".  Duplicate calls to this function with
+ * the same name are silently ignored.
+ *
+ * @param inst instance
+ * @param name Name (the string passed as the data type for topics using this
+ *             schema)
+ * @param type Type of schema (e.g. "protobuf", "struct", etc)
+ * @param schema Schema data
+ * @param schemaSize Size of schema data
+ */
+void NT_AddSchema(NT_Inst inst, const char* name, const char* type,
+                  const uint8_t* schema, size_t schemaSize);
+
+/** @} */
+
+/**
  * @defgroup ntcore_interop_cfunc Interop Utility Functions
  * @{
  */

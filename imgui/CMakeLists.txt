@@ -69,15 +69,19 @@ endif()
 file(GLOB imgui_sources ${imgui_SOURCE_DIR}/*.cpp ${imgui_SOURCE_DIR}/misc/cpp/*.cpp)
 file(GLOB implot_sources ${implot_SOURCE_DIR}/*.cpp)
 file(GLOB fonts_sources ${fonts_SOURCE_DIR}/src/*.cpp)
-add_library(imgui STATIC
+set(imgui_all_sources
     ${imgui_sources}
     ${implot_sources}
     ${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.cpp
     ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
     ${gl3w_BINARY_DIR}/src/gl3w.c
     ${fonts_sources}
-    src/stb_image.cpp
-)
+    src/stb_image.cpp)
+if (MSVC)
+  add_library(imgui STATIC ${imgui_all_sources})
+else()
+  add_library(imgui ${imgui_all_sources})
+endif()
 target_compile_definitions(imgui PUBLIC IMGUI_IMPL_OPENGL_LOADER_GL3W)
 if (MSVC)
     target_sources(imgui PRIVATE ${imgui_SOURCE_DIR}/backends/imgui_impl_dx11.cpp)

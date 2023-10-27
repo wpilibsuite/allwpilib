@@ -48,7 +48,7 @@ class WebSocketConnection::Stream final : public wpi::raw_ostream {
 };
 
 void WebSocketConnection::Stream::write_impl(const char* data, size_t len) {
-  if (len > kAllocSize) {
+  if (len >= kAllocSize) {
     // only called by raw_ostream::write() when the buffer is empty and a large
     // thing is being written; called with a length that's a multiple of the
     // alloc size
@@ -84,15 +84,7 @@ void WebSocketConnection::Stream::write_impl(const char* data, size_t len) {
 
 WebSocketConnection::WebSocketConnection(wpi::WebSocket& ws,
                                          unsigned int version)
-    : m_ws{ws}, m_version{version} {
-  m_ws.pong.connect([this](auto data) {
-    if (data.size() != 8) {
-      return;
-    }
-    m_lastPingResponse =
-        wpi::support::endian::read64<wpi::support::native>(data.data());
-  });
-}
+    : m_ws{ws}, m_version{version} {}
 
 WebSocketConnection::~WebSocketConnection() {
   for (auto&& buf : m_bufs) {
@@ -101,6 +93,18 @@ WebSocketConnection::~WebSocketConnection() {
   for (auto&& buf : m_buf_pool) {
     buf.Deallocate();
   }
+}
+
+void WebSocketConnection::Start() {
+  m_ws.pong.connect([selfweak = weak_from_this()](auto data) {
+    if (data.size() != 8) {
+      return;
+    }
+    if (auto self = selfweak.lock()) {
+      self->m_lastPingResponse =
+          wpi::support::endian::read64<wpi::support::native>(data.data());
+    }
+  });
 }
 
 void WebSocketConnection::SendPing(uint64_t time) {
@@ -186,7 +190,8 @@ int WebSocketConnection::Flush() {
   m_ws_frames.reserve(m_frames.size());
   for (auto&& frame : m_frames) {
     m_ws_frames.emplace_back(
-        frame.opcode, std::span{&m_bufs[frame.start], &m_bufs[frame.end]});
+        frame.opcode,
+        std::span{m_bufs}.subspan(frame.start, frame.end - frame.start));
   }
 
   auto unsentFrames = m_ws.TrySendFrames(

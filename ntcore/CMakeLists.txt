@@ -54,6 +54,11 @@ if (WITH_JAVA)
     include(UseJava)
     set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
 
+    file(GLOB QUICKBUF_JAR
+        ${WPILIB_BINARY_DIR}/wpiutil/thirdparty/quickbuf/*.jar)
+
+    set(CMAKE_JAVA_INCLUDE_PATH wpimath.jar ${QUICKBUF_JAR})
+
     file(GLOB ntcore_jni_src
         src/main/native/cpp/jni/*.cpp
         ${WPILIB_BINARY_DIR}/ntcore/generated/main/native/cpp/jni/*.cpp)

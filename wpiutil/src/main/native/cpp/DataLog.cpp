@@ -31,6 +31,7 @@
 #include "wpi/Endian.h"
 #include "wpi/Logger.h"
 #include "wpi/MathExtras.h"
+#include "wpi/SmallString.h"
 #include "wpi/fs.h"
 #include "wpi/timestamp.h"
 
@@ -209,6 +210,33 @@ void DataLog::Pause() {
 void DataLog::Resume() {
   std::scoped_lock lock{m_mutex};
   m_paused = false;
+}
+
+bool DataLog::HasSchema(std::string_view name) const {
+  std::scoped_lock lock{m_mutex};
+  wpi::SmallString<128> fullName{"/.schema/"};
+  fullName += name;
+  auto it = m_entries.find(fullName);
+  return it != m_entries.end();
+}
+
+void DataLog::AddSchema(std::string_view name, std::string_view type,
+                        std::span<const uint8_t> schema, int64_t timestamp) {
+  std::scoped_lock lock{m_mutex};
+  wpi::SmallString<128> fullName{"/.schema/"};
+  fullName += name;
+  auto& entryInfo = m_entries[fullName];
+  if (entryInfo.id != 0) {
+    return;  // don't add duplicates
+  }
+  int entry = StartImpl(fullName, type, {}, timestamp);
+
+  // inline AppendRaw() without releasing lock
+  if (entry <= 0) {
+    [[unlikely]] return;  // should never happen, but check anyway
+  }
+  StartRecord(entry, timestamp, schema.size(), 0);
+  AppendImpl(schema);
 }
 
 static void WriteToFile(fs::file_t f, std::span<const uint8_t> data,
@@ -484,6 +512,11 @@ void DataLog::WriterThreadMain(
 int DataLog::Start(std::string_view name, std::string_view type,
                    std::string_view metadata, int64_t timestamp) {
   std::scoped_lock lock{m_mutex};
+  return StartImpl(name, type, metadata, timestamp);
+}
+
+int DataLog::StartImpl(std::string_view name, std::string_view type,
+                       std::string_view metadata, int64_t timestamp) {
   auto& entryInfo = m_entries[name];
   if (entryInfo.id == 0) {
     entryInfo.id = ++m_lastId;

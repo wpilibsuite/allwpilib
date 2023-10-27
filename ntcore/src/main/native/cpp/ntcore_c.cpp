@@ -625,6 +625,15 @@ NT_Listener NT_AddPolledLogger(NT_ListenerPoller poller, unsigned int min_level,
   return nt::AddPolledLogger(poller, min_level, max_level);
 }
 
+NT_Bool NT_HasSchema(NT_Inst inst, const char* name) {
+  return nt::HasSchema(inst, name);
+}
+
+void NT_AddSchema(NT_Inst inst, const char* name, const char* type,
+                  const uint8_t* schema, size_t schemaSize) {
+  nt::AddSchema(inst, name, type, {schema, schemaSize});
+}
+
 void NT_DisposeValue(NT_Value* value) {
   switch (value->type) {
     case NT_UNASSIGNED:

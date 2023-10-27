@@ -232,7 +232,7 @@ public class PWM implements Sendable, AutoCloseable {
     PWMJNI.latchPWMZero(m_handle);
   }
 
-  /** Sets the PWM output to be a continous high signal while enabled. */
+  /** Sets the PWM output to be a continuous high signal while enabled. */
   public void setAlwaysHighMode() {
     PWMJNI.setAlwaysHighMode(m_handle);
   }

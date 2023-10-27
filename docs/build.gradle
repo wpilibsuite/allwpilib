@@ -142,6 +142,8 @@ doxygen {
     //TODO: building memory docs causes search to break
     exclude 'wpi/memory/**'
 
+    exclude '*.pb.h'
+
     aliases 'effects=\\par <i>Effects:</i>^^',
             'notes=\\par <i>Notes:</i>^^',
             'requires=\\par <i>Requires:</i>^^',
@@ -233,6 +235,7 @@ task generateJavaDocs(type: Javadoc) {
     source project(':wpilibj').sourceSets.main.java
     source project(':wpimath').sourceSets.main.java
     source project(':wpinet').sourceSets.main.java
+    source project(':wpiunits').sourceSets.main.java
     source project(':wpiutil').sourceSets.main.java
     source configurations.javaSource.collect { zipTree(it) }
     include '**/*.java'

@@ -29,6 +29,7 @@ public final class UnitBuilder<U extends Unit<U>> {
    * (base value - offset).
    *
    * @param offset the offset
+   * @return this builder
    */
   public UnitBuilder<U> offset(double offset) {
     m_toBase = derivedValue -> derivedValue + offset;

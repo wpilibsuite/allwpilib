@@ -7,19 +7,27 @@
 #include <stdint.h>
 
 #ifdef __cplusplus
+#include <concepts>
 #include <functional>
 #include <initializer_list>
 #include <memory>
+#include <ranges>
 #include <span>
 #include <string>
 #include <string_view>
 #include <thread>
+#include <utility>
 #include <vector>
+#include <version>
 
 #include "wpi/DenseMap.h"
+#include "wpi/SmallVector.h"
 #include "wpi/StringMap.h"
 #include "wpi/condition_variable.h"
 #include "wpi/mutex.h"
+#include "wpi/protobuf/Protobuf.h"
+#include "wpi/struct/Struct.h"
+#include "wpi/timestamp.h"
 #endif  // __cplusplus
 
 /**
@@ -169,6 +177,95 @@ class DataLog final {
    * Resumes appending of data records to the log.
    */
   void Resume();
+
+  /**
+   * Returns whether there is a data schema already registered with the given
+   * name.
+   *
+   * @param name Name (the string passed as the data type for records using this
+   *             schema)
+   * @return True if schema already registered
+   */
+  bool HasSchema(std::string_view name) const;
+
+  /**
+   * Registers a data schema.  Data schemas provide information for how a
+   * certain data type string can be decoded.  The type string of a data schema
+   * indicates the type of the schema itself (e.g. "protobuf" for protobuf
+   * schemas, "struct" for struct schemas, etc). In the data log, schemas are
+   * saved just like normal records, with the name being generated from the
+   * provided name: "/.schema/<name>".  Duplicate calls to this function with
+   * the same name are silently ignored.
+   *
+   * @param name Name (the string passed as the data type for records using this
+   *             schema)
+   * @param type Type of schema (e.g. "protobuf", "struct", etc)
+   * @param schema Schema data
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void AddSchema(std::string_view name, std::string_view type,
+                 std::span<const uint8_t> schema, int64_t timestamp = 0);
+
+  /**
+   * Registers a data schema.  Data schemas provide information for how a
+   * certain data type string can be decoded.  The type string of a data schema
+   * indicates the type of the schema itself (e.g. "protobuf" for protobuf
+   * schemas, "struct" for struct schemas, etc). In the data log, schemas are
+   * saved just like normal records, with the name being generated from the
+   * provided name: "/.schema/<name>".  Duplicate calls to this function with
+   * the same name are silently ignored.
+   *
+   * @param name Name (the string passed as the data type for records using this
+   *             schema)
+   * @param type Type of schema (e.g. "protobuf", "struct", etc)
+   * @param schema Schema data
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void AddSchema(std::string_view name, std::string_view type,
+                 std::string_view schema, int64_t timestamp = 0) {
+    AddSchema(
+        name, type,
+        std::span<const uint8_t>{
+            reinterpret_cast<const uint8_t*>(schema.data()), schema.size()},
+        timestamp);
+  }
+
+  /**
+   * Registers a protobuf schema. Duplicate calls to this function with the same
+   * name are silently ignored.
+   *
+   * @tparam T protobuf serializable type
+   * @param msg protobuf message
+   * @param timestamp Time stamp (0 to indicate now)
+   */
+  template <ProtobufSerializable T>
+  void AddProtobufSchema(ProtobufMessage<T>& msg, int64_t timestamp = 0) {
+    if (timestamp == 0) {
+      timestamp = Now();
+    }
+    msg.ForEachProtobufDescriptor(
+        [this](auto typeString) { return HasSchema(typeString); },
+        [this, timestamp](auto typeString, auto schema) {
+          AddSchema(typeString, "proto:FileDescriptorProto", schema, timestamp);
+        });
+  }
+
+  /**
+   * Registers a struct schema. Duplicate calls to this function with the same
+   * name are silently ignored.
+   *
+   * @tparam T struct serializable type
+   * @param timestamp Time stamp (0 to indicate now)
+   */
+  template <StructSerializable T>
+  void AddStructSchema(int64_t timestamp = 0) {
+    if (timestamp == 0) {
+      timestamp = Now();
+    }
+    ForEachStructSchema<T>([this, timestamp](auto typeString, auto schema) {
+      AddSchema(typeString, "structschema", schema, timestamp);
+    });
+  }
 
   /**
    * Start an entry.  Duplicate names are allowed (with the same type), and
@@ -364,6 +461,8 @@ class DataLog final {
       std::function<void(std::span<const uint8_t> data)> write);
 
   // must be called with m_mutex held
+  int StartImpl(std::string_view name, std::string_view type,
+                std::string_view metadata, int64_t timestamp);
   uint8_t* StartRecord(uint32_t entry, uint64_t timestamp, uint32_t payloadSize,
                        size_t reserveSize);
   uint8_t* Reserve(size_t size);
@@ -819,6 +918,128 @@ class StringArrayLogEntry : public DataLogEntry {
     Append(std::span<const std::string_view>{arr.begin(), arr.end()},
            timestamp);
   }
+};
+
+/**
+ * Log raw struct serializable objects.
+ */
+template <StructSerializable T>
+class StructLogEntry : public DataLogEntry {
+  using S = Struct<T>;
+
+ public:
+  StructLogEntry() = default;
+  StructLogEntry(DataLog& log, std::string_view name, int64_t timestamp = 0)
+      : StructLogEntry{log, name, {}, timestamp} {}
+  StructLogEntry(DataLog& log, std::string_view name, std::string_view metadata,
+                 int64_t timestamp = 0) {
+    m_log = &log;
+    log.AddStructSchema<T>(timestamp);
+    m_entry = log.Start(name, S::kTypeString, metadata, timestamp);
+  }
+
+  /**
+   * Appends a record to the log.
+   *
+   * @param data Data to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void Append(const T& data, int64_t timestamp = 0) {
+    uint8_t buf[S::kSize];
+    S::Pack(buf, data);
+    m_log->AppendRaw(m_entry, buf, timestamp);
+  }
+};
+
+/**
+ * Log raw struct serializable array of objects.
+ */
+template <StructSerializable T>
+class StructArrayLogEntry : public DataLogEntry {
+  using S = Struct<T>;
+
+ public:
+  StructArrayLogEntry() = default;
+  StructArrayLogEntry(DataLog& log, std::string_view name,
+                      int64_t timestamp = 0)
+      : StructArrayLogEntry{log, name, {}, timestamp} {}
+  StructArrayLogEntry(DataLog& log, std::string_view name,
+                      std::string_view metadata, int64_t timestamp = 0) {
+    m_log = &log;
+    log.AddStructSchema<T>(timestamp);
+    m_entry =
+        log.Start(name, MakeStructArrayTypeString<T, std::dynamic_extent>(),
+                  metadata, timestamp);
+  }
+
+  /**
+   * Appends a record to the log.
+   *
+   * @param data Data to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  template <typename U>
+#if __cpp_lib_ranges >= 201911L
+    requires std::ranges::range<U> &&
+             std::convertible_to<std::ranges::range_value_t<U>, T>
+#endif
+  void Append(U&& data, int64_t timestamp = 0) {
+    m_buf.Write(std::forward<U>(data), [&](auto bytes) {
+      m_log->AppendRaw(m_entry, bytes, timestamp);
+    });
+  }
+
+  /**
+   * Appends a record to the log.
+   *
+   * @param data Data to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void Append(std::span<const T> data, int64_t timestamp = 0) {
+    m_buf.Write(
+        data, [&](auto bytes) { m_log->AppendRaw(m_entry, bytes, timestamp); });
+  }
+
+ private:
+  StructArrayBuffer<T> m_buf;
+};
+
+/**
+ * Log protobuf serializable objects.
+ */
+template <ProtobufSerializable T>
+class ProtobufLogEntry : public DataLogEntry {
+  using P = Protobuf<T>;
+
+ public:
+  ProtobufLogEntry() = default;
+  ProtobufLogEntry(DataLog& log, std::string_view name, int64_t timestamp = 0)
+      : ProtobufLogEntry{log, name, {}, timestamp} {}
+  ProtobufLogEntry(DataLog& log, std::string_view name,
+                   std::string_view metadata, int64_t timestamp = 0) {
+    m_log = &log;
+    log.AddProtobufSchema<T>(m_msg, timestamp);
+    m_entry = log.Start(name, m_msg.GetTypeString(), metadata, timestamp);
+  }
+
+  /**
+   * Appends a record to the log.
+   *
+   * @param data Data to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void Append(const T& data, int64_t timestamp = 0) {
+    SmallVector<uint8_t, 128> buf;
+    {
+      std::scoped_lock lock{m_mutex};
+      m_msg.Pack(buf, data);
+    }
+    m_log->AppendRaw(m_entry, buf, timestamp);
+  }
+
+ private:
+  wpi::mutex m_mutex;
+  ProtobufMessage<T> m_msg;
 };
 
 }  // namespace wpi::log
