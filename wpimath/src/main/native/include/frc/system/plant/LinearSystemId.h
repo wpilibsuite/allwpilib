@@ -43,7 +43,8 @@ class WPILIB_DLLEXPORT LinearSystemId {
    */
   static LinearSystem<2, 1, 1> ElevatorSystem(DCMotor motor,
                                               units::kilogram_t mass,
-                                              units::meter_t radius, double gearing);
+                                              units::meter_t radius,
+                                              double gearing);
 
   /**
    * Create a state-space model of a single-jointed arm system.The states of the
