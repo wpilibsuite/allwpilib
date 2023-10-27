@@ -18,11 +18,6 @@
 
 namespace frc2 {
 
-template <typename T>
-std::string GetTypeName(const T& type) {
-  return wpi::Demangle(typeid(type).name());
-}
-
 /**
  * A state machine representing a complete action to be performed by the robot.
  * Commands are run by the CommandScheduler, and can be composed into
