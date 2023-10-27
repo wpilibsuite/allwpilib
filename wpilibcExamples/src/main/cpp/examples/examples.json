@@ -867,7 +867,8 @@
     ],
     "foldername": "UnitTest",
     "gradlebase": "cpp",
-    "commandversion": 2
+    "commandversion": 2,
+    "hasunittests": true
   },
   {
     "name": "SimpleDifferentialDriveSimulation",
