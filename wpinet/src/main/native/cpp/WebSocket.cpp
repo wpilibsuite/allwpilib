@@ -61,6 +61,7 @@ class WebSocket::WriteReq : public uv::WriteReq,
   void Send(uv::Error err) {
     auto ws = m_ws.lock();
     if (!ws || err) {
+      WS_DEBUG("no WS or error, calling callback\n");
       m_frames.ReleaseBufs();
       m_callback(m_userBufs, err);
       return;
@@ -71,8 +72,9 @@ class WebSocket::WriteReq : public uv::WriteReq,
       // We have a control frame; switch to it.  We will come back here via
       // the control frame's m_cont when it's done.
       WS_DEBUG("Continuing with a control write\n");
-      ws->m_curWriteReq = m_controlCont;
-      return m_controlCont->Send({});
+      auto controlCont = std::move(m_controlCont);
+      m_controlCont.reset();
+      return controlCont->Send({});
     }
     int result = Continue(ws->m_stream, shared_from_this());
     WS_DEBUG("Continue() -> {}\n", result);
@@ -813,21 +815,23 @@ void WebSocket::SendControl(
   // There's a write request in flight, but since this is a control frame, we
   // want to send it as soon as we can, without waiting for all frames in that
   // request (or any continuations) to be sent.
-  auto req = std::make_shared<WriteReq>(std::weak_ptr<WebSocket>{},
-                                        std::move(callback));
+  auto req = std::make_shared<WriteReq>(weak_from_this(), std::move(callback));
   VerboseDebug(frame);
-  req->m_frames.AddFrame(frame, m_server);
+  size_t numBytes = req->m_frames.AddFrame(frame, m_server);
   req->m_userBufs.append(frame.data.begin(), frame.data.end());
-  req->m_continueBufPos = req->m_frames.m_bufs.size();
+  req->m_continueFrameOffs.emplace_back(numBytes);
+  req->m_cont = curReq;
   // There may be multiple control packets in flight; maintain in-order
   // transmission. Linear search here is O(n^2), but should be pretty rare.
-  while (curReq->m_controlCont) {
+  if (!curReq->m_controlCont) {
+    curReq->m_controlCont = std::move(req);
+  } else {
     curReq = curReq->m_controlCont;
+    while (curReq->m_cont != req->m_cont) {
+      curReq = curReq->m_cont;
+    }
+    curReq->m_cont = std::move(req);
   }
-  // Insert ahead of any further continuation
-  req->m_cont = std::move(curReq->m_cont);
-  curReq->m_cont = nullptr;
-  curReq->m_controlCont = std::move(req);
 }
 
 void WebSocket::SendError(
