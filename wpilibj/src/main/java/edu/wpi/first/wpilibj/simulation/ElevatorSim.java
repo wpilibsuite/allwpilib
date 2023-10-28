@@ -127,15 +127,15 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
       boolean simulateGravity,
       double startingHeightMeters) {
     this(
-      kG, 
-      gearbox, 
-      gearing, 
-      drumRadiusMeters, 
-      minHeightMeters, 
-      maxHeightMeters, 
-      simulateGravity, 
-      startingHeightMeters, 
-      null);
+        kG,
+        gearbox,
+        gearing,
+        drumRadiusMeters,
+        minHeightMeters,
+        maxHeightMeters,
+        simulateGravity,
+        startingHeightMeters,
+        null);
   }
 
   /**
@@ -162,17 +162,17 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
       double startingHeightMeters,
       Matrix<N1, N1> measurementStdDevs) {
     this(
-      gearbox, 
-      gearing, 
-      kG * gearbox.KtNMPerAmp * gearing / 9.8 / gearbox.rOhms / drumRadiusMeters, 
-      drumRadiusMeters, 
-      minHeightMeters, 
-      maxHeightMeters, 
-      simulateGravity, 
-      startingHeightMeters, 
-      measurementStdDevs);
+        gearbox,
+        gearing,
+        kG * gearbox.KtNMPerAmp * gearing / 9.8 / gearbox.rOhms / drumRadiusMeters,
+        drumRadiusMeters,
+        minHeightMeters,
+        maxHeightMeters,
+        simulateGravity,
+        startingHeightMeters,
+        measurementStdDevs);
   }
-  
+
   /**
    * Creates a simulated elevator mechanism.
    *
