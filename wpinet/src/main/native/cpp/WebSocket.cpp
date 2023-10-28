@@ -55,35 +55,40 @@ class WebSocket::WriteReq : public uv::WriteReq,
       std::weak_ptr<WebSocket> ws,
       std::function<void(std::span<uv::Buffer>, uv::Error)> callback)
       : m_ws{std::move(ws)}, m_callback{std::move(callback)} {
-    finish.connect([this](uv::Error err) {
-      // Continue() is designed so this is *only* called on frame boundaries
-      if (m_controlCont) {
-        // We have a control frame; switch to it.  We will come back here via
-        // the control frame's m_cont when it's done.
-        if (auto ws = m_ws.lock()) {
-          WS_DEBUG("Continuing with a control write\n");
-          ws->m_stream.Write(m_cont->m_frames.m_bufs, m_controlCont);
-          ws->m_curWriteReq = m_controlCont;
-          return;
-        }
+    finish.connect([this](uv::Error err) { Send(err); });
+  }
+
+  void Send(uv::Error err) {
+    auto ws = m_ws.lock();
+    if (!ws || err) {
+      m_frames.ReleaseBufs();
+      m_callback(m_userBufs, err);
+      return;
+    }
+
+    // Continue() is designed so this is *only* called on frame boundaries
+    if (m_controlCont) {
+      // We have a control frame; switch to it.  We will come back here via
+      // the control frame's m_cont when it's done.
+      WS_DEBUG("Continuing with a control write\n");
+      ws->m_curWriteReq = m_controlCont;
+      return m_controlCont->Send({});
+    }
+    int result = Continue(ws->m_stream, shared_from_this());
+    WS_DEBUG("Continue() -> {}\n", result);
+    if (result <= 0) {
+      m_frames.ReleaseBufs();
+      m_callback(m_userBufs, uv::Error{result});
+      if (result == 0 && m_cont) {
+        WS_DEBUG("Continuing with another write\n");
+        ws->m_curWriteReq = m_cont;
+        return m_cont->Send({});
+      } else {
+        ws->m_writeInProgress = false;
+        ws->m_curWriteReq.reset();
+        ws->m_lastWriteReq.reset();
       }
-      int result = Continue(GetStream(), shared_from_this());
-      WS_DEBUG("Continue() -> {}\n", result);
-      if (result <= 0) {
-        m_frames.ReleaseBufs();
-        auto ws = m_ws.lock();
-        m_callback(m_userBufs, err);
-        if (result == 0 && m_cont && ws) {
-          WS_DEBUG("Continuing with another write\n");
-          ws->m_stream.Write(m_cont->m_frames.m_bufs, m_cont);
-          ws->m_curWriteReq = m_cont;
-        } else if (ws) {
-          ws->m_writeInProgress = false;
-          ws->m_curWriteReq.reset();
-          ws->m_lastWriteReq.reset();
-        }
-      }
-    });
+    }
   }
 
   std::weak_ptr<WebSocket> m_ws;
@@ -734,27 +739,16 @@ void WebSocket::SendFrames(
     return;
   }
 
-  if (frames.empty()) {
-    return;
-  }
-
-  // First attempt via TrySend
-  if (!m_writeInProgress) {
-    frames = TrySendFrames(frames, callback);
-    if (frames.empty()) {
-      return;  // nothing left to send
-    }
-  }
-
-  // Build request for remainder
-  auto req = std::make_shared<WriteReq>(std::weak_ptr<WebSocket>{},
-                                        std::move(callback));
+  // Build request
+  auto req = std::make_shared<WriteReq>(weak_from_this(), std::move(callback));
+  int numBytes = 0;
   for (auto&& frame : frames) {
     VerboseDebug(frame);
-    req->m_frames.AddFrame(frame, m_server);
+    numBytes += req->m_frames.AddFrame(frame, m_server);
+    req->m_continueFrameOffs.emplace_back(numBytes);
     req->m_userBufs.append(frame.data.begin(), frame.data.end());
   }
-  req->m_continueBufPos = req->m_frames.m_bufs.size();
+
   if (m_writeInProgress) {
     if (auto lastReq = m_lastWriteReq.lock()) {
       // if write currently in progress, process as a continuation of that
@@ -768,12 +762,10 @@ void WebSocket::SendFrames(
     }
   }
 
-  // This should almost never happen, but just in case, process as normal write
-  WS_DEBUG("Write({})\n", req->m_frames.m_bufs.size());
-  m_stream.Write(req->m_frames.m_bufs, req);
   m_writeInProgress = true;
   m_curWriteReq = req;
   m_lastWriteReq = req;
+  req->Send({});
 }
 
 std::span<const WebSocket::Frame> WebSocket::TrySendFrames(
