@@ -15,6 +15,7 @@ using google::protobuf::Message;
 bool ProtobufMessageDatabase::Add(std::string_view filename,
                                   std::span<const uint8_t> data) {
   auto& file = m_files[filename];
+  bool needsRebuild = false;
   if (file.complete) {
     file.complete = false;
 
@@ -27,14 +28,8 @@ bool ProtobufMessageDatabase::Add(std::string_view filename,
     for (auto&& p : m_files) {
       p.second.inPool = false;
     }
-    for (auto&& p : m_files) {
-      if (p.second.complete && !p.second.inPool) {
-        Rebuild(p.second);
-      }
-    }
 
-    // clear messages and reset factory; Find() will recreate as needed
-    m_factory = std::make_unique<google::protobuf::DynamicMessageFactory>();
+    needsRebuild = true;
   }
 
   if (!file.proto) {
@@ -54,6 +49,19 @@ bool ProtobufMessageDatabase::Add(std::string_view filename,
     return false;
   }
 
+  // rebuild if necessary; we do this after the parse due to dependencies
+  if (needsRebuild) {
+    for (auto&& p : m_files) {
+      if (p.second.complete && !p.second.inPool) {
+        Rebuild(p.second);
+      }
+    }
+
+    // clear messages and reset factory; Find() will recreate as needed
+    m_factory = std::make_unique<google::protobuf::DynamicMessageFactory>();
+  }
+
+  // build this one
   Build(filename, file);
   return true;
 }
@@ -118,5 +126,6 @@ bool ProtobufMessageDatabase::Rebuild(ProtoFile& file) {
     return false;
   }
   file.inPool = true;
+  file.complete = true;
   return true;
 }
