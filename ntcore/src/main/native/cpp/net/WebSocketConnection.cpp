@@ -260,8 +260,12 @@ wpi::uv::Buffer WebSocketConnection::AllocBuf() {
 }
 
 void WebSocketConnection::ReleaseBufs(std::span<wpi::uv::Buffer> bufs) {
+#ifdef __SANITIZE_ADDRESS__
+  size_t numToPool = 0;
+#else
   size_t numToPool = (std::min)(bufs.size(), kMaxPoolSize - m_buf_pool.size());
   m_buf_pool.insert(m_buf_pool.end(), bufs.begin(), bufs.begin() + numToPool);
+#endif
   for (auto&& buf : bufs.subspan(numToPool)) {
     buf.Deallocate();
   }
