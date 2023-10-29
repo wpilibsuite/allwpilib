@@ -4,7 +4,6 @@
 
 #include "wpinet/WebSocketServer.h"  // NOLINT(build/include_order)
 
-#include <fmt/format.h>
 #include <wpi/SmallString.h>
 
 #include "WebSocketTest.h"
