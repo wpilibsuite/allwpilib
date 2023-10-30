@@ -19,10 +19,12 @@ import java.util.function.Supplier;
  * subsystems its components require.
  *
  * <p>This class is provided by the NewCommands VendorDep
+ *
+ * @param <K> The type of key that the selector uses
  */
-public class SelectCommand extends Command {
-  private final Map<Object, Command> m_commands;
-  private final Supplier<Object> m_selector;
+public class SelectCommand<K> extends Command {
+  private final Map<K, Command> m_commands;
+  private final Supplier<? extends K> m_selector;
   private Command m_selectedCommand;
   private boolean m_runsWhenDisabled = true;
   private InterruptionBehavior m_interruptBehavior = InterruptionBehavior.kCancelIncoming;
@@ -36,7 +38,7 @@ public class SelectCommand extends Command {
    * @param commands the map of commands to choose from
    * @param selector the selector to determine which command to run
    */
-  public SelectCommand(Map<Object, Command> commands, Supplier<Object> selector) {
+  public SelectCommand(Map<K, Command> commands, Supplier<? extends K> selector) {
     m_commands = requireNonNullParam(commands, "commands", "SelectCommand");
     m_selector = requireNonNullParam(selector, "selector", "SelectCommand");
 

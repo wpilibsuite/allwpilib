@@ -149,8 +149,8 @@ public final class Commands {
    * @return the command
    * @see SelectCommand
    */
-  public static Command select(Map<Object, Command> commands, Supplier<Object> selector) {
-    return new SelectCommand(commands, selector);
+  public static <K> Command select(Map<K, Command> commands, Supplier<? extends K> selector) {
+    return new SelectCommand<>(commands, selector);
   }
 
   /**
