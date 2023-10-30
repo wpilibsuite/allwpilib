@@ -36,7 +36,7 @@ public class RobotContainer {
   // selector does not have to be an enum; it could be any desired type (string, integer,
   // boolean, double...)
   private final Command m_exampleSelectCommand =
-      new SelectCommand(
+      new SelectCommand<>(
           // Maps selector values to commands
           Map.ofEntries(
               Map.entry(CommandSelector.ONE, new PrintCommand("Command one was selected!")),
