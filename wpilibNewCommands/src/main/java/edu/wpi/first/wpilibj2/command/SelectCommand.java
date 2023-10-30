@@ -20,7 +20,7 @@ import java.util.function.Supplier;
  *
  * <p>This class is provided by the NewCommands VendorDep
  *
- * @param <K> The type of key that the selector uses
+ * @param <K> The type of key used to select the command
  */
 public class SelectCommand<K> extends Command {
   private final Map<K, Command> m_commands;
