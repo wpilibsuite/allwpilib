@@ -38,6 +38,20 @@ if (WITH_JAVA)
 
 endif()
 
+if (WITH_JAVA_SOURCE)
+  find_package(Java REQUIRED)
+  include(UseJava)
+  file(GLOB WPINET_SOURCES src/main/java/edu/wpi/first/net/*.java)
+  add_jar(wpinet_src_jar
+  RESOURCES NAMESPACE "edu/wpi/first/net" ${WPINET_SOURCES}
+  OUTPUT_NAME wpinet-sources)
+
+  get_property(WPINET_SRC_JAR_FILE TARGET wpinet_src_jar PROPERTY JAR_FILE)
+  install(FILES ${WPINET_SRC_JAR_FILE} DESTINATION "${java_lib_dest}")
+
+  set_property(TARGET wpinet_src_jar PROPERTY FOLDER "java")
+endif()
+
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
