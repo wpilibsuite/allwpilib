@@ -244,7 +244,7 @@ public class AprilTagDetector implements AutoCloseable {
    * Adds a family of tags to be detected.
    *
    * @param fam Family name, e.g. "tag16h5"
-   * @param bitsCorrected maximum number of bits to correct
+   * @param bitsCorrected Maximum number of bits to correct
    * @throws IllegalArgumentException if family name not recognized
    */
   public void addFamily(String fam, int bitsCorrected) {
