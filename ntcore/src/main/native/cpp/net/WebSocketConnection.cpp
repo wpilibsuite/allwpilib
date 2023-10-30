@@ -4,6 +4,7 @@
 
 #include "WebSocketConnection.h"
 
+#include <algorithm>
 #include <span>
 
 #include <wpi/Endian.h>
@@ -64,7 +65,8 @@ void WebSocketConnection::Stream::write_impl(const char* data, size_t len) {
   while (len > 0) {
     auto& buf = m_conn.m_bufs.back();
     assert(buf.len <= kAllocSize);
-    size_t amt = (std::min)(kAllocSize - buf.len, len);
+    size_t amt = (std::min)(static_cast<int>(kAllocSize - buf.len),
+                            static_cast<int>(len));
     if (amt > 0) {
       std::memcpy(buf.base + buf.len, data, amt);
       buf.len += amt;
