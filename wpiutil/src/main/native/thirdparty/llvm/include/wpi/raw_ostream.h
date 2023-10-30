@@ -356,6 +356,11 @@ protected:
     SetBufferAndMode(BufferStart, Size, BufferKind::ExternalBuffer);
   }
 
+  /// Force-set the number of bytes in the raw_ostream buffer.
+  void SetNumBytesInBuffer(size_t Size) {
+    OutBufCur = OutBufStart + Size;
+  }
+
   /// Return an efficient buffer size for the underlying output mechanism.
   virtual size_t preferred_buffer_size() const;
 
