@@ -68,7 +68,7 @@ class ElevatorSim : public LinearSystemSim<2, 1, 1> {
    * @param minHeight The min allowable height of the elevator.
    * @param maxHeight The max allowable height of the elevator.
    * @param simulateGravity Whether gravity should be simulated or not.
-   * @param startingHeightMeters The starting height of the elevator.
+   * @param startingHeight The starting height of the elevator.
    * @param measurementStdDevs The standard deviation of the measurements.
    */
   template <typename Distance>
