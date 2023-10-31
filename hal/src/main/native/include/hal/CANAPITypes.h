@@ -57,7 +57,7 @@ HAL_ENUM(HAL_CANManufacturer) {
   HAL_CAN_Man_kStudica = 12,
   HAL_CAN_Man_kTheThriftyBot = 13,
   HAL_CAN_Man_kReduxRobotics = 14,
-  HAL_CAN_MAN_kAndyMark = 15,
+  HAL_CAN_Man_kAndyMark = 15,
   HAL_CAN_Man_kVividHosting = 16
 };
 // clang-format on
