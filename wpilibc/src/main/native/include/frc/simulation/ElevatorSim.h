@@ -36,8 +36,6 @@ class ElevatorSim : public LinearSystemSim<2, 1, 1> {
    *                           LinearSystemId::ElevatorSystem().
    * @param gearbox            The type of and number of motors in your
    *                           elevator gearbox.
-   * @param drumRadius         The radius of the drum that your cable is
-   *                           wrapped around.
    * @param minHeight          The minimum allowed height of the elevator.
    * @param maxHeight          The maximum allowed height of the elevator.
    * @param simulateGravity    Whether gravity should be simulated or not.
