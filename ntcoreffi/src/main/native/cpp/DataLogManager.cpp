@@ -467,7 +467,16 @@ static Instance& GetInstance(std::string_view dir = "",
 
 void DataLogManager::Start(std::string_view dir, std::string_view filename,
                            double period) {
-  GetInstance(dir, filename, period);
+  auto& inst = GetInstance(dir, filename, period);
+  if (!inst.owner) {
+    inst.owner.Start(dir, MakeLogDir(filename), period);
+  }
+}
+
+void DataLogManager::Stop() {
+  auto& inst = GetInstance();
+  inst.owner.GetThread()->m_log.Stop();
+  inst.owner.Stop();
 }
 
 void DataLogManager::Log(std::string_view message) {
@@ -501,6 +510,10 @@ extern "C" {
 
 void DLM_Start(const char* dir, const char* filename, double period) {
   DataLogManager::Start(dir, filename, period);
+}
+
+void DLM_Stop(void) {
+  DataLogManager::Stop();
 }
 
 void DLM_Log(const char* message) {
