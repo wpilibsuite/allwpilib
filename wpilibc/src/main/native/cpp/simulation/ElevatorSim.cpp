@@ -8,6 +8,7 @@
 
 #include "frc/system/NumericalIntegration.h"
 #include "frc/system/plant/LinearSystemId.h"
+#include "units/length.h"
 
 using namespace frc;
 using namespace frc::sim;
