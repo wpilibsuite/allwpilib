@@ -37,7 +37,8 @@ ElevatorSim::ElevatorSim(const DCMotor& gearbox, double gearing,
                   startingHeight, measurementStdDevs) {}
 
 template <typename Distance>
-  requires std::same_as<units::meter, Distance>
+    requires std::same_as<units::meter, Distance> ||
+             std::same_as<units::radian, Distance>
 ElevatorSim::ElevatorSim(decltype(1_V / Velocity_t<Distance>(1)) kV,
                          decltype(1_V / Acceleration_t<Distance>(1)) kA,
                          const DCMotor& gearbox, units::meter_t minHeight,

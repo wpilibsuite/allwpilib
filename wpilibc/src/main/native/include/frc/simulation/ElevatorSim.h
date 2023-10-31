@@ -71,8 +71,9 @@ class ElevatorSim : public LinearSystemSim<2, 1, 1> {
    * @param startingHeight The starting height of the elevator.
    * @param measurementStdDevs The standard deviation of the measurements.
    */
-  template <typename Distance>
-    requires std::same_as<units::meter, Distance>
+template <typename Distance>
+    requires std::same_as<units::meter, Distance> ||
+             std::same_as<units::radian, Distance>
   ElevatorSim(decltype(1_V / Velocity_t<Distance>(1)) kV,
               decltype(1_V / Acceleration_t<Distance>(1)) kA,
               const DCMotor& gearbox, units::meter_t minHeight,
