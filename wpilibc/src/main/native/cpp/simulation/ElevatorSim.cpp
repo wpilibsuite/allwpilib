@@ -86,10 +86,9 @@ units::ampere_t ElevatorSim::GetCurrentDraw() const {
 
   // v = r w, so w = v / r
   double kA = 1.0 / m_plant.B(1, 0);
-  double kV = kA * m_plant.A(1, 1);
+  decltype(1_V / Velocity_t<Distance>(1)) kV = decltype(1_V / Velocity_t<Distance>(1)){kA * m_plant.A(1, 1)};
   units::meters_per_second_t velocity{m_x(1)};
-  units::radians_per_second_t motorVelocity =
-      units::radians_per_second_t{velocity.value() * kV * m_gearbox.Kv.value()};
+  units::radians_per_second_t motorVelocity = velocity * kV * m_gearbox.Kv;
 
   // Perform calculation and return.
   return m_gearbox.Current(motorVelocity, units::volt_t{m_u(0)}) *
