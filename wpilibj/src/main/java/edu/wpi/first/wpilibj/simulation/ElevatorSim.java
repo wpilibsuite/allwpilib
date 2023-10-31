@@ -123,7 +123,6 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
    * @param kV The velocity gain.
    * @param kA The acceleration gain.
    * @param gearbox The type of and number of motors in the elevator gearbox.
-   * @param gearing The gearing of the elevator (numbers greater than 1 represent reductions).
    * @param minHeightMeters The min allowable height of the elevator.
    * @param maxHeightMeters The max allowable height of the elevator.
    * @param simulateGravity Whether gravity should be simulated or not.
