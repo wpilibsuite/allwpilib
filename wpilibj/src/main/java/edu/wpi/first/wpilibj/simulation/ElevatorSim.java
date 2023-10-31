@@ -33,8 +33,8 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
    *
    * @param plant                The linear system that represents the elevator.
    *                             This system can be created with
-   *                             {@link edu.wpi.first.math.system.plant.LinearSystemId#createElevatorSystem(DCMotor, double,
-   *                             double, double)}.
+   *                             {@link edu.wpi.first.math.system.plant.LinearSystemId#createElevatorSystem(DCMotor, 
+   *                             double, double, double)}.
    * @param gearbox              The type of and number of motors in the elevator
    *                             gearbox.
    * @param minHeightMeters      The min allowable height of the elevator.
@@ -65,8 +65,8 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
    *
    * @param plant                The linear system that represents the elevator.
    *                             This system can be created with
-   *                             {@link edu.wpi.first.math.system.plant.LinearSystemId#createElevatorSystem(DCMotor, double,
-   *                             double, double)}.
+   *                             {@link edu.wpi.first.math.system.plant.LinearSystemId#createElevatorSystem(DCMotor, 
+   *                             double, double, double)}.
    * @param gearbox              The type of and number of motors in the elevator
    *                             gearbox.
    * @param minHeightMeters      The min allowable height of the elevator.
@@ -309,8 +309,8 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
     // v = r w, so w = v/r
     double kA = 1 / m_plant.getB().get(1, 0);
     double kV = -m_plant.getA().get(1, 1) * kA;
-    double KvRadPerSecPerVolt = m_gearbox.KvRadPerSecPerVolt;
-    double motorVelocityRadPerSec = getVelocityMetersPerSecond() * kV * KvRadPerSecPerVolt;
+    double motorVelocityRadPerSec = getVelocityMetersPerSecond() *
+        kV * m_gearbox.KvRadPerSecPerVolt;
     var appliedVoltage = m_u.get(0, 0);
     return m_gearbox.getCurrent(motorVelocityRadPerSec, appliedVoltage)
         * Math.signum(appliedVoltage);
