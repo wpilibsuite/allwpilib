@@ -86,7 +86,7 @@ units::ampere_t ElevatorSim::GetCurrentDraw() const {
   auto kV = -m_plant.A(1, 1) * kA;
   units::meters_per_second_t velocity{m_x(1)};
   units::radians_per_second_t motorVelocity =
-      velocity * kV * m_gearbox.Kv * 1_rad;
+      velocity * kV.value() * m_gearbox.Kv * 1_rad;
 
   // Perform calculation and return.
   return m_gearbox.Current(motorVelocity, units::volt_t{m_u(0)}) *
