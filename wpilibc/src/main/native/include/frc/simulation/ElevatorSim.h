@@ -19,6 +19,15 @@ namespace frc::sim {
  */
 class ElevatorSim : public LinearSystemSim<2, 1, 1> {
  public:
+   template <typename Distance>
+  using Velocity_t = units::unit_t<
+      units::compound_unit<Distance, units::inverse<units::seconds>>>;
+
+  template <typename Distance>
+  using Acceleration_t = units::unit_t<units::compound_unit<
+      units::compound_unit<Distance, units::inverse<units::seconds>>,
+      units::inverse<units::seconds>>>;
+
   /**
    * Constructs a simulated elevator mechanism.
    *
