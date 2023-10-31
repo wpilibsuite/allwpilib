@@ -19,7 +19,7 @@ namespace frc::sim {
  */
 class ElevatorSim : public LinearSystemSim<2, 1, 1> {
  public:
-    template <typename Distance>
+  template <typename Distance>
   using Velocity_t = units::unit_t<
       units::compound_unit<Distance, units::inverse<units::seconds>>>;
 
@@ -90,9 +90,10 @@ class ElevatorSim : public LinearSystemSim<2, 1, 1> {
     requires std::same_as<units::meter, Distance> ||
              std::same_as<units::radian, Distance>
   ElevatorSim(decltype(1_V / Velocity_t<Distance>(1)) kV,
-              decltype(1_V / Acceleration_t<Distance>(1)) kA, const DCMotor& gearbox,
-              units::meter_t minHeight, units::meter_t maxHeight,
-              bool simulateGravity, units::meter_t startingHeight,
+              decltype(1_V / Acceleration_t<Distance>(1)) kA,
+              const DCMotor& gearbox, units::meter_t minHeight,
+              units::meter_t maxHeight, bool simulateGravity,
+              units::meter_t startingHeight,
               const std::array<double, 1>& measurementStdDevs = {0.0});
   using LinearSystemSim::SetState;
 
