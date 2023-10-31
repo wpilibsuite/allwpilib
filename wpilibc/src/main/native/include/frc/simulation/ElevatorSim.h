@@ -19,7 +19,7 @@ namespace frc::sim {
  */
 class ElevatorSim : public LinearSystemSim<2, 1, 1> {
  public:
-   template <typename Distance>
+    template <typename Distance>
   using Velocity_t = units::unit_t<
       units::compound_unit<Distance, units::inverse<units::seconds>>>;
 
@@ -36,6 +36,10 @@ class ElevatorSim : public LinearSystemSim<2, 1, 1> {
    *                           LinearSystemId::ElevatorSystem().
    * @param gearbox            The type of and number of motors in your
    *                           elevator gearbox.
+   * @param gearing            The gearing of the elevator (numbers greater
+   *                           than 1 represent reductions).
+   * @param drumRadius         The radius of the drum that your cable is
+   *                           wrapped around.
    * @param minHeight          The minimum allowed height of the elevator.
    * @param maxHeight          The maximum allowed height of the elevator.
    * @param simulateGravity    Whether gravity should be simulated or not.
@@ -68,28 +72,28 @@ class ElevatorSim : public LinearSystemSim<2, 1, 1> {
               units::meter_t minHeight, units::meter_t maxHeight,
               bool simulateGravity, units::meter_t startingHeight,
               const std::array<double, 1>& measurementStdDevs = {0.0});
+
   /**
-   * Creates a simulated elevator mechanism.
+   * Constructs a simulated elevator mechanism.
    *
-   * @param kV The velocity gain.
-   * @param kA The acceleration gain.
-   * @param gearbox The type of and number of motors in the elevator gearbox.
-   * @param minHeight The min allowable height of the elevator.
-   * @param maxHeight The max allowable height of the elevator.
-   * @param simulateGravity Whether gravity should be simulated or not.
-   * @param startingHeight The starting height of the elevator.
+   * @param kV                 The velocity gain.
+   * @param kA                 The acceleration gain.
+   * @param gearbox            The type of and number of motors in your
+   *                           elevator gearbox.
+   * @param minHeight          The minimum allowed height of the elevator.
+   * @param maxHeight          The maximum allowed height of the elevator.
+   * @param simulateGravity    Whether gravity should be simulated or not.
+   * @param startingHeight     The starting height of the elevator.
    * @param measurementStdDevs The standard deviation of the measurements.
    */
-template <typename Distance>
+  template <typename Distance>
     requires std::same_as<units::meter, Distance> ||
              std::same_as<units::radian, Distance>
   ElevatorSim(decltype(1_V / Velocity_t<Distance>(1)) kV,
-              decltype(1_V / Acceleration_t<Distance>(1)) kA,
-              const DCMotor& gearbox, units::meter_t minHeight,
-              units::meter_t maxHeight, bool simulateGravity,
-              units::meter_t startingHeight,
+              decltype(1_V / Acceleration_t<Distance>(1)) kA, const DCMotor& gearbox,
+              units::meter_t minHeight, units::meter_t maxHeight,
+              bool simulateGravity, units::meter_t startingHeight,
               const std::array<double, 1>& measurementStdDevs = {0.0});
-
   using LinearSystemSim::SetState;
 
   /**

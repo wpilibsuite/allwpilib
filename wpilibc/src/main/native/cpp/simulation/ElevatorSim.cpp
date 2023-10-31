@@ -33,18 +33,21 @@ ElevatorSim::ElevatorSim(const DCMotor& gearbox, double gearing,
                          const std::array<double, 1>& measurementStdDevs)
     : ElevatorSim(LinearSystemId::ElevatorSystem(gearbox, carriageMass,
                                                  drumRadius, gearing),
-                  gearbox, minHeight, maxHeight, simulateGravity,
-                  startingHeight, measurementStdDevs) {}
+                  gearbox, minHeight, maxHeight,
+                  simulateGravity, startingHeight, measurementStdDevs) {}
 
+  template <typename Distance>
+    requires std::same_as<units::meter, Distance> ||
+             std::same_as<units::radian, Distance>
 ElevatorSim::ElevatorSim(decltype(1_V / Velocity_t<Distance>(1)) kV,
-                         decltype(1_V / Acceleration_t<Distance>(1)) kA,
-                         const DCMotor& gearbox, units::meter_t minHeight,
+                          decltype(1_V / Acceleration_t<Distance>(1)) kA, const DCMotor& gearbox,
+                         units::meter_t minHeight,
                          units::meter_t maxHeight, bool simulateGravity,
                          units::meter_t startingHeight,
                          const std::array<double, 1>& measurementStdDevs)
-    : ElevatorSim(LinearSystemId::IdentifyPositionSystem(kV, kA), gearbox,
-                  minHeight, maxHeight, simulateGravity, startingHeight,
-                  measurementStdDevs) {}
+    : ElevatorSim(LinearSystemId::IdentifyPositionSystem(kV, kA),
+                  gearbox, minHeight, maxHeight,
+                  simulateGravity, startingHeight, measurementStdDevs) {}
 
 void ElevatorSim::SetState(units::meter_t position,
                            units::meters_per_second_t velocity) {
@@ -83,10 +86,10 @@ units::ampere_t ElevatorSim::GetCurrentDraw() const {
 
   // v = r w, so w = v / r
   double kA = 1.0 / m_plant.B(1, 0);
-  double kV = -m_plant.A(1, 1) * kA;
+  double kV = kA * m_plant.A(1, 1);
   units::meters_per_second_t velocity{m_x(1)};
   units::radians_per_second_t motorVelocity =
-      velocity * kV * m_gearbox.Kv * 1_rad;
+      units::radians_per_second_t{velocity.value() * kV * m_gearbox.Kv.value()};
 
   // Perform calculation and return.
   return m_gearbox.Current(motorVelocity, units::volt_t{m_u(0)}) *
