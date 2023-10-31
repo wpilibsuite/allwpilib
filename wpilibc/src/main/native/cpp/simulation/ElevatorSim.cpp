@@ -84,7 +84,6 @@ units::ampere_t ElevatorSim::GetCurrentDraw() const {
   // Reductions are greater than 1, so a reduction of 10:1 would mean the motor
   // is spinning 10x faster than the output.
 
-  // v = r w, so w = v / r
   double kA = 1.0 / m_plant.B(1, 0);
   using Kv_t = units::unit_t<units::compound_unit<
       units::volt, units::inverse<units::meters_per_second>>>;
