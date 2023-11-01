@@ -4,6 +4,9 @@
 
 package edu.wpi.first.wpilibj2.command;
 
+import java.util.Set;
+import java.util.function.Supplier;
+
 /**
  * A robot subsystem. Subsystems are the basic unit of robot organization in the Command-based
  * framework; they encapsulate low-level hardware objects (motor controllers, sensors, etc.) and
@@ -132,5 +135,17 @@ public interface Subsystem {
    */
   default Command runEnd(Runnable run, Runnable end) {
     return Commands.runEnd(run, end, this);
+  }
+
+  /**
+   * Constructs a {@link DeferredCommand} with the provided supplier. This subsystem is added as a
+   * requirement.
+   *
+   * @param supplier the command supplier.
+   * @return the command.
+   * @see DeferredCommand
+   */
+  default Command defer(Supplier<Command> supplier) {
+    return Commands.defer(supplier, Set.of(this));
   }
 }
