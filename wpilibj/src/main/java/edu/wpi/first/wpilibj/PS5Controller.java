@@ -8,40 +8,38 @@ import edu.wpi.first.wpilibj.event.BooleanEvent;
 import edu.wpi.first.wpilibj.event.EventLoop;
 
 /**
- * Handle input from PS4 controllers connected to the Driver Station.
+ * Handle input from PS5 controllers connected to the Driver Station.
  *
- * <p>This class handles PS4 input that comes from the Driver Station. Each time a value is
+ * <p>This class handles PS5 input that comes from the Driver Station. Each time a value is
  * requested the most recent value is returned. There is a single class instance for each controller
  * and the mapping of ports to hardware buttons depends on the code in the Driver Station.
  */
-public class PS4Controller extends GenericHID {
+public class PS5Controller extends GenericHID {
   /**
    * Construct an instance of a device.
    *
    * @param port The port index on the Driver Station that the device is plugged into.
    */
-  public PS4Controller(int port) {
+  public PS5Controller(int port) {
     super(port);
-
-    // re-enable when PS4Controller is added to Usage Reporting
-    // HAL.report(tResourceType.kResourceType_PS4Controller, port + 1); /
+    // HAL.report(tResourceType.kResourceType_PS5Controller, port + 1);
   }
 
-  /** Represents a digital button on a PS4Controller. */
+  /** Represents a digital button on a PS5Controller. */
   public enum Button {
-    kSquare(1),
-    kCross(2),
-    kCircle(3),
+    kCross(1),
+    kCircle(2),
+    kSquare(3),
     kTriangle(4),
     kL1(5),
     kR1(6),
     kL2(7),
     kR2(8),
-    kShare(9),
+    kCreate(9),
     kOptions(10),
-    kL3(11),
-    kR3(12),
-    kPS(13),
+    kPS(11),
+    kL3(12),
+    kR3(13),
     kTouchpad(14);
 
     public final int value;
@@ -68,14 +66,14 @@ public class PS4Controller extends GenericHID {
     }
   }
 
-  /** Represents an axis on a PS4Controller. */
+  /** Represents an axis on a PS5Controller. */
   public enum Axis {
     kLeftX(0),
     kLeftY(1),
-    kRightX(2),
-    kRightY(5),
-    kL2(3),
-    kR2(4);
+    kL2(2),
+    kRightX(3),
+    kRightY(4),
+    kR2(5);
 
     public final int value;
 
@@ -548,8 +546,8 @@ public class PS4Controller extends GenericHID {
    *
    * @return The state of the button.
    */
-  public boolean getShareButton() {
-    return getRawButton(Button.kShare.value);
+  public boolean getCreateButton() {
+    return getRawButton(Button.kCreate.value);
   }
 
   /**
@@ -557,8 +555,8 @@ public class PS4Controller extends GenericHID {
    *
    * @return Whether the button was pressed since the last check.
    */
-  public boolean getShareButtonPressed() {
-    return getRawButtonPressed(Button.kShare.value);
+  public boolean getCreateButtonPressed() {
+    return getRawButtonPressed(Button.kCreate.value);
   }
 
   /**
@@ -566,8 +564,8 @@ public class PS4Controller extends GenericHID {
    *
    * @return Whether the button was released since the last check.
    */
-  public boolean getShareButtonReleased() {
-    return getRawButtonReleased(Button.kShare.value);
+  public boolean getCreateButtonReleased() {
+    return getRawButtonReleased(Button.kCreate.value);
   }
 
   /**
@@ -578,8 +576,8 @@ public class PS4Controller extends GenericHID {
    *     loop.
    */
   @SuppressWarnings("MethodName")
-  public BooleanEvent share(EventLoop loop) {
-    return new BooleanEvent(loop, this::getShareButton);
+  public BooleanEvent create(EventLoop loop) {
+    return new BooleanEvent(loop, this::getCreateButton);
   }
 
   /**

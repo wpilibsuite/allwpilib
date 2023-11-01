@@ -66,6 +66,21 @@ if (WITH_JAVA)
 
 endif()
 
+if (WITH_JAVA_SOURCE)
+  find_package(Java REQUIRED)
+  include(UseJava)
+  file(GLOB APRILTAG_SOURCES src/main/java/edu/wpi/first/apriltag/*.java)
+  add_jar(apriltag_src_jar
+  RESOURCES NAMESPACE "edu/wpi/first/apriltag" ${APRILTAG_SOURCES}
+  NAMESPACE "edu/wpi/first/apriltag/jni" src/main/java/edu/wpi/first/apriltag/jni/AprilTagJNI.java
+  OUTPUT_NAME apriltag-sources)
+
+  get_property(APRILTAG_SRC_JAR_FILE TARGET apriltag_src_jar PROPERTY JAR_FILE)
+  install(FILES ${APRILTAG_SRC_JAR_FILE} DESTINATION "${java_lib_dest}")
+
+  set_property(TARGET apriltag_src_jar PROPERTY FOLDER "java")
+endif()
+
 generate_resources(src/main/native/resources/edu/wpi/first/apriltag generated/main/cpp APRILTAG frc apriltag_resources_src)
 
 file(GLOB apriltag_native_src src/main/native/cpp/*.cpp)

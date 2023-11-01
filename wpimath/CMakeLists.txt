@@ -128,6 +128,44 @@ if (WITH_JAVA)
 
 endif()
 
+if (WITH_JAVA_SOURCE)
+  find_package(Java REQUIRED)
+  include(UseJava)
+  file(GLOB WPIMATH_SOURCES src/main/java/edu/wpi/first/math/*.java ${WPILIB_BINARY_DIR}/wpimath/generated/main/java/edu/wpi/first/math/Nat.java)
+  file(GLOB WPIMATH_CONTROLLER_SOURCES src/main/java/edu/wpi/first/math/controller/*.java)
+  file(GLOB WPIMATH_ESTIMATOR_SOURCES src/main/java/edu/wpi/first/math/estimator/*.java)
+  file(GLOB WPIMATH_FILTER_SOURCES src/main/java/edu/wpi/first/math/filter/*.java)
+  file(GLOB WPIMATH_GEOMETRY_SOURCES src/main/java/edu/wpi/first/math/geometry/*.java)
+  file(GLOB WPIMATH_INTERPOLATION_SOURCES src/main/java/edu/wpi/first/math/interpolation/*.java)
+  file(GLOB WPIMATH_KINEMATICS_SOURCES src/main/java/edu/wpi/first/math/kinematics/*.java)
+  file(GLOB WPIMATH_NUMBERS_SOURCES ${WPILIB_BINARY_DIR}/wpimath/generated/main/java/edu/wpi/first/math/numbers/*.java)
+  file(GLOB WPIMATH_SPLINE_SOURCES src/main/java/edu/wpi/first/math/spline/*.java)
+  file(GLOB WPIMATH_SYSTEM_SOURCES src/main/java/edu/wpi/first/math/system/*.java)
+  file(GLOB WPIMATH_SYSTEM_PLANT_SOURCES src/main/java/edu/wpi/first/math/system/plant/*.java)
+  file(GLOB WPIMATH_TRAJECTORY_SOURCES src/main/java/edu/wpi/first/math/trajectory/*.java)
+  file(GLOB WPIMATH_TRAJECTORY_CONSTRAINT_SOURCES src/main/java/edu/wpi/first/math/trajectory/constraint/*.java)
+  add_jar(wpimath_src_jar
+  RESOURCES NAMESPACE "edu/wpi/first/math" ${WPIMATH_SOURCES}
+  NAMESPACE "edu/wpi/first/math/controller" ${WPIMATH_CONTROLLER_SOURCES}
+  NAMESPACE "edu/wpi/first/math/estimator" ${WPIMATH_ESTIMATOR_SOURCES}
+  NAMESPACE "edu/wpi/first/math/filter" ${WPIMATH_FILTER_SOURCES}
+  NAMESPACE "edu/wpi/first/math/geometry" ${WPIMATH_GEOMETRY_SOURCES}
+  NAMESPACE "edu/wpi/first/math/interpolation" ${WPIMATH_INTERPOLATION_SOURCES}
+  NAMESPACE "edu/wpi/first/math/kinematics" ${WPIMATH_KINEMATICS_SOURCES}
+  NAMESPACE "edu/wpi/first/math/spline" ${WPIMATH_SPLINE_SOURCES}
+  NAMESPACE "edu/wpi/first/math/system" ${WPIMATH_SYSTEM_SOURCES}
+  NAMESPACE "edu/wpi/first/math/system/plant" ${WPIMATH_SYSTEM_PLANT_SOURCES}
+  NAMESPACE "edu/wpi/first/math/trajectory" ${WPIMATH_TRAJECTORY_SOURCES}
+  NAMESPACE "edu/wpi/first/math/trajectory/constraint" ${WPIMATH_TRAJECTORY_CONSTRAINT_SOURCES}
+  NAMESPACE "edu/wpi/first/math/util" src/main/java/edu/wpi/first/math/util/Units.java
+  OUTPUT_NAME wpimath-sources)
+
+  get_property(WPIMATH_SRC_JAR_FILE TARGET wpimath_src_jar PROPERTY JAR_FILE)
+  install(FILES ${WPIMATH_SRC_JAR_FILE} DESTINATION "${java_lib_dest}")
+
+  set_property(TARGET wpimath_src_jar PROPERTY FOLDER "java")
+endif()
+
 file(GLOB_RECURSE wpimath_native_src src/main/native/cpp/*.cpp)
 list(REMOVE_ITEM wpimath_native_src ${wpimath_jni_src})
 

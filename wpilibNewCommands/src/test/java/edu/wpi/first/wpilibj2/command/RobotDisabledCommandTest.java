@@ -141,8 +141,8 @@ class RobotDisabledCommandTest extends CommandTestBase {
     MockCommandHolder command4Holder = new MockCommandHolder(false);
     Command command4 = command4Holder.getMock();
 
-    Command runWhenDisabled = new SelectCommand(Map.of(1, command1, 2, command2), () -> 1);
-    Command dontRunWhenDisabled = new SelectCommand(Map.of(1, command3, 2, command4), () -> 1);
+    Command runWhenDisabled = new SelectCommand<>(Map.of(1, command1, 2, command2), () -> 1);
+    Command dontRunWhenDisabled = new SelectCommand<>(Map.of(1, command3, 2, command4), () -> 1);
 
     try (CommandScheduler scheduler = new CommandScheduler()) {
       scheduler.schedule(runWhenDisabled, dontRunWhenDisabled);

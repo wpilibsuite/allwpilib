@@ -16,6 +16,7 @@ class SolenoidSim {
   SolenoidSim(std::shared_ptr<PneumaticsBaseSim> moduleSim, int channel);
   SolenoidSim(int module, PneumaticsModuleType type, int channel);
   SolenoidSim(PneumaticsModuleType type, int channel);
+  virtual ~SolenoidSim() = default;
 
   bool GetOutput() const;
   void SetOutput(bool output);
