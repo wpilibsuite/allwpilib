@@ -36,7 +36,7 @@ public final class LinearSystemId {
       throw new IllegalArgumentException("radiusMeters must be greater than zero.");
     }
     if (gearing <= 0) {
-      throw new IllegalArgumentException("Gearing must be greater than zero.");
+      throw new IllegalArgumentException("gearing must be greater than zero.");
     }
 
     return new LinearSystem<>(
@@ -73,7 +73,7 @@ public final class LinearSystemId {
       throw new IllegalArgumentException("J must be greater than zero.");
     }
     if (gearing <= 0.0) {
-      throw new IllegalArgumentException("Gearing must be greater than zero.");
+      throw new IllegalArgumentException("gearing must be greater than zero.");
     }
 
     return new LinearSystem<>(
@@ -104,7 +104,7 @@ public final class LinearSystemId {
       throw new IllegalArgumentException("J must be greater than zero.");
     }
     if (gearing <= 0.0) {
-      throw new IllegalArgumentException("Gearing must be greater than zero.");
+      throw new IllegalArgumentException("gearing must be greater than zero.");
     }
 
     return new LinearSystem<>(
@@ -190,7 +190,7 @@ public final class LinearSystemId {
       throw new IllegalArgumentException("JKgMetersSquared must be greater than zero.");
     }
     if (gearing <= 0.0) {
-      throw new IllegalArgumentException("Gearing must be greater than zero.");
+      throw new IllegalArgumentException("gearing must be greater than zero.");
     }
 
     var C1 =
@@ -225,7 +225,7 @@ public final class LinearSystemId {
       throw new IllegalArgumentException("JKgSquaredMeters must be greater than zero.");
     }
     if (gearing <= 0.0) {
-      throw new IllegalArgumentException("Gearing must be greater than zero.");
+      throw new IllegalArgumentException("gearing must be greater than zero.");
     }
 
     return new LinearSystem<>(
