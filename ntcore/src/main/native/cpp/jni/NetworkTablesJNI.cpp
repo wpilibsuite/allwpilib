@@ -31,7 +31,6 @@ void JNI_UnloadTypes(JNIEnv* env);
 //
 
 // Used for callback.
-static JavaVM* jvm = nullptr;
 static JClass booleanCls;
 static JClass connectionInfoCls;
 static JClass doubleCls;
@@ -72,8 +71,6 @@ static const JExceptionInit exceptions[] = {
 extern "C" {
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
-  jvm = vm;
-
   JNIEnv* env;
   if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
     return JNI_ERR;
@@ -114,7 +111,6 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
     c.cls->free(env);
   }
   nt::JNI_UnloadTypes(env);
-  jvm = nullptr;
 }
 
 }  // extern "C"
@@ -747,7 +743,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setTopicProperty
 {
   wpi::json j;
   try {
-    j = wpi::json::parse(JStringRef{env, value});
+    j = wpi::json::parse(std::string_view{JStringRef{env, value}});
   } catch (wpi::json::parse_error& err) {
     illegalArgEx.Throw(
         env, fmt::format("could not parse value JSON: {}", err.what()));
@@ -791,7 +787,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setTopicProperties
 {
   wpi::json j;
   try {
-    j = wpi::json::parse(JStringRef{env, properties});
+    j = wpi::json::parse(std::string_view{JStringRef{env, properties}});
   } catch (wpi::json::parse_error& err) {
     illegalArgEx.Throw(
         env, fmt::format("could not parse properties JSON: {}", err.what()));
@@ -856,7 +852,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_publishEx
 {
   wpi::json j;
   try {
-    j = wpi::json::parse(JStringRef{env, properties});
+    j = wpi::json::parse(std::string_view{JStringRef{env, properties}});
   } catch (wpi::json::parse_error& err) {
     illegalArgEx.Throw(
         env, fmt::format("could not parse properties JSON: {}", err.what()));
@@ -1286,7 +1282,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setServer__I_3Ljava_lang_Strin
                        "serverNames and ports arrays must be the same size");
     return;
   }
-  jint* portInts = env->GetIntArrayElements(ports, nullptr);
+  JSpan<const jint> portInts{env, ports};
   if (!portInts) {
     return;
   }
@@ -1306,7 +1302,6 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setServer__I_3Ljava_lang_Strin
     servers.emplace_back(
         std::make_pair(std::string_view{names.back()}, portInts[i]));
   }
-  env->ReleaseIntArrayElements(ports, portInts, JNI_ABORT);
   nt::SetServer(inst, servers);
 }
 

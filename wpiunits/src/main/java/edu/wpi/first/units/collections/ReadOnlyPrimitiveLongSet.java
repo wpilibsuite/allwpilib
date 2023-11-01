@@ -7,6 +7,7 @@ package edu.wpi.first.units.collections;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.stream.LongStream;
 
 /** A read-only set of unique primitive {@code long} values. */
@@ -87,7 +88,12 @@ public class ReadOnlyPrimitiveLongSet implements Iterable<Long> {
     return size() == 0;
   }
 
-  /** Creates a stream of primitive long values for the set. */
+  /**
+   * Creates a stream of primitive long values for the set.
+   *
+   * @return a sequential Stream over the elements in this collection
+   * @see Set#stream()
+   */
   public LongStream stream() {
     return Arrays.stream(m_values);
   }

@@ -2,5 +2,9 @@ include(CMakeFindDependencyMacro)
 @FILENAME_DEP_REPLACE@
 @WPIUTIL_DEP_REPLACE@
 
+if(@USE_SYSTEM_EIGEN@)
+    find_dependency(Eigen3)
+endif()
+
 @FILENAME_DEP_REPLACE@
 include(${SELF_DIR}/wpimath.cmake)

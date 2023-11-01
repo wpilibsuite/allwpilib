@@ -73,6 +73,89 @@ public class MecanumDriveWheelSpeeds {
     }
   }
 
+  /**
+   * Adds two MecanumDriveWheelSpeeds and returns the sum.
+   *
+   * <p>For example, MecanumDriveWheelSpeeds{1.0, 0.5, 2.0, 1.5} + MecanumDriveWheelSpeeds{2.0, 1.5,
+   * 0.5, 1.0} = MecanumDriveWheelSpeeds{3.0, 2.0, 2.5, 2.5}
+   *
+   * @param other The MecanumDriveWheelSpeeds to add.
+   * @return The sum of the MecanumDriveWheelSpeeds.
+   */
+  public MecanumDriveWheelSpeeds plus(MecanumDriveWheelSpeeds other) {
+    return new MecanumDriveWheelSpeeds(
+        frontLeftMetersPerSecond + other.frontLeftMetersPerSecond,
+        frontRightMetersPerSecond + other.frontRightMetersPerSecond,
+        rearLeftMetersPerSecond + other.rearLeftMetersPerSecond,
+        rearRightMetersPerSecond + other.rearRightMetersPerSecond);
+  }
+
+  /**
+   * Subtracts the other MecanumDriveWheelSpeeds from the current MecanumDriveWheelSpeeds and
+   * returns the difference.
+   *
+   * <p>For example, MecanumDriveWheelSpeeds{5.0, 4.0, 6.0, 2.5} - MecanumDriveWheelSpeeds{1.0, 2.0,
+   * 3.0, 0.5} = MecanumDriveWheelSpeeds{4.0, 2.0, 3.0, 2.0}
+   *
+   * @param other The MecanumDriveWheelSpeeds to subtract.
+   * @return The difference between the two MecanumDriveWheelSpeeds.
+   */
+  public MecanumDriveWheelSpeeds minus(MecanumDriveWheelSpeeds other) {
+    return new MecanumDriveWheelSpeeds(
+        frontLeftMetersPerSecond - other.frontLeftMetersPerSecond,
+        frontRightMetersPerSecond - other.frontRightMetersPerSecond,
+        rearLeftMetersPerSecond - other.rearLeftMetersPerSecond,
+        rearRightMetersPerSecond - other.rearRightMetersPerSecond);
+  }
+
+  /**
+   * Returns the inverse of the current MecanumDriveWheelSpeeds. This is equivalent to negating all
+   * components of the MecanumDriveWheelSpeeds.
+   *
+   * @return The inverse of the current MecanumDriveWheelSpeeds.
+   */
+  public MecanumDriveWheelSpeeds unaryMinus() {
+    return new MecanumDriveWheelSpeeds(
+        -frontLeftMetersPerSecond,
+        -frontRightMetersPerSecond,
+        -rearLeftMetersPerSecond,
+        -rearRightMetersPerSecond);
+  }
+
+  /**
+   * Multiplies the MecanumDriveWheelSpeeds by a scalar and returns the new MecanumDriveWheelSpeeds.
+   *
+   * <p>For example, MecanumDriveWheelSpeeds{2.0, 2.5, 3.0, 3.5} * 2 = MecanumDriveWheelSpeeds{4.0,
+   * 5.0, 6.0, 7.0}
+   *
+   * @param scalar The scalar to multiply by.
+   * @return The scaled MecanumDriveWheelSpeeds.
+   */
+  public MecanumDriveWheelSpeeds times(double scalar) {
+    return new MecanumDriveWheelSpeeds(
+        frontLeftMetersPerSecond * scalar,
+        frontRightMetersPerSecond * scalar,
+        rearLeftMetersPerSecond * scalar,
+        rearRightMetersPerSecond * scalar);
+  }
+
+  /**
+   * Divides the MecanumDriveWheelSpeeds by a scalar and returns the new MecanumDriveWheelSpeeds.
+   *
+   * <p>For example, MecanumDriveWheelSpeeds{2.0, 2.5, 1.5, 1.0} / 2 = MecanumDriveWheelSpeeds{1.0,
+   * 1.25, 0.75, 0.5}
+   *
+   * @param scalar The scalar to divide by.
+   * @return The scaled MecanumDriveWheelSpeeds.
+   */
+  public MecanumDriveWheelSpeeds div(double scalar) {
+    return new MecanumDriveWheelSpeeds(
+        frontLeftMetersPerSecond / scalar,
+        frontRightMetersPerSecond / scalar,
+        rearLeftMetersPerSecond / scalar,
+        rearRightMetersPerSecond / scalar);
+  }
+
   @Override
   public String toString() {
     return String.format(

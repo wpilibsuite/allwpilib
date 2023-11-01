@@ -43,11 +43,7 @@ wpi::SmallSet<Subsystem*, 4> Command::GetRequirements() const {
   return m_requirements;
 }
 
-void Command::AddRequirements(std::initializer_list<Subsystem*> requirements) {
-  m_requirements.insert(requirements.begin(), requirements.end());
-}
-
-void Command::AddRequirements(std::span<Subsystem* const> requirements) {
+void Command::AddRequirements(Requirements requirements) {
   m_requirements.insert(requirements.begin(), requirements.end());
 }
 
@@ -96,27 +92,14 @@ CommandPtr Command::WithInterruptBehavior(
   return std::move(*this).ToPtr().WithInterruptBehavior(interruptBehavior);
 }
 
-CommandPtr Command::BeforeStarting(
-    std::function<void()> toRun,
-    std::initializer_list<Subsystem*> requirements) && {
-  return std::move(*this).BeforeStarting(
-      std::move(toRun), {requirements.begin(), requirements.end()});
-}
-
-CommandPtr Command::BeforeStarting(
-    std::function<void()> toRun, std::span<Subsystem* const> requirements) && {
+CommandPtr Command::BeforeStarting(std::function<void()> toRun,
+                                   Requirements requirements) && {
   return std::move(*this).ToPtr().BeforeStarting(std::move(toRun),
                                                  requirements);
 }
 
 CommandPtr Command::AndThen(std::function<void()> toRun,
-                            std::initializer_list<Subsystem*> requirements) && {
-  return std::move(*this).AndThen(std::move(toRun),
-                                  {requirements.begin(), requirements.end()});
-}
-
-CommandPtr Command::AndThen(std::function<void()> toRun,
-                            std::span<Subsystem* const> requirements) && {
+                            Requirements requirements) && {
   return std::move(*this).ToPtr().AndThen(std::move(toRun), requirements);
 }
 

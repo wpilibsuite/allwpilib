@@ -7,7 +7,7 @@ include(FetchContent)
 FetchContent_Declare(
     apriltaglib
     GIT_REPOSITORY  https://github.com/wpilibsuite/apriltag.git
-    GIT_TAG         e55b751f2465bd40a880d9acb87d24289e2af89e
+    GIT_TAG         64be6ab26abf5e995321997fd0752c609a7e30f4
 )
 
 # Don't use apriltag's CMakeLists.txt due to conflicting naming and JNI
@@ -62,15 +62,26 @@ if (WITH_JAVA)
   target_link_libraries(apriltagjni PRIVATE apriltag_jni_headers)
   add_dependencies(apriltagjni apriltag_jar)
 
-  if (MSVC)
-    install(TARGETS apriltagjni RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)
-  endif()
-
-  install(TARGETS apriltagjni EXPORT apriltagjni DESTINATION "${main_lib_dest}")
+  install(TARGETS apriltagjni EXPORT apriltagjni)
 
 endif()
 
-GENERATE_RESOURCES(src/main/native/resources/edu/wpi/first/apriltag generated/main/cpp APRILTAG frc apriltag_resources_src)
+if (WITH_JAVA_SOURCE)
+  find_package(Java REQUIRED)
+  include(UseJava)
+  file(GLOB APRILTAG_SOURCES src/main/java/edu/wpi/first/apriltag/*.java)
+  add_jar(apriltag_src_jar
+  RESOURCES NAMESPACE "edu/wpi/first/apriltag" ${APRILTAG_SOURCES}
+  NAMESPACE "edu/wpi/first/apriltag/jni" src/main/java/edu/wpi/first/apriltag/jni/AprilTagJNI.java
+  OUTPUT_NAME apriltag-sources)
+
+  get_property(APRILTAG_SRC_JAR_FILE TARGET apriltag_src_jar PROPERTY JAR_FILE)
+  install(FILES ${APRILTAG_SRC_JAR_FILE} DESTINATION "${java_lib_dest}")
+
+  set_property(TARGET apriltag_src_jar PROPERTY FOLDER "java")
+endif()
+
+generate_resources(src/main/native/resources/edu/wpi/first/apriltag generated/main/cpp APRILTAG frc apriltag_resources_src)
 
 file(GLOB apriltag_native_src src/main/native/cpp/*.cpp)
 
@@ -82,9 +93,9 @@ target_compile_features(apriltag PUBLIC cxx_std_20)
 wpilib_target_warnings(apriltag)
 # disable warnings that apriltaglib can't handle
 if (MSVC)
-  target_compile_options(apriltag PRIVATE /wd4018)
+  target_compile_options(apriltag PRIVATE /wd4018 /wd4005 /wd4996)
 else()
-  target_compile_options(apriltag PRIVATE -Wno-sign-compare -Wno-gnu-zero-variadic-macro-arguments)
+  target_compile_options(apriltag PRIVATE -Wno-sign-compare -Wno-gnu-zero-variadic-macro-arguments -Wno-type-limits)
 endif()
 
 target_link_libraries(apriltag wpimath)
@@ -94,12 +105,8 @@ target_include_directories(apriltag PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
   $<INSTALL_INTERFACE:${include_dest}/apriltag>)
 
-install(TARGETS apriltag EXPORT apriltag DESTINATION "${main_lib_dest}")
+install(TARGETS apriltag EXPORT apriltag)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/apriltag")
-
-if (WITH_JAVA AND MSVC)
-    install(TARGETS apriltag RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)
-endif()
 
 if (WITH_FLAT_INSTALL)
     set (apriltag_config_dir ${wpilib_dest})

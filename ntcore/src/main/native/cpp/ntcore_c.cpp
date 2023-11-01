@@ -596,6 +596,27 @@ void NT_SetNow(int64_t timestamp) {
   nt::SetNow(timestamp);
 }
 
+NT_DataLogger NT_StartEntryDataLog(NT_Inst inst, struct WPI_DataLog* log,
+                                   const char* prefix, const char* logPrefix) {
+  return nt::StartEntryDataLog(inst, *reinterpret_cast<wpi::log::DataLog*>(log),
+                               prefix, logPrefix);
+}
+
+void NT_StopEntryDataLog(NT_DataLogger logger) {
+  nt::StopEntryDataLog(logger);
+}
+
+NT_ConnectionDataLogger NT_StartConnectionDataLog(NT_Inst inst,
+                                                  struct WPI_DataLog* log,
+                                                  const char* name) {
+  return nt::StartConnectionDataLog(
+      inst, *reinterpret_cast<wpi::log::DataLog*>(log), name);
+}
+
+void NT_StopConnectionDataLog(NT_ConnectionDataLogger logger) {
+  nt::StopConnectionDataLog(logger);
+}
+
 NT_Listener NT_AddLogger(NT_Inst inst, unsigned int min_level,
                          unsigned int max_level, void* data,
                          NT_ListenerCallback func) {
@@ -610,6 +631,15 @@ NT_Listener NT_AddLogger(NT_Inst inst, unsigned int min_level,
 NT_Listener NT_AddPolledLogger(NT_ListenerPoller poller, unsigned int min_level,
                                unsigned int max_level) {
   return nt::AddPolledLogger(poller, min_level, max_level);
+}
+
+NT_Bool NT_HasSchema(NT_Inst inst, const char* name) {
+  return nt::HasSchema(inst, name);
+}
+
+void NT_AddSchema(NT_Inst inst, const char* name, const char* type,
+                  const uint8_t* schema, size_t schemaSize) {
+  nt::AddSchema(inst, name, type, {schema, schemaSize});
 }
 
 void NT_DisposeValue(NT_Value* value) {

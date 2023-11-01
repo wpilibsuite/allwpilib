@@ -35,6 +35,7 @@ import java.util.EnumSet;
 public final class Preferences {
   /** The Preferences table name. */
   private static final String TABLE_NAME = "Preferences";
+
   /** The network table. */
   private static NetworkTable m_table;
 

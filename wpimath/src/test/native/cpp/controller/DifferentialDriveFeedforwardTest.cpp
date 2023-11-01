@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <gtest/gtest.h>
-
 #include <cmath>
 
-#include "frc/EigenCore.h"
+#include <Eigen/Core>
+#include <gtest/gtest.h>
+
 #include "frc/controller/DifferentialDriveFeedforward.h"
 #include "frc/controller/LinearPlantInversionFeedforward.h"
 #include "frc/system/plant/LinearSystemId.h"
@@ -38,9 +38,9 @@ TEST(DifferentialDriveFeedforwardTest, CalculateWithTrackwidth) {
           auto [left, right] = differentialDriveFeedforward.Calculate(
               currentLeftVelocity, nextLeftVelocity, currentRightVelocity,
               nextRightVelocity, dt);
-          frc::Matrixd<2, 1> nextX = plant.CalculateX(
-              frc::Vectord<2>{currentLeftVelocity, currentRightVelocity},
-              frc::Vectord<2>{left, right}, dt);
+          Eigen::Vector2d nextX = plant.CalculateX(
+              Eigen::Vector2d{currentLeftVelocity, currentRightVelocity},
+              Eigen::Vector2d{left, right}, dt);
           EXPECT_NEAR(nextX(0), nextLeftVelocity.value(), 1e-6);
           EXPECT_NEAR(nextX(1), nextRightVelocity.value(), 1e-6);
         }
@@ -72,9 +72,9 @@ TEST(DifferentialDriveFeedforwardTest, CalculateWithoutTrackwidth) {
           auto [left, right] = differentialDriveFeedforward.Calculate(
               currentLeftVelocity, nextLeftVelocity, currentRightVelocity,
               nextRightVelocity, dt);
-          frc::Matrixd<2, 1> nextX = plant.CalculateX(
-              frc::Vectord<2>{currentLeftVelocity, currentRightVelocity},
-              frc::Vectord<2>{left, right}, dt);
+          Eigen::Vector2d nextX = plant.CalculateX(
+              Eigen::Vector2d{currentLeftVelocity, currentRightVelocity},
+              Eigen::Vector2d{left, right}, dt);
           EXPECT_NEAR(nextX(0), nextLeftVelocity.value(), 1e-6);
           EXPECT_NEAR(nextX(1), nextRightVelocity.value(), 1e-6);
         }

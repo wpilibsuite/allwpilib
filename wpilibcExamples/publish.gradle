@@ -22,6 +22,10 @@ task cppExamplesZip(type: Zip) {
     from('src/main/cpp/examples') {
         into 'examples'
     }
+
+    from('src/test/cpp/examples') {
+        into 'examples_test'
+    }
 }
 
 task cppTemplatesZip(type: Zip) {
@@ -35,6 +39,10 @@ task cppTemplatesZip(type: Zip) {
     from('src/main/cpp/templates') {
         into 'templates'
     }
+
+    from('src/test/cpp/templates') {
+        into 'templates_test'
+    }
 }
 
 task cppCommandsZip(type: Zip) {
@@ -47,6 +55,10 @@ task cppCommandsZip(type: Zip) {
 
     from('src/main/cpp/commands') {
         into 'commands'
+    }
+
+    from('src/test/cpp/commands') {
+        into 'commands_test'
     }
 }
 

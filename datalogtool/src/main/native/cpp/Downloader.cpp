@@ -4,8 +4,6 @@
 
 #include "Downloader.h"
 
-#include <libssh/sftp.h>
-
 #ifdef _WIN32
 #include <fcntl.h>
 #include <io.h>
@@ -20,6 +18,7 @@
 #include <glass/Storage.h>
 #include <imgui.h>
 #include <imgui_stdlib.h>
+#include <libssh/sftp.h>
 #include <portable-file-dialogs.h>
 #include <wpi/StringExtras.h>
 #include <wpi/fs.h>
@@ -428,7 +427,7 @@ void Downloader::ThreadMain() {
               continue;
             }
             lock.lock();
-          err : {}
+          err: {}
           }
           if (m_state == kDownload) {
             m_state = kDownloadDone;

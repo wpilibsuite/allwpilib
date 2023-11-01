@@ -6,7 +6,8 @@
 
 #include <frc/system/LinearSystem.h>
 
-#include "Eigen/QR"
+#include <Eigen/QR>
+
 #include "frc/EigenCore.h"
 #include "units/time.h"
 

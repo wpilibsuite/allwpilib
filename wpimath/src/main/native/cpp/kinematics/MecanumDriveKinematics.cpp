@@ -25,7 +25,7 @@ MecanumDriveWheelSpeeds MecanumDriveKinematics::ToWheelSpeeds(
                                       chassisSpeeds.vy.value(),
                                       chassisSpeeds.omega.value()};
 
-  Vectord<4> wheelsVector = m_inverseKinematics * chassisSpeedsVector;
+  Eigen::Vector4d wheelsVector = m_inverseKinematics * chassisSpeedsVector;
 
   MecanumDriveWheelSpeeds wheelSpeeds;
   wheelSpeeds.frontLeft = units::meters_per_second_t{wheelsVector(0)};
@@ -37,7 +37,7 @@ MecanumDriveWheelSpeeds MecanumDriveKinematics::ToWheelSpeeds(
 
 ChassisSpeeds MecanumDriveKinematics::ToChassisSpeeds(
     const MecanumDriveWheelSpeeds& wheelSpeeds) const {
-  Vectord<4> wheelSpeedsVector{
+  Eigen::Vector4d wheelSpeedsVector{
       wheelSpeeds.frontLeft.value(), wheelSpeeds.frontRight.value(),
       wheelSpeeds.rearLeft.value(), wheelSpeeds.rearRight.value()};
 
@@ -52,7 +52,7 @@ ChassisSpeeds MecanumDriveKinematics::ToChassisSpeeds(
 Twist2d MecanumDriveKinematics::ToTwist2d(
     const MecanumDriveWheelPositions& start,
     const MecanumDriveWheelPositions& end) const {
-  Vectord<4> wheelDeltasVector{
+  Eigen::Vector4d wheelDeltasVector{
       end.frontLeft.value() - start.frontLeft.value(),
       end.frontRight.value() - start.frontRight.value(),
       end.rearLeft.value() - start.rearLeft.value(),
@@ -66,7 +66,7 @@ Twist2d MecanumDriveKinematics::ToTwist2d(
 
 Twist2d MecanumDriveKinematics::ToTwist2d(
     const MecanumDriveWheelPositions& wheelDeltas) const {
-  Vectord<4> wheelDeltasVector{
+  Eigen::Vector4d wheelDeltasVector{
       wheelDeltas.frontLeft.value(), wheelDeltas.frontRight.value(),
       wheelDeltas.rearLeft.value(), wheelDeltas.rearRight.value()};
 

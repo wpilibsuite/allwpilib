@@ -39,7 +39,7 @@ public final class Filesystem {
    * @return The operating directory
    */
   public static File getOperatingDirectory() {
-    if (RobotBase.isReal()) {
+    if (!RobotBase.isSimulation()) {
       return new File("/home/lvuser");
     } else {
       return getLaunchDirectory();
@@ -54,7 +54,7 @@ public final class Filesystem {
    * @return The 'deploy' directory
    */
   public static File getDeployDirectory() {
-    if (RobotBase.isReal()) {
+    if (!RobotBase.isSimulation()) {
       return new File(getOperatingDirectory(), "deploy");
     } else {
       return new File(

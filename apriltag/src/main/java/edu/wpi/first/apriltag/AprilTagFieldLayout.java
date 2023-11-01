@@ -199,9 +199,16 @@ public class AprilTagFieldLayout {
    * @throws IOException If the resource could not be loaded
    */
   public static AprilTagFieldLayout loadFromResource(String resourcePath) throws IOException {
-    try (InputStream stream = AprilTagFieldLayout.class.getResourceAsStream(resourcePath);
-        InputStreamReader reader = new InputStreamReader(stream)) {
+    InputStream stream = AprilTagFieldLayout.class.getResourceAsStream(resourcePath);
+    if (stream == null) {
+      // Class.getResourceAsStream() returns null if the resource does not exist.
+      throw new IOException("Could not locate resource: " + resourcePath);
+    }
+    InputStreamReader reader = new InputStreamReader(stream);
+    try {
       return new ObjectMapper().readerFor(AprilTagFieldLayout.class).readValue(reader);
+    } catch (IOException e) {
+      throw new IOException("Failed to load AprilTagFieldLayout: " + resourcePath);
     }
   }
 

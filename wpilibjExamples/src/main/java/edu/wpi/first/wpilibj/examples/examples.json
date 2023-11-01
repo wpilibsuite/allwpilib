@@ -174,6 +174,21 @@
     "commandversion": 2
   },
   {
+    "name": "Elevator with exponential profile",
+    "description": "Reach elevator position setpoints with exponential profiles and smart motor controller PID.",
+    "tags": [
+      "Basic Robot",
+      "Elevator",
+      "Exponential Profile",
+      "Smart Motor Controller",
+      "Joystick"
+    ],
+    "foldername": "elevatorexponentialprofile",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
     "name": "Elevator with profiled PID controller",
     "description": "Reach elevator position setpoints with an encoder and profiled PID control.",
     "tags": [
@@ -803,6 +818,23 @@
     "commandversion": 2
   },
   {
+    "name": "Elevator Exponential Profile Simulation",
+    "description": "Simulate an elevator.",
+    "tags": [
+      "Basic Robot",
+      "Elevator",
+      "State-Space",
+      "Simulation",
+      "Mechanism2d",
+      "PID",
+      "Exponential Profile"
+    ],
+    "foldername": "elevatorexponentialsimulation",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
     "name": "ArmSimulation",
     "description": "Simulate a single-jointed arm.",
     "tags": [
@@ -828,7 +860,8 @@
     "foldername": "unittest",
     "gradlebase": "java",
     "mainclass": "Main",
-    "commandversion": 2
+    "commandversion": 2,
+    "hasunittests": true
   },
   {
     "name": "DifferentialDrivePoseEstimator",
@@ -891,7 +924,28 @@
     "foldername": "romireference",
     "gradlebase": "javaromi",
     "mainclass": "Main",
-    "commandversion": 2
+    "commandversion": 2,
+    "extravendordeps": [
+      "romi"
+    ]
+  },
+  {
+    "name": "XRP Reference",
+    "description": "An example command-based robot program that can be used with the XRP reference robot design.",
+    "tags": [
+      "XRP",
+      "Command-based",
+      "Differential Drive",
+      "Digital Input",
+      "Joystick"
+    ],
+    "foldername": "xrpreference",
+    "gradlebase": "javaxrp",
+    "mainclass": "Main",
+    "commandversion": 2,
+    "extravendordeps": [
+      "xrp"
+    ]
   },
   {
     "name": "Digital Communication Sample",
@@ -913,6 +967,19 @@
       "I2C"
     ],
     "foldername": "i2ccommunication",
+    "gradlebase": "java",
+    "commandversion": 2,
+    "mainclass": "Main"
+  },
+  {
+    "name": "Flywheel BangBangController",
+    "description": "A sample program to demonstrate the use of a BangBangController with a flywheel to control RPM",
+    "tags": [
+      "Flywheel",
+      "Simulation",
+      "Joystick"
+    ],
+    "foldername": "flywheelbangbangcontroller",
     "gradlebase": "java",
     "commandversion": 2,
     "mainclass": "Main"

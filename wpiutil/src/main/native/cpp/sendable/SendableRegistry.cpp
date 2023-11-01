@@ -6,7 +6,8 @@
 
 #include <memory>
 
-#include "fmt/format.h"
+#include <fmt/format.h>
+
 #include "wpi/DenseMap.h"
 #include "wpi/SmallVector.h"
 #include "wpi/UidVector.h"

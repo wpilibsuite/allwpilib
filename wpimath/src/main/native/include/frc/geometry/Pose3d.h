@@ -5,15 +5,15 @@
 #pragma once
 
 #include <wpi/SymbolExports.h>
+#include <wpi/json_fwd.h>
+#include <wpi/protobuf/Protobuf.h>
+#include <wpi/struct/Struct.h>
 
 #include "frc/geometry/Pose2d.h"
+#include "frc/geometry/Rotation3d.h"
 #include "frc/geometry/Transform3d.h"
 #include "frc/geometry/Translation3d.h"
 #include "frc/geometry/Twist3d.h"
-
-namespace wpi {
-class json;
-}  // namespace wpi
 
 namespace frc {
 
@@ -56,7 +56,9 @@ class WPILIB_DLLEXPORT Pose3d {
 
   /**
    * Transforms the pose by the given transformation and returns the new
-   * transformed pose.
+   * transformed pose. The transform is applied relative to the pose's frame.
+   * Note that this differs from Pose3d::RotateBy(const Rotation3d&), which is
+   * applied relative to the global frame and around the origin.
    *
    * @param other The transform to transform the pose by.
    *
@@ -133,14 +135,18 @@ class WPILIB_DLLEXPORT Pose3d {
   /**
    * Rotates the pose around the origin and returns the new pose.
    *
-   * @param other The rotation to transform the pose by.
+   * @param other The rotation to transform the pose by, which is applied
+   * extrinsically (from the global frame).
    *
    * @return The rotated pose.
    */
   Pose3d RotateBy(const Rotation3d& other) const;
 
   /**
-   * Transforms the pose by the given transformation and returns the new pose.
+   * Transforms the pose by the given transformation and returns the new
+   * transformed pose. The transform is applied relative to the pose's frame.
+   * Note that this differs from Pose3d::RotateBy(const Rotation3d&), which is
+   * applied relative to the global frame and around the origin.
    *
    * @param other The transform to transform the pose by.
    *
@@ -210,3 +216,37 @@ WPILIB_DLLEXPORT
 void from_json(const wpi::json& json, Pose3d& pose);
 
 }  // namespace frc
+
+template <>
+struct wpi::Struct<frc::Pose3d> {
+  static constexpr std::string_view kTypeString = "struct:Pose3d";
+  static constexpr size_t kSize = wpi::Struct<frc::Translation3d>::kSize +
+                                  wpi::Struct<frc::Rotation3d>::kSize;
+  static constexpr std::string_view kSchema =
+      "Translation3d translation;Rotation3d rotation";
+  static frc::Pose3d Unpack(std::span<const uint8_t, kSize> data) {
+    return {wpi::UnpackStruct<frc::Translation3d, 0>(data),
+            wpi::UnpackStruct<frc::Rotation3d, kRotationOff>(data)};
+  }
+  static void Pack(std::span<uint8_t, kSize> data, const frc::Pose3d& value) {
+    wpi::PackStruct<0>(data, value.Translation());
+    wpi::PackStruct<kRotationOff>(data, value.Rotation());
+  }
+  static void ForEachNested(
+      std::invocable<std::string_view, std::string_view> auto fn) {
+    wpi::ForEachStructSchema<frc::Translation3d>(fn);
+    wpi::ForEachStructSchema<frc::Rotation3d>(fn);
+  }
+
+ private:
+  static constexpr size_t kRotationOff = wpi::Struct<frc::Translation3d>::kSize;
+};
+
+static_assert(wpi::HasNestedStruct<frc::Pose3d>);
+
+template <>
+struct WPILIB_DLLEXPORT wpi::Protobuf<frc::Pose3d> {
+  static google::protobuf::Message* New(google::protobuf::Arena* arena);
+  static frc::Pose3d Unpack(const google::protobuf::Message& msg);
+  static void Pack(google::protobuf::Message* msg, const frc::Pose3d& value);
+};

@@ -4,8 +4,9 @@
 
 #include <limits>
 
+#include <gtest/gtest.h>
+
 #include "frc/MathUtil.h"
-#include "gtest/gtest.h"
 #include "units/angle.h"
 
 #define EXPECT_UNITS_EQ(a, b) EXPECT_DOUBLE_EQ((a).value(), (b).value())

@@ -16,12 +16,17 @@
 #include <vector>
 
 #include <wpi/DenseMap.h>
+#include <wpi/SmallPtrSet.h>
 #include <wpi/StringMap.h>
 #include <wpi/UidVector.h>
 #include <wpi/json.h>
 
+#include "Handle.h"
+#include "Log.h"
 #include "Message.h"
 #include "NetworkInterface.h"
+#include "NetworkOutgoingQueue.h"
+#include "NetworkPing.h"
 #include "PubSubOptions.h"
 #include "VectorSet.h"
 #include "WireConnection.h"
@@ -57,8 +62,8 @@ class ServerImpl final {
 
   explicit ServerImpl(wpi::Logger& logger);
 
-  void SendControl(uint64_t curTimeMs);
-  void SendValues(int clientId, uint64_t curTimeMs);
+  void SendAllOutgoing(uint64_t curTimeMs, bool flush);
+  void SendOutgoing(int clientId, uint64_t curTimeMs);
 
   void HandleLocal(std::span<const ClientMessage> msgs);
   void SetLocal(LocalInterface* local);
@@ -88,9 +93,81 @@ class ServerImpl final {
  private:
   static constexpr uint32_t kMinPeriodMs = 5;
 
+  class ClientData;
   struct PublisherData;
   struct SubscriberData;
-  struct TopicData;
+
+  struct TopicData {
+    TopicData(wpi::Logger& logger, std::string_view name,
+              std::string_view typeStr)
+        : m_logger{logger}, name{name}, typeStr{typeStr} {}
+    TopicData(wpi::Logger& logger, std::string_view name,
+              std::string_view typeStr, wpi::json properties)
+        : m_logger{logger},
+          name{name},
+          typeStr{typeStr},
+          properties(std::move(properties)) {
+      RefreshProperties();
+    }
+
+    bool IsPublished() const {
+      return persistent || retained || publisherCount != 0;
+    }
+
+    // returns true if properties changed
+    bool SetProperties(const wpi::json& update);
+    void RefreshProperties();
+    bool SetFlags(unsigned int flags_);
+
+    NT_Handle GetIdHandle() const { return Handle(0, id, Handle::kTopic); }
+
+    wpi::Logger& m_logger;
+    std::string name;
+    unsigned int id;
+    Value lastValue;
+    ClientData* lastValueClient = nullptr;
+    std::string typeStr;
+    wpi::json properties = wpi::json::object();
+    unsigned int publisherCount{0};
+    bool persistent{false};
+    bool retained{false};
+    bool valueTransient{false};
+    bool special{false};
+    NT_Topic localHandle{0};
+
+    void AddPublisher(ClientData* client, PublisherData* pub) {
+      if (clients[client].publishers.insert(pub).second) {
+        ++publisherCount;
+      }
+    }
+
+    void RemovePublisher(ClientData* client, PublisherData* pub) {
+      if (clients[client].publishers.erase(pub)) {
+        --publisherCount;
+      }
+    }
+
+    struct TopicClientData {
+      wpi::SmallPtrSet<PublisherData*, 2> publishers;
+      wpi::SmallPtrSet<SubscriberData*, 2> subscribers;
+      ValueSendMode sendMode = ValueSendMode::kDisabled;
+
+      bool AddSubscriber(SubscriberData* sub) {
+        bool added = subscribers.insert(sub).second;
+        if (!sub->options.topicsOnly && sendMode == ValueSendMode::kDisabled) {
+          sendMode = ValueSendMode::kNormal;
+        } else if (sub->options.sendAll) {
+          sendMode = ValueSendMode::kAll;
+        }
+        return added;
+      }
+    };
+    wpi::SmallDenseMap<ClientData*, TopicClientData, 4> clients;
+
+    // meta topics
+    TopicData* metaPub = nullptr;
+    TopicData* metaSub = nullptr;
+  };
 
   class ClientData {
    public:
@@ -109,16 +186,14 @@ class ServerImpl final {
     virtual void ProcessIncomingText(std::string_view data) = 0;
     virtual void ProcessIncomingBinary(std::span<const uint8_t> data) = 0;
 
-    enum SendMode { kSendDisabled = 0, kSendAll, kSendNormal, kSendImmNoFlush };
-
     virtual void SendValue(TopicData* topic, const Value& value,
-                           SendMode mode) = 0;
+                           ValueSendMode mode) = 0;
     virtual void SendAnnounce(TopicData* topic,
                               std::optional<int64_t> pubuid) = 0;
     virtual void SendUnannounce(TopicData* topic) = 0;
     virtual void SendPropertiesUpdate(TopicData* topic, const wpi::json& update,
                                       bool ack) = 0;
-    virtual void SendOutgoing(uint64_t curTimeMs) = 0;
+    virtual void SendOutgoing(uint64_t curTimeMs, bool flush) = 0;
     virtual void Flush() = 0;
 
     void UpdateMetaClientPub();
@@ -132,13 +207,14 @@ class ServerImpl final {
     int GetId() const { return m_id; }
 
    protected:
+    virtual void UpdatePeriodic(TopicData* topic) {}
+
     std::string m_name;
     std::string m_connInfo;
     bool m_local;  // local to machine
     ServerImpl::SetPeriodicFunc m_setPeriodic;
     // TODO: make this per-topic?
     uint32_t m_periodMs{UINT32_MAX};
-    uint64_t m_lastSendMs{0};
     ServerImpl& m_server;
     int m_id;
 
@@ -175,6 +251,9 @@ class ServerImpl final {
 
     void ClientSetValue(int64_t pubuid, const Value& value);
 
+    virtual void UpdatePeriod(TopicData::TopicClientData& tcd,
+                              TopicData* topic) {}
+
     wpi::DenseMap<TopicData*, bool> m_announceSent;
   };
 
@@ -186,12 +265,13 @@ class ServerImpl final {
     void ProcessIncomingText(std::string_view data) final {}
     void ProcessIncomingBinary(std::span<const uint8_t> data) final {}
 
-    void SendValue(TopicData* topic, const Value& value, SendMode mode) final;
+    void SendValue(TopicData* topic, const Value& value,
+                   ValueSendMode mode) final;
     void SendAnnounce(TopicData* topic, std::optional<int64_t> pubuid) final;
     void SendUnannounce(TopicData* topic) final;
     void SendPropertiesUpdate(TopicData* topic, const wpi::json& update,
                               bool ack) final;
-    void SendOutgoing(uint64_t curTimeMs) final {}
+    void SendOutgoing(uint64_t curTimeMs, bool flush) final {}
     void Flush() final {}
 
     void HandleLocal(std::span<const ClientMessage> msgs);
@@ -204,50 +284,31 @@ class ServerImpl final {
                 ServerImpl& server, int id, wpi::Logger& logger)
         : ClientData4Base{name,   connInfo, local, setPeriodic,
                           server, id,       logger},
-          m_wire{wire} {}
+          m_wire{wire},
+          m_ping{wire},
+          m_outgoing{wire, local} {}
 
     void ProcessIncomingText(std::string_view data) final;
     void ProcessIncomingBinary(std::span<const uint8_t> data) final;
 
-    void SendValue(TopicData* topic, const Value& value, SendMode mode) final;
+    void SendValue(TopicData* topic, const Value& value,
+                   ValueSendMode mode) final;
     void SendAnnounce(TopicData* topic, std::optional<int64_t> pubuid) final;
     void SendUnannounce(TopicData* topic) final;
     void SendPropertiesUpdate(TopicData* topic, const wpi::json& update,
                               bool ack) final;
-    void SendOutgoing(uint64_t curTimeMs) final;
+    void SendOutgoing(uint64_t curTimeMs, bool flush) final;
 
-    void Flush() final;
+    void Flush() final {}
+
+    void UpdatePeriod(TopicData::TopicClientData& tcd, TopicData* topic) final;
 
    public:
     WireConnection& m_wire;
 
    private:
-    std::vector<ServerMessage> m_outgoing;
-    wpi::DenseMap<NT_Topic, size_t> m_outgoingValueMap;
-
-    bool WriteBinary(int64_t id, int64_t time, const Value& value) {
-      return WireEncodeBinary(SendBinary().Add(), id, time, value);
-    }
-
-    TextWriter& SendText() {
-      m_outBinary.reset();  // ensure proper interleaving of text and binary
-      if (!m_outText) {
-        m_outText = m_wire.SendText();
-      }
-      return *m_outText;
-    }
-
-    BinaryWriter& SendBinary() {
-      m_outText.reset();  // ensure proper interleaving of text and binary
-      if (!m_outBinary) {
-        m_outBinary = m_wire.SendBinary();
-      }
-      return *m_outBinary;
-    }
-
-    // valid when we are actively writing to this client
-    std::optional<TextWriter> m_outText;
-    std::optional<BinaryWriter> m_outBinary;
+    NetworkPing m_ping;
+    NetworkOutgoingQueue<ServerMessage> m_outgoing;
   };
 
   class ClientData3 final : public ClientData, private net3::MessageHandler3 {
@@ -265,12 +326,13 @@ class ServerImpl final {
     void ProcessIncomingText(std::string_view data) final {}
     void ProcessIncomingBinary(std::span<const uint8_t> data) final;
 
-    void SendValue(TopicData* topic, const Value& value, SendMode mode) final;
+    void SendValue(TopicData* topic, const Value& value,
+                   ValueSendMode mode) final;
     void SendAnnounce(TopicData* topic, std::optional<int64_t> pubuid) final;
     void SendUnannounce(TopicData* topic) final;
     void SendPropertiesUpdate(TopicData* topic, const wpi::json& update,
                               bool ack) final;
-    void SendOutgoing(uint64_t curTimeMs) final;
+    void SendOutgoing(uint64_t curTimeMs, bool flush) final;
 
     void Flush() final { m_wire.Flush(); }
 
@@ -305,6 +367,7 @@ class ServerImpl final {
     std::vector<net3::Message3> m_outgoing;
     wpi::DenseMap<NT_Topic, size_t> m_outgoingValueMap;
     int64_t m_nextPubUid{1};
+    uint64_t m_lastSendMs{0};
 
     struct TopicData3 {
       explicit TopicData3(TopicData* topic) { UpdateFlags(topic); }
@@ -323,56 +386,19 @@ class ServerImpl final {
     }
   };
 
-  struct TopicData {
-    TopicData(wpi::Logger& logger, std::string_view name,
-              std::string_view typeStr)
-        : m_logger{logger}, name{name}, typeStr{typeStr} {}
-    TopicData(wpi::Logger& logger, std::string_view name,
-              std::string_view typeStr, wpi::json properties)
-        : m_logger{logger},
-          name{name},
-          typeStr{typeStr},
-          properties(std::move(properties)) {
-      RefreshProperties();
-    }
-
-    bool IsPublished() const {
-      return persistent || retained || !publishers.empty();
-    }
-
-    // returns true if properties changed
-    bool SetProperties(const wpi::json& update);
-    void RefreshProperties();
-    bool SetFlags(unsigned int flags_);
-
-    wpi::Logger& m_logger;
-    std::string name;
-    unsigned int id;
-    Value lastValue;
-    ClientData* lastValueClient = nullptr;
-    std::string typeStr;
-    wpi::json properties = wpi::json::object();
-    bool persistent{false};
-    bool retained{false};
-    bool valueTransient{false};
-    bool special{false};
-    NT_Topic localHandle{0};
-
-    VectorSet<PublisherData*> publishers;
-    VectorSet<SubscriberData*> subscribers;
-
-    // meta topics
-    TopicData* metaPub = nullptr;
-    TopicData* metaSub = nullptr;
-  };
-
   struct PublisherData {
     PublisherData(ClientData* client, TopicData* topic, int64_t pubuid)
-        : client{client}, topic{topic}, pubuid{pubuid} {}
+        : client{client}, topic{topic}, pubuid{pubuid} {
+      UpdateMeta();
+    }
+
+    void UpdateMeta();
 
     ClientData* client;
     TopicData* topic;
     int64_t pubuid;
+    std::vector<uint8_t> metaClient;
+    std::vector<uint8_t> metaTopic;
   };
 
   struct SubscriberData {
@@ -383,6 +409,7 @@ class ServerImpl final {
           subuid{subuid},
           options{options},
           periodMs(std::lround(options.periodicMs / 10.0) * 10) {
+      UpdateMeta();
       if (periodMs < kMinPeriodMs) {
         periodMs = kMinPeriodMs;
       }
@@ -392,6 +419,7 @@ class ServerImpl final {
                 const PubSubOptionsImpl& options_) {
       topicNames = {topicNames_.begin(), topicNames_.end()};
       options = options_;
+      UpdateMeta();
       periodMs = std::lround(options_.periodicMs / 10.0) * 10;
       if (periodMs < kMinPeriodMs) {
         periodMs = kMinPeriodMs;
@@ -400,10 +428,15 @@ class ServerImpl final {
 
     bool Matches(std::string_view name, bool special);
 
+    void UpdateMeta();
+
     ClientData* client;
     std::vector<std::string> topicNames;
     int64_t subuid;
     PubSubOptionsImpl options;
+    std::vector<uint8_t> metaClient;
+    std::vector<uint8_t> metaTopic;
+    wpi::DenseMap<TopicData*, bool> topics;
     // in options as double, but copy here as integer; rounded to the nearest
     // 10 ms
     uint32_t periodMs;

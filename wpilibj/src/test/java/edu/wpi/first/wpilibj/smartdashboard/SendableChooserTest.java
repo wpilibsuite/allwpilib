@@ -28,13 +28,16 @@ class SendableChooserTest {
   @ParameterizedTest
   void returnsSelected(int toSelect) {
     try (var chooser = new SendableChooser<Integer>();
-        var publisher = m_inst.getStringTopic("/SmartDashboard/chooser/selected").publish()) {
+        var publisher =
+            m_inst
+                .getStringTopic("/SmartDashboard/returnsSelectedChooser" + toSelect + "/selected")
+                .publish()) {
       for (int i = 1; i <= 3; i++) {
         chooser.addOption(String.valueOf(i), i);
       }
       chooser.setDefaultOption(String.valueOf(0), 0);
 
-      SmartDashboard.putData("chooser", chooser);
+      SmartDashboard.putData("returnsSelectedChooser" + toSelect, chooser);
       SmartDashboard.updateValues();
       publisher.set(String.valueOf(toSelect));
       SmartDashboard.updateValues();
@@ -74,9 +77,9 @@ class SendableChooserTest {
       AtomicInteger currentVal = new AtomicInteger();
       chooser.onChange(val -> currentVal.set(val));
 
-      SmartDashboard.putData("chooser", chooser);
+      SmartDashboard.putData("changeListenerChooser", chooser);
       SmartDashboard.updateValues();
-      SmartDashboard.putString("chooser/selected", "3");
+      SmartDashboard.putString("changeListenerChooser/selected", "3");
       SmartDashboard.updateValues();
       assertEquals(3, currentVal.get());
     }

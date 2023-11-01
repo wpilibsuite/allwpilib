@@ -126,6 +126,7 @@ public final class Units {
    * @param baseUnit the unit being derived from. This does not have to be the base unit of measure
    * @param name the name of the new derived unit
    * @param symbol the symbol of the new derived unit
+   * @return the milli-unit
    */
   @SuppressWarnings({"PMD.MethodName", "checkstyle:methodname"})
   public static <U extends Unit<U>> U Milli(Unit<U> baseUnit, String name, String symbol) {
@@ -137,6 +138,7 @@ public final class Units {
    *
    * @param <U> the type of the unit
    * @param baseUnit the unit being derived from. This does not have to be the base unit of measure
+   * @return the milli-unit
    */
   @SuppressWarnings({"PMD.MethodName", "checkstyle:methodname"})
   public static <U extends Unit<U>> U Milli(Unit<U> baseUnit) {
@@ -152,6 +154,7 @@ public final class Units {
    * @param baseUnit the unit being derived from. This does not have to be the base unit of measure
    * @param name the name of the new derived unit
    * @param symbol the symbol of the new derived unit
+   * @return the micro-unit
    */
   @SuppressWarnings({"PMD.MethodName", "checkstyle:methodname"})
   public static <U extends Unit<U>> U Micro(Unit<U> baseUnit, String name, String symbol) {
@@ -163,6 +166,7 @@ public final class Units {
    *
    * @param <U> the type of the unit
    * @param baseUnit the unit being derived from. This does not have to be the base unit of measure
+   * @return the micro-unit
    */
   @SuppressWarnings({"PMD.MethodName", "checkstyle:methodname"})
   public static <U extends Unit<U>> U Micro(Unit<U> baseUnit) {
@@ -177,6 +181,7 @@ public final class Units {
    * @param baseUnit the unit being derived from. This does not have to be the base unit of measure
    * @param name the name of the new derived unit
    * @param symbol the symbol of the new derived unit
+   * @return the kilo-unit
    */
   @SuppressWarnings({"PMD.MethodName", "checkstyle:methodname"})
   public static <U extends Unit<U>> U Kilo(Unit<U> baseUnit, String name, String symbol) {
@@ -188,6 +193,7 @@ public final class Units {
    *
    * @param <U> the type of the unit
    * @param baseUnit the unit being derived from. This does not have to be the base unit of measure
+   * @return the kilo-unit
    */
   @SuppressWarnings({"PMD.MethodName", "checkstyle:methodname"})
   public static <U extends Unit<U>> U Kilo(Unit<U> baseUnit) {

@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class EventVector {
-  private ReentrantLock m_lock = new ReentrantLock();
-  private List<Integer> m_events = new ArrayList<>();
+  private final ReentrantLock m_lock = new ReentrantLock();
+  private final List<Integer> m_events = new ArrayList<>();
 
   /**
    * Adds an event to the event vector.

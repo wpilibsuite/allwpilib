@@ -25,7 +25,7 @@ frc2::CommandPtr HatchSubsystem::ReleaseHatchCommand() {
 }
 
 void HatchSubsystem::InitSendable(wpi::SendableBuilder& builder) {
-  Subsystem::InitSendable(builder);
+  SubsystemBase::InitSendable(builder);
 
   // Publish the solenoid state to telemetry.
   builder.AddBooleanProperty(

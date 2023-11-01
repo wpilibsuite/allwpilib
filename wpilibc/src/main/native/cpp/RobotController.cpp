@@ -41,6 +41,10 @@ std::string RobotController::GetComments() {
   return std::string(comments, len);
 }
 
+int32_t RobotController::GetTeamNumber() {
+  return HAL_GetTeamNumber();
+}
+
 uint64_t RobotController::GetFPGATime() {
   int32_t status = 0;
   uint64_t time = HAL_GetFPGATime(&status);
@@ -80,6 +84,13 @@ bool RobotController::GetRSLState() {
   int32_t status = 0;
   bool retVal = HAL_GetRSLState(&status);
   FRC_CheckErrorStatus(status, "GetRSLState");
+  return retVal;
+}
+
+bool RobotController::IsSystemTimeValid() {
+  int32_t status = 0;
+  bool retVal = HAL_GetSystemTimeValid(&status);
+  FRC_CheckErrorStatus(status, "IsSystemTimeValid");
   return retVal;
 }
 

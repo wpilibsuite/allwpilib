@@ -103,7 +103,7 @@ bool convertUTF16ToUTF8String(std::span<const char> SrcBytes, SmallVectorImpl<ch
   if (Src[0] == UNI_UTF16_BYTE_ORDER_MARK_SWAPPED) {
     ByteSwapped.insert(ByteSwapped.end(), Src, SrcEnd);
     for (UTF16 &I : ByteSwapped)
-      I = wpi::ByteSwap_16(I);
+      I = wpi::byteswap<uint16_t>(I);
     Src = &ByteSwapped[0];
     SrcEnd = &ByteSwapped[ByteSwapped.size() - 1] + 1;
   }
@@ -161,7 +161,7 @@ bool convertUTF32ToUTF8String(std::span<const char> SrcBytes, std::string &Out) 
   if (Src[0] == UNI_UTF32_BYTE_ORDER_MARK_SWAPPED) {
     ByteSwapped.insert(ByteSwapped.end(), Src, SrcEnd);
     for (UTF32 &I : ByteSwapped)
-      I = wpi::ByteSwap_32(I);
+      I = wpi::byteswap<uint32_t>(I);
     Src = &ByteSwapped[0];
     SrcEnd = &ByteSwapped[ByteSwapped.size() - 1] + 1;
   }

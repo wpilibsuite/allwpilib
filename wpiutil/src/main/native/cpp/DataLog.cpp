@@ -26,17 +26,37 @@
 #include <random>
 #include <vector>
 
-#include "fmt/format.h"
+#include <fmt/format.h>
+
 #include "wpi/Endian.h"
 #include "wpi/Logger.h"
 #include "wpi/MathExtras.h"
+#include "wpi/SmallString.h"
 #include "wpi/fs.h"
 #include "wpi/timestamp.h"
 
 using namespace wpi::log;
 
 static constexpr size_t kBlockSize = 16 * 1024;
+static constexpr size_t kMaxBufferCount = 1024 * 1024 / kBlockSize;
+static constexpr size_t kMaxFreeCount = 256 * 1024 / kBlockSize;
 static constexpr size_t kRecordMaxHeaderSize = 17;
+static constexpr uintmax_t kMinFreeSpace = 5 * 1024 * 1024;
+
+static std::string FormatBytesSize(uintmax_t value) {
+  static constexpr uintmax_t kKiB = 1024;
+  static constexpr uintmax_t kMiB = kKiB * 1024;
+  static constexpr uintmax_t kGiB = kMiB * 1024;
+  if (value >= kGiB) {
+    return fmt::format("{:.1f} GiB", static_cast<double>(value) / kGiB);
+  } else if (value >= kMiB) {
+    return fmt::format("{:.1f} MiB", static_cast<double>(value) / kMiB);
+  } else if (value >= kKiB) {
+    return fmt::format("{:.1f} KiB", static_cast<double>(value) / kKiB);
+  } else {
+    return fmt::format("{} B", value);
+  }
+}
 
 template <typename T>
 static unsigned int WriteVarInt(uint8_t* buf, T val) {
@@ -192,6 +212,33 @@ void DataLog::Resume() {
   m_paused = false;
 }
 
+bool DataLog::HasSchema(std::string_view name) const {
+  std::scoped_lock lock{m_mutex};
+  wpi::SmallString<128> fullName{"/.schema/"};
+  fullName += name;
+  auto it = m_entries.find(fullName);
+  return it != m_entries.end();
+}
+
+void DataLog::AddSchema(std::string_view name, std::string_view type,
+                        std::span<const uint8_t> schema, int64_t timestamp) {
+  std::scoped_lock lock{m_mutex};
+  wpi::SmallString<128> fullName{"/.schema/"};
+  fullName += name;
+  auto& entryInfo = m_entries[fullName];
+  if (entryInfo.id != 0) {
+    return;  // don't add duplicates
+  }
+  int entry = StartImpl(fullName, type, {}, timestamp);
+
+  // inline AppendRaw() without releasing lock
+  if (entry <= 0) {
+    [[unlikely]] return;  // should never happen, but check anyway
+  }
+  StartRecord(entry, timestamp, schema.size(), 0);
+  AppendImpl(schema);
+}
+
 static void WriteToFile(fs::file_t f, std::span<const uint8_t> data,
                         std::string_view filename, wpi::Logger& msglog) {
   do {
@@ -253,32 +300,42 @@ void DataLog::WriterThreadMain(std::string_view dir) {
     filename = MakeRandomFilename();
   }
 
-  // try preferred filename, or randomize it a few times, before giving up
-  fs::file_t f;
-  for (int i = 0; i < 5; ++i) {
-    // open file for append
-#ifdef _WIN32
-    // WIN32 doesn't allow combination of CreateNew and Append
-    f = fs::OpenFileForWrite(dirPath / filename, ec, fs::CD_CreateNew,
-                             fs::OF_None);
-#else
-    f = fs::OpenFileForWrite(dirPath / filename, ec, fs::CD_CreateNew,
-                             fs::OF_Append);
-#endif
-    if (ec) {
-      WPI_ERROR(m_msglog, "Could not open log file '{}': {}",
-                (dirPath / filename).string(), ec.message());
-      // try again with random filename
-      filename = MakeRandomFilename();
-    } else {
-      break;
-    }
-  }
+  fs::file_t f = fs::kInvalidFile;
 
-  if (f == fs::kInvalidFile) {
-    WPI_ERROR(m_msglog, "Could not open log file, no log being saved");
+  // get free space
+  uintmax_t freeSpace = fs::space(dirPath).available;
+  if (freeSpace < kMinFreeSpace) {
+    WPI_ERROR(m_msglog,
+              "Insufficient free space ({} available), no log being saved",
+              FormatBytesSize(freeSpace));
   } else {
-    WPI_INFO(m_msglog, "Logging to '{}'", (dirPath / filename).string());
+    // try preferred filename, or randomize it a few times, before giving up
+    for (int i = 0; i < 5; ++i) {
+      // open file for append
+#ifdef _WIN32
+      // WIN32 doesn't allow combination of CreateNew and Append
+      f = fs::OpenFileForWrite(dirPath / filename, ec, fs::CD_CreateNew,
+                               fs::OF_None);
+#else
+      f = fs::OpenFileForWrite(dirPath / filename, ec, fs::CD_CreateNew,
+                               fs::OF_Append);
+#endif
+      if (ec) {
+        WPI_ERROR(m_msglog, "Could not open log file '{}': {}",
+                  (dirPath / filename).string(), ec.message());
+        // try again with random filename
+        filename = MakeRandomFilename();
+      } else {
+        break;
+      }
+    }
+
+    if (f == fs::kInvalidFile) {
+      WPI_ERROR(m_msglog, "Could not open log file, no log being saved");
+    } else {
+      WPI_INFO(m_msglog, "Logging to '{}' ({} free space)",
+               (dirPath / filename).string(), FormatBytesSize(freeSpace));
+    }
   }
 
   // write header (version 1.0)
@@ -297,6 +354,8 @@ void DataLog::WriterThreadMain(std::string_view dir) {
   }
 
   std::vector<Buffer> toWrite;
+  int freeSpaceCount = 0;
+  bool blocked = false;
 
   std::unique_lock lock{m_mutex};
   while (m_active) {
@@ -306,7 +365,7 @@ void DataLog::WriterThreadMain(std::string_view dir) {
       doFlush = true;
     }
 
-    if (!m_newFilename.empty()) {
+    if (!m_newFilename.empty() && f != fs::kInvalidFile) {
       auto newFilename = std::move(m_newFilename);
       m_newFilename.clear();
       lock.unlock();
@@ -334,10 +393,27 @@ void DataLog::WriterThreadMain(std::string_view dir) {
       // swap outgoing with empty vector
       toWrite.swap(m_outgoing);
 
-      if (f != fs::kInvalidFile) {
+      if (f != fs::kInvalidFile && !blocked) {
         lock.unlock();
+
+        // update free space every 10 flushes (in case other things are writing)
+        if (++freeSpaceCount >= 10) {
+          freeSpaceCount = 0;
+          freeSpace = fs::space(dirPath).available;
+        }
+
         // write buffers to file
         for (auto&& buf : toWrite) {
+          // stop writing when we go below the minimum free space
+          freeSpace -= buf.GetData().size();
+          if (freeSpace < kMinFreeSpace) {
+            [[unlikely]] WPI_ERROR(
+                m_msglog,
+                "Stopped logging due to low free space ({} available)",
+                FormatBytesSize(freeSpace));
+            blocked = true;
+            break;
+          }
           WriteToFile(f, buf.GetData(), filename, m_msglog);
         }
 
@@ -348,12 +424,17 @@ void DataLog::WriterThreadMain(std::string_view dir) {
         ::fsync(f);
 #endif
         lock.lock();
+        if (blocked) {
+          [[unlikely]] m_paused = true;
+        }
       }
 
       // release buffers back to free list
       for (auto&& buf : toWrite) {
         buf.Clear();
-        m_free.emplace_back(std::move(buf));
+        if (m_free.size() < kMaxFreeCount) {
+          [[likely]] m_free.emplace_back(std::move(buf));
+        }
       }
       toWrite.resize(0);
     }
@@ -412,7 +493,9 @@ void DataLog::WriterThreadMain(
       // release buffers back to free list
       for (auto&& buf : toWrite) {
         buf.Clear();
-        m_free.emplace_back(std::move(buf));
+        if (m_free.size() < kMaxFreeCount) {
+          [[likely]] m_free.emplace_back(std::move(buf));
+        }
       }
       toWrite.resize(0);
     }
@@ -429,6 +512,11 @@ void DataLog::WriterThreadMain(
 int DataLog::Start(std::string_view name, std::string_view type,
                    std::string_view metadata, int64_t timestamp) {
   std::scoped_lock lock{m_mutex};
+  return StartImpl(name, type, metadata, timestamp);
+}
+
+int DataLog::StartImpl(std::string_view name, std::string_view type,
+                       std::string_view metadata, int64_t timestamp) {
   auto& entryInfo = m_entries[name];
   if (entryInfo.id == 0) {
     entryInfo.id = ++m_lastId;
@@ -491,6 +579,13 @@ uint8_t* DataLog::Reserve(size_t size) {
   assert(size <= kBlockSize);
   if (m_outgoing.empty() || size > m_outgoing.back().GetRemaining()) {
     if (m_free.empty()) {
+      if (m_outgoing.size() >= kMaxBufferCount) {
+        [[unlikely]] WPI_ERROR(
+            m_msglog,
+            "outgoing buffers exceeded threshold, pausing logging--"
+            "consider flushing to disk more frequently (smaller period)");
+        m_paused = true;
+      }
       m_outgoing.emplace_back();
     } else {
       m_outgoing.emplace_back(std::move(m_free.back()));
@@ -595,7 +690,7 @@ void DataLog::AppendFloat(int entry, float value, int64_t timestamp) {
                 wpi::support::little) {
     std::memcpy(buf, &value, 4);
   } else {
-    wpi::support::endian::write32le(buf, wpi::FloatToBits(value));
+    wpi::support::endian::write32le(buf, wpi::bit_cast<uint32_t>(value));
   }
 }
 
@@ -612,7 +707,7 @@ void DataLog::AppendDouble(int entry, double value, int64_t timestamp) {
                 wpi::support::little) {
     std::memcpy(buf, &value, 8);
   } else {
-    wpi::support::endian::write64le(buf, wpi::DoubleToBits(value));
+    wpi::support::endian::write64le(buf, wpi::bit_cast<uint64_t>(value));
   }
 }
 
@@ -729,14 +824,14 @@ void DataLog::AppendFloatArray(int entry, std::span<const float> arr,
     while ((arr.size() * 4) > kBlockSize) {
       buf = Reserve(kBlockSize);
       for (auto val : arr.subspan(0, kBlockSize / 4)) {
-        wpi::support::endian::write32le(buf, wpi::FloatToBits(val));
+        wpi::support::endian::write32le(buf, wpi::bit_cast<uint32_t>(val));
         buf += 4;
       }
       arr = arr.subspan(kBlockSize / 4);
     }
     buf = Reserve(arr.size() * 4);
     for (auto val : arr) {
-      wpi::support::endian::write32le(buf, wpi::FloatToBits(val));
+      wpi::support::endian::write32le(buf, wpi::bit_cast<uint32_t>(val));
       buf += 4;
     }
   }
@@ -762,14 +857,14 @@ void DataLog::AppendDoubleArray(int entry, std::span<const double> arr,
     while ((arr.size() * 8) > kBlockSize) {
       buf = Reserve(kBlockSize);
       for (auto val : arr.subspan(0, kBlockSize / 8)) {
-        wpi::support::endian::write64le(buf, wpi::DoubleToBits(val));
+        wpi::support::endian::write64le(buf, wpi::bit_cast<uint64_t>(val));
         buf += 8;
       }
       arr = arr.subspan(kBlockSize / 8);
     }
     buf = Reserve(arr.size() * 8);
     for (auto val : arr) {
-      wpi::support::endian::write64le(buf, wpi::DoubleToBits(val));
+      wpi::support::endian::write64le(buf, wpi::bit_cast<uint64_t>(val));
       buf += 8;
     }
   }
@@ -815,7 +910,160 @@ void DataLog::AppendStringArray(int entry,
   }
   uint8_t* buf = StartRecord(entry, timestamp, size, 4);
   wpi::support::endian::write32le(buf, arr.size());
-  for (auto sv : arr) {
+  for (auto&& sv : arr) {
     AppendStringImpl(sv);
   }
 }
+
+void DataLog::AppendStringArray(int entry,
+                                std::span<const WPI_DataLog_String> arr,
+                                int64_t timestamp) {
+  if (entry <= 0) {
+    return;
+  }
+  // storage: 4-byte array length, each string prefixed by 4-byte length
+  // calculate total size
+  size_t size = 4;
+  for (auto&& str : arr) {
+    size += 4 + str.len;
+  }
+  std::scoped_lock lock{m_mutex};
+  if (m_paused) {
+    return;
+  }
+  uint8_t* buf = StartRecord(entry, timestamp, size, 4);
+  wpi::support::endian::write32le(buf, arr.size());
+  for (auto&& sv : arr) {
+    AppendStringImpl(sv.str);
+  }
+}
+
+extern "C" {
+
+struct WPI_DataLog* WPI_DataLog_Create(const char* dir, const char* filename,
+                                       double period, const char* extraHeader) {
+  return reinterpret_cast<WPI_DataLog*>(
+      new DataLog{dir, filename, period, extraHeader});
+}
+
+struct WPI_DataLog* WPI_DataLog_Create_Func(
+    void (*write)(void* ptr, const uint8_t* data, size_t len), void* ptr,
+    double period, const char* extraHeader) {
+  return reinterpret_cast<WPI_DataLog*>(
+      new DataLog{[=](auto data) { write(ptr, data.data(), data.size()); },
+                  period, extraHeader});
+}
+
+void WPI_DataLog_Release(struct WPI_DataLog* datalog) {
+  delete reinterpret_cast<DataLog*>(datalog);
+}
+
+void WPI_DataLog_SetFilename(struct WPI_DataLog* datalog,
+                             const char* filename) {
+  reinterpret_cast<DataLog*>(datalog)->SetFilename(filename);
+}
+
+void WPI_DataLog_Flush(struct WPI_DataLog* datalog) {
+  reinterpret_cast<DataLog*>(datalog)->Flush();
+}
+
+void WPI_DataLog_Pause(struct WPI_DataLog* datalog) {
+  reinterpret_cast<DataLog*>(datalog)->Pause();
+}
+
+void WPI_DataLog_Resume(struct WPI_DataLog* datalog) {
+  reinterpret_cast<DataLog*>(datalog)->Resume();
+}
+
+int WPI_DataLog_Start(struct WPI_DataLog* datalog, const char* name,
+                      const char* type, const char* metadata,
+                      int64_t timestamp) {
+  return reinterpret_cast<DataLog*>(datalog)->Start(name, type, metadata,
+                                                    timestamp);
+}
+
+void WPI_DataLog_Finish(struct WPI_DataLog* datalog, int entry,
+                        int64_t timestamp) {
+  reinterpret_cast<DataLog*>(datalog)->Finish(entry, timestamp);
+}
+
+void WPI_DataLog_SetMetadata(struct WPI_DataLog* datalog, int entry,
+                             const char* metadata, int64_t timestamp) {
+  reinterpret_cast<DataLog*>(datalog)->SetMetadata(entry, metadata, timestamp);
+}
+
+void WPI_DataLog_AppendRaw(struct WPI_DataLog* datalog, int entry,
+                           const uint8_t* data, size_t len, int64_t timestamp) {
+  reinterpret_cast<DataLog*>(datalog)->AppendRaw(entry, {data, len}, timestamp);
+}
+
+void WPI_DataLog_AppendBoolean(struct WPI_DataLog* datalog, int entry,
+                               int value, int64_t timestamp) {
+  reinterpret_cast<DataLog*>(datalog)->AppendBoolean(entry, value, timestamp);
+}
+
+void WPI_DataLog_AppendInteger(struct WPI_DataLog* datalog, int entry,
+                               int64_t value, int64_t timestamp) {
+  reinterpret_cast<DataLog*>(datalog)->AppendInteger(entry, value, timestamp);
+}
+
+void WPI_DataLog_AppendFloat(struct WPI_DataLog* datalog, int entry,
+                             float value, int64_t timestamp) {
+  reinterpret_cast<DataLog*>(datalog)->AppendFloat(entry, value, timestamp);
+}
+
+void WPI_DataLog_AppendDouble(struct WPI_DataLog* datalog, int entry,
+                              double value, int64_t timestamp) {
+  reinterpret_cast<DataLog*>(datalog)->AppendDouble(entry, value, timestamp);
+}
+
+void WPI_DataLog_AppendString(struct WPI_DataLog* datalog, int entry,
+                              const char* value, size_t len,
+                              int64_t timestamp) {
+  reinterpret_cast<DataLog*>(datalog)->AppendString(entry, {value, len},
+                                                    timestamp);
+}
+
+void WPI_DataLog_AppendBooleanArray(struct WPI_DataLog* datalog, int entry,
+                                    const int* arr, size_t len,
+                                    int64_t timestamp) {
+  reinterpret_cast<DataLog*>(datalog)->AppendBooleanArray(entry, {arr, len},
+                                                          timestamp);
+}
+
+void WPI_DataLog_AppendBooleanArrayByte(struct WPI_DataLog* datalog, int entry,
+                                        const uint8_t* arr, size_t len,
+                                        int64_t timestamp) {
+  reinterpret_cast<DataLog*>(datalog)->AppendBooleanArray(entry, {arr, len},
+                                                          timestamp);
+}
+
+void WPI_DataLog_AppendIntegerArray(struct WPI_DataLog* datalog, int entry,
+                                    const int64_t* arr, size_t len,
+                                    int64_t timestamp) {
+  reinterpret_cast<DataLog*>(datalog)->AppendIntegerArray(entry, {arr, len},
+                                                          timestamp);
+}
+
+void WPI_DataLog_AppendFloatArray(struct WPI_DataLog* datalog, int entry,
+                                  const float* arr, size_t len,
+                                  int64_t timestamp) {
+  reinterpret_cast<DataLog*>(datalog)->AppendFloatArray(entry, {arr, len},
+                                                        timestamp);
+}
+
+void WPI_DataLog_AppendDoubleArray(struct WPI_DataLog* datalog, int entry,
+                                   const double* arr, size_t len,
+                                   int64_t timestamp) {
+  reinterpret_cast<DataLog*>(datalog)->AppendDoubleArray(entry, {arr, len},
+                                                         timestamp);
+}
+
+void WPI_DataLog_AppendStringArray(struct WPI_DataLog* datalog, int entry,
+                                   const WPI_DataLog_String* arr, size_t len,
+                                   int64_t timestamp) {
+  reinterpret_cast<DataLog*>(datalog)->AppendStringArray(entry, {arr, len},
+                                                         timestamp);
+}
+
+}  // extern "C"
