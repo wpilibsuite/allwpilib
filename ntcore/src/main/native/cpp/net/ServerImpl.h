@@ -121,7 +121,7 @@ class ServerImpl final {
 
     NT_Handle GetIdHandle() const { return Handle(0, id, Handle::kTopic); }
 
-    wpi::Logger& m_logger;
+    wpi::Logger& m_logger;  // Must be m_logger for WARN macro to work
     std::string name;
     unsigned int id;
     Value lastValue;
