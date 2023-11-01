@@ -7,6 +7,7 @@
 
 #include <string>
 
+#include <fmt/core.h>
 #include <gtest/gtest.h>
 #include <networktables/NetworkTableInstance.h>
 #include <networktables/StringTopic.h>
@@ -21,11 +22,14 @@ TEST_P(SendableChooserTest, ReturnsSelected) {
   }
   chooser.SetDefaultOption("0", 0);
 
-  auto pub = nt::NetworkTableInstance::GetDefault()
-                 .GetStringTopic("/SmartDashboard/chooser/selected")
-                 .Publish();
+  auto pub =
+      nt::NetworkTableInstance::GetDefault()
+          .GetStringTopic(fmt::format(
+              "/SmartDashboard/ReturnsSelectedChooser{}/selected", GetParam()))
+          .Publish();
 
-  frc::SmartDashboard::PutData("chooser", &chooser);
+  frc::SmartDashboard::PutData(
+      fmt::format("ReturnsSelectedChooser{}", GetParam()), &chooser);
   frc::SmartDashboard::UpdateValues();
   pub.Set(std::to_string(GetParam()));
   frc::SmartDashboard::UpdateValues();
@@ -65,9 +69,9 @@ TEST(SendableChooserTest, ChangeListener) {
   int currentVal = 0;
   chooser.OnChange([&](int val) { currentVal = val; });
 
-  frc::SmartDashboard::PutData("chooser", &chooser);
+  frc::SmartDashboard::PutData("ChangeListenerChooser", &chooser);
   frc::SmartDashboard::UpdateValues();
-  frc::SmartDashboard::PutString("chooser/selected", "3");
+  frc::SmartDashboard::PutString("ChangeListenerChooser/selected", "3");
   frc::SmartDashboard::UpdateValues();
 
   EXPECT_EQ(3, currentVal);

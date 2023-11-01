@@ -11,7 +11,8 @@
 using namespace frc;
 
 PS4Controller::PS4Controller(int port) : GenericHID(port) {
-  HAL_Report(HALUsageReporting::kResourceType_PS4Controller, port + 1);
+  // re-enable when PS4Controller is added to Usage Reporting
+  // HAL_Report(HALUsageReporting::kResourceType_PS4Controller, port + 1);
 }
 
 double PS4Controller::GetLeftX() const {

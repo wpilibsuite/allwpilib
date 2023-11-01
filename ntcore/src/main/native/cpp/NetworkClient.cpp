@@ -418,9 +418,13 @@ void NetworkClient::WsConnected(wpi::WebSocket& ws, uv::Tcp& tcp,
   ws.closed.connect([this, &ws](uint16_t, std::string_view reason) {
     if (!ws.GetStream().IsLoopClosing()) {
       // we could be in the middle of sending data, so defer disconnect
+      // capture a shared_ptr copy of ws to make sure it doesn't get destroyed
+      // until after DoDisconnect returns
       uv::Timer::SingleShot(
           m_loop, uv::Timer::Time{0},
-          [this, reason = std::string{reason}] { DoDisconnect(reason); });
+          [this, reason = std::string{reason}, keepws = ws.shared_from_this()] {
+            DoDisconnect(reason);
+          });
     }
   });
   ws.text.connect([this](std::string_view data, bool) {
