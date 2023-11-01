@@ -171,7 +171,7 @@ def overwrite_tests(wpiutil_root, llvm_root):
 
 
 def main():
-    upstream_root = clone_repo("https://github.com/llvm/llvm-project", "llvmorg-17.0.3")
+    upstream_root = clone_repo("https://github.com/llvm/llvm-project", "llvmorg-17.0.4")
     wpilib_root = get_repo_root()
     wpiutil = os.path.join(wpilib_root, "wpiutil")
 
