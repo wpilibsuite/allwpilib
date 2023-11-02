@@ -168,7 +168,7 @@ static int32_t HAL_GetMatchInfoInternal(HAL_MatchInfo* info) {
       info->gameSpecificMessage, &info->gameSpecificMessageSize);
 
   if (info->gameSpecificMessageSize > sizeof(info->gameSpecificMessage)) {
-    info->gameSpecificMessageSize = 0;
+    info->gameSpecificMessageSize = sizeof(info->gameSpecificMessage);
   }
 
   info->matchType = static_cast<HAL_MatchType>(matchType);
