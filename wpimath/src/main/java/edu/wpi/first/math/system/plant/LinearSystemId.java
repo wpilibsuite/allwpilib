@@ -62,7 +62,8 @@ public final class LinearSystemId {
                         * radius.in(Units.Meters)
                         * mass.in(Units.Kilograms)
                         * motor.KvRadPerSecPerVolt)),
-        VecBuilder.fill(0, G.in(Units.Value) * motor.KtNMPerAmp / (motor.rOhms * radius.in(Units.Meters) * mass.in(Units.Kilograms))),
+        VecBuilder.fill(0, G.in(Units.Value) * motor.KtNMPerAmp 
+        / (motor.rOhms * radius.in(Units.Meters) * mass.in(Units.Kilograms))),
         Matrix.mat(Nat.N1(), Nat.N2()).fill(1, 0),
         new Matrix<>(Nat.N1(), Nat.N1()));
   }
@@ -78,7 +79,6 @@ public final class LinearSystemId {
    * @return A LinearSystem representing the given characterized constants.
    * @throws IllegalArgumentException if massKg &lt;= 0, radiusMeters &lt;= 0, or G &lt;= 0.
    */
-  @Deprecated(since = "2024", forRemoval = true)   
   public static LinearSystem<N2, N1, N1> createElevatorSystem(
       DCMotor motor, double massKg, double radiusMeters, double G) {
     if (massKg <= 0.0) {
@@ -132,8 +132,11 @@ public final class LinearSystemId {
         VecBuilder.fill(
             -Math.pow(G.in(Units.Value), 2)
                 * motor.KtNMPerAmp
-                / (motor.KvRadPerSecPerVolt * motor.rOhms * J.in(Units.KilogramsMetersSquared))),
-        VecBuilder.fill(G.in(Units.Value) * motor.KtNMPerAmp / (motor.rOhms * J.in(Units.KilogramsMetersSquared))),
+                / (motor.KvRadPerSecPerVolt 
+                * motor.rOhms 
+                * J.in(Units.KilogramsMetersSquared))),
+        VecBuilder.fill(G.in(Units.Value) * motor.KtNMPerAmp 
+        / (motor.rOhms * J.in(Units.KilogramsMetersSquared))),
         Matrix.eye(Nat.N1()),
         new Matrix<>(Nat.N1(), Nat.N1()));  }
 
@@ -147,7 +150,6 @@ public final class LinearSystemId {
    * @return A LinearSystem representing the given characterized constants.
    * @throws IllegalArgumentException if JKgMetersSquared &lt;= 0 or G &lt;= 0.
    */
-  @Deprecated(since = "2024", forRemoval = true)   
    public static LinearSystem<N1, N1, N1> createFlywheelSystem(
       DCMotor motor, double JKgMetersSquared, double G) {
     if (JKgMetersSquared <= 0.0) {
@@ -196,8 +198,11 @@ public final class LinearSystemId {
                 0,
                 -Math.pow(G.in(Units.Value), 2)
                     * motor.KtNMPerAmp
-                    / (motor.KvRadPerSecPerVolt * motor.rOhms * J.in(Units.KilogramsMetersSquared))),
-        VecBuilder.fill(0, G.in(Units.Value) * motor.KtNMPerAmp / (motor.rOhms * J.in(Units.KilogramsMetersSquared))),
+                    / (motor.KvRadPerSecPerVolt 
+                    * motor.rOhms 
+                    * J.in(Units.KilogramsMetersSquared))),
+        VecBuilder.fill(0, G.in(Units.Value) * motor.KtNMPerAmp 
+        / (motor.rOhms * J.in(Units.KilogramsMetersSquared))),
         Matrix.eye(Nat.N2()),
         new Matrix<>(Nat.N2(), Nat.N1()));  }
 
@@ -212,7 +217,6 @@ public final class LinearSystemId {
    * @return A LinearSystem representing the given characterized constants.
    * @throws IllegalArgumentException if JKgMetersSquared &lt;= 0 or G &lt;= 0.
    */
-  @Deprecated(since = "2024", forRemoval = true)   
   public static LinearSystem<N2, N1, N2> createDCMotorSystem(
       DCMotor motor, double JKgMetersSquared, double G) {
     if (JKgMetersSquared <= 0.0) {
@@ -266,7 +270,8 @@ public final class LinearSystemId {
     }
 
     return new LinearSystem<>(
-        Matrix.mat(Nat.N2(), Nat.N2()).fill(0, 1, 0, -kV.in(Units.VoltsPerRadianPerSecond) / kA.in(Units.VoltsPerRadianPerSecondSquared)),
+        Matrix.mat(Nat.N2(), Nat.N2()).fill(0, 1, 0, -kV.in(Units.VoltsPerRadianPerSecond) 
+        / kA.in(Units.VoltsPerRadianPerSecondSquared)),
         VecBuilder.fill(0, 1 / kA.in(Units.VoltsPerRadianPerSecondSquared)),
         Matrix.eye(Nat.N2()),
         new Matrix<>(Nat.N2(), Nat.N1()));  }
@@ -289,7 +294,6 @@ public final class LinearSystemId {
    * @throws IllegalArgumentException if kV &lt;= 0 or kA &lt;= 0.
    * @see <a href= "https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
    */
-  @Deprecated(since = "2024", forRemoval = true)   
   public static LinearSystem<N2, N1, N2> createDCMotorSystem(double kV, double kA) {
     if (kV <= 0.0) {
       throw new IllegalArgumentException("Kv must be greater than zero.");
@@ -347,8 +351,10 @@ public final class LinearSystemId {
         (motor.KvRadPerSecPerVolt * motor.rOhms * r.in(Units.Meters) * r.in(Units.Meters));
     var C2 = G.in(Units.Value) * motor.KtNMPerAmp / (motor.rOhms * r.in(Units.Meters));
 
-    final double C3 = 1 / mass.in(Units.Kilograms) + rb.in(Units.Meters) * rb.in(Units.Meters) / J.in(Units.KilogramsMetersSquared);
-    final double C4 = 1 / mass.in(Units.Kilograms) - rb.in(Units.Meters) * rb.in(Units.Meters) / J.in(Units.KilogramsMetersSquared);
+    final double C3 = 1 / mass.in(Units.Kilograms) + rb.in(Units.Meters) * rb.in(Units.Meters) 
+    / J.in(Units.KilogramsMetersSquared);
+    final double C4 = 1 / mass.in(Units.Kilograms) - rb.in(Units.Meters) * rb.in(Units.Meters) 
+    / J.in(Units.KilogramsMetersSquared);
     var A = Matrix.mat(Nat.N2(), Nat.N2()).fill(C3 * C1, C4 * C1, C4 * C1, C3 * C1);
     var B = Matrix.mat(Nat.N2(), Nat.N2()).fill(C3 * C2, C4 * C2, C4 * C2, C3 * C2);
     var C = Matrix.mat(Nat.N2(), Nat.N2()).fill(1.0, 0.0, 0.0, 1.0);
@@ -371,7 +377,6 @@ public final class LinearSystemId {
    * @return A LinearSystem representing a differential drivetrain.
    * @throws IllegalArgumentException if m &lt;= 0, r &lt;= 0, rb &lt;= 0, J &lt;= 0, or G &lt;= 0.
    */
-  @Deprecated(since = "2024", forRemoval = true)   
   public static LinearSystem<N2, N2, N2> createDrivetrainVelocitySystem(
       DCMotor motor,
       double massKg,
@@ -436,8 +441,11 @@ public final class LinearSystemId {
                 0,
                 -Math.pow(G.in(Units.Value), 2)
                     * motor.KtNMPerAmp
-                    / (motor.KvRadPerSecPerVolt * motor.rOhms * J.in(Units.KilogramsMetersSquared))),
-        VecBuilder.fill(0, G.in(Units.Value) * motor.KtNMPerAmp / (motor.rOhms * J.in(Units.KilogramsMetersSquared))),
+                    / (motor.KvRadPerSecPerVolt 
+                    * motor.rOhms 
+                    * J.in(Units.KilogramsMetersSquared))),
+        VecBuilder.fill(0, G.in(Units.Value) * motor.KtNMPerAmp 
+        / (motor.rOhms * J.in(Units.KilogramsMetersSquared))),
         Matrix.mat(Nat.N1(), Nat.N2()).fill(1, 0),
         new Matrix<>(Nat.N1(), Nat.N1()));
   }
@@ -452,7 +460,6 @@ public final class LinearSystemId {
    *     will be greater than 1.
    * @return A LinearSystem representing the given characterized constants.
    */
-  @Deprecated(since = "2024", forRemoval = true)   
   public static LinearSystem<N2, N1, N1> createSingleJointedArmSystem(
       DCMotor motor, double JKgSquaredMeters, double G) {
     if (JKgSquaredMeters <= 0.0) {
@@ -502,7 +509,8 @@ public final class LinearSystemId {
     }
 
     return new LinearSystem<>(
-        VecBuilder.fill(-kV.in(Units.VoltsPerRadianPerSecond) / kA.in(Units.VoltsPerRadianPerSecondSquared)),
+        VecBuilder.fill(-kV.in(Units.VoltsPerRadianPerSecond) 
+        / kA.in(Units.VoltsPerRadianPerSecondSquared)),
         VecBuilder.fill(1.0 / kA.in(Units.VoltsPerRadianPerSecondSquared)),
         VecBuilder.fill(1.0),
         VecBuilder.fill(0.0));
@@ -534,7 +542,8 @@ public final class LinearSystemId {
     }
 
     return new LinearSystem<>(
-        VecBuilder.fill(-kV.in(Units.VoltsPerMeterPerSecond) / kA.in(Units.VoltsPerMeterPerSecondSquared)),
+        VecBuilder.fill(-kV.in(Units.VoltsPerMeterPerSecond) 
+        / kA.in(Units.VoltsPerMeterPerSecondSquared)),
         VecBuilder.fill(1.0 / kA.in(Units.VoltsPerMeterPerSecondSquared)),
         VecBuilder.fill(1.0),
         VecBuilder.fill(0.0));
@@ -558,7 +567,6 @@ public final class LinearSystemId {
    * @throws IllegalArgumentException if kV &lt;= 0 or kA &lt;= 0.
    * @see <a href= "https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
    */
-  @Deprecated(since = "2024", forRemoval = true)   
   public static LinearSystem<N1, N1, N1> identifyVelocitySystem(double kV, double kA) {
     if (kV <= 0.0) {
       throw new IllegalArgumentException("Kv must be greater than zero.");
@@ -600,7 +608,8 @@ public final class LinearSystemId {
     }
 
     return new LinearSystem<>(
-        Matrix.mat(Nat.N2(), Nat.N2()).fill(0.0, 1.0, 0.0, -kV.in(Units.VoltsPerRadianPerSecond) / kA.in(Units.VoltsPerRadianPerSecondSquared)),
+        Matrix.mat(Nat.N2(), Nat.N2()).fill(0.0, 1.0, 0.0, -kV.in(Units.VoltsPerRadianPerSecond) 
+        / kA.in(Units.VoltsPerRadianPerSecondSquared)),
         VecBuilder.fill(0.0, 1.0 / kA.in(Units.VoltsPerRadianPerSecondSquared)),
         Matrix.mat(Nat.N1(), Nat.N2()).fill(1.0, 0.0),
         VecBuilder.fill(0.0));
@@ -632,7 +641,8 @@ public final class LinearSystemId {
     }
 
     return new LinearSystem<>(
-        Matrix.mat(Nat.N2(), Nat.N2()).fill(0.0, 1.0, 0.0, -kV.in(Units.VoltsPerMeterPerSecond) / kA.in(Units.VoltsPerMeterPerSecondSquared)),
+        Matrix.mat(Nat.N2(), Nat.N2()).fill(0.0, 1.0, 0.0, -kV.in(Units.VoltsPerMeterPerSecond) 
+        / kA.in(Units.VoltsPerMeterPerSecondSquared)),
         VecBuilder.fill(0.0, 1.0 / kA.in(Units.VoltsPerMeterPerSecondSquared)),
         Matrix.mat(Nat.N1(), Nat.N2()).fill(1.0, 0.0),
         VecBuilder.fill(0.0));
@@ -656,7 +666,6 @@ public final class LinearSystemId {
    * @throws IllegalArgumentException if kV &lt;= 0 or kA &lt;= 0.
    * @see <a href= "https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
    */
-  @Deprecated(since = "2024", forRemoval = true)   
   public static LinearSystem<N2, N1, N1> identifyPositionSystem(double kV, double kA) {
     if (kV <= 0.0) {
       throw new IllegalArgumentException("Kv must be greater than zero.");
@@ -708,12 +717,18 @@ public final class LinearSystemId {
       throw new IllegalArgumentException("Ka,angular must be greater than zero.");
     }
 
-    final double A1 = 0.5 * -(kVLinear.in(Units.VoltsPerMeterPerSecond) / kALinear.in(Units.VoltsPerMeterPerSecondSquared) + 
-    kVAngular.in(Units.VoltsPerRadianPerSecond) / kAAngular.in(Units.VoltsPerRadianPerSecondSquared));
-    final double A2 = 0.5 * -(kVLinear.in(Units.VoltsPerMeterPerSecond) / kALinear.in(Units.VoltsPerMeterPerSecondSquared) - 
-    kVAngular.in(Units.VoltsPerRadianPerSecond) / kAAngular.in(Units.VoltsPerRadianPerSecondSquared));
-    final double B1 = 0.5 * (1.0 / kALinear.in(Units.VoltsPerMeterPerSecondSquared) + 1.0 / kAAngular.in(Units.VoltsPerRadianPerSecondSquared));
-    final double B2 = 0.5 * (1.0 / kALinear.in(Units.VoltsPerMeterPerSecondSquared) + 1.0 / kAAngular.in(Units.VoltsPerRadianPerSecondSquared));
+    final double A1 = 0.5 * -(kVLinear.in(Units.VoltsPerMeterPerSecond) 
+    / kALinear.in(Units.VoltsPerMeterPerSecondSquared) + 
+    kVAngular.in(Units.VoltsPerRadianPerSecond) 
+    / kAAngular.in(Units.VoltsPerRadianPerSecondSquared));
+    final double A2 = 0.5 * -(kVLinear.in(Units.VoltsPerMeterPerSecond) 
+    / kALinear.in(Units.VoltsPerMeterPerSecondSquared) - 
+    kVAngular.in(Units.VoltsPerRadianPerSecond) 
+    / kAAngular.in(Units.VoltsPerRadianPerSecondSquared));
+    final double B1 = 0.5 * (1.0 / kALinear.in(Units.VoltsPerMeterPerSecondSquared) + 1.0 
+    / kAAngular.in(Units.VoltsPerRadianPerSecondSquared));
+    final double B2 = 0.5 * (1.0 / kALinear.in(Units.VoltsPerMeterPerSecondSquared) + 1.0 
+    / kAAngular.in(Units.VoltsPerRadianPerSecondSquared));
 
     return new LinearSystem<>(
         Matrix.mat(Nat.N2(), Nat.N2()).fill(A1, A2, A2, A1),
@@ -799,7 +814,6 @@ public final class LinearSystemId {
    *     kAAngular &lt;= 0.
    * @see <a href= "https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
    */
-  @Deprecated(since = "2024", forRemoval = true)   
   public static LinearSystem<N2, N2, N2> identifyDrivetrainSystem(
       double kVLinear, double kALinear, double kVAngular, double kAAngular) {
     if (kVLinear <= 0.0) {
@@ -847,7 +861,6 @@ public final class LinearSystemId {
    *     kAAngular &lt;= 0, or trackwidth &lt;= 0.
    * @see <a href= "https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
    */
-  @Deprecated(since = "2024", forRemoval = true)   
   public static LinearSystem<N2, N2, N2> identifyDrivetrainSystem(
       double kVLinear, double kALinear, double kVAngular, double kAAngular, double trackwidth) {
     if (kVLinear <= 0.0) {

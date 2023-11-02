@@ -8,7 +8,6 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.units.Angle;
-import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Time;
 import edu.wpi.first.units.Units;
@@ -87,7 +86,6 @@ public class SimpleMotorFeedforward {
    * @param dtSeconds Time between velocity setpoints in seconds.
    * @return The computed feedforward.
    */
-  @Deprecated(since = "2024", forRemoval = true)   
   public double calculate(double currentVelocity, double nextVelocity, double dtSeconds) {
     var plant = LinearSystemId.identifyVelocitySystem(this.kv, this.ka);
     var feedforward = new LinearPlantInversionFeedforward<>(plant, dtSeconds);

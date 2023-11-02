@@ -106,7 +106,8 @@ public class ElevatorFeedforward {
     var r = Matrix.mat(Nat.N1(), Nat.N1()).fill(currentVelocity.in(Units.MetersPerSecond));
     var nextR = Matrix.mat(Nat.N1(), Nat.N1()).fill(nextVelocity.in(Units.MetersPerSecond));
 
-    return kg + ks * Math.signum(currentVelocity.in(Units.MetersPerSecond)) + feedforward.calculate(r, nextR).get(0, 0);
+    return kg + ks * Math.signum(currentVelocity.in(Units.MetersPerSecond)) 
+    + feedforward.calculate(r, nextR).get(0, 0);
   }
   
   /**
@@ -119,7 +120,6 @@ public class ElevatorFeedforward {
    * @param dtSeconds Time between velocity setpoints in seconds.
    * @return The computed feedforward.
    */
-  @Deprecated(since = "2024", forRemoval = true)   
   public double calculate(double currentVelocity, double nextVelocity, double dtSeconds) {
     // Discretize the affine model.
     //
@@ -149,7 +149,8 @@ public class ElevatorFeedforward {
     var r = Matrix.mat(Nat.N1(), Nat.N1()).fill(currentVelocity);
     var nextR = Matrix.mat(Nat.N1(), Nat.N1()).fill(nextVelocity);
 
-    return kg + ks * Math.signum(currentVelocity) + feedforward.calculate(r, nextR).get(0, 0);
+    return kg + ks * Math.signum(currentVelocity) 
+    + feedforward.calculate(r, nextR).get(0, 0);
   }
 
   /**
