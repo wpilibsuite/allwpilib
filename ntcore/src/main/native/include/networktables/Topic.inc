@@ -41,12 +41,12 @@ inline bool Topic::IsRetained() const {
   return ::nt::GetTopicRetained(m_handle);
 }
 
-inline void Topic::SetValueTransient(bool valueTransient) {
-  ::nt::SetTopicValueTransient(m_handle, valueTransient);
+inline void Topic::SetCached(bool cached) {
+  ::nt::SetTopicCached(m_handle, cached);
 }
 
-inline bool Topic::IsValueTransient() const {
-  return ::nt::GetTopicValueTransient(m_handle);
+inline bool Topic::IsCached() const {
+  return ::nt::GetTopicCached(m_handle);
 }
 
 inline bool Topic::Exists() const {

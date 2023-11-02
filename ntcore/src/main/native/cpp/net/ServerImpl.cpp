@@ -917,8 +917,7 @@ void ServerImpl::ClientData3::EntryAssign(std::string_view name,
   auto typeStr = TypeToString(value.type());
   wpi::json properties = wpi::json::object();
   properties["retained"] = true;  // treat all NT3 published topics as retained
-  properties["valueTransient"] =
-      false;  // treat all NT3 published topics as not value-transient
+  properties["cached"] = true;    // treat all NT3 published topics as cached
   if ((flags & NT_PERSISTENT) != 0) {
     properties["persistent"] = true;
   }
@@ -1097,7 +1096,7 @@ bool ServerImpl::TopicData::SetProperties(const wpi::json& update) {
 void ServerImpl::TopicData::RefreshProperties() {
   persistent = false;
   retained = false;
-  valueTransient = false;
+  cached = true;
 
   auto persistentIt = properties.find("persistent");
   if (persistentIt != properties.end()) {
@@ -1113,15 +1112,15 @@ void ServerImpl::TopicData::RefreshProperties() {
     }
   }
 
-  auto valueTransientIt = properties.find("valueTransient");
-  if (valueTransientIt != properties.end()) {
-    if (auto val = valueTransientIt->get_ptr<bool*>()) {
-      valueTransient = *val;
+  auto cachedIt = properties.find("cached");
+  if (cachedIt != properties.end()) {
+    if (auto val = cachedIt->get_ptr<bool*>()) {
+      cached = *val;
     }
   }
 
-  if (valueTransient && persistent) {
-    WARN("topic {}: value transient property disables persistent storage",
+  if (!cached && persistent) {
+    WARN("topic {}: disabling cached property disables persistent storage",
          name);
   }
 }
@@ -1146,17 +1145,17 @@ bool ServerImpl::TopicData::SetFlags(unsigned int flags_) {
     retained = false;
     properties.erase("retained");
   }
-  if ((flags_ & NT_VALUETRANSIENT) != 0) {
-    updated |= !valueTransient;
-    valueTransient = true;
-    properties["valueTransient"] = true;
+  if ((flags_ & NT_CACHED) != 0) {
+    updated |= !cached;
+    cached = true;
+    properties.erase("cached");
   } else {
-    updated |= valueTransient;
-    valueTransient = false;
-    properties.erase("valueTransient");
+    updated |= cached;
+    cached = false;
+    properties["cached"] = false;
   }
-  if (valueTransient && persistent) {
-    WARN("topic {}: value transient property disables persistent storage",
+  if (!cached && persistent) {
+    WARN("topic {}: disabling cached property disables persistent storage",
          name);
   }
   return updated;
@@ -1788,10 +1787,9 @@ void ServerImpl::SetFlags(ClientData* client, TopicData* topic,
 void ServerImpl::SetValue(ClientData* client, TopicData* topic,
                           const Value& value) {
   // update retained value if from same client or timestamp newer
-  if (!topic->valueTransient &&
-      (!topic->lastValue || topic->lastValueClient == client ||
-       topic->lastValue.time() == 0 ||
-       value.time() >= topic->lastValue.time())) {
+  if (topic->cached && (!topic->lastValue || topic->lastValueClient == client ||
+                        topic->lastValue.time() == 0 ||
+                        value.time() >= topic->lastValue.time())) {
     DEBUG4("updating '{}' last value (time was {} is {})", topic->name,
            topic->lastValue.time(), value.time());
     topic->lastValue = value;

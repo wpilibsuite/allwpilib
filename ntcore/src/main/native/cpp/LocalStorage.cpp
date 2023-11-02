@@ -249,12 +249,12 @@ void LocalStorage::Impl::SetFlags(TopicData* topic, unsigned int flags) {
     topic->properties.erase("retained");
     update["retained"] = wpi::json();
   }
-  if ((flags & NT_VALUETRANSIENT) != 0) {
-    topic->properties["valueTransient"] = true;
-    update["valueTransient"] = true;
+  if ((flags & NT_CACHED) != 0) {
+    topic->properties.erase("cached");
+    update["cached"] = wpi::json();
   } else {
-    topic->properties.erase("valueTransient");
-    update["valueTransient"] = wpi::json();
+    topic->properties["cached"] = false;
+    update["cached"] = false;
   }
   topic->flags = flags;
   if (!update.empty()) {
@@ -290,16 +290,16 @@ void LocalStorage::Impl::SetRetained(TopicData* topic, bool value) {
   PropertiesUpdated(topic, update, NT_EVENT_NONE, true, false);
 }
 
-void LocalStorage::Impl::SetValueTransient(TopicData* topic, bool value) {
+void LocalStorage::Impl::SetCached(TopicData* topic, bool value) {
   wpi::json update = wpi::json::object();
   if (value) {
-    topic->flags |= NT_VALUETRANSIENT;
-    topic->properties["valueTransient"] = true;
-    update["valueTransient"] = true;
+    topic->flags |= NT_CACHED;
+    topic->properties.erase("cached");
+    update["cached"] = wpi::json();
   } else {
-    topic->flags &= ~NT_VALUETRANSIENT;
-    topic->properties.erase("valueTransient");
-    update["valueTransient"] = wpi::json();
+    topic->flags &= ~NT_CACHED;
+    topic->properties["cached"] = false;
+    update["cached"] = false;
   }
   PropertiesUpdated(topic, update, NT_EVENT_NONE, true, false);
 }
@@ -349,20 +349,20 @@ void LocalStorage::Impl::PropertiesUpdated(TopicData* topic,
         }
       }
     }
-    it = topic->properties.find("valueTransient");
+    it = topic->properties.find("cached");
     if (it != topic->properties.end()) {
       if (auto val = it->get_ptr<bool*>()) {
         if (*val) {
-          topic->flags |= NT_VALUETRANSIENT;
+          topic->flags |= NT_CACHED;
         } else {
-          topic->flags &= ~NT_VALUETRANSIENT;
+          topic->flags &= ~NT_CACHED;
         }
       }
     }
 
-    if ((topic->flags & NT_VALUETRANSIENT) != 0 &&
+    if ((topic->flags & NT_CACHED) == 0 &&
         (topic->flags & NT_PERSISTENT) != 0) {
-      WARN("topic {}: value transient property disables persistent storage",
+      WARN("topic {}: disabling cached property disables persistent storage",
            topic->name);
     }
   }

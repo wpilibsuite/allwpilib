@@ -673,26 +673,26 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getTopicRetained
 
 /*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
- * Method:    setTopicValueTransient
+ * Method:    setTopicCached
  * Signature: (IZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_setTopicValueTransient
+Java_edu_wpi_first_networktables_NetworkTablesJNI_setTopicCached
   (JNIEnv*, jclass, jint topic, jboolean value)
 {
-  nt::SetTopicValueTransient(topic, value);
+  nt::SetTopicCached(topic, value);
 }
 
 /*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
- * Method:    getTopicValueTransient
+ * Method:    getTopicCached
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getTopicValueTransient
+Java_edu_wpi_first_networktables_NetworkTablesJNI_getTopicCached
   (JNIEnv*, jclass, jint topic)
 {
-  return nt::GetTopicValueTransient(topic);
+  return nt::GetTopicCached(topic);
 }
 
 /*

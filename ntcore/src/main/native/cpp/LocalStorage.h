@@ -136,17 +136,17 @@ class LocalStorage final : public net::ILocalStorage {
     }
   }
 
-  void SetTopicValueTransient(NT_Topic topicHandle, bool value) {
+  void SetTopicCached(NT_Topic topicHandle, bool value) {
     std::scoped_lock lock{m_mutex};
     if (auto topic = m_impl.m_topics.Get(topicHandle)) {
-      m_impl.SetValueTransient(topic, value);
+      m_impl.SetCached(topic, value);
     }
   }
 
-  bool GetTopicValueTransient(NT_Topic topicHandle) {
+  bool GetTopicCached(NT_Topic topicHandle) {
     std::scoped_lock lock{m_mutex};
     if (auto topic = m_impl.m_topics.Get(topicHandle)) {
-      return (topic->flags & NT_VALUETRANSIENT) != 0;
+      return (topic->flags & NT_CACHED) != 0;
     } else {
       return false;
     }
@@ -388,7 +388,7 @@ class LocalStorage final : public net::ILocalStorage {
     Value lastValueNetwork;
     NT_Type type{NT_UNASSIGNED};
     std::string typeStr;
-    unsigned int flags{0};            // for NT3 APIs
+    unsigned int flags{NT_DEFAULTFLAGS};  // for NT3 APIs
     std::string propertiesStr{"{}"};  // cached string for GetTopicInfo() et al
     wpi::json properties = wpi::json::object();
     NT_Entry entry{0};  // cached entry for GetEntry()
@@ -589,7 +589,7 @@ class LocalStorage final : public net::ILocalStorage {
     void SetFlags(TopicData* topic, unsigned int flags);
     void SetPersistent(TopicData* topic, bool value);
     void SetRetained(TopicData* topic, bool value);
-    void SetValueTransient(TopicData* topic, bool value);
+    void SetCached(TopicData* topic, bool value);
     void SetProperties(TopicData* topic, const wpi::json& update,
                        bool sendNetwork);
     void PropertiesUpdated(TopicData* topic, const wpi::json& update,

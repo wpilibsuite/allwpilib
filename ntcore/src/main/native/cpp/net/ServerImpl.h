@@ -131,7 +131,7 @@ class ServerImpl final {
     unsigned int publisherCount{0};
     bool persistent{false};
     bool retained{false};
-    bool valueTransient{false};
+    bool cached{true};
     bool special{false};
     NT_Topic localHandle{0};
 

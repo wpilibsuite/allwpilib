@@ -121,9 +121,9 @@ public final class NetworkTablesJNI {
 
   public static native boolean getTopicRetained(int topic);
 
-  public static native void setTopicValueTransient(int topic, boolean value);
+  public static native void setTopicCached(int topic, boolean value);
 
-  public static native boolean getTopicValueTransient(int topic);
+  public static native boolean getTopicCached(int topic);
 
   public static native String getTopicTypeString(int topic);
 

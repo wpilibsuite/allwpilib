@@ -103,21 +103,19 @@ class Topic {
   bool IsRetained() const;
 
   /**
-   * Prevent the server from storing the latest value, making subscribers only
-   * receive value updates (not the initial value when they being subscribing)
-   * and preventing presistent storage.
+   * Make the server store the latest value, making subscribers receive the
+   * initial value when they begin subscribing and allowing persistent storage.
    *
-   * @param valueTransient True for value transient, false for not value
-   * transient.
+   * @param cached True for cached, false for not cached.
    */
-  void SetValueTransient(bool valueTransient);
+  void SetCached(bool cached);
 
   /**
-   * Returns whether the topic's last value is not stored by the server.
+   * Returns whether the topic's last value is stored by the server.
    *
-   * @return True if the topic is value transient.
+   * @return True if the topic is cached.
    */
-  bool IsValueTransient() const;
+  bool IsCached() const;
 
   /**
    * Determines if the topic is currently being published.

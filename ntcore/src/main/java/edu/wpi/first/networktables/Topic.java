@@ -118,22 +118,22 @@ public class Topic {
   }
 
   /**
-   * Prevent the server from storing the latest value, making subscribers only receive value updates
-   * (not the initial value when they begin subscribing) and preventing persistent storage.
+   * Allow the server to store the latest value, allowing subscribers to receive the initial value
+   * when they begin subscribing and allowing presistent storage.
    *
-   * @param valueTransient True for value transient, false for not value transient.
+   * @param cached True for cached, false for not cached.
    */
-  public void setValueTransient(boolean valueTransient) {
-    NetworkTablesJNI.setTopicValueTransient(m_handle, valueTransient);
+  public void setCached(boolean cached) {
+    NetworkTablesJNI.setTopicCached(m_handle, cached);
   }
 
   /**
-   * Returns whether the topic's last value is not stored by the server.
+   * Returns whether the topic's last value is stored by the server.
    *
-   * @return True if the topic is value transient.
+   * @return True if the topic is cached.
    */
-  public boolean isValueTransient() {
-    return NetworkTablesJNI.getTopicValueTransient(m_handle);
+  public boolean isCached() {
+    return NetworkTablesJNI.getTopicCached(m_handle);
   }
 
   /**

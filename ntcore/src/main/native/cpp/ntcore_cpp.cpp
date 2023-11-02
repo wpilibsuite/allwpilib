@@ -263,19 +263,19 @@ bool GetTopicRetained(NT_Topic topic) {
   }
 }
 
-void SetTopicValueTransient(NT_Topic topic, bool value) {
+void SetTopicCached(NT_Topic topic, bool value) {
   if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
-    ii->localStorage.SetTopicValueTransient(topic, value);
+    ii->localStorage.SetTopicCached(topic, value);
   } else {
     return;
   }
 }
 
-bool GetTopicValueTransient(NT_Topic topic) {
+bool GetTopicCached(NT_Topic topic) {
   if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
-    return ii->localStorage.GetTopicValueTransient(topic);
+    return ii->localStorage.GetTopicCached(topic);
   } else {
-    return true;
+    return {};
   }
 }
 
