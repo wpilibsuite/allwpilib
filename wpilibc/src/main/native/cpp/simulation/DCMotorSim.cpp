@@ -28,7 +28,7 @@ template <typename Distance>
 DCMotorSim::DCMotorSim(decltype(1_V / Velocity_t<Distance>(1)) kV,
                          decltype(1_V / Acceleration_t<Distance>(1)) kA,
                          const DCMotor& gearbox, 
-                         const std::array<double, 2>& measurementStdDevs = {0.0, 0.0})
+                         const std::array<double, 2>& measurementStdDevs)
     : DCMotorSim(LinearSystemId::DCMotorSystem(kV, kA), gearbox,
                   measurementStdDevs) {}
 
