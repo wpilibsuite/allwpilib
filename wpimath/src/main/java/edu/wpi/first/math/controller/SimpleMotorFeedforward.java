@@ -7,6 +7,12 @@ package edu.wpi.first.math.controller;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Time;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.Velocity;
 
 /** A helper class that computes feedforward outputs for a simple permanent-magnet DC motor. */
 public class SimpleMotorFeedforward {
@@ -58,6 +64,30 @@ public class SimpleMotorFeedforward {
    * @param dtSeconds Time between velocity setpoints in seconds.
    * @return The computed feedforward.
    */
+  public double calculate(
+    Measure<Velocity<Angle>> currentVelocity, 
+    Measure<Velocity<Angle>> nextVelocity, 
+    Measure<Time> dtSeconds) {
+    var plant = LinearSystemId.identifyAngularVelocitySystem(
+      Units.VoltsPerRadianPerSecond.of(this.kv), 
+      Units.VoltsPerRadianPerSecondSquared.of(this.ka));
+    var feedforward = new LinearPlantInversionFeedforward<>(plant, dtSeconds.in(Units.Seconds));
+
+    var r = Matrix.mat(Nat.N1(), Nat.N1()).fill(currentVelocity.in(Units.RadiansPerSecond));
+    var nextR = Matrix.mat(Nat.N1(), Nat.N1()).fill(nextVelocity.in(Units.RadiansPerSecond));
+
+    return ks * Math.signum(currentVelocity.in(Units.RadiansPerSecond)) + feedforward.calculate(r, nextR).get(0, 0);
+  }
+  
+  /**
+   * Calculates the feedforward from the gains and setpoints.
+   *
+   * @param currentVelocity The current velocity setpoint.
+   * @param nextVelocity The next velocity setpoint.
+   * @param dtSeconds Time between velocity setpoints in seconds.
+   * @return The computed feedforward.
+   */
+  @Deprecated(since = "2024", forRemoval = true)   
   public double calculate(double currentVelocity, double nextVelocity, double dtSeconds) {
     var plant = LinearSystemId.identifyVelocitySystem(this.kv, this.ka);
     var feedforward = new LinearPlantInversionFeedforward<>(plant, dtSeconds);
