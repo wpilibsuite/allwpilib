@@ -73,9 +73,9 @@ public class ElevatorFeedforward {
    * @return The computed feedforward.
    */
   public double calculate(
-    Measure<Velocity<Distance>> currentVelocity, 
-    Measure<Velocity<Distance>>  nextVelocity, 
-    Measure<Time> dtSeconds) {
+      Measure<Velocity<Distance>> currentVelocity,
+      Measure<Velocity<Distance>> nextVelocity,
+      Measure<Time> dtSeconds) {
     // Discretize the affine model.
     //
     //   dx/dt = Ax + Bu + c
@@ -98,18 +98,20 @@ public class ElevatorFeedforward {
     //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) − Ka(-(Kg/Ka + Ks/Ka sgn(x)))
     //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + Ka(Kg/Ka + Ks/Ka sgn(x))
     //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + Kg + Ks sgn(x)
-    var plant = LinearSystemId.identifyLinearVelocitySystem(
-      Units.VoltsPerMeterPerSecond.of(this.kv), 
+    var plant =
+        LinearSystemId.identifyLinearVelocitySystem(
+            Units.VoltsPerMeterPerSecond.of(this.kv),
             Units.VoltsPerMeterPerSecondSquared.of(this.ka));
     var feedforward = new LinearPlantInversionFeedforward<>(plant, dtSeconds.in(Units.Seconds));
 
     var r = Matrix.mat(Nat.N1(), Nat.N1()).fill(currentVelocity.in(Units.MetersPerSecond));
     var nextR = Matrix.mat(Nat.N1(), Nat.N1()).fill(nextVelocity.in(Units.MetersPerSecond));
 
-    return kg + ks * Math.signum(currentVelocity.in(Units.MetersPerSecond)) 
-    + feedforward.calculate(r, nextR).get(0, 0);
+    return kg
+        + ks * Math.signum(currentVelocity.in(Units.MetersPerSecond))
+        + feedforward.calculate(r, nextR).get(0, 0);
   }
-  
+
   /**
    * Calculates the feedforward from the gains and setpoints.
    *
@@ -149,8 +151,7 @@ public class ElevatorFeedforward {
     var r = Matrix.mat(Nat.N1(), Nat.N1()).fill(currentVelocity);
     var nextR = Matrix.mat(Nat.N1(), Nat.N1()).fill(nextVelocity);
 
-    return kg + ks * Math.signum(currentVelocity) 
-    + feedforward.calculate(r, nextR).get(0, 0);
+    return kg + ks * Math.signum(currentVelocity) + feedforward.calculate(r, nextR).get(0, 0);
   }
 
   /**

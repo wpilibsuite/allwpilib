@@ -64,20 +64,22 @@ public class SimpleMotorFeedforward {
    * @return The computed feedforward.
    */
   public double calculate(
-    Measure<Velocity<Angle>> currentVelocity, 
-    Measure<Velocity<Angle>> nextVelocity, 
-    Measure<Time> dtSeconds) {
-    var plant = LinearSystemId.identifyAngularVelocitySystem(
-      Units.VoltsPerRadianPerSecond.of(this.kv), 
-      Units.VoltsPerRadianPerSecondSquared.of(this.ka));
+      Measure<Velocity<Angle>> currentVelocity,
+      Measure<Velocity<Angle>> nextVelocity,
+      Measure<Time> dtSeconds) {
+    var plant =
+        LinearSystemId.identifyAngularVelocitySystem(
+            Units.VoltsPerRadianPerSecond.of(this.kv),
+            Units.VoltsPerRadianPerSecondSquared.of(this.ka));
     var feedforward = new LinearPlantInversionFeedforward<>(plant, dtSeconds.in(Units.Seconds));
 
     var r = Matrix.mat(Nat.N1(), Nat.N1()).fill(currentVelocity.in(Units.RadiansPerSecond));
     var nextR = Matrix.mat(Nat.N1(), Nat.N1()).fill(nextVelocity.in(Units.RadiansPerSecond));
 
-    return ks * Math.signum(currentVelocity.in(Units.RadiansPerSecond)) + feedforward.calculate(r, nextR).get(0, 0);
+    return ks * Math.signum(currentVelocity.in(Units.RadiansPerSecond))
+        + feedforward.calculate(r, nextR).get(0, 0);
   }
-  
+
   /**
    * Calculates the feedforward from the gains and setpoints.
    *

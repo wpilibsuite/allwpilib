@@ -30,16 +30,16 @@ public class DifferentialDriveFeedforward {
    *     meters.
    */
   public DifferentialDriveFeedforward(
-      Measure<Per<Voltage, Velocity<Distance>>> kVLinear, 
-      Measure<Per<Voltage, Velocity<Velocity<Distance>>>> kALinear, 
-      Measure<Per<Voltage, Velocity<Angle>>> kVAngular, 
-      Measure<Per<Voltage, Velocity<Velocity<Angle>>>> kAAngular, 
+      Measure<Per<Voltage, Velocity<Distance>>> kVLinear,
+      Measure<Per<Voltage, Velocity<Velocity<Distance>>>> kALinear,
+      Measure<Per<Voltage, Velocity<Angle>>> kVAngular,
+      Measure<Per<Voltage, Velocity<Velocity<Angle>>>> kAAngular,
       Measure<Distance> trackwidth) {
     m_plant =
         LinearSystemId.identifyDrivetrainSystem(
             kVLinear, kALinear, kVAngular, kAAngular, trackwidth);
   }
-  
+
   /**
    * Creates a new DifferentialDriveFeedforward with the specified parameters.
    *
@@ -66,13 +66,13 @@ public class DifferentialDriveFeedforward {
    * @param kAAngular The angular acceleration gain in volts per (meters per second squared).
    */
   public DifferentialDriveFeedforward(
-      Measure<Per<Voltage, Velocity<Distance>>> kVLinear, 
-      Measure<Per<Voltage, Velocity<Velocity<Distance>>>> kALinear, 
-      Measure<Per<Voltage, Velocity<Angle>>> kVAngular, 
+      Measure<Per<Voltage, Velocity<Distance>>> kVLinear,
+      Measure<Per<Voltage, Velocity<Velocity<Distance>>>> kALinear,
+      Measure<Per<Voltage, Velocity<Angle>>> kVAngular,
       Measure<Per<Voltage, Velocity<Velocity<Angle>>>> kAAngular) {
     m_plant = LinearSystemId.identifyDrivetrainSystem(kVLinear, kALinear, kVAngular, kAAngular);
   }
-  
+
   /**
    * Creates a new DifferentialDriveFeedforward with the specified parameters.
    *

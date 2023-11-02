@@ -62,8 +62,11 @@ public final class LinearSystemId {
                         * radius.in(Units.Meters)
                         * mass.in(Units.Kilograms)
                         * motor.KvRadPerSecPerVolt)),
-        VecBuilder.fill(0, G.in(Units.Value) * motor.KtNMPerAmp 
-        / (motor.rOhms * radius.in(Units.Meters) * mass.in(Units.Kilograms))),
+        VecBuilder.fill(
+            0,
+            G.in(Units.Value)
+                * motor.KtNMPerAmp
+                / (motor.rOhms * radius.in(Units.Meters) * mass.in(Units.Kilograms))),
         Matrix.mat(Nat.N1(), Nat.N2()).fill(1, 0),
         new Matrix<>(Nat.N1(), Nat.N1()));
   }
@@ -132,13 +135,14 @@ public final class LinearSystemId {
         VecBuilder.fill(
             -Math.pow(G.in(Units.Value), 2)
                 * motor.KtNMPerAmp
-                / (motor.KvRadPerSecPerVolt 
-                * motor.rOhms 
-                * J.in(Units.KilogramsMetersSquared))),
-        VecBuilder.fill(G.in(Units.Value) * motor.KtNMPerAmp 
-        / (motor.rOhms * J.in(Units.KilogramsMetersSquared))),
+                / (motor.KvRadPerSecPerVolt * motor.rOhms * J.in(Units.KilogramsMetersSquared))),
+        VecBuilder.fill(
+            G.in(Units.Value)
+                * motor.KtNMPerAmp
+                / (motor.rOhms * J.in(Units.KilogramsMetersSquared))),
         Matrix.eye(Nat.N1()),
-        new Matrix<>(Nat.N1(), Nat.N1()));  }
+        new Matrix<>(Nat.N1(), Nat.N1()));
+  }
 
   /**
    * Create a state-space model of a flywheel system. The states of the system are [angular
@@ -150,7 +154,7 @@ public final class LinearSystemId {
    * @return A LinearSystem representing the given characterized constants.
    * @throws IllegalArgumentException if JKgMetersSquared &lt;= 0 or G &lt;= 0.
    */
-   public static LinearSystem<N1, N1, N1> createFlywheelSystem(
+  public static LinearSystem<N1, N1, N1> createFlywheelSystem(
       DCMotor motor, double JKgMetersSquared, double G) {
     if (JKgMetersSquared <= 0.0) {
       throw new IllegalArgumentException("J must be greater than zero.");
@@ -198,13 +202,17 @@ public final class LinearSystemId {
                 0,
                 -Math.pow(G.in(Units.Value), 2)
                     * motor.KtNMPerAmp
-                    / (motor.KvRadPerSecPerVolt 
-                    * motor.rOhms 
-                    * J.in(Units.KilogramsMetersSquared))),
-        VecBuilder.fill(0, G.in(Units.Value) * motor.KtNMPerAmp 
-        / (motor.rOhms * J.in(Units.KilogramsMetersSquared))),
+                    / (motor.KvRadPerSecPerVolt
+                        * motor.rOhms
+                        * J.in(Units.KilogramsMetersSquared))),
+        VecBuilder.fill(
+            0,
+            G.in(Units.Value)
+                * motor.KtNMPerAmp
+                / (motor.rOhms * J.in(Units.KilogramsMetersSquared))),
         Matrix.eye(Nat.N2()),
-        new Matrix<>(Nat.N2(), Nat.N1()));  }
+        new Matrix<>(Nat.N2(), Nat.N1()));
+  }
 
   /**
    * Create a state-space model of a DC motor system. The states of the system are [angular
@@ -270,11 +278,17 @@ public final class LinearSystemId {
     }
 
     return new LinearSystem<>(
-        Matrix.mat(Nat.N2(), Nat.N2()).fill(0, 1, 0, -kV.in(Units.VoltsPerRadianPerSecond) 
-        / kA.in(Units.VoltsPerRadianPerSecondSquared)),
+        Matrix.mat(Nat.N2(), Nat.N2())
+            .fill(
+                0,
+                1,
+                0,
+                -kV.in(Units.VoltsPerRadianPerSecond)
+                    / kA.in(Units.VoltsPerRadianPerSecondSquared)),
         VecBuilder.fill(0, 1 / kA.in(Units.VoltsPerRadianPerSecondSquared)),
         Matrix.eye(Nat.N2()),
-        new Matrix<>(Nat.N2(), Nat.N1()));  }
+        new Matrix<>(Nat.N2(), Nat.N1()));
+  }
 
   /**
    * Create a state-space model of a DC motor system. The states of the system are [angular
@@ -347,14 +361,17 @@ public final class LinearSystemId {
     }
 
     var C1 =
-        -Math.pow(G.in(Units.Value), 2) * motor.KtNMPerAmp / 
-        (motor.KvRadPerSecPerVolt * motor.rOhms * r.in(Units.Meters) * r.in(Units.Meters));
+        -Math.pow(G.in(Units.Value), 2)
+            * motor.KtNMPerAmp
+            / (motor.KvRadPerSecPerVolt * motor.rOhms * r.in(Units.Meters) * r.in(Units.Meters));
     var C2 = G.in(Units.Value) * motor.KtNMPerAmp / (motor.rOhms * r.in(Units.Meters));
 
-    final double C3 = 1 / mass.in(Units.Kilograms) + rb.in(Units.Meters) * rb.in(Units.Meters) 
-    / J.in(Units.KilogramsMetersSquared);
-    final double C4 = 1 / mass.in(Units.Kilograms) - rb.in(Units.Meters) * rb.in(Units.Meters) 
-    / J.in(Units.KilogramsMetersSquared);
+    final double C3 =
+        1 / mass.in(Units.Kilograms)
+            + rb.in(Units.Meters) * rb.in(Units.Meters) / J.in(Units.KilogramsMetersSquared);
+    final double C4 =
+        1 / mass.in(Units.Kilograms)
+            - rb.in(Units.Meters) * rb.in(Units.Meters) / J.in(Units.KilogramsMetersSquared);
     var A = Matrix.mat(Nat.N2(), Nat.N2()).fill(C3 * C1, C4 * C1, C4 * C1, C3 * C1);
     var B = Matrix.mat(Nat.N2(), Nat.N2()).fill(C3 * C2, C4 * C2, C4 * C2, C3 * C2);
     var C = Matrix.mat(Nat.N2(), Nat.N2()).fill(1.0, 0.0, 0.0, 1.0);
@@ -441,11 +458,14 @@ public final class LinearSystemId {
                 0,
                 -Math.pow(G.in(Units.Value), 2)
                     * motor.KtNMPerAmp
-                    / (motor.KvRadPerSecPerVolt 
-                    * motor.rOhms 
-                    * J.in(Units.KilogramsMetersSquared))),
-        VecBuilder.fill(0, G.in(Units.Value) * motor.KtNMPerAmp 
-        / (motor.rOhms * J.in(Units.KilogramsMetersSquared))),
+                    / (motor.KvRadPerSecPerVolt
+                        * motor.rOhms
+                        * J.in(Units.KilogramsMetersSquared))),
+        VecBuilder.fill(
+            0,
+            G.in(Units.Value)
+                * motor.KtNMPerAmp
+                / (motor.rOhms * J.in(Units.KilogramsMetersSquared))),
         Matrix.mat(Nat.N1(), Nat.N2()).fill(1, 0),
         new Matrix<>(Nat.N1(), Nat.N1()));
   }
@@ -509,8 +529,8 @@ public final class LinearSystemId {
     }
 
     return new LinearSystem<>(
-        VecBuilder.fill(-kV.in(Units.VoltsPerRadianPerSecond) 
-        / kA.in(Units.VoltsPerRadianPerSecondSquared)),
+        VecBuilder.fill(
+            -kV.in(Units.VoltsPerRadianPerSecond) / kA.in(Units.VoltsPerRadianPerSecondSquared)),
         VecBuilder.fill(1.0 / kA.in(Units.VoltsPerRadianPerSecondSquared)),
         VecBuilder.fill(1.0),
         VecBuilder.fill(0.0));
@@ -542,8 +562,8 @@ public final class LinearSystemId {
     }
 
     return new LinearSystem<>(
-        VecBuilder.fill(-kV.in(Units.VoltsPerMeterPerSecond) 
-        / kA.in(Units.VoltsPerMeterPerSecondSquared)),
+        VecBuilder.fill(
+            -kV.in(Units.VoltsPerMeterPerSecond) / kA.in(Units.VoltsPerMeterPerSecondSquared)),
         VecBuilder.fill(1.0 / kA.in(Units.VoltsPerMeterPerSecondSquared)),
         VecBuilder.fill(1.0),
         VecBuilder.fill(0.0));
@@ -608,8 +628,13 @@ public final class LinearSystemId {
     }
 
     return new LinearSystem<>(
-        Matrix.mat(Nat.N2(), Nat.N2()).fill(0.0, 1.0, 0.0, -kV.in(Units.VoltsPerRadianPerSecond) 
-        / kA.in(Units.VoltsPerRadianPerSecondSquared)),
+        Matrix.mat(Nat.N2(), Nat.N2())
+            .fill(
+                0.0,
+                1.0,
+                0.0,
+                -kV.in(Units.VoltsPerRadianPerSecond)
+                    / kA.in(Units.VoltsPerRadianPerSecondSquared)),
         VecBuilder.fill(0.0, 1.0 / kA.in(Units.VoltsPerRadianPerSecondSquared)),
         Matrix.mat(Nat.N1(), Nat.N2()).fill(1.0, 0.0),
         VecBuilder.fill(0.0));
@@ -641,8 +666,12 @@ public final class LinearSystemId {
     }
 
     return new LinearSystem<>(
-        Matrix.mat(Nat.N2(), Nat.N2()).fill(0.0, 1.0, 0.0, -kV.in(Units.VoltsPerMeterPerSecond) 
-        / kA.in(Units.VoltsPerMeterPerSecondSquared)),
+        Matrix.mat(Nat.N2(), Nat.N2())
+            .fill(
+                0.0,
+                1.0,
+                0.0,
+                -kV.in(Units.VoltsPerMeterPerSecond) / kA.in(Units.VoltsPerMeterPerSecondSquared)),
         VecBuilder.fill(0.0, 1.0 / kA.in(Units.VoltsPerMeterPerSecondSquared)),
         Matrix.mat(Nat.N1(), Nat.N2()).fill(1.0, 0.0),
         VecBuilder.fill(0.0));
@@ -717,18 +746,26 @@ public final class LinearSystemId {
       throw new IllegalArgumentException("Ka,angular must be greater than zero.");
     }
 
-    final double A1 = 0.5 * -(kVLinear.in(Units.VoltsPerMeterPerSecond) 
-    / kALinear.in(Units.VoltsPerMeterPerSecondSquared) + 
-    kVAngular.in(Units.VoltsPerRadianPerSecond) 
-    / kAAngular.in(Units.VoltsPerRadianPerSecondSquared));
-    final double A2 = 0.5 * -(kVLinear.in(Units.VoltsPerMeterPerSecond) 
-    / kALinear.in(Units.VoltsPerMeterPerSecondSquared) - 
-    kVAngular.in(Units.VoltsPerRadianPerSecond) 
-    / kAAngular.in(Units.VoltsPerRadianPerSecondSquared));
-    final double B1 = 0.5 * (1.0 / kALinear.in(Units.VoltsPerMeterPerSecondSquared) + 1.0 
-    / kAAngular.in(Units.VoltsPerRadianPerSecondSquared));
-    final double B2 = 0.5 * (1.0 / kALinear.in(Units.VoltsPerMeterPerSecondSquared) + 1.0 
-    / kAAngular.in(Units.VoltsPerRadianPerSecondSquared));
+    final double A1 =
+        0.5
+            * -(kVLinear.in(Units.VoltsPerMeterPerSecond)
+                    / kALinear.in(Units.VoltsPerMeterPerSecondSquared)
+                + kVAngular.in(Units.VoltsPerRadianPerSecond)
+                    / kAAngular.in(Units.VoltsPerRadianPerSecondSquared));
+    final double A2 =
+        0.5
+            * -(kVLinear.in(Units.VoltsPerMeterPerSecond)
+                    / kALinear.in(Units.VoltsPerMeterPerSecondSquared)
+                - kVAngular.in(Units.VoltsPerRadianPerSecond)
+                    / kAAngular.in(Units.VoltsPerRadianPerSecondSquared));
+    final double B1 =
+        0.5
+            * (1.0 / kALinear.in(Units.VoltsPerMeterPerSecondSquared)
+                + 1.0 / kAAngular.in(Units.VoltsPerRadianPerSecondSquared));
+    final double B2 =
+        0.5
+            * (1.0 / kALinear.in(Units.VoltsPerMeterPerSecondSquared)
+                + 1.0 / kAAngular.in(Units.VoltsPerRadianPerSecondSquared));
 
     return new LinearSystem<>(
         Matrix.mat(Nat.N2(), Nat.N2()).fill(A1, A2, A2, A1),
@@ -790,9 +827,9 @@ public final class LinearSystemId {
     // So multiplying by 2/trackwidth converts the angular gains from V/(rad/s)
     // to V/(m/s).
     return identifyDrivetrainSystem(
-        kVLinear, 
-        kALinear, 
-        kVAngular.times(2.0).divide(trackwidth.in(Units.Meters)), 
+        kVLinear,
+        kALinear,
+        kVAngular.times(2.0).divide(trackwidth.in(Units.Meters)),
         kAAngular.times(2.0).divide(trackwidth.in(Units.Meters)));
   }
 
