@@ -8,12 +8,6 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.units.Angle;
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Per;
-import edu.wpi.first.units.Velocity;
-import edu.wpi.first.units.Voltage;
 
 /** A helper class which computes the feedforward outputs for a differential drive drivetrain. */
 public class DifferentialDriveFeedforward {
@@ -30,47 +24,10 @@ public class DifferentialDriveFeedforward {
    *     meters.
    */
   public DifferentialDriveFeedforward(
-      Measure<Per<Voltage, Velocity<Distance>>> kVLinear,
-      Measure<Per<Voltage, Velocity<Velocity<Distance>>>> kALinear,
-      Measure<Per<Voltage, Velocity<Angle>>> kVAngular,
-      Measure<Per<Voltage, Velocity<Velocity<Angle>>>> kAAngular,
-      Measure<Distance> trackwidth) {
-    m_plant =
-        LinearSystemId.identifyDrivetrainSystem(
-            kVLinear, kALinear, kVAngular, kAAngular, trackwidth);
-  }
-
-  /**
-   * Creates a new DifferentialDriveFeedforward with the specified parameters.
-   *
-   * @param kVLinear The linear velocity gain in volts per (meters per second).
-   * @param kALinear The linear acceleration gain in volts per (meters per second squared).
-   * @param kVAngular The angular velocity gain in volts per (radians per second).
-   * @param kAAngular The angular acceleration gain in volts per (radians per second squared).
-   * @param trackwidth The distance between the differential drive's left and right wheels, in
-   *     meters.
-   */
-  public DifferentialDriveFeedforward(
       double kVLinear, double kALinear, double kVAngular, double kAAngular, double trackwidth) {
     m_plant =
         LinearSystemId.identifyDrivetrainSystem(
             kVLinear, kALinear, kVAngular, kAAngular, trackwidth);
-  }
-
-  /**
-   * Creates a new DifferentialDriveFeedforward with the specified parameters.
-   *
-   * @param kVLinear The linear velocity gain in volts per (meters per second).
-   * @param kALinear The linear acceleration gain in volts per (meters per second squared).
-   * @param kVAngular The angular velocity gain in volts per (meters per second).
-   * @param kAAngular The angular acceleration gain in volts per (meters per second squared).
-   */
-  public DifferentialDriveFeedforward(
-      Measure<Per<Voltage, Velocity<Distance>>> kVLinear,
-      Measure<Per<Voltage, Velocity<Velocity<Distance>>>> kALinear,
-      Measure<Per<Voltage, Velocity<Angle>>> kVAngular,
-      Measure<Per<Voltage, Velocity<Velocity<Angle>>>> kAAngular) {
-    m_plant = LinearSystemId.identifyDrivetrainSystem(kVLinear, kALinear, kVAngular, kAAngular);
   }
 
   /**
