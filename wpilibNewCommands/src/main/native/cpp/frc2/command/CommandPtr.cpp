@@ -209,7 +209,7 @@ CommandPtr CommandPtr::FinallyDo(std::function<void()> end) && {
       [endHandler = std::move(end)](bool interrupted) { endHandler(); });
 }
 
-CommandPtr CommandPtr::HandleInterrupt(std::function<void(void)> handler) && {
+CommandPtr CommandPtr::HandleInterrupt(std::function<void()> handler) && {
   AssertValid();
   return std::move(*this).FinallyDo(
       [handler = std::move(handler)](bool interrupted) {
