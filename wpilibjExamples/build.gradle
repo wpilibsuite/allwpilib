@@ -24,6 +24,7 @@ dependencies {
     implementation project(':wpilibNewCommands')
     implementation project(':romiVendordep')
     implementation project(':xrpVendordep')
+    implementation project(':wpiunits')
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
     testImplementation 'org.junit.jupiter:junit-jupiter-params:5.10.0'
