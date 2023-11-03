@@ -554,7 +554,7 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
   }
 
   std::string pathStr = [self.path UTF8String];
-  OBJCINFO("Connecting to USB camera on {}", pathStr);
+  OBJCINFO("Attempting to connect to USB camera on {}", pathStr);
 
   self.videoDevice = [AVCaptureDevice deviceWithUniqueID:self.path];
   if (self.videoDevice == nil) {
@@ -593,6 +593,8 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
     OBJCWARNING("Creating AVCaptureSession failed");
     goto err;
   }
+
+  OBJCINFO("Connected to USB camera on {}", pathStr);
 
   [[NSNotificationCenter defaultCenter]
       addObserver:self
