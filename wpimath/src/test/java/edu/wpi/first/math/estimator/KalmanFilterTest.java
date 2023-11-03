@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Random;
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings("removal")
 class KalmanFilterTest {
   private static LinearSystem<N2, N1, N1> elevatorPlant;
 
@@ -35,6 +34,7 @@ class KalmanFilterTest {
     createElevator();
   }
 
+  @SuppressWarnings("removal")
   private static void createElevator() {
     var motors = DCMotor.getVex775Pro(2);
 

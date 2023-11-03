@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.motorcontrol.PWMVictorSPX;
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings("removal")
 class ElevatorSimTest {
   @Test
   void testStateSpaceSimWithElevator() {
@@ -91,6 +90,7 @@ class ElevatorSimTest {
     }
   }
 
+  @SuppressWarnings("removal")
   @Test
   void testStability() {
     var sim =

@@ -15,8 +15,8 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings("removal")
 class LinearQuadraticRegulatorTest {
+  @SuppressWarnings("removal")
   @Test
   void testLQROnElevator() {
     var motors = DCMotor.getVex775Pro(2);
@@ -37,6 +37,7 @@ class LinearQuadraticRegulatorTest {
     assertEquals(38.2, K.get(0, 1), 0.1);
   }
 
+  @SuppressWarnings("removal")
   @Test
   void testFourMotorElevator() {
     var dt = 0.020;
@@ -53,6 +54,7 @@ class LinearQuadraticRegulatorTest {
     assertEquals(0.6929, K.get(0, 1), 1e-2);
   }
 
+  @SuppressWarnings("removal")
   @Test
   void testLQROnArm() {
     var motors = DCMotor.getVex775Pro(2);
@@ -155,6 +157,7 @@ class LinearQuadraticRegulatorTest {
     assertEquals(-6.9190500116751458e-05, Kimf.get(0, 1), 1e-10);
   }
 
+  @SuppressWarnings("removal")
   @Test
   void testLatencyCompensate() {
     var dt = 0.02;

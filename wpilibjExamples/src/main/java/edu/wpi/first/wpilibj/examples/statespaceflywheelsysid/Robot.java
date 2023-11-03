@@ -23,7 +23,6 @@ import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
  * This is a sample program to demonstrate how to use a state-space controller to control a
  * flywheel.
  */
-@SuppressWarnings("removal")
 public class Robot extends TimedRobot {
   private static final int kMotorPort = 0;
   private static final int kEncoderAChannel = 0;
@@ -44,6 +43,7 @@ public class Robot extends TimedRobot {
   // Outputs (what we can measure): [velocity], in radians per second.
   //
   // The Kv and Ka constants are found using the FRC Characterization toolsuite.
+  @SuppressWarnings("removal")
   private final LinearSystem<N1, N1, N1> m_flywheelPlant =
       LinearSystemId.identifyVelocitySystem(kFlywheelKv, kFlywheelKa);
 

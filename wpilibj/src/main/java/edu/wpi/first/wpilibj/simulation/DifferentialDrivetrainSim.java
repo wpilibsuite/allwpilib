@@ -37,7 +37,6 @@ import edu.wpi.first.wpilibj.RobotController;
  *
  * <p>y = x
  */
-@SuppressWarnings("removal")
 public class DifferentialDrivetrainSim {
   private final DCMotor m_motor;
   private final double m_originalGearing;
@@ -68,6 +67,7 @@ public class DifferentialDrivetrainSim {
    *     m/s, and position measurement standard deviations of 0.005 meters are a reasonable starting
    *     point.
    */
+  @SuppressWarnings("removal")
   public DifferentialDrivetrainSim(
       DCMotor driveMotor,
       double gearing,

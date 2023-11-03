@@ -14,8 +14,8 @@ import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings("removal")
 class DifferentialDriveAccelerationLimiterTest {
+  @SuppressWarnings("removal")
   @Test
   void testLowLimits() {
     final double trackwidth = 0.9;
@@ -138,6 +138,7 @@ class DifferentialDriveAccelerationLimiterTest {
     }
   }
 
+  @SuppressWarnings("removal")
   @Test
   void testHighLimits() {
     final double trackwidth = 0.9;
@@ -208,6 +209,7 @@ class DifferentialDriveAccelerationLimiterTest {
     }
   }
 
+  @SuppressWarnings("removal")
   @Test
   void testSeperateMinMaxLowLimits() {
     final double trackwidth = 0.9;
@@ -292,6 +294,7 @@ class DifferentialDriveAccelerationLimiterTest {
     }
   }
 
+  @SuppressWarnings("removal")
   @Test
   void testMinAccelGreaterThanMaxAccel() {
     var plant = LinearSystemId.identifyDrivetrainSystem(1.0, 1.0, 1.0, 1.0);

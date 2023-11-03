@@ -14,7 +14,6 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
 
 /** Represents a simulated DC motor mechanism. */
-@SuppressWarnings("removal")
 public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
   // Gearbox for the DC motor.
   private final DCMotor m_gearbox;
@@ -63,6 +62,7 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
    * @param jKgMetersSquared The moment of inertia of the DC motor. If this is unknown, use the
    *     {@link #DCMotorSim(LinearSystem, DCMotor, double, Matrix)} constructor.
    */
+  @SuppressWarnings("removal")
   public DCMotorSim(DCMotor gearbox, double gearing, double jKgMetersSquared) {
     super(LinearSystemId.createDCMotorSystem(gearbox, jKgMetersSquared, gearing));
     m_gearbox = gearbox;
@@ -78,6 +78,7 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
    *     {@link #DCMotorSim(LinearSystem, DCMotor, double, Matrix)} constructor.
    * @param measurementStdDevs The standard deviations of the measurements.
    */
+  @SuppressWarnings("removal")
   public DCMotorSim(
       DCMotor gearbox, double gearing, double jKgMetersSquared, Matrix<N2, N1> measurementStdDevs) {
     super(

@@ -13,8 +13,8 @@ import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings("removal")
 class ImplicitModelFollowerTest {
+  @SuppressWarnings("removal")
   @Test
   void testSameModel() {
     final double dt = 0.005;
@@ -57,6 +57,7 @@ class ImplicitModelFollowerTest {
     }
   }
 
+  @SuppressWarnings("removal")
   @Test
   void testSlowerRefModel() {
     final double dt = 0.005;

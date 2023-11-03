@@ -24,7 +24,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 @ResourceLock("timing")
-@SuppressWarnings("removal")
 class UltrasonicPIDTest {
   private final DCMotor m_gearbox = DCMotor.getFalcon500(2);
   private static final double kGearing = KitbotGearing.k10p71.value;
@@ -50,6 +49,7 @@ class UltrasonicPIDTest {
   private double m_distanceMM;
 
   // We're not using @BeforeEach so m_startToObject gets initialized properly
+  @SuppressWarnings("removal")
   private void startThread() {
     HAL.initialize(500, 0);
     SimHooks.pauseTiming();

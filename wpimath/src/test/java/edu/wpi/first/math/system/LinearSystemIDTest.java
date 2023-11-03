@@ -14,8 +14,8 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings("removal")
 class LinearSystemIDTest {
+  @SuppressWarnings("removal")
   @Test
   void testDrivetrainVelocitySystem() {
     var model =
@@ -40,6 +40,7 @@ class LinearSystemIDTest {
         model.getD().isEqual(Matrix.mat(Nat.N2(), Nat.N2()).fill(0.0, 0.0, 0.0, 0.0), 0.001));
   }
 
+  @SuppressWarnings("removal")
   @Test
   void testElevatorSystem() {
     var model = LinearSystemId.createElevatorSystem(DCMotor.getNEO(2), 5, 0.05, 12);
@@ -53,6 +54,7 @@ class LinearSystemIDTest {
     assertTrue(model.getD().isEqual(VecBuilder.fill(0), 0.001));
   }
 
+  @SuppressWarnings("removal")
   @Test
   void testFlywheelSystem() {
     var model = LinearSystemId.createFlywheelSystem(DCMotor.getNEO(2), 0.00032, 1.0);
@@ -65,6 +67,7 @@ class LinearSystemIDTest {
     assertTrue(model.getD().isEqual(VecBuilder.fill(0), 0.001));
   }
 
+  @SuppressWarnings("removal")
   @Test
   void testDCMotorSystem() {
     var model = LinearSystemId.createDCMotorSystem(DCMotor.getNEO(2), 0.00032, 1.0);
@@ -78,6 +81,7 @@ class LinearSystemIDTest {
     assertTrue(model.getD().isEqual(new Matrix<>(Nat.N2(), Nat.N1()), 0.001));
   }
 
+  @SuppressWarnings("removal")
   @Test
   void testIdentifyPositionSystem() {
     // By controls engineering in frc,
@@ -90,6 +94,7 @@ class LinearSystemIDTest {
     assertEquals(model.getB(), VecBuilder.fill(0, 1 / ka));
   }
 
+  @SuppressWarnings("removal")
   @Test
   void testIdentifyVelocitySystem() {
     // By controls engineering in frc,

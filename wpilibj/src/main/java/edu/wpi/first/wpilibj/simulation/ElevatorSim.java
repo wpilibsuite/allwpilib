@@ -15,7 +15,6 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 
 /** Represents a simulated elevator mechanism. */
-@SuppressWarnings("removal")
 public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
   // Gearbox for the elevator.
   private final DCMotor m_gearbox;
@@ -130,6 +129,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
    * @param startingHeightMeters The starting height of the elevator.
    * @param measurementStdDevs The standard deviations of the measurements.
    */
+  @SuppressWarnings("removal")
   public ElevatorSim(
       double kV,
       double kA,
@@ -162,6 +162,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
    * @param startingHeightMeters The starting height of the elevator.
    * @param measurementStdDevs The standard deviations of the measurements.
    */
+  @SuppressWarnings("removal")
   public ElevatorSim(
       DCMotor gearbox,
       double gearing,

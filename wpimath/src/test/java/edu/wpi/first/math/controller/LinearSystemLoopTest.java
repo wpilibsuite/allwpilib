@@ -21,12 +21,12 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import java.util.Random;
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings("removal")
 class LinearSystemLoopTest {
   private static final double kDt = 0.00505;
   private static final double kPositionStddev = 0.0001;
   private static final Random random = new Random();
 
+  @SuppressWarnings("removal")
   LinearSystem<N2, N1, N1> m_plant =
       LinearSystemId.createElevatorSystem(DCMotor.getVex775Pro(2), 5, 0.0181864, 1.0);
 
@@ -77,6 +77,7 @@ class LinearSystemLoopTest {
     assertEquals(0.0, m_loop.getXHat(1), 0.5);
   }
 
+  @SuppressWarnings("removal")
   @Test
   void testFlywheelEnabled() {
     LinearSystem<N1, N1, N1> plant =

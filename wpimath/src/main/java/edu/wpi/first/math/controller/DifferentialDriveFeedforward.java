@@ -10,7 +10,6 @@ import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 
 /** A helper class which computes the feedforward outputs for a differential drive drivetrain. */
-@SuppressWarnings("removal")
 public class DifferentialDriveFeedforward {
   private final LinearSystem<N2, N2, N2> m_plant;
 
@@ -24,6 +23,7 @@ public class DifferentialDriveFeedforward {
    * @param trackwidth The distance between the differential drive's left and right wheels, in
    *     meters.
    */
+  @SuppressWarnings("removal")
   public DifferentialDriveFeedforward(
       double kVLinear, double kALinear, double kVAngular, double kAAngular, double trackwidth) {
     m_plant =
@@ -39,6 +39,7 @@ public class DifferentialDriveFeedforward {
    * @param kVAngular The angular velocity gain in volts per (meters per second).
    * @param kAAngular The angular acceleration gain in volts per (meters per second squared).
    */
+  @SuppressWarnings("removal")
   public DifferentialDriveFeedforward(
       double kVLinear, double kALinear, double kVAngular, double kAAngular) {
     m_plant = LinearSystemId.identifyDrivetrainSystem(kVLinear, kALinear, kVAngular, kAAngular);

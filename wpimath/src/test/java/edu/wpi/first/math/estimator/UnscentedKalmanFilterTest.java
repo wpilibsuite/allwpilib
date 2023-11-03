@@ -29,7 +29,6 @@ import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings("removal")
 class UnscentedKalmanFilterTest {
   private static Matrix<N5, N1> getDynamics(Matrix<N5, N1> x, Matrix<N2, N1> u) {
     var motors = DCMotor.getCIM(2);
@@ -221,6 +220,7 @@ class UnscentedKalmanFilterTest {
     assertEquals(0.0, observer.getXhat(4), 0.1);
   }
 
+  @SuppressWarnings("removal")
   @Test
   void testLinearUKF() {
     var dt = 0.020;

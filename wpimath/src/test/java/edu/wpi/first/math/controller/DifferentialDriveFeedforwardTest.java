@@ -14,7 +14,6 @@ import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings("removal")
 class DifferentialDriveFeedforwardTest {
   private static final double kVLinear = 1.0;
   private static final double kALinear = 1.0;
@@ -23,6 +22,7 @@ class DifferentialDriveFeedforwardTest {
   private static final double trackwidth = 1.0;
   private static final double dtSeconds = 0.02;
 
+  @SuppressWarnings("removal")
   @Test
   void testCalculateWithTrackwidth() {
     DifferentialDriveFeedforward differentialDriveFeedforward =
@@ -54,6 +54,7 @@ class DifferentialDriveFeedforwardTest {
     }
   }
 
+  @SuppressWarnings("removal")
   @Test
   void testCalculateWithoutTrackwidth() {
     DifferentialDriveFeedforward differentialDriveFeedforward =
