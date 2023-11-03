@@ -313,6 +313,11 @@ struct DataLog::WriterThreadState {
     }
   }
 
+  void SetFilename(std::string_view fn) {
+    filename = fn;
+    path = dirPath / filename;
+  }
+
   fs::path dirPath;
   std::string filename;
   fs::path path;
@@ -324,10 +329,8 @@ void DataLog::StartLogFile(WriterThreadState& state) {
   std::error_code ec;
 
   if (state.filename.empty()) {
-    state.filename = MakeRandomFilename();
+    state.SetFilename(MakeRandomFilename());
   }
-
-  state.path = state.dirPath / state.filename;
 
   // get free space
   state.freeSpace = fs::space(state.dirPath).available;
@@ -351,7 +354,7 @@ void DataLog::StartLogFile(WriterThreadState& state) {
         WPI_ERROR(m_msglog, "Could not open log file '{}': {}",
                   state.path.string(), ec.message());
         // try again with random filename
-        state.filename = MakeRandomFilename();
+        state.SetFilename(MakeRandomFilename());
       } else {
         break;
       }
@@ -387,7 +390,7 @@ void DataLog::WriterThreadMain(std::string_view dir) {
   WriterThreadState state{dir};
   {
     std::scoped_lock lock{m_mutex};
-    state.filename = std::move(m_newFilename);
+    state.SetFilename(m_newFilename);
     m_newFilename.clear();
   }
   StartLogFile(state);
@@ -395,6 +398,7 @@ void DataLog::WriterThreadMain(std::string_view dir) {
   std::error_code ec;
   std::vector<Buffer> toWrite;
   int freeSpaceCount = 0;
+  int checkExistCount = 0;
   bool blocked = false;
   uintmax_t written = 0;
   int segmentCount = 1;
@@ -415,23 +419,25 @@ void DataLog::WriterThreadMain(std::string_view dir) {
     bool doStart = false;
 
     // if file was deleted, recreate it with the same name
-    lock.unlock();
-    bool exists = fs::exists(state.path, ec);
-    lock.lock();
-    if (!ec && !exists) {
-      state.Close();
-      WPI_INFO(m_msglog, "Log file '{}' deleted, recreating as fresh log",
-               state.filename);
-      doStart = true;
+    if (++checkExistCount >= 10) {
+      checkExistCount = 0;
+      lock.unlock();
+      bool exists = fs::exists(state.path, ec);
+      lock.lock();
+      if (!ec && !exists) {
+        state.Close();
+        WPI_INFO(m_msglog, "Log file '{}' deleted, recreating as fresh log",
+                 state.filename);
+        doStart = true;
+      }
     }
 
     // start new file if file exceeds 1.8 GB
     if (written > 1800000000ull) {
       state.Close();
       fs::path path{state.filename};
-      state.filename = fmt::format("{}.{}.{}", path.stem().string(),
-                                   ++segmentCount, path.extension().string());
-      state.path = state.dirPath / state.filename;
+      state.SetFilename(fmt::format("{}.{}.{}", path.stem().string(),
+                                    ++segmentCount, path.extension().string()));
       WPI_INFO(m_msglog, "Log file reached 1.8 GB, starting new file '{}'",
                state.filename);
       doStart = true;
@@ -461,10 +467,11 @@ void DataLog::WriterThreadMain(std::string_view dir) {
     if (!m_newFilename.empty() && state.f != fs::kInvalidFile) {
       auto newFilename = std::move(m_newFilename);
       m_newFilename.clear();
-      lock.unlock();
       // rename
       if (state.filename != newFilename) {
+        lock.unlock();
         fs::rename(state.path, state.dirPath / newFilename, ec);
+        lock.lock();
       }
       if (ec) {
         WPI_ERROR(m_msglog, "Could not rename log file from '{}' to '{}': {}",
@@ -473,9 +480,7 @@ void DataLog::WriterThreadMain(std::string_view dir) {
         WPI_INFO(m_msglog, "Renamed log file from '{}' to '{}'", state.filename,
                  newFilename);
       }
-      state.filename = std::move(newFilename);
-      state.path = state.dirPath / state.filename;
-      lock.lock();
+      state.SetFilename(newFilename);
     }
 
     if (doFlush || m_doFlush) {
