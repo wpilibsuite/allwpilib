@@ -432,7 +432,7 @@ public abstract class Command implements Sendable {
    * @return the decorated command
    */
   public WrapperCommand finallyDo(Runnable end) {
-    return finallyDo((interrupted) -> end.run());
+    return finallyDo(interrupted -> end.run());
   }
 
   /**

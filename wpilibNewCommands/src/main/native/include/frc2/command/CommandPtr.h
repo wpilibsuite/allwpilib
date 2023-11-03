@@ -233,7 +233,7 @@ class CommandPtr final {
    * @return the decorated command
    */
   [[nodiscard]]
-  CommandPtr FinallyDo(std::function<void(void)> end) &&;
+  CommandPtr FinallyDo(std::function<void()> end) &&;
 
   /**
    * Decorates this command with a lambda to call on interrupt, following the

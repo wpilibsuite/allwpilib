@@ -123,7 +123,7 @@ CommandPtr Command::FinallyDo(std::function<void(bool)> end) && {
   return std::move(*this).ToPtr().FinallyDo(std::move(end));
 }
 
-CommandPtr Command::FinallyDo(std::function<void(void)> end) && {
+CommandPtr Command::FinallyDo(std::function<void()> end) && {
   return std::move(*this).ToPtr().FinallyDo(std::move(end));
 }
 
