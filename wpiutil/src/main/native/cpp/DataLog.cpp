@@ -323,12 +323,6 @@ struct DataLog::WriterThreadState {
 void DataLog::StartLogFile(WriterThreadState& state) {
   std::error_code ec;
 
-  {
-    std::scoped_lock lock{m_mutex};
-    state.filename = std::move(m_newFilename);
-    m_newFilename.clear();
-  }
-
   if (state.filename.empty()) {
     state.filename = MakeRandomFilename();
   }
@@ -390,10 +384,15 @@ void DataLog::StartLogFile(WriterThreadState& state) {
 void DataLog::WriterThreadMain(std::string_view dir) {
   std::chrono::duration<double> periodTime{m_period};
 
-  std::error_code ec;
   WriterThreadState state{dir};
+  {
+    std::scoped_lock lock{m_mutex};
+    state.filename = std::move(m_newFilename);
+    m_newFilename.clear();
+  }
   StartLogFile(state);
 
+  std::error_code ec;
   std::vector<Buffer> toWrite;
   int freeSpaceCount = 0;
   bool blocked = false;
@@ -421,6 +420,8 @@ void DataLog::WriterThreadMain(std::string_view dir) {
     lock.lock();
     if (!ec && !exists) {
       state.Close();
+      WPI_INFO(m_msglog, "Log file '{}' deleted, recreating as fresh log",
+               state.filename);
       doStart = true;
     }
 
@@ -431,6 +432,8 @@ void DataLog::WriterThreadMain(std::string_view dir) {
       state.filename = fmt::format("{}.{}.{}", path.stem().string(),
                                    ++segmentCount, path.extension().string());
       state.path = state.dirPath / state.filename;
+      WPI_INFO(m_msglog, "Log file reached 1.8 GB, starting new file '{}'",
+               state.filename);
       doStart = true;
     }
 
