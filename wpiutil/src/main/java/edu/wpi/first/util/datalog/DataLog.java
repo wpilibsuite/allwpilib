@@ -115,9 +115,7 @@ public final class DataLog implements AutoCloseable {
     DataLogJNI.resume(m_impl);
   }
 
-  /**
-   * Stops appending all records to the log, and closes the log file.
-   */
+  /** Stops appending all records to the log, and closes the log file. */
   public void stop() {
     DataLogJNI.stop(m_impl);
   }

@@ -133,9 +133,7 @@ public final class DataLogManager {
     }
   }
 
-  /**
-   * Stop data log manager.
-   */
+  /** Stop data log manager. */
   public static synchronized void stop() {
     if (m_thread != null) {
       m_thread.interrupt();
