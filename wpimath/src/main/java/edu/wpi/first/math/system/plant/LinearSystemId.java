@@ -81,7 +81,8 @@ public final class LinearSystemId {
    * @return A LinearSystem representing the given characterized constants.
    * @throws IllegalArgumentException if massKg &lt;= 0, radiusMeters &lt;= 0, or G &lt;= 0.
    */
-  public static LinearSystem<N2, N1, N1> createElevatorSystem(
+  @Deprecated(since = "2024", forRemoval = true)
+   public static LinearSystem<N2, N1, N1> createElevatorSystem(
       DCMotor motor, double massKg, double radiusMeters, double G) {
     if (massKg <= 0.0) {
       throw new IllegalArgumentException("massKg must be greater than zero.");
@@ -150,6 +151,7 @@ public final class LinearSystemId {
    * @return A LinearSystem representing the given characterized constants.
    * @throws IllegalArgumentException if JKgMetersSquared &lt;= 0 or G &lt;= 0.
    */
+  @Deprecated(since = "2024", forRemoval = true)
   public static LinearSystem<N1, N1, N1> createFlywheelSystem(
       DCMotor motor, double JKgMetersSquared, double G) {
     if (JKgMetersSquared <= 0.0) {
@@ -218,7 +220,8 @@ public final class LinearSystemId {
    * @return A LinearSystem representing the given characterized constants.
    * @throws IllegalArgumentException if JKgMetersSquared &lt;= 0 or G &lt;= 0.
    */
-  public static LinearSystem<N2, N1, N2> createDCMotorSystem(
+  @Deprecated(since = "2024", forRemoval = true)
+   public static LinearSystem<N2, N1, N2> createDCMotorSystem(
       DCMotor motor, double JKgMetersSquared, double G) {
     if (JKgMetersSquared <= 0.0) {
       throw new IllegalArgumentException("J must be greater than zero.");
@@ -301,7 +304,8 @@ public final class LinearSystemId {
    * @throws IllegalArgumentException if kV &lt;= 0 or kA &lt;= 0.
    * @see <a href= "https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
    */
-  public static LinearSystem<N2, N1, N2> createDCMotorSystem(double kV, double kA) {
+  @Deprecated(since = "2024", forRemoval = true)
+   public static LinearSystem<N2, N1, N2> createDCMotorSystem(double kV, double kA) {
     if (kV <= 0.0) {
       throw new IllegalArgumentException("Kv must be greater than zero.");
     }
@@ -387,7 +391,8 @@ public final class LinearSystemId {
    * @return A LinearSystem representing a differential drivetrain.
    * @throws IllegalArgumentException if m &lt;= 0, r &lt;= 0, rb &lt;= 0, J &lt;= 0, or G &lt;= 0.
    */
-  public static LinearSystem<N2, N2, N2> createDrivetrainVelocitySystem(
+  @Deprecated(since = "2024", forRemoval = true)
+   public static LinearSystem<N2, N2, N2> createDrivetrainVelocitySystem(
       DCMotor motor,
       double massKg,
       double rMeters,
@@ -470,6 +475,7 @@ public final class LinearSystemId {
    *     will be greater than 1.
    * @return A LinearSystem representing the given characterized constants.
    */
+  @Deprecated(since = "2024", forRemoval = true)
   public static LinearSystem<N2, N1, N1> createSingleJointedArmSystem(
       DCMotor motor, double JKgSquaredMeters, double G) {
     if (JKgSquaredMeters <= 0.0) {
@@ -577,6 +583,7 @@ public final class LinearSystemId {
    * @throws IllegalArgumentException if kV &lt;= 0 or kA &lt;= 0.
    * @see <a href= "https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
    */
+  @Deprecated(since = "2024", forRemoval = true)
   public static LinearSystem<N1, N1, N1> identifyVelocitySystem(double kV, double kA) {
     if (kV <= 0.0) {
       throw new IllegalArgumentException("Kv must be greater than zero.");
@@ -685,6 +692,7 @@ public final class LinearSystemId {
    * @throws IllegalArgumentException if kV &lt;= 0 or kA &lt;= 0.
    * @see <a href= "https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
    */
+  @Deprecated(since = "2024", forRemoval = true)
   public static LinearSystem<N2, N1, N1> identifyPositionSystem(double kV, double kA) {
     if (kV <= 0.0) {
       throw new IllegalArgumentException("Kv must be greater than zero.");
@@ -841,6 +849,7 @@ public final class LinearSystemId {
    *     kAAngular &lt;= 0.
    * @see <a href= "https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
    */
+  @Deprecated(since = "2024", forRemoval = true)
   public static LinearSystem<N2, N2, N2> identifyDrivetrainSystem(
       double kVLinear, double kALinear, double kVAngular, double kAAngular) {
     if (kVLinear <= 0.0) {
@@ -888,6 +897,7 @@ public final class LinearSystemId {
    *     kAAngular &lt;= 0, or trackwidth &lt;= 0.
    * @see <a href= "https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
    */
+  @Deprecated(since = "2024", forRemoval = true)
   public static LinearSystem<N2, N2, N2> identifyDrivetrainSystem(
       double kVLinear, double kALinear, double kVAngular, double kAAngular, double trackwidth) {
     if (kVLinear <= 0.0) {
