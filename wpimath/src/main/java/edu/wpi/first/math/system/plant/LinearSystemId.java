@@ -11,7 +11,6 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.units.Angle;
-import edu.wpi.first.units.Dimensionless;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Mass;
 import edu.wpi.first.units.Measure;
@@ -38,14 +37,14 @@ public final class LinearSystemId {
    * @throws IllegalArgumentException if mass &lt;= 0, radius &lt;= 0, or G &lt;= 0.
    */
   public static LinearSystem<N2, N1, N1> createElevatorSystem(
-      DCMotor motor, Measure<Mass> mass, Measure<Distance> radius, Measure<Dimensionless> G) {
+      DCMotor motor, Measure<Mass> mass, Measure<Distance> radius, double G) {
     if (mass.in(Units.Kilograms) <= 0.0) {
       throw new IllegalArgumentException("massKg must be greater than zero.");
     }
     if (radius.in(Units.Meters) <= 0.0) {
       throw new IllegalArgumentException("radiusMeters must be greater than zero.");
     }
-    if (G.in(Units.Value) <= 0) {
+    if (G <= 0) {
       throw new IllegalArgumentException("G must be greater than zero.");
     }
 
@@ -55,7 +54,7 @@ public final class LinearSystemId {
                 0,
                 1,
                 0,
-                -Math.pow(G.in(Units.Value), 2)
+                -Math.pow(G, 2)
                     * motor.KtNMPerAmp
                     / (motor.rOhms
                         * radius.in(Units.Meters)
@@ -64,7 +63,7 @@ public final class LinearSystemId {
                         * motor.KvRadPerSecPerVolt)),
         VecBuilder.fill(
             0,
-            G.in(Units.Value)
+            G
                 * motor.KtNMPerAmp
                 / (motor.rOhms * radius.in(Units.Meters) * mass.in(Units.Kilograms))),
         Matrix.mat(Nat.N1(), Nat.N2()).fill(1, 0),
@@ -123,23 +122,20 @@ public final class LinearSystemId {
    * @throws IllegalArgumentException if J &lt;= 0 or G &lt;= 0.
    */
   public static LinearSystem<N1, N1, N1> createFlywheelSystem(
-      DCMotor motor, Measure<Mult<Mass, Mult<Distance, Distance>>> J, Measure<Dimensionless> G) {
+      DCMotor motor, Measure<Mult<Mass, Mult<Distance, Distance>>> J, double G) {
     if (J.in(Units.KilogramsMetersSquared) <= 0.0) {
       throw new IllegalArgumentException("J must be greater than zero.");
     }
-    if (G.in(Units.Value) <= 0.0) {
+    if (G <= 0.0) {
       throw new IllegalArgumentException("G must be greater than zero.");
     }
 
     return new LinearSystem<>(
         VecBuilder.fill(
-            -Math.pow(G.in(Units.Value), 2)
+            -Math.pow(G, 2)
                 * motor.KtNMPerAmp
                 / (motor.KvRadPerSecPerVolt * motor.rOhms * J.in(Units.KilogramsMetersSquared))),
-        VecBuilder.fill(
-            G.in(Units.Value)
-                * motor.KtNMPerAmp
-                / (motor.rOhms * J.in(Units.KilogramsMetersSquared))),
+        VecBuilder.fill(G * motor.KtNMPerAmp / (motor.rOhms * J.in(Units.KilogramsMetersSquared))),
         Matrix.eye(Nat.N1()),
         new Matrix<>(Nat.N1(), Nat.N1()));
   }
@@ -186,11 +182,11 @@ public final class LinearSystemId {
    * @throws IllegalArgumentException if J &lt;= 0 or G &lt;= 0.
    */
   public static LinearSystem<N2, N1, N2> createDCMotorSystem(
-      DCMotor motor, Measure<Mult<Mass, Mult<Distance, Distance>>> J, Measure<Dimensionless> G) {
+      DCMotor motor, Measure<Mult<Mass, Mult<Distance, Distance>>> J, double G) {
     if (J.in(Units.KilogramsMetersSquared) <= 0.0) {
       throw new IllegalArgumentException("J must be greater than zero.");
     }
-    if (G.in(Units.Value) <= 0.0) {
+    if (G <= 0.0) {
       throw new IllegalArgumentException("G must be greater than zero.");
     }
 
@@ -200,16 +196,13 @@ public final class LinearSystemId {
                 0,
                 1,
                 0,
-                -Math.pow(G.in(Units.Value), 2)
+                -Math.pow(G, 2)
                     * motor.KtNMPerAmp
                     / (motor.KvRadPerSecPerVolt
                         * motor.rOhms
                         * J.in(Units.KilogramsMetersSquared))),
         VecBuilder.fill(
-            0,
-            G.in(Units.Value)
-                * motor.KtNMPerAmp
-                / (motor.rOhms * J.in(Units.KilogramsMetersSquared))),
+            0, G * motor.KtNMPerAmp / (motor.rOhms * J.in(Units.KilogramsMetersSquared))),
         Matrix.eye(Nat.N2()),
         new Matrix<>(Nat.N2(), Nat.N1()));
   }
@@ -343,7 +336,7 @@ public final class LinearSystemId {
       Measure<Distance> r,
       Measure<Distance> rb,
       Measure<Mult<Mass, Mult<Distance, Distance>>> J,
-      Measure<Dimensionless> G) {
+      double G) {
     if (mass.in(Units.Kilograms) <= 0.0) {
       throw new IllegalArgumentException("massKg must be greater than zero.");
     }
@@ -356,15 +349,15 @@ public final class LinearSystemId {
     if (J.in(Units.KilogramsMetersSquared) <= 0.0) {
       throw new IllegalArgumentException("JKgMetersSquared must be greater than zero.");
     }
-    if (G.in(Units.Value) <= 0.0) {
+    if (G <= 0.0) {
       throw new IllegalArgumentException("G must be greater than zero.");
     }
 
     var C1 =
-        -Math.pow(G.in(Units.Value), 2)
+        -Math.pow(G, 2)
             * motor.KtNMPerAmp
             / (motor.KvRadPerSecPerVolt * motor.rOhms * r.in(Units.Meters) * r.in(Units.Meters));
-    var C2 = G.in(Units.Value) * motor.KtNMPerAmp / (motor.rOhms * r.in(Units.Meters));
+    var C2 = G * motor.KtNMPerAmp / (motor.rOhms * r.in(Units.Meters));
 
     final double C3 =
         1 / mass.in(Units.Kilograms)
@@ -442,11 +435,11 @@ public final class LinearSystemId {
    * @return A LinearSystem representing the given characterized constants.
    */
   public static LinearSystem<N2, N1, N1> createSingleJointedArmSystem(
-      DCMotor motor, Measure<Mult<Mass, Mult<Distance, Distance>>> J, Measure<Dimensionless> G) {
+      DCMotor motor, Measure<Mult<Mass, Mult<Distance, Distance>>> J, double G) {
     if (J.in(Units.KilogramsMetersSquared) <= 0.0) {
       throw new IllegalArgumentException("JKgSquaredMeters must be greater than zero.");
     }
-    if (G.in(Units.Value) <= 0.0) {
+    if (G <= 0.0) {
       throw new IllegalArgumentException("G must be greater than zero.");
     }
 
@@ -456,16 +449,13 @@ public final class LinearSystemId {
                 0,
                 1,
                 0,
-                -Math.pow(G.in(Units.Value), 2)
+                -Math.pow(G, 2)
                     * motor.KtNMPerAmp
                     / (motor.KvRadPerSecPerVolt
                         * motor.rOhms
                         * J.in(Units.KilogramsMetersSquared))),
         VecBuilder.fill(
-            0,
-            G.in(Units.Value)
-                * motor.KtNMPerAmp
-                / (motor.rOhms * J.in(Units.KilogramsMetersSquared))),
+            0, G * motor.KtNMPerAmp / (motor.rOhms * J.in(Units.KilogramsMetersSquared))),
         Matrix.mat(Nat.N1(), Nat.N2()).fill(1, 0),
         new Matrix<>(Nat.N1(), Nat.N1()));
   }
