@@ -14,7 +14,6 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import org.junit.jupiter.api.Test;
 
 class ImplicitModelFollowerTest {
-  @SuppressWarnings("removal")
   @Test
   void testSameModel() {
     final double dt = 0.005;
@@ -57,7 +56,6 @@ class ImplicitModelFollowerTest {
     }
   }
 
-  @SuppressWarnings("removal")
   @Test
   void testSlowerRefModel() {
     final double dt = 0.005;

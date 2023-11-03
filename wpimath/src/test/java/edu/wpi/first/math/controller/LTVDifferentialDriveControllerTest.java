@@ -52,7 +52,6 @@ class LTVDifferentialDriveControllerTest {
   private static final double kAngularV = 1.382; // V/(m/s)
   private static final double kAngularA = 0.08495; // V/(m/s²)
 
-  @SuppressWarnings("removal")
   private static final LinearSystem<N2, N2, N2> plant =
       LinearSystemId.identifyDrivetrainSystem(kLinearV, kLinearA, kAngularV, kAngularA);
 

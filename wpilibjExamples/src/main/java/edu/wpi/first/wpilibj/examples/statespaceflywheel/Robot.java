@@ -42,7 +42,6 @@ public class Robot extends TimedRobot {
   // States: [velocity], in radians per second.
   // Inputs (what we can "put in"): [voltage], in volts.
   // Outputs (what we can measure): [velocity], in radians per second.
-  @SuppressWarnings("removal")
   private final LinearSystem<N1, N1, N1> m_flywheelPlant =
       LinearSystemId.createFlywheelSystem(
           DCMotor.getNEO(2), kFlywheelMomentOfInertia, kFlywheelGearing);

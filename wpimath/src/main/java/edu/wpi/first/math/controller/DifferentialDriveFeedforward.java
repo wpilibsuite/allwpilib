@@ -23,7 +23,6 @@ public class DifferentialDriveFeedforward {
    * @param trackwidth The distance between the differential drive's left and right wheels, in
    *     meters.
    */
-  @SuppressWarnings("removal")
   public DifferentialDriveFeedforward(
       double kVLinear, double kALinear, double kVAngular, double kAAngular, double trackwidth) {
     m_plant =
@@ -39,7 +38,6 @@ public class DifferentialDriveFeedforward {
    * @param kVAngular The angular velocity gain in volts per (meters per second).
    * @param kAAngular The angular acceleration gain in volts per (meters per second squared).
    */
-  @SuppressWarnings("removal")
   public DifferentialDriveFeedforward(
       double kVLinear, double kALinear, double kVAngular, double kAAngular) {
     m_plant = LinearSystemId.identifyDrivetrainSystem(kVLinear, kALinear, kVAngular, kAAngular);

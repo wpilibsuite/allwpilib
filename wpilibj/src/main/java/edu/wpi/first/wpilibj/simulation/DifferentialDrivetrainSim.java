@@ -67,7 +67,6 @@ public class DifferentialDrivetrainSim {
    *     m/s, and position measurement standard deviations of 0.005 meters are a reasonable starting
    *     point.
    */
-  @SuppressWarnings("removal")
   public DifferentialDrivetrainSim(
       DCMotor driveMotor,
       double gearing,

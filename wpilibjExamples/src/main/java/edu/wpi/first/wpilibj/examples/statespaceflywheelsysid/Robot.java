@@ -43,7 +43,6 @@ public class Robot extends TimedRobot {
   // Outputs (what we can measure): [velocity], in radians per second.
   //
   // The Kv and Ka constants are found using the FRC Characterization toolsuite.
-  @SuppressWarnings("removal")
   private final LinearSystem<N1, N1, N1> m_flywheelPlant =
       LinearSystemId.identifyVelocitySystem(kFlywheelKv, kFlywheelKa);
 

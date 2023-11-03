@@ -34,7 +34,6 @@ class KalmanFilterTest {
     createElevator();
   }
 
-  @SuppressWarnings("removal")
   private static void createElevator() {
     var motors = DCMotor.getVex775Pro(2);
 

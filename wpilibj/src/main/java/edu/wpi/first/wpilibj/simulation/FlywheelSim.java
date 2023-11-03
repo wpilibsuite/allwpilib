@@ -61,7 +61,6 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
    * @param jKgMetersSquared The moment of inertia of the flywheel. If this is unknown, use the
    *     {@link #FlywheelSim(LinearSystem, DCMotor, double, Matrix)} constructor.
    */
-  @SuppressWarnings("removal")
   public FlywheelSim(DCMotor gearbox, double gearing, double jKgMetersSquared) {
     super(LinearSystemId.createFlywheelSystem(gearbox, jKgMetersSquared, gearing));
     m_gearbox = gearbox;
@@ -77,7 +76,6 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
    *     {@link #FlywheelSim(LinearSystem, DCMotor, double, Matrix)} constructor.
    * @param measurementStdDevs The standard deviations of the measurements.
    */
-  @SuppressWarnings("removal")
   public FlywheelSim(
       DCMotor gearbox, double gearing, double jKgMetersSquared, Matrix<N1, N1> measurementStdDevs) {
     super(

@@ -22,7 +22,6 @@ class DifferentialDriveFeedforwardTest {
   private static final double trackwidth = 1.0;
   private static final double dtSeconds = 0.02;
 
-  @SuppressWarnings("removal")
   @Test
   void testCalculateWithTrackwidth() {
     DifferentialDriveFeedforward differentialDriveFeedforward =
@@ -54,7 +53,6 @@ class DifferentialDriveFeedforwardTest {
     }
   }
 
-  @SuppressWarnings("removal")
   @Test
   void testCalculateWithoutTrackwidth() {
     DifferentialDriveFeedforward differentialDriveFeedforward =

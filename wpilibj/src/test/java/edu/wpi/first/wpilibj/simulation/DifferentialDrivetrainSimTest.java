@@ -29,7 +29,6 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class DifferentialDrivetrainSimTest {
-  @SuppressWarnings("removal")
   @Test
   void testConvergence() {
     var motor = DCMotor.getNEO(2);
@@ -96,7 +95,6 @@ class DifferentialDrivetrainSimTest {
         0.01);
   }
 
-  @SuppressWarnings("removal")
   @Test
   void testCurrent() {
     var motor = DCMotor.getNEO(2);
@@ -127,7 +125,6 @@ class DifferentialDrivetrainSimTest {
     assertTrue(sim.getCurrentDrawAmps() > 0);
   }
 
-  @SuppressWarnings("removal")
   @Test
   void testModelStability() {
     var motor = DCMotor.getNEO(2);

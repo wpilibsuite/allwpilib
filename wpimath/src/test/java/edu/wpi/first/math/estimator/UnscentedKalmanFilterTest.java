@@ -220,7 +220,6 @@ class UnscentedKalmanFilterTest {
     assertEquals(0.0, observer.getXhat(4), 0.1);
   }
 
-  @SuppressWarnings("removal")
   @Test
   void testLinearUKF() {
     var dt = 0.020;

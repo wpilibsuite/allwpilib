@@ -90,7 +90,6 @@ class ElevatorSimTest {
     }
   }
 
-  @SuppressWarnings("removal")
   @Test
   void testStability() {
     var sim =

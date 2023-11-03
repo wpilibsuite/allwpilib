@@ -26,7 +26,6 @@ import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
  * This is a sample program to demonstrate how to use a state-space controller to control an
  * elevator.
  */
-@SuppressWarnings("removal")
 public class Robot extends TimedRobot {
   private static final int kMotorPort = 0;
   private static final int kEncoderAChannel = 0;

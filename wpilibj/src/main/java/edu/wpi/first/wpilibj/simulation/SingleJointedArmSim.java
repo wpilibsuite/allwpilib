@@ -151,7 +151,6 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
    * @param startingAngleRads The initial position of the Arm simulation in radians.
    * @param measurementStdDevs The standard deviations of the measurements.
    */
-  @SuppressWarnings("removal")
   public SingleJointedArmSim(
       DCMotor gearbox,
       double gearing,

@@ -49,7 +49,6 @@ class UltrasonicPIDTest {
   private double m_distanceMM;
 
   // We're not using @BeforeEach so m_startToObject gets initialized properly
-  @SuppressWarnings("removal")
   private void startThread() {
     HAL.initialize(500, 0);
     SimHooks.pauseTiming();

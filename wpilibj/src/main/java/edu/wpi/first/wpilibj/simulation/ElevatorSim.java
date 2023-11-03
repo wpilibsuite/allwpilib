@@ -129,7 +129,6 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
    * @param startingHeightMeters The starting height of the elevator.
    * @param measurementStdDevs The standard deviations of the measurements.
    */
-  @SuppressWarnings("removal")
   public ElevatorSim(
       double kV,
       double kA,
@@ -162,7 +161,6 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
    * @param startingHeightMeters The starting height of the elevator.
    * @param measurementStdDevs The standard deviations of the measurements.
    */
-  @SuppressWarnings("removal")
   public ElevatorSim(
       DCMotor gearbox,
       double gearing,
