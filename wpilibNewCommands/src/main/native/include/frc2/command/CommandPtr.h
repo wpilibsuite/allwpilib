@@ -236,14 +236,6 @@ class CommandPtr final {
   CommandPtr FinallyDo(std::function<void(void)> end) &&;
 
   /**
-   * Decorates this command with a lambda to call on interrupt or end, following the command's
-   * inherent {@link #end(boolean)} method. The provided lambda will run identically in both
-   * interrupt and end cases.
-   *
-   * @param end a lambda to run when the command ends, whether or not it was interrupted.
-   * @return the decorated command
-   */
-  /**
    * Decorates this command with a lambda to call on interrupt, following the
    * command's inherent Command::End(bool) method.
    *
