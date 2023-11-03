@@ -28,6 +28,7 @@ import edu.wpi.first.math.util.Units;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
+@SuppressWarnings("removal")
 class DifferentialDrivetrainSimTest {
   @Test
   void testConvergence() {

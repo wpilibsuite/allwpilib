@@ -10,6 +10,7 @@ import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 
 /** A helper class which computes the feedforward outputs for a differential drive drivetrain. */
+@SuppressWarnings("removal")
 public class DifferentialDriveFeedforward {
   private final LinearSystem<N2, N2, N2> m_plant;
 

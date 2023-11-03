@@ -14,6 +14,7 @@ import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import org.junit.jupiter.api.Test;
 
+@SuppressWarnings("removal")
 class DifferentialDriveFeedforwardTest {
   private static final double kVLinear = 1.0;
   private static final double kALinear = 1.0;

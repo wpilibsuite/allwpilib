@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+@SuppressWarnings("removal")
 public class Drivetrain {
   // 3 meters per second.
   public static final double kMaxSpeed = 3.0;

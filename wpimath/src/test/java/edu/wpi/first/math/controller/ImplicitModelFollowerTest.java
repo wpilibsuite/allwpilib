@@ -13,6 +13,7 @@ import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import org.junit.jupiter.api.Test;
 
+@SuppressWarnings("removal")
 class ImplicitModelFollowerTest {
   @Test
   void testSameModel() {

@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Random;
 import org.junit.jupiter.api.Test;
 
+@SuppressWarnings("removal")
 class KalmanFilterTest {
   private static LinearSystem<N2, N1, N1> elevatorPlant;
 

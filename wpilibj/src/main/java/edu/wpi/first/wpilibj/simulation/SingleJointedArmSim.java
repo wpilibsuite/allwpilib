@@ -15,6 +15,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 
 /** Represents a simulated single jointed arm mechanism. */
+@SuppressWarnings("removal")
 public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
   // The gearbox for the arm.
   private final DCMotor m_gearbox;

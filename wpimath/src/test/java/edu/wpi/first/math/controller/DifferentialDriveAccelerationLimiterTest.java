@@ -14,6 +14,7 @@ import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import org.junit.jupiter.api.Test;
 
+@SuppressWarnings("removal")
 class DifferentialDriveAccelerationLimiterTest {
   @Test
   void testLowLimits() {

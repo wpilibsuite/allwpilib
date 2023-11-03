@@ -13,6 +13,7 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
 
 /** Represents a simulated flywheel mechanism. */
+@SuppressWarnings("removal")
 public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
   // Gearbox for the flywheel.
   private final DCMotor m_gearbox;

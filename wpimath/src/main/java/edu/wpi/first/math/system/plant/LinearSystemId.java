@@ -82,7 +82,7 @@ public final class LinearSystemId {
    * @throws IllegalArgumentException if massKg &lt;= 0, radiusMeters &lt;= 0, or G &lt;= 0.
    */
   @Deprecated(since = "2024", forRemoval = true)
-   public static LinearSystem<N2, N1, N1> createElevatorSystem(
+  public static LinearSystem<N2, N1, N1> createElevatorSystem(
       DCMotor motor, double massKg, double radiusMeters, double G) {
     if (massKg <= 0.0) {
       throw new IllegalArgumentException("massKg must be greater than zero.");
@@ -221,7 +221,7 @@ public final class LinearSystemId {
    * @throws IllegalArgumentException if JKgMetersSquared &lt;= 0 or G &lt;= 0.
    */
   @Deprecated(since = "2024", forRemoval = true)
-   public static LinearSystem<N2, N1, N2> createDCMotorSystem(
+  public static LinearSystem<N2, N1, N2> createDCMotorSystem(
       DCMotor motor, double JKgMetersSquared, double G) {
     if (JKgMetersSquared <= 0.0) {
       throw new IllegalArgumentException("J must be greater than zero.");
@@ -305,7 +305,7 @@ public final class LinearSystemId {
    * @see <a href= "https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
    */
   @Deprecated(since = "2024", forRemoval = true)
-   public static LinearSystem<N2, N1, N2> createDCMotorSystem(double kV, double kA) {
+  public static LinearSystem<N2, N1, N2> createDCMotorSystem(double kV, double kA) {
     if (kV <= 0.0) {
       throw new IllegalArgumentException("Kv must be greater than zero.");
     }
@@ -392,7 +392,7 @@ public final class LinearSystemId {
    * @throws IllegalArgumentException if m &lt;= 0, r &lt;= 0, rb &lt;= 0, J &lt;= 0, or G &lt;= 0.
    */
   @Deprecated(since = "2024", forRemoval = true)
-   public static LinearSystem<N2, N2, N2> createDrivetrainVelocitySystem(
+  public static LinearSystem<N2, N2, N2> createDrivetrainVelocitySystem(
       DCMotor motor,
       double massKg,
       double rMeters,

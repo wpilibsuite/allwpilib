@@ -25,6 +25,7 @@ import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import java.util.ArrayList;
 import org.junit.jupiter.api.Test;
 
+@SuppressWarnings("removal")
 class LTVDifferentialDriveControllerTest {
   private static final double kTolerance = 1 / 12.0;
   private static final double kAngularTolerance = Math.toRadians(2);

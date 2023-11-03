@@ -15,6 +15,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import org.junit.jupiter.api.Test;
 
+@SuppressWarnings("removal")
 class LinearQuadraticRegulatorTest {
   @Test
   void testLQROnElevator() {

@@ -12,6 +12,7 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
  * A helper class that computes feedforward outputs for a simple elevator (modeled as a motor acting
  * against the force of gravity).
  */
+@SuppressWarnings("removal")
 public class ElevatorFeedforward {
   public final double ks;
   public final double kg;

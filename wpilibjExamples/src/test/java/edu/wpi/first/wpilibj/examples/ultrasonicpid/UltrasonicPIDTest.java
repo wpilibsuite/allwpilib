@@ -24,6 +24,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 @ResourceLock("timing")
+@SuppressWarnings("removal")
 class UltrasonicPIDTest {
   private final DCMotor m_gearbox = DCMotor.getFalcon500(2);
   private static final double kGearing = KitbotGearing.k10p71.value;

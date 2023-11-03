@@ -37,6 +37,7 @@ import edu.wpi.first.wpilibj.RobotController;
  *
  * <p>y = x
  */
+@SuppressWarnings("removal")
 public class DifferentialDrivetrainSim {
   private final DCMotor m_motor;
   private final double m_originalGearing;

@@ -14,6 +14,7 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
 
 /** Represents a simulated DC motor mechanism. */
+@SuppressWarnings("removal")
 public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
   // Gearbox for the DC motor.
   private final DCMotor m_gearbox;
