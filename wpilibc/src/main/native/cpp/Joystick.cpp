@@ -129,6 +129,7 @@ double Joystick::GetDirectionRadians() const {
 double Joystick::GetDirectionDegrees() const {
   WPI_IGNORE_DEPRECATED
   return (180 / std::numbers::pi) * GetDirectionRadians();
+  WPI_UNIGNORE_DEPRECATED
 }
 
 units::radian_t Joystick::GetDirection() const {
