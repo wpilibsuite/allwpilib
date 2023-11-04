@@ -50,7 +50,8 @@ units::meter_t AprilTagFieldLayout::GetFieldWidth() const {
 }
 
 std::vector<AprilTag> AprilTagFieldLayout::GetTags() const {
-  std::vector<AprilTag> tags{m_apriltags.size()};
+  std::vector<AprilTag> tags;
+  tags.reserve(m_apriltags.size());
   for (const auto& tag : m_apriltags) {
     tags.emplace_back(tag.second);
   }
