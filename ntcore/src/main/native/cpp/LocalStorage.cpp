@@ -130,7 +130,9 @@ void LocalStorage::Impl::NotifyTopic(TopicData* topic,
     if (!m_dataloggers.empty()) {
       auto now = Now();
       for (auto&& datalogger : m_dataloggers) {
-        if (wpi::starts_with(topic->name, datalogger->prefix)) {
+        if (wpi::starts_with(topic->name, datalogger->prefix) &&
+            (!datalogger->prefix.empty() ||
+             !wpi::starts_with(topic->name, '$'))) {
           auto it = std::find_if(topic->datalogs.begin(), topic->datalogs.end(),
                                  [&](const auto& elem) {
                                    return elem.logger == datalogger->handle;
@@ -1449,6 +1451,7 @@ NT_DataLogger LocalStorage::StartDataLog(wpi::log::DataLog& log,
   auto now = nt::Now();
   for (auto&& topic : m_impl.m_topics) {
     if (!wpi::starts_with(topic->name, prefix) ||
+        (prefix.empty() && wpi::starts_with(topic->name, '$')) ||
         topic->type == NT_UNASSIGNED || topic->typeStr.empty()) {
       continue;
     }
