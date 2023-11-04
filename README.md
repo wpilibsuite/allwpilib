@@ -88,9 +88,24 @@ If opening from a fresh clone, generated java dependencies will not exist. Most 
 
 `./gradlew build` builds _everything_, which includes debug and release builds for desktop and all installed cross compilers. Many developers don't need or want to build all of this. Therefore, common tasks have shortcuts to only build necessary components for common development and testing tasks.
 
-`./gradlew testDesktopCpp` and `./gradlew testDesktopJava` will build and run the tests for `wpilibc` and `wpilibj` respectively. They will only build the minimum components required to run the tests.
+`./gradlew testDesktopCpp` and `./gradlew testDesktopJava` will build and run the tests for `wpilibc` and `wpilibj` respectively. They will only build the minimum components required to run the tests. `./gradlew testDesktop` will run both `testDesktopJava` and `testDesktopCpp`.
 
-`testDesktopCpp` and `testDesktopJava` tasks also exist for the projects `wpiutil`, `ntcore`, `cscore`, `hal` `wpilibNewCommands` and `cameraserver`. These can be ran with `./gradlew :projectName:task`.
+`testDesktopCpp`, `testDesktopJava`, and `testDesktop` tasks also exist for the following projects:
+
+- `apriltag`
+- `cameraserver`
+- `cscore`
+- `hal`
+- `ntcore`
+- `wpilibNewCommands`
+- `wpimath`
+- `wpinet`
+- `wpiunits`
+- `wpiutil`
+- `romiVendordep`
+- `xrpVendordep`
+
+These can be ran with `./gradlew :projectName:task`.
 
 `./gradlew buildDesktopCpp` and `./gradlew buildDesktopJava` will compile `wpilibcExamples` and `wpilibjExamples` respectively. The results can't be ran, but they can compile.
 

@@ -8,6 +8,8 @@
 #include <functional>
 #include <utility>
 
+#include <wpi/FunctionExtras.h>
+
 #include "frc2/command/CommandScheduler.h"
 
 namespace frc2 {
@@ -148,5 +150,15 @@ class Subsystem {
    */
   [[nodiscard]]
   CommandPtr RunEnd(std::function<void()> run, std::function<void()> end);
+
+  /**
+   * Constructs a DeferredCommand with the provided supplier. This subsystem is
+   * added as a requirement.
+   *
+   * @param supplier the command supplier.
+   * @return the command.
+   */
+  [[nodiscard]]
+  CommandPtr Defer(wpi::unique_function<CommandPtr()> supplier);
 };
 }  // namespace frc2

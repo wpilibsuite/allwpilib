@@ -22,7 +22,7 @@ namespace wpilibws {
 
 class HALSimWeb : public std::enable_shared_from_this<HALSimWeb> {
  public:
-  using LoopFunc = std::function<void(void)>;
+  using LoopFunc = std::function<void()>;
   using UvExecFunc = wpi::uv::Async<LoopFunc>;
 
   HALSimWeb(wpi::uv::Loop& loop, ProviderContainer& providers,

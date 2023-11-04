@@ -41,9 +41,10 @@ import java.util.Random;
  */
 public final class DataLogManager {
   private static DataLog m_log;
+  private static boolean m_stopped;
   private static String m_logDir;
   private static boolean m_filenameOverride;
-  private static final Thread m_thread;
+  private static Thread m_thread;
   private static final ZoneId m_utc = ZoneId.of("UTC");
   private static final DateTimeFormatter m_timeFormatter =
       DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss").withZone(m_utc);
@@ -58,11 +59,6 @@ public final class DataLogManager {
   private static final int kFileCountThreshold = 10;
 
   private DataLogManager() {}
-
-  static {
-    m_thread = new Thread(DataLogManager::logMain, "DataLogDS");
-    m_thread.setDaemon(true);
-  }
 
   /** Start data log manager with default directory location. */
   public static synchronized void start() {
@@ -100,33 +96,52 @@ public final class DataLogManager {
    *     tradeoff
    */
   public static synchronized void start(String dir, String filename, double period) {
-    if (m_log != null) {
-      return;
-    }
-    m_logDir = makeLogDir(dir);
-    m_filenameOverride = !filename.isEmpty();
+    if (m_log == null) {
+      m_logDir = makeLogDir(dir);
+      m_filenameOverride = !filename.isEmpty();
 
-    // Delete all previously existing FRC_TBD_*.wpilog files. These only exist when the robot
-    // never connects to the DS, so they are very unlikely to have useful data and just clutter
-    // the filesystem.
-    File[] files =
-        new File(m_logDir)
-            .listFiles((d, name) -> name.startsWith("FRC_TBD_") && name.endsWith(".wpilog"));
-    if (files != null) {
-      for (File file : files) {
-        if (!file.delete()) {
-          System.err.println("DataLogManager: could not delete " + file);
+      // Delete all previously existing FRC_TBD_*.wpilog files. These only exist when the robot
+      // never connects to the DS, so they are very unlikely to have useful data and just clutter
+      // the filesystem.
+      File[] files =
+          new File(m_logDir)
+              .listFiles((d, name) -> name.startsWith("FRC_TBD_") && name.endsWith(".wpilog"));
+      if (files != null) {
+        for (File file : files) {
+          if (!file.delete()) {
+            System.err.println("DataLogManager: could not delete " + file);
+          }
         }
       }
+      m_log = new DataLog(m_logDir, makeLogFilename(filename), period);
+      m_messageLog = new StringLogEntry(m_log, "messages");
+
+      // Log all NT entries and connections
+      if (m_ntLoggerEnabled) {
+        startNtLog();
+      }
+    } else if (m_stopped) {
+      m_log.setFilename(makeLogFilename(filename));
+      m_log.resume();
+      m_stopped = false;
     }
 
-    m_log = new DataLog(m_logDir, makeLogFilename(filename), period);
-    m_messageLog = new StringLogEntry(m_log, "messages");
-    m_thread.start();
+    if (m_thread == null) {
+      m_thread = new Thread(DataLogManager::logMain, "DataLogDS");
+      m_thread.setDaemon(true);
+      m_thread.start();
+    }
+  }
 
-    // Log all NT entries and connections
-    if (m_ntLoggerEnabled) {
-      startNtLog();
+  /** Stop data log manager. */
+  public static synchronized void stop() {
+    if (m_thread != null) {
+      m_thread.interrupt();
+      m_thread = null;
+    }
+    if (m_log != null) {
+      m_log.stop();
+      m_stopped = true;
     }
   }
 

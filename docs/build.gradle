@@ -144,6 +144,10 @@ doxygen {
 
     exclude '*.pb.h'
 
+    // Save space by excluding protobuf and eigen
+    exclude 'Eigen/**'
+    exclude 'google/protobuf/**'
+
     aliases 'effects=\\par <i>Effects:</i>^^',
             'notes=\\par <i>Notes:</i>^^',
             'requires=\\par <i>Requires:</i>^^',
