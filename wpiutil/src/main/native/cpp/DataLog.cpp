@@ -322,7 +322,7 @@ struct DataLog::WriterThreadState {
   std::string filename;
   fs::path path;
   fs::file_t f = fs::kInvalidFile;
-  uintmax_t freeSpace;
+  uintmax_t freeSpace = UINTMAX_MAX;
 };
 
 void DataLog::StartLogFile(WriterThreadState& state) {
@@ -333,7 +333,12 @@ void DataLog::StartLogFile(WriterThreadState& state) {
   }
 
   // get free space
-  state.freeSpace = fs::space(state.dirPath).available;
+  auto freeSpaceInfo = fs::space(state.dirPath, ec);
+  if (!ec) {
+    state.freeSpace = freeSpaceInfo.available;
+  } else {
+    state.freeSpace = UINTMAX_MAX;
+  }
   if (state.freeSpace < kMinFreeSpace) {
     WPI_ERROR(m_msglog,
               "Insufficient free space ({} available), no log being saved",
@@ -426,7 +431,11 @@ void DataLog::WriterThreadMain(std::string_view dir) {
       lock.lock();
       if (!ec && !exists) {
         state.Close();
-        WPI_INFO(m_msglog, "Log file '{}' deleted, recreating as fresh log",
+        fs::path path{state.filename};
+        state.SetFilename(fmt::format("{}.{}.{}", path.stem().string(),
+                                      ++segmentCount,
+                                      path.extension().string()));
+        WPI_INFO(m_msglog, "Log file deleted, recreating as fresh log '{}'",
                  state.filename);
         doStart = true;
       }
@@ -498,7 +507,12 @@ void DataLog::WriterThreadMain(std::string_view dir) {
         // update free space every 10 flushes (in case other things are writing)
         if (++freeSpaceCount >= 10) {
           freeSpaceCount = 0;
-          state.freeSpace = fs::space(state.dirPath).available;
+          auto freeSpaceInfo = fs::space(state.dirPath, ec);
+          if (!ec) {
+            state.freeSpace = freeSpaceInfo.available;
+          } else {
+            state.freeSpace = UINTMAX_MAX;
+          }
         }
 
         // write buffers to file
