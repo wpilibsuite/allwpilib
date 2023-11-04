@@ -75,6 +75,12 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
   units::meter_t GetFieldWidth() const;
 
   /**
+   * Returns a vector of all the april tags used in this layout.
+   * @return list of tags
+   */
+  std::vector<AprilTag> GetTags() const;
+
+  /**
    * Sets the origin based on a predefined enumeration of coordinate frame
    * origins. The origins are calculated from the field dimensions.
    *

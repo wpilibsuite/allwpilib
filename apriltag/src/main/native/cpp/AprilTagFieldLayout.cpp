@@ -49,6 +49,15 @@ units::meter_t AprilTagFieldLayout::GetFieldWidth() const {
   return m_fieldWidth;
 }
 
+std::vector<AprilTag> AprilTagFieldLayout::GetTags() const {
+  std::vector<AprilTag> tags;
+  tags.reserve(m_apriltags.size());
+  for (const auto& tag : m_apriltags) {
+    tags.emplace_back(tag.second);
+  }
+  return tags;
+}
+
 void AprilTagFieldLayout::SetOrigin(OriginPosition origin) {
   switch (origin) {
     case OriginPosition::kBlueAllianceWallRightSide:
