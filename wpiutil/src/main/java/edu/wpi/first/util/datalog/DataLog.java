@@ -106,9 +106,18 @@ public final class DataLog implements AutoCloseable {
     DataLogJNI.pause(m_impl);
   }
 
-  /** Resumes appending of data records to the log. */
+  /**
+   * Resumes appending of data records to the log. If called after stop(), opens a new file (with
+   * random name if SetFilename was not called after stop()) and appends Start records and schema
+   * data values for all previously started entries and schemas.
+   */
   public void resume() {
     DataLogJNI.resume(m_impl);
+  }
+
+  /** Stops appending all records to the log, and closes the log file. */
+  public void stop() {
+    DataLogJNI.stop(m_impl);
   }
 
   /**

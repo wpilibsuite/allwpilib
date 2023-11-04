@@ -113,6 +113,22 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_resume
 
 /*
  * Class:     edu_wpi_first_util_datalog_DataLogJNI
+ * Method:    stop
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_util_datalog_DataLogJNI_stop
+  (JNIEnv* env, jclass, jlong impl)
+{
+  if (impl == 0) {
+    wpi::ThrowNullPointerException(env, "impl is null");
+    return;
+  }
+  reinterpret_cast<DataLog*>(impl)->Stop();
+}
+
+/*
+ * Class:     edu_wpi_first_util_datalog_DataLogJNI
  * Method:    addSchema
  * Signature: (JLjava/lang/String;Ljava/lang/String;[BJ)V
  */

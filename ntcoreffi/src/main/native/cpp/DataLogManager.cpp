@@ -264,12 +264,18 @@ Thread::~Thread() {
 void Thread::Main() {
   // based on free disk space, scan for "old" FRC_*.wpilog files and remove
   {
-    uintmax_t freeSpace = fs::space(m_logDir).free;
+    std::error_code ec;
+    uintmax_t freeSpace;
+    auto freeSpaceInfo = fs::space(m_logDir, ec);
+    if (!ec) {
+      freeSpace = freeSpaceInfo.available;
+    } else {
+      freeSpace = UINTMAX_MAX;
+    }
     if (freeSpace < kFreeSpaceThreshold) {
       // Delete oldest FRC_*.wpilog files (ignore FRC_TBD_*.wpilog as we just
       // created one)
       std::vector<fs::directory_entry> entries;
-      std::error_code ec;
       for (auto&& entry : fs::directory_iterator{m_logDir, ec}) {
         auto stem = entry.path().stem().string();
         if (wpi::starts_with(stem, "FRC_") &&
@@ -462,12 +468,21 @@ static Instance& GetInstance(std::string_view dir = "",
                              std::string_view filename = "",
                              double period = 0.25) {
   static Instance instance(dir, filename, period);
+  if (!instance.owner) {
+    instance.owner.Start(MakeLogDir(dir), filename, period);
+  }
   return instance;
 }
 
 void DataLogManager::Start(std::string_view dir, std::string_view filename,
                            double period) {
   GetInstance(dir, filename, period);
+}
+
+void DataLogManager::Stop() {
+  auto& inst = GetInstance();
+  inst.owner.GetThread()->m_log.Stop();
+  inst.owner.Stop();
 }
 
 void DataLogManager::Log(std::string_view message) {
@@ -501,6 +516,10 @@ extern "C" {
 
 void DLM_Start(const char* dir, const char* filename, double period) {
   DataLogManager::Start(dir, filename, period);
+}
+
+void DLM_Stop(void) {
+  DataLogManager::Stop();
 }
 
 void DLM_Log(const char* message) {
