@@ -5,6 +5,8 @@ include(CompileWarnings)
 include(AddTest)
 include(DownloadAndCheck)
 
+# workaround for makefiles - for some reason parent directories aren't created.
+file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/protobuf")
 file(GLOB wpimath_proto_src src/main/proto/*.proto)
 protobuf_generate_cpp(WPIMATH_PROTO_SRCS WPIMATH_PROTO_HDRS PROTOC_OUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/protobuf" PROTOS ${wpimath_proto_src})
 
