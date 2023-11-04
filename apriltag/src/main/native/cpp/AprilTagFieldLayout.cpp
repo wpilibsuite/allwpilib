@@ -4,6 +4,7 @@
 
 #include "frc/apriltag/AprilTagFieldLayout.h"
 
+#include <ranges>
 #include <system_error>
 
 #include <units/angle.h>
@@ -47,6 +48,11 @@ units::meter_t AprilTagFieldLayout::GetFieldLength() const {
 
 units::meter_t AprilTagFieldLayout::GetFieldWidth() const {
   return m_fieldWidth;
+}
+
+std::vector<AprilTag> AprilTagFieldLayout::GetTags() const {
+  auto vals = std::views::values(m_apriltags);
+  return std::vector<AprilTag>{vals.begin(), vals.end()};
 }
 
 void AprilTagFieldLayout::SetOrigin(OriginPosition origin) {
