@@ -314,15 +314,26 @@ struct DataLog::WriterThreadState {
   }
 
   void SetFilename(std::string_view fn) {
+    baseFilename = fn;
     filename = fn;
+    path = dirPath / filename;
+    segmentCount = 1;
+  }
+
+  void IncrementFilename() {
+    fs::path basePath{baseFilename};
+    filename = fmt::format("{}.{}{}", basePath.stem().string(), ++segmentCount,
+                           basePath.extension().string());
     path = dirPath / filename;
   }
 
   fs::path dirPath;
+  std::string baseFilename;
   std::string filename;
   fs::path path;
   fs::file_t f = fs::kInvalidFile;
   uintmax_t freeSpace = UINTMAX_MAX;
+  int segmentCount = 1;
 };
 
 void DataLog::StartLogFile(WriterThreadState& state) {
@@ -406,7 +417,6 @@ void DataLog::WriterThreadMain(std::string_view dir) {
   int checkExistCount = 0;
   bool blocked = false;
   uintmax_t written = 0;
-  int segmentCount = 1;
 
   std::unique_lock lock{m_mutex};
   while (m_state != kShutdown) {
@@ -431,10 +441,7 @@ void DataLog::WriterThreadMain(std::string_view dir) {
       lock.lock();
       if (!ec && !exists) {
         state.Close();
-        fs::path path{state.filename};
-        state.SetFilename(fmt::format("{}.{}.{}", path.stem().string(),
-                                      ++segmentCount,
-                                      path.extension().string()));
+        state.IncrementFilename();
         WPI_INFO(m_msglog, "Log file deleted, recreating as fresh log '{}'",
                  state.filename);
         doStart = true;
@@ -444,9 +451,7 @@ void DataLog::WriterThreadMain(std::string_view dir) {
     // start new file if file exceeds 1.8 GB
     if (written > 1800000000ull) {
       state.Close();
-      fs::path path{state.filename};
-      state.SetFilename(fmt::format("{}.{}.{}", path.stem().string(),
-                                    ++segmentCount, path.extension().string()));
+      state.IncrementFilename();
       WPI_INFO(m_msglog, "Log file reached 1.8 GB, starting new file '{}'",
                state.filename);
       doStart = true;
