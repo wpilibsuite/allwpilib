@@ -41,6 +41,14 @@ AprilTagFieldLayout::AprilTagFieldLayout(std::vector<AprilTag> apriltags,
   }
 }
 
+units::meter_t AprilTagFieldLayout::GetFieldLength() const {
+  return m_fieldLength;
+}
+
+units::meter_t AprilTagFieldLayout::GetFieldWidth() const {
+  return m_fieldWidth;
+}
+
 void AprilTagFieldLayout::SetOrigin(OriginPosition origin) {
   switch (origin) {
     case OriginPosition::kBlueAllianceWallRightSide:
@@ -57,6 +65,10 @@ void AprilTagFieldLayout::SetOrigin(OriginPosition origin) {
 
 void AprilTagFieldLayout::SetOrigin(const Pose3d& origin) {
   m_origin = origin;
+}
+
+Pose3d AprilTagFieldLayout::GetOrigin() const {
+  return m_origin;
 }
 
 std::optional<frc::Pose3d> AprilTagFieldLayout::GetTagPose(int ID) const {

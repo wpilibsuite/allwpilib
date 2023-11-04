@@ -114,6 +114,26 @@ public class AprilTagFieldLayout {
   }
 
   /**
+   * Returns the length of the field the layout is representing in meters.
+   *
+   * @return length, in meters
+   */
+  @JsonIgnore
+  public double getFieldLength() {
+    return m_fieldDimensions.fieldLength;
+  }
+
+  /**
+   * Returns the length of the field the layout is representing in meters.
+   *
+   * @return width, in meters
+   */
+  @JsonIgnore
+  public double getFieldWidth() {
+    return m_fieldDimensions.fieldWidth;
+  }
+
+  /**
    * Sets the origin based on a predefined enumeration of coordinate frame origins. The origins are
    * calculated from the field dimensions.
    *
@@ -150,6 +170,16 @@ public class AprilTagFieldLayout {
   @JsonIgnore
   public void setOrigin(Pose3d origin) {
     m_origin = origin;
+  }
+
+  /**
+   * Returns the origin used for tag pose transformation.
+   *
+   * @return the origin
+   */
+  @JsonIgnore
+  public Pose3d getOrigin() {
+    return m_origin;
   }
 
   /**
