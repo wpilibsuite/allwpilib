@@ -79,7 +79,7 @@ public class TrapezoidProfileCommand extends Command {
   @SuppressWarnings("removal")
   public void execute() {
     if (m_newAPI) {
-      m_output.accept(m_profile.calculate(m_timer.get(), m_goal.get(), m_currentState.get()));
+      m_output.accept(m_profile.calculate(m_timer.get(), m_currentState.get(), m_goal.get()));
     } else {
       m_output.accept(m_profile.calculate(m_timer.get()));
     }
