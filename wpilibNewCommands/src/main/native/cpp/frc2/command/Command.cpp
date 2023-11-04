@@ -127,7 +127,7 @@ CommandPtr Command::FinallyDo(std::function<void()> end) && {
   return std::move(*this).ToPtr().FinallyDo(std::move(end));
 }
 
-CommandPtr Command::HandleInterrupt(std::function<void(void)> handler) && {
+CommandPtr Command::HandleInterrupt(std::function<void()> handler) && {
   return std::move(*this).ToPtr().HandleInterrupt(std::move(handler));
 }
 

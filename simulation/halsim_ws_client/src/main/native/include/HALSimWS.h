@@ -24,7 +24,7 @@ class HALSimWSClientConnection;
 
 class HALSimWS : public std::enable_shared_from_this<HALSimWS> {
  public:
-  using LoopFunc = std::function<void(void)>;
+  using LoopFunc = std::function<void()>;
   using UvExecFunc = wpi::uv::Async<LoopFunc>;
 
   HALSimWS(wpi::uv::Loop& loop, ProviderContainer& providers,

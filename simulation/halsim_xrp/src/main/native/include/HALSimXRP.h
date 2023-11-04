@@ -28,7 +28,7 @@ namespace wpilibxrp {
 class HALSimXRP : public wpilibws::HALSimBaseWebSocketConnection,
                   public std::enable_shared_from_this<HALSimXRP> {
  public:
-  using LoopFunc = std::function<void(void)>;
+  using LoopFunc = std::function<void()>;
   using UvExecFunc = wpi::uv::Async<LoopFunc>;
 
   HALSimXRP(wpi::uv::Loop& loop, wpilibws::ProviderContainer& providers,
