@@ -44,7 +44,7 @@ The following build options are available:
 * `WITH_WPIMATH` (ON Default)
   * This option will build the wpimath library. This option must be on to build wpilib.
 * `WITH_WPIUNITS` (ON Default)
-  * This option will build the wpiunits library. This option must be on to build wpimath.
+  * This option will build the wpiunits library. This option must be on to build the Java wpimath library and requires `WITH_JAVA` to also be on.
 * `WITH_WPILIB` (ON Default)
   * This option will build the hal and wpilibc/j during the build. The HAL is the simulator hal, unless the external hal options are used. The cmake build has no capability to build for the RoboRIO.
 * `WITH_EXAMPLES` (ON Default)
