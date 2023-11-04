@@ -29,7 +29,7 @@ import java.util.Objects;
  *
  * <pre><code>
  * previousProfiledReference =
- * profile.calculate(timeSincePreviousUpdate, unprofiledReference, previousProfiledReference);
+ * profile.calculate(timeSincePreviousUpdate, previousProfiledReference, unprofiledReference);
  * </code></pre>
  *
  * <p>where `unprofiledReference` is free to change between calls. Note that when the unprofiled
@@ -212,11 +212,11 @@ public class TrapezoidProfile {
    * the profile was at time t = 0.
    *
    * @param t The time since the beginning of the profile.
-   * @param goal The desired state when the profile is complete.
    * @param current The current state.
+   * @param goal The desired state when the profile is complete.
    * @return The position and velocity of the profile at time t.
    */
-  public State calculate(double t, State goal, State current) {
+  public State calculate(double t, State current, State goal) {
     m_direction = shouldFlipAcceleration(current, goal) ? -1 : 1;
     m_current = direct(current);
     goal = direct(goal);

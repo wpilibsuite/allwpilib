@@ -79,7 +79,7 @@ class TrapezoidProfileCommand
   void Initialize() override { m_timer.Restart(); }
 
   void Execute() override {
-    m_output(m_profile.Calculate(m_timer.Get(), m_goal(), m_currentState()));
+    m_output(m_profile.Calculate(m_timer.Get(), m_currentState(), m_goal()));
   }
 
   void End(bool interrupted) override { m_timer.Stop(); }
