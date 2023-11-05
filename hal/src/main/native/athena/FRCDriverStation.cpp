@@ -207,7 +207,7 @@ bool TcpCache::Update(uint32_t mask) {
     if (status != 0) {
       failedToReadInfo = true;
       if (!hasReadMatchInfo) {
-        memset(&matchInfo, 0, sizeof(matchInfo));
+        std::memset(&matchInfo, 0, sizeof(matchInfo));
       }
     } else {
       hasReadMatchInfo = true;
