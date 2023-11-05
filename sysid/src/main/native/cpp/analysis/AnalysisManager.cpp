@@ -457,7 +457,7 @@ AnalysisManager::AnalysisManager(std::string_view path, Settings& settings,
       throw FileReadingError(path);
     }
 
-    m_json = wpi::json::parse(fileBuffer->begin(), fileBuffer->end());
+    m_json = wpi::json::parse(fileBuffer->GetCharBuffer());
 
     WPI_INFO(m_logger, "Read {}", path);
   }
@@ -475,7 +475,7 @@ AnalysisManager::AnalysisManager(std::string_view path, Settings& settings,
       throw FileReadingError(newPath);
     }
 
-    m_json = wpi::json::parse(fileBuffer->begin(), fileBuffer->end());
+    m_json = wpi::json::parse(fileBuffer->GetCharBuffer());
 
     WPI_INFO(m_logger, "Read {}", newPath);
   }

@@ -105,7 +105,7 @@ bool ReadConfig() {
   // parse file
   wpi::json j;
   try {
-    j = wpi::json::parse(fileBuffer->begin(), fileBuffer->end());
+    j = wpi::json::parse(fileBuffer->GetCharBuffer());
   } catch (const wpi::json::parse_error& e) {
     fmt::print(stderr, "config error in '{}': byte {}: {}\n", configFile,
                e.byte, e.what());

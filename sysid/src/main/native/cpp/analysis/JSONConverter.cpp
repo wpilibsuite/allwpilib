@@ -40,7 +40,7 @@ static wpi::json GetJSON(std::string_view path, wpi::Logger& logger) {
     throw std::runtime_error(fmt::format("Unable to read: {}", path));
   }
 
-  wpi::json json = wpi::json::parse(fileBuffer->begin(), fileBuffer->end());
+  wpi::json json = wpi::json::parse(fileBuffer->GetCharBuffer());
   WPI_INFO(logger, "Read frc-characterization JSON from {}", path);
   return json;
 }
