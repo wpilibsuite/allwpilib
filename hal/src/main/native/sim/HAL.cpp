@@ -379,10 +379,8 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   }
 #endif  // _WIN32
 
-#ifndef _WIN32
-  setlinebuf(stdin);
-  setlinebuf(stdout);
-#endif
+  setvbuf(stdin, nullptr, _IOLBF, 0);
+  setvbuf(stdout, nullptr, _IOLBF, 0);
 
   if (HAL_LoadExtensions() < 0) {
     return false;
