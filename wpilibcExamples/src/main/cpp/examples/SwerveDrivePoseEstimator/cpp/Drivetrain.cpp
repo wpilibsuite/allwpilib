@@ -15,7 +15,8 @@ void Drivetrain::Drive(units::meters_per_second_t xSpeed,
   auto states =
       m_kinematics.ToSwerveModuleStates(frc::ChassisSpeeds::Discretize(
           fieldRelative ? frc::ChassisSpeeds::FromFieldRelativeSpeeds(
-                              xSpeed, ySpeed, rot, m_poseEstimator.GetEstimatedPosition().Rotation())
+                              xSpeed, ySpeed, rot,
+                              m_poseEstimator.GetEstimatedPosition().Rotation())
                         : frc::ChassisSpeeds{xSpeed, ySpeed, rot},
           period));
 
