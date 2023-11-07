@@ -11,17 +11,37 @@
 #include <string_view>
 #include <thread>
 #include <utility>
+#include <vector>
 
 #include <wpi/DataLogReader.h>
 #include <wpi/DenseMap.h>
 #include <wpi/Signal.h>
 #include <wpi/mutex.h>
+#include <wpi/protobuf/ProtobufMessageDatabase.h>
+#include <wpi/struct/DynamicStruct.h>
 
-class DataLogThread {
+namespace glass {
+
+class DataLogReaderThread {
  public:
-  explicit DataLogThread(wpi::log::DataLogReader reader)
-      : m_reader{std::move(reader)}, m_thread{[=, this] { ReadMain(); }} {}
-  ~DataLogThread();
+  struct Entry : public wpi::log::StartRecordData {
+    struct Range {
+      Range(wpi::log::DataLogReader::iterator begin,
+            wpi::log::DataLogReader::iterator end)
+          : m_begin{begin}, m_end{end} {}
+
+      wpi::log::DataLogReader::iterator begin() const { return m_begin; }
+      wpi::log::DataLogReader::iterator end() const { return m_end; }
+
+      wpi::log::DataLogReader::iterator m_begin;
+      wpi::log::DataLogReader::iterator m_end;
+    };
+    std::vector<Range> ranges;  // ranges where this entry is valid
+  };
+
+  explicit DataLogReaderThread(wpi::log::DataLogReader reader)
+      : m_reader{std::move(reader)}, m_thread{[this] { ReadMain(); }} {}
+  ~DataLogReaderThread();
 
   bool IsDone() const { return m_done; }
   std::string_view GetBufferIdentifier() const {
@@ -33,7 +53,7 @@ class DataLogThread {
     return m_entryNames.size();
   }
 
-  // Passes wpi::log::StartRecordData to func
+  // Passes Entry& to func
   template <typename T>
   void ForEachEntryName(T&& func) {
     std::scoped_lock lock{m_mutex};
@@ -42,19 +62,22 @@ class DataLogThread {
     }
   }
 
-  wpi::log::StartRecordData GetEntry(std::string_view name) const {
+  const Entry* GetEntry(std::string_view name) const {
     std::scoped_lock lock{m_mutex};
     auto it = m_entryNames.find(name);
     if (it == m_entryNames.end()) {
-      return {};
+      return nullptr;
     }
-    return it->second;
+    return &it->second;
   }
+
+  wpi::StructDescriptorDatabase& GetStructDatabase() { return m_structDb; }
+  wpi::ProtobufMessageDatabase& GetProtobufDatabase() { return m_protoDb; }
 
   const wpi::log::DataLogReader& GetReader() const { return m_reader; }
 
   // note: these are called on separate thread
-  wpi::sig::Signal_mt<const wpi::log::StartRecordData&> sigEntryAdded;
+  wpi::sig::Signal_mt<const Entry&> sigEntryAdded;
   wpi::sig::Signal_mt<> sigDone;
 
  private:
@@ -65,7 +88,11 @@ class DataLogThread {
   std::atomic_bool m_active{true};
   std::atomic_bool m_done{false};
   std::atomic<unsigned int> m_numRecords{0};
-  std::map<std::string, wpi::log::StartRecordData, std::less<>> m_entryNames;
-  wpi::DenseMap<int, wpi::log::StartRecordData> m_entries;
+  std::map<std::string, Entry, std::less<>> m_entryNames;
+  wpi::DenseMap<int, Entry*> m_entries;
+  wpi::StructDescriptorDatabase m_structDb;
+  wpi::ProtobufMessageDatabase m_protoDb;
   std::thread m_thread;
 };
+
+}  // namespace glass

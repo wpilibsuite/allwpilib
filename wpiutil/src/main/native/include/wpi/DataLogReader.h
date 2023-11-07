@@ -288,7 +288,7 @@ class DataLogIterator {
 
   pointer operator->() const { return &this->operator*(); }
 
- private:
+ protected:
   const DataLogReader* m_reader;
   size_t m_pos;
   mutable bool m_valid = false;
