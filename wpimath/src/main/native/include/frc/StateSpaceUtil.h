@@ -9,11 +9,11 @@
 #include <concepts>
 #include <limits>
 #include <random>
+#include <utility>
 
 #include <Eigen/Eigenvalues>
 #include <Eigen/QR>
 #include <wpi/SymbolExports.h>
-#include <wpi/deprecated.h>
 
 #include "frc/EigenCore.h"
 #include "frc/geometry/Pose2d.h"
@@ -21,75 +21,23 @@
 namespace frc {
 namespace detail {
 
-template <typename Matrix, typename T, typename... Ts>
-void CostMatrixImpl(Matrix& result, T elem, Ts... elems) {
-  if (elem == std::numeric_limits<double>::infinity()) {
-    result(result.rows() - (sizeof...(Ts) + 1)) = 0.0;
-  } else {
-    result(result.rows() - (sizeof...(Ts) + 1)) = 1.0 / std::pow(elem, 2);
-  }
-  if constexpr (sizeof...(Ts) > 0) {
-    CostMatrixImpl(result, elems...);
-  }
+template <typename T, T... indices, typename F, typename... Ts>
+constexpr void for_each(std::integer_sequence<T, indices...>, F&& f,
+                        Ts&&... elems) {
+  (f(std::integral_constant<T, indices>{}, elems), ...);
 }
 
-template <typename Matrix, typename T, typename... Ts>
-void CovMatrixImpl(Matrix& result, T elem, Ts... elems) {
-  result(result.rows() - (sizeof...(Ts) + 1)) = std::pow(elem, 2);
-  if constexpr (sizeof...(Ts) > 0) {
-    CovMatrixImpl(result, elems...);
-  }
-}
-
-template <typename Matrix, typename T, typename... Ts>
-void WhiteNoiseVectorImpl(Matrix& result, T elem, Ts... elems) {
-  std::random_device rd;
-  std::mt19937 gen{rd()};
-  std::normal_distribution<> distr{0.0, elem};
-
-  result(result.rows() - (sizeof...(Ts) + 1)) = distr(gen);
-  if constexpr (sizeof...(Ts) > 0) {
-    WhiteNoiseVectorImpl(result, elems...);
-  }
-}
-
-template <int States, int Inputs>
-bool IsStabilizableImpl(const Matrixd<States, States>& A,
-                        const Matrixd<States, Inputs>& B) {
-  Eigen::EigenSolver<Matrixd<States, States>> es{A, false};
-
-  for (int i = 0; i < A.rows(); ++i) {
-    if (std::norm(es.eigenvalues()[i]) < 1) {
-      continue;
-    }
-
-    if constexpr (States != Eigen::Dynamic && Inputs != Eigen::Dynamic) {
-      Eigen::Matrix<std::complex<double>, States, States + Inputs> E;
-      E << es.eigenvalues()[i] * Eigen::Matrix<std::complex<double>, States,
-                                               States>::Identity() -
-               A,
-          B;
-
-      Eigen::ColPivHouseholderQR<
-          Eigen::Matrix<std::complex<double>, States, States + Inputs>>
-          qr{E};
-      if (qr.rank() < States) {
-        return false;
-      }
-    } else {
-      Eigen::MatrixXcd E{A.rows(), A.rows() + B.cols()};
-      E << es.eigenvalues()[i] *
-                   Eigen::MatrixXcd::Identity(A.rows(), A.rows()) -
-               A,
-          B;
-
-      Eigen::ColPivHouseholderQR<Eigen::MatrixXcd> qr{E};
-      if (qr.rank() < A.rows()) {
-        return false;
-      }
-    }
-  }
-  return true;
+/**
+ * Calls f(i, elem) for each element of elems where i is the index and elem is
+ * the element.
+ *
+ * @param f The callback.
+ * @param elems The elements.
+ */
+template <typename F, typename... Ts>
+constexpr void for_each(F&& f, Ts&&... elems) {
+  detail::for_each(std::make_integer_sequence<size_t, sizeof...(Ts)>{},
+                   std::forward<F>(f), std::forward<Ts>(elems)...);
 }
 
 }  // namespace detail
@@ -110,7 +58,16 @@ bool IsStabilizableImpl(const Matrixd<States, States>& A,
 template <std::same_as<double>... Ts>
 Matrixd<sizeof...(Ts), sizeof...(Ts)> MakeCostMatrix(Ts... tolerances) {
   Eigen::DiagonalMatrix<double, sizeof...(Ts)> result;
-  detail::CostMatrixImpl(result.diagonal(), tolerances...);
+  auto& diag = result.diagonal();
+  detail::for_each(
+      [&](int i, double tolerance) {
+        if (tolerance == std::numeric_limits<double>::infinity()) {
+          diag(i) = 0.0;
+        } else {
+          diag(i) = 1.0 / std::pow(tolerance, 2);
+        }
+      },
+      tolerances...);
   return result;
 }
 
@@ -129,7 +86,9 @@ Matrixd<sizeof...(Ts), sizeof...(Ts)> MakeCostMatrix(Ts... tolerances) {
 template <std::same_as<double>... Ts>
 Matrixd<sizeof...(Ts), sizeof...(Ts)> MakeCovMatrix(Ts... stdDevs) {
   Eigen::DiagonalMatrix<double, sizeof...(Ts)> result;
-  detail::CovMatrixImpl(result.diagonal(), stdDevs...);
+  auto& diag = result.diagonal();
+  detail::for_each([&](int i, double stdDev) { diag(i) = std::pow(stdDev, 2); },
+                   stdDevs...);
   return result;
 }
 
@@ -150,7 +109,7 @@ template <size_t N>
 Matrixd<N, N> MakeCostMatrix(const std::array<double, N>& costs) {
   Eigen::DiagonalMatrix<double, N> result;
   auto& diag = result.diagonal();
-  for (size_t i = 0; i < N; ++i) {
+  for (size_t i = 0; i < costs.size(); ++i) {
     if (costs[i] == std::numeric_limits<double>::infinity()) {
       diag(i) = 0.0;
     } else {
@@ -183,9 +142,23 @@ Matrixd<N, N> MakeCovMatrix(const std::array<double, N>& stdDevs) {
 }
 
 template <std::same_as<double>... Ts>
-Matrixd<sizeof...(Ts), 1> MakeWhiteNoiseVector(Ts... stdDevs) {
-  Matrixd<sizeof...(Ts), 1> result;
-  detail::WhiteNoiseVectorImpl(result, stdDevs...);
+Vectord<sizeof...(Ts)> MakeWhiteNoiseVector(Ts... stdDevs) {
+  std::random_device rd;
+  std::mt19937 gen{rd()};
+
+  Vectord<sizeof...(Ts)> result;
+  detail::for_each(
+      [&](int i, double stdDev) {
+        // Passing a standard deviation of 0.0 to std::normal_distribution is
+        // undefined behavior
+        if (stdDev == 0.0) {
+          result(i) = 0.0;
+        } else {
+          std::normal_distribution distr{0.0, stdDev};
+          result(i) = distr(gen);
+        }
+      },
+      stdDevs...);
   return result;
 }
 
@@ -203,7 +176,7 @@ Vectord<N> MakeWhiteNoiseVector(const std::array<double, N>& stdDevs) {
   std::mt19937 gen{rd()};
 
   Vectord<N> result;
-  for (int i = 0; i < N; ++i) {
+  for (size_t i = 0; i < stdDevs.size(); ++i) {
     // Passing a standard deviation of 0.0 to std::normal_distribution is
     // undefined behavior
     if (stdDevs[i] == 0.0) {
@@ -251,8 +224,49 @@ Eigen::Vector4d PoseTo4dVector(const Pose2d& pose);
 template <int States, int Inputs>
 bool IsStabilizable(const Matrixd<States, States>& A,
                     const Matrixd<States, Inputs>& B) {
-  return detail::IsStabilizableImpl<States, Inputs>(A, B);
+  Eigen::EigenSolver<Matrixd<States, States>> es{A, false};
+
+  for (int i = 0; i < A.rows(); ++i) {
+    if (std::norm(es.eigenvalues()[i]) < 1) {
+      continue;
+    }
+
+    if constexpr (States != Eigen::Dynamic && Inputs != Eigen::Dynamic) {
+      Eigen::Matrix<std::complex<double>, States, States + Inputs> E;
+      E << es.eigenvalues()[i] * Eigen::Matrix<std::complex<double>, States,
+                                               States>::Identity() -
+               A,
+          B;
+
+      Eigen::ColPivHouseholderQR<
+          Eigen::Matrix<std::complex<double>, States, States + Inputs>>
+          qr{E};
+      if (qr.rank() < States) {
+        return false;
+      }
+    } else {
+      Eigen::MatrixXcd E{A.rows(), A.rows() + B.cols()};
+      E << es.eigenvalues()[i] *
+                   Eigen::MatrixXcd::Identity(A.rows(), A.rows()) -
+               A,
+          B;
+
+      Eigen::ColPivHouseholderQR<Eigen::MatrixXcd> qr{E};
+      if (qr.rank() < A.rows()) {
+        return false;
+      }
+    }
+  }
+  return true;
 }
+
+extern template WPILIB_DLLEXPORT bool IsStabilizable<1, 1>(
+    const Matrixd<1, 1>& A, const Matrixd<1, 1>& B);
+extern template WPILIB_DLLEXPORT bool IsStabilizable<2, 1>(
+    const Matrixd<2, 2>& A, const Matrixd<2, 1>& B);
+extern template WPILIB_DLLEXPORT bool
+IsStabilizable<Eigen::Dynamic, Eigen::Dynamic>(const Eigen::MatrixXd& A,
+                                               const Eigen::MatrixXd& B);
 
 /**
  * Returns true if (A, C) is a detectable pair.
@@ -269,27 +283,8 @@ bool IsStabilizable(const Matrixd<States, States>& A,
 template <int States, int Outputs>
 bool IsDetectable(const Matrixd<States, States>& A,
                   const Matrixd<Outputs, States>& C) {
-  return detail::IsStabilizableImpl<States, Outputs>(A.transpose(),
-                                                     C.transpose());
+  return IsStabilizable<States, Outputs>(A.transpose(), C.transpose());
 }
-
-// Template specializations are used here to make common state-input pairs
-// compile faster.
-template <>
-WPILIB_DLLEXPORT bool IsStabilizable<1, 1>(const Matrixd<1, 1>& A,
-                                           const Matrixd<1, 1>& B);
-
-// Template specializations are used here to make common state-input pairs
-// compile faster.
-template <>
-WPILIB_DLLEXPORT bool IsStabilizable<2, 1>(const Matrixd<2, 2>& A,
-                                           const Matrixd<2, 1>& B);
-
-// Template specializations are used here to make common state-input pairs
-// compile faster.
-template <>
-WPILIB_DLLEXPORT bool IsStabilizable<Eigen::Dynamic, Eigen::Dynamic>(
-    const Eigen::MatrixXd& A, const Eigen::MatrixXd& B);
 
 /**
  * Converts a Pose2d into a vector of [x, y, theta].
