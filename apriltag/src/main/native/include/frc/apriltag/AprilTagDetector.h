@@ -226,6 +226,7 @@ class WPILIB_DLLEXPORT AprilTagDetector {
 
   /**
    * Detect tags from an 8-bit image.
+   * The image must be grayscale.
    *
    * @param width width of the image
    * @param height height of the image
@@ -237,6 +238,7 @@ class WPILIB_DLLEXPORT AprilTagDetector {
 
   /**
    * Detect tags from an 8-bit image.
+   * The image must be grayscale.
    *
    * @param width width of the image
    * @param height height of the image

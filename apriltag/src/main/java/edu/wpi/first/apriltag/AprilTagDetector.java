@@ -270,6 +270,8 @@ public class AprilTagDetector implements AutoCloseable {
   /**
    * Detect tags from an 8-bit image.
    *
+   * <p>The image must be grayscale.
+   *
    * @param img 8-bit OpenCV Mat image
    * @return Results (array of AprilTagDetection)
    */
