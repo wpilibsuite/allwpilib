@@ -62,9 +62,9 @@ inline constexpr Vector2d kLeftColSize{
     310, kAppWindowSize.y - kLeftColPos.y - kWindowGap};
 
 // Left column contents
-inline constexpr Vector2d kLoggerWindowPos = kLeftColPos;
-inline constexpr Vector2d kLoggerWindowSize{
-    kLeftColSize.x, kAppWindowSize.y - kWindowGap - kLoggerWindowPos.y};
+inline constexpr Vector2d kLogLoaderWindowPos = kLeftColPos;
+inline constexpr Vector2d kLogLoaderWindowSize{
+    kLeftColSize.x, kAppWindowSize.y - kWindowGap - kLogLoaderWindowPos.y};
 
 // Center column position and size
 inline constexpr Vector2d kCenterColPos =

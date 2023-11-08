@@ -18,7 +18,6 @@
 
 #include "sysid/Util.h"
 #include "sysid/analysis/FilteringUtils.h"
-#include "sysid/analysis/JSONConverter.h"
 #include "sysid/analysis/TrackWidthAnalysis.h"
 
 using namespace sysid;
@@ -464,20 +463,7 @@ AnalysisManager::AnalysisManager(std::string_view path, Settings& settings,
 
   // Check that we have a sysid JSON
   if (m_json.find("sysid") == m_json.end()) {
-    // If it's not a sysid JSON, try converting it from frc-char format
-    std::string newPath = sysid::ConvertJSON(path, logger);
-
-    // Read JSON from the specified path
-    std::error_code ec;
-    std::unique_ptr<wpi::MemoryBuffer> fileBuffer =
-        wpi::MemoryBuffer::GetFile(path, ec);
-    if (fileBuffer == nullptr || ec) {
-      throw FileReadingError(newPath);
-    }
-
-    m_json = wpi::json::parse(fileBuffer->GetCharBuffer());
-
-    WPI_INFO(m_logger, "Read {}", newPath);
+    throw FileReadingError(path);
   }
 
   WPI_INFO(m_logger, "Parsing initial data of {}", path);

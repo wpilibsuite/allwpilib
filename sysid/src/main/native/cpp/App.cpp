@@ -24,20 +24,17 @@
 #include <wpigui_openurl.h>
 
 #include "sysid/view/Analyzer.h"
-#include "sysid/view/JSONConverter.h"
-#include "sysid/view/Logger.h"
+#include "sysid/view/LogLoader.h"
 #include "sysid/view/UILayout.h"
 
 namespace gui = wpi::gui;
 
 static std::unique_ptr<glass::WindowManager> gWindowManager;
 
-glass::Window* gLoggerWindow;
+glass::Window* gLogLoaderWindow;
 glass::Window* gAnalyzerWindow;
 glass::Window* gProgramLogWindow;
 static glass::MainMenuBar gMainMenu;
-
-std::unique_ptr<sysid::JSONConverter> gJSONConverter;
 
 glass::LogData gLog;
 wpi::Logger gLogger;
@@ -103,8 +100,8 @@ void Application(std::string_view saveDir) {
   gWindowManager = std::make_unique<glass::WindowManager>(storage);
   gWindowManager->GlobalInit();
 
-  gLoggerWindow = gWindowManager->AddWindow(
-      "Logger", std::make_unique<sysid::Logger>(storage, gLogger));
+  gLogLoaderWindow = gWindowManager->AddWindow(
+      "Log Loader", std::make_unique<sysid::LogLoader>(storage, gLogger));
 
   gAnalyzerWindow = gWindowManager->AddWindow(
       "Analyzer", std::make_unique<sysid::Analyzer>(storage, gLogger));
@@ -115,10 +112,10 @@ void Application(std::string_view saveDir) {
   // Set default positions and sizes for windows.
 
   // Logger window position/size
-  gLoggerWindow->SetDefaultPos(sysid::kLoggerWindowPos.x,
-                               sysid::kLoggerWindowPos.y);
-  gLoggerWindow->SetDefaultSize(sysid::kLoggerWindowSize.x,
-                                sysid::kLoggerWindowSize.y);
+  gLogLoaderWindow->SetDefaultPos(sysid::kLogLoaderWindowPos.x,
+                                  sysid::kLogLoaderWindowPos.y);
+  gLogLoaderWindow->SetDefaultSize(sysid::kLogLoaderWindowSize.x,
+                                   sysid::kLogLoaderWindowSize.y);
 
   // Analyzer window position/size
   gAnalyzerWindow->SetDefaultPos(sysid::kAnalyzerWindowPos.x,
@@ -132,8 +129,6 @@ void Application(std::string_view saveDir) {
   gProgramLogWindow->SetDefaultSize(sysid::kProgramLogWindowSize.x,
                                     sysid::kProgramLogWindowSize.y);
   gProgramLogWindow->DisableRenamePopup();
-
-  gJSONConverter = std::make_unique<sysid::JSONConverter>(gLogger);
 
   // Configure save file.
   gui::ConfigurePlatformSaveFile("sysid.ini");
@@ -157,15 +152,6 @@ void Application(std::string_view saveDir) {
       ImGui::EndMenu();
     }
 
-    bool toCSV = false;
-    if (ImGui::BeginMenu("JSON Converters")) {
-      if (ImGui::MenuItem("JSON to CSV Converter")) {
-        toCSV = true;
-      }
-
-      ImGui::EndMenu();
-    }
-
     if (ImGui::BeginMenu("Docs")) {
       if (ImGui::MenuItem("Online documentation")) {
         wpi::gui::OpenURL(
@@ -177,19 +163,6 @@ void Application(std::string_view saveDir) {
     }
 
     ImGui::EndMainMenuBar();
-
-    if (toCSV) {
-      ImGui::OpenPopup("SysId JSON to CSV Converter");
-      toCSV = false;
-    }
-
-    if (ImGui::BeginPopupModal("SysId JSON to CSV Converter")) {
-      gJSONConverter->DisplayCSVConvert();
-      if (ImGui::Button("Close")) {
-        ImGui::CloseCurrentPopup();
-      }
-      ImGui::EndPopup();
-    }
 
     if (about) {
       ImGui::OpenPopup("About");
