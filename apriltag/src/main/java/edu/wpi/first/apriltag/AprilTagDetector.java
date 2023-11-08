@@ -103,7 +103,7 @@ public class AprilTagDetector implements AutoCloseable {
   /** Quad threshold parameters. */
   @SuppressWarnings("MemberName")
   public static class QuadThresholdParameters {
-    /** Threshold used to reject quads containing too few pixels. Default is 5 pixels. */
+    /** Threshold used to reject quads containing too few pixels. Default is 200 pixels. */
     public int minClusterPixels = 200;
 
     /**
