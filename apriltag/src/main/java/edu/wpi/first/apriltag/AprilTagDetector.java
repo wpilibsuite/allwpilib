@@ -104,7 +104,7 @@ public class AprilTagDetector implements AutoCloseable {
   @SuppressWarnings("MemberName")
   public static class QuadThresholdParameters {
     /** Threshold used to reject quads containing too few pixels. Default is 5 pixels. */
-    public int minClusterPixels = 5;
+    public int minClusterPixels = 200;
 
     /**
      * How many corner candidates to consider when segmenting a group of pixels into a quad. Default
@@ -115,9 +115,9 @@ public class AprilTagDetector implements AutoCloseable {
     /**
      * Critical angle, in radians. The detector will reject quads where pairs of edges have angles
      * that are close to straight or close to 180 degrees. Zero means that no quads are rejected.
-     * Default is 10 degrees.
+     * Default is 45 degrees.
      */
-    public double criticalAngle = 10 * Math.PI / 180.0;
+    public double criticalAngle = 45 * Math.PI / 180.0;
 
     /**
      * When fitting lines to the contours, the maximum mean squared error allowed. This is useful in
