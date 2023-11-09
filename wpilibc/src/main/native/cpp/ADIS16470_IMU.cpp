@@ -23,6 +23,7 @@
 #include <string>
 
 #include <hal/HAL.h>
+#include <hal/FRCUsageReporting.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 

@@ -25,6 +25,7 @@
 #include <numbers>
 #include <string>
 
+#include <hal/FRCUsageReporting.h>
 #include <hal/HAL.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>

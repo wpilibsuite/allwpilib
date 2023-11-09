@@ -1965,5 +1965,3 @@ void NT_Meta_FreeClients(struct NT_Meta_Client* arr, size_t count);
 #ifdef __cplusplus
 }  // extern "C"
 #endif
-
-#include "ntcore_c_types.h"
