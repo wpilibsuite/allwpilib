@@ -5,7 +5,8 @@
 #pragma once
 
 #include <stdint.h>
-#include <stddef.h>
+
+#include <cstddef.h>
 
 #include <wpi/Synchronization.h>
 
