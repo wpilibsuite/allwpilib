@@ -51,10 +51,8 @@ class LTVDifferentialDriveControllerTest {
   private static final double kLinearA = 0.642; // V/(m/s²)
   private static final double kAngularV = 1.382; // V/(m/s)
   private static final double kAngularA = 0.08495; // V/(m/s²)
-
   private static final LinearSystem<N2, N2, N2> plant =
       LinearSystemId.identifyDrivetrainSystem(kLinearV, kLinearA, kAngularV, kAngularA);
-
   private static final double kTrackwidth = 0.9;
 
   private static Matrix<N5, N1> dynamics(Matrix<N5, N1> x, Matrix<N2, N1> u) {
