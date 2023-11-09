@@ -21,6 +21,7 @@
 #include "hal/DriverStation.h"
 #include "hal/Encoder.h"
 #include "hal/Errors.h"
+#include "hal/FRCUsageReporting.h"
 #include "hal/HALBase.h"
 #include "hal/I2C.h"
 #include "hal/Interrupts.h"
