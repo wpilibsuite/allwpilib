@@ -63,6 +63,24 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
                       units::meter_t fieldLength, units::meter_t fieldWidth);
 
   /**
+   * Returns the length of the field the layout is representing.
+   * @return length
+   */
+  units::meter_t GetFieldLength() const;
+
+  /**
+   * Returns the length of the field the layout is representing.
+   * @return width
+   */
+  units::meter_t GetFieldWidth() const;
+
+  /**
+   * Returns a vector of all the april tags used in this layout.
+   * @return list of tags
+   */
+  std::vector<AprilTag> GetTags() const;
+
+  /**
    * Sets the origin based on a predefined enumeration of coordinate frame
    * origins. The origins are calculated from the field dimensions.
    *
@@ -82,6 +100,12 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
    * @param origin The new origin for tag transformations
    */
   void SetOrigin(const Pose3d& origin);
+
+  /**
+   * Returns the origin used for tag pose transformation.
+   * @return the origin
+   */
+  Pose3d GetOrigin() const;
 
   /**
    * Gets an AprilTag pose by its ID.

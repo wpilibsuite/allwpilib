@@ -14,16 +14,13 @@
 #include <vector>
 
 #include <wpi/SmallVector.h>
+#include <wpi/json_fwd.h>
 #include <wpi/mutex.h>
 #include <wpi/struct/Struct.h>
 
 #include "networktables/NetworkTableInstance.h"
 #include "networktables/Topic.h"
 #include "ntcore_cpp.h"
-
-namespace wpi {
-class json;
-}  // namespace wpi
 
 namespace nt {
 

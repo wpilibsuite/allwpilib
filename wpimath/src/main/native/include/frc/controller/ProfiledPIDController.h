@@ -322,7 +322,7 @@ class ProfiledPIDController
       m_setpoint.position = setpointMinDistance + measurement;
     }
 
-    m_setpoint = m_profile.Calculate(GetPeriod(), m_goal, m_setpoint);
+    m_setpoint = m_profile.Calculate(GetPeriod(), m_setpoint, m_goal);
     return m_controller.Calculate(measurement.value(),
                                   m_setpoint.position.value());
   }

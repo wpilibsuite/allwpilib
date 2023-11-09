@@ -181,9 +181,10 @@ static int32_t HAL_GetMatchInfoInternal(HAL_MatchInfo* info) {
 namespace {
 struct TcpCache {
   TcpCache() { std::memset(this, 0, sizeof(*this)); }
-  void Update(uint32_t mask);
+  bool Update(uint32_t mask);
   void CloneTo(TcpCache* other) { std::memcpy(other, this, sizeof(*this)); }
 
+  bool hasReadMatchInfo = false;
   HAL_MatchInfo matchInfo;
   HAL_JoystickDescriptor descriptors[HAL_kMaxJoysticks];
 };
@@ -199,15 +200,25 @@ constexpr uint32_t combinedMatchInfoMask = kTcpRecvMask_MatchInfoOld |
                                            kTcpRecvMask_MatchInfo |
                                            kTcpRecvMask_GameSpecific;
 
-void TcpCache::Update(uint32_t mask) {
+bool TcpCache::Update(uint32_t mask) {
+  bool failedToReadInfo = false;
   if ((mask & combinedMatchInfoMask) != 0) {
-    HAL_GetMatchInfoInternal(&matchInfo);
+    int status = HAL_GetMatchInfoInternal(&matchInfo);
+    if (status != 0) {
+      failedToReadInfo = true;
+      if (!hasReadMatchInfo) {
+        std::memset(&matchInfo, 0, sizeof(matchInfo));
+      }
+    } else {
+      hasReadMatchInfo = true;
+    }
   }
   for (int i = 0; i < HAL_kMaxJoysticks; i++) {
     if ((mask & (1 << i)) != 0) {
       HAL_GetJoystickDescriptorInternal(i, &descriptors[i]);
     }
   }
+  return failedToReadInfo;
 }
 
 namespace hal::init {
@@ -532,13 +543,21 @@ HAL_Bool HAL_RefreshDSData(void) {
     if (controlWord.dsAttached) {
       newestControlWord = currentRead->controlWord;
     } else {
+      // Zero out the control word. When the DS has never been connected
+      // this returns garbage. And there is no way we can detect that.
+      std::memset(&controlWord, 0, sizeof(controlWord));
       newestControlWord = controlWord;
     }
   }
 
   uint32_t mask = tcpMask.exchange(0);
   if (mask != 0) {
-    tcpCache.Update(mask);
+    bool failedToReadMatchInfo = tcpCache.Update(mask);
+    if (failedToReadMatchInfo) {
+      // If we failed to read match info
+      // we want to try again next iteration
+      tcpMask.fetch_or(combinedMatchInfoMask);
+    }
     std::scoped_lock tcpLock(tcpCacheMutex);
     tcpCache.CloneTo(&tcpCurrent);
   }
