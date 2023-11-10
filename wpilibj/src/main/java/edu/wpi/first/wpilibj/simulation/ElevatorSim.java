@@ -228,6 +228,68 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
   /**
    * Creates a simulated elevator mechanism.
    *
+   * @param kV The velocity gain.
+   * @param kA The acceleration gain.
+   * @param gearbox The type of and number of motors in the elevator gearbox.
+   * @param minHeightMeters The min allowable height of the elevator.
+   * @param maxHeightMeters The max allowable height of the elevator.
+   * @param simulateGravity Whether gravity should be simulated or not.
+   * @param startingHeightMeters The starting height of the elevator.
+   */
+  public ElevatorSim(
+      double kV,
+      double kA,
+      DCMotor gearbox,
+      double minHeightMeters,
+      double maxHeightMeters,
+      boolean simulateGravity,
+      double startingHeightMeters) {
+    this(
+        kV,
+        kA,
+        gearbox,
+        minHeightMeters,
+        maxHeightMeters,
+        simulateGravity,
+        startingHeightMeters,
+        null);
+  }
+
+  /**
+   * Creates a simulated elevator mechanism.
+   *
+   * @param kV The velocity gain.
+   * @param kA The acceleration gain.
+   * @param gearbox The type of and number of motors in the elevator gearbox.
+   * @param minHeightMeters The min allowable height of the elevator.
+   * @param maxHeightMeters The max allowable height of the elevator.
+   * @param simulateGravity Whether gravity should be simulated or not.
+   * @param startingHeightMeters The starting height of the elevator.
+   * @param measurementStdDevs The standard deviations of the measurements.
+   */
+  public ElevatorSim(
+      double kV,
+      double kA,
+      DCMotor gearbox,
+      double minHeightMeters,
+      double maxHeightMeters,
+      boolean simulateGravity,
+      double startingHeightMeters,
+      Matrix<N1, N1> measurementStdDevs) {
+    this(
+        LinearSystemId.identifyPositionSystem(kV, kA),
+        gearbox,
+        minHeightMeters,
+        maxHeightMeters,
+        simulateGravity,
+        startingHeightMeters,
+        9.8,
+        measurementStdDevs);
+  }
+
+  /**
+   * Creates a simulated elevator mechanism.
+   *
    * @param gearbox The type of and number of motors in the elevator gearbox.
    * @param gearing The gearing of the elevator (numbers greater than 1 represent reductions).
    * @param carriageMassKg The mass of the elevator carriage.
