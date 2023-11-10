@@ -107,6 +107,11 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
 
   // no auto
   return new frc2::SequentialCommandGroup(
+      frc2::InstantCommand(
+          [this, &exampleTrajectory]() {
+            m_drive.ResetOdometry(exampleTrajectory.InitialPose());
+          },
+          {}),
       std::move(mecanumControllerCommand),
       frc2::InstantCommand([this]() { m_drive.Drive(0, 0, 0, false); }, {}));
 }

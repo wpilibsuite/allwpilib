@@ -17,6 +17,7 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.AutoConstants;
 import edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.DriveConstants;
 import edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.OIConstants;
@@ -126,10 +127,10 @@ public class RobotContainer {
             m_robotDrive::tankDriveVolts,
             m_robotDrive);
 
-    // Reset odometry to the starting pose of the trajectory.
-    m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose());
-
-    // Run path following command, then stop at the end.
-    return ramseteCommand.andThen(() -> m_robotDrive.tankDriveVolts(0, 0));
+    // Reset odometry to the initial pose of the trajectory, Run path following command, then stop
+    // at the end.
+    return ramseteCommand
+        .andThen(() -> m_robotDrive.tankDriveVolts(0, 0))
+        .beforeStarting(() -> m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose()));
   }
 }
