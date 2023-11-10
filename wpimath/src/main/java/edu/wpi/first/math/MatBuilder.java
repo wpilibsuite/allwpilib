@@ -14,8 +14,19 @@ import org.ejml.simple.SimpleMatrix;
  * @param <C> The number of columns of the desired matrix.
  */
 public class MatBuilder<R extends Num, C extends Num> {
-  final Nat<R> m_rows;
-  final Nat<C> m_cols;
+  protected final Nat<R> m_rows;
+  protected final Nat<C> m_cols;
+
+  /**
+   * Creates a new {@link MatBuilder} with the given dimensions.
+   *
+   * @param rows The number of rows of the matrix.
+   * @param cols The number of columns of the matrix.
+   */
+  public MatBuilder(Nat<R> rows, Nat<C> cols) {
+    this.m_rows = Objects.requireNonNull(rows);
+    this.m_cols = Objects.requireNonNull(cols);
+  }
 
   /**
    * Fills the matrix with the given data, encoded in row major form. (The matrix is filled row by
@@ -34,19 +45,7 @@ public class MatBuilder<R extends Num, C extends Num> {
               + " matrix, but got "
               + data.length
               + " elements");
-    } else {
-      return new Matrix<>(new SimpleMatrix(this.m_rows.getNum(), this.m_cols.getNum(), true, data));
     }
-  }
-
-  /**
-   * Creates a new {@link MatBuilder} with the given dimensions.
-   *
-   * @param rows The number of rows of the matrix.
-   * @param cols The number of columns of the matrix.
-   */
-  public MatBuilder(Nat<R> rows, Nat<C> cols) {
-    this.m_rows = Objects.requireNonNull(rows);
-    this.m_cols = Objects.requireNonNull(cols);
+    return new Matrix<>(new SimpleMatrix(this.m_rows.getNum(), this.m_cols.getNum(), true, data));
   }
 }

@@ -27,7 +27,13 @@ public class VecBuilder<N extends Num> extends MatBuilder<N, N1> {
     super(rows, Nat.N1());
   }
 
-  private Vector<N> fillVec(double... data) {
+  /**
+   * Fills the vector with the given data.
+   *
+   * @param data The data to fill the vector with.
+   * @return The constructed vector.
+   */
+  public final Vector<N> fillVec(double... data) {
     if (Objects.requireNonNull(data).length != this.m_rows.getNum()) {
       throw new IllegalArgumentException(
           "Invalid vector data provided. Wanted "
@@ -36,7 +42,7 @@ public class VecBuilder<N extends Num> extends MatBuilder<N, N1> {
               + data.length
               + " elements");
     }
-    return new Vector<>(new SimpleMatrix(this.m_rows.getNum(), 1, true, data));
+    return new Vector<>(new SimpleMatrix(data));
   }
 
   /**
