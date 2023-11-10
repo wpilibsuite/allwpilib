@@ -681,7 +681,14 @@ class PROTOBUF_EXPORT EpsCopyOutputStream {
     if (PROTOBUF_PREDICT_FALSE(end_ - ptr < static_cast<int>(size))) {
       return WriteRawFallback(data, size, ptr);
     }
+#if __GNUC__ >= 13
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-overflow="
+#endif  // __GNUC__ >= 13
     std::memcpy(ptr, data, size);
+#if __GNUC__ >= 13
+#pragma GCC diagnostic pop
+#endif  // __GNUC__ >= 13
     return ptr + size;
   }
   // Writes the buffer specified by data, size to the stream. Possibly by
