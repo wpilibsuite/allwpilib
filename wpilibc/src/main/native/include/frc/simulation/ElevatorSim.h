@@ -9,6 +9,8 @@
 #include <units/length.h>
 #include <units/mass.h>
 #include <units/velocity.h>
+#include <units/acceleration.h>
+#include <units/voltage.h>
 
 #include "frc/simulation/LinearSystemSim.h"
 #include "frc/system/plant/DCMotor.h"
@@ -41,11 +43,14 @@ class ElevatorSim : public LinearSystemSim<2, 1, 1> {
    * @param simulateGravity    Whether gravity should be simulated or not.
    * @param startingHeight     The starting height of the elevator.
    * @param measurementStdDevs The standard deviation of the measurements.
+   * @param effectiveGravity   The effective gravity of the system in (m/s^2).  
+   * Determined experimentally or through kG / kA
    */
   ElevatorSim(const LinearSystem<2, 1, 1>& plant, const DCMotor& gearbox,
               units::meter_t minHeight, units::meter_t maxHeight,
               bool simulateGravity, units::meter_t startingHeight,
-              const std::array<double, 1>& measurementStdDevs = {0.0});
+              const std::array<double, 1>& measurementStdDevs = {0.0},
+              units::meters_per_second_squared_t effectGravity = 9.8_mps_sq);
 
   /**
    * Constructs a simulated elevator mechanism.
@@ -62,12 +67,15 @@ class ElevatorSim : public LinearSystemSim<2, 1, 1> {
    * @param simulateGravity    Whether gravity should be simulated or not.
    * @param startingHeight     The starting height of the elevator.
    * @param measurementStdDevs The standard deviation of the measurements.
-   */
+   * @param effectiveGravity   The effective gravity of the system in (m/s^2).  
+   * Determined experimentally or through kG / kA
+  */
   ElevatorSim(const DCMotor& gearbox, double gearing,
               units::kilogram_t carriageMass, units::meter_t drumRadius,
               units::meter_t minHeight, units::meter_t maxHeight,
               bool simulateGravity, units::meter_t startingHeight,
-              const std::array<double, 1>& measurementStdDevs = {0.0});
+              const std::array<double, 1>& measurementStdDevs = {0.0},
+              units::meters_per_second_squared_t effectGravity = 9.8_mps_sq);
 
   /**
    * Constructs a simulated elevator mechanism.
@@ -80,6 +88,7 @@ class ElevatorSim : public LinearSystemSim<2, 1, 1> {
    * @param maxHeight          The maximum allowed height of the elevator.
    * @param simulateGravity    Whether gravity should be simulated or not.
    * @param startingHeight     The starting height of the elevator.
+   * @param kG                 The gravity gain.
    * @param measurementStdDevs The standard deviation of the measurements.
    */
   template <typename Distance>
@@ -89,7 +98,7 @@ class ElevatorSim : public LinearSystemSim<2, 1, 1> {
               decltype(1_V / Acceleration_t<Distance>(1)) kA,
               const DCMotor& gearbox, units::meter_t minHeight,
               units::meter_t maxHeight, bool simulateGravity,
-              units::meter_t startingHeight,
+              units::meter_t startingHeight, units::volt_t kG,
               const std::array<double, 1>& measurementStdDevs = {0.0});
   using LinearSystemSim::SetState;
 
@@ -175,5 +184,6 @@ class ElevatorSim : public LinearSystemSim<2, 1, 1> {
   units::meter_t m_minHeight;
   units::meter_t m_maxHeight;
   bool m_simulateGravity;
+  units::meters_per_second_squared_t m_effectiveGravity;
 };
 }  // namespace frc::sim
