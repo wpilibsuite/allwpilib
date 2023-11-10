@@ -44,7 +44,6 @@ class ElevatorSim : public LinearSystemSim<2, 1, 1> {
    * @param startingHeight     The starting height of the elevator.
    * @param measurementStdDevs The standard deviation of the measurements.
    * @param effectiveGravity   The effective gravity of the system in (m/s^2).  
-   * Determined experimentally or through kG / kA
    */
   ElevatorSim(const LinearSystem<2, 1, 1>& plant, const DCMotor& gearbox,
               units::meter_t minHeight, units::meter_t maxHeight,
@@ -68,8 +67,7 @@ class ElevatorSim : public LinearSystemSim<2, 1, 1> {
    * @param startingHeight     The starting height of the elevator.
    * @param measurementStdDevs The standard deviation of the measurements.
    * @param effectiveGravity   The effective gravity of the system in (m/s^2).  
-   * Determined experimentally or through kG / kA
-  */
+   */
   ElevatorSim(const DCMotor& gearbox, double gearing,
               units::kilogram_t carriageMass, units::meter_t drumRadius,
               units::meter_t minHeight, units::meter_t maxHeight,

@@ -47,8 +47,7 @@ ElevatorSim::ElevatorSim(decltype(1_V / Velocity_t<Distance>(1)) kV,
                          const DCMotor& gearbox, units::meter_t minHeight,
                          units::meter_t maxHeight, bool simulateGravity,
                          units::meter_t startingHeight, units::volt_t kG,
-                         const std::array<double, 1>& measurementStdDevs 
-                         )
+                         const std::array<double, 1>& measurementStdDevs)
     : ElevatorSim(LinearSystemId::IdentifyPositionSystem(kV, kA), gearbox,
                   minHeight, maxHeight, simulateGravity, startingHeight,
                   measurementStdDevs, kG / kA) {}
@@ -61,8 +60,7 @@ ElevatorSim::ElevatorSim(decltype(1_V / Velocity_t<Distance>(1)) kV,
                          const DCMotor& gearbox, units::meter_t minHeight,
                          units::meter_t maxHeight, bool simulateGravity,
                          units::meter_t startingHeight,
-                         const std::array<double, 1>& measurementStdDevs 
-                         )
+                         const std::array<double, 1>& measurementStdDevs)
     : ElevatorSim(LinearSystemId::IdentifyPositionSystem(kV, kA), gearbox,
                   minHeight, maxHeight, simulateGravity, startingHeight,
                   measurementStdDevs, 9.8_mps_sq) {}
