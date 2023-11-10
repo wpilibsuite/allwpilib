@@ -35,6 +35,11 @@ class WPILIB_DLLEXPORT CubicHermiteSpline : public Spline<3> {
                      wpi::array<double, 2> yInitialControlVector,
                      wpi::array<double, 2> yFinalControlVector);
 
+  wpi::array<double, 2> xInitialControlVector;
+  wpi::array<double, 2> xFinalControlVector;
+  wpi::array<double, 2> yInitialControlVector;
+  wpi::array<double, 2> yFinalControlVector;
+
  protected:
   /**
    * Returns the coefficients matrix.
@@ -94,3 +99,6 @@ class WPILIB_DLLEXPORT CubicHermiteSpline : public Spline<3> {
   }
 };
 }  // namespace frc
+
+#include "frc/spline/proto/CubicHermiteSplineProto.h"
+#include "frc/spline/struct/CubicHermiteSplineStruct.h"

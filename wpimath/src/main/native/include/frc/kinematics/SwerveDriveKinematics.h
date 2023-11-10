@@ -293,10 +293,14 @@ class SwerveDriveKinematics
       units::meters_per_second_t attainableMaxRobotTranslationSpeed,
       units::radians_per_second_t attainableMaxRobotRotationSpeed);
 
+  const wpi::array<Translation2d, NumModules> GetModules() const {
+    return m_modules;
+  }
+
  private:
+  wpi::array<Translation2d, NumModules> m_modules;
   mutable Matrixd<NumModules * 2, 3> m_inverseKinematics;
   Eigen::HouseholderQR<Matrixd<NumModules * 2, 3>> m_forwardKinematics;
-  wpi::array<Translation2d, NumModules> m_modules;
   mutable wpi::array<Rotation2d, NumModules> m_moduleHeadings;
 
   mutable Translation2d m_previousCoR;
@@ -308,3 +312,4 @@ extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
 }  // namespace frc
 
 #include "SwerveDriveKinematics.inc"
+#include "frc/kinematics/proto/SwerveDriveKinematicsProto.h"

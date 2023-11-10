@@ -4,11 +4,17 @@
 
 package edu.wpi.first.math.spline;
 
+import edu.wpi.first.math.spline.proto.CubicHermiteSplineProto;
+import edu.wpi.first.math.spline.struct.CubicHermiteSplineStruct;
 import org.ejml.simple.SimpleMatrix;
 
 public class CubicHermiteSpline extends Spline {
   private static SimpleMatrix hermiteBasis;
   private final SimpleMatrix m_coefficients;
+  public final double[] xInitialControlVector;
+  public final double[] xFinalControlVector;
+  public final double[] yInitialControlVector;
+  public final double[] yFinalControlVector;
 
   /**
    * Constructs a cubic hermite spline with the specified control vectors. Each control vector
@@ -19,12 +25,17 @@ public class CubicHermiteSpline extends Spline {
    * @param yInitialControlVector The control vector for the initial point in the y dimension.
    * @param yFinalControlVector The control vector for the final point in the y dimension.
    */
+  @SuppressWarnings("PMD.ArrayIsStoredDirectly")
   public CubicHermiteSpline(
       double[] xInitialControlVector,
       double[] xFinalControlVector,
       double[] yInitialControlVector,
       double[] yFinalControlVector) {
     super(3);
+    this.xInitialControlVector = xInitialControlVector;
+    this.xFinalControlVector = xFinalControlVector;
+    this.yInitialControlVector = yInitialControlVector;
+    this.yFinalControlVector = yFinalControlVector;
 
     // Populate the coefficients for the actual spline equations.
     // Row 0 is x coefficients
@@ -133,4 +144,7 @@ public class CubicHermiteSpline extends Spline {
           finalVector[0], finalVector[1]
         });
   }
+
+  public static final CubicHermiteSplineProto proto = new CubicHermiteSplineProto();
+  public static final CubicHermiteSplineStruct struct = new CubicHermiteSplineStruct();
 }

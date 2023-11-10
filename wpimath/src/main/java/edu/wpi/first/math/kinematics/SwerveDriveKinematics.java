@@ -12,6 +12,7 @@ import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
+import edu.wpi.first.math.kinematics.proto.SwerveDriveKinematicsProto;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
@@ -404,4 +405,11 @@ public class SwerveDriveKinematics
         attainableMaxTranslationalSpeed.in(MetersPerSecond),
         attainableMaxRotationalVelocity.in(RadiansPerSecond));
   }
+
+  @SuppressWarnings("PMD.MethodReturnsInternalArray")
+  public Translation2d[] getModules() {
+    return m_modules;
+  }
+
+  public static final SwerveDriveKinematicsProto proto = new SwerveDriveKinematicsProto();
 }

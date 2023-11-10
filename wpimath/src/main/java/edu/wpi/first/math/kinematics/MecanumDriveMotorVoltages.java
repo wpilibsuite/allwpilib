@@ -4,6 +4,9 @@
 
 package edu.wpi.first.math.kinematics;
 
+import edu.wpi.first.math.kinematics.proto.MecanumDriveMotorVoltagesProto;
+import edu.wpi.first.math.kinematics.struct.MecanumDriveMotorVoltagesStruct;
+
 /** Represents the motor voltages for a mecanum drive drivetrain. */
 public class MecanumDriveMotorVoltages {
   /** Voltage of the front left motor. */
@@ -47,4 +50,9 @@ public class MecanumDriveMotorVoltages {
             + "Rear Left: %.2f V, Rear Right: %.2f V)",
         frontLeftVoltage, frontRightVoltage, rearLeftVoltage, rearRightVoltage);
   }
+
+  public static final MecanumDriveMotorVoltagesStruct struct =
+      new MecanumDriveMotorVoltagesStruct();
+
+  public static final MecanumDriveMotorVoltagesProto proto = new MecanumDriveMotorVoltagesProto();
 }

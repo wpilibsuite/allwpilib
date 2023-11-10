@@ -5,6 +5,8 @@
 package edu.wpi.first.math;
 
 import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.proto.VectorProto;
+import edu.wpi.first.util.protobuf.Protobuf;
 import java.util.Objects;
 import org.ejml.simple.SimpleMatrix;
 
@@ -112,5 +114,15 @@ public class Vector<R extends Num> extends Matrix<R, N1> {
     }
 
     return Math.sqrt(squaredNorm);
+  }
+
+  /**
+   * Creates an implementation of the {@link Protobuf} interface for vectors.
+   *
+   * @param rows The number of rows of the vectors this serializer processes.
+   * @return The protobuf implementation.
+   */
+  public static final <R extends Num> VectorProto<R> getProto(Nat<R> rows) {
+    return new VectorProto<>(rows);
   }
 }

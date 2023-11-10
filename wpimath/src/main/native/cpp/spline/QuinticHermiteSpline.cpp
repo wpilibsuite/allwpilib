@@ -10,7 +10,11 @@ QuinticHermiteSpline::QuinticHermiteSpline(
     wpi::array<double, 3> xInitialControlVector,
     wpi::array<double, 3> xFinalControlVector,
     wpi::array<double, 3> yInitialControlVector,
-    wpi::array<double, 3> yFinalControlVector) {
+    wpi::array<double, 3> yFinalControlVector)
+    : xInitialControlVector{xInitialControlVector},
+      xFinalControlVector{xFinalControlVector},
+      yInitialControlVector{yInitialControlVector},
+      yFinalControlVector{yFinalControlVector} {
   const auto hermite = MakeHermiteBasis();
   const auto x =
       ControlVectorFromArrays(xInitialControlVector, xFinalControlVector);

@@ -1,0 +1,46 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+#pragma once
+
+#include "frc/system/proto/LinearSystemProto.h"
+#include "system.pb.h"
+
+template <int States, int Inputs, int Outputs>
+google::protobuf::Message*
+wpi::Protobuf<frc::LinearSystem<States, Inputs, Outputs>>::New(
+    google::protobuf::Arena* arena) {
+  return google::protobuf::Arena::CreateMessage<
+      wpi::proto::ProtobufLinearSystem>(arena);
+}
+
+template <int States, int Inputs, int Outputs>
+frc::LinearSystem<States, Inputs, Outputs>
+wpi::Protobuf<frc::LinearSystem<States, Inputs, Outputs>>::Unpack(
+    const google::protobuf::Message& msg) {
+  auto m = static_cast<const wpi::proto::ProtobufLinearSystem*>(&msg);
+  if (m->num_states() != States || m->num_inputs() != Inputs ||
+      m->num_outputs() != Outputs) {
+    // TODO Error
+  }
+  return frc::LinearSystem<States, Inputs, Outputs>{
+      wpi::UnpackProtobuf<frc::Matrixd<States, States>>(m->a()),
+      wpi::UnpackProtobuf<frc::Matrixd<States, Inputs>>(m->b()),
+      wpi::UnpackProtobuf<frc::Matrixd<Outputs, States>>(m->c()),
+      wpi::UnpackProtobuf<frc::Matrixd<Outputs, Inputs>>(m->d())};
+}
+
+template <int States, int Inputs, int Outputs>
+void wpi::Protobuf<frc::LinearSystem<States, Inputs, Outputs>>::Pack(
+    google::protobuf::Message* msg,
+    const frc::LinearSystem<States, Inputs, Outputs>& value) {
+  auto m = static_cast<wpi::proto::ProtobufLinearSystem*>(msg);
+  m->set_num_states(States);
+  m->set_num_inputs(Inputs);
+  m->set_num_outputs(Outputs);
+  wpi::PackProtobuf(m->mutable_a(), value.A());
+  wpi::PackProtobuf(m->mutable_b(), value.B());
+  wpi::PackProtobuf(m->mutable_c(), value.C());
+  wpi::PackProtobuf(m->mutable_d(), value.D());
+}

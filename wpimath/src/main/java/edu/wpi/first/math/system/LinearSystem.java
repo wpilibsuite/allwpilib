@@ -5,8 +5,11 @@
 package edu.wpi.first.math.system;
 
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Num;
 import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.system.proto.LinearSystemProto;
+import edu.wpi.first.util.protobuf.Protobuf;
 
 public class LinearSystem<States extends Num, Inputs extends Num, Outputs extends Num> {
   /** Continuous system matrix. */
@@ -189,5 +192,19 @@ public class LinearSystem<States extends Num, Inputs extends Num, Outputs extend
     return String.format(
         "Linear System: A\n%s\n\nB:\n%s\n\nC:\n%s\n\nD:\n%s\n",
         m_A.toString(), m_B.toString(), m_C.toString(), m_D.toString());
+  }
+
+  /**
+   * Creates an implementation of the {@link Protobuf} interface for linear systems.
+   *
+   * @param states The number of states of the linear systems this serializer processes.
+   * @param inputs The number of inputs of the linear systems this serializer processes.
+   * @param outputs The number of outputs of the linear systems this serializer processes.
+   * @return The protobuf implementation.
+   */
+  public static <States extends Num, Inputs extends Num, Outputs extends Num>
+      LinearSystemProto<States, Inputs, Outputs> getProto(
+          Nat<States> states, Nat<Inputs> inputs, Nat<Outputs> outputs) {
+    return new LinearSystemProto<>(states, inputs, outputs);
   }
 }

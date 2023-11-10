@@ -6,6 +6,8 @@ package edu.wpi.first.math.controller;
 
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.controller.proto.SimpleMotorFeedforwardProto;
+import edu.wpi.first.math.controller.struct.SimpleMotorFeedforwardStruct;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 
 /** A helper class that computes feedforward outputs for a simple permanent-magnet DC motor. */
@@ -139,4 +141,8 @@ public class SimpleMotorFeedforward {
   public double minAchievableAcceleration(double maxVoltage, double velocity) {
     return maxAchievableAcceleration(-maxVoltage, velocity);
   }
+
+  public static final SimpleMotorFeedforwardStruct struct = new SimpleMotorFeedforwardStruct();
+
+  public static final SimpleMotorFeedforwardProto proto = new SimpleMotorFeedforwardProto();
 }

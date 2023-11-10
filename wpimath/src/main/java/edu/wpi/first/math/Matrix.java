@@ -5,6 +5,8 @@
 package edu.wpi.first.math;
 
 import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.proto.MatrixProto;
+import edu.wpi.first.util.protobuf.Protobuf;
 import java.util.Objects;
 import org.ejml.MatrixDimensionException;
 import org.ejml.data.DMatrixRMaj;
@@ -761,5 +763,17 @@ public class Matrix<R extends Num, C extends Num> {
   @Override
   public int hashCode() {
     return Objects.hash(m_storage);
+  }
+
+  /**
+   * Creates an implementation of the {@link Protobuf} interface for matrices.
+   *
+   * @param rows The number of rows of the matrices this serializer processes.
+   * @param cols The number of cols of the matrices this serializer processes.
+   * @return The protobuf implementation.
+   */
+  public static <R extends Num, C extends Num> MatrixProto<R, C> getProto(
+      Nat<R> rows, Nat<C> cols) {
+    return new MatrixProto<>(rows, cols);
   }
 }

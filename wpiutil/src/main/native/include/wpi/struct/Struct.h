@@ -16,6 +16,7 @@
 
 #include "wpi/Endian.h"
 #include "wpi/MathExtras.h"
+#include "wpi/array.h"
 #include "wpi/bit.h"
 #include "wpi/ct_string.h"
 #include "wpi/function_ref.h"
@@ -134,6 +135,27 @@ inline T UnpackStruct(std::span<const uint8_t> data) {
 }
 
 /**
+ * Unpack a serialized struct array starting at a given offset within the data.
+ * This is primarily useful in unpack implementations to unpack nested struct
+ * arrays.
+ *
+ * @tparam T object type
+ * @tparam Offset starting offset
+ * @tparam N number of objects
+ * @param data raw struct data
+ * @return Desrialized array
+ */
+template <StructSerializable T, size_t Offset, size_t N>
+inline wpi::array<T, N> UnpackStructArray(std::span<const uint8_t> data) {
+  const auto StructSize = Struct<std::remove_cvref_t<T>>::kSize;
+  wpi::array<T, N> arr(wpi::empty_array);
+  [&]<size_t... Is>(std::index_sequence<Is...>) {
+    ((arr[Is] = UnpackStruct<T, Offset + Is * StructSize>(data)), ...);
+  }(std::make_index_sequence<N>{});
+  return arr;
+}
+
+/**
  * Pack a serialized struct.
  *
  * @param data struct storage (mutable, output)
@@ -160,6 +182,25 @@ inline void PackStruct(std::span<uint8_t> data, T&& value) {
       data.template subspan<Offset,
                             Struct<typename std::remove_cvref_t<T>>::kSize>(),
       std::forward<T>(value));
+}
+
+/**
+ * Pack a serialized struct array starting at a given offset within the data.
+ * This is primarily useful in pack implementations to pack nested struct
+ * arrays.
+ *
+ * @tparam Offset starting offset
+ * @tparam N number of objects
+ * @param data struct storage (mutable, output)
+ * @param value object
+ */
+template <size_t Offset, size_t N, StructSerializable T>
+inline void PackStructArray(std::span<uint8_t> data,
+                            const wpi::array<T, N>& arr) {
+  const auto StructSize = Struct<std::remove_cvref_t<T>>::kSize;
+  [&]<size_t... Is>(std::index_sequence<Is...>) {
+    (PackStruct<Offset + Is * StructSize>(data, arr[Is]), ...);
+  }(std::make_index_sequence<N>{});
 }
 
 /**

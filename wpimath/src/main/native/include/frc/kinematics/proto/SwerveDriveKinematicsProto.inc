@@ -1,0 +1,34 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+#pragma once
+
+#include "frc/kinematics/proto/SwerveDriveKinematicsProto.h"
+#include "kinematics.pb.h"
+
+template <size_t NumModules>
+google::protobuf::Message*
+wpi::Protobuf<frc::SwerveDriveKinematics<NumModules>>::New(
+    google::protobuf::Arena* arena) {
+  return google::protobuf::Arena::CreateMessage<
+      wpi::proto::ProtobufSwerveDriveKinematics>(arena);
+}
+
+template <size_t NumModules>
+frc::SwerveDriveKinematics<NumModules>
+wpi::Protobuf<frc::SwerveDriveKinematics<NumModules>>::Unpack(
+    const google::protobuf::Message& msg) {
+  auto m = static_cast<const wpi::proto::ProtobufSwerveDriveKinematics*>(&msg);
+  return frc::SwerveDriveKinematics<NumModules>{
+      wpi::UnpackProtobufArray<wpi::proto::ProtobufTranslation2d,
+                               frc::Translation2d, NumModules>(m->modules())};
+}
+
+template <size_t NumModules>
+void wpi::Protobuf<frc::SwerveDriveKinematics<NumModules>>::Pack(
+    google::protobuf::Message* msg,
+    const frc::SwerveDriveKinematics<NumModules>& value) {
+  auto m = static_cast<wpi::proto::ProtobufSwerveDriveKinematics*>(msg);
+  wpi::PackProtobufArray(m->mutable_modules(), value.GetModules());
+}

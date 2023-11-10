@@ -1,0 +1,44 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+#pragma once
+
+#include "frc/proto/MatrixProto.h"
+#include "wpimath.pb.h"
+
+template <int Rows, int Cols>
+google::protobuf::Message* wpi::Protobuf<frc::Matrixd<Rows, Cols>>::New(
+    google::protobuf::Arena* arena) {
+  return google::protobuf::Arena::CreateMessage<wpi::proto::ProtobufMatrix>(
+      arena);
+}
+
+template <int Rows, int Cols>
+frc::Matrixd<Rows, Cols> wpi::Protobuf<frc::Matrixd<Rows, Cols>>::Unpack(
+    const google::protobuf::Message& msg) {
+  auto m = static_cast<const wpi::proto::ProtobufMatrix*>(&msg);
+  if (m->num_rows() != Rows || m->num_cols() != Cols) {
+    // TODO Error
+  }
+  if (m->data_size() != Rows * Cols) {
+    // TODO Error
+  }
+  frc::Matrixd<Rows, Cols> mat;
+  for (int i = 0; i < Rows * Cols; i++) {
+    mat(i) = m->data(i);
+  }
+  return mat;
+}
+
+template <int Rows, int Cols>
+void wpi::Protobuf<frc::Matrixd<Rows, Cols>>::Pack(
+    google::protobuf::Message* msg, const frc::Matrixd<Rows, Cols>& value) {
+  auto m = static_cast<wpi::proto::ProtobufMatrix*>(msg);
+  m->set_num_rows(Rows);
+  m->set_num_cols(Cols);
+  m->clear_data();
+  for (int i = 0; i < Rows * Cols; i++) {
+    m->add_data(value(i));
+  }
+}

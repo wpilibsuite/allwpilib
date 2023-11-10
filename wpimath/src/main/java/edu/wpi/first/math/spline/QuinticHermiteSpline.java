@@ -4,11 +4,17 @@
 
 package edu.wpi.first.math.spline;
 
+import edu.wpi.first.math.spline.proto.QuinticHermiteSplineProto;
+import edu.wpi.first.math.spline.struct.QuinticHermiteSplineStruct;
 import org.ejml.simple.SimpleMatrix;
 
 public class QuinticHermiteSpline extends Spline {
   private static SimpleMatrix hermiteBasis;
   private final SimpleMatrix m_coefficients;
+  public final double[] xInitialControlVector;
+  public final double[] yInitialControlVector;
+  public final double[] xFinalControlVector;
+  public final double[] yFinalControlVector;
 
   /**
    * Constructs a quintic hermite spline with the specified control vectors. Each control vector
@@ -19,12 +25,17 @@ public class QuinticHermiteSpline extends Spline {
    * @param yInitialControlVector The control vector for the initial point in the y dimension.
    * @param yFinalControlVector The control vector for the final point in the y dimension.
    */
+  @SuppressWarnings("PMD.ArrayIsStoredDirectly")
   public QuinticHermiteSpline(
       double[] xInitialControlVector,
       double[] xFinalControlVector,
       double[] yInitialControlVector,
       double[] yFinalControlVector) {
     super(5);
+    this.xInitialControlVector = xInitialControlVector;
+    this.yInitialControlVector = yInitialControlVector;
+    this.xFinalControlVector = xFinalControlVector;
+    this.yFinalControlVector = yFinalControlVector;
 
     // Populate the coefficients for the actual spline equations.
     // Row 0 is x coefficients
@@ -141,4 +152,7 @@ public class QuinticHermiteSpline extends Spline {
           finalVector[0], finalVector[1], finalVector[2]
         });
   }
+
+  public static final QuinticHermiteSplineProto proto = new QuinticHermiteSplineProto();
+  public static final QuinticHermiteSplineStruct struct = new QuinticHermiteSplineStruct();
 }

@@ -5,6 +5,8 @@
 package edu.wpi.first.math.controller;
 
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.controller.proto.DifferentialDriveFeedforwardProto;
+import edu.wpi.first.math.controller.struct.DifferentialDriveFeedforwardStruct;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.LinearSystemId;
@@ -12,6 +14,10 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 /** A helper class which computes the feedforward outputs for a differential drive drivetrain. */
 public class DifferentialDriveFeedforward {
   private final LinearSystem<N2, N2, N2> m_plant;
+  public final double m_kVLinear;
+  public final double m_kALinear;
+  public final double m_kVAngular;
+  public final double m_kAAngular;
 
   /**
    * Creates a new DifferentialDriveFeedforward with the specified parameters.
@@ -25,9 +31,8 @@ public class DifferentialDriveFeedforward {
    */
   public DifferentialDriveFeedforward(
       double kVLinear, double kALinear, double kVAngular, double kAAngular, double trackwidth) {
-    m_plant =
-        LinearSystemId.identifyDrivetrainSystem(
-            kVLinear, kALinear, kVAngular, kAAngular, trackwidth);
+    // See LinearSystemId.identifyDrivetrainSystem(double, double, double, double, double)
+    this(kVLinear, kALinear, kVAngular * 2.0 / trackwidth, kAAngular * 2.0 / trackwidth);
   }
 
   /**
@@ -41,6 +46,10 @@ public class DifferentialDriveFeedforward {
   public DifferentialDriveFeedforward(
       double kVLinear, double kALinear, double kVAngular, double kAAngular) {
     m_plant = LinearSystemId.identifyDrivetrainSystem(kVLinear, kALinear, kVAngular, kAAngular);
+    m_kVLinear = kVLinear;
+    m_kALinear = kALinear;
+    m_kVAngular = kVAngular;
+    m_kAAngular = kAAngular;
   }
 
   /**
@@ -67,4 +76,10 @@ public class DifferentialDriveFeedforward {
     var u = feedforward.calculate(r, nextR);
     return new DifferentialDriveWheelVoltages(u.get(0, 0), u.get(1, 0));
   }
+
+  public static final DifferentialDriveFeedforwardStruct struct =
+      new DifferentialDriveFeedforwardStruct();
+
+  public static final DifferentialDriveFeedforwardProto proto =
+      new DifferentialDriveFeedforwardProto();
 }

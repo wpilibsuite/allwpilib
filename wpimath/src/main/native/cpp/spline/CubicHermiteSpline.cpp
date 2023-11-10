@@ -10,7 +10,11 @@ CubicHermiteSpline::CubicHermiteSpline(
     wpi::array<double, 2> xInitialControlVector,
     wpi::array<double, 2> xFinalControlVector,
     wpi::array<double, 2> yInitialControlVector,
-    wpi::array<double, 2> yFinalControlVector) {
+    wpi::array<double, 2> yFinalControlVector)
+    : xInitialControlVector{xInitialControlVector},
+      xFinalControlVector{xFinalControlVector},
+      yInitialControlVector{yInitialControlVector},
+      yFinalControlVector{yFinalControlVector} {
   const auto hermite = MakeHermiteBasis();
   const auto x =
       ControlVectorFromArrays(xInitialControlVector, xFinalControlVector);

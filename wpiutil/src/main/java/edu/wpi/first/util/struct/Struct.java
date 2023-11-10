@@ -113,4 +113,35 @@ public interface Struct<T> {
   default void unpackInto(T out, ByteBuffer bb) {
     throw new UnsupportedOperationException("object does not support unpackInto");
   }
+
+  /**
+   * Deserializes a double array from a raw struct serialized ByteBuffer starting at the current
+   * position. Will increment the ByteBuffer position by size * kSizeDouble bytes. Will not otherwise
+   * modify the ByteBuffer (e.g. byte order will not be changed).
+   *
+   * @param bb ByteBuffer
+   * @param size Size of the array
+   * @return Double array
+   */
+  static double[] unpackDoubleArray(ByteBuffer bb, int size) {
+    double[] arr = new double[size];
+    for (int i = 0; i < size; i++) {
+      arr[i] = bb.getDouble();
+    }
+    return arr;
+  }
+
+  /**
+   * Puts array contents to a ByteBuffer starting at the current position. Will increment the
+   * ByteBuffer position by size * kSizeDouble bytes. Will not otherwise modify the ByteBuffer (e.g.
+   * byte order will not be changed).
+   *
+   * @param bb ByteBuffer
+   * @param arr Array to serialize
+   */
+  static void packArray(ByteBuffer bb, double[] arr) {
+    for (int i = 0; i < arr.length; i++) {
+      bb.putDouble(arr[i]);
+    }
+  }
 }
