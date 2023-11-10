@@ -6,10 +6,10 @@
 
 #include <array>
 
+#include <units/acceleration.h>
 #include <units/length.h>
 #include <units/mass.h>
 #include <units/velocity.h>
-#include <units/acceleration.h>
 #include <units/voltage.h>
 
 #include "frc/simulation/LinearSystemSim.h"
