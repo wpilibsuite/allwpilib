@@ -9,7 +9,6 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
-import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.NumericalIntegration;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
@@ -31,132 +30,136 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
   // The effective gravity of the system factoring in frictional losses torgue.
   private final double m_effectiveGravity;
 
-  /**
-   * Creates a simulated elevator mechanism.
-   *
-   * @param plant The linear system that represents the elevator. This system can be created with
-   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createElevatorSystem(DCMotor, double,
-   *     double, double)}.
-   * @param gearbox The type of and number of motors in the elevator gearbox.
-   * @param minHeightMeters The min allowable height of the elevator.
-   * @param maxHeightMeters The max allowable height of the elevator.
-   * @param simulateGravity Whether gravity should be simulated or not.
-   * @param startingHeightMeters The starting height of the elevator.
-   * @param effectiveGravity The effective gravity of the system.
-   * @param measurementStdDevs The standard deviations of the measurements.
-   */
-  public ElevatorSim(
-      LinearSystem<N2, N1, N1> plant,
-      DCMotor gearbox,
-      double minHeightMeters,
-      double maxHeightMeters,
-      boolean simulateGravity,
-      double startingHeightMeters,
-      double effectiveGravity,
-      Matrix<N1, N1> measurementStdDevs) {
-    super(plant, measurementStdDevs);
-    m_gearbox = gearbox;
-    m_minHeight = minHeightMeters;
-    m_maxHeight = maxHeightMeters;
-    m_simulateGravity = simulateGravity;
-    m_effectiveGravity = effectiveGravity;
+  // /**
+  //  * Creates a simulated elevator mechanism.
+  //  *
+  //  * @param plant The linear system that represents the elevator. This system can be created with
+  //  *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createElevatorSystem(DCMotor,
+  // double,
+  //  *     double, double)}.
+  //  * @param gearbox The type of and number of motors in the elevator gearbox.
+  //  * @param minHeightMeters The min allowable height of the elevator.
+  //  * @param maxHeightMeters The max allowable height of the elevator.
+  //  * @param simulateGravity Whether gravity should be simulated or not.
+  //  * @param startingHeightMeters The starting height of the elevator.
+  //  * @param effectiveGravity The effective gravity of the system.
+  //  * @param measurementStdDevs The standard deviations of the measurements.
+  //  */
+  // public ElevatorSim(
+  //     LinearSystem<N2, N1, N1> plant,
+  //     DCMotor gearbox,
+  //     double minHeightMeters,
+  //     double maxHeightMeters,
+  //     boolean simulateGravity,
+  //     double startingHeightMeters,
+  //     double effectiveGravity,
+  //     Matrix<N1, N1> measurementStdDevs) {
+  //   super(plant, measurementStdDevs);
+  //   m_gearbox = gearbox;
+  //   m_minHeight = minHeightMeters;
+  //   m_maxHeight = maxHeightMeters;
+  //   m_simulateGravity = simulateGravity;
+  //   m_effectiveGravity = effectiveGravity;
 
-    setState(startingHeightMeters, 0);
-  }
+  //   setState(startingHeightMeters, 0);
+  // }
 
-  /**
-   * Creates a simulated elevator mechanism.
-   *
-   * @param plant The linear system that represents the elevator. This system can be created with
-   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createElevatorSystem(DCMotor, double,
-   *     double, double)}.
-   * @param gearbox The type of and number of motors in the elevator gearbox.
-   * @param minHeightMeters The min allowable height of the elevator.
-   * @param maxHeightMeters The max allowable height of the elevator.
-   * @param simulateGravity Whether gravity should be simulated or not.
-   * @param startingHeightMeters The starting height of the elevator.
-   * @param measurementStdDevs The standard deviations of the measurements.
-   */
-  public ElevatorSim(
-      LinearSystem<N2, N1, N1> plant,
-      DCMotor gearbox,
-      double minHeightMeters,
-      double maxHeightMeters,
-      boolean simulateGravity,
-      double startingHeightMeters,
-      Matrix<N1, N1> measurementStdDevs) {
-    this(
-        plant,
-        gearbox,
-        minHeightMeters,
-        maxHeightMeters,
-        simulateGravity,
-        startingHeightMeters,
-        9.8,
-        measurementStdDevs);
-  }
+  // /**
+  //  * Creates a simulated elevator mechanism.
+  //  *
+  //  * @param plant The linear system that represents the elevator. This system can be created with
+  //  *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createElevatorSystem(DCMotor,
+  // double,
+  //  *     double, double)}.
+  //  * @param gearbox The type of and number of motors in the elevator gearbox.
+  //  * @param minHeightMeters The min allowable height of the elevator.
+  //  * @param maxHeightMeters The max allowable height of the elevator.
+  //  * @param simulateGravity Whether gravity should be simulated or not.
+  //  * @param startingHeightMeters The starting height of the elevator.
+  //  * @param measurementStdDevs The standard deviations of the measurements.
+  //  */
+  // public ElevatorSim(
+  //     LinearSystem<N2, N1, N1> plant,
+  //     DCMotor gearbox,
+  //     double minHeightMeters,
+  //     double maxHeightMeters,
+  //     boolean simulateGravity,
+  //     double startingHeightMeters,
+  //     Matrix<N1, N1> measurementStdDevs) {
+  //   this(
+  //       plant,
+  //       gearbox,
+  //       minHeightMeters,
+  //       maxHeightMeters,
+  //       simulateGravity,
+  //       startingHeightMeters,
+  //       9.8,
+  //       measurementStdDevs);
+  // }
 
-  /**
-   * Creates a simulated elevator mechanism.
-   *
-   * @param plant The linear system that represents the elevator. This system can be created with
-   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createElevatorSystem(DCMotor, double,
-   *     double, double)}.
-   * @param gearbox The type of and number of motors in the elevator gearbox.
-   * @param minHeightMeters The min allowable height of the elevator.
-   * @param maxHeightMeters The max allowable height of the elevator.
-   * @param simulateGravity Whether gravity should be simulated or not.
-   * @param startingHeightMeters The starting height of the elevator.
-   * @param effectiveGravity The effective gravity of the system.
-   */
-  public ElevatorSim(
-      LinearSystem<N2, N1, N1> plant,
-      DCMotor gearbox,
-      double minHeightMeters,
-      double maxHeightMeters,
-      boolean simulateGravity,
-      double startingHeightMeters,
-      double effectiveGravity) {
-    this(
-        plant,
-        gearbox,
-        minHeightMeters,
-        maxHeightMeters,
-        simulateGravity,
-        startingHeightMeters,
-        effectiveGravity,
-        null);
-  }
+  // /**
+  //  * Creates a simulated elevator mechanism.
+  //  *
+  //  * @param plant The linear system that represents the elevator. This system can be created with
+  //  *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createElevatorSystem(DCMotor,
+  // double,
+  //  *     double, double)}.
+  //  * @param gearbox The type of and number of motors in the elevator gearbox.
+  //  * @param minHeightMeters The min allowable height of the elevator.
+  //  * @param maxHeightMeters The max allowable height of the elevator.
+  //  * @param simulateGravity Whether gravity should be simulated or not.
+  //  * @param startingHeightMeters The starting height of the elevator.
+  //  * @param effectiveGravity The effective gravity of the system.
+  //  */
+  // public ElevatorSim(
+  //     LinearSystem<N2, N1, N1> plant,
+  //     DCMotor gearbox,
+  //     double minHeightMeters,
+  //     double maxHeightMeters,
+  //     boolean simulateGravity,
+  //     double startingHeightMeters,
+  //     double effectiveGravity) {
+  //   this(
+  //       plant,
+  //       gearbox,
+  //       minHeightMeters,
+  //       maxHeightMeters,
+  //       simulateGravity,
+  //       startingHeightMeters,
+  //       effectiveGravity,
+  //       null);
+  // }
 
-  /**
-   * Creates a simulated elevator mechanism.
-   *
-   * @param plant The linear system that represents the elevator. This system can be created with
-   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createElevatorSystem(DCMotor, double,
-   *     double, double)}.
-   * @param gearbox The type of and number of motors in the elevator gearbox.
-   * @param minHeightMeters The min allowable height of the elevator.
-   * @param maxHeightMeters The max allowable height of the elevator.
-   * @param startingHeightMeters The starting height of the elevator.
-   * @param simulateGravity Whether gravity should be simulated or not.
-   */
-  public ElevatorSim(
-      LinearSystem<N2, N1, N1> plant,
-      DCMotor gearbox,
-      double minHeightMeters,
-      double maxHeightMeters,
-      boolean simulateGravity,
-      double startingHeightMeters) {
-    this(
-        plant,
-        gearbox,
-        minHeightMeters,
-        maxHeightMeters,
-        simulateGravity,
-        startingHeightMeters,
-        9.8,
-        null);
-  }
+  // /**
+  //  * Creates a simulated elevator mechanism.
+  //  *
+  //  * @param plant The linear system that represents the elevator. This system can be created with
+  //  *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createElevatorSystem(DCMotor,
+  // double,
+  //  *     double, double)}.
+  //  * @param gearbox The type of and number of motors in the elevator gearbox.
+  //  * @param minHeightMeters The min allowable height of the elevator.
+  //  * @param maxHeightMeters The max allowable height of the elevator.
+  //  * @param startingHeightMeters The starting height of the elevator.
+  //  * @param simulateGravity Whether gravity should be simulated or not.
+  //  */
+  // public ElevatorSim(
+  //     LinearSystem<N2, N1, N1> plant,
+  //     DCMotor gearbox,
+  //     double minHeightMeters,
+  //     double maxHeightMeters,
+  //     boolean simulateGravity,
+  //     double startingHeightMeters) {
+  //   this(
+  //       plant,
+  //       gearbox,
+  //       minHeightMeters,
+  //       maxHeightMeters,
+  //       simulateGravity,
+  //       startingHeightMeters,
+  //       9.8,
+  //       null);
+  // }
 
   /**
    * Creates a simulated elevator mechanism.
@@ -214,15 +217,13 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
       boolean simulateGravity,
       double startingHeightMeters,
       Matrix<N1, N1> measurementStdDevs) {
-    this(
-        LinearSystemId.identifyPositionSystem(kV, kA),
-        gearbox,
-        minHeightMeters,
-        maxHeightMeters,
-        simulateGravity,
-        startingHeightMeters,
-        kG / kA,
-        measurementStdDevs);
+    super(LinearSystemId.identifyPositionSystem(kV, kA), measurementStdDevs);
+    m_gearbox = gearbox;
+    m_minHeight = minHeightMeters;
+    m_maxHeight = maxHeightMeters;
+    m_simulateGravity = simulateGravity;
+    m_effectiveGravity = kG / kA;
+    setState(startingHeightMeters, 0);
   }
 
   /**
@@ -276,15 +277,13 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
       boolean simulateGravity,
       double startingHeightMeters,
       Matrix<N1, N1> measurementStdDevs) {
-    this(
-        LinearSystemId.identifyPositionSystem(kV, kA),
-        gearbox,
-        minHeightMeters,
-        maxHeightMeters,
-        simulateGravity,
-        startingHeightMeters,
-        9.8,
-        measurementStdDevs);
+    super(LinearSystemId.identifyPositionSystem(kV, kA), measurementStdDevs);
+    m_gearbox = gearbox;
+    m_minHeight = minHeightMeters;
+    m_maxHeight = maxHeightMeters;
+    m_simulateGravity = simulateGravity;
+    m_effectiveGravity = 9.8;
+    setState(startingHeightMeters, 0);
   }
 
   /**
@@ -312,15 +311,15 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
       double startingHeightMeters,
       double effectiveGravity,
       Matrix<N1, N1> measurementStdDevs) {
-    this(
+    super(
         LinearSystemId.createElevatorSystem(gearbox, carriageMassKg, drumRadiusMeters, gearing),
-        gearbox,
-        minHeightMeters,
-        maxHeightMeters,
-        simulateGravity,
-        startingHeightMeters,
-        effectiveGravity,
         measurementStdDevs);
+    m_gearbox = gearbox;
+    m_minHeight = minHeightMeters;
+    m_maxHeight = maxHeightMeters;
+    m_simulateGravity = simulateGravity;
+    m_effectiveGravity = effectiveGravity;
+    setState(startingHeightMeters, 0);
   }
 
   /**
@@ -347,8 +346,10 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
       double startingHeightMeters,
       double effectiveGravity) {
     this(
-        LinearSystemId.createElevatorSystem(gearbox, carriageMassKg, drumRadiusMeters, gearing),
         gearbox,
+        gearing,
+        carriageMassKg,
+        drumRadiusMeters,
         minHeightMeters,
         maxHeightMeters,
         simulateGravity,
@@ -381,8 +382,10 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
       double startingHeightMeters,
       Matrix<N1, N1> measurementStdDevs) {
     this(
-        LinearSystemId.createElevatorSystem(gearbox, carriageMassKg, drumRadiusMeters, gearing),
         gearbox,
+        gearing,
+        carriageMassKg,
+        drumRadiusMeters,
         minHeightMeters,
         maxHeightMeters,
         simulateGravity,
