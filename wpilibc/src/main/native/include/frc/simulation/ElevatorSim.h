@@ -49,7 +49,7 @@ class ElevatorSim : public LinearSystemSim<2, 1, 1> {
               units::meter_t minHeight, units::meter_t maxHeight,
               bool simulateGravity, units::meter_t startingHeight,
               const std::array<double, 1>& measurementStdDevs = {0.0},
-              units::meters_per_second_squared_t effectGravity = 9.8_mps_sq);
+              units::meters_per_second_squared_t effectiveGravity = 9.8_mps_sq);
 
   /**
    * Constructs a simulated elevator mechanism.
@@ -73,7 +73,7 @@ class ElevatorSim : public LinearSystemSim<2, 1, 1> {
               units::meter_t minHeight, units::meter_t maxHeight,
               bool simulateGravity, units::meter_t startingHeight,
               const std::array<double, 1>& measurementStdDevs = {0.0},
-              units::meters_per_second_squared_t effectGravity = 9.8_mps_sq);
+              units::meters_per_second_squared_t effectiveGravity = 9.8_mps_sq);
 
   /**
    * Constructs a simulated elevator mechanism.
