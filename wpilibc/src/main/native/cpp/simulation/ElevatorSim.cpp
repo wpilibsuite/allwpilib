@@ -32,7 +32,7 @@ ElevatorSim::ElevatorSim(const DCMotor& gearbox, double gearing,
                          units::meter_t drumRadius, units::meter_t minHeight,
                          units::meter_t maxHeight, bool simulateGravity,
                          units::meter_t startingHeight,
-                         const std::array<double, 1>& measurementStdDevs, 
+                         const std::array<double, 1>& measurementStdDevs,
                          units::meters_per_second_squared_t effectiveGravity)
     : ElevatorSim(LinearSystemId::ElevatorSystem(gearbox, carriageMass,
                                                  drumRadius, gearing),
