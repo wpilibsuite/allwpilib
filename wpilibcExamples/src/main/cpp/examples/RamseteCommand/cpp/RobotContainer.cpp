@@ -87,6 +87,7 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
             m_drive.ResetOdometry(exampleTrajectory.InitialPose());
           },
           {}))
+
       .AndThen(
           frc2::cmd::RunOnce([this] { m_drive.TankDriveVolts(0_V, 0_V); }, {}));
 }
