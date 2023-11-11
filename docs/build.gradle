@@ -226,8 +226,6 @@ task generateJavaDocs(type: Javadoc) {
     options.addBooleanOption("Xdoclint:html,missing,reference,syntax", true)
     options.addBooleanOption('html5', true)
     options.linkSource(true)
-    dependsOn project(':hal').generateUsageReporting
-    dependsOn project(':ntcore').ntcoreGenerateJavaTypes
     dependsOn project(':wpilibj').generateJavaVersion
     dependsOn project(':wpimath').generateNat
     source project(':apriltag').sourceSets.main.java

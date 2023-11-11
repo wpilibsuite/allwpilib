@@ -1,5 +1,5 @@
-def javaResourceFile = file("$buildDir/generated/java/edu/wpi/first/hal/FRCNetComm.java")
-def cppResourceFile = file("$buildDir/generated/headers/hal/FRCUsageReporting.h")
+def javaResourceFile = file("$projectDir/src/generated/java/edu/wpi/first/hal/FRCNetComm.java")
+def cppResourceFile = file("$projectDir/src/generated/headers/hal/FRCUsageReporting.h")
 
 def generateUsageReporting = tasks.register('generateUsageReporting') {
     def javaBase = file('src/generate/FRCNetComm.java.in')
@@ -43,18 +43,14 @@ def generateUsageReporting = tasks.register('generateUsageReporting') {
     }
 }
 
+addToGenerateAll(generateUsageReporting)
+
 ext {
     addHalDependency = { binary, shared->
-        binary.tasks.withType(AbstractNativeSourceCompileTask) {
-            it.dependsOn generateUsageReporting
-        }
         binary.lib project: ':hal', library: 'hal', linkage: shared
     }
 
     addHalJniDependency = { binary->
-        binary.tasks.withType(AbstractNativeSourceCompileTask) {
-            it.dependsOn generateUsageReporting
-        }
         binary.lib project: ':hal', library: 'halJNIShared', linkage: 'shared'
     }
 
@@ -62,16 +58,10 @@ ext {
     setBaseName = 'wpiHal'
     devMain = 'edu.wpi.first.hal.DevMain'
     niLibraries = true
-    generatedHeaders = "$buildDir/generated/headers"
+    generatedHeaders = "$projectDir/src/generated/headers"
     jniSplitSetup = {
-        it.tasks.withType(AbstractNativeSourceCompileTask) {
-            it.dependsOn generateUsageReporting
-        }
     }
     splitSetup = {
-        it.tasks.withType(AbstractNativeSourceCompileTask) {
-            it.dependsOn generateUsageReporting
-        }
         if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
             it.sources {
                 athenaCpp(CppSourceSet) {
@@ -109,11 +99,7 @@ ext {
 
 apply from: "${rootDir}/shared/jni/setupBuild.gradle"
 
-sourceSets.main.java.srcDir "${buildDir}/generated/java/"
-
-compileJava {
-    dependsOn generateUsageReporting
-}
+sourceSets.main.java.srcDir "${projectDir}/src/generated/java/"
 
 cppSourcesZip {
     from('src/main/native/athena') {
@@ -126,7 +112,6 @@ cppSourcesZip {
 }
 
 cppHeadersZip {
-    dependsOn generateUsageReporting
     from(generatedHeaders) {
         into '/'
     }
@@ -160,9 +145,6 @@ nativeUtils.exportsConfigs {
 model {
     binaries {
         all {
-            it.tasks.withType(AbstractNativeSourceCompileTask) {
-                it.dependsOn generateUsageReporting
-            }
             if (!(it instanceof NativeBinarySpec)) return
                 if (it.component.name != 'hal' && it.component.name != 'halBase') return
                 if (it.targetPlatform.name != nativeUtils.wpi.platforms.roborio) return

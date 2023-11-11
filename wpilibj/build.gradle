@@ -42,6 +42,14 @@ task generateJavaVersion() {
     }
 }
 
+project.afterEvaluate {
+    project.plugins.withId("eclipse") {
+        // This is required because the intellij/eclipse plugin does not allow adding source directories
+        // that do not exist. The intellij/eclipse config files should be valid from the start.
+        project.file(wpilibVersionFileOutput).parentFile.mkdirs()
+    }
+}
+
 gradle.taskGraph.addTaskExecutionGraphListener { graph ->
     def willPublish = graph.hasTask(publish)
     if (willPublish) {

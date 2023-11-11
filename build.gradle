@@ -173,3 +173,9 @@ ext.getCurrentArch = {
 wrapper {
     gradleVersion = '8.4'
 }
+
+task generateAll() {}
+
+ext.addToGenerateAll = { task ->
+    generateAll.dependsOn task
+}

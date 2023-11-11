@@ -46,8 +46,8 @@ dependencies {
 
 def wpilibNumberFileInput = file("src/generate/GenericNumber.java.jinja")
 def natFileInput = file("src/generate/Nat.java.jinja")
-def wpilibNumberFileOutputDir = file("$buildDir/generated/java/edu/wpi/first/math/numbers")
-def wpilibNatFileOutput = file("$buildDir/generated/java/edu/wpi/first/math/Nat.java")
+def wpilibNumberFileOutputDir = file("$projectDir/src/generated/java/edu/wpi/first/math/numbers")
+def wpilibNatFileOutput = file("$projectDir/src/generated/java/edu/wpi/first/math/Nat.java")
 def maxNum = 20
 
 task generateNumbers() {
@@ -78,6 +78,8 @@ task generateNumbers() {
     }
 }
 
+addToGenerateAll(generateNumbers)
+
 task generateNat() {
     description = "Generates Nat.java"
     group = "WPILib"
@@ -103,9 +105,9 @@ task generateNat() {
     }
 }
 
-sourceSets.main.java.srcDir "${buildDir}/generated/java"
-compileJava.dependsOn generateNumbers
-compileJava.dependsOn generateNat
+addToGenerateAll(generateNat)
+
+sourceSets.main.java.srcDir "${projectDir}/src/generated/java"
 
 task unitsHeaders(type: Zip) {
     destinationDirectory = file("$buildDir/outputs")
