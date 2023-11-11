@@ -9,13 +9,10 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.serde.Translation3dProtoSerde;
+import edu.wpi.first.math.geometry.serde.Translation3dStructSerde;
 import edu.wpi.first.math.interpolation.Interpolatable;
-import edu.wpi.first.math.proto.Geometry3D.ProtobufTranslation3d;
-import edu.wpi.first.util.protobuf.Protobuf;
-import edu.wpi.first.util.struct.Struct;
-import java.nio.ByteBuffer;
 import java.util.Objects;
-import us.hebi.quickbuf.Descriptors.Descriptor;
 
 /**
  * Represents a translation in 3D space. This object can be used to represent a point or a vector.
@@ -237,71 +234,6 @@ public class Translation3d implements Interpolatable<Translation3d> {
         MathUtil.interpolate(this.getZ(), endValue.getZ(), t));
   }
 
-  public static final class AStruct implements Struct<Translation3d> {
-    @Override
-    public Class<Translation3d> getTypeClass() {
-      return Translation3d.class;
-    }
-
-    @Override
-    public String getTypeString() {
-      return "struct:Translation3d";
-    }
-
-    @Override
-    public int getSize() {
-      return kSizeDouble * 3;
-    }
-
-    @Override
-    public String getSchema() {
-      return "double x;double y;double z";
-    }
-
-    @Override
-    public Translation3d unpack(ByteBuffer bb) {
-      double x = bb.getDouble();
-      double y = bb.getDouble();
-      double z = bb.getDouble();
-      return new Translation3d(x, y, z);
-    }
-
-    @Override
-    public void pack(ByteBuffer bb, Translation3d value) {
-      bb.putDouble(value.m_x);
-      bb.putDouble(value.m_y);
-      bb.putDouble(value.m_z);
-    }
-  }
-
-  public static final AStruct struct = new AStruct();
-
-  public static final class AProto implements Protobuf<Translation3d, ProtobufTranslation3d> {
-    @Override
-    public Class<Translation3d> getTypeClass() {
-      return Translation3d.class;
-    }
-
-    @Override
-    public Descriptor getDescriptor() {
-      return ProtobufTranslation3d.getDescriptor();
-    }
-
-    @Override
-    public ProtobufTranslation3d createMessage() {
-      return ProtobufTranslation3d.newInstance();
-    }
-
-    @Override
-    public Translation3d unpack(ProtobufTranslation3d msg) {
-      return new Translation3d(msg.getXMeters(), msg.getYMeters(), msg.getZMeters());
-    }
-
-    @Override
-    public void pack(ProtobufTranslation3d msg, Translation3d value) {
-      msg.setXMeters(value.m_x).setYMeters(value.m_y).setZMeters(value.m_z);
-    }
-  }
-
-  public static final AProto proto = new AProto();
+  public static final Translation3dStructSerde struct = new Translation3dStructSerde();
+  public static final Translation3dProtoSerde proto = new Translation3dProtoSerde();
 }

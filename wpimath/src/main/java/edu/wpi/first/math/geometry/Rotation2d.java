@@ -9,14 +9,11 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.serde.Rotation2dProtoSerde;
+import edu.wpi.first.math.geometry.serde.Rotation2dStructSerde;
 import edu.wpi.first.math.interpolation.Interpolatable;
-import edu.wpi.first.math.proto.Geometry2D.ProtobufRotation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.util.protobuf.Protobuf;
-import edu.wpi.first.util.struct.Struct;
-import java.nio.ByteBuffer;
 import java.util.Objects;
-import us.hebi.quickbuf.Descriptors.Descriptor;
 
 /**
  * A rotation in a 2D coordinate frame represented by a point on the unit circle (cosine and sine).
@@ -262,66 +259,6 @@ public class Rotation2d implements Interpolatable<Rotation2d> {
     return plus(endValue.minus(this).times(MathUtil.clamp(t, 0, 1)));
   }
 
-  public static final class AStruct implements Struct<Rotation2d> {
-    @Override
-    public Class<Rotation2d> getTypeClass() {
-      return Rotation2d.class;
-    }
-
-    @Override
-    public String getTypeString() {
-      return "struct:Rotation2d";
-    }
-
-    @Override
-    public int getSize() {
-      return kSizeDouble;
-    }
-
-    @Override
-    public String getSchema() {
-      return "double value";
-    }
-
-    @Override
-    public Rotation2d unpack(ByteBuffer bb) {
-      return new Rotation2d(bb.getDouble());
-    }
-
-    @Override
-    public void pack(ByteBuffer bb, Rotation2d value) {
-      bb.putDouble(value.m_value);
-    }
-  }
-
-  public static final AStruct struct = new AStruct();
-
-  public static final class AProto implements Protobuf<Rotation2d, ProtobufRotation2d> {
-    @Override
-    public Class<Rotation2d> getTypeClass() {
-      return Rotation2d.class;
-    }
-
-    @Override
-    public Descriptor getDescriptor() {
-      return ProtobufRotation2d.getDescriptor();
-    }
-
-    @Override
-    public ProtobufRotation2d createMessage() {
-      return ProtobufRotation2d.newInstance();
-    }
-
-    @Override
-    public Rotation2d unpack(ProtobufRotation2d msg) {
-      return new Rotation2d(msg.getRadians());
-    }
-
-    @Override
-    public void pack(ProtobufRotation2d msg, Rotation2d value) {
-      msg.setRadians(value.m_value);
-    }
-  }
-
-  public static final AProto proto = new AProto();
+  public static final Rotation2dStructSerde struct = new Rotation2dStructSerde();
+  public static final Rotation2dProtoSerde proto = new Rotation2dProtoSerde();
 }
