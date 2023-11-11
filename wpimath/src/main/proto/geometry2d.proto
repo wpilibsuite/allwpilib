@@ -5,12 +5,12 @@ package wpi.proto;
 option java_package = "edu.wpi.first.math.proto";
 
 message ProtobufTranslation2d {
-  double x = 1;
-  double y = 2;
+  double x_meters = 1;
+  double y_meters = 2;
 }
 
 message ProtobufRotation2d {
-  double value = 1;
+  double radians = 1;
 }
 
 message ProtobufPose2d {
@@ -24,7 +24,7 @@ message ProtobufTransform2d {
 }
 
 message ProtobufTwist2d {
-  double dx = 1;
-  double dy = 2;
-  double dtheta = 3;
+  double dx_meters = 1;
+  double dy_meters = 2;
+  double dtheta_radians = 3;
 }

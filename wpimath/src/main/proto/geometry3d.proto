@@ -5,9 +5,9 @@ package wpi.proto;
 option java_package = "edu.wpi.first.math.proto";
 
 message ProtobufTranslation3d {
-  double x = 1;
-  double y = 2;
-  double z = 3;
+  double x_meters = 1;
+  double y_meters = 2;
+  double z_meters = 3;
 }
 
 message ProtobufQuaternion {
@@ -32,10 +32,10 @@ message ProtobufTransform3d {
 }
 
 message ProtobufTwist3d {
-  double dx = 1;
-  double dy = 2;
-  double dz = 3;
-  double rx = 4;
-  double ry = 5;
-  double rz = 6;
+  double dx_meters = 1;
+  double dy_meters = 2;
+  double dz_meters = 3;
+  double rx_radians = 4;
+  double ry_radians = 5;
+  double rz_radians = 6;
 }

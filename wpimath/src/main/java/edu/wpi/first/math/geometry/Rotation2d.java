@@ -314,12 +314,12 @@ public class Rotation2d implements Interpolatable<Rotation2d> {
 
     @Override
     public Rotation2d unpack(ProtobufRotation2d msg) {
-      return new Rotation2d(msg.getValue());
+      return new Rotation2d(msg.getRadians());
     }
 
     @Override
     public void pack(ProtobufRotation2d msg, Rotation2d value) {
-      msg.setValue(value.m_value);
+      msg.setRadians(value.m_value);
     }
   }
 

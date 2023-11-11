@@ -290,12 +290,12 @@ public class Translation2d implements Interpolatable<Translation2d> {
 
     @Override
     public Translation2d unpack(ProtobufTranslation2d msg) {
-      return new Translation2d(msg.getX(), msg.getY());
+      return new Translation2d(msg.getXMeters(), msg.getYMeters());
     }
 
     @Override
     public void pack(ProtobufTranslation2d msg, Translation2d value) {
-      msg.setX(value.m_x).setY(value.m_y);
+      msg.setXMeters(value.m_x).setYMeters(value.m_y);
     }
   }
 

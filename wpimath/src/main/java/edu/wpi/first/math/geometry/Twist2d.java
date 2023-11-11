@@ -125,12 +125,14 @@ public class Twist2d {
 
     @Override
     public Twist2d unpack(ProtobufTwist2d msg) {
-      return new Twist2d(msg.getDx(), msg.getDy(), msg.getDtheta());
+      return new Twist2d(msg.getDxMeters(), msg.getDyMeters(), msg.getDthetaRadians());
     }
 
     @Override
     public void pack(ProtobufTwist2d msg, Twist2d value) {
-      msg.setDx(value.dx).setDy(value.dy).setDtheta(value.dtheta);
+      msg.setDxMeters(value.dx);
+      msg.setDyMeters(value.dy);
+      msg.setDthetaRadians(value.dtheta);
     }
   }
 

@@ -294,12 +294,12 @@ public class Translation3d implements Interpolatable<Translation3d> {
 
     @Override
     public Translation3d unpack(ProtobufTranslation3d msg) {
-      return new Translation3d(msg.getX(), msg.getY(), msg.getZ());
+      return new Translation3d(msg.getXMeters(), msg.getYMeters(), msg.getZMeters());
     }
 
     @Override
     public void pack(ProtobufTranslation3d msg, Translation3d value) {
-      msg.setX(value.m_x).setY(value.m_y).setZ(value.m_z);
+      msg.setXMeters(value.m_x).setYMeters(value.m_y).setZMeters(value.m_z);
     }
   }
 

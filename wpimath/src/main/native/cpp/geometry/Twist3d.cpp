@@ -17,18 +17,18 @@ google::protobuf::Message* wpi::Protobuf<frc::Twist3d>::New(
 frc::Twist3d wpi::Protobuf<frc::Twist3d>::Unpack(
     const google::protobuf::Message& msg) {
   auto m = static_cast<const wpi::proto::ProtobufTwist3d*>(&msg);
-  return frc::Twist3d{units::meter_t{m->dx()},  units::meter_t{m->dy()},
-                      units::meter_t{m->dz()},  units::radian_t{m->rx()},
-                      units::radian_t{m->ry()}, units::radian_t{m->rz()}};
+  return frc::Twist3d{units::meter_t{m->dx_meters()},  units::meter_t{m->dy_meters()},
+                      units::meter_t{m->dz_meters()},  units::radian_t{m->rx_radians()},
+                      units::radian_t{m->ry_radians()}, units::radian_t{m->rz_radians()}};
 }
 
 void wpi::Protobuf<frc::Twist3d>::Pack(google::protobuf::Message* msg,
                                        const frc::Twist3d& value) {
   auto m = static_cast<wpi::proto::ProtobufTwist3d*>(msg);
-  m->set_dx(value.dx.value());
-  m->set_dy(value.dy.value());
-  m->set_dz(value.dz.value());
-  m->set_rx(value.rx.value());
-  m->set_ry(value.ry.value());
-  m->set_rz(value.rz.value());
+  m->set_dx_meters(value.dx.value());
+  m->set_dy_meters(value.dy.value());
+  m->set_dz_meters(value.dz.value());
+  m->set_rx_radians(value.rx.value());
+  m->set_ry_radians(value.ry.value());
+  m->set_rz_radians(value.rz.value());
 }

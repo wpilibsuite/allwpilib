@@ -7,18 +7,18 @@ import "geometry2d.proto";
 option java_package = "edu.wpi.first.math.proto";
 
 message ProtobufChassisSpeeds {
-  double vx = 1;
-  double vy = 2;
-  double omega = 3;
+  double vx_mps = 1;
+  double vy_mps = 2;
+  double omega_rps = 3;
 }
 
 message ProtobufDifferentialDriveKinematics {
-  double track_width = 1;
+  double track_width_meters = 1;
 }
 
 message ProtobufDifferentialDriveWheelSpeeds {
-  double left = 1;
-  double right = 2;
+  double left_mps = 1;
+  double right_mps = 2;
 }
 
 message ProtobufMecanumDriveKinematics {
@@ -29,24 +29,24 @@ message ProtobufMecanumDriveKinematics {
 }
 
 message ProtobufMecanumDriveMotorVoltages {
-  double front_left = 1;
-  double front_right = 2;
-  double rear_left = 3;
-  double rear_right = 4;
+  double front_left_volts = 1;
+  double front_right_volts = 2;
+  double rear_left_volts = 3;
+  double rear_right_volts = 4;
 }
 
 message ProtobufMecanumDriveWheelPositions {
-  double front_left = 1;
-  double front_right = 2;
-  double rear_left = 3;
-  double rear_right = 4;
+  double front_left_meters = 1;
+  double front_right_meters = 2;
+  double rear_left_meters = 3;
+  double rear_right_meters = 4;
 }
 
 message ProtobufMecanumDriveWheelSpeeds {
-  double front_left = 1;
-  double front_right = 2;
-  double rear_left = 3;
-  double rear_right = 4;
+  double front_left_mps = 1;
+  double front_right_mps = 2;
+  double rear_left_mps = 3;
+  double rear_right_mps = 4;
 }
 
 message ProtobufSwerveDriveKinematics {
@@ -54,11 +54,11 @@ message ProtobufSwerveDriveKinematics {
 }
 
 message ProtobufSwerveModulePosition {
-  double distance = 1;
+  double distance_meters = 1;
   ProtobufRotation2d angle = 2;
 }
 
 message ProtobufSwerveModuleState {
-  double speed = 1;
+  double speed_mps = 1;
   ProtobufRotation2d angle = 2;
 }

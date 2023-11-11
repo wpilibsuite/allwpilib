@@ -152,17 +152,17 @@ public class Twist3d {
     @Override
     public Twist3d unpack(ProtobufTwist3d msg) {
       return new Twist3d(
-          msg.getDx(), msg.getDy(), msg.getDz(), msg.getRx(), msg.getRy(), msg.getRz());
+          msg.getDxMeters(), msg.getDyMeters(), msg.getDzMeters(), msg.getRxRadians(), msg.getRyRadians(), msg.getRzRadians());
     }
 
     @Override
     public void pack(ProtobufTwist3d msg, Twist3d value) {
-      msg.setDx(value.dx)
-          .setDy(value.dy)
-          .setDz(value.dz)
-          .setRx(value.rx)
-          .setRy(value.ry)
-          .setRz(value.rz);
+      msg.setDxMeters(value.dx)
+          .setDyMeters(value.dy)
+          .setDzMeters(value.dz)
+          .setRxRadians(value.rx)
+          .setRyRadians(value.ry)
+          .setRzRadians(value.rz);
     }
   }
 
