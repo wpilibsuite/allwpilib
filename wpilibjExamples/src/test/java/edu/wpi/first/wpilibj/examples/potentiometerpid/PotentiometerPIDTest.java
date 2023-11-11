@@ -56,6 +56,7 @@ class PotentiometerPIDTest {
             Robot.kFullHeightMeters,
             true,
             0,
+            9.8,
             null);
     m_analogSim = new AnalogInputSim(Robot.kPotChannel);
     m_motorSim = new PWMSim(Robot.kMotorChannel);
