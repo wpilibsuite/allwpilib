@@ -66,8 +66,15 @@ TEST(ElevatorSimTest, MinMax) {
 
 TEST(ElevatorSimTest, Stability) {
   frc::sim::ElevatorSim sim{
-      frc::DCMotor::Vex775Pro(4), 100, 4_kg, 0.5_in, 0_m, 10_m, false, 0_m, 9.8_mps_sq};
-
+      frc::DCMotor::Vex775Pro(4), 
+      100, 
+      4_kg, 
+      0.5_in, 
+      0_m, 
+      10_m, 
+      false, 
+      0_m, 
+      9.8_mps_sq};
   sim.SetState(frc::Vectord<2>{0.0, 0.0});
   sim.SetInput(frc::Vectord<1>{12.0});
   for (int i = 0; i < 50; ++i) {

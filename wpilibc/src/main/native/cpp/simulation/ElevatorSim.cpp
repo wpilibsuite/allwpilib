@@ -22,7 +22,8 @@ ElevatorSim::ElevatorSim(const LinearSystem<2, 1, 1>& plant,
       m_minHeight(minHeight),
       m_maxHeight(maxHeight),
       m_simulateGravity(simulateGravity),
-      m_effectiveGravity(units::meters_per_second_squared_t{kG.value() / plant.B(1, 0)}){
+      m_effectiveGravity(
+        units::meters_per_second_squared_t{kG.value() / plant.B(1, 0)}){
   SetState(startingHeight, 0_mps);
 }
 
@@ -33,8 +34,12 @@ ElevatorSim::ElevatorSim(const DCMotor& gearbox, double gearing,
                          units::meter_t startingHeight, 
                          units::meters_per_second_squared_t effectiveGravity,
                          const std::array<double, 1>& measurementStdDevs)
-    : LinearSystemSim(LinearSystemId::ElevatorSystem(gearbox, carriageMass,
-                                                 drumRadius, gearing), measurementStdDevs),
+    : LinearSystemSim(LinearSystemId::ElevatorSystem(
+      gearbox, 
+      carriageMass,
+      drumRadius, 
+      gearing), 
+      measurementStdDevs),
       m_gearbox(gearbox),
       m_minHeight(minHeight),
       m_maxHeight(maxHeight),
