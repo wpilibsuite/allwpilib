@@ -84,7 +84,11 @@ model {
                         def arch = it.targetPlatform.name
                         if (arch == systemArch) {
                             def filePath = it.tasks.install.installDirectory.get().toString() + File.separatorChar + 'lib'
-
+                            test.dependsOn it.tasks.install
+                            test.systemProperty 'java.library.path', filePath
+                            test.environment 'LD_LIBRARY_PATH', filePath
+                            test.environment 'DYLD_LIBRARY_PATH', filePath
+                            test.workingDir filePath
                             found = true
                         }
                     }
