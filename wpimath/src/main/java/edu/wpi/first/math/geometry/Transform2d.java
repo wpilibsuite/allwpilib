@@ -4,7 +4,12 @@
 
 package edu.wpi.first.math.geometry;
 
+import edu.wpi.first.math.proto.Geometry2D.ProtobufTransform2d;
+import edu.wpi.first.util.protobuf.Protobuf;
+import edu.wpi.first.util.struct.Struct;
+import java.nio.ByteBuffer;
 import java.util.Objects;
+import us.hebi.quickbuf.Descriptors.Descriptor;
 
 /** Represents a transformation for a Pose2d in the pose's frame. */
 public class Transform2d {
@@ -37,6 +42,18 @@ public class Transform2d {
    */
   public Transform2d(Translation2d translation, Rotation2d rotation) {
     m_translation = translation;
+    m_rotation = rotation;
+  }
+
+  /**
+   * Constructs a transform with x and y translations instead of a separate Translation2d.
+   *
+   * @param x The x component of the translational component of the transform.
+   * @param y The y component of the translational component of the transform.
+   * @param rotation The rotational component of the transform.
+   */
+  public Transform2d(double x, double y, Rotation2d rotation) {
+    m_translation = new Translation2d(x, y);
     m_rotation = rotation;
   }
 
@@ -151,4 +168,83 @@ public class Transform2d {
   public int hashCode() {
     return Objects.hash(m_translation, m_rotation);
   }
+
+  public static final class AStruct implements Struct<Transform2d> {
+    @Override
+    public Class<Transform2d> getTypeClass() {
+      return Transform2d.class;
+    }
+
+    @Override
+    public String getTypeString() {
+      return "struct:Transform2d";
+    }
+
+    @Override
+    public int getSize() {
+      return Translation2d.struct.getSize() + Rotation2d.struct.getSize();
+    }
+
+    @Override
+    public String getSchema() {
+      return "Translation2d translation;Rotation2d rotation";
+    }
+
+    @Override
+    public Struct<?>[] getNested() {
+      return new Struct<?>[] {Translation2d.struct, Rotation2d.struct};
+    }
+
+    @Override
+    public Transform2d unpack(ByteBuffer bb) {
+      Translation2d translation = Translation2d.struct.unpack(bb);
+      Rotation2d rotation = Rotation2d.struct.unpack(bb);
+      return new Transform2d(translation, rotation);
+    }
+
+    @Override
+    public void pack(ByteBuffer bb, Transform2d value) {
+      Translation2d.struct.pack(bb, value.m_translation);
+      Rotation2d.struct.pack(bb, value.m_rotation);
+    }
+  }
+
+  public static final AStruct struct = new AStruct();
+
+  public static final class AProto implements Protobuf<Transform2d, ProtobufTransform2d> {
+    @Override
+    public Class<Transform2d> getTypeClass() {
+      return Transform2d.class;
+    }
+
+    @Override
+    public Descriptor getDescriptor() {
+      return ProtobufTransform2d.getDescriptor();
+    }
+
+    @Override
+    public Protobuf<?, ?>[] getNested() {
+      return new Protobuf<?, ?>[] {Translation2d.proto, Rotation2d.proto};
+    }
+
+    @Override
+    public ProtobufTransform2d createMessage() {
+      return ProtobufTransform2d.newInstance();
+    }
+
+    @Override
+    public Transform2d unpack(ProtobufTransform2d msg) {
+      return new Transform2d(
+          Translation2d.proto.unpack(msg.getTranslation()),
+          Rotation2d.proto.unpack(msg.getRotation()));
+    }
+
+    @Override
+    public void pack(ProtobufTransform2d msg, Transform2d value) {
+      Translation2d.proto.pack(msg.getMutableTranslation(), value.m_translation);
+      Rotation2d.proto.pack(msg.getMutableRotation(), value.m_rotation);
+    }
+  }
+
+  public static final AProto proto = new AProto();
 }

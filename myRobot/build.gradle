@@ -31,7 +31,9 @@ ext {
 
 apply from: "${rootDir}/shared/opencv.gradle"
 
-mainClassName = 'frc.robot.Main'
+application {
+    mainClass = 'frc.robot.Main'
+}
 
 apply plugin: 'com.github.johnrengelman.shadow'
 

@@ -9,7 +9,7 @@ package edu.wpi.first.math.interpolation;
  * from points that are defined. This uses linear interpolation.
  */
 public class InterpolatingDoubleTreeMap extends InterpolatingTreeMap<Double, Double> {
-  InterpolatingDoubleTreeMap() {
+  public InterpolatingDoubleTreeMap() {
     super(InverseInterpolator.forDouble(), Interpolator.forDouble());
   }
 }

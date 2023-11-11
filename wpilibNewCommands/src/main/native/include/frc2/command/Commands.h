@@ -6,15 +6,14 @@
 
 #include <concepts>
 #include <functional>
-#include <initializer_list>
 #include <memory>
-#include <span>
 #include <string>
 #include <type_traits>
 #include <utility>
 #include <vector>
 
 #include "frc2/command/CommandPtr.h"
+#include "frc2/command/Requirements.h"
 #include "frc2/command/SelectCommand.h"
 
 namespace frc2 {
@@ -34,10 +33,11 @@ CommandPtr None();
 /**
  * Constructs a command that does nothing until interrupted.
  *
+ * @param requirements Subsystems to require
  * @return the command
  */
 [[nodiscard]]
-CommandPtr Idle();
+CommandPtr Idle(Requirements requirements = {});
 
 // Action Commands
 
@@ -49,17 +49,7 @@ CommandPtr Idle();
  */
 [[nodiscard]]
 CommandPtr RunOnce(std::function<void()> action,
-                   std::initializer_list<Subsystem*> requirements);
-
-/**
- * Constructs a command that runs an action once and finishes.
- *
- * @param action the action to run
- * @param requirements subsystems the action requires
- */
-[[nodiscard]]
-CommandPtr RunOnce(std::function<void()> action,
-                   std::span<Subsystem* const> requirements = {});
+                   Requirements requirements = {});
 
 /**
  * Constructs a command that runs an action every iteration until interrupted.
@@ -68,18 +58,7 @@ CommandPtr RunOnce(std::function<void()> action,
  * @param requirements subsystems the action requires
  */
 [[nodiscard]]
-CommandPtr Run(std::function<void()> action,
-               std::initializer_list<Subsystem*> requirements);
-
-/**
- * Constructs a command that runs an action every iteration until interrupted.
- *
- * @param action the action to run
- * @param requirements subsystems the action requires
- */
-[[nodiscard]]
-CommandPtr Run(std::function<void()> action,
-               std::span<Subsystem* const> requirements = {});
+CommandPtr Run(std::function<void()> action, Requirements requirements = {});
 
 /**
  * Constructs a command that runs an action once and another action when the
@@ -91,19 +70,7 @@ CommandPtr Run(std::function<void()> action,
  */
 [[nodiscard]]
 CommandPtr StartEnd(std::function<void()> start, std::function<void()> end,
-                    std::initializer_list<Subsystem*> requirements);
-
-/**
- * Constructs a command that runs an action once and another action when the
- * command is interrupted.
- *
- * @param start the action to run on start
- * @param end the action to run on interrupt
- * @param requirements subsystems the action requires
- */
-[[nodiscard]]
-CommandPtr StartEnd(std::function<void()> start, std::function<void()> end,
-                    std::span<Subsystem* const> requirements = {});
+                    Requirements requirements = {});
 
 /**
  * Constructs a command that runs an action every iteration until interrupted,
@@ -115,19 +82,7 @@ CommandPtr StartEnd(std::function<void()> start, std::function<void()> end,
  */
 [[nodiscard]]
 CommandPtr RunEnd(std::function<void()> run, std::function<void()> end,
-                  std::initializer_list<Subsystem*> requirements);
-
-/**
- * Constructs a command that runs an action every iteration until interrupted,
- * and then runs a second action.
- *
- * @param run the action to run every iteration
- * @param end the action to run on interrupt
- * @param requirements subsystems the action requires
- */
-[[nodiscard]]
-CommandPtr RunEnd(std::function<void()> run, std::function<void()> end,
-                  std::span<Subsystem* const> requirements = {});
+                  Requirements requirements = {});
 
 /**
  * Constructs a command that prints a message and finishes.
@@ -186,6 +141,36 @@ CommandPtr Select(std::function<Key()> selector,
 
   return SelectCommand(std::move(selector), std::move(vec)).ToPtr();
 }
+
+/**
+ * Runs the command supplied by the supplier.
+ *
+ * @param supplier the command supplier
+ * @param requirements the set of requirements for this command
+ */
+[[nodiscard]]
+CommandPtr Defer(wpi::unique_function<CommandPtr()> supplier,
+                 Requirements requirements);
+
+/**
+ * Constructs a command that schedules the command returned from the supplier
+ * when initialized, and ends when it is no longer scheduled. The supplier is
+ * called when the command is initialized.
+ *
+ * @param supplier the command supplier
+ */
+[[nodiscard]]
+CommandPtr DeferredProxy(wpi::unique_function<Command*()> supplier);
+
+/**
+ * Constructs a command that schedules the command returned from the supplier
+ * when initialized, and ends when it is no longer scheduled. The supplier is
+ * called when the command is initialized.
+ *
+ * @param supplier the command supplier
+ */
+[[nodiscard]]
+CommandPtr DeferredProxy(wpi::unique_function<CommandPtr()> supplier);
 
 // Command Groups
 

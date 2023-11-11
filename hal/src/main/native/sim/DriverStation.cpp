@@ -194,7 +194,7 @@ int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {
 
 HAL_AllianceStationID HAL_GetAllianceStation(int32_t* status) {
   if (gShutdown) {
-    return HAL_AllianceStationID_kRed1;
+    return HAL_AllianceStationID_kUnknown;
   }
   std::scoped_lock lock{driverStation->cacheMutex};
   return currentRead->allianceStation;

@@ -53,8 +53,8 @@ void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
                            units::meters_per_second_t ySpeed,
                            units::radians_per_second_t rot, bool fieldRelative,
                            units::second_t period) {
-  auto states = kDriveKinematics.ToSwerveModuleStates(
-      frc::ChassisSpeeds::FromDiscreteSpeeds(
+  auto states =
+      kDriveKinematics.ToSwerveModuleStates(frc::ChassisSpeeds::Discretize(
           fieldRelative ? frc::ChassisSpeeds::FromFieldRelativeSpeeds(
                               xSpeed, ySpeed, rot, m_gyro.GetRotation2d())
                         : frc::ChassisSpeeds{xSpeed, ySpeed, rot},

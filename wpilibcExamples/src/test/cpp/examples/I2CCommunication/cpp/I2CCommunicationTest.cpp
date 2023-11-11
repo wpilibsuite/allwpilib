@@ -61,7 +61,7 @@ TEST_P(AllianceTest, Alliance) {
 
   frc::sim::StepTiming(20_ms);
 
-  char expected;
+  char expected = 'U';
   switch (alliance) {
     case HAL_AllianceStationID_kBlue1:
     case HAL_AllianceStationID_kBlue2:

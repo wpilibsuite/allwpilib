@@ -138,6 +138,9 @@ class LinearPlantInversionFeedforward {
    * @return The calculated feedforward.
    */
   InputVector Calculate(const StateVector& r, const StateVector& nextR) {
+    // rₖ₊₁ = Arₖ + Buₖ
+    // Buₖ = rₖ₊₁ − Arₖ
+    // uₖ = B⁺(rₖ₊₁ − Arₖ)
     m_uff = m_B.householderQr().solve(nextR - (m_A * r));
     m_r = nextR;
     return m_uff;

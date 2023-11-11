@@ -9,10 +9,15 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.interpolation.Interpolatable;
+import edu.wpi.first.math.proto.Geometry2D.ProtobufPose2d;
+import edu.wpi.first.util.protobuf.Protobuf;
+import edu.wpi.first.util.struct.Struct;
+import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import us.hebi.quickbuf.Descriptors.Descriptor;
 
 /** Represents a 2D pose containing translational and rotational elements. */
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -305,4 +310,83 @@ public class Pose2d implements Interpolatable<Pose2d> {
       return this.exp(scaledTwist);
     }
   }
+
+  public static final class AStruct implements Struct<Pose2d> {
+    @Override
+    public Class<Pose2d> getTypeClass() {
+      return Pose2d.class;
+    }
+
+    @Override
+    public String getTypeString() {
+      return "struct:Pose2d";
+    }
+
+    @Override
+    public int getSize() {
+      return Translation2d.struct.getSize() + Rotation2d.struct.getSize();
+    }
+
+    @Override
+    public String getSchema() {
+      return "Translation2d translation;Rotation2d rotation";
+    }
+
+    @Override
+    public Struct<?>[] getNested() {
+      return new Struct<?>[] {Translation2d.struct, Rotation2d.struct};
+    }
+
+    @Override
+    public Pose2d unpack(ByteBuffer bb) {
+      Translation2d translation = Translation2d.struct.unpack(bb);
+      Rotation2d rotation = Rotation2d.struct.unpack(bb);
+      return new Pose2d(translation, rotation);
+    }
+
+    @Override
+    public void pack(ByteBuffer bb, Pose2d value) {
+      Translation2d.struct.pack(bb, value.m_translation);
+      Rotation2d.struct.pack(bb, value.m_rotation);
+    }
+  }
+
+  public static final AStruct struct = new AStruct();
+
+  public static final class AProto implements Protobuf<Pose2d, ProtobufPose2d> {
+    @Override
+    public Class<Pose2d> getTypeClass() {
+      return Pose2d.class;
+    }
+
+    @Override
+    public Descriptor getDescriptor() {
+      return ProtobufPose2d.getDescriptor();
+    }
+
+    @Override
+    public Protobuf<?, ?>[] getNested() {
+      return new Protobuf<?, ?>[] {Translation2d.proto, Rotation2d.proto};
+    }
+
+    @Override
+    public ProtobufPose2d createMessage() {
+      return ProtobufPose2d.newInstance();
+    }
+
+    @Override
+    public Pose2d unpack(ProtobufPose2d msg) {
+      return new Pose2d(
+          Translation2d.proto.unpack(msg.getTranslation()),
+          Rotation2d.proto.unpack(msg.getRotation()));
+    }
+
+    @Override
+    public void pack(ProtobufPose2d msg, Pose2d value) {
+      Translation2d.proto.pack(msg.getMutableTranslation(), value.m_translation);
+      Rotation2d.proto.pack(msg.getMutableRotation(), value.m_rotation);
+    }
+  }
+
+  public static final AProto proto = new AProto();
 }

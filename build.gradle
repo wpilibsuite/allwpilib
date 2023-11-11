@@ -24,6 +24,7 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '8.1.1' apply false
     id 'com.diffplug.spotless' version '6.20.0' apply false
     id 'com.github.spotbugs' version '5.1.3' apply false
+    id 'com.google.protobuf' version '0.9.3' apply false
 }
 
 wpilibVersioning.buildServerMode = project.hasProperty('buildServer')
@@ -109,8 +110,10 @@ subprojects {
     }
 
     plugins.withType(JavaPlugin) {
-        sourceCompatibility = 11
-        targetCompatibility = 11
+        java {
+            sourceCompatibility = 11
+            targetCompatibility = 11
+        }
     }
 
     apply from: "${rootDir}/shared/java/javastyle.gradle"
@@ -168,5 +171,5 @@ ext.getCurrentArch = {
 }
 
 wrapper {
-    gradleVersion = '8.1'
+    gradleVersion = '8.4'
 }

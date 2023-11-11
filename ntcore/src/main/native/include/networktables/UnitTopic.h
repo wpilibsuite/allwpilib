@@ -10,12 +10,10 @@
 #include <string_view>
 #include <vector>
 
+#include <wpi/json_fwd.h>
+
 #include "networktables/Topic.h"
 #include "ntcore_cpp.h"
-
-namespace wpi {
-class json;
-}  // namespace wpi
 
 namespace nt {
 

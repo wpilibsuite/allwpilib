@@ -34,12 +34,22 @@ if (WITH_JAVA)
   target_link_libraries(wpinetjni PRIVATE wpinet_jni_headers)
   add_dependencies(wpinetjni wpinet_jar)
 
-  if (MSVC)
-    install(TARGETS wpinetjni RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)
-  endif()
+  install(TARGETS wpinetjni EXPORT wpinetjni)
 
-  install(TARGETS wpinetjni EXPORT wpinetjni DESTINATION "${main_lib_dest}")
+endif()
 
+if (WITH_JAVA_SOURCE)
+  find_package(Java REQUIRED)
+  include(UseJava)
+  file(GLOB WPINET_SOURCES src/main/java/edu/wpi/first/net/*.java)
+  add_jar(wpinet_src_jar
+  RESOURCES NAMESPACE "edu/wpi/first/net" ${WPINET_SOURCES}
+  OUTPUT_NAME wpinet-sources)
+
+  get_property(WPINET_SRC_JAR_FILE TARGET wpinet_src_jar PROPERTY JAR_FILE)
+  install(FILES ${WPINET_SRC_JAR_FILE} DESTINATION "${java_lib_dest}")
+
+  set_property(TARGET wpinet_src_jar PROPERTY FOLDER "java")
 endif()
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
@@ -161,11 +171,7 @@ target_include_directories(wpinet PUBLIC
                             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
                             $<INSTALL_INTERFACE:${include_dest}/wpinet>)
 
-install(TARGETS wpinet EXPORT wpinet DESTINATION "${main_lib_dest}")
-
-if (WITH_JAVA AND MSVC)
-    install(TARGETS wpinet RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)
-endif()
+install(TARGETS wpinet EXPORT wpinet)
 
 if (WITH_FLAT_INSTALL)
     set (wpinet_config_dir ${wpilib_dest})
@@ -209,6 +215,6 @@ set_property(TARGET netconsoleTee PROPERTY FOLDER "examples")
 
 if (WITH_TESTS)
     wpilib_add_test(wpinet src/test/native/cpp)
-    target_include_directories(wpinet_test PRIVATE src/test/native/include)
-    target_link_libraries(wpinet_test wpinet ${LIBUTIL} gmock_main)
+    target_include_directories(wpinet_test PRIVATE src/test/native/include src/main/native/cpp)
+    target_link_libraries(wpinet_test wpinet ${LIBUTIL} gmock_main wpiutil_testlib)
 endif()

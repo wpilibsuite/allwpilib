@@ -12,14 +12,19 @@ WPILib is normally built with Gradle, however for some systems, such as Linux ba
 * halsim
 * wpigui
 * wpimath
+* wpilibNewCommands
 
 By default, all libraries except for the HAL and WPILib get built with a default CMake setup. The libraries are built as shared libraries, and include the JNI libraries as well as building the Java JARs.
 
 ## Prerequisites
 
-The most common prerequisite is going to be OpenCV. OpenCV needs to be findable by CMake. On systems like the Jetson, this is installed by default. Otherwise, you will need to build OpenCV from source and install it.
+The jinja2 pip package is needed to generate classes for NT4's pubsub.
 
-In addition, if you want JNI and Java, you will need a JDK of at least version 11 installed. In addition, you need a `JAVA_HOME` environment variable set properly and set to the JDK directory.
+The protobuf library and compiler are needed for protobuf generation. The QuickBuffers protoc-gen package is also required when Java is being built; this can be obtained from https://github.com/HebiRobotics/QuickBuffers/releases/.
+
+OpenCV needs to be findable by CMake. On systems like the Jetson, this is installed by default. Otherwise, you will need to build OpenCV from source and install it.
+
+If you want JNI and Java, you will need a JDK of at least version 11 installed. In addition, you need a `JAVA_HOME` environment variable set properly and set to the JDK directory.
 
 If you are building with unit tests or simulation modules, you will also need an Internet connection for the initial setup process, as CMake will clone google-test and imgui from GitHub.
 
@@ -29,6 +34,8 @@ The following build options are available:
 
 * `WITH_JAVA` (ON Default)
   * This option will enable Java and JNI builds. If this is on, `WITH_SHARED_LIBS` must be on. Otherwise CMake will error.
+* `WITH_JAVA_SOURCE` (ON Default)
+  * This option will build Java source JARs for each enabled Java library. This does not require `WITH_JAVA` to be on, allowing source JARs to be built without the compiled JARs if desired.
 * `WITH_SHARED_LIBS` (ON Default)
   * This option will cause cmake to build static libraries instead of shared libraries. If this is off, `WITH_JAVA` must be off. Otherwise CMake will error.
 * `WITH_CSCORE` (ON Default)

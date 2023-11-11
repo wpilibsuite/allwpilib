@@ -9,6 +9,8 @@
 #include <Eigen/Core>
 #include <wpi/json.h>
 
+#include "geometry3d.pb.h"
+
 using namespace frc;
 
 namespace {
@@ -186,4 +188,24 @@ void frc::to_json(wpi::json& json, const Pose3d& pose) {
 void frc::from_json(const wpi::json& json, Pose3d& pose) {
   pose = Pose3d{json.at("translation").get<Translation3d>(),
                 json.at("rotation").get<Rotation3d>()};
+}
+
+google::protobuf::Message* wpi::Protobuf<frc::Pose3d>::New(
+    google::protobuf::Arena* arena) {
+  return google::protobuf::Arena::CreateMessage<wpi::proto::ProtobufPose3d>(
+      arena);
+}
+
+frc::Pose3d wpi::Protobuf<frc::Pose3d>::Unpack(
+    const google::protobuf::Message& msg) {
+  auto m = static_cast<const wpi::proto::ProtobufPose3d*>(&msg);
+  return Pose3d{wpi::UnpackProtobuf<frc::Translation3d>(m->translation()),
+                wpi::UnpackProtobuf<frc::Rotation3d>(m->rotation())};
+}
+
+void wpi::Protobuf<frc::Pose3d>::Pack(google::protobuf::Message* msg,
+                                      const frc::Pose3d& value) {
+  auto m = static_cast<wpi::proto::ProtobufPose3d*>(msg);
+  wpi::PackProtobuf(m->mutable_translation(), value.Translation());
+  wpi::PackProtobuf(m->mutable_rotation(), value.Rotation());
 }

@@ -10,8 +10,8 @@
 #include <string_view>
 
 #include <gtest/gtest.h>
+#include <wpi/SpanMatcher.h>
 
-#include "../SpanMatcher.h"
 #include "../TestPrinters.h"
 #include "../ValueMatcher.h"
 #include "gmock/gmock.h"

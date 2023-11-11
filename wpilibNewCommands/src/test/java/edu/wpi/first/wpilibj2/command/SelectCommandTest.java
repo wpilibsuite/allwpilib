@@ -13,7 +13,8 @@ import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
-class SelectCommandTest extends CommandTestBase implements MultiCompositionTestBase<SelectCommand> {
+class SelectCommandTest extends CommandTestBase
+    implements MultiCompositionTestBase<SelectCommand<Integer>> {
   @Test
   void selectCommandTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
@@ -25,8 +26,8 @@ class SelectCommandTest extends CommandTestBase implements MultiCompositionTestB
       MockCommandHolder command3Holder = new MockCommandHolder(true);
       Command command3 = command3Holder.getMock();
 
-      SelectCommand selectCommand =
-          new SelectCommand(
+      SelectCommand<String> selectCommand =
+          new SelectCommand<>(
               Map.ofEntries(
                   Map.entry("one", command1),
                   Map.entry("two", command2),
@@ -61,8 +62,8 @@ class SelectCommandTest extends CommandTestBase implements MultiCompositionTestB
       MockCommandHolder command3Holder = new MockCommandHolder(true);
       Command command3 = command3Holder.getMock();
 
-      SelectCommand selectCommand =
-          new SelectCommand(
+      SelectCommand<String> selectCommand =
+          new SelectCommand<>(
               Map.ofEntries(
                   Map.entry("one", command1),
                   Map.entry("two", command2),
@@ -75,10 +76,10 @@ class SelectCommandTest extends CommandTestBase implements MultiCompositionTestB
 
   @Test
   void selectCommandRequirementTest() {
-    Subsystem system1 = new Subsystem() {};
-    Subsystem system2 = new Subsystem() {};
-    Subsystem system3 = new Subsystem() {};
-    Subsystem system4 = new Subsystem() {};
+    Subsystem system1 = new SubsystemBase() {};
+    Subsystem system2 = new SubsystemBase() {};
+    Subsystem system3 = new SubsystemBase() {};
+    Subsystem system4 = new SubsystemBase() {};
 
     try (CommandScheduler scheduler = new CommandScheduler()) {
       MockCommandHolder command1Holder = new MockCommandHolder(true, system1, system2);
@@ -88,8 +89,8 @@ class SelectCommandTest extends CommandTestBase implements MultiCompositionTestB
       MockCommandHolder command3Holder = new MockCommandHolder(true, system3, system4);
       Command command3 = command3Holder.getMock();
 
-      SelectCommand selectCommand =
-          new SelectCommand(
+      SelectCommand<String> selectCommand =
+          new SelectCommand<>(
               Map.ofEntries(
                   Map.entry("one", command1),
                   Map.entry("two", command2),
@@ -108,11 +109,11 @@ class SelectCommandTest extends CommandTestBase implements MultiCompositionTestB
   }
 
   @Override
-  public SelectCommand compose(Command... members) {
-    var map = new HashMap<Object, Command>();
+  public SelectCommand<Integer> compose(Command... members) {
+    var map = new HashMap<Integer, Command>();
     for (int i = 0; i < members.length; i++) {
       map.put(i, members[i]);
     }
-    return new SelectCommand(map, () -> 0);
+    return new SelectCommand<>(map, () -> 0);
   }
 }

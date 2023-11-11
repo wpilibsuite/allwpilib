@@ -2,6 +2,11 @@
   "name": "main",
   "version-string": "latest",
   "dependencies": [
-    "opencv"
-  ]
+    "opencv",
+    "eigen3",
+    "fmt",
+    "libuv",
+    "protobuf"
+  ],
+  "builtin-baseline": "78b61582c9e093fda56a01ebb654be15a0033897"
 }

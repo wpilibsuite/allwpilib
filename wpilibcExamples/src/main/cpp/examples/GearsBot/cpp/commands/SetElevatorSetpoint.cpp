@@ -11,7 +11,7 @@
 SetElevatorSetpoint::SetElevatorSetpoint(double setpoint, Elevator& elevator)
     : m_setpoint(setpoint), m_elevator(&elevator) {
   SetName("SetElevatorSetpoint");
-  AddRequirements({m_elevator});
+  AddRequirements(m_elevator);
 }
 
 // Called just before this Command runs the first time

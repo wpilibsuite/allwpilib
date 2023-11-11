@@ -33,7 +33,7 @@ target_link_libraries(ntcore PUBLIC wpinet wpiutil)
 
 set_property(TARGET ntcore PROPERTY FOLDER "libraries")
 
-install(TARGETS ntcore EXPORT ntcore DESTINATION "${main_lib_dest}")
+install(TARGETS ntcore EXPORT ntcore)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/ntcore")
 install(DIRECTORY ${WPILIB_BINARY_DIR}/ntcore/generated/main/native/include/ DESTINATION "${include_dest}/ntcore")
 
@@ -53,6 +53,11 @@ if (WITH_JAVA)
     find_package(JNI REQUIRED)
     include(UseJava)
     set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
+
+    file(GLOB QUICKBUF_JAR
+        ${WPILIB_BINARY_DIR}/wpiutil/thirdparty/quickbuf/*.jar)
+
+    set(CMAKE_JAVA_INCLUDE_PATH wpimath.jar ${QUICKBUF_JAR})
 
     file(GLOB ntcore_jni_src
         src/main/native/cpp/jni/*.cpp
@@ -81,15 +86,30 @@ if (WITH_JAVA)
     target_link_libraries(ntcorejni PRIVATE ntcore_jni_headers)
     add_dependencies(ntcorejni ntcore_jar)
 
-    install(TARGETS ntcorejni EXPORT ntcorejni DESTINATION "${main_lib_dest}")
+    install(TARGETS ntcorejni EXPORT ntcorejni)
 
 endif()
 
+if (WITH_JAVA_SOURCE)
+    find_package(Java REQUIRED)
+    include(UseJava)
+    file(GLOB NTCORE_SOURCES src/main/java/edu/wpi/first/networktables/*.java ${WPILIB_BINARY_DIR}/ntcore/generated/*.java)
+    add_jar(ntcore_src_jar
+    RESOURCES NAMESPACE "edu/wpi/first/networktables" ${NTCORE_SOURCES}
+    OUTPUT_NAME ntcore-sources)
+
+    get_property(NTCORE_SRC_JAR_FILE TARGET ntcore_src_jar PROPERTY JAR_FILE)
+    install(FILES ${NTCORE_SRC_JAR_FILE} DESTINATION "${java_lib_dest}")
+
+    set_property(TARGET ntcore_src_jar PROPERTY FOLDER "java")
+endif()
+
 add_executable(ntcoredev src/dev/native/cpp/main.cpp)
+wpilib_target_warnings(ntcoredev)
 target_link_libraries(ntcoredev ntcore)
 
 if (WITH_TESTS)
     wpilib_add_test(ntcore src/test/native/cpp)
     target_include_directories(ntcore_test PRIVATE src/main/native/cpp)
-    target_link_libraries(ntcore_test ntcore gmock_main)
+    target_link_libraries(ntcore_test ntcore gmock_main wpiutil_testlib)
 endif()

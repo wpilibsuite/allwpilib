@@ -2,18 +2,48 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <cmath>
+
 #include <gtest/gtest.h>
 
 #include "frc/kinematics/ChassisSpeeds.h"
 
 static constexpr double kEpsilon = 1E-9;
 
-TEST(ChassisSpeedsTest, FieldRelativeConstruction) {
+TEST(ChassisSpeedsTest, Discretize) {
+  constexpr frc::ChassisSpeeds target{1_mps, 0_mps, 0.5_rad_per_s};
+  constexpr units::second_t duration = 1_s;
+  constexpr units::second_t dt = 10_ms;
+
+  const auto speeds = frc::ChassisSpeeds::Discretize(target, duration);
+  const frc::Twist2d twist{speeds.vx * dt, speeds.vy * dt, speeds.omega * dt};
+
+  frc::Pose2d pose;
+  for (units::second_t time = 0_s; time < duration; time += dt) {
+    pose = pose.Exp(twist);
+  }
+
+  EXPECT_NEAR((target.vx * duration).value(), pose.X().value(), kEpsilon);
+  EXPECT_NEAR((target.vy * duration).value(), pose.Y().value(), kEpsilon);
+  EXPECT_NEAR((target.omega * duration).value(),
+              pose.Rotation().Radians().value(), kEpsilon);
+}
+
+TEST(ChassisSpeedsTest, FromFieldRelativeSpeeds) {
   const auto chassisSpeeds = frc::ChassisSpeeds::FromFieldRelativeSpeeds(
       1.0_mps, 0.0_mps, 0.5_rad_per_s, -90.0_deg);
 
   EXPECT_NEAR(0.0, chassisSpeeds.vx.value(), kEpsilon);
   EXPECT_NEAR(1.0, chassisSpeeds.vy.value(), kEpsilon);
+  EXPECT_NEAR(0.5, chassisSpeeds.omega.value(), kEpsilon);
+}
+
+TEST(ChassisSpeedsTest, FromRobotRelativeSpeeds) {
+  const auto chassisSpeeds = frc::ChassisSpeeds::FromRobotRelativeSpeeds(
+      1.0_mps, 0.0_mps, 0.5_rad_per_s, 45.0_deg);
+
+  EXPECT_NEAR(1.0 / std::sqrt(2.0), chassisSpeeds.vx.value(), kEpsilon);
+  EXPECT_NEAR(1.0 / std::sqrt(2.0), chassisSpeeds.vy.value(), kEpsilon);
   EXPECT_NEAR(0.5, chassisSpeeds.omega.value(), kEpsilon);
 }
 

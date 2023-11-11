@@ -30,12 +30,12 @@ public class Velocity<D extends Unit<D>> extends Unit<Velocity<D>> {
    * the pre-existing units instead of generating new identical ones.
    *
    * <pre>
-   *   Velocity.combine(Kilograms, Second) // => mass flow
-   *   Velocity.combine(Feet, Millisecond) // => linear speed
-   *   Velocity.combine(Radians, Second) // => angular speed
+   *   Velocity.combine(Kilograms, Second) // mass flow
+   *   Velocity.combine(Feet, Millisecond) // linear speed
+   *   Velocity.combine(Radians, Second) // angular speed
    *
-   *   Velocity.combine(Feet.per(Second), Second) // => linear acceleration in ft/s/s
-   *   Velocity.combine(Radians.per(Second), Second) // => angular acceleration
+   *   Velocity.combine(Feet.per(Second), Second) // linear acceleration in ft/s/s
+   *   Velocity.combine(Radians.per(Second), Second) // angular acceleration
    * </pre>
    *
    * <p>It's recommended to use the convenience function {@link Unit#per(Time)} instead of calling
@@ -70,12 +70,12 @@ public class Velocity<D extends Unit<D>> extends Unit<Velocity<D>> {
    * <p>This method automatically generates a new name and symbol for the new velocity unit.
    *
    * <pre>
-   *   Velocity.combine(Kilograms, Second) // => mass flow
-   *   Velocity.combine(Feet, Millisecond) // => linear speed
-   *   Velocity.combine(Radians, Second) // => angular speed
+   *   Velocity.combine(Kilograms, Second) // mass flow
+   *   Velocity.combine(Feet, Millisecond) // linear speed
+   *   Velocity.combine(Radians, Second) // angular speed
    *
-   *   Velocity.combine(Feet.per(Second), Second) // => linear acceleration in ft/s/s
-   *   Velocity.combine(Radians.per(Second), Second) // => angular acceleration
+   *   Velocity.combine(Feet.per(Second), Second) // linear acceleration in ft/s/s
+   *   Velocity.combine(Radians.per(Second), Second) // angular acceleration
    * </pre>
    *
    * <p>It's recommended to use the convenience function {@link Unit#per(Time)} instead of calling

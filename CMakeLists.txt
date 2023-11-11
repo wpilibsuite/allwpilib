@@ -16,7 +16,9 @@ project(allwpilib)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 
 # Make timestamps of extracted files from FetchContent the time of extraction
-cmake_policy(SET CMP0135 NEW)
+if (POLICY CMP0135)
+    cmake_policy(SET CMP0135 NEW)
+endif()
 
 message(STATUS "Platform version: ${CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION}")
 
@@ -53,7 +55,8 @@ ENDIF("${isSystemDir}" STREQUAL "-1")
 
 # Options for building certain parts of the repo. Everything is built by default.
 option(BUILD_SHARED_LIBS "Build with shared libs (needed for JNI)" ON)
-option(WITH_JAVA "Include java and JNI in the build" ON)
+option(WITH_JAVA "Include Java and JNI in the build" ON)
+option(WITH_JAVA_SOURCE "Build Java source jars" ON)
 option(WITH_CSCORE "Build cscore (needs OpenCV)" ON)
 option(WITH_NTCORE "Build ntcore" ON)
 option(WITH_WPIMATH "Build wpimath" ON)
@@ -153,7 +156,6 @@ endif()
 
 set( wpilib_dest "")
 set( include_dest include )
-set( main_lib_dest lib )
 set( java_lib_dest java )
 set( jni_lib_dest jni )
 
@@ -174,6 +176,12 @@ set (EIGEN_SYSTEM_REPLACE "find_package(Eigen3 CONFIG)")
 endif()
 
 find_package(LIBSSH 0.7.1)
+
+find_package(Protobuf REQUIRED)
+find_program(Quickbuf_EXECUTABLE
+    NAMES protoc-gen-quickbuf
+    DOC "The Quickbuf protoc plugin"
+)
 
 if (WITH_FLAT_INSTALL)
 set(WPIUTIL_DEP_REPLACE "include($\{SELF_DIR\}/wpiutil-config.cmake)")
@@ -292,6 +300,7 @@ if (WITH_GUI)
     add_subdirectory(wpigui)
     add_subdirectory(glass)
     add_subdirectory(outlineviewer)
+    add_subdirectory(sysid)
     if (LIBSSH_FOUND)
         add_subdirectory(roborioteamnumbersetter)
         add_subdirectory(datalogtool)
@@ -316,6 +325,8 @@ if (WITH_WPILIB)
     add_subdirectory(wpilibj)
     add_subdirectory(wpilibc)
     add_subdirectory(wpilibNewCommands)
+    add_subdirectory(romiVendordep)
+    add_subdirectory(xrpVendordep)
     if (WITH_EXAMPLES)
         add_subdirectory(wpilibcExamples)
     endif()
