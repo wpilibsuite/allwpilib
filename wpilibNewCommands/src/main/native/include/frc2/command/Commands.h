@@ -204,6 +204,11 @@ std::vector<CommandPtr> MakeVector(Args&&... args) {
 
 }  // namespace impl
 
+/**
+ * Maps a vector of commands by proxying every element.
+ * 
+ * @param commands a vector of commands
+ */
 [[nodiscard]]
 std::vector<CommandPtr> ProxyAll(std::vector<CommandPtr>&& commands);
 

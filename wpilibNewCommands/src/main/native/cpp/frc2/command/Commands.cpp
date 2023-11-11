@@ -108,7 +108,7 @@ std::vector<CommandPtr> cmd::ProxyAll(std::vector<CommandPtr>&& commands) {
   return out.ToPtr();
 }
 
-CommandPtr cmd::Sequence(bool requireUnion = false, std::vector<CommandPtr>&& commands) {
+CommandPtr cmd::Sequence(std::vector<CommandPtr>&& commands) {
   return SequentialCommandGroup(CommandPtr::UnwrapVector(std::move(commands)))
       .ToPtr();
 }
