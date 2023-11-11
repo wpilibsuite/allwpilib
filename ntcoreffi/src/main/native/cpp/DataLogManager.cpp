@@ -482,7 +482,7 @@ void DataLogManager::Start(std::string_view dir, std::string_view filename,
 void DataLogManager::Stop() {
   auto& inst = GetInstance();
   inst.owner.GetThread()->m_log.Stop();
-  inst.owner.Stop();
+  inst.owner.Join();
 }
 
 void DataLogManager::Log(std::string_view message) {
