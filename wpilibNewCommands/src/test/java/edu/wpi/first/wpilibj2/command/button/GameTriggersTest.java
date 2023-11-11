@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj2.command.CommandTestBase;
 import org.junit.jupiter.api.Test;
 
 class GameTriggersTest extends CommandTestBase {
-
   @Test
   void autonomousTest() {
     Trigger auto = GameTriggers.autonomous();
