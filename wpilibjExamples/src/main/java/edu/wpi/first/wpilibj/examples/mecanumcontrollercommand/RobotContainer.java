@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.DriveCo
 import edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.OIConstants;
 import edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.subsystems.DriveSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.MecanumControllerCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -123,8 +124,8 @@ public class RobotContainer {
 
     // Reset odometry to the initial pose of the trajectory, Run path following command, then stop
     // at the end.
-    return mecanumControllerCommand
-        .andThen(() -> m_robotDrive.drive(0, 0, 0, false))
-        .beforeStarting(() -> m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose()));
+    return Commands.runOnce(() -> m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose()))
+        .andThen(mecanumControllerCommand)
+        .andThen(Commands.run(() -> m_robotDrive.drive(0, 0, 0, false)));
   }
 }

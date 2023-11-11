@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.DriveConstants;
 import edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.OIConstants;
 import edu.wpi.first.wpilibj.examples.ramsetecommand.subsystems.DriveSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -129,8 +130,8 @@ public class RobotContainer {
 
     // Reset odometry to the initial pose of the trajectory, Run path following command, then stop
     // at the end.
-    return ramseteCommand
-        .andThen(() -> m_robotDrive.tankDriveVolts(0, 0))
-        .beforeStarting(() -> m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose()));
+    return Commands.runOnce(() -> m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose()))
+        .andThen(ramseteCommand)
+        .andThen(Commands.run(() -> m_robotDrive.tankDriveVolts(0, 0)));
   }
 }
