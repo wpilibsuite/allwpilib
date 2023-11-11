@@ -190,9 +190,19 @@ std::vector<CommandPtr> MakeVector(Args&&... args) {
 }  // namespace impl
 
 /**
- * Maps a vector of commands by proxying every element.
- * 
- * @param commands a vector of commands
+ * @brief Maps a vector of commands by proxying every element using `Command::asProxy()`.
+ *
+ * This is useful to ensure that default commands of subsystems within a command group are
+ * still triggered despite command groups requiring the union of their members' requirements.
+ *
+ * Example usage for creating an auto for a robot that has a drivetrain and arm:
+ *
+ * @code{.cpp}
+ * auto autoCommand = sequence(proxyAll(drive.move(), arm.score()));
+ * @endcode
+ *
+ * @param commands a vector of commands.
+ * @return an array of proxied commands.
  */
 [[nodiscard]]
 std::vector<CommandPtr> ProxyAll(std::vector<CommandPtr>&& commands);
