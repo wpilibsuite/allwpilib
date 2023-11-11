@@ -9,17 +9,17 @@
 using namespace frc2;
 
 Trigger GameTriggers::Autonomous() {
-    return Trigger{&frc::DriverStation::IsAutonomousEnabled};
+  return Trigger{&frc::DriverStation::IsAutonomousEnabled};
 }
 
 Trigger GameTriggers::Teleop() {
-    return Trigger{&frc::DriverStation::IsTeleopEnabled};
+  return Trigger{&frc::DriverStation::IsTeleopEnabled};
 }
 
 Trigger GameTriggers::Disabled() {
-    return Trigger{&frc::DriverStation::IsDisabled};
+  return Trigger{&frc::DriverStation::IsDisabled};
 }
 
 Trigger GameTriggers::Test() {
-    return Trigger{&frc::DriverStation::IsTestEnabled};
+  return Trigger{&frc::DriverStation::IsTestEnabled};
 }

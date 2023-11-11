@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj.DriverStation;
  * changes.
  */
 public class GameTriggers {
-
   // Utility class
   private GameTriggers() {}
 
