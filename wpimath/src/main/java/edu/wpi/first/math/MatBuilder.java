@@ -21,6 +21,8 @@ public class MatBuilder<R extends Num, C extends Num> {
    * @param rows The number of rows of the matrix.
    * @param cols The number of columns of the matrix.
    * @param data The data to fill the matrix with.
+   * @param <R> The number of rows of the matrix.
+   * @param <C> The number of columns of the matrix.
    * @return The constructed matrix.
    */
   public static final <R extends Num, C extends Num> Matrix<R, C> fill(

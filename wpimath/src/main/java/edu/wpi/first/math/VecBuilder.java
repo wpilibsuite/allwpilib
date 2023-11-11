@@ -17,11 +17,7 @@ import edu.wpi.first.math.numbers.N9;
 import java.util.Objects;
 import org.ejml.simple.SimpleMatrix;
 
-/**
- * A specialization of {@link MatBuilder} for constructing vectors (Nx1 matrices).
- *
- * @param <N> The dimension of the vector to be constructed.
- */
+/** A specialization of {@link MatBuilder} for constructing vectors (Nx1 matrices). */
 public final class VecBuilder {
   private VecBuilder() {
     throw new UnsupportedOperationException("this is a utility class!");
