@@ -6,19 +6,18 @@ package edu.wpi.first.wpilibj2.command.button;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.jupiter.api.Test;
-
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj2.command.CommandTestBase;
+import org.junit.jupiter.api.Test;
 
 class GameTriggersTest extends CommandTestBase {
-    
-    @Test
-    void autonomousTest() {
-        Trigger auto = GameTriggers.autonomous();
-        DriverStationSim.setAutonomous(true);
-        DriverStation.refreshData();
-        assertTrue(auto.getAsBoolean());
-    }
+
+  @Test
+  void autonomousTest() {
+    Trigger auto = GameTriggers.autonomous();
+    DriverStationSim.setAutonomous(true);
+    DriverStation.refreshData();
+    assertTrue(auto.getAsBoolean());
+  }
 }
