@@ -89,10 +89,9 @@ CommandPtr cmd::Defer(wpi::unique_function<CommandPtr()> supplier,
 }
 
 std::vector<CommandPtr> cmd::ProxyAll(std::vector<CommandPtr>&& commands) {
-  auto unwrapped = CommandPtr::UnwrapVector(std::move(commands));
-  std::vector<std::unique_ptr<frc2::Command>> out(commands.size());
-  std::transform(unwrapped.begin(), unwrapped.end(), out, Command::AsProxy);
-  return out.ToPtr();
+  std::vector<CommandPtr> out(commands.size());
+  std::transform(commands.begin(), commands.end(), out.begin(), &Command::AsProxy);
+  return out;
 }
 
 CommandPtr cmd::Sequence(std::vector<CommandPtr>&& commands) {
