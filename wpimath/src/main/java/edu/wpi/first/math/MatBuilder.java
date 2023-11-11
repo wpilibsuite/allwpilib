@@ -14,6 +14,30 @@ import org.ejml.simple.SimpleMatrix;
  * @param <C> The number of columns of the desired matrix.
  */
 public class MatBuilder<R extends Num, C extends Num> {
+  /**
+   * Fills the matrix with the given data, encoded in row major form. (The matrix is filled row by
+   * row, left to right with the given data).
+   *
+   * @param rows The number of rows of the matrix.
+   * @param cols The number of columns of the matrix.
+   * @param data The data to fill the matrix with.
+   * @return The constructed matrix.
+   */
+  public static final <R extends Num, C extends Num> Matrix<R, C> fill(
+      Nat<R> rows, Nat<C> cols, double... data) {
+    if (Objects.requireNonNull(data).length != rows.getNum() * cols.getNum()) {
+      throw new IllegalArgumentException(
+          "Invalid matrix data provided. Wanted "
+              + rows.getNum()
+              + " x "
+              + cols.getNum()
+              + " matrix, but got "
+              + data.length
+              + " elements");
+    }
+    return new Matrix<>(new SimpleMatrix(rows.getNum(), cols.getNum(), true, data));
+  }
+
   protected final Nat<R> m_rows;
   protected final Nat<C> m_cols;
 
@@ -36,16 +60,6 @@ public class MatBuilder<R extends Num, C extends Num> {
    * @return The constructed matrix.
    */
   public final Matrix<R, C> fill(double... data) {
-    if (Objects.requireNonNull(data).length != this.m_rows.getNum() * this.m_cols.getNum()) {
-      throw new IllegalArgumentException(
-          "Invalid matrix data provided. Wanted "
-              + this.m_rows.getNum()
-              + " x "
-              + this.m_cols.getNum()
-              + " matrix, but got "
-              + data.length
-              + " elements");
-    }
-    return new Matrix<>(new SimpleMatrix(this.m_rows.getNum(), this.m_cols.getNum(), true, data));
+    return fill(m_rows, m_cols, data);
   }
 }

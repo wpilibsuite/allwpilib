@@ -22,22 +22,16 @@ import org.ejml.simple.SimpleMatrix;
  *
  * @param <N> The dimension of the vector to be constructed.
  */
-public class VecBuilder<N extends Num> extends MatBuilder<N, N1> {
-  public VecBuilder(Nat<N> rows) {
-    super(rows, Nat.N1());
+public final class VecBuilder {
+  private VecBuilder() {
+    throw new UnsupportedOperationException("this is a utility class!");
   }
 
-  /**
-   * Fills the vector with the given data.
-   *
-   * @param data The data to fill the vector with.
-   * @return The constructed vector.
-   */
-  public final Vector<N> fillVec(double... data) {
-    if (Objects.requireNonNull(data).length != this.m_rows.getNum()) {
+  private static <N extends Num> Vector<N> fillVec(Nat<N> rows, double... data) {
+    if (Objects.requireNonNull(data).length != rows.getNum()) {
       throw new IllegalArgumentException(
           "Invalid vector data provided. Wanted "
-              + this.m_rows.getNum()
+              + rows.getNum()
               + " vector, but got "
               + data.length
               + " elements");
@@ -52,7 +46,7 @@ public class VecBuilder<N extends Num> extends MatBuilder<N, N1> {
    * @return 1x1 vector
    */
   public static Vector<N1> fill(double n1) {
-    return new VecBuilder<>(Nat.N1()).fillVec(n1);
+    return fillVec(Nat.N1(), n1);
   }
 
   /**
@@ -63,7 +57,7 @@ public class VecBuilder<N extends Num> extends MatBuilder<N, N1> {
    * @return 2x1 vector
    */
   public static Vector<N2> fill(double n1, double n2) {
-    return new VecBuilder<>(Nat.N2()).fillVec(n1, n2);
+    return fillVec(Nat.N2(), n1, n2);
   }
 
   /**
@@ -75,7 +69,7 @@ public class VecBuilder<N extends Num> extends MatBuilder<N, N1> {
    * @return 3x1 vector
    */
   public static Vector<N3> fill(double n1, double n2, double n3) {
-    return new VecBuilder<>(Nat.N3()).fillVec(n1, n2, n3);
+    return fillVec(Nat.N3(), n1, n2, n3);
   }
 
   /**
@@ -88,7 +82,7 @@ public class VecBuilder<N extends Num> extends MatBuilder<N, N1> {
    * @return 4x1 vector
    */
   public static Vector<N4> fill(double n1, double n2, double n3, double n4) {
-    return new VecBuilder<>(Nat.N4()).fillVec(n1, n2, n3, n4);
+    return fillVec(Nat.N4(), n1, n2, n3, n4);
   }
 
   /**
@@ -102,7 +96,7 @@ public class VecBuilder<N extends Num> extends MatBuilder<N, N1> {
    * @return 5x1 vector
    */
   public static Vector<N5> fill(double n1, double n2, double n3, double n4, double n5) {
-    return new VecBuilder<>(Nat.N5()).fillVec(n1, n2, n3, n4, n5);
+    return fillVec(Nat.N5(), n1, n2, n3, n4, n5);
   }
 
   /**
@@ -117,7 +111,7 @@ public class VecBuilder<N extends Num> extends MatBuilder<N, N1> {
    * @return 6x1 vector
    */
   public static Vector<N6> fill(double n1, double n2, double n3, double n4, double n5, double n6) {
-    return new VecBuilder<>(Nat.N6()).fillVec(n1, n2, n3, n4, n5, n6);
+    return fillVec(Nat.N6(), n1, n2, n3, n4, n5, n6);
   }
 
   /**
@@ -134,7 +128,7 @@ public class VecBuilder<N extends Num> extends MatBuilder<N, N1> {
    */
   public static Vector<N7> fill(
       double n1, double n2, double n3, double n4, double n5, double n6, double n7) {
-    return new VecBuilder<>(Nat.N7()).fillVec(n1, n2, n3, n4, n5, n6, n7);
+    return fillVec(Nat.N7(), n1, n2, n3, n4, n5, n6, n7);
   }
 
   /**
@@ -152,7 +146,7 @@ public class VecBuilder<N extends Num> extends MatBuilder<N, N1> {
    */
   public static Vector<N8> fill(
       double n1, double n2, double n3, double n4, double n5, double n6, double n7, double n8) {
-    return new VecBuilder<>(Nat.N8()).fillVec(n1, n2, n3, n4, n5, n6, n7, n8);
+    return fillVec(Nat.N8(), n1, n2, n3, n4, n5, n6, n7, n8);
   }
 
   /**
@@ -179,7 +173,7 @@ public class VecBuilder<N extends Num> extends MatBuilder<N, N1> {
       double n7,
       double n8,
       double n9) {
-    return new VecBuilder<>(Nat.N9()).fillVec(n1, n2, n3, n4, n5, n6, n7, n8, n9);
+    return fillVec(Nat.N9(), n1, n2, n3, n4, n5, n6, n7, n8, n9);
   }
 
   /**
@@ -208,6 +202,6 @@ public class VecBuilder<N extends Num> extends MatBuilder<N, N1> {
       double n8,
       double n9,
       double n10) {
-    return new VecBuilder<>(Nat.N10()).fillVec(n1, n2, n3, n4, n5, n6, n7, n8, n9, n10);
+    return fillVec(Nat.N10(), n1, n2, n3, n4, n5, n6, n7, n8, n9, n10);
   }
 }
