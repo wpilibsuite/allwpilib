@@ -3,10 +3,11 @@ package edu.wpi.first.wpilibj2.command.button;
 import edu.wpi.first.wpilibj.DriverStation;
 
 /**
- * A class containing static {@link Trigger} factories for running callbacks when the robot mode changes.
+ * A class containing static {@link Trigger} factories for running callbacks when the robot mode
+ * changes.
  */
 public class GameTriggers {
-  // TODO: Add documentation
+
   // Utility class
   private GameTriggers() {}
 
