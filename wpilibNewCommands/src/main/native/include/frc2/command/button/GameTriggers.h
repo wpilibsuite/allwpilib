@@ -15,7 +15,7 @@ namespace frc2 {
 class GameTriggers {
  public:
   GameTriggers() = delete;
-  
+
   /**
    * Returns a trigger that is true when the robot is enabled in autonomous
    * mode.
