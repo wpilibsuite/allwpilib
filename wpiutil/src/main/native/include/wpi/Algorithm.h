@@ -17,24 +17,6 @@ typename std::vector<T>::iterator insert_sorted(std::vector<T>& vec,
   return vec.insert(std::upper_bound(vec.begin(), vec.end(), item), item);
 }
 
-namespace detail {
-
-/**
- * Calls f(i, elem) for each element of elems where i is the index and elem is
- * the element.
- *
- * @tparam Is Parameter pack of index sequence for Ts.
- * @tparam Ts Parameter pack of element types.
- * @param f The callback.
- * @param elems The elements.
- */
-template <size_t... Is, typename F, typename... Ts>
-constexpr void for_each(std::index_sequence<Is...>, F&& f, Ts&&... elems) {
-  (f(Is, elems), ...);
-}
-
-}  // namespace detail
-
 /**
  * Calls f(i, elem) for each element of elems where i is the index and elem is
  * the element.
@@ -44,8 +26,9 @@ constexpr void for_each(std::index_sequence<Is...>, F&& f, Ts&&... elems) {
  */
 template <typename F, typename... Ts>
 constexpr void for_each(F&& f, Ts&&... elems) {
-  detail::for_each(std::index_sequence_for<Ts...>{}, std::forward<F>(f),
-                   std::forward<Ts>(elems)...);
+  [&]<size_t... Is>(std::index_sequence<Is...>) {
+    (f(Is, elems), ...);
+  }(std::index_sequence_for<Ts...>{});
 }
 
 }  // namespace wpi
