@@ -89,8 +89,10 @@ CommandPtr cmd::Defer(wpi::unique_function<CommandPtr()> supplier,
 }
 
 std::vector<CommandPtr> cmd::ProxyAll(std::vector<CommandPtr>&& commands) {
-  std::vector<CommandPtr> out(commands.size());
-  std::transform(commands.begin(), commands.end(), out.begin(), &Command::AsProxy);
+  std::vector<CommandPtr> out;
+  for (auto&& ptr : commands) {
+    out.emplace_back(std::move(ptr).AsProxy());
+  }
   return out;
 }
 

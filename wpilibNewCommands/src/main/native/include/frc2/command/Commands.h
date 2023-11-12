@@ -190,10 +190,24 @@ std::vector<CommandPtr> MakeVector(Args&&... args) {
 }  // namespace impl
 
 /**
- * @brief Maps a vector of commands by proxying every element using `Command::asProxy()`.
+ * @brief Maps a vector of commands by proxying every element.
  *
- * This is useful to ensure that default commands of subsystems within a command group are
- * still triggered despite command groups requiring the union of their members' requirements.
+ * This is useful to ensure that default commands of subsystems within a command
+ * group are still triggered despite command groups requiring the union of their
+ * members' requirements.
+ *
+ * @param commands a vector of command pointers.
+ * @return an array of proxied command pointers.
+ */
+[[nodiscard]]
+std::vector<CommandPtr> ProxyAll(std::vector<CommandPtr>&& commands);
+
+/**
+ * @brief Maps a vector of commands by proxying every element.
+ *
+ * This is useful to ensure that default commands of subsystems within a command
+ * group are still triggered despite command groups requiring the union of their
+ * members' requirements.
  *
  * Example usage for creating an auto for a robot that has a drivetrain and arm:
  *
@@ -201,11 +215,14 @@ std::vector<CommandPtr> MakeVector(Args&&... args) {
  * auto autoCommand = sequence(proxyAll(drive.move(), arm.score()));
  * @endcode
  *
- * @param commands a vector of commands.
- * @return an array of proxied commands.
+ * @param commands a variable number of command pointers.
+ * @return an array of proxied command pointers.
  */
+template <std::convertible_to<CommandPtr>... CommandPtrs>
 [[nodiscard]]
-std::vector<CommandPtr> ProxyAll(std::vector<CommandPtr>&& commands);
+std::vector<CommandPtr> ProxyAll(CommandPtrs&&... commands) {
+  return ProxyAll(impl::MakeVector(std::forward<CommandPtrs>(commands)...));
+}
 
 /**
  * Runs a group of commands in series, one after the other.
