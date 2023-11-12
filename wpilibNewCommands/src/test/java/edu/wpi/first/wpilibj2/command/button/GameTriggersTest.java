@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 
 class GameTriggersTest extends CommandTestBase {
   @Test
-  void autonomous() {
+  void autonomousTest() {
     DriverStationSim.resetData();
     DriverStationSim.setAutonomous(true);
     DriverStationSim.setTest(false);
@@ -24,7 +24,7 @@ class GameTriggersTest extends CommandTestBase {
   }
 
   @Test
-  void teleop() {
+  void teleopTest() {
     DriverStationSim.resetData();
     DriverStationSim.setAutonomous(false);
     DriverStationSim.setTest(false);
@@ -35,7 +35,7 @@ class GameTriggersTest extends CommandTestBase {
   }
 
   @Test
-  void testMode() {
+  void testModeTest() {
     DriverStationSim.resetData();
     DriverStationSim.setAutonomous(false);
     DriverStationSim.setTest(true);
@@ -46,7 +46,7 @@ class GameTriggersTest extends CommandTestBase {
   }
 
   @Test
-  void disabled() {
+  void disabledTest() {
     DriverStationSim.resetData();
     DriverStationSim.setAutonomous(false);
     DriverStationSim.setTest(false);
