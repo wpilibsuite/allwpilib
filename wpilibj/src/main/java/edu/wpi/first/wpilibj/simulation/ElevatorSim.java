@@ -59,7 +59,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
     m_minHeight = minHeightMeters;
     m_maxHeight = maxHeightMeters;
     m_simulateGravity = simulateGravity;
-    m_effectiveGravity = kG / plant.getB().get(1, 0);
+    m_effectiveGravity = kG * plant.getB().get(1, 0);
 
     setState(startingHeightMeters, 0);
   }
