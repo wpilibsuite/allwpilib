@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package wpi.proto;
+
+import "geometry3d.proto";
+
+option java_package = "edu.wpi.first.apriltag.proto";
+
+
+message ProtobufAprilTag {
+  int32 ID = 1;
+  wpi.proto.ProtobufPose3d pose = 2;
+}
+
+message ProtobufFieldDimensions {
+  double length = 1;
+  double width = 2;
+}
+
+message ProtobufAprilTagFieldLayout {
+  wpi.proto.ProtobufPose3d origin = 1;
+  repeated ProtobufAprilTag apriltags = 2;
+  ProtobufFieldDimensions fieldDimensions = 3;
+}

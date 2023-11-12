@@ -6,8 +6,11 @@ package edu.wpi.first.apriltag;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import edu.wpi.first.apriltag.proto.Apriltag.ProtobufAprilTag;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.util.protobuf.Protobuf;
 import java.util.Objects;
+import us.hebi.quickbuf.Descriptors.Descriptor;
 
 @SuppressWarnings("MemberName")
 public class AprilTag {
@@ -44,4 +47,34 @@ public class AprilTag {
   public String toString() {
     return "AprilTag(ID: " + ID + ", pose: " + pose + ")";
   }
+
+  public static final class AProto implements Protobuf<AprilTag, ProtobufAprilTag> {
+    @Override
+    public Class<AprilTag> getTypeClass() {
+      return AprilTag.class;
+    }
+
+    @Override
+    public Descriptor getDescriptor() {
+      return ProtobufAprilTag.getDescriptor();
+    }
+
+    @Override
+    public ProtobufAprilTag createMessage() {
+      return ProtobufAprilTag.newInstance();
+    }
+
+    @Override
+    public AprilTag unpack(ProtobufAprilTag msg) {
+      return new AprilTag(msg.getID(), Pose3d.proto.unpack(msg.getPose()));
+    }
+
+    @Override
+    public void pack(ProtobufAprilTag msg, AprilTag value) {
+      msg.setID(value.ID);
+      Pose3d.proto.pack(msg.getMutablePose(), value.pose);
+    }
+  }
+
+  public static final AProto proto = new AProto();
 }
