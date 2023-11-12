@@ -19,8 +19,8 @@ typename std::vector<T>::iterator insert_sorted(std::vector<T>& vec,
 }
 
 /**
- * Calls f(i, elem) for each element of elems where i is the index and elem is
- * the element.
+ * Calls f(i, elem) for each element of elems where i is the index of the
+ * element in elems and elem is the element.
  *
  * @param f The callback.
  * @param elems The elements.
