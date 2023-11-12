@@ -9,38 +9,16 @@
 #include <concepts>
 #include <limits>
 #include <random>
-#include <utility>
 
 #include <Eigen/Eigenvalues>
 #include <Eigen/QR>
+#include <wpi/Algorithm.h>
 #include <wpi/SymbolExports.h>
 
 #include "frc/EigenCore.h"
 #include "frc/geometry/Pose2d.h"
 
 namespace frc {
-namespace detail {
-
-template <typename T, T... indices, typename F, typename... Ts>
-constexpr void for_each(std::integer_sequence<T, indices...>, F&& f,
-                        Ts&&... elems) {
-  (f(std::integral_constant<T, indices>{}, elems), ...);
-}
-
-/**
- * Calls f(i, elem) for each element of elems where i is the index and elem is
- * the element.
- *
- * @param f The callback.
- * @param elems The elements.
- */
-template <typename F, typename... Ts>
-constexpr void for_each(F&& f, Ts&&... elems) {
-  detail::for_each(std::make_integer_sequence<size_t, sizeof...(Ts)>{},
-                   std::forward<F>(f), std::forward<Ts>(elems)...);
-}
-
-}  // namespace detail
 
 /**
  * Creates a cost matrix from the given vector for use with LQR.
@@ -59,7 +37,7 @@ template <std::same_as<double>... Ts>
 Matrixd<sizeof...(Ts), sizeof...(Ts)> MakeCostMatrix(Ts... tolerances) {
   Eigen::DiagonalMatrix<double, sizeof...(Ts)> result;
   auto& diag = result.diagonal();
-  detail::for_each(
+  wpi::for_each(
       [&](int i, double tolerance) {
         if (tolerance == std::numeric_limits<double>::infinity()) {
           diag(i) = 0.0;
@@ -87,8 +65,8 @@ template <std::same_as<double>... Ts>
 Matrixd<sizeof...(Ts), sizeof...(Ts)> MakeCovMatrix(Ts... stdDevs) {
   Eigen::DiagonalMatrix<double, sizeof...(Ts)> result;
   auto& diag = result.diagonal();
-  detail::for_each([&](int i, double stdDev) { diag(i) = std::pow(stdDev, 2); },
-                   stdDevs...);
+  wpi::for_each([&](int i, double stdDev) { diag(i) = std::pow(stdDev, 2); },
+                stdDevs...);
   return result;
 }
 
@@ -147,7 +125,7 @@ Vectord<sizeof...(Ts)> MakeWhiteNoiseVector(Ts... stdDevs) {
   std::mt19937 gen{rd()};
 
   Vectord<sizeof...(Ts)> result;
-  detail::for_each(
+  wpi::for_each(
       [&](int i, double stdDev) {
         // Passing a standard deviation of 0.0 to std::normal_distribution is
         // undefined behavior
