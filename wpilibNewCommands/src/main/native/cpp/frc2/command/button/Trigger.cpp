@@ -212,3 +212,7 @@ Trigger Trigger::Debounce(units::second_t debounceTime,
     return debouncer.Calculate(condition());
   });
 }
+
+bool Trigger::Get() {
+  return m_condition();
+}
