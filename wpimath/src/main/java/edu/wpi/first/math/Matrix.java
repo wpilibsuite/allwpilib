@@ -657,6 +657,7 @@ public class Matrix<R extends Num, C extends Num> {
    * @deprecated Use {@link MatBuilder#fill} instead.
    */
   @Deprecated(since = "2024", forRemoval = true)
+  @SuppressWarnings("deprecation")
   public static <R extends Num, C extends Num> MatBuilder<R, C> mat(Nat<R> rows, Nat<C> cols) {
     return new MatBuilder<>(Objects.requireNonNull(rows), Objects.requireNonNull(cols));
   }
