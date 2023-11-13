@@ -62,6 +62,7 @@ model {
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             }
 
+            nativeUtils.useRequiredLibrary(it, 'opencv_shared')
             nativeUtils.useRequiredLibrary(it, 'apriltaglib')
         }
     }

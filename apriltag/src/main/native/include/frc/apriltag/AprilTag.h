@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <opencv2/core/mat.hpp>
 #include <wpi/SymbolExports.h>
 #include <wpi/json_fwd.h>
 
@@ -20,6 +21,9 @@ struct WPILIB_DLLEXPORT AprilTag {
    * Checks equality between this AprilTag and another object.
    */
   bool operator==(const AprilTag&) const = default;
+
+  static cv::Mat Generate36h11AprilTagImage(int id);
+  static cv::Mat Generate16h5AprilTagImage(int id);
 };
 
 WPILIB_DLLEXPORT
