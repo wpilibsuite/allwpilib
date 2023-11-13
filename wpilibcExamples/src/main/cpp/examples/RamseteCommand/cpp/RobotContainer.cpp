@@ -81,13 +81,12 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
       [this](auto left, auto right) { m_drive.TankDriveVolts(left, right); },
       {&m_drive})};
 
-  return std::move(ramseteCommand)
-      .BeforeStarting(frc2::cmd::RunOnce(
-          [this, &exampleTrajectory] {
-            m_drive.ResetOdometry(exampleTrajectory.InitialPose());
-          },
-          {}))
-
+  return frc2::cmd::RunOnce(
+             [this, &exampleTrajectory] {
+               m_drive.ResetOdometry(exampleTrajectory.InitialPose());
+             },
+             {})
+      .AndThen(std::move(ramseteCommand))
       .AndThen(
           frc2::cmd::RunOnce([this] { m_drive.TankDriveVolts(0_V, 0_V); }, {}));
 }
