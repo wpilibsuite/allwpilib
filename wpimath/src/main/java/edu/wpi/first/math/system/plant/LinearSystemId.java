@@ -4,6 +4,7 @@
 
 package edu.wpi.first.math.system.plant;
 
+import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
@@ -40,20 +41,17 @@ public final class LinearSystemId {
     }
 
     return new LinearSystem<>(
-        Matrix.mat(Nat.N2(), Nat.N2())
-            .fill(
-                0,
-                1,
-                0,
-                -Math.pow(G, 2)
-                    * motor.KtNMPerAmp
-                    / (motor.rOhms
-                        * radiusMeters
-                        * radiusMeters
-                        * massKg
-                        * motor.KvRadPerSecPerVolt)),
+        MatBuilder.fill(
+            Nat.N2(),
+            Nat.N2(),
+            0,
+            1,
+            0,
+            -Math.pow(G, 2)
+                * motor.KtNMPerAmp
+                / (motor.rOhms * radiusMeters * radiusMeters * massKg * motor.KvRadPerSecPerVolt)),
         VecBuilder.fill(0, G * motor.KtNMPerAmp / (motor.rOhms * radiusMeters * massKg)),
-        Matrix.mat(Nat.N1(), Nat.N2()).fill(1, 0),
+        MatBuilder.fill(Nat.N1(), Nat.N2(), 1, 0),
         new Matrix<>(Nat.N1(), Nat.N1()));
   }
 
@@ -108,15 +106,16 @@ public final class LinearSystemId {
     }
 
     return new LinearSystem<>(
-        Matrix.mat(Nat.N2(), Nat.N2())
-            .fill(
-                0,
-                1,
-                0,
-                -G
-                    * G
-                    * motor.KtNMPerAmp
-                    / (motor.KvRadPerSecPerVolt * motor.rOhms * JKgMetersSquared)),
+        MatBuilder.fill(
+            Nat.N2(),
+            Nat.N2(),
+            0,
+            1,
+            0,
+            -G
+                * G
+                * motor.KtNMPerAmp
+                / (motor.KvRadPerSecPerVolt * motor.rOhms * JKgMetersSquared)),
         VecBuilder.fill(0, G * motor.KtNMPerAmp / (motor.rOhms * JKgMetersSquared)),
         Matrix.eye(Nat.N2()),
         new Matrix<>(Nat.N2(), Nat.N1()));
@@ -149,7 +148,7 @@ public final class LinearSystemId {
     }
 
     return new LinearSystem<>(
-        Matrix.mat(Nat.N2(), Nat.N2()).fill(0, 1, 0, -kV / kA),
+        MatBuilder.fill(Nat.N2(), Nat.N2(), 0, 1, 0, -kV / kA),
         VecBuilder.fill(0, 1 / kA),
         Matrix.eye(Nat.N2()),
         new Matrix<>(Nat.N2(), Nat.N1()));
@@ -198,10 +197,10 @@ public final class LinearSystemId {
 
     final double C3 = 1 / massKg + rbMeters * rbMeters / JKgMetersSquared;
     final double C4 = 1 / massKg - rbMeters * rbMeters / JKgMetersSquared;
-    var A = Matrix.mat(Nat.N2(), Nat.N2()).fill(C3 * C1, C4 * C1, C4 * C1, C3 * C1);
-    var B = Matrix.mat(Nat.N2(), Nat.N2()).fill(C3 * C2, C4 * C2, C4 * C2, C3 * C2);
-    var C = Matrix.mat(Nat.N2(), Nat.N2()).fill(1.0, 0.0, 0.0, 1.0);
-    var D = Matrix.mat(Nat.N2(), Nat.N2()).fill(0.0, 0.0, 0.0, 0.0);
+    var A = MatBuilder.fill(Nat.N2(), Nat.N2(), C3 * C1, C4 * C1, C4 * C1, C3 * C1);
+    var B = MatBuilder.fill(Nat.N2(), Nat.N2(), C3 * C2, C4 * C2, C4 * C2, C3 * C2);
+    var C = MatBuilder.fill(Nat.N2(), Nat.N2(), 1.0, 0.0, 0.0, 1.0);
+    var D = MatBuilder.fill(Nat.N2(), Nat.N2(), 0.0, 0.0, 0.0, 0.0);
 
     return new LinearSystem<>(A, B, C, D);
   }
@@ -226,16 +225,17 @@ public final class LinearSystemId {
     }
 
     return new LinearSystem<>(
-        Matrix.mat(Nat.N2(), Nat.N2())
-            .fill(
-                0,
-                1,
-                0,
-                -Math.pow(G, 2)
-                    * motor.KtNMPerAmp
-                    / (motor.KvRadPerSecPerVolt * motor.rOhms * JKgSquaredMeters)),
+        MatBuilder.fill(
+            Nat.N2(),
+            Nat.N2(),
+            0,
+            1,
+            0,
+            -Math.pow(G, 2)
+                * motor.KtNMPerAmp
+                / (motor.KvRadPerSecPerVolt * motor.rOhms * JKgSquaredMeters)),
         VecBuilder.fill(0, G * motor.KtNMPerAmp / (motor.rOhms * JKgSquaredMeters)),
-        Matrix.mat(Nat.N1(), Nat.N2()).fill(1, 0),
+        MatBuilder.fill(Nat.N1(), Nat.N2(), 1, 0),
         new Matrix<>(Nat.N1(), Nat.N1()));
   }
 
@@ -299,9 +299,9 @@ public final class LinearSystemId {
     }
 
     return new LinearSystem<>(
-        Matrix.mat(Nat.N2(), Nat.N2()).fill(0.0, 1.0, 0.0, -kV / kA),
+        MatBuilder.fill(Nat.N2(), Nat.N2(), 0.0, 1.0, 0.0, -kV / kA),
         VecBuilder.fill(0.0, 1.0 / kA),
-        Matrix.mat(Nat.N1(), Nat.N2()).fill(1.0, 0.0),
+        MatBuilder.fill(Nat.N1(), Nat.N2(), 1.0, 0.0),
         VecBuilder.fill(0.0));
   }
 
@@ -344,10 +344,10 @@ public final class LinearSystemId {
     final double B2 = 0.5 * (1.0 / kALinear - 1.0 / kAAngular);
 
     return new LinearSystem<>(
-        Matrix.mat(Nat.N2(), Nat.N2()).fill(A1, A2, A2, A1),
-        Matrix.mat(Nat.N2(), Nat.N2()).fill(B1, B2, B2, B1),
-        Matrix.mat(Nat.N2(), Nat.N2()).fill(1, 0, 0, 1),
-        Matrix.mat(Nat.N2(), Nat.N2()).fill(0, 0, 0, 0));
+        MatBuilder.fill(Nat.N2(), Nat.N2(), A1, A2, A2, A1),
+        MatBuilder.fill(Nat.N2(), Nat.N2(), B1, B2, B2, B1),
+        MatBuilder.fill(Nat.N2(), Nat.N2(), 1, 0, 0, 1),
+        MatBuilder.fill(Nat.N2(), Nat.N2(), 0, 0, 0, 0));
   }
 
   /**

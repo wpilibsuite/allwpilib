@@ -22,11 +22,11 @@ class ImplicitModelFollowerTest {
 
     var imf = new ImplicitModelFollower<N2, N2, N2>(plant, plant);
 
-    var x = new MatBuilder<>(Nat.N2(), Nat.N1()).fill(0.0, 0.0);
-    var xImf = new MatBuilder<>(Nat.N2(), Nat.N1()).fill(0.0, 0.0);
+    var x = MatBuilder.fill(Nat.N2(), Nat.N1(), 0.0, 0.0);
+    var xImf = MatBuilder.fill(Nat.N2(), Nat.N1(), 0.0, 0.0);
 
     // Forward
-    var u = new MatBuilder<>(Nat.N2(), Nat.N1()).fill(12.0, 12.0);
+    var u = MatBuilder.fill(Nat.N2(), Nat.N1(), 12.0, 12.0);
     for (double t = 0.0; t < 3.0; t += dt) {
       x = plant.calculateX(x, u, dt);
       xImf = plant.calculateX(xImf, imf.calculate(xImf, u), dt);
@@ -36,7 +36,7 @@ class ImplicitModelFollowerTest {
     }
 
     // Backward
-    u = new MatBuilder<>(Nat.N2(), Nat.N1()).fill(-12.0, -12.0);
+    u = MatBuilder.fill(Nat.N2(), Nat.N1(), -12.0, -12.0);
     for (double t = 0.0; t < 3.0; t += dt) {
       x = plant.calculateX(x, u, dt);
       xImf = plant.calculateX(xImf, imf.calculate(xImf, u), dt);
@@ -46,7 +46,7 @@ class ImplicitModelFollowerTest {
     }
 
     // Rotate CCW
-    u = new MatBuilder<>(Nat.N2(), Nat.N1()).fill(-12.0, 12.0);
+    u = MatBuilder.fill(Nat.N2(), Nat.N1(), -12.0, 12.0);
     for (double t = 0.0; t < 3.0; t += dt) {
       x = plant.calculateX(x, u, dt);
       xImf = plant.calculateX(xImf, imf.calculate(xImf, u), dt);
@@ -67,11 +67,11 @@ class ImplicitModelFollowerTest {
 
     var imf = new ImplicitModelFollower<N2, N2, N2>(plant, plantRef);
 
-    var x = new MatBuilder<>(Nat.N2(), Nat.N1()).fill(0.0, 0.0);
-    var xImf = new MatBuilder<>(Nat.N2(), Nat.N1()).fill(0.0, 0.0);
+    var x = MatBuilder.fill(Nat.N2(), Nat.N1(), 0.0, 0.0);
+    var xImf = MatBuilder.fill(Nat.N2(), Nat.N1(), 0.0, 0.0);
 
     // Forward
-    var u = new MatBuilder<>(Nat.N2(), Nat.N1()).fill(12.0, 12.0);
+    var u = MatBuilder.fill(Nat.N2(), Nat.N1(), 12.0, 12.0);
     for (double t = 0.0; t < 3.0; t += dt) {
       x = plant.calculateX(x, u, dt);
       xImf = plant.calculateX(xImf, imf.calculate(xImf, u), dt);
@@ -83,7 +83,7 @@ class ImplicitModelFollowerTest {
     // Backward
     x.fill(0.0);
     xImf.fill(0.0);
-    u = new MatBuilder<>(Nat.N2(), Nat.N1()).fill(-12.0, -12.0);
+    u = MatBuilder.fill(Nat.N2(), Nat.N1(), -12.0, -12.0);
     for (double t = 0.0; t < 3.0; t += dt) {
       x = plant.calculateX(x, u, dt);
       xImf = plant.calculateX(xImf, imf.calculate(xImf, u), dt);
@@ -95,7 +95,7 @@ class ImplicitModelFollowerTest {
     // Rotate CCW
     x.fill(0.0);
     xImf.fill(0.0);
-    u = new MatBuilder<>(Nat.N2(), Nat.N1()).fill(-12.0, 12.0);
+    u = MatBuilder.fill(Nat.N2(), Nat.N1(), -12.0, 12.0);
     for (double t = 0.0; t < 3.0; t += dt) {
       x = plant.calculateX(x, u, dt);
       xImf = plant.calculateX(xImf, imf.calculate(xImf, u), dt);
