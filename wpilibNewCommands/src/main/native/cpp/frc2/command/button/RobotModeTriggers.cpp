@@ -2,24 +2,24 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc2/command/button/GameTriggers.h"
+#include "frc2/command/button/RobotModeTriggers.h"
 
 #include <frc/DriverStation.h>
 
 using namespace frc2;
 
-Trigger GameTriggers::Autonomous() {
+Trigger RobotModeTriggers::Autonomous() {
   return Trigger{&frc::DriverStation::IsAutonomousEnabled};
 }
 
-Trigger GameTriggers::Teleop() {
+Trigger RobotModeTriggers::Teleop() {
   return Trigger{&frc::DriverStation::IsTeleopEnabled};
 }
 
-Trigger GameTriggers::Disabled() {
+Trigger RobotModeTriggers::Disabled() {
   return Trigger{&frc::DriverStation::IsDisabled};
 }
 
-Trigger GameTriggers::Test() {
+Trigger RobotModeTriggers::Test() {
   return Trigger{&frc::DriverStation::IsTestEnabled};
 }

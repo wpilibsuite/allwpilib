@@ -10,9 +10,9 @@ import edu.wpi.first.wpilibj.DriverStation;
  * A class containing static {@link Trigger} factories for running callbacks when the robot mode
  * changes.
  */
-public final class GameTriggers {
+public final class RobotModeTriggers {
   // Utility class
-  private GameTriggers() {}
+  private RobotModeTriggers() {}
 
   /**
    * Returns a trigger that is true when the robot is enabled in autonomous mode.

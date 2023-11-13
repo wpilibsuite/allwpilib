@@ -12,9 +12,9 @@ namespace frc2 {
  * A class containing static Trigger factories for running callbacks when robot
  * mode changes.
  */
-class GameTriggers {
+class RobotModeTriggers {
  public:
-  GameTriggers() = delete;
+  RobotModeTriggers() = delete;
 
   /**
    * Returns a trigger that is true when the robot is enabled in autonomous
