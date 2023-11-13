@@ -110,7 +110,7 @@ class LTVDifferentialDriveControllerTest {
           NumericalIntegration.rkdp(
               LTVDifferentialDriveControllerTest::dynamics,
               x,
-              MatBuilder.fill(Nat.N2(), Nat.N1(), output.left, output.right),
+              VecBuilder.fill(output.left, output.right),
               kDt);
     }
 
