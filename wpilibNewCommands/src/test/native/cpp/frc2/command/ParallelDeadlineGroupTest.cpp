@@ -24,8 +24,8 @@ TEST_F(ParallelDeadlineGroupTest, DeadlineGroupSchedule) {
 
   ParallelDeadlineGroup group(
       std::move(command1Holder),
-      tcb::make_vector<std::unique_ptr<Command>>(std::move(command2Holder),
-                                                 std::move(command3Holder)));
+      make_vector<std::unique_ptr<Command>>(std::move(command2Holder),
+                                            std::move(command3Holder)));
 
   EXPECT_CALL(*command1, Initialize());
   EXPECT_CALL(*command1, Execute()).Times(2);
@@ -64,8 +64,8 @@ TEST_F(ParallelDeadlineGroupTest, SequentialGroupInterrupt) {
 
   ParallelDeadlineGroup group(
       std::move(command1Holder),
-      tcb::make_vector<std::unique_ptr<Command>>(std::move(command2Holder),
-                                                 std::move(command3Holder)));
+      make_vector<std::unique_ptr<Command>>(std::move(command2Holder),
+                                            std::move(command3Holder)));
 
   EXPECT_CALL(*command1, Initialize());
   EXPECT_CALL(*command1, Execute()).Times(1);
