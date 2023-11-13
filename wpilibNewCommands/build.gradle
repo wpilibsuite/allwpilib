@@ -84,7 +84,7 @@ model {
                         def arch = it.targetPlatform.name
                         if (arch == systemArch) {
                             def filePath = it.tasks.install.installDirectory.get().toString() + File.separatorChar + 'lib'
-                            
+
                             found = true
                         }
                     }
