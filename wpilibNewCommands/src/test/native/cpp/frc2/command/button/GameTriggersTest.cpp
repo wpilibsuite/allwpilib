@@ -42,7 +42,7 @@ TEST(GameTriggersTest, Disabled) {
     EXPECT_TRUE(disabled.Get());
 }
 
-TEST(GameTriggersTest, Test) {
+TEST(GameTriggersTest, TestMode) {
     DriverStationSim::ResetData();
     DriverStationSim::SetAutonomous(false);
     DriverStationSim::SetTest(true);
