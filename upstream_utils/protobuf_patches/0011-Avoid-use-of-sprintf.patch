@@ -1,14 +1,14 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Peter Johnson <johnson.peter@gmail.com>
 Date: Mon, 9 Oct 2023 19:28:08 -0700
-Subject: [PATCH 11/11] Avoid use of sprintf
+Subject: [PATCH 11/12] Avoid use of sprintf
 
 ---
  src/google/protobuf/stubs/strutil.cc | 14 +++++++++++---
  1 file changed, 11 insertions(+), 3 deletions(-)
 
 diff --git a/src/google/protobuf/stubs/strutil.cc b/src/google/protobuf/stubs/strutil.cc
-index 3462e91ff273dc071628f06b91698a0f166514fc..e063d0d3039c87d55a6df0dbfe50f365184fe292 100644
+index 3462e91ff273dc071628f06b91698a0f166514fc..58e03d0c4aa7c1b0337b5f650283f00117c12baa 100644
 --- a/src/google/protobuf/stubs/strutil.cc
 +++ b/src/google/protobuf/stubs/strutil.cc
 @@ -503,10 +503,18 @@ int CEscapeInternal(const char* src, int src_len, char* dest,

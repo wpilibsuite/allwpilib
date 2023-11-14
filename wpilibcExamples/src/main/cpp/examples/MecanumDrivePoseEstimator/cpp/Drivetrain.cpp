@@ -50,7 +50,8 @@ void Drivetrain::Drive(units::meters_per_second_t xSpeed,
                        units::second_t period) {
   auto wheelSpeeds = m_kinematics.ToWheelSpeeds(frc::ChassisSpeeds::Discretize(
       fieldRelative ? frc::ChassisSpeeds::FromFieldRelativeSpeeds(
-                          xSpeed, ySpeed, rot, m_gyro.GetRotation2d())
+                          xSpeed, ySpeed, rot,
+                          m_poseEstimator.GetEstimatedPosition().Rotation())
                     : frc::ChassisSpeeds{xSpeed, ySpeed, rot},
       period));
   wheelSpeeds.Desaturate(kMaxSpeed);
