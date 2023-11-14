@@ -123,7 +123,7 @@ task unitsHeaders(type: Zip) {
     }
 
     ext.includeDirs = [
-            project.file('src/main/native/include/units')
+        project.file('src/main/native/include/units')
     ]
 
     ext.includeDirs.each {
