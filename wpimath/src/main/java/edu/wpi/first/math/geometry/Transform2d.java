@@ -4,8 +4,8 @@
 
 package edu.wpi.first.math.geometry;
 
-import edu.wpi.first.math.geometry.serde.Transform2dProtoSerde;
-import edu.wpi.first.math.geometry.serde.Transform2dStructSerde;
+import edu.wpi.first.math.geometry.proto.Transform2dProto;
+import edu.wpi.first.math.geometry.struct.Transform2dStruct;
 import java.util.Objects;
 
 /** Represents a transformation for a Pose2d in the pose's frame. */
@@ -166,6 +166,6 @@ public class Transform2d {
     return Objects.hash(m_translation, m_rotation);
   }
 
-  public static final Transform2dStructSerde struct = new Transform2dStructSerde();
-  public static final Transform2dProtoSerde proto = new Transform2dProtoSerde();
+  public static final Transform2dStruct struct = new Transform2dStruct();
+  public static final Transform2dProto proto = new Transform2dProto();
 }

@@ -9,8 +9,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.WPIMathJNI;
-import edu.wpi.first.math.geometry.serde.Pose3dProtoSerde;
-import edu.wpi.first.math.geometry.serde.Pose3dStructSerde;
+import edu.wpi.first.math.geometry.proto.Pose3dProto;
+import edu.wpi.first.math.geometry.struct.Pose3dStruct;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import java.util.Objects;
 
@@ -321,6 +321,6 @@ public class Pose3d implements Interpolatable<Pose3d> {
     }
   }
 
-  public static final Pose3dStructSerde struct = new Pose3dStructSerde();
-  public static final Pose3dProtoSerde proto = new Pose3dProtoSerde();
+  public static final Pose3dStruct struct = new Pose3dStruct();
+  public static final Pose3dProto proto = new Pose3dProto();
 }

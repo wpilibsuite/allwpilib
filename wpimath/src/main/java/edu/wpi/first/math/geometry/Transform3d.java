@@ -4,8 +4,8 @@
 
 package edu.wpi.first.math.geometry;
 
-import edu.wpi.first.math.geometry.serde.Transform3dProtoSerde;
-import edu.wpi.first.math.geometry.serde.Transform3dStructSerde;
+import edu.wpi.first.math.geometry.proto.Transform3dProto;
+import edu.wpi.first.math.geometry.struct.Transform3dStruct;
 import java.util.Objects;
 
 /** Represents a transformation for a Pose3d in the pose's frame. */
@@ -176,6 +176,6 @@ public class Transform3d {
     return Objects.hash(m_translation, m_rotation);
   }
 
-  public static final Transform3dStructSerde struct = new Transform3dStructSerde();
-  public static final Transform3dProtoSerde proto = new Transform3dProtoSerde();
+  public static final Transform3dStruct struct = new Transform3dStruct();
+  public static final Transform3dProto proto = new Transform3dProto();
 }

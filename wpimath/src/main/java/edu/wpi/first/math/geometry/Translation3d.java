@@ -9,8 +9,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.serde.Translation3dProtoSerde;
-import edu.wpi.first.math.geometry.serde.Translation3dStructSerde;
+import edu.wpi.first.math.geometry.proto.Translation3dProto;
+import edu.wpi.first.math.geometry.struct.Translation3dStruct;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import java.util.Objects;
 
@@ -234,6 +234,6 @@ public class Translation3d implements Interpolatable<Translation3d> {
         MathUtil.interpolate(this.getZ(), endValue.getZ(), t));
   }
 
-  public static final Translation3dStructSerde struct = new Translation3dStructSerde();
-  public static final Translation3dProtoSerde proto = new Translation3dProtoSerde();
+  public static final Translation3dStruct struct = new Translation3dStruct();
+  public static final Translation3dProto proto = new Translation3dProto();
 }

@@ -15,8 +15,8 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
-import edu.wpi.first.math.geometry.serde.Rotation3dProtoSerde;
-import edu.wpi.first.math.geometry.serde.Rotation3dStructSerde;
+import edu.wpi.first.math.geometry.proto.Rotation3dProto;
+import edu.wpi.first.math.geometry.struct.Rotation3dStruct;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.numbers.N3;
 import java.util.Objects;
@@ -437,6 +437,6 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
     return plus(endValue.minus(this).times(MathUtil.clamp(t, 0, 1)));
   }
 
-  public static final Rotation3dStructSerde struct = new Rotation3dStructSerde();
-  public static final Rotation3dProtoSerde proto = new Rotation3dProtoSerde();
+  public static final Rotation3dStruct struct = new Rotation3dStruct();
+  public static final Rotation3dProto proto = new Rotation3dProto();
 }

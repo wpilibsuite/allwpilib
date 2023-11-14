@@ -4,8 +4,8 @@
 
 package edu.wpi.first.math.geometry;
 
-import edu.wpi.first.math.geometry.serde.Twist3dProtoSerde;
-import edu.wpi.first.math.geometry.serde.Twist3dStructSerde;
+import edu.wpi.first.math.geometry.proto.Twist3dProto;
+import edu.wpi.first.math.geometry.struct.Twist3dStruct;
 import java.util.Objects;
 
 /**
@@ -85,6 +85,6 @@ public class Twist3d {
     return Objects.hash(dx, dy, dz, rx, ry, rz);
   }
 
-  public static final Twist3dStructSerde struct = new Twist3dStructSerde();
-  public static final Twist3dProtoSerde proto = new Twist3dProtoSerde();
+  public static final Twist3dStruct struct = new Twist3dStruct();
+  public static final Twist3dProto proto = new Twist3dProto();
 }

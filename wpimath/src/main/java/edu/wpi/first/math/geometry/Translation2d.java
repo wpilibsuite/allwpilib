@@ -9,8 +9,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.serde.Translation2dProtoSerde;
-import edu.wpi.first.math.geometry.serde.Translation2dStructSerde;
+import edu.wpi.first.math.geometry.proto.Translation2dProto;
+import edu.wpi.first.math.geometry.struct.Translation2dStruct;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import java.util.Collections;
 import java.util.Comparator;
@@ -232,6 +232,6 @@ public class Translation2d implements Interpolatable<Translation2d> {
         MathUtil.interpolate(this.getY(), endValue.getY(), t));
   }
 
-  public static final Translation2dStructSerde struct = new Translation2dStructSerde();
-  public static final Translation2dProtoSerde proto = new Translation2dProtoSerde();
+  public static final Translation2dStruct struct = new Translation2dStruct();
+  public static final Translation2dProto proto = new Translation2dProto();
 }

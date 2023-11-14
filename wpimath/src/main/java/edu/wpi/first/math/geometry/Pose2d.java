@@ -8,8 +8,8 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import edu.wpi.first.math.geometry.serde.Pose2dProtoSerde;
-import edu.wpi.first.math.geometry.serde.Pose2dStructSerde;
+import edu.wpi.first.math.geometry.proto.Pose2dProto;
+import edu.wpi.first.math.geometry.struct.Pose2dStruct;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import java.util.Collections;
 import java.util.Comparator;
@@ -308,6 +308,6 @@ public class Pose2d implements Interpolatable<Pose2d> {
     }
   }
 
-  public static final Pose2dStructSerde struct = new Pose2dStructSerde();
-  public static final Pose2dProtoSerde proto = new Pose2dProtoSerde();
+  public static final Pose2dStruct struct = new Pose2dStruct();
+  public static final Pose2dProto proto = new Pose2dProto();
 }

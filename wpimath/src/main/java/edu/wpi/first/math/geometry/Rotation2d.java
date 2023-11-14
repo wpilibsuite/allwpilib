@@ -9,8 +9,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.serde.Rotation2dProtoSerde;
-import edu.wpi.first.math.geometry.serde.Rotation2dStructSerde;
+import edu.wpi.first.math.geometry.proto.Rotation2dProto;
+import edu.wpi.first.math.geometry.struct.Rotation2dStruct;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.util.Units;
 import java.util.Objects;
@@ -259,6 +259,6 @@ public class Rotation2d implements Interpolatable<Rotation2d> {
     return plus(endValue.minus(this).times(MathUtil.clamp(t, 0, 1)));
   }
 
-  public static final Rotation2dStructSerde struct = new Rotation2dStructSerde();
-  public static final Rotation2dProtoSerde proto = new Rotation2dProtoSerde();
+  public static final Rotation2dStruct struct = new Rotation2dStruct();
+  public static final Rotation2dProto proto = new Rotation2dProto();
 }
