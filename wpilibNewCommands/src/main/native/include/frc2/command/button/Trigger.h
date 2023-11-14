@@ -272,7 +272,7 @@ class Trigger {
    * Returns the current state of this trigger.
    * @return A bool representing the current state of the trigger.
    */
-  bool Get();
+  bool Get() const;
 
  private:
   frc::EventLoop* m_loop;

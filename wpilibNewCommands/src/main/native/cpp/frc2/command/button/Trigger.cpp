@@ -213,6 +213,6 @@ Trigger Trigger::Debounce(units::second_t debounceTime,
   });
 }
 
-bool Trigger::Get() {
+bool Trigger::Get() const {
   return m_condition();
 }
