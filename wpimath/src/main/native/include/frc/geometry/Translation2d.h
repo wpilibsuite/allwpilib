@@ -198,5 +198,5 @@ void from_json(const wpi::json& json, Translation2d& state);
 
 }  // namespace frc
 
-#include "frc/geometry/serde/Translation2dSerde.inc"
+#include "frc/geometry/serde/Translation2dSerde.h"
 #include "frc/geometry/Translation2d.inc"

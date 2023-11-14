@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <wpi/SymbolExports.h>
 #include <wpi/protobuf/Protobuf.h>
 #include <wpi/struct/Struct.h>
 
@@ -23,7 +24,6 @@ struct wpi::Struct<frc::Quaternion> {
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<frc::Quaternion> {
-  static constexpr std::string_view kTypeString = "proto:Quaternion";
   static google::protobuf::Message* New(google::protobuf::Arena* arena);
   static frc::Quaternion Unpack(const google::protobuf::Message& msg);
   static void Pack(google::protobuf::Message* msg,

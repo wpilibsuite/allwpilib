@@ -26,12 +26,13 @@ public class Rotation2dStructSerde implements Struct<Rotation2d> {
 
   @Override
   public String getSchema() {
-    return "double value";
+    return "double radians";
   }
 
   @Override
   public Rotation2d unpack(ByteBuffer bb) {
-    return new Rotation2d(bb.getDouble());
+    double radians = bb.getDouble();
+    return new Rotation2d(radians);
   }
 
   @Override

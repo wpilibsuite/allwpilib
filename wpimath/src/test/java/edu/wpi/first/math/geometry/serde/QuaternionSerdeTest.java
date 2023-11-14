@@ -15,11 +15,18 @@ import org.junit.jupiter.api.Test;
 
 class QuaternionSerdeTest {
   private static final Quaternion DATA = new Quaternion(1.1, 2.2, 3.3, 4.4);
-  private static final byte[] STRUCT_BUFFER =
-      new byte[] {
-        -102, -103, -103, -103, -103, -103, -15, 63, -102, -103, -103, -103, -103, -103, 1, 64, 102,
-        102, 102, 102, 102, 102, 10, 64, -102, -103, -103, -103, -103, -103, 17, 64
-      };
+  private static final byte[] STRUCT_BUFFER = createStructBuffer();
+
+  private static final byte[] createStructBuffer() {
+    byte[] bytes = new byte[Quaternion.struct.getSize()];
+    ByteBuffer buffer = ByteBuffer.wrap(bytes);
+    buffer.order(ByteOrder.LITTLE_ENDIAN);
+    buffer.putDouble(1.1);
+    buffer.putDouble(2.2);
+    buffer.putDouble(3.3);
+    buffer.putDouble(4.4);
+    return bytes;
+  }
 
   @Test
   void testStructPack() {

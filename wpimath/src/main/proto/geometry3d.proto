@@ -18,7 +18,7 @@ message ProtobufQuaternion {
 }
 
 message ProtobufRotation3d {
-  ProtobufQuaternion q = 1;
+  ProtobufQuaternion quaternion = 1;
 }
 
 message ProtobufPose3d {

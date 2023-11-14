@@ -26,7 +26,7 @@ public class Translation2dStructSerde implements Struct<Translation2d> {
 
   @Override
   public String getSchema() {
-    return "double x;double y";
+    return "double x_meters;double y_meters";
   }
 
   @Override

@@ -15,7 +15,15 @@ import org.junit.jupiter.api.Test;
 
 class Rotation2dSerdeTest {
   private static final Rotation2d DATA = new Rotation2d(35.04);
-  private static final byte[] STRUCT_BUFFER = new byte[] {-123, -21, 81, -72, 30, -123, 65, 64};
+  private static final byte[] STRUCT_BUFFER = createStructBuffer();
+
+  private static final byte[] createStructBuffer() {
+    byte[] bytes = new byte[Rotation2d.struct.getSize()];
+    ByteBuffer buffer = ByteBuffer.wrap(bytes);
+    buffer.order(ByteOrder.LITTLE_ENDIAN);
+    buffer.putDouble(35.04);
+    return bytes;
+  }
 
   @Test
   void testStructPack() {

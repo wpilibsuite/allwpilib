@@ -18,11 +18,17 @@ import org.junit.jupiter.api.Test;
 class Transform2dSerdeTest {
   private static final Transform2d DATA =
       new Transform2d(new Translation2d(1.91, 2.29), Rotation2d.fromDegrees(35.04));
-  private static final byte[] STRUCT_BUFFER =
-      new byte[] {
-        -113, -62, -11, 40, 92, -113, -2, 63, 82, -72, 30, -123, -21, 81, 2, 64, -41, -77, 36, 88,
-        -19, -111, -29, 63
-      };
+  private static final byte[] STRUCT_BUFFER = createStructBuffer();
+
+  private static final byte[] createStructBuffer() {
+    byte[] bytes = new byte[Transform2d.struct.getSize()];
+    ByteBuffer buffer = ByteBuffer.wrap(bytes);
+    buffer.order(ByteOrder.LITTLE_ENDIAN);
+    buffer.putDouble(1.91);
+    buffer.putDouble(2.29);
+    buffer.putDouble(Math.toRadians(35.04));
+    return bytes;
+  }
 
   @Test
   void testStructPack() {

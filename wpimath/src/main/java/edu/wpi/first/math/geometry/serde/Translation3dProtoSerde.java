@@ -32,6 +32,8 @@ public class Translation3dProtoSerde implements Protobuf<Translation3d, Protobuf
 
   @Override
   public void pack(ProtobufTranslation3d msg, Translation3d value) {
-    msg.setXMeters(value.getX()).setYMeters(value.getY()).setZMeters(value.getZ());
+    msg.setXMeters(value.getX());
+    msg.setYMeters(value.getY());
+    msg.setZMeters(value.getZ());
   }
 }

@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <wpi/SymbolExports.h>
 #include <wpi/protobuf/Protobuf.h>
 #include <wpi/struct/Struct.h>
 
@@ -13,7 +14,7 @@ template <>
 struct wpi::Struct<frc::Rotation3d> {
   static constexpr std::string_view kTypeString = "struct:Rotation3d";
   static constexpr size_t kSize = wpi::Struct<frc::Quaternion>::kSize;
-  static constexpr std::string_view kSchema = "Quaternion q";
+  static constexpr std::string_view kSchema = "Quaternion quaternion";
 
   static frc::Rotation3d Unpack(std::span<const uint8_t, kSize> data);
   static void Pack(std::span<uint8_t, kSize> data,

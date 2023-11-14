@@ -195,4 +195,4 @@ void from_json(const wpi::json& json, Rotation3d& rotation);
 
 }  // namespace frc
 
-#include "frc/geometry/serde/Rotation3dSerde.inc"
+#include "frc/geometry/serde/Rotation3dSerde.h"

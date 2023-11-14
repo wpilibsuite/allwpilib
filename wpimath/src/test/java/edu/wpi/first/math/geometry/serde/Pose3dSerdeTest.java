@@ -19,12 +19,21 @@ import org.junit.jupiter.api.Test;
 class Pose3dSerdeTest {
   private static final Pose3d DATA =
       new Pose3d(1.91, 2.29, 17.4, new Rotation3d(35.4, 12.34, 56.78));
-  private static final byte[] STRUCT_BUFFER =
-      new byte[] {
-        -113, -62, -11, 40, 92, -113, -2, 63, 82, -72, 30, -123, -21, 81, 2, 64, 102, 102, 102, 102,
-        102, 102, 49, 64, 84, -54, 119, -113, -40, -106, -38, -65, -101, 58, -111, -47, -66, -90,
-        -20, 63, 30, 41, -55, -118, 53, 68, -61, 63, -76, -25, -32, -83, -71, 105, -84, 63
-      };
+  private static final byte[] STRUCT_BUFFER = createStructBuffer();
+
+  private static final byte[] createStructBuffer() {
+    byte[] bytes = new byte[Pose3d.struct.getSize()];
+    ByteBuffer buffer = ByteBuffer.wrap(bytes);
+    buffer.order(ByteOrder.LITTLE_ENDIAN);
+    buffer.putDouble(1.91);
+    buffer.putDouble(2.29);
+    buffer.putDouble(17.4);
+    buffer.putDouble(DATA.getRotation().getQuaternion().getW());
+    buffer.putDouble(DATA.getRotation().getQuaternion().getX());
+    buffer.putDouble(DATA.getRotation().getQuaternion().getY());
+    buffer.putDouble(DATA.getRotation().getQuaternion().getZ());
+    return bytes;
+  }
 
   @Test
   void testStructPack() {

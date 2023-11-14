@@ -2,21 +2,31 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/geometry/Transform3d.h"
+#include "frc/geometry/serde/Transform3dSerde.h"
+
 #include "geometry3d.pb.h"
 
+namespace {
+constexpr size_t kTranslationOff = 0;
+constexpr size_t kRotationOff =
+    kTranslationOff + wpi::Struct<frc::Translation3d>::kSize;
+}  // namespace
+
 using StructType = wpi::Struct<frc::Transform3d>;
-static constexpr size_t kRotationOff = wpi::Struct<frc::Translation3d>::kSize;
 
 frc::Transform3d StructType::Unpack(std::span<const uint8_t, kSize> data) {
-  return {wpi::UnpackStruct<frc::Translation3d, 0>(data),
-          wpi::UnpackStruct<frc::Rotation3d, kRotationOff>(data)};
+  return frc::Transform3d{
+      wpi::UnpackStruct<frc::Translation3d, kTranslationOff>(data),
+      wpi::UnpackStruct<frc::Rotation3d, kRotationOff>(data),
+  };
 }
+
 void StructType::Pack(std::span<uint8_t, kSize> data,
                       const frc::Transform3d& value) {
-  wpi::PackStruct<0>(data, value.Translation());
+  wpi::PackStruct<kTranslationOff>(data, value.Translation());
   wpi::PackStruct<kRotationOff>(data, value.Rotation());
 }
+
 void StructType::ForEachNested(
     std::invocable<std::string_view, std::string_view> auto fn) {
   wpi::ForEachStructSchema<frc::Translation3d>(fn);
@@ -34,7 +44,8 @@ frc::Transform3d wpi::Protobuf<frc::Transform3d>::Unpack(
   auto m = static_cast<const wpi::proto::ProtobufTransform3d*>(&msg);
   return frc::Transform3d{
       wpi::UnpackProtobuf<frc::Translation3d>(m->translation()),
-      wpi::UnpackProtobuf<frc::Rotation3d>(m->rotation())};
+      wpi::UnpackProtobuf<frc::Rotation3d>(m->rotation()),
+  };
 }
 
 void wpi::Protobuf<frc::Transform3d>::Pack(google::protobuf::Message* msg,

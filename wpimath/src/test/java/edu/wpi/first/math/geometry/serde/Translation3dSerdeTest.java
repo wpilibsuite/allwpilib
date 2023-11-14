@@ -15,11 +15,17 @@ import org.junit.jupiter.api.Test;
 
 class Translation3dSerdeTest {
   private static final Translation3d DATA = new Translation3d(19.1, 22.9, 3.504);
-  private static final byte[] STRUCT_BUFFER =
-      new byte[] {
-        -102, -103, -103, -103, -103, 25, 51, 64, 102, 102, 102, 102, 102, -26, 54, 64, -43, 120,
-        -23, 38, 49, 8, 12, 64
-      };
+  private static final byte[] STRUCT_BUFFER = createStructBuffer();
+
+  private static final byte[] createStructBuffer() {
+    byte[] bytes = new byte[Translation3d.struct.getSize()];
+    ByteBuffer buffer = ByteBuffer.wrap(bytes);
+    buffer.order(ByteOrder.LITTLE_ENDIAN);
+    buffer.putDouble(19.1);
+    buffer.putDouble(22.9);
+    buffer.putDouble(3.504);
+    return bytes;
+  }
 
   @Test
   void testStructPack() {

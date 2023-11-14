@@ -215,4 +215,4 @@ void from_json(const wpi::json& json, Pose3d& pose);
 
 }  // namespace frc
 
-#include "frc/geometry/serde/Pose3dSerde.inc"
+#include "frc/geometry/serde/Pose3dSerde.h"

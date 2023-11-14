@@ -27,7 +27,7 @@ public class Rotation3dStructSerde implements Struct<Rotation3d> {
 
   @Override
   public String getSchema() {
-    return "Quaternion q";
+    return "Quaternion quaternion";
   }
 
   @Override
@@ -37,7 +37,8 @@ public class Rotation3dStructSerde implements Struct<Rotation3d> {
 
   @Override
   public Rotation3d unpack(ByteBuffer bb) {
-    return new Rotation3d(Quaternion.struct.unpack(bb));
+    Quaternion quaternion = Quaternion.struct.unpack(bb);
+    return new Rotation3d(quaternion);
   }
 
   @Override

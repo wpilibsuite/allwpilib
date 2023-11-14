@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <wpi/SymbolExports.h>
 #include <wpi/protobuf/Protobuf.h>
 #include <wpi/struct/Struct.h>
 
@@ -13,7 +14,8 @@ template <>
 struct wpi::Struct<frc::Translation3d> {
   static constexpr std::string_view kTypeString = "struct:Translation3d";
   static constexpr size_t kSize = 24;
-  static constexpr std::string_view kSchema = "double x;double y;double z";
+  static constexpr std::string_view kSchema =
+      "double x_meters;double y_meters;double z_meters";
 
   static frc::Translation3d Unpack(std::span<const uint8_t, kSize> data);
   static void Pack(std::span<uint8_t, kSize> data,

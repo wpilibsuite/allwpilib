@@ -2,20 +2,28 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/geometry/Translation2d.h"
+#include "frc/geometry/serde/Translation2dSerde.h"
+
 #include "geometry2d.pb.h"
+
+namespace {
+constexpr size_t kXOff = 0;
+constexpr size_t kYOff = kXOff + 8;
+}  // namespace
 
 using StructType = wpi::Struct<frc::Translation2d>;
 
-frc::Translation2d StructType::Unpack(
-    std::span<const uint8_t, StructType::kSize> data) {
-  return {units::meter_t{wpi::UnpackStruct<double, 0>(data)},
-          units::meter_t{wpi::UnpackStruct<double, 8>(data)}};
+frc::Translation2d StructType::Unpack(std::span<const uint8_t, kSize> data) {
+  return frc::Translation2d{
+      units::meter_t{wpi::UnpackStruct<double, kXOff>(data)},
+      units::meter_t{wpi::UnpackStruct<double, kYOff>(data)},
+  };
 }
-void StructType::Pack(std::span<uint8_t, StructType::kSize> data,
+
+void StructType::Pack(std::span<uint8_t, kSize> data,
                       const frc::Translation2d& value) {
-  wpi::PackStruct<0>(data, value.X().value());
-  wpi::PackStruct<8>(data, value.Y().value());
+  wpi::PackStruct<kXOff>(data, value.X().value());
+  wpi::PackStruct<kYOff>(data, value.Y().value());
 }
 
 google::protobuf::Message* wpi::Protobuf<frc::Translation2d>::New(
@@ -27,8 +35,10 @@ google::protobuf::Message* wpi::Protobuf<frc::Translation2d>::New(
 frc::Translation2d wpi::Protobuf<frc::Translation2d>::Unpack(
     const google::protobuf::Message& msg) {
   auto m = static_cast<const wpi::proto::ProtobufTranslation2d*>(&msg);
-  return frc::Translation2d{units::meter_t{m->x_meters()},
-                            units::meter_t{m->y_meters()}};
+  return frc::Translation2d{
+      units::meter_t{m->x_meters()},
+      units::meter_t{m->y_meters()},
+  };
 }
 
 void wpi::Protobuf<frc::Translation2d>::Pack(google::protobuf::Message* msg,

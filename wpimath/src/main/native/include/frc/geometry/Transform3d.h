@@ -130,4 +130,4 @@ class WPILIB_DLLEXPORT Transform3d {
 };
 }  // namespace frc
 
-#include "frc/geometry/serde/Transform3dSerde.inc"
+#include "frc/geometry/serde/Transform3dSerde.h"

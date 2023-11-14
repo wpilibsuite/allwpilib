@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <wpi/SymbolExports.h>
 #include <wpi/protobuf/Protobuf.h>
 #include <wpi/struct/Struct.h>
 
@@ -22,9 +23,6 @@ struct wpi::Struct<frc::Transform2d> {
                    const frc::Transform2d& value);
   static void ForEachNested(
       std::invocable<std::string_view, std::string_view> auto fn);
-
- private:
-  static constexpr size_t kRotationOff = wpi::Struct<frc::Translation2d>::kSize;
 };
 
 static_assert(wpi::HasNestedStruct<frc::Transform2d>);

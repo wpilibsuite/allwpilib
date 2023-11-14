@@ -2,28 +2,40 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/geometry/Twist3d.h"
+#include "frc/geometry/serde/Twist3dSerde.h"
+
 #include "geometry3d.pb.h"
+
+namespace {
+constexpr size_t kDxOff = 0;
+constexpr size_t kDyOff = kDxOff + 8;
+constexpr size_t kDzOff = kDyOff + 8;
+constexpr size_t kRxOff = kDzOff + 8;
+constexpr size_t kRyOff = kRxOff + 8;
+constexpr size_t kRzOff = kRyOff + 8;
+}  // namespace
 
 using StructType = wpi::Struct<frc::Twist3d>;
 
-frc::Twist3d StructType::Unpack(
-    std::span<const uint8_t, StructType::kSize> data) {
-  return {units::meter_t{wpi::UnpackStruct<double, 0>(data)},
-          units::meter_t{wpi::UnpackStruct<double, 8>(data)},
-          units::meter_t{wpi::UnpackStruct<double, 16>(data)},
-          units::radian_t{wpi::UnpackStruct<double, 24>(data)},
-          units::radian_t{wpi::UnpackStruct<double, 32>(data)},
-          units::radian_t{wpi::UnpackStruct<double, 40>(data)}};
+frc::Twist3d StructType::Unpack(std::span<const uint8_t, kSize> data) {
+  return frc::Twist3d{
+      units::meter_t{wpi::UnpackStruct<double, kDxOff>(data)},
+      units::meter_t{wpi::UnpackStruct<double, kDyOff>(data)},
+      units::meter_t{wpi::UnpackStruct<double, kDzOff>(data)},
+      units::radian_t{wpi::UnpackStruct<double, kRxOff>(data)},
+      units::radian_t{wpi::UnpackStruct<double, kRyOff>(data)},
+      units::radian_t{wpi::UnpackStruct<double, kRzOff>(data)},
+  };
 }
-void StructType::Pack(std::span<uint8_t, StructType::kSize> data,
+
+void StructType::Pack(std::span<uint8_t, kSize> data,
                       const frc::Twist3d& value) {
-  wpi::PackStruct<0>(data, value.dx.value());
-  wpi::PackStruct<8>(data, value.dy.value());
-  wpi::PackStruct<16>(data, value.dz.value());
-  wpi::PackStruct<24>(data, value.rx.value());
-  wpi::PackStruct<32>(data, value.ry.value());
-  wpi::PackStruct<40>(data, value.rz.value());
+  wpi::PackStruct<kDxOff>(data, value.dx.value());
+  wpi::PackStruct<kDyOff>(data, value.dy.value());
+  wpi::PackStruct<kDzOff>(data, value.dz.value());
+  wpi::PackStruct<kRxOff>(data, value.rx.value());
+  wpi::PackStruct<kRyOff>(data, value.ry.value());
+  wpi::PackStruct<kRzOff>(data, value.rz.value());
 }
 
 google::protobuf::Message* wpi::Protobuf<frc::Twist3d>::New(
@@ -38,7 +50,8 @@ frc::Twist3d wpi::Protobuf<frc::Twist3d>::Unpack(
   return frc::Twist3d{
       units::meter_t{m->dx_meters()},   units::meter_t{m->dy_meters()},
       units::meter_t{m->dz_meters()},   units::radian_t{m->rx_radians()},
-      units::radian_t{m->ry_radians()}, units::radian_t{m->rz_radians()}};
+      units::radian_t{m->ry_radians()}, units::radian_t{m->rz_radians()},
+  };
 }
 
 void wpi::Protobuf<frc::Twist3d>::Pack(google::protobuf::Message* msg,

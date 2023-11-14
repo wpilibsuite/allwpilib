@@ -188,4 +188,4 @@ void from_json(const wpi::json& json, Quaternion& quaternion);
 
 }  // namespace frc
 
-#include "frc/geometry/serde/QuaternionSerde.inc"
+#include "frc/geometry/serde/QuaternionSerde.h"

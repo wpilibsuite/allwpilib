@@ -176,5 +176,5 @@ void from_json(const wpi::json& json, Rotation2d& rotation);
 
 }  // namespace frc
 
-#include "frc/geometry/serde/Rotation2dSerde.inc"
+#include "frc/geometry/serde/Rotation2dSerde.h"
 #include "frc/geometry/Rotation2d.inc"

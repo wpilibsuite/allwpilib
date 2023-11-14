@@ -38,11 +38,11 @@ public class Twist3dProtoSerde implements Protobuf<Twist3d, ProtobufTwist3d> {
 
   @Override
   public void pack(ProtobufTwist3d msg, Twist3d value) {
-    msg.setDxMeters(value.dx)
-        .setDyMeters(value.dy)
-        .setDzMeters(value.dz)
-        .setRxRadians(value.rx)
-        .setRyRadians(value.ry)
-        .setRzRadians(value.rz);
+    msg.setDxMeters(value.dx);
+    msg.setDyMeters(value.dy);
+    msg.setDzMeters(value.dz);
+    msg.setRxRadians(value.rx);
+    msg.setRyRadians(value.ry);
+    msg.setRzRadians(value.rz);
   }
 }

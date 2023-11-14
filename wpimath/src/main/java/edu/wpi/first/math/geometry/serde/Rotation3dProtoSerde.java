@@ -33,11 +33,11 @@ public class Rotation3dProtoSerde implements Protobuf<Rotation3d, ProtobufRotati
 
   @Override
   public Rotation3d unpack(ProtobufRotation3d msg) {
-    return new Rotation3d(Quaternion.proto.unpack(msg.getQ()));
+    return new Rotation3d(Quaternion.proto.unpack(msg.getQuaternion()));
   }
 
   @Override
   public void pack(ProtobufRotation3d msg, Rotation3d value) {
-    Quaternion.proto.pack(msg.getMutableQ(), value.getQuaternion());
+    Quaternion.proto.pack(msg.getMutableQuaternion(), value.getQuaternion());
   }
 }

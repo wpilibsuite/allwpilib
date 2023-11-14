@@ -32,6 +32,7 @@ public class Translation2dProtoSerde implements Protobuf<Translation2d, Protobuf
 
   @Override
   public void pack(ProtobufTranslation2d msg, Translation2d value) {
-    msg.setXMeters(value.getX()).setYMeters(value.getY());
+    msg.setXMeters(value.getX());
+    msg.setYMeters(value.getY());
   }
 }

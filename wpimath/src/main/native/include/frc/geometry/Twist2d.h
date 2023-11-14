@@ -58,4 +58,4 @@ struct WPILIB_DLLEXPORT Twist2d {
 };
 }  // namespace frc
 
-#include "frc/geometry/serde/Twist2dSerde.inc"
+#include "frc/geometry/serde/Twist2dSerde.h"

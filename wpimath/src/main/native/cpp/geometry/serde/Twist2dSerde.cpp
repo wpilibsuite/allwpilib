@@ -2,22 +2,31 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/geometry/Twist2d.h"
+#include "frc/geometry/serde/Twist2dSerde.h"
+
 #include "geometry2d.pb.h"
+
+namespace {
+constexpr size_t kDxOff = 0;
+constexpr size_t kDyOff = kDxOff + 8;
+constexpr size_t kDthetaOff = kDyOff + 8;
+}  // namespace
 
 using StructType = wpi::Struct<frc::Twist2d>;
 
-frc::Twist2d StructType::Unpack(
-    std::span<const uint8_t, StructType::kSize> data) {
-  return {units::meter_t{wpi::UnpackStruct<double, 0>(data)},
-          units::meter_t{wpi::UnpackStruct<double, 8>(data)},
-          units::radian_t{wpi::UnpackStruct<double, 16>(data)}};
+frc::Twist2d StructType::Unpack(std::span<const uint8_t, kSize> data) {
+  return frc::Twist2d{
+      units::meter_t{wpi::UnpackStruct<double, kDxOff>(data)},
+      units::meter_t{wpi::UnpackStruct<double, kDyOff>(data)},
+      units::radian_t{wpi::UnpackStruct<double, kDthetaOff>(data)},
+  };
 }
-void StructType::Pack(std::span<uint8_t, StructType::kSize> data,
+
+void StructType::Pack(std::span<uint8_t, kSize> data,
                       const frc::Twist2d& value) {
-  wpi::PackStruct<0>(data, value.dx.value());
-  wpi::PackStruct<8>(data, value.dy.value());
-  wpi::PackStruct<16>(data, value.dtheta.value());
+  wpi::PackStruct<kDxOff>(data, value.dx.value());
+  wpi::PackStruct<kDyOff>(data, value.dy.value());
+  wpi::PackStruct<kDthetaOff>(data, value.dtheta.value());
 }
 
 google::protobuf::Message* wpi::Protobuf<frc::Twist2d>::New(
@@ -29,9 +38,11 @@ google::protobuf::Message* wpi::Protobuf<frc::Twist2d>::New(
 frc::Twist2d wpi::Protobuf<frc::Twist2d>::Unpack(
     const google::protobuf::Message& msg) {
   auto m = static_cast<const wpi::proto::ProtobufTwist2d*>(&msg);
-  return frc::Twist2d{units::meter_t{m->dx_meters()},
-                      units::meter_t{m->dy_meters()},
-                      units::radian_t{m->dtheta_radians()}};
+  return frc::Twist2d{
+      units::meter_t{m->dx_meters()},
+      units::meter_t{m->dy_meters()},
+      units::radian_t{m->dtheta_radians()},
+  };
 }
 
 void wpi::Protobuf<frc::Twist2d>::Pack(google::protobuf::Message* msg,

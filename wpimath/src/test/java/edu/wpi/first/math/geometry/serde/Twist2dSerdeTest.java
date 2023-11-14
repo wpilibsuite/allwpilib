@@ -15,11 +15,17 @@ import org.junit.jupiter.api.Test;
 
 class Twist2dSerdeTest {
   private static final Twist2d DATA = new Twist2d(1.91, 2.29, 35.04);
-  private static final byte[] STRUCT_BUFFER =
-      new byte[] {
-        -113, -62, -11, 40, 92, -113, -2, 63, 82, -72, 30, -123, -21, 81, 2, 64, -123, -21, 81, -72,
-        30, -123, 65, 64
-      };
+  private static final byte[] STRUCT_BUFFER = createStructBuffer();
+
+  private static final byte[] createStructBuffer() {
+    byte[] bytes = new byte[Twist2d.struct.getSize()];
+    ByteBuffer buffer = ByteBuffer.wrap(bytes);
+    buffer.order(ByteOrder.LITTLE_ENDIAN);
+    buffer.putDouble(1.91);
+    buffer.putDouble(2.29);
+    buffer.putDouble(35.04);
+    return bytes;
+  }
 
   @Test
   void testStructPack() {

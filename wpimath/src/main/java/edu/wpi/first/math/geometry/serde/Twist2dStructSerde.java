@@ -26,7 +26,7 @@ public class Twist2dStructSerde implements Struct<Twist2d> {
 
   @Override
   public String getSchema() {
-    return "double dx;double dy;double dtheta";
+    return "double dx_meters;double dy_meters;double dtheta_radians";
   }
 
   @Override

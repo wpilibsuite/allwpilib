@@ -32,6 +32,9 @@ public class QuaternionProtoSerde implements Protobuf<Quaternion, ProtobufQuater
 
   @Override
   public void pack(ProtobufQuaternion msg, Quaternion value) {
-    msg.setW(value.getW()).setX(value.getX()).setY(value.getY()).setZ(value.getZ());
+    msg.setW(value.getW());
+    msg.setX(value.getX());
+    msg.setY(value.getY());
+    msg.setZ(value.getZ());
   }
 }
