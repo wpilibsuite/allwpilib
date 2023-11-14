@@ -124,5 +124,6 @@ class WPILIB_DLLEXPORT Transform2d {
 };
 }  // namespace frc
 
-#include "frc/geometry/serde/Transform2dSerde.h"
+#include "frc/geometry/proto/Transform2d.h"
+#include "frc/geometry/struct/Transform2d.h"
 #include "frc/geometry/Transform2d.inc"
