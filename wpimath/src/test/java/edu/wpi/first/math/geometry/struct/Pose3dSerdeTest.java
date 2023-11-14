@@ -18,7 +18,7 @@ class Pose3dSerdeTest {
       new Pose3d(1.91, 2.29, 17.4, new Rotation3d(35.4, 12.34, 56.78));
   private static final byte[] STRUCT_BUFFER = createStructBuffer();
 
-  private static final byte[] createStructBuffer() {
+  private static byte[] createStructBuffer() {
     byte[] bytes = new byte[Pose3d.struct.getSize()];
     ByteBuffer buffer = ByteBuffer.wrap(bytes);
     buffer.order(ByteOrder.LITTLE_ENDIAN);

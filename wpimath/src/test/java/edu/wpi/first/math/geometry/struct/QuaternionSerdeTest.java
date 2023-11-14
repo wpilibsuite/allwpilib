@@ -16,7 +16,7 @@ class QuaternionSerdeTest {
   private static final Quaternion DATA = new Quaternion(1.1, 2.2, 3.3, 4.4);
   private static final byte[] STRUCT_BUFFER = createStructBuffer();
 
-  private static final byte[] createStructBuffer() {
+  private static byte[] createStructBuffer() {
     byte[] bytes = new byte[Quaternion.struct.getSize()];
     ByteBuffer buffer = ByteBuffer.wrap(bytes);
     buffer.order(ByteOrder.LITTLE_ENDIAN);
