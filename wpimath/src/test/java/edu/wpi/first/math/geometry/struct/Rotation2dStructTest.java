@@ -7,33 +7,28 @@ package edu.wpi.first.math.geometry.struct;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import edu.wpi.first.math.geometry.Twist3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import org.junit.jupiter.api.Test;
 
-class Twist3dSerdeTest {
-  private static final Twist3d DATA = new Twist3d(1.91, 2.29, 1.74, 0.3504, 0.0191, 0.0229);
+class Rotation2dStructTest {
+  private static final Rotation2d DATA = new Rotation2d(35.04);
   private static final byte[] STRUCT_BUFFER = createStructBuffer();
 
   private static byte[] createStructBuffer() {
-    byte[] bytes = new byte[Twist3d.struct.getSize()];
+    byte[] bytes = new byte[Rotation2d.struct.getSize()];
     ByteBuffer buffer = ByteBuffer.wrap(bytes);
     buffer.order(ByteOrder.LITTLE_ENDIAN);
-    buffer.putDouble(1.91);
-    buffer.putDouble(2.29);
-    buffer.putDouble(1.74);
-    buffer.putDouble(0.3504);
-    buffer.putDouble(0.0191);
-    buffer.putDouble(0.0229);
+    buffer.putDouble(35.04);
     return bytes;
   }
 
   @Test
   void testStructPack() {
-    ByteBuffer buffer = ByteBuffer.allocate(Twist3d.struct.getSize());
+    ByteBuffer buffer = ByteBuffer.allocate(Rotation2d.struct.getSize());
     buffer.order(ByteOrder.LITTLE_ENDIAN);
-    Twist3d.struct.pack(buffer, DATA);
+    Rotation2d.struct.pack(buffer, DATA);
 
     byte[] actual = buffer.array();
     assertArrayEquals(actual, STRUCT_BUFFER);
@@ -44,12 +39,7 @@ class Twist3dSerdeTest {
     ByteBuffer buffer = ByteBuffer.wrap(STRUCT_BUFFER);
     buffer.order(ByteOrder.LITTLE_ENDIAN);
 
-    Twist3d data = Twist3d.struct.unpack(buffer);
-    assertEquals(DATA.dx, data.dx);
-    assertEquals(DATA.dy, data.dy);
-    assertEquals(DATA.dz, data.dz);
-    assertEquals(DATA.rx, data.rx);
-    assertEquals(DATA.ry, data.ry);
-    assertEquals(DATA.rz, data.rz);
+    Rotation2d data = Rotation2d.struct.unpack(buffer);
+    assertEquals(DATA.getRadians(), data.getRadians());
   }
 }

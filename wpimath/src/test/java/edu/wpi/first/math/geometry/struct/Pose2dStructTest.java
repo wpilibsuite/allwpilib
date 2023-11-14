@@ -7,30 +7,33 @@ package edu.wpi.first.math.geometry.struct;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import edu.wpi.first.math.geometry.Twist2d;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import org.junit.jupiter.api.Test;
 
-class Twist2dSerdeTest {
-  private static final Twist2d DATA = new Twist2d(1.91, 2.29, 35.04);
+class Pose2dStructTest {
+  private static final Pose2d DATA =
+      new Pose2d(new Translation2d(1.91, 2.29), Rotation2d.fromDegrees(35.04));
   private static final byte[] STRUCT_BUFFER = createStructBuffer();
 
   private static byte[] createStructBuffer() {
-    byte[] bytes = new byte[Twist2d.struct.getSize()];
+    byte[] bytes = new byte[Pose2d.struct.getSize()];
     ByteBuffer buffer = ByteBuffer.wrap(bytes);
     buffer.order(ByteOrder.LITTLE_ENDIAN);
     buffer.putDouble(1.91);
     buffer.putDouble(2.29);
-    buffer.putDouble(35.04);
+    buffer.putDouble(Math.toRadians(35.04));
     return bytes;
   }
 
   @Test
   void testStructPack() {
-    ByteBuffer buffer = ByteBuffer.allocate(Twist2d.struct.getSize());
+    ByteBuffer buffer = ByteBuffer.allocate(Pose2d.struct.getSize());
     buffer.order(ByteOrder.LITTLE_ENDIAN);
-    Twist2d.struct.pack(buffer, DATA);
+    Pose2d.struct.pack(buffer, DATA);
 
     byte[] actual = buffer.array();
     assertArrayEquals(actual, STRUCT_BUFFER);
@@ -41,9 +44,8 @@ class Twist2dSerdeTest {
     ByteBuffer buffer = ByteBuffer.wrap(STRUCT_BUFFER);
     buffer.order(ByteOrder.LITTLE_ENDIAN);
 
-    Twist2d data = Twist2d.struct.unpack(buffer);
-    assertEquals(DATA.dx, data.dx);
-    assertEquals(DATA.dy, data.dy);
-    assertEquals(DATA.dtheta, data.dtheta);
+    Pose2d data = Pose2d.struct.unpack(buffer);
+    assertEquals(DATA.getTranslation(), data.getTranslation());
+    assertEquals(DATA.getRotation(), data.getRotation());
   }
 }

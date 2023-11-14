@@ -8,27 +8,32 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import org.junit.jupiter.api.Test;
 
-class Rotation2dSerdeTest {
-  private static final Rotation2d DATA = new Rotation2d(35.04);
+class Transform2dStructTest {
+  private static final Transform2d DATA =
+      new Transform2d(new Translation2d(1.91, 2.29), Rotation2d.fromDegrees(35.04));
   private static final byte[] STRUCT_BUFFER = createStructBuffer();
 
   private static byte[] createStructBuffer() {
-    byte[] bytes = new byte[Rotation2d.struct.getSize()];
+    byte[] bytes = new byte[Transform2d.struct.getSize()];
     ByteBuffer buffer = ByteBuffer.wrap(bytes);
     buffer.order(ByteOrder.LITTLE_ENDIAN);
-    buffer.putDouble(35.04);
+    buffer.putDouble(1.91);
+    buffer.putDouble(2.29);
+    buffer.putDouble(Math.toRadians(35.04));
     return bytes;
   }
 
   @Test
   void testStructPack() {
-    ByteBuffer buffer = ByteBuffer.allocate(Rotation2d.struct.getSize());
+    ByteBuffer buffer = ByteBuffer.allocate(Transform2d.struct.getSize());
     buffer.order(ByteOrder.LITTLE_ENDIAN);
-    Rotation2d.struct.pack(buffer, DATA);
+    Transform2d.struct.pack(buffer, DATA);
 
     byte[] actual = buffer.array();
     assertArrayEquals(actual, STRUCT_BUFFER);
@@ -39,7 +44,8 @@ class Rotation2dSerdeTest {
     ByteBuffer buffer = ByteBuffer.wrap(STRUCT_BUFFER);
     buffer.order(ByteOrder.LITTLE_ENDIAN);
 
-    Rotation2d data = Rotation2d.struct.unpack(buffer);
-    assertEquals(DATA.getRadians(), data.getRadians());
+    Transform2d data = Transform2d.struct.unpack(buffer);
+    assertEquals(DATA.getTranslation(), data.getTranslation());
+    assertEquals(DATA.getRotation(), data.getRotation());
   }
 }

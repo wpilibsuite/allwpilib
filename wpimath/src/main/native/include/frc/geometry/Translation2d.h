@@ -198,6 +198,6 @@ void from_json(const wpi::json& json, Translation2d& state);
 
 }  // namespace frc
 
-#include "frc/geometry/proto/Translation2d.h"
-#include "frc/geometry/struct/Translation2d.h"
+#include "frc/geometry/proto/Translation2dProto.h"
+#include "frc/geometry/struct/Translation2dStruct.h"
 #include "frc/geometry/Translation2d.inc"

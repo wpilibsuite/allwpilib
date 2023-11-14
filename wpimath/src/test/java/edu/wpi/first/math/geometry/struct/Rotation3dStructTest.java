@@ -7,33 +7,31 @@ package edu.wpi.first.math.geometry.struct;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import org.junit.jupiter.api.Test;
 
-class Pose2dSerdeTest {
-  private static final Pose2d DATA =
-      new Pose2d(new Translation2d(1.91, 2.29), Rotation2d.fromDegrees(35.04));
+class Rotation3dStructTest {
+  private static final Rotation3d DATA = new Rotation3d(1.91, 2.29, 35.04);
   private static final byte[] STRUCT_BUFFER = createStructBuffer();
 
   private static byte[] createStructBuffer() {
-    byte[] bytes = new byte[Pose2d.struct.getSize()];
+    byte[] bytes = new byte[Rotation3d.struct.getSize()];
     ByteBuffer buffer = ByteBuffer.wrap(bytes);
     buffer.order(ByteOrder.LITTLE_ENDIAN);
-    buffer.putDouble(1.91);
-    buffer.putDouble(2.29);
-    buffer.putDouble(Math.toRadians(35.04));
+    buffer.putDouble(DATA.getQuaternion().getW());
+    buffer.putDouble(DATA.getQuaternion().getX());
+    buffer.putDouble(DATA.getQuaternion().getY());
+    buffer.putDouble(DATA.getQuaternion().getZ());
     return bytes;
   }
 
   @Test
   void testStructPack() {
-    ByteBuffer buffer = ByteBuffer.allocate(Pose2d.struct.getSize());
+    ByteBuffer buffer = ByteBuffer.allocate(Rotation3d.struct.getSize());
     buffer.order(ByteOrder.LITTLE_ENDIAN);
-    Pose2d.struct.pack(buffer, DATA);
+    Rotation3d.struct.pack(buffer, DATA);
 
     byte[] actual = buffer.array();
     assertArrayEquals(actual, STRUCT_BUFFER);
@@ -44,8 +42,7 @@ class Pose2dSerdeTest {
     ByteBuffer buffer = ByteBuffer.wrap(STRUCT_BUFFER);
     buffer.order(ByteOrder.LITTLE_ENDIAN);
 
-    Pose2d data = Pose2d.struct.unpack(buffer);
-    assertEquals(DATA.getTranslation(), data.getTranslation());
-    assertEquals(DATA.getRotation(), data.getRotation());
+    Rotation3d data = Rotation3d.struct.unpack(buffer);
+    assertEquals(DATA.getQuaternion(), data.getQuaternion());
   }
 }

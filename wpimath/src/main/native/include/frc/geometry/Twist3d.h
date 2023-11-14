@@ -78,5 +78,5 @@ struct WPILIB_DLLEXPORT Twist3d {
 };
 }  // namespace frc
 
-#include "frc/geometry/proto/Twist3d.h"
-#include "frc/geometry/struct/Twist3d.h"
+#include "frc/geometry/proto/Twist3dProto.h"
+#include "frc/geometry/struct/Twist3dStruct.h"

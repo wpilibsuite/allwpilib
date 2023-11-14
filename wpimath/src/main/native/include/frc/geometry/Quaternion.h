@@ -188,5 +188,5 @@ void from_json(const wpi::json& json, Quaternion& quaternion);
 
 }  // namespace frc
 
-#include "frc/geometry/proto/Quaternion.h"
-#include "frc/geometry/struct/Quaternion.h"
+#include "frc/geometry/proto/QuaternionProto.h"
+#include "frc/geometry/struct/QuaternionStruct.h"

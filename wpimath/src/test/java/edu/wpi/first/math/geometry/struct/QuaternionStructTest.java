@@ -12,7 +12,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import org.junit.jupiter.api.Test;
 
-class QuaternionSerdeTest {
+class QuaternionStructTest {
   private static final Quaternion DATA = new Quaternion(1.1, 2.2, 3.3, 4.4);
   private static final byte[] STRUCT_BUFFER = createStructBuffer();
 

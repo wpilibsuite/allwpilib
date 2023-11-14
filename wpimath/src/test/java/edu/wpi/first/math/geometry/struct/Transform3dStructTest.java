@@ -7,33 +7,37 @@ package edu.wpi.first.math.geometry.struct;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import org.junit.jupiter.api.Test;
 
-class Transform2dSerdeTest {
-  private static final Transform2d DATA =
-      new Transform2d(new Translation2d(1.91, 2.29), Rotation2d.fromDegrees(35.04));
+class Transform3dStructTest {
+  private static final Transform3d DATA =
+      new Transform3d(new Translation3d(1.91, 2.29, 1.74), new Rotation3d(1.1, 2.2, 3.3));
   private static final byte[] STRUCT_BUFFER = createStructBuffer();
 
   private static byte[] createStructBuffer() {
-    byte[] bytes = new byte[Transform2d.struct.getSize()];
+    byte[] bytes = new byte[Transform3d.struct.getSize()];
     ByteBuffer buffer = ByteBuffer.wrap(bytes);
     buffer.order(ByteOrder.LITTLE_ENDIAN);
     buffer.putDouble(1.91);
     buffer.putDouble(2.29);
-    buffer.putDouble(Math.toRadians(35.04));
+    buffer.putDouble(1.74);
+    buffer.putDouble(DATA.getRotation().getQuaternion().getW());
+    buffer.putDouble(DATA.getRotation().getQuaternion().getX());
+    buffer.putDouble(DATA.getRotation().getQuaternion().getY());
+    buffer.putDouble(DATA.getRotation().getQuaternion().getZ());
     return bytes;
   }
 
   @Test
   void testStructPack() {
-    ByteBuffer buffer = ByteBuffer.allocate(Transform2d.struct.getSize());
+    ByteBuffer buffer = ByteBuffer.allocate(Transform3d.struct.getSize());
     buffer.order(ByteOrder.LITTLE_ENDIAN);
-    Transform2d.struct.pack(buffer, DATA);
+    Transform3d.struct.pack(buffer, DATA);
 
     byte[] actual = buffer.array();
     assertArrayEquals(actual, STRUCT_BUFFER);
@@ -44,7 +48,7 @@ class Transform2dSerdeTest {
     ByteBuffer buffer = ByteBuffer.wrap(STRUCT_BUFFER);
     buffer.order(ByteOrder.LITTLE_ENDIAN);
 
-    Transform2d data = Transform2d.struct.unpack(buffer);
+    Transform3d data = Transform3d.struct.unpack(buffer);
     assertEquals(DATA.getTranslation(), data.getTranslation());
     assertEquals(DATA.getRotation(), data.getRotation());
   }

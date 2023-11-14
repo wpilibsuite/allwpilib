@@ -7,31 +7,29 @@ package edu.wpi.first.math.geometry.struct;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import org.junit.jupiter.api.Test;
 
-class Rotation3dSerdeTest {
-  private static final Rotation3d DATA = new Rotation3d(1.91, 2.29, 35.04);
+class Translation2dStructTest {
+  private static final Translation2d DATA = new Translation2d(1.91, 2.29);
   private static final byte[] STRUCT_BUFFER = createStructBuffer();
 
   private static byte[] createStructBuffer() {
-    byte[] bytes = new byte[Rotation3d.struct.getSize()];
+    byte[] bytes = new byte[Translation2d.struct.getSize()];
     ByteBuffer buffer = ByteBuffer.wrap(bytes);
     buffer.order(ByteOrder.LITTLE_ENDIAN);
-    buffer.putDouble(DATA.getQuaternion().getW());
-    buffer.putDouble(DATA.getQuaternion().getX());
-    buffer.putDouble(DATA.getQuaternion().getY());
-    buffer.putDouble(DATA.getQuaternion().getZ());
+    buffer.putDouble(1.91);
+    buffer.putDouble(2.29);
     return bytes;
   }
 
   @Test
   void testStructPack() {
-    ByteBuffer buffer = ByteBuffer.allocate(Rotation3d.struct.getSize());
+    ByteBuffer buffer = ByteBuffer.allocate(Translation2d.struct.getSize());
     buffer.order(ByteOrder.LITTLE_ENDIAN);
-    Rotation3d.struct.pack(buffer, DATA);
+    Translation2d.struct.pack(buffer, DATA);
 
     byte[] actual = buffer.array();
     assertArrayEquals(actual, STRUCT_BUFFER);
@@ -42,7 +40,8 @@ class Rotation3dSerdeTest {
     ByteBuffer buffer = ByteBuffer.wrap(STRUCT_BUFFER);
     buffer.order(ByteOrder.LITTLE_ENDIAN);
 
-    Rotation3d data = Rotation3d.struct.unpack(buffer);
-    assertEquals(DATA.getQuaternion(), data.getQuaternion());
+    Translation2d data = Translation2d.struct.unpack(buffer);
+    assertEquals(DATA.getX(), data.getX());
+    assertEquals(DATA.getY(), data.getY());
   }
 }
