@@ -3,7 +3,6 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "frc/geometry/proto/Twist3dProto.h"
-
 #include "geometry3d.pb.h"
 
 google::protobuf::Message* wpi::Protobuf<frc::Twist3d>::New(
