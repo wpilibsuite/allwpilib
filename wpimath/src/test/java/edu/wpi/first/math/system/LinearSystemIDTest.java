@@ -115,7 +115,7 @@ class LinearSystemIDTest {
         LinearSystemId.identifyAngularPositionSystem(
             Units.VoltsPerRadianPerSecond.of(kv), Units.VoltsPerRadianPerSecondSquared.of(ka));
 
-    assertEquals(model.getA(), Matrix.mat(Nat.N2(), Nat.N2()).fill(0, 1, 0, -kv / ka));
+    assertEquals(model.getA(), MatBuilder.fill(Nat.N2(), Nat.N2(), 0, 1, 0, -kv / ka));
     assertEquals(model.getB(), VecBuilder.fill(0, 1 / ka));
   }
 
