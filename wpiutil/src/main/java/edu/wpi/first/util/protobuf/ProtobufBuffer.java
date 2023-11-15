@@ -61,7 +61,7 @@ public final class ProtobufBuffer<T, MessageType extends ProtoMessage<?>> {
     m_msg.clearQuick();
     m_proto.pack(m_msg, value);
     int size = m_msg.getSerializedSize();
-    if (size < m_buf.capacity()) {
+    if (size > m_buf.capacity()) {
       m_buf = ByteBuffer.allocateDirect(size * 2);
       m_sink.setOutput(m_buf);
     }

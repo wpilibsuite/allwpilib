@@ -595,7 +595,7 @@ void UsbCameraImpl::DeviceConnect() {
   }
 
   if (m_connectVerbose) {
-    SINFO("Connecting to USB camera on {}", m_path);
+    SINFO("Attempting to connect to USB camera on {}", m_path);
   }
 
   // Try to open the device
@@ -605,6 +605,10 @@ void UsbCameraImpl::DeviceConnect() {
     return;
   }
   m_fd = fd;
+
+  if (m_connectVerbose) {
+    SINFO("Connected to USB camera on {}", m_path);
+  }
 
   // Get capabilities
   SDEBUG3("getting capabilities");

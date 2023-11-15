@@ -4,7 +4,7 @@
 
 package edu.wpi.first.math.controller;
 
-import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 
@@ -93,8 +93,8 @@ public class ElevatorFeedforward {
     var plant = LinearSystemId.identifyVelocitySystem(this.kv, this.ka);
     var feedforward = new LinearPlantInversionFeedforward<>(plant, dtSeconds);
 
-    var r = Matrix.mat(Nat.N1(), Nat.N1()).fill(currentVelocity);
-    var nextR = Matrix.mat(Nat.N1(), Nat.N1()).fill(nextVelocity);
+    var r = MatBuilder.fill(Nat.N1(), Nat.N1(), currentVelocity);
+    var nextR = MatBuilder.fill(Nat.N1(), Nat.N1(), nextVelocity);
 
     return kg + ks * Math.signum(currentVelocity) + feedforward.calculate(r, nextR).get(0, 0);
   }

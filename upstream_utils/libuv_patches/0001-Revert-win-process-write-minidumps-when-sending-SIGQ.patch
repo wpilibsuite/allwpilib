@@ -6,37 +6,38 @@ Subject: [PATCH 01/10] Revert "win,process: write minidumps when sending
 
 This reverts commit 748d894e82abcdfff7429cf745003e182c47f163.
 ---
- CMakeLists.txt    |   5 +-
+ CMakeLists.txt    |   6 +--
  configure.ac      |   2 +-
  include/uv/win.h  |   1 -
  src/win/process.c | 116 ----------------------------------------------
- 4 files changed, 2 insertions(+), 122 deletions(-)
+ 4 files changed, 2 insertions(+), 123 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 93733dd04783436cc1f1a801133e67e315f4af8d..0958dfb1bd93311cd0e20506311e1e41774c5fa4 100644
+index 72377851b69f74c5285fd34ae206ad6bed3745c1..3ec6bd00542f5aacfc6245b1f82e365eb1cff02c 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -183,10 +183,7 @@ if(WIN32)
+@@ -183,11 +183,7 @@ if(WIN32)
         advapi32
         iphlpapi
         userenv
 -       ws2_32
 -       dbghelp
 -       ole32
--       uuid)
+-       uuid
+-       shell32)
 +       ws2_32)
    list(APPEND uv_sources
         src/win/async.c
         src/win/core.c
 diff --git a/configure.ac b/configure.ac
-index deb083605de639e896df83882715ddca25340fa3..76177a4bc8e5f17bc1e062af3a9028d2dfc76dc9 100644
+index 0a1042ce3d384f6a4392a100275c14cb31ba2816..6c87c36039446e04f6c30c23b8fdb9b957dd610d 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -74,7 +74,7 @@ AM_CONDITIONAL([OS400],    [AS_CASE([$host_os],[os400],         [true], [false])
  AM_CONDITIONAL([SUNOS],    [AS_CASE([$host_os],[solaris*],      [true], [false])])
  AM_CONDITIONAL([WINNT],    [AS_CASE([$host_os],[mingw*],        [true], [false])])
  AS_CASE([$host_os],[mingw*], [
--    LIBS="$LIBS -lws2_32 -lpsapi -liphlpapi -lshell32 -luserenv -luser32 -ldbghelp -lole32 -luuid"
+-    LIBS="$LIBS -lws2_32 -lpsapi -liphlpapi -lshell32 -luserenv -luser32 -ldbghelp -lole32 -luuid -lshell32"
 +    LIBS="$LIBS -lws2_32 -lpsapi -liphlpapi -lshell32 -luserenv -luser32"
  ])
  AS_CASE([$host_os], [solaris2.10], [
@@ -54,7 +55,7 @@ index 6f8c47298e407bcb0151cf383a8370b71074f03e..eb74776978340a4910194bae35a9da64
  #define SIGWINCH             28
  
 diff --git a/src/win/process.c b/src/win/process.c
-index 3e451e2291d6ed200ec258e874becbbea22bbc27..ed44adc67c6d52785a199206d9ba0357e2d0b045 100644
+index 43059858f3112e7e7185796525697629b72988df..119b46cb3f37122395c172c6e9700d472a2173ed 100644
 --- a/src/win/process.c
 +++ b/src/win/process.c
 @@ -32,9 +32,6 @@
@@ -67,7 +68,7 @@ index 3e451e2291d6ed200ec258e874becbbea22bbc27..ed44adc67c6d52785a199206d9ba0357
  
  
  #define SIGKILL         9
-@@ -1197,120 +1194,7 @@ static int uv__kill(HANDLE process_handle, int signum) {
+@@ -1173,120 +1170,7 @@ static int uv__kill(HANDLE process_handle, int signum) {
      return UV_EINVAL;
    }
  

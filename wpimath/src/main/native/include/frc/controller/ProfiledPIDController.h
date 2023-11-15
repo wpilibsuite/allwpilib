@@ -58,7 +58,9 @@ class ProfiledPIDController
    */
   ProfiledPIDController(double Kp, double Ki, double Kd,
                         Constraints constraints, units::second_t period = 20_ms)
-      : m_controller(Kp, Ki, Kd, period), m_constraints(constraints) {
+      : m_controller{Kp, Ki, Kd, period},
+        m_constraints{constraints},
+        m_profile{m_constraints} {
     int instances = detail::IncrementAndGetProfiledPIDControllerInstances();
     wpi::math::MathSharedStore::ReportUsage(
         wpi::math::MathUsageId::kController_ProfiledPIDController, instances);
@@ -202,7 +204,10 @@ class ProfiledPIDController
    *
    * @param constraints Velocity and acceleration constraints for goal.
    */
-  void SetConstraints(Constraints constraints) { m_constraints = constraints; }
+  void SetConstraints(Constraints constraints) {
+    m_constraints = constraints;
+    m_profile = TrapezoidProfile<Distance>{m_constraints};
+  }
 
   /**
    * Get the velocity and acceleration constraints for this controller.
@@ -317,8 +322,7 @@ class ProfiledPIDController
       m_setpoint.position = setpointMinDistance + measurement;
     }
 
-    frc::TrapezoidProfile<Distance> profile{m_constraints};
-    m_setpoint = profile.Calculate(GetPeriod(), m_goal, m_setpoint);
+    m_setpoint = m_profile.Calculate(GetPeriod(), m_setpoint, m_goal);
     return m_controller.Calculate(measurement.value(),
                                   m_setpoint.position.value());
   }
@@ -408,9 +412,11 @@ class ProfiledPIDController
   PIDController m_controller;
   Distance_t m_minimumInput{0};
   Distance_t m_maximumInput{0};
+
+  typename frc::TrapezoidProfile<Distance>::Constraints m_constraints;
+  TrapezoidProfile<Distance> m_profile;
   typename frc::TrapezoidProfile<Distance>::State m_goal;
   typename frc::TrapezoidProfile<Distance>::State m_setpoint;
-  typename frc::TrapezoidProfile<Distance>::Constraints m_constraints;
 };
 
 }  // namespace frc

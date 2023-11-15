@@ -36,8 +36,7 @@ if (OperatingSystem.current().isWindows()) {
         return
     }
 
-    // TODO Remove VersionNumber
-    def expectedVersion = VersionNumber.parse(defaultRedistFile.text.trim())
+    def expectedVersion = defaultRedistFile.text.trim()
 
     def runtimeLocation = file("$vsDirectory\\VC\\Redist\\MSVC\\$expectedVersion")
 

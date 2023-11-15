@@ -76,8 +76,11 @@ static std::string MakeLogDir(std::string_view dir) {
                     "DataLogManager: Logging to RoboRIO 1 internal storage is "
                     "not recommended! Plug in a FAT32 formatted flash drive!");
   }
-#endif
+  fs::create_directory("/home/lvuser/logs", ec);
+  return "/home/lvuser/logs";
+#else
   return filesystem::GetOperatingDirectory();
+#endif
 }
 
 static std::string MakeLogFilename(std::string_view filenameOverride) {
@@ -111,12 +114,18 @@ Thread::~Thread() {
 void Thread::Main() {
   // based on free disk space, scan for "old" FRC_*.wpilog files and remove
   {
-    uintmax_t freeSpace = fs::space(m_logDir).available;
+    std::error_code ec;
+    uintmax_t freeSpace;
+    auto freeSpaceInfo = fs::space(m_logDir, ec);
+    if (!ec) {
+      freeSpace = freeSpaceInfo.available;
+    } else {
+      freeSpace = UINTMAX_MAX;
+    }
     if (freeSpace < kFreeSpaceThreshold) {
       // Delete oldest FRC_*.wpilog files (ignore FRC_TBD_*.wpilog as we just
       // created one)
       std::vector<fs::directory_entry> entries;
-      std::error_code ec;
       for (auto&& entry : fs::directory_iterator{m_logDir, ec}) {
         auto stem = entry.path().stem().string();
         if (wpi::starts_with(stem, "FRC_") &&
@@ -308,12 +317,21 @@ static Instance& GetInstance(std::string_view dir = "",
                              std::string_view filename = "",
                              double period = 0.25) {
   static Instance instance(dir, filename, period);
+  if (!instance.owner) {
+    instance.owner.Start(MakeLogDir(dir), filename, period);
+  }
   return instance;
 }
 
 void DataLogManager::Start(std::string_view dir, std::string_view filename,
                            double period) {
   GetInstance(dir, filename, period);
+}
+
+void DataLogManager::Stop() {
+  auto& inst = GetInstance();
+  inst.owner.GetThread()->m_log.Stop();
+  inst.owner.Join();
 }
 
 void DataLogManager::Log(std::string_view message) {

@@ -36,10 +36,10 @@ index 268fc9652f437eb0d0cda2a9e0b06b9e91eb9742..f53adc156a7c454c492abaeac29d90be
  #pragma GCC diagnostic push
  #pragma GCC diagnostic ignored "-Wdollar-in-identifier-extension"
 diff --git a/src/uv-common.c b/src/uv-common.c
-index cd10b36b4a393e325ea03b93eb9897193ca9800b..bfcc3ef10f4fd7763221638947da6e02e7a17c33 100644
+index 49126e50f07bac16d198775454b731f40630d1d1..3d802cf1d629272f281d07b9ea424ec259b4377e 100644
 --- a/src/uv-common.c
 +++ b/src/uv-common.c
-@@ -799,6 +799,7 @@ void uv__fs_readdir_cleanup(uv_fs_t* req) {
+@@ -802,6 +802,7 @@ void uv__fs_readdir_cleanup(uv_fs_t* req) {
    }
  }
  
@@ -48,7 +48,7 @@ index cd10b36b4a393e325ea03b93eb9897193ca9800b..bfcc3ef10f4fd7763221638947da6e02
  # pragma clang diagnostic push
  # pragma clang diagnostic ignored "-Wvarargs"
 diff --git a/src/win/process.c b/src/win/process.c
-index 2b1b46259959867482079962d0ea44246a42e7cb..18816d3b1e8c863f8ca74fe0104de1aecd0ae3fa 100644
+index eeb0f6a984bb0f61b956cb4b907fbfdb3b4ac7e2..69f94b913f0a4051a36690725c7f79eb3535e594 100644
 --- a/src/win/process.c
 +++ b/src/win/process.c
 @@ -35,7 +35,6 @@
