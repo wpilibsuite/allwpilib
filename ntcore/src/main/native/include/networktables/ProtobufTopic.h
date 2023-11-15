@@ -60,12 +60,12 @@ class ProtobufSubscriber : public Subscriber {
   ProtobufSubscriber(ProtobufSubscriber&& rhs)
       : Subscriber{std::move(rhs)},
         m_msg{std::move(rhs.m_msg)},
-        m_defaultValue{std::move(rhs.defaultValue)} {}
+        m_defaultValue{std::move(rhs.m_defaultValue)} {}
 
   ProtobufSubscriber& operator=(ProtobufSubscriber&& rhs) {
     Subscriber::operator=(std::move(rhs));
     m_msg = std::move(rhs.m_msg);
-    m_defaultValue = std::move(rhs.defaultValue);
+    m_defaultValue = std::move(rhs.m_defaultValue);
     return *this;
   }
 
