@@ -174,9 +174,17 @@ class DataLog final {
   void Pause();
 
   /**
-   * Resumes appending of data records to the log.
+   * Resumes appending of data records to the log.  If called after Stop(),
+   * opens a new file (with random name if SetFilename was not called after
+   * Stop()) and appends Start records and schema data values for all previously
+   * started entries and schemas.
    */
   void Resume();
+
+  /**
+   * Stops appending all records to the log, and closes the log file.
+   */
+  void Stop();
 
   /**
    * Returns whether there is a data schema already registered with the given
@@ -456,6 +464,9 @@ class DataLog final {
                          int64_t timestamp);
 
  private:
+  struct WriterThreadState;
+
+  void StartLogFile(WriterThreadState& state);
   void WriterThreadMain(std::string_view dir);
   void WriterThreadMain(
       std::function<void(std::span<const uint8_t> data)> write);
@@ -468,13 +479,20 @@ class DataLog final {
   uint8_t* Reserve(size_t size);
   void AppendImpl(std::span<const uint8_t> data);
   void AppendStringImpl(std::string_view str);
+  void AppendStartRecord(int id, std::string_view name, std::string_view type,
+                         std::string_view metadata, int64_t timestamp);
 
   wpi::Logger& m_msglog;
   mutable wpi::mutex m_mutex;
   wpi::condition_variable m_cond;
-  bool m_active{true};
   bool m_doFlush{false};
-  bool m_paused{false};
+  enum State {
+    kStart,
+    kActive,
+    kPaused,
+    kStopped,
+    kShutdown,
+  } m_state = kActive;
   double m_period;
   std::string m_extraHeader;
   std::string m_newFilename;
@@ -483,10 +501,15 @@ class DataLog final {
   std::vector<Buffer> m_outgoing;
   struct EntryInfo {
     std::string type;
+    std::vector<uint8_t> schemaData;  // only set for schema entries
     int id{0};
   };
   wpi::StringMap<EntryInfo> m_entries;
-  wpi::DenseMap<int, unsigned int> m_entryCounts;
+  struct EntryInfo2 {
+    std::string metadata;
+    unsigned int count;
+  };
+  wpi::DenseMap<int, EntryInfo2> m_entryIds;
   int m_lastId = 0;
   std::thread m_thread;
 };
@@ -1113,11 +1136,21 @@ void WPI_DataLog_Flush(struct WPI_DataLog* datalog);
 void WPI_DataLog_Pause(struct WPI_DataLog* datalog);
 
 /**
- * Resumes appending of data records to the log.
+ * Resumes appending of data records to the log.  If called after Stop(),
+ * opens a new file (with random name if SetFilename was not called after
+ * Stop()) and appends Start records and schema data values for all previously
+ * started entries and schemas.
  *
  * @param datalog data log
  */
 void WPI_DataLog_Resume(struct WPI_DataLog* datalog);
+
+/**
+ * Stops appending all records to the log, and closes the log file.
+ *
+ * @param datalog data log
+ */
+void WPI_DataLog_Stop(struct WPI_DataLog* datalog);
 
 /**
  * Start an entry.  Duplicate names are allowed (with the same type), and

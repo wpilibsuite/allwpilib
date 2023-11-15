@@ -7,6 +7,7 @@ package edu.wpi.first.math.system;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
@@ -30,20 +31,20 @@ class LinearSystemIDTest {
         model
             .getA()
             .isEqual(
-                Matrix.mat(Nat.N2(), Nat.N2()).fill(-10.14132, 3.06598, 3.06598, -10.14132),
+                MatBuilder.fill(Nat.N2(), Nat.N2(), -10.14132, 3.06598, 3.06598, -10.14132),
                 0.001));
 
     assertTrue(
         model
             .getB()
             .isEqual(
-                Matrix.mat(Nat.N2(), Nat.N2()).fill(4.2590, -1.28762, -1.2876, 4.2590), 0.001));
+                MatBuilder.fill(Nat.N2(), Nat.N2(), 4.2590, -1.28762, -1.2876, 4.2590), 0.001));
 
     assertTrue(
-        model.getC().isEqual(Matrix.mat(Nat.N2(), Nat.N2()).fill(1.0, 0.0, 0.0, 1.0), 0.001));
+        model.getC().isEqual(MatBuilder.fill(Nat.N2(), Nat.N2(), 1.0, 0.0, 0.0, 1.0), 0.001));
 
     assertTrue(
-        model.getD().isEqual(Matrix.mat(Nat.N2(), Nat.N2()).fill(0.0, 0.0, 0.0, 0.0), 0.001));
+        model.getD().isEqual(MatBuilder.fill(Nat.N2(), Nat.N2(), 0.0, 0.0, 0.0, 0.0), 0.001));
   }
 
   @Test
@@ -52,11 +53,11 @@ class LinearSystemIDTest {
         LinearSystemId.createElevatorSystem(
             DCMotor.getNEO(2), Units.Kilograms.of(5), Units.Meters.of(0.05), 12);
     assertTrue(
-        model.getA().isEqual(Matrix.mat(Nat.N2(), Nat.N2()).fill(0, 1, 0, -99.05473), 0.001));
+        model.getA().isEqual(MatBuilder.fill(Nat.N2(), Nat.N2(), 0, 1, 0, -99.05473), 0.001));
 
     assertTrue(model.getB().isEqual(VecBuilder.fill(0, 20.8), 0.001));
 
-    assertTrue(model.getC().isEqual(Matrix.mat(Nat.N1(), Nat.N2()).fill(1, 0), 0.001));
+    assertTrue(model.getC().isEqual(MatBuilder.fill(Nat.N1(), Nat.N2(), 1, 0), 0.001));
 
     assertTrue(model.getD().isEqual(VecBuilder.fill(0), 0.001));
   }
@@ -81,7 +82,7 @@ class LinearSystemIDTest {
         LinearSystemId.createDCMotorSystem(
             DCMotor.getNEO(2), Units.KilogramsMetersSquared.of(0.00032), 1.0);
     assertTrue(
-        model.getA().isEqual(Matrix.mat(Nat.N2(), Nat.N2()).fill(0, 1, 0, -26.87032), 0.001));
+        model.getA().isEqual(MatBuilder.fill(Nat.N2(), Nat.N2(), 0, 1, 0, -26.87032), 0.001));
 
     assertTrue(model.getB().isEqual(VecBuilder.fill(0, 1354.166667), 0.001));
 
@@ -100,7 +101,7 @@ class LinearSystemIDTest {
         LinearSystemId.identifyLinearPositionSystem(
             Units.VoltsPerMeterPerSecond.of(kv), Units.VoltsPerMeterPerSecondSquared.of(ka));
 
-    assertEquals(model.getA(), Matrix.mat(Nat.N2(), Nat.N2()).fill(0, 1, 0, -kv / ka));
+    assertEquals(model.getA(), MatBuilder.fill(Nat.N2(), Nat.N2(), 0, 1, 0, -kv / ka));
     assertEquals(model.getB(), VecBuilder.fill(0, 1 / ka));
   }
 

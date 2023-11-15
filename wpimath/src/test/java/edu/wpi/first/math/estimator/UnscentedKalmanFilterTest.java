@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.StateSpaceUtil;
@@ -264,7 +265,7 @@ class UnscentedKalmanFilterTest {
             VecBuilder.fill(0.0, 0.0),
             dtSeconds);
 
-    var P = Matrix.mat(Nat.N2(), Nat.N2()).fill(2.0, 1.0, 1.0, 2.0);
+    var P = MatBuilder.fill(Nat.N2(), Nat.N2(), 2.0, 1.0, 1.0, 2.0);
     observer.setP(P);
 
     assertTrue(observer.getP().isEqual(P, 1e-9));

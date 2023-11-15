@@ -29,8 +29,8 @@ namespace frc {
  * Run on update:
  * @code{.cpp}
  * previousProfiledReference = profile.Calculate(timeSincePreviousUpdate,
- *                                               unprofiledReference,
- *                                               previousProfiledReference);
+ *                                               previousProfiledReference,
+ *                                               unprofiledReference);
  * @endcode
  *
  * where `unprofiledReference` is free to change between calls. Note that when
@@ -121,10 +121,10 @@ class TrapezoidProfile {
    * where the beginning of the profile was at time t = 0.
    *
    * @param t The time since the beginning of the profile.
-   * @param goal        The desired state when the profile is complete.
    * @param current     The initial state (usually the current state).
+   * @param goal        The desired state when the profile is complete.
    */
-  State Calculate(units::second_t t, State goal, State current);
+  State Calculate(units::second_t t, State current, State goal);
 
   /**
    * Returns the time left until a target distance in the profile is reached.

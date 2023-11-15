@@ -20,19 +20,9 @@ namespace frc {
 class QuinticHermiteSplineTest : public ::testing::Test {
  protected:
   static void Run(const Pose2d& a, const Pose2d& b) {
-    // Start the timer.
-    const auto start = std::chrono::high_resolution_clock::now();
-
     // Generate and parameterize the spline.
     const auto spline = SplineHelper::QuinticSplinesFromWaypoints({a, b})[0];
     const auto poses = SplineParameterizer::Parameterize(spline);
-
-    // End timer.
-    const auto finish = std::chrono::high_resolution_clock::now();
-
-    // Calculate the duration (used when benchmarking)
-    const auto duration =
-        std::chrono::duration_cast<std::chrono::microseconds>(finish - start);
 
     for (unsigned int i = 0; i < poses.size() - 1; i++) {
       auto& p0 = poses[i];
@@ -59,8 +49,6 @@ class QuinticHermiteSplineTest : public ::testing::Test {
     EXPECT_NEAR(poses.back().first.Y().value(), b.Y().value(), 1E-9);
     EXPECT_NEAR(poses.back().first.Rotation().Radians().value(),
                 b.Rotation().Radians().value(), 1E-9);
-
-    static_cast<void>(duration);
   }
 };
 }  // namespace frc

@@ -18,6 +18,8 @@ public class DataLogJNI extends WPIUtilJNI {
 
   static native void resume(long impl);
 
+  static native void stop(long impl);
+
   static native void addSchema(long impl, String name, String type, byte[] schema, long timestamp);
 
   static native void addSchemaString(

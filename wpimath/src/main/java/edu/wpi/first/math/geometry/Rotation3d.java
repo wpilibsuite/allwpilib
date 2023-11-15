@@ -8,7 +8,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
@@ -201,9 +200,7 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
       // so a 180 degree rotation is required. Any orthogonal vector can be used
       // for it. Q in the QR decomposition is an orthonormal basis, so it
       // contains orthogonal unit vectors.
-      var X =
-          new MatBuilder<>(Nat.N3(), Nat.N1())
-              .fill(initial.get(0, 0), initial.get(1, 0), initial.get(2, 0));
+      var X = VecBuilder.fill(initial.get(0, 0), initial.get(1, 0), initial.get(2, 0));
       final var qr = DecompositionFactory_DDRM.qr(3, 1);
       qr.decompose(X.getStorage().getMatrix());
       final var Q = qr.getQ(null, false);
