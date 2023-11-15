@@ -51,6 +51,7 @@ public class AprilTag {
    * Generates an opencv Mat containing the apriltag with the id with family 16h5 passed in.
    *
    * @param id id
+   * @return An OpenCV Mat containing the AprilTag image
    */
   public static Mat generate16h5AprilTagImage(int id) {
     Mat generatedImage = new Mat();
@@ -62,6 +63,7 @@ public class AprilTag {
    * Generates an opencv Mat containing the apriltag with the id with family 36h11 passed in.
    *
    * @param id id
+   * @return An OpenCV Mat containing the AprilTag image
    */
   public static Mat generate36h11AprilTagImage(int id) {
     Mat generatedImage = new Mat();

@@ -7,16 +7,16 @@
 
 #include <functional>
 
+#ifdef __cplusplus
+#include "cscore_oo.h"
+#endif
+
 #include <wpi/RawFrame.h>
 
 #include "cscore_c.h"
 
 #ifdef __cplusplus
 extern "C" {
-#endif
-
-#ifdef __cplusplus
-#include "cscore_oo.h"
 #endif
 
 /**
