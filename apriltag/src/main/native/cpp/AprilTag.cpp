@@ -24,9 +24,9 @@ wpi::RawFrame AprilTag::Generate36h11AprilTagImage(int id) {
   apriltag_family_t* tagFamily = tag36h11_create();
   image_u8_t* image = apriltag_to_image(tagFamily, id);
   wpi::RawFrame markerFrame{};
-  size_t totalDataSize = image->height * image->stride * sizeof(uint8_t);
+  size_t totalDataSize = image->height * image->stride * sizeof(char);
   markerFrame.data = static_cast<char*>(
-      std::calloc(image->height * image->stride, sizeof(uint8_t)));
+      std::calloc(image->height * image->stride, sizeof(char)));
   std::memcpy(markerFrame.data, image->buf, totalDataSize);
   markerFrame.dataLength = image->width;
   markerFrame.height = image->height;
@@ -42,9 +42,9 @@ wpi::RawFrame AprilTag::Generate16h5AprilTagImage(int id) {
   apriltag_family_t* tagFamily = tag16h5_create();
   image_u8_t* image = apriltag_to_image(tagFamily, id);
   wpi::RawFrame markerFrame{};
-  size_t totalDataSize = image->height * image->stride * sizeof(uint8_t);
+  size_t totalDataSize = image->height * image->stride * sizeof(char);
   markerFrame.data = static_cast<char*>(
-      std::calloc(image->height * image->stride, sizeof(uint8_t)));
+      std::calloc(image->height * image->stride, sizeof(char)));
   std::memcpy(markerFrame.data, image->buf, totalDataSize);
   markerFrame.dataLength = image->width;
   markerFrame.height = image->height;
