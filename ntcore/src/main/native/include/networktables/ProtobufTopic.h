@@ -172,8 +172,8 @@ class ProtobufSubscriber : public Subscriber {
   }
 
  private:
-  wpi::mutex m_mutex;
-  wpi::ProtobufMessage<T> m_msg;
+  mutable wpi::mutex m_mutex;
+  mutable wpi::ProtobufMessage<T> m_msg;
   ValueType m_defaultValue;
 };
 
