@@ -20,24 +20,40 @@
 
 using namespace frc;
 
-cv::Mat AprilTag::Generate36h11AprilTagImage(int id) {
+wpi::RawFrame AprilTag::Generate36h11AprilTagImage(int id) {
   apriltag_family_t* tagFamily = tag36h11_create();
   image_u8_t* image = apriltag_to_image(tagFamily, id);
-  cv::Mat_<uint8_t> markerImage{image->height, image->stride, image->buf};
-  cv::Mat_<uint8_t> markerClone = markerImage.colRange(0, image->width).clone();
+  wpi::RawFrame markerFrame{};
+  size_t totalDataSize = image->height * image->stride * sizeof(uint8_t);
+  markerFrame.data = static_cast<char*>(
+      std::calloc(image->height * image->stride, sizeof(uint8_t)));
+  std::memcpy(markerFrame.data, image->buf, totalDataSize);
+  markerFrame.dataLength = image->width;
+  markerFrame.height = image->height;
+  markerFrame.pixelFormat = WPI_PIXFMT_GRAY;
+  markerFrame.width = image->stride;
+  markerFrame.totalData = totalDataSize;
   image_u8_destroy(image);
   tag36h11_destroy(tagFamily);
-  return markerClone;
+  return markerFrame;
 }
 
-cv::Mat AprilTag::Generate16h5AprilTagImage(int id) {
+wpi::RawFrame AprilTag::Generate16h5AprilTagImage(int id) {
   apriltag_family_t* tagFamily = tag16h5_create();
   image_u8_t* image = apriltag_to_image(tagFamily, id);
-  cv::Mat_<uint8_t> markerImage{image->height, image->stride, image->buf};
-  cv::Mat_<uint8_t> markerClone = markerImage.colRange(0, image->width).clone();
+  wpi::RawFrame markerFrame{};
+  size_t totalDataSize = image->height * image->stride * sizeof(uint8_t);
+  markerFrame.data = static_cast<char*>(
+      std::calloc(image->height * image->stride, sizeof(uint8_t)));
+  std::memcpy(markerFrame.data, image->buf, totalDataSize);
+  markerFrame.dataLength = image->width;
+  markerFrame.height = image->height;
+  markerFrame.pixelFormat = WPI_PIXFMT_GRAY;
+  markerFrame.width = image->stride;
+  markerFrame.totalData = totalDataSize;
   image_u8_destroy(image);
   tag16h5_destroy(tagFamily);
-  return markerClone;
+  return markerFrame;
 }
 
 void frc::to_json(wpi::json& json, const AprilTag& apriltag) {

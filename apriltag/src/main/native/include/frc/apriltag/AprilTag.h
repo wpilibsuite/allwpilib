@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <opencv2/core/mat.hpp>
+#include <wpi/RawFrame.h>
 #include <wpi/SymbolExports.h>
 #include <wpi/json_fwd.h>
 
@@ -22,8 +22,8 @@ struct WPILIB_DLLEXPORT AprilTag {
    */
   bool operator==(const AprilTag&) const = default;
 
-  static cv::Mat Generate36h11AprilTagImage(int id);
-  static cv::Mat Generate16h5AprilTagImage(int id);
+  static wpi::RawFrame Generate36h11AprilTagImage(int id);
+  static wpi::RawFrame Generate16h5AprilTagImage(int id);
 };
 
 WPILIB_DLLEXPORT

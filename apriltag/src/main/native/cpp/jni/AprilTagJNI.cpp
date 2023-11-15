@@ -595,10 +595,10 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_estimatePose
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_apriltag_jni_AprilTagJNI_generate16h5AprilTagImage
-  (JNIEnv* env, jclass, jint id, jlong matPtr)
+  (JNIEnv* env, jclass, jint id, jlong framePtr)
 {
-  cv::Mat* javaMat = (cv::Mat*)matPtr;
-  *javaMat = AprilTag::Generate16h5AprilTagImage(id);
+  wpi::RawFrame* javaRawFrame = (wpi::RawFrame*)framePtr;
+  *javaRawFrame = AprilTag::Generate16h5AprilTagImage(id);
 }
 
 /*
@@ -608,10 +608,10 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_generate16h5AprilTagImage
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_apriltag_jni_AprilTagJNI_generate36h11AprilTagImage
-  (JNIEnv* env, jclass, jint id, jlong matPtr)
+  (JNIEnv* env, jclass, jint id, jlong framePtr)
 {
-  cv::Mat* javaMat = (cv::Mat*)matPtr;
-  *javaMat = AprilTag::Generate36h11AprilTagImage(id);
+  wpi::RawFrame* javaRawFrame = (wpi::RawFrame*)framePtr;
+  *javaRawFrame = AprilTag::Generate36h11AprilTagImage(id);
 }
 
 }  // extern "C"
