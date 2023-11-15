@@ -62,7 +62,7 @@ class RawCvSource : public RawSource {
   void PutFrame(cv::Mat& image);
 
  private:
-  RawFrame rawFrame;
+  wpi::RawFrame rawFrame;
 };
 
 /**
@@ -151,7 +151,7 @@ class RawCvSink : public RawSink {
   uint64_t GrabFrameNoTimeoutDirect(cv::Mat& image);
 
  private:
-  RawFrame rawFrame;
+  wpi::RawFrame rawFrame;
 };
 
 inline RawCvSource::RawCvSource(std::string_view name, const VideoMode& mode)
@@ -201,7 +201,7 @@ inline uint64_t RawCvSink::GrabFrameNoTimeout(cv::Mat& image) {
 inline uint64_t RawCvSink::GrabFrameDirect(cv::Mat& image, double timeout) {
   rawFrame.height = 0;
   rawFrame.width = 0;
-  rawFrame.pixelFormat = CS_PixelFormat::CS_PIXFMT_BGR;
+  rawFrame.pixelFormat = WPI_PixelFormat::WPI_PIXFMT_BGR;
   m_status = RawSink::GrabFrame(rawFrame, timeout);
   if (m_status <= 0) {
     return m_status;
@@ -213,7 +213,7 @@ inline uint64_t RawCvSink::GrabFrameDirect(cv::Mat& image, double timeout) {
 inline uint64_t RawCvSink::GrabFrameNoTimeoutDirect(cv::Mat& image) {
   rawFrame.height = 0;
   rawFrame.width = 0;
-  rawFrame.pixelFormat = CS_PixelFormat::CS_PIXFMT_BGR;
+  rawFrame.pixelFormat = WPI_PixelFormat::WPI_PIXFMT_BGR;
   m_status = RawSink::GrabFrameNoTimeout(rawFrame);
   if (m_status <= 0) {
     return m_status;

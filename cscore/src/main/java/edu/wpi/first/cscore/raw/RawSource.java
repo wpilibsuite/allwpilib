@@ -7,6 +7,7 @@ package edu.wpi.first.cscore.raw;
 import edu.wpi.first.cscore.CameraServerJNI;
 import edu.wpi.first.cscore.ImageSource;
 import edu.wpi.first.cscore.VideoMode;
+import edu.wpi.first.util.RawFrame;
 
 /**
  * A source for user code to provide video frames as raw bytes.
