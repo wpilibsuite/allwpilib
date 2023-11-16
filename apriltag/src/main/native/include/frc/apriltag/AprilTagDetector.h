@@ -83,10 +83,10 @@ class WPILIB_DLLEXPORT AprilTagDetector {
     bool operator==(const QuadThresholdParameters&) const = default;
 
     /**
-     * Threshold used to reject quads containing too few pixels. Default is 200
+     * Threshold used to reject quads containing too few pixels. Default is 400
      * pixels.
      */
-    int minClusterPixels = 200;
+    int minClusterPixels = 400;
 
     /**
      * How many corner candidates to consider when segmenting a group of pixels
