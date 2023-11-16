@@ -325,8 +325,8 @@ public final class LinearSystemId {
    *
    * @param motor The motor (or gearbox) attached to the arm.
    * @param J The moment of inertia J of the arm.
-   * @param gearing The gearing between the motor and arm, in output over input. Most of the time this
-   *     will be greater than 1.
+   * @param gearing The gearing between the motor and arm, in output over input. Most of the time
+   *     this will be greater than 1.
    * @return A LinearSystem representing the given characterized constants.
    */
   public static LinearSystem<N2, N1, N1> createSingleJointedArmSystem(
