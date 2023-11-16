@@ -6,7 +6,7 @@ package edu.wpi.first.units;
 
 /**
  * A measure holds the magnitude and unit of some dimension, such as distance, time, or speed. Two
- * measures with the same <i>unit</i> and <i>magnitude</i> are effectively the same object.
+ * measures with the same <i>unit</i> and <i>magnitude</i> are effectively equivalent objects.
  *
  * @param <U> the unit type of the measure
  */

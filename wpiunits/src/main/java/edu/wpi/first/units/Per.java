@@ -11,10 +11,6 @@ import java.util.Objects;
  * Generic combinatory unit type that represents the proportion of one unit to another, such as
  * Meters per Second or Radians per Celsius.
  *
- * <p>Note that due to restrictions with the Java type system, velocities (change per unit time) are
- * represented by the {@link Velocity} class. Accelerations are represented by {@code
- * Velocity<Velocity<X>>}, and so on.
- *
  * @param <N> the type of the numerator unit
  * @param <D> the type of the denominator unit
  */

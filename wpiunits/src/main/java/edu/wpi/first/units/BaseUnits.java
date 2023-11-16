@@ -20,7 +20,7 @@ public final class BaseUnits {
   public static final Velocity<Distance> Velocity =
       new Velocity<>(Distance, Time, "Meter per Second", "m/s");
 
-  /** The standard unit of mass, grams. */
+  /** The standard unit of mass, kilograms. */
   public static final Mass Mass = new Mass(1, "Kilogram", "Kg");
 
   /** The standard unit of angles, revolutions. */
@@ -41,5 +41,6 @@ public final class BaseUnits {
   /** The standard unit of power, watts. */
   public static final Power Power = new Power(1, "Watt", "W");
 
+  /** The standard unit of temperature, kelvin. */
   public static final Temperature Temperature = new Temperature(x -> x, x -> x, "Kelvin", "K");
 }
