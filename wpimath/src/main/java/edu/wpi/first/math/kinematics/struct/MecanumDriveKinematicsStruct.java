@@ -30,7 +30,8 @@ public class MecanumDriveKinematicsStruct implements Struct<MecanumDriveKinemati
 
   @Override
   public String getSchema() {
-    return "Translation2d front_left;Translation2d front_right;Translation2d rear_left;Translation2d rear_right";
+    return "Translation2d front_left;Translation2d front_right;Translation2d rear_left;"
+        + "Translation2d rear_right";
   }
 
   @Override

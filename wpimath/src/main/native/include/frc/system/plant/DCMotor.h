@@ -72,9 +72,9 @@ class WPILIB_DLLEXPORT DCMotor {
    * @param stallCurrent   Current draw when stalled.
    * @param freeCurrent    Current draw under no load.
    * @param freeSpeed      Angular velocity under no load.
-   * @param resistanceOhms The resistance in ohms
-   * @param kvRadPerSecPerVolt The motor velocity constant
-   * @param ktNMPerAmp The motor torque constant
+   * @param resistance     Resistance in ohms
+   * @param kv             Motor velocity constant
+   * @param kt             Motor torque constant
    */
   constexpr DCMotor(units::volt_t nominalVoltage,
                     units::newton_meter_t stallTorque,
