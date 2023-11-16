@@ -23,8 +23,11 @@ TEST(MecanumDriveKinematicsStructTest, Roundtrip) {
 
   MecanumDriveKinematics unpacked_data = StructType::Unpack(buffer);
 
-  EXPECT_EQ(kExpectedData.GetFrontLeftWheel(), unpacked_data.GetFrontLeftWheel());
-  EXPECT_EQ(kExpectedData.GetFrontRightWheel(), unpacked_data.GetFrontRightWheel());
+  EXPECT_EQ(kExpectedData.GetFrontLeftWheel(),
+            unpacked_data.GetFrontLeftWheel());
+  EXPECT_EQ(kExpectedData.GetFrontRightWheel(),
+            unpacked_data.GetFrontRightWheel());
   EXPECT_EQ(kExpectedData.GetRearLeftWheel(), unpacked_data.GetRearLeftWheel());
-  EXPECT_EQ(kExpectedData.GetRearRightWheel(), unpacked_data.GetRearRightWheel());
+  EXPECT_EQ(kExpectedData.GetRearRightWheel(),
+            unpacked_data.GetRearRightWheel());
 }

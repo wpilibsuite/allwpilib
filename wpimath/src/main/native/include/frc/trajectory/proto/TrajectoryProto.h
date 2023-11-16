@@ -7,11 +7,12 @@
 #include <wpi/SymbolExports.h>
 #include <wpi/protobuf/Protobuf.h>
 
-#include "frc/system/plant/DCMotor.h"
+#include "frc/trajectory/Trajectory.h"
 
 template <>
-struct WPILIB_DLLEXPORT wpi::Protobuf<frc::DCMotor> {
+struct WPILIB_DLLEXPORT wpi::Protobuf<frc::Trajectory> {
   static google::protobuf::Message* New(google::protobuf::Arena* arena);
-  static frc::DCMotor Unpack(const google::protobuf::Message& msg);
-  static void Pack(google::protobuf::Message* msg, const frc::DCMotor& value);
+  static frc::Trajectory Unpack(const google::protobuf::Message& msg);
+  static void Pack(google::protobuf::Message* msg,
+                   const frc::Trajectory& value);
 };

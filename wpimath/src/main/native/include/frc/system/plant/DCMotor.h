@@ -79,7 +79,9 @@ class WPILIB_DLLEXPORT DCMotor {
   constexpr DCMotor(units::volt_t nominalVoltage,
                     units::newton_meter_t stallTorque,
                     units::ampere_t stallCurrent, units::ampere_t freeCurrent,
-                    units::radians_per_second_t freeSpeed, units::ohm_t resistance, radians_per_second_per_volt_t kv, newton_meters_per_ampere_t kt)
+                    units::radians_per_second_t freeSpeed,
+                    units::ohm_t resistance, radians_per_second_per_volt_t kv,
+                    newton_meters_per_ampere_t kt)
       : nominalVoltage(nominalVoltage),
         stallTorque(stallTorque),
         stallCurrent(stallCurrent),
@@ -88,7 +90,6 @@ class WPILIB_DLLEXPORT DCMotor {
         R(resistance),
         Kv(kv),
         Kt(kt) {}
-
 
   /**
    * Returns current drawn by motor with given speed and input voltage.
@@ -265,7 +266,6 @@ class WPILIB_DLLEXPORT DCMotor {
 };
 
 }  // namespace frc
-
 
 #include "frc/system/plant/proto/DCMotorProto.h"
 #include "frc/system/plant/struct/DCMotorStruct.h"

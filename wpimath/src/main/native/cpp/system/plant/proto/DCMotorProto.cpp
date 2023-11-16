@@ -28,7 +28,7 @@ frc::DCMotor wpi::Protobuf<frc::DCMotor>::Unpack(
 }
 
 void wpi::Protobuf<frc::DCMotor>::Pack(google::protobuf::Message* msg,
-                                      const frc::DCMotor& value) {
+                                       const frc::DCMotor& value) {
   auto m = static_cast<wpi::proto::ProtobufDCMotor*>(msg);
   m->set_nominal_voltage(value.nominalVoltage.value());
   m->set_stall_torque(value.stallTorque.value());
