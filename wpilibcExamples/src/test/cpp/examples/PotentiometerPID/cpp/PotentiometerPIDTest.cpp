@@ -31,7 +31,7 @@ class PotentiometerPIDTest : public testing::Test {
   std::optional<std::thread> m_thread;
 
  protected:
-  frc::sim::ElevatorSim m_elevatorSim{m_elevatorGearbox,
+  frc::sim::ElevatorSim m_elevatorSim{frc::sim::ElevatorSim::Create(m_elevatorGearbox,
                                       kElevatorGearing,
                                       kCarriageMass,
                                       kElevatorDrumRadius,
@@ -39,7 +39,7 @@ class PotentiometerPIDTest : public testing::Test {
                                       Robot::kFullHeight,
                                       true,
                                       0.0_m,
-                                      9.8_mps_sq};
+                                      9.8_mps_sq)};
   frc::sim::PWMSim m_motorSim{Robot::kMotorChannel};
   frc::sim::AnalogInputSim m_analogSim{Robot::kPotChannel};
   frc::sim::JoystickSim m_joystickSim{Robot::kJoystickChannel};
