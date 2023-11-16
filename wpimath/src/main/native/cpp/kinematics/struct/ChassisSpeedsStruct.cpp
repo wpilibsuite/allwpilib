@@ -14,9 +14,9 @@ using StructType = wpi::Struct<frc::ChassisSpeeds>;
 
 frc::ChassisSpeeds StructType::Unpack(std::span<const uint8_t, kSize> data) {
   return frc::ChassisSpeeds{
-      wpi::UnpackStruct<double, kVxOff>(data),
-      wpi::UnpackStruct<double, kVyOff>(data),
-      wpi::UnpackStruct<double, kOmegaOff>(data),
+      units::meters_per_second_t{wpi::UnpackStruct<double, kVxOff>(data)},
+      units::meters_per_second_t{wpi::UnpackStruct<double, kVyOff>(data)},
+      units::radians_per_second_t{wpi::UnpackStruct<double, kOmegaOff>(data)},
   };
 }
 

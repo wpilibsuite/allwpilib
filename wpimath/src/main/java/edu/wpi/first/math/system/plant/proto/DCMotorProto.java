@@ -4,8 +4,8 @@
 
 package edu.wpi.first.math.system.plant.proto;
 
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.proto.Plant.ProtobufDCMotor;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;
 
@@ -27,9 +27,15 @@ public class DCMotorProto implements Protobuf<DCMotor, ProtobufDCMotor> {
 
   @Override
   public DCMotor unpack(ProtobufDCMotor msg) {
-    return new DCMotor(msg.getNominalVoltage(), msg.getStallTorque(), msg.getStallCurrent(), msg.getFreeCurrent(), msg.getFreeSpeed(), 
-    5// msg.getR(), msg.getKv(), msg.getKt()
-    );
+    return new DCMotor(
+        msg.getNominalVoltage(),
+        msg.getStallTorque(),
+        msg.getStallCurrent(),
+        msg.getFreeCurrent(),
+        msg.getFreeSpeed(),
+        msg.getR(),
+        msg.getKv(),
+        msg.getKt());
   }
 
   @Override
@@ -42,6 +48,5 @@ public class DCMotorProto implements Protobuf<DCMotor, ProtobufDCMotor> {
     msg.setR(value.rOhms);
     msg.setKv(value.KvRadPerSecPerVolt);
     msg.setKt(value.KtNMPerAmp);
-
   }
 }

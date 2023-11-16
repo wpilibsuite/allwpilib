@@ -14,7 +14,7 @@ namespace {
 using ProtoType = wpi::Protobuf<frc::DifferentialDriveKinematics>;
 
 const DifferentialDriveKinematics kExpectedData =
-    DifferentialDriveKinematics{1.74};
+    DifferentialDriveKinematics{1.74_m};
 }  // namespace
 
 TEST(DifferentialDriveKinematicsProtoTest, Roundtrip) {

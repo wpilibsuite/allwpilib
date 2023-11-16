@@ -11,8 +11,13 @@ using namespace frc;
 namespace {
 
 using StructType = wpi::Struct<frc::ElevatorFeedforward>;
-const ElevatorFeedforward kExpectedData{
-    ElevatorFeedforward{1.91, 1.1, 1.1, 0.229}};
+
+static constexpr auto Ks = 1.91_V;
+static constexpr auto Kg = 2.29_V;
+static constexpr auto Kv = 35.04_V * 1_s / 1_m;
+static constexpr auto Ka = 1.74_V * 1_s * 1_s / 1_m;
+
+constexpr ElevatorFeedforward kExpectedData{Ks, Kg, Kv, Ka};
 }  // namespace
 
 TEST(ElevatorFeedforwardStructTest, Roundtrip) {
@@ -22,8 +27,8 @@ TEST(ElevatorFeedforwardStructTest, Roundtrip) {
 
   ElevatorFeedforward unpacked_data = StructType::Unpack(buffer);
 
-  EXPECT_EQ(kExpectedData.ks.value(), unpacked_data.ks.value());
-  EXPECT_EQ(kExpectedData.kg.value(), unpacked_data.kg.value());
-  EXPECT_EQ(kExpectedData.kv.value(), unpacked_data.kv.value());
-  EXPECT_EQ(kExpectedData.ka.value(), unpacked_data.ka.value());
+  EXPECT_EQ(kExpectedData.kS.value(), unpacked_data.kS.value());
+  EXPECT_EQ(kExpectedData.kG.value(), unpacked_data.kG.value());
+  EXPECT_EQ(kExpectedData.kV.value(), unpacked_data.kV.value());
+  EXPECT_EQ(kExpectedData.kA.value(), unpacked_data.kA.value());
 }

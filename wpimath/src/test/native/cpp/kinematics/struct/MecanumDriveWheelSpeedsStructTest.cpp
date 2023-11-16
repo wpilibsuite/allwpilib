@@ -12,7 +12,7 @@ namespace {
 
 using StructType = wpi::Struct<frc::MecanumDriveWheelSpeeds>;
 const MecanumDriveWheelSpeeds kExpectedData{
-    MecanumDriveWheelSpeeds{2.29, 17.4, 4.4, 0.229}};
+    MecanumDriveWheelSpeeds{2.29_mps, 17.4_mps, 4.4_mps, 0.229_mps}};
 }  // namespace
 
 TEST(MecanumDriveWheelSpeedsStructTest, Roundtrip) {

@@ -18,10 +18,10 @@ wpi::Protobuf<frc::MecanumDriveWheelSpeeds>::Unpack(
   auto m =
       static_cast<const wpi::proto::ProtobufMecanumDriveWheelSpeeds*>(&msg);
   return frc::MecanumDriveWheelSpeeds{
-      m->front_left(),
-      m->front_right(),
-      m->rear_left(),
-      m->rear_right(),
+      units::meters_per_second_t{m->front_left()},
+      units::meters_per_second_t{m->front_right()},
+      units::meters_per_second_t{m->rear_left()},
+      units::meters_per_second_t{m->rear_right()},
   };
 }
 

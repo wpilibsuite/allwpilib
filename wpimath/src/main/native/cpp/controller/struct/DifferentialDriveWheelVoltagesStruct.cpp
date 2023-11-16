@@ -14,8 +14,8 @@ using StructType = wpi::Struct<frc::DifferentialDriveWheelVoltages>;
 frc::DifferentialDriveWheelVoltages StructType::Unpack(
     std::span<const uint8_t, kSize> data) {
   return frc::DifferentialDriveWheelVoltages{
-      wpi::UnpackStruct<double, kLeftOff>(data),
-      wpi::UnpackStruct<double, kRightOff>(data),
+      units::volt_t{wpi::UnpackStruct<double, kLeftOff>(data)},
+      units::volt_t{wpi::UnpackStruct<double, kRightOff>(data)},
   };
 }
 

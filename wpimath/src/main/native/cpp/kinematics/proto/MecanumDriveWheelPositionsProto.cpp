@@ -18,10 +18,10 @@ wpi::Protobuf<frc::MecanumDriveWheelPositions>::Unpack(
   auto m =
       static_cast<const wpi::proto::ProtobufMecanumDriveWheelPositions*>(&msg);
   return frc::MecanumDriveWheelPositions{
-      m->front_left(),
-      m->front_right(),
-      m->rear_left(),
-      m->rear_right(),
+      units::meter_t{m->front_left()},
+      units::meter_t{m->front_right()},
+      units::meter_t{m->rear_left()},
+      units::meter_t{m->rear_right()},
   };
 }
 

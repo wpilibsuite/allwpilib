@@ -12,7 +12,7 @@ namespace {
 
 using StructType = wpi::Struct<frc::DifferentialDriveKinematics>;
 const DifferentialDriveKinematics kExpectedData{
-    DifferentialDriveKinematics{1.74}};
+    DifferentialDriveKinematics{1.74_m}};
 }  // namespace
 
 TEST(DifferentialDriveKinematicsStructTest, Roundtrip) {

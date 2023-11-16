@@ -23,7 +23,7 @@ class DifferentialDriveWheelSpeedsStructTest {
     buffer.rewind();
 
     DifferentialDriveWheelSpeeds data = DifferentialDriveWheelSpeeds.struct.unpack(buffer);
-    assertEquals(DATA.left, data.left);
-    assertEquals(DATA.right, data.right);
+    assertEquals(DATA.leftMetersPerSecond, data.leftMetersPerSecond);
+    assertEquals(DATA.rightMetersPerSecond, data.rightMetersPerSecond);
   }
 }

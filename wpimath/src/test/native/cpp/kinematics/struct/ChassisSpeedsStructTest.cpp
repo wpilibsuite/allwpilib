@@ -11,7 +11,7 @@ using namespace frc;
 namespace {
 
 using StructType = wpi::Struct<frc::ChassisSpeeds>;
-const ChassisSpeeds kExpectedData{ChassisSpeeds{2.29, 2.2, 0.3504}};
+const ChassisSpeeds kExpectedData{ChassisSpeeds{2.29_mps, 2.2_mps, 0.3504_rad_per_s}};
 }  // namespace
 
 TEST(ChassisSpeedsStructTest, Roundtrip) {

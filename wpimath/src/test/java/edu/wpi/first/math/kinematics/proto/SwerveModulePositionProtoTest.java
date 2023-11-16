@@ -21,7 +21,7 @@ class SwerveModulePositionProtoTest {
     SwerveModulePosition.proto.pack(proto, DATA);
 
     SwerveModulePosition data = SwerveModulePosition.proto.unpack(proto);
-    assertEquals(DATA.distance, data.distance);
-    assertEquals(DATA.getAngle(), data.getAngle());
+    assertEquals(DATA.distanceMeters, data.distanceMeters);
+    assertEquals(DATA.angle, data.angle);
   }
 }

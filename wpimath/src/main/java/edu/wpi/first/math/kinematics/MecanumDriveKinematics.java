@@ -8,6 +8,8 @@ import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
+import edu.wpi.first.math.kinematics.proto.MecanumDriveKinematicsProto;
+import edu.wpi.first.math.kinematics.struct.MecanumDriveKinematicsStruct;
 import org.ejml.simple.SimpleMatrix;
 
 /**
@@ -41,6 +43,9 @@ public class MecanumDriveKinematics
   private final Translation2d m_rearRightWheelMeters;
 
   private Translation2d m_prevCoR = new Translation2d();
+
+  public static final MecanumDriveKinematicsProto proto = new MecanumDriveKinematicsProto();
+  public static final MecanumDriveKinematicsStruct struct = new MecanumDriveKinematicsStruct();
 
   /**
    * Constructs a mecanum drive kinematics object.

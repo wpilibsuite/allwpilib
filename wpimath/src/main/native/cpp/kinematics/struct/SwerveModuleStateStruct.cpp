@@ -14,7 +14,7 @@ using StructType = wpi::Struct<frc::SwerveModuleState>;
 frc::SwerveModuleState StructType::Unpack(
     std::span<const uint8_t, kSize> data) {
   return frc::SwerveModuleState{
-      wpi::UnpackStruct<double, kSpeedOff>(data),
+      units::meters_per_second_t{wpi::UnpackStruct<double, kSpeedOff>(data)},
       wpi::UnpackStruct<frc::Rotation2d, kAngleOff>(data),
   };
 }
@@ -22,7 +22,7 @@ frc::SwerveModuleState StructType::Unpack(
 void StructType::Pack(std::span<uint8_t, kSize> data,
                       const frc::SwerveModuleState& value) {
   wpi::PackStruct<kSpeedOff>(data, value.speed.value());
-  wpi::PackStruct<kAngleOff>(data, value.angle.value());
+  wpi::PackStruct<kAngleOff>(data, value.angle);
 }
 
 void StructType::ForEachNested(

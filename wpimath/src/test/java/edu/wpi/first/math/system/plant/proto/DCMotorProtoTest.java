@@ -4,10 +4,10 @@
 
 package edu.wpi.first.math.system.plant.proto;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import edu.wpi.first.math.system.plant.DCMotor;
+
 import edu.wpi.first.math.proto.Plant.ProtobufDCMotor;
+import edu.wpi.first.math.system.plant.DCMotor;
 import org.junit.jupiter.api.Test;
 
 class DCMotorProtoTest {
@@ -17,7 +17,7 @@ class DCMotorProtoTest {
   void testRoundtrip() {
     ProtobufDCMotor proto = DCMotor.proto.createMessage();
     DCMotor.proto.pack(proto, DATA);
-    
+
     DCMotor data = DCMotor.proto.unpack(proto);
     assertEquals(DATA.nominalVoltageVolts, data.nominalVoltageVolts);
     assertEquals(DATA.stallTorqueNewtonMeters, data.stallTorqueNewtonMeters);

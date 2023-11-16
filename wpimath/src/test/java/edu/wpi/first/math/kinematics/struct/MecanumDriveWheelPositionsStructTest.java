@@ -23,9 +23,9 @@ class MecanumDriveWheelPositionsStructTest {
     buffer.rewind();
 
     MecanumDriveWheelPositions data = MecanumDriveWheelPositions.struct.unpack(buffer);
-    assertEquals(DATA.frontLeft, data.frontLeft);
-    assertEquals(DATA.frontRight, data.frontRight);
-    assertEquals(DATA.rearLeft, data.rearLeft);
-    assertEquals(DATA.rearRight, data.rearRight);
+    assertEquals(DATA.frontLeftMeters, data.frontLeftMeters);
+    assertEquals(DATA.frontRightMeters, data.frontRightMeters);
+    assertEquals(DATA.rearLeftMeters, data.rearLeftMeters);
+    assertEquals(DATA.rearRightMeters, data.rearRightMeters);
   }
 }

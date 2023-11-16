@@ -16,10 +16,13 @@ using StructType = wpi::Struct<frc::MecanumDriveWheelSpeeds>;
 frc::MecanumDriveWheelSpeeds StructType::Unpack(
     std::span<const uint8_t, kSize> data) {
   return frc::MecanumDriveWheelSpeeds{
-      wpi::UnpackStruct<double, kFrontLeftOff>(data),
-      wpi::UnpackStruct<double, kFrontRightOff>(data),
-      wpi::UnpackStruct<double, kRearLeftOff>(data),
-      wpi::UnpackStruct<double, kRearRightOff>(data),
+      units::meters_per_second_t{
+          wpi::UnpackStruct<double, kFrontLeftOff>(data)},
+      units::meters_per_second_t{
+          wpi::UnpackStruct<double, kFrontRightOff>(data)},
+      units::meters_per_second_t{wpi::UnpackStruct<double, kRearLeftOff>(data)},
+      units::meters_per_second_t{
+          wpi::UnpackStruct<double, kRearRightOff>(data)},
   };
 }
 

@@ -14,7 +14,7 @@ namespace {
 using ProtoType = wpi::Protobuf<frc::DifferentialDriveWheelVoltages>;
 
 const DifferentialDriveWheelVoltages kExpectedData =
-    DifferentialDriveWheelVoltages{0.174, 0.191};
+    DifferentialDriveWheelVoltages{0.174_V, 0.191_V};
 }  // namespace
 
 TEST(DifferentialDriveWheelVoltagesProtoTest, Roundtrip) {

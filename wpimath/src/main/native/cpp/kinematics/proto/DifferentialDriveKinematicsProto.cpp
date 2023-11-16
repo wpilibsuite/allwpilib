@@ -18,7 +18,7 @@ wpi::Protobuf<frc::DifferentialDriveKinematics>::Unpack(
   auto m =
       static_cast<const wpi::proto::ProtobufDifferentialDriveKinematics*>(&msg);
   return frc::DifferentialDriveKinematics{
-      m->track_width(),
+      units::meter_t{m->track_width()},
   };
 }
 

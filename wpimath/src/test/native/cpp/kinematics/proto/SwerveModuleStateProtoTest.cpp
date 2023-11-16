@@ -14,7 +14,7 @@ namespace {
 using ProtoType = wpi::Protobuf<frc::SwerveModuleState>;
 
 const SwerveModuleState kExpectedData =
-    SwerveModuleState{22.9, Rotation2d{3.3}};
+    SwerveModuleState{22.9_mps, Rotation2d{3.3_rad}};
 }  // namespace
 
 TEST(SwerveModuleStateProtoTest, Roundtrip) {
@@ -23,5 +23,5 @@ TEST(SwerveModuleStateProtoTest, Roundtrip) {
 
   SwerveModuleState unpacked_data = ProtoType::Unpack(proto);
   EXPECT_EQ(kExpectedData.speed.value(), unpacked_data.speed.value());
-  EXPECT_EQ(kExpectedData.angle.value(), unpacked_data.angle.value());
+  EXPECT_EQ(kExpectedData.angle, unpacked_data.angle);
 }

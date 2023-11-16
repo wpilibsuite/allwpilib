@@ -14,7 +14,7 @@ namespace {
 using ProtoType = wpi::Protobuf<frc::DifferentialDriveWheelSpeeds>;
 
 const DifferentialDriveWheelSpeeds kExpectedData =
-    DifferentialDriveWheelSpeeds{1.74, 35.04};
+    DifferentialDriveWheelSpeeds{1.74_mps, 35.04_mps};
 }  // namespace
 
 TEST(DifferentialDriveWheelSpeedsProtoTest, Roundtrip) {

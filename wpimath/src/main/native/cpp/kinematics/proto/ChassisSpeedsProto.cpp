@@ -16,9 +16,9 @@ frc::ChassisSpeeds wpi::Protobuf<frc::ChassisSpeeds>::Unpack(
     const google::protobuf::Message& msg) {
   auto m = static_cast<const wpi::proto::ProtobufChassisSpeeds*>(&msg);
   return frc::ChassisSpeeds{
-      m->vx(),
-      m->vy(),
-      m->omega(),
+      units::meters_per_second_t{m->vx()},
+      units::meters_per_second_t{m->vy()},
+      units::radians_per_second_t{m->omega()},
   };
 }
 

@@ -25,10 +25,9 @@ frc::DCMotor StructType::Unpack(
       units::ampere_t{wpi::UnpackStruct<double, kStallCurrentOff>(data)},
       units::ampere_t{wpi::UnpackStruct<double, kFreeCurrentOff>(data)},
       units::radians_per_second_t{wpi::UnpackStruct<double, kFreeSpeedOff>(data)},
-      5,
-      // wpi::UnpackStruct<double, kROff>(data),
-      // wpi::UnpackStruct<double, kKvOff>(data),
-      // wpi::UnpackStruct<double, kKtOff>(data),
+      units::ohm_t{wpi::UnpackStruct<double, kROff>(data)},
+      frc::DCMotor::radians_per_second_per_volt_t{wpi::UnpackStruct<double, kKvOff>(data)},
+      frc::DCMotor::newton_meters_per_ampere_t{wpi::UnpackStruct<double, kKtOff>(data)},
   };
 }
 

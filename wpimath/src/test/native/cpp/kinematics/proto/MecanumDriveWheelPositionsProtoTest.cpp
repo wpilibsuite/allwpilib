@@ -14,7 +14,7 @@ namespace {
 using ProtoType = wpi::Protobuf<frc::MecanumDriveWheelPositions>;
 
 const MecanumDriveWheelPositions kExpectedData =
-    MecanumDriveWheelPositions{17.4, 2.29, 22.9, 1.74};
+    MecanumDriveWheelPositions{17.4_m, 2.29_m, 22.9_m, 1.74_m};
 }  // namespace
 
 TEST(MecanumDriveWheelPositionsProtoTest, Roundtrip) {

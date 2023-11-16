@@ -28,10 +28,10 @@ frc::MecanumDriveKinematics StructType::Unpack(
 
 void StructType::Pack(std::span<uint8_t, kSize> data,
                       const frc::MecanumDriveKinematics& value) {
-  wpi::PackStruct<kFrontLeftOff>(data, value.frontLeft.value());
-  wpi::PackStruct<kFrontRightOff>(data, value.frontRight.value());
-  wpi::PackStruct<kRearLeftOff>(data, value.rearLeft.value());
-  wpi::PackStruct<kRearRightOff>(data, value.rearRight.value());
+  wpi::PackStruct<kFrontLeftOff>(data, value.GetFrontLeftWheel());
+  wpi::PackStruct<kFrontRightOff>(data, value.GetFrontRightWheel());
+  wpi::PackStruct<kRearLeftOff>(data, value.GetRearLeftWheel());
+  wpi::PackStruct<kRearRightOff>(data, value.GetRearRightWheel());
 }
 
 void StructType::ForEachNested(
