@@ -72,7 +72,7 @@ public class AprilTagDetection {
    * @return Homography matrix
    */
   public Matrix<N3, N3> getHomographyMatrix() {
-    return new MatBuilder<>(Nat.N3(), Nat.N3()).fill(m_homography);
+    return MatBuilder.fill(Nat.N3(), Nat.N3(), m_homography);
   }
 
   /**
