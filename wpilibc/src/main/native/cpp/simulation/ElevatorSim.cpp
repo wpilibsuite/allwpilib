@@ -12,7 +12,7 @@
 using namespace frc;
 using namespace frc::sim;
 
-  ElevatorSim ElevatorSim::Create(const LinearSystem<2, 1, 1>& plant, const DCMotor& gearbox,
+ElevatorSim ElevatorSim::Create(const LinearSystem<2, 1, 1>& plant, const DCMotor& gearbox,
               units::volt_t kG, units::meter_t minHeight, 
               units::meter_t maxHeight, bool simulateGravity, units::meter_t startingHeight,
               const std::array<double, 1>& measurementStdDevs){
@@ -67,7 +67,7 @@ ElevatorSim ElevatorSim::Create(decltype(1_V / Velocity_t<Distance>(1)) kV,
                           );
                          }
 
-  ElevatorSim::ElevatorSim(const LinearSystem<2, 1, 1>& plant, const DCMotor& gearbox,
+ElevatorSim::ElevatorSim(const LinearSystem<2, 1, 1>& plant, const DCMotor& gearbox,
               units::meter_t minHeight, units::meter_t maxHeight, 
               bool simulateGravity, units::meter_t startingHeight,
               units::meters_per_second_squared_t g,  
@@ -79,7 +79,7 @@ ElevatorSim ElevatorSim::Create(decltype(1_V / Velocity_t<Distance>(1)) kV,
       m_simulateGravity(simulateGravity),
       m_g(g) {
   SetState(startingHeight, 0_mps);
-        }
+  }
 
 void ElevatorSim::SetState(units::meter_t position,
                            units::meters_per_second_t velocity) {
