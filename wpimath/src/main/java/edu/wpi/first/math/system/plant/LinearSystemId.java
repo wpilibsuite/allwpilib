@@ -33,13 +33,13 @@ public final class LinearSystemId {
    * @param motor The motor (or gearbox) attached to the carriage.
    * @param mass The mass of the elevator carriage.
    * @param radius The radius of the elevator's driving drum.
-   * @param G The reduction between motor and drum, as a ratio of output to input.
+   * @param gearing The reduction between motor and drum, as a ratio of output to input.
    * @return A LinearSystem representing the given characterized constants.
    * @throws IllegalArgumentException if mass &lt;= 0, radius &lt;= 0, or G &lt;= 0.
    */
   public static LinearSystem<N2, N1, N1> createElevatorSystem(
-      DCMotor motor, Measure<Mass> mass, Measure<Distance> radius, double G) {
-    return createElevatorSystem(motor, mass.in(Units.Kilograms), radius.in(Units.Meters), G);
+      DCMotor motor, Measure<Mass> mass, Measure<Distance> radius, double gearing) {
+    return createElevatorSystem(motor, mass.in(Units.Kilograms), radius.in(Units.Meters), gearing);
   }
 
   /**
@@ -86,13 +86,13 @@ public final class LinearSystemId {
    *
    * @param motor The motor (or gearbox) attached to the flywheel.
    * @param J The moment of inertia J of the flywheel.
-   * @param G The reduction between motor and drum, as a ratio of output to input.
+   * @param gearing The reduction between motor and drum, as a ratio of output to input.
    * @return A LinearSystem representing the given characterized constants.
    * @throws IllegalArgumentException if J &lt;= 0 or G &lt;= 0.
    */
   public static LinearSystem<N1, N1, N1> createFlywheelSystem(
-      DCMotor motor, Measure<Mult<Mass, Mult<Distance, Distance>>> J, double G) {
-    return createFlywheelSystem(motor, J.in(Units.KilogramsMetersSquared), G);
+      DCMotor motor, Measure<Mult<Mass, Mult<Distance, Distance>>> J, double gearing) {
+    return createFlywheelSystem(motor, J.in(Units.KilogramsMetersSquared), gearing);
   }
 
   /**
@@ -132,13 +132,13 @@ public final class LinearSystemId {
    *
    * @param motor The motor (or gearbox) attached to system.
    * @param J The moment of inertia J of the DC motor.
-   * @param G The reduction between motor and drum, as a ratio of output to input.
+   * @param gearing The reduction between motor and drum, as a ratio of output to input.
    * @return A LinearSystem representing the given characterized constants.
    * @throws IllegalArgumentException if J &lt;= 0 or G &lt;= 0.
    */
   public static LinearSystem<N2, N1, N2> createDCMotorSystem(
-      DCMotor motor, Measure<Mult<Mass, Mult<Distance, Distance>>> J, double G) {
-    return createDCMotorSystem(motor, J.in(Units.KilogramsMetersSquared), G);
+      DCMotor motor, Measure<Mult<Mass, Mult<Distance, Distance>>> J, double gearing) {
+    return createDCMotorSystem(motor, J.in(Units.KilogramsMetersSquared), gearing);
   }
 
   /**
@@ -245,7 +245,7 @@ public final class LinearSystemId {
    * @param r The radius of the wheels.
    * @param rb The radius of the base (half the track width).
    * @param J The moment of inertia of the robot.
-   * @param G The gearing reduction as output over input.
+   * @param gearing The gearing reduction as output over input.
    * @return A LinearSystem representing a differential drivetrain.
    * @throws IllegalArgumentException if m &lt;= 0, r &lt;= 0, rb &lt;= 0, J &lt;= 0, or G &lt;= 0.
    */
@@ -255,14 +255,14 @@ public final class LinearSystemId {
       Measure<Distance> r,
       Measure<Distance> rb,
       Measure<Mult<Mass, Mult<Distance, Distance>>> J,
-      double G) {
+      double gearing) {
     return createDrivetrainVelocitySystem(
         motor,
         mass.in(Units.Kilograms),
         r.in(Units.Meters),
         rb.in(Units.Meters),
         J.in(Units.KilogramsMetersSquared),
-        G);
+        gearing);
   }
 
   /**
@@ -325,13 +325,13 @@ public final class LinearSystemId {
    *
    * @param motor The motor (or gearbox) attached to the arm.
    * @param J The moment of inertia J of the arm.
-   * @param G The gearing between the motor and arm, in output over input. Most of the time this
+   * @param gearing The gearing between the motor and arm, in output over input. Most of the time this
    *     will be greater than 1.
    * @return A LinearSystem representing the given characterized constants.
    */
   public static LinearSystem<N2, N1, N1> createSingleJointedArmSystem(
-      DCMotor motor, Measure<Mult<Mass, Mult<Distance, Distance>>> J, double G) {
-    return createSingleJointedArmSystem(motor, J.in(Units.KilogramsMetersSquared), G);
+      DCMotor motor, Measure<Mult<Mass, Mult<Distance, Distance>>> J, double gearing) {
+    return createSingleJointedArmSystem(motor, J.in(Units.KilogramsMetersSquared), gearing);
   }
 
   /**
