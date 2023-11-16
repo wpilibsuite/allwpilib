@@ -27,11 +27,11 @@ public class Rotation2dProto implements Protobuf<Rotation2d, ProtobufRotation2d>
 
   @Override
   public Rotation2d unpack(ProtobufRotation2d msg) {
-    return new Rotation2d(msg.getRadians());
+    return new Rotation2d(msg.getValue());
   }
 
   @Override
   public void pack(ProtobufRotation2d msg, Rotation2d value) {
-    msg.setRadians(value.getRadians());
+    msg.setValue(value.getRadians());
   }
 }

@@ -21,7 +21,7 @@ TEST(Translation3dProtoTest, Roundtrip) {
   ProtoType::Pack(&proto, kExpectedData);
 
   Translation3d unpacked_data = ProtoType::Unpack(proto);
-  EXPECT_EQ(kExpectedData.X().value(), unpacked_data.X().value());
-  EXPECT_EQ(kExpectedData.Y().value(), unpacked_data.Y().value());
-  EXPECT_EQ(kExpectedData.Z().value(), unpacked_data.Z().value());
+  EXPECT_EQ(kExpectedData.X(), unpacked_data.X());
+  EXPECT_EQ(kExpectedData.Y(), unpacked_data.Y());
+  EXPECT_EQ(kExpectedData.Z(), unpacked_data.Z());
 }

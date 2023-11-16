@@ -16,12 +16,12 @@ frc::Rotation3d wpi::Protobuf<frc::Rotation3d>::Unpack(
     const google::protobuf::Message& msg) {
   auto m = static_cast<const wpi::proto::ProtobufRotation3d*>(&msg);
   return frc::Rotation3d{
-      wpi::UnpackProtobuf<frc::Quaternion>(m->quaternion()),
+      wpi::UnpackProtobuf<frc::Quaternion>(m->q()),
   };
 }
 
 void wpi::Protobuf<frc::Rotation3d>::Pack(google::protobuf::Message* msg,
                                           const frc::Rotation3d& value) {
   auto m = static_cast<wpi::proto::ProtobufRotation3d*>(msg);
-  wpi::PackProtobuf(m->mutable_quaternion(), value.GetQuaternion());
+  wpi::PackProtobuf(m->mutable_q(), value.GetQuaternion());
 }

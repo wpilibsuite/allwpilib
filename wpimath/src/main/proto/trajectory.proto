@@ -6,14 +6,15 @@ import "geometry2d.proto";
 
 option java_package = "edu.wpi.first.math.proto";
 
-message ProtobufTrajectory {
-  message State {
-    double time_seconds = 1;
-    double velocity_mps = 2;
-    double acceleration_mps_sq = 3;
-    ProtobufPose2d pose = 4;
-    double curvature_rad_per_meter = 5;
-  }
+message ProtobufTrajectoryState {
+  double time = 1;
+  double velocity = 2;
+  double acceleration = 3;
+  ProtobufPose2d pose = 4;
+  double curvature = 5;
+}
 
-  repeated State states = 1;
+message ProtobufTrajectory {
+  double total_time = 1;
+  repeated ProtobufTrajectoryState states = 2;
 }

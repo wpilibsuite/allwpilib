@@ -32,6 +32,6 @@ message ProtobufSimpleMotorFeedforward {
 }
 
 message ProtobufDifferentialDriveWheelVoltages {
-  double left_volts = 1;
-  double right_volts = 2;
+  double left = 1;
+  double right = 2;
 }

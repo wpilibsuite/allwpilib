@@ -28,21 +28,16 @@ public class Twist3dProto implements Protobuf<Twist3d, ProtobufTwist3d> {
   @Override
   public Twist3d unpack(ProtobufTwist3d msg) {
     return new Twist3d(
-        msg.getDxMeters(),
-        msg.getDyMeters(),
-        msg.getDzMeters(),
-        msg.getRxRadians(),
-        msg.getRyRadians(),
-        msg.getRzRadians());
+        msg.getDx(), msg.getDy(), msg.getDz(), msg.getRx(), msg.getRy(), msg.getRz());
   }
 
   @Override
   public void pack(ProtobufTwist3d msg, Twist3d value) {
-    msg.setDxMeters(value.dx);
-    msg.setDyMeters(value.dy);
-    msg.setDzMeters(value.dz);
-    msg.setRxRadians(value.rx);
-    msg.setRyRadians(value.ry);
-    msg.setRzRadians(value.rz);
+    msg.setDx(value.dx);
+    msg.setDy(value.dy);
+    msg.setDz(value.dz);
+    msg.setRx(value.rx);
+    msg.setRy(value.ry);
+    msg.setRz(value.rz);
   }
 }

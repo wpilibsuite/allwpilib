@@ -27,13 +27,13 @@ public class Translation3dProto implements Protobuf<Translation3d, ProtobufTrans
 
   @Override
   public Translation3d unpack(ProtobufTranslation3d msg) {
-    return new Translation3d(msg.getXMeters(), msg.getYMeters(), msg.getZMeters());
+    return new Translation3d(msg.getX(), msg.getY(), msg.getZ());
   }
 
   @Override
   public void pack(ProtobufTranslation3d msg, Translation3d value) {
-    msg.setXMeters(value.getX());
-    msg.setYMeters(value.getY());
-    msg.setZMeters(value.getZ());
+    msg.setX(value.getX());
+    msg.setY(value.getY());
+    msg.setZ(value.getZ());
   }
 }

@@ -27,12 +27,12 @@ public class Translation2dProto implements Protobuf<Translation2d, ProtobufTrans
 
   @Override
   public Translation2d unpack(ProtobufTranslation2d msg) {
-    return new Translation2d(msg.getXMeters(), msg.getYMeters());
+    return new Translation2d(msg.getX(), msg.getY());
   }
 
   @Override
   public void pack(ProtobufTranslation2d msg, Translation2d value) {
-    msg.setXMeters(value.getX());
-    msg.setYMeters(value.getY());
+    msg.setX(value.getX());
+    msg.setY(value.getY());
   }
 }

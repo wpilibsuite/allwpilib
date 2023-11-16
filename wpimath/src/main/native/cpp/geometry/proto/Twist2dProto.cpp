@@ -16,16 +16,16 @@ frc::Twist2d wpi::Protobuf<frc::Twist2d>::Unpack(
     const google::protobuf::Message& msg) {
   auto m = static_cast<const wpi::proto::ProtobufTwist2d*>(&msg);
   return frc::Twist2d{
-      units::meter_t{m->dx_meters()},
-      units::meter_t{m->dy_meters()},
-      units::radian_t{m->dtheta_radians()},
+      units::meter_t{m->dx()},
+      units::meter_t{m->dy()},
+      units::radian_t{m->dtheta()},
   };
 }
 
 void wpi::Protobuf<frc::Twist2d>::Pack(google::protobuf::Message* msg,
                                        const frc::Twist2d& value) {
   auto m = static_cast<wpi::proto::ProtobufTwist2d*>(msg);
-  m->set_dx_meters(value.dx.value());
-  m->set_dy_meters(value.dy.value());
-  m->set_dtheta_radians(value.dtheta.value());
+  m->set_dx(value.dx.value());
+  m->set_dy(value.dy.value());
+  m->set_dtheta(value.dtheta.value());
 }

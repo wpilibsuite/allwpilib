@@ -27,13 +27,13 @@ public class Twist2dProto implements Protobuf<Twist2d, ProtobufTwist2d> {
 
   @Override
   public Twist2d unpack(ProtobufTwist2d msg) {
-    return new Twist2d(msg.getDxMeters(), msg.getDyMeters(), msg.getDthetaRadians());
+    return new Twist2d(msg.getDx(), msg.getDy(), msg.getDtheta());
   }
 
   @Override
   public void pack(ProtobufTwist2d msg, Twist2d value) {
-    msg.setDxMeters(value.dx);
-    msg.setDyMeters(value.dy);
-    msg.setDthetaRadians(value.dtheta);
+    msg.setDx(value.dx);
+    msg.setDy(value.dy);
+    msg.setDtheta(value.dtheta);
   }
 }

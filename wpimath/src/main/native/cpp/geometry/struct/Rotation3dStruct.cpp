@@ -5,20 +5,20 @@
 #include "frc/geometry/struct/Rotation3dStruct.h"
 
 namespace {
-constexpr size_t kQuaternionOff = 0;
+constexpr size_t kQOff = 0;
 }  // namespace
 
 using StructType = wpi::Struct<frc::Rotation3d>;
 
 frc::Rotation3d StructType::Unpack(std::span<const uint8_t, kSize> data) {
   return frc::Rotation3d{
-      wpi::UnpackStruct<frc::Quaternion, kQuaternionOff>(data),
+      wpi::UnpackStruct<frc::Quaternion, kQOff>(data),
   };
 }
 
 void StructType::Pack(std::span<uint8_t, kSize> data,
                       const frc::Rotation3d& value) {
-  wpi::PackStruct<kQuaternionOff>(data, value.GetQuaternion());
+  wpi::PackStruct<kQOff>(data, value.GetQuaternion());
 }
 
 void StructType::ForEachNested(

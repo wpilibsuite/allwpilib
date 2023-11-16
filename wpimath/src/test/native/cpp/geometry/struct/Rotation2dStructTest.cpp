@@ -21,5 +21,5 @@ TEST(Rotation2dStructTest, Roundtrip) {
 
   Rotation2d unpacked_data = StructType::Unpack(buffer);
 
-  EXPECT_EQ(kExpectedData.Radians().value(), unpacked_data.Radians().value());
+  EXPECT_EQ(kExpectedData.Radians(), unpacked_data.Radians());
 }
