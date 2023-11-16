@@ -4,6 +4,8 @@
 
 package edu.wpi.first.math.kinematics;
 
+import edu.wpi.first.math.kinematics.proto.MecanumDriveWheelSpeedsProto;
+import edu.wpi.first.math.kinematics.struct.MecanumDriveWheelSpeedsStruct;
 import java.util.stream.DoubleStream;
 
 public class MecanumDriveWheelSpeeds {
@@ -18,6 +20,9 @@ public class MecanumDriveWheelSpeeds {
 
   /** Speed of the rear right wheel. */
   public double rearRightMetersPerSecond;
+
+  public static final MecanumDriveWheelSpeedsStruct struct = new MecanumDriveWheelSpeedsStruct();
+  public static final MecanumDriveWheelSpeedsProto proto = new MecanumDriveWheelSpeedsProto();
 
   /** Constructs a MecanumDriveWheelSpeeds with zeros for all member fields. */
   public MecanumDriveWheelSpeeds() {}

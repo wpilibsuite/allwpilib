@@ -207,4 +207,20 @@ public class MecanumDriveKinematics
     m_inverseKinematics.setRow(2, 0, 1, 1, rl.getX() - rl.getY());
     m_inverseKinematics.setRow(3, 0, 1, -1, -(rr.getX() + rr.getY()));
   }
+
+  public Translation2d getFrontLeft() {
+    return m_frontLeftWheelMeters;
+  }
+
+  public Translation2d getFrontRight() {
+    return m_frontRightWheelMeters;
+  }
+
+  public Translation2d getRearLeft() {
+    return m_rearLeftWheelMeters;
+  }
+
+  public Translation2d getRearRight() {
+    return m_rearRightWheelMeters;
+  }
 }

@@ -4,6 +4,9 @@
 
 package edu.wpi.first.math.kinematics;
 
+import edu.wpi.first.math.kinematics.proto.DifferentialDriveWheelSpeedsProto;
+import edu.wpi.first.math.kinematics.struct.DifferentialDriveWheelSpeedsStruct;
+
 /** Represents the wheel speeds for a differential drive drivetrain. */
 public class DifferentialDriveWheelSpeeds {
   /** Speed of the left side of the robot. */
@@ -11,6 +14,11 @@ public class DifferentialDriveWheelSpeeds {
 
   /** Speed of the right side of the robot. */
   public double rightMetersPerSecond;
+
+  public static final DifferentialDriveWheelSpeedsProto proto =
+      new DifferentialDriveWheelSpeedsProto();
+  public static final DifferentialDriveWheelSpeedsStruct struct =
+      new DifferentialDriveWheelSpeedsStruct();
 
   /** Constructs a DifferentialDriveWheelSpeeds with zeros for left and right speeds. */
   public DifferentialDriveWheelSpeeds() {}

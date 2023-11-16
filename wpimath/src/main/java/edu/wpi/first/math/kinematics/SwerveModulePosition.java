@@ -7,6 +7,8 @@ package edu.wpi.first.math.kinematics;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.interpolation.Interpolatable;
+import edu.wpi.first.math.kinematics.proto.SwerveModulePositionProto;
+import edu.wpi.first.math.kinematics.struct.SwerveModulePositionStruct;
 import java.util.Objects;
 
 /** Represents the state of one swerve module. */
@@ -17,6 +19,9 @@ public class SwerveModulePosition
 
   /** Angle of the module. */
   public Rotation2d angle = Rotation2d.fromDegrees(0);
+
+  public static final SwerveModulePositionStruct struct = new SwerveModulePositionStruct();
+  public static final SwerveModulePositionProto proto = new SwerveModulePositionProto();
 
   /** Constructs a SwerveModulePosition with zeros for distance and angle. */
   public SwerveModulePosition() {}

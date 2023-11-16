@@ -7,6 +7,8 @@ package edu.wpi.first.math.kinematics;
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.geometry.Twist2d;
+import edu.wpi.first.math.kinematics.proto.DifferentialDriveKinematicsProto;
+import edu.wpi.first.math.kinematics.struct.DifferentialDriveKinematicsStruct;
 
 /**
  * Helper class that converts a chassis velocity (dx and dtheta components) to left and right wheel
@@ -19,6 +21,11 @@ import edu.wpi.first.math.geometry.Twist2d;
 public class DifferentialDriveKinematics
     implements Kinematics<DifferentialDriveWheelSpeeds, DifferentialDriveWheelPositions> {
   public final double trackWidthMeters;
+
+  public static final DifferentialDriveKinematicsProto proto =
+      new DifferentialDriveKinematicsProto();
+  public static final DifferentialDriveKinematicsStruct struct =
+      new DifferentialDriveKinematicsStruct();
 
   /**
    * Constructs a differential drive kinematics object.
