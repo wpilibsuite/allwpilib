@@ -45,6 +45,7 @@ class ElevatorSim : public LinearSystemSim<2, 1, 1> {
    * @param simulateGravity    Whether gravity should be simulated or not.
    * @param startingHeight     The starting height of the elevator.
    * @param measurementStdDevs The standard deviation of the measurements.
+   * @return An ElevatorSim representing the given characterized constants.
    */
   static ElevatorSim Create(const LinearSystem<2, 1, 1>& plant, const DCMotor& gearbox,
               units::volt_t kG, units::meter_t minHeight, 
@@ -67,6 +68,7 @@ class ElevatorSim : public LinearSystemSim<2, 1, 1> {
    * @param startingHeight     The starting height of the elevator.
    * @param g The effective gravity of the system.
    * @param measurementStdDevs The standard deviation of the measurements.
+   * @return An ElevatorSim representing the given characterized constants.
    */
   static ElevatorSim Create(const DCMotor& gearbox, double gearing,
               units::kilogram_t carriageMass, units::meter_t drumRadius,
@@ -88,6 +90,7 @@ class ElevatorSim : public LinearSystemSim<2, 1, 1> {
    * @param simulateGravity    Whether gravity should be simulated or not.
    * @param startingHeight     The starting height of the elevator.
    * @param measurementStdDevs The standard deviation of the measurements.
+   * @return An ElevatorSim representing the given characterized constants.
    */
   template <typename Distance>
     requires std::same_as<units::meter, Distance> ||

@@ -45,6 +45,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
    * @param simulateGravity Whether gravity should be simulated or not.
    * @param startingHeightMeters The starting height of the elevator.
    * @param measurementStdDevs The standard deviations of the measurements.
+   * @return An ElevatorSim representing the given characterized constants.
    */
   public static ElevatorSim create(
       LinearSystem<N2, N1, N1> plant,
@@ -80,6 +81,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
    * @param maxHeightMeters The max allowable height of the elevator.
    * @param simulateGravity Whether gravity should be simulated or not.
    * @param startingHeightMeters The starting height of the elevator.
+   * @return An ElevatorSim representing the given characterized constants.
    */
   public static ElevatorSim create(
       LinearSystem<N2, N1, N1> plant,
@@ -111,6 +113,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
    * @param maxHeightMeters The max allowable height of the elevator.
    * @param simulateGravity Whether gravity should be simulated or not.
    * @param startingHeightMeters The starting height of the elevator.
+   * @return An ElevatorSim representing the given characterized constants.
    */
   public static ElevatorSim create(
       double kV,
@@ -145,6 +148,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
    * @param simulateGravity Whether gravity should be simulated or not.
    * @param startingHeightMeters The starting height of the elevator.
    * @param measurementStdDevs The standard deviations of the measurements.
+   * @return An ElevatorSim representing the given characterized constants.
    */
   public static ElevatorSim create(
       double kV,
@@ -179,6 +183,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
    * @param simulateGravity Whether gravity should be simulated or not.
    * @param startingHeightMeters The starting height of the elevator.
    * @param gMetersPerSecondSquared The effective gravity of the system.
+   * @return An ElevatorSim representing the given characterized constants.
    */
   public static ElevatorSim create(
       DCMotor gearbox,
@@ -216,6 +221,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
    * @param startingHeightMeters The starting height of the elevator.
    * @param gMetersPerSecondSquared The effective gravity of the system.
    * @param measurementStdDevs The standard deviations of the measurements.
+   * @return An ElevatorSim representing the given characterized constants.
    */
   public static ElevatorSim create(
       DCMotor gearbox,
