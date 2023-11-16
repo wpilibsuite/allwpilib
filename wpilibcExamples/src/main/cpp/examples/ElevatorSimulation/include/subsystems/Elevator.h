@@ -49,7 +49,7 @@ class Elevator {
   frc::sim::PWMSim m_motorSim{m_motor};
 
   // Simulation classes help us simulate what's going on, including gravity.
-  frc::sim::ElevatorSim m_elevatorSim{m_elevatorGearbox,
+  frc::sim::ElevatorSim m_elevatorSim{frc::sim::ElevatorSim::Create(m_elevatorGearbox,
                                       Constants::kElevatorGearing,
                                       Constants::kCarriageMass,
                                       Constants::kElevatorDrumRadius,
@@ -58,7 +58,7 @@ class Elevator {
                                       true,
                                       0_m,
                                       9.8_mps_sq,
-                                      {0.01}};
+                                      {0.01})};
   frc::sim::EncoderSim m_encoderSim{m_encoder};
 
   // Create a Mechanism2d display of an elevator

@@ -47,7 +47,7 @@ class PotentiometerPIDTest {
     m_robot = new Robot();
     m_thread = new Thread(m_robot::startCompetition);
     m_elevatorSim =
-        new ElevatorSim(
+        ElevatorSim.create(
             m_elevatorGearbox,
             kElevatorGearing,
             kCarriageMassKg,
@@ -56,8 +56,7 @@ class PotentiometerPIDTest {
             Robot.kFullHeightMeters,
             true,
             0,
-            9.8,
-            null);
+            9.8);
     m_analogSim = new AnalogInputSim(Robot.kPotChannel);
     m_motorSim = new PWMSim(Robot.kMotorChannel);
     m_joystickSim = new JoystickSim(Robot.kJoystickChannel);

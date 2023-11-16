@@ -20,7 +20,7 @@
   EXPECT_LE(units::math::abs(val1 - val2), eps)
 
 TEST(ElevatorSimTest, StateSpaceSim) {
-  frc::sim::ElevatorSim sim(frc::DCMotor::Vex775Pro(4), 14.67, 8_kg, 0.75_in,
+  frc::sim::ElevatorSim sim = frc::sim::ElevatorSim::Create(frc::DCMotor::Vex775Pro(4), 14.67, 8_kg, 0.75_in,
                             0_m, 3_m, true, 0_m, 9.8_mps_sq, {0.01});
   frc::PIDController controller(10, 0.0, 0.0);
 
@@ -45,7 +45,7 @@ TEST(ElevatorSimTest, StateSpaceSim) {
 }
 
 TEST(ElevatorSimTest, MinMax) {
-  frc::sim::ElevatorSim sim(frc::DCMotor::Vex775Pro(4), 14.67, 8_kg, 0.75_in,
+  frc::sim::ElevatorSim sim = frc::sim::ElevatorSim::Create(frc::DCMotor::Vex775Pro(4), 14.67, 8_kg, 0.75_in,
                             0_m, 1_m, true, 0_m, 9.8_mps_sq, {0.01});
   for (size_t i = 0; i < 100; ++i) {
     sim.SetInput(frc::Vectord<1>{0.0});
@@ -65,7 +65,7 @@ TEST(ElevatorSimTest, MinMax) {
 }
 
 TEST(ElevatorSimTest, Stability) {
-  frc::sim::ElevatorSim sim{frc::DCMotor::Vex775Pro(4),
+  frc::sim::ElevatorSim sim = frc::sim::ElevatorSim::Create(frc::DCMotor::Vex775Pro(4),
                             100,
                             4_kg,
                             0.5_in,
@@ -73,7 +73,7 @@ TEST(ElevatorSimTest, Stability) {
                             10_m,
                             false,
                             0_m,
-                            9.8_mps_sq};
+                            9.8_mps_sq);
   sim.SetState(frc::Vectord<2>{0.0, 0.0});
   sim.SetInput(frc::Vectord<1>{12.0});
   for (int i = 0; i < 50; ++i) {

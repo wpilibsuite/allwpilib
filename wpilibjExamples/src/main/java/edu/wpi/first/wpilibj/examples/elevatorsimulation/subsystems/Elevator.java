@@ -46,7 +46,7 @@ public class Elevator implements AutoCloseable {
 
   // Simulation classes help us simulate what's going on, including gravity.
   private final ElevatorSim m_elevatorSim =
-      new ElevatorSim(
+      ElevatorSim.create(
           m_elevatorGearbox,
           Constants.kElevatorGearing,
           Constants.kCarriageMass,

@@ -35,20 +35,20 @@ class ElevatorSim : public LinearSystemSim<2, 1, 1> {
    *
    * @param plant              The linear system that represents the elevator.
    *                           This system can be created with
-   *                           LinearSystemId::ElevatorSystem().
+   *                           LinearSystemId::ElevatorSystem() or with
+   *                           LinearSystemId::IdentifyPositionSystem().
+   * @param kG   The effective gravity of the system.
    * @param gearbox            The type of and number of motors in your
    *                           elevator gearbox.
    * @param minHeight          The minimum allowed height of the elevator.
    * @param maxHeight          The maximum allowed height of the elevator.
    * @param simulateGravity    Whether gravity should be simulated or not.
    * @param startingHeight     The starting height of the elevator.
-   * @param kG   The effective gravity of the system.
    * @param measurementStdDevs The standard deviation of the measurements.
    */
-  ElevatorSim(const LinearSystem<2, 1, 1>& plant, const DCMotor& gearbox,
-              units::meter_t minHeight, units::meter_t maxHeight,
-              bool simulateGravity, units::meter_t startingHeight,
-              units::volt_t kG,
+  static ElevatorSim Create(const LinearSystem<2, 1, 1>& plant, const DCMotor& gearbox,
+              units::volt_t kG, units::meter_t minHeight, 
+              units::meter_t maxHeight, bool simulateGravity, units::meter_t startingHeight,
               const std::array<double, 1>& measurementStdDevs = {0.0});
 
   /**
@@ -65,14 +65,14 @@ class ElevatorSim : public LinearSystemSim<2, 1, 1> {
    * @param maxHeight          The maximum allowed height of the elevator.
    * @param simulateGravity    Whether gravity should be simulated or not.
    * @param startingHeight     The starting height of the elevator.
-   * @param effectiveGravity   The effective gravity of the system.
+   * @param g The effective gravity of the system.
    * @param measurementStdDevs The standard deviation of the measurements.
    */
-  ElevatorSim(const DCMotor& gearbox, double gearing,
+  static ElevatorSim Create(const DCMotor& gearbox, double gearing,
               units::kilogram_t carriageMass, units::meter_t drumRadius,
               units::meter_t minHeight, units::meter_t maxHeight,
               bool simulateGravity, units::meter_t startingHeight,
-              units::meters_per_second_squared_t effectiveGravity,
+              units::meters_per_second_squared_t g,
               const std::array<double, 1>& measurementStdDevs = {0.0});
 
   /**
@@ -80,23 +80,45 @@ class ElevatorSim : public LinearSystemSim<2, 1, 1> {
    *
    * @param kV                 The velocity gain.
    * @param kA                 The acceleration gain.
+   * @param kG                 The gravity gain.
    * @param gearbox            The type of and number of motors in your
    *                           elevator gearbox.
    * @param minHeight          The minimum allowed height of the elevator.
    * @param maxHeight          The maximum allowed height of the elevator.
    * @param simulateGravity    Whether gravity should be simulated or not.
    * @param startingHeight     The starting height of the elevator.
-   * @param kG                 The gravity gain.
    * @param measurementStdDevs The standard deviation of the measurements.
    */
   template <typename Distance>
     requires std::same_as<units::meter, Distance> ||
              std::same_as<units::radian, Distance>
-  ElevatorSim(decltype(1_V / Velocity_t<Distance>(1)) kV,
+  static ElevatorSim Create(decltype(1_V / Velocity_t<Distance>(1)) kV,
               decltype(1_V / Acceleration_t<Distance>(1)) kA,
-              const DCMotor& gearbox, units::meter_t minHeight,
-              units::meter_t maxHeight, bool simulateGravity,
-              units::meter_t startingHeight, units::volt_t kG,
+              units::volt_t kG, const DCMotor& gearbox, 
+              units::meter_t minHeight, units::meter_t maxHeight, 
+              bool simulateGravity, units::meter_t startingHeight,
+              const std::array<double, 1>& measurementStdDevs = {0.0});
+
+  /**
+   * Constructs a simulated elevator mechanism.
+   *
+   * @param plant              The linear system that represents the elevator.
+   *                           This system can be created with
+   *                           LinearSystemId::ElevatorSystem() or with
+   *                           LinearSystemId::IdentifyPositionSystem().
+   * @param gearbox            The type of and number of motors in your
+   *                           elevator gearbox.
+   * @param minHeight          The minimum allowed height of the elevator.
+   * @param maxHeight          The maximum allowed height of the elevator.
+   * @param simulateGravity    Whether gravity should be simulated or not.
+   * @param startingHeight     The starting height of the elevator.
+   * @param g The effective gravity of the system.
+   * @param measurementStdDevs The standard deviation of the measurements.
+   */
+  ElevatorSim(const LinearSystem<2, 1, 1>& plant, const DCMotor& gearbox,
+              units::meter_t minHeight, units::meter_t maxHeight, 
+              bool simulateGravity, units::meter_t startingHeight,
+              units::meters_per_second_squared_t g,  
               const std::array<double, 1>& measurementStdDevs = {0.0});
 
   using LinearSystemSim::SetState;
@@ -183,6 +205,6 @@ class ElevatorSim : public LinearSystemSim<2, 1, 1> {
   units::meter_t m_minHeight;
   units::meter_t m_maxHeight;
   bool m_simulateGravity;
-  units::meters_per_second_squared_t m_effectiveGravity;
+  units::meters_per_second_squared_t m_g;
 };
 }  // namespace frc::sim
