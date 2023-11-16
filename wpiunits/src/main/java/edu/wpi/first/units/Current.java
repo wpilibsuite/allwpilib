@@ -6,10 +6,10 @@ package edu.wpi.first.units;
 
 /**
  * Unit of current dimension.
- * 
+ *
  * <p>This is the base type for units of current dimension. It is also used to specify the
  * dimension for {@link Measure}: <code>Measure&lt;Current&gt;</code>.</p>
- * 
+ *
  * <p>Actual units (such as {@link Units#Amps} and {@link Units#Milliamps}) can be found in the
  * {@link Units} class.</p>
  */

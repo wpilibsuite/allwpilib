@@ -6,10 +6,10 @@ package edu.wpi.first.units;
 
 /**
  * Unit of voltage dimension.
- * 
+ *
  * <p>This is the base type for units of voltage dimension. It is also used to specify the
  * dimension for {@link Measure}: <code>Measure&lt;Voltage&gt;</code>.</p>
- * 
+ *
  * <p>Actual units (such as {@link Units#Volts} and {@link Units#Millivolts}) can be found in the
  * {@link Units} class.</p>
  */

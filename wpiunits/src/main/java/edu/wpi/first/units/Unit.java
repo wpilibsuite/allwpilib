@@ -8,7 +8,7 @@ import java.util.Objects;
 
 /**
  * Unit of measurement that defines a quantity, such as grams, meters, or seconds.
- * 
+ *
  * <p>This is the base class for units. Actual units (such as {@link Units#Grams} and {@link
  * Units#Meters}) can be found in the {@link Units} class.</p>
  *

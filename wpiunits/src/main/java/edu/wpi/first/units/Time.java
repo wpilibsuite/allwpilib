@@ -6,10 +6,10 @@ package edu.wpi.first.units;
 
 /**
  * Unit of time dimension.
- * 
+ *
  * <p>This is the base type for units of time dimension. It is also used to specify the
  * dimension for {@link Measure}: <code>Measure&lt;Time&gt;</code>.</p>
- * 
+ *
  * <p>Actual units (such as {@link Units#Seconds} and {@link Units#Milliseconds}) can be found in
  * the {@link Units} class.</p>
  */

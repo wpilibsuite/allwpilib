@@ -6,10 +6,10 @@ package edu.wpi.first.units;
 
 /**
  * Unit of angular dimension.
- * 
+ *
  * <p>This is the base type for units of angular dimension. It is also used to specify the
  * dimension for {@link Measure}: <code>Measure&lt;Angle&gt;</code>.</p>
- * 
+ *
  * <p>Actual units (such as {@link Units#Degrees} and {@link Units#Radians}) can be found in the
  * {@link Units} class.</p>
  */
@@ -17,7 +17,6 @@ package edu.wpi.first.units;
 // eg Mass * Distance * Velocity<Angle> is equivalent to (Mass * Distance) / Time - otherwise known
 // as Power - in other words, Velocity<Angle> is /actually/ Frequency
 public class Angle extends Unit<Angle> {
-
   /**
    * Creates a new unit with the given name and multiplier to the base unit.
    *

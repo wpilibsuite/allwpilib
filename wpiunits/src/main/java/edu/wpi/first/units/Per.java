@@ -10,7 +10,7 @@ import java.util.Objects;
 /**
  * Generic combinatory unit type that represents the proportion of one unit to another, such as
  * Meters per Second or Radians per Celsius.
- * 
+ *
  * <p>Note: {@link Velocity} is used to represent the velocity dimension.</p>
  *
  * @param <N> the type of the numerator unit

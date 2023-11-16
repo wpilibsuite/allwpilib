@@ -10,15 +10,15 @@ import java.util.Objects;
 /**
  * Unit of velocity dimension that is a combination of a distance unit (numerator) and a time unit
  * (denominator).
- * 
+ *
  * <p>This is the base type for units of velocity dimension. It is also used in combination with a
  * distance dimension to specify the dimension for {@link Measure}. For example:
  * <code>Measure&lt;Velocity&lt;Distance&gt;&gt;</code>.</p>
- * 
+ *
  * <p>Actual units (such as {@link Units#Watts} and {@link Units#Horsepower}) can be found in the
  * {@link Units} class.</p>
- * 
- * @param <D> the distance unit, such as {@link Angle} or {@link Distance} 
+ *
+ * @param <D> the distance unit, such as {@link Angle} or {@link Distance}
  */
 public class Velocity<D extends Unit<D>> extends Unit<Velocity<D>> {
   private final D m_unit;
