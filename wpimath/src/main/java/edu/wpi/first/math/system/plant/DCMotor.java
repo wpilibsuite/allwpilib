@@ -5,6 +5,8 @@
 package edu.wpi.first.math.system.plant;
 
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.math.system.plant.proto.DCMotorProto;
+import edu.wpi.first.math.system.plant.struct.DCMotorStruct;
 
 /** Holds the constants for a DC motor. */
 public class DCMotor {
@@ -16,6 +18,10 @@ public class DCMotor {
   public final double rOhms;
   public final double KvRadPerSecPerVolt;
   public final double KtNMPerAmp;
+  
+
+  public static final DCMotorProto proto = new DCMotorProto();
+  public static final DCMotorStruct struct = new DCMotorStruct();
 
   /**
    * Constructs a DC motor.
@@ -44,6 +50,38 @@ public class DCMotor {
     this.KvRadPerSecPerVolt =
         freeSpeedRadPerSec / (nominalVoltageVolts - rOhms * this.freeCurrentAmps);
     this.KtNMPerAmp = this.stallTorqueNewtonMeters / this.stallCurrentAmps;
+  }
+
+  /**
+   * Constructs a DC motor.
+   *
+   * @param nominalVoltageVolts Voltage at which the motor constants were measured.
+   * @param stallTorqueNewtonMeters Torque when stalled.
+   * @param stallCurrentAmps Current draw when stalled.
+   * @param freeCurrentAmps Current draw under no load.
+   * @param freeSpeedRadPerSec Angular velocity under no load.
+   * @param resistanceOhms The resistance in ohms
+   * @param kvRadPerSecPerVolt The motor velocity constant
+   * @param ktNMPerAmp The motor torque constant
+   */
+  public DCMotor(
+      double nominalVoltageVolts,
+      double stallTorqueNewtonMeters,
+      double stallCurrentAmps,
+      double freeCurrentAmps,
+      double freeSpeedRadPerSec,
+      double resistanceOhms,
+      double kvRadPerSecPerVolt,
+      double ktNMPerAmp) {
+    this.nominalVoltageVolts = nominalVoltageVolts;
+    this.stallTorqueNewtonMeters = stallTorqueNewtonMeters;
+    this.stallCurrentAmps = stallCurrentAmps;
+    this.freeCurrentAmps = freeCurrentAmps;
+    this.freeSpeedRadPerSec = freeSpeedRadPerSec;
+
+    this.rOhms = resistanceOhms;
+    this.KvRadPerSecPerVolt = kvRadPerSecPerVolt;
+    this.KtNMPerAmp = ktNMPerAmp;
   }
 
   /**
