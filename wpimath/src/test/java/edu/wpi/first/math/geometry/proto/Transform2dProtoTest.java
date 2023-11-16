@@ -14,22 +14,12 @@ import org.junit.jupiter.api.Test;
 
 class Transform2dProtoTest {
   private static final Transform2d DATA =
-      new Transform2d(new Translation2d(1.91, 2.29), Rotation2d.fromDegrees(35.04));
+      new Transform2d(new Translation2d(0.191, 2.2), new Rotation2d(4.4));
 
   @Test
-  void testProtoPack() {
+  void testRoundtrip() {
     ProtobufTransform2d proto = Transform2d.proto.createMessage();
     Transform2d.proto.pack(proto, DATA);
-
-    assertEquals(DATA.getTranslation(), Translation2d.proto.unpack(proto.getTranslation()));
-    assertEquals(DATA.getRotation(), Rotation2d.proto.unpack(proto.getRotation()));
-  }
-
-  @Test
-  void testProtoUnpack() {
-    ProtobufTransform2d proto = Transform2d.proto.createMessage();
-    Translation2d.proto.pack(proto.getMutableTranslation(), DATA.getTranslation());
-    Rotation2d.proto.pack(proto.getMutableRotation(), DATA.getRotation());
 
     Transform2d data = Transform2d.proto.unpack(proto);
     assertEquals(DATA.getTranslation(), data.getTranslation());

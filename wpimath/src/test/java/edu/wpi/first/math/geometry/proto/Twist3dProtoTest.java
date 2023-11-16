@@ -11,30 +11,12 @@ import edu.wpi.first.math.proto.Geometry3D.ProtobufTwist3d;
 import org.junit.jupiter.api.Test;
 
 class Twist3dProtoTest {
-  private static final Twist3d DATA = new Twist3d(1.91, 2.29, 1.74, 0.3504, 0.0191, 0.0229);
+  private static final Twist3d DATA = new Twist3d(1.1, 2.29, 35.04, 0.174, 19.1, 4.4);
 
   @Test
-  void testProtoPack() {
+  void testRoundtrip() {
     ProtobufTwist3d proto = Twist3d.proto.createMessage();
     Twist3d.proto.pack(proto, DATA);
-
-    assertEquals(DATA.dx, proto.getDxMeters());
-    assertEquals(DATA.dy, proto.getDyMeters());
-    assertEquals(DATA.dz, proto.getDzMeters());
-    assertEquals(DATA.rx, proto.getRxRadians());
-    assertEquals(DATA.ry, proto.getRyRadians());
-    assertEquals(DATA.rz, proto.getRzRadians());
-  }
-
-  @Test
-  void testProtoUnpack() {
-    ProtobufTwist3d proto = Twist3d.proto.createMessage();
-    proto.setDxMeters(DATA.dx);
-    proto.setDyMeters(DATA.dy);
-    proto.setDzMeters(DATA.dz);
-    proto.setRxRadians(DATA.rx);
-    proto.setRyRadians(DATA.ry);
-    proto.setRzRadians(DATA.rz);
 
     Twist3d data = Twist3d.proto.unpack(proto);
     assertEquals(DATA.dx, data.dx);

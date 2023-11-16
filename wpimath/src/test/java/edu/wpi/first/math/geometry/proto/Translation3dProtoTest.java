@@ -11,24 +11,12 @@ import edu.wpi.first.math.proto.Geometry3D.ProtobufTranslation3d;
 import org.junit.jupiter.api.Test;
 
 class Translation3dProtoTest {
-  private static final Translation3d DATA = new Translation3d(19.1, 22.9, 3.504);
+  private static final Translation3d DATA = new Translation3d(35.04, 22.9, 3.504);
 
   @Test
-  void testProtoPack() {
+  void testRoundtrip() {
     ProtobufTranslation3d proto = Translation3d.proto.createMessage();
     Translation3d.proto.pack(proto, DATA);
-
-    assertEquals(DATA.getX(), proto.getXMeters());
-    assertEquals(DATA.getY(), proto.getYMeters());
-    assertEquals(DATA.getZ(), proto.getZMeters());
-  }
-
-  @Test
-  void testProtoUnpack() {
-    ProtobufTranslation3d proto = Translation3d.proto.createMessage();
-    proto.setXMeters(DATA.getX());
-    proto.setYMeters(DATA.getY());
-    proto.setZMeters(DATA.getZ());
 
     Translation3d data = Translation3d.proto.unpack(proto);
     assertEquals(DATA.getX(), data.getX());

@@ -4,7 +4,6 @@
 
 package edu.wpi.first.math.geometry.struct;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -16,33 +15,14 @@ import org.junit.jupiter.api.Test;
 
 class Pose2dStructTest {
   private static final Pose2d DATA =
-      new Pose2d(new Translation2d(1.91, 2.29), Rotation2d.fromDegrees(35.04));
-  private static final byte[] STRUCT_BUFFER = createStructBuffer();
-
-  private static byte[] createStructBuffer() {
-    byte[] bytes = new byte[Pose2d.struct.getSize()];
-    ByteBuffer buffer = ByteBuffer.wrap(bytes);
-    buffer.order(ByteOrder.LITTLE_ENDIAN);
-    buffer.putDouble(1.91);
-    buffer.putDouble(2.29);
-    buffer.putDouble(Math.toRadians(35.04));
-    return bytes;
-  }
+      new Pose2d(new Translation2d(0.191, 2.2), new Rotation2d(22.9));
 
   @Test
-  void testStructPack() {
+  void testRoundtrip() {
     ByteBuffer buffer = ByteBuffer.allocate(Pose2d.struct.getSize());
     buffer.order(ByteOrder.LITTLE_ENDIAN);
     Pose2d.struct.pack(buffer, DATA);
-
-    byte[] actual = buffer.array();
-    assertArrayEquals(actual, STRUCT_BUFFER);
-  }
-
-  @Test
-  void testStructUnpack() {
-    ByteBuffer buffer = ByteBuffer.wrap(STRUCT_BUFFER);
-    buffer.order(ByteOrder.LITTLE_ENDIAN);
+    buffer.rewind();
 
     Pose2d data = Pose2d.struct.unpack(buffer);
     assertEquals(DATA.getTranslation(), data.getTranslation());

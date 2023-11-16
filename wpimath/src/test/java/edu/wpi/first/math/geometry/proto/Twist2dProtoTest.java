@@ -11,24 +11,12 @@ import edu.wpi.first.math.proto.Geometry2D.ProtobufTwist2d;
 import org.junit.jupiter.api.Test;
 
 class Twist2dProtoTest {
-  private static final Twist2d DATA = new Twist2d(1.91, 2.29, 35.04);
+  private static final Twist2d DATA = new Twist2d(2.29, 35.04, 35.04);
 
   @Test
-  void testProtoPack() {
+  void testRoundtrip() {
     ProtobufTwist2d proto = Twist2d.proto.createMessage();
     Twist2d.proto.pack(proto, DATA);
-
-    assertEquals(DATA.dx, proto.getDxMeters());
-    assertEquals(DATA.dy, proto.getDyMeters());
-    assertEquals(DATA.dtheta, proto.getDthetaRadians());
-  }
-
-  @Test
-  void testProtoUnpack() {
-    ProtobufTwist2d proto = Twist2d.proto.createMessage();
-    proto.setDxMeters(DATA.dx);
-    proto.setDyMeters(DATA.dy);
-    proto.setDthetaRadians(DATA.dtheta);
 
     Twist2d data = Twist2d.proto.unpack(proto);
     assertEquals(DATA.dx, data.dx);

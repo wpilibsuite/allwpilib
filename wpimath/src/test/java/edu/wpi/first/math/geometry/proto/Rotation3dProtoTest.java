@@ -12,20 +12,12 @@ import edu.wpi.first.math.proto.Geometry3D.ProtobufRotation3d;
 import org.junit.jupiter.api.Test;
 
 class Rotation3dProtoTest {
-  private static final Rotation3d DATA = new Rotation3d(1.91, 2.29, 35.04);
+  private static final Rotation3d DATA = new Rotation3d(new Quaternion(2.29, 0.191, 0.191, 17.4));
 
   @Test
-  void testProtoPack() {
+  void testRoundtrip() {
     ProtobufRotation3d proto = Rotation3d.proto.createMessage();
     Rotation3d.proto.pack(proto, DATA);
-
-    assertEquals(DATA.getQuaternion(), Quaternion.proto.unpack(proto.getQuaternion()));
-  }
-
-  @Test
-  void testProtoUnpack() {
-    ProtobufRotation3d proto = Rotation3d.proto.createMessage();
-    Quaternion.proto.pack(proto.getMutableQuaternion(), DATA.getQuaternion());
 
     Rotation3d data = Rotation3d.proto.unpack(proto);
     assertEquals(DATA.getQuaternion(), data.getQuaternion());

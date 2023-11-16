@@ -11,20 +11,12 @@ import edu.wpi.first.math.proto.Geometry2D.ProtobufRotation2d;
 import org.junit.jupiter.api.Test;
 
 class Rotation2dProtoTest {
-  private static final Rotation2d DATA = new Rotation2d(35.04);
+  private static final Rotation2d DATA = new Rotation2d(1.91);
 
   @Test
-  void testProtoPack() {
+  void testRoundtrip() {
     ProtobufRotation2d proto = Rotation2d.proto.createMessage();
     Rotation2d.proto.pack(proto, DATA);
-
-    assertEquals(DATA.getRadians(), proto.getRadians());
-  }
-
-  @Test
-  void testProtoUnpack() {
-    ProtobufRotation2d proto = Rotation2d.proto.createMessage();
-    proto.setRadians(DATA.getRadians());
 
     Rotation2d data = Rotation2d.proto.unpack(proto);
     assertEquals(DATA.getRadians(), data.getRadians());

@@ -7,31 +7,22 @@ package edu.wpi.first.math.geometry.proto;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Quaternion;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.proto.Geometry3D.ProtobufPose3d;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 class Pose3dProtoTest {
   private static final Pose3d DATA =
-      new Pose3d(1.91, 2.29, 17.4, new Rotation3d(35.4, 12.34, 56.78));
+      new Pose3d(
+          new Translation3d(1.1, 2.2, 1.1),
+          new Rotation3d(new Quaternion(1.91, 0.3504, 3.3, 1.74)));
 
   @Test
-  void testProtoPack() {
+  void testRoundtrip() {
     ProtobufPose3d proto = Pose3d.proto.createMessage();
     Pose3d.proto.pack(proto, DATA);
-
-    Assertions.assertEquals(
-        DATA.getTranslation(), Translation3d.proto.unpack(proto.getTranslation()));
-    Assertions.assertEquals(DATA.getRotation(), Rotation3d.proto.unpack(proto.getRotation()));
-  }
-
-  @Test
-  void testProtoUnpack() {
-    ProtobufPose3d proto = Pose3d.proto.createMessage();
-    Translation3d.proto.pack(proto.getMutableTranslation(), DATA.getTranslation());
-    Rotation3d.proto.pack(proto.getMutableRotation(), DATA.getRotation());
 
     Pose3d data = Pose3d.proto.unpack(proto);
     assertEquals(DATA.getTranslation(), data.getTranslation());

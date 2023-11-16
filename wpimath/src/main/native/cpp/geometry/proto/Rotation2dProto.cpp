@@ -15,7 +15,9 @@ google::protobuf::Message* wpi::Protobuf<frc::Rotation2d>::New(
 frc::Rotation2d wpi::Protobuf<frc::Rotation2d>::Unpack(
     const google::protobuf::Message& msg) {
   auto m = static_cast<const wpi::proto::ProtobufRotation2d*>(&msg);
-  return frc::Rotation2d{units::radian_t{m->radians()}};
+  return frc::Rotation2d{
+      units::radian_t{m->radians()},
+  };
 }
 
 void wpi::Protobuf<frc::Rotation2d>::Pack(google::protobuf::Message* msg,

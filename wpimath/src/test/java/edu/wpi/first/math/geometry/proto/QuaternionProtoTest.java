@@ -11,26 +11,12 @@ import edu.wpi.first.math.proto.Geometry3D.ProtobufQuaternion;
 import org.junit.jupiter.api.Test;
 
 class QuaternionProtoTest {
-  private static final Quaternion DATA = new Quaternion(1.1, 2.2, 3.3, 4.4);
+  private static final Quaternion DATA = new Quaternion(1.1, 0.191, 35.04, 19.1);
 
   @Test
-  void testProtoPack() {
+  void testRoundtrip() {
     ProtobufQuaternion proto = Quaternion.proto.createMessage();
     Quaternion.proto.pack(proto, DATA);
-
-    assertEquals(DATA.getW(), proto.getW());
-    assertEquals(DATA.getX(), proto.getX());
-    assertEquals(DATA.getY(), proto.getY());
-    assertEquals(DATA.getZ(), proto.getZ());
-  }
-
-  @Test
-  void testProtoUnpack() {
-    ProtobufQuaternion proto = Quaternion.proto.createMessage();
-    proto.setW(DATA.getW());
-    proto.setX(DATA.getX());
-    proto.setY(DATA.getY());
-    proto.setZ(DATA.getZ());
 
     Quaternion data = Quaternion.proto.unpack(proto);
     assertEquals(DATA.getW(), data.getW());

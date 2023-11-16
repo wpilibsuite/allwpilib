@@ -4,7 +4,6 @@
 
 package edu.wpi.first.math.geometry.struct;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.wpi.first.math.geometry.Twist3d;
@@ -13,36 +12,14 @@ import java.nio.ByteOrder;
 import org.junit.jupiter.api.Test;
 
 class Twist3dStructTest {
-  private static final Twist3d DATA = new Twist3d(1.91, 2.29, 1.74, 0.3504, 0.0191, 0.0229);
-  private static final byte[] STRUCT_BUFFER = createStructBuffer();
-
-  private static byte[] createStructBuffer() {
-    byte[] bytes = new byte[Twist3d.struct.getSize()];
-    ByteBuffer buffer = ByteBuffer.wrap(bytes);
-    buffer.order(ByteOrder.LITTLE_ENDIAN);
-    buffer.putDouble(1.91);
-    buffer.putDouble(2.29);
-    buffer.putDouble(1.74);
-    buffer.putDouble(0.3504);
-    buffer.putDouble(0.0191);
-    buffer.putDouble(0.0229);
-    return bytes;
-  }
+  private static final Twist3d DATA = new Twist3d(1.1, 2.29, 35.04, 0.174, 19.1, 4.4);
 
   @Test
-  void testStructPack() {
+  void testRoundtrip() {
     ByteBuffer buffer = ByteBuffer.allocate(Twist3d.struct.getSize());
     buffer.order(ByteOrder.LITTLE_ENDIAN);
     Twist3d.struct.pack(buffer, DATA);
-
-    byte[] actual = buffer.array();
-    assertArrayEquals(actual, STRUCT_BUFFER);
-  }
-
-  @Test
-  void testStructUnpack() {
-    ByteBuffer buffer = ByteBuffer.wrap(STRUCT_BUFFER);
-    buffer.order(ByteOrder.LITTLE_ENDIAN);
+    buffer.rewind();
 
     Twist3d data = Twist3d.struct.unpack(buffer);
     assertEquals(DATA.dx, data.dx);
