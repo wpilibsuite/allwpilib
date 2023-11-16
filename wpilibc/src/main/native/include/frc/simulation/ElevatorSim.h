@@ -47,10 +47,12 @@ class ElevatorSim : public LinearSystemSim<2, 1, 1> {
    * @param measurementStdDevs The standard deviation of the measurements.
    * @return An ElevatorSim representing the given characterized constants.
    */
-  static ElevatorSim Create(const LinearSystem<2, 1, 1>& plant, const DCMotor& gearbox,
-              units::volt_t kG, units::meter_t minHeight, 
-              units::meter_t maxHeight, bool simulateGravity, units::meter_t startingHeight,
-              const std::array<double, 1>& measurementStdDevs = {0.0});
+  static ElevatorSim Create(const LinearSystem<2, 1, 1>& plant,
+                            const DCMotor& gearbox, units::volt_t kG,
+                            units::meter_t minHeight, units::meter_t maxHeight,
+                            bool simulateGravity, units::meter_t startingHeight,
+                            const std::array<double, 1>& measurementStdDevs = {
+                                0.0});
 
   /**
    * Constructs a simulated elevator mechanism.
@@ -70,12 +72,12 @@ class ElevatorSim : public LinearSystemSim<2, 1, 1> {
    * @param measurementStdDevs The standard deviation of the measurements.
    * @return An ElevatorSim representing the given characterized constants.
    */
-  static ElevatorSim Create(const DCMotor& gearbox, double gearing,
-              units::kilogram_t carriageMass, units::meter_t drumRadius,
-              units::meter_t minHeight, units::meter_t maxHeight,
-              bool simulateGravity, units::meter_t startingHeight,
-              units::meters_per_second_squared_t g,
-              const std::array<double, 1>& measurementStdDevs = {0.0});
+  static ElevatorSim Create(
+      const DCMotor& gearbox, double gearing, units::kilogram_t carriageMass,
+      units::meter_t drumRadius, units::meter_t minHeight,
+      units::meter_t maxHeight, bool simulateGravity,
+      units::meter_t startingHeight, units::meters_per_second_squared_t g,
+      const std::array<double, 1>& measurementStdDevs = {0.0});
 
   /**
    * Constructs a simulated elevator mechanism.
@@ -96,11 +98,12 @@ class ElevatorSim : public LinearSystemSim<2, 1, 1> {
     requires std::same_as<units::meter, Distance> ||
              std::same_as<units::radian, Distance>
   static ElevatorSim Create(decltype(1_V / Velocity_t<Distance>(1)) kV,
-              decltype(1_V / Acceleration_t<Distance>(1)) kA,
-              units::volt_t kG, const DCMotor& gearbox, 
-              units::meter_t minHeight, units::meter_t maxHeight, 
-              bool simulateGravity, units::meter_t startingHeight,
-              const std::array<double, 1>& measurementStdDevs = {0.0});
+                            decltype(1_V / Acceleration_t<Distance>(1)) kA,
+                            units::volt_t kG, const DCMotor& gearbox,
+                            units::meter_t minHeight, units::meter_t maxHeight,
+                            bool simulateGravity, units::meter_t startingHeight,
+                            const std::array<double, 1>& measurementStdDevs = {
+                                0.0});
 
   /**
    * Constructs a simulated elevator mechanism.
@@ -119,9 +122,9 @@ class ElevatorSim : public LinearSystemSim<2, 1, 1> {
    * @param measurementStdDevs The standard deviation of the measurements.
    */
   ElevatorSim(const LinearSystem<2, 1, 1>& plant, const DCMotor& gearbox,
-              units::meter_t minHeight, units::meter_t maxHeight, 
+              units::meter_t minHeight, units::meter_t maxHeight,
               bool simulateGravity, units::meter_t startingHeight,
-              units::meters_per_second_squared_t g,  
+              units::meters_per_second_squared_t g,
               const std::array<double, 1>& measurementStdDevs = {0.0});
 
   using LinearSystemSim::SetState;
