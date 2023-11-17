@@ -4,12 +4,16 @@
 
 package edu.wpi.first.math.geometry;
 
+import static edu.wpi.first.units.Units.Meters;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.proto.Geometry2D.ProtobufPose2d;
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.Measure;
 import edu.wpi.first.util.protobuf.Protobuf;
 import edu.wpi.first.util.struct.Struct;
 import java.nio.ByteBuffer;
@@ -56,6 +60,18 @@ public class Pose2d implements Interpolatable<Pose2d> {
   public Pose2d(double x, double y, Rotation2d rotation) {
     m_translation = new Translation2d(x, y);
     m_rotation = rotation;
+  }
+
+  /**
+   * Constructs a pose with x and y translations instead of a separate Translation2d. The X and Y
+   * translations will be converted to and tracked as meters.
+   *
+   * @param x The x component of the translational component of the pose.
+   * @param y The y component of the translational component of the pose.
+   * @param rotation The rotational component of the pose.
+   */
+  public Pose2d(Measure<Distance> x, Measure<Distance> y, Rotation2d rotation) {
+    this(x.in(Meters), y.in(Meters), rotation);
   }
 
   /**

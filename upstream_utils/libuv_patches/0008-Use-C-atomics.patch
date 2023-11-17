@@ -6,13 +6,13 @@ Subject: [PATCH 08/10] Use C++ atomics
 ---
  src/unix/async.c  | 25 +++++++++++++------------
  src/unix/core.c   |  3 ++-
- src/unix/fs.c     | 32 +++++++++++++++++---------------
+ src/unix/fs.c     | 20 +++++++++++---------
  src/unix/kqueue.c | 10 ++++++----
  src/unix/linux.c  | 45 +++++++++++++++++++++++----------------------
  src/unix/tty.c    |  5 +++--
  src/uv-common.c   |  2 +-
  src/uv-common.h   |  8 +++-----
- 8 files changed, 68 insertions(+), 62 deletions(-)
+ 8 files changed, 62 insertions(+), 56 deletions(-)
 
 diff --git a/src/unix/async.c b/src/unix/async.c
 index 0ff2669e30a628dbb2df9e28ba14b38cf14114e5..fef4ae93343edc0341179a1c4739dcd831ef6e26 100644
@@ -112,19 +112,19 @@ index f53adc156a7c454c492abaeac29d90be436785fc..ce7fd2cdfdd53410dc694450bd56dffc
  
    iovmax = atomic_load_explicit(&iovmax_cached, memory_order_relaxed);
 diff --git a/src/unix/fs.c b/src/unix/fs.c
-index e25d02e54dbe93e4b9c22b0140108c99ae2cb4f7..aba190a9c0240fba0128fb7fbc5d92d7fa86214b 100644
+index bc00c90b07a32a823412b216df6f2d758dbc423b..afdf0c6e592c69961b1286a87b61e62601331763 100644
 --- a/src/unix/fs.c
 +++ b/src/unix/fs.c
-@@ -46,6 +46,8 @@
+@@ -45,6 +45,8 @@
  #include <fcntl.h>
  #include <poll.h>
  
 +#include <atomic>
 +
- #if defined(__DragonFly__)        ||                                      \
-     defined(__FreeBSD__)          ||                                      \
-     defined(__OpenBSD__)          ||                                      \
-@@ -313,7 +315,7 @@ static int uv__fs_mkstemp(uv_fs_t* req) {
+ #if defined(__linux__)
+ # include <sys/sendfile.h>
+ #endif
+@@ -307,7 +309,7 @@ static int uv__fs_mkstemp(uv_fs_t* req) {
    static uv_once_t once = UV_ONCE_INIT;
    int r;
  #ifdef O_CLOEXEC
@@ -133,7 +133,7 @@ index e25d02e54dbe93e4b9c22b0140108c99ae2cb4f7..aba190a9c0240fba0128fb7fbc5d92d7
  #endif
    static const char pattern[] = "XXXXXX";
    static const size_t pattern_size = sizeof(pattern) - 1;
-@@ -338,7 +340,7 @@ static int uv__fs_mkstemp(uv_fs_t* req) {
+@@ -332,7 +334,7 @@ static int uv__fs_mkstemp(uv_fs_t* req) {
    uv_once(&once, uv__mkostemp_initonce);
  
  #ifdef O_CLOEXEC
@@ -142,7 +142,7 @@ index e25d02e54dbe93e4b9c22b0140108c99ae2cb4f7..aba190a9c0240fba0128fb7fbc5d92d7
        uv__mkostemp != NULL) {
      r = uv__mkostemp(path, O_CLOEXEC);
  
-@@ -352,7 +354,7 @@ static int uv__fs_mkstemp(uv_fs_t* req) {
+@@ -346,7 +348,7 @@ static int uv__fs_mkstemp(uv_fs_t* req) {
  
      /* We set the static variable so that next calls don't even
         try to use mkostemp. */
@@ -151,34 +151,7 @@ index e25d02e54dbe93e4b9c22b0140108c99ae2cb4f7..aba190a9c0240fba0128fb7fbc5d92d7
    }
  #endif  /* O_CLOEXEC */
  
-@@ -462,7 +464,7 @@ static ssize_t uv__fs_preadv(uv_file fd,
- 
- static ssize_t uv__fs_read(uv_fs_t* req) {
- #if TRY_PREADV
--  static _Atomic int no_preadv;
-+  static std::atomic<int> no_preadv;
- #endif
-   unsigned int iovmax;
-   ssize_t result;
-@@ -486,7 +488,7 @@ static ssize_t uv__fs_read(uv_fs_t* req) {
-     result = preadv(req->file, (struct iovec*) req->bufs, req->nbufs, req->off);
- #else
- # if TRY_PREADV
--    if (atomic_load_explicit(&no_preadv, memory_order_relaxed)) retry:
-+    if (atomic_load_explicit(&no_preadv, std::memory_order_relaxed)) retry:
- # endif
-     {
-       result = uv__fs_preadv(req->file, req->bufs, req->nbufs, req->off);
-@@ -498,7 +500,7 @@ static ssize_t uv__fs_read(uv_fs_t* req) {
-                       req->nbufs,
-                       req->off);
-       if (result == -1 && errno == ENOSYS) {
--        atomic_store_explicit(&no_preadv, 1, memory_order_relaxed);
-+        atomic_store_explicit(&no_preadv, 1, std::memory_order_relaxed);
-         goto retry;
-       }
-     }
-@@ -939,10 +941,10 @@ static int uv__is_cifs_or_smb(int fd) {
+@@ -867,10 +869,10 @@ static int uv__is_cifs_or_smb(int fd) {
  
  static ssize_t uv__fs_try_copy_file_range(int in_fd, off_t* off,
                                            int out_fd, size_t len) {
@@ -191,7 +164,7 @@ index e25d02e54dbe93e4b9c22b0140108c99ae2cb4f7..aba190a9c0240fba0128fb7fbc5d92d7
      errno = ENOSYS;
      return -1;
    }
-@@ -961,7 +963,7 @@ static ssize_t uv__fs_try_copy_file_range(int in_fd, off_t* off,
+@@ -889,7 +891,7 @@ static ssize_t uv__fs_try_copy_file_range(int in_fd, off_t* off,
        errno = ENOSYS;  /* Use fallback. */
      break;
    case ENOSYS:
@@ -200,34 +173,7 @@ index e25d02e54dbe93e4b9c22b0140108c99ae2cb4f7..aba190a9c0240fba0128fb7fbc5d92d7
      break;
    case EPERM:
      /* It's been reported that CIFS spuriously fails.
-@@ -1162,7 +1164,7 @@ static ssize_t uv__fs_lutime(uv_fs_t* req) {
- 
- static ssize_t uv__fs_write(uv_fs_t* req) {
- #if TRY_PREADV
--  static _Atomic int no_pwritev;
-+  static std::atomic<int> no_pwritev;
- #endif
-   ssize_t r;
- 
-@@ -1191,7 +1193,7 @@ static ssize_t uv__fs_write(uv_fs_t* req) {
-     r = pwritev(req->file, (struct iovec*) req->bufs, req->nbufs, req->off);
- #else
- # if TRY_PREADV
--    if (atomic_load_explicit(&no_pwritev, memory_order_relaxed)) retry:
-+    if (atomic_load_explicit(&no_pwritev, std::memory_order_relaxed)) retry:
- # endif
-     {
-       r = pwrite(req->file, req->bufs[0].base, req->bufs[0].len, req->off);
-@@ -1203,7 +1205,7 @@ static ssize_t uv__fs_write(uv_fs_t* req) {
-                   req->nbufs,
-                   req->off);
-       if (r == -1 && errno == ENOSYS) {
--        atomic_store_explicit(&no_pwritev, 1, memory_order_relaxed);
-+        atomic_store_explicit(&no_pwritev, 1, std::memory_order_relaxed);
-         goto retry;
-       }
-     }
-@@ -1483,14 +1485,14 @@ static int uv__fs_statx(int fd,
+@@ -1380,14 +1382,14 @@ static int uv__fs_statx(int fd,
                          uv_stat_t* buf) {
    STATIC_ASSERT(UV_ENOSYS != -1);
  #ifdef __linux__
@@ -244,7 +190,7 @@ index e25d02e54dbe93e4b9c22b0140108c99ae2cb4f7..aba190a9c0240fba0128fb7fbc5d92d7
      return UV_ENOSYS;
  
    dirfd = AT_FDCWD;
-@@ -1524,7 +1526,7 @@ static int uv__fs_statx(int fd,
+@@ -1421,7 +1423,7 @@ static int uv__fs_statx(int fd,
       * implemented, rc might return 1 with 0 set as the error code in which
       * case we return ENOSYS.
       */
@@ -254,10 +200,10 @@ index e25d02e54dbe93e4b9c22b0140108c99ae2cb4f7..aba190a9c0240fba0128fb7fbc5d92d7
    }
  
 diff --git a/src/unix/kqueue.c b/src/unix/kqueue.c
-index 28e55aae6c613576ede7024a5c73d746e134d865..ffe0f9191cc7b0c233447db358077d8814e0217e 100644
+index 06fbdb24b4adc4adb781d32150d40836fa745531..939a42696778741f9184be29dcea7c858736d181 100644
 --- a/src/unix/kqueue.c
 +++ b/src/unix/kqueue.c
-@@ -34,6 +34,8 @@
+@@ -37,6 +37,8 @@
  #include <fcntl.h>
  #include <time.h>
  
@@ -266,7 +212,7 @@ index 28e55aae6c613576ede7024a5c73d746e134d865..ffe0f9191cc7b0c233447db358077d88
  /*
   * Required on
   * - Until at least FreeBSD 11.0
-@@ -60,7 +62,7 @@ int uv__kqueue_init(uv_loop_t* loop) {
+@@ -63,7 +65,7 @@ int uv__kqueue_init(uv_loop_t* loop) {
  
  
  #if defined(__APPLE__) && MAC_OS_X_VERSION_MAX_ALLOWED >= 1070
@@ -275,7 +221,7 @@ index 28e55aae6c613576ede7024a5c73d746e134d865..ffe0f9191cc7b0c233447db358077d88
  #endif
  
  int uv__io_fork(uv_loop_t* loop) {
-@@ -84,7 +86,7 @@ int uv__io_fork(uv_loop_t* loop) {
+@@ -87,7 +89,7 @@ int uv__io_fork(uv_loop_t* loop) {
      */
      atomic_store_explicit(&uv__has_forked_with_cfrunloop,
                            1,
@@ -284,7 +230,7 @@ index 28e55aae6c613576ede7024a5c73d746e134d865..ffe0f9191cc7b0c233447db358077d88
      uv__free(loop->cf_state);
      loop->cf_state = NULL;
    }
-@@ -541,7 +543,7 @@ int uv_fs_event_start(uv_fs_event_t* handle,
+@@ -555,7 +557,7 @@ int uv_fs_event_start(uv_fs_event_t* handle,
      goto fallback;
  
    if (0 == atomic_load_explicit(&uv__has_forked_with_cfrunloop,
@@ -293,7 +239,7 @@ index 28e55aae6c613576ede7024a5c73d746e134d865..ffe0f9191cc7b0c233447db358077d88
      int r;
      /* The fallback fd is no longer needed */
      uv__close_nocheckstdio(fd);
-@@ -577,7 +579,7 @@ int uv_fs_event_stop(uv_fs_event_t* handle) {
+@@ -591,7 +593,7 @@ int uv_fs_event_stop(uv_fs_event_t* handle) {
  
  #if defined(__APPLE__) && MAC_OS_X_VERSION_MAX_ALLOWED >= 1070
    if (0 == atomic_load_explicit(&uv__has_forked_with_cfrunloop,
@@ -303,7 +249,7 @@ index 28e55aae6c613576ede7024a5c73d746e134d865..ffe0f9191cc7b0c233447db358077d88
        r = uv__fsevents_close(handle);
  #endif
 diff --git a/src/unix/linux.c b/src/unix/linux.c
-index 157443792f1216c83b4221c3810d17c81c5913c4..e3dfb186dc531e5c8197a81681c00d693e0913c6 100644
+index 2b8e1d8fe593a181d049aa50ff9edaf6da258a24..b23d88bd824843eebc3b439e5a18e6f796a747be 100644
 --- a/src/unix/linux.c
 +++ b/src/unix/linux.c
 @@ -27,7 +27,6 @@
@@ -314,7 +260,7 @@ index 157443792f1216c83b4221c3810d17c81c5913c4..e3dfb186dc531e5c8197a81681c00d69
  #include <stddef.h>  /* offsetof */
  #include <stdint.h>
  #include <stdio.h>
-@@ -133,6 +132,8 @@
+@@ -139,6 +138,8 @@
  # include <netpacket/packet.h>
  #endif /* HAVE_IFADDRS_H */
  
@@ -323,7 +269,7 @@ index 157443792f1216c83b4221c3810d17c81c5913c4..e3dfb186dc531e5c8197a81681c00d69
  enum {
    UV__IORING_SETUP_SQPOLL = 2u,
  };
-@@ -311,14 +312,14 @@ static struct watcher_root* uv__inotify_watchers(uv_loop_t* loop) {
+@@ -317,7 +318,7 @@ static struct watcher_root* uv__inotify_watchers(uv_loop_t* loop) {
  
  
  unsigned uv__kernel_version(void) {
@@ -332,25 +278,26 @@ index 157443792f1216c83b4221c3810d17c81c5913c4..e3dfb186dc531e5c8197a81681c00d69
    struct utsname u;
    unsigned version;
    unsigned major;
-   unsigned minor;
-   unsigned patch;
+@@ -326,7 +327,7 @@ unsigned uv__kernel_version(void) {
+   char v_sig[256];
+   char* needle;
  
 -  version = atomic_load_explicit(&cached_version, memory_order_relaxed);
 +  version = std::atomic_load_explicit(&cached_version, std::memory_order_relaxed);
    if (version != 0)
      return version;
  
-@@ -329,7 +330,7 @@ unsigned uv__kernel_version(void) {
-     return 0;
+@@ -382,7 +383,7 @@ unsigned uv__kernel_version(void) {
  
+ calculate_version:
    version = major * 65536 + minor * 256 + patch;
 -  atomic_store_explicit(&cached_version, version, memory_order_relaxed);
 +  std::atomic_store_explicit(&cached_version, version, std::memory_order_relaxed);
  
    return version;
  }
-@@ -424,16 +425,16 @@ static int uv__use_io_uring(void) {
-   return 0;  /* Possibly available but blocked by seccomp. */
+@@ -480,11 +481,11 @@ static int uv__use_io_uring(void) {
+   return 0;  /* All 32 bits kernels appear buggy. */
  #else
    /* Ternary: unknown=0, yes=1, no=-1 */
 -  static _Atomic int use_io_uring;
@@ -362,14 +309,17 @@ index 157443792f1216c83b4221c3810d17c81c5913c4..e3dfb186dc531e5c8197a81681c00d69
 +  use = std::atomic_load_explicit(&use_io_uring, std::memory_order_relaxed);
  
    if (use == 0) {
-     val = getenv("UV_USE_IO_URING");
-     use = val == NULL || atoi(val) ? 1 : -1;
+     /* Older kernels have a bug where the sqpoll thread uses 100% CPU. */
+@@ -495,7 +496,7 @@ static int uv__use_io_uring(void) {
+     if (val != NULL)
+       use = atoi(val) ? 1 : -1;
+ 
 -    atomic_store_explicit(&use_io_uring, use, memory_order_relaxed);
 +    std::atomic_store_explicit(&use_io_uring, use, std::memory_order_relaxed);
    }
  
    return use > 0;
-@@ -709,8 +710,8 @@ static struct uv__io_uring_sqe* uv__iou_get_sqe(struct uv__iou* iou,
+@@ -771,8 +772,8 @@ static struct uv__io_uring_sqe* uv__iou_get_sqe(struct uv__iou* iou,
    if (iou->ringfd == -1)
      return NULL;
  
@@ -380,7 +330,7 @@ index 157443792f1216c83b4221c3810d17c81c5913c4..e3dfb186dc531e5c8197a81681c00d69
    tail = *iou->sqtail;
    mask = iou->sqmask;
  
-@@ -739,12 +740,12 @@ static struct uv__io_uring_sqe* uv__iou_get_sqe(struct uv__iou* iou,
+@@ -801,12 +802,12 @@ static struct uv__io_uring_sqe* uv__iou_get_sqe(struct uv__iou* iou,
  static void uv__iou_submit(struct uv__iou* iou) {
    uint32_t flags;
  
@@ -397,7 +347,7 @@ index 157443792f1216c83b4221c3810d17c81c5913c4..e3dfb186dc531e5c8197a81681c00d69
  
    if (flags & UV__IORING_SQ_NEED_WAKEUP)
      if (uv__io_uring_enter(iou->ringfd, 0, 0, UV__IORING_ENTER_SQ_WAKEUP))
-@@ -1076,8 +1077,8 @@ static void uv__poll_io_uring(uv_loop_t* loop, struct uv__iou* iou) {
+@@ -1147,8 +1148,8 @@ static void uv__poll_io_uring(uv_loop_t* loop, struct uv__iou* iou) {
    int rc;
  
    head = *iou->cqhead;
@@ -408,7 +358,7 @@ index 157443792f1216c83b4221c3810d17c81c5913c4..e3dfb186dc531e5c8197a81681c00d69
    mask = iou->cqmask;
    cqe = (uv__io_uring_cqe*)iou->cqe;
    nevents = 0;
-@@ -1109,15 +1110,15 @@ static void uv__poll_io_uring(uv_loop_t* loop, struct uv__iou* iou) {
+@@ -1180,15 +1181,15 @@ static void uv__poll_io_uring(uv_loop_t* loop, struct uv__iou* iou) {
      nevents++;
    }
  
@@ -428,7 +378,7 @@ index 157443792f1216c83b4221c3810d17c81c5913c4..e3dfb186dc531e5c8197a81681c00d69
  
    if (flags & UV__IORING_SQ_CQ_OVERFLOW) {
      do
-@@ -1531,7 +1532,7 @@ update_timeout:
+@@ -1581,7 +1582,7 @@ update_timeout:
  }
  
  uint64_t uv__hrtime(uv_clocktype_t type) {
@@ -437,7 +387,7 @@ index 157443792f1216c83b4221c3810d17c81c5913c4..e3dfb186dc531e5c8197a81681c00d69
    struct timespec t;
    clock_t clock_id;
  
-@@ -1547,7 +1548,7 @@ uint64_t uv__hrtime(uv_clocktype_t type) {
+@@ -1597,7 +1598,7 @@ uint64_t uv__hrtime(uv_clocktype_t type) {
    if (type != UV_CLOCK_FAST)
      goto done;
  
@@ -446,7 +396,7 @@ index 157443792f1216c83b4221c3810d17c81c5913c4..e3dfb186dc531e5c8197a81681c00d69
    if (clock_id != -1)
      goto done;
  
-@@ -1556,7 +1557,7 @@ uint64_t uv__hrtime(uv_clocktype_t type) {
+@@ -1606,7 +1607,7 @@ uint64_t uv__hrtime(uv_clocktype_t type) {
      if (t.tv_nsec <= 1 * 1000 * 1000)
        clock_id = CLOCK_MONOTONIC_COARSE;
  
@@ -486,10 +436,10 @@ index 1bd217b5a15eed13a8349c479b53471dd36ca216..1304c6d8685cfd122cffea066dc668d1
  int uv__tcsetattr(int fd, int how, const struct termios *term) {
    int rc;
 diff --git a/src/uv-common.c b/src/uv-common.c
-index bfcc3ef10f4fd7763221638947da6e02e7a17c33..5c6d84155408ae4f7c3c6ff9b48bd09ccd16a92e 100644
+index 3d802cf1d629272f281d07b9ea424ec259b4377e..569c6906b7e54c4af1c17564a18066b847ab7ca1 100644
 --- a/src/uv-common.c
 +++ b/src/uv-common.c
-@@ -951,7 +951,7 @@ void uv_free_cpu_info(uv_cpu_info_t* cpu_infos, int count) {
+@@ -954,7 +954,7 @@ void uv_free_cpu_info(uv_cpu_info_t* cpu_infos, int count) {
  __attribute__((destructor))
  #endif
  void uv_library_shutdown(void) {

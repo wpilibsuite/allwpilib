@@ -58,7 +58,7 @@ void DifferentialDrivetrainSim::SetGearing(double newGearing) {
 }
 
 void DifferentialDrivetrainSim::Update(units::second_t dt) {
-  m_x = RK4([this](auto& x, auto& u) { return Dynamics(x, u); }, m_x, m_u, dt);
+  m_x = RKDP([this](auto& x, auto& u) { return Dynamics(x, u); }, m_x, m_u, dt);
   m_y = m_x + frc::MakeWhiteNoiseVector<7>(m_measurementStdDevs);
 }
 

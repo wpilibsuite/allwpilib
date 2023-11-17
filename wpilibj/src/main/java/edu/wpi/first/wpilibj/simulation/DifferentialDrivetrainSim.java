@@ -148,8 +148,7 @@ public class DifferentialDrivetrainSim {
    * @param dtSeconds the time difference
    */
   public void update(double dtSeconds) {
-    // Update state estimate with RK4
-    m_x = NumericalIntegration.rk4(this::getDynamics, m_x, m_u, dtSeconds);
+    m_x = NumericalIntegration.rkdp(this::getDynamics, m_x, m_u, dtSeconds);
     m_y = m_x;
     if (m_measurementStdDevs != null) {
       m_y = m_y.plus(StateSpaceUtil.makeWhiteNoiseVector(m_measurementStdDevs));
