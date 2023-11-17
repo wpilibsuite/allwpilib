@@ -18,9 +18,10 @@ const DifferentialDriveKinematics kExpectedData =
 }  // namespace
 
 TEST(DifferentialDriveKinematicsProtoTest, Roundtrip) {
-  wpi::proto::ProtobufDifferentialDriveKinematics proto;
-  ProtoType::Pack(&proto, kExpectedData);
+  google::protobuf::Arena arena;
+  google::protobuf::Message* proto = ProtoType::New(&arena);
+  ProtoType::Pack(proto, kExpectedData);
 
-  DifferentialDriveKinematics unpacked_data = ProtoType::Unpack(proto);
+  DifferentialDriveKinematics unpacked_data = ProtoType::Unpack(*proto);
   EXPECT_EQ(kExpectedData.trackWidth.value(), unpacked_data.trackWidth.value());
 }

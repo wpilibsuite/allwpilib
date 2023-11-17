@@ -4,12 +4,13 @@
 
 #pragma once
 
+#include <wpi/SymbolExports.h>
 #include <wpi/struct/Struct.h>
 
 #include "frc/controller/ElevatorFeedforward.h"
 
 template <>
-struct wpi::Struct<frc::ElevatorFeedforward> {
+struct WPILIB_DLLEXPORT wpi::Struct<frc::ElevatorFeedforward> {
   static constexpr std::string_view kTypeString = "struct:ElevatorFeedforward";
   static constexpr size_t kSize = 32;
   static constexpr std::string_view kSchema =

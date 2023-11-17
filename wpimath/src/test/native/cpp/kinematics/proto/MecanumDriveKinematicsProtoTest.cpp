@@ -19,10 +19,11 @@ const MecanumDriveKinematics kExpectedData = MecanumDriveKinematics{
 }  // namespace
 
 TEST(MecanumDriveKinematicsProtoTest, Roundtrip) {
-  wpi::proto::ProtobufMecanumDriveKinematics proto;
-  ProtoType::Pack(&proto, kExpectedData);
+  google::protobuf::Arena arena;
+  google::protobuf::Message* proto = ProtoType::New(&arena);
+  ProtoType::Pack(proto, kExpectedData);
 
-  MecanumDriveKinematics unpacked_data = ProtoType::Unpack(proto);
+  MecanumDriveKinematics unpacked_data = ProtoType::Unpack(*proto);
   EXPECT_EQ(kExpectedData.GetFrontLeftWheel(),
             unpacked_data.GetFrontLeftWheel());
   EXPECT_EQ(kExpectedData.GetFrontRightWheel(),

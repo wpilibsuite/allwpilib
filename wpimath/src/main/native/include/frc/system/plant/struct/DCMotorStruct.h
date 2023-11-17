@@ -4,12 +4,13 @@
 
 #pragma once
 
+#include <wpi/SymbolExports.h>
 #include <wpi/struct/Struct.h>
 
 #include "frc/system/plant/DCMotor.h"
 
 template <>
-struct wpi::Struct<frc::DCMotor> {
+struct WPILIB_DLLEXPORT wpi::Struct<frc::DCMotor> {
   static constexpr std::string_view kTypeString = "struct:DCMotor";
   static constexpr size_t kSize = 64;
   static constexpr std::string_view kSchema =

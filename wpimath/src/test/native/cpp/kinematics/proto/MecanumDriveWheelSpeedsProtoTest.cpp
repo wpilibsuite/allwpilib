@@ -18,10 +18,11 @@ const MecanumDriveWheelSpeeds kExpectedData =
 }  // namespace
 
 TEST(MecanumDriveWheelSpeedsProtoTest, Roundtrip) {
-  wpi::proto::ProtobufMecanumDriveWheelSpeeds proto;
-  ProtoType::Pack(&proto, kExpectedData);
+  google::protobuf::Arena arena;
+  google::protobuf::Message* proto = ProtoType::New(&arena);
+  ProtoType::Pack(proto, kExpectedData);
 
-  MecanumDriveWheelSpeeds unpacked_data = ProtoType::Unpack(proto);
+  MecanumDriveWheelSpeeds unpacked_data = ProtoType::Unpack(*proto);
   EXPECT_EQ(kExpectedData.frontLeft.value(), unpacked_data.frontLeft.value());
   EXPECT_EQ(kExpectedData.frontRight.value(), unpacked_data.frontRight.value());
   EXPECT_EQ(kExpectedData.rearLeft.value(), unpacked_data.rearLeft.value());

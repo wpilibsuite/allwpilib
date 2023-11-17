@@ -4,12 +4,13 @@
 
 #pragma once
 
+#include <wpi/SymbolExports.h>
 #include <wpi/struct/Struct.h>
 
 #include "frc/controller/DifferentialDriveWheelVoltages.h"
 
 template <>
-struct wpi::Struct<frc::DifferentialDriveWheelVoltages> {
+struct WPILIB_DLLEXPORT wpi::Struct<frc::DifferentialDriveWheelVoltages> {
   static constexpr std::string_view kTypeString =
       "struct:DifferentialDriveWheelVoltages";
   static constexpr size_t kSize = 16;

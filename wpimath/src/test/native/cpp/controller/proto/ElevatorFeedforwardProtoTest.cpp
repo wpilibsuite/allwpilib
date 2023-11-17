@@ -22,10 +22,11 @@ constexpr ElevatorFeedforward kExpectedData{Ks, Kg, Kv, Ka};
 }  // namespace
 
 TEST(ElevatorFeedforwardProtoTest, Roundtrip) {
-  wpi::proto::ProtobufElevatorFeedforward proto;
-  ProtoType::Pack(&proto, kExpectedData);
+  google::protobuf::Arena arena;
+  google::protobuf::Message* proto = ProtoType::New(&arena);
+  ProtoType::Pack(proto, kExpectedData);
 
-  ElevatorFeedforward unpacked_data = ProtoType::Unpack(proto);
+  ElevatorFeedforward unpacked_data = ProtoType::Unpack(*proto);
   EXPECT_EQ(kExpectedData.kS.value(), unpacked_data.kS.value());
   EXPECT_EQ(kExpectedData.kG.value(), unpacked_data.kG.value());
   EXPECT_EQ(kExpectedData.kV.value(), unpacked_data.kV.value());

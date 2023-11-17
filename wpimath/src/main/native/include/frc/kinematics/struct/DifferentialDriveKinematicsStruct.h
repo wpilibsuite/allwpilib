@@ -4,12 +4,13 @@
 
 #pragma once
 
+#include <wpi/SymbolExports.h>
 #include <wpi/struct/Struct.h>
 
 #include "frc/kinematics/DifferentialDriveKinematics.h"
 
 template <>
-struct wpi::Struct<frc::DifferentialDriveKinematics> {
+struct WPILIB_DLLEXPORT wpi::Struct<frc::DifferentialDriveKinematics> {
   static constexpr std::string_view kTypeString =
       "struct:DifferentialDriveKinematics";
   static constexpr size_t kSize = 8;

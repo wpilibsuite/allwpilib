@@ -20,10 +20,11 @@ const Trajectory::State kExpectedData = Trajectory::State{
 }  // namespace
 
 TEST(TrajectoryStateProtoTest, Roundtrip) {
-  wpi::proto::ProtobufTrajectoryState proto;
-  ProtoType::Pack(&proto, kExpectedData);
+  google::protobuf::Arena arena;
+  google::protobuf::Message* proto = ProtoType::New(&arena);
+  ProtoType::Pack(proto, kExpectedData);
 
-  Trajectory::State unpacked_data = ProtoType::Unpack(proto);
+  Trajectory::State unpacked_data = ProtoType::Unpack(*proto);
   EXPECT_EQ(kExpectedData.t.value(), unpacked_data.t.value());
   EXPECT_EQ(kExpectedData.velocity.value(), unpacked_data.velocity.value());
   EXPECT_EQ(kExpectedData.acceleration.value(),

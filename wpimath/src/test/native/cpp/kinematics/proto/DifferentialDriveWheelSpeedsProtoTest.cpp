@@ -18,10 +18,11 @@ const DifferentialDriveWheelSpeeds kExpectedData =
 }  // namespace
 
 TEST(DifferentialDriveWheelSpeedsProtoTest, Roundtrip) {
-  wpi::proto::ProtobufDifferentialDriveWheelSpeeds proto;
-  ProtoType::Pack(&proto, kExpectedData);
+  google::protobuf::Arena arena;
+  google::protobuf::Message* proto = ProtoType::New(&arena);
+  ProtoType::Pack(proto, kExpectedData);
 
-  DifferentialDriveWheelSpeeds unpacked_data = ProtoType::Unpack(proto);
+  DifferentialDriveWheelSpeeds unpacked_data = ProtoType::Unpack(*proto);
   EXPECT_EQ(kExpectedData.left.value(), unpacked_data.left.value());
   EXPECT_EQ(kExpectedData.right.value(), unpacked_data.right.value());
 }

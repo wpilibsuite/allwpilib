@@ -18,10 +18,11 @@ const SwerveModulePosition kExpectedData =
 }  // namespace
 
 TEST(SwerveModulePositionProtoTest, Roundtrip) {
-  wpi::proto::ProtobufSwerveModulePosition proto;
-  ProtoType::Pack(&proto, kExpectedData);
+  google::protobuf::Arena arena;
+  google::protobuf::Message* proto = ProtoType::New(&arena);
+  ProtoType::Pack(proto, kExpectedData);
 
-  SwerveModulePosition unpacked_data = ProtoType::Unpack(proto);
+  SwerveModulePosition unpacked_data = ProtoType::Unpack(*proto);
   EXPECT_EQ(kExpectedData.distance.value(), unpacked_data.distance.value());
   EXPECT_EQ(kExpectedData.angle, unpacked_data.angle);
 }

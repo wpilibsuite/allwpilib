@@ -4,12 +4,13 @@
 
 #pragma once
 
+#include <wpi/SymbolExports.h>
 #include <wpi/struct/Struct.h>
 
 #include "frc/kinematics/ChassisSpeeds.h"
 
 template <>
-struct wpi::Struct<frc::ChassisSpeeds> {
+struct WPILIB_DLLEXPORT wpi::Struct<frc::ChassisSpeeds> {
   static constexpr std::string_view kTypeString = "struct:ChassisSpeeds";
   static constexpr size_t kSize = 24;
   static constexpr std::string_view kSchema =

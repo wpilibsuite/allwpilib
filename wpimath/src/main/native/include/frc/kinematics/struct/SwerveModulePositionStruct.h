@@ -4,12 +4,13 @@
 
 #pragma once
 
+#include <wpi/SymbolExports.h>
 #include <wpi/struct/Struct.h>
 
 #include "frc/kinematics/SwerveModulePosition.h"
 
 template <>
-struct wpi::Struct<frc::SwerveModulePosition> {
+struct WPILIB_DLLEXPORT wpi::Struct<frc::SwerveModulePosition> {
   static constexpr std::string_view kTypeString = "struct:SwerveModulePosition";
   static constexpr size_t kSize = 8 + wpi::Struct<frc::Rotation2d>::kSize;
   static constexpr std::string_view kSchema =

@@ -22,10 +22,11 @@ const DCMotor kExpectedData = DCMotor{units::volt_t{1.91},
 }  // namespace
 
 TEST(DCMotorProtoTest, Roundtrip) {
-  wpi::proto::ProtobufDCMotor proto;
-  ProtoType::Pack(&proto, kExpectedData);
+  google::protobuf::Arena arena;
+  google::protobuf::Message* proto = ProtoType::New(&arena);
+  ProtoType::Pack(proto, kExpectedData);
 
-  DCMotor unpacked_data = ProtoType::Unpack(proto);
+  DCMotor unpacked_data = ProtoType::Unpack(*proto);
   EXPECT_EQ(kExpectedData.nominalVoltage.value(),
             unpacked_data.nominalVoltage.value());
   EXPECT_EQ(kExpectedData.stallTorque.value(),
