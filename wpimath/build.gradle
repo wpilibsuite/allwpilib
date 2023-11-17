@@ -43,6 +43,7 @@ model {
 }
 
 dependencies {
+    api project(":wpiunits")
     api "org.ejml:ejml-simple:0.43.1"
     api "com.fasterxml.jackson.core:jackson-annotations:2.15.2"
     api "com.fasterxml.jackson.core:jackson-core:2.15.2"
