@@ -371,7 +371,7 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
 
   /**
    * Returns a string representation of this measurement in a longhand form. The name of the backing
-   * unit is used, rather than its symbol, and the magnitude is represented in a full string, no
+   * unit is used, rather than its symbol, and the magnitude is represented in a full string, not
    * scientific notation. (Very large values may be represented in scientific notation, however)
    *
    * @return the long form representation of this measurement
