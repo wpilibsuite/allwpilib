@@ -44,7 +44,7 @@ if (WITH_JAVA)
   add_jar(apriltag_jar
     SOURCES ${JAVA_SOURCES}
     RESOURCES NAMESPACE "edu/wpi/first/apriltag" ${JAVA_RESOURCES}
-    INCLUDE_JARS wpimath_jar ${EJML_JARS} wpiutil_jar ${OPENCV_JAR_FILE}
+    INCLUDE_JARS wpimath_jar wpiunits_jar ${EJML_JARS} wpiutil_jar ${OPENCV_JAR_FILE}
     OUTPUT_NAME apriltag
     GENERATE_NATIVE_HEADERS apriltag_jni_headers)
 
