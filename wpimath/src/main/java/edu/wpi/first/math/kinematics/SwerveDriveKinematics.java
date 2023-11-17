@@ -4,11 +4,18 @@
 
 package edu.wpi.first.math.kinematics;
 
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
+import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Velocity;
 import java.util.Arrays;
 import org.ejml.simple.SimpleMatrix;
 
@@ -303,6 +310,23 @@ public class SwerveDriveKinematics
   }
 
   /**
+   * Renormalizes the wheel speeds if any individual speed is above the specified maximum.
+   *
+   * <p>Sometimes, after inverse kinematics, the requested speed from one or more modules may be
+   * above the max attainable speed for the driving motor on that module. To fix this issue, one can
+   * reduce all the wheel speeds to make sure that all requested module speeds are at-or-below the
+   * absolute threshold, while maintaining the ratio of speeds between modules.
+   *
+   * @param moduleStates Reference to array of module states. The array will be mutated with the
+   *     normalized speeds!
+   * @param attainableMaxSpeed The absolute max speed that a module can reach.
+   */
+  public static void desaturateWheelSpeeds(
+      SwerveModuleState[] moduleStates, Measure<Velocity<Distance>> attainableMaxSpeed) {
+    desaturateWheelSpeeds(moduleStates, attainableMaxSpeed.in(MetersPerSecond));
+  }
+
+  /**
    * Renormalizes the wheel speeds if any individual speed is above the specified maximum, as well
    * as getting rid of joystick saturation at edges of joystick.
    *
@@ -347,5 +371,37 @@ public class SwerveDriveKinematics
     for (SwerveModuleState moduleState : moduleStates) {
       moduleState.speedMetersPerSecond *= scale;
     }
+  }
+
+  /**
+   * Renormalizes the wheel speeds if any individual speed is above the specified maximum, as well
+   * as getting rid of joystick saturation at edges of joystick.
+   *
+   * <p>Sometimes, after inverse kinematics, the requested speed from one or more modules may be
+   * above the max attainable speed for the driving motor on that module. To fix this issue, one can
+   * reduce all the wheel speeds to make sure that all requested module speeds are at-or-below the
+   * absolute threshold, while maintaining the ratio of speeds between modules.
+   *
+   * @param moduleStates Reference to array of module states. The array will be mutated with the
+   *     normalized speeds!
+   * @param desiredChassisSpeed The desired speed of the robot
+   * @param attainableMaxModuleSpeed The absolute max speed that a module can reach
+   * @param attainableMaxTranslationalSpeed The absolute max speed that your robot can reach while
+   *     translating
+   * @param attainableMaxRotationalVelocity The absolute max speed the robot can reach while
+   *     rotating
+   */
+  public static void desaturateWheelSpeeds(
+      SwerveModuleState[] moduleStates,
+      ChassisSpeeds desiredChassisSpeed,
+      Measure<Velocity<Distance>> attainableMaxModuleSpeed,
+      Measure<Velocity<Distance>> attainableMaxTranslationalSpeed,
+      Measure<Velocity<Angle>> attainableMaxRotationalVelocity) {
+    desaturateWheelSpeeds(
+        moduleStates,
+        desiredChassisSpeed,
+        attainableMaxModuleSpeed.in(MetersPerSecond),
+        attainableMaxTranslationalSpeed.in(MetersPerSecond),
+        attainableMaxRotationalVelocity.in(RadiansPerSecond));
   }
 }

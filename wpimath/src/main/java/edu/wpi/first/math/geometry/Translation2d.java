@@ -4,6 +4,8 @@
 
 package edu.wpi.first.math.geometry;
 
+import static edu.wpi.first.units.Units.Meters;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -11,6 +13,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.proto.Geometry2D.ProtobufTranslation2d;
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.Measure;
 import edu.wpi.first.util.protobuf.Protobuf;
 import edu.wpi.first.util.struct.Struct;
 import java.nio.ByteBuffer;
@@ -61,6 +65,17 @@ public class Translation2d implements Interpolatable<Translation2d> {
   public Translation2d(double distance, Rotation2d angle) {
     m_x = distance * angle.getCos();
     m_y = distance * angle.getSin();
+  }
+
+  /**
+   * Constructs a Translation2d with the X and Y components equal to the provided values. The X and
+   * Y components will be converted to and tracked as meters.
+   *
+   * @param x The x component of the translation.
+   * @param y The y component of the translation.
+   */
+  public Translation2d(Measure<Distance> x, Measure<Distance> y) {
+    this(x.in(Meters), y.in(Meters));
   }
 
   /**

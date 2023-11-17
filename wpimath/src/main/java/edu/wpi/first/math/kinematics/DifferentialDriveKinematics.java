@@ -4,11 +4,15 @@
 
 package edu.wpi.first.math.kinematics;
 
+import static edu.wpi.first.units.Units.Meters;
+
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.proto.DifferentialDriveKinematicsProto;
 import edu.wpi.first.math.kinematics.struct.DifferentialDriveKinematicsStruct;
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.Measure;
 
 /**
  * Helper class that converts a chassis velocity (dx and dtheta components) to left and right wheel
@@ -37,6 +41,17 @@ public class DifferentialDriveKinematics
   public DifferentialDriveKinematics(double trackWidthMeters) {
     this.trackWidthMeters = trackWidthMeters;
     MathSharedStore.reportUsage(MathUsageId.kKinematics_DifferentialDrive, 1);
+  }
+
+  /**
+   * Constructs a differential drive kinematics object.
+   *
+   * @param trackWidth The track width of the drivetrain. Theoretically, this is the distance
+   *     between the left wheels and right wheels. However, the empirical value may be larger than
+   *     the physical measured value due to scrubbing effects.
+   */
+  public DifferentialDriveKinematics(Measure<Distance> trackWidth) {
+    this(trackWidth.in(Meters));
   }
 
   /**
