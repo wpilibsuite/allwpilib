@@ -15,7 +15,7 @@ import java.util.Objects;
  * distance dimension to specify the dimension for {@link Measure}. For example:
  * <code>Measure&lt;Velocity&lt;Distance&gt;&gt;</code>.</p>
  *
- * <p>Actual units (such as {@link Units#Watts} and {@link Units#Horsepower}) can be found in the
+ * <p>Actual units (such as {@link Units#MetersPerSecond} and {@link Units#RPM}) can be found in the
  * {@link Units} class.</p>
  *
  * @param <D> the distance unit, such as {@link Angle} or {@link Distance}
