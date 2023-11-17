@@ -4,12 +4,13 @@
 
 #pragma once
 
+#include <wpi/SymbolExports.h>
 #include <wpi/struct/Struct.h>
 
 #include "frc/geometry/Transform3d.h"
 
 template <>
-struct wpi::Struct<frc::Transform3d> {
+struct WPILIB_DLLEXPORT wpi::Struct<frc::Transform3d> {
   static constexpr std::string_view kTypeString = "struct:Transform3d";
   static constexpr size_t kSize = wpi::Struct<frc::Translation3d>::kSize +
                                   wpi::Struct<frc::Rotation3d>::kSize;

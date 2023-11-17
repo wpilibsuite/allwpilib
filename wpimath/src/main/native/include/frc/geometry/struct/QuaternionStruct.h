@@ -4,12 +4,13 @@
 
 #pragma once
 
+#include <wpi/SymbolExports.h>
 #include <wpi/struct/Struct.h>
 
 #include "frc/geometry/Quaternion.h"
 
 template <>
-struct wpi::Struct<frc::Quaternion> {
+struct WPILIB_DLLEXPORT wpi::Struct<frc::Quaternion> {
   static constexpr std::string_view kTypeString = "struct:Quaternion";
   static constexpr size_t kSize = 32;
   static constexpr std::string_view kSchema =

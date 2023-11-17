@@ -4,12 +4,13 @@
 
 #pragma once
 
+#include <wpi/SymbolExports.h>
 #include <wpi/struct/Struct.h>
 
 #include "frc/geometry/Rotation2d.h"
 
 template <>
-struct wpi::Struct<frc::Rotation2d> {
+struct WPILIB_DLLEXPORT wpi::Struct<frc::Rotation2d> {
   static constexpr std::string_view kTypeString = "struct:Rotation2d";
   static constexpr size_t kSize = 8;
   static constexpr std::string_view kSchema = "double value";

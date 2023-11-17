@@ -4,12 +4,13 @@
 
 #pragma once
 
+#include <wpi/SymbolExports.h>
 #include <wpi/struct/Struct.h>
 
 #include "frc/geometry/Rotation3d.h"
 
 template <>
-struct wpi::Struct<frc::Rotation3d> {
+struct WPILIB_DLLEXPORT wpi::Struct<frc::Rotation3d> {
   static constexpr std::string_view kTypeString = "struct:Rotation3d";
   static constexpr size_t kSize = wpi::Struct<frc::Quaternion>::kSize;
   static constexpr std::string_view kSchema = "Quaternion q";

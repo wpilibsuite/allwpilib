@@ -4,12 +4,13 @@
 
 #pragma once
 
+#include <wpi/SymbolExports.h>
 #include <wpi/struct/Struct.h>
 
 #include "frc/geometry/Transform2d.h"
 
 template <>
-struct wpi::Struct<frc::Transform2d> {
+struct WPILIB_DLLEXPORT wpi::Struct<frc::Transform2d> {
   static constexpr std::string_view kTypeString = "struct:Transform2d";
   static constexpr size_t kSize = wpi::Struct<frc::Translation2d>::kSize +
                                   wpi::Struct<frc::Rotation2d>::kSize;

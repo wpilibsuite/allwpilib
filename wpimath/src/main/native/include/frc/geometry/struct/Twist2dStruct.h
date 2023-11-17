@@ -4,12 +4,13 @@
 
 #pragma once
 
+#include <wpi/SymbolExports.h>
 #include <wpi/struct/Struct.h>
 
 #include "frc/geometry/Twist2d.h"
 
 template <>
-struct wpi::Struct<frc::Twist2d> {
+struct WPILIB_DLLEXPORT wpi::Struct<frc::Twist2d> {
   static constexpr std::string_view kTypeString = "struct:Twist2d";
   static constexpr size_t kSize = 24;
   static constexpr std::string_view kSchema =
