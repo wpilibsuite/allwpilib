@@ -60,6 +60,7 @@ option(WITH_JAVA_SOURCE "Build Java source jars" ON)
 option(WITH_CSCORE "Build cscore (needs OpenCV)" ON)
 option(WITH_NTCORE "Build ntcore" ON)
 option(WITH_WPIMATH "Build wpimath" ON)
+option(WITH_WPIUNITS "Build wpiunits" ON)
 option(WITH_WPILIB "Build hal, wpilibc/j, and myRobot (needs OpenCV)" ON)
 option(WITH_EXAMPLES "Build examples" OFF)
 option(WITH_TESTS "Build unit tests (requires internet connection)" ON)
@@ -154,6 +155,13 @@ FATAL: Cannot build wpilib without wpimath.
 ")
 endif()
 
+if (NOT WITH_WPIUNITS AND WITH_WPIMATH AND WITH_JAVA)
+    message(FATAL_ERROR "
+FATAL: Cannot build Java wpimath without wpiunits.
+       Enable wpiunits by setting WITH_WPIUNITS=ON or disable the Java build by setting WITH_JAVA=OFF
+")
+endif()
+
 set( wpilib_dest "")
 set( include_dest include )
 set( java_lib_dest java )
@@ -191,6 +199,7 @@ set(CSCORE_DEP_REPLACE_IMPL "include(\${SELF_DIR}/cscore-config.cmake)")
 set(CAMERASERVER_DEP_REPLACE_IMPL "include(\${SELF_DIR}/cameraserver-config.cmake)")
 set(HAL_DEP_REPLACE_IMPL "include(\${SELF_DIR}/hal-config.cmake)")
 set(WPIMATH_DEP_REPLACE "include($\{SELF_DIR\}/wpimath-config.cmake)")
+set(WPIUNITS_DEP_REPLACE "include($\{SELF_DIR\}/wpiunits-config.cmake)")
 set(WPILIBC_DEP_REPLACE_IMPL "include(\${SELF_DIR}/wpilibc-config.cmake)")
 set(WPILIBNEWCOMMANDS_DEP_REPLACE "include(\${SELF_DIR}/wpilibNewcommands-config.cmake)")
 else()
@@ -201,6 +210,7 @@ set(CSCORE_DEP_REPLACE_IMPL "find_dependency(cscore)")
 set(CAMERASERVER_DEP_REPLACE_IMPL "find_dependency(cameraserver)")
 set(HAL_DEP_REPLACE_IMPL "find_dependency(hal)")
 set(WPIMATH_DEP_REPLACE "find_dependency(wpimath)")
+set(WPIUNITS_DEP_REPLACE "find_dependency(wpiunits)")
 set(WPILIBC_DEP_REPLACE_IMPL "find_dependency(wpilibc)")
 set(WPILIBNEWCOMMANDS_DEP_REPLACE "find_dependency(wpilibNewCommands)")
 endif()
@@ -291,7 +301,15 @@ if (WITH_NTCORE)
 endif()
 
 if (WITH_WPIMATH)
+    if (WITH_JAVA)
+        add_subdirectory(wpiunits)
+    endif()
     add_subdirectory(wpimath)
+endif()
+
+if (WITH_WPIUNITS AND NOT WITH_WPIMATH)
+    # In case of building wpiunits standalone
+    add_subdirectory(wpiunits)
 endif()
 
 if (WITH_GUI)
