@@ -52,38 +52,6 @@ public class DCMotor {
   }
 
   /**
-   * Constructs a DC motor.
-   *
-   * @param nominalVoltageVolts Voltage at which the motor constants were measured.
-   * @param stallTorqueNewtonMeters Torque when stalled.
-   * @param stallCurrentAmps Current draw when stalled.
-   * @param freeCurrentAmps Current draw under no load.
-   * @param freeSpeedRadPerSec Angular velocity under no load.
-   * @param resistanceOhms The resistance in ohms
-   * @param kvRadPerSecPerVolt The motor velocity constant
-   * @param ktNMPerAmp The motor torque constant
-   */
-  public DCMotor(
-      double nominalVoltageVolts,
-      double stallTorqueNewtonMeters,
-      double stallCurrentAmps,
-      double freeCurrentAmps,
-      double freeSpeedRadPerSec,
-      double resistanceOhms,
-      double kvRadPerSecPerVolt,
-      double ktNMPerAmp) {
-    this.nominalVoltageVolts = nominalVoltageVolts;
-    this.stallTorqueNewtonMeters = stallTorqueNewtonMeters;
-    this.stallCurrentAmps = stallCurrentAmps;
-    this.freeCurrentAmps = freeCurrentAmps;
-    this.freeSpeedRadPerSec = freeSpeedRadPerSec;
-
-    this.rOhms = resistanceOhms;
-    this.KvRadPerSecPerVolt = kvRadPerSecPerVolt;
-    this.KtNMPerAmp = ktNMPerAmp;
-  }
-
-  /**
    * Calculate current drawn by motor with given speed and input voltage.
    *
    * @param speedRadiansPerSec The current angular velocity of the motor.

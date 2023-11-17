@@ -13,10 +13,7 @@ template <>
 struct WPILIB_DLLEXPORT wpi::Struct<frc::MecanumDriveKinematics> {
   static constexpr std::string_view kTypeString =
       "struct:MecanumDriveKinematics";
-  static constexpr size_t kSize = wpi::Struct<frc::Translation2d>::kSize +
-                                  wpi::Struct<frc::Translation2d>::kSize +
-                                  wpi::Struct<frc::Translation2d>::kSize +
-                                  wpi::Struct<frc::Translation2d>::kSize;
+  static constexpr size_t kSize = 4 * wpi::Struct<frc::Translation2d>::kSize;
   static constexpr std::string_view kSchema =
       "Translation2d front_left;Translation2d front_right;Translation2d "
       "rear_left;Translation2d rear_right";

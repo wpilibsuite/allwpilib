@@ -12,7 +12,7 @@ import java.nio.ByteOrder;
 import org.junit.jupiter.api.Test;
 
 class DCMotorStructTest {
-  private static final DCMotor DATA = new DCMotor(1.91, 19.1, 1.74, 1.74, 22.9, 2.2, 2.2, 1.1);
+  private static final DCMotor DATA = new DCMotor(1.91, 19.1, 1.74, 1.74, 22.9, 3);
 
   @Test
   void testRoundtrip() {

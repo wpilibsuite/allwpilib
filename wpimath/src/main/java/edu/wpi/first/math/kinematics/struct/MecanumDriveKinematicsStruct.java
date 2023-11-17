@@ -22,10 +22,7 @@ public class MecanumDriveKinematicsStruct implements Struct<MecanumDriveKinemati
 
   @Override
   public int getSize() {
-    return Translation2d.struct.getSize()
-        + Translation2d.struct.getSize()
-        + Translation2d.struct.getSize()
-        + Translation2d.struct.getSize();
+    return 4 * Translation2d.struct.getSize();
   }
 
   @Override
@@ -36,9 +33,7 @@ public class MecanumDriveKinematicsStruct implements Struct<MecanumDriveKinemati
 
   @Override
   public Struct<?>[] getNested() {
-    return new Struct<?>[] {
-      Translation2d.struct, Translation2d.struct, Translation2d.struct, Translation2d.struct
-    };
+    return new Struct<?>[] {Translation2d.struct};
   }
 
   @Override

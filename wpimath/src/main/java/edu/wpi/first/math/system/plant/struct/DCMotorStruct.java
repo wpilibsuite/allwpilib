@@ -21,13 +21,12 @@ public class DCMotorStruct implements Struct<DCMotor> {
 
   @Override
   public int getSize() {
-    return kSizeDouble * 8;
+    return kSizeDouble * 5;
   }
 
   @Override
   public String getSchema() {
-    return "double nominal_voltage;double stall_torque;double stall_current;double free_current;"
-        + "double free_speed;double r;double kv;double kt";
+    return "double nominal_voltage;double stall_torque;double stall_current;double free_current;double free_speed";
   }
 
   @Override
@@ -37,11 +36,7 @@ public class DCMotorStruct implements Struct<DCMotor> {
     double stallCurrent = bb.getDouble();
     double freeCurrent = bb.getDouble();
     double freeSpeed = bb.getDouble();
-    double r = bb.getDouble();
-    double kv = bb.getDouble();
-    double kt = bb.getDouble();
-    return new DCMotor(
-        nominalVoltage, stallTorque, stallCurrent, freeCurrent, freeSpeed, r, kv, kt);
+    return new DCMotor(nominalVoltage, stallTorque, stallCurrent, freeCurrent, freeSpeed, 1);
   }
 
   @Override
@@ -51,8 +46,5 @@ public class DCMotorStruct implements Struct<DCMotor> {
     bb.putDouble(value.stallCurrentAmps);
     bb.putDouble(value.freeCurrentAmps);
     bb.putDouble(value.freeSpeedRadPerSec);
-    bb.putDouble(value.rOhms);
-    bb.putDouble(value.KvRadPerSecPerVolt);
-    bb.putDouble(value.KtNMPerAmp);
   }
 }

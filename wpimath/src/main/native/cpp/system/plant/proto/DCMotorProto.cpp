@@ -21,9 +21,6 @@ frc::DCMotor wpi::Protobuf<frc::DCMotor>::Unpack(
       units::ampere_t{m->stall_current()},
       units::ampere_t{m->free_current()},
       units::radians_per_second_t{m->free_speed()},
-      units::ohm_t{m->r()},
-      frc::DCMotor::radians_per_second_per_volt_t{m->kv()},
-      frc::DCMotor::newton_meters_per_ampere_t{m->kt()},
   };
 }
 
@@ -35,7 +32,4 @@ void wpi::Protobuf<frc::DCMotor>::Pack(google::protobuf::Message* msg,
   m->set_stall_current(value.stallCurrent.value());
   m->set_free_current(value.freeCurrent.value());
   m->set_free_speed(value.freeSpeed.value());
-  m->set_r(value.R.value());
-  m->set_kv(value.Kv.value());
-  m->set_kt(value.Kt.value());
 }

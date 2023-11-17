@@ -37,7 +37,4 @@ void StructType::Pack(std::span<uint8_t, kSize> data,
 void StructType::ForEachNested(
     std::invocable<std::string_view, std::string_view> auto fn) {
   wpi::ForEachStructSchema<frc::Translation2d>(fn);
-  wpi::ForEachStructSchema<frc::Translation2d>(fn);
-  wpi::ForEachStructSchema<frc::Translation2d>(fn);
-  wpi::ForEachStructSchema<frc::Translation2d>(fn);
 }

@@ -65,33 +65,6 @@ class WPILIB_DLLEXPORT DCMotor {
         Kt(this->stallTorque / this->stallCurrent) {}
 
   /**
-   * Constructs a DC motor.
-   *
-   * @param nominalVoltage Voltage at which the motor constants were measured.
-   * @param stallTorque    Torque when stalled.
-   * @param stallCurrent   Current draw when stalled.
-   * @param freeCurrent    Current draw under no load.
-   * @param freeSpeed      Angular velocity under no load.
-   * @param resistance     Resistance in ohms
-   * @param kv             Motor velocity constant
-   * @param kt             Motor torque constant
-   */
-  constexpr DCMotor(units::volt_t nominalVoltage,
-                    units::newton_meter_t stallTorque,
-                    units::ampere_t stallCurrent, units::ampere_t freeCurrent,
-                    units::radians_per_second_t freeSpeed,
-                    units::ohm_t resistance, radians_per_second_per_volt_t kv,
-                    newton_meters_per_ampere_t kt)
-      : nominalVoltage(nominalVoltage),
-        stallTorque(stallTorque),
-        stallCurrent(stallCurrent),
-        freeCurrent(freeCurrent),
-        freeSpeed(freeSpeed),
-        R(resistance),
-        Kv(kv),
-        Kt(kt) {}
-
-  /**
    * Returns current drawn by motor with given speed and input voltage.
    *
    * @param speed        The current angular velocity of the motor.

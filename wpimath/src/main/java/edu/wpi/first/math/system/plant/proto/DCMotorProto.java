@@ -33,9 +33,7 @@ public class DCMotorProto implements Protobuf<DCMotor, ProtobufDCMotor> {
         msg.getStallCurrent(),
         msg.getFreeCurrent(),
         msg.getFreeSpeed(),
-        msg.getR(),
-        msg.getKv(),
-        msg.getKt());
+        1);
   }
 
   @Override
@@ -45,8 +43,5 @@ public class DCMotorProto implements Protobuf<DCMotor, ProtobufDCMotor> {
     msg.setStallCurrent(value.stallCurrentAmps);
     msg.setFreeCurrent(value.freeCurrentAmps);
     msg.setFreeSpeed(value.freeSpeedRadPerSec);
-    msg.setR(value.rOhms);
-    msg.setKv(value.KvRadPerSecPerVolt);
-    msg.setKt(value.KtNMPerAmp);
   }
 }
