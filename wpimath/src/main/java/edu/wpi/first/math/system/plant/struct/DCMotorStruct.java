@@ -26,7 +26,8 @@ public class DCMotorStruct implements Struct<DCMotor> {
 
   @Override
   public String getSchema() {
-    return "double nominal_voltage;double stall_torque;double stall_current;double free_current;double free_speed";
+    return "double nominal_voltage;double stall_torque;double stall_current;"
+        + "double free_current;double free_speed";
   }
 
   @Override
