@@ -4,6 +4,8 @@
 
 package edu.wpi.first.math.geometry;
 
+import static edu.wpi.first.units.Units.Radians;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -13,6 +15,8 @@ import edu.wpi.first.math.geometry.proto.Rotation2dProto;
 import edu.wpi.first.math.geometry.struct.Rotation2dStruct;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.Measure;
 import java.util.Objects;
 
 /**
@@ -64,6 +68,15 @@ public class Rotation2d implements Interpolatable<Rotation2d> {
       m_cos = 1.0;
     }
     m_value = Math.atan2(m_sin, m_cos);
+  }
+
+  /**
+   * Constructs a Rotation2d with the given angle.
+   *
+   * @param angle The angle of the rotation.
+   */
+  public Rotation2d(Measure<Angle> angle) {
+    this(angle.in(Radians));
   }
 
   /**
