@@ -19,10 +19,11 @@ const Pose3d kExpectedData =
 }  // namespace
 
 TEST(Pose3dProtoTest, Roundtrip) {
-  wpi::proto::ProtobufPose3d proto;
-  ProtoType::Pack(&proto, kExpectedData);
+  google::protobuf::Arena arena;
+  google::protobuf::Message* proto = ProtoType::New(&arena);
+  ProtoType::Pack(proto, kExpectedData);
 
-  Pose3d unpacked_data = ProtoType::Unpack(proto);
+  Pose3d unpacked_data = ProtoType::Unpack(*proto);
   EXPECT_EQ(kExpectedData.Translation(), unpacked_data.Translation());
   EXPECT_EQ(kExpectedData.Rotation(), unpacked_data.Rotation());
 }

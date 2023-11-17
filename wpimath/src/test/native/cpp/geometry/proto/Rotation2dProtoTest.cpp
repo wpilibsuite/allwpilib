@@ -17,9 +17,10 @@ const Rotation2d kExpectedData = Rotation2d{1.91_rad};
 }  // namespace
 
 TEST(Rotation2dProtoTest, Roundtrip) {
-  wpi::proto::ProtobufRotation2d proto;
-  ProtoType::Pack(&proto, kExpectedData);
+  google::protobuf::Arena arena;
+  google::protobuf::Message* proto = ProtoType::New(&arena);
+  ProtoType::Pack(proto, kExpectedData);
 
-  Rotation2d unpacked_data = ProtoType::Unpack(proto);
+  Rotation2d unpacked_data = ProtoType::Unpack(*proto);
   EXPECT_EQ(kExpectedData.Radians().value(), unpacked_data.Radians().value());
 }

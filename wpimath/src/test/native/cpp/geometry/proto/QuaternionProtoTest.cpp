@@ -17,10 +17,11 @@ const Quaternion kExpectedData = Quaternion{1.1, 0.191, 35.04, 19.1};
 }  // namespace
 
 TEST(QuaternionProtoTest, Roundtrip) {
-  wpi::proto::ProtobufQuaternion proto;
-  ProtoType::Pack(&proto, kExpectedData);
+  google::protobuf::Arena arena;
+  google::protobuf::Message* proto = ProtoType::New(&arena);
+  ProtoType::Pack(proto, kExpectedData);
 
-  Quaternion unpacked_data = ProtoType::Unpack(proto);
+  Quaternion unpacked_data = ProtoType::Unpack(*proto);
   EXPECT_EQ(kExpectedData.W(), unpacked_data.W());
   EXPECT_EQ(kExpectedData.X(), unpacked_data.X());
   EXPECT_EQ(kExpectedData.Y(), unpacked_data.Y());

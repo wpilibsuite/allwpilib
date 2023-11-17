@@ -18,9 +18,10 @@ const Rotation3d kExpectedData =
 }  // namespace
 
 TEST(Rotation3dProtoTest, Roundtrip) {
-  wpi::proto::ProtobufRotation3d proto;
-  ProtoType::Pack(&proto, kExpectedData);
+  google::protobuf::Arena arena;
+  google::protobuf::Message* proto = ProtoType::New(&arena);
+  ProtoType::Pack(proto, kExpectedData);
 
-  Rotation3d unpacked_data = ProtoType::Unpack(proto);
+  Rotation3d unpacked_data = ProtoType::Unpack(*proto);
   EXPECT_EQ(kExpectedData.GetQuaternion(), unpacked_data.GetQuaternion());
 }

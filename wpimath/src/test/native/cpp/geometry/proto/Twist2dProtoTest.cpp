@@ -17,10 +17,11 @@ const Twist2d kExpectedData = Twist2d{2.29_m, 35.04_m, 35.04_rad};
 }  // namespace
 
 TEST(Twist2dProtoTest, Roundtrip) {
-  wpi::proto::ProtobufTwist2d proto;
-  ProtoType::Pack(&proto, kExpectedData);
+  google::protobuf::Arena arena;
+  google::protobuf::Message* proto = ProtoType::New(&arena);
+  ProtoType::Pack(proto, kExpectedData);
 
-  Twist2d unpacked_data = ProtoType::Unpack(proto);
+  Twist2d unpacked_data = ProtoType::Unpack(*proto);
   EXPECT_EQ(kExpectedData.dx.value(), unpacked_data.dx.value());
   EXPECT_EQ(kExpectedData.dy.value(), unpacked_data.dy.value());
   EXPECT_EQ(kExpectedData.dtheta.value(), unpacked_data.dtheta.value());

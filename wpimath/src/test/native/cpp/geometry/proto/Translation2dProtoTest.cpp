@@ -17,10 +17,11 @@ const Translation2d kExpectedData = Translation2d{3.504_m, 22.9_m};
 }  // namespace
 
 TEST(Translation2dProtoTest, Roundtrip) {
-  wpi::proto::ProtobufTranslation2d proto;
-  ProtoType::Pack(&proto, kExpectedData);
+  google::protobuf::Arena arena;
+  google::protobuf::Message* proto = ProtoType::New(&arena);
+  ProtoType::Pack(proto, kExpectedData);
 
-  Translation2d unpacked_data = ProtoType::Unpack(proto);
+  Translation2d unpacked_data = ProtoType::Unpack(*proto);
   EXPECT_EQ(kExpectedData.X().value(), unpacked_data.X().value());
   EXPECT_EQ(kExpectedData.Y().value(), unpacked_data.Y().value());
 }
