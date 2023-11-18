@@ -26,6 +26,7 @@ frc::Trajectory wpi::Protobuf<frc::Trajectory>::Unpack(
 void wpi::Protobuf<frc::Trajectory>::Pack(google::protobuf::Message* msg,
                                           const frc::Trajectory& value) {
   auto m = static_cast<wpi::proto::ProtobufTrajectory*>(msg);
+  m->mutable_states()->Reserve(value.States().size());
   for (const auto& state : value.States()) {
     wpi::PackProtobuf(m->add_states(), state);
   }
