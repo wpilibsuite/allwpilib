@@ -59,11 +59,7 @@ set_property(TARGET cameraserver PROPERTY FOLDER "libraries")
 install(TARGETS cameraserver EXPORT cameraserver)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/cameraserver")
 
-if (WITH_FLAT_INSTALL)
-    set (cameraserver_config_dir ${wpilib_dest})
-else()
-    set (cameraserver_config_dir share/cameraserver)
-endif()
+set(cameraserver_config_dir share/cameraserver)
 
 configure_file(cameraserver-config.cmake.in ${WPILIB_BINARY_DIR}/cameraserver-config.cmake )
 install(FILES ${WPILIB_BINARY_DIR}/cameraserver-config.cmake DESTINATION ${cameraserver_config_dir})

@@ -17,11 +17,7 @@ if (WITH_JAVA)
 
   set_property(TARGET romiVendordep_jar PROPERTY FOLDER "java")
 
-  if (WITH_FLAT_INSTALL)
-      set (romiVendordep_config_dir ${wpilib_dest})
-  else()
-      set (romiVendordep_config_dir share/romiVendordep)
-  endif()
+  set(romiVendordep_config_dir share/romiVendordep)
 endif()
 
 if (WITH_JAVA_SOURCE)
@@ -54,11 +50,7 @@ target_include_directories(romiVendordep PUBLIC
 install(TARGETS romiVendordep EXPORT romiVendordep DESTINATION "${main_lib_dest}")
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/romiVendordep")
 
-if (FLAT_INSTALL_WPILIB)
-     set(romiVendordep_config_dir ${wpilib_dest})
- else()
-     set(romiVendordep_config_dir share/romiVendordep)
- endif()
+set(romiVendordep_config_dir share/romiVendordep)
 
  configure_file(romiVendordep-config.cmake.in ${WPILIB_BINARY_DIR}/romiVendordep-config.cmake)
  install(FILES ${WPILIB_BINARY_DIR}/romiVendordep-config.cmake DESTINATION ${romiVendordep_config_dir})

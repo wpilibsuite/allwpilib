@@ -17,11 +17,7 @@ if (WITH_JAVA)
 
   set_property(TARGET wpilibNewCommands_jar PROPERTY FOLDER "java")
 
-  if (WITH_FLAT_INSTALL)
-      set (wpilibNewCommands_config_dir ${wpilib_dest})
-  else()
-      set (wpilibNewCommands_config_dir share/wpilibNewCommands)
-  endif()
+  set(wpilibNewCommands_config_dir share/wpilibNewCommands)
 endif()
 
 if (WITH_JAVA_SOURCE)
@@ -56,11 +52,7 @@ target_include_directories(wpilibNewCommands PUBLIC
 install(TARGETS wpilibNewCommands EXPORT wpilibNewCommands)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpilibNewCommands")
 
-if (FLAT_INSTALL_WPILIB)
-     set(wpilibNewCommands_config_dir ${wpilib_dest})
- else()
-     set(wpilibNewCommands_config_dir share/wpilibNewCommands)
- endif()
+set(wpilibNewCommands_config_dir share/wpilibNewCommands)
 
  configure_file(wpilibNewCommands-config.cmake.in ${WPILIB_BINARY_DIR}/wpilibNewCommands-config.cmake)
  install(FILES ${WPILIB_BINARY_DIR}/wpilibNewCommands-config.cmake DESTINATION ${wpilibNewCommands_config_dir})

@@ -205,11 +205,7 @@ target_include_directories(wpiutil PUBLIC
 
 install(TARGETS wpiutil EXPORT wpiutil)
 
-if (WITH_FLAT_INSTALL)
-    set (wpiutil_config_dir ${wpilib_dest})
-else()
-    set (wpiutil_config_dir share/wpiutil)
-endif()
+set(wpiutil_config_dir share/wpiutil)
 
 configure_file(wpiutil-config.cmake.in ${WPILIB_BINARY_DIR}/wpiutil-config.cmake )
 install(FILES ${WPILIB_BINARY_DIR}/wpiutil-config.cmake DESTINATION ${wpiutil_config_dir})

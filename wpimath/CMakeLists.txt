@@ -208,11 +208,7 @@ target_include_directories(wpimath PUBLIC
 
 install(TARGETS wpimath EXPORT wpimath)
 
-if (WITH_FLAT_INSTALL)
-    set (wpimath_config_dir ${wpilib_dest})
-else()
-    set (wpimath_config_dir share/wpimath)
-endif()
+set(wpimath_config_dir share/wpimath)
 
 configure_file(wpimath-config.cmake.in ${WPILIB_BINARY_DIR}/wpimath-config.cmake )
 install(FILES ${WPILIB_BINARY_DIR}/wpimath-config.cmake DESTINATION ${wpimath_config_dir})

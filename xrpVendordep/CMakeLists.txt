@@ -17,11 +17,7 @@ if (WITH_JAVA)
 
   set_property(TARGET xrpVendordep_jar PROPERTY FOLDER "java")
 
-  if (WITH_FLAT_INSTALL)
-      set (xrpVendordep_config_dir ${wpilib_dest})
-  else()
-      set (xrpVendordep_config_dir share/xrpVendordep)
-  endif()
+  set(xrpVendordep_config_dir share/xrpVendordep)
 endif()
 
 if (WITH_JAVA_SOURCE)
@@ -54,11 +50,7 @@ target_include_directories(xrpVendordep PUBLIC
 install(TARGETS xrpVendordep EXPORT xrpVendordep DESTINATION "${main_lib_dest}")
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/xrpVendordep")
 
-if (FLAT_INSTALL_WPILIB)
-     set(xrpVendordep_config_dir ${wpilib_dest})
- else()
-     set(xrpVendordep_config_dir share/xrpVendordep)
- endif()
+set(xrpVendordep_config_dir share/xrpVendordep)
 
  configure_file(xrpVendordep-config.cmake.in ${WPILIB_BINARY_DIR}/xrpVendordep-config.cmake)
  install(FILES ${WPILIB_BINARY_DIR}/xrpVendordep-config.cmake DESTINATION ${xrpVendordep_config_dir})

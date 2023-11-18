@@ -24,11 +24,7 @@ if (WITH_JAVA)
 
     set_property(TARGET wpilibj_jar PROPERTY FOLDER "java")
 
-    if (WITH_FLAT_INSTALL)
-        set (wpilibj_config_dir ${wpilib_dest})
-    else()
-        set (wpilibj_config_dir share/wpilibj)
-    endif()
+    set(wpilibj_config_dir share/wpilibj)
 
     install(FILES wpilibj-config.cmake DESTINATION ${wpilibj_config_dir})
 endif()

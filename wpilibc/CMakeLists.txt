@@ -33,11 +33,7 @@ set_property(TARGET wpilibc PROPERTY FOLDER "libraries")
 install(TARGETS wpilibc EXPORT wpilibc)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpilibc")
 
-if (WITH_FLAT_INSTALL)
-    set (wpilibc_config_dir ${wpilib_dest})
-else()
-    set (wpilibc_config_dir share/wpilibc)
-endif()
+set(wpilibc_config_dir share/wpilibc)
 
 configure_file(wpilibc-config.cmake.in ${WPILIB_BINARY_DIR}/wpilibc-config.cmake )
 install(FILES ${WPILIB_BINARY_DIR}/wpilibc-config.cmake DESTINATION ${wpilibc_config_dir})

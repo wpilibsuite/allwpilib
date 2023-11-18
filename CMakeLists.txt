@@ -76,9 +76,6 @@ option(USE_SYSTEM_FMTLIB "Use system fmtlib" OFF)
 option(USE_SYSTEM_LIBUV "Use system libuv" OFF)
 option(USE_SYSTEM_EIGEN "Use system eigen" OFF)
 
-# Options for installation.
-option(WITH_FLAT_INSTALL "Use a flat install directory" OFF)
-
 # Options for location of OpenCV Java.
 set(OPENCV_JAVA_INSTALL_DIR "" CACHE PATH "Location to search for the OpenCV jar file")
 
@@ -162,16 +159,11 @@ FATAL: Cannot build Java wpimath without wpiunits.
 ")
 endif()
 
-set( wpilib_dest "")
 set( include_dest include )
 set( java_lib_dest java )
 set( jni_lib_dest jni )
 
-if (WITH_FLAT_INSTALL)
-    set (wpilib_config_dir ${wpilib_dest})
-else()
-    set (wpilib_config_dir share/wpilib)
-endif()
+set(wpilib_config_dir share/wpilib)
 
 if (USE_SYSTEM_LIBUV)
 set (LIBUV_SYSTEM_REPLACE "
@@ -191,18 +183,6 @@ find_program(Quickbuf_EXECUTABLE
     DOC "The Quickbuf protoc plugin"
 )
 
-if (WITH_FLAT_INSTALL)
-set(WPIUTIL_DEP_REPLACE "include($\{SELF_DIR\}/wpiutil-config.cmake)")
-set(WPINET_DEP_REPLACE "include($\{SELF_DIR\}/wpinet-config.cmake)")
-set(NTCORE_DEP_REPLACE "include($\{SELF_DIR\}/ntcore-config.cmake)")
-set(CSCORE_DEP_REPLACE_IMPL "include(\${SELF_DIR}/cscore-config.cmake)")
-set(CAMERASERVER_DEP_REPLACE_IMPL "include(\${SELF_DIR}/cameraserver-config.cmake)")
-set(HAL_DEP_REPLACE_IMPL "include(\${SELF_DIR}/hal-config.cmake)")
-set(WPIMATH_DEP_REPLACE "include($\{SELF_DIR\}/wpimath-config.cmake)")
-set(WPIUNITS_DEP_REPLACE "include($\{SELF_DIR\}/wpiunits-config.cmake)")
-set(WPILIBC_DEP_REPLACE_IMPL "include(\${SELF_DIR}/wpilibc-config.cmake)")
-set(WPILIBNEWCOMMANDS_DEP_REPLACE "include(\${SELF_DIR}/wpilibNewcommands-config.cmake)")
-else()
 set(WPIUTIL_DEP_REPLACE "find_dependency(wpiutil)")
 set(WPINET_DEP_REPLACE "find_dependency(wpinet)")
 set(NTCORE_DEP_REPLACE "find_dependency(ntcore)")
@@ -213,7 +193,6 @@ set(WPIMATH_DEP_REPLACE "find_dependency(wpimath)")
 set(WPIUNITS_DEP_REPLACE "find_dependency(wpiunits)")
 set(WPILIBC_DEP_REPLACE_IMPL "find_dependency(wpilibc)")
 set(WPILIBNEWCOMMANDS_DEP_REPLACE "find_dependency(wpilibNewCommands)")
-endif()
 
 set(FILENAME_DEP_REPLACE "get_filename_component(SELF_DIR \"$\{CMAKE_CURRENT_LIST_FILE\}\" PATH)")
 set(SELF_DIR "$\{SELF_DIR\}")

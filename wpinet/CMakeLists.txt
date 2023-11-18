@@ -173,11 +173,7 @@ target_include_directories(wpinet PUBLIC
 
 install(TARGETS wpinet EXPORT wpinet)
 
-if (WITH_FLAT_INSTALL)
-    set (wpinet_config_dir ${wpilib_dest})
-else()
-    set (wpinet_config_dir share/wpinet)
-endif()
+set(wpinet_config_dir share/wpinet)
 
 configure_file(wpinet-config.cmake.in ${WPILIB_BINARY_DIR}/wpinet-config.cmake )
 install(FILES ${WPILIB_BINARY_DIR}/wpinet-config.cmake DESTINATION ${wpinet_config_dir})
