@@ -18,6 +18,7 @@
 
 #include "glass/Model.h"
 #include "glass/Provider.h"
+#include "glass/networktables/NetworkTables.h"
 
 namespace glass {
 
@@ -28,7 +29,8 @@ struct NTProviderFunctions {
   using Exists =
       std::function<bool(nt::NetworkTableInstance inst, const char* path)>;
   using CreateModel = std::function<std::unique_ptr<Model>(
-      nt::NetworkTableInstance inst, const char* path)>;
+      nt::NetworkTableInstance inst,
+      wpi::StructDescriptorDatabase& structDatabse, const char* path)>;
   using ViewExists = std::function<bool(Model*, const char* path)>;
   using CreateView =
       std::function<std::unique_ptr<View>(Window*, Model*, const char* path)>;
@@ -43,8 +45,11 @@ class NetworkTablesProvider : private Provider<detail::NTProviderFunctions> {
   using Provider::CreateModelFunc;
   using Provider::CreateViewFunc;
 
-  explicit NetworkTablesProvider(Storage& storage);
-  NetworkTablesProvider(Storage& storage, nt::NetworkTableInstance inst);
+  NetworkTablesProvider(Storage& storage,
+                        wpi::StructDescriptorDatabase& structDatabse);
+  NetworkTablesProvider(Storage& storage,
+                        wpi::StructDescriptorDatabase& structDatabse,
+                        nt::NetworkTableInstance inst);
 
   /**
    * Get the NetworkTables instance being used for this provider.
@@ -80,6 +85,8 @@ class NetworkTablesProvider : private Provider<detail::NTProviderFunctions> {
   nt::NetworkTableInstance m_inst;
   nt::NetworkTableListenerPoller m_poller;
   NT_Listener m_listener{0};
+
+  wpi::StructDescriptorDatabase& m_structDatabase;
 
   // cached mapping from table name to type string
   Storage& m_typeCache;

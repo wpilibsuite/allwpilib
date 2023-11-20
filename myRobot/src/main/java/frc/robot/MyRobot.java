@@ -4,6 +4,9 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.glass.Canvas2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -20,9 +23,14 @@ public class MyRobot extends TimedRobot {
   public void robotInit() {
     SmartDashboard.putData("Canvas2d", canvas2d);
 
-    canvas2d.drawLine(1, 2, 3, 4, 5, new Color8Bit(Color.kRed));
-    canvas2d.drawLine(6, 7, 8, 9, 10, new Color8Bit(Color.kBlue));
+    canvas2d.drawLine(0, 0, 50, 50, 1, new Color8Bit(Color.kRed));
+    canvas2d.drawLine(10, 90, 90, 10, 4, new Color8Bit(Color.kBlue));
     canvas2d.finishFrame();
+
+    Rotation2d rotation2d = new Rotation2d(1, 2);
+
+    StructPublisher<Rotation2d> rotation2dPublisher = NetworkTableInstance.getDefault().getStructTopic("Rotation", Rotation2d.struct).publish();
+    rotation2dPublisher.set(rotation2d);
 
   }
 

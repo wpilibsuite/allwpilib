@@ -14,18 +14,34 @@
 
 namespace glass {
 
-class Canvas2DLineModel : public Model {
+class Canvas2DLine {
  public:
-  virtual ImVec2 GetPoint1() const = 0;
-  virtual ImVec2 GetPoint2() const = 0;
-  virtual double GetWeight() const = 0;
-  virtual ImU32 GetColor() const = 0;
-  virtual int GetZOrder() const = 0;
+  Canvas2DLine(ImVec2 point1, ImVec2 point2, float weight, ImU32 color,
+               int zOrder)
+      : m_point1{point1},
+        m_point2{point2},
+        m_weight{weight},
+        m_color{color},
+        m_zOrder{zOrder} {}
+
+  ImVec2 GetPoint1() const { return m_point1; }
+  ImVec2 GetPoint2() const { return m_point2; }
+  float GetWeight() const { return m_weight; }
+  ImU32 GetColor() const { return m_color; }
+  int GetZOrder() const { return m_zOrder; }
+
+ private:
+  ImVec2 m_point1;
+  ImVec2 m_point2;
+  float m_weight;
+  ImU32 m_color;
+  int m_zOrder;
 };
 
 class Canvas2DModel : public Model {
  public:
-  virtual std::span<const Canvas2DLineModel*> GetLines() = 0;
+  virtual std::vector<Canvas2DLine> GetLines() const = 0;
+  virtual ImVec2 GetDimensions() const = 0;
 };
 
 void DisplayCanvas2D(Canvas2DModel* model, const ImVec2& contentSize);
@@ -42,4 +58,4 @@ class Canvas2DView : public View {
  private:
   Canvas2DModel* m_model;
 };
-}
+}  // namespace glass
