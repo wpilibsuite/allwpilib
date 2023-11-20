@@ -4,6 +4,8 @@
 
 #include "glass/other/Canvas2D.h"
 
+#include <vector>
+
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>
 #include <wpigui.h>
@@ -30,7 +32,7 @@ void glass::DisplayCanvas2D(Canvas2DModel* model, const ImVec2& contentSize) {
 
   auto drawList = ImGui::GetWindowDrawList();
 
-  auto lines = model->GetLines();
+  std::vector<Canvas2DLine> lines = model->GetLines();
 
   // TODO: make this traverse multuple lists
   for (auto line : lines) {
