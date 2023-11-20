@@ -249,7 +249,7 @@ public abstract class IterativeRobotBase extends RobotBase {
   /**
    * Sets whether LiveWindow operation is enabled during test mode. Calling
    *
-   * @param testLW True to enable, false to disable. Defaults to true.
+   * @param testLW True to enable, false to disable. Defaults to false.
    * @throws ConcurrentModificationException if this is called during test mode.
    */
   public void enableLiveWindowInTest(boolean testLW) {
