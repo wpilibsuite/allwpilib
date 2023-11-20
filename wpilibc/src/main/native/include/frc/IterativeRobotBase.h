@@ -204,7 +204,7 @@ class IterativeRobotBase : public RobotBase {
   /**
    * Sets whether LiveWindow operation is enabled during test mode.
    *
-   * @param testLW True to enable, false to disable. Defaults to true.
+   * @param testLW True to enable, false to disable. Defaults to false.
    * @throws if called in test mode.
    */
   void EnableLiveWindowInTest(bool testLW);
@@ -241,7 +241,7 @@ class IterativeRobotBase : public RobotBase {
   units::second_t m_period;
   Watchdog m_watchdog;
   bool m_ntFlushEnabled = true;
-  bool m_lwEnabledInTest = true;
+  bool m_lwEnabledInTest = false;
 
   void PrintLoopOverrunMessage();
 };
