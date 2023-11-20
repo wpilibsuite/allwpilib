@@ -1,0 +1,38 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Mon, 20 Nov 2023 15:36:10 -0800
+Subject: [PATCH 3/3] Qualify member function calls in template functions
+
+---
+ include/fmt/core.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/include/fmt/core.h b/include/fmt/core.h
+index 1fe13888a00263a085032272482475e5dafbef26..200cf3e84952abc3007237fbcf79f22a5c2e50c6 100644
+--- a/include/fmt/core.h
++++ b/include/fmt/core.h
+@@ -1436,7 +1436,7 @@ template <typename Context> struct arg_mapper {
+   template <typename T, typename U = format_as_t<T>,
+             FMT_ENABLE_IF(std::is_arithmetic<U>::value)>
+   FMT_CONSTEXPR FMT_INLINE auto map(const T& val) -> decltype(this->map(U())) {
+-    return map(format_as(val));
++    return this->map(format_as(val));
+   }
+ 
+   template <typename T, typename U = remove_const_t<T>>
+@@ -1460,13 +1460,13 @@ template <typename Context> struct arg_mapper {
+                           !is_named_arg<U>::value &&
+                           !std::is_arithmetic<format_as_t<U>>::value)>
+   FMT_CONSTEXPR FMT_INLINE auto map(T& val) -> decltype(this->do_map(val)) {
+-    return do_map(val);
++    return this->do_map(val);
+   }
+ 
+   template <typename T, FMT_ENABLE_IF(is_named_arg<T>::value)>
+   FMT_CONSTEXPR FMT_INLINE auto map(const T& named_arg)
+       -> decltype(this->map(named_arg.value)) {
+-    return map(named_arg.value);
++    return this->map(named_arg.value);
+   }
+ 
+   auto map(...) -> unformattable { return {}; }

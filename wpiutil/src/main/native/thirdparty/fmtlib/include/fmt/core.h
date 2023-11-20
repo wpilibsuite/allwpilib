@@ -1436,7 +1436,7 @@ template <typename Context> struct arg_mapper {
   template <typename T, typename U = format_as_t<T>,
             FMT_ENABLE_IF(std::is_arithmetic<U>::value)>
   FMT_CONSTEXPR FMT_INLINE auto map(const T& val) -> decltype(this->map(U())) {
-    return map(format_as(val));
+    return this->map(format_as(val));
   }
 
   template <typename T, typename U = remove_const_t<T>>
@@ -1460,13 +1460,13 @@ template <typename Context> struct arg_mapper {
                           !is_named_arg<U>::value &&
                           !std::is_arithmetic<format_as_t<U>>::value)>
   FMT_CONSTEXPR FMT_INLINE auto map(T& val) -> decltype(this->do_map(val)) {
-    return do_map(val);
+    return this->do_map(val);
   }
 
   template <typename T, FMT_ENABLE_IF(is_named_arg<T>::value)>
   FMT_CONSTEXPR FMT_INLINE auto map(const T& named_arg)
       -> decltype(this->map(named_arg.value)) {
-    return map(named_arg.value);
+    return this->map(named_arg.value);
   }
 
   auto map(...) -> unformattable { return {}; }
