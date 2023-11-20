@@ -1680,12 +1680,12 @@ Java_edu_wpi_first_cscore_CameraServerJNI_setSinkDescription
  */
 JNIEXPORT jlong JNICALL
 Java_edu_wpi_first_cscore_CameraServerCvJNI_grabSinkFrame
-  (JNIEnv* env, jclass, jint sink, jlong imageNativeObj)
+  (JNIEnv* env, jclass, jint sink, jlong imageNativeObj, jint pixelFormat)
 {
   try {
     cv::Mat& image = *((cv::Mat*)imageNativeObj);
     CS_Status status = 0;
-    auto rv = cs::GrabSinkFrame(sink, image, &status);
+    auto rv = cs::GrabSinkFrame(sink, image, static_cast<cs::VideoMode::PixelFormat>(pixelFormat), &status);
     CheckStatus(env, status);
     return rv;
   } catch (const std::exception& e) {
@@ -1704,12 +1704,12 @@ Java_edu_wpi_first_cscore_CameraServerCvJNI_grabSinkFrame
  */
 JNIEXPORT jlong JNICALL
 Java_edu_wpi_first_cscore_CameraServerCvJNI_grabSinkFrameTimeout
-  (JNIEnv* env, jclass, jint sink, jlong imageNativeObj, jdouble timeout)
+  (JNIEnv* env, jclass, jint sink, jlong imageNativeObj, jint pixelFormat, jdouble timeout)
 {
   try {
     cv::Mat& image = *((cv::Mat*)imageNativeObj);
     CS_Status status = 0;
-    auto rv = cs::GrabSinkFrameTimeout(sink, image, timeout, &status);
+    auto rv = cs::GrabSinkFrameTimeout(sink, image, static_cast<cs::VideoMode::PixelFormat>(pixelFormat), timeout, &status);
     CheckStatus(env, status);
     return rv;
   } catch (const std::exception& e) {

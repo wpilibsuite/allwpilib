@@ -8,6 +8,7 @@
 #include <functional>
 
 #include "cscore_c.h"
+#include "cscore_cpp.h"
 
 #ifdef CSCORE_CSCORE_RAW_CV_H_
 #error "Cannot include both cscore_cv.h and cscore_raw_cv.h in the same file"
@@ -29,9 +30,9 @@ struct CvMat;
 void CS_PutSourceFrame(CS_Source source, struct CvMat* image,
                        CS_Status* status);
 
-uint64_t CS_GrabSinkFrame(CS_Sink sink, struct CvMat* image, CS_Status* status);
+uint64_t CS_GrabSinkFrame(CS_Sink sink, struct CvMat* image, CS_PixelFormat pixelFormat, CS_Status* status);
 uint64_t CS_GrabSinkFrameTimeout(CS_Sink sink, struct CvMat* image,
-                                 double timeout, CS_Status* status);
+                                 double timeout, CS_PixelFormat pixelFormat, CS_Status* status);
 
 #ifdef __cplusplus
 }  // extern "C"
@@ -64,8 +65,8 @@ void CS_PutSourceFrameCpp(CS_Source source, cv::Mat* image, CS_Status* status);
 /** @} */
 
 void PutSourceFrame(CS_Source source, cv::Mat& image, CS_Status* status);
-uint64_t GrabSinkFrame(CS_Sink sink, cv::Mat& image, CS_Status* status);
-uint64_t GrabSinkFrameTimeout(CS_Sink sink, cv::Mat& image, double timeout,
+uint64_t GrabSinkFrame(CS_Sink sink, cv::Mat& image, VideoMode::PixelFormat pixelFormat, CS_Status* status);
+uint64_t GrabSinkFrameTimeout(CS_Sink sink, cv::Mat& image, VideoMode::PixelFormat pixelFormat, double timeout,
                               CS_Status* status);
 
 /**
@@ -155,7 +156,7 @@ class CvSink : public ImageSink {
    *         and is in 1 us increments.
    */
   [[nodiscard]]
-  uint64_t GrabFrame(cv::Mat& image, double timeout = 0.225) const;
+  uint64_t GrabFrame(cv::Mat& image, VideoMode::PixelFormat pixelFormat, double timeout = 0.225) const;
 
   /**
    * Wait for the next frame and get the image.  May block forever.
@@ -166,7 +167,7 @@ class CvSink : public ImageSink {
    *         and is in 1 us increments.
    */
   [[nodiscard]]
-  uint64_t GrabFrameNoTimeout(cv::Mat& image) const;
+  uint64_t GrabFrameNoTimeout(cv::Mat& image, VideoMode::PixelFormat pixelFormat) const;
 };
 
 inline CvSource::CvSource(std::string_view name, const VideoMode& mode) {
@@ -193,14 +194,14 @@ inline CvSink::CvSink(std::string_view name,
   m_handle = CreateCvSinkCallback(name, processFrame, &m_status);
 }
 
-inline uint64_t CvSink::GrabFrame(cv::Mat& image, double timeout) const {
+inline uint64_t CvSink::GrabFrame(cv::Mat& image, VideoMode::PixelFormat pixelFormat, double timeout) const {
   m_status = 0;
-  return GrabSinkFrameTimeout(m_handle, image, timeout, &m_status);
+  return GrabSinkFrameTimeout(m_handle, image, pixelFormat, timeout, &m_status);
 }
 
-inline uint64_t CvSink::GrabFrameNoTimeout(cv::Mat& image) const {
+inline uint64_t CvSink::GrabFrameNoTimeout(cv::Mat& image, VideoMode::PixelFormat pixelFormat) const {
   m_status = 0;
-  return GrabSinkFrame(m_handle, image, &m_status);
+  return GrabSinkFrame(m_handle, image, pixelFormat, &m_status);
 }
 
 }  // namespace cs

@@ -69,7 +69,8 @@ public class CameraServerCvJNI {
   // public static native int createCvSinkCallback(String name,
   //                            void (*processFrame)(long time));
 
-  public static native long grabSinkFrame(int sink, long imageNativeObj);
+  public static native long grabSinkFrame(int sink, long imageNativeObj, int pixelFormat);
 
-  public static native long grabSinkFrameTimeout(int sink, long imageNativeObj, double timeout);
+  public static native long grabSinkFrameTimeout(
+      int sink, long imageNativeObj, int pixelFormat, double timeout);
 }

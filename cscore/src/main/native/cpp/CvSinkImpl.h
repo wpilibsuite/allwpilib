@@ -33,8 +33,8 @@ class CvSinkImpl : public SinkImpl {
 
   void Stop();
 
-  uint64_t GrabFrame(cv::Mat& image);
-  uint64_t GrabFrame(cv::Mat& image, double timeout);
+  uint64_t GrabFrame(cv::Mat& image, VideoMode::PixelFormat pixelFormat);
+  uint64_t GrabFrame(cv::Mat& image, VideoMode::PixelFormat pixelFormat, double timeout);
 
  private:
   void ThreadMain();

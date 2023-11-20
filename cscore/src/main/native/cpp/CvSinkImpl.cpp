@@ -48,7 +48,7 @@ void CvSinkImpl::Stop() {
   }
 }
 
-uint64_t CvSinkImpl::GrabFrame(cv::Mat& image) {
+uint64_t CvSinkImpl::GrabFrame(cv::Mat& image, VideoMode::PixelFormat pixelFormat) {
   SetEnabled(true);
 
   auto source = GetSource();
@@ -65,7 +65,7 @@ uint64_t CvSinkImpl::GrabFrame(cv::Mat& image) {
     return 0;  // signal error
   }
 
-  if (!frame.GetCv(image)) {
+  if (!frame.GetCv(image, pixelFormat)) {
     // Shouldn't happen, but just in case...
     std::this_thread::sleep_for(std::chrono::milliseconds(20));
     return 0;
@@ -74,7 +74,7 @@ uint64_t CvSinkImpl::GrabFrame(cv::Mat& image) {
   return frame.GetTime();
 }
 
-uint64_t CvSinkImpl::GrabFrame(cv::Mat& image, double timeout) {
+uint64_t CvSinkImpl::GrabFrame(cv::Mat& image, VideoMode::PixelFormat pixelFormat, double timeout) {
   SetEnabled(true);
 
   auto source = GetSource();
@@ -91,7 +91,7 @@ uint64_t CvSinkImpl::GrabFrame(cv::Mat& image, double timeout) {
     return 0;  // signal error
   }
 
-  if (!frame.GetCv(image)) {
+  if (!frame.GetCv(image, pixelFormat)) {
     // Shouldn't happen, but just in case...
     std::this_thread::sleep_for(std::chrono::milliseconds(20));
     return 0;
@@ -155,23 +155,24 @@ void SetSinkDescription(CS_Sink sink, std::string_view description,
   static_cast<CvSinkImpl&>(*data->sink).SetDescription(description);
 }
 
-uint64_t GrabSinkFrame(CS_Sink sink, cv::Mat& image, CS_Status* status) {
+uint64_t GrabSinkFrame(CS_Sink sink, cv::Mat& image, CS_PixelFormat pixelFormat, CS_Status* status) {
   auto data = Instance::GetInstance().GetSink(sink);
   if (!data || data->kind != CS_SINK_CV) {
     *status = CS_INVALID_HANDLE;
     return 0;
   }
-  return static_cast<CvSinkImpl&>(*data->sink).GrabFrame(image);
+  return static_cast<CvSinkImpl&>(*data->sink).GrabFrame(image, static_cast<VideoMode::PixelFormat>(pixelFormat));
 }
 
-uint64_t GrabSinkFrameTimeout(CS_Sink sink, cv::Mat& image, double timeout,
+uint64_t GrabSinkFrameTimeout(CS_Sink sink, cv::Mat& image, CS_PixelFormat pixelFormat, double timeout,
                               CS_Status* status) {
   auto data = Instance::GetInstance().GetSink(sink);
   if (!data || data->kind != CS_SINK_CV) {
     *status = CS_INVALID_HANDLE;
     return 0;
   }
-  return static_cast<CvSinkImpl&>(*data->sink).GrabFrame(image, timeout);
+  return static_cast<CvSinkImpl&>(*data->sink).GrabFrame(image, 
+              static_cast<VideoMode::PixelFormat>(pixelFormat), timeout);
 }
 
 std::string GetSinkError(CS_Sink sink, CS_Status* status) {
@@ -223,26 +224,26 @@ void CS_SetSinkDescription(CS_Sink sink, const char* description,
 }
 
 #if CV_VERSION_MAJOR < 4
-uint64_t CS_GrabSinkFrame(CS_Sink sink, struct CvMat* image,
+uint64_t CS_GrabSinkFrame(CS_Sink sink, struct CvMat* image, CS_PixelFormat pixelFormat,
                           CS_Status* status) {
   auto mat = cv::cvarrToMat(image);
-  return cs::GrabSinkFrame(sink, mat, status);
+  return cs::GrabSinkFrame(sink, mat, pixelFormat, status);
 }
 
 uint64_t CS_GrabSinkFrameTimeout(CS_Sink sink, struct CvMat* image,
                                  double timeout, CS_Status* status) {
   auto mat = cv::cvarrToMat(image);
-  return cs::GrabSinkFrameTimeout(sink, mat, timeout, status);
+  return cs::GrabSinkFrameTimeout(sink, mat, pixelFormat, timeout, status);
 }
 #endif  // CV_VERSION_MAJOR < 4
 
-uint64_t CS_GrabSinkFrameCpp(CS_Sink sink, cv::Mat* image, CS_Status* status) {
-  return cs::GrabSinkFrame(sink, *image, status);
+uint64_t CS_GrabSinkFrameCpp(CS_Sink sink, cv::Mat* image, CS_PixelFormat pixelFormat, CS_Status* status) {
+  return cs::GrabSinkFrame(sink, *image, pixelFormat, status);
 }
 
-uint64_t CS_GrabSinkFrameTimeoutCpp(CS_Sink sink, cv::Mat* image,
+uint64_t CS_GrabSinkFrameTimeoutCpp(CS_Sink sink, cv::Mat* image, CS_PixelFormat pixelFormat,
                                     double timeout, CS_Status* status) {
-  return cs::GrabSinkFrameTimeout(sink, *image, timeout, status);
+  return cs::GrabSinkFrameTimeout(sink, *image, pixelFormat, timeout, status);
 }
 
 char* CS_GetSinkError(CS_Sink sink, CS_Status* status) {
