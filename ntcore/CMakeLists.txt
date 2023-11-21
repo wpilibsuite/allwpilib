@@ -3,15 +3,6 @@ project(ntcore)
 include(CompileWarnings)
 include(AddTest)
 
-execute_process(COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/generate_topics.py ${WPILIB_BINARY_DIR}/ntcore RESULT_VARIABLE generateResult)
-if(NOT (generateResult EQUAL "0"))
-  # Try python
-  execute_process(COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/generate_topics.py ${WPILIB_BINARY_DIR}/ntcore RESULT_VARIABLE generateResult)
-  if(NOT (generateResult EQUAL "0"))
-    message(FATAL_ERROR "python and python3 generate_topics.py failed")
-  endif()
-endif()
-
 file(GLOB ntcore_native_src
     src/main/native/cpp/*.cpp
     ${WPILIB_BINARY_DIR}/ntcore/generated/main/native/cpp/*.cpp
