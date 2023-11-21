@@ -212,10 +212,9 @@ class ProtobufPublisher : public Publisher {
   ProtobufPublisher& operator=(ProtobufPublisher&& rhs) {
     Publisher::operator=(std::move(rhs));
     m_msg = std::move(rhs.m_msg);
-    m_schemaPublished.clear();
-    if (rhs.m_schemaPublished.test()) {
-      m_schemaPublished.test_and_set();
-    }
+    m_schemaPublished.store(
+        rhs.m_schemaPublished.load(std::memory_order_relaxed),
+        std::memory_order_relaxed);
     return *this;
   }
 
@@ -229,7 +228,7 @@ class ProtobufPublisher : public Publisher {
     wpi::SmallVector<uint8_t, 128> buf;
     {
       std::scoped_lock lock{m_mutex};
-      if (!m_schemaPublished.test_and_set()) {
+      if (!m_schemaPublished.exchange(true, std::memory_order_relaxed)) {
         GetTopic().GetInstance().template AddProtobufSchema<T>(m_msg);
       }
       m_msg.Pack(buf, value);
@@ -248,7 +247,7 @@ class ProtobufPublisher : public Publisher {
     wpi::SmallVector<uint8_t, 128> buf;
     {
       std::scoped_lock lock{m_mutex};
-      if (!m_schemaPublished.test_and_set()) {
+      if (!m_schemaPublished.exchange(true, std::memory_order_relaxed)) {
         GetTopic().GetInstance().template AddProtobufSchema<T>(m_msg);
       }
       m_msg.Pack(buf, value);
@@ -268,7 +267,7 @@ class ProtobufPublisher : public Publisher {
  private:
   wpi::mutex m_mutex;
   wpi::ProtobufMessage<T> m_msg;
-  std::atomic_flag m_schemaPublished = ATOMIC_FLAG_INIT;
+  std::atomic_bool m_schemaPublished{false};
 };
 
 /**

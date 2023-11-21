@@ -238,10 +238,9 @@ class StructArrayPublisher : public Publisher {
   StructArrayPublisher& operator=(StructArrayPublisher&& rhs) {
     Publisher::operator=(std::move(rhs));
     m_buf = std::move(rhs.m_buf);
-    m_schemaPublished.clear();
-    if (rhs.m_schemaPublished.test()) {
-      m_schemaPublished.test_and_set();
-    }
+    m_schemaPublished.store(
+        rhs.m_schemaPublished.load(std::memory_order_relaxed),
+        std::memory_order_relaxed);
     return *this;
   }
 
@@ -257,7 +256,7 @@ class StructArrayPublisher : public Publisher {
              std::convertible_to<std::ranges::range_value_t<U>, T>
 #endif
   void Set(U&& value, int64_t time = 0) {
-    if (!m_schemaPublished.test_and_set()) {
+    if (!m_schemaPublished.exchange(true, std::memory_order_relaxed)) {
       GetTopic().GetInstance().template AddStructSchema<T>();
     }
     m_buf.Write(std::forward<U>(value),
@@ -288,7 +287,7 @@ class StructArrayPublisher : public Publisher {
              std::convertible_to<std::ranges::range_value_t<U>, T>
 #endif
   void SetDefault(U&& value) {
-    if (!m_schemaPublished.test_and_set()) {
+    if (!m_schemaPublished.exchange(true, std::memory_order_relaxed)) {
       GetTopic().GetInstance().template AddStructSchema<T>();
     }
     m_buf.Write(std::forward<U>(value),
@@ -318,7 +317,7 @@ class StructArrayPublisher : public Publisher {
 
  private:
   wpi::StructArrayBuffer<T> m_buf;
-  std::atomic_flag m_schemaPublished = ATOMIC_FLAG_INIT;
+  std::atomic_bool m_schemaPublished{false};
 };
 
 /**
