@@ -47,7 +47,7 @@ class CvSinkImpl : public SinkImpl {
   std::atomic_bool m_active;  // set to false to terminate threads
   std::thread m_thread;
   std::function<void(uint64_t time)> m_processFrame;
-  VideoMode::PixelFormat m_pixel_format;
+  VideoMode::PixelFormat m_pixelFormat;
 };
 
 }  // namespace cs

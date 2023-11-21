@@ -21,7 +21,7 @@ using namespace cs;
 CvSinkImpl::CvSinkImpl(std::string_view name, wpi::Logger& logger,
                        Notifier& notifier, Telemetry& telemetry)
     : SinkImpl{name, logger, notifier, telemetry},
-      m_pixel_format{VideoMode::PixelFormat::kBGR} {
+      m_pixelFormat{VideoMode::PixelFormat::kBGR} {
   m_active = true;
   // m_thread = std::thread(&CvSinkImpl::ThreadMain, this);
 }
@@ -29,7 +29,7 @@ CvSinkImpl::CvSinkImpl(std::string_view name, wpi::Logger& logger,
 CvSinkImpl::CvSinkImpl(std::string_view name, wpi::Logger& logger,
                        Notifier& notifier, Telemetry& telemetry,
                        VideoMode::PixelFormat pixelFormat)
-    : SinkImpl{name, logger, notifier, telemetry}, m_pixel_format{pixelFormat} {
+    : SinkImpl{name, logger, notifier, telemetry}, m_pixelFormat{pixelFormat} {
   m_active = true;
   // m_thread = std::thread(&CvSinkImpl::ThreadMain, this);
 }
@@ -38,14 +38,14 @@ CvSinkImpl::CvSinkImpl(std::string_view name, wpi::Logger& logger,
                        Notifier& notifier, Telemetry& telemetry,
                        std::function<void(uint64_t time)> processFrame)
     : SinkImpl{name, logger, notifier, telemetry},
-      m_pixel_format{VideoMode::PixelFormat::kBGR} {}
+      m_pixelFormat{VideoMode::PixelFormat::kBGR} {}
 
 CvSinkImpl::CvSinkImpl(std::string_view name, wpi::Logger& logger,
                        Notifier& notifier, Telemetry& telemetry,
                        VideoMode::PixelFormat pixelFormat,
                        std::function<void(uint64_t time)> processFrame)
     : SinkImpl{name, logger, notifier, telemetry},
-      m_pixel_format{pixelFormat} {}
+      m_pixelFormat{pixelFormat} {}
 
 CvSinkImpl::~CvSinkImpl() {
   Stop();
@@ -82,7 +82,7 @@ uint64_t CvSinkImpl::GrabFrame(cv::Mat& image) {
     return 0;  // signal error
   }
 
-  if (!frame.GetCv(image, m_pixel_format)) {
+  if (!frame.GetCv(image, m_pixelFormat)) {
     // Shouldn't happen, but just in case...
     std::this_thread::sleep_for(std::chrono::milliseconds(20));
     return 0;
@@ -108,7 +108,7 @@ uint64_t CvSinkImpl::GrabFrame(cv::Mat& image, double timeout) {
     return 0;  // signal error
   }
 
-  if (!frame.GetCv(image, m_pixel_format)) {
+  if (!frame.GetCv(image, m_pixelFormat)) {
     // Shouldn't happen, but just in case...
     std::this_thread::sleep_for(std::chrono::milliseconds(20));
     return 0;
@@ -242,13 +242,13 @@ void SetSinkEnabled(CS_Sink sink, bool enabled, CS_Status* status) {
 
 extern "C" {
 
-CS_Sink CS_CreateCvSink(const char* name, CS_PixelFormat pixelFormat,
+CS_Sink CS_CreateCvSink(const char* name, enum CS_PixelFormat pixelFormat,
                         CS_Status* status) {
   return cs::CreateCvSink(
       name, static_cast<VideoMode::PixelFormat>(pixelFormat), status);
 }
 
-CS_Sink CS_CreateCvSinkCallback(const char* name, CS_PixelFormat pixelFormat,
+CS_Sink CS_CreateCvSinkCallback(const char* name, enum CS_PixelFormat pixelFormat,
                                 void* data,
                                 void (*processFrame)(void* data, uint64_t time),
                                 CS_Status* status) {
