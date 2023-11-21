@@ -36,7 +36,7 @@ public class Mult<A extends Unit<A>, B extends Unit<B>> extends Unit<Mult<A, B>>
    * Creates a new Mult unit derived from two arbitrary units multiplied together.
    *
    * <pre>
-   *   Mult.combine(Volts, Meters) // => Volt-Meters
+   *   Mult.combine(Volts, Meters) // Volt-Meters
    * </pre>
    *
    * <p>It's recommended to use the convenience function {@link Unit#mult(Unit)} instead of calling

@@ -40,20 +40,14 @@ target_link_libraries(cscore PUBLIC wpinet wpiutil ${OpenCV_LIBS})
 
 set_property(TARGET cscore PROPERTY FOLDER "libraries")
 
-install(TARGETS cscore EXPORT cscore DESTINATION "${main_lib_dest}")
+install(TARGETS cscore EXPORT cscore)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/cscore")
 
-if (WITH_FLAT_INSTALL)
-    set (cscore_config_dir ${wpilib_dest})
-else()
-    set (cscore_config_dir share/cscore)
-endif()
-
 configure_file(cscore-config.cmake.in ${WPILIB_BINARY_DIR}/cscore-config.cmake )
-install(FILES ${WPILIB_BINARY_DIR}/cscore-config.cmake DESTINATION ${cscore_config_dir})
-install(EXPORT cscore DESTINATION ${cscore_config_dir})
+install(FILES ${WPILIB_BINARY_DIR}/cscore-config.cmake DESTINATION share/cscore)
+install(EXPORT cscore DESTINATION share/cscore)
 
-SUBDIR_LIST(cscore_examples "${CMAKE_CURRENT_SOURCE_DIR}/examples")
+subdir_list(cscore_examples "${CMAKE_CURRENT_SOURCE_DIR}/examples")
 foreach(example ${cscore_examples})
     file(GLOB cscore_example_src examples/${example}/*.cpp)
     unset(add_libs)
@@ -102,12 +96,7 @@ if (WITH_JAVA)
     file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
     set(CMAKE_JNI_TARGET true)
 
-    if(${CMAKE_VERSION} VERSION_LESS "3.11.0")
-        set(CMAKE_JAVA_COMPILE_FLAGS "-h" "${CMAKE_CURRENT_BINARY_DIR}/jniheaders")
-        add_jar(cscore_jar ${JAVA_SOURCES} INCLUDE_JARS wpiutil_jar ${OPENCV_JAR_FILE} OUTPUT_NAME cscore)
-    else()
-        add_jar(cscore_jar ${JAVA_SOURCES} INCLUDE_JARS wpiutil_jar ${OPENCV_JAR_FILE} OUTPUT_NAME cscore GENERATE_NATIVE_HEADERS cscore_jni_headers)
-    endif()
+    add_jar(cscore_jar ${JAVA_SOURCES} INCLUDE_JARS wpiutil_jar ${OPENCV_JAR_FILE} OUTPUT_NAME cscore GENERATE_NATIVE_HEADERS cscore_jni_headers)
 
     get_property(CSCORE_JAR_FILE TARGET cscore_jar PROPERTY JAR_FILE)
     install(FILES ${CSCORE_JAR_FILE} DESTINATION "${java_lib_dest}")
@@ -131,20 +120,27 @@ if (WITH_JAVA)
 
     set_property(TARGET cscorejni PROPERTY FOLDER "libraries")
 
-    if(${CMAKE_VERSION} VERSION_LESS "3.11.0")
-        target_include_directories(cscorejni PRIVATE ${JNI_INCLUDE_DIRS})
-        target_include_directories(cscorejni PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/jniheaders")
-    else()
-        target_link_libraries(cscorejni PRIVATE cscore_jni_headers)
-    endif()
+    target_link_libraries(cscorejni PRIVATE cscore_jni_headers)
     add_dependencies(cscorejni cscore_jar)
 
-    if (MSVC)
-        install(TARGETS cscorejni RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)
-    endif()
+    install(TARGETS cscorejni EXPORT cscorejni)
 
-    install(TARGETS cscorejni EXPORT cscorejni DESTINATION "${main_lib_dest}")
+endif()
 
+if (WITH_JAVA_SOURCE)
+    find_package(Java REQUIRED)
+    include(UseJava)
+    file(GLOB CSCORE_SOURCES src/main/java/edu/wpi/first/cscore/*.java)
+    file(GLOB CSCORE_RAW_SOURCES src/main/java/edu/wpi/first/cscore/raw/*.java)
+    add_jar(cscore_src_jar
+    RESOURCES NAMESPACE "edu/wpi/first/cscore" ${CSCORE_SOURCES}
+    NAMESPACE "edu/wpi/first/cscore/raw" ${CSCORE_RAW_SOURCES}
+    OUTPUT_NAME cscore-sources)
+
+    get_property(CSCORE_SRC_JAR_FILE TARGET cscore_src_jar PROPERTY JAR_FILE)
+    install(FILES ${CSCORE_SRC_JAR_FILE} DESTINATION "${java_lib_dest}")
+
+    set_property(TARGET cscore_src_jar PROPERTY FOLDER "java")
 endif()
 
 if (WITH_TESTS)

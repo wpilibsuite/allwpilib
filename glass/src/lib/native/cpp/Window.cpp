@@ -56,9 +56,12 @@ void Window::Display() {
   }
 
   char label[128];
-  std::snprintf(label, sizeof(label), "%s###%s",
-                m_name.empty() ? m_defaultName.c_str() : m_name.c_str(),
-                m_id.c_str());
+  if (m_name.empty()) {
+    wpi::format_to_n_c_str(label, sizeof(label), "{}###{}", m_defaultName,
+                           m_id);
+  } else {
+    wpi::format_to_n_c_str(label, sizeof(label), "{}###{}", m_name, m_id);
+  }
 
   if (Begin(label, &m_visible, m_flags)) {
     if (m_renamePopupEnabled || m_view->HasSettings()) {

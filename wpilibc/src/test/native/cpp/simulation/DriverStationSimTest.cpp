@@ -5,13 +5,14 @@
 #include <string>
 #include <tuple>
 
+#include <gtest/gtest.h>
+
 #include "callback_helpers/TestCallbackHelpers.h"
 #include "frc/DriverStation.h"
 #include "frc/Joystick.h"
 #include "frc/RobotState.h"
 #include "frc/simulation/DriverStationSim.h"
 #include "frc/simulation/SimHooks.h"
-#include "gtest/gtest.h"
 
 using namespace frc;
 using namespace frc::sim;
@@ -230,7 +231,7 @@ TEST(DriverStationTest, MatchTime) {
   DriverStationSim::SetMatchTime(kTestTime);
   frc::sim::DriverStationSim::NotifyNewData();
   EXPECT_EQ(kTestTime, DriverStationSim::GetMatchTime());
-  EXPECT_EQ(kTestTime, DriverStation::GetMatchTime());
+  EXPECT_EQ(kTestTime, DriverStation::GetMatchTime().value());
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_EQ(kTestTime, callback.GetLastValue());
 }

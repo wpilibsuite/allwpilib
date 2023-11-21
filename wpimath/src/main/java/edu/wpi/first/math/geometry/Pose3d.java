@@ -9,6 +9,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.WPIMathJNI;
+import edu.wpi.first.math.geometry.proto.Pose3dProto;
+import edu.wpi.first.math.geometry.struct.Pose3dStruct;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import java.util.Objects;
 
@@ -63,7 +65,10 @@ public class Pose3d implements Interpolatable<Pose3d> {
   }
 
   /**
-   * Transforms the pose by the given transformation and returns the new transformed pose.
+   * Transforms the pose by the given transformation and returns the new transformed pose. The
+   * transform is applied relative to the pose's frame. Note that this differs from {@link
+   * Pose3d#rotateBy(Rotation3d)}, which is applied relative to the global frame and around the
+   * origin.
    *
    * @param other The transform to transform the pose by.
    * @return The transformed pose.
@@ -153,15 +158,19 @@ public class Pose3d implements Interpolatable<Pose3d> {
   /**
    * Rotates the pose around the origin and returns the new pose.
    *
-   * @param other The rotation to transform the pose by.
-   * @return The transformed pose.
+   * @param other The rotation to transform the pose by, which is applied extrinsically (from the
+   *     global frame).
+   * @return The rotated pose.
    */
   public Pose3d rotateBy(Rotation3d other) {
     return new Pose3d(m_translation.rotateBy(other), m_rotation.rotateBy(other));
   }
 
   /**
-   * Transforms the pose by the given transformation and returns the new pose.
+   * Transforms the pose by the given transformation and returns the new transformed pose. The
+   * transform is applied relative to the pose's frame. Note that this differs from {@link
+   * Pose3d#rotateBy(Rotation3d)}, which is applied relative to the global frame and around the
+   * origin.
    *
    * @param other The transform to transform the pose by.
    * @return The transformed pose.
@@ -311,4 +320,7 @@ public class Pose3d implements Interpolatable<Pose3d> {
       return this.exp(scaledTwist);
     }
   }
+
+  public static final Pose3dStruct struct = new Pose3dStruct();
+  public static final Pose3dProto proto = new Pose3dProto();
 }

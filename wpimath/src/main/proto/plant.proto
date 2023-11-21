@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package wpi.proto;
+
+option java_package = "edu.wpi.first.math.proto";
+
+message ProtobufDCMotor {
+  double nominal_voltage = 1;
+  double stall_torque = 2;
+  double stall_current = 3;
+  double free_current = 4;
+  double free_speed = 5;
+}

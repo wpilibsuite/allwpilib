@@ -7,7 +7,8 @@
 #include <array>
 #include <functional>
 
-#include "Eigen/QR"
+#include <Eigen/QR>
+
 #include "frc/EigenCore.h"
 #include "frc/system/Discretization.h"
 #include "frc/system/LinearSystem.h"
@@ -137,6 +138,9 @@ class LinearPlantInversionFeedforward {
    * @return The calculated feedforward.
    */
   InputVector Calculate(const StateVector& r, const StateVector& nextR) {
+    // rₖ₊₁ = Arₖ + Buₖ
+    // Buₖ = rₖ₊₁ − Arₖ
+    // uₖ = B⁺(rₖ₊₁ − Arₖ)
     m_uff = m_B.householderQr().solve(nextR - (m_A * r));
     m_r = nextR;
     return m_uff;

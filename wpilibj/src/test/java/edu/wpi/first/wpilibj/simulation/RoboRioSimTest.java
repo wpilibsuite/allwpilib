@@ -210,6 +210,40 @@ class RoboRioSimTest {
   }
 
   @Test
+  void testCPUTemp() {
+    RoboRioSim.resetData();
+
+    DoubleCallback callback = new DoubleCallback();
+
+    try (CallbackStore cb = RoboRioSim.registerCPUTempCallback(callback, false)) {
+      final double kCPUTemp = 100.0;
+
+      RoboRioSim.setCPUTemp(kCPUTemp);
+      assertTrue(callback.wasTriggered());
+      assertEquals(kCPUTemp, callback.getSetValue());
+      assertEquals(kCPUTemp, RoboRioSim.getCPUTemp());
+      assertEquals(kCPUTemp, RobotController.getCPUTemp());
+    }
+  }
+
+  @Test
+  void testTeamNumber() {
+    RoboRioSim.resetData();
+
+    IntCallback callback = new IntCallback();
+
+    try (CallbackStore cb = RoboRioSim.registerTeamNumberCallback(callback, false)) {
+      final int kTeamNumber = 9999;
+
+      RoboRioSim.setTeamNumber(kTeamNumber);
+      assertTrue(callback.wasTriggered());
+      assertEquals(kTeamNumber, callback.getSetValue());
+      assertEquals(kTeamNumber, RoboRioSim.getTeamNumber());
+      assertEquals(kTeamNumber, RobotController.getTeamNumber());
+    }
+  }
+
+  @Test
   void testSerialNumber() {
     RoboRioSim.resetData();
 

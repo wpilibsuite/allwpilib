@@ -8,6 +8,8 @@ import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
+import edu.wpi.first.math.kinematics.proto.MecanumDriveKinematicsProto;
+import edu.wpi.first.math.kinematics.struct.MecanumDriveKinematicsStruct;
 import org.ejml.simple.SimpleMatrix;
 
 /**
@@ -41,6 +43,9 @@ public class MecanumDriveKinematics
   private final Translation2d m_rearRightWheelMeters;
 
   private Translation2d m_prevCoR = new Translation2d();
+
+  public static final MecanumDriveKinematicsProto proto = new MecanumDriveKinematicsProto();
+  public static final MecanumDriveKinematicsStruct struct = new MecanumDriveKinematicsStruct();
 
   /**
    * Constructs a mecanum drive kinematics object.
@@ -206,5 +211,21 @@ public class MecanumDriveKinematics
     m_inverseKinematics.setRow(1, 0, 1, 1, fr.getX() - fr.getY());
     m_inverseKinematics.setRow(2, 0, 1, 1, rl.getX() - rl.getY());
     m_inverseKinematics.setRow(3, 0, 1, -1, -(rr.getX() + rr.getY()));
+  }
+
+  public Translation2d getFrontLeft() {
+    return m_frontLeftWheelMeters;
+  }
+
+  public Translation2d getFrontRight() {
+    return m_frontRightWheelMeters;
+  }
+
+  public Translation2d getRearLeft() {
+    return m_rearLeftWheelMeters;
+  }
+
+  public Translation2d getRearRight() {
+    return m_rearRightWheelMeters;
   }
 }

@@ -26,19 +26,19 @@ Value nt::ConvertNumericValue(const Value& value, NT_Type type) {
       return newval;
     }
     case NT_INTEGER_ARRAY: {
-      Value newval = Value::MakeIntegerArray(GetNumericArrayAs<int64_t>(value),
-                                             value.time());
+      Value newval = Value::MakeIntegerArray(
+          GetNumericArrayAs<int64_t[]>(value), value.time());
       newval.SetServerTime(value.server_time());
       return newval;
     }
     case NT_FLOAT_ARRAY: {
-      Value newval =
-          Value::MakeFloatArray(GetNumericArrayAs<float>(value), value.time());
+      Value newval = Value::MakeFloatArray(GetNumericArrayAs<float[]>(value),
+                                           value.time());
       newval.SetServerTime(value.server_time());
       return newval;
     }
     case NT_DOUBLE_ARRAY: {
-      Value newval = Value::MakeDoubleArray(GetNumericArrayAs<double>(value),
+      Value newval = Value::MakeDoubleArray(GetNumericArrayAs<double[]>(value),
                                             value.time());
       newval.SetServerTime(value.server_time());
       return newval;

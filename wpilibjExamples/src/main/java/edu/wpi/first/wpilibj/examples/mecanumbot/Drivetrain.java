@@ -132,7 +132,7 @@ public class Drivetrain {
       double xSpeed, double ySpeed, double rot, boolean fieldRelative, double periodSeconds) {
     var mecanumDriveWheelSpeeds =
         m_kinematics.toWheelSpeeds(
-            ChassisSpeeds.fromDiscreteSpeeds(
+            ChassisSpeeds.discretize(
                 fieldRelative
                     ? ChassisSpeeds.fromFieldRelativeSpeeds(
                         xSpeed, ySpeed, rot, m_gyro.getRotation2d())

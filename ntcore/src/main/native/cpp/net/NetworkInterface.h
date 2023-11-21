@@ -8,11 +8,9 @@
 #include <string>
 #include <string_view>
 
-#include "ntcore_cpp.h"
+#include <wpi/json_fwd.h>
 
-namespace wpi {
-class json;
-}  // namespace wpi
+#include "ntcore_cpp.h"
 
 namespace nt {
 class PubSubOptionsImpl;

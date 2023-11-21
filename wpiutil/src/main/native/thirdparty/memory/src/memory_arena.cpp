@@ -1,6 +1,5 @@
-// Copyright (C) 2015-2021 Müller <jonathanmueller.dev@gmail.com>
-// This file is subject to the license terms in the LICENSE file
-// found in the top-level directory of this distribution.
+// Copyright (C) 2015-2023 Jonathan Müller and foonathan/memory contributors
+// SPDX-License-Identifier: Zlib
 
 #include "wpi/memory/memory_arena.hpp"
 
@@ -42,7 +41,7 @@ bool memory_block_stack::owns(const void* ptr) const noexcept
     auto address = static_cast<const char*>(ptr);
     for (auto cur = head_; cur; cur = cur->prev)
     {
-        auto mem = static_cast<char*>(static_cast<void*>(cur));
+        auto mem = static_cast<char*>(static_cast<void*>(cur)) + implementation_offset();
         if (address >= mem && address < mem + cur->usable_size)
             return true;
     }

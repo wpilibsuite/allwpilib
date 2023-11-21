@@ -34,7 +34,7 @@ class Robot : public frc::TimedRobot {
 
     // Retrieve the profiled setpoint for the next timestep. This setpoint moves
     // toward the goal while obeying the constraints.
-    m_setpoint = m_profile.Calculate(kDt, m_goal, m_setpoint);
+    m_setpoint = m_profile.Calculate(kDt, m_setpoint, m_goal);
 
     // Send setpoint to offboard controller PID
     m_motor.SetSetpoint(ExampleSmartMotorController::PIDMode::kPosition,

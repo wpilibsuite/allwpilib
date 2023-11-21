@@ -4,11 +4,11 @@
 
 #include "frc/simulation/ADXL345Sim.h"  // NOLINT(build/include_order)
 
+#include <gtest/gtest.h>
 #include <hal/HAL.h>
 
 #include "frc/ADXL345_I2C.h"
 #include "frc/ADXL345_SPI.h"
-#include "gtest/gtest.h"
 
 namespace frc::sim {
 

@@ -43,6 +43,13 @@ public class PowerJNI extends JNIWrapper {
   public static native double getUserCurrent6V();
 
   /**
+   * Enables or disables the 6V rail.
+   *
+   * @param enabled whether the rail should be enabled
+   */
+  public static native void setUserEnabled6V(boolean enabled);
+
+  /**
    * Gets the active state of the 6V rail.
    *
    * @return true if the rail is active, otherwise false
@@ -73,6 +80,13 @@ public class PowerJNI extends JNIWrapper {
    * @see "HAL_GetUserCurrent5V"
    */
   public static native double getUserCurrent5V();
+
+  /**
+   * Enables or disables the 5V rail.
+   *
+   * @param enabled whether the rail should be enabled
+   */
+  public static native void setUserEnabled5V(boolean enabled);
 
   /**
    * Gets the active state of the 5V rail.
@@ -107,6 +121,13 @@ public class PowerJNI extends JNIWrapper {
   public static native double getUserCurrent3V3();
 
   /**
+   * Enables or disables the 3V3 rail.
+   *
+   * @param enabled whether the rail should be enabled
+   */
+  public static native void setUserEnabled3V3(boolean enabled);
+
+  /**
    * Gets the active state of the 3V3 rail.
    *
    * @return true if the rail is active, otherwise false
@@ -139,4 +160,11 @@ public class PowerJNI extends JNIWrapper {
    * @see "HAL_GetBrownoutVoltage"
    */
   public static native double getBrownoutVoltage();
+
+  /**
+   * Get the current CPU temperature in degrees Celsius.
+   *
+   * @return current CPU temperature in degrees Celsius
+   */
+  public static native double getCPUTemp();
 }
