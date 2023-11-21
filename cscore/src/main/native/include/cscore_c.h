@@ -384,8 +384,8 @@ CS_Sink CS_CreateMjpegServer(const char* name, const char* listenAddress,
                              int port, CS_Status* status);
 CS_Sink CS_CreateCvSink(const char* name, enum CS_PixelFormat pixelFormat,
                         CS_Status* status);
-CS_Sink CS_CreateCvSinkCallback(const char* name, enum CS_PixelFormat pixelFormat,
-                                void* data,
+CS_Sink CS_CreateCvSinkCallback(const char* name,
+                                enum CS_PixelFormat pixelFormat, void* data,
                                 void (*processFrame)(void* data, uint64_t time),
                                 CS_Status* status);
 /** @} */

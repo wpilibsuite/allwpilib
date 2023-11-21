@@ -44,8 +44,7 @@ CvSinkImpl::CvSinkImpl(std::string_view name, wpi::Logger& logger,
                        Notifier& notifier, Telemetry& telemetry,
                        VideoMode::PixelFormat pixelFormat,
                        std::function<void(uint64_t time)> processFrame)
-    : SinkImpl{name, logger, notifier, telemetry},
-      m_pixelFormat{pixelFormat} {}
+    : SinkImpl{name, logger, notifier, telemetry}, m_pixelFormat{pixelFormat} {}
 
 CvSinkImpl::~CvSinkImpl() {
   Stop();
@@ -248,8 +247,8 @@ CS_Sink CS_CreateCvSink(const char* name, enum CS_PixelFormat pixelFormat,
       name, static_cast<VideoMode::PixelFormat>(pixelFormat), status);
 }
 
-CS_Sink CS_CreateCvSinkCallback(const char* name, enum CS_PixelFormat pixelFormat,
-                                void* data,
+CS_Sink CS_CreateCvSinkCallback(const char* name,
+                                enum CS_PixelFormat pixelFormat, void* data,
                                 void (*processFrame)(void* data, uint64_t time),
                                 CS_Status* status) {
   return cs::CreateCvSinkCallback(
