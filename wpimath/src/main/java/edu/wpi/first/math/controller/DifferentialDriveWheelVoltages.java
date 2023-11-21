@@ -4,10 +4,18 @@
 
 package edu.wpi.first.math.controller;
 
+import edu.wpi.first.math.controller.proto.DifferentialDriveWheelVoltagesProto;
+import edu.wpi.first.math.controller.struct.DifferentialDriveWheelVoltagesStruct;
+
 /** Motor voltages for a differential drive. */
 public class DifferentialDriveWheelVoltages {
   public double left;
   public double right;
+
+  public static final DifferentialDriveWheelVoltagesProto proto =
+      new DifferentialDriveWheelVoltagesProto();
+  public static final DifferentialDriveWheelVoltagesStruct struct =
+      new DifferentialDriveWheelVoltagesStruct();
 
   public DifferentialDriveWheelVoltages() {}
 

@@ -9,6 +9,8 @@ import static edu.wpi.first.units.Units.Meters;
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.geometry.Twist2d;
+import edu.wpi.first.math.kinematics.proto.DifferentialDriveKinematicsProto;
+import edu.wpi.first.math.kinematics.struct.DifferentialDriveKinematicsStruct;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 
@@ -23,6 +25,11 @@ import edu.wpi.first.units.Measure;
 public class DifferentialDriveKinematics
     implements Kinematics<DifferentialDriveWheelSpeeds, DifferentialDriveWheelPositions> {
   public final double trackWidthMeters;
+
+  public static final DifferentialDriveKinematicsProto proto =
+      new DifferentialDriveKinematicsProto();
+  public static final DifferentialDriveKinematicsStruct struct =
+      new DifferentialDriveKinematicsStruct();
 
   /**
    * Constructs a differential drive kinematics object.
