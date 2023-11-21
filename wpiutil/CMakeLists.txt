@@ -205,11 +205,9 @@ target_include_directories(wpiutil PUBLIC
 
 install(TARGETS wpiutil EXPORT wpiutil)
 
-set(wpiutil_config_dir share/wpiutil)
-
 configure_file(wpiutil-config.cmake.in ${WPILIB_BINARY_DIR}/wpiutil-config.cmake )
-install(FILES ${WPILIB_BINARY_DIR}/wpiutil-config.cmake DESTINATION ${wpiutil_config_dir})
-install(EXPORT wpiutil DESTINATION ${wpiutil_config_dir})
+install(FILES ${WPILIB_BINARY_DIR}/wpiutil-config.cmake DESTINATION share/wpiutil)
+install(EXPORT wpiutil DESTINATION share/wpiutil)
 
 subdir_list(wpiutil_examples "${CMAKE_CURRENT_SOURCE_DIR}/examples")
 foreach(example ${wpiutil_examples})

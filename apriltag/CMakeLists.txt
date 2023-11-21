@@ -108,11 +108,10 @@ target_include_directories(apriltag PUBLIC
 install(TARGETS apriltag EXPORT apriltag)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/apriltag")
 
-set(apriltag_config_dir share/apriltag)
 
 configure_file(apriltag-config.cmake.in ${WPILIB_BINARY_DIR}/apriltag-config.cmake )
-install(FILES ${WPILIB_BINARY_DIR}/apriltag-config.cmake DESTINATION ${apriltag_config_dir})
-install(EXPORT apriltag DESTINATION ${apriltag_config_dir})
+install(FILES ${WPILIB_BINARY_DIR}/apriltag-config.cmake DESTINATION share/apriltag)
+install(EXPORT apriltag DESTINATION share/apriltag)
 
 if (WITH_TESTS)
     wpilib_add_test(apriltag src/test/native/cpp)
