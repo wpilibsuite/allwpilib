@@ -64,13 +64,12 @@ public class CameraServerCvJNI {
 
   public static native void putSourceFrame(int source, long imageNativeObj);
 
-  public static native int createCvSink(String name);
+  public static native int createCvSinkWPixelFormat(String name, int pixelFormat);
 
   // public static native int createCvSinkCallback(String name,
   //                            void (*processFrame)(long time));
 
-  public static native long grabSinkFrame(int sink, long imageNativeObj, int pixelFormat);
+  public static native long grabSinkFrame(int sink, long imageNativeObj);
 
-  public static native long grabSinkFrameTimeout(
-      int sink, long imageNativeObj, int pixelFormat, double timeout);
+  public static native long grabSinkFrameTimeout(int sink, long imageNativeObj, double timeout);
 }

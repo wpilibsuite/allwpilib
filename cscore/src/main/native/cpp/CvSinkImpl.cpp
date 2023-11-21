@@ -20,7 +20,15 @@ using namespace cs;
 
 CvSinkImpl::CvSinkImpl(std::string_view name, wpi::Logger& logger,
                        Notifier& notifier, Telemetry& telemetry)
-    : SinkImpl{name, logger, notifier, telemetry} {
+    : SinkImpl{name, logger, notifier, telemetry}, m_pixel_format{VideoMode::PixelFormat::kBGR} {
+  m_active = true;
+  // m_thread = std::thread(&CvSinkImpl::ThreadMain, this);
+}
+
+CvSinkImpl::CvSinkImpl(std::string_view name, wpi::Logger& logger,
+                       Notifier& notifier, Telemetry& telemetry,
+                       VideoMode::PixelFormat pixelFormat)
+    : SinkImpl{name, logger, notifier, telemetry}, m_pixel_format{pixelFormat} {
   m_active = true;
   // m_thread = std::thread(&CvSinkImpl::ThreadMain, this);
 }
@@ -28,7 +36,13 @@ CvSinkImpl::CvSinkImpl(std::string_view name, wpi::Logger& logger,
 CvSinkImpl::CvSinkImpl(std::string_view name, wpi::Logger& logger,
                        Notifier& notifier, Telemetry& telemetry,
                        std::function<void(uint64_t time)> processFrame)
-    : SinkImpl{name, logger, notifier, telemetry} {}
+    : SinkImpl{name, logger, notifier, telemetry}, m_pixel_format{VideoMode::PixelFormat::kBGR} {}
+
+CvSinkImpl::CvSinkImpl(std::string_view name, wpi::Logger& logger,
+                       Notifier& notifier, Telemetry& telemetry,
+                       VideoMode::PixelFormat pixelFormat,
+                       std::function<void(uint64_t time)> processFrame)
+    : SinkImpl{name, logger, notifier, telemetry}, m_pixel_format{pixelFormat} {}
 
 CvSinkImpl::~CvSinkImpl() {
   Stop();
@@ -48,7 +62,7 @@ void CvSinkImpl::Stop() {
   }
 }
 
-uint64_t CvSinkImpl::GrabFrame(cv::Mat& image, VideoMode::PixelFormat pixelFormat) {
+uint64_t CvSinkImpl::GrabFrame(cv::Mat& image) {
   SetEnabled(true);
 
   auto source = GetSource();
@@ -65,7 +79,7 @@ uint64_t CvSinkImpl::GrabFrame(cv::Mat& image, VideoMode::PixelFormat pixelForma
     return 0;  // signal error
   }
 
-  if (!frame.GetCv(image, pixelFormat)) {
+  if (!frame.GetCv(image, m_pixel_format)) {
     // Shouldn't happen, but just in case...
     std::this_thread::sleep_for(std::chrono::milliseconds(20));
     return 0;
@@ -74,7 +88,7 @@ uint64_t CvSinkImpl::GrabFrame(cv::Mat& image, VideoMode::PixelFormat pixelForma
   return frame.GetTime();
 }
 
-uint64_t CvSinkImpl::GrabFrame(cv::Mat& image, VideoMode::PixelFormat pixelFormat, double timeout) {
+uint64_t CvSinkImpl::GrabFrame(cv::Mat& image, double timeout) {
   SetEnabled(true);
 
   auto source = GetSource();
@@ -91,7 +105,7 @@ uint64_t CvSinkImpl::GrabFrame(cv::Mat& image, VideoMode::PixelFormat pixelForma
     return 0;  // signal error
   }
 
-  if (!frame.GetCv(image, pixelFormat)) {
+  if (!frame.GetCv(image, m_pixel_format)) {
     // Shouldn't happen, but just in case...
     std::this_thread::sleep_for(std::chrono::milliseconds(20));
     return 0;
@@ -134,6 +148,13 @@ CS_Sink CreateCvSink(std::string_view name, CS_Status* status) {
                                                inst.telemetry));
 }
 
+CS_Sink CreateCvSink(std::string_view name, VideoMode::PixelFormat pixelFormat, CS_Status* status) {
+  auto& inst = Instance::GetInstance();
+  return inst.CreateSink(
+      CS_SINK_CV, std::make_shared<CvSinkImpl>(name, inst.logger, inst.notifier,
+                                               inst.telemetry, pixelFormat));
+}
+
 CS_Sink CreateCvSinkCallback(std::string_view name,
                              std::function<void(uint64_t time)> processFrame,
                              CS_Status* status) {
@@ -141,6 +162,15 @@ CS_Sink CreateCvSinkCallback(std::string_view name,
   return inst.CreateSink(
       CS_SINK_CV, std::make_shared<CvSinkImpl>(name, inst.logger, inst.notifier,
                                                inst.telemetry, processFrame));
+}
+
+CS_Sink CreateCvSinkCallback(std::string_view name, VideoMode::PixelFormat pixelFormat,
+                             std::function<void(uint64_t time)> processFrame,
+                             CS_Status* status) {
+  auto& inst = Instance::GetInstance();
+  return inst.CreateSink(
+      CS_SINK_CV, std::make_shared<CvSinkImpl>(name, inst.logger, inst.notifier,
+                                               inst.telemetry, pixelFormat, processFrame));
 }
 
 static constexpr unsigned SinkMask = CS_SINK_CV | CS_SINK_RAW;
@@ -155,24 +185,23 @@ void SetSinkDescription(CS_Sink sink, std::string_view description,
   static_cast<CvSinkImpl&>(*data->sink).SetDescription(description);
 }
 
-uint64_t GrabSinkFrame(CS_Sink sink, cv::Mat& image, CS_PixelFormat pixelFormat, CS_Status* status) {
+uint64_t GrabSinkFrame(CS_Sink sink, cv::Mat& image, CS_Status* status) {
   auto data = Instance::GetInstance().GetSink(sink);
   if (!data || data->kind != CS_SINK_CV) {
     *status = CS_INVALID_HANDLE;
     return 0;
   }
-  return static_cast<CvSinkImpl&>(*data->sink).GrabFrame(image, static_cast<VideoMode::PixelFormat>(pixelFormat));
+  return static_cast<CvSinkImpl&>(*data->sink).GrabFrame(image);
 }
 
-uint64_t GrabSinkFrameTimeout(CS_Sink sink, cv::Mat& image, CS_PixelFormat pixelFormat, double timeout,
+uint64_t GrabSinkFrameTimeout(CS_Sink sink, cv::Mat& image, double timeout,
                               CS_Status* status) {
   auto data = Instance::GetInstance().GetSink(sink);
   if (!data || data->kind != CS_SINK_CV) {
     *status = CS_INVALID_HANDLE;
     return 0;
   }
-  return static_cast<CvSinkImpl&>(*data->sink).GrabFrame(image, 
-              static_cast<VideoMode::PixelFormat>(pixelFormat), timeout);
+  return static_cast<CvSinkImpl&>(*data->sink).GrabFrame(image, timeout);
 }
 
 std::string GetSinkError(CS_Sink sink, CS_Status* status) {
@@ -207,15 +236,15 @@ void SetSinkEnabled(CS_Sink sink, bool enabled, CS_Status* status) {
 
 extern "C" {
 
-CS_Sink CS_CreateCvSink(const char* name, CS_Status* status) {
-  return cs::CreateCvSink(name, status);
+CS_Sink CS_CreateCvSink(const char* name, CS_PixelFormat pixelFormat, CS_Status* status) {
+  return cs::CreateCvSink(name, static_cast<VideoMode::PixelFormat>(pixelFormat), status);
 }
 
-CS_Sink CS_CreateCvSinkCallback(const char* name, void* data,
+CS_Sink CS_CreateCvSinkCallback(const char* name, CS_PixelFormat pixelFormat, void* data,
                                 void (*processFrame)(void* data, uint64_t time),
                                 CS_Status* status) {
   return cs::CreateCvSinkCallback(
-      name, [=](uint64_t time) { processFrame(data, time); }, status);
+      name, static_cast<VideoMode::PixelFormat>(pixelFormat), [=](uint64_t time) { processFrame(data, time); }, status);
 }
 
 void CS_SetSinkDescription(CS_Sink sink, const char* description,
@@ -224,26 +253,26 @@ void CS_SetSinkDescription(CS_Sink sink, const char* description,
 }
 
 #if CV_VERSION_MAJOR < 4
-uint64_t CS_GrabSinkFrame(CS_Sink sink, struct CvMat* image, CS_PixelFormat pixelFormat,
+uint64_t CS_GrabSinkFrame(CS_Sink sink, struct CvMat* image,
                           CS_Status* status) {
   auto mat = cv::cvarrToMat(image);
-  return cs::GrabSinkFrame(sink, mat, pixelFormat, status);
+  return cs::GrabSinkFrame(sink, mat, status);
 }
 
 uint64_t CS_GrabSinkFrameTimeout(CS_Sink sink, struct CvMat* image,
                                  double timeout, CS_Status* status) {
   auto mat = cv::cvarrToMat(image);
-  return cs::GrabSinkFrameTimeout(sink, mat, pixelFormat, timeout, status);
+  return cs::GrabSinkFrameTimeout(sink, mat, timeout, status);
 }
 #endif  // CV_VERSION_MAJOR < 4
 
-uint64_t CS_GrabSinkFrameCpp(CS_Sink sink, cv::Mat* image, CS_PixelFormat pixelFormat, CS_Status* status) {
-  return cs::GrabSinkFrame(sink, *image, pixelFormat, status);
+uint64_t CS_GrabSinkFrameCpp(CS_Sink sink, cv::Mat* image, CS_Status* status) {
+  return cs::GrabSinkFrame(sink, *image, status);
 }
 
-uint64_t CS_GrabSinkFrameTimeoutCpp(CS_Sink sink, cv::Mat* image, CS_PixelFormat pixelFormat,
+uint64_t CS_GrabSinkFrameTimeoutCpp(CS_Sink sink, cv::Mat* image,
                                     double timeout, CS_Status* status) {
-  return cs::GrabSinkFrameTimeout(sink, *image, pixelFormat, timeout, status);
+  return cs::GrabSinkFrameTimeout(sink, *image, timeout, status);
 }
 
 char* CS_GetSinkError(CS_Sink sink, CS_Status* status) {

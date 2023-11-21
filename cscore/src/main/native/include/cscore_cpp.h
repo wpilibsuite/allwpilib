@@ -317,7 +317,11 @@ void SetSourceEnumPropertyChoices(CS_Source source, CS_Property property,
 CS_Sink CreateMjpegServer(std::string_view name, std::string_view listenAddress,
                           int port, CS_Status* status);
 CS_Sink CreateCvSink(std::string_view name, CS_Status* status);
+CS_Sink CreateCvSink(std::string_view name, VideoMode::PixelFormat pixelFormat, CS_Status* status);
 CS_Sink CreateCvSinkCallback(std::string_view name,
+                             std::function<void(uint64_t time)> processFrame,
+                             CS_Status* status);
+CS_Sink CreateCvSinkCallback(std::string_view name, VideoMode::PixelFormat pixelFormat,
                              std::function<void(uint64_t time)> processFrame,
                              CS_Status* status);
 

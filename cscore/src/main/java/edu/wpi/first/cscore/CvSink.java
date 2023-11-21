@@ -17,9 +17,10 @@ public class CvSink extends ImageSink {
    * get each new image.
    *
    * @param name Source name (arbitrary unique identifier)
+   * @param pixelFormat Source pixel format
    */
-  public CvSink(String name) {
-    super(CameraServerCvJNI.createCvSink(name));
+  public CvSink(String name, PixelFormat pixelFormat) {
+    super(CameraServerCvJNI.createCvSinkWPixelFormat(name, pixelFormat.getValue()));
   }
 
   /// Create a sink for accepting OpenCV images in a separate thread.
@@ -42,8 +43,8 @@ public class CvSink extends ImageSink {
    * @param image Where to store the image.
    * @return Frame time, or 0 on error (call GetError() to obtain the error message)
    */
-  public long grabFrame(Mat image, PixelFormat pixelFormat) {
-    return grabFrame(image, pixelFormat, 0.225);
+  public long grabFrame(Mat image) {
+    return grabFrame(image, 0.225);
   }
 
   /**
@@ -55,9 +56,8 @@ public class CvSink extends ImageSink {
    * @return Frame time, or 0 on error (call GetError() to obtain the error message); the frame time
    *     is in 1 us increments.
    */
-  public long grabFrame(Mat image, PixelFormat pixelFormat, double timeout) {
-    return CameraServerCvJNI.grabSinkFrameTimeout(
-        m_handle, image.nativeObj, pixelFormat.getValue(), timeout);
+  public long grabFrame(Mat image, double timeout) {
+    return CameraServerCvJNI.grabSinkFrameTimeout(m_handle, image.nativeObj, timeout);
   }
 
   /**
@@ -68,7 +68,7 @@ public class CvSink extends ImageSink {
    * @return Frame time, or 0 on error (call GetError() to obtain the error message); the frame time
    *     is in 1 us increments.
    */
-  public long grabFrameNoTimeout(Mat image, PixelFormat pixelFormat) {
-    return CameraServerCvJNI.grabSinkFrame(m_handle, image.nativeObj, pixelFormat.getValue());
+  public long grabFrameNoTimeout(Mat image) {
+    return CameraServerCvJNI.grabSinkFrame(m_handle, image.nativeObj);
   }
 }

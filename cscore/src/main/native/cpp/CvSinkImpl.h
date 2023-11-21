@@ -27,14 +27,18 @@ class CvSinkImpl : public SinkImpl {
   CvSinkImpl(std::string_view name, wpi::Logger& logger, Notifier& notifier,
              Telemetry& telemetry);
   CvSinkImpl(std::string_view name, wpi::Logger& logger, Notifier& notifier,
-             Telemetry& telemetry,
+             Telemetry& telemetry, VideoMode::PixelFormat pixelFormat);
+  CvSinkImpl(std::string_view name, wpi::Logger& logger, Notifier& notifier,
+             Telemetry& telemetry, std::function<void(uint64_t time)> processFrame);
+  CvSinkImpl(std::string_view name, wpi::Logger& logger, Notifier& notifier,
+             Telemetry& telemetry, VideoMode::PixelFormat pixelFormat,
              std::function<void(uint64_t time)> processFrame);
   ~CvSinkImpl() override;
 
   void Stop();
 
-  uint64_t GrabFrame(cv::Mat& image, VideoMode::PixelFormat pixelFormat);
-  uint64_t GrabFrame(cv::Mat& image, VideoMode::PixelFormat pixelFormat, double timeout);
+  uint64_t GrabFrame(cv::Mat& image);
+  uint64_t GrabFrame(cv::Mat& image, double timeout);
 
  private:
   void ThreadMain();
@@ -42,6 +46,7 @@ class CvSinkImpl : public SinkImpl {
   std::atomic_bool m_active;  // set to false to terminate threads
   std::thread m_thread;
   std::function<void(uint64_t time)> m_processFrame;
+  VideoMode::PixelFormat m_pixel_format;
 };
 
 }  // namespace cs

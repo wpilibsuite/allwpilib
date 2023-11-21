@@ -1409,6 +1409,25 @@ Java_edu_wpi_first_cscore_CameraServerCvJNI_createCvSink
 }
 
 /*
+ * Class:     edu_wpi_first_cscore_CameraServerCvJNI
+ * Method:    createCvSink
+ * Signature: (Ljava/lang/String;)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_cscore_CameraServerCvJNI_createCvSinkWPixelFormat
+  (JNIEnv* env, jclass, jstring name, jint pixelFormat)
+{
+  if (!name) {
+    nullPointerEx.Throw(env, "name cannot be null");
+    return 0;
+  }
+  CS_Status status = 0;
+  auto val = cs::CreateCvSink(JStringRef{env, name}.str(), static_cast<cs::VideoMode::PixelFormat>(pixelFormat), &status);
+  CheckStatus(env, status);
+  return val;
+}
+
+/*
  * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    createRawSink
  * Signature: (Ljava/lang/String;)I
@@ -1680,12 +1699,12 @@ Java_edu_wpi_first_cscore_CameraServerJNI_setSinkDescription
  */
 JNIEXPORT jlong JNICALL
 Java_edu_wpi_first_cscore_CameraServerCvJNI_grabSinkFrame
-  (JNIEnv* env, jclass, jint sink, jlong imageNativeObj, jint pixelFormat)
+  (JNIEnv* env, jclass, jint sink, jlong imageNativeObj)
 {
   try {
     cv::Mat& image = *((cv::Mat*)imageNativeObj);
     CS_Status status = 0;
-    auto rv = cs::GrabSinkFrame(sink, image, static_cast<cs::VideoMode::PixelFormat>(pixelFormat), &status);
+    auto rv = cs::GrabSinkFrame(sink, image, &status);
     CheckStatus(env, status);
     return rv;
   } catch (const std::exception& e) {
@@ -1704,12 +1723,12 @@ Java_edu_wpi_first_cscore_CameraServerCvJNI_grabSinkFrame
  */
 JNIEXPORT jlong JNICALL
 Java_edu_wpi_first_cscore_CameraServerCvJNI_grabSinkFrameTimeout
-  (JNIEnv* env, jclass, jint sink, jlong imageNativeObj, jint pixelFormat, jdouble timeout)
+  (JNIEnv* env, jclass, jint sink, jlong imageNativeObj, jdouble timeout)
 {
   try {
     cv::Mat& image = *((cv::Mat*)imageNativeObj);
     CS_Status status = 0;
-    auto rv = cs::GrabSinkFrameTimeout(sink, image, static_cast<cs::VideoMode::PixelFormat>(pixelFormat), timeout, &status);
+    auto rv = cs::GrabSinkFrameTimeout(sink, image, timeout, &status);
     CheckStatus(env, status);
     return rv;
   } catch (const std::exception& e) {
