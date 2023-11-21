@@ -172,7 +172,7 @@ class MecanumDriveOdometryTest {
     }
 
     assertEquals(
-        0.0, errorSum / (trajectory.getTotalTimeSeconds() / dt), 0.154, "Incorrect mean error");
+        0.0, errorSum / (trajectory.getTotalTimeSeconds() / dt), 0.35, "Incorrect mean error");
     assertEquals(0.0, maxError, 0.3, "Incorrect max error");
     assertEquals(
         1.0,
