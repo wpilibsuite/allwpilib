@@ -4,12 +4,9 @@
 
 package edu.wpi.first.math.geometry;
 
-import edu.wpi.first.math.proto.Geometry3D.ProtobufTwist3d;
-import edu.wpi.first.util.protobuf.Protobuf;
-import edu.wpi.first.util.struct.Struct;
-import java.nio.ByteBuffer;
+import edu.wpi.first.math.geometry.proto.Twist3dProto;
+import edu.wpi.first.math.geometry.struct.Twist3dStruct;
 import java.util.Objects;
-import us.hebi.quickbuf.Descriptors.Descriptor;
 
 /**
  * A change in distance along a 3D arc since the last pose update. We can use ideas from
@@ -88,83 +85,6 @@ public class Twist3d {
     return Objects.hash(dx, dy, dz, rx, ry, rz);
   }
 
-  public static final class AStruct implements Struct<Twist3d> {
-    @Override
-    public Class<Twist3d> getTypeClass() {
-      return Twist3d.class;
-    }
-
-    @Override
-    public String getTypeString() {
-      return "struct:Twist3d";
-    }
-
-    @Override
-    public int getSize() {
-      return kSizeDouble * 6;
-    }
-
-    @Override
-    public String getSchema() {
-      return "double dx;double dy;double dz;double rx;double ry;double rz";
-    }
-
-    @Override
-    public Twist3d unpack(ByteBuffer bb) {
-      double dx = bb.getDouble();
-      double dy = bb.getDouble();
-      double dz = bb.getDouble();
-      double rx = bb.getDouble();
-      double ry = bb.getDouble();
-      double rz = bb.getDouble();
-      return new Twist3d(dx, dy, dz, rx, ry, rz);
-    }
-
-    @Override
-    public void pack(ByteBuffer bb, Twist3d value) {
-      bb.putDouble(value.dx);
-      bb.putDouble(value.dy);
-      bb.putDouble(value.dz);
-      bb.putDouble(value.rx);
-      bb.putDouble(value.ry);
-      bb.putDouble(value.rz);
-    }
-  }
-
-  public static final AStruct struct = new AStruct();
-
-  public static final class AProto implements Protobuf<Twist3d, ProtobufTwist3d> {
-    @Override
-    public Class<Twist3d> getTypeClass() {
-      return Twist3d.class;
-    }
-
-    @Override
-    public Descriptor getDescriptor() {
-      return ProtobufTwist3d.getDescriptor();
-    }
-
-    @Override
-    public ProtobufTwist3d createMessage() {
-      return ProtobufTwist3d.newInstance();
-    }
-
-    @Override
-    public Twist3d unpack(ProtobufTwist3d msg) {
-      return new Twist3d(
-          msg.getDx(), msg.getDy(), msg.getDz(), msg.getRx(), msg.getRy(), msg.getRz());
-    }
-
-    @Override
-    public void pack(ProtobufTwist3d msg, Twist3d value) {
-      msg.setDx(value.dx)
-          .setDy(value.dy)
-          .setDz(value.dz)
-          .setRx(value.rx)
-          .setRy(value.ry)
-          .setRz(value.rz);
-    }
-  }
-
-  public static final AProto proto = new AProto();
+  public static final Twist3dStruct struct = new Twist3dStruct();
+  public static final Twist3dProto proto = new Twist3dProto();
 }

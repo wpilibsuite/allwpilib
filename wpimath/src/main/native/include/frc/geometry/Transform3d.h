@@ -5,8 +5,6 @@
 #pragma once
 
 #include <wpi/SymbolExports.h>
-#include <wpi/protobuf/Protobuf.h>
-#include <wpi/struct/Struct.h>
 
 #include "frc/geometry/Translation3d.h"
 
@@ -132,38 +130,5 @@ class WPILIB_DLLEXPORT Transform3d {
 };
 }  // namespace frc
 
-template <>
-struct wpi::Struct<frc::Transform3d> {
-  static constexpr std::string_view kTypeString = "struct:Transform3d";
-  static constexpr size_t kSize = wpi::Struct<frc::Translation3d>::kSize +
-                                  wpi::Struct<frc::Rotation3d>::kSize;
-  static constexpr std::string_view kSchema =
-      "Translation3d translation;Rotation3d rotation";
-  static frc::Transform3d Unpack(std::span<const uint8_t, kSize> data) {
-    return {wpi::UnpackStruct<frc::Translation3d, 0>(data),
-            wpi::UnpackStruct<frc::Rotation3d, kRotationOff>(data)};
-  }
-  static void Pack(std::span<uint8_t, kSize> data,
-                   const frc::Transform3d& value) {
-    wpi::PackStruct<0>(data, value.Translation());
-    wpi::PackStruct<kRotationOff>(data, value.Rotation());
-  }
-  static void ForEachNested(
-      std::invocable<std::string_view, std::string_view> auto fn) {
-    wpi::ForEachStructSchema<frc::Translation3d>(fn);
-    wpi::ForEachStructSchema<frc::Rotation3d>(fn);
-  }
-
- private:
-  static constexpr size_t kRotationOff = wpi::Struct<frc::Translation3d>::kSize;
-};
-
-static_assert(wpi::HasNestedStruct<frc::Transform3d>);
-
-template <>
-struct WPILIB_DLLEXPORT wpi::Protobuf<frc::Transform3d> {
-  static google::protobuf::Message* New(google::protobuf::Arena* arena);
-  static frc::Transform3d Unpack(const google::protobuf::Message& msg);
-  static void Pack(google::protobuf::Message* msg,
-                   const frc::Transform3d& value);
-};
+#include "frc/geometry/proto/Transform3dProto.h"
+#include "frc/geometry/struct/Transform3dStruct.h"

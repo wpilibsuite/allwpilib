@@ -14,15 +14,12 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.geometry.proto.Rotation3dProto;
+import edu.wpi.first.math.geometry.struct.Rotation3dStruct;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.math.proto.Geometry3D.ProtobufRotation3d;
-import edu.wpi.first.util.protobuf.Protobuf;
-import edu.wpi.first.util.struct.Struct;
-import java.nio.ByteBuffer;
 import java.util.Objects;
 import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
-import us.hebi.quickbuf.Descriptors.Descriptor;
 
 /** A rotation in a 3D coordinate frame represented by a quaternion. */
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -437,76 +434,6 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
     return plus(endValue.minus(this).times(MathUtil.clamp(t, 0, 1)));
   }
 
-  public static final class AStruct implements Struct<Rotation3d> {
-    @Override
-    public Class<Rotation3d> getTypeClass() {
-      return Rotation3d.class;
-    }
-
-    @Override
-    public String getTypeString() {
-      return "struct:Rotation3d";
-    }
-
-    @Override
-    public int getSize() {
-      return Quaternion.struct.getSize();
-    }
-
-    @Override
-    public String getSchema() {
-      return "Quaternion q";
-    }
-
-    @Override
-    public Struct<?>[] getNested() {
-      return new Struct<?>[] {Quaternion.struct};
-    }
-
-    @Override
-    public Rotation3d unpack(ByteBuffer bb) {
-      return new Rotation3d(Quaternion.struct.unpack(bb));
-    }
-
-    @Override
-    public void pack(ByteBuffer bb, Rotation3d value) {
-      Quaternion.struct.pack(bb, value.m_q);
-    }
-  }
-
-  public static final AStruct struct = new AStruct();
-
-  public static final class AProto implements Protobuf<Rotation3d, ProtobufRotation3d> {
-    @Override
-    public Class<Rotation3d> getTypeClass() {
-      return Rotation3d.class;
-    }
-
-    @Override
-    public Descriptor getDescriptor() {
-      return ProtobufRotation3d.getDescriptor();
-    }
-
-    @Override
-    public Protobuf<?, ?>[] getNested() {
-      return new Protobuf<?, ?>[] {Quaternion.proto};
-    }
-
-    @Override
-    public ProtobufRotation3d createMessage() {
-      return ProtobufRotation3d.newInstance();
-    }
-
-    @Override
-    public Rotation3d unpack(ProtobufRotation3d msg) {
-      return new Rotation3d(Quaternion.proto.unpack(msg.getQ()));
-    }
-
-    @Override
-    public void pack(ProtobufRotation3d msg, Rotation3d value) {
-      Quaternion.proto.pack(msg.getMutableQ(), value.m_q);
-    }
-  }
-
-  public static final AProto proto = new AProto();
+  public static final Rotation3dStruct struct = new Rotation3dStruct();
+  public static final Rotation3dProto proto = new Rotation3dProto();
 }
