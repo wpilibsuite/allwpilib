@@ -1392,29 +1392,10 @@ Java_edu_wpi_first_cscore_CameraServerJNI_createMjpegServer
 /*
  * Class:     edu_wpi_first_cscore_CameraServerCvJNI
  * Method:    createCvSink
- * Signature: (Ljava/lang/String;)I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_cscore_CameraServerCvJNI_createCvSink
-  (JNIEnv* env, jclass, jstring name)
-{
-  if (!name) {
-    nullPointerEx.Throw(env, "name cannot be null");
-    return 0;
-  }
-  CS_Status status = 0;
-  auto val = cs::CreateCvSink(JStringRef{env, name}.str(), &status);
-  CheckStatus(env, status);
-  return val;
-}
-
-/*
- * Class:     edu_wpi_first_cscore_CameraServerCvJNI
- * Method:    createCvSinkWPixelFormat
  * Signature: (Ljava/lang/String;I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_cscore_CameraServerCvJNI_createCvSinkWPixelFormat
+Java_edu_wpi_first_cscore_CameraServerCvJNI_createCvSink
   (JNIEnv* env, jclass, jstring name, jint pixelFormat)
 {
   if (!name) {

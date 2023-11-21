@@ -64,9 +64,7 @@ public class CameraServerCvJNI {
 
   public static native void putSourceFrame(int source, long imageNativeObj);
 
-  public static native int createCvSink(String name);
-
-  public static native int createCvSinkWPixelFormat(String name, int pixelFormat);
+  public static native int createCvSink(String name, int pixelFormat);
 
   // public static native int createCvSinkCallback(String name,
   //                            void (*processFrame)(long time));
