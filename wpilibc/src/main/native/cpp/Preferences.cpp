@@ -26,8 +26,13 @@ struct Instance {
   std::shared_ptr<nt::NetworkTable> table{
       nt::NetworkTableInstance::GetDefault().GetTable(kTableName)};
   nt::StringPublisher typePublisher{table->GetStringTopic(".type").Publish()};
-  nt::MultiSubscriber tableSubscriber{nt::NetworkTableInstance::GetDefault(),
-                                      {{fmt::format("{}/", table->GetPath())}}};
+  nt::MultiSubscriber tableSubscriber{
+      nt::NetworkTableInstance::GetDefault(),
+      // `{{fmt::format("{}/", table->GetPath())}}` is miscompiled by MSVC
+      [&] {
+        std::string path = fmt::format("{}/", table->GetPath());
+        return std::span<const std::string_view>{{path}};
+      }()};
   nt::NetworkTableListener listener;
 };
 }  // namespace
