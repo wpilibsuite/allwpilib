@@ -20,7 +20,8 @@ using namespace cs;
 
 CvSinkImpl::CvSinkImpl(std::string_view name, wpi::Logger& logger,
                        Notifier& notifier, Telemetry& telemetry)
-    : SinkImpl{name, logger, notifier, telemetry}, m_pixel_format{VideoMode::PixelFormat::kBGR} {
+    : SinkImpl{name, logger, notifier, telemetry},
+      m_pixel_format{VideoMode::PixelFormat::kBGR} {
   m_active = true;
   // m_thread = std::thread(&CvSinkImpl::ThreadMain, this);
 }
@@ -36,13 +37,15 @@ CvSinkImpl::CvSinkImpl(std::string_view name, wpi::Logger& logger,
 CvSinkImpl::CvSinkImpl(std::string_view name, wpi::Logger& logger,
                        Notifier& notifier, Telemetry& telemetry,
                        std::function<void(uint64_t time)> processFrame)
-    : SinkImpl{name, logger, notifier, telemetry}, m_pixel_format{VideoMode::PixelFormat::kBGR} {}
+    : SinkImpl{name, logger, notifier, telemetry},
+      m_pixel_format{VideoMode::PixelFormat::kBGR} {}
 
 CvSinkImpl::CvSinkImpl(std::string_view name, wpi::Logger& logger,
                        Notifier& notifier, Telemetry& telemetry,
                        VideoMode::PixelFormat pixelFormat,
                        std::function<void(uint64_t time)> processFrame)
-    : SinkImpl{name, logger, notifier, telemetry}, m_pixel_format{pixelFormat} {}
+    : SinkImpl{name, logger, notifier, telemetry},
+      m_pixel_format{pixelFormat} {}
 
 CvSinkImpl::~CvSinkImpl() {
   Stop();
@@ -148,7 +151,8 @@ CS_Sink CreateCvSink(std::string_view name, CS_Status* status) {
                                                inst.telemetry));
 }
 
-CS_Sink CreateCvSink(std::string_view name, VideoMode::PixelFormat pixelFormat, CS_Status* status) {
+CS_Sink CreateCvSink(std::string_view name, VideoMode::PixelFormat pixelFormat,
+                     CS_Status* status) {
   auto& inst = Instance::GetInstance();
   return inst.CreateSink(
       CS_SINK_CV, std::make_shared<CvSinkImpl>(name, inst.logger, inst.notifier,
@@ -164,13 +168,15 @@ CS_Sink CreateCvSinkCallback(std::string_view name,
                                                inst.telemetry, processFrame));
 }
 
-CS_Sink CreateCvSinkCallback(std::string_view name, VideoMode::PixelFormat pixelFormat,
+CS_Sink CreateCvSinkCallback(std::string_view name,
+                             VideoMode::PixelFormat pixelFormat,
                              std::function<void(uint64_t time)> processFrame,
                              CS_Status* status) {
   auto& inst = Instance::GetInstance();
   return inst.CreateSink(
-      CS_SINK_CV, std::make_shared<CvSinkImpl>(name, inst.logger, inst.notifier,
-                                               inst.telemetry, pixelFormat, processFrame));
+      CS_SINK_CV,
+      std::make_shared<CvSinkImpl>(name, inst.logger, inst.notifier,
+                                   inst.telemetry, pixelFormat, processFrame));
 }
 
 static constexpr unsigned SinkMask = CS_SINK_CV | CS_SINK_RAW;
@@ -236,15 +242,19 @@ void SetSinkEnabled(CS_Sink sink, bool enabled, CS_Status* status) {
 
 extern "C" {
 
-CS_Sink CS_CreateCvSink(const char* name, CS_PixelFormat pixelFormat, CS_Status* status) {
-  return cs::CreateCvSink(name, static_cast<VideoMode::PixelFormat>(pixelFormat), status);
+CS_Sink CS_CreateCvSink(const char* name, CS_PixelFormat pixelFormat,
+                        CS_Status* status) {
+  return cs::CreateCvSink(
+      name, static_cast<VideoMode::PixelFormat>(pixelFormat), status);
 }
 
-CS_Sink CS_CreateCvSinkCallback(const char* name, CS_PixelFormat pixelFormat, void* data,
+CS_Sink CS_CreateCvSinkCallback(const char* name, CS_PixelFormat pixelFormat,
+                                void* data,
                                 void (*processFrame)(void* data, uint64_t time),
                                 CS_Status* status) {
   return cs::CreateCvSinkCallback(
-      name, static_cast<VideoMode::PixelFormat>(pixelFormat), [=](uint64_t time) { processFrame(data, time); }, status);
+      name, static_cast<VideoMode::PixelFormat>(pixelFormat),
+      [=](uint64_t time) { processFrame(data, time); }, status);
 }
 
 void CS_SetSinkDescription(CS_Sink sink, const char* description,

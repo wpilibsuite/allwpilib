@@ -215,7 +215,8 @@ inline CvSink::CvSink(std::string_view name) {
   m_handle = CreateCvSink(name, &m_status);
 }
 
-inline CvSink::CvSink(std::string_view name, VideoMode::PixelFormat pixelFormat) {
+inline CvSink::CvSink(std::string_view name,
+                      VideoMode::PixelFormat pixelFormat) {
   m_handle = CreateCvSink(name, pixelFormat, &m_status);
 }
 

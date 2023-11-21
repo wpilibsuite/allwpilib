@@ -1410,8 +1410,8 @@ Java_edu_wpi_first_cscore_CameraServerCvJNI_createCvSink
 
 /*
  * Class:     edu_wpi_first_cscore_CameraServerCvJNI
- * Method:    createCvSink
- * Signature: (Ljava/lang/String;)I
+ * Method:    createCvSinkWPixelFormat
+ * Signature: (Ljava/lang/String;I)I
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_cscore_CameraServerCvJNI_createCvSinkWPixelFormat
@@ -1422,7 +1422,9 @@ Java_edu_wpi_first_cscore_CameraServerCvJNI_createCvSinkWPixelFormat
     return 0;
   }
   CS_Status status = 0;
-  auto val = cs::CreateCvSink(JStringRef{env, name}.str(), static_cast<cs::VideoMode::PixelFormat>(pixelFormat), &status);
+  auto val = cs::CreateCvSink(
+      JStringRef{env, name}.str(),
+      static_cast<cs::VideoMode::PixelFormat>(pixelFormat), &status);
   CheckStatus(env, status);
   return val;
 }

@@ -29,7 +29,8 @@ class CvSinkImpl : public SinkImpl {
   CvSinkImpl(std::string_view name, wpi::Logger& logger, Notifier& notifier,
              Telemetry& telemetry, VideoMode::PixelFormat pixelFormat);
   CvSinkImpl(std::string_view name, wpi::Logger& logger, Notifier& notifier,
-             Telemetry& telemetry, std::function<void(uint64_t time)> processFrame);
+             Telemetry& telemetry,
+             std::function<void(uint64_t time)> processFrame);
   CvSinkImpl(std::string_view name, wpi::Logger& logger, Notifier& notifier,
              Telemetry& telemetry, VideoMode::PixelFormat pixelFormat,
              std::function<void(uint64_t time)> processFrame);
