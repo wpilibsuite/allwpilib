@@ -15,11 +15,5 @@ if (WITH_JAVA)
 
     set_property(TARGET wpiunits_jar PROPERTY FOLDER "java")
 
-    if (WITH_FLAT_INSTALL)
-        set (wpiunits_config_dir ${wpiunits_dest})
-    else()
-        set (wpiunits_config_dir share/wpiunits)
-    endif()
-
-    install(FILES wpiunits-config.cmake DESTINATION ${wpiunits_config_dir})
+    install(FILES wpiunits-config.cmake DESTINATION share/wpiunits)
 endif()
