@@ -14,15 +14,12 @@
 #include <vector>
 
 #include <wpi/SmallVector.h>
+#include <wpi/json_fwd.h>
 #include <wpi/struct/Struct.h>
 
 #include "networktables/NetworkTableInstance.h"
 #include "networktables/Topic.h"
 #include "ntcore_cpp.h"
-
-namespace wpi {
-class json;
-}  // namespace wpi
 
 namespace nt {
 
@@ -187,10 +184,9 @@ class StructPublisher : public Publisher {
 
   StructPublisher& operator=(StructPublisher&& rhs) {
     Publisher::operator=(std::move(rhs));
-    m_schemaPublished.clear();
-    if (rhs.m_schemaPublished.test()) {
-      m_schemaPublished.test_and_set();
-    }
+    m_schemaPublished.store(
+        rhs.m_schemaPublished.load(std::memory_order_relaxed),
+        std::memory_order_relaxed);
     return *this;
   }
 
@@ -209,7 +205,7 @@ class StructPublisher : public Publisher {
    * @param time timestamp; 0 indicates current NT time should be used
    */
   void Set(const T& value, int64_t time = 0) {
-    if (!m_schemaPublished.test_and_set()) {
+    if (!m_schemaPublished.exchange(true, std::memory_order_relaxed)) {
       GetTopic().GetInstance().template AddStructSchema<T>();
     }
     uint8_t buf[S::kSize];
@@ -225,7 +221,7 @@ class StructPublisher : public Publisher {
    * @param value value
    */
   void SetDefault(const T& value) {
-    if (!m_schemaPublished.test_and_set()) {
+    if (!m_schemaPublished.exchange(true, std::memory_order_relaxed)) {
       GetTopic().GetInstance().template AddStructSchema<T>();
     }
     uint8_t buf[S::kSize];
@@ -243,7 +239,7 @@ class StructPublisher : public Publisher {
   }
 
  private:
-  std::atomic_flag m_schemaPublished = ATOMIC_FLAG_INIT;
+  std::atomic_bool m_schemaPublished{false};
 };
 
 /**

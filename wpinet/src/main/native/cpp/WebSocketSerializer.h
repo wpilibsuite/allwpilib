@@ -130,7 +130,7 @@ int WebSocketWriteReqBase::Continue(Stream& stream, std::shared_ptr<Req> req) {
   }
 
   m_continueFramePos = offIt - m_continueFrameOffs.begin();
-  m_continueBufPos = &(*bufIt) - &(*m_frames.m_bufs.begin());
+  m_continueBufPos += bufIt - bufs.begin();
 
   if (writeBufs.empty()) {
     WS_DEBUG("Write Done\n");
@@ -256,7 +256,6 @@ std::span<const WebSocket::Frame> TrySendFrames(
       // continuation (so the caller isn't responsible for doing this)
       size_t continuePos = 0;
       while (frameStart != frameEnd && !isFin) {
-        req->m_continueFrameOffs.emplace_back(continuePos);
         if (offIt != offEnd) {
           // we already generated the wire buffers for this frame, use them
           while (pos < *offIt && bufIt != bufEnd) {
@@ -271,6 +270,7 @@ std::span<const WebSocket::Frame> TrySendFrames(
           // need to generate and add this frame
           continuePos += req->m_frames.AddFrame(*frameStart, server);
         }
+        req->m_continueFrameOffs.emplace_back(continuePos);
         isFin = (frameStart->opcode & WebSocket::kFlagFin) != 0;
         ++frameStart;
       }

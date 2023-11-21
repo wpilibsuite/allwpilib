@@ -106,9 +106,18 @@ public final class DataLog implements AutoCloseable {
     DataLogJNI.pause(m_impl);
   }
 
-  /** Resumes appending of data records to the log. */
+  /**
+   * Resumes appending of data records to the log. If called after stop(), opens a new file (with
+   * random name if SetFilename was not called after stop()) and appends Start records and schema
+   * data values for all previously started entries and schemas.
+   */
   public void resume() {
     DataLogJNI.resume(m_impl);
+  }
+
+  /** Stops appending all records to the log, and closes the log file. */
+  public void stop() {
+    DataLogJNI.stop(m_impl);
   }
 
   /**
@@ -118,7 +127,7 @@ public final class DataLog implements AutoCloseable {
    * @return True if schema already registered
    */
   public boolean hasSchema(String name) {
-    return m_schemaSet.contains(name);
+    return m_schemaMap.containsKey(name);
   }
 
   /**
@@ -134,7 +143,7 @@ public final class DataLog implements AutoCloseable {
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
   public void addSchema(String name, String type, byte[] schema, long timestamp) {
-    if (!m_schemaSet.add(name)) {
+    if (m_schemaMap.putIfAbsent(name, 1) != null) {
       return;
     }
     DataLogJNI.addSchema(m_impl, name, type, schema, timestamp);
@@ -168,7 +177,7 @@ public final class DataLog implements AutoCloseable {
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
   public void addSchema(String name, String type, String schema, long timestamp) {
-    if (!m_schemaSet.add(name)) {
+    if (m_schemaMap.putIfAbsent(name, 1) != null) {
       return;
     }
     DataLogJNI.addSchemaString(m_impl, name, type, schema, timestamp);
@@ -506,5 +515,4 @@ public final class DataLog implements AutoCloseable {
 
   private long m_impl;
   private final ConcurrentMap<String, Integer> m_schemaMap = new ConcurrentHashMap<>();
-  private final Set<String> m_schemaSet = m_schemaMap.keySet();
 }

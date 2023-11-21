@@ -14,16 +14,13 @@
 #include <vector>
 
 #include <wpi/SmallVector.h>
+#include <wpi/json_fwd.h>
 #include <wpi/mutex.h>
 #include <wpi/protobuf/Protobuf.h>
 
 #include "networktables/NetworkTableInstance.h"
 #include "networktables/Topic.h"
 #include "ntcore_cpp.h"
-
-namespace wpi {
-class json;
-}  // namespace wpi
 
 namespace nt {
 
@@ -63,12 +60,12 @@ class ProtobufSubscriber : public Subscriber {
   ProtobufSubscriber(ProtobufSubscriber&& rhs)
       : Subscriber{std::move(rhs)},
         m_msg{std::move(rhs.m_msg)},
-        m_defaultValue{std::move(rhs.defaultValue)} {}
+        m_defaultValue{std::move(rhs.m_defaultValue)} {}
 
   ProtobufSubscriber& operator=(ProtobufSubscriber&& rhs) {
     Subscriber::operator=(std::move(rhs));
     m_msg = std::move(rhs.m_msg);
-    m_defaultValue = std::move(rhs.defaultValue);
+    m_defaultValue = std::move(rhs.m_defaultValue);
     return *this;
   }
 
@@ -175,8 +172,8 @@ class ProtobufSubscriber : public Subscriber {
   }
 
  private:
-  wpi::mutex m_mutex;
-  wpi::ProtobufMessage<T> m_msg;
+  mutable wpi::mutex m_mutex;
+  mutable wpi::ProtobufMessage<T> m_msg;
   ValueType m_defaultValue;
 };
 
@@ -215,10 +212,9 @@ class ProtobufPublisher : public Publisher {
   ProtobufPublisher& operator=(ProtobufPublisher&& rhs) {
     Publisher::operator=(std::move(rhs));
     m_msg = std::move(rhs.m_msg);
-    m_schemaPublished.clear();
-    if (rhs.m_schemaPublished.test()) {
-      m_schemaPublished.test_and_set();
-    }
+    m_schemaPublished.store(
+        rhs.m_schemaPublished.load(std::memory_order_relaxed),
+        std::memory_order_relaxed);
     return *this;
   }
 
@@ -232,7 +228,7 @@ class ProtobufPublisher : public Publisher {
     wpi::SmallVector<uint8_t, 128> buf;
     {
       std::scoped_lock lock{m_mutex};
-      if (!m_schemaPublished.test_and_set()) {
+      if (!m_schemaPublished.exchange(true, std::memory_order_relaxed)) {
         GetTopic().GetInstance().template AddProtobufSchema<T>(m_msg);
       }
       m_msg.Pack(buf, value);
@@ -251,7 +247,7 @@ class ProtobufPublisher : public Publisher {
     wpi::SmallVector<uint8_t, 128> buf;
     {
       std::scoped_lock lock{m_mutex};
-      if (!m_schemaPublished.test_and_set()) {
+      if (!m_schemaPublished.exchange(true, std::memory_order_relaxed)) {
         GetTopic().GetInstance().template AddProtobufSchema<T>(m_msg);
       }
       m_msg.Pack(buf, value);
@@ -271,7 +267,7 @@ class ProtobufPublisher : public Publisher {
  private:
   wpi::mutex m_mutex;
   wpi::ProtobufMessage<T> m_msg;
-  std::atomic_flag m_schemaPublished = ATOMIC_FLAG_INIT;
+  std::atomic_bool m_schemaPublished{false};
 };
 
 /**
@@ -303,7 +299,7 @@ class ProtobufEntry final : public ProtobufSubscriber<T>,
    */
   ProtobufEntry(NT_Entry handle, wpi::ProtobufMessage<T> msg, T defaultValue)
       : ProtobufSubscriber<T>{handle, std::move(msg), std::move(defaultValue)},
-        ProtobufPublisher<T>{handle, {}} {}
+        ProtobufPublisher<T>{handle, wpi::ProtobufMessage<T>{}} {}
 
   /**
    * Determines if the native handle is valid.

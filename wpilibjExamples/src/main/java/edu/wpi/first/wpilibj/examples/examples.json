@@ -860,7 +860,8 @@
     "foldername": "unittest",
     "gradlebase": "java",
     "mainclass": "Main",
-    "commandversion": 2
+    "commandversion": 2,
+    "hasunittests": true
   },
   {
     "name": "DifferentialDrivePoseEstimator",

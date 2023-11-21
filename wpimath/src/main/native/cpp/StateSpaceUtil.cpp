@@ -18,21 +18,12 @@ Eigen::Vector4d PoseTo4dVector(const Pose2d& pose) {
                          pose.Rotation().Sin()};
 }
 
-template <>
-bool IsStabilizable<1, 1>(const Matrixd<1, 1>& A, const Matrixd<1, 1>& B) {
-  return detail::IsStabilizableImpl<1, 1>(A, B);
-}
-
-template <>
-bool IsStabilizable<2, 1>(const Matrixd<2, 2>& A, const Matrixd<2, 1>& B) {
-  return detail::IsStabilizableImpl<2, 1>(A, B);
-}
-
-template <>
-bool IsStabilizable<Eigen::Dynamic, Eigen::Dynamic>(const Eigen::MatrixXd& A,
-                                                    const Eigen::MatrixXd& B) {
-  return detail::IsStabilizableImpl<Eigen::Dynamic, Eigen::Dynamic>(A, B);
-}
+template bool IsStabilizable<1, 1>(const Matrixd<1, 1>& A,
+                                   const Matrixd<1, 1>& B);
+template bool IsStabilizable<2, 1>(const Matrixd<2, 2>& A,
+                                   const Matrixd<2, 1>& B);
+template bool IsStabilizable<Eigen::Dynamic, Eigen::Dynamic>(
+    const Eigen::MatrixXd& A, const Eigen::MatrixXd& B);
 
 Eigen::Vector3d PoseToVector(const Pose2d& pose) {
   return Eigen::Vector3d{pose.X().value(), pose.Y().value(),

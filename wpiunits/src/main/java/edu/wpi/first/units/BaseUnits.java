@@ -20,11 +20,11 @@ public final class BaseUnits {
   public static final Velocity<Distance> Velocity =
       new Velocity<>(Distance, Time, "Meter per Second", "m/s");
 
-  /** The standard unit of mass, grams. */
+  /** The standard unit of mass, kilograms. */
   public static final Mass Mass = new Mass(1, "Kilogram", "Kg");
 
-  /** The standard unit of angles, revolutions. */
-  public static final Angle Angle = new Angle(1, "Revolution", "R");
+  /** The standard unit of angles, radians. */
+  public static final Angle Angle = new Angle(1, "Radian", "rad");
 
   /** The standard "unitless" unit. */
   public static final Dimensionless Value = new Dimensionless(1, "<?>", "<?>");

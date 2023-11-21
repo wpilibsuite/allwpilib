@@ -35,7 +35,7 @@ __declspec(dllexport)
     return -1;
   }
 
-  std::puts("HALSim XRP Extention Initialized");
+  std::puts("HALSim XRP Extension Initialized");
   return 0;
 }
 

@@ -39,7 +39,7 @@ std::optional<std::vector<ClientPublisher>> nt::meta::DecodeClientPublishers(
     std::span<const uint8_t> data) {
   mpack_reader_t r;
   mpack_reader_init_data(&r, data);
-  uint32_t numPub = mpack_expect_array_max(&r, 1000);
+  uint32_t numPub = mpack_expect_array_max(&r, 10000);
   std::vector<ClientPublisher> publishers;
   publishers.reserve(numPub);
   for (uint32_t i = 0; i < numPub; ++i) {
@@ -71,7 +71,7 @@ std::optional<std::vector<ClientSubscriber>> nt::meta::DecodeClientSubscribers(
     std::span<const uint8_t> data) {
   mpack_reader_t r;
   mpack_reader_init_data(&r, data);
-  uint32_t numSub = mpack_expect_array_max(&r, 1000);
+  uint32_t numSub = mpack_expect_array_max(&r, 10000);
   std::vector<ClientSubscriber> subscribers;
   subscribers.reserve(numSub);
   for (uint32_t i = 0; i < numSub; ++i) {

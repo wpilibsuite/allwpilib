@@ -73,13 +73,3 @@ if (WIN32)
 elseif(APPLE)
     set_target_properties(glass PROPERTIES MACOSX_BUNDLE YES OUTPUT_NAME "Glass")
 endif()
-
-#if (MSVC OR FLAT_INSTALL_WPILIB)
-#    set (wpigui_config_dir ${wpilib_dest})
-#else()
-#    set (wpigui_config_dir share/wpigui)
-#endif()
-
-#configure_file(wpigui-config.cmake.in ${CMAKE_BINARY_DIR}/wpigui-config.cmake )
-#install(FILES ${CMAKE_BINARY_DIR}/wpigui-config.cmake DESTINATION ${wpigui_config_dir})
-#install(EXPORT wpigui DESTINATION ${wpigui_config_dir})

@@ -130,7 +130,7 @@ void LocalStorage::Impl::NotifyTopic(TopicData* topic,
     if (!m_dataloggers.empty()) {
       auto now = Now();
       for (auto&& datalogger : m_dataloggers) {
-        if (wpi::starts_with(topic->name, datalogger->prefix)) {
+        if (PrefixMatch(topic->name, datalogger->prefix, topic->special)) {
           auto it = std::find_if(topic->datalogs.begin(), topic->datalogs.end(),
                                  [&](const auto& elem) {
                                    return elem.logger == datalogger->handle;
@@ -858,14 +858,14 @@ LocalStorage::PublisherData* LocalStorage::Impl::PublishEntry(EntryData* entry,
   if (entry->publisher) {
     return entry->publisher;
   }
-  auto typeStr = TypeToString(type);
   if (entry->subscriber->config.type == NT_UNASSIGNED) {
+    auto typeStr = TypeToString(type);
     entry->subscriber->config.type = type;
     entry->subscriber->config.typeStr = typeStr;
-  } else if (entry->subscriber->config.type != type ||
-             entry->subscriber->config.typeStr != typeStr) {
+  } else if (entry->subscriber->config.type != type) {
     if (!IsNumericCompatible(type, entry->subscriber->config.type)) {
       // don't allow dynamically changing the type of an entry
+      auto typeStr = TypeToString(type);
       ERR("cannot publish entry {} as type {}, previously subscribed as {}",
           entry->topic->name, typeStr, entry->subscriber->config.typeStr);
       return nullptr;
@@ -1448,7 +1448,7 @@ NT_DataLogger LocalStorage::StartDataLog(wpi::log::DataLog& log,
   // start logging any matching topics
   auto now = nt::Now();
   for (auto&& topic : m_impl.m_topics) {
-    if (!wpi::starts_with(topic->name, prefix) ||
+    if (!PrefixMatch(topic->name, prefix, topic->special) ||
         topic->type == NT_UNASSIGNED || topic->typeStr.empty()) {
       continue;
     }

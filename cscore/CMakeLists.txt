@@ -43,15 +43,9 @@ set_property(TARGET cscore PROPERTY FOLDER "libraries")
 install(TARGETS cscore EXPORT cscore)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/cscore")
 
-if (WITH_FLAT_INSTALL)
-    set (cscore_config_dir ${wpilib_dest})
-else()
-    set (cscore_config_dir share/cscore)
-endif()
-
 configure_file(cscore-config.cmake.in ${WPILIB_BINARY_DIR}/cscore-config.cmake )
-install(FILES ${WPILIB_BINARY_DIR}/cscore-config.cmake DESTINATION ${cscore_config_dir})
-install(EXPORT cscore DESTINATION ${cscore_config_dir})
+install(FILES ${WPILIB_BINARY_DIR}/cscore-config.cmake DESTINATION share/cscore)
+install(EXPORT cscore DESTINATION share/cscore)
 
 subdir_list(cscore_examples "${CMAKE_CURRENT_SOURCE_DIR}/examples")
 foreach(example ${cscore_examples})
@@ -131,6 +125,22 @@ if (WITH_JAVA)
 
     install(TARGETS cscorejni EXPORT cscorejni)
 
+endif()
+
+if (WITH_JAVA_SOURCE)
+    find_package(Java REQUIRED)
+    include(UseJava)
+    file(GLOB CSCORE_SOURCES src/main/java/edu/wpi/first/cscore/*.java)
+    file(GLOB CSCORE_RAW_SOURCES src/main/java/edu/wpi/first/cscore/raw/*.java)
+    add_jar(cscore_src_jar
+    RESOURCES NAMESPACE "edu/wpi/first/cscore" ${CSCORE_SOURCES}
+    NAMESPACE "edu/wpi/first/cscore/raw" ${CSCORE_RAW_SOURCES}
+    OUTPUT_NAME cscore-sources)
+
+    get_property(CSCORE_SRC_JAR_FILE TARGET cscore_src_jar PROPERTY JAR_FILE)
+    install(FILES ${CSCORE_SRC_JAR_FILE} DESTINATION "${java_lib_dest}")
+
+    set_property(TARGET cscore_src_jar PROPERTY FOLDER "java")
 endif()
 
 if (WITH_TESTS)
