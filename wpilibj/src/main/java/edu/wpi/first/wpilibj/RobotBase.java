@@ -19,8 +19,8 @@ import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.net.WPINetJNI;
 import edu.wpi.first.networktables.MultiSubscriber;
-import edu.wpi.first.networktables.NetworkTablesJNI;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.NetworkTablesJNI;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -409,6 +409,7 @@ public abstract class RobotBase implements AutoCloseable {
     m_runMutex.unlock();
   }
 
+  /** Load all JNI libraries. */
   public static void loadAllJni() throws IOException {
     WPIUtilJNI.load();
     WPINetJNI.load();

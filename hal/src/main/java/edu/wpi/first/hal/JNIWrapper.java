@@ -6,7 +6,6 @@ package edu.wpi.first.hal;
 
 import edu.wpi.first.util.RuntimeLoader;
 import java.io.IOException;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /** Base class for all JNI wrappers. */
 public class JNIWrapper {
