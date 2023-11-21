@@ -51,68 +51,7 @@ dependencies {
     api "us.hebi.quickbuf:quickbuf-runtime:1.3.2"
 }
 
-def wpilibNumberFileInput = file("src/generate/GenericNumber.java.jinja")
-def natFileInput = file("src/generate/Nat.java.jinja")
-def wpilibNumberFileOutputDir = file("$buildDir/generated/java/edu/wpi/first/math/numbers")
-def wpilibNatFileOutput = file("$buildDir/generated/java/edu/wpi/first/math/Nat.java")
-def maxNum = 20
-
-task generateNumbers() {
-    description = "Generates generic number classes from template"
-    group = "WPILib"
-
-    inputs.file wpilibNumberFileInput
-    outputs.dir wpilibNumberFileOutputDir
-
-    doLast {
-        if(wpilibNumberFileOutputDir.exists()) {
-            wpilibNumberFileOutputDir.delete()
-        }
-        wpilibNumberFileOutputDir.mkdirs()
-
-        def config = new JinjavaConfig()
-        def jinjava = new Jinjava(config)
-
-        def template = wpilibNumberFileInput.text
-
-        for(i in 0..maxNum) {
-            def outputFile = new File(wpilibNumberFileOutputDir, "N${i}.java")
-            def replacements = new HashMap<String,?>()
-            replacements.put("num", i)
-            def output = jinjava.render(template, replacements)
-            outputFile.write(output)
-        }
-    }
-}
-
-task generateNat() {
-    description = "Generates Nat.java"
-    group = "WPILib"
-    inputs.file natFileInput
-    outputs.file wpilibNatFileOutput
-    dependsOn generateNumbers
-
-    doLast {
-        if(wpilibNatFileOutput.exists()) {
-            wpilibNatFileOutput.delete()
-        }
-
-        def config = new JinjavaConfig()
-        def jinjava = new Jinjava(config)
-
-        def template = natFileInput.text
-
-        def replacements = new HashMap<String,?>()
-        replacements.put("nums", 0..maxNum)
-
-        def output = jinjava.render(template, replacements)
-        wpilibNatFileOutput.write(output)
-    }
-}
-
-sourceSets.main.java.srcDir "${buildDir}/generated/java"
-compileJava.dependsOn generateNumbers
-compileJava.dependsOn generateNat
+sourceSets.main.java.srcDir "${projectDir}/src/generated/java"
 
 task unitsHeaders(type: Zip) {
     destinationDirectory = file("$buildDir/outputs")
