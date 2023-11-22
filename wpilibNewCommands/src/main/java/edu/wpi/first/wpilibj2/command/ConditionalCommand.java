@@ -19,7 +19,7 @@ import java.util.function.BooleanSupplier;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public class ConditionalCommand extends CommandBase {
+public class ConditionalCommand extends Command {
   private final Command m_onTrue;
   private final Command m_onFalse;
   private final BooleanSupplier m_condition;
@@ -71,6 +71,16 @@ public class ConditionalCommand extends CommandBase {
   @Override
   public boolean runsWhenDisabled() {
     return m_onTrue.runsWhenDisabled() && m_onFalse.runsWhenDisabled();
+  }
+
+  @Override
+  public InterruptionBehavior getInterruptionBehavior() {
+    if (m_onTrue.getInterruptionBehavior() == InterruptionBehavior.kCancelSelf
+        || m_onFalse.getInterruptionBehavior() == InterruptionBehavior.kCancelSelf) {
+      return InterruptionBehavior.kCancelSelf;
+    } else {
+      return InterruptionBehavior.kCancelIncoming;
+    }
   }
 
   @Override

@@ -39,11 +39,10 @@ constexpr auto kTrackwidth = 0.69_m;
 extern const frc::DifferentialDriveKinematics kDriveKinematics;
 
 constexpr int kEncoderCPR = 1024;
-constexpr double kWheelDiameterInches = 6;
-constexpr double kEncoderDistancePerPulse =
+constexpr units::meter_t kWheelDiameter = 6_in;
+constexpr auto kEncoderDistancePerPulse =
     // Assumes the encoders are directly mounted on the wheel shafts
-    (kWheelDiameterInches * std::numbers::pi) /
-    static_cast<double>(kEncoderCPR);
+    (kWheelDiameter * std::numbers::pi) / static_cast<double>(kEncoderCPR);
 
 // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
 // These characterization values MUST be determined either experimentally or

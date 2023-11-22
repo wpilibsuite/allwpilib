@@ -74,6 +74,17 @@ void HALSimWSClientConnection::OnSimValueChanged(const wpi::json& msg) {
   if (msg.empty()) {
     return;
   }
+
+  // Skip sending if this message is not in the allowed filter list
+  try {
+    auto& type = msg.at("type").get_ref<const std::string&>();
+    if (!m_client->CanSendMessage(type)) {
+      return;
+    }
+  } catch (wpi::json::exception& e) {
+    fmt::print(stderr, "Error with message: {}\n", e.what());
+  }
+
   wpi::SmallVector<uv::Buffer, 4> sendBufs;
   wpi::raw_uv_ostream os{sendBufs, [this]() -> uv::Buffer {
                            std::lock_guard lock(m_buffers_mutex);

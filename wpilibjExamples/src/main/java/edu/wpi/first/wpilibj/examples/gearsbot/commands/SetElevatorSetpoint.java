@@ -5,14 +5,14 @@
 package edu.wpi.first.wpilibj.examples.gearsbot.commands;
 
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Elevator;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 
 /**
  * Move the elevator to a given location. This command finishes when it is within the tolerance, but
  * leaves the PID loop running to maintain the position. Other commands using the elevator should
  * make sure they disable PID!
  */
-public class SetElevatorSetpoint extends CommandBase {
+public class SetElevatorSetpoint extends Command {
   private final Elevator m_elevator;
   private final double m_setpoint;
 

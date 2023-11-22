@@ -11,9 +11,14 @@ if ("${CMAKE_HOST_SYSTEM_NAME}" STREQUAL "Windows")
     set(CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION 10.0.18362.0 CACHE STRING INTERNAL FORCE)
 endif()
 
+cmake_minimum_required(VERSION 3.11)
 project(allwpilib)
-cmake_minimum_required(VERSION 3.3.0)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
+
+# Make timestamps of extracted files from FetchContent the time of extraction
+if (POLICY CMP0135)
+    cmake_policy(SET CMP0135 NEW)
+endif()
 
 message(STATUS "Platform version: ${CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION}")
 
@@ -50,10 +55,12 @@ ENDIF("${isSystemDir}" STREQUAL "-1")
 
 # Options for building certain parts of the repo. Everything is built by default.
 option(BUILD_SHARED_LIBS "Build with shared libs (needed for JNI)" ON)
-option(WITH_JAVA "Include java and JNI in the build" ON)
+option(WITH_JAVA "Include Java and JNI in the build" ON)
+option(WITH_JAVA_SOURCE "Build Java source jars" ON)
 option(WITH_CSCORE "Build cscore (needs OpenCV)" ON)
 option(WITH_NTCORE "Build ntcore" ON)
 option(WITH_WPIMATH "Build wpimath" ON)
+option(WITH_WPIUNITS "Build wpiunits" ON)
 option(WITH_WPILIB "Build hal, wpilibc/j, and myRobot (needs OpenCV)" ON)
 option(WITH_EXAMPLES "Build examples" OFF)
 option(WITH_TESTS "Build unit tests (requires internet connection)" ON)
@@ -69,9 +76,6 @@ option(USE_SYSTEM_FMTLIB "Use system fmtlib" OFF)
 option(USE_SYSTEM_LIBUV "Use system libuv" OFF)
 option(USE_SYSTEM_EIGEN "Use system eigen" OFF)
 
-# Options for installation.
-option(WITH_FLAT_INSTALL "Use a flat install directory" OFF)
-
 # Options for location of OpenCV Java.
 set(OPENCV_JAVA_INSTALL_DIR "" CACHE PATH "Location to search for the OpenCV jar file")
 
@@ -79,11 +83,6 @@ set(OPENCV_JAVA_INSTALL_DIR "" CACHE PATH "Location to search for the OpenCV jar
 # are performed, but debug info still exists).
 if (NOT CMAKE_BUILD_TYPE)
     set (CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING "" FORCE)
-endif()
-
-# We always want flat install with MSVC.
-if (MSVC)
-  set(WITH_FLAT_INSTALL ON)
 endif()
 
 if (WITH_JAVA AND NOT BUILD_SHARED_LIBS)
@@ -153,22 +152,20 @@ FATAL: Cannot build wpilib without wpimath.
 ")
 endif()
 
-set( wpilib_dest "")
+if (NOT WITH_WPIUNITS AND WITH_WPIMATH AND WITH_JAVA)
+    message(FATAL_ERROR "
+FATAL: Cannot build Java wpimath without wpiunits.
+       Enable wpiunits by setting WITH_WPIUNITS=ON or disable the Java build by setting WITH_JAVA=OFF
+")
+endif()
+
 set( include_dest include )
-set( main_lib_dest lib )
 set( java_lib_dest java )
 set( jni_lib_dest jni )
 
-if (WITH_FLAT_INSTALL)
-    set (wpilib_config_dir ${wpilib_dest})
-else()
-    set (wpilib_config_dir share/wpilib)
-endif()
-
 if (USE_SYSTEM_LIBUV)
 set (LIBUV_SYSTEM_REPLACE "
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(libuv REQUIRED IMPORTED_TARGET libuv)
+find_dependency(libuv CONFIG)
 ")
 endif()
 
@@ -178,17 +175,12 @@ endif()
 
 find_package(LIBSSH 0.7.1)
 
-if (WITH_FLAT_INSTALL)
-set(WPIUTIL_DEP_REPLACE "include($\{SELF_DIR\}/wpiutil-config.cmake)")
-set(WPINET_DEP_REPLACE "include($\{SELF_DIR\}/wpinet-config.cmake)")
-set(NTCORE_DEP_REPLACE "include($\{SELF_DIR\}/ntcore-config.cmake)")
-set(CSCORE_DEP_REPLACE_IMPL "include(\${SELF_DIR}/cscore-config.cmake)")
-set(CAMERASERVER_DEP_REPLACE_IMPL "include(\${SELF_DIR}/cameraserver-config.cmake)")
-set(HAL_DEP_REPLACE_IMPL "include(\${SELF_DIR}/hal-config.cmake)")
-set(WPIMATH_DEP_REPLACE "include($\{SELF_DIR\}/wpimath-config.cmake)")
-set(WPILIBC_DEP_REPLACE_IMPL "include(\${SELF_DIR}/wpilibc-config.cmake)")
-set(WPILIBNEWCOMMANDS_DEP_REPLACE "include(\${SELF_DIR}/wpilibNewcommands-config.cmake)")
-else()
+find_package(Protobuf REQUIRED)
+find_program(Quickbuf_EXECUTABLE
+    NAMES protoc-gen-quickbuf
+    DOC "The Quickbuf protoc plugin"
+)
+
 set(WPIUTIL_DEP_REPLACE "find_dependency(wpiutil)")
 set(WPINET_DEP_REPLACE "find_dependency(wpinet)")
 set(NTCORE_DEP_REPLACE "find_dependency(ntcore)")
@@ -196,9 +188,9 @@ set(CSCORE_DEP_REPLACE_IMPL "find_dependency(cscore)")
 set(CAMERASERVER_DEP_REPLACE_IMPL "find_dependency(cameraserver)")
 set(HAL_DEP_REPLACE_IMPL "find_dependency(hal)")
 set(WPIMATH_DEP_REPLACE "find_dependency(wpimath)")
+set(WPIUNITS_DEP_REPLACE "find_dependency(wpiunits)")
 set(WPILIBC_DEP_REPLACE_IMPL "find_dependency(wpilibc)")
 set(WPILIBNEWCOMMANDS_DEP_REPLACE "find_dependency(wpilibNewCommands)")
-endif()
 
 set(FILENAME_DEP_REPLACE "get_filename_component(SELF_DIR \"$\{CMAKE_CURRENT_LIST_FILE\}\" PATH)")
 set(SELF_DIR "$\{SELF_DIR\}")
@@ -286,7 +278,15 @@ if (WITH_NTCORE)
 endif()
 
 if (WITH_WPIMATH)
+    if (WITH_JAVA)
+        add_subdirectory(wpiunits)
+    endif()
     add_subdirectory(wpimath)
+endif()
+
+if (WITH_WPIUNITS AND NOT WITH_WPIMATH)
+    # In case of building wpiunits standalone
+    add_subdirectory(wpiunits)
 endif()
 
 if (WITH_GUI)
@@ -295,6 +295,7 @@ if (WITH_GUI)
     add_subdirectory(wpigui)
     add_subdirectory(glass)
     add_subdirectory(outlineviewer)
+    add_subdirectory(sysid)
     if (LIBSSH_FOUND)
         add_subdirectory(roborioteamnumbersetter)
         add_subdirectory(datalogtool)
@@ -319,6 +320,8 @@ if (WITH_WPILIB)
     add_subdirectory(wpilibj)
     add_subdirectory(wpilibc)
     add_subdirectory(wpilibNewCommands)
+    add_subdirectory(romiVendordep)
+    add_subdirectory(xrpVendordep)
     if (WITH_EXAMPLES)
         add_subdirectory(wpilibcExamples)
     endif()
@@ -330,4 +333,4 @@ if (WITH_SIMULATION_MODULES AND NOT WITH_EXTERNAL_HAL)
 endif()
 
 configure_file(wpilib-config.cmake.in ${WPILIB_BINARY_DIR}/wpilib-config.cmake )
-install(FILES ${WPILIB_BINARY_DIR}/wpilib-config.cmake DESTINATION ${wpilib_config_dir})
+install(FILES ${WPILIB_BINARY_DIR}/wpilib-config.cmake DESTINATION share/wpilib)

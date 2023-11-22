@@ -11,10 +11,7 @@
 using namespace frc;
 
 BangBangController::BangBangController(double tolerance)
-    : m_tolerance(tolerance) {
-  static int instances = 0;
-  instances++;
-}
+    : m_tolerance(tolerance) {}
 
 void BangBangController::SetSetpoint(double setpoint) {
   m_setpoint = setpoint;

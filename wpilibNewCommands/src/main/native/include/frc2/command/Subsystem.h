@@ -4,8 +4,11 @@
 
 #pragma once
 
-#include <type_traits>
+#include <concepts>
+#include <functional>
 #include <utility>
+
+#include <wpi/FunctionExtras.h>
 
 #include "frc2/command/CommandScheduler.h"
 
@@ -65,8 +68,7 @@ class Subsystem {
    *
    * @param defaultCommand the default command to associate with this subsystem
    */
-  template <class T, typename = std::enable_if_t<std::is_base_of_v<
-                         Command, std::remove_reference_t<T>>>>
+  template <std::derived_from<Command> T>
   void SetDefaultCommand(T&& defaultCommand) {
     CommandScheduler::GetInstance().SetDefaultCommand(
         this, std::forward<T>(defaultCommand));
@@ -82,6 +84,12 @@ class Subsystem {
    * @param defaultCommand the default command to associate with this subsystem
    */
   void SetDefaultCommand(CommandPtr&& defaultCommand);
+
+  /**
+   * Removes the default command for the subsystem.  This will not cancel the
+   * default command if it is currently running.
+   */
+  void RemoveDefaultCommand();
 
   /**
    * Gets the default command for this subsystem.  Returns null if no default
@@ -111,7 +119,8 @@ class Subsystem {
    *
    * @param action the action to run
    */
-  [[nodiscard]] CommandPtr RunOnce(std::function<void()> action);
+  [[nodiscard]]
+  CommandPtr RunOnce(std::function<void()> action);
 
   /**
    * Constructs a command that runs an action every iteration until interrupted.
@@ -119,7 +128,8 @@ class Subsystem {
    *
    * @param action the action to run
    */
-  [[nodiscard]] CommandPtr Run(std::function<void()> action);
+  [[nodiscard]]
+  CommandPtr Run(std::function<void()> action);
 
   /**
    * Constructs a command that runs an action once and another action when the
@@ -128,8 +138,8 @@ class Subsystem {
    * @param start the action to run on start
    * @param end the action to run on interrupt
    */
-  [[nodiscard]] CommandPtr StartEnd(std::function<void()> start,
-                                    std::function<void()> end);
+  [[nodiscard]]
+  CommandPtr StartEnd(std::function<void()> start, std::function<void()> end);
 
   /**
    * Constructs a command that runs an action every iteration until interrupted,
@@ -138,7 +148,17 @@ class Subsystem {
    * @param run the action to run every iteration
    * @param end the action to run on interrupt
    */
-  [[nodiscard]] CommandPtr RunEnd(std::function<void()> run,
-                                  std::function<void()> end);
+  [[nodiscard]]
+  CommandPtr RunEnd(std::function<void()> run, std::function<void()> end);
+
+  /**
+   * Constructs a DeferredCommand with the provided supplier. This subsystem is
+   * added as a requirement.
+   *
+   * @param supplier the command supplier.
+   * @return the command.
+   */
+  [[nodiscard]]
+  CommandPtr Defer(wpi::unique_function<CommandPtr()> supplier);
 };
 }  // namespace frc2

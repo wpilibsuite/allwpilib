@@ -33,14 +33,14 @@ HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(
 /**
  * Frees an analog input port.
  *
- * @param analogPortHandle Handle to the analog port.
+ * @param[in,out] analogPortHandle Handle to the analog port.
  */
 void HAL_FreeAnalogInputPort(HAL_AnalogInputHandle analogPortHandle);
 
 /**
  * Checks that the analog module number is valid.
  *
- * @param module The analog module number.
+ * @param[in] module The analog module number.
  * @return Analog module is valid and present
  */
 HAL_Bool HAL_CheckAnalogModule(int32_t module);
@@ -50,7 +50,7 @@ HAL_Bool HAL_CheckAnalogModule(int32_t module);
  * Verifies that the analog channel number is one of the legal channel numbers.
  * Channel numbers are 0-based.
  *
- * @param channel The analog output channel number.
+ * @param[in] channel The analog output channel number.
  * @return Analog channel is valid
  */
 HAL_Bool HAL_CheckAnalogInputChannel(int32_t channel);
@@ -162,9 +162,9 @@ int32_t HAL_GetAnalogValue(HAL_AnalogInputHandle analogPortHandle,
  * The sample is 12-bit + the value configured in SetOversampleBits().
  * The value configured in SetAverageBits() will cause this value to be averaged
  * 2**bits number of samples. This is not a sliding window.  The sample will not
- * change until 2**(OversamplBits + AverageBits) samples have been acquired from
- * the module on this channel. Use GetAverageVoltage() to get the analog value
- * in calibrated units.
+ * change until 2**(OversampleBits + AverageBits) samples have been acquired
+ * from the module on this channel. Use GetAverageVoltage() to get the analog
+ * value in calibrated units.
  *
  * @param[in] analogPortHandle Handle to the analog port to use.
  * @param[out] status the error code, or 0 for success

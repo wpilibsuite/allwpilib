@@ -29,10 +29,6 @@ jobs:
         run: |
           git config --global user.email "you@example.com"
           git config --global user.name "Your Name"
-      - name: Run update_drake.py
-        run: |
-          cd upstream_utils
-          ./update_drake.py
       - name: Run update_eigen.py
         run: |
           cd upstream_utils
@@ -41,6 +37,14 @@ jobs:
         run: |
           cd upstream_utils
           ./update_fmt.py
+      - name: Run update_gcem.py
+        run: |
+          cd upstream_utils
+          ./update_gcem.py
+      - name: Run update_json.py
+        run: |
+          cd upstream_utils
+          ./update_json.py
       - name: Run update_libuv.py
         run: |
           cd upstream_utils
@@ -61,6 +65,10 @@ jobs:
         run: |
           cd upstream_utils
           ./update_memory.py
+      - name: Run update_protobuf.py
+        run: |
+          cd upstream_utils
+          ./update_protobuf.py
       - name: Add untracked files to index so they count as changes
         run: git add -A
       - name: Check output

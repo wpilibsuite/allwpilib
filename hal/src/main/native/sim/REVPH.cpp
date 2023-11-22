@@ -201,7 +201,7 @@ int32_t HAL_GetREVPHSolenoids(HAL_REVPHHandle handle, int32_t* status) {
 
   std::scoped_lock lock{pcm->lock};
   auto& data = SimREVPHData[pcm->module].solenoidOutput;
-  uint8_t ret = 0;
+  int32_t ret = 0;
   for (int i = 0; i < kNumREVPHChannels; i++) {
     ret |= (data[i] << i);
   }

@@ -24,7 +24,7 @@ class UsbCameraTest {
   static class ConnectVerbose {
     @Test
     void setConnectVerboseEnabledTest() {
-      try (UsbCamera camera = new UsbCamera("Nonexistant Camera", getNonexistentCameraDev())) {
+      try (UsbCamera camera = new UsbCamera("Nonexistent Camera", getNonexistentCameraDev())) {
         camera.setConnectVerbose(1);
 
         CompletableFuture<String> result = new CompletableFuture<>();
@@ -32,13 +32,13 @@ class UsbCameraTest {
 
         assertTimeoutPreemptively(
             Duration.ofSeconds(5),
-            () -> assertTrue(result.get().contains("Connecting to USB camera on ")));
+            () -> assertTrue(result.get().contains("Attempting to connect to USB camera on ")));
       }
     }
 
     @Test
     void setConnectVerboseDisabledTest() {
-      try (UsbCamera camera = new UsbCamera("Nonexistant Camera", getNonexistentCameraDev())) {
+      try (UsbCamera camera = new UsbCamera("Nonexistent Camera", getNonexistentCameraDev())) {
         camera.setConnectVerbose(0);
 
         CompletableFuture<String> result = new CompletableFuture<>();

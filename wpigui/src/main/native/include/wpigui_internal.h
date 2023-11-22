@@ -24,6 +24,7 @@ struct SavedSettings {
   int yPos = -1;
   int userScale = 2;
   int style = 0;
+  int fps = 120;
 };
 
 constexpr int kFontScaledLevels = 9;

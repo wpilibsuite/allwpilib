@@ -9,7 +9,6 @@
 #include <wpi/sendable/SendableHelper.h>
 
 #include "frc/SPI.h"
-#include "frc/interfaces/Accelerometer.h"
 
 namespace frc {
 
@@ -19,10 +18,11 @@ namespace frc {
  * This class allows access to an Analog Devices ADXL345 3-axis accelerometer
  * via SPI. This class assumes the sensor is wired in 4-wire SPI mode.
  */
-class ADXL345_SPI : public Accelerometer,
-                    public nt::NTSendable,
+class ADXL345_SPI : public nt::NTSendable,
                     public wpi::SendableHelper<ADXL345_SPI> {
  public:
+  enum Range { kRange_2G = 0, kRange_4G = 1, kRange_8G = 2, kRange_16G = 3 };
+
   enum Axes { kAxis_X = 0x00, kAxis_Y = 0x02, kAxis_Z = 0x04 };
 
   struct AllAxes {
@@ -46,11 +46,34 @@ class ADXL345_SPI : public Accelerometer,
 
   SPI::Port GetSpiPort() const;
 
-  // Accelerometer interface
-  void SetRange(Range range) final;
-  double GetX() override;
-  double GetY() override;
-  double GetZ() override;
+  /**
+   * Set the measuring range of the accelerometer.
+   *
+   * @param range The maximum acceleration, positive or negative, that the
+   *     accelerometer will measure.
+   */
+  void SetRange(Range range);
+
+  /**
+   * Returns the acceleration along the X axis in g-forces.
+   *
+   * @return The acceleration along the X axis in g-forces.
+   */
+  double GetX();
+
+  /**
+   * Returns the acceleration along the Y axis in g-forces.
+   *
+   * @return The acceleration along the Y axis in g-forces.
+   */
+  double GetY();
+
+  /**
+   * Returns the acceleration along the Z axis in g-forces.
+   *
+   * @return The acceleration along the Z axis in g-forces.
+   */
+  double GetZ();
 
   /**
    * Get the acceleration of one axis in Gs.

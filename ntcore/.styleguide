@@ -28,6 +28,7 @@ includeGuardRoots {
 
 includeOtherLibs {
   ^fmt/
+  ^gtest/
   ^support/
   ^wpi/
   ^wpinet/

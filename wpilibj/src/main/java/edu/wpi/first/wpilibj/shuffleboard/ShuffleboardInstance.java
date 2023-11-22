@@ -10,6 +10,7 @@ import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.PubSubOption;
 import edu.wpi.first.networktables.StringPublisher;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -32,7 +33,8 @@ final class ShuffleboardInstance implements ShuffleboardRoot {
     requireNonNullParam(ntInstance, "ntInstance", "ShuffleboardInstance");
     m_rootTable = ntInstance.getTable(Shuffleboard.kBaseTableName);
     m_rootMetaTable = m_rootTable.getSubTable(".metadata");
-    m_selectedTabPub = m_rootMetaTable.getStringTopic("Selected").publish();
+    m_selectedTabPub =
+        m_rootMetaTable.getStringTopic("Selected").publish(PubSubOption.keepDuplicates(true));
     HAL.report(tResourceType.kResourceType_Shuffleboard, 0);
   }
 

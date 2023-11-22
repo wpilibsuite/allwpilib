@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <stdint.h>
+
 #include <string_view>
 
 namespace wpi {
@@ -25,6 +27,8 @@ class WireConnection3 {
   virtual Writer Send() = 0;
 
   virtual void Flush() = 0;
+
+  virtual uint64_t GetLastFlushTime() const = 0;  // in microseconds
 
   virtual void Disconnect(std::string_view reason) = 0;
 

@@ -31,6 +31,10 @@ constexpr Pose2d Pose2d::operator/(double scalar) const {
   return *this * (1.0 / scalar);
 }
 
+constexpr Pose2d Pose2d::RotateBy(const Rotation2d& other) const {
+  return {m_translation.RotateBy(other), m_rotation.RotateBy(other)};
+}
+
 constexpr Pose2d Pose2d::TransformBy(const Transform2d& other) const {
   return {m_translation + (other.Translation().RotateBy(m_rotation)),
           other.Rotation() + m_rotation};

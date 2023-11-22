@@ -15,6 +15,7 @@
 #include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
 #include <networktables/NetworkTableInstance.h>
+#include <wpi/timestamp.h>
 #include <wpimath/MathShared.h>
 
 #include "WPILibVersion.h"
@@ -138,6 +139,10 @@ class WPILibMathShared : public wpi::math::MathShared {
         break;
     }
   }
+
+  units::second_t GetTimestamp() override {
+    return units::second_t{wpi::Now() * 1.0e-6};
+  }
 };
 }  // namespace
 
@@ -205,6 +210,10 @@ bool RobotBase::IsTest() const {
   return DriverStation::IsTest();
 }
 
+bool RobotBase::IsTestEnabled() const {
+  return DriverStation::IsTestEnabled();
+}
+
 std::thread::id RobotBase::GetThreadId() {
   return m_threadId;
 }
@@ -220,13 +229,13 @@ RobotBase::RobotBase() {
   SetupMathShared();
 
   auto inst = nt::NetworkTableInstance::GetDefault();
-  // subscribe to "" to force persistent values to progagate to local
+  // subscribe to "" to force persistent values to propagate to local
   nt::SubscribeMultiple(inst.GetHandle(), {{std::string_view{}}});
-#ifdef __FRC_ROBORIO__
-  inst.StartServer("/home/lvuser/networktables.json");
-#else
-  inst.StartServer();
-#endif
+  if constexpr (!IsSimulation()) {
+    inst.StartServer("/home/lvuser/networktables.json");
+  } else {
+    inst.StartServer();
+  }
 
   // wait for the NT server to actually start
   int count = 0;
@@ -242,7 +251,7 @@ RobotBase::RobotBase() {
 
   SmartDashboard::init();
 
-  if (IsReal()) {
+  if constexpr (!IsSimulation()) {
     std::FILE* file = nullptr;
     file = std::fopen("/tmp/frc_versions/FRC_Lib_Version.ini", "w");
 

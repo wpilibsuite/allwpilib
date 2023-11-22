@@ -271,11 +271,7 @@ public final class TrajectoryParameterizer {
       if (minMaxAccel.minAccelerationMetersPerSecondSq
           > minMaxAccel.maxAccelerationMetersPerSecondSq) {
         throw new TrajectoryGenerationException(
-            "The constraint's min acceleration "
-                + "was greater than its max acceleration.\n Offending Constraint: "
-                + constraint.getClass().getName()
-                + "\n If the offending constraint was packaged with WPILib, please file a bug"
-                + " report.");
+            "Infeasible trajectory constraint: " + constraint.getClass().getName() + "\n");
       }
 
       state.minAccelerationMetersPerSecondSq =

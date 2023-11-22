@@ -4,8 +4,9 @@
 
 #include <ctime>
 
-#include "fmt/chrono.h"
-#include "fmt/format.h"
+#include <fmt/chrono.h>
+#include <fmt/format.h>
+
 #include "wpi/DataLogReader.h"
 #include "wpi/DenseMap.h"
 #include "wpi/MemoryBuffer.h"

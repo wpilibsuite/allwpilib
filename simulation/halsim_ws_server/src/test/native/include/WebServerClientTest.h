@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <functional>
 #include <memory>
 #include <string>
 
@@ -21,7 +22,7 @@ namespace wpilibws {
 class WebServerClientTest {
  public:
   using BufferPool = wpi::uv::SimpleBufferPool<4>;
-  using LoopFunc = std::function<void(void)>;
+  using LoopFunc = std::function<void()>;
   using UvExecFunc = wpi::uv::AsyncFunction<void(LoopFunc)>;
 
   explicit WebServerClientTest(wpi::uv::Loop& loop) : m_loop(loop) {}

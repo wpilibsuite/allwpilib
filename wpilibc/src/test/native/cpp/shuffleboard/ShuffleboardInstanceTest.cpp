@@ -6,10 +6,12 @@
 
 #include <string_view>
 
+#include <gtest/gtest.h>
 #include <networktables/NetworkTableInstance.h>
+#include <networktables/NetworkTableListener.h>
+#include <networktables/StringTopic.h>
 
 #include "frc/shuffleboard/ShuffleboardInstance.h"
-#include "gtest/gtest.h"
 #include "shuffleboard/MockActuatorSendable.h"
 
 class NTWrapper {
@@ -105,4 +107,25 @@ TEST(ShuffleboardInstanceTest, NestedActuatorWidgetsAreDisabled) {
   controllable = controllableEntry.GetValue().GetBoolean();
   EXPECT_FALSE(controllable)
       << "The nested actuator widget should have been disabled";
+}
+
+TEST(ShuffleboardInstanceTest, DuplicateSelectTabs) {
+  NTWrapper ntInst;
+  frc::detail::ShuffleboardInstance shuffleboardInst{ntInst.inst};
+  std::atomic_int counter = 0;
+  auto subscriber =
+      ntInst.inst.GetStringTopic("/Shuffleboard/.metadata/Selected")
+          .Subscribe("", {.keepDuplicates = true});
+  ntInst.inst.AddListener(
+      subscriber, nt::EventFlags::kValueAll | nt::EventFlags::kImmediate,
+      [&counter](auto& event) { counter++; });
+
+  // There shouldn't be anything there
+  EXPECT_EQ(0, counter);
+
+  shuffleboardInst.SelectTab("tab1");
+  shuffleboardInst.SelectTab("tab1");
+  EXPECT_TRUE(ntInst.inst.WaitForListenerQueue(1.0))
+      << "Listener queue timed out!";
+  EXPECT_EQ(2, counter);
 }

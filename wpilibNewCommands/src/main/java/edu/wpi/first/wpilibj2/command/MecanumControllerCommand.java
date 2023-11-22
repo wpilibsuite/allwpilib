@@ -38,7 +38,7 @@ import java.util.function.Supplier;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public class MecanumControllerCommand extends CommandBase {
+public class MecanumControllerCommand extends Command {
   private final Timer m_timer = new Timer();
   private final boolean m_usePID;
   private final Trajectory m_trajectory;
@@ -332,8 +332,7 @@ public class MecanumControllerCommand extends CommandBase {
     m_prevSpeeds =
         m_kinematics.toWheelSpeeds(new ChassisSpeeds(initialXVelocity, initialYVelocity, 0.0));
 
-    m_timer.reset();
-    m_timer.start();
+    m_timer.restart();
   }
 
   @Override

@@ -5,6 +5,7 @@
 package edu.wpi.first.util.datalog;
 
 import edu.wpi.first.util.WPIUtilJNI;
+import java.nio.ByteBuffer;
 
 public class DataLogJNI extends WPIUtilJNI {
   static native long create(String dir, String filename, double period, String extraHeader);
@@ -17,6 +18,13 @@ public class DataLogJNI extends WPIUtilJNI {
 
   static native void resume(long impl);
 
+  static native void stop(long impl);
+
+  static native void addSchema(long impl, String name, String type, byte[] schema, long timestamp);
+
+  static native void addSchemaString(
+      long impl, String name, String type, String schema, long timestamp);
+
   static native int start(long impl, String name, String type, String metadata, long timestamp);
 
   static native void finish(long impl, int entry, long timestamp);
@@ -25,7 +33,30 @@ public class DataLogJNI extends WPIUtilJNI {
 
   static native void close(long impl);
 
-  static native void appendRaw(long impl, int entry, byte[] data, long timestamp);
+  static native void appendRaw(
+      long impl, int entry, byte[] data, int start, int len, long timestamp);
+
+  static void appendRaw(long impl, int entry, ByteBuffer data, int start, int len, long timestamp) {
+    if (data.isDirect()) {
+      if (start < 0) {
+        throw new IndexOutOfBoundsException("start must be >= 0");
+      }
+      if (len < 0) {
+        throw new IndexOutOfBoundsException("len must be >= 0");
+      }
+      if ((start + len) > data.capacity()) {
+        throw new IndexOutOfBoundsException("start + len must be smaller than buffer capacity");
+      }
+      appendRawBuffer(impl, entry, data, start, len, timestamp);
+    } else if (data.hasArray()) {
+      appendRaw(impl, entry, data.array(), data.arrayOffset() + start, len, timestamp);
+    } else {
+      throw new UnsupportedOperationException("ByteBuffer must be direct or have a backing array");
+    }
+  }
+
+  private static native void appendRawBuffer(
+      long impl, int entry, ByteBuffer data, int start, int len, long timestamp);
 
   static native void appendBoolean(long impl, int entry, boolean value, long timestamp);
 

@@ -35,9 +35,13 @@ RobotContainer::RobotContainer() {
   m_drive.SetDefaultCommand(frc2::RunCommand(
       [this] {
         m_drive.Drive(
-            units::meters_per_second_t{m_driverController.GetLeftY()},
-            units::meters_per_second_t{m_driverController.GetLeftX()},
-            units::radians_per_second_t{m_driverController.GetRightX()}, false);
+            // Multiply by max speed to map the joystick unitless inputs to
+            // actual units. This will map the [-1, 1] to [max speed backwards,
+            // max speed forwards], converting them to actual units.
+            m_driverController.GetLeftY() * AutoConstants::kMaxSpeed,
+            m_driverController.GetLeftX() * AutoConstants::kMaxSpeed,
+            m_driverController.GetRightX() * AutoConstants::kMaxAngularSpeed,
+            false);
       },
       {&m_drive}));
 }
@@ -74,8 +78,8 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
 
       m_drive.kDriveKinematics,
 
-      frc2::PIDController{AutoConstants::kPXController, 0, 0},
-      frc2::PIDController{AutoConstants::kPYController, 0, 0}, thetaController,
+      frc::PIDController{AutoConstants::kPXController, 0, 0},
+      frc::PIDController{AutoConstants::kPYController, 0, 0}, thetaController,
 
       [this](auto moduleStates) { m_drive.SetModuleStates(moduleStates); },
 

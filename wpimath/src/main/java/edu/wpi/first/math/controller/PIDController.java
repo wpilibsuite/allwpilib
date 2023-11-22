@@ -24,6 +24,9 @@ public class PIDController implements Sendable, AutoCloseable {
   // Factor for "derivative" control
   private double m_kd;
 
+  // The error range where "integral" control applies
+  private double m_iZone = Double.POSITIVE_INFINITY;
+
   // The period (in seconds) of the loop that calls the controller
   private final double m_period;
 
@@ -142,6 +145,22 @@ public class PIDController implements Sendable, AutoCloseable {
   }
 
   /**
+   * Sets the IZone range. When the absolute value of the position error is greater than IZone, the
+   * total accumulated error will reset to zero, disabling integral gain until the absolute value of
+   * the position error is less than IZone. This is used to prevent integral windup. Must be
+   * non-negative. Passing a value of zero will effectively disable integral gain. Passing a value
+   * of {@link Double#POSITIVE_INFINITY} disables IZone functionality.
+   *
+   * @param iZone Maximum magnitude of error to allow integral control.
+   */
+  public void setIZone(double iZone) {
+    if (iZone < 0) {
+      throw new IllegalArgumentException("IZone must be a non-negative number!");
+    }
+    m_iZone = iZone;
+  }
+
+  /**
    * Get the Proportional coefficient.
    *
    * @return proportional coefficient
@@ -166,6 +185,15 @@ public class PIDController implements Sendable, AutoCloseable {
    */
   public double getD() {
     return m_kd;
+  }
+
+  /**
+   * Get the IZone range.
+   *
+   * @return Maximum magnitude of error to allow integral control.
+   */
+  public double getIZone() {
+    return m_iZone;
   }
 
   /**
@@ -327,6 +355,7 @@ public class PIDController implements Sendable, AutoCloseable {
    */
   public double calculate(double measurement, double setpoint) {
     m_setpoint = setpoint;
+    m_haveSetpoint = true;
     return calculate(measurement);
   }
 
@@ -350,7 +379,10 @@ public class PIDController implements Sendable, AutoCloseable {
 
     m_velocityError = (m_positionError - m_prevError) / m_period;
 
-    if (m_ki != 0) {
+    // If the absolute value of the position error is greater than IZone, reset the total error
+    if (Math.abs(m_positionError) > m_iZone) {
+      m_totalError = 0;
+    } else if (m_ki != 0) {
       m_totalError =
           MathUtil.clamp(
               m_totalError + m_positionError * m_period,
@@ -376,6 +408,7 @@ public class PIDController implements Sendable, AutoCloseable {
     builder.addDoubleProperty("p", this::getP, this::setP);
     builder.addDoubleProperty("i", this::getI, this::setI);
     builder.addDoubleProperty("d", this::getD, this::setD);
+    builder.addDoubleProperty("izone", this::getIZone, this::setIZone);
     builder.addDoubleProperty("setpoint", this::getSetpoint, this::setSetpoint);
   }
 }

@@ -77,6 +77,22 @@ bool HALSimWeb::Initialize() {
     m_port = 3300;
   }
 
+  const char* msgFilters = std::getenv("HALSIMWS_FILTERS");
+  if (msgFilters != nullptr) {
+    m_useMsgFiltering = true;
+
+    std::string_view filters(msgFilters);
+    filters = wpi::trim(filters);
+    wpi::SmallVector<std::string_view, 16> filtersSplit;
+
+    wpi::split(filters, filtersSplit, ',', -1, false);
+    for (auto val : filtersSplit) {
+      m_msgFilters[wpi::trim(val)] = true;
+    }
+  } else {
+    m_useMsgFiltering = false;
+  }
+
   return true;
 }
 
@@ -100,6 +116,16 @@ void HALSimWeb::Start() {
   m_server->Listen();
   fmt::print("Listening at http://localhost:{}\n", m_port);
   fmt::print("WebSocket URI: {}\n", m_uri);
+
+  // Print any filters we are using
+  if (m_useMsgFiltering) {
+    fmt::print("WS Message Filters:");
+    for (auto filter : m_msgFilters.keys()) {
+      fmt::print("* \"{}\"\n", filter);
+    }
+  } else {
+    fmt::print("No WS Message Filters specified");
+  }
 }
 
 bool HALSimWeb::RegisterWebsocket(
@@ -156,4 +182,11 @@ void HALSimWeb::OnNetValueChanged(const wpi::json& msg) {
   } catch (wpi::json::exception& e) {
     fmt::print(stderr, "Error with incoming message: {}\n", e.what());
   }
+}
+
+bool HALSimWeb::CanSendMessage(std::string_view type) {
+  if (!m_useMsgFiltering) {
+    return true;
+  }
+  return m_msgFilters.count(type) > 0;
 }

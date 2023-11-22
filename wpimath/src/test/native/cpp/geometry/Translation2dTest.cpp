@@ -4,8 +4,9 @@
 
 #include <cmath>
 
+#include <gtest/gtest.h>
+
 #include "frc/geometry/Translation2d.h"
-#include "gtest/gtest.h"
 
 using namespace frc;
 
@@ -92,6 +93,37 @@ TEST(Translation2dTest, PolarConstructor) {
   Translation2d two{2_m, Rotation2d{60_deg}};
   EXPECT_DOUBLE_EQ(1.0, two.X().value());
   EXPECT_DOUBLE_EQ(std::sqrt(3.0), two.Y().value());
+}
+
+TEST(Translation2dTest, Nearest) {
+  const Translation2d origin{0_m, 0_m};
+
+  const Translation2d translation1{1_m, Rotation2d{45_deg}};
+  const Translation2d translation2{2_m, Rotation2d{90_deg}};
+  const Translation2d translation3{3_m, Rotation2d{135_deg}};
+  const Translation2d translation4{4_m, Rotation2d{180_deg}};
+  const Translation2d translation5{5_m, Rotation2d{270_deg}};
+
+  EXPECT_DOUBLE_EQ(
+      origin.Nearest({translation5, translation3, translation4}).X().value(),
+      translation3.X().value());
+  EXPECT_DOUBLE_EQ(
+      origin.Nearest({translation5, translation3, translation4}).Y().value(),
+      translation3.Y().value());
+
+  EXPECT_DOUBLE_EQ(
+      origin.Nearest({translation1, translation2, translation3}).X().value(),
+      translation1.X().value());
+  EXPECT_DOUBLE_EQ(
+      origin.Nearest({translation1, translation2, translation3}).Y().value(),
+      translation1.Y().value());
+
+  EXPECT_DOUBLE_EQ(
+      origin.Nearest({translation4, translation2, translation3}).X().value(),
+      translation2.X().value());
+  EXPECT_DOUBLE_EQ(
+      origin.Nearest({translation4, translation2, translation3}).Y().value(),
+      translation2.Y().value());
 }
 
 TEST(Translation2dTest, Constexpr) {

@@ -4,6 +4,8 @@
 
 #include "subsystems/HatchSubsystem.h"
 
+#include <wpi/sendable/SendableBuilder.h>
+
 using namespace HatchConstants;
 
 HatchSubsystem::HatchSubsystem()
@@ -20,4 +22,14 @@ frc2::CommandPtr HatchSubsystem::ReleaseHatchCommand() {
   // implicitly require `this`
   return this->RunOnce(
       [this] { m_hatchSolenoid.Set(frc::DoubleSolenoid::kReverse); });
+}
+
+void HatchSubsystem::InitSendable(wpi::SendableBuilder& builder) {
+  SubsystemBase::InitSendable(builder);
+
+  // Publish the solenoid state to telemetry.
+  builder.AddBooleanProperty(
+      "extended",
+      [this] { return m_hatchSolenoid.Get() == frc::DoubleSolenoid::kForward; },
+      nullptr);
 }

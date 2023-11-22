@@ -21,6 +21,10 @@ void Subsystem::SetDefaultCommand(CommandPtr&& defaultCommand) {
                                                     std::move(defaultCommand));
 }
 
+void Subsystem::RemoveDefaultCommand() {
+  CommandScheduler::GetInstance().RemoveDefaultCommand(this);
+}
+
 Command* Subsystem::GetDefaultCommand() const {
   return CommandScheduler::GetInstance().GetDefaultCommand(this);
 }
@@ -49,4 +53,8 @@ CommandPtr Subsystem::StartEnd(std::function<void()> start,
 CommandPtr Subsystem::RunEnd(std::function<void()> run,
                              std::function<void()> end) {
   return cmd::RunEnd(std::move(run), std::move(end), {this});
+}
+
+CommandPtr Subsystem::Defer(wpi::unique_function<CommandPtr()> supplier) {
+  return cmd::Defer(std::move(supplier), {this});
 }

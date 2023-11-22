@@ -8,6 +8,7 @@
 #include <stdint.h>
 #include <uv.h>
 
+#include <concepts>
 #include <functional>
 #include <memory>
 #include <thread>
@@ -74,6 +75,9 @@ class AsyncFunction<R(T...)> final
   static std::shared_ptr<AsyncFunction> Create(
       const std::shared_ptr<Loop>& loop,
       std::function<void(promise<R>, T...)> func = nullptr) {
+    if (loop->IsClosing()) {
+      return nullptr;
+    }
     auto h =
         std::make_shared<AsyncFunction>(loop, std::move(func), private_init{});
     int err =
@@ -123,6 +127,13 @@ class AsyncFunction<R(T...)> final
     uint64_t req = m_promises.CreateRequest();
 
     auto loop = m_loop.lock();
+    if (loop->IsClosing()) {
+      if constexpr (std::same_as<R, void>) {
+        return m_promises.MakeReadyFuture();
+      } else {
+        return m_promises.MakeReadyFuture({});
+      }
+    }
     if (loop && loop->GetThreadId() == std::this_thread::get_id()) {
       // called from within the loop, just call the function directly
       wakeup(m_promises.CreatePromise(req), std::forward<U>(u)...);

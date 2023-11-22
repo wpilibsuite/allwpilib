@@ -4,11 +4,13 @@
 
 package edu.wpi.first.math.geometry;
 
+import edu.wpi.first.math.geometry.proto.Twist2dProto;
+import edu.wpi.first.math.geometry.struct.Twist2dStruct;
 import java.util.Objects;
 
 /**
  * A change in distance along a 2D arc since the last pose update. We can use ideas from
- * differential calculus to create new Pose2d objects from a Twist2d and vise versa.
+ * differential calculus to create new Pose2d objects from a Twist2d and vice versa.
  *
  * <p>A Twist can be used to represent a difference between two poses.
  */
@@ -62,4 +64,7 @@ public class Twist2d {
   public int hashCode() {
     return Objects.hash(dx, dy, dtheta);
   }
+
+  public static final Twist2dStruct struct = new Twist2dStruct();
+  public static final Twist2dProto proto = new Twist2dProto();
 }

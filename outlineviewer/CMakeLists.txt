@@ -5,7 +5,7 @@ include(GenResources)
 include(LinkMacOSGUI)
 
 configure_file(src/main/generate/WPILibVersion.cpp.in WPILibVersion.cpp)
-GENERATE_RESOURCES(src/main/native/resources generated/main/cpp OV ov outlineviewer_resources_src)
+generate_resources(src/main/native/resources generated/main/cpp OV ov outlineviewer_resources_src)
 
 file(GLOB outlineviewer_src src/main/native/cpp/*.cpp ${CMAKE_CURRENT_BINARY_DIR}/WPILibVersion.cpp)
 
@@ -19,6 +19,7 @@ endif()
 
 add_executable(outlineviewer ${outlineviewer_src} ${outlineviewer_resources_src} ${outlineviewer_rc} ${APP_ICON_MACOSX})
 wpilib_link_macos_gui(outlineviewer)
+wpilib_target_warnings(outlineviewer)
 target_link_libraries(outlineviewer libglassnt libglass)
 
 if (WIN32)

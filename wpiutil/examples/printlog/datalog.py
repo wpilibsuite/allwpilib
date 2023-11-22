@@ -5,6 +5,7 @@
 
 import array
 import struct
+import msgpack
 from typing import List, SupportsBytes
 
 __all__ = ["StartRecordData", "MetadataRecordData", "DataLogRecord", "DataLogReader"]
@@ -127,6 +128,9 @@ class DataLogRecord:
 
     def getString(self) -> str:
         return str(self.data, encoding="utf-8")
+
+    def getMsgPack(self):
+        return msgpack.unpackb(self.data)
 
     def getBooleanArray(self) -> List[bool]:
         return [x != 0 for x in self.data]
@@ -326,6 +330,8 @@ if __name__ == "__main__":
                         print(f"  {record.getInteger()}")
                     elif entry.type in ("string", "json"):
                         print(f"  '{record.getString()}'")
+                    elif entry.type == "msgpack":
+                        print(f"  '{record.getMsgPack()}'")
                     elif entry.type == "boolean":
                         print(f"  {record.getBoolean()}")
                     elif entry.type == "boolean[]":

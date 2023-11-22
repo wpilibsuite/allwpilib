@@ -5,7 +5,7 @@ include(GenResources)
 include(LinkMacOSGUI)
 
 configure_file(src/main/generate/WPILibVersion.cpp.in WPILibVersion.cpp)
-GENERATE_RESOURCES(src/main/native/resources generated/main/cpp RTNS rtns rtns_resources_src)
+generate_resources(src/main/native/resources generated/main/cpp RTNS rtns rtns_resources_src)
 
 file(GLOB rtns_src src/main/native/cpp/*.cpp ${CMAKE_CURRENT_BINARY_DIR}/WPILibVersion.cpp)
 

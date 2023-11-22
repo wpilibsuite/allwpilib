@@ -300,4 +300,58 @@ class SwerveDrivePoseEstimatorTest {
       assertEquals(dx > 0.08 || dy > 0.08 || dtheta > 0.08, true, errorLog);
     }
   }
+
+  @Test
+  void testDiscardsOldVisionMeasurements() {
+    var kinematics =
+        new SwerveDriveKinematics(
+            new Translation2d(1, 1),
+            new Translation2d(-1, 1),
+            new Translation2d(1, -1),
+            new Translation2d(-1, -1));
+    var estimator =
+        new SwerveDrivePoseEstimator(
+            kinematics,
+            new Rotation2d(),
+            new SwerveModulePosition[] {
+              new SwerveModulePosition(),
+              new SwerveModulePosition(),
+              new SwerveModulePosition(),
+              new SwerveModulePosition()
+            },
+            new Pose2d(),
+            VecBuilder.fill(0.1, 0.1, 0.1),
+            VecBuilder.fill(0.9, 0.9, 0.9));
+
+    double time = 0;
+
+    // Add enough measurements to fill up the buffer
+    for (; time < 4; time += 0.02) {
+      estimator.updateWithTime(
+          time,
+          new Rotation2d(),
+          new SwerveModulePosition[] {
+            new SwerveModulePosition(),
+            new SwerveModulePosition(),
+            new SwerveModulePosition(),
+            new SwerveModulePosition()
+          });
+    }
+
+    var odometryPose = estimator.getEstimatedPosition();
+
+    // Apply a vision measurement made 3 seconds ago
+    // This test passes if this does not cause a ConcurrentModificationException.
+    estimator.addVisionMeasurement(
+        new Pose2d(new Translation2d(10, 10), new Rotation2d(0.1)),
+        1,
+        VecBuilder.fill(0.1, 0.1, 0.1));
+
+    assertEquals(odometryPose.getX(), estimator.getEstimatedPosition().getX(), "Incorrect Final X");
+    assertEquals(odometryPose.getY(), estimator.getEstimatedPosition().getY(), "Incorrect Final Y");
+    assertEquals(
+        odometryPose.getRotation().getRadians(),
+        estimator.getEstimatedPosition().getRotation().getRadians(),
+        "Incorrect Final Theta");
+  }
 }

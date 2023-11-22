@@ -42,6 +42,48 @@ task checkTemplates(type: Task) {
     }
 }
 
+def tagList = [
+        /* --- Categories --- */
+        // On-RIO image processing
+        "Vision",
+        // Command-based
+        "Command-based",
+        // Romi
+        "Romi",
+        // XRP
+        "XRP",
+        // Extremely simple programs showcasing a single hardware API
+        "Hardware",
+        // Full robot, with multiple mechanisms
+        "Complete Robot",
+        // A single mechanism in the Robot class
+        "Basic Robot",
+
+        /* --- Mechanisms --- */
+        "Intake", "Flywheel", "Elevator", "Arm", "Differential Drive", "Mecanum Drive",
+        "Swerve Drive",
+
+        /* --- Telemetry --- */
+        "SmartDashboard", "Shuffleboard", "Sendable", "DataLog",
+
+        /* --- Controls --- */
+        "Exponential Profile", "PID", "State-Space", "Ramsete", "Path Following", "Trajectory",
+        "SysId", "Simulation", "Trapezoid Profile", "Profiled PID", "Odometry", "LQR",
+        "Pose Estimator",
+
+        /* --- Hardware --- */
+        "Analog", "Ultrasonic", "Gyro", "Pneumatics", "I2C", "Duty Cycle", "PDP", "DMA", "Relay",
+        "AddressableLEDs", "HAL", "Encoder", "Smart Motor Controller", "Digital Input",
+        "Digital Output",
+
+        /* --- HID --- */
+        "XboxController", "PS4Controller", "PS5Controller", "Joystick",
+
+        /* --- Misc --- */
+        /* (try to keep this section minimal) */
+        "EventLoop", "AprilTags", "Mechanism2d", "Preferences",
+]
+
 task checkExamples(type: Task) {
     doLast {
         def parsedJson = new groovy.json.JsonSlurper().parseText(exampleFile.text)
@@ -50,6 +92,7 @@ task checkExamples(type: Task) {
             assert it.name != null
             assert it.description != null
             assert it.tags != null
+            assert it.tags.findAll { !tagList.contains(it) }.empty
             assert it.foldername != null
             assert it.gradlebase != null
             assert it.commandversion != null

@@ -6,6 +6,7 @@ package edu.wpi.first.math.geometry;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import edu.wpi.first.math.VecBuilder;
@@ -15,6 +16,38 @@ import org.junit.jupiter.api.Test;
 
 class Pose3dTest {
   private static final double kEpsilon = 1E-9;
+
+  @Test
+  void testRotateBy() {
+    final double x = 1.0;
+    final double y = 2.0;
+    var initial =
+        new Pose3d(
+            new Translation3d(x, y, 0.0),
+            new Rotation3d(
+                Units.degreesToRadians(0.0),
+                Units.degreesToRadians(0.0),
+                Units.degreesToRadians(45.0)));
+
+    double yaw = Units.degreesToRadians(5.0);
+    var rotation = new Rotation3d(Units.degreesToRadians(0.0), Units.degreesToRadians(0.0), yaw);
+    var rotated = initial.rotateBy(rotation);
+
+    // Translation is rotated by CCW rotation matrix
+    double c = Math.cos(yaw);
+    double s = Math.sin(yaw);
+    assertAll(
+        () -> assertEquals(c * x - s * y, rotated.getX(), kEpsilon),
+        () -> assertEquals(s * x + c * y, rotated.getY(), kEpsilon),
+        () -> assertEquals(0.0, rotated.getZ(), kEpsilon),
+        () -> assertEquals(0.0, rotated.getRotation().getX(), kEpsilon),
+        () -> assertEquals(0.0, rotated.getRotation().getY(), kEpsilon),
+        () ->
+            assertEquals(
+                initial.getRotation().getZ() + rotation.getZ(),
+                rotated.getRotation().getZ(),
+                kEpsilon));
+  }
 
   @Test
   void testTransformByRotations() {
@@ -228,6 +261,44 @@ class Pose3dTest {
                   start_exp.getRotation().getQuaternion().getZ(),
                   end.getRotation().getQuaternion().getZ(),
                   eps));
+    }
+  }
+
+  @Test
+  void testTwistNaN() {
+    var initial_poses =
+        Arrays.asList(
+            new Pose3d(
+                new Translation3d(6.32, 4.12, 0.00),
+                new Rotation3d(
+                    new Quaternion(-0.9999999999999999, 0.0, 0.0, 1.9208309264993548E-8))),
+            new Pose3d(
+                new Translation3d(3.75, 2.95, 0.00),
+                new Rotation3d(
+                    new Quaternion(0.9999999999999793, 0.0, 0.0, 2.0352360299846772E-7))));
+    var final_poses =
+        Arrays.asList(
+            new Pose3d(
+                new Translation3d(6.33, 4.15, 0.00),
+                new Rotation3d(
+                    new Quaternion(-0.9999999999999999, 0.0, 0.0, 2.416890209039172E-8))),
+            new Pose3d(
+                new Translation3d(3.66, 2.93, 0.00),
+                new Rotation3d(
+                    new Quaternion(0.9999999999999782, 0.0, 0.0, 2.0859477994905617E-7))));
+
+    for (int i = 0; i < initial_poses.size(); i++) {
+      var start = initial_poses.get(i);
+      var end = final_poses.get(i);
+
+      var twist = start.log(end);
+      assertAll(
+          () -> assertFalse(((Double) twist.dx).isNaN()),
+          () -> assertFalse(((Double) twist.dy).isNaN()),
+          () -> assertFalse(((Double) twist.dz).isNaN()),
+          () -> assertFalse(((Double) twist.rx).isNaN()),
+          () -> assertFalse(((Double) twist.ry).isNaN()),
+          () -> assertFalse(((Double) twist.rz).isNaN()));
     }
   }
 }

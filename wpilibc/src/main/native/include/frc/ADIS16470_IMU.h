@@ -20,12 +20,12 @@
 #include <thread>
 
 #include <hal/SimDevice.h>
-#include <networktables/NTSendable.h>
 #include <units/acceleration.h>
 #include <units/angle.h>
 #include <units/angular_velocity.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
+#include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
 #include "frc/DigitalInput.h"
@@ -50,7 +50,7 @@ namespace frc {
  * available on the RoboRIO.
  */
 
-class ADIS16470_IMU : public nt::NTSendable,
+class ADIS16470_IMU : public wpi::Sendable,
                       public wpi::SendableHelper<ADIS16470_IMU> {
  public:
   /* ADIS16470 Calibration Time Enum Class */
@@ -172,7 +172,7 @@ class ADIS16470_IMU : public nt::NTSendable,
    */
   int GetPort() const;
 
-  void InitSendable(nt::NTSendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   /* ADIS16470 Register Map Declaration */

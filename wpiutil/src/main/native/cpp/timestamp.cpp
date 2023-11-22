@@ -6,6 +6,25 @@
 
 #include <atomic>
 
+#ifdef __FRC_ROBORIO__
+#include <stdint.h>
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
+#pragma GCC diagnostic ignored "-Wignored-qualifiers"
+#include <FRC_FPGA_ChipObject/RoboRIO_FRC_ChipObject_Aliases.h>
+#include <FRC_FPGA_ChipObject/nRoboRIO_FPGANamespace/nInterfaceGlobals.h>
+#include <FRC_FPGA_ChipObject/nRoboRIO_FPGANamespace/tHMB.h>
+#include <FRC_NetworkCommunication/LoadOut.h>
+#pragma GCC diagnostic pop
+namespace fpga {
+using namespace nFPGA;
+using namespace nRoboRIO_FPGANamespace;
+}  // namespace fpga
+#include <memory>
+
+#include "dlfcn.h"
+#endif
+
 #ifdef _WIN32
 #include <windows.h>
 
@@ -15,6 +34,88 @@
 #include <chrono>
 #endif
 
+#include <cstdio>
+
+#include <fmt/format.h>
+
+#ifdef __FRC_ROBORIO__
+namespace {
+static constexpr const char hmbName[] = "HMB_0_RAM";
+static constexpr int timestampLowerOffset = 0xF0;
+static constexpr int timestampUpperOffset = 0xF1;
+static constexpr int hmbTimestampOffset = 5;  // 5 us offset
+using NiFpga_CloseHmbFunc = NiFpga_Status (*)(const NiFpga_Session session,
+                                              const char* memoryName);
+using NiFpga_OpenHmbFunc = NiFpga_Status (*)(const NiFpga_Session session,
+                                             const char* memoryName,
+                                             size_t* memorySize,
+                                             void** virtualAddress);
+static std::atomic_flag hmbInitialized = ATOMIC_FLAG_INIT;
+struct HMBHolder {
+  ~HMBHolder() {
+    hmbInitialized.clear();
+    if (hmb) {
+      closeHmb(hmb->getSystemInterface()->getHandle(), hmbName);
+      dlclose(niFpga);
+    }
+  }
+  void Configure() {
+    nFPGA::nRoboRIO_FPGANamespace::g_currentTargetClass =
+        nLoadOut::getTargetClass();
+    int32_t status = 0;
+    hmb.reset(fpga::tHMB::create(&status));
+    niFpga = dlopen("libNiFpga.so", RTLD_LAZY);
+    if (!niFpga) {
+      hmb = nullptr;
+      return;
+    }
+    NiFpga_OpenHmbFunc openHmb = reinterpret_cast<NiFpga_OpenHmbFunc>(
+        dlsym(niFpga, "NiFpgaDll_OpenHmb"));
+    closeHmb = reinterpret_cast<NiFpga_CloseHmbFunc>(
+        dlsym(niFpga, "NiFpgaDll_CloseHmb"));
+    if (openHmb == nullptr || closeHmb == nullptr) {
+      closeHmb = nullptr;
+      dlclose(niFpga);
+      hmb = nullptr;
+      return;
+    }
+    size_t hmbBufferSize = 0;
+    status =
+        openHmb(hmb->getSystemInterface()->getHandle(), hmbName, &hmbBufferSize,
+                reinterpret_cast<void**>(const_cast<uint32_t**>(&hmbBuffer)));
+    if (status != 0) {
+      closeHmb = nullptr;
+      dlclose(niFpga);
+      hmb = nullptr;
+      return;
+    }
+    auto cfg = hmb->readConfig(&status);
+    cfg.Enables_Timestamp = 1;
+    hmb->writeConfig(cfg, &status);
+    hmbInitialized.test_and_set();
+  }
+  void Reset() {
+    hmbInitialized.clear();
+    if (hmb) {
+      std::unique_ptr<fpga::tHMB> oldHmb;
+      oldHmb.swap(hmb);
+      closeHmb(oldHmb->getSystemInterface()->getHandle(), hmbName);
+      closeHmb = nullptr;
+      hmbBuffer = nullptr;
+      oldHmb.reset();
+      dlclose(niFpga);
+      niFpga = nullptr;
+    }
+  }
+  std::unique_ptr<fpga::tHMB> hmb;
+  void* niFpga = nullptr;
+  NiFpga_CloseHmbFunc closeHmb = nullptr;
+  volatile uint32_t* hmbBuffer = nullptr;
+};
+static HMBHolder hmb;
+}  // namespace
+#endif
+
 // offset in microseconds
 static uint64_t time_since_epoch() noexcept {
 #ifdef _WIN32
@@ -22,7 +123,7 @@ static uint64_t time_since_epoch() noexcept {
   uint64_t tmpres = 0;
   // 100-nanosecond intervals since January 1, 1601 (UTC)
   // which means 0.1 us
-  GetSystemTimeAsFileTime(&ft);
+  GetSystemTimePreciseAsFileTime(&ft);
   tmpres |= ft.dwHighDateTime;
   tmpres <<= 32;
   tmpres |= ft.dwLowDateTime;
@@ -88,12 +189,56 @@ uint64_t wpi::NowDefault() {
 
 static std::atomic<uint64_t (*)()> now_impl{wpi::NowDefault};
 
+void wpi::impl::SetupNowRio() {
+#ifdef __FRC_ROBORIO__
+  if (!hmbInitialized.test()) {
+    hmb.Configure();
+  }
+#endif
+}
+
+void wpi::impl::ShutdownNowRio() {
+#ifdef __FRC_ROBORIO__
+  hmb.Reset();
+#endif
+}
+
 void wpi::SetNowImpl(uint64_t (*func)(void)) {
   now_impl = func ? func : NowDefault;
 }
 
 uint64_t wpi::Now() {
+#ifdef __FRC_ROBORIO__
+  // Same code as HAL_GetFPGATime()
+  if (!hmbInitialized.test()) {
+    std::fputs(
+        "FPGA not yet configured in wpi::Now(). Time will not be correct",
+        stderr);
+    std::fflush(stderr);
+    return 1;
+  }
+
+  asm("dmb");
+  uint64_t upper1 = hmb.hmbBuffer[timestampUpperOffset];
+  asm("dmb");
+  uint32_t lower = hmb.hmbBuffer[timestampLowerOffset];
+  asm("dmb");
+  uint64_t upper2 = hmb.hmbBuffer[timestampUpperOffset];
+
+  if (upper1 != upper2) {
+    // Rolled over between the lower call, reread lower
+    asm("dmb");
+    lower = hmb.hmbBuffer[timestampLowerOffset];
+  }
+  // 5 is added here because the time to write from the FPGA
+  // to the HMB buffer is longer then the time to read
+  // from the time register. This would cause register based
+  // timestamps to be ahead of HMB timestamps, which could
+  // be very bad.
+  return (upper2 << 32) + lower + hmbTimestampOffset;
+#else
   return (now_impl.load())();
+#endif
 }
 
 uint64_t wpi::GetSystemTime() {
@@ -101,6 +246,14 @@ uint64_t wpi::GetSystemTime() {
 }
 
 extern "C" {
+
+void WPI_Impl_SetupNowRio(void) {
+  return wpi::impl::SetupNowRio();
+}
+
+void WPI_Impl_ShutdownNowRio(void) {
+  return wpi::impl::ShutdownNowRio();
+}
 
 uint64_t WPI_NowDefault(void) {
   return wpi::NowDefault();

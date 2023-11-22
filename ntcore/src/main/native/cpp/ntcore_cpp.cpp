@@ -685,6 +685,14 @@ void SetServerTeam(NT_Inst inst, unsigned int team, unsigned int port) {
   }
 }
 
+void Disconnect(NT_Inst inst) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+    if (auto client = ii->GetClient()) {
+      client->Disconnect();
+    }
+  }
+}
+
 void StartDSClient(NT_Inst inst, unsigned int port) {
   if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
     if (auto client = ii->GetClient()) {
@@ -771,6 +779,21 @@ NT_Listener AddPolledLogger(NT_ListenerPoller poller, unsigned int minLevel,
     return listener;
   } else {
     return {};
+  }
+}
+
+bool HasSchema(NT_Inst inst, std::string_view name) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+    return ii->localStorage.HasSchema(name);
+  } else {
+    return false;
+  }
+}
+
+void AddSchema(NT_Inst inst, std::string_view name, std::string_view type,
+               std::span<const uint8_t> schema) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+    ii->localStorage.AddSchema(name, type, schema);
   }
 }
 

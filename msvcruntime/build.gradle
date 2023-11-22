@@ -36,7 +36,7 @@ if (OperatingSystem.current().isWindows()) {
         return
     }
 
-    def expectedVersion = VersionNumber.parse(defaultRedistFile.text.trim())
+    def expectedVersion = defaultRedistFile.text.trim()
 
     def runtimeLocation = file("$vsDirectory\\VC\\Redist\\MSVC\\$expectedVersion")
 
@@ -53,7 +53,7 @@ if (OperatingSystem.current().isWindows()) {
         def x64ZipTask = tasks.create('x64RuntimeZip', Zip) {
             destinationDirectory = outputsFolder
             archiveBaseName = zipBaseName
-            classifier = 'x64'
+            archiveClassifier = 'x64'
 
             from x64Folder
         }

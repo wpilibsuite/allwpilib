@@ -11,6 +11,9 @@
 namespace wpi::uv {
 
 std::shared_ptr<Tcp> Tcp::Create(Loop& loop, unsigned int flags) {
+  if (loop.IsClosing()) {
+    return nullptr;
+  }
   auto h = std::make_shared<Tcp>(private_init{});
   int err = uv_tcp_init_ex(loop.GetRaw(), h->GetRaw(), flags);
   if (err < 0) {
@@ -22,7 +25,7 @@ std::shared_ptr<Tcp> Tcp::Create(Loop& loop, unsigned int flags) {
 }
 
 void Tcp::Reuse(std::function<void()> callback, unsigned int flags) {
-  if (IsClosing()) {
+  if (IsLoopClosing() || IsClosing()) {
     return;
   }
   if (!m_reuseData) {
@@ -103,6 +106,9 @@ sockaddr_storage Tcp::GetPeer() {
 
 void Tcp::Connect(const sockaddr& addr,
                   const std::shared_ptr<TcpConnectReq>& req) {
+  if (IsLoopClosing()) {
+    return;
+  }
   if (Invoke(&uv_tcp_connect, req->GetRaw(), GetRaw(), &addr,
              [](uv_connect_t* req, int status) {
                auto& h = *static_cast<TcpConnectReq*>(req->data);
@@ -118,6 +124,9 @@ void Tcp::Connect(const sockaddr& addr,
 }
 
 void Tcp::Connect(const sockaddr& addr, std::function<void()> callback) {
+  if (IsLoopClosing()) {
+    return;
+  }
   auto req = std::make_shared<TcpConnectReq>();
   req->connected.connect(std::move(callback));
   Connect(addr, req);

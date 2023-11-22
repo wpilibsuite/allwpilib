@@ -4,6 +4,12 @@
 
 package edu.wpi.first.math.controller;
 
+import edu.wpi.first.math.MatBuilder;
+import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.controller.proto.ElevatorFeedforwardProto;
+import edu.wpi.first.math.controller.struct.ElevatorFeedforwardStruct;
+import edu.wpi.first.math.system.plant.LinearSystemId;
+
 /**
  * A helper class that computes feedforward outputs for a simple elevator (modeled as a motor acting
  * against the force of gravity).
@@ -13,6 +19,9 @@ public class ElevatorFeedforward {
   public final double kg;
   public final double kv;
   public final double ka;
+
+  public static final ElevatorFeedforwardProto proto = new ElevatorFeedforwardProto();
+  public static final ElevatorFeedforwardStruct struct = new ElevatorFeedforwardStruct();
 
   /**
    * Creates a new ElevatorFeedforward with the specified gains. Units of the gain values will
@@ -51,6 +60,48 @@ public class ElevatorFeedforward {
    */
   public double calculate(double velocity, double acceleration) {
     return ks * Math.signum(velocity) + kg + kv * velocity + ka * acceleration;
+  }
+
+  /**
+   * Calculates the feedforward from the gains and setpoints.
+   *
+   * <p>Note this method is inaccurate when the velocity crosses 0.
+   *
+   * @param currentVelocity The current velocity setpoint.
+   * @param nextVelocity The next velocity setpoint.
+   * @param dtSeconds Time between velocity setpoints in seconds.
+   * @return The computed feedforward.
+   */
+  public double calculate(double currentVelocity, double nextVelocity, double dtSeconds) {
+    // Discretize the affine model.
+    //
+    //   dx/dt = Ax + Bu + c
+    //   dx/dt = Ax + B(u + B⁺c)
+    //   xₖ₊₁ = eᴬᵀxₖ + A⁻¹(eᴬᵀ - I)B(uₖ + B⁺cₖ)
+    //   xₖ₊₁ = A_d xₖ + B_d (uₖ + B⁺cₖ)
+    //   xₖ₊₁ = A_d xₖ + B_duₖ + B_d B⁺cₖ
+    //
+    // Solve for uₖ.
+    //
+    //   B_duₖ = xₖ₊₁ − A_d xₖ − B_d B⁺cₖ
+    //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ − B_d B⁺cₖ)
+    //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) − B⁺cₖ
+    //
+    // For an elevator with the model
+    // dx/dt = -Kv/Ka x + 1/Ka u - Kg/Ka - Ks/Ka sgn(x),
+    // A = -Kv/Ka, B = 1/Ka, and c = -(Kg/Ka + Ks/Ka sgn(x)). Substitute in B
+    // assuming sgn(x) is a constant for the duration of the step.
+    //
+    //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) − Ka(-(Kg/Ka + Ks/Ka sgn(x)))
+    //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + Ka(Kg/Ka + Ks/Ka sgn(x))
+    //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + Kg + Ks sgn(x)
+    var plant = LinearSystemId.identifyVelocitySystem(this.kv, this.ka);
+    var feedforward = new LinearPlantInversionFeedforward<>(plant, dtSeconds);
+
+    var r = MatBuilder.fill(Nat.N1(), Nat.N1(), currentVelocity);
+    var nextR = MatBuilder.fill(Nat.N1(), Nat.N1(), nextVelocity);
+
+    return kg + ks * Math.signum(currentVelocity) + feedforward.calculate(r, nextR).get(0, 0);
   }
 
   /**

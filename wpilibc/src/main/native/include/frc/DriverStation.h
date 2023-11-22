@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <optional>
 #include <string>
 
 #include <units/time.h>
@@ -21,7 +22,7 @@ namespace frc {
  */
 class DriverStation final {
  public:
-  enum Alliance { kRed, kBlue, kInvalid };
+  enum Alliance { kRed, kBlue };
   enum MatchType { kNone, kPractice, kQualification, kElimination };
 
   static constexpr int kJoystickPorts = 6;
@@ -210,6 +211,14 @@ class DriverStation final {
   static bool IsTest();
 
   /**
+   * Check if the DS is commanding Test mode and if it has enabled the robot.
+   *
+   * @return True if the robot is being commanded to be in Test mode and
+   * enabled.
+   */
+  static bool IsTestEnabled();
+
+  /**
    * Check if the DS is attached.
    *
    * @return True if the DS is connected to the robot
@@ -226,6 +235,9 @@ class DriverStation final {
 
   /**
    * Returns the game specific message provided by the FMS.
+   *
+   * If the FMS is not connected, it is set from the game data setting on the
+   * driver station.
    *
    * @return A string containing the game specific message.
    */
@@ -262,39 +274,58 @@ class DriverStation final {
   static int GetReplayNumber();
 
   /**
-   * Return the alliance that the driver station says it is on.
+   * Return the alliance that the driver station says it is on from the FMS.
+   *
+   * If the FMS is not connected, it is set from the team alliance setting on
+   * the driver station.
    *
    * This could return kRed or kBlue.
    *
    * @return The Alliance enum (kRed, kBlue or kInvalid)
    */
-  static Alliance GetAlliance();
+  static std::optional<Alliance> GetAlliance();
 
   /**
-   * Return the driver station location on the field.
+   * Return the driver station location from the FMS.
+   *
+   * If the FMS is not connected, it is set from the team alliance setting on
+   * the driver station.
    *
    * This could return 1, 2, or 3.
    *
    * @return The location of the driver station (1-3, 0 for invalid)
    */
-  static int GetLocation();
+  static std::optional<int> GetLocation();
 
   /**
-   * Return the approximate match time.
+   * Wait for a DS connection.
    *
-   * The FMS does not send an official match time to the robots, but does send
-   * an approximate match time. The value will count down the time remaining in
-   * the current period (auto or teleop).
-   *
+   * @param timeout timeout in seconds. 0 for infinite.
+   * @return true if connected, false if timeout
+   */
+  static bool WaitForDsConnection(units::second_t timeout);
+
+  /**
+   * Return the approximate match time. The FMS does not send an official match
+   * time to the robots, but does send an approximate match time. The value will
+   * count down the time remaining in the current period (auto or teleop).
    * Warning: This is not an official time (so it cannot be used to dispute ref
    * calls or guarantee that a function will trigger before the match ends).
    *
-   * The Practice Match function of the DS approximates the behavior seen on
-   * the field.
+   * <p>When connected to the real field, this number only changes in full
+   * integer increments, and always counts down.
    *
-   * @return Time remaining in current match period (auto or teleop)
+   * <p>When the DS is in practice mode, this number is a floating point number,
+   * and counts down.
+   *
+   * <p>When the DS is in teleop or autonomous mode, this number is a floating
+   * point number, and counts up.
+   *
+   * <p>Simulation matches DS behavior without an FMS connected.
+   *
+   * @return Time remaining in current match period (auto or teleop) in seconds
    */
-  static double GetMatchTime();
+  static units::second_t GetMatchTime();
 
   /**
    * Read the battery voltage.

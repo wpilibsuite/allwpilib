@@ -10,7 +10,7 @@
 
 namespace frc2 {
 /**
- * A subclass of {@link Joystick} with {@link Trigger} factories for
+ * A version of {@link Joystick} with {@link Trigger} factories for
  * command-based.
  *
  * @see Joystick

@@ -46,9 +46,10 @@ class PneumaticHub : public PneumaticsBase {
    * and will turn off when the pressure reaches {@code maxPressure}.
    *
    * @param minPressure The minimum pressure. The compressor will turn on when
-   * the pressure drops below this value.
+   * the pressure drops below this value. Range 0 - 120 PSI.
    * @param maxPressure The maximum pressure. The compressor will turn off when
-   * the pressure reaches this value.
+   * the pressure reaches this value. Range 0 - 120 PSI. Must be larger then
+   * minPressure.
    */
   void EnableCompressorAnalog(
       units::pounds_per_square_inch_t minPressure,
@@ -74,10 +75,11 @@ class PneumaticHub : public PneumaticsBase {
    *
    * @param minPressure The minimum pressure. The compressor will turn on when
    * the pressure drops below this value and the pressure switch indicates that
-   * the system is not full.
+   * the system is not full.  Range 0 - 120 PSI.
    * @param maxPressure The maximum pressure. The compressor will turn off when
    * the pressure reaches this value or the pressure switch is disconnected or
-   * indicates that the system is full.
+   * indicates that the system is full. Range 0 - 120 PSI. Must be larger then
+   * minPressure.
    */
   void EnableCompressorHybrid(
       units::pounds_per_square_inch_t minPressure,

@@ -13,7 +13,7 @@
 #include "frc/MathUtil.h"
 #include "wpimath/MathShared.h"
 
-using namespace frc2;
+using namespace frc;
 
 PIDController::PIDController(double Kp, double Ki, double Kd,
                              units::second_t period)
@@ -52,6 +52,14 @@ void PIDController::SetD(double Kd) {
   m_Kd = Kd;
 }
 
+void PIDController::SetIZone(double iZone) {
+  if (iZone < 0) {
+    wpi::math::MathSharedStore::ReportError(
+        "IZone must be a non-negative number, got {}!", iZone);
+  }
+  m_iZone = iZone;
+}
+
 double PIDController::GetP() const {
   return m_Kp;
 }
@@ -62,6 +70,10 @@ double PIDController::GetI() const {
 
 double PIDController::GetD() const {
   return m_Kd;
+}
+
+double PIDController::GetIZone() const {
+  return m_iZone;
 }
 
 units::second_t PIDController::GetPeriod() const {
@@ -83,7 +95,7 @@ void PIDController::SetSetpoint(double setpoint) {
   if (m_continuous) {
     double errorBound = (m_maximumInput - m_minimumInput) / 2.0;
     m_positionError =
-        frc::InputModulus(m_setpoint - m_measurement, -errorBound, errorBound);
+        InputModulus(m_setpoint - m_measurement, -errorBound, errorBound);
   } else {
     m_positionError = m_setpoint - m_measurement;
   }
@@ -144,14 +156,18 @@ double PIDController::Calculate(double measurement) {
   if (m_continuous) {
     double errorBound = (m_maximumInput - m_minimumInput) / 2.0;
     m_positionError =
-        frc::InputModulus(m_setpoint - m_measurement, -errorBound, errorBound);
+        InputModulus(m_setpoint - m_measurement, -errorBound, errorBound);
   } else {
     m_positionError = m_setpoint - m_measurement;
   }
 
   m_velocityError = (m_positionError - m_prevError) / m_period.value();
 
-  if (m_Ki != 0) {
+  // If the absolute value of the position error is outside of IZone, reset the
+  // total error
+  if (std::abs(m_positionError) > m_iZone) {
+    m_totalError = 0;
+  } else if (m_Ki != 0) {
     m_totalError =
         std::clamp(m_totalError + m_positionError * m_period.value(),
                    m_minimumIntegral / m_Ki, m_maximumIntegral / m_Ki);
@@ -162,6 +178,7 @@ double PIDController::Calculate(double measurement) {
 
 double PIDController::Calculate(double measurement, double setpoint) {
   m_setpoint = setpoint;
+  m_haveSetpoint = true;
   return Calculate(measurement);
 }
 
@@ -181,6 +198,9 @@ void PIDController::InitSendable(wpi::SendableBuilder& builder) {
       "i", [this] { return GetI(); }, [this](double value) { SetI(value); });
   builder.AddDoubleProperty(
       "d", [this] { return GetD(); }, [this](double value) { SetD(value); });
+  builder.AddDoubleProperty(
+      "izone", [this] { return GetIZone(); },
+      [this](double value) { SetIZone(value); });
   builder.AddDoubleProperty(
       "setpoint", [this] { return GetSetpoint(); },
       [this](double value) { SetSetpoint(value); });

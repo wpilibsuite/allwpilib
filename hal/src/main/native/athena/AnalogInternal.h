@@ -69,7 +69,7 @@ void setAnalogNumChannelsToActivate(int32_t channels);
  * number of active channels and the sample rate.
  *
  * When the number of channels changes, use the new value.  Otherwise,
- * return the curent value.
+ * return the current value.
  *
  * @return Value to write to the active channels field.
  */

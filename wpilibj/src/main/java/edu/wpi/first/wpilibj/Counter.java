@@ -51,7 +51,7 @@ public class Counter implements CounterBase, Sendable, AutoCloseable {
   private boolean m_allocatedDownSource;
   int m_counter; // /< The FPGA counter object.
   private int m_index; // /< The index of this counter.
-  private double m_distancePerPulse; // distance of travel for each tick
+  private double m_distancePerPulse = 1; // distance of travel for each tick
 
   /**
    * Create an instance of a counter with the given mode.

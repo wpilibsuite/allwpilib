@@ -16,11 +16,14 @@
 
 #include "wpi/DenseMapInfo.h"
 #include "wpi/Hashing.h"
+#include "wpi/Endian.h"
 #include <optional>
 #include <string>
 #include <tuple>
 
 namespace wpi {
+template <typename HasherT, support::endianness Endianness>
+class HashBuilderImpl;
 class raw_ostream;
 
 /// Represents a version number in the form major[.minor[.subminor[.build]]].
@@ -37,24 +40,25 @@ class VersionTuple {
   unsigned HasBuild : 1;
 
 public:
-  VersionTuple()
+  constexpr VersionTuple()
       : Major(0), Minor(0), HasMinor(false), Subminor(0), HasSubminor(false),
         Build(0), HasBuild(false) {}
 
-  explicit VersionTuple(unsigned Major)
+  explicit constexpr VersionTuple(unsigned Major)
       : Major(Major), Minor(0), HasMinor(false), Subminor(0),
         HasSubminor(false), Build(0), HasBuild(false) {}
 
-  explicit VersionTuple(unsigned Major, unsigned Minor)
+  explicit constexpr VersionTuple(unsigned Major, unsigned Minor)
       : Major(Major), Minor(Minor), HasMinor(true), Subminor(0),
         HasSubminor(false), Build(0), HasBuild(false) {}
 
-  explicit VersionTuple(unsigned Major, unsigned Minor, unsigned Subminor)
+  explicit constexpr VersionTuple(unsigned Major, unsigned Minor,
+                                  unsigned Subminor)
       : Major(Major), Minor(Minor), HasMinor(true), Subminor(Subminor),
         HasSubminor(true), Build(0), HasBuild(false) {}
 
-  explicit VersionTuple(unsigned Major, unsigned Minor, unsigned Subminor,
-                        unsigned Build)
+  explicit constexpr VersionTuple(unsigned Major, unsigned Minor,
+                                  unsigned Subminor, unsigned Build)
       : Major(Major), Minor(Minor), HasMinor(true), Subminor(Subminor),
         HasSubminor(true), Build(Build), HasBuild(true) {}
 
@@ -93,6 +97,12 @@ public:
     if (HasBuild)
       return VersionTuple(Major, Minor, Subminor);
     return *this;
+  }
+
+  /// Return a version tuple that contains a different major version but
+  /// everything else is the same.
+  VersionTuple withMajorReplaced(unsigned NewMajor) const {
+    return VersionTuple(NewMajor, Minor, Subminor, Build);
   }
 
   /// Return a version tuple that contains only components that are non-zero.

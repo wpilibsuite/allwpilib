@@ -24,7 +24,7 @@
  */
 
 /*
- * This is the MPack 1.1 amalgamation package.
+ * This is the MPack 1.1.1 amalgamation package.
  *
  * http://github.com/ludocode/mpack
  */
@@ -38,6 +38,11 @@
 #include "mpack-config.h"
 #endif
 
+/**
+ * @defgroup mpack MPack
+ * MPack is a C implementation of an encoder and decoder for the MessagePack
+ * serialization format.
+ */
 
 /* mpack/mpack-platform.h.h */
 
@@ -62,7 +67,8 @@
 
 
 /**
- * @defgroup config Configuration Options
+ * @defgroup mpack_config Configuration Options
+ * @ingroup mpack
  *
  * Defines the MPack configuration options.
  *
@@ -1880,7 +1886,8 @@ MPACK_EXTERN_C_BEGIN
 
 
 /**
- * @defgroup common Tags and Common Elements
+ * @defgroup mpack_common Tags and Common Elements
+ * @ingroup mpack
  *
  * Contains types, constants and functions shared by both the encoding
  * and decoding portions of MPack.
@@ -1892,7 +1899,7 @@ MPACK_EXTERN_C_BEGIN
 
 #define MPACK_VERSION_MAJOR 1  /**< The major version number of MPack. */
 #define MPACK_VERSION_MINOR 1  /**< The minor version number of MPack. */
-#define MPACK_VERSION_PATCH 0  /**< The patch version number of MPack. */
+#define MPACK_VERSION_PATCH 1  /**< The patch version number of MPack. */
 
 /** A number containing the version number of MPack for comparison purposes. */
 #define MPACK_VERSION ((MPACK_VERSION_MAJOR * 10000) + \
@@ -3056,7 +3063,8 @@ struct mpack_track_t;
 #endif
 
 /**
- * @defgroup writer Write API
+ * @defgroup mpack_writer Write API
+ * @ingroup mpack
  *
  * The MPack Write API encodes structured data of a fixed (hardcoded) schema to MessagePack.
  *
@@ -3779,7 +3787,7 @@ MPACK_INLINE void mpack_finish_map(mpack_writer_t* writer) {
 /**
  * Starts building an array.
  *
- * Elements must follow, and mpack_complete_map() must be called when done. The
+ * Elements must follow, and mpack_complete_array() must be called when done. The
  * number of elements is determined automatically.
  *
  * If you know ahead of time the number of elements in the array, it is more
@@ -4361,7 +4369,8 @@ struct mpack_track_t;
 #define MPACK_READER_SMALL_FRACTION_DENOMINATOR 32
 
 /**
- * @defgroup reader Reader API
+ * @defgroup mpack_reader Reader API
+ * @ingroup mpack
  *
  * The MPack Reader API contains functions for imperatively reading dynamically
  * typed data from a MessagePack stream.
@@ -5303,7 +5312,8 @@ MPACK_EXTERN_C_BEGIN
 #endif
 
 /**
- * @defgroup expect Expect API
+ * @defgroup mpack_expect Expect API
+ * @ingroup mpack
  *
  * The MPack Expect API allows you to easily read MessagePack data when you
  * expect it to follow a predefined schema.
@@ -6770,7 +6780,8 @@ MPACK_EXTERN_C_BEGIN
 #if MPACK_NODE
 
 /**
- * @defgroup node Node API
+ * @defgroup mpack_node Node API
+ * @ingroup mpack
  *
  * The MPack Node API allows you to parse a chunk of MessagePack into a
  * dynamically typed data structure, providing random access to the parsed
@@ -7719,7 +7730,7 @@ size_t mpack_node_bin_size(mpack_node_t node);
  *
  * This returns zero if the tree is in an error state.
  *
- * If this node is not a str, bin or map, @ref mpack_error_type is raised and zero
+ * If this node is not a str, bin or ext, @ref mpack_error_type is raised and zero
  * is returned.
  */
 uint32_t mpack_node_data_len(mpack_node_t node);
@@ -7759,7 +7770,7 @@ const char* mpack_node_str(mpack_node_t node);
  *
  * The pointer is valid as long as the data backing the tree is valid.
  *
- * If this node is not of a str, bin or map, @ref mpack_error_type is raised, and
+ * If this node is not of a str, bin or ext, @ref mpack_error_type is raised, and
  * @c NULL is returned.
  *
  * @see mpack_node_copy_cstr()

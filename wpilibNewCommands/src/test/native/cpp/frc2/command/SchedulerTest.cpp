@@ -43,14 +43,98 @@ TEST_F(SchedulerTest, SchedulerLambdaInterrupt) {
   EXPECT_EQ(counter, 1);
 }
 
+TEST_F(SchedulerTest, SchedulerLambdaInterruptNoCause) {
+  CommandScheduler scheduler = GetScheduler();
+
+  int counter = 0;
+
+  scheduler.OnCommandInterrupt(
+      [&counter](const Command&, const std::optional<Command*>& interruptor) {
+        EXPECT_FALSE(interruptor);
+        counter++;
+      });
+
+  RunCommand command([] {});
+
+  scheduler.Schedule(&command);
+  scheduler.Cancel(&command);
+
+  EXPECT_EQ(1, counter);
+}
+
+TEST_F(SchedulerTest, SchedulerLambdaInterruptCause) {
+  CommandScheduler scheduler = GetScheduler();
+
+  int counter = 0;
+
+  TestSubsystem subsystem{};
+  RunCommand command([] {}, {&subsystem});
+  InstantCommand interruptor([] {}, {&subsystem});
+
+  scheduler.OnCommandInterrupt(
+      [&](const Command&, const std::optional<Command*>& cause) {
+        ASSERT_TRUE(cause);
+        EXPECT_EQ(&interruptor, *cause);
+        counter++;
+      });
+
+  scheduler.Schedule(&command);
+  scheduler.Schedule(&interruptor);
+
+  EXPECT_EQ(1, counter);
+}
+
+TEST_F(SchedulerTest, SchedulerLambdaInterruptCauseInRunLoop) {
+  CommandScheduler scheduler = GetScheduler();
+
+  int counter = 0;
+
+  TestSubsystem subsystem{};
+  RunCommand command([] {}, {&subsystem});
+  InstantCommand interruptor([] {}, {&subsystem});
+  // This command will schedule interruptor in execute() inside the run loop
+  InstantCommand interruptorScheduler(
+      [&] { scheduler.Schedule(&interruptor); });
+
+  scheduler.OnCommandInterrupt(
+      [&](const Command&, const std::optional<Command*>& cause) {
+        ASSERT_TRUE(cause);
+        EXPECT_EQ(&interruptor, *cause);
+        counter++;
+      });
+
+  scheduler.Schedule(&command);
+  scheduler.Schedule(&interruptorScheduler);
+
+  scheduler.Run();
+
+  EXPECT_EQ(1, counter);
+}
+
+TEST_F(SchedulerTest, RegisterSubsystem) {
+  CommandScheduler scheduler = GetScheduler();
+
+  int counter = 0;
+  TestSubsystem system{[&counter] { counter++; }};
+
+  EXPECT_NO_FATAL_FAILURE(scheduler.RegisterSubsystem(&system));
+
+  scheduler.Run();
+  EXPECT_EQ(counter, 1);
+}
+
 TEST_F(SchedulerTest, UnregisterSubsystem) {
   CommandScheduler scheduler = GetScheduler();
 
-  TestSubsystem system;
+  int counter = 0;
+  TestSubsystem system{[&counter] { counter++; }};
 
   scheduler.RegisterSubsystem(&system);
 
   EXPECT_NO_FATAL_FAILURE(scheduler.UnregisterSubsystem(&system));
+
+  scheduler.Run();
+  ASSERT_EQ(counter, 0);
 }
 
 TEST_F(SchedulerTest, SchedulerCancelAll) {
@@ -62,6 +146,10 @@ TEST_F(SchedulerTest, SchedulerCancelAll) {
   int counter = 0;
 
   scheduler.OnCommandInterrupt([&counter](const Command&) { counter++; });
+  scheduler.OnCommandInterrupt(
+      [](const Command&, const std::optional<Command*>& interruptor) {
+        EXPECT_FALSE(interruptor);
+      });
 
   scheduler.Schedule(&command);
   scheduler.Schedule(&command2);

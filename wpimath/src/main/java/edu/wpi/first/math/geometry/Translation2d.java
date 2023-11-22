@@ -4,12 +4,21 @@
 
 package edu.wpi.first.math.geometry;
 
+import static edu.wpi.first.units.Units.Meters;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.proto.Translation2dProto;
+import edu.wpi.first.math.geometry.struct.Translation2dStruct;
 import edu.wpi.first.math.interpolation.Interpolatable;
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.Measure;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -53,6 +62,17 @@ public class Translation2d implements Interpolatable<Translation2d> {
   public Translation2d(double distance, Rotation2d angle) {
     m_x = distance * angle.getCos();
     m_y = distance * angle.getSin();
+  }
+
+  /**
+   * Constructs a Translation2d with the X and Y components equal to the provided values. The X and
+   * Y components will be converted to and tracked as meters.
+   *
+   * @param x The x component of the translation.
+   * @param y The y component of the translation.
+   */
+  public Translation2d(Measure<Distance> x, Measure<Distance> y) {
+    this(x.in(Meters), y.in(Meters));
   }
 
   /**
@@ -185,6 +205,16 @@ public class Translation2d implements Interpolatable<Translation2d> {
     return new Translation2d(m_x / scalar, m_y / scalar);
   }
 
+  /**
+   * Returns the nearest Translation2d from a list of translations.
+   *
+   * @param translations The list of translations.
+   * @return The nearest Translation2d from the list.
+   */
+  public Translation2d nearest(List<Translation2d> translations) {
+    return Collections.min(translations, Comparator.comparing(this::getDistance));
+  }
+
   @Override
   public String toString() {
     return String.format("Translation2d(X: %.2f, Y: %.2f)", m_x, m_y);
@@ -216,4 +246,7 @@ public class Translation2d implements Interpolatable<Translation2d> {
         MathUtil.interpolate(this.getX(), endValue.getX(), t),
         MathUtil.interpolate(this.getY(), endValue.getY(), t));
   }
+
+  public static final Translation2dStruct struct = new Translation2dStruct();
+  public static final Translation2dProto proto = new Translation2dProto();
 }

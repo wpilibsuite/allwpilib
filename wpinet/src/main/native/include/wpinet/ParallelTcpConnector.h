@@ -59,6 +59,9 @@ class ParallelTcpConnector
   static std::shared_ptr<ParallelTcpConnector> Create(
       wpi::uv::Loop& loop, wpi::uv::Timer::Time reconnectRate,
       wpi::Logger& logger, std::function<void(wpi::uv::Tcp& tcp)> connected) {
+    if (loop.IsClosing()) {
+      return nullptr;
+    }
     return std::make_shared<ParallelTcpConnector>(
         loop, reconnectRate, logger, std::move(connected), private_init{});
   }
@@ -112,7 +115,8 @@ class ParallelTcpConnector
   std::shared_ptr<wpi::uv::Timer> m_reconnectTimer;
   std::vector<std::pair<std::string, unsigned int>> m_servers;
   std::vector<std::weak_ptr<wpi::uv::GetAddrInfoReq>> m_resolvers;
-  std::vector<std::weak_ptr<wpi::uv::Tcp>> m_attempts;
+  std::vector<std::pair<sockaddr_storage, std::weak_ptr<wpi::uv::Tcp>>>
+      m_attempts;
   bool m_isConnected{false};
 };
 
