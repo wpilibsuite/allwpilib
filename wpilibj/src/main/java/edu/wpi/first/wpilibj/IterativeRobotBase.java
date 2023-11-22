@@ -70,7 +70,7 @@ public abstract class IterativeRobotBase extends RobotBase {
   private final double m_period;
   private final Watchdog m_watchdog;
   private boolean m_ntFlushEnabled = true;
-  private boolean m_lwEnabledInTest = false;
+  private boolean m_lwEnabledInTest;
   private boolean m_calledDsConnected;
 
   /**
