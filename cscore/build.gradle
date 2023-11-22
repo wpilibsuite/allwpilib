@@ -219,13 +219,9 @@ model {
                                 nativeUtils.useRequiredLibrary(it, 'ni_link_libraries', 'ni_runtime_libraries')
                             }
                         }
-                        sources {
-                            cpp {
-                                source {
-                                    srcDirs 'examples/' + "${key}"
-                                    include '**/*.cpp'
-                                }
-                            }
+                        sources.cpp.source {
+                            srcDirs 'examples/' + "${key}"
+                            include '**/*.cpp'
                         }
                     }
                 }
@@ -240,13 +236,9 @@ model {
                             nativeUtils.useRequiredLibrary(it, 'ni_link_libraries', 'ni_runtime_libraries')
                         }
                     }
-                    sources {
-                        cpp {
-                            source {
-                                srcDirs 'examples/' + "${key}"
-                                include '**/*.cpp'
-                            }
-                        }
+                    sources.cpp.source {
+                        srcDirs 'examples/' + "${key}"
+                        include '**/*.cpp'
                     }
                 }
             }

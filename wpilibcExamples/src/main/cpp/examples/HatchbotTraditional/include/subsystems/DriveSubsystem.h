@@ -8,11 +8,11 @@
 #include <frc/drive/DifferentialDrive.h>
 #include <frc/motorcontrol/MotorControllerGroup.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
-#include <frc2/command/Subsystem.h>
+#include <frc2/command/SubsystemBase.h>
 
 #include "Constants.h"
 
-class DriveSubsystem : public frc2::Subsystem {
+class DriveSubsystem : public frc2::SubsystemBase {
  public:
   DriveSubsystem();
 

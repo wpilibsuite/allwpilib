@@ -219,10 +219,11 @@ class Frame {
                         defaultQuality);
   }
 
-  bool GetCv(cv::Mat& image) {
-    return GetCv(image, GetOriginalWidth(), GetOriginalHeight());
+  bool GetCv(cv::Mat& image, VideoMode::PixelFormat pixelFormat) {
+    return GetCv(image, GetOriginalWidth(), GetOriginalHeight(), pixelFormat);
   }
-  bool GetCv(cv::Mat& image, int width, int height);
+  bool GetCv(cv::Mat& image, int width, int height,
+             VideoMode::PixelFormat pixelFormat);
 
  private:
   Image* ConvertImpl(Image* image, VideoMode::PixelFormat pixelFormat,

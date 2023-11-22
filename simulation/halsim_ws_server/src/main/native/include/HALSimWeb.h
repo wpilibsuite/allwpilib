@@ -13,19 +13,16 @@
 #include <WSProviderContainer.h>
 #include <WSProvider_SimDevice.h>
 #include <wpi/StringMap.h>
+#include <wpi/json_fwd.h>
 #include <wpinet/uv/Async.h>
 #include <wpinet/uv/Loop.h>
 #include <wpinet/uv/Tcp.h>
-
-namespace wpi {
-class json;
-}  // namespace wpi
 
 namespace wpilibws {
 
 class HALSimWeb : public std::enable_shared_from_this<HALSimWeb> {
  public:
-  using LoopFunc = std::function<void(void)>;
+  using LoopFunc = std::function<void()>;
   using UvExecFunc = wpi::uv::Async<LoopFunc>;
 
   HALSimWeb(wpi::uv::Loop& loop, ProviderContainer& providers,

@@ -203,13 +203,14 @@ class UnitsTest {
 
   @Test
   void testRevolutions() {
-    testBaseUnit(Revolutions);
+    assertEquals(1, Revolutions.convertFrom(2 * Math.PI, Radians), thresh);
     assertEquals("Revolution", Revolutions.name());
     assertEquals("R", Revolutions.symbol());
   }
 
   @Test
   void testRadians() {
+    testBaseUnit(Radians);
     assertEquals(2 * Math.PI, Radians.convertFrom(1, Revolutions), thresh);
     assertEquals(2 * Math.PI, Radians.convertFrom(360, Degrees), thresh);
     assertEquals("Radian", Radians.name());

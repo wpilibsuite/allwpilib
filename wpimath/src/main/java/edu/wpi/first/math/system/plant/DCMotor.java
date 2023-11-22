@@ -4,6 +4,8 @@
 
 package edu.wpi.first.math.system.plant;
 
+import edu.wpi.first.math.system.plant.proto.DCMotorProto;
+import edu.wpi.first.math.system.plant.struct.DCMotorStruct;
 import edu.wpi.first.math.util.Units;
 
 /** Holds the constants for a DC motor. */
@@ -16,6 +18,9 @@ public class DCMotor {
   public final double rOhms;
   public final double KvRadPerSecPerVolt;
   public final double KtNMPerAmp;
+
+  public static final DCMotorProto proto = new DCMotorProto();
+  public static final DCMotorStruct struct = new DCMotorStruct();
 
   /**
    * Constructs a DC motor.
@@ -249,5 +254,41 @@ public class DCMotor {
     // From https://www.pololu.com/product/1520/specs
     return new DCMotor(
         4.5, 0.1765, 1.25, 0.13, Units.rotationsPerMinuteToRadiansPerSecond(150.0), numMotors);
+  }
+
+  /**
+   * Return a gearbox of Kraken X60 brushless motors.
+   *
+   * @param numMotors Number of motors in the gearbox.
+   * @return a gearbox of Kraken X60 motors.
+   */
+  public static DCMotor getKrakenX60(int numMotors) {
+    // From https://store.ctr-electronics.com/announcing-kraken-x60/
+    return new DCMotor(
+        12, 7.09, 366, 2, Units.rotationsPerMinuteToRadiansPerSecond(6000), numMotors);
+  }
+
+  /**
+   * Return a gearbox of Kraken X60 brushless motors with FOC (Field-Oriented Control) enabled.
+   *
+   * @param numMotors Number of motors in the gearbox.
+   * @return A gearbox of Kraken X60 FOC enabled motors.
+   */
+  public static DCMotor getKrakenX60Foc(int numMotors) {
+    // From https://store.ctr-electronics.com/announcing-kraken-x60/
+    return new DCMotor(
+        12, 9.37, 483, 2, Units.rotationsPerMinuteToRadiansPerSecond(5800), numMotors);
+  }
+
+  /**
+   * Return a gearbox of Neo Vortex brushless motors.
+   *
+   * @param numMotors Number of motors in the gearbox.
+   * @return a gearbox of Neo Vortex motors.
+   */
+  public static DCMotor getNeoVortex(int numMotors) {
+    // From https://www.revrobotics.com/next-generation-spark-neo/
+    return new DCMotor(
+        12, 3.60, 211, 3.6, Units.rotationsPerMinuteToRadiansPerSecond(6784), numMotors);
   }
 }

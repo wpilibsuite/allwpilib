@@ -8,6 +8,7 @@
 #include <functional>
 #include <initializer_list>
 #include <memory>
+#include <optional>
 #include <span>
 #include <utility>
 
@@ -48,6 +49,8 @@ class CommandScheduler final : public wpi::Sendable,
   CommandScheduler& operator=(const CommandScheduler&) = delete;
 
   using Action = std::function<void(const Command&)>;
+  using InterruptAction =
+      std::function<void(const Command&, const std::optional<Command*>&)>;
 
   /**
    * Changes the period of the loop overrun watchdog. This should be kept in
@@ -354,6 +357,16 @@ class CommandScheduler final : public wpi::Sendable,
   void OnCommandInterrupt(Action action);
 
   /**
+   * Adds an action to perform on the interruption of any command by the
+   * scheduler. The action receives the interrupted command and an optional
+   * containing the interrupting command, or nullopt if it was not canceled by a
+   * command (e.g., by Cancel()).
+   *
+   * @param action the action to perform
+   */
+  void OnCommandInterrupt(InterruptAction action);
+
+  /**
    * Adds an action to perform on the finishing of any command by the scheduler.
    *
    * @param action the action to perform
@@ -396,6 +409,8 @@ class CommandScheduler final : public wpi::Sendable,
 
   void SetDefaultCommandImpl(Subsystem* subsystem,
                              std::unique_ptr<Command> command);
+
+  void Cancel(Command* command, std::optional<Command*> interruptor);
 
   class Impl;
   std::unique_ptr<Impl> m_impl;

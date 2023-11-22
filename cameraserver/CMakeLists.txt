@@ -28,6 +28,22 @@ if (WITH_JAVA)
 
 endif()
 
+if (WITH_JAVA_SOURCE)
+    find_package(Java REQUIRED)
+    include(UseJava)
+    file(GLOB CAMERASERVER_SOURCES src/main/java/edu/wpi/first/cameraserver/*.java)
+    file(GLOB VISION_SOURCES src/main/java/edu/wpi/first/vision/*.java)
+    add_jar(cameraserver_src_jar
+    RESOURCES NAMESPACE "edu/wpi/first/cameraserver" ${CAMERASERVER_SOURCES}
+    NAMESPACE "edu/wpi/first/vision" ${VISION_SOURCES}
+    OUTPUT_NAME cameraserver-sources)
+
+    get_property(CAMERASERVER_SRC_JAR_FILE TARGET cameraserver_src_jar PROPERTY JAR_FILE)
+    install(FILES ${CAMERASERVER_SRC_JAR_FILE} DESTINATION "${java_lib_dest}")
+
+    set_property(TARGET cameraserver_src_jar PROPERTY FOLDER "java")
+endif()
+
 file(GLOB_RECURSE
     cameraserver_native_src src/main/native/cpp/*.cpp)
 add_library(cameraserver ${cameraserver_native_src})
@@ -40,22 +56,12 @@ target_link_libraries(cameraserver PUBLIC ntcore cscore wpiutil ${OpenCV_LIBS})
 
 set_property(TARGET cameraserver PROPERTY FOLDER "libraries")
 
-install(TARGETS cameraserver EXPORT cameraserver DESTINATION "${main_lib_dest}")
+install(TARGETS cameraserver EXPORT cameraserver)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/cameraserver")
 
-if (WITH_JAVA AND MSVC)
-    install(TARGETS cameraserver RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)
-endif()
-
-if (WITH_FLAT_INSTALL)
-    set (cameraserver_config_dir ${wpilib_dest})
-else()
-    set (cameraserver_config_dir share/cameraserver)
-endif()
-
 configure_file(cameraserver-config.cmake.in ${WPILIB_BINARY_DIR}/cameraserver-config.cmake )
-install(FILES ${WPILIB_BINARY_DIR}/cameraserver-config.cmake DESTINATION ${cameraserver_config_dir})
-install(EXPORT cameraserver DESTINATION ${cameraserver_config_dir})
+install(FILES ${WPILIB_BINARY_DIR}/cameraserver-config.cmake DESTINATION share/cameraserver)
+install(EXPORT cameraserver DESTINATION share/cameraserver)
 
 file(GLOB multiCameraServer_src multiCameraServer/src/main/native/cpp/*.cpp)
 add_executable(multiCameraServer ${multiCameraServer_src})

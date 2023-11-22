@@ -6,7 +6,10 @@
 
 #include <cmath>
 
+#include <Eigen/Core>
 #include <wpi/json.h>
+
+#include "geometry3d.pb.h"
 
 using namespace frc;
 
@@ -21,14 +24,14 @@ namespace {
  * @param rotation The rotation vector.
  * @return The rotation vector as a 3x3 rotation matrix.
  */
-Matrixd<3, 3> RotationVectorToMatrix(const Vectord<3>& rotation) {
+Eigen::Matrix3d RotationVectorToMatrix(const Eigen::Vector3d& rotation) {
   // Given a rotation vector <a, b, c>,
   //         [ 0 -c  b]
   // Omega = [ c  0 -a]
   //         [-b  a  0]
-  return Matrixd<3, 3>{{0.0, -rotation(2), rotation(1)},
-                       {rotation(2), 0.0, -rotation(0)},
-                       {-rotation(1), rotation(0), 0.0}};
+  return Eigen::Matrix3d{{0.0, -rotation(2), rotation(1)},
+                         {rotation(2), 0.0, -rotation(0)},
+                         {-rotation(1), rotation(0), 0.0}};
 }
 }  // namespace
 

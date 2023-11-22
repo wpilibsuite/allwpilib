@@ -221,6 +221,7 @@ public final class MutableMeasure<U extends Unit<U>> implements Measure<U> {
    * having to wrap raw numbers in a {@code Measure} object and pay for an object allocation.
    *
    * @param magnitude the magnitude of the other measurement.
+   * @param unit the unit of the other measurement
    * @return this measure
    */
   public MutableMeasure<U> mut_minus(double magnitude, U unit) {

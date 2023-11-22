@@ -11,10 +11,10 @@
 #include <stdexcept>
 #include <vector>
 
+#include <Eigen/QR>
 #include <wpi/array.h>
 #include <wpi/circular_buffer.h>
 
-#include "Eigen/QR"
 #include "frc/EigenCore.h"
 #include "units/time.h"
 #include "wpimath/MathShared.h"

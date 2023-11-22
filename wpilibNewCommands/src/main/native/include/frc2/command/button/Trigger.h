@@ -6,9 +6,7 @@
 
 #include <concepts>
 #include <functional>
-#include <initializer_list>
 #include <memory>
-#include <span>
 #include <utility>
 
 #include <frc/event/BooleanEvent.h>
@@ -269,6 +267,12 @@ class Trigger {
   Trigger Debounce(units::second_t debounceTime,
                    frc::Debouncer::DebounceType type =
                        frc::Debouncer::DebounceType::kRising);
+
+  /**
+   * Returns the current state of this trigger.
+   * @return A bool representing the current state of the trigger.
+   */
+  bool Get() const;
 
  private:
   frc::EventLoop* m_loop;

@@ -14,6 +14,7 @@
 #include <vector>
 
 #include <wpi/SmallVector.h>
+#include <wpi/json_fwd.h>
 
 #include "cscore_c.h"
 
@@ -22,10 +23,6 @@
 #pragma warning(push)
 #pragma warning(disable : 26495)
 #endif
-
-namespace wpi {
-class json;
-}  // namespace wpi
 
 /** CameraServer (cscore) namespace */
 namespace cs {
@@ -319,8 +316,10 @@ void SetSourceEnumPropertyChoices(CS_Source source, CS_Property property,
  */
 CS_Sink CreateMjpegServer(std::string_view name, std::string_view listenAddress,
                           int port, CS_Status* status);
-CS_Sink CreateCvSink(std::string_view name, CS_Status* status);
+CS_Sink CreateCvSink(std::string_view name, VideoMode::PixelFormat pixelFormat,
+                     CS_Status* status);
 CS_Sink CreateCvSinkCallback(std::string_view name,
+                             VideoMode::PixelFormat pixelFormat,
                              std::function<void(uint64_t time)> processFrame,
                              CS_Status* status);
 

@@ -10,7 +10,8 @@
 #include <stdexcept>
 #include <string>
 
-#include "Eigen/Cholesky"
+#include <Eigen/Cholesky>
+
 #include "frc/DARE.h"
 #include "frc/StateSpaceUtil.h"
 #include "frc/estimator/KalmanFilter.h"
@@ -48,7 +49,7 @@ KalmanFilter<States, Inputs, Outputs>::KalmanFilter(
   }
 
   Matrixd<States, States> P =
-      DARE(discA.transpose(), C.transpose(), discQ, discR);
+      DARE<States, Outputs>(discA.transpose(), C.transpose(), discQ, discR);
 
   // S = CPCᵀ + R
   Matrixd<Outputs, Outputs> S = C * P * C.transpose() + discR;

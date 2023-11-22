@@ -7,13 +7,14 @@
 #include <stdexcept>
 #include <string>
 
-#include "Eigen/Cholesky"
+#include <Eigen/Cholesky>
+#include <unsupported/Eigen/MatrixFunctions>
+
 #include "frc/DARE.h"
 #include "frc/StateSpaceUtil.h"
 #include "frc/controller/LinearQuadraticRegulator.h"
 #include "frc/fmt/Eigen.h"
 #include "frc/system/Discretization.h"
-#include "unsupported/Eigen/MatrixFunctions"
 #include "wpimath/MathShared.h"
 
 namespace frc {
@@ -51,7 +52,7 @@ LinearQuadraticRegulator<States, Inputs>::LinearQuadraticRegulator(
     throw std::invalid_argument(msg);
   }
 
-  Matrixd<States, States> S = DARE(discA, discB, Q, R);
+  Matrixd<States, States> S = DARE<States, Inputs>(discA, discB, Q, R);
 
   // K = (BᵀSB + R)⁻¹BᵀSA
   m_K = (discB.transpose() * S * discB + R)
@@ -70,7 +71,7 @@ LinearQuadraticRegulator<States, Inputs>::LinearQuadraticRegulator(
   Matrixd<States, Inputs> discB;
   DiscretizeAB<States, Inputs>(A, B, dt, &discA, &discB);
 
-  Matrixd<States, States> S = DARE(discA, discB, Q, R, N);
+  Matrixd<States, States> S = DARE<States, Inputs>(discA, discB, Q, R, N);
 
   // K = (BᵀSB + R)⁻¹(BᵀSA + Nᵀ)
   m_K = (discB.transpose() * S * discB + R)

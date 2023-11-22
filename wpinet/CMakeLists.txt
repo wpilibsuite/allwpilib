@@ -18,12 +18,7 @@ if (WITH_JAVA)
 
   file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
 
-  if(${CMAKE_VERSION} VERSION_LESS "3.11.0")
-    set(CMAKE_JAVA_COMPILE_FLAGS "-h" "${CMAKE_CURRENT_BINARY_DIR}/jniheaders")
-    add_jar(wpinet_jar ${JAVA_SOURCES} INCLUDE_JARS wpiutil_jar OUTPUT_NAME wpinet)
-  else()
-    add_jar(wpinet_jar ${JAVA_SOURCES} INCLUDE_JARS wpiutil_jar OUTPUT_NAME wpinet GENERATE_NATIVE_HEADERS wpinet_jni_headers)
-  endif()
+  add_jar(wpinet_jar ${JAVA_SOURCES} INCLUDE_JARS wpiutil_jar OUTPUT_NAME wpinet GENERATE_NATIVE_HEADERS wpinet_jni_headers)
 
   get_property(WPINET_JAR_FILE TARGET wpinet_jar PROPERTY JAR_FILE)
   install(FILES ${WPINET_JAR_FILE} DESTINATION "${java_lib_dest}")
@@ -36,20 +31,25 @@ if (WITH_JAVA)
 
   set_property(TARGET wpinetjni PROPERTY FOLDER "libraries")
 
-  if(${CMAKE_VERSION} VERSION_LESS "3.11.0")
-    target_include_directories(wpinetjni PRIVATE ${JNI_INCLUDE_DIRS})
-    target_include_directories(wpinetjni PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/jniheaders")
-  else()
-    target_link_libraries(wpinetjni PRIVATE wpinet_jni_headers)
-  endif()
+  target_link_libraries(wpinetjni PRIVATE wpinet_jni_headers)
   add_dependencies(wpinetjni wpinet_jar)
 
-  if (MSVC)
-    install(TARGETS wpinetjni RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)
-  endif()
+  install(TARGETS wpinetjni EXPORT wpinetjni)
 
-  install(TARGETS wpinetjni EXPORT wpinetjni DESTINATION "${main_lib_dest}")
+endif()
 
+if (WITH_JAVA_SOURCE)
+  find_package(Java REQUIRED)
+  include(UseJava)
+  file(GLOB WPINET_SOURCES src/main/java/edu/wpi/first/net/*.java)
+  add_jar(wpinet_src_jar
+  RESOURCES NAMESPACE "edu/wpi/first/net" ${WPINET_SOURCES}
+  OUTPUT_NAME wpinet-sources)
+
+  get_property(WPINET_SRC_JAR_FILE TARGET wpinet_src_jar PROPERTY JAR_FILE)
+  install(FILES ${WPINET_SRC_JAR_FILE} DESTINATION "${java_lib_dest}")
+
+  set_property(TARGET wpinet_src_jar PROPERTY FOLDER "java")
 endif()
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
@@ -62,7 +62,7 @@ if (NOT MSVC AND NOT APPLE)
     endif()
 endif()
 
-GENERATE_RESOURCES(src/main/native/resources generated/main/cpp WPI wpi wpinet_resources_src)
+generate_resources(src/main/native/resources generated/main/cpp WPI wpi wpinet_resources_src)
 
 file(GLOB_RECURSE wpinet_native_src src/main/native/cpp/*.cpp src/main/native/thirdparty/tcpsockets/cpp/*.cpp)
 list(REMOVE_ITEM wpinet_native_src ${wpinet_jni_src})
@@ -171,23 +171,13 @@ target_include_directories(wpinet PUBLIC
                             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
                             $<INSTALL_INTERFACE:${include_dest}/wpinet>)
 
-install(TARGETS wpinet EXPORT wpinet DESTINATION "${main_lib_dest}")
-
-if (WITH_JAVA AND MSVC)
-    install(TARGETS wpinet RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)
-endif()
-
-if (WITH_FLAT_INSTALL)
-    set (wpinet_config_dir ${wpilib_dest})
-else()
-    set (wpinet_config_dir share/wpinet)
-endif()
+install(TARGETS wpinet EXPORT wpinet)
 
 configure_file(wpinet-config.cmake.in ${WPILIB_BINARY_DIR}/wpinet-config.cmake )
-install(FILES ${WPILIB_BINARY_DIR}/wpinet-config.cmake DESTINATION ${wpinet_config_dir})
-install(EXPORT wpinet DESTINATION ${wpinet_config_dir})
+install(FILES ${WPILIB_BINARY_DIR}/wpinet-config.cmake DESTINATION share/wpinet)
+install(EXPORT wpinet DESTINATION share/wpinet)
 
-SUBDIR_LIST(wpinet_examples "${CMAKE_CURRENT_SOURCE_DIR}/examples")
+subdir_list(wpinet_examples "${CMAKE_CURRENT_SOURCE_DIR}/examples")
 foreach(example ${wpinet_examples})
     file(GLOB wpinet_example_src examples/${example}/*.cpp)
     if(wpinet_example_src)
@@ -219,6 +209,6 @@ set_property(TARGET netconsoleTee PROPERTY FOLDER "examples")
 
 if (WITH_TESTS)
     wpilib_add_test(wpinet src/test/native/cpp)
-    target_include_directories(wpinet_test PRIVATE src/test/native/include)
-    target_link_libraries(wpinet_test wpinet ${LIBUTIL} gmock_main)
+    target_include_directories(wpinet_test PRIVATE src/test/native/include src/main/native/cpp)
+    target_link_libraries(wpinet_test wpinet ${LIBUTIL} gmock_main wpiutil_testlib)
 endif()

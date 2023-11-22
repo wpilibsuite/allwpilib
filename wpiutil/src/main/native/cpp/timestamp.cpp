@@ -36,7 +36,7 @@ using namespace nRoboRIO_FPGANamespace;
 
 #include <cstdio>
 
-#include "fmt/format.h"
+#include <fmt/format.h>
 
 #ifdef __FRC_ROBORIO__
 namespace {
@@ -50,14 +50,15 @@ using NiFpga_OpenHmbFunc = NiFpga_Status (*)(const NiFpga_Session session,
                                              const char* memoryName,
                                              size_t* memorySize,
                                              void** virtualAddress);
+static std::atomic_flag hmbInitialized = ATOMIC_FLAG_INIT;
 struct HMBHolder {
   ~HMBHolder() {
+    hmbInitialized.clear();
     if (hmb) {
       closeHmb(hmb->getSystemInterface()->getHandle(), hmbName);
       dlclose(niFpga);
     }
   }
-  explicit operator bool() const { return hmb != nullptr; }
   void Configure() {
     nFPGA::nRoboRIO_FPGANamespace::g_currentTargetClass =
         nLoadOut::getTargetClass();
@@ -91,6 +92,20 @@ struct HMBHolder {
     auto cfg = hmb->readConfig(&status);
     cfg.Enables_Timestamp = 1;
     hmb->writeConfig(cfg, &status);
+    hmbInitialized.test_and_set();
+  }
+  void Reset() {
+    hmbInitialized.clear();
+    if (hmb) {
+      std::unique_ptr<fpga::tHMB> oldHmb;
+      oldHmb.swap(hmb);
+      closeHmb(oldHmb->getSystemInterface()->getHandle(), hmbName);
+      closeHmb = nullptr;
+      hmbBuffer = nullptr;
+      oldHmb.reset();
+      dlclose(niFpga);
+      niFpga = nullptr;
+    }
   }
   std::unique_ptr<fpga::tHMB> hmb;
   void* niFpga = nullptr;
@@ -108,7 +123,7 @@ static uint64_t time_since_epoch() noexcept {
   uint64_t tmpres = 0;
   // 100-nanosecond intervals since January 1, 1601 (UTC)
   // which means 0.1 us
-  GetSystemTimeAsFileTime(&ft);
+  GetSystemTimePreciseAsFileTime(&ft);
   tmpres |= ft.dwHighDateTime;
   tmpres <<= 32;
   tmpres |= ft.dwLowDateTime;
@@ -176,9 +191,15 @@ static std::atomic<uint64_t (*)()> now_impl{wpi::NowDefault};
 
 void wpi::impl::SetupNowRio() {
 #ifdef __FRC_ROBORIO__
-  if (!hmb) {
+  if (!hmbInitialized.test()) {
     hmb.Configure();
   }
+#endif
+}
+
+void wpi::impl::ShutdownNowRio() {
+#ifdef __FRC_ROBORIO__
+  hmb.Reset();
 #endif
 }
 
@@ -189,12 +210,12 @@ void wpi::SetNowImpl(uint64_t (*func)(void)) {
 uint64_t wpi::Now() {
 #ifdef __FRC_ROBORIO__
   // Same code as HAL_GetFPGATime()
-  if (!hmb) {
+  if (!hmbInitialized.test()) {
     std::fputs(
         "FPGA not yet configured in wpi::Now(). Time will not be correct",
         stderr);
     std::fflush(stderr);
-    return 0;
+    return 1;
   }
 
   asm("dmb");
@@ -228,6 +249,10 @@ extern "C" {
 
 void WPI_Impl_SetupNowRio(void) {
   return wpi::impl::SetupNowRio();
+}
+
+void WPI_Impl_ShutdownNowRio(void) {
+  return wpi::impl::ShutdownNowRio();
 }
 
 uint64_t WPI_NowDefault(void) {

@@ -44,7 +44,7 @@ namespace wpi {
   void install_fatal_error_handler(fatal_error_handler_t handler,
                                    void *user_data = nullptr);
 
-  /// Restores default error handling behavior.
+  /// Restores default error handling behaviour.
   void remove_fatal_error_handler();
 
   /// ScopedFatalErrorHandler - This is a simple helper class which just

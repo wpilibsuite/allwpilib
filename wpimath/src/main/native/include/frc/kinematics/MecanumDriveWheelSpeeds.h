@@ -46,5 +46,80 @@ struct WPILIB_DLLEXPORT MecanumDriveWheelSpeeds {
    * @param attainableMaxSpeed The absolute max speed that a wheel can reach.
    */
   void Desaturate(units::meters_per_second_t attainableMaxSpeed);
+
+  /**
+   * Adds two MecanumDriveWheelSpeeds and returns the sum.
+   *
+   * <p>For example, MecanumDriveWheelSpeeds{1.0, 0.5, 2.0, 1.5} +
+   * MecanumDriveWheelSpeeds{2.0, 1.5, 0.5, 1.0} =
+   * MecanumDriveWheelSpeeds{3.0, 2.0, 2.5, 2.5}
+   *
+   * @param other The MecanumDriveWheelSpeeds to add.
+   * @return The sum of the MecanumDriveWheelSpeeds.
+   */
+  constexpr MecanumDriveWheelSpeeds operator+(
+      const MecanumDriveWheelSpeeds& other) const {
+    return {frontLeft + other.frontLeft, frontRight + other.frontRight,
+            rearLeft + other.rearLeft, rearRight + other.rearRight};
+  }
+
+  /**
+   * Subtracts the other MecanumDriveWheelSpeeds from the current
+   * MecanumDriveWheelSpeeds and returns the difference.
+   *
+   * <p>For example, MecanumDriveWheelSpeeds{5.0, 4.0, 6.0, 2.5} -
+   * MecanumDriveWheelSpeeds{1.0, 2.0, 3.0, 0.5} =
+   * MecanumDriveWheelSpeeds{4.0, 2.0, 3.0, 2.0}
+   *
+   * @param other The MecanumDriveWheelSpeeds to subtract.
+   * @return The difference between the two MecanumDriveWheelSpeeds.
+   */
+  constexpr MecanumDriveWheelSpeeds operator-(
+      const MecanumDriveWheelSpeeds& other) const {
+    return *this + -other;
+  }
+
+  /**
+   * Returns the inverse of the current MecanumDriveWheelSpeeds.
+   * This is equivalent to negating all components of the
+   * MecanumDriveWheelSpeeds.
+   *
+   * @return The inverse of the current MecanumDriveWheelSpeeds.
+   */
+  constexpr MecanumDriveWheelSpeeds operator-() const {
+    return {-frontLeft, -frontRight, -rearLeft, -rearRight};
+  }
+
+  /**
+   * Multiplies the MecanumDriveWheelSpeeds by a scalar and returns the new
+   * MecanumDriveWheelSpeeds.
+   *
+   * <p>For example, MecanumDriveWheelSpeeds{2.0, 2.5, 3.0, 3.5} * 2 =
+   * MecanumDriveWheelSpeeds{4.0, 5.0, 6.0, 7.0}
+   *
+   * @param scalar The scalar to multiply by.
+   * @return The scaled MecanumDriveWheelSpeeds.
+   */
+  constexpr MecanumDriveWheelSpeeds operator*(double scalar) const {
+    return {scalar * frontLeft, scalar * frontRight, scalar * rearLeft,
+            scalar * rearRight};
+  }
+
+  /**
+   * Divides the MecanumDriveWheelSpeeds by a scalar and returns the new
+   * MecanumDriveWheelSpeeds.
+   *
+   * <p>For example, MecanumDriveWheelSpeeds{2.0, 2.5, 1.5, 1.0} / 2 =
+   * MecanumDriveWheelSpeeds{1.0, 1.25, 0.75, 0.5}
+   *
+   * @param scalar The scalar to divide by.
+   * @return The scaled MecanumDriveWheelSpeeds.
+   */
+  constexpr MecanumDriveWheelSpeeds operator/(double scalar) const {
+    return operator*(1.0 / scalar);
+  }
 };
 }  // namespace frc
+
+#include "frc/kinematics/proto/MecanumDriveWheelSpeedsProto.h"
+#include "frc/kinematics/struct/MecanumDriveWheelSpeedsStruct.h"

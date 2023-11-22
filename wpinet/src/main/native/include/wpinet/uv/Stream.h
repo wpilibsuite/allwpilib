@@ -194,8 +194,9 @@ class Stream : public Handle {
    * An error signal will be emitted in case of errors.
    *
    * @param bufs The buffers to be written to the stream.
-   * @return Number of bytes written.
+   * @return Number of bytes written, or negative (error code) on error
    */
+  [[nodiscard]]
   int TryWrite(std::span<const Buffer> bufs);
 
   /**
@@ -206,8 +207,9 @@ class Stream : public Handle {
    * An error signal will be emitted in case of errors.
    *
    * @param bufs The buffers to be written to the stream.
-   * @return Number of bytes written.
+   * @return Number of bytes written, or negative (error code) on error
    */
+  [[nodiscard]]
   int TryWrite(std::initializer_list<Buffer> bufs) {
     return TryWrite({bufs.begin(), bufs.end()});
   }
@@ -221,8 +223,9 @@ class Stream : public Handle {
    *
    * @param bufs The buffers to be written to the stream.
    * @param send send stream
-   * @return Number of bytes written.
+   * @return Number of bytes written, or negative (error code) on error
    */
+  [[nodiscard]]
   int TryWrite2(std::span<const Buffer> bufs, Stream& send);
 
   /**
@@ -234,8 +237,9 @@ class Stream : public Handle {
    *
    * @param bufs The buffers to be written to the stream.
    * @param send send stream
-   * @return Number of bytes written.
+   * @return Number of bytes written, or negative (error code) on error
    */
+  [[nodiscard]]
   int TryWrite2(std::initializer_list<Buffer> bufs, Stream& send) {
     return TryWrite2({bufs.begin(), bufs.end()}, send);
   }

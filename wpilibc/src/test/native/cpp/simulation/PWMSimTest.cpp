@@ -4,11 +4,11 @@
 
 #include "frc/simulation/PWMSim.h"  // NOLINT(build/include_order)
 
+#include <gtest/gtest.h>
 #include <hal/HAL.h>
 
 #include "callback_helpers/TestCallbackHelpers.h"
 #include "frc/PWM.h"
-#include "gtest/gtest.h"
 
 namespace frc::sim {
 

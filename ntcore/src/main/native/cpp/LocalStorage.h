@@ -321,6 +321,13 @@ class LocalStorage final : public net::ILocalStorage {
                              std::string_view logPrefix);
   void StopDataLog(NT_DataLogger logger);
 
+  //
+  // Schema functions
+  //
+  bool HasSchema(std::string_view name);
+  void AddSchema(std::string_view name, std::string_view type,
+                 std::span<const uint8_t> schema);
+
   void Reset();
 
  private:
@@ -548,6 +555,9 @@ class LocalStorage final : public net::ILocalStorage {
 
     // string-based listeners
     VectorSet<ListenerData*> m_topicPrefixListeners;
+
+    // schema publishers
+    wpi::StringMap<NT_Publisher> m_schemas;
 
     // topic functions
     void NotifyTopic(TopicData* topic, unsigned int eventFlags);

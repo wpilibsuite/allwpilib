@@ -4,9 +4,10 @@
 
 #include "frc/Joystick.h"  // NOLINT(build/include_order)
 
+#include <gtest/gtest.h>
+
 #include "JoystickTestMacros.h"
 #include "frc/simulation/JoystickSim.h"
-#include "gtest/gtest.h"
 
 using namespace frc;
 

@@ -205,7 +205,7 @@ void HAL_SetPWMPeriodScale(HAL_DigitalHandle pwmPortHandle, int32_t squelchMask,
                            int32_t* status);
 
 /**
- * Sets the PWM output to be a continous high signal while enabled.
+ * Sets the PWM output to be a continuous high signal while enabled.
  *
  * @param[in] pwmPortHandle the PWM handle.
  * @param[out] status       Error status variable. 0 on success.

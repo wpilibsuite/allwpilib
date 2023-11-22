@@ -6,14 +6,13 @@
 
 #include <concepts>
 #include <functional>
-#include <initializer_list>
 #include <memory>
-#include <span>
 #include <string>
 #include <utility>
 #include <vector>
 
 #include "frc2/command/Command.h"
+#include "frc2/command/Requirements.h"
 
 namespace frc2 {
 /**
@@ -88,18 +87,7 @@ class CommandPtr final {
    */
   [[nodiscard]]
   CommandPtr AndThen(std::function<void()> toRun,
-                     std::span<Subsystem* const> requirements = {}) &&;
-
-  /**
-   * Decorates this command with a runnable to run after the command finishes.
-   *
-   * @param toRun the Runnable to run
-   * @param requirements the required subsystems
-   * @return the decorated command
-   */
-  [[nodiscard]]
-  CommandPtr AndThen(std::function<void()> toRun,
-                     std::initializer_list<Subsystem*> requirements) &&;
+                     Requirements requirements = {}) &&;
 
   /**
    * Decorates this command with a set of commands to run after it in sequence.
@@ -121,18 +109,7 @@ class CommandPtr final {
    */
   [[nodiscard]]
   CommandPtr BeforeStarting(std::function<void()> toRun,
-                            std::initializer_list<Subsystem*> requirements) &&;
-
-  /**
-   * Decorates this command with a runnable to run before this command starts.
-   *
-   * @param toRun the Runnable to run
-   * @param requirements the required subsystems
-   * @return the decorated command
-   */
-  [[nodiscard]]
-  CommandPtr BeforeStarting(std::function<void()> toRun,
-                            std::span<Subsystem* const> requirements = {}) &&;
+                            Requirements requirements = {}) &&;
 
   /**
    * Decorates this command with another command to run before this command
@@ -245,6 +222,18 @@ class CommandPtr final {
    */
   [[nodiscard]]
   CommandPtr FinallyDo(std::function<void(bool)> end) &&;
+
+  /**
+   * Decorates this command with a lambda to call on interrupt or end, following
+   * the command's inherent Command::End(bool) method. The provided lambda will
+   * run identically in both interrupt and end cases.
+   *
+   * @param end a lambda to run when the command ends, whether or not it was
+   * interrupted.
+   * @return the decorated command
+   */
+  [[nodiscard]]
+  CommandPtr FinallyDo(std::function<void()> end) &&;
 
   /**
    * Decorates this command with a lambda to call on interrupt, following the

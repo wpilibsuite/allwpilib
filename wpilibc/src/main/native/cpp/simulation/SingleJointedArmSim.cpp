@@ -28,7 +28,7 @@ SingleJointedArmSim::SingleJointedArmSim(
       m_gearbox(gearbox),
       m_gearing(gearing),
       m_simulateGravity(simulateGravity) {
-  SetState(frc::Vectord<2>{startingAngle, 0.0});
+  SetState(startingAngle, 0_rad_per_s);
 }
 
 SingleJointedArmSim::SingleJointedArmSim(
@@ -41,6 +41,11 @@ SingleJointedArmSim::SingleJointedArmSim(
           LinearSystemId::SingleJointedArmSystem(gearbox, moi, gearing),
           gearbox, gearing, armLength, minAngle, maxAngle, simulateGravity,
           startingAngle, measurementStdDevs) {}
+
+void SingleJointedArmSim::SetState(units::radian_t angle,
+                                   units::radians_per_second_t velocity) {
+  SetState(Vectord<2>{std::clamp(angle, m_minAngle, m_maxAngle), velocity});
+}
 
 bool SingleJointedArmSim::WouldHitLowerLimit(units::radian_t armAngle) const {
   return armAngle <= m_minAngle;

@@ -9,7 +9,6 @@
 #include <wpi/SymbolExports.h>
 #include <wpi/array.h>
 
-#include "frc/EigenCore.h"
 #include "frc/estimator/PoseEstimator.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"

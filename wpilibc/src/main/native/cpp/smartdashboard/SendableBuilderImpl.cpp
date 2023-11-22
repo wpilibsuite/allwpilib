@@ -141,11 +141,24 @@ void SendableBuilderImpl::AddPropertyImpl(Topic topic, Getter getter,
   m_properties.emplace_back(std::move(prop));
 }
 
+template <typename Topic, typename Value>
+void SendableBuilderImpl::PublishConstImpl(Topic topic, Value value) {
+  auto prop = std::make_unique<PropertyImpl<Topic>>();
+  prop->pub = topic.Publish();
+  prop->pub.Set(value);
+  m_properties.emplace_back(std::move(prop));
+}
+
 void SendableBuilderImpl::AddBooleanProperty(std::string_view key,
                                              std::function<bool()> getter,
                                              std::function<void(bool)> setter) {
   AddPropertyImpl(m_table->GetBooleanTopic(key), std::move(getter),
                   std::move(setter));
+}
+
+void SendableBuilderImpl::PublishConstBoolean(std::string_view key,
+                                              bool value) {
+  PublishConstImpl(m_table->GetBooleanTopic(key), value);
 }
 
 void SendableBuilderImpl::AddIntegerProperty(
@@ -155,11 +168,20 @@ void SendableBuilderImpl::AddIntegerProperty(
                   std::move(setter));
 }
 
+void SendableBuilderImpl::PublishConstInteger(std::string_view key,
+                                              int64_t value) {
+  PublishConstImpl(m_table->GetIntegerTopic(key), value);
+}
+
 void SendableBuilderImpl::AddFloatProperty(std::string_view key,
                                            std::function<float()> getter,
                                            std::function<void(float)> setter) {
   AddPropertyImpl(m_table->GetFloatTopic(key), std::move(getter),
                   std::move(setter));
+}
+
+void SendableBuilderImpl::PublishConstFloat(std::string_view key, float value) {
+  PublishConstImpl(m_table->GetFloatTopic(key), value);
 }
 
 void SendableBuilderImpl::AddDoubleProperty(
@@ -169,11 +191,21 @@ void SendableBuilderImpl::AddDoubleProperty(
                   std::move(setter));
 }
 
+void SendableBuilderImpl::PublishConstDouble(std::string_view key,
+                                             double value) {
+  PublishConstImpl(m_table->GetDoubleTopic(key), value);
+}
+
 void SendableBuilderImpl::AddStringProperty(
     std::string_view key, std::function<std::string()> getter,
     std::function<void(std::string_view)> setter) {
   AddPropertyImpl(m_table->GetStringTopic(key), std::move(getter),
                   std::move(setter));
+}
+
+void SendableBuilderImpl::PublishConstString(std::string_view key,
+                                             std::string_view value) {
+  PublishConstImpl(m_table->GetStringTopic(key), value);
 }
 
 void SendableBuilderImpl::AddBooleanArrayProperty(
@@ -183,11 +215,21 @@ void SendableBuilderImpl::AddBooleanArrayProperty(
                   std::move(setter));
 }
 
+void SendableBuilderImpl::PublishConstBooleanArray(std::string_view key,
+                                                   std::span<const int> value) {
+  PublishConstImpl(m_table->GetBooleanArrayTopic(key), value);
+}
+
 void SendableBuilderImpl::AddIntegerArrayProperty(
     std::string_view key, std::function<std::vector<int64_t>()> getter,
     std::function<void(std::span<const int64_t>)> setter) {
   AddPropertyImpl(m_table->GetIntegerArrayTopic(key), std::move(getter),
                   std::move(setter));
+}
+
+void SendableBuilderImpl::PublishConstIntegerArray(
+    std::string_view key, std::span<const int64_t> value) {
+  PublishConstImpl(m_table->GetIntegerArrayTopic(key), value);
 }
 
 void SendableBuilderImpl::AddFloatArrayProperty(
@@ -197,6 +239,11 @@ void SendableBuilderImpl::AddFloatArrayProperty(
                   std::move(setter));
 }
 
+void SendableBuilderImpl::PublishConstFloatArray(std::string_view key,
+                                                 std::span<const float> value) {
+  PublishConstImpl(m_table->GetFloatArrayTopic(key), value);
+}
+
 void SendableBuilderImpl::AddDoubleArrayProperty(
     std::string_view key, std::function<std::vector<double>()> getter,
     std::function<void(std::span<const double>)> setter) {
@@ -204,11 +251,21 @@ void SendableBuilderImpl::AddDoubleArrayProperty(
                   std::move(setter));
 }
 
+void SendableBuilderImpl::PublishConstDoubleArray(
+    std::string_view key, std::span<const double> value) {
+  PublishConstImpl(m_table->GetDoubleArrayTopic(key), value);
+}
+
 void SendableBuilderImpl::AddStringArrayProperty(
     std::string_view key, std::function<std::vector<std::string>()> getter,
     std::function<void(std::span<const std::string>)> setter) {
   AddPropertyImpl(m_table->GetStringArrayTopic(key), std::move(getter),
                   std::move(setter));
+}
+
+void SendableBuilderImpl::PublishConstStringArray(
+    std::string_view key, std::span<const std::string> value) {
+  PublishConstImpl(m_table->GetStringArrayTopic(key), value);
 }
 
 void SendableBuilderImpl::AddRawProperty(
@@ -232,6 +289,16 @@ void SendableBuilderImpl::AddRawProperty(
       }
     };
   }
+  m_properties.emplace_back(std::move(prop));
+}
+
+void SendableBuilderImpl::PublishConstRaw(std::string_view key,
+                                          std::string_view typeString,
+                                          std::span<const uint8_t> value) {
+  auto topic = m_table->GetRawTopic(key);
+  auto prop = std::make_unique<PropertyImpl<nt::RawTopic>>();
+  prop->pub = topic.Publish(typeString);
+  prop->pub.Set(value);
   m_properties.emplace_back(std::move(prop));
 }
 

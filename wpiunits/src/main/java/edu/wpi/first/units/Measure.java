@@ -17,13 +17,26 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
    */
   double EQUIVALENCE_THRESHOLD = 1e-12;
 
-  /** Gets the unitless magnitude of this measure. */
+  /**
+   * Gets the unitless magnitude of this measure.
+   *
+   * @return the magnitude in terms of {@link #unit() the unit}.
+   */
   double magnitude();
 
-  /** Gets the magnitude of this measure in terms of the base unit. */
+  /**
+   * Gets the magnitude of this measure in terms of the base unit. If the unit is the base unit for
+   * its system of measure, then the value will be equivalent to {@link #magnitude()}.
+   *
+   * @return the magnitude in terms of the base unit
+   */
   double baseUnitMagnitude();
 
-  /** Gets the units of this measure. */
+  /**
+   * Gets the units of this measure.
+   *
+   * @return the unit
+   */
   U unit();
 
   /**
@@ -31,8 +44,8 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
    * seconds. Converting to the same unit is equivalent to calling {@link #magnitude()}.
    *
    * <pre>
-   *   Meters.of(12).in(Feet) // => 39.3701
-   *   Seconds.of(15).in(Minutes) // => 0.25
+   *   Meters.of(12).in(Feet) // 39.3701
+   *   Seconds.of(15).in(Minutes) // 0.25
    * </pre>
    *
    * @param unit the unit to convert this measure to
@@ -47,9 +60,13 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
   }
 
   /**
-   * Multiplies this measurement by some constant multiplier and returns the result.
+   * Multiplies this measurement by some constant multiplier and returns the result. The magnitude
+   * of the result will be the <i>base</i> magnitude multiplied by the scalar value. If the measure
+   * uses a unit with a non-linear relation to its base unit (such as Fahrenheit for temperature),
+   * then the result will only be a multiple <i>in terms of the base unit</i>.
    *
    * @param multiplier the constant to multiply by
+   * @return the resulting measure
    */
   default Measure<U> times(double multiplier) {
     return ImmutableMeasure.ofBaseUnits(baseUnitMagnitude() * multiplier, unit());
@@ -110,6 +127,7 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
    * {@code times(1 / divisor)}
    *
    * @param divisor the constant to divide by
+   * @return the resulting measure
    * @see #times(double)
    */
   default Measure<U> divide(double divisor) {
@@ -121,6 +139,7 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
    * {@code divide(divisor.baseUnitMagnitude())}
    *
    * @param divisor the dimensionless measure to divide by
+   * @return the resulting measure
    * @see #divide(double)
    * @see #times(double)
    */
@@ -132,7 +151,7 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
    * Creates a velocity measure by dividing this one by a time period measure.
    *
    * <pre>
-   *   Meters.of(1).per(Second) // => Measure&lt;Velocity&lt;Distance&gt;&gt;
+   *   Meters.of(1).per(Second) // Measure&lt;Velocity&lt;Distance&gt;&gt;
    * </pre>
    *
    * @param period the time period to divide by.
@@ -147,7 +166,7 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
    * Creates a relational measure equivalent to this one per some other unit.
    *
    * <pre>
-   *   Volts.of(1.05).per(Meter) // => V/m, potential PID constant
+   *   Volts.of(1.05).per(Meter) // V/m, potential PID constant
    * </pre>
    *
    * @param <U2> the type of the denominator unit
@@ -179,7 +198,11 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
     return unit().ofBaseUnits(baseUnitMagnitude() - other.baseUnitMagnitude());
   }
 
-  /** Negates this measure and returns the result. */
+  /**
+   * Negates this measure and returns the result.
+   *
+   * @return the resulting measure
+   */
   default Measure<U> negate() {
     return times(-1);
   }
@@ -187,6 +210,8 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
   /**
    * Returns an immutable copy of this measure. The copy can be used freely and is guaranteed never
    * to change.
+   *
+   * @return the copied measure
    */
   Measure<U> copy();
 
@@ -204,8 +229,8 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
    * for use for a +/- scalar, such as 0.05 for +/- 5%.
    *
    * <pre>
-   *   Inches.of(11).isNear(Inches.of(10), 0.1) // => true
-   *   Inches.of(12).isNear(Inches.of(10), 0.1) // => false
+   *   Inches.of(11).isNear(Inches.of(10), 0.1) // true
+   *   Inches.of(12).isNear(Inches.of(10), 0.1) // false
    * </pre>
    *
    * @param other the other measurement to compare against
@@ -240,6 +265,7 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
     return Math.abs(baseUnitMagnitude() - other.baseUnitMagnitude()) <= EQUIVALENCE_THRESHOLD;
   }
 
+  /** {@inheritDoc} */
   @Override
   default int compareTo(Measure<U> o) {
     return Double.compare(this.baseUnitMagnitude(), o.baseUnitMagnitude());
@@ -249,6 +275,7 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
    * Checks if this measure is greater than another measure of the same unit.
    *
    * @param o the other measure to compare to
+   * @return true if this measure has a greater equivalent magnitude, false otherwise
    */
   default boolean gt(Measure<U> o) {
     return compareTo(o) > 0;
@@ -258,6 +285,7 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
    * Checks if this measure is greater than or equivalent to another measure of the same unit.
    *
    * @param o the other measure to compare to
+   * @return true if this measure has an equal or greater equivalent magnitude, false otherwise
    */
   default boolean gte(Measure<U> o) {
     return compareTo(o) > 0 || isEquivalent(o);
@@ -267,6 +295,7 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
    * Checks if this measure is less than another measure of the same unit.
    *
    * @param o the other measure to compare to
+   * @return true if this measure has a lesser equivalent magnitude, false otherwise
    */
   default boolean lt(Measure<U> o) {
     return compareTo(o) < 0;
@@ -276,6 +305,7 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
    * Checks if this measure is less than or equivalent to another measure of the same unit.
    *
    * @param o the other measure to compare to
+   * @return true if this measure has an equal or lesser equivalent magnitude, false otherwise
    */
   default boolean lte(Measure<U> o) {
     return compareTo(o) < 0 || isEquivalent(o);

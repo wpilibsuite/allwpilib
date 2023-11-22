@@ -4,7 +4,14 @@
 
 package edu.wpi.first.math.kinematics;
 
+import static edu.wpi.first.units.Units.MetersPerSecond;
+
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.proto.SwerveModuleStateProto;
+import edu.wpi.first.math.kinematics.struct.SwerveModuleStateStruct;
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Velocity;
 import java.util.Objects;
 
 /** Represents the state of one swerve module. */
@@ -14,6 +21,9 @@ public class SwerveModuleState implements Comparable<SwerveModuleState> {
 
   /** Angle of the module. */
   public Rotation2d angle = Rotation2d.fromDegrees(0);
+
+  public static final SwerveModuleStateStruct struct = new SwerveModuleStateStruct();
+  public static final SwerveModuleStateProto proto = new SwerveModuleStateProto();
 
   /** Constructs a SwerveModuleState with zeros for speed and angle. */
   public SwerveModuleState() {}
@@ -27,6 +37,16 @@ public class SwerveModuleState implements Comparable<SwerveModuleState> {
   public SwerveModuleState(double speedMetersPerSecond, Rotation2d angle) {
     this.speedMetersPerSecond = speedMetersPerSecond;
     this.angle = angle;
+  }
+
+  /**
+   * Constructs a SwerveModuleState.
+   *
+   * @param speed The speed of the wheel of the module.
+   * @param angle The angle of the module.
+   */
+  public SwerveModuleState(Measure<Velocity<Distance>> speed, Rotation2d angle) {
+    this(speed.in(MetersPerSecond), angle);
   }
 
   @Override

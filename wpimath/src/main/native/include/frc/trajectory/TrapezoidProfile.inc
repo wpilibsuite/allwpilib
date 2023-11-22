@@ -97,8 +97,8 @@ TrapezoidProfile<Distance>::Calculate(units::second_t t) const {
 }
 template <class Distance>
 typename TrapezoidProfile<Distance>::State
-TrapezoidProfile<Distance>::Calculate(units::second_t t, State goal,
-                                      State current) {
+TrapezoidProfile<Distance>::Calculate(units::second_t t, State current,
+                                      State goal) {
   m_direction = ShouldFlipAcceleration(current, goal) ? -1 : 1;
   m_current = Direct(current);
   goal = Direct(goal);

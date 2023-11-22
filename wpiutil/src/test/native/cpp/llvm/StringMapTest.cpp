@@ -39,6 +39,7 @@ protected:
     EXPECT_TRUE(testMap.begin() == testMap.end());
 
     // Lookup tests
+    EXPECT_FALSE(testMap.contains(testKey));
     EXPECT_EQ(0u, testMap.count(testKey));
     EXPECT_EQ(0u, testMap.count(std::string_view(testKeyFirst, testKeyLength)));
     EXPECT_EQ(0u, testMap.count(testKeyStr));
@@ -62,6 +63,7 @@ protected:
     EXPECT_TRUE(it == testMap.end());
 
     // Lookup tests
+    EXPECT_TRUE(testMap.contains(testKey));
     EXPECT_EQ(1u, testMap.count(testKey));
     EXPECT_EQ(1u, testMap.count(std::string_view(testKeyFirst, testKeyLength)));
     EXPECT_EQ(1u, testMap.count(testKeyStr));
@@ -201,6 +203,18 @@ TEST_F(StringMapTest, CopyCtorTest) {
   EXPECT_EQ(0, Map2.lookup("drei"));
   EXPECT_EQ(4, Map2.lookup("veir"));
   EXPECT_EQ(5, Map2.lookup("funf"));
+}
+
+TEST_F(StringMapTest, AtTest) {
+  wpi::StringMap<int> Map;
+
+  // keys both found and not found on non-empty map
+  Map["a"] = 1;
+  Map["b"] = 2;
+  Map["c"] = 3;
+  EXPECT_EQ(1, Map.at("a"));
+  EXPECT_EQ(2, Map.at("b"));
+  EXPECT_EQ(3, Map.at("c"));
 }
 
 // A more complex iteration test.

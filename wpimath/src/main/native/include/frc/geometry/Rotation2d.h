@@ -5,12 +5,9 @@
 #pragma once
 
 #include <wpi/SymbolExports.h>
+#include <wpi/json_fwd.h>
 
 #include "units/angle.h"
-
-namespace wpi {
-class json;
-}  // namespace wpi
 
 namespace frc {
 
@@ -179,4 +176,6 @@ void from_json(const wpi::json& json, Rotation2d& rotation);
 
 }  // namespace frc
 
+#include "frc/geometry/proto/Rotation2dProto.h"
+#include "frc/geometry/struct/Rotation2dStruct.h"
 #include "frc/geometry/Rotation2d.inc"

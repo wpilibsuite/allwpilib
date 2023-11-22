@@ -121,7 +121,13 @@ doxygen {
         exclude 'wpinet/uv/**'
 
         // json
+        exclude 'wpi/adl_serializer.h'
+        exclude 'wpi/byte_container_with_subtype.h'
+        exclude 'wpi/detail/**'
         exclude 'wpi/json.h'
+        exclude 'wpi/json_fwd.h'
+        exclude 'wpi/ordered_map.h'
+        exclude 'wpi/thirdparty/**'
 
         // memory
         exclude 'wpi/memory/**'
@@ -135,6 +141,12 @@ doxygen {
 
     //TODO: building memory docs causes search to break
     exclude 'wpi/memory/**'
+
+    exclude '*.pb.h'
+
+    // Save space by excluding protobuf and eigen
+    exclude 'Eigen/**'
+    exclude 'google/protobuf/**'
 
     aliases 'effects=\\par <i>Effects:</i>^^',
             'notes=\\par <i>Notes:</i>^^',
@@ -209,7 +221,7 @@ apply from: "${rootDir}/shared/opencv.gradle"
 
 task generateJavaDocs(type: Javadoc) {
     classpath += project(":wpimath").sourceSets.main.compileClasspath
-    options.links("https://docs.oracle.com/en/java/javase/11/docs/api/")
+    options.links("https://docs.oracle.com/en/java/javase/17/docs/api/")
     options.addStringOption("tag", "pre:a:Pre-Condition")
     options.addBooleanOption("Xdoclint:html,missing,reference,syntax", true)
     options.addBooleanOption('html5', true)
@@ -227,6 +239,7 @@ task generateJavaDocs(type: Javadoc) {
     source project(':wpilibj').sourceSets.main.java
     source project(':wpimath').sourceSets.main.java
     source project(':wpinet').sourceSets.main.java
+    source project(':wpiunits').sourceSets.main.java
     source project(':wpiutil').sourceSets.main.java
     source configurations.javaSource.collect { zipTree(it) }
     include '**/*.java'

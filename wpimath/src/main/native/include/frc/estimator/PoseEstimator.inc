@@ -81,9 +81,9 @@ void PoseEstimator<WheelSpeeds, WheelPositions>::AddVisionMeasurement(
   // Step 3: We should not trust the twist entirely, so instead we scale this
   // twist by a Kalman gain matrix representing how much we trust vision
   // measurements compared to our current pose.
-  Vectord<3> k_times_twist =
+  Eigen::Vector3d k_times_twist =
       m_visionK *
-      Vectord<3>{twist.dx.value(), twist.dy.value(), twist.dtheta.value()};
+      Eigen::Vector3d{twist.dx.value(), twist.dy.value(), twist.dtheta.value()};
 
   // Step 4: Convert back to Twist2d
   Twist2d scaledTwist{units::meter_t{k_times_twist(0)},

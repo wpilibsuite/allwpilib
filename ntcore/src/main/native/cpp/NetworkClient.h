@@ -76,7 +76,7 @@ class NetworkClientBase : public INetworkClient {
   // used only from loop
   std::shared_ptr<wpi::ParallelTcpConnector> m_parallelConnect;
   std::shared_ptr<wpi::uv::Timer> m_readLocalTimer;
-  std::shared_ptr<wpi::uv::Timer> m_sendValuesTimer;
+  std::shared_ptr<wpi::uv::Timer> m_sendOutgoingTimer;
   std::shared_ptr<wpi::uv::Async<>> m_flushLocal;
   std::shared_ptr<wpi::uv::Async<>> m_flush;
 
@@ -138,7 +138,8 @@ class NetworkClient final : public NetworkClientBase {
  private:
   void HandleLocal();
   void TcpConnected(wpi::uv::Tcp& tcp) final;
-  void WsConnected(wpi::WebSocket& ws, wpi::uv::Tcp& tcp);
+  void WsConnected(wpi::WebSocket& ws, wpi::uv::Tcp& tcp,
+                   std::string_view protocol);
   void ForceDisconnect(std::string_view reason) override;
   void DoDisconnect(std::string_view reason) override;
 

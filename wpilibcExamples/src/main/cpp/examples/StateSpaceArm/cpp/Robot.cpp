@@ -117,7 +117,7 @@ class Robot : public frc::TimedRobot {
       goal = {kLoweredPosition, 0_rad_per_s};
     }
     m_lastProfiledReference =
-        m_profile.Calculate(20_ms, goal, m_lastProfiledReference);
+        m_profile.Calculate(20_ms, m_lastProfiledReference, goal);
 
     m_loop.SetNextR(frc::Vectord<2>{m_lastProfiledReference.position.value(),
                                     m_lastProfiledReference.velocity.value()});
