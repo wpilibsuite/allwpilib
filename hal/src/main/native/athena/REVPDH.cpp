@@ -4,7 +4,7 @@
 
 #include "REVPDH.h"
 
-#include "hal/CAN.h"
+#include <hal/CAN.h>
 #include <hal/CANAPI.h>
 #include <hal/CANAPITypes.h>
 #include <hal/Errors.h>
