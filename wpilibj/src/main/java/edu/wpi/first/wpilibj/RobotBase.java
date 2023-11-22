@@ -409,7 +409,11 @@ public abstract class RobotBase implements AutoCloseable {
     m_runMutex.unlock();
   }
 
-  /** Load all JNI libraries. */
+  /**
+   * Load all JNI libraries.
+   *
+   * @throws IOException If any library was not found.
+   */
   public static void loadAllJni() throws IOException {
     WPIUtilJNI.load();
     WPINetJNI.load();
