@@ -19,26 +19,12 @@
 using namespace cs;
 
 CvSinkImpl::CvSinkImpl(std::string_view name, wpi::Logger& logger,
-                       Notifier& notifier, Telemetry& telemetry)
-    : SinkImpl{name, logger, notifier, telemetry},
-      m_pixelFormat{VideoMode::PixelFormat::kBGR} {
-  m_active = true;
-  // m_thread = std::thread(&CvSinkImpl::ThreadMain, this);
-}
-
-CvSinkImpl::CvSinkImpl(std::string_view name, wpi::Logger& logger,
                        Notifier& notifier, Telemetry& telemetry,
                        VideoMode::PixelFormat pixelFormat)
     : SinkImpl{name, logger, notifier, telemetry}, m_pixelFormat{pixelFormat} {
   m_active = true;
   // m_thread = std::thread(&CvSinkImpl::ThreadMain, this);
 }
-
-CvSinkImpl::CvSinkImpl(std::string_view name, wpi::Logger& logger,
-                       Notifier& notifier, Telemetry& telemetry,
-                       std::function<void(uint64_t time)> processFrame)
-    : SinkImpl{name, logger, notifier, telemetry},
-      m_pixelFormat{VideoMode::PixelFormat::kBGR} {}
 
 CvSinkImpl::CvSinkImpl(std::string_view name, wpi::Logger& logger,
                        Notifier& notifier, Telemetry& telemetry,
@@ -143,28 +129,12 @@ void CvSinkImpl::ThreadMain() {
 
 namespace cs {
 
-CS_Sink CreateCvSink(std::string_view name, CS_Status* status) {
-  auto& inst = Instance::GetInstance();
-  return inst.CreateSink(
-      CS_SINK_CV, std::make_shared<CvSinkImpl>(name, inst.logger, inst.notifier,
-                                               inst.telemetry));
-}
-
 CS_Sink CreateCvSink(std::string_view name, VideoMode::PixelFormat pixelFormat,
                      CS_Status* status) {
   auto& inst = Instance::GetInstance();
   return inst.CreateSink(
       CS_SINK_CV, std::make_shared<CvSinkImpl>(name, inst.logger, inst.notifier,
                                                inst.telemetry, pixelFormat));
-}
-
-CS_Sink CreateCvSinkCallback(std::string_view name,
-                             std::function<void(uint64_t time)> processFrame,
-                             CS_Status* status) {
-  auto& inst = Instance::GetInstance();
-  return inst.CreateSink(
-      CS_SINK_CV, std::make_shared<CvSinkImpl>(name, inst.logger, inst.notifier,
-                                               inst.telemetry, processFrame));
 }
 
 CS_Sink CreateCvSinkCallback(std::string_view name,
