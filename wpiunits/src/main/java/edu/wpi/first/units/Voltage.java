@@ -7,11 +7,11 @@ package edu.wpi.first.units;
 /**
  * Unit of electric voltage dimension.
  *
- * <p>This is the base type for units of voltage dimension. It is also used to specify the
- * dimension for {@link Measure}: <code>Measure&lt;Voltage&gt;</code>.</p>
+ * <p>This is the base type for units of voltage dimension. It is also used to specify the dimension
+ * for {@link Measure}: <code>Measure&lt;Voltage&gt;</code>.
  *
  * <p>Actual units (such as {@link Units#Volts} and {@link Units#Millivolts}) can be found in the
- * {@link Units} class.</p>
+ * {@link Units} class.
  */
 public class Voltage extends Unit<Voltage> {
   Voltage(double baseUnitEquivalent, String name, String symbol) {

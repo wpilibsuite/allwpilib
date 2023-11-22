@@ -11,15 +11,15 @@ import java.util.Objects;
  * memory use reasons (such as on the memory-restricted roboRIO 1 or 2 or SBC coprocessors) and
  * should NOT be exposed in the public API for a class that uses it.
  *
- * <p>The advantage of using this class is to reuse one instance of a measurement object, as
- * opposed to instantiating a new immutable instance every time an operation is performed. This
- * will reduce memory pressure, but comes at the cost of increased code complexity and
- * sensitivity to race conditions if misused.</p>
+ * <p>The advantage of using this class is to reuse one instance of a measurement object, as opposed
+ * to instantiating a new immutable instance every time an operation is performed. This will reduce
+ * memory pressure, but comes at the cost of increased code complexity and sensitivity to race
+ * conditions if misused.
  *
  * <p>Any unsafe methods are prefixed with {@code mut_*}, such as {@link #mut_plus(Measure)} or
  * {@link #mut_replace(Measure)}. These methods will change the internal state of the measurement
  * object, and as such can be dangerous to use. They are primarily intended for use to track
- * internal state of things like sensors</p>
+ * internal state of things like sensors
  *
  * @param <U> the type of the unit of measure
  */

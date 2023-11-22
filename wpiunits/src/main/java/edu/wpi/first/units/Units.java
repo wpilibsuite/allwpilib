@@ -6,9 +6,7 @@ package edu.wpi.first.units;
 
 import java.util.Locale;
 
-/**
- * Contains a set of predefined units.
- */
+/** Contains a set of predefined units. */
 public final class Units {
   private Units() {
     // Prevent instantiation

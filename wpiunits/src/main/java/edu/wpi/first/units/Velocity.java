@@ -12,11 +12,11 @@ import java.util.Objects;
  * (denominator).
  *
  * <p>This is the base type for units of velocity dimension. It is also used in combination with a
- * distance dimension to specify the dimension for {@link Measure}. For example:
- * <code>Measure&lt;Velocity&lt;Distance&gt;&gt;</code>.</p>
+ * distance dimension to specify the dimension for {@link Measure}. For example: <code>
+ * Measure&lt;Velocity&lt;Distance&gt;&gt;</code>.
  *
  * <p>Actual units (such as {@link Units#MetersPerSecond} and {@link Units#RPM}) can be found in the
- * {@link Units} class.</p>
+ * {@link Units} class.
  *
  * @param <D> the distance unit, such as {@link Angle} or {@link Distance}
  */

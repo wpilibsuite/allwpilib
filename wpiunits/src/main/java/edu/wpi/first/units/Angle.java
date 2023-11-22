@@ -7,11 +7,11 @@ package edu.wpi.first.units;
 /**
  * Unit of angular dimension.
  *
- * <p>This is the base type for units of angular dimension. It is also used to specify the
- * dimension for {@link Measure}: <code>Measure&lt;Angle&gt;</code>.</p>
+ * <p>This is the base type for units of angular dimension. It is also used to specify the dimension
+ * for {@link Measure}: <code>Measure&lt;Angle&gt;</code>.
  *
  * <p>Actual units (such as {@link Units#Degrees} and {@link Units#Radians}) can be found in the
- * {@link Units} class.</p>
+ * {@link Units} class.
  */
 // technically, angles are unitless dimensions
 // eg Mass * Distance * Velocity<Angle> is equivalent to (Mass * Distance) / Time - otherwise known
