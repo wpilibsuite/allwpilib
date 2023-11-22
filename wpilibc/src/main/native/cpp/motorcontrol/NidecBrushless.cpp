@@ -30,7 +30,7 @@ void NidecBrushless::Set(double speed) {
   if (!m_disabled) {
     m_speed = speed;
     m_dio.UpdateDutyCycle(0.5 + 0.5 * (m_isInverted ? -speed : speed));
-    m_pwm.SetRaw(0xffff);
+    m_pwm.SetAlwaysHighMode();
   }
   Feed();
 }

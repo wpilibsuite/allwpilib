@@ -7,13 +7,13 @@
 #include <cstdio>
 #include <fstream>
 
+#include <gtest/gtest.h>
 #include <networktables/MultiSubscriber.h>
 #include <networktables/NetworkTableInstance.h>
 #include <ntcore.h>
 #include <units/time.h>
 
 #include "frc/Timer.h"
-#include "gtest/gtest.h"
 
 static const char* kFileName = "networktables.json";
 static constexpr auto kSaveTime = 1.2_s;

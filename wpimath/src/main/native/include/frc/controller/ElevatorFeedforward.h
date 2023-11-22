@@ -6,6 +6,9 @@
 
 #include <wpi/MathExtras.h>
 
+#include "frc/EigenCore.h"
+#include "frc/controller/LinearPlantInversionFeedforward.h"
+#include "frc/system/plant/LinearSystemId.h"
 #include "units/length.h"
 #include "units/time.h"
 #include "units/voltage.h"
@@ -52,6 +55,50 @@ class ElevatorFeedforward {
                                     units::unit_t<Acceleration> acceleration =
                                         units::unit_t<Acceleration>(0)) {
     return kS * wpi::sgn(velocity) + kG + kV * velocity + kA * acceleration;
+  }
+
+  /**
+   * Calculates the feedforward from the gains and setpoints.
+   *
+   * @param currentVelocity The current velocity setpoint, in distance per
+   *                        second.
+   * @param nextVelocity    The next velocity setpoint, in distance per second.
+   * @param dt              Time between velocity setpoints in seconds.
+   * @return The computed feedforward, in volts.
+   */
+  units::volt_t Calculate(units::unit_t<Velocity> currentVelocity,
+                          units::unit_t<Velocity> nextVelocity,
+                          units::second_t dt) const {
+    // Discretize the affine model.
+    //
+    //   dx/dt = Ax + Bu + c
+    //   dx/dt = Ax + B(u + B⁺c)
+    //   xₖ₊₁ = eᴬᵀxₖ + A⁻¹(eᴬᵀ - I)B(uₖ + B⁺cₖ)
+    //   xₖ₊₁ = A_d xₖ + B_d (uₖ + B⁺cₖ)
+    //   xₖ₊₁ = A_d xₖ + B_duₖ + B_d B⁺cₖ
+    //
+    // Solve for uₖ.
+    //
+    //   B_duₖ = xₖ₊₁ − A_d xₖ − B_d B⁺cₖ
+    //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ − B_d B⁺cₖ)
+    //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) − B⁺cₖ
+    //
+    // For an elevator with the model
+    // dx/dt = -Kv/Ka x + 1/Ka u - Kg/Ka - Ks/Ka sgn(x),
+    // A = -Kv/Ka, B = 1/Ka, and c = -(Kg/Ka + Ks/Ka sgn(x)). Substitute in B
+    // assuming sgn(x) is a constant for the duration of the step.
+    //
+    //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) − Ka(-(Kg/Ka + Ks/Ka sgn(x)))
+    //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + Ka(Kg/Ka + Ks/Ka sgn(x))
+    //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + Kg + Ks sgn(x)
+    auto plant = LinearSystemId::IdentifyVelocitySystem<Distance>(kV, kA);
+    LinearPlantInversionFeedforward<1, 1> feedforward{plant, dt};
+
+    Vectord<1> r{currentVelocity.value()};
+    Vectord<1> nextR{nextVelocity.value()};
+
+    return kG + kS * wpi::sgn(currentVelocity.value()) +
+           units::volt_t{feedforward.Calculate(r, nextR)(0)};
   }
 
   // Rearranging the main equation from the calculate() method yields the
@@ -129,3 +176,6 @@ class ElevatorFeedforward {
   units::unit_t<ka_unit> kA{0};
 };
 }  // namespace frc
+
+#include "frc/controller/proto/ElevatorFeedforwardProto.h"
+#include "frc/controller/struct/ElevatorFeedforwardStruct.h"

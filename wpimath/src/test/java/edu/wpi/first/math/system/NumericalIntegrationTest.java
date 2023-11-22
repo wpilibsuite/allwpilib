@@ -31,6 +31,20 @@ class NumericalIntegrationTest {
   }
 
   @Test
+  void testZeroRKDP() {
+    var y1 =
+        NumericalIntegration.rkdp(
+            (x, u) -> {
+              return VecBuilder.fill(0);
+            },
+            VecBuilder.fill(0),
+            VecBuilder.fill(0),
+            0.1);
+
+    assertEquals(0.0, y1.get(0, 0), 1e-3);
+  }
+
+  @Test
   void testExponentialRKDP() {
     Matrix<N1, N1> y0 = VecBuilder.fill(0.0);
 

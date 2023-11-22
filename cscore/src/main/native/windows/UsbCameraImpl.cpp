@@ -270,8 +270,9 @@ void UsbCameraImpl::DeviceDisconnect() {
 }
 
 static bool IsPercentageProperty(std::string_view name) {
-  if (wpi::starts_with(name, "raw_"))
+  if (wpi::starts_with(name, "raw_")) {
     name = wpi::substr(name, 4);
+  }
   return name == "Brightness" || name == "Contrast" || name == "Saturation" ||
          name == "Hue" || name == "Sharpness" || name == "Gain" ||
          name == "Exposure";
@@ -498,7 +499,7 @@ bool UsbCameraImpl::DeviceConnect() {
   }
 
   if (m_connectVerbose) {
-    SINFO("Connecting to USB camera on {}", m_path);
+    SINFO("Attempting to connect to USB camera on {}", m_path);
   }
 
   SDEBUG3("opening device");
@@ -523,6 +524,10 @@ bool UsbCameraImpl::DeviceConnect() {
   if (!m_sourceReader) {
     m_mediaSource.Reset();
     return false;
+  }
+
+  if (m_connectVerbose) {
+    SINFO("Connected to USB camera on {}", m_path);
   }
 
   CS_Status st = 0;

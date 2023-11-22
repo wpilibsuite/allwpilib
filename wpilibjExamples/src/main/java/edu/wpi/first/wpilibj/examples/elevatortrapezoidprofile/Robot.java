@@ -17,8 +17,10 @@ public class Robot extends TimedRobot {
   // Note: These gains are fake, and will have to be tuned for your robot.
   private final SimpleMotorFeedforward m_feedforward = new SimpleMotorFeedforward(1, 1.5);
 
-  private final TrapezoidProfile.Constraints m_constraints =
-      new TrapezoidProfile.Constraints(1.75, 0.75);
+  // Create a motion profile with the given maximum velocity and maximum
+  // acceleration constraints for the next setpoint.
+  private final TrapezoidProfile m_profile =
+      new TrapezoidProfile(new TrapezoidProfile.Constraints(1.75, 0.75));
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
 
@@ -33,17 +35,12 @@ public class Robot extends TimedRobot {
     if (m_joystick.getRawButtonPressed(2)) {
       m_goal = new TrapezoidProfile.State(5, 0);
     } else if (m_joystick.getRawButtonPressed(3)) {
-      m_goal = new TrapezoidProfile.State(0, 0);
+      m_goal = new TrapezoidProfile.State();
     }
-
-    // Create a motion profile with the given maximum velocity and maximum
-    // acceleration constraints for the next setpoint, the desired goal, and the
-    // current setpoint.
-    var profile = new TrapezoidProfile(m_constraints, m_goal, m_setpoint);
 
     // Retrieve the profiled setpoint for the next timestep. This setpoint moves
     // toward the goal while obeying the constraints.
-    m_setpoint = profile.calculate(kDt);
+    m_setpoint = m_profile.calculate(kDt, m_setpoint, m_goal);
 
     // Send setpoint to offboard controller PID
     m_motor.setSetpoint(

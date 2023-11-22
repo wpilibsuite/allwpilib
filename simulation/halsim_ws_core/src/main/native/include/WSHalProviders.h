@@ -10,7 +10,7 @@
 #include <string_view>
 
 #include <hal/simulation/NotifyListener.h>
-#include <wpi/json.h>
+#include <wpi/json_fwd.h>
 #include <wpi/mutex.h>
 
 #include "WSBaseProvider.h"

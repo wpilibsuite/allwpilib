@@ -11,7 +11,7 @@
 using namespace frc;
 
 HolonomicDriveController::HolonomicDriveController(
-    frc2::PIDController xController, frc2::PIDController yController,
+    PIDController xController, PIDController yController,
     ProfiledPIDController<units::radian> thetaController)
     : m_xController(std::move(xController)),
       m_yController(std::move(yController)),
@@ -78,4 +78,17 @@ ChassisSpeeds HolonomicDriveController::Calculate(
 
 void HolonomicDriveController::SetEnabled(bool enabled) {
   m_enabled = enabled;
+}
+
+ProfiledPIDController<units::radian>&
+HolonomicDriveController::getThetaController() {
+  return m_thetaController;
+}
+
+PIDController& HolonomicDriveController::getXController() {
+  return m_xController;
+}
+
+PIDController& HolonomicDriveController::getYController() {
+  return m_yController;
 }

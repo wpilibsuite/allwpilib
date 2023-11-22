@@ -9,34 +9,8 @@
 #include <string>
 #include <string_view>
 
-#include "gtest/gtest.h"
-
-namespace wpi {
-
-class json;
-
-inline void PrintTo(std::string_view str, ::std::ostream* os) {
-  ::testing::internal::PrintStringTo(std::string{str}, os);
-}
-
-template <typename T>
-void PrintTo(std::span<T> val, ::std::ostream* os) {
-  *os << '{';
-  bool first = true;
-  for (auto v : val) {
-    if (first) {
-      first = false;
-    } else {
-      *os << ", ";
-    }
-    *os << ::testing::PrintToString(v);
-  }
-  *os << '}';
-}
-
-void PrintTo(const json& val, ::std::ostream* os);
-
-}  // namespace wpi
+#include <gtest/gtest.h>
+#include <wpi/TestPrinters.h>
 
 namespace nt {
 

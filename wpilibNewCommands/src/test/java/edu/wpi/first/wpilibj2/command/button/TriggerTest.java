@@ -194,34 +194,6 @@ class TriggerTest extends CommandTestBase {
     assertEquals(1, endCounter.get());
   }
 
-  // Binding runnables directly is deprecated -- users should create the command manually
-  @SuppressWarnings("deprecation")
-  @Test
-  void runnableBindingTest() {
-    InternalButton buttonWhenActive = new InternalButton();
-    InternalButton buttonWhileActiveContinuous = new InternalButton();
-    InternalButton buttonWhenInactive = new InternalButton();
-
-    buttonWhenActive.setPressed(false);
-    buttonWhileActiveContinuous.setPressed(true);
-    buttonWhenInactive.setPressed(true);
-
-    AtomicInteger counter = new AtomicInteger(0);
-
-    buttonWhenActive.whenPressed(counter::incrementAndGet);
-    buttonWhileActiveContinuous.whileActiveContinuous(counter::incrementAndGet);
-    buttonWhenInactive.whenInactive(counter::incrementAndGet);
-
-    CommandScheduler scheduler = CommandScheduler.getInstance();
-
-    scheduler.run();
-    buttonWhenActive.setPressed(true);
-    buttonWhenInactive.setPressed(false);
-    scheduler.run();
-
-    assertEquals(counter.get(), 4);
-  }
-
   @Test
   void triggerCompositionTest() {
     InternalButton button1 = new InternalButton();

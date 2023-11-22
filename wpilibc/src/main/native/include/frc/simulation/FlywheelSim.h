@@ -20,7 +20,9 @@ class FlywheelSim : public LinearSystemSim<1, 1, 1> {
   /**
    * Creates a simulated flywheel mechanism.
    *
-   * @param plant              The linear system representing the flywheel.
+   * @param plant              The linear system representing the flywheel. This
+   *                           system can be created with
+   *                           LinearSystemId::FlywheelSystem().
    * @param gearbox            The type of and number of motors in the flywheel
    *                           gearbox.
    * @param gearing            The gearing of the flywheel (numbers greater than
@@ -44,6 +46,15 @@ class FlywheelSim : public LinearSystemSim<1, 1, 1> {
   FlywheelSim(const DCMotor& gearbox, double gearing,
               units::kilogram_square_meter_t moi,
               const std::array<double, 1>& measurementStdDevs = {0.0});
+
+  using LinearSystemSim::SetState;
+
+  /**
+   * Sets the flywheel's state.
+   *
+   * @param velocity The new velocity
+   */
+  void SetState(units::radians_per_second_t velocity);
 
   /**
    * Returns the flywheel velocity.

@@ -128,7 +128,7 @@ bool AddIcon(const unsigned char* data, int len);
 
 inline bool AddIcon(std::string_view data) {
   return AddIcon(reinterpret_cast<const unsigned char*>(data.data()),
-                 data.size());
+                 static_cast<int>(data.size()));
 }
 
 /**
@@ -161,6 +161,13 @@ enum Style { kStyleClassic = 0, kStyleDark, kStyleLight };
  * @param style Style
  */
 void SetStyle(Style style);
+
+/**
+ * Sets the FPS limit.  Using this function makes this setting persistent.
+ *
+ * @param fps FPS (0=vsync)
+ */
+void SetFPS(int fps);
 
 /**
  * Sets the clear (background) color.

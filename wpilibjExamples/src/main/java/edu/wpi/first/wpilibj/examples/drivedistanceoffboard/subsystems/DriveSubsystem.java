@@ -19,12 +19,14 @@ public class DriveSubsystem extends SubsystemBase {
   private final ExampleSmartMotorController m_leftFollower =
       new ExampleSmartMotorController(DriveConstants.kLeftMotor2Port);
 
+  // The motors on the right side of the drive.
   private final ExampleSmartMotorController m_rightLeader =
       new ExampleSmartMotorController(DriveConstants.kRightMotor1Port);
 
   private final ExampleSmartMotorController m_rightFollower =
       new ExampleSmartMotorController(DriveConstants.kRightMotor2Port);
 
+  // The feedforward controller.
   private final SimpleMotorFeedforward m_feedforward =
       new SimpleMotorFeedforward(
           DriveConstants.ksVolts,

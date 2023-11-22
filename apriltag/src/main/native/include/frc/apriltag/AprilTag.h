@@ -5,12 +5,9 @@
 #pragma once
 
 #include <wpi/SymbolExports.h>
+#include <wpi/json_fwd.h>
 
 #include "frc/geometry/Pose3d.h"
-
-namespace wpi {
-class json;
-}  // namespace wpi
 
 namespace frc {
 

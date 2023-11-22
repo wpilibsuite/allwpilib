@@ -13,7 +13,7 @@ public class SimDeviceJNI extends JNIWrapper {
    * Creates a simulated device.
    *
    * <p>The device name must be unique. 0 is returned if the device name already exists. If multiple
-   * instances of the same device are desired, recommend appending the instance/unique identifer in
+   * instances of the same device are desired, recommend appending the instance/unique identifier in
    * brackets to the base name, e.g. "device[1]".
    *
    * <p>0 is returned if not in simulation.

@@ -9,11 +9,11 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: React Rocket
-        uses: actions/github-script@v4
+        uses: actions/github-script@v6
         with:
           script: |
             const {owner, repo} = context.issue
-            github.reactions.createForIssueComment({
+            github.rest.reactions.createForIssueComment({
               owner,
               repo,
               comment_id: context.payload.comment.id,
@@ -34,7 +34,7 @@ jobs:
           GITHUB_TOKEN: "${{ secrets.COMMENT_COMMAND_PAT_TOKEN }}"
           NUMBER: ${{ github.event.issue.number }}
       - name: Set up Python 3.8
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: 3.8
       - name: Setup Java
@@ -42,16 +42,10 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: 11
-      - name: Install clang-format
-        run: |
-          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-          sudo sh -c "echo 'deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-14 main' >> /etc/apt/sources.list.d/proposed-repositories.list"
-          sudo apt-get update -q
-          sudo apt-get install -y clang-format-14
       - name: Install wpiformat
         run: pip3 install wpiformat
       - name: Run wpiformat
-        run: wpiformat -clang 14
+        run: wpiformat
       - name: Run spotlessApply
         run: ./gradlew spotlessApply
       - name: Commit

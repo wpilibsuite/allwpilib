@@ -4,19 +4,19 @@
 
 #include "App.h"
 
-#include <libssh/libssh.h>
-
 #include <memory>
 #include <string_view>
-
-#define IMGUI_DEFINE_MATH_OPERATORS
 
 #include <glass/Context.h>
 #include <glass/MainMenuBar.h>
 #include <glass/Storage.h>
+#include <libssh/libssh.h>
+
+#define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <wpigui.h>
+#include <wpigui_openurl.h>
 
 #include "Downloader.h"
 #include "Exporter.h"
@@ -93,6 +93,15 @@ static void DisplayMainMenu() {
     ImGui::EndMenu();
   }
 
+  if (ImGui::BeginMenu("Docs")) {
+    if (ImGui::MenuItem("Online documentation")) {
+      wpi::gui::OpenURL(
+          "https://docs.wpilib.org/en/stable/docs/software/telemetry/"
+          "datalog.html");
+    }
+    ImGui::EndMenu();
+  }
+
   ImGui::EndMainMenuBar();
 
   if (about) {
@@ -104,6 +113,8 @@ static void DisplayMainMenu() {
     ImGui::Text("v%s", GetWPILibVersion());
     ImGui::Separator();
     ImGui::Text("Save location: %s", glass::GetStorageDir().c_str());
+    ImGui::Text("%.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate,
+                ImGui::GetIO().Framerate);
     if (ImGui::Button("Close")) {
       ImGui::CloseCurrentPopup();
     }

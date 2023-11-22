@@ -40,6 +40,10 @@ void RapidReactCommandBot::ConfigureBindings() {
           m_storage.RunCommand())
           // Since we composed this inline we should give it a name
           .WithName("Shoot"));
+
+  // Toggle compressor with the Start button
+  m_driverController.Start().ToggleOnTrue(
+      m_pneumatics.DisableCompressorCommand());
 }
 
 frc2::CommandPtr RapidReactCommandBot::GetAutonomousCommand() {

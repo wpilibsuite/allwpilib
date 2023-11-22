@@ -17,6 +17,7 @@ Welcome to the WPILib project. This repository contains the HAL, WPILibJ, and WP
     - [Custom toolchain location](#custom-toolchain-location)
     - [Formatting/Linting](#formattinglinting)
     - [CMake](#cmake)
+  - [Running examples in simulation](#running-examples-in-simulation)
   - [Publishing](#publishing)
   - [Structure and Organization](#structure-and-organization)
 - [Contributing to WPILib](#contributing-to-wpilib)
@@ -40,7 +41,7 @@ Using Gradle makes building WPILib very straightforward. It only has a few depen
 
 ## Requirements
 
-- [JDK 11](https://adoptopenjdk.net/)
+- [JDK 11](https://adoptium.net/temurin/releases/?version=11)
     - Note that the JRE is insufficient; the full JDK is required
     - On Ubuntu, run `sudo apt install openjdk-11-jdk`
     - On Windows, install the JDK 11 .msi from the link above
@@ -48,7 +49,7 @@ Using Gradle makes building WPILib very straightforward. It only has a few depen
 - C++ compiler
     - On Linux, install GCC 11 or greater
     - On Windows, install [Visual Studio Community 2022](https://visualstudio.microsoft.com/vs/community/) and select the C++ programming language during installation (Gradle can't use the build tools for Visual Studio)
-    - On macOS, install the Xcode command-line build tools via `xcode-select --install`
+    - On macOS, install the Xcode command-line build tools via `xcode-select --install`. Xcode 13 or later is required.
 - ARM compiler toolchain
     - Run `./gradlew installRoboRioToolchain` after cloning this repository
     - If the WPILib installer was used, this toolchain is already installed
@@ -61,7 +62,7 @@ On macOS ARM, run `softwareupdate --install-rosetta`. This is necessary to be ab
 
 Clone the WPILib repository and follow the instructions above for installing any required tooling.
 
-See the [styleguide README](https://github.com/wpilibsuite/styleguide/blob/main/README.md) for wpiformat setup instructions. We use clang-format 14.
+See the [styleguide README](https://github.com/wpilibsuite/styleguide/blob/main/README.md) for wpiformat setup instructions.
 
 ## Building
 
@@ -87,9 +88,24 @@ If opening from a fresh clone, generated java dependencies will not exist. Most 
 
 `./gradlew build` builds _everything_, which includes debug and release builds for desktop and all installed cross compilers. Many developers don't need or want to build all of this. Therefore, common tasks have shortcuts to only build necessary components for common development and testing tasks.
 
-`./gradlew testDesktopCpp` and `./gradlew testDesktopJava` will build and run the tests for `wpilibc` and `wpilibj` respectively. They will only build the minimum components required to run the tests.
+`./gradlew testDesktopCpp` and `./gradlew testDesktopJava` will build and run the tests for `wpilibc` and `wpilibj` respectively. They will only build the minimum components required to run the tests. `./gradlew testDesktop` will run both `testDesktopJava` and `testDesktopCpp`.
 
-`testDesktopCpp` and `testDesktopJava` tasks also exist for the projects `wpiutil`, `ntcore`, `cscore`, `hal` `wpilibNewCommands` and `cameraserver`. These can be ran with `./gradlew :projectName:task`.
+`testDesktopCpp`, `testDesktopJava`, and `testDesktop` tasks also exist for the following projects:
+
+- `apriltag`
+- `cameraserver`
+- `cscore`
+- `hal`
+- `ntcore`
+- `wpilibNewCommands`
+- `wpimath`
+- `wpinet`
+- `wpiunits`
+- `wpiutil`
+- `romiVendordep`
+- `xrpVendordep`
+
+These can be ran with `./gradlew :projectName:task`.
 
 `./gradlew buildDesktopCpp` and `./gradlew buildDesktopJava` will compile `wpilibcExamples` and `wpilibjExamples` respectively. The results can't be ran, but they can compile.
 
@@ -119,7 +135,7 @@ Once a PR has been submitted, formatting can be run in CI by commenting `/format
 
 #### wpiformat
 
-wpiformat can be executed anywhere in the repository via `py -3 -m wpiformat -clang 14` on Windows or `python3 -m wpiformat -clang 14` on other platforms.
+wpiformat can be executed anywhere in the repository via `py -3 -m wpiformat` on Windows or `python3 -m wpiformat` on other platforms.
 
 #### Java Code Quality Tools
 
@@ -130,6 +146,16 @@ If you only want to run the Java autoformatter, run `./gradlew spotlessApply`.
 ### CMake
 
 CMake is also supported for building. See [README-CMAKE.md](README-CMAKE.md).
+
+## Running examples in simulation
+
+Examples can be run in simulation with the following command:
+
+```bash
+./gradlew wpilibcExamples:runExample
+./gradlew wpilibjExamples:runExample
+```
+where `Example` is the example's folder name.
 
 ## Publishing
 

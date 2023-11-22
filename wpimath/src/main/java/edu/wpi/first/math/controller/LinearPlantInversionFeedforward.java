@@ -139,6 +139,9 @@ public class LinearPlantInversionFeedforward<
    * @return The calculated feedforward.
    */
   public Matrix<Inputs, N1> calculate(Matrix<States, N1> r, Matrix<States, N1> nextR) {
+    // rₖ₊₁ = Arₖ + Buₖ
+    // Buₖ = rₖ₊₁ − Arₖ
+    // uₖ = B⁺(rₖ₊₁ − Arₖ)
     m_uff = new Matrix<>(m_B.solve(nextR.minus(m_A.times(r))));
 
     m_r = nextR;

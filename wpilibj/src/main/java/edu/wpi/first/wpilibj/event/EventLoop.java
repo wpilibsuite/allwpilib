@@ -7,12 +7,14 @@ package edu.wpi.first.wpilibj.event;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 
-/** The loop polling {@link BooleanEvent} objects and executing the actions bound to them. */
+/**
+ * A declarative way to bind a set of actions to a loop and execute them when the loop is polled.
+ */
 public final class EventLoop {
   private final Collection<Runnable> m_bindings = new LinkedHashSet<>();
 
   /**
-   * Bind a new action to run whenever the condition is true.
+   * Bind a new action to run when the loop is polled.
    *
    * @param action the action to run.
    */

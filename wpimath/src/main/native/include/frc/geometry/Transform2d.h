@@ -6,14 +6,14 @@
 
 #include <wpi/SymbolExports.h>
 
-#include "Translation2d.h"
+#include "frc/geometry/Translation2d.h"
 
 namespace frc {
 
 class WPILIB_DLLEXPORT Pose2d;
 
 /**
- * Represents a transformation for a Pose2d.
+ * Represents a transformation for a Pose2d in the pose's frame.
  */
 class WPILIB_DLLEXPORT Transform2d {
  public:
@@ -32,6 +32,17 @@ class WPILIB_DLLEXPORT Transform2d {
    * @param rotation Rotational component of the transform.
    */
   constexpr Transform2d(Translation2d translation, Rotation2d rotation);
+
+  /**
+   * Constructs a transform with x and y translations instead of a separate
+   * Translation2d.
+   *
+   * @param x The x component of the translational component of the transform.
+   * @param y The y component of the translational component of the transform.
+   * @param rotation The rotational component of the transform.
+   */
+  constexpr Transform2d(units::meter_t x, units::meter_t y,
+                        Rotation2d rotation);
 
   /**
    * Constructs the identity transform -- maps an initial pose to itself.
@@ -94,7 +105,8 @@ class WPILIB_DLLEXPORT Transform2d {
   }
 
   /**
-   * Composes two transformations.
+   * Composes two transformations. The second transform is applied relative to
+   * the orientation of the first.
    *
    * @param other The transform to compose with this one.
    * @return The composition of the two transformations.
@@ -112,4 +124,6 @@ class WPILIB_DLLEXPORT Transform2d {
 };
 }  // namespace frc
 
-#include "Transform2d.inc"
+#include "frc/geometry/proto/Transform2dProto.h"
+#include "frc/geometry/struct/Transform2dStruct.h"
+#include "frc/geometry/Transform2d.inc"

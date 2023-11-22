@@ -6,6 +6,7 @@
 
 #include <wpi/json.h>
 
+#include "geometry3d.pb.h"
 #include "units/length.h"
 #include "units/math.h"
 

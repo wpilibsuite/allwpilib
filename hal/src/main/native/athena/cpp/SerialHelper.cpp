@@ -192,45 +192,54 @@ void SerialHelper::QueryHubPaths(int32_t* status) {
     // Open the resource, grab its interface name, and close it.
     ViSession vSession;
     *status = viOpen(m_resourceHandle, desc, VI_NULL, VI_NULL, &vSession);
-    if (*status < 0)
+    if (*status < 0) {
       continue;
+    }
     *status = 0;
 
     *status = viGetAttribute(vSession, VI_ATTR_INTF_INST_NAME, &osName);
     // Ignore an error here, as we want to close the session on an error
     // Use a separate close variable so we can check
     ViStatus closeStatus = viClose(vSession);
-    if (*status < 0)
+    if (*status < 0) {
       continue;
-    if (closeStatus < 0)
+    }
+    if (closeStatus < 0) {
       continue;
+    }
     *status = 0;
 
     // split until (/dev/
     std::string_view devNameRef = wpi::split(osName, "(/dev/").second;
     // String not found, continue
-    if (wpi::equals(devNameRef, ""))
+    if (wpi::equals(devNameRef, "")) {
       continue;
+    }
 
     // Split at )
     std::string_view matchString = wpi::split(devNameRef, ')').first;
-    if (wpi::equals(matchString, devNameRef))
+    if (wpi::equals(matchString, devNameRef)) {
       continue;
+    }
 
     // Search directories to get a list of system accessors
     // The directories we need are not symbolic, so we can safely
     // disable symbolic links.
     std::error_code ec;
     for (auto& p : fs::recursive_directory_iterator("/sys/devices/soc0", ec)) {
-      if (ec)
+      if (ec) {
         break;
+      }
       std::string path = p.path();
-      if (path.find("amba") == std::string::npos)
+      if (path.find("amba") == std::string::npos) {
         continue;
-      if (path.find("usb") == std::string::npos)
+      }
+      if (path.find("usb") == std::string::npos) {
         continue;
-      if (path.find(matchString) == std::string::npos)
+      }
+      if (path.find(matchString) == std::string::npos) {
         continue;
+      }
 
       wpi::SmallVector<std::string_view, 16> pathSplitVec;
       // Split path into individual directories
@@ -254,13 +263,15 @@ void SerialHelper::QueryHubPaths(int32_t* status) {
 
       // Get the index for our device
       int hubIndex = findtty;
-      if (findtty == -1)
+      if (findtty == -1) {
         hubIndex = findregex;
+      }
 
       int devStart = findusb + 1;
 
-      if (hubIndex < devStart)
+      if (hubIndex < devStart) {
         continue;
+      }
 
       // Add our devices to our list
       m_unsortedHubPath.emplace_back(

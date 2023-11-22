@@ -9,7 +9,7 @@
 DriveDistance::DriveDistance(double inches, double speed,
                              DriveSubsystem* subsystem)
     : m_drive(subsystem), m_distance(inches), m_speed(speed) {
-  AddRequirements({subsystem});
+  AddRequirements(subsystem);
 }
 
 void DriveDistance::Initialize() {

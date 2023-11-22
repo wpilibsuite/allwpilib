@@ -108,7 +108,7 @@ void HAL_SetSPIMode(HAL_SPIPort port, HAL_SPIMode mode);
  *
  * @param port  The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for
  * MXP
- * @returns     The SPI mode currently set
+ * @return      The SPI mode currently set
  */
 HAL_SPIMode HAL_GetSPIMode(HAL_SPIPort port);
 
@@ -172,7 +172,7 @@ void HAL_FreeSPIAuto(HAL_SPIPort port, int32_t* status);
  *
  * @param[in] port    The number of the port to use. 0-3 for Onboard CS0-CS2, 4
  *                    for MXP.
- * @param[in] period  The accumlation period (seconds).
+ * @param[in] period  The accumulation period (seconds).
  * @param[out] status the error code, or 0 for success
  */
 void HAL_StartSPIAutoRate(HAL_SPIPort port, double period, int32_t* status);
@@ -199,7 +199,7 @@ void HAL_StartSPIAutoTrigger(HAL_SPIPort port, HAL_Handle digitalSourceHandle,
                              int32_t* status);
 
 /**
- * Stops an automatic SPI accumlation.
+ * Stops an automatic SPI accumulation.
  *
  * @param[in] port    The number of the port to use. 0-3 for Onboard CS0-CS2, 4
  *                    for MXP.

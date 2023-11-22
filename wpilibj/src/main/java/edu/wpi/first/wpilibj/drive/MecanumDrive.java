@@ -152,8 +152,8 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
    * <p>Angles are measured counterclockwise from the positive X axis. The robot's speed is
    * independent of its angle or rotation rate.
    *
-   * @param xSpeed The robot's speed along the Y axis [-1.0..1.0]. Forward is positive.
-   * @param ySpeed The robot's speed along the X axis [-1.0..1.0]. Left is positive.
+   * @param xSpeed The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
+   * @param ySpeed The robot's speed along the Y axis [-1.0..1.0]. Left is positive.
    * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Counterclockwise is
    *     positive.
    * @param gyroAngle The gyro heading around the Z axis. Use this to implement field-oriented
@@ -275,13 +275,9 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
     builder.addDoubleProperty(
         "Front Left Motor Speed", m_frontLeftMotor::get, m_frontLeftMotor::set);
     builder.addDoubleProperty(
-        "Front Right Motor Speed",
-        () -> m_frontRightMotor.get(),
-        value -> m_frontRightMotor.set(value));
+        "Front Right Motor Speed", m_frontRightMotor::get, m_frontRightMotor::set);
     builder.addDoubleProperty("Rear Left Motor Speed", m_rearLeftMotor::get, m_rearLeftMotor::set);
     builder.addDoubleProperty(
-        "Rear Right Motor Speed",
-        () -> m_rearRightMotor.get(),
-        value -> m_rearRightMotor.set(value));
+        "Rear Right Motor Speed", m_rearRightMotor::get, m_rearRightMotor::set);
   }
 }

@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <stdint.h>
+
 #include <functional>
 #include <string>
 #include <string_view>

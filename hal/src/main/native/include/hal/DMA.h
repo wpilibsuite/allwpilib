@@ -40,7 +40,7 @@ extern "C" {
 #endif
 
 /**
- * Initializes an object for peforming DMA transfers.
+ * Initializes an object for performing DMA transfers.
  *
  * @param[out] status Error status variable. 0 on success.
  * @return the created dma handle
@@ -185,7 +185,7 @@ void HAL_AddDMAAveragedAnalogInput(HAL_DMAHandle handle,
                                    int32_t* status);
 
 /**
- * Adds acuumulator data of an analog input to be collected by DMA.
+ * Adds accumulator data of an analog input to be collected by DMA.
  *
  * This can only be called if DMA is not started.
  *
@@ -310,7 +310,7 @@ enum HAL_DMAReadStatus HAL_ReadDMADirect(void* dmaPointer,
  *                           timing out
  * @param[in] remainingOut   the number of samples remaining in the queue
  * @param[out] status        Error status variable. 0 on success.
- * @return the succes result of the sample read
+ * @return the success result of the sample read
  */
 enum HAL_DMAReadStatus HAL_ReadDMA(HAL_DMAHandle handle,
                                    HAL_DMASample* dmaSample,

@@ -57,9 +57,9 @@ class TrapezoidProfileTest {
     TrapezoidProfile.State goal = new TrapezoidProfile.State(3, 0);
     TrapezoidProfile.State state = new TrapezoidProfile.State();
 
+    TrapezoidProfile profile = new TrapezoidProfile(constraints);
     for (int i = 0; i < 450; ++i) {
-      TrapezoidProfile profile = new TrapezoidProfile(constraints, goal, state);
-      state = profile.calculate(kDt);
+      state = profile.calculate(kDt, state, goal);
     }
     assertEquals(state, goal);
   }
@@ -67,21 +67,21 @@ class TrapezoidProfileTest {
   // Tests that decreasing the maximum velocity in the middle when it is already
   // moving faster than the new max is handled correctly
   @Test
-  void posContinousUnderVelChange() {
+  void posContinuousUnderVelChange() {
     TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(1.75, 0.75);
     TrapezoidProfile.State goal = new TrapezoidProfile.State(12, 0);
 
-    TrapezoidProfile profile = new TrapezoidProfile(constraints, goal);
-    TrapezoidProfile.State state = profile.calculate(kDt);
+    TrapezoidProfile profile = new TrapezoidProfile(constraints);
+    TrapezoidProfile.State state = profile.calculate(kDt, goal, new TrapezoidProfile.State());
 
     double lastPos = state.position;
     for (int i = 0; i < 1600; ++i) {
       if (i == 400) {
         constraints = new TrapezoidProfile.Constraints(0.75, 0.75);
+        profile = new TrapezoidProfile(constraints);
       }
 
-      profile = new TrapezoidProfile(constraints, goal, state);
-      state = profile.calculate(kDt);
+      state = profile.calculate(kDt, state, goal);
       double estimatedVel = (state.position - lastPos) / kDt;
 
       if (i >= 400) {
@@ -105,9 +105,9 @@ class TrapezoidProfileTest {
     TrapezoidProfile.State goal = new TrapezoidProfile.State(-2, 0);
     TrapezoidProfile.State state = new TrapezoidProfile.State();
 
+    TrapezoidProfile profile = new TrapezoidProfile(constraints);
     for (int i = 0; i < 400; ++i) {
-      TrapezoidProfile profile = new TrapezoidProfile(constraints, goal, state);
-      state = profile.calculate(kDt);
+      state = profile.calculate(kDt, state, goal);
     }
     assertEquals(state, goal);
   }
@@ -118,16 +118,16 @@ class TrapezoidProfileTest {
     TrapezoidProfile.State goal = new TrapezoidProfile.State(-2, 0);
     TrapezoidProfile.State state = new TrapezoidProfile.State();
 
+    TrapezoidProfile profile = new TrapezoidProfile(constraints);
     for (int i = 0; i < 200; ++i) {
-      TrapezoidProfile profile = new TrapezoidProfile(constraints, goal, state);
-      state = profile.calculate(kDt);
+      state = profile.calculate(kDt, state, goal);
     }
     assertNotEquals(state, goal);
 
     goal = new TrapezoidProfile.State(0.0, 0.0);
+    profile = new TrapezoidProfile(constraints);
     for (int i = 0; i < 550; ++i) {
-      TrapezoidProfile profile = new TrapezoidProfile(constraints, goal, state);
-      state = profile.calculate(kDt);
+      state = profile.calculate(kDt, state, goal);
     }
     assertEquals(state, goal);
   }
@@ -139,15 +139,15 @@ class TrapezoidProfileTest {
     TrapezoidProfile.State goal = new TrapezoidProfile.State(4, 0);
     TrapezoidProfile.State state = new TrapezoidProfile.State();
 
+    TrapezoidProfile profile = new TrapezoidProfile(constraints);
     for (int i = 0; i < 200; ++i) {
-      TrapezoidProfile profile = new TrapezoidProfile(constraints, goal, state);
-      state = profile.calculate(kDt);
+      state = profile.calculate(kDt, state, goal);
     }
     assertNear(constraints.maxVelocity, state.velocity, 10e-5);
 
+    profile = new TrapezoidProfile(constraints);
     for (int i = 0; i < 2000; ++i) {
-      TrapezoidProfile profile = new TrapezoidProfile(constraints, goal, state);
-      state = profile.calculate(kDt);
+      state = profile.calculate(kDt, state, goal);
     }
     assertEquals(state, goal);
   }
@@ -158,9 +158,9 @@ class TrapezoidProfileTest {
     TrapezoidProfile.State goal = new TrapezoidProfile.State(2, 0);
     TrapezoidProfile.State state = new TrapezoidProfile.State();
 
+    TrapezoidProfile profile = new TrapezoidProfile(constraints);
     for (int i = 0; i < 400; i++) {
-      TrapezoidProfile profile = new TrapezoidProfile(constraints, goal, state);
-      state = profile.calculate(kDt);
+      state = profile.calculate(kDt, state, goal);
       assertNear(profile.timeLeftUntil(state.position), 0, 2e-2);
     }
   }
@@ -170,14 +170,13 @@ class TrapezoidProfileTest {
     TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(0.75, 0.75);
     TrapezoidProfile.State goal = new TrapezoidProfile.State(2, 0);
 
-    TrapezoidProfile profile = new TrapezoidProfile(constraints, goal);
-    TrapezoidProfile.State state = profile.calculate(kDt);
+    TrapezoidProfile profile = new TrapezoidProfile(constraints);
+    TrapezoidProfile.State state = profile.calculate(kDt, goal, new TrapezoidProfile.State());
 
     double predictedTimeLeft = profile.timeLeftUntil(goal.position);
     boolean reachedGoal = false;
     for (int i = 0; i < 400; i++) {
-      profile = new TrapezoidProfile(constraints, goal, state);
-      state = profile.calculate(kDt);
+      state = profile.calculate(kDt, state, goal);
       if (!reachedGoal && state.equals(goal)) {
         // Expected value using for loop index is just an approximation since
         // the time left in the profile doesn't increase linearly at the
@@ -193,14 +192,13 @@ class TrapezoidProfileTest {
     TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(0.75, 0.75);
     TrapezoidProfile.State goal = new TrapezoidProfile.State(2, 0);
 
-    TrapezoidProfile profile = new TrapezoidProfile(constraints, goal);
-    TrapezoidProfile.State state = profile.calculate(kDt);
+    TrapezoidProfile profile = new TrapezoidProfile(constraints);
+    TrapezoidProfile.State state = profile.calculate(kDt, goal, new TrapezoidProfile.State());
 
     double predictedTimeLeft = profile.timeLeftUntil(1);
     boolean reachedGoal = false;
     for (int i = 0; i < 400; i++) {
-      profile = new TrapezoidProfile(constraints, goal, state);
-      state = profile.calculate(kDt);
+      state = profile.calculate(kDt, state, goal);
       if (!reachedGoal && Math.abs(state.velocity - 1) < 10e-5) {
         assertNear(predictedTimeLeft, i / 100.0, 2e-2);
         reachedGoal = true;
@@ -213,14 +211,13 @@ class TrapezoidProfileTest {
     TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(0.75, 0.75);
     TrapezoidProfile.State goal = new TrapezoidProfile.State(-2, 0);
 
-    TrapezoidProfile profile = new TrapezoidProfile(constraints, goal);
-    TrapezoidProfile.State state = profile.calculate(kDt);
+    TrapezoidProfile profile = new TrapezoidProfile(constraints);
+    TrapezoidProfile.State state = profile.calculate(kDt, goal, new TrapezoidProfile.State());
 
     double predictedTimeLeft = profile.timeLeftUntil(goal.position);
     boolean reachedGoal = false;
     for (int i = 0; i < 400; i++) {
-      profile = new TrapezoidProfile(constraints, goal, state);
-      state = profile.calculate(kDt);
+      state = profile.calculate(kDt, state, goal);
       if (!reachedGoal && state.equals(goal)) {
         // Expected value using for loop index is just an approximation since
         // the time left in the profile doesn't increase linearly at the
@@ -236,14 +233,13 @@ class TrapezoidProfileTest {
     TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(0.75, 0.75);
     TrapezoidProfile.State goal = new TrapezoidProfile.State(-2, 0);
 
-    TrapezoidProfile profile = new TrapezoidProfile(constraints, goal);
-    TrapezoidProfile.State state = profile.calculate(kDt);
+    TrapezoidProfile profile = new TrapezoidProfile(constraints);
+    TrapezoidProfile.State state = profile.calculate(kDt, goal, new TrapezoidProfile.State());
 
     double predictedTimeLeft = profile.timeLeftUntil(-1);
     boolean reachedGoal = false;
     for (int i = 0; i < 400; i++) {
-      profile = new TrapezoidProfile(constraints, goal, state);
-      state = profile.calculate(kDt);
+      state = profile.calculate(kDt, state, goal);
       if (!reachedGoal && Math.abs(state.velocity + 1) < 10e-5) {
         assertNear(predictedTimeLeft, i / 100.0, 2e-2);
         reachedGoal = true;

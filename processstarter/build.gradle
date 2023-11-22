@@ -1,0 +1,85 @@
+import org.gradle.internal.os.OperatingSystem
+
+if (project.hasProperty('onlylinuxathena')) {
+    return;
+}
+
+description = "Process Starter"
+
+apply plugin: 'cpp'
+apply plugin: 'objective-cpp'
+apply plugin: 'visual-studio'
+apply plugin: 'edu.wpi.first.NativeUtils'
+
+ext {
+    nativeName = 'processstarter'
+}
+
+apply from: "${rootDir}/shared/config.gradle"
+
+// Replace shared crt with static crt.
+// Note this means no wpilib binaries can be dependencies
+nativeUtils.platformConfigs.named(nativeUtils.wpi.platforms.windowsx64).configure {
+    cppCompiler.debugArgs.remove('/MDd')
+    cppCompiler.debugArgs.add('/MTd')
+    cppCompiler.releaseArgs.remove('/MD')
+    cppCompiler.releaseArgs.add('/MT')
+}
+
+project(':').libraryBuild.dependsOn build
+
+model {
+    components {
+        "${nativeName}"(NativeExecutableSpec) {
+            baseName = 'processstarter'
+            binaries.all {
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                    it.buildable = false
+                    return
+                }
+                if (it.targetPlatform.operatingSystem.isMacOsX()) {
+                    it.sources {
+                        macObjCpp(ObjectiveCppSourceSet) {
+                            source {
+                                srcDirs 'src/main/native/osx'
+                                include '**/*.mm'
+                            }
+                            exportedHeaders {
+                                srcDirs 'src/main/native/include'
+                                include '**/*.h'
+                            }
+                        }
+                    }
+                } else if (it.targetPlatform.operatingSystem.isLinux()) {
+                    it.sources {
+                        linuxCpp(CppSourceSet) {
+                            source {
+                                srcDirs 'src/main/native/linux'
+                                include '**/*.cpp'
+                            }
+                            exportedHeaders {
+                                srcDirs 'src/main/native/include'
+                                include '**/*.h'
+                            }
+                        }
+                    }
+                } else if (it.targetPlatform.operatingSystem.isWindows()) {
+                    it.sources {
+                        windowsCpp(CppSourceSet) {
+                            source {
+                                srcDirs 'src/main/native/windows'
+                                include '**/*.cpp'
+                            }
+                            exportedHeaders {
+                                srcDirs 'src/main/native/include'
+                                include '**/*.h'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+apply from: 'publish.gradle'

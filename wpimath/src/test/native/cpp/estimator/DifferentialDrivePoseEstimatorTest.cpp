@@ -7,13 +7,14 @@
 #include <tuple>
 #include <utility>
 
+#include <gtest/gtest.h>
+
 #include "frc/StateSpaceUtil.h"
 #include "frc/estimator/DifferentialDrivePoseEstimator.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
 #include "frc/kinematics/DifferentialDriveKinematics.h"
 #include "frc/trajectory/TrajectoryGenerator.h"
-#include "gtest/gtest.h"
 #include "units/angle.h"
 #include "units/length.h"
 #include "units/time.h"
@@ -138,6 +139,7 @@ void testFollowTrajectory(
               0.15);
 
   if (checkError) {
+    // NOLINTNEXTLINE(bugprone-integer-division)
     EXPECT_LT(errorSum / (trajectory.TotalTime() / dt), 0.05);
     EXPECT_LT(maxError, 0.2);
   }
@@ -262,4 +264,32 @@ TEST(DifferentialDrivePoseEstimatorTest, SimultaneousVisionMeasurements) {
 
     EXPECT_TRUE(dx > 0.08_m || dy > 0.08_m || dtheta > 0.08_rad);
   }
+}
+
+TEST(DifferentialDrivePoseEstimatorTest, TestDiscardStaleVisionMeasurements) {
+  frc::DifferentialDriveKinematics kinematics{1_m};
+
+  frc::DifferentialDrivePoseEstimator estimator{
+      kinematics,      frc::Rotation2d{}, 0_m, 0_m, frc::Pose2d{},
+      {0.1, 0.1, 0.1}, {0.45, 0.45, 0.45}};
+
+  // Add enough measurements to fill up the buffer
+  for (auto time = 0.0_s; time < 4_s; time += 0.02_s) {
+    estimator.UpdateWithTime(time, frc::Rotation2d{}, 0_m, 0_m);
+  }
+
+  auto odometryPose = estimator.GetEstimatedPosition();
+
+  // Apply a vision measurement from 3 seconds ago
+  estimator.AddVisionMeasurement(
+      frc::Pose2d{frc::Translation2d{10_m, 10_m}, frc::Rotation2d{0.1_rad}},
+      1_s, {0.1, 0.1, 0.1});
+
+  EXPECT_NEAR(odometryPose.X().value(),
+              estimator.GetEstimatedPosition().X().value(), 1e-6);
+  EXPECT_NEAR(odometryPose.Y().value(),
+              estimator.GetEstimatedPosition().Y().value(), 1e-6);
+  EXPECT_NEAR(odometryPose.Rotation().Radians().value(),
+              estimator.GetEstimatedPosition().Rotation().Radians().value(),
+              1e-6);
 }

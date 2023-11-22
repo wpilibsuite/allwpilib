@@ -150,7 +150,7 @@ Java_edu_wpi_first_hal_SimDeviceJNI_createSimValueEnumDouble
   }
   return HAL_CreateSimValueEnumDouble(
       device, JStringRef{env, name}.c_str(), direction, len, carr.data(),
-      JDoubleArrayRef{env, optionValues}.array().data(), initialValue);
+      JSpan<const jdouble>{env, optionValues}.data(), initialValue);
 }
 
 /*

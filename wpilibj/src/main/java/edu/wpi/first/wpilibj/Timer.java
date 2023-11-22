@@ -101,6 +101,19 @@ public class Timer {
   }
 
   /**
+   * Restart the timer by stopping the timer, if it is not already stopped, resetting the
+   * accumulated time, then starting the timer again. If you want an event to periodically reoccur
+   * at some time interval from the start time, consider using advanceIfElapsed() instead.
+   */
+  public void restart() {
+    if (m_running) {
+      stop();
+    }
+    reset();
+    start();
+  }
+
+  /**
    * Stop the timer. This computes the time as of now and clears the running flag, causing all
    * subsequent time requests to be read from the accumulated time rather than looking at the system
    * clock.

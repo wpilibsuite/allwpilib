@@ -7,6 +7,7 @@ package edu.wpi.first.networktables;
 import edu.wpi.first.util.RuntimeLoader;
 import edu.wpi.first.util.datalog.DataLog;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.EnumSet;
 import java.util.OptionalLong;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -182,12 +183,77 @@ public final class NetworkTablesJNI {
   public static native Timestamped{{ t.TypeName }}[] readQueue{{ t.TypeName }}(int subentry);
 
   public static native {{ t.java.ValueType }}[] readQueueValues{{ t.TypeName }}(int subentry);
+{% if t.TypeName == "Raw" %}
+  public static boolean setRaw(int entry, long time, byte[] value) {
+    return setRaw(entry, time, value, 0, value.length);
+  }
 
+  public static native boolean setRaw(int entry, long time, byte[] value, int start, int len);
+
+  public static boolean setRaw(int entry, long time, ByteBuffer value) {
+    int pos = value.position();
+    return setRaw(entry, time, value, pos, value.capacity() - pos);
+  }
+
+  public static boolean setRaw(int entry, long time, ByteBuffer value, int start, int len) {
+    if (value.isDirect()) {
+      if (start < 0) {
+        throw new IndexOutOfBoundsException("start must be >= 0");
+      }
+      if (len < 0) {
+        throw new IndexOutOfBoundsException("len must be >= 0");
+      }
+      if ((start + len) > value.capacity()) {
+        throw new IndexOutOfBoundsException("start + len must be smaller than buffer capacity");
+      }
+      return setRawBuffer(entry, time, value, start, len);
+    } else if (value.hasArray()) {
+      return setRaw(entry, time, value.array(), value.arrayOffset() + start, len);
+    } else {
+      throw new UnsupportedOperationException("ByteBuffer must be direct or have a backing array");
+    }
+  }
+
+  private static native boolean setRawBuffer(int entry, long time, ByteBuffer value, int start, int len);
+{% else %}
   public static native boolean set{{ t.TypeName }}(int entry, long time, {{ t.java.ValueType }} value);
-
+{% endif %}
   public static native {{ t.java.ValueType }} get{{ t.TypeName }}(int entry, {{ t.java.ValueType }} defaultValue);
+{% if t.TypeName == "Raw" %}
+  public static boolean setDefaultRaw(int entry, long time, byte[] defaultValue) {
+    return setDefaultRaw(entry, time, defaultValue, 0, defaultValue.length);
+  }
 
+  public static native boolean setDefaultRaw(int entry, long time, byte[] defaultValue, int start, int len);
+
+  public static boolean setDefaultRaw(int entry, long time, ByteBuffer defaultValue) {
+    int pos = defaultValue.position();
+    return setDefaultRaw(entry, time, defaultValue, pos, defaultValue.limit() - pos);
+  }
+
+  public static boolean setDefaultRaw(int entry, long time, ByteBuffer defaultValue, int start, int len) {
+    if (defaultValue.isDirect()) {
+      if (start < 0) {
+        throw new IndexOutOfBoundsException("start must be >= 0");
+      }
+      if (len < 0) {
+        throw new IndexOutOfBoundsException("len must be >= 0");
+      }
+      if ((start + len) > defaultValue.capacity()) {
+        throw new IndexOutOfBoundsException("start + len must be smaller than buffer capacity");
+      }
+      return setDefaultRawBuffer(entry, time, defaultValue, start, len);
+    } else if (defaultValue.hasArray()) {
+      return setDefaultRaw(entry, time, defaultValue.array(), defaultValue.arrayOffset() + start, len);
+    } else {
+      throw new UnsupportedOperationException("ByteBuffer must be direct or have a backing array");
+    }
+  }
+
+  private static native boolean setDefaultRawBuffer(int entry, long time, ByteBuffer defaultValue, int start, int len);
+{% else %}
   public static native boolean setDefault{{ t.TypeName }}(int entry, long time, {{ t.java.ValueType }} defaultValue);
+{% endif %}
 {% endfor %}
   public static native NetworkTableValue[] readQueueValue(int subentry);
 
@@ -250,6 +316,8 @@ public final class NetworkTablesJNI {
   public static native void setServer(int inst, String[] serverNames, int[] ports);
 
   public static native void setServerTeam(int inst, int team, int port);
+
+  public static native void disconnect(int inst);
 
   public static native void startDSClient(int inst, int port);
 

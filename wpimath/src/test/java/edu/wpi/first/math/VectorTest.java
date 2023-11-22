@@ -10,6 +10,44 @@ import org.junit.jupiter.api.Test;
 
 class VectorTest {
   @Test
+  void testVectorPlus() {
+    var vec1 = VecBuilder.fill(1.0, 2.0, 3.0);
+    var vec2 = VecBuilder.fill(4.0, 5.0, 6.0);
+    var result1 = vec1.plus(vec2);
+
+    assertEquals(5.0, result1.get(0, 0));
+    assertEquals(7.0, result1.get(1, 0));
+    assertEquals(9.0, result1.get(2, 0));
+
+    var vec3 = VecBuilder.fill(-1.0, 2.0, -3.0);
+    var vec4 = VecBuilder.fill(4.0, -5.0, 6.0);
+    var result2 = vec3.plus(vec4);
+
+    assertEquals(3.0, result2.get(0, 0));
+    assertEquals(-3.0, result2.get(1, 0));
+    assertEquals(3.0, result2.get(2, 0));
+  }
+
+  @Test
+  void testVectorMinus() {
+    var vec1 = VecBuilder.fill(1.0, 2.0, 3.0);
+    var vec2 = VecBuilder.fill(4.0, 5.0, 6.0);
+    var result1 = vec1.minus(vec2);
+
+    assertEquals(-3.0, result1.get(0, 0));
+    assertEquals(-3.0, result1.get(1, 0));
+    assertEquals(-3.0, result1.get(2, 0));
+
+    var vec3 = VecBuilder.fill(-1.0, 2.0, -3.0);
+    var vec4 = VecBuilder.fill(4.0, -5.0, 6.0);
+    var result2 = vec3.minus(vec4);
+
+    assertEquals(-5.0, result2.get(0, 0));
+    assertEquals(7.0, result2.get(1, 0));
+    assertEquals(-9.0, result2.get(2, 0));
+  }
+
+  @Test
   void testVectorDot() {
     var vec1 = VecBuilder.fill(1.0, 2.0, 3.0);
     var vec2 = VecBuilder.fill(4.0, 5.0, 6.0);

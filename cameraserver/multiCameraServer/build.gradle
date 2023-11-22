@@ -18,7 +18,9 @@ ext {
 
 apply from: "${rootDir}/shared/opencv.gradle"
 
-mainClassName = 'edu.wpi.Main'
+application {
+    mainClass = 'edu.wpi.Main'
+}
 
 apply plugin: 'com.github.johnrengelman.shadow'
 
@@ -29,7 +31,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.google.code.gson:gson:2.8.9'
+    implementation 'com.google.code.gson:gson:2.10.1'
 
     implementation project(':wpiutil')
     implementation project(':wpinet')
@@ -59,6 +61,9 @@ model {
                 lib project: ':cscore', library: 'cscore', linkage: 'static'
                 lib project: ':wpinet', library: 'wpinet', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
+                if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                    nativeUtils.useRequiredLibrary(binary, 'ni_link_libraries', 'ni_runtime_libraries')
+                }
             }
         }
     }

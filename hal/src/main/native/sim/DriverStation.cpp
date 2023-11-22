@@ -75,7 +75,7 @@ static HAL_ControlWord newestControlWord;
 static JoystickDataCache caches[3];
 static JoystickDataCache* currentRead = &caches[0];
 static JoystickDataCache* currentReadLocal = &caches[0];
-static std::atomic<JoystickDataCache*> currentCache{&caches[1]};
+static std::atomic<JoystickDataCache*> currentCache{nullptr};
 static JoystickDataCache* lastGiven = &caches[1];
 static JoystickDataCache* cacheToUpdate = &caches[2];
 
@@ -194,7 +194,7 @@ int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {
 
 HAL_AllianceStationID HAL_GetAllianceStation(int32_t* status) {
   if (gShutdown) {
-    return HAL_AllianceStationID_kRed1;
+    return HAL_AllianceStationID_kUnknown;
   }
   std::scoped_lock lock{driverStation->cacheMutex};
   return currentRead->allianceStation;
@@ -318,9 +318,9 @@ void HAL_ObserveUserProgramTest(void) {
   // TODO
 }
 
-void HAL_RefreshDSData(void) {
+HAL_Bool HAL_RefreshDSData(void) {
   if (gShutdown) {
-    return;
+    return false;
   }
   HAL_ControlWord controlWord;
   std::memset(&controlWord, 0, sizeof(controlWord));
@@ -336,6 +336,7 @@ void HAL_RefreshDSData(void) {
     currentRead = prev;
   }
   newestControlWord = controlWord;
+  return prev != nullptr;
 }
 
 void HAL_ProvideNewDataEventHandle(WPI_EventHandle handle) {

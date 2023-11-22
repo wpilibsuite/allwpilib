@@ -7,15 +7,15 @@
 #include <string_view>
 #include <vector>
 
+#include <gtest/gtest.h>
+#include <wpi/SpanMatcher.h>
 #include <wpi/json.h>
 #include <wpi/raw_ostream.h>
 
-#include "../SpanMatcher.h"
 #include "../TestPrinters.h"
 #include "Handle.h"
 #include "PubSubOptions.h"
 #include "gmock/gmock-matchers.h"
-#include "gtest/gtest.h"
 #include "net/Message.h"
 #include "net/WireEncoder.h"
 #include "networktables/NetworkTableValue.h"
@@ -172,14 +172,15 @@ TEST_F(WireEncoderTextTest, MessageSubscribe) {
   ASSERT_TRUE(net::WireEncodeText(os, msg));
   ASSERT_EQ(os.str(),
             "{\"method\":\"subscribe\",\"params\":{"
-            "\"options\":{},\"topics\":[\"a\",\"b\"],\"subuid\":5}}");
+            "\"options\":{},\"topics\":[\"a\",\"b\"],\"subuid\":402653189}}");
 }
 
 TEST_F(WireEncoderTextTest, MessageUnsubscribe) {
   net::ClientMessage msg{
       net::UnsubscribeMsg{Handle{0, 5, Handle::kSubscriber}}};
   ASSERT_TRUE(net::WireEncodeText(os, msg));
-  ASSERT_EQ(os.str(), "{\"method\":\"unsubscribe\",\"params\":{\"subuid\":5}}");
+  ASSERT_EQ(os.str(),
+            "{\"method\":\"unsubscribe\",\"params\":{\"subuid\":402653189}}");
 }
 
 TEST_F(WireEncoderTextTest, MessageAnnounce) {

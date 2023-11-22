@@ -11,8 +11,8 @@ import edu.wpi.first.wpilibj.examples.romireference.commands.ArcadeDrive;
 import edu.wpi.first.wpilibj.examples.romireference.commands.AutonomousDistance;
 import edu.wpi.first.wpilibj.examples.romireference.commands.AutonomousTime;
 import edu.wpi.first.wpilibj.examples.romireference.subsystems.Drivetrain;
-import edu.wpi.first.wpilibj.examples.romireference.subsystems.OnBoardIO;
-import edu.wpi.first.wpilibj.examples.romireference.subsystems.OnBoardIO.ChannelMode;
+import edu.wpi.first.wpilibj.romi.OnBoardIO;
+import edu.wpi.first.wpilibj.romi.OnBoardIO.ChannelMode;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -30,7 +30,7 @@ public class RobotContainer {
   private final Drivetrain m_drivetrain = new Drivetrain();
   private final OnBoardIO m_onboardIO = new OnBoardIO(ChannelMode.INPUT, ChannelMode.INPUT);
 
-  // Assumes a gamepad plugged into channnel 0
+  // Assumes a gamepad plugged into channel 0
   private final Joystick m_controller = new Joystick(0);
 
   // Create SmartDashboard chooser for autonomous routines

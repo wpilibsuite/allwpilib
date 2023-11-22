@@ -10,8 +10,9 @@
 #include <stdexcept>
 #include <string>
 
-#include "Eigen/Cholesky"
-#include "drake/math/discrete_algebraic_riccati_equation.h"
+#include <Eigen/Cholesky>
+
+#include "frc/DARE.h"
 #include "frc/StateSpaceUtil.h"
 #include "frc/estimator/KalmanFilter.h"
 #include "frc/system/Discretization.h"
@@ -31,7 +32,7 @@ KalmanFilter<States, Inputs, Outputs>::KalmanFilter(
 
   Matrixd<States, States> discA;
   Matrixd<States, States> discQ;
-  DiscretizeAQTaylor<States>(plant.A(), contQ, dt, &discA, &discQ);
+  DiscretizeAQ<States>(plant.A(), contQ, dt, &discA, &discQ);
 
   auto discR = DiscretizeR<Outputs>(contR, dt);
 
@@ -47,8 +48,8 @@ KalmanFilter<States, Inputs, Outputs>::KalmanFilter(
     throw std::invalid_argument(msg);
   }
 
-  Matrixd<States, States> P = drake::math::DiscreteAlgebraicRiccatiEquation(
-      discA.transpose(), C.transpose(), discQ, discR);
+  Matrixd<States, States> P =
+      DARE<States, Outputs>(discA.transpose(), C.transpose(), discQ, discR);
 
   // S = CPCᵀ + R
   Matrixd<Outputs, Outputs> S = C * P * C.transpose() + discR;

@@ -114,8 +114,7 @@ class SwerveControllerCommandTest {
             this::setModuleStates,
             subsystem);
 
-    m_timer.reset();
-    m_timer.start();
+    m_timer.restart();
 
     command.initialize();
     while (!command.isFinished()) {

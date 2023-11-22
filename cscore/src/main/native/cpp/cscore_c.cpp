@@ -516,7 +516,7 @@ void CS_FreeEnumeratedVideoModes(CS_VideoMode* modes, int count) {
   std::free(modes);
 }
 
-char* CS_GetHostname() {
+char* CS_GetHostname(void) {
   return cs::ConvertToC(cs::GetHostname());
 }
 

@@ -44,26 +44,14 @@ class DriveSubsystem : public frc2::SubsystemBase {
   double GetAverageEncoderDistance();
 
   /**
-   * Gets the left drive encoder.
-   *
-   * @return the left drive encoder
-   */
-  frc::Encoder& GetLeftEncoder();
-
-  /**
-   * Gets the right drive encoder.
-   *
-   * @return the right drive encoder
-   */
-  frc::Encoder& GetRightEncoder();
-
-  /**
    * Sets the max output of the drive.  Useful for scaling the drive to drive
    * more slowly.
    *
    * @param maxOutput the maximum output to which the drive will be constrained
    */
   void SetMaxOutput(double maxOutput);
+
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   // Components (e.g. motor controllers and sensors) should generally be

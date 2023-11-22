@@ -4,14 +4,14 @@
 
 #pragma once
 
+#include <initializer_list>
+#include <span>
+
 #include <wpi/SymbolExports.h>
+#include <wpi/json_fwd.h>
 
-#include "Rotation2d.h"
+#include "frc/geometry/Rotation2d.h"
 #include "units/length.h"
-
-namespace wpi {
-class json;
-}  // namespace wpi
 
 namespace frc {
 
@@ -170,6 +170,21 @@ class WPILIB_DLLEXPORT Translation2d {
    */
   bool operator==(const Translation2d& other) const;
 
+  /**
+   * Returns the nearest Translation2d from a collection of translations
+   * @param translations The collection of translations.
+   * @return The nearest Translation2d from the collection.
+   */
+  Translation2d Nearest(std::span<const Translation2d> translations) const;
+
+  /**
+   * Returns the nearest Translation2d from a collection of translations
+   * @param translations The collection of translations.
+   * @return The nearest Translation2d from the collection.
+   */
+  Translation2d Nearest(
+      std::initializer_list<Translation2d> translations) const;
+
  private:
   units::meter_t m_x = 0_m;
   units::meter_t m_y = 0_m;
@@ -183,4 +198,6 @@ void from_json(const wpi::json& json, Translation2d& state);
 
 }  // namespace frc
 
-#include "Translation2d.inc"
+#include "frc/geometry/proto/Translation2dProto.h"
+#include "frc/geometry/struct/Translation2dStruct.h"
+#include "frc/geometry/Translation2d.inc"

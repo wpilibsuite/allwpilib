@@ -54,6 +54,14 @@ void Timer::Start() {
   }
 }
 
+void Timer::Restart() {
+  if (m_running) {
+    Stop();
+  }
+  Reset();
+  Start();
+}
+
 void Timer::Stop() {
   if (m_running) {
     m_accumulatedTime = Get();
@@ -82,5 +90,5 @@ units::second_t Timer::GetFPGATimestamp() {
 }
 
 units::second_t Timer::GetMatchTime() {
-  return units::second_t{frc::DriverStation::GetMatchTime()};
+  return frc::DriverStation::GetMatchTime();
 }

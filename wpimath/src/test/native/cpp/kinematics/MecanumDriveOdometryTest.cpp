@@ -5,9 +5,10 @@
 #include <limits>
 #include <random>
 
+#include <gtest/gtest.h>
+
 #include "frc/kinematics/MecanumDriveOdometry.h"
 #include "frc/trajectory/TrajectoryGenerator.h"
-#include "gtest/gtest.h"
 
 using namespace frc;
 

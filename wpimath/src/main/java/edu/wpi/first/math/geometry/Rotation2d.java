@@ -4,13 +4,19 @@
 
 package edu.wpi.first.math.geometry;
 
+import static edu.wpi.first.units.Units.Radians;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.proto.Rotation2dProto;
+import edu.wpi.first.math.geometry.struct.Rotation2dStruct;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.Measure;
 import java.util.Objects;
 
 /**
@@ -62,6 +68,15 @@ public class Rotation2d implements Interpolatable<Rotation2d> {
       m_cos = 1.0;
     }
     m_value = Math.atan2(m_sin, m_cos);
+  }
+
+  /**
+   * Constructs a Rotation2d with the given angle.
+   *
+   * @param angle The angle of the rotation.
+   */
+  public Rotation2d(Measure<Angle> angle) {
+    this(angle.in(Radians));
   }
 
   /**
@@ -256,4 +271,7 @@ public class Rotation2d implements Interpolatable<Rotation2d> {
   public Rotation2d interpolate(Rotation2d endValue, double t) {
     return plus(endValue.minus(this).times(MathUtil.clamp(t, 0, 1)));
   }
+
+  public static final Rotation2dStruct struct = new Rotation2dStruct();
+  public static final Rotation2dProto proto = new Rotation2dProto();
 }

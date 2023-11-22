@@ -8,13 +8,10 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import edu.wpi.first.math.MatBuilder;
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Nat;
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.WPIMathJNI;
+import edu.wpi.first.math.geometry.proto.Pose3dProto;
+import edu.wpi.first.math.geometry.struct.Pose3dStruct;
 import edu.wpi.first.math.interpolation.Interpolatable;
-import edu.wpi.first.math.numbers.N3;
 import java.util.Objects;
 
 /** Represents a 3D pose containing translational and rotational elements. */
@@ -68,7 +65,10 @@ public class Pose3d implements Interpolatable<Pose3d> {
   }
 
   /**
-   * Transforms the pose by the given transformation and returns the new transformed pose.
+   * Transforms the pose by the given transformation and returns the new transformed pose. The
+   * transform is applied relative to the pose's frame. Note that this differs from {@link
+   * Pose3d#rotateBy(Rotation3d)}, which is applied relative to the global frame and around the
+   * origin.
    *
    * @param other The transform to transform the pose by.
    * @return The transformed pose.
@@ -156,8 +156,21 @@ public class Pose3d implements Interpolatable<Pose3d> {
   }
 
   /**
-   * Transforms the pose by the given transformation and returns the new pose. See + operator for
-   * the matrix multiplication performed.
+   * Rotates the pose around the origin and returns the new pose.
+   *
+   * @param other The rotation to transform the pose by, which is applied extrinsically (from the
+   *     global frame).
+   * @return The rotated pose.
+   */
+  public Pose3d rotateBy(Rotation3d other) {
+    return new Pose3d(m_translation.rotateBy(other), m_rotation.rotateBy(other));
+  }
+
+  /**
+   * Transforms the pose by the given transformation and returns the new transformed pose. The
+   * transform is applied relative to the pose's frame. Note that this differs from {@link
+   * Pose3d#rotateBy(Rotation3d)}, which is applied relative to the global frame and around the
+   * origin.
    *
    * @param other The transform to transform the pose by.
    * @return The transformed pose.
@@ -200,36 +213,28 @@ public class Pose3d implements Interpolatable<Pose3d> {
    * @return The new pose of the robot.
    */
   public Pose3d exp(Twist3d twist) {
-    final var Omega = rotationVectorToMatrix(VecBuilder.fill(twist.rx, twist.ry, twist.rz));
-    final var OmegaSq = Omega.times(Omega);
-
-    double thetaSq = twist.rx * twist.rx + twist.ry * twist.ry + twist.rz * twist.rz;
-
-    // Get left Jacobian of SO3. See first line in right column of
-    // http://asrl.utias.utoronto.ca/~tdb/bib/barfoot_ser17_identities.pdf
-    Matrix<N3, N3> J;
-    if (thetaSq < 1E-9 * 1E-9) {
-      // J = I + 0.5ω
-      J = Matrix.eye(Nat.N3()).plus(Omega.times(0.5));
-    } else {
-      double theta = Math.sqrt(thetaSq);
-      // J = I + (1 − cos(θ))/θ² ω + (θ − sin(θ))/θ³ ω²
-      J =
-          Matrix.eye(Nat.N3())
-              .plus(Omega.times((1.0 - Math.cos(theta)) / thetaSq))
-              .plus(OmegaSq.times((theta - Math.sin(theta)) / (thetaSq * theta)));
-    }
-
-    // Get translation component
-    final var translation =
-        J.times(new MatBuilder<>(Nat.N3(), Nat.N1()).fill(twist.dx, twist.dy, twist.dz));
-
-    final var transform =
-        new Transform3d(
-            new Translation3d(translation.get(0, 0), translation.get(1, 0), translation.get(2, 0)),
-            new Rotation3d(twist.rx, twist.ry, twist.rz));
-
-    return this.plus(transform);
+    var quaternion = this.getRotation().getQuaternion();
+    double[] resultArray =
+        WPIMathJNI.expPose3d(
+            this.getX(),
+            this.getY(),
+            this.getZ(),
+            quaternion.getW(),
+            quaternion.getX(),
+            quaternion.getY(),
+            quaternion.getZ(),
+            twist.dx,
+            twist.dy,
+            twist.dz,
+            twist.rx,
+            twist.ry,
+            twist.rz);
+    return new Pose3d(
+        resultArray[0],
+        resultArray[1],
+        resultArray[2],
+        new Rotation3d(
+            new Quaternion(resultArray[3], resultArray[4], resultArray[5], resultArray[6])));
   }
 
   /**
@@ -240,50 +245,31 @@ public class Pose3d implements Interpolatable<Pose3d> {
    * @return The twist that maps this to end.
    */
   public Twist3d log(Pose3d end) {
-    final var transform = end.relativeTo(this);
-
-    final var rotVec = transform.getRotation().getQuaternion().toRotationVector();
-
-    final var Omega = rotationVectorToMatrix(rotVec);
-    final var OmegaSq = Omega.times(Omega);
-
-    double thetaSq =
-        rotVec.get(0, 0) * rotVec.get(0, 0)
-            + rotVec.get(1, 0) * rotVec.get(1, 0)
-            + rotVec.get(2, 0) * rotVec.get(2, 0);
-
-    // Get left Jacobian inverse of SO3. See fourth line in right column of
-    // http://asrl.utias.utoronto.ca/~tdb/bib/barfoot_ser17_identities.pdf
-    Matrix<N3, N3> Jinv;
-    if (thetaSq < 1E-9 * 1E-9) {
-      // J⁻¹ = I − 0.5ω + 1/12 ω²
-      Jinv = Matrix.eye(Nat.N3()).minus(Omega.times(0.5)).plus(OmegaSq.times(1.0 / 12.0));
-    } else {
-      double theta = Math.sqrt(thetaSq);
-      double halfTheta = 0.5 * theta;
-
-      // J⁻¹ = I − 0.5ω + (1 − 0.5θ cos(θ/2) / sin(θ/2))/θ² ω²
-      Jinv =
-          Matrix.eye(Nat.N3())
-              .minus(Omega.times(0.5))
-              .plus(
-                  OmegaSq.times(
-                      (1.0 - 0.5 * theta * Math.cos(halfTheta) / Math.sin(halfTheta)) / thetaSq));
-    }
-
-    // Get dtranslation component
-    final var dtranslation =
-        Jinv.times(
-            new MatBuilder<>(Nat.N3(), Nat.N1())
-                .fill(transform.getX(), transform.getY(), transform.getZ()));
-
+    var thisQuaternion = this.getRotation().getQuaternion();
+    var endQuaternion = end.getRotation().getQuaternion();
+    double[] resultArray =
+        WPIMathJNI.logPose3d(
+            this.getX(),
+            this.getY(),
+            this.getZ(),
+            thisQuaternion.getW(),
+            thisQuaternion.getX(),
+            thisQuaternion.getY(),
+            thisQuaternion.getZ(),
+            end.getX(),
+            end.getY(),
+            end.getZ(),
+            endQuaternion.getW(),
+            endQuaternion.getX(),
+            endQuaternion.getY(),
+            endQuaternion.getZ());
     return new Twist3d(
-        dtranslation.get(0, 0),
-        dtranslation.get(1, 0),
-        dtranslation.get(2, 0),
-        rotVec.get(0, 0),
-        rotVec.get(1, 0),
-        rotVec.get(2, 0));
+        resultArray[0],
+        resultArray[1],
+        resultArray[2],
+        resultArray[3],
+        resultArray[4],
+        resultArray[5]);
   }
 
   /**
@@ -335,30 +321,6 @@ public class Pose3d implements Interpolatable<Pose3d> {
     }
   }
 
-  /**
-   * Applies the hat operator to a rotation vector.
-   *
-   * <p>It takes a rotation vector and returns the corresponding matrix representation of the Lie
-   * algebra element (a 3x3 rotation matrix).
-   *
-   * @param rotation The rotation vector.
-   * @return The rotation vector as a 3x3 rotation matrix.
-   */
-  private Matrix<N3, N3> rotationVectorToMatrix(Vector<N3> rotation) {
-    // Given a rotation vector <a, b, c>,
-    //         [ 0 -c  b]
-    // Omega = [ c  0 -a]
-    //         [-b  a  0]
-    return new MatBuilder<>(Nat.N3(), Nat.N3())
-        .fill(
-            0.0,
-            -rotation.get(2, 0),
-            rotation.get(1, 0),
-            rotation.get(2, 0),
-            0.0,
-            -rotation.get(0, 0),
-            -rotation.get(1, 0),
-            rotation.get(0, 0),
-            0.0);
-  }
+  public static final Pose3dStruct struct = new Pose3dStruct();
+  public static final Pose3dProto proto = new Pose3dProto();
 }

@@ -5,12 +5,12 @@
 #include <chrono>
 #include <thread>
 
+#include <gtest/gtest.h>
 #include <wpi/Synchronization.h>
 #include <wpi/json.h>
 
 #include "TestPrinters.h"
 #include "ValueMatcher.h"
-#include "gtest/gtest.h"
 #include "ntcore_c.h"
 #include "ntcore_cpp.h"
 

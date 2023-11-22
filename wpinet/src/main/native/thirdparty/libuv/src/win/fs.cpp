@@ -33,6 +33,11 @@
 #include <stdio.h>
 
 #include "uv.h"
+
+/* <winioctl.h> requires <windows.h>, included via "uv.h" above, but needs to
+   be included before our "winapi.h", included via "internal.h" below. */
+#include <winioctl.h>
+
 #include "internal.h"
 #include "req-inl.h"
 #include "handle-inl.h"
@@ -145,172 +150,9 @@ void uv__fs_init(void) {
 }
 
 
-INLINE static int fs__capture_path(uv_fs_t* req, const char* path,
-    const char* new_path, const int copy_path) {
-  char* buf;
-  char* pos;
-  ssize_t buf_sz = 0, path_len = 0, pathw_len = 0, new_pathw_len = 0;
-
-  /* new_path can only be set if path is also set. */
-  assert(new_path == NULL || path != NULL);
-
-  if (path != NULL) {
-    pathw_len = MultiByteToWideChar(CP_UTF8,
-                                    0,
-                                    path,
-                                    -1,
-                                    NULL,
-                                    0);
-    if (pathw_len == 0) {
-      return GetLastError();
-    }
-
-    buf_sz += pathw_len * sizeof(WCHAR);
-  }
-
-  if (path != NULL && copy_path) {
-    path_len = 1 + strlen(path);
-    buf_sz += path_len;
-  }
-
-  if (new_path != NULL) {
-    new_pathw_len = MultiByteToWideChar(CP_UTF8,
-                                        0,
-                                        new_path,
-                                        -1,
-                                        NULL,
-                                        0);
-    if (new_pathw_len == 0) {
-      return GetLastError();
-    }
-
-    buf_sz += new_pathw_len * sizeof(WCHAR);
-  }
-
-
-  if (buf_sz == 0) {
-    req->file.pathw = NULL;
-    req->fs.info.new_pathw = NULL;
-    req->path = NULL;
-    return 0;
-  }
-
-  buf = (char*) uv__malloc(buf_sz);
-  if (buf == NULL) {
-    return ERROR_OUTOFMEMORY;
-  }
-
-  pos = buf;
-
-  if (path != NULL) {
-    DWORD r = MultiByteToWideChar(CP_UTF8,
-                                  0,
-                                  path,
-                                  -1,
-                                  (WCHAR*) pos,
-                                  pathw_len);
-    assert(r == (DWORD) pathw_len);
-    req->file.pathw = (WCHAR*) pos;
-    pos += r * sizeof(WCHAR);
-  } else {
-    req->file.pathw = NULL;
-  }
-
-  if (new_path != NULL) {
-    DWORD r = MultiByteToWideChar(CP_UTF8,
-                                  0,
-                                  new_path,
-                                  -1,
-                                  (WCHAR*) pos,
-                                  new_pathw_len);
-    assert(r == (DWORD) new_pathw_len);
-    req->fs.info.new_pathw = (WCHAR*) pos;
-    pos += r * sizeof(WCHAR);
-  } else {
-    req->fs.info.new_pathw = NULL;
-  }
-
-  req->path = path;
-  if (path != NULL && copy_path) {
-    memcpy(pos, path, path_len);
-    assert(path_len == buf_sz - (pos - buf));
-    req->path = pos;
-  }
-
-  req->flags |= UV_FS_FREE_PATHS;
-
-  return 0;
-}
-
-
-
-INLINE static void uv__fs_req_init(uv_loop_t* loop, uv_fs_t* req,
-    uv_fs_type fs_type, const uv_fs_cb cb) {
-  uv__once_init();
-  UV_REQ_INIT(req, UV_FS);
-  req->loop = loop;
-  req->flags = 0;
-  req->fs_type = fs_type;
-  req->sys_errno_ = 0;
-  req->result = 0;
-  req->ptr = NULL;
-  req->path = NULL;
-  req->cb = cb;
-  memset(&req->fs, 0, sizeof(req->fs));
-}
-
-
-static int fs__wide_to_utf8(WCHAR* w_source_ptr,
-                               DWORD w_source_len,
-                               char** target_ptr,
-                               uint64_t* target_len_ptr) {
-  int r;
-  int target_len;
-  char* target;
-  target_len = WideCharToMultiByte(CP_UTF8,
-                                   0,
-                                   w_source_ptr,
-                                   w_source_len,
-                                   NULL,
-                                   0,
-                                   NULL,
-                                   NULL);
-
-  if (target_len == 0) {
-    return -1;
-  }
-
-  if (target_len_ptr != NULL) {
-    *target_len_ptr = target_len;
-  }
-
-  if (target_ptr == NULL) {
-    return 0;
-  }
-
-  target = (char*)uv__malloc(target_len + 1);
-  if (target == NULL) {
-    SetLastError(ERROR_OUTOFMEMORY);
-    return -1;
-  }
-
-  r = WideCharToMultiByte(CP_UTF8,
-                          0,
-                          w_source_ptr,
-                          w_source_len,
-                          target,
-                          target_len,
-                          NULL,
-                          NULL);
-  assert(r == target_len);
-  target[target_len] = '\0';
-  *target_ptr = target;
-  return 0;
-}
-
-
-INLINE static int fs__readlink_handle(HANDLE handle, char** target_ptr,
-    uint64_t* target_len_ptr) {
+INLINE static int fs__readlink_handle(HANDLE handle,
+                                      char** target_ptr,
+                                      size_t* target_len_ptr) {
   char buffer[MAXIMUM_REPARSE_DATA_BUFFER_SIZE];
   REPARSE_DATA_BUFFER* reparse_data = (REPARSE_DATA_BUFFER*) buffer;
   WCHAR* w_target;
@@ -440,7 +282,99 @@ INLINE static int fs__readlink_handle(HANDLE handle, char** target_ptr,
     return -1;
   }
 
-  return fs__wide_to_utf8(w_target, w_target_len, target_ptr, target_len_ptr);
+  assert(target_ptr == NULL || *target_ptr == NULL);
+  return uv_utf16_to_wtf8((const uint16_t*)w_target, w_target_len, target_ptr, target_len_ptr);
+}
+
+
+INLINE static int fs__capture_path(uv_fs_t* req, const char* path,
+    const char* new_path, const int copy_path) {
+  WCHAR* buf;
+  WCHAR* pos;
+  size_t buf_sz = 0;
+  size_t path_len = 0;
+  ssize_t pathw_len = 0;
+  ssize_t new_pathw_len = 0;
+
+  /* new_path can only be set if path is also set. */
+  assert(new_path == NULL || path != NULL);
+
+  if (path != NULL) {
+    pathw_len = uv_wtf8_length_as_utf16(path);
+    if (pathw_len < 0)
+      return ERROR_INVALID_NAME;
+    buf_sz += pathw_len * sizeof(WCHAR);
+  }
+
+  if (path != NULL && copy_path) {
+    path_len = 1 + strlen(path);
+    buf_sz += path_len;
+  }
+
+  if (new_path != NULL) {
+    new_pathw_len = uv_wtf8_length_as_utf16(new_path);
+    if (new_pathw_len < 0)
+      return ERROR_INVALID_NAME;
+    buf_sz += new_pathw_len * sizeof(WCHAR);
+  }
+
+
+  if (buf_sz == 0) {
+    req->file.pathw = NULL;
+    req->fs.info.new_pathw = NULL;
+    req->path = NULL;
+    return 0;
+  }
+
+  buf = (WCHAR*)uv__malloc(buf_sz);
+  if (buf == NULL) {
+    return ERROR_OUTOFMEMORY;
+  }
+
+  pos = buf;
+
+  if (path != NULL) {
+    uv_wtf8_to_utf16(path, (uint16_t*)pos, pathw_len);
+    req->file.pathw = pos;
+    pos += pathw_len;
+  } else {
+    req->file.pathw = NULL;
+  }
+
+  if (new_path != NULL) {
+    uv_wtf8_to_utf16(new_path, (uint16_t*)pos, new_pathw_len);
+    req->fs.info.new_pathw = pos;
+    pos += new_pathw_len;
+  } else {
+    req->fs.info.new_pathw = NULL;
+  }
+
+  req->path = path;
+  if (path != NULL && copy_path) {
+    memcpy(pos, path, path_len);
+    assert(path_len == buf_sz - (pos - buf) * sizeof(WCHAR));
+    req->path = (char*) pos;
+  }
+
+  req->flags |= UV_FS_FREE_PATHS;
+
+  return 0;
+}
+
+
+INLINE static void uv__fs_req_init(uv_loop_t* loop, uv_fs_t* req,
+    uv_fs_type fs_type, const uv_fs_cb cb) {
+  uv__once_init();
+  UV_REQ_INIT(req, UV_FS);
+  req->loop = loop;
+  req->flags = 0;
+  req->fs_type = fs_type;
+  req->sys_errno_ = 0;
+  req->result = 0;
+  req->ptr = NULL;
+  req->path = NULL;
+  req->cb = cb;
+  memset(&req->fs, 0, sizeof(req->fs));
 }
 
 
@@ -1430,7 +1364,8 @@ void fs__scandir(uv_fs_t* req) {
       uv__dirent_t* dirent;
 
       size_t wchar_len;
-      size_t utf8_len;
+      size_t wtf8_len;
+      char* wtf8;
 
       /* Obtain a pointer to the current directory entry. */
       position += next_entry_offset;
@@ -1457,11 +1392,8 @@ void fs__scandir(uv_fs_t* req) {
           info->FileName[1] == L'.')
         continue;
 
-      /* Compute the space required to store the filename as UTF-8. */
-      utf8_len = WideCharToMultiByte(
-          CP_UTF8, 0, &info->FileName[0], wchar_len, NULL, 0, NULL, NULL);
-      if (utf8_len == 0)
-        goto win32_error;
+      /* Compute the space required to store the filename as WTF-8. */
+      wtf8_len = uv_utf16_length_as_wtf8((const uint16_t*)&info->FileName[0], wchar_len);
 
       /* Resize the dirent array if needed. */
       if (dirents_used >= dirents_size) {
@@ -1481,25 +1413,16 @@ void fs__scandir(uv_fs_t* req) {
        * includes room for the first character of the filename, but `utf8_len`
        * doesn't count the NULL terminator at this point.
        */
-      dirent = (uv__dirent_t*)uv__malloc(sizeof *dirent + utf8_len);
+      dirent = (uv__dirent_t*)uv__malloc(sizeof *dirent + wtf8_len);
       if (dirent == NULL)
         goto out_of_memory_error;
 
       dirents[dirents_used++] = dirent;
 
       /* Convert file name to UTF-8. */
-      if (WideCharToMultiByte(CP_UTF8,
-                              0,
-                              &info->FileName[0],
-                              wchar_len,
-                              &dirent->d_name[0],
-                              utf8_len,
-                              NULL,
-                              NULL) == 0)
-        goto win32_error;
-
-      /* Add a null terminator to the filename. */
-      dirent->d_name[utf8_len] = '\0';
+      wtf8 = &dirent->d_name[0];
+      if (uv_utf16_to_wtf8((const uint16_t*)&info->FileName[0], wchar_len, &wtf8, &wtf8_len) != 0)
+        goto out_of_memory_error;
 
       /* Fill out the type field. */
       if (info->FileAttributes & FILE_ATTRIBUTE_DEVICE)
@@ -1709,10 +1632,36 @@ void fs__closedir(uv_fs_t* req) {
 
 INLINE static int fs__stat_handle(HANDLE handle, uv_stat_t* statbuf,
     int do_lstat) {
+  size_t target_length = 0;
+  FILE_FS_DEVICE_INFORMATION device_info;
   FILE_ALL_INFORMATION file_info;
   FILE_FS_VOLUME_INFORMATION volume_info;
   NTSTATUS nt_status;
   IO_STATUS_BLOCK io_status;
+
+  nt_status = pNtQueryVolumeInformationFile(handle,
+                                            &io_status,
+                                            &device_info,
+                                            sizeof device_info,
+                                            FileFsDeviceInformation);
+
+  /* Buffer overflow (a warning status code) is expected here. */
+  if (NT_ERROR(nt_status)) {
+    SetLastError(pRtlNtStatusToDosError(nt_status));
+    return -1;
+  }
+
+  /* If it's NUL device set fields as reasonable as possible and return. */
+  if (device_info.DeviceType == FILE_DEVICE_NULL) {
+    memset(statbuf, 0, sizeof(uv_stat_t));
+    statbuf->st_mode = _S_IFCHR;
+    statbuf->st_mode |= (_S_IREAD | _S_IWRITE) | ((_S_IREAD | _S_IWRITE) >> 3) |
+                        ((_S_IREAD | _S_IWRITE) >> 6);
+    statbuf->st_nlink = 1;
+    statbuf->st_blksize = 4096;    
+    statbuf->st_rdev = FILE_DEVICE_NULL << 16;
+    return 0;
+  }
 
   nt_status = pNtQueryInformationFile(handle,
                                       &io_status,
@@ -1779,9 +1728,10 @@ INLINE static int fs__stat_handle(HANDLE handle, uv_stat_t* statbuf,
      * to be treated as a regular file. The higher level lstat function will
      * detect this failure and retry without do_lstat if appropriate.
      */
-    if (fs__readlink_handle(handle, NULL, &statbuf->st_size) != 0)
+    if (fs__readlink_handle(handle, NULL, &target_length) != 0)
       return -1;
     statbuf->st_mode |= S_IFLNK;
+    statbuf->st_size = target_length;
   }
 
   if (statbuf->st_mode == 0) {
@@ -1918,6 +1868,37 @@ INLINE static void fs__stat_impl(uv_fs_t* req, int do_lstat) {
 }
 
 
+INLINE static int fs__fstat_handle(int fd, HANDLE handle, uv_stat_t* statbuf) {
+  DWORD file_type;
+
+  /* Each file type is processed differently. */
+  file_type = uv_guess_handle(fd);
+  switch (file_type) {
+  /* Disk files use the existing logic from fs__stat_handle. */
+  case UV_FILE:
+    return fs__stat_handle(handle, statbuf, 0);
+
+  /* Devices and pipes are processed identically. There is no more information
+   * for them from any API. Fields are set as reasonably as possible and the
+   * function returns. */
+  case UV_TTY:
+  case UV_NAMED_PIPE:
+    memset(statbuf, 0, sizeof(uv_stat_t));
+    statbuf->st_mode = file_type == UV_TTY ? _S_IFCHR : _S_IFIFO;
+    statbuf->st_nlink = 1;
+    statbuf->st_rdev = (file_type == UV_TTY ? FILE_DEVICE_CONSOLE : FILE_DEVICE_NAMED_PIPE) << 16;
+    statbuf->st_ino = (uintptr_t) handle;
+    return 0;
+
+  /* If file type is unknown it is an error. */
+  case UV_UNKNOWN_HANDLE:
+  default:
+    SetLastError(ERROR_INVALID_HANDLE);
+    return -1;
+  }
+}
+
+
 static void fs__stat(uv_fs_t* req) {
   fs__stat_prepare_path(req->file.pathw);
   fs__stat_impl(req, 0);
@@ -1943,7 +1924,7 @@ static void fs__fstat(uv_fs_t* req) {
     return;
   }
 
-  if (fs__stat_handle(handle, &req->statbuf, 0) != 0) {
+  if (fs__fstat_handle(fd, handle, &req->statbuf) != 0) {
     SET_REQ_WIN32_ERROR(req, GetLastError());
     return;
   }
@@ -2224,7 +2205,7 @@ static void fs__fchmod(uv_fs_t* req) {
         SET_REQ_WIN32_ERROR(req, pRtlNtStatusToDosError(nt_status));
         goto fchmod_cleanup;
       }
-      /* Remeber to clear the flag later on */
+      /* Remember to clear the flag later on */
       clear_archive_flag = 1;
   } else {
       clear_archive_flag = 0;
@@ -2606,8 +2587,12 @@ static void fs__readlink(uv_fs_t* req) {
     return;
   }
 
+  assert(req->ptr == NULL);
   if (fs__readlink_handle(handle, (char**) &req->ptr, NULL) != 0) {
-    SET_REQ_WIN32_ERROR(req, GetLastError());
+    DWORD error = GetLastError();
+    SET_REQ_WIN32_ERROR(req, error);
+    if (error == ERROR_NOT_A_REPARSE_POINT)
+      req->result = UV_EINVAL;
     CloseHandle(handle);
     return;
   }
@@ -2662,7 +2647,8 @@ static ssize_t fs__realpath_handle(HANDLE handle, char** realpath_ptr) {
     return -1;
   }
 
-  r = fs__wide_to_utf8(w_realpath_ptr, w_realpath_len, realpath_ptr, NULL);
+  assert(*realpath_ptr == NULL);
+  r = uv_utf16_to_wtf8((const uint16_t*)w_realpath_ptr, w_realpath_len, realpath_ptr, NULL);
   uv__free(w_realpath_buf);
   return r;
 }
@@ -2682,6 +2668,7 @@ static void fs__realpath(uv_fs_t* req) {
     return;
   }
 
+  assert(req->ptr == NULL);
   if (fs__realpath_handle(handle, (char**) &req->ptr) == -1) {
     CloseHandle(handle);
     SET_REQ_WIN32_ERROR(req, GetLastError());

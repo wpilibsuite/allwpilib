@@ -37,6 +37,7 @@
 #include "wpi/STLForwardCompat.h"
 #include "wpi/MemAlloc.h"
 #include "wpi/type_traits.h"
+#include <cstddef>
 #include <cstring>
 #include <memory>
 #include <type_traits>
@@ -66,13 +67,13 @@ namespace detail {
 
 template <typename T>
 using EnableIfTrivial =
-    std::enable_if_t<wpi::is_trivially_move_constructible<T>::value &&
+    std::enable_if_t<std::is_trivially_move_constructible<T>::value &&
                      std::is_trivially_destructible<T>::value>;
 template <typename CallableT, typename ThisT>
 using EnableUnlessSameType =
     std::enable_if_t<!std::is_same<remove_cvref_t<CallableT>, ThisT>::value>;
 template <typename CallableT, typename Ret, typename... Params>
-using EnableIfCallable = std::enable_if_t<wpi::disjunction<
+using EnableIfCallable = std::enable_if_t<std::disjunction<
     std::is_void<Ret>,
     std::is_same<decltype(std::declval<CallableT>()(std::declval<Params>()...)),
                  Ret>,
@@ -106,11 +107,11 @@ protected:
   template <typename T> struct AdjustedParamTBase {
     static_assert(!std::is_reference<T>::value,
                   "references should be handled by template specialization");
-    using type = typename std::conditional<
-        wpi::is_trivially_copy_constructible<T>::value &&
-            wpi::is_trivially_move_constructible<T>::value &&
-            IsSizeLessThanThresholdT<T>::value,
-        T, T &>::type;
+    using type =
+        std::conditional_t<std::is_trivially_copy_constructible<T>::value &&
+                               std::is_trivially_move_constructible<T>::value &&
+                               IsSizeLessThanThresholdT<T>::value,
+                           T, T &>;
   };
 
   // This specialization ensures that 'AdjustedParam<V<T>&>' or
@@ -167,9 +168,7 @@ protected:
     // provide four pointers worth of storage here.
     // This is mutable as an inlined `const unique_function<void() const>` may
     // still modify its own mutable members.
-    mutable
-        typename std::aligned_storage<InlineStorageSize, alignof(void *)>::type
-            InlineStorage;
+    alignas(void*) mutable std::byte InlineStorage[InlineStorageSize];
   } StorageUnion;
 
   // A compressed pointer to either our dispatching callback or our table of
@@ -180,16 +179,15 @@ protected:
   bool isInlineStorage() const { return CallbackAndInlineFlag.getInt(); }
 
   bool isTrivialCallback() const {
-    return CallbackAndInlineFlag.getPointer().template is<TrivialCallback *>();
+    return isa<TrivialCallback *>(CallbackAndInlineFlag.getPointer());
   }
 
   CallPtrT getTrivialCallback() const {
-    return CallbackAndInlineFlag.getPointer().template get<TrivialCallback *>()->CallPtr;
+    return cast<TrivialCallback *>(CallbackAndInlineFlag.getPointer())->CallPtr;
   }
 
   NonTrivialCallbacks *getNonTrivialCallbacks() const {
-    return CallbackAndInlineFlag.getPointer()
-        .template get<NonTrivialCallbacks *>();
+    return cast<NonTrivialCallbacks *>(CallbackAndInlineFlag.getPointer());
   }
 
   CallPtrT getCallPtr() const {

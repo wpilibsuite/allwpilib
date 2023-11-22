@@ -15,13 +15,12 @@ import edu.wpi.first.networktables.DoubleTopic;
 import edu.wpi.first.networktables.NTSendable;
 import edu.wpi.first.networktables.NTSendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
-import edu.wpi.first.wpilibj.interfaces.Accelerometer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 /** ADXL345 SPI Accelerometer. */
 @SuppressWarnings({"TypeName", "PMD.UnusedPrivateField"})
-public class ADXL345_SPI implements Accelerometer, NTSendable, AutoCloseable {
+public class ADXL345_SPI implements NTSendable, AutoCloseable {
   private static final int kPowerCtlRegister = 0x2D;
   private static final int kDataFormatRegister = 0x31;
   private static final int kDataRegister = 0x32;
@@ -40,6 +39,13 @@ public class ADXL345_SPI implements Accelerometer, NTSendable, AutoCloseable {
   private static final int kDataFormat_IntInvert = 0x20;
   private static final int kDataFormat_FullRes = 0x08;
   private static final int kDataFormat_Justify = 0x04;
+
+  public enum Range {
+    k2G,
+    k4G,
+    k8G,
+    k16G
+  }
 
   public enum Axes {
     kX((byte) 0x00),
@@ -133,10 +139,14 @@ public class ADXL345_SPI implements Accelerometer, NTSendable, AutoCloseable {
     HAL.report(tResourceType.kResourceType_ADXL345, tInstances.kADXL345_SPI);
   }
 
-  @Override
+  /**
+   * Set the measuring range of the accelerometer.
+   *
+   * @param range The maximum acceleration, positive or negative, that the accelerometer will
+   *     measure.
+   */
   public void setRange(Range range) {
     final byte value;
-
     switch (range) {
       case k2G:
         value = 0;
@@ -151,7 +161,7 @@ public class ADXL345_SPI implements Accelerometer, NTSendable, AutoCloseable {
         value = 3;
         break;
       default:
-        throw new IllegalArgumentException(range + " unsupported");
+        throw new IllegalArgumentException("Missing case for range type " + range);
     }
 
     // Specify the data format to read
@@ -163,17 +173,29 @@ public class ADXL345_SPI implements Accelerometer, NTSendable, AutoCloseable {
     }
   }
 
-  @Override
+  /**
+   * Returns the acceleration along the X axis in g-forces.
+   *
+   * @return The acceleration along the X axis in g-forces.
+   */
   public double getX() {
     return getAcceleration(Axes.kX);
   }
 
-  @Override
+  /**
+   * Returns the acceleration along the Y axis in g-forces.
+   *
+   * @return The acceleration along the Y axis in g-forces.
+   */
   public double getY() {
     return getAcceleration(Axes.kY);
   }
 
-  @Override
+  /**
+   * Returns the acceleration along the Z axis in g-forces.
+   *
+   * @return The acceleration along the Z axis in g-forces.
+   */
   public double getZ() {
     return getAcceleration(Axes.kZ);
   }

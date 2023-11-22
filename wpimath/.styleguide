@@ -34,14 +34,14 @@ includeGuardRoots {
 }
 
 includeOtherLibs {
+  ^Eigen/
   ^fmt/
+  ^gcem/
+  ^gtest/
+  ^unsupported/
   ^wpi/
 }
 
 includeProject {
-  ^gcem/
-  ^drake/
-  ^Eigen/
   ^units/
-  ^unsupported/
 }

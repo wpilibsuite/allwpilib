@@ -72,7 +72,7 @@ public class FakeCounterSource implements AutoCloseable {
     }
   }
 
-  /** Common initailization code. */
+  /** Common initialization code. */
   private void initEncoder() {
     m_milliSec = 1;
     m_task = new EncoderThread(this);
@@ -95,7 +95,7 @@ public class FakeCounterSource implements AutoCloseable {
     Timer.delay(0.01);
   }
 
-  /** Starts and completes a task set - does not return until thred has finished its operations. */
+  /** Starts and completes a task set - does not return until thread has finished its operations. */
   public void execute() {
     start();
     complete();

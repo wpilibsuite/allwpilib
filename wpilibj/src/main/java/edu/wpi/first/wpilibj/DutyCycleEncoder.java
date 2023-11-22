@@ -208,6 +208,9 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
    */
   public void setDistancePerRotation(double distancePerRotation) {
     m_distancePerRotation = distancePerRotation;
+    if (m_simDistancePerRotation != null) {
+      m_simDistancePerRotation.set(distancePerRotation);
+    }
   }
 
   /**
@@ -243,7 +246,10 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
     if (m_counter != null) {
       m_counter.reset();
     }
-    m_positionOffset = m_dutyCycle.getOutput();
+    if (m_simPosition != null) {
+      m_simPosition.set(0);
+    }
+    m_positionOffset = getAbsolutePosition();
   }
 
   /**

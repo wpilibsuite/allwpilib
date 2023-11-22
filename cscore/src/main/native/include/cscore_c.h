@@ -323,7 +323,7 @@ void CS_ReleaseSource(CS_Source source, CS_Status* status);
 /** @} */
 
 /**
- * @defgroup cscore_source_prop_cfunc Camera Source Common Property Fuctions
+ * @defgroup cscore_source_prop_cfunc Camera Source Common Property Functions
  * @{
  */
 void CS_SetCameraBrightness(CS_Source source, int brightness,
@@ -504,7 +504,7 @@ void CS_FreeHttpCameraUrls(char** urls, int count);
 void CS_FreeEnumeratedProperties(CS_Property* properties, int count);
 void CS_FreeEnumeratedVideoModes(CS_VideoMode* modes, int count);
 
-char* CS_GetHostname();
+char* CS_GetHostname(void);
 
 char** CS_GetNetworkInterfaces(int* count);
 void CS_FreeNetworkInterfaces(char** interfaces, int count);

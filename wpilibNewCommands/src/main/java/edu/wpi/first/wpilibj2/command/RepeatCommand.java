@@ -19,7 +19,7 @@ import edu.wpi.first.util.sendable.SendableBuilder;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public class RepeatCommand extends CommandBase {
+public class RepeatCommand extends Command {
   protected final Command m_command;
   private boolean m_ended;
 
@@ -63,7 +63,12 @@ public class RepeatCommand extends CommandBase {
 
   @Override
   public void end(boolean interrupted) {
-    m_command.end(interrupted);
+    // Make sure we didn't already call end() (which would happen if the command finished in the
+    // last call to our execute())
+    if (!m_ended) {
+      m_command.end(interrupted);
+      m_ended = true;
+    }
   }
 
   @Override

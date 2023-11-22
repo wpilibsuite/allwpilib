@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <gtest/gtest.h>
-
 #include <cmath>
+
+#include <gtest/gtest.h>
 
 #include "frc/EigenCore.h"
 #include "frc/controller/LinearQuadraticRegulator.h"
@@ -158,10 +158,10 @@ TEST(LinearQuadraticRegulatorTest, MatrixOverloadsWithDoubleIntegrator) {
   EXPECT_NEAR(0.51182128351092726, K(0, 1), 1e-10);
 
   // QRN overload
-  Matrixd<2, 2> Aref{{0, 1}, {0, -Kv / (Ka * 2.0)}};
+  Matrixd<2, 2> Aref{{0, 1}, {0, -Kv / (Ka * 5.0)}};
   Matrixd<1, 2> Kimf = GetImplicitModelFollowingK<2, 1>(A, B, Q, R, Aref, 5_ms);
   EXPECT_NEAR(0.0, Kimf(0, 0), 1e-10);
-  EXPECT_NEAR(-5.367540084534802e-05, Kimf(0, 1), 1e-10);
+  EXPECT_NEAR(-6.9190500116751458e-05, Kimf(0, 1), 1e-10);
 }
 
 TEST(LinearQuadraticRegulatorTest, LatencyCompensate) {

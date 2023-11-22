@@ -5,6 +5,7 @@
 package edu.wpi.first.hal;
 
 public enum AllianceStationID {
+  Unknown,
   Red1,
   Red2,
   Red3,

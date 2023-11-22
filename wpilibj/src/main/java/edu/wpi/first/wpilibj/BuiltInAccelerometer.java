@@ -10,14 +10,19 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
-import edu.wpi.first.wpilibj.interfaces.Accelerometer;
 
 /**
  * Built-in accelerometer.
  *
  * <p>This class allows access to the roboRIO's internal accelerometer.
  */
-public class BuiltInAccelerometer implements Accelerometer, Sendable, AutoCloseable {
+public class BuiltInAccelerometer implements Sendable, AutoCloseable {
+  public enum Range {
+    k2G,
+    k4G,
+    k8G
+  }
+
   /**
    * Constructor.
    *
@@ -39,7 +44,12 @@ public class BuiltInAccelerometer implements Accelerometer, Sendable, AutoClosea
     SendableRegistry.remove(this);
   }
 
-  @Override
+  /**
+   * Set the measuring range of the accelerometer.
+   *
+   * @param range The maximum acceleration, positive or negative, that the accelerometer will
+   *     measure.
+   */
   public void setRange(Range range) {
     AccelerometerJNI.setAccelerometerActive(false);
 
@@ -53,9 +63,8 @@ public class BuiltInAccelerometer implements Accelerometer, Sendable, AutoClosea
       case k8G:
         AccelerometerJNI.setAccelerometerRange(2);
         break;
-      case k16G:
       default:
-        throw new IllegalArgumentException(range + " range not supported (use k2G, k4G, or k8G)");
+        throw new IllegalArgumentException("Missing case for range type " + range);
     }
 
     AccelerometerJNI.setAccelerometerActive(true);
@@ -66,7 +75,6 @@ public class BuiltInAccelerometer implements Accelerometer, Sendable, AutoClosea
    *
    * @return The acceleration of the roboRIO along the X axis in g-forces
    */
-  @Override
   public double getX() {
     return AccelerometerJNI.getAccelerometerX();
   }
@@ -76,7 +84,6 @@ public class BuiltInAccelerometer implements Accelerometer, Sendable, AutoClosea
    *
    * @return The acceleration of the roboRIO along the Y axis in g-forces
    */
-  @Override
   public double getY() {
     return AccelerometerJNI.getAccelerometerY();
   }
@@ -86,7 +93,6 @@ public class BuiltInAccelerometer implements Accelerometer, Sendable, AutoClosea
    *
    * @return The acceleration of the roboRIO along the Z axis in g-forces
    */
-  @Override
   public double getZ() {
     return AccelerometerJNI.getAccelerometerZ();
   }

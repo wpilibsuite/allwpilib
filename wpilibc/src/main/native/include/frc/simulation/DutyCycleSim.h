@@ -51,7 +51,8 @@ class DutyCycleSim {
    * @param initialNotify whether to run the callback with the initial state
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterInitializedCallback(
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterInitializedCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**
@@ -75,7 +76,8 @@ class DutyCycleSim {
    * @param initialNotify whether to call the callback with the initial state
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterFrequencyCallback(
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterFrequencyCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**
@@ -99,8 +101,9 @@ class DutyCycleSim {
    * @param initialNotify whether to call the callback with the initial state
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterOutputCallback(
-      NotifyCallback callback, bool initialNotify);
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterOutputCallback(NotifyCallback callback,
+                                                        bool initialNotify);
 
   /**
    * Measure the output from this duty cycle port.

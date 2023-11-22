@@ -439,7 +439,7 @@ void ReleaseSource(CS_Source source, CS_Status* status) {
 }
 
 //
-// Camera Source Common Property Fuctions
+// Camera Source Common Property Functions
 //
 
 void SetCameraBrightness(CS_Source source, int brightness, CS_Status* status) {

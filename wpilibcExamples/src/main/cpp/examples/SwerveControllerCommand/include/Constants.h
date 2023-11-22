@@ -4,6 +4,7 @@
 
 #include <numbers>
 
+#include <frc/TimedRobot.h>
 #include <frc/geometry/Translation2d.h>
 #include <frc/kinematics/SwerveDriveKinematics.h>
 #include <frc/trajectory/TrapezoidProfile.h>
@@ -57,6 +58,10 @@ constexpr bool kFrontLeftDriveEncoderReversed = false;
 constexpr bool kRearLeftDriveEncoderReversed = true;
 constexpr bool kFrontRightDriveEncoderReversed = false;
 constexpr bool kRearRightDriveEncoderReversed = true;
+
+// If you call DriveSubsystem::Drive with a different period make sure to update
+// this.
+constexpr units::second_t kDrivePeriod = frc::TimedRobot::kDefaultPeriod;
 
 // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
 // These characterization values MUST be determined either experimentally or

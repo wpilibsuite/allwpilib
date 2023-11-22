@@ -4,9 +4,10 @@
 
 #include <numbers>
 
+#include <gtest/gtest.h>
+
 #include "frc/kinematics/DifferentialDriveKinematics.h"
 #include "frc/kinematics/DifferentialDriveOdometry.h"
-#include "gtest/gtest.h"
 
 static constexpr double kEpsilon = 1E-9;
 

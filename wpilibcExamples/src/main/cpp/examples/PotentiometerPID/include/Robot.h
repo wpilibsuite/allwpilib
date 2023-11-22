@@ -25,7 +25,7 @@ class Robot : public frc::TimedRobot {
 
   static constexpr int kPotChannel = 1;
   static constexpr int kMotorChannel = 7;
-  static constexpr int kJoystickChannel = 0;
+  static constexpr int kJoystickChannel = 3;
 
   // The elevator can move 1.5 meters from top to bottom
   static constexpr units::meter_t kFullHeight = 1.5_m;
@@ -48,7 +48,7 @@ class Robot : public frc::TimedRobot {
   frc::AnalogPotentiometer m_potentiometer{kPotChannel, kFullHeight.value()};
 
   frc::PWMSparkMax m_elevatorMotor{kMotorChannel};
-  frc2::PIDController m_pidController{kP, kI, kD};
+  frc::PIDController m_pidController{kP, kI, kD};
   frc::Joystick m_joystick{kJoystickChannel};
 
   size_t m_index;

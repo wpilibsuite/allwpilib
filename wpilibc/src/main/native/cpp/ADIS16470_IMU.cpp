@@ -23,7 +23,7 @@
 #include <string>
 
 #include <hal/HAL.h>
-#include <networktables/NTSendableBuilder.h>
+#include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/Errors.h"
@@ -279,7 +279,7 @@ bool ADIS16470_IMU::SwitchToAutoSPI() {
   }
   // Configure auto stall time
   m_spi->ConfigureAutoStall(HAL_SPI_kOnboardCS0, 5, 1000, 1);
-  // Kick off DMA SPI (Note: Device configration impossible after SPI DMA is
+  // Kick off DMA SPI (Note: Device configuration impossible after SPI DMA is
   // activated) DR High = Data good (data capture should be triggered on the
   // rising edge)
   m_spi->StartAutoTrigger(*m_auto_interrupt, true, false);
@@ -816,7 +816,7 @@ int ADIS16470_IMU::GetPort() const {
  * This function pushes the most recent angle estimates for all axes to the
  *driver station.
  **/
-void ADIS16470_IMU::InitSendable(nt::NTSendableBuilder& builder) {
+void ADIS16470_IMU::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("ADIS16470 IMU");
   builder.AddDoubleProperty(
       "Yaw Angle", [=, this] { return GetAngle().value(); }, nullptr);

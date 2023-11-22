@@ -33,7 +33,7 @@ import java.util.function.Supplier;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public class RamseteCommand extends CommandBase {
+public class RamseteCommand extends Command {
   private final Timer m_timer = new Timer();
   private final boolean m_usePID;
   private final Trajectory m_trajectory;
@@ -45,7 +45,7 @@ public class RamseteCommand extends CommandBase {
   private final PIDController m_leftController;
   private final PIDController m_rightController;
   private final BiConsumer<Double, Double> m_output;
-  private DifferentialDriveWheelSpeeds m_prevSpeeds;
+  private DifferentialDriveWheelSpeeds m_prevSpeeds = new DifferentialDriveWheelSpeeds();
   private double m_prevTime;
 
   /**
@@ -143,8 +143,7 @@ public class RamseteCommand extends CommandBase {
                 initialState.velocityMetersPerSecond,
                 0,
                 initialState.curvatureRadPerMeter * initialState.velocityMetersPerSecond));
-    m_timer.reset();
-    m_timer.start();
+    m_timer.restart();
     if (m_usePID) {
       m_leftController.reset();
       m_rightController.reset();

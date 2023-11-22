@@ -19,7 +19,7 @@ namespace frc::sim {
 class DifferentialDrivetrainSim {
  public:
   /**
-   * Create a SimDrivetrain.
+   * Creates a simulated differential drivetrain.
    *
    * @param plant The LinearSystem representing the robot's drivetrain. This
    *              system can be created with
@@ -46,7 +46,7 @@ class DifferentialDrivetrainSim {
       const std::array<double, 7>& measurementStdDevs = {});
 
   /**
-   * Create a SimDrivetrain.
+   * Creates a simulated differential drivetrain.
    *
    * @param driveMotor  A DCMotor representing the left side of the drivetrain.
    * @param gearing     The gearing on the drive between motor and wheel, as
@@ -80,7 +80,7 @@ class DifferentialDrivetrainSim {
    * @param u The input vector.
    * @return The normalized input.
    */
-  Vectord<2> ClampInput(const Vectord<2>& u);
+  Eigen::Vector2d ClampInput(const Eigen::Vector2d& u);
 
   /**
    * Sets the applied voltage to the drivetrain. Note that positive voltage must
@@ -187,7 +187,7 @@ class DifferentialDrivetrainSim {
    */
   void SetPose(const frc::Pose2d& pose);
 
-  Vectord<7> Dynamics(const Vectord<7>& x, const Vectord<2>& u);
+  Vectord<7> Dynamics(const Vectord<7>& x, const Eigen::Vector2d& u);
 
   class State {
    public:
@@ -325,7 +325,7 @@ class DifferentialDrivetrainSim {
   double m_currentGearing;
 
   Vectord<7> m_x;
-  Vectord<2> m_u;
+  Eigen::Vector2d m_u;
   Vectord<7> m_y;
   std::array<double, 7> m_measurementStdDevs;
 };

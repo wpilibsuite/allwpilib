@@ -15,7 +15,8 @@ class Storage : frc2::SubsystemBase {
  public:
   Storage();
   /** Returns a command that runs the storage motor indefinitely. */
-  [[nodiscard]] frc2::CommandPtr RunCommand();
+  [[nodiscard]]
+  frc2::CommandPtr RunCommand();
 
   /** Whether the ball storage is full. */
   bool IsFull() const;
