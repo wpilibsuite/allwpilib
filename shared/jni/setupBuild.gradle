@@ -64,12 +64,9 @@ model {
                 }
                 it.cppCompiler.define 'WPILIB_EXPORTS'
                 it.cCompiler.define 'WPILIB_EXPORTS'
-                it.cppCompiler.define 'PROTOBUF_USE_DLLS'
-                it.cCompiler.define 'PROTOBUF_USE_DLLS'
-                if (nativeName == 'wpiutil') {
-                    it.cppCompiler.define 'LIBPROTOBUF_EXPORTS'
-                    it.cCompiler.define 'LIBPROTOBUF_EXPORTS'
-                } else {
+                if (nativeName != 'wpiutil') {
+                    it.cppCompiler.define 'PROTOBUF_USE_DLLS'
+                    it.cCompiler.define 'PROTOBUF_USE_DLLS'
                     it.cppCompiler.define 'LIBPROTOBUF_IMPORTS'
                     it.cCompiler.define 'LIBPROTOBUF_IMPORTS'
                 }
