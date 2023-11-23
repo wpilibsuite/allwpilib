@@ -10,9 +10,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.wpi.first.apriltag.proto.Apriltag.ProtobufAprilTag;
+import edu.wpi.first.apriltag.proto.Apriltag.ProtobufAprilTagFieldLayout;
+import edu.wpi.first.apriltag.proto.Apriltag.ProtobufFieldDimensions;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.util.protobuf.Protobuf;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -23,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import us.hebi.quickbuf.Descriptors.Descriptor;
 
 /**
  * Class for representing a layout of AprilTags on a field and reading them from a JSON format.
@@ -256,6 +261,57 @@ public class AprilTagFieldLayout {
     return Objects.hash(m_apriltags, m_origin);
   }
 
+  public static final class AProto
+      implements Protobuf<AprilTagFieldLayout, ProtobufAprilTagFieldLayout> {
+    @Override
+    public Class<AprilTagFieldLayout> getTypeClass() {
+      return AprilTagFieldLayout.class;
+    }
+
+    @Override
+    public Descriptor getDescriptor() {
+      return ProtobufAprilTagFieldLayout.getDescriptor();
+    }
+
+    @Override
+    public Protobuf<?, ?>[] getNested() {
+      return new Protobuf<?, ?>[] {AprilTag.proto, Pose3d.proto, FieldDimensions.proto};
+    }
+
+    @Override
+    public ProtobufAprilTagFieldLayout createMessage() {
+      return ProtobufAprilTagFieldLayout.newInstance();
+    }
+
+    @Override
+    public AprilTagFieldLayout unpack(ProtobufAprilTagFieldLayout msg) {
+      ArrayList<AprilTag> tags = new ArrayList<>(msg.getApriltags().length());
+      for (ProtobufAprilTag tag : msg.getApriltags()) {
+        tags.add(AprilTag.proto.unpack(tag));
+      }
+
+      var layout =
+          new AprilTagFieldLayout(tags, FieldDimensions.proto.unpack(msg.getFieldDimensions()));
+      layout.setOrigin(Pose3d.proto.unpack(msg.getOrigin()));
+
+      return layout;
+    }
+
+    @Override
+    public void pack(ProtobufAprilTagFieldLayout msg, AprilTagFieldLayout value) {
+      var tags = msg.getMutableApriltags().reserve(value.m_apriltags.size());
+      for (var tag : value.getTags()) {
+        var protoTag = tags.next();
+        AprilTag.proto.pack(protoTag, tag);
+      }
+
+      Pose3d.proto.pack(msg.getMutableOrigin(), value.m_origin);
+      FieldDimensions.proto.pack(msg.getMutableFieldDimensions(), value.m_fieldDimensions);
+    }
+  }
+
+  public static final AProto proto = new AProto();
+
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
   private static class FieldDimensions {
@@ -274,5 +330,34 @@ public class AprilTagFieldLayout {
       this.fieldLength = fieldLength;
       this.fieldWidth = fieldWidth;
     }
+
+    public static final class AProto implements Protobuf<FieldDimensions, ProtobufFieldDimensions> {
+      @Override
+      public Class<FieldDimensions> getTypeClass() {
+        return FieldDimensions.class;
+      }
+
+      @Override
+      public Descriptor getDescriptor() {
+        return ProtobufFieldDimensions.getDescriptor();
+      }
+
+      @Override
+      public ProtobufFieldDimensions createMessage() {
+        return ProtobufFieldDimensions.newInstance();
+      }
+
+      @Override
+      public FieldDimensions unpack(ProtobufFieldDimensions msg) {
+        return new FieldDimensions(msg.getLength(), msg.getWidth());
+      }
+
+      @Override
+      public void pack(ProtobufFieldDimensions msg, FieldDimensions value) {
+        msg.setLength(value.fieldLength).setWidth(value.fieldWidth);
+      }
+    }
+
+    public static final AProto proto = new AProto();
   }
 }
