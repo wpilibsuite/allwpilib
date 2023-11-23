@@ -147,7 +147,7 @@ inline T UnpackStruct(std::span<const uint8_t> data) {
  */
 template <StructSerializable T, size_t Offset, size_t N>
 inline wpi::array<T, N> UnpackStructArray(std::span<const uint8_t> data) {
-  const auto StructSize = Struct<std::remove_cvref_t<T>>::kSize;
+  constexpr auto StructSize = Struct<std::remove_cvref_t<T>>::kSize;
   wpi::array<T, N> arr(wpi::empty_array);
   [&]<size_t... Is>(std::index_sequence<Is...>) {
     ((arr[Is] = UnpackStruct<T, Offset + Is * StructSize>(data)), ...);
@@ -197,7 +197,7 @@ inline void PackStruct(std::span<uint8_t> data, T&& value) {
 template <size_t Offset, size_t N, StructSerializable T>
 inline void PackStructArray(std::span<uint8_t> data,
                             const wpi::array<T, N>& arr) {
-  const auto StructSize = Struct<std::remove_cvref_t<T>>::kSize;
+  constexpr auto StructSize = Struct<std::remove_cvref_t<T>>::kSize;
   [&]<size_t... Is>(std::index_sequence<Is...>) {
     (PackStruct<Offset + Is * StructSize>(data, arr[Is]), ...);
   }(std::make_index_sequence<N>{});
