@@ -48,6 +48,13 @@
 // detect/prohibit anytime it is #included twice without a corresponding
 // #undef.
 
+#if __has_include("wpi/SymbolExports.h")
+#include "wpi/SymbolExports.h"
+#ifdef _MSC_VER
+#pragma warning(disable : 4275)
+#endif
+#endif
+
 // The definitions in this file are intended to be portable across Clang,
 // GCC, and MSVC. Function-like macros are usable without an #ifdef guard.
 // Syntax macros (for example, attributes) are always defined, although
