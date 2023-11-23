@@ -64,12 +64,6 @@ model {
                 }
                 it.cppCompiler.define 'WPILIB_EXPORTS'
                 it.cCompiler.define 'WPILIB_EXPORTS'
-                if (nativeName != 'wpiutil') {
-                    it.cppCompiler.define 'PROTOBUF_USE_DLLS'
-                    it.cCompiler.define 'PROTOBUF_USE_DLLS'
-                    it.cppCompiler.define 'LIBPROTOBUF_IMPORTS'
-                    it.cCompiler.define 'LIBPROTOBUF_IMPORTS'
-                }
                 if (!project.hasProperty('noWpiutil')) {
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 }
