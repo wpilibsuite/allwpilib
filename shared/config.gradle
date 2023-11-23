@@ -40,8 +40,6 @@ nativeUtils.platformConfigs.each {
         it.linker.args << "-headerpad_max_install_names"
     } else if (it.name.contains('linux')) {
         it.linker.args << '-Wl,-rpath,\'$ORIGIN\''
-    } else if (it.name.contains('windows')) {
-        it.cppCompiler.args << "/wd4275"
     }
 }
 

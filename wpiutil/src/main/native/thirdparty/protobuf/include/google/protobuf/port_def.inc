@@ -50,6 +50,9 @@
 
 #if __has_include("wpi/SymbolExports.h")
 #include "wpi/SymbolExports.h"
+#ifdef _MSC_VER
+#pragma warning(disable : 4275)
+#endif
 #endif
 
 // The definitions in this file are intended to be portable across Clang,
