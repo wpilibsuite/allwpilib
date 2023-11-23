@@ -211,14 +211,14 @@ void SetSinkEnabled(CS_Sink sink, bool enabled, CS_Status* status) {
 
 extern "C" {
 
-CS_Sink CS_CreateCvSink(const char* name, enum CS_PixelFormat pixelFormat,
+CS_Sink CS_CreateCvSink(const char* name, enum WPI_PixelFormat pixelFormat,
                         CS_Status* status) {
   return cs::CreateCvSink(
       name, static_cast<VideoMode::PixelFormat>(pixelFormat), status);
 }
 
 CS_Sink CS_CreateCvSinkCallback(const char* name,
-                                enum CS_PixelFormat pixelFormat, void* data,
+                                enum WPI_PixelFormat pixelFormat, void* data,
                                 void (*processFrame)(void* data, uint64_t time),
                                 CS_Status* status) {
   return cs::CreateCvSinkCallback(
