@@ -126,7 +126,7 @@ model {
                         include '**/jni/**/*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include', "$buildDir/generated/source/proto/main/cpp"
+                        srcDir 'src/main/native/include'
                         if (project.hasProperty('generatedHeaders')) {
                             srcDir generatedHeaders
                         }
@@ -142,9 +142,6 @@ model {
                 lib library: "${nativeName}", linkage: 'shared'
                 if (!project.hasProperty('noWpiutil')) {
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                }
-                it.tasks.withType(CppCompile) {
-                    it.dependsOn generateProto
                 }
                 if (project.hasProperty('jniSplitSetup')) {
                     jniSplitSetup(it)
@@ -225,6 +222,9 @@ model {
                     if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                         nativeUtils.useRequiredLibrary(it, 'ni_link_libraries', 'ni_runtime_libraries')
                     }
+                }
+                it.tasks.withType(CppCompile) {
+                    it.dependsOn generateProto
                 }
                 if (project.hasProperty('exeSplitSetup')) {
                     exeSplitSetup(it)

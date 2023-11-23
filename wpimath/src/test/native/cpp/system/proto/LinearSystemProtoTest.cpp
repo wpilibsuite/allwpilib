@@ -6,6 +6,7 @@
 
 #include "../../ProtoTestBase.h"
 #include "frc/system/LinearSystem.h"
+#include "frc/system/proto/LinearSystemProto.h"
 
 using namespace frc;
 

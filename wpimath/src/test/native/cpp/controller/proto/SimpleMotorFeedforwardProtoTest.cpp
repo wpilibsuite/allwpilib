@@ -6,6 +6,7 @@
 
 #include "../../ProtoTestBase.h"
 #include "frc/controller/SimpleMotorFeedforward.h"
+#include "frc/controller/proto/SimpleMotorFeedforwardProto.h"
 
 using namespace frc;
 

@@ -21,6 +21,3 @@ template <int Rows, int Cols,
 using Matrixd = Eigen::Matrix<double, Rows, Cols, Options, MaxRows, MaxCols>;
 
 }  // namespace frc
-
-#include "frc/proto/VectorProto.h"
-#include "frc/proto/MatrixProto.h"

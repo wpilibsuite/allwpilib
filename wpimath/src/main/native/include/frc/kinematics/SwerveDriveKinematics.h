@@ -312,4 +312,3 @@ extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
 }  // namespace frc
 
 #include "SwerveDriveKinematics.inc"
-#include "frc/kinematics/proto/SwerveDriveKinematicsProto.h"

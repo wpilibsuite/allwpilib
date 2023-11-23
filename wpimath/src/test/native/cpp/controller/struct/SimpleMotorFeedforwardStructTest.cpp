@@ -6,6 +6,7 @@
 
 #include "../../StructTestBase.h"
 #include "frc/controller/SimpleMotorFeedforward.h"
+#include "frc/controller/struct/SimpleMotorFeedforwardStruct.h"
 
 using namespace frc;
 

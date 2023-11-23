@@ -187,5 +187,3 @@ class LinearSystem {
 };
 
 }  // namespace frc
-
-#include "frc/system/proto/LinearSystemProto.h"

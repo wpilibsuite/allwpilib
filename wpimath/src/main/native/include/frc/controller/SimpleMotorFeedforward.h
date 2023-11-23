@@ -153,6 +153,3 @@ class SimpleMotorFeedforward {
   units::unit_t<ka_unit> kA{0};
 };
 }  // namespace frc
-
-#include "frc/controller/proto/SimpleMotorFeedforwardProto.h"
-#include "frc/controller/struct/SimpleMotorFeedforwardStruct.h"

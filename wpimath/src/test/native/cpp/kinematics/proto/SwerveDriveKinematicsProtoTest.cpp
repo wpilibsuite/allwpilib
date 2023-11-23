@@ -6,6 +6,7 @@
 
 #include "../../ProtoTestBase.h"
 #include "frc/kinematics/SwerveDriveKinematics.h"
+#include "frc/kinematics/proto/SwerveDriveKinematicsProto.h"
 
 using namespace frc;
 

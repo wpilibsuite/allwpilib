@@ -6,6 +6,7 @@
 
 #include "../ProtoTestBase.h"
 #include "frc/EigenCore.h"
+#include "frc/proto/VectorProto.h"
 
 using namespace frc;
 
