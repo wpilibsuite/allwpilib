@@ -277,6 +277,7 @@ def main():
         "0010-Disable-pedantic-warning.patch",
         "0011-Avoid-use-of-sprintf.patch",
         "0012-Suppress-stringop-overflow-warning-false-positives.patch",
+        "0013-Include-WPI-SymbolExports.patch",
     ]:
         git_am(os.path.join(wpilib_root, "upstream_utils/protobuf_patches", f))
 

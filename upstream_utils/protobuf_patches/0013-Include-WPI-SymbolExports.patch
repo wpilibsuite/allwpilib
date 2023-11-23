@@ -1,0 +1,30 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Johnson <johnson.peter@gmail.com>
+Date: Thu, 23 Nov 2023 10:32:59 -0800
+Subject: [PATCH 13/13] Include WPI SymbolExports
+
+Also suppress 4275 warning on MSVC.
+
+This is needed to enable WPILIB_DLLEXPORT from wpimath.
+---
+ src/google/protobuf/port_def.inc | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/src/google/protobuf/port_def.inc b/src/google/protobuf/port_def.inc
+index 6c6aa1834b0cbf38b16660e6231f24da72157306..dd1798ce8b3806efb26187f4cb91b209498af2f8 100644
+--- a/src/google/protobuf/port_def.inc
++++ b/src/google/protobuf/port_def.inc
+@@ -48,6 +48,13 @@
+ // detect/prohibit anytime it is #included twice without a corresponding
+ // #undef.
+ 
++#if __has_include("wpi/SymbolExports.h")
++#include "wpi/SymbolExports.h"
++#ifdef _MSC_VER
++#pragma warning(disable : 4275)
++#endif
++#endif
++
+ // The definitions in this file are intended to be portable across Clang,
+ // GCC, and MSVC. Function-like macros are usable without an #ifdef guard.
+ // Syntax macros (for example, attributes) are always defined, although
