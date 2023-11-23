@@ -37,15 +37,9 @@ install(TARGETS ntcore EXPORT ntcore)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/ntcore")
 install(DIRECTORY ${WPILIB_BINARY_DIR}/ntcore/generated/main/native/include/ DESTINATION "${include_dest}/ntcore")
 
-if (WITH_FLAT_INSTALL)
-    set (ntcore_config_dir ${wpilib_dest})
-else()
-    set (ntcore_config_dir share/ntcore)
-endif()
-
 configure_file(ntcore-config.cmake.in ${WPILIB_BINARY_DIR}/ntcore-config.cmake )
-install(FILES ${WPILIB_BINARY_DIR}/ntcore-config.cmake DESTINATION ${ntcore_config_dir})
-install(EXPORT ntcore DESTINATION ${ntcore_config_dir})
+install(FILES ${WPILIB_BINARY_DIR}/ntcore-config.cmake DESTINATION share/ntcore)
+install(EXPORT ntcore DESTINATION share/ntcore)
 
 # Java bindings
 if (WITH_JAVA)

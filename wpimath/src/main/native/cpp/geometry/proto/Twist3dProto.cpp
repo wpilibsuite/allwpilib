@@ -2,11 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/geometry/Twist3d.h"
+#include "frc/geometry/proto/Twist3dProto.h"
 
 #include "geometry3d.pb.h"
-
-using namespace frc;
 
 google::protobuf::Message* wpi::Protobuf<frc::Twist3d>::New(
     google::protobuf::Arena* arena) {
@@ -17,9 +15,11 @@ google::protobuf::Message* wpi::Protobuf<frc::Twist3d>::New(
 frc::Twist3d wpi::Protobuf<frc::Twist3d>::Unpack(
     const google::protobuf::Message& msg) {
   auto m = static_cast<const wpi::proto::ProtobufTwist3d*>(&msg);
-  return frc::Twist3d{units::meter_t{m->dx()},  units::meter_t{m->dy()},
-                      units::meter_t{m->dz()},  units::radian_t{m->rx()},
-                      units::radian_t{m->ry()}, units::radian_t{m->rz()}};
+  return frc::Twist3d{
+      units::meter_t{m->dx()},  units::meter_t{m->dy()},
+      units::meter_t{m->dz()},  units::radian_t{m->rx()},
+      units::radian_t{m->ry()}, units::radian_t{m->rz()},
+  };
 }
 
 void wpi::Protobuf<frc::Twist3d>::Pack(google::protobuf::Message* msg,

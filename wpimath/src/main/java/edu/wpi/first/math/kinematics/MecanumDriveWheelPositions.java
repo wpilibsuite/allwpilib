@@ -4,7 +4,13 @@
 
 package edu.wpi.first.math.kinematics;
 
+import static edu.wpi.first.units.Units.Meters;
+
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.kinematics.proto.MecanumDriveWheelPositionsProto;
+import edu.wpi.first.math.kinematics.struct.MecanumDriveWheelPositionsStruct;
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.Measure;
 import java.util.Objects;
 
 public class MecanumDriveWheelPositions implements WheelPositions<MecanumDriveWheelPositions> {
@@ -19,6 +25,10 @@ public class MecanumDriveWheelPositions implements WheelPositions<MecanumDriveWh
 
   /** Distance measured by the rear right wheel. */
   public double rearRightMeters;
+
+  public static final MecanumDriveWheelPositionsStruct struct =
+      new MecanumDriveWheelPositionsStruct();
+  public static final MecanumDriveWheelPositionsProto proto = new MecanumDriveWheelPositionsProto();
 
   /** Constructs a MecanumDriveWheelPositions with zeros for all member fields. */
   public MecanumDriveWheelPositions() {}
@@ -40,6 +50,22 @@ public class MecanumDriveWheelPositions implements WheelPositions<MecanumDriveWh
     this.frontRightMeters = frontRightMeters;
     this.rearLeftMeters = rearLeftMeters;
     this.rearRightMeters = rearRightMeters;
+  }
+
+  /**
+   * Constructs a MecanumDriveWheelPositions.
+   *
+   * @param frontLeft Distance measured by the front left wheel.
+   * @param frontRight Distance measured by the front right wheel.
+   * @param rearLeft Distance measured by the rear left wheel.
+   * @param rearRight Distance measured by the rear right wheel.
+   */
+  public MecanumDriveWheelPositions(
+      Measure<Distance> frontLeft,
+      Measure<Distance> frontRight,
+      Measure<Distance> rearLeft,
+      Measure<Distance> rearRight) {
+    this(frontLeft.in(Meters), frontRight.in(Meters), rearLeft.in(Meters), rearRight.in(Meters));
   }
 
   @Override

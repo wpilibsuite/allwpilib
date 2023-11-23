@@ -2,11 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/geometry/Twist2d.h"
+#include "frc/geometry/proto/Twist2dProto.h"
 
 #include "geometry2d.pb.h"
-
-using namespace frc;
 
 google::protobuf::Message* wpi::Protobuf<frc::Twist2d>::New(
     google::protobuf::Arena* arena) {
@@ -17,8 +15,11 @@ google::protobuf::Message* wpi::Protobuf<frc::Twist2d>::New(
 frc::Twist2d wpi::Protobuf<frc::Twist2d>::Unpack(
     const google::protobuf::Message& msg) {
   auto m = static_cast<const wpi::proto::ProtobufTwist2d*>(&msg);
-  return frc::Twist2d{units::meter_t{m->dx()}, units::meter_t{m->dy()},
-                      units::radian_t{m->dtheta()}};
+  return frc::Twist2d{
+      units::meter_t{m->dx()},
+      units::meter_t{m->dy()},
+      units::radian_t{m->dtheta()},
+  };
 }
 
 void wpi::Protobuf<frc::Twist2d>::Pack(google::protobuf::Message* msg,

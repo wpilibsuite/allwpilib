@@ -4,18 +4,19 @@
 
 package edu.wpi.first.math.geometry;
 
+import static edu.wpi.first.units.Units.Meters;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.proto.Translation3dProto;
+import edu.wpi.first.math.geometry.struct.Translation3dStruct;
 import edu.wpi.first.math.interpolation.Interpolatable;
-import edu.wpi.first.math.proto.Geometry3D.ProtobufTranslation3d;
-import edu.wpi.first.util.protobuf.Protobuf;
-import edu.wpi.first.util.struct.Struct;
-import java.nio.ByteBuffer;
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.Measure;
 import java.util.Objects;
-import us.hebi.quickbuf.Descriptors.Descriptor;
 
 /**
  * Represents a translation in 3D space. This object can be used to represent a point or a vector.
@@ -65,6 +66,18 @@ public class Translation3d implements Interpolatable<Translation3d> {
     m_x = rectangular.getX();
     m_y = rectangular.getY();
     m_z = rectangular.getZ();
+  }
+
+  /**
+   * Constructs a Translation3d with the X, Y, and Z components equal to the provided values. The
+   * components will be converted to and tracked as meters.
+   *
+   * @param x The x component of the translation.
+   * @param y The y component of the translation.
+   * @param z The z component of the translation.
+   */
+  public Translation3d(Measure<Distance> x, Measure<Distance> y, Measure<Distance> z) {
+    this(x.in(Meters), y.in(Meters), z.in(Meters));
   }
 
   /**
@@ -237,71 +250,6 @@ public class Translation3d implements Interpolatable<Translation3d> {
         MathUtil.interpolate(this.getZ(), endValue.getZ(), t));
   }
 
-  public static final class AStruct implements Struct<Translation3d> {
-    @Override
-    public Class<Translation3d> getTypeClass() {
-      return Translation3d.class;
-    }
-
-    @Override
-    public String getTypeString() {
-      return "struct:Translation3d";
-    }
-
-    @Override
-    public int getSize() {
-      return kSizeDouble * 3;
-    }
-
-    @Override
-    public String getSchema() {
-      return "double x;double y;double z";
-    }
-
-    @Override
-    public Translation3d unpack(ByteBuffer bb) {
-      double x = bb.getDouble();
-      double y = bb.getDouble();
-      double z = bb.getDouble();
-      return new Translation3d(x, y, z);
-    }
-
-    @Override
-    public void pack(ByteBuffer bb, Translation3d value) {
-      bb.putDouble(value.m_x);
-      bb.putDouble(value.m_y);
-      bb.putDouble(value.m_z);
-    }
-  }
-
-  public static final AStruct struct = new AStruct();
-
-  public static final class AProto implements Protobuf<Translation3d, ProtobufTranslation3d> {
-    @Override
-    public Class<Translation3d> getTypeClass() {
-      return Translation3d.class;
-    }
-
-    @Override
-    public Descriptor getDescriptor() {
-      return ProtobufTranslation3d.getDescriptor();
-    }
-
-    @Override
-    public ProtobufTranslation3d createMessage() {
-      return ProtobufTranslation3d.newInstance();
-    }
-
-    @Override
-    public Translation3d unpack(ProtobufTranslation3d msg) {
-      return new Translation3d(msg.getX(), msg.getY(), msg.getZ());
-    }
-
-    @Override
-    public void pack(ProtobufTranslation3d msg, Translation3d value) {
-      msg.setX(value.m_x).setY(value.m_y).setZ(value.m_z);
-    }
-  }
-
-  public static final AProto proto = new AProto();
+  public static final Translation3dStruct struct = new Translation3dStruct();
+  public static final Translation3dProto proto = new Translation3dProto();
 }

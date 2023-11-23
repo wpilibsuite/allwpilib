@@ -4,6 +4,14 @@
 
 package edu.wpi.first.math.kinematics;
 
+import static edu.wpi.first.units.Units.MetersPerSecond;
+
+import edu.wpi.first.math.kinematics.proto.DifferentialDriveWheelSpeedsProto;
+import edu.wpi.first.math.kinematics.struct.DifferentialDriveWheelSpeedsStruct;
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Velocity;
+
 /** Represents the wheel speeds for a differential drive drivetrain. */
 public class DifferentialDriveWheelSpeeds {
   /** Speed of the left side of the robot. */
@@ -11,6 +19,11 @@ public class DifferentialDriveWheelSpeeds {
 
   /** Speed of the right side of the robot. */
   public double rightMetersPerSecond;
+
+  public static final DifferentialDriveWheelSpeedsProto proto =
+      new DifferentialDriveWheelSpeedsProto();
+  public static final DifferentialDriveWheelSpeedsStruct struct =
+      new DifferentialDriveWheelSpeedsStruct();
 
   /** Constructs a DifferentialDriveWheelSpeeds with zeros for left and right speeds. */
   public DifferentialDriveWheelSpeeds() {}
@@ -24,6 +37,17 @@ public class DifferentialDriveWheelSpeeds {
   public DifferentialDriveWheelSpeeds(double leftMetersPerSecond, double rightMetersPerSecond) {
     this.leftMetersPerSecond = leftMetersPerSecond;
     this.rightMetersPerSecond = rightMetersPerSecond;
+  }
+
+  /**
+   * Constructs a DifferentialDriveWheelSpeeds.
+   *
+   * @param left The left speed.
+   * @param right The right speed.
+   */
+  public DifferentialDriveWheelSpeeds(
+      Measure<Velocity<Distance>> left, Measure<Velocity<Distance>> right) {
+    this(left.in(MetersPerSecond), right.in(MetersPerSecond));
   }
 
   /**
@@ -44,6 +68,20 @@ public class DifferentialDriveWheelSpeeds {
       rightMetersPerSecond =
           rightMetersPerSecond / realMaxSpeed * attainableMaxSpeedMetersPerSecond;
     }
+  }
+
+  /**
+   * Renormalizes the wheel speeds if any either side is above the specified maximum.
+   *
+   * <p>Sometimes, after inverse kinematics, the requested speed from one or more wheels may be
+   * above the max attainable speed for the driving motor on that wheel. To fix this issue, one can
+   * reduce all the wheel speeds to make sure that all requested module speeds are at-or-below the
+   * absolute threshold, while maintaining the ratio of speeds between wheels.
+   *
+   * @param attainableMaxSpeed The absolute max speed that a wheel can reach.
+   */
+  public void desaturate(Measure<Velocity<Distance>> attainableMaxSpeed) {
+    desaturate(attainableMaxSpeed.in(MetersPerSecond));
   }
 
   /**

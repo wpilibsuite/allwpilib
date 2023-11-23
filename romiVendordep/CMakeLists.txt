@@ -10,18 +10,12 @@ if (WITH_JAVA)
   set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
 
   file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
-  add_jar(romiVendordep_jar ${JAVA_SOURCES} INCLUDE_JARS hal_jar ntcore_jar cscore_jar cameraserver_jar wpimath_jar wpiutil_jar wpilibj_jar OUTPUT_NAME romiVendordep)
+  add_jar(romiVendordep_jar ${JAVA_SOURCES} INCLUDE_JARS hal_jar ntcore_jar cscore_jar cameraserver_jar wpimath_jar wpiunits_jar wpiutil_jar wpilibj_jar OUTPUT_NAME romiVendordep)
 
   get_property(ROMIVENDORDEP_JAR_FILE TARGET romiVendordep_jar PROPERTY JAR_FILE)
   install(FILES ${ROMIVENDORDEP_JAR_FILE} DESTINATION "${java_lib_dest}")
 
   set_property(TARGET romiVendordep_jar PROPERTY FOLDER "java")
-
-  if (WITH_FLAT_INSTALL)
-      set (romiVendordep_config_dir ${wpilib_dest})
-  else()
-      set (romiVendordep_config_dir share/romiVendordep)
-  endif()
 endif()
 
 if (WITH_JAVA_SOURCE)
@@ -54,15 +48,9 @@ target_include_directories(romiVendordep PUBLIC
 install(TARGETS romiVendordep EXPORT romiVendordep DESTINATION "${main_lib_dest}")
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/romiVendordep")
 
-if (FLAT_INSTALL_WPILIB)
-     set(romiVendordep_config_dir ${wpilib_dest})
- else()
-     set(romiVendordep_config_dir share/romiVendordep)
- endif()
-
- configure_file(romiVendordep-config.cmake.in ${WPILIB_BINARY_DIR}/romiVendordep-config.cmake)
- install(FILES ${WPILIB_BINARY_DIR}/romiVendordep-config.cmake DESTINATION ${romiVendordep_config_dir})
- install(EXPORT romiVendordep DESTINATION ${romiVendordep_config_dir})
+configure_file(romiVendordep-config.cmake.in ${WPILIB_BINARY_DIR}/romiVendordep-config.cmake)
+install(FILES ${WPILIB_BINARY_DIR}/romiVendordep-config.cmake DESTINATION share/romiVendordep)
+install(EXPORT romiVendordep DESTINATION share/romiVendordep)
 
  if (WITH_TESTS)
      wpilib_add_test(romiVendordep src/test/native/cpp)

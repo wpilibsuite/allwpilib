@@ -110,7 +110,7 @@ if (WITH_JAVA)
 
   file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java ${WPILIB_BINARY_DIR}/wpimath/generated/*.java)
 
-  add_jar(wpimath_jar ${JAVA_SOURCES} ${WPIMATH_QUICKBUF_SRCS} INCLUDE_JARS ${EJML_JARS} wpiutil_jar OUTPUT_NAME wpimath GENERATE_NATIVE_HEADERS wpimath_jni_headers)
+  add_jar(wpimath_jar ${JAVA_SOURCES} ${WPIMATH_QUICKBUF_SRCS} INCLUDE_JARS ${EJML_JARS} wpiutil_jar wpiunits_jar OUTPUT_NAME wpimath GENERATE_NATIVE_HEADERS wpimath_jni_headers)
 
   get_property(WPIMATH_JAR_FILE TARGET wpimath_jar PROPERTY JAR_FILE)
   install(FILES ${WPIMATH_JAR_FILE} DESTINATION "${java_lib_dest}")
@@ -208,15 +208,9 @@ target_include_directories(wpimath PUBLIC
 
 install(TARGETS wpimath EXPORT wpimath)
 
-if (WITH_FLAT_INSTALL)
-    set (wpimath_config_dir ${wpilib_dest})
-else()
-    set (wpimath_config_dir share/wpimath)
-endif()
-
 configure_file(wpimath-config.cmake.in ${WPILIB_BINARY_DIR}/wpimath-config.cmake )
-install(FILES ${WPILIB_BINARY_DIR}/wpimath-config.cmake DESTINATION ${wpimath_config_dir})
-install(EXPORT wpimath DESTINATION ${wpimath_config_dir})
+install(FILES ${WPILIB_BINARY_DIR}/wpimath-config.cmake DESTINATION share/wpimath)
+install(EXPORT wpimath DESTINATION share/wpimath)
 
 if (WITH_TESTS)
     wpilib_add_test(wpimath src/test/native/cpp)

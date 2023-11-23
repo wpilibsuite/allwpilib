@@ -44,13 +44,3 @@ target_link_libraries(wpiguidev wpigui)
 
 install(TARGETS wpigui EXPORT wpigui)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpigui")
-
-#if (WITH_FLAT_INSTALL)
-#    set (wpigui_config_dir ${wpilib_dest})
-#else()
-#    set (wpigui_config_dir share/wpigui)
-#endif()
-
-#configure_file(wpigui-config.cmake.in ${WPILIB_BINARY_DIR}/wpigui-config.cmake )
-#install(FILES ${WPILIB_BINARY_DIR}/wpigui-config.cmake DESTINATION ${wpigui_config_dir})
-#install(EXPORT wpigui DESTINATION ${wpigui_config_dir})

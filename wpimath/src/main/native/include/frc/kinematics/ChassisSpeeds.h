@@ -251,3 +251,6 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
   }
 };
 }  // namespace frc
+
+#include "frc/kinematics/proto/ChassisSpeedsProto.h"
+#include "frc/kinematics/struct/ChassisSpeedsStruct.h"
