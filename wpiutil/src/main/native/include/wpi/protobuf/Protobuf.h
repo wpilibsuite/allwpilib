@@ -169,7 +169,7 @@ inline void PackProtobuf(google::protobuf::Message* msg, const T& value) {
  * @tparam T object type
  * @tparam N number of objects
  * @param msg protobuf message (mutable, output)
- * @param array array of objects
+ * @param arr array of objects
  */
 template <std::derived_from<google::protobuf::Message> Proto,
           ProtobufSerializable T, size_t N>
@@ -188,7 +188,7 @@ void PackProtobufArray(google::protobuf::RepeatedPtrField<Proto>* msg,
  * @tparam T object type
  * @tparam N number of objects
  * @param msg protobuf message (mutable, output)
- * @param array array of objects
+ * @param arr array of objects
  */
 template <typename T, size_t N>
 void PackProtobufArray(google::protobuf::RepeatedField<T>* msg,

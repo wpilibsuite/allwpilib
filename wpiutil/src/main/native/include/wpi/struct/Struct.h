@@ -192,7 +192,7 @@ inline void PackStruct(std::span<uint8_t> data, T&& value) {
  * @tparam Offset starting offset
  * @tparam N number of objects
  * @param data struct storage (mutable, output)
- * @param value object
+ * @param arr array of object
  */
 template <size_t Offset, size_t N, StructSerializable T>
 inline void PackStructArray(std::span<uint8_t> data,
