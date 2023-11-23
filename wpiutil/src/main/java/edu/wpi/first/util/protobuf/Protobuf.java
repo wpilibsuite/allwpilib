@@ -126,8 +126,8 @@ public interface Protobuf<T, MessageType extends ProtoMessage<?>> {
   /**
    * Unpack a serialized protobuf array message.
    *
-   * @tparam T object type
-   * @tparam MessageType element type of the protobuf array
+   * @param <T> object type
+   * @param <MessageType> element type of the protobuf array
    * @param msg protobuf array message
    * @param proto protobuf implementation
    * @return Deserialized array
@@ -159,8 +159,8 @@ public interface Protobuf<T, MessageType extends ProtoMessage<?>> {
   /**
    * Pack a serialized protobuf array message.
    *
-   * @tparam T object type
-   * @tparam MessageType element type of the protobuf array
+   * @param <T> object type
+   * @param <MessageType> element type of the protobuf array
    * @param msg protobuf array message
    * @param arr array of objects
    * @param proto protobuf implementation

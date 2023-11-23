@@ -119,6 +119,7 @@ public class Vector<R extends Num> extends Matrix<R, N1> {
   /**
    * Creates an implementation of the {@link Protobuf} interface for vectors.
    *
+   * @param <R> The number of rows of the vectors this serializer processes.
    * @param rows The number of rows of the vectors this serializer processes.
    * @return The protobuf implementation.
    */

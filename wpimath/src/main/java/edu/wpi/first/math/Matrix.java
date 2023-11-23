@@ -768,6 +768,8 @@ public class Matrix<R extends Num, C extends Num> {
   /**
    * Creates an implementation of the {@link Protobuf} interface for matrices.
    *
+   * @param <R> The number of rows of the matrices this serializer processes.
+   * @param <C> The number of cols of the matrices this serializer processes.
    * @param rows The number of rows of the matrices this serializer processes.
    * @param cols The number of cols of the matrices this serializer processes.
    * @return The protobuf implementation.

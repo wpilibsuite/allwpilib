@@ -116,8 +116,8 @@ public interface Struct<T> {
 
   /**
    * Deserializes a double array from a raw struct serialized ByteBuffer starting at the current
-   * position. Will increment the ByteBuffer position by size * kSizeDouble bytes. Will not otherwise
-   * modify the ByteBuffer (e.g. byte order will not be changed).
+   * position. Will increment the ByteBuffer position by size * kSizeDouble bytes. Will not
+   * otherwise modify the ByteBuffer (e.g. byte order will not be changed).
    *
    * @param bb ByteBuffer
    * @param size Size of the array
@@ -140,8 +140,8 @@ public interface Struct<T> {
    * @param arr Array to serialize
    */
   static void packArray(ByteBuffer bb, double[] arr) {
-    for (int i = 0; i < arr.length; i++) {
-      bb.putDouble(arr[i]);
+    for (double obj : arr) {
+      bb.putDouble(obj);
     }
   }
 }

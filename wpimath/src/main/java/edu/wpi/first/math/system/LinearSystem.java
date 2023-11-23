@@ -197,6 +197,9 @@ public class LinearSystem<States extends Num, Inputs extends Num, Outputs extend
   /**
    * Creates an implementation of the {@link Protobuf} interface for linear systems.
    *
+   * @param <States> The number of states of the linear systems this serializer processes.
+   * @param <Inputs> The number of inputs of the linear systems this serializer processes.
+   * @param <Outputs> The number of outputs of the linear systems this serializer processes.
    * @param states The number of states of the linear systems this serializer processes.
    * @param inputs The number of inputs of the linear systems this serializer processes.
    * @param outputs The number of outputs of the linear systems this serializer processes.
