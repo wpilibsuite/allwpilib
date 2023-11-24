@@ -9,11 +9,13 @@
 
 using namespace glass;
 
-NTProfiledPIDControllerModel::NTProfiledPIDControllerModel(std::string_view path)
-    : NTProfiledPIDControllerModel(nt::NetworkTableInstance::GetDefault(), path) {}
+NTProfiledPIDControllerModel::NTProfiledPIDControllerModel(
+    std::string_view path)
+    : NTProfiledPIDControllerModel(nt::NetworkTableInstance::GetDefault(),
+                                   path) {}
 
-NTProfiledPIDControllerModel::NTProfiledPIDControllerModel(nt::NetworkTableInstance inst,
-                                           std::string_view path)
+NTProfiledPIDControllerModel::NTProfiledPIDControllerModel(
+    nt::NetworkTableInstance inst, std::string_view path)
     : m_inst{inst},
       m_name{inst.GetStringTopic(fmt::format("{}/.name", path)).Subscribe("")},
       m_controllable{inst.GetBooleanTopic(fmt::format("{}/.controllable", path))
@@ -21,8 +23,7 @@ NTProfiledPIDControllerModel::NTProfiledPIDControllerModel(nt::NetworkTableInsta
       m_p{inst.GetDoubleTopic(fmt::format("{}/p", path)).GetEntry(0)},
       m_i{inst.GetDoubleTopic(fmt::format("{}/i", path)).GetEntry(0)},
       m_d{inst.GetDoubleTopic(fmt::format("{}/d", path)).GetEntry(0)},
-      m_goal{
-          inst.GetDoubleTopic(fmt::format("{}/goal", path)).GetEntry(0)},
+      m_goal{inst.GetDoubleTopic(fmt::format("{}/goal", path)).GetEntry(0)},
       m_pData{fmt::format("NTPIDCtrlP:{}", path)},
       m_iData{fmt::format("NTPIDCtrlI:{}", path)},
       m_dData{fmt::format("NTPIDCtrlD:{}", path)},

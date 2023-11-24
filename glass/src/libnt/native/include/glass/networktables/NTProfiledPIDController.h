@@ -21,7 +21,8 @@ class NTProfiledPIDControllerModel : public ProfiledPIDControllerModel {
   static constexpr const char* kType = "ProfiledPIDController";
 
   explicit NTProfiledPIDControllerModel(std::string_view path);
-  NTProfiledPIDControllerModel(nt::NetworkTableInstance inst, std::string_view path);
+  NTProfiledPIDControllerModel(nt::NetworkTableInstance inst,
+                               std::string_view path);
 
   const char* GetName() const override { return m_nameValue.c_str(); }
 

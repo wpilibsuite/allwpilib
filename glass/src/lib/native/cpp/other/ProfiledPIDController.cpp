@@ -44,8 +44,7 @@ void glass::DisplayProfiledPIDController(ProfiledPIDControllerModel* m) {
     }
     if (auto s = m->GetGoalData()) {
       double value = s->GetValue();
-      createTuningParameter("Goal", &value,
-                            [=](auto v) { m->SetGoal(v); });
+      createTuningParameter("Goal", &value, [=](auto v) { m->SetGoal(v); });
     }
   } else {
     ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(96, 96, 96, 255));

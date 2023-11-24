@@ -150,7 +150,8 @@ void glass::AddStandardNetworkTablesViews(NetworkTablesProvider& provider) {
       [](Window* win, Model* model, const char* path) {
         win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
         return MakeFunctionView([=] {
-          DisplayProfiledPIDController(static_cast<NTProfiledPIDControllerModel*>(model));
+          DisplayProfiledPIDController(
+              static_cast<NTProfiledPIDControllerModel*>(model));
         });
       });
   provider.Register(
