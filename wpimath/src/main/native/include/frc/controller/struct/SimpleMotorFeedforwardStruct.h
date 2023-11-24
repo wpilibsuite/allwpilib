@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <wpi/SymbolExports.h>
 #include <wpi/struct/Struct.h>
 
 #include "frc/controller/SimpleMotorFeedforward.h"
@@ -12,7 +13,7 @@
 // frc::SimpleMotorFeedforward<units::meters>
 
 template <class Distance>
-struct wpi::Struct<frc::SimpleMotorFeedforward<Distance>> {
+struct WPILIB_DLLEXPORT wpi::Struct<frc::SimpleMotorFeedforward<Distance>> {
   static constexpr std::string_view kTypeString =
       "struct:SimpleMotorFeedforward";
   static constexpr size_t kSize = 24;

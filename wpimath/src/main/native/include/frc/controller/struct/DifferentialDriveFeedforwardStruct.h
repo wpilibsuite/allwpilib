@@ -4,12 +4,13 @@
 
 #pragma once
 
+#include <wpi/SymbolExports.h>
 #include <wpi/struct/Struct.h>
 
 #include "frc/controller/DifferentialDriveFeedforward.h"
 
 template <>
-struct wpi::Struct<frc::DifferentialDriveFeedforward> {
+struct WPILIB_DLLEXPORT wpi::Struct<frc::DifferentialDriveFeedforward> {
   static constexpr std::string_view kTypeString =
       "struct:DifferentialDriveFeedforward";
   static constexpr size_t kSize = 32;
