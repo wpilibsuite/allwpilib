@@ -154,9 +154,7 @@ protobuf {
     generateProtoTasks {
         all().configureEach { task ->
             task.builtins {
-                cpp {
-                    option "dllexport_decl=WPILIB_DLLEXPORT"
-                }
+                cpp {}
                 remove java
             }
             task.plugins {
