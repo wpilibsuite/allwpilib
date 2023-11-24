@@ -52,7 +52,6 @@ model {
             if (!it.buildable || !(it instanceof NativeBinarySpec)) {
                 return
             }
-            it.cppCompiler.define 'WPILIB_EXPORTS'
 
             if (it.component.name == "${nativeName}JNI") {
                 lib project: ':wpimath', library: 'wpimath', linkage: 'static'
@@ -83,5 +82,23 @@ model {
                 }
             }
         }
+    }
+}
+
+nativeUtils.exportsConfigs {
+    apriltag {
+        x64ExcludeSymbols = [
+            '_CT??_R0?AV_System_error',
+            '_CT??_R0?AVexception',
+            '_CT??_R0?AVfailure',
+            '_CT??_R0?AVruntime_error',
+            '_CT??_R0?AVsystem_error',
+            '_CTA5?AVfailure',
+            '_TI5?AVfailure',
+            '_CT??_R0?AVout_of_range',
+            '_CTA3?AVout_of_range',
+            '_TI3?AVout_of_range',
+            '_CT??_R0?AVbad_cast'
+        ]
     }
 }
