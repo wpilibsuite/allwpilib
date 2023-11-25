@@ -17,13 +17,12 @@ def Output(outPath, outfn, contents):
                 return
 
     # File either doesn't exist or has different contents
-    with open(outpathname, "w") as f:
+    with open(outpathname, "w", newline="\n") as f:
         f.write(contents)
 
 
 def main():
     dirname, _ = os.path.split(os.path.abspath(__file__))
-    cmake_binary_dir = sys.argv[1]
 
     with open(f"{dirname}/src/generate/types.json") as f:
         types = json.load(f)
@@ -32,7 +31,7 @@ def main():
     env = Environment(
         loader=FileSystemLoader(f"{dirname}/src/generate/java"), autoescape=False
     )
-    rootPath = f"{cmake_binary_dir}/generated/main/java/edu/wpi/first/networktables"
+    rootPath = f"{dirname}/src/generated/main/java/edu/wpi/first/networktables"
     for fn in glob.glob(f"{dirname}/src/generate/java/*.jinja"):
         template = env.get_template(os.path.basename(fn))
         outfn = os.path.basename(fn)[:-6]  # drop ".jinja"
@@ -55,7 +54,7 @@ def main():
         loader=FileSystemLoader(f"{dirname}/src/generate/include/networktables"),
         autoescape=False,
     )
-    rootPath = f"{cmake_binary_dir}/generated/main/native/include/networktables"
+    rootPath = f"{dirname}/src/generated/main/native/include/networktables"
     for fn in glob.glob(f"{dirname}/src/generate/include/networktables/*.jinja"):
         template = env.get_template(os.path.basename(fn))
         outfn = os.path.basename(fn)[:-6]  # drop ".jinja"
@@ -71,7 +70,7 @@ def main():
     template = env.get_template("ntcore_cpp_types.h.jinja")
     output = template.render(types=types)
     Output(
-        f"{cmake_binary_dir}/generated/main/native/include",
+        f"{dirname}/src/generated/main/native/include",
         "ntcore_cpp_types.h",
         output,
     )
@@ -82,9 +81,7 @@ def main():
     )
     template = env.get_template("ntcore_cpp_types.cpp.jinja")
     output = template.render(types=types)
-    Output(
-        f"{cmake_binary_dir}/generated/main/native/cpp", "ntcore_cpp_types.cpp", output
-    )
+    Output(f"{dirname}/src/generated/main/native/cpp", "ntcore_cpp_types.cpp", output)
 
     # C handle API (header)
     env = Environment(
@@ -93,7 +90,7 @@ def main():
     template = env.get_template("ntcore_c_types.h.jinja")
     output = template.render(types=types)
     Output(
-        f"{cmake_binary_dir}/generated/main/native/include",
+        f"{dirname}/src/generated/main/native/include",
         "ntcore_c_types.h",
         output,
     )
@@ -104,9 +101,7 @@ def main():
     )
     template = env.get_template("ntcore_c_types.cpp.jinja")
     output = template.render(types=types)
-    Output(
-        f"{cmake_binary_dir}/generated/main/native/cpp", "ntcore_c_types.cpp", output
-    )
+    Output(f"{dirname}/src/generated/main/native/cpp", "ntcore_c_types.cpp", output)
 
     # JNI
     env = Environment(
@@ -114,7 +109,7 @@ def main():
     )
     template = env.get_template("types_jni.cpp.jinja")
     output = template.render(types=types)
-    Output(f"{cmake_binary_dir}/generated/main/native/cpp/jni", "types_jni.cpp", output)
+    Output(f"{dirname}/src/generated/main/native/cpp/jni", "types_jni.cpp", output)
 
 
 if __name__ == "__main__":
