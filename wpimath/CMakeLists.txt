@@ -80,7 +80,7 @@ if(WITH_JAVA)
     include(UseJava)
     set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
 
-    quickbuf_generate(WPIMATH_QUICKBUF_SRCS "edu/wpi/first/math/proto" ${wpimath_proto_src})
+    quickbuf_generate(WPIMATH_QUICKBUF_SRCS   "edu/wpi/first/math/proto"   ${wpimath_proto_src})
 
     if(NOT EXISTS "${WPILIB_BINARY_DIR}/wpimath/thirdparty/ejml/ejml-simple-0.43.1.jar")
         set(BASE_URL "https://search.maven.org/remotecontent?filepath=")
@@ -119,29 +119,9 @@ if(WITH_JAVA)
 
     set(CMAKE_JAVA_INCLUDE_PATH wpimath.jar ${EJML_JARS} ${JACKSON_JARS} ${QUICKBUF_JAR})
 
-    execute_process(
-        COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/generate_numbers.py ${WPILIB_BINARY_DIR}/wpimath
-        RESULT_VARIABLE generateResult
-    )
-    if(NOT (generateResult EQUAL "0"))
-        # Try python
-        execute_process(
-            COMMAND
-                python ${CMAKE_CURRENT_SOURCE_DIR}/generate_numbers.py ${WPILIB_BINARY_DIR}/wpimath
-            RESULT_VARIABLE generateResult
-        )
-        if(NOT (generateResult EQUAL "0"))
-            message(FATAL_ERROR "python and python3 generate_numbers.py failed")
-        endif()
-    endif()
-
     set(CMAKE_JNI_TARGET true)
 
-    file(
-        GLOB_RECURSE JAVA_SOURCES
-        src/main/java/*.java
-        ${WPILIB_BINARY_DIR}/wpimath/generated/*.java
-    )
+    file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java src/generated/main/java/*.java)
 
     add_jar(
         wpimath_jar
@@ -175,7 +155,7 @@ if(WITH_JAVA_SOURCE)
     file(
         GLOB WPIMATH_SOURCES
         src/main/java/edu/wpi/first/math/*.java
-        ${WPILIB_BINARY_DIR}/wpimath/generated/main/java/edu/wpi/first/math/Nat.java
+        src/generated/main/java/edu/wpi/first/math/Nat.java
     )
     file(GLOB WPIMATH_CONTROLLER_SOURCES src/main/java/edu/wpi/first/math/controller/*.java)
     file(GLOB WPIMATH_ESTIMATOR_SOURCES src/main/java/edu/wpi/first/math/estimator/*.java)
@@ -183,10 +163,7 @@ if(WITH_JAVA_SOURCE)
     file(GLOB WPIMATH_GEOMETRY_SOURCES src/main/java/edu/wpi/first/math/geometry/*.java)
     file(GLOB WPIMATH_INTERPOLATION_SOURCES src/main/java/edu/wpi/first/math/interpolation/*.java)
     file(GLOB WPIMATH_KINEMATICS_SOURCES src/main/java/edu/wpi/first/math/kinematics/*.java)
-    file(
-        GLOB WPIMATH_NUMBERS_SOURCES
-        ${WPILIB_BINARY_DIR}/wpimath/generated/main/java/edu/wpi/first/math/numbers/*.java
-    )
+    file(GLOB WPIMATH_NUMBERS_SOURCES src/generated/main/java/edu/wpi/first/math/numbers/*.java)
     file(GLOB WPIMATH_SPLINE_SOURCES src/main/java/edu/wpi/first/math/spline/*.java)
     file(GLOB WPIMATH_SYSTEM_SOURCES src/main/java/edu/wpi/first/math/system/*.java)
     file(GLOB WPIMATH_SYSTEM_PLANT_SOURCES src/main/java/edu/wpi/first/math/system/plant/*.java)
