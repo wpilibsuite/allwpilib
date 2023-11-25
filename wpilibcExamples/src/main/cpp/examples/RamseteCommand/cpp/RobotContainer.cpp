@@ -81,7 +81,7 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
       [this](auto left, auto right) { m_drive.TankDriveVolts(left, right); },
       {&m_drive})};
 
-  // Reset odometry to the initial pose of the trajectory, Run path following
+  // Reset odometry to the initial pose of the trajectory, run path following
   // command, then stop at the end.
   return frc2::cmd::RunOnce(
              [this, &exampleTrajectory] {

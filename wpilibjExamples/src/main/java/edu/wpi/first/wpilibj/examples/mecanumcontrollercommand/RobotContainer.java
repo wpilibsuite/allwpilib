@@ -86,7 +86,7 @@ public class RobotContainer {
             // Add kinematics to ensure max speed is actually obeyed
             .setKinematics(DriveConstants.kDriveKinematics);
 
-    // An example trajectory to follow.  All units in meters.
+    // An example trajectory to follow. All units in meters.
     Trajectory exampleTrajectory =
         TrajectoryGenerator.generateTrajectory(
             // Start at the origin facing the +X direction
@@ -122,7 +122,8 @@ public class RobotContainer {
             m_robotDrive::setDriveMotorControllersVolts, // Consumer for the output motor voltages
             m_robotDrive);
 
-    // Reset odometry to the initial pose of the trajectory, Run path following command, then stop
+    // Reset odometry to the initial pose of the trajectory, run path following
+    // command, then stop
     // at the end.
     return Commands.runOnce(() -> m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose()))
         .andThen(mecanumControllerCommand)

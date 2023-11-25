@@ -83,7 +83,7 @@ public class RobotContainer {
             // Add kinematics to ensure max speed is actually obeyed
             .setKinematics(DriveConstants.kDriveKinematics);
 
-    // An example trajectory to follow.  All units in meters.
+    // An example trajectory to follow. All units in meters.
     Trajectory exampleTrajectory =
         TrajectoryGenerator.generateTrajectory(
             // Start at the origin facing the +X direction
@@ -112,7 +112,7 @@ public class RobotContainer {
             m_robotDrive::setModuleStates,
             m_robotDrive);
 
-    // Reset odometry, Run path following command, then stop at the end.
+    // Reset odometry, run path following command, then stop at the end.
     return Commands.runOnce(() -> m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose()))
         .andThen(swerveControllerCommand)
         .andThen(Commands.run(() -> m_robotDrive.drive(0, 0, 0, false)));
