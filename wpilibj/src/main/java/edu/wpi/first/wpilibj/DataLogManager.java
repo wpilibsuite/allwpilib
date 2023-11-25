@@ -225,6 +225,10 @@ public final class DataLogManager {
                 + " Plug in a FAT32 formatted flash drive!",
             false);
       }
+      if (!new File("/home/lvuser/logs").mkdir()) {
+        // ignored
+      }
+      return "/home/lvuser/logs";
     }
     return Filesystem.getOperatingDirectory().getAbsolutePath();
   }

@@ -4,6 +4,8 @@
 
 package edu.wpi.first.math.kinematics;
 
+import static edu.wpi.first.units.Units.InchesPerSecond;
+import static edu.wpi.first.units.Units.RPM;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -42,6 +44,19 @@ class ChassisSpeedsTest {
                 target.omegaRadiansPerSecond * duration,
                 result.getRotation().getRadians(),
                 kEpsilon));
+  }
+
+  @Test
+  void testMeasureConstructor() {
+    var vx = InchesPerSecond.of(14.52);
+    var vy = InchesPerSecond.zero();
+    var omega = RPM.of(0.02);
+    var speeds = new ChassisSpeeds(vx, vy, omega);
+
+    assertAll(
+        () -> assertEquals(0.368808, speeds.vxMetersPerSecond, kEpsilon),
+        () -> assertEquals(0, speeds.vyMetersPerSecond, kEpsilon),
+        () -> assertEquals(0.002094395102, speeds.omegaRadiansPerSecond, kEpsilon));
   }
 
   @Test

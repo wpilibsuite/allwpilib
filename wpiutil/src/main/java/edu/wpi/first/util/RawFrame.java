@@ -2,9 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.cscore.raw;
+package edu.wpi.first.util;
 
-import edu.wpi.first.cscore.CameraServerJNI;
 import java.nio.ByteBuffer;
 
 /**
@@ -23,7 +22,7 @@ public class RawFrame implements AutoCloseable {
 
   /** Construct a new RawFrame. */
   public RawFrame() {
-    m_framePtr = CameraServerJNI.allocateRawFrame();
+    m_framePtr = WPIUtilJNI.allocateRawFrame();
   }
 
   /**
@@ -32,7 +31,7 @@ public class RawFrame implements AutoCloseable {
    */
   @Override
   public void close() {
-    CameraServerJNI.freeRawFrame(m_framePtr);
+    WPIUtilJNI.freeRawFrame(m_framePtr);
   }
 
   /**

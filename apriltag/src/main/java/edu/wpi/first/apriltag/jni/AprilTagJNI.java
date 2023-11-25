@@ -189,4 +189,8 @@ public class AprilTagJNI {
       double fy,
       double cx,
       double cy);
+
+  public static native void generate16h5AprilTagImage(int id, long nativeAddr);
+
+  public static native void generate36h11AprilTagImage(int id, long nativeAddr);
 }

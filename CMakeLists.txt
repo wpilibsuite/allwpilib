@@ -60,6 +60,7 @@ option(WITH_JAVA_SOURCE "Build Java source jars" ON)
 option(WITH_CSCORE "Build cscore (needs OpenCV)" ON)
 option(WITH_NTCORE "Build ntcore" ON)
 option(WITH_WPIMATH "Build wpimath" ON)
+option(WITH_WPIUNITS "Build wpiunits" ON)
 option(WITH_WPILIB "Build hal, wpilibc/j, and myRobot (needs OpenCV)" ON)
 option(WITH_EXAMPLES "Build examples" OFF)
 option(WITH_TESTS "Build unit tests (requires internet connection)" ON)
@@ -74,9 +75,6 @@ set(EXTERNAL_HAL_FILE "" CACHE FILEPATH "Location to look for an external HAL CM
 option(USE_SYSTEM_FMTLIB "Use system fmtlib" OFF)
 option(USE_SYSTEM_LIBUV "Use system libuv" OFF)
 option(USE_SYSTEM_EIGEN "Use system eigen" OFF)
-
-# Options for installation.
-option(WITH_FLAT_INSTALL "Use a flat install directory" OFF)
 
 # Options for location of OpenCV Java.
 set(OPENCV_JAVA_INSTALL_DIR "" CACHE PATH "Location to search for the OpenCV jar file")
@@ -154,16 +152,16 @@ FATAL: Cannot build wpilib without wpimath.
 ")
 endif()
 
-set( wpilib_dest "")
+if (NOT WITH_WPIUNITS AND WITH_WPIMATH AND WITH_JAVA)
+    message(FATAL_ERROR "
+FATAL: Cannot build Java wpimath without wpiunits.
+       Enable wpiunits by setting WITH_WPIUNITS=ON or disable the Java build by setting WITH_JAVA=OFF
+")
+endif()
+
 set( include_dest include )
 set( java_lib_dest java )
 set( jni_lib_dest jni )
-
-if (WITH_FLAT_INSTALL)
-    set (wpilib_config_dir ${wpilib_dest})
-else()
-    set (wpilib_config_dir share/wpilib)
-endif()
 
 if (USE_SYSTEM_LIBUV)
 set (LIBUV_SYSTEM_REPLACE "
@@ -183,17 +181,6 @@ find_program(Quickbuf_EXECUTABLE
     DOC "The Quickbuf protoc plugin"
 )
 
-if (WITH_FLAT_INSTALL)
-set(WPIUTIL_DEP_REPLACE "include($\{SELF_DIR\}/wpiutil-config.cmake)")
-set(WPINET_DEP_REPLACE "include($\{SELF_DIR\}/wpinet-config.cmake)")
-set(NTCORE_DEP_REPLACE "include($\{SELF_DIR\}/ntcore-config.cmake)")
-set(CSCORE_DEP_REPLACE_IMPL "include(\${SELF_DIR}/cscore-config.cmake)")
-set(CAMERASERVER_DEP_REPLACE_IMPL "include(\${SELF_DIR}/cameraserver-config.cmake)")
-set(HAL_DEP_REPLACE_IMPL "include(\${SELF_DIR}/hal-config.cmake)")
-set(WPIMATH_DEP_REPLACE "include($\{SELF_DIR\}/wpimath-config.cmake)")
-set(WPILIBC_DEP_REPLACE_IMPL "include(\${SELF_DIR}/wpilibc-config.cmake)")
-set(WPILIBNEWCOMMANDS_DEP_REPLACE "include(\${SELF_DIR}/wpilibNewcommands-config.cmake)")
-else()
 set(WPIUTIL_DEP_REPLACE "find_dependency(wpiutil)")
 set(WPINET_DEP_REPLACE "find_dependency(wpinet)")
 set(NTCORE_DEP_REPLACE "find_dependency(ntcore)")
@@ -201,9 +188,9 @@ set(CSCORE_DEP_REPLACE_IMPL "find_dependency(cscore)")
 set(CAMERASERVER_DEP_REPLACE_IMPL "find_dependency(cameraserver)")
 set(HAL_DEP_REPLACE_IMPL "find_dependency(hal)")
 set(WPIMATH_DEP_REPLACE "find_dependency(wpimath)")
+set(WPIUNITS_DEP_REPLACE "find_dependency(wpiunits)")
 set(WPILIBC_DEP_REPLACE_IMPL "find_dependency(wpilibc)")
 set(WPILIBNEWCOMMANDS_DEP_REPLACE "find_dependency(wpilibNewCommands)")
-endif()
 
 set(FILENAME_DEP_REPLACE "get_filename_component(SELF_DIR \"$\{CMAKE_CURRENT_LIST_FILE\}\" PATH)")
 set(SELF_DIR "$\{SELF_DIR\}")
@@ -291,7 +278,15 @@ if (WITH_NTCORE)
 endif()
 
 if (WITH_WPIMATH)
+    if (WITH_JAVA)
+        add_subdirectory(wpiunits)
+    endif()
     add_subdirectory(wpimath)
+endif()
+
+if (WITH_WPIUNITS AND NOT WITH_WPIMATH)
+    # In case of building wpiunits standalone
+    add_subdirectory(wpiunits)
 endif()
 
 if (WITH_GUI)
@@ -338,4 +333,4 @@ if (WITH_SIMULATION_MODULES AND NOT WITH_EXTERNAL_HAL)
 endif()
 
 configure_file(wpilib-config.cmake.in ${WPILIB_BINARY_DIR}/wpilib-config.cmake )
-install(FILES ${WPILIB_BINARY_DIR}/wpilib-config.cmake DESTINATION ${wpilib_config_dir})
+install(FILES ${WPILIB_BINARY_DIR}/wpilib-config.cmake DESTINATION share/wpilib)

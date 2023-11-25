@@ -709,8 +709,9 @@ Image* Frame::GetImageImpl(int width, int height,
   return ConvertImpl(cur, pixelFormat, requiredJpegQuality, defaultJpegQuality);
 }
 
-bool Frame::GetCv(cv::Mat& image, int width, int height) {
-  Image* rawImage = GetImage(width, height, VideoMode::kBGR);
+bool Frame::GetCv(cv::Mat& image, int width, int height,
+                  VideoMode::PixelFormat pixelFormat) {
+  Image* rawImage = GetImage(width, height, pixelFormat);
   if (!rawImage) {
     return false;
   }

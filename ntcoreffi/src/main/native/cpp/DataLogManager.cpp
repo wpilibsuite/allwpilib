@@ -229,8 +229,11 @@ static std::string MakeLogDir(std::string_view dir) {
                     "DataLogManager: Logging to RoboRIO 1 internal storage is "
                     "not recommended! Plug in a FAT32 formatted flash drive!");
   }
-#endif
+  fs::create_directory("/home/lvuser/logs", ec);
+  return "/home/lvuser/logs";
+#else
   return filesystem::GetOperatingDirectory();
+#endif
 }
 
 static std::string MakeLogFilename(std::string_view filenameOverride) {

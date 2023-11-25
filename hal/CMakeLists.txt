@@ -59,15 +59,9 @@ install(TARGETS hal EXPORT hal)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/hal")
 install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/gen/ DESTINATION "${include_dest}/hal")
 
-if (WITH_FLAT_INSTALL)
-    set (hal_config_dir ${wpilib_dest})
-else()
-    set (hal_config_dir share/hal)
-endif()
-
 configure_file(hal-config.cmake.in ${WPILIB_BINARY_DIR}/hal-config.cmake )
-install(FILES ${WPILIB_BINARY_DIR}/hal-config.cmake DESTINATION ${hal_config_dir})
-install(EXPORT hal DESTINATION ${hal_config_dir})
+install(FILES ${WPILIB_BINARY_DIR}/hal-config.cmake DESTINATION share/hal)
+install(EXPORT hal DESTINATION share/hal)
 
 # Java bindings
 if (WITH_JAVA)

@@ -6,7 +6,7 @@ package edu.wpi.first.units;
 
 /**
  * A measure holds the magnitude and unit of some dimension, such as distance, time, or speed. Two
- * measures with the same <i>unit</i> and <i>magnitude</i> are effectively the same object.
+ * measures with the same <i>unit</i> and <i>magnitude</i> are effectively equivalent objects.
  *
  * @param <U> the unit type of the measure
  */
@@ -371,7 +371,7 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
 
   /**
    * Returns a string representation of this measurement in a longhand form. The name of the backing
-   * unit is used, rather than its symbol, and the magnitude is represented in a full string, no
+   * unit is used, rather than its symbol, and the magnitude is represented in a full string, not
    * scientific notation. (Very large values may be represented in scientific notation, however)
    *
    * @return the long form representation of this measurement

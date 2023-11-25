@@ -6,7 +6,7 @@ package edu.wpi.first.math.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.numbers.N1;
@@ -27,8 +27,8 @@ class ElevatorFeedforwardTest {
     assertEquals(6.5, m_elevatorFF.calculate(2, 1), 0.002);
     assertEquals(-0.5, m_elevatorFF.calculate(-2, 1), 0.002);
 
-    var A = Matrix.mat(Nat.N1(), Nat.N1()).fill(-kv / ka);
-    var B = Matrix.mat(Nat.N1(), Nat.N1()).fill(1.0 / ka);
+    var A = MatBuilder.fill(Nat.N1(), Nat.N1(), -kv / ka);
+    var B = MatBuilder.fill(Nat.N1(), Nat.N1(), 1.0 / ka);
     final double dt = 0.02;
     var plantInversion = new LinearPlantInversionFeedforward<N1, N1, N1>(A, B, dt);
 

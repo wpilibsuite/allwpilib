@@ -176,3 +176,6 @@ class ElevatorFeedforward {
   units::unit_t<ka_unit> kA{0};
 };
 }  // namespace frc
+
+#include "frc/controller/proto/ElevatorFeedforwardProto.h"
+#include "frc/controller/struct/ElevatorFeedforwardStruct.h"

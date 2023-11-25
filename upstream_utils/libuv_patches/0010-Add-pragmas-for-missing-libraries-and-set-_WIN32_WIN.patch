@@ -27,7 +27,7 @@ index 6d0afe69e7dd4caf4c9459e548fe75cf0c51b501..613065df435d813cd517efbc138b13ee
  
  #if !defined(_SSIZE_T_) && !defined(_SSIZE_T_DEFINED)
 diff --git a/src/win/util.c b/src/win/util.c
-index 9324992ec521cc3496e3e9304e600963a3f20897..4b76417fcbac2480725471740c037deb859e17ca 100644
+index 8828857db76a54d6e184c7f5714a091e92eba8ed..14295c41342b6dda16f39c5c548a6cc8269bfa0b 100644
 --- a/src/win/util.c
 +++ b/src/win/util.c
 @@ -73,7 +73,9 @@ static char *process_title;
