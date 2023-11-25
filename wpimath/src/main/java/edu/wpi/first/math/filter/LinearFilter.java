@@ -6,7 +6,7 @@ package edu.wpi.first.math.filter;
 
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
-import edu.wpi.first.util.CircularBuffer;
+import edu.wpi.first.util.DoubleCircularBuffer;
 import java.util.Arrays;
 import org.ejml.simple.SimpleMatrix;
 
@@ -48,8 +48,8 @@ import org.ejml.simple.SimpleMatrix;
  * to make sure calculate() gets called at the desired, constant frequency!
  */
 public class LinearFilter {
-  private final CircularBuffer m_inputs;
-  private final CircularBuffer m_outputs;
+  private final DoubleCircularBuffer m_inputs;
+  private final DoubleCircularBuffer m_outputs;
   private final double[] m_inputGains;
   private final double[] m_outputGains;
 
@@ -62,8 +62,8 @@ public class LinearFilter {
    * @param fbGains The "feedback" or IIR gains.
    */
   public LinearFilter(double[] ffGains, double[] fbGains) {
-    m_inputs = new CircularBuffer(ffGains.length);
-    m_outputs = new CircularBuffer(fbGains.length);
+    m_inputs = new DoubleCircularBuffer(ffGains.length);
+    m_outputs = new DoubleCircularBuffer(fbGains.length);
     m_inputGains = Arrays.copyOf(ffGains, ffGains.length);
     m_outputGains = Arrays.copyOf(fbGains, fbGains.length);
 
