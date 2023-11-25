@@ -77,6 +77,8 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * @param kV The velocity gain, in volts/(unit/sec).
    * @param kA The acceleration gain, in volts/(unit/sec²).
    * @throws std::domain_error if kV <= 0 or kA <= 0.
+   * @see <a
+   * href="https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
    */
   template <typename Distance>
     requires std::same_as<units::meter, Distance> ||
@@ -118,6 +120,8 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * @param kA The acceleration gain, in volts/(unit/sec²).
    *
    * @throws std::domain_error if kV <= 0 or kA <= 0.
+   * @see <a
+   * href="https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
    */
   template <typename Distance>
     requires std::same_as<units::meter, Distance> ||
@@ -159,6 +163,8 @@ class WPILIB_DLLEXPORT LinearSystemId {
    *                  second squared).
    * @throws domain_error if kVLinear <= 0, kALinear <= 0, kVAngular <= 0,
    *         or kAAngular <= 0.
+   * @see <a
+   * href="https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
    */
   static LinearSystem<2, 2, 2> IdentifyDrivetrainSystem(
       decltype(1_V / 1_mps) kVLinear, decltype(1_V / 1_mps_sq) kALinear,
@@ -186,6 +192,8 @@ class WPILIB_DLLEXPORT LinearSystemId {
    *                   right wheels, in meters.
    * @throws domain_error if kVLinear <= 0, kALinear <= 0, kVAngular <= 0,
    *         kAAngular <= 0, or trackwidth <= 0.
+   * @see <a
+   * href="https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
    */
   static LinearSystem<2, 2, 2> IdentifyDrivetrainSystem(
       decltype(1_V / 1_mps) kVLinear, decltype(1_V / 1_mps_sq) kALinear,
@@ -215,6 +223,8 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * @param J the moment of inertia J of the DC motor.
    * @param gearing Gear ratio from motor to output.
    * @throws std::domain_error if J <= 0 or gearing <= 0.
+   * @see <a
+   * href="https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
    */
   static LinearSystem<2, 1, 2> DCMotorSystem(DCMotor motor,
                                              units::kilogram_square_meter_t J,
