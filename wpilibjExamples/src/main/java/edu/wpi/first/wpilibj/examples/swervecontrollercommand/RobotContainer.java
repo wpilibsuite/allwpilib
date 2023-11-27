@@ -19,8 +19,9 @@ import edu.wpi.first.wpilibj.examples.swervecontrollercommand.Constants.ModuleCo
 import edu.wpi.first.wpilibj.examples.swervecontrollercommand.Constants.OIConstants;
 import edu.wpi.first.wpilibj.examples.swervecontrollercommand.subsystems.DriveSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import java.util.List;
@@ -115,8 +116,9 @@ public class RobotContainer {
     // // Reset odometry to the initial pose of the trajectory, run path following
     // command, then stop
     // at the end.
-    return Commands.runOnce(() -> m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose()))
-        .andThen(swerveControllerCommand)
-        .andThen(Commands.runOnce(() -> m_robotDrive.drive(0, 0, 0, false)));
+    return new SequentialCommandGroup(
+        new InstantCommand(() -> m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose())),
+        swerveControllerCommand,
+        new InstantCommand(() -> m_robotDrive.drive(0, 0, 0, false)));
   }
 }

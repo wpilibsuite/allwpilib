@@ -19,10 +19,10 @@ import edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.DriveCo
 import edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.OIConstants;
 import edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.subsystems.DriveSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.MecanumControllerCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import java.util.List;
 
@@ -125,8 +125,10 @@ public class RobotContainer {
     // Reset odometry to the initial pose of the trajectory, run path following
     // command, then stop
     // at the end.
-    return Commands.runOnce(() -> m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose()))
-        .andThen(mecanumControllerCommand)
-        .andThen(Commands.runOnce(() -> m_robotDrive.drive(0, 0, 0, false)));
+
+    return new SequentialCommandGroup(
+        new InstantCommand(() -> m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose())),
+        mecanumControllerCommand,
+        new InstantCommand(() -> m_robotDrive.drive(0, 0, 0, false)));
   }
 }
