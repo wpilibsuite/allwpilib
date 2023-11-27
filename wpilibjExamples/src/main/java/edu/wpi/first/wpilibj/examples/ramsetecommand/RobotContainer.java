@@ -133,6 +133,6 @@ public class RobotContainer {
     // at the end.
     return Commands.runOnce(() -> m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose()))
         .andThen(ramseteCommand)
-        .andThen(Commands.run(() -> m_robotDrive.tankDriveVolts(0, 0)));
+        .andThen(Commands.runOnce(() -> m_robotDrive.tankDriveVolts(0, 0)));
   }
 }

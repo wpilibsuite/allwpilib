@@ -112,9 +112,11 @@ public class RobotContainer {
             m_robotDrive::setModuleStates,
             m_robotDrive);
 
-    // Reset odometry, run path following command, then stop at the end.
+    // // Reset odometry to the initial pose of the trajectory, run path following
+    // command, then stop
+    // at the end.
     return Commands.runOnce(() -> m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose()))
         .andThen(swerveControllerCommand)
-        .andThen(Commands.run(() -> m_robotDrive.drive(0, 0, 0, false)));
+        .andThen(Commands.runOnce(() -> m_robotDrive.drive(0, 0, 0, false)));
   }
 }

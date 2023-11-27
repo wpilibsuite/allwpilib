@@ -127,6 +127,6 @@ public class RobotContainer {
     // at the end.
     return Commands.runOnce(() -> m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose()))
         .andThen(mecanumControllerCommand)
-        .andThen(Commands.run(() -> m_robotDrive.drive(0, 0, 0, false)));
+        .andThen(Commands.runOnce(() -> m_robotDrive.drive(0, 0, 0, false)));
   }
 }
