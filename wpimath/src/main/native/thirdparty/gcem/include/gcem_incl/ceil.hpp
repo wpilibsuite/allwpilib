@@ -21,6 +21,9 @@
 #ifndef _gcem_ceil_HPP
 #define _gcem_ceil_HPP
 
+#include <cmath>
+#include <type_traits>
+
 namespace internal
 {
 
@@ -124,7 +127,11 @@ return_t<T>
 ceil(const T x)
 noexcept
 {
+  if (std::is_constant_evaluated()) {
     return internal::ceil_check( static_cast<return_t<T>>(x) );
+  } else {
+    return std::ceil(x);
+  }
 }
 
 #endif

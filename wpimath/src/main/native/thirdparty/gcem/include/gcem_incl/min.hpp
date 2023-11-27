@@ -21,6 +21,9 @@
 #ifndef _gcem_min_HPP
 #define _gcem_min_HPP
 
+#include <cmath>
+#include <type_traits>
+
 /**
  * Compile-time pairwise minimum function
  *
@@ -35,7 +38,11 @@ common_t<T1,T2>
 min(const T1 x, const T2 y)
 noexcept
 {
+  if (std::is_constant_evaluated()) {
     return( y > x ? x : y );
+  } else {
+    return std::min(x, y);
+  }
 }
 
 #endif

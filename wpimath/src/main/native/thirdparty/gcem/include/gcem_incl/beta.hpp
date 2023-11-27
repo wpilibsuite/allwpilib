@@ -21,6 +21,9 @@
 #ifndef _gcem_beta_HPP
 #define _gcem_beta_HPP
 
+#include <cmath>
+#include <type_traits>
+
 /**
  * Compile-time beta function
  *
@@ -36,7 +39,11 @@ common_return_t<T1,T2>
 beta(const T1 a, const T2 b)
 noexcept
 {
+  if (std::is_constant_evaluated()) {
     return exp( lbeta(a,b) );
+  } else {
+    return std::beta(a, b);
+  }
 }
 
 #endif

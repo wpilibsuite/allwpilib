@@ -25,6 +25,9 @@
 #ifndef _gcem_log2_HPP
 #define _gcem_log2_HPP
 
+#include <cmath>
+#include <type_traits>
+
 namespace internal
 {
 
@@ -53,7 +56,11 @@ return_t<T>
 log2(const T x)
 noexcept
 {
+  if (std::is_constant_evaluated()) {
     return internal::log2_check( x );
+  } else {
+    return std::log2(x);
+  }
 }
 
 #endif

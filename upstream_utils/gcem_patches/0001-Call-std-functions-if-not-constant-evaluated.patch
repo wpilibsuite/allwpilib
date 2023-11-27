@@ -1,0 +1,989 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Sun, 26 Nov 2023 18:09:12 -0800
+Subject: [PATCH] Call std functions if not constant-evaluated
+
+---
+ include/gcem_incl/abs.hpp      | 7 +++++++
+ include/gcem_incl/acos.hpp     | 7 +++++++
+ include/gcem_incl/acosh.hpp    | 7 +++++++
+ include/gcem_incl/asin.hpp     | 7 +++++++
+ include/gcem_incl/asinh.hpp    | 7 +++++++
+ include/gcem_incl/atan.hpp     | 7 +++++++
+ include/gcem_incl/atan2.hpp    | 7 +++++++
+ include/gcem_incl/atanh.hpp    | 7 +++++++
+ include/gcem_incl/beta.hpp     | 7 +++++++
+ include/gcem_incl/ceil.hpp     | 7 +++++++
+ include/gcem_incl/copysign.hpp | 7 +++++++
+ include/gcem_incl/cos.hpp      | 7 +++++++
+ include/gcem_incl/cosh.hpp     | 7 +++++++
+ include/gcem_incl/erf.hpp      | 7 +++++++
+ include/gcem_incl/exp.hpp      | 7 +++++++
+ include/gcem_incl/expm1.hpp    | 7 +++++++
+ include/gcem_incl/floor.hpp    | 7 +++++++
+ include/gcem_incl/fmod.hpp     | 7 +++++++
+ include/gcem_incl/hypot.hpp    | 7 +++++++
+ include/gcem_incl/lgamma.hpp   | 7 +++++++
+ include/gcem_incl/log.hpp      | 7 +++++++
+ include/gcem_incl/log10.hpp    | 7 +++++++
+ include/gcem_incl/log1p.hpp    | 7 +++++++
+ include/gcem_incl/log2.hpp     | 7 +++++++
+ include/gcem_incl/max.hpp      | 7 +++++++
+ include/gcem_incl/min.hpp      | 7 +++++++
+ include/gcem_incl/pow.hpp      | 7 +++++++
+ include/gcem_incl/round.hpp    | 7 +++++++
+ include/gcem_incl/signbit.hpp  | 7 +++++++
+ include/gcem_incl/sin.hpp      | 7 +++++++
+ include/gcem_incl/sinh.hpp     | 7 +++++++
+ include/gcem_incl/sqrt.hpp     | 7 +++++++
+ include/gcem_incl/tan.hpp      | 7 +++++++
+ include/gcem_incl/tanh.hpp     | 7 +++++++
+ include/gcem_incl/tgamma.hpp   | 7 +++++++
+ include/gcem_incl/trunc.hpp    | 7 +++++++
+ 36 files changed, 252 insertions(+)
+
+diff --git a/include/gcem_incl/abs.hpp b/include/gcem_incl/abs.hpp
+index 6d7b66d91bc9f4d0c05fd0c3dd1571b552d8a19a..32ee89494c088a51862f00aecadeb180c0159997 100644
+--- a/include/gcem_incl/abs.hpp
++++ b/include/gcem_incl/abs.hpp
+@@ -21,6 +21,9 @@
+ #ifndef _gcem_abs_HPP
+ #define _gcem_abs_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
+ /**
+  * Compile-time absolute value function
+  *
+@@ -34,12 +37,16 @@ T
+ abs(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return( // deal with signed-zeros
+             x == T(0) ? \
+                 T(0) :
+             // else
+             x < T(0) ? \
+                 - x : x );
++  } else {
++    return std::abs(x);
++  }
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/acos.hpp b/include/gcem_incl/acos.hpp
+index a47003d61d8ab2fb7dd0226410e1457809a73458..c40006de7f3747c8eb2678dc5c1187d6f72a30e3 100644
+--- a/include/gcem_incl/acos.hpp
++++ b/include/gcem_incl/acos.hpp
+@@ -25,6 +25,9 @@
+ #ifndef _gcem_acos_HPP
+ #define _gcem_acos_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
+ namespace internal
+ {
+ 
+@@ -78,7 +81,11 @@ return_t<T>
+ acos(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::acos_check( static_cast<return_t<T>>(x) );
++  } else {
++    return std::acos(x);
++  }
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/acosh.hpp b/include/gcem_incl/acosh.hpp
+index 8767200778168aeb409f16945b2ceac75b69158d..edf71db655bacd376174fdf212312ec201dc48a6 100644
+--- a/include/gcem_incl/acosh.hpp
++++ b/include/gcem_incl/acosh.hpp
+@@ -25,6 +25,9 @@
+ #ifndef _gcem_acosh_HPP
+ #define _gcem_acosh_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
+ namespace internal
+ {
+ 
+@@ -62,7 +65,11 @@ return_t<T>
+ acosh(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::acosh_compute( static_cast<return_t<T>>(x) );
++  } else {
++    return std::acosh(x);
++  }
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/asin.hpp b/include/gcem_incl/asin.hpp
+index 6a79e87df435c7e60b140b7c7133b22deea7fd73..57840d4b1a0dba4943662b2cf2979ec14ace16f0 100644
+--- a/include/gcem_incl/asin.hpp
++++ b/include/gcem_incl/asin.hpp
+@@ -25,6 +25,9 @@
+ #ifndef _gcem_asin_HPP
+ #define _gcem_asin_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
+ namespace internal
+ {
+ 
+@@ -76,7 +79,11 @@ return_t<T>
+ asin(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::asin_check( static_cast<return_t<T>>(x) );
++  } else {
++    return std::asin(x);
++  }
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/asinh.hpp b/include/gcem_incl/asinh.hpp
+index a5f3ff62a0208d350f4027d736ce3fc035c16ded..7e5190289abe60eb591a4f43db41370b10892949 100644
+--- a/include/gcem_incl/asinh.hpp
++++ b/include/gcem_incl/asinh.hpp
+@@ -25,6 +25,9 @@
+ #ifndef _gcem_asinh_HPP
+ #define _gcem_asinh_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
+ namespace internal
+ {
+ 
+@@ -59,7 +62,11 @@ return_t<T>
+ asinh(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::asinh_compute( static_cast<return_t<T>>(x) );
++  } else {
++    return std::asinh(x);
++  }
+ }
+ 
+ 
+diff --git a/include/gcem_incl/atan.hpp b/include/gcem_incl/atan.hpp
+index 3f46974c07920fca6396e42e93261d8167a27eb1..9ebd33e65d06d14d5091e60f660e1769835f4ade 100644
+--- a/include/gcem_incl/atan.hpp
++++ b/include/gcem_incl/atan.hpp
+@@ -29,6 +29,9 @@
+ #ifndef _gcem_atan_HPP
+ #define _gcem_atan_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
+ namespace internal
+ {
+ 
+@@ -149,7 +152,11 @@ return_t<T>
+ atan(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::atan_check( static_cast<return_t<T>>(x) );
++  } else {
++    return std::atan(x);
++  }
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/atan2.hpp b/include/gcem_incl/atan2.hpp
+index 5ca55b79c8e11569511fb6d4842c74be50c70c67..d3abcd88c9e0c1e0f3f62659934cb101b8478214 100644
+--- a/include/gcem_incl/atan2.hpp
++++ b/include/gcem_incl/atan2.hpp
+@@ -25,6 +25,9 @@
+ #ifndef _gcem_atan2_HPP
+ #define _gcem_atan2_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
+ namespace internal
+ {
+ 
+@@ -82,7 +85,11 @@ common_return_t<T1,T2>
+ atan2(const T1 y, const T2 x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::atan2_type_check(x,y);
++  } else {
++    return std::atan2(y, x);
++  }
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/atanh.hpp b/include/gcem_incl/atanh.hpp
+index dfb4dc312d479e2c6dd837d2391bc658e3b678ed..753d469857e5d618c447887f03991a76ab9043a5 100644
+--- a/include/gcem_incl/atanh.hpp
++++ b/include/gcem_incl/atanh.hpp
+@@ -25,6 +25,9 @@
+ #ifndef _gcem_atanh_HPP
+ #define _gcem_atanh_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
+ namespace internal
+ {
+ 
+@@ -73,7 +76,11 @@ return_t<T>
+ atanh(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::atanh_check( static_cast<return_t<T>>(x) );
++  } else {
++    return std::atanh(x);
++  }
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/beta.hpp b/include/gcem_incl/beta.hpp
+index e43d4fcd9a10e37e16652351ec7092cb7200f808..b47efb7a6e2c2d14924ac6eda304d1ab330ed48c 100644
+--- a/include/gcem_incl/beta.hpp
++++ b/include/gcem_incl/beta.hpp
+@@ -21,6 +21,9 @@
+ #ifndef _gcem_beta_HPP
+ #define _gcem_beta_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
+ /**
+  * Compile-time beta function
+  *
+@@ -36,7 +39,11 @@ common_return_t<T1,T2>
+ beta(const T1 a, const T2 b)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return exp( lbeta(a,b) );
++  } else {
++    return std::beta(a, b);
++  }
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/ceil.hpp b/include/gcem_incl/ceil.hpp
+index ff1097bac2f53c3f6a4b3d4bfc612e0fcd34a63b..257ff0550c50f3ac5e82b1d08905e1a13a5c88ed 100644
+--- a/include/gcem_incl/ceil.hpp
++++ b/include/gcem_incl/ceil.hpp
+@@ -21,6 +21,9 @@
+ #ifndef _gcem_ceil_HPP
+ #define _gcem_ceil_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
+ namespace internal
+ {
+ 
+@@ -124,7 +127,11 @@ return_t<T>
+ ceil(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::ceil_check( static_cast<return_t<T>>(x) );
++  } else {
++    return std::ceil(x);
++  }
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/copysign.hpp b/include/gcem_incl/copysign.hpp
+index c1741f7f321110ff3cf52cb9035d5f2dca5f0ffc..eecfea21a2dd431243a55c3bcdebc5f7ddbb2297 100644
+--- a/include/gcem_incl/copysign.hpp
++++ b/include/gcem_incl/copysign.hpp
+@@ -21,6 +21,9 @@
+ #ifndef _gcem_copysign_HPP
+ #define _gcem_copysign_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
+ /**
+  * Compile-time copy sign function
+  *
+@@ -35,7 +38,11 @@ T1
+ copysign(const T1 x, const T2 y)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return( signbit(x) != signbit(y) ? -x : x );
++  } else {
++    return std::copysign(x, y);
++  }
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/cos.hpp b/include/gcem_incl/cos.hpp
+index 82f4c609f5268d19771e281987ed1653e81ef173..9c8181bb991508d79c5fc427c6e5c4c1ae0b46fa 100644
+--- a/include/gcem_incl/cos.hpp
++++ b/include/gcem_incl/cos.hpp
+@@ -25,6 +25,9 @@
+ #ifndef _gcem_cos_HPP
+ #define _gcem_cos_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
+ namespace internal
+ {
+ 
+@@ -77,7 +80,11 @@ return_t<T>
+ cos(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::cos_check( static_cast<return_t<T>>(x) );
++  } else {
++    return std::cos(x);
++  }
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/cosh.hpp b/include/gcem_incl/cosh.hpp
+index fc89c0d06482a687442998da511eb1e7b17f95d5..225c37a011857725ff77af8e0ff3cd3d779843e4 100644
+--- a/include/gcem_incl/cosh.hpp
++++ b/include/gcem_incl/cosh.hpp
+@@ -25,6 +25,9 @@
+ #ifndef _gcem_cosh_HPP
+ #define _gcem_cosh_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
+ namespace internal
+ {
+ 
+@@ -59,7 +62,11 @@ return_t<T>
+ cosh(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::cosh_compute( static_cast<return_t<T>>(x) );
++  } else {
++    return std::cosh(x);
++  }
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/erf.hpp b/include/gcem_incl/erf.hpp
+index d0bc83ada14af7a4b50262541c8558016823303a..ee5386325b1cde9a447c384488afb837358c5fef 100644
+--- a/include/gcem_incl/erf.hpp
++++ b/include/gcem_incl/erf.hpp
+@@ -25,6 +25,9 @@
+ #ifndef _gcem_erf_HPP
+ #define _gcem_erf_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
+ namespace internal
+ {
+ 
+@@ -137,7 +140,11 @@ return_t<T>
+ erf(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::erf_check( static_cast<return_t<T>>(x) );
++  } else {
++    return std::erf(x);
++  }
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/exp.hpp b/include/gcem_incl/exp.hpp
+index 595ffc2a6202d763560fd879f27fcef32c6b2d64..acbda39377fbf9936a439e71dd760fb6203bd138 100644
+--- a/include/gcem_incl/exp.hpp
++++ b/include/gcem_incl/exp.hpp
+@@ -25,6 +25,9 @@
+ #ifndef _gcem_exp_HPP
+ #define _gcem_exp_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
+ namespace internal
+ {
+ 
+@@ -124,7 +127,11 @@ return_t<T>
+ exp(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::exp_check( static_cast<return_t<T>>(x) );
++  } else {
++    return std::exp(x);
++  }
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/expm1.hpp b/include/gcem_incl/expm1.hpp
+index 70c9ecf5a4a241bfef617e6e4ee0000a80978355..edecd394cfc54e32713d7ed381db6fa8e0057983 100644
+--- a/include/gcem_incl/expm1.hpp
++++ b/include/gcem_incl/expm1.hpp
+@@ -25,6 +25,9 @@
+ #ifndef _gcem_expm1_HPP
+ #define _gcem_expm1_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
+ namespace internal
+ {
+ 
+@@ -70,7 +73,11 @@ return_t<T>
+ expm1(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::expm1_check( static_cast<return_t<T>>(x) );
++  } else {
++    return std::expm1(x);
++  }
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/floor.hpp b/include/gcem_incl/floor.hpp
+index 8b260ff8a10fb8b9d048307c7d9b18a7e91900c1..e35592a391e03934a45a943ffb92ae3c264d768c 100644
+--- a/include/gcem_incl/floor.hpp
++++ b/include/gcem_incl/floor.hpp
+@@ -21,6 +21,9 @@
+ #ifndef _gcem_floor_HPP
+ #define _gcem_floor_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
+ namespace internal
+ {
+ 
+@@ -124,7 +127,11 @@ return_t<T>
+ floor(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::floor_check( static_cast<return_t<T>>(x) );
++  } else {
++    return std::floor(x);
++  }
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/fmod.hpp b/include/gcem_incl/fmod.hpp
+index 02459efd4b3a016939a306c9fd1a7ead12ff123b..2f503140e354e05d03dadd2077b60879f80acd61 100644
+--- a/include/gcem_incl/fmod.hpp
++++ b/include/gcem_incl/fmod.hpp
+@@ -21,6 +21,9 @@
+ #ifndef _gcem_fmod_HPP
+ #define _gcem_fmod_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
+ namespace internal
+ {
+ 
+@@ -64,7 +67,11 @@ common_return_t<T1,T2>
+ fmod(const T1 x, const T2 y)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::fmod_type_check(x,y);
++  } else {
++    return std::fmod(x, y);
++  }
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/hypot.hpp b/include/gcem_incl/hypot.hpp
+index 01ad4e9212547c649113e50954a73ee9f7394334..c51a5b42e57520b94d50b497ec4aa4bb33b0b774 100644
+--- a/include/gcem_incl/hypot.hpp
++++ b/include/gcem_incl/hypot.hpp
+@@ -27,6 +27,9 @@
+ #ifndef _gcem_hypot_HPP
+ #define _gcem_hypot_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
+ namespace internal
+ {
+ 
+@@ -84,7 +87,11 @@ common_return_t<T1,T2>
+ hypot(const T1 x, const T2 y)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::hypot_type_check(x,y);
++  } else {
++    return std::hypot(x, y);
++  }
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/lgamma.hpp b/include/gcem_incl/lgamma.hpp
+index 507c6d4c91423b31be55426f494f67b0cb085c9f..7c11fe56ad1156eb51ab9d9acbe0a4406a9e6c4e 100644
+--- a/include/gcem_incl/lgamma.hpp
++++ b/include/gcem_incl/lgamma.hpp
+@@ -28,6 +28,9 @@
+ #ifndef _gcem_lgamma_HPP
+ #define _gcem_lgamma_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
+ namespace internal
+ {
+ 
+@@ -129,7 +132,11 @@ return_t<T>
+ lgamma(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::lgamma_check( static_cast<return_t<T>>(x) );
++  } else {
++    return std::lgamma(x);
++  }
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/log.hpp b/include/gcem_incl/log.hpp
+index c2e24b006c2fdd01196b189220f35ca982d8bf9e..b9f1f02cedbacf88538626dda43729bc75495b1f 100644
+--- a/include/gcem_incl/log.hpp
++++ b/include/gcem_incl/log.hpp
+@@ -25,6 +25,9 @@
+ #ifndef _gcem_log_HPP
+ #define _gcem_log_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
+ namespace internal
+ {
+ 
+@@ -180,7 +183,11 @@ return_t<T>
+ log(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::log_integral_check( x );
++  } else {
++    return std::log(x);
++  }
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/log10.hpp b/include/gcem_incl/log10.hpp
+index cda8894fdd62054f11ec4c3c3e6402c3752e0dd7..0d4ff3ecb0f7a1314c35197e51e75a78c3128b74 100644
+--- a/include/gcem_incl/log10.hpp
++++ b/include/gcem_incl/log10.hpp
+@@ -25,6 +25,9 @@
+ #ifndef _gcem_log10_HPP
+ #define _gcem_log10_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
+ namespace internal
+ {
+ 
+@@ -53,7 +56,11 @@ return_t<T>
+ log10(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::log10_check( x );
++  } else {
++    return std::log10(x);
++  }
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/log1p.hpp b/include/gcem_incl/log1p.hpp
+index ccd08b8cb8799f2d4d34d5634dbc2fcabb3fd5b3..b7e6cd534dedb8f55c7a3e9dd03af15d6a19837f 100644
+--- a/include/gcem_incl/log1p.hpp
++++ b/include/gcem_incl/log1p.hpp
+@@ -25,6 +25,9 @@
+ #ifndef _gcem_log1p_HPP
+ #define _gcem_log1p_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
+ namespace internal
+ {
+ 
+@@ -74,7 +77,11 @@ return_t<T>
+ log1p(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::log1p_check( static_cast<return_t<T>>(x) );
++  } else {
++    return std::log1p(x);
++  }
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/log2.hpp b/include/gcem_incl/log2.hpp
+index a97fed4c7236f816fa07ac2494f243adbac6742b..37196152d060f7380ff57e084b2b2e119c69587d 100644
+--- a/include/gcem_incl/log2.hpp
++++ b/include/gcem_incl/log2.hpp
+@@ -25,6 +25,9 @@
+ #ifndef _gcem_log2_HPP
+ #define _gcem_log2_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
+ namespace internal
+ {
+ 
+@@ -53,7 +56,11 @@ return_t<T>
+ log2(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::log2_check( x );
++  } else {
++    return std::log2(x);
++  }
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/max.hpp b/include/gcem_incl/max.hpp
+index ddc3e4e6caff1a781e662a3ded8909cb703729ab..94cd379d87cfa514bec3ce32470d09d1ea8aa7d5 100644
+--- a/include/gcem_incl/max.hpp
++++ b/include/gcem_incl/max.hpp
+@@ -21,6 +21,9 @@
+ #ifndef _gcem_max_HPP
+ #define _gcem_max_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
+ /**
+  * Compile-time pairwise maximum function
+  *
+@@ -35,7 +38,11 @@ common_t<T1,T2>
+ max(const T1 x, const T2 y)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return( y < x ? x : y );
++  } else {
++    return std::max(x, y);
++  }
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/min.hpp b/include/gcem_incl/min.hpp
+index 5ce70b38e6d243267a053ec33fae31e59f6a359f..998601a4cc7864d0fc4466444a71090ad43917bd 100644
+--- a/include/gcem_incl/min.hpp
++++ b/include/gcem_incl/min.hpp
+@@ -21,6 +21,9 @@
+ #ifndef _gcem_min_HPP
+ #define _gcem_min_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
+ /**
+  * Compile-time pairwise minimum function
+  *
+@@ -35,7 +38,11 @@ common_t<T1,T2>
+ min(const T1 x, const T2 y)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return( y > x ? x : y );
++  } else {
++    return std::min(x, y);
++  }
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/pow.hpp b/include/gcem_incl/pow.hpp
+index 3891edef0e8f1e7b64e8632f46e87fd39bdba162..35b2a9aa173d4d201dbe6d642a58b0ac6b53b684 100644
+--- a/include/gcem_incl/pow.hpp
++++ b/include/gcem_incl/pow.hpp
+@@ -25,6 +25,9 @@
+ #ifndef _gcem_pow_HPP
+ #define _gcem_pow_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
+ namespace internal
+ {
+ 
+@@ -76,7 +79,11 @@ common_t<T1,T2>
+ pow(const T1 base, const T2 exp_term)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::pow_check(base,exp_term);
++  } else {
++    return std::pow(base, exp_term);
++  }
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/round.hpp b/include/gcem_incl/round.hpp
+index 9ac4a09f0a9e7b09a303795d30ccee32ebe841b1..d7c1300b142062c4947c7df31757772f1b8c8cb0 100644
+--- a/include/gcem_incl/round.hpp
++++ b/include/gcem_incl/round.hpp
+@@ -21,6 +21,9 @@
+ #ifndef _gcem_round_HPP
+ #define _gcem_round_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
+ namespace internal
+ {
+ 
+@@ -119,7 +122,11 @@ return_t<T>
+ round(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::round_check( static_cast<return_t<T>>(x) );
++  } else {
++    return std::round(x);
++  }
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/signbit.hpp b/include/gcem_incl/signbit.hpp
+index 282e24403345dccfa8bf580112c129b43df5aa6d..c13c6f3265e81c7280f4dd4db454e4262278d7a5 100644
+--- a/include/gcem_incl/signbit.hpp
++++ b/include/gcem_incl/signbit.hpp
+@@ -21,6 +21,9 @@
+ #ifndef _gcem_signbit_HPP
+ #define _gcem_signbit_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
+ /**
+  * Compile-time sign bit detection function
+  *
+@@ -34,11 +37,15 @@ bool
+ signbit(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+ #ifdef _MSC_VER
+     return( (x == T(0)) ? (_fpclass(x) == _FPCLASS_NZ) : (x < T(0)) );
+ #else
+     return GCEM_SIGNBIT(x);
+ #endif
++  } else {
++    return std::signbit(x);
++  }
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/sin.hpp b/include/gcem_incl/sin.hpp
+index 56c8dcaf62dc22207ee7f41ec84d272e4535ab4e..203ea5d9723cc135bd024466a392aabce0896cdb 100644
+--- a/include/gcem_incl/sin.hpp
++++ b/include/gcem_incl/sin.hpp
+@@ -27,6 +27,9 @@
+ #ifndef _gcem_sin_HPP
+ #define _gcem_sin_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
+ namespace internal
+ {
+ 
+@@ -79,7 +82,11 @@ return_t<T>
+ sin(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::sin_check( static_cast<return_t<T>>(x) );
++  } else {
++    return std::sin(x);
++  }
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/sinh.hpp b/include/gcem_incl/sinh.hpp
+index fe3ecdd0e719856c8bcc0e8d692d93c98c496942..337ee3d576ec4def690f8f3e2720d74a6b155744 100644
+--- a/include/gcem_incl/sinh.hpp
++++ b/include/gcem_incl/sinh.hpp
+@@ -25,6 +25,9 @@
+ #ifndef _gcem_sinh_HPP
+ #define _gcem_sinh_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
+ namespace internal
+ {
+ 
+@@ -59,7 +62,11 @@ return_t<T>
+ sinh(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::sinh_check( static_cast<return_t<T>>(x) );
++  } else {
++    return std::sinh(x);
++  }
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/sqrt.hpp b/include/gcem_incl/sqrt.hpp
+index 1b2753c99ede5189fc2272080828c83ca63a184c..f65070a5ea4c8681d1d7ad99acd82644c6ddee5f 100644
+--- a/include/gcem_incl/sqrt.hpp
++++ b/include/gcem_incl/sqrt.hpp
+@@ -25,6 +25,9 @@
+ #ifndef _gcem_sqrt_HPP
+ #define _gcem_sqrt_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
+ namespace internal
+ {
+ 
+@@ -103,7 +106,11 @@ return_t<T>
+ sqrt(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::sqrt_check( static_cast<return_t<T>>(x) );
++  } else {
++    return std::sqrt(x);
++  }
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/tan.hpp b/include/gcem_incl/tan.hpp
+index 386cce0f412107f65183031b3458455059f55d54..354c302a50c7a0b2b31e8288c9dab363ceac9cbe 100644
+--- a/include/gcem_incl/tan.hpp
++++ b/include/gcem_incl/tan.hpp
+@@ -25,6 +25,9 @@
+ #ifndef _gcem_tan_HPP
+ #define _gcem_tan_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
+ namespace internal
+ {
+ 
+@@ -134,7 +137,11 @@ return_t<T>
+ tan(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::tan_check( static_cast<return_t<T>>(x) );
++  } else {
++    return std::tan(x);
++  }
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/tanh.hpp b/include/gcem_incl/tanh.hpp
+index 30b431886601ec9f77ca9a93a6ca62b3cabd9e57..15d47b4a258f7ac4b49164ab48058dff6db28c92 100644
+--- a/include/gcem_incl/tanh.hpp
++++ b/include/gcem_incl/tanh.hpp
+@@ -25,6 +25,9 @@
+ #ifndef _gcem_tanh_HPP
+ #define _gcem_tanh_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
+ namespace internal
+ {
+ 
+@@ -83,7 +86,11 @@ return_t<T>
+ tanh(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::tanh_check( static_cast<return_t<T>>(x) );
++  } else {
++    return std::tanh(x);
++  }
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/tgamma.hpp b/include/gcem_incl/tgamma.hpp
+index deffd3a8e77c34a9ebfd5209ee32594dc5b241e2..a3bf41de5b9dc104661bbc8a574d45d587f10061 100644
+--- a/include/gcem_incl/tgamma.hpp
++++ b/include/gcem_incl/tgamma.hpp
+@@ -25,6 +25,9 @@
+ #ifndef _gcem_tgamma_HPP
+ #define _gcem_tgamma_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
+ namespace internal
+ {
+ 
+@@ -74,7 +77,11 @@ return_t<T>
+ tgamma(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::tgamma_check( static_cast<return_t<T>>(x) );
++  } else {
++    return std::tgamma(x);
++  }
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/trunc.hpp b/include/gcem_incl/trunc.hpp
+index af3f448915f0f9a1b5f2d843596331f7874a6da5..979265725c95d57c66e51fe2a86de34691cbb391 100644
+--- a/include/gcem_incl/trunc.hpp
++++ b/include/gcem_incl/trunc.hpp
+@@ -21,6 +21,9 @@
+ #ifndef _gcem_trunc_HPP
+ #define _gcem_trunc_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
+ namespace internal
+ {
+ 
+@@ -115,7 +118,11 @@ return_t<T>
+ trunc(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::trunc_check( static_cast<return_t<T>>(x) );
++  } else {
++    return std::trunc(x);
++  }
+ }
+ 
+ #endif
