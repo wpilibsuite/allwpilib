@@ -5,7 +5,9 @@
 #pragma once
 
 #include <memory>
-#include <span>
+#include <set>
+#include <string>
+#include <vector>
 
 #include <imgui.h>
 #include <networktables/DoubleArrayTopic.h>

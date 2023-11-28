@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 
 public class MyRobot extends TimedRobot {
-  Canvas2d canvas2D = new Canvas2d(150, 150);
+  Canvas2d m_canvas2D = new Canvas2d(150, 150);
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -23,7 +23,7 @@ public class MyRobot extends TimedRobot {
    */
   @Override
   public void robotInit() {
-    SmartDashboard.putData("Canvas2d", canvas2D);
+    SmartDashboard.putData("Canvas2d", m_canvas2D);
 
     Rotation2d rotation2d = new Rotation2d(1, 2);
 
@@ -36,10 +36,10 @@ public class MyRobot extends TimedRobot {
     canvasLine2dPublisher.set(
         new CanvasLine2d[] {new CanvasLine2d(1, 2, 3, 4, 5, new Color8Bit(Color.kRed), 255, 0)});
 
-    canvas2D.drawLine(0, 0, 50, 50, 1, new Color8Bit(Color.kRed), 255);
-    canvas2D.drawRect(50, 50, 100, 100, 0, true, new Color8Bit(Color.kGreen), 255);
-    canvas2D.drawCircle(105, 105, 10, 3, false, new Color8Bit(Color.kBlue), 100);
-    canvas2D.finishFrame();
+    m_canvas2D.drawLine(0, 0, 50, 50, 1, new Color8Bit(Color.kRed), 255);
+    m_canvas2D.drawRect(50, 50, 100, 100, 0, true, new Color8Bit(Color.kGreen), 255);
+    m_canvas2D.drawCircle(105, 105, 10, 3, false, new Color8Bit(Color.kBlue), 100);
+    m_canvas2D.finishFrame();
   }
 
   /** This function is run once each time the robot enters autonomous mode. */

@@ -79,7 +79,7 @@ public class Canvas2d implements NTSendable, AutoCloseable {
    * @param y1 The y coordinate of the first point
    * @param x2 The x coordinate of the second point
    * @param y2 The y coordinate of the second point
-   * @param thickness The thickness of the outline. For unfilled rectangles.
+   * @param weight The thickness of the outline. For unfilled rectangles.
    * @param fill Whether the rectangle should be filled
    * @param color The color of the rectangle
    * @param opacity The opacity of the rectangle [0-255]
