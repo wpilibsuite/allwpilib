@@ -4,6 +4,7 @@
 
 #include "glass/other/Canvas2D.h"
 
+#include <span>
 #include <vector>
 
 #define IMGUI_DEFINE_MATH_OPERATORS
@@ -13,12 +14,45 @@
 using namespace glass;
 namespace gui = wpi::gui;
 
+void Canvas2DLine::Draw(float scale, const ImVec2& cursorPos,
+                        ImDrawList* drawList) const {
+  drawList->AddLine(cursorPos + (m_point1 * scale),
+                    cursorPos + (m_point2 * scale), m_color, m_weight * scale);
+}
+
+void Canvas2DQuad::Draw(float scale, const ImVec2& cursorPos,
+                        ImDrawList* drawList) const {
+  if (m_fill) {
+    drawList->AddQuadFilled(cursorPos + (m_point1 * scale),
+                            cursorPos + (m_point2 * scale),
+                            cursorPos + (m_point3 * scale),
+                            cursorPos + (m_point4 * scale), m_color);
+  } else {
+    drawList->AddQuad(
+        cursorPos + (m_point1 * scale), cursorPos + (m_point2 * scale),
+        cursorPos + (m_point3 * scale), cursorPos + (m_point4 * scale), m_color,
+        m_weight * scale);
+  }
+}
+
+void Canvas2DCircle::Draw(float scale, const ImVec2& cursorPos,
+                          ImDrawList* drawList) const {
+  if (m_fill) {
+    drawList->AddCircleFilled(cursorPos + (m_center * scale), m_radius * scale,
+                              m_color);
+  } else {
+    drawList->AddCircle(cursorPos + (m_center * scale), m_radius * scale,
+                        m_color, 0, m_weight * scale);
+  }
+}
+
 void glass::DisplayCanvas2D(Canvas2DModel* model, const ImVec2& contentSize) {
   if (contentSize.x <= 0 || contentSize.y <= 0) {
     return;
   }
 
   ImVec2 dimensions = model->GetDimensions();
+  ImDrawList* drawList = ImGui::GetWindowDrawList();
 
   float scale;
   ImVec2 cursorPos = ImGui::GetWindowPos() + ImGui::GetCursorPos();
@@ -30,15 +64,8 @@ void glass::DisplayCanvas2D(Canvas2DModel* model, const ImVec2& contentSize) {
     cursorPos.y += (contentSize.y - dimensions.y * scale) / 2;
   }
 
-  auto drawList = ImGui::GetWindowDrawList();
-
-  std::vector<Canvas2DLine> lines = model->GetLines();
-
-  // TODO: make this traverse multuple lists
-  for (auto line : lines) {
-    drawList->AddLine(line.GetPoint1() * scale + cursorPos,
-                      line.GetPoint2() * scale + cursorPos, line.GetColor(),
-                      line.GetWeight() * scale);
+  for (auto&& element : model->GetElements()) {
+    element->Draw(scale, cursorPos, drawList);
   }
 }
 

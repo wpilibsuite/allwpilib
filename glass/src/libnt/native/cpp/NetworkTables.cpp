@@ -29,6 +29,7 @@
 #include <wpi/StringExtras.h>
 #include <wpi/mpack.h>
 #include <wpi/raw_ostream.h>
+#include <wpi/struct/DynamicStruct.h>
 
 #include "glass/Context.h"
 #include "glass/DataSource.h"
@@ -740,6 +741,7 @@ void NetworkTablesModel::ValueSource::UpdateFromValue(
               valueChildrenMap = false;
             }
             auto raw = value.GetRaw();
+            wpi::DynamicStructArray sArray{desc, raw};
             valueChildren.resize(raw.size() / desc->GetSize());
             unsigned int i = 0;
             for (auto&& child : valueChildren) {
@@ -747,11 +749,10 @@ void NetworkTablesModel::ValueSource::UpdateFromValue(
                 child.name = fmt::format("[{}]", i);
                 child.path = fmt::format("{}{}", name, child.name);
               }
-              wpi::DynamicStruct s{desc, raw};
+              wpi::DynamicStruct& s = sArray[i];
               UpdateStructValueSource(model, &child, s, child.path,
                                       value.last_change());
               ++i;
-              raw = wpi::drop_front(raw, desc->GetSize());
             }
           } else {
             wpi::DynamicStruct s{desc, value.GetRaw()};

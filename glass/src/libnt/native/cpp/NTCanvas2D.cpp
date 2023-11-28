@@ -30,14 +30,24 @@ NTCanvas2DModel::NTCanvas2DModel(nt::NetworkTableInstance inst,
     : m_path{fmt::format("{}/", path)},
       m_inst{inst},
       m_structDatabase{structDatabase},
+      m_nameSub(
+          inst.GetStringTopic(fmt::format("{}/.name", path)).Subscribe("")),
       m_dimensionsSub(
           inst.GetFloatArrayTopic(fmt::format("{}/dims", path)).Subscribe({})),
       m_linesSub(inst.GetRawTopic(fmt::format("{}/lines", path))
-                     .Subscribe("struct:CanvasLine2d[]", {})) {}
+                     .Subscribe("struct:CanvasLine2d[]", {})),
+      m_quadsSub(inst.GetRawTopic(fmt::format("{}/quads", path))
+                     .Subscribe("struct:CanvasQuad2d[]", {})),
+      m_circlesSub(inst.GetRawTopic(fmt::format("{}/circles", path))
+                       .Subscribe("struct:CanvasCircle2d[]", {})) {}
 
 NTCanvas2DModel::~NTCanvas2DModel() = default;
 
 void NTCanvas2DModel::Update() {
+  for (auto&& v : m_nameSub.ReadQueue()) {
+    m_name = v.value;
+  }
+
   for (auto&& v : m_dimensionsSub.ReadQueue()) {
     if (v.value.size() == 2) {
       m_dimensions.x = v.value[0];
@@ -55,34 +65,113 @@ void NTCanvas2DModel::Update() {
     auto* x2Field = lineDesc->FindFieldByName("x2");
     auto* y2Field = lineDesc->FindFieldByName("y2");
     auto* weightField = lineDesc->FindFieldByName("weight");
-    auto* zOrderField = lineDesc->FindFieldByName("zOrder");
     auto* redField = lineDesc->FindFieldByName("r");
     auto* greenField = lineDesc->FindFieldByName("g");
     auto* blueField = lineDesc->FindFieldByName("b");
+    auto* opacityField = lineDesc->FindFieldByName("a");
+    auto* zOrderField = lineDesc->FindFieldByName("zOrder");
 
     for (auto&& v : m_linesSub.ReadQueue()) {
       m_lines.clear();
 
-      std::span<const unsigned char> raw(v.value);
-      int amount = raw.size() / lineDesc->GetSize();
-      for (int i = 0; i < amount; i++) {
-        wpi::DynamicStruct asStruct{lineDesc, raw};
+      wpi::DynamicStructArray lineArray{lineDesc, v.value};
+      for (const auto& line : lineArray) {
+        ImVec2 point1{line.GetFloatField(x1Field), line.GetFloatField(y1Field)};
+        ImVec2 point2{line.GetFloatField(x2Field), line.GetFloatField(y2Field)};
+        float weight = line.GetFloatField(weightField);
+        ImU32 color = IM_COL32(
+            line.GetUintField(redField), line.GetUintField(greenField),
+            line.GetUintField(blueField), line.GetUintField(opacityField));
+        int zOrder = line.GetIntField(zOrderField);
 
-        ImVec2 p1{asStruct.GetFloatField(x1Field),
-                  asStruct.GetFloatField(y1Field)};
-        ImVec2 p2{asStruct.GetFloatField(x2Field),
-                  asStruct.GetFloatField(y2Field)};
-        float weight = asStruct.GetFloatField(weightField);
-        ImU32 color = IM_COL32(asStruct.GetUintField(redField),
-                               asStruct.GetUintField(greenField),
-                               asStruct.GetUintField(blueField), 255);
-        int zOrder = asStruct.GetIntField(zOrderField);
-
-        m_lines.emplace_back(p1, p2, weight, color, zOrder);
-
-        raw = wpi::drop_front(raw, lineDesc->GetSize());
+        m_lines.emplace_back(point1, point2, weight, color, zOrder);
       }
     }
+  }
+
+  const wpi::StructDescriptor* quadDesc = m_structDatabase.Find("CanvasQuad2d");
+  if (quadDesc) {
+    auto* x1Field = quadDesc->FindFieldByName("x1");
+    auto* y1Field = quadDesc->FindFieldByName("y1");
+    auto* x2Field = quadDesc->FindFieldByName("x2");
+    auto* y2Field = quadDesc->FindFieldByName("y2");
+    auto* x3Field = quadDesc->FindFieldByName("x3");
+    auto* y3Field = quadDesc->FindFieldByName("y3");
+    auto* x4Field = quadDesc->FindFieldByName("x4");
+    auto* y4Field = quadDesc->FindFieldByName("y4");
+    auto* weightField = quadDesc->FindFieldByName("weight");
+    auto* fillField = quadDesc->FindFieldByName("fill");
+    auto* redField = quadDesc->FindFieldByName("r");
+    auto* greenField = quadDesc->FindFieldByName("g");
+    auto* blueField = quadDesc->FindFieldByName("b");
+    auto* opacityField = quadDesc->FindFieldByName("a");
+    auto* zOrderField = quadDesc->FindFieldByName("zOrder");
+
+    for (auto&& v : m_quadsSub.ReadQueue()) {
+      m_quads.clear();
+
+      wpi::DynamicStructArray quadArray{quadDesc, v.value};
+      for (const auto& quad : quadArray) {
+        ImVec2 point1{quad.GetFloatField(x1Field), quad.GetFloatField(y1Field)};
+        ImVec2 point2{quad.GetFloatField(x2Field), quad.GetFloatField(y2Field)};
+        ImVec2 point3{quad.GetFloatField(x3Field), quad.GetFloatField(y3Field)};
+        ImVec2 point4{quad.GetFloatField(x4Field), quad.GetFloatField(y4Field)};
+        float weight = quad.GetFloatField(weightField);
+        ImU32 color = IM_COL32(
+            quad.GetUintField(redField), quad.GetUintField(greenField),
+            quad.GetUintField(blueField), quad.GetUintField(opacityField));
+        bool fill = quad.GetBoolField(fillField);
+        int zOrder = quad.GetIntField(zOrderField);
+
+        m_quads.emplace_back(point1, point2, point3, point4, weight, fill,
+                             color, zOrder);
+      }
+    }
+  }
+
+  const wpi::StructDescriptor* circleDesc =
+      m_structDatabase.Find("CanvasCircle2d");
+  if (circleDesc) {
+    auto* xField = circleDesc->FindFieldByName("x");
+    auto* yField = circleDesc->FindFieldByName("y");
+    auto* radiusField = circleDesc->FindFieldByName("radius");
+    auto* weightField = circleDesc->FindFieldByName("weight");
+    auto* fillField = circleDesc->FindFieldByName("fill");
+    auto* redField = circleDesc->FindFieldByName("r");
+    auto* greenField = circleDesc->FindFieldByName("g");
+    auto* blueField = circleDesc->FindFieldByName("b");
+    auto* opacityField = circleDesc->FindFieldByName("a");
+    auto* zOrderField = circleDesc->FindFieldByName("zOrder");
+
+    for (auto&& v : m_circlesSub.ReadQueue()) {
+      m_circles.clear();
+
+      wpi::DynamicStructArray circleArray{circleDesc, v.value};
+      for (const auto& circle : circleArray) {
+        ImVec2 center{circle.GetFloatField(xField),
+                      circle.GetFloatField(yField)};
+        float radius = circle.GetFloatField(radiusField);
+        float weight = circle.GetFloatField(weightField);
+        bool fill = circle.GetBoolField(fillField);
+        ImU32 color = IM_COL32(
+            circle.GetUintField(redField), circle.GetUintField(greenField),
+            circle.GetUintField(blueField), circle.GetUintField(opacityField));
+        int zOrder = circle.GetIntField(zOrderField);
+
+        m_circles.emplace_back(center, radius, weight, fill, color, zOrder);
+      }
+    }
+  }
+
+  m_elements.clear();
+  for (const auto& line : m_lines) {
+    m_elements.insert(&line);
+  }
+  for (const auto& quad : m_quads) {
+    m_elements.insert(&quad);
+  }
+  for (const auto& circle : m_circles) {
+    m_elements.insert(&circle);
   }
 }
 
@@ -98,6 +187,7 @@ ImVec2 NTCanvas2DModel::GetDimensions() const {
   return m_dimensions;
 }
 
-std::vector<Canvas2DLine> NTCanvas2DModel::GetLines() const {
-  return m_lines;
+std::set<const Canvas2DElement*, Canvas2DElementSort>
+NTCanvas2DModel::GetElements() const {
+  return m_elements;
 }

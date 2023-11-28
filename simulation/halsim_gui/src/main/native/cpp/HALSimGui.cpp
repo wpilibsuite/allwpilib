@@ -26,7 +26,8 @@ void HALSimGui::GlobalInit() {
   halProvider = std::make_unique<HALProvider>(
       glass::GetStorageRoot().GetChild("HALProvider"));
   halProvider->GlobalInit();
-  // TODO: Fix this, it should use whatever struct database it has for the treeview but idk where that is
+  // TODO: Fix this, it should use whatever struct database it has for the
+  // treeview but idk where that is
   ntProvider = std::make_unique<glass::NetworkTablesProvider>(
       glass::GetStorageRoot().GetChild("NTProvider"), structDatabase);
   ntProvider->GlobalInit();

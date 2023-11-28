@@ -14,6 +14,7 @@
 #include <networktables/NetworkTableInstance.h>
 #include <networktables/NetworkTableListener.h>
 #include <networktables/RawTopic.h>
+#include <networktables/StringTopic.h>
 #include <ntcore_cpp.h>
 #include <wpi/struct/DynamicStruct.h>
 
@@ -33,12 +34,14 @@ class NTCanvas2DModel : public Canvas2DModel {
   ~NTCanvas2DModel() override;
 
   const char* GetPath() const { return m_path.c_str(); }
+  const char* GetName() const { return m_name.c_str(); }
 
   void Update() override;
   bool Exists() override;
   bool IsReadOnly() override;
 
-  std::vector<Canvas2DLine> GetLines() const override;
+  std::set<const Canvas2DElement*, Canvas2DElementSort> GetElements()
+      const override;
   ImVec2 GetDimensions() const override;
 
  private:
@@ -46,10 +49,18 @@ class NTCanvas2DModel : public Canvas2DModel {
   nt::NetworkTableInstance m_inst;
   wpi::StructDescriptorDatabase& m_structDatabase;
 
+  nt::StringSubscriber m_nameSub;
   nt::FloatArraySubscriber m_dimensionsSub;
   nt::RawSubscriber m_linesSub;
+  nt::RawSubscriber m_quadsSub;
+  nt::RawSubscriber m_circlesSub;
 
+  std::string m_name;
   ImVec2 m_dimensions;
+
+  std::set<const Canvas2DElement*, Canvas2DElementSort> m_elements;
   std::vector<Canvas2DLine> m_lines;
+  std::vector<Canvas2DQuad> m_quads;
+  std::vector<Canvas2DCircle> m_circles;
 };
 }  // namespace glass
