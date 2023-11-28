@@ -1119,6 +1119,11 @@ void ServerImpl::TopicData::RefreshProperties() {
     }
   }
 
+  if (!cached) {
+    lastValue = {};
+    lastValueClient = nullptr;
+  }
+
   if (!cached && persistent) {
     WARN("topic {}: disabling cached property disables persistent storage",
          name);
@@ -1153,6 +1158,8 @@ bool ServerImpl::TopicData::SetFlags(unsigned int flags_) {
     updated |= cached;
     cached = false;
     properties["cached"] = false;
+    lastValue = {};
+    lastValueClient = nullptr;
   }
   if (!cached && persistent) {
     WARN("topic {}: disabling cached property disables persistent storage",
