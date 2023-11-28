@@ -76,7 +76,6 @@ void glass::DisplayCanvas2DSettings(Canvas2DModel* model) {
 void Canvas2DView::Display() {
   DisplayCanvas2D(m_model, ImGui::GetWindowContentRegionMax() -
                                ImGui::GetWindowContentRegionMin());
-  ;
 }
 
 void Canvas2DView::Settings() {

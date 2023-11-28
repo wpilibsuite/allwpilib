@@ -68,8 +68,8 @@ public class Canvas2d implements NTSendable, AutoCloseable {
    * @param opacity The opacity of the line [0-255]
    */
   public void drawLine(
-      float x1, float y1, float x2, float y2, float thickness, Color8Bit color, int opacity) {
-    m_lines.add(new CanvasLine2d(x1, y1, x2, y2, thickness, color, opacity, m_currentZOrder++));
+      float x1, float y1, float x2, float y2, float weight, Color8Bit color, int opacity) {
+    m_lines.add(new CanvasLine2d(x1, y1, x2, y2, weight, color, opacity, m_currentZOrder++));
   }
 
   /**
@@ -89,13 +89,13 @@ public class Canvas2d implements NTSendable, AutoCloseable {
       float y1,
       float x2,
       float y2,
-      float thickness,
+      float weight,
       boolean fill,
       Color8Bit color,
       int opacity) {
     m_quads.add(
         new CanvasQuad2d(
-            x1, y1, x2, y1, x2, y2, x1, y2, thickness, fill, color, opacity, m_currentZOrder++));
+            x1, y1, x2, y1, x2, y2, x1, y2, weight, fill, color, opacity, m_currentZOrder++));
   }
 
   /**
@@ -123,13 +123,13 @@ public class Canvas2d implements NTSendable, AutoCloseable {
       float y3,
       float x4,
       float y4,
-      float thickness,
+      float weight,
       boolean fill,
       Color8Bit color,
       int opacity) {
     m_quads.add(
         new CanvasQuad2d(
-            x1, y1, x2, y2, x3, y3, x4, y4, thickness, fill, color, opacity, m_currentZOrder++));
+            x1, y1, x2, y2, x3, y3, x4, y4, weight, fill, color, opacity, m_currentZOrder++));
   }
 
   /**
@@ -144,9 +144,9 @@ public class Canvas2d implements NTSendable, AutoCloseable {
    * @param opacity The opacity of the circle [0-255]
    */
   public void drawCircle(
-      float x, float y, float radius, float thickness, boolean fill, Color8Bit color, int opacity) {
+      float x, float y, float radius, float weight, boolean fill, Color8Bit color, int opacity) {
     m_circles.add(
-        new CanvasCircle2d(x, y, radius, thickness, fill, color, opacity, m_currentZOrder++));
+        new CanvasCircle2d(x, y, radius, weight, fill, color, opacity, m_currentZOrder++));
   }
 
   /** Finish and push the frame to Sendable. Clears the canvas after pushing the frame. */
