@@ -214,7 +214,8 @@ uint64_t wpi::Now() {
 #ifdef __FRC_ROBORIO__
   // Same code as HAL_GetFPGATime()
   if (!hmbInitialized.test()) {
-    fmt::print(stderr,
+    fmt::print(
+        stderr,
         "FPGA not yet configured in wpi::Now(). Time will not be correct.\n");
     std::fflush(stderr);
     return 1;
