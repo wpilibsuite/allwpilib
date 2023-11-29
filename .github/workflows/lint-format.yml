@@ -68,7 +68,10 @@ jobs:
       - name: Install wpiformat
         run: pip3 install wpiformat
       - name: Create compile_commands.json
-        run: ./gradlew generateCompileCommands -Ptoolchain-optional-roboRio
+        run: |
+          ./gradlew generateCompileCommands -Ptoolchain-optional-roboRio
+          ./.github/workflows/fix_compile_commands.py build/TargetedCompileCommands/linuxx86-64release/compile_commands.json
+          ./.github/workflows/fix_compile_commands.py build/TargetedCompileCommands/linuxx86-64debug/compile_commands.json
       - name: List changed files
         run: wpiformat -list-changed-files
       - name: Run clang-tidy release
