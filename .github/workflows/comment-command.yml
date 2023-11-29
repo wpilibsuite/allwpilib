@@ -49,7 +49,7 @@ jobs:
       - name: Run wpiformat
         run: wpiformat
       - name: Run gersemi
-        run: gersemi -l 150 .
+        run: gersemi -l 150 -i .
       - name: Run spotlessApply
         run: ./gradlew spotlessApply
       - name: Commit

@@ -124,7 +124,7 @@ jobs:
       - name: Install gersemi
         run: pip3 install gersemi
       - name: Run
-        run: gersemi -l 150 .
+        run: gersemi -l 150 -i .
       - name: Check output
         run: git --no-pager diff --exit-code HEAD
       - name: Generate diff
