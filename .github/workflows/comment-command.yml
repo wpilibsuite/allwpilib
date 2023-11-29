@@ -44,12 +44,8 @@ jobs:
           java-version: 11
       - name: Install wpiformat
         run: pip3 install wpiformat
-      - name: Install gersemi
-        run: pip3 install gersemi
       - name: Run wpiformat
         run: wpiformat
-      - name: Run gersemi
-        run: gersemi -l 150 .
       - name: Run spotlessApply
         run: ./gradlew spotlessApply
       - name: Commit
