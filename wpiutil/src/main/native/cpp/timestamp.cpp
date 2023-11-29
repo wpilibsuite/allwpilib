@@ -215,7 +215,7 @@ uint64_t wpi::Now() {
   // Same code as HAL_GetFPGATime()
   if (!hmbInitialized.test()) {
     fmt::print(stderr,
-        "FPGA not yet configured in wpi::Now(). Time will not be correct\n");
+        "FPGA not yet configured in wpi::Now(). Time will not be correct.\n");
     std::fflush(stderr);
     return 1;
   }
