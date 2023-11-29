@@ -213,7 +213,10 @@ public final class DataLogManager {
       try {
         // prefer a mounted USB drive if one is accessible
         Path usbDir = Paths.get("/u").toRealPath();
-        if (Files.isWritable(usbDir) && new File("/u/logs").mkdir()) {
+        if (Files.isWritable(usbDir)) {
+          if (!new File("/u/logs").mkdir()) {
+            // ignored
+          }
           return "/u/logs";
         }
       } catch (IOException ex) {
