@@ -7,30 +7,33 @@
 #include "frc/proto/VectorProto.h"
 #include "wpimath.pb.h"
 
-template <int Size>
-google::protobuf::Message* wpi::Protobuf<frc::Vectord<Size>>::New(
+template <int Size, int Options, int MaxRows, int MaxCols>
+google::protobuf::Message*
+wpi::Protobuf<frc::Matrixd<Size, 1, Options, MaxRows, MaxCols>>::New(
     google::protobuf::Arena* arena) {
   return google::protobuf::Arena::CreateMessage<wpi::proto::ProtobufVector>(
       arena);
 }
 
-template <int Size>
-frc::Vectord<Size> wpi::Protobuf<frc::Vectord<Size>>::Unpack(
+template <int Size, int Options, int MaxRows, int MaxCols>
+frc::Matrixd<Size, 1, Options, MaxRows, MaxCols>
+wpi::Protobuf<frc::Matrixd<Size, 1, Options, MaxRows, MaxCols>>::Unpack(
     const google::protobuf::Message& msg) {
   auto m = static_cast<const wpi::proto::ProtobufVector*>(&msg);
   if (m->rows_size() != Size) {
     // TODO Error
   }
-  frc::Vectord<Size> vec;
+  frc::Matrixd<Size, 1, Options, MaxRows, MaxCols> vec;
   for (int i = 0; i < Size; i++) {
     vec(i) = m->rows(i);
   }
   return vec;
 }
 
-template <int Size>
-void wpi::Protobuf<frc::Vectord<Size>>::Pack(google::protobuf::Message* msg,
-                                             const frc::Vectord<Size>& value) {
+template <int Size, int Options, int MaxRows, int MaxCols>
+void wpi::Protobuf<frc::Matrixd<Size, 1, Options, MaxRows, MaxCols>>::Pack(
+    google::protobuf::Message* msg,
+    const frc::Matrixd<Size, 1, Options, MaxRows, MaxCols>& value) {
   auto m = static_cast<wpi::proto::ProtobufVector*>(msg);
   m->clear_rows();
   for (int i = 0; i < Size; i++) {

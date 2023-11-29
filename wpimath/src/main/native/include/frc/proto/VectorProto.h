@@ -9,12 +9,15 @@
 
 #include "frc/EigenCore.h"
 
-template <int Size>
-struct WPILIB_DLLEXPORT wpi::Protobuf<frc::Vectord<Size>> {
+template <int Size, int Options, int MaxRows, int MaxCols>
+struct WPILIB_DLLEXPORT
+    wpi::Protobuf<frc::Matrixd<Size, 1, Options, MaxRows, MaxCols>> {
   static google::protobuf::Message* New(google::protobuf::Arena* arena);
-  static frc::Vectord<Size> Unpack(const google::protobuf::Message& msg);
-  static void Pack(google::protobuf::Message* msg,
-                   const frc::Vectord<Size>& value);
+  static frc::Matrixd<Size, 1, Options, MaxRows, MaxCols> Unpack(
+      const google::protobuf::Message& msg);
+  static void Pack(
+      google::protobuf::Message* msg,
+      const frc::Matrixd<Size, 1, Options, MaxRows, MaxCols>& value);
 };
 
 #include "frc/proto/VectorProto.inc"

@@ -9,12 +9,16 @@
 
 #include "frc/EigenCore.h"
 
-template <int Rows, int Cols>
-struct WPILIB_DLLEXPORT wpi::Protobuf<frc::Matrixd<Rows, Cols>> {
+template <int Rows, int Cols, int Options, int MaxRows, int MaxCols>
+  requires(Cols != 1)
+struct WPILIB_DLLEXPORT
+    wpi::Protobuf<frc::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>> {
   static google::protobuf::Message* New(google::protobuf::Arena* arena);
-  static frc::Matrixd<Rows, Cols> Unpack(const google::protobuf::Message& msg);
-  static void Pack(google::protobuf::Message* msg,
-                   const frc::Matrixd<Rows, Cols>& value);
+  static frc::Matrixd<Rows, Cols, Options, MaxRows, MaxCols> Unpack(
+      const google::protobuf::Message& msg);
+  static void Pack(
+      google::protobuf::Message* msg,
+      const frc::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>& value);
 };
 
 #include "frc/proto/MatrixProto.inc"
