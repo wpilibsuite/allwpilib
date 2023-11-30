@@ -15,7 +15,7 @@ public class PoseEstimationTestUtil {
    * This class is intended for use as "drivetrain-agnostic" kinematics. Odometry measurements are
    * akin to Poses, while their difference is akin to Twists.
    */
-  protected static class SE2KinematicPrimitive implements WheelPositions<SE2KinematicPrimitive> {
+  public static class SE2KinematicPrimitive implements WheelPositions<SE2KinematicPrimitive> {
     private final Pose2d pose;
 
     public SE2KinematicPrimitive(final Pose2d pose) {
@@ -36,7 +36,7 @@ public class PoseEstimationTestUtil {
     }
   }
 
-  protected static class SE2Kinematics
+  public static class SE2Kinematics
       implements Kinematics<SE2KinematicPrimitive, SE2KinematicPrimitive> {
     private final double timeConstant;
 
