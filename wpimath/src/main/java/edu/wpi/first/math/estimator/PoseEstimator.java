@@ -124,7 +124,7 @@ public class PoseEstimator<T extends WheelPositions<T>> {
    * Return the pose at a given timestamp, if one exists.
    *
    * @param timestamp The pose's timestamp in seconds.
-   * @return Rhe pose at a given timestamp, if one exists.
+   * @return The pose at a given timestamp, if one exists.
    */
   public Optional<Pose2d> sampleAt(double timestamp) {
     return m_poseBuffer
