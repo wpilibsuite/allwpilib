@@ -122,6 +122,39 @@ class Canvas2DCircle : public Canvas2DElement {
   int m_zOrder;
 };
 
+class Canvas2DNgon : public Canvas2DElement {
+public:
+  Canvas2DNgon(ImVec2 center, float radius, int numSides, float weight,
+              bool fill, ImU32 color, int zOrder)
+      : m_center{center},
+        m_radius{radius},
+        m_numSides{numSides},
+        m_weight{weight},
+        m_fill{fill},
+        m_color{color},
+        m_zOrder{zOrder} {}
+
+  ImVec2 GetCenter() const { return m_center; }
+  float GetRadius() const { return m_radius; }
+  int GetNumSides() const { return m_numSides; }
+  float GetWeight() const { return m_weight; }
+  bool IsFill() const { return m_fill; }
+  ImU32 GetColor() const { return m_color; }
+  int GetZOrder() const override { return m_zOrder; }
+
+  void Draw(float scale, const ImVec2& cursorPos,
+            ImDrawList* drawList) const override;
+
+private:
+  ImVec2 m_center;
+  float m_radius;
+  int m_numSides;
+  float m_weight;
+  bool m_fill;
+  ImU32 m_color;
+  int m_zOrder;
+};
+
 class Canvas2DModel : public Model {
  public:
   virtual std::set<const Canvas2DElement*, Canvas2DElementSort> GetElements()

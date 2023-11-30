@@ -39,7 +39,9 @@ NTCanvas2DModel::NTCanvas2DModel(nt::NetworkTableInstance inst,
       m_quadsSub(inst.GetRawTopic(fmt::format("{}/quads", path))
                      .Subscribe("struct:CanvasQuad2d[]", {})),
       m_circlesSub(inst.GetRawTopic(fmt::format("{}/circles", path))
-                       .Subscribe("struct:CanvasCircle2d[]", {})) {}
+                       .Subscribe("struct:CanvasCircle2d[]", {})),
+      m_ngonsSub(inst.GetRawTopic(fmt::format("{}/ngons", path))
+                      .Subscribe("struct:CanvasNgon2d[]", {})) {}
 
 NTCanvas2DModel::~NTCanvas2DModel() = default;
 
@@ -163,6 +165,41 @@ void NTCanvas2DModel::Update() {
     }
   }
 
+  const wpi::StructDescriptor* ngonDesc = m_structDatabase.Find("CanvasNgon2d");
+  if (ngonDesc) {
+    auto* xField = ngonDesc->FindFieldByName("x");
+    auto* yField = ngonDesc->FindFieldByName("y");
+    auto* radiusField = ngonDesc->FindFieldByName("radius");
+    auto* numSidesField = ngonDesc->FindFieldByName("numSides");
+    auto* weightField = ngonDesc->FindFieldByName("weight");
+    auto* fillField = ngonDesc->FindFieldByName("fill");
+    auto* redField = ngonDesc->FindFieldByName("r");
+    auto* greenField = ngonDesc->FindFieldByName("g");
+    auto* blueField = ngonDesc->FindFieldByName("b");
+    auto* opacityField = ngonDesc->FindFieldByName("a");
+    auto* zOrderField = ngonDesc->FindFieldByName("zOrder");
+
+    for (auto&& v : m_ngonsSub.ReadQueue()) {
+      m_ngons.clear();
+
+      wpi::DynamicStructArray ngonArray{ngonDesc, v.value};
+      for (const auto& ngon : ngonArray) {
+        ImVec2 center{ngon.GetFloatField(xField), ngon.GetFloatField(yField)};
+        float radius = ngon.GetFloatField(radiusField);
+        int numSides = ngon.GetIntField(numSidesField);
+        float weight = ngon.GetFloatField(weightField);
+        bool fill = ngon.GetBoolField(fillField);
+        ImU32 color = IM_COL32(
+            ngon.GetUintField(redField), ngon.GetUintField(greenField),
+            ngon.GetUintField(blueField), ngon.GetUintField(opacityField));
+        int zOrder = ngon.GetIntField(zOrderField);
+
+        m_ngons.emplace_back(center, radius, numSides, weight, fill, color,
+                             zOrder);
+      }
+    }
+  }
+
   m_elements.clear();
   for (const auto& line : m_lines) {
     m_elements.insert(&line);
@@ -173,10 +210,13 @@ void NTCanvas2DModel::Update() {
   for (const auto& circle : m_circles) {
     m_elements.insert(&circle);
   }
+  for (const auto& ngon : m_ngons) {
+    m_elements.insert(&ngon);
+  }
 }
 
 bool NTCanvas2DModel::Exists() {
-  return m_dimensionsSub.Exists();
+  return m_nameSub.Exists();
 }
 
 bool NTCanvas2DModel::IsReadOnly() {

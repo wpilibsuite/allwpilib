@@ -56,6 +56,7 @@ class NTCanvas2DModel : public Canvas2DModel {
   nt::RawSubscriber m_linesSub;
   nt::RawSubscriber m_quadsSub;
   nt::RawSubscriber m_circlesSub;
+  nt::RawSubscriber m_ngonsSub;
 
   std::string m_name;
   ImVec2 m_dimensions;
@@ -64,5 +65,6 @@ class NTCanvas2DModel : public Canvas2DModel {
   std::vector<Canvas2DLine> m_lines;
   std::vector<Canvas2DQuad> m_quads;
   std::vector<Canvas2DCircle> m_circles;
+  std::vector<Canvas2DNgon> m_ngons;
 };
 }  // namespace glass

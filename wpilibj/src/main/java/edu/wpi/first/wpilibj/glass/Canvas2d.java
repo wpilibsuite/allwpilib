@@ -19,12 +19,14 @@ public class Canvas2d implements NTSendable, AutoCloseable {
   private final List<CanvasLine2d> m_lines = new ArrayList<>();
   private final List<CanvasQuad2d> m_quads = new ArrayList<>();
   private final List<CanvasCircle2d> m_circles = new ArrayList<>();
+  private final List<CanvasNgon2d> m_ngons = new ArrayList<>();
 
   private boolean m_sendableInitialized = false;
   private FloatArrayPublisher m_dimsPub;
   private StructArrayPublisher<CanvasLine2d> m_linesPub;
   private StructArrayPublisher<CanvasQuad2d> m_quadsPub;
   private StructArrayPublisher<CanvasCircle2d> m_circlesPub;
+  private StructArrayPublisher<CanvasNgon2d> m_ngonsPub;
 
   private int m_currentZOrder = 0;
 
@@ -149,6 +151,31 @@ public class Canvas2d implements NTSendable, AutoCloseable {
         new CanvasCircle2d(x, y, radius, weight, fill, color, opacity, m_currentZOrder++));
   }
 
+  /**
+   * Draws an ngon on the canvas.
+   *
+   * @param x The x coordinate of the center of the ngon
+   * @param y The y coordinate of the center of the ngon
+   * @param radius The radius of the ngon
+   * @param numSides The number of sides of the ngon
+   * @param weight The thickness of the ngon. For unfilled ngons.
+   * @param fill Whether the ngon should be filled
+   * @param color The color of the ngon
+   * @param opacity The opacity of the ngon [0-255]
+   */
+  public void drawNgon(
+      float x,
+      float y,
+      float radius,
+      int numSides,
+      float weight,
+      boolean fill,
+      Color8Bit color,
+      int opacity) {
+    m_ngons.add(
+        new CanvasNgon2d(x, y, radius, numSides, weight, fill, color, opacity, m_currentZOrder++));
+  }
+
   /** Finish and push the frame to Sendable. Clears the canvas after pushing the frame. */
   public void finishFrame() {
     finishFrame(true);
@@ -166,6 +193,7 @@ public class Canvas2d implements NTSendable, AutoCloseable {
     m_linesPub.set(m_lines.toArray(new CanvasLine2d[0]));
     m_quadsPub.set(m_quads.toArray(new CanvasQuad2d[0]));
     m_circlesPub.set(m_circles.toArray(new CanvasCircle2d[0]));
+    m_ngonsPub.set(m_ngons.toArray(new CanvasNgon2d[0]));
 
     if (clearCanvas) {
       clear();
@@ -201,6 +229,11 @@ public class Canvas2d implements NTSendable, AutoCloseable {
       m_circlesPub.close();
     }
     m_circlesPub = table.getStructArrayTopic("circles", CanvasCircle2d.struct).publish();
+
+    if (m_ngonsPub != null) {
+      m_ngonsPub.close();
+    }
+    m_ngonsPub = table.getStructArrayTopic("ngons", CanvasNgon2d.struct).publish();
   }
 
   @Override
@@ -216,6 +249,9 @@ public class Canvas2d implements NTSendable, AutoCloseable {
     }
     if (m_circlesPub != null) {
       m_circlesPub.close();
+    }
+    if (m_ngonsPub != null) {
+      m_ngonsPub.close();
     }
   }
 }

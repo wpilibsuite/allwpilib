@@ -46,6 +46,17 @@ void Canvas2DCircle::Draw(float scale, const ImVec2& cursorPos,
   }
 }
 
+void Canvas2DNgon::Draw(float scale, const ImVec2& cursorPos,
+                        ImDrawList* drawList) const {
+  if (m_fill) {
+    drawList->AddNgonFilled(cursorPos + (m_center * scale), m_radius * scale,
+                            m_color, m_numSides);
+  } else {
+    drawList->AddNgon(cursorPos + (m_center * scale), m_radius * scale,
+                      m_color, m_numSides, m_weight * scale);
+  }
+}
+
 void glass::DisplayCanvas2D(Canvas2DModel* model, const ImVec2& contentSize) {
   if (contentSize.x <= 0 || contentSize.y <= 0) {
     return;
