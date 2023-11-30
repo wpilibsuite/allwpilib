@@ -352,7 +352,6 @@ PlotSeries::Action PlotSeries::EmitPlot(PlotView& view, double now, size_t i,
 
   // Calculate if cursor time corresponds to some index of data drawn on the
   // screen
-  int numPoints = getterData.size;
   int cursorIdx = -1;
   bool validIdx = false;
   double cursorVal = 0.0;
