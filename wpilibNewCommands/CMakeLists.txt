@@ -13,7 +13,15 @@ if(WITH_JAVA)
     add_jar(
         wpilibNewCommands_jar
         ${JAVA_SOURCES}
-        INCLUDE_JARS hal_jar ntcore_jar cscore_jar cameraserver_jar wpimath_jar wpiunits_jar wpiutil_jar wpilibj_jar
+        INCLUDE_JARS
+            hal_jar
+            ntcore_jar
+            cscore_jar
+            cameraserver_jar
+            wpimath_jar
+            wpiunits_jar
+            wpiutil_jar
+            wpilibj_jar
         OUTPUT_NAME wpilibNewCommands
     )
 
@@ -27,7 +35,10 @@ if(WITH_JAVA_SOURCE)
     find_package(Java REQUIRED)
     include(UseJava)
     file(GLOB WPILIBNEWCOMMANDS_SOURCES src/main/java/edu/wpi/first/wpilibj2/command/*.java)
-    file(GLOB WPILIBNEWCOMMANDS_BUTTON_SOURCES src/main/java/edu/wpi/first/wpilibj2/command/button*.java)
+    file(
+        GLOB WPILIBNEWCOMMANDS_BUTTON_SOURCES
+        src/main/java/edu/wpi/first/wpilibj2/command/button*.java
+    )
     add_jar(
         wpilibNewCommands_src_jar
         RESOURCES
@@ -53,14 +64,22 @@ target_link_libraries(wpilibNewCommands wpilibc)
 
 target_include_directories(
     wpilibNewCommands
-    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include> $<INSTALL_INTERFACE:${include_dest}/wpilibNewCommands>
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
+        $<INSTALL_INTERFACE:${include_dest}/wpilibNewCommands>
 )
 
 install(TARGETS wpilibNewCommands EXPORT wpilibNewCommands)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpilibNewCommands")
 
-configure_file(wpilibNewCommands-config.cmake.in ${WPILIB_BINARY_DIR}/wpilibNewCommands-config.cmake)
-install(FILES ${WPILIB_BINARY_DIR}/wpilibNewCommands-config.cmake DESTINATION share/wpilibNewCommands)
+configure_file(
+    wpilibNewCommands-config.cmake.in
+    ${WPILIB_BINARY_DIR}/wpilibNewCommands-config.cmake
+)
+install(
+    FILES ${WPILIB_BINARY_DIR}/wpilibNewCommands-config.cmake
+    DESTINATION share/wpilibNewCommands
+)
 install(EXPORT wpilibNewCommands DESTINATION share/wpilibNewCommands)
 
 if(WITH_TESTS)

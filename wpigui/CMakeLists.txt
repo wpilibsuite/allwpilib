@@ -23,7 +23,9 @@ target_link_libraries(wpigui PUBLIC imgui)
 
 target_include_directories(
     wpigui
-    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include> $<INSTALL_INTERFACE:${include_dest}/wpigui>
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
+        $<INSTALL_INTERFACE:${include_dest}/wpigui>
 )
 
 if(MSVC)

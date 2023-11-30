@@ -6,7 +6,11 @@ include(CompileWarnings)
 include(AddTest)
 include(DownloadAndCheck)
 
-file(GLOB wpiutil_jni_src src/main/native/cpp/jni/WPIUtilJNI.cpp src/main/native/cpp/jni/DataLogJNI.cpp)
+file(
+    GLOB wpiutil_jni_src
+    src/main/native/cpp/jni/WPIUtilJNI.cpp
+    src/main/native/cpp/jni/DataLogJNI.cpp
+)
 
 # Java bindings
 if(WITH_JAVA)
@@ -41,7 +45,11 @@ if(WITH_JAVA)
         set(JAR_ROOT "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/quickbuf")
 
         message(STATUS "Downloading Quickbuf jarfile...")
-        file(DOWNLOAD "${BASE_URL}us/hebi/quickbuf/quickbuf-runtime/1.3.2/quickbuf-runtime-1.3.2.jar" "${JAR_ROOT}/quickbuf-runtime-1.3.2.jar")
+        file(
+            DOWNLOAD
+                "${BASE_URL}us/hebi/quickbuf/quickbuf-runtime/1.3.2/quickbuf-runtime-1.3.2.jar"
+                "${JAR_ROOT}/quickbuf-runtime-1.3.2.jar"
+        )
 
         message(STATUS "Downloaded.")
     endif()
@@ -54,7 +62,13 @@ if(WITH_JAVA)
 
     file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
 
-    add_jar(wpiutil_jar ${JAVA_SOURCES} INCLUDE_JARS ${JACKSON_JARS} ${QUICKBUF_JAR} OUTPUT_NAME wpiutil GENERATE_NATIVE_HEADERS wpiutil_jni_headers)
+    add_jar(
+        wpiutil_jar
+        ${JAVA_SOURCES}
+        INCLUDE_JARS ${JACKSON_JARS} ${QUICKBUF_JAR}
+        OUTPUT_NAME wpiutil
+        GENERATE_NATIVE_HEADERS wpiutil_jni_headers
+    )
 
     get_property(WPIUTIL_JAR_FILE TARGET wpiutil_jar PROPERTY JAR_FILE)
     install(FILES ${WPIUTIL_JAR_FILE} DESTINATION "${java_lib_dest}")
@@ -152,10 +166,15 @@ endif()
 
 if(NOT USE_SYSTEM_FMTLIB)
     target_sources(wpiutil PRIVATE ${fmtlib_native_src})
-    install(DIRECTORY src/main/native/thirdparty/fmtlib/include/ DESTINATION "${include_dest}/wpiutil")
+    install(
+        DIRECTORY src/main/native/thirdparty/fmtlib/include/
+        DESTINATION "${include_dest}/wpiutil"
+    )
     target_include_directories(
         wpiutil
-        PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/fmtlib/include> $<INSTALL_INTERFACE:${include_dest}/wpiutil>
+        PUBLIC
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/fmtlib/include>
+            $<INSTALL_INTERFACE:${include_dest}/wpiutil>
     )
 else()
     find_package(fmt CONFIG REQUIRED)
@@ -192,31 +211,41 @@ target_include_directories(
 install(DIRECTORY src/main/native/thirdparty/json/include/ DESTINATION "${include_dest}/wpiutil")
 target_include_directories(
     wpiutil
-    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/json/include> $<INSTALL_INTERFACE:${include_dest}/wpiutil>
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/json/include>
+        $<INSTALL_INTERFACE:${include_dest}/wpiutil>
 )
 
 install(DIRECTORY src/main/native/thirdparty/llvm/include/ DESTINATION "${include_dest}/wpiutil")
 target_include_directories(
     wpiutil
-    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/llvm/include> $<INSTALL_INTERFACE:${include_dest}/wpiutil>
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/llvm/include>
+        $<INSTALL_INTERFACE:${include_dest}/wpiutil>
 )
 
 install(DIRECTORY src/main/native/thirdparty/mpack/include/ DESTINATION "${include_dest}/wpiutil")
 target_include_directories(
     wpiutil
-    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/mpack/include> $<INSTALL_INTERFACE:${include_dest}/wpiutil>
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/mpack/include>
+        $<INSTALL_INTERFACE:${include_dest}/wpiutil>
 )
 
 install(DIRECTORY src/main/native/thirdparty/sigslot/include/ DESTINATION "${include_dest}/wpiutil")
 target_include_directories(
     wpiutil
-    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/sigslot/include> $<INSTALL_INTERFACE:${include_dest}/wpiutil>
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/sigslot/include>
+        $<INSTALL_INTERFACE:${include_dest}/wpiutil>
 )
 
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpiutil")
 target_include_directories(
     wpiutil
-    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include> $<INSTALL_INTERFACE:${include_dest}/wpiutil>
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
+        $<INSTALL_INTERFACE:${include_dest}/wpiutil>
 )
 
 install(TARGETS wpiutil EXPORT wpiutil)

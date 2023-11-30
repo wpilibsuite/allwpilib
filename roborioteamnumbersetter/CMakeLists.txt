@@ -17,7 +17,13 @@ elseif(APPLE)
     set_source_files_properties(${APP_ICON_MACOSX} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 endif()
 
-add_executable(roborioteamnumbersetter ${rtns_src} ${rtns_resources_src} ${rtns_rc} ${APP_ICON_MACOSX})
+add_executable(
+    roborioteamnumbersetter
+    ${rtns_src}
+    ${rtns_resources_src}
+    ${rtns_rc}
+    ${APP_ICON_MACOSX}
+)
 wpilib_link_macos_gui(roborioteamnumbersetter)
 target_link_libraries(roborioteamnumbersetter libglass wpinet ${LIBSSH_LIBRARIES})
 target_include_directories(roborioteamnumbersetter SYSTEM PRIVATE ${LIBSSH_INCLUDE_DIRS})
@@ -25,5 +31,8 @@ target_include_directories(roborioteamnumbersetter SYSTEM PRIVATE ${LIBSSH_INCLU
 if(WIN32)
     set_target_properties(roborioteamnumbersetter PROPERTIES WIN32_EXECUTABLE YES)
 elseif(APPLE)
-    set_target_properties(roborioteamnumbersetter PROPERTIES MACOSX_BUNDLE YES OUTPUT_NAME "roborioTeamNumberSetter")
+    set_target_properties(
+        roborioteamnumbersetter
+        PROPERTIES MACOSX_BUNDLE YES OUTPUT_NAME "roborioTeamNumberSetter"
+    )
 endif()

@@ -13,7 +13,15 @@ if(WITH_JAVA)
     add_jar(
         xrpVendordep_jar
         ${JAVA_SOURCES}
-        INCLUDE_JARS hal_jar ntcore_jar cscore_jar cameraserver_jar wpimath_jar wpiunits_jar wpiutil_jar wpilibj_jar
+        INCLUDE_JARS
+            hal_jar
+            ntcore_jar
+            cscore_jar
+            cameraserver_jar
+            wpimath_jar
+            wpiunits_jar
+            wpiutil_jar
+            wpilibj_jar
         OUTPUT_NAME xrpVendordep
     )
 
@@ -27,7 +35,12 @@ if(WITH_JAVA_SOURCE)
     find_package(Java REQUIRED)
     include(UseJava)
     file(GLOB XRPVENDORDEP_SOURCES src/main/java/edu/wpi/first/wpilibj/xrp/*.java)
-    add_jar(xrpVendordep_src_jar RESOURCES NAMESPACE "edu/wpi/first/wpilibj/xrp" ${XRPVENDORDEP_SOURCES} OUTPUT_NAME xrpVendordep-sources)
+    add_jar(
+        xrpVendordep_src_jar
+        RESOURCES
+        NAMESPACE "edu/wpi/first/wpilibj/xrp" ${XRPVENDORDEP_SOURCES}
+        OUTPUT_NAME xrpVendordep-sources
+    )
 
     get_property(xrpVendordep_src_JAR_FILE TARGET xrpVendordep_src_jar PROPERTY JAR_FILE)
     install(FILES ${xrpVendordep_src_JAR_FILE} DESTINATION "${java_lib_dest}")
@@ -46,7 +59,9 @@ target_link_libraries(xrpVendordep wpilibc)
 
 target_include_directories(
     xrpVendordep
-    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include> $<INSTALL_INTERFACE:${include_dest}/xrpVendordep>
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
+        $<INSTALL_INTERFACE:${include_dest}/xrpVendordep>
 )
 
 install(TARGETS xrpVendordep EXPORT xrpVendordep DESTINATION "${main_lib_dest}")

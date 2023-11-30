@@ -41,7 +41,9 @@ function(quickbuf_generate SRCS JAVA_PACKAGE)
         endforeach()
         list(JOIN _name_components_out "" _basename_title)
 
-        set(_generated_src "${CMAKE_CURRENT_BINARY_DIR}/quickbuf/${JAVA_PACKAGE}/${_basename_title}.java")
+        set(_generated_src
+            "${CMAKE_CURRENT_BINARY_DIR}/quickbuf/${JAVA_PACKAGE}/${_basename_title}.java"
+        )
 
         list(APPEND _generated_srcs_all ${_generated_src})
 
@@ -49,7 +51,8 @@ function(quickbuf_generate SRCS JAVA_PACKAGE)
             OUTPUT ${_generated_src}
             COMMAND protobuf::protoc
             ARGS
-                --plugin=protoc-gen-quickbuf=${Quickbuf_EXECUTABLE} --quickbuf_out=gen_descriptors=true:${CMAKE_CURRENT_BINARY_DIR}/quickbuf
+                --plugin=protoc-gen-quickbuf=${Quickbuf_EXECUTABLE}
+                --quickbuf_out=gen_descriptors=true:${CMAKE_CURRENT_BINARY_DIR}/quickbuf
                 -I${_abs_dir} ${_abs_file}
             DEPENDS ${_abs_file} protobuf::protoc
             COMMENT "Running quickbuf protocol buffer compiler on ${_proto}"
@@ -116,10 +119,17 @@ if(WITH_JAVA)
 
     set(CMAKE_JAVA_INCLUDE_PATH wpimath.jar ${EJML_JARS} ${JACKSON_JARS} ${QUICKBUF_JAR})
 
-    execute_process(COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/generate_numbers.py ${WPILIB_BINARY_DIR}/wpimath RESULT_VARIABLE generateResult)
+    execute_process(
+        COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/generate_numbers.py ${WPILIB_BINARY_DIR}/wpimath
+        RESULT_VARIABLE generateResult
+    )
     if(NOT (generateResult EQUAL "0"))
         # Try python
-        execute_process(COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/generate_numbers.py ${WPILIB_BINARY_DIR}/wpimath RESULT_VARIABLE generateResult)
+        execute_process(
+            COMMAND
+                python ${CMAKE_CURRENT_SOURCE_DIR}/generate_numbers.py ${WPILIB_BINARY_DIR}/wpimath
+            RESULT_VARIABLE generateResult
+        )
         if(NOT (generateResult EQUAL "0"))
             message(FATAL_ERROR "python and python3 generate_numbers.py failed")
         endif()
@@ -127,7 +137,11 @@ if(WITH_JAVA)
 
     set(CMAKE_JNI_TARGET true)
 
-    file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java ${WPILIB_BINARY_DIR}/wpimath/generated/*.java)
+    file(
+        GLOB_RECURSE JAVA_SOURCES
+        src/main/java/*.java
+        ${WPILIB_BINARY_DIR}/wpimath/generated/*.java
+    )
 
     add_jar(
         wpimath_jar
@@ -158,19 +172,29 @@ endif()
 if(WITH_JAVA_SOURCE)
     find_package(Java REQUIRED)
     include(UseJava)
-    file(GLOB WPIMATH_SOURCES src/main/java/edu/wpi/first/math/*.java ${WPILIB_BINARY_DIR}/wpimath/generated/main/java/edu/wpi/first/math/Nat.java)
+    file(
+        GLOB WPIMATH_SOURCES
+        src/main/java/edu/wpi/first/math/*.java
+        ${WPILIB_BINARY_DIR}/wpimath/generated/main/java/edu/wpi/first/math/Nat.java
+    )
     file(GLOB WPIMATH_CONTROLLER_SOURCES src/main/java/edu/wpi/first/math/controller/*.java)
     file(GLOB WPIMATH_ESTIMATOR_SOURCES src/main/java/edu/wpi/first/math/estimator/*.java)
     file(GLOB WPIMATH_FILTER_SOURCES src/main/java/edu/wpi/first/math/filter/*.java)
     file(GLOB WPIMATH_GEOMETRY_SOURCES src/main/java/edu/wpi/first/math/geometry/*.java)
     file(GLOB WPIMATH_INTERPOLATION_SOURCES src/main/java/edu/wpi/first/math/interpolation/*.java)
     file(GLOB WPIMATH_KINEMATICS_SOURCES src/main/java/edu/wpi/first/math/kinematics/*.java)
-    file(GLOB WPIMATH_NUMBERS_SOURCES ${WPILIB_BINARY_DIR}/wpimath/generated/main/java/edu/wpi/first/math/numbers/*.java)
+    file(
+        GLOB WPIMATH_NUMBERS_SOURCES
+        ${WPILIB_BINARY_DIR}/wpimath/generated/main/java/edu/wpi/first/math/numbers/*.java
+    )
     file(GLOB WPIMATH_SPLINE_SOURCES src/main/java/edu/wpi/first/math/spline/*.java)
     file(GLOB WPIMATH_SYSTEM_SOURCES src/main/java/edu/wpi/first/math/system/*.java)
     file(GLOB WPIMATH_SYSTEM_PLANT_SOURCES src/main/java/edu/wpi/first/math/system/plant/*.java)
     file(GLOB WPIMATH_TRAJECTORY_SOURCES src/main/java/edu/wpi/first/math/trajectory/*.java)
-    file(GLOB WPIMATH_TRAJECTORY_CONSTRAINT_SOURCES src/main/java/edu/wpi/first/math/trajectory/constraint/*.java)
+    file(
+        GLOB WPIMATH_TRAJECTORY_CONSTRAINT_SOURCES
+        src/main/java/edu/wpi/first/math/trajectory/constraint/*.java
+    )
     add_jar(
         wpimath_src_jar
         RESOURCES
@@ -185,7 +209,9 @@ if(WITH_JAVA_SOURCE)
         NAMESPACE "edu/wpi/first/math/system" ${WPIMATH_SYSTEM_SOURCES}
         NAMESPACE "edu/wpi/first/math/system/plant" ${WPIMATH_SYSTEM_PLANT_SOURCES}
         NAMESPACE "edu/wpi/first/math/trajectory" ${WPIMATH_TRAJECTORY_SOURCES}
-        NAMESPACE "edu/wpi/first/math/trajectory/constraint" ${WPIMATH_TRAJECTORY_CONSTRAINT_SOURCES}
+        NAMESPACE
+            "edu/wpi/first/math/trajectory/constraint"
+            ${WPIMATH_TRAJECTORY_CONSTRAINT_SOURCES}
         NAMESPACE "edu/wpi/first/math/util" src/main/java/edu/wpi/first/math/util/Units.java
         OUTPUT_NAME wpimath-sources
     )
@@ -215,11 +241,16 @@ wpilib_target_warnings(wpimath)
 target_link_libraries(wpimath wpiutil)
 
 if(NOT USE_SYSTEM_EIGEN)
-    install(DIRECTORY src/main/native/thirdparty/eigen/include/ DESTINATION "${include_dest}/wpimath")
+    install(
+        DIRECTORY src/main/native/thirdparty/eigen/include/
+        DESTINATION "${include_dest}/wpimath"
+    )
     target_include_directories(
         wpimath
         SYSTEM
-        PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/eigen/include> $<INSTALL_INTERFACE:${include_dest}/wpimath>
+        PUBLIC
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/eigen/include>
+            $<INSTALL_INTERFACE:${include_dest}/wpimath>
     )
 else()
     find_package(Eigen3 CONFIG REQUIRED)
@@ -227,7 +258,11 @@ else()
 endif()
 
 install(DIRECTORY src/main/native/thirdparty/gcem/include/ DESTINATION "${include_dest}/wpimath")
-target_include_directories(wpimath SYSTEM PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/gcem/include>)
+target_include_directories(
+    wpimath
+    SYSTEM
+    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/gcem/include>
+)
 
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpimath")
 target_include_directories(

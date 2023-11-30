@@ -17,7 +17,13 @@ elseif(APPLE)
     set_source_files_properties(${APP_ICON_MACOSX} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 endif()
 
-add_executable(outlineviewer ${outlineviewer_src} ${outlineviewer_resources_src} ${outlineviewer_rc} ${APP_ICON_MACOSX})
+add_executable(
+    outlineviewer
+    ${outlineviewer_src}
+    ${outlineviewer_resources_src}
+    ${outlineviewer_rc}
+    ${APP_ICON_MACOSX}
+)
 wpilib_link_macos_gui(outlineviewer)
 wpilib_target_warnings(outlineviewer)
 target_link_libraries(outlineviewer libglassnt libglass)

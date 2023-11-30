@@ -18,7 +18,13 @@ if(WITH_JAVA)
         src/main/native/resources/*.png
         src/main/native/resources/*.jpg
     )
-    add_jar(field_images_jar SOURCES ${JAVA_SOURCES} RESOURCES NAMESPACE "edu/wpi/first/fields" ${JAVA_RESOURCES} OUTPUT_NAME fieldImages)
+    add_jar(
+        field_images_jar
+        SOURCES ${JAVA_SOURCES}
+        RESOURCES
+        NAMESPACE "edu/wpi/first/fields" ${JAVA_RESOURCES}
+        OUTPUT_NAME fieldImages
+    )
 
     get_property(FIELD_IMAGES_JAR_FILE TARGET field_images_jar PROPERTY JAR_FILE)
     install(FILES ${FIELD_IMAGES_JAR_FILE} DESTINATION "${java_lib_dest}")
@@ -40,5 +46,7 @@ wpilib_target_warnings(fieldImages)
 
 target_include_directories(
     fieldImages
-    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include> $<INSTALL_INTERFACE:${include_dest}/fields>
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
+        $<INSTALL_INTERFACE:${include_dest}/fields>
 )

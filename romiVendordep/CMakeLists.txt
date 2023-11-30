@@ -13,7 +13,15 @@ if(WITH_JAVA)
     add_jar(
         romiVendordep_jar
         ${JAVA_SOURCES}
-        INCLUDE_JARS hal_jar ntcore_jar cscore_jar cameraserver_jar wpimath_jar wpiunits_jar wpiutil_jar wpilibj_jar
+        INCLUDE_JARS
+            hal_jar
+            ntcore_jar
+            cscore_jar
+            cameraserver_jar
+            wpimath_jar
+            wpiunits_jar
+            wpiutil_jar
+            wpilibj_jar
         OUTPUT_NAME romiVendordep
     )
 
@@ -27,7 +35,12 @@ if(WITH_JAVA_SOURCE)
     find_package(Java REQUIRED)
     include(UseJava)
     file(GLOB_RECURSE ROMIVENDORDEP_SOURCES src/main/java/*.java)
-    add_jar(romiVendordep_src_jar RESOURCES NAMESPACE "edu/wpi/first/wpilibj/romi" ${ROMIVENDORDEP_SOURCES} OUTPUT_NAME romiVendordep-sources)
+    add_jar(
+        romiVendordep_src_jar
+        RESOURCES
+        NAMESPACE "edu/wpi/first/wpilibj/romi" ${ROMIVENDORDEP_SOURCES}
+        OUTPUT_NAME romiVendordep-sources
+    )
 
     get_property(ROMIVENDORDEP_SRC_JAR_FILE TARGET romiVendordep_src_jar PROPERTY JAR_FILE)
     install(FILES ${ROMIVENDORDEP_JAR_FILE} DESTINATION "${java_lib_dest}")
@@ -46,7 +59,9 @@ target_link_libraries(romiVendordep wpilibc)
 
 target_include_directories(
     romiVendordep
-    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include> $<INSTALL_INTERFACE:${include_dest}/romiVendordep>
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
+        $<INSTALL_INTERFACE:${include_dest}/romiVendordep>
 )
 
 install(TARGETS romiVendordep EXPORT romiVendordep DESTINATION "${main_lib_dest}")

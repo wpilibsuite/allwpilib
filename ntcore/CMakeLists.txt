@@ -3,10 +3,16 @@ project(ntcore)
 include(CompileWarnings)
 include(AddTest)
 
-execute_process(COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/generate_topics.py ${WPILIB_BINARY_DIR}/ntcore RESULT_VARIABLE generateResult)
+execute_process(
+    COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/generate_topics.py ${WPILIB_BINARY_DIR}/ntcore
+    RESULT_VARIABLE generateResult
+)
 if(NOT (generateResult EQUAL "0"))
     # Try python
-    execute_process(COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/generate_topics.py ${WPILIB_BINARY_DIR}/ntcore RESULT_VARIABLE generateResult)
+    execute_process(
+        COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/generate_topics.py ${WPILIB_BINARY_DIR}/ntcore
+        RESULT_VARIABLE generateResult
+    )
     if(NOT (generateResult EQUAL "0"))
         message(FATAL_ERROR "python and python3 generate_topics.py failed")
     endif()
@@ -39,7 +45,10 @@ set_property(TARGET ntcore PROPERTY FOLDER "libraries")
 
 install(TARGETS ntcore EXPORT ntcore)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/ntcore")
-install(DIRECTORY ${WPILIB_BINARY_DIR}/ntcore/generated/main/native/include/ DESTINATION "${include_dest}/ntcore")
+install(
+    DIRECTORY ${WPILIB_BINARY_DIR}/ntcore/generated/main/native/include/
+    DESTINATION "${include_dest}/ntcore"
+)
 
 configure_file(ntcore-config.cmake.in ${WPILIB_BINARY_DIR}/ntcore-config.cmake)
 install(FILES ${WPILIB_BINARY_DIR}/ntcore-config.cmake DESTINATION share/ntcore)
@@ -56,12 +65,26 @@ if(WITH_JAVA)
 
     set(CMAKE_JAVA_INCLUDE_PATH wpimath.jar ${QUICKBUF_JAR})
 
-    file(GLOB ntcore_jni_src src/main/native/cpp/jni/*.cpp ${WPILIB_BINARY_DIR}/ntcore/generated/main/native/cpp/jni/*.cpp)
+    file(
+        GLOB ntcore_jni_src
+        src/main/native/cpp/jni/*.cpp
+        ${WPILIB_BINARY_DIR}/ntcore/generated/main/native/cpp/jni/*.cpp
+    )
 
-    file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java ${WPILIB_BINARY_DIR}/ntcore/generated/*.java)
+    file(
+        GLOB_RECURSE JAVA_SOURCES
+        src/main/java/*.java
+        ${WPILIB_BINARY_DIR}/ntcore/generated/*.java
+    )
     set(CMAKE_JNI_TARGET true)
 
-    add_jar(ntcore_jar ${JAVA_SOURCES} INCLUDE_JARS wpiutil_jar OUTPUT_NAME ntcore GENERATE_NATIVE_HEADERS ntcore_jni_headers)
+    add_jar(
+        ntcore_jar
+        ${JAVA_SOURCES}
+        INCLUDE_JARS wpiutil_jar
+        OUTPUT_NAME ntcore
+        GENERATE_NATIVE_HEADERS ntcore_jni_headers
+    )
 
     get_property(NTCORE_JAR_FILE TARGET ntcore_jar PROPERTY JAR_FILE)
     install(FILES ${NTCORE_JAR_FILE} DESTINATION "${java_lib_dest}")
@@ -87,8 +110,17 @@ endif()
 if(WITH_JAVA_SOURCE)
     find_package(Java REQUIRED)
     include(UseJava)
-    file(GLOB NTCORE_SOURCES src/main/java/edu/wpi/first/networktables/*.java ${WPILIB_BINARY_DIR}/ntcore/generated/*.java)
-    add_jar(ntcore_src_jar RESOURCES NAMESPACE "edu/wpi/first/networktables" ${NTCORE_SOURCES} OUTPUT_NAME ntcore-sources)
+    file(
+        GLOB NTCORE_SOURCES
+        src/main/java/edu/wpi/first/networktables/*.java
+        ${WPILIB_BINARY_DIR}/ntcore/generated/*.java
+    )
+    add_jar(
+        ntcore_src_jar
+        RESOURCES
+        NAMESPACE "edu/wpi/first/networktables" ${NTCORE_SOURCES}
+        OUTPUT_NAME ntcore-sources
+    )
 
     get_property(NTCORE_SRC_JAR_FILE TARGET ntcore_src_jar PROPERTY JAR_FILE)
     install(FILES ${NTCORE_SRC_JAR_FILE} DESTINATION "${java_lib_dest}")

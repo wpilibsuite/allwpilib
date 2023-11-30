@@ -12,7 +12,9 @@ set_target_properties(wpilibc PROPERTIES DEBUG_POSTFIX "d")
 
 target_include_directories(
     wpilibc
-    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include> $<INSTALL_INTERFACE:${include_dest}/wpilibc>
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
+        $<INSTALL_INTERFACE:${include_dest}/wpilibc>
 )
 wpilib_target_warnings(wpilibc)
 
@@ -22,7 +24,10 @@ if(WITH_CSCORE)
 else()
     target_compile_definitions(wpilibc PRIVATE DYNAMIC_CAMERA_SERVER)
     # Add just the camera server include directory
-    target_include_directories(wpilibc PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../cameraserver/src/main/native/include)
+    target_include_directories(
+        wpilibc
+        PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../cameraserver/src/main/native/include
+    )
 endif()
 
 target_link_libraries(wpilibc PUBLIC hal ntcore wpimath wpiutil)
@@ -43,6 +48,9 @@ if(WITH_TESTS)
     if(NOT WITH_CSCORE)
         target_compile_definitions(wpilibc_test PRIVATE DYNAMIC_CAMERA_SERVER)
         # Add just the camera server include directory
-        target_include_directories(wpilibc_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../cameraserver/src/main/native/include)
+        target_include_directories(
+            wpilibc_test
+            PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../cameraserver/src/main/native/include
+        )
     endif()
 endif()

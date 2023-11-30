@@ -60,7 +60,11 @@ if(WITH_JAVA_SOURCE)
     file(GLOB WPILIBJ_SHUFFLEBOARD_SOURCES src/main/java/edu/wpi/first/wpilibj/shuffleboard*.java)
     file(GLOB WPILIBJ_SIMULATION_SOURCES src/main/java/edu/wpi/first/wpilibj/simulation*.java)
     file(GLOB WPILIBJ_SMARTDASHBOARD_SOURCES src/main/java/edu/wpi/first/wpilibj/*.java)
-    file(GLOB WPILIBJ_UTIL_SOURCES src/main/java/edu/wpi/first/wpilibj/*.java ${CMAKE_CURRENT_BINARY_DIR}/WPILibVersion.java)
+    file(
+        GLOB WPILIBJ_UTIL_SOURCES
+        src/main/java/edu/wpi/first/wpilibj/*.java
+        ${CMAKE_CURRENT_BINARY_DIR}/WPILibVersion.java
+    )
     add_jar(
         wpilibj_src_jar
         RESOURCES
@@ -69,8 +73,12 @@ if(WITH_JAVA_SOURCE)
         NAMESPACE "edu/wpi/first/wpilibj/drive" ${WPILIBJ_DRIVE_SOURCES}
         NAMESPACE "edu/wpi/first/wpilibj/event" ${WPILIBJ_EVENT_SOURCES}
         NAMESPACE "edu/wpi/first/wpilibj/interfaces" ${WPILIBJ_INTERFACES_SOURCES}
-        NAMESPACE "edu/wpi/first/wpilibj/internal" src/main/java/edu/wpi/first/wpilibj/internal/DriverStationModeThread.java
-        NAMESPACE "edu/wpi/first/wpilibj/livewindow" src/main/java/edu/wpi/first/wpilibj/livewindow/LiveWindow.java
+        NAMESPACE
+            "edu/wpi/first/wpilibj/internal"
+            src/main/java/edu/wpi/first/wpilibj/internal/DriverStationModeThread.java
+        NAMESPACE
+            "edu/wpi/first/wpilibj/livewindow"
+            src/main/java/edu/wpi/first/wpilibj/livewindow/LiveWindow.java
         NAMESPACE "edu/wpi/first/wpilibj/motorcontrol" ${WPILIBJ_MOTORCONTROL_SOURCES}
         NAMESPACE "edu/wpi/first/wpilibj/shuffleboard" ${WPILIBJ_SHUFFLEBOARD_SOURCES}
         NAMESPACE "edu/wpi/first/wpilibj/simulation" ${WPILIBJ_SIMULATION_SOURCES}

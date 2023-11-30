@@ -20,8 +20,8 @@ macro(
         add_custom_command(
             OUTPUT ${output}
             COMMAND
-                ${CMAKE_COMMAND} "-Dinput=${input}" "-Doutput=${output}" "-Dprefix=${prefix}" "-Dnamespace=${namespace}" -P
-                "${scripts_dir}/GenResource.cmake"
+                ${CMAKE_COMMAND} "-Dinput=${input}" "-Doutput=${output}" "-Dprefix=${prefix}"
+                "-Dnamespace=${namespace}" -P "${scripts_dir}/GenResource.cmake"
             MAIN_DEPENDENCY ${input}
             DEPENDS ${scripts_dir}/GenResource.cmake
             VERBATIM

@@ -50,9 +50,19 @@ configure_file(src/generate/FRCUsageReporting.h.in gen/hal/FRCUsageReporting.h)
 
 set_target_properties(hal PROPERTIES OUTPUT_NAME "wpiHal")
 
-target_include_directories(hal PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include> $<INSTALL_INTERFACE:${include_dest}/hal>)
+target_include_directories(
+    hal
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
+        $<INSTALL_INTERFACE:${include_dest}/hal>
+)
 
-target_include_directories(hal PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/gen> $<INSTALL_INTERFACE:${include_dest}/hal>)
+target_include_directories(
+    hal
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/gen>
+        $<INSTALL_INTERFACE:${include_dest}/hal>
+)
 target_link_libraries(hal PUBLIC wpiutil)
 
 set_property(TARGET hal PROPERTY FOLDER "libraries")
@@ -115,7 +125,11 @@ endif()
 if(WITH_JAVA_SOURCE)
     find_package(Java REQUIRED)
     include(UseJava)
-    file(GLOB HAL_SOURCES src/main/java/edu/wpi/first/hal/*.java ${CMAKE_CURRENT_BINARY_DIR}/FRCNetComm.java)
+    file(
+        GLOB HAL_SOURCES
+        src/main/java/edu/wpi/first/hal/*.java
+        ${CMAKE_CURRENT_BINARY_DIR}/FRCNetComm.java
+    )
     file(GLOB HAL_CAN_SOURCES src/main/java/edu/wpi/first/hal/can/*.java)
     file(GLOB HAL_SIMULATION_SOURCES src/main/java/edu/wpi/first/hal/simulation/*.java)
     file(GLOB HAL_UTIL_SOURCES src/main/java/edu/wpi/first/hal/util/*.java)
@@ -124,7 +138,9 @@ if(WITH_JAVA_SOURCE)
         RESOURCES
         NAMESPACE "edu/wpi/first/hal" ${HAL_SOURCES}
         NAMESPACE "edu/wpi/first/hal/can" ${HAL_CAN_SOURCES}
-        NAMESPACE "edu/wpi/first/hal/communication" src/main/java/edu/wpi/first/hal/communication/NIRioStatus.java
+        NAMESPACE
+            "edu/wpi/first/hal/communication"
+            src/main/java/edu/wpi/first/hal/communication/NIRioStatus.java
         NAMESPACE "edu/wpi/first/hal/simulation" ${HAL_SIMULATION_SOURCES}
         NAMESPACE "edu/wpi/first/hal/util" ${HAL_UTIL_SOURCES}
         OUTPUT_NAME wpiHal-sources

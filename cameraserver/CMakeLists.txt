@@ -24,7 +24,12 @@ if(WITH_JAVA)
 
     file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
 
-    add_jar(cameraserver_jar ${JAVA_SOURCES} INCLUDE_JARS wpiutil_jar cscore_jar ntcore_jar ${OPENCV_JAR_FILE} OUTPUT_NAME cameraserver)
+    add_jar(
+        cameraserver_jar
+        ${JAVA_SOURCES}
+        INCLUDE_JARS wpiutil_jar cscore_jar ntcore_jar ${OPENCV_JAR_FILE}
+        OUTPUT_NAME cameraserver
+    )
 
     get_property(CAMERASERVER_JAR_FILE TARGET cameraserver_jar PROPERTY JAR_FILE)
     install(FILES ${CAMERASERVER_JAR_FILE} DESTINATION "${java_lib_dest}")
@@ -56,7 +61,9 @@ add_library(cameraserver ${cameraserver_native_src})
 set_target_properties(cameraserver PROPERTIES DEBUG_POSTFIX "d")
 target_include_directories(
     cameraserver
-    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include> $<INSTALL_INTERFACE:${include_dest}/cameraserver>
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
+        $<INSTALL_INTERFACE:${include_dest}/cameraserver>
 )
 wpilib_target_warnings(cameraserver)
 target_link_libraries(cameraserver PUBLIC ntcore cscore wpiutil ${OpenCV_LIBS})

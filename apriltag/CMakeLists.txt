@@ -4,7 +4,11 @@ include(CompileWarnings)
 include(GenResources)
 include(FetchContent)
 
-fetchcontent_declare(apriltaglib GIT_REPOSITORY https://github.com/wpilibsuite/apriltag.git GIT_TAG 64be6ab26abf5e995321997fd0752c609a7e30f4)
+fetchcontent_declare(
+    apriltaglib
+    GIT_REPOSITORY https://github.com/wpilibsuite/apriltag.git
+    GIT_TAG 64be6ab26abf5e995321997fd0752c609a7e30f4
+)
 
 # Don't use apriltag's CMakeLists.txt due to conflicting naming and JNI
 fetchcontent_getproperties(apriltaglib)
@@ -14,7 +18,11 @@ endif()
 
 aux_source_directory(${apriltaglib_SOURCE_DIR}/common APRILTAGLIB_COMMON_SRC)
 file(GLOB TAG_FILES ${apriltaglib_SOURCE_DIR}/tag*.c)
-set(APRILTAGLIB_SRCS ${apriltaglib_SOURCE_DIR}/apriltag.c ${apriltaglib_SOURCE_DIR}/apriltag_pose.c ${apriltaglib_SOURCE_DIR}/apriltag_quad_thresh.c)
+set(APRILTAGLIB_SRCS
+    ${apriltaglib_SOURCE_DIR}/apriltag.c
+    ${apriltaglib_SOURCE_DIR}/apriltag_pose.c
+    ${apriltaglib_SOURCE_DIR}/apriltag_quad_thresh.c
+)
 
 file(GLOB apriltag_jni_src src/main/native/cpp/jni/AprilTagJNI.cpp)
 
@@ -31,14 +39,21 @@ if(WITH_JAVA)
     find_file(
         OPENCV_JAR_FILE
         NAMES opencv-${OpenCV_VERSION_MAJOR}${OpenCV_VERSION_MINOR}${OpenCV_VERSION_PATCH}.jar
-        PATHS ${OPENCV_JAVA_INSTALL_DIR} ${OpenCV_INSTALL_PATH}/bin ${OpenCV_INSTALL_PATH}/share/java
+        PATHS
+            ${OPENCV_JAVA_INSTALL_DIR}
+            ${OpenCV_INSTALL_PATH}/bin
+            ${OpenCV_INSTALL_PATH}/share/java
         NO_DEFAULT_PATH
     )
 
     set(CMAKE_JAVA_INCLUDE_PATH apriltag.jar ${EJML_JARS} ${JACKSON_JARS})
 
     file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
-    file(GLOB_RECURSE JAVA_RESOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} src/main/native/resources/*.json)
+    file(
+        GLOB_RECURSE JAVA_RESOURCES
+        RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+        src/main/native/resources/*.json
+    )
     add_jar(
         apriltag_jar
         SOURCES ${JAVA_SOURCES}
@@ -74,7 +89,9 @@ if(WITH_JAVA_SOURCE)
         apriltag_src_jar
         RESOURCES
         NAMESPACE "edu/wpi/first/apriltag" ${APRILTAG_SOURCES}
-        NAMESPACE "edu/wpi/first/apriltag/jni" src/main/java/edu/wpi/first/apriltag/jni/AprilTagJNI.java
+        NAMESPACE
+            "edu/wpi/first/apriltag/jni"
+            src/main/java/edu/wpi/first/apriltag/jni/AprilTagJNI.java
         OUTPUT_NAME apriltag-sources
     )
 
@@ -105,7 +122,10 @@ wpilib_target_warnings(apriltag)
 if(MSVC)
     target_compile_options(apriltag PRIVATE /wd4018 /wd4005 /wd4996)
 else()
-    target_compile_options(apriltag PRIVATE -Wno-sign-compare -Wno-gnu-zero-variadic-macro-arguments -Wno-type-limits)
+    target_compile_options(
+        apriltag
+        PRIVATE -Wno-sign-compare -Wno-gnu-zero-variadic-macro-arguments -Wno-type-limits
+    )
 endif()
 
 target_link_libraries(apriltag wpimath)

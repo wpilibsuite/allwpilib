@@ -22,7 +22,9 @@ if(NOT MSVC)
         target_compile_options(cscore PRIVATE "-fobjc-arc")
         set_target_properties(
             cscore
-            PROPERTIES LINK_FLAGS "-framework CoreFoundation -framework AVFoundation -framework Foundation -framework CoreMedia -framework CoreVideo"
+            PROPERTIES
+                LINK_FLAGS
+                    "-framework CoreFoundation -framework AVFoundation -framework Foundation -framework CoreMedia -framework CoreVideo"
         )
     else()
         target_sources(cscore PRIVATE ${cscore_linux_src})
@@ -35,7 +37,9 @@ endif()
 
 target_include_directories(
     cscore
-    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include> $<INSTALL_INTERFACE:${include_dest}/cscore>
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
+        $<INSTALL_INTERFACE:${include_dest}/cscore>
 )
 target_include_directories(cscore PRIVATE src/main/native/cpp)
 wpilib_target_warnings(cscore)
@@ -90,7 +94,10 @@ if(WITH_JAVA)
     find_file(
         OPENCV_JAR_FILE
         NAMES opencv-${OpenCV_VERSION_MAJOR}${OpenCV_VERSION_MINOR}${OpenCV_VERSION_PATCH}.jar
-        PATHS ${OPENCV_JAVA_INSTALL_DIR} ${OpenCV_INSTALL_PATH}/bin ${OpenCV_INSTALL_PATH}/share/java
+        PATHS
+            ${OPENCV_JAVA_INSTALL_DIR}
+            ${OpenCV_INSTALL_PATH}/bin
+            ${OpenCV_INSTALL_PATH}/share/java
         NO_DEFAULT_PATH
     )
     find_file(
@@ -114,7 +121,13 @@ if(WITH_JAVA)
     file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
     set(CMAKE_JNI_TARGET true)
 
-    add_jar(cscore_jar ${JAVA_SOURCES} INCLUDE_JARS wpiutil_jar ${OPENCV_JAR_FILE} OUTPUT_NAME cscore GENERATE_NATIVE_HEADERS cscore_jni_headers)
+    add_jar(
+        cscore_jar
+        ${JAVA_SOURCES}
+        INCLUDE_JARS wpiutil_jar ${OPENCV_JAR_FILE}
+        OUTPUT_NAME cscore
+        GENERATE_NATIVE_HEADERS cscore_jni_headers
+    )
 
     get_property(CSCORE_JAR_FILE TARGET cscore_jar PROPERTY JAR_FILE)
     install(FILES ${CSCORE_JAR_FILE} DESTINATION "${java_lib_dest}")
@@ -126,7 +139,8 @@ if(WITH_JAVA)
         foreach(cvFile ${OpenCV_LIBS})
             find_file(
                 ${cvFile}Loc
-                NAMES ${cvFile}${OpenCV_VERSION_MAJOR}${OpenCV_VERSION_MINOR}${OpenCV_VERSION_PATCH}.dll
+                NAMES
+                    ${cvFile}${OpenCV_VERSION_MAJOR}${OpenCV_VERSION_MINOR}${OpenCV_VERSION_PATCH}.dll
                 PATHS
                     ${OPENCV_JAVA_INSTALL_DIR}
                     ${OpenCV_INSTALL_PATH}/bin

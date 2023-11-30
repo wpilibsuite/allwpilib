@@ -18,7 +18,13 @@ if(WITH_JAVA)
 
     file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
 
-    add_jar(wpinet_jar ${JAVA_SOURCES} INCLUDE_JARS wpiutil_jar OUTPUT_NAME wpinet GENERATE_NATIVE_HEADERS wpinet_jni_headers)
+    add_jar(
+        wpinet_jar
+        ${JAVA_SOURCES}
+        INCLUDE_JARS wpiutil_jar
+        OUTPUT_NAME wpinet
+        GENERATE_NATIVE_HEADERS wpinet_jni_headers
+    )
 
     get_property(WPINET_JAR_FILE TARGET wpinet_jar PROPERTY JAR_FILE)
     install(FILES ${WPINET_JAR_FILE} DESTINATION "${java_lib_dest}")
@@ -41,7 +47,12 @@ if(WITH_JAVA_SOURCE)
     find_package(Java REQUIRED)
     include(UseJava)
     file(GLOB WPINET_SOURCES src/main/java/edu/wpi/first/net/*.java)
-    add_jar(wpinet_src_jar RESOURCES NAMESPACE "edu/wpi/first/net" ${WPINET_SOURCES} OUTPUT_NAME wpinet-sources)
+    add_jar(
+        wpinet_src_jar
+        RESOURCES
+        NAMESPACE "edu/wpi/first/net" ${WPINET_SOURCES}
+        OUTPUT_NAME wpinet-sources
+    )
 
     get_property(WPINET_SRC_JAR_FILE TARGET wpinet_src_jar PROPERTY JAR_FILE)
     install(FILES ${WPINET_SRC_JAR_FILE} DESTINATION "${java_lib_dest}")
@@ -61,7 +72,11 @@ endif()
 
 generate_resources(src/main/native/resources generated/main/cpp WPI wpi wpinet_resources_src)
 
-file(GLOB_RECURSE wpinet_native_src src/main/native/cpp/*.cpp src/main/native/thirdparty/tcpsockets/cpp/*.cpp)
+file(
+    GLOB_RECURSE wpinet_native_src
+    src/main/native/cpp/*.cpp
+    src/main/native/thirdparty/tcpsockets/cpp/*.cpp
+)
 list(REMOVE_ITEM wpinet_native_src ${wpinet_jni_src})
 file(GLOB_RECURSE wpinet_unix_src src/main/native/unix/*.cpp)
 file(GLOB_RECURSE wpinet_linux_src src/main/native/linux/*.cpp)
@@ -122,11 +137,16 @@ target_link_libraries(wpinet PUBLIC wpiutil)
 
 if(NOT USE_SYSTEM_LIBUV)
     target_sources(wpinet PRIVATE ${uv_native_src})
-    install(DIRECTORY src/main/native/thirdparty/libuv/include/ DESTINATION "${include_dest}/wpinet")
+    install(
+        DIRECTORY src/main/native/thirdparty/libuv/include/
+        DESTINATION "${include_dest}/wpinet"
+    )
     target_include_directories(wpinet PRIVATE src/main/native/thirdparty/libuv/src)
     target_include_directories(
         wpinet
-        PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/libuv/include> $<INSTALL_INTERFACE:${include_dest}/wpinet>
+        PUBLIC
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/libuv/include>
+            $<INSTALL_INTERFACE:${include_dest}/wpinet>
     )
     if(NOT MSVC)
         target_sources(wpinet PRIVATE ${uv_unix_src})
@@ -158,16 +178,23 @@ else()
     endif()
 endif()
 
-install(DIRECTORY src/main/native/thirdparty/tcpsockets/include/ DESTINATION "${include_dest}/wpinet")
+install(
+    DIRECTORY src/main/native/thirdparty/tcpsockets/include/
+    DESTINATION "${include_dest}/wpinet"
+)
 target_include_directories(
     wpinet
-    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/tcpsockets/include> $<INSTALL_INTERFACE:${include_dest}/wpinet>
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/tcpsockets/include>
+        $<INSTALL_INTERFACE:${include_dest}/wpinet>
 )
 
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpinet")
 target_include_directories(
     wpinet
-    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include> $<INSTALL_INTERFACE:${include_dest}/wpinet>
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
+        $<INSTALL_INTERFACE:${include_dest}/wpinet>
 )
 
 install(TARGETS wpinet EXPORT wpinet)

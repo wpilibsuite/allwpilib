@@ -1,7 +1,15 @@
 include(FetchContent)
 
-fetchcontent_declare(glfw3 GIT_REPOSITORY https://github.com/glfw/glfw.git GIT_TAG 6b57e08bb0078c9834889eab871bac2368198c15)
-fetchcontent_declare(gl3w GIT_REPOSITORY https://github.com/skaslev/gl3w GIT_TAG 5f8d7fd191ba22ff2b60c1106d7135bb9a335533)
+fetchcontent_declare(
+    glfw3
+    GIT_REPOSITORY https://github.com/glfw/glfw.git
+    GIT_TAG 6b57e08bb0078c9834889eab871bac2368198c15
+)
+fetchcontent_declare(
+    gl3w
+    GIT_REPOSITORY https://github.com/skaslev/gl3w
+    GIT_TAG 5f8d7fd191ba22ff2b60c1106d7135bb9a335533
+)
 fetchcontent_declare(
     imgui
     GIT_REPOSITORY https://github.com/ocornut/imgui.git
@@ -19,7 +27,11 @@ fetchcontent_declare(
     URL https://github.com/wpilibsuite/thirdparty-fonts/releases/download/v0.2/fonts.zip
     URL_HASH SHA256=cedf365657fab0770e11f72d49e4f0f889f564d2e635a4d214029d0ab6bcd324
 )
-fetchcontent_declare(stb GIT_REPOSITORY https://github.com/nothings/stb.git GIT_TAG c9064e317699d2e495f36ba4f9ac037e88ee371a)
+fetchcontent_declare(
+    stb
+    GIT_REPOSITORY https://github.com/nothings/stb.git
+    GIT_TAG c9064e317699d2e495f36ba4f9ac037e88ee371a
+)
 
 fetchcontent_makeavailable(imgui implot fonts stb)
 
@@ -42,7 +54,10 @@ if(NOT gl3w_POPULATED)
 endif()
 if(NOT EXISTS "${gl3w_BINARY_DIR}/src/gl3w.c")
     find_package(Python COMPONENTS Interpreter Development REQUIRED)
-    execute_process(COMMAND "${Python_EXECUTABLE}" ${gl3w_SOURCE_DIR}/gl3w_gen.py "--root=${gl3w_BINARY_DIR}" WORKING_DIRECTORY ${gl3w_BINARY_DIR})
+    execute_process(
+        COMMAND "${Python_EXECUTABLE}" ${gl3w_SOURCE_DIR}/gl3w_gen.py "--root=${gl3w_BINARY_DIR}"
+        WORKING_DIRECTORY ${gl3w_BINARY_DIR}
+    )
 endif()
 
 # Add imgui directly to our build.
