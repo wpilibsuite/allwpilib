@@ -5,6 +5,8 @@ include(CompileWarnings)
 include(AddTest)
 include(DownloadAndCheck)
 
+# workaround for makefiles - for some reason parent directories aren't created.
+file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/protobuf")
 file(GLOB wpimath_proto_src src/main/proto/*.proto)
 protobuf_generate_cpp(WPIMATH_PROTO_SRCS WPIMATH_PROTO_HDRS PROTOC_OUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/protobuf" PROTOS ${wpimath_proto_src})
 
@@ -108,7 +110,7 @@ if (WITH_JAVA)
 
   file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java ${WPILIB_BINARY_DIR}/wpimath/generated/*.java)
 
-  add_jar(wpimath_jar ${JAVA_SOURCES} ${WPIMATH_QUICKBUF_SRCS} INCLUDE_JARS ${EJML_JARS} wpiutil_jar OUTPUT_NAME wpimath GENERATE_NATIVE_HEADERS wpimath_jni_headers)
+  add_jar(wpimath_jar ${JAVA_SOURCES} ${WPIMATH_QUICKBUF_SRCS} INCLUDE_JARS ${EJML_JARS} wpiutil_jar wpiunits_jar OUTPUT_NAME wpimath GENERATE_NATIVE_HEADERS wpimath_jni_headers)
 
   get_property(WPIMATH_JAR_FILE TARGET wpimath_jar PROPERTY JAR_FILE)
   install(FILES ${WPIMATH_JAR_FILE} DESTINATION "${java_lib_dest}")
@@ -126,6 +128,44 @@ if (WITH_JAVA)
 
   install(TARGETS wpimathjni EXPORT wpimathjni)
 
+endif()
+
+if (WITH_JAVA_SOURCE)
+  find_package(Java REQUIRED)
+  include(UseJava)
+  file(GLOB WPIMATH_SOURCES src/main/java/edu/wpi/first/math/*.java ${WPILIB_BINARY_DIR}/wpimath/generated/main/java/edu/wpi/first/math/Nat.java)
+  file(GLOB WPIMATH_CONTROLLER_SOURCES src/main/java/edu/wpi/first/math/controller/*.java)
+  file(GLOB WPIMATH_ESTIMATOR_SOURCES src/main/java/edu/wpi/first/math/estimator/*.java)
+  file(GLOB WPIMATH_FILTER_SOURCES src/main/java/edu/wpi/first/math/filter/*.java)
+  file(GLOB WPIMATH_GEOMETRY_SOURCES src/main/java/edu/wpi/first/math/geometry/*.java)
+  file(GLOB WPIMATH_INTERPOLATION_SOURCES src/main/java/edu/wpi/first/math/interpolation/*.java)
+  file(GLOB WPIMATH_KINEMATICS_SOURCES src/main/java/edu/wpi/first/math/kinematics/*.java)
+  file(GLOB WPIMATH_NUMBERS_SOURCES ${WPILIB_BINARY_DIR}/wpimath/generated/main/java/edu/wpi/first/math/numbers/*.java)
+  file(GLOB WPIMATH_SPLINE_SOURCES src/main/java/edu/wpi/first/math/spline/*.java)
+  file(GLOB WPIMATH_SYSTEM_SOURCES src/main/java/edu/wpi/first/math/system/*.java)
+  file(GLOB WPIMATH_SYSTEM_PLANT_SOURCES src/main/java/edu/wpi/first/math/system/plant/*.java)
+  file(GLOB WPIMATH_TRAJECTORY_SOURCES src/main/java/edu/wpi/first/math/trajectory/*.java)
+  file(GLOB WPIMATH_TRAJECTORY_CONSTRAINT_SOURCES src/main/java/edu/wpi/first/math/trajectory/constraint/*.java)
+  add_jar(wpimath_src_jar
+  RESOURCES NAMESPACE "edu/wpi/first/math" ${WPIMATH_SOURCES}
+  NAMESPACE "edu/wpi/first/math/controller" ${WPIMATH_CONTROLLER_SOURCES}
+  NAMESPACE "edu/wpi/first/math/estimator" ${WPIMATH_ESTIMATOR_SOURCES}
+  NAMESPACE "edu/wpi/first/math/filter" ${WPIMATH_FILTER_SOURCES}
+  NAMESPACE "edu/wpi/first/math/geometry" ${WPIMATH_GEOMETRY_SOURCES}
+  NAMESPACE "edu/wpi/first/math/interpolation" ${WPIMATH_INTERPOLATION_SOURCES}
+  NAMESPACE "edu/wpi/first/math/kinematics" ${WPIMATH_KINEMATICS_SOURCES}
+  NAMESPACE "edu/wpi/first/math/spline" ${WPIMATH_SPLINE_SOURCES}
+  NAMESPACE "edu/wpi/first/math/system" ${WPIMATH_SYSTEM_SOURCES}
+  NAMESPACE "edu/wpi/first/math/system/plant" ${WPIMATH_SYSTEM_PLANT_SOURCES}
+  NAMESPACE "edu/wpi/first/math/trajectory" ${WPIMATH_TRAJECTORY_SOURCES}
+  NAMESPACE "edu/wpi/first/math/trajectory/constraint" ${WPIMATH_TRAJECTORY_CONSTRAINT_SOURCES}
+  NAMESPACE "edu/wpi/first/math/util" src/main/java/edu/wpi/first/math/util/Units.java
+  OUTPUT_NAME wpimath-sources)
+
+  get_property(WPIMATH_SRC_JAR_FILE TARGET wpimath_src_jar PROPERTY JAR_FILE)
+  install(FILES ${WPIMATH_SRC_JAR_FILE} DESTINATION "${java_lib_dest}")
+
+  set_property(TARGET wpimath_src_jar PROPERTY FOLDER "java")
 endif()
 
 file(GLOB_RECURSE wpimath_native_src src/main/native/cpp/*.cpp)
@@ -168,15 +208,9 @@ target_include_directories(wpimath PUBLIC
 
 install(TARGETS wpimath EXPORT wpimath)
 
-if (WITH_FLAT_INSTALL)
-    set (wpimath_config_dir ${wpilib_dest})
-else()
-    set (wpimath_config_dir share/wpimath)
-endif()
-
 configure_file(wpimath-config.cmake.in ${WPILIB_BINARY_DIR}/wpimath-config.cmake )
-install(FILES ${WPILIB_BINARY_DIR}/wpimath-config.cmake DESTINATION ${wpimath_config_dir})
-install(EXPORT wpimath DESTINATION ${wpimath_config_dir})
+install(FILES ${WPILIB_BINARY_DIR}/wpimath-config.cmake DESTINATION share/wpimath)
+install(EXPORT wpimath DESTINATION share/wpimath)
 
 if (WITH_TESTS)
     wpilib_add_test(wpimath src/test/native/cpp)

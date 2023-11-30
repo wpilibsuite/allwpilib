@@ -22,9 +22,11 @@ public class ProfiledPIDController implements Sendable {
   private PIDController m_controller;
   private double m_minimumInput;
   private double m_maximumInput;
+
+  private TrapezoidProfile.Constraints m_constraints;
+  private TrapezoidProfile m_profile;
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
-  private TrapezoidProfile.Constraints m_constraints;
 
   /**
    * Allocates a ProfiledPIDController with the given constants for Kp, Ki, and Kd.
@@ -52,6 +54,7 @@ public class ProfiledPIDController implements Sendable {
       double Kp, double Ki, double Kd, TrapezoidProfile.Constraints constraints, double period) {
     m_controller = new PIDController(Kp, Ki, Kd, period);
     m_constraints = constraints;
+    m_profile = new TrapezoidProfile(m_constraints);
     instances++;
 
     SendableRegistry.add(this, "ProfiledPIDController", instances);
@@ -219,6 +222,7 @@ public class ProfiledPIDController implements Sendable {
    */
   public void setConstraints(TrapezoidProfile.Constraints constraints) {
     m_constraints = constraints;
+    m_profile = new TrapezoidProfile(m_constraints);
   }
 
   /**
@@ -343,8 +347,7 @@ public class ProfiledPIDController implements Sendable {
       m_setpoint.position = setpointMinDistance + measurement;
     }
 
-    var profile = new TrapezoidProfile(m_constraints);
-    m_setpoint = profile.calculate(getPeriod(), m_goal, m_setpoint);
+    m_setpoint = m_profile.calculate(getPeriod(), m_setpoint, m_goal);
     return m_controller.calculate(measurement, m_setpoint.position);
   }
 

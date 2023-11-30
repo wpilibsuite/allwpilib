@@ -20,7 +20,7 @@ TEST_F(ParallelCommandGroupTest, ParallelGroupSchedule) {
   MockCommand* command1 = command1Holder.get();
   MockCommand* command2 = command2Holder.get();
 
-  ParallelCommandGroup group(tcb::make_vector<std::unique_ptr<Command>>(
+  ParallelCommandGroup group(make_vector<std::unique_ptr<Command>>(
       std::move(command1Holder), std::move(command2Holder)));
 
   EXPECT_CALL(*command1, Initialize());
@@ -50,7 +50,7 @@ TEST_F(ParallelCommandGroupTest, ParallelGroupInterrupt) {
   MockCommand* command1 = command1Holder.get();
   MockCommand* command2 = command2Holder.get();
 
-  ParallelCommandGroup group(tcb::make_vector<std::unique_ptr<Command>>(
+  ParallelCommandGroup group(make_vector<std::unique_ptr<Command>>(
       std::move(command1Holder), std::move(command2Holder)));
 
   EXPECT_CALL(*command1, Initialize());

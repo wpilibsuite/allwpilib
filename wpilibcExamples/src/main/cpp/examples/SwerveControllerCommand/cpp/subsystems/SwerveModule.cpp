@@ -11,8 +11,8 @@
 #include "Constants.h"
 
 SwerveModule::SwerveModule(int driveMotorChannel, int turningMotorChannel,
-                           const int driveEncoderPorts[],
-                           const int turningEncoderPorts[],
+                           const int driveEncoderPorts[2],
+                           const int turningEncoderPorts[2],
                            bool driveEncoderReversed,
                            bool turningEncoderReversed)
     : m_driveMotor(driveMotorChannel),

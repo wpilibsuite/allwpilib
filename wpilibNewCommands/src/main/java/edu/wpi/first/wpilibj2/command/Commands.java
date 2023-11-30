@@ -144,13 +144,14 @@ public final class Commands {
   /**
    * Runs one of several commands, based on the selector function.
    *
+   * @param <K> The type of key used to select the command
    * @param selector the selector function
    * @param commands map of commands to select from
    * @return the command
    * @see SelectCommand
    */
-  public static Command select(Map<Object, Command> commands, Supplier<Object> selector) {
-    return new SelectCommand(commands, selector);
+  public static <K> Command select(Map<K, Command> commands, Supplier<? extends K> selector) {
+    return new SelectCommand<>(commands, selector);
   }
 
   /**

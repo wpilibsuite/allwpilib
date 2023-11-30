@@ -6,6 +6,7 @@ package edu.wpi.first.units;
 
 import java.util.Locale;
 
+/** Contains a set of predefined units. */
 public final class Units {
   private Units() {
     // Prevent instantiation
@@ -38,10 +39,9 @@ public final class Units {
   public static final Time Minute = Minutes; // singularized alias
 
   // Angle
-  public static final Angle Revolutions = BaseUnits.Angle;
-  public static final Angle Rotations = new Angle(1, "Rotation", "R"); // alias
-  public static final Angle Radians =
-      derive(Revolutions).splitInto(2 * Math.PI).named("Radian").symbol("rad").make();
+  public static final Angle Radians = BaseUnits.Angle;
+  public static final Angle Revolutions = new Angle(2 * Math.PI, "Revolution", "R");
+  public static final Angle Rotations = new Angle(2 * Math.PI, "Rotation", "R"); // alias revolution
   public static final Angle Degrees =
       derive(Revolutions).splitInto(360).named("Degree").symbol("°").make();
 

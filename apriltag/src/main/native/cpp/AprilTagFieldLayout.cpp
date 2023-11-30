@@ -22,7 +22,7 @@ AprilTagFieldLayout::AprilTagFieldLayout(std::string_view path) {
     throw std::runtime_error(fmt::format("Cannot open file: {}", path));
   }
 
-  wpi::json json = wpi::json::parse(fileBuffer->begin(), fileBuffer->end());
+  wpi::json json = wpi::json::parse(fileBuffer->GetCharBuffer());
 
   for (const auto& tag : json.at("tags").get<std::vector<AprilTag>>()) {
     m_apriltags[tag.ID] = tag;
@@ -41,6 +41,23 @@ AprilTagFieldLayout::AprilTagFieldLayout(std::vector<AprilTag> apriltags,
   }
 }
 
+units::meter_t AprilTagFieldLayout::GetFieldLength() const {
+  return m_fieldLength;
+}
+
+units::meter_t AprilTagFieldLayout::GetFieldWidth() const {
+  return m_fieldWidth;
+}
+
+std::vector<AprilTag> AprilTagFieldLayout::GetTags() const {
+  std::vector<AprilTag> tags;
+  tags.reserve(m_apriltags.size());
+  for (const auto& tag : m_apriltags) {
+    tags.emplace_back(tag.second);
+  }
+  return tags;
+}
+
 void AprilTagFieldLayout::SetOrigin(OriginPosition origin) {
   switch (origin) {
     case OriginPosition::kBlueAllianceWallRightSide:
@@ -57,6 +74,10 @@ void AprilTagFieldLayout::SetOrigin(OriginPosition origin) {
 
 void AprilTagFieldLayout::SetOrigin(const Pose3d& origin) {
   m_origin = origin;
+}
+
+Pose3d AprilTagFieldLayout::GetOrigin() const {
+  return m_origin;
 }
 
 std::optional<frc::Pose3d> AprilTagFieldLayout::GetTagPose(int ID) const {

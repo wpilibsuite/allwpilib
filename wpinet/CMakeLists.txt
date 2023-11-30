@@ -38,6 +38,20 @@ if (WITH_JAVA)
 
 endif()
 
+if (WITH_JAVA_SOURCE)
+  find_package(Java REQUIRED)
+  include(UseJava)
+  file(GLOB WPINET_SOURCES src/main/java/edu/wpi/first/net/*.java)
+  add_jar(wpinet_src_jar
+  RESOURCES NAMESPACE "edu/wpi/first/net" ${WPINET_SOURCES}
+  OUTPUT_NAME wpinet-sources)
+
+  get_property(WPINET_SRC_JAR_FILE TARGET wpinet_src_jar PROPERTY JAR_FILE)
+  install(FILES ${WPINET_SRC_JAR_FILE} DESTINATION "${java_lib_dest}")
+
+  set_property(TARGET wpinet_src_jar PROPERTY FOLDER "java")
+endif()
+
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
@@ -159,15 +173,9 @@ target_include_directories(wpinet PUBLIC
 
 install(TARGETS wpinet EXPORT wpinet)
 
-if (WITH_FLAT_INSTALL)
-    set (wpinet_config_dir ${wpilib_dest})
-else()
-    set (wpinet_config_dir share/wpinet)
-endif()
-
 configure_file(wpinet-config.cmake.in ${WPILIB_BINARY_DIR}/wpinet-config.cmake )
-install(FILES ${WPILIB_BINARY_DIR}/wpinet-config.cmake DESTINATION ${wpinet_config_dir})
-install(EXPORT wpinet DESTINATION ${wpinet_config_dir})
+install(FILES ${WPILIB_BINARY_DIR}/wpinet-config.cmake DESTINATION share/wpinet)
+install(EXPORT wpinet DESTINATION share/wpinet)
 
 subdir_list(wpinet_examples "${CMAKE_CURRENT_SOURCE_DIR}/examples")
 foreach(example ${wpinet_examples})

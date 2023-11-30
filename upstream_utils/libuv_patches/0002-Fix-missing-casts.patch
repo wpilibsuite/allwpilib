@@ -1,10 +1,11 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 26 Apr 2022 15:01:25 -0400
-Subject: [PATCH 02/10] Fix missing casts
+Subject: [PATCH 2/9] Fix missing casts
 
 ---
  src/fs-poll.c                  | 10 ++++----
+ src/idna.c                     |  2 +-
  src/inet.c                     | 11 ++++----
  src/strscpy.c                  |  2 +-
  src/thread-common.c            |  2 +-
@@ -30,19 +31,23 @@ Subject: [PATCH 02/10] Fix missing casts
  src/unix/proctitle.c           |  2 +-
  src/unix/random-sysctl-linux.c |  2 +-
  src/unix/stream.c              | 31 ++++++++++++-----------
+ src/unix/tcp.c                 |  2 +-
  src/unix/thread.c              |  5 ++--
  src/unix/udp.c                 |  8 +++---
  src/uv-common.c                | 16 ++++++------
  src/win/core.c                 |  8 +++---
+ src/win/dl.c                   |  2 +-
  src/win/fs-event.c             |  4 +--
  src/win/fs-fd-hash-inl.h       |  2 +-
- src/win/fs.c                   | 28 ++++++++++-----------
- src/win/pipe.c                 | 12 ++++-----
- src/win/process.c              | 12 ++++-----
+ src/win/fs.c                   | 38 ++++++++++++++--------------
+ src/win/getaddrinfo.c          | 12 ++++-----
+ src/win/pipe.c                 |  8 +++---
+ src/win/process.c              | 22 ++++++++--------
  src/win/tcp.c                  |  2 +-
  src/win/thread.c               |  4 +--
- src/win/util.c                 | 27 ++++++++++----------
- 38 files changed, 183 insertions(+), 178 deletions(-)
+ src/win/tty.c                  |  6 ++---
+ src/win/util.c                 | 35 +++++++++++++-------------
+ 43 files changed, 207 insertions(+), 202 deletions(-)
 
 diff --git a/src/fs-poll.c b/src/fs-poll.c
 index 1bac1c568e36cadd0b68451926c6f045f88342d2..5a39daed095502b2db34f23fcaf0ab04f31f96ff 100644
@@ -93,6 +98,19 @@ index 1bac1c568e36cadd0b68451926c6f045f88342d2..5a39daed095502b2db34f23fcaf0ab04
           it != ctx;
           last = it, it = it->previous) {
        assert(last->previous != NULL);
+diff --git a/src/idna.c b/src/idna.c
+index 1c0a60cf3e3becc1badafa394e7c422af7f56833..0c952cf605a88136ed9035f9385f9b1080c30c28 100644
+--- a/src/idna.c
++++ b/src/idna.c
+@@ -477,7 +477,7 @@ int uv_utf16_to_wtf8(const uint16_t* w_source_ptr,
+     return 0;
+ 
+   if (*target_ptr == NULL) {
+-    target = uv__malloc(target_len + 1);
++    target = (char*)uv__malloc(target_len + 1);
+     if (target == NULL) {
+       return UV_ENOMEM;
+     }
 diff --git a/src/inet.c b/src/inet.c
 index cd77496846e90e8b8e61c63c10f498f153344fe5..dd94bea3886ca37945fcad7909d765e3700e3c21 100644
 --- a/src/inet.c
@@ -279,7 +297,7 @@ index 5288083ef04fd78d90c34071cc76281adbc310d8..9bd55dd764b845cf8ea441d525b4e136
    if (display_name_key == NULL || *display_name_key == NULL)
      goto out;
 diff --git a/src/unix/darwin.c b/src/unix/darwin.c
-index 90790d701c4327518d17230c5aa69b9a74112e73..9ee5cd8eb9d02fb8b71986c47fe8a686f0983847 100644
+index 5e764a65ee4c71efd61876c70b0e999420f24f61..dc93d236b6b7c6da62dc7aa66cb42ddc125575a2 100644
 --- a/src/unix/darwin.c
 +++ b/src/unix/darwin.c
 @@ -217,7 +217,7 @@ int uv_cpu_info(uv_cpu_info_t** cpu_infos, int* count) {
@@ -314,10 +332,10 @@ index 191bc8bc213ffddb15c5e04baa66e2a0a8d69a3d..1bd63886b823be6451ac013d94e29885
      uv__free(*cpu_infos);
      return UV_ENOMEM;
 diff --git a/src/unix/fs.c b/src/unix/fs.c
-index 6b051c124f2fd9b0f72b41d7d7ba9c715e9686e1..e25d02e54dbe93e4b9c22b0140108c99ae2cb4f7 100644
+index 891306daedcc6a9b493bdfefcdb7d43c7efbb622..bc00c90b07a32a823412b216df6f2d758dbc423b 100644
 --- a/src/unix/fs.c
 +++ b/src/unix/fs.c
-@@ -140,7 +140,7 @@ extern char *mkdtemp(char *template); /* See issue #740 on AIX < 7 */
+@@ -134,7 +134,7 @@ extern char *mkdtemp(char *template); /* See issue #740 on AIX < 7 */
        size_t new_path_len;                                                    \
        path_len = strlen(path) + 1;                                            \
        new_path_len = strlen(new_path) + 1;                                    \
@@ -326,7 +344,7 @@ index 6b051c124f2fd9b0f72b41d7d7ba9c715e9686e1..e25d02e54dbe93e4b9c22b0140108c99
        if (req->path == NULL)                                                  \
          return UV_ENOMEM;                                                     \
        req->new_path = req->path + path_len;                                   \
-@@ -568,7 +568,7 @@ static ssize_t uv__fs_scandir(uv_fs_t* req) {
+@@ -496,7 +496,7 @@ static ssize_t uv__fs_scandir(uv_fs_t* req) {
  static int uv__fs_opendir(uv_fs_t* req) {
    uv_dir_t* dir;
  
@@ -335,7 +353,7 @@ index 6b051c124f2fd9b0f72b41d7d7ba9c715e9686e1..e25d02e54dbe93e4b9c22b0140108c99
    if (dir == NULL)
      goto error;
  
-@@ -592,7 +592,7 @@ static int uv__fs_readdir(uv_fs_t* req) {
+@@ -520,7 +520,7 @@ static int uv__fs_readdir(uv_fs_t* req) {
    unsigned int dirent_idx;
    unsigned int i;
  
@@ -344,7 +362,7 @@ index 6b051c124f2fd9b0f72b41d7d7ba9c715e9686e1..e25d02e54dbe93e4b9c22b0140108c99
    dirent_idx = 0;
  
    while (dirent_idx < dir->nentries) {
-@@ -634,7 +634,7 @@ error:
+@@ -562,7 +562,7 @@ error:
  static int uv__fs_closedir(uv_fs_t* req) {
    uv_dir_t* dir;
  
@@ -353,7 +371,7 @@ index 6b051c124f2fd9b0f72b41d7d7ba9c715e9686e1..e25d02e54dbe93e4b9c22b0140108c99
  
    if (dir->dir != NULL) {
      closedir(dir->dir);
-@@ -663,7 +663,7 @@ static int uv__fs_statfs(uv_fs_t* req) {
+@@ -591,7 +591,7 @@ static int uv__fs_statfs(uv_fs_t* req) {
  #endif /* defined(__sun) */
      return -1;
  
@@ -362,7 +380,7 @@ index 6b051c124f2fd9b0f72b41d7d7ba9c715e9686e1..e25d02e54dbe93e4b9c22b0140108c99
    if (stat_fs == NULL) {
      errno = ENOMEM;
      return -1;
-@@ -727,7 +727,7 @@ static ssize_t uv__fs_readlink(uv_fs_t* req) {
+@@ -655,7 +655,7 @@ static ssize_t uv__fs_readlink(uv_fs_t* req) {
      maxlen = uv__fs_pathmax_size(req->path);
  #endif
  
@@ -371,7 +389,7 @@ index 6b051c124f2fd9b0f72b41d7d7ba9c715e9686e1..e25d02e54dbe93e4b9c22b0140108c99
  
    if (buf == NULL) {
      errno = ENOMEM;
-@@ -747,7 +747,7 @@ static ssize_t uv__fs_readlink(uv_fs_t* req) {
+@@ -675,7 +675,7 @@ static ssize_t uv__fs_readlink(uv_fs_t* req) {
  
    /* Uncommon case: resize to make room for the trailing nul byte. */
    if (len == maxlen) {
@@ -380,7 +398,7 @@ index 6b051c124f2fd9b0f72b41d7d7ba9c715e9686e1..e25d02e54dbe93e4b9c22b0140108c99
  
      if (buf == NULL)
        return -1;
-@@ -770,7 +770,7 @@ static ssize_t uv__fs_realpath(uv_fs_t* req) {
+@@ -698,7 +698,7 @@ static ssize_t uv__fs_realpath(uv_fs_t* req) {
    ssize_t len;
  
    len = uv__fs_pathmax_size(req->path);
@@ -389,8 +407,8 @@ index 6b051c124f2fd9b0f72b41d7d7ba9c715e9686e1..e25d02e54dbe93e4b9c22b0140108c99
  
    if (buf == NULL) {
      errno = ENOMEM;
-@@ -1984,7 +1984,7 @@ int uv_fs_read(uv_loop_t* loop, uv_fs_t* req,
-   req->nbufs = nbufs;
+@@ -1886,7 +1886,7 @@ int uv_fs_read(uv_loop_t* loop, uv_fs_t* req,
+ 
    req->bufs = req->bufsml;
    if (nbufs > ARRAY_SIZE(req->bufsml))
 -    req->bufs = uv__malloc(nbufs * sizeof(*bufs));
@@ -398,7 +416,7 @@ index 6b051c124f2fd9b0f72b41d7d7ba9c715e9686e1..e25d02e54dbe93e4b9c22b0140108c99
  
    if (req->bufs == NULL)
      return UV_ENOMEM;
-@@ -2171,7 +2171,7 @@ int uv_fs_write(uv_loop_t* loop,
+@@ -2071,7 +2071,7 @@ int uv_fs_write(uv_loop_t* loop,
    req->nbufs = nbufs;
    req->bufs = req->bufsml;
    if (nbufs > ARRAY_SIZE(req->bufsml))
@@ -585,10 +603,10 @@ index 837bba6e2fef7b834a8d104d263bef47eaed0950..5e0fa98d104428534e5264a1c6358e3f
      return UV_ENOMEM;
    }
 diff --git a/src/unix/kqueue.c b/src/unix/kqueue.c
-index b78242d3be4e3cf6b7b998f56dc65213982d4bc7..28e55aae6c613576ede7024a5c73d746e134d865 100644
+index 94ace58680cf391707f68357d7927173cb1db08e..06fbdb24b4adc4adb781d32150d40836fa745531 100644
 --- a/src/unix/kqueue.c
 +++ b/src/unix/kqueue.c
-@@ -299,8 +299,8 @@ void uv__io_poll(uv_loop_t* loop, int timeout) {
+@@ -303,8 +303,8 @@ void uv__io_poll(uv_loop_t* loop, int timeout) {
      nevents = 0;
  
      assert(loop->watchers != NULL);
@@ -599,7 +617,7 @@ index b78242d3be4e3cf6b7b998f56dc65213982d4bc7..28e55aae6c613576ede7024a5c73d746
      for (i = 0; i < nfds; i++) {
        ev = events + i;
        fd = ev->ident;
-@@ -322,7 +322,7 @@ void uv__io_poll(uv_loop_t* loop, int timeout) {
+@@ -326,7 +326,7 @@ void uv__io_poll(uv_loop_t* loop, int timeout) {
        /* Skip invalidated events, see uv__platform_invalidate_fd */
        if (fd == -1)
          continue;
@@ -609,10 +627,10 @@ index b78242d3be4e3cf6b7b998f56dc65213982d4bc7..28e55aae6c613576ede7024a5c73d746
        if (w == NULL) {
          /* File descriptor that we've stopped watching, disarm it. */
 diff --git a/src/unix/linux.c b/src/unix/linux.c
-index 48b9c2c43e104079d3ccb5d830d1d79f891fb1a3..9173850bd158eaf9c41deca38f9ba84762a027a1 100644
+index 8eeb352e6238a9e9557ec4dfc71f192105135cd7..2b8e1d8fe593a181d049aa50ff9edaf6da258a24 100644
 --- a/src/unix/linux.c
 +++ b/src/unix/linux.c
-@@ -456,8 +456,8 @@ static void uv__iou_init(int epollfd,
+@@ -518,8 +518,8 @@ static void uv__iou_init(int epollfd,
    char* sqe;
    int ringfd;
  
@@ -623,7 +641,7 @@ index 48b9c2c43e104079d3ccb5d830d1d79f891fb1a3..9173850bd158eaf9c41deca38f9ba847
  
    if (!uv__use_io_uring())
      return;
-@@ -496,14 +496,14 @@ static void uv__iou_init(int epollfd,
+@@ -558,14 +558,14 @@ static void uv__iou_init(int epollfd,
    maxlen = sqlen < cqlen ? cqlen : sqlen;
    sqelen = params.sq_entries * sizeof(struct uv__io_uring_sqe);
  
@@ -640,7 +658,7 @@ index 48b9c2c43e104079d3ccb5d830d1d79f891fb1a3..9173850bd158eaf9c41deca38f9ba847
               sqelen,
               PROT_READ | PROT_WRITE,
               MAP_SHARED | MAP_POPULATE,
-@@ -643,7 +643,7 @@ void uv__platform_invalidate_fd(uv_loop_t* loop, int fd) {
+@@ -705,7 +705,7 @@ void uv__platform_invalidate_fd(uv_loop_t* loop, int fd) {
    int i;
  
    lfields = uv__get_internal_fields(loop);
@@ -649,7 +667,7 @@ index 48b9c2c43e104079d3ccb5d830d1d79f891fb1a3..9173850bd158eaf9c41deca38f9ba847
  
    /* Invalidate events with same file descriptor */
    if (inv != NULL)
-@@ -718,7 +718,7 @@ static struct uv__io_uring_sqe* uv__iou_get_sqe(struct uv__iou* iou,
+@@ -780,7 +780,7 @@ static struct uv__io_uring_sqe* uv__iou_get_sqe(struct uv__iou* iou,
      return NULL;  /* No room in ring buffer. TODO(bnoordhuis) maybe flush it? */
  
    slot = tail & mask;
@@ -658,7 +676,7 @@ index 48b9c2c43e104079d3ccb5d830d1d79f891fb1a3..9173850bd158eaf9c41deca38f9ba847
    sqe = &sqe[slot];
    memset(sqe, 0, sizeof(*sqe));
    sqe->user_data = (uintptr_t) req;
-@@ -986,7 +986,7 @@ int uv__iou_fs_statx(uv_loop_t* loop,
+@@ -1057,7 +1057,7 @@ int uv__iou_fs_statx(uv_loop_t* loop,
    struct uv__statx* statxbuf;
    struct uv__iou* iou;
  
@@ -667,7 +685,7 @@ index 48b9c2c43e104079d3ccb5d830d1d79f891fb1a3..9173850bd158eaf9c41deca38f9ba847
    if (statxbuf == NULL)
      return 0;
  
-@@ -1050,7 +1050,7 @@ static void uv__iou_fs_statx_post(uv_fs_t* req) {
+@@ -1121,7 +1121,7 @@ static void uv__iou_fs_statx_post(uv_fs_t* req) {
    uv_stat_t* buf;
  
    buf = &req->statbuf;
@@ -676,7 +694,7 @@ index 48b9c2c43e104079d3ccb5d830d1d79f891fb1a3..9173850bd158eaf9c41deca38f9ba847
    req->ptr = NULL;
  
    if (req->result == 0) {
-@@ -1079,7 +1079,7 @@ static void uv__poll_io_uring(uv_loop_t* loop, struct uv__iou* iou) {
+@@ -1150,7 +1150,7 @@ static void uv__poll_io_uring(uv_loop_t* loop, struct uv__iou* iou) {
    tail = atomic_load_explicit((_Atomic uint32_t*) iou->cqtail,
                                memory_order_acquire);
    mask = iou->cqmask;
@@ -685,7 +703,7 @@ index 48b9c2c43e104079d3ccb5d830d1d79f891fb1a3..9173850bd158eaf9c41deca38f9ba847
    nevents = 0;
  
    for (i = head; i != tail; i++) {
-@@ -1170,7 +1170,7 @@ static void uv__epoll_ctl_prep(int epollfd,
+@@ -1241,7 +1241,7 @@ static void uv__epoll_ctl_prep(int epollfd,
      pe = &(*events)[slot];
      *pe = *e;
  
@@ -694,7 +712,7 @@ index 48b9c2c43e104079d3ccb5d830d1d79f891fb1a3..9173850bd158eaf9c41deca38f9ba847
      sqe = &sqe[slot];
  
      memset(sqe, 0, sizeof(*sqe));
-@@ -1226,7 +1226,7 @@ static void uv__epoll_ctl_flush(int epollfd,
+@@ -1297,7 +1297,7 @@ static void uv__epoll_ctl_flush(int epollfd,
    while (*ctl->cqhead != *ctl->cqtail) {
      slot = (*ctl->cqhead)++ & ctl->cqmask;
  
@@ -703,7 +721,7 @@ index 48b9c2c43e104079d3ccb5d830d1d79f891fb1a3..9173850bd158eaf9c41deca38f9ba847
      cqe = &cqe[slot];
  
      if (cqe->res == 0)
-@@ -1708,7 +1708,7 @@ int uv_cpu_info(uv_cpu_info_t** ci, int* count) {
+@@ -1758,7 +1758,7 @@ int uv_cpu_info(uv_cpu_info_t** ci, int* count) {
    snprintf(*models, sizeof(*models), "unknown");
    maxcpu = 0;
  
@@ -712,7 +730,7 @@ index 48b9c2c43e104079d3ccb5d830d1d79f891fb1a3..9173850bd158eaf9c41deca38f9ba847
    if (cpus == NULL)
      return UV_ENOMEM;
  
-@@ -1764,9 +1764,9 @@ int uv_cpu_info(uv_cpu_info_t** ci, int* count) {
+@@ -1816,9 +1816,9 @@ int uv_cpu_info(uv_cpu_info_t** ci, int* count) {
  
      /* arm64: translate CPU part code to model name. */
      if (*parts) {
@@ -724,7 +742,7 @@ index 48b9c2c43e104079d3ccb5d830d1d79f891fb1a3..9173850bd158eaf9c41deca38f9ba847
        else
          p += n + 1;
        n = (int) strcspn(p, "\n");
-@@ -1815,7 +1815,7 @@ nocpuinfo:
+@@ -1868,7 +1868,7 @@ nocpuinfo:
    }
  
    size = n * sizeof(**ci) + sizeof(models);
@@ -733,7 +751,7 @@ index 48b9c2c43e104079d3ccb5d830d1d79f891fb1a3..9173850bd158eaf9c41deca38f9ba847
    *count = 0;
  
    if (*ci == NULL) {
-@@ -1824,7 +1824,7 @@ nocpuinfo:
+@@ -1877,7 +1877,7 @@ nocpuinfo:
    }
  
    *count = n;
@@ -742,7 +760,7 @@ index 48b9c2c43e104079d3ccb5d830d1d79f891fb1a3..9173850bd158eaf9c41deca38f9ba847
  
    i = 0;
    for (cpu = 0; cpu < maxcpu; cpu++) {
-@@ -1833,19 +1833,19 @@ nocpuinfo:
+@@ -1886,19 +1886,19 @@ nocpuinfo:
  
      c = *cpus + cpu;
  
@@ -766,7 +784,7 @@ index 48b9c2c43e104079d3ccb5d830d1d79f891fb1a3..9173850bd158eaf9c41deca38f9ba847
      };
    }
  
-@@ -1902,7 +1902,7 @@ int uv_interface_addresses(uv_interface_address_t** addresses, int* count) {
+@@ -1955,7 +1955,7 @@ int uv_interface_addresses(uv_interface_address_t** addresses, int* count) {
    }
  
    /* Make sure the memory is initiallized to zero using calloc() */
@@ -775,7 +793,7 @@ index 48b9c2c43e104079d3ccb5d830d1d79f891fb1a3..9173850bd158eaf9c41deca38f9ba847
    if (!(*addresses)) {
      freeifaddrs(addrs);
      return UV_ENOMEM;
-@@ -2470,12 +2470,12 @@ int uv_fs_event_start(uv_fs_event_t* handle,
+@@ -2523,12 +2523,12 @@ int uv_fs_event_start(uv_fs_event_t* handle,
      goto no_insert;
  
    len = strlen(path) + 1;
@@ -1058,8 +1076,21 @@ index 28c4d5463c4622725a433b8807e5e7bde580dadd..265ddade7aec129eb9dbf07cde2a16a0
      for (i = 0; i < queued_fds->offset; i++)
        uv__close(queued_fds->fds[i]);
      uv__free(handle->queued_fds);
+diff --git a/src/unix/tcp.c b/src/unix/tcp.c
+index a6b53e5913271d0c83e1d7f7e4cb8140f5f3936d..4c4213a4241b51d245146f1a37a371448d57b3b8 100644
+--- a/src/unix/tcp.c
++++ b/src/unix/tcp.c
+@@ -274,7 +274,7 @@ int uv__tcp_connect(uv_connect_t* req,
+     memcpy(&tmp6, addr, sizeof(tmp6));
+     if (tmp6.sin6_scope_id == 0) {
+       tmp6.sin6_scope_id = uv__ipv6_link_local_scope_id();
+-      addr = (void*) &tmp6;
++      addr = (const struct sockaddr*) &tmp6;
+     }
+   }
+ 
 diff --git a/src/unix/thread.c b/src/unix/thread.c
-index 4d6f4b8232ec6dc0bd27258a1315340e3e272ae9..531c6211bb4321e5f11031a0644b4e3ab9174396 100644
+index f05e6fe0f7dd5ac579f6a9d6f93bffb99e1bcbc2..20409541de3cb300504b823472a73bc95fa38f62 100644
 --- a/src/unix/thread.c
 +++ b/src/unix/thread.c
 @@ -168,8 +168,7 @@ int uv_thread_create_ex(uv_thread_t* tid,
@@ -1118,7 +1149,7 @@ index c2814512a5f507ceb9e764cdb7c6ff3d36e77974..cbee16b22a36b1c82e74f6a81c381105
    if (req->bufs == NULL) {
      uv__req_unregister(handle->loop, req);
 diff --git a/src/uv-common.c b/src/uv-common.c
-index 916f3f4e00664ab47f94d2a6ee7c6a9ef0461389..c04f93596ab1f730576256d86e216ccb7f258b72 100644
+index 2200fe3f0a41e295acb426f39ccc9f0133994675..69e95801a18104ea910abf86db236d85f62afb66 100644
 --- a/src/uv-common.c
 +++ b/src/uv-common.c
 @@ -54,10 +54,10 @@ static uv__allocator_t uv__allocator = {
@@ -1148,7 +1179,7 @@ index 916f3f4e00664ab47f94d2a6ee7c6a9ef0461389..c04f93596ab1f730576256d86e216ccb
  }
  
  void* uv__malloc(size_t size) {
-@@ -688,7 +688,7 @@ void uv__fs_scandir_cleanup(uv_fs_t* req) {
+@@ -691,7 +691,7 @@ void uv__fs_scandir_cleanup(uv_fs_t* req) {
    unsigned int n;
  
    if (req->result >= 0) {
@@ -1157,7 +1188,7 @@ index 916f3f4e00664ab47f94d2a6ee7c6a9ef0461389..c04f93596ab1f730576256d86e216ccb
      nbufs = uv__get_nbufs(req);
  
      i = 0;
-@@ -721,7 +721,7 @@ int uv_fs_scandir_next(uv_fs_t* req, uv_dirent_t* ent) {
+@@ -724,7 +724,7 @@ int uv_fs_scandir_next(uv_fs_t* req, uv_dirent_t* ent) {
    nbufs = uv__get_nbufs(req);
    assert(nbufs);
  
@@ -1166,7 +1197,7 @@ index 916f3f4e00664ab47f94d2a6ee7c6a9ef0461389..c04f93596ab1f730576256d86e216ccb
  
    /* Free previous entity */
    if (*nbufs > 0)
-@@ -786,7 +786,7 @@ void uv__fs_readdir_cleanup(uv_fs_t* req) {
+@@ -789,7 +789,7 @@ void uv__fs_readdir_cleanup(uv_fs_t* req) {
    if (req->ptr == NULL)
      return;
  
@@ -1175,7 +1206,7 @@ index 916f3f4e00664ab47f94d2a6ee7c6a9ef0461389..c04f93596ab1f730576256d86e216ccb
    dirents = dir->dirents;
    req->ptr = NULL;
  
-@@ -832,7 +832,7 @@ uv_loop_t* uv_default_loop(void) {
+@@ -835,7 +835,7 @@ uv_loop_t* uv_default_loop(void) {
  uv_loop_t* uv_loop_new(void) {
    uv_loop_t* loop;
  
@@ -1217,8 +1248,21 @@ index e9885a0f1ff3890a8d957c8793e22b01cedc0e97..87ade7ad65243ee3ff940320f84e1960
    if (timer_heap == NULL) {
      err = UV_ENOMEM;
      goto fail_timers_alloc;
+diff --git a/src/win/dl.c b/src/win/dl.c
+index 7880c9595be1f66ea0dcbdbcc4a91ce40577587f..d88400f0e819d74998e13f60f13c67a606dec398 100644
+--- a/src/win/dl.c
++++ b/src/win/dl.c
+@@ -37,7 +37,7 @@ int uv_dlopen(const char* filename, uv_lib_t* lib) {
+     return uv__dlerror(lib, filename, ERROR_NO_UNICODE_TRANSLATION);
+   if ((size_t) r > ARRAY_SIZE(filename_w))
+     return uv__dlerror(lib, filename, ERROR_INSUFFICIENT_BUFFER);
+-  uv_wtf8_to_utf16(filename, filename_w, r);
++  uv_wtf8_to_utf16(filename, (uint16_t*)filename_w, r);
+ 
+   lib->handle = LoadLibraryExW(filename_w, NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
+   if (lib->handle == NULL) {
 diff --git a/src/win/fs-event.c b/src/win/fs-event.c
-index 6758c7c78bc1d6a5316a8ae7dc2d1e23cd0f32bc..150467313d576bfe2966b55f3d8cffa23cbb8ea3 100644
+index 4a0ca1f70a22b6342e208124838d6ecf3173f1a8..5a07acfe54efe90cf2ab0bca5b5998a961e72ebd 100644
 --- a/src/win/fs-event.c
 +++ b/src/win/fs-event.c
 @@ -73,7 +73,7 @@ static void uv__relative_path(const WCHAR* filename,
@@ -1230,7 +1274,7 @@ index 6758c7c78bc1d6a5316a8ae7dc2d1e23cd0f32bc..150467313d576bfe2966b55f3d8cffa2
    if (!*relpath)
      uv_fatal_error(ERROR_OUTOFMEMORY, "uv__malloc");
    wcsncpy(*relpath, filename + dirlen + 1, relpathlen);
-@@ -242,7 +242,7 @@ int uv_fs_event_start(uv_fs_event_t* handle,
+@@ -229,7 +229,7 @@ int uv_fs_event_start(uv_fs_event_t* handle,
      if (short_path_buffer_len == 0) {
        goto short_path_done;
      }
@@ -1253,28 +1297,53 @@ index 0b532af12d4371c2311bd50a66913287a0716f43..703a8d8f87de1089ac8b18bd817d416d
          uv_fatal_error(ERROR_OUTOFMEMORY, "uv__malloc");
        }
 diff --git a/src/win/fs.c b/src/win/fs.c
-index fc209c54f470edaa031009979061cff071cbf66d..328c8f2e0513562b53c948ffea59d0841e14b264 100644
+index 99c8a2bf8bf1244f0db7114c1eaa8bff22564996..d9c2a4f728c7fb491995c6153b2a63a835b206b7 100644
 --- a/src/win/fs.c
 +++ b/src/win/fs.c
-@@ -258,7 +258,7 @@ INLINE static int fs__capture_path(uv_fs_t* req, const char* path,
+@@ -280,7 +280,7 @@ INLINE static int fs__readlink_handle(HANDLE handle,
+   }
+ 
+   assert(target_ptr == NULL || *target_ptr == NULL);
+-  return uv_utf16_to_wtf8(w_target, w_target_len, target_ptr, target_len_ptr);
++  return uv_utf16_to_wtf8((const uint16_t*)w_target, w_target_len, target_ptr, target_len_ptr);
+ }
+ 
+ 
+@@ -323,7 +323,7 @@ INLINE static int fs__capture_path(uv_fs_t* req, const char* path,
      return 0;
    }
  
 -  buf = uv__malloc(buf_sz);
-+  buf = (WCHAR *)uv__malloc(buf_sz);
++  buf = (WCHAR*)uv__malloc(buf_sz);
    if (buf == NULL) {
      return ERROR_OUTOFMEMORY;
    }
-@@ -376,7 +376,7 @@ static int fs__wide_to_wtf8(WCHAR* w_source_ptr,
-     return 0;
+@@ -331,7 +331,7 @@ INLINE static int fs__capture_path(uv_fs_t* req, const char* path,
+   pos = buf;
  
-   if (*target_ptr == NULL) {
--    target = uv__malloc(target_len + 1);
-+    target = (char *)uv__malloc(target_len + 1);
-     if (target == NULL) {
-       SetLastError(ERROR_OUTOFMEMORY);
-       return -1;
-@@ -1575,7 +1575,7 @@ void fs__scandir(uv_fs_t* req) {
+   if (path != NULL) {
+-    uv_wtf8_to_utf16(path, pos, pathw_len);
++    uv_wtf8_to_utf16(path, (uint16_t*)pos, pathw_len);
+     req->file.pathw = pos;
+     pos += pathw_len;
+   } else {
+@@ -339,7 +339,7 @@ INLINE static int fs__capture_path(uv_fs_t* req, const char* path,
+   }
+ 
+   if (new_path != NULL) {
+-    uv_wtf8_to_utf16(new_path, pos, new_pathw_len);
++    uv_wtf8_to_utf16(new_path, (uint16_t*)pos, new_pathw_len);
+     req->fs.info.new_pathw = pos;
+     pos += new_pathw_len;
+   } else {
+@@ -1390,13 +1390,13 @@ void fs__scandir(uv_fs_t* req) {
+         continue;
+ 
+       /* Compute the space required to store the filename as WTF-8. */
+-      wtf8_len = uv_utf16_length_as_wtf8(&info->FileName[0], wchar_len);
++      wtf8_len = uv_utf16_length_as_wtf8((const uint16_t*)&info->FileName[0], wchar_len);
+ 
+       /* Resize the dirent array if needed. */
        if (dirents_used >= dirents_size) {
          size_t new_dirents_size =
              dirents_size == 0 ? dirents_initial_size : dirents_size << 1;
@@ -1283,7 +1352,7 @@ index fc209c54f470edaa031009979061cff071cbf66d..328c8f2e0513562b53c948ffea59d084
              uv__realloc(dirents, new_dirents_size * sizeof *dirents);
  
          if (new_dirents == NULL)
-@@ -1589,7 +1589,7 @@ void fs__scandir(uv_fs_t* req) {
+@@ -1410,7 +1410,7 @@ void fs__scandir(uv_fs_t* req) {
         * includes room for the first character of the filename, but `utf8_len`
         * doesn't count the NULL terminator at this point.
         */
@@ -1292,7 +1361,16 @@ index fc209c54f470edaa031009979061cff071cbf66d..328c8f2e0513562b53c948ffea59d084
        if (dirent == NULL)
          goto out_of_memory_error;
  
-@@ -1691,7 +1691,7 @@ void fs__opendir(uv_fs_t* req) {
+@@ -1418,7 +1418,7 @@ void fs__scandir(uv_fs_t* req) {
+ 
+       /* Convert file name to UTF-8. */
+       wtf8 = &dirent->d_name[0];
+-      if (uv_utf16_to_wtf8(&info->FileName[0], wchar_len, &wtf8, &wtf8_len) != 0)
++      if (uv_utf16_to_wtf8((const uint16_t*)&info->FileName[0], wchar_len, &wtf8, &wtf8_len) != 0)
+         goto out_of_memory_error;
+ 
+       /* Fill out the type field. */
+@@ -1512,7 +1512,7 @@ void fs__opendir(uv_fs_t* req) {
      goto error;
    }
  
@@ -1301,7 +1379,7 @@ index fc209c54f470edaa031009979061cff071cbf66d..328c8f2e0513562b53c948ffea59d084
    if (dir == NULL) {
      SET_REQ_UV_ERROR(req, UV_ENOMEM, ERROR_OUTOFMEMORY);
      goto error;
-@@ -1706,7 +1706,7 @@ void fs__opendir(uv_fs_t* req) {
+@@ -1527,7 +1527,7 @@ void fs__opendir(uv_fs_t* req) {
    else
      fmt = L"%s\\*";
  
@@ -1310,7 +1388,7 @@ index fc209c54f470edaa031009979061cff071cbf66d..328c8f2e0513562b53c948ffea59d084
    if (find_path == NULL) {
      SET_REQ_UV_ERROR(req, UV_ENOMEM, ERROR_OUTOFMEMORY);
      goto error;
-@@ -1743,7 +1743,7 @@ void fs__readdir(uv_fs_t* req) {
+@@ -1564,7 +1564,7 @@ void fs__readdir(uv_fs_t* req) {
    int r;
  
    req->flags |= UV_FS_FREE_PTR;
@@ -1319,7 +1397,7 @@ index fc209c54f470edaa031009979061cff071cbf66d..328c8f2e0513562b53c948ffea59d084
    dirents = dir->dirents;
    memset(dirents, 0, dir->nentries * sizeof(*dir->dirents));
    find_data = &dir->find_data;
-@@ -1800,7 +1800,7 @@ error:
+@@ -1621,7 +1621,7 @@ error:
  void fs__closedir(uv_fs_t* req) {
    uv_dir_t* dir;
  
@@ -1328,7 +1406,7 @@ index fc209c54f470edaa031009979061cff071cbf66d..328c8f2e0513562b53c948ffea59d084
    FindClose(dir->dir_handle);
    uv__free(req->ptr);
    SET_REQ_RESULT(req, 0);
-@@ -2791,7 +2791,7 @@ static ssize_t fs__realpath_handle(HANDLE handle, char** realpath_ptr) {
+@@ -2612,7 +2612,7 @@ static ssize_t fs__realpath_handle(HANDLE handle, char** realpath_ptr) {
      return -1;
    }
  
@@ -1337,7 +1415,16 @@ index fc209c54f470edaa031009979061cff071cbf66d..328c8f2e0513562b53c948ffea59d084
    if (w_realpath_buf == NULL) {
      SetLastError(ERROR_OUTOFMEMORY);
      return -1;
-@@ -2904,7 +2904,7 @@ retry_get_disk_free_space:
+@@ -2645,7 +2645,7 @@ static ssize_t fs__realpath_handle(HANDLE handle, char** realpath_ptr) {
+   }
+ 
+   assert(*realpath_ptr == NULL);
+-  r = uv_utf16_to_wtf8(w_realpath_ptr, w_realpath_len, realpath_ptr, NULL);
++  r = uv_utf16_to_wtf8((const uint16_t*)w_realpath_ptr, w_realpath_len, realpath_ptr, NULL);
+   uv__free(w_realpath_buf);
+   return r;
+ }
+@@ -2725,7 +2725,7 @@ retry_get_disk_free_space:
      }
  
      len = MAX_PATH + 1;
@@ -1346,7 +1433,7 @@ index fc209c54f470edaa031009979061cff071cbf66d..328c8f2e0513562b53c948ffea59d084
      if (pathw == NULL) {
        SET_REQ_UV_ERROR(req, UV_ENOMEM, ERROR_OUTOFMEMORY);
        return;
-@@ -2920,7 +2920,7 @@ retry_get_full_path_name:
+@@ -2741,7 +2741,7 @@ retry_get_full_path_name:
        return;
      } else if (ret > len) {
        len = ret;
@@ -1355,7 +1442,7 @@ index fc209c54f470edaa031009979061cff071cbf66d..328c8f2e0513562b53c948ffea59d084
        if (pathw == NULL) {
          SET_REQ_UV_ERROR(req, UV_ENOMEM, ERROR_OUTOFMEMORY);
          return;
-@@ -2936,7 +2936,7 @@ retry_get_full_path_name:
+@@ -2757,7 +2757,7 @@ retry_get_full_path_name:
      uv__free(pathw);
    }
  
@@ -1364,7 +1451,7 @@ index fc209c54f470edaa031009979061cff071cbf66d..328c8f2e0513562b53c948ffea59d084
    if (stat_fs == NULL) {
      SET_REQ_UV_ERROR(req, UV_ENOMEM, ERROR_OUTOFMEMORY);
      return;
-@@ -3095,7 +3095,7 @@ int uv_fs_read(uv_loop_t* loop,
+@@ -2916,7 +2916,7 @@ int uv_fs_read(uv_loop_t* loop,
    req->fs.info.nbufs = nbufs;
    req->fs.info.bufs = req->fs.info.bufsml;
    if (nbufs > ARRAY_SIZE(req->fs.info.bufsml))
@@ -1373,7 +1460,7 @@ index fc209c54f470edaa031009979061cff071cbf66d..328c8f2e0513562b53c948ffea59d084
  
    if (req->fs.info.bufs == NULL) {
      SET_REQ_UV_ERROR(req, UV_ENOMEM, ERROR_OUTOFMEMORY);
-@@ -3128,7 +3128,7 @@ int uv_fs_write(uv_loop_t* loop,
+@@ -2949,7 +2949,7 @@ int uv_fs_write(uv_loop_t* loop,
    req->fs.info.nbufs = nbufs;
    req->fs.info.bufs = req->fs.info.bufsml;
    if (nbufs > ARRAY_SIZE(req->fs.info.bufsml))
@@ -1382,38 +1469,64 @@ index fc209c54f470edaa031009979061cff071cbf66d..328c8f2e0513562b53c948ffea59d084
  
    if (req->fs.info.bufs == NULL) {
      SET_REQ_UV_ERROR(req, UV_ENOMEM, ERROR_OUTOFMEMORY);
+diff --git a/src/win/getaddrinfo.c b/src/win/getaddrinfo.c
+index 8b8406ada8e7434e291b2e50caf4ed7f36613fa0..5bc63d8e19411b967a2acf5c24b34b9b17323ccc 100644
+--- a/src/win/getaddrinfo.c
++++ b/src/win/getaddrinfo.c
+@@ -132,7 +132,7 @@ static void uv__getaddrinfo_done(struct uv__work* w, int status) {
+       addrinfo_len += addrinfo_struct_len +
+           ALIGNED_SIZE(addrinfow_ptr->ai_addrlen);
+       if (addrinfow_ptr->ai_canonname != NULL) {
+-        name_len = uv_utf16_length_as_wtf8(addrinfow_ptr->ai_canonname, -1);
++        name_len = uv_utf16_length_as_wtf8((const uint16_t*)addrinfow_ptr->ai_canonname, -1);
+         if (name_len < 0) {
+           req->retcode = name_len;
+           goto complete;
+@@ -281,9 +281,9 @@ int uv_getaddrinfo(uv_loop_t* loop,
+   }
+ 
+   /* allocate memory for inputs, and partition it as needed */
+-  alloc_ptr = uv__malloc(ALIGNED_SIZE(nodesize * sizeof(WCHAR)) +
+-                         ALIGNED_SIZE(servicesize * sizeof(WCHAR)) +
+-                         hintssize);
++  alloc_ptr = (char*)uv__malloc(ALIGNED_SIZE(nodesize * sizeof(WCHAR)) +
++                                ALIGNED_SIZE(servicesize * sizeof(WCHAR)) +
++                                hintssize);
+   if (!alloc_ptr)
+     return UV_ENOMEM;
+ 
+@@ -294,7 +294,7 @@ int uv_getaddrinfo(uv_loop_t* loop,
+    * request. The node here has been converted to ascii. */
+   if (node != NULL) {
+     req->node = (WCHAR*) alloc_ptr;
+-    uv_wtf8_to_utf16(node, (WCHAR*) alloc_ptr, nodesize);
++    uv_wtf8_to_utf16(node, (uint16_t*) alloc_ptr, nodesize);
+     alloc_ptr += ALIGNED_SIZE(nodesize * sizeof(WCHAR));
+   } else {
+     req->node = NULL;
+@@ -304,7 +304,7 @@ int uv_getaddrinfo(uv_loop_t* loop,
+    * the req. */
+   if (service != NULL) {
+     req->service = (WCHAR*) alloc_ptr;
+-    uv_wtf8_to_utf16(service, (WCHAR*) alloc_ptr, servicesize);
++    uv_wtf8_to_utf16(service, (uint16_t*) alloc_ptr, servicesize);
+     alloc_ptr += ALIGNED_SIZE(servicesize * sizeof(WCHAR));
+   } else {
+     req->service = NULL;
 diff --git a/src/win/pipe.c b/src/win/pipe.c
-index f0cac3822564e14052feb5e1934f54c57c78160d..c1739efe82b8755999145860b4da6b50c73518a2 100644
+index cec72ff750b5a17e139fd85080ccbdfc3c71d8c0..0f045a873073cf9b07feb457ea199990df521e5f 100644
 --- a/src/win/pipe.c
 +++ b/src/win/pipe.c
-@@ -756,7 +756,7 @@ int uv_pipe_bind2(uv_pipe_t* handle,
- 
-   /* Convert name to UTF16. */
-   nameSize = MultiByteToWideChar(CP_UTF8, 0, name, -1, NULL, 0) * sizeof(WCHAR);
--  handle->name = uv__malloc(nameSize);
-+  handle->name = (WCHAR*)uv__malloc(nameSize);
-   if (!handle->name) {
-     uv_fatal_error(ERROR_OUTOFMEMORY, "uv__malloc");
-   }
-@@ -906,7 +906,7 @@ int uv_pipe_connect2(uv_connect_t* req,
- 
-   /* Convert name to UTF16. */
-   nameSize = MultiByteToWideChar(CP_UTF8, 0, name, -1, NULL, 0) * sizeof(WCHAR);
--  handle->name = uv__malloc(nameSize);
-+  handle->name = (WCHAR*)uv__malloc(nameSize);
-   if (!handle->name) {
-     uv_fatal_error(ERROR_OUTOFMEMORY, "uv__malloc");
-   }
-@@ -924,7 +924,7 @@ int uv_pipe_connect2(uv_connect_t* req,
-   pipeHandle = open_named_pipe(handle->name, &duplex_flags);
+@@ -899,7 +899,7 @@ int uv_pipe_connect2(uv_connect_t* req,
    if (pipeHandle == INVALID_HANDLE_VALUE) {
      if (GetLastError() == ERROR_PIPE_BUSY) {
+       nameSize = (wcslen(handle->name) + 1) * sizeof(WCHAR);
 -      req->u.connect.name = uv__malloc(nameSize);
 +      req->u.connect.name = (WCHAR *)uv__malloc(nameSize);
        if (!req->u.connect.name) {
          uv_fatal_error(ERROR_OUTOFMEMORY, "uv__malloc");
        }
-@@ -1528,7 +1528,7 @@ static int uv__build_coalesced_write_req(uv_write_t* user_req,
+@@ -1503,7 +1503,7 @@ static int uv__build_coalesced_write_req(uv_write_t* user_req,
                         data_length;                  /* (c) */
  
    /* Allocate buffer. */
@@ -1422,7 +1535,7 @@ index f0cac3822564e14052feb5e1934f54c57c78160d..c1739efe82b8755999145860b4da6b50
    if (heap_buffer == NULL)
      return ERROR_NOT_ENOUGH_MEMORY; /* Maps to UV_ENOMEM. */
  
-@@ -1777,7 +1777,7 @@ int uv__pipe_write_ipc(uv_loop_t* loop,
+@@ -1752,7 +1752,7 @@ int uv__pipe_write_ipc(uv_loop_t* loop,
      bufs = stack_bufs;
    } else {
      /* Use heap-allocated buffer array. */
@@ -1431,7 +1544,7 @@ index f0cac3822564e14052feb5e1934f54c57c78160d..c1739efe82b8755999145860b4da6b50
      if (bufs == NULL)
        return ERROR_NOT_ENOUGH_MEMORY; /* Maps to UV_ENOMEM. */
    }
-@@ -2514,7 +2514,7 @@ static int uv__pipe_getname(const uv_pipe_t* handle, char* buffer, size_t* size)
+@@ -2449,7 +2449,7 @@ static int uv__pipe_getname(const uv_pipe_t* handle, char* buffer, size_t* size)
                                        FileNameInformation);
    if (nt_status == STATUS_BUFFER_OVERFLOW) {
      name_size = sizeof(*name_info) + tmp_name_info.FileNameLength;
@@ -1439,12 +1552,38 @@ index f0cac3822564e14052feb5e1934f54c57c78160d..c1739efe82b8755999145860b4da6b50
 +    name_info = (FILE_NAME_INFORMATION*)uv__malloc(name_size);
      if (!name_info) {
        *size = 0;
-       err = UV_ENOMEM;
+       return UV_ENOMEM;
 diff --git a/src/win/process.c b/src/win/process.c
-index ed44adc67c6d52785a199206d9ba0357e2d0b045..b383e8b405db56d413985b38df216d09c58ec4a0 100644
+index 119b46cb3f37122395c172c6e9700d472a2173ed..0103004c565bb09b7b9c150e874f9c68486ab26c 100644
 --- a/src/win/process.c
 +++ b/src/win/process.c
-@@ -615,8 +615,8 @@ error:
+@@ -543,14 +543,14 @@ int make_program_args(char** args, int verbatim_arguments, WCHAR** dst_ptr) {
+   dst_len = dst_len * 2 + arg_count * 2;
+ 
+   /* Allocate buffer for the final command line. */
+-  dst = uv__malloc(dst_len * sizeof(WCHAR));
++  dst = (WCHAR*)uv__malloc(dst_len * sizeof(WCHAR));
+   if (dst == NULL) {
+     err = UV_ENOMEM;
+     goto error;
+   }
+ 
+   /* Allocate temporary working buffer. */
+-  temp_buffer = uv__malloc(temp_buffer_len * sizeof(WCHAR));
++  temp_buffer = (WCHAR*)uv__malloc(temp_buffer_len * sizeof(WCHAR));
+   if (temp_buffer == NULL) {
+     err = UV_ENOMEM;
+     goto error;
+@@ -564,7 +564,7 @@ int make_program_args(char** args, int verbatim_arguments, WCHAR** dst_ptr) {
+     arg_len = uv_wtf8_length_as_utf16(*arg);
+     assert(arg_len > 0);
+     assert(temp_buffer_len >= (size_t) arg_len);
+-    uv_wtf8_to_utf16(*arg, temp_buffer, arg_len);
++    uv_wtf8_to_utf16(*arg, (uint16_t*)temp_buffer, arg_len);
+ 
+     if (verbatim_arguments) {
+       /* Copy verbatim. */
+@@ -592,8 +592,8 @@ error:
  
  
  int env_strncmp(const wchar_t* a, int na, const wchar_t* b) {
@@ -1455,7 +1594,7 @@ index ed44adc67c6d52785a199206d9ba0357e2d0b045..b383e8b405db56d413985b38df216d09
    wchar_t* A;
    wchar_t* B;
    int nb;
-@@ -633,8 +633,8 @@ int env_strncmp(const wchar_t* a, int na, const wchar_t* b) {
+@@ -610,8 +610,8 @@ int env_strncmp(const wchar_t* a, int na, const wchar_t* b) {
    assert(b_eq);
    nb = b_eq - b;
  
@@ -1466,16 +1605,30 @@ index ed44adc67c6d52785a199206d9ba0357e2d0b045..b383e8b405db56d413985b38df216d09
  
    r = LCMapStringW(LOCALE_INVARIANT, LCMAP_UPPERCASE, a, na, A, na);
    assert(r==na);
-@@ -717,7 +717,7 @@ int make_program_env(char* env_block[], WCHAR** dst_ptr) {
+@@ -684,11 +684,11 @@ int make_program_env(char* env_block[], WCHAR** dst_ptr) {
+   }
+ 
+   /* second pass: copy to UTF-16 environment block */
+-  dst_copy = uv__malloc(env_len * sizeof(WCHAR));
++  dst_copy = (WCHAR*)uv__malloc(env_len * sizeof(WCHAR));
    if (dst_copy == NULL && env_len > 0) {
-     return ERROR_OUTOFMEMORY;
+     return UV_ENOMEM;
    }
 -  env_copy = alloca(env_block_count * sizeof(WCHAR*));
 +  env_copy = (WCHAR**)alloca(env_block_count * sizeof(WCHAR*));
  
    ptr = dst_copy;
    ptr_copy = env_copy;
-@@ -771,7 +771,7 @@ int make_program_env(char* env_block[], WCHAR** dst_ptr) {
+@@ -698,7 +698,7 @@ int make_program_env(char* env_block[], WCHAR** dst_ptr) {
+       len = uv_wtf8_length_as_utf16(*env);
+       assert(len > 0);
+       assert((size_t) len <= env_len - (ptr - dst_copy));
+-      uv_wtf8_to_utf16(*env, ptr, len);
++      uv_wtf8_to_utf16(*env, (uint16_t*)ptr, len);
+       *ptr_copy++ = ptr;
+       ptr += len;
+     }
+@@ -736,7 +736,7 @@ int make_program_env(char* env_block[], WCHAR** dst_ptr) {
    }
  
    /* final pass: copy, in sort order, and inserting required variables */
@@ -1483,7 +1636,7 @@ index ed44adc67c6d52785a199206d9ba0357e2d0b045..b383e8b405db56d413985b38df216d09
 +  dst = (WCHAR*)uv__malloc((1+env_len) * sizeof(WCHAR));
    if (!dst) {
      uv__free(dst_copy);
-     return ERROR_OUTOFMEMORY;
+     return UV_ENOMEM;
 diff --git a/src/win/tcp.c b/src/win/tcp.c
 index 187f36e2a61c870b0d16e17e9d4a9e1161ba8851..d8da4d941a51b0625fc0c072342ec4edf74c0ea3 100644
 --- a/src/win/tcp.c
@@ -1519,11 +1672,51 @@ index 57c25e8f5a861c9d8a4c402c260d3ac235200423..57f1698f595e2410a51044f7f228b5a2
    if (ctx == NULL)
      return UV_ENOMEM;
  
+diff --git a/src/win/tty.c b/src/win/tty.c
+index ac836930d6f3a185d57ba59fb42c817496aa0fdf..3aacaaf0b514ba71755dc51f1bd7263de5cbc308 100644
+--- a/src/win/tty.c
++++ b/src/win/tty.c
+@@ -528,7 +528,7 @@ static DWORD CALLBACK uv_tty_line_read_thread(void* data) {
+ 
+   if (read_console_success) {
+     read_bytes = bytes;
+-    uv_utf16_to_wtf8(utf16,
++    uv_utf16_to_wtf8((const uint16_t*)utf16,
+                      read_chars,
+                      &handle->tty.rd.read_line_buffer.base,
+                      &read_bytes);
+@@ -827,7 +827,7 @@ void uv_process_tty_read_raw_req(uv_loop_t* loop, uv_tty_t* handle,
+           WCHAR utf16_buffer[2];
+           utf16_buffer[0] = handle->tty.rd.last_utf16_high_surrogate;
+           utf16_buffer[1] = KEV.uChar.UnicodeChar;
+-          if (uv_utf16_to_wtf8(utf16_buffer,
++          if (uv_utf16_to_wtf8((const uint16_t*)utf16_buffer,
+                                2,
+                                &last_key_buf,
+                                &char_len))
+@@ -835,7 +835,7 @@ void uv_process_tty_read_raw_req(uv_loop_t* loop, uv_tty_t* handle,
+           handle->tty.rd.last_utf16_high_surrogate = 0;
+         } else {
+           /* Single UTF-16 character */
+-          if (uv_utf16_to_wtf8(&KEV.uChar.UnicodeChar,
++          if (uv_utf16_to_wtf8((const uint16_t*)&KEV.uChar.UnicodeChar,
+                                1,
+                                &last_key_buf,
+                                &char_len))
 diff --git a/src/win/util.c b/src/win/util.c
-index f6ec79cd57b5010ed5fd6829d952bcdacc8b7671..1cfd7b2caf0d4ad1a6a66df9406c21f4e2b69b04 100644
+index 91d88a54fb24a613df45d7915c345b6764dd6ffd..5fbc70f52952f90b36fb22ee03ec7f70e6ed5954 100644
 --- a/src/win/util.c
 +++ b/src/win/util.c
-@@ -160,7 +160,7 @@ static int uv__cwd(WCHAR** buf, DWORD *len) {
+@@ -124,7 +124,7 @@ int uv_exepath(char* buffer, size_t* size_ptr) {
+ 
+   /* Convert to UTF-8 */
+   utf8_len = *size_ptr - 1; /* Reserve space for NUL */
+-  err = uv_utf16_to_wtf8(utf16_buffer, utf16_len, &buffer, &utf8_len);
++  err = uv_utf16_to_wtf8((const uint16_t*)utf16_buffer, utf16_len, &buffer, &utf8_len);
+   if (err == UV_ENOBUFS) {
+     utf8_len = *size_ptr - 1;
+     err = 0;
+@@ -152,7 +152,7 @@ static int uv__cwd(WCHAR** buf, DWORD *len) {
        return uv_translate_sys_error(GetLastError());
  
      /* |t| is the size of the buffer _including_ nul. */
@@ -1532,16 +1725,7 @@ index f6ec79cd57b5010ed5fd6829d952bcdacc8b7671..1cfd7b2caf0d4ad1a6a66df9406c21f4
      if (p == NULL)
        return UV_ENOMEM;
  
-@@ -265,7 +265,7 @@ int uv_chdir(const char* dir) {
-   if (utf16_len == 0) {
-     return uv_translate_sys_error(GetLastError());
-   }
--  utf16_buffer = uv__malloc(utf16_len * sizeof(WCHAR));
-+  utf16_buffer = (WCHAR*)uv__malloc(utf16_len * sizeof(WCHAR));
-   if (utf16_buffer == NULL) {
-     return UV_ENOMEM;
-   }
-@@ -623,14 +623,14 @@ int uv_cpu_info(uv_cpu_info_t** cpu_infos_ptr, int* cpu_count_ptr) {
+@@ -548,14 +548,14 @@ int uv_cpu_info(uv_cpu_info_t** cpu_infos_ptr, int* cpu_count_ptr) {
    GetSystemInfo(&system_info);
    cpu_count = system_info.dwNumberOfProcessors;
  
@@ -1558,7 +1742,7 @@ index f6ec79cd57b5010ed5fd6829d952bcdacc8b7671..1cfd7b2caf0d4ad1a6a66df9406c21f4
    if (sppi == NULL) {
      err = ERROR_OUTOFMEMORY;
      goto error;
-@@ -774,7 +774,8 @@ int uv_interface_addresses(uv_interface_address_t** addresses_ptr,
+@@ -699,7 +699,8 @@ int uv_interface_addresses(uv_interface_address_t** addresses_ptr,
        case ERROR_BUFFER_OVERFLOW:
          /* This happens when win_address_buf is NULL or too small to hold all
           * adapters. */
@@ -1568,7 +1752,7 @@ index f6ec79cd57b5010ed5fd6829d952bcdacc8b7671..1cfd7b2caf0d4ad1a6a66df9406c21f4
          if (win_address_buf == NULL)
            return UV_ENOMEM;
  
-@@ -782,7 +783,7 @@ int uv_interface_addresses(uv_interface_address_t** addresses_ptr,
+@@ -707,7 +708,7 @@ int uv_interface_addresses(uv_interface_address_t** addresses_ptr,
  
        case ERROR_NO_DATA: {
          /* No adapters were found. */
@@ -1577,7 +1761,16 @@ index f6ec79cd57b5010ed5fd6829d952bcdacc8b7671..1cfd7b2caf0d4ad1a6a66df9406c21f4
          if (uv_address_buf == NULL)
            return UV_ENOMEM;
  
-@@ -859,7 +860,7 @@ int uv_interface_addresses(uv_interface_address_t** addresses_ptr,
+@@ -758,7 +759,7 @@ int uv_interface_addresses(uv_interface_address_t** addresses_ptr,
+       continue;
+ 
+     /* Compute the size of the interface name. */
+-    name_size = uv_utf16_length_as_wtf8(adapter->FriendlyName, -1);
++    name_size = uv_utf16_length_as_wtf8((const uint16_t*)adapter->FriendlyName, -1);
+     uv_address_buf_size += name_size + 1;
+ 
+     /* Count the number of addresses associated with this interface, and
+@@ -773,7 +774,7 @@ int uv_interface_addresses(uv_interface_address_t** addresses_ptr,
    }
  
    /* Allocate space to store interface data plus adapter names. */
@@ -1586,7 +1779,7 @@ index f6ec79cd57b5010ed5fd6829d952bcdacc8b7671..1cfd7b2caf0d4ad1a6a66df9406c21f4
    if (uv_address_buf == NULL) {
      uv__free(win_address_buf);
      return UV_ENOMEM;
-@@ -1074,7 +1075,7 @@ int uv_os_tmpdir(char* buffer, size_t* size) {
+@@ -982,7 +983,7 @@ int uv_os_tmpdir(char* buffer, size_t* size) {
    }
    /* Include space for terminating null char. */
    len += 1;
@@ -1595,25 +1788,46 @@ index f6ec79cd57b5010ed5fd6829d952bcdacc8b7671..1cfd7b2caf0d4ad1a6a66df9406c21f4
    if (path == NULL) {
      return UV_ENOMEM;
    }
-@@ -1153,7 +1154,7 @@ int uv__convert_utf16_to_utf8(const WCHAR* utf16, int utf16len, char** utf8) {
-   /* Allocate the destination buffer adding an extra byte for the terminating
-    * NULL. If utf16len is not -1 WideCharToMultiByte will not add it, so
-    * we do it ourselves always, just in case. */
--  *utf8 = uv__malloc(bufsize + 1);
-+  *utf8 = (char*)uv__malloc(bufsize + 1);
+@@ -1019,7 +1020,7 @@ int uv__convert_utf16_to_utf8(const WCHAR* utf16, size_t utf16len, char** utf8)
+     return UV_EINVAL;
  
-   if (*utf8 == NULL)
-     return UV_ENOMEM;
-@@ -1201,7 +1202,7 @@ int uv__convert_utf8_to_utf16(const char* utf8, int utf8len, WCHAR** utf16) {
-   /* Allocate the destination buffer adding an extra byte for the terminating
-    * NULL. If utf8len is not -1 MultiByteToWideChar will not add it, so
-    * we do it ourselves always, just in case. */
--  *utf16 = uv__malloc(sizeof(WCHAR) * (bufsize + 1));
-+  *utf16 = (WCHAR*)uv__malloc(sizeof(WCHAR) * (bufsize + 1));
+    *utf8 = NULL;
+-   return uv_utf16_to_wtf8(utf16, utf16len, utf8, &utf8_len);
++   return uv_utf16_to_wtf8((const uint16_t*)utf16, utf16len, utf8, &utf8_len);
+ }
+ 
+ 
+@@ -1039,13 +1040,13 @@ int uv__convert_utf8_to_utf16(const char* utf8, WCHAR** utf16) {
+     return UV__EINVAL;
+ 
+   /* Allocate the destination buffer. */
+-  *utf16 = uv__malloc(sizeof(WCHAR) * bufsize);
++  *utf16 = (WCHAR*)uv__malloc(sizeof(WCHAR) * bufsize);
  
    if (*utf16 == NULL)
      return UV_ENOMEM;
-@@ -1242,7 +1243,7 @@ static int uv__getpwuid_r(uv_passwd_t* pwd) {
+ 
+   /* Convert to UTF-16 */
+-  uv_wtf8_to_utf16(utf8, *utf16, bufsize);
++  uv_wtf8_to_utf16(utf8, (uint16_t*)*utf16, bufsize);
+ 
+   return 0;
+ }
+@@ -1065,11 +1066,11 @@ int uv__copy_utf16_to_utf8(const WCHAR* utf16buffer, size_t utf16len, char* utf8
+     return UV_EINVAL;
+ 
+   if (*size == 0) {
+-    *size = uv_utf16_length_as_wtf8(utf16buffer, utf16len);
++    *size = uv_utf16_length_as_wtf8((const uint16_t*)utf16buffer, utf16len);
+     r = UV_ENOBUFS;
+   } else {
+     *size -= 1; /* Reserve space for NUL. */
+-    r = uv_utf16_to_wtf8(utf16buffer, utf16len, &utf8, size);
++    r = uv_utf16_to_wtf8((const uint16_t*)utf16buffer, utf16len, &utf8, size);
+   }
+   if (r == UV_ENOBUFS)
+     *size += 1; /* Add space for NUL. */
+@@ -1099,7 +1100,7 @@ static int uv__getpwuid_r(uv_passwd_t* pwd) {
      return uv_translate_sys_error(r);
    }
  
@@ -1622,7 +1836,7 @@ index f6ec79cd57b5010ed5fd6829d952bcdacc8b7671..1cfd7b2caf0d4ad1a6a66df9406c21f4
    if (path == NULL) {
      CloseHandle(token);
      return UV_ENOMEM;
-@@ -1323,7 +1324,7 @@ int uv_os_environ(uv_env_item_t** envitems, int* count) {
+@@ -1180,7 +1181,7 @@ int uv_os_environ(uv_env_item_t** envitems, int* count) {
  
    for (penv = env, i = 0; *penv != L'\0'; penv += wcslen(penv) + 1, i++);
  
@@ -1631,7 +1845,7 @@ index f6ec79cd57b5010ed5fd6829d952bcdacc8b7671..1cfd7b2caf0d4ad1a6a66df9406c21f4
    if (*envitems == NULL) {
      FreeEnvironmentStringsW(env);
      return UV_ENOMEM;
-@@ -1413,7 +1414,7 @@ int uv_os_getenv(const char* name, char* buffer, size_t* size) {
+@@ -1269,7 +1270,7 @@ int uv_os_getenv(const char* name, char* buffer, size_t* size) {
        uv__free(var);
  
      varlen = 1 + len;

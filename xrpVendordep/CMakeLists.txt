@@ -10,18 +10,26 @@ if (WITH_JAVA)
   set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
 
   file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
-  add_jar(xrpVendordep_jar ${JAVA_SOURCES} INCLUDE_JARS hal_jar ntcore_jar cscore_jar cameraserver_jar wpimath_jar wpiutil_jar wpilibj_jar OUTPUT_NAME xrpVendordep)
+  add_jar(xrpVendordep_jar ${JAVA_SOURCES} INCLUDE_JARS hal_jar ntcore_jar cscore_jar cameraserver_jar wpimath_jar wpiunits_jar wpiutil_jar wpilibj_jar OUTPUT_NAME xrpVendordep)
 
   get_property(xrpVendordep_JAR_FILE TARGET xrpVendordep_jar PROPERTY JAR_FILE)
   install(FILES ${xrpVendordep_JAR_FILE} DESTINATION "${java_lib_dest}")
 
   set_property(TARGET xrpVendordep_jar PROPERTY FOLDER "java")
+endif()
 
-  if (WITH_FLAT_INSTALL)
-      set (xrpVendordep_config_dir ${wpilib_dest})
-  else()
-      set (xrpVendordep_config_dir share/xrpVendordep)
-  endif()
+if (WITH_JAVA_SOURCE)
+  find_package(Java REQUIRED)
+  include(UseJava)
+  file(GLOB XRPVENDORDEP_SOURCES src/main/java/edu/wpi/first/wpilibj/xrp/*.java)
+  add_jar(xrpVendordep_src_jar
+  RESOURCES NAMESPACE "edu/wpi/first/wpilibj/xrp" ${XRPVENDORDEP_SOURCES}
+  OUTPUT_NAME xrpVendordep-sources)
+
+  get_property(xrpVendordep_src_JAR_FILE TARGET xrpVendordep_src_jar PROPERTY JAR_FILE)
+  install(FILES ${xrpVendordep_src_JAR_FILE} DESTINATION "${java_lib_dest}")
+
+  set_property(TARGET xrpVendordep_src_jar PROPERTY FOLDER "java")
 endif()
 
 file(GLOB_RECURSE xrpVendordep_native_src src/main/native/cpp/*.cpp)
@@ -40,15 +48,9 @@ target_include_directories(xrpVendordep PUBLIC
 install(TARGETS xrpVendordep EXPORT xrpVendordep DESTINATION "${main_lib_dest}")
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/xrpVendordep")
 
-if (FLAT_INSTALL_WPILIB)
-     set(xrpVendordep_config_dir ${wpilib_dest})
- else()
-     set(xrpVendordep_config_dir share/xrpVendordep)
- endif()
-
- configure_file(xrpVendordep-config.cmake.in ${WPILIB_BINARY_DIR}/xrpVendordep-config.cmake)
- install(FILES ${WPILIB_BINARY_DIR}/xrpVendordep-config.cmake DESTINATION ${xrpVendordep_config_dir})
- install(EXPORT xrpVendordep DESTINATION ${xrpVendordep_config_dir})
+configure_file(xrpVendordep-config.cmake.in ${WPILIB_BINARY_DIR}/xrpVendordep-config.cmake)
+install(FILES ${WPILIB_BINARY_DIR}/xrpVendordep-config.cmake DESTINATION share/xrpVendordep)
+install(EXPORT xrpVendordep DESTINATION share/xrpVendordep)
 
  if (WITH_TESTS)
      wpilib_add_test(xrpVendordep src/test/native/cpp)

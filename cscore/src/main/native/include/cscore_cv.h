@@ -127,8 +127,10 @@ class CvSink : public ImageSink {
    * image.
    *
    * @param name Source name (arbitrary unique identifier)
+   * @param pixelFormat Source pixel format
    */
-  explicit CvSink(std::string_view name);
+  explicit CvSink(std::string_view name, VideoMode::PixelFormat pixelFormat =
+                                             VideoMode::PixelFormat::kBGR);
 
   /**
    * Create a sink for accepting OpenCV images in a separate thread.
@@ -141,9 +143,10 @@ class CvSink : public ImageSink {
    *        time=0 if an error occurred.  processFrame should call GetImage()
    *        or GetError() as needed, but should not call (except in very
    *        unusual circumstances) WaitForImage().
+   * @param pixelFormat Source pixel format
    */
-  CvSink(std::string_view name,
-         std::function<void(uint64_t time)> processFrame);
+  CvSink(std::string_view name, std::function<void(uint64_t time)> processFrame,
+         VideoMode::PixelFormat pixelFormat = VideoMode::PixelFormat::kBGR);
 
   /**
    * Wait for the next frame and get the image.
@@ -184,13 +187,15 @@ inline void CvSource::PutFrame(cv::Mat& image) {
   PutSourceFrame(m_handle, image, &m_status);
 }
 
-inline CvSink::CvSink(std::string_view name) {
-  m_handle = CreateCvSink(name, &m_status);
+inline CvSink::CvSink(std::string_view name,
+                      VideoMode::PixelFormat pixelFormat) {
+  m_handle = CreateCvSink(name, pixelFormat, &m_status);
 }
 
 inline CvSink::CvSink(std::string_view name,
-                      std::function<void(uint64_t time)> processFrame) {
-  m_handle = CreateCvSinkCallback(name, processFrame, &m_status);
+                      std::function<void(uint64_t time)> processFrame,
+                      VideoMode::PixelFormat pixelFormat) {
+  m_handle = CreateCvSinkCallback(name, pixelFormat, processFrame, &m_status);
 }
 
 inline uint64_t CvSink::GrabFrame(cv::Mat& image, double timeout) const {

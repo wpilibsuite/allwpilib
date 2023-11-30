@@ -4,12 +4,9 @@
 
 package edu.wpi.first.math.geometry;
 
-import edu.wpi.first.math.proto.Geometry3D.ProtobufTransform3d;
-import edu.wpi.first.util.protobuf.Protobuf;
-import edu.wpi.first.util.struct.Struct;
-import java.nio.ByteBuffer;
+import edu.wpi.first.math.geometry.proto.Transform3dProto;
+import edu.wpi.first.math.geometry.struct.Transform3dStruct;
 import java.util.Objects;
-import us.hebi.quickbuf.Descriptors.Descriptor;
 
 /** Represents a transformation for a Pose3d in the pose's frame. */
 public class Transform3d {
@@ -179,82 +176,6 @@ public class Transform3d {
     return Objects.hash(m_translation, m_rotation);
   }
 
-  public static final class AStruct implements Struct<Transform3d> {
-    @Override
-    public Class<Transform3d> getTypeClass() {
-      return Transform3d.class;
-    }
-
-    @Override
-    public String getTypeString() {
-      return "struct:Transform3d";
-    }
-
-    @Override
-    public int getSize() {
-      return Translation3d.struct.getSize() + Rotation3d.struct.getSize();
-    }
-
-    @Override
-    public String getSchema() {
-      return "Translation3d translation;Rotation3d rotation";
-    }
-
-    @Override
-    public Struct<?>[] getNested() {
-      return new Struct<?>[] {Translation3d.struct, Rotation3d.struct};
-    }
-
-    @Override
-    public Transform3d unpack(ByteBuffer bb) {
-      Translation3d translation = Translation3d.struct.unpack(bb);
-      Rotation3d rotation = Rotation3d.struct.unpack(bb);
-      return new Transform3d(translation, rotation);
-    }
-
-    @Override
-    public void pack(ByteBuffer bb, Transform3d value) {
-      Translation3d.struct.pack(bb, value.m_translation);
-      Rotation3d.struct.pack(bb, value.m_rotation);
-    }
-  }
-
-  public static final AStruct struct = new AStruct();
-
-  public static final class AProto implements Protobuf<Transform3d, ProtobufTransform3d> {
-    @Override
-    public Class<Transform3d> getTypeClass() {
-      return Transform3d.class;
-    }
-
-    @Override
-    public Descriptor getDescriptor() {
-      return ProtobufTransform3d.getDescriptor();
-    }
-
-    @Override
-    public Protobuf<?, ?>[] getNested() {
-      return new Protobuf<?, ?>[] {Translation3d.proto, Rotation3d.proto};
-    }
-
-    @Override
-    public ProtobufTransform3d createMessage() {
-      return ProtobufTransform3d.newInstance();
-    }
-
-    @Override
-    public Transform3d unpack(ProtobufTransform3d msg) {
-      return new Transform3d(
-          Translation3d.proto.unpack(msg.getTranslation()),
-          Rotation3d.proto.unpack(msg.getRotation()));
-    }
-
-    @Override
-    public void pack(ProtobufTransform3d msg, Transform3d value) {
-      Translation3d.proto.pack(msg.getMutableTranslation(), value.m_translation);
-      Rotation3d.proto.pack(msg.getMutableRotation(), value.m_rotation);
-    }
-  }
-
-  public static final AProto proto = new AProto();
+  public static final Transform3dStruct struct = new Transform3dStruct();
+  public static final Transform3dProto proto = new Transform3dProto();
 }
