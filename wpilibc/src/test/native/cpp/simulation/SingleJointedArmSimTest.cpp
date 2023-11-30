@@ -4,12 +4,13 @@
 
 #include <numbers>
 
+#include <gtest/gtest.h>
+
 #include "frc/simulation/SingleJointedArmSim.h"
-#include "gtest/gtest.h"
 
 TEST(SingleJointedArmTest, Disabled) {
   frc::sim::SingleJointedArmSim sim(frc::DCMotor::Vex775Pro(2), 300, 3_kg_sq_m,
-                                    30_in, -180_deg, 0_deg, true);
+                                    30_in, -180_deg, 0_deg, true, 90_deg);
   sim.SetState(frc::Vectord<2>{0.0, 0.0});
 
   for (size_t i = 0; i < 12 / 0.02; ++i) {

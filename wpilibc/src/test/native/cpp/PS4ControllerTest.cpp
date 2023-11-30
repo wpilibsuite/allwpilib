@@ -4,9 +4,10 @@
 
 #include "frc/PS4Controller.h"  // NOLINT(build/include_order)
 
+#include <gtest/gtest.h>
+
 #include "JoystickTestMacros.h"
 #include "frc/simulation/PS4ControllerSim.h"
-#include "gtest/gtest.h"
 
 using namespace frc;
 

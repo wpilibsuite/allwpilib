@@ -23,7 +23,7 @@
 #include <string>
 
 #include <hal/HAL.h>
-#include <networktables/NTSendableBuilder.h>
+#include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/Errors.h"
@@ -816,7 +816,7 @@ int ADIS16470_IMU::GetPort() const {
  * This function pushes the most recent angle estimates for all axes to the
  *driver station.
  **/
-void ADIS16470_IMU::InitSendable(nt::NTSendableBuilder& builder) {
+void ADIS16470_IMU::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("ADIS16470 IMU");
   builder.AddDoubleProperty(
       "Yaw Angle", [=, this] { return GetAngle().value(); }, nullptr);

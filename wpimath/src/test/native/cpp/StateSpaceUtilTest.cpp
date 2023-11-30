@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <gtest/gtest.h>
-
 #include <array>
+
+#include <gtest/gtest.h>
 
 #include "frc/EigenCore.h"
 #include "frc/StateSpaceUtil.h"
@@ -63,13 +63,12 @@ TEST(StateSpaceUtilTest, CovArray) {
 }
 
 TEST(StateSpaceUtilTest, WhiteNoiseVectorParameterPack) {
-  frc::Vectord<2> vec = frc::MakeWhiteNoiseVector(2.0, 3.0);
-  static_cast<void>(vec);
+  [[maybe_unused]] frc::Vectord<2> vec = frc::MakeWhiteNoiseVector(2.0, 3.0);
 }
 
 TEST(StateSpaceUtilTest, WhiteNoiseVectorArray) {
-  frc::Vectord<2> vec = frc::MakeWhiteNoiseVector<2>({2.0, 3.0});
-  static_cast<void>(vec);
+  [[maybe_unused]] frc::Vectord<2> vec =
+      frc::MakeWhiteNoiseVector<2>({2.0, 3.0});
 }
 
 TEST(StateSpaceUtilTest, IsStabilizable) {

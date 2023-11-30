@@ -5,13 +5,14 @@
 #include <string>
 #include <tuple>
 
+#include <gtest/gtest.h>
+
 #include "callback_helpers/TestCallbackHelpers.h"
 #include "frc/DriverStation.h"
 #include "frc/Joystick.h"
 #include "frc/RobotState.h"
 #include "frc/simulation/DriverStationSim.h"
 #include "frc/simulation/SimHooks.h"
-#include "gtest/gtest.h"
 
 using namespace frc;
 using namespace frc::sim;
@@ -129,6 +130,17 @@ TEST(DriverStationTest, AllianceStationId) {
 
   auto cb = DriverStationSim::RegisterAllianceStationIdCallback(
       callback.GetCallback(), false);
+
+  // Unknown
+  allianceStation = HAL_AllianceStationID_kUnknown;
+  DriverStationSim::SetAllianceStationId(allianceStation);
+  frc::sim::DriverStationSim::NotifyNewData();
+  EXPECT_EQ(allianceStation, DriverStationSim::GetAllianceStationId());
+  EXPECT_FALSE(DriverStation::GetAlliance().has_value());
+  EXPECT_FALSE(DriverStation::GetLocation().has_value());
+  EXPECT_TRUE(callback.WasTriggered());
+  EXPECT_EQ(allianceStation, callback.GetLastValue());
+
   // B1
   allianceStation = HAL_AllianceStationID_kBlue1;
   DriverStationSim::SetAllianceStationId(allianceStation);
@@ -219,7 +231,7 @@ TEST(DriverStationTest, MatchTime) {
   DriverStationSim::SetMatchTime(kTestTime);
   frc::sim::DriverStationSim::NotifyNewData();
   EXPECT_EQ(kTestTime, DriverStationSim::GetMatchTime());
-  EXPECT_EQ(kTestTime, DriverStation::GetMatchTime());
+  EXPECT_EQ(kTestTime, DriverStation::GetMatchTime().value());
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_EQ(kTestTime, callback.GetLastValue());
 }

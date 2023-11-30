@@ -55,19 +55,13 @@ target_link_libraries(hal PUBLIC wpiutil)
 
 set_property(TARGET hal PROPERTY FOLDER "libraries")
 
-install(TARGETS hal EXPORT hal DESTINATION "${main_lib_dest}")
+install(TARGETS hal EXPORT hal)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/hal")
 install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/gen/ DESTINATION "${include_dest}/hal")
 
-if (WITH_FLAT_INSTALL)
-    set (hal_config_dir ${wpilib_dest})
-else()
-    set (hal_config_dir share/hal)
-endif()
-
 configure_file(hal-config.cmake.in ${WPILIB_BINARY_DIR}/hal-config.cmake )
-install(FILES ${WPILIB_BINARY_DIR}/hal-config.cmake DESTINATION ${hal_config_dir})
-install(EXPORT hal DESTINATION ${hal_config_dir})
+install(FILES ${WPILIB_BINARY_DIR}/hal-config.cmake DESTINATION share/hal)
+install(EXPORT hal DESTINATION share/hal)
 
 # Java bindings
 if (WITH_JAVA)
@@ -80,17 +74,10 @@ if (WITH_JAVA)
 
     file(GLOB_RECURSE hal_shared_jni_src src/main/native/cpp/jni/*.cpp)
 
-    file(GLOB_RECURSE JAVA_SOURCES
-        ${CMAKE_CURRENT_BINARY_DIR}/FRCNetComm.java
-        src/main/java/*.java)
+    file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
     set(CMAKE_JNI_TARGET true)
 
-    if(${CMAKE_VERSION} VERSION_LESS "3.11.0")
-        set(CMAKE_JAVA_COMPILE_FLAGS "-h" "${CMAKE_CURRENT_BINARY_DIR}/jniheaders")
-        add_jar(hal_jar ${JAVA_SOURCES} INCLUDE_JARS wpiutil_jar OUTPUT_NAME wpiHal)
-    else()
-        add_jar(hal_jar ${JAVA_SOURCES} INCLUDE_JARS wpiutil_jar OUTPUT_NAME wpiHal GENERATE_NATIVE_HEADERS hal_jni_headers)
-    endif()
+    add_jar(hal_jar ${JAVA_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/FRCNetComm.java INCLUDE_JARS wpiutil_jar OUTPUT_NAME wpiHal GENERATE_NATIVE_HEADERS hal_jni_headers)
 
     get_property(HAL_JAR_FILE TARGET hal_jar PROPERTY JAR_FILE)
     install(FILES ${HAL_JAR_FILE} DESTINATION "${java_lib_dest}")
@@ -110,20 +97,32 @@ if (WITH_JAVA)
 
     set_property(TARGET haljni PROPERTY FOLDER "libraries")
 
-    if(${CMAKE_VERSION} VERSION_LESS "3.11.0")
-        target_include_directories(haljni PRIVATE ${JNI_INCLUDE_DIRS})
-        target_include_directories(haljni PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/jniheaders")
-    else()
-        target_link_libraries(haljni PRIVATE hal_jni_headers)
-    endif()
+    target_link_libraries(haljni PRIVATE hal_jni_headers)
     add_dependencies(haljni hal_jar)
 
-    if (MSVC)
-        install(TARGETS haljni RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)
-    endif()
+    install(TARGETS haljni EXPORT haljni)
 
-    install(TARGETS haljni EXPORT haljni DESTINATION "${main_lib_dest}")
+endif()
 
+if (WITH_JAVA_SOURCE)
+    find_package(Java REQUIRED)
+    include(UseJava)
+    file(GLOB HAL_SOURCES src/main/java/edu/wpi/first/hal/*.java ${CMAKE_CURRENT_BINARY_DIR}/FRCNetComm.java)
+    file(GLOB HAL_CAN_SOURCES src/main/java/edu/wpi/first/hal/can/*.java)
+    file(GLOB HAL_SIMULATION_SOURCES src/main/java/edu/wpi/first/hal/simulation/*.java)
+    file(GLOB HAL_UTIL_SOURCES src/main/java/edu/wpi/first/hal/util/*.java)
+    add_jar(hal_src_jar
+    RESOURCES NAMESPACE "edu/wpi/first/hal" ${HAL_SOURCES}
+    NAMESPACE "edu/wpi/first/hal/can" ${HAL_CAN_SOURCES}
+    NAMESPACE "edu/wpi/first/hal/communication" src/main/java/edu/wpi/first/hal/communication/NIRioStatus.java
+    NAMESPACE "edu/wpi/first/hal/simulation" ${HAL_SIMULATION_SOURCES}
+    NAMESPACE "edu/wpi/first/hal/util" ${HAL_UTIL_SOURCES}
+    OUTPUT_NAME wpiHal-sources)
+
+    get_property(HAL_SRC_JAR_FILE TARGET hal_src_jar PROPERTY JAR_FILE)
+    install(FILES ${HAL_SRC_JAR_FILE} DESTINATION "${java_lib_dest}")
+
+    set_property(TARGET hal_src_jar PROPERTY FOLDER "java")
 endif()
 
 if (WITH_TESTS)

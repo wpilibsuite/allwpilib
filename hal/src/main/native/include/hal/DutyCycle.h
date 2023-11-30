@@ -26,7 +26,7 @@ extern "C" {
  * @param[in] triggerType the analog trigger type of the source if it is
  *                         an analog trigger
  * @param[out] status Error status variable. 0 on success.
- * @return thre created duty cycle handle
+ * @return the created duty cycle handle
  */
 HAL_DutyCycleHandle HAL_InitializeDutyCycle(HAL_Handle digitalSourceHandle,
                                             HAL_AnalogTriggerType triggerType,

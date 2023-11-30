@@ -19,3 +19,5 @@ endif()
 
 target_compile_features(gtest PUBLIC cxx_std_20)
 target_compile_features(gtest_main PUBLIC cxx_std_20)
+target_compile_features(gmock PUBLIC cxx_std_20)
+target_compile_features(gmock_main PUBLIC cxx_std_20)

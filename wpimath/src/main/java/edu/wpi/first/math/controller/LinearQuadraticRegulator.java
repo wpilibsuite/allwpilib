@@ -4,7 +4,7 @@
 
 package edu.wpi.first.math.controller;
 
-import edu.wpi.first.math.Drake;
+import edu.wpi.first.math.DARE;
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Num;
@@ -35,6 +35,10 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
   /**
    * Constructs a controller with the given coefficients and plant. Rho is defaulted to 1.
    *
+   * <p>See
+   * https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-intro.html#lqr-tuning
+   * for how to select the tolerances.
+   *
    * @param plant The plant being controlled.
    * @param qelms The maximum desired error tolerance for each state.
    * @param relms The maximum desired control effort for each input.
@@ -56,6 +60,10 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
 
   /**
    * Constructs a controller with the given coefficients and plant.
+   *
+   * <p>See
+   * https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-intro.html#lqr-tuning
+   * for how to select the tolerances.
    *
    * @param A Continuous system matrix of the plant being controlled.
    * @param B Continuous input matrix of the plant being controlled.
@@ -111,7 +119,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
       throw new IllegalArgumentException(msg);
     }
 
-    var S = Drake.discreteAlgebraicRiccatiEquation(discA, discB, Q, R);
+    var S = DARE.dare(discA, discB, Q, R);
 
     // K = (BᵀSB + R)⁻¹BᵀSA
     m_K =
@@ -150,7 +158,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
     var discA = discABPair.getFirst();
     var discB = discABPair.getSecond();
 
-    var S = Drake.discreteAlgebraicRiccatiEquation(discA, discB, Q, R, N);
+    var S = DARE.dare(discA, discB, Q, R, N);
 
     // K = (BᵀSB + R)⁻¹(BᵀSA + Nᵀ)
     m_K =

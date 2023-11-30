@@ -8,7 +8,11 @@ file(GLOB wpigui_windows_src src/main/native/directx11/*.cpp)
 file(GLOB wpigui_mac_src src/main/native/metal/*.mm)
 file(GLOB wpigui_unix_src src/main/native/opengl3/*.cpp)
 
-add_library(wpigui STATIC ${wpigui_src})
+if (MSVC)
+  add_library(wpigui STATIC ${wpigui_src})
+else()
+  add_library(wpigui ${wpigui_src})
+endif()
 set_target_properties(wpigui PROPERTIES DEBUG_POSTFIX "d")
 set_property(TARGET wpigui PROPERTY POSITION_INDEPENDENT_CODE ON)
 
@@ -35,17 +39,8 @@ endif()
 
 add_executable(wpiguidev src/dev/native/cpp/main.cpp)
 wpilib_link_macos_gui(wpiguidev)
+wpilib_target_warnings(wpiguidev)
 target_link_libraries(wpiguidev wpigui)
 
-install(TARGETS wpigui EXPORT wpigui DESTINATION "${main_lib_dest}")
+install(TARGETS wpigui EXPORT wpigui)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpigui")
-
-#if (WITH_FLAT_INSTALL)
-#    set (wpigui_config_dir ${wpilib_dest})
-#else()
-#    set (wpigui_config_dir share/wpigui)
-#endif()
-
-#configure_file(wpigui-config.cmake.in ${WPILIB_BINARY_DIR}/wpigui-config.cmake )
-#install(FILES ${WPILIB_BINARY_DIR}/wpigui-config.cmake DESTINATION ${wpigui_config_dir})
-#install(EXPORT wpigui DESTINATION ${wpigui_config_dir})

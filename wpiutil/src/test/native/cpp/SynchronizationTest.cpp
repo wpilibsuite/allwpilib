@@ -6,7 +6,7 @@
 
 #include <thread>
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 TEST(EventTest, AutoReset) {
   auto event = wpi::CreateEvent(false, false);

@@ -10,6 +10,7 @@
 #include "Constants.h"
 #include "subsystems/Drive.h"
 #include "subsystems/Intake.h"
+#include "subsystems/Pneumatics.h"
 #include "subsystems/Shooter.h"
 #include "subsystems/Storage.h"
 
@@ -45,6 +46,7 @@ class RapidReactCommandBot {
   Intake m_intake;
   Shooter m_shooter;
   Storage m_storage;
+  Pneumatics m_pneumatics;
 
   // The driver's controller
   frc2::CommandXboxController m_driverController{

@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <frc/simulation/SimHooks.h>
+#include <gtest/gtest.h>
 
 #include "../CommandTestBase.h"
 #include "frc2/command/CommandPtr.h"
@@ -11,7 +12,6 @@
 #include "frc2/command/RunCommand.h"
 #include "frc2/command/WaitUntilCommand.h"
 #include "frc2/command/button/Trigger.h"
-#include "gtest/gtest.h"
 
 using namespace frc2;
 class TriggerTest : public CommandTestBase {};
@@ -205,24 +205,6 @@ TEST_F(TriggerTest, Negate) {
   scheduler.Run();
   EXPECT_TRUE(scheduler.IsScheduled(&command));
 }
-
-// this type of binding is deprecated and identical to OnTrue
-WPI_IGNORE_DEPRECATED
-TEST_F(TriggerTest, RValueTrigger) {
-  auto& scheduler = CommandScheduler::GetInstance();
-  int counter = 0;
-  bool pressed = false;
-
-  RunCommand command([&counter] { counter++; }, {});
-
-  Trigger([&pressed] { return pressed; }).WhenActive(std::move(command));
-  scheduler.Run();
-  EXPECT_EQ(counter, 0);
-  pressed = true;
-  scheduler.Run();
-  EXPECT_EQ(counter, 1);
-}
-WPI_UNIGNORE_DEPRECATED
 
 TEST_F(TriggerTest, Debounce) {
   auto& scheduler = CommandScheduler::GetInstance();

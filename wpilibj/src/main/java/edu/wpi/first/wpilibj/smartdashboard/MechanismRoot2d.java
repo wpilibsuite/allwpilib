@@ -6,8 +6,6 @@ package edu.wpi.first.wpilibj.smartdashboard;
 
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTable;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Root Mechanism2d node.
@@ -19,10 +17,7 @@ import java.util.Map;
  *
  * <p>Append other nodes by using {@link #append(MechanismObject2d)}.
  */
-public final class MechanismRoot2d implements AutoCloseable {
-  private final String m_name;
-  private NetworkTable m_table;
-  private final Map<String, MechanismObject2d> m_objects = new HashMap<>(1);
+public final class MechanismRoot2d extends MechanismObject2d {
   private double m_x;
   private DoublePublisher m_xPub;
   private double m_y;
@@ -36,7 +31,7 @@ public final class MechanismRoot2d implements AutoCloseable {
    * @param y y coordinate of root (provide only when constructing a root node)
    */
   MechanismRoot2d(String name, double x, double y) {
-    m_name = name;
+    super(name);
     m_x = x;
     m_y = y;
   }
@@ -49,29 +44,7 @@ public final class MechanismRoot2d implements AutoCloseable {
     if (m_yPub != null) {
       m_yPub.close();
     }
-    for (MechanismObject2d obj : m_objects.values()) {
-      obj.close();
-    }
-  }
-
-  /**
-   * Append a Mechanism object that is based on this one.
-   *
-   * @param <T> The object type.
-   * @param object the object to add.
-   * @return the object given as a parameter, useful for variable assignments and call chaining.
-   * @throws UnsupportedOperationException if the object's name is already used - object names must
-   *     be unique.
-   */
-  public synchronized <T extends MechanismObject2d> T append(T object) {
-    if (m_objects.containsKey(object.getName())) {
-      throw new UnsupportedOperationException("Mechanism object names must be unique!");
-    }
-    m_objects.put(object.getName(), object);
-    if (m_table != null) {
-      object.update(m_table.getSubTable(object.getName()));
-    }
-    return object;
+    super.close();
   }
 
   /**
@@ -86,24 +59,17 @@ public final class MechanismRoot2d implements AutoCloseable {
     flush();
   }
 
-  synchronized void update(NetworkTable table) {
-    m_table = table;
+  @Override
+  protected synchronized void updateEntries(NetworkTable table) {
     if (m_xPub != null) {
       m_xPub.close();
     }
-    m_xPub = m_table.getDoubleTopic("x").publish();
+    m_xPub = table.getDoubleTopic("x").publish();
     if (m_yPub != null) {
       m_yPub.close();
     }
-    m_yPub = m_table.getDoubleTopic("y").publish();
+    m_yPub = table.getDoubleTopic("y").publish();
     flush();
-    for (MechanismObject2d obj : m_objects.values()) {
-      obj.update(m_table.getSubTable(obj.getName()));
-    }
-  }
-
-  public String getName() {
-    return m_name;
   }
 
   private void flush() {

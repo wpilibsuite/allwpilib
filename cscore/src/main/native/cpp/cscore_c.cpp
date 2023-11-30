@@ -181,7 +181,7 @@ CS_Bool CS_SetSourceVideoMode(CS_Source source, const CS_VideoMode* mode,
 }
 
 CS_Bool CS_SetSourceVideoModeDiscrete(CS_Source source,
-                                      enum CS_PixelFormat pixelFormat,
+                                      enum WPI_PixelFormat pixelFormat,
                                       int width, int height, int fps,
                                       CS_Status* status) {
   return cs::SetSourceVideoMode(
@@ -193,7 +193,7 @@ CS_Bool CS_SetSourceVideoModeDiscrete(CS_Source source,
 }
 
 CS_Bool CS_SetSourcePixelFormat(CS_Source source,
-                                enum CS_PixelFormat pixelFormat,
+                                enum WPI_PixelFormat pixelFormat,
                                 CS_Status* status) {
   return cs::SetSourcePixelFormat(
       source,
@@ -516,7 +516,7 @@ void CS_FreeEnumeratedVideoModes(CS_VideoMode* modes, int count) {
   std::free(modes);
 }
 
-char* CS_GetHostname() {
+char* CS_GetHostname(void) {
   return cs::ConvertToC(cs::GetHostname());
 }
 
@@ -539,27 +539,6 @@ void CS_FreeNetworkInterfaces(char** interfaces, int count) {
     std::free(interfaces[i]);
   }
   std::free(interfaces);
-}
-
-void CS_AllocateRawFrameData(CS_RawFrame* frame, int requestedSize) {
-  if (frame->dataLength >= requestedSize) {
-    return;
-  }
-  if (frame->data) {
-    frame->data =
-        static_cast<char*>(wpi::safe_realloc(frame->data, requestedSize));
-  } else {
-    frame->data = static_cast<char*>(wpi::safe_malloc(requestedSize));
-  }
-  frame->dataLength = requestedSize;
-}
-
-void CS_FreeRawFrameData(CS_RawFrame* frame) {
-  if (frame->data) {
-    std::free(frame->data);
-    frame->data = nullptr;
-    frame->dataLength = 0;
-  }
 }
 
 }  // extern "C"

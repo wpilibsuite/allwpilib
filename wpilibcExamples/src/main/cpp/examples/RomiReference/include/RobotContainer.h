@@ -5,16 +5,16 @@
 #pragma once
 
 #include <frc/Joystick.h>
+#include <frc/romi/OnBoardIO.h>
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc2/command/Command.h>
 #include <frc2/command/CommandPtr.h>
-#include <frc2/command/button/Button.h>
+#include <frc2/command/button/Trigger.h>
 
 #include "Constants.h"
 #include "commands/AutonomousDistance.h"
 #include "commands/AutonomousTime.h"
 #include "subsystems/Drivetrain.h"
-#include "subsystems/OnBoardIO.h"
 
 /**
  * This class is where the bulk of the robot should be declared.  Since
@@ -47,8 +47,8 @@ class RobotContainer {
 
   // The robot's subsystems
   Drivetrain m_drive;
-  OnBoardIO m_onboardIO{OnBoardIO::ChannelMode::INPUT,
-                        OnBoardIO::ChannelMode::INPUT};
+  frc::OnBoardIO m_onboardIO{frc::OnBoardIO::ChannelMode::INPUT,
+                             frc::OnBoardIO::ChannelMode::INPUT};
 
   // Example button
   frc2::Trigger m_onboardButtonA{

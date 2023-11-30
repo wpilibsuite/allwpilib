@@ -5,15 +5,13 @@
 #pragma once
 
 #include <wpi/SymbolExports.h>
+#include <wpi/json_fwd.h>
 
-#include "Pose2d.h"
-#include "Transform3d.h"
-#include "Translation3d.h"
-#include "Twist3d.h"
-
-namespace wpi {
-class json;
-}  // namespace wpi
+#include "frc/geometry/Pose2d.h"
+#include "frc/geometry/Rotation3d.h"
+#include "frc/geometry/Transform3d.h"
+#include "frc/geometry/Translation3d.h"
+#include "frc/geometry/Twist3d.h"
 
 namespace frc {
 
@@ -56,7 +54,9 @@ class WPILIB_DLLEXPORT Pose3d {
 
   /**
    * Transforms the pose by the given transformation and returns the new
-   * transformed pose.
+   * transformed pose. The transform is applied relative to the pose's frame.
+   * Note that this differs from Pose3d::RotateBy(const Rotation3d&), which is
+   * applied relative to the global frame and around the origin.
    *
    * @param other The transform to transform the pose by.
    *
@@ -131,8 +131,20 @@ class WPILIB_DLLEXPORT Pose3d {
   Pose3d operator/(double scalar) const;
 
   /**
-   * Transforms the pose by the given transformation and returns the new pose.
-   * See + operator for the matrix multiplication performed.
+   * Rotates the pose around the origin and returns the new pose.
+   *
+   * @param other The rotation to transform the pose by, which is applied
+   * extrinsically (from the global frame).
+   *
+   * @return The rotated pose.
+   */
+  Pose3d RotateBy(const Rotation3d& other) const;
+
+  /**
+   * Transforms the pose by the given transformation and returns the new
+   * transformed pose. The transform is applied relative to the pose's frame.
+   * Note that this differs from Pose3d::RotateBy(const Rotation3d&), which is
+   * applied relative to the global frame and around the origin.
    *
    * @param other The transform to transform the pose by.
    *
@@ -202,3 +214,6 @@ WPILIB_DLLEXPORT
 void from_json(const wpi::json& json, Pose3d& pose);
 
 }  // namespace frc
+
+#include "frc/geometry/proto/Pose3dProto.h"
+#include "frc/geometry/struct/Pose3dStruct.h"

@@ -8,15 +8,7 @@ using namespace frc2;
 
 StartEndCommand::StartEndCommand(std::function<void()> onInit,
                                  std::function<void()> onEnd,
-                                 std::initializer_list<Subsystem*> requirements)
-    : CommandHelper(
-          std::move(onInit), [] {},
-          [onEnd = std::move(onEnd)](bool interrupted) { onEnd(); },
-          [] { return false; }, requirements) {}
-
-StartEndCommand::StartEndCommand(std::function<void()> onInit,
-                                 std::function<void()> onEnd,
-                                 std::span<Subsystem* const> requirements)
+                                 Requirements requirements)
     : CommandHelper(
           std::move(onInit), [] {},
           [onEnd = std::move(onEnd)](bool interrupted) { onEnd(); },

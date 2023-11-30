@@ -29,11 +29,13 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
 /**
- * Implement a Robot Program framework. The RobotBase class is intended to be subclassed by a user
- * creating a robot program. Overridden autonomous() and operatorControl() methods are called at the
- * appropriate time as the match proceeds. In the current implementation, the Autonomous code will
- * run to completion before the OperatorControl code could start. In the future the Autonomous code
- * might be spawned as a task, then killed at the end of the Autonomous period.
+ * Implement a Robot Program framework. The RobotBase class is intended to be subclassed to create a
+ * robot program. The user must implement {@link #startCompetition()}, which will be called once and
+ * is not expected to exit. The user must also implement {@link #endCompetition()}, which signals to
+ * the code in {@link #startCompetition()} that it should exit.
+ *
+ * <p>It is not recommended to subclass this class directly - instead subclass IterativeRobotBase or
+ * TimedRobot.
  */
 public abstract class RobotBase implements AutoCloseable {
   /** The ID of the main Java thread. */
@@ -72,7 +74,7 @@ public abstract class RobotBase implements AutoCloseable {
 
           @Override
           public boolean isRoboRIO() {
-            return RobotBase.isReal();
+            return !RobotBase.isSimulation();
           }
         };
 
@@ -138,9 +140,9 @@ public abstract class RobotBase implements AutoCloseable {
   }
 
   /**
-   * Constructor for a generic robot program. User code should be placed in the constructor that
-   * runs before the Autonomous or Operator Control period starts. The constructor will run to
-   * completion before Autonomous is entered.
+   * Constructor for a generic robot program. User code can be placed in the constructor that runs
+   * before the Autonomous or Operator Control period starts. The constructor will run to completion
+   * before Autonomous is entered.
    *
    * <p>This must be used to ensure that the communications code starts. In the future it would be
    * nice to put this code into its own task that loads on boot so ensure that it runs.
@@ -152,7 +154,7 @@ public abstract class RobotBase implements AutoCloseable {
     setupMathShared();
     // subscribe to "" to force persistent values to propagate to local
     m_suball = new MultiSubscriber(inst, new String[] {""});
-    if (isReal()) {
+    if (!isSimulation()) {
       inst.startServer("/home/lvuser/networktables.json");
     } else {
       inst.startServer();
@@ -200,7 +202,7 @@ public abstract class RobotBase implements AutoCloseable {
    * @return If the robot is running in simulation.
    */
   public static boolean isSimulation() {
-    return !isReal();
+    return getRuntimeType() == RuntimeType.kSimulation;
   }
 
   /**
@@ -288,10 +290,13 @@ public abstract class RobotBase implements AutoCloseable {
     return DriverStation.isTeleopEnabled();
   }
 
-  /** Provide an alternate "main loop" via startCompetition(). */
+  /**
+   * Start the main robot code. This function will be called once and should not exit until
+   * signalled by {@link #endCompetition()}
+   */
   public abstract void startCompetition();
 
-  /** Ends the main loop in startCompetition(). */
+  /** Ends the main loop in {@link #startCompetition()}. */
   public abstract void endCompetition();
 
   private static final ReentrantLock m_runMutex = new ReentrantLock();
@@ -332,7 +337,7 @@ public abstract class RobotBase implements AutoCloseable {
     m_robotCopy = robot;
     m_runMutex.unlock();
 
-    if (isReal()) {
+    if (!isSimulation()) {
       final File file = new File("/tmp/frc_versions/FRC_Lib_Version.ini");
       try {
         if (file.exists() && !file.delete()) {

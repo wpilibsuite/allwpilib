@@ -30,18 +30,12 @@ target_link_libraries(wpilibc PUBLIC hal ntcore wpimath wpiutil)
 
 set_property(TARGET wpilibc PROPERTY FOLDER "libraries")
 
-install(TARGETS wpilibc EXPORT wpilibc DESTINATION "${main_lib_dest}")
+install(TARGETS wpilibc EXPORT wpilibc)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpilibc")
 
-if (WITH_FLAT_INSTALL)
-    set (wpilibc_config_dir ${wpilib_dest})
-else()
-    set (wpilibc_config_dir share/wpilibc)
-endif()
-
 configure_file(wpilibc-config.cmake.in ${WPILIB_BINARY_DIR}/wpilibc-config.cmake )
-install(FILES ${WPILIB_BINARY_DIR}/wpilibc-config.cmake DESTINATION ${wpilibc_config_dir})
-install(EXPORT wpilibc DESTINATION ${wpilibc_config_dir})
+install(FILES ${WPILIB_BINARY_DIR}/wpilibc-config.cmake DESTINATION share/wpilibc)
+install(EXPORT wpilibc DESTINATION share/wpilibc)
 
 if (WITH_TESTS)
     wpilib_add_test(wpilibc src/test/native/cpp)

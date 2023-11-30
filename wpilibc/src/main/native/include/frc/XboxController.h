@@ -36,63 +36,87 @@ class XboxController : public GenericHID {
 
   /**
    * Get the X axis value of left side of the controller.
+   *
+   * @return the axis value
    */
   double GetLeftX() const;
 
   /**
    * Get the X axis value of right side of the controller.
+   *
+   * @return the axis value
    */
   double GetRightX() const;
 
   /**
    * Get the Y axis value of left side of the controller.
+   *
+   * @return the axis value
    */
   double GetLeftY() const;
 
   /**
    * Get the Y axis value of right side of the controller.
+   *
+   * @return the axis value
    */
   double GetRightY() const;
 
   /**
    * Get the left trigger (LT) axis value of the controller. Note that this axis
    * is bound to the range of [0, 1] as opposed to the usual [-1, 1].
+   *
+   * @return the axis value
    */
   double GetLeftTriggerAxis() const;
 
   /**
    * Get the right trigger (RT) axis value of the controller. Note that this
    * axis is bound to the range of [0, 1] as opposed to the usual [-1, 1].
+   *
+   * @return the axis value
    */
   double GetRightTriggerAxis() const;
 
   /**
    * Read the value of the left bumper (LB) button on the controller.
+   *
+   * @return the state of the button
    */
   bool GetLeftBumper() const;
 
   /**
    * Read the value of the right bumper (RB) button on the controller.
+   *
+   * @return the state of the button
    */
   bool GetRightBumper() const;
 
   /**
    * Whether the left bumper (LB) was pressed since the last check.
+   *
+   * @return Whether the button was pressed since the last check
    */
   bool GetLeftBumperPressed();
 
   /**
    * Whether the right bumper (RB) was pressed since the last check.
+   *
+   * @return Whether the button was pressed since the last check
    */
   bool GetRightBumperPressed();
 
   /**
    * Whether the left bumper (LB) was released since the last check.
+   *
+   * @return Whether the button was released since the last check.
    */
   bool GetLeftBumperReleased();
 
   /**
    * Whether the right bumper (RB) was released since the last check.
+   *
+   * @return Whether the button was released since the last check.
    */
   bool GetRightBumperReleased();
 
@@ -116,31 +140,43 @@ class XboxController : public GenericHID {
 
   /**
    * Read the value of the left stick button (LSB) on the controller.
+   *
+   * @return the state of the button
    */
   bool GetLeftStickButton() const;
 
   /**
    * Read the value of the right stick button (RSB) on the controller.
+   *
+   * @return the state of the button
    */
   bool GetRightStickButton() const;
 
   /**
    * Whether the left stick button (LSB) was pressed since the last check.
+   *
+   * @return Whether the button was pressed since the last check.
    */
   bool GetLeftStickButtonPressed();
 
   /**
    * Whether the right stick button (RSB) was pressed since the last check.
+   *
+   * @return Whether the button was pressed since the last check
    */
   bool GetRightStickButtonPressed();
 
   /**
    * Whether the left stick button (LSB) was released since the last check.
+   *
+   * @return Whether the button was released since the last check.
    */
   bool GetLeftStickButtonReleased();
 
   /**
    * Whether the right stick button (RSB) was released since the last check.
+   *
+   * @return Whether the button was released since the last check.
    */
   bool GetRightStickButtonReleased();
 

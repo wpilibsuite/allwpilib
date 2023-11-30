@@ -77,7 +77,7 @@ public:
   explicit StringMapEntryStorage(size_t keyLength)
       : StringMapEntryBase(keyLength), second() {}
   template <typename... InitTy>
-  StringMapEntryStorage(size_t keyLength, InitTy &&... initVals)
+  StringMapEntryStorage(size_t keyLength, InitTy &&...initVals)
       : StringMapEntryBase(keyLength),
         second(std::forward<InitTy>(initVals)...) {}
   StringMapEntryStorage(StringMapEntryStorage &e) = delete;
@@ -88,9 +88,11 @@ public:
   void setValue(const ValueTy &V) { second = V; }
 };
 
-template <> class StringMapEntryStorage<std::nullopt_t> : public StringMapEntryBase {
+template <>
+class StringMapEntryStorage<std::nullopt_t> : public StringMapEntryBase {
 public:
-  explicit StringMapEntryStorage(size_t keyLength, std::nullopt_t = std::nullopt)
+  explicit StringMapEntryStorage(size_t keyLength,
+                                 std::nullopt_t = std::nullopt)
       : StringMapEntryBase(keyLength) {}
   StringMapEntryStorage(StringMapEntryStorage &entry) = delete;
 
@@ -104,6 +106,8 @@ template <typename ValueTy>
 class StringMapEntry final : public StringMapEntryStorage<ValueTy> {
 public:
   using StringMapEntryStorage<ValueTy>::StringMapEntryStorage;
+
+  using ValueType = ValueTy;
 
   std::string_view getKey() const {
     return std::string_view(getKeyData(), this->getKeyLength());
@@ -123,7 +127,7 @@ public:
   /// Create a StringMapEntry for the specified key construct the value using
   /// \p InitiVals.
   template <typename AllocatorTy, typename... InitTy>
-  static StringMapEntry *Create(std::string_view key, AllocatorTy &allocator,
+  static StringMapEntry *create(std::string_view key, AllocatorTy &allocator,
                                 InitTy &&... initVals) {
     return new (StringMapEntryBase::allocateWithKey(
         sizeof(StringMapEntry), alignof(StringMapEntry), key, allocator))
@@ -148,6 +152,26 @@ public:
   }
 };
 
+// Allow structured bindings on StringMapEntry.
+template <std::size_t Index, typename ValueTy>
+decltype(auto) get(const StringMapEntry<ValueTy> &E) {
+  static_assert(Index < 2);
+  if constexpr (Index == 0)
+    return E.first();
+  else
+    return E.second;
+}
+
 } // end namespace wpi
+
+namespace std {
+template <typename ValueTy>
+struct tuple_size<wpi::StringMapEntry<ValueTy>>
+    : std::integral_constant<std::size_t, 2> {};
+
+template <std::size_t I, typename ValueTy>
+struct tuple_element<I, wpi::StringMapEntry<ValueTy>>
+    : std::conditional<I == 0, std::string_view, ValueTy> {};
+} // namespace std
 
 #endif // WPIUTIL_WPI_STRINGMAPENTRY_H

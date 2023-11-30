@@ -139,17 +139,17 @@ void HAL_WriteAddressableLEDData(HAL_AddressableLEDHandle handle,
         status,
         fmt::format(
             "Data length must be less than or equal to {}. {} was requested",
-            SimAddressableLEDData[led->index].length, length));
+            SimAddressableLEDData[led->index].length.Get(), length));
     return;
   }
   SimAddressableLEDData[led->index].SetData(data, length);
 }
 
 void HAL_SetAddressableLEDBitTiming(HAL_AddressableLEDHandle handle,
-                                    int32_t lowTime0NanoSeconds,
                                     int32_t highTime0NanoSeconds,
-                                    int32_t lowTime1NanoSeconds,
+                                    int32_t lowTime0NanoSeconds,
                                     int32_t highTime1NanoSeconds,
+                                    int32_t lowTime1NanoSeconds,
                                     int32_t* status) {}
 
 void HAL_SetAddressableLEDSyncTime(HAL_AddressableLEDHandle handle,

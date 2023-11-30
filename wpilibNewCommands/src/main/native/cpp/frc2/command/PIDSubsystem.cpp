@@ -8,7 +8,8 @@
 
 using namespace frc2;
 
-PIDSubsystem::PIDSubsystem(PIDController controller, double initialPosition)
+PIDSubsystem::PIDSubsystem(frc::PIDController controller,
+                           double initialPosition)
     : m_controller{std::move(controller)} {
   SetSetpoint(initialPosition);
   AddChild("PID Controller", &m_controller);
@@ -42,6 +43,6 @@ bool PIDSubsystem::IsEnabled() {
   return m_enabled;
 }
 
-PIDController& PIDSubsystem::GetController() {
+frc::PIDController& PIDSubsystem::GetController() {
   return m_controller;
 }

@@ -26,16 +26,10 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: 3.8
-      - name: Install clang-format
-        run: |
-          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-          sudo sh -c "echo 'deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-14 main' >> /etc/apt/sources.list.d/proposed-repositories.list"
-          sudo apt-get update -q
-          sudo apt-get install -y clang-format-14
       - name: Install wpiformat
         run: pip3 install wpiformat
       - name: Run
-        run: wpiformat -clang 14
+        run: wpiformat
       - name: Check output
         run: git --no-pager diff --exit-code HEAD
       - name: Generate diff
@@ -70,20 +64,16 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: 3.8
-      - name: Install clang-tidy
-        run: |
-          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-          sudo sh -c "echo 'deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-14 main' >> /etc/apt/sources.list.d/proposed-repositories.list"
-          sudo apt-get update -q
-          sudo apt-get install -y clang-tidy-14 clang-format-14
       - name: Install wpiformat
         run: pip3 install wpiformat
       - name: Create compile_commands.json
         run: ./gradlew generateCompileCommands -Ptoolchain-optional-roboRio
       - name: List changed files
         run: wpiformat -list-changed-files
-      - name: Run clang-tidy
-        run: wpiformat -clang 14 -no-format -tidy-changed -compile-commands=build/compile_commands/linuxx86-64 -vv
+      - name: Run clang-tidy release
+        run: wpiformat -no-format -tidy-changed -compile-commands=build/TargetedCompileCommands/linuxx86-64release -vv
+      - name: Run clang-tidy debug
+        run: wpiformat -no-format -tidy-changed -compile-commands=build/TargetedCompileCommands/linuxx86-64debug -vv
   javaformat:
     name: "Java format"
     runs-on: ubuntu-22.04

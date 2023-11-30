@@ -209,10 +209,9 @@ inline std::span<WPI_Handle> WaitForObjects(
  * Sets up signaling for an arbitrary handle.  With this function, any handle
  * can operate like an event handle.
  *
- * @param handle handle
+ * @param handle Event handle
  * @param manualReset true for manual reset, false for automatic reset
  * @param initialState true to make the handle initially in signaled state
- * @return Event handle
  */
 void CreateSignalObject(WPI_Handle handle, bool manualReset = false,
                         bool initialState = false);

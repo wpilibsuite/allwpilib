@@ -7,6 +7,8 @@
 
 #include <stdint.h>
 
+#include <wpi/RawFrame.h>
+
 #ifdef __cplusplus
 #include <cstddef>
 #else
@@ -82,20 +84,6 @@ enum CS_LogLevel {
   CS_LOG_DEBUG2 = 8,
   CS_LOG_DEBUG3 = 7,
   CS_LOG_DEBUG4 = 6
-};
-
-/**
- * Pixel formats
- */
-enum CS_PixelFormat {
-  CS_PIXFMT_UNKNOWN = 0,
-  CS_PIXFMT_MJPEG,
-  CS_PIXFMT_YUYV,
-  CS_PIXFMT_RGB565,
-  CS_PIXFMT_BGR,
-  CS_PIXFMT_GRAY,
-  CS_PIXFMT_Y16,
-  CS_PIXFMT_UYVY
 };
 
 /**
@@ -302,11 +290,11 @@ void CS_GetSourceVideoMode(CS_Source source, CS_VideoMode* mode,
 CS_Bool CS_SetSourceVideoMode(CS_Source source, const CS_VideoMode* mode,
                               CS_Status* status);
 CS_Bool CS_SetSourceVideoModeDiscrete(CS_Source source,
-                                      enum CS_PixelFormat pixelFormat,
+                                      enum WPI_PixelFormat pixelFormat,
                                       int width, int height, int fps,
                                       CS_Status* status);
 CS_Bool CS_SetSourcePixelFormat(CS_Source source,
-                                enum CS_PixelFormat pixelFormat,
+                                enum WPI_PixelFormat pixelFormat,
                                 CS_Status* status);
 CS_Bool CS_SetSourceResolution(CS_Source source, int width, int height,
                                CS_Status* status);
@@ -382,8 +370,10 @@ void CS_SetSourceEnumPropertyChoices(CS_Source source, CS_Property property,
  */
 CS_Sink CS_CreateMjpegServer(const char* name, const char* listenAddress,
                              int port, CS_Status* status);
-CS_Sink CS_CreateCvSink(const char* name, CS_Status* status);
-CS_Sink CS_CreateCvSinkCallback(const char* name, void* data,
+CS_Sink CS_CreateCvSink(const char* name, enum WPI_PixelFormat pixelFormat,
+                        CS_Status* status);
+CS_Sink CS_CreateCvSinkCallback(const char* name,
+                                enum WPI_PixelFormat pixelFormat, void* data,
                                 void (*processFrame)(void* data, uint64_t time),
                                 CS_Status* status);
 /** @} */
@@ -504,7 +494,7 @@ void CS_FreeHttpCameraUrls(char** urls, int count);
 void CS_FreeEnumeratedProperties(CS_Property* properties, int count);
 void CS_FreeEnumeratedVideoModes(CS_VideoMode* modes, int count);
 
-char* CS_GetHostname();
+char* CS_GetHostname(void);
 
 char** CS_GetNetworkInterfaces(int* count);
 void CS_FreeNetworkInterfaces(char** interfaces, int count);

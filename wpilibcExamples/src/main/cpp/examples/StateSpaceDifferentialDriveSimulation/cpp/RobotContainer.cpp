@@ -91,8 +91,8 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
           DriveConstants::ks, DriveConstants::kv, DriveConstants::ka),
       DriveConstants::kDriveKinematics,
       [this] { return m_drive.GetWheelSpeeds(); },
-      frc2::PIDController{DriveConstants::kPDriveVel, 0, 0},
-      frc2::PIDController{DriveConstants::kPDriveVel, 0, 0},
+      frc::PIDController{DriveConstants::kPDriveVel, 0, 0},
+      frc::PIDController{DriveConstants::kPDriveVel, 0, 0},
       [this](auto left, auto right) { m_drive.TankDriveVolts(left, right); },
       {&m_drive});
 
