@@ -9,7 +9,7 @@ generate_resources(src/main/native/resources generated/main/cpp DLT dlt datalogt
 
 file(GLOB datalogtool_src src/main/native/cpp/*.cpp ${CMAKE_CURRENT_BINARY_DIR}/WPILibVersion.cpp)
 
-if (WIN32)
+if(WIN32)
     set(datalogtool_rc src/main/native/win/datalogtool.rc)
 elseif(APPLE)
     set(MACOSX_BUNDLE_ICON_FILE datalogtool.icns)
@@ -22,7 +22,7 @@ wpilib_link_macos_gui(datalogtool)
 target_link_libraries(datalogtool libglass ${LIBSSH_LIBRARIES})
 target_include_directories(datalogtool SYSTEM PRIVATE ${LIBSSH_INCLUDE_DIRS})
 
-if (WIN32)
+if(WIN32)
     set_target_properties(datalogtool PROPERTIES WIN32_EXECUTABLE YES)
 elseif(APPLE)
     set_target_properties(datalogtool PROPERTIES MACOSX_BUNDLE YES OUTPUT_NAME "datalogTool")

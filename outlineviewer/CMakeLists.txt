@@ -9,7 +9,7 @@ generate_resources(src/main/native/resources generated/main/cpp OV ov outlinevie
 
 file(GLOB outlineviewer_src src/main/native/cpp/*.cpp ${CMAKE_CURRENT_BINARY_DIR}/WPILibVersion.cpp)
 
-if (WIN32)
+if(WIN32)
     set(outlineviewer_rc src/main/native/win/outlineviewer.rc)
 elseif(APPLE)
     set(MACOSX_BUNDLE_ICON_FILE ov.icns)
@@ -22,7 +22,7 @@ wpilib_link_macos_gui(outlineviewer)
 wpilib_target_warnings(outlineviewer)
 target_link_libraries(outlineviewer libglassnt libglass)
 
-if (WIN32)
+if(WIN32)
     set_target_properties(outlineviewer PROPERTIES WIN32_EXECUTABLE YES)
 elseif(APPLE)
     set_target_properties(outlineviewer PROPERTIES MACOSX_BUNDLE YES OUTPUT_NAME "OutlineViewer")
