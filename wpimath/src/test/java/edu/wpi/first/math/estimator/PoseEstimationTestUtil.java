@@ -10,7 +10,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.Kinematics;
 import edu.wpi.first.math.kinematics.WheelPositions;
 
-public class PoseEstimationTestUtils {
+public class PoseEstimationTestUtil {
   /**
    * This class is intended for use as "drivetrain-agnostic" kinematics. Odometry measurements are
    * akin to Poses, while their difference is akin to Twists.

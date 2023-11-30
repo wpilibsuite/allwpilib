@@ -8,8 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
-import edu.wpi.first.math.estimator.PoseEstimationTestUtils.SE2KinematicPrimitive;
-import edu.wpi.first.math.estimator.PoseEstimationTestUtils.SE2Kinematics;
+import edu.wpi.first.math.estimator.PoseEstimationTestUtil.SE2KinematicPrimitive;
+import edu.wpi.first.math.estimator.PoseEstimationTestUtil.SE2Kinematics;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -19,7 +19,7 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-import edu.wpi.first.math.util.SamplingUtils;
+import edu.wpi.first.math.util.SamplingUtil;
 import java.util.List;
 import java.util.Random;
 import java.util.TreeMap;
@@ -149,7 +149,7 @@ class PoseEstimatorTest {
       // We are due for a new vision measurement if it's been `visionUpdateRate` seconds since the
       // last vision measurement
       if (visionUpdateQueue.isEmpty() || visionUpdateQueue.lastKey() + visionUpdateRate < t) {
-        var adjustment = SamplingUtils.sampleTwist2d(rand, visionStdDevs);
+        var adjustment = SamplingUtil.sampleTwist2d(rand, visionStdDevs);
         Pose2d newVisionPose = groundTruthState.poseMeters.exp(adjustment);
 
         visionUpdateQueue.put(t, newVisionPose);
@@ -167,11 +167,11 @@ class PoseEstimatorTest {
           groundTruthState
               .poseMeters
               .getRotation()
-              .plus(SamplingUtils.sampleRotation2d(rand, stateStdDevs.get(2, 0)));
+              .plus(SamplingUtil.sampleRotation2d(rand, stateStdDevs.get(2, 0)));
 
       var update =
           new SE2KinematicPrimitive(
-              groundTruthState.poseMeters.exp(SamplingUtils.sampleTwist2d(rand, stateStdDevs)));
+              groundTruthState.poseMeters.exp(SamplingUtil.sampleTwist2d(rand, stateStdDevs)));
 
       var xHat = estimator.updateWithTime(t, gyroAngle, update);
 
