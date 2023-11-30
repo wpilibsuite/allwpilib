@@ -68,7 +68,8 @@ class PlotSeries {
   DataSource* GetSource() const { return m_source; }
 
   enum Action { kNone, kMoveUp, kMoveDown, kDelete };
-  Action EmitPlot(PlotView& view, double now, size_t i, size_t plotIndex, double cursorTime=-1);
+  Action EmitPlot(PlotView& view, double now, size_t i, size_t plotIndex,
+                  double cursorTime = -1);
   void EmitSettings(size_t i);
   void EmitDragDropPayload(PlotView& view, size_t i, size_t plotIndex);
 
@@ -349,16 +350,17 @@ PlotSeries::Action PlotSeries::EmitPlot(PlotView& view, double now, size_t i,
     return ImPlotPoint{point->x - d->zeroTime, point->y};
   };
 
-  // Calculate if cursor time corresponds to some index of data drawn on the screen
+  // Calculate if cursor time corresponds to some index of data drawn on the
+  // screen
   int numPoints = getterData.size;
   int cursorIdx = -1;
   bool validIdx = false;
   double cursorVal = 0.0;
 
-  for(int i = 1; i < getterData.size-1; i++){
-    double prevPointTime = getterData.data[i-1].x - getterData.zeroTime;
-    double nextPointTime = getterData.data[i+1].x - getterData.zeroTime;
-    if(cursorTime > prevPointTime && cursorTime < nextPointTime){
+  for (int i = 1; i < getterData.size - 1; i++) {
+    double prevPointTime = getterData.data[i - 1].x - getterData.zeroTime;
+    double nextPointTime = getterData.data[i + 1].x - getterData.zeroTime;
+    if (cursorTime > prevPointTime && cursorTime < nextPointTime) {
       validIdx = true;
       cursorIdx = i;
     }
@@ -366,7 +368,7 @@ PlotSeries::Action PlotSeries::EmitPlot(PlotView& view, double now, size_t i,
 
   // Handle plot name (which includes value if cursor time is on the plot)
   char label[128];
-  if(validIdx){
+  if (validIdx) {
     cursorVal = getter(cursorIdx, &getterData).y;
     wpi::format_to_n_c_str(label, sizeof(label), "{} {}###name{}_{}", GetName(),
                            static_cast<double>(cursorVal), static_cast<int>(i),
@@ -374,8 +376,7 @@ PlotSeries::Action PlotSeries::EmitPlot(PlotView& view, double now, size_t i,
   } else {
     wpi::format_to_n_c_str(label, sizeof(label), "{}###name{}_{}", GetName(),
                            static_cast<int>(i), static_cast<int>(plotIndex));
-    }
-
+  }
 
   // Generate Plot
   if (m_color.GetColorFloat()[3] == IMPLOT_AUTO) {
@@ -395,14 +396,13 @@ PlotSeries::Action PlotSeries::EmitPlot(PlotView& view, double now, size_t i,
       ImPlot::SetAxis(ImAxis_Y1);
     }
     ImPlotRect plotArea = ImPlot::GetPlotLimits();
-    if(plotArea.Size().x > 5.0 ){
-      ImPlot::SetNextMarkerStyle(-1); //disable markers to prevent clutter
+    if (plotArea.Size().x > 5.0) {
+      ImPlot::SetNextMarkerStyle(-1);  // disable markers to prevent clutter
     } else {
       ImPlot::SetNextMarkerStyle(m_marker.GetValue() - 1);
     }
     ImPlot::PlotLineG(label, getter, &getterData, size + 1);
   }
-
 
   // DND source for PlotSeries
   if (ImPlot::BeginDragDropSourceItem(label)) {
@@ -674,22 +674,19 @@ void Plot::EmitPlot(PlotView& view, double now, bool paused, size_t i) {
 
     ImPlot::SetupFinish();
 
-    
-
-
     for (size_t j = 0; j < m_series.size(); ++j) {
-
-      //Manually generated cursor
+      // Manually generated cursor
       ImPlotRect plotArea = ImPlot::GetPlotLimits();
       ImPlotPoint mousePos = ImPlot::GetPlotMousePos();
-      if(mousePos.x > plotArea.X.Min && mousePos.x < plotArea.X.Max){
+      if (mousePos.x > plotArea.X.Min && mousePos.x < plotArea.X.Max) {
         double cursorXs[2], cursorYs[2];
         cursorXs[0] = mousePos.x;
         cursorXs[1] = mousePos.x;
         cursorYs[0] = plotArea.Y.Min;
         cursorYs[1] = plotArea.Y.Max;
         ImPlot::PushStyleColor(ImPlotCol_Line, ImVec4(1.0f, 1.0f, 0.0f, 1.0f));
-        ImPlot::PlotLine("Cursor", cursorXs, cursorYs, 2, ImPlotItemFlags_NoLegend);
+        ImPlot::PlotLine("Cursor", cursorXs, cursorYs, 2,
+                         ImPlotItemFlags_NoLegend);
         ImPlot::PopStyleColor();
       }
 
