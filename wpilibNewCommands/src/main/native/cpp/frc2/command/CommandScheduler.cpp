@@ -453,11 +453,12 @@ void CommandScheduler::OnCommandFinish(Action action) {
 }
 
 void CommandScheduler::RequireUngrouped(const Command* command) {
-  if (command->IsComposed()) {
+  auto stacktrace = command->GetPreviousCompositionSite();
+  if (stacktrace.has_value()) {
     throw FRC_MakeError(frc::err::CommandIllegalUse,
                         "Commands that have been composed may not be added to "
-                        "another composition or scheduled "
-                        "individually!");
+                        "another composition or scheduled individually!"
+                        "\nOriginally composed at:\n{}", stacktrace.value());
   }
 }
 

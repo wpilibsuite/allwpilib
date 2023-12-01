@@ -7,10 +7,12 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <optional>
 
 #include <units/time.h>
 #include <wpi/Demangle.h>
 #include <wpi/SmallSet.h>
+#include <wpi/StackTrace.h>
 #include <wpi/sendable/Sendable.h>
 
 #include "frc2/command/Requirements.h"
@@ -388,6 +390,14 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
   void SetComposed(bool isComposed);
 
   /**
+   * Get the stacktrace of where this command was composed, or an empty optional.
+   * Intended for internal use.
+   *
+   * @return optional string representation of the composition site stack trace.
+   */
+  std::optional<std::string> GetPreviousCompositionSite() const;
+
+  /**
    * Whether the given command should run when the robot is disabled.  Override
    * to return true if the command should run when disabled.
    *
@@ -424,7 +434,7 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
    */
   virtual std::unique_ptr<Command> TransferOwnership() && = 0;
 
-  bool m_isComposed = false;
+  std::optional<std::string> m_previousComposition;
 };
 
 /**
