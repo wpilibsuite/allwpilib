@@ -419,7 +419,7 @@ Each published topic may also have properties associated to it.  Properties are 
 |Property|Type|Description|Notes
 |`persistent`|boolean|Persistent Flag|If true, the last set value will be periodically saved to persistent storage on the server and be restored during server startup.  Topics with this property set to true will not be deleted by the server when the last publisher stops publishing.
 |`retained`|boolean|Retained Flag|Topics with this property set to true will not be deleted by the server when the last publisher stops publishing.
-|`cached`|boolean|Cached Flag|If false, the server will not store the value of the topic.  This means that clients will not receive a value on subscription (only for value changes after subscription), and the persistent property will not cause the last set value to be saved to persistent storage.
+|`cached`|boolean|Cached Flag|If false, the server and clients will not store the value of the topic.  This means that only value updates will be available for the topic.
 |===
 
 [[sub-options]]

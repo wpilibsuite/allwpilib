@@ -103,15 +103,15 @@ class Topic {
   bool IsRetained() const;
 
   /**
-   * Make the server store the latest value, making subscribers receive the
-   * initial value when they begin subscribing and allowing persistent storage.
+   * Allow storage of the topic's last value, allowing the value to be read (and
+   * not just accessed through event queues and listeners).
    *
    * @param cached True for cached, false for not cached.
    */
   void SetCached(bool cached);
 
   /**
-   * Returns whether the topic's last value is stored by the server.
+   * Returns whether the topic's last value is stored.
    *
    * @return True if the topic is cached.
    */

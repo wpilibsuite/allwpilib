@@ -118,8 +118,8 @@ public class Topic {
   }
 
   /**
-   * Allow the server to store the latest value, allowing subscribers to receive the initial value
-   * when they begin subscribing and allowing presistent storage.
+   * Allow storage of the topic's last value, allowing the value to be read (and not just accessed
+   * through event queues and listeners).
    *
    * @param cached True for cached, false for not cached.
    */
@@ -128,7 +128,7 @@ public class Topic {
   }
 
   /**
-   * Returns whether the topic's last value is stored by the server.
+   * Returns whether the topic's last value is stored.
    *
    * @return True if the topic is cached.
    */

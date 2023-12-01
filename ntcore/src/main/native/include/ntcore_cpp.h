@@ -682,9 +682,9 @@ void SetTopicRetained(NT_Topic topic, bool value);
 bool GetTopicRetained(NT_Topic topic);
 
 /**
- * Sets the cached property of a topic.  If true, the server will
- * store the latest value, causing subscribers to receive the initial value when
- * they begin subscribing and allowing persistent storage.
+ * Sets the cached property of a topic.  If true, the server and clients will
+ * store the latest value, allowing the value to be read (and not just accessed
+ * through event queues and listeners).
  *
  * @param topic topic handle
  * @param value True for cached, false for not cached
