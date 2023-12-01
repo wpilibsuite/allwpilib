@@ -550,7 +550,7 @@ public abstract class Command implements Sendable {
     var requirements = getRequirements();
     List<String> list = new ArrayList<>(requirements.size());
     for (Subsystem req : requirements) {
-      String simpleName = req.getClass().getSimpleName();
+      String simpleName = req.getName();
       list.add(simpleName);
     }
     var names = list.toArray(new String[0]);

@@ -199,6 +199,13 @@ void Command::InitSendable(wpi::SendableBuilder& builder) {
   }
   builder.PublishConstString("interruptBehavior", interruptBehaviorString);
   builder.PublishConstBoolean("runsWhenDisabled", RunsWhenDisabled());
+  auto requirements = GetRequirements();
+  std::vector<std::string> names;
+  names.reserve(requirements.size());
+  for (auto&& requirement : requirements) {
+    names.emplace_back(requirement->GetName());
+  }
+  builder.PublishConstStringArray("requirements", names);
 }
 
 namespace frc2 {
