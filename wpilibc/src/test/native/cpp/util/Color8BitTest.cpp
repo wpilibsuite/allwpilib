@@ -56,7 +56,9 @@ TEST(Color8BitTest, ImplicitConversionToColor) {
 }
 
 TEST(Color8BitTest, ToHexString) {
-  constexpr frc::Color8Bit color{255, 128, 64};
+  constexpr frc::Color8Bit color1{255, 128, 64};
+  EXPECT_EQ("#FF8040", color1.HexString());
 
-  EXPECT_EQ("#FF8040", color.HexString());
+  frc::Color8Bit color2{255, 128, 64};
+  EXPECT_EQ("#FF8040", color2.HexString());
 }
