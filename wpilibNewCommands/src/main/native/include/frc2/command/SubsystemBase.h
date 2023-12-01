@@ -30,7 +30,7 @@ class SubsystemBase : public Subsystem,
    *
    * @return Name
    */
-  std::string GetName() const;
+  std::string GetName() const override;
 
   /**
    * Sets the name of this Subsystem.
