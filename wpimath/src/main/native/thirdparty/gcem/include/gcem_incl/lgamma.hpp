@@ -28,6 +28,9 @@
 #ifndef _gcem_lgamma_HPP
 #define _gcem_lgamma_HPP
 
+#include <cmath>
+#include <type_traits>
+
 namespace internal
 {
 
@@ -129,7 +132,11 @@ return_t<T>
 lgamma(const T x)
 noexcept
 {
+  if (std::is_constant_evaluated()) {
     return internal::lgamma_check( static_cast<return_t<T>>(x) );
+  } else {
+    return std::lgamma(x);
+  }
 }
 
 #endif
