@@ -9,7 +9,8 @@ file(GLOB ntcore_native_src
     src/main/native/cpp/net/*.cpp
     src/main/native/cpp/net3/*.cpp
     src/main/native/cpp/networktables/*.cpp
-    src/main/native/cpp/tables/*.cpp)
+    src/main/native/cpp/tables/*.cpp
+)
 add_library(ntcore ${ntcore_native_src})
 set_target_properties(ntcore PROPERTIES DEBUG_POSTFIX "d")
 target_include_directories(ntcore
@@ -28,30 +29,36 @@ install(TARGETS ntcore EXPORT ntcore)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/ntcore")
 install(DIRECTORY src/generated/main/native/include DESTINATION "${include_dest}/ntcore")
 
-configure_file(ntcore-config.cmake.in ${WPILIB_BINARY_DIR}/ntcore-config.cmake )
+configure_file(ntcore-config.cmake.in ${WPILIB_BINARY_DIR}/ntcore-config.cmake)
 install(FILES ${WPILIB_BINARY_DIR}/ntcore-config.cmake DESTINATION share/ntcore)
 install(EXPORT ntcore DESTINATION share/ntcore)
 
 # Java bindings
-if (WITH_JAVA)
+if(WITH_JAVA)
     find_package(Java REQUIRED)
     find_package(JNI REQUIRED)
     include(UseJava)
     set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
 
-    file(GLOB QUICKBUF_JAR
-        ${WPILIB_BINARY_DIR}/wpiutil/thirdparty/quickbuf/*.jar)
+    file(GLOB QUICKBUF_JAR ${WPILIB_BINARY_DIR}/wpiutil/thirdparty/quickbuf/*.jar)
 
     set(CMAKE_JAVA_INCLUDE_PATH wpimath.jar ${QUICKBUF_JAR})
 
-    file(GLOB ntcore_jni_src
+    file(
+        GLOB ntcore_jni_src
         src/main/native/cpp/jni/*.cpp
         src/generated/main/native/cpp/jni/*.cpp)
 
     file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java src/generated/main/java/*.java)
     set(CMAKE_JNI_TARGET true)
 
-    add_jar(ntcore_jar ${JAVA_SOURCES} INCLUDE_JARS wpiutil_jar OUTPUT_NAME ntcore GENERATE_NATIVE_HEADERS ntcore_jni_headers)
+    add_jar(
+        ntcore_jar
+        ${JAVA_SOURCES}
+        INCLUDE_JARS wpiutil_jar
+        OUTPUT_NAME ntcore
+        GENERATE_NATIVE_HEADERS ntcore_jni_headers
+    )
 
     get_property(NTCORE_JAR_FILE TARGET ntcore_jar PROPERTY JAR_FILE)
     install(FILES ${NTCORE_JAR_FILE} DESTINATION "${java_lib_dest}")
@@ -64,7 +71,7 @@ if (WITH_JAVA)
 
     set_property(TARGET ntcorejni PROPERTY FOLDER "libraries")
 
-    if (MSVC)
+    if(MSVC)
         install(TARGETS ntcorejni RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)
     endif()
 
@@ -72,10 +79,9 @@ if (WITH_JAVA)
     add_dependencies(ntcorejni ntcore_jar)
 
     install(TARGETS ntcorejni EXPORT ntcorejni)
-
 endif()
 
-if (WITH_JAVA_SOURCE)
+if(WITH_JAVA_SOURCE)
     find_package(Java REQUIRED)
     include(UseJava)
     file(GLOB NTCORE_SOURCES src/main/java/edu/wpi/first/networktables/*.java src/generated/main/java/*.java)
@@ -93,7 +99,7 @@ add_executable(ntcoredev src/dev/native/cpp/main.cpp)
 wpilib_target_warnings(ntcoredev)
 target_link_libraries(ntcoredev ntcore)
 
-if (WITH_TESTS)
+if(WITH_TESTS)
     wpilib_add_test(ntcore src/test/native/cpp)
     target_include_directories(ntcore_test PRIVATE src/main/native/cpp)
     target_link_libraries(ntcore_test ntcore gmock_main wpiutil_testlib)

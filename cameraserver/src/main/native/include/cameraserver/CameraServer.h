@@ -195,9 +195,31 @@ class CameraServer {
    * Get OpenCV access to the specified camera.  This allows you to get
    * images from the camera for image processing on the roboRIO.
    *
+   * @param camera Camera (e.g. as returned by startAutomaticCapture).
+   * @param pixelFormat The desired pixelFormat of captured frames from the
+   * camera
+   */
+  static cs::CvSink GetVideo(const cs::VideoSource& camera,
+                             cs::VideoMode::PixelFormat pixelFormat);
+
+  /**
+   * Get OpenCV access to the specified camera.  This allows you to get
+   * images from the camera for image processing on the roboRIO.
+   *
    * @param name Camera name
    */
   static cs::CvSink GetVideo(std::string_view name);
+
+  /**
+   * Get OpenCV access to the specified camera.  This allows you to get
+   * images from the camera for image processing on the roboRIO.
+   *
+   * @param name Camera name
+   * @param pixelFormat The desired pixelFormat of captured frames from the
+   * camera
+   */
+  static cs::CvSink GetVideo(std::string_view name,
+                             cs::VideoMode::PixelFormat pixelFormat);
 
   /**
    * Create a MJPEG stream with OpenCV input. This can be called to pass custom

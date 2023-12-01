@@ -4,6 +4,7 @@
 
 #include "sysid/analysis/OLS.h"
 
+#include <cassert>
 #include <tuple>
 #include <vector>
 

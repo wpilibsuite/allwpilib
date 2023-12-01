@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Thu, 13 Jul 2023 22:13:47 -0700
-Subject: [PATCH 08/10] Use C++ atomics
+Subject: [PATCH 7/9] Use C++ atomics
 
 ---
  src/unix/async.c  | 25 +++++++++++++------------
@@ -91,7 +91,7 @@ index 0ff2669e30a628dbb2df9e28ba14b38cf14114e5..fef4ae93343edc0341179a1c4739dcd8
        continue;
  
 diff --git a/src/unix/core.c b/src/unix/core.c
-index f53adc156a7c454c492abaeac29d90be436785fc..ce7fd2cdfdd53410dc694450bd56dffc26ff4792 100644
+index 268fc9652f437eb0d0cda2a9e0b06b9e91eb9742..1a52716792d2dbbb71a4ebdd2255173b7447979b 100644
 --- a/src/unix/core.c
 +++ b/src/unix/core.c
 @@ -45,6 +45,7 @@
@@ -436,10 +436,10 @@ index 1bd217b5a15eed13a8349c479b53471dd36ca216..1304c6d8685cfd122cffea066dc668d1
  int uv__tcsetattr(int fd, int how, const struct termios *term) {
    int rc;
 diff --git a/src/uv-common.c b/src/uv-common.c
-index 3d802cf1d629272f281d07b9ea424ec259b4377e..569c6906b7e54c4af1c17564a18066b847ab7ca1 100644
+index 49126e50f07bac16d198775454b731f40630d1d1..1ce25c24d6c046f7aaeaa52dcfc4fafa5a738650 100644
 --- a/src/uv-common.c
 +++ b/src/uv-common.c
-@@ -954,7 +954,7 @@ void uv_free_cpu_info(uv_cpu_info_t* cpu_infos, int count) {
+@@ -953,7 +953,7 @@ void uv_free_cpu_info(uv_cpu_info_t* cpu_infos, int count) {
  __attribute__((destructor))
  #endif
  void uv_library_shutdown(void) {

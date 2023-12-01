@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 26 Apr 2022 15:19:14 -0400
-Subject: [PATCH 04/10] Preprocessor cleanup
+Subject: [PATCH 4/9] Preprocessor cleanup
 
 ---
  include/uv.h        | 12 ------------
