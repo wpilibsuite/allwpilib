@@ -377,6 +377,8 @@ class LocalStorage final : public net::ILocalStorage {
 
     bool Exists() const { return onNetwork || !localPublishers.empty(); }
 
+    bool Cached() const { return (flags & NT_CACHED) != 0; }
+
     TopicInfo GetTopicInfo() const;
 
     // invariants
@@ -581,10 +583,10 @@ class LocalStorage final : public net::ILocalStorage {
     void CheckReset(TopicData* topic);
 
     bool SetValue(TopicData* topic, const Value& value, unsigned int eventFlags,
-                  bool isDuplicate, bool suppressIfDuplicate,
-                  const PublisherData* publisher);
-    void NotifyValue(TopicData* topic, unsigned int eventFlags,
-                     bool isDuplicate, const PublisherData* publisher);
+                  bool suppressIfDuplicate, const PublisherData* publisher);
+    void NotifyValue(TopicData* topic, const Value& value,
+                     unsigned int eventFlags, bool isDuplicate,
+                     const PublisherData* publisher);
 
     void SetFlags(TopicData* topic, unsigned int flags);
     void SetPersistent(TopicData* topic, bool value);

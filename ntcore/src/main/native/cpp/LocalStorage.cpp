@@ -175,22 +175,26 @@ void LocalStorage::Impl::CheckReset(TopicData* topic) {
 }
 
 bool LocalStorage::Impl::SetValue(TopicData* topic, const Value& value,
-                                  unsigned int eventFlags, bool isDuplicate,
+                                  unsigned int eventFlags,
                                   bool suppressIfDuplicate,
                                   const PublisherData* publisher) {
+  const bool isDuplicate = topic->Cached() && topic->lastValue == value;
   DEBUG4("SetValue({}, {}, {}, {})", topic->name, value.time(), eventFlags,
          isDuplicate);
   if (topic->type != NT_UNASSIGNED && topic->type != value.type()) {
     return false;
   }
+  // Make sure value isn't older than last value
   if (!topic->lastValue || topic->lastValue.time() == 0 ||
       value.time() >= topic->lastValue.time()) {
     // TODO: notify option even if older value
     if (!(suppressIfDuplicate && isDuplicate)) {
       topic->type = value.type();
-      topic->lastValue = value;
-      topic->lastValueFromNetwork = false;
-      NotifyValue(topic, eventFlags, isDuplicate, publisher);
+      if (topic->Cached()) {
+        topic->lastValue = value;
+        topic->lastValueFromNetwork = false;
+      }
+      NotifyValue(topic, value, eventFlags, isDuplicate, publisher);
       if (topic->datalogType == value.type()) {
         for (auto&& datalog : topic->datalogs) {
           datalog.Append(value);
@@ -202,8 +206,8 @@ bool LocalStorage::Impl::SetValue(TopicData* topic, const Value& value,
   return true;
 }
 
-void LocalStorage::Impl::NotifyValue(TopicData* topic, unsigned int eventFlags,
-                                     bool isDuplicate,
+void LocalStorage::Impl::NotifyValue(TopicData* topic, const Value& value,
+                                     unsigned int eventFlags, bool isDuplicate,
                                      const PublisherData* publisher) {
   bool isNetwork = (eventFlags & NT_EVENT_VALUE_REMOTE) != 0;
   for (auto&& subscriber : topic->localSubscribers) {
@@ -213,11 +217,11 @@ void LocalStorage::Impl::NotifyValue(TopicData* topic, unsigned int eventFlags,
          (!isNetwork && !subscriber->config.disableLocal)) &&
         (!publisher || (publisher && (subscriber->config.excludePublisher !=
                                       publisher->handle)))) {
-      subscriber->pollStorage.emplace_back(topic->lastValue);
+      subscriber->pollStorage.emplace_back(value);
       subscriber->handle.Set();
       if (!subscriber->valueListeners.empty()) {
         m_listenerStorage.Notify(subscriber->valueListeners, eventFlags,
-                                 topic->handle, 0, topic->lastValue);
+                                 topic->handle, 0, value);
       }
     }
   }
@@ -227,7 +231,7 @@ void LocalStorage::Impl::NotifyValue(TopicData* topic, unsigned int eventFlags,
       subscriber->handle.Set();
       if (!subscriber->valueListeners.empty()) {
         m_listenerStorage.Notify(subscriber->valueListeners, eventFlags,
-                                 topic->handle, 0, topic->lastValue);
+                                 topic->handle, 0, value);
       }
     }
   }
@@ -255,6 +259,11 @@ void LocalStorage::Impl::SetFlags(TopicData* topic, unsigned int flags) {
   } else {
     topic->properties["cached"] = false;
     update["cached"] = false;
+  }
+  if ((flags & NT_CACHED) == 0) {
+    topic->lastValue = {};
+    topic->lastValueNetwork = {};
+    topic->lastValueFromNetwork = false;
   }
   if ((flags & NT_CACHED) == 0 && (flags & NT_PERSISTENT) != 0) {
     WARN("topic {}: disabling cached property disables persistent storage",
@@ -362,6 +371,12 @@ void LocalStorage::Impl::PropertiesUpdated(TopicData* topic,
           topic->flags &= ~NT_CACHED;
         }
       }
+    }
+
+    if ((topic->flags & NT_CACHED) == 0) {
+      topic->lastValue = {};
+      topic->lastValueNetwork = {};
+      topic->lastValueFromNetwork = false;
     }
 
     if ((topic->flags & NT_CACHED) == 0 &&
@@ -936,20 +951,22 @@ bool LocalStorage::Impl::PublishLocalValue(PublisherData* publisher,
     return false;
   }
   if (publisher->active) {
-    bool isDuplicate, isNetworkDuplicate, suppressDuplicates;
+    bool isNetworkDuplicate, suppressDuplicates;
     if (force || publisher->config.keepDuplicates) {
       suppressDuplicates = false;
       isNetworkDuplicate = false;
     } else {
       suppressDuplicates = true;
-      isNetworkDuplicate = (publisher->topic->lastValueNetwork == value);
+      isNetworkDuplicate = publisher->topic->Cached() &&
+                           (publisher->topic->lastValueNetwork == value);
     }
-    isDuplicate = (publisher->topic->lastValue == value);
     if (!isNetworkDuplicate && m_network) {
-      publisher->topic->lastValueNetwork = value;
+      if (publisher->topic->Cached()) {
+        publisher->topic->lastValueNetwork = value;
+      }
       m_network->SetValue(publisher->handle, value);
     }
-    return SetValue(publisher->topic, value, NT_EVENT_VALUE_LOCAL, isDuplicate,
+    return SetValue(publisher->topic, value, NT_EVENT_VALUE_LOCAL,
                     suppressDuplicates, publisher);
   } else {
     return false;
@@ -981,7 +998,7 @@ bool LocalStorage::Impl::SetDefaultEntryValue(NT_Handle pubsubentryHandle,
     return false;
   }
   if (auto topic = GetTopic(pubsubentryHandle)) {
-    if (!topic->lastValue &&
+    if (topic->Cached() && !topic->lastValue &&
         (topic->type == NT_UNASSIGNED || topic->type == value.type() ||
          IsNumericCompatible(topic->type, value.type()))) {
       // publish if we haven't yet
@@ -1067,10 +1084,11 @@ void LocalStorage::NetworkPropertiesUpdate(std::string_view name,
 void LocalStorage::NetworkSetValue(NT_Topic topicHandle, const Value& value) {
   std::scoped_lock lock{m_mutex};
   if (auto topic = m_impl.m_topics.Get(topicHandle)) {
-    if (m_impl.SetValue(topic, value, NT_EVENT_VALUE_REMOTE,
-                        value == topic->lastValue, false, nullptr)) {
-      topic->lastValueNetwork = value;
-      topic->lastValueFromNetwork = true;
+    if (m_impl.SetValue(topic, value, NT_EVENT_VALUE_REMOTE, false, nullptr)) {
+      if (topic->Cached()) {
+        topic->lastValueNetwork = value;
+        topic->lastValueFromNetwork = true;
+      }
     }
   }
 }
