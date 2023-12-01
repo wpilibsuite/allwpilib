@@ -31,10 +31,10 @@ def main():
 
     # Java files
     env = Environment(
-        loader=FileSystemLoader(f"{dirname}/src/generate/java"), autoescape=False
+        loader=FileSystemLoader(f"{dirname}/src/generate/main/java"), autoescape=False
     )
     rootPath = f"{dirname}/src/generated/main/java/edu/wpi/first/networktables"
-    for fn in glob.glob(f"{dirname}/src/generate/java/*.jinja"):
+    for fn in glob.glob(f"{dirname}/src/generate/main/java/*.jinja"):
         template = env.get_template(os.path.basename(fn))
         outfn = os.path.basename(fn)[:-6]  # drop ".jinja"
         if os.path.basename(fn).startswith("NetworkTable") or os.path.basename(
@@ -53,11 +53,15 @@ def main():
 
     # C++ classes
     env = Environment(
-        loader=FileSystemLoader(f"{dirname}/src/generate/include/networktables"),
+        loader=FileSystemLoader(
+            f"{dirname}/src/generate/main/native/include/networktables"
+        ),
         autoescape=False,
     )
     rootPath = f"{dirname}/src/generated/main/native/include/networktables"
-    for fn in glob.glob(f"{dirname}/src/generate/include/networktables/*.jinja"):
+    for fn in glob.glob(
+        f"{dirname}/src/generate/main/native/include/networktables/*.jinja"
+    ):
         template = env.get_template(os.path.basename(fn))
         outfn = os.path.basename(fn)[:-6]  # drop ".jinja"
         for replacements in types:
@@ -67,7 +71,8 @@ def main():
 
     # C++ handle API (header)
     env = Environment(
-        loader=FileSystemLoader(f"{dirname}/src/generate/include"), autoescape=False
+        loader=FileSystemLoader(f"{dirname}/src/generate/main/native/include"),
+        autoescape=False,
     )
     template = env.get_template("ntcore_cpp_types.h.jinja")
     output = template.render(types=types)
@@ -79,7 +84,8 @@ def main():
 
     # C++ handle API (source)
     env = Environment(
-        loader=FileSystemLoader(f"{dirname}/src/generate/cpp"), autoescape=False
+        loader=FileSystemLoader(f"{dirname}/src/generate/main/native/cpp"),
+        autoescape=False,
     )
     template = env.get_template("ntcore_cpp_types.cpp.jinja")
     output = template.render(types=types)
@@ -87,7 +93,8 @@ def main():
 
     # C handle API (header)
     env = Environment(
-        loader=FileSystemLoader(f"{dirname}/src/generate/include"), autoescape=False
+        loader=FileSystemLoader(f"{dirname}/src/generate/main/native/include"),
+        autoescape=False,
     )
     template = env.get_template("ntcore_c_types.h.jinja")
     output = template.render(types=types)
@@ -99,7 +106,8 @@ def main():
 
     # C handle API (source)
     env = Environment(
-        loader=FileSystemLoader(f"{dirname}/src/generate/cpp"), autoescape=False
+        loader=FileSystemLoader(f"{dirname}/src/generate/main/native/cpp"),
+        autoescape=False,
     )
     template = env.get_template("ntcore_c_types.cpp.jinja")
     output = template.render(types=types)
@@ -107,7 +115,8 @@ def main():
 
     # JNI
     env = Environment(
-        loader=FileSystemLoader(f"{dirname}/src/generate/cpp/jni"), autoescape=False
+        loader=FileSystemLoader(f"{dirname}/src/generate/main/native/cpp/jni"),
+        autoescape=False,
     )
     template = env.get_template("types_jni.cpp.jinja")
     output = template.render(types=types)
