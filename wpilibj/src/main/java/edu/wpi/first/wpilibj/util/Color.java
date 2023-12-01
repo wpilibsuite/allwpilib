@@ -21,6 +21,13 @@ public class Color {
   public final double blue;
   private String m_name;
 
+  /** Constructs a default color (black). */
+  public Color() {
+    red = 0.0;
+    green = 0.0;
+    blue = 0.0;
+  }
+
   /**
    * Constructs a Color from doubles.
    *

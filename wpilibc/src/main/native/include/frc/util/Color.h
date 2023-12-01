@@ -744,6 +744,9 @@ class Color {
    */
   static const Color kYellowGreen;
 
+  /**
+   * Constructs a default color (black).
+   */
   constexpr Color() = default;
 
   /**
@@ -783,12 +786,12 @@ class Color {
           fmt::format("Invalid hex string for Color \"{}\"", hexString));
     }
 
-    int r = wpi::hexDigitValue(hexString[0]) * 16 +
-            wpi::hexDigitValue(hexString[1]);
-    int g = wpi::hexDigitValue(hexString[2]) * 16 +
-            wpi::hexDigitValue(hexString[3]);
-    int b = wpi::hexDigitValue(hexString[4]) * 16 +
-            wpi::hexDigitValue(hexString[5]);
+    int r = wpi::hexDigitValue(hexString[1]) * 16 +
+            wpi::hexDigitValue(hexString[2]);
+    int g = wpi::hexDigitValue(hexString[3]) * 16 +
+            wpi::hexDigitValue(hexString[4]);
+    int b = wpi::hexDigitValue(hexString[5]) * 16 +
+            wpi::hexDigitValue(hexString[6]);
 
     red = r / 255.0;
     green = g / 255.0;

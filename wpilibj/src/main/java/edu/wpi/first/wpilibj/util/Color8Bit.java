@@ -14,6 +14,13 @@ public class Color8Bit {
   public final int green;
   public final int blue;
 
+  /** Constructs a default color (black). */
+  public Color8Bit() {
+    red = 0;
+    green = 0;
+    blue = 0;
+  }
+
   /**
    * Constructs a Color8Bit.
    *

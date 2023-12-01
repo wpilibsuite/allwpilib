@@ -21,6 +21,9 @@ namespace frc {
  */
 class Color8Bit {
  public:
+  /**
+   * Constructs a default color (black).
+   */
   constexpr Color8Bit() = default;
 
   /**
@@ -60,12 +63,12 @@ class Color8Bit {
           fmt::format("Invalid hex string for Color \"{}\"", hexString));
     }
 
-    red = wpi::hexDigitValue(hexString[0]) * 16 +
-          wpi::hexDigitValue(hexString[1]);
-    green = wpi::hexDigitValue(hexString[2]) * 16 +
-            wpi::hexDigitValue(hexString[3]);
-    blue = wpi::hexDigitValue(hexString[4]) * 16 +
-           wpi::hexDigitValue(hexString[5]);
+    red = wpi::hexDigitValue(hexString[1]) * 16 +
+          wpi::hexDigitValue(hexString[2]);
+    green = wpi::hexDigitValue(hexString[3]) * 16 +
+            wpi::hexDigitValue(hexString[4]);
+    blue = wpi::hexDigitValue(hexString[5]) * 16 +
+           wpi::hexDigitValue(hexString[6]);
   }
 
   constexpr bool operator==(const Color8Bit&) const = default;
