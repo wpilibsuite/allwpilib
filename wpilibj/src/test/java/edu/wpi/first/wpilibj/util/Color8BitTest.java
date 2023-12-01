@@ -20,5 +20,5 @@ class Color8BitTest {
   void testConstructFromHexString() {}
 
   @Test
-  void testHexString() {}
+  void testToHexString() {}
 }

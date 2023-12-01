@@ -16,4 +16,4 @@ TEST(Color8BitTest, ConstructFromHexString) {}
 
 TEST(Color8BitTest, ImplicitConversionToColor) {}
 
-TEST(Color8BitTest, HexString) {}
+TEST(Color8BitTest, ToHexString) {}

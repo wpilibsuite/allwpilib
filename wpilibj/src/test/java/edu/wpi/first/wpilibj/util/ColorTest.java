@@ -23,5 +23,5 @@ class ColorTest {
   void testFromHSV() {}
 
   @Test
-  void testHexString() {}
+  void testToHexString() {}
 }

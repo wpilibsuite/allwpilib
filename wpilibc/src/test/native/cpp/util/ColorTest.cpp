@@ -16,4 +16,4 @@ TEST(ColorTest, ConstructFromHexString) {}
 
 TEST(ColorTest, FromHSV) {}
 
-TEST(ColorTest, HexString) {}
+TEST(ColorTest, ToHexString) {}
