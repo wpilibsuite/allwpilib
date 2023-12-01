@@ -37,14 +37,16 @@ public class Color8Bit {
   }
 
   /**
-   * Create a Color8Bit from a hex string. Throws an exception if the Hex String is invalid.
+   * Create a Color8Bit from a hex string.
    *
    * @param hexString a string of the format <code>#RRGGBB</code>
    * @return Color8Bit object from hex string.
+   * @throws IllegalArgumentException if the hex string is invalid.
    */
   public static Color8Bit fromHexString(String hexString) {
-    if (hexString.length() != 7 || !hexString.startsWith("#"))
-      throw new IllegalArgumentException("Invalid Hex String");
+    if (hexString.length() != 7 || !hexString.startsWith("#")) {
+      throw new IllegalArgumentException("Invalid hex string \"" + hexString + "\"");
+    }
 
     return new Color8Bit(
         Integer.valueOf(hexString.substring(1, 3), 16),

@@ -116,19 +116,21 @@ public class Color {
   }
 
   /**
-   * Create a Color from a hex string. Throws an exception if the Hex String is invalid.
+   * Create a Color from a hex string.
    *
    * @param hexString a string of the format <code>#RRGGBB</code>
    * @return Color object from hex string.
+   * @throws IllegalArgumentException if the hex string is invalid.
    */
   public static Color fromHexString(String hexString) {
-    if (hexString.length() != 7 || !hexString.startsWith("#"))
-      throw new IllegalArgumentException("Invalid Hex String");
+    if (hexString.length() != 7 || !hexString.startsWith("#")) {
+      throw new IllegalArgumentException("Invalid hex string \"" + hexString + "\"");
+    }
 
     return new Color(
-        Integer.valueOf(hexString.substring(1, 3), 16) / 255.0,
-        Integer.valueOf(hexString.substring(3, 5), 16) / 255.0,
-        Integer.valueOf(hexString.substring(5, 7), 16) / 255.0);
+        Integer.valueOf(hexString.substring(1, 3), 16),
+        Integer.valueOf(hexString.substring(3, 5), 16),
+        Integer.valueOf(hexString.substring(5, 7), 16));
   }
 
   @Override

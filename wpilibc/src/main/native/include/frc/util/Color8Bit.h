@@ -7,6 +7,10 @@
 #include <algorithm>
 #include <stdexcept>
 #include <string>
+#include <string_view>
+
+#include <fmt/core.h>
+#include <wpi/StringExtras.h>
 
 #include "Color.h"
 
@@ -46,20 +50,28 @@ class Color8Bit {
   }
 
   /**
-   * Create a Color8Bit from a hex string. Throws an exception if the Hex String
-   * is invalid.
+   * Create a Color8Bit from a hex string.
    *
    * @param hexString a string of the format <tt>\#RRGGBB</tt>
    * @return Color8Bit object from hex string.
+   * @throws std::invalid_argument if the hex string is invalid.
    */
-  static constexpr Color8Bit FromHexString(std::string hexString) {
-    if (hexString.length() != 7 || !hexString.starts_with("#")) {
-      throw std::invalid_argument("Invalid Hex String for Color");
+  static constexpr Color8Bit FromHexString(std::string_view hexString) {
+    if (hexString.length() != 7 || !hexString.starts_with("#") ||
+        !wpi::isHexDigit(hexString[1]) || !wpi::isHexDigit(hexString[2]) ||
+        !wpi::isHexDigit(hexString[3]) || !wpi::isHexDigit(hexString[4]) ||
+        !wpi::isHexDigit(hexString[5]) || !wpi::isHexDigit(hexString[6])) {
+      throw std::invalid_argument(
+          fmt::format("Invalid hex string for Color \"{}\"", hexString));
     }
 
-    int r, g, b;
-    std::sscanf(hexString.c_str(), "#%02x%02x%02x", &r, &g, &b);
-    return Color8Bit(r, g, b);
+    int r = wpi::hexDigitValue(hexString[0]) * 16 +
+            wpi::hexDigitValue(hexString[1]);
+    int g = wpi::hexDigitValue(hexString[2]) * 16 +
+            wpi::hexDigitValue(hexString[3]);
+    int b = wpi::hexDigitValue(hexString[4]) * 16 +
+            wpi::hexDigitValue(hexString[5]);
+    return Color8Bit{r, g, b};
   }
 
   constexpr bool operator==(const Color8Bit&) const = default;
