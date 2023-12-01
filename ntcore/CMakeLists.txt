@@ -3,7 +3,8 @@ project(ntcore)
 include(CompileWarnings)
 include(AddTest)
 
-file(GLOB ntcore_native_src
+file(
+    GLOB ntcore_native_src
     src/main/native/cpp/*.cpp
     src/generated/main/native/cpp/*.cpp
     src/main/native/cpp/net/*.cpp
@@ -13,12 +14,14 @@ file(GLOB ntcore_native_src
 )
 add_library(ntcore ${ntcore_native_src})
 set_target_properties(ntcore PROPERTIES DEBUG_POSTFIX "d")
-target_include_directories(ntcore
-                PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/cpp
-                PUBLIC
-                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
-                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/generated/main/native/include>
-                            $<INSTALL_INTERFACE:${include_dest}/ntcore>)
+target_include_directories(
+    ntcore
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/cpp
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/generated/main/native/include>
+        $<INSTALL_INTERFACE:${include_dest}/ntcore>
+)
 wpilib_target_warnings(ntcore)
 target_compile_features(ntcore PUBLIC cxx_std_20)
 target_link_libraries(ntcore PUBLIC wpinet wpiutil)
@@ -44,10 +47,7 @@ if(WITH_JAVA)
 
     set(CMAKE_JAVA_INCLUDE_PATH wpimath.jar ${QUICKBUF_JAR})
 
-    file(
-        GLOB ntcore_jni_src
-        src/main/native/cpp/jni/*.cpp
-        src/generated/main/native/cpp/jni/*.cpp)
+    file(GLOB ntcore_jni_src src/main/native/cpp/jni/*.cpp src/generated/main/native/cpp/jni/*.cpp)
 
     file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java src/generated/main/java/*.java)
     set(CMAKE_JNI_TARGET true)
@@ -84,10 +84,17 @@ endif()
 if(WITH_JAVA_SOURCE)
     find_package(Java REQUIRED)
     include(UseJava)
-    file(GLOB NTCORE_SOURCES src/main/java/edu/wpi/first/networktables/*.java src/generated/main/java/*.java)
-    add_jar(ntcore_src_jar
-    RESOURCES NAMESPACE "edu/wpi/first/networktables" ${NTCORE_SOURCES}
-    OUTPUT_NAME ntcore-sources)
+    file(
+        GLOB NTCORE_SOURCES
+        src/main/java/edu/wpi/first/networktables/*.java
+        src/generated/main/java/*.java
+    )
+    add_jar(
+        ntcore_src_jar
+        RESOURCES
+        NAMESPACE "edu/wpi/first/networktables" ${NTCORE_SOURCES}
+        OUTPUT_NAME ntcore-sources
+    )
 
     get_property(NTCORE_SRC_JAR_FILE TARGET ntcore_src_jar PROPERTY JAR_FILE)
     install(FILES ${NTCORE_SRC_JAR_FILE} DESTINATION "${java_lib_dest}")
