@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
-class CircularBufferTest {
+class DoubleCircularBufferTest {
   private final double[] m_values = {
     751.848, 766.366, 342.657, 234.252, 716.126, 132.344, 445.697, 22.727, 421.125, 799.913
   };
@@ -21,7 +21,7 @@ class CircularBufferTest {
 
   @Test
   void addFirstTest() {
-    var queue = new CircularBuffer<Double>(8);
+    var queue = new DoubleCircularBuffer(8);
 
     for (double value : m_values) {
       queue.addFirst(value);
@@ -34,7 +34,7 @@ class CircularBufferTest {
 
   @Test
   void addLastTest() {
-    var queue = new CircularBuffer<Double>(8);
+    var queue = new DoubleCircularBuffer(8);
 
     for (double value : m_values) {
       queue.addLast(value);
@@ -47,7 +47,7 @@ class CircularBufferTest {
 
   @Test
   void pushPopTest() {
-    var queue = new CircularBuffer<Double>(3);
+    var queue = new DoubleCircularBuffer(3);
 
     // Insert three elements into the buffer
     queue.addLast(1.0);
@@ -91,20 +91,22 @@ class CircularBufferTest {
 
   @Test
   void resetTest() {
-    var queue = new CircularBuffer<Double>(5);
+    var queue = new DoubleCircularBuffer(5);
 
     for (int i = 0; i < 6; i++) {
-      queue.addLast((double) i);
+      queue.addLast(i);
     }
 
     queue.clear();
 
-    assertEquals(0, queue.size());
+    for (int i = 0; i < 5; i++) {
+      assertEquals(0.0, queue.get(i), 0.00005);
+    }
   }
 
   @Test
   void resizeTest() {
-    var queue = new CircularBuffer<Double>(5);
+    var queue = new DoubleCircularBuffer(5);
 
     /* Buffer contains {1, 2, 3, _, _}
      *                  ^ front
