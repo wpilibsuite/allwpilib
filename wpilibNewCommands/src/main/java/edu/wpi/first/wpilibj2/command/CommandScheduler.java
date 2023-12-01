@@ -623,12 +623,13 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
    * @throws IllegalArgumentException if the given commands have already been composed.
    */
   public void requireNotComposed(Command... commands) {
-    for (var command: commands) {
+    for (var command : commands) {
       var exception = m_composedCommands.getOrDefault(command, null);
       if (exception != null) {
         throw new IllegalArgumentException(
-                "Commands that have been composed may not be added to another composition or scheduled "
-                + "individually!", exception);
+            "Commands that have been composed may not be added to another composition or scheduled "
+                + "individually!",
+            exception);
       }
     }
   }
