@@ -4,43 +4,43 @@ Date: Sun, 26 Nov 2023 18:09:12 -0800
 Subject: [PATCH] Call std functions if not constant-evaluated
 
 ---
- include/gcem_incl/abs.hpp      | 7 +++++++
- include/gcem_incl/acos.hpp     | 7 +++++++
- include/gcem_incl/acosh.hpp    | 7 +++++++
- include/gcem_incl/asin.hpp     | 7 +++++++
- include/gcem_incl/asinh.hpp    | 7 +++++++
- include/gcem_incl/atan.hpp     | 7 +++++++
- include/gcem_incl/atan2.hpp    | 7 +++++++
- include/gcem_incl/atanh.hpp    | 7 +++++++
- include/gcem_incl/beta.hpp     | 7 +++++++
- include/gcem_incl/ceil.hpp     | 7 +++++++
- include/gcem_incl/copysign.hpp | 7 +++++++
- include/gcem_incl/cos.hpp      | 7 +++++++
- include/gcem_incl/cosh.hpp     | 7 +++++++
- include/gcem_incl/erf.hpp      | 7 +++++++
- include/gcem_incl/exp.hpp      | 7 +++++++
- include/gcem_incl/expm1.hpp    | 7 +++++++
- include/gcem_incl/floor.hpp    | 7 +++++++
- include/gcem_incl/fmod.hpp     | 7 +++++++
- include/gcem_incl/hypot.hpp    | 7 +++++++
- include/gcem_incl/lgamma.hpp   | 7 +++++++
- include/gcem_incl/log.hpp      | 7 +++++++
- include/gcem_incl/log10.hpp    | 7 +++++++
- include/gcem_incl/log1p.hpp    | 7 +++++++
- include/gcem_incl/log2.hpp     | 7 +++++++
- include/gcem_incl/max.hpp      | 7 +++++++
- include/gcem_incl/min.hpp      | 7 +++++++
- include/gcem_incl/pow.hpp      | 7 +++++++
- include/gcem_incl/round.hpp    | 7 +++++++
- include/gcem_incl/signbit.hpp  | 7 +++++++
- include/gcem_incl/sin.hpp      | 7 +++++++
- include/gcem_incl/sinh.hpp     | 7 +++++++
- include/gcem_incl/sqrt.hpp     | 7 +++++++
- include/gcem_incl/tan.hpp      | 7 +++++++
- include/gcem_incl/tanh.hpp     | 7 +++++++
- include/gcem_incl/tgamma.hpp   | 7 +++++++
- include/gcem_incl/trunc.hpp    | 7 +++++++
- 36 files changed, 252 insertions(+)
+ include/gcem_incl/abs.hpp      |  7 +++++++
+ include/gcem_incl/acos.hpp     |  7 +++++++
+ include/gcem_incl/acosh.hpp    |  7 +++++++
+ include/gcem_incl/asin.hpp     |  7 +++++++
+ include/gcem_incl/asinh.hpp    |  7 +++++++
+ include/gcem_incl/atan.hpp     |  7 +++++++
+ include/gcem_incl/atan2.hpp    |  7 +++++++
+ include/gcem_incl/atanh.hpp    |  7 +++++++
+ include/gcem_incl/beta.hpp     | 11 +++++++++++
+ include/gcem_incl/ceil.hpp     |  7 +++++++
+ include/gcem_incl/copysign.hpp |  7 +++++++
+ include/gcem_incl/cos.hpp      |  7 +++++++
+ include/gcem_incl/cosh.hpp     |  7 +++++++
+ include/gcem_incl/erf.hpp      |  7 +++++++
+ include/gcem_incl/exp.hpp      |  7 +++++++
+ include/gcem_incl/expm1.hpp    |  7 +++++++
+ include/gcem_incl/floor.hpp    |  7 +++++++
+ include/gcem_incl/fmod.hpp     |  7 +++++++
+ include/gcem_incl/hypot.hpp    |  7 +++++++
+ include/gcem_incl/lgamma.hpp   |  7 +++++++
+ include/gcem_incl/log.hpp      |  7 +++++++
+ include/gcem_incl/log10.hpp    |  7 +++++++
+ include/gcem_incl/log1p.hpp    |  7 +++++++
+ include/gcem_incl/log2.hpp     |  7 +++++++
+ include/gcem_incl/max.hpp      |  7 +++++++
+ include/gcem_incl/min.hpp      |  7 +++++++
+ include/gcem_incl/pow.hpp      |  7 +++++++
+ include/gcem_incl/round.hpp    |  7 +++++++
+ include/gcem_incl/signbit.hpp  |  7 +++++++
+ include/gcem_incl/sin.hpp      |  7 +++++++
+ include/gcem_incl/sinh.hpp     |  7 +++++++
+ include/gcem_incl/sqrt.hpp     |  7 +++++++
+ include/gcem_incl/tan.hpp      |  7 +++++++
+ include/gcem_incl/tanh.hpp     |  7 +++++++
+ include/gcem_incl/tgamma.hpp   |  7 +++++++
+ include/gcem_incl/trunc.hpp    |  7 +++++++
+ 36 files changed, 256 insertions(+)
 
 diff --git a/include/gcem_incl/abs.hpp b/include/gcem_incl/abs.hpp
 index 6d7b66d91bc9f4d0c05fd0c3dd1571b552d8a19a..32ee89494c088a51862f00aecadeb180c0159997 100644
@@ -256,7 +256,7 @@ index dfb4dc312d479e2c6dd837d2391bc658e3b678ed..753d469857e5d618c447887f03991a76
  
  #endif
 diff --git a/include/gcem_incl/beta.hpp b/include/gcem_incl/beta.hpp
-index e43d4fcd9a10e37e16652351ec7092cb7200f808..b47efb7a6e2c2d14924ac6eda304d1ab330ed48c 100644
+index e43d4fcd9a10e37e16652351ec7092cb7200f808..b7da514a255b71714766deeee87906e4af3bef09 100644
 --- a/include/gcem_incl/beta.hpp
 +++ b/include/gcem_incl/beta.hpp
 @@ -21,6 +21,9 @@
@@ -269,14 +269,18 @@ index e43d4fcd9a10e37e16652351ec7092cb7200f808..b47efb7a6e2c2d14924ac6eda304d1ab
  /**
   * Compile-time beta function
   *
-@@ -36,7 +39,11 @@ common_return_t<T1,T2>
+@@ -36,7 +39,15 @@ common_return_t<T1,T2>
  beta(const T1 a, const T2 b)
  noexcept
  {
 +  if (std::is_constant_evaluated()) {
-     return exp( lbeta(a,b) );
++    return exp( lbeta(a,b) );
 +  } else {
++#ifdef __cpp_lib_math_special_functions
 +    return std::beta(a, b);
++#else
+     return exp( lbeta(a,b) );
++#endif
 +  }
  }
  

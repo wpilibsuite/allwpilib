@@ -42,7 +42,11 @@ noexcept
   if (std::is_constant_evaluated()) {
     return exp( lbeta(a,b) );
   } else {
+#ifdef __cpp_lib_math_special_functions
     return std::beta(a, b);
+#else
+    return exp( lbeta(a,b) );
+#endif
   }
 }
 
