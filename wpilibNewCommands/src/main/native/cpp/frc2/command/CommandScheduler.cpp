@@ -458,7 +458,8 @@ void CommandScheduler::RequireUngrouped(const Command* command) {
     throw FRC_MakeError(frc::err::CommandIllegalUse,
                         "Commands that have been composed may not be added to "
                         "another composition or scheduled individually!"
-                        "\nOriginally composed at:\n{}", stacktrace.value());
+                        "\nOriginally composed at:\n{}",
+                        stacktrace.value());
   }
 }
 

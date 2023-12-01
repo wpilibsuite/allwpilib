@@ -6,8 +6,8 @@
 
 #include <functional>
 #include <memory>
-#include <string>
 #include <optional>
+#include <string>
 
 #include <units/time.h>
 #include <wpi/Demangle.h>
@@ -390,8 +390,8 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
   void SetComposed(bool isComposed);
 
   /**
-   * Get the stacktrace of where this command was composed, or an empty optional.
-   * Intended for internal use.
+   * Get the stacktrace of where this command was composed, or an empty
+   * optional. Intended for internal use.
    *
    * @return optional string representation of the composition site stack trace.
    */

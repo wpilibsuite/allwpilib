@@ -36,7 +36,8 @@ CommandPtr::CommandPtr(CommandPtr&& rhs) {
 void CommandPtr::AssertValid() const {
   if (!m_ptr) {
     throw FRC_MakeError(frc::err::CommandIllegalUse,
-                        "Moved-from CommandPtr object used!\nMoved out at:\n{}", m_moveOutSite);
+                        "Moved-from CommandPtr object used!\nMoved out at:\n{}",
+                        m_moveOutSite);
   }
 }
 
