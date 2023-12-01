@@ -17,10 +17,10 @@ class ColorTest {
   void testConstructFromInts() {}
 
   @Test
-  void testFromHSV() {}
+  void testConstructFromHexString() {}
 
   @Test
-  void testFromHexString() {}
+  void testFromHSV() {}
 
   @Test
   void testHexString() {}

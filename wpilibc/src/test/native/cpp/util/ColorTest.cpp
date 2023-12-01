@@ -12,8 +12,8 @@ TEST(ColorTest, ConstructFromDoubles) {}
 
 TEST(ColorTest, ConstructFromInts) {}
 
-TEST(ColorTest, FromHSV) {}
+TEST(ColorTest, ConstructFromHexString) {}
 
-TEST(ColorTest, FromHexString) {}
+TEST(ColorTest, FromHSV) {}
 
 TEST(ColorTest, HexString) {}

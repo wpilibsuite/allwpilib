@@ -46,6 +46,29 @@ class Color8Bit {
         green(color.green * 255),
         blue(color.blue * 255) {}
 
+  /**
+   * Constructs a Color8Bit from a hex string.
+   *
+   * @param hexString a string of the format <tt>\#RRGGBB</tt>
+   * @throws std::invalid_argument if the hex string is invalid.
+   */
+  explicit constexpr Color8Bit(std::string_view hexString) {
+    if (hexString.length() != 7 || !hexString.starts_with("#") ||
+        !wpi::isHexDigit(hexString[1]) || !wpi::isHexDigit(hexString[2]) ||
+        !wpi::isHexDigit(hexString[3]) || !wpi::isHexDigit(hexString[4]) ||
+        !wpi::isHexDigit(hexString[5]) || !wpi::isHexDigit(hexString[6])) {
+      throw std::invalid_argument(
+          fmt::format("Invalid hex string for Color \"{}\"", hexString));
+    }
+
+    red = wpi::hexDigitValue(hexString[0]) * 16 +
+          wpi::hexDigitValue(hexString[1]);
+    green = wpi::hexDigitValue(hexString[2]) * 16 +
+            wpi::hexDigitValue(hexString[3]);
+    blue = wpi::hexDigitValue(hexString[4]) * 16 +
+           wpi::hexDigitValue(hexString[5]);
+  }
+
   constexpr bool operator==(const Color8Bit&) const = default;
 
   constexpr operator Color() const {  // NOLINT
