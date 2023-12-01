@@ -19,7 +19,7 @@ def main():
 
     # Apply patches to upstream Git repo
     os.chdir(upstream_root)
-    for f in []:
+    for f in ["0001-Call-std-functions-if-not-constant-evaluated.patch"]:
         git_am(os.path.join(wpilib_root, "upstream_utils/gcem_patches", f))
 
     # Delete old install
