@@ -107,9 +107,7 @@ class Color8Bit {
    *
    * @return a string of the format <tt>\#RRGGBB</tt>
    */
-  std::string HexString() const {
-    return fmt::format("#{:02X}{:02X}{:02X}", red, green, blue);
-  }
+  std::string HexString() const;
 
   int red = 0;
   int green = 0;

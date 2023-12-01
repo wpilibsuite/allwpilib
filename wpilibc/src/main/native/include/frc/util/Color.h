@@ -851,11 +851,7 @@ class Color {
    *
    * @return a string of the format <tt>\#RRGGBB</tt>
    */
-  std::string HexString() const {
-    return fmt::format("#{:02X}{:02X}{:02X}", static_cast<int>(255.0 * red),
-                       static_cast<int>(255.0 * green),
-                       static_cast<int>(255.0 * blue));
-  }
+  std::string HexString() const;
 
   double red = 0.0;
   double green = 0.0;
