@@ -8,6 +8,7 @@
 #include <stdexcept>
 #include <string>
 #include <string_view>
+#include <type_traits>
 
 #include <fmt/core.h>
 #include <wpi/StringExtras.h>
@@ -846,7 +847,26 @@ class Color {
    *
    * @return a string of the format <tt>\#RRGGBB</tt>
    */
-  std::string HexString() const;
+  constexpr std::string HexString() const {
+    int r = static_cast<int>(255.0 * red);
+    int g = static_cast<int>(255.0 * green);
+    int b = static_cast<int>(255.0 * blue);
+
+    if (std::is_constant_evaluated()) {
+      std::string str = "#";
+
+      str += wpi::hexdigit(r / 16);
+      str += wpi::hexdigit(r % 16);
+      str += wpi::hexdigit(g / 16);
+      str += wpi::hexdigit(g % 16);
+      str += wpi::hexdigit(b / 16);
+      str += wpi::hexdigit(b % 16);
+
+      return str;
+    } else {
+      return fmt::format("#{:02X}{:02X}{:02X}", r, g, b);
+    }
+  }
 
   double red = 0.0;
   double green = 0.0;

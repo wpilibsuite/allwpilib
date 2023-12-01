@@ -8,6 +8,7 @@
 #include <stdexcept>
 #include <string>
 #include <string_view>
+#include <type_traits>
 
 #include <fmt/core.h>
 #include <wpi/StringExtras.h>
@@ -45,6 +46,8 @@ class Color8Bit {
         green(color.green * 255),
         blue(color.blue * 255) {}
 
+  constexpr bool operator==(const Color8Bit&) const = default;
+
   constexpr operator Color() const {  // NOLINT
     return Color(red / 255.0, green / 255.0, blue / 255.0);
   }
@@ -74,14 +77,27 @@ class Color8Bit {
     return Color8Bit{r, g, b};
   }
 
-  constexpr bool operator==(const Color8Bit&) const = default;
-
   /**
    * Return this color represented as a hex string.
    *
    * @return a string of the format <tt>\#RRGGBB</tt>
    */
-  std::string HexString() const;
+  constexpr std::string HexString() const {
+    if (std::is_constant_evaluated()) {
+      std::string str = "#";
+
+      str += wpi::hexdigit(red / 16);
+      str += wpi::hexdigit(red % 16);
+      str += wpi::hexdigit(green / 16);
+      str += wpi::hexdigit(green % 16);
+      str += wpi::hexdigit(blue / 16);
+      str += wpi::hexdigit(blue % 16);
+
+      return str;
+    } else {
+      return fmt::format("#{:02X}{:02X}{:02X}", red, green, blue);
+    }
+  }
 
   int red = 0;
   int green = 0;
