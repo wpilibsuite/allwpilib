@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj;
 
+@SuppressWarnings("PMD.TestClassWithoutTestCases")
 class RobotControllerTest extends UtilityClassTest<RobotController> {
   RobotControllerTest() {
     super(RobotController.class);

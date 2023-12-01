@@ -9,6 +9,7 @@
     "cpp": {
       "ValueType": "bool",
       "ParamType": "bool",
+      "TemplateType": "bool",
       "TYPE_NAME": "BOOLEAN"
     },
     "java": {
@@ -40,6 +41,7 @@
     "cpp": {
       "ValueType": "int64_t",
       "ParamType": "int64_t",
+      "TemplateType": "int64_t",
       "TYPE_NAME": "INTEGER"
     },
     "java": {
@@ -71,6 +73,7 @@
     "cpp": {
       "ValueType": "float",
       "ParamType": "float",
+      "TemplateType": "float",
       "TYPE_NAME": "FLOAT"
     },
     "java": {
@@ -104,6 +107,7 @@
     "cpp": {
       "ValueType": "double",
       "ParamType": "double",
+      "TemplateType": "double",
       "TYPE_NAME": "DOUBLE"
     },
     "java": {
@@ -136,6 +140,7 @@
     "cpp": {
       "ValueType": "std::string",
       "ParamType": "std::string_view",
+      "TemplateType": "std::string",
       "TYPE_NAME": "STRING",
       "INCLUDES": "#include <string>\n#include <string_view>\n#include <utility>",
       "SmallRetType": "std::string_view",
@@ -168,6 +173,7 @@
     "cpp": {
       "ValueType": "std::vector<uint8_t>",
       "ParamType": "std::span<const uint8_t>",
+      "TemplateType": "uint8_t[]",
       "DefaultValueCopy": "defaultValue.begin(), defaultValue.end()",
       "TYPE_NAME": "RAW",
       "INCLUDES": "#include <utility>",
@@ -184,7 +190,7 @@
       "jtype": "jbyteArray",
       "jtypestr": "[B",
       "JavaObject": true,
-      "FromJavaBegin": "CriticalJByteArrayRef{env, ",
+      "FromJavaBegin": "CriticalJSpan<const jbyte>{env, ",
       "FromJavaEnd": "}.uarray()",
       "ToJavaBegin": "MakeJByteArray(env, ",
       "ToJavaEnd": ")",
@@ -202,6 +208,7 @@
     "cpp": {
       "ValueType": "std::vector<int>",
       "ParamType": "std::span<const int>",
+      "TemplateType": "bool[]",
       "DefaultValueCopy": "defaultValue.begin(), defaultValue.end()",
       "TYPE_NAME": "BOOLEAN_ARRAY",
       "INCLUDES": "#include <utility>",
@@ -237,6 +244,7 @@
     "cpp": {
       "ValueType": "std::vector<int64_t>",
       "ParamType": "std::span<const int64_t>",
+      "TemplateType": "int64_t[]",
       "DefaultValueCopy": "defaultValue.begin(), defaultValue.end()",
       "TYPE_NAME": "INTEGER_ARRAY",
       "INCLUDES": "#include <utility>",
@@ -254,7 +262,7 @@
       "jtype": "jlongArray",
       "jtypestr": "[J",
       "JavaObject": true,
-      "FromJavaBegin": "CriticalJLongArrayRef{env, ",
+      "FromJavaBegin": "CriticalJSpan<const jlong>{env, ",
       "FromJavaEnd": "}",
       "ToJavaBegin": "MakeJLongArray(env, ",
       "ToJavaEnd": ")",
@@ -272,6 +280,7 @@
     "cpp": {
       "ValueType": "std::vector<float>",
       "ParamType": "std::span<const float>",
+      "TemplateType": "float[]",
       "DefaultValueCopy": "defaultValue.begin(), defaultValue.end()",
       "TYPE_NAME": "FLOAT_ARRAY",
       "INCLUDES": "#include <utility>",
@@ -289,7 +298,7 @@
       "jtype": "jfloatArray",
       "jtypestr": "[F",
       "JavaObject": true,
-      "FromJavaBegin": "CriticalJFloatArrayRef{env, ",
+      "FromJavaBegin": "CriticalJSpan<const jfloat>{env, ",
       "FromJavaEnd": "}",
       "ToJavaBegin": "MakeJFloatArray(env, ",
       "ToJavaEnd": ")",
@@ -307,6 +316,7 @@
     "cpp": {
       "ValueType": "std::vector<double>",
       "ParamType": "std::span<const double>",
+      "TemplateType": "double[]",
       "DefaultValueCopy": "defaultValue.begin(), defaultValue.end()",
       "TYPE_NAME": "DOUBLE_ARRAY",
       "INCLUDES": "#include <utility>",
@@ -324,7 +334,7 @@
       "jtype": "jdoubleArray",
       "jtypestr": "[D",
       "JavaObject": true,
-      "FromJavaBegin": "CriticalJDoubleArrayRef{env, ",
+      "FromJavaBegin": "CriticalJSpan<const jdouble>{env, ",
       "FromJavaEnd": "}",
       "ToJavaBegin": "MakeJDoubleArray(env, ",
       "ToJavaEnd": ")",
@@ -342,6 +352,7 @@
     "cpp": {
       "ValueType": "std::vector<std::string>",
       "ParamType": "std::span<const std::string>",
+      "TemplateType": "std::string[]",
       "DefaultValueCopy": "defaultValue.begin(), defaultValue.end()",
       "TYPE_NAME": "STRING_ARRAY",
       "INCLUDES": "#include <utility>"

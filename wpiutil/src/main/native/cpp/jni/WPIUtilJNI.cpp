@@ -2,10 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "WPIUtilJNI.h"
+
 #include <jni.h>
 
+#include <fmt/format.h>
+
 #include "edu_wpi_first_util_WPIUtilJNI.h"
-#include "fmt/format.h"
+#include "wpi/RawFrame.h"
 #include "wpi/Synchronization.h"
 #include "wpi/jni_util.h"
 #include "wpi/timestamp.h"
@@ -15,7 +19,28 @@ using namespace wpi::java;
 static bool mockTimeEnabled = false;
 static uint64_t mockNow = 0;
 
+static JException illegalArgEx;
+static JException indexOobEx;
 static JException interruptedEx;
+static JException nullPointerEx;
+
+static const JExceptionInit exceptions[] = {
+    {"java/lang/IllegalArgumentException", &illegalArgEx},
+    {"java/lang/IndexOutOfBoundsException", &indexOobEx},
+    {"java/lang/InterruptedException", &interruptedEx},
+    {"java/lang/NullPointerException", &nullPointerEx}};
+
+void wpi::ThrowIllegalArgumentException(JNIEnv* env, std::string_view msg) {
+  illegalArgEx.Throw(env, msg);
+}
+
+void wpi::ThrowIndexOobException(JNIEnv* env, std::string_view msg) {
+  indexOobEx.Throw(env, msg);
+}
+
+void wpi::ThrowNullPointerException(JNIEnv* env, std::string_view msg) {
+  nullPointerEx.Throw(env, msg);
+}
 
 extern "C" {
 
@@ -25,9 +50,11 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
     return JNI_ERR;
   }
 
-  interruptedEx = JException(env, "java/lang/InterruptedException");
-  if (!interruptedEx) {
-    return JNI_ERR;
+  for (auto& c : exceptions) {
+    *c.cls = JException(env, c.name);
+    if (!*c.cls) {
+      return JNI_ERR;
+    }
   }
 
   return JNI_VERSION_1_6;
@@ -39,7 +66,9 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
     return;
   }
 
-  interruptedEx.free(env);
+  for (auto& c : exceptions) {
+    c.cls->free(env);
+  }
 }
 
 /*
@@ -51,7 +80,7 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_util_WPIUtilJNI_writeStderr
   (JNIEnv* env, jclass, jstring str)
 {
-  fmt::print(stderr, "{}", JStringRef{env, str});
+  fmt::print(stderr, "{}", JStringRef{env, str}.str());
 }
 
 /*
@@ -63,8 +92,12 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_util_WPIUtilJNI_enableMockTime
   (JNIEnv*, jclass)
 {
+#ifdef __FRC_ROBORIO__
+  fmt::print(stderr, "WPIUtil: Mocking time is not available on the Rio\n");
+#else
   mockTimeEnabled = true;
   wpi::SetNowImpl([] { return mockNow; });
+#endif
 }
 
 /*
@@ -244,11 +277,11 @@ JNIEXPORT jintArray JNICALL
 Java_edu_wpi_first_util_WPIUtilJNI_waitForObjects
   (JNIEnv* env, jclass, jintArray handles)
 {
-  JIntArrayRef handlesArr{env, handles};
+  JSpan<const jint> handlesArr{env, handles};
   wpi::SmallVector<WPI_Handle, 8> signaledBuf;
   signaledBuf.resize(handlesArr.size());
   std::span<const WPI_Handle> handlesArr2{
-      reinterpret_cast<const WPI_Handle*>(handlesArr.array().data()),
+      reinterpret_cast<const WPI_Handle*>(handlesArr.data()),
       handlesArr.size()};
 
   auto signaled = wpi::WaitForObjects(handlesArr2, signaledBuf);
@@ -268,11 +301,11 @@ JNIEXPORT jintArray JNICALL
 Java_edu_wpi_first_util_WPIUtilJNI_waitForObjectsTimeout
   (JNIEnv* env, jclass, jintArray handles, jdouble timeout)
 {
-  JIntArrayRef handlesArr{env, handles};
+  JSpan<const jint> handlesArr{env, handles};
   wpi::SmallVector<WPI_Handle, 8> signaledBuf;
   signaledBuf.resize(handlesArr.size());
   std::span<const WPI_Handle> handlesArr2{
-      reinterpret_cast<const WPI_Handle*>(handlesArr.array().data()),
+      reinterpret_cast<const WPI_Handle*>(handlesArr.data()),
       handlesArr.size()};
 
   bool timedOut;
@@ -283,6 +316,34 @@ Java_edu_wpi_first_util_WPIUtilJNI_waitForObjectsTimeout
     return nullptr;
   }
   return MakeJIntArray(env, signaled);
+}
+
+/*
+ * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Method:    allocateRawFrame
+ * Signature: ()J
+ */
+JNIEXPORT jlong JNICALL
+Java_edu_wpi_first_util_WPIUtilJNI_allocateRawFrame
+  (JNIEnv*, jclass)
+{
+  wpi::RawFrame* rawFrame = new wpi::RawFrame{};
+  intptr_t rawFrameIntPtr = reinterpret_cast<intptr_t>(rawFrame);
+  return static_cast<jlong>(rawFrameIntPtr);
+}
+
+/*
+ * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Method:    freeRawFrame
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_util_WPIUtilJNI_freeRawFrame
+  (JNIEnv*, jclass, jlong rawFrame)
+{
+  wpi::RawFrame* ptr =
+      reinterpret_cast<wpi::RawFrame*>(static_cast<intptr_t>(rawFrame));
+  delete ptr;
 }
 
 }  // extern "C"

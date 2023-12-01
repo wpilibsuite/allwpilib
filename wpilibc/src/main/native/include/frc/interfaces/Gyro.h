@@ -12,8 +12,11 @@ namespace frc {
 
 /**
  * Interface for yaw rate gyros.
+ *
+ * @deprecated This interface is being removed with no replacement.
  */
-class Gyro {
+class [[deprecated(
+    "This interface is being removed with no replacement.")]] Gyro {
  public:
   Gyro() = default;
   virtual ~Gyro() = default;

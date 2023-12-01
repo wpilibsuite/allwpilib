@@ -9,12 +9,11 @@ import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.Timer;
 
 /**
- * A command that does nothing but takes a specified amount of time to finish. Useful for
- * CommandGroups. Can also be subclassed to make a command with an internal timer.
+ * A command that does nothing but takes a specified amount of time to finish.
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public class WaitCommand extends CommandBase {
+public class WaitCommand extends Command {
   protected Timer m_timer = new Timer();
   private final double m_duration;
 

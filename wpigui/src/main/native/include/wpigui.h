@@ -128,7 +128,7 @@ bool AddIcon(const unsigned char* data, int len);
 
 inline bool AddIcon(std::string_view data) {
   return AddIcon(reinterpret_cast<const unsigned char*>(data.data()),
-                 data.size());
+                 static_cast<int>(data.size()));
 }
 
 /**

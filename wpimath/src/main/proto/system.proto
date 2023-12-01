@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package wpi.proto;
+
+import "wpimath.proto";
+
+option java_package = "edu.wpi.first.math.proto";
+
+message ProtobufLinearSystem {
+  uint32 num_states = 1;
+  uint32 num_inputs = 2;
+  uint32 num_outputs = 3;
+  ProtobufMatrix a = 4;
+  ProtobufMatrix b = 5;
+  ProtobufMatrix c = 6;
+  ProtobufMatrix d = 7;
+}

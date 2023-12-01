@@ -11,13 +11,11 @@
 #include <utility>
 #include <vector>
 
+#include <wpi/json_fwd.h>
+
 #include "networktables/NetworkTableType.h"
 #include "ntcore_c.h"
 #include "ntcore_cpp.h"
-
-namespace wpi {
-class json;
-}  // namespace wpi
 
 namespace nt {
 
@@ -169,7 +167,8 @@ class Topic {
    * @param options subscribe options
    * @return subscriber
    */
-  [[nodiscard]] GenericSubscriber GenericSubscribe(
+  [[nodiscard]]
+  GenericSubscriber GenericSubscribe(
       const PubSubOptions& options = kDefaultPubSubOptions);
 
   /**
@@ -186,7 +185,8 @@ class Topic {
    * @param options subscribe options
    * @return subscriber
    */
-  [[nodiscard]] GenericSubscriber GenericSubscribe(
+  [[nodiscard]]
+  GenericSubscriber GenericSubscribe(
       std::string_view typeString,
       const PubSubOptions& options = kDefaultPubSubOptions);
 
@@ -206,7 +206,8 @@ class Topic {
    * @param options publish options
    * @return publisher
    */
-  [[nodiscard]] GenericPublisher GenericPublish(
+  [[nodiscard]]
+  GenericPublisher GenericPublish(
       std::string_view typeString,
       const PubSubOptions& options = kDefaultPubSubOptions);
 
@@ -228,7 +229,8 @@ class Topic {
    * @param options publish options
    * @return publisher
    */
-  [[nodiscard]] GenericPublisher GenericPublishEx(
+  [[nodiscard]]
+  GenericPublisher GenericPublishEx(
       std::string_view typeString, const wpi::json& properties,
       const PubSubOptions& options = kDefaultPubSubOptions);
 
@@ -250,7 +252,8 @@ class Topic {
    * @param options publish and/or subscribe options
    * @return entry
    */
-  [[nodiscard]] GenericEntry GetGenericEntry(
+  [[nodiscard]]
+  GenericEntry GetGenericEntry(
       const PubSubOptions& options = kDefaultPubSubOptions);
 
   /**
@@ -272,7 +275,8 @@ class Topic {
    * @param options publish and/or subscribe options
    * @return entry
    */
-  [[nodiscard]] GenericEntry GetGenericEntry(
+  [[nodiscard]]
+  GenericEntry GetGenericEntry(
       std::string_view typeString,
       const PubSubOptions& options = kDefaultPubSubOptions);
 

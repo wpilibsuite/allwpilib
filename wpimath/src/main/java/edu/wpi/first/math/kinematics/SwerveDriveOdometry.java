@@ -17,14 +17,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
  * <p>Teams can use odometry during the autonomous period for complex tasks like path following.
  * Furthermore, odometry can be used for latency compensation when using computer-vision systems.
  */
-public class SwerveDriveOdometry {
-  private final SwerveDriveKinematics m_kinematics;
-  private Pose2d m_poseMeters;
-
-  private Rotation2d m_gyroOffset;
-  private Rotation2d m_previousAngle;
+public class SwerveDriveOdometry extends Odometry<SwerveDriveWheelPositions> {
   private final int m_numModules;
-  private SwerveModulePosition[] m_previousModulePositions;
 
   /**
    * Constructs a SwerveDriveOdometry object.
@@ -39,18 +33,9 @@ public class SwerveDriveOdometry {
       Rotation2d gyroAngle,
       SwerveModulePosition[] modulePositions,
       Pose2d initialPose) {
-    m_kinematics = kinematics;
-    m_poseMeters = initialPose;
-    m_gyroOffset = m_poseMeters.getRotation().minus(gyroAngle);
-    m_previousAngle = initialPose.getRotation();
-    m_numModules = modulePositions.length;
+    super(kinematics, gyroAngle, new SwerveDriveWheelPositions(modulePositions), initialPose);
 
-    m_previousModulePositions = new SwerveModulePosition[m_numModules];
-    for (int index = 0; index < m_numModules; index++) {
-      m_previousModulePositions[index] =
-          new SwerveModulePosition(
-              modulePositions[index].distanceMeters, modulePositions[index].angle);
-    }
+    m_numModules = modulePositions.length;
 
     MathSharedStore.reportUsage(MathUsageId.kOdometry_SwerveDrive, 1);
   }
@@ -83,29 +68,18 @@ public class SwerveDriveOdometry {
    */
   public void resetPosition(
       Rotation2d gyroAngle, SwerveModulePosition[] modulePositions, Pose2d pose) {
-    if (modulePositions.length != m_numModules) {
+    resetPosition(gyroAngle, new SwerveDriveWheelPositions(modulePositions), pose);
+  }
+
+  @Override
+  public void resetPosition(
+      Rotation2d gyroAngle, SwerveDriveWheelPositions modulePositions, Pose2d pose) {
+    if (modulePositions.positions.length != m_numModules) {
       throw new IllegalArgumentException(
           "Number of modules is not consistent with number of wheel locations provided in "
               + "constructor");
     }
-
-    m_poseMeters = pose;
-    m_previousAngle = pose.getRotation();
-    m_gyroOffset = m_poseMeters.getRotation().minus(gyroAngle);
-    for (int index = 0; index < m_numModules; index++) {
-      m_previousModulePositions[index] =
-          new SwerveModulePosition(
-              modulePositions[index].distanceMeters, modulePositions[index].angle);
-    }
-  }
-
-  /**
-   * Returns the position of the robot on the field.
-   *
-   * @return The pose of the robot (x and y are in meters).
-   */
-  public Pose2d getPoseMeters() {
-    return m_poseMeters;
+    super.resetPosition(gyroAngle, modulePositions, pose);
   }
 
   /**
@@ -121,32 +95,16 @@ public class SwerveDriveOdometry {
    * @return The new pose of the robot.
    */
   public Pose2d update(Rotation2d gyroAngle, SwerveModulePosition[] modulePositions) {
-    if (modulePositions.length != m_numModules) {
+    return update(gyroAngle, new SwerveDriveWheelPositions(modulePositions));
+  }
+
+  @Override
+  public Pose2d update(Rotation2d gyroAngle, SwerveDriveWheelPositions modulePositions) {
+    if (modulePositions.positions.length != m_numModules) {
       throw new IllegalArgumentException(
           "Number of modules is not consistent with number of wheel locations provided in "
               + "constructor");
     }
-
-    var moduleDeltas = new SwerveModulePosition[m_numModules];
-    for (int index = 0; index < m_numModules; index++) {
-      var current = modulePositions[index];
-      var previous = m_previousModulePositions[index];
-
-      moduleDeltas[index] =
-          new SwerveModulePosition(current.distanceMeters - previous.distanceMeters, current.angle);
-      previous.distanceMeters = current.distanceMeters;
-    }
-
-    var angle = gyroAngle.plus(m_gyroOffset);
-
-    var twist = m_kinematics.toTwist2d(moduleDeltas);
-    twist.dtheta = angle.minus(m_previousAngle).getRadians();
-
-    var newPose = m_poseMeters.exp(twist);
-
-    m_previousAngle = angle;
-    m_poseMeters = new Pose2d(newPose.getTranslation(), angle);
-
-    return m_poseMeters;
+    return super.update(gyroAngle, modulePositions);
   }
 }

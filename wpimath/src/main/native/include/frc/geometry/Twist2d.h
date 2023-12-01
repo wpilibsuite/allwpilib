@@ -14,7 +14,7 @@ namespace frc {
 /**
  * A change in distance along a 2D arc since the last pose update. We can use
  * ideas from differential calculus to create new Pose2ds from a Twist2d and
- * vise versa.
+ * vice versa.
  *
  * A Twist can be used to represent a difference between two poses.
  */
@@ -57,3 +57,6 @@ struct WPILIB_DLLEXPORT Twist2d {
   }
 };
 }  // namespace frc
+
+#include "frc/geometry/proto/Twist2dProto.h"
+#include "frc/geometry/struct/Twist2dStruct.h"

@@ -7,7 +7,8 @@
 #include <array>
 #include <functional>
 
-#include "Eigen/QR"
+#include <Eigen/QR>
+
 #include "frc/EigenCore.h"
 #include "frc/system/NumericalJacobian.h"
 #include "units/time.h"
@@ -165,6 +166,9 @@ class ControlAffinePlantInversionFeedforward {
   InputVector Calculate(const StateVector& r, const StateVector& nextR) {
     StateVector rDot = (nextR - r) / m_dt.value();
 
+    // ṙ = f(r) + Bu
+    // Bu = ṙ − f(r)
+    // u = B⁺(ṙ − f(r))
     m_uff = m_B.householderQr().solve(rDot - m_f(r, InputVector::Zero()));
 
     m_r = nextR;

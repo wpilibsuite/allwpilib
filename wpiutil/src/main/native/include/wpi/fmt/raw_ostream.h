@@ -5,7 +5,8 @@
 #ifndef WPIUTIL_WPI_FMT_RAW_OSTREAM_H_
 #define WPIUTIL_WPI_FMT_RAW_OSTREAM_H_
 
-#include "fmt/format.h"
+#include <fmt/format.h>
+
 #include "wpi/raw_ostream.h"
 
 FMT_BEGIN_NAMESPACE

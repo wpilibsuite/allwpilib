@@ -8,7 +8,6 @@
 
 #include <algorithm>
 #include <atomic>
-#include <cstdio>
 #include <cstring>
 #include <memory>
 #include <string>
@@ -16,6 +15,7 @@
 #include <vector>
 
 #include <fmt/format.h>
+#include <wpi/StringExtras.h>
 
 #if defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
@@ -135,6 +135,8 @@ class Plot {
     }
   }
 
+  void SetColor(const ImVec4& color) { m_backgroundColor.SetColor(color); }
+
  private:
   void EmitSettingsLimits(int axis);
   void DragDropAccept(PlotView& view, size_t i, int yAxis);
@@ -143,6 +145,9 @@ class Plot {
 
   std::string& m_name;
   bool& m_visible;
+  static constexpr float kDefaultBackgroundColor[4] = {0.0, 0.0, 0.0,
+                                                       IMPLOT_AUTO};
+  ColorSetting m_backgroundColor;
   bool& m_showPause;
   bool& m_lockPrevX;
   bool& m_legend;
@@ -316,8 +321,8 @@ PlotSeries::Action PlotSeries::EmitPlot(PlotView& view, double now, size_t i,
   CheckSource();
 
   char label[128];
-  std::snprintf(label, sizeof(label), "%s###name%d_%d", GetName(),
-                static_cast<int>(i), static_cast<int>(plotIndex));
+  wpi::format_to_n_c_str(label, sizeof(label), "{}###name{}_{}", GetName(),
+                         static_cast<int>(i), static_cast<int>(plotIndex));
 
   int size = m_size;
   int offset = m_offset;
@@ -484,6 +489,8 @@ Plot::Plot(Storage& storage)
     : m_seriesStorage{storage.GetChildArray("series")},
       m_name{storage.GetString("name")},
       m_visible{storage.GetBool("visible", true)},
+      m_backgroundColor{
+          storage.GetFloatArray("backgroundColor", kDefaultBackgroundColor)},
       m_showPause{storage.GetBool("showPause", true)},
       m_lockPrevX{storage.GetBool("lockPrevX", false)},
       m_legend{storage.GetBool("legend", true)},
@@ -573,13 +580,19 @@ void Plot::EmitPlot(PlotView& view, double now, bool paused, size_t i) {
   }
 
   char label[128];
-  std::snprintf(label, sizeof(label), "%s###plot%d", m_name.c_str(),
-                static_cast<int>(i));
+  wpi::format_to_n_c_str(label, sizeof(label), "{}###plot{}", m_name,
+                         static_cast<int>(i));
+
   ImPlotFlags plotFlags = (m_legend ? 0 : ImPlotFlags_NoLegend) |
                           (m_crosshairs ? ImPlotFlags_Crosshairs : 0) |
                           (m_mousePosition ? 0 : ImPlotFlags_NoMouseText);
 
   if (ImPlot::BeginPlot(label, ImVec2(-1, m_height), plotFlags)) {
+    if (m_backgroundColor.GetColorFloat()[3] == IMPLOT_AUTO) {
+      SetColor(ImGui::GetStyleColorVec4(ImGuiCol_WindowBg));
+    }
+    ImPlot::PushStyleColor(ImPlotCol_PlotBg, m_backgroundColor.GetColor());
+
     // setup legend
     if (m_legend) {
       ImPlotLegendFlags legendFlags =
@@ -656,6 +669,8 @@ void Plot::EmitPlot(PlotView& view, double now, bool paused, size_t i) {
     m_xaxisRange = ImPlot::GetPlotLimits().X;
 
     ImPlotPlot* plot = ImPlot::GetCurrentPlot();
+
+    ImPlot::PopStyleColor();
     ImPlot::EndPlot();
 
     // copy plot settings back to storage
@@ -715,6 +730,12 @@ void Plot::EmitSettings(size_t i) {
   ImGui::Text("Edit plot name:");
   ImGui::InputText("##editname", &m_name);
   ImGui::Checkbox("Visible", &m_visible);
+  m_backgroundColor.ColorEdit3("Background color",
+                               ImGuiColorEditFlags_NoInputs);
+  ImGui::SameLine();
+  if (ImGui::Button("Default")) {
+    SetColor(ImGui::GetStyleColorVec4(ImGuiCol_WindowBg));
+  }
   ImGui::Checkbox("Show Pause Button", &m_showPause);
   if (i != 0) {
     ImGui::Checkbox("Lock X-axis to previous plot", &m_lockPrevX);
@@ -917,14 +938,15 @@ void PlotView::Settings() {
 
     char name[64];
     if (!plot->GetName().empty()) {
-      std::snprintf(name, sizeof(name), "%s", plot->GetName().c_str());
+      wpi::format_to_n_c_str(name, sizeof(name), "{}", plot->GetName().c_str());
     } else {
-      std::snprintf(name, sizeof(name), "Plot %d", static_cast<int>(i));
+      wpi::format_to_n_c_str(name, sizeof(name), "Plot {}",
+                             static_cast<int>(i));
     }
 
     char label[90];
-    std::snprintf(label, sizeof(label), "%s###header%d", name,
-                  static_cast<int>(i));
+    wpi::format_to_n_c_str(label, sizeof(label), "{}###header{}", name,
+                           static_cast<int>(i));
 
     bool open = ImGui::CollapsingHeader(label);
 
@@ -993,7 +1015,8 @@ void PlotProvider::DisplayMenu() {
     char id[32];
     size_t numWindows = m_windows.size();
     for (size_t i = 0; i <= numWindows; ++i) {
-      std::snprintf(id, sizeof(id), "Plot <%d>", static_cast<int>(i));
+      wpi::format_to_n_c_str(id, sizeof(id), "Plot <{}>", static_cast<int>(i));
+
       bool match = false;
       for (size_t j = 0; j < numWindows; ++j) {
         if (m_windows[j]->GetId() == id) {

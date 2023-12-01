@@ -4,12 +4,33 @@
 
 #include <cmath>
 
+#include <gtest/gtest.h>
 #include <wpi/array.h>
 
 #include "frc/geometry/Pose3d.h"
-#include "gtest/gtest.h"
 
 using namespace frc;
+
+TEST(Pose3dTest, RotateBy) {
+  constexpr auto x = 1_m;
+  constexpr auto y = 2_m;
+  const Pose3d initial{x, y, 0_m, Rotation3d{0_deg, 0_deg, 45_deg}};
+
+  constexpr units::radian_t yaw = 5_deg;
+  const Rotation3d rotation{0_deg, 0_deg, yaw};
+  const auto rotated = initial.RotateBy(rotation);
+
+  // Translation is rotated by CCW rotation matrix
+  double c = std::cos(yaw.value());
+  double s = std::sin(yaw.value());
+  EXPECT_DOUBLE_EQ(c * x.value() - s * y.value(), rotated.X().value());
+  EXPECT_DOUBLE_EQ(s * x.value() + c * y.value(), rotated.Y().value());
+  EXPECT_DOUBLE_EQ(0.0, rotated.Z().value());
+  EXPECT_DOUBLE_EQ(0.0, rotated.Rotation().X().value());
+  EXPECT_DOUBLE_EQ(0.0, rotated.Rotation().Y().value());
+  EXPECT_DOUBLE_EQ(initial.Rotation().Z().value() + rotation.Z().value(),
+                   rotated.Rotation().Z().value());
+}
 
 TEST(Pose3dTest, TestTransformByRotations) {
   const double kEpsilon = 1E-9;
@@ -145,5 +166,38 @@ TEST(Pose3dTest, ComplexTwists) {
                 end.Rotation().GetQuaternion().Y(), eps);
     EXPECT_NEAR(start_exp.Rotation().GetQuaternion().Z(),
                 end.Rotation().GetQuaternion().Z(), eps);
+  }
+}
+
+TEST(Pose3dTest, TwistNaN) {
+  wpi::array<Pose3d, 2> initial_poses{
+      Pose3d{6.32_m, 4.12_m, 0.00_m,
+             Rotation3d{Quaternion{-0.9999999999999999, 0.0, 0.0,
+                                   1.9208309264993548E-8}}},
+      Pose3d{3.75_m, 2.95_m, 0.00_m,
+             Rotation3d{Quaternion{0.9999999999999793, 0.0, 0.0,
+                                   2.0352360299846772E-7}}},
+  };
+
+  wpi::array<Pose3d, 2> final_poses{
+      Pose3d{6.33_m, 4.15_m, 0.00_m,
+             Rotation3d{Quaternion{-0.9999999999999999, 0.0, 0.0,
+                                   2.416890209039172E-8}}},
+      Pose3d{3.66_m, 2.93_m, 0.00_m,
+             Rotation3d{Quaternion{0.9999999999999782, 0.0, 0.0,
+                                   2.0859477994905617E-7}}},
+  };
+
+  for (size_t i = 0; i < initial_poses.size(); i++) {
+    auto start = initial_poses[i];
+    auto end = final_poses[i];
+    auto twist = start.Log(end);
+
+    EXPECT_FALSE(std::isnan(twist.dx.value()));
+    EXPECT_FALSE(std::isnan(twist.dy.value()));
+    EXPECT_FALSE(std::isnan(twist.dz.value()));
+    EXPECT_FALSE(std::isnan(twist.rx.value()));
+    EXPECT_FALSE(std::isnan(twist.ry.value()));
+    EXPECT_FALSE(std::isnan(twist.rz.value()));
   }
 }

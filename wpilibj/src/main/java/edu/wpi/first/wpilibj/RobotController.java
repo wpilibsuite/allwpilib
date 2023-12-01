@@ -58,6 +58,15 @@ public final class RobotController {
   }
 
   /**
+   * Returns the team number configured for the robot controller.
+   *
+   * @return team number, or 0 if not found.
+   */
+  public static int getTeamNumber() {
+    return HALUtil.getTeamNumber();
+  }
+
+  /**
    * Read the microsecond timer from the FPGA.
    *
    * @return The current time in microseconds according to the FPGA.
@@ -104,6 +113,24 @@ public final class RobotController {
   }
 
   /**
+   * Gets the current state of the Robot Signal Light (RSL).
+   *
+   * @return The current state of the RSL- true if on, false if off
+   */
+  public static boolean getRSLState() {
+    return HAL.getRSLState();
+  }
+
+  /**
+   * Gets if the system time is valid.
+   *
+   * @return True if the system time is valid, false otherwise
+   */
+  public static boolean isSystemTimeValid() {
+    return HAL.getSystemTimeValid();
+  }
+
+  /**
    * Get the input voltage to the robot controller.
    *
    * @return The controller input voltage value in Volts
@@ -137,6 +164,15 @@ public final class RobotController {
    */
   public static double getCurrent3V3() {
     return PowerJNI.getUserCurrent3V3();
+  }
+
+  /**
+   * Enables or disables the 3.3V rail.
+   *
+   * @param enabled whether to enable the 3.3V rail.
+   */
+  public static void setEnabled3V3(boolean enabled) {
+    PowerJNI.setUserEnabled3V3(enabled);
   }
 
   /**
@@ -177,6 +213,15 @@ public final class RobotController {
   }
 
   /**
+   * Enables or disables the 5V rail.
+   *
+   * @param enabled whether to enable the 5V rail.
+   */
+  public static void setEnabled5V(boolean enabled) {
+    PowerJNI.setUserEnabled5V(enabled);
+  }
+
+  /**
    * Get the enabled state of the 5V rail. The rail may be disabled due to a controller brownout, a
    * short circuit on the rail, or controller over-voltage.
    *
@@ -211,6 +256,15 @@ public final class RobotController {
    */
   public static double getCurrent6V() {
     return PowerJNI.getUserCurrent6V();
+  }
+
+  /**
+   * Enables or disables the 6V rail.
+   *
+   * @param enabled whether to enable the 6V rail.
+   */
+  public static void setEnabled6V(boolean enabled) {
+    PowerJNI.setUserEnabled6V(enabled);
   }
 
   /**
@@ -250,6 +304,15 @@ public final class RobotController {
    */
   public static void setBrownoutVoltage(double brownoutVoltage) {
     PowerJNI.setBrownoutVoltage(brownoutVoltage);
+  }
+
+  /**
+   * Get the current CPU temperature in degrees Celsius.
+   *
+   * @return current CPU temperature in degrees Celsius
+   */
+  public static double getCPUTemp() {
+    return PowerJNI.getCPUTemp();
   }
 
   /**

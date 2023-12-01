@@ -24,6 +24,8 @@ IterativeRobotBase::IterativeRobotBase(units::second_t period)
 
 void IterativeRobotBase::RobotInit() {}
 
+void IterativeRobotBase::DriverStationConnected() {}
+
 void IterativeRobotBase::SimulationInit() {}
 
 void IterativeRobotBase::DisabledInit() {}
@@ -95,7 +97,7 @@ void IterativeRobotBase::SetNetworkTablesFlushEnabled(bool enabled) {
 }
 
 void IterativeRobotBase::EnableLiveWindowInTest(bool testLW) {
-  if (IsTest()) {
+  if (IsTestEnabled()) {
     throw FRC_MakeError(err::IncompatibleMode,
                         "Can't configure test mode while in test mode!");
   }
@@ -125,6 +127,11 @@ void IterativeRobotBase::LoopFunc() {
     mode = Mode::kTeleop;
   } else if (word.IsTest()) {
     mode = Mode::kTest;
+  }
+
+  if (!m_calledDsConnected && word.IsDSAttached()) {
+    m_calledDsConnected = true;
+    DriverStationConnected();
   }
 
   // If mode changed, call mode exit and entry functions

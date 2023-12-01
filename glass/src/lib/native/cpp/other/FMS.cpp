@@ -11,8 +11,8 @@
 
 using namespace glass;
 
-static const char* stations[] = {"Red 1",  "Red 2",  "Red 3",
-                                 "Blue 1", "Blue 2", "Blue 3"};
+static const char* stations[] = {"Invalid", "Red 1",  "Red 2", "Red 3",
+                                 "Blue 1",  "Blue 2", "Blue 3"};
 
 void glass::DisplayFMS(FMSModel* model) {
   if (!model->Exists() || model->IsReadOnly()) {
@@ -41,7 +41,7 @@ void glass::DisplayFMS(FMSModel* model) {
   if (auto data = model->GetAllianceStationIdData()) {
     int val = data->GetValue();
     ImGui::SetNextItemWidth(ImGui::GetFontSize() * 8);
-    if (ImGui::Combo("Alliance Station", &val, stations, 6)) {
+    if (ImGui::Combo("Alliance Station", &val, stations, 7)) {
       model->SetAllianceStationId(val);
     }
     data->EmitDrag();

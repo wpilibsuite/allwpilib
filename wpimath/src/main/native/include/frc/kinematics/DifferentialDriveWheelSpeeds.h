@@ -36,5 +36,82 @@ struct WPILIB_DLLEXPORT DifferentialDriveWheelSpeeds {
    * @param attainableMaxSpeed The absolute max speed that a wheel can reach.
    */
   void Desaturate(units::meters_per_second_t attainableMaxSpeed);
+
+  /**
+   * Adds two DifferentialDriveWheelSpeeds and returns the sum.
+   *
+   * <p>For example, DifferentialDriveWheelSpeeds{1.0, 0.5} +
+   * DifferentialDriveWheelSpeeds{2.0, 1.5} =
+   * DifferentialDriveWheelSpeeds{3.0, 2.0}
+   *
+   * @param other The DifferentialDriveWheelSpeeds to add.
+   *
+   * @return The sum of the DifferentialDriveWheelSpeeds.
+   */
+  constexpr DifferentialDriveWheelSpeeds operator+(
+      const DifferentialDriveWheelSpeeds& other) const {
+    return {left + other.left, right + other.right};
+  }
+
+  /**
+   * Subtracts the other DifferentialDriveWheelSpeeds from the current
+   * DifferentialDriveWheelSpeeds and returns the difference.
+   *
+   * <p>For example, DifferentialDriveWheelSpeeds{5.0, 4.0} -
+   * DifferentialDriveWheelSpeeds{1.0, 2.0} =
+   * DifferentialDriveWheelSpeeds{4.0, 2.0}
+   *
+   * @param other The DifferentialDriveWheelSpeeds to subtract.
+   *
+   * @return The difference between the two DifferentialDriveWheelSpeeds.
+   */
+  constexpr DifferentialDriveWheelSpeeds operator-(
+      const DifferentialDriveWheelSpeeds& other) const {
+    return *this + -other;
+  }
+
+  /**
+   * Returns the inverse of the current DifferentialDriveWheelSpeeds.
+   * This is equivalent to negating all components of the
+   * DifferentialDriveWheelSpeeds.
+   *
+   * @return The inverse of the current DifferentialDriveWheelSpeeds.
+   */
+  constexpr DifferentialDriveWheelSpeeds operator-() const {
+    return {-left, -right};
+  }
+
+  /**
+   * Multiplies the DifferentialDriveWheelSpeeds by a scalar and returns the new
+   * DifferentialDriveWheelSpeeds.
+   *
+   * <p>For example, DifferentialDriveWheelSpeeds{2.0, 2.5} * 2
+   * = DifferentialDriveWheelSpeeds{4.0, 5.0}
+   *
+   * @param scalar The scalar to multiply by.
+   *
+   * @return The scaled DifferentialDriveWheelSpeeds.
+   */
+  constexpr DifferentialDriveWheelSpeeds operator*(double scalar) const {
+    return {scalar * left, scalar * right};
+  }
+
+  /**
+   * Divides the DifferentialDriveWheelSpeeds by a scalar and returns the new
+   * DifferentialDriveWheelSpeeds.
+   *
+   * <p>For example, DifferentialDriveWheelSpeeds{2.0, 2.5} / 2
+   * = DifferentialDriveWheelSpeeds{1.0, 1.25}
+   *
+   * @param scalar The scalar to divide by.
+   *
+   * @return The scaled DifferentialDriveWheelSpeeds.
+   */
+  constexpr DifferentialDriveWheelSpeeds operator/(double scalar) const {
+    return operator*(1.0 / scalar);
+  }
 };
 }  // namespace frc
+
+#include "frc/kinematics/proto/DifferentialDriveWheelSpeedsProto.h"
+#include "frc/kinematics/struct/DifferentialDriveWheelSpeedsStruct.h"

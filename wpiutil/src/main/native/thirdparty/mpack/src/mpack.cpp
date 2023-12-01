@@ -24,7 +24,7 @@
  */
 
 /*
- * This is the MPack 1.1 amalgamation package.
+ * This is the MPack 1.1.1 amalgamation package.
  *
  * http://github.com/ludocode/mpack
  */
@@ -427,7 +427,7 @@ static void mpack_tag_debug_pseudo_json_bin(mpack_tag_t tag, char* buffer, size_
         const char* prefix, size_t prefix_size)
 {
     mpack_assert(mpack_tag_type(&tag) == mpack_type_bin);
-    size_t length = (size_t)mpack_snprintf(buffer, buffer_size, "<binary data of length %u", tag.v.l);
+    size_t length = (size_t)mpack_snprintf(buffer, buffer_size, "<binary data of length %" PRIu32 "", tag.v.l);
     mpack_tag_debug_complete_bin_ext(tag, length, buffer, buffer_size, prefix, prefix_size);
 }
 
@@ -436,7 +436,7 @@ static void mpack_tag_debug_pseudo_json_ext(mpack_tag_t tag, char* buffer, size_
         const char* prefix, size_t prefix_size)
 {
     mpack_assert(mpack_tag_type(&tag) == mpack_type_ext);
-    size_t length = (size_t)mpack_snprintf(buffer, buffer_size, "<ext data of type %i and length %u",
+    size_t length = (size_t)mpack_snprintf(buffer, buffer_size, "<ext data of type %i and length %" PRIu32 "",
             mpack_tag_ext_exttype(&tag), mpack_tag_ext_length(&tag));
     mpack_tag_debug_complete_bin_ext(tag, length, buffer, buffer_size, prefix, prefix_size);
 }
@@ -477,7 +477,7 @@ static void mpack_tag_debug_pseudo_json_impl(mpack_tag_t tag, char* buffer, size
             return;
 
         case mpack_type_str:
-            mpack_snprintf(buffer, buffer_size, "<string of %u bytes>", tag.v.l);
+            mpack_snprintf(buffer, buffer_size, "<string of %" PRIu32 " bytes>", tag.v.l);
             return;
         case mpack_type_bin:
             mpack_tag_debug_pseudo_json_bin(tag, buffer, buffer_size, prefix, prefix_size);
@@ -489,10 +489,10 @@ static void mpack_tag_debug_pseudo_json_impl(mpack_tag_t tag, char* buffer, size
         #endif
 
         case mpack_type_array:
-            mpack_snprintf(buffer, buffer_size, "<array of %u elements>", tag.v.n);
+            mpack_snprintf(buffer, buffer_size, "<array of %" PRIu32 " elements>", tag.v.n);
             return;
         case mpack_type_map:
-            mpack_snprintf(buffer, buffer_size, "<map of %u key-value pairs>", tag.v.n);
+            mpack_snprintf(buffer, buffer_size, "<map of %" PRIu32 " key-value pairs>", tag.v.n);
             return;
     }
 
@@ -544,22 +544,22 @@ static void mpack_tag_debug_describe_impl(mpack_tag_t tag, char* buffer, size_t 
             #endif
             return;
         case mpack_type_str:
-            mpack_snprintf(buffer, buffer_size, "str of %u bytes", tag.v.l);
+            mpack_snprintf(buffer, buffer_size, "str of %" PRIu32 " bytes", tag.v.l);
             return;
         case mpack_type_bin:
-            mpack_snprintf(buffer, buffer_size, "bin of %u bytes", tag.v.l);
+            mpack_snprintf(buffer, buffer_size, "bin of %" PRIu32 " bytes", tag.v.l);
             return;
         #if MPACK_EXTENSIONS
         case mpack_type_ext:
-            mpack_snprintf(buffer, buffer_size, "ext of type %i, %u bytes",
+            mpack_snprintf(buffer, buffer_size, "ext of type %i, %" PRIu32 " bytes",
                     mpack_tag_ext_exttype(&tag), mpack_tag_ext_length(&tag));
             return;
         #endif
         case mpack_type_array:
-            mpack_snprintf(buffer, buffer_size, "array of %u elements", tag.v.n);
+            mpack_snprintf(buffer, buffer_size, "array of %" PRIu32 " elements", tag.v.n);
             return;
         case mpack_type_map:
-            mpack_snprintf(buffer, buffer_size, "map of %u key-value pairs", tag.v.n);
+            mpack_snprintf(buffer, buffer_size, "map of %" PRIu32 " key-value pairs", tag.v.n);
             return;
     }
 
@@ -1039,7 +1039,7 @@ static inline void mpack_writer_track_element(mpack_writer_t* writer) {
         if (build->nested_compound_elements == 0) {
             if (build->type != mpack_type_map) {
                 ++build->count;
-                mpack_log("adding element to build %p, now %u elements\n", (void*)build, build->count);
+                mpack_log("adding element to build %p, now %" PRIu32 " elements\n", (void*)build, build->count);
             } else if (build->key_needs_value) {
                 build->key_needs_value = false;
                 ++build->count;
@@ -1492,6 +1492,46 @@ mpack_error_t mpack_writer_destroy(mpack_writer_t* writer) {
     // clean up tracking, asserting if we're not already in an error state
     #if MPACK_WRITE_TRACKING
     mpack_track_destroy(&writer->track, writer->error != mpack_ok);
+    #endif
+
+    #if MPACK_BUILDER
+    mpack_builder_t* builder = &writer->builder;
+    if (builder->current_build != NULL) {
+        // A builder is open!
+
+        // Flag an error, if there's not already an error. You can only skip
+        // closing any open compound types if a write error occurred. If there
+        // wasn't already an error, it's a bug, which will assert in debug.
+        if (mpack_writer_error(writer) == mpack_ok) {
+            mpack_break("writer cannot be destroyed with an incomplete builder unless "
+                    "an error was flagged!");
+            mpack_writer_flag_error(writer, mpack_error_bug);
+        }
+
+        // Free any remaining builder pages
+        mpack_builder_page_t* page = builder->pages;
+        #if MPACK_BUILDER_INTERNAL_STORAGE
+        mpack_assert(page == (mpack_builder_page_t*)builder->internal);
+        page = page->next;
+        #endif
+        while (page != NULL) {
+            mpack_builder_page_t* next = page->next;
+            MPACK_FREE(page);
+            page = next;
+        }
+
+        // Restore the stashed pointers. The teardown function may need to free
+        // them (e.g. mpack_growable_writer_teardown().)
+        writer->buffer = builder->stash_buffer;
+        writer->position = builder->stash_position;
+        writer->end = builder->stash_end;
+
+        // Note: It's not necessary to clean up the current_build or other
+        // pointers at this point because we're guaranteed to be in an error
+        // state already so a user error callback can't longjmp out. This
+        // destroy function will complete no matter what so it doesn't matter
+        // what junk is left in the writer.
+    }
     #endif
 
     // flush any outstanding data
@@ -2022,7 +2062,7 @@ void mpack_write_timestamp(mpack_writer_t* writer, int64_t seconds, uint32_t nan
     #endif
 
     if (nanoseconds > MPACK_TIMESTAMP_NANOSECONDS_MAX) {
-        mpack_break("timestamp nanoseconds out of bounds: %u", nanoseconds);
+        mpack_break("timestamp nanoseconds out of bounds: %" PRIu32 , nanoseconds);
         mpack_writer_flag_error(writer, mpack_error_bug);
         return;
     }
@@ -2165,7 +2205,7 @@ void mpack_start_ext(mpack_writer_t* writer, int8_t exttype, uint32_t count) {
  */
 
 void mpack_write_str(mpack_writer_t* writer, const char* data, uint32_t count) {
-    mpack_assert(data != NULL, "data for string of length %i is NULL", (int)count);
+    mpack_assert(count == 0 || data != NULL, "data for string of length %i is NULL", (int)count);
 
     #if MPACK_OPTIMIZE_FOR_SIZE
     mpack_writer_track_element(writer);
@@ -2220,7 +2260,7 @@ void mpack_write_str(mpack_writer_t* writer, const char* data, uint32_t count) {
 }
 
 void mpack_write_bin(mpack_writer_t* writer, const char* data, uint32_t count) {
-    mpack_assert(data != NULL, "data pointer for bin of %i bytes is NULL", (int)count);
+    mpack_assert(count == 0 || data != NULL, "data pointer for bin of %i bytes is NULL", (int)count);
     mpack_start_bin(writer, count);
     mpack_write_bytes(writer, data, count);
     mpack_finish_bin(writer);
@@ -2228,7 +2268,7 @@ void mpack_write_bin(mpack_writer_t* writer, const char* data, uint32_t count) {
 
 #if MPACK_EXTENSIONS
 void mpack_write_ext(mpack_writer_t* writer, int8_t exttype, const char* data, uint32_t count) {
-    mpack_assert(data != NULL, "data pointer for ext of type %i and %i bytes is NULL", exttype, (int)count);
+    mpack_assert(count == 0 || data != NULL, "data pointer for ext of type %i and %i bytes is NULL", exttype, (int)count);
     mpack_start_ext(writer, exttype, count);
     mpack_write_bytes(writer, data, count);
     mpack_finish_ext(writer);
@@ -2236,7 +2276,7 @@ void mpack_write_ext(mpack_writer_t* writer, int8_t exttype, const char* data, u
 #endif
 
 void mpack_write_bytes(mpack_writer_t* writer, const char* data, size_t count) {
-    mpack_assert(data != NULL, "data pointer for %i bytes is NULL", (int)count);
+    mpack_assert(count == 0 || data != NULL, "data pointer for %i bytes is NULL", (int)count);
     mpack_writer_track_bytes(writer, count);
     mpack_write_native(writer, data, count);
 }
@@ -2257,7 +2297,7 @@ void mpack_write_cstr_or_nil(mpack_writer_t* writer, const char* cstr) {
 }
 
 void mpack_write_utf8(mpack_writer_t* writer, const char* str, uint32_t length) {
-    mpack_assert(str != NULL, "data for string of length %i is NULL", (int)length);
+    mpack_assert(length == 0 || str != NULL, "data for string of length %i is NULL", (int)length);
     if (!mpack_utf8_check(str, length)) {
         mpack_writer_flag_error(writer, mpack_error_invalid);
         return;
@@ -2557,6 +2597,16 @@ MPACK_NOINLINE
 static void mpack_builder_resolve(mpack_writer_t* writer) {
     mpack_builder_t* builder = &writer->builder;
 
+    // We should not have gotten here if we are in an error state. If an error
+    // occurs with an open builder, the writer will free the open builder pages
+    // when destroyed.
+    mpack_assert(mpack_writer_error(writer) == mpack_ok, "can't resolve in error state!");
+
+    // We don't want the user to longjmp out of any I/O errors while we are
+    // walking the page list, so defer error callbacks to after we're done.
+    mpack_writer_error_t error_fn = writer->error_fn;
+    writer->error_fn = NULL;
+
     // The starting page is the internal storage (if we have it), otherwise
     // it's the first page in the array
     mpack_builder_page_t* page =
@@ -2589,13 +2639,13 @@ static void mpack_builder_resolve(mpack_writer_t* writer) {
 
     // Walk the list of builds, writing everything out in the buffer. Note that
     // we don't check for errors anywhere. The lower-level write functions will
-    // all check for errors. We need to walk all pages anyway to free them, so
-    // there's not much point in optimizing an error path at the expense of the
-    // normal path.
+    // all check for errors and do nothing after an error occurs. We need to
+    // walk all pages anyway to free them, so there's not much point in
+    // optimizing an error path at the expense of the normal path.
     while (true) {
 
         // write out the container tag
-        mpack_log("writing out an %s with count %u followed by %zi bytes\n",
+        mpack_log("writing out an %s with count %" PRIu32 " followed by %zi bytes\n",
                 mpack_type_to_string(build->type), build->count, build->bytes);
         switch (build->type) {
             case mpack_type_map:
@@ -2645,7 +2695,7 @@ static void mpack_builder_resolve(mpack_writer_t* writer) {
 
         // now see if we can find another build.
         offset = mpack_builder_align_build(offset);
-        if (offset + sizeof(mpack_build_t) >= mpack_builder_page_size(writer, page)) {
+        if (offset + sizeof(mpack_build_t) > mpack_builder_page_size(writer, page)) {
             mpack_log("not enough room in this page for another build\n");
             mpack_builder_page_t* next_page = page->next;
             mpack_builder_free_page(writer, page);
@@ -2671,13 +2721,18 @@ static void mpack_builder_resolve(mpack_writer_t* writer) {
     }
 
     mpack_log("done resolve.\n");
+
+    // We can now restore the error handler and call it if an error occurred.
+    writer->error_fn = error_fn;
+    if (writer->error_fn && mpack_writer_error(writer) != mpack_ok)
+        writer->error_fn(writer, writer->error);
 }
 
 static void mpack_builder_complete(mpack_writer_t* writer, mpack_type_t type) {
+    mpack_writer_track_pop_builder(writer, type);
     if (mpack_writer_error(writer) != mpack_ok)
         return;
 
-    mpack_writer_track_pop_builder(writer, type);
     mpack_builder_t* builder = &writer->builder;
     mpack_assert(builder->current_build != NULL, "no build in progress!");
     mpack_assert(builder->latest_build != NULL, "missing latest build!");
@@ -3120,7 +3175,7 @@ void mpack_skip_bytes(mpack_reader_t* reader, size_t count) {
     // check if we have enough in the buffer already
     size_t left = (size_t)(reader->end - reader->data);
     if (left >= count) {
-        mpack_log("skipping %u bytes still in buffer\n", (uint32_t)count);
+        mpack_log("skipping %" PRIu32 " bytes still in buffer\n", (uint32_t)count);
         reader->data += count;
         return;
     }
@@ -5013,7 +5068,7 @@ static bool mpack_tree_reserve_fill(mpack_tree_t* tree) {
             return false;
         }
 
-        mpack_log("read %u more bytes\n", (uint32_t)read);
+        mpack_log("read %" PRIu32 " more bytes\n", (uint32_t)read);
         tree->data_length += read;
         tree->parser.possible_nodes_left += read;
     } while (tree->parser.possible_nodes_left < bytes);

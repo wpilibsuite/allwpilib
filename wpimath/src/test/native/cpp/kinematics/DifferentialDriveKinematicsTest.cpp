@@ -4,9 +4,10 @@
 
 #include <numbers>
 
+#include <gtest/gtest.h>
+
 #include "frc/kinematics/ChassisSpeeds.h"
 #include "frc/kinematics/DifferentialDriveKinematics.h"
-#include "gtest/gtest.h"
 #include "units/angular_velocity.h"
 #include "units/length.h"
 #include "units/velocity.h"

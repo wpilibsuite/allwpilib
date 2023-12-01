@@ -9,11 +9,15 @@
 #pragma warning(disable : 4521)
 #endif
 
+#include <concepts>
 #include <memory>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
-#include "frc2/command/CommandGroupBase.h"
+#include <wpi/DecayedDerivedFrom.h>
+
+#include "frc2/command/CommandBase.h"
 #include "frc2/command/CommandHelper.h"
 
 namespace frc2 {
@@ -30,7 +34,7 @@ namespace frc2 {
  * This class is provided by the NewCommands VendorDep
  */
 class ParallelDeadlineGroup
-    : public CommandHelper<CommandGroupBase, ParallelDeadlineGroup> {
+    : public CommandHelper<Command, ParallelDeadlineGroup> {
  public:
   /**
    * Creates a new ParallelDeadlineGroup. The given commands (including the
@@ -54,15 +58,11 @@ class ParallelDeadlineGroup
    * @param deadline the command that determines when the composition ends
    * @param commands the commands to be executed
    */
-  template <class T, class... Types,
-            typename = std::enable_if_t<
-                std::is_base_of_v<Command, std::remove_reference_t<T>>>,
-            typename = std::enable_if_t<std::conjunction_v<
-                std::is_base_of<Command, std::remove_reference_t<Types>>...>>>
-  explicit ParallelDeadlineGroup(T&& deadline, Types&&... commands) {
-    SetDeadline(std::make_unique<std::remove_reference_t<T>>(
-        std::forward<T>(deadline)));
-    AddCommands(std::forward<Types>(commands)...);
+  template <wpi::DecayedDerivedFrom<Command> T,
+            wpi::DecayedDerivedFrom<Command>... Commands>
+  explicit ParallelDeadlineGroup(T&& deadline, Commands&&... commands) {
+    SetDeadline(std::make_unique<std::decay_t<T>>(std::forward<T>(deadline)));
+    AddCommands(std::forward<Commands>(commands)...);
   }
 
   ParallelDeadlineGroup(ParallelDeadlineGroup&& other) = default;
@@ -73,13 +73,16 @@ class ParallelDeadlineGroup
   // Prevent template expansion from emulating copy ctor
   ParallelDeadlineGroup(ParallelDeadlineGroup&) = delete;
 
-  template <class... Types,
-            typename = std::enable_if_t<std::conjunction_v<
-                std::is_base_of<Command, std::remove_reference_t<Types>>...>>>
-  void AddCommands(Types&&... commands) {
+  /**
+   * Adds the given commands to the group.
+   *
+   * @param commands Commands to add to the group.
+   */
+  template <wpi::DecayedDerivedFrom<Command>... Commands>
+  void AddCommands(Commands&&... commands) {
     std::vector<std::unique_ptr<Command>> foo;
-    ((void)foo.emplace_back(std::make_unique<std::remove_reference_t<Types>>(
-         std::forward<Types>(commands))),
+    ((void)foo.emplace_back(std::make_unique<std::decay_t<Commands>>(
+         std::forward<Commands>(commands))),
      ...);
     AddCommands(std::move(foo));
   }
@@ -99,7 +102,7 @@ class ParallelDeadlineGroup
   void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
-  void AddCommands(std::vector<std::unique_ptr<Command>>&& commands) final;
+  void AddCommands(std::vector<std::unique_ptr<Command>>&& commands);
 
   void SetDeadline(std::unique_ptr<Command>&& deadline);
 

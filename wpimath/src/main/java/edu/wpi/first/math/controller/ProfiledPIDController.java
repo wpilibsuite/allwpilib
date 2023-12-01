@@ -22,9 +22,11 @@ public class ProfiledPIDController implements Sendable {
   private PIDController m_controller;
   private double m_minimumInput;
   private double m_maximumInput;
+
+  private TrapezoidProfile.Constraints m_constraints;
+  private TrapezoidProfile m_profile;
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
-  private TrapezoidProfile.Constraints m_constraints;
 
   /**
    * Allocates a ProfiledPIDController with the given constants for Kp, Ki, and Kd.
@@ -52,6 +54,7 @@ public class ProfiledPIDController implements Sendable {
       double Kp, double Ki, double Kd, TrapezoidProfile.Constraints constraints, double period) {
     m_controller = new PIDController(Kp, Ki, Kd, period);
     m_constraints = constraints;
+    m_profile = new TrapezoidProfile(m_constraints);
     instances++;
 
     SendableRegistry.add(this, "ProfiledPIDController", instances);
@@ -99,6 +102,19 @@ public class ProfiledPIDController implements Sendable {
   }
 
   /**
+   * Sets the IZone range. When the absolute value of the position error is greater than IZone, the
+   * total accumulated error will reset to zero, disabling integral gain until the absolute value of
+   * the position error is less than IZone. This is used to prevent integral windup. Must be
+   * non-negative. Passing a value of zero will effectively disable integral gain. Passing a value
+   * of {@link Double#POSITIVE_INFINITY} disables IZone functionality.
+   *
+   * @param iZone Maximum magnitude of error to allow integral control.
+   */
+  public void setIZone(double iZone) {
+    m_controller.setIZone(iZone);
+  }
+
+  /**
    * Gets the proportional coefficient.
    *
    * @return proportional coefficient
@@ -123,6 +139,15 @@ public class ProfiledPIDController implements Sendable {
    */
   public double getD() {
     return m_controller.getD();
+  }
+
+  /**
+   * Get the IZone range.
+   *
+   * @return Maximum magnitude of error to allow integral control.
+   */
+  public double getIZone() {
+    return m_controller.getIZone();
   }
 
   /**
@@ -197,6 +222,16 @@ public class ProfiledPIDController implements Sendable {
    */
   public void setConstraints(TrapezoidProfile.Constraints constraints) {
     m_constraints = constraints;
+    m_profile = new TrapezoidProfile(m_constraints);
+  }
+
+  /**
+   * Get the velocity and acceleration constraints for this controller.
+   *
+   * @return Velocity and acceleration constraints.
+   */
+  public TrapezoidProfile.Constraints getConstraints() {
+    return m_constraints;
   }
 
   /**
@@ -312,8 +347,7 @@ public class ProfiledPIDController implements Sendable {
       m_setpoint.position = setpointMinDistance + measurement;
     }
 
-    var profile = new TrapezoidProfile(m_constraints, m_goal, m_setpoint);
-    m_setpoint = profile.calculate(getPeriod());
+    m_setpoint = m_profile.calculate(getPeriod(), m_setpoint, m_goal);
     return m_controller.calculate(measurement, m_setpoint.position);
   }
 
@@ -391,6 +425,7 @@ public class ProfiledPIDController implements Sendable {
     builder.addDoubleProperty("p", this::getP, this::setP);
     builder.addDoubleProperty("i", this::getI, this::setI);
     builder.addDoubleProperty("d", this::getD, this::setD);
+    builder.addDoubleProperty("izone", this::getIZone, this::setIZone);
     builder.addDoubleProperty("goal", () -> getGoal().position, this::setGoal);
   }
 }

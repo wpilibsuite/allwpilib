@@ -18,8 +18,8 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SimBoolean;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDouble;
-import edu.wpi.first.networktables.NTSendable;
-import edu.wpi.first.networktables.NTSendableBuilder;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 
 // CHECKSTYLE.OFF: TypeName
 // CHECKSTYLE.OFF: MemberName
@@ -50,7 +50,7 @@ import edu.wpi.first.networktables.NTSendableBuilder;
   "PMD.EmptyIfStmt",
   "PMD.EmptyStatementNotInLoop"
 })
-public class ADIS16448_IMU implements AutoCloseable, NTSendable {
+public class ADIS16448_IMU implements AutoCloseable, Sendable {
   /** ADIS16448 Register Map Declaration */
   private static final int FLASH_CNT = 0x00; // Flash memory write count
 
@@ -455,7 +455,7 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
     m_spi.setAutoTransmitData(new byte[] {GLOB_CMD}, 27);
     // Configure auto stall time
     m_spi.configureAutoStall(100, 1000, 255);
-    // Kick off auto SPI (Note: Device configration impossible after auto SPI is
+    // Kick off auto SPI (Note: Device configuration impossible after auto SPI is
     // activated)
     m_spi.startAutoTrigger(m_auto_interrupt, true, false);
 
@@ -655,6 +655,10 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
         }
         m_spi = null;
       }
+    }
+    if (m_simDevice != null) {
+      m_simDevice.close();
+      m_simDevice = null;
     }
     System.out.println("Finished cleaning up after the IMU driver.");
   }
@@ -1157,7 +1161,7 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
   }
 
   @Override
-  public void initSendable(NTSendableBuilder builder) {
+  public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Gyro");
     builder.addDoubleProperty("Value", this::getAngle, null);
   }

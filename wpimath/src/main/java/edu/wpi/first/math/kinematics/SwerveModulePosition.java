@@ -4,16 +4,28 @@
 
 package edu.wpi.first.math.kinematics;
 
+import static edu.wpi.first.units.Units.Meters;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.interpolation.Interpolatable;
+import edu.wpi.first.math.kinematics.proto.SwerveModulePositionProto;
+import edu.wpi.first.math.kinematics.struct.SwerveModulePositionStruct;
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.Measure;
 import java.util.Objects;
 
 /** Represents the state of one swerve module. */
-public class SwerveModulePosition implements Comparable<SwerveModulePosition> {
+public class SwerveModulePosition
+    implements Comparable<SwerveModulePosition>, Interpolatable<SwerveModulePosition> {
   /** Distance measured by the wheel of the module. */
   public double distanceMeters;
 
   /** Angle of the module. */
   public Rotation2d angle = Rotation2d.fromDegrees(0);
+
+  public static final SwerveModulePositionStruct struct = new SwerveModulePositionStruct();
+  public static final SwerveModulePositionProto proto = new SwerveModulePositionProto();
 
   /** Constructs a SwerveModulePosition with zeros for distance and angle. */
   public SwerveModulePosition() {}
@@ -27,6 +39,16 @@ public class SwerveModulePosition implements Comparable<SwerveModulePosition> {
   public SwerveModulePosition(double distanceMeters, Rotation2d angle) {
     this.distanceMeters = distanceMeters;
     this.angle = angle;
+  }
+
+  /**
+   * Constructs a SwerveModulePosition.
+   *
+   * @param distance The distance measured by the wheel of the module.
+   * @param angle The angle of the module.
+   */
+  public SwerveModulePosition(Measure<Distance> distance, Rotation2d angle) {
+    this(distance.in(Meters), angle);
   }
 
   @Override
@@ -59,5 +81,21 @@ public class SwerveModulePosition implements Comparable<SwerveModulePosition> {
   public String toString() {
     return String.format(
         "SwerveModulePosition(Distance: %.2f m, Angle: %s)", distanceMeters, angle);
+  }
+
+  /**
+   * Returns a copy of this swerve module position.
+   *
+   * @return A copy.
+   */
+  public SwerveModulePosition copy() {
+    return new SwerveModulePosition(distanceMeters, angle);
+  }
+
+  @Override
+  public SwerveModulePosition interpolate(SwerveModulePosition endValue, double t) {
+    return new SwerveModulePosition(
+        MathUtil.interpolate(this.distanceMeters, endValue.distanceMeters, t),
+        this.angle.interpolate(endValue.angle, t));
   }
 }

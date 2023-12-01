@@ -6,11 +6,10 @@
 
 #include <span>
 
-#include <wpi/SmallVector.h>
+#include <wpi/SmallSet.h>
 
-#include "frc2/command/CommandBase.h"
+#include "frc2/command/Command.h"
 #include "frc2/command/CommandHelper.h"
-#include "frc2/command/SetUtilities.h"
 
 namespace frc2 {
 /**
@@ -21,7 +20,7 @@ namespace frc2 {
  *
  * This class is provided by the NewCommands VendorDep
  */
-class ScheduleCommand : public CommandHelper<CommandBase, ScheduleCommand> {
+class ScheduleCommand : public CommandHelper<Command, ScheduleCommand> {
  public:
   /**
    * Creates a new ScheduleCommand that schedules the given commands when
@@ -44,6 +43,6 @@ class ScheduleCommand : public CommandHelper<CommandBase, ScheduleCommand> {
   bool RunsWhenDisabled() const override;
 
  private:
-  wpi::SmallVector<Command*, 4> m_toSchedule;
+  wpi::SmallSet<Command*, 4> m_toSchedule;
 };
 }  // namespace frc2

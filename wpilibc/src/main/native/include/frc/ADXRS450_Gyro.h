@@ -11,7 +11,7 @@
 #include <wpi/sendable/SendableHelper.h>
 
 #include "frc/SPI.h"
-#include "frc/interfaces/Gyro.h"
+#include "frc/geometry/Rotation2d.h"
 
 namespace frc {
 
@@ -28,8 +28,7 @@ namespace frc {
  * This class is for the digital ADXRS450 gyro sensor that connects via SPI.
  * Only one instance of an ADXRS %Gyro is supported.
  */
-class ADXRS450_Gyro : public Gyro,
-                      public wpi::Sendable,
+class ADXRS450_Gyro : public wpi::Sendable,
                       public wpi::SendableHelper<ADXRS450_Gyro> {
  public:
   /**
@@ -61,7 +60,7 @@ class ADXRS450_Gyro : public Gyro,
    *
    * @return the current heading of the robot in degrees.
    */
-  double GetAngle() const override;
+  double GetAngle() const;
 
   /**
    * Return the rate of rotation of the gyro
@@ -70,7 +69,7 @@ class ADXRS450_Gyro : public Gyro,
    *
    * @return the current rate in degrees per second
    */
-  double GetRate() const override;
+  double GetRate() const;
 
   /**
    * Reset the gyro.
@@ -79,11 +78,9 @@ class ADXRS450_Gyro : public Gyro,
    * significant drift in the gyro and it needs to be recalibrated after it has
    * been running.
    */
-  void Reset() override;
+  void Reset();
 
   /**
-   * Initialize the gyro.
-   *
    * Calibrate the gyro by running for a number of samples and computing the
    * center value. Then use the center value as the Accumulator center value for
    * subsequent measurements.
@@ -93,7 +90,22 @@ class ADXRS450_Gyro : public Gyro,
    * robot is first turned on while it's sitting at rest before the competition
    * starts.
    */
-  void Calibrate() final;
+  void Calibrate();
+
+  /**
+   * Return the heading of the robot as a Rotation2d.
+   *
+   * The angle is continuous, that is it will continue from 360 to 361 degrees.
+   * This allows algorithms that wouldn't want to see a discontinuity in the
+   * gyro output as it sweeps past from 360 to 0 on the second time around.
+   *
+   * The angle is expected to increase as the gyro turns counterclockwise when
+   * looked at from the top. It needs to follow the NWU axis convention.
+   *
+   * @return the current heading of the robot as a Rotation2d. This heading is
+   *         based on integration of the returned rate from the gyro.
+   */
+  Rotation2d GetRotation2d() const;
 
   /**
    * Get the SPI port number.

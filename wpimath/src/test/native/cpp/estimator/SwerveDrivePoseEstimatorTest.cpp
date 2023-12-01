@@ -8,13 +8,13 @@
 #include <tuple>
 
 #include <fmt/format.h>
+#include <gtest/gtest.h>
 #include <wpi/timestamp.h>
 
 #include "frc/estimator/SwerveDrivePoseEstimator.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/kinematics/SwerveDriveKinematics.h"
 #include "frc/trajectory/TrajectoryGenerator.h"
-#include "gtest/gtest.h"
 
 void testFollowTrajectory(
     const frc::SwerveDriveKinematics<4>& kinematics,
@@ -133,6 +133,7 @@ void testFollowTrajectory(
               0.15);
 
   if (checkError) {
+    // NOLINTNEXTLINE(bugprone-integer-division)
     EXPECT_LT(errorSum / (trajectory.TotalTime() / dt), 0.058);
     EXPECT_LT(maxError, 0.2);
   }
@@ -290,7 +291,7 @@ TEST(SwerveDrivePoseEstimatorTest, TestDiscardStaleVisionMeasurements) {
       kinematics,    frc::Rotation2d{}, {fl, fr, bl, br},
       frc::Pose2d{}, {0.1, 0.1, 0.1},   {0.45, 0.45, 0.45}};
 
-  // Add enough measurements to fill up the bufer
+  // Add enough measurements to fill up the buffer
   for (auto time = 0.0_s; time < 4_s; time += 0.02_s) {
     estimator.UpdateWithTime(time, frc::Rotation2d{}, {fl, fr, bl, br});
   }

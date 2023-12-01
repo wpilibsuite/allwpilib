@@ -8,6 +8,8 @@ import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
+import edu.wpi.first.math.kinematics.proto.MecanumDriveKinematicsProto;
+import edu.wpi.first.math.kinematics.struct.MecanumDriveKinematicsStruct;
 import org.ejml.simple.SimpleMatrix;
 
 /**
@@ -30,7 +32,8 @@ import org.ejml.simple.SimpleMatrix;
  * <p>Forward kinematics is also used for odometry -- determining the position of the robot on the
  * field using encoders and a gyro.
  */
-public class MecanumDriveKinematics {
+public class MecanumDriveKinematics
+    implements Kinematics<MecanumDriveWheelSpeeds, MecanumDriveWheelPositions> {
   private final SimpleMatrix m_inverseKinematics;
   private final SimpleMatrix m_forwardKinematics;
 
@@ -40,6 +43,9 @@ public class MecanumDriveKinematics {
   private final Translation2d m_rearRightWheelMeters;
 
   private Translation2d m_prevCoR = new Translation2d();
+
+  public static final MecanumDriveKinematicsProto proto = new MecanumDriveKinematicsProto();
+  public static final MecanumDriveKinematicsStruct struct = new MecanumDriveKinematicsStruct();
 
   /**
    * Constructs a mecanum drive kinematics object.
@@ -125,6 +131,7 @@ public class MecanumDriveKinematics {
    * @param chassisSpeeds The desired chassis speed.
    * @return The wheel speeds.
    */
+  @Override
   public MecanumDriveWheelSpeeds toWheelSpeeds(ChassisSpeeds chassisSpeeds) {
     return toWheelSpeeds(chassisSpeeds, new Translation2d());
   }
@@ -137,6 +144,7 @@ public class MecanumDriveKinematics {
    * @param wheelSpeeds The current mecanum drive wheel speeds.
    * @return The resulting chassis speed.
    */
+  @Override
   public ChassisSpeeds toChassisSpeeds(MecanumDriveWheelSpeeds wheelSpeeds) {
     var wheelSpeedsVector = new SimpleMatrix(4, 1);
     wheelSpeedsVector.setColumn(
@@ -152,6 +160,20 @@ public class MecanumDriveKinematics {
         chassisSpeedsVector.get(0, 0),
         chassisSpeedsVector.get(1, 0),
         chassisSpeedsVector.get(2, 0));
+  }
+
+  @Override
+  public Twist2d toTwist2d(MecanumDriveWheelPositions start, MecanumDriveWheelPositions end) {
+    var wheelDeltasVector = new SimpleMatrix(4, 1);
+    wheelDeltasVector.setColumn(
+        0,
+        0,
+        end.frontLeftMeters - start.frontLeftMeters,
+        end.frontRightMeters - start.frontRightMeters,
+        end.rearLeftMeters - start.rearLeftMeters,
+        end.rearRightMeters - start.rearRightMeters);
+    var twist = m_forwardKinematics.mult(wheelDeltasVector);
+    return new Twist2d(twist.get(0, 0), twist.get(1, 0), twist.get(2, 0));
   }
 
   /**
@@ -172,7 +194,6 @@ public class MecanumDriveKinematics {
         wheelDeltas.rearLeftMeters,
         wheelDeltas.rearRightMeters);
     var twist = m_forwardKinematics.mult(wheelDeltasVector);
-
     return new Twist2d(twist.get(0, 0), twist.get(1, 0), twist.get(2, 0));
   }
 
@@ -190,5 +211,21 @@ public class MecanumDriveKinematics {
     m_inverseKinematics.setRow(1, 0, 1, 1, fr.getX() - fr.getY());
     m_inverseKinematics.setRow(2, 0, 1, 1, rl.getX() - rl.getY());
     m_inverseKinematics.setRow(3, 0, 1, -1, -(rr.getX() + rr.getY()));
+  }
+
+  public Translation2d getFrontLeft() {
+    return m_frontLeftWheelMeters;
+  }
+
+  public Translation2d getFrontRight() {
+    return m_frontRightWheelMeters;
+  }
+
+  public Translation2d getRearLeft() {
+    return m_rearLeftWheelMeters;
+  }
+
+  public Translation2d getRearRight() {
+    return m_rearRightWheelMeters;
   }
 }

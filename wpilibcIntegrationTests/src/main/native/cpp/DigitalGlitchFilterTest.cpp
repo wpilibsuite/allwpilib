@@ -4,17 +4,18 @@
 
 #include "frc/DigitalGlitchFilter.h"  // NOLINT(build/include_order)
 
+#include <gtest/gtest.h>
+
 #include "frc/Counter.h"
 #include "frc/DigitalInput.h"
 #include "frc/Encoder.h"
-#include "gtest/gtest.h"
 
 /**
  * Tests that configuring inputs to be filtered succeeds.
  *
  * This test actually tests everything except that the actual FPGA
  * implementation works as intended.  We configure the FPGA and then query it to
- * make sure that the acutal configuration matches.
+ * make sure that the actual configuration matches.
  */
 TEST(DigitalGlitchFilterTest, Basic) {
   frc::DigitalInput input1{1};

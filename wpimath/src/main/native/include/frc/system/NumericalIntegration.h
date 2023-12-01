@@ -4,12 +4,10 @@
 
 #pragma once
 
-#include <frc/StateSpaceUtil.h>
-
 #include <algorithm>
 #include <array>
+#include <cmath>
 
-#include "Eigen/Core"
 #include "units/time.h"
 
 namespace frc {
@@ -122,7 +120,11 @@ T RKDP(F&& f, T x, U u, units::second_t dt, double maxError = 1e-6) {
                               (b1[6] - b2[6]) * k7))
                             .norm();
 
-      h *= 0.9 * std::pow(maxError / truncationError, 1.0 / 5.0);
+      if (truncationError == 0.0) {
+        h = dt.value() - dtElapsed;
+      } else {
+        h *= 0.9 * std::pow(maxError / truncationError, 1.0 / 5.0);
+      }
     } while (truncationError > maxError);
 
     dtElapsed += h;

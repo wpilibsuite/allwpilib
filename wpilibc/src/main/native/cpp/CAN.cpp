@@ -131,3 +131,7 @@ bool CAN::ReadPacketTimeout(int apiId, int timeoutMs, CANData* data) {
     return true;
   }
 }
+
+uint64_t CAN::GetTimestampBaseTime() {
+  return HAL_GetCANPacketBaseTime();
+}

@@ -2,10 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <gtest/gtest.h>
-
 #include <cmath>
 
+#include <gtest/gtest.h>
+
+#include "frc/EigenCore.h"
 #include "frc/system/NumericalIntegration.h"
 
 // Tests that integrating dx/dt = e^x works.
@@ -28,6 +29,16 @@ TEST(NumericalIntegrationTest, ExponentialWithU) {
       },
       y0, frc::Vectord<1>{1.0}, 0.1_s);
   EXPECT_NEAR(y1(0), std::exp(0.1) - std::exp(0), 1e-3);
+}
+
+// Tests that integrating dx/dt = 0 works with RKDP
+TEST(NumericalIntegrationTest, ZeroRKDP) {
+  frc::Vectord<1> y1 = frc::RKDP(
+      [](const frc::Vectord<1>& x, const frc::Vectord<1>& u) {
+        return frc::Vectord<1>::Zero();
+      },
+      frc::Vectord<1>{0.0}, frc::Vectord<1>{0.0}, 0.1_s);
+  EXPECT_NEAR(y1(0), 0.0, 1e-3);
 }
 
 // Tests that integrating dx/dt = e^x works with RKDP

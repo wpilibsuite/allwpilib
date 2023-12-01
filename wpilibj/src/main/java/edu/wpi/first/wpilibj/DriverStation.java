@@ -22,6 +22,9 @@ import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.FloatArrayLogEntry;
 import edu.wpi.first.util.datalog.IntegerArrayLogEntry;
 import java.nio.ByteBuffer;
+import java.util.Map;
+import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.concurrent.locks.ReentrantLock;
 
 /** Provide access to the network communication data to / from the Driver Station. */
@@ -67,8 +70,7 @@ public final class DriverStation {
   /** The robot alliance that the robot is a part of. */
   public enum Alliance {
     Red,
-    Blue,
-    Invalid
+    Blue
   }
 
   public enum MatchType {
@@ -216,78 +218,97 @@ public final class DriverStation {
       m_logAxes = new FloatArrayLogEntry(log, "DS:joystick" + stick + "/axes", timestamp);
       m_logPOVs = new IntegerArrayLogEntry(log, "DS:joystick" + stick + "/povs", timestamp);
 
-      appendButtons(timestamp);
-      appendAxes(timestamp);
-      appendPOVs(timestamp);
+      appendButtons(m_joystickButtons[m_stick], timestamp);
+      appendAxes(m_joystickAxes[m_stick], timestamp);
+      appendPOVs(m_joystickPOVs[m_stick], timestamp);
     }
 
     public void send(long timestamp) {
-      if (m_joystickButtonsCache[m_stick].m_count != m_joystickButtons[m_stick].m_count
-          || m_joystickButtonsCache[m_stick].m_buttons != m_joystickButtons[m_stick].m_buttons) {
-        appendButtons(timestamp);
+      HALJoystickButtons buttons = m_joystickButtons[m_stick];
+      if (buttons.m_count != m_prevButtons.m_count
+          || buttons.m_buttons != m_prevButtons.m_buttons) {
+        appendButtons(buttons, timestamp);
       }
 
-      if (m_joystickAxesCache[m_stick].m_count != m_joystickAxes[m_stick].m_count) {
-        appendAxes(timestamp);
+      HALJoystickAxes axes = m_joystickAxes[m_stick];
+      int count = axes.m_count;
+      boolean needToLog = false;
+      if (count != m_prevAxes.m_count) {
+        needToLog = true;
       } else {
-        int count = m_joystickAxesCache[m_stick].m_count;
         for (int i = 0; i < count; i++) {
-          if (m_joystickAxesCache[m_stick].m_axes[i] != m_joystickAxes[m_stick].m_axes[i]) {
-            appendAxes(timestamp);
-            break;
+          if (axes.m_axes[i] != m_prevAxes.m_axes[i]) {
+            needToLog = true;
           }
         }
       }
+      if (needToLog) {
+        appendAxes(axes, timestamp);
+      }
 
-      if (m_joystickPOVsCache[m_stick].m_count != m_joystickPOVs[m_stick].m_count) {
-        appendPOVs(timestamp);
+      HALJoystickPOVs povs = m_joystickPOVs[m_stick];
+      count = m_joystickPOVs[m_stick].m_count;
+      needToLog = false;
+      if (count != m_prevPOVs.m_count) {
+        needToLog = true;
       } else {
-        int count = m_joystickPOVsCache[m_stick].m_count;
         for (int i = 0; i < count; i++) {
-          if (m_joystickPOVsCache[m_stick].m_povs[i] != m_joystickPOVs[m_stick].m_povs[i]) {
-            appendPOVs(timestamp);
-            break;
+          if (povs.m_povs[i] != m_prevPOVs.m_povs[i]) {
+            needToLog = true;
           }
         }
+      }
+      if (needToLog) {
+        appendPOVs(povs, timestamp);
       }
     }
 
-    void appendButtons(long timestamp) {
-      int count = m_joystickButtonsCache[m_stick].m_count;
+    void appendButtons(HALJoystickButtons buttons, long timestamp) {
+      byte count = buttons.m_count;
       if (m_sizedButtons == null || m_sizedButtons.length != count) {
         m_sizedButtons = new boolean[count];
       }
-      int buttons = m_joystickButtonsCache[m_stick].m_buttons;
+      int buttonsValue = buttons.m_buttons;
       for (int i = 0; i < count; i++) {
-        m_sizedButtons[i] = (buttons & (1 << i)) != 0;
+        m_sizedButtons[i] = (buttonsValue & (1 << i)) != 0;
       }
       m_logButtons.append(m_sizedButtons, timestamp);
+      m_prevButtons.m_count = count;
+      m_prevButtons.m_buttons = buttons.m_buttons;
     }
 
-    void appendAxes(long timestamp) {
-      int count = m_joystickAxesCache[m_stick].m_count;
+    void appendAxes(HALJoystickAxes axes, long timestamp) {
+      int count = axes.m_count;
       if (m_sizedAxes == null || m_sizedAxes.length != count) {
         m_sizedAxes = new float[count];
       }
-      System.arraycopy(m_joystickAxesCache[m_stick].m_axes, 0, m_sizedAxes, 0, count);
+      System.arraycopy(axes.m_axes, 0, m_sizedAxes, 0, count);
       m_logAxes.append(m_sizedAxes, timestamp);
+      m_prevAxes.m_count = count;
+      System.arraycopy(axes.m_axes, 0, m_prevAxes.m_axes, 0, count);
     }
 
-    void appendPOVs(long timestamp) {
-      int count = m_joystickPOVsCache[m_stick].m_count;
+    @SuppressWarnings("PMD.AvoidArrayLoops")
+    void appendPOVs(HALJoystickPOVs povs, long timestamp) {
+      int count = povs.m_count;
       if (m_sizedPOVs == null || m_sizedPOVs.length != count) {
         m_sizedPOVs = new long[count];
       }
       for (int i = 0; i < count; i++) {
-        m_sizedPOVs[i] = m_joystickPOVsCache[m_stick].m_povs[i];
+        m_sizedPOVs[i] = povs.m_povs[i];
       }
       m_logPOVs.append(m_sizedPOVs, timestamp);
+      m_prevPOVs.m_count = count;
+      System.arraycopy(povs.m_povs, 0, m_prevPOVs.m_povs, 0, count);
     }
 
     final int m_stick;
     boolean[] m_sizedButtons;
     float[] m_sizedAxes;
     long[] m_sizedPOVs;
+    final HALJoystickButtons m_prevButtons = new HALJoystickButtons();
+    final HALJoystickAxes m_prevAxes = new HALJoystickAxes(DriverStationJNI.kMaxJoystickAxes);
+    final HALJoystickPOVs m_prevPOVs = new HALJoystickPOVs(DriverStationJNI.kMaxJoystickPOVs);
     final BooleanArrayLogEntry m_logButtons;
     final FloatArrayLogEntry m_logAxes;
     final IntegerArrayLogEntry m_logPOVs;
@@ -927,7 +948,7 @@ public final class DriverStation {
   }
 
   /**
-   * Gets a value indicating whether the Driver Station requires the robot to be running in test
+   * Gets a value indicating whether the Driver Station requires the robot to be running in Test
    * mode.
    *
    * @return True if test mode should be enabled, false otherwise.
@@ -936,6 +957,21 @@ public final class DriverStation {
     m_cacheDataMutex.lock();
     try {
       return m_controlWord.getTest();
+    } finally {
+      m_cacheDataMutex.unlock();
+    }
+  }
+
+  /**
+   * Gets a value indicating whether the Driver Station requires the robot to be running in Test
+   * mode and enabled.
+   *
+   * @return True if test mode should be set and the robot should be enabled.
+   */
+  public static boolean isTestEnabled() {
+    m_cacheDataMutex.lock();
+    try {
+      return m_controlWord.getTest() && m_controlWord.getEnabled();
     } finally {
       m_cacheDataMutex.unlock();
     }
@@ -1052,33 +1088,40 @@ public final class DriverStation {
     }
   }
 
+  private static Map<AllianceStationID, Optional<Alliance>> m_allianceMap =
+      Map.of(
+          AllianceStationID.Unknown, Optional.empty(),
+          AllianceStationID.Red1, Optional.of(Alliance.Red),
+          AllianceStationID.Red2, Optional.of(Alliance.Red),
+          AllianceStationID.Red3, Optional.of(Alliance.Red),
+          AllianceStationID.Blue1, Optional.of(Alliance.Blue),
+          AllianceStationID.Blue2, Optional.of(Alliance.Blue),
+          AllianceStationID.Blue3, Optional.of(Alliance.Blue));
+
+  private static Map<AllianceStationID, OptionalInt> m_stationMap =
+      Map.of(
+          AllianceStationID.Unknown, OptionalInt.empty(),
+          AllianceStationID.Red1, OptionalInt.of(1),
+          AllianceStationID.Red2, OptionalInt.of(2),
+          AllianceStationID.Red3, OptionalInt.of(3),
+          AllianceStationID.Blue1, OptionalInt.of(1),
+          AllianceStationID.Blue2, OptionalInt.of(2),
+          AllianceStationID.Blue3, OptionalInt.of(3));
+
   /**
    * Get the current alliance from the FMS.
    *
    * <p>If the FMS is not connected, it is set from the team alliance setting on the driver station.
    *
-   * @return the current alliance
+   * @return The alliance (red or blue) or an empty optional if the alliance is invalid
    */
-  public static Alliance getAlliance() {
+  public static Optional<Alliance> getAlliance() {
     AllianceStationID allianceStationID = DriverStationJNI.getAllianceStation();
     if (allianceStationID == null) {
-      return Alliance.Invalid;
+      allianceStationID = AllianceStationID.Unknown;
     }
 
-    switch (allianceStationID) {
-      case Red1:
-      case Red2:
-      case Red3:
-        return Alliance.Red;
-
-      case Blue1:
-      case Blue2:
-      case Blue3:
-        return Alliance.Blue;
-
-      default:
-        return Alliance.Invalid;
-    }
+    return m_allianceMap.get(allianceStationID);
   }
 
   /**
@@ -1088,35 +1131,69 @@ public final class DriverStation {
    *
    * @return the location of the team's driver station controls: 1, 2, or 3
    */
-  public static int getLocation() {
+  public static OptionalInt getLocation() {
     AllianceStationID allianceStationID = DriverStationJNI.getAllianceStation();
     if (allianceStationID == null) {
-      return 0;
+      allianceStationID = AllianceStationID.Unknown;
     }
-    switch (allianceStationID) {
-      case Red1:
-      case Blue1:
-        return 1;
 
-      case Red2:
-      case Blue2:
-        return 2;
+    return m_stationMap.get(allianceStationID);
+  }
 
-      case Blue3:
-      case Red3:
-        return 3;
+  /**
+   * Gets the raw alliance station of the teams driver station.
+   *
+   * <p>This returns the raw low level value. Prefer getLocation or getAlliance unless necessary for
+   * performance.
+   *
+   * @return The raw alliance station id.
+   */
+  public static AllianceStationID getRawAllianceStation() {
+    return DriverStationJNI.getAllianceStation();
+  }
 
-      default:
-        return 0;
+  /**
+   * Wait for a DS connection.
+   *
+   * @param timeoutSeconds timeout in seconds. 0 for infinite.
+   * @return true if connected, false if timeout
+   */
+  public static boolean waitForDsConnection(double timeoutSeconds) {
+    int event = WPIUtilJNI.createEvent(true, false);
+    DriverStationJNI.provideNewDataEventHandle(event);
+    boolean result;
+    try {
+      if (timeoutSeconds == 0) {
+        WPIUtilJNI.waitForObject(event);
+        result = true;
+      } else {
+        result = !WPIUtilJNI.waitForObjectTimeout(event, timeoutSeconds);
+      }
+    } catch (InterruptedException ex) {
+      Thread.currentThread().interrupt();
+      result = false;
+    } finally {
+      DriverStationJNI.removeNewDataEventHandle(event);
+      WPIUtilJNI.destroyEvent(event);
     }
+    return result;
   }
 
   /**
    * Return the approximate match time. The FMS does not send an official match time to the robots,
    * but does send an approximate match time. The value will count down the time remaining in the
    * current period (auto or teleop). Warning: This is not an official time (so it cannot be used to
-   * dispute ref calls or guarantee that a function will trigger before the match ends) The Practice
-   * Match function of the DS approximates the behavior seen on the field.
+   * dispute ref calls or guarantee that a function will trigger before the match ends).
+   *
+   * <p>When connected to the real field, this number only changes in full integer increments, and
+   * always counts down.
+   *
+   * <p>When the DS is in practice mode, this number is a floating point number, and counts down.
+   *
+   * <p>When the DS is in teleop or autonomous mode, this number is a floating point number, and
+   * counts up.
+   *
+   * <p>Simulation matches DS behavior without an FMS connected.
    *
    * @return Time remaining in current match period (auto or teleop) in seconds
    */

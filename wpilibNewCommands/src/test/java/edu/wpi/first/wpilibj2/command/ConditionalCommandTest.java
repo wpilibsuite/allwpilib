@@ -4,11 +4,19 @@
 
 package edu.wpi.first.wpilibj2.command;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
+import java.util.function.BooleanSupplier;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class ConditionalCommandTest extends CommandTestBase {
   @Test
@@ -59,5 +67,93 @@ class ConditionalCommandTest extends CommandTestBase {
       verify(command1).end(true);
       verify(command2, never()).end(true);
     }
+  }
+
+  static Stream<Arguments> interruptible() {
+    return Stream.of(
+        arguments(
+            "AllCancelSelf",
+            InterruptionBehavior.kCancelSelf,
+            new WaitUntilCommand(() -> false)
+                .withInterruptBehavior(InterruptionBehavior.kCancelSelf),
+            new WaitUntilCommand(() -> false)
+                .withInterruptBehavior(InterruptionBehavior.kCancelSelf),
+            (BooleanSupplier) () -> true),
+        arguments(
+            "AllCancelIncoming",
+            InterruptionBehavior.kCancelIncoming,
+            new WaitUntilCommand(() -> false)
+                .withInterruptBehavior(InterruptionBehavior.kCancelIncoming),
+            new WaitUntilCommand(() -> false)
+                .withInterruptBehavior(InterruptionBehavior.kCancelIncoming),
+            (BooleanSupplier) () -> true),
+        arguments(
+            "OneCancelSelfOneIncoming",
+            InterruptionBehavior.kCancelSelf,
+            new WaitUntilCommand(() -> false)
+                .withInterruptBehavior(InterruptionBehavior.kCancelSelf),
+            new WaitUntilCommand(() -> false)
+                .withInterruptBehavior(InterruptionBehavior.kCancelIncoming),
+            (BooleanSupplier) () -> true),
+        arguments(
+            "OneCancelIncomingOneSelf",
+            InterruptionBehavior.kCancelSelf,
+            new WaitUntilCommand(() -> false)
+                .withInterruptBehavior(InterruptionBehavior.kCancelIncoming),
+            new WaitUntilCommand(() -> false)
+                .withInterruptBehavior(InterruptionBehavior.kCancelSelf),
+            (BooleanSupplier) () -> true));
+  }
+
+  @MethodSource
+  @ParameterizedTest(name = "interruptible[{index}]: {0}")
+  void interruptible(
+      @SuppressWarnings("unused") String name,
+      InterruptionBehavior expected,
+      Command command1,
+      Command command2,
+      BooleanSupplier selector) {
+    var command = Commands.either(command1, command2, selector);
+    assertEquals(expected, command.getInterruptionBehavior());
+  }
+
+  static Stream<Arguments> runsWhenDisabled() {
+    return Stream.of(
+        arguments(
+            "AllFalse",
+            false,
+            new WaitUntilCommand(() -> false).ignoringDisable(false),
+            new WaitUntilCommand(() -> false).ignoringDisable(false),
+            (BooleanSupplier) () -> true),
+        arguments(
+            "AllTrue",
+            true,
+            new WaitUntilCommand(() -> false).ignoringDisable(true),
+            new WaitUntilCommand(() -> false).ignoringDisable(true),
+            (BooleanSupplier) () -> true),
+        arguments(
+            "OneTrueOneFalse",
+            false,
+            new WaitUntilCommand(() -> false).ignoringDisable(true),
+            new WaitUntilCommand(() -> false).ignoringDisable(false),
+            (BooleanSupplier) () -> true),
+        arguments(
+            "OneFalseOneTrue",
+            false,
+            new WaitUntilCommand(() -> false).ignoringDisable(false),
+            new WaitUntilCommand(() -> false).ignoringDisable(true),
+            (BooleanSupplier) () -> true));
+  }
+
+  @MethodSource
+  @ParameterizedTest(name = "runsWhenDisabled[{index}]: {0}")
+  void runsWhenDisabled(
+      @SuppressWarnings("unused") String name,
+      boolean expected,
+      Command command1,
+      Command command2,
+      BooleanSupplier selector) {
+    var command = Commands.either(command1, command2, selector);
+    assertEquals(expected, command.runsWhenDisabled());
   }
 }

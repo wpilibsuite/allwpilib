@@ -466,7 +466,8 @@ static void ValueToCsv(wpi::raw_ostream& os, const Entry& entry,
       fmt::print(os, "{}", val);
       return;
     }
-  } else if (entry.type == "int64") {
+  } else if (entry.type == "int64" || entry.type == "int") {
+    // support "int" for compatibility with old NT4 datalogs
     int64_t val;
     if (record.GetInteger(&val)) {
       fmt::print(os, "{}", val);

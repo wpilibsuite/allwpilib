@@ -4,6 +4,8 @@
 
 package edu.wpi.first.math;
 
+import edu.wpi.first.util.WPIUtilJNI;
+
 public final class MathSharedStore {
   private static MathShared mathShared;
 
@@ -23,6 +25,11 @@ public final class MathSharedStore {
 
             @Override
             public void reportUsage(MathUsageId id, int count) {}
+
+            @Override
+            public double getTimestamp() {
+              return WPIUtilJNI.now() * 1.0e-6;
+            }
           };
     }
     return mathShared;
@@ -55,5 +62,14 @@ public final class MathSharedStore {
    */
   public static void reportUsage(MathUsageId id, int count) {
     getMathShared().reportUsage(id, count);
+  }
+
+  /**
+   * Get the time.
+   *
+   * @return The time in seconds.
+   */
+  public static double getTimestamp() {
+    return getMathShared().getTimestamp();
   }
 }

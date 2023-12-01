@@ -97,7 +97,7 @@ void ParallelDeadlineGroup::SetDeadline(std::unique_ptr<Command>&& deadline) {
 }
 
 void ParallelDeadlineGroup::InitSendable(wpi::SendableBuilder& builder) {
-  CommandBase::InitSendable(builder);
+  Command::InitSendable(builder);
 
   builder.AddStringProperty(
       "deadline", [this] { return m_deadline->GetName(); }, nullptr);

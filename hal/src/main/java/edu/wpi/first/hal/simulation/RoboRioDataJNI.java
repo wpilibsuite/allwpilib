@@ -151,6 +151,23 @@ public class RoboRioDataJNI extends JNIWrapper {
 
   public static native void setBrownoutVoltage(double brownoutVoltage);
 
+  public static native int registerCPUTempCallback(NotifyCallback callback, boolean initialNotify);
+
+  public static native void cancelCPUTempCallback(int uid);
+
+  public static native double getCPUTemp();
+
+  public static native void setCPUTemp(double cpuTemp);
+
+  public static native int registerTeamNumberCallback(
+      NotifyCallback callback, boolean initialNotify);
+
+  public static native void cancelTeamNumberCallback(int uid);
+
+  public static native int getTeamNumber();
+
+  public static native void setTeamNumber(int teamNumber);
+
   public static native String getSerialNumber();
 
   public static native void setSerialNumber(String serialNumber);

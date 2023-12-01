@@ -30,11 +30,12 @@ extern "C" {
 /**
  * Initializes a serial port.
  *
- * The channels are either the onboard RS232, the mxp uart, or 2 USB ports. The
+ * The channels are either the onboard RS232, the MXP UART, or 2 USB ports. The
  * top port is USB1, the bottom port is USB2.
  *
  * @param[in] port the serial port to initialize
  * @param[out] status the error code, or 0 for success
+ * @return Serial Port Handle
  */
 HAL_SerialPortHandle HAL_InitializeSerialPort(HAL_SerialPort port,
                                               int32_t* status);
@@ -48,6 +49,7 @@ HAL_SerialPortHandle HAL_InitializeSerialPort(HAL_SerialPort port,
  * @param[in] port     the serial port to initialize
  * @param[in] portName the dev port name
  * @param[out] status  the error code, or 0 for success
+ * @return Serial Port Handle
  */
 HAL_SerialPortHandle HAL_InitializeSerialPortDirect(HAL_SerialPort port,
                                                     const char* portName,

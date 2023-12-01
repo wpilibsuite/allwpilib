@@ -25,9 +25,6 @@ public class SimDeviceSim {
    */
   public SimDeviceSim(String name) {
     this(SimDeviceDataJNI.getSimDeviceHandle(name));
-    if (m_handle == 0) {
-      throw new IllegalArgumentException("No sim device exists with name '" + name + "'.");
-    }
   }
 
   /**

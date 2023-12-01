@@ -6,7 +6,9 @@ package edu.wpi.first.apriltag;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import edu.wpi.first.apriltag.jni.AprilTagJNI;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.util.RawFrame;
 import java.util.Objects;
 
 @SuppressWarnings("MemberName")
@@ -43,5 +45,29 @@ public class AprilTag {
   @Override
   public String toString() {
     return "AprilTag(ID: " + ID + ", pose: " + pose + ")";
+  }
+
+  /**
+   * Generates a RawFrame containing the apriltag with the id with family 16h5 passed in.
+   *
+   * @param id id
+   * @return A RawFrame containing the AprilTag image
+   */
+  public static RawFrame generate16h5AprilTagImage(int id) {
+    RawFrame generatedImage = new RawFrame();
+    AprilTagJNI.generate16h5AprilTagImage(id, generatedImage.getDataPtr());
+    return generatedImage;
+  }
+
+  /**
+   * Generates a RawFrame containing the apriltag with the id with family 36h11 passed in.
+   *
+   * @param id id
+   * @return A RawFrame containing the AprilTag image
+   */
+  public static RawFrame generate36h11AprilTagImage(int id) {
+    RawFrame generatedImage = new RawFrame();
+    AprilTagJNI.generate36h11AprilTagImage(id, generatedImage.getDataPtr());
+    return generatedImage;
   }
 }

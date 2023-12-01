@@ -11,7 +11,9 @@ ext {
 
 apply from: "${rootDir}/shared/opencv.gradle"
 
-mainClassName = 'edu.wpi.first.wpilibj.test.AntJunitLauncher'
+application {
+    mainClass = 'edu.wpi.first.wpilibj.test.AntJunitLauncher'
+}
 
 apply plugin: 'com.github.johnrengelman.shadow'
 
@@ -44,7 +46,7 @@ def testOutputFolder = file("${project(':').buildDir}/integrationTestFiles")
 task copyWpilibJIntegrationTestJarToOutput(type: Copy) {
     destinationDir testOutputFolder
     dependsOn shadowJar
-    inputs.file shadowJar.archivePath
+    inputs.file shadowJar.archiveFile
     from(shadowJar) {
         into 'java'
     }

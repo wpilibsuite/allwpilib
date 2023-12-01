@@ -1,0 +1,27 @@
+cppHeaderFileInclude {
+  \.h$
+}
+
+cppSrcFileInclude {
+  \.cpp$
+}
+
+modifiableFileExclude {
+  src/main/native/include/DataLogManager\.h$
+}
+
+repoRootNameOverride {
+  ntcoreffi
+}
+
+includeOtherLibs {
+  ^fmt/
+  ^gmock/
+  ^gtest/
+  ^networktables/
+  ^wpi/
+}
+
+includeGuardRoots {
+  ntcoreffi/src/main/native/include/
+}

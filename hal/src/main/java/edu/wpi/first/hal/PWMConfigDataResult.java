@@ -15,18 +15,18 @@ public class PWMConfigDataResult {
     this.min = min;
   }
 
-  /** The maximum PWM value. */
+  /** The maximum PWM value in microseconds. */
   public int max;
 
-  /** The deadband maximum PWM value. */
+  /** The deadband maximum PWM value in microseconds. */
   public int deadbandMax;
 
-  /** The center PWM value. */
+  /** The center PWM value in microseconds. */
   public int center;
 
-  /** The deadband minimum PWM value. */
+  /** The deadband minimum PWM value in microseconds. */
   public int deadbandMin;
 
-  /** The minimum PWM value. */
+  /** The minimum PWM value in microseconds. */
   public int min;
 }

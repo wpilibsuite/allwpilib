@@ -12,12 +12,11 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
 /**
- * A {@link Button} that uses a {@link NetworkTable} boolean field.
+ * A {@link Trigger} that uses a {@link NetworkTable} boolean field.
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-@SuppressWarnings("deprecation")
-public class NetworkButton extends Button {
+public class NetworkButton extends Trigger {
   /**
    * Creates a NetworkButton that commands can be bound to.
    *

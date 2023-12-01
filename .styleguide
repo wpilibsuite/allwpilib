@@ -10,6 +10,7 @@ cppSrcFileInclude {
 }
 
 modifiableFileExclude {
+  cmake/toolchains/
   \.patch$
   gradlew
 }
@@ -29,8 +30,9 @@ includeOtherLibs {
   ^Eigen/
   ^cameraserver/
   ^cscore
-  ^drake/
   ^fmt/
+  ^gtest/
+  ^google/
   ^hal/
   ^imgui
   ^implot

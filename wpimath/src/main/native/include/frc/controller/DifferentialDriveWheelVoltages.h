@@ -17,3 +17,6 @@ struct DifferentialDriveWheelVoltages {
 };
 
 }  // namespace frc
+
+#include "frc/controller/proto/DifferentialDriveWheelVoltagesProto.h"
+#include "frc/controller/struct/DifferentialDriveWheelVoltagesStruct.h"

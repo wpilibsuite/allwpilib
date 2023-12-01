@@ -15,7 +15,7 @@ public final class StateSpaceUtil {
   private static Random rand = new Random();
 
   private StateSpaceUtil() {
-    // Utility class
+    throw new UnsupportedOperationException("This is a utility class!");
   }
 
   /**
@@ -90,7 +90,7 @@ public final class StateSpaceUtil {
    * Returns true if (A, B) is a stabilizable pair.
    *
    * <p>(A, B) is stabilizable if and only if the uncontrollable eigenvalues of A, if any, have
-   * absolute values less than one, where an eigenvalue is uncontrollable if rank(λI - A, B) %3C n
+   * absolute values less than one, where an eigenvalue is uncontrollable if rank([λI - A, B]) %3C n
    * where n is the number of states.
    *
    * @param <States> Num representing the size of A.
@@ -108,7 +108,7 @@ public final class StateSpaceUtil {
    * Returns true if (A, C) is a detectable pair.
    *
    * <p>(A, C) is detectable if and only if the unobservable eigenvalues of A, if any, have absolute
-   * values less than one, where an eigenvalue is unobservable if rank(λI - A; C) %3C n where n is
+   * values less than one, where an eigenvalue is unobservable if rank([λI - A; C]) %3C n where n is
    * the number of states.
    *
    * @param <States> Num representing the size of A.
