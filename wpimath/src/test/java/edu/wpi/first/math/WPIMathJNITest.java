@@ -11,6 +11,6 @@ import org.junit.jupiter.api.Test;
 public class WPIMathJNITest {
   @Test
   public void testLink() {
-    assertDoesNotThrow(WPIMathJNI::forceLoad);
+    assertDoesNotThrow(WPIMathJNI::load);
   }
 }

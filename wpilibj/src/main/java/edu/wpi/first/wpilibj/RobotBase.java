@@ -4,18 +4,23 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.apriltag.jni.AprilTagJNI;
 import edu.wpi.first.cameraserver.CameraServerShared;
 import edu.wpi.first.cameraserver.CameraServerSharedStore;
+import edu.wpi.first.cscore.CameraServerCvJNI;
 import edu.wpi.first.cscore.CameraServerJNI;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.HALUtil;
+import edu.wpi.first.hal.JNIWrapper;
 import edu.wpi.first.math.MathShared;
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
+import edu.wpi.first.net.WPINetJNI;
 import edu.wpi.first.networktables.MultiSubscriber;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.NetworkTablesJNI;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -405,12 +410,31 @@ public abstract class RobotBase implements AutoCloseable {
   }
 
   /**
+   * Load all JNI libraries.
+   *
+   * @throws IOException If any library was not found.
+   */
+  public static void loadAllJni() throws IOException {
+    WPIUtilJNI.load();
+    WPINetJNI.load();
+    JNIWrapper.load();
+    NetworkTablesJNI.load();
+    CameraServerCvJNI.load(); // Loads non CV as well
+    AprilTagJNI.load();
+  }
+
+  /**
    * Starting point for the applications.
    *
    * @param <T> Robot subclass.
    * @param robotSupplier Function that returns an instance of the robot subclass.
    */
   public static <T extends RobotBase> void startRobot(Supplier<T> robotSupplier) {
+    try {
+      loadAllJni();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
     if (!HAL.initialize(500, 0)) {
       throw new IllegalStateException("Failed to initialize. Terminating");
     }

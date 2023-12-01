@@ -10,6 +10,6 @@ import org.junit.jupiter.api.Test;
 public class WPINetJNITest {
   @Test
   void jniLinkTest() throws IOException {
-    WPINetJNI.forceLoad();
+    WPINetJNI.load();
   }
 }

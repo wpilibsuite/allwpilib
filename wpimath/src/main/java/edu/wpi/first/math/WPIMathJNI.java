@@ -6,33 +6,17 @@ package edu.wpi.first.math;
 
 import edu.wpi.first.util.RuntimeLoader;
 import java.io.IOException;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public final class WPIMathJNI {
   static boolean libraryLoaded = false;
   static RuntimeLoader<WPIMathJNI> loader = null;
 
-  static {
-    if (Helper.getExtractOnStaticLoad()) {
-      try {
-        loader =
-            new RuntimeLoader<>(
-                "wpimathjni", RuntimeLoader.getDefaultExtractionRoot(), WPIMathJNI.class);
-        loader.loadLibrary();
-      } catch (IOException ex) {
-        ex.printStackTrace();
-        System.exit(1);
-      }
-      libraryLoaded = true;
-    }
-  }
-
   /**
-   * Force load the library.
+   * Load the library.
    *
    * @throws IOException If the library could not be loaded or found.
    */
-  public static synchronized void forceLoad() throws IOException {
+  public static synchronized void load() throws IOException {
     if (libraryLoaded) {
       return;
     }
@@ -384,16 +368,4 @@ public final class WPIMathJNI {
    * @return A JSON containing the serialized trajectory.
    */
   public static native String serializeTrajectory(double[] elements);
-
-  public static class Helper {
-    private static AtomicBoolean extractOnStaticLoad = new AtomicBoolean(true);
-
-    public static boolean getExtractOnStaticLoad() {
-      return extractOnStaticLoad.get();
-    }
-
-    public static void setExtractOnStaticLoad(boolean load) {
-      extractOnStaticLoad.set(load);
-    }
-  }
 }
