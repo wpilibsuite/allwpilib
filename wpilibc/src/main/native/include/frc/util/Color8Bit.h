@@ -8,7 +8,6 @@
 #include <stdexcept>
 #include <string>
 #include <string_view>
-#include <type_traits>
 
 #include <fmt/core.h>
 #include <wpi/StringExtras.h>
@@ -105,21 +104,8 @@ class Color8Bit {
    *
    * @return a string of the format <tt>\#RRGGBB</tt>
    */
-  constexpr std::string HexString() const {
-    if (std::is_constant_evaluated()) {
-      std::string str = "#";
-
-      str += wpi::hexdigit(red / 16);
-      str += wpi::hexdigit(red % 16);
-      str += wpi::hexdigit(green / 16);
-      str += wpi::hexdigit(green % 16);
-      str += wpi::hexdigit(blue / 16);
-      str += wpi::hexdigit(blue % 16);
-
-      return str;
-    } else {
-      return fmt::format("#{:02X}{:02X}{:02X}", red, green, blue);
-    }
+  std::string HexString() const {
+    return fmt::format("#{:02X}{:02X}{:02X}", red, green, blue);
   }
 
   int red = 0;
