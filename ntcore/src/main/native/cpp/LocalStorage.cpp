@@ -256,6 +256,10 @@ void LocalStorage::Impl::SetFlags(TopicData* topic, unsigned int flags) {
     topic->properties["cached"] = false;
     update["cached"] = false;
   }
+  if ((flags & NT_CACHED) == 0 && (flags & NT_PERSISTENT) != 0) {
+    WARN("topic {}: disabling cached property disables persistent storage",
+         topic->name);
+  }
   topic->flags = flags;
   if (!update.empty()) {
     PropertiesUpdated(topic, update, NT_EVENT_NONE, true, false);
