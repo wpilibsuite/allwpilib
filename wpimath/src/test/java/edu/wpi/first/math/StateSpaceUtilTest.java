@@ -15,8 +15,6 @@ import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.wpilibj.UtilityClassTest;
 import java.util.ArrayList;
 import java.util.List;
-import org.ejml.dense.row.MatrixFeatures_DDRM;
-import org.ejml.simple.SimpleMatrix;
 import org.junit.jupiter.api.Test;
 
 class StateSpaceUtilTest extends UtilityClassTest<StateSpaceUtil> {
@@ -151,29 +149,6 @@ class StateSpaceUtilTest extends UtilityClassTest<StateSpaceUtil> {
     assertTrue(
         wrappedResult.isEqual(
             MatBuilder.fill(Nat.N2(), Nat.N2(), 1.01035625, 0.02050912, 0.03076368, 1.04111993),
-            1E-8));
-  }
-
-  @Test
-  void testSimpleMatrixExp() {
-    SimpleMatrix matrix = SimpleMatrixUtils.eye(2);
-    var result = SimpleMatrixUtils.exp(matrix);
-
-    assertTrue(
-        MatrixFeatures_DDRM.isIdentical(
-            result.getDDRM(),
-            new SimpleMatrix(2, 2, true, new double[] {Math.E, 0, 0, Math.E}).getDDRM(),
-            1E-9));
-
-    matrix = new SimpleMatrix(2, 2, true, new double[] {1, 2, 3, 4});
-    result = SimpleMatrixUtils.exp(matrix.scale(0.01));
-
-    assertTrue(
-        MatrixFeatures_DDRM.isIdentical(
-            result.getDDRM(),
-            new SimpleMatrix(
-                    2, 2, true, new double[] {1.01035625, 0.02050912, 0.03076368, 1.04111993})
-                .getDDRM(),
             1E-8));
   }
 
