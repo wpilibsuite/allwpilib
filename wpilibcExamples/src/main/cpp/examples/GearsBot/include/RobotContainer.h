@@ -5,8 +5,8 @@
 #pragma once
 
 #include <frc/XboxController.h>
-#include <frc2/command/CommandPtr.h>
 #include <frc2/command/Command.h>
+#include <frc2/command/CommandPtr.h>
 
 #include "commands/Autonomous.h"
 #include "subsystems/Claw.h"

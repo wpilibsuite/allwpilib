@@ -76,12 +76,12 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
   switch (m_chooser.GetSelected()) {
     case autos::AutoEnum::kSimpleAuto:
       return autos::SimpleAuto(&m_drive);
-    break;
+      break;
     case autos::AutoEnum::kComplexAuto:
       return autos::ComplexAuto(&m_drive, &m_hatch);
-    break;
+      break;
     default:
       return frc2::CommandPtr(nullptr);
-    break;
+      break;
   }
 }

@@ -6,8 +6,8 @@
 
 #include <frc/XboxController.h>
 #include <frc/smartdashboard/SendableChooser.h>
-#include <frc2/command/CommandPtr.h>
 #include <frc2/command/Command.h>
+#include <frc2/command/CommandPtr.h>
 
 #include "Constants.h"
 #include "commands/ComplexAuto.h"
@@ -17,13 +17,10 @@
 #include "subsystems/HatchSubsystem.h"
 
 /**
- * This is where the autos can be listed for the autonomous chooser so it can use CommandPtr
- * the sendable chooser does not support the use of CommandPtr
+ * This is where the autos can be listed for the autonomous chooser so it can
+ * use CommandPtr the sendable chooser does not support the use of CommandPtr
  */
-enum class Autos {
-  kSimpleAuto,
-  kComplexAuto
-};
+enum class Autos { kSimpleAuto, kComplexAuto };
 
 /**
  * This class is where the bulk of the robot should be declared.  Since

@@ -11,11 +11,11 @@
 #include <frc/shuffleboard/Shuffleboard.h>
 #include <frc/trajectory/Trajectory.h>
 #include <frc/trajectory/TrajectoryGenerator.h>
+#include <frc2/command/Commands.h>
 #include <frc2/command/InstantCommand.h>
 #include <frc2/command/SequentialCommandGroup.h>
 #include <frc2/command/SwerveControllerCommand.h>
 #include <frc2/command/button/JoystickButton.h>
-#include <frc2/command/Commands.h>
 #include <units/angle.h>
 #include <units/velocity.h>
 
@@ -79,18 +79,20 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
 
   // no auto
   return frc2::cmd::Sequence(
-    frc2::SwerveControllerCommand<4>(
-      exampleTrajectory, [this]() { return m_drive.GetPose(); },
+      frc2::SwerveControllerCommand<4>(
+          exampleTrajectory, [this]() { return m_drive.GetPose(); },
 
-      m_drive.kDriveKinematics,
+          m_drive.kDriveKinematics,
 
-      frc::PIDController{AutoConstants::kPXController, 0, 0},
-      frc::PIDController{AutoConstants::kPYController, 0, 0}, thetaController,
+          frc::PIDController{AutoConstants::kPXController, 0, 0},
+          frc::PIDController{AutoConstants::kPYController, 0, 0},
+          thetaController,
 
-      [this](auto moduleStates) { m_drive.SetModuleStates(moduleStates); },
+          [this](auto moduleStates) { m_drive.SetModuleStates(moduleStates); },
 
-      {&m_drive}).ToPtr(),
-    frc2::InstantCommand([this] { m_drive.Drive(0_mps, 0_mps, 0_rad_per_s, false); }, {}).ToPtr()
-  );
-
+          {&m_drive})
+          .ToPtr(),
+      frc2::InstantCommand(
+          [this] { m_drive.Drive(0_mps, 0_mps, 0_rad_per_s, false); }, {})
+          .ToPtr());
 }
