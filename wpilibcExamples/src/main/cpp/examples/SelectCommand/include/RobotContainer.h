@@ -26,11 +26,7 @@ class RobotContainer {
   // The enum used as keys for selecting the command to run.
   enum CommandSelector { ONE, TWO, THREE };
 
-  // An example selector method for the selectcommand.  Returns the selector
-  // that will select which command to run.  Can base this choice on logical
-  // conditions evaluated at runtime.
-  CommandSelector Select() { return ONE; }
-
+  // An example of how command selector may be used with SendableChooser
   frc::SendableChooser<CommandSelector> m_chooser;
 
   // The robot's subsystems and commands are defined here...
