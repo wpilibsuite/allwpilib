@@ -7,6 +7,7 @@
 #include <memory>
 
 #include <hal/Types.h>
+#include <units/pressure.h>
 #include <wpi/DenseMap.h>
 #include <wpi/mutex.h>
 

@@ -25,9 +25,9 @@ import edu.wpi.first.math.system.LinearSystem;
  * amount of the difference between the actual measurements and the measurements predicted by the
  * model.
  *
- * <p>For more on the underlying math, read
- * https://file.tavsys.net/control/controls-engineering-in-frc.pdf chapter 9 "Stochastic control
- * theory".
+ * <p>For more on the underlying math, read <a
+ * href="https://file.tavsys.net/control/controls-engineering-in-frc.pdf">https://file.tavsys.net/control/controls-engineering-in-frc.pdf</a>
+ * chapter 9 "Stochastic control theory".
  */
 public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extends Num>
     implements KalmanTypeFilter<States, Inputs, Outputs> {
@@ -45,8 +45,8 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
   /**
    * Constructs a Kalman filter with the given plant.
    *
-   * <p>See
-   * https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-observers.html#process-and-measurement-noise-covariance-matrices
+   * <p>See <a
+   * href="https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-observers.html#process-and-measurement-noise-covariance-matrices">https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-observers.html#process-and-measurement-noise-covariance-matrices</a>
    * for how to select the standard deviations.
    *
    * @param states A Nat representing the states of the system.
@@ -82,15 +82,12 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
     var C = plant.getC();
 
     if (!StateSpaceUtil.isDetectable(discA, C)) {
-      var builder =
-          new StringBuilder("The system passed to the Kalman filter is unobservable!\n\nA =\n");
-      builder
-          .append(discA.getStorage().toString())
-          .append("\nC =\n")
-          .append(C.getStorage().toString())
-          .append('\n');
-
-      var msg = builder.toString();
+      var msg =
+          "The system passed to the Kalman filter is unobservable!\n\nA =\n"
+              + discA.getStorage().toString()
+              + "\nC =\n"
+              + C.getStorage().toString()
+              + '\n';
       MathSharedStore.reportError(msg, Thread.currentThread().getStackTrace());
       throw new IllegalArgumentException(msg);
     }

@@ -87,7 +87,7 @@ public class TravelingSalesman {
    *     array.
    */
   private <Poses extends Num> Vector<Poses> neighbor(Vector<Poses> state) {
-    var proposedState = new Vector<Poses>(state);
+    var proposedState = new Vector<>(state);
 
     int rangeStart = (int) (Math.random() * (state.getNumRows() - 1));
     int rangeEnd = (int) (Math.random() * (state.getNumRows() - 1));

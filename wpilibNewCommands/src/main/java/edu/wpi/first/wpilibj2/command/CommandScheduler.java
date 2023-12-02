@@ -683,9 +683,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
         null);
     builder.addIntegerArrayProperty(
         "Cancel",
-        () -> {
-          return new long[] {};
-        },
+        () -> new long[] {},
         toCancel -> {
           Map<Long, Command> ids = new LinkedHashMap<>();
           for (Command command : m_scheduledCommands) {

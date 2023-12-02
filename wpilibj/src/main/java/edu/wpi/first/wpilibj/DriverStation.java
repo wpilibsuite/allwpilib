@@ -239,6 +239,7 @@ public final class DriverStation {
         for (int i = 0; i < count; i++) {
           if (axes.m_axes[i] != m_prevAxes.m_axes[i]) {
             needToLog = true;
+            break;
           }
         }
       }
@@ -255,6 +256,7 @@ public final class DriverStation {
         for (int i = 0; i < count; i++) {
           if (povs.m_povs[i] != m_prevPOVs.m_povs[i]) {
             needToLog = true;
+            break;
           }
         }
       }

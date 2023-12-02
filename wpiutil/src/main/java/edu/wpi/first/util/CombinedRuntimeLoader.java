@@ -59,8 +59,7 @@ public final class CombinedRuntimeLoader {
   @SuppressWarnings("unchecked")
   public static <T> List<String> extractLibraries(Class<T> clazz, String resourceName)
       throws IOException {
-    TypeReference<HashMap<String, Object>> typeRef =
-        new TypeReference<HashMap<String, Object>>() {};
+    TypeReference<HashMap<String, Object>> typeRef = new TypeReference<>() {};
     ObjectMapper mapper = new ObjectMapper();
     Map<String, Object> map;
     try (var stream = clazz.getResourceAsStream(resourceName)) {

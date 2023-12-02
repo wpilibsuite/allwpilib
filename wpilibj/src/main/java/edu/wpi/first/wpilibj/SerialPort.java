@@ -216,7 +216,7 @@ public class SerialPort implements AutoCloseable {
    */
   public String readString(int count) {
     byte[] out = read(count);
-    return new String(out, 0, out.length, StandardCharsets.US_ASCII);
+    return new String(out, StandardCharsets.US_ASCII);
   }
 
   /**

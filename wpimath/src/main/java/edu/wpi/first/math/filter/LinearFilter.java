@@ -35,9 +35,13 @@ import org.ejml.simple.SimpleMatrix;
  * PID controller out of this class!
  *
  * <p>For more on filters, we highly recommend the following articles:<br>
- * https://en.wikipedia.org/wiki/Linear_filter<br>
- * https://en.wikipedia.org/wiki/Iir_filter<br>
- * https://en.wikipedia.org/wiki/Fir_filter<br>
+ * <a
+ * href="https://en.wikipedia.org/wiki/Linear_filter">https://en.wikipedia.org/wiki/Linear_filter</a>
+ * <br>
+ * <a href="https://en.wikipedia.org/wiki/Iir_filter">https://en.wikipedia.org/wiki/Iir_filter</a>
+ * <br>
+ * <a href="https://en.wikipedia.org/wiki/Fir_filter">https://en.wikipedia.org/wiki/Fir_filter</a>
+ * <br>
  *
  * <p>Note 1: calculate() should be called by the user on a known, regular period. You can use a
  * Notifier for this or do it "inline" with code in a periodic function.

@@ -236,12 +236,9 @@ public class DifferentialDrivetrainSim {
    * @return the drivetrain's left side current draw, in amps
    */
   public double getLeftCurrentDrawAmps() {
-    var loadIleft =
-        m_motor.getCurrent(
-                getState(State.kLeftVelocity) * m_currentGearing / m_wheelRadiusMeters,
-                m_u.get(0, 0))
-            * Math.signum(m_u.get(0, 0));
-    return loadIleft;
+    return m_motor.getCurrent(
+            getState(State.kLeftVelocity) * m_currentGearing / m_wheelRadiusMeters, m_u.get(0, 0))
+        * Math.signum(m_u.get(0, 0));
   }
 
   /**
@@ -250,13 +247,9 @@ public class DifferentialDrivetrainSim {
    * @return the drivetrain's right side current draw, in amps
    */
   public double getRightCurrentDrawAmps() {
-    var loadIright =
-        m_motor.getCurrent(
-                getState(State.kRightVelocity) * m_currentGearing / m_wheelRadiusMeters,
-                m_u.get(1, 0))
-            * Math.signum(m_u.get(1, 0));
-
-    return loadIright;
+    return m_motor.getCurrent(
+            getState(State.kRightVelocity) * m_currentGearing / m_wheelRadiusMeters, m_u.get(1, 0))
+        * Math.signum(m_u.get(1, 0));
   }
 
   /**
