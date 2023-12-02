@@ -1,6 +1,7 @@
 include(CMakeFindDependencyMacro)
 @FILENAME_DEP_REPLACE@
 @WPIUTIL_DEP_REPLACE@
+@WPIUNITS_DEP_REPLACE@
 
 if(@USE_SYSTEM_EIGEN@)
     find_dependency(Eigen3)

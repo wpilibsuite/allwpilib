@@ -25,6 +25,9 @@
 #ifndef _gcem_tan_HPP
 #define _gcem_tan_HPP
 
+#include <cmath>
+#include <type_traits>
+
 namespace internal
 {
 
@@ -134,7 +137,11 @@ return_t<T>
 tan(const T x)
 noexcept
 {
+  if (std::is_constant_evaluated()) {
     return internal::tan_check( static_cast<return_t<T>>(x) );
+  } else {
+    return std::tan(x);
+  }
 }
 
 #endif

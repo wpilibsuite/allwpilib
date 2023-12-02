@@ -13,6 +13,7 @@
 
 #include "frc2/command/CommandHelper.h"
 #include "frc2/command/CommandScheduler.h"
+#include "frc2/command/Requirements.h"
 #include "frc2/command/SubsystemBase.h"
 #include "gmock/gmock.h"
 #include "make_vector.h"
@@ -50,8 +51,8 @@ class MockCommand : public CommandHelper<Command, MockCommand> {
         .WillRepeatedly(::testing::Return(true));
   }
 
-  MockCommand(std::initializer_list<Subsystem*> requirements,
-              bool finished = false, bool runWhenDisabled = true) {
+  explicit MockCommand(Requirements requirements, bool finished = false,
+                       bool runWhenDisabled = true) {
     m_requirements.insert(requirements.begin(), requirements.end());
     EXPECT_CALL(*this, GetRequirements())
         .WillRepeatedly(::testing::Return(m_requirements));

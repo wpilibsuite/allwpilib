@@ -114,6 +114,9 @@ int Stream::TryWrite(std::span<const Buffer> bufs) {
     return UV_ECANCELED;
   }
   int val = uv_try_write(GetRawStream(), bufs.data(), bufs.size());
+  if (val == UV_EAGAIN) {
+    return 0;
+  }
   if (val < 0) {
     this->ReportError(val);
     return val;
@@ -127,6 +130,9 @@ int Stream::TryWrite2(std::span<const Buffer> bufs, Stream& send) {
   }
   int val = uv_try_write2(GetRawStream(), bufs.data(), bufs.size(),
                           send.GetRawStream());
+  if (val == UV_EAGAIN) {
+    return 0;
+  }
   if (val < 0) {
     this->ReportError(val);
     return val;

@@ -22,6 +22,7 @@
 #include "frc/DriverStation.h"
 #include "frc/Filesystem.h"
 #include "frc/RobotBase.h"
+#include "frc/RobotController.h"
 
 using namespace frc;
 
@@ -63,20 +64,23 @@ static std::string MakeLogDir(std::string_view dir) {
   }
 #ifdef __FRC_ROBORIO__
   // prefer a mounted USB drive if one is accessible
-  constexpr std::string_view usbDir{"/u"};
   std::error_code ec;
-  auto s = fs::status(usbDir, ec);
+  auto s = fs::status("/u", ec);
   if (!ec && fs::is_directory(s) &&
       (s.permissions() & fs::perms::others_write) != fs::perms::none) {
-    return std::string{usbDir};
+    fs::create_directory("/u/logs", ec);
+    return "/u/logs";
   }
-  if (frc::RobotBase::GetRuntimeType() == kRoboRIO) {
+  if (RobotBase::GetRuntimeType() == kRoboRIO) {
     FRC_ReportError(warn::Warning,
                     "DataLogManager: Logging to RoboRIO 1 internal storage is "
                     "not recommended! Plug in a FAT32 formatted flash drive!");
   }
+  fs::create_directory("/home/lvuser/logs", ec);
+  return "/home/lvuser/logs";
+#else
+  return filesystem::GetOperatingDirectory();
 #endif
-  return frc::filesystem::GetOperatingDirectory();
 }
 
 static std::string MakeLogFilename(std::string_view filenameOverride) {
@@ -110,12 +114,18 @@ Thread::~Thread() {
 void Thread::Main() {
   // based on free disk space, scan for "old" FRC_*.wpilog files and remove
   {
-    uintmax_t freeSpace = fs::space(m_logDir).free;
+    std::error_code ec;
+    uintmax_t freeSpace;
+    auto freeSpaceInfo = fs::space(m_logDir, ec);
+    if (!ec) {
+      freeSpace = freeSpaceInfo.available;
+    } else {
+      freeSpace = UINTMAX_MAX;
+    }
     if (freeSpace < kFreeSpaceThreshold) {
       // Delete oldest FRC_*.wpilog files (ignore FRC_TBD_*.wpilog as we just
       // created one)
       std::vector<fs::directory_entry> entries;
-      std::error_code ec;
       for (auto&& entry : fs::directory_iterator{m_logDir, ec}) {
         auto stem = entry.path().stem().string();
         if (wpi::starts_with(stem, "FRC_") &&
@@ -203,12 +213,10 @@ void Thread::Main() {
       } else {
         dsAttachCount = 0;
       }
-      if (dsAttachCount > 300) {  // 6 seconds
-        std::time_t now = std::time(nullptr);
-        auto tm = std::gmtime(&now);
-        if (tm->tm_year > 100) {
-          // assume local clock is now synchronized to DS, so rename based on
-          // local time
+      if (dsAttachCount > 50) {  // 1 second
+        if (RobotController::IsSystemTimeValid()) {
+          std::time_t now = std::time(nullptr);
+          auto tm = std::gmtime(&now);
           m_log.SetFilename(fmt::format("FRC_{:%Y%m%d_%H%M%S}.wpilog", *tm));
           dsRenamed = true;
         } else {
@@ -260,7 +268,9 @@ void Thread::Main() {
     ++sysTimeCount;
     if (sysTimeCount >= 250) {
       sysTimeCount = 0;
-      sysTimeEntry.Append(wpi::GetSystemTime(), wpi::Now());
+      if (RobotController::IsSystemTimeValid()) {
+        sysTimeEntry.Append(wpi::GetSystemTime(), wpi::Now());
+      }
     }
   }
   DriverStation::RemoveRefreshedDataEventHandle(newDataEvent.GetHandle());
@@ -307,12 +317,21 @@ static Instance& GetInstance(std::string_view dir = "",
                              std::string_view filename = "",
                              double period = 0.25) {
   static Instance instance(dir, filename, period);
+  if (!instance.owner) {
+    instance.owner.Start(MakeLogDir(dir), filename, period);
+  }
   return instance;
 }
 
 void DataLogManager::Start(std::string_view dir, std::string_view filename,
                            double period) {
   GetInstance(dir, filename, period);
+}
+
+void DataLogManager::Stop() {
+  auto& inst = GetInstance();
+  inst.owner.GetThread()->m_log.Stop();
+  inst.owner.Join();
 }
 
 void DataLogManager::Log(std::string_view message) {

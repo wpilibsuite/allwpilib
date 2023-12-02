@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj.examples.xrpreference.subsystems;
 
-import edu.wpi.first.wpilibj.examples.xrpreference.devices.XRPServo;
+import edu.wpi.first.wpilibj.xrp.XRPServo;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Arm extends SubsystemBase {

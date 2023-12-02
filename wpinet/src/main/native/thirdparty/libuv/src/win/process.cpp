@@ -35,6 +35,7 @@
 #include "handle-inl.h"
 #include "req-inl.h"
 
+
 #define SIGKILL         9
 
 
@@ -103,38 +104,26 @@ static void uv__init_global_job_handle(void) {
                                &info,
                                sizeof info))
     uv_fatal_error(GetLastError(), "SetInformationJobObject");
+
+
+  if (!AssignProcessToJobObject(uv_global_job_handle_, GetCurrentProcess())) {
+    /* Make sure this handle is functional. The Windows kernel has a bug that
+     * if the first use of AssignProcessToJobObject is for a Windows Store
+     * program, subsequent attempts to use the handle with fail with
+     * INVALID_PARAMETER (87). This is possibly because all uses of the handle
+     * must be for the same Terminal Services session. We can ensure it is tied
+     * to our current session now by adding ourself to it. We could remove
+     * ourself afterwards, but there doesn't seem to be a reason to.
+     */
+    DWORD err = GetLastError();
+    if (err != ERROR_ACCESS_DENIED)
+      uv_fatal_error(err, "AssignProcessToJobObject");
+  }
 }
 
 
 static int uv__utf8_to_utf16_alloc(const char* s, WCHAR** ws_ptr) {
-  int ws_len, r;
-  WCHAR* ws;
-
-  ws_len = MultiByteToWideChar(CP_UTF8,
-                               0,
-                               s,
-                               -1,
-                               NULL,
-                               0);
-  if (ws_len <= 0) {
-    return GetLastError();
-  }
-
-  ws = (WCHAR*) uv__malloc(ws_len * sizeof(WCHAR));
-  if (ws == NULL) {
-    return ERROR_OUTOFMEMORY;
-  }
-
-  r = MultiByteToWideChar(CP_UTF8,
-                          0,
-                          s,
-                          -1,
-                          ws,
-                          ws_len);
-  assert(r == ws_len);
-
-  *ws_ptr = ws;
-  return 0;
+  return uv__convert_utf8_to_utf16(s, ws_ptr);
 }
 
 
@@ -394,7 +383,7 @@ static WCHAR* search_path(const WCHAR *file,
                                   name_has_ext);
 
     while (result == NULL) {
-      if (*dir_end == L'\0') {
+      if (dir_end == NULL || *dir_end == L'\0') {
         break;
       }
 
@@ -537,21 +526,15 @@ int make_program_args(char** args, int verbatim_arguments, WCHAR** dst_ptr) {
 
   /* Count the required size. */
   for (arg = args; *arg; arg++) {
-    DWORD arg_len;
+    ssize_t arg_len;
 
-    arg_len = MultiByteToWideChar(CP_UTF8,
-                                  0,
-                                  *arg,
-                                  -1,
-                                  NULL,
-                                  0);
-    if (arg_len == 0) {
-      return GetLastError();
-    }
+    arg_len = uv_wtf8_length_as_utf16(*arg);
+    if (arg_len < 0)
+      return arg_len;
 
     dst_len += arg_len;
 
-    if (arg_len > temp_buffer_len)
+    if ((size_t) arg_len > temp_buffer_len)
       temp_buffer_len = arg_len;
 
     arg_count++;
@@ -562,34 +545,28 @@ int make_program_args(char** args, int verbatim_arguments, WCHAR** dst_ptr) {
   dst_len = dst_len * 2 + arg_count * 2;
 
   /* Allocate buffer for the final command line. */
-  dst = (WCHAR*) uv__malloc(dst_len * sizeof(WCHAR));
+  dst = (WCHAR*)uv__malloc(dst_len * sizeof(WCHAR));
   if (dst == NULL) {
-    err = ERROR_OUTOFMEMORY;
+    err = UV_ENOMEM;
     goto error;
   }
 
   /* Allocate temporary working buffer. */
-  temp_buffer = (WCHAR*) uv__malloc(temp_buffer_len * sizeof(WCHAR));
+  temp_buffer = (WCHAR*)uv__malloc(temp_buffer_len * sizeof(WCHAR));
   if (temp_buffer == NULL) {
-    err = ERROR_OUTOFMEMORY;
+    err = UV_ENOMEM;
     goto error;
   }
 
   pos = dst;
   for (arg = args; *arg; arg++) {
-    DWORD arg_len;
+    ssize_t arg_len;
 
     /* Convert argument to wide char. */
-    arg_len = MultiByteToWideChar(CP_UTF8,
-                                  0,
-                                  *arg,
-                                  -1,
-                                  temp_buffer,
-                                  (int) (dst + dst_len - pos));
-    if (arg_len == 0) {
-      err = GetLastError();
-      goto error;
-    }
+    arg_len = uv_wtf8_length_as_utf16(*arg);
+    assert(arg_len > 0);
+    assert(temp_buffer_len >= (size_t) arg_len);
+    uv_wtf8_to_utf16(*arg, (uint16_t*)temp_buffer, arg_len);
 
     if (verbatim_arguments) {
       /* Copy verbatim. */
@@ -601,6 +578,7 @@ int make_program_args(char** args, int verbatim_arguments, WCHAR** dst_ptr) {
     }
 
     *pos++ = *(arg + 1) ? L' ' : L'\0';
+    assert(pos <= dst + dst_len);
   }
 
   uv__free(temp_buffer);
@@ -686,28 +664,22 @@ int make_program_env(char* env_block[], WCHAR** dst_ptr) {
   WCHAR* ptr;
   char** env;
   size_t env_len = 0;
-  int len;
+  size_t len;
   size_t i;
-  DWORD var_size;
+  size_t var_size;
   size_t env_block_count = 1; /* 1 for null-terminator */
   WCHAR* dst_copy;
   WCHAR** ptr_copy;
   WCHAR** env_copy;
-  DWORD required_vars_value_len[ARRAY_SIZE(required_vars)];
+  size_t required_vars_value_len[ARRAY_SIZE(required_vars)];
 
   /* first pass: determine size in UTF-16 */
   for (env = env_block; *env; env++) {
-    int len;
+    ssize_t len;
     if (strchr(*env, '=')) {
-      len = MultiByteToWideChar(CP_UTF8,
-                                0,
-                                *env,
-                                -1,
-                                NULL,
-                                0);
-      if (len <= 0) {
-        return GetLastError();
-      }
+      len = uv_wtf8_length_as_utf16(*env);
+      if (len < 0)
+        return len;
       env_len += len;
       env_block_count++;
     }
@@ -716,25 +688,19 @@ int make_program_env(char* env_block[], WCHAR** dst_ptr) {
   /* second pass: copy to UTF-16 environment block */
   dst_copy = (WCHAR*)uv__malloc(env_len * sizeof(WCHAR));
   if (dst_copy == NULL && env_len > 0) {
-    return ERROR_OUTOFMEMORY;
+    return UV_ENOMEM;
   }
   env_copy = (WCHAR**)alloca(env_block_count * sizeof(WCHAR*));
 
   ptr = dst_copy;
   ptr_copy = env_copy;
   for (env = env_block; *env; env++) {
+    ssize_t len;
     if (strchr(*env, '=')) {
-      len = MultiByteToWideChar(CP_UTF8,
-                                0,
-                                *env,
-                                -1,
-                                ptr,
-                                (int) (env_len - (ptr - dst_copy)));
-      if (len <= 0) {
-        DWORD err = GetLastError();
-        uv__free(dst_copy);
-        return err;
-      }
+      len = uv_wtf8_length_as_utf16(*env);
+      assert(len > 0);
+      assert((size_t) len <= env_len - (ptr - dst_copy));
+      uv_wtf8_to_utf16(*env, (uint16_t*)ptr, len);
       *ptr_copy++ = ptr;
       ptr += len;
     }
@@ -752,7 +718,7 @@ int make_program_env(char* env_block[], WCHAR** dst_ptr) {
       cmp = -1;
     } else {
       cmp = env_strncmp(required_vars[i].wide_eq,
-                       required_vars[i].len,
+                        required_vars[i].len,
                         *ptr_copy);
     }
     if (cmp < 0) {
@@ -775,7 +741,7 @@ int make_program_env(char* env_block[], WCHAR** dst_ptr) {
   dst = (WCHAR*)uv__malloc((1+env_len) * sizeof(WCHAR));
   if (!dst) {
     uv__free(dst_copy);
-    return ERROR_OUTOFMEMORY;
+    return UV_ENOMEM;
   }
 
   for (ptr = dst, ptr_copy = env_copy, i = 0;
@@ -973,26 +939,26 @@ int uv_spawn(uv_loop_t* loop,
 
   err = uv__utf8_to_utf16_alloc(options->file, &application);
   if (err)
-    goto done;
+    goto done_uv;
 
   err = make_program_args(
       options->args,
       options->flags & UV_PROCESS_WINDOWS_VERBATIM_ARGUMENTS,
       &arguments);
   if (err)
-    goto done;
+    goto done_uv;
 
   if (options->env) {
      err = make_program_env(options->env, &env);
      if (err)
-       goto done;
+       goto done_uv;
   }
 
   if (options->cwd) {
     /* Explicit cwd */
     err = uv__utf8_to_utf16_alloc(options->cwd, &cwd);
     if (err)
-      goto done;
+      goto done_uv;
 
   } else {
     /* Inherit cwd */
@@ -1023,22 +989,19 @@ int uv_spawn(uv_loop_t* loop,
     DWORD path_len, r;
 
     path_len = GetEnvironmentVariableW(L"PATH", NULL, 0);
-    if (path_len == 0) {
-      err = GetLastError();
-      goto done;
-    }
+    if (path_len != 0) {
+      alloc_path = (WCHAR*) uv__malloc(path_len * sizeof(WCHAR));
+      if (alloc_path == NULL) {
+        err = ERROR_OUTOFMEMORY;
+        goto done;
+      }
+      path = alloc_path;
 
-    alloc_path = (WCHAR*) uv__malloc(path_len * sizeof(WCHAR));
-    if (alloc_path == NULL) {
-      err = ERROR_OUTOFMEMORY;
-      goto done;
-    }
-    path = alloc_path;
-
-    r = GetEnvironmentVariableW(L"PATH", path, path_len);
-    if (r == 0 || r >= path_len) {
-      err = GetLastError();
-      goto done;
+      r = GetEnvironmentVariableW(L"PATH", path, path_len);
+      if (r == 0 || r >= path_len) {
+        err = GetLastError();
+        goto done;
+      }
     }
   }
 
@@ -1100,6 +1063,7 @@ int uv_spawn(uv_loop_t* loop,
      * breakaway.
      */
     process_flags |= DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP;
+    process_flags |= CREATE_SUSPENDED;
   }
 
   if (!CreateProcessW(application_path,
@@ -1116,11 +1080,6 @@ int uv_spawn(uv_loop_t* loop,
     err = GetLastError();
     goto done;
   }
-
-  /* Spawn succeeded. Beyond this point, failure is reported asynchronously. */
-
-  process->process_handle = info.hProcess;
-  process->pid = info.dwProcessId;
 
   /* If the process isn't spawned as detached, assign to the global job object
    * so windows will kill it when the parent process dies. */
@@ -1143,6 +1102,19 @@ int uv_spawn(uv_loop_t* loop,
         uv_fatal_error(err, "AssignProcessToJobObject");
     }
   }
+
+  if (process_flags & CREATE_SUSPENDED) {
+    if (ResumeThread(info.hThread) == ((DWORD)-1)) {
+      err = GetLastError();
+      TerminateProcess(info.hProcess, 1);
+      goto done;
+    }
+  }
+
+  /* Spawn succeeded. Beyond this point, failure is reported asynchronously. */
+
+  process->process_handle = info.hProcess;
+  process->pid = info.dwProcessId;
 
   /* Set IPC pid to all IPC pipes. */
   for (i = 0; i < options->stdio_count; i++) {
@@ -1171,8 +1143,13 @@ int uv_spawn(uv_loop_t* loop,
    * made or the handle is closed, whichever happens first. */
   uv__handle_start(process);
 
+  goto done_uv;
+
   /* Cleanup, whether we succeeded or failed. */
  done:
+  err = uv_translate_sys_error(err);
+
+ done_uv:
   uv__free(application);
   uv__free(application_path);
   uv__free(arguments);
@@ -1186,7 +1163,7 @@ int uv_spawn(uv_loop_t* loop,
     child_stdio_buffer = NULL;
   }
 
-  return uv_translate_sys_error(err);
+  return err;
 }
 
 

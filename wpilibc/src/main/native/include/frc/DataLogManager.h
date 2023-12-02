@@ -50,6 +50,11 @@ class DataLogManager final {
                     double period = 0.25);
 
   /**
+   * Stop data log manager.
+   */
+  static void Stop();
+
+  /**
    * Log a message to the "messages" entry. The message is also printed to
    * standard output (followed by a newline).
    *

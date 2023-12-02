@@ -10,6 +10,7 @@
 #include <ntcore_cpp.h>
 #include <wpi/StringExtras.h>
 #include <wpigui.h>
+#include <wpigui_openurl.h>
 
 #include "glass/Context.h"
 #include "glass/MainMenuBar.h"
@@ -279,6 +280,15 @@ int main(int argc, char** argv) {
     if (ImGui::BeginMenu("Info")) {
       if (ImGui::MenuItem("About")) {
         gAbout = true;
+      }
+      ImGui::EndMenu();
+    }
+
+    if (ImGui::BeginMenu("Docs")) {
+      if (ImGui::MenuItem("Online documentation")) {
+        wpi::gui::OpenURL(
+            "https://docs.wpilib.org/en/stable/docs/software/dashboards/"
+            "glass/");
       }
       ImGui::EndMenu();
     }

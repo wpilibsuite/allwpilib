@@ -12,6 +12,7 @@
 #include <HALSimBaseWebSocketConnection.h>
 #include <WSProviderContainer.h>
 #include <WSProvider_SimDevice.h>
+#include <wpi/json_fwd.h>
 #include <wpinet/uv/Async.h>
 #include <wpinet/uv/Buffer.h>
 #include <wpinet/uv/Loop.h>
@@ -20,10 +21,6 @@
 
 #include "XRP.h"
 
-namespace wpi {
-class json;
-}  // namespace wpi
-
 namespace wpilibxrp {
 
 // This masquerades as a "WebSocket" so that we can reuse the
@@ -31,7 +28,7 @@ namespace wpilibxrp {
 class HALSimXRP : public wpilibws::HALSimBaseWebSocketConnection,
                   public std::enable_shared_from_this<HALSimXRP> {
  public:
-  using LoopFunc = std::function<void(void)>;
+  using LoopFunc = std::function<void()>;
   using UvExecFunc = wpi::uv::Async<LoopFunc>;
 
   HALSimXRP(wpi::uv::Loop& loop, wpilibws::ProviderContainer& providers,

@@ -5,15 +5,13 @@
 #pragma once
 
 #include <wpi/SymbolExports.h>
+#include <wpi/json_fwd.h>
 
 #include "frc/geometry/Pose2d.h"
+#include "frc/geometry/Rotation3d.h"
 #include "frc/geometry/Transform3d.h"
 #include "frc/geometry/Translation3d.h"
 #include "frc/geometry/Twist3d.h"
-
-namespace wpi {
-class json;
-}  // namespace wpi
 
 namespace frc {
 
@@ -216,3 +214,6 @@ WPILIB_DLLEXPORT
 void from_json(const wpi::json& json, Pose3d& pose);
 
 }  // namespace frc
+
+#include "frc/geometry/proto/Pose3dProto.h"
+#include "frc/geometry/struct/Pose3dStruct.h"

@@ -53,11 +53,11 @@ class CommandScheduler::Impl {
 
   // Flag and queues for avoiding concurrent modification if commands are
   // scheduled/canceled during run
-
   bool inRunLoop = false;
   wpi::SmallVector<Command*, 4> toSchedule;
   wpi::SmallVector<Command*, 4> toCancelCommands;
   wpi::SmallVector<std::optional<Command*>, 4> toCancelInterruptors;
+  wpi::SmallSet<Command*, 4> endingCommands;
 };
 
 template <typename TMap, typename TKey>
@@ -183,7 +183,7 @@ void CommandScheduler::Run() {
     if constexpr (frc::RobotBase::IsSimulation()) {
       subsystem.getFirst()->SimulationPeriodic();
     }
-    m_watchdog.AddEpoch("Subsystem Periodic()");
+    m_watchdog.AddEpoch(subsystem.getFirst()->GetName() + ".Periodic()");
   }
 
   // Cache the active instance to avoid concurrency problems if SetActiveLoop()
@@ -194,9 +194,10 @@ void CommandScheduler::Run() {
   m_watchdog.AddEpoch("buttons.Run()");
 
   m_impl->inRunLoop = true;
+  bool isDisabled = frc::RobotState::IsDisabled();
   // Run scheduled commands, remove finished commands.
   for (Command* command : m_impl->scheduledCommands) {
-    if (!command->RunsWhenDisabled() && frc::RobotState::IsDisabled()) {
+    if (isDisabled && !command->RunsWhenDisabled()) {
       Cancel(command, std::nullopt);
       continue;
     }
@@ -208,16 +209,18 @@ void CommandScheduler::Run() {
     m_watchdog.AddEpoch(command->GetName() + ".Execute()");
 
     if (command->IsFinished()) {
+      m_impl->endingCommands.insert(command);
       command->End(false);
       for (auto&& action : m_impl->finishActions) {
         action(*command);
       }
+      m_impl->endingCommands.erase(command);
 
+      m_impl->scheduledCommands.erase(command);
       for (auto&& requirement : command->GetRequirements()) {
         m_impl->requirements.erase(requirement);
       }
 
-      m_impl->scheduledCommands.erase(command);
       m_watchdog.AddEpoch(command->GetName() + ".End(false)");
     }
   }
@@ -326,26 +329,28 @@ void CommandScheduler::Cancel(Command* command,
   if (!m_impl) {
     return;
   }
-
+  if (m_impl->endingCommands.contains(command)) {
+    return;
+  }
   if (m_impl->inRunLoop) {
     m_impl->toCancelCommands.emplace_back(command);
     m_impl->toCancelInterruptors.emplace_back(interruptor);
     return;
   }
-
-  auto find = m_impl->scheduledCommands.find(command);
-  if (find == m_impl->scheduledCommands.end()) {
+  if (!IsScheduled(command)) {
     return;
   }
-  m_impl->scheduledCommands.erase(*find);
+  m_impl->endingCommands.insert(command);
+  command->End(true);
+  for (auto&& action : m_impl->interruptActions) {
+    action(*command, interruptor);
+  }
+  m_impl->endingCommands.erase(command);
+  m_impl->scheduledCommands.erase(command);
   for (auto&& requirement : m_impl->requirements) {
     if (requirement.second == command) {
       m_impl->requirements.erase(requirement.first);
     }
-  }
-  command->End(true);
-  for (auto&& action : m_impl->interruptActions) {
-    action(*command, interruptor);
   }
   m_watchdog.AddEpoch(command->GetName() + ".End(true)");
 }

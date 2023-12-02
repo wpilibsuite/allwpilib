@@ -6,14 +6,11 @@
 
 #include <Eigen/Core>
 #include <wpi/SymbolExports.h>
+#include <wpi/json_fwd.h>
 
 #include "frc/geometry/Quaternion.h"
 #include "frc/geometry/Rotation2d.h"
 #include "units/angle.h"
-
-namespace wpi {
-class json;
-}  // namespace wpi
 
 namespace frc {
 
@@ -135,7 +132,7 @@ class WPILIB_DLLEXPORT Rotation3d {
   /**
    * Checks equality between this Rotation3d and another object.
    */
-  bool operator==(const Rotation3d&) const = default;
+  bool operator==(const Rotation3d&) const;
 
   /**
    * Adds the new rotation to the current rotation. The other rotation is
@@ -197,3 +194,6 @@ WPILIB_DLLEXPORT
 void from_json(const wpi::json& json, Rotation3d& rotation);
 
 }  // namespace frc
+
+#include "frc/geometry/proto/Rotation3dProto.h"
+#include "frc/geometry/struct/Rotation3dStruct.h"

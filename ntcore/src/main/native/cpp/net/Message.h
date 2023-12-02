@@ -70,6 +70,7 @@ struct ClientMessage {
   using Contents =
       std::variant<std::monostate, PublishMsg, UnpublishMsg, SetPropertiesMsg,
                    SubscribeMsg, UnsubscribeMsg, ClientValueMsg>;
+  using ValueMsg = ClientValueMsg;
   Contents contents;
 };
 
@@ -103,6 +104,7 @@ struct ServerValueMsg {
 struct ServerMessage {
   using Contents = std::variant<std::monostate, AnnounceMsg, UnannounceMsg,
                                 PropertiesUpdateMsg, ServerValueMsg>;
+  using ValueMsg = ServerValueMsg;
   Contents contents;
 };
 

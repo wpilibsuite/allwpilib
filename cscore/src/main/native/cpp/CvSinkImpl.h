@@ -25,9 +25,9 @@ class SourceImpl;
 class CvSinkImpl : public SinkImpl {
  public:
   CvSinkImpl(std::string_view name, wpi::Logger& logger, Notifier& notifier,
-             Telemetry& telemetry);
+             Telemetry& telemetry, VideoMode::PixelFormat pixelFormat);
   CvSinkImpl(std::string_view name, wpi::Logger& logger, Notifier& notifier,
-             Telemetry& telemetry,
+             Telemetry& telemetry, VideoMode::PixelFormat pixelFormat,
              std::function<void(uint64_t time)> processFrame);
   ~CvSinkImpl() override;
 
@@ -42,6 +42,7 @@ class CvSinkImpl : public SinkImpl {
   std::atomic_bool m_active;  // set to false to terminate threads
   std::thread m_thread;
   std::function<void(uint64_t time)> m_processFrame;
+  VideoMode::PixelFormat m_pixelFormat;
 };
 
 }  // namespace cs

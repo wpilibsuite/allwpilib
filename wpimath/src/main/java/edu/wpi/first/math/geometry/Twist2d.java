@@ -4,6 +4,8 @@
 
 package edu.wpi.first.math.geometry;
 
+import edu.wpi.first.math.geometry.proto.Twist2dProto;
+import edu.wpi.first.math.geometry.struct.Twist2dStruct;
 import java.util.Objects;
 
 /**
@@ -62,4 +64,7 @@ public class Twist2d {
   public int hashCode() {
     return Objects.hash(dx, dy, dtheta);
   }
+
+  public static final Twist2dStruct struct = new Twist2dStruct();
+  public static final Twist2dProto proto = new Twist2dProto();
 }

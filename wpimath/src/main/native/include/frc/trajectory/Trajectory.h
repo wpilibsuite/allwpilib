@@ -7,6 +7,7 @@
 #include <vector>
 
 #include <wpi/SymbolExports.h>
+#include <wpi/json_fwd.h>
 
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Transform2d.h"
@@ -14,10 +15,6 @@
 #include "units/curvature.h"
 #include "units/time.h"
 #include "units/velocity.h"
-
-namespace wpi {
-class json;
-}  // namespace wpi
 
 namespace frc {
 /**
@@ -148,3 +145,6 @@ WPILIB_DLLEXPORT
 void from_json(const wpi::json& json, Trajectory::State& state);
 
 }  // namespace frc
+
+#include "frc/trajectory/proto/TrajectoryProto.h"
+#include "frc/trajectory/proto/TrajectoryStateProto.h"

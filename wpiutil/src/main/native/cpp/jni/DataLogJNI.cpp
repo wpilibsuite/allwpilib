@@ -113,6 +113,63 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_resume
 
 /*
  * Class:     edu_wpi_first_util_datalog_DataLogJNI
+ * Method:    stop
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_util_datalog_DataLogJNI_stop
+  (JNIEnv* env, jclass, jlong impl)
+{
+  if (impl == 0) {
+    wpi::ThrowNullPointerException(env, "impl is null");
+    return;
+  }
+  reinterpret_cast<DataLog*>(impl)->Stop();
+}
+
+/*
+ * Class:     edu_wpi_first_util_datalog_DataLogJNI
+ * Method:    addSchema
+ * Signature: (JLjava/lang/String;Ljava/lang/String;[BJ)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_util_datalog_DataLogJNI_addSchema
+  (JNIEnv* env, jclass, jlong impl, jstring name, jstring type,
+   jbyteArray schema, jlong timestamp)
+{
+  if (impl == 0) {
+    wpi::ThrowNullPointerException(env, "impl is null");
+    return;
+  }
+  reinterpret_cast<DataLog*>(impl)->AddSchema(
+      JStringRef{env, name}, JStringRef{env, type},
+      JSpan<const jbyte>{env, schema}.uarray(), timestamp);
+}
+
+/*
+ * Class:     edu_wpi_first_util_datalog_DataLogJNI
+ * Method:    addSchemaString
+ * Signature: (JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;J)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_util_datalog_DataLogJNI_addSchemaString
+  (JNIEnv* env, jclass, jlong impl, jstring name, jstring type, jstring schema,
+   jlong timestamp)
+{
+  if (impl == 0) {
+    wpi::ThrowNullPointerException(env, "impl is null");
+    return;
+  }
+  JStringRef schemaStr{env, schema};
+  std::string_view schemaView = schemaStr.str();
+  reinterpret_cast<DataLog*>(impl)->AddSchema(
+      JStringRef{env, name}, JStringRef{env, type},
+      {reinterpret_cast<const uint8_t*>(schemaView.data()), schemaView.size()},
+      timestamp);
+}
+
+/*
+ * Class:     edu_wpi_first_util_datalog_DataLogJNI
  * Method:    start
  * Signature: (JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;J)I
  */

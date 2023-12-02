@@ -13,6 +13,7 @@
 #include <wpi/json.h>
 
 #include "frc/fmt/Eigen.h"
+#include "geometry3d.pb.h"
 #include "units/math.h"
 #include "wpimath/MathShared.h"
 
@@ -172,6 +173,11 @@ Rotation3d Rotation3d::operator*(double scalar) const {
 
 Rotation3d Rotation3d::operator/(double scalar) const {
   return *this * (1.0 / scalar);
+}
+
+bool Rotation3d::operator==(const Rotation3d& other) const {
+  return std::abs(std::abs(m_q.Dot(other.m_q)) -
+                  m_q.Norm() * other.m_q.Norm()) < 1e-9;
 }
 
 Rotation3d Rotation3d::RotateBy(const Rotation3d& other) const {

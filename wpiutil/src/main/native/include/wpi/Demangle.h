@@ -7,6 +7,7 @@
 
 #include <string>
 #include <string_view>
+#include <typeinfo>
 
 namespace wpi {
 
@@ -17,6 +18,15 @@ namespace wpi {
  * @return The demangled symbol, or mangledSymbol if demangling fails.
  */
 std::string Demangle(std::string_view mangledSymbol);
+
+/**
+ * Returns the type name of an object
+ * @param type The object
+ */
+template <typename T>
+std::string GetTypeName(const T& type) {
+  return Demangle(typeid(type).name());
+}
 
 }  // namespace wpi
 

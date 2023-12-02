@@ -19,7 +19,7 @@ class DiscretizationTest {
   // analytically,
   @Test
   void testDiscretizeA() {
-    final var contA = new MatBuilder<>(Nat.N2(), Nat.N2()).fill(0, 1, 0, 0);
+    final var contA = MatBuilder.fill(Nat.N2(), Nat.N2(), 0, 1, 0, 0);
     final var x0 = VecBuilder.fill(1, 1);
 
     final var discA = Discretization.discretizeA(contA, 1.0);
@@ -37,8 +37,8 @@ class DiscretizationTest {
   // analytically,
   @Test
   void testDiscretizeAB() {
-    final var contA = new MatBuilder<>(Nat.N2(), Nat.N2()).fill(0, 1, 0, 0);
-    final var contB = new MatBuilder<>(Nat.N2(), Nat.N1()).fill(0, 1);
+    final var contA = MatBuilder.fill(Nat.N2(), Nat.N2(), 0, 1, 0, 0);
+    final var contB = MatBuilder.fill(Nat.N2(), Nat.N1(), 0, 1);
 
     final var x0 = VecBuilder.fill(1, 1);
     final var u = VecBuilder.fill(1);
@@ -63,8 +63,8 @@ class DiscretizationTest {
   //                                               0
   @Test
   void testDiscretizeSlowModelAQ() {
-    final var contA = new MatBuilder<>(Nat.N2(), Nat.N2()).fill(0, 1, 0, 0);
-    final var contQ = new MatBuilder<>(Nat.N2(), Nat.N2()).fill(1, 0, 0, 1);
+    final var contA = MatBuilder.fill(Nat.N2(), Nat.N2(), 0, 1, 0, 0);
+    final var contQ = MatBuilder.fill(Nat.N2(), Nat.N2(), 1, 0, 0, 1);
 
     final double dt = 1.0;
 
@@ -95,8 +95,8 @@ class DiscretizationTest {
   //                                               0
   @Test
   void testDiscretizeFastModelAQ() {
-    final var contA = new MatBuilder<>(Nat.N2(), Nat.N2()).fill(0, 1, 0, -1406.29);
-    final var contQ = new MatBuilder<>(Nat.N2(), Nat.N2()).fill(0.0025, 0, 0, 1);
+    final var contA = MatBuilder.fill(Nat.N2(), Nat.N2(), 0, 1, 0, -1406.29);
+    final var contQ = MatBuilder.fill(Nat.N2(), Nat.N2(), 0.0025, 0, 0, 1);
 
     final var dt = 0.005;
 
@@ -125,8 +125,8 @@ class DiscretizationTest {
   // Test that DiscretizeR() works
   @Test
   void testDiscretizeR() {
-    var contR = Matrix.mat(Nat.N2(), Nat.N2()).fill(2.0, 0.0, 0.0, 1.0);
-    var discRTruth = Matrix.mat(Nat.N2(), Nat.N2()).fill(4.0, 0.0, 0.0, 2.0);
+    var contR = MatBuilder.fill(Nat.N2(), Nat.N2(), 2.0, 0.0, 0.0, 1.0);
+    var discRTruth = MatBuilder.fill(Nat.N2(), Nat.N2(), 4.0, 0.0, 0.0, 2.0);
 
     var discR = Discretization.discretizeR(contR, 0.5);
 

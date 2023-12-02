@@ -7,6 +7,7 @@ package edu.wpi.first.wpilibj2.command;
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
@@ -28,10 +29,11 @@ public final class Commands {
   /**
    * Constructs a command that does nothing until interrupted.
    *
+   * @param requirements Subsystems to require
    * @return the command
    */
-  public static Command idle() {
-    return run(() -> {});
+  public static Command idle(Subsystem... requirements) {
+    return run(() -> {}, requirements);
   }
 
   // Action Commands
@@ -142,13 +144,26 @@ public final class Commands {
   /**
    * Runs one of several commands, based on the selector function.
    *
+   * @param <K> The type of key used to select the command
    * @param selector the selector function
    * @param commands map of commands to select from
    * @return the command
    * @see SelectCommand
    */
-  public static Command select(Map<Object, Command> commands, Supplier<Object> selector) {
-    return new SelectCommand(commands, selector);
+  public static <K> Command select(Map<K, Command> commands, Supplier<? extends K> selector) {
+    return new SelectCommand<>(commands, selector);
+  }
+
+  /**
+   * Runs the command supplied by the supplier.
+   *
+   * @param supplier the command supplier
+   * @param requirements the set of requirements for this command
+   * @return the command
+   * @see DeferredCommand
+   */
+  public static Command defer(Supplier<Command> supplier, Set<Subsystem> requirements) {
+    return new DeferredCommand(supplier, requirements);
   }
 
   /**

@@ -91,7 +91,7 @@ class SendableChooser : public SendableChooserBase {
    */
   void OnChange(std::function<void(T)>);
 
-  void InitSendable(nt::NTSendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 };
 
 }  // namespace frc

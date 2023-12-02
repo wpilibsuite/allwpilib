@@ -9,22 +9,22 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: React Rocket
-        uses: actions/github-script@v4
+        uses: actions/github-script@v6
         with:
           script: |
             const {owner, repo} = context.issue
-            github.reactions.createForIssueComment({
+            github.rest.reactions.createForIssueComment({
               owner,
               repo,
               comment_id: context.payload.comment.id,
               content: "rocket",
             });
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
+          fetch-depth: 0
           token: ${{ secrets.COMMENT_COMMAND_PAT_TOKEN }}
       - name: Fetch all history and metadata
         run: |
-          git fetch --prune --unshallow
           git checkout -b pr
           git branch -f main origin/main
       - name: Checkout PR
@@ -34,7 +34,7 @@ jobs:
           GITHUB_TOKEN: "${{ secrets.COMMENT_COMMAND_PAT_TOKEN }}"
           NUMBER: ${{ github.event.issue.number }}
       - name: Set up Python 3.8
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: 3.8
       - name: Setup Java

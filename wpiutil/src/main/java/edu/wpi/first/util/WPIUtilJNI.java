@@ -80,6 +80,10 @@ public class WPIUtilJNI {
 
   public static native boolean releaseSemaphore(int semHandle, int releaseCount);
 
+  public static native long allocateRawFrame();
+
+  public static native void freeRawFrame(long frame);
+
   /**
    * Waits for a handle to be signaled.
    *

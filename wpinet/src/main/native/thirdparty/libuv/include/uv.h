@@ -1755,6 +1755,7 @@ UV_EXTERN uint64_t uv_get_total_memory(void);
 UV_EXTERN uint64_t uv_get_constrained_memory(void);
 UV_EXTERN uint64_t uv_get_available_memory(void);
 
+UV_EXTERN int uv_clock_gettime(uv_clock_id clock_id, uv_timespec64_t* ts);
 UV_EXTERN uint64_t uv_hrtime(void);
 UV_EXTERN void uv_sleep(unsigned int msec);
 
@@ -1874,6 +1875,18 @@ struct uv_loop_s {
 
 UV_EXTERN void* uv_loop_get_data(const uv_loop_t*);
 UV_EXTERN void uv_loop_set_data(uv_loop_t*, void* data);
+
+/* String utilities needed internally for dealing with Windows. */
+size_t uv_utf16_length_as_wtf8(const uint16_t* utf16,
+                               ssize_t utf16_len);
+int uv_utf16_to_wtf8(const uint16_t* utf16,
+                     ssize_t utf16_len,
+                     char** wtf8_ptr,
+                     size_t* wtf8_len_ptr);
+ssize_t uv_wtf8_length_as_utf16(const char* wtf8);
+void uv_wtf8_to_utf16(const char* wtf8,
+                      uint16_t* utf16,
+                      size_t utf16_len);
 
 /* Don't export the private CPP symbols. */
 #undef UV_HANDLE_TYPE_PRIVATE

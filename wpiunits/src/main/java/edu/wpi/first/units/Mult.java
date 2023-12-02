@@ -8,9 +8,7 @@ import edu.wpi.first.units.collections.LongToObjectHashMap;
 import java.util.Objects;
 
 /**
- * A combinatory unit type that is equivalent to the product of two other others. For example,
- * Newton * Meters for torque could be represented as a unit of <code>
- * Mult&lt;Force, Distance, Torque&gt;</code>
+ * A combinatory unit type that is equivalent to the product of two other others.
  *
  * @param <A> the type of the first unit in the result
  * @param <B> the type of the second unit in the result
@@ -36,7 +34,7 @@ public class Mult<A extends Unit<A>, B extends Unit<B>> extends Unit<Mult<A, B>>
    * Creates a new Mult unit derived from two arbitrary units multiplied together.
    *
    * <pre>
-   *   Mult.combine(Volts, Meters) // => Volt-Meters
+   *   Mult.combine(Volts, Meters) // Volt-Meters
    * </pre>
    *
    * <p>It's recommended to use the convenience function {@link Unit#mult(Unit)} instead of calling

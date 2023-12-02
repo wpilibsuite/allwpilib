@@ -351,3 +351,155 @@ When calculating a\_z:
 ```
 
 Note that this reuses the cos(a\_y) cos(a\_z) and cos(a\_y) sin(a\_z) terms needed to calculate a\_z.
+
+## Quaternion Exponential
+
+We will take it as given that a quaternion has scalar and vector components `𝑞 = s + 𝑣⃗`, with vector component 𝑣⃗ consisting of a unit vector and magnitude `𝑣⃗ = θ * v̂`.
+
+```
+𝑞 = s + 𝑣⃗
+
+𝑣⃗ = θ * v̂
+
+exp(𝑞) = exp(s + 𝑣⃗)
+exp(𝑞) = exp(s) * exp(𝑣⃗)
+exp(𝑞) = exp(s) * exp(θ * v̂)
+```
+
+Applying euler's identity:
+
+```
+exp(θ * v̂) = cos(θ) + sin(θ) * v̂
+```
+
+Gives us:
+```
+exp(𝑞) = exp(s) * [cos(θ) + sin(θ) * v̂]
+```
+
+Rearranging `𝑣⃗ = θ * v̂` we can solve for v̂: `v̂ = 𝑣⃗ / θ`
+
+```
+exp(𝑞) = exp(s) * [cos(θ) + sin(θ) / θ * 𝑣⃗]
+```
+
+## Quaternion Logarithm
+
+We will take it as a given that for a given quaternion of the form `𝑞 = s + 𝑣⃗`, we can calculate the exponential: `exp(𝑞) = exp(s) * [cos(θ) + sin(θ) / θ * 𝑣⃗]` where `θ = ||𝑣⃗||`.
+
+Additionally, `exp(log(𝑞)) = q` for a given value of `log(𝑞)`. There are multiple solutions to `log(𝑞)` caused by the imaginary axes in 𝑣⃗, discussed here: https://en.wikipedia.org/wiki/Complex_logarithm
+
+We will demonstrate the principal solution of `log(𝑞)` satisfying `exp(log(𝑞)) = q`.
+This being `log(𝑞) = log(||𝑞||) + atan2(θ, s) / θ * 𝑣⃗`, is the principal solution to `log(𝑞)` because the function `atan2(θ, s)` returns the principal value corresponding to its arguments.
+
+Proof: `log(𝑞) = log(||𝑞||) + atan2(θ, s) / θ * 𝑣⃗` satisfies `exp(log(𝑞)) = q`.
+
+```
+exp(log(𝑞)) = exp(log(||𝑞||) + atan2(θ, s) / θ * 𝑣⃗)
+
+
+exp(log(𝑞)) = exp(log(||𝑞||)) * exp(atan2(θ, s) / θ * 𝑣⃗)
+
+Substitutions:
+𝑣⃗ = θ * v̂:
+exp(log(||𝑞||)) = ||𝑞||
+exp(log(𝑞)) = ||𝑞|| * exp(atan2(θ, s) * v̂)
+
+exp(log(𝑞)) = ||𝑞|| * [cos(atan2(θ, s)) + sin(atan2(θ, s)) * v̂]
+
+Substitutions:
+cos(atan2(θ, s)) = s / √(θ² + s²)
+sin(atan2(θ, s)) = θ / √(θ² + s²)
+
+exp(log(𝑞)) = ||𝑞|| * [s / √(θ² + s²) + θ / √(θ² + s²) * v̂]
+
+√(θ² + s²) = ||𝑞||
+
+exp(log(𝑞)) = ||𝑞|| * [s / ||𝑞|| + θ / ||𝑞|| * v̂]
+exp(log(𝑞)) = s + θ * v̂
+
+exp(log(𝑞)) = s + 𝑣⃗
+
+exp(log(𝑞)) = 𝑞
+```
+
+## Unit Quaternion in SO(3) from Rotation Vector in 𝖘𝖔(3)
+
+We will take it as a given that members of 𝖘𝖔(3) take the form `𝑣⃗ = θ * v̂`, representing a rotation θ around a unit axis v̂.
+
+We additionally take it as a given that quaternions in SO(3) are of the form `𝑞 = cos(θ / 2) + sin(θ / 2) * v̂`, representing a rotation of θ around unit axis v̂.
+
+```
+θ = ||𝑣⃗||
+v̂ = 𝑣⃗ / θ
+
+𝑞 = cos(θ / 2) + sin(θ / 2) * v̂
+𝑞 = cos(||𝑣⃗|| / 2) + sin(||𝑣⃗|| / 2) / ||𝑣⃗|| * 𝑣⃗
+```
+
+## Rotation vector in 𝖘𝖔(3) from Unit Quaternion in SO(3)
+
+We will take it as a given that members of 𝖘𝖔(3) take the form  `𝑟⃗ = θ * r̂`, representing a rotation θ around a unit axis r̂.
+
+We additionally take it as a given that quaternions in SO(3) are of the form `𝑞 = s + 𝑣⃗ = cos(θ / 2) + sin(θ / 2) * v̂`, representing a rotation of θ around unit axis v̂.
+
+```
+s + 𝑣⃗ = cos(θ / 2) + sin(θ / 2) * v̂
+s = cos(θ / 2)
+𝑣⃗ = sin(θ / 2) * v̂
+||𝑣⃗|| = sin(θ / 2)
+
+θ / 2 = atan2(||𝑣⃗||, s)
+θ = 2 * atan2(||𝑣⃗||, s)
+
+r̂ = 𝑣⃗ / ||𝑣⃗||
+
+𝑟⃗ = θ * r̂
+𝑟⃗ = 2 * atan2(||𝑣⃗||, s) / ||𝑣⃗|| * 𝑣⃗
+```
+
+## Closed form solution for an Exponential Motion Profile
+
+### [Derivation of continuous-time model](wpimath/algorithms/docs/ExponentialProfileModel.py)
+
+
+### Heuristic for input direction in Exponential Profile
+
+Demonstration: https://www.desmos.com/calculator/3jamollwrk
+
+The fastest path possible for an exponential profile (and the placement of the inflection point) depend on boundary conditions.
+
+Specifically, the placement (xf, vf) relative to the possible trajectories that cross through (x0, v0) decides this. There are two possible trajectories to take from the initial state. In the desmos demo these are colored Green and Purple, which arise from applying +input and -input from the initial state respectively. Red and Yellow trajectories arise from applying -input and +input respectively from terminal conditions.
+
+In order to reach the terminal state from the initial state by following Green in the +v direction, the second step is following Red in the -v direction.
+Likewise, Purple must be followed in the -v direction, and then Yellow must be followed in the +v direction.
+
+The specific conditions surrounding this decision are fourfold:
+- A: v0 >= 0
+- B: vf >= 0
+- C: vf >= x1_ps(vf, U)
+- D: vf >= x1_ps(vf, -U)
+
+Where x1_ps(v, U) follows the Green line, and x1_ps(v, -U) follows the Purple line.
+
+This creates a decision table:
+| v0>=0 | vf>=0 | vf>=x1_ps(vf,U) | vf>=x1_ps(vf,-U) | Output Sign |
+|-------|-------|-----------------|------------------|------------:|
+| False | False | False           | False            |          -1 |
+| False | False | False           | True             |           1 |
+| False | False | True            | False            |           1 |
+| False | False | True            | True             |           1 |
+| False | True  | False           | False            |          -1 |
+| False | True  | False           | True             |          -1 |
+| False | True  | True            | False            |           1 |
+| False | True  | True            | True             |           1 |
+| True  | False | False           | False            |          -1 |
+| True  | False | False           | True             |           1 |
+| True  | False | True            | False            |          -1 |
+| True  | False | True            | True             |           1 |
+| True  | True  | False           | False            |          -1 |
+| True  | True  | False           | True             |          -1 |
+| True  | True  | True            | False            |          -1 |
+| True  | True  | True            | True             |           1 |
+
+Which is equivalent to `-1 if (A & ~D) | (B & ~C) | (~C & ~D) else 1`.

@@ -1,3 +1,10 @@
+DLM_GetLog
+DLM_GetLogDir
+DLM_Log
+DLM_LogNetworkTables
+DLM_SignalNewDSDataOccur
+DLM_Start
+DLM_Stop
 NT_AddListener
 NT_AddListenerMultiple
 NT_AddListenerSingle
@@ -239,6 +246,7 @@ WPI_DataLog_Resume
 WPI_DataLog_SetFilename
 WPI_DataLog_SetMetadata
 WPI_DataLog_Start
+WPI_DataLog_Stop
 WPI_DestroyEvent
 WPI_DestroySemaphore
 WPI_DestroySignalObject

@@ -5,14 +5,13 @@
 #pragma once
 
 #include <functional>
-#include <initializer_list>
-#include <span>
 
 #include <frc/Timer.h>
 #include <frc/trajectory/TrapezoidProfile.h>
 
 #include "frc2/command/Command.h"
 #include "frc2/command/CommandHelper.h"
+#include "frc2/command/Requirements.h"
 
 namespace frc2 {
 /**
@@ -80,7 +79,7 @@ class TrapezoidProfileCommand
   void Initialize() override { m_timer.Restart(); }
 
   void Execute() override {
-    m_output(m_profile.Calculate(m_timer.Get(), m_goal(), m_currentState()));
+    m_output(m_profile.Calculate(m_timer.Get(), m_currentState(), m_goal()));
   }
 
   void End(bool interrupted) override { m_timer.Stop(); }

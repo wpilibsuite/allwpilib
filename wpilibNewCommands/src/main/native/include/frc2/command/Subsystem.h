@@ -6,7 +6,10 @@
 
 #include <concepts>
 #include <functional>
+#include <string>
 #include <utility>
+
+#include <wpi/FunctionExtras.h>
 
 #include "frc2/command/CommandScheduler.h"
 
@@ -56,6 +59,13 @@ class Subsystem {
    * sensor readings.
    */
   virtual void SimulationPeriodic();
+
+  /**
+   * Gets the name of this Subsystem.
+   *
+   * @return Name
+   */
+  virtual std::string GetName() const;
 
   /**
    * Sets the default Command of the subsystem.  The default command will be
@@ -148,5 +158,15 @@ class Subsystem {
    */
   [[nodiscard]]
   CommandPtr RunEnd(std::function<void()> run, std::function<void()> end);
+
+  /**
+   * Constructs a DeferredCommand with the provided supplier. This subsystem is
+   * added as a requirement.
+   *
+   * @param supplier the command supplier.
+   * @return the command.
+   */
+  [[nodiscard]]
+  CommandPtr Defer(wpi::unique_function<CommandPtr()> supplier);
 };
 }  // namespace frc2

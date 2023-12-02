@@ -5,8 +5,6 @@
 #pragma once
 
 #include <functional>
-#include <initializer_list>
-#include <span>
 #include <utility>
 
 #include <frc/controller/ProfiledPIDController.h>
@@ -14,6 +12,7 @@
 
 #include "frc2/command/Command.h"
 #include "frc2/command/CommandHelper.h"
+#include "frc2/command/Requirements.h"
 
 namespace frc2 {
 /**

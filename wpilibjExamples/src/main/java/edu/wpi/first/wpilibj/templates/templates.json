@@ -46,7 +46,7 @@
     "commandversion": 2
   },
   {
-    "name": "Timesice Robot",
+    "name": "Timeslice Robot",
     "description": "Timeslice style",
     "tags": [
       "Timeslice"
@@ -90,7 +90,10 @@
     "foldername": "romicommandbased",
     "gradlebase": "javaromi",
     "mainclass": "Main",
-    "commandversion": 2
+    "commandversion": 2,
+    "extravendordeps": [
+      "romi"
+    ]
   },
   {
     "name": "Romi - Timed Robot",
@@ -102,7 +105,10 @@
     "foldername": "romitimed",
     "gradlebase": "javaromi",
     "mainclass": "Main",
-    "commandversion": 2
+    "commandversion": 2,
+    "extravendordeps": [
+      "romi"
+    ]
   },
   {
     "name": "XRP - Command Robot",
@@ -114,7 +120,10 @@
     "foldername": "xrpcommandbased",
     "gradlebase": "javaxrp",
     "mainclass": "Main",
-    "commandversion": 2
+    "commandversion": 2,
+    "extravendordeps": [
+      "xrp"
+    ]
   },
   {
     "name": "XRP - Timed Robot",
@@ -126,7 +135,10 @@
     "foldername": "xrptimed",
     "gradlebase": "javaxrp",
     "mainclass": "Main",
-    "commandversion": 2
+    "commandversion": 2,
+    "extravendordeps": [
+      "xrp"
+    ]
   },
   {
     "name": "Educational Robot",
@@ -149,7 +161,10 @@
     "foldername": "romieducational",
     "gradlebase": "javaromi",
     "mainclass": "Main",
-    "commandversion": 2
+    "commandversion": 2,
+    "extravendordeps": [
+      "romi"
+    ]
   },
   {
     "name": "XRP - Educational Robot",
@@ -161,6 +176,9 @@
     "foldername": "xrpeducational",
     "gradlebase": "javaxrp",
     "mainclass": "Main",
-    "commandversion": 2
+    "commandversion": 2,
+    "extravendordeps": [
+      "xrp"
+    ]
   }
 ]

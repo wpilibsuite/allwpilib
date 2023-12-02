@@ -25,6 +25,9 @@
 #ifndef _gcem_pow_HPP
 #define _gcem_pow_HPP
 
+#include <cmath>
+#include <type_traits>
+
 namespace internal
 {
 
@@ -76,7 +79,11 @@ common_t<T1,T2>
 pow(const T1 base, const T2 exp_term)
 noexcept
 {
+  if (std::is_constant_evaluated()) {
     return internal::pow_check(base,exp_term);
+  } else {
+    return std::pow(base, exp_term);
+  }
 }
 
 #endif

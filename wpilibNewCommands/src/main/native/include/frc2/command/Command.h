@@ -5,9 +5,7 @@
 #pragma once
 
 #include <functional>
-#include <initializer_list>
 #include <memory>
-#include <span>
 #include <string>
 
 #include <units/time.h>
@@ -19,11 +17,6 @@
 #include "frc2/command/Subsystem.h"
 
 namespace frc2 {
-
-template <typename T>
-std::string GetTypeName(const T& type) {
-  return wpi::Demangle(typeid(type).name());
-}
 
 /**
  * A state machine representing a complete action to be performed by the robot.
@@ -319,6 +312,18 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
    */
   [[nodiscard]]
   CommandPtr FinallyDo(std::function<void(bool)> end) &&;
+
+  /**
+   * Decorates this command with a lambda to call on interrupt or end, following
+   * the command's inherent Command::End(bool) method. The provided lambda will
+   * run identically in both interrupt and end cases.
+   *
+   * @param end a lambda to run when the command ends, whether or not it was
+   * interrupted.
+   * @return the decorated command
+   */
+  [[nodiscard]]
+  CommandPtr FinallyDo(std::function<void()> end) &&;
 
   /**
    * Decorates this command with a lambda to call on interrupt, following the
