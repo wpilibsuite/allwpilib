@@ -5,18 +5,6 @@ include(CompileWarnings)
 include(AddTest)
 include(DownloadAndCheck)
 
-# workaround for makefiles - for some reason parent directories aren't created.
-file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/protobuf")
-file(GLOB wpimath_proto_src src/main/proto/*.proto)
-protobuf_generate_cpp(
-    WPIMATH_PROTO_SRCS
-    WPIMATH_PROTO_HDRS
-    PROTOC_OUT_DIR
-    "${CMAKE_CURRENT_BINARY_DIR}/protobuf"
-    PROTOS
-    ${wpimath_proto_src}
-)
-
 file(
     GLOB wpimath_jni_src
     src/main/native/cpp/jni/WPIMathJNI_DARE.cpp
@@ -153,6 +141,9 @@ endif()
 file(GLOB_RECURSE wpimath_native_src src/main/native/cpp/*.cpp)
 list(REMOVE_ITEM wpimath_native_src ${wpimath_jni_src})
 
+file(GLOB_RECURSE WPIMATH_PROTO_SRCS src/generated/main/native/protobuf/*.cc)
+file(GLOB_RECURSE WPIMATH_PROTO_HDRS src/generated/main/native/protobuf/*.h)
+
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS FALSE)
 add_library(wpimath ${wpimath_native_src} ${WPIMATH_PROTO_SRCS})
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
@@ -197,7 +188,7 @@ target_include_directories(
     wpimath
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/protobuf>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/generated/main/native/protobuf>
         $<INSTALL_INTERFACE:${include_dest}/wpimath>
 )
 
