@@ -40,8 +40,5 @@ class RobotContainer {
   // The robot's subsystems
   DriveSubsystem m_drive;
 
-  // The chooser for the autonomous routines
-  frc::SendableChooser<frc2::Command*> m_chooser;
-
   void ConfigureButtonBindings();
 };
