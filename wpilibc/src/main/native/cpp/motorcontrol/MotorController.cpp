@@ -9,5 +9,6 @@
 using namespace frc;
 
 void MotorController::SetVoltage(units::volt_t output) {
+  // NOLINTNEXTLINE(bugprone-integer-division)
   Set(output / RobotController::GetBatteryVoltage());
 }
