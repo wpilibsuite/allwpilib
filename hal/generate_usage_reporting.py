@@ -1,3 +1,8 @@
+#!/usr/bin/env python3
+
+# Copyright (c) FIRST and other WPILib contributors.
+# Open Source Software; you can modify and/or share it under the terms of
+# the WPILib BSD license file in the root directory of this project.
 import os
 
 
@@ -21,17 +26,20 @@ def main():
 
     with open("hal/src/generate/FRCNetComm.java.in") as java_usage_reporting:
         contents = java_usage_reporting.read()
-        contents = contents.replace(r"${usage_reporting_types}", usage_reporting_types)
+        contents = contents.replace(
+            r"${usage_reporting_types}", usage_reporting_types)
         if os.path.exists(f"hal/src/generated/main/java/{java_package}/FRCNetComm.java"):
             with open(f"hal/src/generated/main/java/{java_package}/FRCNetComm.java", "w") as java_out:
-                java_out.write(contents.replace(r"${usage_reporting_instances}", usage_reporting_instances))
+                java_out.write(contents.replace(
+                    r"${usage_reporting_instances}", usage_reporting_instances))
         else:
             with open(f"hal/src/generated/main/java/{java_package}/FRCNetComm.java", "x") as java_out:
-                java_out.write(contents.replace(r"${usage_reporting_instances}", usage_reporting_instances))
+                java_out.write(contents.replace(
+                    r"${usage_reporting_instances}", usage_reporting_instances))
 
     with open("hal/src/generate/FRCUsageReporting.h.in") as cpp_usage_reporting:
         contents = cpp_usage_reporting.read()
-        contents = contents.replace(r"${usage_reporting_types_cpp}",usage_reporting_types_cpp).replace(
+        contents = contents.replace(r"${usage_reporting_types_cpp}", usage_reporting_types_cpp).replace(
             r"${usage_reporting_instances_cpp}", usage_reporting_instances_cpp)
         if os.path.exists("hal/src/generated/main/native/include/hal/FRCUsageReporting.h"):
             with open("hal/src/generated/main/native/include/hal/FRCUsageReporting.h", "w") as cpp_out:
