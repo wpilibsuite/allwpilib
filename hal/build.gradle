@@ -1,15 +1,9 @@
 ext {
     addHalDependency = { binary, shared->
-        binary.tasks.withType(AbstractNativeSourceCompileTask) {
-            it.dependsOn generateUsageReporting
-        }
         binary.lib project: ':hal', library: 'hal', linkage: shared
     }
 
     addHalJniDependency = { binary->
-        binary.tasks.withType(AbstractNativeSourceCompileTask) {
-            it.dependsOn generateUsageReporting
-        }
         binary.lib project: ':hal', library: 'halJNIShared', linkage: 'shared'
     }
 
@@ -18,15 +12,7 @@ ext {
     devMain = 'edu.wpi.first.hal.DevMain'
     niLibraries = true
     generatedHeaders = "src/generated/main/native/include"
-    jniSplitSetup = {
-        it.tasks.withType(AbstractNativeSourceCompileTask) {
-            it.dependsOn generateUsageReporting
-        }
-    }
     splitSetup = {
-        it.tasks.withType(AbstractNativeSourceCompileTask) {
-            it.dependsOn generateUsageReporting
-        }
         if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
             it.sources {
                 athenaCpp(CppSourceSet) {
@@ -64,11 +50,7 @@ ext {
 
 apply from: "${rootDir}/shared/jni/setupBuild.gradle"
 
-sourceSets.main.java.srcDir "src/generated/main/java/"
-
-compileJava {
-    dependsOn generateUsageReporting
-}
+sourceSets.main.java.srcDir "src/generated/main/java/edu/wpi/first/hal/"
 
 cppSourcesZip {
     from('src/main/native/athena') {
@@ -81,7 +63,6 @@ cppSourcesZip {
 }
 
 cppHeadersZip {
-    dependsOn generateUsageReporting
     from(generatedHeaders) {
         into '/'
     }
@@ -115,9 +96,6 @@ nativeUtils.exportsConfigs {
 model {
     binaries {
         all {
-            it.tasks.withType(AbstractNativeSourceCompileTask) {
-                it.dependsOn generateUsageReporting
-            }
             if (!(it instanceof NativeBinarySpec)) return
                 if (it.component.name != 'hal' && it.component.name != 'halBase') return
                 if (it.targetPlatform.name != nativeUtils.wpi.platforms.roborio) return

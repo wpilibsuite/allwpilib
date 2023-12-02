@@ -2,8 +2,9 @@ import os
 
 
 def main():
+    java_package = "edu/wpi/first/hal"
     os.makedirs("hal/src/generated/main/native/include", exist_ok=True)
-    os.makedirs("hal/src/generated/main/java", exist_ok=True)
+    os.makedirs(f"hal/src/generated/main/java/{java_package}", exist_ok=True)
     usage_reporting_types_cpp = ""
     usage_reporting_instances_cpp = ""
     usage_reporting_types = ""
@@ -21,11 +22,11 @@ def main():
     with open("hal/src/generate/FRCNetComm.java.in") as java_usage_reporting:
         contents = java_usage_reporting.read()
         contents = contents.replace(r"${usage_reporting_types}", usage_reporting_types)
-        if os.path.exists("hal/src/generated/main/java/FRCNetComm.java"):
-            with open("hal/src/generated/main/java/FRCNetComm.java", "w") as java_out:
+        if os.path.exists(f"hal/src/generated/main/java/{java_package}/FRCNetComm.java"):
+            with open(f"hal/src/generated/main/java/{java_package}/FRCNetComm.java", "w") as java_out:
                 java_out.write(contents.replace(r"${usage_reporting_instances}", usage_reporting_instances))
         else:
-            with open("hal/src/generated/main/java/FRCNetComm.java", "x") as java_out:
+            with open(f"hal/src/generated/main/java/{java_package}/FRCNetComm.java", "x") as java_out:
                 java_out.write(contents.replace(r"${usage_reporting_instances}", usage_reporting_instances))
 
     with open("hal/src/generate/FRCUsageReporting.h.in") as cpp_usage_reporting:
