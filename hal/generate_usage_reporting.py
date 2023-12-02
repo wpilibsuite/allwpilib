@@ -3,7 +3,7 @@ import os
 
 def main():
     java_package = "edu/wpi/first/hal"
-    os.makedirs("hal/src/generated/main/native/include", exist_ok=True)
+    os.makedirs("hal/src/generated/main/native/include/hal", exist_ok=True)
     os.makedirs(f"hal/src/generated/main/java/{java_package}", exist_ok=True)
     usage_reporting_types_cpp = ""
     usage_reporting_instances_cpp = ""
@@ -33,11 +33,11 @@ def main():
         contents = cpp_usage_reporting.read()
         contents = contents.replace(r"${usage_reporting_types_cpp}",usage_reporting_types_cpp).replace(
             r"${usage_reporting_instances_cpp}", usage_reporting_instances_cpp)
-        if os.path.exists("hal/src/generated/main/native/include/FRCUsageReporting.h"):
-            with open("hal/src/generated/main/native/include/FRCUsageReporting.h", "w") as cpp_out:
+        if os.path.exists("hal/src/generated/main/native/include/hal/FRCUsageReporting.h"):
+            with open("hal/src/generated/main/native/include/hal/FRCUsageReporting.h", "w") as cpp_out:
                 cpp_out.write(contents)
         else:
-            with open("hal/src/generated/main/native/include/FRCUsageReporting.h", "x") as cpp_out:
+            with open("hal/src/generated/main/native/include/hal/FRCUsageReporting.h", "x") as cpp_out:
                 cpp_out.write(contents)
 
 
