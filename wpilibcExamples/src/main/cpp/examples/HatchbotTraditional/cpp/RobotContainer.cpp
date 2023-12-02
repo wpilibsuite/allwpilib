@@ -16,8 +16,8 @@ RobotContainer::RobotContainer() {
   // Initialize all of your commands and subsystems here
 
   // Add commands to the autonomous command chooser
-  m_chooser.SetDefaultOption("Simple Auto", &m_simpleAuto);
-  m_chooser.AddOption("Complex Auto", &m_complexAuto);
+  m_chooser.SetDefaultOption("Simple Auto", Autos::kSimpleAuto);
+  m_chooser.AddOption("Complex Auto", Autos::kComplexAuto);
 
   // Put the chooser on the dashboard
   frc::Shuffleboard::GetTab("Autonomous").Add(m_chooser);
@@ -78,7 +78,18 @@ void RobotContainer::ConfigureButtonBindings() {
       .WhileTrue(HalveDriveSpeed(&m_drive).ToPtr());
 }
 
-frc2::Command* RobotContainer::GetAutonomousCommand() {
+frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
   // Runs the chosen command in autonomous
-  return m_chooser.GetSelected();
+  switch (m_chooser.GetSelected()) {
+    case Autos::kSimpleAuto:
+      return DriveDistance(AutoConstants::kAutoDriveDistanceInches,
+                             AutoConstants::kAutoDriveSpeed, &m_drive).ToPtr();
+    break;
+    case Autos::kComplexAuto:
+      return ComplexAuto(&m_drive, &m_hatch).ToPtr();
+    break;
+    default: 
+      return frc2::CommandPtr(nullptr);
+    break;
+  }
 }

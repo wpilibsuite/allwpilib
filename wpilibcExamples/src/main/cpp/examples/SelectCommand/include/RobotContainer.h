@@ -6,6 +6,7 @@
 
 #include <frc2/command/Command.h>
 #include <frc2/command/Commands.h>
+#include <frc2/command/CommandPtr.h>
 
 /**
  * This class is where the bulk of the robot should be declared.  Since
@@ -18,7 +19,7 @@ class RobotContainer {
  public:
   RobotContainer();
 
-  frc2::Command* GetAutonomousCommand();
+  frc2::CommandPtr GetAutonomousCommand();
 
  private:
   // The enum used as keys for selecting the command to run.

@@ -16,6 +16,7 @@
 #include <frc2/command/MecanumControllerCommand.h>
 #include <frc2/command/SequentialCommandGroup.h>
 #include <frc2/command/button/JoystickButton.h>
+#include <frc2/command/Commands.h>
 
 #include "Constants.h"
 
@@ -47,7 +48,7 @@ void RobotContainer::ConfigureButtonBindings() {
       .OnFalse(&m_driveFullSpeed);
 }
 
-frc2::Command* RobotContainer::GetAutonomousCommand() {
+frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
   // Set up config for trajectory
   frc::TrajectoryConfig config(AutoConstants::kMaxSpeed,
                                AutoConstants::kMaxAcceleration);
@@ -65,7 +66,12 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
       // Pass the config
       config);
 
-  frc2::MecanumControllerCommand mecanumControllerCommand(
+  // Reset odometry to the starting pose of the trajectory.
+  m_drive.ResetOdometry(exampleTrajectory.InitialPose());
+
+  // no auto
+  return frc2::cmd::Sequence(
+    frc2::MecanumControllerCommand(
       exampleTrajectory, [this]() { return m_drive.GetPose(); },
 
       frc::SimpleMotorFeedforward<units::meters>(ks, kv, ka),
@@ -100,13 +106,8 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
                                          rearRight);
       },
 
-      {&m_drive});
+      {&m_drive}).ToPtr(), 
+    frc2::InstantCommand([this] { m_drive.Drive(0, 0, 0, false); }, {}).ToPtr()
+  );
 
-  // Reset odometry to the starting pose of the trajectory.
-  m_drive.ResetOdometry(exampleTrajectory.InitialPose());
-
-  // no auto
-  return new frc2::SequentialCommandGroup(
-      std::move(mecanumControllerCommand),
-      frc2::InstantCommand([this]() { m_drive.Drive(0, 0, 0, false); }, {}));
 }

@@ -27,7 +27,7 @@ class RobotContainer {
   RobotContainer();
 
   // The chooser for the autonomous routines
-  frc2::Command* GetAutonomousCommand();
+  frc2::CommandPtr GetAutonomousCommand();
 
  private:
   // The driver's controller
@@ -48,25 +48,6 @@ class RobotContainer {
   frc2::CommandPtr m_stopShooter =
       frc2::cmd::RunOnce([this] { m_shooter.Disable(); }, {&m_shooter});
 
-  // An autonomous routine that shoots the loaded frisbees
-  frc2::CommandPtr m_autonomousCommand =
-      frc2::cmd::Sequence(
-          // Start the command by spinning up the shooter...
-          frc2::cmd::RunOnce([this] { m_shooter.Enable(); }, {&m_shooter}),
-          // Wait until the shooter is at speed before feeding the frisbees
-          frc2::cmd::WaitUntil([this] { return m_shooter.AtSetpoint(); }),
-          // Start running the feeder
-          frc2::cmd::RunOnce([this] { m_shooter.RunFeeder(); }, {&m_shooter}),
-          // Shoot for the specified time
-          frc2::cmd::Wait(ac::kAutoShootTimeSeconds))
-          // Add a timeout (will end the command if, for instance, the shooter
-          // never gets up to speed)
-          .WithTimeout(ac::kAutoTimeoutSeconds)
-          // When the command ends, turn off the shooter and the feeder
-          .AndThen(frc2::cmd::RunOnce([this] {
-            m_shooter.Disable();
-            m_shooter.StopFeeder();
-          }));
 
   void ConfigureButtonBindings();
 };

@@ -13,6 +13,7 @@
 #include <frc2/command/PIDCommand.h>
 #include <frc2/command/ParallelRaceGroup.h>
 #include <frc2/command/RunCommand.h>
+#include <frc2/command/CommandPtr.h>
 
 #include "Constants.h"
 #include "subsystems/DriveSubsystem.h"
@@ -28,7 +29,7 @@ class RobotContainer {
  public:
   RobotContainer();
 
-  frc2::Command* GetAutonomousCommand();
+  frc2::CommandPtr GetAutonomousCommand();
 
  private:
   // The driver's controller
@@ -44,8 +45,6 @@ class RobotContainer {
   frc2::InstantCommand m_driveFullSpeed{[this] { m_drive.SetMaxOutput(1); },
                                         {}};
 
-  // The chooser for the autonomous routines
-  frc::SendableChooser<frc2::Command*> m_chooser;
 
   void ConfigureButtonBindings();
 };

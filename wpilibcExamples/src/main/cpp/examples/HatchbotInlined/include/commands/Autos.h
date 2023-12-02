@@ -23,4 +23,9 @@ frc2::CommandPtr SimpleAuto(DriveSubsystem* drive);
  */
 frc2::CommandPtr ComplexAuto(DriveSubsystem* drive, HatchSubsystem* hatch);
 
+enum class AutoEnum {
+  kSimpleAuto, 
+  kComplexAuto
+};
+
 }  // namespace autos

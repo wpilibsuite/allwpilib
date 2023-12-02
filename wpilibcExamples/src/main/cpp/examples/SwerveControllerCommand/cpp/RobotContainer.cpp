@@ -15,6 +15,7 @@
 #include <frc2/command/SequentialCommandGroup.h>
 #include <frc2/command/SwerveControllerCommand.h>
 #include <frc2/command/button/JoystickButton.h>
+#include <frc2/command/Commands.h>
 #include <units/angle.h>
 #include <units/velocity.h>
 
@@ -48,7 +49,7 @@ RobotContainer::RobotContainer() {
 
 void RobotContainer::ConfigureButtonBindings() {}
 
-frc2::Command* RobotContainer::GetAutonomousCommand() {
+frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
   // Set up config for trajectory
   frc::TrajectoryConfig config(AutoConstants::kMaxSpeed,
                                AutoConstants::kMaxAcceleration);
@@ -73,7 +74,12 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
   thetaController.EnableContinuousInput(units::radian_t{-std::numbers::pi},
                                         units::radian_t{std::numbers::pi});
 
-  frc2::SwerveControllerCommand<4> swerveControllerCommand(
+  // Reset odometry to the starting pose of the trajectory.
+  m_drive.ResetOdometry(exampleTrajectory.InitialPose());
+
+  // no auto
+  return frc2::cmd::Sequence(
+    frc2::SwerveControllerCommand<4>(
       exampleTrajectory, [this]() { return m_drive.GetPose(); },
 
       m_drive.kDriveKinematics,
@@ -83,14 +89,8 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
 
       [this](auto moduleStates) { m_drive.SetModuleStates(moduleStates); },
 
-      {&m_drive});
+      {&m_drive}).ToPtr(),
+    frc2::InstantCommand([this] { m_drive.Drive(0_mps, 0_mps, 0_rad_per_s, false); }, {}).ToPtr()
+  );
 
-  // Reset odometry to the starting pose of the trajectory.
-  m_drive.ResetOdometry(exampleTrajectory.InitialPose());
-
-  // no auto
-  return new frc2::SequentialCommandGroup(
-      std::move(swerveControllerCommand),
-      frc2::InstantCommand(
-          [this]() { m_drive.Drive(0_mps, 0_mps, 0_rad_per_s, false); }, {}));
 }

@@ -13,6 +13,7 @@
 #include <frc2/command/PIDCommand.h>
 #include <frc2/command/ParallelRaceGroup.h>
 #include <frc2/command/RunCommand.h>
+#include <frc2/command/CommandPtr.h>
 
 #include "Constants.h"
 #include "subsystems/DriveSubsystem.h"
@@ -28,7 +29,7 @@ class RobotContainer {
  public:
   RobotContainer();
 
-  frc2::Command* GetAutonomousCommand();
+  frc2::CommandPtr GetAutonomousCommand();
 
  private:
   // The driver's controller

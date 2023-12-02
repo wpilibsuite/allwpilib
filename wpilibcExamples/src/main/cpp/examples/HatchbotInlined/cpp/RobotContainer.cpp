@@ -11,8 +11,8 @@ RobotContainer::RobotContainer() {
 
   // Add commands to the autonomous command chooser
   // Note that we do *not* move ownership into the chooser
-  m_chooser.SetDefaultOption("Simple Auto", m_simpleAuto.get());
-  m_chooser.AddOption("Complex Auto", m_complexAuto.get());
+  m_chooser.SetDefaultOption("Simple Auto", autos::AutoEnum::kSimpleAuto);
+  m_chooser.AddOption("Complex Auto", autos::AutoEnum::kComplexAuto);
 
   // Put the chooser on the dashboard
   frc::Shuffleboard::GetTab("Autonomous").Add(m_chooser);
@@ -71,7 +71,17 @@ void RobotContainer::ConfigureButtonBindings() {
       .OnFalse(frc2::cmd::RunOnce([this] { m_drive.SetMaxOutput(1.0); }, {}));
 }
 
-frc2::Command* RobotContainer::GetAutonomousCommand() {
+frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
   // Runs the chosen command in autonomous
-  return m_chooser.GetSelected();
+  switch (m_chooser.GetSelected()) {
+    case autos::AutoEnum::kSimpleAuto:
+      return autos::SimpleAuto(&m_drive);
+    break;
+    case autos::AutoEnum::kComplexAuto:
+      return autos::ComplexAuto(&m_drive, &m_hatch);
+    break;
+    default:
+      return frc2::CommandPtr(nullptr);
+    break;
+  }
 }
