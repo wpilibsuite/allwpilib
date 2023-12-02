@@ -117,19 +117,15 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
     // Require that the rotation matrix is special orthogonal. This is true if
     // the matrix is orthogonal (RRᵀ = I) and normalized (determinant is 1).
     if (R.times(R.transpose()).minus(Matrix.eye(Nat.N3())).normF() > 1e-9) {
-      var builder = new StringBuilder("Rotation matrix isn't orthogonal\n\nR =\n");
-      builder.append(R.getStorage().toString()).append('\n');
-
-      var msg = builder.toString();
+      var msg = "Rotation matrix isn't orthogonal\n\nR =\n" + R.getStorage().toString() + '\n';
       MathSharedStore.reportError(msg, Thread.currentThread().getStackTrace());
       throw new IllegalArgumentException(msg);
     }
     if (Math.abs(R.det() - 1.0) > 1e-9) {
-      var builder =
-          new StringBuilder("Rotation matrix is orthogonal but not special orthogonal\n\nR =\n");
-      builder.append(R.getStorage().toString()).append('\n');
-
-      var msg = builder.toString();
+      var msg =
+          "Rotation matrix is orthogonal but not special orthogonal\n\nR =\n"
+              + R.getStorage().toString()
+              + '\n';
       MathSharedStore.reportError(msg, Thread.currentThread().getStackTrace());
       throw new IllegalArgumentException(msg);
     }

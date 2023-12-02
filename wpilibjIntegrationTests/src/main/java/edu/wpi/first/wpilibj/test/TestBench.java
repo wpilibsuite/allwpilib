@@ -58,7 +58,7 @@ public final class TestBench {
    * The single constructor for the TestBench. This method is private in order to prevent multiple
    * TestBench objects from being allocated.
    */
-  protected TestBench() {}
+  private TestBench() {}
 
   /**
    * Constructs a new set of objects representing a connected set of Talon controlled Motors and an
@@ -67,7 +67,7 @@ public final class TestBench {
    * @return a freshly allocated Talon, Encoder pair
    */
   public static MotorEncoderFixture<Talon> getTalonPair() {
-    return new MotorEncoderFixture<Talon>() {
+    return new MotorEncoderFixture<>() {
       @Override
       protected Talon giveMotorController() {
         return new Talon(kTalonChannel);
@@ -97,7 +97,7 @@ public final class TestBench {
    * @return a freshly allocated Victor, Encoder pair
    */
   public static MotorEncoderFixture<Victor> getVictorPair() {
-    return new MotorEncoderFixture<Victor>() {
+    return new MotorEncoderFixture<>() {
       @Override
       protected Victor giveMotorController() {
         return new Victor(kVictorChannel);
@@ -127,7 +127,7 @@ public final class TestBench {
    * @return a freshly allocated Jaguar, Encoder pair
    */
   public static MotorEncoderFixture<Jaguar> getJaguarPair() {
-    return new MotorEncoderFixture<Jaguar>() {
+    return new MotorEncoderFixture<>() {
       @Override
       protected Jaguar giveMotorController() {
         return new Jaguar(kJaguarChannel);
@@ -189,7 +189,7 @@ public final class TestBench {
 
   /** Gets two lists of possible DIO pairs for the two pairs. */
   private static List<List<Integer[]>> getDIOCrossConnect() {
-    List<List<Integer[]>> pairs = new ArrayList<List<Integer[]>>();
+    List<List<Integer[]>> pairs = new ArrayList<>();
     List<Integer[]> setA =
         List.of(
             new Integer[][] {
@@ -251,7 +251,7 @@ public final class TestBench {
    * @return pairs of DIOCrossConnectFixtures
    */
   public static Collection<Integer[]> getDIOCrossConnectCollection() {
-    Collection<Integer[]> pairs = new ArrayList<Integer[]>();
+    Collection<Integer[]> pairs = new ArrayList<>();
     for (Collection<Integer[]> collection : getDIOCrossConnect()) {
       pairs.addAll(collection);
     }
@@ -266,7 +266,7 @@ public final class TestBench {
    */
   private static Collection<Integer[]> getPairArray(
       List<Integer[]> listA, List<Integer[]> listB, boolean flip) {
-    Collection<Integer[]> encoderPortPairs = new ArrayList<Integer[]>();
+    Collection<Integer[]> encoderPortPairs = new ArrayList<>();
     for (Integer[] portPairsA : listA) {
       Integer[] inputs = new Integer[5];
       inputs[0] = portPairsA[0]; // InputA
@@ -278,7 +278,7 @@ public final class TestBench {
         inputs[4] = flip ? 0 : 1; // The flip bit
       }
 
-      ArrayList<Integer[]> construtorInput = new ArrayList<Integer[]>();
+      ArrayList<Integer[]> construtorInput = new ArrayList<>();
       construtorInput.add(inputs);
 
       inputs = inputs.clone();
@@ -299,7 +299,7 @@ public final class TestBench {
    * @return A collection of different input pairs to use for the encoder
    */
   public static Collection<Integer[]> getEncoderDIOCrossConnectCollection() {
-    Collection<Integer[]> encoderPortPairs = new ArrayList<Integer[]>();
+    Collection<Integer[]> encoderPortPairs = new ArrayList<>();
     assert getDIOCrossConnect().size() == 2;
     encoderPortPairs.addAll(
         getPairArray(getDIOCrossConnect().get(0), getDIOCrossConnect().get(1), false));

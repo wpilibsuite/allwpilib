@@ -190,14 +190,14 @@ final class ProtobufEntryImpl<T> extends EntryBase implements ProtobufEntry<T> {
 
   private TimestampedObject<T> fromRaw(TimestampedRaw raw, T defaultValue) {
     if (raw.value.length == 0) {
-      return new TimestampedObject<T>(0, 0, defaultValue);
+      return new TimestampedObject<>(0, 0, defaultValue);
     }
     try {
       synchronized (m_buf) {
-        return new TimestampedObject<T>(raw.timestamp, raw.serverTime, m_buf.read(raw.value));
+        return new TimestampedObject<>(raw.timestamp, raw.serverTime, m_buf.read(raw.value));
       }
     } catch (IOException e) {
-      return new TimestampedObject<T>(0, 0, defaultValue);
+      return new TimestampedObject<>(0, 0, defaultValue);
     }
   }
 

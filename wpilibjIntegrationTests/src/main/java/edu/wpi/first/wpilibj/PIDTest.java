@@ -72,7 +72,7 @@ public class PIDTest extends AbstractComsSetup {
   @Parameters
   public static Collection<Object[]> generateData() {
     // logger.fine("Loading the MotorList");
-    Collection<Object[]> data = new ArrayList<Object[]>();
+    Collection<Object[]> data = new ArrayList<>();
     double kp = 0.001;
     double ki = 0.0005;
     double kd = 0.0;

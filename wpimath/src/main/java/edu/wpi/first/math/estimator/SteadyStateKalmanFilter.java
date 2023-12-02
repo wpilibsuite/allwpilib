@@ -81,15 +81,12 @@ public class SteadyStateKalmanFilter<States extends Num, Inputs extends Num, Out
     var C = plant.getC();
 
     if (!StateSpaceUtil.isDetectable(discA, C)) {
-      var builder =
-          new StringBuilder("The system passed to the Kalman filter is unobservable!\n\nA =\n");
-      builder
-          .append(discA.getStorage().toString())
-          .append("\nC =\n")
-          .append(C.getStorage().toString())
-          .append('\n');
-
-      var msg = builder.toString();
+      var msg =
+          "The system passed to the Kalman filter is unobservable!\n\nA =\n"
+              + discA.getStorage().toString()
+              + "\nC =\n"
+              + C.getStorage().toString()
+              + '\n';
       MathSharedStore.reportError(msg, Thread.currentThread().getStackTrace());
       throw new IllegalArgumentException(msg);
     }

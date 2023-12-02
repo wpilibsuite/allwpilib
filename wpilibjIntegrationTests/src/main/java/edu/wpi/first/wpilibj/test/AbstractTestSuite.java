@@ -7,6 +7,7 @@ package edu.wpi.first.wpilibj.test;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -34,15 +35,11 @@ public abstract class AbstractTestSuite {
    */
   protected List<Class<?>> getAnnotatedTestClasses() {
     SuiteClasses annotation = getClass().getAnnotation(SuiteClasses.class);
-    List<Class<?>> classes = new ArrayList<>();
     if (annotation == null) {
       throw new RuntimeException(
           String.format("class '%s' must have a SuiteClasses annotation", getClass().getName()));
     }
-    for (Class<?> c : annotation.value()) {
-      classes.add(c);
-    }
-    return classes;
+    return new ArrayList<>(Arrays.asList(annotation.value()));
   }
 
   private boolean areAnySuperClassesOfTypeAbstractTestSuite(Class<?> check) {

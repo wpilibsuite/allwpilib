@@ -208,14 +208,12 @@ public class ExponentialProfile {
    * @return The position and velocity of the profile at the inflection point.
    */
   private State calculateInflectionPoint(State current, State goal, double input) {
-    var u = input;
-
     if (current.equals(goal)) {
       return current;
     }
 
-    var inflectionVelocity = solveForInflectionVelocity(u, current, goal);
-    var inflectionPosition = computeDistanceFromVelocity(inflectionVelocity, -u, goal);
+    var inflectionVelocity = solveForInflectionVelocity(input, current, goal);
+    var inflectionPosition = computeDistanceFromVelocity(inflectionVelocity, -input, goal);
 
     return new State(inflectionPosition, inflectionVelocity);
   }
@@ -261,8 +259,6 @@ public class ExponentialProfile {
    */
   private ProfileTiming calculateProfileTiming(
       State current, State inflectionPoint, State goal, double input) {
-    var u = input;
-
     double inflectionT_forward;
 
     // We need to handle 5 cases here:
@@ -287,13 +283,13 @@ public class ExponentialProfile {
         x_at_solvable_v = current.position;
       } else {
         if (Math.abs(current.velocity) > m_constraints.maxVelocity()) {
-          solvableV += Math.signum(u) * epsilon;
+          solvableV += Math.signum(input) * epsilon;
         } else {
-          solvableV -= Math.signum(u) * epsilon;
+          solvableV -= Math.signum(input) * epsilon;
         }
 
-        t_to_solvable_v = computeTimeFromVelocity(solvableV, u, current.velocity);
-        x_at_solvable_v = computeDistanceFromVelocity(solvableV, u, current);
+        t_to_solvable_v = computeTimeFromVelocity(solvableV, input, current.velocity);
+        x_at_solvable_v = computeDistanceFromVelocity(solvableV, input, current);
       }
 
       inflectionT_forward =
@@ -302,10 +298,12 @@ public class ExponentialProfile {
                   * (inflectionPoint.position - x_at_solvable_v)
                   / m_constraints.maxVelocity();
     } else {
-      inflectionT_forward = computeTimeFromVelocity(inflectionPoint.velocity, u, current.velocity);
+      inflectionT_forward =
+          computeTimeFromVelocity(inflectionPoint.velocity, input, current.velocity);
     }
 
-    var inflectionT_backward = computeTimeFromVelocity(inflectionPoint.velocity, -u, goal.velocity);
+    var inflectionT_backward =
+        computeTimeFromVelocity(inflectionPoint.velocity, -input, goal.velocity);
 
     return new ProfileTiming(inflectionT_forward, inflectionT_forward - inflectionT_backward);
   }
@@ -321,10 +319,9 @@ public class ExponentialProfile {
   private double computeDistanceFromTime(double t, double input, State initial) {
     var A = m_constraints.A;
     var B = m_constraints.B;
-    var u = input;
 
     return initial.position
-        + (-B * u * t + (initial.velocity + B * u / A) * (Math.exp(A * t) - 1)) / A;
+        + (-B * input * t + (initial.velocity + B * input / A) * (Math.exp(A * t) - 1)) / A;
   }
 
   /**
@@ -338,9 +335,8 @@ public class ExponentialProfile {
   private double computeVelocityFromTime(double t, double input, State initial) {
     var A = m_constraints.A;
     var B = m_constraints.B;
-    var u = input;
 
-    return (initial.velocity + B * u / A) * Math.exp(A * t) - B * u / A;
+    return (initial.velocity + B * input / A) * Math.exp(A * t) - B * input / A;
   }
 
   /**
@@ -354,9 +350,8 @@ public class ExponentialProfile {
   private double computeTimeFromVelocity(double velocity, double input, double initial) {
     var A = m_constraints.A;
     var B = m_constraints.B;
-    var u = input;
 
-    return Math.log((A * velocity + B * u) / (A * initial + B * u)) / A;
+    return Math.log((A * velocity + B * input) / (A * initial + B * input)) / A;
   }
 
   /**
@@ -371,11 +366,13 @@ public class ExponentialProfile {
   private double computeDistanceFromVelocity(double velocity, double input, State initial) {
     var A = m_constraints.A;
     var B = m_constraints.B;
-    var u = input;
 
     return initial.position
         + (velocity - initial.velocity) / A
-        - B * u / (A * A) * Math.log((A * velocity + B * u) / (A * initial.velocity + B * u));
+        - B
+            * input
+            / (A * A)
+            * Math.log((A * velocity + B * input) / (A * initial.velocity + B * input));
   }
 
   /**
@@ -390,18 +387,17 @@ public class ExponentialProfile {
   private double solveForInflectionVelocity(double input, State current, State goal) {
     var A = m_constraints.A;
     var B = m_constraints.B;
-    var u = input;
 
-    var U_dir = Math.signum(u);
+    var U_dir = Math.signum(input);
 
     var position_delta = goal.position - current.position;
     var velocity_delta = goal.velocity - current.velocity;
 
-    var scalar = (A * current.velocity + B * u) * (A * goal.velocity - B * u);
-    var power = -A / B / u * (A * position_delta - velocity_delta);
+    var scalar = (A * current.velocity + B * input) * (A * goal.velocity - B * input);
+    var power = -A / B / input * (A * position_delta - velocity_delta);
 
     var a = -A * A;
-    var c = (B * B) * (u * u) + scalar * Math.exp(power);
+    var c = (B * B) * (input * input) + scalar * Math.exp(power);
 
     if (-1e-9 < c && c < 0) {
       // Numerical stability issue - the heuristic gets it right but c is around -1e-13

@@ -890,7 +890,7 @@ public final class NetworkTableInstance implements AutoCloseable {
                       } catch (Throwable throwable) {
                         System.err.println(
                             "Unhandled exception during listener callback: "
-                            + throwable.toString());
+                            + throwable);
                         throwable.printStackTrace();
                       }
                     }
