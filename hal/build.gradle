@@ -1,48 +1,3 @@
-def javaResourceFile = file("$buildDir/generated/java/edu/wpi/first/hal/FRCNetComm.java")
-def cppResourceFile = file("$buildDir/generated/headers/hal/FRCUsageReporting.h")
-
-def generateUsageReporting = tasks.register('generateUsageReporting') {
-    def javaBase = file('src/generate/FRCNetComm.java.in')
-    def cppBase = file('src/generate/FRCUsageReporting.h.in')
-
-    def instances = file('src/generate/Instances.txt')
-    def resourceType = file('src/generate/ResourceType.txt')
-
-    inputs.file(javaBase)
-    inputs.file(cppBase)
-    inputs.file(instances)
-    inputs.file(resourceType)
-
-    outputs.file(javaResourceFile)
-    outputs.file(cppResourceFile)
-
-    doLast {
-        def instanceTextJava = instances as String[]
-        def instanceTextCpp = instances as String[]
-        def resourceTextJava = resourceType as String[]
-        def resourceTextCpp = resourceType as String[]
-
-        instanceTextJava = instanceTextJava.collect {
-            "    public static final int ${it};"
-        }.join('\n')
-
-        instanceTextCpp = instanceTextCpp.collect {
-            "    ${it},"
-        }.join('\n')
-
-        resourceTextJava = resourceTextJava.collect {
-            "    public static final int ${it};"
-        }.join('\n')
-
-        resourceTextCpp = resourceTextCpp.collect {
-            "    ${it},"
-        }.join('\n')
-
-        javaResourceFile.text = javaBase.text.replace('${usage_reporting_types}', resourceTextJava).replace('${usage_reporting_instances}', instanceTextJava)
-        cppResourceFile.text = cppBase.text.replace('${usage_reporting_types_cpp}', resourceTextCpp).replace('${usage_reporting_instances_cpp}', instanceTextCpp)
-    }
-}
-
 ext {
     addHalDependency = { binary, shared->
         binary.tasks.withType(AbstractNativeSourceCompileTask) {
@@ -62,7 +17,7 @@ ext {
     setBaseName = 'wpiHal'
     devMain = 'edu.wpi.first.hal.DevMain'
     niLibraries = true
-    generatedHeaders = "$buildDir/generated/headers"
+    generatedHeaders = "src/generated/main/native/include"
     jniSplitSetup = {
         it.tasks.withType(AbstractNativeSourceCompileTask) {
             it.dependsOn generateUsageReporting
@@ -109,7 +64,7 @@ ext {
 
 apply from: "${rootDir}/shared/jni/setupBuild.gradle"
 
-sourceSets.main.java.srcDir "${buildDir}/generated/java/"
+sourceSets.main.java.srcDir "src/generated/main/java/"
 
 compileJava {
     dependsOn generateUsageReporting
