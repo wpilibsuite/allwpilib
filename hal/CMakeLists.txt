@@ -63,13 +63,12 @@ if(WITH_JAVA)
 
     file(GLOB_RECURSE hal_shared_jni_src src/main/native/cpp/jni/*.cpp)
 
-    file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
+    file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java src/generated/main/java/*.java)
     set(CMAKE_JNI_TARGET true)
 
     add_jar(
         hal_jar
         ${JAVA_SOURCES}
-        src/generated/main/java/FRCNetComm.java
         INCLUDE_JARS wpiutil_jar
         OUTPUT_NAME wpiHal
         GENERATE_NATIVE_HEADERS hal_jni_headers
@@ -102,11 +101,7 @@ endif()
 if(WITH_JAVA_SOURCE)
     find_package(Java REQUIRED)
     include(UseJava)
-    file(
-        GLOB HAL_SOURCES
-        src/main/java/edu/wpi/first/hal/*.java
-        src/generated/main/java/FRCNetComm.java
-    )
+    file(GLOB HAL_SOURCES src/main/java/edu/wpi/first/hal/*.java src/generated/main/java/*.java)
     file(GLOB HAL_CAN_SOURCES src/main/java/edu/wpi/first/hal/can/*.java)
     file(GLOB HAL_SIMULATION_SOURCES src/main/java/edu/wpi/first/hal/simulation/*.java)
     file(GLOB HAL_UTIL_SOURCES src/main/java/edu/wpi/first/hal/util/*.java)
