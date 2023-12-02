@@ -6,7 +6,6 @@
 
 #include <frc/shuffleboard/Shuffleboard.h>
 #include <frc2/command/button/JoystickButton.h>
-#include <frc2/command/Commands.h>
 
 #include "commands/DefaultDrive.h"
 #include "commands/GrabHatch.h"
@@ -17,8 +16,8 @@ RobotContainer::RobotContainer() {
   // Initialize all of your commands and subsystems here
 
   // Add commands to the autonomous command chooser
-  m_chooser.SetDefaultOption("Simple Auto", Autos::kSimpleAuto);
-  m_chooser.AddOption("Complex Auto", Autos::kComplexAuto);
+  m_chooser.SetDefaultOption("Simple Auto", &m_simpleAuto);
+  m_chooser.AddOption("Complex Auto", &m_complexAuto);
 
   // Put the chooser on the dashboard
   frc::Shuffleboard::GetTab("Autonomous").Add(m_chooser);
@@ -79,19 +78,7 @@ void RobotContainer::ConfigureButtonBindings() {
       .WhileTrue(HalveDriveSpeed(&m_drive).ToPtr());
 }
 
-frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
+frc2::Command* RobotContainer::GetAutonomousCommand() {
   // Runs the chosen command in autonomous
-  switch (m_chooser.GetSelected()) {
-    case Autos::kSimpleAuto:
-      return DriveDistance(AutoConstants::kAutoDriveDistanceInches,
-                           AutoConstants::kAutoDriveSpeed, &m_drive)
-          .ToPtr();
-      break;
-    case Autos::kComplexAuto:
-      return ComplexAuto(&m_drive, &m_hatch).ToPtr();
-      break;
-    default:
-      return frc2::cmd::None();
-      break;
-  }
+  return m_chooser.GetSelected();
 }

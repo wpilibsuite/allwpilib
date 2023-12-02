@@ -7,7 +7,6 @@
 #include <frc/XboxController.h>
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc2/command/Command.h>
-#include <frc2/command/CommandPtr.h>
 
 #include "Constants.h"
 #include "commands/ComplexAuto.h"
@@ -15,12 +14,6 @@
 #include "commands/DriveDistance.h"
 #include "subsystems/DriveSubsystem.h"
 #include "subsystems/HatchSubsystem.h"
-
-/**
- * This is where the autos can be listed for the autonomous chooser so it can
- * use CommandPtr the sendable chooser does not support the use of CommandPtr
- */
-enum class Autos { kSimpleAuto, kComplexAuto };
 
 /**
  * This class is where the bulk of the robot should be declared.  Since
@@ -33,7 +26,7 @@ class RobotContainer {
  public:
   RobotContainer();
 
-  frc2::CommandPtr GetAutonomousCommand();
+  frc2::Command* GetAutonomousCommand();
 
  private:
   // The robot's subsystems and commands are defined here...
@@ -42,8 +35,13 @@ class RobotContainer {
   DriveSubsystem m_drive;
   HatchSubsystem m_hatch;
 
+  // The autonomous routines
+  DriveDistance m_simpleAuto{AutoConstants::kAutoDriveDistanceInches,
+                             AutoConstants::kAutoDriveSpeed, &m_drive};
+  ComplexAuto m_complexAuto{&m_drive, &m_hatch};
+
   // The chooser for the autonomous routines
-  frc::SendableChooser<Autos> m_chooser;
+  frc::SendableChooser<frc2::Command*> m_chooser;
 
   // The driver's controller
   frc::XboxController m_driverController{OIConstants::kDriverControllerPort};

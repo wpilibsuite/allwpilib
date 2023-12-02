@@ -6,7 +6,6 @@
 
 #include <frc/XboxController.h>
 #include <frc2/command/Command.h>
-#include <frc2/command/CommandPtr.h>
 
 #include "commands/Autonomous.h"
 #include "subsystems/Claw.h"
@@ -25,7 +24,7 @@ class RobotContainer {
  public:
   RobotContainer();
 
-  frc2::CommandPtr GetAutonomousCommand();
+  frc2::Command* GetAutonomousCommand();
 
  private:
   // The robot's subsystems and commands are defined here...
@@ -35,6 +34,8 @@ class RobotContainer {
   Wrist m_wrist;
   Elevator m_elevator;
   Drivetrain m_drivetrain;
+
+  Autonomous m_autonomousCommand;
 
   void ConfigureButtonBindings();
 };

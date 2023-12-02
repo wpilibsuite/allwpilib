@@ -15,7 +15,8 @@
 #include "commands/SetElevatorSetpoint.h"
 #include "commands/TankDrive.h"
 
-RobotContainer::RobotContainer() {
+RobotContainer::RobotContainer()
+    : m_autonomousCommand(m_claw, m_wrist, m_elevator, m_drivetrain) {
   frc::SmartDashboard::PutData(&m_drivetrain);
   frc::SmartDashboard::PutData(&m_elevator);
   frc::SmartDashboard::PutData(&m_wrist);
@@ -47,7 +48,7 @@ void RobotContainer::ConfigureButtonBindings() {
       .OnTrue(PrepareToPickup(m_claw, m_wrist, m_elevator).ToPtr());
 }
 
-frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
+frc2::Command* RobotContainer::GetAutonomousCommand() {
   // An example command will be run in autonomous
-  return Autonomous(m_claw, m_wrist, m_elevator, m_drivetrain).ToPtr();
+  return &m_autonomousCommand;
 }

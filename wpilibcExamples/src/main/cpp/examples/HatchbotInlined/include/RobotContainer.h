@@ -6,7 +6,6 @@
 
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc2/command/Command.h>
-#include <frc2/command/CommandPtr.h>
 #include <frc2/command/Commands.h>
 #include <frc2/command/button/CommandPS4Controller.h>
 
@@ -28,7 +27,7 @@ class RobotContainer {
  public:
   RobotContainer();
 
-  frc2::CommandPtr GetAutonomousCommand();
+  frc2::Command* GetAutonomousCommand();
 
  private:
   // The driver's controller
@@ -43,8 +42,12 @@ class RobotContainer {
 
   // Commands owned by RobotContainer
 
+  // The autonomous routines
+  frc2::CommandPtr m_simpleAuto = autos::SimpleAuto(&m_drive);
+  frc2::CommandPtr m_complexAuto = autos::ComplexAuto(&m_drive, &m_hatch);
+
   // The chooser for the autonomous routines
-  frc::SendableChooser<autos::AutoEnum> m_chooser;
+  frc::SendableChooser<frc2::Command*> m_chooser;
 
   void ConfigureButtonBindings();
 };
