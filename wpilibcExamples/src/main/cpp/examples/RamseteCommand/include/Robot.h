@@ -4,10 +4,9 @@
 
 #pragma once
 
-#include <optional>
-
 #include <frc/TimedRobot.h>
 #include <frc2/command/CommandPtr.h>
+#include <frc2/command/Commands.h>
 
 #include "RobotContainer.h"
 
@@ -25,7 +24,7 @@ class Robot : public frc::TimedRobot {
 
  private:
   // Have it empty by default
-  std::optional<frc2::CommandPtr> m_autonomousCommand;
+  frc2::CommandPtr m_autonomousCommand = frc2::cmd::None();
 
   RobotContainer m_container;
 };
