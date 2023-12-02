@@ -4,7 +4,9 @@
 
 #include <stdint.h>
 
+#include <algorithm>
 #include <cstring>
+#include <numeric>
 #include <span>
 
 #include <wpi/MemAlloc.h>
@@ -27,10 +29,32 @@ struct StringArrayStorage {
     InitNtStrings();
   }
   void InitNtStrings();
+  size_t EstimateSize() const {
+    return sizeof(StringArrayStorage) +
+           strings.capacity() * sizeof(std::string) +
+           ntStrings.capacity() * sizeof(NT_String) +
+           std::accumulate(strings.begin(), strings.end(), 0,
+                           [](const auto& sum, const auto& val) {
+                             return sum + val.capacity();
+                           });
+  }
 
   std::vector<std::string> strings;
   std::vector<NT_String> ntStrings;
 };
+
+template <typename T>
+inline std::shared_ptr<T[]> AllocateArray(size_t nelem) {
+#if __cpp_lib_shared_ptr_arrays >= 201707L
+#if __cpp_lib_smart_ptr_for_overwrite >= 202002L
+  return std::make_shared_for_overwrite<T[]>(nelem);
+#else
+  return std::make_shared<T[]>(nelem);
+#endif
+#else
+  return std::shared_ptr<T[]>{new T[nelem]};
+#endif
+}
 }  // namespace
 
 void StringArrayStorage::InitNtStrings() {
@@ -46,12 +70,13 @@ Value::Value() {
   m_val.type = NT_UNASSIGNED;
   m_val.last_change = 0;
   m_val.server_time = 0;
+  m_size = 0;
 }
 
-Value::Value(NT_Type type, int64_t time, const private_init&)
-    : Value{type, time == 0 ? nt::Now() : time, 1, private_init{}} {}
+Value::Value(NT_Type type, size_t size, int64_t time, const private_init&)
+    : Value{type, size, time == 0 ? nt::Now() : time, 1, private_init{}} {}
 
-Value::Value(NT_Type type, int64_t time, int64_t serverTime,
+Value::Value(NT_Type type, size_t size, int64_t time, int64_t serverTime,
              const private_init&) {
   m_val.type = type;
   m_val.last_change = time;
@@ -67,30 +92,31 @@ Value::Value(NT_Type type, int64_t time, int64_t serverTime,
   } else if (m_val.type == NT_STRING_ARRAY) {
     m_val.data.arr_string.arr = nullptr;
   }
+  m_size = size;
 }
 
 Value Value::MakeBooleanArray(std::span<const bool> value, int64_t time) {
-  Value val{NT_BOOLEAN_ARRAY, time, private_init{}};
-  auto data = std::make_shared<std::vector<int>>(value.begin(), value.end());
-  // data->reserve(value.size());
-  // std::copy(value.begin(), value.end(), *data);
-  val.m_val.data.arr_boolean.arr = data->data();
-  val.m_val.data.arr_boolean.size = data->size();
+  Value val{NT_BOOLEAN_ARRAY, value.size() * sizeof(int), time, private_init{}};
+  auto data = AllocateArray<int>(value.size());
+  std::copy(value.begin(), value.end(), data.get());
+  val.m_val.data.arr_boolean.arr = data.get();
+  val.m_val.data.arr_boolean.size = value.size();
   val.m_storage = std::move(data);
   return val;
 }
 
 Value Value::MakeBooleanArray(std::span<const int> value, int64_t time) {
-  Value val{NT_BOOLEAN_ARRAY, time, private_init{}};
-  auto data = std::make_shared<std::vector<int>>(value.begin(), value.end());
-  val.m_val.data.arr_boolean.arr = data->data();
-  val.m_val.data.arr_boolean.size = data->size();
+  Value val{NT_BOOLEAN_ARRAY, value.size() * sizeof(int), time, private_init{}};
+  auto data = AllocateArray<int>(value.size());
+  std::copy(value.begin(), value.end(), data.get());
+  val.m_val.data.arr_boolean.arr = data.get();
+  val.m_val.data.arr_boolean.size = value.size();
   val.m_storage = std::move(data);
   return val;
 }
 
 Value Value::MakeBooleanArray(std::vector<int>&& value, int64_t time) {
-  Value val{NT_BOOLEAN_ARRAY, time, private_init{}};
+  Value val{NT_BOOLEAN_ARRAY, value.size() * sizeof(int), time, private_init{}};
   auto data = std::make_shared<std::vector<int>>(std::move(value));
   val.m_val.data.arr_boolean.arr = data->data();
   val.m_val.data.arr_boolean.size = data->size();
@@ -99,17 +125,19 @@ Value Value::MakeBooleanArray(std::vector<int>&& value, int64_t time) {
 }
 
 Value Value::MakeIntegerArray(std::span<const int64_t> value, int64_t time) {
-  Value val{NT_INTEGER_ARRAY, time, private_init{}};
-  auto data =
-      std::make_shared<std::vector<int64_t>>(value.begin(), value.end());
-  val.m_val.data.arr_int.arr = data->data();
-  val.m_val.data.arr_int.size = data->size();
+  Value val{NT_INTEGER_ARRAY, value.size() * sizeof(int64_t), time,
+            private_init{}};
+  auto data = AllocateArray<int64_t>(value.size());
+  std::copy(value.begin(), value.end(), data.get());
+  val.m_val.data.arr_int.arr = data.get();
+  val.m_val.data.arr_int.size = value.size();
   val.m_storage = std::move(data);
   return val;
 }
 
 Value Value::MakeIntegerArray(std::vector<int64_t>&& value, int64_t time) {
-  Value val{NT_INTEGER_ARRAY, time, private_init{}};
+  Value val{NT_INTEGER_ARRAY, value.size() * sizeof(int64_t), time,
+            private_init{}};
   auto data = std::make_shared<std::vector<int64_t>>(std::move(value));
   val.m_val.data.arr_int.arr = data->data();
   val.m_val.data.arr_int.size = data->size();
@@ -118,16 +146,17 @@ Value Value::MakeIntegerArray(std::vector<int64_t>&& value, int64_t time) {
 }
 
 Value Value::MakeFloatArray(std::span<const float> value, int64_t time) {
-  Value val{NT_FLOAT_ARRAY, time, private_init{}};
-  auto data = std::make_shared<std::vector<float>>(value.begin(), value.end());
-  val.m_val.data.arr_float.arr = data->data();
-  val.m_val.data.arr_float.size = data->size();
+  Value val{NT_FLOAT_ARRAY, value.size() * sizeof(float), time, private_init{}};
+  auto data = AllocateArray<float>(value.size());
+  std::copy(value.begin(), value.end(), data.get());
+  val.m_val.data.arr_float.arr = data.get();
+  val.m_val.data.arr_float.size = value.size();
   val.m_storage = std::move(data);
   return val;
 }
 
 Value Value::MakeFloatArray(std::vector<float>&& value, int64_t time) {
-  Value val{NT_FLOAT_ARRAY, time, private_init{}};
+  Value val{NT_FLOAT_ARRAY, value.size() * sizeof(float), time, private_init{}};
   auto data = std::make_shared<std::vector<float>>(std::move(value));
   val.m_val.data.arr_float.arr = data->data();
   val.m_val.data.arr_float.size = data->size();
@@ -136,16 +165,19 @@ Value Value::MakeFloatArray(std::vector<float>&& value, int64_t time) {
 }
 
 Value Value::MakeDoubleArray(std::span<const double> value, int64_t time) {
-  Value val{NT_DOUBLE_ARRAY, time, private_init{}};
-  auto data = std::make_shared<std::vector<double>>(value.begin(), value.end());
-  val.m_val.data.arr_double.arr = data->data();
-  val.m_val.data.arr_double.size = data->size();
+  Value val{NT_DOUBLE_ARRAY, value.size() * sizeof(double), time,
+            private_init{}};
+  auto data = AllocateArray<double>(value.size());
+  std::copy(value.begin(), value.end(), data.get());
+  val.m_val.data.arr_double.arr = data.get();
+  val.m_val.data.arr_double.size = value.size();
   val.m_storage = std::move(data);
   return val;
 }
 
 Value Value::MakeDoubleArray(std::vector<double>&& value, int64_t time) {
-  Value val{NT_DOUBLE_ARRAY, time, private_init{}};
+  Value val{NT_DOUBLE_ARRAY, value.size() * sizeof(double), time,
+            private_init{}};
   auto data = std::make_shared<std::vector<double>>(std::move(value));
   val.m_val.data.arr_double.arr = data->data();
   val.m_val.data.arr_double.size = data->size();
@@ -154,8 +186,8 @@ Value Value::MakeDoubleArray(std::vector<double>&& value, int64_t time) {
 }
 
 Value Value::MakeStringArray(std::span<const std::string> value, int64_t time) {
-  Value val{NT_STRING_ARRAY, time, private_init{}};
   auto data = std::make_shared<StringArrayStorage>(value);
+  Value val{NT_STRING_ARRAY, data->EstimateSize(), time, private_init{}};
   val.m_val.data.arr_string.arr = data->ntStrings.data();
   val.m_val.data.arr_string.size = data->ntStrings.size();
   val.m_storage = std::move(data);
@@ -163,8 +195,8 @@ Value Value::MakeStringArray(std::span<const std::string> value, int64_t time) {
 }
 
 Value Value::MakeStringArray(std::vector<std::string>&& value, int64_t time) {
-  Value val{NT_STRING_ARRAY, time, private_init{}};
   auto data = std::make_shared<StringArrayStorage>(std::move(value));
+  Value val{NT_STRING_ARRAY, data->EstimateSize(), time, private_init{}};
   val.m_val.data.arr_string.arr = data->ntStrings.data();
   val.m_val.data.arr_string.size = data->ntStrings.size();
   val.m_storage = std::move(data);
@@ -317,6 +349,9 @@ bool nt::operator==(const Value& lhs, const Value& rhs) {
       if (lhs.m_val.data.arr_boolean.size != rhs.m_val.data.arr_boolean.size) {
         return false;
       }
+      if (lhs.m_val.data.arr_boolean.size == 0) {
+        return true;
+      }
       return std::memcmp(lhs.m_val.data.arr_boolean.arr,
                          rhs.m_val.data.arr_boolean.arr,
                          lhs.m_val.data.arr_boolean.size *
@@ -325,12 +360,18 @@ bool nt::operator==(const Value& lhs, const Value& rhs) {
       if (lhs.m_val.data.arr_int.size != rhs.m_val.data.arr_int.size) {
         return false;
       }
+      if (lhs.m_val.data.arr_int.size == 0) {
+        return true;
+      }
       return std::memcmp(lhs.m_val.data.arr_int.arr, rhs.m_val.data.arr_int.arr,
                          lhs.m_val.data.arr_int.size *
                              sizeof(lhs.m_val.data.arr_int.arr[0])) == 0;
     case NT_FLOAT_ARRAY:
       if (lhs.m_val.data.arr_float.size != rhs.m_val.data.arr_float.size) {
         return false;
+      }
+      if (lhs.m_val.data.arr_float.size == 0) {
+        return true;
       }
       return std::memcmp(lhs.m_val.data.arr_float.arr,
                          rhs.m_val.data.arr_float.arr,
@@ -340,11 +381,20 @@ bool nt::operator==(const Value& lhs, const Value& rhs) {
       if (lhs.m_val.data.arr_double.size != rhs.m_val.data.arr_double.size) {
         return false;
       }
+      if (lhs.m_val.data.arr_double.size == 0) {
+        return true;
+      }
       return std::memcmp(lhs.m_val.data.arr_double.arr,
                          rhs.m_val.data.arr_double.arr,
                          lhs.m_val.data.arr_double.size *
                              sizeof(lhs.m_val.data.arr_double.arr[0])) == 0;
     case NT_STRING_ARRAY:
+      if (lhs.m_val.data.arr_string.size != rhs.m_val.data.arr_string.size) {
+        return false;
+      }
+      if (lhs.m_val.data.arr_string.size == 0) {
+        return true;
+      }
       return static_cast<StringArrayStorage*>(lhs.m_storage.get())->strings ==
              static_cast<StringArrayStorage*>(rhs.m_storage.get())->strings;
     default:

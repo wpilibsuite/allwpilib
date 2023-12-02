@@ -1,0 +1,1856 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Tue, 26 Apr 2022 15:01:25 -0400
+Subject: [PATCH 2/9] Fix missing casts
+
+---
+ src/fs-poll.c                  | 10 ++++----
+ src/idna.c                     |  2 +-
+ src/inet.c                     | 11 ++++----
+ src/strscpy.c                  |  2 +-
+ src/thread-common.c            |  2 +-
+ src/threadpool.c               |  2 +-
+ src/unix/bsd-ifaddrs.c         |  2 +-
+ src/unix/core.c                | 18 ++++++-------
+ src/unix/darwin-proctitle.c    |  5 ++--
+ src/unix/darwin.c              |  2 +-
+ src/unix/freebsd.c             |  4 +--
+ src/unix/fs.c                  | 20 +++++++--------
+ src/unix/fsevents.c            | 34 ++++++++++++-------------
+ src/unix/getaddrinfo.c         |  8 +++---
+ src/unix/ibmi.c                |  2 +-
+ src/unix/kqueue.c              |  6 ++---
+ src/unix/linux.c               | 46 +++++++++++++++++-----------------
+ src/unix/loop.c                |  2 +-
+ src/unix/netbsd.c              |  4 +--
+ src/unix/openbsd.c             |  4 +--
+ src/unix/pipe.c                |  4 +--
+ src/unix/poll.c                |  4 +--
+ src/unix/posix-poll.c          |  2 +-
+ src/unix/process.c             |  4 +--
+ src/unix/proctitle.c           |  2 +-
+ src/unix/random-sysctl-linux.c |  2 +-
+ src/unix/stream.c              | 31 ++++++++++++-----------
+ src/unix/tcp.c                 |  2 +-
+ src/unix/thread.c              |  5 ++--
+ src/unix/udp.c                 |  8 +++---
+ src/uv-common.c                | 16 ++++++------
+ src/win/core.c                 |  8 +++---
+ src/win/dl.c                   |  2 +-
+ src/win/fs-event.c             |  4 +--
+ src/win/fs-fd-hash-inl.h       |  2 +-
+ src/win/fs.c                   | 38 ++++++++++++++--------------
+ src/win/getaddrinfo.c          | 12 ++++-----
+ src/win/pipe.c                 |  8 +++---
+ src/win/process.c              | 22 ++++++++--------
+ src/win/tcp.c                  |  2 +-
+ src/win/thread.c               |  4 +--
+ src/win/tty.c                  |  6 ++---
+ src/win/util.c                 | 35 +++++++++++++-------------
+ 43 files changed, 207 insertions(+), 202 deletions(-)
+
+diff --git a/src/fs-poll.c b/src/fs-poll.c
+index 1bac1c568e36cadd0b68451926c6f045f88342d2..5a39daed095502b2db34f23fcaf0ab04f31f96ff 100644
+--- a/src/fs-poll.c
++++ b/src/fs-poll.c
+@@ -77,7 +77,7 @@ int uv_fs_poll_start(uv_fs_poll_t* handle,
+ 
+   loop = handle->loop;
+   len = strlen(path);
+-  ctx = uv__calloc(1, sizeof(*ctx) + len);
++  ctx = (struct poll_ctx*)uv__calloc(1, sizeof(*ctx) + len);
+ 
+   if (ctx == NULL)
+     return UV_ENOMEM;
+@@ -101,7 +101,7 @@ int uv_fs_poll_start(uv_fs_poll_t* handle,
+     goto error;
+ 
+   if (handle->poll_ctx != NULL)
+-    ctx->previous = handle->poll_ctx;
++    ctx->previous = (struct poll_ctx*)handle->poll_ctx;
+   handle->poll_ctx = ctx;
+   uv__handle_start(handle);
+ 
+@@ -119,7 +119,7 @@ int uv_fs_poll_stop(uv_fs_poll_t* handle) {
+   if (!uv_is_active((uv_handle_t*)handle))
+     return 0;
+ 
+-  ctx = handle->poll_ctx;
++  ctx = (struct poll_ctx*)handle->poll_ctx;
+   assert(ctx != NULL);
+   assert(ctx->parent_handle == handle);
+ 
+@@ -144,7 +144,7 @@ int uv_fs_poll_getpath(uv_fs_poll_t* handle, char* buffer, size_t* size) {
+     return UV_EINVAL;
+   }
+ 
+-  ctx = handle->poll_ctx;
++  ctx = (struct poll_ctx*)handle->poll_ctx;
+   assert(ctx != NULL);
+ 
+   required_len = strlen(ctx->path);
+@@ -244,7 +244,7 @@ static void timer_close_cb(uv_handle_t* timer) {
+     if (handle->poll_ctx == NULL && uv__is_closing(handle))
+       uv__make_close_pending((uv_handle_t*)handle);
+   } else {
+-    for (last = handle->poll_ctx, it = last->previous;
++    for (last = (struct poll_ctx*)handle->poll_ctx, it = last->previous;
+          it != ctx;
+          last = it, it = it->previous) {
+       assert(last->previous != NULL);
+diff --git a/src/idna.c b/src/idna.c
+index 1c0a60cf3e3becc1badafa394e7c422af7f56833..0c952cf605a88136ed9035f9385f9b1080c30c28 100644
+--- a/src/idna.c
++++ b/src/idna.c
+@@ -477,7 +477,7 @@ int uv_utf16_to_wtf8(const uint16_t* w_source_ptr,
+     return 0;
+ 
+   if (*target_ptr == NULL) {
+-    target = uv__malloc(target_len + 1);
++    target = (char*)uv__malloc(target_len + 1);
+     if (target == NULL) {
+       return UV_ENOMEM;
+     }
+diff --git a/src/inet.c b/src/inet.c
+index cd77496846e90e8b8e61c63c10f498f153344fe5..dd94bea3886ca37945fcad7909d765e3700e3c21 100644
+--- a/src/inet.c
++++ b/src/inet.c
+@@ -35,9 +35,9 @@ static int inet_pton6(const char *src, unsigned char *dst);
+ int uv_inet_ntop(int af, const void* src, char* dst, size_t size) {
+   switch (af) {
+   case AF_INET:
+-    return (inet_ntop4(src, dst, size));
++    return (inet_ntop4((const unsigned char*)src, dst, size));
+   case AF_INET6:
+-    return (inet_ntop6(src, dst, size));
++    return (inet_ntop6((const unsigned char*)src, dst, size));
+   default:
+     return UV_EAFNOSUPPORT;
+   }
+@@ -149,10 +149,11 @@ int uv_inet_pton(int af, const char* src, void* dst) {
+ 
+   switch (af) {
+   case AF_INET:
+-    return (inet_pton4(src, dst));
++    return (inet_pton4(src, (unsigned char*)dst));
+   case AF_INET6: {
+     int len;
+-    char tmp[UV__INET6_ADDRSTRLEN], *s, *p;
++    char tmp[UV__INET6_ADDRSTRLEN], *s;
++    const char *p;
+     s = (char*) src;
+     p = strchr(src, '%');
+     if (p != NULL) {
+@@ -163,7 +164,7 @@ int uv_inet_pton(int af, const char* src, void* dst) {
+       memcpy(s, src, len);
+       s[len] = '\0';
+     }
+-    return inet_pton6(s, dst);
++    return inet_pton6(s, (unsigned char*)dst);
+   }
+   default:
+     return UV_EAFNOSUPPORT;
+diff --git a/src/strscpy.c b/src/strscpy.c
+index 20df6fcbed29e9d944c866ddbcd5c09345a426b3..6b4cc3bc741b40b9c2b13d4c06e7090f8083a7ba 100644
+--- a/src/strscpy.c
++++ b/src/strscpy.c
+@@ -27,7 +27,7 @@ ssize_t uv__strscpy(char* d, const char* s, size_t n) {
+ 
+   for (i = 0; i < n; i++)
+     if ('\0' == (d[i] = s[i]))
+-      return i > SSIZE_MAX ? UV_E2BIG : (ssize_t) i;
++      return i > SSIZE_MAX ? (ssize_t) UV_E2BIG : (ssize_t) i;
+ 
+   if (i == 0)
+     return 0;
+diff --git a/src/thread-common.c b/src/thread-common.c
+index c67c0a7dd7279af6c67b7d5d4a623c47bdf3fff2..c0e39b543df229dd8cb8492bb695e61e40911453 100644
+--- a/src/thread-common.c
++++ b/src/thread-common.c
+@@ -49,7 +49,7 @@ int uv_barrier_init(uv_barrier_t* barrier, unsigned int count) {
+   if (barrier == NULL || count == 0)
+     return UV_EINVAL;
+ 
+-  b = uv__malloc(sizeof(*b));
++  b = (struct _uv_barrier *)uv__malloc(sizeof(*b));
+   if (b == NULL)
+     return UV_ENOMEM;
+ #endif
+diff --git a/src/threadpool.c b/src/threadpool.c
+index dbef67f2f10f1df498f228c21eba2a71ceceee29..f572de5aaf1a1b150e58c7b989949441cac279c4 100644
+--- a/src/threadpool.c
++++ b/src/threadpool.c
+@@ -207,7 +207,7 @@ static void init_threads(void) {
+ 
+   threads = default_threads;
+   if (nthreads > ARRAY_SIZE(default_threads)) {
+-    threads = uv__malloc(nthreads * sizeof(threads[0]));
++    threads = (uv_thread_t*)uv__malloc(nthreads * sizeof(threads[0]));
+     if (threads == NULL) {
+       nthreads = ARRAY_SIZE(default_threads);
+       threads = default_threads;
+diff --git a/src/unix/bsd-ifaddrs.c b/src/unix/bsd-ifaddrs.c
+index 11ca95591fc38244e931fecd9dd4038d3968af7a..c3dd71a1889bfae08cfdf95acda61e6c3472bd2c 100644
+--- a/src/unix/bsd-ifaddrs.c
++++ b/src/unix/bsd-ifaddrs.c
+@@ -92,7 +92,7 @@ int uv_interface_addresses(uv_interface_address_t** addresses, int* count) {
+   }
+ 
+   /* Make sure the memory is initiallized to zero using calloc() */
+-  *addresses = uv__calloc(*count, sizeof(**addresses));
++  *addresses = (uv_interface_address_t*)uv__calloc(*count, sizeof(**addresses));
+ 
+   if (*addresses == NULL) {
+     freeifaddrs(addrs);
+diff --git a/src/unix/core.c b/src/unix/core.c
+index 25c5181f370e94983e8a5f797f02f7a8dc207e00..28c036f94f3e76717afa651451969f128c5a573c 100644
+--- a/src/unix/core.c
++++ b/src/unix/core.c
+@@ -855,7 +855,7 @@ static unsigned int next_power_of_two(unsigned int val) {
+ }
+ 
+ static void maybe_resize(uv_loop_t* loop, unsigned int len) {
+-  uv__io_t** watchers;
++  void** watchers;
+   void* fake_watcher_list;
+   void* fake_watcher_count;
+   unsigned int nwatchers;
+@@ -874,8 +874,8 @@ static void maybe_resize(uv_loop_t* loop, unsigned int len) {
+   }
+ 
+   nwatchers = next_power_of_two(len + 2) - 2;
+-  watchers = uv__reallocf(loop->watchers,
+-                          (nwatchers + 2) * sizeof(loop->watchers[0]));
++  watchers = (void**)
++      uv__reallocf(loop->watchers, (nwatchers + 2) * sizeof(loop->watchers[0]));
+ 
+   if (watchers == NULL)
+     abort();
+@@ -884,7 +884,7 @@ static void maybe_resize(uv_loop_t* loop, unsigned int len) {
+   watchers[nwatchers] = fake_watcher_list;
+   watchers[nwatchers + 1] = fake_watcher_count;
+ 
+-  loop->watchers = watchers;
++  loop->watchers = (uv__io_t**)watchers;
+   loop->nwatchers = nwatchers;
+ }
+ 
+@@ -1216,7 +1216,7 @@ static int uv__getpwuid_r(uv_passwd_t *pwd, uid_t uid) {
+    * is frequently 1024 or 4096, so we can just use that directly. The pwent
+    * will not usually be large. */
+   for (bufsize = 2000;; bufsize *= 2) {
+-    buf = uv__malloc(bufsize);
++    buf = (char*)uv__malloc(bufsize);
+ 
+     if (buf == NULL)
+       return UV_ENOMEM;
+@@ -1242,7 +1242,7 @@ static int uv__getpwuid_r(uv_passwd_t *pwd, uid_t uid) {
+   name_size = strlen(pw.pw_name) + 1;
+   homedir_size = strlen(pw.pw_dir) + 1;
+   shell_size = strlen(pw.pw_shell) + 1;
+-  pwd->username = uv__malloc(name_size + homedir_size + shell_size);
++  pwd->username = (char*)uv__malloc(name_size + homedir_size + shell_size);
+ 
+   if (pwd->username == NULL) {
+     uv__free(buf);
+@@ -1292,7 +1292,7 @@ int uv_os_get_group(uv_group_t* grp, uv_uid_t gid) {
+    * is frequently 1024 or 4096, so we can just use that directly. The pwent
+    * will not usually be large. */
+   for (bufsize = 2000;; bufsize *= 2) {
+-    buf = uv__malloc(bufsize);
++    buf = (char*)uv__malloc(bufsize);
+ 
+     if (buf == NULL)
+       return UV_ENOMEM;
+@@ -1323,7 +1323,7 @@ int uv_os_get_group(uv_group_t* grp, uv_uid_t gid) {
+     members++;
+   }
+ 
+-  gr_mem = uv__malloc(name_size + mem_size);
++  gr_mem = (char*)uv__malloc(name_size + mem_size);
+   if (gr_mem == NULL) {
+     uv__free(buf);
+     return UV_ENOMEM;
+@@ -1380,7 +1380,7 @@ int uv_os_environ(uv_env_item_t** envitems, int* count) {
+ 
+   for (i = 0; environ[i] != NULL; i++);
+ 
+-  *envitems = uv__calloc(i, sizeof(**envitems));
++  *envitems = (uv_env_item_s*)uv__calloc(i, sizeof(**envitems));
+ 
+   if (*envitems == NULL)
+     return UV_ENOMEM;
+diff --git a/src/unix/darwin-proctitle.c b/src/unix/darwin-proctitle.c
+index 5288083ef04fd78d90c34071cc76281adbc310d8..9bd55dd764b845cf8ea441d525b4e136699eb52e 100644
+--- a/src/unix/darwin-proctitle.c
++++ b/src/unix/darwin-proctitle.c
+@@ -128,8 +128,9 @@ int uv__set_process_title(const char* title) {
+   if (pLSSetApplicationInformationItem == NULL)
+     goto out;
+ 
+-  display_name_key = pCFBundleGetDataPointerForName(launch_services_bundle,
+-                                                    S("_kLSDisplayNameKey"));
++  display_name_key = (CFStringRef*)
++      pCFBundleGetDataPointerForName(launch_services_bundle,
++                                     S("_kLSDisplayNameKey"));
+ 
+   if (display_name_key == NULL || *display_name_key == NULL)
+     goto out;
+diff --git a/src/unix/darwin.c b/src/unix/darwin.c
+index 5e764a65ee4c71efd61876c70b0e999420f24f61..dc93d236b6b7c6da62dc7aa66cb42ddc125575a2 100644
+--- a/src/unix/darwin.c
++++ b/src/unix/darwin.c
+@@ -217,7 +217,7 @@ int uv_cpu_info(uv_cpu_info_t** cpu_infos, int* count) {
+     return UV_EINVAL;  /* FIXME(bnoordhuis) Translate error. */
+   }
+ 
+-  *cpu_infos = uv__malloc(numcpus * sizeof(**cpu_infos));
++  *cpu_infos = (uv_cpu_info_t*)uv__malloc(numcpus * sizeof(**cpu_infos));
+   if (!(*cpu_infos)) {
+     vm_deallocate(mach_task_self(), (vm_address_t)info, msg_type);
+     return UV_ENOMEM;
+diff --git a/src/unix/freebsd.c b/src/unix/freebsd.c
+index 191bc8bc213ffddb15c5e04baa66e2a0a8d69a3d..1bd63886b823be6451ac013d94e29885795375b7 100644
+--- a/src/unix/freebsd.c
++++ b/src/unix/freebsd.c
+@@ -220,7 +220,7 @@ int uv_cpu_info(uv_cpu_info_t** cpu_infos, int* count) {
+   if (sysctlbyname("hw.ncpu", &numcpus, &size, NULL, 0))
+     return UV__ERR(errno);
+ 
+-  *cpu_infos = uv__malloc(numcpus * sizeof(**cpu_infos));
++  *cpu_infos = (uv_cpu_info_t*)uv__malloc(numcpus * sizeof(**cpu_infos));
+   if (!(*cpu_infos))
+     return UV_ENOMEM;
+ 
+@@ -237,7 +237,7 @@ int uv_cpu_info(uv_cpu_info_t** cpu_infos, int* count) {
+ 
+   size = maxcpus * CPUSTATES * sizeof(long);
+ 
+-  cp_times = uv__malloc(size);
++  cp_times = (long*)uv__malloc(size);
+   if (cp_times == NULL) {
+     uv__free(*cpu_infos);
+     return UV_ENOMEM;
+diff --git a/src/unix/fs.c b/src/unix/fs.c
+index 891306daedcc6a9b493bdfefcdb7d43c7efbb622..bc00c90b07a32a823412b216df6f2d758dbc423b 100644
+--- a/src/unix/fs.c
++++ b/src/unix/fs.c
+@@ -134,7 +134,7 @@ extern char *mkdtemp(char *template); /* See issue #740 on AIX < 7 */
+       size_t new_path_len;                                                    \
+       path_len = strlen(path) + 1;                                            \
+       new_path_len = strlen(new_path) + 1;                                    \
+-      req->path = uv__malloc(path_len + new_path_len);                        \
++      req->path = (char*)uv__malloc(path_len + new_path_len);                 \
+       if (req->path == NULL)                                                  \
+         return UV_ENOMEM;                                                     \
+       req->new_path = req->path + path_len;                                   \
+@@ -496,7 +496,7 @@ static ssize_t uv__fs_scandir(uv_fs_t* req) {
+ static int uv__fs_opendir(uv_fs_t* req) {
+   uv_dir_t* dir;
+ 
+-  dir = uv__malloc(sizeof(*dir));
++  dir = (uv_dir_t*)uv__malloc(sizeof(*dir));
+   if (dir == NULL)
+     goto error;
+ 
+@@ -520,7 +520,7 @@ static int uv__fs_readdir(uv_fs_t* req) {
+   unsigned int dirent_idx;
+   unsigned int i;
+ 
+-  dir = req->ptr;
++  dir = (uv_dir_t*)req->ptr;
+   dirent_idx = 0;
+ 
+   while (dirent_idx < dir->nentries) {
+@@ -562,7 +562,7 @@ error:
+ static int uv__fs_closedir(uv_fs_t* req) {
+   uv_dir_t* dir;
+ 
+-  dir = req->ptr;
++  dir = (uv_dir_t*)req->ptr;
+ 
+   if (dir->dir != NULL) {
+     closedir(dir->dir);
+@@ -591,7 +591,7 @@ static int uv__fs_statfs(uv_fs_t* req) {
+ #endif /* defined(__sun) */
+     return -1;
+ 
+-  stat_fs = uv__malloc(sizeof(*stat_fs));
++  stat_fs = (uv_statfs_t*)uv__malloc(sizeof(*stat_fs));
+   if (stat_fs == NULL) {
+     errno = ENOMEM;
+     return -1;
+@@ -655,7 +655,7 @@ static ssize_t uv__fs_readlink(uv_fs_t* req) {
+     maxlen = uv__fs_pathmax_size(req->path);
+ #endif
+ 
+-  buf = uv__malloc(maxlen);
++  buf = (char*)uv__malloc(maxlen);
+ 
+   if (buf == NULL) {
+     errno = ENOMEM;
+@@ -675,7 +675,7 @@ static ssize_t uv__fs_readlink(uv_fs_t* req) {
+ 
+   /* Uncommon case: resize to make room for the trailing nul byte. */
+   if (len == maxlen) {
+-    buf = uv__reallocf(buf, len + 1);
++    buf = (char*)uv__reallocf(buf, len + 1);
+ 
+     if (buf == NULL)
+       return -1;
+@@ -698,7 +698,7 @@ static ssize_t uv__fs_realpath(uv_fs_t* req) {
+   ssize_t len;
+ 
+   len = uv__fs_pathmax_size(req->path);
+-  buf = uv__malloc(len + 1);
++  buf = (char*)uv__malloc(len + 1);
+ 
+   if (buf == NULL) {
+     errno = ENOMEM;
+@@ -1886,7 +1886,7 @@ int uv_fs_read(uv_loop_t* loop, uv_fs_t* req,
+ 
+   req->bufs = req->bufsml;
+   if (nbufs > ARRAY_SIZE(req->bufsml))
+-    req->bufs = uv__malloc(nbufs * sizeof(*bufs));
++    req->bufs = (uv_buf_t*)uv__malloc(nbufs * sizeof(*bufs));
+ 
+   if (req->bufs == NULL)
+     return UV_ENOMEM;
+@@ -2071,7 +2071,7 @@ int uv_fs_write(uv_loop_t* loop,
+   req->nbufs = nbufs;
+   req->bufs = req->bufsml;
+   if (nbufs > ARRAY_SIZE(req->bufsml))
+-    req->bufs = uv__malloc(nbufs * sizeof(*bufs));
++    req->bufs = (uv_buf_t*)uv__malloc(nbufs * sizeof(*bufs));
+ 
+   if (req->bufs == NULL)
+     return UV_ENOMEM;
+diff --git a/src/unix/fsevents.c b/src/unix/fsevents.c
+index df703f3635fc95bab21debc9697dba06a2a44827..c31d08ba37cfd10672ab6a7a8fd38a1c79b952fe 100644
+--- a/src/unix/fsevents.c
++++ b/src/unix/fsevents.c
+@@ -183,7 +183,7 @@ static void (*pFSEventStreamStop)(FSEventStreamRef);
+ static void uv__fsevents_cb(uv_async_t* cb) {
+   uv_fs_event_t* handle;
+ 
+-  handle = cb->data;
++  handle = (uv_fs_event_t*)cb->data;
+ 
+   UV__FSEVENTS_PROCESS(handle, {
+     handle->cb(handle, event->path[0] ? event->path : NULL, event->events, 0);
+@@ -231,10 +231,10 @@ static void uv__fsevents_event_cb(const FSEventStreamRef streamRef,
+   FSEventStreamEventFlags flags;
+   struct uv__queue head;
+ 
+-  loop = info;
+-  state = loop->cf_state;
++  loop = (uv_loop_t*)info;
++  state = (uv__cf_loop_state_t*)loop->cf_state;
+   assert(state != NULL);
+-  paths = eventPaths;
++  paths = (char**)eventPaths;
+ 
+   /* For each handle */
+   uv_mutex_lock(&state->fsevent_mutex);
+@@ -304,7 +304,7 @@ static void uv__fsevents_event_cb(const FSEventStreamRef streamRef,
+           continue;
+       }
+ 
+-      event = uv__malloc(sizeof(*event) + len);
++      event = (uv__fsevents_event_t*)uv__malloc(sizeof(*event) + len);
+       if (event == NULL)
+         break;
+ 
+@@ -438,7 +438,7 @@ static void uv__fsevents_reschedule(uv__cf_loop_state_t* state,
+   uv_mutex_lock(&state->fsevent_mutex);
+   path_count = state->fsevent_handle_count;
+   if (path_count != 0) {
+-    paths = uv__malloc(sizeof(*paths) * path_count);
++    paths = (CFStringRef*)uv__malloc(sizeof(*paths) * path_count);
+     if (paths == NULL) {
+       uv_mutex_unlock(&state->fsevent_mutex);
+       goto final;
+@@ -594,7 +594,7 @@ static int uv__fsevents_loop_init(uv_loop_t* loop) {
+   if (err)
+     return err;
+ 
+-  state = uv__calloc(1, sizeof(*state));
++  state = (uv__cf_loop_state_t*)uv__calloc(1, sizeof(*state));
+   if (state == NULL)
+     return UV_ENOMEM;
+ 
+@@ -696,7 +696,7 @@ void uv__fsevents_loop_delete(uv_loop_t* loop) {
+   }
+ 
+   /* Destroy state */
+-  state = loop->cf_state;
++  state = (uv__cf_loop_state_t*)loop->cf_state;
+   uv_sem_destroy(&state->fsevent_sem);
+   uv_mutex_destroy(&state->fsevent_mutex);
+   pCFRelease(state->signal_source);
+@@ -710,8 +710,8 @@ static void* uv__cf_loop_runner(void* arg) {
+   uv_loop_t* loop;
+   uv__cf_loop_state_t* state;
+ 
+-  loop = arg;
+-  state = loop->cf_state;
++  loop = (uv_loop_t*)arg;
++  state = (uv__cf_loop_state_t*)loop->cf_state;
+   state->loop = pCFRunLoopGetCurrent();
+ 
+   pCFRunLoopAddSource(state->loop,
+@@ -739,8 +739,8 @@ static void uv__cf_loop_cb(void* arg) {
+   struct uv__queue split_head;
+   uv__cf_loop_signal_t* s;
+ 
+-  loop = arg;
+-  state = loop->cf_state;
++  loop = (uv_loop_t*)arg;
++  state = (uv__cf_loop_state_t*)loop->cf_state;
+ 
+   uv_mutex_lock(&loop->cf_mutex);
+   uv__queue_move(&loop->cf_signals, &split_head);
+@@ -770,7 +770,7 @@ int uv__cf_loop_signal(uv_loop_t* loop,
+   uv__cf_loop_signal_t* item;
+   uv__cf_loop_state_t* state;
+ 
+-  item = uv__malloc(sizeof(*item));
++  item = (uv__cf_loop_signal_t*)uv__malloc(sizeof(*item));
+   if (item == NULL)
+     return UV_ENOMEM;
+ 
+@@ -780,7 +780,7 @@ int uv__cf_loop_signal(uv_loop_t* loop,
+   uv_mutex_lock(&loop->cf_mutex);
+   uv__queue_insert_tail(&loop->cf_signals, &item->member);
+ 
+-  state = loop->cf_state;
++  state = (uv__cf_loop_state_t*)loop->cf_state;
+   assert(state != NULL);
+   pCFRunLoopSourceSignal(state->signal_source);
+   pCFRunLoopWakeUp(state->loop);
+@@ -814,7 +814,7 @@ int uv__fsevents_init(uv_fs_event_t* handle) {
+    * Events will occur in other thread.
+    * Initialize callback for getting them back into event loop's thread
+    */
+-  handle->cf_cb = uv__malloc(sizeof(*handle->cf_cb));
++  handle->cf_cb = (uv_async_t*)uv__malloc(sizeof(*handle->cf_cb));
+   if (handle->cf_cb == NULL) {
+     err = UV_ENOMEM;
+     goto fail_cf_cb_malloc;
+@@ -830,7 +830,7 @@ int uv__fsevents_init(uv_fs_event_t* handle) {
+     goto fail_cf_mutex_init;
+ 
+   /* Insert handle into the list */
+-  state = handle->loop->cf_state;
++  state = (uv__cf_loop_state_t*)handle->loop->cf_state;
+   uv_mutex_lock(&state->fsevent_mutex);
+   uv__queue_insert_tail(&state->fsevent_handles, &handle->cf_member);
+   state->fsevent_handle_count++;
+@@ -870,7 +870,7 @@ int uv__fsevents_close(uv_fs_event_t* handle) {
+     return UV_EINVAL;
+ 
+   /* Remove handle from  the list */
+-  state = handle->loop->cf_state;
++  state = (uv__cf_loop_state_t*)handle->loop->cf_state;
+   uv_mutex_lock(&state->fsevent_mutex);
+   uv__queue_remove(&handle->cf_member);
+   state->fsevent_handle_count--;
+diff --git a/src/unix/getaddrinfo.c b/src/unix/getaddrinfo.c
+index 77337ace9454e032a392c97cb9aa311f15518956..41dc3909969a643e129847ae3a3252d51feadb27 100644
+--- a/src/unix/getaddrinfo.c
++++ b/src/unix/getaddrinfo.c
+@@ -172,7 +172,7 @@ int uv_getaddrinfo(uv_loop_t* loop,
+   hostname_len = hostname ? strlen(hostname) + 1 : 0;
+   service_len = service ? strlen(service) + 1 : 0;
+   hints_len = hints ? sizeof(*hints) : 0;
+-  buf = uv__malloc(hostname_len + service_len + hints_len);
++  buf = (char*)uv__malloc(hostname_len + service_len + hints_len);
+ 
+   if (buf == NULL)
+     return UV_ENOMEM;
+@@ -190,17 +190,17 @@ int uv_getaddrinfo(uv_loop_t* loop,
+   len = 0;
+ 
+   if (hints) {
+-    req->hints = memcpy(buf + len, hints, sizeof(*hints));
++    req->hints = (struct addrinfo*)memcpy(buf + len, hints, sizeof(*hints));
+     len += sizeof(*hints);
+   }
+ 
+   if (service) {
+-    req->service = memcpy(buf + len, service, service_len);
++    req->service = (char*)memcpy(buf + len, service, service_len);
+     len += service_len;
+   }
+ 
+   if (hostname)
+-    req->hostname = memcpy(buf + len, hostname, hostname_len);
++    req->hostname = (char*)memcpy(buf + len, hostname, hostname_len);
+ 
+   if (cb) {
+     uv__work_submit(loop,
+diff --git a/src/unix/ibmi.c b/src/unix/ibmi.c
+index 837bba6e2fef7b834a8d104d263bef47eaed0950..5e0fa98d104428534e5264a1c6358e3f68c58b82 100644
+--- a/src/unix/ibmi.c
++++ b/src/unix/ibmi.c
+@@ -293,7 +293,7 @@ int uv_cpu_info(uv_cpu_info_t** cpu_infos, int* count) {
+ 
+   numcpus = sysconf(_SC_NPROCESSORS_ONLN);
+ 
+-  *cpu_infos = uv__malloc(numcpus * sizeof(uv_cpu_info_t));
++  *cpu_infos = (uv_cpu_info_t*)uv__malloc(numcpus * sizeof(uv_cpu_info_t));
+   if (!*cpu_infos) {
+     return UV_ENOMEM;
+   }
+diff --git a/src/unix/kqueue.c b/src/unix/kqueue.c
+index 94ace58680cf391707f68357d7927173cb1db08e..06fbdb24b4adc4adb781d32150d40836fa745531 100644
+--- a/src/unix/kqueue.c
++++ b/src/unix/kqueue.c
+@@ -303,8 +303,8 @@ void uv__io_poll(uv_loop_t* loop, int timeout) {
+     nevents = 0;
+ 
+     assert(loop->watchers != NULL);
+-    loop->watchers[loop->nwatchers] = (void*) events;
+-    loop->watchers[loop->nwatchers + 1] = (void*) (uintptr_t) nfds;
++    loop->watchers[loop->nwatchers] = (uv__io_t*) events;
++    loop->watchers[loop->nwatchers + 1] = (uv__io_t*) (uintptr_t) nfds;
+     for (i = 0; i < nfds; i++) {
+       ev = events + i;
+       fd = ev->ident;
+@@ -326,7 +326,7 @@ void uv__io_poll(uv_loop_t* loop, int timeout) {
+       /* Skip invalidated events, see uv__platform_invalidate_fd */
+       if (fd == -1)
+         continue;
+-      w = loop->watchers[fd];
++      w = (uv__io_t*)loop->watchers[fd];
+ 
+       if (w == NULL) {
+         /* File descriptor that we've stopped watching, disarm it. */
+diff --git a/src/unix/linux.c b/src/unix/linux.c
+index 8eeb352e6238a9e9557ec4dfc71f192105135cd7..2b8e1d8fe593a181d049aa50ff9edaf6da258a24 100644
+--- a/src/unix/linux.c
++++ b/src/unix/linux.c
+@@ -518,8 +518,8 @@ static void uv__iou_init(int epollfd,
+   char* sqe;
+   int ringfd;
+ 
+-  sq = MAP_FAILED;
+-  sqe = MAP_FAILED;
++  sq = (char*)MAP_FAILED;
++  sqe = (char*)MAP_FAILED;
+ 
+   if (!uv__use_io_uring())
+     return;
+@@ -558,14 +558,14 @@ static void uv__iou_init(int epollfd,
+   maxlen = sqlen < cqlen ? cqlen : sqlen;
+   sqelen = params.sq_entries * sizeof(struct uv__io_uring_sqe);
+ 
+-  sq = mmap(0,
++  sq = (char*)mmap(0,
+             maxlen,
+             PROT_READ | PROT_WRITE,
+             MAP_SHARED | MAP_POPULATE,
+             ringfd,
+             0);  /* IORING_OFF_SQ_RING */
+ 
+-  sqe = mmap(0,
++  sqe = (char*)mmap(0,
+              sqelen,
+              PROT_READ | PROT_WRITE,
+              MAP_SHARED | MAP_POPULATE,
+@@ -705,7 +705,7 @@ void uv__platform_invalidate_fd(uv_loop_t* loop, int fd) {
+   int i;
+ 
+   lfields = uv__get_internal_fields(loop);
+-  inv = lfields->inv;
++  inv = (uv__invalidate*)lfields->inv;
+ 
+   /* Invalidate events with same file descriptor */
+   if (inv != NULL)
+@@ -780,7 +780,7 @@ static struct uv__io_uring_sqe* uv__iou_get_sqe(struct uv__iou* iou,
+     return NULL;  /* No room in ring buffer. TODO(bnoordhuis) maybe flush it? */
+ 
+   slot = tail & mask;
+-  sqe = iou->sqe;
++  sqe = (uv__io_uring_sqe*)iou->sqe;
+   sqe = &sqe[slot];
+   memset(sqe, 0, sizeof(*sqe));
+   sqe->user_data = (uintptr_t) req;
+@@ -1057,7 +1057,7 @@ int uv__iou_fs_statx(uv_loop_t* loop,
+   struct uv__statx* statxbuf;
+   struct uv__iou* iou;
+ 
+-  statxbuf = uv__malloc(sizeof(*statxbuf));
++  statxbuf = (struct uv__statx*)uv__malloc(sizeof(*statxbuf));
+   if (statxbuf == NULL)
+     return 0;
+ 
+@@ -1121,7 +1121,7 @@ static void uv__iou_fs_statx_post(uv_fs_t* req) {
+   uv_stat_t* buf;
+ 
+   buf = &req->statbuf;
+-  statxbuf = req->ptr;
++  statxbuf = (struct uv__statx*)req->ptr;
+   req->ptr = NULL;
+ 
+   if (req->result == 0) {
+@@ -1150,7 +1150,7 @@ static void uv__poll_io_uring(uv_loop_t* loop, struct uv__iou* iou) {
+   tail = atomic_load_explicit((_Atomic uint32_t*) iou->cqtail,
+                               memory_order_acquire);
+   mask = iou->cqmask;
+-  cqe = iou->cqe;
++  cqe = (uv__io_uring_cqe*)iou->cqe;
+   nevents = 0;
+ 
+   for (i = head; i != tail; i++) {
+@@ -1241,7 +1241,7 @@ static void uv__epoll_ctl_prep(int epollfd,
+     pe = &(*events)[slot];
+     *pe = *e;
+ 
+-    sqe = ctl->sqe;
++    sqe = (uv__io_uring_sqe*)ctl->sqe;
+     sqe = &sqe[slot];
+ 
+     memset(sqe, 0, sizeof(*sqe));
+@@ -1297,7 +1297,7 @@ static void uv__epoll_ctl_flush(int epollfd,
+   while (*ctl->cqhead != *ctl->cqtail) {
+     slot = (*ctl->cqhead)++ & ctl->cqmask;
+ 
+-    cqe = ctl->cqe;
++    cqe = (uv__io_uring_cqe*)ctl->cqe;
+     cqe = &cqe[slot];
+ 
+     if (cqe->res == 0)
+@@ -1758,7 +1758,7 @@ int uv_cpu_info(uv_cpu_info_t** ci, int* count) {
+   snprintf(*models, sizeof(*models), "unknown");
+   maxcpu = 0;
+ 
+-  cpus = uv__calloc(ARRAY_SIZE(*cpus), sizeof(**cpus));
++  cpus = (decltype(cpus))uv__calloc(ARRAY_SIZE(*cpus), sizeof(**cpus));
+   if (cpus == NULL)
+     return UV_ENOMEM;
+ 
+@@ -1816,9 +1816,9 @@ int uv_cpu_info(uv_cpu_info_t** ci, int* count) {
+ 
+     /* arm64: translate CPU part code to model name. */
+     if (*parts) {
+-      p = memmem(parts, sizeof(parts) - 1, p, n + 1);
++      p = (char*)memmem(parts, sizeof(parts) - 1, p, n + 1);
+       if (p == NULL)
+-        p = "unknown";
++        p = const_cast<char*>("unknown");
+       else
+         p += n + 1;
+       n = (int) strcspn(p, "\n");
+@@ -1868,7 +1868,7 @@ nocpuinfo:
+   }
+ 
+   size = n * sizeof(**ci) + sizeof(models);
+-  *ci = uv__malloc(size);
++  *ci = (uv_cpu_info_t*)uv__malloc(size);
+   *count = 0;
+ 
+   if (*ci == NULL) {
+@@ -1877,7 +1877,7 @@ nocpuinfo:
+   }
+ 
+   *count = n;
+-  p = memcpy(*ci + n, models, sizeof(models));
++  p = (char*)memcpy(*ci + n, models, sizeof(models));
+ 
+   i = 0;
+   for (cpu = 0; cpu < maxcpu; cpu++) {
+@@ -1886,19 +1886,19 @@ nocpuinfo:
+ 
+     c = *cpus + cpu;
+ 
+-    (*ci)[i++] = (uv_cpu_info_t) {
++    (*ci)[i++] = uv_cpu_info_t{
+       .model     = p + c->model * sizeof(*model),
+-      .speed     = c->freq / 1000,
++      .speed     = (int)(c->freq / 1000),
+       /* Note: sysconf(_SC_CLK_TCK) is fixed at 100 Hz,
+        * therefore the multiplier is always 1000/100 = 10.
+        */
+-      .cpu_times = (struct uv_cpu_times_s) {
++      .cpu_times = {
+         .user = 10 * c->user,
+         .nice = 10 * c->nice,
+         .sys  = 10 * c->sys,
+         .idle = 10 * c->idle,
+         .irq  = 10 * c->irq,
+-      },
++      }
+     };
+   }
+ 
+@@ -1955,7 +1955,7 @@ int uv_interface_addresses(uv_interface_address_t** addresses, int* count) {
+   }
+ 
+   /* Make sure the memory is initiallized to zero using calloc() */
+-  *addresses = uv__calloc(*count, sizeof(**addresses));
++  *addresses = (uv_interface_address_t*)uv__calloc(*count, sizeof(**addresses));
+   if (!(*addresses)) {
+     freeifaddrs(addrs);
+     return UV_ENOMEM;
+@@ -2523,12 +2523,12 @@ int uv_fs_event_start(uv_fs_event_t* handle,
+     goto no_insert;
+ 
+   len = strlen(path) + 1;
+-  w = uv__malloc(sizeof(*w) + len);
++  w = (watcher_list*)uv__malloc(sizeof(*w) + len);
+   if (w == NULL)
+     return UV_ENOMEM;
+ 
+   w->wd = wd;
+-  w->path = memcpy(w + 1, path, len);
++  w->path = (char*)memcpy(w + 1, path, len);
+   uv__queue_init(&w->watchers);
+   w->iterating = 0;
+   RB_INSERT(watcher_root, uv__inotify_watchers(loop), w);
+diff --git a/src/unix/loop.c b/src/unix/loop.c
+index a9468e8e19cbede795032980c47eb83aee1e0c68..3babe4d701949ebc69d74f7dedee33c777d89892 100644
+--- a/src/unix/loop.c
++++ b/src/unix/loop.c
+@@ -148,7 +148,7 @@ int uv_loop_fork(uv_loop_t* loop) {
+ 
+   /* Rearm all the watchers that aren't re-queued by the above. */
+   for (i = 0; i < loop->nwatchers; i++) {
+-    w = loop->watchers[i];
++    w = (uv__io_t*)loop->watchers[i];
+     if (w == NULL)
+       continue;
+ 
+diff --git a/src/unix/netbsd.c b/src/unix/netbsd.c
+index fa21e98e41aec8b7d8bc46c299c4c20a7a0c3f0c..4c6d5a24fe896d89e3b2f1db1dc2b1dd7d010aec 100644
+--- a/src/unix/netbsd.c
++++ b/src/unix/netbsd.c
+@@ -211,14 +211,14 @@ int uv_cpu_info(uv_cpu_info_t** cpu_infos, int* count) {
+     cpuspeed = 0;
+ 
+   size = numcpus * CPUSTATES * sizeof(*cp_times);
+-  cp_times = uv__malloc(size);
++  cp_times = (u_int64_t*)uv__malloc(size);
+   if (cp_times == NULL)
+     return UV_ENOMEM;
+ 
+   if (sysctlbyname("kern.cp_time", cp_times, &size, NULL, 0))
+     return UV__ERR(errno);
+ 
+-  *cpu_infos = uv__malloc(numcpus * sizeof(**cpu_infos));
++  *cpu_infos = (uv_cpu_info_t*)uv__malloc(numcpus * sizeof(**cpu_infos));
+   if (!(*cpu_infos)) {
+     uv__free(cp_times);
+     uv__free(*cpu_infos);
+diff --git a/src/unix/openbsd.c b/src/unix/openbsd.c
+index 9c863b6c90dad9864cb8341c2b6203c1390a9487..2aa61e2ee3321d91ba84887c7ed6dcfa23d00ccf 100644
+--- a/src/unix/openbsd.c
++++ b/src/unix/openbsd.c
+@@ -72,7 +72,7 @@ int uv_exepath(char* buffer, size_t* size) {
+   mypid = getpid();
+   for (;;) {
+     err = UV_ENOMEM;
+-    argsbuf = uv__reallocf(argsbuf, argsbuf_size);
++    argsbuf = (char**)uv__reallocf(argsbuf, argsbuf_size);
+     if (argsbuf == NULL)
+       goto out;
+     mib[0] = CTL_KERN;
+@@ -202,7 +202,7 @@ int uv_cpu_info(uv_cpu_info_t** cpu_infos, int* count) {
+   if (sysctl(which, ARRAY_SIZE(which), &numcpus, &size, NULL, 0))
+     return UV__ERR(errno);
+ 
+-  *cpu_infos = uv__malloc(numcpus * sizeof(**cpu_infos));
++  *cpu_infos = (uv_cpu_info_t*)uv__malloc(numcpus * sizeof(**cpu_infos));
+   if (!(*cpu_infos))
+     return UV_ENOMEM;
+ 
+diff --git a/src/unix/pipe.c b/src/unix/pipe.c
+index d332f3518303d6ef1dee1d835c392bb60b935bad..a60b1a0e442bb3c482575da117f30e9f119f55d3 100644
+--- a/src/unix/pipe.c
++++ b/src/unix/pipe.c
+@@ -377,7 +377,7 @@ int uv_pipe_pending_count(uv_pipe_t* handle) {
+   if (handle->queued_fds == NULL)
+     return 1;
+ 
+-  queued_fds = handle->queued_fds;
++  queued_fds = (uv__stream_queued_fds_t*)(handle->queued_fds);
+   return queued_fds->offset + 1;
+ }
+ 
+@@ -414,7 +414,7 @@ int uv_pipe_chmod(uv_pipe_t* handle, int mode) {
+   if (r != UV_ENOBUFS)
+     return r;
+ 
+-  name_buffer = uv__malloc(name_len);
++  name_buffer = (char*)uv__malloc(name_len);
+   if (name_buffer == NULL)
+     return UV_ENOMEM;
+ 
+diff --git a/src/unix/poll.c b/src/unix/poll.c
+index 7a12e2d1488a9d48712439e62c6637b9e1161f69..c21722b2e8eef4d16c523f7319fb57c3167d8dd9 100644
+--- a/src/unix/poll.c
++++ b/src/unix/poll.c
+@@ -117,7 +117,7 @@ int uv_poll_stop(uv_poll_t* handle) {
+ 
+ 
+ int uv_poll_start(uv_poll_t* handle, int pevents, uv_poll_cb poll_cb) {
+-  uv__io_t** watchers;
++  void** watchers;
+   uv__io_t* w;
+   int events;
+ 
+@@ -125,7 +125,7 @@ int uv_poll_start(uv_poll_t* handle, int pevents, uv_poll_cb poll_cb) {
+                       UV_PRIORITIZED)) == 0);
+   assert(!uv__is_closing(handle));
+ 
+-  watchers = handle->loop->watchers;
++  watchers = (void**)handle->loop->watchers;
+   w = &handle->io_watcher;
+ 
+   if (uv__fd_exists(handle->loop, w->fd))
+diff --git a/src/unix/posix-poll.c b/src/unix/posix-poll.c
+index 2e016c2fbaed2eeccd78080969a86aff821a4251..b71eee3f01a3f30b3b5efef539194139f258009a 100644
+--- a/src/unix/posix-poll.c
++++ b/src/unix/posix-poll.c
+@@ -61,7 +61,7 @@ static void uv__pollfds_maybe_resize(uv_loop_t* loop) {
+     return;
+ 
+   n = loop->poll_fds_size ? loop->poll_fds_size * 2 : 64;
+-  p = uv__reallocf(loop->poll_fds, n * sizeof(*loop->poll_fds));
++  p = (struct pollfd*)uv__reallocf(loop->poll_fds, n * sizeof(*loop->poll_fds));
+   if (p == NULL)
+     abort();
+ 
+diff --git a/src/unix/process.c b/src/unix/process.c
+index dd58c18d9b9359fca1a924698c39bd6390dafbe0..2d622c956de6d7b6f8a04be3ecd311f39602b241 100644
+--- a/src/unix/process.c
++++ b/src/unix/process.c
+@@ -423,7 +423,7 @@ static int posix_spawn_can_use_setsid;
+ static void uv__spawn_init_posix_spawn_fncs(void) {
+   /* Try to locate all non-portable functions at runtime */
+   posix_spawn_fncs.file_actions.addchdir_np =
+-    dlsym(RTLD_DEFAULT, "posix_spawn_file_actions_addchdir_np");
++    (int (*)(void* const*, const char*)) dlsym(RTLD_DEFAULT, "posix_spawn_file_actions_addchdir_np");
+ }
+ 
+ 
+@@ -988,7 +988,7 @@ int uv_spawn(uv_loop_t* loop,
+   err = UV_ENOMEM;
+   pipes = pipes_storage;
+   if (stdio_count > (int) ARRAY_SIZE(pipes_storage))
+-    pipes = uv__malloc(stdio_count * sizeof(*pipes));
++    pipes = (int (*)[2])uv__malloc(stdio_count * sizeof(*pipes));
+ 
+   if (pipes == NULL)
+     goto error;
+diff --git a/src/unix/proctitle.c b/src/unix/proctitle.c
+index 9d1f00ddf66e291abd40d0c0052a7f9bd5c03017..8cdec753d003ebe16485db2b47ffb3863a9473ff 100644
+--- a/src/unix/proctitle.c
++++ b/src/unix/proctitle.c
+@@ -65,7 +65,7 @@ char** uv_setup_args(int argc, char** argv) {
+   /* Add space for the argv pointers. */
+   size += (argc + 1) * sizeof(char*);
+ 
+-  new_argv = uv__malloc(size);
++  new_argv = (char**)uv__malloc(size);
+   if (new_argv == NULL)
+     return argv;
+ 
+diff --git a/src/unix/random-sysctl-linux.c b/src/unix/random-sysctl-linux.c
+index 66ba8d74ec22b72d318b91d82365f5b9693feb3c..9ef18df01a51aa6a26ae6d1d9660a819d18604d0 100644
+--- a/src/unix/random-sysctl-linux.c
++++ b/src/unix/random-sysctl-linux.c
+@@ -48,7 +48,7 @@ int uv__random_sysctl(void* buf, size_t buflen) {
+   char* pe;
+   size_t n;
+ 
+-  p = buf;
++  p = (char*)buf;
+   pe = p + buflen;
+ 
+   while (p < pe) {
+diff --git a/src/unix/stream.c b/src/unix/stream.c
+index 28c4d5463c4622725a433b8807e5e7bde580dadd..265ddade7aec129eb9dbf07cde2a16a0e341d1a7 100644
+--- a/src/unix/stream.c
++++ b/src/unix/stream.c
+@@ -123,7 +123,7 @@ static void uv__stream_osx_interrupt_select(uv_stream_t* stream) {
+   uv__stream_select_t* s;
+   int r;
+ 
+-  s = stream->select;
++  s = (uv__stream_select_t*)stream->select;
+   if (s == NULL)
+     return;
+ 
+@@ -152,8 +152,8 @@ static void uv__stream_osx_select(void* arg) {
+   int r;
+   int max_fd;
+ 
+-  stream = arg;
+-  s = stream->select;
++  stream = (uv_stream_t*)arg;
++  s = (uv__stream_select_t*)stream->select;
+   fd = s->fd;
+ 
+   if (fd > s->int_fd)
+@@ -330,7 +330,7 @@ int uv__stream_try_select(uv_stream_t* stream, int* fd) {
+   sread_sz = ROUND_UP(max_fd + 1, sizeof(uint32_t) * NBBY) / NBBY;
+   swrite_sz = sread_sz;
+ 
+-  s = uv__malloc(sizeof(*s) + sread_sz + swrite_sz);
++  s = (uv__stream_select_t*)uv__malloc(sizeof(*s) + sread_sz + swrite_sz);
+   if (s == NULL) {
+     err = UV_ENOMEM;
+     goto failed_malloc;
+@@ -573,7 +573,7 @@ done:
+   if (server->queued_fds != NULL) {
+     uv__stream_queued_fds_t* queued_fds;
+ 
+-    queued_fds = server->queued_fds;
++    queued_fds = (uv__stream_queued_fds_t*)(server->queued_fds);
+ 
+     /* Read first */
+     server->accepted_fd = queued_fds->fds[0];
+@@ -942,11 +942,12 @@ static int uv__stream_queue_fd(uv_stream_t* stream, int fd) {
+   uv__stream_queued_fds_t* queued_fds;
+   unsigned int queue_size;
+ 
+-  queued_fds = stream->queued_fds;
++  queued_fds = (uv__stream_queued_fds_t*)stream->queued_fds;
+   if (queued_fds == NULL) {
+     queue_size = 8;
+-    queued_fds = uv__malloc((queue_size - 1) * sizeof(*queued_fds->fds) +
+-                            sizeof(*queued_fds));
++    queued_fds = (uv__stream_queued_fds_t*)
++        uv__malloc((queue_size - 1) * sizeof(*queued_fds->fds) +
++                   sizeof(*queued_fds));
+     if (queued_fds == NULL)
+       return UV_ENOMEM;
+     queued_fds->size = queue_size;
+@@ -956,9 +957,9 @@ static int uv__stream_queue_fd(uv_stream_t* stream, int fd) {
+     /* Grow */
+   } else if (queued_fds->size == queued_fds->offset) {
+     queue_size = queued_fds->size + 8;
+-    queued_fds = uv__realloc(queued_fds,
+-                             (queue_size - 1) * sizeof(*queued_fds->fds) +
+-                              sizeof(*queued_fds));
++    queued_fds = (uv__stream_queued_fds_t*)
++        uv__realloc(queued_fds, (queue_size - 1) * sizeof(*queued_fds->fds) +
++                    sizeof(*queued_fds));
+ 
+     /*
+      * Allocation failure, report back.
+@@ -1356,7 +1357,7 @@ int uv_write2(uv_write_t* req,
+ 
+   req->bufs = req->bufsml;
+   if (nbufs > ARRAY_SIZE(req->bufsml))
+-    req->bufs = uv__malloc(nbufs * sizeof(bufs[0]));
++    req->bufs = (uv_buf_t*)uv__malloc(nbufs * sizeof(bufs[0]));
+ 
+   if (req->bufs == NULL)
+     return UV_ENOMEM;
+@@ -1490,7 +1491,7 @@ int uv___stream_fd(const uv_stream_t* handle) {
+          handle->type == UV_TTY ||
+          handle->type == UV_NAMED_PIPE);
+ 
+-  s = handle->select;
++  s = (const uv__stream_select_t*)handle->select;
+   if (s != NULL)
+     return s->fd;
+ 
+@@ -1508,7 +1509,7 @@ void uv__stream_close(uv_stream_t* handle) {
+   if (handle->select != NULL) {
+     uv__stream_select_t* s;
+ 
+-    s = handle->select;
++    s = (uv__stream_select_t*)handle->select;
+ 
+     uv_sem_post(&s->close_sem);
+     uv_sem_post(&s->async_sem);
+@@ -1543,7 +1544,7 @@ void uv__stream_close(uv_stream_t* handle) {
+ 
+   /* Close all queued fds */
+   if (handle->queued_fds != NULL) {
+-    queued_fds = handle->queued_fds;
++    queued_fds = (uv__stream_queued_fds_t*)(handle->queued_fds);
+     for (i = 0; i < queued_fds->offset; i++)
+       uv__close(queued_fds->fds[i]);
+     uv__free(handle->queued_fds);
+diff --git a/src/unix/tcp.c b/src/unix/tcp.c
+index a6b53e5913271d0c83e1d7f7e4cb8140f5f3936d..4c4213a4241b51d245146f1a37a371448d57b3b8 100644
+--- a/src/unix/tcp.c
++++ b/src/unix/tcp.c
+@@ -274,7 +274,7 @@ int uv__tcp_connect(uv_connect_t* req,
+     memcpy(&tmp6, addr, sizeof(tmp6));
+     if (tmp6.sin6_scope_id == 0) {
+       tmp6.sin6_scope_id = uv__ipv6_link_local_scope_id();
+-      addr = (void*) &tmp6;
++      addr = (const struct sockaddr*) &tmp6;
+     }
+   }
+ 
+diff --git a/src/unix/thread.c b/src/unix/thread.c
+index f05e6fe0f7dd5ac579f6a9d6f93bffb99e1bcbc2..20409541de3cb300504b823472a73bc95fa38f62 100644
+--- a/src/unix/thread.c
++++ b/src/unix/thread.c
+@@ -168,8 +168,7 @@ int uv_thread_create_ex(uv_thread_t* tid,
+       abort();
+   }
+ 
+-  f.in = entry;
+-  err = pthread_create(tid, attr, f.out, arg);
++  err = pthread_create(tid, attr, (void*(*)(void*)) (void(*)(void)) entry, arg);
+ 
+   if (attr != NULL)
+     pthread_attr_destroy(attr);
+@@ -540,7 +539,7 @@ static int uv__custom_sem_init(uv_sem_t* sem_, unsigned int value) {
+   int err;
+   uv_semaphore_t* sem;
+ 
+-  sem = uv__malloc(sizeof(*sem));
++  sem = (uv_semaphore_t*)uv__malloc(sizeof(*sem));
+   if (sem == NULL)
+     return UV_ENOMEM;
+ 
+diff --git a/src/unix/udp.c b/src/unix/udp.c
+index c2814512a5f507ceb9e764cdb7c6ff3d36e77974..cbee16b22a36b1c82e74f6a81c3811052e9b8482 100644
+--- a/src/unix/udp.c
++++ b/src/unix/udp.c
+@@ -191,11 +191,11 @@ static int uv__udp_recvmmsg(uv_udp_t* handle, uv_buf_t* buf) {
+       if (msgs[k].msg_hdr.msg_flags & MSG_TRUNC)
+         flags |= UV_UDP_PARTIAL;
+ 
+-      chunk_buf = uv_buf_init(iov[k].iov_base, iov[k].iov_len);
++      chunk_buf = uv_buf_init((char*) iov[k].iov_base, iov[k].iov_len);
+       handle->recv_cb(handle,
+                       msgs[k].msg_len,
+                       &chunk_buf,
+-                      msgs[k].msg_hdr.msg_name,
++                      (const sockaddr*) msgs[k].msg_hdr.msg_name,
+                       flags);
+     }
+ 
+@@ -245,7 +245,7 @@ static void uv__udp_recvmsg(uv_udp_t* handle) {
+     memset(&peer, 0, sizeof(peer));
+     h.msg_name = &peer;
+     h.msg_namelen = sizeof(peer);
+-    h.msg_iov = (void*) &buf;
++    h.msg_iov = (iovec*) &buf;
+     h.msg_iovlen = 1;
+ 
+     do {
+@@ -719,7 +719,7 @@ int uv__udp_send(uv_udp_send_t* req,
+ 
+   req->bufs = req->bufsml;
+   if (nbufs > ARRAY_SIZE(req->bufsml))
+-    req->bufs = uv__malloc(nbufs * sizeof(bufs[0]));
++    req->bufs = (uv_buf_t*)uv__malloc(nbufs * sizeof(bufs[0]));
+ 
+   if (req->bufs == NULL) {
+     uv__req_unregister(handle->loop, req);
+diff --git a/src/uv-common.c b/src/uv-common.c
+index 2200fe3f0a41e295acb426f39ccc9f0133994675..69e95801a18104ea910abf86db236d85f62afb66 100644
+--- a/src/uv-common.c
++++ b/src/uv-common.c
+@@ -54,10 +54,10 @@ static uv__allocator_t uv__allocator = {
+ 
+ char* uv__strdup(const char* s) {
+   size_t len = strlen(s) + 1;
+-  char* m = uv__malloc(len);
++  char* m = (char*)uv__malloc(len);
+   if (m == NULL)
+     return NULL;
+-  return memcpy(m, s, len);
++  return (char*)memcpy(m, s, len);
+ }
+ 
+ char* uv__strndup(const char* s, size_t n) {
+@@ -65,11 +65,11 @@ char* uv__strndup(const char* s, size_t n) {
+   size_t len = strlen(s);
+   if (n < len)
+     len = n;
+-  m = uv__malloc(len + 1);
++  m = (char*)uv__malloc(len + 1);
+   if (m == NULL)
+     return NULL;
+   m[len] = '\0';
+-  return memcpy(m, s, len);
++  return (char*)memcpy(m, s, len);
+ }
+ 
+ void* uv__malloc(size_t size) {
+@@ -691,7 +691,7 @@ void uv__fs_scandir_cleanup(uv_fs_t* req) {
+   unsigned int n;
+ 
+   if (req->result >= 0) {
+-    dents = req->ptr;
++    dents = (uv__dirent_t**)(req->ptr);
+     nbufs = uv__get_nbufs(req);
+ 
+     i = 0;
+@@ -724,7 +724,7 @@ int uv_fs_scandir_next(uv_fs_t* req, uv_dirent_t* ent) {
+   nbufs = uv__get_nbufs(req);
+   assert(nbufs);
+ 
+-  dents = req->ptr;
++  dents = (uv__dirent_t**)(req->ptr);
+ 
+   /* Free previous entity */
+   if (*nbufs > 0)
+@@ -789,7 +789,7 @@ void uv__fs_readdir_cleanup(uv_fs_t* req) {
+   if (req->ptr == NULL)
+     return;
+ 
+-  dir = req->ptr;
++  dir = (uv_dir_t*)req->ptr;
+   dirents = dir->dirents;
+   req->ptr = NULL;
+ 
+@@ -835,7 +835,7 @@ uv_loop_t* uv_default_loop(void) {
+ uv_loop_t* uv_loop_new(void) {
+   uv_loop_t* loop;
+ 
+-  loop = uv__malloc(sizeof(*loop));
++  loop = (uv_loop_t*)uv__malloc(sizeof(*loop));
+   if (loop == NULL)
+     return NULL;
+ 
+diff --git a/src/win/core.c b/src/win/core.c
+index e9885a0f1ff3890a8d957c8793e22b01cedc0e97..87ade7ad65243ee3ff940320f84e1960390300e1 100644
+--- a/src/win/core.c
++++ b/src/win/core.c
+@@ -98,7 +98,8 @@ static int uv__loops_add(uv_loop_t* loop) {
+ 
+   if (uv__loops_size == uv__loops_capacity) {
+     new_capacity = uv__loops_capacity + UV__LOOPS_CHUNK_SIZE;
+-    new_loops = uv__realloc(uv__loops, sizeof(uv_loop_t*) * new_capacity);
++    new_loops = (uv_loop_t**)
++        uv__realloc(uv__loops, sizeof(uv_loop_t*) * new_capacity);
+     if (!new_loops)
+       goto failed_loops_realloc;
+     uv__loops = new_loops;
+@@ -152,7 +153,8 @@ static void uv__loops_remove(uv_loop_t* loop) {
+   smaller_capacity = uv__loops_capacity / 2;
+   if (uv__loops_size >= smaller_capacity)
+     goto loop_removed;
+-  new_loops = uv__realloc(uv__loops, sizeof(uv_loop_t*) * smaller_capacity);
++  new_loops = (uv_loop_t**)
++      uv__realloc(uv__loops, sizeof(uv_loop_t*) * smaller_capacity);
+   if (!new_loops)
+     goto loop_removed;
+   uv__loops = new_loops;
+@@ -264,7 +266,7 @@ int uv_loop_init(uv_loop_t* loop) {
+ 
+   loop->endgame_handles = NULL;
+ 
+-  loop->timer_heap = timer_heap = uv__malloc(sizeof(*timer_heap));
++  loop->timer_heap = timer_heap = (heap*)uv__malloc(sizeof(*timer_heap));
+   if (timer_heap == NULL) {
+     err = UV_ENOMEM;
+     goto fail_timers_alloc;
+diff --git a/src/win/dl.c b/src/win/dl.c
+index 7880c9595be1f66ea0dcbdbcc4a91ce40577587f..d88400f0e819d74998e13f60f13c67a606dec398 100644
+--- a/src/win/dl.c
++++ b/src/win/dl.c
+@@ -37,7 +37,7 @@ int uv_dlopen(const char* filename, uv_lib_t* lib) {
+     return uv__dlerror(lib, filename, ERROR_NO_UNICODE_TRANSLATION);
+   if ((size_t) r > ARRAY_SIZE(filename_w))
+     return uv__dlerror(lib, filename, ERROR_INSUFFICIENT_BUFFER);
+-  uv_wtf8_to_utf16(filename, filename_w, r);
++  uv_wtf8_to_utf16(filename, (uint16_t*)filename_w, r);
+ 
+   lib->handle = LoadLibraryExW(filename_w, NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
+   if (lib->handle == NULL) {
+diff --git a/src/win/fs-event.c b/src/win/fs-event.c
+index 4a0ca1f70a22b6342e208124838d6ecf3173f1a8..5a07acfe54efe90cf2ab0bca5b5998a961e72ebd 100644
+--- a/src/win/fs-event.c
++++ b/src/win/fs-event.c
+@@ -73,7 +73,7 @@ static void uv__relative_path(const WCHAR* filename,
+   if (dirlen > 0 && dir[dirlen - 1] == '\\')
+     dirlen--;
+   relpathlen = filenamelen - dirlen - 1;
+-  *relpath = uv__malloc((relpathlen + 1) * sizeof(WCHAR));
++  *relpath = (WCHAR*)uv__malloc((relpathlen + 1) * sizeof(WCHAR));
+   if (!*relpath)
+     uv_fatal_error(ERROR_OUTOFMEMORY, "uv__malloc");
+   wcsncpy(*relpath, filename + dirlen + 1, relpathlen);
+@@ -229,7 +229,7 @@ int uv_fs_event_start(uv_fs_event_t* handle,
+     if (short_path_buffer_len == 0) {
+       goto short_path_done;
+     }
+-    short_path_buffer = uv__malloc(short_path_buffer_len * sizeof(WCHAR));
++    short_path_buffer = (WCHAR*)uv__malloc(short_path_buffer_len * sizeof(WCHAR));
+     if (short_path_buffer == NULL) {
+       goto short_path_done;
+     }
+diff --git a/src/win/fs-fd-hash-inl.h b/src/win/fs-fd-hash-inl.h
+index 0b532af12d4371c2311bd50a66913287a0716f43..703a8d8f87de1089ac8b18bd817d416d48dc442e 100644
+--- a/src/win/fs-fd-hash-inl.h
++++ b/src/win/fs-fd-hash-inl.h
+@@ -146,7 +146,7 @@ INLINE static void uv__fd_hash_add(int fd, struct uv__fd_info_s* info) {
+ 
+     if (bucket_ptr->size != 0 && i == 0) {
+       struct uv__fd_hash_entry_group_s* new_group_ptr =
+-        uv__malloc(sizeof(*new_group_ptr));
++        (struct uv__fd_hash_entry_group_s*)uv__malloc(sizeof(*new_group_ptr));
+       if (new_group_ptr == NULL) {
+         uv_fatal_error(ERROR_OUTOFMEMORY, "uv__malloc");
+       }
+diff --git a/src/win/fs.c b/src/win/fs.c
+index 99c8a2bf8bf1244f0db7114c1eaa8bff22564996..d9c2a4f728c7fb491995c6153b2a63a835b206b7 100644
+--- a/src/win/fs.c
++++ b/src/win/fs.c
+@@ -280,7 +280,7 @@ INLINE static int fs__readlink_handle(HANDLE handle,
+   }
+ 
+   assert(target_ptr == NULL || *target_ptr == NULL);
+-  return uv_utf16_to_wtf8(w_target, w_target_len, target_ptr, target_len_ptr);
++  return uv_utf16_to_wtf8((const uint16_t*)w_target, w_target_len, target_ptr, target_len_ptr);
+ }
+ 
+ 
+@@ -323,7 +323,7 @@ INLINE static int fs__capture_path(uv_fs_t* req, const char* path,
+     return 0;
+   }
+ 
+-  buf = uv__malloc(buf_sz);
++  buf = (WCHAR*)uv__malloc(buf_sz);
+   if (buf == NULL) {
+     return ERROR_OUTOFMEMORY;
+   }
+@@ -331,7 +331,7 @@ INLINE static int fs__capture_path(uv_fs_t* req, const char* path,
+   pos = buf;
+ 
+   if (path != NULL) {
+-    uv_wtf8_to_utf16(path, pos, pathw_len);
++    uv_wtf8_to_utf16(path, (uint16_t*)pos, pathw_len);
+     req->file.pathw = pos;
+     pos += pathw_len;
+   } else {
+@@ -339,7 +339,7 @@ INLINE static int fs__capture_path(uv_fs_t* req, const char* path,
+   }
+ 
+   if (new_path != NULL) {
+-    uv_wtf8_to_utf16(new_path, pos, new_pathw_len);
++    uv_wtf8_to_utf16(new_path, (uint16_t*)pos, new_pathw_len);
+     req->fs.info.new_pathw = pos;
+     pos += new_pathw_len;
+   } else {
+@@ -1390,13 +1390,13 @@ void fs__scandir(uv_fs_t* req) {
+         continue;
+ 
+       /* Compute the space required to store the filename as WTF-8. */
+-      wtf8_len = uv_utf16_length_as_wtf8(&info->FileName[0], wchar_len);
++      wtf8_len = uv_utf16_length_as_wtf8((const uint16_t*)&info->FileName[0], wchar_len);
+ 
+       /* Resize the dirent array if needed. */
+       if (dirents_used >= dirents_size) {
+         size_t new_dirents_size =
+             dirents_size == 0 ? dirents_initial_size : dirents_size << 1;
+-        uv__dirent_t** new_dirents =
++        uv__dirent_t** new_dirents = (uv__dirent_t**)
+             uv__realloc(dirents, new_dirents_size * sizeof *dirents);
+ 
+         if (new_dirents == NULL)
+@@ -1410,7 +1410,7 @@ void fs__scandir(uv_fs_t* req) {
+        * includes room for the first character of the filename, but `utf8_len`
+        * doesn't count the NULL terminator at this point.
+        */
+-      dirent = uv__malloc(sizeof *dirent + wtf8_len);
++      dirent = (uv__dirent_t*)uv__malloc(sizeof *dirent + wtf8_len);
+       if (dirent == NULL)
+         goto out_of_memory_error;
+ 
+@@ -1418,7 +1418,7 @@ void fs__scandir(uv_fs_t* req) {
+ 
+       /* Convert file name to UTF-8. */
+       wtf8 = &dirent->d_name[0];
+-      if (uv_utf16_to_wtf8(&info->FileName[0], wchar_len, &wtf8, &wtf8_len) != 0)
++      if (uv_utf16_to_wtf8((const uint16_t*)&info->FileName[0], wchar_len, &wtf8, &wtf8_len) != 0)
+         goto out_of_memory_error;
+ 
+       /* Fill out the type field. */
+@@ -1512,7 +1512,7 @@ void fs__opendir(uv_fs_t* req) {
+     goto error;
+   }
+ 
+-  dir = uv__malloc(sizeof(*dir));
++  dir = (uv_dir_t*)uv__malloc(sizeof(*dir));
+   if (dir == NULL) {
+     SET_REQ_UV_ERROR(req, UV_ENOMEM, ERROR_OUTOFMEMORY);
+     goto error;
+@@ -1527,7 +1527,7 @@ void fs__opendir(uv_fs_t* req) {
+   else
+     fmt = L"%s\\*";
+ 
+-  find_path = uv__malloc(sizeof(WCHAR) * (len + 4));
++  find_path = (WCHAR*)uv__malloc(sizeof(WCHAR) * (len + 4));
+   if (find_path == NULL) {
+     SET_REQ_UV_ERROR(req, UV_ENOMEM, ERROR_OUTOFMEMORY);
+     goto error;
+@@ -1564,7 +1564,7 @@ void fs__readdir(uv_fs_t* req) {
+   int r;
+ 
+   req->flags |= UV_FS_FREE_PTR;
+-  dir = req->ptr;
++  dir = (uv_dir_t*)req->ptr;
+   dirents = dir->dirents;
+   memset(dirents, 0, dir->nentries * sizeof(*dir->dirents));
+   find_data = &dir->find_data;
+@@ -1621,7 +1621,7 @@ error:
+ void fs__closedir(uv_fs_t* req) {
+   uv_dir_t* dir;
+ 
+-  dir = req->ptr;
++  dir = (uv_dir_t*)req->ptr;
+   FindClose(dir->dir_handle);
+   uv__free(req->ptr);
+   SET_REQ_RESULT(req, 0);
+@@ -2612,7 +2612,7 @@ static ssize_t fs__realpath_handle(HANDLE handle, char** realpath_ptr) {
+     return -1;
+   }
+ 
+-  w_realpath_buf = uv__malloc((w_realpath_len + 1) * sizeof(WCHAR));
++  w_realpath_buf = (WCHAR*)uv__malloc((w_realpath_len + 1) * sizeof(WCHAR));
+   if (w_realpath_buf == NULL) {
+     SetLastError(ERROR_OUTOFMEMORY);
+     return -1;
+@@ -2645,7 +2645,7 @@ static ssize_t fs__realpath_handle(HANDLE handle, char** realpath_ptr) {
+   }
+ 
+   assert(*realpath_ptr == NULL);
+-  r = uv_utf16_to_wtf8(w_realpath_ptr, w_realpath_len, realpath_ptr, NULL);
++  r = uv_utf16_to_wtf8((const uint16_t*)w_realpath_ptr, w_realpath_len, realpath_ptr, NULL);
+   uv__free(w_realpath_buf);
+   return r;
+ }
+@@ -2725,7 +2725,7 @@ retry_get_disk_free_space:
+     }
+ 
+     len = MAX_PATH + 1;
+-    pathw = uv__malloc(len * sizeof(*pathw));
++    pathw = (WCHAR*)uv__malloc(len * sizeof(*pathw));
+     if (pathw == NULL) {
+       SET_REQ_UV_ERROR(req, UV_ENOMEM, ERROR_OUTOFMEMORY);
+       return;
+@@ -2741,7 +2741,7 @@ retry_get_full_path_name:
+       return;
+     } else if (ret > len) {
+       len = ret;
+-      pathw = uv__reallocf(pathw, len * sizeof(*pathw));
++      pathw = (WCHAR*)uv__reallocf(pathw, len * sizeof(*pathw));
+       if (pathw == NULL) {
+         SET_REQ_UV_ERROR(req, UV_ENOMEM, ERROR_OUTOFMEMORY);
+         return;
+@@ -2757,7 +2757,7 @@ retry_get_full_path_name:
+     uv__free(pathw);
+   }
+ 
+-  stat_fs = uv__malloc(sizeof(*stat_fs));
++  stat_fs = (uv_statfs_t*)uv__malloc(sizeof(*stat_fs));
+   if (stat_fs == NULL) {
+     SET_REQ_UV_ERROR(req, UV_ENOMEM, ERROR_OUTOFMEMORY);
+     return;
+@@ -2916,7 +2916,7 @@ int uv_fs_read(uv_loop_t* loop,
+   req->fs.info.nbufs = nbufs;
+   req->fs.info.bufs = req->fs.info.bufsml;
+   if (nbufs > ARRAY_SIZE(req->fs.info.bufsml))
+-    req->fs.info.bufs = uv__malloc(nbufs * sizeof(*bufs));
++    req->fs.info.bufs = (uv_buf_t*)uv__malloc(nbufs * sizeof(*bufs));
+ 
+   if (req->fs.info.bufs == NULL) {
+     SET_REQ_UV_ERROR(req, UV_ENOMEM, ERROR_OUTOFMEMORY);
+@@ -2949,7 +2949,7 @@ int uv_fs_write(uv_loop_t* loop,
+   req->fs.info.nbufs = nbufs;
+   req->fs.info.bufs = req->fs.info.bufsml;
+   if (nbufs > ARRAY_SIZE(req->fs.info.bufsml))
+-    req->fs.info.bufs = uv__malloc(nbufs * sizeof(*bufs));
++    req->fs.info.bufs = (uv_buf_t*)uv__malloc(nbufs * sizeof(*bufs));
+ 
+   if (req->fs.info.bufs == NULL) {
+     SET_REQ_UV_ERROR(req, UV_ENOMEM, ERROR_OUTOFMEMORY);
+diff --git a/src/win/getaddrinfo.c b/src/win/getaddrinfo.c
+index 8b8406ada8e7434e291b2e50caf4ed7f36613fa0..5bc63d8e19411b967a2acf5c24b34b9b17323ccc 100644
+--- a/src/win/getaddrinfo.c
++++ b/src/win/getaddrinfo.c
+@@ -132,7 +132,7 @@ static void uv__getaddrinfo_done(struct uv__work* w, int status) {
+       addrinfo_len += addrinfo_struct_len +
+           ALIGNED_SIZE(addrinfow_ptr->ai_addrlen);
+       if (addrinfow_ptr->ai_canonname != NULL) {
+-        name_len = uv_utf16_length_as_wtf8(addrinfow_ptr->ai_canonname, -1);
++        name_len = uv_utf16_length_as_wtf8((const uint16_t*)addrinfow_ptr->ai_canonname, -1);
+         if (name_len < 0) {
+           req->retcode = name_len;
+           goto complete;
+@@ -281,9 +281,9 @@ int uv_getaddrinfo(uv_loop_t* loop,
+   }
+ 
+   /* allocate memory for inputs, and partition it as needed */
+-  alloc_ptr = uv__malloc(ALIGNED_SIZE(nodesize * sizeof(WCHAR)) +
+-                         ALIGNED_SIZE(servicesize * sizeof(WCHAR)) +
+-                         hintssize);
++  alloc_ptr = (char*)uv__malloc(ALIGNED_SIZE(nodesize * sizeof(WCHAR)) +
++                                ALIGNED_SIZE(servicesize * sizeof(WCHAR)) +
++                                hintssize);
+   if (!alloc_ptr)
+     return UV_ENOMEM;
+ 
+@@ -294,7 +294,7 @@ int uv_getaddrinfo(uv_loop_t* loop,
+    * request. The node here has been converted to ascii. */
+   if (node != NULL) {
+     req->node = (WCHAR*) alloc_ptr;
+-    uv_wtf8_to_utf16(node, (WCHAR*) alloc_ptr, nodesize);
++    uv_wtf8_to_utf16(node, (uint16_t*) alloc_ptr, nodesize);
+     alloc_ptr += ALIGNED_SIZE(nodesize * sizeof(WCHAR));
+   } else {
+     req->node = NULL;
+@@ -304,7 +304,7 @@ int uv_getaddrinfo(uv_loop_t* loop,
+    * the req. */
+   if (service != NULL) {
+     req->service = (WCHAR*) alloc_ptr;
+-    uv_wtf8_to_utf16(service, (WCHAR*) alloc_ptr, servicesize);
++    uv_wtf8_to_utf16(service, (uint16_t*) alloc_ptr, servicesize);
+     alloc_ptr += ALIGNED_SIZE(servicesize * sizeof(WCHAR));
+   } else {
+     req->service = NULL;
+diff --git a/src/win/pipe.c b/src/win/pipe.c
+index cec72ff750b5a17e139fd85080ccbdfc3c71d8c0..0f045a873073cf9b07feb457ea199990df521e5f 100644
+--- a/src/win/pipe.c
++++ b/src/win/pipe.c
+@@ -899,7 +899,7 @@ int uv_pipe_connect2(uv_connect_t* req,
+   if (pipeHandle == INVALID_HANDLE_VALUE) {
+     if (GetLastError() == ERROR_PIPE_BUSY) {
+       nameSize = (wcslen(handle->name) + 1) * sizeof(WCHAR);
+-      req->u.connect.name = uv__malloc(nameSize);
++      req->u.connect.name = (WCHAR *)uv__malloc(nameSize);
+       if (!req->u.connect.name) {
+         uv_fatal_error(ERROR_OUTOFMEMORY, "uv__malloc");
+       }
+@@ -1503,7 +1503,7 @@ static int uv__build_coalesced_write_req(uv_write_t* user_req,
+                        data_length;                  /* (c) */
+ 
+   /* Allocate buffer. */
+-  heap_buffer = uv__malloc(heap_buffer_length);
++  heap_buffer = (char*)uv__malloc(heap_buffer_length);
+   if (heap_buffer == NULL)
+     return ERROR_NOT_ENOUGH_MEMORY; /* Maps to UV_ENOMEM. */
+ 
+@@ -1752,7 +1752,7 @@ int uv__pipe_write_ipc(uv_loop_t* loop,
+     bufs = stack_bufs;
+   } else {
+     /* Use heap-allocated buffer array. */
+-    bufs = uv__calloc(buf_count, sizeof(uv_buf_t));
++    bufs = (uv_buf_t*)uv__calloc(buf_count, sizeof(uv_buf_t));
+     if (bufs == NULL)
+       return ERROR_NOT_ENOUGH_MEMORY; /* Maps to UV_ENOMEM. */
+   }
+@@ -2449,7 +2449,7 @@ static int uv__pipe_getname(const uv_pipe_t* handle, char* buffer, size_t* size)
+                                       FileNameInformation);
+   if (nt_status == STATUS_BUFFER_OVERFLOW) {
+     name_size = sizeof(*name_info) + tmp_name_info.FileNameLength;
+-    name_info = uv__malloc(name_size);
++    name_info = (FILE_NAME_INFORMATION*)uv__malloc(name_size);
+     if (!name_info) {
+       *size = 0;
+       return UV_ENOMEM;
+diff --git a/src/win/process.c b/src/win/process.c
+index 119b46cb3f37122395c172c6e9700d472a2173ed..0103004c565bb09b7b9c150e874f9c68486ab26c 100644
+--- a/src/win/process.c
++++ b/src/win/process.c
+@@ -543,14 +543,14 @@ int make_program_args(char** args, int verbatim_arguments, WCHAR** dst_ptr) {
+   dst_len = dst_len * 2 + arg_count * 2;
+ 
+   /* Allocate buffer for the final command line. */
+-  dst = uv__malloc(dst_len * sizeof(WCHAR));
++  dst = (WCHAR*)uv__malloc(dst_len * sizeof(WCHAR));
+   if (dst == NULL) {
+     err = UV_ENOMEM;
+     goto error;
+   }
+ 
+   /* Allocate temporary working buffer. */
+-  temp_buffer = uv__malloc(temp_buffer_len * sizeof(WCHAR));
++  temp_buffer = (WCHAR*)uv__malloc(temp_buffer_len * sizeof(WCHAR));
+   if (temp_buffer == NULL) {
+     err = UV_ENOMEM;
+     goto error;
+@@ -564,7 +564,7 @@ int make_program_args(char** args, int verbatim_arguments, WCHAR** dst_ptr) {
+     arg_len = uv_wtf8_length_as_utf16(*arg);
+     assert(arg_len > 0);
+     assert(temp_buffer_len >= (size_t) arg_len);
+-    uv_wtf8_to_utf16(*arg, temp_buffer, arg_len);
++    uv_wtf8_to_utf16(*arg, (uint16_t*)temp_buffer, arg_len);
+ 
+     if (verbatim_arguments) {
+       /* Copy verbatim. */
+@@ -592,8 +592,8 @@ error:
+ 
+ 
+ int env_strncmp(const wchar_t* a, int na, const wchar_t* b) {
+-  wchar_t* a_eq;
+-  wchar_t* b_eq;
++  const wchar_t* a_eq;
++  const wchar_t* b_eq;
+   wchar_t* A;
+   wchar_t* B;
+   int nb;
+@@ -610,8 +610,8 @@ int env_strncmp(const wchar_t* a, int na, const wchar_t* b) {
+   assert(b_eq);
+   nb = b_eq - b;
+ 
+-  A = alloca((na+1) * sizeof(wchar_t));
+-  B = alloca((nb+1) * sizeof(wchar_t));
++  A = (wchar_t*)alloca((na+1) * sizeof(wchar_t));
++  B = (wchar_t*)alloca((nb+1) * sizeof(wchar_t));
+ 
+   r = LCMapStringW(LOCALE_INVARIANT, LCMAP_UPPERCASE, a, na, A, na);
+   assert(r==na);
+@@ -684,11 +684,11 @@ int make_program_env(char* env_block[], WCHAR** dst_ptr) {
+   }
+ 
+   /* second pass: copy to UTF-16 environment block */
+-  dst_copy = uv__malloc(env_len * sizeof(WCHAR));
++  dst_copy = (WCHAR*)uv__malloc(env_len * sizeof(WCHAR));
+   if (dst_copy == NULL && env_len > 0) {
+     return UV_ENOMEM;
+   }
+-  env_copy = alloca(env_block_count * sizeof(WCHAR*));
++  env_copy = (WCHAR**)alloca(env_block_count * sizeof(WCHAR*));
+ 
+   ptr = dst_copy;
+   ptr_copy = env_copy;
+@@ -698,7 +698,7 @@ int make_program_env(char* env_block[], WCHAR** dst_ptr) {
+       len = uv_wtf8_length_as_utf16(*env);
+       assert(len > 0);
+       assert((size_t) len <= env_len - (ptr - dst_copy));
+-      uv_wtf8_to_utf16(*env, ptr, len);
++      uv_wtf8_to_utf16(*env, (uint16_t*)ptr, len);
+       *ptr_copy++ = ptr;
+       ptr += len;
+     }
+@@ -736,7 +736,7 @@ int make_program_env(char* env_block[], WCHAR** dst_ptr) {
+   }
+ 
+   /* final pass: copy, in sort order, and inserting required variables */
+-  dst = uv__malloc((1+env_len) * sizeof(WCHAR));
++  dst = (WCHAR*)uv__malloc((1+env_len) * sizeof(WCHAR));
+   if (!dst) {
+     uv__free(dst_copy);
+     return UV_ENOMEM;
+diff --git a/src/win/tcp.c b/src/win/tcp.c
+index 187f36e2a61c870b0d16e17e9d4a9e1161ba8851..d8da4d941a51b0625fc0c072342ec4edf74c0ea3 100644
+--- a/src/win/tcp.c
++++ b/src/win/tcp.c
+@@ -585,7 +585,7 @@ int uv__tcp_listen(uv_tcp_t* handle, int backlog, uv_connection_cb cb) {
+ 
+   if (handle->tcp.serv.accept_reqs == NULL) {
+     handle->tcp.serv.accept_reqs =
+-      uv__malloc(uv_simultaneous_server_accepts * sizeof(uv_tcp_accept_t));
++      (uv_tcp_accept_t*)uv__malloc(uv_simultaneous_server_accepts * sizeof(uv_tcp_accept_t));
+     if (!handle->tcp.serv.accept_reqs) {
+       uv_fatal_error(ERROR_OUTOFMEMORY, "uv__malloc");
+     }
+diff --git a/src/win/thread.c b/src/win/thread.c
+index 57c25e8f5a861c9d8a4c402c260d3ac235200423..57f1698f595e2410a51044f7f228b5a235206819 100644
+--- a/src/win/thread.c
++++ b/src/win/thread.c
+@@ -98,7 +98,7 @@ static UINT __stdcall uv__thread_start(void* arg) {
+   struct thread_ctx *ctx_p;
+   struct thread_ctx ctx;
+ 
+-  ctx_p = arg;
++  ctx_p = (struct thread_ctx*)arg;
+   ctx = *ctx_p;
+   uv__free(ctx_p);
+ 
+@@ -141,7 +141,7 @@ int uv_thread_create_ex(uv_thread_t* tid,
+       return UV_EINVAL;
+   }
+ 
+-  ctx = uv__malloc(sizeof(*ctx));
++  ctx = (struct thread_ctx*)uv__malloc(sizeof(*ctx));
+   if (ctx == NULL)
+     return UV_ENOMEM;
+ 
+diff --git a/src/win/tty.c b/src/win/tty.c
+index ac836930d6f3a185d57ba59fb42c817496aa0fdf..3aacaaf0b514ba71755dc51f1bd7263de5cbc308 100644
+--- a/src/win/tty.c
++++ b/src/win/tty.c
+@@ -528,7 +528,7 @@ static DWORD CALLBACK uv_tty_line_read_thread(void* data) {
+ 
+   if (read_console_success) {
+     read_bytes = bytes;
+-    uv_utf16_to_wtf8(utf16,
++    uv_utf16_to_wtf8((const uint16_t*)utf16,
+                      read_chars,
+                      &handle->tty.rd.read_line_buffer.base,
+                      &read_bytes);
+@@ -827,7 +827,7 @@ void uv_process_tty_read_raw_req(uv_loop_t* loop, uv_tty_t* handle,
+           WCHAR utf16_buffer[2];
+           utf16_buffer[0] = handle->tty.rd.last_utf16_high_surrogate;
+           utf16_buffer[1] = KEV.uChar.UnicodeChar;
+-          if (uv_utf16_to_wtf8(utf16_buffer,
++          if (uv_utf16_to_wtf8((const uint16_t*)utf16_buffer,
+                                2,
+                                &last_key_buf,
+                                &char_len))
+@@ -835,7 +835,7 @@ void uv_process_tty_read_raw_req(uv_loop_t* loop, uv_tty_t* handle,
+           handle->tty.rd.last_utf16_high_surrogate = 0;
+         } else {
+           /* Single UTF-16 character */
+-          if (uv_utf16_to_wtf8(&KEV.uChar.UnicodeChar,
++          if (uv_utf16_to_wtf8((const uint16_t*)&KEV.uChar.UnicodeChar,
+                                1,
+                                &last_key_buf,
+                                &char_len))
+diff --git a/src/win/util.c b/src/win/util.c
+index 91d88a54fb24a613df45d7915c345b6764dd6ffd..5fbc70f52952f90b36fb22ee03ec7f70e6ed5954 100644
+--- a/src/win/util.c
++++ b/src/win/util.c
+@@ -124,7 +124,7 @@ int uv_exepath(char* buffer, size_t* size_ptr) {
+ 
+   /* Convert to UTF-8 */
+   utf8_len = *size_ptr - 1; /* Reserve space for NUL */
+-  err = uv_utf16_to_wtf8(utf16_buffer, utf16_len, &buffer, &utf8_len);
++  err = uv_utf16_to_wtf8((const uint16_t*)utf16_buffer, utf16_len, &buffer, &utf8_len);
+   if (err == UV_ENOBUFS) {
+     utf8_len = *size_ptr - 1;
+     err = 0;
+@@ -152,7 +152,7 @@ static int uv__cwd(WCHAR** buf, DWORD *len) {
+       return uv_translate_sys_error(GetLastError());
+ 
+     /* |t| is the size of the buffer _including_ nul. */
+-    p = uv__malloc(t * sizeof(*p));
++    p = (WCHAR *)uv__malloc(t * sizeof(*p));
+     if (p == NULL)
+       return UV_ENOMEM;
+ 
+@@ -548,14 +548,14 @@ int uv_cpu_info(uv_cpu_info_t** cpu_infos_ptr, int* cpu_count_ptr) {
+   GetSystemInfo(&system_info);
+   cpu_count = system_info.dwNumberOfProcessors;
+ 
+-  cpu_infos = uv__calloc(cpu_count, sizeof *cpu_infos);
++  cpu_infos = (uv_cpu_info_t*)uv__calloc(cpu_count, sizeof *cpu_infos);
+   if (cpu_infos == NULL) {
+     err = ERROR_OUTOFMEMORY;
+     goto error;
+   }
+ 
+   sppi_size = cpu_count * sizeof(*sppi);
+-  sppi = uv__malloc(sppi_size);
++  sppi = (SYSTEM_PROCESSOR_PERFORMANCE_INFORMATION*)uv__malloc(sppi_size);
+   if (sppi == NULL) {
+     err = ERROR_OUTOFMEMORY;
+     goto error;
+@@ -699,7 +699,8 @@ int uv_interface_addresses(uv_interface_address_t** addresses_ptr,
+       case ERROR_BUFFER_OVERFLOW:
+         /* This happens when win_address_buf is NULL or too small to hold all
+          * adapters. */
+-        win_address_buf = uv__malloc(win_address_buf_size);
++        win_address_buf =
++            (IP_ADAPTER_ADDRESSES*)uv__malloc(win_address_buf_size);
+         if (win_address_buf == NULL)
+           return UV_ENOMEM;
+ 
+@@ -707,7 +708,7 @@ int uv_interface_addresses(uv_interface_address_t** addresses_ptr,
+ 
+       case ERROR_NO_DATA: {
+         /* No adapters were found. */
+-        uv_address_buf = uv__malloc(1);
++        uv_address_buf = (uv_interface_address_t*)uv__malloc(1);
+         if (uv_address_buf == NULL)
+           return UV_ENOMEM;
+ 
+@@ -758,7 +759,7 @@ int uv_interface_addresses(uv_interface_address_t** addresses_ptr,
+       continue;
+ 
+     /* Compute the size of the interface name. */
+-    name_size = uv_utf16_length_as_wtf8(adapter->FriendlyName, -1);
++    name_size = uv_utf16_length_as_wtf8((const uint16_t*)adapter->FriendlyName, -1);
+     uv_address_buf_size += name_size + 1;
+ 
+     /* Count the number of addresses associated with this interface, and
+@@ -773,7 +774,7 @@ int uv_interface_addresses(uv_interface_address_t** addresses_ptr,
+   }
+ 
+   /* Allocate space to store interface data plus adapter names. */
+-  uv_address_buf = uv__malloc(uv_address_buf_size);
++  uv_address_buf = (uv_interface_address_t*)uv__malloc(uv_address_buf_size);
+   if (uv_address_buf == NULL) {
+     uv__free(win_address_buf);
+     return UV_ENOMEM;
+@@ -982,7 +983,7 @@ int uv_os_tmpdir(char* buffer, size_t* size) {
+   }
+   /* Include space for terminating null char. */
+   len += 1;
+-  path = uv__malloc(len * sizeof(wchar_t));
++  path = (wchar_t*)uv__malloc(len * sizeof(wchar_t));
+   if (path == NULL) {
+     return UV_ENOMEM;
+   }
+@@ -1019,7 +1020,7 @@ int uv__convert_utf16_to_utf8(const WCHAR* utf16, size_t utf16len, char** utf8)
+     return UV_EINVAL;
+ 
+    *utf8 = NULL;
+-   return uv_utf16_to_wtf8(utf16, utf16len, utf8, &utf8_len);
++   return uv_utf16_to_wtf8((const uint16_t*)utf16, utf16len, utf8, &utf8_len);
+ }
+ 
+ 
+@@ -1039,13 +1040,13 @@ int uv__convert_utf8_to_utf16(const char* utf8, WCHAR** utf16) {
+     return UV__EINVAL;
+ 
+   /* Allocate the destination buffer. */
+-  *utf16 = uv__malloc(sizeof(WCHAR) * bufsize);
++  *utf16 = (WCHAR*)uv__malloc(sizeof(WCHAR) * bufsize);
+ 
+   if (*utf16 == NULL)
+     return UV_ENOMEM;
+ 
+   /* Convert to UTF-16 */
+-  uv_wtf8_to_utf16(utf8, *utf16, bufsize);
++  uv_wtf8_to_utf16(utf8, (uint16_t*)*utf16, bufsize);
+ 
+   return 0;
+ }
+@@ -1065,11 +1066,11 @@ int uv__copy_utf16_to_utf8(const WCHAR* utf16buffer, size_t utf16len, char* utf8
+     return UV_EINVAL;
+ 
+   if (*size == 0) {
+-    *size = uv_utf16_length_as_wtf8(utf16buffer, utf16len);
++    *size = uv_utf16_length_as_wtf8((const uint16_t*)utf16buffer, utf16len);
+     r = UV_ENOBUFS;
+   } else {
+     *size -= 1; /* Reserve space for NUL. */
+-    r = uv_utf16_to_wtf8(utf16buffer, utf16len, &utf8, size);
++    r = uv_utf16_to_wtf8((const uint16_t*)utf16buffer, utf16len, &utf8, size);
+   }
+   if (r == UV_ENOBUFS)
+     *size += 1; /* Add space for NUL. */
+@@ -1099,7 +1100,7 @@ static int uv__getpwuid_r(uv_passwd_t* pwd) {
+     return uv_translate_sys_error(r);
+   }
+ 
+-  path = uv__malloc(bufsize * sizeof(wchar_t));
++  path = (wchar_t*)uv__malloc(bufsize * sizeof(wchar_t));
+   if (path == NULL) {
+     CloseHandle(token);
+     return UV_ENOMEM;
+@@ -1180,7 +1181,7 @@ int uv_os_environ(uv_env_item_t** envitems, int* count) {
+ 
+   for (penv = env, i = 0; *penv != L'\0'; penv += wcslen(penv) + 1, i++);
+ 
+-  *envitems = uv__calloc(i, sizeof(**envitems));
++  *envitems = (uv_env_item_t*)uv__calloc(i, sizeof(**envitems));
+   if (*envitems == NULL) {
+     FreeEnvironmentStringsW(env);
+     return UV_ENOMEM;
+@@ -1269,7 +1270,7 @@ int uv_os_getenv(const char* name, char* buffer, size_t* size) {
+       uv__free(var);
+ 
+     varlen = 1 + len;
+-    var = uv__malloc(varlen * sizeof(*var));
++    var = (wchar_t*)uv__malloc(varlen * sizeof(*var));
+ 
+     if (var == NULL) {
+       r = UV_ENOMEM;

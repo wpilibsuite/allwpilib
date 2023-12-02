@@ -5,14 +5,11 @@
 #pragma once
 
 #include <wpi/SymbolExports.h>
+#include <wpi/json_fwd.h>
 
-#include "Rotation3d.h"
-#include "Translation2d.h"
+#include "frc/geometry/Rotation3d.h"
+#include "frc/geometry/Translation2d.h"
 #include "units/length.h"
-
-namespace wpi {
-class json;
-}  // namespace wpi
 
 namespace frc {
 
@@ -186,4 +183,6 @@ void from_json(const wpi::json& json, Translation3d& state);
 
 }  // namespace frc
 
-#include "Translation3d.inc"
+#include "frc/geometry/proto/Translation3dProto.h"
+#include "frc/geometry/struct/Translation3dStruct.h"
+#include "frc/geometry/Translation3d.inc"

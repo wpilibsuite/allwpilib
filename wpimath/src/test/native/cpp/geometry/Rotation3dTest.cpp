@@ -5,13 +5,48 @@
 #include <cmath>
 #include <numbers>
 
+#include <Eigen/Core>
+#include <gtest/gtest.h>
 #include <wpi/MathExtras.h>
 
-#include "frc/EigenCore.h"
 #include "frc/geometry/Rotation3d.h"
-#include "gtest/gtest.h"
 
 using namespace frc;
+
+TEST(Rotation3dTest, GimbalLockAccuracy) {
+  auto rot1 = Rotation3d{0_rad, 0_rad, units::radian_t{std::numbers::pi / 2}};
+  auto rot2 = Rotation3d{units::radian_t{std::numbers::pi}, 0_rad, 0_rad};
+  auto rot3 = Rotation3d{-units::radian_t{std::numbers::pi / 2}, 0_rad, 0_rad};
+  const auto result1 = rot1 + rot2 + rot3;
+  const auto expected1 =
+      Rotation3d{0_rad, -units::radian_t{std::numbers::pi / 2},
+                 units::radian_t{std::numbers::pi / 2}};
+  EXPECT_EQ(expected1, result1);
+  EXPECT_DOUBLE_EQ(std::numbers::pi / 2, (result1.X() + result1.Z()).value());
+  EXPECT_DOUBLE_EQ(-std::numbers::pi / 2, result1.Y().value());
+
+  rot1 = Rotation3d{0_rad, 0_rad, units::radian_t{std::numbers::pi / 2}};
+  rot2 = Rotation3d{units::radian_t{-std::numbers::pi}, 0_rad, 0_rad};
+  rot3 = Rotation3d{units::radian_t{std::numbers::pi / 2}, 0_rad, 0_rad};
+  const auto result2 = rot1 + rot2 + rot3;
+  const auto expected2 =
+      Rotation3d{0_rad, units::radian_t{std::numbers::pi / 2},
+                 units::radian_t{std::numbers::pi / 2}};
+  EXPECT_EQ(expected2, result2);
+  EXPECT_DOUBLE_EQ(std::numbers::pi / 2, (result2.Z() - result2.X()).value());
+  EXPECT_DOUBLE_EQ(std::numbers::pi / 2, result2.Y().value());
+
+  rot1 = Rotation3d{0_rad, 0_rad, units::radian_t{std::numbers::pi / 2}};
+  rot2 = Rotation3d{0_rad, units::radian_t{std::numbers::pi / 3}, 0_rad};
+  rot3 = Rotation3d{-units::radian_t{std::numbers::pi / 2}, 0_rad, 0_rad};
+  const auto result3 = rot1 + rot2 + rot3;
+  const auto expected3 =
+      Rotation3d{0_rad, units::radian_t{std::numbers::pi / 2},
+                 units::radian_t{std::numbers::pi / 6}};
+  EXPECT_EQ(expected3, result3);
+  EXPECT_DOUBLE_EQ(std::numbers::pi / 6, (result3.Z() - result3.X()).value());
+  EXPECT_DOUBLE_EQ(std::numbers::pi / 2, result3.Y().value());
+}
 
 TEST(Rotation3dTest, InitAxisAngleAndRollPitchYaw) {
   const Eigen::Vector3d xAxis{1.0, 0.0, 0.0};
@@ -38,25 +73,25 @@ TEST(Rotation3dTest, InitAxisAngleAndRollPitchYaw) {
 
 TEST(Rotation3dTest, InitRotationMatrix) {
   // No rotation
-  const Matrixd<3, 3> R1 = Matrixd<3, 3>::Identity();
+  const Eigen::Matrix3d R1 = Eigen::Matrix3d::Identity();
   const Rotation3d rot1{R1};
   EXPECT_EQ(Rotation3d{}, rot1);
 
   // 90 degree CCW rotation around z-axis
-  Matrixd<3, 3> R2;
-  R2.block<3, 1>(0, 0) = Vectord<3>{0.0, 1.0, 0.0};
-  R2.block<3, 1>(0, 1) = Vectord<3>{-1.0, 0.0, 0.0};
-  R2.block<3, 1>(0, 2) = Vectord<3>{0.0, 0.0, 1.0};
+  Eigen::Matrix3d R2;
+  R2.block<3, 1>(0, 0) = Eigen::Vector3d{0.0, 1.0, 0.0};
+  R2.block<3, 1>(0, 1) = Eigen::Vector3d{-1.0, 0.0, 0.0};
+  R2.block<3, 1>(0, 2) = Eigen::Vector3d{0.0, 0.0, 1.0};
   const Rotation3d rot2{R2};
   const Rotation3d expected2{0_deg, 0_deg, 90_deg};
   EXPECT_EQ(expected2, rot2);
 
   // Matrix that isn't orthogonal
-  const Matrixd<3, 3> R3{{1.0, 0.0, 0.0}, {1.0, 0.0, 0.0}, {1.0, 0.0, 0.0}};
+  const Eigen::Matrix3d R3{{1.0, 0.0, 0.0}, {1.0, 0.0, 0.0}, {1.0, 0.0, 0.0}};
   EXPECT_THROW(Rotation3d{R3}, std::domain_error);
 
   // Matrix that's orthogonal but not special orthogonal
-  const Matrixd<3, 3> R4 = Matrixd<3, 3>::Identity() * 2.0;
+  const Eigen::Matrix3d R4 = Eigen::Matrix3d::Identity() * 2.0;
   EXPECT_THROW(Rotation3d{R4}, std::domain_error);
 }
 

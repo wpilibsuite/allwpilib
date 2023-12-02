@@ -7,6 +7,10 @@
 #include <wpi/SymbolExports.h>
 
 #include "frc/geometry/Pose2d.h"
+#include "frc/kinematics/DifferentialDriveKinematics.h"
+#include "frc/kinematics/DifferentialDriveWheelPositions.h"
+#include "frc/kinematics/DifferentialDriveWheelSpeeds.h"
+#include "frc/kinematics/Odometry.h"
 #include "units/length.h"
 
 namespace frc {
@@ -22,7 +26,9 @@ namespace frc {
  * It is important that you reset your encoders to zero before using this class.
  * Any subsequent pose resets also require the encoders to be reset to zero.
  */
-class WPILIB_DLLEXPORT DifferentialDriveOdometry {
+class WPILIB_DLLEXPORT DifferentialDriveOdometry
+    : public Odometry<DifferentialDriveWheelSpeeds,
+                      DifferentialDriveWheelPositions> {
  public:
   /**
    * Constructs a DifferentialDriveOdometry object.
@@ -56,19 +62,12 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry {
    */
   void ResetPosition(const Rotation2d& gyroAngle, units::meter_t leftDistance,
                      units::meter_t rightDistance, const Pose2d& pose) {
-    m_pose = pose;
-    m_previousAngle = pose.Rotation();
-    m_gyroOffset = m_pose.Rotation() - gyroAngle;
-
-    m_prevLeftDistance = leftDistance;
-    m_prevRightDistance = rightDistance;
+    Odometry<DifferentialDriveWheelSpeeds,
+             DifferentialDriveWheelPositions>::ResetPosition(gyroAngle,
+                                                             {leftDistance,
+                                                              rightDistance},
+                                                             pose);
   }
-
-  /**
-   * Returns the position of the robot on the field.
-   * @return The pose of the robot.
-   */
-  const Pose2d& GetPose() const { return m_pose; }
 
   /**
    * Updates the robot position on the field using distance measurements from
@@ -82,15 +81,14 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry {
    * @return The new pose of the robot.
    */
   const Pose2d& Update(const Rotation2d& gyroAngle, units::meter_t leftDistance,
-                       units::meter_t rightDistance);
+                       units::meter_t rightDistance) {
+    return Odometry<DifferentialDriveWheelSpeeds,
+                    DifferentialDriveWheelPositions>::Update(gyroAngle,
+                                                             {leftDistance,
+                                                              rightDistance});
+  }
 
  private:
-  Pose2d m_pose;
-
-  Rotation2d m_gyroOffset;
-  Rotation2d m_previousAngle;
-
-  units::meter_t m_prevLeftDistance = 0_m;
-  units::meter_t m_prevRightDistance = 0_m;
+  DifferentialDriveKinematics m_kinematicsImpl{units::meter_t{1}};
 };
 }  // namespace frc

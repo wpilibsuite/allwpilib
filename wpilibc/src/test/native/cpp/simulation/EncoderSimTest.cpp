@@ -4,11 +4,12 @@
 
 #include "frc/simulation/EncoderSim.h"  // NOLINT(build/include_order)
 
+#include <gtest/gtest.h>
 #include <hal/HAL.h>
+#include <wpi/deprecated.h>
 
 #include "callback_helpers/TestCallbackHelpers.h"
 #include "frc/Encoder.h"
-#include "gtest/gtest.h"
 
 namespace frc::sim {
 

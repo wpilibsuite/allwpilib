@@ -1,6 +1,6 @@
 /*################################################################################
   ##
-  ##   Copyright (C) 2016-2022 Keith O'Hara
+  ##   Copyright (C) 2016-2023 Keith O'Hara
   ##
   ##   This file is part of the GCE-Math C++ library.
   ##
@@ -26,6 +26,9 @@
 
 #ifndef _gcem_hypot_HPP
 #define _gcem_hypot_HPP
+
+#include <cmath>
+#include <type_traits>
 
 namespace internal
 {
@@ -84,7 +87,11 @@ common_return_t<T1,T2>
 hypot(const T1 x, const T2 y)
 noexcept
 {
+  if (std::is_constant_evaluated()) {
     return internal::hypot_type_check(x,y);
+  } else {
+    return std::hypot(x, y);
+  }
 }
 
 #endif

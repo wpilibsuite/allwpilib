@@ -4,18 +4,18 @@
 
 #include "frc/simulation/ADXL345Sim.h"  // NOLINT(build/include_order)
 
+#include <gtest/gtest.h>
 #include <hal/HAL.h>
 
 #include "frc/ADXL345_I2C.h"
 #include "frc/ADXL345_SPI.h"
-#include "gtest/gtest.h"
 
 namespace frc::sim {
 
 TEST(ADXL345SimTest, SetSpiAttributes) {
   HAL_Initialize(500, 0);
 
-  ADXL345_SPI accel(SPI::kMXP, Accelerometer::kRange_2G);
+  ADXL345_SPI accel(SPI::kMXP, ADXL345_SPI::kRange_2G);
   ADXL345Sim sim(accel);
 
   EXPECT_EQ(0, accel.GetX());

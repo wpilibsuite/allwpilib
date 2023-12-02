@@ -14,5 +14,5 @@ bool shouldReverseIterate() {
 #endif
 }
 
-}
+} // namespace wpi
 #endif

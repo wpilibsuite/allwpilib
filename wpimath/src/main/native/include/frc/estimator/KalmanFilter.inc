@@ -4,16 +4,16 @@
 
 #pragma once
 
-#include <frc/fmt/Eigen.h>
-
 #include <cmath>
 #include <stdexcept>
 #include <string>
 
-#include "Eigen/Cholesky"
-#include "drake/math/discrete_algebraic_riccati_equation.h"
+#include <Eigen/Cholesky>
+
+#include "frc/DARE.h"
 #include "frc/StateSpaceUtil.h"
 #include "frc/estimator/KalmanFilter.h"
+#include "frc/fmt/Eigen.h"
 #include "frc/system/Discretization.h"
 #include "wpimath/MathShared.h"
 
@@ -26,14 +26,16 @@ KalmanFilter<States, Inputs, Outputs>::KalmanFilter(
     units::second_t dt) {
   m_plant = &plant;
 
-  auto contQ = MakeCovMatrix(stateStdDevs);
-  auto contR = MakeCovMatrix(measurementStdDevs);
+  m_contQ = MakeCovMatrix(stateStdDevs);
+  m_contR = MakeCovMatrix(measurementStdDevs);
+  m_dt = dt;
 
+  // Find discrete A and Q
   Matrixd<States, States> discA;
   Matrixd<States, States> discQ;
-  DiscretizeAQTaylor<States>(plant.A(), contQ, dt, &discA, &discQ);
+  DiscretizeAQ<States>(plant.A(), m_contQ, dt, &discA, &discQ);
 
-  auto discR = DiscretizeR<Outputs>(contR, dt);
+  Matrixd<Outputs, Outputs> discR = DiscretizeR<Outputs>(m_contR, dt);
 
   const auto& C = plant.C();
 
@@ -47,11 +49,38 @@ KalmanFilter<States, Inputs, Outputs>::KalmanFilter(
     throw std::invalid_argument(msg);
   }
 
-  Matrixd<States, States> P = drake::math::DiscreteAlgebraicRiccatiEquation(
-      discA.transpose(), C.transpose(), discQ, discR);
+  m_initP =
+      DARE<States, Outputs>(discA.transpose(), C.transpose(), discQ, discR);
 
-  // S = CPCᵀ + R
-  Matrixd<Outputs, Outputs> S = C * P * C.transpose() + discR;
+  Reset();
+}
+
+template <int States, int Inputs, int Outputs>
+void KalmanFilter<States, Inputs, Outputs>::Predict(const InputVector& u,
+                                                    units::second_t dt) {
+  // Find discrete A and Q
+  StateMatrix discA;
+  StateMatrix discQ;
+  DiscretizeAQ<States>(m_plant->A(), m_contQ, dt, &discA, &discQ);
+
+  m_xHat = m_plant->CalculateX(m_xHat, u, dt);
+
+  // Pₖ₊₁⁻ = APₖ⁻Aᵀ + Q
+  m_P = discA * m_P * discA.transpose() + discQ;
+
+  m_dt = dt;
+}
+
+template <int States, int Inputs, int Outputs>
+void KalmanFilter<States, Inputs, Outputs>::Correct(
+    const InputVector& u, const OutputVector& y,
+    const Matrixd<Outputs, Outputs>& R) {
+  const auto& C = m_plant->C();
+  const auto& D = m_plant->D();
+
+  const Matrixd<Outputs, Outputs> discR = DiscretizeR<Outputs>(R, m_dt);
+
+  Matrixd<Outputs, Outputs> S = C * m_P * C.transpose() + discR;
 
   // We want to put K = PCᵀS⁻¹ into Ax = b form so we can solve it more
   // efficiently.
@@ -65,22 +94,17 @@ KalmanFilter<States, Inputs, Outputs>::KalmanFilter(
   //
   // Kᵀ = Sᵀ.solve(CPᵀ)
   // K = (Sᵀ.solve(CPᵀ))ᵀ
-  m_K = S.transpose().ldlt().solve(C * P.transpose()).transpose();
+  Matrixd<States, Outputs> K =
+      S.transpose().ldlt().solve(C * m_P.transpose()).transpose();
 
-  Reset();
-}
-
-template <int States, int Inputs, int Outputs>
-void KalmanFilter<States, Inputs, Outputs>::Predict(const InputVector& u,
-                                                    units::second_t dt) {
-  m_xHat = m_plant->CalculateX(m_xHat, u, dt);
-}
-
-template <int States, int Inputs, int Outputs>
-void KalmanFilter<States, Inputs, Outputs>::Correct(const InputVector& u,
-                                                    const OutputVector& y) {
   // x̂ₖ₊₁⁺ = x̂ₖ₊₁⁻ + K(y − (Cx̂ₖ₊₁⁻ + Duₖ₊₁))
-  m_xHat += m_K * (y - (m_plant->C() * m_xHat + m_plant->D() * u));
+  m_xHat += K * (y - (C * m_xHat + D * u));
+
+  // Pₖ₊₁⁺ = (I−Kₖ₊₁C)Pₖ₊₁⁻(I−Kₖ₊₁C)ᵀ + Kₖ₊₁RKₖ₊₁ᵀ
+  // Use Joseph form for numerical stability
+  m_P = (StateMatrix::Identity() - K * C) * m_P *
+            (StateMatrix::Identity() - K * C).transpose() +
+        K * discR * K.transpose();
 }
 
 }  // namespace frc

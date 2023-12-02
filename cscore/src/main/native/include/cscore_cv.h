@@ -5,6 +5,8 @@
 #ifndef CSCORE_CSCORE_CV_H_
 #define CSCORE_CSCORE_CV_H_
 
+#include <functional>
+
 #include "cscore_c.h"
 
 #ifdef CSCORE_CSCORE_RAW_CV_H_
@@ -125,8 +127,10 @@ class CvSink : public ImageSink {
    * image.
    *
    * @param name Source name (arbitrary unique identifier)
+   * @param pixelFormat Source pixel format
    */
-  explicit CvSink(std::string_view name);
+  explicit CvSink(std::string_view name, VideoMode::PixelFormat pixelFormat =
+                                             VideoMode::PixelFormat::kBGR);
 
   /**
    * Create a sink for accepting OpenCV images in a separate thread.
@@ -139,9 +143,10 @@ class CvSink : public ImageSink {
    *        time=0 if an error occurred.  processFrame should call GetImage()
    *        or GetError() as needed, but should not call (except in very
    *        unusual circumstances) WaitForImage().
+   * @param pixelFormat Source pixel format
    */
-  CvSink(std::string_view name,
-         std::function<void(uint64_t time)> processFrame);
+  CvSink(std::string_view name, std::function<void(uint64_t time)> processFrame,
+         VideoMode::PixelFormat pixelFormat = VideoMode::PixelFormat::kBGR);
 
   /**
    * Wait for the next frame and get the image.
@@ -152,8 +157,8 @@ class CvSink : public ImageSink {
    *         message); the frame time is in the same time base as wpi::Now(),
    *         and is in 1 us increments.
    */
-  [[nodiscard]] uint64_t GrabFrame(cv::Mat& image,
-                                   double timeout = 0.225) const;
+  [[nodiscard]]
+  uint64_t GrabFrame(cv::Mat& image, double timeout = 0.225) const;
 
   /**
    * Wait for the next frame and get the image.  May block forever.
@@ -163,7 +168,8 @@ class CvSink : public ImageSink {
    *         message); the frame time is in the same time base as wpi::Now(),
    *         and is in 1 us increments.
    */
-  [[nodiscard]] uint64_t GrabFrameNoTimeout(cv::Mat& image) const;
+  [[nodiscard]]
+  uint64_t GrabFrameNoTimeout(cv::Mat& image) const;
 };
 
 inline CvSource::CvSource(std::string_view name, const VideoMode& mode) {
@@ -181,13 +187,15 @@ inline void CvSource::PutFrame(cv::Mat& image) {
   PutSourceFrame(m_handle, image, &m_status);
 }
 
-inline CvSink::CvSink(std::string_view name) {
-  m_handle = CreateCvSink(name, &m_status);
+inline CvSink::CvSink(std::string_view name,
+                      VideoMode::PixelFormat pixelFormat) {
+  m_handle = CreateCvSink(name, pixelFormat, &m_status);
 }
 
 inline CvSink::CvSink(std::string_view name,
-                      std::function<void(uint64_t time)> processFrame) {
-  m_handle = CreateCvSinkCallback(name, processFrame, &m_status);
+                      std::function<void(uint64_t time)> processFrame,
+                      VideoMode::PixelFormat pixelFormat) {
+  m_handle = CreateCvSinkCallback(name, pixelFormat, processFrame, &m_status);
 }
 
 inline uint64_t CvSink::GrabFrame(cv::Mat& image, double timeout) const {

@@ -1,6 +1,6 @@
 /*################################################################################
   ##
-  ##   Copyright (C) 2016-2022 Keith O'Hara
+  ##   Copyright (C) 2016-2023 Keith O'Hara
   ##
   ##   This file is part of the GCE-Math C++ library.
   ##
@@ -24,6 +24,9 @@
 
 #ifndef _gcem_cos_HPP
 #define _gcem_cos_HPP
+
+#include <cmath>
+#include <type_traits>
 
 namespace internal
 {
@@ -77,7 +80,11 @@ return_t<T>
 cos(const T x)
 noexcept
 {
+  if (std::is_constant_evaluated()) {
     return internal::cos_check( static_cast<return_t<T>>(x) );
+  } else {
+    return std::cos(x);
+  }
 }
 
 #endif

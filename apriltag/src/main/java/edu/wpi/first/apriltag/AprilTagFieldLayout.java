@@ -114,6 +114,26 @@ public class AprilTagFieldLayout {
   }
 
   /**
+   * Returns the length of the field the layout is representing in meters.
+   *
+   * @return length, in meters
+   */
+  @JsonIgnore
+  public double getFieldLength() {
+    return m_fieldDimensions.fieldLength;
+  }
+
+  /**
+   * Returns the length of the field the layout is representing in meters.
+   *
+   * @return width, in meters
+   */
+  @JsonIgnore
+  public double getFieldWidth() {
+    return m_fieldDimensions.fieldWidth;
+  }
+
+  /**
    * Sets the origin based on a predefined enumeration of coordinate frame origins. The origins are
    * calculated from the field dimensions.
    *
@@ -150,6 +170,16 @@ public class AprilTagFieldLayout {
   @JsonIgnore
   public void setOrigin(Pose3d origin) {
     m_origin = origin;
+  }
+
+  /**
+   * Returns the origin used for tag pose transformation.
+   *
+   * @return the origin
+   */
+  @JsonIgnore
+  public Pose3d getOrigin() {
+    return m_origin;
   }
 
   /**
@@ -220,11 +250,16 @@ public class AprilTagFieldLayout {
    */
   @Deprecated
   public static AprilTagFieldLayout loadFromResource(String resourcePath) {
-    try (InputStream stream = AprilTagFieldLayout.class.getResourceAsStream(resourcePath);
-        InputStreamReader reader = new InputStreamReader(stream)) {
+    InputStream stream = AprilTagFieldLayout.class.getResourceAsStream(resourcePath);
+    if (stream == null) {
+      // Class.getResourceAsStream() returns null if the resource does not exist.
+      throw new IOException("Could not locate resource: " + resourcePath);
+    }
+    InputStreamReader reader = new InputStreamReader(stream);
+    try {
       return new ObjectMapper().readerFor(AprilTagFieldLayout.class).readValue(reader);
     } catch (IOException e) {
-      throw new RuntimeException("AprilTagFi eldLayout failed to load from internal resource", e);
+      throw new IOException("Failed to load AprilTagFieldLayout: " + resourcePath);
     }
   }
 

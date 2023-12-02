@@ -60,7 +60,8 @@ class AddressableLEDSim {
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the CallbackStore object storing this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterInitializedCallback(
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterInitializedCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**
@@ -85,7 +86,8 @@ class AddressableLEDSim {
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterOutputPortCallback(
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterOutputPortCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**
@@ -110,8 +112,9 @@ class AddressableLEDSim {
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterLengthCallback(
-      NotifyCallback callback, bool initialNotify);
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterLengthCallback(NotifyCallback callback,
+                                                        bool initialNotify);
 
   /**
    * Get the length of the LED strip.
@@ -135,7 +138,8 @@ class AddressableLEDSim {
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterRunningCallback(
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterRunningCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**
@@ -160,7 +164,8 @@ class AddressableLEDSim {
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterDataCallback(
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterDataCallback(
       ConstBufferCallback callback, bool initialNotify);
 
   /**

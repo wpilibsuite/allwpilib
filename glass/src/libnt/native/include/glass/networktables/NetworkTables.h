@@ -18,6 +18,8 @@
 #include <ntcore_cpp.h>
 #include <wpi/DenseMap.h>
 #include <wpi/json.h>
+#include <wpi/protobuf/ProtobufMessageDatabase.h>
+#include <wpi/struct/DynamicStruct.h>
 
 #include "glass/Model.h"
 #include "glass/View.h"
@@ -31,7 +33,7 @@ class NetworkTablesModel : public Model {
   struct EntryValueTreeNode;
 
   struct ValueSource {
-    void UpdateFromValue(nt::Value&& v, std::string_view name,
+    void UpdateFromValue(NetworkTablesModel& model, std::string_view name,
                          std::string_view typeStr);
 
     /** The latest value. */
@@ -39,6 +41,9 @@ class NetworkTablesModel : public Model {
 
     /** String representation of the value (for arrays / complex values). */
     std::string valueStr;
+
+    /** Data type */
+    std::string typeStr;
 
     /** Data source (for numeric values). */
     std::unique_ptr<DataSource> source;
@@ -48,6 +53,15 @@ class NetworkTablesModel : public Model {
 
     /** Whether or not the children represent a map */
     bool valueChildrenMap = false;
+
+   private:
+    void UpdateDiscreteSource(std::string_view name, double value, int64_t time,
+                              bool digital = false);
+
+    template <typename T, typename MakeValue>
+    void UpdateDiscreteArray(std::string_view name, std::span<const T> arr,
+                             int64_t time, MakeValue makeValue,
+                             bool digital = false);
   };
 
   struct EntryValueTreeNode : public ValueSource {
@@ -63,6 +77,10 @@ class NetworkTablesModel : public Model {
     Entry(const Entry&) = delete;
     Entry& operator=(const Entry&) = delete;
     ~Entry();
+
+    void UpdateFromValue(NetworkTablesModel& model) {
+      ValueSource::UpdateFromValue(model, info.name, info.type_str);
+    }
 
     void UpdateTopic(nt::Event&& event) {
       if (std::holds_alternative<nt::TopicInfo>(event.data)) {
@@ -149,6 +167,9 @@ class NetworkTablesModel : public Model {
   Entry* GetEntry(std::string_view name);
   Entry* AddEntry(NT_Topic topic);
 
+  wpi::StructDescriptorDatabase& GetStructDatabase() { return m_structDb; }
+  wpi::ProtobufMessageDatabase& GetProtobufDatabase() { return m_protoDb; }
+
  private:
   void RebuildTree();
   void RebuildTreeImpl(std::vector<TreeNode>* tree, int category);
@@ -168,6 +189,9 @@ class NetworkTablesModel : public Model {
 
   std::map<std::string, Client, std::less<>> m_clients;
   Client m_server;
+
+  wpi::StructDescriptorDatabase m_structDb;
+  wpi::ProtobufMessageDatabase m_protoDb;
 };
 
 using NetworkTablesFlags = int;

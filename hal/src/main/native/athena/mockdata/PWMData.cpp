@@ -13,7 +13,7 @@ void HALSIM_ResetPWMData(int32_t index) {}
   HAL_SIMDATAVALUE_STUB_CAPI(TYPE, HALSIM, PWM##CAPINAME, RETURN)
 
 DEFINE_CAPI(HAL_Bool, Initialized, false)
-DEFINE_CAPI(int32_t, RawValue, 0)
+DEFINE_CAPI(int32_t, PulseMicrosecond, 0)
 DEFINE_CAPI(double, Speed, 0)
 DEFINE_CAPI(double, Position, 0)
 DEFINE_CAPI(int32_t, PeriodScale, 0)

@@ -5,11 +5,10 @@
 #pragma once
 
 #include <functional>
-#include <initializer_list>
-#include <span>
 
 #include "frc2/command/CommandHelper.h"
 #include "frc2/command/FunctionalCommand.h"
+#include "frc2/command/Requirements.h"
 
 namespace frc2 {
 /**
@@ -33,18 +32,7 @@ class StartEndCommand
    * @param requirements the subsystems required by this command
    */
   StartEndCommand(std::function<void()> onInit, std::function<void()> onEnd,
-                  std::initializer_list<Subsystem*> requirements);
-
-  /**
-   * Creates a new StartEndCommand.  Will run the given runnables when the
-   * command starts and when it ends.
-   *
-   * @param onInit       the Runnable to run on command init
-   * @param onEnd        the Runnable to run on command end
-   * @param requirements the subsystems required by this command
-   */
-  StartEndCommand(std::function<void()> onInit, std::function<void()> onEnd,
-                  std::span<Subsystem* const> requirements = {});
+                  Requirements requirements = {});
 
   StartEndCommand(StartEndCommand&& other) = default;
 

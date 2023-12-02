@@ -13,13 +13,18 @@
 ReplaceMeTrapezoidProfileCommand::ReplaceMeTrapezoidProfileCommand()
     : CommandHelper
       // The profile to execute
-      (frc::TrapezoidProfile<units::meters>(
-           // The maximum velocity and acceleration of the profile
-           {5_mps, 5_mps_sq},
-           // The goal state of the profile
-           {10_m, 0_mps},
-           // The initial state of the profile
-           {0_m, 0_mps}),
-       [](frc::TrapezoidProfile<units::meters>::State state) {
-         // Use the computed intermediate trajectory state here
-       }) {}
+      (
+          frc::TrapezoidProfile<units::meters>(
+              // The maximum velocity and acceleration of the profile
+              {5_mps, 5_mps_sq}),
+          [](frc::TrapezoidProfile<units::meters>::State state) {
+            // Use the computed intermediate trajectory state here
+          },
+          // The goal state of the profile
+          [] {
+            return frc::TrapezoidProfile<units::meters>::State{10_m, 0_mps};
+          },
+          // The initial state of the profile
+          [] {
+            return frc::TrapezoidProfile<units::meters>::State{0_m, 0_mps};
+          }) {}

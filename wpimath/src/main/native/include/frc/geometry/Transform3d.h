@@ -6,14 +6,14 @@
 
 #include <wpi/SymbolExports.h>
 
-#include "Translation3d.h"
+#include "frc/geometry/Translation3d.h"
 
 namespace frc {
 
 class WPILIB_DLLEXPORT Pose3d;
 
 /**
- * Represents a transformation for a Pose3d.
+ * Represents a transformation for a Pose3d in the pose's frame.
  */
 class WPILIB_DLLEXPORT Transform3d {
  public:
@@ -32,6 +32,18 @@ class WPILIB_DLLEXPORT Transform3d {
    * @param rotation Rotational component of the transform.
    */
   Transform3d(Translation3d translation, Rotation3d rotation);
+
+  /**
+   * Constructs a transform with x, y, and z translations instead of a separate
+   * Translation3d.
+   *
+   * @param x The x component of the translational component of the transform.
+   * @param y The y component of the translational component of the transform.
+   * @param z The z component of the translational component of the transform.
+   * @param rotation The rotational component of the transform.
+   */
+  Transform3d(units::meter_t x, units::meter_t y, units::meter_t z,
+              Rotation3d rotation);
 
   /**
    * Constructs the identity transform -- maps an initial pose to itself.
@@ -99,7 +111,8 @@ class WPILIB_DLLEXPORT Transform3d {
   Transform3d operator/(double scalar) const { return *this * (1.0 / scalar); }
 
   /**
-   * Composes two transformations.
+   * Composes two transformations. The second transform is applied relative to
+   * the orientation of the first.
    *
    * @param other The transform to compose with this one.
    * @return The composition of the two transformations.
@@ -116,3 +129,6 @@ class WPILIB_DLLEXPORT Transform3d {
   Rotation3d m_rotation;
 };
 }  // namespace frc
+
+#include "frc/geometry/proto/Transform3dProto.h"
+#include "frc/geometry/struct/Transform3dStruct.h"

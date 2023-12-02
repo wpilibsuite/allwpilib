@@ -34,8 +34,16 @@ model {
                             description("Creates a macOS application bundle for DataLogTool")
                             from(file("$project.projectDir/Info.plist"))
                             into(file("$project.buildDir/outputs/bundles/$binary.targetPlatform.architecture.name/DataLogTool.app/Contents"))
-                            into("MacOS") { with copySpec { from binary.executable.file } }
-                            into("Resources") { with copySpec { from icon } }
+                            into("MacOS") {
+                                with copySpec {
+                                    from binary.executable.file
+                                }
+                            }
+                            into("Resources") {
+                                with copySpec {
+                                    from icon
+                                }
+                            }
 
                             inputs.property "HasDeveloperId", project.hasProperty("developerID")
 
@@ -71,7 +79,7 @@ model {
 
                             archiveBaseName = '_M_' + zipBaseName
                             duplicatesStrategy = 'exclude'
-                            classifier = nativeUtils.getPublishClassifier(binary)
+                            archiveClassifier = nativeUtils.getPublishClassifier(binary)
 
                             from(licenseFile) {
                                 into '/'

@@ -4,6 +4,7 @@
 
 #include <exception>
 
+#include <gtest/gtest.h>
 #include <hal/HAL.h>
 
 #include "frc/simulation/AddressableLEDSim.h"
@@ -23,7 +24,6 @@
 #include "frc/simulation/RelaySim.h"
 #include "frc/simulation/RoboRioSim.h"
 #include "frc/simulation/SPIAccelerometerSim.h"
-#include "gtest/gtest.h"
 
 using namespace frc::sim;
 

@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj.simulation;
 
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
@@ -23,7 +24,9 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
   /**
    * Creates a simulated DC motor mechanism.
    *
-   * @param plant The linear system that represents the DC motor.
+   * @param plant The linear system representing the DC motor. This system can be created with
+   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createDCMotorSystem(DCMotor, double,
+   *     double)}.
    * @param gearbox The type of and number of motors in the DC motor gearbox.
    * @param gearing The gearing of the DC motor (numbers greater than 1 represent reductions).
    */
@@ -36,7 +39,7 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
   /**
    * Creates a simulated DC motor mechanism.
    *
-   * @param plant The linear system that represents the DC motor.
+   * @param plant The linear system representing the DC motor. This system can be created with
    * @param gearbox The type of and number of motors in the DC motor gearbox.
    * @param gearing The gearing of the DC motor (numbers greater than 1 represent reductions).
    * @param measurementStdDevs The standard deviations of the measurements.
@@ -80,6 +83,16 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
         LinearSystemId.createDCMotorSystem(gearbox, jKgMetersSquared, gearing), measurementStdDevs);
     m_gearbox = gearbox;
     m_gearing = gearing;
+  }
+
+  /**
+   * Sets the state of the DC motor.
+   *
+   * @param angularPositionRad The new position in radians.
+   * @param angularVelocityRadPerSec The new velocity in radians per second.
+   */
+  public void setState(double angularPositionRad, double angularVelocityRadPerSec) {
+    setState(VecBuilder.fill(angularPositionRad, angularVelocityRadPerSec));
   }
 
   /**

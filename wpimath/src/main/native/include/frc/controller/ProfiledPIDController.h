@@ -58,7 +58,9 @@ class ProfiledPIDController
    */
   ProfiledPIDController(double Kp, double Ki, double Kd,
                         Constraints constraints, units::second_t period = 20_ms)
-      : m_controller(Kp, Ki, Kd, period), m_constraints(constraints) {
+      : m_controller{Kp, Ki, Kd, period},
+        m_constraints{constraints},
+        m_profile{m_constraints} {
     int instances = detail::IncrementAndGetProfiledPIDControllerInstances();
     wpi::math::MathSharedStore::ReportUsage(
         wpi::math::MathUsageId::kController_ProfiledPIDController, instances);
@@ -107,6 +109,18 @@ class ProfiledPIDController
   void SetD(double Kd) { m_controller.SetD(Kd); }
 
   /**
+   * Sets the IZone range. When the absolute value of the position error is
+   * greater than IZone, the total accumulated error will reset to zero,
+   * disabling integral gain until the absolute value of the position error is
+   * less than IZone. This is used to prevent integral windup. Must be
+   * non-negative. Passing a value of zero will effectively disable integral
+   * gain. Passing a value of infinity disables IZone functionality.
+   *
+   * @param iZone Maximum magnitude of error to allow integral control.
+   */
+  void SetIZone(double iZone) { m_controller.SetIZone(iZone); }
+
+  /**
    * Gets the proportional coefficient.
    *
    * @return proportional coefficient
@@ -126,6 +140,13 @@ class ProfiledPIDController
    * @return differential coefficient
    */
   double GetD() const { return m_controller.GetD(); }
+
+  /**
+   * Get the IZone range.
+   *
+   * @return Maximum magnitude of error to allow integral control.
+   */
+  double GetIZone() const { return m_controller.GetIZone(); }
 
   /**
    * Gets the period of this controller.
@@ -183,7 +204,16 @@ class ProfiledPIDController
    *
    * @param constraints Velocity and acceleration constraints for goal.
    */
-  void SetConstraints(Constraints constraints) { m_constraints = constraints; }
+  void SetConstraints(Constraints constraints) {
+    m_constraints = constraints;
+    m_profile = TrapezoidProfile<Distance>{m_constraints};
+  }
+
+  /**
+   * Get the velocity and acceleration constraints for this controller.
+   * @return Velocity and acceleration constraints.
+   */
+  Constraints GetConstraints() { return m_constraints; }
 
   /**
    * Returns the current setpoint of the ProfiledPIDController.
@@ -292,8 +322,7 @@ class ProfiledPIDController
       m_setpoint.position = setpointMinDistance + measurement;
     }
 
-    frc::TrapezoidProfile<Distance> profile{m_constraints, m_goal, m_setpoint};
-    m_setpoint = profile.Calculate(GetPeriod());
+    m_setpoint = m_profile.Calculate(GetPeriod(), m_setpoint, m_goal);
     return m_controller.Calculate(measurement.value(),
                                   m_setpoint.position.value());
   }
@@ -372,17 +401,22 @@ class ProfiledPIDController
     builder.AddDoubleProperty(
         "d", [this] { return GetD(); }, [this](double value) { SetD(value); });
     builder.AddDoubleProperty(
+        "izone", [this] { return GetIZone(); },
+        [this](double value) { SetIZone(value); });
+    builder.AddDoubleProperty(
         "goal", [this] { return GetGoal().position.value(); },
         [this](double value) { SetGoal(Distance_t{value}); });
   }
 
  private:
-  frc2::PIDController m_controller;
+  PIDController m_controller;
   Distance_t m_minimumInput{0};
   Distance_t m_maximumInput{0};
+
+  typename frc::TrapezoidProfile<Distance>::Constraints m_constraints;
+  TrapezoidProfile<Distance> m_profile;
   typename frc::TrapezoidProfile<Distance>::State m_goal;
   typename frc::TrapezoidProfile<Distance>::State m_setpoint;
-  typename frc::TrapezoidProfile<Distance>::Constraints m_constraints;
 };
 
 }  // namespace frc

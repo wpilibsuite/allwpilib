@@ -34,10 +34,6 @@ Compressor::~Compressor() {
   }
 }
 
-bool Compressor::Enabled() const {
-  return IsEnabled();
-}
-
 bool Compressor::IsEnabled() const {
   return m_module->GetCompressor();
 }

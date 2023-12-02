@@ -4,11 +4,17 @@
 
 package edu.wpi.first.math.geometry;
 
+import static edu.wpi.first.units.Units.Meters;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import edu.wpi.first.math.geometry.proto.Pose2dProto;
+import edu.wpi.first.math.geometry.struct.Pose2dStruct;
 import edu.wpi.first.math.interpolation.Interpolatable;
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.Measure;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -51,6 +57,18 @@ public class Pose2d implements Interpolatable<Pose2d> {
   public Pose2d(double x, double y, Rotation2d rotation) {
     m_translation = new Translation2d(x, y);
     m_rotation = rotation;
+  }
+
+  /**
+   * Constructs a pose with x and y translations instead of a separate Translation2d. The X and Y
+   * translations will be converted to and tracked as meters.
+   *
+   * @param x The x component of the translational component of the pose.
+   * @param y The y component of the translational component of the pose.
+   * @param rotation The rotational component of the pose.
+   */
+  public Pose2d(Measure<Distance> x, Measure<Distance> y, Rotation2d rotation) {
+    this(x.in(Meters), y.in(Meters), rotation);
   }
 
   /**
@@ -136,6 +154,16 @@ public class Pose2d implements Interpolatable<Pose2d> {
    */
   public Pose2d div(double scalar) {
     return times(1.0 / scalar);
+  }
+
+  /**
+   * Rotates the pose around the origin and returns the new pose.
+   *
+   * @param other The rotation to transform the pose by.
+   * @return The transformed pose.
+   */
+  public Pose2d rotateBy(Rotation2d other) {
+    return new Pose2d(m_translation.rotateBy(other), m_rotation.rotateBy(other));
   }
 
   /**
@@ -295,4 +323,7 @@ public class Pose2d implements Interpolatable<Pose2d> {
       return this.exp(scaledTwist);
     }
   }
+
+  public static final Pose2dStruct struct = new Pose2dStruct();
+  public static final Pose2dProto proto = new Pose2dProto();
 }

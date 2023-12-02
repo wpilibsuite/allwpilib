@@ -4,10 +4,9 @@
 
 #include "wpinet/WorkerThread.h"  // NOLINT(build/include_order)
 
-#include "gtest/gtest.h"  // NOLINT(build/include_order)
-
 #include <thread>
 
+#include <gtest/gtest.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
 

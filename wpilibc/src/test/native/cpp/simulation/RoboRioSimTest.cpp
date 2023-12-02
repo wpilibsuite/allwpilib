@@ -4,12 +4,12 @@
 
 #include "frc/simulation/RoboRioSim.h"  // NOLINT(build/include_order)
 
+#include <gtest/gtest.h>
 #include <hal/HAL.h>
 #include <hal/HALBase.h>
 
 #include "callback_helpers/TestCallbackHelpers.h"
 #include "frc/RobotController.h"
-#include "gtest/gtest.h"
 
 namespace frc::sim {
 
@@ -205,6 +205,36 @@ TEST(RoboRioSimTest, Set3V3) {
   EXPECT_EQ(kTestFaults, faultCallback.GetLastValue());
   EXPECT_EQ(kTestFaults, RoboRioSim::GetUserFaults3V3());
   EXPECT_EQ(kTestFaults, RobotController::GetFaultCount3V3());
+}
+
+TEST(RoboRioSimTest, SetCPUTemp) {
+  RoboRioSim::ResetData();
+
+  DoubleCallback callback;
+  auto cbHandle =
+      RoboRioSim::RegisterCPUTempCallback(callback.GetCallback(), false);
+  constexpr double kCPUTemp = 100.0;
+
+  RoboRioSim::SetCPUTemp(units::celsius_t{kCPUTemp});
+  EXPECT_TRUE(callback.WasTriggered());
+  EXPECT_EQ(kCPUTemp, callback.GetLastValue());
+  EXPECT_EQ(kCPUTemp, RoboRioSim::GetCPUTemp().value());
+  EXPECT_EQ(kCPUTemp, RobotController::GetCPUTemp().value());
+}
+
+TEST(RoboRioSimTest, SetTeamNumber) {
+  RoboRioSim::ResetData();
+
+  IntCallback callback;
+  auto cbHandle =
+      RoboRioSim::RegisterTeamNumberCallback(callback.GetCallback(), false);
+  constexpr int kTeamNumber = 9999;
+
+  RoboRioSim::SetTeamNumber(kTeamNumber);
+  EXPECT_TRUE(callback.WasTriggered());
+  EXPECT_EQ(kTeamNumber, callback.GetLastValue());
+  EXPECT_EQ(kTeamNumber, RoboRioSim::GetTeamNumber());
+  EXPECT_EQ(kTeamNumber, RobotController::GetTeamNumber());
 }
 
 TEST(RoboRioSimTest, SetSerialNumber) {

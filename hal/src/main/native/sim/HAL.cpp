@@ -288,6 +288,10 @@ size_t HAL_GetComments(char* buffer, size_t size) {
   return HALSIM_GetRoboRioComments(buffer, size);
 }
 
+int32_t HAL_GetTeamNumber(void) {
+  return HALSIM_GetRoboRioTeamNumber();
+}
+
 uint64_t HAL_GetFPGATime(int32_t* status) {
   return hal::GetFPGATime();
 }
@@ -326,6 +330,14 @@ HAL_Bool HAL_GetSystemActive(int32_t* status) {
 
 HAL_Bool HAL_GetBrownedOut(int32_t* status) {
   return false;  // Figure out if we need to detect a brownout condition
+}
+
+HAL_Bool HAL_GetRSLState(int32_t* status) {
+  return false;
+}
+
+HAL_Bool HAL_GetSystemTimeValid(int32_t* status) {
+  return true;
 }
 
 HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {

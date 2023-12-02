@@ -11,10 +11,10 @@
 #include <stdexcept>
 #include <vector>
 
+#include <Eigen/QR>
 #include <wpi/array.h>
 #include <wpi/circular_buffer.h>
 
-#include "Eigen/QR"
 #include "frc/EigenCore.h"
 #include "units/time.h"
 #include "wpimath/MathShared.h"
@@ -95,7 +95,7 @@ class LinearFilter {
     static int instances = 0;
     instances++;
     wpi::math::MathSharedStore::ReportUsage(
-        wpi::math::MathUsageId::kFilter_Linear, 1);
+        wpi::math::MathUsageId::kFilter_Linear, instances);
   }
 
   /**

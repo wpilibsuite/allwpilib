@@ -5,6 +5,7 @@
 #ifndef CSCORE_CSCORE_OO_H_
 #define CSCORE_CSCORE_OO_H_
 
+#include <functional>
 #include <initializer_list>
 #include <span>
 #include <string>

@@ -22,6 +22,7 @@ includeOtherLibs {
   ^GLFW
   ^fmt/
   ^imgui
+  ^libssh/
   ^ntcore
   ^wpi/
   ^wpigui

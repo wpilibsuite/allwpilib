@@ -4,12 +4,33 @@
 
 #include <cmath>
 
+#include <gtest/gtest.h>
 #include <wpi/array.h>
 
 #include "frc/geometry/Pose3d.h"
-#include "gtest/gtest.h"
 
 using namespace frc;
+
+TEST(Pose3dTest, RotateBy) {
+  constexpr auto x = 1_m;
+  constexpr auto y = 2_m;
+  const Pose3d initial{x, y, 0_m, Rotation3d{0_deg, 0_deg, 45_deg}};
+
+  constexpr units::radian_t yaw = 5_deg;
+  const Rotation3d rotation{0_deg, 0_deg, yaw};
+  const auto rotated = initial.RotateBy(rotation);
+
+  // Translation is rotated by CCW rotation matrix
+  double c = std::cos(yaw.value());
+  double s = std::sin(yaw.value());
+  EXPECT_DOUBLE_EQ(c * x.value() - s * y.value(), rotated.X().value());
+  EXPECT_DOUBLE_EQ(s * x.value() + c * y.value(), rotated.Y().value());
+  EXPECT_DOUBLE_EQ(0.0, rotated.Z().value());
+  EXPECT_DOUBLE_EQ(0.0, rotated.Rotation().X().value());
+  EXPECT_DOUBLE_EQ(0.0, rotated.Rotation().Y().value());
+  EXPECT_DOUBLE_EQ(initial.Rotation().Z().value() + rotation.Z().value(),
+                   rotated.Rotation().Z().value());
+}
 
 TEST(Pose3dTest, TestTransformByRotations) {
   const double kEpsilon = 1E-9;

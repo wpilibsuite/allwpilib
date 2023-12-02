@@ -4,12 +4,11 @@
 
 #pragma once
 
-#include <libssh/libssh.h>
-
 #include <stdexcept>
 #include <string>
 #include <string_view>
 
+#include <libssh/libssh.h>
 #include <wpi/Logger.h>
 
 namespace sysid {

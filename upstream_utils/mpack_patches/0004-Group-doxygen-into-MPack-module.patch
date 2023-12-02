@@ -1,0 +1,133 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Ryan Blue <ryanzblue@gmail.com>
+Date: Thu, 8 Jun 2023 19:28:50 -0400
+Subject: [PATCH 4/4] Group doxygen into MPack module
+
+---
+ src/mpack/mpack-common.h   | 3 ++-
+ src/mpack/mpack-expect.h   | 3 ++-
+ src/mpack/mpack-node.h     | 3 ++-
+ src/mpack/mpack-platform.h | 3 ++-
+ src/mpack/mpack-reader.h   | 3 ++-
+ src/mpack/mpack-writer.h   | 3 ++-
+ src/mpack/mpack.h          | 6 ++++++
+ tools/amalgamate.sh        | 5 +++++
+ 8 files changed, 23 insertions(+), 6 deletions(-)
+
+diff --git a/src/mpack/mpack-common.h b/src/mpack/mpack-common.h
+index 1c6b8d472f9591575973db8f7573ce98c5a6169d..14f7dd05c0f9cdc3689bb357f8aac9c8d0671f45 100644
+--- a/src/mpack/mpack-common.h
++++ b/src/mpack/mpack-common.h
+@@ -40,7 +40,8 @@ MPACK_EXTERN_C_BEGIN
+ 
+ 
+ /**
+- * @defgroup common Tags and Common Elements
++ * @defgroup mpack_common Tags and Common Elements
++ * @ingroup mpack
+  *
+  * Contains types, constants and functions shared by both the encoding
+  * and decoding portions of MPack.
+diff --git a/src/mpack/mpack-expect.h b/src/mpack/mpack-expect.h
+index 02a1abc0cbe0250636d4a82c21517fba36484608..e62536e46bcab4fdf6bca1d3ea74ee5d9e8e7bd8 100644
+--- a/src/mpack/mpack-expect.h
++++ b/src/mpack/mpack-expect.h
+@@ -40,7 +40,8 @@ MPACK_EXTERN_C_BEGIN
+ #endif
+ 
+ /**
+- * @defgroup expect Expect API
++ * @defgroup mpack_expect Expect API
++ * @ingroup mpack
+  *
+  * The MPack Expect API allows you to easily read MessagePack data when you
+  * expect it to follow a predefined schema.
+diff --git a/src/mpack/mpack-node.h b/src/mpack/mpack-node.h
+index 52142c4f9965c690e4227a6f89354e1e65b9b6a4..4c1289c834398a20f0c25f86e17e57a31832d623 100644
+--- a/src/mpack/mpack-node.h
++++ b/src/mpack/mpack-node.h
+@@ -36,7 +36,8 @@ MPACK_EXTERN_C_BEGIN
+ #if MPACK_NODE
+ 
+ /**
+- * @defgroup node Node API
++ * @defgroup mpack_node Node API
++ * @ingroup mpack
+  *
+  * The MPack Node API allows you to parse a chunk of MessagePack into a
+  * dynamically typed data structure, providing random access to the parsed
+diff --git a/src/mpack/mpack-platform.h b/src/mpack/mpack-platform.h
+index 27a2f9eeb10cc8c6aa274a5e1b0c96bead6a37fb..3a100564c11d12494cd0f607645c8cfa5dd86dec 100644
+--- a/src/mpack/mpack-platform.h
++++ b/src/mpack/mpack-platform.h
+@@ -40,7 +40,8 @@
+ 
+ 
+ /**
+- * @defgroup config Configuration Options
++ * @defgroup mpack_config Configuration Options
++ * @ingroup mpack
+  *
+  * Defines the MPack configuration options.
+  *
+diff --git a/src/mpack/mpack-reader.h b/src/mpack/mpack-reader.h
+index 092e2ba2c36f8709b912d24b4d12974e81c82678..f981683512a60c0c2b5363b7f27cbd874c1b44f8 100644
+--- a/src/mpack/mpack-reader.h
++++ b/src/mpack/mpack-reader.h
+@@ -44,7 +44,8 @@ struct mpack_track_t;
+ #define MPACK_READER_SMALL_FRACTION_DENOMINATOR 32
+ 
+ /**
+- * @defgroup reader Reader API
++ * @defgroup mpack_reader Reader API
++ * @ingroup mpack
+  *
+  * The MPack Reader API contains functions for imperatively reading dynamically
+  * typed data from a MessagePack stream.
+diff --git a/src/mpack/mpack-writer.h b/src/mpack/mpack-writer.h
+index abeee1a6eb960b0ce61203ae75eb7c7488186860..03fdb7592b0bcaeeeaaf2f8c64c0fb30ba5e1292 100644
+--- a/src/mpack/mpack-writer.h
++++ b/src/mpack/mpack-writer.h
+@@ -40,7 +40,8 @@ struct mpack_track_t;
+ #endif
+ 
+ /**
+- * @defgroup writer Write API
++ * @defgroup mpack_writer Write API
++ * @ingroup mpack
+  *
+  * The MPack Write API encodes structured data of a fixed (hardcoded) schema to MessagePack.
+  *
+diff --git a/src/mpack/mpack.h b/src/mpack/mpack.h
+index 129a276115d85e09d717504df3736a7614fbd2ea..9739205efd0406a1bd05c728556c8f36368b1528 100644
+--- a/src/mpack/mpack.h
++++ b/src/mpack/mpack.h
+@@ -29,6 +29,12 @@
+ #ifndef MPACK_H
+ #define MPACK_H 1
+ 
++/**
++ * @defgroup mpack MPack
++ * MPack is a C implementation of an encoder and decoder for the MessagePack
++ * serialization format.
++ */
++
+ #include "mpack-common.h"
+ #include "mpack-writer.h"
+ #include "mpack-reader.h"
+diff --git a/tools/amalgamate.sh b/tools/amalgamate.sh
+index 4dfe999ee49ee67fd394e948b0bb3133d6acdbdc..ebff08200198406940720efe093df909a31caf65 100755
+--- a/tools/amalgamate.sh
++++ b/tools/amalgamate.sh
+@@ -66,6 +66,11 @@ echo -e "#define MPACK_AMALGAMATED 1\n" >> $HEADER
+ echo -e "#if defined(MPACK_HAS_CONFIG) && MPACK_HAS_CONFIG" >> $HEADER
+ echo -e "#include \"mpack-config.h\"" >> $HEADER
+ echo -e "#endif\n" >> $HEADER
++echo -e "/**" >> $HEADER
++echo -e " * @defgroup mpack MPack" >> $HEADER
++echo -e " * MPack is a C implementation of an encoder and decoder for the MessagePack" >> $HEADER
++echo -e " * serialization format." >> $HEADER
++echo -e " */" >> $HEADER
+ for f in $HEADERS; do
+     echo -e "\n/* $f.h */" >> $HEADER
+     sed -e 's@^#include ".*@/* & */@' -e '0,/^ \*\/$/d' src/$f >> $HEADER

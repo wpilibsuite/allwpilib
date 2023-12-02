@@ -6,6 +6,7 @@ package edu.wpi.first.math.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
@@ -35,13 +36,12 @@ class ControlAffinePlantInversionFeedforwardTest {
   }
 
   protected Matrix<N2, N1> getDynamics(Matrix<N2, N1> x, Matrix<N1, N1> u) {
-    return Matrix.mat(Nat.N2(), Nat.N2())
-        .fill(1.000, 0, 0, 1.000)
+    return MatBuilder.fill(Nat.N2(), Nat.N2(), 1.000, 0, 0, 1.000)
         .times(x)
         .plus(VecBuilder.fill(0, 1).times(u));
   }
 
   protected Matrix<N2, N1> getStateDynamics(Matrix<N2, N1> x) {
-    return Matrix.mat(Nat.N2(), Nat.N2()).fill(1.000, 0, 0, 1.000).times(x);
+    return MatBuilder.fill(Nat.N2(), Nat.N2(), 1.000, 0, 0, 1.000).times(x);
   }
 }

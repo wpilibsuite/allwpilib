@@ -9,6 +9,8 @@
 #error "Cannot include both cscore_cv.h and cscore_raw_cv.h in the same file"
 #endif
 
+#include <functional>
+
 #include <opencv2/core/mat.hpp>
 
 #include "cscore_raw.h"
@@ -60,7 +62,7 @@ class RawCvSource : public RawSource {
   void PutFrame(cv::Mat& image);
 
  private:
-  RawFrame rawFrame;
+  wpi::RawFrame rawFrame;
 };
 
 /**
@@ -111,7 +113,8 @@ class RawCvSink : public RawSink {
    *         message); the frame time is in the same time base as wpi::Now(),
    *         and is in 1 us increments.
    */
-  [[nodiscard]] uint64_t GrabFrame(cv::Mat& image, double timeout = 0.225);
+  [[nodiscard]]
+  uint64_t GrabFrame(cv::Mat& image, double timeout = 0.225);
 
   /**
    * Wait for the next frame and get the image.  May block forever.
@@ -121,7 +124,8 @@ class RawCvSink : public RawSink {
    *         message); the frame time is in the same time base as wpi::Now(),
    *         and is in 1 us increments.
    */
-  [[nodiscard]] uint64_t GrabFrameNoTimeout(cv::Mat& image);
+  [[nodiscard]]
+  uint64_t GrabFrameNoTimeout(cv::Mat& image);
 
   /**
    * Wait for the next frame and get the image.
@@ -132,8 +136,8 @@ class RawCvSink : public RawSink {
    *         message); the frame time is in the same time base as wpi::Now(),
    *         and is in 1 us increments.
    */
-  [[nodiscard]] uint64_t GrabFrameDirect(cv::Mat& image,
-                                         double timeout = 0.225);
+  [[nodiscard]]
+  uint64_t GrabFrameDirect(cv::Mat& image, double timeout = 0.225);
 
   /**
    * Wait for the next frame and get the image.  May block forever.
@@ -143,10 +147,11 @@ class RawCvSink : public RawSink {
    *         message); the frame time is in the same time base as wpi::Now(),
    *         and is in 1 us increments.
    */
-  [[nodiscard]] uint64_t GrabFrameNoTimeoutDirect(cv::Mat& image);
+  [[nodiscard]]
+  uint64_t GrabFrameNoTimeoutDirect(cv::Mat& image);
 
  private:
-  RawFrame rawFrame;
+  wpi::RawFrame rawFrame;
 };
 
 inline RawCvSource::RawCvSource(std::string_view name, const VideoMode& mode)
@@ -163,7 +168,8 @@ inline void RawCvSource::PutFrame(cv::Mat& image) {
   rawFrame.width = image.cols;
   rawFrame.height = image.rows;
   rawFrame.totalData = image.total() * image.channels();
-  rawFrame.pixelFormat = image.channels() == 3 ? CS_PIXFMT_BGR : CS_PIXFMT_GRAY;
+  rawFrame.pixelFormat =
+      image.channels() == 3 ? WPI_PIXFMT_BGR : WPI_PIXFMT_GRAY;
   PutSourceFrame(m_handle, rawFrame, &m_status);
 }
 
@@ -196,7 +202,7 @@ inline uint64_t RawCvSink::GrabFrameNoTimeout(cv::Mat& image) {
 inline uint64_t RawCvSink::GrabFrameDirect(cv::Mat& image, double timeout) {
   rawFrame.height = 0;
   rawFrame.width = 0;
-  rawFrame.pixelFormat = CS_PixelFormat::CS_PIXFMT_BGR;
+  rawFrame.pixelFormat = WPI_PixelFormat::WPI_PIXFMT_BGR;
   m_status = RawSink::GrabFrame(rawFrame, timeout);
   if (m_status <= 0) {
     return m_status;
@@ -208,7 +214,7 @@ inline uint64_t RawCvSink::GrabFrameDirect(cv::Mat& image, double timeout) {
 inline uint64_t RawCvSink::GrabFrameNoTimeoutDirect(cv::Mat& image) {
   rawFrame.height = 0;
   rawFrame.width = 0;
-  rawFrame.pixelFormat = CS_PixelFormat::CS_PIXFMT_BGR;
+  rawFrame.pixelFormat = WPI_PixelFormat::WPI_PIXFMT_BGR;
   m_status = RawSink::GrabFrameNoTimeout(rawFrame);
   if (m_status <= 0) {
     return m_status;

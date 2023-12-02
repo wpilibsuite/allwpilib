@@ -13,8 +13,6 @@
 #include <string_view>
 #include <vector>
 
-#include <wpi/deprecated.h>
-
 #include "networktables/NetworkTableType.h"
 #include "networktables/NetworkTableValue.h"
 #include "ntcore_c.h"
@@ -101,7 +99,7 @@ class NetworkTableEntry final {
    * @return the flags (bitmask)
    * @deprecated Use IsPersistent() or topic properties instead
    */
-  WPI_DEPRECATED("Use IsPersistent() or topic properties instead")
+  [[deprecated("Use IsPersistent() or topic properties instead")]]
   unsigned int GetFlags() const;
 
   /**
@@ -468,7 +466,7 @@ class NetworkTableEntry final {
    * @param flags the flags to set (bitmask)
    * @deprecated Use SetPersistent() or topic properties instead
    */
-  WPI_DEPRECATED("Use SetPersistent() or topic properties instead")
+  [[deprecated("Use SetPersistent() or topic properties instead")]]
   void SetFlags(unsigned int flags);
 
   /**
@@ -477,7 +475,7 @@ class NetworkTableEntry final {
    * @param flags the flags to clear (bitmask)
    * @deprecated Use SetPersistent() or topic properties instead
    */
-  WPI_DEPRECATED("Use SetPersistent() or topic properties instead")
+  [[deprecated("Use SetPersistent() or topic properties instead")]]
   void ClearFlags(unsigned int flags);
 
   /**
@@ -506,7 +504,7 @@ class NetworkTableEntry final {
    * Deletes the entry.
    * @deprecated Use Unpublish() instead.
    */
-  WPI_DEPRECATED("Use Unpublish() instead")
+  [[deprecated("Use Unpublish() instead")]]
   void Delete();
 
   /**
