@@ -169,7 +169,7 @@ void LocalStorage::Impl::CheckReset(TopicData* topic) {
   topic->lastValueFromNetwork = false;
   topic->type = NT_UNASSIGNED;
   topic->typeStr.clear();
-  topic->flags = 0;
+  topic->flags = NT_DEFAULTFLAGS;
   topic->properties = wpi::json::object();
   topic->propertiesStr = "{}";
 }
