@@ -12,14 +12,14 @@ constexpr size_t kRightOff = kLeftOff + 8;
 using StructType = wpi::Struct<frc::DifferentialDriveWheelSpeeds>;
 
 frc::DifferentialDriveWheelSpeeds StructType::Unpack(
-    std::span<const uint8_t, kSize> data) {
+    std::span<const uint8_t> data) {
   return frc::DifferentialDriveWheelSpeeds{
       units::meters_per_second_t{wpi::UnpackStruct<double, kLeftOff>(data)},
       units::meters_per_second_t{wpi::UnpackStruct<double, kRightOff>(data)},
   };
 }
 
-void StructType::Pack(std::span<uint8_t, kSize> data,
+void StructType::Pack(std::span<uint8_t> data,
                       const frc::DifferentialDriveWheelSpeeds& value) {
   wpi::PackStruct<kLeftOff>(data, value.left.value());
   wpi::PackStruct<kRightOff>(data, value.right.value());

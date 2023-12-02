@@ -12,7 +12,7 @@ constexpr size_t kZOff = kYOff + 8;
 
 using StructType = wpi::Struct<frc::Translation3d>;
 
-frc::Translation3d StructType::Unpack(std::span<const uint8_t, kSize> data) {
+frc::Translation3d StructType::Unpack(std::span<const uint8_t> data) {
   return frc::Translation3d{
       units::meter_t{wpi::UnpackStruct<double, kXOff>(data)},
       units::meter_t{wpi::UnpackStruct<double, kYOff>(data)},
@@ -20,7 +20,7 @@ frc::Translation3d StructType::Unpack(std::span<const uint8_t, kSize> data) {
   };
 }
 
-void StructType::Pack(std::span<uint8_t, kSize> data,
+void StructType::Pack(std::span<uint8_t> data,
                       const frc::Translation3d& value) {
   wpi::PackStruct<kXOff>(data, value.X().value());
   wpi::PackStruct<kYOff>(data, value.Y().value());
