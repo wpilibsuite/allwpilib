@@ -10,6 +10,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.geometry.proto.QuaternionProto;
+import edu.wpi.first.math.geometry.struct.QuaternionStruct;
 import edu.wpi.first.math.numbers.N3;
 import java.util.Objects;
 
@@ -400,4 +402,7 @@ public class Quaternion {
 
     return VecBuilder.fill(coeff * getX(), coeff * getY(), coeff * getZ());
   }
+
+  public static final QuaternionStruct struct = new QuaternionStruct();
+  public static final QuaternionProto proto = new QuaternionProto();
 }

@@ -499,7 +499,7 @@ bool UsbCameraImpl::DeviceConnect() {
   }
 
   if (m_connectVerbose) {
-    SINFO("Connecting to USB camera on {}", m_path);
+    SINFO("Attempting to connect to USB camera on {}", m_path);
   }
 
   SDEBUG3("opening device");
@@ -524,6 +524,10 @@ bool UsbCameraImpl::DeviceConnect() {
   if (!m_sourceReader) {
     m_mediaSource.Reset();
     return false;
+  }
+
+  if (m_connectVerbose) {
+    SINFO("Connected to USB camera on {}", m_path);
   }
 
   CS_Status st = 0;

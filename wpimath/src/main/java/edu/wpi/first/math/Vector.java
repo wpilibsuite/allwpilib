@@ -5,6 +5,7 @@
 package edu.wpi.first.math;
 
 import edu.wpi.first.math.numbers.N1;
+import java.util.Objects;
 import org.ejml.simple.SimpleMatrix;
 
 /**
@@ -60,6 +61,26 @@ public class Vector<R extends Num> extends Matrix<R, N1> {
   @Override
   public Vector<R> div(double value) {
     return new Vector<>(this.m_storage.divide(value));
+  }
+
+  /**
+   * Adds the given vector to this vector.
+   *
+   * @param value The vector to add.
+   * @return The resultant vector.
+   */
+  public final Vector<R> plus(Vector<R> value) {
+    return new Vector<>(this.m_storage.plus(Objects.requireNonNull(value).m_storage));
+  }
+
+  /**
+   * Subtracts the given vector to this vector.
+   *
+   * @param value The vector to add.
+   * @return The resultant vector.
+   */
+  public final Vector<R> minus(Vector<R> value) {
+    return new Vector<>(this.m_storage.minus(Objects.requireNonNull(value).m_storage));
   }
 
   /**

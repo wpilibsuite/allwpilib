@@ -242,7 +242,11 @@ void NetworkClient3::TcpConnected(uv::Tcp& tcp) {
         tcp.error.connect([this, &tcp](uv::Error err) {
           DEBUG3("NT3 TCP error {}", err.str());
           if (!tcp.IsLoopClosing()) {
-            DoDisconnect(err.str());
+            // we could be in the middle of sending data, so defer disconnect
+            uv::Timer::SingleShot(m_loop, uv::Timer::Time{0},
+                                  [this, reason = std::string{err.str()}] {
+                                    DoDisconnect(reason);
+                                  });
           }
         });
         tcp.end.connect([this, &tcp] {
@@ -397,6 +401,7 @@ void NetworkClient::WsConnected(wpi::WebSocket& ws, uv::Tcp& tcp,
 
   m_wire =
       std::make_shared<net::WebSocketConnection>(ws, connInfo.protocol_version);
+  m_wire->Start();
   m_clientImpl = std::make_unique<net::ClientImpl>(
       m_loop.Now().count(), m_inst, *m_wire, m_logger, m_timeSyncUpdated,
       [this](uint32_t repeatMs) {
@@ -412,7 +417,14 @@ void NetworkClient::WsConnected(wpi::WebSocket& ws, uv::Tcp& tcp,
   m_clientImpl->SendInitial();
   ws.closed.connect([this, &ws](uint16_t, std::string_view reason) {
     if (!ws.GetStream().IsLoopClosing()) {
-      DoDisconnect(reason);
+      // we could be in the middle of sending data, so defer disconnect
+      // capture a shared_ptr copy of ws to make sure it doesn't get destroyed
+      // until after DoDisconnect returns
+      uv::Timer::SingleShot(
+          m_loop, uv::Timer::Time{0},
+          [this, reason = std::string{reason}, keepws = ws.shared_from_this()] {
+            DoDisconnect(reason);
+          });
     }
   });
   ws.text.connect([this](std::string_view data, bool) {

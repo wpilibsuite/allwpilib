@@ -4,6 +4,8 @@
 
 package edu.wpi.first.math.kinematics;
 
+import static edu.wpi.first.units.Units.InchesPerSecond;
+import static edu.wpi.first.units.Units.RPM;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -45,6 +47,19 @@ class ChassisSpeedsTest {
   }
 
   @Test
+  void testMeasureConstructor() {
+    var vx = InchesPerSecond.of(14.52);
+    var vy = InchesPerSecond.zero();
+    var omega = RPM.of(0.02);
+    var speeds = new ChassisSpeeds(vx, vy, omega);
+
+    assertAll(
+        () -> assertEquals(0.368808, speeds.vxMetersPerSecond, kEpsilon),
+        () -> assertEquals(0, speeds.vyMetersPerSecond, kEpsilon),
+        () -> assertEquals(0.002094395102, speeds.omegaRadiansPerSecond, kEpsilon));
+  }
+
+  @Test
   void testFromFieldRelativeSpeeds() {
     final var chassisSpeeds =
         ChassisSpeeds.fromFieldRelativeSpeeds(1.0, 0.0, 0.5, Rotation2d.fromDegrees(-90.0));
@@ -52,6 +67,17 @@ class ChassisSpeedsTest {
     assertAll(
         () -> assertEquals(0.0, chassisSpeeds.vxMetersPerSecond, kEpsilon),
         () -> assertEquals(1.0, chassisSpeeds.vyMetersPerSecond, kEpsilon),
+        () -> assertEquals(0.5, chassisSpeeds.omegaRadiansPerSecond, kEpsilon));
+  }
+
+  @Test
+  void testFromRobotRelativeSpeeds() {
+    final var chassisSpeeds =
+        ChassisSpeeds.fromRobotRelativeSpeeds(1.0, 0.0, 0.5, Rotation2d.fromDegrees(45.0));
+
+    assertAll(
+        () -> assertEquals(1.0 / Math.sqrt(2.0), chassisSpeeds.vxMetersPerSecond, kEpsilon),
+        () -> assertEquals(1.0 / Math.sqrt(2.0), chassisSpeeds.vyMetersPerSecond, kEpsilon),
         () -> assertEquals(0.5, chassisSpeeds.omegaRadiansPerSecond, kEpsilon));
   }
 

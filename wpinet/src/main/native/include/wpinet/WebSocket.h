@@ -514,7 +514,8 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
   // outgoing write request
   bool m_writeInProgress = false;
   class WriteReq;
-  std::weak_ptr<WriteReq> m_writeReq;
+  std::weak_ptr<WriteReq> m_curWriteReq;
+  std::weak_ptr<WriteReq> m_lastWriteReq;
 
   // operating state
   State m_state = CONNECTING;

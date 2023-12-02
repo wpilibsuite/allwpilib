@@ -41,6 +41,7 @@ repoRootNameOverride {
 
 includeOtherLibs {
   ^fmt/
+  ^google/
   ^gmock/
   ^gtest/
 }

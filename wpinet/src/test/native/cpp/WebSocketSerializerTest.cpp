@@ -281,10 +281,14 @@ TEST_F(WebSocketTrySendTest, ServerPartialMidFrameMidBuf0) {
   std::array<uv::Buffer, 2> remBufs{std::span{m_buf0data}.subspan(2),
                                     m_bufs[1]};
   std::array<uv::Buffer, 2> contBufs{m_frameHeaders[1], m_bufs[2]};
+  std::array<int, 1> contFrameOffs{static_cast<int>(m_serialized[1].size())};
   EXPECT_CALL(stream, DoWrite(wpi::SpanEq(remBufs), _));
   CheckTrySendFrames({}, std::span{m_frames}.subspan(2));
   ASSERT_EQ(makeReqCalled, 1);
   ASSERT_THAT(req->m_frames.m_bufs, SpanEq(contBufs));
+  ASSERT_EQ(req->m_continueBufPos, 0u);
+  ASSERT_EQ(req->m_continueFramePos, 0u);
+  ASSERT_THAT(req->m_continueFrameOffs, SpanEq(contFrameOffs));
   ASSERT_EQ(callbackCalled, 0);
 }
 

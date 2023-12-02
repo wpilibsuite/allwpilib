@@ -16,7 +16,6 @@
 #include <wpi/StringExtras.h>
 #include <wpi/fs.h>
 #include <wpi/json.h>
-#include <wpi/json_serializer.h>
 #include <wpi/raw_ostream.h>
 #include <wpi/timestamp.h>
 #include <wpigui.h>
@@ -138,9 +137,8 @@ static bool LoadWindowStorageImpl(const std::string& filename) {
     return false;
   } else {
     try {
-      return JsonToWindow(
-          wpi::json::parse({fileBuffer->begin(), fileBuffer->end()}),
-          filename.c_str());
+      return JsonToWindow(wpi::json::parse(fileBuffer->GetCharBuffer()),
+                          filename.c_str());
     } catch (wpi::json::parse_error& e) {
       ImGui::LogText("Error loading %s: %s", filename.c_str(), e.what());
       return false;
@@ -165,9 +163,8 @@ static bool LoadStorageRootImpl(Context* ctx, const std::string& filename,
       createdStorage = true;
     }
     try {
-      storage->FromJson(
-          wpi::json::parse({fileBuffer->begin(), fileBuffer->end()}),
-          filename.c_str());
+      storage->FromJson(wpi::json::parse(fileBuffer->GetCharBuffer()),
+                        filename.c_str());
     } catch (wpi::json::parse_error& e) {
       ImGui::LogText("Error loading %s: %s", filename.c_str(), e.what());
       if (createdStorage) {

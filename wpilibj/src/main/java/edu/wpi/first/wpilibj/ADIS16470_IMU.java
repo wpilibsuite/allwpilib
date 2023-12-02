@@ -680,6 +680,10 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
         m_spi = null;
       }
     }
+    if (m_simDevice != null) {
+      m_simDevice.close();
+      m_simDevice = null;
+    }
     System.out.println("Finished cleaning up after the IMU driver.");
   }
 

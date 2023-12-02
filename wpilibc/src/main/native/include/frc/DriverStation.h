@@ -274,14 +274,13 @@ class DriverStation final {
   static int GetReplayNumber();
 
   /**
-   * Return the alliance that the driver station says it is on from the FMS.
+   * Get the current alliance from the FMS.
    *
    * If the FMS is not connected, it is set from the team alliance setting on
    * the driver station.
    *
-   * This could return kRed or kBlue.
-   *
-   * @return The Alliance enum (kRed, kBlue or kInvalid)
+   * @return The alliance (red or blue) or an empty optional if the alliance is
+   * invalid
    */
   static std::optional<Alliance> GetAlliance();
 

@@ -4,6 +4,8 @@
 
 package edu.wpi.first.math.geometry;
 
+import edu.wpi.first.math.geometry.proto.Transform3dProto;
+import edu.wpi.first.math.geometry.struct.Transform3dStruct;
 import java.util.Objects;
 
 /** Represents a transformation for a Pose3d in the pose's frame. */
@@ -37,6 +39,19 @@ public class Transform3d {
    */
   public Transform3d(Translation3d translation, Rotation3d rotation) {
     m_translation = translation;
+    m_rotation = rotation;
+  }
+
+  /**
+   * Constructs a transform with x, y, and z translations instead of a separate Translation3d.
+   *
+   * @param x The x component of the translational component of the transform.
+   * @param y The y component of the translational component of the transform.
+   * @param z The z component of the translational component of the transform.
+   * @param rotation The rotational component of the transform.
+   */
+  public Transform3d(double x, double y, double z, Rotation3d rotation) {
+    m_translation = new Translation3d(x, y, z);
     m_rotation = rotation;
   }
 
@@ -160,4 +175,7 @@ public class Transform3d {
   public int hashCode() {
     return Objects.hash(m_translation, m_rotation);
   }
+
+  public static final Transform3dStruct struct = new Transform3dStruct();
+  public static final Transform3dProto proto = new Transform3dProto();
 }

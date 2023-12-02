@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 26 Apr 2022 15:19:14 -0400
-Subject: [PATCH 04/10] Preprocessor cleanup
+Subject: [PATCH 4/9] Preprocessor cleanup
 
 ---
  include/uv.h        | 12 ------------
@@ -14,7 +14,7 @@ Subject: [PATCH 04/10] Preprocessor cleanup
  7 files changed, 14 insertions(+), 20 deletions(-)
 
 diff --git a/include/uv.h b/include/uv.h
-index 02397dd0fdd43d51f86c0dde9a62046702f12bdb..d5342b0d52232bbf83825948cc6bc09e5d74a4c7 100644
+index 5642101c10c351a602a195d3b74027b53bf641d2..aff06cb7f4352eb4fcf93c938f09a789318bddc3 100644
 --- a/include/uv.h
 +++ b/include/uv.h
 @@ -23,9 +23,6 @@
@@ -44,7 +44,7 @@ index 02397dd0fdd43d51f86c0dde9a62046702f12bdb..d5342b0d52232bbf83825948cc6bc09e
  UV_EXTERN uv_handle_type uv_guess_handle(uv_file file);
  
  enum {
-@@ -1906,7 +1897,4 @@ UV_EXTERN void uv_loop_set_data(uv_loop_t*, void* data);
+@@ -1918,7 +1909,4 @@ void uv_wtf8_to_utf16(const char* wtf8,
  #undef UV_LOOP_PRIVATE_PLATFORM_FIELDS
  #undef UV__ERR
  
@@ -85,19 +85,19 @@ index 98c437dcadec5b5106d697e82d5394d459f55e47..854d98a16a74c45e0b6cb92b17782de6
  
  /* core */
 diff --git a/src/win/fs.c b/src/win/fs.c
-index 565c05fff13c2e6e74091c1da7b31636d7fd370d..f415ddc2c39d09eea317fc857777acce1ce7d13e 100644
+index 7df1df2b9ba23c0ecb96e82a6cfcaae824826b69..26ba539936786902af5830c2811594292815d2d7 100644
 --- a/src/win/fs.c
 +++ b/src/win/fs.c
-@@ -40,6 +40,7 @@
- 
- #include <winioctl.h>
+@@ -43,6 +43,7 @@
+ #include "handle-inl.h"
+ #include "fs-fd-hash-inl.h"
  
 +#pragma comment(lib, "Advapi32.lib")
  
  #define UV_FS_FREE_PATHS         0x0002
  #define UV_FS_FREE_PTR           0x0008
 diff --git a/src/win/tty.c b/src/win/tty.c
-index abbe1315883257d6825b794344dcd4cba9514097..9bb3d9e830c901122da5e521e0c6b032dfd5044c 100644
+index c90995afb6166a7cab0a267f5eb513705ce05148..7adf3cd3ba81a9c41064f4ef2af01667092f27d1 100644
 --- a/src/win/tty.c
 +++ b/src/win/tty.c
 @@ -37,6 +37,8 @@
@@ -110,7 +110,7 @@ index abbe1315883257d6825b794344dcd4cba9514097..9bb3d9e830c901122da5e521e0c6b032
  # define InterlockedOr _InterlockedOr
  #endif
 diff --git a/src/win/util.c b/src/win/util.c
-index 1cfd7b2caf0d4ad1a6a66df9406c21f4e2b69b04..af18cfa6c106c5de0996e4fff9b4127aaa3b576b 100644
+index 5fbc70f52952f90b36fb22ee03ec7f70e6ed5954..f505cfad4987768fa6470ca27612312c2ba0729d 100644
 --- a/src/win/util.c
 +++ b/src/win/util.c
 @@ -64,12 +64,20 @@

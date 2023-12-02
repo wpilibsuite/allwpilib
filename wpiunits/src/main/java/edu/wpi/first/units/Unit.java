@@ -7,7 +7,10 @@ package edu.wpi.first.units;
 import java.util.Objects;
 
 /**
- * A unit is some unit of measurement that defines a quantity, such as grams, meters, or seconds.
+ * Unit of measurement that defines a quantity, such as grams, meters, or seconds.
+ *
+ * <p>This is the base class for units. Actual units (such as {@link Units#Grams} and {@link
+ * Units#Meters}) can be found in the {@link Units} class.
  *
  * @param <U> the self type, e.g. {@code class SomeUnit extends Unit<SomeUnit>}
  */
@@ -85,12 +88,13 @@ public class Unit<U extends Unit<U>> {
    * this unit.
    *
    * <pre>
-   *   Inches.convertFrom(12, Feet) // => 144.0
-   *   Kilograms.convertFrom(2.2, Pounds) // => 0.9979024
+   *   Inches.convertFrom(12, Feet) // 144.0
+   *   Kilograms.convertFrom(2.2, Pounds) // 0.9979024
    * </pre>
    *
    * @param magnitude a magnitude measured in another unit
    * @param otherUnit the unit to convert the magnitude to
+   * @return the corresponding value in terms of this unit.
    */
   public double convertFrom(double magnitude, Unit<U> otherUnit) {
     if (this.equivalent(otherUnit)) {
@@ -125,6 +129,7 @@ public class Unit<U extends Unit<U>> {
    * <i>immutable</i> and cannot have its value modified.
    *
    * @param magnitude the magnitude of the measure to create
+   * @return the measure
    */
   public Measure<U> of(double magnitude) {
     if (magnitude == 0) {
@@ -180,8 +185,8 @@ public class Unit<U extends Unit<U>> {
    * jerk, etc.
    *
    * <pre>
-   *   Meters.per(Second) // => linear velocity
-   *   Kilograms.per(Second) // => mass flow
+   *   Meters.per(Second) // linear velocity
+   *   Kilograms.per(Second) // mass flow
    *   Feet.per(Second).per(Second).of(32) // roughly 1G of acceleration
    * </pre>
    *

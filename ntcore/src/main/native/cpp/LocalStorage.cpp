@@ -7,6 +7,7 @@
 #include <algorithm>
 
 #include <wpi/DataLog.h>
+#include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
 #include <wpi/json.h>
 
@@ -129,7 +130,7 @@ void LocalStorage::Impl::NotifyTopic(TopicData* topic,
     if (!m_dataloggers.empty()) {
       auto now = Now();
       for (auto&& datalogger : m_dataloggers) {
-        if (wpi::starts_with(topic->name, datalogger->prefix)) {
+        if (PrefixMatch(topic->name, datalogger->prefix, topic->special)) {
           auto it = std::find_if(topic->datalogs.begin(), topic->datalogs.end(),
                                  [&](const auto& elem) {
                                    return elem.logger == datalogger->handle;
@@ -857,14 +858,14 @@ LocalStorage::PublisherData* LocalStorage::Impl::PublishEntry(EntryData* entry,
   if (entry->publisher) {
     return entry->publisher;
   }
-  auto typeStr = TypeToString(type);
   if (entry->subscriber->config.type == NT_UNASSIGNED) {
+    auto typeStr = TypeToString(type);
     entry->subscriber->config.type = type;
     entry->subscriber->config.typeStr = typeStr;
-  } else if (entry->subscriber->config.type != type ||
-             entry->subscriber->config.typeStr != typeStr) {
+  } else if (entry->subscriber->config.type != type) {
     if (!IsNumericCompatible(type, entry->subscriber->config.type)) {
       // don't allow dynamically changing the type of an entry
+      auto typeStr = TypeToString(type);
       ERR("cannot publish entry {} as type {}, previously subscribed as {}",
           entry->topic->name, typeStr, entry->subscriber->config.typeStr);
       return nullptr;
@@ -1447,7 +1448,7 @@ NT_DataLogger LocalStorage::StartDataLog(wpi::log::DataLog& log,
   // start logging any matching topics
   auto now = nt::Now();
   for (auto&& topic : m_impl.m_topics) {
-    if (!wpi::starts_with(topic->name, prefix) ||
+    if (!PrefixMatch(topic->name, prefix, topic->special) ||
         topic->type == NT_UNASSIGNED || topic->typeStr.empty()) {
       continue;
     }
@@ -1479,6 +1480,41 @@ void LocalStorage::StopDataLog(NT_DataLogger logger) {
       }
     }
   }
+}
+
+bool LocalStorage::HasSchema(std::string_view name) {
+  std::scoped_lock lock{m_mutex};
+  wpi::SmallString<128> fullName{"/.schema/"};
+  fullName += name;
+  auto it = m_impl.m_schemas.find(fullName);
+  return it != m_impl.m_schemas.end();
+}
+
+void LocalStorage::AddSchema(std::string_view name, std::string_view type,
+                             std::span<const uint8_t> schema) {
+  std::scoped_lock lock{m_mutex};
+  wpi::SmallString<128> fullName{"/.schema/"};
+  fullName += name;
+  auto& pubHandle = m_impl.m_schemas[fullName];
+  if (pubHandle != 0) {
+    return;
+  }
+
+  auto topic = m_impl.GetOrCreateTopic(fullName);
+
+  if (topic->localPublishers.size() >= kMaxPublishers) {
+    WPI_ERROR(m_impl.m_logger,
+              "reached maximum number of publishers to '{}', not publishing",
+              topic->name);
+    return;
+  }
+
+  pubHandle = m_impl
+                  .AddLocalPublisher(topic, {{"retained", true}},
+                                     PubSubConfig{NT_RAW, type, {}})
+                  ->handle;
+
+  m_impl.SetDefaultEntryValue(pubHandle, Value::MakeRaw(schema));
 }
 
 void LocalStorage::Reset() {

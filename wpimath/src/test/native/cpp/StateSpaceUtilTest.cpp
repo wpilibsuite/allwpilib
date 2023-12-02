@@ -63,13 +63,12 @@ TEST(StateSpaceUtilTest, CovArray) {
 }
 
 TEST(StateSpaceUtilTest, WhiteNoiseVectorParameterPack) {
-  frc::Vectord<2> vec = frc::MakeWhiteNoiseVector(2.0, 3.0);
-  static_cast<void>(vec);
+  [[maybe_unused]] frc::Vectord<2> vec = frc::MakeWhiteNoiseVector(2.0, 3.0);
 }
 
 TEST(StateSpaceUtilTest, WhiteNoiseVectorArray) {
-  frc::Vectord<2> vec = frc::MakeWhiteNoiseVector<2>({2.0, 3.0});
-  static_cast<void>(vec);
+  [[maybe_unused]] frc::Vectord<2> vec =
+      frc::MakeWhiteNoiseVector<2>({2.0, 3.0});
 }
 
 TEST(StateSpaceUtilTest, IsStabilizable) {

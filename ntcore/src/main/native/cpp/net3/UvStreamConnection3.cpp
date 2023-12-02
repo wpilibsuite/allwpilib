@@ -28,10 +28,14 @@ void UvStreamConnection3::Flush() {
   ++m_sendsActive;
   m_stream.Write(m_buffers, [selfweak = weak_from_this()](auto bufs, auto) {
     if (auto self = selfweak.lock()) {
+#ifdef __SANITIZE_ADDRESS__
+      size_t numToPool = 0;
+#else
       size_t numToPool =
           (std::min)(bufs.size(), kMaxPoolSize - self->m_buf_pool.size());
       self->m_buf_pool.insert(self->m_buf_pool.end(), bufs.begin(),
                               bufs.begin() + numToPool);
+#endif
       for (auto&& buf : bufs.subspan(numToPool)) {
         buf.Deallocate();
       }

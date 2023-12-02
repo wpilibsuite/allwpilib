@@ -13,6 +13,7 @@
 #include <wpi/json.h>
 
 #include "frc/fmt/Eigen.h"
+#include "geometry3d.pb.h"
 #include "units/math.h"
 #include "wpimath/MathShared.h"
 

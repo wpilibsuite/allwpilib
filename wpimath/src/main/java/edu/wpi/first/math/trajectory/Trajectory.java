@@ -7,6 +7,8 @@ package edu.wpi.first.math.trajectory;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.trajectory.proto.TrajectoryProto;
+import edu.wpi.first.math.trajectory.proto.TrajectoryStateProto;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -17,6 +19,8 @@ import java.util.stream.Collectors;
  * represent the pose, curvature, time elapsed, velocity, and acceleration at that point.
  */
 public class Trajectory {
+  public static final TrajectoryProto proto = new TrajectoryProto();
+
   private final double m_totalTimeSeconds;
   private final List<State> m_states;
 
@@ -264,6 +268,8 @@ public class Trajectory {
    * represent the pose, curvature, time elapsed, velocity, and acceleration at that point.
    */
   public static class State {
+    public static final TrajectoryStateProto proto = new TrajectoryStateProto();
+
     // The time elapsed since the beginning of the trajectory.
     @JsonProperty("time")
     public double timeSeconds;

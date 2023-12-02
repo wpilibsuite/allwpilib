@@ -206,6 +206,20 @@
     "commandversion": 2
   },
   {
+    "name": "Elevator with exponential profiled PID",
+    "description": "Reach elevator position setpoints with exponential profiles and smart motor controller PID.",
+    "tags": [
+      "Basic Robot",
+      "Elevator",
+      "Exponential Profile",
+      "Smart Motor Controller",
+      "Joystick"
+    ],
+    "foldername": "ElevatorExponentialProfile",
+    "gradlebase": "cpp",
+    "commandversion": 2
+  },
+  {
     "name": "Elevator with trapezoid profiled PID",
     "description": "Reach elevator position setpoints with trapezoid profiles and smart motor controller PID.",
     "tags": [
@@ -785,6 +799,21 @@
     "commandversion": 2
   },
   {
+    "name": "Elevator Exponential Profile Simulation",
+    "description": "Simulate an elevator.",
+    "tags": [
+      "Basic Robot",
+      "Elevator",
+      "State-Space",
+      "Simulation",
+      "Mechanism2d",
+      "Profiled PID"
+    ],
+    "foldername": "ElevatorExponentialSimulation",
+    "gradlebase": "cpp",
+    "commandversion": 2
+  },
+  {
     "name": "DifferentialDrivePoseEstimator",
     "description": "Combine differential-drive odometry with vision data using DifferentialDrivePoseEstimator.",
     "tags": [
@@ -838,7 +867,8 @@
     ],
     "foldername": "UnitTest",
     "gradlebase": "cpp",
-    "commandversion": 2
+    "commandversion": 2,
+    "hasunittests": true
   },
   {
     "name": "SimpleDifferentialDriveSimulation",

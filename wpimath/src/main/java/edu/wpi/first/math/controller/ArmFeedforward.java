@@ -4,6 +4,9 @@
 
 package edu.wpi.first.math.controller;
 
+import edu.wpi.first.math.controller.proto.ArmFeedforwardProto;
+import edu.wpi.first.math.controller.struct.ArmFeedforwardStruct;
+
 /**
  * A helper class that computes feedforward outputs for a simple arm (modeled as a motor acting
  * against the force of gravity on a beam suspended at an angle).
@@ -13,6 +16,9 @@ public class ArmFeedforward {
   public final double kg;
   public final double kv;
   public final double ka;
+
+  public static final ArmFeedforwardProto proto = new ArmFeedforwardProto();
+  public static final ArmFeedforwardStruct struct = new ArmFeedforwardStruct();
 
   /**
    * Creates a new ArmFeedforward with the specified gains. Units of the gain values will dictate

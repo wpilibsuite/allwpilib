@@ -6,6 +6,8 @@
 
 #include <stdint.h>
 
+#include <stddef.h>  //NOLINT
+
 #include <wpi/Synchronization.h>
 
 #include "hal/DriverStationTypes.h"

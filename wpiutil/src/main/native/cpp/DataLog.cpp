@@ -31,6 +31,7 @@
 #include "wpi/Endian.h"
 #include "wpi/Logger.h"
 #include "wpi/MathExtras.h"
+#include "wpi/SmallString.h"
 #include "wpi/fs.h"
 #include "wpi/timestamp.h"
 
@@ -178,7 +179,7 @@ DataLog::DataLog(wpi::Logger& msglog,
 DataLog::~DataLog() {
   {
     std::scoped_lock lock{m_mutex};
-    m_active = false;
+    m_state = kShutdown;
     m_doFlush = true;
   }
   m_cond.notify_all();
@@ -203,12 +204,56 @@ void DataLog::Flush() {
 
 void DataLog::Pause() {
   std::scoped_lock lock{m_mutex};
-  m_paused = true;
+  m_state = kPaused;
 }
 
 void DataLog::Resume() {
   std::scoped_lock lock{m_mutex};
-  m_paused = false;
+  if (m_state == kPaused) {
+    m_state = kActive;
+  } else if (m_state == kStopped) {
+    m_state = kStart;
+  }
+}
+
+void DataLog::Stop() {
+  {
+    std::scoped_lock lock{m_mutex};
+    m_state = kStopped;
+    m_newFilename.clear();
+  }
+  m_cond.notify_all();
+}
+
+bool DataLog::HasSchema(std::string_view name) const {
+  std::scoped_lock lock{m_mutex};
+  wpi::SmallString<128> fullName{"/.schema/"};
+  fullName += name;
+  auto it = m_entries.find(fullName);
+  return it != m_entries.end();
+}
+
+void DataLog::AddSchema(std::string_view name, std::string_view type,
+                        std::span<const uint8_t> schema, int64_t timestamp) {
+  std::scoped_lock lock{m_mutex};
+  wpi::SmallString<128> fullName{"/.schema/"};
+  fullName += name;
+  auto& entryInfo = m_entries[fullName];
+  if (entryInfo.id != 0) {
+    return;  // don't add duplicates
+  }
+  entryInfo.schemaData.assign(schema.begin(), schema.end());
+  int entry = StartImpl(fullName, type, {}, timestamp);
+
+  // inline AppendRaw() without releasing lock
+  if (entry <= 0) {
+    [[unlikely]] return;  // should never happen, but check anyway
+  }
+  if (m_state != kActive && m_state != kPaused) {
+    [[unlikely]] return;
+  }
+  StartRecord(entry, timestamp, schema.size(), 0);
+  AppendImpl(schema);
 }
 
 static void WriteToFile(fs::file_t f, std::span<const uint8_t> data,
@@ -255,105 +300,201 @@ static std::string MakeRandomFilename() {
   return filename;
 }
 
-void DataLog::WriterThreadMain(std::string_view dir) {
-  std::chrono::duration<double> periodTime{m_period};
+struct DataLog::WriterThreadState {
+  explicit WriterThreadState(std::string_view dir) : dirPath{dir} {}
+  WriterThreadState(const WriterThreadState&) = delete;
+  WriterThreadState& operator=(const WriterThreadState&) = delete;
+  ~WriterThreadState() { Close(); }
 
-  std::error_code ec;
-  fs::path dirPath{dir};
+  void Close() {
+    if (f != fs::kInvalidFile) {
+      fs::CloseFile(f);
+      f = fs::kInvalidFile;
+    }
+  }
+
+  void SetFilename(std::string_view fn) {
+    baseFilename = fn;
+    filename = fn;
+    path = dirPath / filename;
+    segmentCount = 1;
+  }
+
+  void IncrementFilename() {
+    fs::path basePath{baseFilename};
+    filename = fmt::format("{}.{}{}", basePath.stem().string(), ++segmentCount,
+                           basePath.extension().string());
+    path = dirPath / filename;
+  }
+
+  fs::path dirPath;
+  std::string baseFilename;
   std::string filename;
-
-  {
-    std::scoped_lock lock{m_mutex};
-    filename = std::move(m_newFilename);
-    m_newFilename.clear();
-  }
-
-  if (filename.empty()) {
-    filename = MakeRandomFilename();
-  }
-
+  fs::path path;
   fs::file_t f = fs::kInvalidFile;
+  uintmax_t freeSpace = UINTMAX_MAX;
+  int segmentCount = 1;
+};
+
+void DataLog::StartLogFile(WriterThreadState& state) {
+  std::error_code ec;
+
+  if (state.filename.empty()) {
+    state.SetFilename(MakeRandomFilename());
+  }
 
   // get free space
-  uintmax_t freeSpace = fs::space(dirPath).available;
-  if (freeSpace < kMinFreeSpace) {
+  auto freeSpaceInfo = fs::space(state.dirPath, ec);
+  if (!ec) {
+    state.freeSpace = freeSpaceInfo.available;
+  } else {
+    state.freeSpace = UINTMAX_MAX;
+  }
+  if (state.freeSpace < kMinFreeSpace) {
     WPI_ERROR(m_msglog,
               "Insufficient free space ({} available), no log being saved",
-              FormatBytesSize(freeSpace));
+              FormatBytesSize(state.freeSpace));
   } else {
     // try preferred filename, or randomize it a few times, before giving up
     for (int i = 0; i < 5; ++i) {
       // open file for append
 #ifdef _WIN32
       // WIN32 doesn't allow combination of CreateNew and Append
-      f = fs::OpenFileForWrite(dirPath / filename, ec, fs::CD_CreateNew,
-                               fs::OF_None);
+      state.f =
+          fs::OpenFileForWrite(state.path, ec, fs::CD_CreateNew, fs::OF_None);
 #else
-      f = fs::OpenFileForWrite(dirPath / filename, ec, fs::CD_CreateNew,
-                               fs::OF_Append);
+      state.f =
+          fs::OpenFileForWrite(state.path, ec, fs::CD_CreateNew, fs::OF_Append);
 #endif
       if (ec) {
         WPI_ERROR(m_msglog, "Could not open log file '{}': {}",
-                  (dirPath / filename).string(), ec.message());
+                  state.path.string(), ec.message());
         // try again with random filename
-        filename = MakeRandomFilename();
+        state.SetFilename(MakeRandomFilename());
       } else {
         break;
       }
     }
 
-    if (f == fs::kInvalidFile) {
+    if (state.f == fs::kInvalidFile) {
       WPI_ERROR(m_msglog, "Could not open log file, no log being saved");
     } else {
-      WPI_INFO(m_msglog, "Logging to '{}' ({} free space)",
-               (dirPath / filename).string(), FormatBytesSize(freeSpace));
+      WPI_INFO(m_msglog, "Logging to '{}' ({} free space)", state.path.string(),
+               FormatBytesSize(state.freeSpace));
     }
   }
 
   // write header (version 1.0)
-  if (f != fs::kInvalidFile) {
+  if (state.f != fs::kInvalidFile) {
     const uint8_t header[] = {'W', 'P', 'I', 'L', 'O', 'G', 0, 1};
-    WriteToFile(f, header, filename, m_msglog);
+    WriteToFile(state.f, header, state.filename, m_msglog);
     uint8_t extraLen[4];
     support::endian::write32le(extraLen, m_extraHeader.size());
-    WriteToFile(f, extraLen, filename, m_msglog);
+    WriteToFile(state.f, extraLen, state.filename, m_msglog);
     if (m_extraHeader.size() > 0) {
-      WriteToFile(f,
+      WriteToFile(state.f,
                   {reinterpret_cast<const uint8_t*>(m_extraHeader.data()),
                    m_extraHeader.size()},
-                  filename, m_msglog);
+                  state.filename, m_msglog);
     }
   }
+}
 
+void DataLog::WriterThreadMain(std::string_view dir) {
+  std::chrono::duration<double> periodTime{m_period};
+
+  WriterThreadState state{dir};
+  {
+    std::scoped_lock lock{m_mutex};
+    state.SetFilename(m_newFilename);
+    m_newFilename.clear();
+  }
+  StartLogFile(state);
+
+  std::error_code ec;
   std::vector<Buffer> toWrite;
   int freeSpaceCount = 0;
+  int checkExistCount = 0;
   bool blocked = false;
+  uintmax_t written = 0;
 
   std::unique_lock lock{m_mutex};
-  while (m_active) {
+  while (m_state != kShutdown) {
     bool doFlush = false;
     auto timeoutTime = std::chrono::steady_clock::now() + periodTime;
     if (m_cond.wait_until(lock, timeoutTime) == std::cv_status::timeout) {
       doFlush = true;
     }
 
-    if (!m_newFilename.empty() && f != fs::kInvalidFile) {
+    if (m_state == kStopped) {
+      state.Close();
+      continue;
+    }
+
+    bool doStart = false;
+
+    // if file was deleted, recreate it with the same name
+    if (++checkExistCount >= 10) {
+      checkExistCount = 0;
+      lock.unlock();
+      bool exists = fs::exists(state.path, ec);
+      lock.lock();
+      if (!ec && !exists) {
+        state.Close();
+        state.IncrementFilename();
+        WPI_INFO(m_msglog, "Log file deleted, recreating as fresh log '{}'",
+                 state.filename);
+        doStart = true;
+      }
+    }
+
+    // start new file if file exceeds 1.8 GB
+    if (written > 1800000000ull) {
+      state.Close();
+      state.IncrementFilename();
+      WPI_INFO(m_msglog, "Log file reached 1.8 GB, starting new file '{}'",
+               state.filename);
+      doStart = true;
+    }
+
+    if (m_state == kStart || doStart) {
+      lock.unlock();
+      StartLogFile(state);
+      lock.lock();
+      if (state.f != fs::kInvalidFile) {
+        // Emit start and schema data records
+        for (auto&& entryInfo : m_entries) {
+          AppendStartRecord(entryInfo.second.id, entryInfo.first(),
+                            entryInfo.second.type,
+                            m_entryIds[entryInfo.second.id].metadata, 0);
+          if (!entryInfo.second.schemaData.empty()) {
+            StartRecord(entryInfo.second.id, 0,
+                        entryInfo.second.schemaData.size(), 0);
+            AppendImpl(entryInfo.second.schemaData);
+          }
+        }
+      }
+      m_state = kActive;
+      written = 0;
+    }
+
+    if (!m_newFilename.empty() && state.f != fs::kInvalidFile) {
       auto newFilename = std::move(m_newFilename);
       m_newFilename.clear();
-      lock.unlock();
       // rename
-      if (filename != newFilename) {
-        fs::rename(dirPath / filename, dirPath / newFilename, ec);
+      if (state.filename != newFilename) {
+        lock.unlock();
+        fs::rename(state.path, state.dirPath / newFilename, ec);
+        lock.lock();
       }
       if (ec) {
         WPI_ERROR(m_msglog, "Could not rename log file from '{}' to '{}': {}",
-                  filename, newFilename, ec.message());
+                  state.filename, newFilename, ec.message());
       } else {
-        WPI_INFO(m_msglog, "Renamed log file from '{}' to '{}'", filename,
+        WPI_INFO(m_msglog, "Renamed log file from '{}' to '{}'", state.filename,
                  newFilename);
       }
-      filename = std::move(newFilename);
-      lock.lock();
+      state.SetFilename(newFilename);
     }
 
     if (doFlush || m_doFlush) {
@@ -365,39 +506,45 @@ void DataLog::WriterThreadMain(std::string_view dir) {
       // swap outgoing with empty vector
       toWrite.swap(m_outgoing);
 
-      if (f != fs::kInvalidFile && !blocked) {
+      if (state.f != fs::kInvalidFile && !blocked) {
         lock.unlock();
 
         // update free space every 10 flushes (in case other things are writing)
         if (++freeSpaceCount >= 10) {
           freeSpaceCount = 0;
-          freeSpace = fs::space(dirPath).available;
+          auto freeSpaceInfo = fs::space(state.dirPath, ec);
+          if (!ec) {
+            state.freeSpace = freeSpaceInfo.available;
+          } else {
+            state.freeSpace = UINTMAX_MAX;
+          }
         }
 
         // write buffers to file
         for (auto&& buf : toWrite) {
           // stop writing when we go below the minimum free space
-          freeSpace -= buf.GetData().size();
-          if (freeSpace < kMinFreeSpace) {
+          state.freeSpace -= buf.GetData().size();
+          written += buf.GetData().size();
+          if (state.freeSpace < kMinFreeSpace) {
             [[unlikely]] WPI_ERROR(
                 m_msglog,
                 "Stopped logging due to low free space ({} available)",
-                FormatBytesSize(freeSpace));
+                FormatBytesSize(state.freeSpace));
             blocked = true;
             break;
           }
-          WriteToFile(f, buf.GetData(), filename, m_msglog);
+          WriteToFile(state.f, buf.GetData(), state.filename, m_msglog);
         }
 
         // sync to storage
 #if defined(__linux__)
-        ::fdatasync(f);
+        ::fdatasync(state.f);
 #elif defined(__APPLE__)
-        ::fsync(f);
+        ::fsync(state.f);
 #endif
         lock.lock();
         if (blocked) {
-          [[unlikely]] m_paused = true;
+          [[unlikely]] m_state = kPaused;
         }
       }
 
@@ -410,10 +557,6 @@ void DataLog::WriterThreadMain(std::string_view dir) {
       }
       toWrite.resize(0);
     }
-  }
-
-  if (f != fs::kInvalidFile) {
-    fs::CloseFile(f);
   }
 }
 
@@ -437,7 +580,7 @@ void DataLog::WriterThreadMain(
   std::vector<Buffer> toWrite;
 
   std::unique_lock lock{m_mutex};
-  while (m_active) {
+  while (m_state != kShutdown) {
     bool doFlush = false;
     auto timeoutTime = std::chrono::steady_clock::now() + periodTime;
     if (m_cond.wait_until(lock, timeoutTime) == std::cv_status::timeout) {
@@ -484,13 +627,18 @@ void DataLog::WriterThreadMain(
 int DataLog::Start(std::string_view name, std::string_view type,
                    std::string_view metadata, int64_t timestamp) {
   std::scoped_lock lock{m_mutex};
+  return StartImpl(name, type, metadata, timestamp);
+}
+
+int DataLog::StartImpl(std::string_view name, std::string_view type,
+                       std::string_view metadata, int64_t timestamp) {
   auto& entryInfo = m_entries[name];
   if (entryInfo.id == 0) {
     entryInfo.id = ++m_lastId;
   }
-  auto& savedCount = m_entryCounts[entryInfo.id];
-  ++savedCount;
-  if (savedCount > 1) {
+  auto& entryInfo2 = m_entryIds[entryInfo.id];
+  ++entryInfo2.count;
+  if (entryInfo2.count > 1) {
     if (entryInfo.type != type) {
       WPI_ERROR(m_msglog,
                 "type mismatch for '{}': was '{}', requested '{}'; ignoring",
@@ -500,15 +648,26 @@ int DataLog::Start(std::string_view name, std::string_view type,
     return entryInfo.id;
   }
   entryInfo.type = type;
+  entryInfo2.metadata = metadata;
+
+  if (m_state != kActive && m_state != kPaused) {
+    [[unlikely]] return entryInfo.id;
+  }
+
+  AppendStartRecord(entryInfo.id, name, type, metadata, timestamp);
+  return entryInfo.id;
+}
+
+void DataLog::AppendStartRecord(int id, std::string_view name,
+                                std::string_view type,
+                                std::string_view metadata, int64_t timestamp) {
   size_t strsize = name.size() + type.size() + metadata.size();
   uint8_t* buf = StartRecord(0, timestamp, 5 + 12 + strsize, 5);
   *buf++ = impl::kControlStart;
-  wpi::support::endian::write32le(buf, entryInfo.id);
+  wpi::support::endian::write32le(buf, id);
   AppendStringImpl(name);
   AppendStringImpl(type);
   AppendStringImpl(metadata);
-
-  return entryInfo.id;
 }
 
 void DataLog::Finish(int entry, int64_t timestamp) {
@@ -516,15 +675,18 @@ void DataLog::Finish(int entry, int64_t timestamp) {
     return;
   }
   std::scoped_lock lock{m_mutex};
-  auto& savedCount = m_entryCounts[entry];
-  if (savedCount == 0) {
+  auto& entryInfo2 = m_entryIds[entry];
+  if (entryInfo2.count == 0) {
     return;
   }
-  --savedCount;
-  if (savedCount != 0) {
+  --entryInfo2.count;
+  if (entryInfo2.count != 0) {
     return;
   }
-  m_entryCounts.erase(entry);
+  m_entryIds.erase(entry);
+  if (m_state != kActive && m_state != kPaused) {
+    [[unlikely]] return;
+  }
   uint8_t* buf = StartRecord(0, timestamp, 5, 5);
   *buf++ = impl::kControlFinish;
   wpi::support::endian::write32le(buf, entry);
@@ -536,6 +698,10 @@ void DataLog::SetMetadata(int entry, std::string_view metadata,
     return;
   }
   std::scoped_lock lock{m_mutex};
+  m_entryIds[entry].metadata = metadata;
+  if (m_state != kActive && m_state != kPaused) {
+    [[unlikely]] return;
+  }
   uint8_t* buf = StartRecord(0, timestamp, 5 + 4 + metadata.size(), 5);
   *buf++ = impl::kControlSetMetadata;
   wpi::support::endian::write32le(buf, entry);
@@ -551,7 +717,7 @@ uint8_t* DataLog::Reserve(size_t size) {
             m_msglog,
             "outgoing buffers exceeded threshold, pausing logging--"
             "consider flushing to disk more frequently (smaller period)");
-        m_paused = true;
+        m_state = kPaused;
       }
       m_outgoing.emplace_back();
     } else {
@@ -593,8 +759,8 @@ void DataLog::AppendRaw(int entry, std::span<const uint8_t> data,
     return;
   }
   std::scoped_lock lock{m_mutex};
-  if (m_paused) {
-    return;
+  if (m_state != kActive) {
+    [[unlikely]] return;
   }
   StartRecord(entry, timestamp, data.size(), 0);
   AppendImpl(data);
@@ -607,8 +773,8 @@ void DataLog::AppendRaw2(int entry,
     return;
   }
   std::scoped_lock lock{m_mutex};
-  if (m_paused) {
-    return;
+  if (m_state != kActive) {
+    [[unlikely]] return;
   }
   size_t size = 0;
   for (auto&& chunk : data) {
@@ -625,8 +791,8 @@ void DataLog::AppendBoolean(int entry, bool value, int64_t timestamp) {
     return;
   }
   std::scoped_lock lock{m_mutex};
-  if (m_paused) {
-    return;
+  if (m_state != kActive) {
+    [[unlikely]] return;
   }
   uint8_t* buf = StartRecord(entry, timestamp, 1, 1);
   buf[0] = value ? 1 : 0;
@@ -637,8 +803,8 @@ void DataLog::AppendInteger(int entry, int64_t value, int64_t timestamp) {
     return;
   }
   std::scoped_lock lock{m_mutex};
-  if (m_paused) {
-    return;
+  if (m_state != kActive) {
+    [[unlikely]] return;
   }
   uint8_t* buf = StartRecord(entry, timestamp, 8, 8);
   wpi::support::endian::write64le(buf, value);
@@ -649,8 +815,8 @@ void DataLog::AppendFloat(int entry, float value, int64_t timestamp) {
     return;
   }
   std::scoped_lock lock{m_mutex};
-  if (m_paused) {
-    return;
+  if (m_state != kActive) {
+    [[unlikely]] return;
   }
   uint8_t* buf = StartRecord(entry, timestamp, 4, 4);
   if constexpr (wpi::support::endian::system_endianness() ==
@@ -666,8 +832,8 @@ void DataLog::AppendDouble(int entry, double value, int64_t timestamp) {
     return;
   }
   std::scoped_lock lock{m_mutex};
-  if (m_paused) {
-    return;
+  if (m_state != kActive) {
+    [[unlikely]] return;
   }
   uint8_t* buf = StartRecord(entry, timestamp, 8, 8);
   if constexpr (wpi::support::endian::system_endianness() ==
@@ -691,8 +857,8 @@ void DataLog::AppendBooleanArray(int entry, std::span<const bool> arr,
     return;
   }
   std::scoped_lock lock{m_mutex};
-  if (m_paused) {
-    return;
+  if (m_state != kActive) {
+    [[unlikely]] return;
   }
   StartRecord(entry, timestamp, arr.size(), 0);
   uint8_t* buf;
@@ -715,8 +881,8 @@ void DataLog::AppendBooleanArray(int entry, std::span<const int> arr,
     return;
   }
   std::scoped_lock lock{m_mutex};
-  if (m_paused) {
-    return;
+  if (m_state != kActive) {
+    [[unlikely]] return;
   }
   StartRecord(entry, timestamp, arr.size(), 0);
   uint8_t* buf;
@@ -750,8 +916,8 @@ void DataLog::AppendIntegerArray(int entry, std::span<const int64_t> arr,
       return;
     }
     std::scoped_lock lock{m_mutex};
-    if (m_paused) {
-      return;
+    if (m_state != kActive) {
+      [[unlikely]] return;
     }
     StartRecord(entry, timestamp, arr.size() * 8, 0);
     uint8_t* buf;
@@ -783,8 +949,8 @@ void DataLog::AppendFloatArray(int entry, std::span<const float> arr,
       return;
     }
     std::scoped_lock lock{m_mutex};
-    if (m_paused) {
-      return;
+    if (m_state != kActive) {
+      [[unlikely]] return;
     }
     StartRecord(entry, timestamp, arr.size() * 4, 0);
     uint8_t* buf;
@@ -816,8 +982,8 @@ void DataLog::AppendDoubleArray(int entry, std::span<const double> arr,
       return;
     }
     std::scoped_lock lock{m_mutex};
-    if (m_paused) {
-      return;
+    if (m_state != kActive) {
+      [[unlikely]] return;
     }
     StartRecord(entry, timestamp, arr.size() * 8, 0);
     uint8_t* buf;
@@ -849,8 +1015,8 @@ void DataLog::AppendStringArray(int entry, std::span<const std::string> arr,
     size += 4 + str.size();
   }
   std::scoped_lock lock{m_mutex};
-  if (m_paused) {
-    return;
+  if (m_state != kActive) {
+    [[unlikely]] return;
   }
   uint8_t* buf = StartRecord(entry, timestamp, size, 4);
   wpi::support::endian::write32le(buf, arr.size());
@@ -872,8 +1038,8 @@ void DataLog::AppendStringArray(int entry,
     size += 4 + str.size();
   }
   std::scoped_lock lock{m_mutex};
-  if (m_paused) {
-    return;
+  if (m_state != kActive) {
+    [[unlikely]] return;
   }
   uint8_t* buf = StartRecord(entry, timestamp, size, 4);
   wpi::support::endian::write32le(buf, arr.size());
@@ -895,8 +1061,8 @@ void DataLog::AppendStringArray(int entry,
     size += 4 + str.len;
   }
   std::scoped_lock lock{m_mutex};
-  if (m_paused) {
-    return;
+  if (m_state != kActive) {
+    [[unlikely]] return;
   }
   uint8_t* buf = StartRecord(entry, timestamp, size, 4);
   wpi::support::endian::write32le(buf, arr.size());
@@ -940,6 +1106,10 @@ void WPI_DataLog_Pause(struct WPI_DataLog* datalog) {
 
 void WPI_DataLog_Resume(struct WPI_DataLog* datalog) {
   reinterpret_cast<DataLog*>(datalog)->Resume();
+}
+
+void WPI_DataLog_Stop(struct WPI_DataLog* datalog) {
+  reinterpret_cast<DataLog*>(datalog)->Stop();
 }
 
 int WPI_DataLog_Start(struct WPI_DataLog* datalog, const char* name,

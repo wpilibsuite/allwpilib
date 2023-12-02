@@ -1115,7 +1115,7 @@ public final class DriverStation {
    *
    * <p>If the FMS is not connected, it is set from the team alliance setting on the driver station.
    *
-   * @return the current alliance
+   * @return The alliance (red or blue) or an empty optional if the alliance is invalid
    */
   public static Optional<Alliance> getAlliance() {
     AllianceStationID allianceStationID = DriverStationJNI.getAllianceStation();

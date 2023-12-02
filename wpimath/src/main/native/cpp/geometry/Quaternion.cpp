@@ -8,6 +8,8 @@
 
 #include <wpi/json.h>
 
+#include "geometry3d.pb.h"
+
 using namespace frc;
 
 Quaternion::Quaternion(double w, double x, double y, double z)

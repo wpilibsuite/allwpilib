@@ -183,4 +183,6 @@ void from_json(const wpi::json& json, Translation3d& state);
 
 }  // namespace frc
 
+#include "frc/geometry/proto/Translation3dProto.h"
+#include "frc/geometry/struct/Translation3dStruct.h"
 #include "frc/geometry/Translation3d.inc"

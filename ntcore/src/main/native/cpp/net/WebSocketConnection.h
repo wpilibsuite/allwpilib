@@ -26,6 +26,8 @@ class WebSocketConnection final
   WebSocketConnection(const WebSocketConnection&) = delete;
   WebSocketConnection& operator=(const WebSocketConnection&) = delete;
 
+  void Start();
+
   unsigned int GetVersion() const final { return m_version; }
 
   void SendPing(uint64_t time) final;

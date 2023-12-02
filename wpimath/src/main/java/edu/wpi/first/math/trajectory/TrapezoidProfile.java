@@ -6,6 +6,9 @@ package edu.wpi.first.math.trajectory;
 
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Unit;
+import edu.wpi.first.units.Velocity;
 import java.util.Objects;
 
 /**
@@ -29,7 +32,7 @@ import java.util.Objects;
  *
  * <pre><code>
  * previousProfiledReference =
- * profile.calculate(timeSincePreviousUpdate, unprofiledReference, previousProfiledReference);
+ * profile.calculate(timeSincePreviousUpdate, previousProfiledReference, unprofiledReference);
  * </code></pre>
  *
  * <p>where `unprofiledReference` is free to change between calls. Note that when the unprofiled
@@ -67,6 +70,11 @@ public class TrapezoidProfile {
       this.maxAcceleration = maxAcceleration;
       MathSharedStore.reportUsage(MathUsageId.kTrajectory_TrapezoidProfile, 1);
     }
+
+    public <U extends Unit<U>> Constraints(
+        Measure<Velocity<U>> maxVelocity, Measure<Velocity<Velocity<U>>> maxAcceleration) {
+      this(maxVelocity.baseUnitMagnitude(), maxAcceleration.baseUnitMagnitude());
+    }
   }
 
   public static class State {
@@ -79,6 +87,10 @@ public class TrapezoidProfile {
     public State(double position, double velocity) {
       this.position = position;
       this.velocity = velocity;
+    }
+
+    public <U extends Unit<U>> State(Measure<U> position, Measure<Velocity<U>> velocity) {
+      this(position.baseUnitMagnitude(), velocity.baseUnitMagnitude());
     }
 
     @Override
@@ -212,11 +224,11 @@ public class TrapezoidProfile {
    * the profile was at time t = 0.
    *
    * @param t The time since the beginning of the profile.
-   * @param goal The desired state when the profile is complete.
    * @param current The current state.
+   * @param goal The desired state when the profile is complete.
    * @return The position and velocity of the profile at time t.
    */
-  public State calculate(double t, State goal, State current) {
+  public State calculate(double t, State current, State goal) {
     m_direction = shouldFlipAcceleration(current, goal) ? -1 : 1;
     m_current = direct(current);
     goal = direct(goal);

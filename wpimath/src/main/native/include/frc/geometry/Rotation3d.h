@@ -194,3 +194,6 @@ WPILIB_DLLEXPORT
 void from_json(const wpi::json& json, Rotation3d& rotation);
 
 }  // namespace frc
+
+#include "frc/geometry/proto/Rotation3dProto.h"
+#include "frc/geometry/struct/Rotation3dStruct.h"

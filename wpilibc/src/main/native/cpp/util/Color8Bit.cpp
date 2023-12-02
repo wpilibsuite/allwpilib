@@ -4,8 +4,6 @@
 
 #include "frc/util/Color8Bit.h"
 
-#include <fmt/format.h>
-
 using namespace frc;
 
 std::string Color8Bit::HexString() const {

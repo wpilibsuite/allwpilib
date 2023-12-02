@@ -4,8 +4,10 @@
 
 package edu.wpi.first.math.controller;
 
-import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.controller.proto.ElevatorFeedforwardProto;
+import edu.wpi.first.math.controller.struct.ElevatorFeedforwardStruct;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 
 /**
@@ -17,6 +19,9 @@ public class ElevatorFeedforward {
   public final double kg;
   public final double kv;
   public final double ka;
+
+  public static final ElevatorFeedforwardProto proto = new ElevatorFeedforwardProto();
+  public static final ElevatorFeedforwardStruct struct = new ElevatorFeedforwardStruct();
 
   /**
    * Creates a new ElevatorFeedforward with the specified gains. Units of the gain values will
@@ -93,8 +98,8 @@ public class ElevatorFeedforward {
     var plant = LinearSystemId.identifyVelocitySystem(this.kv, this.ka);
     var feedforward = new LinearPlantInversionFeedforward<>(plant, dtSeconds);
 
-    var r = Matrix.mat(Nat.N1(), Nat.N1()).fill(currentVelocity);
-    var nextR = Matrix.mat(Nat.N1(), Nat.N1()).fill(nextVelocity);
+    var r = MatBuilder.fill(Nat.N1(), Nat.N1(), currentVelocity);
+    var nextR = MatBuilder.fill(Nat.N1(), Nat.N1(), nextVelocity);
 
     return kg + ks * Math.signum(currentVelocity) + feedforward.calculate(r, nextR).get(0, 0);
   }

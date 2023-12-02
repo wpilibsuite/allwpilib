@@ -150,18 +150,24 @@ TEST_F(WebSocketIntegrationTest, ClientSendText) {
 TEST_F(WebSocketIntegrationTest, ServerSendPing) {
   int gotPing = 0;
   int gotPong = 0;
+  int gotData = 0;
 
   serverPipe->Listen([&]() {
     auto conn = serverPipe->Accept();
     auto server = WebSocketServer::Create(*conn);
     server->connected.connect([&](std::string_view, WebSocket& ws) {
+      ws.SendText({{"hello"}}, [&](auto, uv::Error) {});
       ws.SendPing({uv::Buffer{"\x03\x04", 2}}, [&](auto, uv::Error) {});
+      ws.SendPing({uv::Buffer{"\x03\x04", 2}}, [&](auto, uv::Error) {});
+      ws.SendText({{"hello"}}, [&](auto, uv::Error) {});
       ws.pong.connect([&](auto data) {
         ++gotPong;
         std::vector<uint8_t> recvData{data.begin(), data.end()};
         std::vector<uint8_t> expectData{0x03, 0x04};
         ASSERT_EQ(recvData, expectData);
-        ws.Close();
+        if (gotPong == 2) {
+          ws.Close();
+        }
       });
     });
   });
@@ -180,12 +186,17 @@ TEST_F(WebSocketIntegrationTest, ServerSendPing) {
       std::vector<uint8_t> expectData{0x03, 0x04};
       ASSERT_EQ(recvData, expectData);
     });
+    ws->text.connect([&](std::string_view data, bool) {
+      ++gotData;
+      ASSERT_EQ(data, "hello");
+    });
   });
 
   loop->Run();
 
-  ASSERT_EQ(gotPing, 1);
-  ASSERT_EQ(gotPong, 1);
+  ASSERT_EQ(gotPing, 2);
+  ASSERT_EQ(gotPong, 2);
+  ASSERT_EQ(gotData, 2);
 }
 
 }  // namespace wpi
