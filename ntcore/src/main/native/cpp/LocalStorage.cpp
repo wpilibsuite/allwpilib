@@ -998,7 +998,11 @@ bool LocalStorage::Impl::SetDefaultEntryValue(NT_Handle pubsubentryHandle,
     return false;
   }
   if (auto topic = GetTopic(pubsubentryHandle)) {
-    if (topic->Cached() && !topic->lastValue &&
+    if (!topic->Cached()) {
+      WARN("ignoring default value on non-cached topic '{}'", topic->name);
+      return false;
+    }
+    if (!topic->lastValue &&
         (topic->type == NT_UNASSIGNED || topic->type == value.type() ||
          IsNumericCompatible(topic->type, value.type()))) {
       // publish if we haven't yet
