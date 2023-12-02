@@ -9,6 +9,7 @@
 #include <string_view>
 
 #include <hal/cpp/fpga_clock.h>
+#include <networktables/NetworkTableInstance.h>
 #include <networktables/IntegerTopic.h>
 #include <wpi/DataLog.h>
 #include <wpi/StringMap.h>
