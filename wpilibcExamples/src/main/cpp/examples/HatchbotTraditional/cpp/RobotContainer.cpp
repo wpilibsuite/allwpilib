@@ -83,13 +83,14 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
   switch (m_chooser.GetSelected()) {
     case Autos::kSimpleAuto:
       return DriveDistance(AutoConstants::kAutoDriveDistanceInches,
-                             AutoConstants::kAutoDriveSpeed, &m_drive).ToPtr();
-    break;
+                           AutoConstants::kAutoDriveSpeed, &m_drive)
+          .ToPtr();
+      break;
     case Autos::kComplexAuto:
       return ComplexAuto(&m_drive, &m_hatch).ToPtr();
-    break;
-    default: 
+      break;
+    default:
       return frc2::CommandPtr(nullptr);
-    break;
+      break;
   }
 }

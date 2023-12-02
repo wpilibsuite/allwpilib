@@ -7,8 +7,8 @@
 #include <frc/PS4Controller.h>
 #include <frc/controller/PIDController.h>
 #include <frc/smartdashboard/SendableChooser.h>
-#include <frc2/command/CommandPtr.h>
 #include <frc2/command/Command.h>
+#include <frc2/command/CommandPtr.h>
 #include <frc2/command/InstantCommand.h>
 
 #include "Constants.h"

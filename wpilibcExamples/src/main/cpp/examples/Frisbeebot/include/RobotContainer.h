@@ -48,6 +48,5 @@ class RobotContainer {
   frc2::CommandPtr m_stopShooter =
       frc2::cmd::RunOnce([this] { m_shooter.Disable(); }, {&m_shooter});
 
-
   void ConfigureButtonBindings();
 };
