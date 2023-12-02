@@ -211,6 +211,7 @@ def main():
         "0031-Replace-deprecated-std-aligned_storage_t.patch",
         "0032-Fix-compilation-of-MathExtras.h-on-Windows-with-sdl.patch",
         "0033-raw_ostream-Add-SetNumBytesInBuffer.patch",
+        "0034-type_traits.h-Add-is_constexpr.patch",
     ]:
         git_am(
             os.path.join(wpilib_root, "upstream_utils/llvm_patches", f),

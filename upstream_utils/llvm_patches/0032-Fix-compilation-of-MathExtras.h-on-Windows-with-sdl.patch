@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Benjamin Hall <bhallctre@gmail.com>
 Date: Mon, 23 Oct 2023 21:36:40 -0400
-Subject: [PATCH 32/32] Fix compilation of MathExtras.h on Windows with /sdl
+Subject: [PATCH 32/34] Fix compilation of MathExtras.h on Windows with /sdl
 
 See https://github.com/llvm/llvm-project/pull/68978
 ---
