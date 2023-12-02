@@ -17,52 +17,6 @@ protobuf_generate_cpp(
     ${wpimath_proto_src}
 )
 
-function(quickbuf_generate SRCS JAVA_PACKAGE)
-    if(NOT ARGN)
-        message(SEND_ERROR "Error: PROTOBUF_GENERATE_QUICKBUF() called without any proto files")
-        return()
-    endif()
-
-    set(_generated_srcs_all)
-    foreach(_proto ${ARGN})
-        get_filename_component(_abs_file ${_proto} ABSOLUTE)
-        get_filename_component(_abs_dir ${_abs_file} DIRECTORY)
-        get_filename_component(_basename ${_proto} NAME_WLE)
-        file(RELATIVE_PATH _rel_dir ${CMAKE_CURRENT_SOURCE_DIR} ${_abs_dir})
-
-        # convert to QuickBuffers Java case (geometry2d -> Geometry2D)
-        string(REGEX MATCHALL "[A-Za-z_]+|[0-9]+" _name_components ${_basename})
-        set(_name_components_out)
-        foreach(_part ${_name_components})
-            string(SUBSTRING ${_part} 0 1 _first_letter)
-            string(TOUPPER ${_first_letter} _first_letter)
-            string(REGEX REPLACE "^.(.*)" "${_first_letter}\\1" _part_out "${_part}")
-            list(APPEND _name_components_out ${_part_out})
-        endforeach()
-        list(JOIN _name_components_out "" _basename_title)
-
-        set(_generated_src
-            "${CMAKE_CURRENT_BINARY_DIR}/quickbuf/${JAVA_PACKAGE}/${_basename_title}.java"
-        )
-
-        list(APPEND _generated_srcs_all ${_generated_src})
-
-        add_custom_command(
-            OUTPUT ${_generated_src}
-            COMMAND protobuf::protoc
-            ARGS
-                --plugin=protoc-gen-quickbuf=${Quickbuf_EXECUTABLE}
-                --quickbuf_out=gen_descriptors=true:${CMAKE_CURRENT_BINARY_DIR}/quickbuf
-                -I${_abs_dir} ${_abs_file}
-            DEPENDS ${_abs_file} protobuf::protoc
-            COMMENT "Running quickbuf protocol buffer compiler on ${_proto}"
-            VERBATIM
-        )
-    endforeach()
-
-    set(${SRCS} ${_generated_srcs_all} PARENT_SCOPE)
-endfunction()
-
 file(
     GLOB wpimath_jni_src
     src/main/native/cpp/jni/WPIMathJNI_DARE.cpp
@@ -79,8 +33,6 @@ if(WITH_JAVA)
     find_package(JNI REQUIRED)
     include(UseJava)
     set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
-
-    quickbuf_generate(WPIMATH_QUICKBUF_SRCS   "edu/wpi/first/math/proto"   ${wpimath_proto_src})
 
     if(NOT EXISTS "${WPILIB_BINARY_DIR}/wpimath/thirdparty/ejml/ejml-simple-0.43.1.jar")
         set(BASE_URL "https://search.maven.org/remotecontent?filepath=")
@@ -126,7 +78,6 @@ if(WITH_JAVA)
     add_jar(
         wpimath_jar
         ${JAVA_SOURCES}
-        ${WPIMATH_QUICKBUF_SRCS}
         INCLUDE_JARS ${EJML_JARS} wpiutil_jar wpiunits_jar
         OUTPUT_NAME wpimath
         GENERATE_NATIVE_HEADERS wpimath_jni_headers
