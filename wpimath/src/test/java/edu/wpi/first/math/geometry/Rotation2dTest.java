@@ -8,10 +8,18 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
+import edu.wpi.first.units.Units;
 import org.junit.jupiter.api.Test;
 
 class Rotation2dTest {
   private static final double kEpsilon = 1E-9;
+
+  @Test
+  void testNewWithMeasures() {
+    var rot = new Rotation2d(Units.Degrees.of(45));
+
+    assertEquals(Math.PI / 4, rot.getRadians(), kEpsilon);
+  }
 
   @Test
   void testRadiansToDegrees() {

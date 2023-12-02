@@ -25,6 +25,9 @@
 #ifndef _gcem_atanh_HPP
 #define _gcem_atanh_HPP
 
+#include <cmath>
+#include <type_traits>
+
 namespace internal
 {
 
@@ -73,7 +76,11 @@ return_t<T>
 atanh(const T x)
 noexcept
 {
+  if (std::is_constant_evaluated()) {
     return internal::atanh_check( static_cast<return_t<T>>(x) );
+  } else {
+    return std::atanh(x);
+  }
 }
 
 #endif

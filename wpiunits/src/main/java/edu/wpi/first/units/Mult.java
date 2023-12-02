@@ -8,9 +8,7 @@ import edu.wpi.first.units.collections.LongToObjectHashMap;
 import java.util.Objects;
 
 /**
- * A combinatory unit type that is equivalent to the product of two other others. For example,
- * Newton * Meters for torque could be represented as a unit of <code>
- * Mult&lt;Force, Distance, Torque&gt;</code>
+ * A combinatory unit type that is equivalent to the product of two other others.
  *
  * @param <A> the type of the first unit in the result
  * @param <B> the type of the second unit in the result

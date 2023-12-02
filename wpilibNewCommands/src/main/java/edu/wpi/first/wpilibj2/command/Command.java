@@ -424,6 +424,18 @@ public abstract class Command implements Sendable {
   }
 
   /**
+   * Decorates this command with a lambda to call on interrupt or end, following the command's
+   * inherent {@link #end(boolean)} method. The provided lambda will run identically in both
+   * interrupt and end cases.
+   *
+   * @param end a lambda to run when the command ends, whether or not it was interrupted.
+   * @return the decorated command
+   */
+  public WrapperCommand finallyDo(Runnable end) {
+    return finallyDo(interrupted -> end.run());
+  }
+
+  /**
    * Decorates this command with a lambda to call on interrupt, following the command's inherent
    * {@link #end(boolean)} method.
    *

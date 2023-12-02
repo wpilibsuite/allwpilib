@@ -25,6 +25,9 @@
 #ifndef _gcem_asin_HPP
 #define _gcem_asin_HPP
 
+#include <cmath>
+#include <type_traits>
+
 namespace internal
 {
 
@@ -76,7 +79,11 @@ return_t<T>
 asin(const T x)
 noexcept
 {
+  if (std::is_constant_evaluated()) {
     return internal::asin_check( static_cast<return_t<T>>(x) );
+  } else {
+    return std::asin(x);
+  }
 }
 
 #endif

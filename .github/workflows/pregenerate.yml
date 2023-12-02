@@ -1,0 +1,45 @@
+name: Check Pregenerated Files
+
+on:
+  pull_request:
+  push:
+    branches-ignore:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  update:
+    name: "Update"
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: Fetch all history and metadata
+        run: |
+          git fetch --prune --unshallow
+          git checkout -b pr
+          git branch -f main origin/main
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+      - name: Install jinja
+        run: python -m pip install jinja2
+      - name: Run ntcore
+        run: ./ntcore/generate_topics.py
+      - name: Run wpimath
+        run: ./wpimath/generate_numbers.py
+      - name: Add untracked files to index so they count as changes
+        run: git add -A
+      - name: Check output
+        run: git --no-pager diff --exit-code HEAD
+      - name: Generate diff
+        run: git diff HEAD > pregenerated-files-fixes.patch
+        if: ${{ failure() }}
+      - uses: actions/upload-artifact@v3
+        with:
+          name: pregenerated-files-fixes
+          path: pregenerated-files-fixes.patch
+        if: ${{ failure() }}

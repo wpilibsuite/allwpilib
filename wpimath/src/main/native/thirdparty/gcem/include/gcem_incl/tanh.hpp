@@ -25,6 +25,9 @@
 #ifndef _gcem_tanh_HPP
 #define _gcem_tanh_HPP
 
+#include <cmath>
+#include <type_traits>
+
 namespace internal
 {
 
@@ -83,7 +86,11 @@ return_t<T>
 tanh(const T x)
 noexcept
 {
+  if (std::is_constant_evaluated()) {
     return internal::tanh_check( static_cast<return_t<T>>(x) );
+  } else {
+    return std::tanh(x);
+  }
 }
 
 #endif

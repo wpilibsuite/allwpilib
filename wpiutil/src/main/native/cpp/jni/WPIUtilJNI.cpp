@@ -9,6 +9,7 @@
 #include <fmt/format.h>
 
 #include "edu_wpi_first_util_WPIUtilJNI.h"
+#include "wpi/RawFrame.h"
 #include "wpi/Synchronization.h"
 #include "wpi/jni_util.h"
 #include "wpi/timestamp.h"
@@ -315,6 +316,34 @@ Java_edu_wpi_first_util_WPIUtilJNI_waitForObjectsTimeout
     return nullptr;
   }
   return MakeJIntArray(env, signaled);
+}
+
+/*
+ * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Method:    allocateRawFrame
+ * Signature: ()J
+ */
+JNIEXPORT jlong JNICALL
+Java_edu_wpi_first_util_WPIUtilJNI_allocateRawFrame
+  (JNIEnv*, jclass)
+{
+  wpi::RawFrame* rawFrame = new wpi::RawFrame{};
+  intptr_t rawFrameIntPtr = reinterpret_cast<intptr_t>(rawFrame);
+  return static_cast<jlong>(rawFrameIntPtr);
+}
+
+/*
+ * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Method:    freeRawFrame
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_util_WPIUtilJNI_freeRawFrame
+  (JNIEnv*, jclass, jlong rawFrame)
+{
+  wpi::RawFrame* ptr =
+      reinterpret_cast<wpi::RawFrame*>(static_cast<intptr_t>(rawFrame));
+  delete ptr;
 }
 
 }  // extern "C"

@@ -25,6 +25,9 @@
 #ifndef _gcem_tgamma_HPP
 #define _gcem_tgamma_HPP
 
+#include <cmath>
+#include <type_traits>
+
 namespace internal
 {
 
@@ -74,7 +77,11 @@ return_t<T>
 tgamma(const T x)
 noexcept
 {
+  if (std::is_constant_evaluated()) {
     return internal::tgamma_check( static_cast<return_t<T>>(x) );
+  } else {
+    return std::tgamma(x);
+  }
 }
 
 #endif

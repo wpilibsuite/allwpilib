@@ -91,3 +91,6 @@ class WPILIB_DLLEXPORT DifferentialDriveKinematics
   units::meter_t trackWidth;
 };
 }  // namespace frc
+
+#include "frc/kinematics/proto/DifferentialDriveKinematicsProto.h"
+#include "frc/kinematics/struct/DifferentialDriveKinematicsStruct.h"

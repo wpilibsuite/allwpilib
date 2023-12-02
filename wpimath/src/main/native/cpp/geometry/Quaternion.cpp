@@ -232,24 +232,3 @@ void frc::from_json(const wpi::json& json, Quaternion& quaternion) {
       Quaternion{json.at("W").get<double>(), json.at("X").get<double>(),
                  json.at("Y").get<double>(), json.at("Z").get<double>()};
 }
-
-google::protobuf::Message* wpi::Protobuf<frc::Quaternion>::New(
-    google::protobuf::Arena* arena) {
-  return google::protobuf::Arena::CreateMessage<wpi::proto::ProtobufQuaternion>(
-      arena);
-}
-
-frc::Quaternion wpi::Protobuf<frc::Quaternion>::Unpack(
-    const google::protobuf::Message& msg) {
-  auto m = static_cast<const wpi::proto::ProtobufQuaternion*>(&msg);
-  return frc::Quaternion{m->w(), m->x(), m->y(), m->z()};
-}
-
-void wpi::Protobuf<frc::Quaternion>::Pack(google::protobuf::Message* msg,
-                                          const frc::Quaternion& value) {
-  auto m = static_cast<wpi::proto::ProtobufQuaternion*>(msg);
-  m->set_w(value.W());
-  m->set_x(value.X());
-  m->set_y(value.Y());
-  m->set_z(value.Z());
-}

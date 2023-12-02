@@ -51,15 +51,13 @@ frc::Vectord<5> Dynamics(const frc::Vectord<5>& x, const frc::Vectord<2>& u) {
           k1.value() * ((C1 * vr).value() + (C2 * Vr).value())};
 }
 
-frc::Vectord<3> LocalMeasurementModel(const frc::Vectord<5>& x,
-                                      const frc::Vectord<2>& u) {
-  static_cast<void>(u);
+frc::Vectord<3> LocalMeasurementModel(
+    const frc::Vectord<5>& x, [[maybe_unused]] const frc::Vectord<2>& u) {
   return frc::Vectord<3>{x(2), x(3), x(4)};
 }
 
-frc::Vectord<5> GlobalMeasurementModel(const frc::Vectord<5>& x,
-                                       const frc::Vectord<2>& u) {
-  static_cast<void>(u);
+frc::Vectord<5> GlobalMeasurementModel(
+    const frc::Vectord<5>& x, [[maybe_unused]] const frc::Vectord<2>& u) {
   return frc::Vectord<5>{x(0), x(1), x(2), x(3), x(4)};
 }
 }  // namespace

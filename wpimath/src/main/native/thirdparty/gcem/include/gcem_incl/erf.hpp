@@ -25,6 +25,9 @@
 #ifndef _gcem_erf_HPP
 #define _gcem_erf_HPP
 
+#include <cmath>
+#include <type_traits>
+
 namespace internal
 {
 
@@ -137,7 +140,11 @@ return_t<T>
 erf(const T x)
 noexcept
 {
+  if (std::is_constant_evaluated()) {
     return internal::erf_check( static_cast<return_t<T>>(x) );
+  } else {
+    return std::erf(x);
+  }
 }
 
 #endif
