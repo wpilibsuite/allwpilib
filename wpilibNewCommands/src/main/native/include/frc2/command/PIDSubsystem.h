@@ -27,7 +27,8 @@ class WPI_DEPRECATED(
    * @param controller the PIDController to use
    * @param initialPosition the initial setpoint of the subsystem
    */
-  explicit PIDSubsystem(PIDController controller, double initialPosition = 0);
+  explicit PIDSubsystem(frc::PIDController controller,
+                        double initialPosition = 0);
 
   void Periodic() override;
 
@@ -67,10 +68,10 @@ class WPI_DEPRECATED(
    *
    * @return The controller.
    */
-  PIDController& GetController();
+  frc::PIDController& GetController();
 
  protected:
-  PIDController m_controller;
+  frc::PIDController m_controller;
   bool m_enabled{false};
 
   /**

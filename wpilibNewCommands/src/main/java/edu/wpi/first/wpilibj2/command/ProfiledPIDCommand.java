@@ -21,7 +21,7 @@ import java.util.function.Supplier;
  * <p>This class is provided by the NewCommands VendorDep
  */
 @Deprecated
-public class ProfiledPIDCommand extends CommandBase {
+public class ProfiledPIDCommand extends Command {
   protected final ProfiledPIDController m_controller;
   protected DoubleSupplier m_measurement;
   protected Supplier<State> m_goal;

@@ -38,18 +38,12 @@ class CoordinateSystemTest {
     assertEquals(
         transformTo.getTranslation(),
         CoordinateSystem.convert(transformFrom.getTranslation(), coordFrom, coordTo));
-    assertEquals(
-        transformTo.getRotation(),
-        CoordinateSystem.convert(transformFrom.getRotation(), coordFrom, coordTo));
     assertEquals(transformTo, CoordinateSystem.convert(transformFrom, coordFrom, coordTo));
 
     // "to" to "from"
     assertEquals(
         transformFrom.getTranslation(),
         CoordinateSystem.convert(transformTo.getTranslation(), coordTo, coordFrom));
-    assertEquals(
-        transformFrom.getRotation(),
-        CoordinateSystem.convert(transformTo.getRotation(), coordTo, coordFrom));
     assertEquals(transformFrom, CoordinateSystem.convert(transformTo, coordTo, coordFrom));
   }
 
@@ -158,9 +152,7 @@ class CoordinateSystemTest {
     // No rotation from EDN to NWU
     checkTransform3dConvert(
         new Transform3d(new Translation3d(1.0, 2.0, 3.0), new Rotation3d()),
-        new Transform3d(
-            new Translation3d(3.0, -1.0, -2.0),
-            new Rotation3d(Units.degreesToRadians(-90.0), 0.0, Units.degreesToRadians(-90.0))),
+        new Transform3d(new Translation3d(3.0, -1.0, -2.0), new Rotation3d()),
         CoordinateSystem.EDN(),
         CoordinateSystem.NWU());
 
@@ -171,7 +163,7 @@ class CoordinateSystemTest {
             new Rotation3d(Units.degreesToRadians(45.0), 0.0, 0.0)),
         new Transform3d(
             new Translation3d(3.0, -1.0, -2.0),
-            new Rotation3d(Units.degreesToRadians(-45.0), 0.0, Units.degreesToRadians(-90.0))),
+            new Rotation3d(0.0, Units.degreesToRadians(-45.0), 0.0)),
         CoordinateSystem.EDN(),
         CoordinateSystem.NWU());
 
@@ -182,7 +174,7 @@ class CoordinateSystemTest {
             new Rotation3d(0.0, Units.degreesToRadians(45.0), 0.0)),
         new Transform3d(
             new Translation3d(3.0, -1.0, -2.0),
-            new Rotation3d(Units.degreesToRadians(-90.0), 0.0, Units.degreesToRadians(-135.0))),
+            new Rotation3d(0.0, 0.0, Units.degreesToRadians(-45.0))),
         CoordinateSystem.EDN(),
         CoordinateSystem.NWU());
 
@@ -193,10 +185,7 @@ class CoordinateSystemTest {
             new Rotation3d(0.0, 0.0, Units.degreesToRadians(45.0))),
         new Transform3d(
             new Translation3d(3.0, -1.0, -2.0),
-            new Rotation3d(
-                Units.degreesToRadians(-90.0),
-                Units.degreesToRadians(45.0),
-                Units.degreesToRadians(-90.0))),
+            new Rotation3d(Units.degreesToRadians(45.0), 0.0, 0.0)),
         CoordinateSystem.EDN(),
         CoordinateSystem.NWU());
   }
@@ -206,9 +195,7 @@ class CoordinateSystemTest {
     // No rotation from EDN to NED
     checkTransform3dConvert(
         new Transform3d(new Translation3d(1.0, 2.0, 3.0), new Rotation3d()),
-        new Transform3d(
-            new Translation3d(3.0, 1.0, 2.0),
-            new Rotation3d(Units.degreesToRadians(90.0), 0.0, Units.degreesToRadians(90.0))),
+        new Transform3d(new Translation3d(3.0, 1.0, 2.0), new Rotation3d()),
         CoordinateSystem.EDN(),
         CoordinateSystem.NED());
 
@@ -219,7 +206,7 @@ class CoordinateSystemTest {
             new Rotation3d(Units.degreesToRadians(45.0), 0.0, 0.0)),
         new Transform3d(
             new Translation3d(3.0, 1.0, 2.0),
-            new Rotation3d(Units.degreesToRadians(135.0), 0.0, Units.degreesToRadians(90.0))),
+            new Rotation3d(0.0, Units.degreesToRadians(45.0), 0.0)),
         CoordinateSystem.EDN(),
         CoordinateSystem.NED());
 
@@ -230,7 +217,7 @@ class CoordinateSystemTest {
             new Rotation3d(0.0, Units.degreesToRadians(45.0), 0.0)),
         new Transform3d(
             new Translation3d(3.0, 1.0, 2.0),
-            new Rotation3d(Units.degreesToRadians(90.0), 0.0, Units.degreesToRadians(135.0))),
+            new Rotation3d(0.0, 0.0, Units.degreesToRadians(45.0))),
         CoordinateSystem.EDN(),
         CoordinateSystem.NED());
 
@@ -241,10 +228,7 @@ class CoordinateSystemTest {
             new Rotation3d(0.0, 0.0, Units.degreesToRadians(45.0))),
         new Transform3d(
             new Translation3d(3.0, 1.0, 2.0),
-            new Rotation3d(
-                Units.degreesToRadians(90.0),
-                Units.degreesToRadians(-45.0),
-                Units.degreesToRadians(90.0))),
+            new Rotation3d(Units.degreesToRadians(45.0), 0.0, 0.0)),
         CoordinateSystem.EDN(),
         CoordinateSystem.NED());
   }

@@ -4,7 +4,10 @@
 
 #pragma once
 
-#include "Eigen/Cholesky"
+#include <functional>
+
+#include <Eigen/Cholesky>
+
 #include "frc/StateSpaceUtil.h"
 #include "frc/estimator/UnscentedKalmanFilter.h"
 #include "frc/estimator/UnscentedTransform.h"

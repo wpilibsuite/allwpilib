@@ -2,6 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <gtest/gtest.h>
 #include <wpi/SmallString.h>
 #include <wpi/raw_ostream.h>
 
@@ -9,7 +10,6 @@
 #include "../TestPrinters.h"
 #include "Handle.h"
 #include "gmock/gmock.h"
-#include "gtest/gtest.h"
 #include "net/Message.h"
 #include "net/WireDecoder.h"
 #include "networktables/NetworkTableValue.h"
@@ -67,8 +67,8 @@ TEST_F(WireDecodeTextClientTest, ErrorEmpty) {
       logger,
       Call(_, _, _,
            "could not decode JSON message: [json.exception.parse_error.101] "
-           "parse error at 1: syntax error - "
-           "unexpected end of input; expected '[', '{', or a literal"sv));
+           "parse error at line 1, column 1: syntax error while parsing value "
+           "- unexpected end of input; expected '[', '{', or a literal"sv));
   net::WireDecodeText("", handler, logger);
 }
 
@@ -77,8 +77,8 @@ TEST_F(WireDecodeTextClientTest, ErrorBadJson1) {
       logger,
       Call(_, _, _,
            "could not decode JSON message: [json.exception.parse_error.101] "
-           "parse error at 2: syntax error - "
-           "unexpected end of input; expected '[', '{', or a literal"sv));
+           "parse error at line 1, column 2: syntax error while parsing value "
+           "- unexpected end of input; expected '[', '{', or a literal"sv));
   net::WireDecodeText("[", handler, logger);
 }
 
@@ -87,8 +87,8 @@ TEST_F(WireDecodeTextClientTest, ErrorBadJson2) {
       logger,
       Call(_, _, _,
            "could not decode JSON message: [json.exception.parse_error.101] "
-           "parse error at 3: syntax error - "
-           "unexpected end of input; expected string literal"sv));
+           "parse error at line 1, column 3: syntax error while parsing object "
+           "key - unexpected end of input; expected string literal"sv));
   net::WireDecodeText("[{", handler, logger);
 }
 

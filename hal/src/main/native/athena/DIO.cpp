@@ -230,12 +230,13 @@ void HAL_SetDigitalPWMDutyCycle(HAL_DigitalPWMHandle pwmGenerator,
       // frequencies.
       rawDutyCycle = rawDutyCycle / std::pow(2.0, 4 - pwmPeriodPower);
     }
-    if (id < 4)
+    if (id < 4) {
       digitalSystem->writePWMDutyCycleA(id, static_cast<uint8_t>(rawDutyCycle),
                                         status);
-    else
+    } else {
       digitalSystem->writePWMDutyCycleB(
           id - 4, static_cast<uint8_t>(rawDutyCycle), status);
+    }
   }
 }
 
@@ -254,12 +255,13 @@ void HAL_SetDigitalPWMPPS(HAL_DigitalPWMHandle pwmGenerator, double dutyCycle,
   }
   {
     std::scoped_lock lock(digitalPwmMutex);
-    if (id < 4)
+    if (id < 4) {
       digitalSystem->writePWMDutyCycleA(id, static_cast<uint8_t>(rawDutyCycle),
                                         status);
-    else
+    } else {
       digitalSystem->writePWMDutyCycleB(
           id - 4, static_cast<uint8_t>(rawDutyCycle), status);
+    }
   }
 }
 

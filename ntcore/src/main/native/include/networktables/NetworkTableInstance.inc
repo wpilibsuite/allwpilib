@@ -38,6 +38,24 @@ inline NT_Inst NetworkTableInstance::GetHandle() const {
   return m_handle;
 }
 
+template <wpi::ProtobufSerializable T>
+inline ProtobufTopic<T> NetworkTableInstance::GetProtobufTopic(
+    std::string_view name) const {
+  return ProtobufTopic<T>{GetTopic(name)};
+}
+
+template <wpi::StructSerializable T>
+inline StructTopic<T> NetworkTableInstance::GetStructTopic(
+    std::string_view name) const {
+  return StructTopic<T>{GetTopic(name)};
+}
+
+template <wpi::StructSerializable T>
+inline StructArrayTopic<T> NetworkTableInstance::GetStructArrayTopic(
+    std::string_view name) const {
+  return StructArrayTopic<T>{GetTopic(name)};
+}
+
 inline std::vector<Topic> NetworkTableInstance::GetTopics() {
   auto handles = ::nt::GetTopics(m_handle, "", 0);
   return {handles.begin(), handles.end()};
@@ -222,5 +240,47 @@ inline NT_Listener NetworkTableInstance::AddLogger(unsigned int min_level,
                                                    ListenerCallback func) {
   return ::nt::AddLogger(m_handle, min_level, max_level, std::move(func));
 }
+
+inline bool NetworkTableInstance::HasSchema(std::string_view name) const {
+  return ::nt::HasSchema(m_handle, name);
+}
+
+inline void NetworkTableInstance::AddSchema(std::string_view name,
+                                            std::string_view type,
+                                            std::span<const uint8_t> schema) {
+  ::nt::AddSchema(m_handle, name, type, schema);
+}
+
+inline void NetworkTableInstance::AddSchema(std::string_view name,
+                                            std::string_view type,
+                                            std::string_view schema) {
+  ::nt::AddSchema(m_handle, name, type, schema);
+}
+
+// Suppress unused-lambda-capture warning on AddSchema() call
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-lambda-capture"
+#endif
+
+template <wpi::ProtobufSerializable T>
+void NetworkTableInstance::AddProtobufSchema(wpi::ProtobufMessage<T>& msg) {
+  msg.ForEachProtobufDescriptor(
+      [this](auto typeString) { return HasSchema(typeString); },
+      [this](auto typeString, auto schema) {
+        AddSchema(typeString, "proto:FileDescriptorProto", schema);
+      });
+}
+
+template <wpi::StructSerializable T>
+void NetworkTableInstance::AddStructSchema() {
+  wpi::ForEachStructSchema<T>([this](auto typeString, auto schema) {
+    AddSchema(typeString, "structschema", schema);
+  });
+}
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 }  // namespace nt

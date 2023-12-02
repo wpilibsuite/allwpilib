@@ -6,17 +6,12 @@
 
 #include <string>
 
-#include "networktables/NetworkTableInstance.h"
 #include "networktables/NetworkTableType.h"
 #include "networktables/Topic.h"
 #include "ntcore_c.h"
 #include "ntcore_cpp.h"
 
 namespace nt {
-
-inline NetworkTableInstance Topic::GetInstance() const {
-  return NetworkTableInstance{GetInstanceFromHandle(m_handle)};
-}
 
 inline std::string Topic::GetName() const {
   return ::nt::GetTopicName(m_handle);

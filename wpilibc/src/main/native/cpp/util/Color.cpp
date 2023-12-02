@@ -4,8 +4,6 @@
 
 #include "frc/util/Color.h"
 
-#include <fmt/format.h>
-
 using namespace frc;
 
 std::string Color::HexString() const {

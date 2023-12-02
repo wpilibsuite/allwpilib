@@ -4,7 +4,7 @@
 
 #include "glass/Storage.h"
 
-#include <type_traits>
+#include <concepts>
 
 #include <imgui.h>
 #include <wpi/StringExtras.h>
@@ -14,7 +14,7 @@ using namespace glass;
 
 template <typename To>
 bool ConvertFromString(To* out, std::string_view str) {
-  if constexpr (std::is_same_v<To, bool>) {
+  if constexpr (std::same_as<To, bool>) {
     if (str == "true") {
       *out = true;
     } else if (str == "false") {
@@ -24,7 +24,7 @@ bool ConvertFromString(To* out, std::string_view str) {
     } else {
       return false;
     }
-  } else if constexpr (std::is_floating_point_v<To>) {
+  } else if constexpr (std::floating_point<To>) {
     if (auto val = wpi::parse_float<To>(str)) {
       *out = val.value();
     } else {
@@ -95,10 +95,14 @@ static inline bool ConvertString(Storage::Value* value) {
 template <typename From, typename To>
 static void ConvertArray(std::vector<To>** outPtr, std::vector<From>** inPtr) {
   if (*inPtr) {
-    std::vector<To>* tmp;
-    tmp = new std::vector<To>{(*inPtr)->begin(), (*inPtr)->end()};
-    delete *inPtr;
-    *outPtr = tmp;
+    if (*outPtr) {
+      (*outPtr)->assign((*inPtr)->begin(), (*inPtr)->end());
+    } else {
+      std::vector<To>* tmp;
+      tmp = new std::vector<To>{(*inPtr)->begin(), (*inPtr)->end()};
+      delete *inPtr;
+      *outPtr = tmp;
+    }
   } else {
     *outPtr = nullptr;
   }
@@ -300,7 +304,7 @@ Storage& Storage::GetChild(std::string_view label_id) {
     childPtr = std::make_unique<Value>();
   }
   if (childPtr->type != Value::kChild) {
-    childPtr->type = Value::kChild;
+    childPtr->Reset(Value::kChild);
     childPtr->child = new Storage;
   }
   return *childPtr->child;
@@ -630,22 +634,46 @@ void Storage::ClearValues() {
         value.stringVal = value.stringDefault;
         break;
       case Value::kIntArray:
-        *value.intArray = *value.intArrayDefault;
+        if (value.intArrayDefault) {
+          *value.intArray = *value.intArrayDefault;
+        } else {
+          value.intArray->clear();
+        }
         break;
       case Value::kInt64Array:
-        *value.int64Array = *value.int64ArrayDefault;
+        if (value.int64ArrayDefault) {
+          *value.int64Array = *value.int64ArrayDefault;
+        } else {
+          value.int64Array->clear();
+        }
         break;
       case Value::kBoolArray:
-        *value.boolArray = *value.boolArrayDefault;
+        if (value.boolArrayDefault) {
+          *value.boolArray = *value.boolArrayDefault;
+        } else {
+          value.boolArray->clear();
+        }
         break;
       case Value::kFloatArray:
-        *value.floatArray = *value.floatArrayDefault;
+        if (value.floatArrayDefault) {
+          *value.floatArray = *value.floatArrayDefault;
+        } else {
+          value.floatArray->clear();
+        }
         break;
       case Value::kDoubleArray:
-        *value.doubleArray = *value.doubleArrayDefault;
+        if (value.doubleArrayDefault) {
+          *value.doubleArray = *value.doubleArrayDefault;
+        } else {
+          value.doubleArray->clear();
+        }
         break;
       case Value::kStringArray:
-        *value.stringArray = *value.stringArrayDefault;
+        if (value.stringArrayDefault) {
+          *value.stringArray = *value.stringArrayDefault;
+        } else {
+          value.stringArray->clear();
+        }
         break;
       case Value::kChild:
         value.child->Clear();

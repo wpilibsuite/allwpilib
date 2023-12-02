@@ -12,6 +12,19 @@ extern "C" {
 #endif
 
 /**
+ * Initialize the on-Rio Now() implementation to use the FPGA timestamp.
+ * No effect on non-Rio platforms. This is called by HAL_Initialize() and
+ * thus should generally not be called by user code.
+ */
+void WPI_Impl_SetupNowRio(void);
+
+/**
+ * De-initialize the on-Rio Now() implementation. No effect on non-Rio
+ * platforms.
+ */
+void WPI_Impl_ShutdownNowRio(void);
+
+/**
  * The default implementation used for Now().
  * In general this is the time returned by the operating system.
  * @return Time in microseconds.
@@ -48,12 +61,27 @@ uint64_t WPI_GetSystemTime(void);
 #ifdef __cplusplus
 namespace wpi {
 
+namespace impl {
+/**
+ * Initialize the on-Rio Now() implementation to use the FPGA timestamp.
+ * No effect on non-Rio platforms. This is called by HAL_Initialize() and
+ * thus should generally not be called by user code.
+ */
+void SetupNowRio();
+
+/**
+ * De-initialize the on-Rio Now() implementation. No effect on non-Rio
+ * platforms.
+ */
+void ShutdownNowRio();
+}  // namespace impl
+
 /**
  * The default implementation used for Now().
  * In general this is the time returned by the operating system.
  * @return Time in microseconds.
  */
-uint64_t NowDefault(void);
+uint64_t NowDefault();
 
 /**
  * Set the implementation used by Now().
@@ -68,7 +96,7 @@ void SetNowImpl(uint64_t (*func)());
  * This is a monotonic clock with an undefined epoch.
  * @return Time in microseconds.
  */
-uint64_t Now(void);
+uint64_t Now();
 
 /**
  * Return the current system time in microseconds since the Unix epoch

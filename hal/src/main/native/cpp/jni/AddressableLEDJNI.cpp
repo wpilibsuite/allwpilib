@@ -69,12 +69,11 @@ Java_edu_wpi_first_hal_AddressableLEDJNI_setData
   (JNIEnv* env, jclass, jint handle, jbyteArray arr)
 {
   int32_t status = 0;
-  JByteArrayRef jArrRef{env, arr};
-  auto arrRef = jArrRef.array();
+  JSpan<const jbyte> jArrRef{env, arr};
   HAL_WriteAddressableLEDData(
       static_cast<HAL_AddressableLEDHandle>(handle),
-      reinterpret_cast<const HAL_AddressableLEDData*>(arrRef.data()),
-      arrRef.size() / 4, &status);
+      reinterpret_cast<const HAL_AddressableLEDData*>(jArrRef.data()),
+      jArrRef.size() / 4, &status);
   CheckStatus(env, status);
 }
 

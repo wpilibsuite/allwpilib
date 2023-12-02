@@ -4,13 +4,14 @@
 
 #pragma once
 
+#include <wpi/MathExtras.h>
 #include <wpi/SymbolExports.h>
 
 #include "units/length.h"
 
 namespace frc {
 /**
- * Represents the wheel speeds for a mecanum drive drivetrain.
+ * Represents the wheel positions for a mecanum drive drivetrain.
  */
 struct WPILIB_DLLEXPORT MecanumDriveWheelPositions {
   /**
@@ -49,5 +50,16 @@ struct WPILIB_DLLEXPORT MecanumDriveWheelPositions {
    * @return Whether the two objects are not equal.
    */
   bool operator!=(const MecanumDriveWheelPositions& other) const = default;
+
+  MecanumDriveWheelPositions Interpolate(
+      const MecanumDriveWheelPositions& endValue, double t) const {
+    return {wpi::Lerp(frontLeft, endValue.frontLeft, t),
+            wpi::Lerp(frontRight, endValue.frontRight, t),
+            wpi::Lerp(rearLeft, endValue.rearLeft, t),
+            wpi::Lerp(rearRight, endValue.rearRight, t)};
+  }
 };
 }  // namespace frc
+
+#include "frc/kinematics/proto/MecanumDriveWheelPositionsProto.h"
+#include "frc/kinematics/struct/MecanumDriveWheelPositionsStruct.h"

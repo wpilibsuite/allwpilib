@@ -4,13 +4,13 @@
 
 #include <string_view>
 
+#include <gtest/gtest.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
 #include <wpi/raw_ostream.h>
 
 #include "frc/ScopedTracer.h"
 #include "frc/simulation/SimHooks.h"
-#include "gtest/gtest.h"
 
 TEST(ScopedTracerTest, Timing) {
   wpi::SmallString<128> buf;

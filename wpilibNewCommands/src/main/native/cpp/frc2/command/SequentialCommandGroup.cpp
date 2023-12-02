@@ -83,7 +83,7 @@ void SequentialCommandGroup::AddCommands(
 }
 
 void SequentialCommandGroup::InitSendable(wpi::SendableBuilder& builder) {
-  CommandBase::InitSendable(builder);
+  Command::InitSendable(builder);
   builder.AddIntegerProperty(
       "index", [this] { return m_currentCommandIndex; }, nullptr);
 }

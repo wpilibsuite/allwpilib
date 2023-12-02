@@ -4,8 +4,6 @@
 
 package edu.wpi.first.wpilibj.shuffleboard;
 
-import edu.wpi.first.wpilibj.interfaces.Accelerometer.Range;
-
 /**
  * The types of the widgets bundled with Shuffleboard.
  *
@@ -362,7 +360,6 @@ public enum BuiltInWidgets implements WidgetType {
    *
    * <table>
    * <tr><th>Name</th><th>Type</th><th>Default Value</th><th>Notes</th></tr>
-   * <tr><td>Range</td><td>{@link Range}</td><td>k16G</td><td>The accelerometer range</td></tr>
    * <tr><td>Show value</td><td>Boolean</td><td>true</td>
    * <td>Show or hide the acceleration values</td></tr>
    * <tr><td>Precision</td><td>Number</td><td>2</td>

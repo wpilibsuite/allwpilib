@@ -5,139 +5,16 @@
 #include "WireDecoder3.h"
 
 #include <algorithm>
-#include <optional>
 #include <string>
-#include <vector>
 
 #include <fmt/format.h>
 #include <wpi/MathExtras.h>
 #include <wpi/SpanExtras.h>
-#include <wpi/leb128.h>
 
 #include "Message3.h"
 
 using namespace nt;
 using namespace nt::net3;
-
-namespace {
-
-class SimpleValueReader {
- public:
-  std::optional<uint16_t> Read16(std::span<const uint8_t>* in);
-  std::optional<uint32_t> Read32(std::span<const uint8_t>* in);
-  std::optional<uint64_t> Read64(std::span<const uint8_t>* in);
-  std::optional<double> ReadDouble(std::span<const uint8_t>* in);
-
- private:
-  uint64_t m_value = 0;
-  int m_count = 0;
-};
-
-struct StringReader {
-  void SetLen(uint64_t len_) {
-    len = len_;
-    buf.clear();
-  }
-
-  std::optional<uint64_t> len;
-  std::string buf;
-};
-
-struct RawReader {
-  void SetLen(uint64_t len_) {
-    len = len_;
-    buf.clear();
-  }
-
-  std::optional<uint64_t> len;
-  std::vector<uint8_t> buf;
-};
-
-struct ValueReader {
-  ValueReader() = default;
-  explicit ValueReader(NT_Type type_) : type{type_} {}
-
-  void SetSize(uint32_t size_) {
-    haveSize = true;
-    size = size_;
-    ints.clear();
-    doubles.clear();
-    strings.clear();
-  }
-
-  NT_Type type = NT_UNASSIGNED;
-  bool haveSize = false;
-  uint32_t size = 0;
-  std::vector<int> ints;
-  std::vector<double> doubles;
-  std::vector<std::string> strings;
-};
-
-struct WDImpl {
-  explicit WDImpl(MessageHandler3& out) : m_out{out} {}
-
-  MessageHandler3& m_out;
-
-  // primary (message) decode state
-  enum {
-    kStart,
-    kClientHello_1ProtoRev,
-    kClientHello_2Id,
-    kProtoUnsup_1ProtoRev,
-    kServerHello_1Flags,
-    kServerHello_2Id,
-    kEntryAssign_1Name,
-    kEntryAssign_2Type,
-    kEntryAssign_3Id,
-    kEntryAssign_4SeqNum,
-    kEntryAssign_5Flags,
-    kEntryAssign_6Value,
-    kEntryUpdate_1Id,
-    kEntryUpdate_2SeqNum,
-    kEntryUpdate_3Type,
-    kEntryUpdate_4Value,
-    kFlagsUpdate_1Id,
-    kFlagsUpdate_2Flags,
-    kEntryDelete_1Id,
-    kClearEntries_1Magic,
-    kExecuteRpc_1Id,
-    kExecuteRpc_2Uid,
-    kExecuteRpc_3Params,
-    kRpcResponse_1Id,
-    kRpcResponse_2Uid,
-    kRpcResponse_3Result,
-    kError
-  } m_state = kStart;
-
-  // detail decoders
-  wpi::Uleb128Reader m_ulebReader;
-  SimpleValueReader m_simpleReader;
-  StringReader m_stringReader;
-  RawReader m_rawReader;
-  ValueReader m_valueReader;
-
-  std::string m_error;
-
-  std::string m_str;
-  unsigned int m_id{0};  // also used for proto_rev
-  unsigned int m_flags{0};
-  unsigned int m_seq_num_uid{0};
-
-  void Execute(std::span<const uint8_t>* in);
-
-  std::nullopt_t EmitError(std::string_view msg) {
-    m_state = kError;
-    m_error = msg;
-    return std::nullopt;
-  }
-
-  std::optional<std::string> ReadString(std::span<const uint8_t>* in);
-  std::optional<std::vector<uint8_t>> ReadRaw(std::span<const uint8_t>* in);
-  std::optional<NT_Type> ReadType(std::span<const uint8_t>* in);
-  std::optional<Value> ReadValue(std::span<const uint8_t>* in);
-};
-
-}  // namespace
 
 static uint8_t Read8(std::span<const uint8_t>* in) {
   uint8_t val = in->front();
@@ -145,7 +22,7 @@ static uint8_t Read8(std::span<const uint8_t>* in) {
   return val;
 }
 
-std::optional<uint16_t> SimpleValueReader::Read16(
+std::optional<uint16_t> WireDecoder3::SimpleValueReader::Read16(
     std::span<const uint8_t>* in) {
   while (!in->empty()) {
     m_value <<= 8;
@@ -161,7 +38,7 @@ std::optional<uint16_t> SimpleValueReader::Read16(
   return std::nullopt;
 }
 
-std::optional<uint32_t> SimpleValueReader::Read32(
+std::optional<uint32_t> WireDecoder3::SimpleValueReader::Read32(
     std::span<const uint8_t>* in) {
   while (!in->empty()) {
     m_value <<= 8;
@@ -177,7 +54,7 @@ std::optional<uint32_t> SimpleValueReader::Read32(
   return std::nullopt;
 }
 
-std::optional<uint64_t> SimpleValueReader::Read64(
+std::optional<uint64_t> WireDecoder3::SimpleValueReader::Read64(
     std::span<const uint8_t>* in) {
   while (!in->empty()) {
     m_value <<= 8;
@@ -193,16 +70,16 @@ std::optional<uint64_t> SimpleValueReader::Read64(
   return std::nullopt;
 }
 
-std::optional<double> SimpleValueReader::ReadDouble(
+std::optional<double> WireDecoder3::SimpleValueReader::ReadDouble(
     std::span<const uint8_t>* in) {
   if (auto val = Read64(in)) {
-    return wpi::BitsToDouble(val.value());
+    return wpi::bit_cast<double>(val.value());
   } else {
     return std::nullopt;
   }
 }
 
-void WDImpl::Execute(std::span<const uint8_t>* in) {
+void WireDecoder3::DoExecute(std::span<const uint8_t>* in) {
   while (!in->empty()) {
     switch (m_state) {
       case kStart: {
@@ -417,7 +294,8 @@ void WDImpl::Execute(std::span<const uint8_t>* in) {
   }
 }
 
-std::optional<std::string> WDImpl::ReadString(std::span<const uint8_t>* in) {
+std::optional<std::string> WireDecoder3::ReadString(
+    std::span<const uint8_t>* in) {
   // string length
   if (!m_stringReader.len) {
     if (auto val = m_ulebReader.ReadOne(in)) {
@@ -442,7 +320,7 @@ std::optional<std::string> WDImpl::ReadString(std::span<const uint8_t>* in) {
   return std::nullopt;
 }
 
-std::optional<std::vector<uint8_t>> WDImpl::ReadRaw(
+std::optional<std::vector<uint8_t>> WireDecoder3::ReadRaw(
     std::span<const uint8_t>* in) {
   // string length
   if (!m_rawReader.len) {
@@ -468,7 +346,7 @@ std::optional<std::vector<uint8_t>> WDImpl::ReadRaw(
   return std::nullopt;
 }
 
-std::optional<NT_Type> WDImpl::ReadType(std::span<const uint8_t>* in) {
+std::optional<NT_Type> WireDecoder3::ReadType(std::span<const uint8_t>* in) {
   // Convert from byte value to enum
   switch (Read8(in)) {
     case Message3::kBoolean:
@@ -492,7 +370,7 @@ std::optional<NT_Type> WDImpl::ReadType(std::span<const uint8_t>* in) {
   }
 }
 
-std::optional<Value> WDImpl::ReadValue(std::span<const uint8_t>* in) {
+std::optional<Value> WireDecoder3::ReadValue(std::span<const uint8_t>* in) {
   while (!in->empty()) {
     switch (m_valueReader.type) {
       case NT_BOOLEAN:
@@ -576,25 +454,4 @@ std::optional<Value> WDImpl::ReadValue(std::span<const uint8_t>* in) {
     }
   }
   return std::nullopt;
-}
-
-struct WireDecoder3::Impl : public WDImpl {
-  explicit Impl(MessageHandler3& out) : WDImpl{out} {}
-};
-
-WireDecoder3::WireDecoder3(MessageHandler3& out) : m_impl{new Impl{out}} {}
-
-WireDecoder3::~WireDecoder3() = default;
-
-bool WireDecoder3::Execute(std::span<const uint8_t>* in) {
-  m_impl->Execute(in);
-  return m_impl->m_state != Impl::kError;
-}
-
-void WireDecoder3::SetError(std::string_view message) {
-  m_impl->EmitError(message);
-}
-
-std::string WireDecoder3::GetError() const {
-  return m_impl->m_error;
 }

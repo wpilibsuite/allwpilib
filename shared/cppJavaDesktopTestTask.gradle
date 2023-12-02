@@ -1,0 +1,7 @@
+apply from: "${rootDir}/shared/cppDesktopTestTask.gradle"
+apply from: "${rootDir}/shared/javaDesktopTestTask.gradle"
+
+tasks.register('testDesktop') {
+    dependsOn testDesktopJava
+    dependsOn testDesktopCpp
+}

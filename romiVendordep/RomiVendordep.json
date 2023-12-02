@@ -1,0 +1,37 @@
+{
+  "fileName": "RomiVendordep.json",
+  "name": "Romi-Vendordep",
+  "version": "1.0.0",
+  "uuid": "1010372a-b446-46f4-b229-61e53a26a7dc",
+  "frcYear": "2024",
+  "mavenUrls": [],
+  "jsonUrl": "",
+  "javaDependencies": [
+    {
+      "groupId": "edu.wpi.first.romiVendordep",
+      "artifactId": "romiVendordep-java",
+      "version": "wpilib"
+    }
+  ],
+  "jniDependencies": [],
+  "cppDependencies": [
+    {
+      "groupId": "edu.wpi.first.romiVendordep",
+      "artifactId": "romiVendordep-cpp",
+      "version": "wpilib",
+      "libName": "romiVendordep",
+      "headerClassifier": "headers",
+      "sourcesClassifier": "sources",
+      "sharedLibrary": true,
+      "skipInvalidPlatforms": true,
+      "binaryPlatforms": [
+        "linuxarm32",
+        "linuxarm64",
+        "windowsx86-64",
+        "windowsx86",
+        "linuxx86-64",
+        "osxuniversal"
+      ]
+    }
+  ]
+}

@@ -18,7 +18,7 @@
 
 /**
  * @defgroup hal_capi WPILib HAL API
- * Hardware Abstraction Layer to hardware or simulator
+ * Hardware Abstraction Layer (HAL) to hardware or simulator
  * @{
  */
 
@@ -75,9 +75,9 @@ int32_t HAL_GetFPGAVersion(int32_t* status);
 int64_t HAL_GetFPGARevision(int32_t* status);
 
 /**
- * Returns the serial number.
+ * Returns the roboRIO serial number.
  *
- * @param[out] buffer The serial number.
+ * @param[out] buffer The roboRIO serial number.
  * @param size The maximum characters to copy into buffer.
  * @return Number of characters copied into buffer.
  */
@@ -91,6 +91,12 @@ size_t HAL_GetSerialNumber(char* buffer, size_t size);
  * @return Number of characters copied into buffer.
  */
 size_t HAL_GetComments(char* buffer, size_t size);
+
+/**
+ * Returns the team number configured for the robot controller.
+ * @return team number, or 0 if not found.
+ */
+int32_t HAL_GetTeamNumber(void);
 
 /**
  * Returns the runtime type of the HAL.
@@ -108,7 +114,7 @@ HAL_RuntimeType HAL_GetRuntimeType(void);
 HAL_Bool HAL_GetFPGAButton(int32_t* status);
 
 /**
- * Gets if the system outputs are currently active
+ * Gets if the system outputs are currently active.
  *
  * @param[out] status the error code, or 0 for success
  * @return true if the system outputs are active, false if disabled
@@ -173,11 +179,20 @@ uint64_t HAL_GetFPGATime(int32_t* status);
 uint64_t HAL_ExpandFPGATime(uint32_t unexpandedLower, int32_t* status);
 
 /**
- * Gets the current state of the Robot Signal Light (RSL)
+ * Gets the current state of the Robot Signal Light (RSL).
+ *
  * @param[out] status the error code, or 0 for success
  * @return The current state of the RSL- true if on, false if off
  */
 HAL_Bool HAL_GetRSLState(int32_t* status);
+
+/**
+ * Gets if the system time is valid.
+ *
+ * @param[out] status the error code, or 0 for success
+ * @return True if the system time is valid, false otherwise
+ */
+HAL_Bool HAL_GetSystemTimeValid(int32_t* status);
 
 /**
  * Call this to start up HAL. This is required for robot programs.

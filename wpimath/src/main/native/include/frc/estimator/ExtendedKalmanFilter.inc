@@ -4,7 +4,10 @@
 
 #pragma once
 
-#include "Eigen/Cholesky"
+#include <functional>
+
+#include <Eigen/Cholesky>
+
 #include "frc/DARE.h"
 #include "frc/StateSpaceUtil.h"
 #include "frc/estimator/ExtendedKalmanFilter.h"
@@ -41,7 +44,8 @@ ExtendedKalmanFilter<States, Inputs, Outputs>::ExtendedKalmanFilter(
   Matrixd<Outputs, Outputs> discR = DiscretizeR<Outputs>(m_contR, dt);
 
   if (IsDetectable<States, Outputs>(discA, C) && Outputs <= States) {
-    m_initP = DARE(discA.transpose(), C.transpose(), discQ, discR);
+    m_initP =
+        DARE<States, Outputs>(discA.transpose(), C.transpose(), discQ, discR);
   } else {
     m_initP = StateMatrix::Zero();
   }
@@ -76,7 +80,8 @@ ExtendedKalmanFilter<States, Inputs, Outputs>::ExtendedKalmanFilter(
   Matrixd<Outputs, Outputs> discR = DiscretizeR<Outputs>(m_contR, dt);
 
   if (IsDetectable<States, Outputs>(discA, C) && Outputs <= States) {
-    m_initP = DARE(discA.transpose(), C.transpose(), discQ, discR);
+    m_initP =
+        DARE<States, Outputs>(discA.transpose(), C.transpose(), discQ, discR);
   } else {
     m_initP = StateMatrix::Zero();
   }

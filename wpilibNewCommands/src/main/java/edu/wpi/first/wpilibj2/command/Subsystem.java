@@ -4,6 +4,9 @@
 
 package edu.wpi.first.wpilibj2.command;
 
+import java.util.Set;
+import java.util.function.Supplier;
+
 /**
  * A robot subsystem. Subsystems are the basic unit of robot organization in the Command-based
  * framework; they encapsulate low-level hardware objects (motor controllers, sensors, etc.) and
@@ -36,6 +39,15 @@ public interface Subsystem {
    * {@link edu.wpi.first.wpilibj.simulation} classes and setting simulated sensor readings.
    */
   default void simulationPeriodic() {}
+
+  /**
+   * Gets the subsystem name of this Subsystem.
+   *
+   * @return Subsystem name
+   */
+  default String getName() {
+    return this.getClass().getSimpleName();
+  }
 
   /**
    * Sets the default {@link Command} of the subsystem. The default command will be automatically
@@ -93,7 +105,7 @@ public interface Subsystem {
    * @return the command
    * @see InstantCommand
    */
-  default CommandBase runOnce(Runnable action) {
+  default Command runOnce(Runnable action) {
     return Commands.runOnce(action, this);
   }
 
@@ -105,7 +117,7 @@ public interface Subsystem {
    * @return the command
    * @see RunCommand
    */
-  default CommandBase run(Runnable action) {
+  default Command run(Runnable action) {
     return Commands.run(action, this);
   }
 
@@ -118,7 +130,7 @@ public interface Subsystem {
    * @return the command
    * @see StartEndCommand
    */
-  default CommandBase startEnd(Runnable start, Runnable end) {
+  default Command startEnd(Runnable start, Runnable end) {
     return Commands.startEnd(start, end, this);
   }
 
@@ -130,7 +142,19 @@ public interface Subsystem {
    * @param end the action to run on interrupt
    * @return the command
    */
-  default CommandBase runEnd(Runnable run, Runnable end) {
+  default Command runEnd(Runnable run, Runnable end) {
     return Commands.runEnd(run, end, this);
+  }
+
+  /**
+   * Constructs a {@link DeferredCommand} with the provided supplier. This subsystem is added as a
+   * requirement.
+   *
+   * @param supplier the command supplier.
+   * @return the command.
+   * @see DeferredCommand
+   */
+  default Command defer(Supplier<Command> supplier) {
+    return Commands.defer(supplier, Set.of(this));
   }
 }

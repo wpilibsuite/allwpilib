@@ -134,7 +134,7 @@ double HAL_GetPowerDistributionChannelCurrent(
     HAL_PowerDistributionHandle handle, int32_t channel, int32_t* status);
 
 /**
- * Gets the current of all 24 channels on the PowerDistribution.
+ * Gets the current of all channels on the PowerDistribution.
  *
  * The array must be large enough to hold all channels.
  *
@@ -214,6 +214,7 @@ void HAL_SetPowerDistributionSwitchableChannel(
  *
  * @param[in] handle the module handle
  * @param[out] status Error status variable. 0 on success.
+ * @return the state of the switchable channel
  */
 HAL_Bool HAL_GetPowerDistributionSwitchableChannel(
     HAL_PowerDistributionHandle handle, int32_t* status);
@@ -291,15 +292,55 @@ struct HAL_PowerDistributionStickyFaults {
   uint32_t hasReset : 1;
 };
 
+/**
+ * Get the version of the PowerDistribution.
+ *
+ * @param[in] handle the module handle
+ * @param[out] version the HAL_PowerDistributionVersion to populate
+ * @param[out] status Error status variable. 0 on success.
+ */
 void HAL_GetPowerDistributionVersion(HAL_PowerDistributionHandle handle,
                                      HAL_PowerDistributionVersion* version,
                                      int32_t* status);
+/**
+ * Get the current faults of the PowerDistribution.
+ *
+ * @param[in] handle the module handle
+ * @param[out] faults the HAL_PowerDistributionFaults to populate
+ * @param[out] status Error status variable. 0 on success.
+ */
 void HAL_GetPowerDistributionFaults(HAL_PowerDistributionHandle handle,
                                     HAL_PowerDistributionFaults* faults,
                                     int32_t* status);
+
+/**
+ * Gets the sticky faults of the PowerDistribution.
+ *
+ * @param[in] handle the module handle
+ * @param[out] stickyFaults the HAL_PowerDistributionStickyFaults to populate
+ * @param[out] status Error status variable. 0 on success.
+ */
 void HAL_GetPowerDistributionStickyFaults(
     HAL_PowerDistributionHandle handle,
     HAL_PowerDistributionStickyFaults* stickyFaults, int32_t* status);
+
+void HAL_StartPowerDistributionStream(HAL_PowerDistributionHandle handle,
+                                      int32_t* status);
+
+typedef struct HAL_PowerDistributionChannelData {
+  float current;
+  int32_t channel;
+  uint32_t timestamp;
+} HAL_PowerDistributionChannelData;
+
+HAL_PowerDistributionChannelData* HAL_GetPowerDistributionStreamData(
+    HAL_PowerDistributionHandle handle, int32_t* count, int32_t* status);
+
+void HAL_FreePowerDistributionStreamData(HAL_PowerDistributionChannelData* data,
+                                         int32_t count);
+
+void HAL_StopPowerDistributionStream(HAL_PowerDistributionHandle handle,
+                                     int32_t* status);
 
 #ifdef __cplusplus
 }  // extern "C"

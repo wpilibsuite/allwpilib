@@ -5,10 +5,9 @@
 #include <vector>
 
 #include <fmt/format.h>
+#include <gtest/gtest.h>
 
 #include "frc/fmt/Eigen.h"
-#include "frc/fmt/Units.h"
-#include "gtest/gtest.h"
 #include "units/velocity.h"
 
 TEST(FormatterTest, Eigen) {
@@ -17,14 +16,14 @@ TEST(FormatterTest, Eigen) {
       "  0.000000  1.000000\n"
       "  2.000000  3.000000\n"
       "  4.000000  5.000000",
-      fmt::format("{}", A));
+      fmt::format("{:f}", A));
 
   Eigen::MatrixXd B{{0.0, 1.0}, {2.0, 3.0}, {4.0, 5.0}};
   EXPECT_EQ(
       "  0.000000  1.000000\n"
       "  2.000000  3.000000\n"
       "  4.000000  5.000000",
-      fmt::format("{}", B));
+      fmt::format("{:f}", B));
 
   Eigen::SparseMatrix<double> C{3, 2};
   std::vector<Eigen::Triplet<double>> triplets;
@@ -38,7 +37,7 @@ TEST(FormatterTest, Eigen) {
       "  0.000000  1.000000\n"
       "  2.000000  3.000000\n"
       "  4.000000  5.000000",
-      fmt::format("{}", C));
+      fmt::format("{:f}", C));
 }
 
 TEST(FormatterTest, Units) {

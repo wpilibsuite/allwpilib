@@ -1,6 +1,6 @@
 /*################################################################################
   ##
-  ##   Copyright (C) 2016-2022 Keith O'Hara
+  ##   Copyright (C) 2016-2023 Keith O'Hara
   ##
   ##   This file is part of the GCE-Math C++ library.
   ##
@@ -21,6 +21,9 @@
 #ifndef _gcem_copysign_HPP
 #define _gcem_copysign_HPP
 
+#include <cmath>
+#include <type_traits>
+
 /**
  * Compile-time copy sign function
  *
@@ -35,7 +38,11 @@ T1
 copysign(const T1 x, const T2 y)
 noexcept
 {
+  if (std::is_constant_evaluated()) {
     return( signbit(x) != signbit(y) ? -x : x );
+  } else {
+    return std::copysign(x, y);
+  }
 }
 
 #endif

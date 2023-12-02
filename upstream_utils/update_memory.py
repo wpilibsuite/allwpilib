@@ -59,7 +59,7 @@ def run_global_replacements(memory_files):
 
 
 def main():
-    upstream_root = clone_repo("https://github.com/foonathan/memory", "v0.7-2")
+    upstream_root = clone_repo("https://github.com/foonathan/memory", "v0.7-3")
     wpilib_root = get_repo_root()
     wpiutil = os.path.join(wpilib_root, "wpiutil")
 

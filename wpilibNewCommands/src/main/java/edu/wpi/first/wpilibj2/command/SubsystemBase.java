@@ -28,6 +28,7 @@ public abstract class SubsystemBase implements Subsystem, Sendable {
    *
    * @return Name
    */
+  @Override
   public String getName() {
     return SendableRegistry.getName(this);
   }

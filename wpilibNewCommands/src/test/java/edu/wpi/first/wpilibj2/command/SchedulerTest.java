@@ -6,6 +6,9 @@ package edu.wpi.first.wpilibj2.command;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
@@ -44,12 +47,110 @@ class SchedulerTest extends CommandTestBase {
   }
 
   @Test
+  void schedulerInterruptNoCauseLambdaTest() {
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      AtomicInteger counter = new AtomicInteger();
+
+      scheduler.onCommandInterrupt(
+          (interrupted, cause) -> {
+            assertFalse(cause.isPresent());
+            counter.incrementAndGet();
+          });
+
+      Command command = Commands.run(() -> {});
+
+      scheduler.schedule(command);
+      scheduler.cancel(command);
+
+      assertEquals(1, counter.get());
+    }
+  }
+
+  @Test
+  void schedulerInterruptCauseLambdaTest() {
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      AtomicInteger counter = new AtomicInteger();
+
+      Subsystem subsystem = new Subsystem() {};
+      Command command = subsystem.run(() -> {});
+      Command interruptor = subsystem.runOnce(() -> {});
+
+      scheduler.onCommandInterrupt(
+          (interrupted, cause) -> {
+            assertTrue(cause.isPresent());
+            assertSame(interruptor, cause.get());
+            counter.incrementAndGet();
+          });
+
+      scheduler.schedule(command);
+      scheduler.schedule(interruptor);
+
+      assertEquals(1, counter.get());
+    }
+  }
+
+  @Test
+  void schedulerInterruptCauseLambdaInRunLoopTest() {
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      AtomicInteger counter = new AtomicInteger();
+
+      Subsystem subsystem = new Subsystem() {};
+      Command command = subsystem.run(() -> {});
+      Command interruptor = subsystem.runOnce(() -> {});
+      // This command will schedule interruptor in execute() inside the run loop
+      Command interruptorScheduler = Commands.runOnce(() -> scheduler.schedule(interruptor));
+
+      scheduler.onCommandInterrupt(
+          (interrupted, cause) -> {
+            assertTrue(cause.isPresent());
+            assertSame(interruptor, cause.get());
+            counter.incrementAndGet();
+          });
+
+      scheduler.schedule(command);
+      scheduler.schedule(interruptorScheduler);
+
+      scheduler.run();
+
+      assertEquals(1, counter.get());
+    }
+  }
+
+  @Test
+  void registerSubsystemTest() {
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      AtomicInteger counter = new AtomicInteger(0);
+      Subsystem system =
+          new SubsystemBase() {
+            @Override
+            public void periodic() {
+              counter.incrementAndGet();
+            }
+          };
+
+      assertDoesNotThrow(() -> scheduler.registerSubsystem(system));
+
+      scheduler.run();
+      assertEquals(1, counter.get());
+    }
+  }
+
+  @Test
   void unregisterSubsystemTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
-      Subsystem system = new SubsystemBase() {};
-
+      AtomicInteger counter = new AtomicInteger(0);
+      Subsystem system =
+          new SubsystemBase() {
+            @Override
+            public void periodic() {
+              counter.incrementAndGet();
+            }
+          };
       scheduler.registerSubsystem(system);
       assertDoesNotThrow(() -> scheduler.unregisterSubsystem(system));
+
+      scheduler.run();
+      assertEquals(0, counter.get());
     }
   }
 
@@ -59,6 +160,7 @@ class SchedulerTest extends CommandTestBase {
       AtomicInteger counter = new AtomicInteger();
 
       scheduler.onCommandInterrupt(command -> counter.incrementAndGet());
+      scheduler.onCommandInterrupt((command, interruptor) -> assertFalse(interruptor.isPresent()));
 
       Command command = new WaitCommand(10);
       Command command2 = new WaitCommand(10);

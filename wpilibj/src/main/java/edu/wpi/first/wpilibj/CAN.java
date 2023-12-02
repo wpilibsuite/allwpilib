@@ -172,4 +172,15 @@ public class CAN implements Closeable {
   public boolean readPacketTimeout(int apiId, int timeoutMs, CANData data) {
     return CANAPIJNI.readCANPacketTimeout(m_handle, apiId, timeoutMs, data);
   }
+
+  /**
+   * Reads the current value of the millisecond-resolution timer that {@link CANData} timestamps are
+   * based on.
+   *
+   * @return Current value of timer used as a base time for {@link CANData} timestamps in
+   *     milliseconds
+   */
+  public static long getTimestampBaseTime() {
+    return CANAPIJNI.getCANPacketBaseTime();
+  }
 }

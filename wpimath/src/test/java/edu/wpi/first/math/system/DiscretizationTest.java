@@ -19,7 +19,7 @@ class DiscretizationTest {
   // analytically,
   @Test
   void testDiscretizeA() {
-    final var contA = new MatBuilder<>(Nat.N2(), Nat.N2()).fill(0, 1, 0, 0);
+    final var contA = MatBuilder.fill(Nat.N2(), Nat.N2(), 0, 1, 0, 0);
     final var x0 = VecBuilder.fill(1, 1);
 
     final var discA = Discretization.discretizeA(contA, 1.0);
@@ -37,8 +37,8 @@ class DiscretizationTest {
   // analytically,
   @Test
   void testDiscretizeAB() {
-    final var contA = new MatBuilder<>(Nat.N2(), Nat.N2()).fill(0, 1, 0, 0);
-    final var contB = new MatBuilder<>(Nat.N2(), Nat.N1()).fill(0, 1);
+    final var contA = MatBuilder.fill(Nat.N2(), Nat.N2(), 0, 1, 0, 0);
+    final var contB = MatBuilder.fill(Nat.N2(), Nat.N1(), 0, 1);
 
     final var x0 = VecBuilder.fill(1, 1);
     final var u = VecBuilder.fill(1);
@@ -63,8 +63,8 @@ class DiscretizationTest {
   //                                               0
   @Test
   void testDiscretizeSlowModelAQ() {
-    final var contA = new MatBuilder<>(Nat.N2(), Nat.N2()).fill(0, 1, 0, 0);
-    final var contQ = new MatBuilder<>(Nat.N2(), Nat.N2()).fill(1, 0, 0, 1);
+    final var contA = MatBuilder.fill(Nat.N2(), Nat.N2(), 0, 1, 0, 0);
+    final var contQ = MatBuilder.fill(Nat.N2(), Nat.N2(), 1, 0, 0, 1);
 
     final double dt = 1.0;
 
@@ -95,8 +95,8 @@ class DiscretizationTest {
   //                                               0
   @Test
   void testDiscretizeFastModelAQ() {
-    final var contA = new MatBuilder<>(Nat.N2(), Nat.N2()).fill(0, 1, 0, -1406.29);
-    final var contQ = new MatBuilder<>(Nat.N2(), Nat.N2()).fill(0.0025, 0, 0, 1);
+    final var contA = MatBuilder.fill(Nat.N2(), Nat.N2(), 0, 1, 0, -1406.29);
+    final var contQ = MatBuilder.fill(Nat.N2(), Nat.N2(), 0.0025, 0, 0, 1);
 
     final var dt = 0.005;
 
@@ -122,103 +122,11 @@ class DiscretizationTest {
             + discQIntegrated);
   }
 
-  // Test that the Taylor series discretization produces nearly identical results.
-  @Test
-  void testDiscretizeSlowModelAQTaylor() {
-    final var contA = new MatBuilder<>(Nat.N2(), Nat.N2()).fill(0, 1, 0, 0);
-    final var contQ = new MatBuilder<>(Nat.N2(), Nat.N2()).fill(1, 0, 0, 1);
-
-    final var dt = 1.0;
-
-    // Continuous Q should be positive semidefinite
-    final var esCont = contQ.getStorage().eig();
-    for (int i = 0; i < contQ.getNumRows(); ++i) {
-      assertTrue(esCont.getEigenvalue(i).real >= 0);
-    }
-
-    //       T
-    // Q_d = ∫ e^(Aτ) Q e^(Aᵀτ) dτ
-    //       0
-    final var discQIntegrated =
-        RungeKuttaTimeVarying.rungeKuttaTimeVarying(
-            (Double t, Matrix<N2, N2> x) ->
-                contA.times(t).exp().times(contQ).times(contA.transpose().times(t).exp()),
-            0.0,
-            new Matrix<>(Nat.N2(), Nat.N2()),
-            dt);
-
-    var discA = Discretization.discretizeA(contA, dt);
-
-    var discAQPair = Discretization.discretizeAQ(contA, contQ, dt);
-    var discATaylor = discAQPair.getFirst();
-    var discQTaylor = discAQPair.getSecond();
-
-    assertTrue(
-        discQIntegrated.minus(discQTaylor).normF() < 1e-10,
-        "Expected these to be nearly equal:\ndiscQTaylor:\n"
-            + discQTaylor
-            + "\ndiscQIntegrated:\n"
-            + discQIntegrated);
-    assertTrue(discA.minus(discATaylor).normF() < 1e-10);
-
-    // Discrete Q should be positive semidefinite
-    final var esDisc = discQTaylor.getStorage().eig();
-    for (int i = 0; i < discQTaylor.getNumRows(); ++i) {
-      assertTrue(esDisc.getEigenvalue(i).real >= 0);
-    }
-  }
-
-  // Test that the Taylor series discretization produces nearly identical results.
-  @Test
-  void testDiscretizeFastModelAQTaylor() {
-    final var contA = new MatBuilder<>(Nat.N2(), Nat.N2()).fill(0, 1, 0, -1500);
-    final var contQ = new MatBuilder<>(Nat.N2(), Nat.N2()).fill(0.0025, 0, 0, 1);
-
-    final var dt = 0.005;
-
-    // Continuous Q should be positive semidefinite
-    final var esCont = contQ.getStorage().eig();
-    for (int i = 0; i < contQ.getNumRows(); ++i) {
-      assertTrue(esCont.getEigenvalue(i).real >= 0);
-    }
-
-    //       T
-    // Q_d = ∫ e^(Aτ) Q e^(Aᵀτ) dτ
-    //       0
-    final var discQIntegrated =
-        RungeKuttaTimeVarying.rungeKuttaTimeVarying(
-            (Double t, Matrix<N2, N2> x) ->
-                contA.times(t).exp().times(contQ).times(contA.transpose().times(t).exp()),
-            0.0,
-            new Matrix<>(Nat.N2(), Nat.N2()),
-            dt);
-
-    var discA = Discretization.discretizeA(contA, dt);
-
-    var discAQPair = Discretization.discretizeAQ(contA, contQ, dt);
-    var discATaylor = discAQPair.getFirst();
-    var discQTaylor = discAQPair.getSecond();
-
-    assertTrue(
-        discQIntegrated.minus(discQTaylor).normF() < 1e-3,
-        "Expected these to be nearly equal:\ndiscQTaylor:\n"
-            + discQTaylor
-            + "\ndiscQIntegrated:\n"
-            + discQIntegrated);
-    assertTrue(discA.minus(discATaylor).normF() < 1e-10);
-
-    // Discrete Q should be positive semidefinite
-    final var esDisc = discQTaylor.getStorage().eig();
-    for (int i = 0; i < discQTaylor.getNumRows(); ++i) {
-      assertTrue(esDisc.getEigenvalue(i).real >= 0);
-    }
-  }
-
   // Test that DiscretizeR() works
   @Test
   void testDiscretizeR() {
-    var contR = Matrix.mat(Nat.N2(), Nat.N2()).fill(2.0, 0.0, 0.0, 1.0);
-    var discRTruth = Matrix.mat(Nat.N2(), Nat.N2()).fill(4.0, 0.0, 0.0, 2.0);
+    var contR = MatBuilder.fill(Nat.N2(), Nat.N2(), 2.0, 0.0, 0.0, 1.0);
+    var discRTruth = MatBuilder.fill(Nat.N2(), Nat.N2(), 4.0, 0.0, 0.0, 2.0);
 
     var discR = Discretization.discretizeR(contR, 0.5);
 

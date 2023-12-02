@@ -14,8 +14,11 @@
 
 #include <wpi/StringMap.h>
 #include <wpi/mutex.h>
+#include <wpi/protobuf/Protobuf.h>
+#include <wpi/struct/Struct.h>
 
 #include "networktables/NetworkTableEntry.h"
+#include "networktables/Topic.h"
 #include "ntcore_c.h"
 
 namespace nt {
@@ -29,9 +32,15 @@ class FloatTopic;
 class IntegerArrayTopic;
 class IntegerTopic;
 class NetworkTableInstance;
+template <wpi::ProtobufSerializable T>
+class ProtobufTopic;
 class RawTopic;
 class StringArrayTopic;
 class StringTopic;
+template <wpi::StructSerializable T>
+class StructArrayTopic;
+template <wpi::StructSerializable T>
+class StructTopic;
 class Topic;
 
 /**
@@ -219,6 +228,39 @@ class NetworkTable final {
    * @return StringArrayTopic
    */
   StringArrayTopic GetStringArrayTopic(std::string_view name) const;
+
+  /**
+   * Gets a protobuf serialized value topic.
+   *
+   * @param name topic name
+   * @return Topic
+   */
+  template <wpi::ProtobufSerializable T>
+  ProtobufTopic<T> GetProtobufTopic(std::string_view name) const {
+    return ProtobufTopic<T>{GetTopic(name)};
+  }
+
+  /**
+   * Gets a raw struct serialized value topic.
+   *
+   * @param name topic name
+   * @return Topic
+   */
+  template <wpi::StructSerializable T>
+  StructTopic<T> GetStructTopic(std::string_view name) const {
+    return StructTopic<T>{GetTopic(name)};
+  }
+
+  /**
+   * Gets a raw struct serialized array topic.
+   *
+   * @param name topic name
+   * @return Topic
+   */
+  template <wpi::StructSerializable T>
+  StructArrayTopic<T> GetStructArrayTopic(std::string_view name) const {
+    return StructArrayTopic<T>{GetTopic(name)};
+  }
 
   /**
    * Returns the table at the specified key. If there is no table at the

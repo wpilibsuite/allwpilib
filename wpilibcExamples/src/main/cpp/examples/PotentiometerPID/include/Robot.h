@@ -48,7 +48,7 @@ class Robot : public frc::TimedRobot {
   frc::AnalogPotentiometer m_potentiometer{kPotChannel, kFullHeight.value()};
 
   frc::PWMSparkMax m_elevatorMotor{kMotorChannel};
-  frc2::PIDController m_pidController{kP, kI, kD};
+  frc::PIDController m_pidController{kP, kI, kD};
   frc::Joystick m_joystick{kJoystickChannel};
 
   size_t m_index;

@@ -193,7 +193,8 @@ wpi::HttpConnection* HttpCameraImpl::DeviceStreamConnect(
   auto [mediaType, contentType] = wpi::split(conn->contentType.str(), ';');
   mediaType = wpi::trim(mediaType);
   if (mediaType != "multipart/x-mixed-replace") {
-    SWARNING("\"{}\": unrecognized Content-Type \"{}\"", req.host, mediaType);
+    SWARNING("\"{}\": unrecognized Content-Type \"{}\"", req.host.str(),
+             mediaType);
     std::scoped_lock lock(m_mutex);
     m_streamConn = nullptr;
     return nullptr;
@@ -216,7 +217,8 @@ wpi::HttpConnection* HttpCameraImpl::DeviceStreamConnect(
   }
 
   if (boundary.empty()) {
-    SWARNING("\"{}\": empty multi-part boundary or no Content-Type", req.host);
+    SWARNING("\"{}\": empty multi-part boundary or no Content-Type",
+             req.host.str());
     std::scoped_lock lock(m_mutex);
     m_streamConn = nullptr;
     return nullptr;
@@ -281,8 +283,8 @@ bool HttpCameraImpl::DeviceStreamFrame(wpi::raw_istream& is,
   // Check the content type (if present)
   if (!contentTypeBuf.str().empty() &&
       !wpi::starts_with(contentTypeBuf, "image/jpeg")) {
-    auto errMsg =
-        fmt::format("received unknown Content-Type \"{}\"", contentTypeBuf);
+    auto errMsg = fmt::format("received unknown Content-Type \"{}\"",
+                              contentTypeBuf.str());
     SWARNING("{}", errMsg);
     PutError(errMsg, wpi::Now());
     return false;

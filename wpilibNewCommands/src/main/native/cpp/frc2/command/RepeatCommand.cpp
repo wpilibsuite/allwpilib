@@ -56,7 +56,7 @@ Command::InterruptionBehavior RepeatCommand::GetInterruptionBehavior() const {
 }
 
 void RepeatCommand::InitSendable(wpi::SendableBuilder& builder) {
-  CommandBase::InitSendable(builder);
+  Command::InitSendable(builder);
   builder.AddStringProperty(
       "command", [this] { return m_command->GetName(); }, nullptr);
 }

@@ -9,10 +9,11 @@
 #include <atomic>
 #include <thread>
 
+#include <gtest/gtest.h>
+
 #include "frc/livewindow/LiveWindow.h"
 #include "frc/simulation/DriverStationSim.h"
 #include "frc/simulation/SimHooks.h"
-#include "gtest/gtest.h"
 
 using namespace frc;
 

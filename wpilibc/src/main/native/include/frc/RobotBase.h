@@ -228,7 +228,11 @@ class RobotBase {
    * @return If the robot is running in simulation.
    */
   static constexpr bool IsSimulation() {
-    return !IsReal();
+#ifdef __FRC_ROBORIO__
+    return false;
+#else
+    return true;
+#endif
   }
 
   /**

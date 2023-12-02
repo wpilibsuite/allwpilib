@@ -64,6 +64,10 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
   /**
    * Constructs an Unscented Kalman Filter.
    *
+   * <p>See
+   * https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-observers.html#process-and-measurement-noise-covariance-matrices
+   * for how to select the standard deviations.
+   *
    * @param states A Nat representing the number of states.
    * @param outputs A Nat representing the number of outputs.
    * @param f A vector-valued function of x and u that returns the derivative of the state vector.
@@ -99,6 +103,10 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
    * Constructs an unscented Kalman filter with custom mean, residual, and addition functions. Using
    * custom functions for arithmetic can be useful if you have angles in the state or measurements,
    * because they allow you to correctly account for the modular nature of angle arithmetic.
+   *
+   * <p>See
+   * https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-observers.html#process-and-measurement-noise-covariance-matrices
+   * for how to select the standard deviations.
    *
    * @param states A Nat representing the number of states.
    * @param outputs A Nat representing the number of outputs.
@@ -373,6 +381,19 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
   /**
    * Correct the state estimate x-hat using the measurements in y.
    *
+   * <p>This is useful for when the measurement noise covariances vary.
+   *
+   * @param u Same control input used in the predict step.
+   * @param y Measurement vector.
+   * @param R Continuous measurement noise covariance matrix.
+   */
+  public void correct(Matrix<Inputs, N1> u, Matrix<Outputs, N1> y, Matrix<Outputs, Outputs> R) {
+    correct(m_outputs, u, y, m_h, R, m_meanFuncY, m_residualFuncY, m_residualFuncX, m_addFuncX);
+  }
+
+  /**
+   * Correct the state estimate x-hat using the measurements in y.
+   *
    * <p>This is useful for when the measurements available during a timestep's Correct() call vary.
    * The h(x, u) passed to the constructor is used if one is not provided (the two-argument version
    * of this function).
@@ -382,7 +403,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
    * @param u Same control input used in the predict step.
    * @param y Measurement vector.
    * @param h A vector-valued function of x and u that returns the measurement vector.
-   * @param R Measurement noise covariance matrix (continuous-time).
+   * @param R Continuous measurement noise covariance matrix.
    */
   public <R extends Num> void correct(
       Nat<R> rows,
@@ -411,7 +432,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
    * @param u Same control input used in the predict step.
    * @param y Measurement vector.
    * @param h A vector-valued function of x and u that returns the measurement vector.
-   * @param R Measurement noise covariance matrix (continuous-time).
+   * @param R Continuous measurement noise covariance matrix.
    * @param meanFuncY A function that computes the mean of 2 * States + 1 measurement vectors using
    *     a given set of weights.
    * @param residualFuncY A function that computes the residual of two measurement vectors (i.e. it

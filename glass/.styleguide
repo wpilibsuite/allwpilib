@@ -24,6 +24,7 @@ includeOtherLibs {
   ^fmt/
   ^fields/
   ^frc/
+  ^google/
   ^imgui
   ^networktables/
   ^ntcore

@@ -57,3 +57,6 @@ struct WPILIB_DLLEXPORT Twist2d {
   }
 };
 }  // namespace frc
+
+#include "frc/geometry/proto/Twist2dProto.h"
+#include "frc/geometry/struct/Twist2dStruct.h"
