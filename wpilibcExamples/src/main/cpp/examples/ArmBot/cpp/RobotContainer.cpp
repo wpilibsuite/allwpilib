@@ -61,5 +61,5 @@ void RobotContainer::DisablePIDSubsystems() {
 }
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
-  return frc2::CommandPtr(nullptr);
+  return frc2::cmd::None();
 }

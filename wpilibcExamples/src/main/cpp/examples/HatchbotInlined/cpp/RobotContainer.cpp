@@ -5,6 +5,7 @@
 #include "RobotContainer.h"
 
 #include <frc/shuffleboard/Shuffleboard.h>
+#include <frc2/command/Commands.h>
 
 RobotContainer::RobotContainer() {
   // Initialize all of your commands and subsystems here
@@ -81,7 +82,7 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
       return autos::ComplexAuto(&m_drive, &m_hatch);
       break;
     default:
-      return frc2::CommandPtr(nullptr);
+      return frc2::cmd::None();
       break;
   }
 }

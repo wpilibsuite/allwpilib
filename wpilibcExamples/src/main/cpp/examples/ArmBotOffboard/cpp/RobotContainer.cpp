@@ -4,6 +4,8 @@
 
 #include "RobotContainer.h"
 
+#include <frc2/command/Commands.h>
+
 #include <units/angle.h>
 
 RobotContainer::RobotContainer() {
@@ -35,5 +37,5 @@ void RobotContainer::ConfigureButtonBindings() {
 }
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
-  return frc2::CommandPtr(nullptr);
+  return frc2::cmd::None();
 }

@@ -77,7 +77,6 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
   // Reset odometry to the starting pose of the trajectory.
   m_drive.ResetOdometry(exampleTrajectory.InitialPose());
 
-  // no auto
   return frc2::cmd::Sequence(
       frc2::SwerveControllerCommand<4>(
           exampleTrajectory, [this]() { return m_drive.GetPose(); },

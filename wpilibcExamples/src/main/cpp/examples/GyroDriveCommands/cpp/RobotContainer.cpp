@@ -66,5 +66,5 @@ void RobotContainer::ConfigureButtonBindings() {
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
   // no auto
-  return frc2::CommandPtr(nullptr);
+  return frc2::cmd::None();
 }

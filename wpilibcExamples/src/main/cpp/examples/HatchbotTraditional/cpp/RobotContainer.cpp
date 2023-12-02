@@ -6,6 +6,7 @@
 
 #include <frc/shuffleboard/Shuffleboard.h>
 #include <frc2/command/button/JoystickButton.h>
+#include <frc2/command/Commands.h>
 
 #include "commands/DefaultDrive.h"
 #include "commands/GrabHatch.h"
@@ -90,7 +91,7 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
       return ComplexAuto(&m_drive, &m_hatch).ToPtr();
       break;
     default:
-      return frc2::CommandPtr(nullptr);
+      return frc2::cmd::None();
       break;
   }
 }
