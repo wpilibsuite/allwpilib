@@ -23,6 +23,6 @@ if __name__ == "__main__":
             content = file.read()
         with open(java_file, "tw") as file:
             file.write(
-                "// Copyright (c) FIRST and other WPILib contributors.\n// Open Source Software; you can modify and/or share it under the terms of\n// the WPILib BSD license file in the root directory of this project.\n\n"
+                "// Copyright (c) FIRST and other WPILib contributors.\n// Open Source Software; you can modify and/or share it under the terms of\n// the WPILib BSD license file in the root directory of this project.\n\n// CHECKSTYLE.OFF\n"
                 + content
             )
