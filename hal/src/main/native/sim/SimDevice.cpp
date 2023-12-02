@@ -21,7 +21,7 @@ bool gSimDeviceCreationDisabled = false;
 
 HAL_SimDeviceHandle HAL_CreateSimDevice(const char* name) {
   hal::init::CheckInit();
-  if (disabled) {
+  if (gSimDeviceCreationDisabled) {
     return 0;
   }
   return SimSimDeviceData->CreateDevice(name);
