@@ -9,25 +9,20 @@ package edu.wpi.first.math.numbers;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Num;
 
-/**
- * A class representing the number 13.
-*/
+/** A class representing the number 13. */
 public final class N13 extends Num implements Nat<N13> {
-  private N13() {
-  }
+  private N13() {}
 
   /**
    * The integer this class represents.
    *
    * @return The literal number 13.
-  */
+   */
   @Override
   public int getNum() {
     return 13;
   }
 
-  /**
-   * The singleton instance of this class.
-  */
+  /** The singleton instance of this class. */
   public static final N13 instance = new N13();
 }

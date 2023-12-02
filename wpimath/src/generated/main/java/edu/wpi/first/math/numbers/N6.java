@@ -9,25 +9,20 @@ package edu.wpi.first.math.numbers;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Num;
 
-/**
- * A class representing the number 6.
-*/
+/** A class representing the number 6. */
 public final class N6 extends Num implements Nat<N6> {
-  private N6() {
-  }
+  private N6() {}
 
   /**
    * The integer this class represents.
    *
    * @return The literal number 6.
-  */
+   */
   @Override
   public int getNum() {
     return 6;
   }
 
-  /**
-   * The singleton instance of this class.
-  */
+  /** The singleton instance of this class. */
   public static final N6 instance = new N6();
 }

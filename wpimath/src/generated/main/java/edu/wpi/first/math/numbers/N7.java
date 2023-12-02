@@ -9,25 +9,20 @@ package edu.wpi.first.math.numbers;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Num;
 
-/**
- * A class representing the number 7.
-*/
+/** A class representing the number 7. */
 public final class N7 extends Num implements Nat<N7> {
-  private N7() {
-  }
+  private N7() {}
 
   /**
    * The integer this class represents.
    *
    * @return The literal number 7.
-  */
+   */
   @Override
   public int getNum() {
     return 7;
   }
 
-  /**
-   * The singleton instance of this class.
-  */
+  /** The singleton instance of this class. */
   public static final N7 instance = new N7();
 }

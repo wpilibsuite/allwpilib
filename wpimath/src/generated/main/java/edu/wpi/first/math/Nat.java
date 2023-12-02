@@ -6,7 +6,7 @@
 
 package edu.wpi.first.math;
 
-//CHECKSTYLE.OFF: ImportOrder
+// CHECKSTYLE.OFF: ImportOrder
 
 import edu.wpi.first.math.numbers.N0;
 import edu.wpi.first.math.numbers.N1;
@@ -29,7 +29,7 @@ import edu.wpi.first.math.numbers.N17;
 import edu.wpi.first.math.numbers.N18;
 import edu.wpi.first.math.numbers.N19;
 import edu.wpi.first.math.numbers.N20;
-//CHECKSTYLE.ON
+// CHECKSTYLE.ON
 
 /**
  * A natural number expressed as a java class.
@@ -128,5 +128,4 @@ public interface Nat<T extends Num> {
   static Nat<N20> N20() {
     return N20.instance;
   }
-
 }

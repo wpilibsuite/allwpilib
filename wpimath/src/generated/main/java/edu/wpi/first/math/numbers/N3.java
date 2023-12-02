@@ -9,25 +9,20 @@ package edu.wpi.first.math.numbers;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Num;
 
-/**
- * A class representing the number 3.
-*/
+/** A class representing the number 3. */
 public final class N3 extends Num implements Nat<N3> {
-  private N3() {
-  }
+  private N3() {}
 
   /**
    * The integer this class represents.
    *
    * @return The literal number 3.
-  */
+   */
   @Override
   public int getNum() {
     return 3;
   }
 
-  /**
-   * The singleton instance of this class.
-  */
+  /** The singleton instance of this class. */
   public static final N3 instance = new N3();
 }

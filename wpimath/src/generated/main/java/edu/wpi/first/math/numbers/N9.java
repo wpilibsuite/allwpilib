@@ -9,25 +9,20 @@ package edu.wpi.first.math.numbers;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Num;
 
-/**
- * A class representing the number 9.
-*/
+/** A class representing the number 9. */
 public final class N9 extends Num implements Nat<N9> {
-  private N9() {
-  }
+  private N9() {}
 
   /**
    * The integer this class represents.
    *
    * @return The literal number 9.
-  */
+   */
   @Override
   public int getNum() {
     return 9;
   }
 
-  /**
-   * The singleton instance of this class.
-  */
+  /** The singleton instance of this class. */
   public static final N9 instance = new N9();
 }
