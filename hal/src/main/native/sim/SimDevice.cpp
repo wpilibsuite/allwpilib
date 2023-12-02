@@ -17,9 +17,18 @@ void InitializeSimDevice() {}
 
 extern "C" {
 
+bool gSimDeviceCreationDisabled = false;
+
 HAL_SimDeviceHandle HAL_CreateSimDevice(const char* name) {
   hal::init::CheckInit();
+  if (disabled) {
+    return 0;
+  }
   return SimSimDeviceData->CreateDevice(name);
+}
+
+void HAL_DisableSimDeviceCreation(bool disabled) {
+  gSimDeviceCreationDisabled = disabled;
 }
 
 void HAL_FreeSimDevice(HAL_SimDeviceHandle handle) {

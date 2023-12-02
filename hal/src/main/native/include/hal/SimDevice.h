@@ -58,6 +58,17 @@ extern "C" {
 HAL_SimDeviceHandle HAL_CreateSimDevice(const char* name);
 
 /**
+ * Disables future creation of sim devices.
+ *
+ * Sim devices that have already been created will remain enabled. There is
+ * usually no reason to call this in a normal program. This is meant as an
+ * override for simulation extensions that allow interaction with real hardware.
+ *
+ * @param disabled Whether or not sim device creation is disabled
+ */
+void HAL_DisableSimDeviceCreation(bool disabled);
+
+/**
  * Frees a simulated device.
  *
  * This also allows the same device name to be used again.
