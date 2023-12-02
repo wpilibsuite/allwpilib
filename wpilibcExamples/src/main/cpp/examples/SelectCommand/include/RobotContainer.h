@@ -7,6 +7,7 @@
 #include <frc2/command/Command.h>
 #include <frc2/command/CommandPtr.h>
 #include <frc2/command/Commands.h>
+#include <frc/smartdashboard/SendableChooser.h>
 
 /**
  * This class is where the bulk of the robot should be declared.  Since
@@ -30,6 +31,8 @@ class RobotContainer {
   // conditions evaluated at runtime.
   CommandSelector Select() { return ONE; }
 
+  frc::SendableChooser<CommandSelector> m_chooser;
+
   // The robot's subsystems and commands are defined here...
 
   // An example selectcommand.  Will select from the three commands based on the
@@ -37,7 +40,7 @@ class RobotContainer {
   // takes a generic type, so the selector does not have to be an enum; it could
   // be any desired type (string, integer, boolean, double...)
   frc2::CommandPtr m_exampleSelectCommand = frc2::cmd::Select<CommandSelector>(
-      [this] { return Select(); },
+      [this] { return m_chooser.GetSelected(); },
       // Maps selector values to commands
       std::pair{ONE, frc2::cmd::Print("Command one was selected!")},
       std::pair{TWO, frc2::cmd::Print("Command two was selected!")},
