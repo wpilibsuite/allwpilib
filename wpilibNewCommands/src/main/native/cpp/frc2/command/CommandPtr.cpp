@@ -23,7 +23,7 @@
 using namespace frc2;
 
 CommandPtr::CommandPtr(std::unique_ptr<Command>&& command)
-      : m_ptr(std::move(command)) {
+    : m_ptr(std::move(command)) {
   AssertValid();
 }
 
