@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import edu.wpi.first.wpilibj.motorcontrol.Victor;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -192,7 +191,7 @@ public final class TestBench {
   private static List<List<Integer[]>> getDIOCrossConnect() {
     List<List<Integer[]>> pairs = new ArrayList<List<Integer[]>>();
     List<Integer[]> setA =
-        Arrays.asList(
+        List.of(
             new Integer[][] {
               {DIOCrossConnectA1, DIOCrossConnectA2},
               {DIOCrossConnectA2, DIOCrossConnectA1}
@@ -200,7 +199,7 @@ public final class TestBench {
     pairs.add(setA);
 
     List<Integer[]> setB =
-        Arrays.asList(
+        List.of(
             new Integer[][] {
               {DIOCrossConnectB1, DIOCrossConnectB2},
               {DIOCrossConnectB2, DIOCrossConnectB1}

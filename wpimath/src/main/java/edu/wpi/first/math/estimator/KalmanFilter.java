@@ -26,8 +26,8 @@ import edu.wpi.first.math.system.LinearSystem;
  * model.
  *
  * <p>For more on the underlying math, read <a
- * href="https://file.tavsys.net/control/controls-engineering-in-frc.pdf">...</a> chapter 9
- * "Stochastic control theory".
+ * href="https://file.tavsys.net/control/controls-engineering-in-frc.pdf">https://file.tavsys.net/control/controls-engineering-in-frc.pdf</a>
+ * chapter 9 "Stochastic control theory".
  */
 public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extends Num>
     implements KalmanTypeFilter<States, Inputs, Outputs> {
@@ -46,7 +46,7 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
    * Constructs a Kalman filter with the given plant.
    *
    * <p>See <a
-   * href="https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-observers.html#process-and-measurement-noise-covariance-matrices">...</a>
+   * href="https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-observers.html#process-and-measurement-noise-covariance-matrices">https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-observers.html#process-and-measurement-noise-covariance-matrices</a>
    * for how to select the standard deviations.
    *
    * @param states A Nat representing the states of the system.

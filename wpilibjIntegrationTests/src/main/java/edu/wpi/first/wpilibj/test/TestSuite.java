@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj.WpiLibJTestSuite;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.LogManager;
@@ -193,7 +192,7 @@ public class TestSuite extends AbstractTestSuite {
       }
     }
 
-    ArrayList<String> argsParsed = new ArrayList<String>(Arrays.asList(args));
+    ArrayList<String> argsParsed = new ArrayList<String>(List.of(args));
     if (argsParsed.contains(HELP_FLAG)) {
       // If the user inputs the help flag then return the help message and exit
       // without running any tests

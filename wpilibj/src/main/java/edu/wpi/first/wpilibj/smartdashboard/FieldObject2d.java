@@ -122,7 +122,7 @@ public class FieldObject2d implements AutoCloseable {
     int ndx = 0;
     for (Pose2d pose : m_poses) {
       Translation2d translation = pose.getTranslation();
-      arr[ndx] = translation.getX();
+      arr[ndx + 0] = translation.getX();
       arr[ndx + 1] = translation.getY();
       arr[ndx + 2] = pose.getRotation().getDegrees();
       ndx += 3;

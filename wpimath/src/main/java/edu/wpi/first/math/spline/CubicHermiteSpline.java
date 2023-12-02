@@ -128,8 +128,13 @@ public class CubicHermiteSpline extends Spline {
       // [a₀] = [ 1  0  0  0][P'(i+1)]
       hermiteBasis =
           new SimpleMatrix(
-              4, 4, true, +2.0, +1.0, -2.0, +1.0, -3.0, -2.0, +3.0, -1.0, +0.0, +1.0, +0.0, +0.0,
-              +1.0, +0.0, +0.0, +0.0);
+              4,
+              4,
+              true,
+              new double[] {
+                +2.0, +1.0, -2.0, +1.0, -3.0, -2.0, +3.0, -1.0, +0.0, +1.0, +0.0, +0.0, +1.0, +0.0,
+                +0.0, +0.0
+              });
     }
     return hermiteBasis;
   }
@@ -147,6 +152,12 @@ public class CubicHermiteSpline extends Spline {
       throw new IllegalArgumentException("Size of vectors must be 2 or greater.");
     }
     return new SimpleMatrix(
-        4, 1, true, initialVector[0], initialVector[1], finalVector[0], finalVector[1]);
+        4,
+        1,
+        true,
+        new double[] {
+          initialVector[0], initialVector[1],
+          finalVector[0], finalVector[1]
+        });
   }
 }

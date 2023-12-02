@@ -26,7 +26,7 @@ import java.util.function.Function;
  * when the feedforward is created and remains constant.
  *
  * <p>For more on the underlying math, read <a
- * href="https://file.tavsys.net/control/controls-engineering-in-frc.pdf">...</a>.
+ * href="https://file.tavsys.net/control/controls-engineering-in-frc.pdf">https://file.tavsys.net/control/controls-engineering-in-frc.pdf</a>.
  */
 public class ControlAffinePlantInversionFeedforward<States extends Num, Inputs extends Num> {
   /** The current reference state. */

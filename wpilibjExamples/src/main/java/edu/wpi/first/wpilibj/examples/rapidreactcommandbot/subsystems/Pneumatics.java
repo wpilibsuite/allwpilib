@@ -49,8 +49,8 @@ public class Pneumatics extends SubsystemBase {
    * @return command
    */
   public Command disableCompressorCommand() {
-    // Disable closed-loop mode on the compressor.
     return startEnd(
+            // Disable closed-loop mode on the compressor.
             m_compressor::disable,
             // Enable closed-loop mode based on the digital pressure switch connected to the
             // PCM/PH.

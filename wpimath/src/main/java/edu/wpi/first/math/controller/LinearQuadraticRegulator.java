@@ -20,7 +20,7 @@ import org.ejml.simple.SimpleMatrix;
  * the control law u = K(r - x).
  *
  * <p>For more on the underlying math, read <a
- * href="https://file.tavsys.net/control/controls-engineering-in-frc.pdf">...</a>.
+ * href="https://file.tavsys.net/control/controls-engineering-in-frc.pdf">https://file.tavsys.net/control/controls-engineering-in-frc.pdf</a>.
  */
 public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Outputs extends Num> {
   /** The current reference state. */
@@ -36,7 +36,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
    * Constructs a controller with the given coefficients and plant. Rho is defaulted to 1.
    *
    * <p>See <a
-   * href="https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-intro.html#lqr-tuning">...</a>
+   * href="https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-intro.html#lqr-tuning">https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-intro.html#lqr-tuning</a>
    * for how to select the tolerances.
    *
    * @param plant The plant being controlled.
@@ -62,7 +62,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
    * Constructs a controller with the given coefficients and plant.
    *
    * <p>See <a
-   * href="https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-intro.html#lqr-tuning">...</a>
+   * href="https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-intro.html#lqr-tuning">https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-intro.html#lqr-tuning</a>
    * for how to select the tolerances.
    *
    * @param A Continuous system matrix of the plant being controlled.
@@ -258,7 +258,8 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
    * are time-delayed too long, the LQR may be unstable. However, if we know the amount of delay, we
    * can compute the control based on where the system will be after the time delay.
    *
-   * <p>See <a href="https://file.tavsys.net/control/controls-engineering-in-frc.pdf">...</a>
+   * <p>See <a
+   * href="https://file.tavsys.net/control/controls-engineering-in-frc.pdf">https://file.tavsys.net/control/controls-engineering-in-frc.pdf</a>
    * appendix C.4 for a derivation.
    *
    * @param plant The plant being controlled.
