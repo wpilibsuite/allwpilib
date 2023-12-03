@@ -75,17 +75,18 @@ public class SendableChooser<V> implements Sendable, AutoCloseable {
   }
 
   /**
-   * Removes a given object from this list of options. On the {@link SmartDashboard} on the desktop, the
-   * object with the given name will disappear.
+   * Removes a given object from this list of options. On the {@link SmartDashboard} on the desktop,
+   * the object with the given name will disappear.
    *
    * @param name the name of the option
    */
   public void removeOption(String name) {
     m_map.remove(name);
   }
-  
+
   /**
-   * Clears the list of options. On the {@link SmartDashboard} on the desktop, all options will disappear.
+   * Clears the list of options. On the {@link SmartDashboard} on the desktop, all options will
+   * disappear.
    */
   public void removeAllOptions() {
     m_map.clear();
