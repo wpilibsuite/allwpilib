@@ -20,7 +20,7 @@ class RobotContainer {
  public:
   RobotContainer();
 
-  frc2::CommandPtr GetAutonomousCommand();
+  frc2::Command* GetAutonomousCommand();
 
  private:
   // The enum used as keys for selecting the command to run.
