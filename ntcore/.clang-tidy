@@ -4,8 +4,6 @@ Checks:
   bugprone-copy-constructor-init,
   bugprone-dangling-handle,
   bugprone-dynamic-static-initializers,
-  bugprone-exception-escape,
-  bugprone-forward-declaration-namespace,
   bugprone-forwarding-reference-overload,
   bugprone-inaccurate-erase,
   bugprone-incorrect-roundings,
@@ -66,8 +64,6 @@ Checks:
   modernize-use-noexcept,
   modernize-use-nullptr,
   modernize-use-override,
+  modernize-use-using,
   readability-braces-around-statements'
 FormatStyle: file
-CheckOptions:
-  - key: bugprone-dangling-handle
-    value: 'std::string_view'
