@@ -5,7 +5,6 @@
 #include "RobotContainer.h"
 
 #include <frc2/command/Commands.h>
-
 #include <units/angle.h>
 
 RobotContainer::RobotContainer() {

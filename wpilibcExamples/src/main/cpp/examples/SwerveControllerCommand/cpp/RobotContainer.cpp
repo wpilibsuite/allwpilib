@@ -77,19 +77,19 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
   // Reset odometry to the starting pose of the trajectory.
   m_drive.ResetOdometry(exampleTrajectory.InitialPose());
 
-  frc2::CommandPtr swerveDriveCommand = 
-          frc2::SwerveControllerCommand<4>(
-            exampleTrajectory, [this]() { return m_drive.GetPose(); },
-  
-            m_drive.kDriveKinematics,
-  
-            frc::PIDController{AutoConstants::kPXController, 0, 0},
-            frc::PIDController{AutoConstants::kPYController, 0, 0},
-            thetaController,
-  
-            [this](auto moduleStates) { m_drive.SetModuleStates(moduleStates); },
-  
-            {&m_drive})
+  frc2::CommandPtr swerveDriveCommand =
+      frc2::SwerveControllerCommand<4>(
+          exampleTrajectory, [this]() { return m_drive.GetPose(); },
+
+          m_drive.kDriveKinematics,
+
+          frc::PIDController{AutoConstants::kPXController, 0, 0},
+          frc::PIDController{AutoConstants::kPYController, 0, 0},
+          thetaController,
+
+          [this](auto moduleStates) { m_drive.SetModuleStates(moduleStates); },
+
+          {&m_drive})
           .ToPtr();
 
   return frc2::cmd::Sequence(

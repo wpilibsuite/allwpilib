@@ -4,10 +4,10 @@
 
 #pragma once
 
+#include <frc/smartdashboard/SendableChooser.h>
 #include <frc2/command/Command.h>
 #include <frc2/command/CommandPtr.h>
 #include <frc2/command/Commands.h>
-#include <frc/smartdashboard/SendableChooser.h>
 
 /**
  * This class is where the bulk of the robot should be declared.  Since
