@@ -27,8 +27,7 @@ namespace frc2 {
  */
 class CommandPtr final {
  public:
-  explicit CommandPtr(std::unique_ptr<Command>&& command)
-      : m_ptr(std::move(command)) {}
+  explicit CommandPtr(std::unique_ptr<Command>&& command);
 
   template <std::derived_from<Command> T>
   // NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
@@ -38,6 +37,8 @@ class CommandPtr final {
 
   CommandPtr(CommandPtr&&) = default;
   CommandPtr& operator=(CommandPtr&&) = default;
+
+  explicit CommandPtr(std::nullptr_t) = delete;
 
   /**
    * Decorates this command to run repeatedly, restarting it when it ends, until
