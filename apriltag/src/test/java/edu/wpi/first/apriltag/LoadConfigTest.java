@@ -12,24 +12,23 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
-import java.io.IOException;
 import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
 
 class LoadConfigTest {
-  @ParameterizedTest
-  @EnumSource(AprilTagFields.class)
-  void testLoad(AprilTagFields field) {
-    AprilTagFieldLayout layout = Assertions.assertDoesNotThrow(field::loadAprilTagLayoutField);
+  @Test
+  void testLoad() {
+    AprilTagFieldLayout layout =
+        Assertions.assertDoesNotThrow(AprilTagFieldLayout::load2022RapidReactFieldLayout);
+    assertNotNull(layout);
+    layout = Assertions.assertDoesNotThrow(AprilTagFieldLayout::load2023ChargedUpFieldLayout);
     assertNotNull(layout);
   }
 
   @Test
-  void test2022RapidReact() throws IOException {
-    AprilTagFieldLayout layout = AprilTagFields.k2022RapidReact.loadAprilTagLayoutField();
+  void test2022RapidReact() {
+    AprilTagFieldLayout layout = AprilTagFieldLayout.load2022RapidReactFieldLayout();
 
     // Blue Hangar Truss - Hub
     Pose3d expectedPose =

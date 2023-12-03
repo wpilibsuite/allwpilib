@@ -28,6 +28,7 @@ public enum AprilTagFields {
    * @return AprilTagFieldLayout of the field
    * @throws UncheckedIOException If the layout does not exist
    */
+  @Deprecated
   public AprilTagFieldLayout loadAprilTagLayoutField() {
     try {
       return AprilTagFieldLayout.loadFromResource(m_resourceFile);

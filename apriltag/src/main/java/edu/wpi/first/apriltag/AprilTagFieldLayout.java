@@ -218,17 +218,38 @@ public class AprilTagFieldLayout {
     new ObjectMapper().writeValue(path.toFile(), this);
   }
 
+  private static final String kBaseResourceDir = "/edu/wpi/first/apriltag/";
+
+  /**
+   * Loads the field layout for the 2022 Rapid React field.
+   *
+   * @return AprilTagFieldLayout for the 2022 Rapid React field.
+   */
+  public static AprilTagFieldLayout load2022RapidReactFieldLayout() {
+    return loadFromResource(kBaseResourceDir + "2022-rapidreact.json");
+  }
+
+  /**
+   * Loads the field layout for the 2023 Charged Up field.
+   *
+   * @return AprilTagFieldLayout for the 2023 Charged Up field.
+   */
+  public static AprilTagFieldLayout load2023ChargedUpFieldLayout() {
+    return loadFromResource(kBaseResourceDir + "2023-chargedup.json");
+  }
+
   /**
    * Deserializes a field layout from a resource within a internal jar file.
    *
    * <p>Users should use {@link AprilTagFields#loadAprilTagLayoutField()} to load official layouts
    * and {@link #AprilTagFieldLayout(String)} for custom layouts.
    *
-   * @param resourcePath The absolute path of the resource
-   * @return The deserialized layout
-   * @throws IOException If the resource could not be loaded
+   * @param resourcePath The absolute path of the resource.
+   * @return The deserialized layout.
+   * @throws IOException If the resource could not be loaded.
    */
-  public static AprilTagFieldLayout loadFromResource(String resourcePath) throws IOException {
+  @Deprecated
+  public static AprilTagFieldLayout loadFromResource(String resourcePath) {
     InputStream stream = AprilTagFieldLayout.class.getResourceAsStream(resourcePath);
     if (stream == null) {
       // Class.getResourceAsStream() returns null if the resource does not exist.
