@@ -21,6 +21,9 @@
 #ifndef _gcem_lcm_HPP
 #define _gcem_lcm_HPP
 
+namespace gcem
+{
+
 namespace internal
 {
 
@@ -60,6 +63,8 @@ lcm(const T1 a, const T2 b)
 noexcept
 {
     return internal::lcm_type_check(a,b);
+}
+
 }
 
 #endif

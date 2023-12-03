@@ -28,6 +28,9 @@
 #include <cmath>
 #include <type_traits>
 
+namespace gcem
+{
+
 namespace internal
 {
 
@@ -84,6 +87,8 @@ noexcept
   } else {
     return std::pow(base, exp_term);
   }
+}
+
 }
 
 #endif

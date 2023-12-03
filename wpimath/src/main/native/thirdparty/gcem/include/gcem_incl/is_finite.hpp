@@ -25,6 +25,9 @@
 #ifndef _gcem_is_finite_HPP
 #define _gcem_is_finite_HPP
 
+namespace gcem
+{
+
 namespace internal
 {
 
@@ -71,6 +74,8 @@ all_finite(const T1 x, const T2 y, const T3 z)
 noexcept
 {
     return( is_finite(x) && is_finite(y) && is_finite(z) );
+}
+
 }
 
 }

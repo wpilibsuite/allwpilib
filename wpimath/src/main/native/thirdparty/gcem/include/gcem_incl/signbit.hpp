@@ -24,6 +24,9 @@
 #include <cmath>
 #include <type_traits>
 
+namespace gcem
+{
+
 /**
  * Compile-time sign bit detection function
  *
@@ -46,6 +49,8 @@ noexcept
   } else {
     return std::signbit(x);
   }
+}
+
 }
 
 #endif

@@ -24,6 +24,9 @@
 #include <cmath>
 #include <type_traits>
 
+namespace gcem
+{
+
 /**
  * Compile-time absolute value function
  *
@@ -47,6 +50,8 @@ noexcept
   } else {
     return std::abs(x);
   }
+}
+
 }
 
 #endif
