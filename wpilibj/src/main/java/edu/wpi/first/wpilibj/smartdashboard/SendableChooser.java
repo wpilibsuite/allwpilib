@@ -85,7 +85,7 @@ public class SendableChooser<V> implements Sendable, AutoCloseable {
   }
   
   /**
-   * Clears the list of options. On the {{@link} SmartDashboard} on the desktop, all options will disappear.
+   * Clears the list of options. On the {@link SmartDashboard} on the desktop, all options will disappear.
    */
   public void removeAllOptions() {
     m_map.clear();
