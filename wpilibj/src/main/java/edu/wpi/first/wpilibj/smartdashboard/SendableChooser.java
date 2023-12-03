@@ -74,6 +74,14 @@ public class SendableChooser<V> implements Sendable, AutoCloseable {
     m_map.put(name, object);
   }
 
+  public void removeOption(String name) {
+    m_map.remove(name);
+  }
+
+  public void removeAllOptions() {
+    m_map.clear();
+  }
+
   /**
    * Adds the given object to the list of options and marks it as the default. Functionally, this is
    * very close to {@link #addOption(String, Object)} except that it will use this as the default
