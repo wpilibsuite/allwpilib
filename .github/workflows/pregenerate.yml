@@ -27,6 +27,8 @@ jobs:
           python-version: 3.9
       - name: Install jinja
         run: python -m pip install jinja2
+      - name: Run hal
+        run: ./hal/generate_usage_reporting.py
       - name: Run ntcore
         run: ./ntcore/generate_topics.py
       - name: Run wpimath
