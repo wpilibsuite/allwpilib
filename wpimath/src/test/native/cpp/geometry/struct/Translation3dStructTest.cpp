@@ -15,8 +15,8 @@ const Translation3d kExpectedData{Translation3d{35.04_m, 22.9_m, 3.504_m}};
 }  // namespace
 
 TEST(Translation3dStructTest, Roundtrip) {
-  uint8_t buffer[StructType::kSize];
-  std::memset(buffer, 0, StructType::kSize);
+  uint8_t buffer[StructType::GetSize()];
+  std::memset(buffer, 0, StructType::GetSize());
   StructType::Pack(buffer, kExpectedData);
 
   Translation3d unpacked_data = StructType::Unpack(buffer);

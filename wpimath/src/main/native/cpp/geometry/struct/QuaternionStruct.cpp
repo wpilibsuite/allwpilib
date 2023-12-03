@@ -13,7 +13,7 @@ constexpr size_t kZOff = kYOff + 8;
 
 using StructType = wpi::Struct<frc::Quaternion>;
 
-frc::Quaternion StructType::Unpack(std::span<const uint8_t, kSize> data) {
+frc::Quaternion StructType::Unpack(std::span<const uint8_t> data) {
   return frc::Quaternion{
       wpi::UnpackStruct<double, kWOff>(data),
       wpi::UnpackStruct<double, kXOff>(data),
@@ -22,8 +22,7 @@ frc::Quaternion StructType::Unpack(std::span<const uint8_t, kSize> data) {
   };
 }
 
-void StructType::Pack(std::span<uint8_t, kSize> data,
-                      const frc::Quaternion& value) {
+void StructType::Pack(std::span<uint8_t> data, const frc::Quaternion& value) {
   wpi::PackStruct<kWOff>(data, value.W());
   wpi::PackStruct<kXOff>(data, value.X());
   wpi::PackStruct<kYOff>(data, value.Y());
