@@ -75,7 +75,7 @@ public class SendableChooser<V> implements Sendable, AutoCloseable {
   }
 
   /**
-   * Removes a given object from this list of options. On the {@link} SmartDashboard} on the desktop, the
+   * Removes a given object from this list of options. On the {@link SmartDashboard} on the desktop, the
    * object with the given name will disappear.
    *
    * @param name the name of the option
