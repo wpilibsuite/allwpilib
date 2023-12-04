@@ -3,3 +3,13 @@
 *.json text eol=lf
 *.md text eol=lf
 *.xml text eol=lf
+
+# Generated files
+hal/src/generated/** linguist-generated
+ntcore/src/generated/** linguist-generated
+wpimath/src/generated/** linguist-generated
+
+# Thirdparty files
+wpimath/src/main/native/thirdparty/** linguist-vendored
+wpinet/src/main/native/thirdparty/** linguist-vendored
+wpiutil/src/main/native/thirdparty/** linguist-vendored
