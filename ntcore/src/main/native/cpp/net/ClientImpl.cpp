@@ -20,7 +20,6 @@
 #include "NetworkInterface.h"
 #include "WireConnection.h"
 #include "WireEncoder.h"
-#include "net/NetworkOutgoingQueue.h"
 #include "networktables/NetworkTableValue.h"
 
 using namespace nt;
