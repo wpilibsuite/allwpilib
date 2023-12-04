@@ -59,7 +59,7 @@ endif("${isSystemDir}" STREQUAL "-1")
 # Options for building certain parts of the repo. Everything is built by default.
 option(BUILD_SHARED_LIBS "Build with shared libs (needed for JNI)" ON)
 option(WITH_JAVA "Include Java and JNI in the build" ON)
-option(WITH_JAVA_SOURCE "Build Java source jars" ON)
+option(WITH_JAVA_SOURCE "Build Java source jars" ${WITH_JAVA})
 option(WITH_CSCORE "Build cscore (needs OpenCV)" ON)
 option(WITH_NTCORE "Build ntcore" ON)
 option(WITH_WPIMATH "Build wpimath" ON)
