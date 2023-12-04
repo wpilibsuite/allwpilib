@@ -118,7 +118,7 @@ jobs:
           java-version: 17
           architecture: ${{ matrix.architecture }}
       - name: Import Developer ID Certificate
-        uses: wpilibsuite/import-signing-certificate@v1
+        uses: wpilibsuite/import-signing-certificate@master
         with:
           certificate-data: ${{ secrets.APPLE_CERTIFICATE_DATA }}
           certificate-passphrase: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
