@@ -65,6 +65,20 @@ struct ct_string {
 
   constexpr bool operator==(const ct_string<Char, Traits, N>&) const = default;
 
+  constexpr bool operator==(const std::basic_string<Char, Traits>& rhs) const {
+    if (size() != rhs.size()) {
+      return false;
+    }
+
+    for (size_t i = 0; i < size(); ++i) {
+      if (chars[i] != rhs[i]) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   constexpr bool operator==(std::basic_string_view<Char, Traits> rhs) const {
     if (size() != rhs.size()) {
       return false;
@@ -83,6 +97,16 @@ struct ct_string {
     requires(N + 1 == M)
   constexpr bool operator==(Char const (&rhs)[M]) const {
     for (size_t i = 0; i < M; ++i) {
+      if (chars[i] != rhs[i]) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  constexpr bool operator==(const Char* rhs) const {
+    for (size_t i = 0; i < N + 1; ++i) {
       if (chars[i] != rhs[i]) {
         return false;
       }
