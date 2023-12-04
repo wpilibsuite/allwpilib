@@ -26,7 +26,11 @@ if(WITH_JAVA)
     )
 
     install_jar(romiVendordep_jar DESTINATION ${java_lib_dest})
-    install_jar_exports(TARGETS romiVendordep_jar FILE romiVendordep_jar.cmake DESTINATION share/romiVendordep)
+    install_jar_exports(
+        TARGETS romiVendordep_jar
+        FILE romiVendordep_jar.cmake
+        DESTINATION share/romiVendordep
+    )
 endif()
 
 if(WITH_JAVA_SOURCE)

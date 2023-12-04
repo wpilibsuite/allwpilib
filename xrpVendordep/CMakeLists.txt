@@ -26,7 +26,11 @@ if(WITH_JAVA)
     )
 
     install_jar(xrpVendordep_jar DESTINATION ${java_lib_dest})
-    install_jar_exports(TARGETS xrpVendordep_jar FILE xrpVendordep_jar.cmake DESTINATION share/xrpVendordep)
+    install_jar_exports(
+        TARGETS xrpVendordep_jar
+        FILE xrpVendordep_jar.cmake
+        DESTINATION share/xrpVendordep
+    )
 endif()
 
 if(WITH_JAVA_SOURCE)

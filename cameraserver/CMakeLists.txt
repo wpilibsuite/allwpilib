@@ -31,7 +31,7 @@ if(WITH_JAVA)
         OUTPUT_NAME cameraserver
     )
 
-    install(cameraserver_jar DESTINATION ${java_lib_dest})
+    install_jar(cameraserver_jar DESTINATION ${java_lib_dest})
     install_jar_exports(
         TARGETS cameraserver_jar
         FILE cameraserver_jar.cmake

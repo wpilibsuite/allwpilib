@@ -26,7 +26,11 @@ if(WITH_JAVA)
     )
 
     install_jar(wpilibNewCommands_jar DESTINATION ${java_lib_dest})
-    install_jar_exports(TARGETS wpilibNewCommands_jar FILE wpilibNewCommands_jar.cmake DESTINATION share/wpilibNewCommands)
+    install_jar_exports(
+        TARGETS wpilibNewCommands_jar
+        FILE wpilibNewCommands_jar.cmake
+        DESTINATION share/wpilibNewCommands
+    )
 endif()
 
 if(WITH_JAVA_SOURCE)
