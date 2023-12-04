@@ -21,7 +21,7 @@ class SimulatedAnnealingTest {
         new SimulatedAnnealing<Double>(
             2.0,
             x -> MathUtil.clamp(x + (Math.random() - 0.5) * stepSize, -3, 3),
-            x -> function.applyAsDouble(x));
+            function::applyAsDouble);
 
     double solution = simulatedAnnealing.solve(-1.0, 5000);
 
@@ -38,7 +38,7 @@ class SimulatedAnnealingTest {
         new SimulatedAnnealing<Double>(
             2.0,
             x -> MathUtil.clamp(x + (Math.random() - 0.5) * stepSize, 0, 7),
-            x -> function.applyAsDouble(x));
+            function::applyAsDouble);
 
     double solution = simulatedAnnealing.solve(-1.0, 5000);
 

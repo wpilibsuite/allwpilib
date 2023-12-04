@@ -78,7 +78,7 @@ public class RobotContainer {
                     // End at desired position in meters; implicitly starts at 0
                     () -> new TrapezoidProfile.State(3, 0),
                     // Current position
-                    () -> new TrapezoidProfile.State(),
+                    TrapezoidProfile.State::new,
                     // Require the drive
                     m_robotDrive)
                 .beforeStarting(m_robotDrive::resetEncoders)

@@ -129,9 +129,9 @@ class LinearFilterTest {
         1,
         3,
         // f(x) = sin(x)
-        (double x) -> Math.sin(x),
+        Math::sin,
         // df/dx = cos(x)
-        (double x) -> Math.cos(x),
+        Math::cos,
         h,
         -20.0,
         20.0);
@@ -140,7 +140,7 @@ class LinearFilterTest {
         1,
         3,
         // f(x) = ln(x)
-        (double x) -> Math.log(x),
+        Math::log,
         // df/dx = 1/x
         (double x) -> 1.0 / x,
         h,
@@ -162,7 +162,7 @@ class LinearFilterTest {
         2,
         5,
         // f(x) = sin(x)
-        (double x) -> Math.sin(x),
+        Math::sin,
         // d²f/dx² = -sin(x)
         (double x) -> -Math.sin(x),
         h,
@@ -173,7 +173,7 @@ class LinearFilterTest {
         2,
         5,
         // f(x) = ln(x)
-        (double x) -> Math.log(x),
+        Math::log,
         // d²f/dx² = -1/x²
         (double x) -> -1.0 / (x * x),
         h,
@@ -201,9 +201,9 @@ class LinearFilterTest {
         1,
         2,
         // f(x) = sin(x)
-        (double x) -> Math.sin(x),
+        Math::sin,
         // df/dx = cos(x)
-        (double x) -> Math.cos(x),
+        Math::cos,
         h,
         -20.0,
         20.0);
@@ -212,7 +212,7 @@ class LinearFilterTest {
         1,
         2,
         // f(x) = ln(x)
-        (double x) -> Math.log(x),
+        Math::log,
         // df/dx = 1/x
         (double x) -> 1.0 / x,
         h,
@@ -234,7 +234,7 @@ class LinearFilterTest {
         2,
         4,
         // f(x) = sin(x)
-        (double x) -> Math.sin(x),
+        Math::sin,
         // d²f/dx² = -sin(x)
         (double x) -> -Math.sin(x),
         h,
@@ -245,7 +245,7 @@ class LinearFilterTest {
         2,
         4,
         // f(x) = ln(x)
-        (double x) -> Math.log(x),
+        Math::log,
         // d²f/dx² = -1/x²
         (double x) -> -1.0 / (x * x),
         h,

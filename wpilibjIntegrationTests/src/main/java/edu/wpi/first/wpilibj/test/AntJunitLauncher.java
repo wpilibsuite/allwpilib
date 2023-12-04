@@ -24,9 +24,8 @@ public class AntJunitLauncher {
    */
   public static void main(String... args) {
     if (args.length == 0) {
-      String path =
+      String pathToReports =
           String.format("%s/%s", System.getProperty("user.dir"), "/testResults/AntReports");
-      String pathToReports = path;
       Project project = new Project();
 
       try {

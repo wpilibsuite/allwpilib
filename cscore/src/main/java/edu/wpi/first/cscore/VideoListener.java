@@ -102,7 +102,7 @@ public class VideoListener implements AutoCloseable {
                       listener.accept(event);
                     } catch (Throwable throwable) {
                       System.err.println(
-                          "Unhandled exception during listener callback: " + throwable.toString());
+                          "Unhandled exception during listener callback: " + throwable);
                       throwable.printStackTrace();
                     }
                   }
