@@ -99,6 +99,11 @@ struct ct_string {
   constexpr auto data() const noexcept { return chars.data(); }
   constexpr auto c_str() const noexcept { return chars.data(); }
 
+  constexpr operator std::basic_string<Char, Traits>()  // NOLINT
+      const noexcept {
+    return std::basic_string<Char, Traits>{chars.data(), N};
+  }
+
   constexpr operator std::basic_string_view<Char, Traits>()  // NOLINT
       const noexcept {
     return std::basic_string_view<Char, Traits>{chars.data(), N};
