@@ -3,7 +3,6 @@
 import glob
 import os
 import sys
-import argparse
 from jinja2 import Environment, FileSystemLoader
 import json
 
@@ -14,36 +13,28 @@ def Output(outPath, outfn, contents):
 
     outpathname = f"{outPath}/{outfn}"
 
+    if os.path.exists(outpathname):
+        with open(outpathname, "r") as f:
+            if f.read() == contents:
+                return
+
     # File either doesn't exist or has different contents
     with open(outpathname, "w", newline="\n") as f:
         f.write(contents)
 
 
 def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--output_directory",
-        help="Optional. If set, will output the generated files to this directory, otherwise it will use a path relative to the script",
-    )
-    args = parser.parse_args()
+    dirname, _ = os.path.split(os.path.abspath(__file__))
 
-    if args.output_directory:
-        generation_root = args.output_directory
-        template_root = "ntcore/src/generate"
-    else:
-        dirname, _ = os.path.split(os.path.abspath(__file__))
-        generation_root = os.path.join(dirname, "src", "generated")
-        template_root = os.path.join(dirname, "src", "generate")
-
-    with open(f"{template_root}/types.json") as f:
+    with open(f"{dirname}/src/generate/types.json") as f:
         types = json.load(f)
 
     # Java files
     env = Environment(
-        loader=FileSystemLoader(f"{template_root}/main/java"), autoescape=False
+        loader=FileSystemLoader(f"{dirname}/src/generate/main/java"), autoescape=False
     )
-    rootPath = f"{generation_root}/main/java/edu/wpi/first/networktables"
-    for fn in glob.glob(f"{template_root}/main/java/*.jinja"):
+    rootPath = f"{dirname}/src/generated/main/java/edu/wpi/first/networktables"
+    for fn in glob.glob(f"{dirname}/src/generate/main/java/*.jinja"):
         template = env.get_template(os.path.basename(fn))
         outfn = os.path.basename(fn)[:-6]  # drop ".jinja"
         if os.path.basename(fn).startswith("NetworkTable") or os.path.basename(
@@ -62,11 +53,15 @@ def main():
 
     # C++ classes
     env = Environment(
-        loader=FileSystemLoader(f"{template_root}/main/native/include/networktables"),
+        loader=FileSystemLoader(
+            f"{dirname}/src/generate/main/native/include/networktables"
+        ),
         autoescape=False,
     )
-    rootPath = f"{generation_root}/main/native/include/networktables"
-    for fn in glob.glob(f"{template_root}/main/native/include/networktables/*.jinja"):
+    rootPath = f"{dirname}/src/generated/main/native/include/networktables"
+    for fn in glob.glob(
+        f"{dirname}/src/generate/main/native/include/networktables/*.jinja"
+    ):
         template = env.get_template(os.path.basename(fn))
         outfn = os.path.basename(fn)[:-6]  # drop ".jinja"
         for replacements in types:
@@ -76,56 +71,56 @@ def main():
 
     # C++ handle API (header)
     env = Environment(
-        loader=FileSystemLoader(f"{template_root}/main/native/include"),
+        loader=FileSystemLoader(f"{dirname}/src/generate/main/native/include"),
         autoescape=False,
     )
     template = env.get_template("ntcore_cpp_types.h.jinja")
     output = template.render(types=types)
     Output(
-        f"{generation_root}/main/native/include",
+        f"{dirname}/src/generated/main/native/include",
         "ntcore_cpp_types.h",
         output,
     )
 
     # C++ handle API (source)
     env = Environment(
-        loader=FileSystemLoader(f"{template_root}/main/native/cpp"),
+        loader=FileSystemLoader(f"{dirname}/src/generate/main/native/cpp"),
         autoescape=False,
     )
     template = env.get_template("ntcore_cpp_types.cpp.jinja")
     output = template.render(types=types)
-    Output(f"{generation_root}/main/native/cpp", "ntcore_cpp_types.cpp", output)
+    Output(f"{dirname}/src/generated/main/native/cpp", "ntcore_cpp_types.cpp", output)
 
     # C handle API (header)
     env = Environment(
-        loader=FileSystemLoader(f"{template_root}/main/native/include"),
+        loader=FileSystemLoader(f"{dirname}/src/generate/main/native/include"),
         autoescape=False,
     )
     template = env.get_template("ntcore_c_types.h.jinja")
     output = template.render(types=types)
     Output(
-        f"{generation_root}/main/native/include",
+        f"{dirname}/src/generated/main/native/include",
         "ntcore_c_types.h",
         output,
     )
 
     # C handle API (source)
     env = Environment(
-        loader=FileSystemLoader(f"{template_root}/main/native/cpp"),
+        loader=FileSystemLoader(f"{dirname}/src/generate/main/native/cpp"),
         autoescape=False,
     )
     template = env.get_template("ntcore_c_types.cpp.jinja")
     output = template.render(types=types)
-    Output(f"{generation_root}/main/native/cpp", "ntcore_c_types.cpp", output)
+    Output(f"{dirname}/src/generated/main/native/cpp", "ntcore_c_types.cpp", output)
 
     # JNI
     env = Environment(
-        loader=FileSystemLoader(f"{template_root}/main/native/cpp/jni"),
+        loader=FileSystemLoader(f"{dirname}/src/generate/main/native/cpp/jni"),
         autoescape=False,
     )
     template = env.get_template("types_jni.cpp.jinja")
     output = template.render(types=types)
-    Output(f"{generation_root}/main/native/cpp/jni", "types_jni.cpp", output)
+    Output(f"{dirname}/src/generated/main/native/cpp/jni", "types_jni.cpp", output)
 
 
 if __name__ == "__main__":

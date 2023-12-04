@@ -4,22 +4,12 @@
 # Open Source Software; you can modify and/or share it under the terms of
 # the WPILib BSD license file in the root directory of this project.
 import os
-import argparse
+
 
 def main():
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--output_directory",
-        help="Optional. If set, will output the generated files to this directory, otherwise it will use a path relative to the script",
-    )
-    args = parser.parse_args()
-
-    output_dir = args.output_directory or "hal/src/generated/"
-
     java_package = "edu/wpi/first/hal"
-    os.makedirs(f"{output_dir}/main/native/include/hal", exist_ok=True)
-    os.makedirs(f"{output_dir}/main/java/{java_package}", exist_ok=True)
+    os.makedirs("hal/src/generated/main/native/include/hal", exist_ok=True)
+    os.makedirs(f"hal/src/generated/main/java/{java_package}", exist_ok=True)
     usage_reporting_types_cpp = ""
     usage_reporting_instances_cpp = ""
     usage_reporting_types = ""
@@ -38,16 +28,25 @@ def main():
         contents = java_usage_reporting.read()
         contents = contents.replace(
             r"${usage_reporting_types}", usage_reporting_types)
-        with open(f"{output_dir}/main/java/{java_package}/FRCNetComm.java", "w") as java_out:
-            java_out.write(contents.replace(
-                r"${usage_reporting_instances}", usage_reporting_instances))
+        if os.path.exists(f"hal/src/generated/main/java/{java_package}/FRCNetComm.java"):
+            with open(f"hal/src/generated/main/java/{java_package}/FRCNetComm.java", "w") as java_out:
+                java_out.write(contents.replace(
+                    r"${usage_reporting_instances}", usage_reporting_instances))
+        else:
+            with open(f"hal/src/generated/main/java/{java_package}/FRCNetComm.java", "x") as java_out:
+                java_out.write(contents.replace(
+                    r"${usage_reporting_instances}", usage_reporting_instances))
 
     with open("hal/src/generate/FRCUsageReporting.h.in") as cpp_usage_reporting:
         contents = cpp_usage_reporting.read()
         contents = contents.replace(r"${usage_reporting_types_cpp}", usage_reporting_types_cpp).replace(
             r"${usage_reporting_instances_cpp}", usage_reporting_instances_cpp)
-        with open(f"{output_dir}/main/native/include/hal/FRCUsageReporting.h", "w") as cpp_out:
-            cpp_out.write(contents)
+        if os.path.exists("hal/src/generated/main/native/include/hal/FRCUsageReporting.h"):
+            with open("hal/src/generated/main/native/include/hal/FRCUsageReporting.h", "w") as cpp_out:
+                cpp_out.write(contents)
+        else:
+            with open("hal/src/generated/main/native/include/hal/FRCUsageReporting.h", "x") as cpp_out:
+                cpp_out.write(contents)
 
 
 if __name__ == "__main__":
