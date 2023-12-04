@@ -23,6 +23,10 @@ import java.util.function.Supplier;
  * base for user implementations that handles this.
  *
  * <p>This class is provided by the NewCommands VendorDep
+ *
+ * @see <a
+ *     href="https://docs.wpilib.org/en/stable/docs/software/commandbased/subsystems.html">Subsystem
+ *     on frc-docs</a>
  */
 public interface Subsystem {
   /**

@@ -21,6 +21,9 @@ namespace frc {
  *
  * The DoubleSolenoid class is typically used for pneumatics solenoids that
  * have two positions controlled by two separate channels.
+ * @see <a
+ * href="https://docs.wpilib.org/en/stable/docs/software/hardware-apis/pneumatics/pneumatics.html#double-solenoids-in-wpilib">Double
+ * Solenoids on frc-docs</a>
  */
 class DoubleSolenoid : public wpi::Sendable,
                        public wpi::SendableHelper<DoubleSolenoid> {

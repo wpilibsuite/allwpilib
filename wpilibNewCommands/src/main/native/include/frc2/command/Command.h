@@ -35,6 +35,9 @@ namespace frc2 {
  *
  * @see CommandScheduler
  * @see CommandHelper
+ * @see <a
+ * href="https://docs.wpilib.org/en/stable/docs/software/commandbased/index.html">Command-Based
+ * Programming on frc-docs</a>
  */
 class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
  public:

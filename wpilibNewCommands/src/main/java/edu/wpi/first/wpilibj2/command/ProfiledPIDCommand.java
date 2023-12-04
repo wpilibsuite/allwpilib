@@ -19,6 +19,10 @@ import java.util.function.Supplier;
  * output are performed synchronously in the command's execute() method.
  *
  * <p>This class is provided by the NewCommands VendorDep
+ *
+ * @see <a
+ *     href="https://docs.wpilib.org/en/stable/docs/software/commandbased/profilepid-subsystems-commands.html#profiledpidcommand">ProfilePIDCommand
+ *     on frc-docs</a>
  */
 public class ProfiledPIDCommand extends Command {
   protected final ProfiledPIDController m_controller;

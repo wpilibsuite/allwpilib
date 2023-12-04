@@ -64,6 +64,9 @@ class TimedRobot : public IterativeRobotBase {
    * @param offset   The offset from the common starting time. This is useful
    *                 for scheduling a callback in a different timeslot relative
    *                 to TimedRobot.
+   * @see <a
+   * href="https://docs.wpilib.org/en/stable/docs/software/convenience-features/scheduling-functions.html">Scheduling
+   * Functions at Custom Frequency on frc-docs</a>
    */
   void AddPeriodic(std::function<void()> callback, units::second_t period,
                    units::second_t offset = 0_s);

@@ -29,6 +29,9 @@ namespace frc {
  * Teams can use odometry during the autonomous period for complex tasks like
  * path following. Furthermore, odometry can be used for latency compensation
  * when using computer-vision systems.
+ * @see <a
+ * href="https://docs.wpilib.org/en/stable/docs/software/kinematics-and-odometry/swerve-drive-odometry.html">SwerveDriveOdometry
+ * on frc-docs</a>
  */
 template <size_t NumModules>
 class SwerveDriveOdometry

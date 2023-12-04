@@ -15,6 +15,10 @@ import edu.wpi.first.hal.PWMJNI;
  * <p>By default, the timing supports WS2812B LEDs, but is configurable using setBitTiming()
  *
  * <p>Only 1 LED driver is currently supported by the roboRIO.
+ *
+ * @see <a
+ *     href="https://docs.wpilib.org/en/stable/docs/software/hardware-apis/misc/addressable-leds.html">Addressable
+ *     LEDs on frc-docs</a>
  */
 public class AddressableLED implements AutoCloseable {
   private final int m_pwmHandle;

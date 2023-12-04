@@ -23,6 +23,10 @@ import java.util.function.BooleanSupplier;
  * specified explicitly from the command implementation.
  *
  * <p>This class is provided by the NewCommands VendorDep
+ *
+ * @see <a
+ *     href="https://docs.wpilib.org/en/stable/docs/software/commandbased/index.html">Command-Based
+ *     Programming on frc-docs</a>
  */
 public abstract class Command implements Sendable {
   protected Set<Subsystem> m_requirements = new HashSet<>();

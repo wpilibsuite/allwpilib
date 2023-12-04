@@ -17,6 +17,10 @@ import edu.wpi.first.util.sendable.SendableRegistry;
  * on the channel. Other devices such as encoders, gear tooth sensors, etc. that are implemented
  * elsewhere will automatically allocate digital inputs and outputs as required. This class is only
  * for devices like switches etc. that aren't implemented anywhere else.
+ *
+ * @see <a
+ *     href="https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/digital-inputs-software.html">Digital
+ *     Inputs on frc-docs</a>
  */
 public class DigitalInput extends DigitalSource implements Sendable {
   private final int m_channel;

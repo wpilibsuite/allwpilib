@@ -31,6 +31,10 @@ import org.ejml.simple.SimpleMatrix;
  *
  * <p>Forward kinematics is also used for odometry -- determining the position of the robot on the
  * field using encoders and a gyro.
+ *
+ * @see <a
+ *     href="https://docs.wpilib.org/en/stable/docs/software/kinematics-and-odometry/mecanum-drive-kinematics.html">MecanumDriveKinematics
+ *     on frc-docs</a>
  */
 public class MecanumDriveKinematics
     implements Kinematics<MecanumDriveWheelSpeeds, MecanumDriveWheelPositions> {

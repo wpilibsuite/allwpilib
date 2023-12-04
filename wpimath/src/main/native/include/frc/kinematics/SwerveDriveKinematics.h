@@ -49,6 +49,9 @@ using SwerveDriveWheelSpeeds = wpi::array<SwerveModuleState, NumModules>;
  *
  * Forward kinematics is also used for odometry -- determining the position of
  * the robot on the field using encoders and a gyro.
+ * @see <a
+ * href="https://docs.wpilib.org/en/stable/docs/software/kinematics-and-odometry/swerve-drive-kinematics.html">SwerveDriveKinematics
+ * on frc-docs</a>
  */
 template <size_t NumModules>
 class SwerveDriveKinematics

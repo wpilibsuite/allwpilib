@@ -21,6 +21,9 @@ class DigitalGlitchFilter;
  * implemented elsewhere will automatically allocate digital inputs and outputs
  * as required. This class is only for devices like switches etc. that aren't
  * implemented anywhere else.
+ * @see <a
+ * href="https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/digital-inputs-software.html">Digital
+ * Inputs on frc-docs</a>
  */
 class DigitalInput : public DigitalSource,
                      public wpi::Sendable,

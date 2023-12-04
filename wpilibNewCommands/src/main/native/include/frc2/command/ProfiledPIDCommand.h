@@ -24,6 +24,9 @@ namespace frc2 {
  * This class is provided by the NewCommands VendorDep
  *
  * @see ProfiledPIDController<Distance>
+ * @see <a
+ * href="https://docs.wpilib.org/en/stable/docs/software/commandbased/profilepid-subsystems-commands.html#profiledpidcommand">ProfilePIDCommand
+ * on frc-docs</a>
  */
 template <class Distance>
 class ProfiledPIDCommand

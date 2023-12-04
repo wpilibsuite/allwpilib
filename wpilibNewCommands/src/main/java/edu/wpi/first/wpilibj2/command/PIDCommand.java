@@ -17,6 +17,10 @@ import java.util.function.DoubleSupplier;
  * are performed synchronously in the command's execute() method.
  *
  * <p>This class is provided by the NewCommands VendorDep
+ *
+ * @see <a
+ *     href="https://docs.wpilib.org/en/stable/docs/software/commandbased/pid-subsystems-commands.html#pidcommand">PIDCommand
+ *     on frc-docs</a>
  */
 public class PIDCommand extends Command {
   protected final PIDController m_controller;
