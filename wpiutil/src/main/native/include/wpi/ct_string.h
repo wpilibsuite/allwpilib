@@ -110,6 +110,12 @@ struct ct_string {
       if (chars[i] != rhs[i]) {
         return false;
       }
+
+      // If index of rhs's null terminator is less than lhs's size - 1, rhs is
+      // shorter than lhs
+      if (rhs[i] == '\0' && i < N) {
+        return false;
+      }
     }
 
     return true;
