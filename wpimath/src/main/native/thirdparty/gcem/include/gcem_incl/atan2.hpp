@@ -28,6 +28,9 @@
 #include <cmath>
 #include <type_traits>
 
+namespace gcem
+{
+
 namespace internal
 {
 
@@ -90,6 +93,8 @@ noexcept
   } else {
     return std::atan2(y, x);
   }
+}
+
 }
 
 #endif

@@ -31,6 +31,9 @@
 #include <cmath>
 #include <type_traits>
 
+namespace gcem
+{
+
 namespace internal
 {
 
@@ -137,6 +140,8 @@ noexcept
   } else {
     return std::lgamma(x);
   }
+}
+
 }
 
 #endif
