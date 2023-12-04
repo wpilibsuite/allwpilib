@@ -31,10 +31,12 @@ if(WITH_JAVA)
         OUTPUT_NAME cameraserver
     )
 
-    get_property(CAMERASERVER_JAR_FILE TARGET cameraserver_jar PROPERTY JAR_FILE)
-    install(FILES ${CAMERASERVER_JAR_FILE} DESTINATION "${java_lib_dest}")
-
-    set_property(TARGET cameraserver_jar PROPERTY FOLDER "java")
+    install(cameraserver_jar DESTINATION ${java_lib_dest})
+    install_jar_exports(
+        TARGETS cameraserver_jar
+        FILE cameraserver_jar.cmake
+        DESTINATION share/cameraserver
+    )
 endif()
 
 if(WITH_JAVA_SOURCE)

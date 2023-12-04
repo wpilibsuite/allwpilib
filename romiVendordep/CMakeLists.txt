@@ -25,10 +25,8 @@ if(WITH_JAVA)
         OUTPUT_NAME romiVendordep
     )
 
-    get_property(ROMIVENDORDEP_JAR_FILE TARGET romiVendordep_jar PROPERTY JAR_FILE)
-    install(FILES ${ROMIVENDORDEP_JAR_FILE} DESTINATION "${java_lib_dest}")
-
-    set_property(TARGET romiVendordep_jar PROPERTY FOLDER "java")
+    install_jar(romiVendordep_jar DESTINATION ${java_lib_dest})
+    install_jar_exports(TARGETS romiVendordep_jar FILE romiVendordep_jar.cmake DESTINATION share/romiVendordep)
 endif()
 
 if(WITH_JAVA_SOURCE)

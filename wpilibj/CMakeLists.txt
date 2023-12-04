@@ -40,10 +40,8 @@ if(WITH_JAVA)
         OUTPUT_NAME wpilibj
     )
 
-    get_property(WPILIBJ_JAR_FILE TARGET wpilibj_jar PROPERTY JAR_FILE)
-    install(FILES ${WPILIBJ_JAR_FILE} DESTINATION "${java_lib_dest}")
-
-    set_property(TARGET wpilibj_jar PROPERTY FOLDER "java")
+    install_jar(wpilibj_jar DESTINATION ${java_lib_dest})
+    install_jar_exports(TARGETS wpilibj_jar FILE wpilibj_jar.cmake DESTINATION share/wpilibj)
 
     install(FILES wpilibj-config.cmake DESTINATION share/wpilibj)
 endif()

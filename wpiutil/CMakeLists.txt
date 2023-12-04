@@ -70,10 +70,8 @@ if(WITH_JAVA)
         GENERATE_NATIVE_HEADERS wpiutil_jni_headers
     )
 
-    get_property(WPIUTIL_JAR_FILE TARGET wpiutil_jar PROPERTY JAR_FILE)
-    install(FILES ${WPIUTIL_JAR_FILE} DESTINATION "${java_lib_dest}")
-
-    set_property(TARGET wpiutil_jar PROPERTY FOLDER "java")
+    install_jar(wpiutil_jar DESTINATION ${java_lib_dest})
+    install_jar_exports(TARGETS wpiutil_jar FILE wpiutil_jar.cmake DESTINATION share/wpiutil)
 
     add_library(wpiutiljni ${wpiutil_jni_src})
     wpilib_target_warnings(wpiutiljni)
