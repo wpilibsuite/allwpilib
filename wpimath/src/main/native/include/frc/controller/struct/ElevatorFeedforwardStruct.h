@@ -11,12 +11,15 @@
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Struct<frc::ElevatorFeedforward> {
-  static constexpr std::string_view kTypeString = "struct:ElevatorFeedforward";
-  static constexpr size_t kSize = 32;
-  static constexpr std::string_view kSchema =
-      "double ks;double kg;double kv;double ka";
+  static constexpr std::string_view GetTypeString() {
+    return "struct:ElevatorFeedforward";
+  }
+  static constexpr size_t GetSize() { return 32; }
+  static constexpr std::string_view GetSchema() {
+    return "double ks;double kg;double kv;double ka";
+  }
 
-  static frc::ElevatorFeedforward Unpack(std::span<const uint8_t, kSize> data);
-  static void Pack(std::span<uint8_t, kSize> data,
+  static frc::ElevatorFeedforward Unpack(std::span<const uint8_t> data);
+  static void Pack(std::span<uint8_t> data,
                    const frc::ElevatorFeedforward& value);
 };

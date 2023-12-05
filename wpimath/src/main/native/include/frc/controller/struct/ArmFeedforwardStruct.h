@@ -11,12 +11,14 @@
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Struct<frc::ArmFeedforward> {
-  static constexpr std::string_view kTypeString = "struct:ArmFeedforward";
-  static constexpr size_t kSize = 32;
-  static constexpr std::string_view kSchema =
-      "double ks;double kg;double kv;double ka";
+  static constexpr std::string_view GetTypeString() {
+    return "struct:ArmFeedforward";
+  }
+  static constexpr size_t GetSize() { return 32; }
+  static constexpr std::string_view GetSchema() {
+    return "double ks;double kg;double kv;double ka";
+  }
 
-  static frc::ArmFeedforward Unpack(std::span<const uint8_t, kSize> data);
-  static void Pack(std::span<uint8_t, kSize> data,
-                   const frc::ArmFeedforward& value);
+  static frc::ArmFeedforward Unpack(std::span<const uint8_t> data);
+  static void Pack(std::span<uint8_t> data, const frc::ArmFeedforward& value);
 };

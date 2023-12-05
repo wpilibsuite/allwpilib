@@ -11,13 +11,16 @@
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Struct<frc::DifferentialDriveWheelVoltages> {
-  static constexpr std::string_view kTypeString =
-      "struct:DifferentialDriveWheelVoltages";
-  static constexpr size_t kSize = 16;
-  static constexpr std::string_view kSchema = "double left;double right";
+  static constexpr std::string_view GetTypeString() {
+    return "struct:DifferentialDriveWheelVoltages";
+  }
+  static constexpr size_t GetSize() { return 16; }
+  static constexpr std::string_view GetSchema() {
+    return "double left;double right";
+  }
 
   static frc::DifferentialDriveWheelVoltages Unpack(
-      std::span<const uint8_t, kSize> data);
-  static void Pack(std::span<uint8_t, kSize> data,
+      std::span<const uint8_t> data);
+  static void Pack(std::span<uint8_t> data,
                    const frc::DifferentialDriveWheelVoltages& value);
 };

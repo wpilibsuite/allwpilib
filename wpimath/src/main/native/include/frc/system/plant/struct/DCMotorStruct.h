@@ -11,12 +11,14 @@
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Struct<frc::DCMotor> {
-  static constexpr std::string_view kTypeString = "struct:DCMotor";
-  static constexpr size_t kSize = 40;
-  static constexpr std::string_view kSchema =
-      "double nominal_voltage;double stall_torque;double stall_current;double "
-      "free_current;double free_speed";
+  static constexpr std::string_view GetTypeString() { return "struct:DCMotor"; }
+  static constexpr size_t GetSize() { return 40; }
+  static constexpr std::string_view GetSchema() {
+    return "double nominal_voltage;double stall_torque;double "
+           "stall_current;double "
+           "free_current;double free_speed";
+  }
 
-  static frc::DCMotor Unpack(std::span<const uint8_t, kSize> data);
-  static void Pack(std::span<uint8_t, kSize> data, const frc::DCMotor& value);
+  static frc::DCMotor Unpack(std::span<const uint8_t> data);
+  static void Pack(std::span<uint8_t> data, const frc::DCMotor& value);
 };
