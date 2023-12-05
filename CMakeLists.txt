@@ -222,7 +222,6 @@ set(WPILIBC_DEP_REPLACE_IMPL "find_dependency(wpilibc)")
 set(WPILIBNEWCOMMANDS_DEP_REPLACE "find_dependency(wpilibNewCommands)")
 set(WPIMATH_DEP_REPLACE "find_dependency(wpimath)")
 set(WPINET_DEP_REPLACE "find_dependency(wpinet)")
-set(WPIUNITS_DEP_REPLACE "find_dependency(wpiunits)")
 set(WPIUTIL_DEP_REPLACE "find_dependency(wpiutil)")
 
 set(FILENAME_DEP_REPLACE "get_filename_component(SELF_DIR \"$\{CMAKE_CURRENT_LIST_FILE\}\" PATH)")
