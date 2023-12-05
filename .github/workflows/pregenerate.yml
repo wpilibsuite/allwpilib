@@ -34,7 +34,7 @@ jobs:
       - name: Run ntcore
         run: ./ntcore/generate_topics.py
       - name: Run wpimath
-        run: ./wpimath/generate_numbers.py && ./wpimath/generate_quickbuf protoc protoc-gen-quickbuf-1.3.2-linux-x86_64.exe
+        run: ./wpimath/generate_numbers.py && ./wpimath/generate_quickbuf.py protoc protoc-gen-quickbuf-1.3.2-linux-x86_64.exe
       - name: Add untracked files to index so they count as changes
         run: git add -A
       - name: Check output
