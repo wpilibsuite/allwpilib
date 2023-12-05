@@ -33,12 +33,7 @@ class WatchdogTest {
   void enableDisableTest() {
     final AtomicInteger watchdogCounter = new AtomicInteger(0);
 
-    try (Watchdog watchdog =
-        new Watchdog(
-            0.4,
-            () -> {
-              watchdogCounter.addAndGet(1);
-            })) {
+    try (Watchdog watchdog = new Watchdog(0.4, () -> watchdogCounter.addAndGet(1))) {
       // Run 1
       watchdog.enable();
       SimHooks.stepTiming(0.2);
@@ -71,12 +66,7 @@ class WatchdogTest {
   void resetTest() {
     final AtomicInteger watchdogCounter = new AtomicInteger(0);
 
-    try (Watchdog watchdog =
-        new Watchdog(
-            0.4,
-            () -> {
-              watchdogCounter.addAndGet(1);
-            })) {
+    try (Watchdog watchdog = new Watchdog(0.4, () -> watchdogCounter.addAndGet(1))) {
       watchdog.enable();
       SimHooks.stepTiming(0.2);
       watchdog.reset();
@@ -92,12 +82,7 @@ class WatchdogTest {
   void setTimeoutTest() {
     final AtomicInteger watchdogCounter = new AtomicInteger(0);
 
-    try (Watchdog watchdog =
-        new Watchdog(
-            1.0,
-            () -> {
-              watchdogCounter.addAndGet(1);
-            })) {
+    try (Watchdog watchdog = new Watchdog(1.0, () -> watchdogCounter.addAndGet(1))) {
       watchdog.enable();
       SimHooks.stepTiming(0.2);
       watchdog.setTimeout(0.2);
@@ -137,12 +122,7 @@ class WatchdogTest {
   void epochsTest() {
     final AtomicInteger watchdogCounter = new AtomicInteger(0);
 
-    try (Watchdog watchdog =
-        new Watchdog(
-            0.4,
-            () -> {
-              watchdogCounter.addAndGet(1);
-            })) {
+    try (Watchdog watchdog = new Watchdog(0.4, () -> watchdogCounter.addAndGet(1))) {
       // Run 1
       watchdog.enable();
       watchdog.addEpoch("Epoch 1");
@@ -173,18 +153,8 @@ class WatchdogTest {
     final AtomicInteger watchdogCounter1 = new AtomicInteger(0);
     final AtomicInteger watchdogCounter2 = new AtomicInteger(0);
 
-    try (Watchdog watchdog1 =
-            new Watchdog(
-                0.2,
-                () -> {
-                  watchdogCounter1.addAndGet(1);
-                });
-        Watchdog watchdog2 =
-            new Watchdog(
-                0.6,
-                () -> {
-                  watchdogCounter2.addAndGet(1);
-                })) {
+    try (Watchdog watchdog1 = new Watchdog(0.2, () -> watchdogCounter1.addAndGet(1));
+        Watchdog watchdog2 = new Watchdog(0.6, () -> watchdogCounter2.addAndGet(1))) {
       watchdog2.enable();
       SimHooks.stepTiming(0.25);
       assertEquals(0, watchdogCounter1.get(), "Watchdog triggered early");

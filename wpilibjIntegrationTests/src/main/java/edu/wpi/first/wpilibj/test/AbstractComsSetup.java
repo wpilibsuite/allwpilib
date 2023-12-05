@@ -31,7 +31,7 @@ public abstract class AbstractComsSetup {
   // We have no way to stop the MockDS, so its thread is daemon.
   private static MockDS ds;
 
-  /**
+  /*
    * This sets up the network communications library to enable the driver station. After starting
    * network coms, it will loop until the driver station returns that the robot is enabled, to
    * ensure that tests will be able to run on the hardware.

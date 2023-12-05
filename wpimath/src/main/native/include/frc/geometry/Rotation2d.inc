@@ -4,27 +4,23 @@
 
 #pragma once
 
-#include <type_traits>
+#include <gcem.hpp>
 
 #include "frc/geometry/Rotation2d.h"
-#include "gcem.hpp"
 #include "units/angle.h"
 
 namespace frc {
 
 constexpr Rotation2d::Rotation2d(units::radian_t value)
     : m_value(value),
-      m_cos(std::is_constant_evaluated() ? gcem::cos(value.to<double>())
-                                         : std::cos(value.to<double>())),
-      m_sin(std::is_constant_evaluated() ? gcem::sin(value.to<double>())
-                                         : std::sin(value.to<double>())) {}
+      m_cos(gcem::cos(value.to<double>())),
+      m_sin(gcem::sin(value.to<double>())) {}
 
 constexpr Rotation2d::Rotation2d(units::degree_t value)
     : Rotation2d(units::radian_t{value}) {}
 
 constexpr Rotation2d::Rotation2d(double x, double y) {
-  double magnitude =
-      std::is_constant_evaluated() ? gcem::hypot(x, y) : std::hypot(x, y);
+  double magnitude = gcem::hypot(x, y);
   if (magnitude > 1e-6) {
     m_sin = y / magnitude;
     m_cos = x / magnitude;
@@ -32,9 +28,7 @@ constexpr Rotation2d::Rotation2d(double x, double y) {
     m_sin = 0.0;
     m_cos = 1.0;
   }
-  m_value =
-      units::radian_t{std::is_constant_evaluated() ? gcem::atan2(m_sin, m_cos)
-                                                   : std::atan2(m_sin, m_cos)};
+  m_value = units::radian_t{gcem::atan2(m_sin, m_cos)};
 }
 
 constexpr Rotation2d Rotation2d::operator-() const {
@@ -58,9 +52,7 @@ constexpr Rotation2d Rotation2d::operator/(double scalar) const {
 }
 
 constexpr bool Rotation2d::operator==(const Rotation2d& other) const {
-  return (std::is_constant_evaluated()
-              ? gcem::hypot(Cos() - other.Cos(), Sin() - other.Sin())
-              : std::hypot(Cos() - other.Cos(), Sin() - other.Sin())) < 1E-9;
+  return gcem::hypot(Cos() - other.Cos(), Sin() - other.Sin()) < 1E-9;
 }
 
 constexpr Rotation2d Rotation2d::RotateBy(const Rotation2d& other) const {

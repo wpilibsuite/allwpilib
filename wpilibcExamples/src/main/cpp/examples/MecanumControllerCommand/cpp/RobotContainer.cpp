@@ -12,6 +12,7 @@
 #include <frc/trajectory/Trajectory.h>
 #include <frc/trajectory/TrajectoryGenerator.h>
 #include <frc/trajectory/constraint/MecanumDriveKinematicsConstraint.h>
+#include <frc2/command/Commands.h>
 #include <frc2/command/InstantCommand.h>
 #include <frc2/command/MecanumControllerCommand.h>
 #include <frc2/command/SequentialCommandGroup.h>
@@ -47,7 +48,7 @@ void RobotContainer::ConfigureButtonBindings() {
       .OnFalse(&m_driveFullSpeed);
 }
 
-frc2::Command* RobotContainer::GetAutonomousCommand() {
+frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
   // Set up config for trajectory
   frc::TrajectoryConfig config(AutoConstants::kMaxSpeed,
                                AutoConstants::kMaxAcceleration);

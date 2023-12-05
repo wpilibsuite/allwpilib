@@ -15,7 +15,7 @@ constexpr size_t kRzOff = kRyOff + 8;
 
 using StructType = wpi::Struct<frc::Twist3d>;
 
-frc::Twist3d StructType::Unpack(std::span<const uint8_t, kSize> data) {
+frc::Twist3d StructType::Unpack(std::span<const uint8_t> data) {
   return frc::Twist3d{
       units::meter_t{wpi::UnpackStruct<double, kDxOff>(data)},
       units::meter_t{wpi::UnpackStruct<double, kDyOff>(data)},
@@ -26,8 +26,7 @@ frc::Twist3d StructType::Unpack(std::span<const uint8_t, kSize> data) {
   };
 }
 
-void StructType::Pack(std::span<uint8_t, kSize> data,
-                      const frc::Twist3d& value) {
+void StructType::Pack(std::span<uint8_t> data, const frc::Twist3d& value) {
   wpi::PackStruct<kDxOff>(data, value.dx.value());
   wpi::PackStruct<kDyOff>(data, value.dy.value());
   wpi::PackStruct<kDzOff>(data, value.dz.value());

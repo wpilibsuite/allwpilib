@@ -23,15 +23,15 @@ using namespace frc;
 /** Converts volts to PSI per the REV Analog Pressure Sensor datasheet. */
 units::pounds_per_square_inch_t VoltsToPSI(units::volt_t sensorVoltage,
                                            units::volt_t supplyVoltage) {
-  auto pressure = 250 * (sensorVoltage.value() / supplyVoltage.value()) - 25;
-  return units::pounds_per_square_inch_t{pressure};
+  return units::pounds_per_square_inch_t{
+      250 * (sensorVoltage.value() / supplyVoltage.value()) - 25};
 }
 
 /** Converts PSI to volts per the REV Analog Pressure Sensor datasheet. */
 units::volt_t PSIToVolts(units::pounds_per_square_inch_t pressure,
                          units::volt_t supplyVoltage) {
-  auto voltage = supplyVoltage.value() * (0.004 * pressure.value() + 0.1);
-  return units::volt_t{voltage};
+  return units::volt_t{supplyVoltage.value() *
+                       (0.004 * pressure.value() + 0.1)};
 }
 
 wpi::mutex PneumaticHub::m_handleLock;

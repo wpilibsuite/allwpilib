@@ -7,17 +7,16 @@
 namespace {
 constexpr size_t kFrontLeftOff = 0;
 constexpr size_t kFrontRightOff =
-    kFrontLeftOff + wpi::Struct<frc::Translation2d>::kSize;
+    kFrontLeftOff + wpi::GetStructSize<frc::Translation2d>();
 constexpr size_t kRearLeftOff =
-    kFrontRightOff + wpi::Struct<frc::Translation2d>::kSize;
+    kFrontRightOff + wpi::GetStructSize<frc::Translation2d>();
 constexpr size_t kRearRightOff =
-    kRearLeftOff + wpi::Struct<frc::Translation2d>::kSize;
+    kRearLeftOff + wpi::GetStructSize<frc::Translation2d>();
 }  // namespace
 
 using StructType = wpi::Struct<frc::MecanumDriveKinematics>;
 
-frc::MecanumDriveKinematics StructType::Unpack(
-    std::span<const uint8_t, kSize> data) {
+frc::MecanumDriveKinematics StructType::Unpack(std::span<const uint8_t> data) {
   return frc::MecanumDriveKinematics{
       wpi::UnpackStruct<frc::Translation2d, kFrontLeftOff>(data),
       wpi::UnpackStruct<frc::Translation2d, kFrontRightOff>(data),
@@ -26,15 +25,10 @@ frc::MecanumDriveKinematics StructType::Unpack(
   };
 }
 
-void StructType::Pack(std::span<uint8_t, kSize> data,
+void StructType::Pack(std::span<uint8_t> data,
                       const frc::MecanumDriveKinematics& value) {
   wpi::PackStruct<kFrontLeftOff>(data, value.GetFrontLeftWheel());
   wpi::PackStruct<kFrontRightOff>(data, value.GetFrontRightWheel());
   wpi::PackStruct<kRearLeftOff>(data, value.GetRearLeftWheel());
   wpi::PackStruct<kRearRightOff>(data, value.GetRearRightWheel());
-}
-
-void StructType::ForEachNested(
-    std::invocable<std::string_view, std::string_view> auto fn) {
-  wpi::ForEachStructSchema<frc::Translation2d>(fn);
 }

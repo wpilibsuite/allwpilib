@@ -22,7 +22,7 @@ public final class StructBuffer<T> {
   }
 
   public static <T> StructBuffer<T> create(Struct<T> struct) {
-    return new StructBuffer<T>(struct);
+    return new StructBuffer<>(struct);
   }
 
   /**

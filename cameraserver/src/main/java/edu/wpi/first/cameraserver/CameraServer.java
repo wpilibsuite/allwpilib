@@ -114,7 +114,7 @@ public final class CameraServer {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
       if (m_booleanValueEntry != null) {
         m_booleanValueEntry.close();
       }
@@ -740,6 +740,34 @@ public final class CameraServer {
     }
 
     CvSink newsink = new CvSink(name);
+    newsink.setSource(camera);
+    addServer(newsink);
+    return newsink;
+  }
+
+  /**
+   * Get OpenCV access to the specified camera. This allows you to get images from the camera for
+   * image processing on the roboRIO.
+   *
+   * @param camera Camera (e.g. as returned by startAutomaticCapture).
+   * @param pixelFormat Desired pixelFormat of the camera
+   * @return OpenCV sink for the specified camera
+   */
+  public static CvSink getVideo(VideoSource camera, PixelFormat pixelFormat) {
+    String name = "opencv_" + camera.getName();
+
+    synchronized (CameraServer.class) {
+      VideoSink sink = m_sinks.get(name);
+      if (sink != null) {
+        VideoSink.Kind kind = sink.getKind();
+        if (kind != VideoSink.Kind.kCv) {
+          throw new VideoException("expected OpenCV sink, but got " + kind);
+        }
+        return (CvSink) sink;
+      }
+    }
+
+    CvSink newsink = new CvSink(name, pixelFormat);
     newsink.setSource(camera);
     addServer(newsink);
     return newsink;

@@ -17,8 +17,8 @@ import org.ejml.simple.SimpleMatrix;
  * system and makes it behave like some other system. This can be used to make a drivetrain more
  * controllable during teleop driving by making it behave like a slower or more benign drivetrain.
  *
- * <p>For more on the underlying math, read appendix B.3 in
- * https://file.tavsys.net/control/controls-engineering-in-frc.pdf.
+ * <p>For more on the underlying math, read appendix B.3 in <a
+ * href="https://file.tavsys.net/control/controls-engineering-in-frc.pdf">https://file.tavsys.net/control/controls-engineering-in-frc.pdf</a>.
  */
 public class ImplicitModelFollower<States extends Num, Inputs extends Num, Outputs extends Num> {
   // Computed controller output

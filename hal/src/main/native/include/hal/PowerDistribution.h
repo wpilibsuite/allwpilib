@@ -324,6 +324,24 @@ void HAL_GetPowerDistributionStickyFaults(
     HAL_PowerDistributionHandle handle,
     HAL_PowerDistributionStickyFaults* stickyFaults, int32_t* status);
 
+void HAL_StartPowerDistributionStream(HAL_PowerDistributionHandle handle,
+                                      int32_t* status);
+
+typedef struct HAL_PowerDistributionChannelData {
+  float current;
+  int32_t channel;
+  uint32_t timestamp;
+} HAL_PowerDistributionChannelData;
+
+HAL_PowerDistributionChannelData* HAL_GetPowerDistributionStreamData(
+    HAL_PowerDistributionHandle handle, int32_t* count, int32_t* status);
+
+void HAL_FreePowerDistributionStreamData(HAL_PowerDistributionChannelData* data,
+                                         int32_t count);
+
+void HAL_StopPowerDistributionStream(HAL_PowerDistributionHandle handle,
+                                     int32_t* status);
+
 #ifdef __cplusplus
 }  // extern "C"
 #endif

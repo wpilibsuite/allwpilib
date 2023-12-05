@@ -11,6 +11,7 @@
 #include <frc/shuffleboard/Shuffleboard.h>
 #include <frc/trajectory/Trajectory.h>
 #include <frc/trajectory/TrajectoryGenerator.h>
+#include <frc2/command/Commands.h>
 #include <frc2/command/InstantCommand.h>
 #include <frc2/command/SequentialCommandGroup.h>
 #include <frc2/command/SwerveControllerCommand.h>
@@ -48,7 +49,7 @@ RobotContainer::RobotContainer() {
 
 void RobotContainer::ConfigureButtonBindings() {}
 
-frc2::Command* RobotContainer::GetAutonomousCommand() {
+frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
   // Set up config for trajectory
   frc::TrajectoryConfig config(AutoConstants::kMaxSpeed,
                                AutoConstants::kMaxAcceleration);
@@ -96,5 +97,6 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
           {}),
       std::move(swerveControllerCommand),
       frc2::InstantCommand(
-          [this]() { m_drive.Drive(0_mps, 0_mps, 0_rad_per_s, false); }, {}));
+          [this] { m_drive.Drive(0_mps, 0_mps, 0_rad_per_s, false); }, {})
+          .ToPtr());
 }
