@@ -27,4 +27,5 @@ struct WPILIB_DLLEXPORT wpi::Struct<frc::Rotation3d> {
   }
 };
 
+static_assert(wpi::StructSerializable<frc::Rotation3d>);
 static_assert(wpi::HasNestedStruct<frc::Rotation3d>);

@@ -12,14 +12,14 @@ constexpr size_t kRightOff = kLeftOff + 8;
 using StructType = wpi::Struct<frc::DifferentialDriveWheelVoltages>;
 
 frc::DifferentialDriveWheelVoltages StructType::Unpack(
-    std::span<const uint8_t, kSize> data) {
+    std::span<const uint8_t> data) {
   return frc::DifferentialDriveWheelVoltages{
       units::volt_t{wpi::UnpackStruct<double, kLeftOff>(data)},
       units::volt_t{wpi::UnpackStruct<double, kRightOff>(data)},
   };
 }
 
-void StructType::Pack(std::span<uint8_t, kSize> data,
+void StructType::Pack(std::span<uint8_t> data,
                       const frc::DifferentialDriveWheelVoltages& value) {
   wpi::PackStruct<kLeftOff>(data, value.left.value());
   wpi::PackStruct<kRightOff>(data, value.right.value());

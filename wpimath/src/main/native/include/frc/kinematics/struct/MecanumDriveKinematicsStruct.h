@@ -31,4 +31,5 @@ struct WPILIB_DLLEXPORT wpi::Struct<frc::MecanumDriveKinematics> {
   }
 };
 
+static_assert(wpi::StructSerializable<frc::MecanumDriveKinematics>);
 static_assert(wpi::HasNestedStruct<frc::MecanumDriveKinematics>);
