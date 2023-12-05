@@ -24,3 +24,5 @@ struct WPILIB_DLLEXPORT wpi::Struct<frc::MecanumDriveWheelPositions> {
   static void Pack(std::span<uint8_t> data,
                    const frc::MecanumDriveWheelPositions& value);
 };
+
+static_assert(wpi::StructSerializable<frc::MecanumDriveWheelPositions>);

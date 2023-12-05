@@ -22,3 +22,5 @@ struct WPILIB_DLLEXPORT wpi::Struct<frc::ArmFeedforward> {
   static frc::ArmFeedforward Unpack(std::span<const uint8_t> data);
   static void Pack(std::span<uint8_t> data, const frc::ArmFeedforward& value);
 };
+
+static_assert(wpi::StructSerializable<frc::ArmFeedforward>);

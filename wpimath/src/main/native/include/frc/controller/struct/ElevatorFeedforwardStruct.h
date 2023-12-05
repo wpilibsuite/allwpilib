@@ -23,3 +23,5 @@ struct WPILIB_DLLEXPORT wpi::Struct<frc::ElevatorFeedforward> {
   static void Pack(std::span<uint8_t> data,
                    const frc::ElevatorFeedforward& value);
 };
+
+static_assert(wpi::StructSerializable<frc::ElevatorFeedforward>);

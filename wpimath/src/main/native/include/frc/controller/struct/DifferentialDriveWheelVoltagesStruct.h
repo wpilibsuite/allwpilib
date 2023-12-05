@@ -24,3 +24,5 @@ struct WPILIB_DLLEXPORT wpi::Struct<frc::DifferentialDriveWheelVoltages> {
   static void Pack(std::span<uint8_t> data,
                    const frc::DifferentialDriveWheelVoltages& value);
 };
+
+static_assert(wpi::StructSerializable<frc::DifferentialDriveWheelVoltages>);

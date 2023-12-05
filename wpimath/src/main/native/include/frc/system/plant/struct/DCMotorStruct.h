@@ -22,3 +22,5 @@ struct WPILIB_DLLEXPORT wpi::Struct<frc::DCMotor> {
   static frc::DCMotor Unpack(std::span<const uint8_t> data);
   static void Pack(std::span<uint8_t> data, const frc::DCMotor& value);
 };
+
+static_assert(wpi::StructSerializable<frc::DCMotor>);

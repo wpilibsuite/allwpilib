@@ -20,3 +20,5 @@ struct WPILIB_DLLEXPORT wpi::Struct<frc::Twist3d> {
   static frc::Twist3d Unpack(std::span<const uint8_t> data);
   static void Pack(std::span<uint8_t> data, const frc::Twist3d& value);
 };
+
+static_assert(wpi::StructSerializable<frc::Twist3d>);
