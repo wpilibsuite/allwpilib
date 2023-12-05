@@ -41,7 +41,7 @@ if(WITH_JAVA)
     )
 
     install_jar(wpilibj_jar DESTINATION ${java_lib_dest})
-    install_jar_exports(TARGETS wpilibj_jar FILE wpilibj_jar.cmake DESTINATION share/wpilibj)
+    install_jar_exports(TARGETS wpilibj_jar FILE wpilibj.cmake DESTINATION share/wpilibj)
 
     install(FILES wpilibj-config.cmake DESTINATION share/wpilibj)
 endif()

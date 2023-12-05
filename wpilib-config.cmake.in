@@ -15,3 +15,6 @@ find_dependency(Threads)
 @WPIMATH_DEP_REPLACE@
 @WPINET_DEP_REPLACE@
 @WPIUTIL_DEP_REPLACE@
+if(@WITH_JAVA@)
+    @WPILIBJ_DEP_REPLACE@
+endif()
