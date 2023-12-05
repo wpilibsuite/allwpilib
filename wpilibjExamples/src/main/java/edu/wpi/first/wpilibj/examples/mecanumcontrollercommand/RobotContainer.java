@@ -123,8 +123,7 @@ public class RobotContainer {
             m_robotDrive);
 
     // Reset odometry to the initial pose of the trajectory, run path following
-    // command, then stop
-    // at the end.
+    // command, then stop at the end.
 
     return new SequentialCommandGroup(
         new InstantCommand(() -> m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose())),

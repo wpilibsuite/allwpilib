@@ -86,8 +86,7 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
       {&m_drive});
 
   // Reset odometry to the initial pose of the trajectory, run path following
-  // command, then stop
-  // at the end.
+  // command, then stop at the end.
 
   return new frc2::SequentialCommandGroup(
       frc2::InstantCommand(
