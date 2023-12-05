@@ -41,5 +41,6 @@ public final class BaseUnits {
   /** The standard unit of power, watts. */
   public static final Power Power = new Power(1, "Watt", "W");
 
+  /** The standard unit of temperature, kelvin. */
   public static final Temperature Temperature = new Temperature(x -> x, x -> x, "Kelvin", "K");
 }

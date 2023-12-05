@@ -21,7 +21,7 @@ RawSourceImpl::RawSourceImpl(std::string_view name, wpi::Logger& logger,
 
 RawSourceImpl::~RawSourceImpl() = default;
 
-void RawSourceImpl::PutFrame(const CS_RawFrame& image) {
+void RawSourceImpl::PutFrame(const WPI_RawFrame& image) {
   int type;
   switch (image.pixelFormat) {
     case VideoMode::kYUYV:
@@ -57,7 +57,7 @@ CS_Source CreateRawSource(std::string_view name, const VideoMode& mode,
                                               inst.telemetry, mode));
 }
 
-void PutSourceFrame(CS_Source source, const CS_RawFrame& image,
+void PutSourceFrame(CS_Source source, const WPI_RawFrame& image,
                     CS_Status* status) {
   auto data = Instance::GetInstance().GetSource(source);
   if (!data || data->kind != CS_SOURCE_RAW) {
@@ -75,7 +75,7 @@ CS_Source CS_CreateRawSource(const char* name, const CS_VideoMode* mode,
                              status);
 }
 
-void CS_PutRawSourceFrame(CS_Source source, const struct CS_RawFrame* image,
+void CS_PutRawSourceFrame(CS_Source source, const struct WPI_RawFrame* image,
                           CS_Status* status) {
   return cs::PutSourceFrame(source, *image, status);
 }

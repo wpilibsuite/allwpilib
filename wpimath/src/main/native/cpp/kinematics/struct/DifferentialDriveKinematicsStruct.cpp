@@ -11,13 +11,13 @@ constexpr size_t kTrackWidthOff = 0;
 using StructType = wpi::Struct<frc::DifferentialDriveKinematics>;
 
 frc::DifferentialDriveKinematics StructType::Unpack(
-    std::span<const uint8_t, kSize> data) {
+    std::span<const uint8_t> data) {
   return frc::DifferentialDriveKinematics{
       units::meter_t{wpi::UnpackStruct<double, kTrackWidthOff>(data)},
   };
 }
 
-void StructType::Pack(std::span<uint8_t, kSize> data,
+void StructType::Pack(std::span<uint8_t> data,
                       const frc::DifferentialDriveKinematics& value) {
   wpi::PackStruct<kTrackWidthOff>(data, value.trackWidth.value());
 }

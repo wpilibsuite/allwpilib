@@ -7,26 +7,19 @@
 namespace {
 constexpr size_t kTranslationOff = 0;
 constexpr size_t kRotationOff =
-    kTranslationOff + wpi::Struct<frc::Translation2d>::kSize;
+    kTranslationOff + wpi::GetStructSize<frc::Translation2d>();
 }  // namespace
 
 using StructType = wpi::Struct<frc::Transform2d>;
 
-frc::Transform2d StructType::Unpack(std::span<const uint8_t, kSize> data) {
+frc::Transform2d StructType::Unpack(std::span<const uint8_t> data) {
   return frc::Transform2d{
       wpi::UnpackStruct<frc::Translation2d, kTranslationOff>(data),
       wpi::UnpackStruct<frc::Rotation2d, kRotationOff>(data),
   };
 }
 
-void StructType::Pack(std::span<uint8_t, kSize> data,
-                      const frc::Transform2d& value) {
+void StructType::Pack(std::span<uint8_t> data, const frc::Transform2d& value) {
   wpi::PackStruct<kTranslationOff>(data, value.Translation());
   wpi::PackStruct<kRotationOff>(data, value.Rotation());
-}
-
-void StructType::ForEachNested(
-    std::invocable<std::string_view, std::string_view> auto fn) {
-  wpi::ForEachStructSchema<frc::Translation2d>(fn);
-  wpi::ForEachStructSchema<frc::Rotation2d>(fn);
 }

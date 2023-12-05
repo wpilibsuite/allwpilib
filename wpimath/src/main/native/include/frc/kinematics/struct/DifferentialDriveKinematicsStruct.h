@@ -11,13 +11,13 @@
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Struct<frc::DifferentialDriveKinematics> {
-  static constexpr std::string_view kTypeString =
-      "struct:DifferentialDriveKinematics";
-  static constexpr size_t kSize = 8;
-  static constexpr std::string_view kSchema = "double track_width";
+  static constexpr std::string_view GetTypeString() {
+    return "struct:DifferentialDriveKinematics";
+  }
+  static constexpr size_t GetSize() { return 8; }
+  static constexpr std::string_view GetSchema() { return "double track_width"; }
 
-  static frc::DifferentialDriveKinematics Unpack(
-      std::span<const uint8_t, kSize> data);
-  static void Pack(std::span<uint8_t, kSize> data,
+  static frc::DifferentialDriveKinematics Unpack(std::span<const uint8_t> data);
+  static void Pack(std::span<uint8_t> data,
                    const frc::DifferentialDriveKinematics& value);
 };

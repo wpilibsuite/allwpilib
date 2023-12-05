@@ -4,7 +4,7 @@
 
 package edu.wpi.first.cscore;
 
-import edu.wpi.first.cscore.raw.RawFrame;
+import edu.wpi.first.util.RawFrame;
 import edu.wpi.first.util.RuntimeLoader;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -386,10 +386,6 @@ public class CameraServerJNI {
   public static native String getHostname();
 
   public static native String[] getNetworkInterfaces();
-
-  public static native long allocateRawFrame();
-
-  public static native void freeRawFrame(long frame);
 
   public static native void runMainRunLoop();
 

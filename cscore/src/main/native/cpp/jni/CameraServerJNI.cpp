@@ -10,7 +10,6 @@
 #include <wpi/SmallString.h>
 #include <wpi/jni_util.h>
 
-#include "cscore_cpp.h"
 #include "cscore_cv.h"
 #include "cscore_raw.h"
 #include "cscore_runloop.h"
@@ -43,8 +42,7 @@ static JNIEnv* listenerEnv = nullptr;
 static const JClassInit classes[] = {
     {"edu/wpi/first/cscore/UsbCameraInfo", &usbCameraInfoCls},
     {"edu/wpi/first/cscore/VideoMode", &videoModeCls},
-    {"edu/wpi/first/cscore/VideoEvent", &videoEventCls},
-    {"edu/wpi/first/cscore/raw/RawFrame", &rawFrameCls}};
+    {"edu/wpi/first/cscore/VideoEvent", &videoEventCls}};
 
 static const JExceptionInit exceptions[] = {
     {"edu/wpi/first/cscore/VideoException", &videoEx},
@@ -1233,7 +1231,7 @@ Java_edu_wpi_first_cscore_CameraServerJNI_putRawSourceFrameBB
   (JNIEnv* env, jclass, jint source, jobject byteBuffer, jint width,
    jint height, jint pixelFormat, jint totalData)
 {
-  CS_RawFrame rawFrame;
+  WPI_RawFrame rawFrame;
   rawFrame.data =
       reinterpret_cast<char*>(env->GetDirectBufferAddress(byteBuffer));
   rawFrame.totalData = totalData;
@@ -1255,7 +1253,7 @@ Java_edu_wpi_first_cscore_CameraServerJNI_putRawSourceFrame
   (JNIEnv* env, jclass, jint source, jlong ptr, jint width, jint height,
    jint pixelFormat, jint totalData)
 {
-  CS_RawFrame rawFrame;
+  WPI_RawFrame rawFrame;
   rawFrame.data = reinterpret_cast<char*>(static_cast<intptr_t>(ptr));
   rawFrame.totalData = totalData;
   rawFrame.pixelFormat = pixelFormat;
@@ -1725,7 +1723,7 @@ Java_edu_wpi_first_cscore_CameraServerCvJNI_grabSinkFrameTimeout
 
 static void SetRawFrameData(JNIEnv* env, jobject rawFrameObj,
                             jobject byteBuffer, bool didChangeDataPtr,
-                            const CS_RawFrame& frame) {
+                            const WPI_RawFrame& frame) {
   static jmethodID setMethod =
       env->GetMethodID(rawFrameCls, "setData", "(Ljava/nio/ByteBuffer;JIIII)V");
   jlong framePtr = static_cast<jlong>(reinterpret_cast<intptr_t>(frame.data));
@@ -1750,8 +1748,8 @@ Java_edu_wpi_first_cscore_CameraServerJNI_grabRawSinkFrameImpl
   (JNIEnv* env, jclass, jint sink, jobject rawFrameObj, jlong rawFramePtr,
    jobject byteBuffer, jint width, jint height, jint pixelFormat)
 {
-  CS_RawFrame* ptr =
-      reinterpret_cast<CS_RawFrame*>(static_cast<intptr_t>(rawFramePtr));
+  WPI_RawFrame* ptr =
+      reinterpret_cast<WPI_RawFrame*>(static_cast<intptr_t>(rawFramePtr));
   auto origDataPtr = ptr->data;
   ptr->width = width;
   ptr->height = height;
@@ -1776,8 +1774,8 @@ Java_edu_wpi_first_cscore_CameraServerJNI_grabRawSinkFrameTimeoutImpl
    jobject byteBuffer, jint width, jint height, jint pixelFormat,
    jdouble timeout)
 {
-  CS_RawFrame* ptr =
-      reinterpret_cast<CS_RawFrame*>(static_cast<intptr_t>(rawFramePtr));
+  WPI_RawFrame* ptr =
+      reinterpret_cast<WPI_RawFrame*>(static_cast<intptr_t>(rawFramePtr));
   auto origDataPtr = ptr->data;
   ptr->width = width;
   ptr->height = height;
@@ -2199,34 +2197,6 @@ Java_edu_wpi_first_cscore_CameraServerJNI_setLogger
         LoggerJNI::GetInstance().Send(level, file, line, msg);
       },
       minLevel);
-}
-
-/*
- * Class:     edu_wpi_first_cscore_CameraServerJNI
- * Method:    allocateRawFrame
- * Signature: ()J
- */
-JNIEXPORT jlong JNICALL
-Java_edu_wpi_first_cscore_CameraServerJNI_allocateRawFrame
-  (JNIEnv*, jclass)
-{
-  cs::RawFrame* rawFrame = new cs::RawFrame{};
-  intptr_t rawFrameIntPtr = reinterpret_cast<intptr_t>(rawFrame);
-  return static_cast<jlong>(rawFrameIntPtr);
-}
-
-/*
- * Class:     edu_wpi_first_cscore_CameraServerJNI
- * Method:    freeRawFrame
- * Signature: (J)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_cscore_CameraServerJNI_freeRawFrame
-  (JNIEnv*, jclass, jlong rawFrame)
-{
-  cs::RawFrame* ptr =
-      reinterpret_cast<cs::RawFrame*>(static_cast<intptr_t>(rawFrame));
-  delete ptr;
 }
 
 /*

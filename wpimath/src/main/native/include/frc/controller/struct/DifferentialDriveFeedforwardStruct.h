@@ -11,14 +11,17 @@
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Struct<frc::DifferentialDriveFeedforward> {
-  static constexpr std::string_view kTypeString =
-      "struct:DifferentialDriveFeedforward";
-  static constexpr size_t kSize = 32;
-  static constexpr std::string_view kSchema =
-      "double kv_linear;double ka_linear;double kv_angular;double ka_angular";
+  static constexpr std::string_view GetTypeString() {
+    return "struct:DifferentialDriveFeedforward";
+  }
+  static constexpr size_t GetSize() { return 32; }
+  static constexpr std::string_view GetSchema() {
+    return "double kv_linear;double ka_linear;double kv_angular;double "
+           "ka_angular";
+  }
 
   static frc::DifferentialDriveFeedforward Unpack(
-      std::span<const uint8_t, kSize> data);
-  static void Pack(std::span<uint8_t, kSize> data,
+      std::span<const uint8_t> data);
+  static void Pack(std::span<uint8_t> data,
                    const frc::DifferentialDriveFeedforward& value);
 };

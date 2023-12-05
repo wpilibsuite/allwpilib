@@ -14,14 +14,17 @@
 
 template <class Distance>
 struct WPILIB_DLLEXPORT wpi::Struct<frc::SimpleMotorFeedforward<Distance>> {
-  static constexpr std::string_view kTypeString =
-      "struct:SimpleMotorFeedforward";
-  static constexpr size_t kSize = 24;
-  static constexpr std::string_view kSchema = "double ks;double kv;double ka";
+  static constexpr std::string_view GetTypeString() {
+    return "struct:SimpleMotorFeedforward";
+  }
+  static constexpr size_t GetSize() { return 24; }
+  static constexpr std::string_view GetSchema() {
+    return "double ks;double kv;double ka";
+  }
 
   static frc::SimpleMotorFeedforward<Distance> Unpack(
-      std::span<const uint8_t, kSize> data);
-  static void Pack(std::span<uint8_t, kSize> data,
+      std::span<const uint8_t> data);
+  static void Pack(std::span<uint8_t> data,
                    const frc::SimpleMotorFeedforward<Distance>& value);
 };
 

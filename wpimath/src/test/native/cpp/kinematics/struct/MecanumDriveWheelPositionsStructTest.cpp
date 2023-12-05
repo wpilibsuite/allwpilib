@@ -16,8 +16,8 @@ const MecanumDriveWheelPositions kExpectedData{
 }  // namespace
 
 TEST(MecanumDriveWheelPositionsStructTest, Roundtrip) {
-  uint8_t buffer[StructType::kSize];
-  std::memset(buffer, 0, StructType::kSize);
+  uint8_t buffer[StructType::GetSize()];
+  std::memset(buffer, 0, StructType::GetSize());
   StructType::Pack(buffer, kExpectedData);
 
   MecanumDriveWheelPositions unpacked_data = StructType::Unpack(buffer);

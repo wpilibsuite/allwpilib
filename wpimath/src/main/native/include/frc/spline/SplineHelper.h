@@ -77,6 +77,17 @@ class WPILIB_DLLEXPORT SplineHelper {
   static std::vector<QuinticHermiteSpline> QuinticSplinesFromControlVectors(
       const std::vector<Spline<5>::ControlVector>& controlVectors);
 
+  /**
+   * Optimizes the curvature of 2 or more quintic splines at knot points.
+   * Overall, this reduces the integral of the absolute value of the second
+   * derivative across the set of splines.
+   *
+   * @param splines A vector of un-optimized quintic splines.
+   * @return A vector of optimized quintic splines.
+   */
+  static std::vector<QuinticHermiteSpline> OptimizeCurvature(
+      const std::vector<QuinticHermiteSpline>& splines);
+
  private:
   static Spline<3>::ControlVector CubicControlVector(double scalar,
                                                      const Pose2d& point) {

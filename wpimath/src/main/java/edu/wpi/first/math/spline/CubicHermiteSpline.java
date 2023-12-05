@@ -16,6 +16,9 @@ public class CubicHermiteSpline extends Spline {
   public final double[] yInitialControlVector;
   public final double[] yFinalControlVector;
 
+  private final ControlVector m_initialControlVector;
+  private final ControlVector m_finalControlVector;
+
   /**
    * Constructs a cubic hermite spline with the specified control vectors. Each control vector
    * contains info about the location of the point and its first derivative.
@@ -71,6 +74,10 @@ public class CubicHermiteSpline extends Spline {
       m_coefficients.set(4, i, m_coefficients.get(2, i) * (2 - i));
       m_coefficients.set(5, i, m_coefficients.get(3, i) * (2 - i));
     }
+
+    // Assign member variables.
+    m_initialControlVector = new ControlVector(xInitialControlVector, yInitialControlVector);
+    m_finalControlVector = new ControlVector(xFinalControlVector, yFinalControlVector);
   }
 
   /**
@@ -79,8 +86,28 @@ public class CubicHermiteSpline extends Spline {
    * @return The coefficients matrix.
    */
   @Override
-  protected SimpleMatrix getCoefficients() {
+  public SimpleMatrix getCoefficients() {
     return m_coefficients;
+  }
+
+  /**
+   * Returns the initial control vector that created this spline.
+   *
+   * @return The initial control vector that created this spline.
+   */
+  @Override
+  public ControlVector getInitialControlVector() {
+    return m_initialControlVector;
+  }
+
+  /**
+   * Returns the final control vector that created this spline.
+   *
+   * @return The final control vector that created this spline.
+   */
+  @Override
+  public ControlVector getFinalControlVector() {
+    return m_finalControlVector;
   }
 
   /**
@@ -132,8 +159,8 @@ public class CubicHermiteSpline extends Spline {
    * @return The control vector matrix for a dimension.
    */
   private SimpleMatrix getControlVectorFromArrays(double[] initialVector, double[] finalVector) {
-    if (initialVector.length != 2 || finalVector.length != 2) {
-      throw new IllegalArgumentException("Size of vectors must be 2");
+    if (initialVector.length < 2 || finalVector.length < 2) {
+      throw new IllegalArgumentException("Size of vectors must be 2 or greater.");
     }
     return new SimpleMatrix(
         4,

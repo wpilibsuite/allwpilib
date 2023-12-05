@@ -25,12 +25,10 @@ frc::CubicHermiteSpline wpi::Protobuf<frc::CubicHermiteSpline>::Unpack(
 void wpi::Protobuf<frc::CubicHermiteSpline>::Pack(
     google::protobuf::Message* msg, const frc::CubicHermiteSpline& value) {
   auto m = static_cast<wpi::proto::ProtobufCubicHermiteSpline*>(msg);
-  wpi::PackProtobufArray<double, 2>(m->mutable_x_initial(),
-                                    value.xInitialControlVector);
-  wpi::PackProtobufArray<double, 2>(m->mutable_x_final(),
-                                    value.xFinalControlVector);
-  wpi::PackProtobufArray<double, 2>(m->mutable_y_initial(),
-                                    value.yInitialControlVector);
-  wpi::PackProtobufArray<double, 2>(m->mutable_y_final(),
-                                    value.yFinalControlVector);
+  wpi::PackProtobufArray(m->mutable_x_initial(),
+                         value.GetInitialControlVector().x);
+  wpi::PackProtobufArray(m->mutable_x_final(), value.GetFinalControlVector().x);
+  wpi::PackProtobufArray(m->mutable_y_initial(),
+                         value.GetInitialControlVector().y);
+  wpi::PackProtobufArray(m->mutable_y_final(), value.GetFinalControlVector().y);
 }

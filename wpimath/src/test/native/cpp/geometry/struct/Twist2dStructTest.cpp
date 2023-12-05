@@ -15,8 +15,8 @@ const Twist2d kExpectedData{Twist2d{2.29_m, 35.04_m, 35.04_rad}};
 }  // namespace
 
 TEST(Twist2dStructTest, Roundtrip) {
-  uint8_t buffer[StructType::kSize];
-  std::memset(buffer, 0, StructType::kSize);
+  uint8_t buffer[StructType::GetSize()];
+  std::memset(buffer, 0, StructType::GetSize());
   StructType::Pack(buffer, kExpectedData);
 
   Twist2d unpacked_data = StructType::Unpack(buffer);

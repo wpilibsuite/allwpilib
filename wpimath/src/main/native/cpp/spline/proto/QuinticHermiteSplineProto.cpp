@@ -25,8 +25,10 @@ frc::QuinticHermiteSpline wpi::Protobuf<frc::QuinticHermiteSpline>::Unpack(
 void wpi::Protobuf<frc::QuinticHermiteSpline>::Pack(
     google::protobuf::Message* msg, const frc::QuinticHermiteSpline& value) {
   auto m = static_cast<wpi::proto::ProtobufQuinticHermiteSpline*>(msg);
-  wpi::PackProtobufArray(m->mutable_x_initial(), value.xInitialControlVector);
-  wpi::PackProtobufArray(m->mutable_x_final(), value.xFinalControlVector);
-  wpi::PackProtobufArray(m->mutable_y_initial(), value.yInitialControlVector);
-  wpi::PackProtobufArray(m->mutable_y_final(), value.yFinalControlVector);
+  wpi::PackProtobufArray(m->mutable_x_initial(),
+                         value.GetInitialControlVector().x);
+  wpi::PackProtobufArray(m->mutable_x_final(), value.GetFinalControlVector().x);
+  wpi::PackProtobufArray(m->mutable_y_initial(),
+                         value.GetInitialControlVector().y);
+  wpi::PackProtobufArray(m->mutable_y_final(), value.GetFinalControlVector().y);
 }

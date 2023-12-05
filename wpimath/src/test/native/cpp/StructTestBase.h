@@ -20,8 +20,8 @@ TYPED_TEST_SUITE_P(StructTest);
 TYPED_TEST_P(StructTest, RoundTrip) {
   using Type = typename TypeParam::Type;
   using StructType = wpi::Struct<Type>;
-  uint8_t buffer[StructType::kSize];
-  std::memset(buffer, 0, StructType::kSize);
+  uint8_t buffer[StructType::GetSize()];
+  std::memset(buffer, 0, StructType::GetSize());
   wpi::PackStruct(buffer, TypeParam::kTestData);
 
   Type unpacked_data = wpi::UnpackStruct<Type>(buffer);
@@ -31,8 +31,8 @@ TYPED_TEST_P(StructTest, RoundTrip) {
 TYPED_TEST_P(StructTest, DoublePack) {
   using Type = typename TypeParam::Type;
   using StructType = wpi::Struct<Type>;
-  uint8_t buffer[StructType::kSize];
-  std::memset(buffer, 0, StructType::kSize);
+  uint8_t buffer[StructType::GetSize()];
+  std::memset(buffer, 0, StructType::GetSize());
   wpi::PackStruct(buffer, TypeParam::kTestData);
   wpi::PackStruct(buffer, TypeParam::kTestData);
 
@@ -43,8 +43,8 @@ TYPED_TEST_P(StructTest, DoublePack) {
 TYPED_TEST_P(StructTest, DoubleUnpack) {
   using Type = typename TypeParam::Type;
   using StructType = wpi::Struct<Type>;
-  uint8_t buffer[StructType::kSize];
-  std::memset(buffer, 0, StructType::kSize);
+  uint8_t buffer[StructType::GetSize()];
+  std::memset(buffer, 0, StructType::GetSize());
   wpi::PackStruct(buffer, TypeParam::kTestData);
 
   {

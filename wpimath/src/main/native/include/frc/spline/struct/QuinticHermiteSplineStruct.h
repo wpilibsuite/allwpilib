@@ -11,12 +11,16 @@
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Struct<frc::QuinticHermiteSpline> {
-  static constexpr std::string_view kTypeString = "struct:QuinticHermiteSpline";
-  static constexpr size_t kSize = 4 * 3 * 8;
-  static constexpr std::string_view kSchema =
-      "double xInitial[3];double xFinal[3];double yInitial[3];double yFinal[3]";
+  static constexpr std::string_view GetTypeString() {
+    return "struct:QuinticHermiteSpline";
+  }
+  static constexpr size_t GetSize() { return 4 * 3 * 8; }
+  static constexpr std::string_view GetSchema() {
+    return "double xInitial[3];double xFinal[3];double yInitial[3];double "
+           "yFinal[3]";
+  }
 
-  static frc::QuinticHermiteSpline Unpack(std::span<const uint8_t, kSize> data);
-  static void Pack(std::span<uint8_t, kSize> data,
+  static frc::QuinticHermiteSpline Unpack(std::span<const uint8_t> data);
+  static void Pack(std::span<uint8_t> data,
                    const frc::QuinticHermiteSpline& value);
 };

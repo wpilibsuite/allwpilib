@@ -32,6 +32,13 @@ class StructTopic;
 template <wpi::StructSerializable T>
 class StructSubscriber : public Subscriber {
   using S = wpi::Struct<T>;
+  static constexpr size_t kBufSize = []() -> size_t {
+    if constexpr (wpi::is_constexpr([] { S::GetSize(); })) {
+      return S::GetSize();
+    } else {
+      return 128;
+    }
+  }();
 
  public:
   using TopicType = StructTopic<T>;
@@ -81,12 +88,12 @@ class StructSubscriber : public Subscriber {
    * @return true if successful
    */
   bool GetInto(T* out) {
-    wpi::SmallVector<uint8_t, S::kSize> buf;
+    wpi::SmallVector<uint8_t, kBufSize> buf;
     TimestampedRawView view = ::nt::GetAtomicRaw(m_subHandle, buf, {});
-    if (view.value.size() < S::kSize) {
+    if (view.value.size() < S::GetSize()) {
       return false;
     } else {
-      wpi::UnpackStructInto(out, view.value.subspan<0, S::kSize>());
+      wpi::UnpackStructInto(out, view.value);
       return true;
     }
   }
@@ -109,13 +116,12 @@ class StructSubscriber : public Subscriber {
    * @return timestamped value
    */
   TimestampedValueType GetAtomic(const T& defaultValue) const {
-    wpi::SmallVector<uint8_t, S::kSize> buf;
+    wpi::SmallVector<uint8_t, kBufSize> buf;
     TimestampedRawView view = ::nt::GetAtomicRaw(m_subHandle, buf, {});
-    if (view.value.size() < S::kSize) {
+    if (view.value.size() < S::GetSize()) {
       return {0, 0, defaultValue};
     } else {
-      return {view.time, view.serverTime,
-              S::Unpack(view.value.subspan<0, S::kSize>())};
+      return {view.time, view.serverTime, S::Unpack(view.value)};
     }
   }
 
@@ -135,13 +141,11 @@ class StructSubscriber : public Subscriber {
     std::vector<TimestampedValueType> rv;
     rv.reserve(raw.size());
     for (auto&& r : raw) {
-      if (r.value.size() < S::kSize) {
+      if (r.value.size() < S::GetSize()) {
         continue;
       } else {
-        rv.emplace_back(
-            r.time, r.serverTime,
-            S::Unpack(
-                std::span<const uint8_t>(r.value).subspan<0, S::kSize>()));
+        rv.emplace_back(r.time, r.serverTime,
+                        S::Unpack(std::span<const uint8_t>(r.value)));
       }
     }
     return rv;
@@ -208,9 +212,16 @@ class StructPublisher : public Publisher {
     if (!m_schemaPublished.exchange(true, std::memory_order_relaxed)) {
       GetTopic().GetInstance().template AddStructSchema<T>();
     }
-    uint8_t buf[S::kSize];
-    S::Pack(buf, value);
-    ::nt::SetRaw(m_pubHandle, buf, time);
+    if constexpr (wpi::is_constexpr([] { S::GetSize(); })) {
+      uint8_t buf[S::GetSize()];
+      S::Pack(buf, value);
+      ::nt::SetRaw(m_pubHandle, buf, time);
+    } else {
+      wpi::SmallVector<uint8_t, 128> buf;
+      buf.resize_for_overwrite(S::GetSize());
+      S::Pack(buf, value);
+      ::nt::SetRaw(m_pubHandle, buf, time);
+    }
   }
 
   /**
@@ -224,9 +235,16 @@ class StructPublisher : public Publisher {
     if (!m_schemaPublished.exchange(true, std::memory_order_relaxed)) {
       GetTopic().GetInstance().template AddStructSchema<T>();
     }
-    uint8_t buf[S::kSize];
-    S::Pack(buf, value);
-    ::nt::SetDefaultRaw(m_pubHandle, buf);
+    if constexpr (wpi::is_constexpr([] { S::GetSize(); })) {
+      uint8_t buf[S::GetSize()];
+      S::Pack(buf, value);
+      ::nt::SetDefaultRaw(m_pubHandle, buf);
+    } else {
+      wpi::SmallVector<uint8_t, 128> buf;
+      buf.resize_for_overwrite(S::GetSize());
+      S::Pack(buf, value);
+      ::nt::SetDefaultRaw(m_pubHandle, buf);
+    }
   }
 
   /**

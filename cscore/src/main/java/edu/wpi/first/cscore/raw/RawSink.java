@@ -6,6 +6,7 @@ package edu.wpi.first.cscore.raw;
 
 import edu.wpi.first.cscore.CameraServerJNI;
 import edu.wpi.first.cscore.ImageSink;
+import edu.wpi.first.util.RawFrame;
 
 /**
  * A sink for user code to accept video frames as raw bytes.

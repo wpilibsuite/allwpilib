@@ -15,8 +15,8 @@ const Quaternion kExpectedData{Quaternion{1.1, 0.191, 35.04, 19.1}};
 }  // namespace
 
 TEST(QuaternionStructTest, Roundtrip) {
-  uint8_t buffer[StructType::kSize];
-  std::memset(buffer, 0, StructType::kSize);
+  uint8_t buffer[StructType::GetSize()];
+  std::memset(buffer, 0, StructType::GetSize());
   StructType::Pack(buffer, kExpectedData);
 
   Quaternion unpacked_data = StructType::Unpack(buffer);

@@ -9,7 +9,7 @@
 template <class Distance>
 frc::SimpleMotorFeedforward<Distance>
 wpi::Struct<frc::SimpleMotorFeedforward<Distance>>::Unpack(
-    std::span<const uint8_t, kSize> data) {
+    std::span<const uint8_t> data) {
   return {units::volt_t{wpi::UnpackStruct<double, 0>(data)},
           units::unit_t<frc::SimpleMotorFeedforward<units::meters>::kv_unit>{
               wpi::UnpackStruct<double, 8>(data)},
@@ -19,7 +19,7 @@ wpi::Struct<frc::SimpleMotorFeedforward<Distance>>::Unpack(
 
 template <class Distance>
 void wpi::Struct<frc::SimpleMotorFeedforward<Distance>>::Pack(
-    std::span<uint8_t, kSize> data,
+    std::span<uint8_t> data,
     const frc::SimpleMotorFeedforward<Distance>& value) {
   wpi::PackStruct<0>(data, value.kS.value());
   wpi::PackStruct<8>(

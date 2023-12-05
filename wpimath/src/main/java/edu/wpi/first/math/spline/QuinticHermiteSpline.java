@@ -16,6 +16,9 @@ public class QuinticHermiteSpline extends Spline {
   public final double[] xFinalControlVector;
   public final double[] yFinalControlVector;
 
+  private final ControlVector m_initialControlVector;
+  private final ControlVector m_finalControlVector;
+
   /**
    * Constructs a quintic hermite spline with the specified control vectors. Each control vector
    * contains into about the location of the point, its first derivative, and its second derivative.
@@ -71,6 +74,10 @@ public class QuinticHermiteSpline extends Spline {
       m_coefficients.set(4, i, m_coefficients.get(2, i) * (4 - i));
       m_coefficients.set(5, i, m_coefficients.get(3, i) * (4 - i));
     }
+
+    // Assign member variables.
+    m_initialControlVector = new ControlVector(xInitialControlVector, yInitialControlVector);
+    m_finalControlVector = new ControlVector(xFinalControlVector, yFinalControlVector);
   }
 
   /**
@@ -79,8 +86,28 @@ public class QuinticHermiteSpline extends Spline {
    * @return The coefficients matrix.
    */
   @Override
-  protected SimpleMatrix getCoefficients() {
+  public SimpleMatrix getCoefficients() {
     return m_coefficients;
+  }
+
+  /**
+   * Returns the initial control vector that created this spline.
+   *
+   * @return The initial control vector that created this spline.
+   */
+  @Override
+  public ControlVector getInitialControlVector() {
+    return m_initialControlVector;
+  }
+
+  /**
+   * Returns the final control vector that created this spline.
+   *
+   * @return The final control vector that created this spline.
+   */
+  @Override
+  public ControlVector getFinalControlVector() {
+    return m_finalControlVector;
   }
 
   /**

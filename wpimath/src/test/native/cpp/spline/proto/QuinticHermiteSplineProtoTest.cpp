@@ -18,10 +18,14 @@ struct QuinticHermiteSplineProtoTestData {
                                      wpi::array<double, 3>{{0.10, 0.11, 0.11}}};
 
   static void CheckEq(const Type& testData, const Type& data) {
-    EXPECT_EQ(testData.xInitialControlVector, data.xInitialControlVector);
-    EXPECT_EQ(testData.xFinalControlVector, data.xFinalControlVector);
-    EXPECT_EQ(testData.yInitialControlVector, data.yInitialControlVector);
-    EXPECT_EQ(testData.yFinalControlVector, data.yFinalControlVector);
+    EXPECT_EQ(testData.GetInitialControlVector().x,
+              data.GetInitialControlVector().x);
+    EXPECT_EQ(testData.GetFinalControlVector().x,
+              data.GetFinalControlVector().x);
+    EXPECT_EQ(testData.GetInitialControlVector().y,
+              data.GetInitialControlVector().y);
+    EXPECT_EQ(testData.GetFinalControlVector().y,
+              data.GetFinalControlVector().y);
   }
 };
 
