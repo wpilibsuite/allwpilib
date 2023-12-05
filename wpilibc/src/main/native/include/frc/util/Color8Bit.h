@@ -11,6 +11,7 @@
 
 #include <fmt/core.h>
 #include <wpi/StringExtras.h>
+#include <wpi/ct_string.h>
 
 #include "Color.h"
 
@@ -107,7 +108,12 @@ class Color8Bit {
    *
    * @return a string of the format <tt>\#RRGGBB</tt>
    */
-  std::string HexString() const;
+  constexpr auto HexString() const {
+    return wpi::ct_string<char, std::char_traits<char>, 7>{
+        {'#', wpi::hexdigit(red / 16), wpi::hexdigit(red % 16),
+         wpi::hexdigit(green / 16), wpi::hexdigit(green % 16),
+         wpi::hexdigit(blue / 16), wpi::hexdigit(blue % 16)}};
+  }
 
   int red = 0;
   int green = 0;
