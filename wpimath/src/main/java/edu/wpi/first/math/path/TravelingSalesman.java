@@ -80,14 +80,6 @@ public class TravelingSalesman {
     }
 
     // Rotate solution list until solution[0] = poses[0]
-    int index = 0;
-    for (int i = 0; i < poses.length; i++) {
-      if (solution[i].equals(poses[0])) {
-        index = i;
-        break;
-      }
-    }
-
     Collections.rotate(Arrays.asList(solution), -Arrays.asList(solution).indexOf(poses[0]));
 
     return solution;
