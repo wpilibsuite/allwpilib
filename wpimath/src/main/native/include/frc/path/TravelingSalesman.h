@@ -44,7 +44,8 @@ class TravelingSalesman {
       : m_cost{std::move(cost)} {}
 
   /**
-   * Finds the path through every pose that minimizes the cost.
+   * Finds the path through every pose that minimizes the cost. The first pose
+   * in the returned array is the first pose that was passed in.
    *
    * This overload supports a statically-sized list of poses.
    *
@@ -90,7 +91,8 @@ class TravelingSalesman {
   }
 
   /**
-   * Finds the path through every pose that minimizes the cost.
+   * Finds the path through every pose that minimizes the cost. The first pose
+   * in the returned array is the first pose that was passed in.
    *
    * This overload supports a dynamically-sized list of poses for Python to use.
    *

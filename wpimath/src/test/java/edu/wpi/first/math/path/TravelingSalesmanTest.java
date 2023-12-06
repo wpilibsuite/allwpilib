@@ -22,16 +22,10 @@ class TravelingSalesmanTest {
   private boolean isMatchingCycle(Pose2d[] expected, Pose2d[] actual) {
     assertEquals(expected.length, actual.length);
 
-    // Find first element in actual that matches expected
-    int actualStart = 0;
-    while (!actual[actualStart].equals(expected[0])) {
-      ++actualStart;
-    }
-
     // Check actual has expected cycle (forward)
     var actualBufferForward = new CircularBuffer<Pose2d>(actual.length);
     for (int i = 0; i < actual.length; ++i) {
-      actualBufferForward.addLast(actual[(actualStart + i) % actual.length]);
+      actualBufferForward.addLast(actual[i % actual.length]);
     }
     boolean matchesExpectedForward = true;
     for (int i = 0; i < expected.length; ++i) {
@@ -41,7 +35,7 @@ class TravelingSalesmanTest {
     // Check actual has expected cycle (reverse)
     var actualBufferReverse = new CircularBuffer<Pose2d>(actual.length);
     for (int i = 0; i < actual.length; ++i) {
-      actualBufferReverse.addFirst(actual[(actualStart + 1 + i) % actual.length]);
+      actualBufferReverse.addFirst(actual[(1 + i) % actual.length]);
     }
 
     boolean matchesExpectedReverse = true;
@@ -76,7 +70,6 @@ class TravelingSalesmanTest {
     assertEquals(5, solution.length);
     var expected = new Pose2d[] {poses[0], poses[2], poses[4], poses[1], poses[3]};
     assertTrue(isMatchingCycle(expected, solution));
-    assertEquals(expected[0], solution[0]);
   }
 
   @Test
@@ -111,6 +104,5 @@ class TravelingSalesmanTest {
           poses[7]
         };
     assertTrue(isMatchingCycle(expected, solution));
-    assertEquals(expected[0], solution[0]);
   }
 }
