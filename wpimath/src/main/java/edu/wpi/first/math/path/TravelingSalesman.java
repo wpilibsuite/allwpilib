@@ -8,6 +8,8 @@ import edu.wpi.first.math.Num;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.optimization.SimulatedAnnealing;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.function.ToDoubleBiFunction;
 
 /**
@@ -85,19 +87,10 @@ public class TravelingSalesman {
         break;
       }
     }
-    reverseSection(solution, 0, index - 1);
-    reverseSection(solution, index, solution.length - 1);
-    reverseSection(solution, 0, solution.length - 1);
+
+    Collections.rotate(Arrays.asList(solution), -index);
 
     return solution;
-  }
-
-  private <E> void reverseSection(E[] arr, int startIndex, int endIndex) {
-    for (int i = startIndex; i <= (endIndex + startIndex) / 2; i++) {
-      E temp = arr[i];
-      arr[i] = arr[endIndex - (i - startIndex)];
-      arr[endIndex - (i - startIndex)] = temp;
-    }
   }
 
   /**
