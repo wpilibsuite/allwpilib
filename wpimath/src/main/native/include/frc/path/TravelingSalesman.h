@@ -81,6 +81,11 @@ class TravelingSalesman {
       solution[i] = poses[static_cast<int>(indices[i])];
     }
 
+    // Rotate solution list until solution[0] = poses[0]
+    std::rotate(solution.begin(),
+                std::find(solution.begin(), solution.end(), poses[0]),
+                solution.end());
+
     return solution;
   }
 
@@ -118,6 +123,11 @@ class TravelingSalesman {
     for (size_t i = 0; i < poses.size(); ++i) {
       solution.emplace_back(poses[static_cast<int>(indices[i])]);
     }
+
+    // Rotate solution list until solution[0] = poses[0]
+    std::rotate(solution.begin(),
+                std::find(solution.begin(), solution.end(), poses[0]),
+                solution.end());
 
     return solution;
   }

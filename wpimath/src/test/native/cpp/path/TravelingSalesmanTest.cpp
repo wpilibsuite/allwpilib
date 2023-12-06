@@ -75,6 +75,7 @@ TEST(TravelingSalesmanTest, FiveLengthStaticPathWithDistanceCost) {
                                       poses[3]};
 
   EXPECT_TRUE(IsMatchingCycle(expected, solution));
+  EXPECT_EQ(poses[0], solution[0]);
 }
 
 TEST(TravelingSalesmanTest, FiveLengthDynamicPathWithDistanceCost) {
@@ -98,6 +99,7 @@ TEST(TravelingSalesmanTest, FiveLengthDynamicPathWithDistanceCost) {
                                       poses[3]};
 
   EXPECT_TRUE(IsMatchingCycle(expected, solution));
+  EXPECT_EQ(poses[0], solution[0]);
 }
 
 TEST(TravelingSalesmanTest, TenLengthStaticPathWithDistanceCost) {
@@ -122,6 +124,7 @@ TEST(TravelingSalesmanTest, TenLengthStaticPathWithDistanceCost) {
                                        poses[5], poses[7]};
 
   EXPECT_TRUE(IsMatchingCycle(expected, solution));
+  EXPECT_EQ(poses[0], solution[0]);
 }
 
 TEST(TravelingSalesmanTest, TenLengthDynamicPathWithDistanceCost) {
@@ -148,4 +151,5 @@ TEST(TravelingSalesmanTest, TenLengthDynamicPathWithDistanceCost) {
                                        poses[5], poses[7]};
 
   EXPECT_TRUE(IsMatchingCycle(expected, solution));
+  EXPECT_EQ(poses[0], solution[0]);
 }

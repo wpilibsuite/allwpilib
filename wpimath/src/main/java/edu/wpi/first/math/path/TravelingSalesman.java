@@ -88,7 +88,7 @@ public class TravelingSalesman {
       }
     }
 
-    Collections.rotate(Arrays.asList(solution), -index);
+    Collections.rotate(Arrays.asList(solution), -Arrays.asList(solution).indexOf(poses[0]));
 
     return solution;
   }
