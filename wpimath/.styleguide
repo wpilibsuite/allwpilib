@@ -21,6 +21,7 @@ generatedFileExclude {
   src/test/native/cpp/UnitsTest\.cpp$
   src/test/native/cpp/drake/
   src/test/native/include/drake/
+  src/generated/main/java/edu/wpi/first/math/proto
 }
 
 repoRootNameOverride {
