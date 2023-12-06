@@ -25,16 +25,10 @@ bool IsMatchingCycle(std::span<const frc::Pose2d> expected,
                      std::span<const frc::Pose2d> actual) {
   assert(expected.size() == actual.size());
 
-  // Find first element in actual that matches expected
-  size_t actualStart = 0;
-  while (actual[actualStart] != expected[0]) {
-    ++actualStart;
-  }
-
   // Check actual has expected cycle (forward)
   wpi::circular_buffer<frc::Pose2d> actualBufferForward{expected.size()};
   for (size_t i = 0; i < actual.size(); ++i) {
-    actualBufferForward.push_back(actual[(actualStart + i) % actual.size()]);
+    actualBufferForward.push_back(actual[i % actual.size()]);
   }
   bool matchesExpectedForward = true;
   for (size_t i = 0; i < expected.size(); ++i) {
@@ -44,8 +38,7 @@ bool IsMatchingCycle(std::span<const frc::Pose2d> expected,
   // Check actual has expected cycle (reverse)
   wpi::circular_buffer<frc::Pose2d> actualBufferReverse{expected.size()};
   for (size_t i = 0; i < actual.size(); ++i) {
-    actualBufferReverse.push_front(
-        actual[(actualStart + 1 + i) % actual.size()]);
+    actualBufferReverse.push_front(actual[(1 + i) % actual.size()]);
   }
   bool matchesExpectedReverse = true;
   for (size_t i = 0; i < expected.size(); ++i) {

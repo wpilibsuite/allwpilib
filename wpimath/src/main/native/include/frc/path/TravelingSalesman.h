@@ -44,7 +44,8 @@ class TravelingSalesman {
       : m_cost{std::move(cost)} {}
 
   /**
-   * Finds the path through every pose that minimizes the cost.
+   * Finds the path through every pose that minimizes the cost. The first pose
+   * in the returned array is the first pose that was passed in.
    *
    * This overload supports a statically-sized list of poses.
    *
@@ -81,11 +82,17 @@ class TravelingSalesman {
       solution[i] = poses[static_cast<int>(indices[i])];
     }
 
+    // Rotate solution list until solution[0] = poses[0]
+    std::rotate(solution.begin(),
+                std::find(solution.begin(), solution.end(), poses[0]),
+                solution.end());
+
     return solution;
   }
 
   /**
-   * Finds the path through every pose that minimizes the cost.
+   * Finds the path through every pose that minimizes the cost. The first pose
+   * in the returned array is the first pose that was passed in.
    *
    * This overload supports a dynamically-sized list of poses for Python to use.
    *
@@ -118,6 +125,11 @@ class TravelingSalesman {
     for (size_t i = 0; i < poses.size(); ++i) {
       solution.emplace_back(poses[static_cast<int>(indices[i])]);
     }
+
+    // Rotate solution list until solution[0] = poses[0]
+    std::rotate(solution.begin(),
+                std::find(solution.begin(), solution.end(), poses[0]),
+                solution.end());
 
     return solution;
   }
