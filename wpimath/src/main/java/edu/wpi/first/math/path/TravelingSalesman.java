@@ -40,7 +40,8 @@ public class TravelingSalesman {
   }
 
   /**
-   * Finds the path through every pose that minimizes the cost.
+   * Finds the path through every pose that minimizes the cost. The first pose in the returned array
+   * is the first pose that was passed in.
    *
    * @param <Poses> A Num defining the length of the path and the number of poses.
    * @param poses An array of Pose2ds the path must pass through.
@@ -76,7 +77,27 @@ public class TravelingSalesman {
       solution[i] = poses[(int) indices.get(i, 0)];
     }
 
+    // Rotate solution list until solution[0] = poses[0]
+    int index = 0;
+    for (int i = 0; i < poses.length; i++) {
+      if (solution[i].equals(poses[0])) {
+        index = i;
+        break;
+      }
+    }
+    reverseSection(solution, 0, index - 1);
+    reverseSection(solution, index, solution.length - 1);
+    reverseSection(solution, 0, solution.length - 1);
+
     return solution;
+  }
+
+  private <E> void reverseSection(E[] arr, int startIndex, int endIndex) {
+    for (int i = startIndex; i <= (endIndex + startIndex) / 2; i++) {
+      E temp = arr[i];
+      arr[i] = arr[endIndex - (i - startIndex)];
+      arr[endIndex - (i - startIndex)] = temp;
+    }
   }
 
   /**

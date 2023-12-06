@@ -76,6 +76,7 @@ class TravelingSalesmanTest {
     assertEquals(5, solution.length);
     var expected = new Pose2d[] {poses[0], poses[2], poses[4], poses[1], poses[3]};
     assertTrue(isMatchingCycle(expected, solution));
+    assertEquals(expected[0], solution[0]);
   }
 
   @Test
@@ -110,5 +111,6 @@ class TravelingSalesmanTest {
           poses[7]
         };
     assertTrue(isMatchingCycle(expected, solution));
+    assertEquals(expected[0], solution[0]);
   }
 }
