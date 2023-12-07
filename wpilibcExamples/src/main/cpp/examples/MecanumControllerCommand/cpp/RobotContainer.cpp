@@ -66,10 +66,7 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
       // Pass the config
       config);
 
-  // Reset odometry to the starting pose of the trajectory.
-  m_drive.ResetOdometry(exampleTrajectory.InitialPose());
-
-  frc2::CommandPtr mecanumDriveCommand =
+  frc2::CommandPtr mecanumControllerCommand =
       frc2::MecanumControllerCommand(
           exampleTrajectory, [this]() { return m_drive.GetPose(); },
 
@@ -110,8 +107,16 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
           {&m_drive})
           .ToPtr();
 
+  // Reset odometry to the initial pose of the trajectory, run path following
+  // command, then stop at the end.
   return frc2::cmd::Sequence(
-      std::move(mecanumDriveCommand),
-      frc2::InstantCommand([this] { m_drive.Drive(0, 0, 0, false); }, {})
+      frc2::InstantCommand(
+          [this, &exampleTrajectory]() {
+            m_drive.ResetOdometry(exampleTrajectory.InitialPose());
+          },
+          {})
+          .ToPtr(),
+      std::move(mecanumControllerCommand),
+      frc2::InstantCommand([this]() { m_drive.Drive(0, 0, 0, false); }, {})
           .ToPtr());
 }
