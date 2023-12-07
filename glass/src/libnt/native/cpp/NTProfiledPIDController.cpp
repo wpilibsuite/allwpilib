@@ -24,10 +24,12 @@ NTProfiledPIDControllerModel::NTProfiledPIDControllerModel(
       m_i{inst.GetDoubleTopic(fmt::format("{}/i", path)).GetEntry(0)},
       m_d{inst.GetDoubleTopic(fmt::format("{}/d", path)).GetEntry(0)},
       m_goal{inst.GetDoubleTopic(fmt::format("{}/goal", path)).GetEntry(0)},
+      m_iZone{inst.GetDoubleTopic(fmt::format("{}/izone", path)).GetEntry(0)},
       m_pData{fmt::format("NTPIDCtrlP:{}", path)},
       m_iData{fmt::format("NTPIDCtrlI:{}", path)},
       m_dData{fmt::format("NTPIDCtrlD:{}", path)},
       m_goalData{fmt::format("NTPIDCtrlGoal:{}", path)},
+      m_iZoneData{fmt::format("NTPIDCtrlIZone:{}", path)},
       m_nameValue{wpi::rsplit(path, '/').second} {}
 
 void NTProfiledPIDControllerModel::SetP(double value) {
@@ -45,6 +47,9 @@ void NTProfiledPIDControllerModel::SetD(double value) {
 void NTProfiledPIDControllerModel::SetGoal(double value) {
   m_goal.Set(value);
 }
+void NTProfiledPIDControllerModel::SetIZone(double value) {
+  m_iZone.Set(value);
+}
 
 void NTProfiledPIDControllerModel::Update() {
   for (auto&& v : m_name.ReadQueue()) {
@@ -61,6 +66,9 @@ void NTProfiledPIDControllerModel::Update() {
   }
   for (auto&& v : m_goal.ReadQueue()) {
     m_goalData.SetValue(v.value, v.time);
+  }
+  for (auto&& v : m_iZone.ReadQueue()) {
+    m_iZoneData.SetValue(v.value, v.time);
   }
   for (auto&& v : m_controllable.ReadQueue()) {
     m_controllableValue = v.value;
