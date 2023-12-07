@@ -49,8 +49,7 @@ void glass::DisplayPIDController(PIDControllerModel* m) {
     }
     if (auto s = m->GetIZoneData()) {
       double value = s->GetValue();
-      createTuningParameter("IZone", &value,
-                            [=](auto v) { m->SetIZone(v); });
+      createTuningParameter("IZone", &value, [=](auto v) { m->SetIZone(v); });
     }
   } else {
     ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(96, 96, 96, 255));
