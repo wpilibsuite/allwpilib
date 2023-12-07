@@ -113,7 +113,7 @@ public class RobotContainer {
             m_robotDrive::setModuleStates,
             m_robotDrive);
 
-    // // Reset odometry to the initial pose of the trajectory, run path following
+    // Reset odometry to the initial pose of the trajectory, run path following
     // command, then stop at the end.
     return Commands.sequence(
         new InstantCommand(() -> m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose())),
