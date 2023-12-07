@@ -16,8 +16,8 @@ const MecanumDriveWheelSpeeds kExpectedData{
 }  // namespace
 
 TEST(MecanumDriveWheelSpeedsStructTest, Roundtrip) {
-  uint8_t buffer[StructType::kSize];
-  std::memset(buffer, 0, StructType::kSize);
+  uint8_t buffer[StructType::GetSize()];
+  std::memset(buffer, 0, StructType::GetSize());
   StructType::Pack(buffer, kExpectedData);
 
   MecanumDriveWheelSpeeds unpacked_data = StructType::Unpack(buffer);

@@ -58,7 +58,7 @@ class RelaySimTest {
 
     try (CallbackStore fwdCb = sim.registerInitializedForwardCallback(forwardCallback, false);
         CallbackStore revCb = sim.registerInitializedReverseCallback(reverseCallback, false);
-        Relay relay = new Relay(0, Relay.Direction.kForward); ) {
+        Relay relay = new Relay(0, Relay.Direction.kForward)) {
       assertTrue(sim.getInitializedForward());
       assertFalse(sim.getInitializedReverse());
 
@@ -84,7 +84,7 @@ class RelaySimTest {
 
     try (CallbackStore fwdCb = sim.registerInitializedForwardCallback(forwardCallback, false);
         CallbackStore revCb = sim.registerInitializedReverseCallback(reverseCallback, false);
-        Relay relay = new Relay(0, Relay.Direction.kReverse); ) {
+        Relay relay = new Relay(0, Relay.Direction.kReverse)) {
       assertFalse(sim.getInitializedForward());
       assertTrue(sim.getInitializedReverse());
 

@@ -4,6 +4,8 @@
 
 #include "frc2/command/Subsystem.h"
 
+#include <wpi/Demangle.h>
+
 #include "frc2/command/CommandPtr.h"
 #include "frc2/command/Commands.h"
 
@@ -15,6 +17,10 @@ Subsystem::~Subsystem() {
 void Subsystem::Periodic() {}
 
 void Subsystem::SimulationPeriodic() {}
+
+std::string Subsystem::GetName() const {
+  return wpi::GetTypeName(*this);
+}
 
 void Subsystem::SetDefaultCommand(CommandPtr&& defaultCommand) {
   CommandScheduler::GetInstance().SetDefaultCommand(this,

@@ -11,11 +11,14 @@
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Struct<frc::Rotation2d> {
-  static constexpr std::string_view kTypeString = "struct:Rotation2d";
-  static constexpr size_t kSize = 8;
-  static constexpr std::string_view kSchema = "double value";
+  static constexpr std::string_view GetTypeString() {
+    return "struct:Rotation2d";
+  }
+  static constexpr size_t GetSize() { return 8; }
+  static constexpr std::string_view GetSchema() { return "double value"; }
 
-  static frc::Rotation2d Unpack(std::span<const uint8_t, kSize> data);
-  static void Pack(std::span<uint8_t, kSize> data,
-                   const frc::Rotation2d& value);
+  static frc::Rotation2d Unpack(std::span<const uint8_t> data);
+  static void Pack(std::span<uint8_t> data, const frc::Rotation2d& value);
 };
+
+static_assert(wpi::StructSerializable<frc::Rotation2d>);

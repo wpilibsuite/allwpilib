@@ -176,6 +176,7 @@ class MeasureTest {
   }
 
   @Test
+  @SuppressWarnings("SelfComparison")
   void testCompare() {
     var unit = new ExampleUnit(7);
     var base = unit.of(1);

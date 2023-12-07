@@ -33,7 +33,7 @@ public class StructDescriptorDatabase {
     }
 
     // turn parsed schema into descriptors
-    StructDescriptor theStruct = m_structs.computeIfAbsent(name, k -> new StructDescriptor(k));
+    StructDescriptor theStruct = m_structs.computeIfAbsent(name, StructDescriptor::new);
     theStruct.m_schema = schema;
     theStruct.m_fields.clear();
     boolean isValid = true;
@@ -76,7 +76,7 @@ public class StructDescriptorDatabase {
 
         // cross-reference struct, creating a placeholder if necessary
         StructDescriptor aStruct =
-            m_structs.computeIfAbsent(decl.typeString, k -> new StructDescriptor(k));
+            m_structs.computeIfAbsent(decl.typeString, StructDescriptor::new);
 
         // if the struct isn't valid, we can't be valid either
         if (aStruct.isValid()) {

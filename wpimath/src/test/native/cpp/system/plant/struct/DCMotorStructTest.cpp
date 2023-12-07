@@ -20,8 +20,8 @@ const DCMotor kExpectedData = DCMotor{units::volt_t{1.91},
 }  // namespace
 
 TEST(DCMotorStructTest, Roundtrip) {
-  uint8_t buffer[StructType::kSize];
-  std::memset(buffer, 0, StructType::kSize);
+  uint8_t buffer[StructType::GetSize()];
+  std::memset(buffer, 0, StructType::GetSize());
   StructType::Pack(buffer, kExpectedData);
 
   DCMotor unpacked_data = StructType::Unpack(buffer);

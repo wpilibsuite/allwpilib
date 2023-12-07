@@ -12,7 +12,7 @@ constexpr size_t kOmegaOff = kVyOff + 8;
 
 using StructType = wpi::Struct<frc::ChassisSpeeds>;
 
-frc::ChassisSpeeds StructType::Unpack(std::span<const uint8_t, kSize> data) {
+frc::ChassisSpeeds StructType::Unpack(std::span<const uint8_t> data) {
   return frc::ChassisSpeeds{
       units::meters_per_second_t{wpi::UnpackStruct<double, kVxOff>(data)},
       units::meters_per_second_t{wpi::UnpackStruct<double, kVyOff>(data)},
@@ -20,7 +20,7 @@ frc::ChassisSpeeds StructType::Unpack(std::span<const uint8_t, kSize> data) {
   };
 }
 
-void StructType::Pack(std::span<uint8_t, kSize> data,
+void StructType::Pack(std::span<uint8_t> data,
                       const frc::ChassisSpeeds& value) {
   wpi::PackStruct<kVxOff>(data, value.vx.value());
   wpi::PackStruct<kVyOff>(data, value.vy.value());

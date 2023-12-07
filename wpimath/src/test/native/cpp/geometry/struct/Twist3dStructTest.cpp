@@ -16,8 +16,8 @@ const Twist3d kExpectedData{
 }  // namespace
 
 TEST(Twist3dStructTest, Roundtrip) {
-  uint8_t buffer[StructType::kSize];
-  std::memset(buffer, 0, StructType::kSize);
+  uint8_t buffer[StructType::GetSize()];
+  std::memset(buffer, 0, StructType::GetSize());
   StructType::Pack(buffer, kExpectedData);
 
   Twist3d unpacked_data = StructType::Unpack(buffer);

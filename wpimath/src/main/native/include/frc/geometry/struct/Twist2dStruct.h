@@ -11,11 +11,14 @@
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Struct<frc::Twist2d> {
-  static constexpr std::string_view kTypeString = "struct:Twist2d";
-  static constexpr size_t kSize = 24;
-  static constexpr std::string_view kSchema =
-      "double dx;double dy;double dtheta";
+  static constexpr std::string_view GetTypeString() { return "struct:Twist2d"; }
+  static constexpr size_t GetSize() { return 24; }
+  static constexpr std::string_view GetSchema() {
+    return "double dx;double dy;double dtheta";
+  }
 
-  static frc::Twist2d Unpack(std::span<const uint8_t, kSize> data);
-  static void Pack(std::span<uint8_t, kSize> data, const frc::Twist2d& value);
+  static frc::Twist2d Unpack(std::span<const uint8_t> data);
+  static void Pack(std::span<uint8_t> data, const frc::Twist2d& value);
 };
+
+static_assert(wpi::StructSerializable<frc::Twist2d>);

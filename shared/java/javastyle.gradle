@@ -23,7 +23,7 @@ if (!project.hasProperty('skipJavaFormat')) {
         java {
             target fileTree('.') {
                 include '**/*.java'
-                exclude '**/build/**', '**/build-*/**', '**/bin/**'
+                exclude '**/build/**', '**/build-*/**', '**/bin/**', "src/generated/**"
             }
             toggleOffOn()
             googleJavaFormat()

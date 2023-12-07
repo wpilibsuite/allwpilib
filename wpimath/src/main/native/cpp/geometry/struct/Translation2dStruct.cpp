@@ -11,14 +11,14 @@ constexpr size_t kYOff = kXOff + 8;
 
 using StructType = wpi::Struct<frc::Translation2d>;
 
-frc::Translation2d StructType::Unpack(std::span<const uint8_t, kSize> data) {
+frc::Translation2d StructType::Unpack(std::span<const uint8_t> data) {
   return frc::Translation2d{
       units::meter_t{wpi::UnpackStruct<double, kXOff>(data)},
       units::meter_t{wpi::UnpackStruct<double, kYOff>(data)},
   };
 }
 
-void StructType::Pack(std::span<uint8_t, kSize> data,
+void StructType::Pack(std::span<uint8_t> data,
                       const frc::Translation2d& value) {
   wpi::PackStruct<kXOff>(data, value.X().value());
   wpi::PackStruct<kYOff>(data, value.Y().value());

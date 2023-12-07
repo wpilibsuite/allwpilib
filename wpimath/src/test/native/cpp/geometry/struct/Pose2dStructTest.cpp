@@ -16,8 +16,8 @@ const Pose2d kExpectedData{
 }  // namespace
 
 TEST(Pose2dStructTest, Roundtrip) {
-  uint8_t buffer[StructType::kSize];
-  std::memset(buffer, 0, StructType::kSize);
+  uint8_t buffer[StructType::GetSize()];
+  std::memset(buffer, 0, StructType::GetSize());
   StructType::Pack(buffer, kExpectedData);
 
   Pose2d unpacked_data = StructType::Unpack(buffer);

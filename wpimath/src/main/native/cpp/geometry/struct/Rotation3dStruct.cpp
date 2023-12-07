@@ -10,18 +10,12 @@ constexpr size_t kQOff = 0;
 
 using StructType = wpi::Struct<frc::Rotation3d>;
 
-frc::Rotation3d StructType::Unpack(std::span<const uint8_t, kSize> data) {
+frc::Rotation3d StructType::Unpack(std::span<const uint8_t> data) {
   return frc::Rotation3d{
       wpi::UnpackStruct<frc::Quaternion, kQOff>(data),
   };
 }
 
-void StructType::Pack(std::span<uint8_t, kSize> data,
-                      const frc::Rotation3d& value) {
+void StructType::Pack(std::span<uint8_t> data, const frc::Rotation3d& value) {
   wpi::PackStruct<kQOff>(data, value.GetQuaternion());
-}
-
-void StructType::ForEachNested(
-    std::invocable<std::string_view, std::string_view> auto fn) {
-  wpi::ForEachStructSchema<frc::Quaternion>(fn);
 }
