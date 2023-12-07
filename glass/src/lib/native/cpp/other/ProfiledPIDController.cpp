@@ -29,6 +29,16 @@ void glass::DisplayProfiledPIDController(ProfiledPIDControllerModel* m) {
         callback(*v);
       }
     };
+    // Workaround to allow for the input of inf, -inf, and nan
+    auto createTuningParameterNoFilter =
+        [flag](const char* name, double* v,
+               std::function<void(double)> callback) {
+          ImGui::SetNextItemWidth(ImGui::GetFontSize() * 4);
+          if (ImGui::InputScalar(name, ImGuiDataType_Double, v, NULL, NULL,
+                                 "%.3f", flag)) {
+            callback(*v);
+          }
+        };
 
     if (auto p = m->GetPData()) {
       double value = p->GetValue();
@@ -48,7 +58,8 @@ void glass::DisplayProfiledPIDController(ProfiledPIDControllerModel* m) {
     }
     if (auto s = m->GetIZoneData()) {
       double value = s->GetValue();
-      createTuningParameter("IZone", &value, [=](auto v) { m->SetIZone(v); });
+      createTuningParameterNoFilter("IZone", &value,
+                                    [=](auto v) { m->SetIZone(v); });
     }
   } else {
     ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(96, 96, 96, 255));
