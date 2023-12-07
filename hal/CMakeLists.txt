@@ -74,10 +74,8 @@ if(WITH_JAVA)
         GENERATE_NATIVE_HEADERS hal_jni_headers
     )
 
-    get_property(HAL_JAR_FILE TARGET hal_jar PROPERTY JAR_FILE)
-    install(FILES ${HAL_JAR_FILE} DESTINATION "${java_lib_dest}")
-
-    set_property(TARGET hal_jar PROPERTY FOLDER "java")
+    install_jar(hal_jar DESTINATION ${java_lib_dest})
+    install_jar_exports(TARGETS hal_jar FILE hal_jar.cmake DESTINATION share/hal)
 
     add_library(haljni ${hal_shared_jni_src})
 

@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <string>
+
 #include <gtest/gtest.h>
 
 #include "frc/util/Color8Bit.h"
@@ -56,7 +58,12 @@ TEST(Color8BitTest, ImplicitConversionToColor) {
 }
 
 TEST(Color8BitTest, ToHexString) {
-  constexpr frc::Color8Bit color{255, 128, 64};
+  constexpr frc::Color8Bit color1{255, 128, 64};
+  EXPECT_EQ("#FF8040", color1.HexString());
 
-  EXPECT_EQ("#FF8040", color.HexString());
+  // Ensure conversion to std::string works
+  [[maybe_unused]] std::string str = color1.HexString();
+
+  frc::Color8Bit color2{255, 128, 64};
+  EXPECT_EQ("#FF8040", color2.HexString());
 }

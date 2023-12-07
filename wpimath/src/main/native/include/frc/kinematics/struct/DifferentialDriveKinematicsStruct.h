@@ -21,3 +21,5 @@ struct WPILIB_DLLEXPORT wpi::Struct<frc::DifferentialDriveKinematics> {
   static void Pack(std::span<uint8_t> data,
                    const frc::DifferentialDriveKinematics& value);
 };
+
+static_assert(wpi::StructSerializable<frc::DifferentialDriveKinematics>);

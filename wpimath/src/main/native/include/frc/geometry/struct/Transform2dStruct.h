@@ -31,4 +31,5 @@ struct WPILIB_DLLEXPORT wpi::Struct<frc::Transform2d> {
   }
 };
 
+static_assert(wpi::StructSerializable<frc::Transform2d>);
 static_assert(wpi::HasNestedStruct<frc::Transform2d>);

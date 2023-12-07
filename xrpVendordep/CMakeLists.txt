@@ -25,10 +25,12 @@ if(WITH_JAVA)
         OUTPUT_NAME xrpVendordep
     )
 
-    get_property(xrpVendordep_JAR_FILE TARGET xrpVendordep_jar PROPERTY JAR_FILE)
-    install(FILES ${xrpVendordep_JAR_FILE} DESTINATION "${java_lib_dest}")
-
-    set_property(TARGET xrpVendordep_jar PROPERTY FOLDER "java")
+    install_jar(xrpVendordep_jar DESTINATION ${java_lib_dest})
+    install_jar_exports(
+        TARGETS xrpVendordep_jar
+        FILE xrpVendordep_jar.cmake
+        DESTINATION share/xrpVendordep
+    )
 endif()
 
 if(WITH_JAVA_SOURCE)

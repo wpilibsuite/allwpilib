@@ -8,6 +8,8 @@ import edu.wpi.first.math.Num;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.optimization.SimulatedAnnealing;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.function.ToDoubleBiFunction;
 
 /**
@@ -40,7 +42,8 @@ public class TravelingSalesman {
   }
 
   /**
-   * Finds the path through every pose that minimizes the cost.
+   * Finds the path through every pose that minimizes the cost. The first pose in the returned array
+   * is the first pose that was passed in.
    *
    * @param <Poses> A Num defining the length of the path and the number of poses.
    * @param poses An array of Pose2ds the path must pass through.
@@ -75,6 +78,9 @@ public class TravelingSalesman {
     for (int i = 0; i < poses.length; ++i) {
       solution[i] = poses[(int) indices.get(i, 0)];
     }
+
+    // Rotate solution list until solution[0] = poses[0]
+    Collections.rotate(Arrays.asList(solution), -Arrays.asList(solution).indexOf(poses[0]));
 
     return solution;
   }

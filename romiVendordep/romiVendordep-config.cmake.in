@@ -9,3 +9,6 @@ include(CMakeFindDependencyMacro)
 
  @FILENAME_DEP_REPLACE@
  include(${SELF_DIR}/romiVendordep.cmake)
+ if(@WITH_JAVA@)
+     include(${SELF_DIR}/romiVendordep_jar.cmake)
+ endif()
