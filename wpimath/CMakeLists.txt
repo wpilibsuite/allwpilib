@@ -83,10 +83,8 @@ if(WITH_JAVA)
         GENERATE_NATIVE_HEADERS wpimath_jni_headers
     )
 
-    get_property(WPIMATH_JAR_FILE TARGET wpimath_jar PROPERTY JAR_FILE)
-    install(FILES ${WPIMATH_JAR_FILE} DESTINATION "${java_lib_dest}")
-
-    set_property(TARGET wpimath_jar PROPERTY FOLDER "java")
+    install_jar(wpimath_jar DESTINATION ${java_lib_dest})
+    install_jar_exports(TARGETS wpimath_jar FILE wpimath_jar.cmake DESTINATION share/wpimath)
 
     add_library(wpimathjni ${wpimath_jni_src})
     wpilib_target_warnings(wpimathjni)
