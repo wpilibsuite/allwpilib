@@ -64,8 +64,14 @@ namespace impl {
  * No effect on non-Rio platforms. This is called by HAL_Initialize() and
  * thus should generally not be called by user code.
  */
+#ifndef __FRC_ROBORIO__
 template<typename T>
 void SetupNowRio(void* chipObjectLibrary, std::unique_ptr<T> hmbObject);
+#else
+template<typename T>
+void SetupNowRio(void* chipObjectLibrary, std::unique_ptr<T> hmbObject) {}
+#endif
+
 
 /**
  * Initialize the on-Rio Now() implementation to use the FPGA timestamp.

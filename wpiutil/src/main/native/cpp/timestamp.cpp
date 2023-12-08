@@ -234,15 +234,15 @@ uint64_t wpi::NowDefault() {
 
 static std::atomic<uint64_t (*)()> now_impl{wpi::NowDefault};
 
+#ifdef __FRC_ROBORIO__
 template <>
 void wpi::impl::SetupNowRio(void* chipObjectLibrary,
                             std::unique_ptr<fpga::tHMB> hmbObject) {
-#ifdef __FRC_ROBORIO__
   if (!hmbInitialized.test()) {
     hmb.Configure(chipObjectLibrary, std::move(hmbObject));
   }
-#endif
 }
+#endif
 
 void wpi::impl::SetupNowRio(uint32_t session) {
 #ifdef __FRC_ROBORIO__
