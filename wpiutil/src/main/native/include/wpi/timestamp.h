@@ -8,11 +8,11 @@
 #include <stdint.h>
 
 #ifdef __cplusplus
-extern "C" {
+#include <memory> // NOLINT
 #endif
 
 #ifdef __cplusplus
-#include <memory>
+extern "C" {
 #endif
 
 /**
