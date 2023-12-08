@@ -63,7 +63,6 @@ using NiFpga_ReadU32Func = NiFpga_Status (*)(NiFpga_Session session,
 using NiFpga_WriteU32Func = NiFpga_Status (*)(NiFpga_Session session,
                                               uint32_t control, uint32_t value);
 static std::atomic_flag hmbInitialized = ATOMIC_FLAG_INIT;
-
 struct HMBLowLevel {
   ~HMBLowLevel() {
     hmbInitialized.clear();
@@ -72,7 +71,6 @@ struct HMBLowLevel {
       dlclose(niFpga);
     }
   }
-
   bool Configure(const NiFpga_Session session) {
     int32_t status = 0;
     niFpga = dlopen("libNiFpga.so", RTLD_LAZY);
@@ -87,19 +85,17 @@ struct HMBLowLevel {
     NiFpga_FindRegisterFunc findRegister =
         reinterpret_cast<NiFpga_FindRegisterFunc>(
             dlsym(niFpga, "NiFpgaDll_FindRegister"));
-        NiFpga_ReadU32Func readU32 =
-        reinterpret_cast<NiFpga_ReadU32Func>(
-            dlsym(niFpga, "NiFpgaDll_ReadU32"));
-        NiFpga_WriteU32Func writeU32 =
-        reinterpret_cast<NiFpga_WriteU32Func>(
-            dlsym(niFpga, "NiFpgaDll_WriteU32"));
-    if (openHmb == nullptr || closeHmb == nullptr || findRegister == nullptr || writeU32 == nullptr || readU32 == nullptr) {
+    NiFpga_ReadU32Func readU32 = reinterpret_cast<NiFpga_ReadU32Func>(
+        dlsym(niFpga, "NiFpgaDll_ReadU32"));
+    NiFpga_WriteU32Func writeU32 = reinterpret_cast<NiFpga_WriteU32Func>(
+        dlsym(niFpga, "NiFpgaDll_WriteU32"));
+    if (openHmb == nullptr || closeHmb == nullptr || findRegister == nullptr ||
+        writeU32 == nullptr || readU32 == nullptr) {
       fmt::print(stderr, "Could not find HMB symbols in libNiFpga.so\n");
       closeHmb = nullptr;
       dlclose(niFpga);
       return false;
     }
-
     uint32_t hmbConfigRegister = 0;
     status = findRegister(session, "HMB.Config", &hmbConfigRegister);
     if (status != 0) {
@@ -109,7 +105,6 @@ struct HMBLowLevel {
       dlclose(niFpga);
       return false;
     }
-
     size_t hmbBufferSize = 0;
     status =
         openHmb(session, hmbName, &hmbBufferSize,
@@ -130,15 +125,12 @@ struct HMBLowLevel {
     hmbInitialized.test_and_set();
     return true;
   }
-
   void Reset() {}
-
   std::optional<NiFpga_Session> hmbSession;
   void* niFpga = nullptr;
   NiFpga_CloseHmbFunc closeHmb = nullptr;
   volatile uint32_t* hmbBuffer = nullptr;
 };
-
 struct HMBHolder {
   void Configure() {
     nFPGA::nRoboRIO_FPGANamespace::g_currentTargetClass =
@@ -160,7 +152,6 @@ struct HMBHolder {
   HMBLowLevel lowLevel;
   std::unique_ptr<fpga::tHMB> hmb;
 };
-
 static HMBHolder hmb;
 }  // namespace
 #endif
