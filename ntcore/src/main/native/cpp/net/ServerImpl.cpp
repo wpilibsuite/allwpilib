@@ -1663,8 +1663,12 @@ ServerImpl::TopicData* ServerImpl::CreateTopic(ClientData* client,
       }
 
       auto& tcd = topic->clients[aClient.get()];
+      bool added = false;
       for (auto subscriber : subscribers) {
-        tcd.AddSubscriber(subscriber);
+        added = added || tcd.AddSubscriber(subscriber);
+      }
+      if (added) {
+        aClient->UpdatePeriod(tcd, topic);
       }
 
       if (aClient.get() == client) {
@@ -1707,6 +1711,7 @@ void ServerImpl::DeleteTopic(TopicData* topic) {
   // unannounce to all subscribers
   for (auto&& tcd : topic->clients) {
     if (!tcd.second.subscribers.empty()) {
+      tcd.first->UpdatePeriod(tcd.second, topic);
       tcd.first->SendUnannounce(topic);
     }
   }

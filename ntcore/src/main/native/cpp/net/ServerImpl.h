@@ -148,10 +148,12 @@ class ServerImpl final {
 
       bool AddSubscriber(SubscriberData* sub) {
         bool added = subscribers.insert(sub).second;
-        if (!sub->options.topicsOnly && sendMode == ValueSendMode::kDisabled) {
-          sendMode = ValueSendMode::kNormal;
-        } else if (sub->options.sendAll) {
-          sendMode = ValueSendMode::kAll;
+        if (!sub->options.topicsOnly) {
+          if (sub->options.sendAll) {
+            sendMode = ValueSendMode::kAll;
+          } else if (sendMode == ValueSendMode::kDisabled) {
+            sendMode = ValueSendMode::kNormal;
+          }
         }
         return added;
       }
@@ -200,9 +202,10 @@ class ServerImpl final {
     std::string_view GetName() const { return m_name; }
     int GetId() const { return m_id; }
 
-   protected:
-    virtual void UpdatePeriodic(TopicData* topic) {}
+    virtual void UpdatePeriod(TopicData::TopicClientData& tcd,
+                              TopicData* topic) {}
 
+   protected:
     std::string m_name;
     std::string m_connInfo;
     bool m_local;  // local to machine
@@ -244,9 +247,6 @@ class ServerImpl final {
     void ClientUnsubscribe(int64_t subuid) final;
 
     void ClientSetValue(int64_t pubuid, const Value& value);
-
-    virtual void UpdatePeriod(TopicData::TopicClientData& tcd,
-                              TopicData* topic) {}
 
     wpi::DenseMap<TopicData*, bool> m_announceSent;
   };
