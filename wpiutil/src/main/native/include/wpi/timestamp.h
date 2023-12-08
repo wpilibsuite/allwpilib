@@ -60,6 +60,13 @@ namespace wpi {
 
 namespace impl {
 /**
+ * Initialize the on-Rio Now() implementation to use the desktop timestamp.
+ * No effect on non-Rio platforms. This should only be used for testing
+ * purposes if the HAL is not available.
+ */
+void SetupNowDefaultOnRio();
+
+/**
  * Initialize the on-Rio Now() implementation to use the FPGA timestamp.
  * No effect on non-Rio platforms. This is called by HAL_Initialize() and
  * thus should generally not be called by user code.

@@ -61,6 +61,7 @@ static void dlcloseWrapper(void* handle) {
   dlclose(handle);
 }
 static std::atomic_flag hmbInitialized = ATOMIC_FLAG_INIT;
+static std::atomic_flag nowUseDefaultOnFailure = ATOMIC_FLAG_INIT;
 struct HMBLowLevel {
   ~HMBLowLevel() { Reset(); }
   bool Configure(const NiFpga_Session session) {
@@ -227,6 +228,12 @@ uint64_t wpi::NowDefault() {
 
 static std::atomic<uint64_t (*)()> now_impl{wpi::NowDefault};
 
+void wpi::impl::SetupNowDefaultOnRio() {
+#ifdef __FRC_ROBORIO__
+  nowUseDefaultOnFailure.test_and_set();
+#endif
+}
+
 #ifdef __FRC_ROBORIO__
 template <>
 void wpi::impl::SetupNowRio(void* chipObjectLibrary,
@@ -259,11 +266,15 @@ uint64_t wpi::Now() {
 #ifdef __FRC_ROBORIO__
   // Same code as HAL_GetFPGATime()
   if (!hmbInitialized.test()) {
-    fmt::print(
-        stderr,
-        "FPGA not yet configured in wpi::Now(). Time will not be correct.\n");
-    std::fflush(stderr);
-    return 1;
+    if (nowUseDefaultOnFailure.test()) {
+      return (now_impl.load())();
+    } else {
+      fmt::print(
+          stderr,
+          "FPGA not yet configured in wpi::Now(). Time will not be correct.\n");
+      std::fflush(stderr);
+      return 1;
+    }
   }
 
   asm("dmb");
@@ -294,6 +305,10 @@ uint64_t wpi::GetSystemTime() {
 }
 
 extern "C" {
+
+void WPI_Impl_SetupNowUseDefaultOnRio(void) {
+  return wpi::impl::SetupNowDefaultOnRio();
+}
 
 void WPI_Impl_SetupNowRioWithSession(uint32_t session) {
   return wpi::impl::SetupNowRio(session);
