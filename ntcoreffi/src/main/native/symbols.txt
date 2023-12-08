@@ -251,7 +251,6 @@ WPI_DestroyEvent
 WPI_DestroySemaphore
 WPI_DestroySignalObject
 WPI_GetSystemTime
-WPI_Impl_SetupNowRio
 WPI_Impl_SetupNowRioWithSession
 WPI_Impl_ShutdownNowRio
 WPI_Now

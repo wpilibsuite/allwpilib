@@ -8,15 +8,12 @@
 #include <stdint.h>
 
 #ifdef __cplusplus
-extern "C" {
+#include <memory>
 #endif
 
-/**
- * Initialize the on-Rio Now() implementation to use the FPGA timestamp.
- * No effect on non-Rio platforms. This is called by HAL_Initialize() and
- * thus should generally not be called by user code.
- */
-void WPI_Impl_SetupNowRio(void);
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * De-initialize the on-Rio Now() implementation. No effect on non-Rio
@@ -67,7 +64,8 @@ namespace impl {
  * No effect on non-Rio platforms. This is called by HAL_Initialize() and
  * thus should generally not be called by user code.
  */
-void SetupNowRio();
+template<typename T>
+void SetupNowRio(void* chipObjectLibrary, std::unique_ptr<T> hmbObject);
 
 /**
  * Initialize the on-Rio Now() implementation to use the FPGA timestamp.
