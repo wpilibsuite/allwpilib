@@ -570,6 +570,7 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
 
   HAL_InitializeHMB(&status);
   if (status != 0) {
+    fmt::print(stderr, "Failed to open HAL HMB, status code {}\n", status);
     return false;
   }
   hmbBuffer = HAL_GetHMBBuffer();

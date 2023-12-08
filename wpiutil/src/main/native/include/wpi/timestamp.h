@@ -70,6 +70,13 @@ namespace impl {
 void SetupNowRio();
 
 /**
+ * Initialize the on-Rio Now() implementation to use the FPGA timestamp.
+ * No effect on non-Rio platforms. This take an FPGA session that has
+ * already been initialized, and is used from LabVIEW.
+ */
+void SetupNowRio(uint32_t session);
+
+/**
  * De-initialize the on-Rio Now() implementation. No effect on non-Rio
  * platforms.
  */
