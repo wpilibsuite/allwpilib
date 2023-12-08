@@ -43,7 +43,6 @@ static constexpr const char hmbName[] = "HMB_0_RAM";
 static constexpr int timestampLowerOffset = 0xF0;
 static constexpr int timestampUpperOffset = 0xF1;
 static constexpr int hmbTimestampOffset = 5;  // 5 us offset
-
 using NiFpga_CloseHmbFunc = NiFpga_Status (*)(const NiFpga_Session session,
                                               const char* memoryName);
 using NiFpga_OpenHmbFunc = NiFpga_Status (*)(const NiFpga_Session session,
@@ -58,11 +57,9 @@ using NiFpga_ReadU32Func = NiFpga_Status (*)(NiFpga_Session session,
                                              uint32_t* value);
 using NiFpga_WriteU32Func = NiFpga_Status (*)(NiFpga_Session session,
                                               uint32_t control, uint32_t value);
-
 static void dlcloseWrapper(void* handle) {
   dlclose(handle);
 }
-
 static std::atomic_flag hmbInitialized = ATOMIC_FLAG_INIT;
 struct HMBLowLevel {
   ~HMBLowLevel() { Reset(); }
@@ -73,7 +70,6 @@ struct HMBLowLevel {
       fmt::print(stderr, "Could not open libNiFpga.so\n");
       return false;
     }
-
     NiFpga_OpenHmbFunc openHmb = reinterpret_cast<NiFpga_OpenHmbFunc>(
         dlsym(niFpga.get(), "NiFpgaDll_OpenHmb"));
     closeHmb = reinterpret_cast<NiFpga_CloseHmbFunc>(
@@ -120,7 +116,6 @@ struct HMBLowLevel {
     hmbInitialized.test_and_set();
     return true;
   }
-
   void Reset() {
     hmbInitialized.clear();
     std::optional<NiFpga_Session> oldSesh;
@@ -130,13 +125,12 @@ struct HMBLowLevel {
       niFpga = nullptr;
     }
   }
-
   std::optional<NiFpga_Session> hmbSession;
   NiFpga_CloseHmbFunc closeHmb = nullptr;
   volatile uint32_t* hmbBuffer = nullptr;
-  std::unique_ptr<void, decltype(&dlcloseWrapper)> niFpga{nullptr, dlcloseWrapper};
+  std::unique_ptr<void, decltype(&dlcloseWrapper)> niFpga{nullptr,
+                                                          dlcloseWrapper};
 };
-
 struct HMBHolder {
   void Configure(void* col, std::unique_ptr<fpga::tHMB> hmbObject) {
     hmb = std::move(hmbObject);
@@ -146,16 +140,15 @@ struct HMBHolder {
       chipObjectLibrary = nullptr;
     }
   }
-
   void Reset() {
     lowLevel.Reset();
     hmb = nullptr;
     chipObjectLibrary = nullptr;
   }
-
   HMBLowLevel lowLevel;
   std::unique_ptr<fpga::tHMB> hmb;
-  std::unique_ptr<void, decltype(&dlcloseWrapper)> chipObjectLibrary{nullptr, dlcloseWrapper};
+  std::unique_ptr<void, decltype(&dlcloseWrapper)> chipObjectLibrary{
+      nullptr, dlcloseWrapper};
 };
 static HMBHolder hmb;
 }  // namespace

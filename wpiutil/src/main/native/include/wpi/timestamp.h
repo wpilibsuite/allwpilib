@@ -8,11 +8,11 @@
 #include <stdint.h>
 
 #ifdef __cplusplus
-#include <memory>
+extern "C" {
 #endif
 
 #ifdef __cplusplus
-extern "C" {
+#include <memory>
 #endif
 
 /**
@@ -65,13 +65,12 @@ namespace impl {
  * thus should generally not be called by user code.
  */
 #ifdef __FRC_ROBORIO__
-template<typename T>
+template <typename T>
 void SetupNowRio(void* chipObjectLibrary, std::unique_ptr<T> hmbObject);
 #else
-template<typename T>
+template <typename T>
 void SetupNowRio(void* chipObjectLibrary, std::unique_ptr<T> hmbObject) {}
 #endif
-
 
 /**
  * Initialize the on-Rio Now() implementation to use the FPGA timestamp.

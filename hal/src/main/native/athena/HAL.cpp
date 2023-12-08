@@ -4,10 +4,10 @@
 
 #include "hal/HAL.h"
 
+#include <dlfcn.h>
 #include <signal.h>  // linux for kill
 #include <sys/prctl.h>
 #include <unistd.h>
-#include <dlfcn.h>
 
 #include <atomic>
 #include <cstdio>
@@ -523,9 +523,9 @@ static bool killExistingProgram(int timeout, int mode) {
   return true;
 }
 
-static void SetupNowRio() {
+static void SetupNowRio(void) {
   nFPGA::nRoboRIO_FPGANamespace::g_currentTargetClass =
-        nLoadOut::getTargetClass();
+      nLoadOut::getTargetClass();
 
   int32_t status = 0;
 
