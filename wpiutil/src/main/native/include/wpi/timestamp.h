@@ -8,7 +8,8 @@
 #include <stdint.h>
 
 #ifdef __cplusplus
-#include <memory> // NOLINT
+#include <memory>  // NOLINT
+
 #endif
 
 #ifdef __cplusplus
