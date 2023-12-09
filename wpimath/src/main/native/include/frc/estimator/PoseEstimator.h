@@ -4,14 +4,16 @@
 
 #pragma once
 
+#include <optional>
+
 #include <Eigen/Core>
 #include <wpi/SymbolExports.h>
 #include <wpi/array.h>
 
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
+#include "frc/geometry/Twist2d.h"
 #include "frc/interpolation/TimeInterpolatableBuffer.h"
-#include "frc/kinematics/Kinematics.h"
 #include "frc/kinematics/Odometry.h"
 #include "frc/kinematics/WheelPositions.h"
 #include "units/time.h"
@@ -37,8 +39,6 @@ class WPILIB_DLLEXPORT PoseEstimator {
   /**
    * Constructs a PoseEstimator.
    *
-   * @param kinematics A correctly-configured kinematics object for your
-   *     drivetrain.
    * @param odometry A correctly-configured odometry object for your drivetrain.
    * @param stateStdDevs Standard deviations of the pose estimate (x position in
    *     meters, y position in meters, and heading in radians). Increase these
@@ -48,8 +48,7 @@ class WPILIB_DLLEXPORT PoseEstimator {
    *     radians). Increase these numbers to trust the vision pose measurement
    *     less.
    */
-  PoseEstimator(Kinematics<WheelSpeeds, WheelPositions>& kinematics,
-                Odometry<WheelSpeeds, WheelPositions>& odometry,
+  PoseEstimator(Odometry<WheelSpeeds, WheelPositions>& odometry,
                 const wpi::array<double, 3>& stateStdDevs,
                 const wpi::array<double, 3>& visionMeasurementStdDevs);
 
@@ -85,6 +84,14 @@ class WPILIB_DLLEXPORT PoseEstimator {
    * @return The estimated robot pose in meters.
    */
   Pose2d GetEstimatedPosition() const;
+
+  /**
+   * Return the pose at a given timestamp, if one exists.
+   *
+   * @param timestamp The pose's timestamp.
+   * @return The pose at a given timestamp, if one exists.
+   */
+  std::optional<Pose2d> SampleAt(units::second_t timestamp) const;
 
   /**
    * Adds a vision measurement to the Kalman Filter. This will correct
@@ -171,57 +178,25 @@ class WPILIB_DLLEXPORT PoseEstimator {
                         const WheelPositions& wheelPositions);
 
  private:
-  struct InterpolationRecord {
-    // The pose observed given the current sensor inputs and the previous pose.
-    Pose2d pose;
-
-    // The current gyroscope angle.
-    Rotation2d gyroAngle;
-
-    // The distances traveled by the wheels.
-    WheelPositions wheelPositions;
-
-    /**
-     * Checks equality between this InterpolationRecord and another object.
-     *
-     * @param other The other object.
-     * @return Whether the two objects are equal.
-     */
-    bool operator==(const InterpolationRecord& other) const = default;
-
-    /**
-     * Checks inequality between this InterpolationRecord and another object.
-     *
-     * @param other The other object.
-     * @return Whether the two objects are not equal.
-     */
-    bool operator!=(const InterpolationRecord& other) const = default;
-
-    /**
-     * Interpolates between two InterpolationRecords.
-     *
-     * @param endValue The end value for the interpolation.
-     * @param i The interpolant (fraction).
-     *
-     * @return The interpolated state.
-     */
-    InterpolationRecord Interpolate(
-        Kinematics<WheelSpeeds, WheelPositions>& kinematics,
-        InterpolationRecord endValue, double i) const;
-  };
-
   static constexpr units::second_t kBufferDuration = 1.5_s;
 
-  Kinematics<WheelSpeeds, WheelPositions>& m_kinematics;
   Odometry<WheelSpeeds, WheelPositions>& m_odometry;
   wpi::array<double, 3> m_q{wpi::empty_array};
   Eigen::Matrix3d m_visionK = Eigen::Matrix3d::Zero();
 
-  TimeInterpolatableBuffer<InterpolationRecord> m_poseBuffer{
-      kBufferDuration, [this](const InterpolationRecord& start,
-                              const InterpolationRecord& end, double t) {
-        return start.Interpolate(this->m_kinematics, end, t);
+  TimeInterpolatableBuffer<Pose2d> m_poseBuffer{
+      kBufferDuration, [](const Pose2d& start, const Pose2d& end, double t) {
+        if (t <= 0) {
+          return start;
+        } else if (t >= 1) {
+          return end;
+        } else {
+          auto twist = start.Log(end);
+          Twist2d scaledTwist{twist.dx * t, twist.dy * t, twist.dtheta * t};
+          return start.Exp(scaledTwist);
+        }
       }};
+  Pose2d m_poseEstimate;
 };
 }  // namespace frc
 
