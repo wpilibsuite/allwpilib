@@ -180,10 +180,12 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_getAllCurrents
   (JNIEnv* env, jclass, jint handle, jdoubleArray jarr)
 {
   int32_t status = 0;
-  int32_t size = HAL_GetPowerDistributionNumChannels(handle, &status);  //status won't change here
-  std::vector<double> storage(size,0);
+  // status won't change here
+  int32_t size = HAL_GetPowerDistributionNumChannels(handle, &status);
+  std::vector<double> storage(size, 0);
 
-  HAL_GetPowerDistributionAllChannelCurrents(handle, storage.data(), size, &status);
+  HAL_GetPowerDistributionAllChannelCurrents(handle, storage.data(), size,
+                                             &status);
   if (!CheckStatus(env, status, false)) {
     return;
   }

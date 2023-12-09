@@ -97,9 +97,10 @@ double PowerDistribution::GetCurrent(int channel) const {
 std::vector<double> PowerDistribution::GetAllCurrents() const {
   int32_t status = 0;
   int32_t size = this->GetNumChannels();
-  std::vector<double> currents(size,0);
+  std::vector<double> currents(size, 0);
 
-  HAL_GetPowerDistributionAllChannelCurrents(m_handle, currents.data(), size, &status);
+  HAL_GetPowerDistributionAllChannelCurrents(m_handle, currents.data(), size,
+                                             &status);
   FRC_ReportError(status, "Module {}", m_module);
   return currents;
 }

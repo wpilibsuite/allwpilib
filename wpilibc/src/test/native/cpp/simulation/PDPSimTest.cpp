@@ -85,16 +85,16 @@ TEST(PowerDistributionSimTest, GetAllCurrents) {
   PowerDistribution pdp{2, frc::PowerDistribution::ModuleType::kRev};
   PowerDistributionSim sim(pdp);
 
-  //setup
+  // setup
   for (int channel = 0; channel < pdp.GetNumChannels(); ++channel) {
     const double kTestCurrent = 24 - channel;
     sim.SetCurrent(channel, kTestCurrent);
   }
-  
-  //run it
+
+  // run it
   std::vector<double> currents = pdp.GetAllCurrents();
-  
-  //verify
+
+  // verify
   for (int channel = 0; channel < pdp.GetNumChannels(); ++channel) {
     const double kTestCurrent = 24 - channel;
     EXPECT_EQ(kTestCurrent, currents[channel]);
