@@ -49,5 +49,6 @@ TEST_F(StorageTest, IdleCommand) {
 
   EXPECT_NEAR(0.0, sim.GetMotor(), 1e-6);
   auto idleCommand = storage.GetCurrentCommand();
-  EXPECT_STREQ(std::string{"Idle"}, idleCommand->GetName());
+  auto expectedName = std::string{"Idle"};
+  EXPECT_STREQ(expectedName.c_str(), idleCommand->GetName());
 }
