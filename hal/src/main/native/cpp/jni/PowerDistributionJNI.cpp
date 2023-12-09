@@ -180,17 +180,16 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_getAllCurrents
   (JNIEnv* env, jclass, jint handle, jdoubleArray jarr)
 {
   int32_t status = 0;
-  // status won't change here
-  int32_t size = HAL_GetPowerDistributionNumChannels(handle, &status);
-  std::vector<double> storage(size, 0);
+  wpi::SmallVector<double, 24> storage;
+  storage.resize_for_overwrite(24);
 
-  HAL_GetPowerDistributionAllChannelCurrents(handle, storage.data(), size,
+  HAL_GetPowerDistributionAllChannelCurrents(handle, storage.data(), 24,
                                              &status);
   if (!CheckStatus(env, status, false)) {
     return;
   }
 
-  env->SetDoubleArrayRegion(jarr, 0, size, storage.data());
+  env->SetDoubleArrayRegion(jarr, 0, 24, storage.data());
 }
 
 /*

@@ -96,8 +96,8 @@ double PowerDistribution::GetCurrent(int channel) const {
 
 std::vector<double> PowerDistribution::GetAllCurrents() const {
   int32_t status = 0;
-  int32_t size = this->GetNumChannels();
-  std::vector<double> currents(size, 0);
+  int32_t size = GetNumChannels();
+  std::vector<double> currents(size);
 
   HAL_GetPowerDistributionAllChannelCurrents(m_handle, currents.data(), size,
                                              &status);
@@ -206,7 +206,7 @@ PowerDistribution::StickyFaults PowerDistribution::GetStickyFaults() const {
 
 void PowerDistribution::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("PowerDistribution");
-  int numChannels = this->GetNumChannels();
+  int numChannels = GetNumChannels();
   // Use manual reads to avoid printing errors
   for (int i = 0; i < numChannels; ++i) {
     builder.AddDoubleProperty(
