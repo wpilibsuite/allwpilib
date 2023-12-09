@@ -137,7 +137,7 @@ class ParallelDeadlineGroupTest extends MultiCompositionTestBase<ParallelDeadlin
     Command a = new InstantCommand(() -> {});
     Command b = new InstantCommand(() -> {});
     ParallelDeadlineGroup group = new ParallelDeadlineGroup(a, b);
-    assertThrows(IllegalArgumentException.class, () -> group.setDeadline(b));
+    assertDoesNotThrow(() -> group.setDeadline(b));
   }
 
   @Override

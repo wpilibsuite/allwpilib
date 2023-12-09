@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj2.command;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,6 +21,8 @@ import java.util.Map;
 public class ParallelCommandGroup extends Command {
   // maps commands in this composition to whether they are still running
   private final Map<Command, Boolean> m_commands = new HashMap<>();
+  // a thin read-only view of m_commands for public API usage
+  private final Map<Command, Boolean> m_readonlyCommands = Collections.unmodifiableMap(m_commands);
   private boolean m_runWhenDisabled = true;
   private InterruptionBehavior m_interruptBehavior = InterruptionBehavior.kCancelIncoming;
 
@@ -32,6 +35,17 @@ public class ParallelCommandGroup extends Command {
    */
   public ParallelCommandGroup(Command... commands) {
     addCommands(commands);
+  }
+
+  /**
+   * Creates a new ParallelCommandGroup. The given commands will be executed simultaneously. The
+   * command composition will finish when the last command finishes. If the composition is
+   * interrupted, only the commands that are still running will be interrupted.
+   *
+   * @param commands the commands to include in this composition.
+   */
+  public ParallelCommandGroup(Collection<Command> commands) {
+    this(commands.toArray(Command[]::new));
   }
 
   /**
@@ -85,17 +99,15 @@ public class ParallelCommandGroup extends Command {
 
   @Override
   public final void end(boolean interrupted) {
-    if (interrupted) {
-      for (Map.Entry<Command, Boolean> commandRunning : m_commands.entrySet()) {
-        if (commandRunning.getValue()) {
-          commandRunning.getKey().end(true);
-        }
+    for (Map.Entry<Command, Boolean> commandRunning : m_commands.entrySet()) {
+      if (commandRunning.getValue()) {
+        commandRunning.getKey().end(true);
       }
     }
   }
 
   @Override
-  public final boolean isFinished() {
+  public boolean isFinished() {
     return !m_commands.containsValue(true);
   }
 
@@ -107,5 +119,19 @@ public class ParallelCommandGroup extends Command {
   @Override
   public InterruptionBehavior getInterruptionBehavior() {
     return m_interruptBehavior;
+  }
+
+  /**
+   * Gets the statuses of all the commands composed within this group. Commands are mapped to a
+   * boolean true/false value denoting if it's currently running (true) or has completed naturally
+   * (false). A composed command that was ended due to the parallel group ending will have a status
+   * of {@code true}.
+   *
+   * <p>This is intended to be used by subclasses to customize the {@link #isFinished()} behavior.
+   *
+   * @return the statuses of the composed commands
+   */
+  protected final Map<Command, Boolean> getCommandStatuses() {
+    return m_readonlyCommands;
   }
 }
