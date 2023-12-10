@@ -85,6 +85,93 @@ class SendableChooserTest {
     }
   }
 
+
+  @ValueSource(ints = {0, 1, 2, 3})
+  @ParameterizedTest
+  void testRemoveSelectedOption(int toSelect) {
+    try (var chooser = new SendableChooser<Integer>();
+    
+        var publisher =
+            m_inst
+                .getStringTopic("/SmartDashboard/returnsSelectedChooser" + toSelect + "/selected")
+                .publish()) {
+      for (int i = 1; i <= 3; i++) {
+        chooser.addOption(String.valueOf(i), i);
+      }
+      chooser.setDefaultOption(String.valueOf(0), 0);
+
+      SmartDashboard.putData("returnsSelectedChooser" + toSelect, chooser);
+      SmartDashboard.updateValues();
+      publisher.set(String.valueOf(toSelect));
+      SmartDashboard.updateValues();
+
+      chooser.removeOption(chooser.getSelected().toString());
+
+      if(toSelect != 0){
+        assertEquals(0, chooser.getSelected());
+      }else{
+        assertNull(chooser.getSelected());
+      }
+    }
+  }
+
+  @ValueSource(ints = {0, 1, 2, 3})
+  @ParameterizedTest
+  void testRemoveAllOptions(int toSelect) {
+    try (var chooser = new SendableChooser<Integer>();
+    
+        var publisher =
+            m_inst
+                .getStringTopic("/SmartDashboard/returnsSelectedChooser" + toSelect + "/selected")
+                .publish()) {
+      for (int i = 1; i <= 3; i++) {
+        chooser.addOption(String.valueOf(i), i);
+      }
+      chooser.setDefaultOption(String.valueOf(0), 0);
+
+      SmartDashboard.putData("returnsSelectedChooser" + toSelect, chooser);
+      SmartDashboard.updateValues();
+      publisher.set(String.valueOf(toSelect));
+      SmartDashboard.updateValues();
+
+      chooser.removeAllOptions();
+      assertNull(chooser.getSelected());
+    }
+  }
+
+
+  @Test 
+  void testRemoveSelectedOption(){
+    try (var chooser = new SendableChooser<Integer>()){
+
+      chooser.setDefaultOption("default", 5);
+      for (int i = 1; i <= 3; i++) {
+        chooser.addOption(String.valueOf(i), i);
+      }
+
+      chooser.removeOption(chooser.getSelected().toString());
+
+      assertEquals(chooser.getSelected(), 5);
+    }
+  }
+
+  @Test 
+  void testRemoveAllOptions(){
+    try (var chooser = new SendableChooser<Integer>()){
+
+      chooser.setDefaultOption("default", 5);
+      for (int i = 1; i <= 3; i++) {
+        chooser.addOption(String.valueOf(i), i);
+      }
+
+      chooser.removeAllOptions();
+
+      assertEquals(chooser.getSelected(), 5);
+    }
+  }
+
+
+
   @AfterEach
   void tearDown() {
     m_inst.close();

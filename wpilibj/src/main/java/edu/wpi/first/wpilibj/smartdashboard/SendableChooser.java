@@ -81,6 +81,9 @@ public class SendableChooser<V> implements Sendable, AutoCloseable {
    * @param name the name of the option
    */
   public void removeOption(String name) {
+    if(name == m_defaultChoice){
+      m_defaultChoice = "";
+    }
     m_map.remove(name);
   }
 
@@ -89,6 +92,7 @@ public class SendableChooser<V> implements Sendable, AutoCloseable {
    * disappear.
    */
   public void removeAllOptions() {
+    m_defaultChoice = "";
     m_map.clear();
   }
 
