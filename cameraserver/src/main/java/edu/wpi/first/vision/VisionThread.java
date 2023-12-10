@@ -21,6 +21,7 @@ public class VisionThread extends Thread {
    *
    * @param visionRunner the runner for a vision pipeline
    */
+  @SuppressWarnings("this-escape")
   public VisionThread(VisionRunner<?> visionRunner) {
     super(visionRunner::runForever, "WPILib Vision Thread");
     setDaemon(true);

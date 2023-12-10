@@ -236,7 +236,7 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
   }
 
   @Override
-  public void reset() {
+  public final void reset() {
     m_xHat = new Matrix<>(m_states, Nat.N1());
     m_P = m_initP;
   }

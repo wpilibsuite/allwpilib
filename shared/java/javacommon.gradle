@@ -114,11 +114,6 @@ tasks.withType(JavaCompile).configureEach {
         // ignore missing serialVersionUID warnings
         "-Xlint:-serial",
     ]
-
-    if (JavaVersion.current() >= JavaVersion.VERSION_21) {
-      // ignore this escape warnings
-      options.compilerArgs.add("-Xlint:-this-escape");
-    }
 }
 
 dependencies {

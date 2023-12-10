@@ -39,6 +39,7 @@ public class AnalogTrigger implements Sendable, AutoCloseable {
    *
    * @param channel the port to use for the analog trigger
    */
+  @SuppressWarnings("this-escape")
   public AnalogTrigger(final int channel) {
     this(new AnalogInput(channel));
     m_ownsAnalog = true;
@@ -51,6 +52,7 @@ public class AnalogTrigger implements Sendable, AutoCloseable {
    *
    * @param channel the AnalogInput to use for the analog trigger
    */
+  @SuppressWarnings("this-escape")
   public AnalogTrigger(AnalogInput channel) {
     m_analogInput = channel;
 
@@ -67,6 +69,7 @@ public class AnalogTrigger implements Sendable, AutoCloseable {
    *
    * @param input the DutyCycle to use for the analog trigger
    */
+  @SuppressWarnings("this-escape")
   public AnalogTrigger(DutyCycle input) {
     m_dutyCycle = input;
 

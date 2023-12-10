@@ -38,6 +38,7 @@ public class AnalogInput implements Sendable, AutoCloseable {
    *
    * @param channel The channel number to represent. 0-3 are on-board 4-7 are on the MXP port.
    */
+  @SuppressWarnings("this-escape")
   public AnalogInput(final int channel) {
     AnalogJNI.checkAnalogInputChannel(channel);
     m_channel = channel;
