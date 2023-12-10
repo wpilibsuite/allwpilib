@@ -221,7 +221,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
   }
 
   /** Resets the controller. */
-  public void reset() {
+  public final void reset() {
     m_r.fill(0.0);
     m_u.fill(0.0);
   }

@@ -81,6 +81,7 @@ public class PIDController implements Sendable, AutoCloseable {
    * @param kd The derivative coefficient.
    * @param period The period between controller updates in seconds. Must be non-zero and positive.
    */
+  @SuppressWarnings("this-escape")
   public PIDController(double kp, double ki, double kd, double period) {
     m_kp = kp;
     m_ki = ki;

@@ -28,6 +28,7 @@ public class NotifierCommand extends Command {
    * @param period the period at which the notifier should run, in seconds
    * @param requirements the subsystems required by this command
    */
+  @SuppressWarnings("this-escape")
   public NotifierCommand(Runnable toRun, double period, Subsystem... requirements) {
     m_notifier = new Notifier(toRun);
     m_period = period;

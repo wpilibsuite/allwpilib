@@ -29,6 +29,7 @@ public class DigitalOutput extends DigitalSource implements Sendable {
    * @param channel the DIO channel to use for the digital output. 0-9 are on-board, 10-25 are on
    *     the MXP
    */
+  @SuppressWarnings("this-escape")
   public DigitalOutput(int channel) {
     SensorUtil.checkDigitalChannel(channel);
     m_channel = channel;

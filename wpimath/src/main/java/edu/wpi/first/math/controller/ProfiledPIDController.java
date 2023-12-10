@@ -50,6 +50,7 @@ public class ProfiledPIDController implements Sendable {
    * @param constraints Velocity and acceleration constraints for goal.
    * @param period The period between controller updates in seconds. The default is 0.02 seconds.
    */
+  @SuppressWarnings("this-escape")
   public ProfiledPIDController(
       double Kp, double Ki, double Kd, TrapezoidProfile.Constraints constraints, double period) {
     m_controller = new PIDController(Kp, Ki, Kd, period);

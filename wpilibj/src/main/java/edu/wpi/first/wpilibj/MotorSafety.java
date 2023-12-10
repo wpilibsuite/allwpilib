@@ -62,6 +62,7 @@ public abstract class MotorSafety {
   }
 
   /** MotorSafety constructor. */
+  @SuppressWarnings("this-escape")
   public MotorSafety() {
     synchronized (m_listMutex) {
       m_instanceList.add(this);

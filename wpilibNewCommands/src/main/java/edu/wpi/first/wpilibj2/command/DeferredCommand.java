@@ -37,6 +37,7 @@ public class DeferredCommand extends Command {
    *     omission of command requirements. Use {@link Set#of()} to easily construct a requirement
    *     set.
    */
+  @SuppressWarnings("this-escape")
   public DeferredCommand(Supplier<Command> supplier, Set<Subsystem> requirements) {
     m_supplier = requireNonNullParam(supplier, "supplier", "DeferredCommand");
     addRequirements(requirements.toArray(new Subsystem[0]));

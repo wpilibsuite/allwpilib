@@ -99,7 +99,7 @@ public class ImplicitModelFollower<States extends Num, Inputs extends Num, Outpu
   }
 
   /** Resets the controller. */
-  public void reset() {
+  public final void reset() {
     m_u.fill(0.0);
   }
 

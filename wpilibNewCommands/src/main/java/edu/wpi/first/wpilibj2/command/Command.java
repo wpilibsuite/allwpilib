@@ -27,6 +27,7 @@ import java.util.function.BooleanSupplier;
 public abstract class Command implements Sendable {
   protected Set<Subsystem> m_requirements = new HashSet<>();
 
+  @SuppressWarnings("this-escape")
   protected Command() {
     String name = getClass().getName();
     SendableRegistry.add(this, name.substring(name.lastIndexOf('.') + 1));
