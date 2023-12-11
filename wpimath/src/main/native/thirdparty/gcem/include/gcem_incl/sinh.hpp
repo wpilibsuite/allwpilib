@@ -25,6 +25,12 @@
 #ifndef _gcem_sinh_HPP
 #define _gcem_sinh_HPP
 
+#include <cmath>
+#include <type_traits>
+
+namespace gcem
+{
+
 namespace internal
 {
 
@@ -59,7 +65,13 @@ return_t<T>
 sinh(const T x)
 noexcept
 {
+  if (std::is_constant_evaluated()) {
     return internal::sinh_check( static_cast<return_t<T>>(x) );
+  } else {
+    return std::sinh(x);
+  }
+}
+
 }
 
 #endif

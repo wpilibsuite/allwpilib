@@ -5,7 +5,13 @@
 #pragma once
 
 #include <algorithm>
+#include <stdexcept>
 #include <string>
+#include <string_view>
+
+#include <fmt/core.h>
+#include <wpi/StringExtras.h>
+#include <wpi/ct_string.h>
 
 namespace frc {
 
@@ -739,6 +745,9 @@ class Color {
    */
   static const Color kYellowGreen;
 
+  /**
+   * Constructs a default color (black).
+   */
   constexpr Color() = default;
 
   /**
@@ -762,6 +771,33 @@ class Color {
    */
   constexpr Color(int r, int g, int b)
       : Color(r / 255.0, g / 255.0, b / 255.0) {}
+
+  /**
+   * Constructs a Color from a hex string.
+   *
+   * @param hexString a string of the format <tt>\#RRGGBB</tt>
+   * @throws std::invalid_argument if the hex string is invalid.
+   */
+  explicit constexpr Color(std::string_view hexString) {
+    if (hexString.length() != 7 || !hexString.starts_with("#") ||
+        !wpi::isHexDigit(hexString[1]) || !wpi::isHexDigit(hexString[2]) ||
+        !wpi::isHexDigit(hexString[3]) || !wpi::isHexDigit(hexString[4]) ||
+        !wpi::isHexDigit(hexString[5]) || !wpi::isHexDigit(hexString[6])) {
+      throw std::invalid_argument(
+          fmt::format("Invalid hex string for Color \"{}\"", hexString));
+    }
+
+    int r = wpi::hexDigitValue(hexString[1]) * 16 +
+            wpi::hexDigitValue(hexString[2]);
+    int g = wpi::hexDigitValue(hexString[3]) * 16 +
+            wpi::hexDigitValue(hexString[4]);
+    int b = wpi::hexDigitValue(hexString[5]) * 16 +
+            wpi::hexDigitValue(hexString[6]);
+
+    red = r / 255.0;
+    green = g / 255.0;
+    blue = b / 255.0;
+  }
 
   constexpr bool operator==(const Color&) const = default;
 
@@ -816,7 +852,16 @@ class Color {
    *
    * @return a string of the format <tt>\#RRGGBB</tt>
    */
-  std::string HexString() const;
+  constexpr auto HexString() const {
+    const int r = 255.0 * red;
+    const int g = 255.0 * green;
+    const int b = 255.0 * blue;
+
+    return wpi::ct_string<char, std::char_traits<char>, 7>{
+        {'#', wpi::hexdigit(r / 16), wpi::hexdigit(r % 16),
+         wpi::hexdigit(g / 16), wpi::hexdigit(g % 16), wpi::hexdigit(b / 16),
+         wpi::hexdigit(b % 16)}};
+  }
 
   double red = 0.0;
   double green = 0.0;

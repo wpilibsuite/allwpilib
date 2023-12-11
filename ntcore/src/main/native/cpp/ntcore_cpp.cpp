@@ -263,6 +263,22 @@ bool GetTopicRetained(NT_Topic topic) {
   }
 }
 
+void SetTopicCached(NT_Topic topic, bool value) {
+  if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
+    ii->localStorage.SetTopicCached(topic, value);
+  } else {
+    return;
+  }
+}
+
+bool GetTopicCached(NT_Topic topic) {
+  if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
+    return ii->localStorage.GetTopicCached(topic);
+  } else {
+    return {};
+  }
+}
+
 bool GetTopicExists(NT_Handle handle) {
   if (auto ii = InstanceImpl::GetHandle(handle)) {
     return ii->localStorage.GetTopicExists(handle);

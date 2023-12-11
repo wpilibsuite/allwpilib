@@ -6,6 +6,8 @@ package edu.wpi.first.math.kinematics;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
+import edu.wpi.first.math.kinematics.proto.MecanumDriveWheelSpeedsProto;
+import edu.wpi.first.math.kinematics.struct.MecanumDriveWheelSpeedsStruct;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
@@ -23,6 +25,9 @@ public class MecanumDriveWheelSpeeds {
 
   /** Speed of the rear right wheel. */
   public double rearRightMetersPerSecond;
+
+  public static final MecanumDriveWheelSpeedsStruct struct = new MecanumDriveWheelSpeedsStruct();
+  public static final MecanumDriveWheelSpeedsProto proto = new MecanumDriveWheelSpeedsProto();
 
   /** Constructs a MecanumDriveWheelSpeeds with zeros for all member fields. */
   public MecanumDriveWheelSpeeds() {}

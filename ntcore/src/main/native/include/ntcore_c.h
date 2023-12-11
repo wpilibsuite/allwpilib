@@ -65,7 +65,11 @@ enum NT_Type {
 };
 
 /** NetworkTables entry flags. */
-enum NT_EntryFlags { NT_PERSISTENT = 0x01, NT_RETAINED = 0x02 };
+enum NT_EntryFlags {
+  NT_PERSISTENT = 0x01,
+  NT_RETAINED = 0x02,
+  NT_UNCACHED = 0x04
+};
 
 /** NetworkTables logging levels. */
 enum NT_LogLevel {
@@ -684,6 +688,24 @@ void NT_SetTopicRetained(NT_Topic topic, NT_Bool value);
  * @return retained property value
  */
 NT_Bool NT_GetTopicRetained(NT_Topic topic);
+
+/**
+ * Sets the cached property of a topic.  If true, the server and clients will
+ * store the latest value, allowing the value to be read (and not just accessed
+ * through event queues and listeners).
+ *
+ * @param topic topic handle
+ * @param value True for cached, false for not cached
+ */
+void NT_SetTopicCached(NT_Topic topic, NT_Bool value);
+
+/**
+ * Gets the cached property of a topic.
+ *
+ * @param topic topic handle
+ * @return cached property value
+ */
+NT_Bool NT_GetTopicCached(NT_Topic topic);
 
 /**
  * Determine if topic exists (e.g. has at least one publisher).

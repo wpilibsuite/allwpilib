@@ -41,6 +41,7 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
    *
    * @param channel the channel to attach to
    */
+  @SuppressWarnings("this-escape")
   public DutyCycleEncoder(int channel) {
     m_digitalInput = new DigitalInput(channel);
     m_ownsDutyCycle = true;
@@ -53,6 +54,7 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
    *
    * @param dutyCycle the duty cycle to attach to
    */
+  @SuppressWarnings("this-escape")
   public DutyCycleEncoder(DutyCycle dutyCycle) {
     m_dutyCycle = dutyCycle;
     init();
@@ -63,6 +65,7 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
    *
    * @param source the digital source to attach to
    */
+  @SuppressWarnings("this-escape")
   public DutyCycleEncoder(DigitalSource source) {
     m_ownsDutyCycle = true;
     m_dutyCycle = new DutyCycle(source);

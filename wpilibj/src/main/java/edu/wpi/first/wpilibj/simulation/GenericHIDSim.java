@@ -135,7 +135,7 @@ public class GenericHIDSim {
    */
   public boolean getOutput(int outputNumber) {
     long outputs = getOutputs();
-    return (outputs & (1 << (outputNumber - 1))) != 0;
+    return (outputs & (1L << (outputNumber - 1))) != 0;
   }
 
   /**

@@ -10,6 +10,6 @@ suppressions PUBLIC "-//Puppy Crawl//DTD Suppressions 1.1//EN"
     checks="(LocalVariableName|MemberName|MethodName|MethodTypeParameterName|ParameterName)" />
   <suppress files=".*JNI.*"
     checks="(EmptyLineSeparator|LineLength|MissingJavadocMethod|ParameterName)" />
-  <suppress files=".*quickbuf.*"
+  <suppress files=".*math[/\\]proto.*"
     checks="(CustomImportOrder|EmptyLineSeparator|LineLength|JavadocParagraph|MissingJavadocMethod|OverloadMethodsDeclarationOrder|SummaryJavadoc|UnnecessaryParentheses|OperatorWrap|JavadocMethod|JavadocTagContinuationIndentation)" />
 </suppressions>

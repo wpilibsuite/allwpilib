@@ -22,6 +22,9 @@
  * Gauss-Legendre quadrature: 30 points
  */
 
+namespace gcem
+{
+
 static const long double gauss_legendre_30_points[30] = \
 {
     -0.05147184255531769583302521316672L,
@@ -89,3 +92,5 @@ static const long double gauss_legendre_30_weights[30] = \
     0.00796819249616660561546588347467L,
     0.00796819249616660561546588347467L\
 };
+
+}

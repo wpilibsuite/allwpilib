@@ -33,6 +33,7 @@ public class DutyCycle implements Sendable, AutoCloseable {
    *
    * @param digitalSource The DigitalSource to use.
    */
+  @SuppressWarnings("this-escape")
   public DutyCycle(DigitalSource digitalSource) {
     m_handle =
         DutyCycleJNI.initialize(

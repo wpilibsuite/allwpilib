@@ -22,8 +22,8 @@ public class ReplaceMeTrapezoidProfileCommand extends TrapezoidProfileCommand {
           // Use current trajectory state here
         },
         // Goal state
-        () -> new TrapezoidProfile.State(),
+        TrapezoidProfile.State::new,
         // Current state
-        () -> new TrapezoidProfile.State());
+        TrapezoidProfile.State::new);
   }
 }

@@ -47,7 +47,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
    * @param measurementStdDevs The standard deviations of the measurements.
    * @return An ElevatorSim representing the given characterized constants.
    */
-  public static ElevatorSim create(
+public static ElevatorSim create(
       LinearSystem<N2, N1, N1> plant,
       double kG,
       DCMotor gearbox,
@@ -319,7 +319,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
    * @param positionMeters The new position in meters.
    * @param velocityMetersPerSecond New velocity in meters per second.
    */
-  public void setState(double positionMeters, double velocityMetersPerSecond) {
+  public final void setState(double positionMeters, double velocityMetersPerSecond) {
     setState(
         VecBuilder.fill(
             MathUtil.clamp(positionMeters, m_minHeight, m_maxHeight), velocityMetersPerSecond));

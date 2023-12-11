@@ -130,7 +130,7 @@ deploy {
                 myRobotJava(JavaArtifact) {
                     jarTask = shadowJar
                     postdeploy << { ctx ->
-                        ctx.execute("echo '/usr/local/frc/JRE/bin/java -XX:+UseG1GC -XX:MaxGCPauseMillis=1 -XX:GCTimeRatio=1 -Djava.library.path=/usr/local/frc/third-party/lib -Djava.lang.invoke.stringConcat=BC_SB -jar /home/lvuser/myRobot-all.jar' > /home/lvuser/robotCommand")
+                        ctx.execute("echo '/usr/local/frc/JRE/bin/java -XX:+UseSerialGC -Djava.library.path=/usr/local/frc/third-party/lib -Djava.lang.invoke.stringConcat=BC_SB -jar /home/lvuser/myRobot-all.jar' > /home/lvuser/robotCommand")
                         ctx.execute("chmod +x /home/lvuser/robotCommand; chown lvuser /home/lvuser/robotCommand")
                     }
                 }

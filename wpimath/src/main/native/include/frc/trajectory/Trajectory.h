@@ -145,3 +145,6 @@ WPILIB_DLLEXPORT
 void from_json(const wpi::json& json, Trajectory::State& state);
 
 }  // namespace frc
+
+#include "frc/trajectory/proto/TrajectoryProto.h"
+#include "frc/trajectory/proto/TrajectoryStateProto.h"

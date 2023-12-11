@@ -4,6 +4,8 @@
 
 package edu.wpi.first.math.system.plant;
 
+import edu.wpi.first.math.system.plant.proto.DCMotorProto;
+import edu.wpi.first.math.system.plant.struct.DCMotorStruct;
 import edu.wpi.first.math.util.Units;
 
 /** Holds the constants for a DC motor. */
@@ -16,6 +18,9 @@ public class DCMotor {
   public final double rOhms;
   public final double KvRadPerSecPerVolt;
   public final double KtNMPerAmp;
+
+  public static final DCMotorProto proto = new DCMotorProto();
+  public static final DCMotorStruct struct = new DCMotorStruct();
 
   /**
    * Constructs a DC motor.

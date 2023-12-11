@@ -239,6 +239,7 @@ public final class DriverStation {
         for (int i = 0; i < count; i++) {
           if (axes.m_axes[i] != m_prevAxes.m_axes[i]) {
             needToLog = true;
+            break;
           }
         }
       }
@@ -255,6 +256,7 @@ public final class DriverStation {
         for (int i = 0; i < count; i++) {
           if (povs.m_povs[i] != m_prevPOVs.m_povs[i]) {
             needToLog = true;
+            break;
           }
         }
       }
@@ -1113,7 +1115,7 @@ public final class DriverStation {
    *
    * <p>If the FMS is not connected, it is set from the team alliance setting on the driver station.
    *
-   * @return the current alliance
+   * @return The alliance (red or blue) or an empty optional if the alliance is invalid
    */
   public static Optional<Alliance> getAlliance() {
     AllianceStationID allianceStationID = DriverStationJNI.getAllianceStation();

@@ -273,4 +273,36 @@ void HAL_GetPowerDistributionStickyFaults(
   }
 }
 
+void HAL_StartPowerDistributionStream(HAL_PowerDistributionHandle handle,
+                                      int32_t* status) {
+  if (IsCtre(handle)) {
+    HAL_StartPDPStream(handle, status);
+  } else {
+    HAL_StartREVPDHStream(handle, status);
+  }
+}
+
+HAL_PowerDistributionChannelData* HAL_GetPowerDistributionStreamData(
+    HAL_PowerDistributionHandle handle, int32_t* count, int32_t* status) {
+  if (IsCtre(handle)) {
+    return HAL_GetPDPStreamData(handle, count, status);
+  } else {
+    return HAL_GetREVPDHStreamData(handle, count, status);
+  }
+}
+
+void HAL_FreePowerDistributionStreamData(HAL_PowerDistributionChannelData* data,
+                                         int32_t count) {
+  delete[] data;
+}
+
+void HAL_StopPowerDistributionStream(HAL_PowerDistributionHandle handle,
+                                     int32_t* status) {
+  if (IsCtre(handle)) {
+    HAL_StopPDPStream(handle, status);
+  } else {
+    HAL_StopREVPDHStream(handle, status);
+  }
+}
+
 }  // extern "C"

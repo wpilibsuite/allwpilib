@@ -25,7 +25,6 @@
 #include "uv.h"
 #include "internal.h"
 
-
 #pragma comment(lib, "Ws2_32.lib")
 
 /* Whether there are any non-IFS LSPs stacked on TCP */

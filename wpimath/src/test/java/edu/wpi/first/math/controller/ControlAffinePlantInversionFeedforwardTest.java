@@ -18,8 +18,7 @@ class ControlAffinePlantInversionFeedforwardTest {
   @Test
   void testCalculate() {
     ControlAffinePlantInversionFeedforward<N2, N1> feedforward =
-        new ControlAffinePlantInversionFeedforward<N2, N1>(
-            Nat.N2(), Nat.N1(), this::getDynamics, 0.02);
+        new ControlAffinePlantInversionFeedforward<>(Nat.N2(), Nat.N1(), this::getDynamics, 0.02);
 
     assertEquals(
         48.0, feedforward.calculate(VecBuilder.fill(2, 2), VecBuilder.fill(3, 3)).get(0, 0), 1e-6);
@@ -28,8 +27,7 @@ class ControlAffinePlantInversionFeedforwardTest {
   @Test
   void testCalculateState() {
     ControlAffinePlantInversionFeedforward<N2, N1> feedforward =
-        new ControlAffinePlantInversionFeedforward<N2, N1>(
-            Nat.N2(), Nat.N1(), this::getDynamics, 0.02);
+        new ControlAffinePlantInversionFeedforward<>(Nat.N2(), Nat.N1(), this::getDynamics, 0.02);
 
     assertEquals(
         48.0, feedforward.calculate(VecBuilder.fill(2, 2), VecBuilder.fill(3, 3)).get(0, 0), 1e-6);

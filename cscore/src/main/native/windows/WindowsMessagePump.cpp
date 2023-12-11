@@ -99,8 +99,9 @@ WindowsMessagePump::WindowsMessagePump(
 
 WindowsMessagePump::~WindowsMessagePump() {
   auto res = SendMessageA(hwnd, WM_CLOSE, NULL, NULL);
-  if (m_mainThread.joinable())
+  if (m_mainThread.joinable()) {
     m_mainThread.join();
+  }
 }
 
 void WindowsMessagePump::ThreadMain(HANDLE eventHandle) {

@@ -239,3 +239,6 @@ class WPILIB_DLLEXPORT DCMotor {
 };
 
 }  // namespace frc
+
+#include "frc/system/plant/proto/DCMotorProto.h"
+#include "frc/system/plant/struct/DCMotorStruct.h"

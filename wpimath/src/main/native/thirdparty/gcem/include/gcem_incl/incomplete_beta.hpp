@@ -27,6 +27,9 @@
 #ifndef _gcem_incomplete_beta_HPP
 #define _gcem_incomplete_beta_HPP
 
+namespace gcem
+{
+
 namespace internal
 {
 
@@ -189,6 +192,8 @@ incomplete_beta(const T1 a, const T2 b, const T3 z)
 noexcept
 {
     return internal::incomplete_beta_type_check(a,b,z);
+}
+
 }
 
 #endif
