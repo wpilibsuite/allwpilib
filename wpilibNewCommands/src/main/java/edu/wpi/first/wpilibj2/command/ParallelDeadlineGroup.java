@@ -49,7 +49,7 @@ public class ParallelDeadlineGroup extends ParallelCommandGroup {
 
   @Override
   public final boolean isFinished() {
-    return m_deadline.isFinished();
+    return !getCommandStatuses().get(m_deadline);
   }
 
   @Override
