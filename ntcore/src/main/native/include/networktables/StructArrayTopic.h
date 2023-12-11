@@ -7,9 +7,9 @@
 #include <stdint.h>
 
 #include <atomic>
+#include <memory>
 #include <ranges>
 #include <span>
-#include <string_view>
 #include <utility>
 #include <vector>
 
@@ -121,16 +121,17 @@ class StructArraySubscriber : public Subscriber {
 #endif
   TimestampedValueType GetAtomic(U&& defaultValue) const {
     wpi::SmallVector<uint8_t, 128> buf;
+    size_t size = S::GetSize();
     TimestampedRawView view = ::nt::GetAtomicRaw(m_subHandle, buf, {});
-    if (view.value.size() == 0 || (view.value.size() % S::kSize) != 0) {
+    if (view.value.size() == 0 || (view.value.size() % size) != 0) {
       return {0, 0, std::forward<U>(defaultValue)};
     }
     TimestampedValueType rv{view.time, view.serverTime, {}};
-    rv.value.reserve(view.value.size() / S::kSize);
+    rv.value.reserve(view.value.size() / size);
     for (auto in = view.value.begin(), end = view.value.end(); in != end;
-         in += S::kSize) {
+         in += size) {
       rv.value.emplace_back(
-          S::Unpack(std::span<const uint8_t, S::kSize>{in, in + S::kSize}));
+          S::Unpack(std::span<const uint8_t>{std::to_address(in), size}));
     }
     return rv;
   }
@@ -145,16 +146,17 @@ class StructArraySubscriber : public Subscriber {
    */
   TimestampedValueType GetAtomic(std::span<const T> defaultValue) const {
     wpi::SmallVector<uint8_t, 128> buf;
+    size_t size = S::GetSize();
     TimestampedRawView view = ::nt::GetAtomicRaw(m_subHandle, buf, {});
-    if (view.value.size() == 0 || (view.value.size() % S::kSize) != 0) {
+    if (view.value.size() == 0 || (view.value.size() % size) != 0) {
       return {0, 0, {defaultValue.begin(), defaultValue.end()}};
     }
     TimestampedValueType rv{view.time, view.serverTime, {}};
-    rv.value.reserve(view.value.size() / S::kSize);
+    rv.value.reserve(view.value.size() / size);
     for (auto in = view.value.begin(), end = view.value.end(); in != end;
-         in += S::kSize) {
+         in += size) {
       rv.value.emplace_back(
-          S::Unpack(std::span<const uint8_t, S::kSize>{in, in + S::kSize}));
+          S::Unpack(std::span<const uint8_t>{std::to_address(in), size}));
     }
     return rv;
   }
@@ -174,16 +176,17 @@ class StructArraySubscriber : public Subscriber {
     auto raw = ::nt::ReadQueueRaw(m_subHandle);
     std::vector<TimestampedValueType> rv;
     rv.reserve(raw.size());
+    size_t size = S::GetSize();
     for (auto&& r : raw) {
-      if (r.value.size() == 0 || (r.value.size() % S::kSize) != 0) {
+      if (r.value.size() == 0 || (r.value.size() % size) != 0) {
         continue;
       }
       std::vector<T> values;
-      values.reserve(r.value.size() / S::kSize);
+      values.reserve(r.value.size() / size);
       for (auto in = r.value.begin(), end = r.value.end(); in != end;
-           in += S::kSize) {
+           in += size) {
         values.emplace_back(
-            S::Unpack(std::span<const uint8_t, S::kSize>{in, in + S::kSize}));
+            S::Unpack(std::span<const uint8_t>{std::to_address(in), size}));
       }
       rv.emplace_back(r.time, r.serverTime, std::move(values));
     }
@@ -238,10 +241,9 @@ class StructArrayPublisher : public Publisher {
   StructArrayPublisher& operator=(StructArrayPublisher&& rhs) {
     Publisher::operator=(std::move(rhs));
     m_buf = std::move(rhs.m_buf);
-    m_schemaPublished.clear();
-    if (rhs.m_schemaPublished.test()) {
-      m_schemaPublished.test_and_set();
-    }
+    m_schemaPublished.store(
+        rhs.m_schemaPublished.load(std::memory_order_relaxed),
+        std::memory_order_relaxed);
     return *this;
   }
 
@@ -257,7 +259,7 @@ class StructArrayPublisher : public Publisher {
              std::convertible_to<std::ranges::range_value_t<U>, T>
 #endif
   void Set(U&& value, int64_t time = 0) {
-    if (!m_schemaPublished.test_and_set()) {
+    if (!m_schemaPublished.exchange(true, std::memory_order_relaxed)) {
       GetTopic().GetInstance().template AddStructSchema<T>();
     }
     m_buf.Write(std::forward<U>(value),
@@ -288,7 +290,7 @@ class StructArrayPublisher : public Publisher {
              std::convertible_to<std::ranges::range_value_t<U>, T>
 #endif
   void SetDefault(U&& value) {
-    if (!m_schemaPublished.test_and_set()) {
+    if (!m_schemaPublished.exchange(true, std::memory_order_relaxed)) {
       GetTopic().GetInstance().template AddStructSchema<T>();
     }
     m_buf.Write(std::forward<U>(value),
@@ -318,7 +320,7 @@ class StructArrayPublisher : public Publisher {
 
  private:
   wpi::StructArrayBuffer<T> m_buf;
-  std::atomic_flag m_schemaPublished = ATOMIC_FLAG_INIT;
+  std::atomic_bool m_schemaPublished{false};
 };
 
 /**

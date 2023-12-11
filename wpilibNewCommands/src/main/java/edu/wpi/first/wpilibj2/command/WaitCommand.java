@@ -22,6 +22,7 @@ public class WaitCommand extends Command {
    *
    * @param seconds the time to wait, in seconds
    */
+  @SuppressWarnings("this-escape")
   public WaitCommand(double seconds) {
     m_duration = seconds;
     SendableRegistry.setName(this, getName() + ": " + seconds + " seconds");

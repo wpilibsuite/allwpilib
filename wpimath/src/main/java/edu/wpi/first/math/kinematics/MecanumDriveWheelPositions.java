@@ -7,6 +7,8 @@ package edu.wpi.first.math.kinematics;
 import static edu.wpi.first.units.Units.Meters;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.kinematics.proto.MecanumDriveWheelPositionsProto;
+import edu.wpi.first.math.kinematics.struct.MecanumDriveWheelPositionsStruct;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import java.util.Objects;
@@ -23,6 +25,10 @@ public class MecanumDriveWheelPositions implements WheelPositions<MecanumDriveWh
 
   /** Distance measured by the rear right wheel. */
   public double rearRightMeters;
+
+  public static final MecanumDriveWheelPositionsStruct struct =
+      new MecanumDriveWheelPositionsStruct();
+  public static final MecanumDriveWheelPositionsProto proto = new MecanumDriveWheelPositionsProto();
 
   /** Constructs a MecanumDriveWheelPositions with zeros for all member fields. */
   public MecanumDriveWheelPositions() {}

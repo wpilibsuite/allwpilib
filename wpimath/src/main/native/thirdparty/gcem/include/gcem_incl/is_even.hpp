@@ -25,6 +25,9 @@
 #ifndef _gcem_is_even_HPP
 #define _gcem_is_even_HPP
 
+namespace gcem
+{
+
 namespace internal
 {
 
@@ -34,6 +37,8 @@ is_even(const llint_t x)
 noexcept
 {
     return !is_odd(x);
+}
+
 }
 
 }

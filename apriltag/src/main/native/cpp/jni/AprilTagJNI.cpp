@@ -8,6 +8,7 @@
 #include <wpi/jni_util.h>
 
 #include "edu_wpi_first_apriltag_jni_AprilTagJNI.h"
+#include "frc/apriltag/AprilTag.h"
 #include "frc/apriltag/AprilTagDetector.h"
 #include "frc/apriltag/AprilTagPoseEstimator.h"
 
@@ -585,6 +586,32 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_estimatePose
 
   AprilTagPoseEstimator estimator({units::meter_t{tagSize}, fx, fy, cx, cy});
   return MakeJObject(env, estimator.Estimate(harr, carr));
+}
+
+/*
+ * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
+ * Method:    generate16h5AprilTagImage
+ * Signature: (IJ)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_apriltag_jni_AprilTagJNI_generate16h5AprilTagImage
+  (JNIEnv* env, jclass, jint id, jlong framePtr)
+{
+  wpi::RawFrame* javaRawFrame = (wpi::RawFrame*)framePtr;
+  *javaRawFrame = AprilTag::Generate16h5AprilTagImage(id);
+}
+
+/*
+ * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
+ * Method:    generate36h11AprilTagImage
+ * Signature: (IJ)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_apriltag_jni_AprilTagJNI_generate36h11AprilTagImage
+  (JNIEnv* env, jclass, jint id, jlong framePtr)
+{
+  wpi::RawFrame* javaRawFrame = (wpi::RawFrame*)framePtr;
+  *javaRawFrame = AprilTag::Generate36h11AprilTagImage(id);
 }
 
 }  // extern "C"

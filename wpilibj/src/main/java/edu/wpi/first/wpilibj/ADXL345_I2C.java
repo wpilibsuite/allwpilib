@@ -95,6 +95,7 @@ public class ADXL345_I2C implements NTSendable, AutoCloseable {
    * @param range The range (+ or -) that the accelerometer will measure.
    * @param deviceAddress I2C address of the accelerometer (0x1D or 0x53)
    */
+  @SuppressWarnings("this-escape")
   public ADXL345_I2C(I2C.Port port, Range range, int deviceAddress) {
     m_i2c = new I2C(port, deviceAddress);
 
@@ -149,7 +150,7 @@ public class ADXL345_I2C implements NTSendable, AutoCloseable {
    * @param range The maximum acceleration, positive or negative, that the accelerometer will
    *     measure.
    */
-  public void setRange(Range range) {
+  public final void setRange(Range range) {
     final byte value;
     switch (range) {
       case k2G:

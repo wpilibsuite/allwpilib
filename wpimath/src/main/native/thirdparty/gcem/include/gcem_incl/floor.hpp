@@ -21,6 +21,12 @@
 #ifndef _gcem_floor_HPP
 #define _gcem_floor_HPP
 
+#include <cmath>
+#include <type_traits>
+
+namespace gcem
+{
+
 namespace internal
 {
 
@@ -124,7 +130,13 @@ return_t<T>
 floor(const T x)
 noexcept
 {
+  if (std::is_constant_evaluated()) {
     return internal::floor_check( static_cast<return_t<T>>(x) );
+  } else {
+    return std::floor(x);
+  }
+}
+
 }
 
 #endif

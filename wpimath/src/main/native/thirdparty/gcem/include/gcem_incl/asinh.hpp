@@ -25,6 +25,12 @@
 #ifndef _gcem_asinh_HPP
 #define _gcem_asinh_HPP
 
+#include <cmath>
+#include <type_traits>
+
+namespace gcem
+{
+
 namespace internal
 {
 
@@ -59,8 +65,13 @@ return_t<T>
 asinh(const T x)
 noexcept
 {
+  if (std::is_constant_evaluated()) {
     return internal::asinh_compute( static_cast<return_t<T>>(x) );
+  } else {
+    return std::asinh(x);
+  }
 }
 
+}
 
 #endif

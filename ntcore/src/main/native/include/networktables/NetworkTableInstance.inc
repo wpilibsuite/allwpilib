@@ -257,6 +257,12 @@ inline void NetworkTableInstance::AddSchema(std::string_view name,
   ::nt::AddSchema(m_handle, name, type, schema);
 }
 
+// Suppress unused-lambda-capture warning on AddSchema() call
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-lambda-capture"
+#endif
+
 template <wpi::ProtobufSerializable T>
 void NetworkTableInstance::AddProtobufSchema(wpi::ProtobufMessage<T>& msg) {
   msg.ForEachProtobufDescriptor(
@@ -272,5 +278,9 @@ void NetworkTableInstance::AddStructSchema() {
     AddSchema(typeString, "structschema", schema);
   });
 }
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 }  // namespace nt

@@ -8,13 +8,13 @@ import java.util.Objects;
 
 /**
  * A specialization of {@link Measure} that allows for mutability. This is intended to be used for
- * memory use reasons (such as on the memory-restricted RoboRIO 1 or 2 or SBC coprocessors) and
+ * memory use reasons (such as on the memory-restricted roboRIO 1 or 2 or SBC coprocessors) and
  * should NOT be exposed in the public API for a class that uses it.
  *
- * <p>The advantage of using this class is that only one instance of a measurement object will exist
- * at a time, as opposed to instantiating a new immutable instance every time a value is fetched.
- * This can greatly reduce memory pressure, but comes at the cost of increased code complexity and
- * sensitivity to race conditions if used poorly.
+ * <p>The advantage of using this class is to reuse one instance of a measurement object, as opposed
+ * to instantiating a new immutable instance every time an operation is performed. This will reduce
+ * memory pressure, but comes at the cost of increased code complexity and sensitivity to race
+ * conditions if misused.
  *
  * <p>Any unsafe methods are prefixed with {@code mut_*}, such as {@link #mut_plus(Measure)} or
  * {@link #mut_replace(Measure)}. These methods will change the internal state of the measurement

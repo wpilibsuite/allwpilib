@@ -40,6 +40,7 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
    *
    * @param analogInput the analog input to attach to
    */
+  @SuppressWarnings("this-escape")
   public AnalogEncoder(AnalogInput analogInput) {
     m_analogInput = analogInput;
     init();

@@ -64,12 +64,12 @@ static std::string MakeLogDir(std::string_view dir) {
   }
 #ifdef __FRC_ROBORIO__
   // prefer a mounted USB drive if one is accessible
-  constexpr std::string_view usbDir{"/u"};
   std::error_code ec;
-  auto s = fs::status(usbDir, ec);
+  auto s = fs::status("/u", ec);
   if (!ec && fs::is_directory(s) &&
       (s.permissions() & fs::perms::others_write) != fs::perms::none) {
-    return std::string{usbDir};
+    fs::create_directory("/u/logs", ec);
+    return "/u/logs";
   }
   if (RobotBase::GetRuntimeType() == kRoboRIO) {
     FRC_ReportError(warn::Warning,

@@ -673,6 +673,30 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getTopicRetained
 
 /*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Method:    setTopicCached
+ * Signature: (IZ)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_networktables_NetworkTablesJNI_setTopicCached
+  (JNIEnv*, jclass, jint topic, jboolean value)
+{
+  nt::SetTopicCached(topic, value);
+}
+
+/*
+ * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Method:    getTopicCached
+ * Signature: (I)Z
+ */
+JNIEXPORT jboolean JNICALL
+Java_edu_wpi_first_networktables_NetworkTablesJNI_getTopicCached
+  (JNIEnv*, jclass, jint topic)
+{
+  return nt::GetTopicCached(topic);
+}
+
+/*
+ * Class:     edu_wpi_first_networktables_NetworkTablesJNI
  * Method:    getTopicTypeString
  * Signature: (I)Ljava/lang/String;
  */

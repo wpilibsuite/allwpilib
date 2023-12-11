@@ -25,6 +25,12 @@
 #ifndef _gcem_exp_HPP
 #define _gcem_exp_HPP
 
+#include <cmath>
+#include <type_traits>
+
+namespace gcem
+{
+
 namespace internal
 {
 
@@ -124,7 +130,13 @@ return_t<T>
 exp(const T x)
 noexcept
 {
+  if (std::is_constant_evaluated()) {
     return internal::exp_check( static_cast<return_t<T>>(x) );
+  } else {
+    return std::exp(x);
+  }
+}
+
 }
 
 #endif

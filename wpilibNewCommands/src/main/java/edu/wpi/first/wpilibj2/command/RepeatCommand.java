@@ -29,6 +29,7 @@ public class RepeatCommand extends Command {
    *
    * @param command the command to run repeatedly
    */
+  @SuppressWarnings("this-escape")
   public RepeatCommand(Command command) {
     m_command = requireNonNullParam(command, "command", "RepeatCommand");
     CommandScheduler.getInstance().registerComposedCommands(command);

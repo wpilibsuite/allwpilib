@@ -112,7 +112,8 @@ void NetworkServer::ServerConnection::UpdateOutgoingTimer(uint32_t repeatMs) {
   DEBUG4("Setting periodic timer to {}", repeatMs);
   if (repeatMs == UINT32_MAX) {
     m_outgoingTimer->Stop();
-  } else {
+  } else if (!m_outgoingTimer->IsActive() ||
+             uv::Timer::Time{repeatMs} != m_outgoingTimer->GetRepeat()) {
     m_outgoingTimer->Start(uv::Timer::Time{repeatMs},
                            uv::Timer::Time{repeatMs});
   }

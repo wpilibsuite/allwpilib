@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 #include <concepts>
+#include <memory>
 #include <span>
 #include <string>
 #include <string_view>
@@ -14,12 +15,14 @@
 #include <utility>
 #include <vector>
 
+#include <fmt/format.h>
+
 #include "wpi/Endian.h"
-#include "wpi/MathExtras.h"
 #include "wpi/bit.h"
 #include "wpi/ct_string.h"
 #include "wpi/function_ref.h"
 #include "wpi/mutex.h"
+#include "wpi/type_traits.h"
 
 namespace wpi {
 
@@ -45,37 +48,39 @@ struct Struct {};
  * Implementations must define a template specialization for wpi::Struct with
  * T being the type that is being serialized/deserialized, with the following
  * static members (as enforced by this concept):
- * - std::string_view kTypeString: the type string
- * - size_t kSize: the structure size in bytes
- * - std::string_view kSchema: the struct schema
- * - T Unpack(std::span<const uint8_t, kSize>): function for deserialization
- * - void Pack(std::span<uint8_t, kSize>, T&& value): function for
+ * - std::string_view GetTypeString(): function that returns the type string
+ * - size_t GetSize(): function that returns the structure size in bytes
+ * - std::string_view GetSchema(): function that returns the struct schema
+ * - T Unpack(std::span<const uint8_t>): function for deserialization
+ * - void Pack(std::span<uint8_t>, T&& value): function for
  *   serialization
+ *
+ * If possible, the GetTypeString(), GetSize(), and GetSchema() functions should
+ * be marked constexpr. GetTypeString() and GetSchema() may return types other
+ * than std::string_view, as long as the return value is convertible to
+ * std::string_view.
  *
  * If the struct has nested structs, implementations should also meet the
  * requirements of HasNestedStruct<T>.
  */
 template <typename T>
-concept StructSerializable =
-    requires(std::span<const uint8_t> in, std::span<uint8_t> out, T&& value) {
-      typename Struct<typename std::remove_cvref_t<T>>;
-      {
-        Struct<typename std::remove_cvref_t<T>>::kTypeString
-      } -> std::convertible_to<std::string_view>;
-      {
-        Struct<typename std::remove_cvref_t<T>>::kSize
-      } -> std::convertible_to<size_t>;
-      {
-        Struct<typename std::remove_cvref_t<T>>::kSchema
-      } -> std::convertible_to<std::string_view>;
-      {
-        Struct<typename std::remove_cvref_t<T>>::Unpack(
-            in.subspan<0, Struct<typename std::remove_cvref_t<T>>::kSize>())
-      } -> std::same_as<typename std::remove_cvref_t<T>>;
-      Struct<typename std::remove_cvref_t<T>>::Pack(
-          out.subspan<0, Struct<typename std::remove_cvref_t<T>>::kSize>(),
-          std::forward<T>(value));
-    };
+concept StructSerializable = requires(std::span<const uint8_t> in,
+                                      std::span<uint8_t> out, T&& value) {
+  typename Struct<typename std::remove_cvref_t<T>>;
+  {
+    Struct<typename std::remove_cvref_t<T>>::GetTypeString()
+  } -> std::convertible_to<std::string_view>;
+  {
+    Struct<typename std::remove_cvref_t<T>>::GetSize()
+  } -> std::convertible_to<size_t>;
+  {
+    Struct<typename std::remove_cvref_t<T>>::GetSchema()
+  } -> std::convertible_to<std::string_view>;
+  {
+    Struct<typename std::remove_cvref_t<T>>::Unpack(in)
+  } -> std::same_as<typename std::remove_cvref_t<T>>;
+  Struct<typename std::remove_cvref_t<T>>::Pack(out, std::forward<T>(value));
+};
 
 /**
  * Specifies that a type is capable of in-place raw struct deserialization.
@@ -87,8 +92,7 @@ concept StructSerializable =
 template <typename T>
 concept MutableStructSerializable =
     StructSerializable<T> && requires(T* out, std::span<const uint8_t> in) {
-      Struct<typename std::remove_cvref_t<T>>::UnpackInto(
-          out, in.subspan<0, Struct<typename std::remove_cvref_t<T>>::kSize>());
+      Struct<typename std::remove_cvref_t<T>>::UnpackInto(out, in);
     };
 
 /**
@@ -115,7 +119,7 @@ concept HasNestedStruct =
  * @return Deserialized object
  */
 template <StructSerializable T>
-inline T UnpackStruct(std::span<const uint8_t, Struct<T>::kSize> data) {
+inline T UnpackStruct(std::span<const uint8_t> data) {
   return Struct<T>::Unpack(data);
 }
 
@@ -130,7 +134,7 @@ inline T UnpackStruct(std::span<const uint8_t, Struct<T>::kSize> data) {
  */
 template <StructSerializable T, size_t Offset>
 inline T UnpackStruct(std::span<const uint8_t> data) {
-  return Struct<T>::Unpack(data.template subspan<Offset, Struct<T>::kSize>());
+  return Struct<T>::Unpack(data.subspan(Offset));
 }
 
 /**
@@ -140,9 +144,7 @@ inline T UnpackStruct(std::span<const uint8_t> data) {
  * @param value object
  */
 template <StructSerializable T>
-inline void PackStruct(
-    std::span<uint8_t, Struct<typename std::remove_cvref_t<T>>::kSize> data,
-    T&& value) {
+inline void PackStruct(std::span<uint8_t> data, T&& value) {
   Struct<typename std::remove_cvref_t<T>>::Pack(data, std::forward<T>(value));
 }
 
@@ -156,10 +158,8 @@ inline void PackStruct(
  */
 template <size_t Offset, StructSerializable T>
 inline void PackStruct(std::span<uint8_t> data, T&& value) {
-  Struct<typename std::remove_cvref_t<T>>::Pack(
-      data.template subspan<Offset,
-                            Struct<typename std::remove_cvref_t<T>>::kSize>(),
-      std::forward<T>(value));
+  Struct<typename std::remove_cvref_t<T>>::Pack(data.subspan(Offset),
+                                                std::forward<T>(value));
 }
 
 /**
@@ -169,8 +169,7 @@ inline void PackStruct(std::span<uint8_t> data, T&& value) {
  * @param data raw struct data
  */
 template <StructSerializable T>
-inline void UnpackStructInto(T* out,
-                             std::span<const uint8_t, Struct<T>::kSize> data) {
+inline void UnpackStructInto(T* out, std::span<const uint8_t> data) {
   if constexpr (MutableStructSerializable<T>) {
     Struct<T>::UnpackInto(out, data);
   } else {
@@ -190,8 +189,7 @@ inline void UnpackStructInto(T* out,
 template <size_t Offset, StructSerializable T>
 inline void UnpackStructInto(T* out, std::span<const uint8_t> data) {
   if constexpr (MutableStructSerializable<T>) {
-    Struct<T>::UnpackInto(out,
-                          data.template subspan<Offset, Struct<T>::kSize>());
+    Struct<T>::UnpackInto(out, data.subspan(Offset));
   } else {
     *out = UnpackStruct<T, Offset>(data);
   }
@@ -205,59 +203,86 @@ inline void UnpackStructInto(T* out, std::span<const uint8_t> data) {
  */
 template <StructSerializable T>
 constexpr auto GetStructTypeString() {
-  return Struct<T>::kTypeString;
+  return Struct<T>::GetTypeString();
+}
+
+/**
+ * Get the size for a raw struct serializable type
+ *
+ * @tparam T serializable type
+ * @return size
+ */
+template <StructSerializable T>
+constexpr size_t GetStructSize() {
+  return Struct<T>::GetSize();
 }
 
 template <StructSerializable T, size_t N>
-consteval auto MakeStructArrayTypeString() {
-  using namespace literals;
-  if constexpr (N == std::dynamic_extent) {
-    return Concat(
-        ct_string<char, std::char_traits<char>, Struct<T>::kTypeString.size()>{
-            Struct<T>::kTypeString},
-        "[]"_ct_string);
+constexpr auto MakeStructArrayTypeString() {
+  if constexpr (is_constexpr([] { Struct<T>::GetTypeString(); })) {
+    constexpr auto typeString = Struct<T>::GetTypeString();
+    using namespace literals;
+    if constexpr (N == std::dynamic_extent) {
+      return Concat(
+          ct_string<char, std::char_traits<char>, typeString.size()>{
+              typeString},
+          "[]"_ct_string);
+    } else {
+      return Concat(
+          ct_string<char, std::char_traits<char>, typeString.size()>{
+              typeString},
+          "["_ct_string, NumToCtString<N>(), "]"_ct_string);
+    }
   } else {
-    return Concat(
-        ct_string<char, std::char_traits<char>, Struct<T>::kTypeString.size()>{
-            Struct<T>::kTypeString},
-        "["_ct_string, NumToCtString<N>(), "]"_ct_string);
+    if constexpr (N == std::dynamic_extent) {
+      return fmt::format("{}[]", Struct<T>::GetTypeString());
+    } else {
+      return fmt::format("{}[{}]", Struct<T>::GetTypeString(), N);
+    }
   }
 }
 
 template <StructSerializable T, size_t N>
 consteval auto MakeStructArraySchema() {
-  using namespace literals;
-  if constexpr (N == std::dynamic_extent) {
-    return Concat(
-        ct_string<char, std::char_traits<char>, Struct<T>::kSchema.size()>{
-            Struct<T>::kSchema},
-        "[]"_ct_string);
+  if constexpr (is_constexpr([] { Struct<T>::GetSchema(); })) {
+    constexpr auto schema = Struct<T>::GetSchema();
+    using namespace literals;
+    if constexpr (N == std::dynamic_extent) {
+      return Concat(
+          ct_string<char, std::char_traits<char>, schema.size()>{schema},
+          "[]"_ct_string);
+    } else {
+      return Concat(
+          ct_string<char, std::char_traits<char>, schema.size()>{schema},
+          "["_ct_string, NumToCtString<N>(), "]"_ct_string);
+    }
   } else {
-    return Concat(
-        ct_string<char, std::char_traits<char>, Struct<T>::kSchema.size()>{
-            Struct<T>::kSchema},
-        "["_ct_string, NumToCtString<N>(), "]"_ct_string);
+    if constexpr (N == std::dynamic_extent) {
+      return fmt::format("{}[]", Struct<T>::GetSchema());
+    } else {
+      return fmt::format("{}[{}]", Struct<T>::GetSchema(), N);
+    }
   }
 }
 
 template <StructSerializable T>
 constexpr std::string_view GetStructSchema() {
-  return Struct<T>::kSchema;
+  return Struct<T>::GetSchema();
 }
 
 template <StructSerializable T>
 constexpr std::span<const uint8_t> GetStructSchemaBytes() {
-  return {reinterpret_cast<const uint8_t*>(Struct<T>::kSchema.data()),
-          Struct<T>::kSchema.size()};
+  auto schema = Struct<T>::GetSchema();
+  return {reinterpret_cast<const uint8_t*>(schema.data()), schema.size()};
 }
 
 template <StructSerializable T>
 void ForEachStructSchema(
     std::invocable<std::string_view, std::string_view> auto fn) {
   if constexpr (HasNestedStruct<T>) {
-    Struct<T>::ForEachNested(fn);
+    Struct<typename std::remove_cvref_t<T>>::ForEachNested(fn);
   }
-  fn(Struct<T>::kTypeString, Struct<T>::kSchema);
+  fn(Struct<T>::GetTypeString(), Struct<T>::GetSchema());
 }
 
 template <StructSerializable T>
@@ -282,24 +307,25 @@ class StructArrayBuffer {
 #endif
       std::invocable<F, std::span<const uint8_t>>
     void Write(U&& data, F&& func) {
-    if ((std::size(data) * S::kSize) < 256) {
+    auto size = S::GetSize();
+    if ((std::size(data) * size) < 256) {
       // use the stack
       uint8_t buf[256];
       auto out = buf;
       for (auto&& val : data) {
-        S::Pack(std::span<uint8_t, S::kSize>{out, out + S::kSize},
+        S::Pack(std::span<uint8_t>{std::to_address(out), size},
                 std::forward<decltype(val)>(val));
-        out += S::kSize;
+        out += size;
       }
       func(std::span<uint8_t>{buf, out});
     } else {
       std::scoped_lock lock{m_mutex};
-      m_buf.resize(std::size(data) * S::kSize);
+      m_buf.resize(std::size(data) * size);
       auto out = m_buf.begin();
       for (auto&& val : data) {
-        S::Pack(std::span<uint8_t, S::kSize>{out, out + S::kSize},
+        S::Pack(std::span<uint8_t>{std::to_address(out), size},
                 std::forward<decltype(val)>(val));
-        out += S::kSize;
+        out += size;
       }
       func(m_buf);
     }
@@ -315,36 +341,38 @@ class StructArrayBuffer {
  */
 template <StructSerializable T, size_t N>
 struct Struct<std::array<T, N>> {
-  static constexpr auto kTypeString = MakeStructArrayTypeString<T, N>();
-  static constexpr size_t kSize = N * Struct<T>::kSize;
-  static constexpr auto kSchema = MakeStructArraySchema<T, N>();
-  static std::array<T, N> Unpack(std::span<const uint8_t, kSize> data) {
+  static constexpr auto GetTypeString() {
+    return MakeStructArrayTypeString<T, N>();
+  }
+  static constexpr size_t GetSize() { return N * GetStructSize<T>(); }
+  static constexpr auto GetSchema() { return MakeStructArraySchema<T, N>(); }
+  static std::array<T, N> Unpack(std::span<const uint8_t> data) {
+    auto size = GetStructSize<T>();
     std::array<T, N> result;
     for (size_t i = 0; i < N; ++i) {
       result[i] = UnpackStruct<T, 0>(data);
-      data = data.subspan(Struct<T>::kSize);
+      data = data.subspan(size);
     }
     return result;
   }
-  static void Pack(std::span<uint8_t, kSize> data,
-                   std::span<const T, N> values) {
+  static void Pack(std::span<uint8_t> data, std::span<const T, N> values) {
+    auto size = GetStructSize<T>();
     std::span<uint8_t> unsizedData = data;
     for (auto&& val : values) {
-      PackStruct<0>(unsizedData, val);
-      unsizedData = unsizedData.subspan(Struct<T>::kSize);
+      PackStruct(unsizedData, val);
+      unsizedData = unsizedData.subspan(size);
     }
   }
-  static void UnpackInto(std::array<T, N>* out,
-                         std::span<const uint8_t, kSize> data) {
+  static void UnpackInto(std::array<T, N>* out, std::span<const uint8_t> data) {
     UnpackInto(std::span{*out}, data);
   }
   // alternate span-based function
-  static void UnpackInto(std::span<T, N> out,
-                         std::span<const uint8_t, kSize> data) {
+  static void UnpackInto(std::span<T, N> out, std::span<const uint8_t> data) {
+    auto size = GetStructSize<T>();
     std::span<const uint8_t> unsizedData = data;
     for (size_t i = 0; i < N; ++i) {
-      UnpackStructInto<0, T>(&out[i], unsizedData);
-      unsizedData = unsizedData.subspan(Struct<T>::kSize);
+      UnpackStructInto(&out[i], unsizedData);
+      unsizedData = unsizedData.subspan(size);
     }
   }
 };
@@ -355,11 +383,11 @@ struct Struct<std::array<T, N>> {
  */
 template <>
 struct Struct<bool> {
-  static constexpr std::string_view kTypeString = "struct:bool";
-  static constexpr size_t kSize = 1;
-  static constexpr std::string_view kSchema = "bool value";
-  static bool Unpack(std::span<const uint8_t, 1> data) { return data[0]; }
-  static void Pack(std::span<uint8_t, 1> data, bool value) {
+  static constexpr std::string_view GetTypeString() { return "struct:bool"; }
+  static constexpr size_t GetSize() { return 1; }
+  static constexpr std::string_view GetSchema() { return "bool value"; }
+  static bool Unpack(std::span<const uint8_t> data) { return data[0]; }
+  static void Pack(std::span<uint8_t> data, bool value) {
     data[0] = static_cast<char>(value ? 1 : 0);
   }
 };
@@ -370,13 +398,11 @@ struct Struct<bool> {
  */
 template <>
 struct Struct<uint8_t> {
-  static constexpr std::string_view kTypeString = "struct:uint8";
-  static constexpr size_t kSize = 1;
-  static constexpr std::string_view kSchema = "uint8 value";
-  static uint8_t Unpack(std::span<const uint8_t, 1> data) { return data[0]; }
-  static void Pack(std::span<uint8_t, 1> data, uint8_t value) {
-    data[0] = value;
-  }
+  static constexpr std::string_view GetTypeString() { return "struct:uint8"; }
+  static constexpr size_t GetSize() { return 1; }
+  static constexpr std::string_view GetSchema() { return "uint8 value"; }
+  static uint8_t Unpack(std::span<const uint8_t> data) { return data[0]; }
+  static void Pack(std::span<uint8_t> data, uint8_t value) { data[0] = value; }
 };
 
 /**
@@ -385,9 +411,9 @@ struct Struct<uint8_t> {
  */
 template <>
 struct Struct<int8_t> {
-  static constexpr std::string_view kTypeString = "struct:int8";
-  static constexpr size_t kSize = 1;
-  static constexpr std::string_view kSchema = "int8 value";
+  static constexpr std::string_view GetTypeString() { return "struct:int8"; }
+  static constexpr size_t GetSize() { return 1; }
+  static constexpr std::string_view GetSchema() { return "int8 value"; }
   static int8_t Unpack(std::span<const uint8_t, 1> data) { return data[0]; }
   static void Pack(std::span<uint8_t, 1> data, int8_t value) {
     data[0] = value;
@@ -400,13 +426,13 @@ struct Struct<int8_t> {
  */
 template <>
 struct Struct<uint16_t> {
-  static constexpr std::string_view kTypeString = "struct:uint16";
-  static constexpr size_t kSize = 2;
-  static constexpr std::string_view kSchema = "uint16 value";
-  static uint16_t Unpack(std::span<const uint8_t, 2> data) {
+  static constexpr std::string_view GetTypeString() { return "struct:uint16"; }
+  static constexpr size_t GetSize() { return 2; }
+  static constexpr std::string_view GetSchema() { return "uint16 value"; }
+  static uint16_t Unpack(std::span<const uint8_t> data) {
     return support::endian::read16le(data.data());
   }
-  static void Pack(std::span<uint8_t, 2> data, uint16_t value) {
+  static void Pack(std::span<uint8_t> data, uint16_t value) {
     support::endian::write16le(data.data(), value);
   }
 };
@@ -417,13 +443,13 @@ struct Struct<uint16_t> {
  */
 template <>
 struct Struct<int16_t> {
-  static constexpr std::string_view kTypeString = "struct:int16";
-  static constexpr size_t kSize = 2;
-  static constexpr std::string_view kSchema = "int16 value";
-  static int16_t Unpack(std::span<const uint8_t, 2> data) {
+  static constexpr std::string_view GetTypeString() { return "struct:int16"; }
+  static constexpr size_t GetSize() { return 2; }
+  static constexpr std::string_view GetSchema() { return "int16 value"; }
+  static int16_t Unpack(std::span<const uint8_t> data) {
     return support::endian::read16le(data.data());
   }
-  static void Pack(std::span<uint8_t, 2> data, int16_t value) {
+  static void Pack(std::span<uint8_t> data, int16_t value) {
     support::endian::write16le(data.data(), value);
   }
 };
@@ -434,13 +460,13 @@ struct Struct<int16_t> {
  */
 template <>
 struct Struct<uint32_t> {
-  static constexpr std::string_view kTypeString = "struct:uint32";
-  static constexpr size_t kSize = 4;
-  static constexpr std::string_view kSchema = "uint32 value";
-  static uint32_t Unpack(std::span<const uint8_t, 4> data) {
+  static constexpr std::string_view GetTypeString() { return "struct:uint32"; }
+  static constexpr size_t GetSize() { return 4; }
+  static constexpr std::string_view GetSchema() { return "uint32 value"; }
+  static uint32_t Unpack(std::span<const uint8_t> data) {
     return support::endian::read32le(data.data());
   }
-  static void Pack(std::span<uint8_t, 4> data, uint32_t value) {
+  static void Pack(std::span<uint8_t> data, uint32_t value) {
     support::endian::write32le(data.data(), value);
   }
 };
@@ -451,13 +477,13 @@ struct Struct<uint32_t> {
  */
 template <>
 struct Struct<int32_t> {
-  static constexpr std::string_view kTypeString = "struct:int32";
-  static constexpr size_t kSize = 4;
-  static constexpr std::string_view kSchema = "int32 value";
-  static int32_t Unpack(std::span<const uint8_t, 4> data) {
+  static constexpr std::string_view GetTypeString() { return "struct:int32"; }
+  static constexpr size_t GetSize() { return 4; }
+  static constexpr std::string_view GetSchema() { return "int32 value"; }
+  static int32_t Unpack(std::span<const uint8_t> data) {
     return support::endian::read32le(data.data());
   }
-  static void Pack(std::span<uint8_t, 4> data, int32_t value) {
+  static void Pack(std::span<uint8_t> data, int32_t value) {
     support::endian::write32le(data.data(), value);
   }
 };
@@ -468,13 +494,13 @@ struct Struct<int32_t> {
  */
 template <>
 struct Struct<uint64_t> {
-  static constexpr std::string_view kTypeString = "struct:uint64";
-  static constexpr size_t kSize = 8;
-  static constexpr std::string_view kSchema = "uint64 value";
-  static uint64_t Unpack(std::span<const uint8_t, 8> data) {
+  static constexpr std::string_view GetTypeString() { return "struct:uint64"; }
+  static constexpr size_t GetSize() { return 8; }
+  static constexpr std::string_view GetSchema() { return "uint64 value"; }
+  static uint64_t Unpack(std::span<const uint8_t> data) {
     return support::endian::read64le(data.data());
   }
-  static void Pack(std::span<uint8_t, 8> data, uint64_t value) {
+  static void Pack(std::span<uint8_t> data, uint64_t value) {
     support::endian::write64le(data.data(), value);
   }
 };
@@ -485,13 +511,13 @@ struct Struct<uint64_t> {
  */
 template <>
 struct Struct<int64_t> {
-  static constexpr std::string_view kTypeString = "struct:int64";
-  static constexpr size_t kSize = 8;
-  static constexpr std::string_view kSchema = "int64 value";
-  static int64_t Unpack(std::span<const uint8_t, 8> data) {
+  static constexpr std::string_view GetTypeString() { return "struct:int64"; }
+  static constexpr size_t GetSize() { return 8; }
+  static constexpr std::string_view GetSchema() { return "int64 value"; }
+  static int64_t Unpack(std::span<const uint8_t> data) {
     return support::endian::read64le(data.data());
   }
-  static void Pack(std::span<uint8_t, 8> data, int64_t value) {
+  static void Pack(std::span<uint8_t> data, int64_t value) {
     support::endian::write64le(data.data(), value);
   }
 };
@@ -502,13 +528,13 @@ struct Struct<int64_t> {
  */
 template <>
 struct Struct<float> {
-  static constexpr std::string_view kTypeString = "struct:float";
-  static constexpr size_t kSize = 4;
-  static constexpr std::string_view kSchema = "float value";
-  static float Unpack(std::span<const uint8_t, 4> data) {
+  static constexpr std::string_view GetTypeString() { return "struct:float"; }
+  static constexpr size_t GetSize() { return 4; }
+  static constexpr std::string_view GetSchema() { return "float value"; }
+  static float Unpack(std::span<const uint8_t> data) {
     return bit_cast<float>(support::endian::read32le(data.data()));
   }
-  static void Pack(std::span<uint8_t, 4> data, float value) {
+  static void Pack(std::span<uint8_t> data, float value) {
     support::endian::write32le(data.data(), bit_cast<uint32_t>(value));
   }
 };
@@ -519,13 +545,13 @@ struct Struct<float> {
  */
 template <>
 struct Struct<double> {
-  static constexpr std::string_view kTypeString = "struct:double";
-  static constexpr size_t kSize = 8;
-  static constexpr std::string_view kSchema = "double value";
-  static double Unpack(std::span<const uint8_t, 8> data) {
+  static constexpr std::string_view GetTypeString() { return "struct:double"; }
+  static constexpr size_t GetSize() { return 8; }
+  static constexpr std::string_view GetSchema() { return "double value"; }
+  static double Unpack(std::span<const uint8_t> data) {
     return bit_cast<double>(support::endian::read64le(data.data()));
   }
-  static void Pack(std::span<uint8_t, 8> data, double value) {
+  static void Pack(std::span<uint8_t> data, double value) {
     support::endian::write64le(data.data(), bit_cast<uint64_t>(value));
   }
 };

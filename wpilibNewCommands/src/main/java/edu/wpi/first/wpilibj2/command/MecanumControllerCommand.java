@@ -86,6 +86,7 @@ public class MecanumControllerCommand extends Command {
    *     voltages.
    * @param requirements The subsystems to require.
    */
+  @SuppressWarnings("this-escape")
   public MecanumControllerCommand(
       Trajectory trajectory,
       Supplier<Pose2d> pose,
@@ -229,6 +230,7 @@ public class MecanumControllerCommand extends Command {
    * @param outputWheelSpeeds A MecanumDriveWheelSpeeds object containing the output wheel speeds.
    * @param requirements The subsystems to require.
    */
+  @SuppressWarnings("this-escape")
   public MecanumControllerCommand(
       Trajectory trajectory,
       Supplier<Pose2d> pose,

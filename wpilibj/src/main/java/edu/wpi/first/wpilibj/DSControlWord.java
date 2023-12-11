@@ -20,7 +20,7 @@ public class DSControlWord {
   }
 
   /** Update internal Driver Station control word. */
-  public void refresh() {
+  public final void refresh() {
     DriverStation.refreshControlWordFromCache(m_controlWord);
   }
 

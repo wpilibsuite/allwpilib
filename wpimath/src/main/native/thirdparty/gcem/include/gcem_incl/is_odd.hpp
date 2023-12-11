@@ -25,6 +25,9 @@
 #ifndef _gcem_is_odd_HPP
 #define _gcem_is_odd_HPP
 
+namespace gcem
+{
+
 namespace internal
 {
 
@@ -35,6 +38,8 @@ noexcept
 {
     // return( x % llint_t(2) == llint_t(0) ? false : true );
     return (x & 1U) != 0;
+}
+
 }
 
 }

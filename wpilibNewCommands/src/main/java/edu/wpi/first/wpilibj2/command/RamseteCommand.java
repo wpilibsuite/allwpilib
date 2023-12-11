@@ -70,6 +70,7 @@ public class RamseteCommand extends Command {
    *     the robot drive.
    * @param requirements The subsystems to require.
    */
+  @SuppressWarnings("this-escape")
   public RamseteCommand(
       Trajectory trajectory,
       Supplier<Pose2d> pose,
@@ -109,6 +110,7 @@ public class RamseteCommand extends Command {
    * @param outputMetersPerSecond A function that consumes the computed left and right wheel speeds.
    * @param requirements The subsystems to require.
    */
+  @SuppressWarnings("this-escape")
   public RamseteCommand(
       Trajectory trajectory,
       Supplier<Pose2d> pose,

@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <wpi/RawFrame.h>
 #include <wpi/SymbolExports.h>
 #include <wpi/json_fwd.h>
 
@@ -20,6 +21,9 @@ struct WPILIB_DLLEXPORT AprilTag {
    * Checks equality between this AprilTag and another object.
    */
   bool operator==(const AprilTag&) const = default;
+
+  static wpi::RawFrame Generate36h11AprilTagImage(int id);
+  static wpi::RawFrame Generate16h5AprilTagImage(int id);
 };
 
 WPILIB_DLLEXPORT

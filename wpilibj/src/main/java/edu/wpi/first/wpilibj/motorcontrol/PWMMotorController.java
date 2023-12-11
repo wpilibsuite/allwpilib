@@ -23,6 +23,7 @@ public abstract class PWMMotorController extends MotorSafety
    * @param channel The PWM channel that the controller is attached to. 0-9 are on-board, 10-19 are
    *     on the MXP port
    */
+  @SuppressWarnings("this-escape")
   protected PWMMotorController(final String name, final int channel) {
     m_pwm = new PWM(channel, false);
     SendableRegistry.addLW(this, name, channel);
