@@ -242,15 +242,15 @@ public interface SendableBuilder extends AutoCloseable {
    * via a method reference to a SendableBuilder instance in a Sendable implementation's {@code
    * initSendable} method in conjunction with {@link #caching the builder's caching function}.
    *
-   * <p>
+   * <p>For example:
    *
    * <pre>
    *  {@literal @}Override
    *   public void initSendable(SendableBuilder builder) {
    *     builder.caching(
    *       "Things",
-   *       () -> m_things.hashCode(),
-   *       () -> m_things.stream().map(Thing::getName).toArray(String[]::new),
+   *       () -&gt; m_things.hashCode(),
+   *       () -&gt; m_things.stream().map(Thing::getName).toArray(String[]::new),
    *       null,
    *       builder::addStringArrayProperty
    *     );
@@ -277,7 +277,7 @@ public interface SendableBuilder extends AutoCloseable {
    * properties when it is possible to know ahead of time if the property value will change. This
    * function can only be applied to string and array-type properties.
    *
-   * <p>
+   * <p>For example:
    *
    * <pre>
    *   private List&lt;Thing&gt; m_list;
@@ -287,7 +287,7 @@ public interface SendableBuilder extends AutoCloseable {
    *     builder.caching(
    *       "Thing Names",
    *       m_list::hashCode,
-   *       () -> m_list.stream().map(Thing::getName).toArray(String[]::new),
+   *       () -&gt; m_list.stream().map(Thing::getName).toArray(String[]::new),
    *       null,
    *       builder::addStringArrayProperty
    *     )

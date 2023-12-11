@@ -116,18 +116,18 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     void publish(long time) {
       int hash = m_hashFunction.getAsInt();
 
-      if (hash != m_previousHash || !m_cached) {
+      if (m_firstRun || hash != m_previousHash) {
         // Cache is dirty, update the wrapped property and reset the saved previous hash
         m_property.publish(time);
         m_previousHash = hash;
-        m_cached = true;
+        m_firstRun = false;
       }
     }
 
     final Property<P, S> m_property;
     final IntSupplier m_hashFunction;
     int m_previousHash;
-    boolean m_cached = false;
+    boolean m_firstRun = true;
   }
 
   private final List<Property<?, ?>> m_properties = new ArrayList<>();
