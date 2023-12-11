@@ -68,8 +68,7 @@ enum NT_Type {
 enum NT_EntryFlags {
   NT_PERSISTENT = 0x01,
   NT_RETAINED = 0x02,
-  NT_CACHED = 0x04,
-  NT_DEFAULTFLAGS = NT_CACHED
+  NT_UNCACHED = 0x04
 };
 
 /** NetworkTables logging levels. */

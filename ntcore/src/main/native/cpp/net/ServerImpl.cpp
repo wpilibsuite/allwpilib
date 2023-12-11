@@ -1150,16 +1150,16 @@ bool ServerImpl::TopicData::SetFlags(unsigned int flags_) {
     retained = false;
     properties.erase("retained");
   }
-  if ((flags_ & NT_CACHED) != 0) {
-    updated |= !cached;
-    cached = true;
-    properties.erase("cached");
-  } else {
+  if ((flags_ & NT_UNCACHED) != 0) {
     updated |= cached;
     cached = false;
     properties["cached"] = false;
     lastValue = {};
     lastValueClient = nullptr;
+  } else {
+    updated |= !cached;
+    cached = true;
+    properties.erase("cached");
   }
   if (!cached && persistent) {
     WARN("topic {}: disabling cached property disables persistent storage",

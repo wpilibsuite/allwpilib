@@ -146,7 +146,7 @@ class LocalStorage final : public net::ILocalStorage {
   bool GetTopicCached(NT_Topic topicHandle) {
     std::scoped_lock lock{m_mutex};
     if (auto topic = m_impl.m_topics.Get(topicHandle)) {
-      return (topic->flags & NT_CACHED) != 0;
+      return (topic->flags & NT_UNCACHED) == 0;
     } else {
       return false;
     }
@@ -377,7 +377,7 @@ class LocalStorage final : public net::ILocalStorage {
 
     bool Exists() const { return onNetwork || !localPublishers.empty(); }
 
-    bool IsCached() const { return (flags & NT_CACHED) != 0; }
+    bool IsCached() const { return (flags & NT_UNCACHED) == 0; }
 
     TopicInfo GetTopicInfo() const;
 
@@ -390,7 +390,7 @@ class LocalStorage final : public net::ILocalStorage {
     Value lastValueNetwork;
     NT_Type type{NT_UNASSIGNED};
     std::string typeStr;
-    unsigned int flags{NT_DEFAULTFLAGS};  // for NT3 APIs
+    unsigned int flags{0};            // for NT3 APIs
     std::string propertiesStr{"{}"};  // cached string for GetTopicInfo() et al
     wpi::json properties = wpi::json::object();
     NT_Entry entry{0};  // cached entry for GetEntry()

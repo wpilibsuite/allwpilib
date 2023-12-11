@@ -169,7 +169,7 @@ void LocalStorage::Impl::CheckReset(TopicData* topic) {
   topic->lastValueFromNetwork = false;
   topic->type = NT_UNASSIGNED;
   topic->typeStr.clear();
-  topic->flags = NT_DEFAULTFLAGS;
+  topic->flags = 0;
   topic->properties = wpi::json::object();
   topic->propertiesStr = "{}";
 }
@@ -253,19 +253,19 @@ void LocalStorage::Impl::SetFlags(TopicData* topic, unsigned int flags) {
     topic->properties.erase("retained");
     update["retained"] = wpi::json();
   }
-  if ((flags & NT_CACHED) != 0) {
-    topic->properties.erase("cached");
-    update["cached"] = wpi::json();
-  } else {
+  if ((flags & NT_UNCACHED) != 0) {
     topic->properties["cached"] = false;
     update["cached"] = false;
+  } else {
+    topic->properties.erase("cached");
+    update["cached"] = wpi::json();
   }
-  if ((flags & NT_CACHED) == 0) {
+  if ((flags & NT_UNCACHED) != 0) {
     topic->lastValue = {};
     topic->lastValueNetwork = {};
     topic->lastValueFromNetwork = false;
   }
-  if ((flags & NT_CACHED) == 0 && (flags & NT_PERSISTENT) != 0) {
+  if ((flags & NT_UNCACHED) != 0 && (flags & NT_PERSISTENT) != 0) {
     WARN("topic {}: disabling cached property disables persistent storage",
          topic->name);
   }
@@ -306,11 +306,11 @@ void LocalStorage::Impl::SetRetained(TopicData* topic, bool value) {
 void LocalStorage::Impl::SetCached(TopicData* topic, bool value) {
   wpi::json update = wpi::json::object();
   if (value) {
-    topic->flags |= NT_CACHED;
+    topic->flags &= ~NT_UNCACHED;
     topic->properties.erase("cached");
     update["cached"] = wpi::json();
   } else {
-    topic->flags &= ~NT_CACHED;
+    topic->flags |= NT_UNCACHED;
     topic->properties["cached"] = false;
     update["cached"] = false;
   }
@@ -366,20 +366,20 @@ void LocalStorage::Impl::PropertiesUpdated(TopicData* topic,
     if (it != topic->properties.end()) {
       if (auto val = it->get_ptr<bool*>()) {
         if (*val) {
-          topic->flags |= NT_CACHED;
+          topic->flags &= ~NT_UNCACHED;
         } else {
-          topic->flags &= ~NT_CACHED;
+          topic->flags |= NT_UNCACHED;
         }
       }
     }
 
-    if ((topic->flags & NT_CACHED) == 0) {
+    if ((topic->flags & NT_UNCACHED) != 0) {
       topic->lastValue = {};
       topic->lastValueNetwork = {};
       topic->lastValueFromNetwork = false;
     }
 
-    if ((topic->flags & NT_CACHED) == 0 &&
+    if ((topic->flags & NT_UNCACHED) != 0 &&
         (topic->flags & NT_PERSISTENT) != 0) {
       WARN("topic {}: disabling cached property disables persistent storage",
            topic->name);
