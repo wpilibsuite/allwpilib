@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj.smartdashboard;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
 import java.util.concurrent.atomic.AtomicInteger;
