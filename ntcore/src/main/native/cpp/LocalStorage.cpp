@@ -178,7 +178,7 @@ bool LocalStorage::Impl::SetValue(TopicData* topic, const Value& value,
                                   unsigned int eventFlags,
                                   bool suppressIfDuplicate,
                                   const PublisherData* publisher) {
-  const bool isDuplicate = topic->Cached() && topic->lastValue == value;
+  const bool isDuplicate = topic->IsCached() && topic->lastValue == value;
   DEBUG4("SetValue({}, {}, {}, {})", topic->name, value.time(), eventFlags,
          isDuplicate);
   if (topic->type != NT_UNASSIGNED && topic->type != value.type()) {
@@ -190,7 +190,7 @@ bool LocalStorage::Impl::SetValue(TopicData* topic, const Value& value,
     // TODO: notify option even if older value
     if (!(suppressIfDuplicate && isDuplicate)) {
       topic->type = value.type();
-      if (topic->Cached()) {
+      if (topic->IsCached()) {
         topic->lastValue = value;
         topic->lastValueFromNetwork = false;
       }
@@ -957,11 +957,11 @@ bool LocalStorage::Impl::PublishLocalValue(PublisherData* publisher,
       isNetworkDuplicate = false;
     } else {
       suppressDuplicates = true;
-      isNetworkDuplicate = publisher->topic->Cached() &&
+      isNetworkDuplicate = publisher->topic->IsCached() &&
                            (publisher->topic->lastValueNetwork == value);
     }
     if (!isNetworkDuplicate && m_network) {
-      if (publisher->topic->Cached()) {
+      if (publisher->topic->IsCached()) {
         publisher->topic->lastValueNetwork = value;
       }
       m_network->SetValue(publisher->handle, value);
@@ -998,7 +998,7 @@ bool LocalStorage::Impl::SetDefaultEntryValue(NT_Handle pubsubentryHandle,
     return false;
   }
   if (auto topic = GetTopic(pubsubentryHandle)) {
-    if (!topic->Cached()) {
+    if (!topic->IsCached()) {
       WARN("ignoring default value on non-cached topic '{}'", topic->name);
       return false;
     }
@@ -1089,7 +1089,7 @@ void LocalStorage::NetworkSetValue(NT_Topic topicHandle, const Value& value) {
   std::scoped_lock lock{m_mutex};
   if (auto topic = m_impl.m_topics.Get(topicHandle)) {
     if (m_impl.SetValue(topic, value, NT_EVENT_VALUE_REMOTE, false, nullptr)) {
-      if (topic->Cached()) {
+      if (topic->IsCached()) {
         topic->lastValueNetwork = value;
         topic->lastValueFromNetwork = true;
       }

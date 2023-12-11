@@ -377,7 +377,7 @@ class LocalStorage final : public net::ILocalStorage {
 
     bool Exists() const { return onNetwork || !localPublishers.empty(); }
 
-    bool Cached() const { return (flags & NT_CACHED) != 0; }
+    bool IsCached() const { return (flags & NT_CACHED) != 0; }
 
     TopicInfo GetTopicInfo() const;
 
