@@ -98,11 +98,15 @@ class ServerImpl final {
   struct SubscriberData;
 
   struct TopicData {
-    TopicData(std::string_view name, std::string_view typeStr)
-        : name{name}, typeStr{typeStr} {}
-    TopicData(std::string_view name, std::string_view typeStr,
-              wpi::json properties)
-        : name{name}, typeStr{typeStr}, properties(std::move(properties)) {
+    TopicData(wpi::Logger& logger, std::string_view name,
+              std::string_view typeStr)
+        : m_logger{logger}, name{name}, typeStr{typeStr} {}
+    TopicData(wpi::Logger& logger, std::string_view name,
+              std::string_view typeStr, wpi::json properties)
+        : m_logger{logger},
+          name{name},
+          typeStr{typeStr},
+          properties(std::move(properties)) {
       RefreshProperties();
     }
 
@@ -117,6 +121,7 @@ class ServerImpl final {
 
     NT_Handle GetIdHandle() const { return Handle(0, id, Handle::kTopic); }
 
+    wpi::Logger& m_logger;  // Must be m_logger for WARN macro to work
     std::string name;
     unsigned int id;
     Value lastValue;
@@ -126,6 +131,7 @@ class ServerImpl final {
     unsigned int publisherCount{0};
     bool persistent{false};
     bool retained{false};
+    bool cached{true};
     bool special{false};
     NT_Topic localHandle{0};
 
