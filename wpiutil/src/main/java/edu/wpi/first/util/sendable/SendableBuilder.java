@@ -11,6 +11,7 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
+import java.util.function.IntSupplier;
 import java.util.function.LongConsumer;
 import java.util.function.LongSupplier;
 import java.util.function.Supplier;
@@ -235,6 +236,78 @@ public interface SendableBuilder extends AutoCloseable {
    * @param value the value
    */
   void publishConstRaw(String key, String typeString, byte[] value);
+
+  /**
+   * Functional interface for adding a generic object-based property. This is expected to be used
+   * via a method reference to a SendableBuilder instance in a Sendable implementation's {@code
+   * initSendable} method in conjunction with {@link #caching the builder's caching function}.
+   *
+   * <p>
+   *
+   * <pre>
+   *  {@literal @}Override
+   *   public void initSendable(SendableBuilder builder) {
+   *     builder.caching(
+   *       "Things",
+   *       () -> m_things.hashCode(),
+   *       () -> m_things.stream().map(Thing::getName).toArray(String[]::new),
+   *       null,
+   *       builder::addStringArrayProperty
+   *     );
+   *   }
+   * </pre>
+   *
+   * @param <T> the type of the values in the property
+   */
+  @FunctionalInterface
+  interface PropertyFn<T> {
+    /**
+     * Adds a property.
+     *
+     * @param key property name
+     * @param getter getter function (returns current value)
+     * @param setter setter function (sets new value)
+     */
+    void addProperty(String key, Supplier<T> getter, Consumer<T> setter);
+  }
+
+  /**
+   * Wraps a property with a caching function. Values will be read from a cache, which will only be
+   * updated when the cache key changes. This is useful for avoiding expensive recomputation of
+   * properties when it is possible to know ahead of time if the property value will change. This
+   * function can only be applied to string and array-type properties.
+   *
+   * <p>
+   *
+   * <pre>
+   *   private List&lt;Thing&gt; m_list;
+   *
+   *  {@literal @}Override
+   *   public void initSendable(SendableBuilder builder) {
+   *     builder.caching(
+   *       "Thing Names",
+   *       m_list::hashCode,
+   *       () -> m_list.stream().map(Thing::getName).toArray(String[]::new),
+   *       null,
+   *       builder::addStringArrayProperty
+   *     )
+   *   }
+   * </pre>
+   *
+   * @param key property name
+   * @param hashFunction the hash function to use to determine when the cache needs to be updated
+   * @param getter getter function (returns current value). Only called when the cache is updated
+   * @param setter setter function (sets new value). Unaffected by caching, and will be called as
+   *     normal
+   * @param property the builder property function to wrap
+   * @param <T> the type of the values of the property
+   */
+  <T> void caching(
+      String key,
+      IntSupplier hashFunction,
+      Supplier<T> getter,
+      Consumer<T> setter,
+      PropertyFn<T> property);
 
   /**
    * Gets the kind of backend being used.

@@ -53,6 +53,7 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
+import java.util.function.IntSupplier;
 import java.util.function.LongConsumer;
 import java.util.function.LongSupplier;
 import java.util.function.Supplier;
@@ -82,9 +83,17 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     }
 
     void update(boolean controllable, long time) {
+      consume(controllable);
+      publish(time);
+    }
+
+    void consume(boolean controllable) {
       if (controllable && m_sub != null && m_updateLocal != null) {
         m_updateLocal.accept(m_sub);
       }
+    }
+
+    void publish(long time) {
       if (m_pub != null && m_updateNetwork != null) {
         m_updateNetwork.accept(m_pub, time);
       }
@@ -94,6 +103,31 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     S m_sub;
     TimedConsumer<P> m_updateNetwork;
     Consumer<S> m_updateLocal;
+  }
+
+  private static class CachableProperty<P extends Publisher, S extends Subscriber>
+      extends Property<P, S> {
+    CachableProperty(Property<P, S> property, IntSupplier hashFunction) {
+      m_property = property;
+      m_hashFunction = hashFunction;
+    }
+
+    @Override
+    void publish(long time) {
+      int hash = m_hashFunction.getAsInt();
+
+      if (hash != m_previousHash || !m_cached) {
+        // Cache is dirty, update the wrapped property and reset the saved previous hash
+        m_property.publish(time);
+        m_previousHash = hash;
+        m_cached = true;
+      }
+    }
+
+    final Property<P, S> m_property;
+    final IntSupplier m_hashFunction;
+    int m_previousHash;
+    boolean m_cached = false;
   }
 
   private final List<Property<?, ?>> m_properties = new ArrayList<>();
@@ -709,5 +743,22 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     property.m_pub = topic.publish(typestring);
     property.m_pub.set(value);
     m_properties.add(property);
+  }
+
+  @Override
+  public <T> void caching(
+      String key,
+      IntSupplier hashFunction,
+      Supplier<T> getter,
+      Consumer<T> setter,
+      PropertyFn<T> property) {
+    property.addProperty(key, getter, setter);
+
+    // Remove the property added above, wrap it, and add the wrapper in its place
+    var originalProperty = m_properties.get(m_properties.size() - 1);
+    var cachedProperty = new CachableProperty<>(originalProperty, hashFunction);
+
+    m_properties.remove(originalProperty);
+    m_properties.add(cachedProperty);
   }
 }
