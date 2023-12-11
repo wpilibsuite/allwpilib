@@ -140,5 +140,47 @@ public class ParallelDeadlineGroup extends Command {
     super.initSendable(builder);
 
     builder.addStringProperty("deadline", m_deadline::getName, null);
+
+    // NOTE: this is an identical implementation to ParallelCommandGroup. DRY this up!
+    builder.caching(
+        "Commands",
+        m_commands::hashCode,
+        () -> {
+          var names = new String[m_commands.size()];
+          int i = 0;
+          for (var command : m_commands.keySet()) {
+            names[i] = command.getName();
+            i++;
+          }
+          return names;
+        },
+        null,
+        builder::addStringArrayProperty);
+
+    builder.caching(
+        "Running Commands",
+        m_commands::hashCode,
+        () -> {
+          // Initial array sized for the maximum capacity. If any command has finished,
+          // then there will be a null value for that index.
+          var tmp = new String[m_commands.size()];
+          int i = 0;
+          for (var entry : m_commands.entrySet()) {
+            if (entry.getValue()) {
+              tmp[i] = entry.getKey().getName();
+              i++;
+            }
+          }
+          if (tmp.length == i) {
+            return tmp;
+          } else {
+            // To avoid null values in the output, copy to a new, correctly-sized array
+            var names = new String[i];
+            System.arraycopy(tmp, 0, names, 0, i);
+            return names;
+          }
+        },
+        null,
+        builder::addStringArrayProperty);
   }
 }
