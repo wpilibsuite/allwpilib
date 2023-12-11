@@ -47,7 +47,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
    * @param measurementStdDevs The standard deviations of the measurements.
    * @return An ElevatorSim representing the given characterized constants.
    */
-public static ElevatorSim create(
+  public static ElevatorSim create(
       LinearSystem<N2, N1, N1> plant,
       double kG,
       DCMotor gearbox,
