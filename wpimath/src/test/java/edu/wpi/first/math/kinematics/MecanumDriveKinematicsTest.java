@@ -244,7 +244,7 @@ class MecanumDriveKinematicsTest {
     var wheelSpeeds = new MecanumDriveWheelSpeeds(-5, 6, 4, -7);
     wheelSpeeds.desaturate(5.5);
 
-    double factor = 5.5 / 7.0;
+    final double kFactor = 5.5 / 7.0;
 
     assertAll(
         () -> assertEquals(-5.0 * factor, wheelSpeeds.frontLeftMetersPerSecond, kEpsilon),
