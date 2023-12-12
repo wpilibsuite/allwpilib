@@ -238,6 +238,7 @@ class MecanumDriveKinematicsTest {
         () -> assertEquals(4.0 * factor, wheelSpeeds.rearLeftMetersPerSecond, kEpsilon),
         () -> assertEquals(7.0 * factor, wheelSpeeds.rearRightMetersPerSecond, kEpsilon));
   }
+
   @Test
   void testDesaturateNegativeSpeeds() {
     var wheelSpeeds = new MecanumDriveWheelSpeeds(-5, 6, 4, -7);

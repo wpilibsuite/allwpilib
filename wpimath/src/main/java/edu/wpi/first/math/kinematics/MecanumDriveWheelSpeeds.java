@@ -11,7 +11,6 @@ import edu.wpi.first.math.kinematics.struct.MecanumDriveWheelSpeedsStruct;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
-import java.util.stream.DoubleStream;
 
 public class MecanumDriveWheelSpeeds {
   /** Speed of the front left wheel. */
@@ -82,7 +81,8 @@ public class MecanumDriveWheelSpeeds {
    * @param attainableMaxSpeedMetersPerSecond The absolute max speed that a wheel can reach.
    */
   public void desaturate(double attainableMaxSpeedMetersPerSecond) {
-    double realMaxSpeed = Math.max(Math.abs(frontLeftMetersPerSecond), Math.abs(frontRightMetersPerSecond));
+    double realMaxSpeed =
+        Math.max(Math.abs(frontLeftMetersPerSecond), Math.abs(frontRightMetersPerSecond));
     realMaxSpeed = Math.max(realMaxSpeed, Math.abs(rearLeftMetersPerSecond));
     realMaxSpeed = Math.max(realMaxSpeed, Math.abs(rearRightMetersPerSecond));
 
