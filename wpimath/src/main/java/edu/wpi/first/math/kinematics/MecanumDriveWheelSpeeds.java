@@ -82,14 +82,9 @@ public class MecanumDriveWheelSpeeds {
    * @param attainableMaxSpeedMetersPerSecond The absolute max speed that a wheel can reach.
    */
   public void desaturate(double attainableMaxSpeedMetersPerSecond) {
-    double realMaxSpeed =
-        DoubleStream.of(
-                frontLeftMetersPerSecond,
-                frontRightMetersPerSecond,
-                rearLeftMetersPerSecond,
-                rearRightMetersPerSecond)
-            .max()
-            .getAsDouble();
+    double realMaxSpeed = Math.max(Math.abs(frontLeftMetersPerSecond), Math.abs(frontRightMetersPerSecond));
+    realMaxSpeed = Math.max(realMaxSpeed, Math.abs(rearLeftMetersPerSecond));
+    realMaxSpeed = Math.max(realMaxSpeed, Math.abs(rearRightMetersPerSecond));
 
     if (realMaxSpeed > attainableMaxSpeedMetersPerSecond) {
       frontLeftMetersPerSecond =
