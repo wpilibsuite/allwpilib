@@ -85,27 +85,6 @@ CommandPtr RunEnd(std::function<void()> run, std::function<void()> end,
                   Requirements requirements = {});
 
 /**
- * Constructs a command that runs an action every iteration based on elapsed
- * time until interrupted.
- *
- * @param action the action to run based on elapsed time
- * @param requirements subsystems the action requires
- */
-[[nodiscard]] CommandPtr RunTimed(
-    std::function<void(units::second_t)> toRun,
-    std::initializer_list<Subsystem*> requirements);
-
-/**
- * Constructs a command that runs an action every iteration based on elapsed
- * time until interrupted.
- *
- * @param action the action to run based on elapsed time
- * @param requirements subsystems the action requires
- */
-[[nodiscard]] CommandPtr RunTimed(std::function<void(units::second_t)> toRun,
-                                  std::span<Subsystem* const> requirements);
-
-/**
  * Constructs a command that prints a message and finishes.
  *
  * @param msg the message to print
