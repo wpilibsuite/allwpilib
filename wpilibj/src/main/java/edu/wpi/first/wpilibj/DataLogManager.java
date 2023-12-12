@@ -233,7 +233,11 @@ public final class DataLogManager {
       }
       return "/home/lvuser/logs";
     }
-    return Filesystem.getOperatingDirectory().getAbsolutePath();
+    String logDir = Filesystem.getOperatingDirectory().getAbsolutePath() + "/logs";
+    if (!new File(logDir).mkdir()) {
+      // ignored
+    }
+    return logDir;
   }
 
   private static String makeLogFilename(String filenameOverride) {
