@@ -247,9 +247,9 @@ class MecanumDriveKinematicsTest {
     final double kFactor = 5.5 / 7.0;
 
     assertAll(
-        () -> assertEquals(-5.0 * factor, wheelSpeeds.frontLeftMetersPerSecond, kEpsilon),
-        () -> assertEquals(6.0 * factor, wheelSpeeds.frontRightMetersPerSecond, kEpsilon),
-        () -> assertEquals(4.0 * factor, wheelSpeeds.rearLeftMetersPerSecond, kEpsilon),
-        () -> assertEquals(-7.0 * factor, wheelSpeeds.rearRightMetersPerSecond, kEpsilon));
+        () -> assertEquals(-5.0 * kFactor, wheelSpeeds.frontLeftMetersPerSecond, kEpsilon),
+        () -> assertEquals(6.0 * kFactor, wheelSpeeds.frontRightMetersPerSecond, kEpsilon),
+        () -> assertEquals(4.0 * kFactor, wheelSpeeds.rearLeftMetersPerSecond, kEpsilon),
+        () -> assertEquals(-7.0 * kFactor, wheelSpeeds.rearRightMetersPerSecond, kEpsilon));
   }
 }
