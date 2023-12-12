@@ -20,7 +20,7 @@ import java.util.function.Supplier;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-@Deprecated
+@Deprecated(since = "2024", forRemoval = true)
 public class ProfiledPIDCommand extends Command {
   protected final ProfiledPIDController m_controller;
   protected DoubleSupplier m_measurement;
@@ -36,10 +36,7 @@ public class ProfiledPIDCommand extends Command {
    * @param goalSource the controller's goal
    * @param useOutput the controller's output
    * @param requirements the subsystems required by this command
-   * @deprecated this class is cumbersome and unreadable without providing substantial benefit, see
-   *     instead <a href=
-   *     "https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#capturing-state-in-inline-commands">capturing
-   *     state in inline commands</a>
+   * @deprecated use a {@link ProfiledPIDController} inside a {@link Command} instead
    */
   public ProfiledPIDCommand(
       ProfiledPIDController controller,
@@ -68,10 +65,7 @@ public class ProfiledPIDCommand extends Command {
    * @param goalSource the controller's goal
    * @param useOutput the controller's output
    * @param requirements the subsystems required by this command
-   * @deprecated this class is cumbersome and unreadable without providing substantial benefit, see
-   *     instead <a href=
-   *     "https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#capturing-state-in-inline-commands">capturing
-   *     state in inline commands</a>
+   * @deprecated use a {@link ProfiledPIDController} inside a {@link Command} instead
    */
   public ProfiledPIDCommand(
       ProfiledPIDController controller,
@@ -100,10 +94,7 @@ public class ProfiledPIDCommand extends Command {
    * @param goal the controller's goal
    * @param useOutput the controller's output
    * @param requirements the subsystems required by this command
-   * @deprecated this class is cumbersome and unreadable without providing substantial benefit, see
-   *     instead <a href=
-   *     "https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#capturing-state-in-inline-commands">capturing
-   *     state in inline commands</a>
+   * @deprecated use a {@link ProfiledPIDController} inside a {@link Command} instead
    */
   public ProfiledPIDCommand(
       ProfiledPIDController controller,
@@ -123,10 +114,7 @@ public class ProfiledPIDCommand extends Command {
    * @param goal the controller's goal
    * @param useOutput the controller's output
    * @param requirements the subsystems required by this command
-   * @deprecated this class is cumbersome and unreadable without providing substantial benefit, see
-   *     instead <a href=
-   *     "https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#capturing-state-in-inline-commands">capturing
-   *     state in inline commands</a>
+   * @deprecated use a {@link ProfiledPIDController} inside a {@link Command} instead
    */
   public ProfiledPIDCommand(
       ProfiledPIDController controller,

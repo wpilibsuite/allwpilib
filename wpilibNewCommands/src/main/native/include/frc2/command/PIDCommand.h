@@ -23,9 +23,7 @@ namespace frc2 {
  *
  * @see PIDController
  */
-class [[deprecated(
-    "This class is cumbersome and unreadable, use inline commands with a "
-    "PIDController instead.")]] PIDCommand
+class [[deprecated("Use a PIDController inside a Command instead.")]] PIDCommand
     : public CommandHelper<Command, PIDCommand> {
  public:
   /**
@@ -37,6 +35,7 @@ class [[deprecated(
    * @param setpointSource   the controller's reference (aka setpoint)
    * @param useOutput         the controller's output
    * @param requirements      the subsystems required by this command
+   * @deprecated use a PIDController inside a Command instead
    */
   PIDCommand(frc::PIDController controller,
              std::function<double()> measurementSource,
@@ -53,6 +52,7 @@ class [[deprecated(
    * @param setpoint         the controller's setpoint (aka setpoint)
    * @param useOutput         the controller's output
    * @param requirements      the subsystems required by this command
+   * @deprecated use a PIDController inside a Command instead
    */
   PIDCommand(frc::PIDController controller,
              std::function<double()> measurementSource, double setpoint,

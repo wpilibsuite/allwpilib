@@ -26,9 +26,7 @@ namespace frc2 {
  * @see ProfiledPIDController<Distance>
  */
 template <class Distance>
-class [[deprecated(
-    "This class is cumbersome and unreadable, use inline commands with a "
-    "ProfiledPIDController instead.")]] ProfiledPIDCommand
+class [[deprecated("Use a ProfiledPIDController inside a Command instead.")]] ProfiledPIDCommand
     : public CommandHelper<Command, ProfiledPIDCommand<Distance>> {
   using Distance_t = units::unit_t<Distance>;
   using Velocity =
@@ -46,6 +44,7 @@ class [[deprecated(
    * @param goalSource   the controller's goal
    * @param useOutput         the controller's output
    * @param requirements      the subsystems required by this command
+   * @deprecated use a ProfiledPIDController inside a Command instead
    */
   ProfiledPIDCommand(frc::ProfiledPIDController<Distance> controller,
                      std::function<Distance_t()> measurementSource,
@@ -68,6 +67,7 @@ class [[deprecated(
    * @param goalSource   the controller's goal
    * @param useOutput         the controller's output
    * @param requirements      the subsystems required by this command
+   * @deprecated use a ProfiledPIDController inside a Command instead
    */
   ProfiledPIDCommand(frc::ProfiledPIDController<Distance> controller,
                      std::function<Distance_t()> measurementSource,
@@ -90,6 +90,7 @@ class [[deprecated(
    * @param goal         the controller's goal
    * @param useOutput         the controller's output
    * @param requirements      the subsystems required by this command
+   * @deprecated use a ProfiledPIDController inside a Command instead
    */
   ProfiledPIDCommand(frc::ProfiledPIDController<Distance> controller,
                      std::function<Distance_t()> measurementSource, State goal,
@@ -108,6 +109,7 @@ class [[deprecated(
    * @param goal         the controller's goal
    * @param useOutput         the controller's output
    * @param requirements      the subsystems required by this command
+   * @deprecated use a ProfiledPIDController inside a Command instead
    */
   ProfiledPIDCommand(frc::ProfiledPIDController<Distance> controller,
                      std::function<Distance_t()> measurementSource,

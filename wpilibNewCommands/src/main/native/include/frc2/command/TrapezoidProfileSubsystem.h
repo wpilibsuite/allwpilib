@@ -18,9 +18,7 @@ namespace frc2 {
  * This class is provided by the NewCommands VendorDep
  */
 template <class Distance>
-class WPI_DEPRECATED(
-    "This class is cumbersome and unreadable, use inline commands with a "
-    "TrapezoidProfile instead.") TrapezoidProfileSubsystem
+class [[deprecated("Use TrapezoidProfiles inside a Subsystem or Command instead.")]] TrapezoidProfileSubsystem
     : public SubsystemBase {
   using Distance_t = units::unit_t<Distance>;
   using Velocity =
@@ -38,6 +36,7 @@ class WPI_DEPRECATED(
    * @param initialPosition The initial position of the controller mechanism
    * when the subsystem is constructed.
    * @param period          The period of the main robot loop, in seconds.
+   * @deprecated Use TrapezoidProfiles inside a Subsystem or Command instead.
    */
   explicit TrapezoidProfileSubsystem(Constraints constraints,
                                      Distance_t initialPosition = Distance_t{0},

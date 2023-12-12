@@ -17,7 +17,6 @@ import java.util.function.Supplier;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-@Deprecated
 public class TrapezoidProfileCommand extends Command {
   private final TrapezoidProfile m_profile;
   private final Consumer<State> m_output;

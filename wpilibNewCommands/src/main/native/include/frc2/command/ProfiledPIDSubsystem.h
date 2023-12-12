@@ -19,9 +19,7 @@ namespace frc2 {
  * @see ProfiledPIDController
  */
 template <class Distance>
-class WPI_DEPRECATED(
-    "This class is cumbersome and unreadable, use inline commands with a "
-    "ProfiledPIDController instead.") ProfiledPIDSubsystem
+class [[deprecated("Use a ProfiledPIDController inside a Subsystem instead.")]] ProfiledPIDSubsystem
     : public SubsystemBase {
   using Distance_t = units::unit_t<Distance>;
   using Velocity =
@@ -35,6 +33,7 @@ class WPI_DEPRECATED(
    *
    * @param controller the ProfiledPIDController to use
    * @param initialPosition the initial goal position of the subsystem
+   * @deprecated use a ProfiledPIDController inside a Subsystem instead
    */
   explicit ProfiledPIDSubsystem(frc::ProfiledPIDController<Distance> controller,
                                 Distance_t initialPosition = Distance_t{0})

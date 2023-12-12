@@ -17,15 +17,14 @@ namespace frc2 {
  *
  * @see PIDController
  */
-class WPI_DEPRECATED(
-    "This class is cumbersome and unreadable, use inline commands with a "
-    "PIDController instead.") PIDSubsystem : public SubsystemBase {
+class [[deprecated("Use a PIDController inside a Subsystem instead.")]] PIDSubsystem : public SubsystemBase {
  public:
   /**
    * Creates a new PIDSubsystem.
    *
    * @param controller the PIDController to use
    * @param initialPosition the initial setpoint of the subsystem
+   * @deprecated use a PIDController inside a Subsystem instead
    */
   explicit PIDSubsystem(frc::PIDController controller,
                         double initialPosition = 0);
