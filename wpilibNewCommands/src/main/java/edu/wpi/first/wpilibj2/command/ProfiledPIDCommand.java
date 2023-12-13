@@ -8,6 +8,7 @@ import static edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.DoubleSupplier;
@@ -38,6 +39,7 @@ public class ProfiledPIDCommand extends Command {
    * @param requirements the subsystems required by this command
    * @deprecated use a {@link ProfiledPIDController} inside a {@link Command} instead
    */
+  @Deprecated(since = "2024", forRemoval = true)
   public ProfiledPIDCommand(
       ProfiledPIDController controller,
       DoubleSupplier measurementSource,
@@ -67,6 +69,7 @@ public class ProfiledPIDCommand extends Command {
    * @param requirements the subsystems required by this command
    * @deprecated use a {@link ProfiledPIDController} inside a {@link Command} instead
    */
+  @Deprecated(since = "2024", forRemoval = true)
   public ProfiledPIDCommand(
       ProfiledPIDController controller,
       DoubleSupplier measurementSource,
@@ -96,6 +99,7 @@ public class ProfiledPIDCommand extends Command {
    * @param requirements the subsystems required by this command
    * @deprecated use a {@link ProfiledPIDController} inside a {@link Command} instead
    */
+  @Deprecated(since = "2024", forRemoval = true)
   public ProfiledPIDCommand(
       ProfiledPIDController controller,
       DoubleSupplier measurementSource,
@@ -116,6 +120,7 @@ public class ProfiledPIDCommand extends Command {
    * @param requirements the subsystems required by this command
    * @deprecated use a {@link ProfiledPIDController} inside a {@link Command} instead
    */
+  @Deprecated(since = "2024", forRemoval = true)
   public ProfiledPIDCommand(
       ProfiledPIDController controller,
       DoubleSupplier measurementSource,

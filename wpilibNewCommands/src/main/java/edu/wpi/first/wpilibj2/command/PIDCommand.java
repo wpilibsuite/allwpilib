@@ -35,6 +35,7 @@ public class PIDCommand extends Command {
    * @param requirements the subsystems required by this command
    * @deprecated use a {@link PIDController} inside a {@link Command} instead
    */
+  @Deprecated(since = "2024", forRemoval = true)
   public PIDCommand(
       PIDController controller,
       DoubleSupplier measurementSource,
@@ -63,6 +64,7 @@ public class PIDCommand extends Command {
    * @param requirements the subsystems required by this command
    * @deprecated use a {@link PIDController} inside a {@link Command} instead
    */
+  @Deprecated(since = "2024", forRemoval = true)
   public PIDCommand(
       PIDController controller,
       DoubleSupplier measurementSource,

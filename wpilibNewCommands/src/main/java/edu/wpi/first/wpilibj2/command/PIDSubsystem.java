@@ -26,6 +26,7 @@ public abstract class PIDSubsystem extends SubsystemBase {
    * @param initialPosition the initial setpoint of the subsystem
    * @deprecated use a {@link PIDController} inside a {@link Subsystem} instead
    */
+  @Deprecated(since = "2024", forRemoval = true)
   @SuppressWarnings("this-escape")
   public PIDSubsystem(PIDController controller, double initialPosition) {
     m_controller = requireNonNullParam(controller, "controller", "PIDSubsystem");
@@ -39,6 +40,7 @@ public abstract class PIDSubsystem extends SubsystemBase {
    * @param controller the PIDController to use
    * @deprecated use a {@link PIDController} inside a {@link Subsystem} instead
    */
+  @Deprecated(since = "2024", forRemoval = true)
   public PIDSubsystem(PIDController controller) {
     this(controller, 0);
   }

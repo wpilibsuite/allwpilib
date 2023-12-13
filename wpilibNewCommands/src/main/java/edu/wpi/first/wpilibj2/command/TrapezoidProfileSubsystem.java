@@ -33,6 +33,7 @@ public abstract class TrapezoidProfileSubsystem extends SubsystemBase {
    * @param period The period of the main robot loop, in seconds.
    * @deprecated use {@link TrapezoidProfile}s inside a {@link Subsystem} or {@link Command} instead
    */
+  @Deprecated(since = "2024", forRemoval = true)
   public TrapezoidProfileSubsystem(
       TrapezoidProfile.Constraints constraints, double initialPosition, double period) {
     requireNonNullParam(constraints, "constraints", "TrapezoidProfileSubsystem");
@@ -50,6 +51,7 @@ public abstract class TrapezoidProfileSubsystem extends SubsystemBase {
    *     constructed.
    * @deprecated use {@link TrapezoidProfile}s inside a {@link Subsystem} or {@link Command} instead
    */
+  @Deprecated(since = "2024", forRemoval = true)
   public TrapezoidProfileSubsystem(
       TrapezoidProfile.Constraints constraints, double initialPosition) {
     this(constraints, initialPosition, 0.02);
@@ -61,6 +63,7 @@ public abstract class TrapezoidProfileSubsystem extends SubsystemBase {
    * @param constraints The constraints (maximum velocity and acceleration) for the profiles.
    * @deprecated use {@link TrapezoidProfile}s inside a {@link Subsystem} or {@link Command} instead
    */
+  @Deprecated(since = "2024", forRemoval = true)
   public TrapezoidProfileSubsystem(TrapezoidProfile.Constraints constraints) {
     this(constraints, 0, 0.02);
   }
