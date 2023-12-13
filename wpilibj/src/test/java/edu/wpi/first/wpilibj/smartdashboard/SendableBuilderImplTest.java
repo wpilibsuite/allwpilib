@@ -5,6 +5,8 @@
 package edu.wpi.first.wpilibj.smartdashboard;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -27,6 +29,9 @@ class SendableBuilderImplTest {
           null,
           impl::addIntegerArrayProperty);
 
+      assertTrue(
+          inst.getTable("table").containsKey("The Property"), "Property should be configured");
+
       impl.update();
       assertEquals(1, updateCalls.get(), "Initial update queries the value");
 
@@ -37,6 +42,30 @@ class SendableBuilderImplTest {
       hashcode.incrementAndGet();
       impl.update();
       assertEquals(2, updateCalls.get(), "Update after cache invalidation queries the value");
+    }
+  }
+
+  @Test
+  void cacheWithBadCallback() {
+    try (var impl = new SendableBuilderImpl();
+        var inst = NetworkTableInstance.create()) {
+      impl.setTable(inst.getTable("table"));
+
+      var hashcode = new AtomicInteger(0);
+      var updateCalls = new AtomicLong(0);
+      impl.caching(
+          "The Property",
+          hashcode::get,
+          () -> new long[] {updateCalls.incrementAndGet()},
+          null,
+          (key, getter, setter) -> {
+            // bad callback, doesn't actually add the property
+          });
+
+      impl.update();
+      assertFalse(
+          inst.getTable("table").containsKey("The Property"),
+          "Property should not have been configured");
     }
   }
 }

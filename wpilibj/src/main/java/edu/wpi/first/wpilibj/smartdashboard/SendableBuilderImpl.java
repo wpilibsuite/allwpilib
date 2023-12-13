@@ -752,7 +752,15 @@ public class SendableBuilderImpl implements NTSendableBuilder {
       Supplier<T> getter,
       Consumer<T> setter,
       PropertyFn<T> property) {
+    int initialPropertyCount = m_properties.size();
     property.addProperty(key, getter, setter);
+
+    if (m_properties.size() != initialPropertyCount + 1) {
+      // The callback function didn't create a property for us to cache; bail. This can happen if
+      // the callback function doesn't adhere to the contract of creating a new sendable property
+      // when called
+      return;
+    }
 
     // Remove the property added above, wrap it, and add the wrapper in its place
     var originalProperty = m_properties.get(m_properties.size() - 1);
