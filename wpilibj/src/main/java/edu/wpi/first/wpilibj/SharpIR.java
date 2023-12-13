@@ -51,11 +51,9 @@ public class SharpIR implements Sendable, AutoCloseable {
   }
 
   /**
-   * Sharp GP2Y0A41SK0F is an analog IR sensor capable of measuring
-   * distances from 4cm to 30cm.
-   * 
-   * @param channel Analog input channel the sensor is connected to
+   * Sharp GP2Y0A41SK0F is an analog IR sensor capable of measuring distances from 4cm to 30cm.
    *
+   * @param channel Analog input channel the sensor is connected to
    * @return sensor object
    */
   public static SharpIR GP2Y0A41SK0F(int channel) {
@@ -63,11 +61,9 @@ public class SharpIR implements Sendable, AutoCloseable {
   }
 
   /**
-   * Sharp GP2Y0A51SK0F is an analog IR sensor capable of measuring
-   * distances from 2cm to 15cm.
+   * Sharp GP2Y0A51SK0F is an analog IR sensor capable of measuring distances from 2cm to 15cm.
    *
    * @param channel Analog input channel the sensor is connected to
-   *
    * @return sensor object
    */
   public static SharpIR GP2Y0A51SK0F(int channel) {

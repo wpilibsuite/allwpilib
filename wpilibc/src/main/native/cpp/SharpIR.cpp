@@ -24,9 +24,8 @@ SharpIR SharpIR::GP2Y0A41SK0F(int channel) {
 }
 
 SharpIR SharpIR::GP2Y0A51SK0F(int channel) {
-    return SharpIR(channel, 5.2819, -1.161, 2.0, 15.0);
+  return SharpIR(channel, 5.2819, -1.161, 2.0, 15.0);
 }
-
 
 SharpIR::SharpIR(int channel, double a, double b, double minCM, double maxCM)
     : m_sensor(channel), m_A(a), m_B(b), m_minCM(minCM), m_maxCM(maxCM) {
