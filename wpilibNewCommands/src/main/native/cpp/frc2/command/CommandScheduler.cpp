@@ -183,7 +183,7 @@ void CommandScheduler::Run() {
     if constexpr (frc::RobotBase::IsSimulation()) {
       subsystem.getFirst()->SimulationPeriodic();
     }
-    m_watchdog.AddEpoch("Subsystem Periodic()");
+    m_watchdog.AddEpoch(subsystem.getFirst()->GetName() + ".Periodic()");
   }
 
   // Cache the active instance to avoid concurrency problems if SetActiveLoop()
@@ -453,11 +453,13 @@ void CommandScheduler::OnCommandFinish(Action action) {
 }
 
 void CommandScheduler::RequireUngrouped(const Command* command) {
-  if (command->IsComposed()) {
+  auto stacktrace = command->GetPreviousCompositionSite();
+  if (stacktrace.has_value()) {
     throw FRC_MakeError(frc::err::CommandIllegalUse,
                         "Commands that have been composed may not be added to "
-                        "another composition or scheduled "
-                        "individually!");
+                        "another composition or scheduled individually!"
+                        "\nOriginally composed at:\n{}",
+                        stacktrace.value());
   }
 }
 

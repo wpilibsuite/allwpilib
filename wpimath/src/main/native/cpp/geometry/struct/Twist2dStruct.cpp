@@ -12,7 +12,7 @@ constexpr size_t kDthetaOff = kDyOff + 8;
 
 using StructType = wpi::Struct<frc::Twist2d>;
 
-frc::Twist2d StructType::Unpack(std::span<const uint8_t, kSize> data) {
+frc::Twist2d StructType::Unpack(std::span<const uint8_t> data) {
   return frc::Twist2d{
       units::meter_t{wpi::UnpackStruct<double, kDxOff>(data)},
       units::meter_t{wpi::UnpackStruct<double, kDyOff>(data)},
@@ -20,8 +20,7 @@ frc::Twist2d StructType::Unpack(std::span<const uint8_t, kSize> data) {
   };
 }
 
-void StructType::Pack(std::span<uint8_t, kSize> data,
-                      const frc::Twist2d& value) {
+void StructType::Pack(std::span<uint8_t> data, const frc::Twist2d& value) {
   wpi::PackStruct<kDxOff>(data, value.dx.value());
   wpi::PackStruct<kDyOff>(data, value.dy.value());
   wpi::PackStruct<kDthetaOff>(data, value.dtheta.value());

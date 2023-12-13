@@ -16,9 +16,8 @@ import java.util.function.Function;
  * Constructs a control-affine plant inversion model-based feedforward from given model dynamics.
  *
  * <p>If given the vector valued function as f(x, u) where x is the state vector and u is the input
- * vector, the B matrix(continuous input matrix) is calculated through a {@link
- * edu.wpi.first.math.system.NumericalJacobian}. In this case f has to be control-affine (of the
- * form f(x) + Bu).
+ * vector, the B matrix(continuous input matrix) is calculated through a {@link NumericalJacobian}.
+ * In this case f has to be control-affine (of the form f(x) + Bu).
  *
  * <p>The feedforward is calculated as <strong> u_ff = B<sup>+</sup> (rDot - f(x))</strong>, where
  * <strong> B<sup>+</sup> </strong> is the pseudoinverse of B.
@@ -26,8 +25,8 @@ import java.util.function.Function;
  * <p>This feedforward does not account for a dynamic B matrix, B is either determined or supplied
  * when the feedforward is created and remains constant.
  *
- * <p>For more on the underlying math, read
- * https://file.tavsys.net/control/controls-engineering-in-frc.pdf.
+ * <p>For more on the underlying math, read <a
+ * href="https://file.tavsys.net/control/controls-engineering-in-frc.pdf">https://file.tavsys.net/control/controls-engineering-in-frc.pdf</a>.
  */
 public class ControlAffinePlantInversionFeedforward<States extends Num, Inputs extends Num> {
   /** The current reference state. */
@@ -145,13 +144,13 @@ public class ControlAffinePlantInversionFeedforward<States extends Num, Inputs e
    *
    * @param initialState The initial state vector.
    */
-  public void reset(Matrix<States, N1> initialState) {
+  public final void reset(Matrix<States, N1> initialState) {
     m_r = initialState;
     m_uff.fill(0.0);
   }
 
   /** Resets the feedforward with a zero initial state vector. */
-  public void reset() {
+  public final void reset() {
     m_r.fill(0.0);
     m_uff.fill(0.0);
   }

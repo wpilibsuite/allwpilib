@@ -576,7 +576,6 @@ int uv__accept(int sockfd) {
   return peerfd;
 }
 
-
 #if defined(__APPLE__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdollar-in-identifier-extension"

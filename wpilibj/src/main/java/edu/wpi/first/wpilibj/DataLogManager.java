@@ -214,7 +214,10 @@ public final class DataLogManager {
         // prefer a mounted USB drive if one is accessible
         Path usbDir = Paths.get("/u").toRealPath();
         if (Files.isWritable(usbDir)) {
-          return usbDir.toString();
+          if (!new File("/u/logs").mkdir()) {
+            // ignored
+          }
+          return "/u/logs";
         }
       } catch (IOException ex) {
         // ignored
@@ -230,7 +233,11 @@ public final class DataLogManager {
       }
       return "/home/lvuser/logs";
     }
-    return Filesystem.getOperatingDirectory().getAbsolutePath();
+    String logDir = Filesystem.getOperatingDirectory().getAbsolutePath() + "/logs";
+    if (!new File(logDir).mkdir()) {
+      // ignored
+    }
+    return logDir;
   }
 
   private static String makeLogFilename(String filenameOverride) {

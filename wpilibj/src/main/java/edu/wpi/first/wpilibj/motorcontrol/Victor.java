@@ -17,7 +17,8 @@ import edu.wpi.first.wpilibj.PWM;
  * 884 controllers also but if users experience issues such as asymmetric behavior around the
  * deadband or inability to saturate the controller in either direction, calibration is recommended.
  * The calibration procedure can be found in the Victor 884 User Manual available from VEX Robotics:
- * http://content.vexrobotics.com/docs/ifi-v884-users-manual-9-25-06.pdf
+ * <a
+ * href="http://content.vexrobotics.com/docs/ifi-v884-users-manual-9-25-06.pdf">http://content.vexrobotics.com/docs/ifi-v884-users-manual-9-25-06.pdf</a>
  *
  * <ul>
  *   <li>2.027ms = full "forward"
@@ -34,6 +35,7 @@ public class Victor extends PWMMotorController {
    * @param channel The PWM channel that the Victor is attached to. 0-9 are on-board, 10-19 are on
    *     the MXP port
    */
+  @SuppressWarnings("this-escape")
   public Victor(final int channel) {
     super("Victor", channel);
 

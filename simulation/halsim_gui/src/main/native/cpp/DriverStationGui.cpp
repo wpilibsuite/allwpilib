@@ -609,6 +609,7 @@ void KeyboardJoystick::EditKey(const char* label, int* key) {
 void KeyboardJoystick::SettingsDisplay() {
   if (s_keyEdit) {
     ImGuiIO& io = ImGui::GetIO();
+    // NOLINTNEXTLINE(bugprone-sizeof-expression)
     for (int i = 0; i < IM_ARRAYSIZE(io.KeysDown); ++i) {
       if (io.KeysDown[i]) {
         // remove all other uses

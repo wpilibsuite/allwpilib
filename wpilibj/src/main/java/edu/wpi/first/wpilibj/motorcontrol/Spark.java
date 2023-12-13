@@ -32,6 +32,7 @@ public class Spark extends PWMMotorController {
    * @param channel The PWM channel that the SPARK is attached to. 0-9 are on-board, 10-19 are on
    *     the MXP port
    */
+  @SuppressWarnings("this-escape")
   public Spark(final int channel) {
     super("Spark", channel);
 

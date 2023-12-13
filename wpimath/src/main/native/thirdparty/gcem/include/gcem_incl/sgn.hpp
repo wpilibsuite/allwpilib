@@ -21,6 +21,9 @@
 #ifndef _gcem_sgn_HPP
 #define _gcem_sgn_HPP
 
+namespace gcem
+{
+
 /**
  * Compile-time sign function
  *
@@ -40,6 +43,8 @@ noexcept
             x < T(0) ? -1 :
             // else
                 0 );
+}
+
 }
 
 #endif

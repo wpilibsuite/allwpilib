@@ -41,6 +41,15 @@ public interface Subsystem {
   default void simulationPeriodic() {}
 
   /**
+   * Gets the subsystem name of this Subsystem.
+   *
+   * @return Subsystem name
+   */
+  default String getName() {
+    return this.getClass().getSimpleName();
+  }
+
+  /**
    * Sets the default {@link Command} of the subsystem. The default command will be automatically
    * scheduled when no other commands are scheduled that require the subsystem. Default commands
    * should generally not end on their own, i.e. their {@link Command#isFinished()} method should

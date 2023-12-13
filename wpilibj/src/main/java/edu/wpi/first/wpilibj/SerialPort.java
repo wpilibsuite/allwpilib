@@ -186,7 +186,7 @@ public class SerialPort implements AutoCloseable {
   }
 
   /** Disable termination behavior. */
-  public void disableTermination() {
+  public final void disableTermination() {
     SerialPortJNI.serialDisableTermination(m_portHandle);
   }
 
@@ -216,7 +216,7 @@ public class SerialPort implements AutoCloseable {
    */
   public String readString(int count) {
     byte[] out = read(count);
-    return new String(out, 0, out.length, StandardCharsets.US_ASCII);
+    return new String(out, StandardCharsets.US_ASCII);
   }
 
   /**
@@ -268,7 +268,7 @@ public class SerialPort implements AutoCloseable {
    *
    * @param timeout The number of seconds to wait for I/O.
    */
-  public void setTimeout(double timeout) {
+  public final void setTimeout(double timeout) {
     SerialPortJNI.serialSetTimeout(m_portHandle, timeout);
   }
 
@@ -283,7 +283,7 @@ public class SerialPort implements AutoCloseable {
    *
    * @param size The read buffer size.
    */
-  public void setReadBufferSize(int size) {
+  public final void setReadBufferSize(int size) {
     SerialPortJNI.serialSetReadBufferSize(m_portHandle, size);
   }
 
@@ -309,7 +309,7 @@ public class SerialPort implements AutoCloseable {
    *
    * @param mode The write buffer mode.
    */
-  public void setWriteBufferMode(WriteBufferMode mode) {
+  public final void setWriteBufferMode(WriteBufferMode mode) {
     SerialPortJNI.serialSetWriteMode(m_portHandle, (byte) mode.value);
   }
 

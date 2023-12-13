@@ -1,17 +1,17 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Peter Johnson <johnson.peter@gmail.com>
 Date: Fri, 20 Jan 2023 23:41:56 -0800
-Subject: [PATCH 2/3] Intellisense fix
+Subject: [PATCH 2/2] Intellisense fix
 
 ---
  Eigen/src/Core/util/Macros.h | 10 ++++++++++
  1 file changed, 10 insertions(+)
 
 diff --git a/Eigen/src/Core/util/Macros.h b/Eigen/src/Core/util/Macros.h
-index 986c3d44db94c8ba339792b6738c47cdd2c5acbc..81986b9447824c440e004f38a220393ef5a089c6 100644
+index 5d054e67c4355a549b1351f1ecc5e49a96e91ace..fda6ad91eedacc9958a5a0bc34db33d8b4e57cd6 100644
 --- a/Eigen/src/Core/util/Macros.h
 +++ b/Eigen/src/Core/util/Macros.h
-@@ -58,6 +58,16 @@
+@@ -60,6 +60,16 @@
  // Compiler identification, EIGEN_COMP_*
  //------------------------------------------------------------------------------------------
  
@@ -25,6 +25,6 @@ index 986c3d44db94c8ba339792b6738c47cdd2c5acbc..81986b9447824c440e004f38a220393e
 +#endif
 +#endif
 +
- /// \internal EIGEN_COMP_GNUC set to 1 for all compilers compatible with GCC
+ /// \internal EIGEN_COMP_GNUC set to version (e.g., 951 for GCC 9.5.1) for all compilers compatible with GCC
  #ifdef __GNUC__
-   #define EIGEN_COMP_GNUC (__GNUC__*10+__GNUC_MINOR__)
+ #define EIGEN_COMP_GNUC (__GNUC__ * 100 + __GNUC_MINOR__ * 10 + __GNUC_PATCHLEVEL__)

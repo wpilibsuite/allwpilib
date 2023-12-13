@@ -6,6 +6,7 @@
 
 #include <concepts>
 #include <functional>
+#include <string>
 #include <utility>
 
 #include <wpi/FunctionExtras.h>
@@ -58,6 +59,13 @@ class Subsystem {
    * sensor readings.
    */
   virtual void SimulationPeriodic();
+
+  /**
+   * Gets the name of this Subsystem.
+   *
+   * @return Name
+   */
+  virtual std::string GetName() const;
 
   /**
    * Sets the default Command of the subsystem.  The default command will be

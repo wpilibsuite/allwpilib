@@ -21,6 +21,12 @@
 #ifndef _gcem_signbit_HPP
 #define _gcem_signbit_HPP
 
+#include <cmath>
+#include <type_traits>
+
+namespace gcem
+{
+
 /**
  * Compile-time sign bit detection function
  *
@@ -34,11 +40,17 @@ bool
 signbit(const T x)
 noexcept
 {
+  if (std::is_constant_evaluated()) {
 #ifdef _MSC_VER
     return( (x == T(0)) ? (_fpclass(x) == _FPCLASS_NZ) : (x < T(0)) );
 #else
     return GCEM_SIGNBIT(x);
 #endif
+  } else {
+    return std::signbit(x);
+  }
+}
+
 }
 
 #endif

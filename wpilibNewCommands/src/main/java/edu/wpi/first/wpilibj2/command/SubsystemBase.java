@@ -16,6 +16,7 @@ import edu.wpi.first.util.sendable.SendableRegistry;
  */
 public abstract class SubsystemBase implements Subsystem, Sendable {
   /** Constructor. */
+  @SuppressWarnings("this-escape")
   public SubsystemBase() {
     String name = this.getClass().getSimpleName();
     name = name.substring(name.lastIndexOf('.') + 1);
@@ -28,6 +29,7 @@ public abstract class SubsystemBase implements Subsystem, Sendable {
    *
    * @return Name
    */
+  @Override
   public String getName() {
     return SendableRegistry.getName(this);
   }

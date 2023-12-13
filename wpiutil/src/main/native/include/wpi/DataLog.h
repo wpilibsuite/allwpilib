@@ -968,9 +968,16 @@ class StructLogEntry : public DataLogEntry {
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
   void Append(const T& data, int64_t timestamp = 0) {
-    uint8_t buf[S::kSize];
-    S::Pack(buf, data);
-    m_log->AppendRaw(m_entry, buf, timestamp);
+    if constexpr (wpi::is_constexpr([] { S::GetSize(); })) {
+      uint8_t buf[S::GetSize()];
+      S::Pack(buf, data);
+      m_log->AppendRaw(m_entry, buf, timestamp);
+    } else {
+      wpi::SmallVector<uint8_t, 128> buf;
+      buf.resize_for_overwrite(S::GetSize());
+      S::Pack(buf, data);
+      m_log->AppendRaw(m_entry, buf, timestamp);
+    }
   }
 };
 
