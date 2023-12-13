@@ -19,8 +19,9 @@ namespace frc2 {
  * @see ProfiledPIDController
  */
 template <class Distance>
-class [[deprecated("Use a ProfiledPIDController inside a Subsystem instead.")]] ProfiledPIDSubsystem
-    : public SubsystemBase {
+class [[deprecated(
+    "Use a ProfiledPIDController inside a Subsystem "
+    "instead.")]] ProfiledPIDSubsystem : public SubsystemBase {
   using Distance_t = units::unit_t<Distance>;
   using Velocity =
       units::compound_unit<Distance, units::inverse<units::seconds>>;

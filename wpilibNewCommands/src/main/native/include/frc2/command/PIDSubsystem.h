@@ -17,7 +17,9 @@ namespace frc2 {
  *
  * @see PIDController
  */
-class [[deprecated("Use a PIDController inside a Subsystem instead.")]] PIDSubsystem : public SubsystemBase {
+class [[deprecated(
+    "Use a PIDController inside a Subsystem instead.")]] PIDSubsystem
+    : public SubsystemBase {
  public:
   /**
    * Creates a new PIDSubsystem.

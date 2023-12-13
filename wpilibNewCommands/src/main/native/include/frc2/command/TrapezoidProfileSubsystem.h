@@ -18,8 +18,9 @@ namespace frc2 {
  * This class is provided by the NewCommands VendorDep
  */
 template <class Distance>
-class [[deprecated("Use TrapezoidProfiles inside a Subsystem or Command instead.")]] TrapezoidProfileSubsystem
-    : public SubsystemBase {
+class [[deprecated(
+    "Use TrapezoidProfiles inside a Subsystem or Command "
+    "instead.")]] TrapezoidProfileSubsystem : public SubsystemBase {
   using Distance_t = units::unit_t<Distance>;
   using Velocity =
       units::compound_unit<Distance, units::inverse<units::seconds>>;
