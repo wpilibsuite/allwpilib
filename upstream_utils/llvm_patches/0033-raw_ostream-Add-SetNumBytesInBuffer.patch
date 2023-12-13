@@ -1,14 +1,14 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Peter Johnson <johnson.peter@gmail.com>
 Date: Sun, 29 Oct 2023 23:00:08 -0700
-Subject: [PATCH 33/33] raw_ostream: Add SetNumBytesInBuffer
+Subject: [PATCH 33/34] raw_ostream: Add SetNumBytesInBuffer
 
 ---
  llvm/include/llvm/Support/raw_ostream.h | 5 +++++
  1 file changed, 5 insertions(+)
 
 diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
-index 9a9a1f688313a5784a58a70f2cb4cc0d6ec70e79..39f98e4e7696e28587779e90a03995463767b02d 100644
+index 9a9a1f688313a5784a58a70f2cb4cc0d6ec70e79..d832bcb97b4131a08ba3692eb438455e4c9764e4 100644
 --- a/llvm/include/llvm/Support/raw_ostream.h
 +++ b/llvm/include/llvm/Support/raw_ostream.h
 @@ -356,6 +356,11 @@ protected:

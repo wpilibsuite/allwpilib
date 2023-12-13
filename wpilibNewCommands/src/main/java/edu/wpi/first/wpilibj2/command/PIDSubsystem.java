@@ -26,6 +26,7 @@ public abstract class PIDSubsystem extends SubsystemBase {
    * @param initialPosition the initial setpoint of the subsystem
    * @deprecated use a {@link PIDController} inside a {@link Subsystem} instead
    */
+  @SuppressWarnings("this-escape")
   public PIDSubsystem(PIDController controller, double initialPosition) {
     m_controller = requireNonNullParam(controller, "controller", "PIDSubsystem");
     setSetpoint(initialPosition);
@@ -58,7 +59,7 @@ public abstract class PIDSubsystem extends SubsystemBase {
    *
    * @param setpoint the setpoint for the subsystem
    */
-  public void setSetpoint(double setpoint) {
+  public final void setSetpoint(double setpoint) {
     m_controller.setSetpoint(setpoint);
   }
 

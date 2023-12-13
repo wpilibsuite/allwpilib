@@ -14,7 +14,7 @@ constexpr size_t kFreeSpeedOff = kFreeCurrentOff + 8;
 
 using StructType = wpi::Struct<frc::DCMotor>;
 
-frc::DCMotor StructType::Unpack(std::span<const uint8_t, kSize> data) {
+frc::DCMotor StructType::Unpack(std::span<const uint8_t> data) {
   return frc::DCMotor{
       units::volt_t{wpi::UnpackStruct<double, kNominalVoltageOff>(data)},
       units::newton_meter_t{wpi::UnpackStruct<double, kStallTorqueOff>(data)},
@@ -25,8 +25,7 @@ frc::DCMotor StructType::Unpack(std::span<const uint8_t, kSize> data) {
   };
 }
 
-void StructType::Pack(std::span<uint8_t, kSize> data,
-                      const frc::DCMotor& value) {
+void StructType::Pack(std::span<uint8_t> data, const frc::DCMotor& value) {
   wpi::PackStruct<kNominalVoltageOff>(data, value.nominalVoltage.value());
   wpi::PackStruct<kStallTorqueOff>(data, value.stallTorque.value());
   wpi::PackStruct<kStallCurrentOff>(data, value.stallCurrent.value());

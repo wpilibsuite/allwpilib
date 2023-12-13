@@ -295,6 +295,14 @@ NT_Bool NT_GetTopicRetained(NT_Topic topic) {
   return nt::GetTopicRetained(topic);
 }
 
+void NT_SetTopicCached(NT_Topic topic, NT_Bool value) {
+  nt::SetTopicCached(topic, value);
+}
+
+NT_Bool NT_GetTopicCached(NT_Topic topic) {
+  return nt::GetTopicCached(topic);
+}
+
 NT_Bool NT_GetTopicExists(NT_Handle handle) {
   return nt::GetTopicExists(handle);
 }

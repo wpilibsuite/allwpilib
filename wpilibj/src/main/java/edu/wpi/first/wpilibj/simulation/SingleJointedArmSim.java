@@ -49,6 +49,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
    * @param startingAngleRads The initial position of the Arm simulation in radians.
    * @param measurementStdDevs The standard deviations of the measurements.
    */
+  @SuppressWarnings("this-escape")
   public SingleJointedArmSim(
       LinearSystem<N2, N1, N1> plant,
       DCMotor gearbox,
@@ -180,7 +181,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
    * @param angleRadians The new angle in radians.
    * @param velocityRadPerSec The new angular velocity in radians per second.
    */
-  public void setState(double angleRadians, double velocityRadPerSec) {
+  public final void setState(double angleRadians, double velocityRadPerSec) {
     setState(
         VecBuilder.fill(MathUtil.clamp(angleRadians, m_minAngle, m_maxAngle), velocityRadPerSec));
   }

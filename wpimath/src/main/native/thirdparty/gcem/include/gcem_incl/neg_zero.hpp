@@ -22,6 +22,9 @@
  * extract signbit for signed zeros
  */
 
+namespace gcem
+{
+
 namespace internal
 {
 
@@ -32,6 +35,8 @@ neg_zero(const T x)
 noexcept
 {
     return( (x == T(0.0)) && (copysign(T(1.0), x) == T(-1.0)) );
+}
+
 }
 
 }

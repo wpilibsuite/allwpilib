@@ -24,6 +24,9 @@
 #include <cmath>
 #include <type_traits>
 
+namespace gcem
+{
+
 /**
  * Compile-time pairwise maximum function
  *
@@ -43,6 +46,8 @@ noexcept
   } else {
     return std::max(x, y);
   }
+}
+
 }
 
 #endif

@@ -21,6 +21,7 @@ public class AnalogOutput implements Sendable, AutoCloseable {
    *
    * @param channel The channel number to represent.
    */
+  @SuppressWarnings("this-escape")
   public AnalogOutput(final int channel) {
     SensorUtil.checkAnalogOutputChannel(channel);
     m_channel = channel;

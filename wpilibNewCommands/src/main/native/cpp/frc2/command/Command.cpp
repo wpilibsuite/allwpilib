@@ -4,6 +4,7 @@
 
 #include "frc2/command/Command.h"
 
+#include <wpi/StackTrace.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 
@@ -31,7 +32,7 @@ Command::~Command() {
 }
 
 Command& Command::operator=(const Command& rhs) {
-  m_isComposed = false;
+  SetComposed(false);
   return *this;
 }
 
@@ -156,11 +157,19 @@ bool Command::HasRequirement(Subsystem* requirement) const {
 }
 
 bool Command::IsComposed() const {
-  return m_isComposed;
+  return GetPreviousCompositionSite().has_value();
 }
 
 void Command::SetComposed(bool isComposed) {
-  m_isComposed = isComposed;
+  if (isComposed) {
+    m_previousComposition = wpi::GetStackTrace(1);
+  } else {
+    m_previousComposition.reset();
+  }
+}
+
+std::optional<std::string> Command::GetPreviousCompositionSite() const {
+  return m_previousComposition;
 }
 
 void Command::InitSendable(wpi::SendableBuilder& builder) {

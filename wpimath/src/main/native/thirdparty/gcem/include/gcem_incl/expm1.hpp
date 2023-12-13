@@ -28,6 +28,9 @@
 #include <cmath>
 #include <type_traits>
 
+namespace gcem
+{
+
 namespace internal
 {
 
@@ -78,6 +81,8 @@ noexcept
   } else {
     return std::expm1(x);
   }
+}
+
 }
 
 #endif

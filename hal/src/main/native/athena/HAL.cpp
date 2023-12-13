@@ -4,6 +4,7 @@
 
 #include "hal/HAL.h"
 
+#include <dlfcn.h>
 #include <signal.h>  // linux for kill
 #include <sys/prctl.h>
 #include <unistd.h>
@@ -522,6 +523,35 @@ static bool killExistingProgram(int timeout, int mode) {
   return true;
 }
 
+static void SetupNowRio(void) {
+  nFPGA::nRoboRIO_FPGANamespace::g_currentTargetClass =
+      nLoadOut::getTargetClass();
+
+  int32_t status = 0;
+
+  Dl_info info;
+  status = dladdr(reinterpret_cast<void*>(tHMB::create), &info);
+  if (status == 0) {
+    fmt::print(stderr, "Failed to call dladdr on chipobject {}\n", dlerror());
+    return;
+  }
+
+  void* chipObjectLibrary = dlopen(info.dli_fname, RTLD_LAZY);
+  if (chipObjectLibrary == nullptr) {
+    fmt::print(stderr, "Failed to call dlopen on chipobject {}\n", dlerror());
+    return;
+  }
+
+  std::unique_ptr<tHMB> hmb;
+  hmb.reset(tHMB::create(&status));
+  if (hmb == nullptr) {
+    fmt::print(stderr, "Failed to open HMB on chipobject {}\n", status);
+    dlclose(chipObjectLibrary);
+    return;
+  }
+  wpi::impl::SetupNowRio(chipObjectLibrary, std::move(hmb));
+}
+
 HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   static std::atomic_bool initialized{false};
   static wpi::mutex initializeMutex;
@@ -562,14 +592,13 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
     setNewDataSem(nullptr);
   });
 
-  // Setup WPI_Now to use FPGA timestamp
-  // this also sets nFPGA::nRoboRIO_FPGANamespace::g_currentTargetClass
-  wpi::impl::SetupNowRio();
+  SetupNowRio();
 
   int32_t status = 0;
 
   HAL_InitializeHMB(&status);
   if (status != 0) {
+    fmt::print(stderr, "Failed to open HAL HMB, status code {}\n", status);
     return false;
   }
   hmbBuffer = HAL_GetHMBBuffer();

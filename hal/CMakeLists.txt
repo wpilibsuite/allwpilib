@@ -3,27 +3,6 @@ project(hal)
 include(CompileWarnings)
 include(AddTest)
 
-file(STRINGS src/generate/Instances.txt RAW_INSTANCES)
-file(STRINGS src/generate/ResourceType.txt RAW_RESOURCE_TYPES)
-
-set(usage_reporting_types_cpp "")
-set(usage_reporting_instances_cpp "")
-set(usage_reporting_types "")
-set(usage_reporting_instances "")
-
-foreach(ITEM ${RAW_INSTANCES})
-    list(APPEND usage_reporting_instances_cpp "    ${ITEM},")
-    list(APPEND usage_reporting_instances "\n    public static final int ${ITEM};")
-endforeach()
-
-foreach(ITEM ${RAW_RESOURCE_TYPES})
-    list(APPEND usage_reporting_types_cpp "    ${ITEM},")
-    list(APPEND usage_reporting_types "\n    public static final int ${ITEM};")
-endforeach()
-
-string(REPLACE ";" "\n" usage_reporting_types_cpp "${usage_reporting_types_cpp}")
-string(REPLACE ";" "\n" usage_reporting_instances_cpp "${usage_reporting_instances_cpp}")
-
 file(
     GLOB hal_shared_native_src
     src/main/native/cpp/*.cpp
@@ -46,8 +25,6 @@ else()
     target_sources(hal PRIVATE ${hal_sim_native_src})
 endif()
 
-configure_file(src/generate/FRCUsageReporting.h.in gen/hal/FRCUsageReporting.h)
-
 set_target_properties(hal PROPERTIES OUTPUT_NAME "wpiHal")
 
 target_include_directories(
@@ -60,7 +37,7 @@ target_include_directories(
 target_include_directories(
     hal
     PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/gen>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/generated/main/native/include>
         $<INSTALL_INTERFACE:${include_dest}/hal>
 )
 target_link_libraries(hal PUBLIC wpiutil)
@@ -69,7 +46,7 @@ set_property(TARGET hal PROPERTY FOLDER "libraries")
 
 install(TARGETS hal EXPORT hal)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/hal")
-install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/gen/ DESTINATION "${include_dest}/hal")
+install(DIRECTORY src/generated/main/native/include/ DESTINATION "${include_dest}/hal")
 
 configure_file(hal-config.cmake.in ${WPILIB_BINARY_DIR}/hal-config.cmake)
 install(FILES ${WPILIB_BINARY_DIR}/hal-config.cmake DESTINATION share/hal)
@@ -86,22 +63,19 @@ if(WITH_JAVA)
 
     file(GLOB_RECURSE hal_shared_jni_src src/main/native/cpp/jni/*.cpp)
 
-    file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
+    file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java src/generated/main/java/*.java)
     set(CMAKE_JNI_TARGET true)
 
     add_jar(
         hal_jar
         ${JAVA_SOURCES}
-        ${CMAKE_CURRENT_BINARY_DIR}/FRCNetComm.java
         INCLUDE_JARS wpiutil_jar
         OUTPUT_NAME wpiHal
         GENERATE_NATIVE_HEADERS hal_jni_headers
     )
 
-    get_property(HAL_JAR_FILE TARGET hal_jar PROPERTY JAR_FILE)
-    install(FILES ${HAL_JAR_FILE} DESTINATION "${java_lib_dest}")
-
-    set_property(TARGET hal_jar PROPERTY FOLDER "java")
+    install_jar(hal_jar DESTINATION ${java_lib_dest})
+    install_jar_exports(TARGETS hal_jar FILE hal_jar.cmake DESTINATION share/hal)
 
     add_library(haljni ${hal_shared_jni_src})
 
@@ -125,11 +99,7 @@ endif()
 if(WITH_JAVA_SOURCE)
     find_package(Java REQUIRED)
     include(UseJava)
-    file(
-        GLOB HAL_SOURCES
-        src/main/java/edu/wpi/first/hal/*.java
-        ${CMAKE_CURRENT_BINARY_DIR}/FRCNetComm.java
-    )
+    file(GLOB HAL_SOURCES src/main/java/edu/wpi/first/hal/*.java src/generated/main/java/*.java)
     file(GLOB HAL_CAN_SOURCES src/main/java/edu/wpi/first/hal/can/*.java)
     file(GLOB HAL_SIMULATION_SOURCES src/main/java/edu/wpi/first/hal/simulation/*.java)
     file(GLOB HAL_UTIL_SOURCES src/main/java/edu/wpi/first/hal/util/*.java)

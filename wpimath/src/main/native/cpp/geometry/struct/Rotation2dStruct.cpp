@@ -10,13 +10,12 @@ constexpr size_t kValueOff = 0;
 
 using StructType = wpi::Struct<frc::Rotation2d>;
 
-frc::Rotation2d StructType::Unpack(std::span<const uint8_t, kSize> data) {
+frc::Rotation2d StructType::Unpack(std::span<const uint8_t> data) {
   return frc::Rotation2d{
       units::radian_t{wpi::UnpackStruct<double, kValueOff>(data)},
   };
 }
 
-void StructType::Pack(std::span<uint8_t, kSize> data,
-                      const frc::Rotation2d& value) {
+void StructType::Pack(std::span<uint8_t> data, const frc::Rotation2d& value) {
   wpi::PackStruct<kValueOff>(data, value.Radians().value());
 }

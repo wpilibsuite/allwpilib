@@ -13,8 +13,7 @@ constexpr size_t kKaOff = kKvOff + 8;
 
 using StructType = wpi::Struct<frc::ElevatorFeedforward>;
 
-frc::ElevatorFeedforward StructType::Unpack(
-    std::span<const uint8_t, kSize> data) {
+frc::ElevatorFeedforward StructType::Unpack(std::span<const uint8_t> data) {
   return frc::ElevatorFeedforward{
       units::volt_t{wpi::UnpackStruct<double, kKsOff>(data)},
       units::volt_t{wpi::UnpackStruct<double, kKgOff>(data)},
@@ -25,7 +24,7 @@ frc::ElevatorFeedforward StructType::Unpack(
   };
 }
 
-void StructType::Pack(std::span<uint8_t, kSize> data,
+void StructType::Pack(std::span<uint8_t> data,
                       const frc::ElevatorFeedforward& value) {
   wpi::PackStruct<kKsOff>(data, value.kS());
   wpi::PackStruct<kKgOff>(data, value.kG());

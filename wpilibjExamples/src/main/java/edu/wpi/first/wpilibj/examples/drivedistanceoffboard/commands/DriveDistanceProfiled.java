@@ -29,7 +29,7 @@ public class DriveDistanceProfiled extends TrapezoidProfileCommand {
         // End at desired position in meters; implicitly starts at 0
         () -> new TrapezoidProfile.State(meters, 0),
         // Current position
-        () -> new TrapezoidProfile.State(),
+        TrapezoidProfile.State::new,
         // Require the drive
         drive);
     // Reset drive encoders since we're starting at 0

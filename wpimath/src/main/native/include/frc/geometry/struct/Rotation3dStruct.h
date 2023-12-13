@@ -11,15 +11,21 @@
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Struct<frc::Rotation3d> {
-  static constexpr std::string_view kTypeString = "struct:Rotation3d";
-  static constexpr size_t kSize = wpi::Struct<frc::Quaternion>::kSize;
-  static constexpr std::string_view kSchema = "Quaternion q";
+  static constexpr std::string_view GetTypeString() {
+    return "struct:Rotation3d";
+  }
+  static constexpr size_t GetSize() {
+    return wpi::GetStructSize<frc::Quaternion>();
+  }
+  static constexpr std::string_view GetSchema() { return "Quaternion q"; }
 
-  static frc::Rotation3d Unpack(std::span<const uint8_t, kSize> data);
-  static void Pack(std::span<uint8_t, kSize> data,
-                   const frc::Rotation3d& value);
+  static frc::Rotation3d Unpack(std::span<const uint8_t> data);
+  static void Pack(std::span<uint8_t> data, const frc::Rotation3d& value);
   static void ForEachNested(
-      std::invocable<std::string_view, std::string_view> auto fn);
+      std::invocable<std::string_view, std::string_view> auto fn) {
+    wpi::ForEachStructSchema<frc::Quaternion>(fn);
+  }
 };
 
+static_assert(wpi::StructSerializable<frc::Rotation3d>);
 static_assert(wpi::HasNestedStruct<frc::Rotation3d>);

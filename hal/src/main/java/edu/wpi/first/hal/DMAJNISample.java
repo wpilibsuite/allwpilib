@@ -131,8 +131,7 @@ public class DMAJNISample {
     }
 
     // + 2 Hack, but needed to not have to call into JNI
-    int value = readValue(data.m_valueType + 2, data.m_index);
-    return value;
+    return readValue(data.m_valueType + 2, data.m_index);
   }
 
   public void getAnalogAccumulator(int analogInputHandle, AccumulatorResult result) {

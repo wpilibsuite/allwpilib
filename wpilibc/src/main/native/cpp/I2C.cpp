@@ -4,6 +4,7 @@
 
 #include "frc/I2C.h"
 
+#include <algorithm>
 #include <utility>
 
 #include <hal/FRCUsageReporting.h>
@@ -96,7 +97,7 @@ bool I2C::VerifySensor(int registerAddress, int count,
   uint8_t deviceData[4];
   for (int i = 0, curRegisterAddress = registerAddress; i < count;
        i += 4, curRegisterAddress += 4) {
-    int toRead = count - i < 4 ? count - i : 4;
+    int toRead = std::min(count - i, 4);
     // Read the chunk of data.  Return false if the sensor does not respond.
     if (Read(curRegisterAddress, toRead, deviceData)) {
       return false;

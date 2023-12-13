@@ -13,6 +13,7 @@ public class PS5ControllerSim extends GenericHIDSim {
    *
    * @param joystick controller to simulate
    */
+  @SuppressWarnings("this-escape")
   public PS5ControllerSim(PS5Controller joystick) {
     super(joystick);
     setAxisCount(6);
@@ -25,6 +26,7 @@ public class PS5ControllerSim extends GenericHIDSim {
    *
    * @param port port number
    */
+  @SuppressWarnings("this-escape")
   public PS5ControllerSim(int port) {
     super(port);
     setAxisCount(6);

@@ -15,8 +15,8 @@ const Rotation2d kExpectedData{Rotation2d{1.91_rad}};
 }  // namespace
 
 TEST(Rotation2dStructTest, Roundtrip) {
-  uint8_t buffer[StructType::kSize];
-  std::memset(buffer, 0, StructType::kSize);
+  uint8_t buffer[StructType::GetSize()];
+  std::memset(buffer, 0, StructType::GetSize());
   StructType::Pack(buffer, kExpectedData);
 
   Rotation2d unpacked_data = StructType::Unpack(buffer);

@@ -28,7 +28,7 @@ public final class ProtobufBuffer<T, MessageType extends ProtoMessage<?>> {
 
   public static <T, MessageType extends ProtoMessage<?>> ProtobufBuffer<T, MessageType> create(
       Protobuf<T, MessageType> proto) {
-    return new ProtobufBuffer<T, MessageType>(proto);
+    return new ProtobufBuffer<>(proto);
   }
 
   /**

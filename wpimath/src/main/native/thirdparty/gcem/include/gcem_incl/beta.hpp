@@ -24,6 +24,9 @@
 #include <cmath>
 #include <type_traits>
 
+namespace gcem
+{
+
 /**
  * Compile-time beta function
  *
@@ -48,6 +51,8 @@ noexcept
     return exp( lbeta(a,b) );
 #endif
   }
+}
+
 }
 
 #endif

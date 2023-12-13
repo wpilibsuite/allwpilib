@@ -110,6 +110,7 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
    * @param channel The channel number for this relay (0 - 3).
    * @param direction The direction that the Relay object will control.
    */
+  @SuppressWarnings("this-escape")
   public Relay(final int channel, Direction direction) {
     m_channel = channel;
     m_direction = requireNonNullParam(direction, "direction", "Relay");
@@ -279,6 +280,7 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
    *
    * @param direction The direction for the relay to operate in
    */
+  @SuppressWarnings("this-escape")
   public void setDirection(Direction direction) {
     requireNonNullParam(direction, "direction", "setDirection");
     if (m_direction == direction) {

@@ -5,6 +5,7 @@
 #pragma once
 
 #include <cstddef>
+#include <iterator>
 #include <vector>
 
 namespace wpi {
@@ -32,7 +33,7 @@ class circular_buffer {
     using reference = T&;
 
     iterator(circular_buffer* buffer, size_t index)
-        : m_buffer(buffer), m_index(index) {}
+        : m_buffer{buffer}, m_index{index} {}
 
     iterator& operator++() {
       ++m_index;
@@ -60,7 +61,7 @@ class circular_buffer {
     using const_reference = const T&;
 
     const_iterator(const circular_buffer* buffer, size_t index)
-        : m_buffer(buffer), m_index(index) {}
+        : m_buffer{buffer}, m_index{index} {}
 
     const_iterator& operator++() {
       ++m_index;

@@ -7,6 +7,7 @@
 #include <concepts>
 #include <functional>
 #include <memory>
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>
@@ -27,8 +28,7 @@ namespace frc2 {
  */
 class CommandPtr final {
  public:
-  explicit CommandPtr(std::unique_ptr<Command>&& command)
-      : m_ptr(std::move(command)) {}
+  explicit CommandPtr(std::unique_ptr<Command>&& command);
 
   template <std::derived_from<Command> T>
   // NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
@@ -36,8 +36,10 @@ class CommandPtr final {
       : CommandPtr(
             std::make_unique<std::decay_t<T>>(std::forward<T>(command))) {}
 
-  CommandPtr(CommandPtr&&) = default;
+  CommandPtr(CommandPtr&&);
   CommandPtr& operator=(CommandPtr&&) = default;
+
+  explicit CommandPtr(std::nullptr_t) = delete;
 
   /**
    * Decorates this command to run repeatedly, restarting it when it ends, until
@@ -326,6 +328,7 @@ class CommandPtr final {
 
  private:
   std::unique_ptr<Command> m_ptr;
+  std::string m_moveOutSite{""};
   void AssertValid() const;
 };
 

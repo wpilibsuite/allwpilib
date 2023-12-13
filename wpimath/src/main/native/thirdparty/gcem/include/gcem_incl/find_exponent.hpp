@@ -25,6 +25,9 @@
 #ifndef _gcem_find_exponent_HPP
 #define _gcem_find_exponent_HPP
 
+namespace gcem
+{
+
 namespace internal
 {
 
@@ -50,6 +53,8 @@ noexcept
                 find_exponent(x / T(1e+04), exponent + llint_t(4)) :
             // else
                 exponent );
+}
+
 }
 
 }

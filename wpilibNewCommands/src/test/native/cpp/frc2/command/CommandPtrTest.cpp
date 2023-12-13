@@ -34,3 +34,7 @@ TEST_F(CommandPtrTest, MovedFrom) {
 
   EXPECT_EQ(1, counter);
 }
+
+TEST_F(CommandPtrTest, NullInitialization) {
+  EXPECT_THROW(CommandPtr{std::unique_ptr<Command>{}}, frc::RuntimeError);
+}

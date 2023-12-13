@@ -35,6 +35,7 @@ public class ProxyCommand extends Command {
    *
    * @param command the command to run by proxy
    */
+  @SuppressWarnings("this-escape")
   public ProxyCommand(Command command) {
     this(() -> command);
     setName("Proxy(" + command.getName() + ")");

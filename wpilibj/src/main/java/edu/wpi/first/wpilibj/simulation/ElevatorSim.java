@@ -41,6 +41,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
    * @param startingHeightMeters The starting height of the elevator.
    * @param measurementStdDevs The standard deviations of the measurements.
    */
+  @SuppressWarnings("this-escape")
   public ElevatorSim(
       LinearSystem<N2, N1, N1> plant,
       DCMotor gearbox,
@@ -221,7 +222,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
    * @param positionMeters The new position in meters.
    * @param velocityMetersPerSecond New velocity in meters per second.
    */
-  public void setState(double positionMeters, double velocityMetersPerSecond) {
+  public final void setState(double positionMeters, double velocityMetersPerSecond) {
     setState(
         VecBuilder.fill(
             MathUtil.clamp(positionMeters, m_minHeight, m_maxHeight), velocityMetersPerSecond));

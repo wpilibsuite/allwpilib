@@ -28,6 +28,9 @@
 #ifndef _gcem_erf_inv_HPP
 #define _gcem_erf_inv_HPP
 
+namespace gcem
+{
+
 namespace internal
 {
 
@@ -260,5 +263,6 @@ noexcept
     return internal::erf_inv_begin( static_cast<return_t<T>>(p) );
 }
 
+}
 
 #endif

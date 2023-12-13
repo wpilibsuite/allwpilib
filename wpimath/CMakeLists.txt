@@ -17,52 +17,6 @@ protobuf_generate_cpp(
     ${wpimath_proto_src}
 )
 
-function(quickbuf_generate SRCS JAVA_PACKAGE)
-    if(NOT ARGN)
-        message(SEND_ERROR "Error: PROTOBUF_GENERATE_QUICKBUF() called without any proto files")
-        return()
-    endif()
-
-    set(_generated_srcs_all)
-    foreach(_proto ${ARGN})
-        get_filename_component(_abs_file ${_proto} ABSOLUTE)
-        get_filename_component(_abs_dir ${_abs_file} DIRECTORY)
-        get_filename_component(_basename ${_proto} NAME_WLE)
-        file(RELATIVE_PATH _rel_dir ${CMAKE_CURRENT_SOURCE_DIR} ${_abs_dir})
-
-        # convert to QuickBuffers Java case (geometry2d -> Geometry2D)
-        string(REGEX MATCHALL "[A-Za-z_]+|[0-9]+" _name_components ${_basename})
-        set(_name_components_out)
-        foreach(_part ${_name_components})
-            string(SUBSTRING ${_part} 0 1 _first_letter)
-            string(TOUPPER ${_first_letter} _first_letter)
-            string(REGEX REPLACE "^.(.*)" "${_first_letter}\\1" _part_out "${_part}")
-            list(APPEND _name_components_out ${_part_out})
-        endforeach()
-        list(JOIN _name_components_out "" _basename_title)
-
-        set(_generated_src
-            "${CMAKE_CURRENT_BINARY_DIR}/quickbuf/${JAVA_PACKAGE}/${_basename_title}.java"
-        )
-
-        list(APPEND _generated_srcs_all ${_generated_src})
-
-        add_custom_command(
-            OUTPUT ${_generated_src}
-            COMMAND protobuf::protoc
-            ARGS
-                --plugin=protoc-gen-quickbuf=${Quickbuf_EXECUTABLE}
-                --quickbuf_out=gen_descriptors=true:${CMAKE_CURRENT_BINARY_DIR}/quickbuf
-                -I${_abs_dir} ${_abs_file}
-            DEPENDS ${_abs_file} protobuf::protoc
-            COMMENT "Running quickbuf protocol buffer compiler on ${_proto}"
-            VERBATIM
-        )
-    endforeach()
-
-    set(${SRCS} ${_generated_srcs_all} PARENT_SCOPE)
-endfunction()
-
 file(
     GLOB wpimath_jni_src
     src/main/native/cpp/jni/WPIMathJNI_DARE.cpp
@@ -79,8 +33,6 @@ if(WITH_JAVA)
     find_package(JNI REQUIRED)
     include(UseJava)
     set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
-
-    quickbuf_generate(WPIMATH_QUICKBUF_SRCS "edu/wpi/first/math/proto" ${wpimath_proto_src})
 
     if(NOT EXISTS "${WPILIB_BINARY_DIR}/wpimath/thirdparty/ejml/ejml-simple-0.43.1.jar")
         set(BASE_URL "https://search.maven.org/remotecontent?filepath=")
@@ -119,43 +71,20 @@ if(WITH_JAVA)
 
     set(CMAKE_JAVA_INCLUDE_PATH wpimath.jar ${EJML_JARS} ${JACKSON_JARS} ${QUICKBUF_JAR})
 
-    execute_process(
-        COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/generate_numbers.py ${WPILIB_BINARY_DIR}/wpimath
-        RESULT_VARIABLE generateResult
-    )
-    if(NOT (generateResult EQUAL "0"))
-        # Try python
-        execute_process(
-            COMMAND
-                python ${CMAKE_CURRENT_SOURCE_DIR}/generate_numbers.py ${WPILIB_BINARY_DIR}/wpimath
-            RESULT_VARIABLE generateResult
-        )
-        if(NOT (generateResult EQUAL "0"))
-            message(FATAL_ERROR "python and python3 generate_numbers.py failed")
-        endif()
-    endif()
-
     set(CMAKE_JNI_TARGET true)
 
-    file(
-        GLOB_RECURSE JAVA_SOURCES
-        src/main/java/*.java
-        ${WPILIB_BINARY_DIR}/wpimath/generated/*.java
-    )
+    file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java src/generated/main/java/*.java)
 
     add_jar(
         wpimath_jar
         ${JAVA_SOURCES}
-        ${WPIMATH_QUICKBUF_SRCS}
         INCLUDE_JARS ${EJML_JARS} wpiutil_jar wpiunits_jar
         OUTPUT_NAME wpimath
         GENERATE_NATIVE_HEADERS wpimath_jni_headers
     )
 
-    get_property(WPIMATH_JAR_FILE TARGET wpimath_jar PROPERTY JAR_FILE)
-    install(FILES ${WPIMATH_JAR_FILE} DESTINATION "${java_lib_dest}")
-
-    set_property(TARGET wpimath_jar PROPERTY FOLDER "java")
+    install_jar(wpimath_jar DESTINATION ${java_lib_dest})
+    install_jar_exports(TARGETS wpimath_jar FILE wpimath_jar.cmake DESTINATION share/wpimath)
 
     add_library(wpimathjni ${wpimath_jni_src})
     wpilib_target_warnings(wpimathjni)
@@ -175,7 +104,7 @@ if(WITH_JAVA_SOURCE)
     file(
         GLOB WPIMATH_SOURCES
         src/main/java/edu/wpi/first/math/*.java
-        ${WPILIB_BINARY_DIR}/wpimath/generated/main/java/edu/wpi/first/math/Nat.java
+        src/generated/main/java/edu/wpi/first/math/Nat.java
     )
     file(GLOB WPIMATH_CONTROLLER_SOURCES src/main/java/edu/wpi/first/math/controller/*.java)
     file(GLOB WPIMATH_ESTIMATOR_SOURCES src/main/java/edu/wpi/first/math/estimator/*.java)
@@ -183,10 +112,7 @@ if(WITH_JAVA_SOURCE)
     file(GLOB WPIMATH_GEOMETRY_SOURCES src/main/java/edu/wpi/first/math/geometry/*.java)
     file(GLOB WPIMATH_INTERPOLATION_SOURCES src/main/java/edu/wpi/first/math/interpolation/*.java)
     file(GLOB WPIMATH_KINEMATICS_SOURCES src/main/java/edu/wpi/first/math/kinematics/*.java)
-    file(
-        GLOB WPIMATH_NUMBERS_SOURCES
-        ${WPILIB_BINARY_DIR}/wpimath/generated/main/java/edu/wpi/first/math/numbers/*.java
-    )
+    file(GLOB WPIMATH_NUMBERS_SOURCES src/generated/main/java/edu/wpi/first/math/numbers/*.java)
     file(GLOB WPIMATH_SPLINE_SOURCES src/main/java/edu/wpi/first/math/spline/*.java)
     file(GLOB WPIMATH_SYSTEM_SOURCES src/main/java/edu/wpi/first/math/system/*.java)
     file(GLOB WPIMATH_SYSTEM_PLANT_SOURCES src/main/java/edu/wpi/first/math/system/plant/*.java)

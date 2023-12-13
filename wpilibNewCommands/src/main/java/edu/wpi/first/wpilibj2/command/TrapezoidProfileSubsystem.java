@@ -78,7 +78,7 @@ public abstract class TrapezoidProfileSubsystem extends SubsystemBase {
    *
    * @param goal The goal state for the subsystem's motion profile.
    */
-  public void setGoal(TrapezoidProfile.State goal) {
+  public final void setGoal(TrapezoidProfile.State goal) {
     m_goal = goal;
   }
 
@@ -87,7 +87,7 @@ public abstract class TrapezoidProfileSubsystem extends SubsystemBase {
    *
    * @param goal The goal position for the subsystem's motion profile.
    */
-  public void setGoal(double goal) {
+  public final void setGoal(double goal) {
     setGoal(new TrapezoidProfile.State(goal, 0));
   }
 
