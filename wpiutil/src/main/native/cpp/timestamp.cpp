@@ -267,7 +267,7 @@ uint64_t wpi::Now() {
   // Same code as HAL_GetFPGATime()
   if (!hmbInitialized.test()) {
     if (nowUseDefaultOnFailure.test()) {
-      return (now_impl.load())();
+      return timestamp() - offset_val;
     } else {
       fmt::print(
           stderr,
