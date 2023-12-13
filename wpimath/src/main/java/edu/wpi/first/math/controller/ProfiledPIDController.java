@@ -426,7 +426,7 @@ public class ProfiledPIDController implements Sendable {
     builder.addDoubleProperty("p", this::getP, this::setP);
     builder.addDoubleProperty("i", this::getI, this::setI);
     builder.addDoubleProperty("d", this::getD, this::setD);
-    builder.addDoubleProperty("izone", this::getIZone, this::setIZone);
+    builder.addDoubleProperty("izone", this::getIZone, (double toSet)->{try{setIZone(toSet);}catch(IllegalArgumentException e){MathSharedStore.reportError("IZone must be a non-negative number!", e.getStackTrace());}});
     builder.addDoubleProperty("goal", () -> getGoal().position, this::setGoal);
   }
 }
