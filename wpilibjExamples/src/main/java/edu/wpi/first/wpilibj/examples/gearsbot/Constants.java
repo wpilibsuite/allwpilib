@@ -25,6 +25,13 @@ public final class Constants {
     public static final double kEncoderDistancePerPulse =
         // Assumes the encoders are directly mounted on the wheel shafts
         (kWheelDiameterInches * Math.PI) / (double) kEncoderCPR;
+
+    public static final class PositionPID {
+      // these pid constants are not real, and will need to be tuned
+      public static final double kP = 2.0;
+      public static final double kI = 0.0;
+      public static final double kD = 0.0;
+    }
   }
 
   public static final class ClawConstants {
@@ -66,13 +73,6 @@ public final class Constants {
     public static final double kDistToBox2 = 0.60;
 
     public static final double kWristSetpoint = -45.0;
-  }
-
-  public static final class DriveStraightConstants {
-    // these pid constants are not real, and will need to be tuned
-    public static final double kP = 4.0;
-    public static final double kI = 0.0;
-    public static final double kD = 0.0;
   }
 
   public static final class Positions {

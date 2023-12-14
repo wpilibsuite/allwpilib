@@ -4,10 +4,13 @@
 
 package edu.wpi.first.wpilibj.examples.gearsbot.subsystems;
 
+import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.ClawConstants.*;
+
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.examples.gearsbot.Constants.ClawConstants;
 import edu.wpi.first.wpilibj.motorcontrol.Victor;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /**
@@ -15,8 +18,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  * motors, you should probably use a sensor so that the motors don't stall.
  */
 public class Claw extends SubsystemBase {
-  private final Victor m_motor = new Victor(ClawConstants.kMotorPort);
-  private final DigitalInput m_contact = new DigitalInput(ClawConstants.kContactPort);
+  private final Victor m_motor = new Victor(kMotorPort);
+  private final DigitalInput m_contact = new DigitalInput(kContactPort);
 
   /** Create a new claw subsystem. */
   public Claw() {
@@ -30,18 +33,19 @@ public class Claw extends SubsystemBase {
   }
 
   /** Set the claw motor to move in the open direction. */
-  public void open() {
-    m_motor.set(-1);
+  public Command open() {
+    return runOnce(() -> m_motor.set(-1))
+        .andThen(Commands.waitSeconds(1))
+        .andThen(m_motor::stopMotor)
+        .withName("open claw");
   }
 
   /** Set the claw motor to move in the close direction. */
-  public void close() {
-    m_motor.set(1);
-  }
-
-  /** Stops the claw motor from moving. */
-  public void stop() {
-    m_motor.set(0);
+  public Command close() {
+    return runOnce(() -> m_motor.set(1))
+        .andThen(Commands.waitSeconds(1))
+        .andThen(m_motor::stopMotor)
+        .withName("close claw");
   }
 
   /** Return true when the robot is grabbing an object hard enough to trigger the limit switch. */

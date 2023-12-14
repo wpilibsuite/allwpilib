@@ -4,52 +4,44 @@
 
 package edu.wpi.first.wpilibj.examples.gearsbot.subsystems;
 
+import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.DriveConstants.*;
+
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.examples.gearsbot.Constants.DriveConstants;
 import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import java.util.function.DoubleSupplier;
 
+/**
+ * The Drivetrain subsystem incorporates the sensors and actuators attached to the robots chassis.
+ * These include four drive motors, a left and right encoder and a gyro.
+ */
 public class Drivetrain extends SubsystemBase {
-  /**
-   * The Drivetrain subsystem incorporates the sensors and actuators attached to the robots chassis.
-   * These include four drive motors, a left and right encoder and a gyro.
-   */
   private final MotorController m_leftMotor =
-      new MotorControllerGroup(
-          new PWMSparkMax(DriveConstants.kLeftMotorPort1),
-          new PWMSparkMax(DriveConstants.kLeftMotorPort1));
+      new MotorControllerGroup(new PWMSparkMax(kLeftMotorPort1), new PWMSparkMax(kLeftMotorPort1));
 
   private final MotorController m_rightMotor =
-      new MotorControllerGroup(
-          new PWMSparkMax(DriveConstants.kRightMotorPort2),
-          new PWMSparkMax(DriveConstants.kLeftMotorPort2));
+      new MotorControllerGroup(new PWMSparkMax(kRightMotorPort2), new PWMSparkMax(kLeftMotorPort2));
 
   private final DifferentialDrive m_drive = new DifferentialDrive(m_leftMotor, m_rightMotor);
 
   private final Encoder m_leftEncoder =
-      new Encoder(
-          DriveConstants.kLeftEncoderPorts[0],
-          DriveConstants.kLeftEncoderPorts[1],
-          DriveConstants.kLeftEncoderReversed);
+      new Encoder(kLeftEncoderPorts[0], kLeftEncoderPorts[1], kLeftEncoderReversed);
   private final Encoder m_rightEncoder =
-      new Encoder(
-          DriveConstants.kRightEncoderPorts[0],
-          DriveConstants.kRightEncoderPorts[1],
-          DriveConstants.kRightEncoderReversed);
-  private final AnalogInput m_rangefinder = new AnalogInput(DriveConstants.kRangeFinderPort);
-  private final AnalogGyro m_gyro = new AnalogGyro(DriveConstants.kAnalogGyroPort);
+      new Encoder(kRightEncoderPorts[0], kRightEncoderPorts[1], kRightEncoderReversed);
+  private final AnalogInput m_rangefinder = new AnalogInput(kRangeFinderPort);
+  private final AnalogGyro m_gyro = new AnalogGyro(kAnalogGyroPort);
 
   /** Create a new drivetrain subsystem. */
   public Drivetrain() {
-    super();
-
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
@@ -61,8 +53,8 @@ public class Drivetrain extends SubsystemBase {
     // simulate 360 tick encoders. This if statement allows for the
     // real robot to handle this difference in devices.
     if (Robot.isReal()) {
-      m_leftEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse);
-      m_rightEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse);
+      m_leftEncoder.setDistancePerPulse(kEncoderDistancePerPulse);
+      m_rightEncoder.setDistancePerPulse(kEncoderDistancePerPulse);
     } else {
       // Circumference = diameter in feet * pi. 360 tick simulated encoders.
       m_leftEncoder.setDistancePerPulse((4.0 / 12.0 * Math.PI) / 360.0);
@@ -77,15 +69,6 @@ public class Drivetrain extends SubsystemBase {
     addChild("Gyro", m_gyro);
   }
 
-  /** The log method puts interesting information to the SmartDashboard. */
-  public void log() {
-    SmartDashboard.putNumber("Left Distance", m_leftEncoder.getDistance());
-    SmartDashboard.putNumber("Right Distance", m_rightEncoder.getDistance());
-    SmartDashboard.putNumber("Left Speed", m_leftEncoder.getRate());
-    SmartDashboard.putNumber("Right Speed", m_rightEncoder.getRate());
-    SmartDashboard.putNumber("Gyro", m_gyro.getAngle());
-  }
-
   /**
    * Tank style driving for the Drivetrain.
    *
@@ -94,6 +77,19 @@ public class Drivetrain extends SubsystemBase {
    */
   public void drive(double left, double right) {
     m_drive.tankDrive(left, right);
+  }
+
+  /**
+   * Drives the robot tank style.
+   *
+   * @param left The control input for the left side of the drive
+   * @param right The control input for the right sight of the drive
+   * @return The tank drive command.
+   */
+  public Command tankDrive(DoubleSupplier left, DoubleSupplier right) {
+    return run(() -> drive(left.getAsDouble(), right.getAsDouble()))
+        .finallyDo(() -> drive(0, 0))
+        .withName("driving");
   }
 
   /**
@@ -129,6 +125,63 @@ public class Drivetrain extends SubsystemBase {
   public double getDistanceToObstacle() {
     // Really meters in simulation since it's a rangefinder...
     return m_rangefinder.getAverageVoltage();
+  }
+
+  /**
+   * Drive until the robot is the given distance away from the box. Uses a local PID controller to
+   * run a simple PID loop that is only enabled while this command is running. The input is the
+   * averaged values of the left and right encoders.
+   *
+   * @param distance The distance away from the box to drive to
+   * @return A command that drives the robot to the provided distance based on the rangefinder.
+   */
+  public Command driveDistanceFromObstacle(double distance) {
+    return driveDistance(-distance, () -> -getDistanceToObstacle());
+  }
+
+  /**
+   * Drive the given distance straight (negative values go backwards). Uses a local PID controller
+   * to run a simple PID loop that is only enabled while this command is running. The input is the
+   * averaged values of the left and right encoders.
+   *
+   * @param distance The distance to drive
+   * @return The command to drive straight
+   */
+  public Command driveDistanceEncoders(double distance) {
+    return driveDistance(distance, this::getDistance);
+  }
+
+  /**
+   * A private factory for commands that drive a specific distance based on sensor inputs.
+   *
+   * @param setpoint The setpoint
+   * @param measurement The measurement
+   * @return
+   */
+  @SuppressWarnings("resource")
+  private Command driveDistance(double setpoint, DoubleSupplier measurement) {
+    PIDController controller = new PIDController(PositionPID.kP, PositionPID.kI, PositionPID.kD);
+    controller.setSetpoint(setpoint);
+    controller.setTolerance(0.01);
+
+    return runOnce(this::reset)
+        .andThen(
+            run(
+                () -> {
+                  double out = controller.calculate(measurement.getAsDouble());
+                  drive(out, out);
+                }))
+        .until(controller::atSetpoint)
+        .withName("drive distance");
+  }
+
+  /** The log method puts interesting information to the SmartDashboard. */
+  public void log() {
+    SmartDashboard.putNumber("Left Distance", m_leftEncoder.getDistance());
+    SmartDashboard.putNumber("Right Distance", m_rightEncoder.getDistance());
+    SmartDashboard.putNumber("Left Speed", m_leftEncoder.getRate());
+    SmartDashboard.putNumber("Right Speed", m_rightEncoder.getRate());
+    SmartDashboard.putNumber("Gyro", m_gyro.getAngle());
   }
 
   /** Call log method every loop. */
