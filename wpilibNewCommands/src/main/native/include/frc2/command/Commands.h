@@ -12,6 +12,7 @@
 #include <utility>
 #include <vector>
 
+#include "frc2/command/CommandConcepts.h"
 #include "frc2/command/CommandPtr.h"
 #include "frc2/command/Requirements.h"
 #include "frc2/command/SelectCommand.h"
@@ -130,13 +131,14 @@ CommandPtr Either(CommandPtr&& onTrue, CommandPtr&& onFalse,
  * @param selector the selector function
  * @param commands map of commands to select from
  */
-template <typename Key, std::convertible_to<CommandPtr>... CommandPtrs>
+template <typename Key, OwnedCommand... CommandPtrs>
 [[nodiscard]]
 CommandPtr Select(std::function<Key()> selector,
                   std::pair<Key, CommandPtrs>&&... commands) {
   std::vector<std::pair<Key, std::unique_ptr<Command>>> vec;
 
-  ((void)vec.emplace_back(commands.first, std::move(commands.second).Unwrap()),
+  ((void)vec.emplace_back(commands.first,
+                          CommandPtr(std::move(commands.second)).Unwrap()),
    ...);
 
   return SelectCommand(std::move(selector), std::move(vec)).ToPtr();
@@ -179,11 +181,11 @@ namespace impl {
 /**
  * Create a vector of commands.
  */
-template <std::convertible_to<CommandPtr>... Args>
+template <OwnedCommand... Args>
 std::vector<CommandPtr> MakeVector(Args&&... args) {
   std::vector<CommandPtr> data;
   data.reserve(sizeof...(Args));
-  (data.emplace_back(std::forward<Args>(args)), ...);
+  (data.emplace_back(CommandPtr(std::forward<Args>(args))), ...);
   return data;
 }
 
@@ -198,7 +200,7 @@ CommandPtr Sequence(std::vector<CommandPtr>&& commands);
 /**
  * Runs a group of commands in series, one after the other.
  */
-template <std::convertible_to<CommandPtr>... CommandPtrs>
+template <OwnedCommand... CommandPtrs>
 [[nodiscard]]
 CommandPtr Sequence(CommandPtrs&&... commands) {
   return Sequence(impl::MakeVector(std::forward<CommandPtrs>(commands)...));
@@ -215,7 +217,7 @@ CommandPtr RepeatingSequence(std::vector<CommandPtr>&& commands);
  * Runs a group of commands in series, one after the other. Once the last
  * command ends, the group is restarted.
  */
-template <std::convertible_to<CommandPtr>... CommandPtrs>
+template <OwnedCommand... CommandPtrs>
 [[nodiscard]]
 CommandPtr RepeatingSequence(CommandPtrs&&... commands) {
   return RepeatingSequence(
@@ -233,7 +235,7 @@ CommandPtr Parallel(std::vector<CommandPtr>&& commands);
  * Runs a group of commands at the same time. Ends once all commands in the
  * group finish.
  */
-template <std::convertible_to<CommandPtr>... CommandPtrs>
+template <OwnedCommand... CommandPtrs>
 [[nodiscard]]
 CommandPtr Parallel(CommandPtrs&&... commands) {
   return Parallel(impl::MakeVector(std::forward<CommandPtrs>(commands)...));
@@ -250,7 +252,7 @@ CommandPtr Race(std::vector<CommandPtr>&& commands);
  * Runs a group of commands at the same time. Ends once any command in the group
  * finishes, and cancels the others.
  */
-template <std::convertible_to<CommandPtr>... CommandPtrs>
+template <OwnedCommand... CommandPtrs>
 [[nodiscard]]
 CommandPtr Race(CommandPtrs&&... commands) {
   return Race(impl::MakeVector(std::forward<CommandPtrs>(commands)...));
@@ -267,10 +269,10 @@ CommandPtr Deadline(CommandPtr&& deadline, std::vector<CommandPtr>&& others);
  * Runs a group of commands at the same time. Ends once a specific command
  * finishes, and cancels the others.
  */
-template <std::convertible_to<CommandPtr>... CommandPtrs>
+template <OwnedCommand DeadlineCommandPtr, OwnedCommand... CommandPtrs>
 [[nodiscard]]
-CommandPtr Deadline(CommandPtr&& deadline, CommandPtrs&&... commands) {
-  return Deadline(std::move(deadline),
+CommandPtr Deadline(DeadlineCommandPtr&& deadline, CommandPtrs&&... commands) {
+  return Deadline(CommandPtr(std::forward<DeadlineCommandPtr>(deadline)),
                   impl::MakeVector(std::forward<CommandPtrs>(commands)...));
 }
 
