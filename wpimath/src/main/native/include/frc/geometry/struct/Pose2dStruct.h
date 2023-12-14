@@ -29,4 +29,5 @@ struct WPILIB_DLLEXPORT wpi::Struct<frc::Pose2d> {
   }
 };
 
+static_assert(wpi::StructSerializable<frc::Pose2d>);
 static_assert(wpi::HasNestedStruct<frc::Pose2d>);

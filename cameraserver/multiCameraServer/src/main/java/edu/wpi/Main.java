@@ -98,7 +98,7 @@ public final class Main {
     // parse file
     JsonElement top;
     try {
-      top = new JsonParser().parse(Files.newBufferedReader(Paths.get(configFile)));
+      top = JsonParser.parseReader(Files.newBufferedReader(Paths.get(configFile)));
     } catch (IOException ex) {
       System.err.println("could not open '" + configFile + "': " + ex);
       return false;

@@ -24,6 +24,9 @@
 #include <cmath>
 #include <type_traits>
 
+namespace gcem
+{
+
 /**
  * Compile-time copy sign function
  *
@@ -43,6 +46,8 @@ noexcept
   } else {
     return std::copysign(x, y);
   }
+}
+
 }
 
 #endif

@@ -28,6 +28,9 @@
 #include <cmath>
 #include <type_traits>
 
+namespace gcem
+{
+
 namespace internal
 {
 
@@ -111,6 +114,8 @@ noexcept
   } else {
     return std::sqrt(x);
   }
+}
+
 }
 
 #endif

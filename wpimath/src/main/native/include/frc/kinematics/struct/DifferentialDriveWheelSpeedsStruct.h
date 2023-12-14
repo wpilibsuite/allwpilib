@@ -24,3 +24,5 @@ struct WPILIB_DLLEXPORT wpi::Struct<frc::DifferentialDriveWheelSpeeds> {
   static void Pack(std::span<uint8_t> data,
                    const frc::DifferentialDriveWheelSpeeds& value);
 };
+
+static_assert(wpi::StructSerializable<frc::DifferentialDriveWheelSpeeds>);

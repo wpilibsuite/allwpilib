@@ -21,6 +21,7 @@ public class MotorControllerGroup implements MotorController, Sendable, AutoClos
    * @param motorController The first MotorController to add
    * @param motorControllers The MotorControllers to add
    */
+  @SuppressWarnings("this-escape")
   public MotorControllerGroup(
       MotorController motorController, MotorController... motorControllers) {
     m_motorControllers = new MotorController[motorControllers.length + 1];
@@ -29,6 +30,7 @@ public class MotorControllerGroup implements MotorController, Sendable, AutoClos
     init();
   }
 
+  @SuppressWarnings("this-escape")
   public MotorControllerGroup(MotorController[] motorControllers) {
     m_motorControllers = Arrays.copyOf(motorControllers, motorControllers.length);
     init();

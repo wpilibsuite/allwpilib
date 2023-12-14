@@ -30,6 +30,7 @@ public class NidecBrushless extends MotorSafety
    * @param dioChannel The DIO channel that the Nidec Brushless controller is attached to. 0-9 are
    *     on-board, 10-25 are on the MXP port
    */
+  @SuppressWarnings("this-escape")
   public NidecBrushless(final int pwmChannel, final int dioChannel) {
     setSafetyEnabled(false);
 

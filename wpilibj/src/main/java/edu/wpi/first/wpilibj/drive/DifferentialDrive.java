@@ -128,6 +128,7 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    * @param leftMotor Left motor.
    * @param rightMotor Right motor.
    */
+  @SuppressWarnings("this-escape")
   public DifferentialDrive(MotorController leftMotor, MotorController rightMotor) {
     requireNonNullParam(leftMotor, "leftMotor", "DifferentialDrive");
     requireNonNullParam(rightMotor, "rightMotor", "DifferentialDrive");

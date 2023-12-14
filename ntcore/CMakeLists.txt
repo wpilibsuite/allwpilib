@@ -30,7 +30,7 @@ set_property(TARGET ntcore PROPERTY FOLDER "libraries")
 
 install(TARGETS ntcore EXPORT ntcore)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/ntcore")
-install(DIRECTORY src/generated/main/native/include DESTINATION "${include_dest}/ntcore")
+install(DIRECTORY src/generated/main/native/include/ DESTINATION "${include_dest}/ntcore")
 
 configure_file(ntcore-config.cmake.in ${WPILIB_BINARY_DIR}/ntcore-config.cmake)
 install(FILES ${WPILIB_BINARY_DIR}/ntcore-config.cmake DESTINATION share/ntcore)
@@ -60,10 +60,8 @@ if(WITH_JAVA)
         GENERATE_NATIVE_HEADERS ntcore_jni_headers
     )
 
-    get_property(NTCORE_JAR_FILE TARGET ntcore_jar PROPERTY JAR_FILE)
-    install(FILES ${NTCORE_JAR_FILE} DESTINATION "${java_lib_dest}")
-
-    set_property(TARGET ntcore_jar PROPERTY FOLDER "java")
+    install_jar(ntcore_jar DESTINATION ${java_lib_dest})
+    install_jar_exports(TARGETS ntcore_jar FILE ntcore_jar.cmake DESTINATION share/ntcore)
 
     add_library(ntcorejni ${ntcore_jni_src})
     wpilib_target_warnings(ntcorejni)

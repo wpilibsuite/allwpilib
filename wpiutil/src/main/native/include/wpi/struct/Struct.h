@@ -51,8 +51,8 @@ struct Struct {};
  * - std::string_view GetTypeString(): function that returns the type string
  * - size_t GetSize(): function that returns the structure size in bytes
  * - std::string_view GetSchema(): function that returns the struct schema
- * - T Unpack(std::span<const uint8_t, kSize>): function for deserialization
- * - void Pack(std::span<uint8_t, kSize>, T&& value): function for
+ * - T Unpack(std::span<const uint8_t>): function for deserialization
+ * - void Pack(std::span<uint8_t>, T&& value): function for
  *   serialization
  *
  * If possible, the GetTypeString(), GetSize(), and GetSchema() functions should
@@ -411,9 +411,9 @@ struct Struct<uint8_t> {
  */
 template <>
 struct Struct<int8_t> {
-  static constexpr std::string_view kTypeString = "struct:int8";
-  static constexpr size_t kSize = 1;
-  static constexpr std::string_view kSchema = "int8 value";
+  static constexpr std::string_view GetTypeString() { return "struct:int8"; }
+  static constexpr size_t GetSize() { return 1; }
+  static constexpr std::string_view GetSchema() { return "int8 value"; }
   static int8_t Unpack(std::span<const uint8_t, 1> data) { return data[0]; }
   static void Pack(std::span<uint8_t, 1> data, int8_t value) {
     data[0] = value;

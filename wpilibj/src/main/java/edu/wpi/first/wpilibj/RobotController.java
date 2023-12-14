@@ -33,7 +33,7 @@ public final class RobotController {
    * @return FPGA Revision number.
    */
   public static long getFPGARevision() {
-    return (long) HALUtil.getFPGARevision();
+    return HALUtil.getFPGARevision();
   }
 
   /**

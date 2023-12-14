@@ -593,24 +593,24 @@ public final class DynamicStruct {
       case 1:
         {
           byte val = m_data.get(field.m_offset + arrIndex);
-          val &= ~(field.getBitMask() << field.m_bitShift);
-          val |= (value & field.getBitMask()) << field.m_bitShift;
+          val &= (byte) ~(field.getBitMask() << field.m_bitShift);
+          val |= (byte) ((value & field.getBitMask()) << field.m_bitShift);
           m_data.put(field.m_offset + arrIndex, val);
           break;
         }
       case 2:
         {
           short val = m_data.getShort(field.m_offset + arrIndex * 2);
-          val &= ~(field.getBitMask() << field.m_bitShift);
-          val |= (value & field.getBitMask()) << field.m_bitShift;
+          val &= (short) ~(field.getBitMask() << field.m_bitShift);
+          val |= (short) ((value & field.getBitMask()) << field.m_bitShift);
           m_data.putShort(field.m_offset + arrIndex * 2, val);
           break;
         }
       case 4:
         {
           int val = m_data.getInt(field.m_offset + arrIndex * 4);
-          val &= ~(field.getBitMask() << field.m_bitShift);
-          val |= (value & field.getBitMask()) << field.m_bitShift;
+          val &= (int) ~(field.getBitMask() << field.m_bitShift);
+          val |= (int) ((value & field.getBitMask()) << field.m_bitShift);
           m_data.putInt(field.m_offset + arrIndex * 4, val);
           break;
         }

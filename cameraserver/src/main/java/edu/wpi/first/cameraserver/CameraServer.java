@@ -114,7 +114,7 @@ public final class CameraServer {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
       if (m_booleanValueEntry != null) {
         m_booleanValueEntry.close();
       }

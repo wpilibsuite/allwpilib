@@ -32,7 +32,7 @@ import org.opencv.imgproc.Imgproc;
 public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
-    var visionThread = new Thread(() -> apriltagVisionThreadProc());
+    var visionThread = new Thread(this::apriltagVisionThreadProc);
     visionThread.setDaemon(true);
     visionThread.start();
   }

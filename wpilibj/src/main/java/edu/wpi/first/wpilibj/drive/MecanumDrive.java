@@ -104,6 +104,7 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
    * @param frontRightMotor The motor on the front-right corner.
    * @param rearRightMotor The motor on the rear-right corner.
    */
+  @SuppressWarnings("this-escape")
   public MecanumDrive(
       MotorController frontLeftMotor,
       MotorController rearLeftMotor,

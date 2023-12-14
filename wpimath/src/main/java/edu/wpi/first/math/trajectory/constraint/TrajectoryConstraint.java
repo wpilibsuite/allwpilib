@@ -38,7 +38,7 @@ public interface TrajectoryConstraint {
   /** Represents a minimum and maximum acceleration. */
   class MinMax {
     public double minAccelerationMetersPerSecondSq = -Double.MAX_VALUE;
-    public double maxAccelerationMetersPerSecondSq = +Double.MAX_VALUE;
+    public double maxAccelerationMetersPerSecondSq = Double.MAX_VALUE;
 
     /**
      * Constructs a MinMax.

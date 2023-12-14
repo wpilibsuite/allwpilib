@@ -146,21 +146,11 @@ protobuf {
     protoc {
         artifact = 'com.google.protobuf:protoc:3.21.12'
     }
-    plugins {
-        quickbuf {
-            artifact = 'us.hebi.quickbuf:protoc-gen-quickbuf:1.3.2'
-        }
-    }
     generateProtoTasks {
         all().configureEach { task ->
             task.builtins {
                 cpp {}
                 remove java
-            }
-            task.plugins {
-                quickbuf {
-                    option "gen_descriptors=true"
-                }
             }
         }
     }

@@ -78,7 +78,7 @@ class MeasureTest {
   }
 
   @Test
-  void testPerUnitTime() {
+  void testPerMeasureTime() {
     var measure = Units.Kilograms.of(144);
     var dt = Units.Milliseconds.of(53);
 
@@ -86,6 +86,16 @@ class MeasureTest {
 
     var result = measure.per(dt);
     assertEquals(144_000.0 / 53, result.baseUnitMagnitude(), 1e-5);
+    assertEquals(Units.Kilograms.per(Units.Milliseconds), result.unit());
+  }
+
+  @Test
+  void testPerUnitTime() {
+    var measure = Units.Kilograms.of(144);
+    var result = measure.per(Units.Millisecond);
+
+    assertEquals(Velocity.class, result.unit().getClass());
+    assertEquals(144_000.0, result.baseUnitMagnitude(), 1e-5);
     assertEquals(Units.Kilograms.per(Units.Milliseconds), result.unit());
   }
 
@@ -176,6 +186,7 @@ class MeasureTest {
   }
 
   @Test
+  @SuppressWarnings("SelfComparison")
   void testCompare() {
     var unit = new ExampleUnit(7);
     var base = unit.of(1);

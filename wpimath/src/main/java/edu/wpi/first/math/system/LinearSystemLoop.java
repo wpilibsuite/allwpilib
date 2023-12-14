@@ -25,8 +25,8 @@ import org.ejml.simple.SimpleMatrix;
  * of the controller (U is an output because that's what goes to the motors and Y is an input
  * because that's what comes back from the sensors).
  *
- * <p>For more on the underlying math, read
- * https://file.tavsys.net/control/controls-engineering-in-frc.pdf.
+ * <p>For more on the underlying math, read <a
+ * href="https://file.tavsys.net/control/controls-engineering-in-frc.pdf">https://file.tavsys.net/control/controls-engineering-in-frc.pdf</a>.
  */
 public class LinearSystemLoop<States extends Num, Inputs extends Num, Outputs extends Num> {
   private final LinearQuadraticRegulator<States, Inputs, Outputs> m_controller;
@@ -265,7 +265,7 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num, Outputs ex
    *
    * @param initialState The initial state.
    */
-  public void reset(Matrix<States, N1> initialState) {
+  public final void reset(Matrix<States, N1> initialState) {
     m_nextR.fill(0.0);
     m_controller.reset();
     m_feedforward.reset(initialState);

@@ -58,6 +58,7 @@ public class Counter implements CounterBase, Sendable, AutoCloseable {
    *
    * @param mode The counter mode.
    */
+  @SuppressWarnings("this-escape")
   public Counter(final Mode mode) {
     ByteBuffer index = ByteBuffer.allocateDirect(4);
     // set the byte order
@@ -95,6 +96,7 @@ public class Counter implements CounterBase, Sendable, AutoCloseable {
    *
    * @param source the digital source to count
    */
+  @SuppressWarnings("this-escape")
   public Counter(DigitalSource source) {
     this();
 
@@ -109,6 +111,7 @@ public class Counter implements CounterBase, Sendable, AutoCloseable {
    *
    * @param channel the DIO channel to use as the up source. 0-9 are on-board, 10-25 are on the MXP
    */
+  @SuppressWarnings("this-escape")
   public Counter(int channel) {
     this();
     setUpSource(channel);
@@ -125,6 +128,7 @@ public class Counter implements CounterBase, Sendable, AutoCloseable {
    * @param downSource second source for direction
    * @param inverted true to invert the count
    */
+  @SuppressWarnings("this-escape")
   public Counter(
       EncodingType encodingType,
       DigitalSource upSource,
@@ -162,6 +166,7 @@ public class Counter implements CounterBase, Sendable, AutoCloseable {
    *
    * @param trigger the analog trigger to count
    */
+  @SuppressWarnings("this-escape")
   public Counter(AnalogTrigger trigger) {
     this();
 
@@ -200,7 +205,7 @@ public class Counter implements CounterBase, Sendable, AutoCloseable {
    *
    * @param channel the DIO channel to count 0-9 are on-board, 10-25 are on the MXP
    */
-  public void setUpSource(int channel) {
+  public final void setUpSource(int channel) {
     setUpSource(new DigitalInput(channel));
     m_allocatedUpSource = true;
     SendableRegistry.addChild(this, m_upSource);
@@ -401,7 +406,7 @@ public class Counter implements CounterBase, Sendable, AutoCloseable {
    * @param maxPeriod The maximum period where the counted device is considered moving in seconds.
    */
   @Override
-  public void setMaxPeriod(double maxPeriod) {
+  public final void setMaxPeriod(double maxPeriod) {
     CounterJNI.setCounterMaxPeriod(m_counter, maxPeriod);
   }
 

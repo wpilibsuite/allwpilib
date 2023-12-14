@@ -193,9 +193,9 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
     _32s(10),
     _64s(11);
 
-    private int value;
+    private final int value;
 
-    private CalibrationTime(int value) {
+    CalibrationTime(int value) {
       this.value = value;
     }
   }
@@ -287,6 +287,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
    * @param port The SPI Port the gyro is plugged into
    * @param cal_time Calibration time
    */
+  @SuppressWarnings("this-escape")
   public ADIS16470_IMU(IMUAxis yaw_axis, SPI.Port port, CalibrationTime cal_time) {
     m_yaw_axis = yaw_axis;
     m_calibration_time = cal_time.value;
@@ -396,7 +397,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
    * @return
    */
   private static int toShort(int... buf) {
-    return (short) (((buf[0] & 0xFF) << 8) + ((buf[1] & 0xFF) << 0));
+    return (short) (((buf[0] & 0xFF) << 8) + ((buf[1] & 0xFF)));
   }
 
   /**
@@ -593,7 +594,6 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
     if (!switchToAutoSPI()) {
       DriverStation.reportError("Failed to configure/reconfigure auto SPI.", false);
     }
-    ;
   }
 
   /**

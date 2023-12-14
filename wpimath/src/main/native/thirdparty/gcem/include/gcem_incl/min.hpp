@@ -24,6 +24,9 @@
 #include <cmath>
 #include <type_traits>
 
+namespace gcem
+{
+
 /**
  * Compile-time pairwise minimum function
  *
@@ -43,6 +46,8 @@ noexcept
   } else {
     return std::min(x, y);
   }
+}
+
 }
 
 #endif

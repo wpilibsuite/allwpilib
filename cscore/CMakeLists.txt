@@ -129,8 +129,8 @@ if(WITH_JAVA)
         GENERATE_NATIVE_HEADERS cscore_jni_headers
     )
 
-    get_property(CSCORE_JAR_FILE TARGET cscore_jar PROPERTY JAR_FILE)
-    install(FILES ${CSCORE_JAR_FILE} DESTINATION "${java_lib_dest}")
+    install_jar(cscore_jar DESTINATION ${java_lib_dest})
+    install_jar_exports(TARGETS cscore_jar FILE cscore_jar.cmake DESTINATION share/cscore)
     install(FILES ${OPENCV_JAR_FILE} DESTINATION "${java_lib_dest}")
 
     if(MSVC)
@@ -152,8 +152,6 @@ if(WITH_JAVA)
             install(FILES ${${cvFile}Loc} DESTINATION "${jni_lib_dest}")
         endforeach()
     endif()
-
-    set_property(TARGET cscore_jar PROPERTY FOLDER "java")
 
     add_library(cscorejni ${cscore_jni_src})
     wpilib_target_warnings(cscorejni)

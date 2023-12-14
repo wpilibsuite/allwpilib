@@ -10,10 +10,7 @@ if(WITH_JAVA)
 
     add_jar(wpiunits_jar ${JAVA_SOURCES} OUTPUT_NAME wpiunits)
 
-    get_property(WPIUNITS_JAR_FILE TARGET wpiunits_jar PROPERTY JAR_FILE)
-    install(FILES ${WPIUNITS_JAR_FILE} DESTINATION "${java_lib_dest}")
-
-    set_property(TARGET wpiunits_jar PROPERTY FOLDER "java")
-
+    install_jar(wpiunits_jar DESTINATION ${java_lib_dest})
+    install_jar_exports(TARGETS wpiunits_jar FILE wpiunits.cmake DESTINATION share/wpiunits)
     install(FILES wpiunits-config.cmake DESTINATION share/wpiunits)
 endif()

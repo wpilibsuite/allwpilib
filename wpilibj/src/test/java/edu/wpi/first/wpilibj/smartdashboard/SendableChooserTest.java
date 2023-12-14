@@ -75,7 +75,7 @@ class SendableChooserTest {
         chooser.addOption(String.valueOf(i), i);
       }
       AtomicInteger currentVal = new AtomicInteger();
-      chooser.onChange(val -> currentVal.set(val));
+      chooser.onChange(currentVal::set);
 
       SmartDashboard.putData("changeListenerChooser", chooser);
       SmartDashboard.updateValues();
