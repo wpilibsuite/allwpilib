@@ -10,7 +10,8 @@ Storage::Storage() {
 }
 
 frc2::CommandPtr Storage::RunCommand() {
-  return Run([this] { m_motor.Set(1.0); }).WithName("Run");
+  return Run([this] { m_motor.Set(StorageConstants::kStorageDutyCycle); })
+      .WithName("Run");
 }
 
 bool Storage::IsFull() const {

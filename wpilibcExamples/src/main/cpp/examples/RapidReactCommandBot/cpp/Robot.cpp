@@ -18,6 +18,13 @@ void Robot::RobotPeriodic() {
   frc2::CommandScheduler::GetInstance().Run();
 }
 
+void Robot::SimulationPeriodic() {
+  m_driveSim.SimulationPeriodic();
+  m_shooterSim.SimulationPeriodic();
+  m_intakeSim.SimulationPeriodic();
+  m_storageSim.SimulationPeriodic();
+}
+
 void Robot::DisabledInit() {}
 
 void Robot::DisabledPeriodic() {}

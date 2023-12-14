@@ -31,6 +31,18 @@ public final class Constants {
     public static final double kEncoderDistancePerPulse =
         // Assumes the encoders are directly mounted on the wheel shafts
         (kWheelDiameterMeters * Math.PI) / (double) kEncoderCPR;
+
+    // Linear constants
+    public static final double ksVolts = 0.22;
+    public static final double kvVoltSecondsPerMeter = 1.98;
+    public static final double kaVoltSecondsSquaredPerMeter = 0.2;
+
+    // Angular constants
+    public static final double kvVoltSecondsPerRadian = 1.5;
+    public static final double kaVoltSecondsSquaredPerRadian = 0.3;
+
+    public static final double kDriveGearing = 8;
+    public static final double kTrackwidthMeters = 0.69;
   }
 
   public static final class ShooterConstants {
@@ -49,7 +61,7 @@ public final class Constants {
     public static final double kShooterToleranceRPS = 50;
 
     // These are not real PID gains, and will have to be tuned for your specific robot.
-    public static final double kP = 1;
+    public static final double kP = 0.1;
 
     // On a real robot the feedforward constants should be empirically determined; these are
     // reasonable guesses.
@@ -58,23 +70,31 @@ public final class Constants {
         // Should have value 12V at free speed...
         12.0 / kShooterFreeRPS;
 
+    public static final double kVVoltSecondPerRadian = 0.000360;
+
+    public static final double kAVoltSecondsSquaredPerRadian = 0.00159154943091895356;
+
     public static final double kFeederSpeed = 0.5;
   }
 
   public static final class IntakeConstants {
     public static final int kMotorPort = 6;
     public static final int[] kSolenoidPorts = {2, 3};
+
+    public static final double kIntakeDutyCycle = 1.0;
   }
 
   public static final class StorageConstants {
     public static final int kMotorPort = 7;
     public static final int kBallSensorPort = 6;
+
+    public static final double kStorageDutyCycle = 1.0;
   }
 
   public static final class AutoConstants {
     public static final double kTimeoutSeconds = 3;
     public static final double kDriveDistanceMeters = 2;
-    public static final double kDriveSpeed = 0.5;
+    public static final double kDriveSpeed = 0.4;
   }
 
   public static final class OIConstants {

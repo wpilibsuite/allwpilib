@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /** Subsystem for managing the compressor, pressure sensor, etc. */
-public class Pneumatics extends SubsystemBase {
+public class Pneumatics extends SubsystemBase implements AutoCloseable {
   // External analog pressure sensor
   // product-specific voltage->pressure conversion, see product manual
   // in this case, 250(V/5)-25
@@ -57,5 +57,11 @@ public class Pneumatics extends SubsystemBase {
             // The switch is open when the pressure is over ~120 PSI.
             m_compressor::enableDigital)
         .withName("Compressor Disabled");
+  }
+
+  @Override
+  public void close() {
+    m_pressureTransducer.close();
+    m_compressor.close();
   }
 }
