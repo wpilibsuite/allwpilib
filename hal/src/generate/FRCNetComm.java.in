@@ -17,6 +17,7 @@ public class FRCNetComm {
   public static final class tResourceType {
     private tResourceType() {
     }
+
 ${usage_reporting_types}
   }
 
@@ -27,6 +28,7 @@ ${usage_reporting_types}
   public static final class tInstances {
     private tInstances() {
     }
+
 ${usage_reporting_instances}
   }
 }

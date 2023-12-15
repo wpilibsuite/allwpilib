@@ -51,7 +51,6 @@ int64_t HAL_Report(int32_t resource, int32_t instanceNumber, int32_t context,
 #ifdef __cplusplus
 namespace HALUsageReporting {
   enum tResourceType : int32_t {
-
     kResourceType_Controller = 0,
     kResourceType_Module = 1,
     kResourceType_Language = 2,
@@ -154,9 +153,22 @@ namespace HALUsageReporting {
     kResourceType_CTRE_future12 = 99,
     kResourceType_CTRE_future13 = 100,
     kResourceType_CTRE_future14 = 101,
+    kResourceType_ExponentialProfile = 102,
+    kResourceType_PS4Controller = 103,
+    kResourceType_PhotonCamera = 104,
+    kResourceType_PhotonPoseEstimator = 105,
+    kResourceType_PathPlannerPath = 106,
+    kResourceType_PathPlannerAuto = 107,
+    kResourceType_PathFindingCommand = 108,
+    kResourceType_Redux_future1 = 109,
+    kResourceType_Redux_future2 = 110,
+    kResourceType_Redux_future3 = 111,
+    kResourceType_Redux_future4 = 112,
+    kResourceType_Redux_future5 = 113,
+    kResourceType_RevSparkFlexCAN = 114,
+    kResourceType_RevSparkFlexPWM = 115,
   };
   enum tInstances : int32_t {
-
     kLanguage_LabVIEW = 1,
     kLanguage_CPlusPlus = 2,
     kLanguage_Java = 3,
@@ -171,6 +183,7 @@ namespace HALUsageReporting {
     kFramework_Timed = 4,
     kFramework_ROS = 5,
     kFramework_RobotBuilder = 6,
+    kFramework_AdvantageKit = 7,
     kRobotDrive_ArcadeStandard = 1,
     kRobotDrive_ArcadeButtonSpin = 2,
     kRobotDrive_ArcadeRatioCurve = 3,
