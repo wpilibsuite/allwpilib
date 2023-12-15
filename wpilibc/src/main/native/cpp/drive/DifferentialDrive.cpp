@@ -16,11 +16,20 @@
 
 using namespace frc;
 
+WPI_IGNORE_DEPRECATED
+
 DifferentialDrive::DifferentialDrive(MotorController& leftMotor,
                                      MotorController& rightMotor)
-    : m_leftMotor(&leftMotor), m_rightMotor(&rightMotor) {
-  wpi::SendableRegistry::AddChild(this, m_leftMotor);
-  wpi::SendableRegistry::AddChild(this, m_rightMotor);
+    : DifferentialDrive{[&](double output) { leftMotor.Set(output); },
+                        [&](double output) { rightMotor.Set(output); }} {}
+
+WPI_UNIGNORE_DEPRECATED
+
+DifferentialDrive::DifferentialDrive(std::function<void(double)> leftMotor,
+                                     std::function<void(double)> rightMotor)
+    : m_leftMotor{std::move(leftMotor)}, m_rightMotor{std::move(rightMotor)} {
+  // wpi::SendableRegistry::AddChild(this, m_leftMotor);
+  // wpi::SendableRegistry::AddChild(this, m_rightMotor);
   static int instances = 0;
   ++instances;
   wpi::SendableRegistry::AddLW(this, "DifferentialDrive", instances);
@@ -40,8 +49,8 @@ void DifferentialDrive::ArcadeDrive(double xSpeed, double zRotation,
 
   auto [left, right] = ArcadeDriveIK(xSpeed, zRotation, squareInputs);
 
-  m_leftMotor->Set(left * m_maxOutput);
-  m_rightMotor->Set(right * m_maxOutput);
+  m_leftMotor(left * m_maxOutput);
+  m_rightMotor(right * m_maxOutput);
 
   Feed();
 }
@@ -60,8 +69,8 @@ void DifferentialDrive::CurvatureDrive(double xSpeed, double zRotation,
 
   auto [left, right] = CurvatureDriveIK(xSpeed, zRotation, allowTurnInPlace);
 
-  m_leftMotor->Set(left * m_maxOutput);
-  m_rightMotor->Set(right * m_maxOutput);
+  m_leftMotor(left * m_maxOutput);
+  m_rightMotor(right * m_maxOutput);
 
   Feed();
 }
@@ -80,8 +89,8 @@ void DifferentialDrive::TankDrive(double leftSpeed, double rightSpeed,
 
   auto [left, right] = TankDriveIK(leftSpeed, rightSpeed, squareInputs);
 
-  m_leftMotor->Set(left * m_maxOutput);
-  m_rightMotor->Set(right * m_maxOutput);
+  m_leftMotor(left * m_maxOutput);
+  m_rightMotor(right * m_maxOutput);
 
   Feed();
 }
@@ -157,8 +166,8 @@ DifferentialDrive::WheelSpeeds DifferentialDrive::TankDriveIK(
 }
 
 void DifferentialDrive::StopMotor() {
-  m_leftMotor->StopMotor();
-  m_rightMotor->StopMotor();
+  m_leftMotor(0.0);
+  m_rightMotor(0.0);
   Feed();
 }
 
@@ -170,10 +179,6 @@ void DifferentialDrive::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("DifferentialDrive");
   builder.SetActuator(true);
   builder.SetSafeState([=, this] { StopMotor(); });
-  builder.AddDoubleProperty(
-      "Left Motor Speed", [=, this] { return m_leftMotor->Get(); },
-      [=, this](double value) { m_leftMotor->Set(value); });
-  builder.AddDoubleProperty(
-      "Right Motor Speed", [=, this] { return m_rightMotor->Get(); },
-      [=, this](double value) { m_rightMotor->Set(value); });
+  builder.AddDoubleProperty("Left Motor Speed", nullptr, m_leftMotor);
+  builder.AddDoubleProperty("Right Motor Speed", nullptr, m_rightMotor);
 }

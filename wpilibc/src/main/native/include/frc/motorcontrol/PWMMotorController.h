@@ -6,7 +6,10 @@
 
 #include <string>
 #include <string_view>
+#include <vector>
 
+#include <units/voltage.h>
+#include <wpi/deprecated.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
@@ -16,6 +19,8 @@
 
 namespace frc {
 class DMA;
+
+WPI_IGNORE_DEPRECATED
 
 /**
  * Common base class for all PWM Motor Controllers.
@@ -39,6 +44,20 @@ class PWMMotorController : public MotorController,
    * @param value The speed value between -1.0 and 1.0 to set.
    */
   void Set(double value) override;
+
+  /**
+   * Sets the voltage output of the PWMMotorController. Compensates for
+   * the current bus voltage to ensure that the desired voltage is output even
+   * if the battery voltage is below 12V - highly useful when the voltage
+   * outputs are "meaningful" (e.g. they come from a feedforward calculation).
+   *
+   * <p>NOTE: This function *must* be called regularly in order for voltage
+   * compensation to work properly - unlike the ordinary set function, it is not
+   * "set it and forget it."
+   *
+   * @param output The voltage to output.
+   */
+  void SetVoltage(units::volt_t output) override;
 
   /**
    * Get the recently set value of the PWM. This value is affected by the
@@ -71,6 +90,13 @@ class PWMMotorController : public MotorController,
    */
   void EnableDeadbandElimination(bool eliminateDeadband);
 
+  /**
+   * Make the given PWM motor controller follow the output of this one.
+   *
+   * @param follower The motor controller follower.
+   */
+  void AddFollower(PWMMotorController& follower);
+
  protected:
   /**
    * Constructor for a PWM Motor %Controller connected via PWM.
@@ -87,8 +113,11 @@ class PWMMotorController : public MotorController,
 
  private:
   bool m_isInverted = false;
+  std::vector<PWMMotorController*> m_followers;
 
   PWM* GetPwm() { return &m_pwm; }
 };
+
+WPI_UNIGNORE_DEPRECATED
 
 }  // namespace frc

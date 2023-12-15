@@ -4,10 +4,12 @@
 
 #pragma once
 
+#include <functional>
 #include <memory>
 #include <string>
 
 #include <units/angle.h>
+#include <wpi/deprecated.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
@@ -69,14 +71,39 @@ class MecanumDrive : public RobotDriveBase,
     double rearRight = 0.0;
   };
 
+  WPI_IGNORE_DEPRECATED
+
   /**
    * Construct a MecanumDrive.
    *
    * If a motor needs to be inverted, do so before passing it in.
+   *
+   * @param frontLeftMotor Front-left motor.
+   * @param rearLeftMotor Rear-left motor.
+   * @param frontRightMotor Front-right motor.
+   * @param rearRightMotor Rear-right motor.
    */
+  WPI_DEPRECATED("Use MecanumDrive constructor with function arguments.")
   MecanumDrive(MotorController& frontLeftMotor, MotorController& rearLeftMotor,
                MotorController& frontRightMotor,
                MotorController& rearRightMotor);
+
+  WPI_UNIGNORE_DEPRECATED
+
+  /**
+   * Construct a MecanumDrive.
+   *
+   * If a motor needs to be inverted, do so before passing it in.
+   *
+   * @param frontLeftMotor Front-left motor setter.
+   * @param rearLeftMotor Rear-left motor setter.
+   * @param frontRightMotor Front-right motor setter.
+   * @param rearRightMotor Rear-right motor setter.
+   */
+  MecanumDrive(std::function<void(double)> frontLeftMotor,
+               std::function<void(double)> rearLeftMotor,
+               std::function<void(double)> frontRightMotor,
+               std::function<void(double)> rearRightMotor);
 
   ~MecanumDrive() override = default;
 
@@ -141,10 +168,10 @@ class MecanumDrive : public RobotDriveBase,
   void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
-  MotorController* m_frontLeftMotor;
-  MotorController* m_rearLeftMotor;
-  MotorController* m_frontRightMotor;
-  MotorController* m_rearRightMotor;
+  std::function<void(double)> m_frontLeftMotor;
+  std::function<void(double)> m_rearLeftMotor;
+  std::function<void(double)> m_frontRightMotor;
+  std::function<void(double)> m_rearRightMotor;
 
   bool reported = false;
 };

@@ -9,10 +9,13 @@
 #include <frc2/command/Commands.h>
 
 Drive::Drive() {
+  m_leftLeader.AddFollower(m_leftFollower);
+  m_rightLeader.AddFollower(m_rightFollower);
+
   // We need to invert one side of the drivetrain so that positive voltages
   // result in both sides moving forward. Depending on how your robot's
   // gearbox is constructed, you might have to invert the left side instead.
-  m_rightMotors.SetInverted(true);
+  m_rightLeader.SetInverted(true);
 
   // Sets the distance per pulse for the encoders
   m_leftEncoder.SetDistancePerPulse(DriveConstants::kEncoderDistancePerPulse);

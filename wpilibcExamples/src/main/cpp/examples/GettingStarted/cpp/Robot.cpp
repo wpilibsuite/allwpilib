@@ -48,7 +48,9 @@ class Robot : public frc::TimedRobot {
   // Robot drive system
   frc::PWMSparkMax m_left{0};
   frc::PWMSparkMax m_right{1};
-  frc::DifferentialDrive m_robotDrive{m_left, m_right};
+  frc::DifferentialDrive m_robotDrive{
+      [&](double output) { m_left.Set(output); },
+      [&](double output) { m_right.Set(output); }};
 
   frc::XboxController m_controller{0};
   frc::Timer m_timer;

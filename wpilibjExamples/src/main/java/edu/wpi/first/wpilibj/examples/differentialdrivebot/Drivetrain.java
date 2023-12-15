@@ -12,8 +12,6 @@ import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.motorcontrol.MotorController;
-import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 
 /** Represents a differential drive style drivetrain. */
@@ -25,18 +23,13 @@ public class Drivetrain {
   private static final double kWheelRadius = 0.0508; // meters
   private static final int kEncoderResolution = 4096;
 
-  private final MotorController m_leftLeader = new PWMSparkMax(1);
-  private final MotorController m_leftFollower = new PWMSparkMax(2);
-  private final MotorController m_rightLeader = new PWMSparkMax(3);
-  private final MotorController m_rightFollower = new PWMSparkMax(4);
+  private final PWMSparkMax m_leftLeader = new PWMSparkMax(1);
+  private final PWMSparkMax m_leftFollower = new PWMSparkMax(2);
+  private final PWMSparkMax m_rightLeader = new PWMSparkMax(3);
+  private final PWMSparkMax m_rightFollower = new PWMSparkMax(4);
 
   private final Encoder m_leftEncoder = new Encoder(0, 1);
   private final Encoder m_rightEncoder = new Encoder(2, 3);
-
-  private final MotorControllerGroup m_leftGroup =
-      new MotorControllerGroup(m_leftLeader, m_leftFollower);
-  private final MotorControllerGroup m_rightGroup =
-      new MotorControllerGroup(m_rightLeader, m_rightFollower);
 
   private final AnalogGyro m_gyro = new AnalogGyro(0);
 
@@ -58,10 +51,13 @@ public class Drivetrain {
   public Drivetrain() {
     m_gyro.reset();
 
+    m_leftLeader.addFollower(m_leftFollower);
+    m_rightLeader.addFollower(m_rightFollower);
+
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
-    m_rightGroup.setInverted(true);
+    m_rightLeader.setInverted(true);
 
     // Set the distance per pulse for the drive encoders. We can simply use the
     // distance traveled for one rotation of the wheel divided by the encoder
@@ -90,8 +86,8 @@ public class Drivetrain {
         m_leftPIDController.calculate(m_leftEncoder.getRate(), speeds.leftMetersPerSecond);
     final double rightOutput =
         m_rightPIDController.calculate(m_rightEncoder.getRate(), speeds.rightMetersPerSecond);
-    m_leftGroup.setVoltage(leftOutput + leftFeedforward);
-    m_rightGroup.setVoltage(rightOutput + rightFeedforward);
+    m_leftLeader.setVoltage(leftOutput + leftFeedforward);
+    m_rightLeader.setVoltage(rightOutput + rightFeedforward);
   }
 
   /**

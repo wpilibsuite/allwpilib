@@ -11,7 +11,8 @@ namespace frc {
 /**
  * Interface for motor controlling devices.
  */
-class MotorController {
+class [[deprecated(
+    "This class is being removed with no replacement")]] MotorController {
  public:
   virtual ~MotorController() = default;
 

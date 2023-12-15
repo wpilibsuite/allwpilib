@@ -50,7 +50,8 @@ class Robot : public frc::TimedRobot {
 
   frc::PWMSparkMax m_left{kLeftMotorPort};
   frc::PWMSparkMax m_right{kRightMotorPort};
-  frc::DifferentialDrive m_drive{m_left, m_right};
+  frc::DifferentialDrive m_drive{[&](double output) { m_left.Set(output); },
+                                 [&](double output) { m_right.Set(output); }};
 
   frc::AnalogGyro m_gyro{kGyroPort};
   frc::Joystick m_joystick{kJoystickPort};

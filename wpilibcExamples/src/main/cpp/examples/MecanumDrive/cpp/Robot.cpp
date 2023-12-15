@@ -40,8 +40,11 @@ class Robot : public frc::TimedRobot {
   frc::PWMSparkMax m_rearLeft{kRearLeftChannel};
   frc::PWMSparkMax m_frontRight{kFrontRightChannel};
   frc::PWMSparkMax m_rearRight{kRearRightChannel};
-  frc::MecanumDrive m_robotDrive{m_frontLeft, m_rearLeft, m_frontRight,
-                                 m_rearRight};
+  frc::MecanumDrive m_robotDrive{
+      [&](double output) { m_frontLeft.Set(output); },
+      [&](double output) { m_rearLeft.Set(output); },
+      [&](double output) { m_frontRight.Set(output); },
+      [&](double output) { m_rearRight.Set(output); }};
 
   frc::Joystick m_stick{kJoystickChannel};
 };

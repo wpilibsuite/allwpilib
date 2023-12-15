@@ -16,6 +16,7 @@ import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
+import java.util.function.DoubleConsumer;
 
 /**
  * A class for driving Mecanum drive platforms.
@@ -56,10 +57,10 @@ import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 public class MecanumDrive extends RobotDriveBase implements Sendable, AutoCloseable {
   private static int instances;
 
-  private final MotorController m_frontLeftMotor;
-  private final MotorController m_rearLeftMotor;
-  private final MotorController m_frontRightMotor;
-  private final MotorController m_rearRightMotor;
+  private final DoubleConsumer m_frontLeftMotor;
+  private final DoubleConsumer m_rearLeftMotor;
+  private final DoubleConsumer m_frontRightMotor;
+  private final DoubleConsumer m_rearRightMotor;
 
   private boolean m_reported;
 
@@ -104,12 +105,35 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
    * @param frontRightMotor The motor on the front-right corner.
    * @param rearRightMotor The motor on the rear-right corner.
    */
-  @SuppressWarnings("this-escape")
+  @SuppressWarnings({"removal", "this-escape"})
   public MecanumDrive(
       MotorController frontLeftMotor,
       MotorController rearLeftMotor,
       MotorController frontRightMotor,
       MotorController rearRightMotor) {
+    this(
+        (double output) -> frontLeftMotor.set(output),
+        (double output) -> rearLeftMotor.set(output),
+        (double output) -> frontRightMotor.set(output),
+        (double output) -> rearRightMotor.set(output));
+  }
+
+  /**
+   * Construct a MecanumDrive.
+   *
+   * <p>If a motor needs to be inverted, do so before passing it in.
+   *
+   * @param frontLeftMotor The setter for the motor on the front-left corner.
+   * @param rearLeftMotor The setter for the motor on the rear-left corner.
+   * @param frontRightMotor The setter for the motor on the front-right corner.
+   * @param rearRightMotor The setter for the motor on the rear-right corner.
+   */
+  @SuppressWarnings("this-escape")
+  public MecanumDrive(
+      DoubleConsumer frontLeftMotor,
+      DoubleConsumer rearLeftMotor,
+      DoubleConsumer frontRightMotor,
+      DoubleConsumer rearRightMotor) {
     requireNonNullParam(frontLeftMotor, "frontLeftMotor", "MecanumDrive");
     requireNonNullParam(rearLeftMotor, "rearLeftMotor", "MecanumDrive");
     requireNonNullParam(frontRightMotor, "frontRightMotor", "MecanumDrive");
@@ -119,10 +143,10 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
     m_rearLeftMotor = rearLeftMotor;
     m_frontRightMotor = frontRightMotor;
     m_rearRightMotor = rearRightMotor;
-    SendableRegistry.addChild(this, m_frontLeftMotor);
-    SendableRegistry.addChild(this, m_rearLeftMotor);
-    SendableRegistry.addChild(this, m_frontRightMotor);
-    SendableRegistry.addChild(this, m_rearRightMotor);
+    // SendableRegistry.addChild(this, m_frontLeftMotor);
+    // SendableRegistry.addChild(this, m_rearLeftMotor);
+    // SendableRegistry.addChild(this, m_frontRightMotor);
+    // SendableRegistry.addChild(this, m_rearRightMotor);
     instances++;
     SendableRegistry.addLW(this, "MecanumDrive", instances);
   }
@@ -172,10 +196,10 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
 
     var speeds = driveCartesianIK(xSpeed, ySpeed, zRotation, gyroAngle);
 
-    m_frontLeftMotor.set(speeds.frontLeft * m_maxOutput);
-    m_frontRightMotor.set(speeds.frontRight * m_maxOutput);
-    m_rearLeftMotor.set(speeds.rearLeft * m_maxOutput);
-    m_rearRightMotor.set(speeds.rearRight * m_maxOutput);
+    m_frontLeftMotor.accept(speeds.frontLeft * m_maxOutput);
+    m_frontRightMotor.accept(speeds.frontRight * m_maxOutput);
+    m_rearLeftMotor.accept(speeds.rearLeft * m_maxOutput);
+    m_rearRightMotor.accept(speeds.rearRight * m_maxOutput);
 
     feed();
   }
@@ -256,10 +280,10 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
 
   @Override
   public void stopMotor() {
-    m_frontLeftMotor.stopMotor();
-    m_frontRightMotor.stopMotor();
-    m_rearLeftMotor.stopMotor();
-    m_rearRightMotor.stopMotor();
+    m_frontLeftMotor.accept(0.0);
+    m_frontRightMotor.accept(0.0);
+    m_rearLeftMotor.accept(0.0);
+    m_rearRightMotor.accept(0.0);
     feed();
   }
 
@@ -273,12 +297,9 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
     builder.setSmartDashboardType("MecanumDrive");
     builder.setActuator(true);
     builder.setSafeState(this::stopMotor);
-    builder.addDoubleProperty(
-        "Front Left Motor Speed", m_frontLeftMotor::get, m_frontLeftMotor::set);
-    builder.addDoubleProperty(
-        "Front Right Motor Speed", m_frontRightMotor::get, m_frontRightMotor::set);
-    builder.addDoubleProperty("Rear Left Motor Speed", m_rearLeftMotor::get, m_rearLeftMotor::set);
-    builder.addDoubleProperty(
-        "Rear Right Motor Speed", m_rearRightMotor::get, m_rearRightMotor::set);
+    builder.addDoubleProperty("Front Left Motor Speed", null, m_frontLeftMotor::accept);
+    builder.addDoubleProperty("Front Right Motor Speed", null, m_frontRightMotor::accept);
+    builder.addDoubleProperty("Rear Left Motor Speed", null, m_rearLeftMotor::accept);
+    builder.addDoubleProperty("Rear Right Motor Speed", null, m_rearRightMotor::accept);
   }
 }

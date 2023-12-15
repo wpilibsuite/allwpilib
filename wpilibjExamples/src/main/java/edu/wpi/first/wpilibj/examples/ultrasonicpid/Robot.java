@@ -41,7 +41,8 @@ public class Robot extends TimedRobot {
   private final Ultrasonic m_ultrasonic = new Ultrasonic(kUltrasonicPingPort, kUltrasonicEchoPort);
   private final PWMSparkMax m_leftMotor = new PWMSparkMax(kLeftMotorPort);
   private final PWMSparkMax m_rightMotor = new PWMSparkMax(kRightMotorPort);
-  private final DifferentialDrive m_robotDrive = new DifferentialDrive(m_leftMotor, m_rightMotor);
+  private final DifferentialDrive m_robotDrive =
+      new DifferentialDrive(m_leftMotor::set, m_rightMotor::set);
   private final PIDController m_pidController = new PIDController(kP, kI, kD);
 
   @Override

@@ -26,7 +26,8 @@ public class Drivetrain extends SubsystemBase {
   private final Encoder m_rightEncoder = new Encoder(6, 7);
 
   // Set up the differential drive controller
-  private final DifferentialDrive m_diffDrive = new DifferentialDrive(m_leftMotor, m_rightMotor);
+  private final DifferentialDrive m_diffDrive =
+      new DifferentialDrive(m_leftMotor::set, m_rightMotor::set);
 
   // Set up the RomiGyro
   private final RomiGyro m_gyro = new RomiGyro();

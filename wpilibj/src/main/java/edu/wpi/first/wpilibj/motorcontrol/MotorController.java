@@ -6,7 +6,12 @@ package edu.wpi.first.wpilibj.motorcontrol;
 
 import edu.wpi.first.wpilibj.RobotController;
 
-/** Interface for motor controlling devices. */
+/**
+ * Interface for motor controlling devices.
+ *
+ * @deprecated This class is being removed with no replacement.
+ */
+@Deprecated(forRemoval = true, since = "2024")
 public interface MotorController {
   /**
    * Common interface for setting the speed of a motor controller.

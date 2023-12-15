@@ -8,11 +8,26 @@
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 
+#include "frc/RobotController.h"
+
 using namespace frc;
 
 void PWMMotorController::Set(double speed) {
-  m_pwm.SetSpeed(m_isInverted ? -speed : speed);
+  if (m_isInverted) {
+    speed = -speed;
+  }
+  m_pwm.SetSpeed(speed);
+
+  for (auto& follower : m_followers) {
+    follower->Set(speed);
+  }
+
   Feed();
+}
+
+void PWMMotorController::SetVoltage(units::volt_t output) {
+  // NOLINTNEXTLINE(bugprone-integer-division)
+  Set(output / RobotController::GetBatteryVoltage());
 }
 
 double PWMMotorController::Get() const {
@@ -48,10 +63,18 @@ void PWMMotorController::EnableDeadbandElimination(bool eliminateDeadband) {
   m_pwm.EnableDeadbandElimination(eliminateDeadband);
 }
 
+void PWMMotorController::AddFollower(PWMMotorController& follower) {
+  m_followers.emplace_back(&follower);
+}
+
+WPI_IGNORE_DEPRECATED
+
 PWMMotorController::PWMMotorController(std::string_view name, int channel)
     : m_pwm(channel, false) {
   wpi::SendableRegistry::AddLW(this, name, channel);
 }
+
+WPI_UNIGNORE_DEPRECATED
 
 void PWMMotorController::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Motor Controller");
