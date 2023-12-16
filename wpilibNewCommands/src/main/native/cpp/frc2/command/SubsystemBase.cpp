@@ -17,6 +17,11 @@ SubsystemBase::SubsystemBase() {
   CommandScheduler::GetInstance().RegisterSubsystem({this});
 }
 
+SubsystemBase::SubsystemBase(std::string_view name) {
+  wpi::SendableRegistry::AddLW(this, name);
+  CommandScheduler::GetInstance().RegisterSubsystem({this});
+}
+
 void SubsystemBase::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Subsystem");
   builder.AddBooleanProperty(
