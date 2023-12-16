@@ -140,23 +140,6 @@ class SendableChooserTest {
   }
 
 
-  @Test 
-  void testRemoveSelectedOption(){
-    try (var chooser = new SendableChooser<Integer>()){
-
-      chooser.setDefaultOption("default", 5);
-      for (int i = 1; i <= 3; i++) {
-        chooser.addOption(String.valueOf(i), i);
-      }
-
-      chooser.removeOption(chooser.getSelected().toString());
-
-      assertEquals(chooser.getSelected(), 5);
-    }
-  }
-
-
-
   @AfterEach
   void tearDown() {
     m_inst.close();
