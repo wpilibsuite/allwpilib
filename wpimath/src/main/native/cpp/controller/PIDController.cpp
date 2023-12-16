@@ -18,24 +18,29 @@ using namespace frc;
 PIDController::PIDController(double Kp, double Ki, double Kd,
                              units::second_t period)
     : m_Kp(Kp), m_Ki(Ki), m_Kd(Kd), m_period(period) {
+  bool invalidGains = false;
   if (Kp < 0.0) {
     wpi::math::MathSharedStore::ReportError(
         "Kp must be a non-negative number, got {}!", Kp);
-    m_Kp = 0.0;
-    wpi::math::MathSharedStore::ReportWarning("Kp defaulted to 0.");
+    invalidGains = true;
   }
   if (Ki < 0.0) {
     wpi::math::MathSharedStore::ReportError(
         "Ki must be a non-negative number, got {}!", Ki);
-    m_Ki = 0.0;
-    wpi::math::MathSharedStore::ReportWarning("Ki defaulted to 0.");
+    invalidGains = true;
   }
   if (Kd < 0.0) {
     wpi::math::MathSharedStore::ReportError(
         "Kd must be a non-negative number, got {}!", Kd);
-    m_Kd = 0.0;
-    wpi::math::MathSharedStore::ReportWarning("Kd defaulted to 0.");
+    invalidGains = true;
   }
+  if (invalidGains) {
+    m_Kp = 0.0;
+    m_Ki = 0.0;
+    m_Kd = 0.0;
+    wpi::math::MathSharedStore::ReportWarning("PID gains defaulted to 0.");
+  }
+
   if (period <= 0_s) {
     wpi::math::MathSharedStore::ReportError(
         "Controller period must be a non-zero positive number, got {}!",
