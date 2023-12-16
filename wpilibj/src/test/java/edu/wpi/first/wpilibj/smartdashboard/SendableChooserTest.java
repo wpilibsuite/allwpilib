@@ -105,7 +105,7 @@ class SendableChooserTest {
       publisher.set(String.valueOf(toSelect));
       SmartDashboard.updateValues();
 
-      chooser.removeOption(chooser.getSelected().toString());
+      chooser.removeOption(String.valueOf(toSelect));
 
       if(toSelect != 0){
         assertEquals(0, chooser.getSelected());
