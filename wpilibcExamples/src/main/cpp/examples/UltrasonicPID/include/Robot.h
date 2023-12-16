@@ -31,8 +31,6 @@ class Robot : public frc::TimedRobot {
 
  private:
   // proportional speed constant
-  // negative because applying positive voltage will bring us closer to the
-  // target
   static constexpr double kP = 0.001;
   // integral speed constant
   static constexpr double kI = 0.0;
