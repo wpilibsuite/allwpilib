@@ -68,6 +68,9 @@ public class PIDController implements Sendable, AutoCloseable {
    * @param kp The proportional coefficient.
    * @param ki The integral coefficient.
    * @param kd The derivative coefficient.
+   * @throws IllegalArgumentException if kp &lt; 0
+   * @throws IllegalArgumentException if ki &lt; 0
+   * @throws IllegalArgumentException if kd &lt; 0
    */
   public PIDController(double kp, double ki, double kd) {
     this(kp, ki, kd, 0.02);
@@ -80,6 +83,10 @@ public class PIDController implements Sendable, AutoCloseable {
    * @param ki The integral coefficient.
    * @param kd The derivative coefficient.
    * @param period The period between controller updates in seconds. Must be non-zero and positive.
+   * @throws IllegalArgumentException if kp &lt; 0
+   * @throws IllegalArgumentException if ki &lt; 0
+   * @throws IllegalArgumentException if kd &lt; 0
+   * @throws IllegalArgumentException if period &lt;= 0
    */
   @SuppressWarnings("this-escape")
   public PIDController(double kp, double ki, double kd, double period) {
@@ -87,7 +94,16 @@ public class PIDController implements Sendable, AutoCloseable {
     m_ki = ki;
     m_kd = kd;
 
-    if (period <= 0) {
+    if (kp < 0.0) {
+      throw new IllegalArgumentException("Kp must be a non-negative number!");
+    }
+    if (ki < 0.0) {
+      throw new IllegalArgumentException("Ki must be a non-negative number!");
+    }
+    if (kd < 0.0) {
+      throw new IllegalArgumentException("Kd must be a non-negative number!");
+    }
+    if (period <= 0.0) {
       throw new IllegalArgumentException("Controller period must be a non-zero positive number!");
     }
     m_period = period;
