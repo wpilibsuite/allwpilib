@@ -5,6 +5,7 @@
 #pragma once
 
 #include <set>
+#include <string_view>
 #include <vector>
 
 #define IMGUI_DEFINE_MATH_OPERATORS
@@ -123,9 +124,9 @@ class Canvas2DCircle : public Canvas2DElement {
 };
 
 class Canvas2DNgon : public Canvas2DElement {
-public:
+ public:
   Canvas2DNgon(ImVec2 center, float radius, int numSides, float weight,
-              bool fill, ImU32 color, int zOrder)
+               bool fill, ImU32 color, int zOrder)
       : m_center{center},
         m_radius{radius},
         m_numSides{numSides},
@@ -145,12 +146,42 @@ public:
   void Draw(float scale, const ImVec2& cursorPos,
             ImDrawList* drawList) const override;
 
-private:
+ private:
   ImVec2 m_center;
   float m_radius;
   int m_numSides;
   float m_weight;
   bool m_fill;
+  ImU32 m_color;
+  int m_zOrder;
+};
+
+class Canvas2DText : public Canvas2DElement {
+ public:
+  Canvas2DText(ImVec2 position, float fontSize, float wrapWidth,
+               std::string text, ImU32 color, int zOrder)
+      : m_position{position},
+        m_fontSize{fontSize},
+        m_wrapWidth{wrapWidth},
+        m_text(std::move(text)),
+        m_color{color},
+        m_zOrder{zOrder} {}
+
+  ImVec2 GetPosition() const { return m_position; }
+  float GetSize() const { return m_fontSize; }
+  float GetWrapWidth() const { return m_wrapWidth; }
+  ImU32 GetColor() const { return m_color; }
+  std::string_view GetText() const { return m_text; }
+  int GetZOrder() const override { return m_zOrder; }
+
+  void Draw(float scale, const ImVec2& cursorPos,
+            ImDrawList* drawList) const override;
+
+ private:
+  ImVec2 m_position;
+  float m_fontSize;
+  float m_wrapWidth;
+  std::string m_text;
   ImU32 m_color;
   int m_zOrder;
 };

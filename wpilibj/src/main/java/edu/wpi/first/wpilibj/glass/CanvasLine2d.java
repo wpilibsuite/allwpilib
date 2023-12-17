@@ -69,7 +69,7 @@ public class CanvasLine2d {
 
     @Override
     public String getSchema() {
-      return "float x1;float y1;float x2;float y2;float weight;uint8 r;uint8 g;uint8 b;uint8 a;int32 zOrder";
+      return "float x1;float y1;float x2;float y2;float weight;uint8 color[4];int32 zOrder";
     }
 
     @Override
@@ -82,6 +82,7 @@ public class CanvasLine2d {
       Color8Bit color = new Color8Bit(bb.get(), bb.get(), bb.get());
       int opacity = bb.get();
       int zOrder = bb.getInt();
+
       return new CanvasLine2d(x1, y1, x2, y2, weight, color, opacity, zOrder);
     }
 

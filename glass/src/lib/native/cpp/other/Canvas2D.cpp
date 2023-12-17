@@ -52,9 +52,16 @@ void Canvas2DNgon::Draw(float scale, const ImVec2& cursorPos,
     drawList->AddNgonFilled(cursorPos + (m_center * scale), m_radius * scale,
                             m_color, m_numSides);
   } else {
-    drawList->AddNgon(cursorPos + (m_center * scale), m_radius * scale,
-                      m_color, m_numSides, m_weight * scale);
+    drawList->AddNgon(cursorPos + (m_center * scale), m_radius * scale, m_color,
+                      m_numSides, m_weight * scale);
   }
+}
+
+void Canvas2DText::Draw(float scale, const ImVec2& cursorPos,
+                        ImDrawList* drawList) const {
+  drawList->AddText(nullptr, m_fontSize * scale,
+                    cursorPos + (m_position * scale), m_color, m_text.c_str(),
+                    nullptr, m_wrapWidth * scale);
 }
 
 void glass::DisplayCanvas2D(Canvas2DModel* model, const ImVec2& contentSize) {

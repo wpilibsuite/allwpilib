@@ -69,7 +69,7 @@ public class CanvasCircle2d {
 
     @Override
     public String getSchema() {
-      return "float x;float y;float radius;float weight;bool fill;uint8 r;uint8 g;uint8 b;uint8 a;int32 zOrder";
+      return "float x;float y;float radius;float weight;bool fill;uint8 color[4];int32 zOrder";
     }
 
     @Override
@@ -82,6 +82,7 @@ public class CanvasCircle2d {
       Color8Bit color = new Color8Bit(bb.get(), bb.get(), bb.get());
       int opacity = bb.get();
       int zOrder = bb.getInt();
+
       return new CanvasCircle2d(x, y, radius, weight, fill, color, opacity, zOrder);
     }
 

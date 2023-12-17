@@ -20,6 +20,7 @@ public class Canvas2d implements NTSendable, AutoCloseable {
   private final List<CanvasQuad2d> m_quads = new ArrayList<>();
   private final List<CanvasCircle2d> m_circles = new ArrayList<>();
   private final List<CanvasNgon2d> m_ngons = new ArrayList<>();
+  private final List<CanvasText2d> m_texts = new ArrayList<>();
 
   private boolean m_sendableInitialized = false;
   private FloatArrayPublisher m_dimsPub;
@@ -27,6 +28,7 @@ public class Canvas2d implements NTSendable, AutoCloseable {
   private StructArrayPublisher<CanvasQuad2d> m_quadsPub;
   private StructArrayPublisher<CanvasCircle2d> m_circlesPub;
   private StructArrayPublisher<CanvasNgon2d> m_ngonsPub;
+  private StructArrayPublisher<CanvasText2d> m_textsPub;
 
   private int m_currentZOrder = 0;
 
@@ -56,6 +58,8 @@ public class Canvas2d implements NTSendable, AutoCloseable {
     m_lines.clear();
     m_quads.clear();
     m_circles.clear();
+    m_ngons.clear();
+    m_texts.clear();
   }
 
   /**
@@ -176,6 +180,29 @@ public class Canvas2d implements NTSendable, AutoCloseable {
         new CanvasNgon2d(x, y, radius, numSides, weight, fill, color, opacity, m_currentZOrder++));
   }
 
+  /**
+   * Draws text on the canvas.
+   *
+   * @param x The x coordinate of the text
+   * @param y The y coordinate of the text
+   * @param fontSize The size of the text
+   * @param wrapWidth The width at which the text should wrap. 0 for no wrap
+   * @param text The text. The max length of the text is 64 characters
+   * @param color The color of the text
+   * @param opacity The opacity of the text [0-255]
+   */
+  public void drawText(
+      float x,
+      float y,
+      float fontSize,
+      float wrapWidth,
+      String text,
+      Color8Bit color,
+      int opacity) {
+    m_texts.add(
+        new CanvasText2d(x, y, fontSize, wrapWidth, text, color, opacity, m_currentZOrder++));
+  }
+
   /** Finish and push the frame to Sendable. Clears the canvas after pushing the frame. */
   public void finishFrame() {
     finishFrame(true);
@@ -194,6 +221,7 @@ public class Canvas2d implements NTSendable, AutoCloseable {
     m_quadsPub.set(m_quads.toArray(new CanvasQuad2d[0]));
     m_circlesPub.set(m_circles.toArray(new CanvasCircle2d[0]));
     m_ngonsPub.set(m_ngons.toArray(new CanvasNgon2d[0]));
+    m_textsPub.set(m_texts.toArray(new CanvasText2d[0]));
 
     if (clearCanvas) {
       clear();
@@ -217,8 +245,6 @@ public class Canvas2d implements NTSendable, AutoCloseable {
       m_linesPub.close();
     }
     m_linesPub = table.getStructArrayTopic("lines", CanvasLine2d.struct).publish();
-    m_linesPub.set(
-        new CanvasLine2d[] {new CanvasLine2d(0, 0, 50, 50, 1, new Color8Bit(255, 0, 0), 255, 0)});
 
     if (m_quadsPub != null) {
       m_quadsPub.close();
@@ -234,6 +260,11 @@ public class Canvas2d implements NTSendable, AutoCloseable {
       m_ngonsPub.close();
     }
     m_ngonsPub = table.getStructArrayTopic("ngons", CanvasNgon2d.struct).publish();
+
+    if (m_textsPub != null) {
+      m_textsPub.close();
+    }
+    m_textsPub = table.getStructArrayTopic("texts", CanvasText2d.struct).publish();
   }
 
   @Override
@@ -252,6 +283,9 @@ public class Canvas2d implements NTSendable, AutoCloseable {
     }
     if (m_ngonsPub != null) {
       m_ngonsPub.close();
+    }
+    if (m_textsPub != null) {
+      m_textsPub.close();
     }
   }
 }
