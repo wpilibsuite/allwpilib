@@ -33,6 +33,6 @@ public final class Autos {
         m_placement.place(),
         m_drivetrain.driveDistanceFromObstacle(kDistToBox2),
         // m_drivetrain.driveDistanceEncoders(-2), // Use encoders if ultrasonic is broken
-        m_wrist.goTo(() -> kWristSetpoint).asProxy().alongWith(m_claw.close()));
+        m_wrist.goTo(() -> kWristSetpoint).alongWith(m_claw.close()));
   }
 }

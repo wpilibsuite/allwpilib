@@ -42,8 +42,8 @@ public class Claw extends SubsystemBase {
 
   /** Set the claw motor to move in the close direction. */
   public Command close() {
-    return runOnce(() -> m_motor.set(1))
-        .andThen(Commands.waitSeconds(1))
+    return run(() -> m_motor.set(1))
+        .until(this::isGrabbing)
         .andThen(m_motor::stopMotor)
         .withName("close claw");
   }
