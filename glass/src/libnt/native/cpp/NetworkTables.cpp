@@ -879,7 +879,10 @@ void NetworkTablesModel::Update() {
           } else if (desc->IsValid()) {
             // loop over all entries with this type and update
             for (auto&& entryPair : m_entries) {
-              auto ts = entryPair.second->info.type_str;
+              if (!entryPair.second) {
+                continue;
+              }
+              auto& ts = entryPair.second->info.type_str;
               if (!wpi::starts_with(ts, "struct:")) {
                 continue;
               }
@@ -901,6 +904,9 @@ void NetworkTablesModel::Update() {
           } else {
             // loop over all protobuf entries and update (conservatively)
             for (auto&& entryPair : m_entries) {
+              if (!entryPair.second) {
+                continue;
+              }
               auto& ts = entryPair.second->info.type_str;
               if (wpi::starts_with(ts, "proto:")) {
                 entryPair.second->UpdateFromValue(*this);
