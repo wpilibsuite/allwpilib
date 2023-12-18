@@ -882,7 +882,7 @@ void NetworkTablesModel::Update() {
               if (!entryPair.second) {
                 continue;
               }
-              auto& ts = entryPair.second->info.type_str;
+              std::string_view ts = entryPair.second->info.type_str;
               if (!wpi::starts_with(ts, "struct:")) {
                 continue;
               }
@@ -907,7 +907,7 @@ void NetworkTablesModel::Update() {
               if (!entryPair.second) {
                 continue;
               }
-              auto& ts = entryPair.second->info.type_str;
+              std::string_view ts = entryPair.second->info.type_str;
               if (wpi::starts_with(ts, "proto:")) {
                 entryPair.second->UpdateFromValue(*this);
               }
