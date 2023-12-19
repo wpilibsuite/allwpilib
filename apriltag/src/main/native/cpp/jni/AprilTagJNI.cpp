@@ -326,10 +326,11 @@ static jobject MakeJObject(JNIEnv* env, const wpi::RawFrame& frame) {
       env->GetMethodID(rawFrameCls, "setData", "(Ljava/nio/ByteBuffer;JIIII)V");
 
   jobject retVal = env->NewObject(rawFrameCls, constructor);
-  env->CallVoidMethod(retVal, setData,
-                      env->NewDirectByteBuffer(frame.data, frame.totalData),
-                      frame.data, frame.dataLength, frame.width, frame.height,
-                      frame.pixelFormat);
+  env->CallVoidMethod(
+      retVal, setData, env->NewDirectByteBuffer(frame.data, frame.totalData),
+      static_cast<jlong>(reinterpret_cast<intptr_t>(frame.data)),
+      static_cast<jint>(frame.dataLength), static_cast<jint>(frame.width),
+      static_cast<jint>(frame.height), static_cast<jint>(frame.pixelFormat));
   return retVal;
 }
 
