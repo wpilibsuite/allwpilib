@@ -11,9 +11,13 @@ import edu.wpi.first.math.kinematics.struct.DifferentialDriveWheelSpeedsStruct;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.StructSerializable;
 
 /** Represents the wheel speeds for a differential drive drivetrain. */
-public class DifferentialDriveWheelSpeeds {
+public class DifferentialDriveWheelSpeeds
+    implements ProtobufSerializable<DifferentialDriveWheelSpeeds>,
+        StructSerializable<DifferentialDriveWheelSpeeds> {
   /** Speed of the left side of the robot. */
   public double leftMetersPerSecond;
 

@@ -6,10 +6,13 @@ package edu.wpi.first.math.geometry;
 
 import edu.wpi.first.math.geometry.proto.Transform3dProto;
 import edu.wpi.first.math.geometry.struct.Transform3dStruct;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
 
 /** Represents a transformation for a Pose3d in the pose's frame. */
-public class Transform3d {
+public class Transform3d
+    implements ProtobufSerializable<Transform3d>, StructSerializable<Transform3d> {
   private final Translation3d m_translation;
   private final Rotation3d m_rotation;
 

@@ -10,10 +10,13 @@ import edu.wpi.first.math.geometry.proto.Transform2dProto;
 import edu.wpi.first.math.geometry.struct.Transform2dStruct;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
 
 /** Represents a transformation for a Pose2d in the pose's frame. */
-public class Transform2d {
+public class Transform2d
+    implements ProtobufSerializable<Transform2d>, StructSerializable<Transform2d> {
   private final Translation2d m_translation;
   private final Rotation2d m_rotation;
 
