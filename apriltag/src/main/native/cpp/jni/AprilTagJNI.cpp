@@ -5,6 +5,7 @@
 #include <cstdio>
 #include <cstring>
 
+#include <wpi/RawFrame.h>
 #include <wpi/jni_util.h>
 
 #include "edu_wpi_first_apriltag_jni_AprilTagJNI.h"
@@ -25,6 +26,7 @@ static JClass quaternionCls;
 static JClass rotation3dCls;
 static JClass transform3dCls;
 static JClass translation3dCls;
+static JClass rawFrameCls;
 static JException illegalArgEx;
 static JException nullPointerEx;
 
@@ -37,7 +39,8 @@ static const JClassInit classes[] = {
     {"edu/wpi/first/math/geometry/Quaternion", &quaternionCls},
     {"edu/wpi/first/math/geometry/Rotation3d", &rotation3dCls},
     {"edu/wpi/first/math/geometry/Transform3d", &transform3dCls},
-    {"edu/wpi/first/math/geometry/Translation3d", &translation3dCls}};
+    {"edu/wpi/first/math/geometry/Translation3d", &translation3dCls},
+    {"edu/wpi/first/util/RawFrame", &rawFrameCls}};
 
 static const JExceptionInit exceptions[] = {
     {"java/lang/IllegalArgumentException", &illegalArgEx},
@@ -316,6 +319,20 @@ static jobject MakeJObject(JNIEnv* env, const AprilTagPoseEstimate& est) {
                         static_cast<jdouble>(est.error2));
 }
 
+static jobject MakeJObject(JNIEnv* env, const wpi::RawFrame& frame) {
+  static jmethodID constructor = env->GetMethodID(rawFrameCls, "<init>", "()V");
+
+  static jmethodID setData =
+      env->GetMethodID(rawFrameCls, "setData", "(Ljava/nio/ByteBuffer;JIIII)V");
+
+  jobject retVal = env->NewObject(rawFrameCls, constructor);
+  env->CallVoidMethod(retVal, setData,
+                      env->NewDirectByteBuffer(frame.data, frame.totalData),
+                      frame.data, frame.dataLength, frame.width, frame.height,
+                      frame.pixelFormat);
+  return retVal;
+}
+
 extern "C" {
 
 /*
@@ -591,27 +608,25 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_estimatePose
 /*
  * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
  * Method:    generate16h5AprilTagImage
- * Signature: (IJ)V
+ * Signature: (I)Ljava/lang/Object;
  */
-JNIEXPORT void JNICALL
+JNIEXPORT jobject JNICALL
 Java_edu_wpi_first_apriltag_jni_AprilTagJNI_generate16h5AprilTagImage
-  (JNIEnv* env, jclass, jint id, jlong framePtr)
+  (JNIEnv* env, jclass, jint id)
 {
-  wpi::RawFrame* javaRawFrame = (wpi::RawFrame*)framePtr;
-  *javaRawFrame = AprilTag::Generate16h5AprilTagImage(id);
+  return MakeJObject(env, AprilTag::Generate16h5AprilTagImage(id));
 }
 
 /*
  * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
  * Method:    generate36h11AprilTagImage
- * Signature: (IJ)V
+ * Signature: (I)Ljava/lang/Object;
  */
-JNIEXPORT void JNICALL
+JNIEXPORT jobject JNICALL
 Java_edu_wpi_first_apriltag_jni_AprilTagJNI_generate36h11AprilTagImage
-  (JNIEnv* env, jclass, jint id, jlong framePtr)
+  (JNIEnv* env, jclass, jint id)
 {
-  wpi::RawFrame* javaRawFrame = (wpi::RawFrame*)framePtr;
-  *javaRawFrame = AprilTag::Generate36h11AprilTagImage(id);
+  return MakeJObject(env, AprilTag::Generate36h11AprilTagImage(id));
 }
 
 }  // extern "C"
