@@ -17,11 +17,6 @@ DriveSubsystem::DriveSubsystem()
   // gearbox is constructed, you might have to invert the left side instead.
   m_rightLeader.SetInverted(true);
 
-  // You might need to not do this depending on the specific motor controller
-  // that you are using -- contact the respective vendor's documentation for
-  // more details.
-  m_rightFollower.SetInverted(true);
-
   m_leftFollower.Follow(m_leftLeader);
   m_rightFollower.Follow(m_rightLeader);
 
