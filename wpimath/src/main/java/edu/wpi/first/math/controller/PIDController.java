@@ -82,7 +82,7 @@ public class PIDController implements Sendable, AutoCloseable {
    * @param kp The proportional coefficient.
    * @param ki The integral coefficient.
    * @param kd The derivative coefficient.
-   * @param period The period between controller updates in seconds. Must be non-zero and positive.
+   * @param period The period between controller updates in seconds.
    * @throws IllegalArgumentException if kp &lt; 0
    * @throws IllegalArgumentException if ki &lt; 0
    * @throws IllegalArgumentException if kd &lt; 0
@@ -104,7 +104,7 @@ public class PIDController implements Sendable, AutoCloseable {
       throw new IllegalArgumentException("Kd must be a non-negative number!");
     }
     if (period <= 0.0) {
-      throw new IllegalArgumentException("Controller period must be a non-zero positive number!");
+      throw new IllegalArgumentException("Controller period must be a positive number!");
     }
     m_period = period;
 
@@ -137,7 +137,7 @@ public class PIDController implements Sendable, AutoCloseable {
   /**
    * Sets the Proportional coefficient of the PID controller gain.
    *
-   * @param kp proportional coefficient
+   * @param kp The proportional coefficient. Must be &gt;= 0.
    */
   public void setP(double kp) {
     m_kp = kp;
@@ -146,7 +146,7 @@ public class PIDController implements Sendable, AutoCloseable {
   /**
    * Sets the Integral coefficient of the PID controller gain.
    *
-   * @param ki integral coefficient
+   * @param ki The integral coefficient. Must be &gt;= 0.
    */
   public void setI(double ki) {
     m_ki = ki;
@@ -155,7 +155,7 @@ public class PIDController implements Sendable, AutoCloseable {
   /**
    * Sets the Differential coefficient of the PID controller gain.
    *
-   * @param kd differential coefficient
+   * @param kd The differential coefficient. Must be &gt;= 0.
    */
   public void setD(double kd) {
     m_kd = kd;
@@ -169,6 +169,7 @@ public class PIDController implements Sendable, AutoCloseable {
    * of {@link Double#POSITIVE_INFINITY} disables IZone functionality.
    *
    * @param iZone Maximum magnitude of error to allow integral control.
+   * @throws IllegalArgumentException if iZone &lt; 0
    */
   public void setIZone(double iZone) {
     if (iZone < 0) {

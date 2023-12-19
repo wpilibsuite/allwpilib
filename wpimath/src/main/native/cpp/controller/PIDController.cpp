@@ -43,8 +43,7 @@ PIDController::PIDController(double Kp, double Ki, double Kd,
 
   if (period <= 0_s) {
     wpi::math::MathSharedStore::ReportError(
-        "Controller period must be a non-zero positive number, got {}!",
-        period.value());
+        "Controller period must be a positive number, got {}!", period.value());
     m_period = 20_ms;
     wpi::math::MathSharedStore::ReportWarning(
         "Controller period defaulted to 20ms.");
