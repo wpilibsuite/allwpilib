@@ -291,10 +291,16 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
 
   @Override
   public void stopMotor() {
+    m_frontLeftOutput = 0.0;
+    m_frontRightOutput = 0.0;
+    m_rearLeftOutput = 0.0;
+    m_rearRightOutput = 0.0;
+
     m_frontLeftMotor.accept(0.0);
     m_frontRightMotor.accept(0.0);
     m_rearLeftMotor.accept(0.0);
     m_rearRightMotor.accept(0.0);
+
     feed();
   }
 

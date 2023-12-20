@@ -175,8 +175,12 @@ DifferentialDrive::WheelSpeeds DifferentialDrive::TankDriveIK(
 }
 
 void DifferentialDrive::StopMotor() {
+  m_leftOutput = 0.0;
+  m_rightOutput = 0.0;
+
   m_leftMotor(0.0);
   m_rightMotor(0.0);
+
   Feed();
 }
 

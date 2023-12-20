@@ -348,8 +348,12 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
 
   @Override
   public void stopMotor() {
+    m_leftOutput = 0.0;
+    m_rightOutput = 0.0;
+
     m_leftMotor.accept(0.0);
     m_rightMotor.accept(0.0);
+
     feed();
   }
 
