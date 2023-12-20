@@ -1708,7 +1708,9 @@ ServerImpl::TopicData* ServerImpl::CreateTopic(ClientData* client,
       auto& tcd = topic->clients[aClient.get()];
       bool added = false;
       for (auto subscriber : subscribers) {
-        added = added || tcd.AddSubscriber(subscriber);
+        if (tcd.AddSubscriber(subscriber)) {
+          added = true;
+        }
       }
       if (added) {
         aClient->UpdatePeriod(tcd, topic);
