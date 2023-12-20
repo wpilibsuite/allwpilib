@@ -58,6 +58,10 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
   private final DoubleConsumer m_leftMotor;
   private final DoubleConsumer m_rightMotor;
 
+  // Used for Sendable property getters
+  private double m_leftOutput;
+  private double m_rightOutput;
+
   private boolean m_reported;
 
   /**
@@ -162,8 +166,11 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
 
     var speeds = arcadeDriveIK(xSpeed, zRotation, squareInputs);
 
-    m_leftMotor.accept(speeds.left * m_maxOutput);
-    m_rightMotor.accept(speeds.right * m_maxOutput);
+    m_leftOutput = speeds.left * m_maxOutput;
+    m_rightOutput = speeds.right * m_maxOutput;
+
+    m_leftMotor.accept(m_leftOutput);
+    m_rightMotor.accept(m_rightOutput);
 
     feed();
   }
@@ -191,8 +198,11 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
 
     var speeds = curvatureDriveIK(xSpeed, zRotation, allowTurnInPlace);
 
-    m_leftMotor.accept(speeds.left * m_maxOutput);
-    m_rightMotor.accept(speeds.right * m_maxOutput);
+    m_leftOutput = speeds.left * m_maxOutput;
+    m_rightOutput = speeds.right * m_maxOutput;
+
+    m_leftMotor.accept(m_leftOutput);
+    m_rightMotor.accept(m_rightOutput);
 
     feed();
   }
@@ -229,8 +239,11 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
 
     var speeds = tankDriveIK(leftSpeed, rightSpeed, squareInputs);
 
-    m_leftMotor.accept(speeds.left * m_maxOutput);
-    m_rightMotor.accept(speeds.right * m_maxOutput);
+    m_leftOutput = speeds.left * m_maxOutput;
+    m_rightOutput = speeds.right * m_maxOutput;
+
+    m_leftMotor.accept(m_leftOutput);
+    m_rightMotor.accept(m_rightOutput);
 
     feed();
   }
@@ -350,7 +363,7 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
     builder.setSmartDashboardType("DifferentialDrive");
     builder.setActuator(true);
     builder.setSafeState(this::stopMotor);
-    builder.addDoubleProperty("Left Motor Speed", null, m_leftMotor::accept);
-    builder.addDoubleProperty("Right Motor Speed", null, m_rightMotor::accept);
+    builder.addDoubleProperty("Left Motor Speed", () -> m_leftOutput, m_leftMotor::accept);
+    builder.addDoubleProperty("Right Motor Speed", () -> m_rightOutput, m_rightMotor::accept);
   }
 }

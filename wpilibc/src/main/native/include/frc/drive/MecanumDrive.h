@@ -173,6 +173,12 @@ class MecanumDrive : public RobotDriveBase,
   std::function<void(double)> m_frontRightMotor;
   std::function<void(double)> m_rearRightMotor;
 
+  // Used for Sendable property getters
+  double m_frontLeftOutput = 0.0;
+  double m_rearLeftOutput = 0.0;
+  double m_frontRightOutput = 0.0;
+  double m_rearRightOutput = 0.0;
+
   bool reported = false;
 };
 

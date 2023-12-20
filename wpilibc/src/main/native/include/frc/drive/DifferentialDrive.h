@@ -201,6 +201,10 @@ class DifferentialDrive : public RobotDriveBase,
  private:
   std::function<void(double)> m_leftMotor;
   std::function<void(double)> m_rightMotor;
+
+  // Used for Sendable property getters
+  double m_leftOutput = 0.0;
+  double m_rightOutput = 0.0;
 };
 
 }  // namespace frc

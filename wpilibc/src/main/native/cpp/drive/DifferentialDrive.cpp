@@ -49,8 +49,11 @@ void DifferentialDrive::ArcadeDrive(double xSpeed, double zRotation,
 
   auto [left, right] = ArcadeDriveIK(xSpeed, zRotation, squareInputs);
 
-  m_leftMotor(left * m_maxOutput);
-  m_rightMotor(right * m_maxOutput);
+  m_leftOutput = left * m_maxOutput;
+  m_rightOutput = right * m_maxOutput;
+
+  m_leftMotor(m_leftOutput);
+  m_rightMotor(m_rightOutput);
 
   Feed();
 }
@@ -69,8 +72,11 @@ void DifferentialDrive::CurvatureDrive(double xSpeed, double zRotation,
 
   auto [left, right] = CurvatureDriveIK(xSpeed, zRotation, allowTurnInPlace);
 
-  m_leftMotor(left * m_maxOutput);
-  m_rightMotor(right * m_maxOutput);
+  m_leftOutput = left * m_maxOutput;
+  m_rightOutput = right * m_maxOutput;
+
+  m_leftMotor(m_leftOutput);
+  m_rightMotor(m_rightOutput);
 
   Feed();
 }
@@ -89,8 +95,11 @@ void DifferentialDrive::TankDrive(double leftSpeed, double rightSpeed,
 
   auto [left, right] = TankDriveIK(leftSpeed, rightSpeed, squareInputs);
 
-  m_leftMotor(left * m_maxOutput);
-  m_rightMotor(right * m_maxOutput);
+  m_leftOutput = left * m_maxOutput;
+  m_rightOutput = right * m_maxOutput;
+
+  m_leftMotor(m_leftOutput);
+  m_rightMotor(m_rightOutput);
 
   Feed();
 }
@@ -179,6 +188,8 @@ void DifferentialDrive::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("DifferentialDrive");
   builder.SetActuator(true);
   builder.SetSafeState([=, this] { StopMotor(); });
-  builder.AddDoubleProperty("Left Motor Speed", nullptr, m_leftMotor);
-  builder.AddDoubleProperty("Right Motor Speed", nullptr, m_rightMotor);
+  builder.AddDoubleProperty(
+      "Left Motor Speed", [&] { return m_leftOutput; }, m_leftMotor);
+  builder.AddDoubleProperty(
+      "Right Motor Speed", [&] { return m_rightOutput; }, m_rightMotor);
 }

@@ -60,10 +60,15 @@ void MecanumDrive::DriveCartesian(double xSpeed, double ySpeed,
   auto [frontLeft, frontRight, rearLeft, rearRight] =
       DriveCartesianIK(xSpeed, ySpeed, zRotation, gyroAngle);
 
-  m_frontLeftMotor(frontLeft * m_maxOutput);
-  m_frontRightMotor(frontRight * m_maxOutput);
-  m_rearLeftMotor(rearLeft * m_maxOutput);
-  m_rearRightMotor(rearRight * m_maxOutput);
+  m_frontLeftOutput = frontLeft * m_maxOutput;
+  m_rearLeftOutput = rearLeft * m_maxOutput;
+  m_frontRightOutput = frontRight * m_maxOutput;
+  m_rearRightOutput = rearRight * m_maxOutput;
+
+  m_frontLeftMotor(m_frontLeftOutput);
+  m_frontRightMotor(m_frontRightOutput);
+  m_rearLeftMotor(m_rearLeftOutput);
+  m_rearRightMotor(m_rearRightOutput);
 
   Feed();
 }
@@ -120,11 +125,16 @@ void MecanumDrive::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("MecanumDrive");
   builder.SetActuator(true);
   builder.SetSafeState([=, this] { StopMotor(); });
-  builder.AddDoubleProperty("Front Left Motor Speed", nullptr,
-                            m_frontLeftMotor);
-  builder.AddDoubleProperty("Front Right Motor Speed", nullptr,
-                            m_frontRightMotor);
-  builder.AddDoubleProperty("Rear Left Motor Speed", nullptr, m_rearLeftMotor);
-  builder.AddDoubleProperty("Rear Right Motor Speed", nullptr,
-                            m_rearRightMotor);
+  builder.AddDoubleProperty(
+      "Front Left Motor Speed", [&] { return m_frontLeftOutput; },
+      m_frontLeftMotor);
+  builder.AddDoubleProperty(
+      "Front Right Motor Speed", [&] { return m_frontRightOutput; },
+      m_frontRightMotor);
+  builder.AddDoubleProperty(
+      "Rear Left Motor Speed", [&] { return m_rearLeftOutput; },
+      m_rearLeftMotor);
+  builder.AddDoubleProperty(
+      "Rear Right Motor Speed", [&] { return m_rearRightOutput; },
+      m_rearRightMotor);
 }

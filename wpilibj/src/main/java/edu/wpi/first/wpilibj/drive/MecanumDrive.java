@@ -62,6 +62,12 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
   private final DoubleConsumer m_frontRightMotor;
   private final DoubleConsumer m_rearRightMotor;
 
+  // Used for Sendable property getters
+  private double m_frontLeftOutput;
+  private double m_rearLeftOutput;
+  private double m_frontRightOutput;
+  private double m_rearRightOutput;
+
   private boolean m_reported;
 
   /**
@@ -196,10 +202,15 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
 
     var speeds = driveCartesianIK(xSpeed, ySpeed, zRotation, gyroAngle);
 
-    m_frontLeftMotor.accept(speeds.frontLeft * m_maxOutput);
-    m_frontRightMotor.accept(speeds.frontRight * m_maxOutput);
-    m_rearLeftMotor.accept(speeds.rearLeft * m_maxOutput);
-    m_rearRightMotor.accept(speeds.rearRight * m_maxOutput);
+    m_frontLeftOutput = speeds.frontLeft * m_maxOutput;
+    m_rearLeftOutput = speeds.rearLeft * m_maxOutput;
+    m_frontRightOutput = speeds.frontRight * m_maxOutput;
+    m_rearRightOutput = speeds.rearRight * m_maxOutput;
+
+    m_frontLeftMotor.accept(m_frontLeftOutput);
+    m_frontRightMotor.accept(m_frontRightOutput);
+    m_rearLeftMotor.accept(m_rearLeftOutput);
+    m_rearRightMotor.accept(m_rearRightOutput);
 
     feed();
   }
@@ -297,9 +308,13 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
     builder.setSmartDashboardType("MecanumDrive");
     builder.setActuator(true);
     builder.setSafeState(this::stopMotor);
-    builder.addDoubleProperty("Front Left Motor Speed", null, m_frontLeftMotor::accept);
-    builder.addDoubleProperty("Front Right Motor Speed", null, m_frontRightMotor::accept);
-    builder.addDoubleProperty("Rear Left Motor Speed", null, m_rearLeftMotor::accept);
-    builder.addDoubleProperty("Rear Right Motor Speed", null, m_rearRightMotor::accept);
+    builder.addDoubleProperty(
+        "Front Left Motor Speed", () -> m_frontLeftOutput, m_frontLeftMotor::accept);
+    builder.addDoubleProperty(
+        "Front Right Motor Speed", () -> m_frontRightOutput, m_frontRightMotor::accept);
+    builder.addDoubleProperty(
+        "Rear Left Motor Speed", () -> m_rearLeftOutput, m_rearLeftMotor::accept);
+    builder.addDoubleProperty(
+        "Rear Right Motor Speed", () -> m_rearRightOutput, m_rearRightMotor::accept);
   }
 }
