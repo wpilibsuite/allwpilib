@@ -276,6 +276,10 @@ class RobotController {
 
   enum RadioLEDState { kOff = 0, kGreen = 1, kRed = 2, kOrange = 3 };
 
+  /**
+   * Set the state of the "Radio" LED. On the RoboRIO, this writes to sysfs, so this function should not be called multiple times per loop cycle to avoid overruns.
+   * @param state The state to set the LED to.
+   */
   static void SetRadioLEDState(RadioLEDState state);
 
   /**

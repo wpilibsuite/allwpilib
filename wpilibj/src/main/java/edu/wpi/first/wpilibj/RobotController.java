@@ -316,12 +316,18 @@ public final class RobotController {
     return PowerJNI.getCPUTemp();
   }
 
+  /** State for the radio led */
   public enum RadioLEDState {
+    /** Off */
     kOff(0),
+    /** Green */
     kGreen(1),
+    /** Red */
     kRed(2),
+    /** Orange */
     kOrange(3);
 
+    /** The native value for this state */
     final int value;
 
     RadioLEDState(int value) {
@@ -329,6 +335,12 @@ public final class RobotController {
     }
   }
 
+  /**
+   * Set the state of the "Radio" LED. On the RoboRIO, this writes to sysfs, so this function should
+   * not be called multiple times per loop cycle to avoid overruns.
+   *
+   * @param state The state to set the LED to.
+   */
   public static void setRadioLEDState(RadioLEDState state) {
     LEDJNI.setRadioLEDState(state.value);
   }

@@ -5,5 +5,11 @@
 package edu.wpi.first.hal;
 
 public class LEDJNI extends JNIWrapper {
+  /**
+   * Set the state of the "Radio" LED.
+   *
+   * @param state The state to set the LED to.
+   * @see "HAL_SetRadioLEDState"
+   */
   public static native void setRadioLEDState(int state);
 }

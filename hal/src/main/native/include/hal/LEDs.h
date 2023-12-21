@@ -8,4 +8,9 @@
 HAL_ENUM(HAL_RadioLEDState){HAL_RadioLED_kOFF = 0, HAL_RadioLED_kGreen = 1,
                             HAL_RadioLED_kRed = 2, HAL_RadioLED_kOrange = 3};
 
+/**
+ * Set the state of the "Radio" LED.
+ * @param state The state to set the LED to.
+ * @param[out] status the error code, or 0 for success
+ */
 void HAL_SetRadioLEDState(HAL_RadioLEDState state, int32_t* status);
