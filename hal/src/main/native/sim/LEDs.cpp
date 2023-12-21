@@ -6,6 +6,10 @@
 
 #include "hal/simulation/RoboRioData.h"
 
+namespace hal::init {
+void InitializeLEDs() {}
+}  // namespace hal::init
+
 void HAL_SetRadioLEDState(HAL_RadioLEDState state, int32_t* status) {
   HALSIM_SetRoboRioRadioLEDState(state);
 }

@@ -11,6 +11,14 @@
 #include "hal/Errors.h"
 #include "hal/LEDS.h"
 
+namespace hal::init {
+
+void InitializeLEDs() {
+  int32_t status = 0;
+  HAL_SetRadioLEDState(HAL_RadioLED_kOff, &status);
+}
+}  // namespace hal::init
+
 static const fs::path radioLEDGreenFilePath =
     "/sys/class/leds/nilrt:wifi:primary/brightness";
 static const fs::path radioLEDRedFilePath =
