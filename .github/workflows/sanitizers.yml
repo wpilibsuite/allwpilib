@@ -33,7 +33,7 @@ jobs:
 
       - name: Install QuickBuffers
         if: runner.os == 'Linux'
-        run: wget https://github.com/HebiRobotics/QuickBuffers/releases/download/1.3.2/protoc-gen-quickbuf_1.3.2_amd64.deb && sudo apt install ./protoc-gen-quickbuf_1.3.2_amd64.deb
+        run: wget https://github.com/HebiRobotics/QuickBuffers/releases/download/1.3.3/protoc-gen-quickbuf_1.3.3_amd64.deb && sudo apt install ./protoc-gen-quickbuf_1.3.3_amd64.deb
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@v0.0.3
