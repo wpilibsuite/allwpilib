@@ -6,6 +6,7 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.HALUtil;
+import edu.wpi.first.hal.LEDJNI;
 import edu.wpi.first.hal.PowerJNI;
 import edu.wpi.first.hal.can.CANJNI;
 import edu.wpi.first.hal.can.CANStatus;
@@ -313,6 +314,23 @@ public final class RobotController {
    */
   public static double getCPUTemp() {
     return PowerJNI.getCPUTemp();
+  }
+
+  public enum RadioLEDState {
+    kOff(0),
+    kGreen(1),
+    kRed(2),
+    kOrange(3);
+
+    final int value;
+
+    RadioLEDState(int value) {
+      this.value = value;
+    }
+  }
+
+  public static void setRadioLEDState(RadioLEDState state) {
+    LEDJNI.setRadioLEDState(state.value);
   }
 
   /**

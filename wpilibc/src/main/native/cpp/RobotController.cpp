@@ -8,6 +8,7 @@
 
 #include <hal/CAN.h>
 #include <hal/HALBase.h>
+#include <hal/LEDs.h>
 #include <hal/Power.h>
 
 #include "frc/Errors.h"
@@ -228,6 +229,12 @@ units::celsius_t RobotController::GetCPUTemp() {
   double retVal = HAL_GetCPUTemp(&status);
   FRC_CheckErrorStatus(status, "GetCPUTemp");
   return units::celsius_t{retVal};
+}
+
+void RobotController::SetRadioLEDState(RadioLEDState state) {
+  int32_t status = 0;
+  HAL_SetRadioLEDState(static_cast<HAL_RadioLEDState>(state), &status);
+  FRC_CheckErrorStatus(status, "SetRadioLEDState");
 }
 
 CANStatus RobotController::GetCANStatus() {

@@ -274,6 +274,10 @@ class RobotController {
    */
   static units::celsius_t GetCPUTemp();
 
+  enum RadioLEDState { kOff = 0, kGreen = 1, kRed = 2, kOrange = 3 };
+
+  static void SetRadioLEDState(RadioLEDState state);
+
   /**
    * Get the current status of the CAN bus.
    *
