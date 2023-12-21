@@ -32,9 +32,14 @@ class RoboRioData {
   HAL_SIMDATAVALUE_DEFINE_NAME(BrownoutVoltage)
   HAL_SIMDATAVALUE_DEFINE_NAME(CPUTemp)
   HAL_SIMDATAVALUE_DEFINE_NAME(TeamNumber)
+  HAL_SIMDATAVALUE_DEFINE_NAME(RadioLEDState)
 
   HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(SerialNumber)
   HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(Comments);
+
+  static inline HAL_Value MakeRadioLEDStateValue(HAL_RadioLEDState value) {
+    return HAL_MakeEnum(value);
+  }
 
  public:
   SimDataValue<HAL_Bool, HAL_MakeBoolean, GetFPGAButtonName> fpgaButton{false};
@@ -61,6 +66,8 @@ class RoboRioData {
       6.75};
   SimDataValue<double, HAL_MakeDouble, GetCPUTempName> cpuTemp{45.0};
   SimDataValue<int32_t, HAL_MakeInt, GetTeamNumberName> teamNumber{0};
+  SimDataValue<HAL_RadioLEDState, MakeRadioLEDStateValue, GetRadioLEDStateName>
+      radioLedState{HAL_RadioLED_kOFF};
 
   int32_t RegisterSerialNumberCallback(HAL_RoboRioStringCallback callback,
                                        void* param, HAL_Bool initialNotify);
