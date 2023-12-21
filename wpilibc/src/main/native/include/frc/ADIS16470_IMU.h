@@ -48,7 +48,7 @@ namespace frc {
  *
  * This class is for the ADIS16470 IMU connected via the primary SPI port
  * available on the RoboRIO.
- */
+*/
 
 class ADIS16470_IMU : public wpi::Sendable,
                       public wpi::SendableHelper<ADIS16470_IMU> {
@@ -69,33 +69,14 @@ class ADIS16470_IMU : public wpi::Sendable,
     _64s = 11
   };
 
-  enum IMUAxis { kX, kY, kZ };
+  enum IMUAxis { kX, kY, kZ, kYaw, kPitch, kRoll };
 
-  /**
-   * @brief Default constructor. Uses CS0 on the 10-pin SPI port, the yaw axis
-   * is set to the IMU Z axis, and calibration time is defaulted to 4 seconds.
-   */
   ADIS16470_IMU();
+  ADIS16470_IMU(IMUAxis yaw_axis, IMUAxis pitch_axis, IMUAxis roll_axis);
 
-  /**
-   * @brief Customizable constructor. Allows the SPI port and CS to be
-   * customized, the yaw axis used for GetAngle() is adjustable, and initial
-   * calibration time can be modified.
-   *
-   * @param yaw_axis Selects the "default" axis to use for GetAngle() and
-   * GetRate()
-   *
-   * @param port The SPI port and CS where the IMU is connected.
-   *
-   * @param cal_time The calibration time that should be used on start-up.
-   */
-  explicit ADIS16470_IMU(IMUAxis yaw_axis, SPI::Port port,
-                         CalibrationTime cal_time);
+  explicit ADIS16470_IMU(IMUAxis yaw_axis, IMUAxis pitch_axis, IMUAxis roll_axis,
+                         frc::SPI::Port port, CalibrationTime cal_time);
 
-  /**
-   * @brief Destructor. Kills the acquisition loop and closes the SPI
-   * peripheral.
-   */
   ~ADIS16470_IMU() override;
 
   ADIS16470_IMU(ADIS16470_IMU&&) = default;
@@ -124,20 +105,29 @@ class ADIS16470_IMU : public wpi::Sendable,
   void Reset();
 
   /**
-   * Returns the yaw axis angle in degrees (CCW positive).
+   * Sets an axis angle to a value in degrees (CCW positive).
    */
-  units::degree_t GetAngle() const;
+  void SetGyroAngle(IMUAxis axis, units::degree_t angle);
+
+  void SetGyroAngleX(units::degree_t angle);
+  void SetGyroAngleY(units::degree_t angle);
+  void SetGyroAngleZ(units::degree_t angle);
 
   /**
-   * Returns the yaw axis angular rate in degrees per second (CCW positive).
+   * Returns the angle of an axis in degrees (CCW positive).
    */
-  units::degrees_per_second_t GetRate() const;
+  units::degree_t GetAngle(IMUAxis axis) const;
+
+  /**
+   * Returns the angular rate of an axis in degrees per second (CCW positive).
+   */
+  units::degrees_per_second_t GetRate(IMUAxis axis) const;
 
   /**
    * Returns the acceleration in the X axis.
    */
   units::meters_per_second_squared_t GetAccelX() const;
-
+  
   /**
    * Returns the acceleration in the Y axis.
    */
@@ -149,152 +139,113 @@ class ADIS16470_IMU : public wpi::Sendable,
   units::meters_per_second_squared_t GetAccelZ() const;
 
   units::degree_t GetXComplementaryAngle() const;
-
   units::degree_t GetYComplementaryAngle() const;
 
   units::degree_t GetXFilteredAccelAngle() const;
-
   units::degree_t GetYFilteredAccelAngle() const;
 
   IMUAxis GetYawAxis() const;
-
-  int SetYawAxis(IMUAxis yaw_axis);
+  IMUAxis GetPitchAxis() const;
+  IMUAxis GetRollAxis() const;
 
   bool IsConnected() const;
 
-  // IMU yaw axis
   IMUAxis m_yaw_axis;
+  IMUAxis m_pitch_axis;
+  IMUAxis m_roll_axis;
 
-  /**
-   * Get the SPI port number.
-   *
-   * @return The SPI port number.
-   */
   int GetPort() const;
 
   void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
-  /* ADIS16470 Register Map Declaration */
-  static constexpr uint8_t FLASH_CNT = 0x00;  // Flash memory write count
-  static constexpr uint8_t DIAG_STAT =
-      0x02;  // Diagnostic and operational status
-  static constexpr uint8_t X_GYRO_LOW =
-      0x04;  // X-axis gyroscope output, lower word
-  static constexpr uint8_t X_GYRO_OUT =
-      0x06;  // X-axis gyroscope output, upper word
-  static constexpr uint8_t Y_GYRO_LOW =
-      0x08;  // Y-axis gyroscope output, lower word
-  static constexpr uint8_t Y_GYRO_OUT =
-      0x0A;  // Y-axis gyroscope output, upper word
-  static constexpr uint8_t Z_GYRO_LOW =
-      0x0C;  // Z-axis gyroscope output, lower word
-  static constexpr uint8_t Z_GYRO_OUT =
-      0x0E;  // Z-axis gyroscope output, upper word
-  static constexpr uint8_t X_ACCL_LOW =
-      0x10;  // X-axis accelerometer output, lower word
-  static constexpr uint8_t X_ACCL_OUT =
-      0x12;  // X-axis accelerometer output, upper word
-  static constexpr uint8_t Y_ACCL_LOW =
-      0x14;  // Y-axis accelerometer output, lower word
-  static constexpr uint8_t Y_ACCL_OUT =
-      0x16;  // Y-axis accelerometer output, upper word
-  static constexpr uint8_t Z_ACCL_LOW =
-      0x18;  // Z-axis accelerometer output, lower word
-  static constexpr uint8_t Z_ACCL_OUT =
-      0x1A;  // Z-axis accelerometer output, upper word
-  static constexpr uint8_t TEMP_OUT =
-      0x1C;  // Temperature output (internal, not calibrated)
-  static constexpr uint8_t TIME_STAMP = 0x1E;  // PPS mode time stamp
-  static constexpr uint8_t X_DELTANG_LOW =
-      0x24;  // X-axis delta angle output, lower word
-  static constexpr uint8_t X_DELTANG_OUT =
-      0x26;  // X-axis delta angle output, upper word
-  static constexpr uint8_t Y_DELTANG_LOW =
-      0x28;  // Y-axis delta angle output, lower word
-  static constexpr uint8_t Y_DELTANG_OUT =
-      0x2A;  // Y-axis delta angle output, upper word
-  static constexpr uint8_t Z_DELTANG_LOW =
-      0x2C;  // Z-axis delta angle output, lower word
-  static constexpr uint8_t Z_DELTANG_OUT =
-      0x2E;  // Z-axis delta angle output, upper word
-  static constexpr uint8_t X_DELTVEL_LOW =
-      0x30;  // X-axis delta velocity output, lower word
-  static constexpr uint8_t X_DELTVEL_OUT =
-      0x32;  // X-axis delta velocity output, upper word
-  static constexpr uint8_t Y_DELTVEL_LOW =
-      0x34;  // Y-axis delta velocity output, lower word
-  static constexpr uint8_t Y_DELTVEL_OUT =
-      0x36;  // Y-axis delta velocity output, upper word
-  static constexpr uint8_t Z_DELTVEL_LOW =
-      0x38;  // Z-axis delta velocity output, lower word
-  static constexpr uint8_t Z_DELTVEL_OUT =
-      0x3A;  // Z-axis delta velocity output, upper word
-  static constexpr uint8_t XG_BIAS_LOW =
-      0x40;  // X-axis gyroscope bias offset correction, lower word
-  static constexpr uint8_t XG_BIAS_HIGH =
-      0x42;  // X-axis gyroscope bias offset correction, upper word
-  static constexpr uint8_t YG_BIAS_LOW =
-      0x44;  // Y-axis gyroscope bias offset correction, lower word
-  static constexpr uint8_t YG_BIAS_HIGH =
-      0x46;  // Y-axis gyroscope bias offset correction, upper word
-  static constexpr uint8_t ZG_BIAS_LOW =
-      0x48;  // Z-axis gyroscope bias offset correction, lower word
-  static constexpr uint8_t ZG_BIAS_HIGH =
-      0x4A;  // Z-axis gyroscope bias offset correction, upper word
-  static constexpr uint8_t XA_BIAS_LOW =
-      0x4C;  // X-axis accelerometer bias offset correction, lower word
-  static constexpr uint8_t XA_BIAS_HIGH =
-      0x4E;  // X-axis accelerometer bias offset correction, upper word
-  static constexpr uint8_t YA_BIAS_LOW =
-      0x50;  // Y-axis accelerometer bias offset correction, lower word
-  static constexpr uint8_t YA_BIAS_HIGH =
-      0x52;  // Y-axis accelerometer bias offset correction, upper word
-  static constexpr uint8_t ZA_BIAS_LOW =
-      0x54;  // Z-axis accelerometer bias offset correction, lower word
-  static constexpr uint8_t ZA_BIAS_HIGH =
-      0x56;  // Z-axis accelerometer bias offset correction, upper word
-  static constexpr uint8_t FILT_CTRL = 0x5C;  // Filter control
-  static constexpr uint8_t MSC_CTRL = 0x60;   // Miscellaneous control
-  static constexpr uint8_t UP_SCALE = 0x62;   // Clock scale factor, PPS mode
-  static constexpr uint8_t DEC_RATE =
-      0x64;  // Decimation rate control (output data rate)
-  static constexpr uint8_t NULL_CNFG = 0x66;  // Auto-null configuration control
-  static constexpr uint8_t GLOB_CMD = 0x68;   // Global commands
-  static constexpr uint8_t FIRM_REV = 0x6C;   // Firmware revision
-  static constexpr uint8_t FIRM_DM =
-      0x6E;  // Firmware revision date, month and day
-  static constexpr uint8_t FIRM_Y = 0x70;   // Firmware revision date, year
-  static constexpr uint8_t PROD_ID = 0x72;  // Product identification
-  static constexpr uint8_t SERIAL_NUM =
-      0x74;  // Serial number (relative to assembly lot)
-  static constexpr uint8_t USER_SCR1 = 0x76;  // User scratch register 1
-  static constexpr uint8_t USER_SCR2 = 0x78;  // User scratch register 2
-  static constexpr uint8_t USER_SCR3 = 0x7A;  // User scratch register 3
-  static constexpr uint8_t FLSHCNT_LOW =
-      0x7C;  // Flash update count, lower word
-  static constexpr uint8_t FLSHCNT_HIGH =
-      0x7E;  // Flash update count, upper word
+  // Register Map Declaration
+  static constexpr uint8_t FLASH_CNT     = 0x00; // Flash memory write count
+  static constexpr uint8_t DIAG_STAT     = 0x02; // Diagnostic and operational status
+  static constexpr uint8_t X_GYRO_LOW    = 0x04; // X-axis gyroscope output, lower word
+  static constexpr uint8_t X_GYRO_OUT    = 0x06; // X-axis gyroscope output, upper word
+  static constexpr uint8_t Y_GYRO_LOW    = 0x08; // Y-axis gyroscope output, lower word
+  static constexpr uint8_t Y_GYRO_OUT    = 0x0A; // Y-axis gyroscope output, upper word
+  static constexpr uint8_t Z_GYRO_LOW    = 0x0C; // Z-axis gyroscope output, lower word
+  static constexpr uint8_t Z_GYRO_OUT    = 0x0E; // Z-axis gyroscope output, upper word
+  static constexpr uint8_t X_ACCL_LOW    = 0x10; // X-axis accelerometer output, lower word
+  static constexpr uint8_t X_ACCL_OUT    = 0x12; // X-axis accelerometer output, upper word
+  static constexpr uint8_t Y_ACCL_LOW    = 0x14; // Y-axis accelerometer output, lower word
+  static constexpr uint8_t Y_ACCL_OUT    = 0x16; // Y-axis accelerometer output, upper word
+  static constexpr uint8_t Z_ACCL_LOW    = 0x18; // Z-axis accelerometer output, lower word
+  static constexpr uint8_t Z_ACCL_OUT    = 0x1A; // Z-axis accelerometer output, upper word
+  static constexpr uint8_t TEMP_OUT      = 0x1C; // Temperature output (internal, not calibrated)
+  static constexpr uint8_t TIME_STAMP    = 0x1E; // PPS mode time stamp
+  static constexpr uint8_t X_DELTANG_LOW = 0x24; // X-axis delta angle output, lower word
+  static constexpr uint8_t X_DELTANG_OUT = 0x26; // X-axis delta angle output, upper word
+  static constexpr uint8_t Y_DELTANG_LOW = 0x28; // Y-axis delta angle output, lower word
+  static constexpr uint8_t Y_DELTANG_OUT = 0x2A; // Y-axis delta angle output, upper word
+  static constexpr uint8_t Z_DELTANG_LOW = 0x2C; // Z-axis delta angle output, lower word
+  static constexpr uint8_t Z_DELTANG_OUT = 0x2E; // Z-axis delta angle output, upper word
+  static constexpr uint8_t X_DELTVEL_LOW = 0x30; // X-axis delta velocity output, lower word
+  static constexpr uint8_t X_DELTVEL_OUT = 0x32; // X-axis delta velocity output, upper word
+  static constexpr uint8_t Y_DELTVEL_LOW = 0x34; // Y-axis delta velocity output, lower word
+  static constexpr uint8_t Y_DELTVEL_OUT = 0x36; // Y-axis delta velocity output, upper word
+  static constexpr uint8_t Z_DELTVEL_LOW = 0x38; // Z-axis delta velocity output, lower word
+  static constexpr uint8_t Z_DELTVEL_OUT = 0x3A; // Z-axis delta velocity output, upper word
+  static constexpr uint8_t XG_BIAS_LOW   = 0x40; // X-axis gyroscope bias offset correction, lower word
+  static constexpr uint8_t XG_BIAS_HIGH  = 0x42; // X-axis gyroscope bias offset correction, upper word
+  static constexpr uint8_t YG_BIAS_LOW   = 0x44; // Y-axis gyroscope bias offset correction, lower word
+  static constexpr uint8_t YG_BIAS_HIGH  = 0x46; // Y-axis gyroscope bias offset correction, upper word
+  static constexpr uint8_t ZG_BIAS_LOW   = 0x48; // Z-axis gyroscope bias offset correction, lower word
+  static constexpr uint8_t ZG_BIAS_HIGH  = 0x4A; // Z-axis gyroscope bias offset correction, upper word
+  static constexpr uint8_t XA_BIAS_LOW   = 0x4C; // X-axis accelerometer bias offset correction, lower word
+  static constexpr uint8_t XA_BIAS_HIGH  = 0x4E; // X-axis accelerometer bias offset correction, upper word
+  static constexpr uint8_t YA_BIAS_LOW   = 0x50; // Y-axis accelerometer bias offset correction, lower word
+  static constexpr uint8_t YA_BIAS_HIGH  = 0x52; // Y-axis accelerometer bias offset correction, upper word
+  static constexpr uint8_t ZA_BIAS_LOW   = 0x54; // Z-axis accelerometer bias offset correction, lower word
+  static constexpr uint8_t ZA_BIAS_HIGH  = 0x56; // Z-axis accelerometer bias offset correction, upper word
+  static constexpr uint8_t FILT_CTRL     = 0x5C; // Filter control
+  static constexpr uint8_t MSC_CTRL      = 0x60; // Miscellaneous control
+  static constexpr uint8_t UP_SCALE      = 0x62; // Clock scale factor, PPS mode
+  static constexpr uint8_t DEC_RATE      = 0x64; // Decimation rate control (output data rate)
+  static constexpr uint8_t NULL_CNFG     = 0x66; // Auto-null configuration control
+  static constexpr uint8_t GLOB_CMD      = 0x68; // Global commands
+  static constexpr uint8_t FIRM_REV      = 0x6C; // Firmware revision
+  static constexpr uint8_t FIRM_DM       = 0x6E; // Firmware revision date, month and day
+  static constexpr uint8_t FIRM_Y        = 0x70; // Firmware revision date, year
+  static constexpr uint8_t PROD_ID       = 0x72; // Product identification
+  static constexpr uint8_t SERIAL_NUM    = 0x74; // Serial number (relative to assembly lot)
+  static constexpr uint8_t USER_SCR1     = 0x76; // User scratch register 1
+  static constexpr uint8_t USER_SCR2     = 0x78; // User scratch register 2
+  static constexpr uint8_t USER_SCR3     = 0x7A; // User scratch register 3
+  static constexpr uint8_t FLSHCNT_LOW   = 0x7C; // Flash update count, lower word
+  static constexpr uint8_t FLSHCNT_HIGH  = 0x7E; // Flash update count, upper word
 
-  /* ADIS16470 Auto SPI Data Packets */
-  static constexpr uint8_t m_autospi_x_packet[16] = {
-      X_DELTANG_OUT, FLASH_CNT, X_DELTANG_LOW, FLASH_CNT, X_GYRO_OUT, FLASH_CNT,
-      Y_GYRO_OUT,    FLASH_CNT, Z_GYRO_OUT,    FLASH_CNT, X_ACCL_OUT, FLASH_CNT,
-      Y_ACCL_OUT,    FLASH_CNT, Z_ACCL_OUT,    FLASH_CNT};
+  // Auto SPI Data Packet to read all thrre gyro axes.
+  static constexpr uint8_t m_autospi_allangle_packet[24] = {
+    X_DELTANG_OUT,
+    FLASH_CNT,
+    X_DELTANG_LOW,
+    FLASH_CNT,
+    Y_DELTANG_OUT,
+    FLASH_CNT,
+    Y_DELTANG_LOW,
+    FLASH_CNT,
+    Z_DELTANG_OUT,
+    FLASH_CNT,
+    Z_DELTANG_LOW,
+    FLASH_CNT,
+    X_GYRO_OUT,
+    FLASH_CNT,
+    Y_GYRO_OUT,
+    FLASH_CNT,
+    Z_GYRO_OUT,
+    FLASH_CNT,
+    X_ACCL_OUT,
+    FLASH_CNT,
+    Y_ACCL_OUT,
+    FLASH_CNT,
+    Z_ACCL_OUT,
+    FLASH_CNT
+  };
 
-  static constexpr uint8_t m_autospi_y_packet[16] = {
-      Y_DELTANG_OUT, FLASH_CNT, Y_DELTANG_LOW, FLASH_CNT, X_GYRO_OUT, FLASH_CNT,
-      Y_GYRO_OUT,    FLASH_CNT, Z_GYRO_OUT,    FLASH_CNT, X_ACCL_OUT, FLASH_CNT,
-      Y_ACCL_OUT,    FLASH_CNT, Z_ACCL_OUT,    FLASH_CNT};
-
-  static constexpr uint8_t m_autospi_z_packet[16] = {
-      Z_DELTANG_OUT, FLASH_CNT, Z_DELTANG_LOW, FLASH_CNT, X_GYRO_OUT, FLASH_CNT,
-      Y_GYRO_OUT,    FLASH_CNT, Z_GYRO_OUT,    FLASH_CNT, X_ACCL_OUT, FLASH_CNT,
-      Y_ACCL_OUT,    FLASH_CNT, Z_ACCL_OUT,    FLASH_CNT};
-
-  /* ADIS16470 Constants */
-  static constexpr double delta_angle_sf =
-      2160.0 / 2147483648.0; /* 2160 / (2^31) */
+  static constexpr double delta_angle_sf = 2160.0 / 2147483648.0;
   static constexpr double rad_to_deg = 57.2957795;
   static constexpr double deg_to_rad = 0.0174532;
   static constexpr double grav = 9.81;
@@ -350,8 +301,10 @@ class ADIS16470_IMU : public wpi::Sendable,
 
   void Close();
 
-  // Integrated gyro value
-  double m_integ_angle = 0.0;
+  // Integrated gyro angles.
+  double m_integ_angle_x = 0.0;
+  double m_integ_angle_y = 0.0;
+  double m_integ_angle_z = 0.0;
 
   // Instant raw outputs
   double m_gyro_rate_x = 0.0;
