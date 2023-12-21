@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "hal/LEDs.h"
+
 #include <unistd.h>
 
 #include <fstream>
@@ -9,7 +11,6 @@
 #include <wpi/fs.h>
 
 #include "hal/Errors.h"
-#include "hal/LEDS.h"
 
 namespace hal::init {
 
