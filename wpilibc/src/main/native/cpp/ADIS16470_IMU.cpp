@@ -65,26 +65,31 @@ inline void ADISReportError(int32_t status, const char* file, int line,
 ADIS16470_IMU::ADIS16470_IMU()
     : ADIS16470_IMU(kZ, kY, kX, SPI::Port::kOnboardCS0, CalibrationTime::_4s) {}
 
-ADIS16470_IMU::ADIS16470_IMU(IMUAxis yaw_axis, IMUAxis pitch_axis, IMUAxis roll_axis)
-    : ADIS16470_IMU(yaw_axis, pitch_axis, roll_axis, SPI::Port::kOnboardCS0, CalibrationTime::_4s) {}
+ADIS16470_IMU::ADIS16470_IMU(IMUAxis yaw_axis, IMUAxis pitch_axis,
+                             IMUAxis roll_axis)
+    : ADIS16470_IMU(yaw_axis, pitch_axis, roll_axis, SPI::Port::kOnboardCS0,
+                    CalibrationTime::_4s) {}
 
-ADIS16470_IMU::ADIS16470_IMU(IMUAxis yaw_axis, IMUAxis pitch_axis, IMUAxis roll_axis,
-                             SPI::Port port, CalibrationTime cal_time)
+ADIS16470_IMU::ADIS16470_IMU(IMUAxis yaw_axis, IMUAxis pitch_axis,
+                             IMUAxis roll_axis, SPI::Port port,
+                             CalibrationTime cal_time)
     : m_yaw_axis(yaw_axis),
       m_pitch_axis(pitch_axis),
       m_roll_axis(roll_axis),
       m_spi_port(port),
       m_calibration_time(static_cast<uint16_t>(cal_time)),
       m_simDevice("Gyro:ADIS16470", port) {
-
-  if (yaw_axis   == kYaw || yaw_axis   == kPitch || yaw_axis   == kRoll ||
+  if (yaw_axis == kYaw || yaw_axis == kPitch || yaw_axis == kRoll ||
       pitch_axis == kYaw || pitch_axis == kPitch || pitch_axis == kRoll ||
-      roll_axis  == kYaw || roll_axis  == kPitch || roll_axis  == kRoll) {
-      REPORT_ERROR("ADIS16740 constructor only allows IMUAxis.kX, IMUAxis.kY or IMUAxis.kZ as arguments.");
-      REPORT_ERROR("Constructing ADIS with default axes. (IMUAxis.kZ is defined as Yaw)");
-      yaw_axis = kZ;
-      pitch_axis = kY;
-      roll_axis = kX;
+      roll_axis == kYaw || roll_axis == kPitch || roll_axis == kRoll) {
+    REPORT_ERROR(
+        "ADIS16740 constructor only allows IMUAxis.kX, IMUAxis.kY or "
+        "IMUAxis.kZ as arguments.");
+    REPORT_ERROR(
+        "Constructing ADIS with default axes. (IMUAxis.kZ is defined as Yaw)");
+    yaw_axis = kZ;
+    pitch_axis = kY;
+    roll_axis = kX;
   }
 
   if (m_simDevice) {
@@ -573,9 +578,15 @@ void ADIS16470_IMU::Acquire() {
         m_dt = (buffer[i] - previous_timestamp) / 1000000.0;
         /* Get delta angle value for selected yaw axis and scale by the elapsed
          * time (based on timestamp) */
-        delta_angle_x = (ToInt(&buffer[i + 3]) * delta_angle_sf) / (m_scaled_sample_rate / (buffer[i] - previous_timestamp));
-        delta_angle_y = (ToInt(&buffer[i + 7]) * delta_angle_sf) / (m_scaled_sample_rate / (buffer[i] - previous_timestamp));
-        delta_angle_z = (ToInt(&buffer[i + 11]) * delta_angle_sf) / (m_scaled_sample_rate / (buffer[i] - previous_timestamp));
+        delta_angle_x =
+            (ToInt(&buffer[i + 3]) * delta_angle_sf) /
+            (m_scaled_sample_rate / (buffer[i] - previous_timestamp));
+        delta_angle_y =
+            (ToInt(&buffer[i + 7]) * delta_angle_sf) /
+            (m_scaled_sample_rate / (buffer[i] - previous_timestamp));
+        delta_angle_z =
+            (ToInt(&buffer[i + 11]) * delta_angle_sf) /
+            (m_scaled_sample_rate / (buffer[i] - previous_timestamp));
 
         gyro_rate_x = (BuffToShort(&buffer[i + 15]) / 10.0);
         gyro_rate_y = (BuffToShort(&buffer[i + 17]) / 10.0);
@@ -726,7 +737,8 @@ void ADIS16470_IMU::SetGyroAngle(IMUAxis axis, units::degree_t angle) {
     case kRoll:
       axis = m_roll_axis;
       break;
-    default: break;
+    default:
+      break;
   }
 
   switch (axis) {
@@ -739,7 +751,8 @@ void ADIS16470_IMU::SetGyroAngle(IMUAxis axis, units::degree_t angle) {
     case kZ:
       SetGyroAngleZ(angle);
       break;
-    default: break;
+    default:
+      break;
   }
 }
 
@@ -769,7 +782,8 @@ units::degree_t ADIS16470_IMU::GetAngle(IMUAxis axis) const {
     case kRoll:
       axis = m_roll_axis;
       break;
-    default: break;
+    default:
+      break;
   }
 
   switch (axis) {
@@ -797,7 +811,8 @@ units::degree_t ADIS16470_IMU::GetAngle(IMUAxis axis) const {
         std::scoped_lock sync(m_mutex);
         return units::degree_t{m_integ_angle_z};
       }
-    default: break;
+    default:
+      break;
   }
 
   return units::degree_t{0.0};
@@ -814,7 +829,8 @@ units::degrees_per_second_t ADIS16470_IMU::GetRate(IMUAxis axis) const {
     case kRoll:
       axis = m_roll_axis;
       break;
-    default: break;
+    default:
+      break;
   }
 
   switch (axis) {
@@ -842,7 +858,8 @@ units::degrees_per_second_t ADIS16470_IMU::GetRate(IMUAxis axis) const {
         std::scoped_lock sync(m_mutex);
         return units::degrees_per_second_t{m_gyro_rate_z};
       }
-    default: break;
+    default:
+      break;
   }
 
   return 0_deg_per_s;
