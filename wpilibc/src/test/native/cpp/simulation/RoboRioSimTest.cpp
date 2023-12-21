@@ -274,4 +274,24 @@ TEST(RoboRioSimTest, SetComments) {
   EXPECT_EQ(kCommentsTruncated, RobotController::GetComments());
 }
 
+TEST(RoboRioSimTest, SetRadioLEDState) {
+  RoboRioSim::ResetData();
+
+  EnumCallback callback;
+  auto cbHandle =
+      RoboRioSim::RegisterRadioLEDStateCallback(callback.GetCallback(), false);
+
+  RobotController::SetRadioLEDState(RadioLEDState::kGreen);
+  EXPECT_TRUE(callback.WasTriggered());
+  EXPECT_EQ(RadioLEDState::kGreen, callback.GetLastValue());
+  EXPECT_EQ(RadioLEDState::kGreen, RoboRioSim::GetRadioLEDState());
+
+  callback.Reset();
+
+  RoboRioSim::SetRadioLEDState(RadioLEDState::kOrange);
+  EXPECT_TRUE(callback.WasTriggered());
+  EXPECT_EQ(RadioLEDState::kOrange, callback.GetLastValue());
+  EXPECT_EQ(RadioLEDState::kOrange, RoboRioSim::GetRadioLEDState());
+}
+
 }  // namespace frc::sim

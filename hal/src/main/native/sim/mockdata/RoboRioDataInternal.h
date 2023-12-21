@@ -67,7 +67,7 @@ class RoboRioData {
   SimDataValue<double, HAL_MakeDouble, GetCPUTempName> cpuTemp{45.0};
   SimDataValue<int32_t, HAL_MakeInt, GetTeamNumberName> teamNumber{0};
   SimDataValue<HAL_RadioLEDState, MakeRadioLEDStateValue, GetRadioLEDStateName>
-      radioLedState{HAL_RadioLED_kOFF};
+      radioLedState{HAL_RadioLED_kOff};
 
   int32_t RegisterSerialNumberCallback(HAL_RoboRioStringCallback callback,
                                        void* param, HAL_Bool initialNotify);

@@ -5,6 +5,11 @@
 package edu.wpi.first.hal;
 
 public class LEDJNI extends JNIWrapper {
+  public static final int RADIO_LED_STATE_OFF = 0;
+  public static final int RADIO_LED_STATE_GREEN = 1;
+  public static final int RADIO_LED_STATE_RED = 2;
+  public static final int RADIO_LED_STATE_ORANGE = 3;
+
   /**
    * Set the state of the "Radio" LED.
    *

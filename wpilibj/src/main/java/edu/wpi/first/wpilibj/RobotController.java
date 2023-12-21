@@ -316,22 +316,43 @@ public final class RobotController {
     return PowerJNI.getCPUTemp();
   }
 
-  /** State for the radio led */
+  /** State for the radio led. */
   public enum RadioLEDState {
-    /** Off */
-    kOff(0),
-    /** Green */
-    kGreen(1),
-    /** Red */
-    kRed(2),
-    /** Orange */
-    kOrange(3);
+    /** Off. */
+    kOff(LEDJNI.RADIO_LED_STATE_OFF),
+    /** Green. */
+    kGreen(LEDJNI.RADIO_LED_STATE_GREEN),
+    /** Red. */
+    kRed(LEDJNI.RADIO_LED_STATE_RED),
+    /** Orange. */
+    kOrange(LEDJNI.RADIO_LED_STATE_ORANGE);
 
-    /** The native value for this state */
-    final int value;
+    /** The native value for this state. */
+    public final int value;
 
     RadioLEDState(int value) {
       this.value = value;
+    }
+
+    /**
+     * Gets a state from an int value.
+     *
+     * @param value int value
+     * @return state
+     */
+    public static RadioLEDState fromValue(int value) {
+      switch (value) {
+        case LEDJNI.RADIO_LED_STATE_OFF:
+          return RadioLEDState.kOff;
+        case LEDJNI.RADIO_LED_STATE_GREEN:
+          return RadioLEDState.kGreen;
+        case LEDJNI.RADIO_LED_STATE_RED:
+          return RadioLEDState.kRed;
+        case LEDJNI.RADIO_LED_STATE_ORANGE:
+          return RadioLEDState.kOrange;
+        default:
+          return RadioLEDState.kOff;
+      }
     }
   }
 

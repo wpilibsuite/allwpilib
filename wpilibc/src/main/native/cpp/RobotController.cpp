@@ -231,6 +231,17 @@ units::celsius_t RobotController::GetCPUTemp() {
   return units::celsius_t{retVal};
 }
 
+static_assert(RadioLEDState::kOff ==
+              static_cast<RadioLEDState>(HAL_RadioLEDState::HAL_RadioLED_kOff));
+static_assert(
+    RadioLEDState::kGreen ==
+    static_cast<RadioLEDState>(HAL_RadioLEDState::HAL_RadioLED_kGreen));
+static_assert(RadioLEDState::kRed ==
+              static_cast<RadioLEDState>(HAL_RadioLEDState::HAL_RadioLED_kRed));
+static_assert(
+    RadioLEDState::kOrange ==
+    static_cast<RadioLEDState>(HAL_RadioLEDState::HAL_RadioLED_kOrange));
+
 void RobotController::SetRadioLEDState(RadioLEDState state) {
   int32_t status = 0;
   HAL_SetRadioLEDState(static_cast<HAL_RadioLEDState>(state), &status);

@@ -8,6 +8,15 @@
 #include "edu_wpi_first_hal_LEDJNI.h"
 #include "hal/LEDs.h"
 
+static_assert(edu_wpi_first_hal_LEDJNI_RADIO_LED_STATE_OFF ==
+              HAL_RadioLEDState::HAL_RadioLED_kOff);
+static_assert(edu_wpi_first_hal_LEDJNI_RADIO_LED_STATE_GREEN ==
+              HAL_RadioLEDState::HAL_RadioLED_kGreen);
+static_assert(edu_wpi_first_hal_LEDJNI_RADIO_LED_STATE_RED ==
+              HAL_RadioLEDState::HAL_RadioLED_kRed);
+static_assert(edu_wpi_first_hal_LEDJNI_RADIO_LED_STATE_ORANGE ==
+              HAL_RadioLEDState::HAL_RadioLED_kOrange);
+
 using namespace hal;
 /*
  * Class:     edu_wpi_first_hal_LEDJNI
@@ -19,6 +28,6 @@ Java_edu_wpi_first_hal_LEDJNI_setRadioLEDState
   (JNIEnv* env, jclass, jint state)
 {
   int32_t status = 0;
-  HAL_SetRadioLEDState((HAL_RadioLEDState)state, &status);
+  HAL_SetRadioLEDState(static_cast<HAL_RadioLEDState>(state), &status);
   CheckStatus(env, status);
 }

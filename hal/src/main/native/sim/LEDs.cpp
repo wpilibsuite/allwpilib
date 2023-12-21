@@ -4,4 +4,8 @@
 
 #include "hal/LEDs.h"
 
-void HAL_SetRadioLEDState(HAL_RadioLEDState state, int32_t* status) {}
+#include "hal/simulation/RoboRioData.h"
+
+void HAL_SetRadioLEDState(HAL_RadioLEDState state, int32_t* status) {
+  HALSIM_SetRoboRioRadioLEDState(state);
+}
