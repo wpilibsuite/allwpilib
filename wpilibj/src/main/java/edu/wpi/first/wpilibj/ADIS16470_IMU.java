@@ -265,24 +265,20 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
   }
 
   /**
-   * Creates a new ADIS16740 IMU object.
-   * The default setup is the onboard SPI port with a calibration time
-   * of 4 seconds. Yaw, pitch, and roll are kZ, kX, and kY respectively.
+   * Creates a new ADIS16740 IMU object. The default setup is the onboard SPI port with a
+   * calibration time of 4 seconds. Yaw, pitch, and roll are kZ, kX, and kY respectively.
    */
   public ADIS16470_IMU() {
     this(IMUAxis.kZ, IMUAxis.kX, IMUAxis.kY, SPI.Port.kOnboardCS0, CalibrationTime._4s);
-}
+  }
 
   /**
-   * Creates a new ADIS16740 IMU object.
-   * The default setup is the onboard SPI port with a
+   * Creates a new ADIS16740 IMU object. The default setup is the onboard SPI port with a
    * calibration time of 4 seconds.
-   * 
-   * <b><i>
-   * Input axes limited to kX, kY and kZ. Specifying kYaw,
-   * kPitch,or kRoll will result in an error.
-   * </b></i>
-   * 
+   *
+   * <p><b><i>Input axes limited to kX, kY and kZ. Specifying kYaw, kPitch,or kRoll will result in
+   * an error. </i></b>
+   *
    * @param yaw_axis The axis that measures the yaw
    * @param pitch_axis The axis that measures the pitch
    * @param roll_axis The axis that measures the roll
@@ -293,12 +289,10 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
 
   /**
    * Creates a new ADIS16740 IMU object.
-   * 
-   * <b><i>
-   * Input axes limited to kX, kY and kZ. Specifying kYaw,
-   * kPitch,or kRoll will result in an error.
-   * </b></i>
-   * 
+   *
+   * <p><b><i> Input axes limited to kX, kY and kZ. Specifying kYaw, kPitch,or kRoll will result in
+   * an error. </i></b>
+   *
    * @param yaw_axis The axis that measures the yaw
    * @param pitch_axis The axis that measures the pitch
    * @param roll_axis The axis that measures the roll
@@ -306,20 +300,26 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
    * @param cal_time Calibration time
    */
   @SuppressWarnings("this-escape")
-  public ADIS16470_IMU(IMUAxis yaw_axis, IMUAxis pitch_axis, IMUAxis roll_axis, SPI.Port port, CalibrationTime cal_time) {
-    if (
-      yaw_axis == IMUAxis.kYaw ||
-      yaw_axis == IMUAxis.kPitch ||
-      yaw_axis == IMUAxis.kRoll ||
-      pitch_axis == IMUAxis.kYaw ||
-      pitch_axis == IMUAxis.kPitch ||
-      pitch_axis == IMUAxis.kRoll ||
-      roll_axis == IMUAxis.kYaw ||
-      roll_axis == IMUAxis.kPitch ||
-      roll_axis == IMUAxis.kRoll
-    ) {
-      DriverStation.reportError("ADIS16740 constructor only allows IMUAxis.kX, IMUAxis.kY or IMUAxis.kZ as arguments.", false);
-      DriverStation.reportError("Constructing ADIS with default axes. (IMUAxis.kZ is defined as Yaw)", false);
+  public ADIS16470_IMU(
+      IMUAxis yaw_axis,
+      IMUAxis pitch_axis,
+      IMUAxis roll_axis,
+      SPI.Port port,
+      CalibrationTime cal_time) {
+    if (yaw_axis == IMUAxis.kYaw
+        || yaw_axis == IMUAxis.kPitch
+        || yaw_axis == IMUAxis.kRoll
+        || pitch_axis == IMUAxis.kYaw
+        || pitch_axis == IMUAxis.kPitch
+        || pitch_axis == IMUAxis.kRoll
+        || roll_axis == IMUAxis.kYaw
+        || roll_axis == IMUAxis.kPitch
+        || roll_axis == IMUAxis.kRoll) {
+      DriverStation.reportError(
+          "ADIS16740 constructor only allows IMUAxis.kX, IMUAxis.kY or IMUAxis.kZ as arguments.",
+          false);
+      DriverStation.reportError(
+          "Constructing ADIS with default axes. (IMUAxis.kZ is defined as Yaw)", false);
       yaw_axis = IMUAxis.kZ;
       pitch_axis = IMUAxis.kY;
       roll_axis = IMUAxis.kX;
@@ -444,7 +444,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
    * @return
    */
   private static int toInt(int... buf) {
-    return (int) ((buf[0] & 0xFF) << 24 | (buf[1] & 0xFF) << 16 | (buf[2] & 0xFF) << 8 | (buf[3] & 0xFF));
+    return (buf[0] & 0xFF) << 24 | (buf[1] & 0xFF) << 16 | (buf[2] & 0xFF) << 8 | (buf[3] & 0xFF);
   }
 
   /**
@@ -731,7 +731,9 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
       if (m_thread_active) {
         m_thread_idle = false;
 
-        data_count = m_spi.readAutoReceivedData(buffer, 0, 0); // Read number of bytes currently stored in the buffer
+        data_count =
+            m_spi.readAutoReceivedData(
+                buffer, 0, 0); // Read number of bytes currently stored in the buffer
 
         data_remainder =
             data_count % dataset_len; // Check if frame is incomplete. Add 1 because of timestamp
@@ -777,14 +779,15 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
            * (based on timestamp)
            */
           delta_angle_x =
-            (toInt(buffer[i + 3], buffer[i + 4], buffer[i + 5], buffer[i + 6]) * delta_angle_sf) /
-            (m_scaled_sample_rate / (buffer[i] - previous_timestamp));
+              (toInt(buffer[i + 3], buffer[i + 4], buffer[i + 5], buffer[i + 6]) * delta_angle_sf)
+                  / (m_scaled_sample_rate / (buffer[i] - previous_timestamp));
           delta_angle_y =
-            (toInt(buffer[i + 7], buffer[i + 8], buffer[i + 9], buffer[i + 10]) * delta_angle_sf) /
-            (m_scaled_sample_rate / (buffer[i] - previous_timestamp));
+              (toInt(buffer[i + 7], buffer[i + 8], buffer[i + 9], buffer[i + 10]) * delta_angle_sf)
+                  / (m_scaled_sample_rate / (buffer[i] - previous_timestamp));
           delta_angle_z =
-            (toInt(buffer[i + 11], buffer[i + 12], buffer[i + 13], buffer[i + 14]) * delta_angle_sf) /
-            (m_scaled_sample_rate / (buffer[i] - previous_timestamp));
+              (toInt(buffer[i + 11], buffer[i + 12], buffer[i + 13], buffer[i + 14])
+                      * delta_angle_sf)
+                  / (m_scaled_sample_rate / (buffer[i] - previous_timestamp));
 
           gyro_rate_x = (toShort(buffer[i + 15], buffer[i + 16]) / 10.0);
           gyro_rate_y = (toShort(buffer[i + 17], buffer[i + 18]) / 10.0);
@@ -870,7 +873,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
 
         // The inverse of data to read divided by dataset length, his is the number of iterations
         // of the for loop inverted (so multiplication can be used instead of division)
-        double invTotalIterations = dataset_len / data_to_read;
+        double invTotalIterations = (double) dataset_len / data_to_read;
         m_average_gyro_rate_x *= invTotalIterations;
         m_average_gyro_rate_y *= invTotalIterations;
         m_average_gyro_rate_z *= invTotalIterations;
@@ -961,22 +964,18 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
     return compAngle;
   }
 
-  /**
-   * Resets all gyro axis accumulators to 0.0
-   */
+  /** Resets all gyro axis accumulators to 0.0 */
   public void reset() {
     synchronized (this) {
-        m_integ_angle_x = 0.0;
-        m_integ_angle_y = 0.0;
-        m_integ_angle_z = 0.0;
+      m_integ_angle_x = 0.0;
+      m_integ_angle_y = 0.0;
+      m_integ_angle_z = 0.0;
     }
   }
 
   /**
-   * Allow the designated gyro angle to be set to a
-   * given value. This may happen with unread values
-   * in the buffer, it is suggested that the IMU is
-   * not moving when this method is run.
+   * Allow the designated gyro angle to be set to a given value. This may happen with unread values
+   * in the buffer, it is suggested that the IMU is not moving when this method is run.
    *
    * @param axis IMUAxis that will be changed
    * @param angle A double in degrees (CCW positive)
@@ -1010,24 +1009,20 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
   }
 
   /**
-   * Allow the gyro angle X to be set to a given value.
-   * This may happen with unread values in the
-   * buffer, it is suggested that the IMU is not
-   * moving when this method is run.
+   * Allow the gyro angle X to be set to a given value. This may happen with unread values in the
+   * buffer, it is suggested that the IMU is not moving when this method is run.
    *
    * @param angle A double in degrees (CCW positive)
    */
   public void setGyroAngleX(double angle) {
     synchronized (this) {
-        m_integ_angle_x = angle;
+      m_integ_angle_x = angle;
     }
   }
 
   /**
-   * Allow the gyro angle Y to be set to a given value.
-   * This may happen with unread values in the
-   * buffer, it is suggested that the IMU is not
-   * moving when this method is run.
+   * Allow the gyro angle Y to be set to a given value. This may happen with unread values in the
+   * buffer, it is suggested that the IMU is not moving when this method is run.
    *
    * @param angle A double in degrees (CCW positive)
    */
@@ -1038,16 +1033,14 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
   }
 
   /**
-   * Allow the gyro angle Z to be set to a given value.
-   * This may happen with unread values in the
-   * buffer, it is suggested that the IMU is not
-   * moving when this method is run.
+   * Allow the gyro angle Z to be set to a given value. This may happen with unread values in the
+   * buffer, it is suggested that the IMU is not moving when this method is run.
    *
    * @param angle A double in degrees (CCW positive)
    */
   public void setGyroAngleZ(double angle) {
     synchronized (this) {
-        m_integ_angle_z = angle;
+      m_integ_angle_z = angle;
     }
   }
 
@@ -1094,7 +1087,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
   /**
    * @param axis The IMUAxis whose rate to return
    * @return Axis angular rate in degrees per second (CCW positive)
-   * */
+   */
   public synchronized double getRate(IMUAxis axis) {
     switch (axis) {
       case kYaw:
@@ -1132,6 +1125,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
 
   /**
    * Returns which axis, kX, kY, or kZ, is set to the yaw axis.
+   *
    * @return IMUAxis Yaw Axis
    */
   public IMUAxis getYawAxis() {
@@ -1140,18 +1134,20 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
 
   /**
    * Returns which axis, kX, kY, or kZ, is set to the pitch axis.
+   *
    * @return IMUAxis Pitch Axis
    */
   public IMUAxis getPitchAxis() {
-      return m_pitch_axis;
+    return m_pitch_axis;
   }
 
   /**
    * Returns which axis, kX, kY, or kZ, is set to the roll axis.
+   *
    * @return IMUAxis Roll Axis
    */
   public IMUAxis getRollAxis() {
-      return m_roll_axis;
+    return m_roll_axis;
   }
 
   /**
