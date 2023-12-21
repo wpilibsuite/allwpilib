@@ -1,8 +1,12 @@
 macro(wpilib_target_warnings target)
+    set(WARNING_FLAGS -Wall -pedantic -Wextra -Wno-unused-parameter ${WPILIB_TARGET_WARNINGS})
+    if (NOT NO_WERROR)
+        set(WARNING_FLAGS "${WARNING_FLAGS}" -Werror)
+    endif()
     if(NOT MSVC)
         target_compile_options(
             ${target}
-            PRIVATE -Wall -pedantic -Wextra -Werror -Wno-unused-parameter ${WPILIB_TARGET_WARNINGS}
+            PRIVATE ${WARNING_FLAGS}
         )
     else()
         target_compile_options(

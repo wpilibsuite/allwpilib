@@ -82,6 +82,9 @@ option(USE_SYSTEM_EIGEN "Use system eigen" OFF)
 # Options for location of OpenCV Java.
 set(OPENCV_JAVA_INSTALL_DIR "" CACHE PATH "Location to search for the OpenCV jar file")
 
+# Options for compilation flags.
+option(NO_WERROR "Disable -Werror flag during compilation" OFF)
+
 # Set default build type to release with debug info (i.e. release mode optimizations
 # are performed, but debug info still exists).
 if(NOT CMAKE_BUILD_TYPE)
