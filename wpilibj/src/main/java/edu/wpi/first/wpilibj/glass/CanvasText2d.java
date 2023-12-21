@@ -64,12 +64,15 @@ class CanvasText2d {
       Color8Bit color,
       int opacity,
       int zOrder) {
-    // TODO: check text length
+    // TODO: Warn on long text?
     m_x = x;
     m_y = y;
     m_fontSize = size;
     m_wrapWidth = wrapWidth;
-    m_text = text;
+    m_text = new char[64];
+    for (int i = 0; i < Math.min(text.length, m_text.length); i++) {
+      m_text[i] = text[i];
+    }
     m_color = color;
     m_opacity = MathUtil.clamp(opacity, 0, 255);
     m_zOrder = zOrder;

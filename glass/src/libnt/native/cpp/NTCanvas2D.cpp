@@ -217,7 +217,6 @@ void NTCanvas2DModel::Update() {
 
         m_texts.emplace_back(position, fontSize, wrapWidth, std::move(textStr),
                              color, zOrder);
-        m_texts.size();
       }
     }
   }
