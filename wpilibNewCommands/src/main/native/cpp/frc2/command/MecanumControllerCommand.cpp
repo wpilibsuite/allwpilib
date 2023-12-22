@@ -10,7 +10,8 @@
 #include <units/voltage.h>
 
 using namespace frc2;
-using kv_unit = units::compound_unit<units::volts, units::inverse<units::meters_per_second>>;
+using kv_unit = units::compound_unit<units::volts,
+                                     units::inverse<units::meters_per_second>>;
 
 MecanumControllerCommand::MecanumControllerCommand(
     frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
@@ -99,9 +100,7 @@ MecanumControllerCommand::MecanumControllerCommand(
     Requirements requirements)
     : m_trajectory(std::move(trajectory)),
       m_pose(std::move(pose)),
-      m_feedforward(
-        0_V, 
-        units::unit_t<kv_unit>{0}),
+      m_feedforward(0_V, units::unit_t<kv_unit>{0}),
       m_kinematics(kinematics),
       m_controller(xController, yController, thetaController),
       m_desiredRotation(std::move(desiredRotation)),
@@ -123,9 +122,7 @@ MecanumControllerCommand::MecanumControllerCommand(
     Requirements requirements)
     : m_trajectory(std::move(trajectory)),
       m_pose(std::move(pose)),
-      m_feedforward(
-        0_V,
-        units::unit_t<kv_unit>{0}),
+      m_feedforward(0_V, units::unit_t<kv_unit>{0}),
       m_kinematics(kinematics),
       m_controller(xController, yController, thetaController),
       m_maxWheelVelocity(maxWheelVelocity),
