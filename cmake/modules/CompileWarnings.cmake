@@ -8,7 +8,7 @@ macro(wpilib_target_warnings target)
             ${WPILIB_TARGET_WARNINGS}
         )
         if(NOT NO_WERROR)
-            set(WARNING_FLAGS "${WARNING_FLAGS}" -Werror)
+            set(WARNING_FLAGS ${WARNING_FLAGS} -Werror)
         endif()
 
         target_compile_options(${target} PRIVATE ${WARNING_FLAGS})
