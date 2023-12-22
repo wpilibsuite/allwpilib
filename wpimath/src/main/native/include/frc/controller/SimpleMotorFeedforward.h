@@ -54,13 +54,6 @@ class SimpleMotorFeedforward {
         }
       }
 
-  template<typename U, typename = Distance>
-  constexpr SimpleMotorFeedforward(const SimpleMotorFeedforward<U>& other) {
-    kS = other.kS;
-    kV = other.kV;
-    kA = other.kA;
-  }
-
   /**
    * Calculates the feedforward from the gains and setpoints.
    *
