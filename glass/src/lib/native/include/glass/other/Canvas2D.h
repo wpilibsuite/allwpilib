@@ -5,7 +5,9 @@
 #pragma once
 
 #include <set>
+#include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #define IMGUI_DEFINE_MATH_OPERATORS
