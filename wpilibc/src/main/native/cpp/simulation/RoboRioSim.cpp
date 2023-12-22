@@ -338,6 +338,23 @@ void RoboRioSim::SetComments(std::string_view comments) {
   HALSIM_SetRoboRioComments(comments.data(), comments.size());
 }
 
+std::unique_ptr<CallbackStore> RoboRioSim::RegisterRadioLEDStateCallback(
+    NotifyCallback callback, bool initialNotify) {
+  auto store = std::make_unique<CallbackStore>(
+      -1, callback, &HALSIM_CancelRoboRioRadioLEDStateCallback);
+  store->SetUid(HALSIM_RegisterRoboRioRadioLEDStateCallback(
+      &CallbackStoreThunk, store.get(), initialNotify));
+  return store;
+}
+
+RadioLEDState RoboRioSim::GetRadioLEDState() {
+  return static_cast<RadioLEDState>(HALSIM_GetRoboRioRadioLEDState());
+}
+
+void RoboRioSim::SetRadioLEDState(RadioLEDState state) {
+  HALSIM_SetRoboRioRadioLEDState(static_cast<HAL_RadioLEDState>(state));
+}
+
 void RoboRioSim::ResetData() {
   HALSIM_ResetRoboRioData();
 }
