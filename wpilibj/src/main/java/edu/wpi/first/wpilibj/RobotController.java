@@ -367,6 +367,16 @@ public final class RobotController {
   }
 
   /**
+   * Get the state of the "Radio" LED. On the RoboRIO, this reads from sysfs, so this function
+   * should not be called multiple times per loop cycle to avoid overruns.
+   *
+   * @return The state of the LED.
+   */
+  public static RadioLEDState getRadioLEDState() {
+    return RadioLEDState.fromValue(LEDJNI.getRadioLEDState());
+  }
+
+  /**
    * Get the current status of the CAN bus.
    *
    * @return The status of the CAN bus

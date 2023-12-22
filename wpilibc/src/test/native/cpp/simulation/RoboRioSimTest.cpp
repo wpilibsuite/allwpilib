@@ -285,6 +285,7 @@ TEST(RoboRioSimTest, SetRadioLEDState) {
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_EQ(RadioLEDState::kGreen, callback.GetLastValue());
   EXPECT_EQ(RadioLEDState::kGreen, RoboRioSim::GetRadioLEDState());
+  EXPECT_EQ(RadioLEDState::kGreen, RobotController::GetRadioLEDState());
 
   callback.Reset();
 
@@ -292,6 +293,7 @@ TEST(RoboRioSimTest, SetRadioLEDState) {
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_EQ(RadioLEDState::kOrange, callback.GetLastValue());
   EXPECT_EQ(RadioLEDState::kOrange, RoboRioSim::GetRadioLEDState());
+  EXPECT_EQ(RadioLEDState::kOrange, RobotController::GetRadioLEDState());
 }
 
 }  // namespace frc::sim

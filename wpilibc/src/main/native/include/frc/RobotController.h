@@ -285,6 +285,15 @@ class RobotController {
   static void SetRadioLEDState(RadioLEDState state);
 
   /**
+   * Get the state of the "Radio" LED. On the RoboRIO, this reads from sysfs, so
+   * this function should not be called multiple times per loop cycle to avoid
+   * overruns.
+   *
+   * @return The state of the LED.
+   */
+  static RadioLEDState GetRadioLEDState();
+
+  /**
    * Get the current status of the CAN bus.
    *
    * @return The status of the CAN bus

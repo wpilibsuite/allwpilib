@@ -292,6 +292,7 @@ class RoboRioSimTest {
       assertTrue(callback.wasTriggered());
       assertEquals(RadioLEDState.kGreen.value, callback.getSetValue());
       assertEquals(RadioLEDState.kGreen, RoboRioSim.getRadioLEDState());
+      assertEquals(RadioLEDState.kGreen, RobotController.getRadioLEDState());
 
       callback.reset();
 
@@ -299,6 +300,7 @@ class RoboRioSimTest {
       assertTrue(callback.wasTriggered());
       assertEquals(RadioLEDState.kOrange.value, callback.getSetValue());
       assertEquals(RadioLEDState.kOrange, RoboRioSim.getRadioLEDState());
+      assertEquals(RadioLEDState.kOrange, RobotController.getRadioLEDState());
     }
   }
 }

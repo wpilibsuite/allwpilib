@@ -15,5 +15,7 @@ extern "C" {
 void HAL_SetRadioLEDState(HAL_RadioLEDState state, int32_t* status) {
   HALSIM_SetRoboRioRadioLEDState(state);
 }
-
+HAL_RadioLEDState HAL_GetRadioLEDState(int32_t* status) {
+  return HALSIM_GetRoboRioRadioLEDState();
+}
 }  // extern "C"

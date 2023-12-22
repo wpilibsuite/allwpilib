@@ -18,6 +18,13 @@ extern "C" {
  */
 void HAL_SetRadioLEDState(HAL_RadioLEDState state, int32_t* status);
 
+/**
+ * Get the state of the "Radio" LED.
+ *
+ * @param[out] status the error code, or 0 for success
+ * @return The state of the LED.
+ */
+HAL_RadioLEDState HAL_GetRadioLEDState(int32_t* status);
 #ifdef __cplusplus
 }  // extern "C"
 #endif

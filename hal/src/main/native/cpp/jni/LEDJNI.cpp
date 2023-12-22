@@ -33,4 +33,19 @@ Java_edu_wpi_first_hal_LEDJNI_setRadioLEDState
   HAL_SetRadioLEDState(static_cast<HAL_RadioLEDState>(state), &status);
   CheckStatus(env, status);
 }
+
+/*
+ * Class:     edu_wpi_first_hal_LEDJNI
+ * Method:    getRadioLEDState
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_LEDJNI_getRadioLEDState
+  (JNIEnv* env, jclass)
+{
+  int32_t status = 0;
+  auto retVal = HAL_GetRadioLEDState(&status);
+  CheckStatus(env, status);
+  return retVal;
+}
 }  // extern "C"

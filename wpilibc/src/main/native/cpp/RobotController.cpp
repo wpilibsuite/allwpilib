@@ -248,6 +248,13 @@ void RobotController::SetRadioLEDState(RadioLEDState state) {
   FRC_CheckErrorStatus(status, "SetRadioLEDState");
 }
 
+RadioLEDState RobotController::GetRadioLEDState() {
+  int32_t status = 0;
+  auto retVal = static_cast<RadioLEDState>(HAL_GetRadioLEDState(&status));
+  FRC_CheckErrorStatus(status, "GetRadioLEDState");
+  return retVal;
+}
+
 CANStatus RobotController::GetCANStatus() {
   int32_t status = 0;
   float percentBusUtilization = 0;
