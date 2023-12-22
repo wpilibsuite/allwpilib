@@ -251,7 +251,7 @@ bool StadiaController::GetLeftTriggerButtonReleased() {
   return GetRawButtonReleased(Button::kLeftTrigger);
 }
 
-BooleanEvent StadiaController::LeftTriggerButton(EventLoop* loop) const {
+BooleanEvent StadiaController::LeftTrigger(EventLoop* loop) const {
   return BooleanEvent(loop, [this]() { return this->GetLeftTriggerButton(); });
 }
 
@@ -267,6 +267,6 @@ bool StadiaController::GetRightTriggerButtonReleased() {
   return GetRawButtonReleased(Button::kRightTrigger);
 }
 
-BooleanEvent StadiaController::RightTriggerButton(EventLoop* loop) const {
+BooleanEvent StadiaController::RightTrigger(EventLoop* loop) const {
   return BooleanEvent(loop, [this]() { return this->GetRightTriggerButton(); });
 }
