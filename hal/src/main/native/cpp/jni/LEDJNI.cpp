@@ -18,6 +18,8 @@ static_assert(edu_wpi_first_hal_LEDJNI_RADIO_LED_STATE_ORANGE ==
               HAL_RadioLEDState::HAL_RadioLED_kOrange);
 
 using namespace hal;
+
+extern "C" {
 /*
  * Class:     edu_wpi_first_hal_LEDJNI
  * Method:    setRadioLEDState
@@ -31,3 +33,4 @@ Java_edu_wpi_first_hal_LEDJNI_setRadioLEDState
   HAL_SetRadioLEDState(static_cast<HAL_RadioLEDState>(state), &status);
   CheckStatus(env, status);
 }
+}  // extern "C"

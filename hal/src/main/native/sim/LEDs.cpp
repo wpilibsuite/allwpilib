@@ -10,6 +10,10 @@ namespace hal::init {
 void InitializeLEDs() {}
 }  // namespace hal::init
 
+extern "C" {
+
 void HAL_SetRadioLEDState(HAL_RadioLEDState state, int32_t* status) {
   HALSIM_SetRoboRioRadioLEDState(state);
 }
+
+}  // extern "C"

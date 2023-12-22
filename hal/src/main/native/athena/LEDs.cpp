@@ -28,6 +28,7 @@ static const fs::path radioLEDRedFilePath =
 static const char* onStr = "1";
 static const char* offStr = "0";
 
+extern "C" {
 void HAL_SetRadioLEDState(HAL_RadioLEDState state, int32_t* status) {
   std::error_code ec;
   fs::file_t greenFile = fs::OpenFileForWrite(radioLEDGreenFilePath, ec,
@@ -49,3 +50,5 @@ void HAL_SetRadioLEDState(HAL_RadioLEDState state, int32_t* status) {
   fs::CloseFile(greenFile);
   fs::CloseFile(redFile);
 }
+
+}  // extern "C"
