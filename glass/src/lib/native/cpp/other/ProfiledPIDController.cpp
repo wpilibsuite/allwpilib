@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/other/PIDController.h"
+#include "glass/other/ProfiledPIDController.h"
 
 #include <string>
 
@@ -13,7 +13,7 @@
 
 using namespace glass;
 
-void glass::DisplayPIDController(PIDControllerModel* m) {
+void glass::DisplayProfiledPIDController(ProfiledPIDControllerModel* m) {
   if (auto name = m->GetName()) {
     ImGui::Text("%s", name);
     ImGui::Separator();
@@ -52,10 +52,9 @@ void glass::DisplayPIDController(PIDControllerModel* m) {
       double value = d->GetValue();
       createTuningParameter("D", &value, [=](auto v) { m->SetD(v); });
     }
-    if (auto s = m->GetSetpointData()) {
+    if (auto s = m->GetGoalData()) {
       double value = s->GetValue();
-      createTuningParameter("Setpoint", &value,
-                            [=](auto v) { m->SetSetpoint(v); });
+      createTuningParameter("Goal", &value, [=](auto v) { m->SetGoal(v); });
     }
     if (auto s = m->GetIZoneData()) {
       double value = s->GetValue();

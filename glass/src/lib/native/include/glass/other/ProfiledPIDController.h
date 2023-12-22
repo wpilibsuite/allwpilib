@@ -8,21 +8,21 @@
 
 namespace glass {
 class DataSource;
-class PIDControllerModel : public Model {
+class ProfiledPIDControllerModel : public Model {
  public:
   virtual const char* GetName() const = 0;
 
   virtual DataSource* GetPData() = 0;
   virtual DataSource* GetIData() = 0;
   virtual DataSource* GetDData() = 0;
-  virtual DataSource* GetSetpointData() = 0;
+  virtual DataSource* GetGoalData() = 0;
   virtual DataSource* GetIZoneData() = 0;
 
   virtual void SetP(double value) = 0;
   virtual void SetI(double value) = 0;
   virtual void SetD(double value) = 0;
-  virtual void SetSetpoint(double value) = 0;
+  virtual void SetGoal(double value) = 0;
   virtual void SetIZone(double value) = 0;
 };
-void DisplayPIDController(PIDControllerModel* m);
+void DisplayProfiledPIDController(ProfiledPIDControllerModel* m);
 }  // namespace glass
