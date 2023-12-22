@@ -6,6 +6,7 @@
 
 #include <cstddef>
 
+#include "hal/LEDs.h"
 #include "hal/Types.h"
 #include "hal/simulation/NotifyListener.h"
 
@@ -145,9 +146,6 @@ void HALSIM_CancelRoboRioCommentsCallback(int32_t uid);
 size_t HALSIM_GetRoboRioComments(char* buffer, size_t size);
 void HALSIM_SetRoboRioComments(const char* comments, size_t size);
 
-void HALSIM_RegisterRoboRioAllCallbacks(HAL_NotifyCallback callback,
-                                        void* param, HAL_Bool initialNotify);
-
 int32_t HALSIM_RegisterRoboRioCPUTempCallback(HAL_NotifyCallback callback,
                                               void* param,
                                               HAL_Bool initialNotify);
@@ -155,6 +153,15 @@ void HALSIM_CancelRoboRioCPUTempCallback(int32_t uid);
 double HALSIM_GetRoboRioCPUTemp(void);
 void HALSIM_SetRoboRioCPUTemp(double cpuTemp);
 
+int32_t HALSIM_RegisterRoboRioRadioLEDStateCallback(HAL_NotifyCallback callback,
+                                                    void* param,
+                                                    HAL_Bool initialNotify);
+void HALSIM_CancelRoboRioRadioLEDStateCallback(int32_t uid);
+HAL_RadioLEDState HALSIM_GetRoboRioRadioLEDState(void);
+void HALSIM_SetRoboRioRadioLEDState(HAL_RadioLEDState state);
+
+void HALSIM_RegisterRoboRioAllCallbacks(HAL_NotifyCallback callback,
+                                        void* param, HAL_Bool initialNotify);
 #ifdef __cplusplus
 }  // extern "C"
 #endif

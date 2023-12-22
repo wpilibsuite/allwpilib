@@ -21,6 +21,8 @@ struct CANStatus {
   int transmitErrorCount;
 };
 
+enum RadioLEDState { kOff = 0, kGreen = 1, kRed = 2, kOrange = 3 };
+
 class RobotController {
  public:
   RobotController() = delete;
@@ -273,6 +275,23 @@ class RobotController {
    * @return current CPU temperature
    */
   static units::celsius_t GetCPUTemp();
+
+  /**
+   * Set the state of the "Radio" LED. On the RoboRIO, this writes to sysfs, so
+   * this function should not be called multiple times per loop cycle to avoid
+   * overruns.
+   * @param state The state to set the LED to.
+   */
+  static void SetRadioLEDState(RadioLEDState state);
+
+  /**
+   * Get the state of the "Radio" LED. On the RoboRIO, this reads from sysfs, so
+   * this function should not be called multiple times per loop cycle to avoid
+   * overruns.
+   *
+   * @return The state of the LED.
+   */
+  static RadioLEDState GetRadioLEDState();
 
   /**
    * Get the current status of the CAN bus.

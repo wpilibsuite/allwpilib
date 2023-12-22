@@ -69,7 +69,7 @@ dependencies {
     api "com.fasterxml.jackson.core:jackson-annotations:2.15.2"
     api "com.fasterxml.jackson.core:jackson-core:2.15.2"
     api "com.fasterxml.jackson.core:jackson-databind:2.15.2"
-    api "us.hebi.quickbuf:quickbuf-runtime:1.3.2"
+    api "us.hebi.quickbuf:quickbuf-runtime:1.3.3"
 }
 
 sourceSets.main.java.srcDir "${projectDir}/src/generated/main/java"

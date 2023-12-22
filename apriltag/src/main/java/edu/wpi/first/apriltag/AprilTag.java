@@ -54,9 +54,7 @@ public class AprilTag {
    * @return A RawFrame containing the AprilTag image
    */
   public static RawFrame generate16h5AprilTagImage(int id) {
-    RawFrame generatedImage = new RawFrame();
-    AprilTagJNI.generate16h5AprilTagImage(id, generatedImage.getDataPtr());
-    return generatedImage;
+    return AprilTagJNI.generate16h5AprilTagImage(id);
   }
 
   /**
@@ -66,8 +64,6 @@ public class AprilTag {
    * @return A RawFrame containing the AprilTag image
    */
   public static RawFrame generate36h11AprilTagImage(int id) {
-    RawFrame generatedImage = new RawFrame();
-    AprilTagJNI.generate36h11AprilTagImage(id, generatedImage.getDataPtr());
-    return generatedImage;
+    return AprilTagJNI.generate36h11AprilTagImage(id);
   }
 }
