@@ -51,10 +51,10 @@ public class REVPHFaults {
   public final boolean HardwareFault;
 
   /**
-   * Gets whether there is a fault at a specified channel.
+   * Gets whether there is a fault at the specified channel.
    *
-   * @param channel Index to check for faults.
-   * @return If there is a fault.
+   * @param channel Channel to check for faults.
+   * @return True if a a fault exists at the channel, otherwise false.
    * @throws IndexOutOfBoundsException if the provided channel is outside of the range supported by
    *     the hardware.
    */

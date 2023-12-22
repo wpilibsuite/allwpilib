@@ -63,10 +63,10 @@ public class PowerDistributionStickyFaults {
   public final boolean HasReset;
 
   /**
-   * Gets whether there is a sticky breaker fault at a specified channel.
+   * Gets whether there is a sticky breaker fault at the specified channel.
    *
    * @param channel Channel to check for sticky faults.
-   * @return If there is a sticky breaker fault.
+   * @return True if there is a sticky breaker fault at the channel, otherwise false.
    * @throws IndexOutOfBoundsException if the provided channel is outside of the range supported by
    *     the hardware.
    */

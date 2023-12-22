@@ -203,11 +203,12 @@ class PowerDistribution : public wpi::Sendable,
     uint32_t HasReset : 1;
 
     /**
-     * Gets whether there is a sticky breaker fault at a specified channel.
+     * Gets whether there is a sticky breaker fault at the specified channel.
      * @param channel Index to check for sticky faults.
-     * @return If there is a sticky breaker fault.
-     * @throws A ChannelIndexOutOfRange error if the given int is outside of the
-     * range supported by the hardware.
+     * @return True if there is a sticky breaker fault at the channel, otherwise
+     * false.
+     * @throws A ChannelIndexOutOfRange error if the provided channel is outside
+     * of the range supported by the hardware.
      */
     bool GetBreakerFault(int channel) const;
   };

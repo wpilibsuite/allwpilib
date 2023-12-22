@@ -175,7 +175,7 @@ PowerDistribution::Faults PowerDistribution::GetFaults() const {
 bool PowerDistribution::Faults::GetBreakerFault(int channel) const {
   switch (channel) {
     case 0:
-      return this->Channel0BreakerFault;
+      return this->Channel0BreakerFault != 0;
     case 1:
       return this->Channel1BreakerFault != 0;
     case 2:
@@ -231,7 +231,7 @@ bool PowerDistribution::Faults::GetBreakerFault(int channel) const {
 bool PowerDistribution::StickyFaults::GetBreakerFault(int channel) const {
   switch (channel) {
     case 0:
-      return this->Channel0BreakerFault;
+      return this->Channel0BreakerFault != 0;
     case 1:
       return this->Channel1BreakerFault != 0;
     case 2:

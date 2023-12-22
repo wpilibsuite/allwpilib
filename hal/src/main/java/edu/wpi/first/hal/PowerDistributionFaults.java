@@ -61,10 +61,10 @@ public class PowerDistributionFaults {
   public final boolean HardwareFault;
 
   /**
-   * Gets whether there is a breaker fault at a specified channel.
+   * Gets whether there is a breaker fault at the specified channel.
    *
    * @param channel Channel to check for faults.
-   * @return If there is a breaker fault.
+   * @return True if there is a breaker fault at the channel, otherwise false.
    * @throws IndexOutOfBoundsException if the provided channel is outside of the range supported by
    *     the hardware.
    */
