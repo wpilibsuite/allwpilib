@@ -21,8 +21,8 @@ public class SimpleMotorFeedforward {
    * @param ks The static gain.
    * @param kv The velocity gain.
    * @param ka The acceleration gain.
-   * @throws IllegalArgumentException for kv &lt; zero. 
-   * @throws IllegalArgumentException for ka &lt; zero. 
+   * @throws IllegalArgumentException for kv &lt; zero.
+   * @throws IllegalArgumentException for ka &lt; zero.
    */
   public SimpleMotorFeedforward(double ks, double kv, double ka) {
     this.ks = ks;

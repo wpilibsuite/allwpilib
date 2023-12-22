@@ -29,7 +29,7 @@ public class ArmFeedforward {
    * @param kv The velocity gain.
    * @param ka The acceleration gain.
    * @throws IllegalArgumentException for kv &lt; zero.
-   * @throws IllegalArgumentException for ka &lt; zero. 
+   * @throws IllegalArgumentException for ka &lt; zero.
    */
   public ArmFeedforward(double ks, double kg, double kv, double ka) {
     this.ks = ks;
