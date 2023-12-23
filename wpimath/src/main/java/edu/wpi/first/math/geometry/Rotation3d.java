@@ -18,13 +18,18 @@ import edu.wpi.first.math.geometry.proto.Rotation3dProto;
 import edu.wpi.first.math.geometry.struct.Rotation3dStruct;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
 import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 
 /** A rotation in a 3D coordinate frame represented by a quaternion. */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
-public class Rotation3d implements Interpolatable<Rotation3d> {
+public class Rotation3d
+    implements Interpolatable<Rotation3d>,
+        ProtobufSerializable<Rotation3d>,
+        StructSerializable<Rotation3d> {
   private final Quaternion m_q;
 
   /** Constructs a Rotation3d with a default angle of 0 degrees. */
