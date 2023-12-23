@@ -6,7 +6,8 @@
 
 using namespace frc2;
 
-Trigger CommandStadiaController::Button(int button, frc::EventLoop* loop) const {
+Trigger CommandStadiaController::Button(int button,
+                                        frc::EventLoop* loop) const {
   return GenericHID::Button(button, loop).CastTo<Trigger>();
 }
 

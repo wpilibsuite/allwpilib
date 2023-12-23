@@ -129,18 +129,18 @@ class CommandStadiaController : public frc::StadiaController {
    * attached to the given loop.
    */
   Trigger Ellipses(frc::EventLoop* loop = CommandScheduler::GetInstance()
-                                          .GetDefaultButtonLoop()) const;
+                                              .GetDefaultButtonLoop()) const;
 
   /**
    * Constructs an event instance around the hamburger button's digital signal.
    *
    * @param loop the event loop instance to attach the event to. Defaults to the
    * CommandScheduler's default loop.
-   * @return an event instance representing the hamburger button's digital signal
-   * attached to the given loop.
+   * @return an event instance representing the hamburger button's digital
+   * signal attached to the given loop.
    */
   Trigger Hamburger(frc::EventLoop* loop = CommandScheduler::GetInstance()
-                                           .GetDefaultButtonLoop()) const;
+                                               .GetDefaultButtonLoop()) const;
 
   /**
    * Constructs an event instance around the stadia button's digital signal.
@@ -151,7 +151,7 @@ class CommandStadiaController : public frc::StadiaController {
    * attached to the given loop.
    */
   Trigger Stadia(frc::EventLoop* loop = CommandScheduler::GetInstance()
-                                           .GetDefaultButtonLoop()) const;
+                                            .GetDefaultButtonLoop()) const;
 
   /**
    * Constructs an event instance around the google button's digital signal.
@@ -162,7 +162,7 @@ class CommandStadiaController : public frc::StadiaController {
    * attached to the given loop.
    */
   Trigger Google(frc::EventLoop* loop = CommandScheduler::GetInstance()
-                                           .GetDefaultButtonLoop()) const;
+                                            .GetDefaultButtonLoop()) const;
 
   /**
    * Constructs an event instance around the frame button's digital signal.
@@ -184,7 +184,7 @@ class CommandStadiaController : public frc::StadiaController {
    * attached to the given loop.
    */
   Trigger LeftTrigger(frc::EventLoop* loop = CommandScheduler::GetInstance()
-                                               .GetDefaultButtonLoop()) const;
+                                                 .GetDefaultButtonLoop()) const;
 
   /**
    * Constructs an event instance around the right trigger's digital signal.
@@ -194,8 +194,8 @@ class CommandStadiaController : public frc::StadiaController {
    * @return an event instance representing the right trigger's digital signal
    * attached to the given loop.
    */
-  Trigger RightTrigger(frc::EventLoop* loop = CommandScheduler::GetInstance()
-                                                .GetDefaultButtonLoop()) const;
-
+  Trigger RightTrigger(
+      frc::EventLoop* loop =
+          CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
 };
 }  // namespace frc2

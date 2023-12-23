@@ -12,10 +12,10 @@ namespace frc {
  * Handle input from Stadia controllers connected to the Driver
  * Station.
  *
- * This class handles Stadia input that comes from the Driver Station. Each time a
- * value is requested the most recent value is returned. There is a single class
- * instance for each controller and the mapping of ports to hardware buttons
- * depends on the code in the Driver Station.
+ * This class handles Stadia input that comes from the Driver Station. Each time
+ * a value is requested the most recent value is returned. There is a single
+ * class instance for each controller and the mapping of ports to hardware
+ * buttons depends on the code in the Driver Station.
  */
 class StadiaController : public GenericHID {
  public:
@@ -357,8 +357,8 @@ class StadiaController : public GenericHID {
    * Constructs an event instance around the hamburger button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the hamburger button's digital signal
-   * attached to the given loop.
+   * @return an event instance representing the hamburger button's digital
+   * signal attached to the given loop.
    */
   BooleanEvent Hamburger(EventLoop* loop) const;
 
@@ -474,11 +474,12 @@ class StadiaController : public GenericHID {
   bool GetLeftTriggerButtonReleased();
 
   /**
-   * Constructs an event instance around the left trigger button's digital signal.
+   * Constructs an event instance around the left trigger button's digital
+   * signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the left trigger button's digital signal
-   * attached to the given loop.
+   * @return an event instance representing the left trigger button's digital
+   * signal attached to the given loop.
    */
   BooleanEvent LeftTrigger(EventLoop* loop) const;
 
@@ -504,11 +505,12 @@ class StadiaController : public GenericHID {
   bool GetRightTriggerButtonReleased();
 
   /**
-   * Constructs an event instance around the right trigger button's digital signal.
+   * Constructs an event instance around the right trigger button's digital
+   * signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the right trigger button's digital signal
-   * attached to the given loop.
+   * @return an event instance representing the right trigger button's digital
+   * signal attached to the given loop.
    */
   BooleanEvent RightTrigger(EventLoop* loop) const;
 
