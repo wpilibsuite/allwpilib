@@ -128,8 +128,8 @@ public class CommandStadiaController extends CommandGenericHID {
   /**
    * Constructs an event instance around the right trigger button's digital signal.
    *
-   * @return an event instance representing the right trigger button's digital signal attached to the
-   *     {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   * @return an event instance representing the right trigger button's digital signal attached to
+   *     the {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
    * @see #rightTrigger(EventLoop)
    */
   public Trigger rightTrigger() {
@@ -140,14 +140,14 @@ public class CommandStadiaController extends CommandGenericHID {
    * Constructs an event instance around the right trigger button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the right trigger button's digital signal attached to the
-   *     given loop.
+   * @return an event instance representing the right trigger button's digital signal attached to
+   *     the given loop.
    */
   public Trigger rightTrigger(EventLoop loop) {
     return m_hid.rightTrigger(loop).castTo(Trigger::new);
   }
 
-    /**
+  /**
    * Constructs an event instance around the left trigger button's digital signal.
    *
    * @return an event instance representing the left trigger button's digital signal attached to the
@@ -168,7 +168,7 @@ public class CommandStadiaController extends CommandGenericHID {
   public Trigger leftTrigger(EventLoop loop) {
     return m_hid.leftTrigger(loop).castTo(Trigger::new);
   }
-  
+
   /**
    * Constructs an event instance around the A button's digital signal.
    *
@@ -260,8 +260,8 @@ public class CommandStadiaController extends CommandGenericHID {
   /**
    * Constructs an event instance around the ellipses button's digital signal.
    *
-   * @return an event instance representing the ellipses button's digital signal attached to the {@link
-   *     CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   * @return an event instance representing the ellipses button's digital signal attached to the
+   *     {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
    * @see #ellipses(EventLoop)
    */
   public Trigger ellipses() {
@@ -272,8 +272,8 @@ public class CommandStadiaController extends CommandGenericHID {
    * Constructs an event instance around the ellipses button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the ellipses button's digital signal attached to the given
-   *     loop.
+   * @return an event instance representing the ellipses button's digital signal attached to the
+   *     given loop.
    */
   public Trigger ellipses(EventLoop loop) {
     return m_hid.ellipses(loop).castTo(Trigger::new);
@@ -282,8 +282,8 @@ public class CommandStadiaController extends CommandGenericHID {
   /**
    * Constructs an event instance around the stadia button's digital signal.
    *
-   * @return an event instance representing the stadia button's digital signal attached to the {@link
-   *     CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   * @return an event instance representing the stadia button's digital signal attached to the
+   *     {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
    * @see #stadia(EventLoop)
    */
   public Trigger stadia() {
@@ -304,8 +304,8 @@ public class CommandStadiaController extends CommandGenericHID {
   /**
    * Constructs an event instance around the google button's digital signal.
    *
-   * @return an event instance representing the google button's digital signal attached to the {@link
-   *     CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   * @return an event instance representing the google button's digital signal attached to the
+   *     {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
    * @see #google(EventLoop)
    */
   public Trigger google() {
@@ -348,8 +348,8 @@ public class CommandStadiaController extends CommandGenericHID {
   /**
    * Constructs an event instance around the hamburger button's digital signal.
    *
-   * @return an event instance representing the hamburger button's digital signal attached to the {@link
-   *     CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   * @return an event instance representing the hamburger button's digital signal attached to the
+   *     {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
    * @see #hamburger(EventLoop)
    */
   public Trigger hamburger() {
@@ -360,8 +360,8 @@ public class CommandStadiaController extends CommandGenericHID {
    * Constructs an event instance around the hamburger button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the hamburger button's digital signal attached to the given
-   *     loop.
+   * @return an event instance representing the hamburger button's digital signal attached to the
+   *     given loop.
    */
   public Trigger hamburger(EventLoop loop) {
     return m_hid.hamburger(loop).castTo(Trigger::new);
@@ -402,5 +402,4 @@ public class CommandStadiaController extends CommandGenericHID {
   public double getRightY() {
     return m_hid.getRightY();
   }
-
 }
