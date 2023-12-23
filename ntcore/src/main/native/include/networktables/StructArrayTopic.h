@@ -24,18 +24,20 @@
 
 namespace nt {
 
-template <wpi::StructSerializable T>
+template <typename T, typename... I>
+  requires wpi::StructSerializable<T, I...>
 class StructArrayTopic;
 
 /**
  * NetworkTables struct-encoded value array subscriber.
  */
-template <wpi::StructSerializable T>
+template <typename T, typename... I>
+  requires wpi::StructSerializable<T, I...>
 class StructArraySubscriber : public Subscriber {
-  using S = wpi::Struct<T>;
+  using S = wpi::Struct<T, I...>;
 
  public:
-  using TopicType = StructArrayTopic<T>;
+  using TopicType = StructArrayTopic<T, I...>;
   using ValueType = std::vector<T>;
   using ParamType = std::span<const T>;
   using TimestampedValueType = Timestamped<ValueType>;
@@ -64,9 +66,10 @@ class StructArraySubscriber : public Subscriber {
    * If no value has been published or the value cannot be unpacked, returns the
    * stored default value.
    *
+   * @param info optional struct type info
    * @return value
    */
-  ValueType Get() const { return Get(m_defaultValue); }
+  ValueType Get(const I&... info) const { return Get(m_defaultValue, info...); }
 
   /**
    * Get the last published value.
@@ -74,6 +77,7 @@ class StructArraySubscriber : public Subscriber {
    * passed defaultValue.
    *
    * @param defaultValue default value to return if no value has been published
+   * @param info optional struct type info
    * @return value
    */
   template <typename U>
@@ -81,8 +85,8 @@ class StructArraySubscriber : public Subscriber {
     requires std::ranges::range<U> &&
              std::convertible_to<std::ranges::range_value_t<U>, T>
 #endif
-  ValueType Get(U&& defaultValue) const {
-    return GetAtomic(std::forward<U>(defaultValue)).value;
+  ValueType Get(U&& defaultValue, const I&... info) const {
+    return GetAtomic(std::forward<U>(defaultValue), info...).value;
   }
 
   /**
@@ -91,10 +95,11 @@ class StructArraySubscriber : public Subscriber {
    * passed defaultValue.
    *
    * @param defaultValue default value to return if no value has been published
+   * @param info optional struct type info
    * @return value
    */
-  ValueType Get(std::span<const T> defaultValue) const {
-    return GetAtomic(defaultValue).value;
+  ValueType Get(std::span<const T> defaultValue, const I&... info) const {
+    return GetAtomic(defaultValue, info...).value;
   }
 
   /**
@@ -102,9 +107,12 @@ class StructArraySubscriber : public Subscriber {
    * If no value has been published or the value cannot be unpacked, returns the
    * stored default value and a timestamp of 0.
    *
+   * @param info optional struct type info
    * @return timestamped value
    */
-  TimestampedValueType GetAtomic() const { return GetAtomic(m_defaultValue); }
+  TimestampedValueType GetAtomic(const I&... info) const {
+    return GetAtomic(m_defaultValue, info...);
+  }
 
   /**
    * Get the last published value along with its timestamp.
@@ -112,6 +120,7 @@ class StructArraySubscriber : public Subscriber {
    * passed defaultValue and a timestamp of 0.
    *
    * @param defaultValue default value to return if no value has been published
+   * @param info optional struct type info
    * @return timestamped value
    */
   template <typename U>
@@ -119,9 +128,9 @@ class StructArraySubscriber : public Subscriber {
     requires std::ranges::range<U> &&
              std::convertible_to<std::ranges::range_value_t<U>, T>
 #endif
-  TimestampedValueType GetAtomic(U&& defaultValue) const {
+  TimestampedValueType GetAtomic(U&& defaultValue, const I&... info) const {
     wpi::SmallVector<uint8_t, 128> buf;
-    size_t size = S::GetSize();
+    size_t size = S::GetSize(info...);
     TimestampedRawView view = ::nt::GetAtomicRaw(m_subHandle, buf, {});
     if (view.value.size() == 0 || (view.value.size() % size) != 0) {
       return {0, 0, std::forward<U>(defaultValue)};
@@ -130,8 +139,8 @@ class StructArraySubscriber : public Subscriber {
     rv.value.reserve(view.value.size() / size);
     for (auto in = view.value.begin(), end = view.value.end(); in != end;
          in += size) {
-      rv.value.emplace_back(
-          S::Unpack(std::span<const uint8_t>{std::to_address(in), size}));
+      rv.value.emplace_back(S::Unpack(
+          std::span<const uint8_t>{std::to_address(in), size}, info...));
     }
     return rv;
   }
@@ -142,11 +151,13 @@ class StructArraySubscriber : public Subscriber {
    * passed defaultValue and a timestamp of 0.
    *
    * @param defaultValue default value to return if no value has been published
+   * @param info optional struct type info
    * @return timestamped value
    */
-  TimestampedValueType GetAtomic(std::span<const T> defaultValue) const {
+  TimestampedValueType GetAtomic(std::span<const T> defaultValue,
+                                 const I&... info) const {
     wpi::SmallVector<uint8_t, 128> buf;
-    size_t size = S::GetSize();
+    size_t size = S::GetSize(info...);
     TimestampedRawView view = ::nt::GetAtomicRaw(m_subHandle, buf, {});
     if (view.value.size() == 0 || (view.value.size() % size) != 0) {
       return {0, 0, {defaultValue.begin(), defaultValue.end()}};
@@ -155,8 +166,8 @@ class StructArraySubscriber : public Subscriber {
     rv.value.reserve(view.value.size() / size);
     for (auto in = view.value.begin(), end = view.value.end(); in != end;
          in += size) {
-      rv.value.emplace_back(
-          S::Unpack(std::span<const uint8_t>{std::to_address(in), size}));
+      rv.value.emplace_back(S::Unpack(
+          std::span<const uint8_t>{std::to_address(in), size}, info...));
     }
     return rv;
   }
@@ -169,14 +180,15 @@ class StructArraySubscriber : public Subscriber {
    * @note The "poll storage" subscribe option can be used to set the queue
    *     depth.
    *
+   * @param info optional struct type info
    * @return Array of timestamped values; empty array if no valid new changes
    *     have been published since the previous call.
    */
-  std::vector<TimestampedValueType> ReadQueue() {
+  std::vector<TimestampedValueType> ReadQueue(const I&... info) {
     auto raw = ::nt::ReadQueueRaw(m_subHandle);
     std::vector<TimestampedValueType> rv;
     rv.reserve(raw.size());
-    size_t size = S::GetSize();
+    size_t size = S::GetSize(info...);
     for (auto&& r : raw) {
       if (r.value.size() == 0 || (r.value.size() % size) != 0) {
         continue;
@@ -185,8 +197,8 @@ class StructArraySubscriber : public Subscriber {
       values.reserve(r.value.size() / size);
       for (auto in = r.value.begin(), end = r.value.end(); in != end;
            in += size) {
-        values.emplace_back(
-            S::Unpack(std::span<const uint8_t>{std::to_address(in), size}));
+        values.emplace_back(S::Unpack(
+            std::span<const uint8_t>{std::to_address(in), size}, info...));
       }
       rv.emplace_back(r.time, r.serverTime, std::move(values));
     }
@@ -199,7 +211,7 @@ class StructArraySubscriber : public Subscriber {
    * @return Topic
    */
   TopicType GetTopic() const {
-    return StructArrayTopic<T>{::nt::GetTopicFromHandle(m_subHandle)};
+    return StructArrayTopic<T, I...>{::nt::GetTopicFromHandle(m_subHandle)};
   }
 
  private:
@@ -209,12 +221,13 @@ class StructArraySubscriber : public Subscriber {
 /**
  * NetworkTables struct-encoded value array publisher.
  */
-template <wpi::StructSerializable T>
+template <typename T, typename... I>
+  requires wpi::StructSerializable<T, I...>
 class StructArrayPublisher : public Publisher {
-  using S = wpi::Struct<T>;
+  using S = wpi::Struct<T, I...>;
 
  public:
-  using TopicType = StructArrayTopic<T>;
+  using TopicType = StructArrayTopic<T, I...>;
   using ValueType = std::vector<T>;
   using ParamType = std::span<const T>;
 
@@ -251,6 +264,7 @@ class StructArrayPublisher : public Publisher {
    * Publish a new value.
    *
    * @param value value to publish
+   * @param info optional struct type info
    * @param time timestamp; 0 indicates current NT time should be used
    */
   template <typename U>
@@ -258,23 +272,26 @@ class StructArrayPublisher : public Publisher {
     requires std::ranges::range<U> &&
              std::convertible_to<std::ranges::range_value_t<U>, T>
 #endif
-  void Set(U&& value, int64_t time = 0) {
+  void Set(U&& value, const I&... info, int64_t time = 0) {
     if (!m_schemaPublished.exchange(true, std::memory_order_relaxed)) {
-      GetTopic().GetInstance().template AddStructSchema<T>();
+      GetTopic().GetInstance().template AddStructSchema<T>(info...);
     }
-    m_buf.Write(std::forward<U>(value),
-                [&](auto bytes) { ::nt::SetRaw(m_pubHandle, bytes, time); });
+    m_buf.Write(
+        std::forward<U>(value),
+        [&](auto bytes) { ::nt::SetRaw(m_pubHandle, bytes, time); }, info...);
   }
 
   /**
    * Publish a new value.
    *
    * @param value value to publish
+   * @param info optional struct type info
    * @param time timestamp; 0 indicates current NT time should be used
    */
-  void Set(std::span<const T> value, int64_t time = 0) {
-    m_buf.Write(value,
-                [&](auto bytes) { ::nt::SetRaw(m_pubHandle, bytes, time); });
+  void Set(std::span<const T> value, const I&... info, int64_t time = 0) {
+    m_buf.Write(
+        value, [&](auto bytes) { ::nt::SetRaw(m_pubHandle, bytes, time); },
+        info...);
   }
 
   /**
@@ -283,18 +300,20 @@ class StructArrayPublisher : public Publisher {
    * published value.
    *
    * @param value value
+   * @param info optional struct type info
    */
   template <typename U>
 #if __cpp_lib_ranges >= 201911L
     requires std::ranges::range<U> &&
              std::convertible_to<std::ranges::range_value_t<U>, T>
 #endif
-  void SetDefault(U&& value) {
+  void SetDefault(U&& value, const I&... info) {
     if (!m_schemaPublished.exchange(true, std::memory_order_relaxed)) {
-      GetTopic().GetInstance().template AddStructSchema<T>();
+      GetTopic().GetInstance().template AddStructSchema<T>(info...);
     }
-    m_buf.Write(std::forward<U>(value),
-                [&](auto bytes) { ::nt::SetDefaultRaw(m_pubHandle, bytes); });
+    m_buf.Write(
+        std::forward<U>(value),
+        [&](auto bytes) { ::nt::SetDefaultRaw(m_pubHandle, bytes); }, info...);
   }
 
   /**
@@ -303,10 +322,12 @@ class StructArrayPublisher : public Publisher {
    * published value.
    *
    * @param value value
+   * @param info optional struct type info
    */
-  void SetDefault(std::span<const T> value) {
-    m_buf.Write(value,
-                [&](auto bytes) { ::nt::SetDefaultRaw(m_pubHandle, bytes); });
+  void SetDefault(std::span<const T> value, const I&... info) {
+    m_buf.Write(
+        value, [&](auto bytes) { ::nt::SetDefaultRaw(m_pubHandle, bytes); },
+        info...);
   }
 
   /**
@@ -315,11 +336,11 @@ class StructArrayPublisher : public Publisher {
    * @return Topic
    */
   TopicType GetTopic() const {
-    return StructArrayTopic<T>{::nt::GetTopicFromHandle(m_pubHandle)};
+    return StructArrayTopic<T, I...>{::nt::GetTopicFromHandle(m_pubHandle)};
   }
 
  private:
-  wpi::StructArrayBuffer<T> m_buf;
+  wpi::StructArrayBuffer<T, I...> m_buf;
   std::atomic_bool m_schemaPublished{false};
 };
 
@@ -328,13 +349,14 @@ class StructArrayPublisher : public Publisher {
  *
  * @note Unlike NetworkTableEntry, the entry goes away when this is destroyed.
  */
-template <wpi::StructSerializable T>
-class StructArrayEntry final : public StructArraySubscriber<T>,
-                               public StructArrayPublisher<T> {
+template <typename T, typename... I>
+  requires wpi::StructSerializable<T, I...>
+class StructArrayEntry final : public StructArraySubscriber<T, I...>,
+                               public StructArrayPublisher<T, I...> {
  public:
-  using SubscriberType = StructArraySubscriber<T>;
-  using PublisherType = StructArrayPublisher<T>;
-  using TopicType = StructArrayTopic<T>;
+  using SubscriberType = StructArraySubscriber<T, I...>;
+  using PublisherType = StructArrayPublisher<T, I...>;
+  using TopicType = StructArrayTopic<T, I...>;
   using ValueType = std::vector<T>;
   using ParamType = std::span<const T>;
 
@@ -355,8 +377,8 @@ class StructArrayEntry final : public StructArraySubscriber<T>,
                  std::convertible_to<std::ranges::range_value_t<U>, T>
 #endif
   StructArrayEntry(NT_Entry handle, U&& defaultValue)
-      : StructArraySubscriber<T>{handle, defaultValue},
-        StructArrayPublisher<T>{handle} {
+      : StructArraySubscriber<T, I...>{handle, defaultValue},
+        StructArrayPublisher<T, I...>{handle} {
   }
 
   /**
@@ -379,7 +401,8 @@ class StructArrayEntry final : public StructArraySubscriber<T>,
    * @return Topic
    */
   TopicType GetTopic() const {
-    return StructArrayTopic<T>{::nt::GetTopicFromHandle(this->m_subHandle)};
+    return StructArrayTopic<T, I...>{
+        ::nt::GetTopicFromHandle(this->m_subHandle)};
   }
 
   /**
@@ -391,12 +414,13 @@ class StructArrayEntry final : public StructArraySubscriber<T>,
 /**
  * NetworkTables struct-encoded value array topic.
  */
-template <wpi::StructSerializable T>
+template <typename T, typename... I>
+  requires wpi::StructSerializable<T, I...>
 class StructArrayTopic final : public Topic {
  public:
-  using SubscriberType = StructArraySubscriber<T>;
-  using PublisherType = StructArrayPublisher<T>;
-  using EntryType = StructArrayEntry<T>;
+  using SubscriberType = StructArraySubscriber<T, I...>;
+  using PublisherType = StructArrayPublisher<T, I...>;
+  using EntryType = StructArrayEntry<T, I...>;
   using ValueType = std::vector<T>;
   using ParamType = std::span<const T>;
   using TimestampedValueType = Timestamped<ValueType>;
@@ -430,6 +454,7 @@ class StructArrayTopic final : public Topic {
    *
    * @param defaultValue default value used when a default is not provided to a
    *        getter function
+   * @param info optional struct type info
    * @param options subscribe options
    * @return subscriber
    */
@@ -440,11 +465,13 @@ class StructArrayTopic final : public Topic {
 #endif
   [[nodiscard]]
   SubscriberType Subscribe(
-      U&& defaultValue, const PubSubOptions& options = kDefaultPubSubOptions) {
-    return StructArraySubscriber<T>{
+      U&& defaultValue, const I&... info,
+      const PubSubOptions& options = kDefaultPubSubOptions) {
+    return StructArraySubscriber<T, I...>{
         ::nt::Subscribe(
             m_handle, NT_RAW,
-            wpi::MakeStructArrayTypeString<T, std::dynamic_extent>(), options),
+            wpi::MakeStructArrayTypeString<T, std::dynamic_extent>(info...),
+            options),
         defaultValue};
   }
 
@@ -460,17 +487,19 @@ class StructArrayTopic final : public Topic {
    *
    * @param defaultValue default value used when a default is not provided to a
    *        getter function
+   * @param info optional struct type info
    * @param options subscribe options
    * @return subscriber
    */
   [[nodiscard]]
   SubscriberType Subscribe(
-      std::span<const T> defaultValue,
+      std::span<const T> defaultValue, const I&... info,
       const PubSubOptions& options = kDefaultPubSubOptions) {
-    return StructArraySubscriber<T>{
+    return StructArraySubscriber<T, I...>{
         ::nt::Subscribe(
             m_handle, NT_RAW,
-            wpi::MakeStructArrayTypeString<T, std::dynamic_extent>(), options),
+            wpi::MakeStructArrayTypeString<T, std::dynamic_extent>(info...),
+            options),
         defaultValue};
   }
 
@@ -486,14 +515,17 @@ class StructArrayTopic final : public Topic {
    *     do not match the topic's data type are dropped (ignored). To determine
    *     if the data type matches, use the appropriate Topic functions.
    *
+   * @param info optional struct type info
    * @param options publish options
    * @return publisher
    */
   [[nodiscard]]
-  PublisherType Publish(const PubSubOptions& options = kDefaultPubSubOptions) {
-    return StructArrayPublisher<T>{::nt::Publish(
+  PublisherType Publish(const I&... info,
+                        const PubSubOptions& options = kDefaultPubSubOptions) {
+    return StructArrayPublisher<T, I...>{::nt::Publish(
         m_handle, NT_RAW,
-        wpi::MakeStructArrayTypeString<T, std::dynamic_extent>(), options)};
+        wpi::MakeStructArrayTypeString<T, std::dynamic_extent>(info...),
+        options)};
   }
 
   /**
@@ -510,17 +542,18 @@ class StructArrayTopic final : public Topic {
    *     if the data type matches, use the appropriate Topic functions.
    *
    * @param properties JSON properties
+   * @param info optional struct type info
    * @param options publish options
    * @return publisher
    */
   [[nodiscard]]
   PublisherType PublishEx(
-      const wpi::json& properties,
+      const wpi::json& properties, const I&... info,
       const PubSubOptions& options = kDefaultPubSubOptions) {
-    return StructArrayPublisher<T>{::nt::PublishEx(
+    return StructArrayPublisher<T, I...>{::nt::PublishEx(
         m_handle, NT_RAW,
-        wpi::MakeStructArrayTypeString<T, std::dynamic_extent>(), properties,
-        options)};
+        wpi::MakeStructArrayTypeString<T, std::dynamic_extent>(info...),
+        properties, options)};
   }
 
   /**
@@ -540,6 +573,7 @@ class StructArrayTopic final : public Topic {
    *
    * @param defaultValue default value used when a default is not provided to a
    *        getter function
+   * @param info optional struct type info
    * @param options publish and/or subscribe options
    * @return entry
    */
@@ -549,12 +583,13 @@ class StructArrayTopic final : public Topic {
              std::convertible_to<std::ranges::range_value_t<U>, T>
 #endif
   [[nodiscard]]
-  EntryType GetEntry(U&& defaultValue,
+  EntryType GetEntry(U&& defaultValue, const I&... info,
                      const PubSubOptions& options = kDefaultPubSubOptions) {
-    return StructArrayEntry<T>{
-        ::nt::GetEntry(m_handle, NT_RAW,
-                       wpi::MakeStructArrayTypeString<T, std::dynamic_extent>(),
-                       options),
+    return StructArrayEntry<T, I...>{
+        ::nt::GetEntry(
+            m_handle, NT_RAW,
+            wpi::MakeStructArrayTypeString<T, std::dynamic_extent>(info...),
+            options),
         defaultValue};
   }
 
@@ -575,16 +610,18 @@ class StructArrayTopic final : public Topic {
    *
    * @param defaultValue default value used when a default is not provided to a
    *        getter function
+   * @param info optional struct type info
    * @param options publish and/or subscribe options
    * @return entry
    */
   [[nodiscard]]
-  EntryType GetEntry(std::span<const T> defaultValue,
+  EntryType GetEntry(std::span<const T> defaultValue, const I&... info,
                      const PubSubOptions& options = kDefaultPubSubOptions) {
-    return StructArrayEntry<T>{
-        ::nt::GetEntry(m_handle, NT_RAW,
-                       wpi::MakeStructArrayTypeString<T, std::dynamic_extent>(),
-                       options),
+    return StructArrayEntry<T, I...>{
+        ::nt::GetEntry(
+            m_handle, NT_RAW,
+            wpi::MakeStructArrayTypeString<T, std::dynamic_extent>(info...),
+            options),
         defaultValue};
   }
 };

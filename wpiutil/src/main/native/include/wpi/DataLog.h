@@ -263,16 +263,20 @@ class DataLog final {
    * name are silently ignored.
    *
    * @tparam T struct serializable type
+   * @param info optional struct type info
    * @param timestamp Time stamp (0 to indicate now)
    */
-  template <StructSerializable T>
-  void AddStructSchema(int64_t timestamp = 0) {
+  template <typename T, typename... I>
+    requires StructSerializable<T, I...>
+  void AddStructSchema(const I&... info, int64_t timestamp = 0) {
     if (timestamp == 0) {
       timestamp = Now();
     }
-    ForEachStructSchema<T>([this, timestamp](auto typeString, auto schema) {
-      AddSchema(typeString, "structschema", schema, timestamp);
-    });
+    ForEachStructSchema<T>(
+        [this, timestamp](auto typeString, auto schema) {
+          this->AddSchema(typeString, "structschema", schema, timestamp);
+        },
+        info...);
   }
 
   /**
@@ -946,36 +950,40 @@ class StringArrayLogEntry : public DataLogEntry {
 /**
  * Log raw struct serializable objects.
  */
-template <StructSerializable T>
+template <typename T, typename... I>
+  requires StructSerializable<T, I...>
 class StructLogEntry : public DataLogEntry {
-  using S = Struct<T>;
+  using S = Struct<T, I...>;
 
  public:
   StructLogEntry() = default;
-  StructLogEntry(DataLog& log, std::string_view name, int64_t timestamp = 0)
-      : StructLogEntry{log, name, {}, timestamp} {}
+  StructLogEntry(DataLog& log, std::string_view name, const I&... info,
+                 int64_t timestamp = 0)
+      : StructLogEntry{log, name, {}, info..., timestamp} {}
   StructLogEntry(DataLog& log, std::string_view name, std::string_view metadata,
-                 int64_t timestamp = 0) {
+                 const I&... info, int64_t timestamp = 0) {
     m_log = &log;
-    log.AddStructSchema<T>(timestamp);
-    m_entry = log.Start(name, S::kTypeString, metadata, timestamp);
+    log.AddStructSchema<T, I...>(info..., timestamp);
+    m_entry = log.Start(name, S::GetTypeString(info...), metadata, timestamp);
   }
 
   /**
    * Appends a record to the log.
    *
    * @param data Data to record
+   * @param info optional struct type info
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
-  void Append(const T& data, int64_t timestamp = 0) {
-    if constexpr (wpi::is_constexpr([] { S::GetSize(); })) {
-      uint8_t buf[S::GetSize()];
+  void Append(const T& data, const I&... info, int64_t timestamp = 0) {
+    if constexpr (sizeof...(I) == 0 &&
+                  wpi::is_constexpr([&] { S::GetSize(info...); })) {
+      uint8_t buf[S::GetSize(info...)];
       S::Pack(buf, data);
       m_log->AppendRaw(m_entry, buf, timestamp);
     } else {
       wpi::SmallVector<uint8_t, 128> buf;
-      buf.resize_for_overwrite(S::GetSize());
-      S::Pack(buf, data);
+      buf.resize_for_overwrite(S::GetSize(info...));
+      S::Pack(buf, data, info...);
       m_log->AppendRaw(m_entry, buf, timestamp);
     }
   }
@@ -984,28 +992,31 @@ class StructLogEntry : public DataLogEntry {
 /**
  * Log raw struct serializable array of objects.
  */
-template <StructSerializable T>
+template <typename T, typename... I>
+  requires StructSerializable<T, I...>
 class StructArrayLogEntry : public DataLogEntry {
-  using S = Struct<T>;
+  using S = Struct<T, I...>;
 
  public:
   StructArrayLogEntry() = default;
-  StructArrayLogEntry(DataLog& log, std::string_view name,
+  StructArrayLogEntry(DataLog& log, std::string_view name, const I&... info,
                       int64_t timestamp = 0)
-      : StructArrayLogEntry{log, name, {}, timestamp} {}
+      : StructArrayLogEntry{log, name, {}, info..., timestamp} {}
   StructArrayLogEntry(DataLog& log, std::string_view name,
-                      std::string_view metadata, int64_t timestamp = 0) {
+                      std::string_view metadata, const I&... info,
+                      int64_t timestamp = 0) {
     m_log = &log;
-    log.AddStructSchema<T>(timestamp);
-    m_entry =
-        log.Start(name, MakeStructArrayTypeString<T, std::dynamic_extent>(),
-                  metadata, timestamp);
+    log.AddStructSchema<T, I...>(info..., timestamp);
+    m_entry = log.Start(
+        name, MakeStructArrayTypeString<T, std::dynamic_extent>(info...),
+        metadata, timestamp);
   }
 
   /**
    * Appends a record to the log.
    *
    * @param data Data to record
+   * @param info optional struct type info
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
   template <typename U>
@@ -1013,25 +1024,29 @@ class StructArrayLogEntry : public DataLogEntry {
     requires std::ranges::range<U> &&
              std::convertible_to<std::ranges::range_value_t<U>, T>
 #endif
-  void Append(U&& data, int64_t timestamp = 0) {
-    m_buf.Write(std::forward<U>(data), [&](auto bytes) {
-      m_log->AppendRaw(m_entry, bytes, timestamp);
-    });
+  void Append(U&& data, const I&... info, int64_t timestamp = 0) {
+    m_buf.Write(
+        std::forward<U>(data),
+        [&](auto bytes) { m_log->AppendRaw(m_entry, bytes, timestamp); },
+        info...);
   }
 
   /**
    * Appends a record to the log.
    *
    * @param data Data to record
+   * @param info optional struct type info
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
-  void Append(std::span<const T> data, int64_t timestamp = 0) {
+  void Append(std::span<const T> data, const I&... info,
+              int64_t timestamp = 0) {
     m_buf.Write(
-        data, [&](auto bytes) { m_log->AppendRaw(m_entry, bytes, timestamp); });
+        data, [&](auto bytes) { m_log->AppendRaw(m_entry, bytes, timestamp); },
+        info...);
   }
 
  private:
-  StructArrayBuffer<T> m_buf;
+  StructArrayBuffer<T, I...> m_buf;
 };
 
 /**

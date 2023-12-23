@@ -44,16 +44,18 @@ inline ProtobufTopic<T> NetworkTableInstance::GetProtobufTopic(
   return ProtobufTopic<T>{GetTopic(name)};
 }
 
-template <wpi::StructSerializable T>
-inline StructTopic<T> NetworkTableInstance::GetStructTopic(
+template <typename T, typename... I>
+  requires wpi::StructSerializable<T, I...>
+inline StructTopic<T, I...> NetworkTableInstance::GetStructTopic(
     std::string_view name) const {
-  return StructTopic<T>{GetTopic(name)};
+  return StructTopic<T, I...>{GetTopic(name)};
 }
 
-template <wpi::StructSerializable T>
-inline StructArrayTopic<T> NetworkTableInstance::GetStructArrayTopic(
+template <typename T, typename... I>
+  requires wpi::StructSerializable<T, I...>
+inline StructArrayTopic<T, I...> NetworkTableInstance::GetStructArrayTopic(
     std::string_view name) const {
-  return StructArrayTopic<T>{GetTopic(name)};
+  return StructArrayTopic<T, I...>{GetTopic(name)};
 }
 
 inline std::vector<Topic> NetworkTableInstance::GetTopics() {
@@ -272,11 +274,14 @@ void NetworkTableInstance::AddProtobufSchema(wpi::ProtobufMessage<T>& msg) {
       });
 }
 
-template <wpi::StructSerializable T>
-void NetworkTableInstance::AddStructSchema() {
-  wpi::ForEachStructSchema<T>([this](auto typeString, auto schema) {
-    AddSchema(typeString, "structschema", schema);
-  });
+template <typename T, typename... I>
+  requires wpi::StructSerializable<T, I...>
+void NetworkTableInstance::AddStructSchema(const I&... info) {
+  wpi::ForEachStructSchema<T>(
+      [this](auto typeString, auto schema) {
+        AddSchema(typeString, "structschema", schema);
+      },
+      info...);
 }
 
 #ifdef __clang__

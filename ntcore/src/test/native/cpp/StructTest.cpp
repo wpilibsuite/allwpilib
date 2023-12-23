@@ -12,23 +12,35 @@
 
 namespace {
 struct Inner {
-  int a;
-  int b;
+  int a = 0;
+  int b = 0;
 };
 
 struct Outer {
   Inner inner;
-  int c;
+  int c = 0;
 };
 
 struct Inner2 {
-  int a;
-  int b;
+  int a = 0;
+  int b = 0;
 };
 
 struct Outer2 {
   Inner2 inner;
-  int c;
+  int c = 0;
+};
+
+struct ThingA {
+  int x = 0;
+};
+
+struct ThingB {
+  int x = 0;
+};
+
+struct Info1 {
+  int info = 0;
 };
 }  // namespace
 
@@ -107,6 +119,36 @@ struct wpi::Struct<Outer2> {
   static void ForEachNested(
       std::invocable<std::string_view, std::string_view> auto fn) {
     wpi::ForEachStructSchema<Inner2>(fn);
+  }
+};
+
+template <>
+struct wpi::Struct<ThingA> {
+  static constexpr std::string_view GetTypeString() { return "struct:ThingA"; }
+  static constexpr size_t GetSize() { return 1; }
+  static constexpr std::string_view GetSchema() { return "uint8 value"; }
+  static ThingA Unpack(std::span<const uint8_t> data) {
+    return ThingA{.x = data[0]};
+  }
+  static void Pack(std::span<uint8_t> data, const ThingA& value) {
+    data[0] = value.x;
+  }
+};
+
+template <>
+struct wpi::Struct<ThingB, Info1> {
+  static constexpr std::string_view GetTypeString(const Info1&) {
+    return "struct:ThingB";
+  }
+  static constexpr size_t GetSize(const Info1&) { return 1; }
+  static constexpr std::string_view GetSchema(const Info1&) {
+    return "uint8 value";
+  }
+  static ThingB Unpack(std::span<const uint8_t> data, const Info1&) {
+    return ThingB{.x = data[0]};
+  }
+  static void Pack(std::span<uint8_t> data, const ThingB& value, const Info1&) {
+    data[0] = value.x;
   }
 };
 
@@ -291,6 +333,120 @@ TEST_F(StructTest, InnerArrayNonconstexpr) {
   ASSERT_EQ(vals[0].value.size(), 1u);
   ASSERT_EQ(vals[0].value[0].a, 1);
   ASSERT_EQ(vals[0].value[0].b, 2);
+}
+
+TEST_F(StructTest, StructA) {
+  nt::StructTopic<ThingA> topic = inst.GetStructTopic<ThingA>("a");
+  nt::StructPublisher<ThingA> pub = topic.Publish();
+  nt::StructPublisher<ThingA> pub2 = topic.PublishEx({{}});
+  nt::StructSubscriber<ThingA> sub = topic.Subscribe({});
+  nt::StructEntry<ThingA> entry = topic.GetEntry({});
+  pub.SetDefault({});
+  pub.Set({}, 5);
+  sub.Get();
+  sub.Get({});
+  sub.GetAtomic();
+  sub.GetAtomic({});
+  entry.SetDefault({});
+  entry.Set({}, 6);
+  entry.Get({});
+}
+
+TEST_F(StructTest, StructArrayA) {
+  nt::StructArrayTopic<ThingA> topic = inst.GetStructArrayTopic<ThingA>("a");
+  nt::StructArrayPublisher<ThingA> pub = topic.Publish();
+  nt::StructArrayPublisher<ThingA> pub2 = topic.PublishEx({{}});
+  nt::StructArraySubscriber<ThingA> sub = topic.Subscribe({});
+  nt::StructArrayEntry<ThingA> entry = topic.GetEntry({});
+  pub.SetDefault({{ThingA{}, ThingA{}}});
+  pub.Set({{ThingA{}, ThingA{}}}, 5);
+  sub.Get();
+  sub.Get({});
+  sub.GetAtomic();
+  sub.GetAtomic({});
+  entry.SetDefault({{ThingA{}, ThingA{}}});
+  entry.Set({{ThingA{}, ThingA{}}}, 6);
+  entry.Get({});
+}
+
+TEST_F(StructTest, StructFixedArrayA) {
+  nt::StructTopic<std::array<ThingA, 2>> topic =
+      inst.GetStructTopic<std::array<ThingA, 2>>("a");
+  nt::StructPublisher<std::array<ThingA, 2>> pub = topic.Publish();
+  nt::StructPublisher<std::array<ThingA, 2>> pub2 = topic.PublishEx({{}});
+  nt::StructSubscriber<std::array<ThingA, 2>> sub = topic.Subscribe({});
+  nt::StructEntry<std::array<ThingA, 2>> entry = topic.GetEntry({});
+  std::array<ThingA, 2> arr;
+  pub.SetDefault(arr);
+  pub.Set(arr, 5);
+  sub.Get();
+  sub.Get(arr);
+  sub.GetAtomic();
+  sub.GetAtomic(arr);
+  entry.SetDefault(arr);
+  entry.Set(arr, 6);
+  entry.Get(arr);
+}
+
+TEST_F(StructTest, StructB) {
+  Info1 info;
+  nt::StructTopic<ThingB, Info1> topic =
+      inst.GetStructTopic<ThingB, Info1>("b");
+  nt::StructPublisher<ThingB, Info1> pub = topic.Publish(info);
+  nt::StructPublisher<ThingB, Info1> pub2 = topic.PublishEx({{}}, info);
+  nt::StructSubscriber<ThingB, Info1> sub = topic.Subscribe({}, info);
+  nt::StructEntry<ThingB, Info1> entry = topic.GetEntry({}, info);
+  pub.SetDefault({}, info);
+  pub.Set({}, info, 5);
+  sub.Get(info);
+  sub.Get({}, info);
+  sub.GetAtomic(info);
+  sub.GetAtomic({}, info);
+  entry.SetDefault({}, info);
+  entry.Set({}, info, 6);
+  entry.Get({}, info);
+}
+
+TEST_F(StructTest, StructArrayB) {
+  Info1 info;
+  nt::StructArrayTopic<ThingB, Info1> topic =
+      inst.GetStructArrayTopic<ThingB, Info1>("b");
+  nt::StructArrayPublisher<ThingB, Info1> pub = topic.Publish(info);
+  nt::StructArrayPublisher<ThingB, Info1> pub2 = topic.PublishEx({{}}, info);
+  nt::StructArraySubscriber<ThingB, Info1> sub = topic.Subscribe({}, info);
+  nt::StructArrayEntry<ThingB, Info1> entry = topic.GetEntry({}, info);
+  pub.SetDefault({{ThingB{}, ThingB{}}}, info);
+  pub.Set({{ThingB{}, ThingB{}}}, info, 5);
+  sub.Get(info);
+  sub.Get({}, info);
+  sub.GetAtomic(info);
+  sub.GetAtomic({}, info);
+  entry.SetDefault({{ThingB{}, ThingB{}}}, info);
+  entry.Set({{ThingB{}, ThingB{}}}, info, 6);
+  entry.Get({}, info);
+}
+
+TEST_F(StructTest, StructFixedArrayB) {
+  Info1 info;
+  nt::StructTopic<std::array<ThingB, 2>, Info1> topic =
+      inst.GetStructTopic<std::array<ThingB, 2>, Info1>("b");
+  nt::StructPublisher<std::array<ThingB, 2>, Info1> pub = topic.Publish(info);
+  nt::StructPublisher<std::array<ThingB, 2>, Info1> pub2 =
+      topic.PublishEx({{}}, info);
+  nt::StructSubscriber<std::array<ThingB, 2>, Info1> sub =
+      topic.Subscribe({}, info);
+  nt::StructEntry<std::array<ThingB, 2>, Info1> entry =
+      topic.GetEntry({}, info);
+  std::array<ThingB, 2> arr;
+  pub.SetDefault(arr, info);
+  pub.Set(arr, info, 5);
+  sub.Get(info);
+  sub.Get(arr, info);
+  sub.GetAtomic(info);
+  sub.GetAtomic(arr, info);
+  entry.SetDefault(arr, info);
+  entry.Set(arr, info, 6);
+  entry.Get(arr, info);
 }
 
 }  // namespace nt
