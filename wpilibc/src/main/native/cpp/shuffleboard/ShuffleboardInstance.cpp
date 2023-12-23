@@ -30,12 +30,12 @@ ShuffleboardInstance::ShuffleboardInstance(nt::NetworkTableInstance ntInstance)
   m_impl->selectedTabPub =
       m_impl->rootMetaTable->GetStringTopic("Selected")
           .Publish(nt::PubSubOptions{.keepDuplicates = true});
-  HAL_Report(HALUsageReporting::kResourceType_Shuffleboard, 0);
 }
 
 ShuffleboardInstance::~ShuffleboardInstance() = default;
 
 frc::ShuffleboardTab& ShuffleboardInstance::GetTab(std::string_view title) {
+  HAL_Report(HALUsageReporting::kResourceType_Shuffleboard, 0);
   if (m_impl->tabs.find(title) == m_impl->tabs.end()) {
     m_impl->tabs.try_emplace(title,
                              std::make_unique<ShuffleboardTab>(*this, title));

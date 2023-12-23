@@ -35,12 +35,12 @@ final class ShuffleboardInstance implements ShuffleboardRoot {
     m_rootMetaTable = m_rootTable.getSubTable(".metadata");
     m_selectedTabPub =
         m_rootMetaTable.getStringTopic("Selected").publish(PubSubOption.keepDuplicates(true));
-    HAL.report(tResourceType.kResourceType_Shuffleboard, 0);
   }
 
   @Override
   public ShuffleboardTab getTab(String title) {
     requireNonNullParam(title, "title", "getTab");
+    HAL.report(tResourceType.kResourceType_Shuffleboard, 0);
     if (!m_tabs.containsKey(title)) {
       m_tabs.put(title, new ShuffleboardTab(this, title));
       m_tabsChanged = true;
@@ -89,6 +89,8 @@ final class ShuffleboardInstance implements ShuffleboardRoot {
    * @param func the function to apply to all complex widgets
    */
   private void applyToAllComplexWidgets(Consumer<ComplexWidget> func) {
+    HAL.report(tResourceType.kResourceType_Shuffleboard, 0);
+
     for (ShuffleboardTab tab : m_tabs.values()) {
       apply(tab, func);
     }
