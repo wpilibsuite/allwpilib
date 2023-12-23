@@ -31,12 +31,20 @@ public class ElevatorFeedforward {
    * @param kg The gravity gain.
    * @param kv The velocity gain.
    * @param ka The acceleration gain.
+   * @throws IllegalArgumentException for kv &lt; zero.
+   * @throws IllegalArgumentException for ka &lt; zero.
    */
   public ElevatorFeedforward(double ks, double kg, double kv, double ka) {
     this.ks = ks;
     this.kg = kg;
     this.kv = kv;
     this.ka = ka;
+    if (kv < 0.0) {
+      throw new IllegalArgumentException("kv must be a non-negative number, got " + kv + "!");
+    }
+    if (ka < 0.0) {
+      throw new IllegalArgumentException("ka must be a non-negative number, got " + kv + "!");
+    }
   }
 
   /**
