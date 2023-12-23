@@ -743,8 +743,10 @@ void DataLog::AppendImpl(std::span<const uint8_t> data) {
     std::memcpy(buf, data.data(), kBlockSize);
     data = data.subspan(kBlockSize);
   }
-  uint8_t* buf = Reserve(data.size());
-  std::memcpy(buf, data.data(), data.size());
+  if (!data.empty()) {
+    uint8_t* buf = Reserve(data.size());
+    std::memcpy(buf, data.data(), data.size());
+  }
 }
 
 void DataLog::AppendStringImpl(std::string_view str) {
