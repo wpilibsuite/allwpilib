@@ -15,5 +15,6 @@ PWMSparkFlex::PWMSparkFlex(int channel)
   m_pwm.SetSpeed(0.0);
   m_pwm.SetZeroLatch();
 
-  HAL_Report(HALUsageReporting::kResourceType_RevSparkFlexPWM, GetChannel() + 1);
+  HAL_Report(HALUsageReporting::kResourceType_RevSparkFlexPWM,
+             GetChannel() + 1);
 }
