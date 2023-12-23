@@ -347,8 +347,8 @@ public class StadiaController extends GenericHID {
    * Constructs an event instance around the left trigger button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the left trigger button's digital signal attached
-   * to the given loop.
+   * @return an event instance representing the left trigger button's digital signal attached to the
+   *     given loop.
    */
   public BooleanEvent leftTrigger(EventLoop loop) {
     return new BooleanEvent(loop, this::getLeftTriggerButton);
@@ -358,8 +358,8 @@ public class StadiaController extends GenericHID {
    * Constructs an event instance around the right trigger button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the right trigger button's digital signal attached
-   * to the given loop.
+   * @return an event instance representing the right trigger button's digital signal attached to
+   *     the given loop.
    */
   public BooleanEvent rightTrigger(EventLoop loop) {
     return new BooleanEvent(loop, this::getRightTriggerButton);
@@ -552,8 +552,8 @@ public class StadiaController extends GenericHID {
    * Constructs an event instance around the ellipses button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the ellipses button's digital signal attached
-   * to the given loop.
+   * @return an event instance representing the ellipses button's digital signal attached to the
+   *     given loop.
    */
   public BooleanEvent ellipses(EventLoop loop) {
     return new BooleanEvent(loop, this::getEllipsesButton);
@@ -590,8 +590,8 @@ public class StadiaController extends GenericHID {
    * Constructs an event instance around the hamburger button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the hamburger button's digital signal attached
-   * to the given loop.
+   * @return an event instance representing the hamburger button's digital signal attached to the
+   *     given loop.
    */
   public BooleanEvent hamburger(EventLoop loop) {
     return new BooleanEvent(loop, this::getHamburgerButton);
@@ -713,5 +713,4 @@ public class StadiaController extends GenericHID {
   public BooleanEvent frame(EventLoop loop) {
     return new BooleanEvent(loop, this::getFrameButton);
   }
-
 }
