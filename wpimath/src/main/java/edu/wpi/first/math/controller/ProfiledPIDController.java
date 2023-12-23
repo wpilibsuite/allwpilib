@@ -35,6 +35,9 @@ public class ProfiledPIDController implements Sendable {
    * @param Ki The integral coefficient.
    * @param Kd The derivative coefficient.
    * @param constraints Velocity and acceleration constraints for goal.
+   * @throws IllegalArgumentException if kp &lt; 0
+   * @throws IllegalArgumentException if ki &lt; 0
+   * @throws IllegalArgumentException if kd &lt; 0
    */
   public ProfiledPIDController(
       double Kp, double Ki, double Kd, TrapezoidProfile.Constraints constraints) {
@@ -49,6 +52,10 @@ public class ProfiledPIDController implements Sendable {
    * @param Kd The derivative coefficient.
    * @param constraints Velocity and acceleration constraints for goal.
    * @param period The period between controller updates in seconds. The default is 0.02 seconds.
+   * @throws IllegalArgumentException if kp &lt; 0
+   * @throws IllegalArgumentException if ki &lt; 0
+   * @throws IllegalArgumentException if kd &lt; 0
+   * @throws IllegalArgumentException if period &lt;= 0
    */
   @SuppressWarnings("this-escape")
   public ProfiledPIDController(
@@ -67,9 +74,9 @@ public class ProfiledPIDController implements Sendable {
    *
    * <p>Sets the proportional, integral, and differential coefficients.
    *
-   * @param Kp Proportional coefficient
-   * @param Ki Integral coefficient
-   * @param Kd Differential coefficient
+   * @param Kp The proportional coefficient. Must be &gt;= 0.
+   * @param Ki The integral coefficient. Must be &gt;= 0.
+   * @param Kd The differential coefficient. Must be &gt;= 0.
    */
   public void setPID(double Kp, double Ki, double Kd) {
     m_controller.setPID(Kp, Ki, Kd);
@@ -78,7 +85,7 @@ public class ProfiledPIDController implements Sendable {
   /**
    * Sets the proportional coefficient of the PID controller gain.
    *
-   * @param Kp proportional coefficient
+   * @param Kp The proportional coefficient. Must be &gt;= 0.
    */
   public void setP(double Kp) {
     m_controller.setP(Kp);
@@ -87,7 +94,7 @@ public class ProfiledPIDController implements Sendable {
   /**
    * Sets the integral coefficient of the PID controller gain.
    *
-   * @param Ki integral coefficient
+   * @param Ki The integral coefficient. Must be &gt;= 0.
    */
   public void setI(double Ki) {
     m_controller.setI(Ki);
@@ -96,7 +103,7 @@ public class ProfiledPIDController implements Sendable {
   /**
    * Sets the differential coefficient of the PID controller gain.
    *
-   * @param Kd differential coefficient
+   * @param Kd The differential coefficient. Must be &gt;= 0.
    */
   public void setD(double Kd) {
     m_controller.setD(Kd);
@@ -110,6 +117,7 @@ public class ProfiledPIDController implements Sendable {
    * of {@link Double#POSITIVE_INFINITY} disables IZone functionality.
    *
    * @param iZone Maximum magnitude of error to allow integral control.
+   * @throws IllegalArgumentException if iZone &lt;= 0
    */
   public void setIZone(double iZone) {
     m_controller.setIZone(iZone);
