@@ -12,7 +12,6 @@
 #include <utility>
 #include <vector>
 
-#include "frc2/command/CommandConcepts.h"
 #include "frc2/command/CommandPtr.h"
 #include "frc2/command/Requirements.h"
 #include "frc2/command/SelectCommand.h"
@@ -180,11 +179,11 @@ namespace impl {
 /**
  * Create a vector of commands.
  */
-template <OwnedCommand... Args>
+template <std::convertible_to<CommandPtr>... Args>
 std::vector<CommandPtr> MakeVector(Args&&... args) {
   std::vector<CommandPtr> data;
   data.reserve(sizeof...(Args));
-  (data.emplace_back(CommandPtr(std::forward<Args>(args))), ...);
+  (data.emplace_back(std::forward<Args>(args)), ...);
   return data;
 }
 
@@ -199,9 +198,10 @@ CommandPtr Sequence(std::vector<CommandPtr>&& commands);
 /**
  * Runs a group of commands in series, one after the other.
  */
+template <std::convertible_to<CommandPtr>... CommandPtrs>
 [[nodiscard]]
-CommandPtr Sequence(OwnedCommand auto&&... commands) {
-  return Sequence(impl::MakeVector(std::forward<OwnedCommand>(commands)...));
+CommandPtr Sequence(CommandPtrs&&... commands) {
+  return Sequence(impl::MakeVector(std::forward<CommandPtrs>(commands)...));
 }
 
 /**
