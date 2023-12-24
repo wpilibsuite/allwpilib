@@ -152,13 +152,13 @@ class StructSubscriber : public Subscriber {
       if (r.value.size() < std::apply(S::GetSize, m_info)) {
         continue;
       } else {
-        rv.emplace_back(r.time, r.serverTime,
-                        std::apply(
-                            [&](const I&... info) {
-                              return S::Unpack(
-                                  std::span<const uint8_t>(r.value), info...);
-                            },
-                            m_info));
+        std::apply(
+            [&](const I&... info) {
+              rv.emplace_back(
+                  r.time, r.serverTime,
+                  S::Unpack(std::span<const uint8_t>(r.value), info...));
+            },
+            m_info);
       }
     }
     return rv;
@@ -206,14 +206,14 @@ class StructPublisher : public Publisher {
   StructPublisher(StructPublisher&& rhs)
       : Publisher{std::move(rhs)},
         m_schemaPublished{rhs.m_schemaPublished},
-        m_info{rhs.m_info} {}
+        m_info{std::move(rhs.m_info)} {}
 
   StructPublisher& operator=(StructPublisher&& rhs) {
     Publisher::operator=(std::move(rhs));
     m_schemaPublished.store(
         rhs.m_schemaPublished.load(std::memory_order_relaxed),
         std::memory_order_relaxed);
-    m_info = rhs.m_info;
+    m_info = std::move(rhs.m_info);
     return *this;
   }
 
@@ -355,7 +355,7 @@ class StructEntry final : public StructSubscriber<T, I...>,
    * @return Topic
    */
   TopicType GetTopic() const {
-    return this->template Subscriber<T, I...>::GetTopic();
+    return StructSubscriber<T, I...>::GetTopic();
   }
 
   /**

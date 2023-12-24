@@ -54,8 +54,8 @@ inline StructTopic<T, I...> NetworkTableInstance::GetStructTopic(
 template <typename T, typename... I>
   requires wpi::StructSerializable<T, I...>
 inline StructArrayTopic<T, I...> NetworkTableInstance::GetStructArrayTopic(
-    std::string_view name) const {
-  return StructArrayTopic<T, I...>{GetTopic(name)};
+    std::string_view name, I... info) const {
+  return StructArrayTopic<T, I...>{GetTopic(name), std::move(info)...};
 }
 
 inline std::vector<Topic> NetworkTableInstance::GetTopics() {

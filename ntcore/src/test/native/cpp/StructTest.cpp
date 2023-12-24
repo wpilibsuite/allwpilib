@@ -410,20 +410,20 @@ TEST_F(StructTest, StructB) {
 TEST_F(StructTest, StructArrayB) {
   Info1 info;
   nt::StructArrayTopic<ThingB, Info1> topic =
-      inst.GetStructArrayTopic<ThingB, Info1>("b");
-  nt::StructArrayPublisher<ThingB, Info1> pub = topic.Publish(info);
-  nt::StructArrayPublisher<ThingB, Info1> pub2 = topic.PublishEx({{}}, info);
-  nt::StructArraySubscriber<ThingB, Info1> sub = topic.Subscribe({}, info);
-  nt::StructArrayEntry<ThingB, Info1> entry = topic.GetEntry({}, info);
-  pub.SetDefault({{ThingB{}, ThingB{}}}, info);
-  pub.Set({{ThingB{}, ThingB{}}}, info, 5);
-  sub.Get(info);
-  sub.Get({}, info);
-  sub.GetAtomic(info);
-  sub.GetAtomic({}, info);
-  entry.SetDefault({{ThingB{}, ThingB{}}}, info);
-  entry.Set({{ThingB{}, ThingB{}}}, info, 6);
-  entry.Get({}, info);
+      inst.GetStructArrayTopic<ThingB, Info1>("b", info);
+  nt::StructArrayPublisher<ThingB, Info1> pub = topic.Publish();
+  nt::StructArrayPublisher<ThingB, Info1> pub2 = topic.PublishEx({{}});
+  nt::StructArraySubscriber<ThingB, Info1> sub = topic.Subscribe({});
+  nt::StructArrayEntry<ThingB, Info1> entry = topic.GetEntry({});
+  pub.SetDefault({{ThingB{}, ThingB{}}});
+  pub.Set({{ThingB{}, ThingB{}}}, 5);
+  sub.Get();
+  sub.Get({});
+  sub.GetAtomic();
+  sub.GetAtomic({});
+  entry.SetDefault({{ThingB{}, ThingB{}}});
+  entry.Set({{ThingB{}, ThingB{}}}, 6);
+  entry.Get({});
 }
 
 TEST_F(StructTest, StructFixedArrayB) {

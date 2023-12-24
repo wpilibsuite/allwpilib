@@ -273,11 +273,13 @@ class NetworkTableInstance final {
    * Gets a raw struct serialized array topic.
    *
    * @param name topic name
+   * @param info optional struct type info
    * @return Topic
    */
   template <typename T, typename... I>
     requires wpi::StructSerializable<T, I...>
-  StructArrayTopic<T, I...> GetStructArrayTopic(std::string_view name) const;
+  StructArrayTopic<T, I...> GetStructArrayTopic(std::string_view name,
+                                                I... info) const;
 
   /**
    * Get Published Topics.
