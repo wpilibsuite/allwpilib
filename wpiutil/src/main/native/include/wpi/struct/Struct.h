@@ -132,7 +132,8 @@ concept HasNestedStruct =
  * @param info optional struct type info
  * @return Deserialized object
  */
-template <StructSerializable T, typename... I>
+template <typename T, typename... I>
+  requires StructSerializable<T, I...>
 inline T UnpackStruct(std::span<const uint8_t> data, const I&... info) {
   using S = Struct<T, typename std::remove_cvref_t<I>...>;
   return S::Unpack(data, info...);
