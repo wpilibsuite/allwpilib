@@ -83,6 +83,9 @@ class ADIS16470_IMU : public wpi::Sendable,
   ADIS16470_IMU(ADIS16470_IMU&&) = default;
   ADIS16470_IMU& operator=(ADIS16470_IMU&&) = default;
 
+  /**
+   * @brief Configures the decimation rate of the IMU.
+   */
   int ConfigDecRate(uint16_t reg);
 
   /**
@@ -98,29 +101,57 @@ class ADIS16470_IMU : public wpi::Sendable,
   int ConfigCalTime(CalibrationTime new_cal_time);
 
   /**
-   * @brief Resets (zeros) the xgyro, ygyro, and zgyro angle integrations.
-   *
-   * Resets the gyro accumulations to a heading of zero. This can be used if
-   * the "zero" orientation of the sensor needs to be changed in runtime.
+   * @brief Resets the gyro accumulations to a heading of zero. This can be used
+   * if the "zero" orientation of the sensor needs to be changed in runtime.
    */
   void Reset();
 
   /**
-   * Sets an axis angle to a value in degrees (CCW positive).
+   * Allow the designated gyro angle to be set to a given value. This may happen
+   * with unread values in the buffer, it is suggested that the IMU is not
+   * moving when this method is run.
+   *
+   * @param axis IMUAxis that will be changed
+   * @param angle The new angle (CCW positive)
    */
   void SetGyroAngle(IMUAxis axis, units::degree_t angle);
 
+  /**
+   * Allow the gyro angle X to be set to a given value. This may happen with
+   * unread values in the buffer, it is suggested that the IMU is not moving
+   * when this method is run.
+   *
+   * @param angle The new angle (CCW positive)
+   */
   void SetGyroAngleX(units::degree_t angle);
+
+  /**
+   * Allow the gyro angle Y to be set to a given value. This may happen with
+   * unread values in the buffer, it is suggested that the IMU is not moving
+   * when this method is run.
+   *
+   * @param angle The new angle (CCW positive)
+   */
   void SetGyroAngleY(units::degree_t angle);
+
+  /**
+   * Allow the gyro angle Z to be set to a given value. This may happen with
+   * unread values in the buffer, it is suggested that the IMU is not moving
+   * when this method is run.
+   *
+   * @param angle The new angle (CCW positive)
+   */
   void SetGyroAngleZ(units::degree_t angle);
 
   /**
-   * Returns the angle of an axis in degrees (CCW positive).
+   * @param axis The IMUAxis whose angle to return
+   * @return The axis angle (CCW positive)
    */
   units::degree_t GetAngle(IMUAxis axis) const;
 
   /**
-   * Returns the angular rate of an axis in degrees per second (CCW positive).
+   * @param axis The IMUAxis whose rate to return
+   * @return Axis angular rate (CCW positive)
    */
   units::degrees_per_second_t GetRate(IMUAxis axis) const;
 
@@ -139,22 +170,63 @@ class ADIS16470_IMU : public wpi::Sendable,
    */
   units::meters_per_second_squared_t GetAccelZ() const;
 
+  /**
+   * Returns the X-axis complementary angle.
+   */
   units::degree_t GetXComplementaryAngle() const;
+
+  /**
+   * Returns the Y-axis complementary angle.
+   */
   units::degree_t GetYComplementaryAngle() const;
 
+  /**
+   * Returns the X-axis filtered acceleration angle.
+   */
   units::degree_t GetXFilteredAccelAngle() const;
+
+  /**
+   * Returns the Y-axis filtered acceleration angle.
+   */
   units::degree_t GetYFilteredAccelAngle() const;
 
+  /**
+   * Returns which axis, kX, kY, or kZ, is set to the yaw axis.
+   *
+   * @return IMUAxis Yaw Axis
+   */
   IMUAxis GetYawAxis() const;
+
+  /**
+   * Returns which axis, kX, kY, or kZ, is set to the pitch axis.
+   *
+   * @return IMUAxis Pitch Axis
+   */
   IMUAxis GetPitchAxis() const;
+
+  /**
+   * Returns which axis, kX, kY, or kZ, is set to the roll axis.
+   *
+   * @return IMUAxis Roll Axis
+   */
   IMUAxis GetRollAxis() const;
 
+  /**
+   * Checks the connection status of the IMU.
+   *
+   * @return True if the IMU is connected, false otherwise.
+   */
   bool IsConnected() const;
 
   IMUAxis m_yaw_axis;
   IMUAxis m_pitch_axis;
   IMUAxis m_roll_axis;
 
+  /**
+   * Gets the SPI port number.
+   *
+   * @return The SPI port number.
+   */
   int GetPort() const;
 
   void InitSendable(wpi::SendableBuilder& builder) override;

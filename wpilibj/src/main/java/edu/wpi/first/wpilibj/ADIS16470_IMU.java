@@ -408,6 +408,11 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
     m_connected = true;
   }
 
+  /**
+   * Checks the connection status of the IMU.
+   *
+   * @return True if the IMU is connected, false otherwise.
+   */
   public boolean isConnected() {
     if (m_simConnected != null) {
       return m_simConnected.get();
@@ -450,7 +455,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
   /**
    * Switch to standard SPI mode.
    *
-   * @return
+   * @return True if successful, false otherwise.
    */
   private boolean switchToStandardSPI() {
     // Check to see whether the acquire thread is active. If so, wait for it to stop
@@ -516,7 +521,9 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
   }
 
   /**
-   * @return
+   * Switch to auto SPI mode.
+   *
+   * @return True if successful, false otherwise.
    */
   boolean switchToAutoSPI() {
     // No SPI port has been set up. Go set one up first.
@@ -590,6 +597,9 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
     return 0;
   }
 
+  /**
+   * Configures the decimation rate of the IMU.
+   */
   public int configDecRate(int reg) {
     int m_reg = reg;
     if (!switchToStandardSPI()) {
@@ -597,7 +607,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
       return 2;
     }
     if (m_reg > 1999) {
-      DriverStation.reportError("Attempted to write an invalid deimation value.", false);
+      DriverStation.reportError("Attempted to write an invalid decimation value.", false);
       m_reg = 1999;
     }
     m_scaled_sample_rate = (((m_reg + 1.0) / 2000.0) * 1000000.0);
@@ -964,7 +974,10 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
     return compAngle;
   }
 
-  /** Resets all gyro axis accumulators to 0.0 */
+  /**
+   * Resets the gyro accumulations to a heading of zero. This can be used if
+   * the "zero" orientation of the sensor needs to be changed in runtime.
+   */
   public void reset() {
     synchronized (this) {
       m_integ_angle_x = 0.0;
@@ -1151,56 +1164,56 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
   }
 
   /**
-   * @return Current acceleration in the X axis
+   * Returns the acceleration in the X axis.
    */
   public synchronized double getAccelX() {
     return m_accel_x * 9.81;
   }
 
   /**
-   * @return Current acceleration in the Y axis
+   * Returns the acceleration in the Y axis.
    */
   public synchronized double getAccelY() {
     return m_accel_y * 9.81;
   }
 
   /**
-   * @return Current acceleration in the Z axis
+   * Returns the acceleration in the Z axis.
    */
   public synchronized double getAccelZ() {
     return m_accel_z * 9.81;
   }
 
   /**
-   * @return X-axis complementary angle
+   * Returns the X-axis complementary angle.
    */
   public synchronized double getXComplementaryAngle() {
     return m_compAngleX;
   }
 
   /**
-   * @return Y-axis complementary angle
+   * Returns the Y-axis complementary angle.
    */
   public synchronized double getYComplementaryAngle() {
     return m_compAngleY;
   }
 
   /**
-   * @return X-axis filtered acceleration angle
+   * Returns the X-axis filtered acceleration angle.
    */
   public synchronized double getXFilteredAccelAngle() {
     return m_accelAngleX;
   }
 
   /**
-   * @return Y-axis filtered acceleration angle
+   * Returns the Y-axis filtered acceleration angle.
    */
   public synchronized double getYFilteredAccelAngle() {
     return m_accelAngleY;
   }
 
   /**
-   * Get the SPI port number.
+   * Gets the SPI port number.
    *
    * @return The SPI port number.
    */
