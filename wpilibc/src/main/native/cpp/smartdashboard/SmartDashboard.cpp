@@ -46,6 +46,8 @@ void ResetSmartDashboardInstance() {
 }  // namespace frc::impl
 #endif
 
+static bool gReported = false;
+
 void SmartDashboard::init() {
   GetInstance();
 }
@@ -78,7 +80,9 @@ void SmartDashboard::PutData(std::string_view key, wpi::Sendable* data) {
   if (!data) {
     throw FRC_MakeError(err::NullParameter, "value");
   }
-  HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
+  if (!gReported) {
+    HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
+  }
   auto& inst = GetInstance();
   std::scoped_lock lock(inst.tablesToDataMutex);
   auto& uid = inst.tablesToData[key];
@@ -116,13 +120,20 @@ wpi::Sendable* SmartDashboard::GetData(std::string_view key) {
 }
 
 bool SmartDashboard::PutBoolean(std::string_view keyName, bool value) {
-  HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
+  if (!gReported) {
+    HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
+  }
   return GetInstance().table->GetEntry(keyName).SetBoolean(value);
 }
 
 bool SmartDashboard::SetDefaultBoolean(std::string_view key,
                                        bool defaultValue) {
-  HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
+  if (!gReported) {
+    HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
+  }
+  if (!gReported) {
+    HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
+  }
   return GetInstance().table->GetEntry(key).SetDefaultBoolean(defaultValue);
 }
 
@@ -131,13 +142,17 @@ bool SmartDashboard::GetBoolean(std::string_view keyName, bool defaultValue) {
 }
 
 bool SmartDashboard::PutNumber(std::string_view keyName, double value) {
-  HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
+  if (!gReported) {
+    HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
+  }
   return GetInstance().table->GetEntry(keyName).SetDouble(value);
 }
 
 bool SmartDashboard::SetDefaultNumber(std::string_view key,
                                       double defaultValue) {
-  HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
+  if (!gReported) {
+    HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
+  }
   return GetInstance().table->GetEntry(key).SetDefaultDouble(defaultValue);
 }
 
@@ -148,13 +163,17 @@ double SmartDashboard::GetNumber(std::string_view keyName,
 
 bool SmartDashboard::PutString(std::string_view keyName,
                                std::string_view value) {
-  HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
+  if (!gReported) {
+    HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
+  }
   return GetInstance().table->GetEntry(keyName).SetString(value);
 }
 
 bool SmartDashboard::SetDefaultString(std::string_view key,
                                       std::string_view defaultValue) {
-  HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
+  if (!gReported) {
+    HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
+  }
   return GetInstance().table->GetEntry(key).SetDefaultString(defaultValue);
 }
 
@@ -165,13 +184,17 @@ std::string SmartDashboard::GetString(std::string_view keyName,
 
 bool SmartDashboard::PutBooleanArray(std::string_view key,
                                      std::span<const int> value) {
-  HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
+  if (!gReported) {
+    HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
+  }
   return GetInstance().table->GetEntry(key).SetBooleanArray(value);
 }
 
 bool SmartDashboard::SetDefaultBooleanArray(std::string_view key,
                                             std::span<const int> defaultValue) {
-  HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
+  if (!gReported) {
+    HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
+  }
   return GetInstance().table->GetEntry(key).SetDefaultBooleanArray(
       defaultValue);
 }
@@ -183,13 +206,17 @@ std::vector<int> SmartDashboard::GetBooleanArray(
 
 bool SmartDashboard::PutNumberArray(std::string_view key,
                                     std::span<const double> value) {
-  HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
+  if (!gReported) {
+    HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
+  }
   return GetInstance().table->GetEntry(key).SetDoubleArray(value);
 }
 
 bool SmartDashboard::SetDefaultNumberArray(
     std::string_view key, std::span<const double> defaultValue) {
-  HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
+  if (!gReported) {
+    HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
+  }
   return GetInstance().table->GetEntry(key).SetDefaultDoubleArray(defaultValue);
 }
 
@@ -200,13 +227,17 @@ std::vector<double> SmartDashboard::GetNumberArray(
 
 bool SmartDashboard::PutStringArray(std::string_view key,
                                     std::span<const std::string> value) {
-  HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
+  if (!gReported) {
+    HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
+  }
   return GetInstance().table->GetEntry(key).SetStringArray(value);
 }
 
 bool SmartDashboard::SetDefaultStringArray(
     std::string_view key, std::span<const std::string> defaultValue) {
-  HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
+  if (!gReported) {
+    HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
+  }
   return GetInstance().table->GetEntry(key).SetDefaultStringArray(defaultValue);
 }
 
@@ -217,13 +248,17 @@ std::vector<std::string> SmartDashboard::GetStringArray(
 
 bool SmartDashboard::PutRaw(std::string_view key,
                             std::span<const uint8_t> value) {
-  HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
+  if (!gReported) {
+    HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
+  }
   return GetInstance().table->GetEntry(key).SetRaw(value);
 }
 
 bool SmartDashboard::SetDefaultRaw(std::string_view key,
                                    std::span<const uint8_t> defaultValue) {
-  HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
+  if (!gReported) {
+    HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
+  }
   return GetInstance().table->GetEntry(key).SetDefaultRaw(defaultValue);
 }
 
@@ -234,13 +269,17 @@ std::vector<uint8_t> SmartDashboard::GetRaw(
 
 bool SmartDashboard::PutValue(std::string_view keyName,
                               const nt::Value& value) {
-  HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
+  if (!gReported) {
+    HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
+  }
   return GetInstance().table->GetEntry(keyName).SetValue(value);
 }
 
 bool SmartDashboard::SetDefaultValue(std::string_view key,
                                      const nt::Value& defaultValue) {
-  HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
+  if (!gReported) {
+    HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
+  }
   return GetInstance().table->GetEntry(key).SetDefaultValue(defaultValue);
 }
 

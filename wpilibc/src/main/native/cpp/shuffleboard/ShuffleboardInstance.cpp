@@ -34,8 +34,12 @@ ShuffleboardInstance::ShuffleboardInstance(nt::NetworkTableInstance ntInstance)
 
 ShuffleboardInstance::~ShuffleboardInstance() = default;
 
+static bool gReported = false;
+
 frc::ShuffleboardTab& ShuffleboardInstance::GetTab(std::string_view title) {
-  HAL_Report(HALUsageReporting::kResourceType_Shuffleboard, 0);
+  if (!gReported) {
+    HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
+  }
   if (m_impl->tabs.find(title) == m_impl->tabs.end()) {
     m_impl->tabs.try_emplace(title,
                              std::make_unique<ShuffleboardTab>(*this, title));
