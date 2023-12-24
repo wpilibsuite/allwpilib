@@ -39,13 +39,8 @@ public class ParallelDeadlineGroup extends Command {
    * @throws IllegalArgumentException if the deadline command is also in the otherCommands argument
    */
   public ParallelDeadlineGroup(Command deadline, Command... otherCommands) {
-    m_deadline = deadline;
     addCommands(otherCommands);
-    if (m_commands.containsKey(deadline)) {
-      throw new IllegalArgumentException(
-          "The deadline command cannot also be in the other commands!");
-    }
-    addCommands(deadline);
+    setDeadline(deadline);
   }
 
   /**
@@ -53,11 +48,19 @@ public class ParallelDeadlineGroup extends Command {
    * contained.
    *
    * @param deadline the command that determines when the group ends
+   * @throws IllegalArgumentException if the deadline command is already in the composition
    */
   public void setDeadline(Command deadline) {
-    if (!m_commands.containsKey(deadline)) {
-      addCommands(deadline);
+    @SuppressWarnings("PMD.CompareObjectsWithEquals")
+    boolean isAlreadyDeadline = deadline == m_deadline;
+    if (isAlreadyDeadline) {
+      return;
     }
+    if (m_commands.containsKey(deadline)) {
+      throw new IllegalArgumentException(
+          "The deadline command cannot also be in the other commands!");
+    }
+    addCommands(deadline);
     m_deadline = deadline;
   }
 

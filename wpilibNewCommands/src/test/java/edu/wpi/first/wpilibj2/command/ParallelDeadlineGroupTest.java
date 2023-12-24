@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj2.command;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -122,6 +123,21 @@ class ParallelDeadlineGroupTest extends MultiCompositionTestBase<ParallelDeadlin
 
     assertThrows(
         IllegalArgumentException.class, () -> new ParallelDeadlineGroup(command1, command2));
+  }
+
+  @Test
+  void parallelDeadlineSetDeadlineToDeadlineTest() {
+    Command a = new InstantCommand(() -> {});
+    ParallelDeadlineGroup group = new ParallelDeadlineGroup(a);
+    assertDoesNotThrow(() -> group.setDeadline(a));
+  }
+
+  @Test
+  void parallelDeadlineSetDeadlineDuplicateTest() {
+    Command a = new InstantCommand(() -> {});
+    Command b = new InstantCommand(() -> {});
+    ParallelDeadlineGroup group = new ParallelDeadlineGroup(a, b);
+    assertThrows(IllegalArgumentException.class, () -> group.setDeadline(b));
   }
 
   @Override
