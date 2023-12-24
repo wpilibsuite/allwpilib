@@ -155,18 +155,31 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
     FLASH_CNT
   };
 
+  /** Calibration times for the ADIS16470. */
   public enum CalibrationTime {
+    /** 32ms calibration */
     _32ms(0),
+    /** 64ms calibration */
     _64ms(1),
+    /** 128ms calibration */
     _128ms(2),
+    /** 256ms calibration */
     _256ms(3),
+    /** 512ms calibration */
     _512ms(4),
+    /** 1 second calibration */
     _1s(5),
+    /** 2 second calibration */
     _2s(6),
+    /** 4 second calibration */
     _4s(7),
+    /** 8 second calibration */
     _8s(8),
+    /** 16 second calibration */
     _16s(9),
+    /** 32 second calibration */
     _32s(10),
+    /** 64 second calibration */
     _64s(11);
 
     private final int value;
@@ -176,12 +189,24 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
     }
   }
 
+  /**
+   * IMU axes.
+   *
+   * <p>kX, kY, and kZ refer to the IMU's X, Y, and Z axes respectively. kYaw, kPitch, and kRoll are
+   * configured by the user to refer to an X, Y, or Z axis.
+   */
   public enum IMUAxis {
+    /** The IMU's X axis */
     kX,
+    /** The IMU's Y axis */
     kY,
+    /** The IMU's Z axis */
     kZ,
+    /** The user configured yaw axis */
     kYaw,
+    /** The user configured pitch axis */
     kPitch,
+    /** The user configured roll axis */
     kRoll,
   }
 
@@ -597,7 +622,12 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
     return 0;
   }
 
-  /** Configures the decimation rate of the IMU. */
+  /**
+   * Configures the decimation rate of the IMU.
+   *
+   * @param reg The new decimation value.
+   * @return 0 if OK, 2 if error
+   */
   public int configDecRate(int reg) {
     int m_reg = reg;
     if (!switchToStandardSPI()) {
@@ -1161,37 +1191,51 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
     return m_roll_axis;
   }
 
-  /** Returns the acceleration in the X axis. */
+  /**
+   * @return The acceleration in the X axis
+   */
   public synchronized double getAccelX() {
     return m_accel_x * 9.81;
   }
 
-  /** Returns the acceleration in the Y axis. */
+  /**
+   * @return The acceleration in the Y axis
+   */
   public synchronized double getAccelY() {
     return m_accel_y * 9.81;
   }
 
-  /** Returns the acceleration in the Z axis. */
+  /**
+   * @return The acceleration in the Z axis
+   */
   public synchronized double getAccelZ() {
     return m_accel_z * 9.81;
   }
 
-  /** Returns the X-axis complementary angle. */
+  /**
+   * @return The X-axis complementary angle
+   */
   public synchronized double getXComplementaryAngle() {
     return m_compAngleX;
   }
 
-  /** Returns the Y-axis complementary angle. */
+  /**
+   * @return The Y-axis complementary angle
+   */
   public synchronized double getYComplementaryAngle() {
     return m_compAngleY;
   }
 
-  /** Returns the X-axis filtered acceleration angle. */
+  /**
+   * @return The X-axis filtered acceleration angle
+   */
   public synchronized double getXFilteredAccelAngle() {
     return m_accelAngleX;
   }
 
-  /** Returns the Y-axis filtered acceleration angle. */
+  /**
+   * @return The Y-axis filtered acceleration angle
+   */
   public synchronized double getYFilteredAccelAngle() {
     return m_accelAngleY;
   }
