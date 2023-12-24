@@ -74,7 +74,7 @@ nt::NetworkTableEntry SmartDashboard::GetEntry(std::string_view key) {
   if (!gReported) {
     HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
   }
-  return GetEntry(key);
+  return GetInstance().table->GetEntry(key);
 }
 
 void SmartDashboard::PutData(std::string_view key, wpi::Sendable* data) {
