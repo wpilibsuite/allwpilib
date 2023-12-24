@@ -50,13 +50,6 @@ void SmartDashboard::init() {
   GetInstance();
 }
 
-nt::NetworkTableEntry GetEntry(std::string_view key) {
-  if (!gReported) {
-    HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
-  }
-  return GetInstance().table->GetEntry(key);
-}
-
 bool SmartDashboard::ContainsKey(std::string_view key) {
   return GetInstance().table->ContainsKey(key);
 }
@@ -78,6 +71,9 @@ bool SmartDashboard::IsPersistent(std::string_view key) {
 }
 
 nt::NetworkTableEntry SmartDashboard::GetEntry(std::string_view key) {
+  if (!gReported) {
+    HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
+  }
   return GetEntry(key);
 }
 
