@@ -16,6 +16,7 @@
 #include <string>
 #include <string_view>
 #include <thread>
+#include <tuple>
 #include <utility>
 #include <vector>
 #include <version>
@@ -956,12 +957,13 @@ class StructLogEntry : public DataLogEntry {
   using S = Struct<T, I...>;
 
  public:
-  StructLogEntry() = default;
+  explicit StructLogEntry(const I&... info) : m_info{std::cref(info)...} {}
   StructLogEntry(DataLog& log, std::string_view name, const I&... info,
                  int64_t timestamp = 0)
       : StructLogEntry{log, name, {}, info..., timestamp} {}
   StructLogEntry(DataLog& log, std::string_view name, std::string_view metadata,
-                 const I&... info, int64_t timestamp = 0) {
+                 const I&... info, int64_t timestamp = 0)
+      : m_info{std::cref(info)...} {
     m_log = &log;
     log.AddStructSchema<T, I...>(info..., timestamp);
     m_entry = log.Start(name, S::GetTypeString(info...), metadata, timestamp);
@@ -971,22 +973,25 @@ class StructLogEntry : public DataLogEntry {
    * Appends a record to the log.
    *
    * @param data Data to record
-   * @param info optional struct type info
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
-  void Append(const T& data, const I&... info, int64_t timestamp = 0) {
-    if constexpr (sizeof...(I) == 0 &&
-                  wpi::is_constexpr([&] { S::GetSize(info...); })) {
-      uint8_t buf[S::GetSize(info...)];
-      S::Pack(buf, data);
-      m_log->AppendRaw(m_entry, buf, timestamp);
-    } else {
-      wpi::SmallVector<uint8_t, 128> buf;
-      buf.resize_for_overwrite(S::GetSize(info...));
-      S::Pack(buf, data, info...);
-      m_log->AppendRaw(m_entry, buf, timestamp);
+  void Append(const T& data, int64_t timestamp = 0) {
+    if constexpr (sizeof...(I) == 0) {
+      if constexpr (wpi::is_constexpr([] { S::GetSize(); })) {
+        uint8_t buf[S::GetSize()];
+        S::Pack(buf, data);
+        m_log->AppendRaw(m_entry, buf, timestamp);
+        return;
+      }
     }
+    wpi::SmallVector<uint8_t, 128> buf;
+    buf.resize_for_overwrite(std::apply(S::GetSize, m_info));
+    std::apply([&](const I&... info) { S::Pack(buf, data, info...); }, m_info);
+    m_log->AppendRaw(m_entry, buf, timestamp);
   }
+
+ private:
+  [[no_unique_address]] std::tuple<const I&...> m_info;
 };
 
 /**
@@ -998,13 +1003,14 @@ class StructArrayLogEntry : public DataLogEntry {
   using S = Struct<T, I...>;
 
  public:
-  StructArrayLogEntry() = default;
+  explicit StructArrayLogEntry(const I&... info) : m_info{std::cref(info)...} {}
   StructArrayLogEntry(DataLog& log, std::string_view name, const I&... info,
                       int64_t timestamp = 0)
       : StructArrayLogEntry{log, name, {}, info..., timestamp} {}
   StructArrayLogEntry(DataLog& log, std::string_view name,
                       std::string_view metadata, const I&... info,
-                      int64_t timestamp = 0) {
+                      int64_t timestamp = 0)
+      : m_info{std::cref(info)...} {
     m_log = &log;
     log.AddStructSchema<T, I...>(info..., timestamp);
     m_entry = log.Start(
@@ -1016,7 +1022,6 @@ class StructArrayLogEntry : public DataLogEntry {
    * Appends a record to the log.
    *
    * @param data Data to record
-   * @param info optional struct type info
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
   template <typename U>
@@ -1024,29 +1029,37 @@ class StructArrayLogEntry : public DataLogEntry {
     requires std::ranges::range<U> &&
              std::convertible_to<std::ranges::range_value_t<U>, T>
 #endif
-  void Append(U&& data, const I&... info, int64_t timestamp = 0) {
-    m_buf.Write(
-        std::forward<U>(data),
-        [&](auto bytes) { m_log->AppendRaw(m_entry, bytes, timestamp); },
-        info...);
+  void Append(U&& data, int64_t timestamp = 0) {
+    std::apply(
+        [&](const I&... info) {
+          m_buf.Write(
+              std::forward<U>(data),
+              [&](auto bytes) { m_log->AppendRaw(m_entry, bytes, timestamp); },
+              info...);
+        },
+        m_info);
   }
 
   /**
    * Appends a record to the log.
    *
    * @param data Data to record
-   * @param info optional struct type info
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
-  void Append(std::span<const T> data, const I&... info,
-              int64_t timestamp = 0) {
-    m_buf.Write(
-        data, [&](auto bytes) { m_log->AppendRaw(m_entry, bytes, timestamp); },
-        info...);
+  void Append(std::span<const T> data, int64_t timestamp = 0) {
+    std::apply(
+        [&](const I&... info) {
+          m_buf.Write(
+              data,
+              [&](auto bytes) { m_log->AppendRaw(m_entry, bytes, timestamp); },
+              info...);
+        },
+        m_info);
   }
 
  private:
   StructArrayBuffer<T, I...> m_buf;
+  [[no_unique_address]] std::tuple<const I&...> m_info;
 };
 
 /**

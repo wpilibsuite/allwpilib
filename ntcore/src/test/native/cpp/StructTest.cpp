@@ -391,20 +391,20 @@ TEST_F(StructTest, StructFixedArrayA) {
 TEST_F(StructTest, StructB) {
   Info1 info;
   nt::StructTopic<ThingB, Info1> topic =
-      inst.GetStructTopic<ThingB, Info1>("b");
-  nt::StructPublisher<ThingB, Info1> pub = topic.Publish(info);
-  nt::StructPublisher<ThingB, Info1> pub2 = topic.PublishEx({{}}, info);
-  nt::StructSubscriber<ThingB, Info1> sub = topic.Subscribe({}, info);
-  nt::StructEntry<ThingB, Info1> entry = topic.GetEntry({}, info);
-  pub.SetDefault({}, info);
-  pub.Set({}, info, 5);
-  sub.Get(info);
-  sub.Get({}, info);
-  sub.GetAtomic(info);
-  sub.GetAtomic({}, info);
-  entry.SetDefault({}, info);
-  entry.Set({}, info, 6);
-  entry.Get({}, info);
+      inst.GetStructTopic<ThingB, Info1>("b", info);
+  nt::StructPublisher<ThingB, Info1> pub = topic.Publish();
+  nt::StructPublisher<ThingB, Info1> pub2 = topic.PublishEx({{}});
+  nt::StructSubscriber<ThingB, Info1> sub = topic.Subscribe({});
+  nt::StructEntry<ThingB, Info1> entry = topic.GetEntry({});
+  pub.SetDefault({});
+  pub.Set({}, 5);
+  sub.Get();
+  sub.Get({});
+  sub.GetAtomic();
+  sub.GetAtomic({});
+  entry.SetDefault({});
+  entry.Set({}, 6);
+  entry.Get({});
 }
 
 TEST_F(StructTest, StructArrayB) {
@@ -429,24 +429,24 @@ TEST_F(StructTest, StructArrayB) {
 TEST_F(StructTest, StructFixedArrayB) {
   Info1 info;
   nt::StructTopic<std::array<ThingB, 2>, Info1> topic =
-      inst.GetStructTopic<std::array<ThingB, 2>, Info1>("b");
-  nt::StructPublisher<std::array<ThingB, 2>, Info1> pub = topic.Publish(info);
+      inst.GetStructTopic<std::array<ThingB, 2>, Info1>("b", info);
+  nt::StructPublisher<std::array<ThingB, 2>, Info1> pub = topic.Publish();
   nt::StructPublisher<std::array<ThingB, 2>, Info1> pub2 =
-      topic.PublishEx({{}}, info);
+      topic.PublishEx({{}});
   nt::StructSubscriber<std::array<ThingB, 2>, Info1> sub =
-      topic.Subscribe({}, info);
+      topic.Subscribe({});
   nt::StructEntry<std::array<ThingB, 2>, Info1> entry =
-      topic.GetEntry({}, info);
+      topic.GetEntry({});
   std::array<ThingB, 2> arr;
-  pub.SetDefault(arr, info);
-  pub.Set(arr, info, 5);
-  sub.Get(info);
-  sub.Get(arr, info);
-  sub.GetAtomic(info);
-  sub.GetAtomic(arr, info);
-  entry.SetDefault(arr, info);
-  entry.Set(arr, info, 6);
-  entry.Get(arr, info);
+  pub.SetDefault(arr);
+  pub.Set(arr, 5);
+  sub.Get();
+  sub.Get(arr);
+  sub.GetAtomic();
+  sub.GetAtomic(arr);
+  entry.SetDefault(arr);
+  entry.Set(arr, 6);
+  entry.Get(arr);
 }
 
 }  // namespace nt

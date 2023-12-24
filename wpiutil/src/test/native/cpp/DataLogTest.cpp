@@ -131,6 +131,7 @@ TEST(DataLogTest, SimpleInt) {
 
 TEST(DataLogTest, StructA) {
   wpi::log::DataLog log{[](auto) {}};
+  [[maybe_unused]] wpi::log::StructLogEntry<ThingA> entry0;
   wpi::log::StructLogEntry<ThingA> entry{log, "a", 5};
   entry.Append(ThingA{});
   entry.Append(ThingA{}, 7);
@@ -138,6 +139,7 @@ TEST(DataLogTest, StructA) {
 
 TEST(DataLogTest, StructArrayA) {
   wpi::log::DataLog log{[](auto) {}};
+  [[maybe_unused]] wpi::log::StructArrayLogEntry<ThingA> entry0;
   wpi::log::StructArrayLogEntry<ThingA> entry{log, "a", 5};
   entry.Append({{ThingA{}, ThingA{}}});
   entry.Append({{ThingA{}, ThingA{}}}, 7);
@@ -145,6 +147,7 @@ TEST(DataLogTest, StructArrayA) {
 
 TEST(DataLogTest, StructFixedArrayA) {
   wpi::log::DataLog log{[](auto) {}};
+  [[maybe_unused]] wpi::log::StructArrayLogEntry<std::array<ThingA, 2>> entry0;
   wpi::log::StructLogEntry<std::array<ThingA, 2>> entry{log, "a", 5};
   std::array<ThingA, 2> arr;
   entry.Append(arr);
@@ -154,17 +157,19 @@ TEST(DataLogTest, StructFixedArrayA) {
 TEST(DataLogTest, StructB) {
   wpi::log::DataLog log{[](auto) {}};
   Info1 info;
+  [[maybe_unused]] wpi::log::StructLogEntry<ThingB, Info1> entry0{info};
   wpi::log::StructLogEntry<ThingB, Info1> entry{log, "b", info, 5};
-  entry.Append(ThingB{}, info);
-  entry.Append(ThingB{}, info, 7);
+  entry.Append(ThingB{});
+  entry.Append(ThingB{}, 7);
 }
 
 TEST(DataLogTest, StructArrayB) {
   wpi::log::DataLog log{[](auto) {}};
   Info1 info;
+  [[maybe_unused]] wpi::log::StructArrayLogEntry<ThingB, Info1> entry0{info};
   wpi::log::StructArrayLogEntry<ThingB, Info1> entry{log, "a", info, 5};
-  entry.Append({{ThingB{}, ThingB{}}}, info);
-  entry.Append({{ThingB{}, ThingB{}}}, info, 7);
+  entry.Append({{ThingB{}, ThingB{}}});
+  entry.Append({{ThingB{}, ThingB{}}}, 7);
 }
 
 TEST(DataLogTest, StructFixedArrayB) {
@@ -173,8 +178,8 @@ TEST(DataLogTest, StructFixedArrayB) {
   wpi::log::StructLogEntry<std::array<ThingB, 2>, Info1> entry{log, "a", info,
                                                                5};
   std::array<ThingB, 2> arr;
-  entry.Append(arr, info);
-  entry.Append(arr, info, 7);
+  entry.Append(arr);
+  entry.Append(arr, 7);
 }
 
 TEST(DataLogTest, StructC) {
@@ -187,14 +192,14 @@ TEST(DataLogTest, StructC) {
   {
     Info1 info;
     wpi::log::StructLogEntry<ThingC, Info1> entry{log, "c1", info, 5};
-    entry.Append(ThingC{}, info);
-    entry.Append(ThingC{}, info, 7);
+    entry.Append(ThingC{});
+    entry.Append(ThingC{}, 7);
   }
   {
     Info2 info;
     wpi::log::StructLogEntry<ThingC, Info2> entry{log, "c2", info, 5};
-    entry.Append(ThingC{}, info);
-    entry.Append(ThingC{}, info, 7);
+    entry.Append(ThingC{});
+    entry.Append(ThingC{}, 7);
   }
 }
 
@@ -208,14 +213,14 @@ TEST(DataLogTest, StructArrayC) {
   {
     Info1 info;
     wpi::log::StructArrayLogEntry<ThingC, Info1> entry{log, "c1", info, 5};
-    entry.Append({{ThingC{}, ThingC{}}}, info);
-    entry.Append({{ThingC{}, ThingC{}}}, info, 7);
+    entry.Append({{ThingC{}, ThingC{}}});
+    entry.Append({{ThingC{}, ThingC{}}}, 7);
   }
   {
     Info2 info;
     wpi::log::StructArrayLogEntry<ThingC, Info2> entry{log, "c2", info, 5};
-    entry.Append({{ThingC{}, ThingC{}}}, info);
-    entry.Append({{ThingC{}, ThingC{}}}, info, 7);
+    entry.Append({{ThingC{}, ThingC{}}});
+    entry.Append({{ThingC{}, ThingC{}}}, 7);
   }
 }
 
@@ -231,14 +236,14 @@ TEST(DataLogTest, StructFixedArrayC) {
     Info1 info;
     wpi::log::StructLogEntry<std::array<ThingC, 2>, Info1> entry{log, "c1",
                                                                  info, 5};
-    entry.Append(arr, info);
-    entry.Append(arr, info, 7);
+    entry.Append(arr);
+    entry.Append(arr, 7);
   }
   {
     Info2 info;
     wpi::log::StructLogEntry<std::array<ThingC, 2>, Info2> entry{log, "c2",
                                                                  info, 5};
-    entry.Append(arr, info);
-    entry.Append(arr, info, 7);
+    entry.Append(arr);
+    entry.Append(arr, 7);
   }
 }
