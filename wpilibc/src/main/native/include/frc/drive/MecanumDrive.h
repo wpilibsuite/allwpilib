@@ -83,7 +83,6 @@ class MecanumDrive : public RobotDriveBase,
    * @param frontRightMotor Front-right motor.
    * @param rearRightMotor Rear-right motor.
    */
-  WPI_DEPRECATED("Use MecanumDrive constructor with function arguments.")
   MecanumDrive(MotorController& frontLeftMotor, MotorController& rearLeftMotor,
                MotorController& frontRightMotor,
                MotorController& rearRightMotor);
