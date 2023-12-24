@@ -12,12 +12,15 @@ import edu.wpi.first.math.WPIMathJNI;
 import edu.wpi.first.math.geometry.proto.Pose3dProto;
 import edu.wpi.first.math.geometry.struct.Pose3dStruct;
 import edu.wpi.first.math.interpolation.Interpolatable;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
 
 /** Represents a 3D pose containing translational and rotational elements. */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
-public class Pose3d implements Interpolatable<Pose3d> {
+public class Pose3d
+    implements Interpolatable<Pose3d>, ProtobufSerializable<Pose3d>, StructSerializable<Pose3d> {
   private final Translation3d m_translation;
   private final Rotation3d m_rotation;
 

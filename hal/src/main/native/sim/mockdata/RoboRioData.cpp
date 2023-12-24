@@ -136,6 +136,7 @@ DEFINE_CAPI(int32_t, UserFaults3V3, userFaults3V3)
 DEFINE_CAPI(double, BrownoutVoltage, brownoutVoltage)
 DEFINE_CAPI(double, CPUTemp, cpuTemp)
 DEFINE_CAPI(int32_t, TeamNumber, teamNumber)
+DEFINE_CAPI(HAL_RadioLEDState, RadioLEDState, radioLedState)
 
 int32_t HALSIM_RegisterRoboRioSerialNumberCallback(
     HAL_RoboRioStringCallback callback, void* param, HAL_Bool initialNotify) {
@@ -192,5 +193,6 @@ void HALSIM_RegisterRoboRioAllCallbacks(HAL_NotifyCallback callback,
   REGISTER(userFaults3V3);
   REGISTER(brownoutVoltage);
   REGISTER(cpuTemp);
+  REGISTER(radioLedState);
 }
 }  // extern "C"

@@ -486,12 +486,12 @@ class DataLog final {
   mutable wpi::mutex m_mutex;
   wpi::condition_variable m_cond;
   bool m_doFlush{false};
+  bool m_shutdown{false};
   enum State {
     kStart,
     kActive,
     kPaused,
     kStopped,
-    kShutdown,
   } m_state = kActive;
   double m_period;
   std::string m_extraHeader;

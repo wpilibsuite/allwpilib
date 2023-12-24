@@ -12,8 +12,7 @@ import static org.mockito.Mockito.verify;
 
 import org.junit.jupiter.api.Test;
 
-class SequentialCommandGroupTest extends CommandTestBase
-    implements MultiCompositionTestBase<SequentialCommandGroup> {
+class SequentialCommandGroupTest extends MultiCompositionTestBase<SequentialCommandGroup> {
   @Test
   void sequentialGroupScheduleTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {

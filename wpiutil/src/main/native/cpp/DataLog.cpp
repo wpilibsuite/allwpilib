@@ -179,7 +179,7 @@ DataLog::DataLog(wpi::Logger& msglog,
 DataLog::~DataLog() {
   {
     std::scoped_lock lock{m_mutex};
-    m_state = kShutdown;
+    m_shutdown = true;
     m_doFlush = true;
   }
   m_cond.notify_all();
@@ -419,7 +419,7 @@ void DataLog::WriterThreadMain(std::string_view dir) {
   uintmax_t written = 0;
 
   std::unique_lock lock{m_mutex};
-  while (m_state != kShutdown) {
+  do {
     bool doFlush = false;
     auto timeoutTime = std::chrono::steady_clock::now() + periodTime;
     if (m_cond.wait_until(lock, timeoutTime) == std::cv_status::timeout) {
@@ -557,7 +557,7 @@ void DataLog::WriterThreadMain(std::string_view dir) {
       }
       toWrite.resize(0);
     }
-  }
+  } while (!m_shutdown);
 }
 
 void DataLog::WriterThreadMain(
@@ -580,7 +580,7 @@ void DataLog::WriterThreadMain(
   std::vector<Buffer> toWrite;
 
   std::unique_lock lock{m_mutex};
-  while (m_state != kShutdown) {
+  do {
     bool doFlush = false;
     auto timeoutTime = std::chrono::steady_clock::now() + periodTime;
     if (m_cond.wait_until(lock, timeoutTime) == std::cv_status::timeout) {
@@ -614,7 +614,7 @@ void DataLog::WriterThreadMain(
       }
       toWrite.resize(0);
     }
-  }
+  } while (!m_shutdown);
 
   write({});  // indicate EOF
 }
@@ -743,8 +743,10 @@ void DataLog::AppendImpl(std::span<const uint8_t> data) {
     std::memcpy(buf, data.data(), kBlockSize);
     data = data.subspan(kBlockSize);
   }
-  uint8_t* buf = Reserve(data.size());
-  std::memcpy(buf, data.data(), data.size());
+  if (!data.empty()) {
+    uint8_t* buf = Reserve(data.size());
+    std::memcpy(buf, data.data(), data.size());
+  }
 }
 
 void DataLog::AppendStringImpl(std::string_view str) {

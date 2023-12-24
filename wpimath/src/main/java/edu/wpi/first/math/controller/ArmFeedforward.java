@@ -6,12 +6,15 @@ package edu.wpi.first.math.controller;
 
 import edu.wpi.first.math.controller.proto.ArmFeedforwardProto;
 import edu.wpi.first.math.controller.struct.ArmFeedforwardStruct;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.StructSerializable;
 
 /**
  * A helper class that computes feedforward outputs for a simple arm (modeled as a motor acting
  * against the force of gravity on a beam suspended at an angle).
  */
-public class ArmFeedforward {
+public class ArmFeedforward
+    implements ProtobufSerializable<ArmFeedforward>, StructSerializable<ArmFeedforward> {
   public final double ks;
   public final double kg;
   public final double kv;
@@ -28,12 +31,20 @@ public class ArmFeedforward {
    * @param kg The gravity gain.
    * @param kv The velocity gain.
    * @param ka The acceleration gain.
+   * @throws IllegalArgumentException for kv &lt; zero.
+   * @throws IllegalArgumentException for ka &lt; zero.
    */
   public ArmFeedforward(double ks, double kg, double kv, double ka) {
     this.ks = ks;
     this.kg = kg;
     this.kv = kv;
     this.ka = ka;
+    if (kv < 0.0) {
+      throw new IllegalArgumentException("kv must be a non-negative number, got " + kv + "!");
+    }
+    if (ka < 0.0) {
+      throw new IllegalArgumentException("ka must be a non-negative number, got " + kv + "!");
+    }
   }
 
   /**

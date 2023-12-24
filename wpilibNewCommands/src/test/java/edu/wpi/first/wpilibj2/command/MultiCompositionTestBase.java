@@ -13,11 +13,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-interface MultiCompositionTestBase<T extends Command> extends SingleCompositionTestBase<T> {
-  T compose(Command... members);
+abstract class MultiCompositionTestBase<T extends Command> extends SingleCompositionTestBase<T> {
+  abstract T compose(Command... members);
 
   @Override
-  default T composeSingle(Command member) {
+  T composeSingle(Command member) {
     return compose(member);
   }
 
@@ -63,7 +63,7 @@ interface MultiCompositionTestBase<T extends Command> extends SingleCompositionT
 
   @MethodSource
   @ParameterizedTest(name = "interruptible[{index}]: {0}")
-  default void interruptible(
+  void interruptible(
       @SuppressWarnings("unused") String name,
       InterruptionBehavior expected,
       Command command1,
@@ -103,7 +103,7 @@ interface MultiCompositionTestBase<T extends Command> extends SingleCompositionT
 
   @MethodSource
   @ParameterizedTest(name = "runsWhenDisabled[{index}]: {0}")
-  default void runsWhenDisabled(
+  void runsWhenDisabled(
       @SuppressWarnings("unused") String name,
       boolean expected,
       Command command1,

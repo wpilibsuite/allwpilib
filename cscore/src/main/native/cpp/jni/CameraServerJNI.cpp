@@ -42,7 +42,8 @@ static JNIEnv* listenerEnv = nullptr;
 static const JClassInit classes[] = {
     {"edu/wpi/first/cscore/UsbCameraInfo", &usbCameraInfoCls},
     {"edu/wpi/first/cscore/VideoMode", &videoModeCls},
-    {"edu/wpi/first/cscore/VideoEvent", &videoEventCls}};
+    {"edu/wpi/first/cscore/VideoEvent", &videoEventCls},
+    {"edu/wpi/first/util/RawFrame", &rawFrameCls}};
 
 static const JExceptionInit exceptions[] = {
     {"edu/wpi/first/cscore/VideoException", &videoEx},

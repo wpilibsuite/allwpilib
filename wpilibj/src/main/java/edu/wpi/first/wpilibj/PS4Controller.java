@@ -4,6 +4,8 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.event.BooleanEvent;
 import edu.wpi.first.wpilibj.event.EventLoop;
 
@@ -23,8 +25,7 @@ public class PS4Controller extends GenericHID {
   public PS4Controller(int port) {
     super(port);
 
-    // re-enable when PS4Controller is added to Usage Reporting
-    // HAL.report(tResourceType.kResourceType_PS4Controller, port + 1); /
+    HAL.report(tResourceType.kResourceType_PS4Controller, port + 1);
   }
 
   /** Represents a digital button on a PS4Controller. */

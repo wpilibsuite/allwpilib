@@ -985,6 +985,57 @@ Java_edu_wpi_first_hal_simulation_RoboRioDataJNI_setComments
 
 /*
  * Class:     edu_wpi_first_hal_simulation_RoboRioDataJNI
+ * Method:    registerRadioLEDStateCallback
+ * Signature: (Ljava/lang/Object;Z)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_simulation_RoboRioDataJNI_registerRadioLEDStateCallback
+  (JNIEnv* env, jclass, jobject callback, jboolean initialNotify)
+{
+  return sim::AllocateCallbackNoIndex(
+      env, callback, initialNotify,
+      &HALSIM_RegisterRoboRioRadioLEDStateCallback);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_RoboRioDataJNI
+ * Method:    cancelRadioLEDStateCallback
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_RoboRioDataJNI_cancelRadioLEDStateCallback
+  (JNIEnv* env, jclass, jint handle)
+{
+  return sim::FreeCallbackNoIndex(env, handle,
+                                  &HALSIM_CancelRoboRioRadioLEDStateCallback);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_RoboRioDataJNI
+ * Method:    getRadioLEDState
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_simulation_RoboRioDataJNI_getRadioLEDState
+  (JNIEnv*, jclass)
+{
+  return HALSIM_GetRoboRioRadioLEDState();
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_RoboRioDataJNI
+ * Method:    setRadioLEDState
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_RoboRioDataJNI_setRadioLEDState
+  (JNIEnv*, jclass, jint value)
+{
+  HALSIM_SetRoboRioRadioLEDState(static_cast<HAL_RadioLEDState>(value));
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_RoboRioDataJNI
  * Method:    resetData
  * Signature: ()V
  */

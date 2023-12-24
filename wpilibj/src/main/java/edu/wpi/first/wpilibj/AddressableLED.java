@@ -14,7 +14,8 @@ import edu.wpi.first.hal.PWMJNI;
  *
  * <p>By default, the timing supports WS2812B LEDs, but is configurable using setBitTiming()
  *
- * <p>Only 1 LED driver is currently supported by the roboRIO.
+ * <p>Only 1 LED driver is currently supported by the roboRIO. However, multiple LED strips can be
+ * connected in series and controlled from the single driver.
  */
 public class AddressableLED implements AutoCloseable {
   private final int m_pwmHandle;

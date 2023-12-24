@@ -7,9 +7,11 @@ package edu.wpi.first.math.system.plant;
 import edu.wpi.first.math.system.plant.proto.DCMotorProto;
 import edu.wpi.first.math.system.plant.struct.DCMotorStruct;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.StructSerializable;
 
 /** Holds the constants for a DC motor. */
-public class DCMotor {
+public class DCMotor implements ProtobufSerializable<DCMotor>, StructSerializable<DCMotor> {
   public final double nominalVoltageVolts;
   public final double stallTorqueNewtonMeters;
   public final double stallCurrentAmps;
