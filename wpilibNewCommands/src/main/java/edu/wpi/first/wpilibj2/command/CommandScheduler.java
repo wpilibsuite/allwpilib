@@ -589,7 +589,10 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
     try {
       commandSet = Set.of(commands);
     } catch (IllegalArgumentException e) {
-      throw new IllegalArgumentException("Cannot compose a command twice in the same composition!");
+      throw new IllegalArgumentException(
+          "Cannot compose a command twice in the same composition! (Original exception: "
+              + e
+              + ")");
     }
     requireNotComposedOrScheduled(commandSet);
     var exception = new Exception("Originally composed at:");
