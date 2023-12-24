@@ -316,7 +316,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
         || roll_axis == IMUAxis.kPitch
         || roll_axis == IMUAxis.kRoll) {
       DriverStation.reportError(
-          "ADIS16740 constructor only allows IMUAxis.kX, IMUAxis.kY or IMUAxis.kZ as arguments.",
+          "ADIS16470 constructor only allows IMUAxis.kX, IMUAxis.kY or IMUAxis.kZ as arguments.",
           false);
       DriverStation.reportError(
           "Constructing ADIS with default axes. (IMUAxis.kZ is defined as Yaw)", false);
