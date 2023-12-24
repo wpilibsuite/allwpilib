@@ -1,5 +1,5 @@
 # Simulation Extensions
-This is where WPILib's simulation extensions are housed. Simulation extensions are referred to by a few names: simulation plugins, sim extensions, HALSIM extensions, but they all refer to the same thing, which are dynamically loaded libraries that can use HALSIM functions to register callbacks that update HAL data. The robot program loads simulation extensions by looking for the `HALSIM_EXTENSIONS` environment variable which contains colon separated paths to the libraries.
+This is where WPILib's simulation extensions are housed. Simulation extensions are referred to by various names: simulation plugins, simulation modules, sim extensions, HALSIM extensions, but they all refer to the same thing, which are dynamically loaded libraries that can use HALSIM functions to register callbacks that update HAL data. The robot program loads simulation extensions by looking for the `HALSIM_EXTENSIONS` environment variable which contains colon separated paths to the libraries.
 
 # Writing a custom simulation extension
 All simulation extensions contain a `int HALSIM_InitExtension(void)` function, which is the entry point. The function declaration should look like this:
@@ -14,7 +14,7 @@ int HALSIM_InitExtension(void) {
 }
 ```
 
-The function is contained with an `extern "C"` block so it can be called by the robot program and has `__delspec(dllexport)` for Windows. From here, you can interface with the HAL to provide data.
+The function is contained with an `extern "C"` block so it can be called by the robot program and has `__declspec(dllexport)` for Windows. From here, you can interface with the HAL to provide data.
 
 ## Using HALSIM functions
 Several devices in the HAL have functions that allow you to feed data from an external source into the HAL. The full list can be found in the HAL subdirectory in `include/hal/simulation`. For example, the AccelerometerData header declares functions that update the X, Y, and Z axes with data. Some functions accept callbacks; the I2CData header declares functions which accept other functions with parameters that allow it to accept data. This allows the implementation of a simulation extension that interfaces with an I2C bus and connects it to the HAL, allowing the use of real I2C hardware in simulation.
