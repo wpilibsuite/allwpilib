@@ -597,9 +597,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
     return 0;
   }
 
-  /**
-   * Configures the decimation rate of the IMU.
-   */
+  /** Configures the decimation rate of the IMU. */
   public int configDecRate(int reg) {
     int m_reg = reg;
     if (!switchToStandardSPI()) {
@@ -975,8 +973,8 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
   }
 
   /**
-   * Resets the gyro accumulations to a heading of zero. This can be used if
-   * the "zero" orientation of the sensor needs to be changed in runtime.
+   * Resets the gyro accumulations to a heading of zero. This can be used if the "zero" orientation
+   * of the sensor needs to be changed in runtime.
    */
   public void reset() {
     synchronized (this) {
@@ -1163,51 +1161,37 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
     return m_roll_axis;
   }
 
-  /**
-   * Returns the acceleration in the X axis.
-   */
+  /** Returns the acceleration in the X axis. */
   public synchronized double getAccelX() {
     return m_accel_x * 9.81;
   }
 
-  /**
-   * Returns the acceleration in the Y axis.
-   */
+  /** Returns the acceleration in the Y axis. */
   public synchronized double getAccelY() {
     return m_accel_y * 9.81;
   }
 
-  /**
-   * Returns the acceleration in the Z axis.
-   */
+  /** Returns the acceleration in the Z axis. */
   public synchronized double getAccelZ() {
     return m_accel_z * 9.81;
   }
 
-  /**
-   * Returns the X-axis complementary angle.
-   */
+  /** Returns the X-axis complementary angle. */
   public synchronized double getXComplementaryAngle() {
     return m_compAngleX;
   }
 
-  /**
-   * Returns the Y-axis complementary angle.
-   */
+  /** Returns the Y-axis complementary angle. */
   public synchronized double getYComplementaryAngle() {
     return m_compAngleY;
   }
 
-  /**
-   * Returns the X-axis filtered acceleration angle.
-   */
+  /** Returns the X-axis filtered acceleration angle. */
   public synchronized double getXFilteredAccelAngle() {
     return m_accelAngleX;
   }
 
-  /**
-   * Returns the Y-axis filtered acceleration angle.
-   */
+  /** Returns the Y-axis filtered acceleration angle. */
   public synchronized double getYFilteredAccelAngle() {
     return m_accelAngleY;
   }
