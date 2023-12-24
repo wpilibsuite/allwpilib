@@ -50,7 +50,6 @@ void SmartDashboard::init() {
   GetInstance();
 }
 
-
 nt::NetworkTableEntry GetEntry(std::string_view name) {
   if (!gReported) {
     HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
@@ -174,8 +173,7 @@ bool SmartDashboard::PutBooleanArray(std::string_view key,
 
 bool SmartDashboard::SetDefaultBooleanArray(std::string_view key,
                                             std::span<const int> defaultValue) {
-  return GetEntry(key).SetDefaultBooleanArray(
-      defaultValue);
+  return GetEntry(key).SetDefaultBooleanArray(defaultValue);
 }
 
 std::vector<int> SmartDashboard::GetBooleanArray(
