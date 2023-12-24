@@ -92,10 +92,6 @@ final class ShuffleboardInstance implements ShuffleboardRoot {
    * @param func the function to apply to all complex widgets
    */
   private void applyToAllComplexWidgets(Consumer<ComplexWidget> func) {
-    if (!m_reported) {
-      HAL.report(tResourceType.kResourceType_Shuffleboard, 0);
-      m_reported = true;
-    }
     for (ShuffleboardTab tab : m_tabs.values()) {
       apply(tab, func);
     }

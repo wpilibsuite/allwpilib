@@ -19,8 +19,6 @@ using namespace frc;
 
 namespace {
 struct Instance {
-  Instance() {}
-
   detail::ListenerExecutor listenerExecutor;
   std::shared_ptr<nt::NetworkTable> table =
       nt::NetworkTableInstance::GetDefault().GetTable("SmartDashboard");
@@ -52,6 +50,14 @@ void SmartDashboard::init() {
   GetInstance();
 }
 
+
+nt::NetworkTableEntry GetEntry(std::string_view name) {
+  if (!gReported) {
+    HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
+  }
+  return GetInstance().table->GetEntry(key);
+}
+
 bool SmartDashboard::ContainsKey(std::string_view key) {
   return GetInstance().table->ContainsKey(key);
 }
@@ -61,19 +67,19 @@ std::vector<std::string> SmartDashboard::GetKeys(int types) {
 }
 
 void SmartDashboard::SetPersistent(std::string_view key) {
-  GetInstance().table->GetEntry(key).SetPersistent();
+  GetEntry(key).SetPersistent();
 }
 
 void SmartDashboard::ClearPersistent(std::string_view key) {
-  GetInstance().table->GetEntry(key).ClearPersistent();
+  GetEntry(key).ClearPersistent();
 }
 
 bool SmartDashboard::IsPersistent(std::string_view key) {
-  return GetInstance().table->GetEntry(key).IsPersistent();
+  return GetEntry(key).IsPersistent();
 }
 
 nt::NetworkTableEntry SmartDashboard::GetEntry(std::string_view key) {
-  return GetInstance().table->GetEntry(key);
+  return GetEntry(key);
 }
 
 void SmartDashboard::PutData(std::string_view key, wpi::Sendable* data) {
@@ -120,21 +126,12 @@ wpi::Sendable* SmartDashboard::GetData(std::string_view key) {
 }
 
 bool SmartDashboard::PutBoolean(std::string_view keyName, bool value) {
-  if (!gReported) {
-    HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
-  }
   return GetInstance().table->GetEntry(keyName).SetBoolean(value);
 }
 
 bool SmartDashboard::SetDefaultBoolean(std::string_view key,
                                        bool defaultValue) {
-  if (!gReported) {
-    HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
-  }
-  if (!gReported) {
-    HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
-  }
-  return GetInstance().table->GetEntry(key).SetDefaultBoolean(defaultValue);
+  return GetEntry(key).SetDefaultBoolean(defaultValue);
 }
 
 bool SmartDashboard::GetBoolean(std::string_view keyName, bool defaultValue) {
@@ -142,18 +139,12 @@ bool SmartDashboard::GetBoolean(std::string_view keyName, bool defaultValue) {
 }
 
 bool SmartDashboard::PutNumber(std::string_view keyName, double value) {
-  if (!gReported) {
-    HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
-  }
   return GetInstance().table->GetEntry(keyName).SetDouble(value);
 }
 
 bool SmartDashboard::SetDefaultNumber(std::string_view key,
                                       double defaultValue) {
-  if (!gReported) {
-    HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
-  }
-  return GetInstance().table->GetEntry(key).SetDefaultDouble(defaultValue);
+  return GetEntry(key).SetDefaultDouble(defaultValue);
 }
 
 double SmartDashboard::GetNumber(std::string_view keyName,
@@ -163,18 +154,12 @@ double SmartDashboard::GetNumber(std::string_view keyName,
 
 bool SmartDashboard::PutString(std::string_view keyName,
                                std::string_view value) {
-  if (!gReported) {
-    HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
-  }
   return GetInstance().table->GetEntry(keyName).SetString(value);
 }
 
 bool SmartDashboard::SetDefaultString(std::string_view key,
                                       std::string_view defaultValue) {
-  if (!gReported) {
-    HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
-  }
-  return GetInstance().table->GetEntry(key).SetDefaultString(defaultValue);
+  return GetEntry(key).SetDefaultString(defaultValue);
 }
 
 std::string SmartDashboard::GetString(std::string_view keyName,
@@ -184,103 +169,73 @@ std::string SmartDashboard::GetString(std::string_view keyName,
 
 bool SmartDashboard::PutBooleanArray(std::string_view key,
                                      std::span<const int> value) {
-  if (!gReported) {
-    HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
-  }
-  return GetInstance().table->GetEntry(key).SetBooleanArray(value);
+  return GetEntry(key).SetBooleanArray(value);
 }
 
 bool SmartDashboard::SetDefaultBooleanArray(std::string_view key,
                                             std::span<const int> defaultValue) {
-  if (!gReported) {
-    HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
-  }
-  return GetInstance().table->GetEntry(key).SetDefaultBooleanArray(
+  return GetEntry(key).SetDefaultBooleanArray(
       defaultValue);
 }
 
 std::vector<int> SmartDashboard::GetBooleanArray(
     std::string_view key, std::span<const int> defaultValue) {
-  return GetInstance().table->GetEntry(key).GetBooleanArray(defaultValue);
+  return GetEntry(key).GetBooleanArray(defaultValue);
 }
 
 bool SmartDashboard::PutNumberArray(std::string_view key,
                                     std::span<const double> value) {
-  if (!gReported) {
-    HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
-  }
-  return GetInstance().table->GetEntry(key).SetDoubleArray(value);
+  return GetEntry(key).SetDoubleArray(value);
 }
 
 bool SmartDashboard::SetDefaultNumberArray(
     std::string_view key, std::span<const double> defaultValue) {
-  if (!gReported) {
-    HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
-  }
-  return GetInstance().table->GetEntry(key).SetDefaultDoubleArray(defaultValue);
+  return GetEntry(key).SetDefaultDoubleArray(defaultValue);
 }
 
 std::vector<double> SmartDashboard::GetNumberArray(
     std::string_view key, std::span<const double> defaultValue) {
-  return GetInstance().table->GetEntry(key).GetDoubleArray(defaultValue);
+  return GetEntry(key).GetDoubleArray(defaultValue);
 }
 
 bool SmartDashboard::PutStringArray(std::string_view key,
                                     std::span<const std::string> value) {
-  if (!gReported) {
-    HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
-  }
-  return GetInstance().table->GetEntry(key).SetStringArray(value);
+  return GetEntry(key).SetStringArray(value);
 }
 
 bool SmartDashboard::SetDefaultStringArray(
     std::string_view key, std::span<const std::string> defaultValue) {
-  if (!gReported) {
-    HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
-  }
-  return GetInstance().table->GetEntry(key).SetDefaultStringArray(defaultValue);
+  return GetEntry(key).SetDefaultStringArray(defaultValue);
 }
 
 std::vector<std::string> SmartDashboard::GetStringArray(
     std::string_view key, std::span<const std::string> defaultValue) {
-  return GetInstance().table->GetEntry(key).GetStringArray(defaultValue);
+  return GetEntry(key).GetStringArray(defaultValue);
 }
 
 bool SmartDashboard::PutRaw(std::string_view key,
                             std::span<const uint8_t> value) {
-  if (!gReported) {
-    HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
-  }
-  return GetInstance().table->GetEntry(key).SetRaw(value);
+  return GetEntry(key).SetRaw(value);
 }
 
 bool SmartDashboard::SetDefaultRaw(std::string_view key,
                                    std::span<const uint8_t> defaultValue) {
-  if (!gReported) {
-    HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
-  }
-  return GetInstance().table->GetEntry(key).SetDefaultRaw(defaultValue);
+  return GetEntry(key).SetDefaultRaw(defaultValue);
 }
 
 std::vector<uint8_t> SmartDashboard::GetRaw(
     std::string_view key, std::span<const uint8_t> defaultValue) {
-  return GetInstance().table->GetEntry(key).GetRaw(defaultValue);
+  return GetEntry(key).GetRaw(defaultValue);
 }
 
 bool SmartDashboard::PutValue(std::string_view keyName,
                               const nt::Value& value) {
-  if (!gReported) {
-    HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
-  }
   return GetInstance().table->GetEntry(keyName).SetValue(value);
 }
 
 bool SmartDashboard::SetDefaultValue(std::string_view key,
                                      const nt::Value& defaultValue) {
-  if (!gReported) {
-    HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
-  }
-  return GetInstance().table->GetEntry(key).SetDefaultValue(defaultValue);
+  return GetEntry(key).SetDefaultValue(defaultValue);
 }
 
 nt::Value SmartDashboard::GetValue(std::string_view keyName) {
