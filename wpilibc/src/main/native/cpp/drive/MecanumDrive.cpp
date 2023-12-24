@@ -25,7 +25,12 @@ MecanumDrive::MecanumDrive(MotorController& frontLeftMotor,
     : MecanumDrive{[&](double output) { frontLeftMotor.Set(output); },
                    [&](double output) { rearLeftMotor.Set(output); },
                    [&](double output) { frontRightMotor.Set(output); },
-                   [&](double output) { rearRightMotor.Set(output); }} {}
+                   [&](double output) { rearRightMotor.Set(output); }} {
+  wpi::SendableRegistry::AddChild(this, &frontLeftMotor);
+  wpi::SendableRegistry::AddChild(this, &rearLeftMotor);
+  wpi::SendableRegistry::AddChild(this, &frontRightMotor);
+  wpi::SendableRegistry::AddChild(this, &rearRightMotor);
+}
 
 WPI_UNIGNORE_DEPRECATED
 
@@ -37,10 +42,6 @@ MecanumDrive::MecanumDrive(std::function<void(double)> frontLeftMotor,
       m_rearLeftMotor{std::move(rearLeftMotor)},
       m_frontRightMotor{std::move(frontRightMotor)},
       m_rearRightMotor{std::move(rearRightMotor)} {
-  // wpi::SendableRegistry::AddChild(this, m_frontLeftMotor);
-  // wpi::SendableRegistry::AddChild(this, m_rearLeftMotor);
-  // wpi::SendableRegistry::AddChild(this, m_frontRightMotor);
-  // wpi::SendableRegistry::AddChild(this, m_rearRightMotor);
   static int instances = 0;
   ++instances;
   wpi::SendableRegistry::AddLW(this, "MecanumDrive", instances);

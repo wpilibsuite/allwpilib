@@ -21,15 +21,16 @@ WPI_IGNORE_DEPRECATED
 DifferentialDrive::DifferentialDrive(MotorController& leftMotor,
                                      MotorController& rightMotor)
     : DifferentialDrive{[&](double output) { leftMotor.Set(output); },
-                        [&](double output) { rightMotor.Set(output); }} {}
+                        [&](double output) { rightMotor.Set(output); }} {
+  wpi::SendableRegistry::AddChild(this, &leftMotor);
+  wpi::SendableRegistry::AddChild(this, &rightMotor);
+}
 
 WPI_UNIGNORE_DEPRECATED
 
 DifferentialDrive::DifferentialDrive(std::function<void(double)> leftMotor,
                                      std::function<void(double)> rightMotor)
     : m_leftMotor{std::move(leftMotor)}, m_rightMotor{std::move(rightMotor)} {
-  // wpi::SendableRegistry::AddChild(this, m_leftMotor);
-  // wpi::SendableRegistry::AddChild(this, m_rightMotor);
   static int instances = 0;
   ++instances;
   wpi::SendableRegistry::AddLW(this, "DifferentialDrive", instances);

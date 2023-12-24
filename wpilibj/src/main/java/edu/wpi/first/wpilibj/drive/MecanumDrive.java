@@ -122,6 +122,10 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
         (double output) -> rearLeftMotor.set(output),
         (double output) -> frontRightMotor.set(output),
         (double output) -> rearRightMotor.set(output));
+    SendableRegistry.addChild(this, frontLeftMotor);
+    SendableRegistry.addChild(this, rearLeftMotor);
+    SendableRegistry.addChild(this, frontRightMotor);
+    SendableRegistry.addChild(this, rearRightMotor);
   }
 
   /**
@@ -149,10 +153,6 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
     m_rearLeftMotor = rearLeftMotor;
     m_frontRightMotor = frontRightMotor;
     m_rearRightMotor = rearRightMotor;
-    // SendableRegistry.addChild(this, m_frontLeftMotor);
-    // SendableRegistry.addChild(this, m_rearLeftMotor);
-    // SendableRegistry.addChild(this, m_frontRightMotor);
-    // SendableRegistry.addChild(this, m_rearRightMotor);
     instances++;
     SendableRegistry.addLW(this, "MecanumDrive", instances);
   }
