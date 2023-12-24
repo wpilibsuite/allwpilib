@@ -9,6 +9,9 @@
 #include <frc2/command/Commands.h>
 
 Drive::Drive() {
+  wpi::SendableRegistry::AddChild(&m_drive, &m_leftLeader);
+  wpi::SendableRegistry::AddChild(&m_drive, &m_rightLeader);
+
   m_leftLeader.AddFollower(m_leftFollower);
   m_rightLeader.AddFollower(m_rightFollower);
 

@@ -11,6 +11,9 @@
 #include <units/length.h>
 
 Drivetrain::Drivetrain() {
+  wpi::SendableRegistry::AddChild(&m_robotDrive, &m_frontLeft);
+  wpi::SendableRegistry::AddChild(&m_robotDrive, &m_frontRight);
+
   m_frontLeft.AddFollower(m_rearLeft);
   m_frontRight.AddFollower(m_rearRight);
 

@@ -17,6 +17,9 @@ DriveSubsystem::DriveSubsystem()
       m_leftEncoder{kLeftEncoderPorts[0], kLeftEncoderPorts[1]},
       m_rightEncoder{kRightEncoderPorts[0], kRightEncoderPorts[1]},
       m_odometry{m_gyro.GetRotation2d(), units::meter_t{0}, units::meter_t{0}} {
+  wpi::SendableRegistry::AddChild(&m_drive, &m_left1);
+  wpi::SendableRegistry::AddChild(&m_drive, &m_right1);
+
   m_left1.AddFollower(m_left2);
   m_right1.AddFollower(m_right2);
 

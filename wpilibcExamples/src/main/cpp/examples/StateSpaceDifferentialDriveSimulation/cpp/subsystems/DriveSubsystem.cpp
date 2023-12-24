@@ -14,6 +14,9 @@
 using namespace DriveConstants;
 
 DriveSubsystem::DriveSubsystem() {
+  wpi::SendableRegistry::AddChild(&m_drive, &m_left1);
+  wpi::SendableRegistry::AddChild(&m_drive, &m_right1);
+
   m_left1.AddFollower(m_left2);
   m_right1.AddFollower(m_right2);
 

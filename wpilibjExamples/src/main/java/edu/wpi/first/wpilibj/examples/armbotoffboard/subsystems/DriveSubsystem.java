@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj.examples.armbotoffboard.subsystems;
 
+import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.examples.armbotoffboard.Constants.DriveConstants;
@@ -42,6 +43,9 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
+    SendableRegistry.addChild(m_drive, m_leftLeader);
+    SendableRegistry.addChild(m_drive, m_rightLeader);
+
     // Sets the distance per pulse for the encoders
     m_leftEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse);
     m_rightEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse);

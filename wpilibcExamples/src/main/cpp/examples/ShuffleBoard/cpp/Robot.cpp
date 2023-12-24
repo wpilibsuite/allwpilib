@@ -30,6 +30,9 @@
 class Robot : public frc::TimedRobot {
  public:
   void RobotInit() override {
+    wpi::SendableRegistry::AddChild(&m_robotDrive, &m_left);
+    wpi::SendableRegistry::AddChild(&m_robotDrive, &m_right);
+
     // Add a widget titled 'Max Speed' with a number slider.
     m_maxSpeed = frc::Shuffleboard::GetTab("Configuration")
                      .Add("Max Speed", 1)

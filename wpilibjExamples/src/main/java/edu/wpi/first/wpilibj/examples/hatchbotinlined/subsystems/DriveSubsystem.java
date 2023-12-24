@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj.examples.hatchbotinlined.subsystems;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.examples.hatchbotinlined.Constants.DriveConstants;
@@ -40,6 +41,9 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
+    SendableRegistry.addChild(m_drive, m_leftLeader);
+    SendableRegistry.addChild(m_drive, m_rightLeader);
+
     m_leftLeader.addFollower(m_leftFollower);
     m_rightLeader.addFollower(m_rightFollower);
 

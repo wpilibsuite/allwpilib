@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj.examples.gyrodrivecommands.subsystems;
 
+import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -43,6 +44,9 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
+    SendableRegistry.addChild(m_drive, m_leftLeader);
+    SendableRegistry.addChild(m_drive, m_rightLeader);
+
     m_leftLeader.addFollower(m_leftFollower);
     m_rightLeader.addFollower(m_rightFollower);
 

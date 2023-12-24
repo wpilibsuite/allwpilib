@@ -15,6 +15,9 @@ DriveSubsystem::DriveSubsystem()
       m_right2{kRightMotor2Port},
       m_leftEncoder{kLeftEncoderPorts[0], kLeftEncoderPorts[1]},
       m_rightEncoder{kRightEncoderPorts[0], kRightEncoderPorts[1]} {
+  wpi::SendableRegistry::AddChild(&m_drive, &m_left1);
+  wpi::SendableRegistry::AddChild(&m_drive, &m_right1);
+
   m_left1.AddFollower(m_left2);
   m_right1.AddFollower(m_right2);
 

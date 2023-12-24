@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj.examples.rapidreactcommandbot.subsystems;
 
+import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.Constants.DriveConstants;
@@ -41,6 +42,9 @@ public class Drive extends SubsystemBase {
 
   /** Creates a new Drive subsystem. */
   public Drive() {
+    SendableRegistry.addChild(m_drive, m_leftLeader);
+    SendableRegistry.addChild(m_drive, m_rightLeader);
+
     m_leftLeader.addFollower(m_leftFollower);
     m_rightLeader.addFollower(m_rightFollower);
 

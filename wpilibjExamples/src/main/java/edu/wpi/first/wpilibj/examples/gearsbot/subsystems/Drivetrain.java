@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj.examples.gearsbot.subsystems;
 
+import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.Encoder;
@@ -41,6 +42,9 @@ public class Drivetrain extends SubsystemBase {
   /** Create a new drivetrain subsystem. */
   public Drivetrain() {
     super();
+
+    SendableRegistry.addChild(m_drive, m_leftLeader);
+    SendableRegistry.addChild(m_drive, m_rightLeader);
 
     m_leftLeader.addFollower(m_leftFollower);
     m_rightLeader.addFollower(m_rightFollower);

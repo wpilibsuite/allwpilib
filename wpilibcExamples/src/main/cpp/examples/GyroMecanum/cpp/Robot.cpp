@@ -16,6 +16,11 @@
 class Robot : public frc::TimedRobot {
  public:
   void RobotInit() override {
+    wpi::SendableRegistry::AddChild(&m_robotDrive, &m_frontLeft);
+    wpi::SendableRegistry::AddChild(&m_robotDrive, &m_rearLeft);
+    wpi::SendableRegistry::AddChild(&m_robotDrive, &m_frontRight);
+    wpi::SendableRegistry::AddChild(&m_robotDrive, &m_rearRight);
+
     // Invert the right side motors. You may need to change or remove this to
     // match your robot.
     m_frontRight.SetInverted(true);

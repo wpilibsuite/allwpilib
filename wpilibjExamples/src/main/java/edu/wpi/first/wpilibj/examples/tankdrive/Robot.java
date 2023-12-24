@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj.examples.tankdrive;
 
+import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -14,7 +15,7 @@ import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
  * the code necessary to operate a robot with tank drive.
  */
 public class Robot extends TimedRobot {
-  private DifferentialDrive m_myRobot;
+  private DifferentialDrive m_robotDrive;
   private Joystick m_leftStick;
   private Joystick m_rightStick;
 
@@ -23,18 +24,21 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
+    SendableRegistry.addChild(m_robotDrive, m_leftMotor);
+    SendableRegistry.addChild(m_robotDrive, m_rightMotor);
+
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
     m_rightMotor.setInverted(true);
 
-    m_myRobot = new DifferentialDrive(m_leftMotor::set, m_rightMotor::set);
+    m_robotDrive = new DifferentialDrive(m_leftMotor::set, m_rightMotor::set);
     m_leftStick = new Joystick(0);
     m_rightStick = new Joystick(1);
   }
 
   @Override
   public void teleopPeriodic() {
-    m_myRobot.tankDrive(-m_leftStick.getY(), -m_rightStick.getY());
+    m_robotDrive.tankDrive(-m_leftStick.getY(), -m_rightStick.getY());
   }
 }

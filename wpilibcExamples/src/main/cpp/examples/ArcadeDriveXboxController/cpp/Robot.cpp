@@ -20,6 +20,11 @@ class Robot : public frc::TimedRobot {
   frc::XboxController m_driverController{0};
 
  public:
+  Robot() {
+    wpi::SendableRegistry::AddChild(&m_robotDrive, &m_leftMotor);
+    wpi::SendableRegistry::AddChild(&m_robotDrive, &m_rightMotor);
+  }
+
   void RobotInit() override {
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's

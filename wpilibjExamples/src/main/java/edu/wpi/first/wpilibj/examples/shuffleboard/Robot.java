@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj.examples.shuffleboard;
 
 import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -29,6 +30,9 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
+    SendableRegistry.addChild(m_tankDrive, m_leftDriveMotor);
+    SendableRegistry.addChild(m_tankDrive, m_rightDriveMotor);
+
     // Add a 'max speed' widget to a tab named 'Configuration', using a number slider
     // The widget will be placed in the second column and row and will be TWO columns wide
     m_maxSpeed =

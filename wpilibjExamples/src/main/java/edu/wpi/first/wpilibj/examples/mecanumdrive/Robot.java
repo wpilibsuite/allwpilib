@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj.examples.mecanumdrive;
 
+import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
@@ -27,6 +28,11 @@ public class Robot extends TimedRobot {
     PWMSparkMax rearLeft = new PWMSparkMax(kRearLeftChannel);
     PWMSparkMax frontRight = new PWMSparkMax(kFrontRightChannel);
     PWMSparkMax rearRight = new PWMSparkMax(kRearRightChannel);
+
+    SendableRegistry.addChild(m_robotDrive, frontLeft);
+    SendableRegistry.addChild(m_robotDrive, rearLeft);
+    SendableRegistry.addChild(m_robotDrive, frontRight);
+    SendableRegistry.addChild(m_robotDrive, rearRight);
 
     // Invert the right side motors.
     // You may need to change or remove this to match your robot.
