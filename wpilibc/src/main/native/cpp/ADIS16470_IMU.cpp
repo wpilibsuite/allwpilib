@@ -83,7 +83,7 @@ ADIS16470_IMU::ADIS16470_IMU(IMUAxis yaw_axis, IMUAxis pitch_axis,
       pitch_axis == kYaw || pitch_axis == kPitch || pitch_axis == kRoll ||
       roll_axis == kYaw || roll_axis == kPitch || roll_axis == kRoll) {
     REPORT_ERROR(
-        "ADIS16740 constructor only allows IMUAxis.kX, IMUAxis.kY or "
+        "ADIS16470 constructor only allows IMUAxis.kX, IMUAxis.kY or "
         "IMUAxis.kZ as arguments.");
     REPORT_ERROR(
         "Constructing ADIS with default axes. (IMUAxis.kZ is defined as Yaw)");
