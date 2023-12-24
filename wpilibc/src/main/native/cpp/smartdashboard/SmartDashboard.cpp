@@ -50,7 +50,7 @@ void SmartDashboard::init() {
   GetInstance();
 }
 
-nt::NetworkTableEntry GetEntry(std::string_view name) {
+nt::NetworkTableEntry GetEntry(std::string_view key) {
   if (!gReported) {
     HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
   }
