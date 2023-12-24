@@ -433,10 +433,8 @@ TEST_F(StructTest, StructFixedArrayB) {
   nt::StructPublisher<std::array<ThingB, 2>, Info1> pub = topic.Publish();
   nt::StructPublisher<std::array<ThingB, 2>, Info1> pub2 =
       topic.PublishEx({{}});
-  nt::StructSubscriber<std::array<ThingB, 2>, Info1> sub =
-      topic.Subscribe({});
-  nt::StructEntry<std::array<ThingB, 2>, Info1> entry =
-      topic.GetEntry({});
+  nt::StructSubscriber<std::array<ThingB, 2>, Info1> sub = topic.Subscribe({});
+  nt::StructEntry<std::array<ThingB, 2>, Info1> entry = topic.GetEntry({});
   std::array<ThingB, 2> arr;
   pub.SetDefault(arr);
   pub.Set(arr, 5);

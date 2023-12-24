@@ -354,9 +354,7 @@ class StructEntry final : public StructSubscriber<T, I...>,
    *
    * @return Topic
    */
-  TopicType GetTopic() const {
-    return StructSubscriber<T, I...>::GetTopic();
-  }
+  TopicType GetTopic() const { return StructSubscriber<T, I...>::GetTopic(); }
 
   /**
    * Stops publishing the entry if it's published.
