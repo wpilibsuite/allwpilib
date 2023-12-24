@@ -29,8 +29,7 @@ TEST_P(DeferredFunctionsTest, DeferredFunctions) {
                                  [&] {
                                    isFinishedCount++;
                                    return finished;
-                                 }}
-                                 .ToPtr();
+                                 }};
                            },
                            {}};
 

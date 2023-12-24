@@ -27,7 +27,7 @@ frc2::CommandPtr autos::SimpleAuto(DriveSubsystem* drive) {
              },
              // Requires the drive subsystem
              {drive})
-      .ToPtr();
+      ;
 }
 
 frc2::CommandPtr autos::ComplexAuto(DriveSubsystem* drive,
@@ -49,7 +49,7 @@ frc2::CommandPtr autos::ComplexAuto(DriveSubsystem* drive,
           },
           // Requires the drive subsystem
           {drive})
-          .ToPtr(),
+          ,
       // Release the hatch
       hatch->ReleaseHatchCommand(),
       // Drive backward the specified distance
@@ -69,5 +69,5 @@ frc2::CommandPtr autos::ComplexAuto(DriveSubsystem* drive,
           },
           // Requires the drive subsystem
           {drive})
-          .ToPtr());
+          );
 }

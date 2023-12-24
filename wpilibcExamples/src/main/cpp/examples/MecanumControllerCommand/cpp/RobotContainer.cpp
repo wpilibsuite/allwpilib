@@ -103,9 +103,7 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
             m_drive.SetMotorControllersVolts(frontLeft, rearLeft, frontRight,
                                              rearRight);
           },
-
-          {&m_drive})
-          .ToPtr();
+          {&m_drive});
 
   // Reset odometry to the initial pose of the trajectory, run path following
   // command, then stop at the end.
@@ -114,9 +112,7 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
           [this, &exampleTrajectory]() {
             m_drive.ResetOdometry(exampleTrajectory.InitialPose());
           },
-          {})
-          .ToPtr(),
+          {}),
       std::move(mecanumControllerCommand),
-      frc2::InstantCommand([this]() { m_drive.Drive(0, 0, 0, false); }, {})
-          .ToPtr());
+      frc2::InstantCommand([this]() { m_drive.Drive(0, 0, 0, false); }, {}));
 }

@@ -68,14 +68,14 @@ void RobotContainer::ConfigureButtonBindings() {
 
   // Grab the hatch when the 'A' button is pressed.
   frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kA)
-      .OnTrue(GrabHatch(&m_hatch).ToPtr());
+      .OnTrue(GrabHatch(&m_hatch));
   // Release the hatch when the 'B' button is pressed.
   frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kB)
-      .OnTrue(ReleaseHatch(&m_hatch).ToPtr());
+      .OnTrue(ReleaseHatch(&m_hatch));
   // While holding the shoulder button, drive at half speed
   frc2::JoystickButton(&m_driverController,
                        frc::XboxController::Button::kRightBumper)
-      .WhileTrue(HalveDriveSpeed(&m_drive).ToPtr());
+      .WhileTrue(HalveDriveSpeed(&m_drive));
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() {

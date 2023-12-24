@@ -40,9 +40,7 @@ class WrapperCommand : public CommandHelper<Command, WrapperCommand> {
    * @param command the command being wrapped. Trying to directly schedule this
    * command or add it to a group will throw an exception.
    */
-  template <std::derived_from<Command> T>
-  // NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
-  explicit WrapperCommand(T&& command)
+  explicit WrapperCommand(CommandPtr&& command)
       : WrapperCommand(
             std::make_unique<std::decay_t<T>>(std::forward<T>(command))) {}
 

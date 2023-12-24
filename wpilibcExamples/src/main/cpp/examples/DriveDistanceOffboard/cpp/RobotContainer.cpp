@@ -55,8 +55,6 @@ void RobotContainer::ConfigureButtonBindings() {
           [] { return frc::TrapezoidProfile<units::meters>::State{}; },
           // Require the drive
           {&m_drive})
-          // Convert to CommandPtr
-          .ToPtr()
           .BeforeStarting(
               frc2::cmd::RunOnce([this]() { m_drive.ResetEncoders(); }, {}))
           .WithTimeout(10_s));

@@ -87,7 +87,7 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
           [this](auto moduleStates) { m_drive.SetModuleStates(moduleStates); },
 
           {&m_drive})
-          .ToPtr();
+          ;
 
   // Reset odometry to the initial pose of the trajectory, run path following
   // command, then stop at the end.
@@ -96,10 +96,9 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
           [this, &exampleTrajectory]() {
             m_drive.ResetOdometry(exampleTrajectory.InitialPose());
           },
-          {})
-          .ToPtr(),
+          {}),
       std::move(swerveControllerCommand),
       frc2::InstantCommand(
           [this] { m_drive.Drive(0_mps, 0_mps, 0_rad_per_s, false); }, {})
-          .ToPtr());
+          );
 }

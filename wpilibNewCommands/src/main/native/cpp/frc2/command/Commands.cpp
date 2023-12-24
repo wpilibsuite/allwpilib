@@ -23,7 +23,7 @@ using namespace frc2;
 // Factories
 
 CommandPtr cmd::None() {
-  return InstantCommand().ToPtr();
+  return InstantCommand();
 }
 
 CommandPtr cmd::Idle(Requirements requirements) {
@@ -32,11 +32,11 @@ CommandPtr cmd::Idle(Requirements requirements) {
 
 CommandPtr cmd::RunOnce(std::function<void()> action,
                         Requirements requirements) {
-  return InstantCommand(std::move(action), requirements).ToPtr();
+  return InstantCommand(std::move(action), requirements);
 }
 
 CommandPtr cmd::Run(std::function<void()> action, Requirements requirements) {
-  return RunCommand(std::move(action), requirements).ToPtr();
+  return RunCommand(std::move(action), requirements);
 }
 
 CommandPtr cmd::StartEnd(std::function<void()> start, std::function<void()> end,
@@ -45,7 +45,7 @@ CommandPtr cmd::StartEnd(std::function<void()> start, std::function<void()> end,
              std::move(start), [] {},
              [end = std::move(end)](bool interrupted) { end(); },
              [] { return false; }, requirements)
-      .ToPtr();
+      ;
 }
 
 CommandPtr cmd::RunEnd(std::function<void()> run, std::function<void()> end,
@@ -53,44 +53,44 @@ CommandPtr cmd::RunEnd(std::function<void()> run, std::function<void()> end,
   return FunctionalCommand([] {}, std::move(run),
                            [end = std::move(end)](bool interrupted) { end(); },
                            [] { return false; }, requirements)
-      .ToPtr();
+      ;
 }
 
 CommandPtr cmd::Print(std::string_view msg) {
-  return PrintCommand(msg).ToPtr();
+  return PrintCommand(msg);
 }
 
 CommandPtr cmd::DeferredProxy(wpi::unique_function<Command*()> supplier) {
-  return ProxyCommand(std::move(supplier)).ToPtr();
+  return ProxyCommand(std::move(supplier));
 }
 
 CommandPtr cmd::DeferredProxy(wpi::unique_function<CommandPtr()> supplier) {
-  return ProxyCommand(std::move(supplier)).ToPtr();
+  return ProxyCommand(std::move(supplier));
 }
 
 CommandPtr cmd::Wait(units::second_t duration) {
-  return WaitCommand(duration).ToPtr();
+  return WaitCommand(duration);
 }
 
 CommandPtr cmd::WaitUntil(std::function<bool()> condition) {
-  return WaitUntilCommand(condition).ToPtr();
+  return WaitUntilCommand(condition);
 }
 
 CommandPtr cmd::Either(CommandPtr&& onTrue, CommandPtr&& onFalse,
                        std::function<bool()> selector) {
   return ConditionalCommand(std::move(onTrue).Unwrap(),
                             std::move(onFalse).Unwrap(), std::move(selector))
-      .ToPtr();
+      ;
 }
 
 CommandPtr cmd::Defer(wpi::unique_function<CommandPtr()> supplier,
                       Requirements requirements) {
-  return DeferredCommand(std::move(supplier), requirements).ToPtr();
+  return DeferredCommand(std::move(supplier), requirements);
 }
 
 CommandPtr cmd::Sequence(std::vector<CommandPtr>&& commands) {
   return SequentialCommandGroup(CommandPtr::UnwrapVector(std::move(commands)))
-      .ToPtr();
+      ;
 }
 
 CommandPtr cmd::RepeatingSequence(std::vector<CommandPtr>&& commands) {
@@ -99,17 +99,17 @@ CommandPtr cmd::RepeatingSequence(std::vector<CommandPtr>&& commands) {
 
 CommandPtr cmd::Parallel(std::vector<CommandPtr>&& commands) {
   return ParallelCommandGroup(CommandPtr::UnwrapVector(std::move(commands)))
-      .ToPtr();
+      ;
 }
 
 CommandPtr cmd::Race(std::vector<CommandPtr>&& commands) {
   return ParallelRaceGroup(CommandPtr::UnwrapVector(std::move(commands)))
-      .ToPtr();
+      ;
 }
 
 CommandPtr cmd::Deadline(CommandPtr&& deadline,
                          std::vector<CommandPtr>&& others) {
   return ParallelDeadlineGroup(std::move(deadline).Unwrap(),
                                CommandPtr::UnwrapVector(std::move(others)))
-      .ToPtr();
+      ;
 }

@@ -235,7 +235,7 @@ CommandPtr CommandPtr::WithName(std::string_view name) && {
   AssertValid();
   WrapperCommand wrapper{std::move(m_ptr)};
   wrapper.SetName(name);
-  return std::move(wrapper).ToPtr();
+  return std::move(wrapper);
 }
 
 Command* CommandPtr::get() const& {
