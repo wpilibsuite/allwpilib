@@ -18,7 +18,7 @@ import java.util.function.Consumer;
 
 final class ShuffleboardInstance implements ShuffleboardRoot {
   private final Map<String, ShuffleboardTab> m_tabs = new LinkedHashMap<>();
-  private boolean m_reported = false;
+  private boolean m_reported = false; // NOPMD redundant field initializer
   private boolean m_tabsChanged = false; // NOPMD redundant field initializer
   private final NetworkTable m_rootTable;
   private final NetworkTable m_rootMetaTable;
