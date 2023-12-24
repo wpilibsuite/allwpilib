@@ -12,6 +12,8 @@
 #include <utility>
 #include <vector>
 
+#include <wpi/DecayedDerivedFrom.h>
+
 #include "frc2/command/Command.h"
 #include "frc2/command/Requirements.h"
 
@@ -32,7 +34,7 @@ class CommandPtr final {
 
   template <std::derived_from<Command> T>
   // NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
-  explicit CommandPtr(T&& command)
+  /*implicit*/ CommandPtr(T&& command)
       : CommandPtr(
             std::make_unique<std::decay_t<T>>(std::forward<T>(command))) {}
 
