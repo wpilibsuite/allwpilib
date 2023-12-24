@@ -4,8 +4,12 @@
 
 #pragma once
 
+#include <concepts>
+#include <memory>
 #include <string>
 #include <string_view>
+#include <type_traits>
+#include <utility>
 #include <vector>
 
 #include <units/voltage.h>
@@ -97,6 +101,17 @@ class PWMMotorController : public MotorController,
    */
   void AddFollower(PWMMotorController& follower);
 
+  /**
+   * Make the given PWM motor controller follow the output of this one.
+   *
+   * @param follower The motor controller follower.
+   */
+  template <std::derived_from<PWMMotorController> T>
+  void AddFollower(T&& follower) {
+    m_owningFollowers.emplace_back(
+        std::make_unique<std::decay_t<T>>(std::forward<T>(follower)));
+  }
+
  protected:
   /**
    * Constructor for a PWM Motor %Controller connected via PWM.
@@ -113,7 +128,8 @@ class PWMMotorController : public MotorController,
 
  private:
   bool m_isInverted = false;
-  std::vector<PWMMotorController*> m_followers;
+  std::vector<PWMMotorController*> m_nonowningFollowers;
+  std::vector<std::unique_ptr<PWMMotorController>> m_owningFollowers;
 
   PWM* GetPwm() { return &m_pwm; }
 };

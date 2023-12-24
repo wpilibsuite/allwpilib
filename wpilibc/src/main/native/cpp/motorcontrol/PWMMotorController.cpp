@@ -18,7 +18,10 @@ void PWMMotorController::Set(double speed) {
   }
   m_pwm.SetSpeed(speed);
 
-  for (auto& follower : m_followers) {
+  for (auto& follower : m_nonowningFollowers) {
+    follower->Set(speed);
+  }
+  for (auto& follower : m_owningFollowers) {
     follower->Set(speed);
   }
 
@@ -64,7 +67,7 @@ void PWMMotorController::EnableDeadbandElimination(bool eliminateDeadband) {
 }
 
 void PWMMotorController::AddFollower(PWMMotorController& follower) {
-  m_followers.emplace_back(&follower);
+  m_nonowningFollowers.emplace_back(&follower);
 }
 
 WPI_IGNORE_DEPRECATED
