@@ -157,7 +157,7 @@ TEST(DataLogTest, StructFixedArrayA) {
 TEST(DataLogTest, StructB) {
   wpi::log::DataLog log{[](auto) {}};
   Info1 info;
-  [[maybe_unused]] wpi::log::StructLogEntry<ThingB, Info1> entry0{info};
+  [[maybe_unused]] wpi::log::StructLogEntry<ThingB, Info1> entry0;
   wpi::log::StructLogEntry<ThingB, Info1> entry{log, "b", info, 5};
   entry.Append(ThingB{});
   entry.Append(ThingB{}, 7);
@@ -166,7 +166,7 @@ TEST(DataLogTest, StructB) {
 TEST(DataLogTest, StructArrayB) {
   wpi::log::DataLog log{[](auto) {}};
   Info1 info;
-  [[maybe_unused]] wpi::log::StructArrayLogEntry<ThingB, Info1> entry0{info};
+  [[maybe_unused]] wpi::log::StructArrayLogEntry<ThingB, Info1> entry0;
   wpi::log::StructArrayLogEntry<ThingB, Info1> entry{log, "a", info, 5};
   entry.Append({{ThingB{}, ThingB{}}});
   entry.Append({{ThingB{}, ThingB{}}}, 7);

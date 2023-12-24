@@ -43,7 +43,7 @@ class StructSubscriber : public Subscriber {
   using ParamType = const T&;
   using TimestampedValueType = Timestamped<T>;
 
-  explicit StructSubscriber(const I&... info) : m_info{std::cref(info)...} {}
+  StructSubscriber() = default;
 
   /**
    * Construct from a subscriber handle; recommended to use
@@ -53,10 +53,10 @@ class StructSubscriber : public Subscriber {
    * @param defaultValue Default value
    * @param info optional struct type info
    */
-  StructSubscriber(NT_Subscriber handle, T defaultValue, const I&... info)
+  StructSubscriber(NT_Subscriber handle, T defaultValue, I... info)
       : Subscriber{handle},
         m_defaultValue{std::move(defaultValue)},
-        m_info{std::cref(info)...} {}
+        m_info{std::move(info)...} {}
 
   /**
    * Get the last published value.
@@ -180,7 +180,7 @@ class StructSubscriber : public Subscriber {
 
  private:
   ValueType m_defaultValue;
-  [[no_unique_address]] std::tuple<const I&...> m_info;
+  [[no_unique_address]] std::tuple<I...> m_info;
 };
 
 /**
@@ -198,7 +198,7 @@ class StructPublisher : public Publisher {
 
   using TimestampedValueType = Timestamped<T>;
 
-  explicit StructPublisher(const I&... info) : m_info{std::cref(info)...} {}
+  StructPublisher() = default;
 
   StructPublisher(const StructPublisher&) = delete;
   StructPublisher& operator=(const StructPublisher&) = delete;
@@ -224,8 +224,8 @@ class StructPublisher : public Publisher {
    * @param handle Native handle
    * @param info optional struct type info
    */
-  explicit StructPublisher(NT_Publisher handle, const I&... info)
-      : Publisher{handle}, m_info{std::cref(info)...} {}
+  explicit StructPublisher(NT_Publisher handle, I... info)
+      : Publisher{handle}, m_info{std::move(info)...} {}
 
   /**
    * Publish a new value.
@@ -300,7 +300,7 @@ class StructPublisher : public Publisher {
 
  private:
   std::atomic_bool m_schemaPublished{false};
-  [[no_unique_address]] std::tuple<const I&...> m_info;
+  [[no_unique_address]] std::tuple<I...> m_info;
 };
 
 /**
@@ -321,8 +321,7 @@ class StructEntry final : public StructSubscriber<T, I...>,
 
   using TimestampedValueType = Timestamped<T>;
 
-  explicit StructEntry(const I&... info)
-      : StructSubscriber<T, I...>{info...}, StructPublisher<T, I...>{info...} {}
+  StructEntry() = default;
 
   /**
    * Construct from an entry handle; recommended to use
@@ -379,7 +378,7 @@ class StructTopic final : public Topic {
   using ParamType = const T&;
   using TimestampedValueType = Timestamped<T>;
 
-  explicit StructTopic(const I&... info) : m_info{std::cref(info)...} {}
+  StructTopic() = default;
 
   /**
    * Construct from a topic handle; recommended to use
@@ -388,8 +387,8 @@ class StructTopic final : public Topic {
    * @param handle Native handle
    * @param info optional struct type info
    */
-  explicit StructTopic(NT_Topic handle, const I&... info)
-      : Topic{handle}, m_info{std::cref(info)...} {}
+  explicit StructTopic(NT_Topic handle, I... info)
+      : Topic{handle}, m_info{std::move(info)...} {}
 
   /**
    * Construct from a generic topic.
@@ -397,8 +396,8 @@ class StructTopic final : public Topic {
    * @param topic Topic
    * @param info optional struct type info
    */
-  explicit StructTopic(Topic topic, const I&... info)
-      : Topic{topic}, m_info{std::cref(info)...} {}
+  explicit StructTopic(Topic topic, I... info)
+      : Topic{topic}, m_info{std::move(info)...} {}
 
   /**
    * Create a new subscriber to the topic.
@@ -524,7 +523,7 @@ class StructTopic final : public Topic {
   }
 
  private:
-  [[no_unique_address]] std::tuple<const I&...> m_info;
+  [[no_unique_address]] std::tuple<I...> m_info;
 };
 
 }  // namespace nt

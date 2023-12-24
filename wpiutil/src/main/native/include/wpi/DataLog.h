@@ -957,13 +957,13 @@ class StructLogEntry : public DataLogEntry {
   using S = Struct<T, I...>;
 
  public:
-  explicit StructLogEntry(const I&... info) : m_info{std::cref(info)...} {}
-  StructLogEntry(DataLog& log, std::string_view name, const I&... info,
+  StructLogEntry() = default;
+  StructLogEntry(DataLog& log, std::string_view name, I... info,
                  int64_t timestamp = 0)
-      : StructLogEntry{log, name, {}, info..., timestamp} {}
+      : StructLogEntry{log, name, {}, std::move(info)..., timestamp} {}
   StructLogEntry(DataLog& log, std::string_view name, std::string_view metadata,
-                 const I&... info, int64_t timestamp = 0)
-      : m_info{std::cref(info)...} {
+                 I... info, int64_t timestamp = 0)
+      : m_info{std::move(info)...} {
     m_log = &log;
     log.AddStructSchema<T, I...>(info..., timestamp);
     m_entry = log.Start(name, S::GetTypeString(info...), metadata, timestamp);
@@ -991,7 +991,7 @@ class StructLogEntry : public DataLogEntry {
   }
 
  private:
-  [[no_unique_address]] std::tuple<const I&...> m_info;
+  [[no_unique_address]] std::tuple<I...> m_info;
 };
 
 /**
@@ -1003,14 +1003,14 @@ class StructArrayLogEntry : public DataLogEntry {
   using S = Struct<T, I...>;
 
  public:
-  explicit StructArrayLogEntry(const I&... info) : m_info{std::cref(info)...} {}
-  StructArrayLogEntry(DataLog& log, std::string_view name, const I&... info,
+  StructArrayLogEntry() = default;
+  StructArrayLogEntry(DataLog& log, std::string_view name, I... info,
                       int64_t timestamp = 0)
-      : StructArrayLogEntry{log, name, {}, info..., timestamp} {}
+      : StructArrayLogEntry{log, name, {}, std::move(info)..., timestamp} {}
   StructArrayLogEntry(DataLog& log, std::string_view name,
-                      std::string_view metadata, const I&... info,
+                      std::string_view metadata, I... info,
                       int64_t timestamp = 0)
-      : m_info{std::cref(info)...} {
+      : m_info{std::move(info)...} {
     m_log = &log;
     log.AddStructSchema<T, I...>(info..., timestamp);
     m_entry = log.Start(
@@ -1059,7 +1059,7 @@ class StructArrayLogEntry : public DataLogEntry {
 
  private:
   StructArrayBuffer<T, I...> m_buf;
-  [[no_unique_address]] std::tuple<const I&...> m_info;
+  [[no_unique_address]] std::tuple<I...> m_info;
 };
 
 /**

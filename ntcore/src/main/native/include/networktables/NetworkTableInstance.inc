@@ -47,8 +47,8 @@ inline ProtobufTopic<T> NetworkTableInstance::GetProtobufTopic(
 template <typename T, typename... I>
   requires wpi::StructSerializable<T, I...>
 inline StructTopic<T, I...> NetworkTableInstance::GetStructTopic(
-    std::string_view name, const I&... info) const {
-  return StructTopic<T, I...>{GetTopic(name), info...};
+    std::string_view name, I... info) const {
+  return StructTopic<T, I...>{GetTopic(name), std::move(info)...};
 }
 
 template <typename T, typename... I>
