@@ -67,6 +67,7 @@ public final class SmartDashboard {
   public static synchronized void putData(String key, Sendable data) {
     if (!m_reported) {
       HAL.report(tResourceType.kResourceType_SmartDashboard, 0);
+      m_reported = true;
     }
     Sendable sddata = tablesToData.get(key);
     if (sddata == null || sddata != data) {
@@ -120,6 +121,7 @@ public final class SmartDashboard {
   public static NetworkTableEntry getEntry(String key) {
     if (!m_reported) {
       HAL.report(tResourceType.kResourceType_SmartDashboard, 0);
+      m_reported = true;
     }
     return table.getEntry(key);
   }

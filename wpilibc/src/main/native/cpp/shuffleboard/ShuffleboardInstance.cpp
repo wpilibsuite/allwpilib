@@ -40,6 +40,7 @@ static bool gReported = false;
 frc::ShuffleboardTab& ShuffleboardInstance::GetTab(std::string_view title) {
   if (!gReported) {
     HAL_Report(HALUsageReporting::kResourceType_Shuffleboard, 0);
+    gReported = true;
   }
   if (m_impl->tabs.find(title) == m_impl->tabs.end()) {
     m_impl->tabs.try_emplace(title,
