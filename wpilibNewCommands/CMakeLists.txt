@@ -80,7 +80,7 @@ configure_file(
     ${WPILIB_BINARY_DIR}/wpilibnewcommands-config.cmake
 )
 install(
-    FILES ${WPILIB_BINARY_DIR}/wpilibNewCommands-config.cmake
+    FILES ${WPILIB_BINARY_DIR}/wpilibnewcommands-config.cmake
     DESTINATION share/wpilibNewCommands
 )
 install(EXPORT wpilibNewCommands DESTINATION share/wpilibNewCommands)

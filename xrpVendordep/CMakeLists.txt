@@ -71,7 +71,7 @@ install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/xrpVendo
 
 # Convert config filename to lowercase otherwise CMake errors on case-sensitive filesystems
 configure_file(xrpVendordep-config.cmake.in ${WPILIB_BINARY_DIR}/xrpvendordep-config.cmake)
-install(FILES ${WPILIB_BINARY_DIR}/xrpVendordep-config.cmake DESTINATION share/xrpVendordep)
+install(FILES ${WPILIB_BINARY_DIR}/xrpvendordep-config.cmake DESTINATION share/xrpVendordep)
 install(EXPORT xrpVendordep DESTINATION share/xrpVendordep)
 
 if(WITH_TESTS)

@@ -71,7 +71,7 @@ install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/romiVend
 
 # Convert config filename to lowercase otherwise CMake errors on case-sensitive filesystems
 configure_file(romiVendordep-config.cmake.in ${WPILIB_BINARY_DIR}/romivendordep-config.cmake)
-install(FILES ${WPILIB_BINARY_DIR}/romiVendordep-config.cmake DESTINATION share/romiVendordep)
+install(FILES ${WPILIB_BINARY_DIR}/romivendordep-config.cmake DESTINATION share/romiVendordep)
 install(EXPORT romiVendordep DESTINATION share/romiVendordep)
 
 if(WITH_TESTS)
