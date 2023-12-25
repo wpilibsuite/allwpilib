@@ -15,12 +15,9 @@ jobs:
     name: "Update"
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
-      - name: Fetch all history and metadata
-        run: |
-          git fetch --prune --unshallow
-          git checkout -b pr
-          git branch -f main origin/main
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Set up Python 3.9
         uses: actions/setup-python@v4
         with:
