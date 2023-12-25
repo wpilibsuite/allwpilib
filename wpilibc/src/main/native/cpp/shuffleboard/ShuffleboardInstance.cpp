@@ -6,7 +6,6 @@
 
 #include <hal/FRCUsageReporting.h>
 #include <networktables/NetworkTable.h>
-#include <networktables/NetworkTableEntry.h>
 #include <networktables/NetworkTableInstance.h>
 #include <wpi/SmallVector.h>
 #include <wpi/StringMap.h>
