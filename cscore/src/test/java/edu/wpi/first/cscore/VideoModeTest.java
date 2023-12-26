@@ -7,6 +7,7 @@ package edu.wpi.first.cscore;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
+import edu.wpi.first.util.PixelFormat;
 import org.junit.jupiter.api.Test;
 
 class VideoModeTest {
