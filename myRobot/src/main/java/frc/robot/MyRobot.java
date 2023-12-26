@@ -40,7 +40,7 @@ public class MyRobot extends TimedRobot {
     m_canvas2D.drawRect(50, 50, 100, 100, 0, true, new Color8Bit(Color.kGreen), 255);
     m_canvas2D.drawCircle(105, 105, 10, 3, false, new Color8Bit(Color.kBlue), 100);
     m_canvas2D.drawNgon(120, 120, 10, 5, 1, false, new Color8Bit(Color.kYellow), 255);
-    m_canvas2D.drawText(5, 5, 5, -1, "Hello world", new Color8Bit(255, 2, 51), 255);
+    m_canvas2D.drawText(5, 5, 5, "Hello world", new Color8Bit(255, 2, 51), 255, 0);
     m_canvas2D.finishFrame();
   }
 
