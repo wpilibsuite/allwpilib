@@ -29,7 +29,7 @@ static bool FamilyToImage(wpi::RawFrame* frame, apriltag_family_t* family,
   bool rv = frame->Reserve(totalDataSize);
   std::memcpy(frame->data, image->buf, totalDataSize);
   frame->size = totalDataSize;
-  frame->width = image->stride;
+  frame->width = image->width;
   frame->height = image->height;
   frame->stride = image->stride;
   frame->pixelFormat = WPI_PIXFMT_GRAY;
