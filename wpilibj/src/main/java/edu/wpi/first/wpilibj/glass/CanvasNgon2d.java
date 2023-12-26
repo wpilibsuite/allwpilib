@@ -10,7 +10,8 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import java.nio.ByteBuffer;
 
 /**
- * Represents the data for a ngon element on a Canvas2d. To draw on a Canvas2d, use {@link Canvas2d#drawNgon}.
+ * Represents the data for a ngon element on a Canvas2d. To draw on a Canvas2d, use {@link
+ * Canvas2d#drawNgon}.
  */
 public class CanvasNgon2d {
   public final float m_x;

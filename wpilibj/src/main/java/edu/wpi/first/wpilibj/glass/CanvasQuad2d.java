@@ -10,7 +10,8 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import java.nio.ByteBuffer;
 
 /**
- * Represents a quad element on a Canvas2d. To draw on a Canvas2d, use {@link Canvas2d#drawQuad} or {@link Canvas2d#drawRect}.
+ * Represents a quad element on a Canvas2d. To draw on a Canvas2d, use {@link Canvas2d#drawQuad} or
+ * {@link Canvas2d#drawRect}.
  */
 public class CanvasQuad2d {
   public final float m_x1;

@@ -186,7 +186,8 @@ public class Canvas2d implements NTSendable, AutoCloseable {
       float fontSize,
       String text,
       Color8Bit color,
-      int opacity, float wrapWidth) {
+      int opacity,
+      float wrapWidth) {
     m_texts.add(
         new CanvasText2d(x, y, fontSize, text, color, opacity, wrapWidth, m_currentZOrder++));
   }
