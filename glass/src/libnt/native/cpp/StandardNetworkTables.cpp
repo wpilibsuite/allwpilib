@@ -171,7 +171,8 @@ void glass::AddStandardNetworkTablesViews(NetworkTablesProvider& provider) {
       });
   provider.Register(
       NTProfiledPIDControllerModel::kType,
-      [](nt::NetworkTableInstance inst, const char* path) {
+      [](nt::NetworkTableInstance inst,
+         wpi::StructDescriptorDatabase& structDatabase, const char* path) {
         return std::make_unique<NTProfiledPIDControllerModel>(inst, path);
       },
       [](Window* win, Model* model, const char* path) {
