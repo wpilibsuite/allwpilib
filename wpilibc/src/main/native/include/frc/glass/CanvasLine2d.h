@@ -12,6 +12,10 @@
 
 namespace frc {
 
+/**
+ * Represents the data for a line element on a Canvas2d. To draw on a Canvas2d,
+ * use Canvas2d#DrawLine.
+ */
 struct CanvasLine2d {
   float x1;
   float y1;

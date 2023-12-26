@@ -43,15 +43,6 @@ public class Canvas2d implements NTSendable, AutoCloseable {
     m_dims[1] = length;
   }
 
-  /**
-   * Draw a complex object on the canvas.
-   *
-   * @param object The object
-   */
-  public void draw(CanvasComplexObject2d object) {
-    object.drawOn(this);
-  }
-
   /** Clears the canvas. */
   public void clear() {
     m_currentZOrder = 0;
@@ -99,9 +90,7 @@ public class Canvas2d implements NTSendable, AutoCloseable {
       boolean fill,
       Color8Bit color,
       int opacity) {
-    m_quads.add(
-        new CanvasQuad2d(
-            x1, y1, x2, y1, x2, y2, x1, y2, weight, fill, color, opacity, m_currentZOrder++));
+    drawQuad(x1, y1, x2, y1, x2, y2, x1, y2, weight, fill, color, opacity);
   }
 
   /**
@@ -186,21 +175,20 @@ public class Canvas2d implements NTSendable, AutoCloseable {
    * @param x The x coordinate of the text
    * @param y The y coordinate of the text
    * @param fontSize The size of the text
-   * @param wrapWidth The width at which the text should wrap. 0 for no wrap
    * @param text The text. The max length of the text is 64 characters
    * @param color The color of the text
    * @param opacity The opacity of the text [0-255]
+   * @param wrapWidth The width at which the text should wrap. 0 for no wrap
    */
   public void drawText(
       float x,
       float y,
       float fontSize,
-      float wrapWidth,
       String text,
       Color8Bit color,
-      int opacity) {
+      int opacity, float wrapWidth) {
     m_texts.add(
-        new CanvasText2d(x, y, fontSize, wrapWidth, text, color, opacity, m_currentZOrder++));
+        new CanvasText2d(x, y, fontSize, text, color, opacity, wrapWidth, m_currentZOrder++));
   }
 
   /** Finish and push the frame to Sendable. Clears the canvas after pushing the frame. */
@@ -209,7 +197,7 @@ public class Canvas2d implements NTSendable, AutoCloseable {
   }
 
   /**
-   * Finish and push the frame to Sendable.
+   * Finish and push the frame to Sendable. If sendable is not initialized, this does nothing.
    *
    * @param clearCanvas Whether to clear the canvas after pushing the frame.
    */
@@ -245,26 +233,31 @@ public class Canvas2d implements NTSendable, AutoCloseable {
       m_linesPub.close();
     }
     m_linesPub = table.getStructArrayTopic("lines", CanvasLine2d.struct).publish();
+    m_linesPub.set(new CanvasLine2d[0]);
 
     if (m_quadsPub != null) {
       m_quadsPub.close();
     }
     m_quadsPub = table.getStructArrayTopic("quads", CanvasQuad2d.struct).publish();
+    m_quadsPub.set(new CanvasQuad2d[0]);
 
     if (m_circlesPub != null) {
       m_circlesPub.close();
     }
     m_circlesPub = table.getStructArrayTopic("circles", CanvasCircle2d.struct).publish();
+    m_circlesPub.set(new CanvasCircle2d[0]);
 
     if (m_ngonsPub != null) {
       m_ngonsPub.close();
     }
     m_ngonsPub = table.getStructArrayTopic("ngons", CanvasNgon2d.struct).publish();
+    m_ngonsPub.set(new CanvasNgon2d[0]);
 
     if (m_textsPub != null) {
       m_textsPub.close();
     }
     m_textsPub = table.getStructArrayTopic("texts", CanvasText2d.struct).publish();
+    m_textsPub.set(new CanvasText2d[0]);
   }
 
   @Override

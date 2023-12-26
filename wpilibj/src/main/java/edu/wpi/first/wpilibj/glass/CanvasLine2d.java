@@ -9,6 +9,9 @@ import edu.wpi.first.util.struct.Struct;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import java.nio.ByteBuffer;
 
+/**
+ * Represents the data for a line element on a Canvas2d. To draw on a Canvas2d, use {@link Canvas2d#drawLine}.
+ */
 public class CanvasLine2d {
   public final float m_x1;
   public final float m_y1;

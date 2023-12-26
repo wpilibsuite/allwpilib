@@ -9,12 +9,15 @@ import edu.wpi.first.util.struct.Struct;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import java.nio.ByteBuffer;
 
+/**
+ * Represents the data for a text element on a Canvas2d. To draw on a Canvas2d, use {@link Canvas2d#drawText}.
+ */
 class CanvasText2d {
   public final float m_x;
   public final float m_y;
   public final float m_fontSize;
-  public final float m_wrapWidth;
   public final char[] m_text;
+  public final float m_wrapWidth;
   public final Color8Bit m_color;
   public final int m_opacity;
   public final int m_zOrder;
@@ -35,12 +38,12 @@ class CanvasText2d {
       float x,
       float y,
       float fontSize,
-      float wrapWidth,
       String text,
       Color8Bit color,
       int opacity,
+      float wrapWidth,
       int zOrder) {
-    this(x, y, fontSize, wrapWidth, text.toCharArray(), color, opacity, zOrder);
+    this(x, y, fontSize, text.toCharArray(), color, opacity, wrapWidth, zOrder);
   }
 
   /**
@@ -59,22 +62,22 @@ class CanvasText2d {
       float x,
       float y,
       float size,
-      float wrapWidth,
       char[] text,
       Color8Bit color,
       int opacity,
+      float wrapWidth,
       int zOrder) {
     // TODO: Warn on long text?
     m_x = x;
     m_y = y;
     m_fontSize = size;
-    m_wrapWidth = wrapWidth;
     m_text = new char[64];
     for (int i = 0; i < Math.min(text.length, m_text.length); i++) {
       m_text[i] = text[i];
     }
     m_color = color;
     m_opacity = MathUtil.clamp(opacity, 0, 255);
+    m_wrapWidth = wrapWidth;
     m_zOrder = zOrder;
   }
 
@@ -91,12 +94,12 @@ class CanvasText2d {
 
     @Override
     public int getSize() {
-      return kSizeFloat * 4 + kSizeInt8 * 64 + kSizeInt8 * 4 + kSizeInt32;
+      return kSizeFloat * 3 + kSizeInt8 * 64 + kSizeFloat + kSizeInt8 * 4 + kSizeInt32;
     }
 
     @Override
     public String getSchema() {
-      return "float x;float y;float fontSize;float wrapWidth;char text[64];uint8 color[4];int32 zOrder";
+      return "float x;float y;float fontSize;char text[64];uint8 color[4];float wrapWidth;int32 zOrder";
     }
 
     @Override
@@ -104,25 +107,23 @@ class CanvasText2d {
       float x = bb.getFloat();
       float y = bb.getFloat();
       float fontSize = bb.getFloat();
-      float wrapWidth = bb.getFloat();
       char[] text = new char[64];
       for (int i = 0; i < 64; i++) {
         text[i] = (char) bb.get();
       }
       Color8Bit color = new Color8Bit(bb.get(), bb.get(), bb.get());
       int opacity = bb.get();
+      float wrapWidth = bb.getFloat();
       int zOrder = bb.getInt();
 
-      return new CanvasText2d(x, y, fontSize, wrapWidth, text, color, opacity, zOrder);
+      return new CanvasText2d(x, y, fontSize, text, color, opacity, wrapWidth, zOrder);
     }
 
     @Override
     public void pack(ByteBuffer bb, CanvasText2d value) {
-      System.out.println(bb.position());
       bb.putFloat(value.m_x);
       bb.putFloat(value.m_y);
       bb.putFloat(value.m_fontSize);
-      bb.putFloat(value.m_wrapWidth);
       for (int i = 0; i < value.m_text.length; i++) {
         bb.put((byte) value.m_text[i]);
       }
@@ -133,8 +134,8 @@ class CanvasText2d {
       bb.put((byte) value.m_color.green);
       bb.put((byte) value.m_color.blue);
       bb.put((byte) value.m_opacity);
+      bb.putFloat(value.m_wrapWidth);
       bb.putInt(value.m_zOrder);
-      System.out.println(bb.position());
     }
   }
 

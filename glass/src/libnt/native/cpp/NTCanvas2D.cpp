@@ -196,9 +196,9 @@ void NTCanvas2DModel::Update() {
     auto* xField = textDesc->FindFieldByName("x");
     auto* yField = textDesc->FindFieldByName("y");
     auto* fontSizeField = textDesc->FindFieldByName("fontSize");
-    auto* wrapWidthField = textDesc->FindFieldByName("wrapWidth");
     auto* textField = textDesc->FindFieldByName("text");
     auto* colorField = textDesc->FindFieldByName("color");
+    auto* wrapWidthField = textDesc->FindFieldByName("wrapWidth");
     auto* zOrderField = textDesc->FindFieldByName("zOrder");
 
     for (auto&& v : m_textsSub.ReadQueue()) {
@@ -208,15 +208,15 @@ void NTCanvas2DModel::Update() {
       for (const auto& text : textArray) {
         ImVec2 position{text.GetFloatField(xField), text.GetFloatField(yField)};
         float fontSize = text.GetFloatField(fontSizeField);
-        float wrapWidth = text.GetFloatField(wrapWidthField);
+        std::string textStr{text.GetStringField(textField)};
         ImU32 color = IM_COL32(
             text.GetUintField(colorField, 0), text.GetUintField(colorField, 1),
             text.GetUintField(colorField, 2), text.GetUintField(colorField, 3));
-        std::string textStr{text.GetStringField(textField)};
+        float wrapWidth = text.GetFloatField(wrapWidthField);
         int zOrder = text.GetIntField(zOrderField);
 
-        m_texts.emplace_back(position, fontSize, wrapWidth, std::move(textStr),
-                             color, zOrder);
+        m_texts.emplace_back(position, fontSize, std::move(textStr), color,
+                             wrapWidth, zOrder);
       }
     }
   }

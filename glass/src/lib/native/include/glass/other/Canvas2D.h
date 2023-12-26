@@ -160,20 +160,20 @@ class Canvas2DNgon : public Canvas2DElement {
 
 class Canvas2DText : public Canvas2DElement {
  public:
-  Canvas2DText(ImVec2 position, float fontSize, float wrapWidth,
-               std::string text, ImU32 color, int zOrder)
+  Canvas2DText(ImVec2 position, float fontSize, std::string text, ImU32 color,
+               float wrapWidth, int zOrder)
       : m_position{position},
         m_fontSize{fontSize},
-        m_wrapWidth{wrapWidth},
         m_text(std::move(text)),
         m_color{color},
+        m_wrapWidth{wrapWidth},
         m_zOrder{zOrder} {}
 
   ImVec2 GetPosition() const { return m_position; }
-  float GetSize() const { return m_fontSize; }
-  float GetWrapWidth() const { return m_wrapWidth; }
-  ImU32 GetColor() const { return m_color; }
+  float GetFontSize() const { return m_fontSize; }
   std::string_view GetText() const { return m_text; }
+  ImU32 GetColor() const { return m_color; }
+  float GetWrapWidth() const { return m_wrapWidth; }
   int GetZOrder() const override { return m_zOrder; }
 
   void Draw(float scale, const ImVec2& cursorPos,
@@ -182,9 +182,9 @@ class Canvas2DText : public Canvas2DElement {
  private:
   ImVec2 m_position;
   float m_fontSize;
-  float m_wrapWidth;
   std::string m_text;
   ImU32 m_color;
+  float m_wrapWidth;
   int m_zOrder;
 };
 
