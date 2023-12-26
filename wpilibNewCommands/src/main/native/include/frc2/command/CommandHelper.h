@@ -8,6 +8,8 @@
 #include <memory>
 #include <utility>
 
+#include <wpi/deprecated.h>
+
 #include "frc2/command/Command.h"
 #include "frc2/command/CommandPtr.h"
 
@@ -34,9 +36,8 @@ class CommandHelper : public Base {
   }
 
  protected:
-  [[deprecated("Use ToPtr() instead")]]
-      std::unique_ptr<Command> TransferOwnership() &&
-      override {
+  WPI_DEPRECATED("Use ToPtr() instead")
+  std::unique_ptr<Command> TransferOwnership() && override {
     return std::make_unique<CRTP>(std::move(*static_cast<CRTP*>(this)));
   }
 };
