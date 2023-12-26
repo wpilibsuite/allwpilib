@@ -32,5 +32,10 @@ class CommandHelper : public Base {
     return CommandPtr(
         std::make_unique<CRTP>(std::move(*static_cast<CRTP*>(this))));
   }
+
+ protected:
+  std::unique_ptr<Command> TransferOwnership() && override {
+    return std::make_unique<CRTP>(std::move(*static_cast<CRTP*>(this)));
+  }
 };
 }  // namespace frc2
