@@ -34,7 +34,9 @@ class CommandHelper : public Base {
   }
 
  protected:
-  std::unique_ptr<Command> TransferOwnership() && override {
+  [[deprecated("Use ToPtr() instead")]]
+      std::unique_ptr<Command> TransferOwnership() &&
+      override {
     return std::make_unique<CRTP>(std::move(*static_cast<CRTP*>(this)));
   }
 };

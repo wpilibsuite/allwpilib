@@ -134,7 +134,9 @@ class SelectCommand : public CommandHelper<Command, SelectCommand<Key>> {
   }
 
  protected:
-  std::unique_ptr<Command> TransferOwnership() && override {
+  [[deprecated("Use ToPtr() instead")]]
+      std::unique_ptr<Command> TransferOwnership() &&
+      override {
     return std::make_unique<SelectCommand>(std::move(*this));
   }
 
