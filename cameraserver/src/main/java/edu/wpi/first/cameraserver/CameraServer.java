@@ -14,7 +14,6 @@ import edu.wpi.first.cscore.VideoEvent;
 import edu.wpi.first.cscore.VideoException;
 import edu.wpi.first.cscore.VideoListener;
 import edu.wpi.first.cscore.VideoMode;
-import edu.wpi.first.cscore.VideoMode.PixelFormat;
 import edu.wpi.first.cscore.VideoSink;
 import edu.wpi.first.cscore.VideoSource;
 import edu.wpi.first.networktables.BooleanEntry;
@@ -27,6 +26,7 @@ import edu.wpi.first.networktables.StringArrayPublisher;
 import edu.wpi.first.networktables.StringArrayTopic;
 import edu.wpi.first.networktables.StringEntry;
 import edu.wpi.first.networktables.StringPublisher;
+import edu.wpi.first.util.PixelFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -686,7 +686,7 @@ public final class CameraServer {
    */
   public static MjpegServer addSwitchedCamera(String name) {
     // create a dummy CvSource
-    CvSource source = new CvSource(name, VideoMode.PixelFormat.kMJPEG, 160, 120, 30);
+    CvSource source = new CvSource(name, PixelFormat.kMJPEG, 160, 120, 30);
     MjpegServer server = startAutomaticCapture(source);
     synchronized (CameraServer.class) {
       m_fixedSources.put(server.getHandle(), source.getHandle());
@@ -801,7 +801,7 @@ public final class CameraServer {
    * @return OpenCV source for the MJPEG stream
    */
   public static CvSource putVideo(String name, int width, int height) {
-    CvSource source = new CvSource(name, VideoMode.PixelFormat.kMJPEG, width, height, 30);
+    CvSource source = new CvSource(name, PixelFormat.kMJPEG, width, height, 30);
     startAutomaticCapture(source);
     return source;
   }

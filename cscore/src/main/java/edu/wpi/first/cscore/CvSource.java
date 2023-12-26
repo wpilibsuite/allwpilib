@@ -4,6 +4,7 @@
 
 package edu.wpi.first.cscore;
 
+import edu.wpi.first.util.PixelFormat;
 import org.opencv.core.Mat;
 
 /**
@@ -32,7 +33,7 @@ public class CvSource extends ImageSource {
    * @param height height
    * @param fps fps
    */
-  public CvSource(String name, VideoMode.PixelFormat pixelFormat, int width, int height, int fps) {
+  public CvSource(String name, PixelFormat pixelFormat, int width, int height, int fps) {
     super(CameraServerCvJNI.createCvSource(name, pixelFormat.getValue(), width, height, fps));
   }
 
