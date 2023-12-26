@@ -69,38 +69,23 @@ class ADIS16470_IMU : public wpi::Sendable,
     _64s = 11
   };
 
-  enum IMUAxis { kX, kY, kZ };
+  enum IMUAxis { kX, kY, kZ, kYaw, kPitch, kRoll };
 
-  /**
-   * @brief Default constructor. Uses CS0 on the 10-pin SPI port, the yaw axis
-   * is set to the IMU Z axis, and calibration time is defaulted to 4 seconds.
-   */
   ADIS16470_IMU();
+  ADIS16470_IMU(IMUAxis yaw_axis, IMUAxis pitch_axis, IMUAxis roll_axis);
 
-  /**
-   * @brief Customizable constructor. Allows the SPI port and CS to be
-   * customized, the yaw axis used for GetAngle() is adjustable, and initial
-   * calibration time can be modified.
-   *
-   * @param yaw_axis Selects the "default" axis to use for GetAngle() and
-   * GetRate()
-   *
-   * @param port The SPI port and CS where the IMU is connected.
-   *
-   * @param cal_time The calibration time that should be used on start-up.
-   */
-  explicit ADIS16470_IMU(IMUAxis yaw_axis, SPI::Port port,
+  explicit ADIS16470_IMU(IMUAxis yaw_axis, IMUAxis pitch_axis,
+                         IMUAxis roll_axis, frc::SPI::Port port,
                          CalibrationTime cal_time);
 
-  /**
-   * @brief Destructor. Kills the acquisition loop and closes the SPI
-   * peripheral.
-   */
   ~ADIS16470_IMU() override;
 
   ADIS16470_IMU(ADIS16470_IMU&&) = default;
   ADIS16470_IMU& operator=(ADIS16470_IMU&&) = default;
 
+  /**
+   * @brief Configures the decimation rate of the IMU.
+   */
   int ConfigDecRate(uint16_t reg);
 
   /**
@@ -116,22 +101,59 @@ class ADIS16470_IMU : public wpi::Sendable,
   int ConfigCalTime(CalibrationTime new_cal_time);
 
   /**
-   * @brief Resets (zeros) the xgyro, ygyro, and zgyro angle integrations.
-   *
-   * Resets the gyro accumulations to a heading of zero. This can be used if
-   * the "zero" orientation of the sensor needs to be changed in runtime.
+   * @brief Resets the gyro accumulations to a heading of zero. This can be used
+   * if the "zero" orientation of the sensor needs to be changed in runtime.
    */
   void Reset();
 
   /**
-   * Returns the yaw axis angle in degrees (CCW positive).
+   * Allow the designated gyro angle to be set to a given value. This may happen
+   * with unread values in the buffer, it is suggested that the IMU is not
+   * moving when this method is run.
+   *
+   * @param axis IMUAxis that will be changed
+   * @param angle The new angle (CCW positive)
    */
-  units::degree_t GetAngle() const;
+  void SetGyroAngle(IMUAxis axis, units::degree_t angle);
 
   /**
-   * Returns the yaw axis angular rate in degrees per second (CCW positive).
+   * Allow the gyro angle X to be set to a given value. This may happen with
+   * unread values in the buffer, it is suggested that the IMU is not moving
+   * when this method is run.
+   *
+   * @param angle The new angle (CCW positive)
    */
-  units::degrees_per_second_t GetRate() const;
+  void SetGyroAngleX(units::degree_t angle);
+
+  /**
+   * Allow the gyro angle Y to be set to a given value. This may happen with
+   * unread values in the buffer, it is suggested that the IMU is not moving
+   * when this method is run.
+   *
+   * @param angle The new angle (CCW positive)
+   */
+  void SetGyroAngleY(units::degree_t angle);
+
+  /**
+   * Allow the gyro angle Z to be set to a given value. This may happen with
+   * unread values in the buffer, it is suggested that the IMU is not moving
+   * when this method is run.
+   *
+   * @param angle The new angle (CCW positive)
+   */
+  void SetGyroAngleZ(units::degree_t angle);
+
+  /**
+   * @param axis The IMUAxis whose angle to return
+   * @return The axis angle (CCW positive)
+   */
+  units::degree_t GetAngle(IMUAxis axis) const;
+
+  /**
+   * @param axis The IMUAxis whose rate to return
+   * @return Axis angular rate (CCW positive)
+   */
+  units::degrees_per_second_t GetRate(IMUAxis axis) const;
 
   /**
    * Returns the acceleration in the X axis.
@@ -148,25 +170,60 @@ class ADIS16470_IMU : public wpi::Sendable,
    */
   units::meters_per_second_squared_t GetAccelZ() const;
 
+  /**
+   * Returns the X-axis complementary angle.
+   */
   units::degree_t GetXComplementaryAngle() const;
 
+  /**
+   * Returns the Y-axis complementary angle.
+   */
   units::degree_t GetYComplementaryAngle() const;
 
+  /**
+   * Returns the X-axis filtered acceleration angle.
+   */
   units::degree_t GetXFilteredAccelAngle() const;
 
+  /**
+   * Returns the Y-axis filtered acceleration angle.
+   */
   units::degree_t GetYFilteredAccelAngle() const;
 
+  /**
+   * Returns which axis, kX, kY, or kZ, is set to the yaw axis.
+   *
+   * @return IMUAxis Yaw Axis
+   */
   IMUAxis GetYawAxis() const;
 
-  int SetYawAxis(IMUAxis yaw_axis);
-
-  bool IsConnected() const;
-
-  // IMU yaw axis
-  IMUAxis m_yaw_axis;
+  /**
+   * Returns which axis, kX, kY, or kZ, is set to the pitch axis.
+   *
+   * @return IMUAxis Pitch Axis
+   */
+  IMUAxis GetPitchAxis() const;
 
   /**
-   * Get the SPI port number.
+   * Returns which axis, kX, kY, or kZ, is set to the roll axis.
+   *
+   * @return IMUAxis Roll Axis
+   */
+  IMUAxis GetRollAxis() const;
+
+  /**
+   * Checks the connection status of the IMU.
+   *
+   * @return True if the IMU is connected, false otherwise.
+   */
+  bool IsConnected() const;
+
+  IMUAxis m_yaw_axis;
+  IMUAxis m_pitch_axis;
+  IMUAxis m_roll_axis;
+
+  /**
+   * Gets the SPI port number.
    *
    * @return The SPI port number.
    */
@@ -175,7 +232,7 @@ class ADIS16470_IMU : public wpi::Sendable,
   void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
-  /* ADIS16470 Register Map Declaration */
+  // Register Map Declaration
   static constexpr uint8_t FLASH_CNT = 0x00;  // Flash memory write count
   static constexpr uint8_t DIAG_STAT =
       0x02;  // Diagnostic and operational status
@@ -276,25 +333,15 @@ class ADIS16470_IMU : public wpi::Sendable,
   static constexpr uint8_t FLSHCNT_HIGH =
       0x7E;  // Flash update count, upper word
 
-  /* ADIS16470 Auto SPI Data Packets */
-  static constexpr uint8_t m_autospi_x_packet[16] = {
-      X_DELTANG_OUT, FLASH_CNT, X_DELTANG_LOW, FLASH_CNT, X_GYRO_OUT, FLASH_CNT,
-      Y_GYRO_OUT,    FLASH_CNT, Z_GYRO_OUT,    FLASH_CNT, X_ACCL_OUT, FLASH_CNT,
-      Y_ACCL_OUT,    FLASH_CNT, Z_ACCL_OUT,    FLASH_CNT};
+  // Auto SPI Data Packet to read all thrre gyro axes.
+  static constexpr uint8_t m_autospi_allangle_packet[24] = {
+      X_DELTANG_OUT, FLASH_CNT,     X_DELTANG_LOW, FLASH_CNT,     Y_DELTANG_OUT,
+      FLASH_CNT,     Y_DELTANG_LOW, FLASH_CNT,     Z_DELTANG_OUT, FLASH_CNT,
+      Z_DELTANG_LOW, FLASH_CNT,     X_GYRO_OUT,    FLASH_CNT,     Y_GYRO_OUT,
+      FLASH_CNT,     Z_GYRO_OUT,    FLASH_CNT,     X_ACCL_OUT,    FLASH_CNT,
+      Y_ACCL_OUT,    FLASH_CNT,     Z_ACCL_OUT,    FLASH_CNT};
 
-  static constexpr uint8_t m_autospi_y_packet[16] = {
-      Y_DELTANG_OUT, FLASH_CNT, Y_DELTANG_LOW, FLASH_CNT, X_GYRO_OUT, FLASH_CNT,
-      Y_GYRO_OUT,    FLASH_CNT, Z_GYRO_OUT,    FLASH_CNT, X_ACCL_OUT, FLASH_CNT,
-      Y_ACCL_OUT,    FLASH_CNT, Z_ACCL_OUT,    FLASH_CNT};
-
-  static constexpr uint8_t m_autospi_z_packet[16] = {
-      Z_DELTANG_OUT, FLASH_CNT, Z_DELTANG_LOW, FLASH_CNT, X_GYRO_OUT, FLASH_CNT,
-      Y_GYRO_OUT,    FLASH_CNT, Z_GYRO_OUT,    FLASH_CNT, X_ACCL_OUT, FLASH_CNT,
-      Y_ACCL_OUT,    FLASH_CNT, Z_ACCL_OUT,    FLASH_CNT};
-
-  /* ADIS16470 Constants */
-  static constexpr double delta_angle_sf =
-      2160.0 / 2147483648.0; /* 2160 / (2^31) */
+  static constexpr double delta_angle_sf = 2160.0 / 2147483648.0;
   static constexpr double rad_to_deg = 57.2957795;
   static constexpr double deg_to_rad = 0.0174532;
   static constexpr double grav = 9.81;
@@ -350,8 +397,10 @@ class ADIS16470_IMU : public wpi::Sendable,
 
   void Close();
 
-  // Integrated gyro value
-  double m_integ_angle = 0.0;
+  // Integrated gyro angles.
+  double m_integ_angle_x = 0.0;
+  double m_integ_angle_y = 0.0;
+  double m_integ_angle_z = 0.0;
 
   // Instant raw outputs
   double m_gyro_rate_x = 0.0;
