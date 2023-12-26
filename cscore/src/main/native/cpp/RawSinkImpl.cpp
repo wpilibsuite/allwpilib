@@ -109,9 +109,10 @@ uint64_t RawSinkImpl::GrabFrameImpl(WPI_RawFrame& rawFrame,
   WPI_AllocateRawFrameData(&rawFrame, newImage->size());
   rawFrame.height = newImage->height;
   rawFrame.width = newImage->width;
+  rawFrame.stride = newImage->GetStride();
   rawFrame.pixelFormat = newImage->pixelFormat;
-  rawFrame.totalData = newImage->size();
-  std::copy(newImage->data(), newImage->data() + rawFrame.totalData,
+  rawFrame.size = newImage->size();
+  std::copy(newImage->data(), newImage->data() + rawFrame.size,
             rawFrame.data);
 
   return incomingFrame.GetTime();
