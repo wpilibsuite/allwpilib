@@ -7,6 +7,7 @@
 
 #include <fmt/format.h>
 #include <opencv2/core/core.hpp>
+
 #define WPI_RAWFRAME_JNI
 #include <wpi/RawFrame.h>
 #include <wpi/SmallString.h>
@@ -1276,8 +1277,8 @@ Java_edu_wpi_first_cscore_CameraServerJNI_putRawSourceFrameBB
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_cscore_CameraServerJNI_putRawSourceFrameData
-  (JNIEnv* env, jclass, jint source, jlong data, jint size, jint width, jint height,
-   jint stride, jint pixelFormat)
+  (JNIEnv* env, jclass, jint source, jlong data, jint size, jint width,
+   jint height, jint stride, jint pixelFormat)
 {
   WPI_RawFrame frame;  // use WPI_Frame because we don't want the destructor
   frame.data = reinterpret_cast<uint8_t*>(data);
@@ -1770,7 +1771,8 @@ Java_edu_wpi_first_cscore_CameraServerJNI_grabRawSinkFrame
   if (!CheckStatus(env, status)) {
     return 0;
   }
-  wpi::SetFrameData(env, rawFrameCls, frameObj, *frame, origData != frame->data);
+  wpi::SetFrameData(env, rawFrameCls, frameObj, *frame,
+                    origData != frame->data);
   return rv;
 }
 
@@ -1787,12 +1789,13 @@ Java_edu_wpi_first_cscore_CameraServerJNI_grabRawSinkFrameTimeout
   auto* frame = reinterpret_cast<wpi::RawFrame*>(framePtr);
   auto origData = frame->data;
   CS_Status status = 0;
-  auto rv = cs::GrabSinkFrameTimeout(static_cast<CS_Sink>(sink), *frame, timeout,
-                                     &status);
+  auto rv = cs::GrabSinkFrameTimeout(static_cast<CS_Sink>(sink), *frame,
+                                     timeout, &status);
   if (!CheckStatus(env, status)) {
     return 0;
   }
-  wpi::SetFrameData(env, rawFrameCls, frameObj, *frame, origData != frame->data);
+  wpi::SetFrameData(env, rawFrameCls, frameObj, *frame,
+                    origData != frame->data);
   return rv;
 }
 

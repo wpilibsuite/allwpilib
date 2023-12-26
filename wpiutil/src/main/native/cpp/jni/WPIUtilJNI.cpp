@@ -362,11 +362,12 @@ Java_edu_wpi_first_util_WPIUtilJNI_getRawFrameDataPtr
 /*
  * Class:     edu_wpi_first_util_WPIUtilJNI
  * Method:    setRawFrameData
- * Signature: (JLjava/nio/ByteBuffer;IIIII)V
+ * Signature: (JLjava/lang/Object;IIIII)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_util_WPIUtilJNI_setRawFrameData
-  (JNIEnv* env, jclass, jlong frame, jobject data, jint size, jint width, jint height, jint stride, jint pixelFormat)
+  (JNIEnv* env, jclass, jlong frame, jobject data, jint size, jint width,
+   jint height, jint stride, jint pixelFormat)
 {
   auto* f = reinterpret_cast<wpi::RawFrame*>(frame);
   if (!f) {
@@ -394,7 +395,8 @@ Java_edu_wpi_first_util_WPIUtilJNI_setRawFrameData
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_util_WPIUtilJNI_setRawFrameInfo
-  (JNIEnv* env, jclass, jlong frame, jint size, jint width, jint height, jint stride, jint pixelFormat)
+  (JNIEnv* env, jclass, jlong frame, jint size, jint width, jint height,
+   jint stride, jint pixelFormat)
 {
   auto* f = reinterpret_cast<wpi::RawFrame*>(frame);
   if (!f) {

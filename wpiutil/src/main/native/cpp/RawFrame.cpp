@@ -4,9 +4,9 @@
 
 #include "wpi/RawFrame.h"
 
-#include <cstring>
-
 #include <wpi/MemAlloc.h>
+
+#include <cstring>
 
 extern "C" {
 int WPI_AllocateRawFrameData(WPI_RawFrame* frame, size_t requestedSize) {

@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <jni.h>
+
 #include <cstdio>
 #include <cstring>
-
-#include <jni.h>
 
 #define WPI_RAWFRAME_JNI
 #include <wpi/RawFrame.h>
@@ -597,7 +597,7 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_estimatePose
 /*
  * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
  * Method:    generate16h5AprilTagImage
- * Signature: (Ledu/wpi/first/util/RawFrame;JI)V
+ * Signature: (Ljava/lang/Object;JI)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_apriltag_jni_AprilTagJNI_generate16h5AprilTagImage
@@ -615,7 +615,7 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_generate16h5AprilTagImage
 /*
  * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
  * Method:    generate36h11AprilTagImage
- * Signature: (Ledu/wpi/first/util/RawFrame;JI)V
+ * Signature: (Ljava/lang/Object;JI)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_apriltag_jni_AprilTagJNI_generate36h11AprilTagImage
