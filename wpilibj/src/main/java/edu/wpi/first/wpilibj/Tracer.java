@@ -36,7 +36,7 @@ public class Tracer {
   }
 
   /** Restarts the epoch timer. */
-  public void resetTimer() {
+  public final void resetTimer() {
     m_startTime = RobotController.getFPGATime();
   }
 

@@ -59,6 +59,7 @@ public class ADXRS450_Gyro implements Sendable, AutoCloseable {
    *
    * @param port The SPI port that the gyro is connected to
    */
+  @SuppressWarnings("this-escape")
   public ADXRS450_Gyro(SPI.Port port) {
     m_spi = new SPI(port);
 
@@ -113,7 +114,7 @@ public class ADXRS450_Gyro implements Sendable, AutoCloseable {
    * are in progress, this is typically done when the robot is first turned on while it's sitting at
    * rest before the competition starts.
    */
-  public void calibrate() {
+  public final void calibrate() {
     if (m_spi == null) {
       return;
     }

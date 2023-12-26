@@ -35,6 +35,7 @@ public class Victor extends PWMMotorController {
    * @param channel The PWM channel that the Victor is attached to. 0-9 are on-board, 10-19 are on
    *     the MXP port
    */
+  @SuppressWarnings("this-escape")
   public Victor(final int channel) {
     super("Victor", channel);
 

@@ -287,6 +287,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
    * @param port The SPI Port the gyro is plugged into
    * @param cal_time Calibration time
    */
+  @SuppressWarnings("this-escape")
   public ADIS16470_IMU(IMUAxis yaw_axis, SPI.Port port, CalibrationTime cal_time) {
     m_yaw_axis = yaw_axis;
     m_calibration_time = cal_time.value;

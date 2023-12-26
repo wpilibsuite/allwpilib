@@ -265,7 +265,7 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num, Outputs ex
    *
    * @param initialState The initial state.
    */
-  public void reset(Matrix<States, N1> initialState) {
+  public final void reset(Matrix<States, N1> initialState) {
     m_nextR.fill(0.0);
     m_controller.reset();
     m_feedforward.reset(initialState);

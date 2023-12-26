@@ -30,7 +30,7 @@ set_property(TARGET ntcore PROPERTY FOLDER "libraries")
 
 install(TARGETS ntcore EXPORT ntcore)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/ntcore")
-install(DIRECTORY src/generated/main/native/include DESTINATION "${include_dest}/ntcore")
+install(DIRECTORY src/generated/main/native/include/ DESTINATION "${include_dest}/ntcore")
 
 configure_file(ntcore-config.cmake.in ${WPILIB_BINARY_DIR}/ntcore-config.cmake)
 install(FILES ${WPILIB_BINARY_DIR}/ntcore-config.cmake DESTINATION share/ntcore)

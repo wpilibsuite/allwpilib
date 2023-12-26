@@ -13,8 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
-class SelectCommandTest extends CommandTestBase
-    implements MultiCompositionTestBase<SelectCommand<Integer>> {
+class SelectCommandTest extends MultiCompositionTestBase<SelectCommand<Integer>> {
   @Test
   void selectCommandTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {

@@ -93,6 +93,7 @@ public class ADXL362 implements NTSendable, AutoCloseable {
    * @param port The SPI port that the accelerometer is connected to
    * @param range The range (+ or -) that the accelerometer will measure.
    */
+  @SuppressWarnings("this-escape")
   public ADXL362(SPI.Port port, Range range) {
     m_spi = new SPI(port);
 
@@ -164,7 +165,7 @@ public class ADXL362 implements NTSendable, AutoCloseable {
    * @param range The maximum acceleration, positive or negative, that the accelerometer will
    *     measure.
    */
-  public void setRange(Range range) {
+  public final void setRange(Range range) {
     if (m_spi == null) {
       return;
     }

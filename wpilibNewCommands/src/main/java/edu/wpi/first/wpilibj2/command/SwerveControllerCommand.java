@@ -186,6 +186,7 @@ public class SwerveControllerCommand extends Command {
    * @param outputModuleStates The raw output module states from the position controllers.
    * @param requirements The subsystems to require.
    */
+  @SuppressWarnings("this-escape")
   public SwerveControllerCommand(
       Trajectory trajectory,
       Supplier<Pose2d> pose,

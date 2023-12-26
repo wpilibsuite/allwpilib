@@ -15,6 +15,13 @@ namespace frc {
  * An implementation of the Simulated Annealing stochastic nonlinear
  * optimization method.
  *
+ * Solving optimization problems involves tweaking decision variables to try to
+ * minimize some cost function. Simulated annealing is good for solving
+ * optimization problems with many local minima and a very large search space
+ * (it’s a heuristic solver rather than an exact solver like, say, SQP or
+ * interior-point method). Simulated annealing is a popular choice for solving
+ * the traveling salesman problem (see TravelingSalesman).
+ *
  * @see <a
  * href="https://en.wikipedia.org/wiki/Simulated_annealing">https://en.wikipedia.org/wiki/Simulated_annealing</a>
  * @tparam State The type of the state to optimize.

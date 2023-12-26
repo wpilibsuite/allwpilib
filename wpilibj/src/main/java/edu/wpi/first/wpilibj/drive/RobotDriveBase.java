@@ -36,6 +36,7 @@ public abstract class RobotDriveBase extends MotorSafety {
   }
 
   /** RobotDriveBase constructor. */
+  @SuppressWarnings("this-escape")
   public RobotDriveBase() {
     setSafetyEnabled(true);
   }

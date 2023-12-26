@@ -257,6 +257,7 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
    * @param port The SPI Port the gyro is plugged into
    * @param cal_time Calibration time
    */
+  @SuppressWarnings("this-escape")
   public ADIS16448_IMU(final IMUAxis yaw_axis, SPI.Port port, CalibrationTime cal_time) {
     m_yaw_axis = yaw_axis;
     m_spi_port = port;
@@ -527,7 +528,7 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
    * @param new_cal_time New calibration time
    * @return 1 if the new calibration time is the same as the current one else 0
    */
-  public int configCalTime(CalibrationTime new_cal_time) {
+  public final int configCalTime(CalibrationTime new_cal_time) {
     if (m_calibration_time == new_cal_time) {
       return 1;
     } else {

@@ -159,6 +159,15 @@ class PowerDistribution : public wpi::Sendable,
     uint32_t Brownout : 1;
     uint32_t CanWarning : 1;
     uint32_t HardwareFault : 1;
+
+    /**
+     * Gets whether there is a breaker fault at a specified channel.
+     * @param channel Channel to check for faults.
+     * @return If there is a breaker fault.
+     * @throws A ChannelIndexOutOfRange error if the given int is outside of the
+     * range supported by the hardware.
+     */
+    bool GetBreakerFault(int channel) const;
   };
 
   Faults GetFaults() const;
@@ -192,6 +201,16 @@ class PowerDistribution : public wpi::Sendable,
     uint32_t CanWarning : 1;
     uint32_t CanBusOff : 1;
     uint32_t HasReset : 1;
+
+    /**
+     * Gets whether there is a sticky breaker fault at the specified channel.
+     * @param channel Index to check for sticky faults.
+     * @return True if there is a sticky breaker fault at the channel, otherwise
+     * false.
+     * @throws A ChannelIndexOutOfRange error if the provided channel is outside
+     * of the range supported by the hardware.
+     */
+    bool GetBreakerFault(int channel) const;
   };
 
   StickyFaults GetStickyFaults() const;

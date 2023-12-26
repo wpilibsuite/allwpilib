@@ -144,13 +144,13 @@ public class ControlAffinePlantInversionFeedforward<States extends Num, Inputs e
    *
    * @param initialState The initial state vector.
    */
-  public void reset(Matrix<States, N1> initialState) {
+  public final void reset(Matrix<States, N1> initialState) {
     m_r = initialState;
     m_uff.fill(0.0);
   }
 
   /** Resets the feedforward with a zero initial state vector. */
-  public void reset() {
+  public final void reset() {
     m_r.fill(0.0);
     m_uff.fill(0.0);
   }

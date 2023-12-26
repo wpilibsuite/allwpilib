@@ -25,11 +25,11 @@ class WPILIB_DLLEXPORT PIDController
   /**
    * Allocates a PIDController with the given constants for Kp, Ki, and Kd.
    *
-   * @param Kp     The proportional coefficient.
-   * @param Ki     The integral coefficient.
-   * @param Kd     The derivative coefficient.
+   * @param Kp     The proportional coefficient. Must be >= 0.
+   * @param Ki     The integral coefficient. Must be >= 0.
+   * @param Kd     The derivative coefficient. Must be >= 0.
    * @param period The period between controller updates in seconds. The
-   *               default is 20 milliseconds. Must be non-zero and positive.
+   *               default is 20 milliseconds. Must be positive.
    */
   PIDController(double Kp, double Ki, double Kd,
                 units::second_t period = 20_ms);
@@ -46,30 +46,30 @@ class WPILIB_DLLEXPORT PIDController
    *
    * Sets the proportional, integral, and differential coefficients.
    *
-   * @param Kp Proportional coefficient
-   * @param Ki Integral coefficient
-   * @param Kd Differential coefficient
+   * @param Kp The proportional coefficient. Must be >= 0.
+   * @param Ki The integral coefficient. Must be >= 0.
+   * @param Kd The differential coefficient. Must be >= 0.
    */
   void SetPID(double Kp, double Ki, double Kd);
 
   /**
    * Sets the proportional coefficient of the PID controller gain.
    *
-   * @param Kp proportional coefficient
+   * @param Kp The proportional coefficient. Must be >= 0.
    */
   void SetP(double Kp);
 
   /**
    * Sets the integral coefficient of the PID controller gain.
    *
-   * @param Ki integral coefficient
+   * @param Ki The integral coefficient. Must be >= 0.
    */
   void SetI(double Ki);
 
   /**
    * Sets the differential coefficient of the PID controller gain.
    *
-   * @param Kd differential coefficient
+   * @param Kd The differential coefficient. Must be >= 0.
    */
   void SetD(double Kd);
 
@@ -81,7 +81,8 @@ class WPILIB_DLLEXPORT PIDController
    * non-negative. Passing a value of zero will effectively disable integral
    * gain. Passing a value of infinity disables IZone functionality.
    *
-   * @param iZone Maximum magnitude of error to allow integral control.
+   * @param iZone Maximum magnitude of error to allow integral control. Must be
+   *   >= 0.
    */
   void SetIZone(double iZone);
 
