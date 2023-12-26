@@ -7,6 +7,7 @@ package edu.wpi.first.cscore.raw;
 import edu.wpi.first.cscore.CameraServerJNI;
 import edu.wpi.first.cscore.ImageSource;
 import edu.wpi.first.cscore.VideoMode;
+import edu.wpi.first.util.PixelFormat;
 import edu.wpi.first.util.RawFrame;
 
 /**
@@ -36,7 +37,7 @@ public class RawSource extends ImageSource {
    * @param height height
    * @param fps fps
    */
-  public RawSource(String name, VideoMode.PixelFormat pixelFormat, int width, int height, int fps) {
+  public RawSource(String name, PixelFormat pixelFormat, int width, int height, int fps) {
     super(CameraServerJNI.createRawSource(name, pixelFormat.getValue(), width, height, fps));
   }
 
@@ -72,7 +73,7 @@ public class RawSource extends ImageSource {
    * @param totalData length of data in total
    */
   protected void putFrame(
-      long data, int width, int height, VideoMode.PixelFormat pixelFormat, int totalData) {
+      long data, int width, int height, PixelFormat pixelFormat, int totalData) {
     CameraServerJNI.putRawSourceFrame(
         m_handle, data, width, height, pixelFormat.getValue(), totalData);
   }
