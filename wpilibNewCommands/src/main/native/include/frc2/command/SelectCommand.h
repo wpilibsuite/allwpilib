@@ -17,6 +17,7 @@
 #include <utility>
 #include <vector>
 
+#include <wpi/deprecated.h>
 #include <wpi/sendable/SendableBuilder.h>
 
 #include "frc2/command/Command.h"
@@ -134,6 +135,7 @@ class SelectCommand : public CommandHelper<Command, SelectCommand<Key>> {
   }
 
  protected:
+  WPI_DEPRECATED("Use ToPtr() instead")
   std::unique_ptr<Command> TransferOwnership() && override {
     return std::make_unique<SelectCommand>(std::move(*this));
   }
