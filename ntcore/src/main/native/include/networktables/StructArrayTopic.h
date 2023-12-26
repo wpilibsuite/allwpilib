@@ -264,7 +264,8 @@ class StructArrayPublisher : public Publisher {
   StructArrayPublisher(StructArrayPublisher&& rhs)
       : Publisher{std::move(rhs)},
         m_buf{std::move(rhs.m_buf)},
-        m_schemaPublished{rhs.m_schemaPublished},
+        m_schemaPublished{
+            rhs.m_schemaPublished.load(std::memory_order_relaxed)},
         m_info{std::move(rhs.m_info)} {}
 
   StructArrayPublisher& operator=(StructArrayPublisher&& rhs) {

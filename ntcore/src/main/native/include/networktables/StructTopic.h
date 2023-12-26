@@ -205,7 +205,8 @@ class StructPublisher : public Publisher {
 
   StructPublisher(StructPublisher&& rhs)
       : Publisher{std::move(rhs)},
-        m_schemaPublished{rhs.m_schemaPublished},
+        m_schemaPublished{
+            rhs.m_schemaPublished.load(std::memory_order_relaxed)},
         m_info{std::move(rhs.m_info)} {}
 
   StructPublisher& operator=(StructPublisher&& rhs) {
