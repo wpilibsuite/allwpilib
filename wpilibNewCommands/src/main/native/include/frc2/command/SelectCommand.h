@@ -133,11 +133,6 @@ class SelectCommand : public CommandHelper<Command, SelectCommand<Key>> {
         nullptr);
   }
 
- protected:
-  std::unique_ptr<Command> TransferOwnership() && override {
-    return std::make_unique<SelectCommand>(std::move(*this));
-  }
-
  private:
   std::unordered_map<Key, std::unique_ptr<Command>> m_commands;
   std::function<Key()> m_selector;

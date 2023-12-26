@@ -428,12 +428,6 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
 
   wpi::SmallSet<Subsystem*, 4> m_requirements;
 
-  /**
-   * Transfers ownership of this command to a unique pointer.  Used for
-   * decorator methods.
-   */
-  virtual std::unique_ptr<Command> TransferOwnership() && = 0;
-
   std::optional<std::string> m_previousComposition;
 };
 
