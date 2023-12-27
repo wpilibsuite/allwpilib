@@ -11,7 +11,9 @@
 #include <concepts>
 #include <cstddef>
 #else
+
 #include <stddef.h>  // NOLINT
+
 #endif
 
 #ifdef WPI_RAWFRAME_JNI
