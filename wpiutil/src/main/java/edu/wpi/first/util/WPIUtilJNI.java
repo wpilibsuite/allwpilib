@@ -5,6 +5,7 @@
 package edu.wpi.first.util;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class WPIUtilJNI {
@@ -80,9 +81,17 @@ public class WPIUtilJNI {
 
   public static native boolean releaseSemaphore(int semHandle, int releaseCount);
 
-  public static native long allocateRawFrame();
+  static native long allocateRawFrame();
 
-  public static native void freeRawFrame(long frame);
+  static native void freeRawFrame(long frame);
+
+  static native long getRawFrameDataPtr(long frame);
+
+  static native void setRawFrameData(
+      long frame, ByteBuffer data, int size, int width, int height, int stride, int pixelFormat);
+
+  static native void setRawFrameInfo(
+      long frame, int size, int width, int height, int stride, int pixelFormat);
 
   /**
    * Waits for a handle to be signaled.
