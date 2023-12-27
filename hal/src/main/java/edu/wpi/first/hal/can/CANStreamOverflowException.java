@@ -8,20 +8,26 @@ import edu.wpi.first.hal.CANStreamMessage;
 import java.io.IOException;
 
 public class CANStreamOverflowException extends IOException {
-  private final CANStreamMessage[] messages;
-  private final int length;
+  private final CANStreamMessage[] m_messages;
+  private final int m_messagesRead;
 
-  public CANStreamOverflowException(CANStreamMessage[] messages, int length) {
+  /**
+   * Constructs a new CANStreamOverflowException.
+   * 
+   * @param messages The messages
+   * @param messagesRead The length of messages read
+   */
+  public CANStreamOverflowException(CANStreamMessage[] messages, int messagesRead) {
     super("A CAN Stream has overflowed. Data will be missed");
-    this.messages = messages;
-    this.length = length;
+    this.m_messages = messages;
+    this.m_messagesRead = messagesRead;
   }
 
   public CANStreamMessage[] getMessages() {
-    return messages;
+    return m_messages;
   }
 
-  public int getLength() {
-    return length;
+  public int getMessagesRead() {
+    return m_messagesRead;
   }
 }
