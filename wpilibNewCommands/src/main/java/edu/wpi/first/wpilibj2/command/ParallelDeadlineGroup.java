@@ -38,6 +38,7 @@ public class ParallelDeadlineGroup extends Command {
    * @param otherCommands the other commands to be executed
    * @throws IllegalArgumentException if the deadline command is also in the otherCommands argument
    */
+  @SuppressWarnings("this-escape")
   public ParallelDeadlineGroup(Command deadline, Command... otherCommands) {
     addCommands(otherCommands);
     setDeadline(deadline);
