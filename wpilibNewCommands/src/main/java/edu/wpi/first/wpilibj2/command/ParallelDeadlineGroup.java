@@ -38,7 +38,6 @@ public class ParallelDeadlineGroup extends Command {
    * @param otherCommands the other commands to be executed
    * @throws IllegalArgumentException if the deadline command is also in the otherCommands argument
    */
-  @SuppressWarnings("this-escape")
   public ParallelDeadlineGroup(Command deadline, Command... otherCommands) {
     addCommands(otherCommands);
     setDeadline(deadline);
@@ -51,7 +50,7 @@ public class ParallelDeadlineGroup extends Command {
    * @param deadline the command that determines when the group ends
    * @throws IllegalArgumentException if the deadline command is already in the composition
    */
-  public void setDeadline(Command deadline) {
+  public final void setDeadline(Command deadline) {
     @SuppressWarnings("PMD.CompareObjectsWithEquals")
     boolean isAlreadyDeadline = deadline == m_deadline;
     if (isAlreadyDeadline) {
