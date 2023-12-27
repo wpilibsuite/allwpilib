@@ -19,8 +19,8 @@ class SE2KinematicPrimitive {
 
   SE2KinematicPrimitive& operator=(const SE2KinematicPrimitive&) = default;
 
-  constexpr SE2KinematicPrimitive Interpolate(
-      const SE2KinematicPrimitive& endValue, double t) const {
+  SE2KinematicPrimitive Interpolate(const SE2KinematicPrimitive& endValue,
+                                    double t) const {
     auto twist = m_pose.Log(endValue.m_pose);
     Twist2d scaled{twist.dx * t, twist.dy * t, twist.dtheta * t};
 
@@ -40,21 +40,21 @@ class SE2Kinematics
  public:
   explicit SE2Kinematics(units::second_t dt) : m_dt{dt} {}
 
-  constexpr ChassisSpeeds ToChassisSpeeds(
+  ChassisSpeeds ToChassisSpeeds(
       const SE2KinematicPrimitive& wheelSpeeds) const override {
     auto twist = Pose2d{}.Log(wheelSpeeds.GetPose());
     return ChassisSpeeds{twist.dx / m_dt, twist.dy / m_dt, twist.dtheta / m_dt};
   }
 
-  constexpr SE2KinematicPrimitive ToWheelSpeeds(
+  SE2KinematicPrimitive ToWheelSpeeds(
       const ChassisSpeeds& chassisSpeeds) const override {
     return SE2KinematicPrimitive{
         Pose2d{}.Exp(Twist2d{chassisSpeeds.vx * m_dt, chassisSpeeds.vy * m_dt,
                              chassisSpeeds.omega * m_dt})};
   }
 
-  constexpr Twist2d ToTwist2d(const SE2KinematicPrimitive& start,
-                              const SE2KinematicPrimitive& end) const override {
+  Twist2d ToTwist2d(const SE2KinematicPrimitive& start,
+                    const SE2KinematicPrimitive& end) const override {
     return start.GetPose().Log(end.GetPose());
   }
 
