@@ -13,7 +13,7 @@ public class CANStreamOverflowException extends IOException {
 
   /**
    * Constructs a new CANStreamOverflowException.
-   * 
+   *
    * @param messages The messages
    * @param messagesRead The length of messages read
    */
