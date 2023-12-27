@@ -31,8 +31,13 @@ where `Custom Sim Extension` is the name of the extension shown by VS Code and `
 
 # Built-in extensions
 halsim_ds_socket: Allows the real Driver Station to control the robot program.
+
 halsim_gui: Provides the simulation GUI.
+
 halsim_ws_client: A websockets client that allows robot hardware interface state to be transmitted over websockets.
+
 halsim_ws_core: A websockets library for use by other extensions. Not directly usable.
+
 halsim_ws_server: A websockets server that allows robot hardware interface state to be transmitted over websockets.
+
 halsim_xrp: A client that supports the XRP protocol, allowing the robot program to control and receive data from the XRP.
