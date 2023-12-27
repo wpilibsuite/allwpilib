@@ -11,12 +11,14 @@
 #include <concepts>
 #include <cstddef>
 #else
-#include <stddef.h>
+#include <stddef.h>  // NOLINT
 #endif
 
 #ifdef WPI_RAWFRAME_JNI
 #include "jni_util.h"
 #endif
+
+// NOLINT
 
 #ifdef __cplusplus
 extern "C" {
