@@ -84,7 +84,8 @@ static const JExceptionInit exceptions[] = {
     {"edu/wpi/first/hal/can/CANNotInitializedException",
      &canNotInitializedExCls},
     {"edu/wpi/first/hal/util/UncleanStatusException", &uncleanStatusExCls},
-    {"edu/wpi/first/hal/can/CANStreamOverflowException", &canStreamOverflowExCls}};
+    {"edu/wpi/first/hal/can/CANStreamOverflowException",
+     &canStreamOverflowExCls}};
 
 namespace hal {
 
@@ -211,9 +212,13 @@ void ReportCANError(JNIEnv* env, int32_t status, int message_id) {
   }
 }
 
-void ThrowCANStreamOverflowException(JNIEnv* env, jobjectArray messages, jint length) {
-  static jmethodID constructor = env->GetMethodID(canStreamOverflowExCls, "<init>", "([Ledu/wpi/first/hal/CANStreamMessage;I)V");
-  jobject exception = env->NewObject(canStreamOverflowExCls, constructor, messages, length);
+void ThrowCANStreamOverflowException(JNIEnv* env, jobjectArray messages,
+                                     jint length) {
+  static jmethodID constructor =
+      env->GetMethodID(canStreamOverflowExCls, "<init>",
+                       "([Ledu/wpi/first/hal/CANStreamMessage;I)V");
+  jobject exception =
+      env->NewObject(canStreamOverflowExCls, constructor, messages, length);
   env->Throw(static_cast<jthrowable>(exception));
 }
 
