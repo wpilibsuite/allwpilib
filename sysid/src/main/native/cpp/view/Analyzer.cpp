@@ -49,9 +49,9 @@ void Analyzer::UpdateFeedforwardGains() {
   WPI_INFO(m_logger, "{}", "Gain calc");
   try {
     const auto& [ff, trackWidth] = m_manager->CalculateFeedforward();
-    m_ff = std::get<0>(ff);
-    m_accelRSquared = std::get<1>(ff);
-    m_accelRMSE = std::get<2>(ff);
+    m_ff = ff.coeffs;
+    m_accelRSquared = ff.rSquared;
+    m_accelRMSE = ff.rmse;
     m_trackWidth = trackWidth;
     m_settings.preset.measurementDelay =
         m_settings.type == FeedbackControllerLoopType::kPosition

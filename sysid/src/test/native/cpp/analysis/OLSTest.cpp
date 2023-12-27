@@ -11,12 +11,12 @@ TEST(OLSTest, TwoVariablesTwoPoints) {
   Eigen::MatrixXd X{{1.0, 1.0}, {1.0, 2.0}};
   Eigen::VectorXd y{{3.0}, {5.0}};
 
-  auto [coefficients, cod, rmse] = sysid::OLS(X, y);
-  EXPECT_EQ(coefficients.size(), 2u);
+  auto [coeffs, rSquared, rmse] = sysid::OLS(X, y);
+  EXPECT_EQ(coeffs.size(), 2u);
 
-  EXPECT_NEAR(coefficients[0], 1.0, 0.05);
-  EXPECT_NEAR(coefficients[1], 2.0, 0.05);
-  EXPECT_NEAR(cod, 1.0, 1E-4);
+  EXPECT_NEAR(coeffs[0], 1.0, 0.05);
+  EXPECT_NEAR(coeffs[1], 2.0, 0.05);
+  EXPECT_NEAR(rSquared, 1.0, 1e-4);
 }
 
 TEST(OLSTest, TwoVariablesFivePoints) {
@@ -25,12 +25,12 @@ TEST(OLSTest, TwoVariablesFivePoints) {
   Eigen::MatrixXd X{{1, 2}, {1, 3}, {1, 5}, {1, 7}, {1, 9}};
   Eigen::VectorXd y{{4}, {5}, {7}, {10}, {15}};
 
-  auto [coefficients, cod, rmse] = sysid::OLS(X, y);
-  EXPECT_EQ(coefficients.size(), 2u);
+  auto [coeffs, rSquared, rmse] = sysid::OLS(X, y);
+  EXPECT_EQ(coeffs.size(), 2u);
 
-  EXPECT_NEAR(coefficients[0], 0.305, 0.05);
-  EXPECT_NEAR(coefficients[1], 1.518, 0.05);
-  EXPECT_NEAR(cod, 0.985, 0.05);
+  EXPECT_NEAR(coeffs[0], 0.305, 0.05);
+  EXPECT_NEAR(coeffs[1], 1.518, 0.05);
+  EXPECT_NEAR(rSquared, 0.985, 0.05);
 }
 
 #ifndef NDEBUG

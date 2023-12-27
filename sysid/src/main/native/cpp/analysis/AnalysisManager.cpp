@@ -518,9 +518,9 @@ AnalysisManager::FeedforwardGains AnalysisManager::CalculateFeedforward() {
   const auto& ff = sysid::CalculateFeedforwardGains(GetFilteredData(), m_type);
   FeedforwardGains ffGains = {ff, m_trackWidth};
 
-  const auto& Ks = std::get<0>(ff)[0];
-  const auto& Kv = std::get<0>(ff)[1];
-  const auto& Ka = std::get<0>(ff)[2];
+  const auto& Ks = ff.coeffs[0];
+  const auto& Kv = ff.coeffs[1];
+  const auto& Ka = ff.coeffs[2];
 
   if (Ka <= 0 || Kv < 0) {
     throw InvalidDataError(
