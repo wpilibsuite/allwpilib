@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj2.command;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
@@ -111,5 +112,20 @@ abstract class MultiCompositionTestBase<T extends Command> extends SingleComposi
       Command command3) {
     var command = compose(command1, command2, command3);
     assertEquals(expected, command.runsWhenDisabled());
+  }
+
+  static Stream<Arguments> composeDuplicates() {
+    Command a = new InstantCommand(() -> {});
+    Command b = new InstantCommand(() -> {});
+    return Stream.of(
+        arguments("AA", new Command[] {a, a}),
+        arguments("ABA", new Command[] {a, b, a}),
+        arguments("BAA", new Command[] {b, a, a}));
+  }
+
+  @MethodSource
+  @ParameterizedTest(name = "composeDuplicates[{index}]: {0}")
+  void composeDuplicates(@SuppressWarnings("unused") String name, Command[] commands) {
+    assertThrows(IllegalArgumentException.class, () -> compose(commands));
   }
 }

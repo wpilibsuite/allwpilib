@@ -581,10 +581,19 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
    * directly or added to a composition.
    *
    * @param commands the commands to register
-   * @throws IllegalArgumentException if the given commands have already been composed.
+   * @throws IllegalArgumentException if the given commands have already been composed, or the array
+   *     of commands has duplicates.
    */
   public void registerComposedCommands(Command... commands) {
-    var commandSet = Set.of(commands);
+    Set<Command> commandSet;
+    try {
+      commandSet = Set.of(commands);
+    } catch (IllegalArgumentException e) {
+      throw new IllegalArgumentException(
+          "Cannot compose a command twice in the same composition! (Original exception: "
+              + e
+              + ")");
+    }
     requireNotComposedOrScheduled(commandSet);
     var exception = new Exception("Originally composed at:");
     exception.fillInStackTrace();
