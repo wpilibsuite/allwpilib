@@ -191,7 +191,7 @@ public class AprilTagJNI {
       double cx,
       double cy);
 
-  public static native void generate16h5AprilTagImage(RawFrame frameObj, jlong frame, int id);
+  public static native void generate16h5AprilTagImage(RawFrame frameObj, long frame, int id);
 
-  public static native void generate36h11AprilTagImage(RawFrame frameObj, jlong frame, int id);
+  public static native void generate36h11AprilTagImage(RawFrame frameObj, long frame, int id);
 }
