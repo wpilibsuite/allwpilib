@@ -7,9 +7,11 @@
 #include <stdint.h>
 
 #include <atomic>
+#include <functional>
 #include <memory>
 #include <ranges>
 #include <span>
+#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -24,18 +26,20 @@
 
 namespace nt {
 
-template <wpi::StructSerializable T>
+template <typename T, typename... I>
+  requires wpi::StructSerializable<T, I...>
 class StructArrayTopic;
 
 /**
  * NetworkTables struct-encoded value array subscriber.
  */
-template <wpi::StructSerializable T>
+template <typename T, typename... I>
+  requires wpi::StructSerializable<T, I...>
 class StructArraySubscriber : public Subscriber {
-  using S = wpi::Struct<T>;
+  using S = wpi::Struct<T, I...>;
 
  public:
-  using TopicType = StructArrayTopic<T>;
+  using TopicType = StructArrayTopic<T, I...>;
   using ValueType = std::vector<T>;
   using ParamType = std::span<const T>;
   using TimestampedValueType = Timestamped<ValueType>;
@@ -48,15 +52,17 @@ class StructArraySubscriber : public Subscriber {
    *
    * @param handle Native handle
    * @param defaultValue Default value
+   * @param info optional struct type info
    */
   template <typename U>
 #if __cpp_lib_ranges >= 201911L
     requires std::ranges::range<U> &&
                  std::convertible_to<std::ranges::range_value_t<U>, T>
 #endif
-  StructArraySubscriber(NT_Subscriber handle, U&& defaultValue)
+  StructArraySubscriber(NT_Subscriber handle, U&& defaultValue, I... info)
       : Subscriber{handle},
-        m_defaultValue{defaultValue.begin(), defaultValue.end()} {
+        m_defaultValue{defaultValue.begin(), defaultValue.end()},
+        m_info{std::move(info)...} {
   }
 
   /**
@@ -121,7 +127,7 @@ class StructArraySubscriber : public Subscriber {
 #endif
   TimestampedValueType GetAtomic(U&& defaultValue) const {
     wpi::SmallVector<uint8_t, 128> buf;
-    size_t size = S::GetSize();
+    size_t size = std::apply(S::GetSize, m_info);
     TimestampedRawView view = ::nt::GetAtomicRaw(m_subHandle, buf, {});
     if (view.value.size() == 0 || (view.value.size() % size) != 0) {
       return {0, 0, std::forward<U>(defaultValue)};
@@ -130,8 +136,12 @@ class StructArraySubscriber : public Subscriber {
     rv.value.reserve(view.value.size() / size);
     for (auto in = view.value.begin(), end = view.value.end(); in != end;
          in += size) {
-      rv.value.emplace_back(
-          S::Unpack(std::span<const uint8_t>{std::to_address(in), size}));
+      std::apply(
+          [&](const I&... info) {
+            rv.value.emplace_back(S::Unpack(
+                std::span<const uint8_t>{std::to_address(in), size}, info...));
+          },
+          m_info);
     }
     return rv;
   }
@@ -146,7 +156,7 @@ class StructArraySubscriber : public Subscriber {
    */
   TimestampedValueType GetAtomic(std::span<const T> defaultValue) const {
     wpi::SmallVector<uint8_t, 128> buf;
-    size_t size = S::GetSize();
+    size_t size = std::apply(S::GetSize, m_info);
     TimestampedRawView view = ::nt::GetAtomicRaw(m_subHandle, buf, {});
     if (view.value.size() == 0 || (view.value.size() % size) != 0) {
       return {0, 0, {defaultValue.begin(), defaultValue.end()}};
@@ -155,8 +165,12 @@ class StructArraySubscriber : public Subscriber {
     rv.value.reserve(view.value.size() / size);
     for (auto in = view.value.begin(), end = view.value.end(); in != end;
          in += size) {
-      rv.value.emplace_back(
-          S::Unpack(std::span<const uint8_t>{std::to_address(in), size}));
+      std::apply(
+          [&](const I&... info) {
+            rv.value.emplace_back(S::Unpack(
+                std::span<const uint8_t>{std::to_address(in), size}, info...));
+          },
+          m_info);
     }
     return rv;
   }
@@ -176,7 +190,7 @@ class StructArraySubscriber : public Subscriber {
     auto raw = ::nt::ReadQueueRaw(m_subHandle);
     std::vector<TimestampedValueType> rv;
     rv.reserve(raw.size());
-    size_t size = S::GetSize();
+    size_t size = std::apply(S::GetSize, m_info);
     for (auto&& r : raw) {
       if (r.value.size() == 0 || (r.value.size() % size) != 0) {
         continue;
@@ -185,8 +199,13 @@ class StructArraySubscriber : public Subscriber {
       values.reserve(r.value.size() / size);
       for (auto in = r.value.begin(), end = r.value.end(); in != end;
            in += size) {
-        values.emplace_back(
-            S::Unpack(std::span<const uint8_t>{std::to_address(in), size}));
+        std::apply(
+            [&](const I&... info) {
+              values.emplace_back(
+                  S::Unpack(std::span<const uint8_t>{std::to_address(in), size},
+                            info...));
+            },
+            m_info);
       }
       rv.emplace_back(r.time, r.serverTime, std::move(values));
     }
@@ -199,22 +218,29 @@ class StructArraySubscriber : public Subscriber {
    * @return Topic
    */
   TopicType GetTopic() const {
-    return StructArrayTopic<T>{::nt::GetTopicFromHandle(m_subHandle)};
+    return std::apply(
+        [&](const I&... info) {
+          return StructArrayTopic<T, I...>{
+              ::nt::GetTopicFromHandle(m_subHandle), info...};
+        },
+        m_info);
   }
 
  private:
   ValueType m_defaultValue;
+  [[no_unique_address]] std::tuple<I...> m_info;
 };
 
 /**
  * NetworkTables struct-encoded value array publisher.
  */
-template <wpi::StructSerializable T>
+template <typename T, typename... I>
+  requires wpi::StructSerializable<T, I...>
 class StructArrayPublisher : public Publisher {
-  using S = wpi::Struct<T>;
+  using S = wpi::Struct<T, I...>;
 
  public:
-  using TopicType = StructArrayTopic<T>;
+  using TopicType = StructArrayTopic<T, I...>;
   using ValueType = std::vector<T>;
   using ParamType = std::span<const T>;
 
@@ -227,8 +253,10 @@ class StructArrayPublisher : public Publisher {
    * StructTopic::Publish() instead.
    *
    * @param handle Native handle
+   * @param info optional struct type info
    */
-  explicit StructArrayPublisher(NT_Publisher handle) : Publisher{handle} {}
+  explicit StructArrayPublisher(NT_Publisher handle, I... info)
+      : Publisher{handle}, m_info{std::move(info)...} {}
 
   StructArrayPublisher(const StructArrayPublisher&) = delete;
   StructArrayPublisher& operator=(const StructArrayPublisher&) = delete;
@@ -236,7 +264,9 @@ class StructArrayPublisher : public Publisher {
   StructArrayPublisher(StructArrayPublisher&& rhs)
       : Publisher{std::move(rhs)},
         m_buf{std::move(rhs.m_buf)},
-        m_schemaPublished{rhs.m_schemaPublished} {}
+        m_schemaPublished{
+            rhs.m_schemaPublished.load(std::memory_order_relaxed)},
+        m_info{std::move(rhs.m_info)} {}
 
   StructArrayPublisher& operator=(StructArrayPublisher&& rhs) {
     Publisher::operator=(std::move(rhs));
@@ -244,6 +274,7 @@ class StructArrayPublisher : public Publisher {
     m_schemaPublished.store(
         rhs.m_schemaPublished.load(std::memory_order_relaxed),
         std::memory_order_relaxed);
+    m_info = std::move(rhs.m_info);
     return *this;
   }
 
@@ -259,11 +290,17 @@ class StructArrayPublisher : public Publisher {
              std::convertible_to<std::ranges::range_value_t<U>, T>
 #endif
   void Set(U&& value, int64_t time = 0) {
-    if (!m_schemaPublished.exchange(true, std::memory_order_relaxed)) {
-      GetTopic().GetInstance().template AddStructSchema<T>();
-    }
-    m_buf.Write(std::forward<U>(value),
-                [&](auto bytes) { ::nt::SetRaw(m_pubHandle, bytes, time); });
+    std::apply(
+        [&](const I&... info) {
+          if (!m_schemaPublished.exchange(true, std::memory_order_relaxed)) {
+            GetTopic().GetInstance().template AddStructSchema<T>(info...);
+          }
+          m_buf.Write(
+              std::forward<U>(value),
+              [&](auto bytes) { ::nt::SetRaw(m_pubHandle, bytes, time); },
+              info...);
+        },
+        m_info);
   }
 
   /**
@@ -273,8 +310,14 @@ class StructArrayPublisher : public Publisher {
    * @param time timestamp; 0 indicates current NT time should be used
    */
   void Set(std::span<const T> value, int64_t time = 0) {
-    m_buf.Write(value,
-                [&](auto bytes) { ::nt::SetRaw(m_pubHandle, bytes, time); });
+    std::apply(
+        [&](const I&... info) {
+          m_buf.Write(
+              value,
+              [&](auto bytes) { ::nt::SetRaw(m_pubHandle, bytes, time); },
+              info...);
+        },
+        m_info);
   }
 
   /**
@@ -290,11 +333,17 @@ class StructArrayPublisher : public Publisher {
              std::convertible_to<std::ranges::range_value_t<U>, T>
 #endif
   void SetDefault(U&& value) {
-    if (!m_schemaPublished.exchange(true, std::memory_order_relaxed)) {
-      GetTopic().GetInstance().template AddStructSchema<T>();
-    }
-    m_buf.Write(std::forward<U>(value),
-                [&](auto bytes) { ::nt::SetDefaultRaw(m_pubHandle, bytes); });
+    std::apply(
+        [&](const I&... info) {
+          if (!m_schemaPublished.exchange(true, std::memory_order_relaxed)) {
+            GetTopic().GetInstance().template AddStructSchema<T>(info...);
+          }
+          m_buf.Write(
+              std::forward<U>(value),
+              [&](auto bytes) { ::nt::SetDefaultRaw(m_pubHandle, bytes); },
+              info...);
+        },
+        m_info);
   }
 
   /**
@@ -305,8 +354,14 @@ class StructArrayPublisher : public Publisher {
    * @param value value
    */
   void SetDefault(std::span<const T> value) {
-    m_buf.Write(value,
-                [&](auto bytes) { ::nt::SetDefaultRaw(m_pubHandle, bytes); });
+    std::apply(
+        [&](const I&... info) {
+          m_buf.Write(
+              value,
+              [&](auto bytes) { ::nt::SetDefaultRaw(m_pubHandle, bytes); },
+              info...);
+        },
+        m_info);
   }
 
   /**
@@ -315,12 +370,18 @@ class StructArrayPublisher : public Publisher {
    * @return Topic
    */
   TopicType GetTopic() const {
-    return StructArrayTopic<T>{::nt::GetTopicFromHandle(m_pubHandle)};
+    return std::apply(
+        [&](const I&... info) {
+          return StructArrayTopic<T, I...>{
+              ::nt::GetTopicFromHandle(m_pubHandle), info...};
+        },
+        m_info);
   }
 
  private:
-  wpi::StructArrayBuffer<T> m_buf;
+  wpi::StructArrayBuffer<T, I...> m_buf;
   std::atomic_bool m_schemaPublished{false};
+  [[no_unique_address]] std::tuple<I...> m_info;
 };
 
 /**
@@ -328,13 +389,14 @@ class StructArrayPublisher : public Publisher {
  *
  * @note Unlike NetworkTableEntry, the entry goes away when this is destroyed.
  */
-template <wpi::StructSerializable T>
-class StructArrayEntry final : public StructArraySubscriber<T>,
-                               public StructArrayPublisher<T> {
+template <typename T, typename... I>
+  requires wpi::StructSerializable<T, I...>
+class StructArrayEntry final : public StructArraySubscriber<T, I...>,
+                               public StructArrayPublisher<T, I...> {
  public:
-  using SubscriberType = StructArraySubscriber<T>;
-  using PublisherType = StructArrayPublisher<T>;
-  using TopicType = StructArrayTopic<T>;
+  using SubscriberType = StructArraySubscriber<T, I...>;
+  using PublisherType = StructArrayPublisher<T, I...>;
+  using TopicType = StructArrayTopic<T, I...>;
   using ValueType = std::vector<T>;
   using ParamType = std::span<const T>;
 
@@ -348,15 +410,16 @@ class StructArrayEntry final : public StructArraySubscriber<T>,
    *
    * @param handle Native handle
    * @param defaultValue Default value
+   * @param info optional struct type info
    */
   template <typename U>
 #if __cpp_lib_ranges >= 201911L
     requires std::ranges::range<U> &&
                  std::convertible_to<std::ranges::range_value_t<U>, T>
 #endif
-  StructArrayEntry(NT_Entry handle, U&& defaultValue)
-      : StructArraySubscriber<T>{handle, defaultValue},
-        StructArrayPublisher<T>{handle} {
+  StructArrayEntry(NT_Entry handle, U&& defaultValue, const I&... info)
+      : StructArraySubscriber<T, I...>{handle, defaultValue, info...},
+        StructArrayPublisher<T, I...>{handle, info...} {
   }
 
   /**
@@ -379,7 +442,7 @@ class StructArrayEntry final : public StructArraySubscriber<T>,
    * @return Topic
    */
   TopicType GetTopic() const {
-    return StructArrayTopic<T>{::nt::GetTopicFromHandle(this->m_subHandle)};
+    return StructArraySubscriber<T, I...>::GetTopic();
   }
 
   /**
@@ -391,12 +454,13 @@ class StructArrayEntry final : public StructArraySubscriber<T>,
 /**
  * NetworkTables struct-encoded value array topic.
  */
-template <wpi::StructSerializable T>
+template <typename T, typename... I>
+  requires wpi::StructSerializable<T, I...>
 class StructArrayTopic final : public Topic {
  public:
-  using SubscriberType = StructArraySubscriber<T>;
-  using PublisherType = StructArrayPublisher<T>;
-  using EntryType = StructArrayEntry<T>;
+  using SubscriberType = StructArraySubscriber<T, I...>;
+  using PublisherType = StructArrayPublisher<T, I...>;
+  using EntryType = StructArrayEntry<T, I...>;
   using ValueType = std::vector<T>;
   using ParamType = std::span<const T>;
   using TimestampedValueType = Timestamped<ValueType>;
@@ -408,15 +472,19 @@ class StructArrayTopic final : public Topic {
    * NetworkTableInstance::GetStructTopic() instead.
    *
    * @param handle Native handle
+   * @param info optional struct type info
    */
-  explicit StructArrayTopic(NT_Topic handle) : Topic{handle} {}
+  explicit StructArrayTopic(NT_Topic handle, I... info)
+      : Topic{handle}, m_info{std::move(info)...} {}
 
   /**
    * Construct from a generic topic.
    *
    * @param topic Topic
+   * @param info optional struct type info
    */
-  explicit StructArrayTopic(Topic topic) : Topic{topic} {}
+  explicit StructArrayTopic(Topic topic, I... info)
+      : Topic{topic}, m_info{std::move(info)...} {}
 
   /**
    * Create a new subscriber to the topic.
@@ -441,11 +509,17 @@ class StructArrayTopic final : public Topic {
   [[nodiscard]]
   SubscriberType Subscribe(
       U&& defaultValue, const PubSubOptions& options = kDefaultPubSubOptions) {
-    return StructArraySubscriber<T>{
-        ::nt::Subscribe(
-            m_handle, NT_RAW,
-            wpi::MakeStructArrayTypeString<T, std::dynamic_extent>(), options),
-        defaultValue};
+    return std::apply(
+        [&](const I&... info) {
+          return StructArraySubscriber<T, I...>{
+              ::nt::Subscribe(
+                  m_handle, NT_RAW,
+                  wpi::MakeStructArrayTypeString<T, std::dynamic_extent>(
+                      info...),
+                  options),
+              defaultValue, info...};
+        },
+        m_info);
   }
 
   /**
@@ -467,11 +541,17 @@ class StructArrayTopic final : public Topic {
   SubscriberType Subscribe(
       std::span<const T> defaultValue,
       const PubSubOptions& options = kDefaultPubSubOptions) {
-    return StructArraySubscriber<T>{
-        ::nt::Subscribe(
-            m_handle, NT_RAW,
-            wpi::MakeStructArrayTypeString<T, std::dynamic_extent>(), options),
-        defaultValue};
+    return std::apply(
+        [&](const I&... info) {
+          return StructArraySubscriber<T, I...>{
+              ::nt::Subscribe(
+                  m_handle, NT_RAW,
+                  wpi::MakeStructArrayTypeString<T, std::dynamic_extent>(
+                      info...),
+                  options),
+              defaultValue, info...};
+        },
+        m_info);
   }
 
   /**
@@ -491,9 +571,17 @@ class StructArrayTopic final : public Topic {
    */
   [[nodiscard]]
   PublisherType Publish(const PubSubOptions& options = kDefaultPubSubOptions) {
-    return StructArrayPublisher<T>{::nt::Publish(
-        m_handle, NT_RAW,
-        wpi::MakeStructArrayTypeString<T, std::dynamic_extent>(), options)};
+    return std::apply(
+        [&](const I&... info) {
+          return StructArrayPublisher<T, I...>{
+              ::nt::Publish(
+                  m_handle, NT_RAW,
+                  wpi::MakeStructArrayTypeString<T, std::dynamic_extent>(
+                      info...),
+                  options),
+              info...};
+        },
+        m_info);
   }
 
   /**
@@ -517,10 +605,17 @@ class StructArrayTopic final : public Topic {
   PublisherType PublishEx(
       const wpi::json& properties,
       const PubSubOptions& options = kDefaultPubSubOptions) {
-    return StructArrayPublisher<T>{::nt::PublishEx(
-        m_handle, NT_RAW,
-        wpi::MakeStructArrayTypeString<T, std::dynamic_extent>(), properties,
-        options)};
+    return std::apply(
+        [&](const I&... info) {
+          return StructArrayPublisher<T, I...>{
+              ::nt::PublishEx(
+                  m_handle, NT_RAW,
+                  wpi::MakeStructArrayTypeString<T, std::dynamic_extent>(
+                      info...),
+                  properties, options),
+              info...};
+        },
+        m_info);
   }
 
   /**
@@ -551,11 +646,17 @@ class StructArrayTopic final : public Topic {
   [[nodiscard]]
   EntryType GetEntry(U&& defaultValue,
                      const PubSubOptions& options = kDefaultPubSubOptions) {
-    return StructArrayEntry<T>{
-        ::nt::GetEntry(m_handle, NT_RAW,
-                       wpi::MakeStructArrayTypeString<T, std::dynamic_extent>(),
-                       options),
-        defaultValue};
+    return std::apply(
+        [&](const I&... info) {
+          return StructArrayEntry<T, I...>{
+              ::nt::GetEntry(
+                  m_handle, NT_RAW,
+                  wpi::MakeStructArrayTypeString<T, std::dynamic_extent>(
+                      info...),
+                  options),
+              defaultValue, info...};
+        },
+        m_info);
   }
 
   /**
@@ -581,12 +682,21 @@ class StructArrayTopic final : public Topic {
   [[nodiscard]]
   EntryType GetEntry(std::span<const T> defaultValue,
                      const PubSubOptions& options = kDefaultPubSubOptions) {
-    return StructArrayEntry<T>{
-        ::nt::GetEntry(m_handle, NT_RAW,
-                       wpi::MakeStructArrayTypeString<T, std::dynamic_extent>(),
-                       options),
-        defaultValue};
+    return std::apply(
+        [&](const I&... info) {
+          return StructArrayEntry<T, I...>{
+              ::nt::GetEntry(
+                  m_handle, NT_RAW,
+                  wpi::MakeStructArrayTypeString<T, std::dynamic_extent>(
+                      info...),
+                  options),
+              defaultValue, info...};
+        },
+        m_info);
   }
+
+ private:
+  [[no_unique_address]] std::tuple<I...> m_info;
 };
 
 }  // namespace nt
