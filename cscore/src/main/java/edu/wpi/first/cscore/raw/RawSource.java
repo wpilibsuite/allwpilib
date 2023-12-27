@@ -61,8 +61,10 @@ public class RawSource extends ImageSource {
    * @param stride size of each row in bytes
    * @param pixelFormat pixel format
    */
-  protected void putFrame(long data, int size, int width, int height, int stride, PixelFormat pixelFormat) {
-    CameraServerJNI.putRawSourceFrameData(m_handle, data, size, width, height, stride, pixelFormat.getValue());
+  protected void putFrame(
+      long data, int size, int width, int height, int stride, PixelFormat pixelFormat) {
+    CameraServerJNI.putRawSourceFrameData(
+        m_handle, data, size, width, height, stride, pixelFormat.getValue());
   }
 
   /**

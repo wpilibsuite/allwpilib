@@ -87,9 +87,11 @@ public class WPIUtilJNI {
 
   static native long getRawFrameDataPtr(long frame);
 
-  static native void setRawFrameData(long frame, ByteBuffer data, int size, int width, int height, int stride, int pixelFormat);
+  static native void setRawFrameData(
+      long frame, ByteBuffer data, int size, int width, int height, int stride, int pixelFormat);
 
-  static native void setRawFrameInfo(long frame, int size, int width, int height, int stride, int pixelFormat);
+  static native void setRawFrameInfo(
+      long frame, int size, int width, int height, int stride, int pixelFormat);
 
   /**
    * Waits for a handle to be signaled.

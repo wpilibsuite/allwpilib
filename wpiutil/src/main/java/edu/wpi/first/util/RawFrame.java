@@ -43,12 +43,7 @@ public class RawFrame implements AutoCloseable {
    * @param stride The number of bytes in each row of image data
    * @param pixelFormat The PixelFormat of the frame
    */
-  void setDataJNI(
-      ByteBuffer data,
-      int width,
-      int height,
-      int stride,
-      int pixelFormat) {
+  void setDataJNI(ByteBuffer data, int width, int height, int stride, int pixelFormat) {
     m_data = data;
     m_width = width;
     m_height = height;
@@ -64,11 +59,7 @@ public class RawFrame implements AutoCloseable {
    * @param stride The number of bytes in each row of image data
    * @param pixelFormat The PixelFormat of the frame
    */
-  void setInfoJNI(
-      int width,
-      int height,
-      int stride,
-      int pixelFormat) {
+  void setInfoJNI(int width, int height, int stride, int pixelFormat) {
     m_width = width;
     m_height = height;
     m_stride = stride;
@@ -84,12 +75,7 @@ public class RawFrame implements AutoCloseable {
    * @param stride The number of bytes in each row of image data
    * @param pixelFormat The PixelFormat of the frame
    */
-  public void setData(
-      ByteBuffer data,
-      int width,
-      int height,
-      int stride,
-      PixelFormat pixelFormat) {
+  public void setData(ByteBuffer data, int width, int height, int stride, PixelFormat pixelFormat) {
     if (!data.isDirect()) {
       throw new UnsupportedOperationException("ByteBuffer must be direct");
     }
@@ -98,7 +84,8 @@ public class RawFrame implements AutoCloseable {
     m_height = height;
     m_stride = stride;
     m_pixelFormat = pixelFormat;
-    WPIUtilJNI.setRawFrameData(m_nativeObj, data, data.limit(), width, height, stride, pixelFormat.getValue());
+    WPIUtilJNI.setRawFrameData(
+        m_nativeObj, data, data.limit(), width, height, stride, pixelFormat.getValue());
   }
 
   /**
@@ -109,16 +96,13 @@ public class RawFrame implements AutoCloseable {
    * @param stride The number of bytes in each row of image data
    * @param pixelFormat The PixelFormat of the frame
    */
-  public void setInfo(
-      int width,
-      int height,
-      int stride,
-      PixelFormat pixelFormat) {
+  public void setInfo(int width, int height, int stride, PixelFormat pixelFormat) {
     m_width = width;
     m_height = height;
     m_stride = stride;
     m_pixelFormat = pixelFormat;
-    WPIUtilJNI.setRawFrameInfo(m_nativeObj, m_data.limit(), width, height, stride, pixelFormat.getValue());
+    WPIUtilJNI.setRawFrameInfo(
+        m_nativeObj, m_data.limit(), width, height, stride, pixelFormat.getValue());
   }
 
   /**

@@ -257,7 +257,8 @@ public class CameraServerJNI {
 
   public static native long grabRawSinkFrame(int sink, RawFrame frame, long nativeObj);
 
-  public static native long grabRawSinkFrameTimeout(int sink, RawFrame frame, long nativeObj, double timeout);
+  public static native long grabRawSinkFrameTimeout(
+      int sink, RawFrame frame, long nativeObj, double timeout);
 
   public static native String getSinkError(int sink);
 
