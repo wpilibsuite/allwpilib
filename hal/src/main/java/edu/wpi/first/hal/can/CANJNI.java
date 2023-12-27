@@ -31,5 +31,5 @@ public class CANJNI extends JNIWrapper {
   public static native void closeCANStreamSession(int sessionHandle);
 
   public static native int readCANStreamSession(
-      int sessionHandle, CANStreamMessage[] messages, int messagesToRead);
+      int sessionHandle, CANStreamMessage[] messages, int messagesToRead) throws CANStreamOverflowException;
 }

@@ -151,7 +151,7 @@ Java_edu_wpi_first_hal_can_CANJNI_readCANStreamSession
     return 0;
   }
 
-  if (!CheckStatus(env, status)) {
+  if (status != HAL_ERR_CANSessionMux_SessionOverrun && !CheckStatus(env, status)) {
     return 0;
   }
 
@@ -172,6 +172,11 @@ Java_edu_wpi_first_hal_can_CANJNI_readCANStreamSession
     }
     env->SetByteArrayRegion(toSetArray, 0, msg->dataSize,
                             reinterpret_cast<jbyte*>(msg->data));
+  }
+
+  if (status == HAL_ERR_CANSessionMux_SessionOverrun) {
+    ThrowCANStreamOverflowException(env, messages, static_cast<jint>(messagesRead));
+    return 0;
   }
 
   return static_cast<jint>(messagesRead);

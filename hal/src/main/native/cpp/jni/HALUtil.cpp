@@ -46,6 +46,7 @@ static JException canMessageNotFoundExCls;
 static JException canMessageNotAllowedExCls;
 static JException canNotInitializedExCls;
 static JException uncleanStatusExCls;
+static JException canStreamOverflowExCls;
 static JClass powerDistributionVersionCls;
 static JClass pwmConfigDataResultCls;
 static JClass canStatusCls;
@@ -82,7 +83,8 @@ static const JExceptionInit exceptions[] = {
      &canMessageNotAllowedExCls},
     {"edu/wpi/first/hal/can/CANNotInitializedException",
      &canNotInitializedExCls},
-    {"edu/wpi/first/hal/util/UncleanStatusException", &uncleanStatusExCls}};
+    {"edu/wpi/first/hal/util/UncleanStatusException", &uncleanStatusExCls},
+    {"edu/wpi/first/hal/can/CANStreamOverflowException", &canStreamOverflowExCls}};
 
 namespace hal {
 
@@ -207,6 +209,12 @@ void ReportCANError(JNIEnv* env, int32_t status, int message_id) {
       break;
     }
   }
+}
+
+void ThrowCANStreamOverflowException(JNIEnv* env, jobjectArray messages, jint length) {
+  static jmethodID constructor = env->GetMethodID(canStreamOverflowExCls, "<init>", "([Ledu/wpi/first/hal/CANStreamMessage;I)V");
+  jobject exception = env->NewObject(canStreamOverflowExCls, constructor, messages, length);
+  env->Throw(static_cast<jthrowable>(exception));
 }
 
 void ThrowIllegalArgumentException(JNIEnv* env, std::string_view msg) {
