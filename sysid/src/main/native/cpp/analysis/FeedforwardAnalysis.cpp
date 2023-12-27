@@ -13,7 +13,7 @@
 #include "sysid/analysis/FilteringUtils.h"
 #include "sysid/analysis/OLS.h"
 
-using namespace sysid;
+namespace sysid {
 
 /**
  * Populates OLS data for (xₖ₊₁ − xₖ)/τ = αxₖ + βuₖ + γ sgn(xₖ).
@@ -54,9 +54,8 @@ static void PopulateOLSData(const std::vector<PreparedData>& d,
   }
 }
 
-std::tuple<std::vector<double>, double, double>
-sysid::CalculateFeedforwardGains(const Storage& data,
-                                 const AnalysisType& type) {
+OLSResult CalculateFeedforwardGains(const Storage& data,
+                                    const AnalysisType& type) {
   // Iterate through the data and add it to our raw vector.
   const auto& [slowForward, slowBackward, fastForward, fastBackward] = data;
 
@@ -90,23 +89,23 @@ sysid::CalculateFeedforwardGains(const Storage& data,
   // Perform OLS with accel = alpha*vel + beta*voltage + gamma*signum(vel)
   // OLS performs best with the noisiest variable as the dependent var,
   // so we regress accel in terms of the other variables.
-  auto ols = sysid::OLS(X, y);
-  double alpha = std::get<0>(ols)[0];  // -Kv/Ka
-  double beta = std::get<0>(ols)[1];   // 1/Ka
-  double gamma = std::get<0>(ols)[2];  // -Ks/Ka
+  auto ols = OLS(X, y);
+  double alpha = ols.coeffs[0];  // -Kv/Ka
+  double beta = ols.coeffs[1];   // 1/Ka
+  double gamma = ols.coeffs[2];  // -Ks/Ka
 
   // Initialize gains list with Ks, Kv, and Ka
   std::vector<double> gains{-gamma / beta, -alpha / beta, 1 / beta};
 
   if (type == analysis::kElevator) {
     // Add Kg to gains list
-    double delta = std::get<0>(ols)[3];  // -Kg/Ka
+    double delta = ols.coeffs[3];  // -Kg/Ka
     gains.emplace_back(-delta / beta);
   }
 
   if (type == analysis::kArm) {
-    double delta = std::get<0>(ols)[3];    // -Kg/Ka cos(offset)
-    double epsilon = std::get<0>(ols)[4];  // Kg/Ka sin(offset)
+    double delta = ols.coeffs[3];    // -Kg/Ka cos(offset)
+    double epsilon = ols.coeffs[4];  // Kg/Ka sin(offset)
 
     // Add Kg to gains list
     gains.emplace_back(std::hypot(delta, epsilon) / beta);
@@ -116,5 +115,7 @@ sysid::CalculateFeedforwardGains(const Storage& data,
   }
 
   // Gains are Ks, Kv, Ka, Kg (elevator/arm only), offset (arm only)
-  return std::tuple{gains, std::get<1>(ols), std::get<2>(ols)};
+  return OLSResult{gains, ols.rSquared, ols.rmse};
 }
+
+}  // namespace sysid
