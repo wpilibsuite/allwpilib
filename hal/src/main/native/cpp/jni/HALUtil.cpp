@@ -46,7 +46,6 @@ static JException canMessageNotFoundExCls;
 static JException canMessageNotAllowedExCls;
 static JException canNotInitializedExCls;
 static JException uncleanStatusExCls;
-static JException canStreamOverflowExCls;
 static JClass powerDistributionVersionCls;
 static JClass pwmConfigDataResultCls;
 static JClass canStatusCls;
@@ -57,6 +56,7 @@ static JClass canStreamMessageCls;
 static JClass halValueCls;
 static JClass baseStoreCls;
 static JClass revPHVersionCls;
+static JClass canStreamOverflowExCls;
 
 static const JClassInit classes[] = {
     {"edu/wpi/first/hal/PowerDistributionVersion",
@@ -69,7 +69,9 @@ static const JClassInit classes[] = {
     {"edu/wpi/first/hal/CANStreamMessage", &canStreamMessageCls},
     {"edu/wpi/first/hal/HALValue", &halValueCls},
     {"edu/wpi/first/hal/DMAJNISample$BaseStore", &baseStoreCls},
-    {"edu/wpi/first/hal/REVPHVersion", &revPHVersionCls}};
+    {"edu/wpi/first/hal/REVPHVersion", &revPHVersionCls},
+    {"edu/wpi/first/hal/can/CANStreamOverflowException",
+     &canStreamOverflowExCls}};
 
 static const JExceptionInit exceptions[] = {
     {"java/lang/IllegalArgumentException", &illegalArgExCls},
@@ -83,9 +85,7 @@ static const JExceptionInit exceptions[] = {
      &canMessageNotAllowedExCls},
     {"edu/wpi/first/hal/can/CANNotInitializedException",
      &canNotInitializedExCls},
-    {"edu/wpi/first/hal/util/UncleanStatusException", &uncleanStatusExCls},
-    {"edu/wpi/first/hal/can/CANStreamOverflowException",
-     &canStreamOverflowExCls}};
+    {"edu/wpi/first/hal/util/UncleanStatusException", &uncleanStatusExCls}};
 
 namespace hal {
 
