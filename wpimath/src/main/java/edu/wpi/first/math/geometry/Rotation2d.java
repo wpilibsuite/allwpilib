@@ -17,6 +17,8 @@ import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
 
 /**
@@ -28,7 +30,10 @@ import java.util.Objects;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
-public class Rotation2d implements Interpolatable<Rotation2d> {
+public class Rotation2d
+    implements Interpolatable<Rotation2d>,
+        ProtobufSerializable<Rotation2d>,
+        StructSerializable<Rotation2d> {
   private final double m_value;
   private final double m_cos;
   private final double m_sin;

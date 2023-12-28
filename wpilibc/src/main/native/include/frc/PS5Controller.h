@@ -500,9 +500,9 @@ class PS5Controller : public GenericHID {
   BooleanEvent Touchpad(EventLoop* loop) const;
 
   struct Button {
-    static constexpr int kSquare = 3;
-    static constexpr int kCross = 1;
-    static constexpr int kCircle = 2;
+    static constexpr int kSquare = 1;
+    static constexpr int kCross = 2;
+    static constexpr int kCircle = 3;
     static constexpr int kTriangle = 4;
     static constexpr int kL1 = 5;
     static constexpr int kR1 = 6;
@@ -510,19 +510,19 @@ class PS5Controller : public GenericHID {
     static constexpr int kR2 = 8;
     static constexpr int kCreate = 9;
     static constexpr int kOptions = 10;
-    static constexpr int kL3 = 12;
-    static constexpr int kR3 = 13;
-    static constexpr int kPS = 11;
+    static constexpr int kL3 = 11;
+    static constexpr int kR3 = 12;
+    static constexpr int kPS = 13;
     static constexpr int kTouchpad = 14;
   };
 
   struct Axis {
     static constexpr int kLeftX = 0;
     static constexpr int kLeftY = 1;
-    static constexpr int kRightX = 3;
-    static constexpr int kRightY = 4;
-    static constexpr int kL2 = 2;
-    static constexpr int kR2 = 5;
+    static constexpr int kRightX = 2;
+    static constexpr int kRightY = 5;
+    static constexpr int kL2 = 3;
+    static constexpr int kR2 = 4;
   };
 };
 

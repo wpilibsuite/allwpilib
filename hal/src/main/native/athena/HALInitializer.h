@@ -40,6 +40,7 @@ extern void InitializeFRCDriverStation();
 extern void InitializeHAL();
 extern void InitializeI2C();
 extern void InitializeInterrupts();
+extern void InitializeLEDs();
 extern void InitializeMain();
 extern void InitializeNotifier();
 extern void InitializeCTREPDP();

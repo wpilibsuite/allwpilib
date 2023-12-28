@@ -33,7 +33,7 @@ public class RawSink extends ImageSink {
    * @return Frame time, or 0 on error (call getError() to obtain the error message); the frame time
    *     is in the same time base as wpi::Now(), and is in 1 us increments.
    */
-  protected long grabFrame(RawFrame frame) {
+  public long grabFrame(RawFrame frame) {
     return grabFrame(frame, 0.225);
   }
 
@@ -46,8 +46,8 @@ public class RawSink extends ImageSink {
    * @return Frame time, or 0 on error (call getError() to obtain the error message); the frame time
    *     is in the same time base as wpi::Now(), and is in 1 us increments.
    */
-  protected long grabFrame(RawFrame frame, double timeout) {
-    return CameraServerJNI.grabSinkFrameTimeout(m_handle, frame, timeout);
+  public long grabFrame(RawFrame frame, double timeout) {
+    return CameraServerJNI.grabRawSinkFrameTimeout(m_handle, frame, frame.getNativeObj(), timeout);
   }
 
   /**
@@ -58,7 +58,7 @@ public class RawSink extends ImageSink {
    * @return Frame time, or 0 on error (call getError() to obtain the error message); the frame time
    *     is in the same time base as wpi::Now(), and is in 1 us increments.
    */
-  protected long grabFrameNoTimeout(RawFrame frame) {
-    return CameraServerJNI.grabSinkFrame(m_handle, frame);
+  public long grabFrameNoTimeout(RawFrame frame) {
+    return CameraServerJNI.grabRawSinkFrame(m_handle, frame, frame.getNativeObj());
   }
 }

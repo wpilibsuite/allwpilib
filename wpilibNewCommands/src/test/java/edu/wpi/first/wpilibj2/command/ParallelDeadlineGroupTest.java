@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj2.command;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -14,8 +15,7 @@ import static org.mockito.internal.verification.VerificationModeFactory.times;
 import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 
-class ParallelDeadlineGroupTest extends CommandTestBase
-    implements MultiCompositionTestBase<ParallelDeadlineGroup> {
+class ParallelDeadlineGroupTest extends MultiCompositionTestBase<ParallelDeadlineGroup> {
   @Test
   void parallelDeadlineScheduleTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
@@ -123,6 +123,21 @@ class ParallelDeadlineGroupTest extends CommandTestBase
 
     assertThrows(
         IllegalArgumentException.class, () -> new ParallelDeadlineGroup(command1, command2));
+  }
+
+  @Test
+  void parallelDeadlineSetDeadlineToDeadlineTest() {
+    Command a = new InstantCommand(() -> {});
+    ParallelDeadlineGroup group = new ParallelDeadlineGroup(a);
+    assertDoesNotThrow(() -> group.setDeadline(a));
+  }
+
+  @Test
+  void parallelDeadlineSetDeadlineDuplicateTest() {
+    Command a = new InstantCommand(() -> {});
+    Command b = new InstantCommand(() -> {});
+    ParallelDeadlineGroup group = new ParallelDeadlineGroup(a, b);
+    assertThrows(IllegalArgumentException.class, () -> group.setDeadline(b));
   }
 
   @Override

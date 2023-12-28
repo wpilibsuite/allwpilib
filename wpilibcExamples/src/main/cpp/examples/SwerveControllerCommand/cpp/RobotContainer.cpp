@@ -74,10 +74,7 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
   thetaController.EnableContinuousInput(units::radian_t{-std::numbers::pi},
                                         units::radian_t{std::numbers::pi});
 
-  // Reset odometry to the starting pose of the trajectory.
-  m_drive.ResetOdometry(exampleTrajectory.InitialPose());
-
-  frc2::CommandPtr swerveDriveCommand =
+  frc2::CommandPtr swerveControllerCommand =
       frc2::SwerveControllerCommand<4>(
           exampleTrajectory, [this]() { return m_drive.GetPose(); },
 
@@ -92,8 +89,16 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
           {&m_drive})
           .ToPtr();
 
+  // Reset odometry to the initial pose of the trajectory, run path following
+  // command, then stop at the end.
   return frc2::cmd::Sequence(
-      std::move(swerveDriveCommand),
+      frc2::InstantCommand(
+          [this, &exampleTrajectory]() {
+            m_drive.ResetOdometry(exampleTrajectory.InitialPose());
+          },
+          {})
+          .ToPtr(),
+      std::move(swerveControllerCommand),
       frc2::InstantCommand(
           [this] { m_drive.Drive(0_mps, 0_mps, 0_rad_per_s, false); }, {})
           .ToPtr());

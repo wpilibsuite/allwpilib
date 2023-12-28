@@ -159,7 +159,7 @@ public class TimedRobot extends IterativeRobotBase {
    * @param callback The callback to run.
    * @param periodSeconds The period at which to run the callback in seconds.
    */
-  public void addPeriodic(Runnable callback, double periodSeconds) {
+  public final void addPeriodic(Runnable callback, double periodSeconds) {
     m_callbacks.add(new Callback(callback, m_startTime, periodSeconds, 0.0));
   }
 
@@ -174,7 +174,7 @@ public class TimedRobot extends IterativeRobotBase {
    * @param offsetSeconds The offset from the common starting time in seconds. This is useful for
    *     scheduling a callback in a different timeslot relative to TimedRobot.
    */
-  public void addPeriodic(Runnable callback, double periodSeconds, double offsetSeconds) {
+  public final void addPeriodic(Runnable callback, double periodSeconds, double offsetSeconds) {
     m_callbacks.add(new Callback(callback, m_startTime, periodSeconds, offsetSeconds));
   }
 }

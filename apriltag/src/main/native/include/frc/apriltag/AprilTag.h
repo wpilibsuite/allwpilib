@@ -22,8 +22,8 @@ struct WPILIB_DLLEXPORT AprilTag {
    */
   bool operator==(const AprilTag&) const = default;
 
-  static wpi::RawFrame Generate36h11AprilTagImage(int id);
-  static wpi::RawFrame Generate16h5AprilTagImage(int id);
+  static bool Generate36h11AprilTagImage(wpi::RawFrame* frame, int id);
+  static bool Generate16h5AprilTagImage(wpi::RawFrame* frame, int id);
 };
 
 WPILIB_DLLEXPORT

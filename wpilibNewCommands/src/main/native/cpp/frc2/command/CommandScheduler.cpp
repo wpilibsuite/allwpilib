@@ -453,11 +453,13 @@ void CommandScheduler::OnCommandFinish(Action action) {
 }
 
 void CommandScheduler::RequireUngrouped(const Command* command) {
-  if (command->IsComposed()) {
+  auto stacktrace = command->GetPreviousCompositionSite();
+  if (stacktrace.has_value()) {
     throw FRC_MakeError(frc::err::CommandIllegalUse,
                         "Commands that have been composed may not be added to "
-                        "another composition or scheduled "
-                        "individually!");
+                        "another composition or scheduled individually!"
+                        "\nOriginally composed at:\n{}",
+                        stacktrace.value());
   }
 }
 
@@ -472,6 +474,29 @@ void CommandScheduler::RequireUngrouped(
     std::initializer_list<const Command*> commands) {
   for (auto&& command : commands) {
     RequireUngrouped(command);
+  }
+}
+
+void CommandScheduler::RequireUngroupedAndUnscheduled(const Command* command) {
+  if (IsScheduled(command)) {
+    throw FRC_MakeError(frc::err::CommandIllegalUse,
+                        "Commands that have been scheduled individually may "
+                        "not be added to another composition!");
+  }
+  RequireUngrouped(command);
+}
+
+void CommandScheduler::RequireUngroupedAndUnscheduled(
+    std::span<const std::unique_ptr<Command>> commands) {
+  for (auto&& command : commands) {
+    RequireUngroupedAndUnscheduled(command.get());
+  }
+}
+
+void CommandScheduler::RequireUngroupedAndUnscheduled(
+    std::initializer_list<const Command*> commands) {
+  for (auto&& command : commands) {
+    RequireUngroupedAndUnscheduled(command);
   }
 }
 

@@ -31,6 +31,7 @@ public class Servo extends PWM {
    * @param channel The PWM channel to which the servo is attached. 0-9 are on-board, 10-19 are on
    *     the MXP port
    */
+  @SuppressWarnings("this-escape")
   public Servo(final int channel) {
     super(channel);
     setBoundsMicroseconds(kDefaultMaxServoPWM, 0, 0, 0, kDefaultMinServoPWM);

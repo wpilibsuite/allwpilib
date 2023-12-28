@@ -10,8 +10,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 
-class RepeatCommandTest extends CommandTestBase
-    implements SingleCompositionTestBase<RepeatCommand> {
+class RepeatCommandTest extends SingleCompositionTestBase<RepeatCommand> {
   @Test
   void callsMethodsCorrectly() {
     try (CommandScheduler scheduler = new CommandScheduler()) {

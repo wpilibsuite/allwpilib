@@ -2,9 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <jni.h>
+
 #include <cstdio>
 #include <cstring>
 
+#define WPI_RAWFRAME_JNI
+#include <wpi/RawFrame.h>
 #include <wpi/jni_util.h>
 
 #include "edu_wpi_first_apriltag_jni_AprilTagJNI.h"
@@ -25,6 +29,7 @@ static JClass quaternionCls;
 static JClass rotation3dCls;
 static JClass transform3dCls;
 static JClass translation3dCls;
+static JClass rawFrameCls;
 static JException illegalArgEx;
 static JException nullPointerEx;
 
@@ -37,7 +42,8 @@ static const JClassInit classes[] = {
     {"edu/wpi/first/math/geometry/Quaternion", &quaternionCls},
     {"edu/wpi/first/math/geometry/Rotation3d", &rotation3dCls},
     {"edu/wpi/first/math/geometry/Transform3d", &transform3dCls},
-    {"edu/wpi/first/math/geometry/Translation3d", &translation3dCls}};
+    {"edu/wpi/first/math/geometry/Translation3d", &translation3dCls},
+    {"edu/wpi/first/util/RawFrame", &rawFrameCls}};
 
 static const JExceptionInit exceptions[] = {
     {"java/lang/IllegalArgumentException", &illegalArgEx},
@@ -591,27 +597,38 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_estimatePose
 /*
  * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
  * Method:    generate16h5AprilTagImage
- * Signature: (IJ)V
+ * Signature: (Ljava/lang/Object;JI)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_apriltag_jni_AprilTagJNI_generate16h5AprilTagImage
-  (JNIEnv* env, jclass, jint id, jlong framePtr)
+  (JNIEnv* env, jclass, jobject frameObj, jlong framePtr, jint id)
 {
-  wpi::RawFrame* javaRawFrame = (wpi::RawFrame*)framePtr;
-  *javaRawFrame = AprilTag::Generate16h5AprilTagImage(id);
+  auto* frame = reinterpret_cast<wpi::RawFrame*>(framePtr);
+  if (!frame) {
+    nullPointerEx.Throw(env, "frame is null");
+    return;
+  }
+  bool newData = AprilTag::Generate16h5AprilTagImage(frame, id);
+  wpi::SetFrameData(env, rawFrameCls, frameObj, *frame, newData);
 }
 
 /*
  * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
  * Method:    generate36h11AprilTagImage
- * Signature: (IJ)V
+ * Signature: (Ljava/lang/Object;JI)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_apriltag_jni_AprilTagJNI_generate36h11AprilTagImage
-  (JNIEnv* env, jclass, jint id, jlong framePtr)
+  (JNIEnv* env, jclass, jobject frameObj, jlong framePtr, jint id)
 {
-  wpi::RawFrame* javaRawFrame = (wpi::RawFrame*)framePtr;
-  *javaRawFrame = AprilTag::Generate36h11AprilTagImage(id);
+  auto* frame = reinterpret_cast<wpi::RawFrame*>(framePtr);
+  if (!frame) {
+    nullPointerEx.Throw(env, "frame is null");
+    return;
+  }
+  // function might reallocate
+  bool newData = AprilTag::Generate36h11AprilTagImage(frame, id);
+  wpi::SetFrameData(env, rawFrameCls, frameObj, *frame, newData);
 }
 
 }  // extern "C"

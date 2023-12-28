@@ -21,11 +21,22 @@ class ColorTest {
 
   @Test
   void testConstructFromDoubles() {
-    var color = new Color(1.0, 0.5, 0.25);
+    {
+      var color = new Color(1.0, 0.5, 0.25);
 
-    assertEquals(1.0, color.red, 1e-2);
-    assertEquals(0.5, color.green, 1e-2);
-    assertEquals(0.25, color.blue, 1e-2);
+      assertEquals(1.0, color.red, 1e-2);
+      assertEquals(0.5, color.green, 1e-2);
+      assertEquals(0.25, color.blue, 1e-2);
+    }
+
+    {
+      var color = new Color(1.0, 0.0, 0.0);
+
+      // Check for exact match to ensure round-and-clamp is correct
+      assertEquals(1.0, color.red);
+      assertEquals(0.0, color.green);
+      assertEquals(0.0, color.blue);
+    }
   }
 
   @Test

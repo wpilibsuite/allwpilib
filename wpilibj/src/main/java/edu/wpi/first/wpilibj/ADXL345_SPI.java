@@ -81,6 +81,7 @@ public class ADXL345_SPI implements NTSendable, AutoCloseable {
    * @param port The SPI port that the accelerometer is connected to
    * @param range The range (+ or -) that the accelerometer will measure.
    */
+  @SuppressWarnings("this-escape")
   public ADXL345_SPI(SPI.Port port, Range range) {
     m_spi = new SPI(port);
     // simulation

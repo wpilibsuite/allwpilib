@@ -339,6 +339,46 @@ PneumaticHub::StickyFaults PneumaticHub::GetStickyFaults() const {
   return stickyFaults;
 }
 
+bool PneumaticHub::Faults::GetChannelFault(int channel) const {
+  switch (channel) {
+    case 0:
+      return Channel0Fault != 0;
+    case 1:
+      return Channel1Fault != 0;
+    case 2:
+      return Channel2Fault != 0;
+    case 3:
+      return Channel3Fault != 0;
+    case 4:
+      return Channel4Fault != 0;
+    case 5:
+      return Channel5Fault != 0;
+    case 6:
+      return Channel6Fault != 0;
+    case 7:
+      return Channel7Fault != 0;
+    case 8:
+      return Channel8Fault != 0;
+    case 9:
+      return Channel9Fault != 0;
+    case 10:
+      return Channel10Fault != 0;
+    case 11:
+      return Channel11Fault != 0;
+    case 12:
+      return Channel12Fault != 0;
+    case 13:
+      return Channel13Fault != 0;
+    case 14:
+      return Channel14Fault != 0;
+    case 15:
+      return Channel15Fault != 0;
+    default:
+      throw FRC_MakeError(err::ChannelIndexOutOfRange,
+                          "Pneumatics fault channel out of bounds!");
+  }
+}
+
 void PneumaticHub::ClearStickyFaults() {
   int32_t status = 0;
   HAL_ClearREVPHStickyFaults(m_handle, &status);

@@ -6,25 +6,44 @@
 
 #include <wpi/MemAlloc.h>
 
+#include <cstring>
+
 extern "C" {
-void WPI_AllocateRawFrameData(WPI_RawFrame* frame, int requestedSize) {
-  if (frame->dataLength >= requestedSize) {
-    return;
+int WPI_AllocateRawFrameData(WPI_RawFrame* frame, size_t requestedSize) {
+  if (frame->capacity >= requestedSize) {
+    return 0;
   }
-  if (frame->data) {
-    frame->data =
-        static_cast<char*>(wpi::safe_realloc(frame->data, requestedSize));
-  } else {
-    frame->data = static_cast<char*>(wpi::safe_malloc(requestedSize));
-  }
-  frame->dataLength = requestedSize;
+  WPI_FreeRawFrameData(frame);
+  frame->data = static_cast<uint8_t*>(wpi::safe_malloc(requestedSize));
+  frame->capacity = requestedSize;
+  frame->size = 0;
+  return 1;
 }
 
 void WPI_FreeRawFrameData(WPI_RawFrame* frame) {
   if (frame->data) {
-    std::free(frame->data);
+    if (frame->freeFunc) {
+      frame->freeFunc(frame->freeCbData, frame->data, frame->capacity);
+    } else {
+      std::free(frame->data);
+    }
     frame->data = nullptr;
-    frame->dataLength = 0;
+    frame->freeFunc = nullptr;
+    frame->freeCbData = nullptr;
+    frame->capacity = 0;
   }
 }
+
+void WPI_SetRawFrameData(WPI_RawFrame* frame, void* data, size_t size,
+                         size_t capacity, void* cbdata,
+                         void (*freeFunc)(void* cbdata, void* data,
+                                          size_t capacity)) {
+  WPI_FreeRawFrameData(frame);
+  frame->data = static_cast<uint8_t*>(data);
+  frame->freeFunc = freeFunc;
+  frame->freeCbData = cbdata;
+  frame->capacity = capacity;
+  frame->size = size;
+}
+
 }  // extern "C"

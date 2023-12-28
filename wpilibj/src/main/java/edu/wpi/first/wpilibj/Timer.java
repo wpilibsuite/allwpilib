@@ -83,7 +83,7 @@ public class Timer {
    *
    * <p>Make the timer startTime the current time so new requests will be relative now.
    */
-  public void reset() {
+  public final void reset() {
     m_accumulatedTime = 0;
     m_startTime = getMsClock();
   }

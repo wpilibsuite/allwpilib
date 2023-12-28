@@ -16,6 +16,8 @@ import edu.wpi.first.math.geometry.struct.Translation3dStruct;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
 
 /**
@@ -27,7 +29,10 @@ import java.util.Objects;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
-public class Translation3d implements Interpolatable<Translation3d> {
+public class Translation3d
+    implements Interpolatable<Translation3d>,
+        ProtobufSerializable<Translation3d>,
+        StructSerializable<Translation3d> {
   private final double m_x;
   private final double m_y;
   private final double m_z;

@@ -184,7 +184,7 @@ public class Joystick extends GenericHID {
    *
    * @return the z position
    */
-  public double getZ() {
+  public final double getZ() {
     return getRawAxis(m_axes[AxisType.kZ.value]);
   }
 
@@ -194,7 +194,7 @@ public class Joystick extends GenericHID {
    *
    * @return The Twist value of the joystick.
    */
-  public double getTwist() {
+  public final double getTwist() {
     return getRawAxis(m_axes[AxisType.kTwist.value]);
   }
 
@@ -204,7 +204,7 @@ public class Joystick extends GenericHID {
    *
    * @return The Throttle value of the joystick.
    */
-  public double getThrottle() {
+  public final double getThrottle() {
     return getRawAxis(m_axes[AxisType.kThrottle.value]);
   }
 

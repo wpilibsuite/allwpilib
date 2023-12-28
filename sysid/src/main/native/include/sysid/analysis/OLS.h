@@ -5,22 +5,29 @@
 #pragma once
 
 #include <cstddef>
-#include <tuple>
 #include <vector>
 
 #include <Eigen/Core>
 
 namespace sysid {
 
+struct OLSResult {
+  /// Regression coeficients.
+  std::vector<double> coeffs;
+
+  /// R² (coefficient of determination)
+  double rSquared = 0.0;
+
+  /// Root-mean-square error
+  double rmse = 0.0;
+};
+
 /**
- * Performs ordinary least squares multiple regression on the provided data and
- * returns a vector of coefficients along with the r-squared (coefficient of
- * determination) and RMSE (stardard deviation of the residuals) of the fit.
+ * Performs ordinary least squares multiple regression on the provided data.
  *
  * @param X The independent data in y = Xβ.
  * @param y The dependent data in y = Xβ.
  */
-std::tuple<std::vector<double>, double, double> OLS(const Eigen::MatrixXd& X,
-                                                    const Eigen::VectorXd& y);
+OLSResult OLS(const Eigen::MatrixXd& X, const Eigen::VectorXd& y);
 
 }  // namespace sysid

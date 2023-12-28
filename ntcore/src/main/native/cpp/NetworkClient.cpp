@@ -206,7 +206,9 @@ void NetworkClient3::TcpConnected(uv::Tcp& tcp) {
   auto clientImpl = std::make_shared<net3::ClientImpl3>(
       m_loop.Now().count(), m_inst, *wire, m_logger, [this](uint32_t repeatMs) {
         DEBUG4("Setting periodic timer to {}", repeatMs);
-        if (m_sendOutgoingTimer) {
+        if (m_sendOutgoingTimer &&
+            (!m_sendOutgoingTimer->IsActive() ||
+             uv::Timer::Time{repeatMs} != m_sendOutgoingTimer->GetRepeat())) {
           m_sendOutgoingTimer->Start(uv::Timer::Time{repeatMs},
                                      uv::Timer::Time{repeatMs});
         }
@@ -406,7 +408,9 @@ void NetworkClient::WsConnected(wpi::WebSocket& ws, uv::Tcp& tcp,
       m_loop.Now().count(), m_inst, *m_wire, m_logger, m_timeSyncUpdated,
       [this](uint32_t repeatMs) {
         DEBUG4("Setting periodic timer to {}", repeatMs);
-        if (m_sendOutgoingTimer) {
+        if (m_sendOutgoingTimer &&
+            (!m_sendOutgoingTimer->IsActive() ||
+             uv::Timer::Time{repeatMs} != m_sendOutgoingTimer->GetRepeat())) {
           m_sendOutgoingTimer->Start(uv::Timer::Time{repeatMs},
                                      uv::Timer::Time{repeatMs});
         }

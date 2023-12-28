@@ -28,30 +28,30 @@
  */
 
 namespace DriveConstants {
-constexpr int kFrontLeftMotorPort = 0;
-constexpr int kRearLeftMotorPort = 1;
-constexpr int kFrontRightMotorPort = 2;
-constexpr int kRearRightMotorPort = 3;
+inline constexpr int kFrontLeftMotorPort = 0;
+inline constexpr int kRearLeftMotorPort = 1;
+inline constexpr int kFrontRightMotorPort = 2;
+inline constexpr int kRearRightMotorPort = 3;
 
-constexpr int kFrontLeftEncoderPorts[]{0, 1};
-constexpr int kRearLeftEncoderPorts[]{2, 3};
-constexpr int kFrontRightEncoderPorts[]{4, 5};
-constexpr int kRearRightEncoderPorts[]{6, 7};
+inline constexpr int kFrontLeftEncoderPorts[]{0, 1};
+inline constexpr int kRearLeftEncoderPorts[]{2, 3};
+inline constexpr int kFrontRightEncoderPorts[]{4, 5};
+inline constexpr int kRearRightEncoderPorts[]{6, 7};
 
-constexpr bool kFrontLeftEncoderReversed = false;
-constexpr bool kRearLeftEncoderReversed = true;
-constexpr bool kFrontRightEncoderReversed = false;
-constexpr bool kRearRightEncoderReversed = true;
+inline constexpr bool kFrontLeftEncoderReversed = false;
+inline constexpr bool kRearLeftEncoderReversed = true;
+inline constexpr bool kFrontRightEncoderReversed = false;
+inline constexpr bool kRearRightEncoderReversed = true;
 
-constexpr auto kTrackWidth =
+inline constexpr auto kTrackWidth =
     0.5_m;  // Distance between centers of right and left wheels on robot
-constexpr auto kWheelBase =
+inline constexpr auto kWheelBase =
     0.7_m;  // Distance between centers of front and back wheels on robot
 extern const frc::MecanumDriveKinematics kDriveKinematics;
 
-constexpr int kEncoderCPR = 1024;
-constexpr double kWheelDiameterMeters = 0.15;
-constexpr double kEncoderDistancePerPulse =
+inline constexpr int kEncoderCPR = 1024;
+inline constexpr double kWheelDiameterMeters = 0.15;
+inline constexpr double kEncoderDistancePerPulse =
     // Assumes the encoders are directly mounted on the wheel shafts
     (kWheelDiameterMeters * std::numbers::pi) /
     static_cast<double>(kEncoderCPR);
@@ -60,26 +60,26 @@ constexpr double kEncoderDistancePerPulse =
 // These characterization values MUST be determined either experimentally or
 // theoretically for *your* robot's drive. The SysId tool provides a convenient
 // method for obtaining these values for your robot.
-constexpr auto ks = 1_V;
-constexpr auto kv = 0.8 * 1_V * 1_s / 1_m;
-constexpr auto ka = 0.15 * 1_V * 1_s * 1_s / 1_m;
+inline constexpr auto ks = 1_V;
+inline constexpr auto kv = 0.8 * 1_V * 1_s / 1_m;
+inline constexpr auto ka = 0.15 * 1_V * 1_s * 1_s / 1_m;
 
 // Example value only - as above, this must be tuned for your drive!
-constexpr double kPFrontLeftVel = 0.5;
-constexpr double kPRearLeftVel = 0.5;
-constexpr double kPFrontRightVel = 0.5;
-constexpr double kPRearRightVel = 0.5;
+inline constexpr double kPFrontLeftVel = 0.5;
+inline constexpr double kPRearLeftVel = 0.5;
+inline constexpr double kPFrontRightVel = 0.5;
+inline constexpr double kPRearRightVel = 0.5;
 }  // namespace DriveConstants
 
 namespace AutoConstants {
-constexpr auto kMaxSpeed = 3_mps;
-constexpr auto kMaxAcceleration = 3_mps_sq;
-constexpr auto kMaxAngularSpeed = 3_rad_per_s;
-constexpr auto kMaxAngularAcceleration = 3_rad_per_s_sq;
+inline constexpr auto kMaxSpeed = 3_mps;
+inline constexpr auto kMaxAcceleration = 3_mps_sq;
+inline constexpr auto kMaxAngularSpeed = 3_rad_per_s;
+inline constexpr auto kMaxAngularAcceleration = 3_rad_per_s_sq;
 
-constexpr double kPXController = 0.5;
-constexpr double kPYController = 0.5;
-constexpr double kPThetaController = 0.5;
+inline constexpr double kPXController = 0.5;
+inline constexpr double kPYController = 0.5;
+inline constexpr double kPThetaController = 0.5;
 
 extern const frc::TrapezoidProfile<units::radians>::Constraints
     kThetaControllerConstraints;
@@ -87,5 +87,5 @@ extern const frc::TrapezoidProfile<units::radians>::Constraints
 }  // namespace AutoConstants
 
 namespace OIConstants {
-constexpr int kDriverControllerPort = 0;
+inline constexpr int kDriverControllerPort = 0;
 }  // namespace OIConstants

@@ -25,8 +25,8 @@ import java.util.Random;
 /**
  * Centralized data log that provides automatic data log file management. It automatically cleans up
  * old files when disk space is low and renames the file based either on current date/time or (if
- * available) competition match number. The deta file will be saved to a USB flash drive if one is
- * attached, or to /home/lvuser otherwise.
+ * available) competition match number. The data file will be saved to a USB flash drive in a folder
+ * named "logs" if one is attached, or to /home/lvuser/logs otherwise.
  *
  * <p>Log files are initially named "FRC_TBD_{random}.wpilog" until the DS connects. After the DS
  * connects, the log file is renamed to "FRC_yyyyMMdd_HHmmss.wpilog" (where the date/time is UTC).
@@ -233,7 +233,11 @@ public final class DataLogManager {
       }
       return "/home/lvuser/logs";
     }
-    return Filesystem.getOperatingDirectory().getAbsolutePath();
+    String logDir = Filesystem.getOperatingDirectory().getAbsolutePath() + "/logs";
+    if (!new File(logDir).mkdir()) {
+      // ignored
+    }
+    return logDir;
   }
 
   private static String makeLogFilename(String filenameOverride) {

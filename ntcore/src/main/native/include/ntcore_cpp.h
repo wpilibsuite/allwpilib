@@ -682,6 +682,24 @@ void SetTopicRetained(NT_Topic topic, bool value);
 bool GetTopicRetained(NT_Topic topic);
 
 /**
+ * Sets the cached property of a topic.  If true, the server and clients will
+ * store the latest value, allowing the value to be read (and not just accessed
+ * through event queues and listeners).
+ *
+ * @param topic topic handle
+ * @param value True for cached, false for not cached
+ */
+void SetTopicCached(NT_Topic topic, bool value);
+
+/**
+ * Gets the cached property of a topic.
+ *
+ * @param topic topic handle
+ * @return cached property value
+ */
+bool GetTopicCached(NT_Topic topic);
+
+/**
  * Determine if topic exists (e.g. has at least one publisher).
  *
  * @param handle Topic, entry, or subscriber handle.

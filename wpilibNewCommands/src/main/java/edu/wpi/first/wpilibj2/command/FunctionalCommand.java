@@ -32,6 +32,7 @@ public class FunctionalCommand extends Command {
    * @param isFinished the function that determines whether the command has finished
    * @param requirements the subsystems required by this command
    */
+  @SuppressWarnings("this-escape")
   public FunctionalCommand(
       Runnable onInit,
       Runnable onExecute,

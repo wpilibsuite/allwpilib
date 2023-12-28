@@ -16,6 +16,7 @@
 #include <string>
 #include <string_view>
 #include <thread>
+#include <tuple>
 #include <utility>
 #include <vector>
 #include <version>
@@ -263,16 +264,20 @@ class DataLog final {
    * name are silently ignored.
    *
    * @tparam T struct serializable type
+   * @param info optional struct type info
    * @param timestamp Time stamp (0 to indicate now)
    */
-  template <StructSerializable T>
-  void AddStructSchema(int64_t timestamp = 0) {
+  template <typename T, typename... I>
+    requires StructSerializable<T, I...>
+  void AddStructSchema(const I&... info, int64_t timestamp = 0) {
     if (timestamp == 0) {
       timestamp = Now();
     }
-    ForEachStructSchema<T>([this, timestamp](auto typeString, auto schema) {
-      AddSchema(typeString, "structschema", schema, timestamp);
-    });
+    ForEachStructSchema<T>(
+        [this, timestamp](auto typeString, auto schema) {
+          this->AddSchema(typeString, "structschema", schema, timestamp);
+        },
+        info...);
   }
 
   /**
@@ -486,12 +491,12 @@ class DataLog final {
   mutable wpi::mutex m_mutex;
   wpi::condition_variable m_cond;
   bool m_doFlush{false};
+  bool m_shutdown{false};
   enum State {
     kStart,
     kActive,
     kPaused,
     kStopped,
-    kShutdown,
   } m_state = kActive;
   double m_period;
   std::string m_extraHeader;
@@ -946,19 +951,22 @@ class StringArrayLogEntry : public DataLogEntry {
 /**
  * Log raw struct serializable objects.
  */
-template <StructSerializable T>
+template <typename T, typename... I>
+  requires StructSerializable<T, I...>
 class StructLogEntry : public DataLogEntry {
-  using S = Struct<T>;
+  using S = Struct<T, I...>;
 
  public:
   StructLogEntry() = default;
-  StructLogEntry(DataLog& log, std::string_view name, int64_t timestamp = 0)
-      : StructLogEntry{log, name, {}, timestamp} {}
+  StructLogEntry(DataLog& log, std::string_view name, I... info,
+                 int64_t timestamp = 0)
+      : StructLogEntry{log, name, {}, std::move(info)..., timestamp} {}
   StructLogEntry(DataLog& log, std::string_view name, std::string_view metadata,
-                 int64_t timestamp = 0) {
+                 I... info, int64_t timestamp = 0)
+      : m_info{std::move(info)...} {
     m_log = &log;
-    log.AddStructSchema<T>(timestamp);
-    m_entry = log.Start(name, S::kTypeString, metadata, timestamp);
+    log.AddStructSchema<T, I...>(info..., timestamp);
+    m_entry = log.Start(name, S::GetTypeString(info...), metadata, timestamp);
   }
 
   /**
@@ -968,38 +976,46 @@ class StructLogEntry : public DataLogEntry {
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
   void Append(const T& data, int64_t timestamp = 0) {
-    if constexpr (wpi::is_constexpr([] { S::GetSize(); })) {
-      uint8_t buf[S::GetSize()];
-      S::Pack(buf, data);
-      m_log->AppendRaw(m_entry, buf, timestamp);
-    } else {
-      wpi::SmallVector<uint8_t, 128> buf;
-      buf.resize_for_overwrite(S::GetSize());
-      S::Pack(buf, data);
-      m_log->AppendRaw(m_entry, buf, timestamp);
+    if constexpr (sizeof...(I) == 0) {
+      if constexpr (wpi::is_constexpr([] { S::GetSize(); })) {
+        uint8_t buf[S::GetSize()];
+        S::Pack(buf, data);
+        m_log->AppendRaw(m_entry, buf, timestamp);
+        return;
+      }
     }
+    wpi::SmallVector<uint8_t, 128> buf;
+    buf.resize_for_overwrite(std::apply(S::GetSize, m_info));
+    std::apply([&](const I&... info) { S::Pack(buf, data, info...); }, m_info);
+    m_log->AppendRaw(m_entry, buf, timestamp);
   }
+
+ private:
+  [[no_unique_address]] std::tuple<I...> m_info;
 };
 
 /**
  * Log raw struct serializable array of objects.
  */
-template <StructSerializable T>
+template <typename T, typename... I>
+  requires StructSerializable<T, I...>
 class StructArrayLogEntry : public DataLogEntry {
-  using S = Struct<T>;
+  using S = Struct<T, I...>;
 
  public:
   StructArrayLogEntry() = default;
-  StructArrayLogEntry(DataLog& log, std::string_view name,
+  StructArrayLogEntry(DataLog& log, std::string_view name, I... info,
                       int64_t timestamp = 0)
-      : StructArrayLogEntry{log, name, {}, timestamp} {}
+      : StructArrayLogEntry{log, name, {}, std::move(info)..., timestamp} {}
   StructArrayLogEntry(DataLog& log, std::string_view name,
-                      std::string_view metadata, int64_t timestamp = 0) {
+                      std::string_view metadata, I... info,
+                      int64_t timestamp = 0)
+      : m_info{std::move(info)...} {
     m_log = &log;
-    log.AddStructSchema<T>(timestamp);
-    m_entry =
-        log.Start(name, MakeStructArrayTypeString<T, std::dynamic_extent>(),
-                  metadata, timestamp);
+    log.AddStructSchema<T, I...>(info..., timestamp);
+    m_entry = log.Start(
+        name, MakeStructArrayTypeString<T, std::dynamic_extent>(info...),
+        metadata, timestamp);
   }
 
   /**
@@ -1014,9 +1030,14 @@ class StructArrayLogEntry : public DataLogEntry {
              std::convertible_to<std::ranges::range_value_t<U>, T>
 #endif
   void Append(U&& data, int64_t timestamp = 0) {
-    m_buf.Write(std::forward<U>(data), [&](auto bytes) {
-      m_log->AppendRaw(m_entry, bytes, timestamp);
-    });
+    std::apply(
+        [&](const I&... info) {
+          m_buf.Write(
+              std::forward<U>(data),
+              [&](auto bytes) { m_log->AppendRaw(m_entry, bytes, timestamp); },
+              info...);
+        },
+        m_info);
   }
 
   /**
@@ -1026,12 +1047,19 @@ class StructArrayLogEntry : public DataLogEntry {
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
   void Append(std::span<const T> data, int64_t timestamp = 0) {
-    m_buf.Write(
-        data, [&](auto bytes) { m_log->AppendRaw(m_entry, bytes, timestamp); });
+    std::apply(
+        [&](const I&... info) {
+          m_buf.Write(
+              data,
+              [&](auto bytes) { m_log->AppendRaw(m_entry, bytes, timestamp); },
+              info...);
+        },
+        m_info);
   }
 
  private:
-  StructArrayBuffer<T> m_buf;
+  StructArrayBuffer<T, I...> m_buf;
+  [[no_unique_address]] std::tuple<I...> m_info;
 };
 
 /**

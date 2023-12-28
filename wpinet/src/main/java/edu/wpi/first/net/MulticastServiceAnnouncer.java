@@ -25,6 +25,7 @@ public class MulticastServiceAnnouncer implements AutoCloseable {
    * @param port port
    * @param txt txt
    */
+  @SuppressWarnings("this-escape")
   public MulticastServiceAnnouncer(
       String serviceName, String serviceType, int port, Map<String, String> txt) {
     String[] keys = txt.keySet().toArray(String[]::new);
@@ -41,6 +42,7 @@ public class MulticastServiceAnnouncer implements AutoCloseable {
    * @param serviceType service type
    * @param port port
    */
+  @SuppressWarnings("this-escape")
   public MulticastServiceAnnouncer(String serviceName, String serviceType, int port) {
     m_handle =
         WPINetJNI.createMulticastServiceAnnouncer(serviceName, serviceType, port, null, null);

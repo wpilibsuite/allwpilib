@@ -323,7 +323,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
 
   /** Resets the observer. */
   @Override
-  public void reset() {
+  public final void reset() {
     m_xHat = new Matrix<>(m_states, Nat.N1());
     m_S = new Matrix<>(m_states, m_states);
     m_sigmasF = new Matrix<>(new SimpleMatrix(m_states.getNum(), 2 * m_states.getNum() + 1));

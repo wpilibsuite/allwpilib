@@ -232,7 +232,10 @@ static std::string MakeLogDir(std::string_view dir) {
   fs::create_directory("/home/lvuser/logs", ec);
   return "/home/lvuser/logs";
 #else
-  return filesystem::GetOperatingDirectory();
+  std::string logDir = filesystem::GetOperatingDirectory() + "/logs";
+  std::error_code ec;
+  fs::create_directory(logDir, ec);
+  return logDir;
 #endif
 }
 

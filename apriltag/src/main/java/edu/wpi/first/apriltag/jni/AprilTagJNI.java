@@ -8,6 +8,7 @@ import edu.wpi.first.apriltag.AprilTagDetection;
 import edu.wpi.first.apriltag.AprilTagDetector;
 import edu.wpi.first.apriltag.AprilTagPoseEstimate;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.util.RawFrame;
 import edu.wpi.first.util.RuntimeLoader;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -190,7 +191,7 @@ public class AprilTagJNI {
       double cx,
       double cy);
 
-  public static native void generate16h5AprilTagImage(int id, long nativeAddr);
+  public static native void generate16h5AprilTagImage(RawFrame frameObj, long frame, int id);
 
-  public static native void generate36h11AprilTagImage(int id, long nativeAddr);
+  public static native void generate36h11AprilTagImage(RawFrame frameObj, long frame, int id);
 }

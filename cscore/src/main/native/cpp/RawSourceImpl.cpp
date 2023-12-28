@@ -39,10 +39,11 @@ void RawSourceImpl::PutFrame(const WPI_RawFrame& image) {
       type = CV_8UC1;
       break;
   }
-  cv::Mat finalImage{image.height, image.width, type, image.data};
+  cv::Mat finalImage{image.height, image.width, type, image.data,
+                     static_cast<size_t>(image.stride)};
   std::unique_ptr<Image> dest =
       AllocImage(static_cast<VideoMode::PixelFormat>(image.pixelFormat),
-                 image.width, image.height, image.totalData);
+                 image.width, image.height, image.size);
   finalImage.copyTo(dest->AsMat());
 
   SourceImpl::PutFrame(std::move(dest), wpi::Now());
