@@ -17,12 +17,14 @@ public class CANStreamOverflowException extends IOException {
    * @param messages The messages
    * @param messagesRead The length of messages read
    */
+  @SuppressWarnings("PMD.ArrayIsStoredDirectly")
   public CANStreamOverflowException(CANStreamMessage[] messages, int messagesRead) {
     super("A CAN Stream has overflowed. Data will be missed");
     this.m_messages = messages;
     this.m_messagesRead = messagesRead;
   }
 
+  @SuppressWarnings("PMD.MethodReturnsInternalArray")
   public CANStreamMessage[] getMessages() {
     return m_messages;
   }
