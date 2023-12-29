@@ -160,11 +160,11 @@ Java_edu_wpi_first_hal_can_CANJNI_readCANStreamSession
     JLocal<jobject> elem{
         env, static_cast<jstring>(env->GetObjectArrayElement(messages, i))};
     if (!elem) {
-      // If element doesn't exist, construct it in place. If that fails, we are OOM,
-      // just return
+      // If element doesn't exist, construct it in place. If that fails, we are
+      // OOM, just return
       elem = JLocal<jobject>{env, CreateCANStreamMessage(env)};
       if (elem) {
-        printf("Allocated and set object\n");
+        std::printf("Allocated and set object\n");
         env->SetObjectArrayElement(messages, i, elem);
       } else {
         return 0;
