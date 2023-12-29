@@ -56,6 +56,7 @@ static JClass canStreamMessageCls;
 static JClass halValueCls;
 static JClass baseStoreCls;
 static JClass revPHVersionCls;
+static JClass canStreamOverflowExCls;
 
 static const JClassInit classes[] = {
     {"edu/wpi/first/hal/PowerDistributionVersion",
@@ -68,7 +69,9 @@ static const JClassInit classes[] = {
     {"edu/wpi/first/hal/CANStreamMessage", &canStreamMessageCls},
     {"edu/wpi/first/hal/HALValue", &halValueCls},
     {"edu/wpi/first/hal/DMAJNISample$BaseStore", &baseStoreCls},
-    {"edu/wpi/first/hal/REVPHVersion", &revPHVersionCls}};
+    {"edu/wpi/first/hal/REVPHVersion", &revPHVersionCls},
+    {"edu/wpi/first/hal/can/CANStreamOverflowException",
+     &canStreamOverflowExCls}};
 
 static const JExceptionInit exceptions[] = {
     {"java/lang/IllegalArgumentException", &illegalArgExCls},
@@ -207,6 +210,16 @@ void ReportCANError(JNIEnv* env, int32_t status, int message_id) {
       break;
     }
   }
+}
+
+void ThrowCANStreamOverflowException(JNIEnv* env, jobjectArray messages,
+                                     jint length) {
+  static jmethodID constructor =
+      env->GetMethodID(canStreamOverflowExCls, "<init>",
+                       "([Ledu/wpi/first/hal/CANStreamMessage;I)V");
+  jobject exception =
+      env->NewObject(canStreamOverflowExCls, constructor, messages, length);
+  env->Throw(static_cast<jthrowable>(exception));
 }
 
 void ThrowIllegalArgumentException(JNIEnv* env, std::string_view msg) {
