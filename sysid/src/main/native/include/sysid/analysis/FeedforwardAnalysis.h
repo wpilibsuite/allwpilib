@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <string>
 #include <tuple>
 #include <vector>
 
@@ -14,10 +15,39 @@
 namespace sysid {
 
 /**
+ * Exception for data that doesn't sample enough of the state-input space.
+ */
+class InsufficientSamplesError : public std::exception {
+ public:
+  /**
+   * Constructs an InsufficientSamplesError.
+   *
+   * @param message The error message
+   */
+  explicit InsufficientSamplesError(std::string_view message) {
+    m_message = message;
+  }
+
+  const char* what() const noexcept override { return m_message.c_str(); }
+
+ private:
+  /**
+   * Stores the error message
+   */
+  std::string m_message;
+};
+
+/**
  * Calculates feedforward gains given the data and the type of analysis to
  * perform.
+ *
+ * @param data The OLS input data.
+ * @param type The analysis type.
+ * @param throwOnRankDeficiency Whether to throw if the fit is going to be poor.
+ *   This option is provided for unit testing purposes.
  */
 OLSResult CalculateFeedforwardGains(const Storage& data,
-                                    const AnalysisType& type);
+                                    const AnalysisType& type,
+                                    bool throwOnRankDeficiency = true);
 
 }  // namespace sysid

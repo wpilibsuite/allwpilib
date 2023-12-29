@@ -14,6 +14,7 @@
 #include <utility>
 #include <vector>
 
+#include <fmt/format.h>
 #include <frc/filter/LinearFilter.h>
 #include <units/time.h>
 #include <wpi/StringMap.h>
@@ -30,7 +31,8 @@ constexpr int kNoiseMeanWindow = 9;
  * Exception for Invalid Data Errors in which we can't pin the cause of error to
  * any one specific setting of the GUI.
  */
-struct InvalidDataError : public std::exception {
+class InvalidDataError : public std::exception {
+ public:
   /**
    * Creates an InvalidDataError Exception. It adds additional steps after the
    * initial error message to inform users in the ways that they could fix their
@@ -46,17 +48,20 @@ struct InvalidDataError : public std::exception {
         message);
   }
 
+  const char* what() const noexcept override { return m_message.c_str(); }
+
+ private:
   /**
    * Stores the error message
    */
   std::string m_message;
-  const char* what() const noexcept override { return m_message.c_str(); }
 };
 
 /**
  * Exception for Quasistatic Data being completely removed.
  */
-struct NoQuasistaticDataError : public std::exception {
+class NoQuasistaticDataError : public std::exception {
+ public:
   const char* what() const noexcept override {
     return "Quasistatic test trimming removed all data. Please adjust your "
            "motion threshold and double check "
@@ -68,7 +73,8 @@ struct NoQuasistaticDataError : public std::exception {
 /**
  * Exception for Dynamic Data being completely removed.
  */
-struct NoDynamicDataError : public std::exception {
+class NoDynamicDataError : public std::exception {
+ public:
   const char* what() const noexcept override {
     return "Dynamic test trimming removed all data. Please adjust your test "
            "duration and double check "
