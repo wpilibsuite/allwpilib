@@ -18,6 +18,7 @@ import java.util.function.DoubleSupplier;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
+@Deprecated(since = "2024", forRemoval = true)
 public class PIDCommand extends Command {
   protected final PIDController m_controller;
   protected DoubleSupplier m_measurement;
@@ -32,7 +33,9 @@ public class PIDCommand extends Command {
    * @param setpointSource the controller's setpoint
    * @param useOutput the controller's output
    * @param requirements the subsystems required by this command
+   * @deprecated use a {@link PIDController} inside a {@link Command} instead
    */
+  @Deprecated(since = "2024", forRemoval = true)
   public PIDCommand(
       PIDController controller,
       DoubleSupplier measurementSource,
@@ -59,7 +62,9 @@ public class PIDCommand extends Command {
    * @param setpoint the controller's setpoint
    * @param useOutput the controller's output
    * @param requirements the subsystems required by this command
+   * @deprecated use a {@link PIDController} inside a {@link Command} instead
    */
+  @Deprecated(since = "2024", forRemoval = true)
   public PIDCommand(
       PIDController controller,
       DoubleSupplier measurementSource,

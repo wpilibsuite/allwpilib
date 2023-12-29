@@ -9,6 +9,7 @@ import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 
 /**
  * A subsystem that uses a {@link ProfiledPIDController} to control an output. The controller is run
@@ -16,6 +17,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
+@Deprecated(since = "2024", forRemoval = true)
 public abstract class ProfiledPIDSubsystem extends SubsystemBase {
   protected final ProfiledPIDController m_controller;
   protected boolean m_enabled;
@@ -25,7 +27,9 @@ public abstract class ProfiledPIDSubsystem extends SubsystemBase {
    *
    * @param controller the ProfiledPIDController to use
    * @param initialPosition the initial goal position of the controller
+   * @deprecated use a {@link ProfiledPIDController} inside a {@link Subsystem} instead
    */
+  @Deprecated(since = "2024", forRemoval = true)
   public ProfiledPIDSubsystem(ProfiledPIDController controller, double initialPosition) {
     m_controller = requireNonNullParam(controller, "controller", "ProfiledPIDSubsystem");
     setGoal(initialPosition);
@@ -35,7 +39,9 @@ public abstract class ProfiledPIDSubsystem extends SubsystemBase {
    * Creates a new ProfiledPIDSubsystem. Initial goal position is zero.
    *
    * @param controller the ProfiledPIDController to use
+   * @deprecated use a {@link ProfiledPIDController} inside a {@link Subsystem} instead
    */
+  @Deprecated(since = "2024", forRemoval = true)
   public ProfiledPIDSubsystem(ProfiledPIDController controller) {
     this(controller, 0);
   }

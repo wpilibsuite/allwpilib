@@ -23,7 +23,8 @@ namespace frc2 {
  *
  * @see PIDController
  */
-class PIDCommand : public CommandHelper<Command, PIDCommand> {
+class [[deprecated("Use a PIDController inside a Command instead.")]] PIDCommand
+    : public CommandHelper<Command, PIDCommand> {
  public:
   /**
    * Creates a new PIDCommand, which controls the given output with a
@@ -34,6 +35,7 @@ class PIDCommand : public CommandHelper<Command, PIDCommand> {
    * @param setpointSource   the controller's reference (aka setpoint)
    * @param useOutput         the controller's output
    * @param requirements      the subsystems required by this command
+   * @deprecated use a PIDController inside a Command instead
    */
   PIDCommand(frc::PIDController controller,
              std::function<double()> measurementSource,
@@ -50,6 +52,7 @@ class PIDCommand : public CommandHelper<Command, PIDCommand> {
    * @param setpoint         the controller's setpoint (aka setpoint)
    * @param useOutput         the controller's output
    * @param requirements      the subsystems required by this command
+   * @deprecated use a PIDController inside a Command instead
    */
   PIDCommand(frc::PIDController controller,
              std::function<double()> measurementSource, double setpoint,

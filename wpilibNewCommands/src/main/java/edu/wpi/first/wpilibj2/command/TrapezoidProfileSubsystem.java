@@ -14,6 +14,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
+@Deprecated(since = "2024", forRemoval = true)
 public abstract class TrapezoidProfileSubsystem extends SubsystemBase {
   private final double m_period;
   private final TrapezoidProfile m_profile;
@@ -30,7 +31,9 @@ public abstract class TrapezoidProfileSubsystem extends SubsystemBase {
    * @param initialPosition The initial position of the controlled mechanism when the subsystem is
    *     constructed.
    * @param period The period of the main robot loop, in seconds.
+   * @deprecated use {@link TrapezoidProfile}s inside a {@link Subsystem} or {@link Command} instead
    */
+  @Deprecated(since = "2024", forRemoval = true)
   public TrapezoidProfileSubsystem(
       TrapezoidProfile.Constraints constraints, double initialPosition, double period) {
     requireNonNullParam(constraints, "constraints", "TrapezoidProfileSubsystem");
@@ -46,7 +49,9 @@ public abstract class TrapezoidProfileSubsystem extends SubsystemBase {
    * @param constraints The constraints (maximum velocity and acceleration) for the profiles.
    * @param initialPosition The initial position of the controlled mechanism when the subsystem is
    *     constructed.
+   * @deprecated use {@link TrapezoidProfile}s inside a {@link Subsystem} or {@link Command} instead
    */
+  @Deprecated(since = "2024", forRemoval = true)
   public TrapezoidProfileSubsystem(
       TrapezoidProfile.Constraints constraints, double initialPosition) {
     this(constraints, initialPosition, 0.02);
@@ -56,7 +61,9 @@ public abstract class TrapezoidProfileSubsystem extends SubsystemBase {
    * Creates a new TrapezoidProfileSubsystem.
    *
    * @param constraints The constraints (maximum velocity and acceleration) for the profiles.
+   * @deprecated use {@link TrapezoidProfile}s inside a {@link Subsystem} or {@link Command} instead
    */
+  @Deprecated(since = "2024", forRemoval = true)
   public TrapezoidProfileSubsystem(TrapezoidProfile.Constraints constraints) {
     this(constraints, 0, 0.02);
   }
