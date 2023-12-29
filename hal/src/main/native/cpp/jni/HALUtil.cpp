@@ -365,6 +365,12 @@ jobject CreatePowerDistributionVersion(JNIEnv* env, uint32_t firmwareMajor,
       static_cast<jint>(hardwareMajor), static_cast<jint>(uniqueId));
 }
 
+jobject CreateCANStreamMessage(JNIEnv* env) {
+  static jmethodID constructor =
+      env->GetMethodID(canStreamMessageCls, "<init>", "()V");
+  return env->NewObject(canStreamMessageCls, constructor);
+}
+
 JavaVM* GetJVM() {
   return jvm;
 }

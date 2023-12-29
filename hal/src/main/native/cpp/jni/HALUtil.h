@@ -93,6 +93,8 @@ jobject CreatePowerDistributionVersion(JNIEnv* env, uint32_t firmwareMajor,
                                        uint32_t hardwareMajor,
                                        uint32_t uniqueId);
 
+jobject CreateCANStreamMessage(JNIEnv* env);
+
 JavaVM* GetJVM();
 
 }  // namespace hal
