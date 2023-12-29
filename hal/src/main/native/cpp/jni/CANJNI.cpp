@@ -135,6 +135,17 @@ Java_edu_wpi_first_hal_can_CANJNI_readCANStreamSession
   (JNIEnv* env, jclass, jint sessionHandle, jobjectArray messages,
    jint messagesToRead)
 {
+  if (messages == nullptr) {
+    ThrowNullPointerException(env, "messages cannot be null");
+    return 0;
+  }
+
+  jsize messagesArrayLen = env->GetArrayLength(messages);
+
+  if (messagesArrayLen < messagesToRead) {
+    messagesToRead = messagesArrayLen;
+  }
+
   uint32_t handle = static_cast<uint32_t>(sessionHandle);
   uint32_t messagesRead = 0;
 

@@ -46,6 +46,7 @@ static JException canMessageNotFoundExCls;
 static JException canMessageNotAllowedExCls;
 static JException canNotInitializedExCls;
 static JException uncleanStatusExCls;
+static JException nullPointerEx;
 static JClass powerDistributionVersionCls;
 static JClass pwmConfigDataResultCls;
 static JClass canStatusCls;
@@ -82,7 +83,8 @@ static const JExceptionInit exceptions[] = {
      &canMessageNotAllowedExCls},
     {"edu/wpi/first/hal/can/CANNotInitializedException",
      &canNotInitializedExCls},
-    {"edu/wpi/first/hal/util/UncleanStatusException", &uncleanStatusExCls}};
+    {"edu/wpi/first/hal/util/UncleanStatusException", &uncleanStatusExCls},
+    {"java/lang/NullPointerException", &nullPointerEx}};
 
 namespace hal {
 
@@ -207,6 +209,10 @@ void ReportCANError(JNIEnv* env, int32_t status, int message_id) {
       break;
     }
   }
+}
+
+void ThrowNullPointerException(JNIEnv* env, std::string_view msg) {
+  nullPointerEx.Throw(env, msg);
 }
 
 void ThrowIllegalArgumentException(JNIEnv* env, std::string_view msg) {
