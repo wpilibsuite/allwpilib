@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "frc/event/EventLoop.h"
+
 #include "frc/Errors.h"
 
 using namespace frc;
@@ -21,7 +22,8 @@ EventLoop::EventLoop() {}
 
 void EventLoop::Bind(wpi::unique_function<void()> action) {
   if (m_running) {
-    throw FRC_MakeError(err::Error, "Cannot bind EventLoop while it is running");
+    throw FRC_MakeError(err::Error,
+                        "Cannot bind EventLoop while it is running");
   }
   m_bindings.emplace_back(std::move(action));
 }
@@ -35,7 +37,8 @@ void EventLoop::Poll() {
 
 void EventLoop::Clear() {
   if (m_running) {
-    throw FRC_MakeError(err::Error, "Cannot clear EventLoop while it is running");
+    throw FRC_MakeError(err::Error,
+                        "Cannot clear EventLoop while it is running");
   }
   m_bindings.clear();
 }
