@@ -4,14 +4,14 @@
 
 package edu.wpi.first.wpilibj.event;
 
-import java.util.Collection;
-import java.util.LinkedHashSet;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A declarative way to bind a set of actions to a loop and execute them when the loop is polled.
  */
 public final class EventLoop {
-  private final Collection<Runnable> m_bindings = new LinkedHashSet<>();
+  private final List<Runnable> m_bindings = new ArrayList<>();
 
   /**
    * Bind a new action to run when the loop is polled.
