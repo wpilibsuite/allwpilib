@@ -46,10 +46,10 @@ bool LocalStorage::MultiSubscriberData::Matches(std::string_view name,
 }
 
 int LocalStorage::DataLoggerData::Start(TopicData* topic, int64_t time) {
-  return log.Start(fmt::format("{}{}", logPrefix,
-                               wpi::drop_front(topic->name, prefix.size())),
-                   topic->typeStr == "int" ? "int64" : topic->typeStr,
-                   DataLoggerEntry::MakeMetadata(topic->propertiesStr), time);
+  return log.Start(
+      fmt::format("{}{}", logPrefix, wpi::remove_prefix(topic->name, prefix)),
+      topic->typeStr == "int" ? "int64" : topic->typeStr,
+      DataLoggerEntry::MakeMetadata(topic->propertiesStr), time);
 }
 
 void LocalStorage::DataLoggerEntry::Append(const Value& v) {

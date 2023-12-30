@@ -726,10 +726,10 @@ void NetworkTablesModel::ValueSource::UpdateFromValue(
         UpdateMsgpackValueSource(model, this, r, name, value.last_change());
         mpack_reader_destroy(&r);
       } else if (wpi::starts_with(typeStr, "struct:")) {
-        auto structName = wpi::drop_front(typeStr, 7);
-        bool isArray = structName.ends_with("[]");
+        auto structName = wpi::remove_prefix(typeStr, "struct:");
+        bool isArray = wpi::ends_with(structName, "[]");
         if (isArray) {
-          structName = wpi::drop_back(structName, 2);
+          structName = wpi::remove_suffix(structName, "[]");
         }
         auto desc = model.m_structDb.Find(structName);
         if (desc && desc->IsValid()) {
@@ -761,7 +761,7 @@ void NetworkTablesModel::ValueSource::UpdateFromValue(
           valueChildren.clear();
         }
       } else if (wpi::starts_with(typeStr, "proto:")) {
-        auto msg = model.m_protoDb.Find(wpi::drop_front(typeStr, 6));
+        auto msg = model.m_protoDb.Find(wpi::remove_prefix(typeStr, "proto:"));
         if (msg) {
           msg->Clear();
           auto raw = value.GetRaw();
@@ -807,12 +807,14 @@ void NetworkTablesModel::Update() {
           } else if (info->name == "$serversub") {
             m_server.subscribers.clear();
           } else if (wpi::starts_with(info->name, "$clientpub$")) {
-            auto it = m_clients.find(wpi::drop_front(info->name, 11));
+            auto it =
+                m_clients.find(wpi::remove_prefix(info->name, "$clientpub$"));
             if (it != m_clients.end()) {
               it->second.publishers.clear();
             }
           } else if (wpi::starts_with(info->name, "$clientsub$")) {
-            auto it = m_clients.find(wpi::drop_front(info->name, 11));
+            auto it =
+                m_clients.find(wpi::remove_prefix(info->name, "$clientsub$"));
             if (it != m_clients.end()) {
               it->second.subscribers.clear();
             }
@@ -853,12 +855,14 @@ void NetworkTablesModel::Update() {
           } else if (entry->info.name == "$serversub") {
             m_server.UpdateSubscribers(entry->value.GetRaw());
           } else if (wpi::starts_with(entry->info.name, "$clientpub$")) {
-            auto it = m_clients.find(wpi::drop_front(entry->info.name, 11));
+            auto it = m_clients.find(
+                wpi::remove_prefix(entry->info.name, "$clientpub$"));
             if (it != m_clients.end()) {
               it->second.UpdatePublishers(entry->value.GetRaw());
             }
           } else if (wpi::starts_with(entry->info.name, "$clientsub$")) {
-            auto it = m_clients.find(wpi::drop_front(entry->info.name, 11));
+            auto it = m_clients.find(
+                wpi::remove_prefix(entry->info.name, "$clientsub$"));
             if (it != m_clients.end()) {
               it->second.UpdateSubscribers(entry->value.GetRaw());
             }
@@ -867,7 +871,8 @@ void NetworkTablesModel::Update() {
                    wpi::starts_with(entry->info.name, "/.schema/struct:") &&
                    entry->info.type_str == "structschema") {
           // struct schema handling
-          auto typeStr = wpi::drop_front(entry->info.name, 16);
+          auto typeStr =
+              wpi::remove_prefix(entry->info.name, "/.schema/struct:");
           std::string_view schema{
               reinterpret_cast<const char*>(entry->value.GetRaw().data()),
               entry->value.GetRaw().size()};
@@ -886,9 +891,8 @@ void NetworkTablesModel::Update() {
               if (!wpi::starts_with(ts, "struct:")) {
                 continue;
               }
-              ts = wpi::drop_front(ts, 7);
-              if (ts == typeStr || (wpi::ends_with(ts, "[]") &&
-                                    wpi::drop_back(ts, 2) == typeStr)) {
+              ts = wpi::remove_prefix(ts, "struct:");
+              if (wpi::remove_suffix(ts, "[]") == typeStr) {
                 entryPair.second->UpdateFromValue(*this);
               }
             }
@@ -897,7 +901,8 @@ void NetworkTablesModel::Update() {
                    wpi::starts_with(entry->info.name, "/.schema/proto:") &&
                    entry->info.type_str == "proto:FileDescriptorProto") {
           // protobuf descriptor handling
-          auto filename = wpi::drop_front(entry->info.name, 15);
+          auto filename =
+              wpi::remove_prefix(entry->info.name, "/.schema/proto:");
           if (!m_protoDb.Add(filename, entry->value.GetRaw())) {
             fmt::print("could not decode protobuf '{}' filename '{}'\n",
                        entry->info.name, filename);
@@ -1079,17 +1084,17 @@ void NetworkTablesModel::UpdateClients(std::span<const uint8_t> data) {
 
 static bool GetHeadingTypeString(std::string_view* ts) {
   if (wpi::starts_with(*ts, "proto:")) {
-    *ts = wpi::drop_front(*ts, 6);
+    *ts = wpi::remove_prefix(*ts, "proto:");
     auto lastdot = ts->rfind('.');
     if (lastdot != std::string_view::npos) {
       *ts = wpi::substr(*ts, lastdot + 1);
     }
     if (wpi::starts_with(*ts, "Protobuf")) {
-      *ts = wpi::drop_front(*ts, 8);
+      *ts = wpi::remove_prefix(*ts, "Protobuf");
     }
     return true;
   } else if (wpi::starts_with(*ts, "struct:")) {
-    *ts = wpi::drop_front(*ts, 7);
+    *ts = wpi::remove_prefix(*ts, "struct:");
     return true;
   }
   return false;

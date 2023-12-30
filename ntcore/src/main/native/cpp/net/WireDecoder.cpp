@@ -567,7 +567,6 @@ bool nt::net::WireDecodeBinary(std::span<const uint8_t>* in, int64_t* outId,
   outValue->SetServerTime(time);
   outValue->SetTime(time == 0 ? 0 : time + localTimeOffset);
   // update input range
-  *in = wpi::drop_front(*in,
-                        in->size() - mpack_reader_remaining(&reader, nullptr));
+  *in = wpi::take_back(*in, mpack_reader_remaining(&reader, nullptr));
   return true;
 }
