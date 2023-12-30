@@ -15,6 +15,10 @@ import edu.wpi.first.wpilibj.event.EventLoop;
  * <p>This class handles PS4 input that comes from the Driver Station. Each time a value is
  * requested the most recent value is returned. There is a single class instance for each controller
  * and the mapping of ports to hardware buttons depends on the code in the Driver Station.
+ *
+ * Only first party controllers from Sony are guaranteed to have the correct
+ * mapping, and only through the official NI DS. Sim is not guaranteed to have
+ * the same mapping, as well as any 3rd party controllers.
  */
 public class PS4Controller extends GenericHID {
   /**
