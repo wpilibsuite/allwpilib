@@ -30,13 +30,11 @@
 /**
  * Direction of a simulated value (from the perspective of user code).
  */
-// clang-format off
 HAL_ENUM(HAL_SimValueDirection) {
-  HAL_SimValueInput = 0,  /**< input to user code from the simulator */
-  HAL_SimValueOutput,     /**< output from user code to the simulator */
-  HAL_SimValueBidir       /**< bidirectional between user code and simulator */
+  HAL_SimValueInput = 0, /**< input to user code from the simulator */
+  HAL_SimValueOutput,    /**< output from user code to the simulator */
+  HAL_SimValueBidir      /**< bidirectional between user code and simulator */
 };
-// clang-format on
 
 #ifdef __cplusplus
 extern "C" {

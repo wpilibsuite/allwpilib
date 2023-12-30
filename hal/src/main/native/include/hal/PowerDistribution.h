@@ -15,7 +15,6 @@
  * @{
  */
 
-// clang-format off
 /**
  * The types of power distribution devices.
  */
@@ -24,7 +23,6 @@ HAL_ENUM(HAL_PowerDistributionType) {
   HAL_PowerDistributionType_kCTRE = 1,
   HAL_PowerDistributionType_kRev = 2,
 };
-// clang-format on
 
 #define HAL_DEFAULT_POWER_DISTRIBUTION_MODULE -1
 
