@@ -5,8 +5,12 @@
 #pragma once
 #include "hal/Types.h"
 
-HAL_ENUM(HAL_RadioLEDState){HAL_RadioLED_kOff = 0, HAL_RadioLED_kGreen = 1,
-                            HAL_RadioLED_kRed = 2, HAL_RadioLED_kOrange = 3};
+HAL_ENUM(HAL_RadioLEDState) {
+  HAL_RadioLED_kOff = 0,
+  HAL_RadioLED_kGreen = 1,
+  HAL_RadioLED_kRed = 2,
+  HAL_RadioLED_kOrange = 3
+};
 
 #ifdef __cplusplus
 extern "C" {

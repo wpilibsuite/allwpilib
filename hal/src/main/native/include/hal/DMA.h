@@ -13,7 +13,6 @@
  * @{
  */
 
-// clang-format off
 /**
  * The DMA Read Status.
  */
@@ -22,7 +21,6 @@ HAL_ENUM(HAL_DMAReadStatus) {
   HAL_DMA_TIMEOUT = 2,
   HAL_DMA_ERROR = 3,
 };
-// clang-format on
 
 /**
  * Buffer for containing all DMA data for a specific sample.

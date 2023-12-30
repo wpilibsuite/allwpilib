@@ -14,7 +14,6 @@
  * @{
  */
 
-// clang-format off
 /**
  * The type of analog trigger to trigger on.
  */
@@ -24,7 +23,6 @@ HAL_ENUM(HAL_AnalogTriggerType) {
   HAL_Trigger_kRisingPulse = 2,
   HAL_Trigger_kFallingPulse = 3
 };
-// clang-format on
 
 #ifdef __cplusplus
 extern "C" {
