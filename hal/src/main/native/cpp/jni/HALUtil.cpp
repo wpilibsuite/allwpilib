@@ -57,6 +57,7 @@ static JClass canStreamMessageCls;
 static JClass halValueCls;
 static JClass baseStoreCls;
 static JClass revPHVersionCls;
+static JClass canStreamOverflowExCls;
 
 static const JClassInit classes[] = {
     {"edu/wpi/first/hal/PowerDistributionVersion",
@@ -69,7 +70,9 @@ static const JClassInit classes[] = {
     {"edu/wpi/first/hal/CANStreamMessage", &canStreamMessageCls},
     {"edu/wpi/first/hal/HALValue", &halValueCls},
     {"edu/wpi/first/hal/DMAJNISample$BaseStore", &baseStoreCls},
-    {"edu/wpi/first/hal/REVPHVersion", &revPHVersionCls}};
+    {"edu/wpi/first/hal/REVPHVersion", &revPHVersionCls},
+    {"edu/wpi/first/hal/can/CANStreamOverflowException",
+     &canStreamOverflowExCls}};
 
 static const JExceptionInit exceptions[] = {
     {"java/lang/IllegalArgumentException", &illegalArgExCls},
@@ -213,6 +216,16 @@ void ReportCANError(JNIEnv* env, int32_t status, int message_id) {
 
 void ThrowNullPointerException(JNIEnv* env, std::string_view msg) {
   nullPointerEx.Throw(env, msg);
+}
+
+void ThrowCANStreamOverflowException(JNIEnv* env, jobjectArray messages,
+                                     jint length) {
+  static jmethodID constructor =
+      env->GetMethodID(canStreamOverflowExCls, "<init>",
+                       "([Ledu/wpi/first/hal/CANStreamMessage;I)V");
+  jobject exception =
+      env->NewObject(canStreamOverflowExCls, constructor, messages, length);
+  env->Throw(static_cast<jthrowable>(exception));
 }
 
 void ThrowIllegalArgumentException(JNIEnv* env, std::string_view msg) {
@@ -369,6 +382,12 @@ jobject CreatePowerDistributionVersion(JNIEnv* env, uint32_t firmwareMajor,
       static_cast<jint>(firmwareMajor), static_cast<jint>(firmwareMinor),
       static_cast<jint>(firmwareFix), static_cast<jint>(hardwareMinor),
       static_cast<jint>(hardwareMajor), static_cast<jint>(uniqueId));
+}
+
+jobject CreateCANStreamMessage(JNIEnv* env) {
+  static jmethodID constructor =
+      env->GetMethodID(canStreamMessageCls, "<init>", "()V");
+  return env->NewObject(canStreamMessageCls, constructor);
 }
 
 JavaVM* GetJVM() {

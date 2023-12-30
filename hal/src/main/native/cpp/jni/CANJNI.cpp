@@ -162,7 +162,8 @@ Java_edu_wpi_first_hal_can_CANJNI_readCANStreamSession
     return 0;
   }
 
-  if (!CheckStatus(env, status)) {
+  if (status != HAL_ERR_CANSessionMux_SessionOverrun &&
+      !CheckStatus(env, status)) {
     return 0;
   }
 
@@ -171,8 +172,15 @@ Java_edu_wpi_first_hal_can_CANJNI_readCANStreamSession
     JLocal<jobject> elem{
         env, static_cast<jstring>(env->GetObjectArrayElement(messages, i))};
     if (!elem) {
-      // TODO decide if should throw
-      continue;
+      // If element doesn't exist, construct it in place. If that fails, we are
+      // OOM, just return
+      elem = JLocal<jobject>{env, CreateCANStreamMessage(env)};
+      if (elem) {
+        std::printf("Allocated and set object\n");
+        env->SetObjectArrayElement(messages, i, elem);
+      } else {
+        return 0;
+      }
     }
     JLocal<jbyteArray> toSetArray{
         env, SetCANStreamObject(env, elem, msg->dataSize, msg->messageID,
@@ -183,6 +191,12 @@ Java_edu_wpi_first_hal_can_CANJNI_readCANStreamSession
     }
     env->SetByteArrayRegion(toSetArray, 0, msg->dataSize,
                             reinterpret_cast<jbyte*>(msg->data));
+  }
+
+  if (status == HAL_ERR_CANSessionMux_SessionOverrun) {
+    ThrowCANStreamOverflowException(env, messages,
+                                    static_cast<jint>(messagesRead));
+    return 0;
   }
 
   return static_cast<jint>(messagesRead);
