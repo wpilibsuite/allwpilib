@@ -727,7 +727,7 @@ void NetworkTablesModel::ValueSource::UpdateFromValue(
         mpack_reader_destroy(&r);
       } else if (wpi::starts_with(typeStr, "struct:")) {
         auto structName = wpi::remove_prefix(typeStr, "struct:");
-        bool isArray = wpi::ends_with(structName, "[]");
+        bool isArray = structName.ends_with("[]");
         if (isArray) {
           structName = wpi::remove_suffix(structName, "[]");
         }
