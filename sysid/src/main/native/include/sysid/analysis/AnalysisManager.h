@@ -24,6 +24,7 @@
 #include "sysid/analysis/FeedbackControllerPreset.h"
 #include "sysid/analysis/FeedforwardAnalysis.h"
 #include "sysid/analysis/Storage.h"
+#include "wpi/StringMap.h"
 
 namespace sysid {
 
@@ -203,10 +204,8 @@ class AnalysisManager {
    * Overrides the units in the JSON with the user-provided ones.
    *
    * @param unit             The unit to output gains in.
-   * @param unitsPerRotation The conversion factor between rotations and the
-   *                         selected unit.
    */
-  void OverrideUnits(std::string_view unit, double unitsPerRotation);
+  void OverrideUnits(std::string_view unit);
 
   /**
    * Resets the units back to those defined in the JSON.
@@ -218,21 +217,14 @@ class AnalysisManager {
    *
    * @return The analysis type.
    */
-  const AnalysisType& GetAnalysisType() const { return m_type; }
+  const AnalysisType& GetAnalysisType() const { return m_data.mechanismType; }
 
   /**
    * Returns the units of analysis.
    *
    * @return The units of analysis.
    */
-  std::string_view GetUnit() const { return m_unit; }
-
-  /**
-   * Returns the factor (a.k.a. units per rotation) for analysis.
-   *
-   * @return The factor (a.k.a. units per rotation) for analysis.
-   */
-  double GetFactor() const { return m_factor; }
+  std::string_view GetUnit() const { return m_data.distanceUnit; }
 
   /**
    * Returns a reference to the iterator of the currently selected raw datset.
@@ -242,7 +234,7 @@ class AnalysisManager {
    * @return A reference to the raw internal data.
    */
   Storage& GetRawData() {
-    return m_rawDataset[static_cast<int>(m_settings.dataset)];
+    return m_rawDataset;
   }
 
   /**
@@ -253,7 +245,7 @@ class AnalysisManager {
    * @return A reference to the filtered internal data.
    */
   Storage& GetFilteredData() {
-    return m_filteredDataset[static_cast<int>(m_settings.dataset)];
+    return m_filteredDataset;
   }
 
   /**
@@ -262,7 +254,7 @@ class AnalysisManager {
    * @return The original (untouched) dataset
    */
   Storage& GetOriginalData() {
-    return m_originalDataset[static_cast<int>(m_settings.dataset)];
+    return m_originalDataset;
   }
 
   /**
@@ -315,21 +307,19 @@ class AnalysisManager {
   }
 
   bool HasData() const {
-    return !m_originalDataset[static_cast<int>(
-                                  Settings::DrivetrainDataset::kCombined)]
-                .empty();
+    return !m_originalDataset.empty();
   }
 
  private:
   wpi::Logger& m_logger;
 
-  // This is used to store the various datasets (i.e. Combined, Forward,
-  // Backward, etc.)
-  wpi::json m_json;
+  // This contains data for each test (e.g. quasistatic-forward, quasistatic-backward, etc)
+  // indexed by test name
+  TestData m_data;
 
-  std::array<Storage, 3> m_originalDataset;
-  std::array<Storage, 3> m_rawDataset;
-  std::array<Storage, 3> m_filteredDataset;
+  Storage m_originalDataset;
+  Storage m_rawDataset;
+  Storage m_filteredDataset;
 
   // Stores the various start times of the different tests.
   std::array<units::second_t, 4> m_startTimes;
@@ -337,12 +327,6 @@ class AnalysisManager {
   // The settings for this instance. This contains pointers to the feedback
   // controller preset, LQR parameters, acceleration window size, etc.
   Settings& m_settings;
-
-  // Miscellaneous data from the JSON -- the analysis type, the units, and the
-  // units per rotation.
-  AnalysisType m_type;
-  std::string m_unit;
-  double m_factor;
 
   units::second_t m_minStepTime{0};
   units::second_t m_maxStepTime{std::numeric_limits<double>::infinity()};
@@ -353,9 +337,5 @@ class AnalysisManager {
   std::optional<double> m_trackWidth;
 
   void PrepareGeneralData();
-
-  void PrepareAngularDrivetrainData();
-
-  void PrepareLinearDrivetrainData();
 };
 }  // namespace sysid

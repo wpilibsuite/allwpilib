@@ -57,7 +57,6 @@ void Analyzer::UpdateFeedforwardGains() {
         m_settings.type == FeedbackControllerLoopType::kPosition
             ? m_manager->GetPositionDelay()
             : m_manager->GetVelocityDelay();
-    m_conversionFactor = m_manager->GetFactor();
     PrepareGraphs();
   } catch (const sysid::InvalidDataError& e) {
     m_state = AnalyzerState::kGeneralDataError;
@@ -172,9 +171,8 @@ bool Analyzer::DisplayResetAndUnitOverride() {
   ImGui::Spacing();
   ImGui::Text(
       "Units:              %s\n"
-      "Units Per Rotation: %.4f\n"
       "Type:               %s",
-      std::string(unit).c_str(), m_conversionFactor, type.name);
+      std::string(unit).c_str(), type.name);
 
   if (type == analysis::kDrivetrainAngular) {
     ImGui::SameLine();
@@ -197,24 +195,11 @@ bool Analyzer::DisplayResetAndUnitOverride() {
                  IM_ARRAYSIZE(kUnits));
     unit = kUnits[m_selectedOverrideUnit];
 
-    if (unit == "Degrees") {
-      m_conversionFactor = 360.0;
-    } else if (unit == "Radians") {
-      m_conversionFactor = 2 * std::numbers::pi;
-    } else if (unit == "Rotations") {
-      m_conversionFactor = 1.0;
-    }
-
-    bool isRotational = m_selectedOverrideUnit > 2;
-
     ImGui::SetNextItemWidth(ImGui::GetFontSize() * 7);
-    ImGui::InputDouble(
-        "Units Per Rotation", &m_conversionFactor, 0.0, 0.0, "%.4f",
-        isRotational ? ImGuiInputTextFlags_ReadOnly : ImGuiInputTextFlags_None);
 
     if (ImGui::Button("Close")) {
       ImGui::CloseCurrentPopup();
-      m_manager->OverrideUnits(unit, m_conversionFactor);
+      m_manager->OverrideUnits(unit);
       PrepareData();
     }
 
@@ -234,8 +219,8 @@ void Analyzer::ConfigParamsOnFileSelect() {
   WPI_INFO(m_logger, "{}", "Configuring Params");
   m_stepTestDuration = m_settings.stepTestDuration.to<float>();
 
-  // Estimate qp as 1/8 * units-per-rot
-  m_settings.lqr.qp = 0.125 * m_manager->GetFactor();
+  // Estimate qp as 1/10 native distance unit
+  m_settings.lqr.qp = 0.1;
   // Estimate qv as 1/4 * max velocity = 1/4 * (12V - kS) / kV
   m_settings.lqr.qv = 0.25 * (12.0 - m_ff[0]) / m_ff[1];
 }

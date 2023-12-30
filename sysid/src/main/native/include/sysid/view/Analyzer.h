@@ -226,7 +226,6 @@ class Analyzer : public glass::View {
 
   // Units
   int m_selectedOverrideUnit = 0;
-  double m_conversionFactor = 0.0;
 
   // Data analysis
   std::unique_ptr<AnalysisManager> m_manager;

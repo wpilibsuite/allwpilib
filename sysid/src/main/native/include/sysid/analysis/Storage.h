@@ -7,8 +7,38 @@
 #include <vector>
 
 #include <units/time.h>
+#include "units/voltage.h"
+#include "wpi/StringMap.h"
+#include "sysid/analysis/AnalysisType.h"
+
 
 namespace sysid {
+
+struct MotorData {
+  // name of the *motor*, not the test
+  std::string name;
+
+  // Data for a single contiguous motor test
+  // Timestamps are not necessarily aligned!
+  struct Run {
+    template <typename T> requires std::is_arithmetic_v<T> || units::traits::is_unit_t_v<T>
+    struct Sample {
+      units::second_t time;
+      T measurement;
+    };
+    std::vector<Sample<units::volt_t>> voltage;
+    std::vector<Sample<double>> position;
+    std::vector<Sample<double>> velocity;
+  };
+
+  std::vector<Run> runs;
+};
+
+
+struct TestData : public wpi::StringMap<MotorData> {
+  std::string distanceUnit;
+  AnalysisType mechanismType;
+};
 
 /**
  * Represents each data point after it is cleaned and various parameters are
