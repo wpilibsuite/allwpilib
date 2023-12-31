@@ -36,10 +36,10 @@ public class CANAPITypes {
     kIOBreakout(11),
     kFirmwareUpdate(31);
 
-    public final int id;
+    public final int m_id;
 
     CANDeviceType(int id) {
-      this.id = id;
+      this.m_id = id;
     }
   }
 
@@ -72,10 +72,10 @@ public class CANAPITypes {
     kAndyMark(15),
     kVividHosting(16);
 
-    public final int id;
+    public final int m_id;
 
     CANManufacturer(int id) {
-      this.id = id;
+      this.m_id = id;
     }
   }
 }
