@@ -22,23 +22,24 @@
 
 namespace glass {
 
+class DataLogReaderEntry : public wpi::log::StartRecordData {
+ public:
+  struct Range {
+    Range(wpi::log::DataLogReader::iterator begin,
+          wpi::log::DataLogReader::iterator end)
+        : m_begin{begin}, m_end{end} {}
+
+    wpi::log::DataLogReader::iterator begin() const { return m_begin; }
+    wpi::log::DataLogReader::iterator end() const { return m_end; }
+
+    wpi::log::DataLogReader::iterator m_begin;
+    wpi::log::DataLogReader::iterator m_end;
+  };
+  std::vector<Range> ranges;  // ranges where this entry is valid
+};
+
 class DataLogReaderThread {
  public:
-  struct Entry : public wpi::log::StartRecordData {
-    struct Range {
-      Range(wpi::log::DataLogReader::iterator begin,
-            wpi::log::DataLogReader::iterator end)
-          : m_begin{begin}, m_end{end} {}
-
-      wpi::log::DataLogReader::iterator begin() const { return m_begin; }
-      wpi::log::DataLogReader::iterator end() const { return m_end; }
-
-      wpi::log::DataLogReader::iterator m_begin;
-      wpi::log::DataLogReader::iterator m_end;
-    };
-    std::vector<Range> ranges;  // ranges where this entry is valid
-  };
-
   explicit DataLogReaderThread(wpi::log::DataLogReader reader)
       : m_reader{std::move(reader)}, m_thread{[this] { ReadMain(); }} {}
   ~DataLogReaderThread();
@@ -62,7 +63,7 @@ class DataLogReaderThread {
     }
   }
 
-  const Entry* GetEntry(std::string_view name) const {
+  const DataLogReaderEntry* GetEntry(std::string_view name) const {
     std::scoped_lock lock{m_mutex};
     auto it = m_entriesByName.find(name);
     if (it == m_entriesByName.end()) {
@@ -77,7 +78,7 @@ class DataLogReaderThread {
   const wpi::log::DataLogReader& GetReader() const { return m_reader; }
 
   // note: these are called on separate thread
-  wpi::sig::Signal_mt<const Entry&> sigEntryAdded;
+  wpi::sig::Signal_mt<const DataLogReaderEntry&> sigEntryAdded;
   wpi::sig::Signal_mt<> sigDone;
 
  private:
@@ -88,8 +89,8 @@ class DataLogReaderThread {
   std::atomic_bool m_active{true};
   std::atomic_bool m_done{false};
   std::atomic<unsigned int> m_numRecords{0};
-  std::map<std::string, Entry, std::less<>> m_entriesByName;
-  wpi::DenseMap<int, Entry*> m_entriesById;
+  std::map<std::string, DataLogReaderEntry, std::less<>> m_entriesByName;
+  wpi::DenseMap<int, DataLogReaderEntry*> m_entriesById;
   wpi::StructDescriptorDatabase m_structDb;
   wpi::ProtobufMessageDatabase m_protoDb;
   std::thread m_thread;

@@ -7,6 +7,7 @@
 #include <glass/View.h>
 
 namespace glass {
+class DataLogReaderEntry;
 class Storage;
 }  // namespace glass
 
@@ -32,6 +33,19 @@ class DataSelector : public glass::View {
    * Displays the log loader window.
    */
   void Display() override;
+
+  /**
+   * Resets view. Must be called whenever the DataLogReader goes away, as this
+   * class keeps references to DataLogReaderEntry objects.
+   */
+  void Reset();
+
+  /**
+   * Sets the run state entry.
+   *
+   * @param entry
+   */
+  void SetRunStateEntry(const glass::DataLogReaderEntry& entry);
 
  private:
   wpi::Logger& m_logger;

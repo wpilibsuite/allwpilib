@@ -10,12 +10,17 @@
 #include <vector>
 
 #include <glass/View.h>
-#include <glass/support/DataLogReaderThread.h>
-#include <portable-file-dialogs.h>
+#include <wpi/Signal.h>
 
 namespace glass {
+class DataLogReaderEntry;
+class DataLogReaderThread;
 class Storage;
 }  // namespace glass
+
+namespace pfd {
+class open_file;
+}  // namespace pfd
 
 namespace wpi {
 class Logger;
@@ -32,13 +37,25 @@ class LogLoader : public glass::View {
    *
    * @param logger The program logger
    */
-  explicit LogLoader(glass::Storage& storage, wpi::Logger& logger)
-      : m_logger(logger) {}
+  explicit LogLoader(glass::Storage& storage, wpi::Logger& logger);
+
+  ~LogLoader() override;
 
   /**
    * Displays the log loader window.
    */
   void Display() override;
+
+  /**
+   * Signal called when the current file is unloaded (invalidates any LogEntry*).
+   */
+  wpi::sig::Signal<> unload;
+
+  /**
+   * Signal called when a new file is fully loaded.
+   * The parameter is the LogEntry for the analysis state string entry.
+   */
+  wpi::sig::Signal<const glass::DataLogReaderEntry&> loaded;
 
  private:
   wpi::Logger& m_logger;
@@ -53,7 +70,7 @@ class LogLoader : public glass::View {
     explicit EntryTreeNode(std::string_view name) : name{name} {}
     std::string name;  // name of just this node
     std::string path;  // full path if entry is nullptr
-    const glass::DataLogReaderThread::Entry* entry = nullptr;
+    const glass::DataLogReaderEntry* entry = nullptr;
     std::vector<EntryTreeNode> children;  // children, sorted by name
   };
   std::vector<EntryTreeNode> m_entryTree;

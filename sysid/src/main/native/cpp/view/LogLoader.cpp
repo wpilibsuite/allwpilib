@@ -5,20 +5,23 @@
 #include "sysid/view/LogLoader.h"
 
 #include <algorithm>
+#include <memory>
 #include <span>
 #include <string_view>
-#include <system_error>
 
 #include <glass/support/DataLogReaderThread.h>
 #include <imgui.h>
 #include <portable-file-dialogs.h>
-#include <wpi/SmallVector.h>
 #include <wpi/SpanExtras.h>
 #include <wpi/StringExtras.h>
 #include <wpi/fs.h>
-#include <wpi/timestamp.h>
 
 using namespace sysid;
+
+LogLoader::LogLoader(glass::Storage& storage, wpi::Logger& logger)
+    : m_logger(logger) {}
+
+LogLoader::~LogLoader() = default;
 
 void LogLoader::Display() {
   if (ImGui::Button("Open data log file...")) {
@@ -46,6 +49,7 @@ void LogLoader::Display() {
         m_error = "Not a valid datalog file";
         return;
       }
+      unload();
       m_reader =
           std::make_unique<glass::DataLogReaderThread>(std::move(reader));
       m_entryTree.clear();
@@ -85,20 +89,21 @@ void LogLoader::Display() {
   }
 
   ImGui::BeginTable(
-      "Entries", 3,
+      "Entries", 1,
       ImGuiTableFlags_Borders | ImGuiTableFlags_SizingStretchProp);
+#if 0
   ImGui::TableSetupColumn("Name");
   ImGui::TableSetupColumn("Type");
   ImGui::TableSetupColumn("Metadata");
   ImGui::TableHeadersRow();
+#endif
   DisplayEntryTree(m_entryTree);
   ImGui::EndTable();
 }
 
 void LogLoader::RebuildEntryTree() {
   wpi::SmallVector<std::string_view, 16> parts;
-  m_reader->ForEachEntryName([&](const glass::DataLogReaderThread::Entry&
-                                     entry) {
+  m_reader->ForEachEntryName([&](const glass::DataLogReaderEntry& entry) {
     // only show double/float entries (TODO: support struct/protobuf)
     if (entry.type != "double" && entry.type != "float") {
       return;
@@ -150,7 +155,7 @@ void LogLoader::RebuildEntryTree() {
 }
 
 static void EmitEntry(const std::string& name,
-                      const glass::DataLogReaderThread::Entry& entry) {
+                      const glass::DataLogReaderEntry& entry) {
   ImGui::TableNextColumn();
   ImGui::Selectable(name.c_str());
   if (ImGui::BeginDragDropSource()) {
@@ -161,7 +166,7 @@ static void EmitEntry(const std::string& name,
                            entry.name.data() + entry.name.size());
     ImGui::EndDragDropSource();
   }
-
+#if 0
   ImGui::TableNextColumn();
   ImGui::TextUnformatted(entry.type.data(),
                          entry.type.data() + entry.type.size());
@@ -169,6 +174,7 @@ static void EmitEntry(const std::string& name,
   ImGui::TableNextColumn();
   ImGui::TextUnformatted(entry.metadata.data(),
                          entry.metadata.data() + entry.metadata.size());
+#endif
 }
 
 void LogLoader::DisplayEntryTree(const std::vector<EntryTreeNode>& tree) {
@@ -181,8 +187,10 @@ void LogLoader::DisplayEntryTree(const std::vector<EntryTreeNode>& tree) {
       ImGui::TableNextColumn();
       bool open = ImGui::TreeNodeEx(node.name.c_str(),
                                     ImGuiTreeNodeFlags_SpanFullWidth);
+#if 0
       ImGui::TableNextColumn();
       ImGui::TableNextColumn();
+#endif
       if (open) {
         DisplayEntryTree(node.children);
         ImGui::TreePop();

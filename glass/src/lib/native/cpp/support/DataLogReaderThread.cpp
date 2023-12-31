@@ -19,7 +19,8 @@ DataLogReaderThread::~DataLogReaderThread() {
 }
 
 void DataLogReaderThread::ReadMain() {
-  wpi::SmallDenseMap<int, std::pair<Entry*, std::span<const uint8_t>>, 8>
+  wpi::SmallDenseMap<
+      int, std::pair<DataLogReaderEntry*, std::span<const uint8_t>>, 8>
       schemaEntries;
 
   for (auto recordIt = m_reader.begin(), recordEnd = m_reader.end();
@@ -30,7 +31,7 @@ void DataLogReaderThread::ReadMain() {
     }
     ++m_numRecords;
     if (record.IsStart()) {
-      Entry data;
+      DataLogReaderEntry data;
       if (record.GetStartData(&data)) {
         std::scoped_lock lock{m_mutex};
         auto& entryPtr = m_entriesById[data.entry];

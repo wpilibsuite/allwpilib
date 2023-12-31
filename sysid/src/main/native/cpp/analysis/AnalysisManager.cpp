@@ -118,13 +118,13 @@ void AnalysisManager::PrepareGeneralData() {
   WPI_INFO(m_logger, "{}", "Preprocessing raw data.");
 
   WPI_INFO(m_logger, "{}", "Copying raw data.");
-  CopyRawData(&m_data);
+  CopyRawData(&m_data.motorData);
 
   WPI_INFO(m_logger, "{}", "Converting raw data to PreparedData struct.");
   // Convert data to PreparedData structs
-  for (auto& it : m_data) {
+  for (auto& it : m_data.motorData) {
     auto key = it.first();
-    preparedData[key] = ConvertToPrepared(m_data[key]);
+    preparedData[key] = ConvertToPrepared(m_data.motorData[key]);
   }
 
   // Store the original datasets
