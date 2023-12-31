@@ -33,11 +33,11 @@ void DataLogReaderThread::ReadMain() {
       Entry data;
       if (record.GetStartData(&data)) {
         std::scoped_lock lock{m_mutex};
-        auto& entryPtr = m_entries[data.entry];
+        auto& entryPtr = m_entriesById[data.entry];
         if (entryPtr) {
           fmt::print("...DUPLICATE entry ID, overriding\n");
         }
-        auto [it, isNew] = m_entryNames.emplace(data.name, data);
+        auto [it, isNew] = m_entriesByName.emplace(data.name, data);
         if (isNew) {
           it->second.ranges.emplace_back(recordIt, recordEnd);
         }
@@ -55,12 +55,12 @@ void DataLogReaderThread::ReadMain() {
       int entry;
       if (record.GetFinishEntry(&entry)) {
         std::scoped_lock lock{m_mutex};
-        auto it = m_entries.find(entry);
-        if (it == m_entries.end()) {
+        auto it = m_entriesById.find(entry);
+        if (it == m_entriesById.end()) {
           fmt::print("...ID not found\n");
         } else {
           it->second->ranges.back().m_end = recordIt;
-          m_entries.erase(it);
+          m_entriesById.erase(it);
         }
       } else {
         fmt::print("Finish(INVALID)\n");
@@ -69,8 +69,8 @@ void DataLogReaderThread::ReadMain() {
       wpi::log::MetadataRecordData data;
       if (record.GetSetMetadataData(&data)) {
         std::scoped_lock lock{m_mutex};
-        auto it = m_entries.find(data.entry);
-        if (it == m_entries.end()) {
+        auto it = m_entriesById.find(data.entry);
+        if (it == m_entriesById.end()) {
           fmt::print("...ID not found\n");
         } else {
           it->second->metadata = data.metadata;

@@ -50,22 +50,22 @@ class DataLogReaderThread {
   unsigned int GetNumRecords() const { return m_numRecords; }
   unsigned int GetNumEntries() const {
     std::scoped_lock lock{m_mutex};
-    return m_entryNames.size();
+    return m_entriesByName.size();
   }
 
   // Passes Entry& to func
   template <typename T>
   void ForEachEntryName(T&& func) {
     std::scoped_lock lock{m_mutex};
-    for (auto&& kv : m_entryNames) {
+    for (auto&& kv : m_entriesByName) {
       func(kv.second);
     }
   }
 
   const Entry* GetEntry(std::string_view name) const {
     std::scoped_lock lock{m_mutex};
-    auto it = m_entryNames.find(name);
-    if (it == m_entryNames.end()) {
+    auto it = m_entriesByName.find(name);
+    if (it == m_entriesByName.end()) {
       return nullptr;
     }
     return &it->second;
@@ -88,8 +88,8 @@ class DataLogReaderThread {
   std::atomic_bool m_active{true};
   std::atomic_bool m_done{false};
   std::atomic<unsigned int> m_numRecords{0};
-  std::map<std::string, Entry, std::less<>> m_entryNames;
-  wpi::DenseMap<int, Entry*> m_entries;
+  std::map<std::string, Entry, std::less<>> m_entriesByName;
+  wpi::DenseMap<int, Entry*> m_entriesById;
   wpi::StructDescriptorDatabase m_structDb;
   wpi::ProtobufMessageDatabase m_protoDb;
   std::thread m_thread;
