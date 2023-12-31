@@ -15,7 +15,7 @@ public class CANAPITypes {
    * FRC CAN device type.
    *
    * <p>This enum represents different types of CAN devices. Teams are encouraged to use the
-   * HAL_CAN_Dev_kMiscellaneous type for custom or miscellaneous devices.
+   * kMiscellaneous for custom or miscellaneous devices.
    *
    * @see <a
    *     href="https://docs.wpilib.org/en/stable/docs/software/can-devices/can-addressing.html">CAN
@@ -47,7 +47,7 @@ public class CANAPITypes {
    * FRC CAN manufacturer ID.
    *
    * <p>This enum represents different manufacturer IDs for CAN devices. Teams are encouraged to use
-   * the HAL_CAN_Man_kTeamUse manufacturer ID for custom or team-specific devices.
+   * the kTeamUse manufacturer ID for custom or team-specific devices.
    *
    * @see <a
    *     href="https://docs.wpilib.org/en/stable/docs/software/can-devices/can-addressing.html">CAN
