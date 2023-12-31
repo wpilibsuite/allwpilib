@@ -11,7 +11,7 @@ import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 
 /** Holds the constants for a DC motor. */
-public class DCMotor implements ProtobufSerializable<DCMotor>, StructSerializable<DCMotor> {
+public class DCMotor implements ProtobufSerializable, StructSerializable {
   public final double nominalVoltageVolts;
   public final double stallTorqueNewtonMeters;
   public final double stallCurrentAmps;

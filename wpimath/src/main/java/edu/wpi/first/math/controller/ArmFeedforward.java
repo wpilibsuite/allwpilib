@@ -13,8 +13,7 @@ import edu.wpi.first.util.struct.StructSerializable;
  * A helper class that computes feedforward outputs for a simple arm (modeled as a motor acting
  * against the force of gravity on a beam suspended at an angle).
  */
-public class ArmFeedforward
-    implements ProtobufSerializable<ArmFeedforward>, StructSerializable<ArmFeedforward> {
+public class ArmFeedforward implements ProtobufSerializable, StructSerializable {
   public final double ks;
   public final double kg;
   public final double kv;

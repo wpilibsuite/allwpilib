@@ -15,8 +15,7 @@ import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
 
 /** Represents a transformation for a Pose2d in the pose's frame. */
-public class Transform2d
-    implements ProtobufSerializable<Transform2d>, StructSerializable<Transform2d> {
+public class Transform2d implements ProtobufSerializable, StructSerializable {
   private final Translation2d m_translation;
   private final Rotation2d m_rotation;
 

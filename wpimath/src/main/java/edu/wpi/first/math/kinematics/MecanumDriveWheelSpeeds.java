@@ -14,9 +14,7 @@ import edu.wpi.first.units.Velocity;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 
-public class MecanumDriveWheelSpeeds
-    implements ProtobufSerializable<MecanumDriveWheelSpeeds>,
-        StructSerializable<MecanumDriveWheelSpeeds> {
+public class MecanumDriveWheelSpeeds implements ProtobufSerializable, StructSerializable {
   /** Speed of the front left wheel. */
   public double frontLeftMetersPerSecond;
 

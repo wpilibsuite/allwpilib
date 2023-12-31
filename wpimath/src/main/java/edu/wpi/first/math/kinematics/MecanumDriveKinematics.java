@@ -36,8 +36,8 @@ import org.ejml.simple.SimpleMatrix;
  */
 public class MecanumDriveKinematics
     implements Kinematics<MecanumDriveWheelSpeeds, MecanumDriveWheelPositions>,
-        ProtobufSerializable<MecanumDriveKinematics>,
-        StructSerializable<MecanumDriveKinematics> {
+        ProtobufSerializable,
+        StructSerializable {
   private final SimpleMatrix m_inverseKinematics;
   private final SimpleMatrix m_forwardKinematics;
 

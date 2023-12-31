@@ -15,9 +15,7 @@ import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 
 /** Represents the wheel speeds for a differential drive drivetrain. */
-public class DifferentialDriveWheelSpeeds
-    implements ProtobufSerializable<DifferentialDriveWheelSpeeds>,
-        StructSerializable<DifferentialDriveWheelSpeeds> {
+public class DifferentialDriveWheelSpeeds implements ProtobufSerializable, StructSerializable {
   /** Speed of the left side of the robot. */
   public double leftMetersPerSecond;
 

@@ -21,8 +21,8 @@ import java.util.Objects;
 public class SwerveModulePosition
     implements Comparable<SwerveModulePosition>,
         Interpolatable<SwerveModulePosition>,
-        ProtobufSerializable<SwerveModulePosition>,
-        StructSerializable<SwerveModulePosition> {
+        ProtobufSerializable,
+        StructSerializable {
   /** Distance measured by the wheel of the module. */
   public double distanceMeters;
 

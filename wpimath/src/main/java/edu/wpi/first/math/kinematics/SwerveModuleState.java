@@ -18,9 +18,7 @@ import java.util.Objects;
 
 /** Represents the state of one swerve module. */
 public class SwerveModuleState
-    implements Comparable<SwerveModuleState>,
-        ProtobufSerializable<SwerveModuleState>,
-        StructSerializable<SwerveModuleState> {
+    implements Comparable<SwerveModuleState>, ProtobufSerializable, StructSerializable {
   /** Speed of the wheel of the module. */
   public double speedMetersPerSecond;
 

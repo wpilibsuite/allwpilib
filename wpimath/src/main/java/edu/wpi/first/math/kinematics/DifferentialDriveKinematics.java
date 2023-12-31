@@ -26,8 +26,8 @@ import edu.wpi.first.util.struct.StructSerializable;
  */
 public class DifferentialDriveKinematics
     implements Kinematics<DifferentialDriveWheelSpeeds, DifferentialDriveWheelPositions>,
-        ProtobufSerializable<DifferentialDriveKinematics>,
-        StructSerializable<DifferentialDriveKinematics> {
+        ProtobufSerializable,
+        StructSerializable {
   public final double trackWidthMeters;
 
   public static final DifferentialDriveKinematicsProto proto =
