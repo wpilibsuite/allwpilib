@@ -24,7 +24,7 @@ public class CANJNI extends JNIWrapper {
   public static final int CAN_IS_FRAME_11BIT = 0x40000000;
 
   /**
-   * Sends a CAN message
+   * Sends a CAN message.
    *
    * @param messageID The ID of the CAN message.
    * @param data The data bytes to be sent.
@@ -81,9 +81,9 @@ public class CANJNI extends JNIWrapper {
    * @param sessionHandle The handle of the CAN stream session.
    * @param messages An array to hold the CANStreamMessage objects (output parameter).
    * @param messagesToRead The number of messages to read from the session.
+   * @return The number of messages read into the buffer
    * @throws CANStreamOverflowException If the number of messages to read exceeds the capacity of
    *     the provided messages array.
-   * @return The number of messages read into the buffer
    */
   public static native int readCANStreamSession(
       int sessionHandle, CANStreamMessage[] messages, int messagesToRead)
