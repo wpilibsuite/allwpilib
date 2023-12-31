@@ -10,8 +10,9 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
 /**
- * The CANJNI class provides Java Native Interface (JNI) methods for interfacing with the Controller
- * Area Network (CAN) bus.
+ * CAN API HAL JNI Functions.
+ *
+ * @see "hal/CAN.h"
  */
 @SuppressWarnings("MethodName")
 public class CANJNI extends JNIWrapper {
@@ -82,7 +83,7 @@ public class CANJNI extends JNIWrapper {
    * @param messagesToRead The number of messages to read from the session.
    * @throws CANStreamOverflowException If the number of messages to read exceeds the capacity of
    *     the provided messages array.
-   * @returns The number of messages read
+   * @return The number of messages read into the buffer
    */
   public static native int readCANStreamSession(
       int sessionHandle, CANStreamMessage[] messages, int messagesToRead)
