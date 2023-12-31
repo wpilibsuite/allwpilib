@@ -16,8 +16,7 @@ import edu.wpi.first.util.struct.StructSerializable;
  * A helper class that computes feedforward outputs for a simple elevator (modeled as a motor acting
  * against the force of gravity).
  */
-public class ElevatorFeedforward
-    implements ProtobufSerializable<ElevatorFeedforward>, StructSerializable<ElevatorFeedforward> {
+public class ElevatorFeedforward implements ProtobufSerializable, StructSerializable {
   public final double ks;
   public final double kg;
   public final double kv;

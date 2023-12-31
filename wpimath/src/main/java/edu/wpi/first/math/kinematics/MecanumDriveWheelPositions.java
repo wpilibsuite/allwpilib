@@ -17,8 +17,8 @@ import java.util.Objects;
 
 public class MecanumDriveWheelPositions
     implements WheelPositions<MecanumDriveWheelPositions>,
-        ProtobufSerializable<MecanumDriveWheelPositions>,
-        StructSerializable<MecanumDriveWheelPositions> {
+        ProtobufSerializable,
+        StructSerializable {
   /** Distance measured by the front left wheel. */
   public double frontLeftMeters;
 

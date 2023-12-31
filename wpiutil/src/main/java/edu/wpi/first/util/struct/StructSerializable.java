@@ -12,4 +12,4 @@ import edu.wpi.first.util.WPISerializable;
  * <p>While this cannot be enforced by the interface, any class implementing this interface should
  * provide a public final static `struct` member variable.
  */
-public interface StructSerializable<T> extends WPISerializable<T> {}
+public interface StructSerializable extends WPISerializable {}

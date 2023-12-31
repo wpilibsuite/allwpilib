@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
  * Represents a time-parameterized trajectory. The trajectory contains of various States that
  * represent the pose, curvature, time elapsed, velocity, and acceleration at that point.
  */
-public class Trajectory implements ProtobufSerializable<Trajectory> {
+public class Trajectory implements ProtobufSerializable {
   public static final TrajectoryProto proto = new TrajectoryProto();
 
   private final double m_totalTimeSeconds;
@@ -268,7 +268,7 @@ public class Trajectory implements ProtobufSerializable<Trajectory> {
    * Represents a time-parameterized trajectory. The trajectory contains of various States that
    * represent the pose, curvature, time elapsed, velocity, and acceleration at that point.
    */
-  public static class State implements ProtobufSerializable<State> {
+  public static class State implements ProtobufSerializable {
     public static final TrajectoryStateProto proto = new TrajectoryStateProto();
 
     // The time elapsed since the beginning of the trajectory.

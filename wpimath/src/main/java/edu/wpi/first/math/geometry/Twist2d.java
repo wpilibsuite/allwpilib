@@ -16,7 +16,7 @@ import java.util.Objects;
  *
  * <p>A Twist can be used to represent a difference between two poses.
  */
-public class Twist2d implements ProtobufSerializable<Twist2d>, StructSerializable<Twist2d> {
+public class Twist2d implements ProtobufSerializable, StructSerializable {
   /** Linear "dx" component. */
   public double dx;
 

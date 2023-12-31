@@ -32,9 +32,7 @@ import java.util.Objects;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Translation2d
-    implements Interpolatable<Translation2d>,
-        ProtobufSerializable<Translation2d>,
-        StructSerializable<Translation2d> {
+    implements Interpolatable<Translation2d>, ProtobufSerializable, StructSerializable {
   private final double m_x;
   private final double m_y;
 

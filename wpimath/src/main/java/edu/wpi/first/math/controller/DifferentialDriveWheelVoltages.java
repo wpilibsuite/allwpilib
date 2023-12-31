@@ -10,9 +10,7 @@ import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 
 /** Motor voltages for a differential drive. */
-public class DifferentialDriveWheelVoltages
-    implements ProtobufSerializable<DifferentialDriveWheelVoltages>,
-        StructSerializable<DifferentialDriveWheelVoltages> {
+public class DifferentialDriveWheelVoltages implements ProtobufSerializable, StructSerializable {
   public double left;
   public double right;
 

@@ -5,4 +5,4 @@
 package edu.wpi.first.util;
 
 /** Marker interface to indicate a class is serializable using WPI serialization methods. */
-public interface WPISerializable<T> {}
+public interface WPISerializable {}
