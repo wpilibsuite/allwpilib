@@ -93,7 +93,7 @@ class ADXL345_SPI : public nt::NTSendable,
 
   void InitSendable(nt::NTSendableBuilder& builder) override;
 
- protected:
+ private:
   SPI m_spi;
 
   hal::SimDevice m_simDevice;

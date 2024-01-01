@@ -70,13 +70,13 @@ public class ADXL345_I2C implements NTSendable, AutoCloseable {
     public double ZAxis;
   }
 
-  protected I2C m_i2c;
+  private I2C m_i2c;
 
-  protected SimDevice m_simDevice;
-  protected SimEnum m_simRange;
-  protected SimDouble m_simX;
-  protected SimDouble m_simY;
-  protected SimDouble m_simZ;
+  private SimDevice m_simDevice;
+  private SimEnum m_simRange;
+  private SimDouble m_simX;
+  private SimDouble m_simY;
+  private SimDouble m_simZ;
 
   /**
    * Constructs the ADXL345 Accelerometer with I2C address 0x1D.

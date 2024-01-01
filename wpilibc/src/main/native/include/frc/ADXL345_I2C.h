@@ -100,7 +100,7 @@ class ADXL345_I2C : public nt::NTSendable,
 
   void InitSendable(nt::NTSendableBuilder& builder) override;
 
- protected:
+ private:
   I2C m_i2c;
 
   hal::SimDevice m_simDevice;
