@@ -213,8 +213,6 @@ task generateJavaDocs(type: Javadoc) {
     options.links("https://docs.oracle.com/en/java/javase/17/docs/api/")
     options.links("https://docs.opencv.org/4.x/javadoc/")
     options.addStringOption("tag", "pre:a:Pre-Condition")
-    options.addStringOption("Xmaxerrs","9999")
-    options.addStringOption("Xmaxwarns","9999")
     options.addBooleanOption("Xdoclint/package:-edu.wpi.first.math.proto," +
             "-edu.wpi.first.math.controller.proto," +
             "-edu.wpi.first.math.controller.struct," +
@@ -224,7 +222,7 @@ task generateJavaDocs(type: Javadoc) {
             "-edu.wpi.first.math.kinematics.struct" +
             "-edu.wpi.first.math.system.plant.proto," +
             "-edu.wpi.first.math.system.plant.struct" +
-            "-edu.wpi.first.math.trajectory.proto", true)
+            "-edu.wpi.first.math.trajectory.proto" true)
     options.addBooleanOption("Xdoclint:html,missing,reference,syntax", true)
     options.addBooleanOption('html5', true)
     options.linkSource(true)
