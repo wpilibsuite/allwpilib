@@ -10,8 +10,10 @@ import edu.wpi.first.math.Num;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.system.proto.LinearSystemProto;
 import edu.wpi.first.util.protobuf.Protobuf;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
 
-public class LinearSystem<States extends Num, Inputs extends Num, Outputs extends Num> {
+public class LinearSystem<States extends Num, Inputs extends Num, Outputs extends Num>
+    implements ProtobufSerializable {
   /** Continuous system matrix. */
   private final Matrix<States, States> m_A;
 

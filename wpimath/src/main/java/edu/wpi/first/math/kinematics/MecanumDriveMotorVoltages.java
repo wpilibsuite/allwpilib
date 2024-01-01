@@ -6,9 +6,11 @@ package edu.wpi.first.math.kinematics;
 
 import edu.wpi.first.math.kinematics.proto.MecanumDriveMotorVoltagesProto;
 import edu.wpi.first.math.kinematics.struct.MecanumDriveMotorVoltagesStruct;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.StructSerializable;
 
 /** Represents the motor voltages for a mecanum drive drivetrain. */
-public class MecanumDriveMotorVoltages {
+public class MecanumDriveMotorVoltages implements ProtobufSerializable, StructSerializable {
   /** Voltage of the front left motor. */
   public double frontLeftVoltage;
 

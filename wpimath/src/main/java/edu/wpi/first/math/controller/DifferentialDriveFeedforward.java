@@ -10,9 +10,11 @@ import edu.wpi.first.math.controller.struct.DifferentialDriveFeedforwardStruct;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.StructSerializable;
 
 /** A helper class which computes the feedforward outputs for a differential drive drivetrain. */
-public class DifferentialDriveFeedforward {
+public class DifferentialDriveFeedforward implements ProtobufSerializable, StructSerializable {
   private final LinearSystem<N2, N2, N2> m_plant;
   public final double m_kVLinear;
   public final double m_kALinear;

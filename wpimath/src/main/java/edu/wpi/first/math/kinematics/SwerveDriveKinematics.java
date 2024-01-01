@@ -17,6 +17,8 @@ import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Arrays;
 import org.ejml.simple.SimpleMatrix;
 
@@ -41,7 +43,9 @@ import org.ejml.simple.SimpleMatrix;
  * field using encoders and a gyro.
  */
 public class SwerveDriveKinematics
-    implements Kinematics<SwerveDriveKinematics.SwerveDriveWheelStates, SwerveDriveWheelPositions> {
+    implements Kinematics<SwerveDriveKinematics.SwerveDriveWheelStates, SwerveDriveWheelPositions>,
+        ProtobufSerializable,
+        StructSerializable {
   public static class SwerveDriveWheelStates {
     public SwerveModuleState[] states;
 

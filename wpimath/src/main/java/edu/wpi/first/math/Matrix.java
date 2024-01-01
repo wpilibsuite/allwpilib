@@ -7,6 +7,7 @@ package edu.wpi.first.math;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.proto.MatrixProto;
 import edu.wpi.first.util.protobuf.Protobuf;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import java.util.Objects;
 import org.ejml.MatrixDimensionException;
 import org.ejml.data.DMatrixRMaj;
@@ -25,7 +26,7 @@ import org.ejml.simple.SimpleMatrix;
  * @param <R> The number of rows in this matrix.
  * @param <C> The number of columns in this matrix.
  */
-public class Matrix<R extends Num, C extends Num> {
+public class Matrix<R extends Num, C extends Num> implements ProtobufSerializable {
   protected final SimpleMatrix m_storage;
 
   /**

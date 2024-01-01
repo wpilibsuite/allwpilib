@@ -9,9 +9,11 @@ import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.controller.proto.SimpleMotorFeedforwardProto;
 import edu.wpi.first.math.controller.struct.SimpleMotorFeedforwardStruct;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.StructSerializable;
 
 /** A helper class that computes feedforward outputs for a simple permanent-magnet DC motor. */
-public class SimpleMotorFeedforward {
+public class SimpleMotorFeedforward implements ProtobufSerializable, StructSerializable {
   public final double ks;
   public final double kv;
   public final double ka;

@@ -6,9 +6,12 @@ package edu.wpi.first.math.spline;
 
 import edu.wpi.first.math.spline.proto.QuinticHermiteSplineProto;
 import edu.wpi.first.math.spline.struct.QuinticHermiteSplineStruct;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.StructSerializable;
 import org.ejml.simple.SimpleMatrix;
 
-public class QuinticHermiteSpline extends Spline {
+public class QuinticHermiteSpline extends Spline
+    implements ProtobufSerializable, StructSerializable {
   private static SimpleMatrix hermiteBasis;
   private final SimpleMatrix m_coefficients;
   public final double[] xInitialControlVector;
