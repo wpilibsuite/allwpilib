@@ -247,10 +247,9 @@ public class LinearFilter {
   }
 
   /**
-   * Resets the filter state, initializing internal buffers to the provided values. <br>
-   * <br>
+   * Resets the filter state, initializing internal buffers to the provided values.<br><br>
+   * 
    * These are the expected lengths of the buffers, depending on what type of linear filter used:
-   *
    * <table>
    * <tr><th>Type</th><th>Input Buffer Length</th><th>Output Buffer Length</th></tr>
    * <tr><td>Unspecified</td><td>length of {@code ffGains}</td><td>length of {@code fbGains}</td>
