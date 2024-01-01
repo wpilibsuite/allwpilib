@@ -272,30 +272,64 @@ class LinearFilter {
   }
 
   /**
-   * Resets the filter state, initializing internal buffers to the provided values. <br><br>
-   * 
-   * These are the expected lengths of the buffers, depending on what type of linear filter used:
+   * Resets the filter state, initializing internal buffers to the provided
+   * values.
+   *
+   * These are the expected lengths of the buffers, depending on what type of
+   * linear filter used:
+   *
    * <table>
-   * <tr><th>Type</th><th>Input Buffer Size</th><th>Output Buffer Size</th></tr>
-   * <tr><td>Unspecified</td><td>size of {@code ffGains}</td><td>size of {@code fbGains}</td>
-   * </tr>
-   * <tr><td>Single Pole IIR</td><td>1</td><td>1</td></tr>
-   * <tr><td>High-Pass</td><td>2</td><td>1</td></tr>
-   * <tr><td>Moving Average</td><td>{@code taps}</td><td>0</td></tr>
-   * <tr><td>Finite Difference</td><td>size of {@code stencil}</td><td>0</td></tr>
-   * <tr><td>Backward Finite Difference</td><td>{@code Samples}</td><td>0</td></tr>
+   *   <tr>
+   *     <th>Type</th>
+   *     <th>Input Buffer Size</th>
+   *     <th>Output Buffer Size</th>
+   *   </tr>
+   *   <tr>
+   *     <td>Unspecified</td>
+   *     <td>size of {@code ffGains}</td>
+   *     <td>size of {@code fbGains}</td>
+   *   </tr>
+   *   <tr>
+   *     <td>Single Pole IIR</td>
+   *     <td>1</td>
+   *     <td>1</td>
+   *   </tr>
+   *   <tr>
+   *     <td>High-Pass</td>
+   *     <td>2</td>
+   *     <td>1</td>
+   *   </tr>
+   *   <tr>
+   *     <td>Moving Average</td>
+   *     <td>{@code taps}</td>
+   *     <td>0</td>
+   *   </tr>
+   *   <tr>
+   *     <td>Finite Difference</td>
+   *     <td>size of {@code stencil}</td>
+   *     <td>0</td>
+   *   </tr>
+   *   <tr>
+   *     <td>Backward Finite Difference</td>
+   *     <td>{@code Samples}</td>
+   *     <td>0</td>
+   *   </tr>
    * </table>
    *
    * @param inputBuffer Values to initialize input buffer.
    * @param outputBuffer Values to initialize output buffer.
-   * @throws std::runtime_error if size of inputBuffer or outputBuffer does not match the size of 
-   *     ffGains and fbGains provided in the constructor.
+   * @throws std::runtime_error if size of inputBuffer or outputBuffer does not
+   *   match the size of ffGains and fbGains provided in the constructor.
    */
-  void Reset(std::span<const double> inputBuffer, std::span<const double> outputBuffer) {
-    Reset(); // Clear buffers
-    
-    if (inputBuffer.size() != m_inputGains.size() || outputBuffer.size() != m_outputGains.size()) {
-      throw std::runtime_error("Incorrect length of inputBuffer or outputBuffer");
+  void Reset(std::span<const double> inputBuffer,
+             std::span<const double> outputBuffer) {
+    // Clear buffers
+    Reset();
+
+    if (inputBuffer.size() != m_inputGains.size() ||
+        outputBuffer.size() != m_outputGains.size()) {
+      throw std::runtime_error(
+          "Incorrect length of inputBuffer or outputBuffer");
     }
 
     for (size_t i = 0; i < inputBuffer.size(); ++i) {

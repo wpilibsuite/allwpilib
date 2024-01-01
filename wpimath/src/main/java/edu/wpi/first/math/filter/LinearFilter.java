@@ -247,9 +247,10 @@ public class LinearFilter {
   }
 
   /**
-   * Resets the filter state, initializing internal buffers to the provided values.<br><br>
-   * 
-   * These are the expected lengths of the buffers, depending on what type of linear filter used:
+   * Resets the filter state, initializing internal buffers to the provided values.
+   *
+   * <p>These are the expected lengths of the buffers, depending on what type of linear filter used:
+   *
    * <table>
    * <tr><th>Type</th><th>Input Buffer Length</th><th>Output Buffer Length</th></tr>
    * <tr><td>Unspecified</td><td>length of {@code ffGains}</td><td>length of {@code fbGains}</td>
@@ -267,7 +268,8 @@ public class LinearFilter {
    *     length of ffGains and fbGains provided in the constructor.
    */
   public void reset(double[] inputBuffer, double[] outputBuffer) {
-    reset(); // Clear buffers
+    // Clear buffers
+    reset();
 
     if (inputBuffer.length != m_inputGains.length || outputBuffer.length != m_outputGains.length) {
       throw new IllegalArgumentException("Incorrect length of inputBuffer or outputBuffer");
