@@ -12,7 +12,6 @@
 #include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/kinematics/DifferentialDriveKinematics.h>
 #include <frc/kinematics/DifferentialDriveOdometry.h>
-#include <frc/motorcontrol/MotorControllerGroup.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
 #include <units/angle.h>
 #include <units/angular_velocity.h>
@@ -25,10 +24,13 @@
 class Drivetrain {
  public:
   Drivetrain() {
+    m_leftLeader.AddFollower(m_leftFollower);
+    m_rightLeader.AddFollower(m_rightFollower);
+
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
-    m_rightGroup.SetInverted(true);
+    m_rightLeader.SetInverted(true);
 
     m_gyro.Reset();
     // Set the distance per pulse for the drive encoders. We can simply use the
@@ -62,9 +64,6 @@ class Drivetrain {
   frc::PWMSparkMax m_leftFollower{2};
   frc::PWMSparkMax m_rightLeader{3};
   frc::PWMSparkMax m_rightFollower{4};
-
-  frc::MotorControllerGroup m_leftGroup{m_leftLeader, m_leftFollower};
-  frc::MotorControllerGroup m_rightGroup{m_rightLeader, m_rightFollower};
 
   frc::Encoder m_leftEncoder{0, 1};
   frc::Encoder m_rightEncoder{2, 3};

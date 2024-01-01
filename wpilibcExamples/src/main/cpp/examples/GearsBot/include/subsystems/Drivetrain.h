@@ -8,7 +8,6 @@
 #include <frc/AnalogInput.h>
 #include <frc/Encoder.h>
 #include <frc/drive/DifferentialDrive.h>
-#include <frc/motorcontrol/MotorControllerGroup.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc2/command/SubsystemBase.h>
 
@@ -66,13 +65,13 @@ class Drivetrain : public frc2::SubsystemBase {
  private:
   frc::PWMSparkMax m_frontLeft{1};
   frc::PWMSparkMax m_rearLeft{2};
-  frc::MotorControllerGroup m_left{m_frontLeft, m_rearLeft};
 
   frc::PWMSparkMax m_frontRight{3};
   frc::PWMSparkMax m_rearRight{4};
-  frc::MotorControllerGroup m_right{m_frontRight, m_rearRight};
 
-  frc::DifferentialDrive m_robotDrive{m_left, m_right};
+  frc::DifferentialDrive m_robotDrive{
+      [&](double output) { m_frontLeft.Set(output); },
+      [&](double output) { m_frontRight.Set(output); }};
 
   frc::Encoder m_leftEncoder{1, 2};
   frc::Encoder m_rightEncoder{3, 4};

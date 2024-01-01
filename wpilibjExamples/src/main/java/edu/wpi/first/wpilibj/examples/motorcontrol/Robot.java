@@ -7,7 +7,6 @@ package edu.wpi.first.wpilibj.examples.motorcontrol;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -27,7 +26,7 @@ public class Robot extends TimedRobot {
   private static final int kEncoderPortA = 0;
   private static final int kEncoderPortB = 1;
 
-  private MotorController m_motor;
+  private PWMSparkMax m_motor;
   private Joystick m_joystick;
   private Encoder m_encoder;
 

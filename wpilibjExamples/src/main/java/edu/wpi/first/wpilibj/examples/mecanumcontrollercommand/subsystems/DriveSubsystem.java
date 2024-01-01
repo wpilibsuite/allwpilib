@@ -9,6 +9,7 @@ import edu.wpi.first.math.kinematics.MecanumDriveMotorVoltages;
 import edu.wpi.first.math.kinematics.MecanumDriveOdometry;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
+import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
@@ -23,7 +24,7 @@ public class DriveSubsystem extends SubsystemBase {
   private final PWMSparkMax m_rearRight = new PWMSparkMax(DriveConstants.kRearRightMotorPort);
 
   private final MecanumDrive m_drive =
-      new MecanumDrive(m_frontLeft, m_rearLeft, m_frontRight, m_rearRight);
+      new MecanumDrive(m_frontLeft::set, m_rearLeft::set, m_frontRight::set, m_rearRight::set);
 
   // The front-left-side drive encoder
   private final Encoder m_frontLeftEncoder =
@@ -65,6 +66,11 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
+    SendableRegistry.addChild(m_drive, m_frontLeft);
+    SendableRegistry.addChild(m_drive, m_rearLeft);
+    SendableRegistry.addChild(m_drive, m_frontRight);
+    SendableRegistry.addChild(m_drive, m_rearRight);
+
     // Sets the distance per pulse for the encoders
     m_frontLeftEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse);
     m_rearLeftEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse);

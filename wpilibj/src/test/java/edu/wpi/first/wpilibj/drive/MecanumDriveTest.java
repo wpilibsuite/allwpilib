@@ -7,7 +7,7 @@ package edu.wpi.first.wpilibj.drive;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.motorcontrol.MockMotorController;
+import edu.wpi.first.wpilibj.motorcontrol.MockPWMMotorController;
 import org.junit.jupiter.api.Test;
 
 class MecanumDriveTest {
@@ -89,11 +89,11 @@ class MecanumDriveTest {
 
   @Test
   void testCartesian() {
-    var fl = new MockMotorController();
-    var fr = new MockMotorController();
-    var rl = new MockMotorController();
-    var rr = new MockMotorController();
-    var drive = new MecanumDrive(fl, rl, fr, rr);
+    var fl = new MockPWMMotorController();
+    var rl = new MockPWMMotorController();
+    var fr = new MockPWMMotorController();
+    var rr = new MockPWMMotorController();
+    var drive = new MecanumDrive(fl::set, rl::set, fr::set, rr::set);
     drive.setDeadband(0.0);
 
     // Forward
@@ -134,11 +134,11 @@ class MecanumDriveTest {
 
   @Test
   void testCartesianGyro90CW() {
-    var fl = new MockMotorController();
-    var fr = new MockMotorController();
-    var rl = new MockMotorController();
-    var rr = new MockMotorController();
-    var drive = new MecanumDrive(fl, rl, fr, rr);
+    var fl = new MockPWMMotorController();
+    var rl = new MockPWMMotorController();
+    var fr = new MockPWMMotorController();
+    var rr = new MockPWMMotorController();
+    var drive = new MecanumDrive(fl::set, rl::set, fr::set, rr::set);
     drive.setDeadband(0.0);
 
     // Forward in global frame; left in robot frame
@@ -179,11 +179,11 @@ class MecanumDriveTest {
 
   @Test
   void testPolar() {
-    var fl = new MockMotorController();
-    var fr = new MockMotorController();
-    var rl = new MockMotorController();
-    var rr = new MockMotorController();
-    var drive = new MecanumDrive(fl, rl, fr, rr);
+    var fl = new MockPWMMotorController();
+    var rl = new MockPWMMotorController();
+    var fr = new MockPWMMotorController();
+    var rr = new MockPWMMotorController();
+    var drive = new MecanumDrive(fl::set, rl::set, fr::set, rr::set);
     drive.setDeadband(0.0);
 
     // Forward

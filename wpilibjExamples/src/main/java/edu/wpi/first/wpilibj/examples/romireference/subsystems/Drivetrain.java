@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj.examples.romireference.subsystems;
 
+import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.BuiltInAccelerometer;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -26,7 +27,8 @@ public class Drivetrain extends SubsystemBase {
   private final Encoder m_rightEncoder = new Encoder(6, 7);
 
   // Set up the differential drive controller
-  private final DifferentialDrive m_diffDrive = new DifferentialDrive(m_leftMotor, m_rightMotor);
+  private final DifferentialDrive m_diffDrive =
+      new DifferentialDrive(m_leftMotor::set, m_rightMotor::set);
 
   // Set up the RomiGyro
   private final RomiGyro m_gyro = new RomiGyro();
@@ -36,6 +38,9 @@ public class Drivetrain extends SubsystemBase {
 
   /** Creates a new Drivetrain. */
   public Drivetrain() {
+    SendableRegistry.addChild(m_diffDrive, m_leftMotor);
+    SendableRegistry.addChild(m_diffDrive, m_rightMotor);
+
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
