@@ -40,8 +40,8 @@ void DifferentialDrive::ArcadeDrive(double xSpeed, double zRotation,
 
   auto [left, right] = ArcadeDriveIK(xSpeed, zRotation, squareInputs);
 
-  m_leftMotor->Set(left);
-  m_rightMotor->Set(right);
+  m_leftMotor->Set(left * m_maxOutput);
+  m_rightMotor->Set(right * m_maxOutput);
 
   Feed();
 }

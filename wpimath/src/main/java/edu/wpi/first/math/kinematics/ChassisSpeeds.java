@@ -18,6 +18,8 @@ import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Time;
 import edu.wpi.first.units.Velocity;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.StructSerializable;
 
 /**
  * Represents the speed of a robot chassis. Although this class contains similar members compared to
@@ -28,7 +30,7 @@ import edu.wpi.first.units.Velocity;
  * component because it can never move sideways. Holonomic drivetrains such as swerve and mecanum
  * will often have all three components.
  */
-public class ChassisSpeeds {
+public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
   /** Velocity along the x-axis. (Fwd is +) */
   public double vxMetersPerSecond;
 

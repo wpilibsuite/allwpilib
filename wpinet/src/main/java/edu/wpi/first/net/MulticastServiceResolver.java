@@ -21,6 +21,7 @@ public class MulticastServiceResolver implements AutoCloseable {
    *
    * @param serviceType service type to look for
    */
+  @SuppressWarnings("this-escape")
   public MulticastServiceResolver(String serviceType) {
     m_handle = WPINetJNI.createMulticastServiceResolver(serviceType);
     m_cleanable = WPICleaner.register(this, cleanupAction(m_handle));

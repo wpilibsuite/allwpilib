@@ -64,10 +64,8 @@ if(WITH_JAVA)
         GENERATE_NATIVE_HEADERS apriltag_jni_headers
     )
 
-    get_property(APRILTAG_JAR_FILE TARGET apriltag_jar PROPERTY JAR_FILE)
-    install(FILES ${APRILTAG_JAR_FILE} DESTINATION "${java_lib_dest}")
-
-    set_property(TARGET apriltag_jar PROPERTY FOLDER "java")
+    install_jar(apriltag_jar DESTINATION ${java_lib_dest})
+    install_jar_exports(TARGETS apriltag_jar FILE apriltag_jar.cmake DESTINATION share/apriltag)
 
     add_library(apriltagjni ${apriltag_jni_src})
     wpilib_target_warnings(apriltagjni)

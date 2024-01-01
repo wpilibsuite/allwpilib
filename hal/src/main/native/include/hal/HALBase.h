@@ -22,9 +22,11 @@
  * @{
  */
 
-// clang-format off
-HAL_ENUM(HAL_RuntimeType) { HAL_Runtime_RoboRIO, HAL_Runtime_RoboRIO2, HAL_Runtime_Simulation };
-// clang-format on
+HAL_ENUM(HAL_RuntimeType) {
+  HAL_Runtime_RoboRIO,
+  HAL_Runtime_RoboRIO2,
+  HAL_Runtime_Simulation
+};
 
 #ifdef __cplusplus
 extern "C" {

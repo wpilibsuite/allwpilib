@@ -51,6 +51,9 @@ inline bool CheckCANStatus(JNIEnv* env, int32_t status, int32_t message_id) {
   return status == 0;
 }
 
+void ThrowNullPointerException(JNIEnv* env, std::string_view msg);
+void ThrowCANStreamOverflowException(JNIEnv* env, jobjectArray messages,
+                                     jint length);
 void ThrowIllegalArgumentException(JNIEnv* env, std::string_view msg);
 void ThrowBoundaryException(JNIEnv* env, double value, double lower,
                             double upper);
@@ -92,6 +95,8 @@ jobject CreatePowerDistributionVersion(JNIEnv* env, uint32_t firmwareMajor,
                                        uint32_t hardwareMinor,
                                        uint32_t hardwareMajor,
                                        uint32_t uniqueId);
+
+jobject CreateCANStreamMessage(JNIEnv* env);
 
 JavaVM* GetJVM();
 

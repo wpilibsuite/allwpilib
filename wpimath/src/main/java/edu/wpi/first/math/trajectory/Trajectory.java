@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.trajectory.proto.TrajectoryProto;
 import edu.wpi.first.math.trajectory.proto.TrajectoryStateProto;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -18,7 +19,7 @@ import java.util.stream.Collectors;
  * Represents a time-parameterized trajectory. The trajectory contains of various States that
  * represent the pose, curvature, time elapsed, velocity, and acceleration at that point.
  */
-public class Trajectory {
+public class Trajectory implements ProtobufSerializable {
   public static final TrajectoryProto proto = new TrajectoryProto();
 
   private final double m_totalTimeSeconds;
@@ -267,7 +268,7 @@ public class Trajectory {
    * Represents a time-parameterized trajectory. The trajectory contains of various States that
    * represent the pose, curvature, time elapsed, velocity, and acceleration at that point.
    */
-  public static class State {
+  public static class State implements ProtobufSerializable {
     public static final TrajectoryStateProto proto = new TrajectoryStateProto();
 
     // The time elapsed since the beginning of the trajectory.

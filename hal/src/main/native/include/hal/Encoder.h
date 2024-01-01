@@ -15,7 +15,6 @@
  * @{
  */
 
-// clang-format off
 /**
  * The type of index pulse for the encoder.
  */
@@ -34,7 +33,6 @@ HAL_ENUM(HAL_EncoderEncodingType) {
   HAL_Encoder_k2X,
   HAL_Encoder_k4X
 };
-// clang-format on
 
 #ifdef __cplusplus
 extern "C" {

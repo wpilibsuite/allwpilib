@@ -6,6 +6,8 @@ package edu.wpi.first.math.geometry;
 
 import edu.wpi.first.math.geometry.proto.Twist3dProto;
 import edu.wpi.first.math.geometry.struct.Twist3dStruct;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
 
 /**
@@ -14,7 +16,7 @@ import java.util.Objects;
  *
  * <p>A Twist can be used to represent a difference between two poses.
  */
-public class Twist3d {
+public class Twist3d implements ProtobufSerializable, StructSerializable {
   /** Linear "dx" component. */
   public double dx;
 

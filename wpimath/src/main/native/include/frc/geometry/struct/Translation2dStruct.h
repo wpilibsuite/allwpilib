@@ -20,3 +20,5 @@ struct WPILIB_DLLEXPORT wpi::Struct<frc::Translation2d> {
   static frc::Translation2d Unpack(std::span<const uint8_t> data);
   static void Pack(std::span<uint8_t> data, const frc::Translation2d& value);
 };
+
+static_assert(wpi::StructSerializable<frc::Translation2d>);

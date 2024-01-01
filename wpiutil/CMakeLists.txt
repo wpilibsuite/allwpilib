@@ -40,15 +40,15 @@ if(WITH_JAVA)
 
     file(GLOB JACKSON_JARS ${WPILIB_BINARY_DIR}/wpiutil/thirdparty/jackson/*.jar)
 
-    if(NOT EXISTS "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/quickbuf/quickbuf-runtime-1.3.2.jar")
+    if(NOT EXISTS "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/quickbuf/quickbuf-runtime-1.3.3.jar")
         set(BASE_URL "https://search.maven.org/remotecontent?filepath=")
         set(JAR_ROOT "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/quickbuf")
 
         message(STATUS "Downloading Quickbuf jarfile...")
         file(
             DOWNLOAD
-                "${BASE_URL}us/hebi/quickbuf/quickbuf-runtime/1.3.2/quickbuf-runtime-1.3.2.jar"
-                "${JAR_ROOT}/quickbuf-runtime-1.3.2.jar"
+                "${BASE_URL}us/hebi/quickbuf/quickbuf-runtime/1.3.3/quickbuf-runtime-1.3.3.jar"
+                "${JAR_ROOT}/quickbuf-runtime-1.3.3.jar"
         )
 
         message(STATUS "Downloaded.")
@@ -70,10 +70,8 @@ if(WITH_JAVA)
         GENERATE_NATIVE_HEADERS wpiutil_jni_headers
     )
 
-    get_property(WPIUTIL_JAR_FILE TARGET wpiutil_jar PROPERTY JAR_FILE)
-    install(FILES ${WPIUTIL_JAR_FILE} DESTINATION "${java_lib_dest}")
-
-    set_property(TARGET wpiutil_jar PROPERTY FOLDER "java")
+    install_jar(wpiutil_jar DESTINATION ${java_lib_dest})
+    install_jar_exports(TARGETS wpiutil_jar FILE wpiutil_jar.cmake DESTINATION share/wpiutil)
 
     add_library(wpiutiljni ${wpiutil_jni_src})
     wpilib_target_warnings(wpiutiljni)

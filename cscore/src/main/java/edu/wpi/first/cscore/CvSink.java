@@ -4,7 +4,7 @@
 
 package edu.wpi.first.cscore;
 
-import edu.wpi.first.cscore.VideoMode.PixelFormat;
+import edu.wpi.first.util.PixelFormat;
 import org.opencv.core.Mat;
 
 /**

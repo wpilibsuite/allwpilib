@@ -41,18 +41,10 @@ class SimDeviceSimTest {
         SimDevice dev1 = SimDevice.create("testDC1")) {
       try (CallbackStore callback1 =
               SimDeviceSim.registerDeviceCreatedCallback(
-                  "testDC",
-                  (name, handle) -> {
-                    callback1Counter.addAndGet(1);
-                  },
-                  false);
+                  "testDC", (name, handle) -> callback1Counter.addAndGet(1), false);
           CallbackStore callback2 =
               SimDeviceSim.registerDeviceCreatedCallback(
-                  "testDC",
-                  (name, handle) -> {
-                    callback2Counter.addAndGet(1);
-                  },
-                  true)) {
+                  "testDC", (name, handle) -> callback2Counter.addAndGet(1), true)) {
         assertEquals(0, callback1Counter.get(), "Callback 1 called early");
         assertEquals(
             1,
@@ -82,11 +74,7 @@ class SimDeviceSimTest {
     SimDevice dev1 = SimDevice.create("testDF1");
     try (CallbackStore callback =
         SimDeviceSim.registerDeviceFreedCallback(
-            "testDF",
-            (name, handle) -> {
-              counter.addAndGet(1);
-            },
-            false)) {
+            "testDF", (name, handle) -> counter.addAndGet(1), false)) {
       assertEquals(0, counter.get(), "Callback called early");
       dev1.close();
       assertEquals(1, counter.get(), "Callback called either more than once or not at all");
@@ -108,16 +96,10 @@ class SimDeviceSimTest {
       SimDeviceSim sim = new SimDeviceSim("testVM1");
       try (CallbackStore callback1 =
               sim.registerValueCreatedCallback(
-                  (name, handle, readonly, value) -> {
-                    callback1Counter.addAndGet(1);
-                  },
-                  false);
+                  (name, handle, readonly, value) -> callback1Counter.addAndGet(1), false);
           CallbackStore callback2 =
               sim.registerValueCreatedCallback(
-                  (name, handle, readonly, value) -> {
-                    callback2Counter.addAndGet(1);
-                  },
-                  true)) {
+                  (name, handle, readonly, value) -> callback2Counter.addAndGet(1), true)) {
         assertEquals(0, callback1Counter.get(), "Callback 1 called early");
         assertEquals(
             1,
@@ -148,18 +130,10 @@ class SimDeviceSimTest {
       SimValue simVal = sim.getValue("v1");
       try (CallbackStore callback1 =
               sim.registerValueChangedCallback(
-                  simVal,
-                  (name, handle, readonly, value) -> {
-                    callback1Counter.addAndGet(1);
-                  },
-                  false);
+                  simVal, (name, handle, readonly, value) -> callback1Counter.addAndGet(1), false);
           CallbackStore callback2 =
               sim.registerValueChangedCallback(
-                  simVal,
-                  (name, handle, readonly, value) -> {
-                    callback2Counter.addAndGet(1);
-                  },
-                  true)) {
+                  simVal, (name, handle, readonly, value) -> callback2Counter.addAndGet(1), true)) {
         assertEquals(0, callback1Counter.get(), "Callback 1 called early");
         assertEquals(
             1,

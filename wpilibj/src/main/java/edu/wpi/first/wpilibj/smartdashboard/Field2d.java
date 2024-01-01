@@ -31,6 +31,7 @@ import java.util.List;
  */
 public class Field2d implements NTSendable, AutoCloseable {
   /** Constructor. */
+  @SuppressWarnings("this-escape")
   public Field2d() {
     FieldObject2d obj = new FieldObject2d("Robot");
     obj.setPose(new Pose2d());

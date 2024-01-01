@@ -179,6 +179,21 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
   }
 
   /**
+   * Creates a velocity measure equivalent to this one per a unit of time.
+   *
+   * <pre>
+   *   Radians.of(3.14).per(Second) // Velocity&lt;Angle&gt; equivalent to RadiansPerSecond.of(3.14)
+   * </pre>
+   *
+   * @param time the unit of time
+   * @return the velocity measure
+   */
+  default Measure<Velocity<U>> per(Time time) {
+    var newUnit = unit().per(time);
+    return newUnit.of(magnitude());
+  }
+
+  /**
    * Adds another measure to this one. The resulting measure has the same unit as this one.
    *
    * @param other the measure to add to this one

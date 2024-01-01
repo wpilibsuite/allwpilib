@@ -41,6 +41,14 @@ inline bool Topic::IsRetained() const {
   return ::nt::GetTopicRetained(m_handle);
 }
 
+inline void Topic::SetCached(bool cached) {
+  ::nt::SetTopicCached(m_handle, cached);
+}
+
+inline bool Topic::IsCached() const {
+  return ::nt::GetTopicCached(m_handle);
+}
+
 inline bool Topic::Exists() const {
   return nt::GetTopicExists(m_handle);
 }

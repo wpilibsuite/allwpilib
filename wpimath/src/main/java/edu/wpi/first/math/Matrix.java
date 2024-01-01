@@ -290,7 +290,7 @@ public class Matrix<R extends Num, C extends Num> {
    * @return The resultant matrix.
    */
   public Matrix<R, C> div(int value) {
-    return new Matrix<>(this.m_storage.divide((double) value));
+    return new Matrix<>(this.m_storage.divide(value));
   }
 
   /**
@@ -490,7 +490,7 @@ public class Matrix<R extends Num, C extends Num> {
    * @return The element by element power of "this" and b.
    */
   public final Matrix<R, C> elementPower(int b) {
-    return new Matrix<>(this.m_storage.elementPower((double) b));
+    return new Matrix<>(this.m_storage.elementPower(b));
   }
 
   /**
@@ -547,7 +547,7 @@ public class Matrix<R extends Num, C extends Num> {
    */
   public final <R2 extends Num, C2 extends Num> Matrix<R2, C2> block(
       int height, int width, int startingRow, int startingCol) {
-    return new Matrix<R2, C2>(
+    return new Matrix<>(
         this.m_storage.extractMatrix(
             startingRow, startingRow + height, startingCol, startingCol + width));
   }
@@ -609,8 +609,7 @@ public class Matrix<R extends Num, C extends Num> {
         return new Matrix<>(new SimpleMatrix(temp.getNumRows(), temp.getNumCols()));
       }
 
-      throw new RuntimeException(
-          "Cholesky decomposition failed! Input matrix:\n" + m_storage.toString());
+      throw new RuntimeException("Cholesky decomposition failed! Input matrix:\n" + m_storage);
     }
 
     return new Matrix<>(SimpleMatrix.wrap(chol.getT(null)));

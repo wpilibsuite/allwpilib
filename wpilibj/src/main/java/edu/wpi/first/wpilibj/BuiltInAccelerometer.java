@@ -28,6 +28,7 @@ public class BuiltInAccelerometer implements Sendable, AutoCloseable {
    *
    * @param range The range the accelerometer will measure
    */
+  @SuppressWarnings("this-escape")
   public BuiltInAccelerometer(Range range) {
     setRange(range);
     HAL.report(tResourceType.kResourceType_Accelerometer, 0, 0, "Built-in accelerometer");
@@ -50,7 +51,7 @@ public class BuiltInAccelerometer implements Sendable, AutoCloseable {
    * @param range The maximum acceleration, positive or negative, that the accelerometer will
    *     measure.
    */
-  public void setRange(Range range) {
+  public final void setRange(Range range) {
     AccelerometerJNI.setAccelerometerActive(false);
 
     switch (range) {

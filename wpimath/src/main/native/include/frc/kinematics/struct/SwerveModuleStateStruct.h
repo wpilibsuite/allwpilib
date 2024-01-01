@@ -30,4 +30,5 @@ struct WPILIB_DLLEXPORT wpi::Struct<frc::SwerveModuleState> {
   }
 };
 
+static_assert(wpi::StructSerializable<frc::SwerveModuleState>);
 static_assert(wpi::HasNestedStruct<frc::SwerveModuleState>);

@@ -53,7 +53,7 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
    * @param forwardChannel The forward channel on the module to control.
    * @param reverseChannel The reverse channel on the module to control.
    */
-  @SuppressWarnings("PMD.UseTryWithResources")
+  @SuppressWarnings({"PMD.UseTryWithResources", "this-escape"})
   public DoubleSolenoid(
       final int module,
       final PneumaticsModuleType moduleType,

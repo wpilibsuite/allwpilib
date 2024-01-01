@@ -14,7 +14,6 @@
  * @{
  */
 
-// clang-format off
 /**
  * The CAN device type.
  *
@@ -60,5 +59,4 @@ HAL_ENUM(HAL_CANManufacturer) {
   HAL_CAN_Man_kAndyMark = 15,
   HAL_CAN_Man_kVividHosting = 16
 };
-// clang-format on
 /** @} */

@@ -29,20 +29,18 @@ public class ParallelDeadlineGroup extends Command {
   private InterruptionBehavior m_interruptBehavior = InterruptionBehavior.kCancelIncoming;
 
   /**
-   * Creates a new ParallelDeadlineGroup. The given commands (including the deadline) will be
+   * Creates a new ParallelDeadlineGroup. The given commands, including the deadline, will be
    * executed simultaneously. The composition will finish when the deadline finishes, interrupting
    * all other still-running commands. If the composition is interrupted, only the commands still
    * running will be interrupted.
    *
    * @param deadline the command that determines when the composition ends
-   * @param commands the commands to be executed
+   * @param otherCommands the other commands to be executed
+   * @throws IllegalArgumentException if the deadline command is also in the otherCommands argument
    */
-  public ParallelDeadlineGroup(Command deadline, Command... commands) {
-    m_deadline = deadline;
-    addCommands(commands);
-    if (!m_commands.containsKey(deadline)) {
-      addCommands(deadline);
-    }
+  public ParallelDeadlineGroup(Command deadline, Command... otherCommands) {
+    addCommands(otherCommands);
+    setDeadline(deadline);
   }
 
   /**
@@ -50,11 +48,19 @@ public class ParallelDeadlineGroup extends Command {
    * contained.
    *
    * @param deadline the command that determines when the group ends
+   * @throws IllegalArgumentException if the deadline command is already in the composition
    */
-  public void setDeadline(Command deadline) {
-    if (!m_commands.containsKey(deadline)) {
-      addCommands(deadline);
+  public final void setDeadline(Command deadline) {
+    @SuppressWarnings("PMD.CompareObjectsWithEquals")
+    boolean isAlreadyDeadline = deadline == m_deadline;
+    if (isAlreadyDeadline) {
+      return;
     }
+    if (m_commands.containsKey(deadline)) {
+      throw new IllegalArgumentException(
+          "The deadline command cannot also be in the other commands!");
+    }
+    addCommands(deadline);
     m_deadline = deadline;
   }
 
@@ -74,7 +80,7 @@ public class ParallelDeadlineGroup extends Command {
     for (Command command : commands) {
       if (!Collections.disjoint(command.getRequirements(), m_requirements)) {
         throw new IllegalArgumentException(
-            "Multiple commands in a parallel group cannot" + "require the same subsystems");
+            "Multiple commands in a parallel group cannot require the same subsystems");
       }
       m_commands.put(command, false);
       m_requirements.addAll(command.getRequirements());

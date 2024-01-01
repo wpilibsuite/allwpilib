@@ -59,7 +59,7 @@ endif("${isSystemDir}" STREQUAL "-1")
 # Options for building certain parts of the repo. Everything is built by default.
 option(BUILD_SHARED_LIBS "Build with shared libs (needed for JNI)" ON)
 option(WITH_JAVA "Include Java and JNI in the build" ON)
-option(WITH_JAVA_SOURCE "Build Java source jars" ON)
+option(WITH_JAVA_SOURCE "Build Java source jars" ${WITH_JAVA})
 option(WITH_CSCORE "Build cscore (needs OpenCV)" ON)
 option(WITH_NTCORE "Build ntcore" ON)
 option(WITH_WPIMATH "Build wpimath" ON)
@@ -81,6 +81,9 @@ option(USE_SYSTEM_EIGEN "Use system eigen" OFF)
 
 # Options for location of OpenCV Java.
 set(OPENCV_JAVA_INSTALL_DIR "" CACHE PATH "Location to search for the OpenCV jar file")
+
+# Options for compilation flags.
+option(NO_WERROR "Disable -Werror flag during compilation" OFF)
 
 # Set default build type to release with debug info (i.e. release mode optimizations
 # are performed, but debug info still exists).
@@ -213,16 +216,18 @@ find_package(LIBSSH 0.7.1)
 find_package(Protobuf REQUIRED)
 find_program(Quickbuf_EXECUTABLE NAMES protoc-gen-quickbuf DOC "The Quickbuf protoc plugin")
 
-set(WPIUTIL_DEP_REPLACE "find_dependency(wpiutil)")
-set(WPINET_DEP_REPLACE "find_dependency(wpinet)")
-set(NTCORE_DEP_REPLACE "find_dependency(ntcore)")
-set(CSCORE_DEP_REPLACE_IMPL "find_dependency(cscore)")
+set(APRILTAG_DEP_REPLACE "find_dependency(apriltag)")
 set(CAMERASERVER_DEP_REPLACE_IMPL "find_dependency(cameraserver)")
+set(CSCORE_DEP_REPLACE_IMPL "find_dependency(cscore)")
 set(HAL_DEP_REPLACE_IMPL "find_dependency(hal)")
-set(WPIMATH_DEP_REPLACE "find_dependency(wpimath)")
-set(WPIUNITS_DEP_REPLACE "find_dependency(wpiunits)")
+set(NTCORE_DEP_REPLACE "find_dependency(ntcore)")
 set(WPILIBC_DEP_REPLACE_IMPL "find_dependency(wpilibc)")
+set(WPILIBJ_DEP_REPLACE "find_dependency(wpilibj)")
 set(WPILIBNEWCOMMANDS_DEP_REPLACE "find_dependency(wpilibNewCommands)")
+set(WPIMATH_DEP_REPLACE "find_dependency(wpimath)")
+set(WPINET_DEP_REPLACE "find_dependency(wpinet)")
+set(WPIUNITS_DEP_REPLACE "find_dependency(wpiunits)")
+set(WPIUTIL_DEP_REPLACE "find_dependency(wpiutil)")
 
 set(FILENAME_DEP_REPLACE "get_filename_component(SELF_DIR \"$\{CMAKE_CURRENT_LIST_FILE\}\" PATH)")
 set(SELF_DIR "$\{SELF_DIR\}")

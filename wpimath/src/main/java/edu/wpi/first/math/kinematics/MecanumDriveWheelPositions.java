@@ -11,9 +11,14 @@ import edu.wpi.first.math.kinematics.proto.MecanumDriveWheelPositionsProto;
 import edu.wpi.first.math.kinematics.struct.MecanumDriveWheelPositionsStruct;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
 
-public class MecanumDriveWheelPositions implements WheelPositions<MecanumDriveWheelPositions> {
+public class MecanumDriveWheelPositions
+    implements WheelPositions<MecanumDriveWheelPositions>,
+        ProtobufSerializable,
+        StructSerializable {
   /** Distance measured by the front left wheel. */
   public double frontLeftMeters;
 

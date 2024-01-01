@@ -7,6 +7,7 @@
 #include <concepts>
 #include <functional>
 #include <memory>
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>
@@ -35,7 +36,7 @@ class CommandPtr final {
       : CommandPtr(
             std::make_unique<std::decay_t<T>>(std::forward<T>(command))) {}
 
-  CommandPtr(CommandPtr&&) = default;
+  CommandPtr(CommandPtr&&);
   CommandPtr& operator=(CommandPtr&&) = default;
 
   explicit CommandPtr(std::nullptr_t) = delete;
@@ -327,6 +328,7 @@ class CommandPtr final {
 
  private:
   std::unique_ptr<Command> m_ptr;
+  std::string m_moveOutSite{""};
   void AssertValid() const;
 };
 

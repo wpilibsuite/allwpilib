@@ -15,6 +15,8 @@ import edu.wpi.first.math.geometry.struct.Pose2dStruct;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -23,7 +25,7 @@ import java.util.Objects;
 /** Represents a 2D pose containing translational and rotational elements. */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
-public class Pose2d implements Interpolatable<Pose2d> {
+public class Pose2d implements Interpolatable<Pose2d>, ProtobufSerializable, StructSerializable {
   private final Translation2d m_translation;
   private final Rotation2d m_rotation;
 

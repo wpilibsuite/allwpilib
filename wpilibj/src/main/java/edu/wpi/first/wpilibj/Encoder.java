@@ -122,6 +122,7 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
    *     selected, then a counter object will be used and the returned value will either exactly
    *     match the spec'd count or be double (2x) the spec'd count.
    */
+  @SuppressWarnings("this-escape")
   public Encoder(
       final int channelA,
       final int channelB,
@@ -152,6 +153,7 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
    * @param reverseDirection represents the orientation of the encoder and inverts the output values
    *     if necessary so forward represents positive values.
    */
+  @SuppressWarnings("this-escape")
   public Encoder(
       final int channelA, final int channelB, final int indexChannel, boolean reverseDirection) {
     this(channelA, channelB, reverseDirection);
@@ -222,6 +224,7 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
    *     selected then a counter object will be used and the returned value will either exactly
    *     match the spec'd count or be double (2x) the spec'd count.
    */
+  @SuppressWarnings("this-escape")
   public Encoder(
       DigitalSource sourceA,
       DigitalSource sourceB,
@@ -492,7 +495,7 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
    *
    * @param channel A DIO channel to set as the encoder index
    */
-  public void setIndexSource(int channel) {
+  public final void setIndexSource(int channel) {
     setIndexSource(channel, IndexingType.kResetOnRisingEdge);
   }
 
@@ -502,7 +505,7 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
    *
    * @param source A digital source to set as the encoder index
    */
-  public void setIndexSource(DigitalSource source) {
+  public final void setIndexSource(DigitalSource source) {
     setIndexSource(source, IndexingType.kResetOnRisingEdge);
   }
 
@@ -513,7 +516,7 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
    * @param channel A DIO channel to set as the encoder index
    * @param type The state that will cause the encoder to reset
    */
-  public void setIndexSource(int channel, IndexingType type) {
+  public final void setIndexSource(int channel, IndexingType type) {
     if (m_allocatedI) {
       throw new AllocationException("Digital Input for Indexing already allocated");
     }
@@ -530,7 +533,7 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
    * @param source A digital source to set as the encoder index
    * @param type The state that will cause the encoder to reset
    */
-  public void setIndexSource(DigitalSource source, IndexingType type) {
+  public final void setIndexSource(DigitalSource source, IndexingType type) {
     EncoderJNI.setEncoderIndexSource(
         m_encoder,
         source.getPortHandleForRouting(),

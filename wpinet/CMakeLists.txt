@@ -26,10 +26,8 @@ if(WITH_JAVA)
         GENERATE_NATIVE_HEADERS wpinet_jni_headers
     )
 
-    get_property(WPINET_JAR_FILE TARGET wpinet_jar PROPERTY JAR_FILE)
-    install(FILES ${WPINET_JAR_FILE} DESTINATION "${java_lib_dest}")
-
-    set_property(TARGET wpinet_jar PROPERTY FOLDER "java")
+    install_jar(wpinet_jar DESTINATION ${java_lib_dest})
+    install_jar_exports(TARGETS wpinet_jar FILE wpinet_jar.cmake DESTINATION share/wpinet)
 
     add_library(wpinetjni ${wpinet_jni_src})
     wpilib_target_warnings(wpinetjni)

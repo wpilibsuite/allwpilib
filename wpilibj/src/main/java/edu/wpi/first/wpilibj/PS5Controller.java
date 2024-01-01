@@ -13,6 +13,10 @@ import edu.wpi.first.wpilibj.event.EventLoop;
  * <p>This class handles PS5 input that comes from the Driver Station. Each time a value is
  * requested the most recent value is returned. There is a single class instance for each controller
  * and the mapping of ports to hardware buttons depends on the code in the Driver Station.
+ *
+ * <p>Only first party controllers from Sony are guaranteed to have the correct mapping, and only
+ * through the official NI DS. Sim is not guaranteed to have the same mapping, as well as any 3rd
+ * party controllers.
  */
 public class PS5Controller extends GenericHID {
   /**
@@ -27,9 +31,9 @@ public class PS5Controller extends GenericHID {
 
   /** Represents a digital button on a PS5Controller. */
   public enum Button {
-    kCross(1),
-    kCircle(2),
-    kSquare(3),
+    kSquare(1),
+    kCross(2),
+    kCircle(3),
     kTriangle(4),
     kL1(5),
     kR1(6),
@@ -37,9 +41,9 @@ public class PS5Controller extends GenericHID {
     kR2(8),
     kCreate(9),
     kOptions(10),
-    kPS(11),
-    kL3(12),
-    kR3(13),
+    kL3(11),
+    kR3(12),
+    kPS(13),
     kTouchpad(14);
 
     public final int value;
@@ -70,10 +74,10 @@ public class PS5Controller extends GenericHID {
   public enum Axis {
     kLeftX(0),
     kLeftY(1),
-    kL2(2),
-    kRightX(3),
-    kRightY(4),
-    kR2(5);
+    kL2(3),
+    kRightX(2),
+    kRightY(5),
+    kR2(4);
 
     public final int value;
 

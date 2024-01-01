@@ -28,6 +28,9 @@
 #include <cmath>
 #include <type_traits>
 
+namespace gcem
+{
+
 namespace internal
 {
 
@@ -67,6 +70,8 @@ noexcept
   } else {
     return std::cosh(x);
   }
+}
+
 }
 
 #endif

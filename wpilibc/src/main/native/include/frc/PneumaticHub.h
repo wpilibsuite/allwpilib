@@ -7,6 +7,7 @@
 #include <memory>
 
 #include <hal/Types.h>
+#include <units/pressure.h>
 #include <wpi/DenseMap.h>
 #include <wpi/mutex.h>
 
@@ -157,6 +158,15 @@ class PneumaticHub : public PneumaticsBase {
     uint32_t Brownout : 1;
     uint32_t CanWarning : 1;
     uint32_t HardwareFault : 1;
+
+    /**
+     * Gets whether there is a fault at the specified channel.
+     * @param channel Channel to check for faults.
+     * @return True if a a fault exists at the channel, otherwise false.
+     * @throws A ChannelIndexOutOfRange error if the provided channel is outside
+     * of the range supported by the hardware.
+     */
+    bool GetChannelFault(int channel) const;
   };
 
   /**

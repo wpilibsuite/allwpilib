@@ -54,22 +54,10 @@ class TimesliceRobotTest {
     // | RobotPeriodic() |           0 |              2 |
     // | Callback 1      |           2 |            0.5 |
     // | Callback 2      |         2.5 |              1 |
-    robot.schedule(
-        () -> {
-          callbackCount1.addAndGet(1);
-        },
-        0.0005);
-    robot.schedule(
-        () -> {
-          callbackCount2.addAndGet(1);
-        },
-        0.001);
+    robot.schedule(() -> callbackCount1.addAndGet(1), 0.0005);
+    robot.schedule(() -> callbackCount2.addAndGet(1), 0.001);
 
-    Thread robotThread =
-        new Thread(
-            () -> {
-              robot.startCompetition();
-            });
+    Thread robotThread = new Thread(robot::startCompetition);
     robotThread.start();
 
     DriverStationSim.setEnabled(false);

@@ -50,7 +50,7 @@ ext {
 
 apply from: "${rootDir}/shared/jni/setupBuild.gradle"
 
-sourceSets.main.java.srcDir "src/generated/main/java/edu/wpi/first/hal/"
+sourceSets.main.java.srcDir "${projectDir}/src/generated/main/java"
 
 cppSourcesZip {
     from('src/main/native/athena') {

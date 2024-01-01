@@ -25,10 +25,12 @@ if(WITH_JAVA)
         OUTPUT_NAME wpilibNewCommands
     )
 
-    get_property(WPILIBNEWCOMMANDS_JAR_FILE TARGET wpilibNewCommands_jar PROPERTY JAR_FILE)
-    install(FILES ${WPILIBNEWCOMMANDS_JAR_FILE} DESTINATION "${java_lib_dest}")
-
-    set_property(TARGET wpilibNewCommands_jar PROPERTY FOLDER "java")
+    install_jar(wpilibNewCommands_jar DESTINATION ${java_lib_dest})
+    install_jar_exports(
+        TARGETS wpilibNewCommands_jar
+        FILE wpilibNewCommands_jar.cmake
+        DESTINATION share/wpilibNewCommands
+    )
 endif()
 
 if(WITH_JAVA_SOURCE)

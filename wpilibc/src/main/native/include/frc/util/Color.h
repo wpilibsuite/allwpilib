@@ -10,7 +10,9 @@
 #include <string_view>
 
 #include <fmt/core.h>
+#include <gcem.hpp>
 #include <wpi/StringExtras.h>
+#include <wpi/ct_string.h>
 
 namespace frc {
 
@@ -851,19 +853,24 @@ class Color {
    *
    * @return a string of the format <tt>\#RRGGBB</tt>
    */
-  std::string HexString() const;
+  constexpr auto HexString() const {
+    const int r = 255.0 * red;
+    const int g = 255.0 * green;
+    const int b = 255.0 * blue;
+
+    return wpi::ct_string<char, std::char_traits<char>, 7>{
+        {'#', wpi::hexdigit(r / 16), wpi::hexdigit(r % 16),
+         wpi::hexdigit(g / 16), wpi::hexdigit(g % 16), wpi::hexdigit(b / 16),
+         wpi::hexdigit(b % 16)}};
+  }
 
   double red = 0.0;
   double green = 0.0;
   double blue = 0.0;
 
  private:
-  static constexpr double kPrecision = 1.0 / (1 << 12);
-
   static constexpr double roundAndClamp(double value) {
-    const auto rounded =
-        (static_cast<int>(value / kPrecision) + 0.5) * kPrecision;
-    return std::clamp(rounded, 0.0, 1.0);
+    return std::clamp(gcem::ceil(value * (1 << 12)) / (1 << 12), 0.0, 1.0);
   }
 };
 

@@ -9,7 +9,7 @@
 using namespace frc2;
 
 RepeatCommand::RepeatCommand(std::unique_ptr<Command>&& command) {
-  CommandScheduler::GetInstance().RequireUngrouped(command.get());
+  CommandScheduler::GetInstance().RequireUngroupedAndUnscheduled(command.get());
   m_command = std::move(command);
   m_command->SetComposed(true);
   AddRequirements(m_command->GetRequirements());

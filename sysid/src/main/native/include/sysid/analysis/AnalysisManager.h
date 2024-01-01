@@ -98,7 +98,7 @@ class AnalysisManager {
     /**
      * Stores the Feedforward gains.
      */
-    std::tuple<std::vector<double>, double, double> ffGains;
+    OLSResult ffGains;
 
     /**
      * Stores the trackwidth for angular drivetrain tests.
@@ -109,7 +109,8 @@ class AnalysisManager {
   /**
    * Exception for File Reading Errors.
    */
-  struct FileReadingError : public std::exception {
+  class FileReadingError : public std::exception {
+   public:
     /**
      * Creates a FileReadingError object
      *
@@ -119,11 +120,13 @@ class AnalysisManager {
       msg = fmt::format("Unable to read: {}", path);
     }
 
+    const char* what() const noexcept override { return msg.c_str(); }
+
+   private:
     /**
      * The path of the file that was opened.
      */
     std::string msg;
-    const char* what() const noexcept override { return msg.c_str(); }
   };
 
   /**
