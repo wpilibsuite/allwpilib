@@ -9,7 +9,7 @@ public class BadSchemaException extends Exception {
   private final String m_field;
 
   /**
-   * Constructs a BadSchemaException
+   * Constructs a BadSchemaException.
    *
    * @param message the detail message.
    */
@@ -19,7 +19,7 @@ public class BadSchemaException extends Exception {
   }
 
   /**
-   * Constructs a BadSchemaException
+   * Constructs a BadSchemaException.
    *
    * @param message the detail message.
    * @param cause The cause (which is saved for later retrieval by the {@link #getCause()} method).
@@ -30,7 +30,7 @@ public class BadSchemaException extends Exception {
   }
 
   /**
-   * Constructs a BadSchemaException
+   * Constructs a BadSchemaException.
    *
    * @param cause The cause (which is saved for later retrieval by the {@link #getCause()} method).
    */
@@ -40,7 +40,7 @@ public class BadSchemaException extends Exception {
   }
 
   /**
-   * Constructs a BadSchemaException
+   * Constructs a BadSchemaException.
    *
    * @param field The bad schema field.
    * @param message the detail message.
@@ -51,7 +51,7 @@ public class BadSchemaException extends Exception {
   }
 
   /**
-   * Constructs a BadSchemaException
+   * Constructs a BadSchemaException.
    *
    * @param field The bad schema field.
    * @param message the detail message.
