@@ -17,8 +17,8 @@ public class CANAPITypes {
    * <p>This enum represents different types of CAN devices. Teams are encouraged to use the
    * kMiscellaneous for custom or miscellaneous devices.
    *
-   * @see <a
-   *     href="https://docs.wpilib.org/en/stable/docs/software/can-devices/can-addressing.html">CAN
+   * @see <a href=
+   *     "https://docs.wpilib.org/en/stable/docs/software/can-devices/can-addressing.html">CAN
    *     Device Types</a>
    */
   public enum CANDeviceType {
@@ -36,10 +36,11 @@ public class CANAPITypes {
     kIOBreakout(11),
     kFirmwareUpdate(31);
 
-    public final int m_id;
+    @SuppressWarnings("PMD.MemberName")
+    public final int id;
 
     CANDeviceType(int id) {
-      this.m_id = id;
+      this.id = id;
     }
   }
 
@@ -49,8 +50,8 @@ public class CANAPITypes {
    * <p>This enum represents different manufacturer IDs for CAN devices. Teams are encouraged to use
    * the kTeamUse manufacturer ID for custom or team-specific devices.
    *
-   * @see <a
-   *     href="https://docs.wpilib.org/en/stable/docs/software/can-devices/can-addressing.html">CAN
+   * @see <a href=
+   *     "https://docs.wpilib.org/en/stable/docs/software/can-devices/can-addressing.html">CAN
    *     Manufacturer IDs</a>
    */
   public enum CANManufacturer {
@@ -72,10 +73,11 @@ public class CANAPITypes {
     kAndyMark(15),
     kVividHosting(16);
 
-    public final int m_id;
+    @SuppressWarnings("PMD.MemberName")
+    public final int id;
 
     CANManufacturer(int id) {
-      this.m_id = id;
+      this.id = id;
     }
   }
 }
