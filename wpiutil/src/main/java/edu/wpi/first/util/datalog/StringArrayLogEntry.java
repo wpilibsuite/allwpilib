@@ -6,7 +6,6 @@ package edu.wpi.first.util.datalog;
 
 /** Log array of string values. */
 public class StringArrayLogEntry extends DataLogEntry {
-
   /** The data type for string array values. */
   public static final String kDataType = "string[]";
 
