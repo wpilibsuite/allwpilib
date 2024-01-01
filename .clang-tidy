@@ -49,7 +49,6 @@ Checks:
   google-build-namespaces,
   google-explicit-constructor,
   google-global-names-in-headers,
-  google-readability-avoid-underscore-in-googletest-name,
   google-readability-casting,
   google-runtime-operator,
   misc-definitions-in-headers,
