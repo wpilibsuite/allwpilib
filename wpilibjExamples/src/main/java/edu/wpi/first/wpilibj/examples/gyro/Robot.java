@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj.examples.gyro;
 
+import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -30,9 +31,15 @@ public class Robot extends TimedRobot {
 
   private final PWMSparkMax m_leftDrive = new PWMSparkMax(kLeftMotorPort);
   private final PWMSparkMax m_rightDrive = new PWMSparkMax(kRightMotorPort);
-  private final DifferentialDrive m_myRobot = new DifferentialDrive(m_leftDrive, m_rightDrive);
+  private final DifferentialDrive m_robotDrive =
+      new DifferentialDrive(m_leftDrive::set, m_rightDrive::set);
   private final AnalogGyro m_gyro = new AnalogGyro(kGyroPort);
   private final Joystick m_joystick = new Joystick(kJoystickPort);
+
+  public Robot() {
+    SendableRegistry.addChild(m_robotDrive, m_leftDrive);
+    SendableRegistry.addChild(m_robotDrive, m_rightDrive);
+  }
 
   @Override
   public void robotInit() {
@@ -50,6 +57,6 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     double turningValue = (kAngleSetpoint - m_gyro.getAngle()) * kP;
-    m_myRobot.arcadeDrive(-m_joystick.getY(), -turningValue);
+    m_robotDrive.arcadeDrive(-m_joystick.getY(), -turningValue);
   }
 }

@@ -21,7 +21,6 @@
 #include <frc/geometry/Quaternion.h>
 #include <frc/geometry/Transform3d.h>
 #include <frc/kinematics/DifferentialDriveKinematics.h>
-#include <frc/motorcontrol/MotorControllerGroup.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc/simulation/AnalogGyroSim.h>
 #include <frc/simulation/DifferentialDrivetrainSim.h>
@@ -139,9 +138,6 @@ class Drivetrain {
   frc::PWMSparkMax m_leftFollower{2};
   frc::PWMSparkMax m_rightLeader{3};
   frc::PWMSparkMax m_rightFollower{4};
-
-  frc::MotorControllerGroup m_leftGroup{m_leftLeader, m_leftFollower};
-  frc::MotorControllerGroup m_rightGroup{m_rightLeader, m_rightFollower};
 
   frc::Encoder m_leftEncoder{0, 1};
   frc::Encoder m_rightEncoder{2, 3};

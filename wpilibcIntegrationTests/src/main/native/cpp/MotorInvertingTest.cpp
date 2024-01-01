@@ -4,6 +4,7 @@
 
 #include <gtest/gtest.h>
 #include <units/time.h>
+#include <wpi/deprecated.h>
 
 #include "TestBench.h"
 #include "frc/Encoder.h"
@@ -32,6 +33,9 @@ std::ostream& operator<<(std::ostream& os, MotorInvertingTestType const& type) {
 
   return os;
 }
+
+WPI_IGNORE_DEPRECATED
+
 class MotorInvertingTest
     : public testing::TestWithParam<MotorInvertingTestType> {
  protected:
@@ -153,3 +157,5 @@ TEST_P(MotorInvertingTest, InvertingSwitchingNegToPos) {
 
 INSTANTIATE_TEST_SUITE_P(Tests, MotorInvertingTest,
                          testing::Values(TEST_VICTOR, TEST_JAGUAR, TEST_TALON));
+
+WPI_UNIGNORE_DEPRECATED
