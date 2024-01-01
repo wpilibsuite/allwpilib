@@ -72,9 +72,9 @@ public final class HALUtil extends JNIWrapper {
   /**
    * Reads the microsecond-resolution timer on the FPGA.
    *
-   * Warning: the User Button is used to stop user programs from automatically loading if it is
-   * held for more then 5 seconds. Because of this, it's not recommended to be used by teams for
-   * any other purpose.
+   * <p>Warning: the User Button is used to stop user programs from automatically loading if it is
+   * held for more then 5 seconds. Because of this, it's not recommended to be used by teams for any
+   * other purpose.
    *
    * @return The current time in microseconds according to the FPGA (since FPGA reset).
    */
