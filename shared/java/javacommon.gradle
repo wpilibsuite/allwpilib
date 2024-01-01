@@ -80,6 +80,7 @@ test {
         exceptionFormat "full"
     }
     finalizedBy jacocoTestReport
+    jvmArgs(['--enable-preview'])
 }
 
 if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxarm32') || project.hasProperty('onlylinuxarm64') || project.hasProperty('onlywindowsarm64')) {
@@ -105,6 +106,7 @@ tasks.withType(JavaCompile).configureEach {
     options.compilerArgs = [
         '--release',
         '21',
+        '--enable-preview',
         '-encoding',
         'UTF8',
 //        "-Werror",
