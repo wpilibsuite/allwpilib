@@ -4,7 +4,14 @@
 
 #pragma once
 
+#include <future>
+#include <map>
+#include <string>
+#include <vector>
+
 #include <glass/View.h>
+#include <glass/support/DataLogReaderThread.h>
+#include <wpi/StringMap.h>
 
 namespace glass {
 class DataLogReaderEntry;
@@ -27,7 +34,7 @@ class DataSelector : public glass::View {
    * @param logger The program logger
    */
   explicit DataSelector(glass::Storage& storage, wpi::Logger& logger)
-      : m_logger(logger) {}
+      /*: m_logger{logger}*/ {}
 
   /**
    * Displays the log loader window.
@@ -40,14 +47,19 @@ class DataSelector : public glass::View {
    */
   void Reset();
 
-  /**
-   * Sets the run state entry.
-   *
-   * @param entry
-   */
-  void SetRunStateEntry(const glass::DataLogReaderEntry& entry);
-
  private:
-  wpi::Logger& m_logger;
+  void LoadTests(const glass::DataLogReaderEntry& testStateEntry);
+
+  // wpi::Logger& m_logger;
+  using Runs = std::vector<glass::DataLogReaderRange>;
+  using State = std::map<std::string, Runs, std::less<>>;   // full name
+  using Tests = std::map<std::string, State, std::less<>>;  // e.g. "dynamic"
+  std::future<Tests> m_testsFuture;
+  std::string m_selectedTest;
+  Tests m_tests;
+  const glass::DataLogReaderEntry* m_testStateEntry = nullptr;
+  const glass::DataLogReaderEntry* m_velocityEntry = nullptr;
+  const glass::DataLogReaderEntry* m_positionEntry = nullptr;
+  const glass::DataLogReaderEntry* m_voltageEntry = nullptr;
 };
 }  // namespace sysid

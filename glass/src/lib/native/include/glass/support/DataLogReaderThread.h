@@ -22,20 +22,22 @@
 
 namespace glass {
 
+class DataLogReaderRange {
+ public:
+  DataLogReaderRange(wpi::log::DataLogReader::iterator begin,
+                     wpi::log::DataLogReader::iterator end)
+      : m_begin{begin}, m_end{end} {}
+
+  wpi::log::DataLogReader::iterator begin() const { return m_begin; }
+  wpi::log::DataLogReader::iterator end() const { return m_end; }
+
+  wpi::log::DataLogReader::iterator m_begin;
+  wpi::log::DataLogReader::iterator m_end;
+};
+
 class DataLogReaderEntry : public wpi::log::StartRecordData {
  public:
-  struct Range {
-    Range(wpi::log::DataLogReader::iterator begin,
-          wpi::log::DataLogReader::iterator end)
-        : m_begin{begin}, m_end{end} {}
-
-    wpi::log::DataLogReader::iterator begin() const { return m_begin; }
-    wpi::log::DataLogReader::iterator end() const { return m_end; }
-
-    wpi::log::DataLogReader::iterator m_begin;
-    wpi::log::DataLogReader::iterator m_end;
-  };
-  std::vector<Range> ranges;  // ranges where this entry is valid
+  std::vector<DataLogReaderRange> ranges;  // ranges where this entry is valid
 };
 
 class DataLogReaderThread {

@@ -51,12 +51,6 @@ class LogLoader : public glass::View {
    */
   wpi::sig::Signal<> unload;
 
-  /**
-   * Signal called when a new file is fully loaded.
-   * The parameter is the LogEntry for the analysis state string entry.
-   */
-  wpi::sig::Signal<const glass::DataLogReaderEntry&> loaded;
-
  private:
   wpi::Logger& m_logger;
 

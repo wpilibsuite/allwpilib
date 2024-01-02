@@ -24,6 +24,7 @@
 #include <wpigui_openurl.h>
 
 #include "sysid/view/Analyzer.h"
+#include "sysid/view/DataSelector.h"
 #include "sysid/view/LogLoader.h"
 #include "sysid/view/UILayout.h"
 
@@ -32,6 +33,7 @@ namespace gui = wpi::gui;
 static std::unique_ptr<glass::WindowManager> gWindowManager;
 
 glass::Window* gLogLoaderWindow;
+glass::Window* gDataSelectorWindow;
 glass::Window* gAnalyzerWindow;
 glass::Window* gProgramLogWindow;
 static glass::MainMenuBar gMainMenu;
@@ -100,8 +102,16 @@ void Application(std::string_view saveDir) {
   gWindowManager = std::make_unique<glass::WindowManager>(storage);
   gWindowManager->GlobalInit();
 
-  gLogLoaderWindow = gWindowManager->AddWindow(
-      "Log Loader", std::make_unique<sysid::LogLoader>(storage, gLogger));
+  auto logLoader = std::make_unique<sysid::LogLoader>(storage, gLogger);
+  auto dataSelector = std::make_unique<sysid::DataSelector>(storage, gLogger);
+
+  logLoader->unload.connect([ds = dataSelector.get()] { ds->Reset(); });
+
+  gLogLoaderWindow =
+      gWindowManager->AddWindow("Log Loader", std::move(logLoader));
+
+  gDataSelectorWindow =
+      gWindowManager->AddWindow("Data Selector", std::move(dataSelector));
 
   gAnalyzerWindow = gWindowManager->AddWindow(
       "Analyzer", std::make_unique<sysid::Analyzer>(storage, gLogger));
@@ -116,6 +126,12 @@ void Application(std::string_view saveDir) {
                                   sysid::kLogLoaderWindowPos.y);
   gLogLoaderWindow->SetDefaultSize(sysid::kLogLoaderWindowSize.x,
                                    sysid::kLogLoaderWindowSize.y);
+
+  // Data selector window position/size
+  gDataSelectorWindow->SetDefaultPos(sysid::kDataSelectorWindowPos.x,
+                                     sysid::kDataSelectorWindowPos.y);
+  gDataSelectorWindow->SetDefaultSize(sysid::kDataSelectorWindowSize.x,
+                                      sysid::kDataSelectorWindowSize.y);
 
   // Analyzer window position/size
   gAnalyzerWindow->SetDefaultPos(sysid::kAnalyzerWindowPos.x,

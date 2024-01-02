@@ -89,14 +89,12 @@ void LogLoader::Display() {
   }
 
   ImGui::BeginTable(
-      "Entries", 1,
+      "Entries", 2,
       ImGuiTableFlags_Borders | ImGuiTableFlags_SizingStretchProp);
-#if 0
   ImGui::TableSetupColumn("Name");
   ImGui::TableSetupColumn("Type");
-  ImGui::TableSetupColumn("Metadata");
+  // ImGui::TableSetupColumn("Metadata");
   ImGui::TableHeadersRow();
-#endif
   DisplayEntryTree(m_entryTree);
   ImGui::EndTable();
 }
@@ -104,8 +102,9 @@ void LogLoader::Display() {
 void LogLoader::RebuildEntryTree() {
   wpi::SmallVector<std::string_view, 16> parts;
   m_reader->ForEachEntryName([&](const glass::DataLogReaderEntry& entry) {
-    // only show double/float entries (TODO: support struct/protobuf)
-    if (entry.type != "double" && entry.type != "float") {
+    // only show double/float/string entries (TODO: support struct/protobuf)
+    if (entry.type != "double" && entry.type != "float" &&
+        entry.type != "string") {
       return;
     }
 
@@ -160,17 +159,18 @@ static void EmitEntry(const std::string& name,
   ImGui::Selectable(name.c_str());
   if (ImGui::BeginDragDropSource()) {
     auto entryPtr = &entry;
-    ImGui::SetDragDropPayload("DataLogEntry", &entryPtr,
-                              sizeof(entryPtr));  // NOLINT
+    ImGui::SetDragDropPayload(
+        entry.type == "string" ? "DataLogEntryString" : "DataLogEntry",
+        &entryPtr,
+        sizeof(entryPtr));  // NOLINT
     ImGui::TextUnformatted(entry.name.data(),
                            entry.name.data() + entry.name.size());
     ImGui::EndDragDropSource();
   }
-#if 0
   ImGui::TableNextColumn();
   ImGui::TextUnformatted(entry.type.data(),
                          entry.type.data() + entry.type.size());
-
+#if 0
   ImGui::TableNextColumn();
   ImGui::TextUnformatted(entry.metadata.data(),
                          entry.metadata.data() + entry.metadata.size());
@@ -187,8 +187,8 @@ void LogLoader::DisplayEntryTree(const std::vector<EntryTreeNode>& tree) {
       ImGui::TableNextColumn();
       bool open = ImGui::TreeNodeEx(node.name.c_str(),
                                     ImGuiTreeNodeFlags_SpanFullWidth);
-#if 0
       ImGui::TableNextColumn();
+#if 0
       ImGui::TableNextColumn();
 #endif
       if (open) {
