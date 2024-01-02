@@ -6,6 +6,7 @@ package edu.wpi.first.wpilibj.smartdashboard;
 
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.wpilibj.smartdashboard.proto.MechanismRoot2dProto;
 
 /**
  * Root Mechanism2d node.
@@ -24,13 +25,13 @@ public final class MechanismRoot2d extends MechanismObject2d {
   private DoublePublisher m_yPub;
 
   /**
-   * Package-private constructor for roots.
+   * Constructor for roots. Do not use this constructor!
    *
    * @param name name
    * @param x x coordinate of root (provide only when constructing a root node)
    * @param y y coordinate of root (provide only when constructing a root node)
    */
-  MechanismRoot2d(String name, double x, double y) {
+  public MechanismRoot2d(String name, double x, double y) {
     super(name);
     m_x = x;
     m_y = y;
@@ -59,6 +60,24 @@ public final class MechanismRoot2d extends MechanismObject2d {
     flush();
   }
 
+  /**
+   * Get the root's x coordinate.
+   *
+   * @return the x coordinate
+   */
+  public synchronized double getX() {
+    return m_x;
+  }
+
+  /**
+   * Get the root's y coordinate.
+   *
+   * @return the y coordinate
+   */
+  public synchronized double getY() {
+    return m_y;
+  }
+
   @Override
   protected synchronized void updateEntries(NetworkTable table) {
     if (m_xPub != null) {
@@ -80,4 +99,6 @@ public final class MechanismRoot2d extends MechanismObject2d {
       m_yPub.set(m_y);
     }
   }
+
+  public static final MechanismRoot2dProto proto = new MechanismRoot2dProto();
 }

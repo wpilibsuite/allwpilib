@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package wpi.proto;
+
+option java_package = "edu.wpi.first.wpilibj.proto";
+
+message ProtobufMechanismRoot2d {
+    string name = 1;
+    double x = 2;
+    double y = 3;
+    repeated ProtobufMechanismLigament2d ligaments = 4;
+}
+
+message ProtobufMechanismLigament2d {
+    string name = 1;
+    double angle = 2;
+    string color = 3;
+    double length = 4;
+    double weight = 5;
+    repeated ProtobufMechanismLigament2d ligaments = 6;
+}
+
+message ProtobufMechanism2d {
+    double width = 1;
+    double height = 2;
+    string background_color = 3;
+    repeated ProtobufMechanismRoot2d roots = 4;
+}

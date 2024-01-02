@@ -9,6 +9,7 @@
   <exclude-pattern>.*/*JNI.*</exclude-pattern>
   <exclude-pattern>.*/*IntegrationTests.*</exclude-pattern>
   <exclude-pattern>.*/math/proto.*</exclude-pattern>
+  <exclude-pattern>.*/generated/main/java/edu/wpi/first/wpilibj/proto.*</exclude-pattern>
 
   <rule ref="category/java/bestpractices.xml">
     <exclude name="AccessorClassGeneration" />

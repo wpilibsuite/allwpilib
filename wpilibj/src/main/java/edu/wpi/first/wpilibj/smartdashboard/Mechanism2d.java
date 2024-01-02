@@ -9,6 +9,7 @@ import edu.wpi.first.networktables.NTSendable;
 import edu.wpi.first.networktables.NTSendableBuilder;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.StringPublisher;
+import edu.wpi.first.wpilibj.smartdashboard.proto.Mechanism2dProto;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import java.util.HashMap;
 import java.util.Map;
@@ -99,6 +100,15 @@ public final class Mechanism2d implements NTSendable, AutoCloseable {
   }
 
   /**
+   * Get all roots in this Mechanism2d.
+   *
+   * @return a map with all the roots.
+   */
+  public synchronized Map<String, MechanismRoot2d> getAllRoots() {
+    return m_roots;
+  }
+
+  /**
    * Set the Mechanism2d background color.
    *
    * @param color the new color
@@ -109,6 +119,34 @@ public final class Mechanism2d implements NTSendable, AutoCloseable {
       m_colorPub.set(m_color);
     }
   }
+
+  /**
+   * Get the Mechanism2d background color.
+   * 
+   * @return the background color
+   */
+  public synchronized String getBackgroundColor() {
+    return m_color;
+  }
+
+  /**
+   * Get the Mechanism2d width.
+   * 
+   * @return the width
+   */
+  public synchronized double getWidth() {
+    return m_dims[0];
+  }
+
+  /**
+   * Get the Mechanism2d height.
+   * 
+   * @return the height
+   */
+  public synchronized double getHeight() {
+    return m_dims[1];
+  }
+
 
   @Override
   public void initSendable(NTSendableBuilder builder) {
@@ -134,4 +172,6 @@ public final class Mechanism2d implements NTSendable, AutoCloseable {
       }
     }
   }
+
+  public static final Mechanism2dProto proto = new Mechanism2dProto();
 }

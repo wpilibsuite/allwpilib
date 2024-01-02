@@ -9,6 +9,7 @@ import edu.wpi.first.networktables.DoubleEntry;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.StringEntry;
 import edu.wpi.first.networktables.StringPublisher;
+import edu.wpi.first.wpilibj.smartdashboard.proto.MechanismLigament2dProto;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 
 /**
@@ -228,4 +229,6 @@ public class MechanismLigament2d extends MechanismObject2d {
     m_weightEntry = table.getDoubleTopic("weight").getEntry(0.0);
     m_weightEntry.set(m_weight);
   }
+
+  public static final MechanismLigament2dProto proto = new MechanismLigament2dProto();
 }

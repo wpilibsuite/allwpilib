@@ -49,6 +49,7 @@ gradle.taskGraph.addTaskExecutionGraphListener { graph ->
     }
 }
 
+sourceSets.main.java.srcDir "${projectDir}/src/generated/main/java"
 sourceSets.main.java.srcDir "${buildDir}/generated/java/"
 
 compileJava {
