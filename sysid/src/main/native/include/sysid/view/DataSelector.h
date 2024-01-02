@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <functional>
 #include <future>
 #include <map>
 #include <string>
@@ -12,6 +13,8 @@
 #include <glass/View.h>
 #include <glass/support/DataLogReaderThread.h>
 #include <wpi/StringMap.h>
+
+#include "sysid/analysis/Storage.h"
 
 namespace glass {
 class DataLogReaderEntry;
@@ -47,19 +50,29 @@ class DataSelector : public glass::View {
    */
   void Reset();
 
- private:
-  void LoadTests(const glass::DataLogReaderEntry& testStateEntry);
+  /**
+   * Called when new test data is loaded.
+   */
+  std::function<void(TestData)> testdata;
 
+ private:
   // wpi::Logger& m_logger;
   using Runs = std::vector<glass::DataLogReaderRange>;
   using State = std::map<std::string, Runs, std::less<>>;   // full name
   using Tests = std::map<std::string, State, std::less<>>;  // e.g. "dynamic"
   std::future<Tests> m_testsFuture;
-  std::string m_selectedTest;
   Tests m_tests;
+  std::string m_selectedTest;
   const glass::DataLogReaderEntry* m_testStateEntry = nullptr;
   const glass::DataLogReaderEntry* m_velocityEntry = nullptr;
   const glass::DataLogReaderEntry* m_positionEntry = nullptr;
   const glass::DataLogReaderEntry* m_voltageEntry = nullptr;
+  int m_selectedUnit = 0;
+  int m_selectedAnalysis = 0;
+  std::future<TestData> m_testdataFuture;
+  std::vector<std::string> m_testdataStats;
+
+  static Tests LoadTests(const glass::DataLogReaderEntry& testStateEntry);
+  TestData BuildTestData();
 };
 }  // namespace sysid

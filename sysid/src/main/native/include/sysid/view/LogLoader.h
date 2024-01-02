@@ -47,7 +47,8 @@ class LogLoader : public glass::View {
   void Display() override;
 
   /**
-   * Signal called when the current file is unloaded (invalidates any LogEntry*).
+   * Signal called when the current file is unloaded (invalidates any
+   * LogEntry*).
    */
   wpi::sig::Signal<> unload;
 

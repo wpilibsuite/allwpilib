@@ -63,7 +63,7 @@ inline constexpr Vector2d kLeftColSize{
 
 // Left column contents
 inline constexpr Vector2d kLogLoaderWindowPos = kLeftColPos;
-inline constexpr Vector2d kLogLoaderWindowSize{kLeftColSize.x, 550};
+inline constexpr Vector2d kLogLoaderWindowSize{kLeftColSize.x, 500};
 inline constexpr Vector2d kDataSelectorWindowPos =
     kLogLoaderWindowPos + Vector2d{0, kLogLoaderWindowSize.y + kWindowGap};
 inline constexpr Vector2d kDataSelectorWindowSize{
