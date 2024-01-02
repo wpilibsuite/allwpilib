@@ -69,8 +69,21 @@ public class WPINetJNI {
     libraryLoaded = true;
   }
 
+  /**
+   * Forward a local TCP port to a remote host and port. Note that local ports less than 1024 won't
+   * work as a normal user.
+   *
+   * @param port local port number
+   * @param remoteHost remote IP address / DNS name
+   * @param remotePort remote port number
+   */
   public static native void addPortForwarder(int port, String remoteHost, int remotePort);
 
+  /**
+   * Stop TCP forwarding on a port.
+   *
+   * @param port local port number
+   */
   public static native void removePortForwarder(int port);
 
   public static native int createMulticastServiceAnnouncer(

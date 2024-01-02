@@ -206,8 +206,22 @@ public class AprilTagJNI {
       double cx,
       double cy);
 
+  /**
+   * Generates a RawFrame containing the apriltag with the id with family 16h5 passed in.
+   *
+   * @param frameObj generated frame (output parameter).
+   * @param frame raw frame handle
+   * @param id id
+   */
   public static native void generate16h5AprilTagImage(RawFrame frameObj, long frame, int id);
 
+  /**
+   * Generates a RawFrame containing the apriltag with the id with family 36h11 passed in.
+   *
+   * @param frameObj generated frame (output parameter).
+   * @param frame raw frame handle
+   * @param id id
+   */
   public static native void generate36h11AprilTagImage(RawFrame frameObj, long frame, int id);
 
   /** Utility class. */
