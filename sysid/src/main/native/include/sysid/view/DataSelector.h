@@ -56,7 +56,6 @@ class DataSelector : public glass::View {
   using Tests = std::map<std::string, State, std::less<>>;  // e.g. "dynamic"
   std::future<Tests> m_testsFuture;
   std::string m_selectedTest;
-  int m_selectedRun = 0;
   Tests m_tests;
   const glass::DataLogReaderEntry* m_testStateEntry = nullptr;
   const glass::DataLogReaderEntry* m_velocityEntry = nullptr;

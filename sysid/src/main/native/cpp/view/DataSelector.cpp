@@ -64,31 +64,9 @@ void DataSelector::Display() {
     for (auto&& test : m_tests) {
       if (ImGui::Selectable(test.first.c_str(), test.first == m_selectedTest)) {
         m_selectedTest = test.first;
-        m_selectedRun = 0;
       }
     }
     ImGui::EndCombo();
-  }
-
-  // Run number selection
-  if (!m_selectedTest.empty()) {
-    int numRuns = INT_MAX;
-    for (auto&& state : m_tests[m_selectedTest]) {
-      numRuns = std::min(numRuns, static_cast<int>(state.second.size()));
-    }
-    if (numRuns != INT_MAX) {
-      std::string runStr =
-          m_selectedRun == 0 ? "" : fmt::format("{}", m_selectedRun);
-      if (ImGui::BeginCombo("Run", runStr.c_str())) {
-        for (int i = 1; i < (numRuns + 1); ++i) {
-          runStr = fmt::format("{}", i);
-          if (ImGui::Selectable(runStr.c_str(), i == m_selectedRun)) {
-            m_selectedRun = i;
-          }
-        }
-        ImGui::EndCombo();
-      }
-    }
   }
 
   // DND targets
@@ -110,7 +88,6 @@ void DataSelector::Reset() {
   m_velocityEntry = nullptr;
   m_positionEntry = nullptr;
   m_voltageEntry = nullptr;
-  m_selectedRun = 0;
 }
 
 void DataSelector::LoadTests(const glass::DataLogReaderEntry& testStateEntry) {
