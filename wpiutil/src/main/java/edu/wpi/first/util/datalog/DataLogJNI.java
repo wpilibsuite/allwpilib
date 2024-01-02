@@ -7,6 +7,11 @@ package edu.wpi.first.util.datalog;
 import edu.wpi.first.util.WPIUtilJNI;
 import java.nio.ByteBuffer;
 
+/**
+ * DataLog wpiutil JNI Functions.
+ *
+ * @see "wpiutil/DataLog.h"
+ */
 public class DataLogJNI extends WPIUtilJNI {
   static native long create(String dir, String filename, double period, String extraHeader);
 
