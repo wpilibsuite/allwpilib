@@ -453,7 +453,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
    * @return
    */
   private static int toUShort(ByteBuffer buf) {
-    return (buf.getShort(0)) & 0xFFFF;
+    return buf.getShort(0) & 0xFFFF;
   }
 
   /**
@@ -469,7 +469,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
    * @return
    */
   private static int toShort(int... buf) {
-    return (short) (((buf[0] & 0xFF) << 8) + ((buf[1] & 0xFF)));
+    return (short) (((buf[0] & 0xFF) << 8) + (buf[1] & 0xFF));
   }
 
   /**
@@ -693,7 +693,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
   private void writeRegister(int reg, int val) {
     ByteBuffer buf = ByteBuffer.allocateDirect(2);
     // low byte
-    buf.put(0, (byte) ((0x80 | reg)));
+    buf.put(0, (byte) (0x80 | reg));
     buf.put(1, (byte) (val & 0xff));
     m_spi.write(buf, 2);
     // high byte

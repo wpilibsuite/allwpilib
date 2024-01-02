@@ -181,7 +181,7 @@ public class ControlAffinePlantInversionFeedforward<States extends Num, Inputs e
    * @return The calculated feedforward.
    */
   public Matrix<Inputs, N1> calculate(Matrix<States, N1> r, Matrix<States, N1> nextR) {
-    var rDot = (nextR.minus(r)).div(m_dt);
+    var rDot = nextR.minus(r).div(m_dt);
 
     // ṙ = f(r) + Bu
     // Bu = ṙ − f(r)

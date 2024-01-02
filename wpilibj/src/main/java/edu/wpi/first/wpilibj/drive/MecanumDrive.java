@@ -321,13 +321,10 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
     builder.setSmartDashboardType("MecanumDrive");
     builder.setActuator(true);
     builder.setSafeState(this::stopMotor);
+    builder.addDoubleProperty("Front Left Motor Speed", () -> m_frontLeftOutput, m_frontLeftMotor);
     builder.addDoubleProperty(
-        "Front Left Motor Speed", () -> m_frontLeftOutput, m_frontLeftMotor::accept);
-    builder.addDoubleProperty(
-        "Front Right Motor Speed", () -> m_frontRightOutput, m_frontRightMotor::accept);
-    builder.addDoubleProperty(
-        "Rear Left Motor Speed", () -> m_rearLeftOutput, m_rearLeftMotor::accept);
-    builder.addDoubleProperty(
-        "Rear Right Motor Speed", () -> m_rearRightOutput, m_rearRightMotor::accept);
+        "Front Right Motor Speed", () -> m_frontRightOutput, m_frontRightMotor);
+    builder.addDoubleProperty("Rear Left Motor Speed", () -> m_rearLeftOutput, m_rearLeftMotor);
+    builder.addDoubleProperty("Rear Right Motor Speed", () -> m_rearRightOutput, m_rearRightMotor);
   }
 }
