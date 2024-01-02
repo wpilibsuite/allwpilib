@@ -495,7 +495,7 @@ public final class DataLog implements AutoCloseable {
   }
 
   /**
-   * Gets the JNI implemtation handle.
+   * Gets the JNI implementation handle.
    *
    * @return data log handle.
    */
