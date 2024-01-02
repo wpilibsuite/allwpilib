@@ -64,9 +64,31 @@ void DataSelector::Display() {
     for (auto&& test : m_tests) {
       if (ImGui::Selectable(test.first.c_str(), test.first == m_selectedTest)) {
         m_selectedTest = test.first;
+        m_selectedRun = 0;
       }
     }
     ImGui::EndCombo();
+  }
+
+  // Run number selection
+  if (!m_selectedTest.empty()) {
+    int numRuns = INT_MAX;
+    for (auto&& state : m_tests[m_selectedTest]) {
+      numRuns = std::min(numRuns, static_cast<int>(state.second.size()));
+    }
+    if (numRuns != INT_MAX) {
+      std::string runStr =
+          m_selectedRun == 0 ? "" : fmt::format("{}", m_selectedRun);
+      if (ImGui::BeginCombo("Run", runStr.c_str())) {
+        for (int i = 1; i < (numRuns + 1); ++i) {
+          runStr = fmt::format("{}", i);
+          if (ImGui::Selectable(runStr.c_str(), i == m_selectedRun)) {
+            m_selectedRun = i;
+          }
+        }
+        ImGui::EndCombo();
+      }
+    }
   }
 
   // DND targets
@@ -88,12 +110,14 @@ void DataSelector::Reset() {
   m_velocityEntry = nullptr;
   m_positionEntry = nullptr;
   m_voltageEntry = nullptr;
+  m_selectedRun = 0;
 }
 
 void DataSelector::LoadTests(const glass::DataLogReaderEntry& testStateEntry) {
   m_testsFuture = std::async(std::launch::async, [&] {
     Tests rv;
     for (auto&& range : testStateEntry.ranges) {
+      std::string_view prevState;
       Runs* curRuns = nullptr;
       wpi::log::DataLogReader::iterator lastStart = range.begin();
       for (auto it = range.begin(), end = range.end(); it != end; ++it) {
@@ -110,10 +134,10 @@ void DataSelector::LoadTests(const glass::DataLogReaderEntry& testStateEntry) {
         auto [testName, direction] = wpi::rsplit(testState, '-');
 
         // track runs as iterator ranges of the same test
-        if (curRuns) {
+        if (curRuns && testState != prevState) {
           curRuns->emplace_back(lastStart, it);
+          lastStart = it;
         }
-        lastStart = it;
         auto testIt = rv.find(testName);
         if (testIt == rv.end()) {
           testIt = rv.emplace(std::string{testName}, State{}).first;
@@ -124,6 +148,11 @@ void DataSelector::LoadTests(const glass::DataLogReaderEntry& testStateEntry) {
               testIt->second.emplace(std::string{testState}, Runs{}).first;
         }
         curRuns = &stateIt->second;
+        prevState = testState;
+      }
+
+      if (curRuns) {
+        curRuns->emplace_back(lastStart, range.end());
       }
     }
     return rv;
