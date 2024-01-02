@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.CANAPIJNI;
+import edu.wpi.first.hal.CANAPITypes;
 import edu.wpi.first.hal.CANData;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -21,8 +22,8 @@ import java.io.Closeable;
  * calls.
  */
 public class CAN implements Closeable {
-  public static final int kTeamManufacturer = 8;
-  public static final int kTeamDeviceType = 10;
+  public static final int kTeamManufacturer = CANAPITypes.CANManufacturer.kTeamUse.id;
+  public static final int kTeamDeviceType = CANAPITypes.CANDeviceType.kMiscellaneous.id;
 
   private final int m_handle;
 
