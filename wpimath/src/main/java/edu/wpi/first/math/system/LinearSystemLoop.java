@@ -27,6 +27,10 @@ import org.ejml.simple.SimpleMatrix;
  *
  * <p>For more on the underlying math, read <a
  * href="https://file.tavsys.net/control/controls-engineering-in-frc.pdf">https://file.tavsys.net/control/controls-engineering-in-frc.pdf</a>.
+ *
+ * @param <States> Number of states.
+ * @param <Inputs> Number of inputs.
+ * @param <Outputs> Number of outputs.
  */
 public class LinearSystemLoop<States extends Num, Inputs extends Num, Outputs extends Num> {
   private final LinearQuadraticRegulator<States, Inputs, Outputs> m_controller;

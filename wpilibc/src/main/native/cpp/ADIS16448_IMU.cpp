@@ -679,8 +679,13 @@ double ADIS16448_IMU::CompFilterProcess(double compAngle, double accelAngle,
   return compAngle;
 }
 
-int ADIS16448_IMU::ConfigDecRate(uint16_t DecimationSetting) {
-  uint16_t writeValue = DecimationSetting;
+int ADIS16448_IMU::ConfigDecRate(uint16_t decimationRate) {
+  // Switches the active SPI port to standard SPI mode, writes a new value to
+  // the DECIMATE register in the IMU, and re-enables auto SPI.
+  //
+  // This function enters standard SPI mode, writes a new DECIMATE setting to
+  // the IMU, adjusts the sample scale factor, and re-enters auto SPI mode.
+  uint16_t writeValue = decimationRate;
   uint16_t readbackValue;
   if (!SwitchToStandardSPI()) {
     REPORT_ERROR("Failed to configure/reconfigure standard SPI.");
@@ -688,14 +693,14 @@ int ADIS16448_IMU::ConfigDecRate(uint16_t DecimationSetting) {
   }
 
   /* Check max */
-  if (DecimationSetting > 9) {
+  if (decimationRate > 9) {
     REPORT_ERROR(
         "Attempted to write an invalid decimation value. Capping at 9");
-    DecimationSetting = 9;
+    decimationRate = 9;
   }
 
   /* Shift decimation setting to correct position and select internal sync */
-  writeValue = (DecimationSetting << 8) | 0x1;
+  writeValue = (decimationRate << 8) | 0x1;
 
   /* Apply to IMU */
   WriteRegister(SMPL_PRD, writeValue);

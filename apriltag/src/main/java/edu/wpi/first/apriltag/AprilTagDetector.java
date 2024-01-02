@@ -182,6 +182,7 @@ public class AprilTagDetector implements AutoCloseable {
     }
   }
 
+  /** Constructs an AprilTagDetector. */
   public AprilTagDetector() {
     m_native = AprilTagJNI.createDetector();
   }

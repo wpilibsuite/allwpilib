@@ -44,4 +44,7 @@ public class PWMJNI extends DIOJNI {
   public static native void setAlwaysHighMode(int pwmPortHandle);
 
   public static native void setPWMPeriodScale(int pwmPortHandle, int squelchMask);
+
+  /** Utility class. */
+  private PWMJNI() {}
 }

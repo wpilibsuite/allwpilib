@@ -14,6 +14,7 @@ import org.opencv.core.Mat;
  * code. The easiest way to use this is to run it in a {@link VisionThread} and use the listener to
  * take snapshots of the pipeline's outputs.
  *
+ * @param <P> Vision pipeline type.
  * @see VisionPipeline
  * @see VisionThread
  * @see <a href="package-summary.html">vision</a>

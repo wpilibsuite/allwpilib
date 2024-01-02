@@ -34,6 +34,8 @@ import java.util.Objects;
  *
  * <p>{@link PoseEstimator#addVisionMeasurement} can be called as infrequently as you want; if you
  * never call it then this class will behave exactly like regular encoder odometry.
+ *
+ * @param <T> Wheel positions type.
  */
 public class PoseEstimator<T extends WheelPositions<T>> {
   private final Kinematics<?, T> m_kinematics;

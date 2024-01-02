@@ -6,6 +6,7 @@ package edu.wpi.first.hal.simulation;
 
 import edu.wpi.first.hal.JNIWrapper;
 
+/** JNI for power distribution data. */
 public class PowerDistributionDataJNI extends JNIWrapper {
   public static native int registerInitializedCallback(
       int index, NotifyCallback callback, boolean initialNotify);
@@ -44,4 +45,7 @@ public class PowerDistributionDataJNI extends JNIWrapper {
   public static native void setCurrent(int index, int channel, double current);
 
   public static native void resetData(int index);
+
+  /** Utility class. */
+  private PowerDistributionDataJNI() {}
 }

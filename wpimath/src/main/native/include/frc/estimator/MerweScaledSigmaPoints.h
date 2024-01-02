@@ -21,8 +21,8 @@ namespace frc {
  * [1] R. Van der Merwe "Sigma-Point Kalman Filters for Probabilitic
  *     Inference in Dynamic State-Space Models" (Doctoral dissertation)
  *
- * @tparam States The dimensionality of the state. 2*States+1 weights will be
- *                generated.
+ * @tparam States The dimensionality of the state. 2 * States + 1 weights will
+ *                be generated.
  */
 template <int States>
 class MerweScaledSigmaPoints {

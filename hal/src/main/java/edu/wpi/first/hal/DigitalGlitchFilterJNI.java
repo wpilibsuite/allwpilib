@@ -59,4 +59,7 @@ public class DigitalGlitchFilterJNI extends JNIWrapper {
    * @see "HAL_GetFilterPeriod"
    */
   public static native int getFilterPeriod(int filterIndex);
+
+  /** Utility class. */
+  private DigitalGlitchFilterJNI() {}
 }

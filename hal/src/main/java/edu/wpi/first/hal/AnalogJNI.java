@@ -497,4 +497,7 @@ public class AnalogJNI extends JNIWrapper {
    * @see "HAL_GetAnalogTriggerFPGAIndex"
    */
   public static native int getAnalogTriggerFPGAIndex(int analogTriggerHandle);
+
+  /** Utility class. */
+  private AnalogJNI() {}
 }

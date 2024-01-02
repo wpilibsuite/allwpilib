@@ -30,9 +30,12 @@ public class AnalogTrigger implements Sendable, AutoCloseable {
   /** Where the analog trigger is attached. */
   protected int m_port;
 
-  protected AnalogInput m_analogInput;
-  protected DutyCycle m_dutyCycle;
-  protected boolean m_ownsAnalog;
+  private AnalogInput m_analogInput;
+
+  @SuppressWarnings({"PMD.SingularField", "PMD.UnusedPrivateField"})
+  private DutyCycle m_dutyCycle;
+
+  private boolean m_ownsAnalog;
 
   /**
    * Constructor for an analog trigger given a channel number.

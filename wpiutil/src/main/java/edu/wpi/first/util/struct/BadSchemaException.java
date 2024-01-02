@@ -5,6 +5,7 @@
 package edu.wpi.first.util.struct;
 
 public class BadSchemaException extends Exception {
+  /** The bad schema field. */
   private final String m_field;
 
   public BadSchemaException(String s) {

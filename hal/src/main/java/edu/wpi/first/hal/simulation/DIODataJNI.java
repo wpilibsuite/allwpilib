@@ -6,6 +6,7 @@ package edu.wpi.first.hal.simulation;
 
 import edu.wpi.first.hal.JNIWrapper;
 
+/** JNI for DIO data. */
 public class DIODataJNI extends JNIWrapper {
   public static native int registerInitializedCallback(
       int index, NotifyCallback callback, boolean initialNotify);
@@ -53,4 +54,7 @@ public class DIODataJNI extends JNIWrapper {
   public static native void setFilterIndex(int index, int filterIndex);
 
   public static native void resetData(int index);
+
+  /** Utility class. */
+  private DIODataJNI() {}
 }

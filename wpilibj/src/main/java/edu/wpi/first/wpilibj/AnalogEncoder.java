@@ -22,9 +22,9 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
   private double m_distancePerRotation = 1.0;
   private double m_lastPosition;
 
-  protected SimDevice m_simDevice;
-  protected SimDouble m_simPosition;
-  protected SimDouble m_simAbsolutePosition;
+  private SimDevice m_simDevice;
+  private SimDouble m_simPosition;
+  private SimDouble m_simAbsolutePosition;
 
   /**
    * Construct a new AnalogEncoder attached to a specific AnalogIn channel.

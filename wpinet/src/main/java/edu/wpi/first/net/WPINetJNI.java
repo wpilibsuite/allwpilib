@@ -8,20 +8,35 @@ import edu.wpi.first.util.RuntimeLoader;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/** WPINet JNI. */
 public class WPINetJNI {
   static boolean libraryLoaded = false;
   static RuntimeLoader<WPINetJNI> loader = null;
 
+  /** Sets whether JNI should be loaded in the static block. */
   public static class Helper {
     private static AtomicBoolean extractOnStaticLoad = new AtomicBoolean(true);
 
+    /**
+     * Returns true if the JNI should be loaded in the static block.
+     *
+     * @return True if the JNI should be loaded in the static block.
+     */
     public static boolean getExtractOnStaticLoad() {
       return extractOnStaticLoad.get();
     }
 
+    /**
+     * Sets whether the JNI should be loaded in the static block.
+     *
+     * @param load Whether the JNI should be loaded in the static block.
+     */
     public static void setExtractOnStaticLoad(boolean load) {
       extractOnStaticLoad.set(load);
     }
+
+    /** Utility class. */
+    private Helper() {}
   }
 
   static {
@@ -82,4 +97,7 @@ public class WPINetJNI {
   public static native int getMulticastServiceResolverEventHandle(int handle);
 
   public static native ServiceData[] getMulticastServiceResolverData(int handle);
+
+  /** Utility class. */
+  private WPINetJNI() {}
 }

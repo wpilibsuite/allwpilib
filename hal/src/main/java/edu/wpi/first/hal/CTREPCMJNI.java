@@ -221,4 +221,7 @@ public class CTREPCMJNI extends JNIWrapper {
    * @see "HAL_SetCTREPCMOneShotDuration"
    */
   public static native void setOneShotDuration(int handle, int index, int durMs);
+
+  /** Utility class. */
+  private CTREPCMJNI() {}
 }

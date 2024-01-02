@@ -15,6 +15,7 @@ import java.util.Set;
  * subsystems its components require.
  */
 public abstract class WrapperCommand extends Command {
+  /** Command being wrapped. */
   protected final Command m_command;
 
   /**
