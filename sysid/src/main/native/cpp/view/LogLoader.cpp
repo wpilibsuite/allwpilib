@@ -11,6 +11,7 @@
 
 #include <glass/support/DataLogReaderThread.h>
 #include <imgui.h>
+#include <imgui_stdlib.h>
 #include <portable-file-dialogs.h>
 #include <wpi/SpanExtras.h>
 #include <wpi/StringExtras.h>
@@ -83,8 +84,10 @@ void LogLoader::Display() {
     return;
   }
 
+  bool refilter = ImGui::InputText("Filter", &m_filter);
+
   // Display tree of entries
-  if (m_entryTree.empty()) {
+  if (m_entryTree.empty() || refilter) {
     RebuildEntryTree();
   }
 
@@ -100,11 +103,17 @@ void LogLoader::Display() {
 }
 
 void LogLoader::RebuildEntryTree() {
+  m_entryTree.clear();
   wpi::SmallVector<std::string_view, 16> parts;
   m_reader->ForEachEntryName([&](const glass::DataLogReaderEntry& entry) {
     // only show double/float/string entries (TODO: support struct/protobuf)
     if (entry.type != "double" && entry.type != "float" &&
         entry.type != "string") {
+      return;
+    }
+
+    // filter on name
+    if (!m_filter.empty() && !wpi::contains_lower(entry.name, m_filter)) {
       return;
     }
 

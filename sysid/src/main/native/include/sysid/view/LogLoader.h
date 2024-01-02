@@ -60,6 +60,8 @@ class LogLoader : public glass::View {
 
   std::string m_error;
 
+  std::string m_filter;
+
   struct EntryTreeNode {
     explicit EntryTreeNode(std::string_view name) : name{name} {}
     std::string name;  // name of just this node
