@@ -13,7 +13,6 @@ import java.nio.ByteBuffer;
  * @see "wpiutil/DataLog.h"
  */
 public class DataLogJNI extends WPIUtilJNI {
-
   /**
    * Create a new Data Log. The log will be initially created with a temporary filename.
    *
