@@ -72,6 +72,15 @@ class PWMMotorController : public MotorController,
    */
   double Get() const override;
 
+  /**
+   * Common interface for inverting direction of a motor controller.
+   *
+   * @return returns the voltage of the motor controller is between -12V and
+   * 12V.
+   */
+  virtual units::volt_t GetVoltage() const;
+
+
   void SetInverted(bool isInverted) override;
 
   bool GetInverted() const override;

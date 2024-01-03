@@ -73,6 +73,15 @@ public abstract class PWMMotorController extends MotorSafety
     return m_pwm.getSpeed() * (m_isInverted ? -1.0 : 1.0);
   }
 
+  /**
+   * Common interface for getting the current voltage of the motor controller.
+   *
+   * @return The current controller voltage output. Value is between -12V and 12V.
+   */
+  default double getVoltage() {
+    return get() * RobotController.getBatteryVoltage();
+  }
+
   @Override
   public void setInverted(boolean isInverted) {
     m_isInverted = isInverted;
