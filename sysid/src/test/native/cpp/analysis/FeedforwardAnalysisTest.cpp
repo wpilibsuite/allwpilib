@@ -28,7 +28,7 @@ enum Movements : uint32_t {
   kFastBackward
 };
 
-constexpr int kMovementCombinations = 16;
+inline constexpr int kMovementCombinations = 16;
 
 /**
  * Return simulated test data for a given simulation model.
