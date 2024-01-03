@@ -160,17 +160,21 @@ DataSelector::Tests DataSelector::LoadTests(
         continue;
       }
 
+      // track runs as iterator ranges of the same test
+      if (testState != prevState) {
+        if (curRuns) {
+          curRuns->emplace_back(lastStart, it);
+        }
+        lastStart = it;
+      }
+      prevState = testState;
+
       if (testState == "none") {
+        curRuns = nullptr;
         continue;
       }
 
       auto [testName, direction] = wpi::rsplit(testState, '-');
-
-      // track runs as iterator ranges of the same test
-      if (curRuns && testState != prevState) {
-        curRuns->emplace_back(lastStart, it);
-        lastStart = it;
-      }
       auto testIt = tests.find(testName);
       if (testIt == tests.end()) {
         testIt = tests.emplace(std::string{testName}, State{}).first;
@@ -180,7 +184,6 @@ DataSelector::Tests DataSelector::LoadTests(
         stateIt = testIt->second.emplace(std::string{testState}, Runs{}).first;
       }
       curRuns = &stateIt->second;
-      prevState = testState;
     }
 
     if (curRuns) {
