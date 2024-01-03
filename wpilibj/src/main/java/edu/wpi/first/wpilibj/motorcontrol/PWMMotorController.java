@@ -9,6 +9,7 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.MotorSafety;
 import edu.wpi.first.wpilibj.PWM;
+import edu.wpi.first.wpilibj.RobotController;
 import java.util.ArrayList;
 
 /** Common base class for all PWM Motor Controllers. */
