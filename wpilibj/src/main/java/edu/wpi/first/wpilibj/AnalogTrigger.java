@@ -15,18 +15,6 @@ import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
 
 /** Class for creating and configuring Analog Triggers. */
 public class AnalogTrigger implements Sendable, AutoCloseable {
-  /** Exceptions dealing with improper operation of the Analog trigger. */
-  public static class AnalogTriggerException extends RuntimeException {
-    /**
-     * Create a new exception with the given message.
-     *
-     * @param message the message to pass with the exception
-     */
-    public AnalogTriggerException(String message) {
-      super(message);
-    }
-  }
-
   /** Where the analog trigger is attached. */
   protected int m_port;
 
