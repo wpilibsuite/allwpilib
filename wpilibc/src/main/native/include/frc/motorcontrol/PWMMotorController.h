@@ -80,7 +80,6 @@ class PWMMotorController : public MotorController,
    */
   virtual units::volt_t GetVoltage() const;
 
-
   void SetInverted(bool isInverted) override;
 
   bool GetInverted() const override;
