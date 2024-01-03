@@ -29,8 +29,7 @@ MechanismRoot2d* Mechanism2d::GetRoot(std::string_view name, double x,
   if (obj) {
     return obj.get();
   }
-  obj = std::make_unique<MechanismRoot2d>(name, x, y,
-                                          MechanismRoot2d::private_init{});
+  obj = std::make_unique<MechanismRoot2d>(name, x, y);
   if (m_table) {
     obj->Update(m_table->GetSubTable(name));
   }
