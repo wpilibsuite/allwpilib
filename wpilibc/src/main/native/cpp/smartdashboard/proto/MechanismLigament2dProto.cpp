@@ -18,7 +18,7 @@ frc::MechanismLigament2d wpi::Protobuf<frc::MechanismLigament2d>::Unpack(
   auto m = static_cast<const wpi::proto::ProtobufMechanismLigament2d*>(&msg);
   auto root = frc::MechanismLigament2d{m->name(), m->length(), units::angle::degree_t{m->angle()}, m->weight(), frc::Color8Bit{m->color()}};
   for (const auto ligament : m->ligaments()) {
-    root.Append<frc::MechanismLigament2d>(wpi::UnpackProtobuf<frc::MechanismLigament2d>(ligament));
+    root.Append<frc::MechanismLigament2d>(ligament.name(), wpi::UnpackProtobuf<frc::MechanismLigament2d>(ligament));
   }
 }
 

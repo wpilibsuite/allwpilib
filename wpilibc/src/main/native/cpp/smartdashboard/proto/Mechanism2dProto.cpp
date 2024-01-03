@@ -20,8 +20,8 @@ frc::Mechanism2d wpi::Protobuf<frc::Mechanism2d>::Unpack(
   auto mechanism = frc::Mechanism2d{m->width(), m->height(), frc::Color8Bit{m->background_color()}};
   for (auto root : m->roots()) {
     auto mechanismRoot = mechanism.GetRoot(root.name(), root.x(), root.y());
-    for (auto ligament: root.ligaments()) {
-      mechanismRoot->Append<frc::MechanismLigament2d>(ligament.name(), ligament.length(), units::angle::degree_t{ligament.angle()}, ligament.weight(), frc::Color8Bit{ligament.color()});
+    for (const auto ligament: root.ligaments()) {
+      mechanismRoot->Append<frc::MechanismLigament2d>(ligament.name(), wpi::UnpackProtobuf<frc::MechanismLigament2d>(ligament));
     }
   }
 }

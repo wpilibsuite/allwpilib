@@ -19,7 +19,7 @@ frc::MechanismRoot2d wpi::Protobuf<frc::MechanismRoot2d>::Unpack(
   auto m = static_cast<const wpi::proto::ProtobufMechanismRoot2d*>(&msg);
   auto root = frc::MechanismRoot2d{m->name(), m->x(), m->y()};
   for (const auto ligament : m->ligaments()) {
-    root.Append<frc::MechanismLigament2d>(wpi::UnpackProtobuf<frc::MechanismLigament2d>(ligament));
+    root.Append<frc::MechanismLigament2d>(ligament.name(), wpi::UnpackProtobuf<frc::MechanismLigament2d>(ligament));
   }
 }
 
