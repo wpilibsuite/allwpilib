@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <string>
 #include <vector>
 
 #include <units/time.h>
@@ -24,6 +25,8 @@ struct MotorData {
     template <typename T>
       requires std::is_arithmetic_v<T> || units::traits::is_unit_t_v<T>
     struct Sample {
+      Sample(units::second_t time, T measurement)
+          : time{time}, measurement{measurement} {}
       units::second_t time;
       T measurement;
     };

@@ -53,7 +53,7 @@ class LogLoader : public glass::View {
   wpi::sig::Signal<> unload;
 
  private:
-  wpi::Logger& m_logger;
+  // wpi::Logger& m_logger;
 
   std::string m_filename;
   std::unique_ptr<pfd::open_file> m_opener;

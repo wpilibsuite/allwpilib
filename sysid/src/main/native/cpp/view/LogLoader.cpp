@@ -19,8 +19,7 @@
 
 using namespace sysid;
 
-LogLoader::LogLoader(glass::Storage& storage, wpi::Logger& logger)
-    : m_logger(logger) {}
+LogLoader::LogLoader(glass::Storage& storage, wpi::Logger& logger) {}
 
 LogLoader::~LogLoader() = default;
 
