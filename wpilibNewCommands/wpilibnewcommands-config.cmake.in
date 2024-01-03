@@ -8,7 +8,7 @@ include(CMakeFindDependencyMacro)
 @WPIMATH_DEP_REPLACE@
 
 @FILENAME_DEP_REPLACE@
-include(${SELF_DIR}/wpilibNewCommands.cmake)
+include(${SELF_DIR}/wpilibnewcommands.cmake)
 if(@WITH_JAVA@)
     include(${SELF_DIR}/wpilibNewCommands_jar.cmake)
 endif()

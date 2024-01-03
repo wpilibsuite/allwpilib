@@ -66,13 +66,12 @@ target_include_directories(
         $<INSTALL_INTERFACE:${include_dest}/xrpVendordep>
 )
 
-install(TARGETS xrpVendordep EXPORT xrpVendordep DESTINATION "${main_lib_dest}")
+install(TARGETS xrpVendordep EXPORT xrpvendordep DESTINATION "${main_lib_dest}")
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/xrpVendordep")
 
-# Convert config filename to lowercase otherwise CMake errors on case-sensitive filesystems
 configure_file(xrpvendordep-config.cmake.in ${WPILIB_BINARY_DIR}/xrpvendordep-config.cmake)
 install(FILES ${WPILIB_BINARY_DIR}/xrpvendordep-config.cmake DESTINATION share/xrpVendordep)
-install(EXPORT xrpVendordep DESTINATION share/xrpVendordep)
+install(EXPORT xrpvendordep DESTINATION share/xrpVendordep)
 
 if(WITH_TESTS)
     wpilib_add_test(xrpVendordep src/test/native/cpp)

@@ -71,10 +71,9 @@ target_include_directories(
         $<INSTALL_INTERFACE:${include_dest}/wpilibNewCommands>
 )
 
-install(TARGETS wpilibNewCommands EXPORT wpilibNewCommands)
+install(TARGETS wpilibNewCommands EXPORT wpilibnewcommands)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpilibNewCommands")
 
-# Convert config filename to lowercase otherwise CMake errors on case-sensitive filesystems
 configure_file(
     wpilibnewcommands-config.cmake.in
     ${WPILIB_BINARY_DIR}/wpilibnewcommands-config.cmake
@@ -83,7 +82,7 @@ install(
     FILES ${WPILIB_BINARY_DIR}/wpilibnewcommands-config.cmake
     DESTINATION share/wpilibNewCommands
 )
-install(EXPORT wpilibNewCommands DESTINATION share/wpilibNewCommands)
+install(EXPORT wpilibnewcommands DESTINATION share/wpilibNewCommands)
 
 if(WITH_TESTS)
     wpilib_add_test(wpilibNewCommands src/test/native/cpp)
