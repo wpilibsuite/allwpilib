@@ -103,6 +103,7 @@ void DataSelector::Display() {
     return;
   }
 
+#if 0
   // Test filtering
   if (ImGui::BeginCombo("Test", m_selectedTest.c_str())) {
     for (auto&& test : m_tests) {
@@ -112,6 +113,7 @@ void DataSelector::Display() {
     }
     ImGui::EndCombo();
   }
+#endif
 
   ImGui::Combo("Analysis Type", &m_selectedAnalysis, kAnalysisTypes,
                IM_ARRAYSIZE(kAnalysisTypes));
@@ -124,7 +126,7 @@ void DataSelector::Display() {
   ImGui::SetNextItemWidth(ImGui::GetFontSize() * 7);
   ImGui::Combo("Units", &m_selectedUnit, kUnits, IM_ARRAYSIZE(kUnits));
 
-  if (!m_selectedTest.empty() && m_velocityEntry && m_positionEntry &&
+  if (/*!m_selectedTest.empty() &&*/ m_velocityEntry && m_positionEntry &&
       m_voltageEntry) {
     if (ImGui::Button("Load")) {
       m_testdataFuture =
@@ -214,17 +216,19 @@ TestData DataSelector::BuildTestData() {
   bool positionDouble = m_positionEntry->type == "double";
   bool velocityDouble = m_velocityEntry->type == "double";
 
-  for (auto&& state : m_tests[m_selectedTest]) {
-    auto& motorData = data.motorData[state.first];
-    for (auto&& range : state.second) {
-      auto& run = motorData.runs.emplace_back();
-      for (auto&& record : range) {
-        if (record.GetEntry() == m_voltageEntry->entry) {
-          AddSample(run.voltage, record, voltageDouble);
-        } else if (record.GetEntry() == m_positionEntry->entry) {
-          AddSample(run.position, record, positionDouble);
-        } else if (record.GetEntry() == m_velocityEntry->entry) {
-          AddSample(run.velocity, record, velocityDouble);
+  for (auto&& test : m_tests) {
+    for (auto&& state : test.second) {
+      auto& motorData = data.motorData[state.first];
+      for (auto&& range : state.second) {
+        auto& run = motorData.runs.emplace_back();
+        for (auto&& record : range) {
+          if (record.GetEntry() == m_voltageEntry->entry) {
+            AddSample(run.voltage, record, voltageDouble);
+          } else if (record.GetEntry() == m_positionEntry->entry) {
+            AddSample(run.position, record, positionDouble);
+          } else if (record.GetEntry() == m_velocityEntry->entry) {
+            AddSample(run.velocity, record, velocityDouble);
+          }
         }
       }
     }
