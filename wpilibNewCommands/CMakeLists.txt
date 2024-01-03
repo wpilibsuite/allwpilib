@@ -76,7 +76,7 @@ install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpilibNe
 
 # Convert config filename to lowercase otherwise CMake errors on case-sensitive filesystems
 configure_file(
-    wpilibNewCommands-config.cmake.in
+    wpilibnewcommands-config.cmake.in
     ${WPILIB_BINARY_DIR}/wpilibnewcommands-config.cmake
 )
 install(

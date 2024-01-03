@@ -70,7 +70,7 @@ install(TARGETS xrpVendordep EXPORT xrpVendordep DESTINATION "${main_lib_dest}")
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/xrpVendordep")
 
 # Convert config filename to lowercase otherwise CMake errors on case-sensitive filesystems
-configure_file(xrpVendordep-config.cmake.in ${WPILIB_BINARY_DIR}/xrpvendordep-config.cmake)
+configure_file(xrpvendordep-config.cmake.in ${WPILIB_BINARY_DIR}/xrpvendordep-config.cmake)
 install(FILES ${WPILIB_BINARY_DIR}/xrpvendordep-config.cmake DESTINATION share/xrpVendordep)
 install(EXPORT xrpVendordep DESTINATION share/xrpVendordep)
 
