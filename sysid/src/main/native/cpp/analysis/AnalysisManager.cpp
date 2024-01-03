@@ -99,10 +99,10 @@ void AnalysisManager::PrepareGeneralData() {
   wpi::StringMap<std::vector<PreparedData>> preparedData;
 
   // Store the raw data columns.
-  static constexpr size_t kTimeCol = 0;
-  static constexpr size_t kVoltageCol = 1;
-  static constexpr size_t kPosCol = 2;
-  static constexpr size_t kVelCol = 3;
+  constexpr size_t kTimeCol = 0;
+  constexpr size_t kVoltageCol = 1;
+  constexpr size_t kPosCol = 2;
+  constexpr size_t kVelCol = 3;
 
   WPI_INFO(m_logger, "{}", "Reading JSON data.");
   // Get the major components from the JSON and store them inside a StringMap.
@@ -176,15 +176,15 @@ void AnalysisManager::PrepareAngularDrivetrainData() {
   wpi::StringMap<std::vector<PreparedData>> preparedData;
 
   // Store the relevant raw data columns.
-  static constexpr size_t kTimeCol = 0;
-  static constexpr size_t kLVoltageCol = 1;
-  static constexpr size_t kRVoltageCol = 2;
-  static constexpr size_t kLPosCol = 3;
-  static constexpr size_t kRPosCol = 4;
-  static constexpr size_t kLVelCol = 5;
-  static constexpr size_t kRVelCol = 6;
-  static constexpr size_t kAngleCol = 7;
-  static constexpr size_t kAngularRateCol = 8;
+  constexpr size_t kTimeCol = 0;
+  constexpr size_t kLVoltageCol = 1;
+  constexpr size_t kRVoltageCol = 2;
+  constexpr size_t kLPosCol = 3;
+  constexpr size_t kRPosCol = 4;
+  constexpr size_t kLVelCol = 5;
+  constexpr size_t kRVelCol = 6;
+  constexpr size_t kAngleCol = 7;
+  constexpr size_t kAngularRateCol = 8;
 
   WPI_INFO(m_logger, "{}", "Reading JSON data.");
   // Get the major components from the JSON and store them inside a StringMap.
@@ -293,13 +293,13 @@ void AnalysisManager::PrepareLinearDrivetrainData() {
   wpi::StringMap<std::vector<PreparedData>> preparedData;
 
   // Store the relevant raw data columns.
-  static constexpr size_t kTimeCol = 0;
-  static constexpr size_t kLVoltageCol = 1;
-  static constexpr size_t kRVoltageCol = 2;
-  static constexpr size_t kLPosCol = 3;
-  static constexpr size_t kRPosCol = 4;
-  static constexpr size_t kLVelCol = 5;
-  static constexpr size_t kRVelCol = 6;
+  constexpr size_t kTimeCol = 0;
+  constexpr size_t kLVoltageCol = 1;
+  constexpr size_t kRVoltageCol = 2;
+  constexpr size_t kLPosCol = 3;
+  constexpr size_t kRPosCol = 4;
+  constexpr size_t kLVelCol = 5;
+  constexpr size_t kRVelCol = 6;
 
   // Get the major components from the JSON and store them inside a StringMap.
   WPI_INFO(m_logger, "{}", "Reading JSON data.");
