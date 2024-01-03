@@ -45,6 +45,13 @@ class MechanismLigament2d : public MechanismObject2d {
   Color8Bit GetColor();
 
   /**
+   * Get the ligament color.
+   *
+   * @return the color of the line
+   */
+  std::string GetColorConst() const;
+
+  /**
    * Set the ligament's length.
    *
    * @param length the line length
@@ -57,6 +64,13 @@ class MechanismLigament2d : public MechanismObject2d {
    * @return the line length
    */
   double GetLength();
+
+  /**
+   * Get the ligament length.
+   *
+   * @return the line length
+   */
+  double GetLengthConst() const;
 
   /**
    * Set the ligament's angle relative to its parent.
@@ -73,6 +87,13 @@ class MechanismLigament2d : public MechanismObject2d {
   double GetAngle();
 
   /**
+   * Get the ligament's angle relative to its parent.
+   *
+   * @return the angle
+   */
+  double GetAngleConst() const;
+
+  /**
    * Set the line thickness.
    *
    * @param lineWidth the line thickness
@@ -85,6 +106,13 @@ class MechanismLigament2d : public MechanismObject2d {
    * @return the line thickness
    */
   double GetLineWeight();
+
+  /**
+   * Get the line thickness.
+   *
+   * @return the line thickness
+   */
+  double GetLineWeightConst() const;
 
  protected:
   void UpdateEntries(std::shared_ptr<nt::NetworkTable> table) override;

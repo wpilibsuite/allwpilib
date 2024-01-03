@@ -25,12 +25,9 @@ namespace frc {
  */
 class MechanismRoot2d : private MechanismObject2d {
   friend class Mechanism2d;
-  friend struct wpi::Protobuf<frc::Mechanism2d>;
-  struct private_init {};
 
  public:
-  MechanismRoot2d(std::string_view name, double x, double y,
-                  const private_init&);
+  MechanismRoot2d(std::string_view name, double x, double y);
 
   /**
    * Set the root's position.
@@ -40,11 +37,13 @@ class MechanismRoot2d : private MechanismObject2d {
    */
   void SetPosition(double x, double y);
 
-  double GetX();
+  double GetX() const;
 
-  double GetY();
+  double GetY() const;
   
   using MechanismObject2d::GetName;
+
+  using MechanismObject2d::GetObjects;
 
   using MechanismObject2d::Append;
 

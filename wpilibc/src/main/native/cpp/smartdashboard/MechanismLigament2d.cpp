@@ -73,11 +73,21 @@ Color8Bit MechanismLigament2d::GetColor() {
   return {static_cast<int>(r), static_cast<int>(g), static_cast<int>(b)};
 }
 
+std::string MechanismLigament2d::GetColorConst() const {
+  std::scoped_lock lock(m_mutex);
+  return m_color;
+}
+
 double MechanismLigament2d::GetAngle() {
   std::scoped_lock lock(m_mutex);
   if (m_angleEntry) {
     m_angle = m_angleEntry.Get();
   }
+  return m_angle;
+}
+
+double MechanismLigament2d::GetAngleConst() const {
+  std::scoped_lock lock(m_mutex);
   return m_angle;
 }
 
@@ -89,11 +99,21 @@ double MechanismLigament2d::GetLength() {
   return m_length;
 }
 
+double MechanismLigament2d::GetLengthConst() const {
+  std::scoped_lock lock(m_mutex);
+  return m_length;
+}
+
 double MechanismLigament2d::GetLineWeight() {
   std::scoped_lock lock(m_mutex);
   if (m_weightEntry) {
     m_weight = m_weightEntry.Get();
   }
+  return m_weight;
+}
+
+double MechanismLigament2d::GetLineWeightConst() const {
+  std::scoped_lock lock(m_mutex);
   return m_weight;
 }
 

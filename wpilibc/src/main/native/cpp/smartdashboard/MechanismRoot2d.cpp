@@ -8,8 +8,7 @@
 
 using namespace frc;
 
-MechanismRoot2d::MechanismRoot2d(std::string_view name, double x, double y,
-                                 const private_init&)
+MechanismRoot2d::MechanismRoot2d(std::string_view name, double x, double y)
     : MechanismObject2d{name}, m_x{x}, m_y{y} {}
 
 void MechanismRoot2d::SetPosition(double x, double y) {
@@ -19,11 +18,11 @@ void MechanismRoot2d::SetPosition(double x, double y) {
   Flush();
 }
 
-double MechanismRoot2d::GetX() {
+double MechanismRoot2d::GetX() const {
   return m_x;
 }
 
-double MechanismRoot2d::GetY() {
+double MechanismRoot2d::GetY() const {
   return m_y;
 }
 
