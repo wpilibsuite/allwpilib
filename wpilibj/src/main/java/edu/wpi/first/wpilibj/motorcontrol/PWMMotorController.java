@@ -79,7 +79,7 @@ public abstract class PWMMotorController extends MotorSafety
    *
    * @return The current controller voltage output. Value is between -12V and 12V.
    */
-  double getVoltage() {
+  public double getVoltage() {
     return get() * RobotController.getBatteryVoltage();
   }
 
