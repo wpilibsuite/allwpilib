@@ -43,8 +43,14 @@ task cppHeadersZip(type: Zip) {
             into '/'
         }
     }
+
+    from("$buildDir/generated/source/proto/main/cpp") {
+        into '/wpilibc/protobuf'
+        include '*.h'
+    }
 }
 
+cppHeadersZip.dependsOn generateProto
 build.dependsOn cppHeadersZip
 build.dependsOn cppSourcesZip
 
