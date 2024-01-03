@@ -37,6 +37,10 @@ double PWMMotorController::Get() const {
   return m_pwm.GetSpeed() * (m_isInverted ? -1.0 : 1.0);
 }
 
+units::volt_t PWMMotorController::GetVoltage() const {
+  return Get() * RobotController::GetBatteryVoltage();
+}
+
 void PWMMotorController::SetInverted(bool isInverted) {
   m_isInverted = isInverted;
 }
