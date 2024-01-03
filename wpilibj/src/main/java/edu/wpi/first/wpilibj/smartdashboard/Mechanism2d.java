@@ -122,7 +122,7 @@ public final class Mechanism2d implements NTSendable, AutoCloseable {
 
   /**
    * Get the Mechanism2d background color.
-   * 
+   *
    * @return the background color
    */
   public synchronized String getBackgroundColor() {
@@ -131,7 +131,7 @@ public final class Mechanism2d implements NTSendable, AutoCloseable {
 
   /**
    * Get the Mechanism2d width.
-   * 
+   *
    * @return the width
    */
   public synchronized double getWidth() {
@@ -140,13 +140,12 @@ public final class Mechanism2d implements NTSendable, AutoCloseable {
 
   /**
    * Get the Mechanism2d height.
-   * 
+   *
    * @return the height
    */
   public synchronized double getHeight() {
     return m_dims[1];
   }
-
 
   @Override
   public void initSendable(NTSendableBuilder builder) {

@@ -32,7 +32,8 @@ public class Mechanism2dProto implements Protobuf<Mechanism2d, ProtobufMechanism
 
   @Override
   public Mechanism2d unpack(ProtobufMechanism2d msg) {
-    var mechanism = new Mechanism2d(msg.getWidth(), msg.getHeight(), new Color8Bit(msg.getBackgroundColor()));
+    var mechanism =
+        new Mechanism2d(msg.getWidth(), msg.getHeight(), new Color8Bit(msg.getBackgroundColor()));
     // Unpack each root into the mechanism
     for (ProtobufMechanismRoot2d root : msg.getRoots()) {
       var mechanismRoot = mechanism.getRoot(root.getName(), root.getX(), root.getY());

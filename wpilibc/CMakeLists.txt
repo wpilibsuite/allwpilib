@@ -19,7 +19,12 @@ protobuf_generate_cpp(
 
 file(GLOB_RECURSE wpilibc_native_src src/main/native/cpp/*.cpp src/main/native/cppcs/*.cpp)
 
-add_library(wpilibc ${wpilibc_native_src} ${WPILIBC_PROTO_SRCS} ${CMAKE_CURRENT_BINARY_DIR}/WPILibVersion.cpp)
+add_library(
+    wpilibc
+    ${wpilibc_native_src}
+    ${WPILIBC_PROTO_SRCS}
+    ${CMAKE_CURRENT_BINARY_DIR}/WPILibVersion.cpp
+)
 set_target_properties(wpilibc PROPERTIES DEBUG_POSTFIX "d")
 
 target_include_directories(
