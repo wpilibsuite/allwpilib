@@ -286,4 +286,7 @@ public class SimDeviceJNI extends JNIWrapper {
    * @param handle simulated value handle
    */
   public static native void resetSimValue(int handle);
+
+  /** Utility class. */
+  private SimDeviceJNI() {}
 }

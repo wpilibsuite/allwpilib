@@ -6,16 +6,18 @@
 
 namespace frc {
 
-/** Defines the state in which the AnalogTrigger triggers. */
-enum class AnalogTriggerType {
-  /// In window.
-  kInWindow = 0,
-  /// State.
-  kState = 1,
-  /// Rising Pulse.
-  kRisingPulse = 2,
-  /// Falling pulse.
-  kFallingPulse = 3
+class MockPWMMotorController {
+ public:
+  void Set(double speed);
+  double Get() const;
+  void SetInverted(bool isInverted);
+  bool GetInverted() const;
+  void Disable();
+  void StopMotor();
+
+ private:
+  double m_speed = 0.0;
+  bool m_isInverted = false;
 };
 
 }  // namespace frc

@@ -20,17 +20,17 @@
 #include "sysid/analysis/AnalysisType.h"
 
 // Sizes of the arrays for new sysid data.
-static constexpr size_t kDrivetrainSize = 9;
-static constexpr size_t kGeneralSize = 4;
+inline constexpr size_t kDrivetrainSize = 9;
+inline constexpr size_t kGeneralSize = 4;
 
 // Indices for the old data.
-static constexpr size_t kTimestampCol = 0;
-static constexpr size_t kLVoltsCol = 3;
-static constexpr size_t kRVoltsCol = 4;
-static constexpr size_t kLPosCol = 5;
-static constexpr size_t kRPosCol = 6;
-static constexpr size_t kLVelCol = 7;
-static constexpr size_t kRVelCol = 8;
+inline constexpr size_t kTimestampCol = 0;
+inline constexpr size_t kLVoltsCol = 3;
+inline constexpr size_t kRVoltsCol = 4;
+inline constexpr size_t kLPosCol = 5;
+inline constexpr size_t kRPosCol = 6;
+inline constexpr size_t kLVelCol = 7;
+inline constexpr size_t kRVelCol = 8;
 
 static wpi::json GetJSON(std::string_view path, wpi::Logger& logger) {
   std::error_code ec;

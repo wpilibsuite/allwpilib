@@ -53,27 +53,93 @@ namespace frc {
 class ADIS16470_IMU : public wpi::Sendable,
                       public wpi::SendableHelper<ADIS16470_IMU> {
  public:
-  /* ADIS16470 Calibration Time Enum Class */
+  /**
+   * ADIS16470 calibration times.
+   */
   enum class CalibrationTime {
+    /// 32 ms calibration time.
     _32ms = 0,
+    /// 64 ms calibration time.
     _64ms = 1,
+    /// 128 ms calibration time.
     _128ms = 2,
+    /// 256 ms calibration time.
     _256ms = 3,
+    /// 512 ms calibration time.
     _512ms = 4,
+    /// 1 s calibration time.
     _1s = 5,
+    /// 2 s calibration time.
     _2s = 6,
+    /// 4 s calibration time.
     _4s = 7,
+    /// 8 s calibration time.
     _8s = 8,
+    /// 16 s calibration time.
     _16s = 9,
+    /// 32 s calibration time.
     _32s = 10,
+    /// 64 s calibration time.
     _64s = 11
   };
 
-  enum IMUAxis { kX, kY, kZ, kYaw, kPitch, kRoll };
+  /**
+   * IMU axes.
+   *
+   * kX, kY, and kZ refer to the IMU's X, Y, and Z axes respectively. kYaw,
+   * kPitch, and kRoll are configured by the user to refer to an X, Y, or Z
+   * axis.
+   */
+  enum IMUAxis {
+    /// The IMU's X axis.
+    kX,
+    /// The IMU's Y axis.
+    kY,
+    /// The IMU's Z axis.
+    kZ,
+    /// The user-configured yaw axis.
+    kYaw,
+    /// The user-configured pitch axis.
+    kPitch,
+    /// The user-configured roll axis.
+    kRoll
+  };
 
+  /**
+   * Creates a new ADIS16740 IMU object.
+   *
+   * The default setup is the onboard SPI port with a calibration time of 4
+   * seconds. Yaw, pitch, and roll are kZ, kX, and kY respectively.
+   */
   ADIS16470_IMU();
+
+  /**
+   * Creates a new ADIS16740 IMU object.
+   *
+   * The default setup is the onboard SPI port with a calibration time of 4
+   * seconds.
+   *
+   * <b><i>Input axes limited to kX, kY and kZ. Specifying kYaw, kPitch,or kRoll
+   * will result in an error.</i></b>
+   *
+   * @param yaw_axis The axis that measures the yaw
+   * @param pitch_axis The axis that measures the pitch
+   * @param roll_axis The axis that measures the roll
+   */
   ADIS16470_IMU(IMUAxis yaw_axis, IMUAxis pitch_axis, IMUAxis roll_axis);
 
+  /**
+   * Creates a new ADIS16740 IMU object.
+   *
+   * <b><i>Input axes limited to kX, kY and kZ. Specifying kYaw, kPitch, or
+   * kRoll will result in an error.</i></b>
+   *
+   * @param yaw_axis The axis that measures the yaw
+   * @param pitch_axis The axis that measures the pitch
+   * @param roll_axis The axis that measures the roll
+   * @param port The SPI Port the gyro is plugged into
+   * @param cal_time Calibration time
+   */
   explicit ADIS16470_IMU(IMUAxis yaw_axis, IMUAxis pitch_axis,
                          IMUAxis roll_axis, frc::SPI::Port port,
                          CalibrationTime cal_time);
@@ -84,9 +150,12 @@ class ADIS16470_IMU : public wpi::Sendable,
   ADIS16470_IMU& operator=(ADIS16470_IMU&&) = default;
 
   /**
-   * @brief Configures the decimation rate of the IMU.
+   * Configures the decimation rate of the IMU.
+   *
+   * @param decimationRate The new decimation value.
+   * @return 0 if success, 1 if no change, 2 if error.
    */
-  int ConfigDecRate(uint16_t reg);
+  int ConfigDecRate(uint16_t decimationRate);
 
   /**
    * @brief Switches the active SPI port to standard SPI mode, writes the
@@ -101,8 +170,11 @@ class ADIS16470_IMU : public wpi::Sendable,
   int ConfigCalTime(CalibrationTime new_cal_time);
 
   /**
-   * @brief Resets the gyro accumulations to a heading of zero. This can be used
-   * if the "zero" orientation of the sensor needs to be changed in runtime.
+   * Reset the gyro.
+   *
+   * Resets the gyro accumulations to a heading of zero. This can be used if
+   * there is significant drift in the gyro and it needs to be recalibrated
+   * after running.
    */
   void Reset();
 
@@ -144,14 +216,18 @@ class ADIS16470_IMU : public wpi::Sendable,
   void SetGyroAngleZ(units::degree_t angle);
 
   /**
-   * @param axis The IMUAxis whose angle to return
-   * @return The axis angle (CCW positive)
+   * Returns the axis angle (CCW positive).
+   *
+   * @param axis The IMUAxis whose angle to return.
+   * @return The axis angle (CCW positive).
    */
   units::degree_t GetAngle(IMUAxis axis) const;
 
   /**
-   * @param axis The IMUAxis whose rate to return
-   * @return Axis angular rate (CCW positive)
+   * Returns the axis angular rate (CCW positive).
+   *
+   * @param axis The IMUAxis whose rate to return.
+   * @return Axis angular rate (CCW positive).
    */
   units::degrees_per_second_t GetRate(IMUAxis axis) const;
 

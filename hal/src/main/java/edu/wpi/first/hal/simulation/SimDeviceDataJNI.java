@@ -7,6 +7,7 @@ package edu.wpi.first.hal.simulation;
 import edu.wpi.first.hal.HALValue;
 import edu.wpi.first.hal.JNIWrapper;
 
+/** JNI for sim device data. */
 public class SimDeviceDataJNI extends JNIWrapper {
   public static native void setSimDeviceEnabled(String prefix, boolean enabled);
 
@@ -106,4 +107,7 @@ public class SimDeviceDataJNI extends JNIWrapper {
   public static native double[] getSimValueEnumDoubleValues(int handle);
 
   public static native void resetSimDeviceData();
+
+  /** Utility class. */
+  private SimDeviceDataJNI() {}
 }

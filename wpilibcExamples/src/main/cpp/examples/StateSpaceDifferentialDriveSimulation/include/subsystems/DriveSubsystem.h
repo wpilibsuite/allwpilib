@@ -9,7 +9,6 @@
 #include <frc/drive/DifferentialDrive.h>
 #include <frc/geometry/Pose2d.h>
 #include <frc/kinematics/DifferentialDriveOdometry.h>
-#include <frc/motorcontrol/MotorControllerGroup.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc/simulation/ADXRS450_GyroSim.h>
 #include <frc/simulation/DifferentialDrivetrainSim.h>
@@ -133,14 +132,9 @@ class DriveSubsystem : public frc2::SubsystemBase {
   frc::PWMSparkMax m_right1{DriveConstants::kRightMotor1Port};
   frc::PWMSparkMax m_right2{DriveConstants::kRightMotor2Port};
 
-  // The motors on the left side of the drive
-  frc::MotorControllerGroup m_leftMotors{m_left1, m_left2};
-
-  // The motors on the right side of the drive
-  frc::MotorControllerGroup m_rightMotors{m_right1, m_right2};
-
   // The robot's drive
-  frc::DifferentialDrive m_drive{m_leftMotors, m_rightMotors};
+  frc::DifferentialDrive m_drive{[&](double output) { m_left1.Set(output); },
+                                 [&](double output) { m_right1.Set(output); }};
 
   // The left-side drive encoder
   frc::Encoder m_leftEncoder{DriveConstants::kLeftEncoderPorts[0],

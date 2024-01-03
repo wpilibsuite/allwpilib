@@ -20,6 +20,9 @@ namespace frc {
  * Teams can use odometry during the autonomous period for complex tasks like
  * path following. Furthermore, odometry can be used for latency compensation
  * when using computer-vision systems.
+ *
+ * @tparam WheelSpeeds Wheel speeds type.
+ * @tparam WheelPositions Wheel positions type.
  */
 template <typename WheelSpeeds, WheelPositions WheelPositions>
 class WPILIB_DLLEXPORT Odometry {

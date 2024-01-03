@@ -17,7 +17,17 @@ namespace frc {
 class BuiltInAccelerometer : public wpi::Sendable,
                              public wpi::SendableHelper<BuiltInAccelerometer> {
  public:
-  enum Range { kRange_2G = 0, kRange_4G = 1, kRange_8G = 2 };
+  /**
+   * Accelerometer range.
+   */
+  enum Range {
+    /// 2 Gs max.
+    kRange_2G = 0,
+    /// 4 Gs max.
+    kRange_4G = 1,
+    /// 8 Gs max.
+    kRange_8G = 2
+  };
 
   /**
    * Constructor.

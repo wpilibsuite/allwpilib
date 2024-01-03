@@ -113,9 +113,11 @@ public class ExponentialProfile {
   }
 
   public static class State {
-    public final double position;
+    public double position;
 
-    public final double velocity;
+    public double velocity;
+
+    public State() {}
 
     /**
      * Construct a state within an exponential profile.

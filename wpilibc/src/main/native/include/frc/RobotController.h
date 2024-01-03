@@ -83,6 +83,10 @@ class RobotController {
   /**
    * Get the state of the "USER" button on the roboRIO.
    *
+   * @warning the User Button is used to stop user programs from automatically
+   * loading if it is held for more then 5 seconds. Because of this, it's not
+   * recommended to be used by teams for any other purpose.
+   *
    * @return True if the button is currently pressed down
    */
   static bool GetUserButton();

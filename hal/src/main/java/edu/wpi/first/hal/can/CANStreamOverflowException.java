@@ -8,7 +8,10 @@ import edu.wpi.first.hal.CANStreamMessage;
 import java.io.IOException;
 
 public class CANStreamOverflowException extends IOException {
+  /** The messages. */
   private final CANStreamMessage[] m_messages;
+
+  /** The length of messages read. */
   private final int m_messagesRead;
 
   /**

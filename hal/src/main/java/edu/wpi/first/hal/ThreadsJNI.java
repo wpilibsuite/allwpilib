@@ -37,4 +37,7 @@ public class ThreadsJNI extends JNIWrapper {
    * @see "HAL_SetCurrentThreadPriority"
    */
   public static native boolean setCurrentThreadPriority(boolean realTime, int priority);
+
+  /** Utility class. */
+  private ThreadsJNI() {}
 }

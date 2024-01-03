@@ -5,6 +5,7 @@
 package edu.wpi.first.util.struct.parser;
 
 public class ParseException extends Exception {
+  /** The parser position. */
   private final int m_pos;
 
   public ParseException(int pos, String s) {

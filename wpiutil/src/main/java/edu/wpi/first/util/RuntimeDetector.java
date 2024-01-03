@@ -6,6 +6,9 @@ package edu.wpi.first.util;
 
 import java.io.File;
 
+/**
+ * A utility class for detecting and providing platform-specific such as OS and CPU architecture.
+ */
 public final class RuntimeDetector {
   private static String filePrefix;
   private static String fileExtension;
@@ -131,32 +134,57 @@ public final class RuntimeDetector {
   }
 
   /**
-   * check if architecture is Arm64.
+   * Check if architecture is Arm64.
    *
-   * @return if architecture is Arm64
+   * @return if architecture is Arm64.
    */
   public static boolean isArm64() {
     String arch = System.getProperty("os.arch");
     return "aarch64".equals(arch) || "arm64".equals(arch);
   }
 
+  /**
+   * Check if OS is Linux.
+   *
+   * @return if OS is Linux.
+   */
   public static boolean isLinux() {
     return System.getProperty("os.name").startsWith("Linux");
   }
 
+  /**
+   * Check if OS is Windows.
+   *
+   * @return if OS is Windows.
+   */
   public static boolean isWindows() {
     return System.getProperty("os.name").startsWith("Windows");
   }
 
+  /**
+   * Check if OS is Mac.
+   *
+   * @return if OS is Mac.
+   */
   public static boolean isMac() {
     return System.getProperty("os.name").startsWith("Mac");
   }
 
+  /**
+   * Check if OS is 32bit Intel.
+   *
+   * @return if OS is 32bit Intel.
+   */
   public static boolean is32BitIntel() {
     String arch = System.getProperty("os.arch");
     return "x86".equals(arch) || "i386".equals(arch);
   }
 
+  /**
+   * Check if OS is 64bit Intel.
+   *
+   * @return if OS is 64bit Intel.
+   */
   public static boolean is64BitIntel() {
     String arch = System.getProperty("os.arch");
     return "amd64".equals(arch) || "x86_64".equals(arch);

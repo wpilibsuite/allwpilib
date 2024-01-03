@@ -43,16 +43,25 @@ public class ADXL345_I2C implements NTSendable, AutoCloseable {
   private static final byte kDataFormat_FullRes = 0x08;
   private static final byte kDataFormat_Justify = 0x04;
 
+  /** Accelerometer range. */
   public enum Range {
+    /** 2 Gs max. */
     k2G,
+    /** 4 Gs max. */
     k4G,
+    /** 8 Gs max. */
     k8G,
+    /** 16 Gs max. */
     k16G
   }
 
+  /** Accelerometer axes. */
   public enum Axes {
+    /** X axis. */
     kX((byte) 0x00),
+    /** Y axis. */
     kY((byte) 0x02),
+    /** Z axis. */
     kZ((byte) 0x04);
 
     /** The integer value representing this enumeration. */
@@ -63,20 +72,29 @@ public class ADXL345_I2C implements NTSendable, AutoCloseable {
     }
   }
 
+  /** Container type for accelerations from all axes. */
   @SuppressWarnings("MemberName")
   public static class AllAxes {
+    /** Acceleration along the X axis in g-forces. */
     public double XAxis;
+
+    /** Acceleration along the Y axis in g-forces. */
     public double YAxis;
+
+    /** Acceleration along the Z axis in g-forces. */
     public double ZAxis;
+
+    /** Default constructor. */
+    public AllAxes() {}
   }
 
-  protected I2C m_i2c;
+  private I2C m_i2c;
 
-  protected SimDevice m_simDevice;
-  protected SimEnum m_simRange;
-  protected SimDouble m_simX;
-  protected SimDouble m_simY;
-  protected SimDouble m_simZ;
+  private SimDevice m_simDevice;
+  private SimEnum m_simRange;
+  private SimDouble m_simX;
+  private SimDouble m_simY;
+  private SimDouble m_simZ;
 
   /**
    * Constructs the ADXL345 Accelerometer with I2C address 0x1D.
@@ -123,10 +141,20 @@ public class ADXL345_I2C implements NTSendable, AutoCloseable {
     SendableRegistry.addLW(this, "ADXL345_I2C", port.value);
   }
 
+  /**
+   * Returns the I2C port.
+   *
+   * @return The I2C port.
+   */
   public int getPort() {
     return m_i2c.getPort();
   }
 
+  /**
+   * Returns the I2C device address.
+   *
+   * @return The I2C device address.
+   */
   public int getDeviceAddress() {
     return m_i2c.getDeviceAddress();
   }

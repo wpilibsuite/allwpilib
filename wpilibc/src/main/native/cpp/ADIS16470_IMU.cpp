@@ -348,31 +348,22 @@ int ADIS16470_IMU::ConfigCalTime(CalibrationTime new_cal_time) {
   return 0;
 }
 
-/**
- * @brief Switches the active SPI port to standard SPI mode, writes a new value
- *to the DECIMATE register in the IMU, and re-enables auto SPI.
- *
- * @param reg Decimation value to be set.
- *
- * @return An int indicating the success or failure of writing the new DECIMATE
- *setting and returning to auto SPI mode. 0 = Success, 1 = No Change, 2 =
- *Failure
- *
- * This function enters standard SPI mode, writes a new DECIMATE setting to the
- *IMU, adjusts the sample scale factor, and re-enters auto SPI mode.
- **/
-int ADIS16470_IMU::ConfigDecRate(uint16_t reg) {
-  uint16_t m_reg = reg;
+int ADIS16470_IMU::ConfigDecRate(uint16_t decimationRate) {
+  // Switches the active SPI port to standard SPI mode, writes a new value to
+  // the DECIMATE register in the IMU, and re-enables auto SPI.
+  //
+  // This function enters standard SPI mode, writes a new DECIMATE setting to
+  // the IMU, adjusts the sample scale factor, and re-enters auto SPI mode.
   if (!SwitchToStandardSPI()) {
     REPORT_ERROR("Failed to configure/reconfigure standard SPI.");
     return 2;
   }
-  if (m_reg > 1999) {
+  if (decimationRate > 1999) {
     REPORT_ERROR("Attempted to write an invalid decimation value.");
-    m_reg = 1999;
+    decimationRate = 1999;
   }
-  m_scaled_sample_rate = (((m_reg + 1.0) / 2000.0) * 1000000.0);
-  WriteRegister(DEC_RATE, m_reg);
+  m_scaled_sample_rate = (((decimationRate + 1.0) / 2000.0) * 1000000.0);
+  WriteRegister(DEC_RATE, decimationRate);
   if (!SwitchToAutoSPI()) {
     REPORT_ERROR("Failed to configure/reconfigure auto SPI.");
     return 2;

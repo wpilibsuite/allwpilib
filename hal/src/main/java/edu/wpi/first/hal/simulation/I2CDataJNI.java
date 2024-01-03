@@ -6,6 +6,7 @@ package edu.wpi.first.hal.simulation;
 
 import edu.wpi.first.hal.JNIWrapper;
 
+/** JNI for I2C data. */
 public class I2CDataJNI extends JNIWrapper {
   public static native int registerInitializedCallback(
       int index, NotifyCallback callback, boolean initialNotify);
@@ -25,4 +26,7 @@ public class I2CDataJNI extends JNIWrapper {
   public static native void cancelWriteCallback(int index, int uid);
 
   public static native void resetData(int index);
+
+  /** Utility class. */
+  private I2CDataJNI() {}
 }

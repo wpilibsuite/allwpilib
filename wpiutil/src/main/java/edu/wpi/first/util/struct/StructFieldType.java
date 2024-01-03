@@ -20,15 +20,19 @@ public enum StructFieldType {
   kDouble("double", false, false, 8),
   kStruct("struct", false, false, 0);
 
+  /** The name of the data type. */
   @SuppressWarnings("MemberName")
   public final String name;
 
+  /** Indicates if the data type is a signed integer. */
   @SuppressWarnings("MemberName")
   public final boolean isInt;
 
+  /** Indicates if the data type is an unsigned integer. */
   @SuppressWarnings("MemberName")
   public final boolean isUint;
 
+  /** The size (in bytes) of the data type. */
   @SuppressWarnings("MemberName")
   public final int size;
 

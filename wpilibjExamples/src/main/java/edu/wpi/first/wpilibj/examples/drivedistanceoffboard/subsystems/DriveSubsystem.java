@@ -6,6 +6,7 @@ package edu.wpi.first.wpilibj.examples.drivedistanceoffboard.subsystems;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.examples.drivedistanceoffboard.Constants.DriveConstants;
 import edu.wpi.first.wpilibj.examples.drivedistanceoffboard.ExampleSmartMotorController;
@@ -34,19 +35,18 @@ public class DriveSubsystem extends SubsystemBase {
           DriveConstants.kaVoltSecondsSquaredPerMeter);
 
   // The robot's drive
-  private final DifferentialDrive m_drive = new DifferentialDrive(m_leftLeader, m_rightLeader);
+  private final DifferentialDrive m_drive =
+      new DifferentialDrive(m_leftLeader::set, m_rightLeader::set);
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
+    SendableRegistry.addChild(m_drive, m_leftLeader);
+    SendableRegistry.addChild(m_drive, m_rightLeader);
+
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
     m_rightLeader.setInverted(true);
-
-    // You might need to not do this depending on the specific motor controller
-    // that you are using -- contact the respective vendor's documentation for
-    // more details.
-    m_rightFollower.setInverted(true);
 
     m_leftFollower.follow(m_leftLeader);
     m_rightFollower.follow(m_rightLeader);
