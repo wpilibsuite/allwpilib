@@ -39,7 +39,8 @@ class NTStringChooserModel : public StringChooserModel {
  private:
   nt::NetworkTableInstance m_inst;
   nt::StringSubscriber m_default;
-  nt::StringEntry m_selected;
+  nt::StringSubscriber m_selected;
+  nt::StringPublisher m_selectedPub;
   nt::StringSubscriber m_active;
   nt::StringArraySubscriber m_options;
 
