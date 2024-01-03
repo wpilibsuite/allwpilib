@@ -38,6 +38,15 @@ public interface MotorController {
   double get();
 
   /**
+   * Common interface for getting the current voltage of the motor controller.
+   *
+   * @return The current controller voltage output. Value is between -12V and 12V.
+   */
+  default double getVoltage() {
+    return get() * RobotController.getBatteryVoltage();
+  }
+
+  /**
    * Common interface for inverting direction of a motor controller.
    *
    * @param isInverted The state of inversion true is inverted.

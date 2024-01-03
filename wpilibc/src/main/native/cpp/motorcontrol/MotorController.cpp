@@ -12,3 +12,7 @@ void MotorController::SetVoltage(units::volt_t output) {
   // NOLINTNEXTLINE(bugprone-integer-division)
   Set(output / RobotController::GetBatteryVoltage());
 }
+
+units::volt_t MotorController::GetVoltage() const {
+  return Get() * RobotController::GetBatteryVoltage();
+}
