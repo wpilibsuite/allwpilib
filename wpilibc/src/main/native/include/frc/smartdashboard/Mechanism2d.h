@@ -56,6 +56,13 @@ class Mechanism2d : public nt::NTSendable,
               const Color8Bit& backgroundColor = {0, 0, 32});
 
   /**
+   * Get all roots in this Mechanism2d.
+   *
+   * @return a map with all the roots.
+   */
+  wpi::StringMap<std::unique_ptr<MechanismRoot2d>> GetAllRoots() const;
+
+  /**
    * Get or create a root in this Mechanism2d with the given name and
    * position.
    *
@@ -75,6 +82,27 @@ class Mechanism2d : public nt::NTSendable,
    * @param color the new background color
    */
   void SetBackgroundColor(const Color8Bit& color);
+
+  /**
+   * Get the Mechanism2d background color.
+   *
+   * @return the background color
+   */
+  std::string GetBackgroundColor() const;
+
+  /**
+   * Get the Mechanism2d width.
+   *
+   * @return the width
+   */
+  double GetWidth() const;
+
+  /**
+   * Get the Mechanism2d height.
+   *
+   * @return the height
+   */
+  double GetHeight() const;
 
   void InitSendable(nt::NTSendableBuilder& builder) override;
 

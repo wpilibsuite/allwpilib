@@ -81,6 +81,10 @@ class MechanismObject2d {
     return ex;
   }
 
+  wpi::StringMap<std::unique_ptr<MechanismObject2d>> GetObjects() {
+    return m_objects;
+  }
+
  private:
   std::string m_name;
   wpi::StringMap<std::unique_ptr<MechanismObject2d>> m_objects;

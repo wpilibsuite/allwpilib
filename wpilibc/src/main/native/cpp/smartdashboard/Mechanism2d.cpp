@@ -19,6 +19,10 @@ Mechanism2d::Mechanism2d(double width, double height,
   SetBackgroundColor(backgroundColor);
 }
 
+wpi::StringMap<std::unique_ptr<MechanismRoot2d>> Mechanism2d::GetAllRoots() const {
+  return m_roots;
+}
+
 MechanismRoot2d* Mechanism2d::GetRoot(std::string_view name, double x,
                                       double y) {
   auto& obj = m_roots[name];
@@ -38,6 +42,18 @@ void Mechanism2d::SetBackgroundColor(const Color8Bit& color) {
   if (m_colorPub) {
     m_colorPub.Set(m_color);
   }
+}
+
+std::string Mechanism2d::GetBackgroundColor() const {
+  return m_color;
+}
+
+double Mechanism2d::GetWidth() const {
+  return m_width;
+}
+
+double Mechanism2d::GetHeight() const {
+  return m_height;
 }
 
 void Mechanism2d::InitSendable(nt::NTSendableBuilder& builder) {

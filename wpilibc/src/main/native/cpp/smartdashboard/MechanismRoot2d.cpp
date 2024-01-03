@@ -19,6 +19,14 @@ void MechanismRoot2d::SetPosition(double x, double y) {
   Flush();
 }
 
+double MechanismRoot2d::GetX() {
+  return m_x;
+}
+
+double MechanismRoot2d::GetY() {
+  return m_y;
+}
+
 void MechanismRoot2d::UpdateEntries(std::shared_ptr<nt::NetworkTable> table) {
   m_xPub = table->GetDoubleTopic("x").Publish();
   m_yPub = table->GetDoubleTopic("y").Publish();
