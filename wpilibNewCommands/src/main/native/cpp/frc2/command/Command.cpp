@@ -9,7 +9,9 @@
 #include <wpi/sendable/SendableRegistry.h>
 
 #include "frc2/command/CommandHelper.h"
+#include "frc2/command/CommandPtr.h"
 #include "frc2/command/CommandScheduler.h"
+#include "frc2/command/Commands.h"
 #include "frc2/command/ConditionalCommand.h"
 #include "frc2/command/InstantCommand.h"
 #include "frc2/command/ParallelCommandGroup.h"
@@ -203,6 +205,18 @@ void Command::InitSendable(wpi::SendableBuilder& builder) {
       nullptr);
   builder.AddBooleanProperty(
       "runsWhenDisabled", [this] { return RunsWhenDisabled(); }, nullptr);
+}
+
+CommandPtr operator<<(Command *command, auto toRun) {
+  return command->AndThen(toRun);
+}
+
+CommandPtr operator|(CommandPtr command1, CommandPtr command2) {
+  return frc2::cmd::Parallel(std::move(command1), std::move(command2));
+}
+
+CommandPtr operator&(CommandPtr command1, CommandPtr command2) {
+  return frc2::cmd::Race(std::move(command1), std::move(command2));
 }
 
 namespace frc2 {
