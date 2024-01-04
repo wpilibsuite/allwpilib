@@ -15,6 +15,9 @@ public class CANData {
   /** CAN frame timestamp in milliseconds. */
   public long timestamp;
 
+  /** Default constructor. */
+  public CANData() {}
+
   /**
    * API used from JNI to set the data.
    *

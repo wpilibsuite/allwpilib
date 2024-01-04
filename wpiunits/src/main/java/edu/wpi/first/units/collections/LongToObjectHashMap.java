@@ -54,6 +54,9 @@ public class LongToObjectHashMap<V> {
   @SuppressWarnings("unchecked")
   private V[] m_values = (V[]) new Object[m_capacity];
 
+  /** Default constructor. */
+  public LongToObjectHashMap() {}
+
   /**
    * Puts a value {@code value} corresponding to key {@code key} in the map.
    *

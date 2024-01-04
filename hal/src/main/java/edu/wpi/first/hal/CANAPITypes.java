@@ -10,7 +10,8 @@ package edu.wpi.first.hal;
  * <p>This class defines enums for CAN device types and manufacturer IDs as specified in the WPILib
  * documentation: https://docs.wpilib.org/en/stable/docs/software/can-devices/can-addressing.html
  */
-public class CANAPITypes {
+@SuppressWarnings("PMD.MissingStaticMethodInNonInstantiatableClass")
+public final class CANAPITypes {
   /**
    * FRC CAN device type.
    *
@@ -80,4 +81,7 @@ public class CANAPITypes {
       this.id = id;
     }
   }
+
+  /** Utility class. */
+  private CANAPITypes() {}
 }

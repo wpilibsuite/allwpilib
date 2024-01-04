@@ -12,4 +12,7 @@ public class NIRioStatus {
   public static final int kRIOStatusOperationTimedOut = -52007;
   public static final int kRIOStatusFeatureNotSupported = kRioStatusOffset - 193;
   public static final int kRIOStatusResourceNotInitialized = -52010;
+
+  /** Default constructor. */
+  public NIRioStatus() {}
 }

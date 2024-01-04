@@ -41,6 +41,9 @@ public class DMASample {
 
   private final DMAJNISample m_dmaSample = new DMAJNISample();
 
+  /** Default constructor. */
+  public DMASample() {}
+
   public DMAReadStatus update(DMA dma, double timeoutSeconds) {
     return DMAReadStatus.getValue(m_dmaSample.update(dma.m_dmaHandle, timeoutSeconds));
   }
