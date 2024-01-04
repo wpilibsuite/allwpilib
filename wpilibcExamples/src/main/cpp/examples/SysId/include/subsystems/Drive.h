@@ -9,7 +9,6 @@
 #include <frc/Encoder.h>
 #include <frc/RobotController.h>
 #include <frc/drive/DifferentialDrive.h>
-#include <frc/motorcontrol/MotorControllerGroup.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc2/command/SubsystemBase.h>
 #include <frc2/command/sysid/SysIdRoutine.h>
@@ -26,17 +25,10 @@ class Drive : public frc2::SubsystemBase {
   frc2::CommandPtr SysIdDynamic(frc2::sysid::Direction direction);
 
  private:
-  frc::PWMSparkMax leftMotor1{constants::drive::kLeftMotor1Port};
-  frc::PWMSparkMax leftMotor2{constants::drive::kLeftMotor2Port};
-
-  frc::MotorControllerGroup m_leftMotors{leftMotor1, leftMotor2};
-
-  frc::PWMSparkMax rightMotor1{constants::drive::kRightMotor1Port};
-  frc::PWMSparkMax rightMotor2{constants::drive::kRightMotor2Port};
-
-  frc::MotorControllerGroup m_rightMotors{rightMotor1, rightMotor2};
-
-  frc::DifferentialDrive m_drive{m_leftMotors, m_rightMotors};
+  frc::PWMSparkMax m_leftMotor{constants::drive::kLeftMotor1Port};
+  frc::PWMSparkMax m_rightMotor{constants::drive::kRightMotor1Port};
+  frc::DifferentialDrive m_drive{[this](auto val) { m_leftMotor.Set(val); },
+                                 [this](auto val) { m_rightMotor.Set(val); }};
 
   frc::Encoder m_leftEncoder{constants::drive::kLeftEncoderPorts[0],
                              constants::drive::kLeftEncoderPorts[1],
@@ -55,19 +47,19 @@ class Drive : public frc2::SubsystemBase {
                           std::nullopt},
       frc2::sysid::Mechanism{
           [this](units::volt_t driveVoltage) {
-            m_leftMotors.SetVoltage(driveVoltage);
-            m_rightMotors.SetVoltage(driveVoltage);
+            m_leftMotor.SetVoltage(driveVoltage);
+            m_rightMotor.SetVoltage(driveVoltage);
           },
           [this](frc::sysid::MotorLog* log) {
             log->RecordFrameLinear(
-                m_appliedVoltage = m_leftMotors.Get() *
+                m_appliedVoltage = m_leftMotor.Get() *
                                    frc::RobotController::GetBatteryVoltage(),
                 m_distance = units::meter_t{m_leftEncoder.GetDistance()},
                 m_velocity =
                     units::meters_per_second_t{m_leftEncoder.GetRate()},
                 "drive-left");
             log->RecordFrameLinear(
-                m_appliedVoltage = m_rightMotors.Get() *
+                m_appliedVoltage = m_rightMotor.Get() *
                                    frc::RobotController::GetBatteryVoltage(),
                 m_distance = units::meter_t{m_rightEncoder.GetDistance()},
                 m_velocity =

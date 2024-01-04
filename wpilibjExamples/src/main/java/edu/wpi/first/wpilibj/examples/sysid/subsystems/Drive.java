@@ -17,7 +17,6 @@ import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.Constants.DriveConstants;
-import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj.sysid.MotorLog;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -27,19 +26,14 @@ import java.util.function.DoubleSupplier;
 
 public class Drive extends SubsystemBase {
   // The motors on the left side of the drive.
-  private final MotorControllerGroup m_leftMotors =
-      new MotorControllerGroup(
-          new PWMSparkMax(DriveConstants.kLeftMotor1Port),
-          new PWMSparkMax(DriveConstants.kLeftMotor2Port));
+  private final PWMSparkMax m_leftMotor = new PWMSparkMax(DriveConstants.kLeftMotor1Port);
 
   // The motors on the right side of the drive.
-  private final MotorControllerGroup m_rightMotors =
-      new MotorControllerGroup(
-          new PWMSparkMax(DriveConstants.kRightMotor1Port),
-          new PWMSparkMax(DriveConstants.kRightMotor2Port));
+  private final PWMSparkMax m_rightMotor = new PWMSparkMax(DriveConstants.kRightMotor1Port);
 
   // The robot's drive
-  private final DifferentialDrive m_drive = new DifferentialDrive(m_leftMotors, m_rightMotors);
+  private final DifferentialDrive m_drive =
+      new DifferentialDrive(m_leftMotor::set, m_rightMotor::set);
 
   // The left-side drive encoder
   private final Encoder m_leftEncoder =
@@ -70,8 +64,8 @@ public class Drive extends SubsystemBase {
           new SysIdRoutine.Mechanism(
               // Tell SysId how to plumb the driving voltage to the motors.
               (Measure<Voltage> volts) -> {
-                m_leftMotors.setVoltage(volts.in(Volts));
-                m_rightMotors.setVoltage(volts.in(Volts));
+                m_leftMotor.setVoltage(volts.in(Volts));
+                m_rightMotor.setVoltage(volts.in(Volts));
               },
               // Tell SysId how to record a frame of data for each motor on the mechanism being
               // characterized.
@@ -79,14 +73,14 @@ public class Drive extends SubsystemBase {
                 // Record a frame for the left motors.  Since these share an encoder, we consider
                 // the entire group to be one motor.
                 log.recordFrameLinear(
-                    m_appliedVoltage.mut_replace(m_leftMotors.getVoltage(), Volts),
+                    m_appliedVoltage.mut_replace(m_leftMotor.getVoltage(), Volts),
                     m_distance.mut_replace(m_leftEncoder.getDistance(), Meters),
                     m_velocity.mut_replace(m_leftEncoder.getRate(), MetersPerSecond),
                     "drive-left");
                 // Record a frame for the right motors.  Since these share an encoder, we consider
                 // the entire group to be one motor.
                 log.recordFrameLinear(
-                    m_appliedVoltage.mut_replace(m_rightMotors.getVoltage(), Volts),
+                    m_appliedVoltage.mut_replace(m_rightMotor.getVoltage(), Volts),
                     m_distance.mut_replace(m_rightEncoder.getDistance(), Meters),
                     m_velocity.mut_replace(m_rightEncoder.getRate(), MetersPerSecond),
                     "drive-right");
@@ -97,10 +91,14 @@ public class Drive extends SubsystemBase {
 
   /** Creates a new Drive subsystem. */
   public Drive() {
+    // Add the second motors on each side of the drivetrain
+    m_leftMotor.addFollower(new PWMSparkMax(DriveConstants.kLeftMotor2Port));
+    m_rightMotor.addFollower(new PWMSparkMax(DriveConstants.kRightMotor2Port));
+
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
-    m_rightMotors.setInverted(true);
+    m_rightMotor.setInverted(true);
 
     // Sets the distance per pulse for the encoders
     m_leftEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse);
