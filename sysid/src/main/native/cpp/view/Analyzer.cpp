@@ -390,8 +390,7 @@ void Analyzer::DisplayGraphs() {
 }
 
 void Analyzer::AnalyzeData() {
-  m_manager =
-      std::make_unique<AnalysisManager>(m_data, m_settings, m_logger);
+  m_manager = std::make_unique<AnalysisManager>(m_data, m_settings, m_logger);
   PrepareData();
   m_dataset = 0;
   ConfigParamsOnFileSelect();

@@ -95,8 +95,8 @@ class Analyzer : public glass::View {
    * Analyzes the selected data.
    */
   void AnalyzeData();
- private:
 
+ private:
   /**
    * Kills the data preparation thread
    */

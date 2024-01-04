@@ -118,8 +118,7 @@ void Application(std::string_view saveDir) {
   gDataSelectorWindow =
       gWindowManager->AddWindow("Data Selector", std::move(dataSelector));
 
-  gAnalyzerWindow = gWindowManager->AddWindow(
-      "Analyzer", std::move(analyzer));
+  gAnalyzerWindow = gWindowManager->AddWindow("Analyzer", std::move(analyzer));
 
   gProgramLogWindow = gWindowManager->AddWindow(
       "Program Log", std::make_unique<glass::LogView>(&gLog));

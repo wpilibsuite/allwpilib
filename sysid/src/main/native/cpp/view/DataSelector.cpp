@@ -4,16 +4,16 @@
 
 #include "sysid/view/DataSelector.h"
 
-#include <glass/support/DataLogReaderThread.h>
 #include <fmt/format.h>
+#include <glass/support/DataLogReaderThread.h>
 #include <imgui.h>
+#include <wpi/DataLogReader.h>
 #include <wpi/Logger.h>
 #include <wpi/StringExtras.h>
 
 #include "sysid/Util.h"
 #include "sysid/analysis/AnalysisType.h"
 #include "sysid/analysis/Storage.h"
-#include "wpi/DataLogReader.h"
 
 using namespace sysid;
 

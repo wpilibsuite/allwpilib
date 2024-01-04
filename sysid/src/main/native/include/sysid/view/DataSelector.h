@@ -37,7 +37,7 @@ class DataSelector : public glass::View {
    * @param logger The program logger
    */
   explicit DataSelector(glass::Storage& storage, wpi::Logger& logger)
-      /*: m_logger{logger}*/ {}
+  /*: m_logger{logger}*/ {}
 
   /**
    * Displays the log loader window.

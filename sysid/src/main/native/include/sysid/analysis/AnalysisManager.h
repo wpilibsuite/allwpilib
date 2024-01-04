@@ -17,6 +17,7 @@
 
 #include <units/time.h>
 #include <wpi/Logger.h>
+#include <wpi/StringMap.h>
 #include <wpi/json.h>
 
 #include "sysid/analysis/AnalysisType.h"
@@ -24,7 +25,6 @@
 #include "sysid/analysis/FeedbackControllerPreset.h"
 #include "sysid/analysis/FeedforwardAnalysis.h"
 #include "sysid/analysis/Storage.h"
-#include "wpi/StringMap.h"
 
 namespace sysid {
 
@@ -34,8 +34,8 @@ namespace sysid {
  */
 class AnalysisManager {
  public:
-  // This contains data for each test (e.g. quasistatic-forward, quasistatic-backward, etc)
-  // indexed by test name
+  // This contains data for each test (e.g. quasistatic-forward,
+  // quasistatic-backward, etc) indexed by test name
   TestData m_data;
   /**
    * Represents settings for an instance of the analysis manager. This contains
@@ -129,7 +129,8 @@ class AnalysisManager {
    * The keys (which contain sysid data) that are in the JSON to analyze.
    */
   static constexpr const char* kJsonDataKeys[] = {
-      "quasistatic-forward", "quasistatic-reverse", "dynamic-forward", "dynamic-reverse"};
+      "quasistatic-forward", "quasistatic-reverse", "dynamic-forward",
+      "dynamic-reverse"};
 
   /**
    * Concatenates a list of vectors. The contents of the source vectors are
@@ -170,8 +171,7 @@ class AnalysisManager {
    * @param settings The settings for this instance of the analysis manager.
    * @param logger   The logger instance to use for log data.
    */
-  AnalysisManager(TestData data, Settings& settings,
-                  wpi::Logger& logger);
+  AnalysisManager(TestData data, Settings& settings, wpi::Logger& logger);
 
   /**
    * Prepares data from the JSON and stores the output in Storage member
@@ -228,9 +228,7 @@ class AnalysisManager {
    *
    * @return A reference to the raw internal data.
    */
-  Storage& GetRawData() {
-    return m_rawDataset;
-  }
+  Storage& GetRawData() { return m_rawDataset; }
 
   /**
    * Returns a reference to the iterator of the currently selected filtered
@@ -239,18 +237,14 @@ class AnalysisManager {
    *
    * @return A reference to the filtered internal data.
    */
-  Storage& GetFilteredData() {
-    return m_filteredDataset;
-  }
+  Storage& GetFilteredData() { return m_filteredDataset; }
 
   /**
    * Returns the original dataset.
    *
    * @return The original (untouched) dataset
    */
-  Storage& GetOriginalData() {
-    return m_originalDataset;
-  }
+  Storage& GetOriginalData() { return m_originalDataset; }
 
   /**
    * Returns the minimum duration of the Step Voltage Test of the currently
@@ -301,9 +295,7 @@ class AnalysisManager {
     return m_startTimes;
   }
 
-  bool HasData() const {
-    return !m_originalDataset.empty();
-  }
+  bool HasData() const { return !m_originalDataset.empty(); }
 
  private:
   wpi::Logger& m_logger;

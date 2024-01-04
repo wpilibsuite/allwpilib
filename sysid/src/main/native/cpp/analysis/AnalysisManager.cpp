@@ -9,12 +9,12 @@
 
 #include <fmt/format.h>
 #include <units/angle.h>
+#include <wpi/MathExtras.h>
 #include <wpi/MemoryBuffer.h>
 #include <wpi/StringExtras.h>
 #include <wpi/StringMap.h>
 
 #include "sysid/analysis/FilteringUtils.h"
-#include "wpi/MathExtras.h"
 
 using namespace sysid;
 
@@ -66,9 +66,10 @@ static std::vector<PreparedData> ConvertToPrepared(const MotorData& data) {
 
     auto currentVelocity = Lerp(currentVoltage.time, run.velocity);
 
-    prepared.emplace_back(PreparedData{
-        currentVoltage.time, currentVoltage.measurement.value(), currentPosition,
-        currentVelocity, nextVoltage.time - currentVoltage.time});
+    prepared.emplace_back(PreparedData{currentVoltage.time,
+                                       currentVoltage.measurement.value(),
+                                       currentPosition, currentVelocity,
+                                       nextVoltage.time - currentVoltage.time});
   }
 
   return prepared;
@@ -128,7 +129,6 @@ void AnalysisManager::PrepareGeneralData() {
     WPI_INFO(m_logger, "SAMPLES {}", preparedData[key].size());
   }
 
-
   // Store the original datasets
   m_originalDataset =
       CombineDatasets(preparedData["original-raw-quasistatic-forward"],
@@ -149,16 +149,15 @@ void AnalysisManager::PrepareGeneralData() {
 
   WPI_INFO(m_logger, "{}", "Storing datasets.");
   // Store the raw datasets
-  m_rawDataset =
-      CombineDatasets(
-          preparedData["raw-quasistatic-forward"], preparedData["raw-quasistatic-reverse"],
-          preparedData["raw-dynamic-forward"], preparedData["raw-dynamic-reverse"]);
+  m_rawDataset = CombineDatasets(preparedData["raw-quasistatic-forward"],
+                                 preparedData["raw-quasistatic-reverse"],
+                                 preparedData["raw-dynamic-forward"],
+                                 preparedData["raw-dynamic-reverse"]);
 
   // Store the filtered datasets
-  m_filteredDataset =
-      CombineDatasets(
-          preparedData["quasistatic-forward"], preparedData["quasistatic-reverse"],
-          preparedData["dynamic-forward"], preparedData["dynamic-reverse"]);
+  m_filteredDataset = CombineDatasets(
+      preparedData["quasistatic-forward"], preparedData["quasistatic-reverse"],
+      preparedData["dynamic-forward"], preparedData["dynamic-reverse"]);
 
   m_startTimes = {preparedData["raw-quasistatic-forward"][0].timestamp,
                   preparedData["raw-quasistatic-reverse"][0].timestamp,
@@ -167,20 +166,18 @@ void AnalysisManager::PrepareGeneralData() {
 }
 
 AnalysisManager::AnalysisManager(Settings& settings, wpi::Logger& logger)
-    : m_logger{logger},
-      m_settings{settings} {}
+    : m_logger{logger}, m_settings{settings} {}
 
 AnalysisManager::AnalysisManager(TestData data, Settings& settings,
                                  wpi::Logger& logger)
     : m_data{std::move(data)}, m_logger{logger}, m_settings{settings} {
-
   // Reset settings for Dynamic Test Limits
   m_settings.stepTestDuration = units::second_t{0.0};
   m_settings.motionThreshold = std::numeric_limits<double>::infinity();
 }
 
 void AnalysisManager::PrepareData() {
-//  WPI_INFO(m_logger, "Preparing {} data", m_data.mechanismType.name);
+  //  WPI_INFO(m_logger, "Preparing {} data", m_data.mechanismType.name);
 
   PrepareGeneralData();
 
@@ -195,8 +192,9 @@ AnalysisManager::FeedforwardGains AnalysisManager::CalculateFeedforward() {
 
   WPI_INFO(m_logger, "{}", "Calculating Gains");
   // Calculate feedforward gains from the data.
-  const auto& ff = sysid::CalculateFeedforwardGains(GetFilteredData(), m_data.mechanismType, false);
-  FeedforwardGains ffGains = {ff };
+  const auto& ff = sysid::CalculateFeedforwardGains(
+      GetFilteredData(), m_data.mechanismType, false);
+  FeedforwardGains ffGains = {ff};
 
   const auto& Ks = ff.coeffs[0];
   const auto& Kv = ff.coeffs[1];
@@ -238,6 +236,4 @@ void AnalysisManager::OverrideUnits(std::string_view unit) {
   m_data.distanceUnit = unit;
 }
 
-void AnalysisManager::ResetUnitsFromJSON() {
-
-}
+void AnalysisManager::ResetUnitsFromJSON() {}
