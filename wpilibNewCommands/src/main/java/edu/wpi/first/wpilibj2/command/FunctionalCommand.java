@@ -18,10 +18,10 @@ import java.util.function.Consumer;
  * <p>This class is provided by the NewCommands VendorDep
  */
 public class FunctionalCommand extends Command {
-  protected final Runnable m_onInit;
-  protected final Runnable m_onExecute;
-  protected final Consumer<Boolean> m_onEnd;
-  protected final BooleanSupplier m_isFinished;
+  private final Runnable m_onInit;
+  private final Runnable m_onExecute;
+  private final Consumer<Boolean> m_onEnd;
+  private final BooleanSupplier m_isFinished;
 
   /**
    * Creates a new FunctionalCommand.
