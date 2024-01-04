@@ -211,6 +211,10 @@ CommandPtr operator<<(CommandPtr command, auto toRun) {
   return command.AndThen(toRun);
 }
 
+CommandPtr operator<<(Command* command, auto toRun) {
+  return command->AndThen(toRun);
+}
+
 CommandPtr operator|(CommandPtr command1, CommandPtr command2) {
   return frc2::cmd::Parallel(std::move(command1), std::move(command2));
 }
