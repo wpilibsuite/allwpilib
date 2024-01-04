@@ -67,6 +67,8 @@ class DataSelector : public glass::View {
   const glass::DataLogReaderEntry* m_velocityEntry = nullptr;
   const glass::DataLogReaderEntry* m_positionEntry = nullptr;
   const glass::DataLogReaderEntry* m_voltageEntry = nullptr;
+  double m_velocityScale = 1.0;
+  double m_positionScale = 1.0;
   int m_selectedUnit = 0;
   int m_selectedAnalysis = 0;
   std::future<TestData> m_testdataFuture;

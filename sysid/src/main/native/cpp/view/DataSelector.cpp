@@ -17,8 +17,7 @@
 
 using namespace sysid;
 
-static constexpr const char* kAnalysisTypes[] = { "Elevator",
-                                                 "Arm", "Simple"};
+static constexpr const char* kAnalysisTypes[] = {"Elevator", "Arm", "Simple"};
 
 static bool EmitEntryTarget(const char* name, bool isString,
                             const glass::DataLogReaderEntry** entry) {
@@ -126,6 +125,9 @@ void DataSelector::Display() {
   ImGui::SetNextItemWidth(ImGui::GetFontSize() * 7);
   ImGui::Combo("Units", &m_selectedUnit, kUnits, IM_ARRAYSIZE(kUnits));
 
+  ImGui::InputDouble("Velocity scaling", &m_velocityScale);
+  ImGui::InputDouble("Position scaling", &m_positionScale);
+
   if (/*!m_selectedTest.empty() &&*/ m_velocityEntry && m_positionEntry &&
       m_voltageEntry) {
     if (ImGui::Button("Load")) {
@@ -195,18 +197,19 @@ DataSelector::Tests DataSelector::LoadTests(
 
 template <typename T>
 static void AddSample(std::vector<MotorData::Run::Sample<T>>& samples,
-                      const wpi::log::DataLogRecord& record, bool isDouble) {
+                      const wpi::log::DataLogRecord& record, bool isDouble,
+                      double scale) {
   if (isDouble) {
     double val;
     if (record.GetDouble(&val)) {
       samples.emplace_back(units::second_t{record.GetTimestamp() * 1.0e-6},
-                           T{val});
+                           T{val * scale});
     }
   } else {
     float val;
     if (record.GetFloat(&val)) {
       samples.emplace_back(units::second_t{record.GetTimestamp() * 1.0e-6},
-                           T{static_cast<double>(val)});
+                           T{static_cast<double>(val * scale)});
     }
   }
 }
@@ -226,11 +229,11 @@ TestData DataSelector::BuildTestData() {
         auto& run = motorData.runs.emplace_back();
         for (auto&& record : range) {
           if (record.GetEntry() == m_voltageEntry->entry) {
-            AddSample(run.voltage, record, voltageDouble);
+            AddSample(run.voltage, record, voltageDouble, 1.0);
           } else if (record.GetEntry() == m_positionEntry->entry) {
-            AddSample(run.position, record, positionDouble);
+            AddSample(run.position, record, positionDouble, m_positionScale);
           } else if (record.GetEntry() == m_velocityEntry->entry) {
-            AddSample(run.velocity, record, velocityDouble);
+            AddSample(run.velocity, record, velocityDouble, m_velocityScale);
           }
         }
       }
