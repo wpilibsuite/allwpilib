@@ -11,9 +11,13 @@ import edu.wpi.first.math.MathSharedStore;
  * baseline for a specified period of time before the filtered value changes.
  */
 public class Debouncer {
+  /** Type of debouncing to perform. */
   public enum DebounceType {
+    /** Rising edge. */
     kRising,
+    /** Falling edge. */
     kFalling,
+    /** Both rising and falling edges. */
     kBoth
   }
 

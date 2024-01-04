@@ -315,7 +315,13 @@ public final class TrajectoryParameterizer {
     }
   }
 
+  /** Exception for trajectory generation failure. */
   public static class TrajectoryGenerationException extends RuntimeException {
+    /**
+     * Constructs a TrajectoryGenerationException.
+     *
+     * @param message Exception message.
+     */
     public TrajectoryGenerationException(String message) {
       super(message);
     }

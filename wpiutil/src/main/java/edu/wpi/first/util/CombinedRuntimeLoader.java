@@ -16,11 +16,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+/** Loads dynamic libraries for all platforms. */
 public final class CombinedRuntimeLoader {
   private CombinedRuntimeLoader() {}
 
   private static String extractionDirectory;
 
+  /**
+   * Returns library extraction directory.
+   *
+   * @return Library extraction directory.
+   */
   public static synchronized String getExtractionDirectory() {
     return extractionDirectory;
   }
@@ -29,6 +35,12 @@ public final class CombinedRuntimeLoader {
     extractionDirectory = directory;
   }
 
+  /**
+   * Sets DLL directory.
+   *
+   * @param directory Directory.
+   * @return DLL directory.
+   */
   public static native String setDllDirectory(String directory);
 
   private static String getLoadErrorMessage(String libraryName, UnsatisfiedLinkError ule) {

@@ -864,8 +864,13 @@ class Color {
          wpi::hexdigit(b % 16)}};
   }
 
+  /// Red component (0-1).
   double red = 0.0;
+
+  /// Green component (0-1).
   double green = 0.0;
+
+  /// Blue component (0-1).
   double blue = 0.0;
 
  private:

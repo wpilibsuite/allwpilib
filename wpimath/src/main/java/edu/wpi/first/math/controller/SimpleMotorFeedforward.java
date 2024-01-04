@@ -10,8 +10,13 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 
 /** A helper class that computes feedforward outputs for a simple permanent-magnet DC motor. */
 public class SimpleMotorFeedforward {
+  /** The static gain. */
   public final double ks;
+
+  /** The velocity gain. */
   public final double kv;
+
+  /** The acceleration gain. */
   public final double ka;
 
   /**

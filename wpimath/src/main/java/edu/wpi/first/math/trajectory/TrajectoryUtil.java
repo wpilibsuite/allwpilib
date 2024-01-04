@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+/** Trajectory utilities. */
 public final class TrajectoryUtil {
   private TrajectoryUtil() {
     throw new UnsupportedOperationException("This is a utility class!");
@@ -111,7 +112,13 @@ public final class TrajectoryUtil {
     return WPIMathJNI.serializeTrajectory(getElementsFromTrajectory(trajectory));
   }
 
+  /** Exception for trajectory serialization failure. */
   public static class TrajectorySerializationException extends RuntimeException {
+    /**
+     * Constructs a TrajectorySerializationException.
+     *
+     * @param message The exception message.
+     */
     public TrajectorySerializationException(String message) {
       super(message);
     }

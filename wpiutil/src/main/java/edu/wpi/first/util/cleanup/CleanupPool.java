@@ -16,6 +16,9 @@ public class CleanupPool implements AutoCloseable {
   // state ArrayDeque is faster anyway.
   private final Deque<AutoCloseable> m_closers = new ArrayDeque<>();
 
+  /** Default constructor. */
+  public CleanupPool() {}
+
   /**
    * Registers an object in the object stack for cleanup.
    *

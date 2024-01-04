@@ -267,4 +267,7 @@ public class DataLogJNI extends WPIUtilJNI {
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
   static native void appendStringArray(long impl, int entry, String[] value, long timestamp);
+
+  /** Utility class. */
+  private DataLogJNI() {}
 }

@@ -13,11 +13,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
+/**
+ * This class incorporates time-delayed measurements into a Kalman filter's state estimate.
+ *
+ * @param <S> The number of states.
+ * @param <I> The number of inputs.
+ * @param <O> The number of outputs.
+ */
 public class KalmanFilterLatencyCompensator<S extends Num, I extends Num, O extends Num> {
   private static final int kMaxPastObserverStates = 300;
 
   private final List<Map.Entry<Double, ObserverSnapshot>> m_pastObserverSnapshots;
 
+  /** Default constructor. */
   KalmanFilterLatencyCompensator() {
     m_pastObserverSnapshots = new ArrayList<>();
   }
@@ -164,9 +172,16 @@ public class KalmanFilterLatencyCompensator<S extends Num, I extends Num, O exte
 
   /** This class contains all the information about our observer at a given time. */
   public class ObserverSnapshot {
+    /** The state estimate. */
     public final Matrix<S, N1> xHat;
+
+    /** The error covariance. */
     public final Matrix<S, S> errorCovariances;
+
+    /** The inputs. */
     public final Matrix<I, N1> inputs;
+
+    /** The local measurements. */
     public final Matrix<O, N1> localMeasurements;
 
     private ObserverSnapshot(

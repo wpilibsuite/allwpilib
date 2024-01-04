@@ -17,18 +17,31 @@ namespace wpi::structparser {
  * A lexed raw struct schema token.
  */
 struct Token {
+  /** A lexed raw struct schema token kind. */
   enum Kind {
+    /// Unknown.
     kUnknown,
+    /// Integer.
     kInteger,
+    /// Identifier.
     kIdentifier,
+    /// Left square bracket.
     kLeftBracket,
+    /// Right square bracket.
     kRightBracket,
+    /// Left curly brace.
     kLeftBrace,
+    /// Right curly brace.
     kRightBrace,
+    /// Colon.
     kColon,
+    /// Semicolon.
     kSemicolon,
+    /// Comma.
     kComma,
+    /// Equals.
     kEquals,
+    /// End of input.
     kEndOfInput,
   };
 

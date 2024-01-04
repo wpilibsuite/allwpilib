@@ -41,6 +41,7 @@ class WaitCommand : public CommandHelper<Command, WaitCommand> {
   void InitSendable(wpi::SendableBuilder& builder) override;
 
  protected:
+  /// The timer used for waiting.
   frc::Timer m_timer;
 
  private:

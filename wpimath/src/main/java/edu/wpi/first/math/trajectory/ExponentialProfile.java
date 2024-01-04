@@ -39,10 +39,20 @@ import java.util.Objects;
 public class ExponentialProfile {
   private final Constraints m_constraints;
 
+  /** Profile timing. */
   public static class ProfileTiming {
+    /** Profile inflection time. */
     public final double inflectionTime;
+
+    /** Total profile time. */
     public final double totalTime;
 
+    /**
+     * Constructs a ProfileTiming.
+     *
+     * @param inflectionTime Profile inflection time.
+     * @param totalTime Total profile time.
+     */
     protected ProfileTiming(double inflectionTime, double totalTime) {
       this.inflectionTime = inflectionTime;
       this.totalTime = totalTime;
@@ -55,14 +65,19 @@ public class ExponentialProfile {
      * @return if the profile is finished at time t.
      */
     public boolean isFinished(double t) {
-      return t > inflectionTime;
+      return t >= inflectionTime;
     }
   }
 
+  /** Profile constraints. */
   public static class Constraints {
+    /** Maximum unsigned input voltage. */
     public final double maxInput;
 
+    /** The State-Space 1x1 system matrix. */
     public final double A;
+
+    /** The State-Space 1x1 input matrix. */
     public final double B;
 
     /**
@@ -112,11 +127,15 @@ public class ExponentialProfile {
     }
   }
 
+  /** Profile state. */
   public static class State {
+    /** The position at this state. */
     public double position;
 
+    /** The velocity at this state. */
     public double velocity;
 
+    /** Default constructor. */
     public State() {}
 
     /**

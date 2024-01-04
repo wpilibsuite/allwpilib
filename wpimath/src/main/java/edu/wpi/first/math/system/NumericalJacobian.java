@@ -11,6 +11,7 @@ import edu.wpi.first.math.numbers.N1;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+/** Numerical Jacobian utilities. */
 public final class NumericalJacobian {
   private NumericalJacobian() {
     // Utility Class.

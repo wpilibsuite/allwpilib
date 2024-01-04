@@ -6,6 +6,7 @@ package edu.wpi.first.math;
 
 import edu.wpi.first.util.WPIUtilJNI;
 
+/** Storage for MathShared object. */
 public final class MathSharedStore {
   private static MathShared mathShared;
 

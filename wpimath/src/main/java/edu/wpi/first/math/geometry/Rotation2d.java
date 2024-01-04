@@ -275,6 +275,9 @@ public class Rotation2d
     return plus(endValue.minus(this).times(MathUtil.clamp(t, 0, 1)));
   }
 
-  public static final Rotation2dStruct struct = new Rotation2dStruct();
+  /** Rotation2d protobuf for serialization. */
   public static final Rotation2dProto proto = new Rotation2dProto();
+
+  /** Rotation2d struct for serialization. */
+  public static final Rotation2dStruct struct = new Rotation2dStruct();
 }

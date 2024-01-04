@@ -8,6 +8,18 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Num;
 import edu.wpi.first.math.numbers.N1;
 
+/**
+ * A plant defined using state-space notation.
+ *
+ * <p>A plant is a mathematical model of a system's dynamics.
+ *
+ * <p>For more on the underlying math, read
+ * https://file.tavsys.net/control/controls-engineering-in-frc.pdf.
+ *
+ * @param <States> Number of states.
+ * @param <Inputs> Number of inputs.
+ * @param <Outputs> Number of outputs.
+ */
 public class LinearSystem<States extends Num, Inputs extends Num, Outputs extends Num> {
   /** Continuous system matrix. */
   private final Matrix<States, States> m_A;

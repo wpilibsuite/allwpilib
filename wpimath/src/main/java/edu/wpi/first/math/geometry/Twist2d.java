@@ -26,6 +26,7 @@ public class Twist2d implements ProtobufSerializable, StructSerializable {
   /** Angular "dtheta" component (radians). */
   public double dtheta;
 
+  /** Default constructor. */
   public Twist2d() {}
 
   /**
@@ -67,6 +68,9 @@ public class Twist2d implements ProtobufSerializable, StructSerializable {
     return Objects.hash(dx, dy, dtheta);
   }
 
-  public static final Twist2dStruct struct = new Twist2dStruct();
+  /** Twist2d protobuf for serialization. */
   public static final Twist2dProto proto = new Twist2dProto();
+
+  /** Twist2d struct for serialization. */
+  public static final Twist2dStruct struct = new Twist2dStruct();
 }

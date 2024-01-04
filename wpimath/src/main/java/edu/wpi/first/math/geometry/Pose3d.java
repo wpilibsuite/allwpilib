@@ -323,6 +323,9 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
     }
   }
 
-  public static final Pose3dStruct struct = new Pose3dStruct();
+  /** Pose3d protobuf for serialization. */
   public static final Pose3dProto proto = new Pose3dProto();
+
+  /** Pose3d struct for serialization. */
+  public static final Pose3dStruct struct = new Pose3dStruct();
 }

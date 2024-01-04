@@ -56,6 +56,7 @@ public final class SplineParameterizer {
     }
   }
 
+  /** Exception for malformed splines. */
   public static class MalformedSplineException extends RuntimeException {
     /**
      * Create a new exception with the given message.

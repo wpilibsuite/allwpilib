@@ -12,8 +12,13 @@
 
 namespace frc {
 
+/**
+ * Loadable AprilTag field layouts.
+ */
 enum class AprilTagField {
+  /// 2022 Rapid React.
   k2022RapidReact,
+  /// 2023 Charged Up.
   k2023ChargedUp,
 
   // This is a placeholder for denoting the last supported field. This should

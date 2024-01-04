@@ -44,8 +44,11 @@ import java.util.Optional;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class AprilTagFieldLayout {
+  /** Common origin positions for the AprilTag coordinate system. */
   public enum OriginPosition {
+    /** Blue alliance wall, right side. */
     kBlueAllianceWallRightSide,
+    /** Red alliance wall, right side. */
     kRedAllianceWallRightSide,
   }
 

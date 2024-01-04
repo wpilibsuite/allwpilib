@@ -17,6 +17,9 @@ import java.util.TreeMap;
 public class InterpolatingMatrixTreeMap<K extends Number, R extends Num, C extends Num> {
   private final TreeMap<K, Matrix<R, C>> m_map = new TreeMap<>();
 
+  /** Default constructor. */
+  public InterpolatingMatrixTreeMap() {}
+
   /**
    * Inserts a key-value pair.
    *

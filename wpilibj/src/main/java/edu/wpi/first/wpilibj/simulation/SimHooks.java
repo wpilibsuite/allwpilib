@@ -6,6 +6,7 @@ package edu.wpi.first.wpilibj.simulation;
 
 import edu.wpi.first.hal.simulation.SimulatorJNI;
 
+/** Simulation hooks. */
 public final class SimHooks {
   private SimHooks() {}
 

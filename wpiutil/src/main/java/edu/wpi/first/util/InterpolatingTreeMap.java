@@ -18,6 +18,9 @@ import java.util.TreeMap;
 public class InterpolatingTreeMap<K extends Number, V extends Number> {
   private final TreeMap<K, V> m_map = new TreeMap<>();
 
+  /** Default constructor. */
+  public InterpolatingTreeMap() {}
+
   /**
    * Inserts a key-value pair.
    *

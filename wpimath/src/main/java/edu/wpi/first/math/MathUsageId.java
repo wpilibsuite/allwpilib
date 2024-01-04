@@ -4,15 +4,35 @@
 
 package edu.wpi.first.math;
 
+/** WPIMath usage reporting IDs. */
 public enum MathUsageId {
+  /** DifferentialDriveKinematics. */
   kKinematics_DifferentialDrive,
+
+  /** MecanumDriveKinematics. */
   kKinematics_MecanumDrive,
+
+  /** SwerveDriveKinematics. */
   kKinematics_SwerveDrive,
+
+  /** TrapezoidProfile. */
   kTrajectory_TrapezoidProfile,
+
+  /** LinearFilter. */
   kFilter_Linear,
+
+  /** DifferentialDriveOdometry. */
   kOdometry_DifferentialDrive,
+
+  /** SwerveDriveOdometry. */
   kOdometry_SwerveDrive,
+
+  /** MecanumDriveOdometry. */
   kOdometry_MecanumDrive,
+
+  /** PIDController. */
   kController_PIDController2,
+
+  /** ProfiledPIDController. */
   kController_ProfiledPIDController,
 }

@@ -250,6 +250,9 @@ public class Translation2d
         MathUtil.interpolate(this.getY(), endValue.getY(), t));
   }
 
-  public static final Translation2dStruct struct = new Translation2dStruct();
+  /** Translation2d protobuf for serialization. */
   public static final Translation2dProto proto = new Translation2dProto();
+
+  /** Translation2d struct for serialization. */
+  public static final Translation2dStruct struct = new Translation2dStruct();
 }

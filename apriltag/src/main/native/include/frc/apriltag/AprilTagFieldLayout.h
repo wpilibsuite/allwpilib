@@ -38,8 +38,13 @@ namespace frc {
  * towards the opposing alliance). */
 class WPILIB_DLLEXPORT AprilTagFieldLayout {
  public:
+  /**
+   * Common origin positions for the AprilTag coordinate system.
+   */
   enum class OriginPosition {
+    /// Blue alliance wall, right side.
     kBlueAllianceWallRightSide,
+    /// Red alliance wall, right side.
     kRedAllianceWallRightSide,
   };
 

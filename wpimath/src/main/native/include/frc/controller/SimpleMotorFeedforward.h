@@ -160,8 +160,13 @@ class SimpleMotorFeedforward {
     return MaxAchievableAcceleration(-maxVoltage, velocity);
   }
 
+  /** The static gain. */
   const units::volt_t kS;
+
+  /** The velocity gain. */
   const units::unit_t<kv_unit> kV;
+
+  /** The acceleration gain. */
   const units::unit_t<ka_unit> kA;
 };
 }  // namespace frc

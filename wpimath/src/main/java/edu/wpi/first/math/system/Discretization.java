@@ -9,6 +9,7 @@ import edu.wpi.first.math.Num;
 import edu.wpi.first.math.Pair;
 import org.ejml.simple.SimpleMatrix;
 
+/** Discretization helper functions. */
 public final class Discretization {
   private Discretization() {
     // Utility class

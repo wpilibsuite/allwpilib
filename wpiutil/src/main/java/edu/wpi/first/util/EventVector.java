@@ -13,6 +13,9 @@ public class EventVector {
   private final ReentrantLock m_lock = new ReentrantLock();
   private final List<Integer> m_events = new ArrayList<>();
 
+  /** Default constructor. */
+  public EventVector() {}
+
   /**
    * Adds an event to the event vector.
    *
