@@ -10,6 +10,7 @@ import edu.wpi.first.util.WPISerializable;
  * Marker interface to indicate a class is serializable using Protobuf serialization.
  *
  * <p>While this cannot be enforced by the interface, any class implementing this interface should
- * provide a public final static `proto` member variable.
+ * provide a public final static `proto` member variable, or a static final `getProto()` method if
+ * the class is generic.
  */
 public interface ProtobufSerializable extends WPISerializable {}
