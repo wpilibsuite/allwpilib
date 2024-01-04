@@ -54,8 +54,14 @@ void WebSocketConnection::Stream::write_impl(const char* data, size_t len) {
     // flush_nonempty() case
     m_conn.m_bufs.back().len = len;
     if (!m_disableAlloc) {
+#ifdef NT_ENABLE_WS_FRAG
       m_conn.m_frames.back().opcode &= ~wpi::WebSocket::kFlagFin;
       m_conn.StartFrame(wpi::WebSocket::Frame::kFragment);
+#else
+      m_conn.m_bufs.emplace_back(m_conn.AllocBuf());
+      m_conn.m_bufs.back().len = 0;
+      ++m_conn.m_frames.back().end;
+#endif
       SetBuffer(m_conn.m_bufs.back().base, kAllocSize);
     }
     return;
@@ -76,9 +82,15 @@ void WebSocketConnection::Stream::write_impl(const char* data, size_t len) {
       len -= amt;
     }
     if (buf.len >= kAllocSize && (len > 0 || !m_disableAlloc)) {
+#ifdef NT_ENABLE_WS_FRAG
       // fragment the current frame and start a new one
       m_conn.m_frames.back().opcode &= ~wpi::WebSocket::kFlagFin;
       m_conn.StartFrame(wpi::WebSocket::Frame::kFragment);
+#else
+      m_conn.m_bufs.emplace_back(m_conn.AllocBuf());
+      m_conn.m_bufs.back().len = 0;
+      ++m_conn.m_frames.back().end;
+#endif
       updateBuffer = true;
     }
   }
