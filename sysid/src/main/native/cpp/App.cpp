@@ -104,8 +104,13 @@ void Application(std::string_view saveDir) {
 
   auto logLoader = std::make_unique<sysid::LogLoader>(storage, gLogger);
   auto dataSelector = std::make_unique<sysid::DataSelector>(storage, gLogger);
+  auto analyzer = std::make_unique<sysid::Analyzer>(storage, gLogger);
 
   logLoader->unload.connect([ds = dataSelector.get()] { ds->Reset(); });
+  dataSelector->testdata = [_analyzer = analyzer.get()](auto data) {
+    _analyzer->m_data = data;
+    _analyzer->AnalyzeData();
+  };
 
   gLogLoaderWindow =
       gWindowManager->AddWindow("Log Loader", std::move(logLoader));
@@ -114,7 +119,7 @@ void Application(std::string_view saveDir) {
       gWindowManager->AddWindow("Data Selector", std::move(dataSelector));
 
   gAnalyzerWindow = gWindowManager->AddWindow(
-      "Analyzer", std::make_unique<sysid::Analyzer>(storage, gLogger));
+      "Analyzer", std::move(analyzer));
 
   gProgramLogWindow = gWindowManager->AddWindow(
       "Program Log", std::make_unique<glass::LogView>(&gLog));
