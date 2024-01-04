@@ -109,6 +109,9 @@ public class SendableBuilderImpl implements NTSendableBuilder {
 
   private final List<AutoCloseable> m_closeables = new ArrayList<>();
 
+  /** Default constructor. */
+  public SendableBuilderImpl() {}
+
   @Override
   @SuppressWarnings("PMD.AvoidCatchingGenericException")
   public void close() {

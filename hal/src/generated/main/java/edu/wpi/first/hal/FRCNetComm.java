@@ -9,7 +9,7 @@ package edu.wpi.first.hal;
 /**
  * JNI wrapper for library <b>FRC_NetworkCommunication</b><br>.
  */
-public class FRCNetComm {
+public final class FRCNetComm {
   /**
    * Resource type from UsageReporting.
    */
@@ -367,4 +367,7 @@ public class FRCNetComm {
     /** kOdometry_SwerveDrive = 3. */
     public static final int kOdometry_SwerveDrive = 3;
   }
+
+  /** Utility class. */
+  private FRCNetComm() {}
 }

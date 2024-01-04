@@ -17,6 +17,9 @@ public class CANStreamMessage {
   @SuppressWarnings("MemberName")
   public int messageID;
 
+  /** Default constructor. */
+  public CANStreamMessage() {}
+
   /**
    * API used from JNI to set the data.
    *
