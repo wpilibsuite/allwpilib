@@ -22,18 +22,31 @@ public class CANAPITypes {
    *     Device Types</a>
    */
   public enum CANDeviceType {
+    /** kBroadcast = 0. */
     kBroadcast(0),
+    /** kRobotController = 1. */
     kRobotController(1),
+    /** kMotorController = 2. */
     kMotorController(2),
+    /** kRelayController = 3. */
     kRelayController(3),
+    /** kGyroSensor = 4. */
     kGyroSensor(4),
+    /** kAccelerometer = 5. */
     kAccelerometer(5),
+    /** kUltrasonicSensor = 6. */
     kUltrasonicSensor(6),
+    /** kGearToothSensor = 7. */
     kGearToothSensor(7),
+    /** kPowerDistribution = 8. */
     kPowerDistribution(8),
+    /** kPneumatics = 9. */
     kPneumatics(9),
+    /** kMiscellaneous = 10. */
     kMiscellaneous(10),
+    /** kIOBreakout = 11. */
     kIOBreakout(11),
+    /** kFirmwareUpdate = 31. */
     kFirmwareUpdate(31);
 
     @SuppressWarnings("PMD.MemberName")
@@ -55,22 +68,39 @@ public class CANAPITypes {
    *     Manufacturer IDs</a>
    */
   public enum CANManufacturer {
+    /** kBroadcast = 0. */
     kBroadcast(0),
+    /** National Instruments = 1. */
     kNI(1),
+    /** Luminary Micro = 2. */
     kLM(2),
+    /** DEKA Research and Development Corp = 3. */
     kDEKA(3),
+    /** Cross the Road Electronics = 4. */
     kCTRE(4),
+    /** REV robotics = 5. */
     kREV(5),
+    /** kGrapple = 6. */
     kGrapple(6),
+    /** MindSensors = 7. */
     kMS(7),
+    /** kTeamUse = 8. */
     kTeamUse(8),
+    /** kKauaiLabs = 9. */
     kKauaiLabs(9),
+    /** kCopperforge = 10. */
     kCopperforge(10),
+    /** Playing With Fusion = 11. */
     kPWF(11),
+    /** kStudica = 12. */
     kStudica(12),
+    /** kTheThriftyBot = 13. */
     kTheThriftyBot(13),
+    /** kReduxRobotics = 14. */
     kReduxRobotics(14),
+    /** kAndyMark = 15. */
     kAndyMark(15),
+    /** kVividHosting = 16. */
     kVividHosting(16);
 
     @SuppressWarnings("PMD.MemberName")

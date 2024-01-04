@@ -44,9 +44,13 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
 
   /** The state to drive a Relay to. */
   public enum Value {
+    /** Relay kOff. */
     kOff("Off"),
+    /** Relay kOn. */
     kOn("On"),
+    /** Relay kForward. */
     kForward("Forward"),
+    /** Relay kReverse. */
     kReverse("Reverse");
 
     private final String m_prettyValue;

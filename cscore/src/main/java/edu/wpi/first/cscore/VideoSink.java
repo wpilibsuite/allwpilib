@@ -9,10 +9,15 @@ package edu.wpi.first.cscore;
  * (e.g. from a stereo or depth camera); these are called channels.
  */
 public class VideoSink implements AutoCloseable {
+  /** Video sink types. */
   public enum Kind {
+    /** Unknown video sink type. */
     kUnknown(0),
+    /** Mjpeg video sink. */
     kMjpeg(2),
+    /** CV video sink. */
     kCv(4),
+    /** Raw video sink. */
     kRaw(8);
 
     private final int value;

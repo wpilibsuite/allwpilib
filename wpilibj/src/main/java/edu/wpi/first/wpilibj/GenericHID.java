@@ -21,28 +21,49 @@ import java.util.Map;
 public class GenericHID {
   /** Represents a rumble output on the JoyStick. */
   public enum RumbleType {
+    /** Left rumble motor. */
     kLeftRumble,
+    /** Right rumble motor. */
     kRightRumble,
+    /** Both left and right rumble motor. */
     kBothRumble
   }
 
+  /** USB HID interface type */
   public enum HIDType {
+    /** kUnknown = -1. */
     kUnknown(-1),
+    /** kXInputUnknown = 0. */
     kXInputUnknown(0),
+    /** kXInputGamepad = 1. */
     kXInputGamepad(1),
+    /** kXInputWheel = 2. */
     kXInputWheel(2),
+    /** kXInputArcadeStick = 3. */
     kXInputArcadeStick(3),
+    /** kXInputFlightStick = 4. */
     kXInputFlightStick(4),
+    /** kXInputDancePad = 5. */
     kXInputDancePad(5),
+    /** kXInputGuitar = 6. */
     kXInputGuitar(6),
+    /** kXInputGuitar2 = 7. */
     kXInputGuitar2(7),
+    /** kXInputDrumKit = 8. */
     kXInputDrumKit(8),
+    /** kXInputGuitar3 = 11. */
     kXInputGuitar3(11),
+    /** kXInputArcadePad = 19. */
     kXInputArcadePad(19),
+    /** kHIDJoystick = 20. */
     kHIDJoystick(20),
+    /** kHIDGamepad = 21. */
     kHIDGamepad(21),
+    /** kHIDDriving = 22. */
     kHIDDriving(22),
+    /** kHIDFlight = 23. */
     kHIDFlight(23),
+    /** kHID1stPerson = 24. */
     kHID1stPerson(24);
 
     public final int value;

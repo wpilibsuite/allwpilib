@@ -24,8 +24,11 @@ public class PowerDistribution implements Sendable, AutoCloseable {
 
   public static final int kDefaultModule = PowerDistributionJNI.DEFAULT_MODULE;
 
+  /** Power distribution module type. */
   public enum ModuleType {
+    /** CTRE (Cross The Road Electronics) CTRE Power Distribution Panel (PDP). */
     kCTRE(PowerDistributionJNI.CTRE_TYPE),
+    /** REV Power Distribution Hub (PDH). */
     kRev(PowerDistributionJNI.REV_TYPE);
 
     public final int value;

@@ -73,6 +73,7 @@ public final class DriverStation {
     Blue
   }
 
+  /** The type of robot match that the robot is part of. */
   public enum MatchType {
     None,
     Practice,

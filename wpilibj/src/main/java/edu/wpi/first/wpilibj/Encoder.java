@@ -29,10 +29,15 @@ import edu.wpi.first.util.sendable.SendableRegistry;
  * before use.
  */
 public class Encoder implements CounterBase, Sendable, AutoCloseable {
+  /** Encoder indexing types. */
   public enum IndexingType {
+    /** Reset while the signal is high. */
     kResetWhileHigh(0),
+    /** Reset while the signal is low. */
     kResetWhileLow(1),
+    /** Reset on falling edge of the signal */
     kResetOnFallingEdge(2),
+    /** Reset on rising edge of the signal. */
     kResetOnRisingEdge(3);
 
     public final int value;

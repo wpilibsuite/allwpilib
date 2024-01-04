@@ -12,10 +12,15 @@ import edu.wpi.first.util.PixelFormat;
  */
 public class VideoSource implements AutoCloseable {
   public enum Kind {
+    /** Unknown video source = 0. */
     kUnknown(0),
+    /** USB video source = 1. */
     kUsb(1),
+    /** Http video source = 2. */
     kHttp(2),
+    /** Cv video source = 4. */
     kCv(4),
+    /** Raw video source = 8. */
     kRaw(8);
 
     private final int value;

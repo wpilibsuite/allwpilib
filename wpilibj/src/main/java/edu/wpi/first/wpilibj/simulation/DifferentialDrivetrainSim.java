@@ -369,10 +369,15 @@ public class DifferentialDrivetrainSim {
    * and 16:48 8.45:1 -- 14:50 and 19:45 7.31:1 -- 14:50 and 21:43 5.95:1 -- 14:50 and 24:40
    */
   public enum KitbotGearing {
+    /** Gear ratio of 12.75:1. */
     k12p75(12.75),
+    /** Gear ratio of 10.71:1. */
     k10p71(10.71),
+    /** Gear ratio of 8.45:1. */
     k8p45(8.45),
+    /** Gear ratio of 7.31:1. */
     k7p31(7.31),
+    /** Gear ratio of 5.95:1. */
     k5p95(5.95);
 
     public final double value;
@@ -384,13 +389,21 @@ public class DifferentialDrivetrainSim {
 
   /** Represents common motor layouts of the kit drivetrain. */
   public enum KitbotMotor {
+    /** One CIM motor per drive side. */
     kSingleCIMPerSide(DCMotor.getCIM(1)),
+    /** Two CIM motors per drive side. */
     kDualCIMPerSide(DCMotor.getCIM(2)),
+    /** One Mini CIM motor per drive side. */
     kSingleMiniCIMPerSide(DCMotor.getMiniCIM(1)),
+    /** Two Mini CIM motors per drive side. */
     kDualMiniCIMPerSide(DCMotor.getMiniCIM(2)),
+    /** One Falcon 500 motor per drive side. */
     kSingleFalcon500PerSide(DCMotor.getFalcon500(1)),
+    /** Two Falcon 500 motors per drive side. */
     kDoubleFalcon500PerSide(DCMotor.getFalcon500(2)),
+    /** One NEO motor per drive side. */
     kSingleNEOPerSide(DCMotor.getNEO(1)),
+    /** Two NEO motors per drive side. */
     kDoubleNEOPerSide(DCMotor.getNEO(2));
 
     public final DCMotor value;
@@ -402,8 +415,11 @@ public class DifferentialDrivetrainSim {
 
   /** Represents common wheel sizes of the kit drivetrain. */
   public enum KitbotWheelSize {
+    /** Six inch diameter wheels */
     kSixInch(Units.inchesToMeters(6)),
+    /** Eight inch diameter wheels */
     kEightInch(Units.inchesToMeters(8)),
+    /** Ten inch diameter wheels */
     kTenInch(Units.inchesToMeters(10));
 
     public final double value;

@@ -31,19 +31,33 @@ public class PS5Controller extends GenericHID {
 
   /** Represents a digital button on a PS5Controller. */
   public enum Button {
+    /** Square button. */
     kSquare(1),
+    /** X button. */
     kCross(2),
+    /** Circle button. */
     kCircle(3),
+    /** Triangle button. */
     kTriangle(4),
+    /** Left trigger 1 button. */
     kL1(5),
+    /** Right trigger 1 button. */
     kR1(6),
+    /** Left trigger 2 button. */
     kL2(7),
+    /** Right trigger 2 button. */
     kR2(8),
+    /** Create button. */
     kCreate(9),
+    /** Options button. */
     kOptions(10),
+    /** Left stick button. */
     kL3(11),
+    /** Right stick button. */
     kR3(12),
+    /** Playstation button. */
     kPS(13),
+    /** Touchpad click button. */
     kTouchpad(14);
 
     public final int value;
@@ -72,11 +86,17 @@ public class PS5Controller extends GenericHID {
 
   /** Represents an axis on a PS5Controller. */
   public enum Axis {
+    /** Left X axis. */
     kLeftX(0),
+    /** Left Y axis. */
     kLeftY(1),
+    /** Left Trigger 2. */
     kL2(3),
+    /** Right X axis. */
     kRightX(2),
+    /** Right Y axis. */
     kRightY(5),
+    /** Right Trigger 2. */
     kR2(4);
 
     public final int value;
