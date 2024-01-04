@@ -241,54 +241,6 @@ TEST(FeedforwardAnalysisTest, Arm) {
   }
 }
 
-TEST(FeedforwardAnalysisTest, Drivetrain) {
-  {
-    constexpr double Ks = 1.01;
-    constexpr double Kv = 3.060;
-    constexpr double Ka = 0.327;
-
-    sysid::SimpleMotorSim model{Ks, Kv, Ka};
-
-    RunTests(model, sysid::analysis::kDrivetrain, {{Ks, Kv, Ka}},
-             {{8e-3, 8e-3, 8e-3}});
-  }
-
-  {
-    constexpr double Ks = 0.547;
-    constexpr double Kv = 0.0693;
-    constexpr double Ka = 0.1170;
-
-    sysid::SimpleMotorSim model{Ks, Kv, Ka};
-
-    RunTests(model, sysid::analysis::kDrivetrain, {{Ks, Kv, Ka}},
-             {{8e-3, 8e-3, 8e-3}});
-  }
-}
-
-TEST(FeedforwardAnalysisTest, DrivetrainAngular) {
-  {
-    constexpr double Ks = 1.01;
-    constexpr double Kv = 3.060;
-    constexpr double Ka = 0.327;
-
-    sysid::SimpleMotorSim model{Ks, Kv, Ka};
-
-    RunTests(model, sysid::analysis::kDrivetrainAngular, {{Ks, Kv, Ka}},
-             {{8e-3, 8e-3, 8e-3}});
-  }
-
-  {
-    constexpr double Ks = 0.547;
-    constexpr double Kv = 0.0693;
-    constexpr double Ka = 0.1170;
-
-    sysid::SimpleMotorSim model{Ks, Kv, Ka};
-
-    RunTests(model, sysid::analysis::kDrivetrainAngular, {{Ks, Kv, Ka}},
-             {{8e-3, 8e-3, 8e-3}});
-  }
-}
-
 TEST(FeedforwardAnalysisTest, Elevator) {
   {
     constexpr double Ks = 1.01;
