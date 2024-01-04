@@ -34,6 +34,9 @@ namespace sysid {
  */
 class AnalysisManager {
  public:
+  // This contains data for each test (e.g. quasistatic-forward, quasistatic-backward, etc)
+  // indexed by test name
+  TestData m_data;
   /**
    * Represents settings for an instance of the analysis manager. This contains
    * information about the feedback controller preset, loop type, motion
@@ -41,7 +44,6 @@ class AnalysisManager {
    * dataset.
    */
   struct Settings {
-    enum class DrivetrainDataset { kCombined = 0, kLeft = 1, kRight = 2 };
     /**
      * The feedback controller preset used to calculate gains.
      */
@@ -88,8 +90,6 @@ class AnalysisManager {
      * in a smart motor controller).
      */
     bool convertGainsToEncTicks = false;
-
-    DrivetrainDataset dataset = DrivetrainDataset::kCombined;
   };
 
   /**
@@ -100,11 +100,6 @@ class AnalysisManager {
      * Stores the Feedforward gains.
      */
     OLSResult ffGains;
-
-    /**
-     * Stores the trackwidth for angular drivetrain tests.
-     */
-    std::optional<double> trackWidth;
   };
 
   /**
@@ -134,7 +129,7 @@ class AnalysisManager {
    * The keys (which contain sysid data) that are in the JSON to analyze.
    */
   static constexpr const char* kJsonDataKeys[] = {
-      "slow-forward", "slow-backward", "fast-forward", "fast-backward"};
+      "quasistatic-forward", "quasistatic-reverse", "dynamic-forward", "dynamic-reverse"};
 
   /**
    * Concatenates a list of vectors. The contents of the source vectors are
@@ -171,11 +166,11 @@ class AnalysisManager {
    * Constructs an instance of the analysis manager with the given path (to the
    * JSON) and analysis manager settings.
    *
-   * @param path     The path to the JSON containing the sysid data.
+   * @param data     The data from the SysId routine.
    * @param settings The settings for this instance of the analysis manager.
    * @param logger   The logger instance to use for log data.
    */
-  AnalysisManager(std::string_view path, Settings& settings,
+  AnalysisManager(TestData data, Settings& settings,
                   wpi::Logger& logger);
 
   /**
@@ -313,10 +308,6 @@ class AnalysisManager {
  private:
   wpi::Logger& m_logger;
 
-  // This contains data for each test (e.g. quasistatic-forward, quasistatic-backward, etc)
-  // indexed by test name
-  TestData m_data;
-
   Storage m_originalDataset;
   Storage m_rawDataset;
   Storage m_filteredDataset;
@@ -332,9 +323,6 @@ class AnalysisManager {
   units::second_t m_maxStepTime{std::numeric_limits<double>::infinity()};
   std::vector<units::second_t> m_positionDelays;
   std::vector<units::second_t> m_velocityDelays;
-
-  // Stores an optional track width if we are doing the drivetrain angular test.
-  std::optional<double> m_trackWidth;
 
   void PrepareGeneralData();
 };
