@@ -207,8 +207,8 @@ void Command::InitSendable(wpi::SendableBuilder& builder) {
       "runsWhenDisabled", [this] { return RunsWhenDisabled(); }, nullptr);
 }
 
-CommandPtr operator<<(Command *command, auto toRun) {
-  return command->AndThen(toRun);
+CommandPtr operator<<(CommandPtr command, auto toRun) {
+  return command.AndThen(toRun);
 }
 
 CommandPtr operator|(CommandPtr command1, CommandPtr command2) {
