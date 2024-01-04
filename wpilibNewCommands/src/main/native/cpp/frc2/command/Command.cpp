@@ -207,21 +207,21 @@ void Command::InitSendable(wpi::SendableBuilder& builder) {
       "runsWhenDisabled", [this] { return RunsWhenDisabled(); }, nullptr);
 }
 
-CommandPtr operator<<(CommandPtr command, auto toRun) {
+CommandPtr operator|(CommandPtr command, auto toRun) {
   return command.AndThen(toRun);
 }
 
-CommandPtr operator<<(Command* command, auto toRun) {
+CommandPtr operator|(Command* command, auto toRun) {
   return command->AndThen(toRun);
 }
 
-CommandPtr operator|(CommandPtr command1, CommandPtr command2) {
-  return frc2::cmd::Parallel(std::move(command1), std::move(command2));
-}
+//CommandPtr operator|(CommandPtr command1, CommandPtr command2) {
+//  return frc2::cmd::Parallel(std::move(command1), std::move(command2));
+//}
 
-CommandPtr operator&(CommandPtr command1, CommandPtr command2) {
-  return frc2::cmd::Race(std::move(command1), std::move(command2));
-}
+//CommandPtr operator&(CommandPtr command1, CommandPtr command2) {
+//  return frc2::cmd::Race(std::move(command1), std::move(command2));
+//}
 
 namespace frc2 {
 bool RequirementsDisjoint(Command* first, Command* second) {
