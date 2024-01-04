@@ -31,16 +31,6 @@ public interface MotorController {
   }
 
   /**
-   * Returns the currently-applied voltage at the motor.
-   *
-   * @return The voltage applied to the motor, in volts. Equal to the current battery voltage times
-   *     the duty cycle output.
-   */
-  default double getVoltage() {
-    return get() * RobotController.getBatteryVoltage();
-  }
-
-  /**
    * Common interface for getting the current set speed of a motor controller.
    *
    * @return The current set speed. Value is between -1.0 and 1.0.

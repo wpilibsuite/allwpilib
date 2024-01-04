@@ -15,6 +15,7 @@ import edu.wpi.first.units.MutableMeasure;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.Constants.DriveConstants;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
@@ -73,14 +74,16 @@ public class Drive extends SubsystemBase {
                 // Record a frame for the left motors.  Since these share an encoder, we consider
                 // the entire group to be one motor.
                 log.recordFrameLinear(
-                    m_appliedVoltage.mut_replace(m_leftMotor.getVoltage(), Volts),
+                    m_appliedVoltage.mut_replace(
+                        m_leftMotor.get() * RobotController.getBatteryVoltage(), Volts),
                     m_distance.mut_replace(m_leftEncoder.getDistance(), Meters),
                     m_velocity.mut_replace(m_leftEncoder.getRate(), MetersPerSecond),
                     "drive-left");
                 // Record a frame for the right motors.  Since these share an encoder, we consider
                 // the entire group to be one motor.
                 log.recordFrameLinear(
-                    m_appliedVoltage.mut_replace(m_rightMotor.getVoltage(), Volts),
+                    m_appliedVoltage.mut_replace(
+                        m_rightMotor.get() * RobotController.getBatteryVoltage(), Volts),
                     m_distance.mut_replace(m_rightEncoder.getDistance(), Meters),
                     m_velocity.mut_replace(m_rightEncoder.getRate(), MetersPerSecond),
                     "drive-right");
