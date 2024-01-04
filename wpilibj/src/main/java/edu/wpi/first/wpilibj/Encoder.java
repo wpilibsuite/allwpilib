@@ -35,7 +35,7 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
     kResetWhileHigh(0),
     /** Reset while the signal is low. */
     kResetWhileLow(1),
-    /** Reset on falling edge of the signal */
+    /** Reset on falling edge of the signal. */
     kResetOnFallingEdge(2),
     /** Reset on rising edge of the signal. */
     kResetOnRisingEdge(3);

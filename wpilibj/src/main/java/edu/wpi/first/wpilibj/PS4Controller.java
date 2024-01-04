@@ -60,7 +60,7 @@ public class PS4Controller extends GenericHID {
     kR3(12),
     /** Playstation button. */
     kPS(13),
-    /** Touchpad click button */
+    /** Touchpad click button. */
     kTouchpad(14);
 
     public final int value;

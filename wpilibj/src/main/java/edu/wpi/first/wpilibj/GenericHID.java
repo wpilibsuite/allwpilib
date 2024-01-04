@@ -29,7 +29,7 @@ public class GenericHID {
     kBothRumble
   }
 
-  /** USB HID interface type */
+  /** USB HID interface type. */
   public enum HIDType {
     /** kUnknown = -1. */
     kUnknown(-1),

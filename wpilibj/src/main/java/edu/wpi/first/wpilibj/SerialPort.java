@@ -88,7 +88,7 @@ public class SerialPort implements AutoCloseable {
 
   /** Represents which type of buffer mode to use when writing to a serial port. */
   public enum WriteBufferMode {
-    /** Flush the buffer on each access */
+    /** Flush the buffer on each access. */
     kFlushOnAccess(1),
     /** Flush the buffer when it is full. */
     kFlushWhenFull(2);
