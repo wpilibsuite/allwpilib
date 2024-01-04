@@ -125,19 +125,24 @@ void AnalysisManager::PrepareGeneralData() {
   for (auto& it : m_data.motorData) {
     auto key = it.first();
     preparedData[key] = ConvertToPrepared(m_data.motorData[key]);
+    WPI_INFO(m_logger, "SAMPLES {}", preparedData[key].size());
   }
+
 
   // Store the original datasets
   m_originalDataset =
-      CombineDatasets(preparedData["original-raw-slow-forward"],
-                      preparedData["original-raw-slow-backward"],
-                      preparedData["original-raw-fast-forward"],
-                      preparedData["original-raw-fast-backward"]);
+      CombineDatasets(preparedData["original-raw-quasistatic-forward"],
+                      preparedData["original-raw-quasistatic-reverse"],
+                      preparedData["original-raw-dynamic-forward"],
+                      preparedData["original-raw-dynamic-reverse"]);
 
   WPI_INFO(m_logger, "{}", "Initial trimming and filtering.");
   sysid::InitialTrimAndFilter(&preparedData, &m_settings, m_positionDelays,
                               m_velocityDelays, m_minStepTime, m_maxStepTime,
                               m_data.distanceUnit);
+
+  WPI_INFO(m_logger, "{}", m_minStepTime);
+  WPI_INFO(m_logger, "{}", m_maxStepTime);
 
   WPI_INFO(m_logger, "{}", "Acceleration filtering.");
   sysid::AccelFilter(&preparedData);
@@ -146,39 +151,28 @@ void AnalysisManager::PrepareGeneralData() {
   // Store the raw datasets
   m_rawDataset =
       CombineDatasets(
-          preparedData["raw-slow-forward"], preparedData["raw-slow-backward"],
-          preparedData["raw-fast-forward"], preparedData["raw-fast-backward"]);
+          preparedData["raw-quasistatic-forward"], preparedData["raw-quasistatic-reverse"],
+          preparedData["raw-dynamic-forward"], preparedData["raw-dynamic-reverse"]);
 
   // Store the filtered datasets
   m_filteredDataset =
       CombineDatasets(
-          preparedData["slow-forward"], preparedData["slow-backward"],
-          preparedData["fast-forward"], preparedData["fast-backward"]);
+          preparedData["quasistatic-forward"], preparedData["quasistatic-reverse"],
+          preparedData["dynamic-forward"], preparedData["dynamic-reverse"]);
 
-  m_startTimes = {preparedData["raw-slow-forward"][0].timestamp,
-                  preparedData["raw-slow-backward"][0].timestamp,
-                  preparedData["raw-fast-forward"][0].timestamp,
-                  preparedData["raw-fast-backward"][0].timestamp};
+  m_startTimes = {preparedData["raw-quasistatic-forward"][0].timestamp,
+                  preparedData["raw-quasistatic-reverse"][0].timestamp,
+                  preparedData["raw-dynamic-forward"][0].timestamp,
+                  preparedData["raw-dynamic-reverse"][0].timestamp};
 }
 
 AnalysisManager::AnalysisManager(Settings& settings, wpi::Logger& logger)
     : m_logger{logger},
       m_settings{settings} {}
 
-AnalysisManager::AnalysisManager(std::string_view path, Settings& settings,
+AnalysisManager::AnalysisManager(TestData data, Settings& settings,
                                  wpi::Logger& logger)
-    : m_logger{logger}, m_settings{settings} {
-  {
-    // Read JSON from the specified path
-    std::error_code ec;
-    std::unique_ptr<wpi::MemoryBuffer> fileBuffer =
-        wpi::MemoryBuffer::GetFile(path, ec);
-    if (fileBuffer == nullptr || ec) {
-      throw FileReadingError(path);
-    }
-
-    WPI_INFO(m_logger, "Read {}", path);
-  }
+    : m_data{std::move(data)}, m_logger{logger}, m_settings{settings} {
 
   // Reset settings for Dynamic Test Limits
   m_settings.stepTestDuration = units::second_t{0.0};
@@ -186,7 +180,7 @@ AnalysisManager::AnalysisManager(std::string_view path, Settings& settings,
 }
 
 void AnalysisManager::PrepareData() {
-  WPI_INFO(m_logger, "Preparing {} data", m_data.mechanismType.name);
+//  WPI_INFO(m_logger, "Preparing {} data", m_data.mechanismType.name);
 
   PrepareGeneralData();
 
@@ -201,8 +195,8 @@ AnalysisManager::FeedforwardGains AnalysisManager::CalculateFeedforward() {
 
   WPI_INFO(m_logger, "{}", "Calculating Gains");
   // Calculate feedforward gains from the data.
-  const auto& ff = sysid::CalculateFeedforwardGains(GetFilteredData(), m_data.mechanismType);
-  FeedforwardGains ffGains = {ff, m_trackWidth};
+  const auto& ff = sysid::CalculateFeedforwardGains(GetFilteredData(), m_data.mechanismType, false);
+  FeedforwardGains ffGains = {ff };
 
   const auto& Ks = ff.coeffs[0];
   const auto& Kv = ff.coeffs[1];

@@ -17,7 +17,7 @@
 
 using namespace sysid;
 
-static constexpr const char* kAnalysisTypes[] = {"Drivetrain", "Elevator",
+static constexpr const char* kAnalysisTypes[] = { "Elevator",
                                                  "Arm", "Simple"};
 
 static bool EmitEntryTarget(const char* name, bool isString,

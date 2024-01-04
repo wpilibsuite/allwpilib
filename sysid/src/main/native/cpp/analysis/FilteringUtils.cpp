@@ -153,26 +153,19 @@ sysid::TrimStepVoltageData(std::vector<PreparedData>* data,
 
   minStepTime = std::min(data->at(0).timestamp - firstTimestamp, minStepTime);
 
-  // If step duration hasn't been set yet, calculate a default (find the entry
-  // before the acceleration first hits zero)
-  if (settings->stepTestDuration <= minStepTime) {
-    // Get noise floor
-    const double accelNoiseFloor = GetNoiseFloor(
-        *data, kNoiseMeanWindow, [](auto&& pt) { return pt.acceleration; });
-    // Find latest element with nonzero acceleration
-    auto endIt = std::find_if(
-        data->rbegin(), data->rend(), [&](const PreparedData& entry) {
-          return std::abs(entry.acceleration) > accelNoiseFloor;
-        });
+  // Find maximum speed reached
+  const auto maxSpeed = GetMaxSpeed(
+      *data, [](auto&& pt) { return pt.velocity; });
+  // Find place where 90% of maximum speed exceeded
+  auto endIt = std::find_if(
+      data->begin(), data->end(), [&](const PreparedData& entry) {
+        return std::abs(entry.velocity) > maxSpeed * 0.9;
+      });
 
-    if (endIt != data->rend()) {
-      // Calculate default duration
-      settings->stepTestDuration = std::min(
-          endIt->timestamp - data->front().timestamp + minStepTime + 1_s,
-          maxStepTime);
-    } else {
-      settings->stepTestDuration = maxStepTime;
-    }
+  if (endIt != data->end()) {
+    settings->stepTestDuration = std::min(
+        endIt->timestamp - data->front().timestamp + minStepTime,
+        maxStepTime);
   }
 
   // Find first entry greater than the step test duration
@@ -186,6 +179,7 @@ sysid::TrimStepVoltageData(std::vector<PreparedData>* data,
   if (maxIt != data->end()) {
     data->erase(maxIt, data->end());
   }
+
   return std::make_tuple(minStepTime, positionDelay, velocityDelay);
 }
 
@@ -202,6 +196,16 @@ double sysid::GetNoiseFloor(
     }
   }
   return std::sqrt(sum / (data.size() - step));
+}
+
+double sysid::GetMaxSpeed(
+    const std::vector<PreparedData>& data,
+    std::function<double(const PreparedData&)> accessorFunction) {
+  double max = 0.0;
+  for (size_t i = 0; i < data.size(); i++) {
+    max = std::max(max, std::abs(accessorFunction(data[i])));
+  }
+  return max;
 }
 
 units::second_t sysid::GetMeanTimeDelta(const std::vector<PreparedData>& data) {
@@ -301,7 +305,7 @@ static units::second_t GetMaxStepTime(
     auto key = it.first();
     auto& dataset = it.getValue();
 
-    if (IsRaw(key) && wpi::contains(key, "fast")) {
+    if (IsRaw(key) && wpi::contains(key, "dynamic")) {
       auto duration = dataset.back().timestamp - dataset.front().timestamp;
       if (duration > maxStepTime) {
         maxStepTime = duration;
@@ -327,7 +331,7 @@ void sysid::InitialTrimAndFilter(
     for (auto& it : preparedData) {
       auto key = it.first();
       auto& dataset = it.getValue();
-      if (wpi::contains(key, "slow")) {
+      if (wpi::contains(key, "quasistatic")) {
         settings->motionThreshold =
             std::min(settings->motionThreshold,
                      GetNoiseFloor(dataset, kNoiseMeanWindow,
@@ -342,7 +346,7 @@ void sysid::InitialTrimAndFilter(
 
     // Trim quasistatic test data to remove all points where voltage is zero or
     // velocity < motion threshold.
-    if (wpi::contains(key, "slow")) {
+    if (wpi::contains(key, "quasistatic")) {
       dataset.erase(std::remove_if(dataset.begin(), dataset.end(),
                                    [&](const auto& pt) {
                                      return std::abs(pt.voltage) <= 0 ||
@@ -366,7 +370,7 @@ void sysid::InitialTrimAndFilter(
     PrepareMechData(&dataset, unit);
 
     // Trims filtered Dynamic Test Data
-    if (IsFiltered(key) && wpi::contains(key, "fast")) {
+    if (IsFiltered(key) && wpi::contains(key, "dynamic")) {
       // Get the filtered dataset name
       auto filteredKey = RemoveStr(key, "raw-");
 
