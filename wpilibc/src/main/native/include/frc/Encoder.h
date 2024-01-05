@@ -42,10 +42,17 @@ class Encoder : public CounterBase,
   friend class DMASample;
 
  public:
+  /**
+   * Encoder indexing types.
+   */
   enum IndexingType {
+    /// Reset while the signal is high.
     kResetWhileHigh,
+    /// Reset while the signal is low.
     kResetWhileLow,
+    /// Reset on falling edge of the signal.
     kResetOnFallingEdge,
+    /// Reset on rising edge of the signal.
     kResetOnRisingEdge
   };
 

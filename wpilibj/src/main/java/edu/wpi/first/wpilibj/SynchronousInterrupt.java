@@ -29,7 +29,7 @@ public class SynchronousInterrupt implements AutoCloseable {
     kRisingEdge(0x1),
     /** Falling edge event. */
     kFallingEdge(0x100),
-    /** Both rising and falling edge event. */
+    /** Both rising and falling edge events. */
     kBoth(0x101);
 
     public final int value;

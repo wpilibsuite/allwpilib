@@ -13,6 +13,7 @@ import java.nio.charset.StandardCharsets;
 public class SerialPort implements AutoCloseable {
   private int m_portHandle;
 
+  /** Serial port. */
   public enum Port {
     /** Onboard serial port on the roboRIO. */
     kOnboard(0),
@@ -40,9 +41,9 @@ public class SerialPort implements AutoCloseable {
     kOdd(1),
     /** Even parity. */
     kEven(2),
-    /** Parity bit aways on. */
+    /** Parity bit always on. */
     kMark(3),
-    /** Parity bit aways off. */
+    /** Parity bit always off. */
     kSpace(4);
 
     public final int value;

@@ -23,25 +23,55 @@ class EventLoop;
  */
 class GenericHID {
  public:
-  enum RumbleType { kLeftRumble, kRightRumble, kBothRumble };
+  /**
+   * Represents a rumble output on the Joystick.
+   */
+  enum RumbleType {
+    /// Left rumble motor.
+    kLeftRumble,
+    /// Right rumble motor.
+    kRightRumble,
+    /// Both left and right rumble motors.
+    kBothRumble
+  };
 
+  /**
+   * USB HID interface type.
+   */
   enum HIDType {
+    /// Unknown.
     kUnknown = -1,
+    /// XInputUnknown.
     kXInputUnknown = 0,
+    /// XInputGamepad.
     kXInputGamepad = 1,
+    /// XInputWheel.
     kXInputWheel = 2,
+    /// XInputArcadeStick.
     kXInputArcadeStick = 3,
+    /// XInputFlightStick.
     kXInputFlightStick = 4,
+    /// XInputDancePad.
     kXInputDancePad = 5,
+    /// XInputGuitar.
     kXInputGuitar = 6,
+    /// XInputGuitar2.
     kXInputGuitar2 = 7,
+    /// XInputDrumKit.
     kXInputDrumKit = 8,
+    /// XInputGuitar3.
     kXInputGuitar3 = 11,
+    /// XInputArcadePad.
     kXInputArcadePad = 19,
+    /// HIDJoystick.
     kHIDJoystick = 20,
+    /// HIDGamepad.
     kHIDGamepad = 21,
+    /// HIDDriving.
     kHIDDriving = 22,
+    /// HIDFlight.
     kHIDFlight = 23,
+    /// HID1stPerson.
     kHID1stPerson = 24
   };
 

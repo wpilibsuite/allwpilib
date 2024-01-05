@@ -9,11 +9,11 @@ import edu.wpi.first.hal.DMAJNISample;
 
 public class DMASample {
   public enum DMAReadStatus {
-    /** OK status = 1. */
+    /** OK status. */
     kOk(1),
-    /** Timeout status = 2. */
+    /** Timeout status. */
     kTimeout(2),
-    /** Error status = 2. */
+    /** Error status. */
     kError(3);
 
     private final int value;

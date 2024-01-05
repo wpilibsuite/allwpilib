@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj.counter;
 
+/** Edge configuration. */
 public enum EdgeConfiguration {
   /** No edge configuration (neither rising nor falling). */
   kNone(false, false),

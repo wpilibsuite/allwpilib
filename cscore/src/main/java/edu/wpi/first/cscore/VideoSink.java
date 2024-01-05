@@ -13,7 +13,7 @@ public class VideoSink implements AutoCloseable {
   public enum Kind {
     /** Unknown video sink type. */
     kUnknown(0),
-    /** Mjpeg video sink. */
+    /** MJPEG video sink. */
     kMjpeg(2),
     /** CV video sink. */
     kCv(4),

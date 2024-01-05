@@ -55,7 +55,7 @@ public class PS5Controller extends GenericHID {
     kL3(11),
     /** Right stick button. */
     kR3(12),
-    /** Playstation button. */
+    /** PlayStation button. */
     kPS(13),
     /** Touchpad click button. */
     kTouchpad(14);
@@ -90,12 +90,12 @@ public class PS5Controller extends GenericHID {
     kLeftX(0),
     /** Left Y axis. */
     kLeftY(1),
-    /** Left Trigger 2. */
-    kL2(3),
     /** Right X axis. */
     kRightX(2),
     /** Right Y axis. */
     kRightY(5),
+    /** Left Trigger 2. */
+    kL2(3),
     /** Right Trigger 2. */
     kR2(4);
 

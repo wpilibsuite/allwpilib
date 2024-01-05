@@ -58,7 +58,7 @@ public class PS4Controller extends GenericHID {
     kL3(11),
     /** Right stick button. */
     kR3(12),
-    /** Playstation button. */
+    /** PlayStation button. */
     kPS(13),
     /** Touchpad click button. */
     kTouchpad(14);

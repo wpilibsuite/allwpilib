@@ -22,31 +22,31 @@ public class CANAPITypes {
    *     Device Types</a>
    */
   public enum CANDeviceType {
-    /** kBroadcast = 0. */
+    /** Broadcast. */
     kBroadcast(0),
-    /** kRobotController = 1. */
+    /** Robot controller. */
     kRobotController(1),
-    /** kMotorController = 2. */
+    /** Motor controller. */
     kMotorController(2),
-    /** kRelayController = 3. */
+    /** Relay controller. */
     kRelayController(3),
-    /** kGyroSensor = 4. */
+    /** Gyro sensor. */
     kGyroSensor(4),
-    /** kAccelerometer = 5. */
+    /** Accelerometer. */
     kAccelerometer(5),
-    /** kUltrasonicSensor = 6. */
+    /** Ultrasonic sensor. */
     kUltrasonicSensor(6),
-    /** kGearToothSensor = 7. */
+    /** Gear tooth sensor. */
     kGearToothSensor(7),
-    /** kPowerDistribution = 8. */
+    /** Power distribution. */
     kPowerDistribution(8),
-    /** kPneumatics = 9. */
+    /** Pneumatics. */
     kPneumatics(9),
-    /** kMiscellaneous = 10. */
+    /** Miscellaneous. */
     kMiscellaneous(10),
-    /** kIOBreakout = 11. */
+    /** IO breakout. */
     kIOBreakout(11),
-    /** kFirmwareUpdate = 31. */
+    /** Firmware update. */
     kFirmwareUpdate(31);
 
     @SuppressWarnings("PMD.MemberName")
@@ -68,39 +68,39 @@ public class CANAPITypes {
    *     Manufacturer IDs</a>
    */
   public enum CANManufacturer {
-    /** kBroadcast = 0. */
+    /** Broadcast. */
     kBroadcast(0),
-    /** National Instruments = 1. */
+    /** National Instruments. */
     kNI(1),
-    /** Luminary Micro = 2. */
+    /** Luminary Micro. */
     kLM(2),
-    /** DEKA Research and Development Corp = 3. */
+    /** DEKA Research and Development Corp. */
     kDEKA(3),
-    /** Cross the Road Electronics = 4. */
+    /** Cross the Road Electronics. */
     kCTRE(4),
-    /** REV robotics = 5. */
+    /** REV Robotics. */
     kREV(5),
-    /** kGrapple = 6. */
+    /** Grapple. */
     kGrapple(6),
-    /** MindSensors = 7. */
+    /** MindSensors. */
     kMS(7),
-    /** kTeamUse = 8. */
+    /** Team use. */
     kTeamUse(8),
-    /** kKauaiLabs = 9. */
+    /** Kauai Labs. */
     kKauaiLabs(9),
-    /** kCopperforge = 10. */
+    /** Copperforge. */
     kCopperforge(10),
-    /** Playing With Fusion = 11. */
+    /** Playing With Fusion. */
     kPWF(11),
-    /** kStudica = 12. */
+    /** Studica. */
     kStudica(12),
-    /** kTheThriftyBot = 13. */
+    /** TheThriftyBot. */
     kTheThriftyBot(13),
-    /** kReduxRobotics = 14. */
+    /** Redux Robotics. */
     kReduxRobotics(14),
-    /** kAndyMark = 15. */
+    /** AndyMark. */
     kAndyMark(15),
-    /** kVividHosting = 16. */
+    /** Vivid-Hosting. */
     kVividHosting(16);
 
     @SuppressWarnings("PMD.MemberName")

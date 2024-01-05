@@ -45,9 +45,9 @@ public class Joystick extends GenericHID {
 
   /** Represents a digital button on a joystick. */
   public enum ButtonType {
-    /** kTrigger = 1. */
+    /** kTrigger. */
     kTrigger(1),
-    /** kTop = 2. */
+    /** kTop. */
     kTop(2);
 
     public final int value;

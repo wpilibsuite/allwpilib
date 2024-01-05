@@ -14,6 +14,7 @@ import java.nio.IntBuffer;
 
 /** Represents an SPI bus port. */
 public class SPI implements AutoCloseable {
+  /** SPI port. */
   public enum Port {
     /** Onboard SPI bus port CS0. */
     kOnboardCS0(SPIJNI.ONBOARD_CS0_PORT),
@@ -33,6 +34,7 @@ public class SPI implements AutoCloseable {
     }
   }
 
+  /** SPI mode. */
   public enum Mode {
     /** Clock idle low, data sampled on rising edge. */
     kMode0(SPIJNI.SPI_MODE0),

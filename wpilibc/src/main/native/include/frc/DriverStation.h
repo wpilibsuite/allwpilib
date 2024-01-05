@@ -22,9 +22,31 @@ namespace frc {
  */
 class DriverStation final {
  public:
-  enum Alliance { kRed, kBlue };
-  enum MatchType { kNone, kPractice, kQualification, kElimination };
+  /**
+   * The robot alliance that the robot is a part of.
+   */
+  enum Alliance {
+    /// Red alliance.
+    kRed,
+    /// Blue alliance.
+    kBlue
+  };
 
+  /**
+   * The type of robot match that the robot is part of.
+   */
+  enum MatchType {
+    /// None.
+    kNone,
+    /// Practice.
+    kPractice,
+    /// Qualification.
+    kQualification,
+    /// Elimination.
+    kElimination
+  };
+
+  /// Number of Joystick ports.
   static constexpr int kJoystickPorts = 6;
 
   /**

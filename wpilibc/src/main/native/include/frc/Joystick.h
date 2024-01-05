@@ -28,8 +28,31 @@ class Joystick : public GenericHID {
   static constexpr int kDefaultTwistChannel = 2;
   static constexpr int kDefaultThrottleChannel = 3;
 
-  enum AxisType { kXAxis, kYAxis, kZAxis, kTwistAxis, kThrottleAxis };
-  enum ButtonType { kTriggerButton, kTopButton };
+  /**
+   * Represents an analog axis on a joystick.
+   */
+  enum AxisType {
+    /// X axis.
+    kXAxis,
+    /// Y axis.
+    kYAxis,
+    /// Z axis.
+    kZAxis,
+    /// Twist axis.
+    kTwistAxis,
+    /// Throttle axis.
+    kThrottleAxis
+  };
+
+  /**
+   * Represents a digital button on a joystick.
+   */
+  enum ButtonType {
+    /// kTrigger.
+    kTriggerButton,
+    /// kTop.
+    kTopButton
+  };
 
   /**
    * Construct an instance of a joystick.

@@ -16,9 +16,9 @@ public class VideoSource implements AutoCloseable {
     kUnknown(0),
     /** USB video source = 1. */
     kUsb(1),
-    /** Http video source = 2. */
+    /** HTTP video source = 2. */
     kHttp(2),
-    /** Cv video source = 4. */
+    /** CV video source = 4. */
     kCv(4),
     /** Raw video source = 8. */
     kRaw(8);

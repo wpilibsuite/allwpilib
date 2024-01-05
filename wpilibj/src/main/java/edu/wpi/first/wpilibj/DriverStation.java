@@ -29,7 +29,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 /** Provide access to the network communication data to / from the Driver Station. */
 public final class DriverStation {
-  /** Number of Joystick Ports. */
+  /** Number of Joystick ports. */
   public static final int kJoystickPorts = 6;
 
   private static class HALJoystickButtons {
@@ -69,15 +69,21 @@ public final class DriverStation {
 
   /** The robot alliance that the robot is a part of. */
   public enum Alliance {
+    /** Red alliance. */
     Red,
+    /** Blue alliance. */
     Blue
   }
 
   /** The type of robot match that the robot is part of. */
   public enum MatchType {
+    /** None. */
     None,
+    /** Practice. */
     Practice,
+    /** Qualification. */
     Qualification,
+    /** Elimination. */
     Elimination
   }
 

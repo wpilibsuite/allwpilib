@@ -19,51 +19,51 @@ import java.util.Map;
  * the mapping of ports to hardware buttons depends on the code in the Driver Station.
  */
 public class GenericHID {
-  /** Represents a rumble output on the JoyStick. */
+  /** Represents a rumble output on the Joystick. */
   public enum RumbleType {
     /** Left rumble motor. */
     kLeftRumble,
     /** Right rumble motor. */
     kRightRumble,
-    /** Both left and right rumble motor. */
+    /** Both left and right rumble motors. */
     kBothRumble
   }
 
   /** USB HID interface type. */
   public enum HIDType {
-    /** kUnknown = -1. */
+    /** Unknown. */
     kUnknown(-1),
-    /** kXInputUnknown = 0. */
+    /** XInputUnknown. */
     kXInputUnknown(0),
-    /** kXInputGamepad = 1. */
+    /** XInputGamepad. */
     kXInputGamepad(1),
-    /** kXInputWheel = 2. */
+    /** XInputWheel. */
     kXInputWheel(2),
-    /** kXInputArcadeStick = 3. */
+    /** XInputArcadeStick. */
     kXInputArcadeStick(3),
-    /** kXInputFlightStick = 4. */
+    /** XInputFlightStick. */
     kXInputFlightStick(4),
-    /** kXInputDancePad = 5. */
+    /** XInputDancePad. */
     kXInputDancePad(5),
-    /** kXInputGuitar = 6. */
+    /** XInputGuitar. */
     kXInputGuitar(6),
-    /** kXInputGuitar2 = 7. */
+    /** XInputGuitar2. */
     kXInputGuitar2(7),
-    /** kXInputDrumKit = 8. */
+    /** XInputDrumKit. */
     kXInputDrumKit(8),
-    /** kXInputGuitar3 = 11. */
+    /** XInputGuitar3. */
     kXInputGuitar3(11),
-    /** kXInputArcadePad = 19. */
+    /** XInputArcadePad. */
     kXInputArcadePad(19),
-    /** kHIDJoystick = 20. */
+    /** HIDJoystick. */
     kHIDJoystick(20),
-    /** kHIDGamepad = 21. */
+    /** HIDGamepad. */
     kHIDGamepad(21),
-    /** kHIDDriving = 22. */
+    /** HIDDriving. */
     kHIDDriving(22),
-    /** kHIDFlight = 23. */
+    /** HIDFlight. */
     kHIDFlight(23),
-    /** kHID1stPerson = 24. */
+    /** HID1stPerson. */
     kHID1stPerson(24);
 
     public final int value;

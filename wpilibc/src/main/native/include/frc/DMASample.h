@@ -20,8 +20,11 @@ namespace frc {
 class DMASample : public HAL_DMASample {
  public:
   enum class DMAReadStatus {
+    /// OK status.
     kOk = HAL_DMA_OK,
+    /// Timeout status.
     kTimeout = HAL_DMA_TIMEOUT,
+    /// Error status.
     kError = HAL_DMA_ERROR
   };
 

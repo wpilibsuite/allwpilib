@@ -25,7 +25,17 @@ namespace frc {
 class DoubleSolenoid : public wpi::Sendable,
                        public wpi::SendableHelper<DoubleSolenoid> {
  public:
-  enum Value { kOff, kForward, kReverse };
+  /**
+   * Possible values for a DoubleSolenoid.
+   */
+  enum Value {
+    /// Off position.
+    kOff,
+    /// Forward position.
+    kForward,
+    /// Reverse position.
+    kReverse
+  };
 
   /**
    * Constructs a double solenoid for a specified module of a specific module
