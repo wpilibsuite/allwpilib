@@ -11,6 +11,9 @@ package edu.wpi.first.wpilibj;
  * source. The source can either be a digital input or analog trigger but not both.
  */
 public abstract class DigitalSource implements AutoCloseable {
+  /** Default constructor. */
+  public DigitalSource() {}
+
   /**
    * Returns true if this DigitalSource is an AnalogTrigger.
    *

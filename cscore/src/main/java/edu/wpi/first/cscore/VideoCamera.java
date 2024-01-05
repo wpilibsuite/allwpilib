@@ -12,6 +12,9 @@ public class VideoCamera extends VideoSource {
     public static final int kFixedOutdoor2 = 5000;
     public static final int kFixedFluorescent1 = 5100;
     public static final int kFixedFlourescent2 = 5200;
+
+    /** Default constructor. */
+    public WhiteBalance() {}
   }
 
   protected VideoCamera(int handle) {

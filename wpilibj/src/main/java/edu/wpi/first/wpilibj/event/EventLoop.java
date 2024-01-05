@@ -15,6 +15,9 @@ public final class EventLoop {
   private final Collection<Runnable> m_bindings = new LinkedHashSet<>();
   private boolean m_running;
 
+  /** Default constructor. */
+  public EventLoop() {}
+
   /**
    * Bind a new action to run when the loop is polled.
    *
