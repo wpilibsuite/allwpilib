@@ -38,10 +38,6 @@ class Drive : public frc2::SubsystemBase {
                               constants::drive::kRightEncoderPorts[1],
                               constants::drive::kRightEncoderReversed};
 
-  units::volt_t m_appliedVoltage{0_V};
-  units::meter_t m_distance{0_m};
-  units::meters_per_second_t m_velocity{0_mps};
-
   frc2::sysid::SysIdRoutine m_sysIdRoutine{
       frc2::sysid::Config{std::nullopt, std::nullopt, std::nullopt,
                           std::nullopt},
@@ -50,21 +46,15 @@ class Drive : public frc2::SubsystemBase {
             m_leftMotor.SetVoltage(driveVoltage);
             m_rightMotor.SetVoltage(driveVoltage);
           },
-          [this](frc::sysid::MotorLog* log) {
-            log->RecordFrameLinear(
-                m_appliedVoltage = m_leftMotor.Get() *
-                                   frc::RobotController::GetBatteryVoltage(),
-                m_distance = units::meter_t{m_leftEncoder.GetDistance()},
-                m_velocity =
-                    units::meters_per_second_t{m_leftEncoder.GetRate()},
-                "drive-left");
-            log->RecordFrameLinear(
-                m_appliedVoltage = m_rightMotor.Get() *
-                                   frc::RobotController::GetBatteryVoltage(),
-                m_distance = units::meter_t{m_rightEncoder.GetDistance()},
-                m_velocity =
-                    units::meters_per_second_t{m_rightEncoder.GetRate()},
-                "drive-right");
+          [this](frc::sysid::SysIdRoutineLog* log) {
+            log->Motor("drive-left")
+              .voltage(m_leftMotor.Get() * frc::RobotController::GetBatteryVoltage())
+              .position(units::meter_t{m_leftEncoder.GetDistance()})
+              .velocity(units::meters_per_second_t{m_leftEncoder.GetRate()});
+            log->Motor("drive-right")
+              .voltage(m_rightMotor.Get() * frc::RobotController::GetBatteryVoltage())
+              .position(units::meter_t{m_rightEncoder.GetDistance()})
+              .velocity(units::meters_per_second_t{m_rightEncoder.GetRate()});
           },
           this}};
 };

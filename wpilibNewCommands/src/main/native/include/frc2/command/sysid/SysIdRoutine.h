@@ -77,7 +77,7 @@ class Mechanism {
    * null.
    */
   Mechanism(std::function<void(units::volt_t)> drive,
-            std::function<void(frc::sysid::MotorLog*)> log,
+            std::function<void(frc::sysid::SysIdRoutineLog*)> log,
             frc2::Subsystem* subsystem, const std::string& name)
       : m_drive(drive), m_log(log), m_subsystem(subsystem), m_name(name) {}
 
@@ -97,14 +97,14 @@ class Mechanism {
    * title for the routine's test state, e.g. "sysid-test-state-subsystem".
    */
   Mechanism(std::function<void(units::volt_t)> drive,
-            std::function<void(frc::sysid::MotorLog*)> log,
+            std::function<void(frc::sysid::SysIdRoutineLog*)> log,
             frc2::Subsystem* subsystem)
       : m_drive(drive),
         m_log(log),
         m_subsystem(subsystem),
         m_name(m_subsystem->GetName()) {}
   std::function<void(units::volt_t)> m_drive;
-  std::function<void(frc::sysid::MotorLog*)> m_log;
+  std::function<void(frc::sysid::SysIdRoutineLog*)> m_log;
   frc2::Subsystem* m_subsystem;
   const std::string m_name;
 };

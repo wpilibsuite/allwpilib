@@ -9,7 +9,6 @@
 
 #include <frc/Timer.h>
 #include <frc/simulation/SimHooks.h>
-#include <frc/sysid/MotorLog.h>
 #include <gtest/gtest.h>
 #include <units/math.h>
 
@@ -59,9 +58,12 @@ class SysIdRoutineTest : public ::testing::Test {
             sentVoltages.emplace_back(driveVoltage);
             currentStateList.emplace_back(StateTest::InDrive);
           },
-          [this](frc::sysid::MotorLog* log) {
+          [this](frc::sysid::SysIdRoutineLog* log) {
             currentStateList.emplace_back(StateTest::InLog);
-            log->RecordFrameLinear(0_V, 0_m, 0_mps, "Mock Motor");
+            log->Motor("Mock Motor")
+                .position(0_m)
+                .velocity(0_mps)
+                .voltage(0_V);
           },
           &m_subsystem}};
   frc2::CommandPtr m_quasistaticForward{

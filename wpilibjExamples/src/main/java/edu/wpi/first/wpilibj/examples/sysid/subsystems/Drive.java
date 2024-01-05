@@ -73,7 +73,8 @@ public class Drive extends SubsystemBase {
                 // Record a frame for the left motors.  Since these share an encoder, we consider
                 // the entire group to be one motor.
                 log.motor("drive-left")
-                    .voltage(m_appliedVoltage.mut_replace(
+                    .voltage(
+                        m_appliedVoltage.mut_replace(
                             m_leftMotor.get() * RobotController.getBatteryVoltage(), Volts))
                     .linearPosition(m_distance.mut_replace(m_leftEncoder.getDistance(), Meters))
                     .linearVelocity(
@@ -81,7 +82,8 @@ public class Drive extends SubsystemBase {
                 // Record a frame for the right motors.  Since these share an encoder, we consider
                 // the entire group to be one motor.
                 log.motor("drive-right")
-                    .voltage(m_appliedVoltage.mut_replace(
+                    .voltage(
+                        m_appliedVoltage.mut_replace(
                             m_rightMotor.get() * RobotController.getBatteryVoltage(), Volts))
                     .linearPosition(m_distance.mut_replace(m_rightEncoder.getDistance(), Meters))
                     .linearVelocity(

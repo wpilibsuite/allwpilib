@@ -4,7 +4,6 @@
 
 #include "SysIdRoutineBot.h"
 
-#include <frc/sysid/MotorLog.h>
 #include <frc2/command/Commands.h>
 
 SysIdRoutineBot::SysIdRoutineBot() {

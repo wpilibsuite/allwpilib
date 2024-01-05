@@ -8,8 +8,14 @@
 #include <unordered_map>
 
 #include <wpi/DataLog.h>
-
-#include "frc/sysid/MotorLog.h"
+#include "units/voltage.h"
+#include "units/angular_velocity.h"
+#include "units/angular_acceleration.h"
+#include "units/acceleration.h"
+#include "units/current.h"
+#include "units/length.h"
+#include "units/angle.h"
+#include "units/velocity.h"
 
 namespace frc::sysid {
 
@@ -27,8 +33,52 @@ enum class State {
  * (quasistatic and dynamic, forward and reverse) should have its own
  * SysIdRoutineLog instance, with a unique log name.
  */
-class SysIdRoutineLog : public MotorLog {
+class SysIdRoutineLog {
+  using MotorEntries = wpi::StringMap<wpi::log::DoubleLogEntry>;
+  using LogEntries = wpi::StringMap<MotorEntries>;
  public:
+  class MotorLog {
+   public:
+    MotorLog(const std::string& motorName, const std::string& logName, LogEntries* logEntries);
+
+    MotorLog& value(const std::string& name, double value, const std::string& unit);
+
+    MotorLog& voltage(units::volt_t voltage) {
+        return value("voltage", voltage.value(), voltage.name());
+    };
+
+    MotorLog& position(units::meter_t position) {
+        return value("position", position.value(), position.name());
+    };
+
+    MotorLog& position(units::turn_t position) {
+        return value("position", position.value(), position.name());
+    };
+
+    MotorLog& velocity(units::meters_per_second_t velocity) {
+        return value("velocity", velocity.value(), velocity.name());
+    };
+
+    MotorLog& velocity(units::turns_per_second_t velocity) {
+        return value("velocity", velocity.value(), velocity.name());
+    };
+
+    MotorLog& acceleration(units::meters_per_second_squared_t acceleration) {
+        return value("acceleration", acceleration.value(), acceleration.name());
+    }
+
+    MotorLog& acceleration(units::turns_per_second_squared_t acceleration) {
+        return value("acceleration", acceleration.value(), acceleration.name());
+    }
+
+    MotorLog& current(units::ampere_t current) {
+        return value("current", current.value(), current.name());
+    };
+   private:
+    std::string m_motorName;
+    std::string m_logName;
+    LogEntries* m_logEntries;
+  };
   /**
    * Create a new logging utility for a SysId test routine.
    *
@@ -38,12 +88,6 @@ class SysIdRoutineLog : public MotorLog {
    * appear in WPILog under the "sysid-test-state-logName" entry.
    */
   explicit SysIdRoutineLog(const std::string& logName);
-  void RecordFrameLinear(units::volt_t voltage, units::meter_t distance,
-                         units::meters_per_second_t velocity,
-                         const std::string& motorName) override;
-  void RecordFrameAngular(units::volt_t voltage, units::turn_t angle,
-                          units::turns_per_second_t velocity,
-                          const std::string& motorName) override;
   /**
    * Records the current state of the SysId test routine. Should be called once
    * per iteration during tests with the type of the current test, and once upon
@@ -52,12 +96,13 @@ class SysIdRoutineLog : public MotorLog {
    * @param state The current state of the SysId test routine.
    */
   void RecordState(State state);
+
+  MotorLog Motor(const std::string& motorName);
+
   static std::string StateEnumToString(State state);
 
  private:
-  std::unordered_map<std::string,
-                     std::unordered_map<std::string, wpi::log::DoubleLogEntry>>
-      m_logEntries{};
+  LogEntries m_logEntries{};
   std::string m_logName{};
   wpi::log::StringLogEntry m_state{};
 };

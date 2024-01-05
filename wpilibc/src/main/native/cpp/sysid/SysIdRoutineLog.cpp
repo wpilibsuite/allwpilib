@@ -15,54 +15,26 @@ SysIdRoutineLog::SysIdRoutineLog(const std::string& logName)
   m_state.Append(StateEnumToString(State::kNone));
 }
 
-void SysIdRoutineLog::RecordFrameLinear(units::volt_t voltage,
-                                        units::meter_t distance,
-                                        units::meters_per_second_t velocity,
-                                        const std::string& motorName) {
-  if (!m_logEntries.contains(motorName)) {
-    wpi::log::DataLog& log = frc::DataLogManager::GetLog();
-
-    m_logEntries[motorName].emplace(
-        "voltage", wpi::log::DoubleLogEntry(
-                       log, "voltage-" + motorName + "-" + m_logName, "Volt"));
-    m_logEntries[motorName].emplace(
-        "distance",
-        wpi::log::DoubleLogEntry(log, "distance-" + motorName + "-" + m_logName,
-                                 "meters"));
-    m_logEntries[motorName].emplace(
-        "velocity",
-        wpi::log::DoubleLogEntry(log, "velocity-" + motorName + "-" + m_logName,
-                                 "meters-per-second"));
-  }
-
-  m_logEntries[motorName]["voltage"].Append(voltage.value());
-  m_logEntries[motorName]["distance"].Append(distance.value());
-  m_logEntries[motorName]["velocity"].Append(velocity.value());
+SysIdRoutineLog::MotorLog::MotorLog(const std::string& motorName, const std::string& logName, LogEntries* logEntries)
+    : m_motorName(motorName), m_logName(logName), m_logEntries(logEntries) {
+  (*logEntries)[motorName] = MotorEntries();
 }
 
-void SysIdRoutineLog::RecordFrameAngular(units::volt_t voltage,
-                                         units::turn_t angle,
-                                         units::turns_per_second_t velocity,
-                                         const std::string& motorName) {
-  if (!m_logEntries.contains(motorName)) {
+SysIdRoutineLog::MotorLog& SysIdRoutineLog::MotorLog::value(const std::string& name, double value, const std::string& unit) {
+  auto& motorEntries = (*m_logEntries)[m_motorName];
+
+  if (!motorEntries.contains(name)) {
     wpi::log::DataLog& log = frc::DataLogManager::GetLog();
 
-    m_logEntries[motorName].emplace(
-        "voltage", wpi::log::DoubleLogEntry(
-                       log, "voltage-" + motorName + "-" + m_logName, "Volt"));
-    m_logEntries[motorName].emplace(
-        "distance",
-        wpi::log::DoubleLogEntry(log, "distance-" + motorName + "-" + m_logName,
-                                 "rotations"));
-    m_logEntries[motorName].emplace(
-        "velocity",
-        wpi::log::DoubleLogEntry(log, "velocity-" + motorName + "-" + m_logName,
-                                 "rotations-per-second"));
+    motorEntries[name] = wpi::log::DoubleLogEntry(log, name + "-" + m_motorName + "-" + m_logName, unit);
   }
 
-  m_logEntries[motorName]["voltage"].Append(voltage.value());
-  m_logEntries[motorName]["distance"].Append(angle.value());
-  m_logEntries[motorName]["velocity"].Append(velocity.value());
+  motorEntries[name].Append(value);
+  return *this;
+}
+
+SysIdRoutineLog::MotorLog SysIdRoutineLog::Motor(const std::string& motorName) {
+  return MotorLog{motorName, m_logName, &m_logEntries};
 }
 
 void SysIdRoutineLog::RecordState(State state) {
