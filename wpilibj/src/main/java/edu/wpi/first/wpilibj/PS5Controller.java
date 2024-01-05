@@ -60,6 +60,7 @@ public class PS5Controller extends GenericHID {
     /** Touchpad click button. */
     kTouchpad(14);
 
+    /** Button value. */
     public final int value;
 
     Button(int index) {
@@ -99,6 +100,7 @@ public class PS5Controller extends GenericHID {
     /** Right Trigger 2. */
     kR2(4);
 
+    /** Axis value. */
     public final int value;
 
     Axis(int index) {

@@ -301,6 +301,13 @@ public class DifferentialDrivetrainSim {
     m_x.set(State.kRightPosition.value, 0, 0);
   }
 
+  /**
+   * The differential drive dynamics function.
+   *
+   * @param x The state.
+   * @param u The input.
+   * @return The state derivative with respect to time.
+   */
   protected Matrix<N7, N1> getDynamics(Matrix<N7, N1> x, Matrix<N2, N1> u) {
     // Because G can be factored out of B, we can divide by the old ratio and multiply
     // by the new ratio to get a new drivetrain model.
@@ -380,6 +387,7 @@ public class DifferentialDrivetrainSim {
     /** Gear ratio of 5.95:1. */
     k5p95(5.95);
 
+    /** KitbotGearing value. */
     public final double value;
 
     KitbotGearing(double i) {
@@ -406,6 +414,7 @@ public class DifferentialDrivetrainSim {
     /** Two NEO motors per drive side. */
     kDoubleNEOPerSide(DCMotor.getNEO(2));
 
+    /** KitbotMotor value. */
     public final DCMotor value;
 
     KitbotMotor(DCMotor i) {
@@ -422,6 +431,7 @@ public class DifferentialDrivetrainSim {
     /** Ten inch diameter wheels. */
     kTenInch(Units.inchesToMeters(10));
 
+    /** KitbotWheelSize value. */
     public final double value;
 
     KitbotWheelSize(double i) {

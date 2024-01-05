@@ -451,17 +451,20 @@ class Counter : public CounterBase,
   void InitSendable(wpi::SendableBuilder& builder) override;
 
  protected:
-  // Makes the counter count up.
+  /// Makes the counter count up.
   std::shared_ptr<DigitalSource> m_upSource;
 
-  // Makes the counter count down.
+  /// Makes the counter count down.
   std::shared_ptr<DigitalSource> m_downSource;
 
-  // The FPGA counter object
+  /// The FPGA counter object
   hal::Handle<HAL_CounterHandle> m_counter;
 
  private:
-  int m_index = 0;  // The index of this counter.
+  /// The index of this counter.
+  int m_index = 0;
+
+  /// Distance of travel for each tick.
   double m_distancePerPulse = 1;
 
   friend class DigitalGlitchFilter;

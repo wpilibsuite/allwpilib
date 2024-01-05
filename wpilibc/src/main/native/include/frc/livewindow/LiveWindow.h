@@ -19,14 +19,14 @@ namespace frc {
 class LiveWindow final {
  public:
   /**
-   * Set function to be called when LiveWindow is enabled.
+   * Sets function to be called when LiveWindow is enabled.
    *
    * @param func function (or nullptr for none)
    */
   static void SetEnabledCallback(std::function<void()> func);
 
   /**
-   * Set function to be called when LiveWindow is disabled.
+   * Sets function to be called when LiveWindow is disabled.
    *
    * @param func function (or nullptr for none)
    */
@@ -56,6 +56,11 @@ class LiveWindow final {
    */
   static void EnableAllTelemetry();
 
+  /**
+   * Returns true if LiveWindow is enabled.
+   *
+   * @return True if LiveWindow is enabled.
+   */
   static bool IsEnabled();
 
   /**

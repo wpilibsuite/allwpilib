@@ -26,6 +26,13 @@ class ShuffleboardContainer;
 template <typename Derived>
 class ShuffleboardComponent : public ShuffleboardComponentBase {
  public:
+  /**
+   * Constructs a ShuffleboardComponent.
+   *
+   * @param parent The parent container.
+   * @param title The component title.
+   * @param type The component type.
+   */
   ShuffleboardComponent(ShuffleboardContainer& parent, std::string_view title,
                         std::string_view type = "");
 

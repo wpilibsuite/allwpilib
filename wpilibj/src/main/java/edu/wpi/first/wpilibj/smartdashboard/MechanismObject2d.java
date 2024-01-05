@@ -74,6 +74,11 @@ public abstract class MechanismObject2d implements AutoCloseable {
    */
   protected abstract void updateEntries(NetworkTable table);
 
+  /**
+   * Retrieve the object's name.
+   *
+   * @return the object's name relative to its parent.
+   */
   public final String getName() {
     return m_name;
   }

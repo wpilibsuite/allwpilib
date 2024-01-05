@@ -26,25 +26,53 @@ public abstract class ShuffleboardComponent<C extends ShuffleboardComponent<C>>
   private int m_width = -1;
   private int m_height = -1;
 
+  /**
+   * Constructs a ShuffleboardComponent.
+   *
+   * @param parent The parent container.
+   * @param title The component title.
+   * @param type The component type.
+   */
   protected ShuffleboardComponent(ShuffleboardContainer parent, String title, String type) {
     m_parent = requireNonNullParam(parent, "parent", "ShuffleboardComponent");
     m_title = requireNonNullParam(title, "title", "ShuffleboardComponent");
     m_type = type;
   }
 
+  /**
+   * Constructs a ShuffleboardComponent.
+   *
+   * @param parent The parent container.
+   * @param title The component title.
+   */
   protected ShuffleboardComponent(ShuffleboardContainer parent, String title) {
     this(parent, title, null);
   }
 
+  /**
+   * Returns the parent container.
+   *
+   * @return The parent container.
+   */
   public final ShuffleboardContainer getParent() {
     return m_parent;
   }
 
+  /**
+   * Sets the component type.
+   *
+   * @param type The component type.
+   */
   protected final void setType(String type) {
     m_type = type;
     m_metadataDirty = true;
   }
 
+  /**
+   * Returns the component type.
+   *
+   * @return The component type.
+   */
   public final String getType() {
     return m_type;
   }
@@ -109,6 +137,11 @@ public abstract class ShuffleboardComponent<C extends ShuffleboardComponent<C>>
     return (C) this;
   }
 
+  /**
+   * Builds NT metadata.
+   *
+   * @param metaTable The NT metadata table.
+   */
   protected final void buildMetadata(NetworkTable metaTable) {
     if (!m_metadataDirty) {
       return;

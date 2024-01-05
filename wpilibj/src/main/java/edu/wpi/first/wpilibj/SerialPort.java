@@ -26,6 +26,7 @@ public class SerialPort implements AutoCloseable {
     /** USB serial port 2. */
     kUSB2(3);
 
+    /** Port value. */
     public final int value;
 
     Port(int value) {
@@ -46,6 +47,7 @@ public class SerialPort implements AutoCloseable {
     /** Parity bit always off. */
     kSpace(4);
 
+    /** Parity value. */
     public final int value;
 
     Parity(int value) {
@@ -62,6 +64,7 @@ public class SerialPort implements AutoCloseable {
     /** Two stop bits. */
     kTwo(20);
 
+    /** StopBits value. */
     public final int value;
 
     StopBits(int value) {
@@ -80,6 +83,7 @@ public class SerialPort implements AutoCloseable {
     /** DTS/DSR flow control. */
     kDtsDsr(4);
 
+    /** FlowControl value. */
     public final int value;
 
     FlowControl(int value) {
@@ -94,6 +98,7 @@ public class SerialPort implements AutoCloseable {
     /** Flush the buffer when it is full. */
     kFlushWhenFull(2);
 
+    /** WriteBufferMode value. */
     public final int value;
 
     WriteBufferMode(int value) {

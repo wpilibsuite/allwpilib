@@ -71,7 +71,10 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    */
   @SuppressWarnings("MemberName")
   public static class WheelSpeeds {
+    /** Left wheel speed. */
     public double left;
+
+    /** Right wheel speed. */
     public double right;
 
     /** Constructs a WheelSpeeds with zeroes for left and right speeds. */

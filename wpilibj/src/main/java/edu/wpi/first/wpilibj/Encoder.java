@@ -40,6 +40,7 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
     /** Reset on rising edge of the signal. */
     kResetOnRisingEdge(3);
 
+    /** IndexingType value. */
     public final int value;
 
     IndexingType(int value) {

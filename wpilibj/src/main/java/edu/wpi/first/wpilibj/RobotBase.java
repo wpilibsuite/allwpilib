@@ -178,6 +178,11 @@ public abstract class RobotBase implements AutoCloseable {
     Shuffleboard.disableActuatorWidgets();
   }
 
+  /**
+   * Returns the main thread ID.
+   *
+   * @return The main thread ID.
+   */
   public static long getMainThreadId() {
     return m_threadId;
   }

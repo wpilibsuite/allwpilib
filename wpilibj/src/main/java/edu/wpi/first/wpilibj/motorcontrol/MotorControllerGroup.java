@@ -37,6 +37,11 @@ public class MotorControllerGroup implements MotorController, Sendable, AutoClos
     init();
   }
 
+  /**
+   * Create a new MotorControllerGroup with the provided MotorControllers.
+   *
+   * @param motorControllers The MotorControllers to add.
+   */
   @SuppressWarnings("this-escape")
   public MotorControllerGroup(MotorController[] motorControllers) {
     m_motorControllers = Arrays.copyOf(motorControllers, motorControllers.length);

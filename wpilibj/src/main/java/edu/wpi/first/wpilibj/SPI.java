@@ -27,6 +27,7 @@ public class SPI implements AutoCloseable {
     /** MXP (roboRIO MXP) SPI bus port. */
     kMXP(SPIJNI.MXP_PORT);
 
+    /** SPI port value. */
     public final int value;
 
     Port(int value) {
@@ -45,6 +46,7 @@ public class SPI implements AutoCloseable {
     /** Clock idle high, data sampled on rising edge. */
     kMode3(SPIJNI.SPI_MODE3);
 
+    /** SPI mode value. */
     public final int value;
 
     Mode(int value) {
@@ -71,6 +73,11 @@ public class SPI implements AutoCloseable {
     HAL.report(tResourceType.kResourceType_SPI, port.value + 1);
   }
 
+  /**
+   * Returns the SPI port value.
+   *
+   * @return SPI port value.
+   */
   public int getPort() {
     return m_port;
   }

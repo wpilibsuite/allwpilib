@@ -1321,10 +1321,20 @@ public final class DriverStation {
     }
   }
 
+  /**
+   * Registers the given handle for DS data refresh notifications.
+   *
+   * @param handle The event handle.
+   */
   public static void provideRefreshedDataEventHandle(int handle) {
     m_refreshEvents.add(handle);
   }
 
+  /**
+   * Unregisters the given handle from DS data refresh notifications.
+   *
+   * @param handle The event handle.
+   */
   public static void removeRefreshedDataEventHandle(int handle) {
     m_refreshEvents.remove(handle);
   }
