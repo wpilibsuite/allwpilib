@@ -6,11 +6,17 @@ package edu.wpi.first.cscore;
 
 /** A source or sink property. */
 public class VideoProperty {
+  /** VideoProperty property types. */
   public enum Kind {
+    /** No specific property. */
     kNone(0),
+    /** Boolean property. */
     kBoolean(1),
+    /** Integer property. */
     kInteger(2),
+    /** String property. */
     kString(4),
+    /** Enum property. */
     kEnum(8);
 
     private final int value;

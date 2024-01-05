@@ -4,10 +4,15 @@
 
 package edu.wpi.first.wpilibj.counter;
 
+/** Edge configuration. */
 public enum EdgeConfiguration {
+  /** No edge configuration (neither rising nor falling). */
   kNone(false, false),
+  /** Rising edge configuration. */
   kRisingEdge(true, false),
+  /** Falling edge configuration. */
   kFallingEdge(false, true),
+  /** Both rising and falling edge configuration. */
   kBoth(true, true);
 
   @SuppressWarnings("MemberName")

@@ -14,11 +14,17 @@ import java.nio.IntBuffer;
 
 /** Represents an SPI bus port. */
 public class SPI implements AutoCloseable {
+  /** SPI port. */
   public enum Port {
+    /** Onboard SPI bus port CS0. */
     kOnboardCS0(SPIJNI.ONBOARD_CS0_PORT),
+    /** Onboard SPI bus port CS1. */
     kOnboardCS1(SPIJNI.ONBOARD_CS1_PORT),
+    /** Onboard SPI bus port CS2. */
     kOnboardCS2(SPIJNI.ONBOARD_CS2_PORT),
+    /** Onboard SPI bus port CS3. */
     kOnboardCS3(SPIJNI.ONBOARD_CS3_PORT),
+    /** MXP (roboRIO MXP) SPI bus port. */
     kMXP(SPIJNI.MXP_PORT);
 
     public final int value;
@@ -28,6 +34,7 @@ public class SPI implements AutoCloseable {
     }
   }
 
+  /** SPI mode. */
   public enum Mode {
     /** Clock idle low, data sampled on rising edge. */
     kMode0(SPIJNI.SPI_MODE0),

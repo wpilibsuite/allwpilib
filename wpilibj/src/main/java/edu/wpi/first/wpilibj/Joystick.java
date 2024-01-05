@@ -25,10 +25,15 @@ public class Joystick extends GenericHID {
 
   /** Represents an analog axis on a joystick. */
   public enum AxisType {
+    /** X axis. */
     kX(0),
+    /** Y axis. */
     kY(1),
+    /** Z axis. */
     kZ(2),
+    /** Twist axis. */
     kTwist(3),
+    /** Throttle axis. */
     kThrottle(4);
 
     public final int value;
@@ -40,7 +45,9 @@ public class Joystick extends GenericHID {
 
   /** Represents a digital button on a joystick. */
   public enum ButtonType {
+    /** kTrigger. */
     kTrigger(1),
+    /** kTop. */
     kTop(2);
 
     public final int value;

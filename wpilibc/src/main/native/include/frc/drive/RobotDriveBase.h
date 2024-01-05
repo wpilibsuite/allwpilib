@@ -23,12 +23,19 @@ class RobotDriveBase : public MotorSafety {
    * The location of a motor on the robot for the purpose of driving.
    */
   enum MotorType {
+    /// Front-left motor.
     kFrontLeft = 0,
+    /// Front-right motor.
     kFrontRight = 1,
+    /// Rear-left motor.
     kRearLeft = 2,
+    /// Rear-right motor.
     kRearRight = 3,
+    /// Left motor.
     kLeft = 0,
+    /// Right motor.
     kRight = 1,
+    /// Back motor.
     kBack = 2
   };
 

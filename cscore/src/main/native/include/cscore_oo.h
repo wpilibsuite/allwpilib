@@ -44,10 +44,15 @@ class VideoProperty {
 
  public:
   enum Kind {
+    /// No specific property.
     kNone = CS_PROP_NONE,
+    /// Boolean property.
     kBoolean = CS_PROP_BOOLEAN,
+    /// Integer property.
     kInteger = CS_PROP_INTEGER,
+    /// String property.
     kString = CS_PROP_STRING,
+    /// Enum property.
     kEnum = CS_PROP_ENUM
   };
 
@@ -100,9 +105,13 @@ class VideoSource {
 
  public:
   enum Kind {
+    /// Unknown video source.
     kUnknown = CS_SOURCE_UNKNOWN,
+    /// USB video source.
     kUsb = CS_SOURCE_USB,
+    /// HTTP video source.
     kHttp = CS_SOURCE_HTTP,
+    /// CV video source.
     kCv = CS_SOURCE_CV
   };
 
@@ -471,9 +480,13 @@ class UsbCamera : public VideoCamera {
 class HttpCamera : public VideoCamera {
  public:
   enum HttpCameraKind {
+    /// Unknown camera kind.
     kUnknown = CS_HTTP_UNKNOWN,
+    /// MJPG Streamer camera.
     kMJPGStreamer = CS_HTTP_MJPGSTREAMER,
+    /// CS Core camera.
     kCSCore = CS_HTTP_CSCORE,
+    /// Axis camera.
     kAxis = CS_HTTP_AXIS
   };
 
@@ -716,8 +729,11 @@ class VideoSink {
 
  public:
   enum Kind {
+    /// Unknown sink type.
     kUnknown = CS_SINK_UNKNOWN,
+    /// MJPEG video sink.
     kMjpeg = CS_SINK_MJPEG,
+    /// CV video sink.
     kCv = CS_SINK_CV
   };
 

@@ -44,9 +44,13 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
 
   /** The state to drive a Relay to. */
   public enum Value {
+    /** Off. */
     kOff("Off"),
+    /** On. */
     kOn("On"),
+    /** Forward. */
     kForward("Forward"),
+    /** Reverse. */
     kReverse("Reverse");
 
     private final String m_prettyValue;
@@ -66,11 +70,11 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
 
   /** The Direction(s) that a relay is configured to operate in. */
   public enum Direction {
-    /** direction: both directions are valid. */
+    /** Both directions are valid. */
     kBoth,
-    /** direction: Only forward is valid. */
+    /** Only forward is valid. */
     kForward,
-    /** direction: only reverse is valid. */
+    /** Only reverse is valid. */
     kReverse
   }
 

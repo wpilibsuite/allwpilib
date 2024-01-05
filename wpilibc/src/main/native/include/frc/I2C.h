@@ -22,7 +22,15 @@ namespace frc {
  */
 class I2C {
  public:
-  enum Port { kOnboard = 0, kMXP };
+  /**
+   * I2C connection ports.
+   */
+  enum Port {
+    /// Onboard I2C port.
+    kOnboard = 0,
+    /// MXP (roboRIO MXP) I2C port.
+    kMXP
+  };
 
   /**
    * Constructor.

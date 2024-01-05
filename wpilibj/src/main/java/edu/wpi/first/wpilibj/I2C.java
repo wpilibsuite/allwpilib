@@ -23,8 +23,11 @@ import java.nio.ByteBuffer;
  * WPILib Known Issues</a> page for details.
  */
 public class I2C implements AutoCloseable {
+  /** I2C connection ports. */
   public enum Port {
+    /** Onboard I2C port. */
     kOnboard(0),
+    /** MXP (roboRIO MXP) I2C port. */
     kMXP(1);
 
     public final int value;

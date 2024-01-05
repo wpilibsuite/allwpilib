@@ -8,26 +8,47 @@ package edu.wpi.first.cscore;
 @SuppressWarnings("MemberName")
 public class VideoEvent {
   public enum Kind {
+    /** Unknown video event. */
     kUnknown(0x0000),
+    /** Source Created event. */
     kSourceCreated(0x0001),
+    /** Source Destroyed event. */
     kSourceDestroyed(0x0002),
+    /** Source Connected event. */
     kSourceConnected(0x0004),
+    /** Source Disconnected event. */
     kSourceDisconnected(0x0008),
+    /** Source Video Modes Updated event. */
     kSourceVideoModesUpdated(0x0010),
+    /** Source VideoMode Changed event. */
     kSourceVideoModeChanged(0x0020),
+    /** Source Property Created event. */
     kSourcePropertyCreated(0x0040),
+    /** Source Property Value Updated event. */
     kSourcePropertyValueUpdated(0x0080),
+    /** Source Property Choices Updated event. */
     kSourcePropertyChoicesUpdated(0x0100),
+    /** Sink Source Changed event. */
     kSinkSourceChanged(0x0200),
+    /** Sink Created event. */
     kSinkCreated(0x0400),
+    /** Sink Destroyed event. */
     kSinkDestroyed(0x0800),
+    /** Sink Enabled event. */
     kSinkEnabled(0x1000),
+    /** Sink Disabled event. */
     kSinkDisabled(0x2000),
+    /** Network Interfaces Changed event. */
     kNetworkInterfacesChanged(0x4000),
+    /** Telemetry Updated event. */
     kTelemetryUpdated(0x8000),
+    /** Sink Property Created event. */
     kSinkPropertyCreated(0x10000),
+    /** Sink Property Value Updated event. */
     kSinkPropertyValueUpdated(0x20000),
+    /** Sink Property Choices Updated event. */
     kSinkPropertyChoicesUpdated(0x40000),
+    /** Usb Cameras Changed event. */
     kUsbCamerasChanged(0x80000);
 
     private final int value;
