@@ -16,7 +16,6 @@ import edu.wpi.first.units.Time;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.sysid.MotorLog;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
@@ -126,7 +125,7 @@ public class SysIdRoutine extends SysIdRoutineLog {
    */
   public static class Mechanism {
     public final Consumer<Measure<Voltage>> m_drive;
-    public final Consumer<MotorLog> m_log;
+    public final Consumer<SysIdRoutineLog> m_log;
     public final Subsystem m_subsystem;
     public final String m_name;
 
@@ -136,18 +135,18 @@ public class SysIdRoutine extends SysIdRoutineLog {
      * @param drive Sends the SysId-specified drive signal to the mechanism motors during test
      *     routines.
      * @param log Returns measured data (voltages, positions, velocities) of the mechanism motors
-     *     during test routines. To return data, call `recordFrame` on the supplied `MotorLog`
-     *     instance. Multiple motors can return data within a single `log` callback by calling
-     *     `recordFrame` multiple times.
+     *     during test routines. To return data, call `recordFrame` on the supplied
+     *     `SysIdRoutineLog` instance. Multiple motors can return data within a single `log`
+     *     callback by calling `recordFrame` multiple times.
      * @param subsystem The subsystem containing the motor(s) that is (or are) being characterized.
      *     Will be declared as a requirement for the returned test commands.
-     * @param name The name of the mechanism being tested. Will be appended to the log entry * title
+     * @param name The name of the mechanism being tested. Will be appended to the log entry title
      *     for the routine's test state, e.g. "sysid-test-state-mechanism". Defaults to the name of
      *     the subsystem if left null.
      */
     public Mechanism(
         Consumer<Measure<Voltage>> drive,
-        Consumer<MotorLog> log,
+        Consumer<SysIdRoutineLog> log,
         Subsystem subsystem,
         String name) {
       m_drive = drive;
@@ -163,16 +162,16 @@ public class SysIdRoutine extends SysIdRoutineLog {
      * @param drive Sends the SysId-specified drive signal to the mechanism motors during test
      *     routines.
      * @param log Returns measured data (voltages, positions, velocities) of the mechanism motors
-     *     during test routines. To return data, call `recordFrame` on the supplied `MotorLog`
-     *     instance. Multiple motors can return data within a single `log` callback by calling
-     *     `recordFrame` multiple times.
+     *     during test routines. To return data, call `recordFrame` on the supplied
+     *     `SysIdRoutineLog` instance. Multiple motors can return data within a single `log`
+     *     callback by calling `recordFrame` multiple times.
      * @param subsystem The subsystem containing the motor(s) that is (or are) being characterized.
      *     Will be declared as a requirement for the returned test commands. The subsystem's `name`
      *     will be appended to the log entry title for the routine's test state, e.g.
      *     "sysid-test-state-subsystem".
      */
     public Mechanism(
-        Consumer<Measure<Voltage>> drive, Consumer<MotorLog> log, Subsystem subsystem) {
+        Consumer<Measure<Voltage>> drive, Consumer<SysIdRoutineLog> log, Subsystem subsystem) {
       this(drive, log, subsystem, null);
     }
   }

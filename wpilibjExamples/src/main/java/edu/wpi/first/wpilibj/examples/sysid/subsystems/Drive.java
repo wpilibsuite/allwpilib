@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.Constants.DriveConstants;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
-import edu.wpi.first.wpilibj.sysid.MotorLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -70,23 +69,23 @@ public class Drive extends SubsystemBase {
               },
               // Tell SysId how to record a frame of data for each motor on the mechanism being
               // characterized.
-              (MotorLog log) -> {
+              log -> {
                 // Record a frame for the left motors.  Since these share an encoder, we consider
                 // the entire group to be one motor.
-                log.recordFrameLinear(
-                    m_appliedVoltage.mut_replace(
-                        m_leftMotor.get() * RobotController.getBatteryVoltage(), Volts),
-                    m_distance.mut_replace(m_leftEncoder.getDistance(), Meters),
-                    m_velocity.mut_replace(m_leftEncoder.getRate(), MetersPerSecond),
-                    "drive-left");
+                log.motor("drive-left")
+                    .voltage(m_appliedVoltage.mut_replace(
+                            m_leftMotor.get() * RobotController.getBatteryVoltage(), Volts))
+                    .linearPosition(m_distance.mut_replace(m_leftEncoder.getDistance(), Meters))
+                    .linearVelocity(
+                        m_velocity.mut_replace(m_leftEncoder.getRate(), MetersPerSecond));
                 // Record a frame for the right motors.  Since these share an encoder, we consider
                 // the entire group to be one motor.
-                log.recordFrameLinear(
-                    m_appliedVoltage.mut_replace(
-                        m_rightMotor.get() * RobotController.getBatteryVoltage(), Volts),
-                    m_distance.mut_replace(m_rightEncoder.getDistance(), Meters),
-                    m_velocity.mut_replace(m_rightEncoder.getRate(), MetersPerSecond),
-                    "drive-right");
+                log.motor("drive-right")
+                    .voltage(m_appliedVoltage.mut_replace(
+                            m_rightMotor.get() * RobotController.getBatteryVoltage(), Volts))
+                    .linearPosition(m_distance.mut_replace(m_rightEncoder.getDistance(), Meters))
+                    .linearVelocity(
+                        m_velocity.mut_replace(m_rightEncoder.getRate(), MetersPerSecond));
               },
               // Tell SysId to make generated commands require this subsystem, suffix test state in
               // WPILog with this subsystem's name ("drive")

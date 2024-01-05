@@ -17,7 +17,6 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.simulation.SimHooks;
-import edu.wpi.first.wpilibj.sysid.MotorLog;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
@@ -31,7 +30,7 @@ class SysIdRoutineTest {
 
     void drive(Measure<Voltage> voltage);
 
-    void log(MotorLog log);
+    void log(SysIdRoutineLog log);
   }
 
   Mechanism m_mechanism;

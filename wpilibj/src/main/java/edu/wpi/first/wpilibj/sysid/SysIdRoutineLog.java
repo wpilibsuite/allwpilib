@@ -4,10 +4,20 @@
 
 package edu.wpi.first.wpilibj.sysid;
 
-import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;
-import static java.util.Map.entry;
 
+import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.Current;
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Velocity;
+import edu.wpi.first.units.Voltage;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.util.datalog.StringLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -19,7 +29,7 @@ import java.util.Map;
  * dynamic, forward and reverse) should have its own SysIdRoutineLog instance, with a unique log
  * name.
  */
-public class SysIdRoutineLog implements MotorLog {
+public class SysIdRoutineLog {
   private final Map<String, Map<String, DoubleLogEntry>> m_logEntries = new HashMap<>();
   private final String m_logName;
   private final StringLogEntry m_state;
@@ -58,35 +68,139 @@ public class SysIdRoutineLog implements MotorLog {
     }
   }
 
-  @Override
-  public void recordFrame(
-      double voltage, double distance, double velocity, String motorName, String distanceUnit) {
-    var motorEntries = m_logEntries.get(motorName);
+  /** Allows logging of data for a single motor during a SysIdRoutine. */
+  public class MotorLog {
+    private final String m_motorName;
 
-    if (motorEntries == null) {
-      var log = DataLogManager.getLog();
-
-      motorEntries =
-          Map.ofEntries(
-              entry(
-                  "voltage",
-                  new DoubleLogEntry(log, "voltage-" + motorName + "-" + m_logName, Volts.name())),
-              entry(
-                  "distance",
-                  new DoubleLogEntry(log, "distance-" + motorName + "-" + m_logName, distanceUnit)),
-              entry(
-                  "velocity",
-                  new DoubleLogEntry(
-                      log,
-                      "velocity-" + motorName + "-" + m_logName,
-                      distanceUnit + "-per-" + Seconds.name())));
-
-      m_logEntries.put(motorName, motorEntries);
+    /**
+     * Create a new SysId motor log handle.
+     *
+     * @param motorName The name of the motor whose data is being logged.
+     */
+    private MotorLog(String motorName) {
+      m_motorName = motorName;
+      m_logEntries.put(motorName, new HashMap<>());
     }
 
-    motorEntries.get("voltage").append(voltage);
-    motorEntries.get("distance").append(distance);
-    motorEntries.get("velocity").append(velocity);
+    /**
+     * Record a generic data value from this motor.
+     *
+     * @param name The name of the data field being recorded.
+     * @param value The numeric value of the data field.
+     * @param unit The unit string of the data field.
+     * @return The motor log (for call chaining).
+     */
+    public MotorLog value(String name, double value, String unit) {
+      var motorEntries = m_logEntries.get(m_motorName);
+      var entry = motorEntries.get(name);
+
+      if (entry == null) {
+        var log = DataLogManager.getLog();
+
+        entry = new DoubleLogEntry(log, name + "-" + m_motorName + "-" + m_logName, unit);
+        motorEntries.put(name, entry);
+      }
+
+      entry.append(value);
+      return this;
+    }
+
+    /**
+     * Record a voltage value from this motor.
+     *
+     * @param voltage The voltage to record.
+     * @return The motor log (for call chaining).
+     */
+    public MotorLog voltage(Measure<Voltage> voltage) {
+      return value("voltage", voltage.in(Volts), Volts.name());
+    }
+
+    /**
+     * Record a linear position value from this motor.
+     *
+     * @param position The linear position to record.
+     * @return The motor log (for call chaining).
+     */
+    public MotorLog linearPosition(Measure<Distance> position) {
+      return value("position", position.in(Meters), Meters.name());
+    }
+
+    /**
+     * Record an angular position value from this motor.
+     *
+     * @param position The angular position to record.
+     * @return The motor log (for call chaining).
+     */
+    public MotorLog angularPosition(Measure<Angle> position) {
+      return value("position", position.in(Rotations), Rotations.name());
+    }
+
+    /**
+     * Record a linear velocity value from this motor.
+     *
+     * @param velocity The linear velocity to record.
+     * @return The motor log (for call chaining).
+     */
+    public MotorLog linearVelocity(Measure<Velocity<Distance>> velocity) {
+      return value("velocity", velocity.in(MetersPerSecond), MetersPerSecond.name());
+    }
+
+    /**
+     * Record an angular velocity value from this motor.
+     *
+     * @param velocity The angular velocity to record.
+     * @return The motor log (for call chaining).
+     */
+    public MotorLog angularVelocity(Measure<Velocity<Angle>> velocity) {
+      return value("velocity", velocity.in(RotationsPerSecond), RotationsPerSecond.name());
+    }
+
+    /**
+     * Record a linear acceleration value from this motor.
+     *
+     * @param acceleration The linear acceleration to record.
+     * @return The motor log (for call chaining).
+     */
+    public MotorLog linearAcceleration(Measure<Velocity<Velocity<Distance>>> acceleration) {
+      return value(
+          "position",
+          acceleration.in(MetersPerSecond.per(Second)),
+          MetersPerSecond.per(Second).name());
+    }
+
+    /**
+     * Record an angular acceleration value from this motor.
+     *
+     * @param acceleration The angular acceleration to record.
+     * @return The motor log (for call chaining).
+     */
+    public MotorLog angularAcceleration(Measure<Velocity<Velocity<Angle>>> acceleration) {
+      return value(
+          "position",
+          acceleration.in(RotationsPerSecond.per(Second)),
+          RotationsPerSecond.per(Second).name());
+    }
+
+    /**
+     * Record a current value for this motor.
+     *
+     * @param current The current to record.
+     * @return The motor log (for call chaining).
+     */
+    public MotorLog current(Measure<Current> current) {
+      value("current", current.in(Amps), Amps.name());
+      return this;
+    }
+  }
+
+  /**
+   * Returns the logging handle for a given motor.
+   *
+   * @param motorName The name of the motor to log data from.
+   * @return The logging handle for the specified motor.
+   */
+  public MotorLog motor(String motorName) {
+    return new MotorLog(motorName);
   }
 
   /**
