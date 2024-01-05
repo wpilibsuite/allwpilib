@@ -105,13 +105,13 @@ class VideoSource {
 
  public:
   enum Kind {
-    /// Unknown video source = 0.
+    /// Unknown video source.
     kUnknown = CS_SOURCE_UNKNOWN,
-    /// USB video source = 1.
+    /// USB video source.
     kUsb = CS_SOURCE_USB,
-    /// HTTP video source = 2.
+    /// HTTP video source.
     kHttp = CS_SOURCE_HTTP,
-    /// CV video source = 3.
+    /// CV video source.
     kCv = CS_SOURCE_CV
   };
 

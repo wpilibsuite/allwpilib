@@ -304,9 +304,9 @@ public class CameraServerJNI {
   // Telemetry Functions
   //
   public enum TelemetryKind {
-    /** kSourceBytesReceived = 1. */
+    /** kSourceBytesReceived. */
     kSourceBytesReceived(1),
-    /** kSourceFramesReceived = 2. */
+    /** kSourceFramesReceived. */
     kSourceFramesReceived(2);
 
     private final int value;
