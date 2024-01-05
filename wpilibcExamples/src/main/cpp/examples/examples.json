@@ -927,5 +927,17 @@
     "foldername": "FlywheelBangBangController",
     "gradlebase": "cpp",
     "commandversion": 2
+  },
+  {
+    "name": "SysIdRoutine",
+    "description": "A sample command-based robot demonstrating use of the SysIdRoutine command factory",
+    "tags": [
+      "SysId",
+      "Command-based",
+      "DataLog"
+    ],
+    "foldername": "SysId",
+    "gradlebase": "cpp",
+    "commandversion": 2
   }
 ]
