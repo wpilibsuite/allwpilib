@@ -61,9 +61,16 @@ public class SysIdRoutine extends SysIdRoutineLog {
 
   /** Hardware-independent configuration for a SysId test routine. */
   public static class Config {
+    /** The voltage ramp rate used for quasistatic test routines. */
     public final Measure<Velocity<Voltage>> m_rampRate;
+
+    /** The step voltage output used for dynamic test routines. */
     public final Measure<Voltage> m_stepVoltage;
+
+    /** Safety timeout for the test routine commands. */
     public final Measure<Time> m_timeout;
+
+    /** Optional handle for recording test state in a third-party logging solution. */
     public final Consumer<State> m_recordState;
 
     /**
@@ -124,9 +131,19 @@ public class SysIdRoutine extends SysIdRoutineLog {
    * routine to control and record data from the mechanism.
    */
   public static class Mechanism {
+    /** Sends the SysId-specified drive signal to the mechanism motors during test routines. */
     public final Consumer<Measure<Voltage>> m_drive;
+
+    /**
+     * Returns measured data (voltages, positions, velocities) of the mechanism motors during test
+     * routines.
+     */
     public final Consumer<SysIdRoutineLog> m_log;
+
+    /** The subsystem containing the motor(s) that is (or are) being characterized. */
     public final Subsystem m_subsystem;
+
+    /** The name of the mechanism being tested. */
     public final String m_name;
 
     /**
@@ -178,7 +195,9 @@ public class SysIdRoutine extends SysIdRoutineLog {
 
   /** Motor direction for a SysId test. */
   public enum Direction {
+    /** Forward. */
     kForward,
+    /** Reverse. */
     kReverse
   }
 

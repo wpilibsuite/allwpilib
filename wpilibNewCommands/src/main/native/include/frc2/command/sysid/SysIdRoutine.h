@@ -23,9 +23,17 @@ using ramp_rate_t = units::unit_t<
 /** Hardware-independent configuration for a SysId test routine. */
 class Config {
  public:
+  /// The voltage ramp rate used for quasistatic test routines.
   ramp_rate_t m_rampRate{1_V / 1_s};
+
+  /// The step voltage output used for dynamic test routines.
   units::volt_t m_stepVoltage{7_V};
+
+  /// Safety timeout for the test routine commands.
   units::second_t m_timeout{10_s};
+
+  /// Optional handle for recording test state in a third-party logging
+  /// solution.
   std::function<void(frc::sysid::State)> m_recordState;
 
   /**
@@ -62,9 +70,20 @@ class Config {
 
 class Mechanism {
  public:
+  /// Sends the SysId-specified drive signal to the mechanism motors during test
+  /// routines.
   std::function<void(units::volt_t)> m_drive;
+
+  /// Returns measured data (voltages, positions, velocities) of the mechanism
+  /// motors during test routines.
   std::function<void(frc::sysid::SysIdRoutineLog*)> m_log;
+
+  /// The subsystem containing the motor(s) that is (or are) being
+  /// characterized.
   frc2::Subsystem* m_subsystem;
+
+  /// The name of the mechanism being tested. Will be appended to the log entry
+  /// title for the routine's test state, e.g. "sysid-test-state-mechanism".
   std::string m_name;
 
   /**
@@ -116,7 +135,15 @@ class Mechanism {
         m_name{m_subsystem->GetName()} {}
 };
 
-enum Direction { kForward, kReverse };
+/**
+ * Motor direction for a SysId test.
+ */
+enum Direction {
+  /// Forward.
+  kForward,
+  /// Reverse.
+  kReverse
+};
 
 /**
  * A SysId characterization routine for a single mechanism. Mechanisms may have

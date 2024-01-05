@@ -20,12 +20,19 @@
 
 namespace frc::sysid {
 
-/** Possible state of a SysId routine. */
+/**
+ * Possible state of a SysId routine.
+ */
 enum class State {
+  /// Quasistatic forward test.
   kQuasistaticForward,
+  /// Quasistatic reverse test.
   kQuasistaticReverse,
+  /// Dynamic forward test.
   kDynamicForward,
+  /// Dynamic reverse test.
   kDynamicReverse,
+  /// No test.
   kNone
 };
 
