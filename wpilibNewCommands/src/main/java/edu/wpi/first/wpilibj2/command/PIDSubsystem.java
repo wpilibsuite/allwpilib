@@ -28,6 +28,7 @@ public abstract class PIDSubsystem extends SubsystemBase {
    * @param initialPosition the initial setpoint of the subsystem
    */
   @SuppressWarnings("this-escape")
+  @Deprecated
   public PIDSubsystem(PIDController controller, double initialPosition) {
     m_controller = requireNonNullParam(controller, "controller", "PIDSubsystem");
     setSetpoint(initialPosition);

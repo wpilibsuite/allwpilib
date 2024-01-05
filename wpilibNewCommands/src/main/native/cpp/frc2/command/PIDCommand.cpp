@@ -8,6 +8,7 @@
 
 using namespace frc2;
 
+[[deprecated("This is now deprecated use PIDController instead")]]
 PIDCommand::PIDCommand(frc::PIDController controller,
                        std::function<double()> measurementSource,
                        std::function<double()> setpointSource,
@@ -20,6 +21,7 @@ PIDCommand::PIDCommand(frc::PIDController controller,
   AddRequirements(requirements);
 }
 
+[[deprecated("This is now deprecated use PIDController instead")]]
 PIDCommand::PIDCommand(frc::PIDController controller,
                        std::function<double()> measurementSource,
                        double setpoint, std::function<void(double)> useOutput,

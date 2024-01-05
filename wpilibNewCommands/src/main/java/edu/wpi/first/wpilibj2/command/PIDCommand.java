@@ -40,6 +40,7 @@ public class PIDCommand extends Command {
    * @param useOutput the controller's output
    * @param requirements the subsystems required by this command
    */
+  @Deprecated
   public PIDCommand(
       PIDController controller,
       DoubleSupplier measurementSource,
@@ -67,6 +68,7 @@ public class PIDCommand extends Command {
    * @param useOutput the controller's output
    * @param requirements the subsystems required by this command
    */
+  @Deprecated
   public PIDCommand(
       PIDController controller,
       DoubleSupplier measurementSource,
