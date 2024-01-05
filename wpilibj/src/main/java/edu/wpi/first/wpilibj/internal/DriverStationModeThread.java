@@ -9,9 +9,7 @@ import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.DriverStation;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/*
- * For internal use only.
- */
+/** For internal use only. */
 public class DriverStationModeThread implements AutoCloseable {
   private final AtomicBoolean m_keepAlive = new AtomicBoolean();
   private final Thread m_thread;

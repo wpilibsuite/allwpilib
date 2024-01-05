@@ -17,6 +17,8 @@ public abstract class PWMMotorController extends MotorSafety
     implements MotorController, Sendable, AutoCloseable {
   private boolean m_isInverted;
   private final ArrayList<PWMMotorController> m_followers = new ArrayList<>();
+
+  /** PWM instances for motor controller. */
   protected PWM m_pwm;
 
   /**

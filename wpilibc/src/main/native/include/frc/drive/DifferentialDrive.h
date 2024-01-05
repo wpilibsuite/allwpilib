@@ -65,7 +65,9 @@ class DifferentialDrive : public RobotDriveBase,
    * Uses normalized voltage [-1.0..1.0].
    */
   struct WheelSpeeds {
+    /// Left wheel speed.
     double left = 0.0;
+    /// Right wheel speed.
     double right = 0.0;
   };
 

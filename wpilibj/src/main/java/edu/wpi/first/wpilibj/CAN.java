@@ -22,7 +22,10 @@ import java.io.Closeable;
  * calls.
  */
 public class CAN implements Closeable {
+  /** Team manufacturer. */
   public static final int kTeamManufacturer = CANAPITypes.CANManufacturer.kTeamUse.id;
+
+  /** Team device type. */
   public static final int kTeamDeviceType = CANAPITypes.CANDeviceType.kMiscellaneous.id;
 
   private final int m_handle;

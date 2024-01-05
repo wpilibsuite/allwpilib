@@ -22,10 +22,15 @@ namespace frc {
  */
 class Joystick : public GenericHID {
  public:
+  /// Default X axis channel.
   static constexpr int kDefaultXChannel = 0;
+  /// Default Y axis channel.
   static constexpr int kDefaultYChannel = 1;
+  /// Default Z axis channel.
   static constexpr int kDefaultZChannel = 2;
+  /// Default twist axis channel.
   static constexpr int kDefaultTwistChannel = 2;
+  /// Default throttle axis channel.
   static constexpr int kDefaultThrottleChannel = 3;
 
   /**

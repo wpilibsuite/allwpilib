@@ -17,10 +17,19 @@ import edu.wpi.first.wpilibj.event.EventLoop;
  * and the mapping of ports to hardware buttons depends on the code in the Driver Station.
  */
 public class Joystick extends GenericHID {
+  /** Default X axis channel. */
   public static final byte kDefaultXChannel = 0;
+
+  /** Default Y axis channel. */
   public static final byte kDefaultYChannel = 1;
+
+  /** Default Z axis channel. */
   public static final byte kDefaultZChannel = 2;
+
+  /** Default twist axis channel. */
   public static final byte kDefaultTwistChannel = 2;
+
+  /** Default throttle axis channel. */
   public static final byte kDefaultThrottleChannel = 3;
 
   /** Represents an analog axis on a joystick. */
@@ -36,6 +45,7 @@ public class Joystick extends GenericHID {
     /** Throttle axis. */
     kThrottle(4);
 
+    /** AxisType value. */
     public final int value;
 
     AxisType(int value) {
@@ -50,6 +60,7 @@ public class Joystick extends GenericHID {
     /** kTop. */
     kTop(2);
 
+    /** ButtonType value. */
     public final int value;
 
     ButtonType(int value) {

@@ -19,6 +19,11 @@ namespace frc {
 class Servo : public PWM {
  public:
   /**
+   * Constructor.
+   *
+   * By default, 2.4 ms is used as the max PWM value and 0.6 ms is used as the
+   * min PWM value.
+   *
    * @param channel The PWM channel to which the servo is attached. 0-9 are
    *                on-board, 10-19 are on the MXP port
    */

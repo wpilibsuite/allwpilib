@@ -12,10 +12,16 @@ import edu.wpi.first.wpilibj.MotorSafety;
  * <p>{@link edu.wpi.first.wpilibj.MotorSafety} is enabled by default.
  */
 public abstract class RobotDriveBase extends MotorSafety {
+  /** Default input deadband. */
   public static final double kDefaultDeadband = 0.02;
+
+  /** Default maximum output. */
   public static final double kDefaultMaxOutput = 1.0;
 
+  /** Input deadband. */
   protected double m_deadband = kDefaultDeadband;
+
+  /** Maximum output. */
   protected double m_maxOutput = kDefaultMaxOutput;
 
   /** The location of a motor on the robot for the purpose of driving. */
@@ -35,6 +41,7 @@ public abstract class RobotDriveBase extends MotorSafety {
     /** Back motor. */
     kBack(2);
 
+    /** MotorType value. */
     public final int value;
 
     MotorType(int value) {

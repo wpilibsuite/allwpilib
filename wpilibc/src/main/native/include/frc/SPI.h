@@ -67,6 +67,11 @@ class SPI {
   SPI(SPI&&) = default;
   SPI& operator=(SPI&&) = default;
 
+  /**
+   * Returns the SPI port.
+   *
+   * @return The SPI port.
+   */
   Port GetPort() const;
 
   /**

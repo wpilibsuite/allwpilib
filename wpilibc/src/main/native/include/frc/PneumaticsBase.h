@@ -18,6 +18,10 @@ namespace frc {
 class Solenoid;
 class DoubleSolenoid;
 class Compressor;
+
+/**
+ * Base class for pneumatics devices.
+ */
 class PneumaticsBase {
  public:
   virtual ~PneumaticsBase() = default;

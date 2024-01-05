@@ -140,11 +140,20 @@ class LinearSystemSim {
         u, frc::RobotController::GetInputVoltage());
   }
 
+  /// The plant that represents the linear system.
   LinearSystem<States, Inputs, Outputs> m_plant;
 
+  /// State vector.
   Vectord<States> m_x;
-  Vectord<Outputs> m_y;
+
+  /// Input vector.
   Vectord<Inputs> m_u;
+
+  /// Output vector.
+  Vectord<Outputs> m_y;
+
+  /// The standard deviations of measurements, used for adding noise to the
+  /// measurements.
   std::array<double, Outputs> m_measurementStdDevs;
 };
 }  // namespace frc::sim

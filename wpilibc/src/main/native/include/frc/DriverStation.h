@@ -355,9 +355,25 @@ class DriverStation final {
    */
   static double GetBatteryVoltage();
 
+  /**
+   * Copy data from the DS task for the user. If no new data exists, it will
+   * just be returned, otherwise the data will be copied from the DS polling
+   * loop.
+   */
   static void RefreshData();
 
+  /**
+   * Registers the given handle for DS data refresh notifications.
+   *
+   * @param handle The event handle.
+   */
   static void ProvideRefreshedDataEventHandle(WPI_EventHandle handle);
+
+  /**
+   * Unregisters the given handle from DS data refresh notifications.
+   *
+   * @param handle The event handle.
+   */
   static void RemoveRefreshedDataEventHandle(WPI_EventHandle handle);
 
   /**
