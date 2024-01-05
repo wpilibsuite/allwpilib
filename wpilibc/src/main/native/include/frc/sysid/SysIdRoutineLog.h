@@ -5,6 +5,7 @@
 #pragma once
 
 #include <string>
+#include <string_view>
 #include <unordered_map>
 
 #include <units/acceleration.h>
@@ -40,11 +41,10 @@ class SysIdRoutineLog {
  public:
   class MotorLog {
    public:
-    MotorLog(const std::string& motorName, const std::string& logName,
+    MotorLog(std::string_view motorName, std::string_view logName,
              LogEntries* logEntries);
 
-    MotorLog& value(const std::string& name, double value,
-                    const std::string& unit);
+    MotorLog& value(std::string_view name, double value, std::string_view unit);
 
     MotorLog& voltage(units::volt_t voltage) {
       return value("voltage", voltage.value(), voltage.name());
@@ -83,15 +83,17 @@ class SysIdRoutineLog {
     std::string m_logName;
     LogEntries* m_logEntries;
   };
+
   /**
    * Create a new logging utility for a SysId test routine.
    *
    * @param logName The name for the test routine in the log. Should be unique
-   * between complete test routines (quasistatic and dynamic, forward and
-   * reverse). The current state of this test (e.g. "quasistatic-forward") will
-   * appear in WPILog under the "sysid-test-state-logName" entry.
+   *   between complete test routines (quasistatic and dynamic, forward and
+   *   reverse). The current state of this test (e.g. "quasistatic-forward")
+   *   will appear in WPILog under the "sysid-test-state-logName" entry.
    */
-  explicit SysIdRoutineLog(const std::string& logName);
+  explicit SysIdRoutineLog(std::string_view logName);
+
   /**
    * Records the current state of the SysId test routine. Should be called once
    * per iteration during tests with the type of the current test, and once upon
@@ -101,13 +103,13 @@ class SysIdRoutineLog {
    */
   void RecordState(State state);
 
-  MotorLog Motor(const std::string& motorName);
+  MotorLog Motor(std::string_view motorName);
 
   static std::string StateEnumToString(State state);
 
  private:
-  LogEntries m_logEntries{};
-  std::string m_logName{};
-  wpi::log::StringLogEntry m_state{};
+  LogEntries m_logEntries;
+  std::string m_logName;
+  wpi::log::StringLogEntry m_state;
 };
 }  // namespace frc::sysid

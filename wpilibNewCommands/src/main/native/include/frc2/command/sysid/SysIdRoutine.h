@@ -6,6 +6,8 @@
 
 #include <functional>
 #include <string>
+#include <string_view>
+#include <utility>
 
 #include <frc/Timer.h>
 #include <frc/sysid/SysIdRoutineLog.h>
@@ -21,18 +23,23 @@ using ramp_rate_t = units::unit_t<
 /** Hardware-independent configuration for a SysId test routine. */
 class Config {
  public:
+  ramp_rate_t m_rampRate{1_V / 1_s};
+  units::volt_t m_stepVoltage{7_V};
+  units::second_t m_timeout{10_s};
+  std::function<void(frc::sysid::State)> m_recordState;
+
   /**
    * Create a new configuration for a SysId test routine.
    *
    * @param rampRate The voltage ramp rate used for quasistatic test routines.
-   * Defaults to 1 volt per second if left null.
+   *   Defaults to 1 volt per second if left null.
    * @param stepVoltage The step voltage output used for dynamic test routines.
-   * Defaults to 7 volts if left null.
+   *   Defaults to 7 volts if left null.
    * @param timeout Safety timeout for the test routine commands. Defaults to 10
-   * seconds if left null.
+   *   seconds if left null.
    * @param recordState Optional handle for recording test state in a
-   * third-party logging solution. If provided, the test routine state will be
-   * passed to this callback instead of logged in WPILog.
+   *   third-party logging solution. If provided, the test routine state will be
+   *   passed to this callback instead of logged in WPILog.
    */
   Config(std::optional<ramp_rate_t> rampRate,
          std::optional<units::volt_t> stepVoltage,
@@ -51,62 +58,62 @@ class Config {
       m_recordState = recordState.value();
     }
   }
-  ramp_rate_t m_rampRate{1_V / 1_s};
-  units::volt_t m_stepVoltage{7_V};
-  units::second_t m_timeout{10_s};
-  std::function<void(frc::sysid::State)> m_recordState;
 };
 
 class Mechanism {
  public:
+  std::function<void(units::volt_t)> m_drive;
+  std::function<void(frc::sysid::SysIdRoutineLog*)> m_log;
+  frc2::Subsystem* m_subsystem;
+  std::string m_name;
+
   /**
    * Create a new mechanism specification for a SysId routine.
    *
    * @param drive Sends the SysId-specified drive signal to the mechanism motors
-   * during test routines.
+   *   during test routines.
    * @param log Returns measured data (voltages, positions, velocities) of the
-   * mechanism motors during test routines. To return data, call `RecordFrame`
-   * on the supplied `MotorLog` instance. Multiple motors can return data within
-   * a single `log` callback by calling `RecordFrame` multiple times.
+   *   mechanism motors during test routines. To return data, call `RecordFrame`
+   *   on the supplied `MotorLog` instance. Multiple motors can return data
+   *   within a single `log` callback by calling `RecordFrame` multiple times.
    * @param subsystem The subsystem containing the motor(s) that is (or are)
-   * being characterized. Will be declared as a requirement for the returned
-   * test commands.
+   *   being characterized. Will be declared as a requirement for the returned
+   *   test commands.
    * @param name The name of the mechanism being tested. Will be appended to the
-   * log entry * title for the routine's test state, e.g.
-   * "sysid-test-state-mechanism". Defaults to the name of the subsystem if left
-   * null.
+   *   log entry * title for the routine's test state, e.g.
+   *   "sysid-test-state-mechanism". Defaults to the name of the subsystem if
+   *   left null.
    */
   Mechanism(std::function<void(units::volt_t)> drive,
             std::function<void(frc::sysid::SysIdRoutineLog*)> log,
-            frc2::Subsystem* subsystem, const std::string& name)
-      : m_drive(drive), m_log(log), m_subsystem(subsystem), m_name(name) {}
+            frc2::Subsystem* subsystem, std::string_view name)
+      : m_drive{std::move(drive)},
+        m_log{std::move(log)},
+        m_subsystem{subsystem},
+        m_name{name} {}
 
   /**
    * Create a new mechanism specification for a SysId routine. Defaults the
    * mechanism name to the subsystem name.
    *
    * @param drive Sends the SysId-specified drive signal to the mechanism motors
-   * during test routines.
+   *   during test routines.
    * @param log Returns measured data (voltages, positions, velocities) of the
-   * mechanism motors during test routines. To return data, call `recordFrame`
-   * on the supplied `MotorLog` instance. Multiple motors can return data within
-   * a single `log` callback by calling `recordFrame` multiple times.
+   *   mechanism motors during test routines. To return data, call `recordFrame`
+   *   on the supplied `MotorLog` instance. Multiple motors can return data
+   *   within a single `log` callback by calling `recordFrame` multiple times.
    * @param subsystem The subsystem containing the motor(s) that is (or are)
-   * being characterized. Will be declared as a requirement for the returned
-   * test commands. The subsystem's `name` will be appended to the log entry
-   * title for the routine's test state, e.g. "sysid-test-state-subsystem".
+   *   being characterized. Will be declared as a requirement for the returned
+   *   test commands. The subsystem's `name` will be appended to the log entry
+   *   title for the routine's test state, e.g. "sysid-test-state-subsystem".
    */
   Mechanism(std::function<void(units::volt_t)> drive,
             std::function<void(frc::sysid::SysIdRoutineLog*)> log,
             frc2::Subsystem* subsystem)
-      : m_drive(drive),
-        m_log(log),
-        m_subsystem(subsystem),
-        m_name(m_subsystem->GetName()) {}
-  std::function<void(units::volt_t)> m_drive;
-  std::function<void(frc::sysid::SysIdRoutineLog*)> m_log;
-  frc2::Subsystem* m_subsystem;
-  const std::string m_name;
+      : m_drive{std::move(drive)},
+        m_log{std::move(log)},
+        m_subsystem{subsystem},
+        m_name{m_subsystem->GetName()} {}
 };
 
 enum Direction { kForward, kReverse };
@@ -115,16 +122,16 @@ enum Direction { kForward, kReverse };
  * A SysId characterization routine for a single mechanism. Mechanisms may have
  * multiple motors.
  *
- * <p>A single subsystem may have multiple mechanisms, but mechanisms should not
+ * A single subsystem may have multiple mechanisms, but mechanisms should not
  * share test routines. Each complete test of a mechanism should have its own
  * SysIdRoutine instance, since the log name of the recorded data is determined
  * by the mechanism name.
  *
- * <p>The test state (e.g. "quasistatic-forward") is logged once per iteration
+ * The test state (e.g. "quasistatic-forward") is logged once per iteration
  * during test execution, and once with state "none" when a test ends. Motor
  * frames are logged every iteration during test execution.
  *
- * <p>Timestamps are not coordinated across data, so motor frames and test state
+ * Timestamps are not coordinated across data, so motor frames and test state
  * tags may be recorded on different log frames. Because frame alignment is not
  * guaranteed, SysId parses the log by using the test state flag to determine
  * the timestamp range for each section of the test, and then extracts the motor
