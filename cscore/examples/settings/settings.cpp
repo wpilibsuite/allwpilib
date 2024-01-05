@@ -6,8 +6,8 @@
 #include <cstdio>
 #include <thread>
 
-#include <fmt/format.h>
 #include <wpi/StringExtras.h>
+#include <wpi/print.h>
 
 #include "cscore.h"
 
@@ -73,26 +73,26 @@ int main(int argc, char** argv) {
   // Print settings
   std::puts("Properties:");
   for (const auto& prop : camera.EnumerateProperties()) {
-    fmt::print("  {}", prop.GetName());
+    wpi::print("  {}", prop.GetName());
     switch (prop.GetKind()) {
       case cs::VideoProperty::kBoolean:
-        fmt::print(" (bool): value={} default={}", prop.Get(),
+        wpi::print(" (bool): value={} default={}", prop.Get(),
                    prop.GetDefault());
         break;
       case cs::VideoProperty::kInteger:
-        fmt::print(" (int): value={} min={} max={} step={} default={}",
+        wpi::print(" (int): value={} min={} max={} step={} default={}",
                    prop.Get(), prop.GetMin(), prop.GetMax(), prop.GetStep(),
                    prop.GetDefault());
         break;
       case cs::VideoProperty::kString:
-        fmt::print(" (string): {}", prop.GetString());
+        wpi::print(" (string): {}", prop.GetString());
         break;
       case cs::VideoProperty::kEnum: {
-        fmt::print(" (enum): value={}", prop.Get());
+        wpi::print(" (enum): value={}", prop.Get());
         auto choices = prop.GetChoices();
         for (size_t i = 0; i < choices.size(); ++i) {
           if (!choices[i].empty()) {
-            fmt::print("\n    {}: {}", i, choices[i]);
+            wpi::print("\n    {}: {}", i, choices[i]);
           }
         }
         break;

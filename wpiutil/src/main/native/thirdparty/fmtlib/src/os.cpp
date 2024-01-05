@@ -18,8 +18,8 @@
 #  include <sys/stat.h>
 #  include <sys/types.h>
 
-#  ifdef _WRS_KERNEL   // VxWorks7 kernel
-#    include <ioLib.h> // getpagesize
+#  ifdef _WRS_KERNEL    // VxWorks7 kernel
+#    include <ioLib.h>  // getpagesize
 #  endif
 
 #  ifndef _WIN32
@@ -182,10 +182,14 @@ void buffered_file::close() {
 }
 
 int buffered_file::descriptor() const {
-#ifdef fileno  // fileno is a macro on OpenBSD so we cannot use FMT_POSIX_CALL.
-  int fd = fileno(file_);
-#else
+#if !defined(fileno)
   int fd = FMT_POSIX_CALL(fileno(file_));
+#elif defined(FMT_HAS_SYSTEM)
+  // fileno is a macro on OpenBSD so we cannot use FMT_POSIX_CALL.
+#  define FMT_DISABLE_MACRO
+  int fd = FMT_SYSTEM(fileno FMT_DISABLE_MACRO(file_));
+#else
+  int fd = fileno(file_);
 #endif
   if (fd == -1)
     FMT_THROW(system_error(errno, FMT_STRING("cannot get file descriptor")));
@@ -258,7 +262,9 @@ long long file::size() const {
 std::size_t file::read(void* buffer, std::size_t count) {
   rwresult result = 0;
   FMT_RETRY(result, FMT_POSIX_CALL(read(fd_, buffer, convert_rwcount(count))));
-  return count;
+  if (result < 0)
+    FMT_THROW(system_error(errno, FMT_STRING("cannot read from file")));
+  return detail::to_unsigned(result);
 }
 
 std::size_t file::write(const void* buffer, std::size_t count) {

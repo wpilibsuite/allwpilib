@@ -15,7 +15,7 @@
 #include "wpi/SmallVector.h"
 #include "wpi/Errc.h"
 #include "wpi/WindowsError.h"
-#include "fmt/format.h"
+#include "wpi/print.h"
 #include <cassert>
 #include <cstdlib>
 #include <mutex>
@@ -86,7 +86,7 @@ void wpi::report_fatal_error(std::string_view Reason, bool GenCrashDiag) {
   if (handler) {
     handler(handlerData, std::string{Reason}.c_str(), GenCrashDiag);
   } else {
-    fmt::print(stderr, "LLVM ERROR: {}\n", Reason);
+    wpi::print(stderr, "LLVM ERROR: {}\n", Reason);
   }
 
   exit(1);
@@ -159,11 +159,11 @@ void wpi::wpi_unreachable_internal(const char *msg, const char *file,
   // wpi_unreachable is intended to be used to indicate "impossible"
   // situations, and not legitimate runtime errors.
   if (msg)
-    fmt::print(stderr, "{}\n", msg);
+    wpi::print(stderr, "{}\n", msg);
   std::fputs("UNREACHABLE executed", stderr);
   if (file)
-    fmt::print(stderr, " at {}:{}", file, line);
-  fmt::print(stderr, "!\n");
+    wpi::print(stderr, " at {}:{}", file, line);
+  wpi::print(stderr, "!\n");
   abort();
 #ifdef LLVM_BUILTIN_UNREACHABLE
   // Windows systems and possibly others don't declare abort() to be noreturn,
