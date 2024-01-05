@@ -13,16 +13,23 @@ import edu.wpi.first.hal.PowerDistributionVersion;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * Class for getting voltage, current, temperature, power and energy from the CTRE Power
- * Distribution Panel (PDP) or REV Power Distribution Hub (PDH) over CAN.
+ * Class for getting voltage, current, temperature, power, resistance, and energy from the CTRE
+ * Power Distribution Panel (PDP) or REV Power Distribution Hub (PDH) over CAN.
  */
 public class PowerDistribution implements Sendable, AutoCloseable {
   private final int m_handle;
   private final int m_module;
+  private final ResistanceCalculator m_totalResistanceCalculator;
+  private final AtomicReference<Double> m_totalResistance = new AtomicReference<>(Double.NaN);
+  private final Notifier m_resistanceLoop = new Notifier(this::updateResistance);
 
   public static final int kDefaultModule = PowerDistributionJNI.DEFAULT_MODULE;
+
+  /** Seconds to wait before updating resistance. */
+  public static final double kUpdatePeriod = 0.025;
 
   public enum ModuleType {
     kCTRE(PowerDistributionJNI.CTRE_TYPE),
@@ -43,11 +50,7 @@ public class PowerDistribution implements Sendable, AutoCloseable {
    */
   @SuppressWarnings("this-escape")
   public PowerDistribution(int module, ModuleType moduleType) {
-    m_handle = PowerDistributionJNI.initialize(module, moduleType.value);
-    m_module = PowerDistributionJNI.getModuleNumber(m_handle);
-
-    HAL.report(tResourceType.kResourceType_PDP, m_module + 1);
-    SendableRegistry.addLW(this, "PowerDistribution", m_module);
+    this(module, moduleType.value);
   }
 
   /**
@@ -57,8 +60,21 @@ public class PowerDistribution implements Sendable, AutoCloseable {
    */
   @SuppressWarnings("this-escape")
   public PowerDistribution() {
-    m_handle = PowerDistributionJNI.initialize(kDefaultModule, PowerDistributionJNI.AUTOMATIC_TYPE);
+    this(kDefaultModule, PowerDistributionJNI.AUTOMATIC_TYPE);
+  }
+
+  /**
+   * Common constructor to construct a PowerDistribution object.
+   *
+   * @param module The CAN ID of the PDP/PDH.
+   * @param moduleType Module type as an integer (CTRE or REV).
+   */
+  private PowerDistribution(int module, int moduleType) {
+    m_handle = PowerDistributionJNI.initialize(module, moduleType);
     m_module = PowerDistributionJNI.getModuleNumber(m_handle);
+
+    m_totalResistanceCalculator = new ResistanceCalculator();
+    m_resistanceLoop.startPeriodic(PowerDistribution.kUpdatePeriod);
 
     HAL.report(tResourceType.kResourceType_PDP, m_module + 1);
     SendableRegistry.addLW(this, "PowerDistribution", m_module);
@@ -196,6 +212,21 @@ public class PowerDistribution implements Sendable, AutoCloseable {
     return PowerDistributionJNI.getStickyFaults(m_handle);
   }
 
+  /**
+   * Get the robot's resistance.
+   *
+   * @return The robot's resistance.
+   */
+  public double getTotalResistance() {
+    return m_totalResistance.get();
+  }
+
+  /** Calculate new total resistance. */
+  private void updateResistance() {
+    m_totalResistance.set(
+        m_totalResistanceCalculator.calculate(this.getTotalCurrent(), this.getVoltage()));
+  }
+
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("PowerDistribution");
@@ -213,5 +244,6 @@ public class PowerDistribution implements Sendable, AutoCloseable {
         "SwitchableChannel",
         () -> PowerDistributionJNI.getSwitchableChannelNoError(m_handle),
         value -> PowerDistributionJNI.setSwitchableChannel(m_handle, value));
+    builder.addDoubleProperty("TotalResistance", this::getTotalResistance, null);
   }
 }
