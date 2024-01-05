@@ -8,12 +8,11 @@
 
 using namespace frc2;
 
-[[deprecated("This is now deprecated use PIDController instead")]]
-PIDCommand::PIDCommand(frc::PIDController controller,
-                       std::function<double()> measurementSource,
-                       std::function<double()> setpointSource,
-                       std::function<void(double)> useOutput,
-                       Requirements requirements)
+[[deprecated("This is now deprecated use PIDController instead")]] PIDCommand::
+    PIDCommand(frc::PIDController controller,
+               std::function<double()> measurementSource,
+               std::function<double()> setpointSource,
+               std::function<void(double)> useOutput, Requirements requirements)
     : m_controller{std::move(controller)},
       m_measurement{std::move(measurementSource)},
       m_setpoint{std::move(setpointSource)},
@@ -21,11 +20,10 @@ PIDCommand::PIDCommand(frc::PIDController controller,
   AddRequirements(requirements);
 }
 
-[[deprecated("This is now deprecated use PIDController instead")]]
-PIDCommand::PIDCommand(frc::PIDController controller,
-                       std::function<double()> measurementSource,
-                       double setpoint, std::function<void(double)> useOutput,
-                       Requirements requirements)
+[[deprecated("This is now deprecated use PIDController instead")]] PIDCommand::
+    PIDCommand(frc::PIDController controller,
+               std::function<double()> measurementSource, double setpoint,
+               std::function<void(double)> useOutput, Requirements requirements)
     : PIDCommand(
           controller, measurementSource, [setpoint] { return setpoint; },
           useOutput, requirements) {}

@@ -8,9 +8,9 @@
 
 using namespace frc2;
 
-[[deprecated("This is now deprecated use PIDController instead")]]
-PIDSubsystem::PIDSubsystem(frc::PIDController controller,
-                           double initialPosition)
+[[deprecated(
+    "This is now deprecated use PIDController instead")]] PIDSubsystem::
+    PIDSubsystem(frc::PIDController controller, double initialPosition)
     : m_controller{std::move(controller)} {
   SetSetpoint(initialPosition);
   AddChild("PID Controller", &m_controller);
