@@ -102,8 +102,8 @@ model {
                 lib project: ':glass', library: 'glass', linkage: 'static'
                 project(':ntcore').addNtcoreDependency(it, 'static')
                 lib project: ':wpinet', library: 'wpinet', linkage: 'static'
-                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'static'
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
                 nativeUtils.useRequiredLibrary(it, 'imgui')
                 if (it.targetPlatform.operatingSystem.isWindows()) {
@@ -144,8 +144,8 @@ model {
                 lib project: ':glass', library: 'glass', linkage: 'static'
                 project(':ntcore').addNtcoreDependency(it, 'static')
                 lib project: ':wpinet', library: 'wpinet', linkage: 'static'
-                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'static'
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
                 nativeUtils.useRequiredLibrary(it, 'imgui')
                 if (it.targetPlatform.operatingSystem.isWindows()) {
