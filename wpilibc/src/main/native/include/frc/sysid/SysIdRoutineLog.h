@@ -7,15 +7,15 @@
 #include <string>
 #include <unordered_map>
 
+#include <units/acceleration.h>
+#include <units/angle.h>
+#include <units/angular_acceleration.h>
+#include <units/angular_velocity.h>
+#include <units/current.h>
+#include <units/length.h>
+#include <units/velocity.h>
+#include <units/voltage.h>
 #include <wpi/DataLog.h>
-#include "units/voltage.h"
-#include "units/angular_velocity.h"
-#include "units/angular_acceleration.h"
-#include "units/acceleration.h"
-#include "units/current.h"
-#include "units/length.h"
-#include "units/angle.h"
-#include "units/velocity.h"
 
 namespace frc::sysid {
 
@@ -36,44 +36,48 @@ enum class State {
 class SysIdRoutineLog {
   using MotorEntries = wpi::StringMap<wpi::log::DoubleLogEntry>;
   using LogEntries = wpi::StringMap<MotorEntries>;
+
  public:
   class MotorLog {
    public:
-    MotorLog(const std::string& motorName, const std::string& logName, LogEntries* logEntries);
+    MotorLog(const std::string& motorName, const std::string& logName,
+             LogEntries* logEntries);
 
-    MotorLog& value(const std::string& name, double value, const std::string& unit);
+    MotorLog& value(const std::string& name, double value,
+                    const std::string& unit);
 
     MotorLog& voltage(units::volt_t voltage) {
-        return value("voltage", voltage.value(), voltage.name());
-    };
+      return value("voltage", voltage.value(), voltage.name());
+    }
 
     MotorLog& position(units::meter_t position) {
-        return value("position", position.value(), position.name());
-    };
+      return value("position", position.value(), position.name());
+    }
 
     MotorLog& position(units::turn_t position) {
-        return value("position", position.value(), position.name());
-    };
+      return value("position", position.value(), position.name());
+    }
 
     MotorLog& velocity(units::meters_per_second_t velocity) {
-        return value("velocity", velocity.value(), velocity.name());
-    };
+      return value("velocity", velocity.value(), velocity.name());
+    }
 
     MotorLog& velocity(units::turns_per_second_t velocity) {
-        return value("velocity", velocity.value(), velocity.name());
-    };
+      return value("velocity", velocity.value(), velocity.name());
+    }
 
     MotorLog& acceleration(units::meters_per_second_squared_t acceleration) {
-        return value("acceleration", acceleration.value(), acceleration.name());
+      return value("acceleration", acceleration.value(), acceleration.name());
     }
 
     MotorLog& acceleration(units::turns_per_second_squared_t acceleration) {
-        return value("acceleration", acceleration.value(), acceleration.name());
+      return value("acceleration", acceleration.value(), acceleration.name());
     }
 
     MotorLog& current(units::ampere_t current) {
-        return value("current", current.value(), current.name());
-    };
+      return value("current", current.value(), current.name());
+    }
+
    private:
     std::string m_motorName;
     std::string m_logName;

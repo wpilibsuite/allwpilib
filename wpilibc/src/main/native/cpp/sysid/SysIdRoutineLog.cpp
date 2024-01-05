@@ -15,18 +15,22 @@ SysIdRoutineLog::SysIdRoutineLog(const std::string& logName)
   m_state.Append(StateEnumToString(State::kNone));
 }
 
-SysIdRoutineLog::MotorLog::MotorLog(const std::string& motorName, const std::string& logName, LogEntries* logEntries)
+SysIdRoutineLog::MotorLog::MotorLog(const std::string& motorName,
+                                    const std::string& logName,
+                                    LogEntries* logEntries)
     : m_motorName(motorName), m_logName(logName), m_logEntries(logEntries) {
   (*logEntries)[motorName] = MotorEntries();
 }
 
-SysIdRoutineLog::MotorLog& SysIdRoutineLog::MotorLog::value(const std::string& name, double value, const std::string& unit) {
+SysIdRoutineLog::MotorLog& SysIdRoutineLog::MotorLog::value(
+    const std::string& name, double value, const std::string& unit) {
   auto& motorEntries = (*m_logEntries)[m_motorName];
 
   if (!motorEntries.contains(name)) {
     wpi::log::DataLog& log = frc::DataLogManager::GetLog();
 
-    motorEntries[name] = wpi::log::DoubleLogEntry(log, name + "-" + m_motorName + "-" + m_logName, unit);
+    motorEntries[name] = wpi::log::DoubleLogEntry(
+        log, name + "-" + m_motorName + "-" + m_logName, unit);
   }
 
   motorEntries[name].Append(value);

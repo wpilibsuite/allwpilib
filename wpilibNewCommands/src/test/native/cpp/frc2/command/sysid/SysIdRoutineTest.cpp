@@ -60,10 +60,7 @@ class SysIdRoutineTest : public ::testing::Test {
           },
           [this](frc::sysid::SysIdRoutineLog* log) {
             currentStateList.emplace_back(StateTest::InLog);
-            log->Motor("Mock Motor")
-                .position(0_m)
-                .velocity(0_mps)
-                .voltage(0_V);
+            log->Motor("Mock Motor").position(0_m).velocity(0_mps).voltage(0_V);
           },
           &m_subsystem}};
   frc2::CommandPtr m_quasistaticForward{
