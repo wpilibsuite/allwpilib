@@ -354,6 +354,8 @@ public final class FRCNetComm {
     public static final int kCommand2_Scheduler = 2;
     /** kSmartDashboard_Instance = 1. */
     public static final int kSmartDashboard_Instance = 1;
+    /** kSmartDashboard_LiveWindow = 2. */
+    public static final int kSmartDashboard_LiveWindow = 2;
     /** kKinematics_DifferentialDrive = 1. */
     public static final int kKinematics_DifferentialDrive = 1;
     /** kKinematics_MecanumDrive = 2. */
