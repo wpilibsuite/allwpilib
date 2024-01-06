@@ -50,10 +50,15 @@ public class SysIdRoutineLog {
 
   /** Possible state of a SysId routine. */
   public enum State {
+    /** Quasistatic forward test. */
     kQuasistaticForward("quasistatic-forward"),
+    /** Quasistatic reverse test. */
     kQuasistaticReverse("quasistatic-reverse"),
+    /** Dynamic forward test. */
     kDynamicForward("dynamic-forward"),
+    /** Dynamic reverse test. */
     kDynamicReverse("dynamic-reverse"),
+    /** No test. */
     kNone("none");
 
     private final String m_state;
