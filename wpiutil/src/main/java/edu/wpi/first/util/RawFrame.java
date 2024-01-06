@@ -17,7 +17,7 @@ public class RawFrame implements AutoCloseable {
   private int m_width;
   private int m_height;
   private int m_stride;
-  private PixelFormat m_pixelFormat;
+  private PixelFormat m_pixelFormat = PixelFormat.kUnknown;
 
   /** Construct a new empty RawFrame. */
   public RawFrame() {
@@ -102,7 +102,12 @@ public class RawFrame implements AutoCloseable {
     m_stride = stride;
     m_pixelFormat = pixelFormat;
     WPIUtilJNI.setRawFrameInfo(
-        m_nativeObj, m_data.limit(), width, height, stride, pixelFormat.getValue());
+        m_nativeObj,
+        m_data != null ? m_data.limit() : 0,
+        width,
+        height,
+        stride,
+        pixelFormat.getValue());
   }
 
   /**
@@ -142,7 +147,7 @@ public class RawFrame implements AutoCloseable {
    * @return The total size of the data stored in the frame.
    */
   public int getSize() {
-    return m_data.limit();
+    return m_data != null ? m_data.limit() : 0;
   }
 
   /**
