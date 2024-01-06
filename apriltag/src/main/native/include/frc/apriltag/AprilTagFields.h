@@ -20,7 +20,7 @@ enum class AprilTagField {
   k2022RapidReact,
   /// 2023 Charged Up.
   k2023ChargedUp,
-  /// 2023 Crescendo.
+  /// 2024 Crescendo.
   k2024Crescendo,
 
   // This is a placeholder for denoting the last supported field. This should
