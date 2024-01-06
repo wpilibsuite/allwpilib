@@ -50,14 +50,6 @@ class SysIdRoutineLog {
   class MotorLog {
    public:
     /**
-     * Create a new SysId motor log handle.
-     *
-     * @param motorName The name of the motor whose data is being logged.
-     */
-    MotorLog(std::string_view motorName, std::string_view logName,
-             LogEntries* logEntries);
-
-    /**
      * Log a generic data value from the motor.
      *
      * @param name The name of the data field being recorded.
@@ -148,6 +140,16 @@ class SysIdRoutineLog {
     }
 
    private:
+    friend class SysIdRoutineLog;
+    /**
+     * Create a new SysId motor log handle.
+     *
+     * @param motorName The name of the motor whose data is being logged.
+     * @param logName The name of the SysIdRoutineLog that this motor belongs to.
+     * @param logEntries The DataLog entries of the SysIdRoutineLog that this motor belongs to.
+     */
+    MotorLog(std::string_view motorName, std::string_view logName,
+             LogEntries* logEntries);
     std::string m_motorName;
     std::string m_logName;
     LogEntries* m_logEntries;
