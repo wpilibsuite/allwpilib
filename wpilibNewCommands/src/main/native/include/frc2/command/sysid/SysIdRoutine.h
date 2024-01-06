@@ -91,11 +91,12 @@ class Mechanism {
    *
    * @param drive Sends the SysId-specified drive signal to the mechanism motors
    * during test routines.
-   * @param log Returns measured data of the mechanism motors during test routines.
-   * To return data, call `Motor(string motorName)` on the supplied `SysIdRoutineLog`
-   * instance, and then call one or more of the chainable logging handles (e.g. `voltage`)
-   * on the returned `MotorLog`.  Multiple motors can be logged in a single callback by
-   * calling `Motor` multiple times.
+   * @param log Returns measured data of the mechanism motors during test
+   * routines. To return data, call `Motor(string motorName)` on the supplied
+   * `SysIdRoutineLog` instance, and then call one or more of the chainable
+   * logging handles (e.g. `voltage`) on the returned `MotorLog`.  Multiple
+   * motors can be logged in a single callback by calling `Motor` multiple
+   * times.
    * @param subsystem The subsystem containing the motor(s) that is (or are)
    *   being characterized. Will be declared as a requirement for the returned
    *   test commands.
@@ -118,11 +119,12 @@ class Mechanism {
    *
    * @param drive Sends the SysId-specified drive signal to the mechanism motors
    * during test routines.
-   * @param log Returns measured data of the mechanism motors during test routines.
-   * To return data, call `Motor(string motorName)` on the supplied `SysIdRoutineLog`
-   * instance, and then call one or more of the chainable logging handles (e.g. `voltage`)
-   * on the returned `MotorLog`.  Multiple motors can be logged in a single callback by
-   * calling `Motor` multiple times.
+   * @param log Returns measured data of the mechanism motors during test
+   * routines. To return data, call `Motor(string motorName)` on the supplied
+   * `SysIdRoutineLog` instance, and then call one or more of the chainable
+   * logging handles (e.g. `voltage`) on the returned `MotorLog`.  Multiple
+   * motors can be logged in a single callback by calling `Motor` multiple
+   * times.
    * @param subsystem The subsystem containing the motor(s) that is (or are)
    *   being characterized. Will be declared as a requirement for the returned
    *   test commands. The subsystem's `name` will be appended to the log entry

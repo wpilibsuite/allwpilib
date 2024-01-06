@@ -49,7 +49,6 @@ class SysIdRoutineLog {
   /** Logs data from a single motor during a SysIdRoutine. */
   class MotorLog {
    public:
-
     /**
      * Create a new SysId motor log handle.
      *
