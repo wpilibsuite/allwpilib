@@ -144,8 +144,8 @@ public class Drivetrain extends SubsystemBase {
    * to run a simple PID loop that is only enabled while this command is running. The input is the
    * averaged values of the left and right encoders.
    *
-   * @param distance The distance to drive
-   * @return The command to drive straight
+   * @param distance The distance to drive.
+   * @return The command to drive straight.
    */
   public Command driveDistanceEncoders(double distance) {
     return driveDistance(distance, this::getDistance);
@@ -154,9 +154,9 @@ public class Drivetrain extends SubsystemBase {
   /**
    * A private factory for commands that drive a specific distance based on sensor inputs.
    *
-   * @param setpoint The setpoint
-   * @param measurement The measurement
-   * @return
+   * @param setpoint The setpoint.
+   * @param measurement The measurement.
+   * @return A generalized command that drives a specific distance based on supplied measurements.
    */
   @SuppressWarnings("resource")
   private Command driveDistance(double setpoint, DoubleSupplier measurement) {

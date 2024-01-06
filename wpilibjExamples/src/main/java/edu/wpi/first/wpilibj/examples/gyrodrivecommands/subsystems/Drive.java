@@ -4,15 +4,23 @@
 
 package edu.wpi.first.wpilibj.examples.gyrodrivecommands.subsystems;
 
+import static edu.wpi.first.wpilibj.examples.gyrodrivecommands.Constants.DriveConstants.*;
+
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.examples.gyrodrivecommands.Constants.DriveConstants;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import java.util.function.DoubleSupplier;
 
-public class DriveSubsystem extends SubsystemBase {
+public class Drive extends SubsystemBase {
   // The motors on the left side of the drive.
   private final MotorControllerGroup m_leftMotors =
       new MotorControllerGroup(
@@ -46,7 +54,7 @@ public class DriveSubsystem extends SubsystemBase {
   private final ADXRS450_Gyro m_gyro = new ADXRS450_Gyro();
 
   /** Creates a new DriveSubsystem. */
-  public DriveSubsystem() {
+  public Drive() {
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
@@ -117,10 +125,10 @@ public class DriveSubsystem extends SubsystemBase {
   /**
    * Returns the heading of the robot.
    *
-   * @return the robot's heading in degrees, from 180 to 180
+   * @return the robot's heading as a Rotation2d.
    */
-  public double getHeading() {
-    return Math.IEEEremainder(m_gyro.getAngle(), 360) * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
+  public Rotation2d getHeading() {
+    return m_gyro.getRotation2d().times(DriveConstants.kGyroReversed ? -1.0 : 1.0);
   }
 
   /**
@@ -130,5 +138,57 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public double getTurnRate() {
     return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
+  }
+
+  /**
+   * A command that turns the robot to the specified angle.
+   *
+   * @param targetAngle The angle to turn to.
+   * @return A command to turn the robot to the desired angle.
+   */
+  @SuppressWarnings("resource")
+  public Command turnToAngle(Rotation2d targetAngle) {
+    PIDController controller = new PIDController(kTurnP, kTurnI, kTurnD);
+    controller.enableContinuousInput(-180, 180);
+    controller.setTolerance(kTurnToleranceDeg, kTurnRateToleranceDegPerS);
+    return run(() ->
+            arcadeDrive(
+                0, controller.calculate(getHeading().getDegrees(), targetAngle.getDegrees())))
+        .until(controller::atSetpoint);
+  }
+
+  /**
+   * A command that smoothly turns the robot to the specified angle.
+   *
+   * @param targetAngle The angle to turn to.
+   * @return A command to turn the robot to the desired angle.
+   */
+  public Command turnToAngleProfiled(Rotation2d targetAngle) {
+    ProfiledPIDController controller =
+        new ProfiledPIDController(
+            kTurnP,
+            kTurnI,
+            kTurnD,
+            new TrapezoidProfile.Constraints(
+                kMaxTurnRateDegPerS, kMaxTurnAccelerationDegPerSSquared));
+    controller.enableContinuousInput(-180, 180);
+    controller.setTolerance(kTurnToleranceDeg, kTurnRateToleranceDegPerS);
+    return run(() ->
+            arcadeDrive(
+                0, controller.calculate(getHeading().getDegrees(), targetAngle.getDegrees())))
+        .until(controller::atSetpoint);
+  }
+
+  /**
+   * A command to stabalize the robot to drive straight at desired speeds.
+   *
+   * @param speed A supplier of the desired speed for the robot.
+   * @return A command to move in a straight line at the desired speed.
+   */
+  @SuppressWarnings("resource")
+  public Command stabilize(DoubleSupplier speed) {
+    // setpoint defaults to 0
+    PIDController controller = new PIDController(kStabilizationP, kStabilizationI, kStabilizationD);
+    return run(() -> arcadeDrive(speed.getAsDouble(), controller.calculate(getTurnRate())));
   }
 }
