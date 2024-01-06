@@ -64,6 +64,9 @@ class ADXL345_I2C : public nt::NTSendable,
     double ZAxis = 0.0;
   };
 
+  /// Default I2C device address.
+  static constexpr int kAddress = 0x1D;
+
   /**
    * Constructs the ADXL345 Accelerometer over I2C.
    *
@@ -137,7 +140,6 @@ class ADXL345_I2C : public nt::NTSendable,
   hal::SimDouble m_simY;
   hal::SimDouble m_simZ;
 
-  static constexpr int kAddress = 0x1D;
   static constexpr int kPowerCtlRegister = 0x2D;
   static constexpr int kDataFormatRegister = 0x31;
   static constexpr int kDataRegister = 0x32;
