@@ -145,8 +145,10 @@ class SysIdRoutineLog {
      * Create a new SysId motor log handle.
      *
      * @param motorName The name of the motor whose data is being logged.
-     * @param logName The name of the SysIdRoutineLog that this motor belongs to.
-     * @param logEntries The DataLog entries of the SysIdRoutineLog that this motor belongs to.
+     * @param logName The name of the SysIdRoutineLog that this motor belongs
+     * to.
+     * @param logEntries The DataLog entries of the SysIdRoutineLog that this
+     * motor belongs to.
      */
     MotorLog(std::string_view motorName, std::string_view logName,
              LogEntries* logEntries);
