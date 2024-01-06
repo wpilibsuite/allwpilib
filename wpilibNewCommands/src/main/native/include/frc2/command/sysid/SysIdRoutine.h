@@ -90,11 +90,12 @@ class Mechanism {
    * Create a new mechanism specification for a SysId routine.
    *
    * @param drive Sends the SysId-specified drive signal to the mechanism motors
-   *   during test routines.
-   * @param log Returns measured data (voltages, positions, velocities) of the
-   *   mechanism motors during test routines. To return data, call `RecordFrame`
-   *   on the supplied `MotorLog` instance. Multiple motors can return data
-   *   within a single `log` callback by calling `RecordFrame` multiple times.
+   * during test routines.
+   * @param log Returns measured data of the mechanism motors during test routines.
+   * To return data, call `Motor(string motorName)` on the supplied `SysIdRoutineLog`
+   * instance, and then call one or more of the chainable logging handles (e.g. `voltage`)
+   * on the returned `MotorLog`.  Multiple motors can be logged in a single callback by
+   * calling `Motor` multiple times.
    * @param subsystem The subsystem containing the motor(s) that is (or are)
    *   being characterized. Will be declared as a requirement for the returned
    *   test commands.
@@ -116,11 +117,12 @@ class Mechanism {
    * mechanism name to the subsystem name.
    *
    * @param drive Sends the SysId-specified drive signal to the mechanism motors
-   *   during test routines.
-   * @param log Returns measured data (voltages, positions, velocities) of the
-   *   mechanism motors during test routines. To return data, call `recordFrame`
-   *   on the supplied `MotorLog` instance. Multiple motors can return data
-   *   within a single `log` callback by calling `recordFrame` multiple times.
+   * during test routines.
+   * @param log Returns measured data of the mechanism motors during test routines.
+   * To return data, call `Motor(string motorName)` on the supplied `SysIdRoutineLog`
+   * instance, and then call one or more of the chainable logging handles (e.g. `voltage`)
+   * on the returned `MotorLog`.  Multiple motors can be logged in a single callback by
+   * calling `Motor` multiple times.
    * @param subsystem The subsystem containing the motor(s) that is (or are)
    *   being characterized. Will be declared as a requirement for the returned
    *   test commands. The subsystem's `name` will be appended to the log entry

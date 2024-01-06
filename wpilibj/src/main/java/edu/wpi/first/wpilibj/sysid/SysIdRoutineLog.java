@@ -73,7 +73,7 @@ public class SysIdRoutineLog {
     }
   }
 
-  /** Allows logging of data for a single motor during a SysIdRoutine. */
+  /** Logs data from a single motor during a SysIdRoutine. */
   public class MotorLog {
     private final String m_motorName;
 
@@ -88,7 +88,7 @@ public class SysIdRoutineLog {
     }
 
     /**
-     * Record a generic data value from this motor.
+     * Log a generic data value from the motor.
      *
      * @param name The name of the data field being recorded.
      * @param value The numeric value of the data field.
@@ -111,7 +111,7 @@ public class SysIdRoutineLog {
     }
 
     /**
-     * Record a voltage value from this motor.
+     * Log the voltage applied to the motor.
      *
      * @param voltage The voltage to record.
      * @return The motor log (for call chaining).
@@ -121,7 +121,7 @@ public class SysIdRoutineLog {
     }
 
     /**
-     * Record a linear position value from this motor.
+     * Log the linear position of the motor.
      *
      * @param position The linear position to record.
      * @return The motor log (for call chaining).
@@ -131,7 +131,7 @@ public class SysIdRoutineLog {
     }
 
     /**
-     * Record an angular position value from this motor.
+     * Log the angular position of the motor.
      *
      * @param position The angular position to record.
      * @return The motor log (for call chaining).
@@ -141,7 +141,7 @@ public class SysIdRoutineLog {
     }
 
     /**
-     * Record a linear velocity value from this motor.
+     * Log the linear velocity of the motor.
      *
      * @param velocity The linear velocity to record.
      * @return The motor log (for call chaining).
@@ -151,7 +151,7 @@ public class SysIdRoutineLog {
     }
 
     /**
-     * Record an angular velocity value from this motor.
+     * Log the angular velocity of the motor.
      *
      * @param velocity The angular velocity to record.
      * @return The motor log (for call chaining).
@@ -161,7 +161,7 @@ public class SysIdRoutineLog {
     }
 
     /**
-     * Record a linear acceleration value from this motor.
+     * Log the linear acceleration of the motor.
      *
      * @param acceleration The linear acceleration to record.
      * @return The motor log (for call chaining).
@@ -174,7 +174,7 @@ public class SysIdRoutineLog {
     }
 
     /**
-     * Record an angular acceleration value from this motor.
+     * Log the angular acceleration of the motor.
      *
      * @param acceleration The angular acceleration to record.
      * @return The motor log (for call chaining).
@@ -187,7 +187,7 @@ public class SysIdRoutineLog {
     }
 
     /**
-     * Record a current value for this motor.
+     * Log the current applied to the motor.
      *
      * @param current The current to record.
      * @return The motor log (for call chaining).
@@ -199,10 +199,10 @@ public class SysIdRoutineLog {
   }
 
   /**
-   * Returns the logging handle for a given motor.
+   * Log data from a motor during a SysId routine.
    *
-   * @param motorName The name of the motor to log data from.
-   * @return The logging handle for the specified motor.
+   * @param motorName The name of the motor.
+   * @return Handle with chainable callbacks to log individual data fields.
    */
   public MotorLog motor(String motorName) {
     return new MotorLog(motorName);
