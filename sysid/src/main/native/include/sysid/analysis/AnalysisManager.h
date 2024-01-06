@@ -17,6 +17,7 @@
 
 #include <units/time.h>
 #include <wpi/Logger.h>
+#include <wpi/StringMap.h>
 #include <wpi/json.h>
 
 #include "sysid/analysis/AnalysisType.h"
@@ -33,6 +34,9 @@ namespace sysid {
  */
 class AnalysisManager {
  public:
+  // This contains data for each test (e.g. quasistatic-forward,
+  // quasistatic-backward, etc) indexed by test name
+  TestData m_data;
   /**
    * Represents settings for an instance of the analysis manager. This contains
    * information about the feedback controller preset, loop type, motion
@@ -40,7 +44,6 @@ class AnalysisManager {
    * dataset.
    */
   struct Settings {
-    enum class DrivetrainDataset { kCombined = 0, kLeft = 1, kRight = 2 };
     /**
      * The feedback controller preset used to calculate gains.
      */
@@ -87,8 +90,6 @@ class AnalysisManager {
      * in a smart motor controller).
      */
     bool convertGainsToEncTicks = false;
-
-    DrivetrainDataset dataset = DrivetrainDataset::kCombined;
   };
 
   /**
@@ -99,11 +100,6 @@ class AnalysisManager {
      * Stores the Feedforward gains.
      */
     OLSResult ffGains;
-
-    /**
-     * Stores the trackwidth for angular drivetrain tests.
-     */
-    std::optional<double> trackWidth;
   };
 
   /**
@@ -133,7 +129,8 @@ class AnalysisManager {
    * The keys (which contain sysid data) that are in the JSON to analyze.
    */
   static constexpr const char* kJsonDataKeys[] = {
-      "slow-forward", "slow-backward", "fast-forward", "fast-backward"};
+      "quasistatic-forward", "quasistatic-reverse", "dynamic-forward",
+      "dynamic-reverse"};
 
   /**
    * Concatenates a list of vectors. The contents of the source vectors are
@@ -170,12 +167,11 @@ class AnalysisManager {
    * Constructs an instance of the analysis manager with the given path (to the
    * JSON) and analysis manager settings.
    *
-   * @param path     The path to the JSON containing the sysid data.
+   * @param data     The data from the SysId routine.
    * @param settings The settings for this instance of the analysis manager.
    * @param logger   The logger instance to use for log data.
    */
-  AnalysisManager(std::string_view path, Settings& settings,
-                  wpi::Logger& logger);
+  AnalysisManager(TestData data, Settings& settings, wpi::Logger& logger);
 
   /**
    * Prepares data from the JSON and stores the output in Storage member
@@ -203,10 +199,8 @@ class AnalysisManager {
    * Overrides the units in the JSON with the user-provided ones.
    *
    * @param unit             The unit to output gains in.
-   * @param unitsPerRotation The conversion factor between rotations and the
-   *                         selected unit.
    */
-  void OverrideUnits(std::string_view unit, double unitsPerRotation);
+  void OverrideUnits(std::string_view unit);
 
   /**
    * Resets the units back to those defined in the JSON.
@@ -218,21 +212,14 @@ class AnalysisManager {
    *
    * @return The analysis type.
    */
-  const AnalysisType& GetAnalysisType() const { return m_type; }
+  const AnalysisType& GetAnalysisType() const { return m_data.mechanismType; }
 
   /**
    * Returns the units of analysis.
    *
    * @return The units of analysis.
    */
-  std::string_view GetUnit() const { return m_unit; }
-
-  /**
-   * Returns the factor (a.k.a. units per rotation) for analysis.
-   *
-   * @return The factor (a.k.a. units per rotation) for analysis.
-   */
-  double GetFactor() const { return m_factor; }
+  std::string_view GetUnit() const { return m_data.distanceUnit; }
 
   /**
    * Returns a reference to the iterator of the currently selected raw datset.
@@ -241,9 +228,7 @@ class AnalysisManager {
    *
    * @return A reference to the raw internal data.
    */
-  Storage& GetRawData() {
-    return m_rawDataset[static_cast<int>(m_settings.dataset)];
-  }
+  Storage& GetRawData() { return m_rawDataset; }
 
   /**
    * Returns a reference to the iterator of the currently selected filtered
@@ -252,18 +237,14 @@ class AnalysisManager {
    *
    * @return A reference to the filtered internal data.
    */
-  Storage& GetFilteredData() {
-    return m_filteredDataset[static_cast<int>(m_settings.dataset)];
-  }
+  Storage& GetFilteredData() { return m_filteredDataset; }
 
   /**
    * Returns the original dataset.
    *
    * @return The original (untouched) dataset
    */
-  Storage& GetOriginalData() {
-    return m_originalDataset[static_cast<int>(m_settings.dataset)];
-  }
+  Storage& GetOriginalData() { return m_originalDataset; }
 
   /**
    * Returns the minimum duration of the Step Voltage Test of the currently
@@ -314,22 +295,14 @@ class AnalysisManager {
     return m_startTimes;
   }
 
-  bool HasData() const {
-    return !m_originalDataset[static_cast<int>(
-                                  Settings::DrivetrainDataset::kCombined)]
-                .empty();
-  }
+  bool HasData() const { return !m_originalDataset.empty(); }
 
  private:
   wpi::Logger& m_logger;
 
-  // This is used to store the various datasets (i.e. Combined, Forward,
-  // Backward, etc.)
-  wpi::json m_json;
-
-  std::array<Storage, 3> m_originalDataset;
-  std::array<Storage, 3> m_rawDataset;
-  std::array<Storage, 3> m_filteredDataset;
+  Storage m_originalDataset;
+  Storage m_rawDataset;
+  Storage m_filteredDataset;
 
   // Stores the various start times of the different tests.
   std::array<units::second_t, 4> m_startTimes;
@@ -338,24 +311,11 @@ class AnalysisManager {
   // controller preset, LQR parameters, acceleration window size, etc.
   Settings& m_settings;
 
-  // Miscellaneous data from the JSON -- the analysis type, the units, and the
-  // units per rotation.
-  AnalysisType m_type;
-  std::string m_unit;
-  double m_factor;
-
   units::second_t m_minStepTime{0};
   units::second_t m_maxStepTime{std::numeric_limits<double>::infinity()};
   std::vector<units::second_t> m_positionDelays;
   std::vector<units::second_t> m_velocityDelays;
 
-  // Stores an optional track width if we are doing the drivetrain angular test.
-  std::optional<double> m_trackWidth;
-
   void PrepareGeneralData();
-
-  void PrepareAngularDrivetrainData();
-
-  void PrepareLinearDrivetrainData();
 };
 }  // namespace sysid

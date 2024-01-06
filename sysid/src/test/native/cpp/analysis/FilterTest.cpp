@@ -45,18 +45,12 @@ TEST(FilterTest, NoiseFloor) {
 
 TEST(FilterTest, StepTrim) {
   std::vector<sysid::PreparedData> testData = {
-      {0_s, 1, 2, 3, 5_ms, 0, 0},    {1_s, 1, 2, 3, 5_ms, 0.25, 0},
-      {2_s, 1, 2, 3, 5_ms, 0.5, 0},  {3_s, 1, 2, 3, 5_ms, 0.45, 0},
-      {4_s, 1, 2, 3, 5_ms, 0.35, 0}, {5_s, 1, 2, 3, 5_ms, 0.15, 0},
-      {6_s, 1, 2, 3, 5_ms, 0, 0},    {7_s, 1, 2, 3, 5_ms, 0.02, 0},
-      {8_s, 1, 2, 3, 5_ms, 0.01, 0}, {9_s, 1, 2, 3, 5_ms, 0, 0},
+      {0_s, 1, 2, 0, 5_ms, 0, 0},   {1_s, 1, 2, 3, 5_ms, 0.25, 0},
+      {2_s, 1, 2, 0, 5_ms, 10, 0},  {3_s, 1, 2, 3, 5_ms, 0.45, 0},
+      {4_s, 1, 2, 9.6, 5_ms, 0, 0}, {5_s, 1, 2, 3, 5_ms, 0.15, 0},
+      {6_s, 1, 2, 0, 5_ms, 0, 0},   {7_s, 1, 2, 3, 5_ms, 0.02, 0},
+      {8_s, 1, 2, 10, 5_ms, 0, 0},  {9_s, 1, 2, 3, 5_ms, 0, 0},
   };
-
-  std::vector<sysid::PreparedData> expectedData = {
-      {2_s, 1, 2, 3, 5_ms, 0.5, 0},
-      {3_s, 1, 2, 3, 5_ms, 0.45, 0},
-      {4_s, 1, 2, 3, 5_ms, 0.35, 0},
-      {5_s, 1, 2, 3, 5_ms, 0.15, 0}};
 
   auto maxTime = 9_s;
   auto minTime = maxTime;
@@ -66,9 +60,7 @@ TEST(FilterTest, StepTrim) {
       sysid::TrimStepVoltageData(&testData, &settings, minTime, maxTime);
   minTime = tempMinTime;
 
-  EXPECT_EQ(expectedData[0].acceleration, testData[0].acceleration);
-  EXPECT_EQ(expectedData.back().acceleration, testData.back().acceleration);
-  EXPECT_EQ(5, settings.stepTestDuration.value());
+  EXPECT_EQ(4, settings.stepTestDuration.value());
   EXPECT_EQ(2, minTime.value());
 }
 

@@ -98,6 +98,9 @@ double GetNoiseFloor(
     const std::vector<PreparedData>& data, int window,
     std::function<double(const PreparedData&)> accessorFunction);
 
+double GetMaxSpeed(const std::vector<PreparedData>& data,
+                   std::function<double(const PreparedData&)> accessorFunction);
+
 /**
  * Reduces noise in velocity data by applying a median filter.
  *

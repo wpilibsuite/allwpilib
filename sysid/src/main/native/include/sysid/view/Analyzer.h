@@ -40,11 +40,12 @@ namespace sysid {
  */
 class Analyzer : public glass::View {
  public:
+  TestData m_data;
   /**
    * The different display and processing states for the GUI
    */
   enum class AnalyzerState {
-    kWaitingForJSON,
+    kWaitingForData,
     kNominalDisplay,
     kMotionThresholdError,
     kTestDurationError,
@@ -90,12 +91,12 @@ class Analyzer : public glass::View {
 
   ~Analyzer() override { AbortDataPrep(); };
 
- private:
   /**
-   * Handles the logic for selecting a json to analyze
+   * Analyzes the selected data.
    */
-  void SelectFile();
+  void AnalyzeData();
 
+ private:
   /**
    * Kills the data preparation thread
    */
@@ -111,11 +112,6 @@ class Analyzer : public glass::View {
    * Displays the graphs of the data.
    */
   void DisplayGraphs();
-
-  /**
-   * Displays the file selection widget.
-   */
-  void DisplayFileSelector();
 
   /**
    * Resets the current analysis data.
@@ -196,7 +192,7 @@ class Analyzer : public glass::View {
   void HandleError(std::string_view msg);
 
   // State of the Display GUI
-  AnalyzerState m_state = AnalyzerState::kWaitingForJSON;
+  AnalyzerState m_state = AnalyzerState::kWaitingForData;
 
   // Stores the exception message.
   std::string m_exception;
@@ -221,28 +217,20 @@ class Analyzer : public glass::View {
   double m_Kd;
   units::millisecond_t m_timescale;
 
-  // Track width
-  std::optional<double> m_trackWidth;
-
   // Units
   int m_selectedOverrideUnit = 0;
-  double m_conversionFactor = 0.0;
 
   // Data analysis
   std::unique_ptr<AnalysisManager> m_manager;
   int m_dataset = 0;
   int m_window = 8;
   double m_threshold = 0.2;
-  float m_stepTestDuration = 0.0;
+  float m_stepTestDuration = 10;
 
   double m_gearingNumerator = 1.0;
   double m_gearingDenominator = 1.0;
 
   bool combinedGraphFit = false;
-
-  // File manipulation
-  std::unique_ptr<pfd::open_file> m_selector;
-  std::string m_location;
 
   // Logger
   wpi::Logger& m_logger;

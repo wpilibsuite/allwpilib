@@ -28,7 +28,7 @@
 using namespace sysid;
 
 Analyzer::Analyzer(glass::Storage& storage, wpi::Logger& logger)
-    : m_location(""), m_logger(logger) {
+    : m_logger(logger) {
   // Fill the StringMap with preset values.
   m_presets["Default"] = presets::kDefault;
   m_presets["WPILib (2020-)"] = presets::kWPILibNew;
@@ -48,16 +48,14 @@ Analyzer::Analyzer(glass::Storage& storage, wpi::Logger& logger)
 void Analyzer::UpdateFeedforwardGains() {
   WPI_INFO(m_logger, "{}", "Gain calc");
   try {
-    const auto& [ff, trackWidth] = m_manager->CalculateFeedforward();
+    const auto& [ff] = m_manager->CalculateFeedforward();
     m_ff = ff.coeffs;
     m_accelRSquared = ff.rSquared;
     m_accelRMSE = ff.rmse;
-    m_trackWidth = trackWidth;
     m_settings.preset.measurementDelay =
         m_settings.type == FeedbackControllerLoopType::kPosition
             ? m_manager->GetPositionDelay()
             : m_manager->GetVelocityDelay();
-    m_conversionFactor = m_manager->GetFactor();
     PrepareGraphs();
   } catch (const sysid::InvalidDataError& e) {
     m_state = AnalyzerState::kGeneralDataError;
@@ -81,6 +79,7 @@ void Analyzer::UpdateFeedforwardGains() {
 }
 
 void Analyzer::UpdateFeedbackGains() {
+  WPI_INFO(m_logger, "{}", "Updating feedback gains");
   if (m_ff[1] > 0 && m_ff[2] > 0) {
     const auto& fb = m_manager->CalculateFeedback(m_ff);
     m_timescale = units::second_t{m_ff[2] / m_ff[1]};
@@ -119,27 +118,9 @@ bool Analyzer::IsDataErrorState() {
          m_state == AnalyzerState::kGeneralDataError;
 }
 
-void Analyzer::DisplayFileSelector() {
-  // Get the current width of the window. This will be used to scale
-  // our UI elements.
-  float width = ImGui::GetContentRegionAvail().x;
-
-  // Show the file location along with an option to choose.
-  if (ImGui::Button("Select")) {
-    m_selector = std::make_unique<pfd::open_file>(
-        "Select Data", "",
-        std::vector<std::string>{"JSON File", SYSID_PFD_JSON_EXT});
-  }
-  ImGui::SameLine();
-  ImGui::SetNextItemWidth(width - ImGui::CalcTextSize("Select").x -
-                          ImGui::GetFontSize() * 5);
-  ImGui::InputText("##location", &m_location, ImGuiInputTextFlags_ReadOnly);
-}
-
 void Analyzer::ResetData() {
   m_plot.ResetData();
   m_manager = std::make_unique<AnalysisManager>(m_settings, m_logger);
-  m_location = "";
   m_ff = std::vector<double>{1, 1, 1};
   UpdateFeedbackGains();
 }
@@ -152,38 +133,15 @@ bool Analyzer::DisplayResetAndUnitOverride() {
   ImGui::SameLine(width - ImGui::CalcTextSize("Reset").x);
   if (ImGui::Button("Reset")) {
     ResetData();
-    m_state = AnalyzerState::kWaitingForJSON;
+    m_state = AnalyzerState::kWaitingForData;
     return true;
-  }
-
-  if (type == analysis::kDrivetrain) {
-    ImGui::SetNextItemWidth(ImGui::GetFontSize() * kTextBoxWidthMultiple);
-    if (ImGui::Combo("Dataset", &m_dataset, kDatasets, 3)) {
-      m_settings.dataset =
-          static_cast<AnalysisManager::Settings::DrivetrainDataset>(m_dataset);
-      PrepareData();
-    }
-    ImGui::SameLine();
-  } else {
-    m_settings.dataset =
-        AnalysisManager::Settings::DrivetrainDataset::kCombined;
   }
 
   ImGui::Spacing();
   ImGui::Text(
       "Units:              %s\n"
-      "Units Per Rotation: %.4f\n"
       "Type:               %s",
-      std::string(unit).c_str(), m_conversionFactor, type.name);
-
-  if (type == analysis::kDrivetrainAngular) {
-    ImGui::SameLine();
-    sysid::CreateTooltip(
-        "Here, the units and units per rotation represent what the wheel "
-        "positions and velocities were captured in. The track width value "
-        "will reflect the unit selected here. However, the Kv and Ka will "
-        "always be in Vs/rad and Vs^2 / rad respectively.");
-  }
+      std::string(unit).c_str(), type.name);
 
   if (ImGui::Button("Override Units")) {
     ImGui::OpenPopup("Override Units");
@@ -197,24 +155,11 @@ bool Analyzer::DisplayResetAndUnitOverride() {
                  IM_ARRAYSIZE(kUnits));
     unit = kUnits[m_selectedOverrideUnit];
 
-    if (unit == "Degrees") {
-      m_conversionFactor = 360.0;
-    } else if (unit == "Radians") {
-      m_conversionFactor = 2 * std::numbers::pi;
-    } else if (unit == "Rotations") {
-      m_conversionFactor = 1.0;
-    }
-
-    bool isRotational = m_selectedOverrideUnit > 2;
-
     ImGui::SetNextItemWidth(ImGui::GetFontSize() * 7);
-    ImGui::InputDouble(
-        "Units Per Rotation", &m_conversionFactor, 0.0, 0.0, "%.4f",
-        isRotational ? ImGuiInputTextFlags_ReadOnly : ImGuiInputTextFlags_None);
 
     if (ImGui::Button("Close")) {
       ImGui::CloseCurrentPopup();
-      m_manager->OverrideUnits(unit, m_conversionFactor);
+      m_manager->OverrideUnits(unit);
       PrepareData();
     }
 
@@ -234,22 +179,21 @@ void Analyzer::ConfigParamsOnFileSelect() {
   WPI_INFO(m_logger, "{}", "Configuring Params");
   m_stepTestDuration = m_settings.stepTestDuration.to<float>();
 
-  // Estimate qp as 1/8 * units-per-rot
-  m_settings.lqr.qp = 0.125 * m_manager->GetFactor();
+  // Estimate qp as 1/10 native distance unit
+  m_settings.lqr.qp = 0.1;
   // Estimate qv as 1/4 * max velocity = 1/4 * (12V - kS) / kV
   m_settings.lqr.qv = 0.25 * (12.0 - m_ff[0]) / m_ff[1];
 }
 
 void Analyzer::Display() {
-  DisplayFileSelector();
   DisplayGraphs();
 
   switch (m_state) {
-    case AnalyzerState::kWaitingForJSON: {
+    case AnalyzerState::kWaitingForData: {
       ImGui::Text(
           "SysId is currently in theoretical analysis mode.\n"
           "To analyze recorded test data, select a "
-          "data JSON.");
+          "data file (.wpilog).");
       sysid::CreateTooltip(
           "Theoretical feedback gains can be calculated from a "
           "physical model of the mechanism being controlled. "
@@ -295,7 +239,7 @@ void Analyzer::Display() {
     case AnalyzerState::kFileError: {
       CreateErrorPopup(m_errorPopup, m_exception);
       if (!m_errorPopup) {
-        m_state = AnalyzerState::kWaitingForJSON;
+        m_state = AnalyzerState::kWaitingForData;
         return;
       }
       break;
@@ -313,20 +257,10 @@ void Analyzer::Display() {
       break;
     }
   }
-
-  // Periodic functions
-  try {
-    SelectFile();
-  } catch (const AnalysisManager::FileReadingError& e) {
-    m_state = AnalyzerState::kFileError;
-    HandleError(e.what());
-  } catch (const wpi::json::exception& e) {
-    m_state = AnalyzerState::kFileError;
-    HandleError(e.what());
-  }
 }
 
 void Analyzer::PrepareData() {
+  WPI_INFO(m_logger, "{}", "Preparing data");
   try {
     m_manager->PrepareData();
     UpdateFeedforwardGains();
@@ -379,9 +313,6 @@ void Analyzer::PrepareGraphs() {
 void Analyzer::HandleError(std::string_view msg) {
   m_exception = msg;
   m_errorPopup = true;
-  if (m_state == AnalyzerState::kFileError) {
-    m_location = "";
-  }
   PrepareRawGraphs();
 }
 
@@ -458,23 +389,12 @@ void Analyzer::DisplayGraphs() {
   ImGui::End();
 }
 
-void Analyzer::SelectFile() {
-  // If the selector exists and is ready with a result, we can store it.
-  if (m_selector && m_selector->ready() && !m_selector->result().empty()) {
-    // Store the location of the file and reset the selector.
-    WPI_INFO(m_logger, "Opening File: {}", m_selector->result()[0]);
-    m_location = m_selector->result()[0];
-    m_selector.reset();
-    WPI_INFO(m_logger, "{}", "Opened File");
-    m_manager =
-        std::make_unique<AnalysisManager>(m_location, m_settings, m_logger);
-    PrepareData();
-    m_dataset = 0;
-    m_settings.dataset =
-        AnalysisManager::Settings::DrivetrainDataset::kCombined;
-    ConfigParamsOnFileSelect();
-    UpdateFeedbackGains();
-  }
+void Analyzer::AnalyzeData() {
+  m_manager = std::make_unique<AnalysisManager>(m_data, m_settings, m_logger);
+  PrepareData();
+  m_dataset = 0;
+  ConfigParamsOnFileSelect();
+  UpdateFeedbackGains();
 }
 
 void Analyzer::AbortDataPrep() {
@@ -625,8 +545,6 @@ void Analyzer::DisplayFeedforwardGains(float beginX, float beginY) {
         "This is the angle offset which, when added to the angle measurement, "
         "zeroes it out when the arm is horizontal. This is needed for the arm "
         "feedforward to work.");
-  } else if (m_trackWidth) {
-    DisplayGain("Track Width", &*m_trackWidth);
   }
   double endY = ImGui::GetCursorPosY();
 
@@ -790,7 +708,7 @@ void Analyzer::DisplayFeedbackGains() {
                    IM_ARRAYSIZE(kLoopTypes))) {
     m_settings.type =
         static_cast<FeedbackControllerLoopType>(m_selectedLoopType);
-    if (m_state == AnalyzerState::kWaitingForJSON) {
+    if (m_state == AnalyzerState::kWaitingForData) {
       m_settings.preset.measurementDelay = 0_ms;
     } else {
       if (m_settings.type == FeedbackControllerLoopType::kPosition) {
@@ -817,7 +735,7 @@ void Analyzer::DisplayFeedbackGains() {
 
   if (m_selectedLoopType == 0) {
     std::string unit;
-    if (m_state != AnalyzerState::kWaitingForJSON) {
+    if (m_state != AnalyzerState::kWaitingForData) {
       unit = fmt::format(" ({})", GetAbbreviation(m_manager->GetUnit()));
     }
 
@@ -831,7 +749,7 @@ void Analyzer::DisplayFeedbackGains() {
   }
 
   std::string unit;
-  if (m_state != AnalyzerState::kWaitingForJSON) {
+  if (m_state != AnalyzerState::kWaitingForData) {
     unit = fmt::format(" ({}/s)", GetAbbreviation(m_manager->GetUnit()));
   }
 

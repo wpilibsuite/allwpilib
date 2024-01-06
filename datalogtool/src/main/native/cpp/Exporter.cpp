@@ -17,6 +17,7 @@
 #include <fmt/chrono.h>
 #include <fmt/format.h>
 #include <glass/Storage.h>
+#include <glass/support/DataLogReaderThread.h>
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <imgui_stdlib.h>
@@ -32,11 +33,10 @@
 #include <wpi/raw_ostream.h>
 
 #include "App.h"
-#include "DataLogThread.h"
 
 namespace {
 struct InputFile {
-  explicit InputFile(std::unique_ptr<DataLogThread> datalog);
+  explicit InputFile(std::unique_ptr<glass::DataLogReaderThread> datalog);
 
   InputFile(std::string_view filename, std::string_view status)
       : filename{filename},
@@ -47,7 +47,7 @@ struct InputFile {
 
   std::string filename;
   std::string stem;
-  std::unique_ptr<DataLogThread> datalog;
+  std::unique_ptr<glass::DataLogReaderThread> datalog;
   std::string status;
   bool highlight = false;
 };
@@ -135,7 +135,7 @@ static void RebuildEntryTree() {
   }
 }
 
-InputFile::InputFile(std::unique_ptr<DataLogThread> datalog_)
+InputFile::InputFile(std::unique_ptr<glass::DataLogReaderThread> datalog_)
     : filename{datalog_->GetBufferIdentifier()},
       stem{fs::path{filename}.stem().string()},
       datalog{std::move(datalog_)} {
@@ -192,7 +192,7 @@ static std::unique_ptr<InputFile> LoadDataLog(std::string_view filename) {
   }
 
   return std::make_unique<InputFile>(
-      std::make_unique<DataLogThread>(std::move(reader)));
+      std::make_unique<glass::DataLogReaderThread>(std::move(reader)));
 }
 
 void DisplayInputFiles() {
@@ -284,9 +284,10 @@ static bool EmitEntry(const std::string& name, Entry& entry) {
     if (ImGui::IsItemHovered()) {
       ImGui::BeginTooltip();
       for (auto inputFile : entry.inputFiles) {
-        ImGui::Text(
-            "%s: %s", inputFile->stem.c_str(),
-            std::string{inputFile->datalog->GetEntry(entry.name).type}.c_str());
+        if (auto info = inputFile->datalog->GetEntry(entry.name)) {
+          ImGui::Text("%s: %s", inputFile->stem.c_str(),
+                      std::string{info->type}.c_str());
+        }
       }
       ImGui::EndTooltip();
     }
@@ -300,10 +301,10 @@ static bool EmitEntry(const std::string& name, Entry& entry) {
     if (ImGui::IsItemHovered()) {
       ImGui::BeginTooltip();
       for (auto inputFile : entry.inputFiles) {
-        ImGui::Text(
-            "%s: %s", inputFile->stem.c_str(),
-            std::string{inputFile->datalog->GetEntry(entry.name).metadata}
-                .c_str());
+        if (auto info = inputFile->datalog->GetEntry(entry.name)) {
+          ImGui::Text("%s: %s", inputFile->stem.c_str(),
+                      std::string{info->metadata}.c_str());
+        }
       }
       ImGui::EndTooltip();
     }

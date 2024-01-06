@@ -52,8 +52,6 @@ struct AnalysisType {
 };
 
 namespace analysis {
-inline constexpr AnalysisType kDrivetrain{3, 9, "Drivetrain"};
-inline constexpr AnalysisType kDrivetrainAngular{3, 9, "Drivetrain (Angular)"};
 inline constexpr AnalysisType kElevator{4, 4, "Elevator"};
 inline constexpr AnalysisType kArm{5, 4, "Arm"};
 inline constexpr AnalysisType kSimple{3, 4, "Simple"};
