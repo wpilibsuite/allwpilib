@@ -95,6 +95,7 @@ model {
             }
             binaries.all { binary ->
                 lib project: ':apriltag', library: 'apriltag', linkage: 'shared'
+                lib project: ':apriltag', library: 'apriltagJNIShared', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimathJNIShared', linkage: 'shared'
                 project(':ntcore').addNtcoreDependency(binary, 'shared')
