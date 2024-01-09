@@ -1142,10 +1142,25 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
    * @return The Z axis angle in degrees (CCW positive).
    */
   public synchronized double getAngle() {
-    if (m_simGyroAngleZ != null) {
-      return m_simGyroAngleZ.get();
+    switch (m_yaw_axis) {
+      case kX:
+        if (m_simGyroAngleX != null) {
+          return m_simGyroAngleX.get();
+        }
+        return m_integ_angle_x;
+      case kY:
+        if (m_simGyroAngleY != null) {
+          return m_simGyroAngleY.get();
+        }
+        return m_integ_angle_y;
+      case kZ:
+        if (m_simGyroAngleZ != null) {
+          return m_simGyroAngleZ.get();
+        }
+        return m_integ_angle_z;
+      default:
     }
-    return m_integ_angle_z;
+    return 0.0;
   }
 
   /**
@@ -1195,10 +1210,26 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
    * @return Z axis angular rate in degrees per second (CCW positive).
    */
   public synchronized double getRate() {
-    if (m_simGyroRateZ != null) {
-      return m_simGyroRateZ.get();
+    switch (m_yaw_axis) {
+      case kX:
+        if (m_simGyroRateX != null) {
+          return m_simGyroRateX.get();
+        }
+        return m_gyro_rate_x;
+      case kY:
+        if (m_simGyroRateY != null) {
+          return m_simGyroRateY.get();
+        }
+        return m_gyro_rate_y;
+      case kZ:
+        if (m_simGyroRateZ != null) {
+          return m_simGyroRateZ.get();
+        }
+        return m_gyro_rate_z;
+      default:
     }
-    return m_gyro_rate_z;
+    return 0.0;
+
   }
 
   /**

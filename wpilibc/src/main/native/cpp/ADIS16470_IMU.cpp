@@ -809,16 +809,6 @@ units::degree_t ADIS16470_IMU::GetAngle(IMUAxis axis) const {
   return units::degree_t{0.0};
 }
 
-units::degree_t ADIS16470_IMU::GetAngle() const {
-  if (m_simGyroAngleZ) {
-    return units::degree_t{m_simGyroAngleZ.Get()};
-  }
-  {
-    std::scoped_lock sync(m_mutex);
-    return units::degree_t{m_integ_angle_z};
-  }
-}
-
 units::degrees_per_second_t ADIS16470_IMU::GetRate(IMUAxis axis) const {
   switch (axis) {
     case kYaw:
@@ -864,16 +854,6 @@ units::degrees_per_second_t ADIS16470_IMU::GetRate(IMUAxis axis) const {
   }
 
   return 0_deg_per_s;
-}
-
-units::degrees_per_second_t ADIS16470_IMU::GetRate() const {
-  if (m_simGyroRateZ) {
-    return units::degrees_per_second_t{m_simGyroRateZ.Get()};
-  }
-  {
-    std::scoped_lock sync(m_mutex);
-    return units::degrees_per_second_t{m_gyro_rate_z};
-  }
 }
 
 units::meters_per_second_squared_t ADIS16470_IMU::GetAccelX() const {

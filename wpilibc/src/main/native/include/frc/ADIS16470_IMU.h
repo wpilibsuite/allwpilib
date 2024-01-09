@@ -218,25 +218,18 @@ class ADIS16470_IMU : public wpi::Sendable,
   /**
    * Returns the axis angle (CCW positive).
    *
-   * @param axis The IMUAxis whose angle to return.
+   * @param axis The IMUAxis whose angle to return. Defaults to user configured Yaw.
    * @return The axis angle (CCW positive).
    */
-  units::degree_t GetAngle(IMUAxis axis) const;
-
-  /**
-   * Returns the Z axis angle (CCW positive).
-   *
-   * @return The Z axis angle (CCW positive).
-   */
-  units::degree_t GetAngle() const;
+  units::degree_t GetAngle(IMUAxis axis = IMUAxis::kYaw) const;
 
   /**
    * Returns the axis angular rate (CCW positive).
    *
-   * @param axis The IMUAxis whose rate to return.
+   * @param axis The IMUAxis whose rate to return. Defaults to user configured Yaw.
    * @return Axis angular rate (CCW positive).
    */
-  units::degrees_per_second_t GetRate(IMUAxis axis) const;
+  units::degrees_per_second_t GetRate(IMUAxis axis = IMUAxis::kYaw) const;
 
   /**
    * Returns the Z axis angular rate (CCW positive).
