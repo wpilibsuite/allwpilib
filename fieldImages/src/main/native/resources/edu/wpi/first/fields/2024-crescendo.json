@@ -3,17 +3,17 @@
   "field-image": "2024-field.png",
   "field-corners": {
     "top-left": [
-      46,
-      36
+      113,
+      25
     ],
     "bottom-right": [
-      1088,
-      544
+      1008,
+      522
     ]
   },
   "field-size": [
     54.27083,
-    26.2916
+    26.9375
   ],
   "field-unit": "foot"
 }
