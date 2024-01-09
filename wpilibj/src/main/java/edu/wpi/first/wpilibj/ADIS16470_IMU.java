@@ -1137,9 +1137,9 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
   }
 
   /**
-   * Returns the Z axis angle in degrees (CCW positive).
+   * Returns the Yaw axis angle in degrees (CCW positive).
    *
-   * @return The Z axis angle in degrees (CCW positive).
+   * @return The Yaw axis angle in degrees (CCW positive).
    */
   public synchronized double getAngle() {
     switch (m_yaw_axis) {
@@ -1205,9 +1205,9 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
   }
 
   /**
-   * Returns the Z axis angular rate in degrees per second (CCW positive).
+   * Returns the Yaw axis angular rate in degrees per second (CCW positive).
    *
-   * @return Z axis angular rate in degrees per second (CCW positive).
+   * @return Yaw axis angular rate in degrees per second (CCW positive).
    */
   public synchronized double getRate() {
     switch (m_yaw_axis) {
