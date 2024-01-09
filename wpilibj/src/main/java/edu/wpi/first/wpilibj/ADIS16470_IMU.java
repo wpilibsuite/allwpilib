@@ -1137,6 +1137,18 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
   }
 
   /**
+   * Returns the Z axis angle in degrees (CCW positive).
+   *
+   * @return The Z axis angle in degrees (CCW positive).
+   */
+  public synchronized double getAngle() {
+    if (m_simGyroAngleZ != null) {
+      return m_simGyroAngleZ.get();
+    }
+    return m_integ_angle_z;
+  }
+
+  /**
    * Returns the axis angular rate in degrees per second (CCW positive).
    *
    * @param axis The IMUAxis whose rate to return.
@@ -1175,6 +1187,18 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
       default:
     }
     return 0.0;
+  }
+
+  /**
+   * Returns the Z axis angular rate in degrees per second (CCW positive).
+   *
+   * @return Z axis angular rate in degrees per second (CCW positive).
+   */
+  public synchronized double getRate() {
+    if (m_simGyroRateZ != null) {
+      return m_simGyroRateZ.get();
+    }
+    return m_gyro_rate_z;
   }
 
   /**
