@@ -3,12 +3,12 @@
   "field-image": "2024-field.png",
   "field-corners": {
     "top-left": [
-      113,
-      25
+      513,
+      79
     ],
     "bottom-right": [
-      1008,
-      522
+      3324,
+      1475
     ]
   },
   "field-size": [
