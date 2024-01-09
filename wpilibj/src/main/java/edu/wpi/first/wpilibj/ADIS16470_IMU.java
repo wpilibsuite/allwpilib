@@ -1229,7 +1229,6 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
       default:
     }
     return 0.0;
-
   }
 
   /**
