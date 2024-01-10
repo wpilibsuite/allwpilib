@@ -198,23 +198,6 @@ DataSelector::Tests DataSelector::LoadTests(
 }
 
 template <typename T>
-static void AddSample(std::vector<MotorData::Run::Sample<T>>& samples,
-                      const wpi::log::DataLogRecord& record, bool isDouble,
-                      double scale) {
-  if (isDouble) {
-    double val;
-    if (record.GetDouble(&val)) {
-      samples.emplace_back(units::second_t{record.GetTimestamp() * 1.0e-6},
-                           T{val * scale});
-    }
-  } else {
-    float val;
-    if (record.GetFloat(&val)) {
-    }
-  }
-}
-
-template <typename T>
 static void AddSamples(std::vector<MotorData::Run::Sample<T>>& samples,
                        const std::vector<std::pair<int64_t, double>>& data,
                        int64_t tsbegin, int64_t tsend) {
