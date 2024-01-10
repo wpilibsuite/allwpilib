@@ -234,13 +234,6 @@ class ADIS16470_IMU : public wpi::Sendable,
   units::degrees_per_second_t GetRate(IMUAxis axis = IMUAxis::kYaw) const;
 
   /**
-   * Returns the Z axis angular rate (CCW positive).
-   *
-   * @return Z axis angular rate (CCW positive).
-   */
-  units::degrees_per_second_t GetRate() const;
-
-  /**
    * Returns the acceleration in the X axis.
    */
   units::meters_per_second_squared_t GetAccelX() const;
