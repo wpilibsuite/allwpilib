@@ -112,6 +112,8 @@ class SysIdRoutineLog {
     /**
      * Log the linear acceleration of the motor.
      *
+     * This is optional; SysId can perform an accurate fit without it.
+     *
      * @param acceleration The linear acceleration to record.
      * @return The motor log (for call chaining).
      */
@@ -122,6 +124,8 @@ class SysIdRoutineLog {
     /**
      * Log the angular acceleration of the motor.
      *
+     * This is optional; SysId can perform an accurate fit without it.
+     *
      * @param acceleration The angular acceleration to record.
      * @return The motor log (for call chaining).
      */
@@ -131,6 +135,8 @@ class SysIdRoutineLog {
 
     /**
      * Log the current applied to the motor.
+     *
+     * This is optional; SysId can perform an accurate fit without it.
      *
      * @param current The current to record.
      * @return The motor log (for call chaining).
