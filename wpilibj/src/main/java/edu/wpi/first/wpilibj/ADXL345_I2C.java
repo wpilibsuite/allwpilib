@@ -43,6 +43,7 @@ public class ADXL345_I2C implements NTSendable, AutoCloseable {
   // private static final byte kDataFormat_SPI = 0x40;
   // private static final byte kDataFormat_IntInvert = 0x20;
   private static final byte kDataFormat_FullRes = 0x08;
+
   // private static final byte kDataFormat_Justify = 0x04;
 
   /** Accelerometer range. */

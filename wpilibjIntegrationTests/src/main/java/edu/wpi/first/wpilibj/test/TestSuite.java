@@ -52,6 +52,7 @@ public class TestSuite extends AbstractTestSuite {
 
   @SuppressWarnings("unused")
   private static final Logger WPILIBJ_ROOT_LOGGER = Logger.getLogger("edu.wpi.first.wpilibj");
+
   @SuppressWarnings("unused")
   private static final Logger WPILIBJ_COMMAND_ROOT_LOGGER =
       Logger.getLogger("edu.wpi.first.wpilibj.command");

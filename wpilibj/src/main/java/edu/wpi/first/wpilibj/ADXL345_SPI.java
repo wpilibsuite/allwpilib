@@ -38,6 +38,7 @@ public class ADXL345_SPI implements NTSendable, AutoCloseable {
   // private static final int kDataFormat_SPI = 0x40;
   // private static final int kDataFormat_IntInvert = 0x20;
   private static final int kDataFormat_FullRes = 0x08;
+
   // private static final int kDataFormat_Justify = 0x04;
 
   /** Accelerometer range. */
