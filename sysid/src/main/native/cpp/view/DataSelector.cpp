@@ -91,6 +91,31 @@ void DataSelector::Display() {
   if (m_testsFuture.valid() &&
       m_testsFuture.wait_for(0s) == std::future_status::ready) {
     m_tests = m_testsFuture.get();
+    for (auto it = m_tests.begin(); it != m_tests.end();) {
+      if (it->first != "quasistatic" && it->first != "dynamic") {
+        WPI_WARNING(m_logger, "Unrecognized test {}, removing", it->first);
+        it = m_tests.erase(it);
+        continue;
+      }
+      for (auto it2 = it->second.begin(); it2 != it->second.end();) {
+        auto direction = wpi::rsplit(it2->first, '-').second;
+        if (direction != "forward" && direction != "reverse") {
+          WPI_WARNING(m_logger, "Unrecognized direction {}, removing",
+                      direction);
+          it2 = it->second.erase(it2);
+          continue;
+        }
+        WPI_INFO(m_logger, "Loaded test state {}", it2->first);
+        ++it2;
+      }
+      if (it->second.empty()) {
+        WPI_WARNING(m_logger, "No data for test {}, removing", it->first);
+        it = m_tests.erase(it);
+        continue;
+      }
+      ++it;
+    }
+    WPI_INFO(m_logger, "Loaded {} tests", m_tests.size());
   }
 
   if (m_tests.empty()) {
