@@ -163,12 +163,14 @@ public class SysIdRoutineLog {
     /**
      * Log the linear acceleration of the motor.
      *
+     * <p>This is optional; SysId can perform an accurate fit without it.
+     *
      * @param acceleration The linear acceleration to record.
      * @return The motor log (for call chaining).
      */
     public MotorLog linearAcceleration(Measure<Velocity<Velocity<Distance>>> acceleration) {
       return value(
-          "position",
+          "acceleration",
           acceleration.in(MetersPerSecond.per(Second)),
           MetersPerSecond.per(Second).name());
     }
@@ -176,18 +178,22 @@ public class SysIdRoutineLog {
     /**
      * Log the angular acceleration of the motor.
      *
+     * <p>This is optional; SysId can perform an accurate fit without it.
+     *
      * @param acceleration The angular acceleration to record.
      * @return The motor log (for call chaining).
      */
     public MotorLog angularAcceleration(Measure<Velocity<Velocity<Angle>>> acceleration) {
       return value(
-          "position",
+          "acceleration",
           acceleration.in(RotationsPerSecond.per(Second)),
           RotationsPerSecond.per(Second).name());
     }
 
     /**
      * Log the current applied to the motor.
+     *
+     * <p>This is optional; SysId can perform an accurate fit without it.
      *
      * @param current The current to record.
      * @return The motor log (for call chaining).
