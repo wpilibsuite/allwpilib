@@ -213,7 +213,6 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
     if (m_watchdogs.isEmpty()) {
       NotifierJNI.cancelNotifierAlarm(m_notifier);
     } else {
-      
       NotifierJNI.updateNotifierAlarm(
           m_notifier, (long) (m_watchdogs.peek().m_expirationTimeSeconds * 1e6));
     }
