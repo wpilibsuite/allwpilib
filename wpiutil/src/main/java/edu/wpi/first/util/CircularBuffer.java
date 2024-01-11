@@ -53,7 +53,6 @@ public class CircularBuffer<T> {
    * @throws IndexOutOfBoundsException if the index is out of range (index &lt; 0 || index &gt;=
    *     size())
    */
-  @SuppressWarnings("unchecked")
   public T getLast() {
     // If there are no elements in the buffer, do nothing
     if (m_length == 0) {
@@ -111,7 +110,6 @@ public class CircularBuffer<T> {
    * @throws IndexOutOfBoundsException if the index is out of range (index &lt; 0 || index &gt;=
    *     size())
    */
-  @SuppressWarnings("unchecked")
   public T removeFirst() {
     // If there are no elements in the buffer, do nothing
     if (m_length == 0) {
@@ -131,7 +129,6 @@ public class CircularBuffer<T> {
    * @throws IndexOutOfBoundsException if the index is out of range (index &lt; 0 || index &gt;=
    *     size())
    */
-  @SuppressWarnings("unchecked")
   public T removeLast() {
     // If there are no elements in the buffer, do nothing
     if (m_length == 0) {

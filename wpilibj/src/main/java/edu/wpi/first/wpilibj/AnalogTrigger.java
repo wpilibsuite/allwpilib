@@ -4,6 +4,8 @@
 
 package edu.wpi.first.wpilibj;
 
+import java.lang.ref.Reference;
+
 import edu.wpi.first.hal.AnalogJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -20,7 +22,6 @@ public class AnalogTrigger implements Sendable, AutoCloseable {
 
   private AnalogInput m_analogInput;
 
-  @SuppressWarnings({"PMD.SingularField", "PMD.UnusedPrivateField"})
   private DutyCycle m_dutyCycle;
 
   private boolean m_ownsAnalog;
@@ -80,6 +81,7 @@ public class AnalogTrigger implements Sendable, AutoCloseable {
     if (m_ownsAnalog && m_analogInput != null) {
       m_analogInput.close();
     }
+    Reference.reachabilityFence(m_dutyCycle);
   }
 
   /**

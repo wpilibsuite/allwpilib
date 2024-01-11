@@ -48,6 +48,7 @@ public final class DriverStation {
 
   private static class HALJoystickAxesRaw {
     public int[] m_axes;
+    @SuppressWarnings("unused")
     public int m_count;
 
     HALJoystickAxesRaw(int count) {
