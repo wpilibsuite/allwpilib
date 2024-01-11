@@ -27,7 +27,6 @@ import edu.wpi.first.networktables.StringArrayTopic;
 import edu.wpi.first.networktables.StringEntry;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.util.PixelFormat;
-
 import java.lang.ref.Reference;
 import java.util.ArrayList;
 import java.util.Arrays;
