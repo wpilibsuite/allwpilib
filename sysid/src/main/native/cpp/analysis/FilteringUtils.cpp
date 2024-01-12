@@ -15,6 +15,7 @@
 #include <frc/filter/MedianFilter.h>
 #include <units/math.h>
 #include <wpi/StringExtras.h>
+#include <wpi/MathExtras.h>
 
 using namespace sysid;
 
@@ -138,7 +139,7 @@ sysid::TrimStepVoltageData(std::vector<PreparedData>* data,
 
   auto maxAccel = std::max_element(
       data->begin(), data->end(), [](const auto& a, const auto& b) {
-        return std::abs(a.acceleration) < std::abs(b.acceleration);
+        return wpi::sgn(a.velocity) * a.acceleration < wpi::sgn(b.velocity) * b.acceleration;
       });
 
   units::second_t velocityDelay;
