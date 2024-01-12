@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 #include <atomic>
+#include <concepts>
 #include <functional>
 #include <string_view>
 #include <thread>
