@@ -45,7 +45,7 @@ TEST(FilterTest, NoiseFloor) {
 
 void FillStepVoltageData(std::vector<sysid::PreparedData>& data) {
   auto previousDatum = data.front();
-  for (int i = 1; i < data.size(); i++) {
+  for (size_t i = 1; i < data.size(); ++i) {
     auto& datum = data.at(i);
     datum.timestamp = previousDatum.timestamp + previousDatum.dt;
     datum.position = 0.5 * previousDatum.acceleration *
