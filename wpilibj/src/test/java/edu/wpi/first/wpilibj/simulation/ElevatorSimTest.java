@@ -22,6 +22,7 @@ class ElevatorSimTest {
   void testStateSpaceSimWithElevator() {
     RoboRioSim.resetData();
 
+    @SuppressWarnings("resource")
     var controller = new PIDController(10, 0, 0);
 
     var sim =

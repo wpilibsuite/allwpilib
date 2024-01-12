@@ -25,7 +25,7 @@ import java.nio.ByteOrder;
  * href="https://docs.wpilib.org/en/stable/docs/yearly-overview/known-issues.html#onboard-i2c-causing-system-lockups">
  * WPILib Known Issues</a> page for details.
  */
-@SuppressWarnings({"TypeName", "PMD.UnusedPrivateField"})
+@SuppressWarnings("TypeName")
 public class ADXL345_I2C implements NTSendable, AutoCloseable {
   /** Default I2C device address. */
   public static final byte kAddress = 0x1D;
@@ -34,16 +34,17 @@ public class ADXL345_I2C implements NTSendable, AutoCloseable {
   private static final byte kDataFormatRegister = 0x31;
   private static final byte kDataRegister = 0x32;
   private static final double kGsPerLSB = 0.00390625;
-  private static final byte kPowerCtl_Link = 0x20;
-  private static final byte kPowerCtl_AutoSleep = 0x10;
+  // private static final byte kPowerCtl_Link = 0x20;
+  // private static final byte kPowerCtl_AutoSleep = 0x10;
   private static final byte kPowerCtl_Measure = 0x08;
-  private static final byte kPowerCtl_Sleep = 0x04;
+  // private static final byte kPowerCtl_Sleep = 0x04;
 
-  private static final byte kDataFormat_SelfTest = (byte) 0x80;
-  private static final byte kDataFormat_SPI = 0x40;
-  private static final byte kDataFormat_IntInvert = 0x20;
+  // private static final byte kDataFormat_SelfTest = (byte) 0x80;
+  // private static final byte kDataFormat_SPI = 0x40;
+  // private static final byte kDataFormat_IntInvert = 0x20;
   private static final byte kDataFormat_FullRes = 0x08;
-  private static final byte kDataFormat_Justify = 0x04;
+
+  // private static final byte kDataFormat_Justify = 0x04;
 
   /** Accelerometer range. */
   public enum Range {
