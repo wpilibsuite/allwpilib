@@ -14,8 +14,8 @@
 #include <frc/filter/LinearFilter.h>
 #include <frc/filter/MedianFilter.h>
 #include <units/math.h>
-#include <wpi/StringExtras.h>
 #include <wpi/MathExtras.h>
+#include <wpi/StringExtras.h>
 
 using namespace sysid;
 
@@ -139,8 +139,11 @@ sysid::TrimStepVoltageData(std::vector<PreparedData>* data,
 
   auto maxAccel = std::max_element(
       data->begin(), data->end(), [](const auto& a, const auto& b) {
-        // Since we don't know if its a forward or backwards test here, we use the sign of each point's velocity to determine how to compare their accelerations.
-        return wpi::sgn(a.velocity) * a.acceleration < wpi::sgn(b.velocity) * b.acceleration;
+        // Since we don't know if its a forward or backwards test here, we use
+        // the sign of each point's velocity to determine how to compare their
+        // accelerations.
+        return wpi::sgn(a.velocity) * a.acceleration <
+               wpi::sgn(b.velocity) * b.acceleration;
       });
 
   units::second_t velocityDelay;
