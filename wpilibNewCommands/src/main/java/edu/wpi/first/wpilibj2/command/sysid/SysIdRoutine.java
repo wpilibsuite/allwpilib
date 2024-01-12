@@ -214,14 +214,16 @@ public class SysIdRoutine extends SysIdRoutineLog {
    * @return A command to run the test.
    */
   public Command quasistatic(Direction direction) {
-    Timer timer = new Timer();
-    double outputSign = direction == Direction.kForward ? 1.0 : -1.0;
-    State state =
-        Map.ofEntries(
-                entry(Direction.kForward, State.kQuasistaticForward),
-                entry(Direction.kReverse, State.kQuasistaticReverse))
-            .get(direction);
+    State state;
+    if (direction == Direction.kForward) {
+      state = State.kQuasistaticForward;
+    } else { // if (direction == Direction.kReverse) {
+      state = State.kQuasistaticReverse;
+    }
 
+    double outputSign = direction == Direction.kForward ? 1.0 : -1.0;
+
+    Timer timer = new Timer();
     return m_mechanism
         .m_subsystem
         .runOnce(timer::start)
