@@ -6,6 +6,7 @@
 
 #include <string>
 #include <string_view>
+#include <unordered_map>
 
 #include <units/acceleration.h>
 #include <units/angle.h>
