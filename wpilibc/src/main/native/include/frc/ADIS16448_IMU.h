@@ -15,8 +15,6 @@
 
 #include <stdint.h>
 
-#include <atomic>
-#include <memory>
 #include <thread>
 
 #include <hal/SimDevice.h>
@@ -33,7 +31,6 @@
 
 #include "frc/DigitalInput.h"
 #include "frc/DigitalOutput.h"
-#include "frc/DigitalSource.h"
 #include "frc/SPI.h"
 
 namespace frc {
