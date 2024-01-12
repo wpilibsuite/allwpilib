@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj.examples.elevatortrapezoidprofile;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.trajectory.ProfileState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -21,8 +22,8 @@ public class Robot extends TimedRobot {
   // acceleration constraints for the next setpoint.
   private final TrapezoidProfile m_profile =
       new TrapezoidProfile(new TrapezoidProfile.Constraints(1.75, 0.75));
-  private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
-  private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
+  private ProfileState m_goal = new ProfileState();
+  private ProfileState m_setpoint = new ProfileState();
 
   @Override
   public void robotInit() {
@@ -33,9 +34,9 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     if (m_joystick.getRawButtonPressed(2)) {
-      m_goal = new TrapezoidProfile.State(5, 0);
+      m_goal = new ProfileState(5, 0);
     } else if (m_joystick.getRawButtonPressed(3)) {
-      m_goal = new TrapezoidProfile.State();
+      m_goal = new ProfileState();
     }
 
     // Retrieve the profiled setpoint for the next timestep. This setpoint moves

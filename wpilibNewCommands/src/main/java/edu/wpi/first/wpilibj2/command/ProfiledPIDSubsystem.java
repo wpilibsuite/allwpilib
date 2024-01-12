@@ -4,11 +4,10 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import static edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.ProfileState;
 
 /**
  * A subsystem that uses a {@link ProfiledPIDController} to control an output. The controller is run
@@ -64,7 +63,7 @@ public abstract class ProfiledPIDSubsystem extends SubsystemBase {
    *
    * @param goal The goal state for the subsystem's motion profile.
    */
-  public final void setGoal(TrapezoidProfile.State goal) {
+  public final void setGoal(ProfileState goal) {
     m_controller.setGoal(goal);
   }
 
@@ -74,7 +73,7 @@ public abstract class ProfiledPIDSubsystem extends SubsystemBase {
    * @param goal The goal position for the subsystem's motion profile.
    */
   public final void setGoal(double goal) {
-    setGoal(new TrapezoidProfile.State(goal, 0));
+    setGoal(new ProfileState(goal, 0));
   }
 
   /**
@@ -83,7 +82,7 @@ public abstract class ProfiledPIDSubsystem extends SubsystemBase {
    * @param output the output of the ProfiledPIDController
    * @param setpoint the setpoint state of the ProfiledPIDController, for feedforward
    */
-  protected abstract void useOutput(double output, State setpoint);
+  protected abstract void useOutput(double output, ProfileState setpoint);
 
   /**
    * Returns the measurement of the process variable used by the ProfiledPIDController.
@@ -101,7 +100,7 @@ public abstract class ProfiledPIDSubsystem extends SubsystemBase {
   /** Disables the PID control. Sets output to zero. */
   public void disable() {
     m_enabled = false;
-    useOutput(0, new State());
+    useOutput(0, new ProfileState());
   }
 
   /**

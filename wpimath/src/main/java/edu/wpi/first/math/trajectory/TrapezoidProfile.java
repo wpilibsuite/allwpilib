@@ -9,7 +9,6 @@ import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Unit;
 import edu.wpi.first.units.Velocity;
-import java.util.Objects;
 
 /**
  * A trapezoid-shaped velocity profile.
@@ -23,8 +22,8 @@ import java.util.Objects;
  * <pre><code>
  * TrapezoidProfile.Constraints constraints =
  *   new TrapezoidProfile.Constraints(kMaxV, kMaxA);
- * TrapezoidProfile.State previousProfiledReference =
- *   new TrapezoidProfile.State(initialReference, 0.0);
+ * TrapezoidProfile.ProfileState previousProfiledReference =
+ *   new ProfileState(initialReference, 0.0);
  * TrapezoidProfile profile = new TrapezoidProfile(constraints);
  * </code></pre>
  *
@@ -46,8 +45,8 @@ public class TrapezoidProfile {
   private int m_direction;
 
   private final Constraints m_constraints;
-  private State m_current;
-  private State m_goal; // TODO: Remove
+  private ProfileState m_current;
+  private ProfileState m_goal; // TODO: Remove
   private final boolean m_newAPI; // TODO: Remove
 
   private double m_endAccel;
@@ -87,55 +86,6 @@ public class TrapezoidProfile {
     }
   }
 
-  /** Profile state. */
-  public static class State {
-    /** The position at this state. */
-    public double position;
-
-    /** The velocity at this state. */
-    public double velocity;
-
-    /** Default constructor. */
-    public State() {}
-
-    /**
-     * Constructs constraints for a Trapezoid Profile.
-     *
-     * @param position The position at this state.
-     * @param velocity The velocity at this state.
-     */
-    public State(double position, double velocity) {
-      this.position = position;
-      this.velocity = velocity;
-    }
-
-    /**
-     * Constructs constraints for a Trapezoid Profile.
-     *
-     * @param <U> Unit type.
-     * @param position The position at this state.
-     * @param velocity The velocity at this state.
-     */
-    public <U extends Unit<U>> State(Measure<U> position, Measure<Velocity<U>> velocity) {
-      this(position.baseUnitMagnitude(), velocity.baseUnitMagnitude());
-    }
-
-    @Override
-    public boolean equals(Object other) {
-      if (other instanceof State) {
-        State rhs = (State) other;
-        return this.position == rhs.position && this.velocity == rhs.velocity;
-      } else {
-        return false;
-      }
-    }
-
-    @Override
-    public int hashCode() {
-      return Objects.hash(position, velocity);
-    }
-  }
-
   /**
    * Construct a TrapezoidProfile.
    *
@@ -156,7 +106,7 @@ public class TrapezoidProfile {
    *     TrapezoidProfile with the desired and current state
    */
   @Deprecated(since = "2024", forRemoval = true)
-  public TrapezoidProfile(Constraints constraints, State goal, State initial) {
+  public TrapezoidProfile(Constraints constraints, ProfileState goal, ProfileState initial) {
     m_direction = shouldFlipAcceleration(initial, goal) ? -1 : 1;
     m_constraints = constraints;
     m_current = direct(initial);
@@ -205,8 +155,8 @@ public class TrapezoidProfile {
    *     TrapezoidProfile with the desired and current state
    */
   @Deprecated(since = "2024", forRemoval = true)
-  public TrapezoidProfile(Constraints constraints, State goal) {
-    this(constraints, goal, new State(0, 0));
+  public TrapezoidProfile(Constraints constraints, ProfileState goal) {
+    this(constraints, goal, new ProfileState(0, 0));
   }
 
   /**
@@ -219,11 +169,11 @@ public class TrapezoidProfile {
    *     TrapezoidProfile with the desired and current state
    */
   @Deprecated(since = "2024", forRemoval = true)
-  public State calculate(double t) {
+  public ProfileState calculate(double t) {
     if (m_newAPI) {
       throw new RuntimeException("Cannot use new constructor with deprecated calculate()");
     }
-    State result = new State(m_current.position, m_current.velocity);
+    ProfileState result = new ProfileState(m_current.position, m_current.velocity);
 
     if (t < m_endAccel) {
       result.velocity += t * m_constraints.maxAcceleration;
@@ -255,7 +205,7 @@ public class TrapezoidProfile {
    * @param goal The desired state when the profile is complete.
    * @return The position and velocity of the profile at time t.
    */
-  public State calculate(double t, State current, State goal) {
+  public ProfileState calculate(double t, ProfileState current, ProfileState goal) {
     m_direction = shouldFlipAcceleration(current, goal) ? -1 : 1;
     m_current = direct(current);
     goal = direct(goal);
@@ -292,7 +242,7 @@ public class TrapezoidProfile {
     m_endAccel = accelerationTime - cutoffBegin;
     m_endFullSpeed = m_endAccel + fullSpeedDist / m_constraints.maxVelocity;
     m_endDeccel = m_endFullSpeed + accelerationTime - cutoffEnd;
-    State result = new State(m_current.position, m_current.velocity);
+    ProfileState result = new ProfileState(m_current.position, m_current.velocity);
 
     if (t < m_endAccel) {
       result.velocity += t * m_constraints.maxAcceleration;
@@ -413,13 +363,13 @@ public class TrapezoidProfile {
    * @param initial The initial state (usually the current state).
    * @param goal The desired state when the profile is complete.
    */
-  private static boolean shouldFlipAcceleration(State initial, State goal) {
+  private static boolean shouldFlipAcceleration(ProfileState initial, ProfileState goal) {
     return initial.position > goal.position;
   }
 
   // Flip the sign of the velocity and position if the profile is inverted
-  private State direct(State in) {
-    State result = new State(in.position, in.velocity);
+  private ProfileState direct(ProfileState in) {
+    ProfileState result = new ProfileState(in.position, in.velocity);
     result.position = result.position * m_direction;
     result.velocity = result.velocity * m_direction;
     return result;

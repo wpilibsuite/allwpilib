@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj.commands.profiledpidsubsystem;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.ProfileState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.ProfiledPIDSubsystem;
 
@@ -22,7 +23,7 @@ public class ReplaceMeProfiledPIDSubsystem extends ProfiledPIDSubsystem {
   }
 
   @Override
-  public void useOutput(double output, TrapezoidProfile.State setpoint) {
+  public void useOutput(double output, ProfileState setpoint) {
     // Use the output (and optionally the setpoint) here
   }
 

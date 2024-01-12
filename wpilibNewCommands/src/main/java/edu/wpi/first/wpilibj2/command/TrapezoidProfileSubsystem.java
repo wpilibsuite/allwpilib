@@ -6,6 +6,7 @@ package edu.wpi.first.wpilibj2.command;
 
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
+import edu.wpi.first.math.trajectory.ProfileState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 
 /**
@@ -18,8 +19,8 @@ public abstract class TrapezoidProfileSubsystem extends SubsystemBase {
   private final double m_period;
   private final TrapezoidProfile m_profile;
 
-  private TrapezoidProfile.State m_state;
-  private TrapezoidProfile.State m_goal;
+  private ProfileState m_state;
+  private ProfileState m_goal;
 
   private boolean m_enabled = true;
 
@@ -35,7 +36,7 @@ public abstract class TrapezoidProfileSubsystem extends SubsystemBase {
       TrapezoidProfile.Constraints constraints, double initialPosition, double period) {
     requireNonNullParam(constraints, "constraints", "TrapezoidProfileSubsystem");
     m_profile = new TrapezoidProfile(constraints);
-    m_state = new TrapezoidProfile.State(initialPosition, 0);
+    m_state = new ProfileState(initialPosition, 0);
     setGoal(initialPosition);
     m_period = period;
   }
@@ -74,7 +75,7 @@ public abstract class TrapezoidProfileSubsystem extends SubsystemBase {
    *
    * @param goal The goal state for the subsystem's motion profile.
    */
-  public final void setGoal(TrapezoidProfile.State goal) {
+  public final void setGoal(ProfileState goal) {
     m_goal = goal;
   }
 
@@ -84,7 +85,7 @@ public abstract class TrapezoidProfileSubsystem extends SubsystemBase {
    * @param goal The goal position for the subsystem's motion profile.
    */
   public final void setGoal(double goal) {
-    setGoal(new TrapezoidProfile.State(goal, 0));
+    setGoal(new ProfileState(goal, 0));
   }
 
   /** Enable the TrapezoidProfileSubsystem's output. */
@@ -102,5 +103,5 @@ public abstract class TrapezoidProfileSubsystem extends SubsystemBase {
    *
    * @param state The current state of the motion profile.
    */
-  protected abstract void useState(TrapezoidProfile.State state);
+  protected abstract void useState(ProfileState state);
 }

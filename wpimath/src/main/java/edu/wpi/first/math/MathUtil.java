@@ -4,6 +4,8 @@
 
 package edu.wpi.first.math;
 
+import edu.wpi.first.math.trajectory.ProfileState;
+
 /** Math utility functions. */
 public final class MathUtil {
   private MathUtil() {
@@ -133,6 +135,26 @@ public final class MathUtil {
    */
   public static double angleModulus(double angleRadians) {
     return inputModulus(angleRadians, -Math.PI, Math.PI);
+  }
+
+  /**
+   * Returns the new goal state.
+   *
+   * @param current The current state.
+   * @param goal The goal state.
+   * @param minimumPosition The minimum value expected from the input.
+   * @param maximumPosition The maximum value expected from the input.
+   * @return The wrapped goal state. The position will be the shortest distance.
+   */
+  public static ProfileState continuousProfileShortestGoal(
+      ProfileState current, ProfileState goal, double minimumPosition, double maximumPosition) {
+    // Get error which is the smallest distance between goal and measurement
+    double errorBound = (maximumPosition - minimumPosition) / 2.0;
+    double goalMinDistance =
+        MathUtil.inputModulus(goal.position - current.position, -errorBound, errorBound);
+    ProfileState state = new ProfileState();
+    state.position = current.position + goalMinDistance;
+    return state;
   }
 
   /**

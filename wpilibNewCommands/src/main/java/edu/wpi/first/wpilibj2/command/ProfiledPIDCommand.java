@@ -4,10 +4,10 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import static edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.ProfileState;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.DoubleSupplier;
@@ -28,10 +28,10 @@ public class ProfiledPIDCommand extends Command {
   protected DoubleSupplier m_measurement;
 
   /** Goal getter. */
-  protected Supplier<State> m_goal;
+  protected Supplier<ProfileState> m_goal;
 
   /** Profiled PID controller output consumer. */
-  protected BiConsumer<Double, State> m_useOutput;
+  protected BiConsumer<Double, ProfileState> m_useOutput;
 
   /**
    * Creates a new PIDCommand, which controls the given output with a ProfiledPIDController. Goal
@@ -46,8 +46,8 @@ public class ProfiledPIDCommand extends Command {
   public ProfiledPIDCommand(
       ProfiledPIDController controller,
       DoubleSupplier measurementSource,
-      Supplier<State> goalSource,
-      BiConsumer<Double, State> useOutput,
+      Supplier<ProfileState> goalSource,
+      BiConsumer<Double, ProfileState> useOutput,
       Subsystem... requirements) {
     requireNonNullParam(controller, "controller", "ProfiledPIDCommand");
     requireNonNullParam(measurementSource, "measurementSource", "ProfiledPIDCommand");
@@ -75,7 +75,7 @@ public class ProfiledPIDCommand extends Command {
       ProfiledPIDController controller,
       DoubleSupplier measurementSource,
       DoubleSupplier goalSource,
-      BiConsumer<Double, State> useOutput,
+      BiConsumer<Double, ProfileState> useOutput,
       Subsystem... requirements) {
     requireNonNullParam(controller, "controller", "SynchronousPIDCommand");
     requireNonNullParam(measurementSource, "measurementSource", "SynchronousPIDCommand");
@@ -85,7 +85,7 @@ public class ProfiledPIDCommand extends Command {
     m_controller = controller;
     m_useOutput = useOutput;
     m_measurement = measurementSource;
-    m_goal = () -> new State(goalSource.getAsDouble(), 0);
+    m_goal = () -> new ProfileState(goalSource.getAsDouble(), 0);
     m_requirements.addAll(Set.of(requirements));
   }
 
@@ -102,8 +102,8 @@ public class ProfiledPIDCommand extends Command {
   public ProfiledPIDCommand(
       ProfiledPIDController controller,
       DoubleSupplier measurementSource,
-      State goal,
-      BiConsumer<Double, State> useOutput,
+      ProfileState goal,
+      BiConsumer<Double, ProfileState> useOutput,
       Subsystem... requirements) {
     this(controller, measurementSource, () -> goal, useOutput, requirements);
   }
@@ -122,7 +122,7 @@ public class ProfiledPIDCommand extends Command {
       ProfiledPIDController controller,
       DoubleSupplier measurementSource,
       double goal,
-      BiConsumer<Double, State> useOutput,
+      BiConsumer<Double, ProfileState> useOutput,
       Subsystem... requirements) {
     this(controller, measurementSource, () -> goal, useOutput, requirements);
   }
@@ -141,7 +141,7 @@ public class ProfiledPIDCommand extends Command {
 
   @Override
   public void end(boolean interrupted) {
-    m_useOutput.accept(0.0, new State());
+    m_useOutput.accept(0.0, new ProfileState());
   }
 
   /**

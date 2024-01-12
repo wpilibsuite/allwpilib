@@ -6,6 +6,7 @@ package edu.wpi.first.wpilibj.examples.armbot.subsystems;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.ProfileState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.examples.armbot.Constants.ArmConstants;
@@ -39,7 +40,7 @@ public class ArmSubsystem extends ProfiledPIDSubsystem {
   }
 
   @Override
-  public void useOutput(double output, TrapezoidProfile.State setpoint) {
+  public void useOutput(double output, ProfileState setpoint) {
     // Calculate the feedforward from the sepoint
     double feedforward = m_feedforward.calculate(setpoint.position, setpoint.velocity);
     // Add the feedforward to the PID output to get the motor output

@@ -9,6 +9,7 @@ import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.ExponentialProfile;
+import edu.wpi.first.math.trajectory.ProfileState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
@@ -33,7 +34,7 @@ public class Elevator implements AutoCloseable {
           ExponentialProfile.Constraints.fromCharacteristics(
               Constants.kElevatorMaxV, Constants.kElevatorkV, Constants.kElevatorkA));
 
-  private ExponentialProfile.State m_setpoint = new ExponentialProfile.State(0, 0);
+  private ProfileState m_setpoint = new ProfileState(0, 0);
 
   // Standard classes for controlling our elevator
   private final PIDController m_pidController =
@@ -104,7 +105,7 @@ public class Elevator implements AutoCloseable {
    * @param goal the position to maintain
    */
   public void reachGoal(double goal) {
-    var goalState = new ExponentialProfile.State(goal, 0);
+    var goalState = new ProfileState(goal, 0);
 
     var next = m_profile.calculate(0.020, m_setpoint, goalState);
 
@@ -124,7 +125,7 @@ public class Elevator implements AutoCloseable {
 
   /** Reset Exponential profile to begin from current position on enable. */
   public void reset() {
-    m_setpoint = new ExponentialProfile.State(m_encoder.getDistance(), 0);
+    m_setpoint = new ProfileState(m_encoder.getDistance(), 0);
   }
 
   /** Update telemetry, including the mechanism visualization. */

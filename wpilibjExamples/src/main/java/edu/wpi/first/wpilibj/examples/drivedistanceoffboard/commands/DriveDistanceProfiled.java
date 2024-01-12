@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj.examples.drivedistanceoffboard.commands;
 
+import edu.wpi.first.math.trajectory.ProfileState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.examples.drivedistanceoffboard.Constants.DriveConstants;
 import edu.wpi.first.wpilibj.examples.drivedistanceoffboard.subsystems.DriveSubsystem;
@@ -27,9 +28,9 @@ public class DriveDistanceProfiled extends TrapezoidProfileCommand {
         // Pipe the profile state to the drive
         setpointState -> drive.setDriveStates(setpointState, setpointState),
         // End at desired position in meters; implicitly starts at 0
-        () -> new TrapezoidProfile.State(meters, 0),
+        () -> new ProfileState(meters, 0),
         // Current position
-        TrapezoidProfile.State::new,
+        ProfileState::new,
         // Require the drive
         drive);
     // Reset drive encoders since we're starting at 0
