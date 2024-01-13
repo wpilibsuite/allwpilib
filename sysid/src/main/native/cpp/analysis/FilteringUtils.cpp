@@ -158,18 +158,22 @@ sysid::TrimStepVoltageData(std::vector<PreparedData>* data,
 
   minStepTime = std::min(data->at(0).timestamp - firstTimestamp, minStepTime);
 
-  // Find maximum speed reached
-  const auto maxSpeed =
-      GetMaxSpeed(*data, [](auto&& pt) { return pt.velocity; });
-  // Find place where 90% of maximum speed exceeded
-  auto endIt =
-      std::find_if(data->begin(), data->end(), [&](const PreparedData& entry) {
-        return std::abs(entry.velocity) > maxSpeed * 0.9;
-      });
+  // If step test duration not yet specified, calculate default
+  if (settings->stepTestDuration == 0_s) {
+    // Find maximum speed reached
+    const auto maxSpeed =
+        GetMaxSpeed(*data, [](auto&& pt) { return pt.velocity; });
+    // Find place where 90% of maximum speed exceeded
+    auto endIt = std::find_if(
+        data->begin(), data->end(), [&](const PreparedData& entry) {
+          return std::abs(entry.velocity) > maxSpeed * 0.9;
+        });
 
-  if (endIt != data->end()) {
-    settings->stepTestDuration = std::min(
-        endIt->timestamp - data->front().timestamp + minStepTime, maxStepTime);
+    if (endIt != data->end()) {
+      settings->stepTestDuration =
+          std::min(endIt->timestamp - data->front().timestamp + minStepTime,
+                   maxStepTime);
+    }
   }
 
   // Find first entry greater than the step test duration

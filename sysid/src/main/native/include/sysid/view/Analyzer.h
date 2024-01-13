@@ -225,7 +225,7 @@ class Analyzer : public glass::View {
   int m_dataset = 0;
   int m_window = 8;
   double m_threshold = 0.2;
-  float m_stepTestDuration = 10;
+  float m_stepTestDuration = 0;
 
   double m_gearingNumerator = 1.0;
   double m_gearingDenominator = 1.0;
