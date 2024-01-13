@@ -63,7 +63,7 @@ void glass::AddStandardNetworkTablesViews(NetworkTablesProvider& provider) {
       [](Window* win, Model* model, const char*) {
         win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
         return MakeFunctionView(
-            [=] { DisplayFMS(static_cast<FMSModel*>(model)); });
+            [=] { DisplayFMS(static_cast<FMSModel*>(model), true); });
       });
   provider.Register(
       NTDigitalInputModel::kType,
