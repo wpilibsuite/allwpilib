@@ -175,6 +175,7 @@ sysid::TrimStepVoltageData(std::vector<PreparedData>* data,
                    maxStepTime);
     }
   }
+
   // Find first entry greater than the step test duration
   auto maxIt =
       std::find_if(data->begin(), data->end(), [&](PreparedData entry) {
