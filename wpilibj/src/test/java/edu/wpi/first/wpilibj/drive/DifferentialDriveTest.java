@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import edu.wpi.first.wpilibj.motorcontrol.MockPWMMotorController;
 import org.junit.jupiter.api.Test;
 
+@SuppressWarnings("resource")
 class DifferentialDriveTest {
   @Test
   void testArcadeDriveIK() {

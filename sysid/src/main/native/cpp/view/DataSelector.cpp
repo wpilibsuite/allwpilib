@@ -91,6 +91,31 @@ void DataSelector::Display() {
   if (m_testsFuture.valid() &&
       m_testsFuture.wait_for(0s) == std::future_status::ready) {
     m_tests = m_testsFuture.get();
+    for (auto it = m_tests.begin(); it != m_tests.end();) {
+      if (it->first != "quasistatic" && it->first != "dynamic") {
+        WPI_WARNING(m_logger, "Unrecognized test {}, removing", it->first);
+        it = m_tests.erase(it);
+        continue;
+      }
+      for (auto it2 = it->second.begin(); it2 != it->second.end();) {
+        auto direction = wpi::rsplit(it2->first, '-').second;
+        if (direction != "forward" && direction != "reverse") {
+          WPI_WARNING(m_logger, "Unrecognized direction {}, removing",
+                      direction);
+          it2 = it->second.erase(it2);
+          continue;
+        }
+        WPI_INFO(m_logger, "Loaded test state {}", it2->first);
+        ++it2;
+      }
+      if (it->second.empty()) {
+        WPI_WARNING(m_logger, "No data for test {}, removing", it->first);
+        it = m_tests.erase(it);
+        continue;
+      }
+      ++it;
+    }
+    WPI_INFO(m_logger, "Loaded {} tests", m_tests.size());
   }
 
   if (m_tests.empty()) {
@@ -155,7 +180,9 @@ DataSelector::Tests DataSelector::LoadTests(
     std::string_view prevState;
     Runs* curRuns = nullptr;
     wpi::log::DataLogReader::iterator lastStart = range.begin();
+    int64_t ts = lastStart->GetTimestamp();
     for (auto it = range.begin(), end = range.end(); it != end; ++it) {
+      ts = it->GetTimestamp();
       std::string_view testState;
       if (it->GetEntry() != testStateEntry.entry ||
           !it->GetString(&testState)) {
@@ -165,7 +192,7 @@ DataSelector::Tests DataSelector::LoadTests(
       // track runs as iterator ranges of the same test
       if (testState != prevState) {
         if (curRuns) {
-          curRuns->emplace_back(lastStart, it);
+          curRuns->emplace_back(lastStart->GetTimestamp(), ts);
         }
         lastStart = it;
       }
@@ -189,53 +216,77 @@ DataSelector::Tests DataSelector::LoadTests(
     }
 
     if (curRuns) {
-      curRuns->emplace_back(lastStart, range.end());
+      curRuns->emplace_back(lastStart->GetTimestamp(), ts);
     }
   }
   return tests;
 }
 
 template <typename T>
-static void AddSample(std::vector<MotorData::Run::Sample<T>>& samples,
-                      const wpi::log::DataLogRecord& record, bool isDouble,
-                      double scale) {
-  if (isDouble) {
-    double val;
-    if (record.GetDouble(&val)) {
-      samples.emplace_back(units::second_t{record.GetTimestamp() * 1.0e-6},
-                           T{val * scale});
-    }
-  } else {
-    float val;
-    if (record.GetFloat(&val)) {
-      samples.emplace_back(units::second_t{record.GetTimestamp() * 1.0e-6},
-                           T{static_cast<double>(val * scale)});
+static void AddSamples(std::vector<MotorData::Run::Sample<T>>& samples,
+                       const std::vector<std::pair<int64_t, double>>& data,
+                       int64_t tsbegin, int64_t tsend) {
+  // data is sorted, so do a binary search for tsbegin and tsend
+  auto begin = std::lower_bound(
+      data.begin(), data.end(), tsbegin,
+      [](const auto& datapoint, double val) { return datapoint.first < val; });
+  auto end = std::lower_bound(
+      begin, data.end(), tsend,
+      [](const auto& datapoint, double val) { return datapoint.first < val; });
+
+  for (auto it = begin; it != end; ++it) {
+    samples.emplace_back(units::second_t{it->first * 1.0e-6}, T{it->second});
+  }
+}
+
+static std::vector<std::pair<int64_t, double>> GetData(
+    const glass::DataLogReaderEntry& entry, double scale) {
+  std::vector<std::pair<int64_t, double>> rv;
+  bool isDouble = entry.type == "double";
+  for (auto&& range : entry.ranges) {
+    for (auto&& record : range) {
+      if (record.GetEntry() != entry.entry) {
+        continue;
+      }
+      if (isDouble) {
+        double val;
+        if (record.GetDouble(&val)) {
+          rv.emplace_back(record.GetTimestamp(), val * scale);
+        }
+      } else {
+        float val;
+        if (record.GetFloat(&val)) {
+          rv.emplace_back(record.GetTimestamp(),
+                          static_cast<double>(val * scale));
+        }
+      }
     }
   }
+
+  std::sort(rv.begin(), rv.end(),
+            [](const auto& a, const auto& b) { return a.first < b.first; });
+  return rv;
 }
 
 TestData DataSelector::BuildTestData() {
   TestData data;
   data.distanceUnit = kUnits[m_selectedUnit];
   data.mechanismType = analysis::FromName(kAnalysisTypes[m_selectedAnalysis]);
-  bool voltageDouble = m_voltageEntry->type == "double";
-  bool positionDouble = m_positionEntry->type == "double";
-  bool velocityDouble = m_velocityEntry->type == "double";
+
+  // read and sort the entire dataset first; this is memory hungry but
+  // dramatically speeds up splitting it into runs.
+  auto voltageData = GetData(*m_voltageEntry, 1.0);
+  auto positionData = GetData(*m_positionEntry, m_positionScale);
+  auto velocityData = GetData(*m_velocityEntry, m_velocityScale);
 
   for (auto&& test : m_tests) {
     for (auto&& state : test.second) {
       auto& motorData = data.motorData[state.first];
-      for (auto&& range : state.second) {
+      for (auto [tsbegin, tsend] : state.second) {
         auto& run = motorData.runs.emplace_back();
-        for (auto&& record : range) {
-          if (record.GetEntry() == m_voltageEntry->entry) {
-            AddSample(run.voltage, record, voltageDouble, 1.0);
-          } else if (record.GetEntry() == m_positionEntry->entry) {
-            AddSample(run.position, record, positionDouble, m_positionScale);
-          } else if (record.GetEntry() == m_velocityEntry->entry) {
-            AddSample(run.velocity, record, velocityDouble, m_velocityScale);
-          }
-        }
+        AddSamples(run.voltage, voltageData, tsbegin, tsend);
+        AddSamples(run.position, positionData, tsbegin, tsend);
+        AddSamples(run.velocity, velocityData, tsbegin, tsend);
       }
     }
   }

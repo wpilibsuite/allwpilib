@@ -248,9 +248,10 @@ class NetworkTable final {
    * @param name topic name
    * @return Topic
    */
-  template <wpi::StructSerializable T>
-  StructTopic<T> GetStructTopic(std::string_view name) const {
-    return StructTopic<T>{GetTopic(name)};
+  template <typename T, typename... I>
+    requires wpi::StructSerializable<T, I...>
+  StructTopic<T, I...> GetStructTopic(std::string_view name) const {
+    return StructTopic<T, I...>{GetTopic(name)};
   }
 
   /**
@@ -259,9 +260,10 @@ class NetworkTable final {
    * @param name topic name
    * @return Topic
    */
-  template <wpi::StructSerializable T>
-  StructArrayTopic<T> GetStructArrayTopic(std::string_view name) const {
-    return StructArrayTopic<T>{GetTopic(name)};
+  template <typename T, typename... I>
+    requires wpi::StructSerializable<T, I...>
+  StructArrayTopic<T, I...> GetStructArrayTopic(std::string_view name) const {
+    return StructArrayTopic<T, I...>{GetTopic(name)};
   }
 
   /**

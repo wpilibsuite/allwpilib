@@ -20,7 +20,6 @@
 
 #include <cmath>
 #include <numbers>
-#include <string>
 
 #include <hal/HAL.h>
 #include <wpi/sendable/SendableBuilder.h>

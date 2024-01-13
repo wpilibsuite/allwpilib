@@ -15,8 +15,6 @@
 
 #include <stdint.h>
 
-#include <atomic>
-#include <memory>
 #include <thread>
 
 #include <hal/SimDevice.h>
@@ -30,7 +28,6 @@
 
 #include "frc/DigitalInput.h"
 #include "frc/DigitalOutput.h"
-#include "frc/DigitalSource.h"
 #include "frc/SPI.h"
 
 namespace frc {
@@ -218,18 +215,20 @@ class ADIS16470_IMU : public wpi::Sendable,
   /**
    * Returns the axis angle (CCW positive).
    *
-   * @param axis The IMUAxis whose angle to return.
+   * @param axis The IMUAxis whose angle to return. Defaults to user configured
+   * Yaw.
    * @return The axis angle (CCW positive).
    */
-  units::degree_t GetAngle(IMUAxis axis) const;
+  units::degree_t GetAngle(IMUAxis axis = IMUAxis::kYaw) const;
 
   /**
    * Returns the axis angular rate (CCW positive).
    *
-   * @param axis The IMUAxis whose rate to return.
+   * @param axis The IMUAxis whose rate to return. Defaults to user configured
+   * Yaw.
    * @return Axis angular rate (CCW positive).
    */
-  units::degrees_per_second_t GetRate(IMUAxis axis) const;
+  units::degrees_per_second_t GetRate(IMUAxis axis = IMUAxis::kYaw) const;
 
   /**
    * Returns the acceleration in the X axis.
