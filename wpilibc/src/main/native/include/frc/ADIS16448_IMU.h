@@ -15,8 +15,8 @@
 
 #include <stdint.h>
 
-#include <thread>
 #include <atomic>
+#include <thread>
 
 #include <hal/SimDevice.h>
 #include <units/acceleration.h>
@@ -115,8 +115,8 @@ class ADIS16448_IMU : public wpi::Sendable,
 
   ~ADIS16448_IMU() override;
 
-  ADIS16448_IMU(ADIS16448_IMU&&) = default;
-  ADIS16448_IMU& operator=(ADIS16448_IMU&&) = default;
+  ADIS16448_IMU(ADIS16448_IMU&&);
+  ADIS16448_IMU& operator=(ADIS16448_IMU&&);
 
   /**
    * Initialize the IMU.
