@@ -16,6 +16,7 @@
 #include <stdint.h>
 
 #include <thread>
+#include <atomic>
 
 #include <hal/SimDevice.h>
 #include <units/acceleration.h>
@@ -414,10 +415,10 @@ class ADIS16448_IMU : public wpi::Sendable,
   double CompFilterProcess(double compAngle, double accelAngle, double omega);
 
   // State and resource variables
-  volatile bool m_thread_active = false;
-  volatile bool m_first_run = true;
-  volatile bool m_thread_idle = false;
-  volatile bool m_start_up_mode = true;
+  std::atomic<bool> m_thread_active = false;
+  std::atomic<bool> m_first_run = true;
+  std::atomic<bool> m_thread_idle = false;
+  std::atomic<bool> m_start_up_mode = true;
 
   bool m_auto_configured = false;
   SPI::Port m_spi_port;
