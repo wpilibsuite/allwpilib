@@ -8,7 +8,9 @@ import edu.wpi.first.units.collections.LongToObjectHashMap;
 import java.util.Objects;
 
 /**
- * A combinatory unit type that is equivalent to the product of two other others.
+ * A combinatory unit type that is equivalent to the product of two other others. Note that
+ * algebraic reduction is not possible in Java's generic type system, so {@code Mult<A, B>} is not
+ * type-compatible with {@code Mult<B, A>}!
  *
  * @param <A> the type of the first unit in the result
  * @param <B> the type of the second unit in the result
@@ -20,6 +22,14 @@ public class Mult<A extends Unit<A>, B extends Unit<B>> extends Unit<Mult<A, B>>
   @SuppressWarnings("rawtypes")
   private static final LongToObjectHashMap<Mult> cache = new LongToObjectHashMap<>();
 
+  /**
+   * Creates a new product unit. Consider using {@link #combine} instead of manually calling this
+   * constructor.
+   *
+   * @param baseType the base type representing the unit product
+   * @param a the first unit of the product
+   * @param b the second unit of the product
+   */
   protected Mult(Class<? extends Mult<A, B>> baseType, A a, B b) {
     super(
         baseType,
@@ -58,10 +68,20 @@ public class Mult<A extends Unit<A>, B extends Unit<B>> extends Unit<Mult<A, B>>
     return mult;
   }
 
+  /**
+   * Gets the first unit of the product.
+   *
+   * @return the first unit
+   */
   public A unitA() {
     return m_unitA;
   }
 
+  /**
+   * Gets the second unit of the product.
+   *
+   * @return the second unit
+   */
   public B unitB() {
     return m_unitB;
   }

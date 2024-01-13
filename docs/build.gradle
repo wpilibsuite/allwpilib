@@ -218,7 +218,6 @@ task generateJavaDocs(type: Javadoc) {
             "-edu.wpi.first.hal," +
             "-edu.wpi.first.hal.can," +
             "-edu.wpi.first.hal.simulation," +
-            "-edu.wpi.first.units," +
             // TODO: ^ Document these, then remove them from the list
             "-edu.wpi.first.math.proto," +
             "-edu.wpi.first.math.controller.proto," +
