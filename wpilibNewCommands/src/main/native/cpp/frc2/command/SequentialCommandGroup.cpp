@@ -86,4 +86,11 @@ void SequentialCommandGroup::InitSendable(wpi::SendableBuilder& builder) {
   Command::InitSendable(builder);
   builder.AddIntegerProperty(
       "index", [this] { return m_currentCommandIndex; }, nullptr);
+
+  std::vector<std::string> names;
+  names.reserve(m_commands.size());
+  for (auto&& command : m_commands) {
+    names.emplace_back(command->GetName());
+  }
+  builder.PublishConstStringArray("members", names);
 }

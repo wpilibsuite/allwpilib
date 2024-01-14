@@ -4,8 +4,11 @@
 
 package edu.wpi.first.wpilibj2.command;
 
+import edu.wpi.first.util.sendable.SendableBuilder;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -100,5 +103,17 @@ public class ParallelRaceGroup extends Command {
   @Override
   public InterruptionBehavior getInterruptionBehavior() {
     return m_interruptBehavior;
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    super.initSendable(builder);
+
+    List<String> list = new ArrayList<>(m_commands.size());
+    for (Command command : m_commands) {
+      String name = command.getName();
+      list.add(name);
+    }
+    builder.publishConstStringArray("members", list.toArray(new String[0]));
   }
 }

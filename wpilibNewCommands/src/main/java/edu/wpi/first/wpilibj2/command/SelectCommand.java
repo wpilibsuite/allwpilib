@@ -7,7 +7,10 @@ package edu.wpi.first.wpilibj2.command;
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.function.Supplier;
 
 /**
@@ -90,6 +93,12 @@ public class SelectCommand<K> extends Command {
   public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);
 
+    List<String> list = new ArrayList<>(m_commands.size());
+    for (Entry<K, Command> entry : m_commands.entrySet()) {
+      String s = entry.getKey().toString() + " : " + entry.getValue().getName();
+      list.add(s);
+    }
+    builder.publishConstStringArray("entries", list.toArray(new String[0]));
     builder.addStringProperty(
         "selected", () -> m_selectedCommand == null ? "null" : m_selectedCommand.getName(), null);
   }

@@ -18,7 +18,7 @@
 
 #include <wpi/DecayedDerivedFrom.h>
 
-#include "frc2/command/CommandBase.h"
+#include "frc2/command/Command.h"
 #include "frc2/command/CommandHelper.h"
 
 namespace frc2 {

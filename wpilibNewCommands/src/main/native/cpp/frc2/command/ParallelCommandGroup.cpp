@@ -4,6 +4,8 @@
 
 #include "frc2/command/ParallelCommandGroup.h"
 
+#include <wpi/sendable/SendableBuilder.h>
+
 using namespace frc2;
 
 ParallelCommandGroup::ParallelCommandGroup(
@@ -87,4 +89,14 @@ void ParallelCommandGroup::AddCommands(
                           "require the same subsystems");
     }
   }
+}
+
+void ParallelCommandGroup::InitSendable(wpi::SendableBuilder& builder) {
+  Command::InitSendable(builder);
+  std::vector<std::string> names;
+  names.reserve(m_commands.size());
+  for (auto&& command : m_commands) {
+    names.emplace_back(command.first->GetName());
+  }
+  builder.PublishConstStringArray("members", names);
 }

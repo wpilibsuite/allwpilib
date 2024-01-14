@@ -5,8 +5,10 @@
 package edu.wpi.first.wpilibj2.command;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -145,6 +147,13 @@ public class ParallelDeadlineGroup extends Command {
   public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);
 
+    List<String> list = new ArrayList<>(m_commands.size());
+    for (Command command : m_commands.keySet()) {
+      String name = command.getName();
+      list.add(name);
+    }
+    var names = list.toArray(new String[0]);
+    builder.publishConstStringArray("members", names);
     builder.addStringProperty("deadline", m_deadline::getName, null);
   }
 }
