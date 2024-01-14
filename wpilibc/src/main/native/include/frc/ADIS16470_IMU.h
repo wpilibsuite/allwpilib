@@ -145,7 +145,7 @@ class ADIS16470_IMU : public wpi::Sendable,
   ~ADIS16470_IMU() override;
 
   ADIS16470_IMU(ADIS16470_IMU&& other);
-  ADIS16470_IMU& operator=(ADIS16470_IMU&& other);
+  ADIS16470_IMU operator=(ADIS16470_IMU&& other);
 
   /**
    * Configures the decimation rate of the IMU.

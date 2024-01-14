@@ -219,6 +219,10 @@ ADIS16470_IMU::ADIS16470_IMU(ADIS16470_IMU&& other)
       m_simAccelZ{std::move(other.m_simAccelZ)},
       m_mutex{std::move(other.m_mutex)} {}
 
+ADIS16470_IMU ADIS16470_IMU::operator=(ADIS16470_IMU&& other) {
+  return ADIS16470_IMU(std::move(other));
+}
+
 bool ADIS16470_IMU::IsConnected() const {
   if (m_simConnected) {
     return m_simConnected.Get();
