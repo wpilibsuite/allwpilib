@@ -175,6 +175,7 @@ namespace HALUsageReporting {
     kLanguage_Python = 4,
     kLanguage_DotNet = 5,
     kLanguage_Kotlin = 6,
+    kLanguage_Rust = 7,
     kCANPlugin_BlackJagBridge = 1,
     kCANPlugin_2CAN = 2,
     kFramework_Iterative = 1,
