@@ -273,6 +273,8 @@ public final class FRCNetComm {
     public static final int kLanguage_DotNet = 5;
     /** kLanguage_Kotlin = 6. */
     public static final int kLanguage_Kotlin = 6;
+    /** kLanguage_Rust = 7. */
+    public static final int kLanguage_Rust = 7;
     /** kCANPlugin_BlackJagBridge = 1. */
     public static final int kCANPlugin_BlackJagBridge = 1;
     /** kCANPlugin_2CAN = 2. */
