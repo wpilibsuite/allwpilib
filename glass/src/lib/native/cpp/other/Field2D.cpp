@@ -343,7 +343,7 @@ static bool InputPose(frc::Pose2d* pose) {
 }
 
 FieldInfo::FieldInfo(Storage& storage)
-    : m_builtin{storage.GetString("builtin")},
+    : m_builtin{storage.GetString("builtin", "2024 Crescendo")},
       m_filename{storage.GetString("image")},
       m_width{storage.GetFloat("width", kDefaultWidth.to<float>())},
       m_height{storage.GetFloat("height", kDefaultHeight.to<float>())},
@@ -511,7 +511,7 @@ bool FieldInfo::LoadJson(std::span<const char> is, std::string_view filename) {
   // check scaling
   int fieldWidth = m_right - m_left;
   int fieldHeight = m_bottom - m_top;
-  if (std::abs((fieldWidth / width) - (fieldHeight / height)) > 0.1) {
+  if (std::abs((fieldWidth / width) - (fieldHeight / height)) > 0.3) {
     fmt::print(stderr,
                "GUI: Field X and Y scaling substantially different: "
                "xscale={} yscale={}\n",
