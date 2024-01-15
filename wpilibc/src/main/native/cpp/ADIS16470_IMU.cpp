@@ -219,8 +219,56 @@ ADIS16470_IMU::ADIS16470_IMU(ADIS16470_IMU&& other)
       m_simAccelZ{std::move(other.m_simAccelZ)},
       m_mutex{std::move(other.m_mutex)} {}
 
-ADIS16470_IMU ADIS16470_IMU::operator=(ADIS16470_IMU&& other) {
-  return ADIS16470_IMU(std::move(other));
+ADIS16470_IMU& ADIS16470_IMU::operator=(ADIS16470_IMU&& other) {
+  if (this == &other) {
+    return *this;
+  }
+
+  std::swap(this->m_yaw_axis, other.m_yaw_axis);
+  std::swap(this->m_pitch_axis, other.m_pitch_axis);
+  std::swap(this->m_roll_axis, other.m_roll_axis);
+  std::swap(this->m_reset_in, other.m_reset_in);
+  std::swap(this->m_status_led, other.m_status_led);
+  std::swap(this->m_integ_angle_x, other.m_integ_angle_x);
+  std::swap(this->m_integ_angle_y, other.m_integ_angle_y);
+  std::swap(this->m_integ_angle_z, other.m_integ_angle_z);
+  std::swap(this->m_gyro_rate_x, other.m_gyro_rate_x);
+  std::swap(this->m_gyro_rate_y, other.m_gyro_rate_y);
+  std::swap(this->m_gyro_rate_z, other.m_gyro_rate_z);
+  std::swap(this->m_accel_x, other.m_accel_x);
+  std::swap(this->m_accel_y, other.m_accel_y);
+  std::swap(this->m_accel_z, other.m_accel_z);
+  std::swap(this->m_tau, other.m_tau);
+  std::swap(this->m_dt, other.m_dt);
+  std::swap(this->m_alpha, other.m_alpha);
+  std::swap(this->m_compAngleX, other.m_compAngleX);
+  std::swap(this->m_compAngleY, other.m_compAngleY);
+  std::swap(this->m_accelAngleX, other.m_accelAngleX);
+  std::swap(this->m_accelAngleY, other.m_accelAngleY);
+  this->m_thread_active = other.m_thread_active.load();
+  this->m_first_run = other.m_first_run.load();
+  this->m_thread_idle = other.m_thread_idle.load();
+  std::swap(this->m_auto_configured, other.m_auto_configured);
+  std::swap(this->m_spi_port, other.m_spi_port);
+  std::swap(this->m_calibration_time, other.m_calibration_time);
+  std::swap(this->m_spi, other.m_spi);
+  std::swap(this->m_auto_interrupt, other.m_auto_interrupt);
+  std::swap(this->m_scaled_sample_rate, other.m_scaled_sample_rate);
+  std::swap(this->m_connected, other.m_connected);
+  std::swap(this->m_acquire_task, other.m_acquire_task);
+  std::swap(this->m_simDevice, other.m_simDevice);
+  std::swap(this->m_simConnected, other.m_simConnected);
+  std::swap(this->m_simGyroAngleX, other.m_simGyroAngleX);
+  std::swap(this->m_simGyroAngleY, other.m_simGyroAngleZ);
+  std::swap(this->m_simGyroAngleZ, other.m_simGyroAngleZ);
+  std::swap(this->m_simGyroRateX, other.m_simGyroRateX);
+  std::swap(this->m_simGyroRateY, other.m_simGyroRateY);
+  std::swap(this->m_simGyroRateZ, other.m_simGyroRateZ);
+  std::swap(this->m_simAccelX, other.m_simAccelX);
+  std::swap(this->m_simAccelY, other.m_simAccelY);
+  std::swap(this->m_simAccelZ, other.m_simAccelZ);
+  std::swap(this->m_mutex, other.m_mutex);
+  return *this;
 }
 
 bool ADIS16470_IMU::IsConnected() const {

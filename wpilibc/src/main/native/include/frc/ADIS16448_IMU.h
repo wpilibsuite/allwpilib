@@ -116,7 +116,7 @@ class ADIS16448_IMU : public wpi::Sendable,
   ~ADIS16448_IMU() override;
 
   ADIS16448_IMU(ADIS16448_IMU&&);
-  ADIS16448_IMU operator=(ADIS16448_IMU&&);
+  ADIS16448_IMU& operator=(ADIS16448_IMU&&);
 
   /**
    * Initialize the IMU.
