@@ -74,22 +74,6 @@ class AnalysisManager {
      * zero indicates it needs to be set to the default.
      */
     units::second_t stepTestDuration = 0_s;
-
-    /**
-     * The conversion factor of counts per revolution.
-     */
-    int cpr = 1440;
-
-    /**
-     * The conversion factor of gearing.
-     */
-    double gearing = 1;
-
-    /**
-     * Whether or not the gains should be in the encoder's units (mainly for use
-     * in a smart motor controller).
-     */
-    bool convertGainsToEncTicks = false;
   };
 
   /**

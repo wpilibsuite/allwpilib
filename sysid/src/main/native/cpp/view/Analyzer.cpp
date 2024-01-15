@@ -562,7 +562,6 @@ void Analyzer::DisplayFeedbackGains() {
     m_settings.type = FeedbackControllerLoopType::kVelocity;
     m_selectedLoopType =
         static_cast<int>(FeedbackControllerLoopType::kVelocity);
-    m_settings.convertGainsToEncTicks = m_selectedPreset > 2;
     UpdateFeedbackGains();
   }
   ImGui::SameLine();
@@ -645,59 +644,6 @@ void Analyzer::DisplayFeedbackGains() {
       "on many motor controllers, so be careful that this value is "
       "accurate if the characteristic timescale of the mechanism "
       "is small.");
-
-  // Add CPR and Gearing for converting Feedback Gains
-  ImGui::Separator();
-  ImGui::Spacing();
-
-  if (ImGui::Checkbox("Convert Gains to Encoder Counts",
-                      &m_settings.convertGainsToEncTicks)) {
-    UpdateFeedbackGains();
-  }
-  sysid::CreateTooltip(
-      "Whether the feedback gains should be in terms of encoder counts or "
-      "output units. Because smart motor controllers usually don't have "
-      "direct access to the output units (i.e. m/s for a drivetrain), they "
-      "perform feedback on the encoder counts directly. If you are using a "
-      "PID Controller on the RoboRIO, you are probably performing feedback "
-      "on the output units directly.\n\nNote that if you have properly set "
-      "up position and velocity conversion factors with the SPARK MAX, you "
-      "can leave this box unchecked. The motor controller will perform "
-      "feedback on the output directly.");
-
-  if (m_settings.convertGainsToEncTicks) {
-    ImGui::SetNextItemWidth(ImGui::GetFontSize() * 5);
-    if (ImGui::InputDouble("##Numerator", &m_gearingNumerator, 0.0, 0.0, "%.4f",
-                           ImGuiInputTextFlags_EnterReturnsTrue) &&
-        m_gearingNumerator > 0) {
-      m_settings.gearing = m_gearingNumerator / m_gearingDenominator;
-      UpdateFeedbackGains();
-    }
-    ImGui::SameLine();
-    ImGui::SetNextItemWidth(ImGui::GetFontSize() * 5);
-    if (ImGui::InputDouble("##Denominator", &m_gearingDenominator, 0.0, 0.0,
-                           "%.4f", ImGuiInputTextFlags_EnterReturnsTrue) &&
-        m_gearingDenominator > 0) {
-      m_settings.gearing = m_gearingNumerator / m_gearingDenominator;
-      UpdateFeedbackGains();
-    }
-    sysid::CreateTooltip(
-        "The gearing between the encoder and the motor shaft (# of encoder "
-        "turns / # of motor shaft turns).");
-
-    ImGui::SetNextItemWidth(ImGui::GetFontSize() * 5);
-    if (ImGui::InputInt("CPR", &m_settings.cpr, 0, 0,
-                        ImGuiInputTextFlags_EnterReturnsTrue) &&
-        m_settings.cpr > 0) {
-      UpdateFeedbackGains();
-    }
-    sysid::CreateTooltip(
-        "The counts per rotation of your encoder. This is the number of counts "
-        "reported in user code when the encoder is rotated exactly once. Some "
-        "common values for various motors/encoders are:\n\n"
-        "Falcon 500: 2048\nNEO: 1\nCTRE Mag Encoder / CANCoder: 4096\nREV "
-        "Through Bore Encoder: 8192\n");
-  }
 
   ImGui::Separator();
   ImGui::Spacing();
