@@ -4,6 +4,9 @@
 
 package edu.wpi.first.wpilibj2.command;
 
+import java.util.function.DoubleSupplier;
+
+import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.Timer;
@@ -17,7 +20,8 @@ public class WaitCommand extends Command {
   /** The timer used for waiting. */
   protected Timer m_timer = new Timer();
 
-  private final double m_duration;
+  // private final double m_duration;
+  private final DoubleSupplier m_delaySeconds;
 
   /**
    * Creates a new WaitCommand. This command will do nothing, and end after the specified duration.
@@ -26,8 +30,14 @@ public class WaitCommand extends Command {
    */
   @SuppressWarnings("this-escape")
   public WaitCommand(double seconds) {
-    m_duration = seconds;
+    // m_duration = seconds;
+    m_delaySeconds = () -> seconds;
     SendableRegistry.setName(this, getName() + ": " + seconds + " seconds");
+  }
+
+  public WaitCommand(DoubleSupplier delaySeconds) {
+    m_delaySeconds = delaySeconds;
+    SendableRegistry.setName(this, getName() + ": DYNAMIC seconds");
   }
 
   @Override
@@ -42,7 +52,7 @@ public class WaitCommand extends Command {
 
   @Override
   public boolean isFinished() {
-    return m_timer.hasElapsed(m_duration);
+    return m_timer.hasElapsed(m_delaySeconds.getAsDouble());
   }
 
   @Override
@@ -53,6 +63,6 @@ public class WaitCommand extends Command {
   @Override
   public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);
-    builder.addDoubleProperty("duration", () -> m_duration, null);
+    builder.addDoubleProperty("duration", () -> m_delaySeconds.getAsDouble(), null);
   }
 }
