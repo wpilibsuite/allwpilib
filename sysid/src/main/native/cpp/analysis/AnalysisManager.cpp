@@ -218,15 +218,11 @@ sysid::FeedbackGains AnalysisManager::CalculateFeedback(
   const auto& Ka = ff[2];
   FeedbackGains fb;
   if (m_settings.type == FeedbackControllerLoopType::kPosition) {
-    fb = sysid::CalculatePositionFeedbackGains(
-        m_settings.preset, m_settings.lqr, Kv, Ka,
-        m_settings.convertGainsToEncTicks ? m_settings.gearing * m_settings.cpr
-                                          : 1);
+    fb = sysid::CalculatePositionFeedbackGains(m_settings.preset,
+                                               m_settings.lqr, Kv, Ka);
   } else {
-    fb = sysid::CalculateVelocityFeedbackGains(
-        m_settings.preset, m_settings.lqr, Kv, Ka,
-        m_settings.convertGainsToEncTicks ? m_settings.gearing * m_settings.cpr
-                                          : 1);
+    fb = sysid::CalculateVelocityFeedbackGains(m_settings.preset,
+                                               m_settings.lqr, Kv, Ka);
   }
 
   return fb;
