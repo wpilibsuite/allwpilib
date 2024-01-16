@@ -4,13 +4,21 @@
 
 #include "frc2/command/WaitCommand.h"
 
+#include <utility>
+
 #include <fmt/format.h>
 #include <wpi/sendable/SendableBuilder.h>
 
 using namespace frc2;
 
-WaitCommand::WaitCommand(units::second_t duration) : m_duration{duration} {
+WaitCommand::WaitCommand(units::second_t duration)
+    : m_delaySeconds{[duration]() { return duration; }} {
   SetName(fmt::format("{}: {}", GetName(), duration));
+}
+
+WaitCommand::WaitCommand(std::function<units::second_t()> delaySeconds)
+    : m_delaySeconds(std::move(delaySeconds)) {
+  SetName(fmt::format("{}: DYNAMIC Seconds", GetName()));
 }
 
 void WaitCommand::Initialize() {
@@ -22,7 +30,7 @@ void WaitCommand::End(bool interrupted) {
 }
 
 bool WaitCommand::IsFinished() {
-  return m_timer.HasElapsed(m_duration);
+  return m_timer.HasElapsed(*m_delaySeconds.target<units::second_t>());
 }
 
 bool WaitCommand::RunsWhenDisabled() const {
@@ -32,5 +40,7 @@ bool WaitCommand::RunsWhenDisabled() const {
 void WaitCommand::InitSendable(wpi::SendableBuilder& builder) {
   Command::InitSendable(builder);
   builder.AddDoubleProperty(
-      "duration", [this] { return m_duration.value(); }, nullptr);
+      "duration",
+      [this] { return m_delaySeconds.target<units::second_t>()->value(); },
+      nullptr);
 }

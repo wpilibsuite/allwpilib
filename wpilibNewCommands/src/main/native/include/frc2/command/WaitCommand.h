@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <functional>
+
 #include <frc/Timer.h>
 #include <units/time.h>
 
@@ -25,6 +27,7 @@ class WaitCommand : public CommandHelper<Command, WaitCommand> {
    * @param duration the time to wait
    */
   explicit WaitCommand(units::second_t duration);
+  explicit WaitCommand(std::function<units::second_t()> delaySeconds);
 
   WaitCommand(WaitCommand&& other) = default;
 
@@ -45,6 +48,6 @@ class WaitCommand : public CommandHelper<Command, WaitCommand> {
   frc::Timer m_timer;
 
  private:
-  units::second_t m_duration;
+  std::function<units::second_t()> m_delaySeconds;
 };
 }  // namespace frc2
