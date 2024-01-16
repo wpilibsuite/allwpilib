@@ -39,7 +39,7 @@ class AnalysisManager {
   TestData m_data;
   /**
    * Represents settings for an instance of the analysis manager. This contains
-   * information about the feedback controller preset, loop type, motion
+   * information about the feedback controller preset, loop type, velocity
    * threshold, acceleration window size, LQR parameters, and the selected
    * dataset.
    */
@@ -60,9 +60,9 @@ class AnalysisManager {
     LQRParameters lqr{1, 1.5, 7};
 
     /**
-     * The motion threshold (units/s) for trimming quasistatic test data.
+     * The velocity threshold (units/s) for trimming quasistatic test data.
      */
-    double motionThreshold = 0.2;
+    double velocityThreshold = 0.2;
 
     /**
      * The window size for the median filter.

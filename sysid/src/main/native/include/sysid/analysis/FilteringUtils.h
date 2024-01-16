@@ -43,7 +43,7 @@ class InvalidDataError : public std::exception {
   explicit InvalidDataError(std::string_view message) {
     m_message = fmt::format(
         "{}. Please verify that your units and data is reasonable and then "
-        "adjust your motion threshold, test duration, and/or window size to "
+        "adjust your velocity threshold, test duration, and/or window size to "
         "try to fix this issue.",
         message);
   }
@@ -64,7 +64,7 @@ class NoQuasistaticDataError : public std::exception {
  public:
   const char* what() const noexcept override {
     return "Quasistatic test trimming removed all data. Please adjust your "
-           "motion threshold and double check "
+           "velocity threshold and double check "
            "your units and test data to make sure that the robot is reporting "
            "reasonable values.";
   }

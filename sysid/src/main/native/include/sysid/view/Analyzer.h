@@ -47,7 +47,7 @@ class Analyzer : public glass::View {
   enum class AnalyzerState {
     kWaitingForData,
     kNominalDisplay,
-    kMotionThresholdError,
+    kVelocityThresholdError,
     kTestDurationError,
     kGeneralDataError,
     kFileError
