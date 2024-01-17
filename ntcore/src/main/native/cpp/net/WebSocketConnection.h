@@ -15,13 +15,18 @@
 
 #include "WireConnection.h"
 
+namespace wpi {
+class Logger;
+}  // namespace wpi
+
 namespace nt::net {
 
 class WebSocketConnection final
     : public WireConnection,
       public std::enable_shared_from_this<WebSocketConnection> {
  public:
-  WebSocketConnection(wpi::WebSocket& ws, unsigned int version);
+  WebSocketConnection(wpi::WebSocket& ws, unsigned int version,
+                      wpi::Logger& logger);
   ~WebSocketConnection() override;
   WebSocketConnection(const WebSocketConnection&) = delete;
   WebSocketConnection& operator=(const WebSocketConnection&) = delete;
@@ -70,6 +75,7 @@ class WebSocketConnection final
   void ReleaseBufs(std::span<wpi::uv::Buffer> bufs);
 
   wpi::WebSocket& m_ws;
+  wpi::Logger& m_logger;
 
   class Stream;
 

@@ -242,7 +242,7 @@ void NetworkServer::ServerConnection4::ProcessWsUpgrade() {
     m_info.protocol_version =
         protocol == "v4.1.networktables.first.wpi.edu" ? 0x0401 : 0x0400;
     m_wire = std::make_shared<net::WebSocketConnection>(
-        *m_websocket, m_info.protocol_version);
+        *m_websocket, m_info.protocol_version, m_logger);
 
     if (protocol == "rtt.networktables.first.wpi.edu") {
       INFO("CONNECTED RTT client (from {})", m_connInfo);
