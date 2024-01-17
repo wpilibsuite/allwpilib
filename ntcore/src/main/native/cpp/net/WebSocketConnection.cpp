@@ -52,7 +52,10 @@ class WebSocketConnection::Stream final : public wpi::raw_ostream {
 void WebSocketConnection::Stream::write_impl(const char* data, size_t len) {
   if (data == m_conn.m_bufs.back().base) {
     // flush_nonempty() case
+    size_t amt = len - m_conn.m_bufs.back().len;
     m_conn.m_bufs.back().len = len;
+    m_conn.m_framePos += amt;
+    m_conn.m_written += amt;
     if (!m_disableAlloc) {
 #ifdef NT_ENABLE_WS_FRAG
       m_conn.m_frames.back().opcode &= ~wpi::WebSocket::kFlagFin;
