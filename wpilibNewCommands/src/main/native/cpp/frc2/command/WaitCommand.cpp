@@ -30,7 +30,7 @@ void WaitCommand::End(bool interrupted) {
 }
 
 bool WaitCommand::IsFinished() {
-  return m_timer.HasElapsed(*m_delaySeconds.target<units::second_t>());
+  return m_timer.HasElapsed(m_delaySeconds());
 }
 
 bool WaitCommand::RunsWhenDisabled() const {
@@ -40,7 +40,5 @@ bool WaitCommand::RunsWhenDisabled() const {
 void WaitCommand::InitSendable(wpi::SendableBuilder& builder) {
   Command::InitSendable(builder);
   builder.AddDoubleProperty(
-      "duration",
-      [this] { return m_delaySeconds.target<units::second_t>()->value(); },
-      nullptr);
+      "duration", [this] { return m_delaySeconds().value(); }, nullptr);
 }
