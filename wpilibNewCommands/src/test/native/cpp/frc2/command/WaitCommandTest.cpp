@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <frc/simulation/SimHooks.h>
+#include <gtest/gtest.h>
 #include <units/time.h>
 
 #include "CommandTestBase.h"
@@ -51,7 +52,7 @@ TEST_F(WaitCommandTest, WaitCommandScheduleNonStaticLambda) {
 
   CommandScheduler scheduler = GetScheduler();
 
-  WaitCommand command([calls] {
+  WaitCommand command([&calls] {
     if (calls == 1) {
       return 100_ms;
     }
@@ -70,6 +71,7 @@ TEST_F(WaitCommandTest, WaitCommandScheduleNonStaticLambda) {
   scheduler.Run();
   EXPECT_FALSE(scheduler.IsScheduled(&command));
   calls++;
+  ASSERT_EQ(calls, 2);
 
   scheduler.Schedule(&command);
   scheduler.Run();
@@ -80,7 +82,6 @@ TEST_F(WaitCommandTest, WaitCommandScheduleNonStaticLambda) {
   frc::sim::StepTiming(20_ms);
   scheduler.Run();
   EXPECT_FALSE(scheduler.IsScheduled(&command));
-  calls++;
 
   frc::sim::ResumeTiming();
 }
