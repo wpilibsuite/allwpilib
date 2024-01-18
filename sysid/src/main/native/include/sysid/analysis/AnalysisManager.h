@@ -110,27 +110,27 @@ class AnalysisManager {
     /**
      * The static gain Ks.
      */
-    FeedforwardGain Ks;
+    FeedforwardGain Ks = {};
 
     /**
      * The velocity gain kV.
      */
-    FeedforwardGain Kv;
+    FeedforwardGain Kv = {};
 
     /**
      * The acceleration gain kA.
      */
-    FeedforwardGain Ka;
+    FeedforwardGain Ka = {};
 
     /**
      * The gravity gain Kg.
      */
-    FeedforwardGain Kg;
+    FeedforwardGain Kg = {};
 
     /**
      * The offset (arm).
      */
-    FeedforwardGain offset;
+    FeedforwardGain offset = {};
   };
 
   /**
