@@ -52,15 +52,15 @@ TEST_F(WaitCommandTest, WaitCommandScheduleNonStaticLambda) {
   CommandScheduler scheduler = GetScheduler();
 
   WaitCommand command([calls] {
-      if (calls == 1) {
-        return 100_ms;
-      }
+    if (calls == 1) {
+      return 100_ms;
+    }
 
-      if (calls == 2) {
-        return 50_ms;
-      }
+    if (calls == 2) {
+      return 50_ms;
+    }
 
-      return 150_ms;
+    return 150_ms;
   });
 
   scheduler.Schedule(&command);
@@ -69,7 +69,7 @@ TEST_F(WaitCommandTest, WaitCommandScheduleNonStaticLambda) {
   frc::sim::StepTiming(110_ms);
   scheduler.Run();
   EXPECT_FALSE(scheduler.IsScheduled(&command));
-  calls ++;
+  calls++;
 
   scheduler.Schedule(&command);
   scheduler.Run();
