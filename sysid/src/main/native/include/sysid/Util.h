@@ -46,6 +46,14 @@ inline constexpr const char* kUnits[] = {"Meters",  "Feet",      "Inches",
 void CreateTooltip(const char* text);
 
 /**
+ * Displays an error tooltip beside the widget that this method is called after
+ * with the provided text.
+ *
+ * @param text The text to show in the error tooltip.
+ */
+void CreateErrorTooltip(const char* text);
+
+/**
  * Utility function to launch an error popup if an exception is detected.
  *
  * @param isError True if an exception is detected

@@ -76,14 +76,61 @@ class AnalysisManager {
     units::second_t stepTestDuration = 0_s;
   };
 
+  struct FeedforwardGain {
+    /**
+     * The feedforward gain.
+     */
+    double gain = 1;
+
+    /**
+     * Descriptor attached to the feedforward gain.
+     */
+    std::string descriptor = "Feedforward gain.";
+
+    /**
+     * Whether the feedforward gain is valid.
+     */
+    bool isValidGain = true;
+
+    /**
+     * Error message attached to the feedforward gain.
+     */
+    std::string errorMessage = "No error.";
+  };
+
   /**
-   * Stores feedforward.
+   * Stores feedforward gains.
    */
   struct FeedforwardGains {
     /**
-     * Stores the Feedforward gains.
+     * Stores the raw OLSResult from analysis.
      */
-    OLSResult ffGains;
+    OLSResult olsResult;
+
+    /**
+     * The static gain Ks.
+     */
+    FeedforwardGain Ks;
+
+    /**
+     * The velocity gain kV.
+     */
+    FeedforwardGain Kv;
+
+    /**
+     * The acceleration gain kA.
+     */
+    FeedforwardGain Ka;
+
+    /**
+     * The gravity gain Kg.
+     */
+    FeedforwardGain Kg;
+
+    /**
+     * The offset (arm).
+     */
+    FeedforwardGain offset;
   };
 
   /**
@@ -177,7 +224,7 @@ class AnalysisManager {
    * @param ff The feedforward gains.
    * @return The calculated feedback gains.
    */
-  FeedbackGains CalculateFeedback(std::vector<double> ff);
+  FeedbackGains CalculateFeedback(FeedforwardGain Kv, FeedforwardGain Ka);
 
   /**
    * Overrides the units in the JSON with the user-provided ones.
