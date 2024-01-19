@@ -393,6 +393,7 @@ public final class DynamicStruct {
    * @throws IllegalArgumentException      if field is not a member of this struct
    * @throws IllegalStateException         if struct descriptor is invalid
    */
+  @SuppressWarnings({"PMD.CollapsibleIfStatements", "PMD.AvoidDeeplyNestedIfStmts"})
   public String getStringField(StructFieldDescriptor field) {
     if (field.getType() != StructFieldType.kChar) {
       throw new UnsupportedOperationException("field is not char type");
