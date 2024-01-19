@@ -272,7 +272,7 @@ TEST_F(DynamicStructTest, DuplicateFieldName) {
 TEST_F(DynamicStructTest, StringAllZeros) {
   auto desc = db.Add("test", "char a[32]", &err);
   uint8_t data[32];
-  memset(data, 0, sizeof(data));
+  std::memset(data, 0, sizeof(data));
   ASSERT_EQ(desc->GetSize(), sizeof(data) / sizeof(data[0]));
   wpi::MutableDynamicStruct dynamic{desc, data};
   auto field = desc->FindFieldByName("a");
@@ -282,7 +282,7 @@ TEST_F(DynamicStructTest, StringAllZeros) {
 TEST_F(DynamicStructTest, StringRoundTrip) {
   auto desc = db.Add("test", "char a[32]", &err);
   uint8_t data[32];
-  memset(data, 0, sizeof(data));
+  std::memset(data, 0, sizeof(data));
   ASSERT_EQ(desc->GetSize(), sizeof(data) / sizeof(data[0]));
   wpi::MutableDynamicStruct dynamic{desc, data};
   auto field = desc->FindFieldByName("a");
@@ -293,7 +293,7 @@ TEST_F(DynamicStructTest, StringRoundTrip) {
 TEST_F(DynamicStructTest, StringRoundTripEmbeddedNull) {
   auto desc = db.Add("test", "char a[32]", &err);
   uint8_t data[32];
-  memset(data, 0, sizeof(data));
+  std::memset(data, 0, sizeof(data));
   ASSERT_EQ(desc->GetSize(), sizeof(data) / sizeof(data[0]));
   wpi::MutableDynamicStruct dynamic{desc, data};
   auto field = desc->FindFieldByName("a");
@@ -308,7 +308,7 @@ TEST_F(DynamicStructTest, StringRoundTripEmbeddedNull) {
 TEST_F(DynamicStructTest, StringRoundTripTooLong) {
   auto desc = db.Add("test", "char a[2]", &err);
   uint8_t data[2];
-  memset(data, 0, sizeof(data));
+  std::memset(data, 0, sizeof(data));
   ASSERT_EQ(desc->GetSize(), sizeof(data) / sizeof(data[0]));
   wpi::MutableDynamicStruct dynamic{desc, data};
   auto field = desc->FindFieldByName("a");
@@ -321,7 +321,7 @@ TEST_F(DynamicStructTest, StringRoundTripTooLong) {
 TEST_F(DynamicStructTest, StringRoundTripPartial2ByteUtf8) {
   auto desc = db.Add("test", "char a[2]", &err);
   uint8_t data[2];
-  memset(data, 0, sizeof(data));
+  std::memset(data, 0, sizeof(data));
   ASSERT_EQ(desc->GetSize(), sizeof(data) / sizeof(data[0]));
   wpi::MutableDynamicStruct dynamic{desc, data};
   auto field = desc->FindFieldByName("a");
@@ -334,7 +334,7 @@ TEST_F(DynamicStructTest, StringRoundTripPartial2ByteUtf8) {
 TEST_F(DynamicStructTest, StringRoundTrip2ByteUtf8) {
   auto desc = db.Add("test", "char a[3]", &err);
   uint8_t data[3];
-  memset(data, 0, sizeof(data));
+  std::memset(data, 0, sizeof(data));
   ASSERT_EQ(desc->GetSize(), sizeof(data) / sizeof(data[0]));
   wpi::MutableDynamicStruct dynamic{desc, data};
   auto field = desc->FindFieldByName("a");
@@ -347,7 +347,7 @@ TEST_F(DynamicStructTest, StringRoundTrip2ByteUtf8) {
 TEST_F(DynamicStructTest, StringRoundTrip3ByteUtf8) {
   auto desc = db.Add("test", "char a[4]", &err);
   uint8_t data[4];
-  memset(data, 0, sizeof(data));
+  std::memset(data, 0, sizeof(data));
   ASSERT_EQ(desc->GetSize(), sizeof(data) / sizeof(data[0]));
   wpi::MutableDynamicStruct dynamic{desc, data};
   auto field = desc->FindFieldByName("a");
@@ -360,7 +360,7 @@ TEST_F(DynamicStructTest, StringRoundTrip3ByteUtf8) {
 TEST_F(DynamicStructTest, StringRoundTrip3ByteUtf8PartialFirstByte) {
   auto desc = db.Add("test", "char a[2]", &err);
   uint8_t data[2];
-  memset(data, 0, sizeof(data));
+  std::memset(data, 0, sizeof(data));
   ASSERT_EQ(desc->GetSize(), sizeof(data) / sizeof(data[0]));
   wpi::MutableDynamicStruct dynamic{desc, data};
   auto field = desc->FindFieldByName("a");
@@ -373,7 +373,7 @@ TEST_F(DynamicStructTest, StringRoundTrip3ByteUtf8PartialFirstByte) {
 TEST_F(DynamicStructTest, StringRoundTrip3ByteUtf8PartialSecondByte) {
   auto desc = db.Add("test", "char a[3]", &err);
   uint8_t data[3];
-  memset(data, 0, sizeof(data));
+  std::memset(data, 0, sizeof(data));
   ASSERT_EQ(desc->GetSize(), sizeof(data) / sizeof(data[0]));
   wpi::MutableDynamicStruct dynamic{desc, data};
   auto field = desc->FindFieldByName("a");
@@ -393,7 +393,7 @@ static constexpr std::string_view fourByteUtf8String{buffer};
 TEST_F(DynamicStructTest, StringRoundTrip4ByteUtf8) {
   auto desc = db.Add("test", "char a[5]", &err);
   uint8_t data[5];
-  memset(data, 0, sizeof(data));
+  std::memset(data, 0, sizeof(data));
   ASSERT_EQ(desc->GetSize(), sizeof(data) / sizeof(data[0]));
   wpi::MutableDynamicStruct dynamic{desc, data};
   auto field = desc->FindFieldByName("a");
@@ -406,7 +406,7 @@ TEST_F(DynamicStructTest, StringRoundTrip4ByteUtf8) {
 TEST_F(DynamicStructTest, StringRoundTrip4ByteUtf8PartialFirstByte) {
   auto desc = db.Add("test", "char a[2]", &err);
   uint8_t data[2];
-  memset(data, 0, sizeof(data));
+  std::memset(data, 0, sizeof(data));
   ASSERT_EQ(desc->GetSize(), sizeof(data) / sizeof(data[0]));
   wpi::MutableDynamicStruct dynamic{desc, data};
   auto field = desc->FindFieldByName("a");
@@ -419,7 +419,7 @@ TEST_F(DynamicStructTest, StringRoundTrip4ByteUtf8PartialFirstByte) {
 TEST_F(DynamicStructTest, StringRoundTrip4ByteUtf8PartialSecondByte) {
   auto desc = db.Add("test", "char a[3]", &err);
   uint8_t data[3];
-  memset(data, 0, sizeof(data));
+  std::memset(data, 0, sizeof(data));
   ASSERT_EQ(desc->GetSize(), sizeof(data) / sizeof(data[0]));
   wpi::MutableDynamicStruct dynamic{desc, data};
   auto field = desc->FindFieldByName("a");
@@ -432,7 +432,7 @@ TEST_F(DynamicStructTest, StringRoundTrip4ByteUtf8PartialSecondByte) {
 TEST_F(DynamicStructTest, StringRoundTrip4ByteUtf8PartialThirdByte) {
   auto desc = db.Add("test", "char a[4]", &err);
   uint8_t data[4];
-  memset(data, 0, sizeof(data));
+  std::memset(data, 0, sizeof(data));
   ASSERT_EQ(desc->GetSize(), sizeof(data) / sizeof(data[0]));
   wpi::MutableDynamicStruct dynamic{desc, data};
   auto field = desc->FindFieldByName("a");
