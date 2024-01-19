@@ -298,12 +298,11 @@ TEST_F(DynamicStructTest, StringRoundTripEmbeddedNull) {
   wpi::MutableDynamicStruct dynamic{desc, data};
   auto field = desc->FindFieldByName("a");
   std::string check{"ab\0c", 4};
-  size_t checkSize = 4;
-  ASSERT_EQ(check.size(), checkSize);
+  ASSERT_EQ(check.size(), 4u);
   EXPECT_TRUE(dynamic.SetStringField(field, check));
   auto get = dynamic.GetStringField(field);
   EXPECT_EQ(get, check);
-  EXPECT_EQ(4, get.size());
+  EXPECT_EQ(4u, get.size());
 }
 
 TEST_F(DynamicStructTest, StringRoundTripTooLong) {
@@ -316,7 +315,7 @@ TEST_F(DynamicStructTest, StringRoundTripTooLong) {
   EXPECT_FALSE(dynamic.SetStringField(field, "abc"));
   auto get = dynamic.GetStringField(field);
   EXPECT_EQ(get, "ab");
-  EXPECT_EQ(2, get.size());
+  EXPECT_EQ(2u, get.size());
 }
 
 TEST_F(DynamicStructTest, StringRoundTripPartial2ByteUtf8) {
@@ -329,7 +328,7 @@ TEST_F(DynamicStructTest, StringRoundTripPartial2ByteUtf8) {
   EXPECT_FALSE(dynamic.SetStringField(field, "a\u0234"));
   auto get = dynamic.GetStringField(field);
   EXPECT_EQ(get, "a");
-  EXPECT_EQ(1, get.size());
+  EXPECT_EQ(1u, get.size());
 }
 
 TEST_F(DynamicStructTest, StringRoundTrip2ByteUtf8) {
@@ -342,7 +341,7 @@ TEST_F(DynamicStructTest, StringRoundTrip2ByteUtf8) {
   EXPECT_TRUE(dynamic.SetStringField(field, "a\u0234"));
   auto get = dynamic.GetStringField(field);
   EXPECT_EQ(get, "a\u0234");
-  EXPECT_EQ(3, get.size());
+  EXPECT_EQ(3u, get.size());
 }
 
 TEST_F(DynamicStructTest, StringRoundTrip3ByteUtf8) {
@@ -355,7 +354,7 @@ TEST_F(DynamicStructTest, StringRoundTrip3ByteUtf8) {
   EXPECT_TRUE(dynamic.SetStringField(field, "a\u1234"));
   auto get = dynamic.GetStringField(field);
   EXPECT_EQ(get, "a\u1234");
-  EXPECT_EQ(4, get.size());
+  EXPECT_EQ(4u, get.size());
 }
 
 TEST_F(DynamicStructTest, StringRoundTrip3ByteUtf8PartialFirstByte) {
@@ -368,7 +367,7 @@ TEST_F(DynamicStructTest, StringRoundTrip3ByteUtf8PartialFirstByte) {
   EXPECT_FALSE(dynamic.SetStringField(field, "a\u1234"));
   auto get = dynamic.GetStringField(field);
   EXPECT_EQ(get, "a");
-  EXPECT_EQ(1, get.size());
+  EXPECT_EQ(1u, get.size());
 }
 
 TEST_F(DynamicStructTest, StringRoundTrip3ByteUtf8PartialSecondByte) {
@@ -381,7 +380,7 @@ TEST_F(DynamicStructTest, StringRoundTrip3ByteUtf8PartialSecondByte) {
   EXPECT_FALSE(dynamic.SetStringField(field, "a\u1234"));
   auto get = dynamic.GetStringField(field);
   EXPECT_EQ(get, "a");
-  EXPECT_EQ(1, get.size());
+  EXPECT_EQ(1u, get.size());
 }
 
 // MSVC and GCC do surrogate pairs differently.
@@ -401,7 +400,7 @@ TEST_F(DynamicStructTest, StringRoundTrip4ByteUtf8) {
   EXPECT_TRUE(dynamic.SetStringField(field, fourByteUtf8String));
   auto get = dynamic.GetStringField(field);
   EXPECT_EQ(get, fourByteUtf8String);
-  EXPECT_EQ(5, get.size());
+  EXPECT_EQ(5u, get.size());
 }
 
 TEST_F(DynamicStructTest, StringRoundTrip4ByteUtf8PartialFirstByte) {
@@ -414,7 +413,7 @@ TEST_F(DynamicStructTest, StringRoundTrip4ByteUtf8PartialFirstByte) {
   EXPECT_FALSE(dynamic.SetStringField(field, fourByteUtf8String));
   auto get = dynamic.GetStringField(field);
   EXPECT_EQ(get, "a");
-  EXPECT_EQ(1, get.size());
+  EXPECT_EQ(1u, get.size());
 }
 
 TEST_F(DynamicStructTest, StringRoundTrip4ByteUtf8PartialSecondByte) {
@@ -427,7 +426,7 @@ TEST_F(DynamicStructTest, StringRoundTrip4ByteUtf8PartialSecondByte) {
   EXPECT_FALSE(dynamic.SetStringField(field, fourByteUtf8String));
   auto get = dynamic.GetStringField(field);
   EXPECT_EQ(get, "a");
-  EXPECT_EQ(1, get.size());
+  EXPECT_EQ(1u, get.size());
 }
 
 TEST_F(DynamicStructTest, StringRoundTrip4ByteUtf8PartialThirdByte) {
@@ -440,7 +439,7 @@ TEST_F(DynamicStructTest, StringRoundTrip4ByteUtf8PartialThirdByte) {
   EXPECT_FALSE(dynamic.SetStringField(field, fourByteUtf8String));
   auto get = dynamic.GetStringField(field);
   EXPECT_EQ(get, "a");
-  EXPECT_EQ(1, get.size());
+  EXPECT_EQ(1u, get.size());
 }
 
 struct SimpleTestParam {
