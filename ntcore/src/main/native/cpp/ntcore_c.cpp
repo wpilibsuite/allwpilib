@@ -178,7 +178,8 @@ void NT_GetEntryValue(NT_Entry entry, struct NT_Value* value) {
   NT_GetEntryValueType(entry, 0, value);
 }
 
-void NT_GetEntryValueType(NT_Entry entry, unsigned int types, struct NT_Value* value) {
+void NT_GetEntryValueType(NT_Entry entry, unsigned int types,
+                          struct NT_Value* value) {
   NT_InitValue(value);
   auto v = nt::GetEntryValue(entry);
   if (!v) {
@@ -211,7 +212,8 @@ struct NT_Value* NT_ReadQueueValue(NT_Handle subentry, size_t* count) {
   return ConvertToC<NT_Value>(nt::ReadQueueValue(subentry), count);
 }
 
-struct NT_Value* NT_ReadQueueValueType(NT_Handle subentry, unsigned int types, size_t* count) {
+struct NT_Value* NT_ReadQueueValueType(NT_Handle subentry, unsigned int types,
+                                       size_t* count) {
   return ConvertToC<NT_Value>(nt::ReadQueueValue(subentry, types), count);
 }
 

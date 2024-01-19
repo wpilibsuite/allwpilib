@@ -479,7 +479,8 @@ void NT_GetEntryValue(NT_Entry entry, struct NT_Value* value);
  * needed (the utility function NT_DisposeValue() is useful for this
  * purpose).
  */
-void NT_GetEntryValueType(NT_Entry entry, unsigned int types, struct NT_Value* value);
+void NT_GetEntryValueType(NT_Entry entry, unsigned int types,
+                          struct NT_Value* value);
 
 /**
  * Set Default Entry Value.
@@ -547,7 +548,8 @@ struct NT_Value* NT_ReadQueueValue(NT_Handle subentry, size_t* count);
  * @param count        count of items in returned array (output)
  * @return entry value array; returns NULL and count=0 if no new values
  */
-struct NT_Value* NT_ReadQueueValueType(NT_Handle subentry, unsigned int types, size_t* count);
+struct NT_Value* NT_ReadQueueValueType(NT_Handle subentry, unsigned int types,
+                                       size_t* count);
 
 /** @} */
 
