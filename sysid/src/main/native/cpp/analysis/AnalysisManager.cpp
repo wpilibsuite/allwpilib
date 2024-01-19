@@ -267,8 +267,8 @@ AnalysisManager::FeedforwardGains AnalysisManager::CalculateFeedforward() {
   return FeedforwardGains{.olsResult = ff};
 }
 
-sysid::FeedbackGains AnalysisManager::CalculateFeedback(FeedforwardGain Kv,
-                                                        FeedforwardGain Ka) {
+sysid::FeedbackGains AnalysisManager::CalculateFeedback(
+    const FeedforwardGain& Kv, const FeedforwardGain& Ka) {
   FeedbackGains fb;
   if (m_settings.type == FeedbackControllerLoopType::kPosition) {
     fb = sysid::CalculatePositionFeedbackGains(

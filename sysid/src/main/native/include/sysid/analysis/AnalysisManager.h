@@ -224,7 +224,8 @@ class AnalysisManager {
    * @param ff The feedforward gains.
    * @return The calculated feedback gains.
    */
-  FeedbackGains CalculateFeedback(FeedforwardGain Kv, FeedforwardGain Ka);
+  FeedbackGains CalculateFeedback(const FeedforwardGain& Kv,
+                                  const FeedforwardGain& Ka);
 
   /**
    * Overrides the units in the JSON with the user-provided ones.

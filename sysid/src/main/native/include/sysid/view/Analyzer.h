@@ -191,7 +191,7 @@ class Analyzer : public glass::View {
    * validity and message.
    */
   void DisplayFeedforwardGain(const char* text,
-                              AnalysisManager::FeedforwardGain ffGain,
+                              AnalysisManager::FeedforwardGain& ffGain,
                               bool readOnly);
 
   /**

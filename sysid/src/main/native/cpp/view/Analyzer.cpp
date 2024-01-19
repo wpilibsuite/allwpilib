@@ -487,7 +487,7 @@ void Analyzer::CollectFeedforwardGains(float beginX, float beginY) {
 }
 
 void Analyzer::DisplayFeedforwardGain(const char* text,
-                                      AnalysisManager::FeedforwardGain ffGain,
+                                      AnalysisManager::FeedforwardGain& ffGain,
                                       bool readOnly = true) {
   DisplayDouble(text, &ffGain.gain, readOnly);
   if (!ffGain.isValidGain) {
