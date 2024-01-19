@@ -29,10 +29,9 @@ class SendableChooserTest {
   @ParameterizedTest
   void returnsSelected(int toSelect) {
     try (var chooser = new SendableChooser<Integer>();
-        var publisher =
-            m_inst
-                .getStringTopic("/SmartDashboard/returnsSelectedChooser" + toSelect + "/selected")
-                .publish()) {
+        var chooserSim =
+            new SendableChooserSim(
+                m_inst, "/SmartDashboard/returnsSelectedChooser" + toSelect + "/")) {
       for (int i = 1; i <= 3; i++) {
         chooser.addOption(String.valueOf(i), i);
       }
@@ -40,7 +39,7 @@ class SendableChooserTest {
 
       SmartDashboard.putData("returnsSelectedChooser" + toSelect, chooser);
       SmartDashboard.updateValues();
-      publisher.set(String.valueOf(toSelect));
+      chooserSim.setSelected(String.valueOf(toSelect));
       SmartDashboard.updateValues();
       assertEquals(toSelect, chooser.getSelected());
     }

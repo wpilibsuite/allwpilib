@@ -15,8 +15,25 @@ namespace frc::sim {
 
 class SendableChooserSim {
  public:
+  /**
+   * Constructs a SendableChooserSim.
+   *
+   * @param path The path where the SendableChooser is published.
+   */
   explicit SendableChooserSim(std::string_view path);
+
+  /**
+   * Constructs a SendableChooserSim.
+   *
+   * @param inst The NetworkTables instance.
+   * @param path The path where the SendableChooser is published.
+   */
   SendableChooserSim(nt::NetworkTableInstance inst, std::string_view path);
+
+  /**
+   * Set the selected option.
+   * @param option The option.
+   */
   void SetSelected(std::string_view option);
 
  private:

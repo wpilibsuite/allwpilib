@@ -17,22 +17,18 @@ class SendableChooserTest : public ::testing::TestWithParam<int> {};
 
 TEST_P(SendableChooserTest, ReturnsSelected) {
   frc::SendableChooser<int> chooser;
+  frc::sim::SendableChooserSim chooserSim = frc::sim::SendableChooserSim{
+      fmt::format("/SmartDashboard/ReturnsSelectedChooser{}/", GetParam())};
 
   for (int i = 1; i <= 3; i++) {
     chooser.AddOption(std::to_string(i), i);
   }
   chooser.SetDefaultOption("0", 0);
 
-  auto pub =
-      nt::NetworkTableInstance::GetDefault()
-          .GetStringTopic(fmt::format(
-              "/SmartDashboard/ReturnsSelectedChooser{}/selected", GetParam()))
-          .Publish();
-
   frc::SmartDashboard::PutData(
       fmt::format("ReturnsSelectedChooser{}", GetParam()), &chooser);
   frc::SmartDashboard::UpdateValues();
-  pub.Set(std::to_string(GetParam()));
+  chooserSim.SetSelected(std::to_string(GetParam()));
   frc::SmartDashboard::UpdateValues();
   EXPECT_EQ(GetParam(), chooser.GetSelected());
 }
@@ -76,24 +72,6 @@ TEST(SendableChooserTest, ChangeListener) {
   frc::SmartDashboard::UpdateValues();
 
   EXPECT_EQ(3, currentVal);
-}
-
-TEST_P(SendableChooserTest, SetSelected) {
-  frc::SendableChooser<int> chooser;
-  frc::sim::SendableChooserSim chooserSim = frc::sim::SendableChooserSim{
-      fmt::format("/SmartDashboard/SetSelectedChooser{}/", GetParam())};
-
-  for (int i = 1; i <= 3; i++) {
-    chooser.AddOption(std::to_string(i), i);
-  }
-  chooser.SetDefaultOption("0", 0);
-
-  frc::SmartDashboard::PutData(fmt::format("SetSelectedChooser{}", GetParam()),
-                               &chooser);
-  frc::SmartDashboard::UpdateValues();
-  chooserSim.SetSelected(std::to_string(GetParam()));
-  frc::SmartDashboard::UpdateValues();
-  EXPECT_EQ(GetParam(), chooser.GetSelected());
 }
 
 INSTANTIATE_TEST_SUITE_P(SendableChooserTests, SendableChooserTest,
