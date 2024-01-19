@@ -390,7 +390,49 @@ public final class DynamicStruct {
     }
     byte[] bytes = new byte[field.m_arraySize];
     m_data.position(field.m_offset).get(bytes, 0, field.m_arraySize);
-    return new String(bytes, StandardCharsets.UTF_8);
+    // Find last non zero character
+    int stringLength = bytes.length;
+    for (; stringLength > 0; stringLength--) {
+      if (bytes[stringLength - 1] != 0) {
+        break;
+      }
+    }
+    // If string is all zeroes, its empty and return an empty string.
+    if (stringLength == 0) {
+      return "";
+    }
+    // Check if the end of the string is in the middle of a continuation byte or not.
+    if ((bytes[stringLength - 1] & 0x80) != 0) {
+      // This is a UTF8 continuation byte. Make sure its valid.
+      // Walk back until initial byte is found
+      int utf8StartByte = stringLength;
+      for (; utf8StartByte > 0; utf8StartByte--) {
+        if ((bytes[utf8StartByte - 1] & 0x40) != 0) {
+          // Having 2nd bit set means start byte
+          break;
+        }
+      }
+      if (utf8StartByte == 0) {
+        // This case means string only contains continuation bytes
+        return "";
+      }
+      utf8StartByte--;
+      // Check if its a 2, 3, or 4 byte
+      byte checkByte = bytes[utf8StartByte];
+      if ((checkByte & 0xE0) == 0xC0 && utf8StartByte != stringLength - 2) {
+        // 2 byte, need 1 more byte
+        stringLength = utf8StartByte;
+      } else if ((checkByte & 0xF0) == 0xE0 && utf8StartByte != stringLength - 3) {
+        // 3 byte, need 2 more bytes
+        stringLength = utf8StartByte;
+      } else if ((checkByte & 0xF8) == 0xF0 && utf8StartByte != stringLength - 4) {
+        // 4 byte, need 3 more bytes
+        stringLength = utf8StartByte;
+      }
+      // If we get here, the string is either completely garbage or fine.
+    }
+
+    return new String(bytes, 0, stringLength, StandardCharsets.UTF_8);
   }
 
   /**
@@ -398,11 +440,12 @@ public final class DynamicStruct {
    *
    * @param field field descriptor
    * @param value field value
+   * @return true if the full value fit in the struct, false if truncated
    * @throws UnsupportedOperationException if field is not char type
    * @throws IllegalArgumentException if field is not a member of this struct
    * @throws IllegalStateException if struct descriptor is invalid
    */
-  public void setStringField(StructFieldDescriptor field, String value) {
+  public boolean setStringField(StructFieldDescriptor field, String value) {
     if (field.getType() != StructFieldType.kChar) {
       throw new UnsupportedOperationException("field is not char type");
     }
@@ -414,10 +457,12 @@ public final class DynamicStruct {
     }
     ByteBuffer bb = StandardCharsets.UTF_8.encode(value);
     int len = Math.min(bb.remaining(), field.m_arraySize);
+    boolean copiedFull = len == bb.remaining();
     m_data.position(field.m_offset).put(bb.limit(len));
     for (int i = len; i < field.m_arraySize; i++) {
       m_data.put((byte) 0);
     }
+    return copiedFull;
   }
 
   /**
@@ -548,9 +593,12 @@ public final class DynamicStruct {
       // for unsigned fields, we can simply logical shift and mask
       return (val >>> field.m_bitShift) & field.getBitMask();
     } else {
-      // to get sign extension, shift so the sign bit within the bitfield goes to the long's sign
-      // bit (also clearing all higher bits), then shift back down (also clearing all lower bits);
-      // since upper and lower bits are cleared with the shifts, the bitmask is unnecessary
+      // to get sign extension, shift so the sign bit within the bitfield goes to the
+      // long's sign
+      // bit (also clearing all higher bits), then shift back down (also clearing all
+      // lower bits);
+      // since upper and lower bits are cleared with the shifts, the bitmask is
+      // unnecessary
       return (val << (64 - field.m_bitShift - field.getBitWidth())) >> (64 - field.getBitWidth());
     }
   }
@@ -628,5 +676,5 @@ public final class DynamicStruct {
   }
 
   private final StructDescriptor m_desc;
-  private final ByteBuffer m_data;
+  final ByteBuffer m_data;
 }
