@@ -385,7 +385,9 @@ TEST_F(DynamicStructTest, StringRoundTrip3ByteUtf8PartialSecondByte) {
 
 // MSVC and GCC do surrogate pairs differently.
 // Manually construct the 4 byte string
-static constexpr char buffer[] = {(char)0x61, (char)0xf0, (char)0x9f, (char)0x90, (char)0x80, (char)0x00};
+static constexpr char buffer[] = {
+    static_cast<char>(0x61), static_cast<char>(0xf0), static_cast<char>(0x9f),
+    static_cast<char>(0x90), static_cast<char>(0x80), static_cast<char>(0x00)};
 static constexpr std::string_view fourByteUtf8String{buffer};
 
 TEST_F(DynamicStructTest, StringRoundTrip4ByteUtf8) {
