@@ -298,7 +298,8 @@ TEST_F(DynamicStructTest, StringRoundTripEmbeddedNull) {
   wpi::MutableDynamicStruct dynamic{desc, data};
   auto field = desc->FindFieldByName("a");
   std::string check{"ab\0c", 4};
-  ASSERT_EQ(check.size(), 4);
+  size_t checkSize = 4;
+  ASSERT_EQ(check.size(), checkSize);
   EXPECT_TRUE(dynamic.SetStringField(field, check));
   auto get = dynamic.GetStringField(field);
   EXPECT_EQ(get, check);
