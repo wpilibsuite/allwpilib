@@ -22,5 +22,7 @@ SendableChooserSim::SendableChooserSim(nt::NetworkTableInstance inst,
 }
 
 void SendableChooserSim::SetSelected(std::string_view option) {
-  m_publisher.Set(option);
+  if (RobotBase::IsSimulation()) {
+    m_publisher.Set(option);
+  }
 }

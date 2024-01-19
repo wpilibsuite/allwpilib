@@ -24,7 +24,7 @@ public class SendableChooserSim implements AutoCloseable {
   /**
    * Constructs a SendableChooserSim.
    *
-   * @param inst The NetworkTable instance.
+   * @param inst The NetworkTables instance.
    * @param path The path where the SendableChooser is published.
    */
   public SendableChooserSim(NetworkTableInstance inst, String path) {
@@ -35,10 +35,19 @@ public class SendableChooserSim implements AutoCloseable {
 
   @Override
   public void close() {
-    m_publisher.close();
+    if (RobotBase.isSimulation()) {
+      m_publisher.close();
+    }
   }
 
+  /**
+   * Set the selected option.
+   *
+   * @param option The option.
+   */
   public void setSelected(String option) {
-    m_publisher.set(option);
+    if (RobotBase.isSimulation()) {
+      m_publisher.set(option);
+    }
   }
 }
