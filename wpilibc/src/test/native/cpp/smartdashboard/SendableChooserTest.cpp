@@ -2,6 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <frc/simulation/SendableChooserSim.h>
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 
@@ -75,6 +76,24 @@ TEST(SendableChooserTest, ChangeListener) {
   frc::SmartDashboard::UpdateValues();
 
   EXPECT_EQ(3, currentVal);
+}
+
+TEST_P(SendableChooserTest, SetSelected) {
+  frc::SendableChooser<int> chooser;
+  frc::sim::SendableChooserSim chooserSim = frc::sim::SendableChooserSim{
+      fmt::format("/SmartDashboard/SetSelectedChooser{}/", GetParam())};
+
+  for (int i = 1; i <= 3; i++) {
+    chooser.AddOption(std::to_string(i), i);
+  }
+  chooser.SetDefaultOption("0", 0);
+
+  frc::SmartDashboard::PutData(fmt::format("SetSelectedChooser{}", GetParam()),
+                               &chooser);
+  frc::SmartDashboard::UpdateValues();
+  chooserSim.SetSelected(std::to_string(GetParam()));
+  frc::SmartDashboard::UpdateValues();
+  EXPECT_EQ(GetParam(), chooser.GetSelected());
 }
 
 INSTANTIATE_TEST_SUITE_P(SendableChooserTests, SendableChooserTest,
