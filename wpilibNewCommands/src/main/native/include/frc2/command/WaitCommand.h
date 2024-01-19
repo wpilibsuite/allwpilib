@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <functional>
+
 #include <frc/Timer.h>
 #include <units/time.h>
 
