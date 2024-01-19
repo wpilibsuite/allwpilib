@@ -9,16 +9,22 @@
 
 using namespace frc2;
 
-WaitCommand::WaitCommand(units::second_t duration) : m_duration{duration} {
+WaitCommand::WaitCommand(units::second_t duration)
+    : WaitCommand{[duration] { return duration; }} {
   SetName(fmt::format("{}: {}", GetName(), duration));
 }
 
+WaitCommand::WaitCommand(std::function<units::second_t()> durationSupplier)
+    : m_durationSupplier{durationSupplier} {}
+
 void WaitCommand::Initialize() {
+  m_duration = m_durationSupplier();
   m_timer.Restart();
 }
 
 void WaitCommand::End(bool interrupted) {
   m_timer.Stop();
+  m_duration = 0_s;
 }
 
 bool WaitCommand::IsFinished() {

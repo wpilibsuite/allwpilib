@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj2.command;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyDouble;
@@ -14,6 +15,7 @@ import static org.mockito.Mockito.when;
 
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.simulation.SimHooks;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -77,6 +79,39 @@ class WaitCommandTest extends CommandTestBase {
       verify(command1).end(true);
       verify(command1, never()).end(false);
       assertFalse(scheduler.isScheduled(timeout));
+    }
+  }
+
+  @Test
+  @ResourceLock("timing")
+  void supplierTest() {
+    final double kWaitTime = 2;
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      AtomicInteger supplierCounter = new AtomicInteger();
+      WaitCommand command =
+          new WaitCommand(
+              () -> {
+                supplierCounter.incrementAndGet();
+                return kWaitTime;
+              });
+      assertEquals(0, supplierCounter.get(), "Supplier should not be called at construction.");
+      scheduler.schedule(command);
+      assertEquals(
+          1,
+          supplierCounter.get(),
+          "Supplier should be called once and only once when command is scheduled.");
+
+      SimHooks.stepTiming(1);
+      scheduler.run();
+      assertTrue(scheduler.isScheduled(command));
+
+      SimHooks.stepTiming(2);
+      scheduler.run();
+      assertFalse(scheduler.isScheduled(command));
+      assertEquals(
+          1,
+          supplierCounter.get(),
+          "Supplier should not be called outside of command initialization.");
     }
   }
 }

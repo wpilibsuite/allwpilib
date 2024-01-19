@@ -27,3 +27,35 @@ TEST_F(WaitCommandTest, WaitCommandSchedule) {
 
   frc::sim::ResumeTiming();
 }
+
+TEST_F(WaitCommandTest, WaitCommandScheduleFunction) {
+  constexpr auto kWaitTime = 2_s;
+  frc::sim::PauseTiming();
+
+  CommandScheduler scheduler = GetScheduler();
+
+  int supplierCounter = 0;
+
+  WaitCommand command{[&supplierCounter, kWaitTime] {
+    supplierCounter++;
+    return kWaitTime;
+  }};
+
+  EXPECT_EQ(0, supplierCounter)
+      << "Supplier should not be called at construction.";
+  scheduler.Schedule(&command);
+  EXPECT_EQ(1, supplierCounter) << "Supplier should be called once and only "
+                                   "once when command is scheduled.";
+
+  frc::sim::StepTiming(1_s);
+  scheduler.Run();
+  EXPECT_TRUE(scheduler.IsScheduled(&command));
+
+  frc::sim::StepTiming(2_s);
+  scheduler.Run();
+  EXPECT_FALSE(scheduler.IsScheduled(&command));
+  EXPECT_EQ(1, supplierCounter)
+      << "Supplier should not be called outside of command initialization.";
+
+  frc::sim::ResumeTiming();
+}

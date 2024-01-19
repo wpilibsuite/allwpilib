@@ -72,6 +72,10 @@ CommandPtr cmd::Wait(units::second_t duration) {
   return WaitCommand(duration).ToPtr();
 }
 
+CommandPtr cmd::Wait(std::function<units::second_t()> durationSupplier) {
+  return WaitCommand(durationSupplier).ToPtr();
+}
+
 CommandPtr cmd::WaitUntil(std::function<bool()> condition) {
   return WaitUntilCommand(condition).ToPtr();
 }

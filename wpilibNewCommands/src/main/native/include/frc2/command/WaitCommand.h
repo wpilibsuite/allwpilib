@@ -26,6 +26,15 @@ class WaitCommand : public CommandHelper<Command, WaitCommand> {
    */
   explicit WaitCommand(units::second_t duration);
 
+  /**
+   * Creates a new WaitCommand. This command will do nothing, and end after the
+   * duration returned by the provided function. The function will be called
+   * once each time the command is initialized.
+   * @param durationSupplier Function that provides the time to wait, in
+   * seconds.
+   */
+  explicit WaitCommand(std::function<units::second_t()> durationSupplier);
+
   WaitCommand(WaitCommand&& other) = default;
 
   WaitCommand(const WaitCommand& other) = default;
@@ -45,6 +54,7 @@ class WaitCommand : public CommandHelper<Command, WaitCommand> {
   frc::Timer m_timer;
 
  private:
+  std::function<units::second_t()> m_durationSupplier;
   units::second_t m_duration;
 };
 }  // namespace frc2
