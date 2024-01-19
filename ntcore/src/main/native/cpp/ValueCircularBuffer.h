@@ -24,7 +24,7 @@ class ValueCircularBuffer {
     m_storage.emplace_back(std::forward<Args...>(args...));
   }
 
-  std::vector<Value> ReadValue();
+  std::vector<Value> ReadValue(unsigned int types);
   template <ValidType T>
   std::vector<Timestamped<typename TypeInfo<T>::Value>> Read();
 

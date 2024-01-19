@@ -144,8 +144,12 @@ unsigned int GetEntryFlags(NT_Entry entry) {
 }
 
 std::vector<Value> ReadQueueValue(NT_Handle subentry) {
+  return ReadQueueValue(subentry, 0);
+}
+
+std::vector<Value> ReadQueueValue(NT_Handle subentry, unsigned int types) {
   if (auto ii = InstanceImpl::GetHandle(subentry)) {
-    return ii->localStorage.ReadQueueValue(subentry);
+    return ii->localStorage.ReadQueueValue(subentry, types);
   } else {
     return {};
   }
