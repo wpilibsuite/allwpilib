@@ -154,7 +154,7 @@ static void DisplayGui() {
     int ipAddressWidth = ImGui::CalcTextSize("255.255.255.255").x;
     int setWidth = ImGui::CalcTextSize(" Set Team To 99999 ").x;
 
-    minWidth = nameWidth + macWidth + ipAddressWidth + setWidth + 200;
+    minWidth = nameWidth + macWidth + ipAddressWidth + setWidth + 100;
 
     std::string setString = fmt::format("Set team to {}", teamNumber);
 
@@ -244,12 +244,17 @@ static void DisplayGui() {
           if (ImGui::Button("Status")) {
             deploySession.GetStatus(i.first, i.second.first);
           }
-          ImGui::SameLine();
-          std::string ds = fmt::format(
-              "Web Server Status: {}, Serial Number: {}, Image: {}",
-              deviceStatus.value().webServerEnabled ? "Enabled" : "Disabled",
-              deviceStatus.value().serialNumber, deviceStatus.value().image);
-          ImGui::Text(ds.c_str());
+          std::string formatted =
+              fmt::format("Image: {}", deviceStatus.value().image);
+          ImGui::Text(formatted.c_str());
+          formatted = fmt::format("Serial Number: {}",
+                                  deviceStatus.value().serialNumber);
+          ImGui::Text(formatted.c_str());
+          formatted = fmt::format(
+              "Web Server Status: {}",
+              deviceStatus.value().webServerEnabled ? "Enabled" : "Disabled");
+          ImGui::Text(formatted.c_str());
+
         } else {
           ImGui::Text("Waiting for refresh");
         }
