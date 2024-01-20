@@ -265,7 +265,7 @@ void WebSocketConnection::Send(
 
 void WebSocketConnection::Disconnect(std::string_view reason) {
   m_reason = reason;
-  m_ws.Fail(1005, reason);
+  m_ws.Fail(1001, reason);
 }
 
 wpi::uv::Buffer WebSocketConnection::AllocBuf() {
