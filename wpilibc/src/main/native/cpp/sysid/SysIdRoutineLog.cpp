@@ -11,9 +11,7 @@
 using namespace frc::sysid;
 
 SysIdRoutineLog::SysIdRoutineLog(std::string_view logName)
-    : m_logName(logName) {
-  m_state.Append(StateEnumToString(State::kNone));
-}
+    : m_logName(logName) {}
 
 SysIdRoutineLog::MotorLog::MotorLog(std::string_view motorName,
                                     std::string_view logName,
