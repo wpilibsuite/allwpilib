@@ -601,10 +601,9 @@ public final class DynamicStruct {
       // for unsigned fields, we can simply logical shift and mask
       return (val >>> field.m_bitShift) & field.getBitMask();
     } else {
-      // to get sign extension, shift so the sign bit within the bitfield goes to the
-      // long's sign bit (also clearing all higher bits), then shift back down (also
-      // clearing all lower bits); since upper and lower bits are cleared with the
-      // shifts, the bitmask is unnecessary
+      // to get sign extension, shift so the sign bit within the bitfield goes to the long's sign
+      // bit (also clearing all higher bits), then shift back down (also clearing all lower bits);
+      // since upper and lower bits are cleared with the shifts, the bitmask is unnecessary
       return (val << (64 - field.m_bitShift - field.getBitWidth())) >> (64 - field.getBitWidth());
     }
   }
