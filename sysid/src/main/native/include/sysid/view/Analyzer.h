@@ -182,9 +182,17 @@ class Analyzer : public glass::View {
   void UpdateFeedbackGains();
 
   /**
-   * Handles logic of displaying a gain on ImGui
+   * Handles logic of displaying a double on ImGui.
    */
-  bool DisplayGain(const char* text, double* data, bool readOnly);
+  bool DisplayDouble(const char* text, double* data, bool readOnly);
+
+  /**
+   * Displays a Feedforward gain, including the gain itself along with its
+   * validity and message.
+   */
+  void DisplayFeedforwardGain(const char* text,
+                              AnalysisManager::FeedforwardGain& ffGain,
+                              bool readOnly);
 
   /**
    * Handles errors when they pop up.
@@ -210,12 +218,13 @@ class Analyzer : public glass::View {
   int m_selectedPreset = 0;
 
   // Feedforward and feedback gains.
-  std::vector<double> m_ff;
+  AnalysisManager::FeedforwardGains m_feedforwardGains;
   double m_accelRSquared;
   double m_accelRMSE;
   double m_Kp;
   double m_Kd;
   units::millisecond_t m_timescale;
+  bool m_timescaleValid = false;
 
   // Units
   int m_selectedOverrideUnit = 0;
