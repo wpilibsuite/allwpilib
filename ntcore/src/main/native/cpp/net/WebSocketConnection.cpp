@@ -113,18 +113,6 @@ WebSocketConnection::~WebSocketConnection() {
   }
 }
 
-void WebSocketConnection::Start() {
-  m_ws.pong.connect([selfweak = weak_from_this()](auto data) {
-    if (data.size() != 8) {
-      return;
-    }
-    if (auto self = selfweak.lock()) {
-      self->m_lastPingResponse =
-          wpi::support::endian::read64<wpi::support::native>(data.data());
-    }
-  });
-}
-
 void WebSocketConnection::SendPing(uint64_t time) {
   auto buf = AllocBuf();
   buf.len = 8;

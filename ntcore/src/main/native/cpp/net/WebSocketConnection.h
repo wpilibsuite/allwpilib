@@ -26,8 +26,6 @@ class WebSocketConnection final
   WebSocketConnection(const WebSocketConnection&) = delete;
   WebSocketConnection& operator=(const WebSocketConnection&) = delete;
 
-  void Start();
-
   unsigned int GetVersion() const final { return m_version; }
 
   void SendPing(uint64_t time) final;
@@ -51,7 +49,9 @@ class WebSocketConnection final
 
   uint64_t GetLastFlushTime() const final { return m_lastFlushTime; }
 
-  uint64_t GetLastPingResponse() const final { return m_lastPingResponse; }
+  uint64_t GetLastReceivedTime() const final {
+    return m_ws.GetLastReceivedTime();
+  }
 
   void Disconnect(std::string_view reason) final;
 
@@ -92,7 +92,6 @@ class WebSocketConnection final
   State m_state = kEmpty;
   std::string m_reason;
   uint64_t m_lastFlushTime = 0;
-  uint64_t m_lastPingResponse = 0;
   unsigned int m_version;
 };
 

@@ -281,7 +281,6 @@ void NetworkServer::ServerConnection4::ProcessWsUpgrade() {
     INFO("CONNECTED NT4 client '{}' (from {})", dedupName, m_connInfo);
     m_info.remote_id = dedupName;
     m_server.AddConnection(this, m_info);
-    m_wire->Start();
     m_websocket->closed.connect([this](uint16_t, std::string_view reason) {
       auto realReason = m_wire->GetDisconnectReason();
       INFO("DISCONNECTED NT4 client '{}' (from {}): {}", m_info.remote_id,
