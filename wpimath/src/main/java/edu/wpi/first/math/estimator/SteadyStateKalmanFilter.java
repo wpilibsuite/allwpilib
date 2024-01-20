@@ -114,7 +114,7 @@ public class SteadyStateKalmanFilter<States extends Num, Inputs extends Num, Out
     // K = (Sᵀ.solve(CPᵀ))ᵀ
     m_K =
         new Matrix<>(
-            S.transpose().getStorage().solve((C.times(P.transpose())).getStorage()).transpose());
+            S.transpose().getStorage().solve(C.times(P.transpose()).getStorage()).transpose());
 
     reset();
   }

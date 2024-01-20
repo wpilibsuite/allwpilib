@@ -48,7 +48,7 @@ public class Mult<A extends Unit<A>, B extends Unit<B>> extends Unit<Mult<A, B>>
    */
   @SuppressWarnings({"unchecked", "rawtypes"})
   public static <A extends Unit<A>, B extends Unit<B>> Mult<A, B> combine(A a, B b) {
-    final long key = ((long) a.hashCode()) << 32L | ((long) b.hashCode()) & 0xFFFFFFFFL;
+    final long key = ((long) a.hashCode()) << 32L | (((long) b.hashCode()) & 0xFFFFFFFFL);
     if (cache.containsKey(key)) {
       return cache.get(key);
     }

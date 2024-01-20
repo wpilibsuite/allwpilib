@@ -58,7 +58,7 @@ public class Per<N extends Unit<N>, D extends Unit<D>> extends Unit<Per<N, D>> {
   public static <N extends Unit<N>, D extends Unit<D>> Per<N, D> combine(
       N numerator, D denominator) {
     final long key =
-        ((long) numerator.hashCode()) << 32L | ((long) denominator.hashCode()) & 0xFFFFFFFFL;
+        ((long) numerator.hashCode()) << 32L | (((long) denominator.hashCode()) & 0xFFFFFFFFL);
 
     var existing = cache.get(key);
     if (existing != null) {
