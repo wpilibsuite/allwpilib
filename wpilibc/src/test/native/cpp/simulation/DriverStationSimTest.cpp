@@ -105,6 +105,7 @@ TEST(DriverStationTest, DsAttached) {
   HAL_Initialize(500, 0);
   DriverStationSim::ResetData();
 
+  DriverStationSim::SetDsAttached(true);
   DriverStationSim::NotifyNewData();
   EXPECT_TRUE(DriverStation::IsDSAttached());
 
