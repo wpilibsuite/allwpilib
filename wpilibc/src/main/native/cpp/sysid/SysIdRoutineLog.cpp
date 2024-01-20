@@ -43,7 +43,7 @@ void SysIdRoutineLog::RecordState(State state) {
   if (!m_stateInitialized) {
     m_state =
         wpi::log::StringLogEntry{frc::DataLogManager::GetLog(),
-                                 fmt::format("sysid-test-state{}", m_logName)};
+                                 fmt::format("sysid-test-state-{}", m_logName)};
     m_stateInitialized = true;
   }
   m_state.Append(StateEnumToString(state));
