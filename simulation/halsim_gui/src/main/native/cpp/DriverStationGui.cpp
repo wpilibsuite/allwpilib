@@ -1143,9 +1143,7 @@ static void DriverStationExecute() {
   if ((curTime - lastNewDataTime) > 0.02 && !HALSIM_IsTimingPaused() &&
       isAttached) {
     lastNewDataTime = curTime;
-    if (isAttached) {
-      gFMSModel->Update();
-    }
+    gFMSModel->Update();
     HALSIM_NotifyDriverStationNewData();
   }
 }
