@@ -61,7 +61,7 @@ void Analyzer::UpdateFeedforwardGains() {
     m_state = AnalyzerState::kGeneralDataError;
     HandleError(e.what());
   } catch (const sysid::NoQuasistaticDataError& e) {
-    m_state = AnalyzerState::kMotionThresholdError;
+    m_state = AnalyzerState::kVelocityThresholdError;
     HandleError(e.what());
   } catch (const sysid::NoDynamicDataError& e) {
     m_state = AnalyzerState::kTestDurationError;
@@ -112,14 +112,14 @@ static void SetPosition(double beginX, double beginY, double xShift,
 }
 
 bool Analyzer::IsErrorState() {
-  return m_state == AnalyzerState::kMotionThresholdError ||
+  return m_state == AnalyzerState::kVelocityThresholdError ||
          m_state == AnalyzerState::kTestDurationError ||
          m_state == AnalyzerState::kGeneralDataError ||
          m_state == AnalyzerState::kFileError;
 }
 
 bool Analyzer::IsDataErrorState() {
-  return m_state == AnalyzerState::kMotionThresholdError ||
+  return m_state == AnalyzerState::kVelocityThresholdError ||
          m_state == AnalyzerState::kTestDurationError ||
          m_state == AnalyzerState::kGeneralDataError;
 }
@@ -253,7 +253,7 @@ void Analyzer::Display() {
     }
     case AnalyzerState::kGeneralDataError:
     case AnalyzerState::kTestDurationError:
-    case AnalyzerState::kMotionThresholdError: {
+    case AnalyzerState::kVelocityThresholdError: {
       CreateErrorPopup(m_errorPopup, m_exception);
       if (DisplayResetAndUnitOverride()) {
         return;
@@ -276,7 +276,7 @@ void Analyzer::PrepareData() {
     m_state = AnalyzerState::kGeneralDataError;
     HandleError(e.what());
   } catch (const sysid::NoQuasistaticDataError& e) {
-    m_state = AnalyzerState::kMotionThresholdError;
+    m_state = AnalyzerState::kVelocityThresholdError;
     HandleError(e.what());
   } catch (const sysid::NoDynamicDataError& e) {
     m_state = AnalyzerState::kTestDurationError;
@@ -437,15 +437,15 @@ void Analyzer::DisplayFeedforwardParameters(float beginX, float beginY) {
         "filter's sliding window.");
   }
 
-  if (displayAll || m_state == AnalyzerState::kMotionThresholdError) {
+  if (displayAll || m_state == AnalyzerState::kVelocityThresholdError) {
     // Wait for enter before refresh so decimal inputs like "0.2" don't
     // prematurely refresh with a velocity threshold of "0".
     SetPosition(beginX, beginY, kHorizontalOffset, 1);
     ImGui::SetNextItemWidth(ImGui::GetFontSize() * 4);
-    double threshold = m_settings.motionThreshold;
+    double threshold = m_settings.velocityThreshold;
     if (ImGui::InputDouble("Velocity Threshold", &threshold, 0.0, 0.0, "%.3f",
                            ImGuiInputTextFlags_EnterReturnsTrue)) {
-      m_settings.motionThreshold = std::max(0.0, threshold);
+      m_settings.velocityThreshold = std::max(0.0, threshold);
       PrepareData();
     }
     CreateTooltip("Velocity data below this threshold will be ignored.");

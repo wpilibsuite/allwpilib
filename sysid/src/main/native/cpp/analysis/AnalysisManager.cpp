@@ -173,7 +173,7 @@ AnalysisManager::AnalysisManager(TestData data, Settings& settings,
     : m_data{std::move(data)}, m_logger{logger}, m_settings{settings} {
   // Reset settings for Dynamic Test Limits
   m_settings.stepTestDuration = units::second_t{0.0};
-  m_settings.motionThreshold = std::numeric_limits<double>::infinity();
+  m_settings.velocityThreshold = std::numeric_limits<double>::infinity();
 }
 
 void AnalysisManager::PrepareData() {

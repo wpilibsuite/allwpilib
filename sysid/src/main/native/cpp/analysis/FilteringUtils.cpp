@@ -127,7 +127,7 @@ sysid::TrimStepVoltageData(std::vector<PreparedData>* data,
   auto motionBegins = std::find_if(
       data->begin(), data->end(), [settings, firstPosition](auto& datum) {
         return std::abs(datum.position - firstPosition) >
-               (settings->motionThreshold * datum.dt.value());
+               (settings->velocityThreshold * datum.dt.value());
       });
 
   units::second_t positionDelay;
@@ -335,13 +335,13 @@ void sysid::InitialTrimAndFilter(
   maxStepTime = GetMaxStepTime(preparedData);
 
   // Calculate Velocity Threshold if it hasn't been set yet
-  if (settings->motionThreshold == std::numeric_limits<double>::infinity()) {
+  if (settings->velocityThreshold == std::numeric_limits<double>::infinity()) {
     for (auto& it : preparedData) {
       auto key = it.first();
       auto& dataset = it.getValue();
       if (wpi::contains(key, "quasistatic")) {
-        settings->motionThreshold =
-            std::min(settings->motionThreshold,
+        settings->velocityThreshold =
+            std::min(settings->velocityThreshold,
                      GetNoiseFloor(dataset, kNoiseMeanWindow,
                                    [](auto&& pt) { return pt.velocity; }));
       }
@@ -353,13 +353,13 @@ void sysid::InitialTrimAndFilter(
     auto& dataset = it.getValue();
 
     // Trim quasistatic test data to remove all points where voltage is zero or
-    // velocity < motion threshold.
+    // velocity < velocity threshold.
     if (wpi::contains(key, "quasistatic")) {
       dataset.erase(std::remove_if(dataset.begin(), dataset.end(),
                                    [&](const auto& pt) {
                                      return std::abs(pt.voltage) <= 0 ||
                                             std::abs(pt.velocity) <
-                                                settings->motionThreshold;
+                                                settings->velocityThreshold;
                                    }),
                     dataset.end());
 
