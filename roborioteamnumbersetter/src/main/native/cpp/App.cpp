@@ -57,6 +57,8 @@ struct TeamNumberRefHolder {
 static std::unique_ptr<TeamNumberRefHolder> teamNumberRef;
 static std::unordered_map<std::string, std::pair<unsigned int, std::string>>
     foundDevices;
+static std::unordered_map<std::string, std::optional<sysid::DeviceStatus>>
+    deviceStatuses;
 static wpi::Logger logger;
 static sysid::DeploySession deploySession{logger};
 static std::unique_ptr<wpi::MulticastServiceResolver> multicastResolver;
@@ -76,7 +78,12 @@ static void FindDevices() {
                        [](const auto& a) { return a.first == "MAC"; });
       if (macKey != data.txt.end()) {
         auto& mac = macKey->second;
-        foundDevices[mac] = std::make_pair(data.ipv4Address, data.hostName);
+        auto& foundDevice = foundDevices[mac];
+        foundDevice = std::make_pair(data.ipv4Address, data.hostName);
+        auto& deviceStatus = deviceStatuses[mac];
+        if (!deviceStatus) {
+          deploySession.GetStatus(mac, foundDevice.first);
+        }
       }
     }
   }
@@ -147,7 +154,7 @@ static void DisplayGui() {
     int ipAddressWidth = ImGui::CalcTextSize("255.255.255.255").x;
     int setWidth = ImGui::CalcTextSize(" Set Team To 99999 ").x;
 
-    minWidth = nameWidth + macWidth + ipAddressWidth + setWidth + 100;
+    minWidth = nameWidth + macWidth + ipAddressWidth + setWidth + 200;
 
     std::string setString = fmt::format("Set team to {}", teamNumber);
 
@@ -175,6 +182,8 @@ static void DisplayGui() {
 
     for (auto&& i : foundDevices) {
       std::future<int>* future = deploySession.GetFuture(i.first);
+      std::future<sysid::DeviceStatus>* futureStatus =
+          deploySession.GetStatusFuture(i.first);
       if (ImGui::BeginTable("Table", 4)) {
         ImGui::TableSetupColumn(
             "Name",
@@ -222,6 +231,30 @@ static void DisplayGui() {
       }
 
       ImGui::PushID(i.first.c_str());
+      if (futureStatus) {
+        ImGui::Text("Refreshing Status");
+        const auto fs = futureStatus->wait_for(std::chrono::seconds(0));
+        if (fs == std::future_status::ready) {
+          deviceStatuses[i.first] = futureStatus->get();
+          deploySession.DestroyStatusFuture(i.first);
+        }
+      } else {
+        auto& deviceStatus = deviceStatuses[i.first];
+        if (deviceStatus) {
+          if (ImGui::Button("Status")) {
+            deploySession.GetStatus(i.first, i.second.first);
+          }
+          ImGui::SameLine();
+          std::string ds = fmt::format(
+              "Web Server Status: {}, Serial Number: {}, Image: {}",
+              deviceStatus.value().webServerEnabled ? "Enabled" : "Disabled",
+              deviceStatus.value().serialNumber, deviceStatus.value().image);
+          ImGui::Text(ds.c_str());
+        } else {
+          ImGui::Text("Waiting for refresh");
+        }
+      }
+
       if (future) {
         ImGui::Text("Deploying");
       } else {
