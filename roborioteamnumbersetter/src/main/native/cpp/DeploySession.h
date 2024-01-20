@@ -49,6 +49,10 @@ class DeploySession {
 
   bool Blink(const std::string& macAddress, unsigned int ipAddress);
 
+  bool DisableWebServer(const std::string& macAddress, unsigned int ipAddress);
+
+  bool EnableWebServer(const std::string& macAddress, unsigned int ipAddress);
+
   bool Reboot(const std::string& macAddress, unsigned int ipAddress);
 
   std::future<int>* GetFuture(const std::string& macAddress);

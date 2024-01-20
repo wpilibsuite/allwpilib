@@ -86,13 +86,28 @@ void SshSession::Execute(std::string_view cmd) {
     ssh_channel_free(channel);
     throw SshException(ssh_get_error(m_session));
   }
-  INFO("{}", cmd);
+  INFO("{} {}", ssh_channel_get_exit_status(channel), cmd);
 
   // Log output.
   char buf[512];
   int read = ssh_channel_read(channel, buf, sizeof(buf), 0);
   if (read != 0) {
-    INFO("{}", cmd);
+    if (read < (sizeof(buf) / sizeof(buf[0]))) {
+      buf[read] = 0;
+    } else {
+      buf[(sizeof(buf) / sizeof(buf[0])) - 1] = 0;
+    }
+    INFO("stdout: {} {}", read, buf);
+  }
+
+  read = ssh_channel_read(channel, buf, sizeof(buf), 1);
+  if (read != 0) {
+    if (read < (sizeof(buf) / sizeof(buf[0]))) {
+      buf[read] = 0;
+    } else {
+      buf[(sizeof(buf) / sizeof(buf[0])) - 1] = 0;
+    }
+    INFO("stderr: {} {}", read, buf);
   }
 
   // Close and free channel.

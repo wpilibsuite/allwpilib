@@ -184,3 +184,85 @@ bool DeploySession::Blink(const std::string& macAddress,
   s_outstanding[macAddress] = std::move(future);
   return true;
 }
+
+bool DeploySession::DisableWebServer(const std::string& macAddress,
+                          unsigned int ipAddress) {
+  auto itr = s_outstanding.find(macAddress);
+  if (itr != s_outstanding.end()) {
+    return false;
+  }
+
+  std::future<int> future =
+      std::async(std::launch::async, [this, ipAddress, mac = macAddress]() {
+        //  Convert to IP address.
+        wpi::SmallString<16> ip;
+        in_addr addr;
+        addr.s_addr = ipAddress;
+        wpi::uv::AddrToName(addr, &ip);
+        DEBUG("Trying to establish SSH connection to {}.", ip.str());
+        try {
+          SshSession session{ip.str(), kPort, kUsername, kPassword, m_logger};
+          session.Open();
+          DEBUG("SSH connection to {} was successful.", ip.str());
+
+          SUCCESS("roboRIO Connected!");
+
+          try {
+            session.Execute("/bin/bash -c \"/etc/init.d/systemWebServer stop\"");
+            session.Execute("/bin/bash -c \"update-rc.d -f systemWebServer remove\"");
+            session.Execute("/bin/bash -c \"sync\"");
+          } catch (const SshSession::SshException& e) {
+            ERROR("An exception occurred: {}", e.what());
+            throw e;
+          }
+        } catch (const SshSession::SshException& e) {
+          DEBUG("SSH connection to {} failed with {}.", ip.str(), e.what());
+          throw e;
+        }
+        return 0;
+      });
+
+  s_outstanding[macAddress] = std::move(future);
+  return true;
+}
+
+bool DeploySession::EnableWebServer(const std::string& macAddress,
+                          unsigned int ipAddress) {
+  auto itr = s_outstanding.find(macAddress);
+  if (itr != s_outstanding.end()) {
+    return false;
+  }
+
+  std::future<int> future =
+      std::async(std::launch::async, [this, ipAddress, mac = macAddress]() {
+        //  Convert to IP address.
+        wpi::SmallString<16> ip;
+        in_addr addr;
+        addr.s_addr = ipAddress;
+        wpi::uv::AddrToName(addr, &ip);
+        DEBUG("Trying to establish SSH connection to {}.", ip.str());
+        try {
+          SshSession session{ip.str(), kPort, kUsername, kPassword, m_logger};
+          session.Open();
+          DEBUG("SSH connection to {} was successful.", ip.str());
+
+          SUCCESS("roboRIO Connected!");
+
+          try {
+            session.Execute("/bin/bash -c \"update-rc.d -f systemWebServer defaults\"");
+            session.Execute("/bin/bash -c \"/etc/init.d/systemWebServer start\"");
+            session.Execute("/bin/bash -c \"sync\"");
+          } catch (const SshSession::SshException& e) {
+            ERROR("An exception occurred: {}", e.what());
+            throw e;
+          }
+        } catch (const SshSession::SshException& e) {
+          DEBUG("SSH connection to {} failed with {}.", ip.str(), e.what());
+          throw e;
+        }
+        return 0;
+      });
+
+  s_outstanding[macAddress] = std::move(future);
+  return true;
+}
