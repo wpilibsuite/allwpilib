@@ -499,6 +499,7 @@ void NetworkServer::Init() {
       if (!tcp) {
         return;
       }
+      tcp->SetLogger(&m_logger);
       tcp->error.connect([logger = &m_logger](uv::Error err) {
         WPI_INFO(*logger, "NT4 socket error: {}", err.str());
       });
