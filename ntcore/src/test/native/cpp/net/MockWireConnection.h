@@ -63,7 +63,7 @@ class MockWireConnection : public WireConnection {
   MOCK_METHOD(int, Flush, (), (override));
 
   MOCK_METHOD(uint64_t, GetLastFlushTime, (), (const, override));
-  MOCK_METHOD(uint64_t, GetLastPingResponse, (), (const, override));
+  MOCK_METHOD(uint64_t, GetLastReceivedTime, (), (const, override));
 
   MOCK_METHOD(void, Disconnect, (std::string_view reason), (override));
 };
