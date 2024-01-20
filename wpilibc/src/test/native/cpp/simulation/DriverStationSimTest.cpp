@@ -104,9 +104,12 @@ TEST(DriverStationTest, FmsAttached) {
 TEST(DriverStationTest, DsAttached) {
   HAL_Initialize(500, 0);
   DriverStationSim::ResetData();
+  DriverStation::RefreshData();
 
+  EXPECT_FALSE(DriverStationSim::GetDsAttached());
   EXPECT_FALSE(DriverStation::IsDSAttached());
   DriverStationSim::NotifyNewData();
+  EXPECT_TRUE(DriverStationSim::GetDsAttached());
   EXPECT_TRUE(DriverStation::IsDSAttached());
 
   BooleanCallback callback;
