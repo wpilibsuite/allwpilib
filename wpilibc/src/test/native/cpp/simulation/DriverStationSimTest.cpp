@@ -105,6 +105,7 @@ TEST(DriverStationTest, DsAttached) {
   HAL_Initialize(500, 0);
   DriverStationSim::ResetData();
 
+  EXPECT_FALSE(DriverStation::IsDSAttached());
   DriverStationSim::NotifyNewData();
   EXPECT_TRUE(DriverStation::IsDSAttached());
 
@@ -112,7 +113,7 @@ TEST(DriverStationTest, DsAttached) {
   auto cb = DriverStationSim::RegisterDsAttachedCallback(callback.GetCallback(),
                                                          false);
   DriverStationSim::SetDsAttached(false);
-  DriverStationSim::NotifyNewData();
+  DriverStation::RefreshData();
   EXPECT_FALSE(DriverStationSim::GetDsAttached());
   EXPECT_FALSE(DriverStation::IsDSAttached());
   EXPECT_TRUE(callback.WasTriggered());
