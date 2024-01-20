@@ -198,6 +198,10 @@ void HAL_WriteAddressableLEDData(HAL_AddressableLEDHandle handle,
     return;
   }
 
+  if (length == 0) {
+    return;
+  }
+
   std::memcpy(led->ledBuffer, data, length * sizeof(HAL_AddressableLEDData));
 
   asm("dmb");
