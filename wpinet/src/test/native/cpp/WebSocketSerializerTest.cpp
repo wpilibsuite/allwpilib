@@ -67,6 +67,8 @@ class MockStream {
   MOCK_METHOD(void, DoWrite,
               (std::span<const uv::Buffer> bufs,
                const std::shared_ptr<MockWebSocketWriteReq>& req));
+
+  Logger* GetLogger() const { return nullptr; }
 };
 
 class WebSocketWriteReqTest : public ::testing::Test {
