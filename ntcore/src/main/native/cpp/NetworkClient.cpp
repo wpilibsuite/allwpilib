@@ -362,6 +362,7 @@ void NetworkClient::HandleLocal() {
 }
 
 void NetworkClient::TcpConnected(uv::Tcp& tcp) {
+  tcp.SetLogger(&m_logger);
   tcp.SetNoDelay(true);
   // Start the WS client
   if (m_logger.min_level() >= wpi::WPI_LOG_DEBUG4) {
