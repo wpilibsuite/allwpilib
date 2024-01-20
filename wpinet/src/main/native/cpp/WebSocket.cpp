@@ -638,7 +638,7 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
             if (m_state != CLOSING) {
               SendClose(code, reason);
             }
-            SetClosed(code, reason);
+            SetClosed(code, fmt::format("remote close: {}", reason));
             // If we're the server, shutdown the connection.
             if (m_server) {
               Shutdown();
@@ -675,7 +675,8 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
             pong(m_controlPayload);
             break;
           default:
-            return Fail(1002, "invalid message opcode");
+            return Fail(1002, fmt::format("invalid message opcode {}",
+                                          static_cast<unsigned int>(opcode)));
         }
 
         // Prepare for next message
