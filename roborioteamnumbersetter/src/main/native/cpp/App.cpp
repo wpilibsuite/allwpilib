@@ -241,7 +241,7 @@ static void DisplayGui() {
       } else {
         auto& deviceStatus = deviceStatuses[i.first];
         if (deviceStatus) {
-          if (ImGui::Button("Status")) {
+          if (ImGui::Button("Refresh Status")) {
             deploySession.GetStatus(i.first, i.second.first);
           }
           std::string formatted =
