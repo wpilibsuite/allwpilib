@@ -157,8 +157,8 @@ std::span<const WebSocket::Frame> TrySendFrames(
     SmallVector<int, 32> frameOffs;
     int numBytes = 0;
     while (frameIt != frameEnd) {
-      frameOffs.emplace_back(numBytes);
       numBytes += sendFrames.AddFrame(*frameIt++, server);
+      frameOffs.emplace_back(numBytes);
       if ((server && (numBytes >= 65536 || frameOffs.size() > 32)) ||
           (!server && numBytes >= 8192)) {
         // don't waste too much memory or effort on header generation or masking
@@ -200,15 +200,15 @@ std::span<const WebSocket::Frame> TrySendFrames(
       // figure out what the last (partially) frame sent actually was
       auto offIt = frameOffs.begin();
       auto offEnd = frameOffs.end();
-      bool isFin = true;
       while (offIt != offEnd && *offIt < sentBytes) {
         ++offIt;
-        isFin = (frameStart->opcode & WebSocket::kFlagFin) != 0;
         ++frameStart;
       }
 
+      bool isFin = (frameStart->opcode & WebSocket::kFlagFin) != 0;
       if (offIt != offEnd && *offIt == sentBytes && isFin) {
         // we finished at a normal FIN frame boundary; no need for a Write()
+        ++frameStart;
         SmallVector<uv::Buffer, 4> bufs;
         for (auto it = frames.begin(); it != frameStart; ++it) {
           bufs.append(it->data.begin(), it->data.end());
@@ -239,12 +239,13 @@ std::span<const WebSocket::Frame> TrySendFrames(
       }
 
       // continue through the last buffer of the last partial frame
-      while (bufIt != bufEnd && offIt != offEnd && pos < *offIt) {
-        pos += bufIt->len;
-        writeBufs.emplace_back(*bufIt++);
-      }
       if (offIt != offEnd) {
+        while (bufIt != bufEnd && pos < *offIt) {
+          pos += bufIt->len;
+          writeBufs.emplace_back(*bufIt++);
+        }
         ++offIt;
+        ++frameStart;
       }
 
       // move allocated buffers into request
@@ -258,7 +259,7 @@ std::span<const WebSocket::Frame> TrySendFrames(
       while (frameStart != frameEnd && !isFin) {
         if (offIt != offEnd) {
           // we already generated the wire buffers for this frame, use them
-          while (pos < *offIt && bufIt != bufEnd) {
+          while (bufIt != bufEnd && pos < *offIt) {
             pos += bufIt->len;
             continuePos += bufIt->len;
             req->m_frames.m_bufs.emplace_back(*bufIt++);
