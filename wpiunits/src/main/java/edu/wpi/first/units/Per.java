@@ -11,7 +11,8 @@ import java.util.Objects;
  * Generic combinatory unit type that represents the proportion of one unit to another, such as
  * Meters per Second or Radians per Celsius.
  *
- * <p>Note: {@link Velocity} is used to represent the velocity dimension.
+ * <p>Note: {@link Velocity} is used to represent the velocity dimension, rather than {@code
+ * Per<Distance, Time>}.
  *
  * @param <N> the type of the numerator unit
  * @param <D> the type of the denominator unit
@@ -27,6 +28,14 @@ public class Per<N extends Unit<N>, D extends Unit<D>> extends Unit<Per<N, D>> {
   @SuppressWarnings("rawtypes")
   private static final LongToObjectHashMap<Per> cache = new LongToObjectHashMap<>();
 
+  /**
+   * Creates a new proportional unit derived from the ratio of one unit to another. Consider using
+   * {@link #combine} instead of manually calling this constructor.
+   *
+   * @param baseType the base type representing the unit ratio
+   * @param numerator the numerator unit
+   * @param denominator the denominator unit
+   */
   protected Per(Class<Per<N, D>> baseType, N numerator, D denominator) {
     super(
         baseType,
@@ -70,10 +79,20 @@ public class Per<N extends Unit<N>, D extends Unit<D>> extends Unit<Per<N, D>> {
     return newUnit;
   }
 
+  /**
+   * Gets the numerator unit. For a {@code Per<A, B>}, this will return the {@code A} unit.
+   *
+   * @return the numerator unit
+   */
   public N numerator() {
     return m_numerator;
   }
 
+  /**
+   * Gets the denominator unit. For a {@code Per<A, B>}, this will return the {@code B} unit.
+   *
+   * @return the denominator unit
+   */
   public D denominator() {
     return m_denominator;
   }

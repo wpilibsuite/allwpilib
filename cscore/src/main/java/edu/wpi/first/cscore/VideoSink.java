@@ -26,6 +26,11 @@ public class VideoSink implements AutoCloseable {
       this.value = value;
     }
 
+    /**
+     * Returns the Kind value.
+     *
+     * @return The Kind value.
+     */
     public int getValue() {
       return value;
     }
@@ -48,6 +53,11 @@ public class VideoSink implements AutoCloseable {
     }
   }
 
+  /**
+   * Constructs a VideoSink.
+   *
+   * @param handle The video sink handle.
+   */
   protected VideoSink(int handle) {
     m_handle = handle;
   }
@@ -60,10 +70,20 @@ public class VideoSink implements AutoCloseable {
     m_handle = 0;
   }
 
+  /**
+   * Returns true if the VideoSink is valid.
+   *
+   * @return True if the VideoSink is valid.
+   */
   public boolean isValid() {
     return m_handle != 0;
   }
 
+  /**
+   * Returns the video sink handle.
+   *
+   * @return The video sink handle.
+   */
   public int getHandle() {
     return m_handle;
   }
@@ -222,5 +242,6 @@ public class VideoSink implements AutoCloseable {
     return rv;
   }
 
+  /** The VideoSink handle. */
   protected int m_handle;
 }

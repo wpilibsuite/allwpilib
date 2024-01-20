@@ -7,16 +7,31 @@ package edu.wpi.first.networktables;
 /** NetworkTables log message. */
 @SuppressWarnings("MemberName")
 public final class LogMessage {
-  /** Logging levels. */
+  /** Critical logging level. */
   public static final int kCritical = 50;
 
+  /** Error logging level. */
   public static final int kError = 40;
+
+  /** Warning log level. */
   public static final int kWarning = 30;
+
+  /** Info log level. */
   public static final int kInfo = 20;
+
+  /** Debug log level. */
   public static final int kDebug = 10;
+
+  /** Debug log level 1. */
   public static final int kDebug1 = 9;
+
+  /** Debug log level 2. */
   public static final int kDebug2 = 8;
+
+  /** Debug log level 3. */
   public static final int kDebug3 = 7;
+
+  /** Debug log level 4. */
   public static final int kDebug4 = 6;
 
   /** Log level of the message. */

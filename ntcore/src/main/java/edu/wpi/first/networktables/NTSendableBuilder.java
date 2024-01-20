@@ -6,6 +6,7 @@ package edu.wpi.first.networktables;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
 
+/** Helper class for building Sendable dashboard representations for NetworkTables. */
 public interface NTSendableBuilder extends SendableBuilder {
   /**
    * Set the function that should be called to update the network table for things other than

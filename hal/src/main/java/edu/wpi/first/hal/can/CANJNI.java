@@ -16,11 +16,16 @@ import java.nio.IntBuffer;
  */
 @SuppressWarnings("MethodName")
 public class CANJNI extends JNIWrapper {
+  /** Flag for sending a CAN message once. */
   public static final int CAN_SEND_PERIOD_NO_REPEAT = 0;
+
+  /** Flag for stopping periodic CAN message sends. */
   public static final int CAN_SEND_PERIOD_STOP_REPEATING = -1;
 
-  /* Flags in the upper bits of the messageID */
+  /** Mask for "is frame remote" in message ID. */
   public static final int CAN_IS_FRAME_REMOTE = 0x80000000;
+
+  /** Mask for "is frame 11 bits" in message ID. */
   public static final int CAN_IS_FRAME_11BIT = 0x40000000;
 
   /** Default constructor. */

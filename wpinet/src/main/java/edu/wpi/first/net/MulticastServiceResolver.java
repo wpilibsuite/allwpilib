@@ -32,22 +32,39 @@ public class MulticastServiceResolver implements AutoCloseable {
     m_cleanable.clean();
   }
 
+  /** Starts multicast service resolver. */
   public void start() {
     WPINetJNI.startMulticastServiceResolver(m_handle);
   }
 
+  /** Stops multicast service resolver. */
   public void stop() {
     WPINetJNI.stopMulticastServiceResolver(m_handle);
   }
 
+  /**
+   * Returns true if there's a multicast service resolver implementation.
+   *
+   * @return True if there's a multicast service resolver implementation.
+   */
   public boolean hasImplementation() {
     return WPINetJNI.getMulticastServiceResolverHasImplementation(m_handle);
   }
 
+  /**
+   * Returns event handle.
+   *
+   * @return Event handle.
+   */
   public int getEventHandle() {
     return WPINetJNI.getMulticastServiceResolverEventHandle(m_handle);
   }
 
+  /**
+   * Returns multicast service resolver data.
+   *
+   * @return Multicast service resolver data.
+   */
   public ServiceData[] getData() {
     return WPINetJNI.getMulticastServiceResolverData(m_handle);
   }

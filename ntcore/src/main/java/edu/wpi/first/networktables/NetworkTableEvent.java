@@ -12,6 +12,7 @@ package edu.wpi.first.networktables;
  */
 @SuppressWarnings("MemberName")
 public final class NetworkTableEvent {
+  /** NetworkTable event kind. */
   public enum Kind {
     /**
      * Initial listener addition. Set this to receive immediate notification of matches to other
@@ -61,6 +62,11 @@ public final class NetworkTableEvent {
       this.value = value;
     }
 
+    /**
+     * Returns the NetworkTable event kind value.
+     *
+     * @return The NetworkTable event kind value.
+     */
     public int getValue() {
       return value;
     }
