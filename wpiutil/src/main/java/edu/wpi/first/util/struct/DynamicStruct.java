@@ -18,8 +18,7 @@ public final class DynamicStruct {
   }
 
   /**
-   * Constructs a new dynamic struct object with internal storage. The descriptor
-   * must be valid. The
+   * Constructs a new dynamic struct object with internal storage. The descriptor must be valid. The
    * internal storage is allocated using ByteBuffer.allocate().
    *
    * @param desc struct descriptor
@@ -31,8 +30,7 @@ public final class DynamicStruct {
   }
 
   /**
-   * Constructs a new dynamic struct object with internal storage. The descriptor
-   * must be valid. The
+   * Constructs a new dynamic struct object with internal storage. The descriptor must be valid. The
    * internal storage is allocated using ByteBuffer.allocateDirect().
    *
    * @param desc struct descriptor
@@ -44,14 +42,11 @@ public final class DynamicStruct {
   }
 
   /**
-   * Constructs a new dynamic struct object. Note: the passed data buffer is not
-   * copied.
-   * Modifications to the passed buffer will be reflected in the struct and
-   * vice-versa.
+   * Constructs a new dynamic struct object. Note: the passed data buffer is not copied.
+   * Modifications to the passed buffer will be reflected in the struct and vice-versa.
    *
    * @param desc struct descriptor
-   * @param data byte buffer containing serialized data starting at current
-   *             position
+   * @param data byte buffer containing serialized data starting at current position
    * @return dynamic struct object
    */
   public static DynamicStruct wrap(StructDescriptor desc, ByteBuffer data) {
@@ -81,8 +76,8 @@ public final class DynamicStruct {
    *
    * @param data replacement data for the struct
    * @throws BufferUnderflowException if data is smaller than the struct size
-   * @throws ReadOnlyBufferException  if the underlying buffer is read-only
-   * @throws IllegalStateException    if struct descriptor is invalid
+   * @throws ReadOnlyBufferException if the underlying buffer is read-only
+   * @throws IllegalStateException if struct descriptor is invalid
    */
   public void setData(byte[] data) {
     if (data.length < m_desc.getSize()) {
@@ -94,12 +89,10 @@ public final class DynamicStruct {
   /**
    * Overwrites the entire serialized struct by copying data from a byte buffer.
    *
-   * @param data replacement data for the struct; copy starts from current
-   *             position
-   * @throws BufferUnderflowException if remaining data is smaller than the struct
-   *                                  size
-   * @throws ReadOnlyBufferException  if the underlying buffer is read-only
-   * @throws IllegalStateException    if struct descriptor is invalid
+   * @param data replacement data for the struct; copy starts from current position
+   * @throws BufferUnderflowException if remaining data is smaller than the struct size
+   * @throws ReadOnlyBufferException if the underlying buffer is read-only
+   * @throws IllegalStateException if struct descriptor is invalid
    */
   public void setData(ByteBuffer data) {
     if (data.remaining() < m_desc.getSize()) {
@@ -123,13 +116,12 @@ public final class DynamicStruct {
   /**
    * Gets the value of a boolean field.
    *
-   * @param field    field descriptor
+   * @param field field descriptor
    * @param arrIndex array index (must be less than field array size)
    * @return boolean field value
-   * @throws UnsupportedOperationException  if field is not bool type
-   * @throws IllegalArgumentException       if field is not a member of this
-   *                                        struct
-   * @throws IllegalStateException          if struct descriptor is invalid
+   * @throws UnsupportedOperationException if field is not bool type
+   * @throws IllegalArgumentException if field is not a member of this struct
+   * @throws IllegalStateException if struct descriptor is invalid
    * @throws ArrayIndexOutOfBoundsException if array index is out of bounds
    */
   public boolean getBoolField(StructFieldDescriptor field, int arrIndex) {
@@ -145,8 +137,8 @@ public final class DynamicStruct {
    * @param field field descriptor
    * @return boolean field value
    * @throws UnsupportedOperationException if field is not bool type
-   * @throws IllegalArgumentException      if field is not a member of this struct
-   * @throws IllegalStateException         if struct descriptor is invalid
+   * @throws IllegalArgumentException if field is not a member of this struct
+   * @throws IllegalStateException if struct descriptor is invalid
    */
   public boolean getBoolField(StructFieldDescriptor field) {
     return getBoolField(field, 0);
@@ -155,15 +147,14 @@ public final class DynamicStruct {
   /**
    * Sets the value of a boolean field.
    *
-   * @param field    field descriptor
-   * @param value    boolean value
+   * @param field field descriptor
+   * @param value boolean value
    * @param arrIndex array index (must be less than field array size)
-   * @throws UnsupportedOperationException  if field is not bool type
-   * @throws IllegalArgumentException       if field is not a member of this
-   *                                        struct
-   * @throws IllegalStateException          if struct descriptor is invalid
+   * @throws UnsupportedOperationException if field is not bool type
+   * @throws IllegalArgumentException if field is not a member of this struct
+   * @throws IllegalStateException if struct descriptor is invalid
    * @throws ArrayIndexOutOfBoundsException if array index is out of bounds
-   * @throws ReadOnlyBufferException        if the underlying buffer is read-only
+   * @throws ReadOnlyBufferException if the underlying buffer is read-only
    */
   public void setBoolField(StructFieldDescriptor field, boolean value, int arrIndex) {
     if (field.getType() != StructFieldType.kBool) {
@@ -178,9 +169,9 @@ public final class DynamicStruct {
    * @param field field descriptor
    * @param value boolean value
    * @throws UnsupportedOperationException if field is not bool type
-   * @throws IllegalArgumentException      if field is not a member of this struct
-   * @throws IllegalStateException         if struct descriptor is invalid
-   * @throws ReadOnlyBufferException       if the underlying buffer is read-only
+   * @throws IllegalArgumentException if field is not a member of this struct
+   * @throws IllegalStateException if struct descriptor is invalid
+   * @throws ReadOnlyBufferException if the underlying buffer is read-only
    */
   public void setBoolField(StructFieldDescriptor field, boolean value) {
     setBoolField(field, value, 0);
@@ -189,13 +180,12 @@ public final class DynamicStruct {
   /**
    * Gets the value of an integer field.
    *
-   * @param field    field descriptor
+   * @param field field descriptor
    * @param arrIndex array index (must be less than field array size)
    * @return integer field value
-   * @throws UnsupportedOperationException  if field is not integer type
-   * @throws IllegalArgumentException       if field is not a member of this
-   *                                        struct
-   * @throws IllegalStateException          if struct descriptor is invalid
+   * @throws UnsupportedOperationException if field is not integer type
+   * @throws IllegalArgumentException if field is not a member of this struct
+   * @throws IllegalStateException if struct descriptor is invalid
    * @throws ArrayIndexOutOfBoundsException if array index is out of bounds
    */
   public long getIntField(StructFieldDescriptor field, int arrIndex) {
@@ -211,8 +201,8 @@ public final class DynamicStruct {
    * @param field field descriptor
    * @return integer field value
    * @throws UnsupportedOperationException if field is not integer type
-   * @throws IllegalArgumentException      if field is not a member of this struct
-   * @throws IllegalStateException         if struct descriptor is invalid
+   * @throws IllegalArgumentException if field is not a member of this struct
+   * @throws IllegalStateException if struct descriptor is invalid
    */
   public long getIntField(StructFieldDescriptor field) {
     return getIntField(field, 0);
@@ -221,15 +211,14 @@ public final class DynamicStruct {
   /**
    * Sets the value of an integer field.
    *
-   * @param field    field descriptor
-   * @param value    integer value
+   * @param field field descriptor
+   * @param value integer value
    * @param arrIndex array index (must be less than field array size)
-   * @throws UnsupportedOperationException  if field is not integer type
-   * @throws IllegalArgumentException       if field is not a member of this
-   *                                        struct
-   * @throws IllegalStateException          if struct descriptor is invalid
+   * @throws UnsupportedOperationException if field is not integer type
+   * @throws IllegalArgumentException if field is not a member of this struct
+   * @throws IllegalStateException if struct descriptor is invalid
    * @throws ArrayIndexOutOfBoundsException if array index is out of bounds
-   * @throws ReadOnlyBufferException        if the underlying buffer is read-only
+   * @throws ReadOnlyBufferException if the underlying buffer is read-only
    */
   public void setIntField(StructFieldDescriptor field, long value, int arrIndex) {
     if (!field.isInt() && !field.isUint()) {
@@ -244,9 +233,9 @@ public final class DynamicStruct {
    * @param field field descriptor
    * @param value integer value
    * @throws UnsupportedOperationException if field is not integer type
-   * @throws IllegalArgumentException      if field is not a member of this struct
-   * @throws IllegalStateException         if struct descriptor is invalid
-   * @throws ReadOnlyBufferException       if the underlying buffer is read-only
+   * @throws IllegalArgumentException if field is not a member of this struct
+   * @throws IllegalStateException if struct descriptor is invalid
+   * @throws ReadOnlyBufferException if the underlying buffer is read-only
    */
   public void setIntField(StructFieldDescriptor field, long value) {
     setIntField(field, value, 0);
@@ -255,13 +244,12 @@ public final class DynamicStruct {
   /**
    * Gets the value of a float field.
    *
-   * @param field    field descriptor
+   * @param field field descriptor
    * @param arrIndex array index (must be less than field array size)
    * @return float field value
-   * @throws UnsupportedOperationException  if field is not float type
-   * @throws IllegalArgumentException       if field is not a member of this
-   *                                        struct
-   * @throws IllegalStateException          if struct descriptor is invalid
+   * @throws UnsupportedOperationException if field is not float type
+   * @throws IllegalArgumentException if field is not a member of this struct
+   * @throws IllegalStateException if struct descriptor is invalid
    * @throws ArrayIndexOutOfBoundsException if array index is out of bounds
    */
   public float getFloatField(StructFieldDescriptor field, int arrIndex) {
@@ -277,8 +265,8 @@ public final class DynamicStruct {
    * @param field field descriptor
    * @return float field value
    * @throws UnsupportedOperationException if field is not float type
-   * @throws IllegalArgumentException      if field is not a member of this struct
-   * @throws IllegalStateException         if struct descriptor is invalid
+   * @throws IllegalArgumentException if field is not a member of this struct
+   * @throws IllegalStateException if struct descriptor is invalid
    */
   public float getFloatField(StructFieldDescriptor field) {
     return getFloatField(field, 0);
@@ -287,15 +275,14 @@ public final class DynamicStruct {
   /**
    * Sets the value of a float field.
    *
-   * @param field    field descriptor
-   * @param value    float value
+   * @param field field descriptor
+   * @param value float value
    * @param arrIndex array index (must be less than field array size)
-   * @throws UnsupportedOperationException  if field is not float type
-   * @throws IllegalArgumentException       if field is not a member of this
-   *                                        struct
-   * @throws IllegalStateException          if struct descriptor is invalid
+   * @throws UnsupportedOperationException if field is not float type
+   * @throws IllegalArgumentException if field is not a member of this struct
+   * @throws IllegalStateException if struct descriptor is invalid
    * @throws ArrayIndexOutOfBoundsException if array index is out of bounds
-   * @throws ReadOnlyBufferException        if the underlying buffer is read-only
+   * @throws ReadOnlyBufferException if the underlying buffer is read-only
    */
   public void setFloatField(StructFieldDescriptor field, float value, int arrIndex) {
     if (field.getType() != StructFieldType.kFloat) {
@@ -310,9 +297,9 @@ public final class DynamicStruct {
    * @param field field descriptor
    * @param value float value
    * @throws UnsupportedOperationException if field is not float type
-   * @throws IllegalArgumentException      if field is not a member of this struct
-   * @throws IllegalStateException         if struct descriptor is invalid
-   * @throws ReadOnlyBufferException       if the underlying buffer is read-only
+   * @throws IllegalArgumentException if field is not a member of this struct
+   * @throws IllegalStateException if struct descriptor is invalid
+   * @throws ReadOnlyBufferException if the underlying buffer is read-only
    */
   public void setFloatField(StructFieldDescriptor field, float value) {
     setFloatField(field, value, 0);
@@ -321,13 +308,12 @@ public final class DynamicStruct {
   /**
    * Gets the value of a double field.
    *
-   * @param field    field descriptor
+   * @param field field descriptor
    * @param arrIndex array index (must be less than field array size)
    * @return double field value
-   * @throws UnsupportedOperationException  if field is not double type
-   * @throws IllegalArgumentException       if field is not a member of this
-   *                                        struct
-   * @throws IllegalStateException          if struct descriptor is invalid
+   * @throws UnsupportedOperationException if field is not double type
+   * @throws IllegalArgumentException if field is not a member of this struct
+   * @throws IllegalStateException if struct descriptor is invalid
    * @throws ArrayIndexOutOfBoundsException if array index is out of bounds
    */
   public double getDoubleField(StructFieldDescriptor field, int arrIndex) {
@@ -343,8 +329,8 @@ public final class DynamicStruct {
    * @param field field descriptor
    * @return double field value
    * @throws UnsupportedOperationException if field is not double type
-   * @throws IllegalArgumentException      if field is not a member of this struct
-   * @throws IllegalStateException         if struct descriptor is invalid
+   * @throws IllegalArgumentException if field is not a member of this struct
+   * @throws IllegalStateException if struct descriptor is invalid
    */
   public double getDoubleField(StructFieldDescriptor field) {
     return getDoubleField(field, 0);
@@ -353,15 +339,14 @@ public final class DynamicStruct {
   /**
    * Sets the value of a double field.
    *
-   * @param field    field descriptor
-   * @param value    double value
+   * @param field field descriptor
+   * @param value double value
    * @param arrIndex array index (must be less than field array size)
-   * @throws UnsupportedOperationException  if field is not double type
-   * @throws IllegalArgumentException       if field is not a member of this
-   *                                        struct
-   * @throws IllegalStateException          if struct descriptor is invalid
+   * @throws UnsupportedOperationException if field is not double type
+   * @throws IllegalArgumentException if field is not a member of this struct
+   * @throws IllegalStateException if struct descriptor is invalid
    * @throws ArrayIndexOutOfBoundsException if array index is out of bounds
-   * @throws ReadOnlyBufferException        if the underlying buffer is read-only
+   * @throws ReadOnlyBufferException if the underlying buffer is read-only
    */
   public void setDoubleField(StructFieldDescriptor field, double value, int arrIndex) {
     if (field.getType() != StructFieldType.kDouble) {
@@ -376,9 +361,9 @@ public final class DynamicStruct {
    * @param field field descriptor
    * @param value double value
    * @throws UnsupportedOperationException if field is not double type
-   * @throws IllegalArgumentException      if field is not a member of this struct
-   * @throws IllegalStateException         if struct descriptor is invalid
-   * @throws ReadOnlyBufferException       if the underlying buffer is read-only
+   * @throws IllegalArgumentException if field is not a member of this struct
+   * @throws IllegalStateException if struct descriptor is invalid
+   * @throws ReadOnlyBufferException if the underlying buffer is read-only
    */
   public void setDoubleField(StructFieldDescriptor field, double value) {
     setDoubleField(field, value, 0);
@@ -390,8 +375,8 @@ public final class DynamicStruct {
    * @param field field descriptor
    * @return field value
    * @throws UnsupportedOperationException if field is not char type
-   * @throws IllegalArgumentException      if field is not a member of this struct
-   * @throws IllegalStateException         if struct descriptor is invalid
+   * @throws IllegalArgumentException if field is not a member of this struct
+   * @throws IllegalStateException if struct descriptor is invalid
    */
   @SuppressWarnings({"PMD.CollapsibleIfStatements", "PMD.AvoidDeeplyNestedIfStmts"})
   public String getStringField(StructFieldDescriptor field) {
@@ -465,8 +450,8 @@ public final class DynamicStruct {
    * @param value field value
    * @return true if the full value fit in the struct, false if truncated
    * @throws UnsupportedOperationException if field is not char type
-   * @throws IllegalArgumentException      if field is not a member of this struct
-   * @throws IllegalStateException         if struct descriptor is invalid
+   * @throws IllegalArgumentException if field is not a member of this struct
+   * @throws IllegalStateException if struct descriptor is invalid
    */
   public boolean setStringField(StructFieldDescriptor field, String value) {
     if (field.getType() != StructFieldType.kChar) {
@@ -491,13 +476,12 @@ public final class DynamicStruct {
   /**
    * Gets the value of a struct field.
    *
-   * @param field    field descriptor
+   * @param field field descriptor
    * @param arrIndex array index (must be less than field array size)
    * @return field value
-   * @throws UnsupportedOperationException  if field is not of struct type
-   * @throws IllegalArgumentException       if field is not a member of this
-   *                                        struct
-   * @throws IllegalStateException          if struct descriptor is invalid
+   * @throws UnsupportedOperationException if field is not of struct type
+   * @throws IllegalArgumentException if field is not a member of this struct
+   * @throws IllegalStateException if struct descriptor is invalid
    * @throws ArrayIndexOutOfBoundsException if array index is out of bounds
    */
   public DynamicStruct getStructField(StructFieldDescriptor field, int arrIndex) {
@@ -524,8 +508,8 @@ public final class DynamicStruct {
    * @param field field descriptor
    * @return field value
    * @throws UnsupportedOperationException if field is not of struct type
-   * @throws IllegalArgumentException      if field is not a member of this struct
-   * @throws IllegalStateException         if struct descriptor is invalid
+   * @throws IllegalArgumentException if field is not a member of this struct
+   * @throws IllegalStateException if struct descriptor is invalid
    */
   public DynamicStruct getStructField(StructFieldDescriptor field) {
     return getStructField(field, 0);
@@ -534,15 +518,14 @@ public final class DynamicStruct {
   /**
    * Sets the value of a struct field.
    *
-   * @param field    field descriptor
-   * @param value    struct value
+   * @param field field descriptor
+   * @param value struct value
    * @param arrIndex array index (must be less than field array size)
-   * @throws UnsupportedOperationException  if field is not struct type
-   * @throws IllegalArgumentException       if field is not a member of this
-   *                                        struct
-   * @throws IllegalStateException          if struct descriptor is invalid
+   * @throws UnsupportedOperationException if field is not struct type
+   * @throws IllegalArgumentException if field is not a member of this struct
+   * @throws IllegalStateException if struct descriptor is invalid
    * @throws ArrayIndexOutOfBoundsException if array index is out of bounds
-   * @throws ReadOnlyBufferException        if the underlying buffer is read-only
+   * @throws ReadOnlyBufferException if the underlying buffer is read-only
    */
   public void setStructField(StructFieldDescriptor field, DynamicStruct value, int arrIndex) {
     if (field.getType() != StructFieldType.kStruct) {
@@ -576,9 +559,9 @@ public final class DynamicStruct {
    * @param field field descriptor
    * @param value struct value
    * @throws UnsupportedOperationException if field is not struct type
-   * @throws IllegalArgumentException      if field is not a member of this struct
-   * @throws IllegalStateException         if struct descriptor is invalid
-   * @throws ReadOnlyBufferException       if the underlying buffer is read-only
+   * @throws IllegalArgumentException if field is not a member of this struct
+   * @throws IllegalStateException if struct descriptor is invalid
+   * @throws ReadOnlyBufferException if the underlying buffer is read-only
    */
   public void setStructField(StructFieldDescriptor field, DynamicStruct value) {
     setStructField(field, value, 0);
@@ -661,34 +644,38 @@ public final class DynamicStruct {
 
     // handle bit shifting and masking into current value
     switch (field.m_size) {
-      case 1: {
-        byte val = m_data.get(field.m_offset + arrIndex);
-        val &= (byte) ~(field.getBitMask() << field.m_bitShift);
-        val |= (byte) ((value & field.getBitMask()) << field.m_bitShift);
-        m_data.put(field.m_offset + arrIndex, val);
-        break;
-      }
-      case 2: {
-        short val = m_data.getShort(field.m_offset + arrIndex * 2);
-        val &= (short) ~(field.getBitMask() << field.m_bitShift);
-        val |= (short) ((value & field.getBitMask()) << field.m_bitShift);
-        m_data.putShort(field.m_offset + arrIndex * 2, val);
-        break;
-      }
-      case 4: {
-        int val = m_data.getInt(field.m_offset + arrIndex * 4);
-        val &= (int) ~(field.getBitMask() << field.m_bitShift);
-        val |= (int) ((value & field.getBitMask()) << field.m_bitShift);
-        m_data.putInt(field.m_offset + arrIndex * 4, val);
-        break;
-      }
-      case 8: {
-        long val = m_data.getLong(field.m_offset + arrIndex * 8);
-        val &= ~(field.getBitMask() << field.m_bitShift);
-        val |= (value & field.getBitMask()) << field.m_bitShift;
-        m_data.putLong(field.m_offset + arrIndex * 8, val);
-        break;
-      }
+      case 1:
+        {
+          byte val = m_data.get(field.m_offset + arrIndex);
+          val &= (byte) ~(field.getBitMask() << field.m_bitShift);
+          val |= (byte) ((value & field.getBitMask()) << field.m_bitShift);
+          m_data.put(field.m_offset + arrIndex, val);
+          break;
+        }
+      case 2:
+        {
+          short val = m_data.getShort(field.m_offset + arrIndex * 2);
+          val &= (short) ~(field.getBitMask() << field.m_bitShift);
+          val |= (short) ((value & field.getBitMask()) << field.m_bitShift);
+          m_data.putShort(field.m_offset + arrIndex * 2, val);
+          break;
+        }
+      case 4:
+        {
+          int val = m_data.getInt(field.m_offset + arrIndex * 4);
+          val &= (int) ~(field.getBitMask() << field.m_bitShift);
+          val |= (int) ((value & field.getBitMask()) << field.m_bitShift);
+          m_data.putInt(field.m_offset + arrIndex * 4, val);
+          break;
+        }
+      case 8:
+        {
+          long val = m_data.getLong(field.m_offset + arrIndex * 8);
+          val &= ~(field.getBitMask() << field.m_bitShift);
+          val |= (value & field.getBitMask()) << field.m_bitShift;
+          m_data.putLong(field.m_offset + arrIndex * 8, val);
+          break;
+        }
       default:
         throw new IllegalStateException("invalid field size");
     }
