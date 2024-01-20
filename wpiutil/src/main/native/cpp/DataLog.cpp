@@ -1050,8 +1050,7 @@ void DataLog::AppendStringArray(int entry,
   }
 }
 
-void DataLog::AppendStringArray(int entry,
-                                std::span<const WPI_DataLog_String> arr,
+void DataLog::AppendStringArray(int entry, std::span<const WPI_ConstString> arr,
                                 int64_t timestamp) {
   if (entry <= 0) {
     return;
@@ -1157,10 +1156,8 @@ void WPI_DataLog_AppendDouble(struct WPI_DataLog* datalog, int entry,
 }
 
 void WPI_DataLog_AppendString(struct WPI_DataLog* datalog, int entry,
-                              const char* value, size_t len,
-                              int64_t timestamp) {
-  reinterpret_cast<DataLog*>(datalog)->AppendString(entry, {value, len},
-                                                    timestamp);
+                              const WPI_ConstString* value, int64_t timestamp) {
+  reinterpret_cast<DataLog*>(datalog)->AppendString(entry, *value, timestamp);
 }
 
 void WPI_DataLog_AppendBooleanArray(struct WPI_DataLog* datalog, int entry,
@@ -1199,7 +1196,7 @@ void WPI_DataLog_AppendDoubleArray(struct WPI_DataLog* datalog, int entry,
 }
 
 void WPI_DataLog_AppendStringArray(struct WPI_DataLog* datalog, int entry,
-                                   const WPI_DataLog_String* arr, size_t len,
+                                   const WPI_ConstString* arr, size_t len,
                                    int64_t timestamp) {
   reinterpret_cast<DataLog*>(datalog)->AppendStringArray(entry, {arr, len},
                                                          timestamp);
