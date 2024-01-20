@@ -95,9 +95,9 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
   /**
    * Construct a DifferentialDrive.
    *
-   * <p>To pass multiple motors per side, use a {@link
-   * edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup}. If a motor needs to be inverted, do
-   * so before passing it in.
+   * <p>To pass multiple motors per side, use CAN motor controller followers or {@link
+   * edu.wpi.first.wpilibj.motorcontrol.PWMMotorController#addFollower(PWMMotorController)}. If a
+   * motor needs to be inverted, do so before passing it in.
    *
    * @param leftMotor Left motor.
    * @param rightMotor Right motor.
