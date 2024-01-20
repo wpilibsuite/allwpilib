@@ -15,6 +15,7 @@
 
 #include <stdint.h>
 
+#include <atomic>
 #include <thread>
 
 #include <hal/SimDevice.h>
@@ -114,8 +115,8 @@ class ADIS16448_IMU : public wpi::Sendable,
 
   ~ADIS16448_IMU() override;
 
-  ADIS16448_IMU(ADIS16448_IMU&&) = default;
-  ADIS16448_IMU& operator=(ADIS16448_IMU&&) = default;
+  ADIS16448_IMU(ADIS16448_IMU&&);
+  ADIS16448_IMU& operator=(ADIS16448_IMU&&);
 
   /**
    * Initialize the IMU.
@@ -414,10 +415,10 @@ class ADIS16448_IMU : public wpi::Sendable,
   double CompFilterProcess(double compAngle, double accelAngle, double omega);
 
   // State and resource variables
-  volatile bool m_thread_active = false;
-  volatile bool m_first_run = true;
-  volatile bool m_thread_idle = false;
-  volatile bool m_start_up_mode = true;
+  std::atomic<bool> m_thread_active = false;
+  std::atomic<bool> m_first_run = true;
+  std::atomic<bool> m_thread_idle = false;
+  std::atomic<bool> m_start_up_mode = true;
 
   bool m_auto_configured = false;
   SPI::Port m_spi_port;

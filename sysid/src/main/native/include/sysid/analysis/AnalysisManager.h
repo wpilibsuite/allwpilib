@@ -74,32 +74,63 @@ class AnalysisManager {
      * zero indicates it needs to be set to the default.
      */
     units::second_t stepTestDuration = 0_s;
+  };
+
+  struct FeedforwardGain {
+    /**
+     * The feedforward gain.
+     */
+    double gain = 1;
 
     /**
-     * The conversion factor of counts per revolution.
+     * Descriptor attached to the feedforward gain.
      */
-    int cpr = 1440;
+    std::string descriptor = "Feedforward gain.";
 
     /**
-     * The conversion factor of gearing.
+     * Whether the feedforward gain is valid.
      */
-    double gearing = 1;
+    bool isValidGain = true;
 
     /**
-     * Whether or not the gains should be in the encoder's units (mainly for use
-     * in a smart motor controller).
+     * Error message attached to the feedforward gain.
      */
-    bool convertGainsToEncTicks = false;
+    std::string errorMessage = "No error.";
   };
 
   /**
-   * Stores feedforward.
+   * Stores feedforward gains.
    */
   struct FeedforwardGains {
     /**
-     * Stores the Feedforward gains.
+     * Stores the raw OLSResult from analysis.
      */
-    OLSResult ffGains;
+    OLSResult olsResult;
+
+    /**
+     * The static gain Ks.
+     */
+    FeedforwardGain Ks = {};
+
+    /**
+     * The velocity gain kV.
+     */
+    FeedforwardGain Kv = {};
+
+    /**
+     * The acceleration gain kA.
+     */
+    FeedforwardGain Ka = {};
+
+    /**
+     * The gravity gain Kg.
+     */
+    FeedforwardGain Kg = {};
+
+    /**
+     * The offset (arm).
+     */
+    FeedforwardGain offset = {};
   };
 
   /**
@@ -193,7 +224,8 @@ class AnalysisManager {
    * @param ff The feedforward gains.
    * @return The calculated feedback gains.
    */
-  FeedbackGains CalculateFeedback(std::vector<double> ff);
+  FeedbackGains CalculateFeedback(const FeedforwardGain& Kv,
+                                  const FeedforwardGain& Ka);
 
   /**
    * Overrides the units in the JSON with the user-provided ones.

@@ -1,6 +1,7 @@
 include(CMakeFindDependencyMacro)
 @FILENAME_DEP_REPLACE@
 @WPIUTIL_DEP_REPLACE@
+@WPINET_DEP_REPLACE@
 find_dependency(OpenCV)
 
 @FILENAME_DEP_REPLACE@

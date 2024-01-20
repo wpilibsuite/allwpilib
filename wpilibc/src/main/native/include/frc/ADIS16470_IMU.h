@@ -15,6 +15,7 @@
 
 #include <stdint.h>
 
+#include <atomic>
 #include <thread>
 
 #include <hal/SimDevice.h>
@@ -143,8 +144,8 @@ class ADIS16470_IMU : public wpi::Sendable,
 
   ~ADIS16470_IMU() override;
 
-  ADIS16470_IMU(ADIS16470_IMU&&) = default;
-  ADIS16470_IMU& operator=(ADIS16470_IMU&&) = default;
+  ADIS16470_IMU(ADIS16470_IMU&& other);
+  ADIS16470_IMU& operator=(ADIS16470_IMU&& other);
 
   /**
    * Configures the decimation rate of the IMU.
@@ -500,9 +501,9 @@ class ADIS16470_IMU : public wpi::Sendable,
   double CompFilterProcess(double compAngle, double accelAngle, double omega);
 
   // State and resource variables
-  volatile bool m_thread_active = false;
-  volatile bool m_first_run = true;
-  volatile bool m_thread_idle = false;
+  std::atomic<bool> m_thread_active = false;
+  std::atomic<bool> m_first_run = true;
+  std::atomic<bool> m_thread_idle = false;
   bool m_auto_configured = false;
   SPI::Port m_spi_port;
   uint16_t m_calibration_time = 0;

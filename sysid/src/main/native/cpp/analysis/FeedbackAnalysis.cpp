@@ -20,7 +20,7 @@ using Ka_t = decltype(1_V / 1_mps_sq);
 
 FeedbackGains sysid::CalculatePositionFeedbackGains(
     const FeedbackControllerPreset& preset, const LQRParameters& params,
-    double Kv, double Ka, double encFactor) {
+    double Kv, double Ka) {
   // If acceleration requires no effort, velocity becomes an input for position
   // control. We choose an appropriate model in this case to avoid numerical
   // instabilities in the LQR.
@@ -34,9 +34,9 @@ FeedbackGains sysid::CalculatePositionFeedbackGains(
     // Compensate for any latency from sensor measurements, filtering, etc.
     controller.LatencyCompensate(system, preset.period, 0.0_s);
 
-    return {controller.K(0, 0) * preset.outputConversionFactor / encFactor,
+    return {controller.K(0, 0) * preset.outputConversionFactor,
             controller.K(0, 1) * preset.outputConversionFactor /
-                (encFactor * (preset.normalized ? 1 : preset.period.value()))};
+                (preset.normalized ? 1 : preset.period.value())};
   }
 
   // This is our special model to avoid instabilities in the LQR.
@@ -49,8 +49,7 @@ FeedbackGains sysid::CalculatePositionFeedbackGains(
   // Compensate for any latency from sensor measurements, filtering, etc.
   controller.LatencyCompensate(system, preset.period, 0.0_s);
 
-  return {Kv * controller.K(0, 0) * preset.outputConversionFactor / encFactor,
-          0.0};
+  return {Kv * controller.K(0, 0) * preset.outputConversionFactor, 0.0};
 }
 
 FeedbackGains sysid::CalculateVelocityFeedbackGains(

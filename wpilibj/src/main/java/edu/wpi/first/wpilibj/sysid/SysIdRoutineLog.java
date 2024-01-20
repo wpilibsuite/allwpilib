@@ -32,7 +32,7 @@ import java.util.Map;
 public class SysIdRoutineLog {
   private final Map<String, Map<String, DoubleLogEntry>> m_logEntries = new HashMap<>();
   private final String m_logName;
-  private final StringLogEntry m_state;
+  private StringLogEntry m_state;
 
   /**
    * Create a new logging utility for a SysId test routine.
@@ -44,8 +44,6 @@ public class SysIdRoutineLog {
    */
   public SysIdRoutineLog(String logName) {
     m_logName = logName;
-    m_state = new StringLogEntry(DataLogManager.getLog(), "sysid-test-state-" + logName);
-    m_state.append(State.kNone.toString());
   }
 
   /** Possible state of a SysId routine. */
@@ -221,6 +219,9 @@ public class SysIdRoutineLog {
    * @param state The current state of the SysId test routine.
    */
   public void recordState(State state) {
+    if (m_state == null) {
+      m_state = new StringLogEntry(DataLogManager.getLog(), "sysid-test-state-" + m_logName);
+    }
     m_state.append(state.toString());
   }
 }

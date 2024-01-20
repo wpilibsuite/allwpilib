@@ -1205,4 +1205,17 @@ void WPI_DataLog_AppendStringArray(struct WPI_DataLog* datalog, int entry,
                                                          timestamp);
 }
 
+void WPI_DataLog_AddSchemaString(struct WPI_DataLog* datalog, const char* name,
+                                 const char* type, const char* schema,
+                                 int64_t timestamp) {
+  reinterpret_cast<DataLog*>(datalog)->AddSchema(name, type, schema, timestamp);
+}
+
+void WPI_DataLog_AddSchema(struct WPI_DataLog* datalog, const char* name,
+                           const char* type, const uint8_t* schema,
+                           size_t schema_len, int64_t timestamp) {
+  reinterpret_cast<DataLog*>(datalog)->AddSchema(
+      name, type, std::span<const uint8_t>{schema, schema_len}, timestamp);
+}
+
 }  // extern "C"
