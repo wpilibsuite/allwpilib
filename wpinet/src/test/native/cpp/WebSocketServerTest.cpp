@@ -167,7 +167,7 @@ TEST_F(WebSocketServerTest, CloseReason) {
     ws->closed.connect([&](uint16_t code, std::string_view reason) {
       ++gotClosed;
       ASSERT_EQ(code, 1000);
-      ASSERT_EQ(reason, "hangup");
+      ASSERT_EQ(reason, "remote close: hangup");
     });
   };
   // need to respond with close for server to finish shutdown
@@ -237,7 +237,7 @@ TEST_F(WebSocketServerTest, ReceiveCloseReason) {
     ws->closed.connect([&](uint16_t code, std::string_view reason) {
       ++gotClosed;
       ASSERT_EQ(code, 1000);
-      ASSERT_EQ(reason, "hangup");
+      ASSERT_EQ(reason, "remote close: hangup");
     });
   };
   const uint8_t contents[] = {0x03u, 0xe8u, 'h', 'a', 'n', 'g', 'u', 'p'};
