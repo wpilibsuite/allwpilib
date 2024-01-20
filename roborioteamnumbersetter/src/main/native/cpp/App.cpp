@@ -246,15 +246,14 @@ static void DisplayGui() {
           }
           std::string formatted =
               fmt::format("Image: {}", deviceStatus.value().image);
-          ImGui::Text(formatted.c_str());
+          ImGui::Text("%s", formatted.c_str());
           formatted = fmt::format("Serial Number: {}",
                                   deviceStatus.value().serialNumber);
-          ImGui::Text(formatted.c_str());
+          ImGui::Text("%s", formatted.c_str());
           formatted = fmt::format(
               "Web Server Status: {}",
               deviceStatus.value().webServerEnabled ? "Enabled" : "Disabled");
-          ImGui::Text(formatted.c_str());
-
+          ImGui::Text("%s", formatted.c_str());
         } else {
           ImGui::Text("Waiting for refresh");
         }
