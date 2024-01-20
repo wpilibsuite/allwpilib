@@ -19,6 +19,10 @@
 #include "wpinet/uv/Error.h"
 #include "wpinet/uv/Loop.h"
 
+namespace wpi {
+class Logger;
+}  // namespace wpi
+
 namespace wpi::uv {
 
 /**
@@ -220,6 +224,18 @@ class Handle : public std::enable_shared_from_this<Handle> {
   void SetData(std::shared_ptr<void> data) { m_data = std::move(data); }
 
   /**
+   * Sets logger.
+   * @param logger Logger
+   */
+  void SetLogger(Logger* logger) { m_logger = logger; }
+
+  /**
+   * Gets logger.
+   * @return Logger, or nullptr if none set
+   */
+  Logger* GetLogger() const { return m_logger; }
+
+  /**
    * Error signal
    */
   sig::Signal<Error> error;
@@ -264,6 +280,7 @@ class Handle : public std::enable_shared_from_this<Handle> {
   std::function<Buffer(size_t)> m_allocBuf{&Buffer::Allocate};
   std::function<void(Buffer&)> m_freeBuf{&DefaultFreeBuf};
   std::shared_ptr<void> m_data;
+  Logger* m_logger = nullptr;
 };
 
 /**
