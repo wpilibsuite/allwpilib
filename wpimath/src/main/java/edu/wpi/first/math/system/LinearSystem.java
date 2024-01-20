@@ -180,7 +180,7 @@ public class LinearSystem<States extends Num, Inputs extends Num, Outputs extend
       Matrix<States, N1> x, Matrix<Inputs, N1> clampedU, double dtSeconds) {
     var discABpair = Discretization.discretizeAB(m_A, m_B, dtSeconds);
 
-    return (discABpair.getFirst().times(x)).plus(discABpair.getSecond().times(clampedU));
+    return discABpair.getFirst().times(x).plus(discABpair.getSecond().times(clampedU));
   }
 
   /**

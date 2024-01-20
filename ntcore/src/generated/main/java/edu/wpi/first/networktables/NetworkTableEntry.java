@@ -1009,7 +1009,5 @@ public final class NetworkTableEntry implements Publisher, Subscriber {
   }
 
   private final Topic m_topic;
-
-  /** Native handle. */
-  protected int m_handle;
+  private final int m_handle;
 }

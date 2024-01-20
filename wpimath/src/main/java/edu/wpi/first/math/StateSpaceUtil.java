@@ -80,7 +80,7 @@ public final class StateSpaceUtil {
       if (tolerances.get(i, 0) == Double.POSITIVE_INFINITY) {
         result.set(i, i, 0.0);
       } else {
-        result.set(i, i, 1.0 / (Math.pow(tolerances.get(i, 0), 2)));
+        result.set(i, i, 1.0 / Math.pow(tolerances.get(i, 0), 2));
       }
     }
 
