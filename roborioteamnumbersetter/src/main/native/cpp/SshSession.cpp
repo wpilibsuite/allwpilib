@@ -92,7 +92,7 @@ void SshSession::Execute(std::string_view cmd) {
   char buf[512];
   int read = ssh_channel_read(channel, buf, sizeof(buf), 0);
   if (read != 0) {
-    if (read < (sizeof(buf) / sizeof(buf[0]))) {
+    if (read < static_cast<int>(sizeof(buf) / sizeof(buf[0]))) {
       buf[read] = 0;
     } else {
       buf[(sizeof(buf) / sizeof(buf[0])) - 1] = 0;
@@ -102,7 +102,7 @@ void SshSession::Execute(std::string_view cmd) {
 
   read = ssh_channel_read(channel, buf, sizeof(buf), 1);
   if (read != 0) {
-    if (read < (sizeof(buf) / sizeof(buf[0]))) {
+    if (read < static_cast<int>(sizeof(buf) / sizeof(buf[0]))) {
       buf[read] = 0;
     } else {
       buf[(sizeof(buf) / sizeof(buf[0])) - 1] = 0;
