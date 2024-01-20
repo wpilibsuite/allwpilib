@@ -73,7 +73,7 @@ int WebSocketWriteReqBase::Continue(Stream& stream, std::shared_ptr<Req> req) {
   }
 
   int sentBytes = stream.TryWrite(bufs);
-  WS_DEBUG("TryWrite({}) -> {} (expected {})\n", bufs.size(), sentBytes,
+  WS_DEBUG(stream, "TryWrite({}) -> {} (expected {})", bufs.size(), sentBytes,
            numBytes);
   if (sentBytes < 0) {
     return sentBytes;  // error
@@ -133,10 +133,10 @@ int WebSocketWriteReqBase::Continue(Stream& stream, std::shared_ptr<Req> req) {
   m_continueBufPos += bufIt - bufs.begin();
 
   if (writeBufs.empty()) {
-    WS_DEBUG("Write Done\n");
+    WS_DEBUG(stream, "Write Done");
     return 0;
   }
-  WS_DEBUG("Write({})\n", writeBufs.size());
+  WS_DEBUG(stream, "Write({})", writeBufs.size());
   stream.Write(writeBufs, req);
   return 1;
 }
@@ -146,7 +146,7 @@ std::span<const WebSocket::Frame> TrySendFrames(
     bool server, Stream& stream, std::span<const WebSocket::Frame> frames,
     MakeReq&& makeReq,
     std::function<void(std::span<uv::Buffer>, uv::Error)> callback) {
-  WS_DEBUG("TrySendFrames({})\n", frames.size());
+  WS_DEBUG(stream, "TrySendFrames({})", frames.size());
   auto frameIt = frames.begin();
   auto frameEnd = frames.end();
   while (frameIt != frameEnd) {
@@ -168,8 +168,8 @@ std::span<const WebSocket::Frame> TrySendFrames(
 
     // try to send
     int sentBytes = stream.TryWrite(sendFrames.m_bufs);
-    WS_DEBUG("TryWrite({}) -> {} (expected {})\n", sendFrames.m_bufs.size(),
-             sentBytes, numBytes);
+    WS_DEBUG(stream, "TryWrite({}) -> {} (expected {})",
+             sendFrames.m_bufs.size(), sentBytes, numBytes);
 
     if (sentBytes == 0) {
       // we haven't started a frame yet; clean up any bufs that have actually
@@ -281,7 +281,7 @@ std::span<const WebSocket::Frame> TrySendFrames(
         req->m_userBufs.append(it->data.begin(), it->data.end());
       }
 
-      WS_DEBUG("Write({})\n", writeBufs.size());
+      WS_DEBUG(stream, "Write({})", writeBufs.size());
       stream.Write(writeBufs, req);
 #ifdef __clang__
       // work around clang bug
