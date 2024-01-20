@@ -382,6 +382,7 @@ void NewDriverStationData() {
   }
   lastGiven = given;
 
+  SimDriverStationData->dsAttached = true;
   driverStation->newDataEvents.Wakeup();
   SimDriverStationData->CallNewDataCallbacks();
 }
