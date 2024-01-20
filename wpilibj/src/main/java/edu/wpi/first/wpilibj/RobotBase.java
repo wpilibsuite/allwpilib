@@ -6,7 +6,6 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.cameraserver.CameraServerShared;
 import edu.wpi.first.cameraserver.CameraServerSharedStore;
-import edu.wpi.first.cscore.CameraServerJNI;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -419,10 +418,6 @@ public abstract class RobotBase implements AutoCloseable {
 
     // Force refresh DS data
     DriverStation.refreshData();
-
-    // Call a CameraServer JNI function to force OpenCV native library loading
-    // Needed because all the OpenCV JNI functions don't have built in loading
-    CameraServerJNI.enumerateSinks();
 
     HAL.report(
         tResourceType.kResourceType_Language, tInstances.kLanguage_Java, 0, WPILibVersion.Version);
