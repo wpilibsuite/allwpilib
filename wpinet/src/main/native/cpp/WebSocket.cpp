@@ -418,6 +418,8 @@ static inline void Unmask(std::span<uint8_t> data,
 }
 
 void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
+  m_lastReceivedTime = m_stream.GetLoopRef().Now().count();
+
   // ignore incoming data if we're failed or closed
   if (m_state == FAILED || m_state == CLOSED) {
     return;
