@@ -186,7 +186,7 @@ bool DeploySession::Blink(const std::string& macAddress,
 }
 
 bool DeploySession::DisableWebServer(const std::string& macAddress,
-                          unsigned int ipAddress) {
+                                     unsigned int ipAddress) {
   auto itr = s_outstanding.find(macAddress);
   if (itr != s_outstanding.end()) {
     return false;
@@ -208,8 +208,10 @@ bool DeploySession::DisableWebServer(const std::string& macAddress,
           SUCCESS("roboRIO Connected!");
 
           try {
-            session.Execute("/bin/bash -c \"/etc/init.d/systemWebServer stop\"");
-            session.Execute("/bin/bash -c \"update-rc.d -f systemWebServer remove\"");
+            session.Execute(
+                "/bin/bash -c \"/etc/init.d/systemWebServer stop\"");
+            session.Execute(
+                "/bin/bash -c \"update-rc.d -f systemWebServer remove\"");
             session.Execute("/bin/bash -c \"sync\"");
           } catch (const SshSession::SshException& e) {
             ERROR("An exception occurred: {}", e.what());
@@ -227,7 +229,7 @@ bool DeploySession::DisableWebServer(const std::string& macAddress,
 }
 
 bool DeploySession::EnableWebServer(const std::string& macAddress,
-                          unsigned int ipAddress) {
+                                    unsigned int ipAddress) {
   auto itr = s_outstanding.find(macAddress);
   if (itr != s_outstanding.end()) {
     return false;
@@ -249,8 +251,10 @@ bool DeploySession::EnableWebServer(const std::string& macAddress,
           SUCCESS("roboRIO Connected!");
 
           try {
-            session.Execute("/bin/bash -c \"update-rc.d -f systemWebServer defaults\"");
-            session.Execute("/bin/bash -c \"/etc/init.d/systemWebServer start\"");
+            session.Execute(
+                "/bin/bash -c \"update-rc.d -f systemWebServer defaults\"");
+            session.Execute(
+                "/bin/bash -c \"/etc/init.d/systemWebServer start\"");
             session.Execute("/bin/bash -c \"sync\"");
           } catch (const SshSession::SshException& e) {
             ERROR("An exception occurred: {}", e.what());
