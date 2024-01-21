@@ -46,10 +46,17 @@ bool LocalStorage::MultiSubscriberData::Matches(std::string_view name,
 }
 
 int LocalStorage::DataLoggerData::Start(TopicData* topic, int64_t time) {
+  std::string_view typeStr = topic->typeStr;
+  // NT and DataLog use different standard representations for int and int[]
+  if (typeStr == "int") {
+    typeStr = "int64";
+  } else if (typeStr == "int[]") {
+    typeStr = "int64[]";
+  }
   return log.Start(fmt::format("{}{}", logPrefix,
                                wpi::drop_front(topic->name, prefix.size())),
-                   topic->typeStr == "int" ? "int64" : topic->typeStr,
-                   DataLoggerEntry::MakeMetadata(topic->propertiesStr), time);
+                   typeStr, DataLoggerEntry::MakeMetadata(topic->propertiesStr),
+                   time);
 }
 
 void LocalStorage::DataLoggerEntry::Append(const Value& v) {
