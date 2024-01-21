@@ -108,14 +108,18 @@ class DriverStationSimTest {
   void testDsAttached() {
     HAL.initialize(500, 0);
     DriverStationSim.resetData();
+    DriverStation.refreshData();
 
+    assertFalse(DriverStationSim.getDsAttached());
+    assertFalse(DriverStation.isDSAttached());
     DriverStationSim.notifyNewData();
+    assertTrue(DriverStationSim.getDsAttached());
     assertTrue(DriverStation.isDSAttached());
 
     BooleanCallback callback = new BooleanCallback();
     try (CallbackStore cb = DriverStationSim.registerDsAttachedCallback(callback, false)) {
       DriverStationSim.setDsAttached(false);
-      DriverStationSim.notifyNewData();
+      DriverStation.refreshData();
       assertFalse(DriverStationSim.getDsAttached());
       assertFalse(DriverStation.isDSAttached());
       assertTrue(callback.wasTriggered());
