@@ -423,8 +423,8 @@ class ADIS16470_IMU : public wpi::Sendable,
   static constexpr double grav = 9.81;
 
   /** @brief Resources **/
-  DigitalInput* m_reset_in;
-  DigitalOutput* m_status_led;
+  DigitalInput* m_reset_in = nullptr;
+  DigitalOutput* m_status_led = nullptr;
 
   /**
    * @brief Switches to standard SPI operation. Primarily used when exiting auto
