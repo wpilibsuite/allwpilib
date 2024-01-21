@@ -53,7 +53,7 @@ public class SysIdRoutine extends SysIdRoutineLog {
    * @param mechanism Hardware interface for the SysId routine.
    */
   public SysIdRoutine(Config config, Mechanism mechanism) {
-    super(mechanism.m_subsystem.getName());
+    super(mechanism.m_name);
     m_config = config;
     m_mechanism = mechanism;
     m_recordState = config.m_recordState != null ? config.m_recordState : this::recordState;
