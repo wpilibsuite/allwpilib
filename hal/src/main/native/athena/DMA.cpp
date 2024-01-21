@@ -9,6 +9,7 @@
 #include <cstring>
 #include <memory>
 #include <type_traits>
+
 #include <fmt/format.h>
 
 #include "AnalogInternal.h"
