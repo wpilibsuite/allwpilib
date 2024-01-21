@@ -179,7 +179,7 @@ class SysIdRoutine : public frc::sysid::SysIdRoutineLog {
    * @param mechanism Hardware interface for the SysId routine.
    */
   SysIdRoutine(Config config, Mechanism mechanism)
-      : SysIdRoutineLog(mechanism.m_subsystem->GetName()),
+      : SysIdRoutineLog(mechanism.m_name),
         m_config(config),
         m_mechanism(mechanism),
         m_recordState(config.m_recordState ? config.m_recordState
