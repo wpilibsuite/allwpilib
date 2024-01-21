@@ -737,10 +737,10 @@ enum HAL_DMAReadStatus HAL_ReadDMADirect(void* dmaPointer,
                      &remainingBytes, status);
 
   if ((remainingBytes % dma->captureStore.captureSize) != 0) {
-    fmt::println(
+    fmt::print(
         "Remaining bytes {} is not a multiple of capture size {}. This is "
         "likely a "
-        "bug in WPILib. Please report this issue with a copy of your code.",
+        "bug in WPILib. Please report this issue with a copy of your code.\n",
         remainingBytes, dma->captureStore.captureSize);
   }
 
