@@ -17,6 +17,7 @@ import edu.wpi.first.math.kinematics.Kinematics;
 import edu.wpi.first.math.kinematics.Odometry;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.util.Some;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -167,12 +168,12 @@ public class PoseEstimator<T> {
     // Step 1: Get the pose odometry measured at the moment the vision measurement was made.
     var sample = m_poseBuffer.getSample(timestampSeconds);
 
-    if (sample.isEmpty()) {
+    if (!(sample instanceof Some<InterpolationRecord>(var odometry))) {
       return;
     }
 
     // Step 2: Measure the twist between the odometry pose and the vision pose.
-    var twist = sample.get().poseMeters.log(visionRobotPoseMeters);
+    var twist = odometry.poseMeters.log(visionRobotPoseMeters);
 
     // Step 3: We should not trust the twist entirely, so instead we scale this twist by a Kalman
     // gain matrix representing how much we trust vision measurements compared to our current pose.
@@ -184,15 +185,13 @@ public class PoseEstimator<T> {
 
     // Step 5: Reset Odometry to state at sample with vision adjustment.
     m_odometry.resetPosition(
-        sample.get().gyroAngle,
-        sample.get().wheelPositions,
-        sample.get().poseMeters.exp(scaledTwist));
+        odometry.gyroAngle, odometry.wheelPositions, odometry.poseMeters.exp(scaledTwist));
 
     // Step 6: Record the current pose to allow multiple measurements from the same timestamp
     m_poseBuffer.addSample(
         timestampSeconds,
         new InterpolationRecord(
-            getEstimatedPosition(), sample.get().gyroAngle, sample.get().wheelPositions));
+            getEstimatedPosition(), odometry.gyroAngle, odometry.wheelPositions));
 
     // Step 7: Replay odometry inputs between sample time and latest recorded sample to update the
     // pose buffer and correct odometry.

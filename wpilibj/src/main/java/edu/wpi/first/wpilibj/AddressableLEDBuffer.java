@@ -74,24 +74,12 @@ public class AddressableLEDBuffer {
     final int X = (chroma * remainder) >> 8;
 
     switch (region) {
-      case 0:
-        setRGB(index, v, X + m, m);
-        break;
-      case 1:
-        setRGB(index, v - X, v, m);
-        break;
-      case 2:
-        setRGB(index, m, v, X + m);
-        break;
-      case 3:
-        setRGB(index, m, v - X, v);
-        break;
-      case 4:
-        setRGB(index, X + m, m, v);
-        break;
-      default:
-        setRGB(index, v, m, v - X);
-        break;
+      case 0 -> setRGB(index, v, X + m, m);
+      case 1 -> setRGB(index, v - X, v, m);
+      case 2 -> setRGB(index, m, v, X + m);
+      case 3 -> setRGB(index, m, v - X, v);
+      case 4 -> setRGB(index, X + m, m, v);
+      default -> setRGB(index, v, m, v - X);
     }
   }
 

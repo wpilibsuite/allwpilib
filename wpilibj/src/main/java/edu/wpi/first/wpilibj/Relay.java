@@ -11,11 +11,11 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.RelayJNI;
 import edu.wpi.first.hal.util.HalHandleException;
 import edu.wpi.first.hal.util.UncleanStatusException;
+import edu.wpi.first.util.Option;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import java.util.Arrays;
-import java.util.Optional;
 
 /**
  * Class for VEX Robotics Spike style relay outputs. Relays are intended to be connected to Spikes
@@ -74,8 +74,9 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
      * @param value The pretty string.
      * @return The value or an empty optional if there is no corresponding value.
      */
-    public static Optional<Value> getValueOf(String value) {
-      return Arrays.stream(Value.values()).filter(v -> v.m_prettyValue.equals(value)).findFirst();
+    public static Option<Value> getValueOf(String value) {
+      return Option.wrapOptional(
+          Arrays.stream(Value.values()).filter(v -> v.m_prettyValue.equals(value)).findFirst());
     }
   }
 
@@ -182,23 +183,23 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
    */
   public void set(Value value) {
     switch (value) {
-      case kOff:
+      case kOff -> {
         if (m_direction == Direction.kBoth || m_direction == Direction.kForward) {
           RelayJNI.setRelay(m_forwardHandle, false);
         }
         if (m_direction == Direction.kBoth || m_direction == Direction.kReverse) {
           RelayJNI.setRelay(m_reverseHandle, false);
         }
-        break;
-      case kOn:
+      }
+      case kOn -> {
         if (m_direction == Direction.kBoth || m_direction == Direction.kForward) {
           RelayJNI.setRelay(m_forwardHandle, true);
         }
         if (m_direction == Direction.kBoth || m_direction == Direction.kReverse) {
           RelayJNI.setRelay(m_reverseHandle, true);
         }
-        break;
-      case kForward:
+      }
+      case kForward -> {
         if (m_direction == Direction.kReverse) {
           throw new InvalidValueException(
               "A relay configured for reverse cannot be set to " + "forward");
@@ -209,8 +210,8 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
         if (m_direction == Direction.kBoth) {
           RelayJNI.setRelay(m_reverseHandle, false);
         }
-        break;
-      case kReverse:
+      }
+      case kReverse -> {
         if (m_direction == Direction.kForward) {
           throw new InvalidValueException(
               "A relay configured for forward cannot be set to " + "reverse");
@@ -221,9 +222,10 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
         if (m_direction == Direction.kBoth || m_direction == Direction.kReverse) {
           RelayJNI.setRelay(m_reverseHandle, true);
         }
-        break;
-      default:
+      }
+      default -> {
         // Cannot hit this, limited by Value enum
+      }
     }
   }
 

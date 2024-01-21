@@ -57,8 +57,7 @@ public class SwerveModuleState
 
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof SwerveModuleState) {
-      SwerveModuleState other = (SwerveModuleState) obj;
+    if (obj instanceof SwerveModuleState other) {
       return Math.abs(other.speedMetersPerSecond - speedMetersPerSecond) < 1E-9
           && angle.equals(other.angle);
     }

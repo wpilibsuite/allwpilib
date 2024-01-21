@@ -50,10 +50,7 @@ public class TimedRobot extends IterativeRobotBase {
 
     @Override
     public boolean equals(Object rhs) {
-      if (rhs instanceof Callback) {
-        return Double.compare(expirationTime, ((Callback) rhs).expirationTime) == 0;
-      }
-      return false;
+      return rhs instanceof Callback callback && expirationTime == callback.expirationTime;
     }
 
     @Override

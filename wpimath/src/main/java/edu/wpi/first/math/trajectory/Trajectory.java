@@ -383,14 +383,8 @@ public class Trajectory implements ProtobufSerializable {
 
     @Override
     public boolean equals(Object obj) {
-      if (this == obj) {
-        return true;
-      }
-      if (!(obj instanceof State)) {
-        return false;
-      }
-      State state = (State) obj;
-      return Double.compare(state.timeSeconds, timeSeconds) == 0
+      return obj instanceof State state
+          && Double.compare(state.timeSeconds, timeSeconds) == 0
           && Double.compare(state.velocityMetersPerSecond, velocityMetersPerSecond) == 0
           && Double.compare(state.accelerationMetersPerSecondSq, accelerationMetersPerSecondSq) == 0
           && Double.compare(state.curvatureRadPerMeter, curvatureRadPerMeter) == 0
@@ -421,6 +415,6 @@ public class Trajectory implements ProtobufSerializable {
 
   @Override
   public boolean equals(Object obj) {
-    return obj instanceof Trajectory && m_states.equals(((Trajectory) obj).getStates());
+    return obj instanceof Trajectory other && m_states.equals(other.getStates());
   }
 }

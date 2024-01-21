@@ -39,11 +39,7 @@ public class AprilTag {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof AprilTag) {
-      var other = (AprilTag) obj;
-      return ID == other.ID && pose.equals(other.pose);
-    }
-    return false;
+    return obj instanceof AprilTag tag && ID == tag.ID && pose.equals(tag.pose);
   }
 
   @Override

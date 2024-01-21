@@ -53,8 +53,7 @@ public class DifferentialDriveWheelPositions
 
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof DifferentialDriveWheelPositions) {
-      DifferentialDriveWheelPositions other = (DifferentialDriveWheelPositions) obj;
+    if (obj instanceof DifferentialDriveWheelPositions other) {
       return Math.abs(other.leftMeters - leftMeters) < 1E-9
           && Math.abs(other.rightMeters - rightMeters) < 1E-9;
     }

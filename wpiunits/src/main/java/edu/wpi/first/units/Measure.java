@@ -95,11 +95,11 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
     if (unit() instanceof Per
         && other.unit().getBaseUnit().equals(((Per<?, ?>) unit()).denominator().getBaseUnit())) {
       // denominator of the Per cancels out, return with just the units of the numerator
-      Unit<?> numerator = ((Per<?, ?>) unit()).numerator();
+      Unit<?> numerator = per.numerator();
       return numerator.ofBaseUnits(baseUnitMagnitude() * other.baseUnitMagnitude());
     } else if (unit() instanceof Velocity && other.unit().getBaseUnit().equals(Seconds)) {
       // Multiplying a velocity by a time, return the scalar unit (eg Distance)
-      Unit<?> numerator = ((Velocity<?>) unit()).getUnit();
+      Unit<?> numerator = v.getUnit();
       return numerator.ofBaseUnits(baseUnitMagnitude() * other.baseUnitMagnitude());
     } else if (other.unit() instanceof Per
         && unit().getBaseUnit().equals(((Per<?, ?>) other.unit()).denominator().getBaseUnit())) {

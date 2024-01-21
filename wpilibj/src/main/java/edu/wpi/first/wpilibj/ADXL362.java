@@ -193,23 +193,21 @@ public class ADXL362 implements NTSendable, AutoCloseable {
       return;
     }
 
-    final byte value;
-    switch (range) {
-      case k2G:
-        value = kFilterCtl_Range2G;
-        m_gsPerLSB = 0.001;
-        break;
-      case k4G:
-        value = kFilterCtl_Range4G;
-        m_gsPerLSB = 0.002;
-        break;
-      case k8G:
-        value = kFilterCtl_Range8G;
-        m_gsPerLSB = 0.004;
-        break;
-      default:
-        throw new IllegalArgumentException("Missing case for range type " + range);
-    }
+    final byte value =
+        switch (range) {
+          case k2G -> {
+            m_gsPerLSB = 0.001;
+            yield kFilterCtl_Range2G;
+          }
+          case k4G -> {
+            m_gsPerLSB = 0.002;
+            yield kFilterCtl_Range4G;
+          }
+          case k8G -> {
+            m_gsPerLSB = 0.004;
+            yield kFilterCtl_Range8G;
+          }
+        };
 
     // Specify the data format to read
     byte[] commands =

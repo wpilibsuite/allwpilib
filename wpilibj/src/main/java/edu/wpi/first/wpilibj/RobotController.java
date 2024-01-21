@@ -345,18 +345,13 @@ public final class RobotController {
      * @return state
      */
     public static RadioLEDState fromValue(int value) {
-      switch (value) {
-        case LEDJNI.RADIO_LED_STATE_OFF:
-          return RadioLEDState.kOff;
-        case LEDJNI.RADIO_LED_STATE_GREEN:
-          return RadioLEDState.kGreen;
-        case LEDJNI.RADIO_LED_STATE_RED:
-          return RadioLEDState.kRed;
-        case LEDJNI.RADIO_LED_STATE_ORANGE:
-          return RadioLEDState.kOrange;
-        default:
-          return RadioLEDState.kOff;
-      }
+      return switch (value) {
+        case LEDJNI.RADIO_LED_STATE_OFF -> RadioLEDState.kOff;
+        case LEDJNI.RADIO_LED_STATE_GREEN -> RadioLEDState.kGreen;
+        case LEDJNI.RADIO_LED_STATE_RED -> RadioLEDState.kRed;
+        case LEDJNI.RADIO_LED_STATE_ORANGE -> RadioLEDState.kOrange;
+        default -> RadioLEDState.kOff;
+      };
     }
   }
 

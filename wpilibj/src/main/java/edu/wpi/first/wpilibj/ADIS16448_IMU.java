@@ -1057,16 +1057,11 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
    * @return Yaw axis angle in degrees (CCW positive).
    */
   public synchronized double getAngle() {
-    switch (m_yaw_axis) {
-      case kX:
-        return getGyroAngleX();
-      case kY:
-        return getGyroAngleY();
-      case kZ:
-        return getGyroAngleZ();
-      default:
-        return 0.0;
-    }
+    return switch (m_yaw_axis) {
+      case kX -> getGyroAngleX();
+      case kY -> getGyroAngleY();
+      case kZ -> getGyroAngleZ();
+    };
   }
 
   /**
@@ -1075,16 +1070,11 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
    * @return Yaw axis angular rate in degrees per second (CCW positive).
    */
   public synchronized double getRate() {
-    switch (m_yaw_axis) {
-      case kX:
-        return getGyroRateX();
-      case kY:
-        return getGyroRateY();
-      case kZ:
-        return getGyroRateZ();
-      default:
-        return 0.0;
-    }
+    return switch (m_yaw_axis) {
+      case kX -> getGyroRateX();
+      case kY -> getGyroRateY();
+      case kZ -> getGyroRateZ();
+    };
   }
 
   /**

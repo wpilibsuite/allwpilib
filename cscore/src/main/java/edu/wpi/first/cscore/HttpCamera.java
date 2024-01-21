@@ -40,16 +40,12 @@ public class HttpCamera extends VideoCamera {
    * @return The kind
    */
   public static HttpCameraKind getHttpCameraKindFromInt(int kind) {
-    switch (kind) {
-      case 1:
-        return HttpCameraKind.kMJPGStreamer;
-      case 2:
-        return HttpCameraKind.kCSCore;
-      case 3:
-        return HttpCameraKind.kAxis;
-      default:
-        return HttpCameraKind.kUnknown;
-    }
+    return switch (kind) {
+      case 1 -> HttpCameraKind.kMJPGStreamer;
+      case 2 -> HttpCameraKind.kCSCore;
+      case 3 -> HttpCameraKind.kAxis;
+      default -> HttpCameraKind.kUnknown;
+    };
   }
 
   /**

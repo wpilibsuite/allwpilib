@@ -40,17 +40,11 @@ public class Debouncer {
 
     resetTimer();
 
-    switch (m_debounceType) {
-      case kBoth: // fall-through
-      case kRising:
-        m_baseline = false;
-        break;
-      case kFalling:
-        m_baseline = true;
-        break;
-      default:
-        throw new IllegalArgumentException("Invalid debounce type!");
-    }
+    m_baseline =
+        switch (m_debounceType) {
+          case kBoth, kRising -> false;
+          case kFalling -> true;
+        };
   }
 
   /**

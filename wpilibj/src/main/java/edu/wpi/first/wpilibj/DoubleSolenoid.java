@@ -125,21 +125,12 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
    * @param value The value to set (Off, Forward, Reverse)
    */
   public void set(final Value value) {
-    int setValue;
-
-    switch (value) {
-      case kOff:
-        setValue = 0;
-        break;
-      case kForward:
-        setValue = m_forwardMask;
-        break;
-      case kReverse:
-        setValue = m_reverseMask;
-        break;
-      default:
-        throw new AssertionError("Illegal value: " + value);
-    }
+    int setValue =
+        switch (value) {
+          case kOff -> 0;
+          case kForward -> m_forwardMask;
+          case kReverse -> m_reverseMask;
+        };
 
     m_module.setSolenoids(m_mask, setValue);
   }

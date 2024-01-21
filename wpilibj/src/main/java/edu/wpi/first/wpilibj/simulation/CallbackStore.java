@@ -107,7 +107,7 @@ public class CallbackStore implements AutoCloseable {
         break;
       default:
         assert false;
-        break;
+      }
     }
     m_cancelType = kAlreadyCancelled;
   }

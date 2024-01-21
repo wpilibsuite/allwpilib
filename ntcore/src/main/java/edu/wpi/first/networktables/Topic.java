@@ -321,14 +321,7 @@ public class Topic {
 
   @Override
   public boolean equals(Object other) {
-    if (other == this) {
-      return true;
-    }
-    if (!(other instanceof Topic)) {
-      return false;
-    }
-
-    return m_handle == ((Topic) other).m_handle;
+    return other instanceof Topic topic && m_handle == topic.m_handle;
   }
 
   @Override

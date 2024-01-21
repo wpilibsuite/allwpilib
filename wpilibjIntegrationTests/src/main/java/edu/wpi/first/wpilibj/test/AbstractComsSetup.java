@@ -106,7 +106,7 @@ public abstract class AbstractComsSetup {
     protected void failed(Throwable throwable, Description description, String status) {
       TestBench.out().println();
       // Instance of is the best way I know to retrieve this data.
-      if (throwable instanceof MultipleFailureException) {
+      if (throwable instanceof MultipleFailureException mfe) {
         /*
          * MultipleFailureExceptions hold multiple exceptions in one exception.
          * In order to properly display these stack traces we have to cast the
@@ -114,8 +114,8 @@ public abstract class AbstractComsSetup {
          * it.
          */
         int exceptionCount = 1; // Running exception count
-        int failureCount = ((MultipleFailureException) throwable).getFailures().size();
-        for (Throwable singleThrown : ((MultipleFailureException) throwable).getFailures()) {
+        int failureCount = mfe.getFailures().size();
+        for (Throwable singleThrown : mfe.getFailures()) {
           getClassLogger()
               .logp(
                   Level.SEVERE,

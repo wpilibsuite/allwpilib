@@ -103,11 +103,11 @@ final class ShuffleboardInstance implements ShuffleboardRoot {
    */
   private void apply(ShuffleboardContainer container, Consumer<ComplexWidget> func) {
     for (ShuffleboardComponent<?> component : container.getComponents()) {
-      if (component instanceof ComplexWidget) {
-        func.accept((ComplexWidget) component);
+      if (component instanceof ComplexWidget widget) {
+        func.accept(widget);
       }
-      if (component instanceof ShuffleboardContainer) {
-        apply((ShuffleboardContainer) component, func);
+      if (component instanceof ShuffleboardContainer nestedContainer) {
+        apply(nestedContainer, func);
       }
     }
   }

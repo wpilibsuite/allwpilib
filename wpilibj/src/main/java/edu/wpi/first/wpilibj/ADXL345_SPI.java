@@ -171,23 +171,13 @@ public class ADXL345_SPI implements NTSendable, AutoCloseable {
    *     measure.
    */
   public void setRange(Range range) {
-    final byte value;
-    switch (range) {
-      case k2G:
-        value = 0;
-        break;
-      case k4G:
-        value = 1;
-        break;
-      case k8G:
-        value = 2;
-        break;
-      case k16G:
-        value = 3;
-        break;
-      default:
-        throw new IllegalArgumentException("Missing case for range type " + range);
-    }
+    final byte value =
+        switch (range) {
+          case k2G -> 0;
+          case k4G -> 1;
+          case k8G -> 2;
+          case k16G -> 3;
+        };
 
     // Specify the data format to read
     byte[] commands = new byte[] {kDataFormatRegister, (byte) (kDataFormat_FullRes | value)};

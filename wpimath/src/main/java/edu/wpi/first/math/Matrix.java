@@ -727,18 +727,9 @@ public class Matrix<R extends Num, C extends Num> {
    */
   @Override
   public boolean equals(Object other) {
-    if (this == other) {
-      return true;
-    }
-    if (!(other instanceof Matrix)) {
-      return false;
-    }
-
-    Matrix<?, ?> matrix = (Matrix<?, ?>) other;
-    if (MatrixFeatures_DDRM.hasUncountable(matrix.m_storage.getDDRM())) {
-      return false;
-    }
-    return MatrixFeatures_DDRM.isEquals(this.m_storage.getDDRM(), matrix.m_storage.getDDRM());
+    return other instanceof Matrix<?, ?> matrix
+      && !MatrixFeatures_DDRM.hasUncountable(matrix.m_storage.getDDRM())
+      && MatrixFeatures_DDRM.isEquals(this.m_storage.getDDRM(), matrix.m_storage.getDDRM());
   }
 
   @Override

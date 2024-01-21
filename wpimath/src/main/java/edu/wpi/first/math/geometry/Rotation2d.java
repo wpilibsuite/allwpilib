@@ -316,8 +316,7 @@ public class Rotation2d
    */
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof Rotation2d) {
-      var other = (Rotation2d) obj;
+    if (obj instanceof Rotation2d other) {
       return Math.hypot(m_cos - other.m_cos, m_sin - other.m_sin) < 1E-9;
     }
     return false;

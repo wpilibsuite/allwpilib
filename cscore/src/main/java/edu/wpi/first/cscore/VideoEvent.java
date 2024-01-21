@@ -75,48 +75,28 @@ public class VideoEvent {
    * @return The kind
    */
   public static Kind getKindFromInt(int kind) {
-    switch (kind) {
-      case 0x0001:
-        return Kind.kSourceCreated;
-      case 0x0002:
-        return Kind.kSourceDestroyed;
-      case 0x0004:
-        return Kind.kSourceConnected;
-      case 0x0008:
-        return Kind.kSourceDisconnected;
-      case 0x0010:
-        return Kind.kSourceVideoModesUpdated;
-      case 0x0020:
-        return Kind.kSourceVideoModeChanged;
-      case 0x0040:
-        return Kind.kSourcePropertyCreated;
-      case 0x0080:
-        return Kind.kSourcePropertyValueUpdated;
-      case 0x0100:
-        return Kind.kSourcePropertyChoicesUpdated;
-      case 0x0200:
-        return Kind.kSinkSourceChanged;
-      case 0x0400:
-        return Kind.kSinkCreated;
-      case 0x0800:
-        return Kind.kSinkDestroyed;
-      case 0x1000:
-        return Kind.kSinkEnabled;
-      case 0x2000:
-        return Kind.kSinkDisabled;
-      case 0x4000:
-        return Kind.kNetworkInterfacesChanged;
-      case 0x10000:
-        return Kind.kSinkPropertyCreated;
-      case 0x20000:
-        return Kind.kSinkPropertyValueUpdated;
-      case 0x40000:
-        return Kind.kSinkPropertyChoicesUpdated;
-      case 0x80000:
-        return Kind.kUsbCamerasChanged;
-      default:
-        return Kind.kUnknown;
-    }
+    return switch (kind) {
+      case 0x0001 -> Kind.kSourceCreated;
+      case 0x0002 -> Kind.kSourceDestroyed;
+      case 0x0004 -> Kind.kSourceConnected;
+      case 0x0008 -> Kind.kSourceDisconnected;
+      case 0x0010 -> Kind.kSourceVideoModesUpdated;
+      case 0x0020 -> Kind.kSourceVideoModeChanged;
+      case 0x0040 -> Kind.kSourcePropertyCreated;
+      case 0x0080 -> Kind.kSourcePropertyValueUpdated;
+      case 0x0100 -> Kind.kSourcePropertyChoicesUpdated;
+      case 0x0200 -> Kind.kSinkSourceChanged;
+      case 0x0400 -> Kind.kSinkCreated;
+      case 0x0800 -> Kind.kSinkDestroyed;
+      case 0x1000 -> Kind.kSinkEnabled;
+      case 0x2000 -> Kind.kSinkDisabled;
+      case 0x4000 -> Kind.kNetworkInterfacesChanged;
+      case 0x10000 -> Kind.kSinkPropertyCreated;
+      case 0x20000 -> Kind.kSinkPropertyValueUpdated;
+      case 0x40000 -> Kind.kSinkPropertyChoicesUpdated;
+      case 0x80000 -> Kind.kUsbCamerasChanged;
+      default -> Kind.kUnknown;
+    };
   }
 
   VideoEvent(

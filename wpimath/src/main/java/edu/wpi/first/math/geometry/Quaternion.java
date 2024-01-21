@@ -140,9 +140,7 @@ public class Quaternion implements ProtobufSerializable, StructSerializable {
    */
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof Quaternion) {
-      var other = (Quaternion) obj;
-
+    if (obj instanceof Quaternion other) {
       return Math.abs(dot(other) - norm() * other.norm()) < 1e-9
           && Math.abs(norm() - other.norm()) < 1e-9;
     }
