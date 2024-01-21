@@ -262,7 +262,8 @@ class NetworkTable final {
    */
   template <typename T, typename... I>
     requires wpi::StructSerializable<T, I...>
-  StructArrayTopic<T, I...> GetStructArrayTopic(std::string_view name, I... info) const {
+  StructArrayTopic<T, I...> GetStructArrayTopic(std::string_view name,
+                                                I... info) const {
     return StructArrayTopic<T, I...>{GetTopic(name), std::move(info)...};
   }
 
