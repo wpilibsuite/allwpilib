@@ -246,6 +246,7 @@ class NetworkTable final {
    * Gets a raw struct serialized value topic.
    *
    * @param name topic name
+   * @param info optional struct type info
    * @return Topic
    */
   template <typename T, typename... I>
@@ -258,6 +259,7 @@ class NetworkTable final {
    * Gets a raw struct serialized array topic.
    *
    * @param name topic name
+   * @param info optional struct type info
    * @return Topic
    */
   template <typename T, typename... I>
