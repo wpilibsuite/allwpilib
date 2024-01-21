@@ -86,18 +86,91 @@ void SshSession::Execute(std::string_view cmd) {
     ssh_channel_free(channel);
     throw SshException(ssh_get_error(m_session));
   }
-  INFO("{}", cmd);
+  INFO("{} {}", ssh_channel_get_exit_status(channel), cmd);
 
   // Log output.
   char buf[512];
   int read = ssh_channel_read(channel, buf, sizeof(buf), 0);
   if (read != 0) {
-    INFO("{}", cmd);
+    if (read < static_cast<int>(sizeof(buf) / sizeof(buf[0]))) {
+      buf[read] = 0;
+    } else {
+      buf[(sizeof(buf) / sizeof(buf[0])) - 1] = 0;
+    }
+    INFO("stdout: {} {}", read, buf);
+  }
+
+  read = ssh_channel_read(channel, buf, sizeof(buf), 1);
+  if (read != 0) {
+    if (read < static_cast<int>(sizeof(buf) / sizeof(buf[0]))) {
+      buf[read] = 0;
+    } else {
+      buf[(sizeof(buf) / sizeof(buf[0])) - 1] = 0;
+    }
+    INFO("stderr: {} {}", read, buf);
   }
 
   // Close and free channel.
   ssh_channel_close(channel);
   ssh_channel_free(channel);
+}
+
+std::string SshSession::ExecuteResult(std::string_view cmd, int* exitStatus) {
+  // Allocate a new channel.
+  ssh_channel channel = ssh_channel_new(m_session);
+  if (!channel) {
+    throw SshException(ssh_get_error(m_session));
+  }
+
+  // Open the channel.
+  int rc = ssh_channel_open_session(channel);
+  if (rc != SSH_OK) {
+    throw SshException(ssh_get_error(m_session));
+  }
+
+  // Execute the command.
+  std::string command{cmd};
+  rc = ssh_channel_request_exec(channel, command.c_str());
+  if (rc != SSH_OK) {
+    ssh_channel_close(channel);
+    ssh_channel_free(channel);
+    throw SshException(ssh_get_error(m_session));
+  }
+  INFO("{} {}", ssh_channel_get_exit_status(channel), cmd);
+
+  std::string result;
+  if (exitStatus) {
+    *exitStatus = ssh_channel_get_exit_status(channel);
+  }
+
+  // Log output.
+  char buf[512];
+  int read = ssh_channel_read(channel, buf, sizeof(buf), 0);
+  if (read != 0) {
+    if (read < static_cast<int>(sizeof(buf) / sizeof(buf[0]))) {
+      buf[read] = 0;
+    } else {
+      buf[(sizeof(buf) / sizeof(buf[0])) - 1] = 0;
+    }
+    result = buf;
+    INFO("stdout: {} {}", read, buf);
+  }
+
+  read = ssh_channel_read(channel, buf, sizeof(buf), 1);
+  if (read != 0) {
+    if (read < static_cast<int>(sizeof(buf) / sizeof(buf[0]))) {
+      buf[read] = 0;
+    } else {
+      buf[(sizeof(buf) / sizeof(buf[0])) - 1] = 0;
+    }
+    INFO("stderr: {} {}", read, buf);
+  }
+
+  // Close and free channel.
+  ssh_channel_close(channel);
+  ssh_channel_free(channel);
+
+  return result;
 }
 
 void SshSession::Put(std::string_view path, std::string_view contents) {
