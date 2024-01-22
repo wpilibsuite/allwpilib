@@ -23,6 +23,9 @@ namespace wpi {
 constexpr std::string_view to_string_view(const WPI_String& str) {
   return {str.str, str.len};
 }
+constexpr WPI_String make_string(std::string_view view) {
+  return WPI_String{view.data(), view.size()};
+}
 }  // namespace wpi
 #endif  // __cplusplus
 

@@ -155,11 +155,11 @@ NT_Inst NT_GetInstanceFromHandle(NT_Handle handle) {
  * Table Functions
  */
 
-NT_Entry NT_GetEntry(NT_Inst inst, const char* name, size_t name_len) {
-  return nt::GetEntry(inst, {name, name_len});
+NT_Entry NT_GetEntry(NT_Inst inst, const struct WPI_String* name) {
+  return nt::GetEntry(inst, wpi::to_string_view(*name));
 }
 
-void NT_GetEntryName(NT_Entry entry, WPI_String* name) {
+void NT_GetEntryName(NT_Entry entry, struct WPI_String* name) {
   nt::ConvertToC(nt::GetEntryName(entry), name);
 }
 
@@ -201,41 +201,39 @@ struct NT_Value* NT_ReadQueueValue(NT_Handle subentry, size_t* count) {
   return ConvertToC<NT_Value>(nt::ReadQueueValue(subentry), count);
 }
 
-NT_Topic* NT_GetTopics(NT_Inst inst, const char* prefix, size_t prefix_len,
+NT_Topic* NT_GetTopics(NT_Inst inst, const struct WPI_String* prefix,
                        unsigned int types, size_t* count) {
-  auto info_v = nt::GetTopics(inst, {prefix, prefix_len}, types);
+  auto info_v = nt::GetTopics(inst, wpi::to_string_view(*prefix), types);
   return ConvertToC<NT_Topic>(info_v, count);
 }
 
-NT_Topic* NT_GetTopicsStr(NT_Inst inst, const char* prefix, size_t prefix_len,
-                          const char* const* types, size_t types_len,
+NT_Topic* NT_GetTopicsStr(NT_Inst inst, const struct WPI_String* prefix,
+                          const struct WPI_String* types, size_t types_len,
                           size_t* count) {
   wpi::SmallVector<std::string_view, 4> typesCpp;
   typesCpp.reserve(types_len);
   for (size_t i = 0; i < types_len; ++i) {
-    typesCpp.emplace_back(types[i]);
+    typesCpp.emplace_back(wpi::to_string_view(types[i]));
   }
-  auto info_v = nt::GetTopics(inst, {prefix, prefix_len}, typesCpp);
+  auto info_v = nt::GetTopics(inst, wpi::to_string_view(*prefix), typesCpp);
   return ConvertToC<NT_Topic>(info_v, count);
 }
 
-struct NT_TopicInfo* NT_GetTopicInfos(NT_Inst inst, const char* prefix,
-                                      size_t prefix_len, unsigned int types,
-                                      size_t* count) {
-  auto info_v = nt::GetTopicInfo(inst, {prefix, prefix_len}, types);
+struct NT_TopicInfo* NT_GetTopicInfos(NT_Inst inst, const struct WPI_String* prefix,
+                                      unsigned int types, size_t* count) {
+  auto info_v = nt::GetTopicInfo(inst, wpi::to_string_view(*prefix), types);
   return ConvertToC<NT_TopicInfo>(info_v, count);
 }
 
-struct NT_TopicInfo* NT_GetTopicInfosStr(NT_Inst inst, const char* prefix,
-                                         size_t prefix_len,
-                                         const char* const* types,
+struct NT_TopicInfo* NT_GetTopicInfosStr(NT_Inst inst, const struct WPI_String* prefix,
+                                         const struct WPI_String* types,
                                          size_t types_len, size_t* count) {
   wpi::SmallVector<std::string_view, 4> typesCpp;
   typesCpp.reserve(types_len);
   for (size_t i = 0; i < types_len; ++i) {
-    typesCpp.emplace_back(types[i]);
+    typesCpp.emplace_back(wpi::to_string_view(types[i]));
   }
-  auto info_v = nt::GetTopicInfo(inst, {prefix, prefix_len}, typesCpp);
+  auto info_v = nt::GetTopicInfo(inst, wpi::to_string_view(*prefix), typesCpp);
   return ConvertToC<NT_TopicInfo>(info_v, count);
 }
 
@@ -248,11 +246,11 @@ NT_Bool NT_GetTopicInfo(NT_Topic topic, struct NT_TopicInfo* info) {
   return true;
 }
 
-NT_Topic NT_GetTopic(NT_Inst inst, const char* name, size_t name_len) {
-  return nt::GetTopic(inst, std::string_view{name, name_len});
+NT_Topic NT_GetTopic(NT_Inst inst, const struct WPI_String* name) {
+  return nt::GetTopic(inst, wpi::to_string_view(*name));
 }
 
-void NT_GetTopicName(NT_Topic topic, WPI_String* name) {
+void NT_GetTopicName(NT_Topic topic, struct WPI_String* name) {
   nt::ConvertToC(nt::GetTopicName(topic), name);
 }
 
@@ -260,7 +258,7 @@ NT_Type NT_GetTopicType(NT_Topic topic) {
   return nt::GetTopicType(topic);
 }
 
-void NT_GetTopicTypeString(NT_Topic topic, WPI_String* type) {
+void NT_GetTopicTypeString(NT_Topic topic, struct WPI_String* type) {
   nt::ConvertToC(nt::GetTopicTypeString(topic), type);
 }
 
@@ -292,81 +290,84 @@ NT_Bool NT_GetTopicExists(NT_Handle handle) {
   return nt::GetTopicExists(handle);
 }
 
-void NT_GetTopicProperty(NT_Topic topic, const char* name, WPI_String* prop) {
-  wpi::json j = nt::GetTopicProperty(topic, name);
+void NT_GetTopicProperty(NT_Topic topic, const struct WPI_String* name,
+                         struct WPI_String* prop) {
+  wpi::json j = nt::GetTopicProperty(topic, wpi::to_string_view(*name));
   nt::ConvertToC(j.dump(), prop);
 }
 
-NT_Bool NT_SetTopicProperty(NT_Topic topic, const char* name,
-                            const char* value) {
+NT_Bool NT_SetTopicProperty(NT_Topic topic, const struct WPI_String* name,
+                            const struct WPI_String* value) {
   wpi::json j;
   try {
-    j = wpi::json::parse(value);
+    j = wpi::json::parse(wpi::to_string_view(*value));
   } catch (wpi::json::parse_error&) {
     return false;
   }
-  nt::SetTopicProperty(topic, name, j);
+  nt::SetTopicProperty(topic, wpi::to_string_view(*name), j);
   return true;
 }
 
-void NT_DeleteTopicProperty(NT_Topic topic, const char* name) {
-  nt::DeleteTopicProperty(topic, name);
+void NT_DeleteTopicProperty(NT_Topic topic, const struct WPI_String* name) {
+  nt::DeleteTopicProperty(topic, wpi::to_string_view(*name));
 }
 
-void NT_GetTopicProperties(NT_Topic topic, WPI_String* property) {
+void NT_GetTopicProperties(NT_Topic topic, struct WPI_String* property) {
   wpi::json j = nt::GetTopicProperties(topic);
   nt::ConvertToC(j.dump(), property);
 }
 
-NT_Bool NT_SetTopicProperties(NT_Topic topic, const char* properties) {
+NT_Bool NT_SetTopicProperties(NT_Topic topic, const struct WPI_String* properties) {
   wpi::json j;
   try {
-    j = wpi::json::parse(properties);
+    j = wpi::json::parse(wpi::to_string_view(*properties));
   } catch (wpi::json::parse_error&) {
     return false;
   }
   return nt::SetTopicProperties(topic, j);
 }
 
-NT_Subscriber NT_Subscribe(NT_Topic topic, NT_Type type, const char* typeStr,
+NT_Subscriber NT_Subscribe(NT_Topic topic, NT_Type type,
+                           const struct WPI_String* typeStr,
                            const struct NT_PubSubOptions* options) {
-  return nt::Subscribe(topic, type, typeStr, ConvertToCpp(options));
+  return nt::Subscribe(topic, type, wpi::to_string_view(*typeStr), ConvertToCpp(options));
 }
 
 void NT_Unsubscribe(NT_Subscriber sub) {
   return nt::Unsubscribe(sub);
 }
 
-NT_Publisher NT_Publish(NT_Topic topic, NT_Type type, const char* typeStr,
+NT_Publisher NT_Publish(NT_Topic topic, NT_Type type, const struct WPI_String* typeStr,
                         const struct NT_PubSubOptions* options) {
-  return nt::Publish(topic, type, typeStr, ConvertToCpp(options));
+  return nt::Publish(topic, type, wpi::to_string_view(*typeStr), ConvertToCpp(options));
 }
 
-NT_Publisher NT_PublishEx(NT_Topic topic, NT_Type type, const char* typeStr,
-                          const char* properties,
+NT_Publisher NT_PublishEx(NT_Topic topic, NT_Type type,
+                          const struct WPI_String* typeStr,
+                          const struct WPI_String* properties,
                           const struct NT_PubSubOptions* options) {
   wpi::json j;
-  if (properties[0] == '\0') {
+  if (properties->len == 0) {
     // gracefully handle empty string
     j = wpi::json::object();
   } else {
     try {
-      j = wpi::json::parse(properties);
+      j = wpi::json::parse(wpi::to_string_view(*properties));
     } catch (wpi::json::parse_error&) {
       return {};
     }
   }
 
-  return nt::PublishEx(topic, type, typeStr, j, ConvertToCpp(options));
+  return nt::PublishEx(topic, type, wpi::to_string_view(*typeStr), j, ConvertToCpp(options));
 }
 
 void NT_Unpublish(NT_Handle pubentry) {
   return nt::Unpublish(pubentry);
 }
 
-NT_Entry NT_GetEntryEx(NT_Topic topic, NT_Type type, const char* typeStr,
+NT_Entry NT_GetEntryEx(NT_Topic topic, NT_Type type, const struct WPI_String* typeStr,
                        const struct NT_PubSubOptions* options) {
-  return nt::GetEntry(topic, type, typeStr, ConvertToCpp(options));
+  return nt::GetEntry(topic, type, wpi::to_string_view(*typeStr), ConvertToCpp(options));
 }
 
 void NT_ReleaseEntry(NT_Entry entry) {
@@ -406,10 +407,10 @@ NT_Bool NT_WaitForListenerQueue(NT_Handle handle, double timeout) {
   return nt::WaitForListenerQueue(handle, timeout);
 }
 
-NT_Listener NT_AddListenerSingle(NT_Inst inst, const char* prefix,
-                                 size_t prefix_len, unsigned int mask,
+NT_Listener NT_AddListenerSingle(NT_Inst inst, const struct WPI_String* prefix,
+                                 unsigned int mask,
                                  void* data, NT_ListenerCallback callback) {
-  std::string_view p{prefix, prefix_len};
+  std::string_view p = wpi::to_string_view(*prefix);
   return nt::AddListener(inst, {{p}}, mask, [=](auto& event) {
     NT_Event event_c;
     ConvertToC(event, &event_c);
@@ -418,7 +419,7 @@ NT_Listener NT_AddListenerSingle(NT_Inst inst, const char* prefix,
   });
 }
 
-NT_Listener NT_AddListenerMultiple(NT_Inst inst, const WPI_String* prefixes,
+NT_Listener NT_AddListenerMultiple(NT_Inst inst, const struct WPI_String* prefixes,
                                    size_t prefixes_len, unsigned int mask,
                                    void* data, NT_ListenerCallback callback) {
   wpi::SmallVector<std::string_view, 8> p;
@@ -445,14 +446,14 @@ NT_Listener NT_AddListener(NT_Topic topic, unsigned int mask, void* data,
 }
 
 NT_Listener NT_AddPolledListenerSingle(NT_ListenerPoller poller,
-                                       const char* prefix, size_t prefix_len,
+                                       const struct WPI_String* prefix,
                                        unsigned int mask) {
-  std::string_view p{prefix, prefix_len};
+  std::string_view p = wpi::to_string_view(*prefix);
   return nt::AddPolledListener(poller, {{p}}, mask);
 }
 
 NT_Listener NT_AddPolledListenerMultiple(NT_ListenerPoller poller,
-                                         const WPI_String* prefixes,
+                                         const struct WPI_String* prefixes,
                                          size_t prefixes_len,
                                          unsigned int mask) {
   wpi::SmallVector<std::string_view, 8> p;
@@ -484,38 +485,40 @@ void NT_StopLocal(NT_Inst inst) {
   nt::StopLocal(inst);
 }
 
-void NT_StartServer(NT_Inst inst, const char* persist_filename,
-                    const char* listen_address, unsigned int port3,
+void NT_StartServer(NT_Inst inst, const struct WPI_String* persist_filename,
+                    const struct WPI_String* listen_address, unsigned int port3,
                     unsigned int port4) {
-  nt::StartServer(inst, persist_filename, listen_address, port3, port4);
+  nt::StartServer(inst, wpi::to_string_view(*persist_filename), wpi::to_string_view(*listen_address), port3, port4);
 }
 
 void NT_StopServer(NT_Inst inst) {
   nt::StopServer(inst);
 }
 
-void NT_StartClient3(NT_Inst inst, const char* identity) {
-  nt::StartClient3(inst, identity);
+void NT_StartClient3(NT_Inst inst, const struct WPI_String* identity) {
+  nt::StartClient3(inst, wpi::to_string_view(*identity));
 }
 
-void NT_StartClient4(NT_Inst inst, const char* identity) {
-  nt::StartClient4(inst, identity);
+void NT_StartClient4(NT_Inst inst, const struct WPI_String* identity) {
+  nt::StartClient4(inst, wpi::to_string_view(*identity));
 }
 
 void NT_StopClient(NT_Inst inst) {
   nt::StopClient(inst);
 }
 
-void NT_SetServer(NT_Inst inst, const char* server_name, unsigned int port) {
-  nt::SetServer(inst, server_name, port);
+void NT_SetServer(NT_Inst inst, const struct WPI_String* server_name,
+                  unsigned int port) {
+  nt::SetServer(inst, wpi::to_string_view(*server_name), port);
 }
 
-void NT_SetServerMulti(NT_Inst inst, size_t count, const char** server_names,
+void NT_SetServerMulti(NT_Inst inst, size_t count,
+                       const struct WPI_String* server_names,
                        const unsigned int* ports) {
   std::vector<std::pair<std::string_view, unsigned int>> servers;
   servers.reserve(count);
   for (size_t i = 0; i < count; ++i) {
-    servers.emplace_back(std::make_pair(server_names[i], ports[i]));
+    servers.emplace_back(std::make_pair(wpi::to_string_view(server_names[i]), ports[i]));
   }
   nt::SetServer(inst, servers);
 }
@@ -576,9 +579,10 @@ void NT_SetNow(int64_t timestamp) {
 }
 
 NT_DataLogger NT_StartEntryDataLog(NT_Inst inst, struct WPI_DataLog* log,
-                                   const char* prefix, const char* logPrefix) {
+                                   const struct WPI_String* prefix,
+                                   const struct WPI_String* logPrefix) {
   return nt::StartEntryDataLog(inst, *reinterpret_cast<wpi::log::DataLog*>(log),
-                               prefix, logPrefix);
+                               wpi::to_string_view(*prefix), wpi::to_string_view(*logPrefix));
 }
 
 void NT_StopEntryDataLog(NT_DataLogger logger) {
@@ -587,9 +591,9 @@ void NT_StopEntryDataLog(NT_DataLogger logger) {
 
 NT_ConnectionDataLogger NT_StartConnectionDataLog(NT_Inst inst,
                                                   struct WPI_DataLog* log,
-                                                  const char* name) {
+                                                  const struct WPI_String* name) {
   return nt::StartConnectionDataLog(
-      inst, *reinterpret_cast<wpi::log::DataLog*>(log), name);
+      inst, *reinterpret_cast<wpi::log::DataLog*>(log), wpi::to_string_view(*name));
 }
 
 void NT_StopConnectionDataLog(NT_ConnectionDataLogger logger) {
@@ -612,13 +616,14 @@ NT_Listener NT_AddPolledLogger(NT_ListenerPoller poller, unsigned int min_level,
   return nt::AddPolledLogger(poller, min_level, max_level);
 }
 
-NT_Bool NT_HasSchema(NT_Inst inst, const char* name) {
-  return nt::HasSchema(inst, name);
+NT_Bool NT_HasSchema(NT_Inst inst, const struct WPI_String* name) {
+  return nt::HasSchema(inst, wpi::to_string_view(*name));
 }
 
-void NT_AddSchema(NT_Inst inst, const char* name, const char* type,
+void NT_AddSchema(NT_Inst inst, const struct WPI_String* name, const struct WPI_String* type,
                   const uint8_t* schema, size_t schemaSize) {
-  nt::AddSchema(inst, name, type, {schema, schemaSize});
+  nt::AddSchema(inst, wpi::to_string_view(*name), wpi::to_string_view(*type),
+                {schema, schemaSize});
 }
 
 void NT_DisposeValue(NT_Value* value) {
@@ -736,8 +741,8 @@ double* NT_AllocateDoubleArray(size_t size) {
 }
 
 struct WPI_String* NT_AllocateStringArray(size_t size) {
-  WPI_String* retVal =
-      static_cast<WPI_String*>(wpi::safe_malloc(size * sizeof(WPI_String)));
+  struct WPI_String* retVal =
+      static_cast<struct WPI_String*>(wpi::safe_malloc(size * sizeof(struct WPI_String)));
   return retVal;
 }
 
@@ -892,15 +897,15 @@ double* NT_GetValueDoubleArray(const struct NT_Value* value,
   return arr;
 }
 
-WPI_String* NT_GetValueStringArray(const struct NT_Value* value,
-                                  uint64_t* last_change, size_t* arr_size) {
+struct WPI_String* NT_GetValueStringArray(const struct NT_Value* value,
+                                   uint64_t* last_change, size_t* arr_size) {
   if (!value || value->type != NT_Type::NT_STRING_ARRAY) {
     return nullptr;
   }
   *last_change = value->last_change;
   *arr_size = value->data.arr_string.size;
-  WPI_String* arr = static_cast<WPI_String*>(
-      wpi::safe_malloc(value->data.arr_string.size * sizeof(WPI_String)));
+  struct WPI_String* arr = static_cast<struct WPI_String*>(
+      wpi::safe_malloc(value->data.arr_string.size * sizeof(struct WPI_String)));
   for (size_t i = 0; i < value->data.arr_string.size; ++i) {
     size_t len = value->data.arr_string.arr[i].len;
     auto write = WPI_AllocateString(&arr[i], len);

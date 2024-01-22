@@ -230,13 +230,13 @@ struct NT_LogMessage {
   unsigned int level;
 
   /** The filename of the source file that generated the message. */
-  WPI_String filename;
+  struct WPI_String filename;
 
   /** The line number in the source file that generated the message. */
   unsigned int line;
 
   /** The message. */
-  WPI_String message;
+  struct WPI_String message;
 };
 
 /** NetworkTables time sync event data. */
@@ -401,10 +401,9 @@ NT_Inst NT_GetInstanceFromHandle(NT_Handle handle);
  *
  * @param inst      instance handle
  * @param name      entry name (UTF-8 string)
- * @param name_len  length of name in bytes
  * @return entry handle
  */
-NT_Entry NT_GetEntry(NT_Inst inst, const char* name, size_t name_len);
+NT_Entry NT_GetEntry(NT_Inst inst, const struct WPI_String* name);
 
 /**
  * Gets the name of the specified entry.
@@ -413,7 +412,7 @@ NT_Entry NT_GetEntry(NT_Inst inst, const char* name, size_t name_len);
  * @param entry     entry handle
  * @param name      entry name (output parameter)
  */
-void NT_GetEntryName(NT_Entry entry, WPI_String* name);
+void NT_GetEntryName(NT_Entry entry, struct WPI_String* name);
 
 /**
  * Gets the type for the specified key, or unassigned if non existent.
@@ -518,13 +517,12 @@ struct NT_Value* NT_ReadQueueValue(NT_Handle subentry, size_t* count);
  * @param inst          instance handle
  * @param prefix        name required prefix; only topics whose name
  *                      starts with this string are returned
- * @param prefix_len    length of prefix in bytes
  * @param types         bitmask of NT_Type values; 0 is treated specially
  *                      as a "don't care"
  * @param count         output parameter; set to length of returned array
  * @return Array of topic handles.
  */
-NT_Topic* NT_GetTopics(NT_Inst inst, const char* prefix, size_t prefix_len,
+NT_Topic* NT_GetTopics(NT_Inst inst, const struct WPI_String* prefix,
                        unsigned int types, size_t* count);
 
 /**
@@ -537,14 +535,13 @@ NT_Topic* NT_GetTopics(NT_Inst inst, const char* prefix, size_t prefix_len,
  * @param inst          instance handle
  * @param prefix        name required prefix; only topics whose name
  *                      starts with this string are returned
- * @param prefix_len    length of prefix in bytes
  * @param types         array of type strings
  * @param types_len     number of elements in types array
  * @param count         output parameter; set to length of returned array
  * @return Array of topic handles.
  */
-NT_Topic* NT_GetTopicsStr(NT_Inst inst, const char* prefix, size_t prefix_len,
-                          const char* const* types, size_t types_len,
+NT_Topic* NT_GetTopicsStr(NT_Inst inst, const struct WPI_String* prefix,
+                          const struct WPI_String* types, size_t types_len,
                           size_t* count);
 
 /**
@@ -557,15 +554,14 @@ NT_Topic* NT_GetTopicsStr(NT_Inst inst, const char* prefix, size_t prefix_len,
  * @param inst          instance handle
  * @param prefix        name required prefix; only topics whose name
  *                      starts with this string are returned
- * @param prefix_len    length of prefix in bytes
  * @param types         bitmask of NT_Type values; 0 is treated specially
  *                      as a "don't care"
  * @param count         output parameter; set to length of returned array
  * @return Array of topic information.
  */
-struct NT_TopicInfo* NT_GetTopicInfos(NT_Inst inst, const char* prefix,
-                                      size_t prefix_len, unsigned int types,
-                                      size_t* count);
+struct NT_TopicInfo* NT_GetTopicInfos(NT_Inst inst,
+                                      const struct WPI_String* prefix,
+                                      unsigned int types, size_t* count);
 
 /**
  * Get Topics.
@@ -577,15 +573,14 @@ struct NT_TopicInfo* NT_GetTopicInfos(NT_Inst inst, const char* prefix,
  * @param inst          instance handle
  * @param prefix        name required prefix; only topics whose name
  *                      starts with this string are returned
- * @param prefix_len    length of prefix in bytes
  * @param types         array of type strings
  * @param types_len     number of elements in types array
  * @param count         output parameter; set to length of returned array
  * @return Array of topic information.
  */
-struct NT_TopicInfo* NT_GetTopicInfosStr(NT_Inst inst, const char* prefix,
-                                         size_t prefix_len,
-                                         const char* const* types,
+struct NT_TopicInfo* NT_GetTopicInfosStr(NT_Inst inst,
+                                         const struct WPI_String* prefix,
+                                         const struct WPI_String* types,
                                          size_t types_len, size_t* count);
 
 /**
@@ -606,10 +601,9 @@ NT_Bool NT_GetTopicInfo(NT_Topic topic, struct NT_TopicInfo* info);
  *
  * @param inst      instance handle
  * @param name      topic name
- * @param name_len  length of topic name in bytes
  * @return Topic handle.
  */
-NT_Topic NT_GetTopic(NT_Inst inst, const char* name, size_t name_len);
+NT_Topic NT_GetTopic(NT_Inst inst, const struct WPI_String* name);
 
 /**
  * Gets the name of the specified topic.
@@ -618,7 +612,7 @@ NT_Topic NT_GetTopic(NT_Inst inst, const char* name, size_t name_len);
  * @param name_len  topic name (output); return length of 0 and nullptr if
  * handle is invalid.
  */
-void NT_GetTopicName(NT_Topic topic, WPI_String* name);
+void NT_GetTopicName(NT_Topic topic, struct WPI_String* name);
 
 /**
  * Gets the type for the specified topic, or unassigned if non existent.
@@ -635,7 +629,7 @@ enum NT_Type NT_GetTopicType(NT_Topic topic);
  * @param topic     topic handle
  * @param type_len  topic type string (output)
  */
-void NT_GetTopicTypeString(NT_Topic topic, WPI_String* type);
+void NT_GetTopicTypeString(NT_Topic topic, struct WPI_String* type);
 
 /**
  * Sets the persistent property of a topic.  If true, the stored value is
@@ -704,7 +698,8 @@ NT_Bool NT_GetTopicExists(NT_Handle handle);
  * @param name property name
  * @param property JSON string (output)
  */
-void NT_GetTopicProperty(NT_Topic topic, const char* name, WPI_String* property);
+void NT_GetTopicProperty(NT_Topic topic, const struct WPI_String* name,
+                         struct WPI_String* property);
 
 /**
  * Sets a property value.
@@ -713,8 +708,8 @@ void NT_GetTopicProperty(NT_Topic topic, const char* name, WPI_String* property)
  * @param name property name
  * @param value property value (JSON string)
  */
-NT_Bool NT_SetTopicProperty(NT_Topic topic, const char* name,
-                            const char* value);
+NT_Bool NT_SetTopicProperty(NT_Topic topic, const struct WPI_String* name,
+                            const struct WPI_String* value);
 
 /**
  * Deletes a property.  Has no effect if the property does not exist.
@@ -722,7 +717,7 @@ NT_Bool NT_SetTopicProperty(NT_Topic topic, const char* name,
  * @param topic topic handle
  * @param name property name
  */
-void NT_DeleteTopicProperty(NT_Topic topic, const char* name);
+void NT_DeleteTopicProperty(NT_Topic topic, const struct WPI_String* name);
 
 /**
  * Gets all topic properties as a JSON string.  Each key in the object
@@ -731,7 +726,7 @@ void NT_DeleteTopicProperty(NT_Topic topic, const char* name);
  * @param topic topic handle
  * @param len JSON string (output)
  */
-void NT_GetTopicProperties(NT_Topic topic, WPI_String* properties);
+void NT_GetTopicProperties(NT_Topic topic, struct WPI_String* properties);
 
 /**
  * Updates multiple topic properties.  Each key in the passed-in JSON object is
@@ -743,7 +738,8 @@ void NT_GetTopicProperties(NT_Topic topic, WPI_String* properties);
  * @param properties JSON object string with keys to add/update/delete
  * @return False if properties are not a valid JSON object
  */
-NT_Bool NT_SetTopicProperties(NT_Topic topic, const char* properties);
+NT_Bool NT_SetTopicProperties(NT_Topic topic,
+                              const struct WPI_String* properties);
 
 /**
  * Creates a new subscriber to value changes on a topic.
@@ -755,7 +751,7 @@ NT_Bool NT_SetTopicProperties(NT_Topic topic, const char* properties);
  * @return Subscriber handle
  */
 NT_Subscriber NT_Subscribe(NT_Topic topic, enum NT_Type type,
-                           const char* typeStr,
+                           const struct WPI_String* typeStr,
                            const struct NT_PubSubOptions* options);
 
 /**
@@ -774,7 +770,8 @@ void NT_Unsubscribe(NT_Subscriber sub);
  * @param options publish options
  * @return Publisher handle
  */
-NT_Publisher NT_Publish(NT_Topic topic, enum NT_Type type, const char* typeStr,
+NT_Publisher NT_Publish(NT_Topic topic, enum NT_Type type,
+                        const struct WPI_String* typeStr,
                         const struct NT_PubSubOptions* options);
 
 /**
@@ -788,7 +785,8 @@ NT_Publisher NT_Publish(NT_Topic topic, enum NT_Type type, const char* typeStr,
  * @return Publisher handle
  */
 NT_Publisher NT_PublishEx(NT_Topic topic, enum NT_Type type,
-                          const char* typeStr, const char* properties,
+                          const struct WPI_String* typeStr,
+                          const struct WPI_String* properties,
                           const struct NT_PubSubOptions* options);
 
 /**
@@ -807,7 +805,8 @@ void NT_Unpublish(NT_Handle pubentry);
  * @param options publish options
  * @return Entry handle
  */
-NT_Entry NT_GetEntryEx(NT_Topic topic, enum NT_Type type, const char* typeStr,
+NT_Entry NT_GetEntryEx(NT_Topic topic, enum NT_Type type,
+                       const struct WPI_String* typeStr,
                        const struct NT_PubSubOptions* options);
 
 /**
@@ -935,16 +934,15 @@ NT_Bool NT_WaitForListenerQueue(NT_Handle handle, double timeout);
  *
  * @param inst Instance handle
  * @param prefix Topic name string prefix
- * @param prefix_len Length of topic name string prefix
  * @param mask Bitmask of NT_EventFlags values (only topic and value events will
  *             be generated)
  * @param data Data passed to callback function
  * @param callback Listener function
  * @return Listener handle
  */
-NT_Listener NT_AddListenerSingle(NT_Inst inst, const char* prefix,
-                                 size_t prefix_len, unsigned int mask,
-                                 void* data, NT_ListenerCallback callback);
+NT_Listener NT_AddListenerSingle(NT_Inst inst, const struct WPI_String* prefix,
+                                 unsigned int mask, void* data,
+                                 NT_ListenerCallback callback);
 
 /**
  * Create a listener for changes to topics with names that start with any of
@@ -995,13 +993,12 @@ NT_Listener NT_AddListener(NT_Handle handle, unsigned int mask, void* data,
  *
  * @param poller            poller handle
  * @param prefix            UTF-8 string prefix
- * @param prefix_len        Length of UTF-8 string prefix
  * @param mask              NT_EventFlags bitmask (only topic and value events
  * will be generated)
  * @return Listener handle
  */
 NT_Listener NT_AddPolledListenerSingle(NT_ListenerPoller poller,
-                                       const char* prefix, size_t prefix_len,
+                                       const struct WPI_String* prefix,
                                        unsigned int mask);
 
 /**
@@ -1083,8 +1080,8 @@ void NT_StopLocal(NT_Inst inst);
  * @param port3             port to communicate over (NT3)
  * @param port4             port to communicate over (NT4)
  */
-void NT_StartServer(NT_Inst inst, const char* persist_filename,
-                    const char* listen_address, unsigned int port3,
+void NT_StartServer(NT_Inst inst, const struct WPI_String* persist_filename,
+                    const struct WPI_String* listen_address, unsigned int port3,
                     unsigned int port4);
 
 /**
@@ -1101,7 +1098,7 @@ void NT_StopServer(NT_Inst inst);
  * @param inst      instance handle
  * @param identity  network identity to advertise (cannot be empty string)
  */
-void NT_StartClient3(NT_Inst inst, const char* identity);
+void NT_StartClient3(NT_Inst inst, const struct WPI_String* identity);
 
 /**
  * Starts a NT4 client.  Use NT_SetServer or NT_SetServerTeam to set the server
@@ -1110,7 +1107,7 @@ void NT_StartClient3(NT_Inst inst, const char* identity);
  * @param inst      instance handle
  * @param identity  network identity to advertise (cannot be empty string)
  */
-void NT_StartClient4(NT_Inst inst, const char* identity);
+void NT_StartClient4(NT_Inst inst, const struct WPI_String* identity);
 
 /**
  * Stops the client if it is running.
@@ -1126,7 +1123,8 @@ void NT_StopClient(NT_Inst inst);
  * @param server_name server name (UTF-8 string, null terminated)
  * @param port        port to communicate over
  */
-void NT_SetServer(NT_Inst inst, const char* server_name, unsigned int port);
+void NT_SetServer(NT_Inst inst, const struct WPI_String* server_name,
+                  unsigned int port);
 
 /**
  * Sets server addresses for client (without restarting client).
@@ -1138,7 +1136,8 @@ void NT_SetServer(NT_Inst inst, const char* server_name, unsigned int port);
  *                     terminated)
  * @param ports        array of ports to communicate over (one for each server)
  */
-void NT_SetServerMulti(NT_Inst inst, size_t count, const char** server_names,
+void NT_SetServerMulti(NT_Inst inst, size_t count,
+                       const struct WPI_String* server_names,
                        const unsigned int* ports);
 
 /**
@@ -1353,7 +1352,8 @@ void NT_SetNow(int64_t timestamp);
  * @return Data logger handle
  */
 NT_DataLogger NT_StartEntryDataLog(NT_Inst inst, struct WPI_DataLog* log,
-                                   const char* prefix, const char* logPrefix);
+                                   const struct WPI_String* prefix,
+                                   const struct WPI_String* logPrefix);
 
 /**
  * Stops logging entry changes to a DataLog.
@@ -1371,9 +1371,8 @@ void NT_StopEntryDataLog(NT_DataLogger logger);
  * @param name data log entry name
  * @return Data logger handle
  */
-NT_ConnectionDataLogger NT_StartConnectionDataLog(NT_Inst inst,
-                                                  struct WPI_DataLog* log,
-                                                  const char* name);
+NT_ConnectionDataLogger NT_StartConnectionDataLog(
+    NT_Inst inst, struct WPI_DataLog* log, const struct WPI_String* name);
 
 /**
  * Stops logging connection changes to a DataLog.
@@ -1437,7 +1436,7 @@ NT_Listener NT_AddPolledLogger(NT_ListenerPoller poller, unsigned int min_level,
  *             schema)
  * @return True if schema already registered
  */
-NT_Bool NT_HasSchema(NT_Inst inst, const char* name);
+NT_Bool NT_HasSchema(NT_Inst inst, const struct WPI_String* name);
 
 /**
  * Registers a data schema.  Data schemas provide information for how a
@@ -1455,8 +1454,9 @@ NT_Bool NT_HasSchema(NT_Inst inst, const char* name);
  * @param schema Schema data
  * @param schemaSize Size of schema data
  */
-void NT_AddSchema(NT_Inst inst, const char* name, const char* type,
-                  const uint8_t* schema, size_t schemaSize);
+void NT_AddSchema(NT_Inst inst, const struct WPI_String* name,
+                  const struct WPI_String* type, const uint8_t* schema,
+                  size_t schemaSize);
 
 /** @} */
 
@@ -1536,12 +1536,12 @@ float* NT_AllocateFloatArray(size_t size);
 double* NT_AllocateDoubleArray(size_t size);
 
 /**
- * Allocates an array of WPI_Strings.
+ * Allocates an array of struct WPI_Strings.
  * Note that the size is the number of elements, and not the
  * specific number of bytes to allocate. That is calculated internally.
  *
  * @param size  the number of elements the array will contain
- * @return      the allocated WPI_String array
+ * @return      the allocated struct WPI_String array
  *
  * After use, the array should be freed using the NT_FreeStringArray()
  * function.
@@ -1584,12 +1584,12 @@ void NT_FreeFloatArray(float* v_float);
 void NT_FreeDoubleArray(double* v_double);
 
 /**
- * Frees an array of WPI_Strings.
+ * Frees an array of struct WPI_Strings.
  *
  * @param v_string  pointer to the string array to free
  * @param arr_size  size of the string array to free
  *
- * Note that the individual WPI_Strings in the array should NOT be
+ * Note that the individual struct WPI_Strings in the array should NOT be
  * freed before calling this. This function will free all the strings
  * individually.
  */
@@ -1762,20 +1762,20 @@ double* NT_GetValueDoubleArray(const struct NT_Value* value,
                                uint64_t* last_change, size_t* arr_size);
 
 /**
- * Returns a copy of the WPI_String array from the NT_Value.
+ * Returns a copy of the struct WPI_String array from the NT_Value.
  * If the NT_Value is null, or is assigned to a different type, returns null.
  *
- * @param value       NT_Value struct to get the WPI_String array from
+ * @param value       NT_Value struct to get the struct WPI_String array from
  * @param last_change returns time in ms since the last change in the value
  * @param arr_size    returns the number of elements in the array
- * @return            pointer to the WPI_String array, or null if error
+ * @return            pointer to the struct WPI_String array, or null if error
  *
  * It is the caller's responsibility to free the array once its no longer
  * needed. The NT_FreeStringArray() function is useful for this purpose.
  * The returned array is a copy of the array in the value, and must be
- * freed separately. Note that the individual WPI_Strings should not be freed,
- * but the entire array should be freed at once. The NT_FreeStringArray()
- * function will free all the WPI_Strings.
+ * freed separately. Note that the individual struct WPI_Strings should not be
+ * freed, but the entire array should be freed at once. The NT_FreeStringArray()
+ * function will free all the struct WPI_Strings.
  */
 struct WPI_String* NT_GetValueStringArray(const struct NT_Value* value,
                                           uint64_t* last_change,

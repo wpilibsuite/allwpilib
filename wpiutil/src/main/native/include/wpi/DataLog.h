@@ -1109,8 +1109,8 @@ struct WPI_DataLog;
  *               this is a time/storage tradeoff
  * @param extraHeader extra header data
  */
-struct WPI_DataLog* WPI_DataLog_Create(const WPI_String* dir, const WPI_String* filename,
-                                       double period, const WPI_String* extraHeader);
+struct WPI_DataLog* WPI_DataLog_Create(const struct WPI_String* dir, const struct WPI_String* filename,
+                                       double period, const struct WPI_String* extraHeader);
 
 /**
  * Construct a new Data Log that passes its output to the provided function
@@ -1126,7 +1126,7 @@ struct WPI_DataLog* WPI_DataLog_Create(const WPI_String* dir, const WPI_String* 
  */
 struct WPI_DataLog* WPI_DataLog_Create_Func(
     void (*write)(void* ptr, const uint8_t* data, size_t len), void* ptr,
-    double period, const WPI_String* extraHeader);
+    double period, const struct WPI_String* extraHeader);
 
 /**
  * Releases a data log object. Closes the file and returns resources to the
@@ -1142,7 +1142,7 @@ void WPI_DataLog_Release(struct WPI_DataLog* datalog);
  * @param datalog data log
  * @param filename filename
  */
-void WPI_DataLog_SetFilename(struct WPI_DataLog* datalog, const WPI_String* filename);
+void WPI_DataLog_SetFilename(struct WPI_DataLog* datalog, const struct WPI_String* filename);
 
 /**
  * Explicitly flushes the log data to disk.
@@ -1192,8 +1192,8 @@ void WPI_DataLog_Stop(struct WPI_DataLog* datalog);
  *
  * @return Entry index
  */
-int WPI_DataLog_Start(struct WPI_DataLog* datalog, const WPI_String* name,
-                      const WPI_String* type, const WPI_String* metadata,
+int WPI_DataLog_Start(struct WPI_DataLog* datalog, const struct WPI_String* name,
+                      const struct WPI_String* type, const struct WPI_String* metadata,
                       int64_t timestamp);
 
 /**
@@ -1215,7 +1215,7 @@ void WPI_DataLog_Finish(struct WPI_DataLog* datalog, int entry,
  * @param timestamp Time stamp (may be 0 to indicate now)
  */
 void WPI_DataLog_SetMetadata(struct WPI_DataLog* datalog, int entry,
-                             const WPI_String* metadata, int64_t timestamp);
+                             const struct WPI_String* metadata, int64_t timestamp);
 
 /**
  * Appends a raw record to the log.

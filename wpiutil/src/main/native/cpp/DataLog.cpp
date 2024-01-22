@@ -1075,10 +1075,10 @@ void DataLog::AppendStringArray(int entry,
 
 extern "C" {
 
-struct WPI_DataLog* WPI_DataLog_Create(const WPI_String* dir,
-                                       const WPI_String* filename,
+struct WPI_DataLog* WPI_DataLog_Create(const struct WPI_String* dir,
+                                       const struct WPI_String* filename,
                                        double period,
-                                       const WPI_String* extraHeader) {
+                                       const struct WPI_String* extraHeader) {
   return reinterpret_cast<WPI_DataLog*>(
       new DataLog{wpi::to_string_view(*dir), wpi::to_string_view(*filename),
                   period, wpi::to_string_view(*extraHeader)});
@@ -1086,7 +1086,7 @@ struct WPI_DataLog* WPI_DataLog_Create(const WPI_String* dir,
 
 struct WPI_DataLog* WPI_DataLog_Create_Func(
     void (*write)(void* ptr, const uint8_t* data, size_t len), void* ptr,
-    double period, const WPI_String* extraHeader) {
+    double period, const struct WPI_String* extraHeader) {
   return reinterpret_cast<WPI_DataLog*>(
       new DataLog{[=](auto data) { write(ptr, data.data(), data.size()); },
                   period, wpi::to_string_view(*extraHeader)});
@@ -1097,7 +1097,7 @@ void WPI_DataLog_Release(struct WPI_DataLog* datalog) {
 }
 
 void WPI_DataLog_SetFilename(struct WPI_DataLog* datalog,
-                             const WPI_String* filename) {
+                             const struct WPI_String* filename) {
   reinterpret_cast<DataLog*>(datalog)->SetFilename(
       wpi::to_string_view(*filename));
 }
@@ -1118,8 +1118,8 @@ void WPI_DataLog_Stop(struct WPI_DataLog* datalog) {
   reinterpret_cast<DataLog*>(datalog)->Stop();
 }
 
-int WPI_DataLog_Start(struct WPI_DataLog* datalog, const WPI_String* name,
-                      const WPI_String* type, const WPI_String* metadata,
+int WPI_DataLog_Start(struct WPI_DataLog* datalog, const struct WPI_String* name,
+                      const struct WPI_String* type, const struct WPI_String* metadata,
                       int64_t timestamp) {
   return reinterpret_cast<DataLog*>(datalog)->Start(
       wpi::to_string_view(*name), wpi::to_string_view(*type),
@@ -1132,7 +1132,7 @@ void WPI_DataLog_Finish(struct WPI_DataLog* datalog, int entry,
 }
 
 void WPI_DataLog_SetMetadata(struct WPI_DataLog* datalog, int entry,
-                             const WPI_String* metadata, int64_t timestamp) {
+                             const struct WPI_String* metadata, int64_t timestamp) {
   reinterpret_cast<DataLog*>(datalog)->SetMetadata(
       entry, wpi::to_string_view(*metadata), timestamp);
 }

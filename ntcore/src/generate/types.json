@@ -133,9 +133,9 @@
     "TypeName": "String",
     "TypeString": "\"string\"",
     "c": {
-      "ValueType": "char*",
-      "ParamType": "const char*",
-      "IsArray": true
+      "ValueType": "struct WPI_String*",
+      "ParamType": "const struct WPI_String*",
+      "ValueInline": "struct WPI_String"
     },
     "cpp": {
       "ValueType": "std::string",
