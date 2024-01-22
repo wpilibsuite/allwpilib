@@ -6,8 +6,7 @@
 
 using namespace frc2;
 
-CommandGenericHID::CommandGenericHID(int port)
-    : m_hid{port} {}
+CommandGenericHID::CommandGenericHID(int port) : m_hid{port} {}
 
 frc::GenericHID* CommandGenericHID::GetHID() {
   return &m_hid;
