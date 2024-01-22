@@ -39,7 +39,7 @@ using kv_unit =
 using kv_unit_t = units::unit_t<kv_unit>;
 
 inline constexpr std::array<int, 2> kEncoderPorts = {4, 5};
-inline constexpr bool kLeftEncoderReversed = false;
+inline constexpr bool kEncoderReversed = false;
 inline constexpr int kEncoderCpr = 1024;
 inline constexpr units::turn_t kEncoderDistancePerPulse =
     units::turn_t{1.0} / static_cast<double>(kEncoderCpr);
