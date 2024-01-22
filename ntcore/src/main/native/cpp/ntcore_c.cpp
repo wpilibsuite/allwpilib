@@ -87,14 +87,14 @@ static void ConvertToC(const Event& in, NT_Event* out) {
 }
 
 static void DisposeConnectionInfo(NT_ConnectionInfo* info) {
-  std::free(info->remote_id.str);
-  std::free(info->remote_ip.str);
+  WPI_FreeString(&info->remote_id);
+  WPI_FreeString(&info->remote_ip);
 }
 
 static void DisposeTopicInfo(NT_TopicInfo* info) {
-  std::free(info->name.str);
-  std::free(info->type_str.str);
-  std::free(info->properties.str);
+  WPI_FreeString(&info->name);
+  WPI_FreeString(&info->type_str);
+  WPI_FreeString(&info->properties);
 }
 
 static void DisposeLogMessage(NT_LogMessage* msg) {
@@ -159,8 +159,8 @@ NT_Entry NT_GetEntry(NT_Inst inst, const char* name, size_t name_len) {
   return nt::GetEntry(inst, {name, name_len});
 }
 
-char* NT_GetEntryName(NT_Entry entry, size_t* name_len) {
-  struct NT_String v_name;
+const char* NT_GetEntryName(NT_Entry entry, size_t* name_len) {
+  struct WPI_String v_name;
   nt::ConvertToC(nt::GetEntryName(entry), &v_name);
   *name_len = v_name.len;
   return v_name.str;
@@ -255,13 +255,13 @@ NT_Topic NT_GetTopic(NT_Inst inst, const char* name, size_t name_len) {
   return nt::GetTopic(inst, std::string_view{name, name_len});
 }
 
-char* NT_GetTopicName(NT_Topic topic, size_t* name_len) {
+const char* NT_GetTopicName(NT_Topic topic, size_t* name_len) {
   auto name = nt::GetTopicName(topic);
   if (name.empty()) {
     *name_len = 0;
     return nullptr;
   }
-  struct NT_String v_name;
+  struct WPI_String v_name;
   nt::ConvertToC(name, &v_name);
   *name_len = v_name.len;
   return v_name.str;
@@ -271,9 +271,9 @@ NT_Type NT_GetTopicType(NT_Topic topic) {
   return nt::GetTopicType(topic);
 }
 
-char* NT_GetTopicTypeString(NT_Topic topic, size_t* type_len) {
+const char* NT_GetTopicTypeString(NT_Topic topic, size_t* type_len) {
   auto type = nt::GetTopicTypeString(topic);
-  struct NT_String v_type;
+  struct WPI_String v_type;
   nt::ConvertToC(type, &v_type);
   *type_len = v_type.len;
   return v_type.str;
@@ -307,9 +307,9 @@ NT_Bool NT_GetTopicExists(NT_Handle handle) {
   return nt::GetTopicExists(handle);
 }
 
-char* NT_GetTopicProperty(NT_Topic topic, const char* name, size_t* len) {
+const char* NT_GetTopicProperty(NT_Topic topic, const char* name, size_t* len) {
   wpi::json j = nt::GetTopicProperty(topic, name);
-  struct NT_String v;
+  struct WPI_String v;
   nt::ConvertToC(j.dump(), &v);
   *len = v.len;
   return v.str;
@@ -331,9 +331,9 @@ void NT_DeleteTopicProperty(NT_Topic topic, const char* name) {
   nt::DeleteTopicProperty(topic, name);
 }
 
-char* NT_GetTopicProperties(NT_Topic topic, size_t* len) {
+const char* NT_GetTopicProperties(NT_Topic topic, size_t* len) {
   wpi::json j = nt::GetTopicProperties(topic);
-  struct NT_String v;
+  struct WPI_String v;
   nt::ConvertToC(j.dump(), &v);
   *len = v.len;
   return v.str;
@@ -439,7 +439,7 @@ NT_Listener NT_AddListenerSingle(NT_Inst inst, const char* prefix,
   });
 }
 
-NT_Listener NT_AddListenerMultiple(NT_Inst inst, const NT_String* prefixes,
+NT_Listener NT_AddListenerMultiple(NT_Inst inst, const WPI_String* prefixes,
                                    size_t prefixes_len, unsigned int mask,
                                    void* data, NT_ListenerCallback callback) {
   wpi::SmallVector<std::string_view, 8> p;
@@ -473,7 +473,7 @@ NT_Listener NT_AddPolledListenerSingle(NT_ListenerPoller poller,
 }
 
 NT_Listener NT_AddPolledListenerMultiple(NT_ListenerPoller poller,
-                                         const NT_String* prefixes,
+                                         const WPI_String* prefixes,
                                          size_t prefixes_len,
                                          unsigned int mask) {
   wpi::SmallVector<std::string_view, 8> p;
@@ -651,7 +651,7 @@ void NT_DisposeValue(NT_Value* value) {
     case NT_DOUBLE:
       break;
     case NT_STRING:
-      std::free(value->data.v_string.str);
+      WPI_FreeString(&value->data.v_string);
       break;
     case NT_RAW:
       std::free(value->data.v_raw.data);
@@ -670,7 +670,7 @@ void NT_DisposeValue(NT_Value* value) {
       break;
     case NT_STRING_ARRAY: {
       for (size_t i = 0; i < value->data.arr_string.size; i++) {
-        std::free(value->data.arr_string.arr[i].str);
+        WPI_FreeString(&value->data.arr_string.arr[i]);
       }
       std::free(value->data.arr_string.arr);
       break;
@@ -687,17 +687,6 @@ void NT_InitValue(NT_Value* value) {
   value->type = NT_UNASSIGNED;
   value->last_change = 0;
   value->server_time = 0;
-}
-
-void NT_DisposeString(NT_String* str) {
-  std::free(str->str);
-  str->str = nullptr;
-  str->len = 0;
-}
-
-void NT_InitString(NT_String* str) {
-  str->str = nullptr;
-  str->len = 0;
 }
 
 void NT_DisposeValueArray(struct NT_Value* arr, size_t count) {
@@ -767,9 +756,9 @@ double* NT_AllocateDoubleArray(size_t size) {
   return retVal;
 }
 
-struct NT_String* NT_AllocateStringArray(size_t size) {
-  NT_String* retVal =
-      static_cast<NT_String*>(wpi::safe_malloc(size * sizeof(NT_String)));
+struct WPI_String* NT_AllocateStringArray(size_t size) {
+  WPI_String* retVal =
+      static_cast<WPI_String*>(wpi::safe_malloc(size * sizeof(WPI_String)));
   return retVal;
 }
 
@@ -788,9 +777,9 @@ void NT_FreeFloatArray(float* v_float) {
 void NT_FreeDoubleArray(double* v_double) {
   std::free(v_double);
 }
-void NT_FreeStringArray(struct NT_String* v_string, size_t arr_size) {
+void NT_FreeStringArray(struct WPI_String* v_string, size_t arr_size) {
   for (size_t i = 0; i < arr_size; ++i) {
-    std::free(v_string[i].str);
+    WPI_FreeString(&v_string[i]);
   }
   std::free(v_string);
 }
@@ -924,20 +913,19 @@ double* NT_GetValueDoubleArray(const struct NT_Value* value,
   return arr;
 }
 
-NT_String* NT_GetValueStringArray(const struct NT_Value* value,
+WPI_String* NT_GetValueStringArray(const struct NT_Value* value,
                                   uint64_t* last_change, size_t* arr_size) {
   if (!value || value->type != NT_Type::NT_STRING_ARRAY) {
     return nullptr;
   }
   *last_change = value->last_change;
   *arr_size = value->data.arr_string.size;
-  NT_String* arr = static_cast<NT_String*>(
-      wpi::safe_malloc(value->data.arr_string.size * sizeof(NT_String)));
+  WPI_String* arr = static_cast<WPI_String*>(
+      wpi::safe_malloc(value->data.arr_string.size * sizeof(WPI_String)));
   for (size_t i = 0; i < value->data.arr_string.size; ++i) {
     size_t len = value->data.arr_string.arr[i].len;
-    arr[i].len = len;
-    arr[i].str = static_cast<char*>(wpi::safe_malloc(len + 1));
-    std::memcpy(arr[i].str, value->data.arr_string.arr[i].str, len + 1);
+    auto write = WPI_AllocateString(&arr[i], len);
+    std::memcpy(write, value->data.arr_string.arr[i].str, len + 1);
   }
   return arr;
 }

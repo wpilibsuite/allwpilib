@@ -455,7 +455,7 @@ class DataLog final {
    * @param arr String array to record
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
-  void AppendStringArray(int entry, std::span<const WPI_ConstString> arr,
+  void AppendStringArray(int entry, std::span<const struct WPI_String> arr,
                          int64_t timestamp);
 
  private:
@@ -1109,8 +1109,8 @@ struct WPI_DataLog;
  *               this is a time/storage tradeoff
  * @param extraHeader extra header data
  */
-struct WPI_DataLog* WPI_DataLog_Create(const WPI_ConstString* dir, const WPI_ConstString* filename,
-                                       double period, const WPI_ConstString* extraHeader);
+struct WPI_DataLog* WPI_DataLog_Create(const char* dir, const char* filename,
+                                       double period, const char* extraHeader);
 
 /**
  * Construct a new Data Log that passes its output to the provided function
@@ -1126,7 +1126,7 @@ struct WPI_DataLog* WPI_DataLog_Create(const WPI_ConstString* dir, const WPI_Con
  */
 struct WPI_DataLog* WPI_DataLog_Create_Func(
     void (*write)(void* ptr, const uint8_t* data, size_t len), void* ptr,
-    double period, const WPI_ConstString* extraHeader);
+    double period, const char* extraHeader);
 
 /**
  * Releases a data log object. Closes the file and returns resources to the
@@ -1142,7 +1142,7 @@ void WPI_DataLog_Release(struct WPI_DataLog* datalog);
  * @param datalog data log
  * @param filename filename
  */
-void WPI_DataLog_SetFilename(struct WPI_DataLog* datalog, const WPI_ConstString* filename);
+void WPI_DataLog_SetFilename(struct WPI_DataLog* datalog, const char* filename);
 
 /**
  * Explicitly flushes the log data to disk.
@@ -1192,8 +1192,8 @@ void WPI_DataLog_Stop(struct WPI_DataLog* datalog);
  *
  * @return Entry index
  */
-int WPI_DataLog_Start(struct WPI_DataLog* datalog, const WPI_ConstString* name,
-                      const WPI_ConstString* type, const WPI_ConstString* metadata,
+int WPI_DataLog_Start(struct WPI_DataLog* datalog, const char* name,
+                      const char* type, const char* metadata,
                       int64_t timestamp);
 
 /**
@@ -1282,7 +1282,7 @@ void WPI_DataLog_AppendDouble(struct WPI_DataLog* datalog, int entry,
  * @param timestamp Time stamp (may be 0 to indicate now)
  */
 void WPI_DataLog_AppendString(struct WPI_DataLog* datalog, int entry,
-                              const WPI_ConstString* value, int64_t timestamp);
+                              const struct WPI_String* value, int64_t timestamp);
 
 /**
  * Appends a boolean array record to the log.
@@ -1359,7 +1359,7 @@ void WPI_DataLog_AppendDoubleArray(struct WPI_DataLog* datalog, int entry,
  * @param timestamp Time stamp (may be 0 to indicate now)
  */
 void WPI_DataLog_AppendStringArray(struct WPI_DataLog* datalog, int entry,
-                                   const WPI_ConstString* arr, size_t len,
+                                   const struct WPI_String* arr, size_t len,
                                    int64_t timestamp);
 
 #ifdef __cplusplus

@@ -20,7 +20,7 @@ static inline std::string_view ConvertFromC(const char* arr, size_t size) {
   return {arr, size};
 }
 
-static std::vector<std::string> ConvertFromC(const NT_String* arr, size_t size) {
+static std::vector<std::string> ConvertFromC(const WPI_String* arr, size_t size) {
   std::vector<std::string> v;
   v.reserve(size);
   for (size_t i = 0; i < size; ++i) {
@@ -93,7 +93,7 @@ static void ConvertToC(const nt::TimestampedDoubleArray& in, NT_TimestampedDoubl
 static void ConvertToC(const nt::TimestampedStringArray& in, NT_TimestampedStringArray* out) {
   out->time = in.time;
   out->serverTime = in.serverTime;
-  out->value = ConvertToC<struct NT_String>(in.value, &out->len);
+  out->value = ConvertToC<struct WPI_String>(in.value, &out->len);
 }
 
 
@@ -457,20 +457,20 @@ void NT_FreeQueueDoubleArray(struct NT_TimestampedDoubleArray* arr, size_t len) 
 }
 
 
-NT_Bool NT_SetStringArray(NT_Handle pubentry, int64_t time, const struct NT_String* value, size_t len) {
+NT_Bool NT_SetStringArray(NT_Handle pubentry, int64_t time, const struct WPI_String* value, size_t len) {
   return nt::SetStringArray(pubentry, ConvertFromC(value, len), time);
 }
 
-NT_Bool NT_SetDefaultStringArray(NT_Handle pubentry, const struct NT_String* defaultValue, size_t defaultValueLen) {
+NT_Bool NT_SetDefaultStringArray(NT_Handle pubentry, const struct WPI_String* defaultValue, size_t defaultValueLen) {
   return nt::SetDefaultStringArray(pubentry, ConvertFromC(defaultValue, defaultValueLen));
 }
 
-struct NT_String* NT_GetStringArray(NT_Handle subentry, const struct NT_String* defaultValue, size_t defaultValueLen, size_t* len) {
+struct WPI_String* NT_GetStringArray(NT_Handle subentry, const struct WPI_String* defaultValue, size_t defaultValueLen, size_t* len) {
   auto cppValue = nt::GetStringArray(subentry, ConvertFromC(defaultValue, defaultValueLen));
-  return ConvertToC<struct NT_String>(cppValue, len);
+  return ConvertToC<struct WPI_String>(cppValue, len);
 }
 
-void NT_GetAtomicStringArray(NT_Handle subentry, const struct NT_String* defaultValue, size_t defaultValueLen, struct NT_TimestampedStringArray* value) {
+void NT_GetAtomicStringArray(NT_Handle subentry, const struct WPI_String* defaultValue, size_t defaultValueLen, struct NT_TimestampedStringArray* value) {
   auto cppValue = nt::GetAtomicStringArray(subentry, ConvertFromC(defaultValue, defaultValueLen));
   ConvertToC(cppValue, value);
 }

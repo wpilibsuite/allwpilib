@@ -345,8 +345,8 @@
     "TypeName": "StringArray",
     "TypeString": "\"string[]\"",
     "c": {
-      "ValueType": "struct NT_String*",
-      "ParamType": "const struct NT_String*",
+      "ValueType": "struct WPI_String*",
+      "ParamType": "const struct WPI_String*",
       "IsArray": true
     },
     "cpp": {

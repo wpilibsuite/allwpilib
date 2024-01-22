@@ -9,37 +9,9 @@
 #endif
 
 /**
- * A mutable UTF8 string.
- */
-struct WPI_MutableString {
-#ifdef __cplusplus
-  // Implicit conversion to string_view
-  operator std::string_view() const { return {str, len}; }
-#endif  // __cplusplus
-
-  /** Contents. */
-  char* str;
-  /** Length */
-  size_t len;
-};
-
-/**
  * A const UTF8 string.
  */
-struct WPI_ConstString {
-#ifdef __cplusplus
-  constexpr WPI_ConstString(std::string_view view)
-      : str{view.data()}, len{view.size()} {}
-  constexpr WPI_ConstString(const char* cStr)
-      : str{cStr}, len{std::char_traits<char>::length(cStr)} {}
-
-  constexpr WPI_ConstString(WPI_MutableString& mutableStr)
-      : str{mutableStr.str}, len{mutableStr.len} {}
-
-  // Implicit conversion to string_view
-  operator std::string_view() const { return {str, len}; }
-#endif  // __cplusplus
-
+struct WPI_String {
   /** Contents. */
   const char* str;
   /** Length */
@@ -50,14 +22,14 @@ struct WPI_ConstString {
 extern "C" {
 #endif  // __cplusplus
 
-void WPI_InitConstString(WPI_ConstString* wpiString, const char* utf8String);
+void WPI_InitString(struct WPI_String* wpiString, const char* utf8String);
 
-void WPI_InitConstStringWithLength(WPI_ConstString* wpiString,
-                                   const char* utf8String, size_t length);
+void WPI_InitStringWithLength(struct WPI_String* wpiString,
+                              const char* utf8String, size_t length);
 
-void WPI_AllocateMutableString(WPI_MutableString* wpiString, size_t length);
+char* WPI_AllocateString(struct WPI_String* wpiString, size_t length);
 
-void WPI_FreeMutableString(const WPI_MutableString* wpiString);
+void WPI_FreeString(const WPI_String* wpiString);
 
 #ifdef __cplusplus
 }  // extern "C"

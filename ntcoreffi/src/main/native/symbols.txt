@@ -135,7 +135,7 @@ NT_GetValueStringArray
 NT_GetValueStringArrayForTesting
 NT_GetValueStringForTesting
 NT_GetValueType
-NT_InitString
+WPI_InitString
 NT_InitValue
 NT_IsConnected
 NT_Meta_DecodeClientPublishers

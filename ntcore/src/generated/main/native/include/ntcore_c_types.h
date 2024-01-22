@@ -1145,7 +1145,7 @@ struct NT_TimestampedStringArray {
   /**
    * Value.
    */
-  struct NT_String* value;
+  struct WPI_String* value;
   /**
    * Value length.
    */
@@ -1168,7 +1168,7 @@ struct NT_TimestampedStringArray {
  * @param len length of value
 
  */
-NT_Bool NT_SetStringArray(NT_Handle pubentry, int64_t time, const struct NT_String* value, size_t len);
+NT_Bool NT_SetStringArray(NT_Handle pubentry, int64_t time, const struct WPI_String* value, size_t len);
 
 /**
  * Publish a default value.
@@ -1180,7 +1180,7 @@ NT_Bool NT_SetStringArray(NT_Handle pubentry, int64_t time, const struct NT_Stri
  * @param defaultValueLen length of default value
 
  */
-NT_Bool NT_SetDefaultStringArray(NT_Handle pubentry, const struct NT_String* defaultValue, size_t defaultValueLen);
+NT_Bool NT_SetDefaultStringArray(NT_Handle pubentry, const struct WPI_String* defaultValue, size_t defaultValueLen);
 
 /**
  * Get the last published value.
@@ -1193,7 +1193,7 @@ NT_Bool NT_SetDefaultStringArray(NT_Handle pubentry, const struct NT_String* def
 
  * @return value
  */
-struct NT_String* NT_GetStringArray(NT_Handle subentry, const struct NT_String* defaultValue, size_t defaultValueLen, size_t* len);
+struct WPI_String* NT_GetStringArray(NT_Handle subentry, const struct WPI_String* defaultValue, size_t defaultValueLen, size_t* len);
 
 /**
  * Get the last published value along with its timestamp.
@@ -1206,7 +1206,7 @@ struct NT_String* NT_GetStringArray(NT_Handle subentry, const struct NT_String* 
 
  * @param value timestamped value (output)
  */
-void NT_GetAtomicStringArray(NT_Handle subentry, const struct NT_String* defaultValue, size_t defaultValueLen, struct NT_TimestampedStringArray* value);
+void NT_GetAtomicStringArray(NT_Handle subentry, const struct WPI_String* defaultValue, size_t defaultValueLen, struct NT_TimestampedStringArray* value);
 
 /**
  * Disposes a timestamped value (as returned by NT_GetAtomicStringArray).

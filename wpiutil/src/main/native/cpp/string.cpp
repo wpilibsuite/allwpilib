@@ -9,24 +9,26 @@
 
 extern "C" {
 
-void WPI_InitConstString(WPI_ConstString* wpiString, const char* utf8String) {
+void WPI_InitString(struct WPI_String* wpiString, const char* utf8String) {
   wpiString->str = utf8String;
   wpiString->len = std::char_traits<char>::length(utf8String);
 }
 
-void WPI_InitConstStringWithLength(WPI_ConstString* wpiString,
-                                   const char* utf8String, size_t length) {
+void WPI_InitStringWithLength(struct WPI_String* wpiString,
+                              const char* utf8String, size_t length) {
   wpiString->str = utf8String;
   wpiString->len = length;
 }
 
-void WPI_AllocateMutableString(WPI_MutableString* wpiString, size_t length) {
-  wpiString->str = static_cast<char*>(wpi::safe_malloc(length));
+char* WPI_AllocateString(struct WPI_String* wpiString, size_t length) {
+  char* str = static_cast<char*>(wpi::safe_malloc(length));
+  wpiString->str = str;
   wpiString->len = length;
+  return str;
 }
 
-void WPI_FreeMutableString(const WPI_MutableString* wpiString) {
-  std::free(wpiString->str);
+void WPI_FreeString(const struct WPI_String* wpiString) {
+  std::free(const_cast<char*>(wpiString->str));
 }
 
 }  // extern "C"

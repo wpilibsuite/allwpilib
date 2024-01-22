@@ -14,7 +14,7 @@
 extern "C" {
 #endif
 
-struct NT_String* NT_GetStringForTesting(const char* str, int* struct_size);
+struct WPI_String* NT_GetStringForTesting(const char* str, int* struct_size);
 // No need for free as one already exists in main library
 
 struct NT_EntryInfo* NT_GetEntryInfoForTesting(const char* name,
@@ -54,7 +54,7 @@ struct NT_Value* NT_GetValueDoubleArrayForTesting(uint64_t last_change,
                                                   int* struct_size);
 
 struct NT_Value* NT_GetValueStringArrayForTesting(uint64_t last_change,
-                                                  const struct NT_String* arr,
+                                                  const struct WPI_String* arr,
                                                   size_t array_len,
                                                   int* struct_size);
 // No need for free as one already exists in the main library

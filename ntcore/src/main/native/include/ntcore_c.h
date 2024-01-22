@@ -5,6 +5,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <wpi/string.h>
 
 #ifdef __cplusplus
 #include <cstddef>
@@ -129,23 +130,6 @@ enum NT_EventFlags {
  * Structures
  */
 
-/** A NetworkTables string. */
-struct NT_String {
-  /**
-   * String contents (UTF-8).
-   * The string is NOT required to be zero-terminated.
-   * When returned by the library, this is zero-terminated and allocated with
-   * std::malloc().
-   */
-  char* str;
-
-  /**
-   * Length of the string in bytes.  If the string happens to be zero
-   * terminated, this does not include the zero-termination.
-   */
-  size_t len;
-};
-
 /** NetworkTables Entry Value.  Note this is a typed union. */
 struct NT_Value {
   enum NT_Type type;
@@ -156,7 +140,7 @@ struct NT_Value {
     int64_t v_int;
     float v_float;
     double v_double;
-    struct NT_String v_string;
+    struct WPI_String v_string;
     struct {
       uint8_t* data;
       size_t size;
@@ -178,7 +162,7 @@ struct NT_Value {
       size_t size;
     } arr_int;
     struct {
-      struct NT_String* arr;
+      struct WPI_String* arr;
       size_t size;
     } arr_string;
   } data;
@@ -190,16 +174,16 @@ struct NT_TopicInfo {
   NT_Topic topic;
 
   /** Topic name */
-  struct NT_String name;
+  struct WPI_String name;
 
   /** Topic type */
   enum NT_Type type;
 
   /** Topic type string */
-  struct NT_String type_str;
+  struct WPI_String type_str;
 
   /** Topic properties JSON string */
-  struct NT_String properties;
+  struct WPI_String properties;
 };
 
 /** NetworkTables Connection Information */
@@ -207,10 +191,10 @@ struct NT_ConnectionInfo {
   /**
    * The remote identifier (as set on the remote node by NT_StartClient4().
    */
-  struct NT_String remote_id;
+  struct WPI_String remote_id;
 
   /** The IP address of the remote node. */
-  struct NT_String remote_ip;
+  struct WPI_String remote_ip;
 
   /** The port number of the remote node. */
   unsigned int remote_port;
@@ -430,7 +414,7 @@ NT_Entry NT_GetEntry(NT_Inst inst, const char* name, size_t name_len);
  * @param name_len  length of the returned string (output parameter)
  * @return Entry name
  */
-char* NT_GetEntryName(NT_Entry entry, size_t* name_len);
+const char* NT_GetEntryName(NT_Entry entry, size_t* name_len);
 
 /**
  * Gets the type for the specified key, or unassigned if non existent.
@@ -635,7 +619,7 @@ NT_Topic NT_GetTopic(NT_Inst inst, const char* name, size_t name_len);
  * @param name_len  length of topic name (output)
  * @return Topic name; returns NULL and name_len=0 if the handle is invalid.
  */
-char* NT_GetTopicName(NT_Topic topic, size_t* name_len);
+const char* NT_GetTopicName(NT_Topic topic, size_t* name_len);
 
 /**
  * Gets the type for the specified topic, or unassigned if non existent.
@@ -653,7 +637,7 @@ enum NT_Type NT_GetTopicType(NT_Topic topic);
  * @param type_len  length of type string (output)
  * @return Topic type string; returns NULL if non-existent
  */
-char* NT_GetTopicTypeString(NT_Topic topic, size_t* type_len);
+const char* NT_GetTopicTypeString(NT_Topic topic, size_t* type_len);
 
 /**
  * Sets the persistent property of a topic.  If true, the stored value is
@@ -723,7 +707,7 @@ NT_Bool NT_GetTopicExists(NT_Handle handle);
  * @param len length of returned string (output)
  * @return JSON string; empty string if the property does not exist.
  */
-char* NT_GetTopicProperty(NT_Topic topic, const char* name, size_t* len);
+const char* NT_GetTopicProperty(NT_Topic topic, const char* name, size_t* len);
 
 /**
  * Sets a property value.
@@ -751,7 +735,7 @@ void NT_DeleteTopicProperty(NT_Topic topic, const char* name);
  * @param len length of returned string (output)
  * @return JSON string
  */
-char* NT_GetTopicProperties(NT_Topic topic, size_t* len);
+const char* NT_GetTopicProperties(NT_Topic topic, size_t* len);
 
 /**
  * Updates multiple topic properties.  Each key in the passed-in JSON object is
@@ -871,7 +855,7 @@ NT_Topic NT_GetTopicFromHandle(NT_Handle pubsubentry);
  * @return subscriber handle
  */
 NT_MultiSubscriber NT_SubscribeMultiple(NT_Inst inst,
-                                        const struct NT_String* prefixes,
+                                        const struct WPI_String* prefixes,
                                         size_t prefixes_len,
                                         const struct NT_PubSubOptions* options);
 
@@ -981,7 +965,7 @@ NT_Listener NT_AddListenerSingle(NT_Inst inst, const char* prefix,
  * @return Listener handle
  */
 NT_Listener NT_AddListenerMultiple(NT_Inst inst,
-                                   const struct NT_String* prefixes,
+                                   const struct WPI_String* prefixes,
                                    size_t prefixes_len, unsigned int mask,
                                    void* data, NT_ListenerCallback callback);
 
@@ -1037,7 +1021,7 @@ NT_Listener NT_AddPolledListenerSingle(NT_ListenerPoller poller,
  * @return Listener handle
  */
 NT_Listener NT_AddPolledListenerMultiple(NT_ListenerPoller poller,
-                                         const struct NT_String* prefixes,
+                                         const struct WPI_String* prefixes,
                                          size_t prefixes_len,
                                          unsigned int mask);
 
@@ -1281,21 +1265,6 @@ void NT_DisposeValue(struct NT_Value* value);
  * @param value value to initialize
  */
 void NT_InitValue(struct NT_Value* value);
-
-/**
- * Frees string memory.
- *
- * @param str   string to free
- */
-void NT_DisposeString(struct NT_String* str);
-
-/**
- * Initializes a NT_String.
- * Sets length to zero and pointer to null.
- *
- * @param str   string to initialize
- */
-void NT_InitString(struct NT_String* str);
 
 /**
  * Frees an array of NT_Values.
@@ -1571,17 +1540,17 @@ float* NT_AllocateFloatArray(size_t size);
 double* NT_AllocateDoubleArray(size_t size);
 
 /**
- * Allocates an array of NT_Strings.
+ * Allocates an array of WPI_Strings.
  * Note that the size is the number of elements, and not the
  * specific number of bytes to allocate. That is calculated internally.
  *
  * @param size  the number of elements the array will contain
- * @return      the allocated NT_String array
+ * @return      the allocated WPI_String array
  *
  * After use, the array should be freed using the NT_FreeStringArray()
  * function.
  */
-struct NT_String* NT_AllocateStringArray(size_t size);
+struct WPI_String* NT_AllocateStringArray(size_t size);
 
 /**
  * Frees an array of chars.
@@ -1619,16 +1588,16 @@ void NT_FreeFloatArray(float* v_float);
 void NT_FreeDoubleArray(double* v_double);
 
 /**
- * Frees an array of NT_Strings.
+ * Frees an array of WPI_Strings.
  *
  * @param v_string  pointer to the string array to free
  * @param arr_size  size of the string array to free
  *
- * Note that the individual NT_Strings in the array should NOT be
+ * Note that the individual WPI_Strings in the array should NOT be
  * freed before calling this. This function will free all the strings
  * individually.
  */
-void NT_FreeStringArray(struct NT_String* v_string, size_t arr_size);
+void NT_FreeStringArray(struct WPI_String* v_string, size_t arr_size);
 
 /** @} */
 
@@ -1797,22 +1766,22 @@ double* NT_GetValueDoubleArray(const struct NT_Value* value,
                                uint64_t* last_change, size_t* arr_size);
 
 /**
- * Returns a copy of the NT_String array from the NT_Value.
+ * Returns a copy of the WPI_String array from the NT_Value.
  * If the NT_Value is null, or is assigned to a different type, returns null.
  *
- * @param value       NT_Value struct to get the NT_String array from
+ * @param value       NT_Value struct to get the WPI_String array from
  * @param last_change returns time in ms since the last change in the value
  * @param arr_size    returns the number of elements in the array
- * @return            pointer to the NT_String array, or null if error
+ * @return            pointer to the WPI_String array, or null if error
  *
  * It is the caller's responsibility to free the array once its no longer
  * needed. The NT_FreeStringArray() function is useful for this purpose.
  * The returned array is a copy of the array in the value, and must be
- * freed separately. Note that the individual NT_Strings should not be freed,
+ * freed separately. Note that the individual WPI_Strings should not be freed,
  * but the entire array should be freed at once. The NT_FreeStringArray()
- * function will free all the NT_Strings.
+ * function will free all the WPI_Strings.
  */
-struct NT_String* NT_GetValueStringArray(const struct NT_Value* value,
+struct WPI_String* NT_GetValueStringArray(const struct NT_Value* value,
                                          uint64_t* last_change,
                                          size_t* arr_size);
 
@@ -1843,7 +1812,7 @@ struct NT_Meta_SubscriberOptions {
  * Topic publisher (as published via `$pub$<topic>`).
  */
 struct NT_Meta_TopicPublisher {
-  struct NT_String client;
+  struct WPI_String client;
   uint64_t pubuid;
 };
 
@@ -1851,7 +1820,7 @@ struct NT_Meta_TopicPublisher {
  * Topic subscriber (as published via `$sub$<topic>`).
  */
 struct NT_Meta_TopicSubscriber {
-  struct NT_String client;
+  struct WPI_String client;
   uint64_t subuid;
   struct NT_Meta_SubscriberOptions options;
 };
@@ -1861,7 +1830,7 @@ struct NT_Meta_TopicSubscriber {
  */
 struct NT_Meta_ClientPublisher {
   int64_t uid;
-  struct NT_String topic;
+  struct WPI_String topic;
 };
 
 /**
@@ -1870,7 +1839,7 @@ struct NT_Meta_ClientPublisher {
 struct NT_Meta_ClientSubscriber {
   int64_t uid;
   size_t topicsCount;
-  struct NT_String* topics;
+  struct WPI_String* topics;
   struct NT_Meta_SubscriberOptions options;
 };
 
@@ -1878,8 +1847,8 @@ struct NT_Meta_ClientSubscriber {
  * Client (as published via `$clients`).
  */
 struct NT_Meta_Client {
-  struct NT_String id;
-  struct NT_String conn;
+  struct WPI_String id;
+  struct WPI_String conn;
   uint16_t version;
 };
 
