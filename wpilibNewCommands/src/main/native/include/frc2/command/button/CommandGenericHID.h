@@ -11,7 +11,7 @@
 namespace frc2 {
 
 /**
- * A version of {@link GenericHID} with {@link Trigger} factories for
+ * A version of {@link frc::GenericHID} with {@link Trigger} factories for
  * command-based.
  *
  * @see GenericHID
