@@ -9,8 +9,9 @@
 #include "frc2/command/CommandScheduler.h"
 
 namespace frc2 {
+
 /**
- * A subclass of {@link GenericHID} with {@link Trigger} factories for
+ * A version of {@link GenericHID} with {@link Trigger} factories for
  * command-based.
  *
  * @see GenericHID
