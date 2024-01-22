@@ -19,6 +19,14 @@ struct WPI_String {
 };
 
 #ifdef __cplusplus
+namespace wpi {
+constexpr std::string_view to_string_view(const WPI_String& str) {
+  return {str.str, str.len};
+}
+}  // namespace wpi
+#endif  // __cplusplus
+
+#ifdef __cplusplus
 extern "C" {
 #endif  // __cplusplus
 

@@ -263,14 +263,12 @@ void nt::ConvertToC(const Value& in, NT_Value* out) {
   }
 }
 
-// size_t nt::ConvertToC(std::string_view in, char** out) {
-//   *out = static_cast<char*>(wpi::safe_malloc(in.size() + 1));
-//   std::memmove(*out, in.data(), in.size());  // NOLINT
-//   (*out)[in.size()] = '\0';
-//   return in.size();
-// }
-
 void nt::ConvertToC(std::string_view in, WPI_String* out) {
+  if (in.empty()) {
+    out->len = 0;
+    out->str = nullptr;
+    return;
+  }
   auto write = WPI_AllocateString(out, in.size());
   std::memcpy(write, in.data(), in.size());
 }

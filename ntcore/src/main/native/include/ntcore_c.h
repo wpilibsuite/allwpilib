@@ -230,13 +230,13 @@ struct NT_LogMessage {
   unsigned int level;
 
   /** The filename of the source file that generated the message. */
-  char* filename;
+  WPI_String filename;
 
   /** The line number in the source file that generated the message. */
   unsigned int line;
 
   /** The message. */
-  char* message;
+  WPI_String message;
 };
 
 /** NetworkTables time sync event data. */
@@ -411,10 +411,9 @@ NT_Entry NT_GetEntry(NT_Inst inst, const char* name, size_t name_len);
  * Returns an empty string if the handle is invalid.
  *
  * @param entry     entry handle
- * @param name_len  length of the returned string (output parameter)
- * @return Entry name
+ * @param name      entry name (output parameter)
  */
-const char* NT_GetEntryName(NT_Entry entry, size_t* name_len);
+void NT_GetEntryName(NT_Entry entry, WPI_String* name);
 
 /**
  * Gets the type for the specified key, or unassigned if non existent.
@@ -616,10 +615,10 @@ NT_Topic NT_GetTopic(NT_Inst inst, const char* name, size_t name_len);
  * Gets the name of the specified topic.
  *
  * @param topic     topic handle
- * @param name_len  length of topic name (output)
- * @return Topic name; returns NULL and name_len=0 if the handle is invalid.
+ * @param name_len  topic name (output); return length of 0 and nullptr if
+ * handle is invalid.
  */
-const char* NT_GetTopicName(NT_Topic topic, size_t* name_len);
+void NT_GetTopicName(NT_Topic topic, WPI_String* name);
 
 /**
  * Gets the type for the specified topic, or unassigned if non existent.
@@ -634,10 +633,9 @@ enum NT_Type NT_GetTopicType(NT_Topic topic);
  * than the numeric type (especially for raw values).
  *
  * @param topic     topic handle
- * @param type_len  length of type string (output)
- * @return Topic type string; returns NULL if non-existent
+ * @param type_len  topic type string (output)
  */
-const char* NT_GetTopicTypeString(NT_Topic topic, size_t* type_len);
+void NT_GetTopicTypeString(NT_Topic topic, WPI_String* type);
 
 /**
  * Sets the persistent property of a topic.  If true, the stored value is
@@ -704,10 +702,9 @@ NT_Bool NT_GetTopicExists(NT_Handle handle);
  *
  * @param topic topic handle
  * @param name property name
- * @param len length of returned string (output)
- * @return JSON string; empty string if the property does not exist.
+ * @param property JSON string (output)
  */
-const char* NT_GetTopicProperty(NT_Topic topic, const char* name, size_t* len);
+void NT_GetTopicProperty(NT_Topic topic, const char* name, WPI_String* property);
 
 /**
  * Sets a property value.
@@ -732,10 +729,9 @@ void NT_DeleteTopicProperty(NT_Topic topic, const char* name);
  * is the property name, and the corresponding value is the property value.
  *
  * @param topic topic handle
- * @param len length of returned string (output)
- * @return JSON string
+ * @param len JSON string (output)
  */
-const char* NT_GetTopicProperties(NT_Topic topic, size_t* len);
+void NT_GetTopicProperties(NT_Topic topic, WPI_String* properties);
 
 /**
  * Updates multiple topic properties.  Each key in the passed-in JSON object is
@@ -1782,8 +1778,8 @@ double* NT_GetValueDoubleArray(const struct NT_Value* value,
  * function will free all the WPI_Strings.
  */
 struct WPI_String* NT_GetValueStringArray(const struct NT_Value* value,
-                                         uint64_t* last_change,
-                                         size_t* arr_size);
+                                          uint64_t* last_change,
+                                          size_t* arr_size);
 
 /** @} */
 /** @} */

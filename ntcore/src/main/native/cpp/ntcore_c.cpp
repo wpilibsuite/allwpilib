@@ -98,8 +98,8 @@ static void DisposeTopicInfo(NT_TopicInfo* info) {
 }
 
 static void DisposeLogMessage(NT_LogMessage* msg) {
-  std::free(msg->filename);
-  std::free(msg->message);
+  WPI_FreeString(&msg->filename);
+  WPI_FreeString(&msg->message);
 }
 
 static void DisposeEvent(NT_Event* event) {
@@ -159,11 +159,8 @@ NT_Entry NT_GetEntry(NT_Inst inst, const char* name, size_t name_len) {
   return nt::GetEntry(inst, {name, name_len});
 }
 
-const char* NT_GetEntryName(NT_Entry entry, size_t* name_len) {
-  struct WPI_String v_name;
-  nt::ConvertToC(nt::GetEntryName(entry), &v_name);
-  *name_len = v_name.len;
-  return v_name.str;
+void NT_GetEntryName(NT_Entry entry, WPI_String* name) {
+  nt::ConvertToC(nt::GetEntryName(entry), name);
 }
 
 enum NT_Type NT_GetEntryType(NT_Entry entry) {
@@ -255,28 +252,16 @@ NT_Topic NT_GetTopic(NT_Inst inst, const char* name, size_t name_len) {
   return nt::GetTopic(inst, std::string_view{name, name_len});
 }
 
-const char* NT_GetTopicName(NT_Topic topic, size_t* name_len) {
-  auto name = nt::GetTopicName(topic);
-  if (name.empty()) {
-    *name_len = 0;
-    return nullptr;
-  }
-  struct WPI_String v_name;
-  nt::ConvertToC(name, &v_name);
-  *name_len = v_name.len;
-  return v_name.str;
+void NT_GetTopicName(NT_Topic topic, WPI_String* name) {
+  nt::ConvertToC(nt::GetTopicName(topic), name);
 }
 
 NT_Type NT_GetTopicType(NT_Topic topic) {
   return nt::GetTopicType(topic);
 }
 
-const char* NT_GetTopicTypeString(NT_Topic topic, size_t* type_len) {
-  auto type = nt::GetTopicTypeString(topic);
-  struct WPI_String v_type;
-  nt::ConvertToC(type, &v_type);
-  *type_len = v_type.len;
-  return v_type.str;
+void NT_GetTopicTypeString(NT_Topic topic, WPI_String* type) {
+  nt::ConvertToC(nt::GetTopicTypeString(topic), type);
 }
 
 void NT_SetTopicPersistent(NT_Topic topic, NT_Bool value) {
@@ -307,12 +292,9 @@ NT_Bool NT_GetTopicExists(NT_Handle handle) {
   return nt::GetTopicExists(handle);
 }
 
-const char* NT_GetTopicProperty(NT_Topic topic, const char* name, size_t* len) {
+void NT_GetTopicProperty(NT_Topic topic, const char* name, WPI_String* prop) {
   wpi::json j = nt::GetTopicProperty(topic, name);
-  struct WPI_String v;
-  nt::ConvertToC(j.dump(), &v);
-  *len = v.len;
-  return v.str;
+  nt::ConvertToC(j.dump(), prop);
 }
 
 NT_Bool NT_SetTopicProperty(NT_Topic topic, const char* name,
@@ -331,12 +313,9 @@ void NT_DeleteTopicProperty(NT_Topic topic, const char* name) {
   nt::DeleteTopicProperty(topic, name);
 }
 
-const char* NT_GetTopicProperties(NT_Topic topic, size_t* len) {
+void NT_GetTopicProperties(NT_Topic topic, WPI_String* property) {
   wpi::json j = nt::GetTopicProperties(topic);
-  struct WPI_String v;
-  nt::ConvertToC(j.dump(), &v);
-  *len = v.len;
-  return v.str;
+  nt::ConvertToC(j.dump(), property);
 }
 
 NT_Bool NT_SetTopicProperties(NT_Topic topic, const char* properties) {
