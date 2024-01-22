@@ -231,6 +231,6 @@ class CommandGenericHID {
           CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
 
  private:
-  frc::GenericHID* m_hid;
+  frc::GenericHID m_hid;
 };
 }  // namespace frc2
