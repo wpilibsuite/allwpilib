@@ -79,7 +79,7 @@ char* WPI_AllocateString(struct WPI_String* wpiString, size_t length);
  *
  * @param wpiString string to free
  */
-void WPI_FreeString(const WPI_String* wpiString);
+void WPI_FreeString(const struct WPI_String* wpiString);
 
 #ifdef __cplusplus
 }  // extern "C"
