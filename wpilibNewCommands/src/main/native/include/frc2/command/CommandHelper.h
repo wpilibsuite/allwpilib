@@ -4,9 +4,9 @@
 
 #pragma once
 
+#include <concepts>
 #include <memory>
 #include <utility>
-#include <concepts>
 
 #include <wpi/deprecated.h>
 

@@ -4,10 +4,10 @@
 
 #pragma once
 
+#include <concepts>
 #include <functional>
 #include <memory>
 #include <utility>
-#include <concepts>
 
 #include "frc2/command/Command.h"
 #include "frc2/command/CommandHelper.h"

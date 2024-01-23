@@ -4,13 +4,13 @@
 
 #pragma once
 
+#include <concepts>
 #include <functional>
 #include <initializer_list>
 #include <memory>
 #include <optional>
 #include <span>
 #include <utility>
-#include <concepts>
 
 #include <frc/Errors.h>
 #include <frc/Watchdog.h>
