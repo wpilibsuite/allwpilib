@@ -34,13 +34,6 @@ class CommandJoystick : public CommandGenericHID {
   frc::Joystick& GetHID();
 
   /**
-   * Construct an instance of a controller.
-   *
-   * @param port The port index on the Driver Station that the controller is
-   * plugged into.
-   */
-
-  /**
    * Constructs an event instance around the trigger button's digital signal.
    *
    * @param loop the event loop instance to attach the event to. Defaults to the
