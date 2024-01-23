@@ -610,7 +610,7 @@ NT_Topic NT_GetTopic(NT_Inst inst, const struct WPI_String* name);
  * Gets the name of the specified topic.
  *
  * @param topic     topic handle
- * @param name_len  topic name (output); return length of 0 and nullptr if
+ * @param name  topic name (output); return length of 0 and nullptr if
  * handle is invalid.
  */
 void NT_GetTopicName(NT_Topic topic, struct WPI_String* name);
@@ -627,8 +627,8 @@ enum NT_Type NT_GetTopicType(NT_Topic topic);
  * Gets the type string for the specified topic.  This may have more information
  * than the numeric type (especially for raw values).
  *
- * @param topic     topic handle
- * @param type_len  topic type string (output)
+ * @param topic topic handle
+ * @param type  topic type string (output)
  */
 void NT_GetTopicTypeString(NT_Topic topic, struct WPI_String* type);
 
@@ -725,7 +725,7 @@ void NT_DeleteTopicProperty(NT_Topic topic, const struct WPI_String* name);
  * is the property name, and the corresponding value is the property value.
  *
  * @param topic topic handle
- * @param len JSON string (output)
+ * @param properties JSON string (output)
  */
 void NT_GetTopicProperties(NT_Topic topic, struct WPI_String* properties);
 

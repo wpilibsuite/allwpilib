@@ -5,13 +5,19 @@
 #include "wpi/string.h"
 
 #include <wpi/MemAlloc.h>
+
 #include <string_view>
 
 extern "C" {
 
 void WPI_InitString(struct WPI_String* wpiString, const char* utf8String) {
-  wpiString->str = utf8String;
-  wpiString->len = std::char_traits<char>::length(utf8String);
+  if (utf8String == nullptr) {
+    wpiString->str = nullptr;
+    wpiString->len = 0;
+  } else {
+    wpiString->str = utf8String;
+    wpiString->len = std::char_traits<char>::length(utf8String);
+  }
 }
 
 void WPI_InitStringWithLength(struct WPI_String* wpiString,

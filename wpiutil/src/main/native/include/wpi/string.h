@@ -20,9 +20,11 @@ struct WPI_String {
 
 #ifdef __cplusplus
 namespace wpi {
+/** Converts a WPI_String to a string_view */
 constexpr std::string_view to_string_view(const WPI_String& str) {
   return {str.str, str.len};
 }
+/** Converts a string_view to a WPI_String */
 constexpr WPI_String make_string(std::string_view view) {
   return WPI_String{view.data(), view.size()};
 }
@@ -33,13 +35,50 @@ constexpr WPI_String make_string(std::string_view view) {
 extern "C" {
 #endif  // __cplusplus
 
+/**
+ * Initializes a WPI_String from a null terminated UTF-8 string.
+ * If input string is null, initializes output to 0 length.
+ * The output length does not include the null terminator.
+ *
+ * The lifetime of the output string is the lifetime of the input string.
+ * Do not call WPI_FreeString() with the output of this call.
+ *
+ * @param wpiString output string
+ * @param utf8String input string (null terminated)
+ */
 void WPI_InitString(struct WPI_String* wpiString, const char* utf8String);
 
+/**
+ * Initializes a WPI_String from a UTF-8 string and length.
+ * If input string is null or 0 length, initilizes output to 0 length.
+ * The input string does not need to be null terminated.
+ *
+ * The lifetime of the output string is the lifetime of the input string.
+ * Do not call WPI_FreeString() with the output of this call.
+ *
+ * @param wpiString output string
+ * @param utf8String input string
+ * @param length input string length in chars
+ */
 void WPI_InitStringWithLength(struct WPI_String* wpiString,
                               const char* utf8String, size_t length);
 
+/**
+ * Allocates a WPI_String for the specified length.
+ * The resultant string must be freed with WPI_FreeString().
+ *
+ * @param wpiString output string
+ * @param length string length in chars to allocate
+ * @return mutable pointer to allocated buffer
+ *
+ */
 char* WPI_AllocateString(struct WPI_String* wpiString, size_t length);
 
+/**
+ * Frees a WPI_String that was allocated with WPI_AllocateString()
+ *
+ * @param wpiString string to free
+ */
 void WPI_FreeString(const WPI_String* wpiString);
 
 #ifdef __cplusplus
