@@ -199,6 +199,34 @@ class CommandStadiaController : public CommandGenericHID {
       frc::EventLoop* loop =
           CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
 
+  /**
+   * Get the X axis value of left side of the controller.
+   *
+   * @return the axis value
+   */
+  double GetLeftX() const;
+
+  /**
+   * Get the X axis value of right side of the controller.
+   *
+   * @return the axis value
+   */
+  double GetRightX() const;
+
+  /**
+   * Get the Y axis value of left side of the controller.
+   *
+   * @return the axis value
+   */
+  double GetLeftY() const;
+
+  /**
+   * Get the Y axis value of right side of the controller.
+   *
+   * @return the axis value
+   */
+  double GetRightY() const;
+
  private:
   frc::StadiaController m_hid;
 };

@@ -20,3 +20,11 @@ Trigger CommandJoystick::Trigger(frc::EventLoop* loop) const {
 Trigger CommandJoystick::Top(frc::EventLoop* loop) const {
   return m_hid.Top(loop).CastTo<class Trigger>();
 }
+
+double CommandJoystick::GetMagnitude() const {
+  return m_hid.GetMagnitude();
+}
+
+units::radian_t CommandJoystick::GetDirection() const {
+  return m_hid.GetDirection();
+}

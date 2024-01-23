@@ -72,3 +72,19 @@ Trigger CommandStadiaController::LeftTrigger(frc::EventLoop* loop) const {
 Trigger CommandStadiaController::RightTrigger(frc::EventLoop* loop) const {
   return m_hid.RightTrigger(loop).CastTo<Trigger>();
 }
+
+double CommandStadiaController::GetLeftX() const {
+  return m_hid.GetLeftX();
+}
+
+double CommandStadiaController::GetRightX() const {
+  return m_hid.GetRightX();
+}
+
+double CommandStadiaController::GetLeftY() const {
+  return m_hid.GetLeftY();
+}
+
+double CommandStadiaController::GetRightY() const {
+  return m_hid.GetRightY();
+}

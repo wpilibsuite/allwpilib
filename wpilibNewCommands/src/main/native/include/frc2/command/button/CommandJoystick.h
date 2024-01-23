@@ -55,6 +55,20 @@ class CommandJoystick : public CommandGenericHID {
    */
   class Trigger Top(frc::EventLoop* loop = CommandScheduler::GetInstance()
                                                .GetDefaultButtonLoop()) const;
+  /**
+   * Get the magnitude of the direction vector formed by the joystick's
+   * current position relative to its origin.
+   *
+   * @return The magnitude of the direction vector
+   */
+  double GetMagnitude() const;
+
+  /**
+   * Get the direction of the vector formed by the joystick and its origin.
+   *
+   * @return The direction of the vector.
+   */
+  units::radian_t GetDirection() const;
 
  private:
   frc::Joystick m_hid;
