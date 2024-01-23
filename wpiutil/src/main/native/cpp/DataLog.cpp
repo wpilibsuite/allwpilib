@@ -1118,9 +1118,10 @@ void WPI_DataLog_Stop(struct WPI_DataLog* datalog) {
   reinterpret_cast<DataLog*>(datalog)->Stop();
 }
 
-int WPI_DataLog_Start(struct WPI_DataLog* datalog, const struct WPI_String* name,
-                      const struct WPI_String* type, const struct WPI_String* metadata,
-                      int64_t timestamp) {
+int WPI_DataLog_Start(struct WPI_DataLog* datalog,
+                      const struct WPI_String* name,
+                      const struct WPI_String* type,
+                      const struct WPI_String* metadata, int64_t timestamp) {
   return reinterpret_cast<DataLog*>(datalog)->Start(
       wpi::to_string_view(*name), wpi::to_string_view(*type),
       wpi::to_string_view(*metadata), timestamp);
@@ -1132,7 +1133,8 @@ void WPI_DataLog_Finish(struct WPI_DataLog* datalog, int entry,
 }
 
 void WPI_DataLog_SetMetadata(struct WPI_DataLog* datalog, int entry,
-                             const struct WPI_String* metadata, int64_t timestamp) {
+                             const struct WPI_String* metadata,
+                             int64_t timestamp) {
   reinterpret_cast<DataLog*>(datalog)->SetMetadata(
       entry, wpi::to_string_view(*metadata), timestamp);
 }

@@ -5,6 +5,7 @@
 #pragma once
 
 #include <stdint.h>
+
 #include <wpi/string.h>
 
 #ifdef __cplusplus
