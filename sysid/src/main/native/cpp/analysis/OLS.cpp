@@ -60,11 +60,11 @@ OLSResult OLS(const Eigen::MatrixXd& X, const Eigen::VectorXd& y) {
   //
   //   SSTO = yᵀy - 1/n yᵀJy
   //
-  // Let J = I.
-  //
-  //   SSTO = yᵀy - 1/n yᵀy
-  //   SSTO = (n − 1)/n yᵀy
-  double SSTO = (n - 1.0) / n * (y.transpose() * y).value();
+  // where J is a matrix of ones.
+  double SSTO =
+      (y.transpose() * y - 1.0 / y.rows() * y.transpose() *
+                               Eigen::MatrixXd::Ones(y.rows(), y.rows()) * y)
+          .value();
 
   // R² or the coefficient of determination, which represents how much of the
   // total variation (variation in y) can be explained by the regression model
