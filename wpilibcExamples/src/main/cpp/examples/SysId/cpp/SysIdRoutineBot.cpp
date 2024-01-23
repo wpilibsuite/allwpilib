@@ -12,8 +12,8 @@ SysIdRoutineBot::SysIdRoutineBot() {
 
 void SysIdRoutineBot::ConfigureBindings() {
   m_drive.SetDefaultCommand(m_drive.ArcadeDriveCommand(
-      [this] { return -m_driverController.GetHID().GetLeftY(); },
-      [this] { return -m_driverController.GetHID().GetRightX(); }));
+      [this] { return -m_driverController.GetLeftY(); },
+      [this] { return -m_driverController.GetRightX(); }));
 
   m_driverController.A().WhileTrue(
       m_drive.SysIdQuasistatic(frc2::sysid::Direction::kForward));

@@ -15,8 +15,8 @@ RobotContainer::RobotContainer() {
 
   // Set up default drive command
   m_drive.SetDefaultCommand(m_drive.ArcadeDriveCommand(
-      [this] { return -m_driverController.GetHID().GetLeftY(); },
-      [this] { return -m_driverController.GetHID().GetRightX(); }));
+      [this] { return -m_driverController.GetLeftY(); },
+      [this] { return -m_driverController.GetRightX(); }));
 }
 
 void RobotContainer::ConfigureButtonBindings() {
