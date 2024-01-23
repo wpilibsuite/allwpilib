@@ -6,6 +6,7 @@
 
 #include <memory>
 #include <utility>
+#include <concepts>
 
 #include <wpi/deprecated.h>
 

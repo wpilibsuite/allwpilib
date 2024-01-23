@@ -10,6 +10,7 @@
 #include <optional>
 #include <span>
 #include <utility>
+#include <concepts>
 
 #include <frc/Errors.h>
 #include <frc/Watchdog.h>
