@@ -509,7 +509,6 @@ NT_Bool NT_SetDefaultString(NT_Handle pubentry, const struct WPI_String* default
  * @param defaultValue default value to return if no value has been published
  * @param value returned value (output)
 
- * @return value
  */
 void NT_GetString(NT_Handle subentry, const struct WPI_String* defaultValue, struct WPI_String* value);
 

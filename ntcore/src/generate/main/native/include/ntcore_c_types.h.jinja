@@ -90,7 +90,9 @@ NT_Bool NT_SetDefault{{ t.TypeName }}(NT_Handle pubentry, {{ t.c.ParamType }} de
  * @param defaultValueLen length of default value
  * @param len length of returned value (output)
 {% endif %}
+{%- if not t.c.ValueInline %}
  * @return value
+{%- endif %}
  */
 {%- if t.c.ValueInline %}
 void NT_Get{{ t.TypeName }}(NT_Handle subentry, {{ t.c.ParamType }} defaultValue, {{ t.c.ValueType }} value);
