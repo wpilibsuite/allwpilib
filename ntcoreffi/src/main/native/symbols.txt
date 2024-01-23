@@ -27,7 +27,6 @@ NT_DestroyListenerPoller
 NT_DisposeConnectionInfoArray
 NT_DisposeEvent
 NT_DisposeEventArray
-NT_DisposeString
 NT_DisposeTimestampedBoolean
 NT_DisposeTimestampedBooleanArray
 NT_DisposeTimestampedDouble
@@ -136,6 +135,9 @@ NT_GetValueStringArrayForTesting
 NT_GetValueStringForTesting
 NT_GetValueType
 WPI_InitString
+WPI_InitStringWithLength
+WPI_AllocateString
+WPI_FreeString
 NT_InitValue
 NT_IsConnected
 NT_Meta_DecodeClientPublishers
