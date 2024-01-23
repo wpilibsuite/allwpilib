@@ -176,6 +176,50 @@ class CommandPS5Controller : public CommandGenericHID {
   Trigger Touchpad(frc::EventLoop* loop = CommandScheduler::GetInstance()
                                               .GetDefaultButtonLoop()) const;
 
+  /**
+   * Get the R2 axis value of the controller. Note that this axis is bound to
+   * the range of [0, 1] as opposed to the usual [-1, 1].
+   *
+   * @return the axis value.
+   */
+  double GetR2Axis();
+
+  /**
+   * Get the L2 axis value of the controller. Note that this axis is bound to
+   * the range of [0, 1] as opposed to the usual [-1, 1].
+   *
+   * @return the axis value.
+   */
+  double GetL2Axis();
+
+  /**
+   * Get the Y axis value of right side of the controller.
+   *
+   * @return the axis value.
+   */
+  double GetRightY();
+
+  /**
+   * Get the Y axis value of left side of the controller.
+   *
+   * @return the axis value.
+   */
+  double GetLeftY();
+
+  /**
+   * Get the X axis value of right side of the controller.
+   *
+   * @return the axis value.
+   */
+  double GetRightX();
+
+  /**
+   * Get the X axis value of left side of the controller.
+   *
+   * @return the axis value.
+   */
+  double GetLeftX();
+
  private:
   frc::PS5Controller m_hid;
 };

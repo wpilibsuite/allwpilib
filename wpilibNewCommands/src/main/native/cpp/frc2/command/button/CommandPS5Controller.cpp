@@ -64,3 +64,27 @@ Trigger CommandPS5Controller::PS(frc::EventLoop* loop) const {
 Trigger CommandPS5Controller::Touchpad(frc::EventLoop* loop) const {
   return m_hid.Touchpad(loop).CastTo<Trigger>();
 }
+
+double CommandPS5Controller::GetR2Axis() {
+  return m_hid.GetR2Axis();
+}
+
+double CommandPS5Controller::GetL2Axis() {
+  return m_hid.GetL2Axis();
+}
+
+double CommandPS5Controller::GetRightY() {
+  return m_hid.GetRightY();
+}
+
+double CommandPS5Controller::GetLeftY() {
+  return m_hid.GetLeftY();
+}
+
+double CommandPS5Controller::GetRightX() {
+  return m_hid.GetRightX();
+}
+
+double CommandPS5Controller::GetLeftX() {
+  return m_hid.GetLeftX();
+}

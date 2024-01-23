@@ -64,3 +64,27 @@ Trigger CommandPS4Controller::PS(frc::EventLoop* loop) const {
 Trigger CommandPS4Controller::Touchpad(frc::EventLoop* loop) const {
   return m_hid.Touchpad(loop).CastTo<Trigger>();
 }
+
+double CommandPS4Controller::GetR2Axis() {
+  return m_hid.GetR2Axis();
+}
+
+double CommandPS4Controller::GetL2Axis() {
+  return m_hid.GetL2Axis();
+}
+
+double CommandPS4Controller::GetRightY() {
+  return m_hid.GetRightY();
+}
+
+double CommandPS4Controller::GetLeftY() {
+  return m_hid.GetLeftY();
+}
+
+double CommandPS4Controller::GetRightX() {
+  return m_hid.GetRightX();
+}
+
+double CommandPS4Controller::GetLeftX() {
+  return m_hid.GetLeftX();
+}

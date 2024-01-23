@@ -62,3 +62,27 @@ Trigger CommandXboxController::RightTrigger(double threshold,
                                             frc::EventLoop* loop) const {
   return m_hid.RightTrigger(threshold, loop).CastTo<Trigger>();
 }
+
+double CommandXboxController::GetRightTriggerAxis() {
+  return m_hid.GetRightTriggerAxis();
+}
+
+double CommandXboxController::GetLeftTriggerAxis() {
+  return m_hid.GetLeftTriggerAxis();
+}
+
+double CommandXboxController::GetRightY() {
+  return m_hid.GetRightY();
+}
+
+double CommandXboxController::GetLeftY() {
+  return m_hid.GetLeftY();
+}
+
+double CommandXboxController::GetRightX() {
+  return m_hid.GetRightX();
+}
+
+double CommandXboxController::GetLeftX() {
+  return m_hid.GetLeftX();
+}
