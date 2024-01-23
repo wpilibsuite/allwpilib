@@ -7,30 +7,31 @@
 
 #include "Trigger.h"
 #include "frc2/command/CommandScheduler.h"
+#include "frc2/command/button/CommandGenericHID.h"
 
 namespace frc2 {
 /**
- * A version of {@link XboxController} with {@link Trigger} factories for
+ * A version of {@link frc::XboxController} with {@link Trigger} factories for
  * command-based.
  *
- * @see XboxController
+ * @see frc::XboxController
  */
-class CommandXboxController : public frc::XboxController {
+class CommandXboxController : CommandGenericHID {
  public:
-  using XboxController::XboxController;
+  /**
+   * Construct an instance of a controller.
+   *
+   * @param port The port index on the Driver Station that the controller is
+   * plugged into.
+   */
+  explicit CommandXboxController(int port);
 
   /**
-   * Constructs an event instance around this button's digital signal.
+   * Get the underlying GenericHID object.
    *
-   * @param button the button index
-   * @param loop the event loop instance to attach the event to. Defaults to the
-   * CommandScheduler's default loop.
-   * @return an event instance representing the button's digital signal attached
-   * to the given loop.
+   * @return the wrapped GenericHID object
    */
-  Trigger Button(int button,
-                 frc::EventLoop* loop = CommandScheduler::GetInstance()
-                                            .GetDefaultButtonLoop()) const;
+  frc::XboxController& GetHID();
 
   /**
    * Constructs an event instance around the left bumper's digital signal.
@@ -176,5 +177,8 @@ class CommandXboxController : public frc::XboxController {
       double threshold = 0.5,
       frc::EventLoop* loop =
           CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
+
+ private:
+  frc::XboxController m_hid;
 };
 }  // namespace frc2
