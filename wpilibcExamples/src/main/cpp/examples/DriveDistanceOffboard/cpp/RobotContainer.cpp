@@ -17,8 +17,8 @@ RobotContainer::RobotContainer() {
   // Set up default drive command
   m_drive.SetDefaultCommand(frc2::cmd::Run(
       [this] {
-        m_drive.ArcadeDrive(-m_driverController.GetLeftY(),
-                            -m_driverController.GetRightX());
+        m_drive.ArcadeDrive(-m_driverController.GetHID().GetLeftY(),
+                            -m_driverController.GetHID().GetRightX());
       },
       {&m_drive}));
 }
