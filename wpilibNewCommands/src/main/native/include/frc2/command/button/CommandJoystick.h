@@ -7,30 +7,38 @@
 
 #include "Trigger.h"
 #include "frc2/command/CommandScheduler.h"
+#include "frc2/command/button/CommandGenericHID.h"
 
 namespace frc2 {
 /**
- * A version of {@link Joystick} with {@link Trigger} factories for
+ * A version of {@link frc::Joystick} with {@link Trigger} factories for
  * command-based.
  *
- * @see Joystick
+ * @see frc::Joystick
  */
-class CommandJoystick : public frc::Joystick {
+class CommandJoystick : public CommandGenericHID {
  public:
-  using Joystick::Joystick;
+  /**
+   * Construct an instance of a controller.
+   *
+   * @param port The port index on the Driver Station that the controller is
+   * plugged into.
+   */
+  explicit CommandJoystick(int port);
 
   /**
-   * Constructs an event instance around this button's digital signal.
+   * Get the underlying GenericHID object.
    *
-   * @param button the button index
-   * @param loop the event loop instance to attach the event to. Defaults to the
-   * CommandScheduler's default loop.
-   * @return an event instance representing the button's digital signal attached
-   * to the given loop.
+   * @return the wrapped GenericHID object
    */
-  class Trigger Button(
-      int button, frc::EventLoop* loop = CommandScheduler::GetInstance()
-                                             .GetDefaultButtonLoop()) const;
+  frc::Joystick& GetHID();
+
+  /**
+   * Construct an instance of a controller.
+   *
+   * @param port The port index on the Driver Station that the controller is
+   * plugged into.
+   */
 
   /**
    * Constructs an event instance around the trigger button's digital signal.
@@ -54,5 +62,8 @@ class CommandJoystick : public frc::Joystick {
    */
   class Trigger Top(frc::EventLoop* loop = CommandScheduler::GetInstance()
                                                .GetDefaultButtonLoop()) const;
+
+ private:
+  frc::Joystick m_hid;
 };
 }  // namespace frc2

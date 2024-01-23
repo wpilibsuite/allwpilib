@@ -7,17 +7,31 @@
 
 #include "Trigger.h"
 #include "frc2/command/CommandScheduler.h"
+#include "frc2/command/button/CommandGenericHID.h"
 
 namespace frc2 {
 /**
- * A version of {@link PS4Controller} with {@link Trigger} factories for
+ * A version of {@link frc::PS4Controller} with {@link Trigger} factories for
  * command-based.
  *
- * @see PS4Controller
+ * @see frc::PS4Controller
  */
-class CommandPS4Controller : public frc::PS4Controller {
+class CommandPS4Controller : public frc2::CommandGenericHID {
  public:
-  using PS4Controller::PS4Controller;
+  /**
+   * Construct an instance of a device.
+   *
+   * @param port The port index on the Driver Station that the device is plugged
+   * into.
+   */
+  explicit CommandPS4Controller(int port);
+
+  /**
+   * Get the underlying GenericHID object.
+   *
+   * @return the wrapped GenericHID object
+   */
+  frc::PS4Controller& GetHID();
 
   /**
    * Constructs an event instance around this button's digital signal.
@@ -174,5 +188,8 @@ class CommandPS4Controller : public frc::PS4Controller {
    */
   Trigger Touchpad(frc::EventLoop* loop = CommandScheduler::GetInstance()
                                               .GetDefaultButtonLoop()) const;
+
+ private:
+  frc::PS4Controller m_hid;
 };
 }  // namespace frc2
