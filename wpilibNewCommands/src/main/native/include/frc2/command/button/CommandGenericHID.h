@@ -31,7 +31,7 @@ class CommandGenericHID {
    *
    * @return the wrapped GenericHID object
    */
-  frc::GenericHID* GetHID();
+  frc::GenericHID& GetHID();
 
   /**
    * Constructs an event instance around this button's digital signal.
