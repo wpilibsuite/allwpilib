@@ -20,10 +20,6 @@ static inline std::string_view ConvertFromC(const struct WPI_String* str) {
   return wpi::to_string_view(*str);
 }
 
-static inline std::string_view ConvertFromC(const char* arr, size_t size) {
-  return {arr, size};
-}
-
 static std::vector<std::string> ConvertFromC(const WPI_String* arr, size_t size) {
   std::vector<std::string> v;
   v.reserve(size);
