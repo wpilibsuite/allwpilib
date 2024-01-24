@@ -58,7 +58,7 @@ public class ProfiledPIDCommand extends Command {
     m_useOutput = useOutput;
     m_measurement = measurementSource;
     m_goal = goalSource;
-    m_requirements.addAll(Set.of(requirements));
+    addRequirements(requirements);
   }
 
   /**
@@ -86,7 +86,7 @@ public class ProfiledPIDCommand extends Command {
     m_useOutput = useOutput;
     m_measurement = measurementSource;
     m_goal = () -> new State(goalSource.getAsDouble(), 0);
-    m_requirements.addAll(Set.of(requirements));
+    addRequirements(requirements);
   }
 
   /**
