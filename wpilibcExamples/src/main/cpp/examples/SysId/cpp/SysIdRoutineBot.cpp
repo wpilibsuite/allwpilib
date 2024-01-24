@@ -23,6 +23,20 @@ void SysIdRoutineBot::ConfigureBindings() {
       m_drive.SysIdDynamic(frc2::sysid::Direction::kForward));
   m_driverController.Y().WhileTrue(
       m_drive.SysIdDynamic(frc2::sysid::Direction::kReverse));
+  
+  m_shooter.SetDefaultCommand(m_shooter.RunShooterCommand(
+    [this] { return constants::shooter::kShooterTargetSpeed; }));
+
+  /* Uncomment to bind Shooter routine, but comment out the drive routines too
+  m_driverController.A().WhileTrue(
+      m_shooter.SysIdQuasistatic(frc2::sysid::Direction::kForward));
+  m_driverController.B().WhileTrue(
+      m_shooter.SysIdQuasistatic(frc2::sysid::Direction::kReverse));
+  m_driverController.X().WhileTrue(
+      m_shooter.SysIdDynamic(frc2::sysid::Direction::kForward));
+  m_driverController.Y().WhileTrue(
+      m_shooter.SysIdDynamic(frc2::sysid::Direction::kReverse));
+  */
 }
 
 frc2::CommandPtr SysIdRoutineBot::GetAutonomousCommand() {
