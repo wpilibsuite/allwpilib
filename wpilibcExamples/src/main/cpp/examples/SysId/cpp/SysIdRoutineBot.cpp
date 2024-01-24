@@ -27,7 +27,7 @@ void SysIdRoutineBot::ConfigureBindings() {
   m_shooter.SetDefaultCommand(m_shooter.RunShooterCommand(
     [this] { return constants::shooter::kShooterTargetSpeed; }));
 
-  /* Uncomment to bind Shooter routine, but comment out the drive routines too
+  /* Uncomment to bind Shooter routine, but comment out the drive routine too
   m_driverController.A().WhileTrue(
       m_shooter.SysIdQuasistatic(frc2::sysid::Direction::kForward));
   m_driverController.B().WhileTrue(

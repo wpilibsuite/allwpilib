@@ -92,7 +92,7 @@ public class Shooter extends SubsystemBase {
    *
    * @param shooterSpeed The commanded shooter wheel speed in rotations per second
    */
-  public Command runShooterCommand(DoubleSupplier shooterSpeed) {
+  public Command runShooter(DoubleSupplier shooterSpeed) {
     // Run shooter wheel at the desired speed using a PID controller and feedforward.
     return run(() -> {
           m_shooterMotor.setVoltage(
