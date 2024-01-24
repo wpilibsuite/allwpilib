@@ -9,6 +9,7 @@
 #include <frc/Encoder.h>
 #include <frc/RobotController.h>
 #include <frc/controller/PIDController.h>
+#include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc2/command/SubsystemBase.h>
 #include <frc2/command/sysid/SysIdRoutine.h>
@@ -48,4 +49,5 @@ class Shooter : public frc2::SubsystemBase {
           },
           this}};
   frc::PIDController m_shooterFeedback{constants::shooter::kP, 0, 0};
+  frc::SimpleMotorFeedforward<units::turns> m_shooterFeedforward{constants::shooter::kS, constants::shooter::kV, constants::shooter::ka_unit_t{0}};
 };

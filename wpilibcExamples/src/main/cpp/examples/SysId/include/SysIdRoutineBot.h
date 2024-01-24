@@ -9,6 +9,7 @@
 
 #include "Constants.h"
 #include "subsystems/Drive.h"
+#include "subsystems/Shooter.h"
 
 class SysIdRoutineBot {
  public:
