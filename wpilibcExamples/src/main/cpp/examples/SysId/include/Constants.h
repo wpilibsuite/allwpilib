@@ -39,7 +39,9 @@ using kv_unit =
                          units::inverse<units::turns>>;
 using kv_unit_t = units::unit_t<kv_unit>;
 
-using ka_unit = units::compound_unit<units::volts, units::inverse<units::turns_per_second_squared>>;
+using ka_unit =
+    units::compound_unit<units::volts,
+                         units::inverse<units::turns_per_second_squared>>;
 using ka_unit_t = units::unit_t<ka_unit>;
 
 inline constexpr std::array<int, 2> kEncoderPorts = {4, 5};
@@ -59,7 +61,7 @@ inline constexpr double kP = 1.0;
 
 inline constexpr units::volt_t kS = 0.05_V;
 inline constexpr kv_unit_t kV = (12_V) / kShooterFreeSpeed;
-inline constexpr ka_unit_t kA = 0_V * 1_s * 1_s / units::turn_t{1}; 
+inline constexpr ka_unit_t kA = 0_V * 1_s * 1_s / units::turn_t{1};
 
 inline constexpr double kFeederSpeed = 0.5;
 }  // namespace shooter
