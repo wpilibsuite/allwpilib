@@ -1,0 +1,9 @@
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_binary")
+
+wpilib_cc_binary(
+    name = "webserver",
+    srcs = ["webserver.cpp"],
+    deps = [
+        "//wpinet/src/main/native:wpinet.static",
+    ],
+)

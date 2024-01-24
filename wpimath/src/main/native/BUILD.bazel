@@ -1,0 +1,34 @@
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_static_and_shared_library")
+load("//shared/bazel/rules/jni:cc_jni.bzl", "wpilib_jni_cc_library")
+
+wpilib_cc_static_and_shared_library(
+    name = "wpimath",
+    srcs = glob(
+        ["cpp/**"],
+        exclude = ["cpp/jni/**"],
+    ),
+    hdrs = glob(["include/**/*"]),
+    defines = ["WPILIB_EXPORTS"],
+    export_symbols = False,
+    includes = ["include"],
+    standard_deps = [
+        "//wpimath/src/main/native/thirdparty/eigen:eigen-headers",
+        "//wpimath/src/main/native/thirdparty/gcem",
+        "//wpimath/src/main/proto:cc_proto",
+    ],
+    strip_include_prefix = "include",
+    visibility = ["//visibility:public"],
+    wpi_maybe_shared_deps = [
+        "//wpiutil/src/main/native:wpiutil",
+    ],
+)
+
+wpilib_jni_cc_library(
+    name = "wpimathjni",
+    srcs = glob(["cpp/jni/**"]),
+    java_dep = "//wpimath/src/main/java/edu/wpi/first/math:wpimath",
+    visibility = ["//visibility:public"],
+    wpi_maybe_shared_deps = [
+        ":wpimath",
+    ],
+)

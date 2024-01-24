@@ -1,0 +1,21 @@
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_test")
+
+wpilib_cc_library(
+    name = "wpiutil-testlib",
+    hdrs = glob(["include/**"]),
+    strip_include_prefix = "include",
+    visibility = ["//visibility:public"],
+)
+
+wpilib_cc_test(
+    name = "wpiutil-test",
+    size = "small",
+    srcs = glob(["cpp/**"]),
+    linkstatic = True,
+    tags = ["no-tsan"],  # TODO(pj.reiniger) Find problem
+    deps = [
+        ":wpiutil-testlib",
+        "//wpiutil/src/main/native:wpiutil.static",
+        "@gtest",
+    ],
+)

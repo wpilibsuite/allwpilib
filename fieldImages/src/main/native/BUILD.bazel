@@ -1,0 +1,11 @@
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library")
+
+wpilib_cc_library(
+    name = "fieldImages-cpp",
+    srcs = ["//fieldImages/src/main/native/resources:generate-resources"] + glob(["cpp/**"]),
+    hdrs = glob(["include/**/*"]),
+    strip_include_prefix = "include",
+    visibility = ["//visibility:public"],
+    deps = [
+    ],
+)

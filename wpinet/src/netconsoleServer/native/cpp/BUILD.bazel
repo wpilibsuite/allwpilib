@@ -1,0 +1,13 @@
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_binary")
+
+wpilib_cc_binary(
+    name = "netconsoleServer",
+    srcs = ["main.cpp"],
+    linkopts = select({
+        "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": ["-lutil"],
+        "//conditions:default": [],
+    }),
+    deps = [
+        "//wpinet/src/main/native:wpinet.static",
+    ],
+)

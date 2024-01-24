@@ -1,0 +1,9 @@
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_binary")
+
+wpilib_cc_binary(
+    name = "writelog",
+    srcs = ["writelog.cpp"],
+    deps = [
+        "//wpiutil/src/main/native:wpiutil.static",
+    ],
+)

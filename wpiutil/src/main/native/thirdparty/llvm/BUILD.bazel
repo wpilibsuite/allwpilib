@@ -1,0 +1,17 @@
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library")
+
+wpilib_cc_library(
+    name = "llvm-headers",
+    hdrs = glob([
+        "include/**/*.h",
+    ]),
+    includes = ["include"],
+    strip_include_prefix = "include",
+    visibility = ["//wpiutil:__subpackages__"],
+)
+
+filegroup(
+    name = "llvm-srcs",
+    srcs = glob(["cpp/**"]),
+    visibility = ["//wpiutil:__subpackages__"],
+)

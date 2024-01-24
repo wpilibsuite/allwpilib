@@ -1,0 +1,14 @@
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_test")
+
+wpilib_cc_test(
+    name = "sysid-test",
+    size = "medium",
+    srcs = glob(["cpp/**"]),
+    tags = [
+        "no-asan",
+    ],
+    deps = [
+        "//sysid/src/main/native:sysid-lib",
+        "@gtest",
+    ],
+)

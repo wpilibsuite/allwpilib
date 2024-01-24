@@ -1,0 +1,16 @@
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_test")
+
+wpilib_cc_test(
+    name = "wpinet-test",
+    size = "small",
+    srcs = glob([
+        "**/*.cpp",
+        "**/*.h",
+    ]),
+    tags = ["no-asan"],
+    deps = [
+        "//wpinet/src/main/native:wpinet.static",
+        "//wpiutil/src/test/native:wpiutil-testlib",
+        "@gtest",
+    ],
+)

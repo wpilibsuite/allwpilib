@@ -1,0 +1,33 @@
+
+build:bullseye32 --platforms=@rules_bzlmodrio_toolchains//platforms/bullseye32
+build:bullseye32 --build_tag_filters=-no-bullseye
+build:bullseye32 --features=compiler_param_file
+build:bullseye32 --platform_suffix=bullseye32
+build:bullseye32 --incompatible_enable_cc_toolchain_resolution
+
+build:bullseye32 --cxxopt=-std=c++20
+build:bullseye32 --cxxopt=-Wformat=2
+build:bullseye32 --cxxopt=-pedantic
+build:bullseye32 --cxxopt=-Wno-psabi
+build:bullseye32 --cxxopt=-Wno-unused-parameter
+build:bullseye32 --cxxopt=-Wno-error=deprecated-declarations
+build:bullseye32 --cxxopt=-fPIC
+build:bullseye32 --cxxopt=-pthread
+
+# Extra 11
+# build:bullseye32 --cxxopt=-Wno-error=deprecated-enum-enum-conversion
+
+# C Only
+build:bullseye32 --conlyopt=-Wformat=2
+build:bullseye32 --conlyopt=-pedantic
+build:bullseye32 --conlyopt=-Wno-psabi
+build:bullseye32 --conlyopt=-Wno-unused-parameter
+build:bullseye32 --conlyopt=-fPIC
+build:bullseye32 --conlyopt=-pthread
+
+
+# Linker
+build:bullseye32 --linkopt=-rdynamic
+build:bullseye32 --linkopt=-pthread
+build:bullseye32 --linkopt=-ldl
+build:bullseye32 --linkopt=-latomic

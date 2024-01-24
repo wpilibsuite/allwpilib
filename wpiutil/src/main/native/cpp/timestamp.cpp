@@ -25,6 +25,12 @@ using namespace nRoboRIO_FPGANamespace;
 #endif
 
 #ifdef _WIN32
+#ifdef _WIN32_WINNT
+// Bazel hardcodes a single version of windows, which does not have all the
+// functions we need.
+#undef _WIN32_WINNT
+#endif
+
 #include <windows.h>
 
 #include <cassert>

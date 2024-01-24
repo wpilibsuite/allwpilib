@@ -1,0 +1,81 @@
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_static_and_shared_library")
+load("//shared/bazel/rules:objectivec_rules.bzl", "wpilib_objc_library")
+load("//shared/bazel/rules/jni:cc_jni.bzl", "wpilib_jni_cc_library")
+
+WIN_SRCS = glob([
+    "windows/**/*.cpp",
+    "windows/**/*.h",
+])
+
+LINUX_SRCS = glob([
+    "linux/**/*.cpp",
+    "linux/**/*.h",
+])
+
+MAC_SRCS = glob(["osx/**/*.cpp"])
+
+filegroup(
+    name = "native-srcs",
+    srcs = select({
+        "@bazel_tools//src/conditions:darwin": MAC_SRCS,
+        "@bazel_tools//src/conditions:windows": WIN_SRCS,
+        "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": LINUX_SRCS,
+    }),
+)
+
+wpilib_objc_library(
+    name = "cscore-mac",
+    srcs = glob([
+        "objcpp/**/*.mm",
+        "cpp/*.h",
+    ]),
+    hdrs = glob([
+        "include/**/*",
+        "objcpp/**/*.h",
+    ]),
+    includes = [
+        "cpp",
+        "include",
+        "objcpp",
+    ],
+    deps = [
+        "//wpinet/src/main/native:wpinet.static",
+        "//wpiutil/src/main/native:wpiutil.static",
+        "@bzlmodrio-opencv//libraries/cpp/opencv",
+    ],
+)
+
+wpilib_cc_static_and_shared_library(
+    name = "cscore",
+    srcs = [":native-srcs"] + glob(
+        ["cpp/**"],
+        exclude = ["cpp/jni/**"],
+    ),
+    hdrs = glob(["include/**/*"]),
+    includes = [
+        "cpp",
+        "include",
+    ],
+    standard_deps = [
+        "@bzlmodrio-opencv//libraries/cpp/opencv",
+    ] + select({
+        "@bazel_tools//src/conditions:darwin": [":cscore-mac"],
+        "//conditions:default": [],
+    }),
+    strip_include_prefix = "include",
+    visibility = ["//visibility:public"],
+    wpi_maybe_shared_deps = [
+        "//wpiutil/src/main/native:wpiutil",
+        "//wpinet/src/main/native:wpinet",
+    ],
+)
+
+wpilib_jni_cc_library(
+    name = "cscorejni",
+    srcs = glob(["cpp/jni/**"]),
+    java_dep = "//cscore/src/main/java/edu/wpi/first/cscore:cscore",
+    visibility = ["//visibility:public"],
+    wpi_maybe_shared_deps = [
+        ":cscore",
+    ],
+)

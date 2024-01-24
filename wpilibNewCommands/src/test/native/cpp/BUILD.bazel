@@ -1,0 +1,15 @@
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_test")
+
+wpilib_cc_test(
+    name = "wpilibNewCommands-cpp-test",
+    size = "small",
+    srcs = glob([
+        "**/*.cpp",
+        "**/*.h",
+    ]),
+    tags = ["no-tsan"],
+    deps = [
+        "//wpilibNewCommands/src/main/native:wpilibNewCommands.static",
+        "@gtest",
+    ],
+)

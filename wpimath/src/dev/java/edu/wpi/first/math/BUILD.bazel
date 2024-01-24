@@ -1,0 +1,9 @@
+load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_binary")
+
+wpilib_java_binary(
+    name = "DevMain",
+    srcs = ["DevMain.java"],
+    deps = [
+        "//wpimath/src/main/java/edu/wpi/first/math:wpimath",
+    ],
+)

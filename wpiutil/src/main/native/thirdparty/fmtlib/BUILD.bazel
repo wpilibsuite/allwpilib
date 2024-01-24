@@ -1,0 +1,17 @@
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library")
+
+wpilib_cc_library(
+    name = "fmtlib-headers",
+    hdrs = glob([
+        "include/**/*.h",
+    ]),
+    includes = ["include"],
+    strip_include_prefix = "include",
+    visibility = ["//wpiutil:__subpackages__"],
+)
+
+filegroup(
+    name = "fmtlib-srcs",
+    srcs = glob(["src/**"]),
+    visibility = ["//wpiutil:__subpackages__"],
+)

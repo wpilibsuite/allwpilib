@@ -1,0 +1,35 @@
+load("//shared/bazel/rules:cc_flags.bzl", "get_wpigui_linker_flags")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_binary", "wpilib_cc_library")
+load("//shared/bazel/rules/gen:gen-resources.bzl", "generate_resources")
+
+generate_resources(
+    name = "generate-resources",
+    namespace = "sysid",
+    prefix = "SYSID",
+    resource_files = glob(["resources/*"]),
+)
+
+wpilib_cc_library(
+    name = "sysid-lib",
+    srcs = glob(
+        ["cpp/**/*.cpp"],
+        exclude = ["cpp/Main.cpp"],
+    ) + [
+        ":generate-resources",
+        "//sysid/src/main/generate:generate-version",
+    ],
+    hdrs = glob(["include/**"]),
+    linkopts = get_wpigui_linker_flags(console = True),
+    strip_include_prefix = "include",
+    visibility = ["//sysid:__subpackages__"],
+    deps = [
+        "//glass/src/libnt/native:libglassnt",
+    ],
+)
+
+wpilib_cc_binary(
+    name = "sysid",
+    srcs = ["cpp/Main.cpp"],
+    linkopts = get_wpigui_linker_flags(console = False),
+    deps = ["sysid-lib"],
+)

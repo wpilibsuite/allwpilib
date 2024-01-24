@@ -1,0 +1,10 @@
+load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
+
+wpilib_java_junit5_test(
+    name = "fieldImages-test",
+    size = "small",
+    srcs = glob(["*.java"]),
+    deps = [
+        "//fieldImages/src/main/java/edu/wpi/fields:fieldImages-java",
+    ],
+)

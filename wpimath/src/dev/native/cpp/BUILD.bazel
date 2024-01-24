@@ -1,0 +1,9 @@
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_binary")
+
+wpilib_cc_binary(
+    name = "DevMain",
+    srcs = ["main.cpp"],
+    deps = [
+        "//wpimath/src/main/native:wpimath.static",
+    ],
+)

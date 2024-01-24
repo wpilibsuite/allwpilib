@@ -10,14 +10,12 @@
 using namespace frc;
 
 namespace {
-
 using ProtoType = wpi::Protobuf<frc::DifferentialDriveKinematics>;
-
-const DifferentialDriveKinematics kExpectedData =
-    DifferentialDriveKinematics{1.74_m};
 }  // namespace
 
 TEST(DifferentialDriveKinematicsProtoTest, Roundtrip) {
+  const DifferentialDriveKinematics kExpectedData =
+      DifferentialDriveKinematics{1.74_m};
   google::protobuf::Arena arena;
   google::protobuf::Message* proto = ProtoType::New(&arena);
   ProtoType::Pack(proto, kExpectedData);

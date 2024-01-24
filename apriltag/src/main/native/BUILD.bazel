@@ -1,0 +1,32 @@
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_static_and_shared_library")
+load("//shared/bazel/rules/jni:cc_jni.bzl", "wpilib_jni_cc_library")
+
+wpilib_cc_static_and_shared_library(
+    name = "apriltag",
+    srcs = ["//apriltag/src/main/native/resources:generate-resources"] + glob(
+        ["cpp/**"],
+        exclude = ["cpp/jni/**"],
+    ),
+    hdrs = glob(["include/**/*"]),
+    defines = ["WPILIB_EXPORTS"],
+    export_symbols = False,
+    standard_deps = [
+        "@bzlmodrio-apriltaglib//libraries/cpp/apriltaglib",
+    ],
+    strip_include_prefix = "include",
+    visibility = ["//visibility:public"],
+    wpi_maybe_shared_deps = [
+        "//wpiutil/src/main/native:wpiutil",
+        "//wpimath/src/main/native:wpimath",
+    ],
+)
+
+wpilib_jni_cc_library(
+    name = "apriltagjni",
+    srcs = glob(["cpp/jni/**"]),
+    java_dep = "//apriltag/src/main/java/edu/wpi/first/apriltag:apriltag",
+    visibility = ["//visibility:public"],
+    wpi_maybe_shared_deps = [
+        ":apriltag",
+    ],
+)

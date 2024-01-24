@@ -20,6 +20,8 @@ generatedFileExclude {
   simulation/gz_msgs/src/include/simulation/gz_msgs/msgs\.h$
   fieldImages/src/main/native/resources/
   apriltag/src/test/resources/
+  BUILD.bazel
+  MODULE.bazel.lock
 }
 
 repoRootNameOverride {

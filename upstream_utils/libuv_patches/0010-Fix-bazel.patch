@@ -1,0 +1,25 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Fri, 20 Oct 2023 16:40:59 -0400
+Subject: [PATCH 10/10] Fix bazel
+
+---
+ src/win/util.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/src/win/util.c b/src/win/util.c
+index 14295c41342b6dda16f39c5c548a6cc8269bfa0b..a63be14a7c9ea7ad029c9c0aa0f9798a57aaf10e 100644
+--- a/src/win/util.c
++++ b/src/win/util.c
+@@ -19,6 +19,11 @@
+  * IN THE SOFTWARE.
+  */
+ 
++// Bazel hardcodes a single version of windows, which does not have all the functions we need.
++#ifdef _WIN32_WINNT
++#undef _WIN32_WINNT
++#endif
++
+ #include <assert.h>
+ #include <direct.h>
+ #include <limits.h>

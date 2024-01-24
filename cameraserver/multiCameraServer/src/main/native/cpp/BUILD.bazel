@@ -1,0 +1,10 @@
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_binary")
+
+wpilib_cc_binary(
+    name = "multiCameraServer",
+    srcs = ["main.cpp"],
+    deps = [
+        "//cameraserver/src/main/native:cameraserver.static",
+        "//ntcore/src/main/native:ntcore.static",
+    ],
+)

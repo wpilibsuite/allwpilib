@@ -1,0 +1,8 @@
+load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_library")
+
+wpilib_java_library(
+    name = "resources",
+    testonly = True,
+    resources = glob(["**"]),
+    visibility = ["//wpilibj/src/test:__subpackages__"],
+)

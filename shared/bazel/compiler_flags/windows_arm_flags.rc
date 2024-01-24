@@ -1,0 +1,31 @@
+
+build:windows_arm --cpu=x64_arm64_windows
+
+# Warning level
+build:windows_arm --copt=/W3
+build:windows_arm --copt=/WX
+
+# C++ options
+build:windows_arm --cxxopt=/utf-8
+build:windows_arm --cxxopt=/EHsc
+build:windows_arm --cxxopt=/FS
+build:windows_arm --cxxopt=/Zc:inline
+build:windows_arm --cxxopt=/wd4244
+build:windows_arm --cxxopt=/wd4267
+build:windows_arm --cxxopt=/wd4146
+build:windows_arm --cxxopt=/wd4996
+build:windows_arm --cxxopt=/Zc:throwingNew
+build:windows_arm --cxxopt=/D_CRT_SECURE_NO_WARNINGS
+build:windows_arm --cxxopt=/std:c++20
+build:windows_arm --cxxopt=/permissive-
+build:windows_arm --cxxopt=/bigobj
+build:windows_arm --cxxopt=/Zc:__cplusplus
+build:windows_arm --cxxopt=/Zc:preprocessor
+build:windows_arm --cxxopt=/wd5105
+
+# C Only
+build:windows_arm --conlyopt=/FS
+build:windows_arm --conlyopt=/Zc:inline
+build:windows_arm --conlyopt=/D_CRT_SECURE_NO_WARNINGS
+
+build:windows_arm --linkopt=/IGNORE:4099
