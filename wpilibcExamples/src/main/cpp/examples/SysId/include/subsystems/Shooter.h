@@ -8,10 +8,10 @@
 
 #include <frc/Encoder.h>
 #include <frc/RobotController.h>
+#include <frc/controller/PIDController.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc2/command/SubsystemBase.h>
 #include <frc2/command/sysid/SysIdRoutine.h>
-#include <frc/controller/PIDController.h>
 
 #include "Constants.h"
 
@@ -31,7 +31,6 @@ class Shooter : public frc2::SubsystemBase {
                                 constants::shooter::kEncoderPorts[1],
                                 constants::shooter::kEncoderReversed};
 
-
   frc2::sysid::SysIdRoutine m_sysIdRoutine{
       frc2::sysid::Config{std::nullopt, std::nullopt, std::nullopt,
                           std::nullopt},
@@ -44,7 +43,8 @@ class Shooter : public frc2::SubsystemBase {
                 .voltage(m_shooterMotor.Get() *
                          frc::RobotController::GetBatteryVoltage())
                 .position(units::turn_t{m_shooterEncoder.GetDistance()})
-                .velocity(units::turns_per_second_t{m_shooterEncoder.GetRate()});
+                .velocity(
+                    units::turns_per_second_t{m_shooterEncoder.GetRate()});
           },
           this}};
   frc::PIDController m_shooterFeedback{constants::shooter::kP, 0, 0};

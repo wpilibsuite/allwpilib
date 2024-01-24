@@ -28,16 +28,16 @@ import java.util.function.DoubleSupplier;
 public class Shooter extends SubsystemBase {
   // The motor on the shooter wheel .
   private final PWMSparkMax m_shooterMotor = new PWMSparkMax(ShooterConstants.kShooterMotorPort);
-  
+
   // The motor on the feeder wheels.
   private final PWMSparkMax m_feederMotor = new PWMSparkMax(ShooterConstants.kFeederMotorPort);
-  
+
   // The shooter wheel encoder
   private final Encoder m_shooterEncoder =
       new Encoder(
-        ShooterConstants.kEncoderPorts[0], 
-        ShooterConstants.kEncoderPorts[1], 
-        ShooterConstants.kEncoderReversed);
+          ShooterConstants.kEncoderPorts[0],
+          ShooterConstants.kEncoderPorts[1],
+          ShooterConstants.kEncoderReversed);
 
   // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
   private final MutableMeasure<Voltage> m_appliedVoltage = mutable(Volts.of(0));
@@ -72,10 +72,14 @@ public class Shooter extends SubsystemBase {
               // Tell SysId to make generated commands require this subsystem, suffix test state in
               // WPILog with this subsystem's name ("drive")
               this));
-  // PID controller to run the shooter wheel in closed-loop, set the constants equal to those calculated by SysId
+  // PID controller to run the shooter wheel in closed-loop, set the constants equal to those
+  // calculated by SysId
   private final PIDController m_shooterFeedback = new PIDController(ShooterConstants.kP, 0, 0);
-  // Feedforward controller to run the shooter wheel in closed-loop, set the constants equal to those calculated by SysId
-  private final SimpleMotorFeedforward m_shooterFeedforward = new SimpleMotorFeedforward(ShooterConstants.kSVolts, ShooterConstants.kVVoltSecondsPerRotation, 0);
+  // Feedforward controller to run the shooter wheel in closed-loop, set the constants equal to
+  // those calculated by SysId
+  private final SimpleMotorFeedforward m_shooterFeedforward =
+      new SimpleMotorFeedforward(
+          ShooterConstants.kSVolts, ShooterConstants.kVVoltSecondsPerRotation, 0);
 
   /** Creates a new Drive subsystem. */
   public Shooter() {
@@ -91,18 +95,22 @@ public class Shooter extends SubsystemBase {
   public Command runShooterCommand(DoubleSupplier shooterSpeed) {
     // Run shooter wheel at the desired speed using a PID controller and feedforward.
     return run(() -> {
-      m_shooterMotor.setVoltage(m_shooterFeedback.calculate(m_shooterEncoder.getRate(), shooterSpeed.getAsDouble()) + m_shooterFeedforward.calculate(shooterSpeed.getAsDouble()));
-      m_feederMotor.set(ShooterConstants.kFeederSpeed);
-    })
-    .finallyDo(() -> {
-      m_shooterMotor.stopMotor();
-      m_feederMotor.stopMotor();
-    }).withName("runShooter");
+          m_shooterMotor.setVoltage(
+              m_shooterFeedback.calculate(m_shooterEncoder.getRate(), shooterSpeed.getAsDouble())
+                  + m_shooterFeedforward.calculate(shooterSpeed.getAsDouble()));
+          m_feederMotor.set(ShooterConstants.kFeederSpeed);
+        })
+        .finallyDo(
+            () -> {
+              m_shooterMotor.stopMotor();
+              m_feederMotor.stopMotor();
+            })
+        .withName("runShooter");
   }
 
   /**
    * Returns a command that will execute a quasistatic test in the given direction.
-   * 
+   *
    * @param direction The direction (forward or reverse) to run the test in
    */
   public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
@@ -111,7 +119,7 @@ public class Shooter extends SubsystemBase {
 
   /**
    * Returns a command that will execute a dynamic test in the given direction.
-   * 
+   *
    * @param direction The direction (forward or reverse) to run the test in
    */
   public Command sysIdDynamic(SysIdRoutine.Direction direction) {

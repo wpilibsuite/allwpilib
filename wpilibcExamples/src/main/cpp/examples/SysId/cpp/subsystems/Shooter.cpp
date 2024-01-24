@@ -4,21 +4,26 @@
 
 #include "subsystems/Shooter.h"
 
+#include <frc2/command/Commands.h>
 #include <units/angle.h>
 #include <units/voltage.h>
-#include <frc2/command/Commands.h>
 
 Shooter::Shooter() {
   m_shooterEncoder.SetDistancePerPulse(
       constants::shooter::kEncoderDistancePerPulse.value());
 }
 
-frc2::CommandPtr Shooter::RunShooterCommand(std::function<double()> shooterSpeed) {
-  return frc2::cmd::Run([this, shooterSpeed] {
-    m_shooterMotor.SetVoltage(units::volt_t{m_shooterFeedback.Calculate(m_shooterEncoder.GetRate(), shooterSpeed())});
-    m_feederMotor.Set(constants::shooter::kFeederSpeed);
-  },
-  {this}).WithName("Set Shooter Speed");
+frc2::CommandPtr Shooter::RunShooterCommand(
+    std::function<double()> shooterSpeed) {
+  return frc2::cmd::Run(
+             [this, shooterSpeed] {
+               m_shooterMotor.SetVoltage(
+                   units::volt_t{m_shooterFeedback.Calculate(
+                       m_shooterEncoder.GetRate(), shooterSpeed())});
+               m_feederMotor.Set(constants::shooter::kFeederSpeed);
+             },
+             {this})
+      .WithName("Set Shooter Speed");
 }
 
 frc2::CommandPtr Shooter::SysIdQuasistatic(frc2::sysid::Direction direction) {
