@@ -56,7 +56,7 @@ public class ParallelRaceGroup extends Command {
             "Multiple commands in a parallel composition cannot require the same subsystems");
       }
       m_commands.add(command);
-      m_requirements.addAll(command.getRequirements());
+      addRequirements(command.getRequirements());
       m_runWhenDisabled &= command.runsWhenDisabled();
       if (command.getInterruptionBehavior() == InterruptionBehavior.kCancelSelf) {
         m_interruptBehavior = InterruptionBehavior.kCancelSelf;
