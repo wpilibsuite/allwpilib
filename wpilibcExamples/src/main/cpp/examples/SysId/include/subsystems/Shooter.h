@@ -11,6 +11,8 @@
 #include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc2/command/SubsystemBase.h>
 #include <frc2/command/sysid/SysIdRoutine.h>
+#include <frc/controller/PIDController.h>
+#include <frc/controller/SimpleMotorFeedforward.h>
 
 #include "Constants.h"
 
@@ -42,8 +44,10 @@ class Shooter : public frc2::SubsystemBase {
             log->Motor("shooter-wheel")
                 .voltage(m_shooterMotor.Get() *
                          frc::RobotController::GetBatteryVoltage())
-                .position(units::rotation_t{m_shooterEncoder.GetDistance()})
-                .velocity(units::rotations_per_second_t{m_shooterEncoder.GetRate()});
+                .position(units::turn_t{m_shooterEncoder.GetDistance()})
+                .velocity(units::turns_per_second_t{m_shooterEncoder.GetRate()});
           },
           this}};
+  frc::PIDController m_shooterFeedback{constants::shooter::kP, 9, 0};
+  frc::SimpleMotorFeedforward<units::turns> m_shooterFeedforward{constants::shooter::kS, constants::shooter::kV, 0};
 };
