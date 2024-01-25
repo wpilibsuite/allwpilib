@@ -46,21 +46,20 @@ public class Shooter extends SubsystemBase {
   // Mutable holder for unit-safe linear velocity values, persisted to avoid reallocation.
   private final MutableMeasure<Velocity<Angle>> m_velocity = mutable(RotationsPerSecond.of(0));
 
-  // Create a new SysId routine for characterizing the drive.
+  // Create a new SysId routine for characterizing the shooter.
   private final SysIdRoutine m_sysIdRoutine =
       new SysIdRoutine(
           // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
           new SysIdRoutine.Config(),
           new SysIdRoutine.Mechanism(
-              // Tell SysId how to plumb the driving voltage to the motors.
+              // Tell SysId how to plumb the driving voltage to the motor(s).
               (Measure<Voltage> volts) -> {
                 m_shooterMotor.setVoltage(volts.in(Volts));
               },
               // Tell SysId how to record a frame of data for each motor on the mechanism being
               // characterized.
               log -> {
-                // Record a frame for the left motors.  Since these share an encoder, we consider
-                // the entire group to be one motor.
+                // Record a frame for the shooter motor.
                 log.motor("shooter-wheel")
                     .voltage(
                         m_appliedVoltage.mut_replace(
@@ -70,7 +69,7 @@ public class Shooter extends SubsystemBase {
                         m_velocity.mut_replace(m_shooterEncoder.getRate(), RotationsPerSecond));
               },
               // Tell SysId to make generated commands require this subsystem, suffix test state in
-              // WPILog with this subsystem's name ("drive")
+              // WPILog with this subsystem's name ("shooter")
               this));
   // PID controller to run the shooter wheel in closed-loop, set the constants equal to those
   // calculated by SysId
