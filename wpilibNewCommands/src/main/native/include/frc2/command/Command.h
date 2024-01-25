@@ -426,9 +426,6 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
  protected:
   Command();
 
-  /// Requirements set.
-  wpi::SmallSet<Subsystem*, 4> m_requirements;
-
   /**
    * Transfers ownership of this command to a unique pointer.  Used for
    * decorator methods.
@@ -437,6 +434,10 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
   virtual std::unique_ptr<Command> TransferOwnership() && = 0;
 
   std::optional<std::string> m_previousComposition;
+
+ private:
+  /// Requirements set.
+  wpi::SmallSet<Subsystem*, 4> m_requirements;
 };
 
 /**
