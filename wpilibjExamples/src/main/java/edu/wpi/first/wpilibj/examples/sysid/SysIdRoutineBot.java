@@ -43,20 +43,20 @@ public class SysIdRoutineBot {
 
     // Bind full set of SysId routine tests to buttons; a complete routine should run each of these
     // once.
-    m_driverController.a().whileTrue(m_drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    m_driverController.b().whileTrue(m_drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    m_driverController.x().whileTrue(m_drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    m_driverController.y().whileTrue(m_drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    // Using bumpers as a modifier and combining it with the buttons so that we can have both sets of bindings at once
+    m_driverController.a().and(m_driverController.rightBumper()).whileTrue(m_drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    m_driverController.b().and(m_driverController.rightBumper()).whileTrue(m_drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    m_driverController.x().and(m_driverController.rightBumper()).whileTrue(m_drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    m_driverController.y().and(m_driverController.rightBumper()).whileTrue(m_drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
     // Control the shooter wheel with the left trigger
     m_shooter.setDefaultCommand(m_shooter.runShooter(m_driverController::getLeftTriggerAxis));
 
-    /* Uncomment to bind Shooter routine, but comment out the drive routine too
-    m_driverController.a().whileTrue(m_drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    m_driverController.b().whileTrue(m_drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    m_driverController.x().whileTrue(m_drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    m_driverController.y().whileTrue(m_drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-    */
+    
+    m_driverController.a().and(m_driverController.leftBumper()).whileTrue(m_drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    m_driverController.b().and(m_driverController.leftBumper()).whileTrue(m_drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    m_driverController.x().and(m_driverController.leftBumper()).whileTrue(m_drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    m_driverController.y().and(m_driverController.leftBumper()).whileTrue(m_drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
   }
 
   /**
