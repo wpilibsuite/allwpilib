@@ -33,15 +33,14 @@ class ExponentialProfileTest {
         "Difference between " + val1 + " and " + val2 + " is greater than " + eps);
   }
 
-  private static void assertNear(
-      ExponentialProfile.State val1, ExponentialProfile.State val2, double eps) {
+  private static void assertNear(ProfileState val1, ProfileState val2, double eps) {
     assertAll(
         () -> assertNear(val1.position, val2.position, eps),
         () -> assertNear(val1.position, val2.position, eps));
   }
 
-  private static ExponentialProfile.State checkDynamics(
-      ExponentialProfile profile, ExponentialProfile.State current, ExponentialProfile.State goal) {
+  private static ProfileState checkDynamics(
+      ExponentialProfile profile, ProfileState current, ProfileState goal) {
     var next = profile.calculate(kDt, current, goal);
 
     var signal = feedforward.calculate(current.velocity, next.velocity, kDt);
@@ -55,8 +54,8 @@ class ExponentialProfileTest {
   void reachesGoal() {
     ExponentialProfile profile = new ExponentialProfile(constraints);
 
-    ExponentialProfile.State goal = new ExponentialProfile.State(10, 0);
-    ExponentialProfile.State state = new ExponentialProfile.State(0, 0);
+    ProfileState goal = new ProfileState(10, 0);
+    ProfileState state = new ProfileState(0, 0);
 
     for (int i = 0; i < 450; ++i) {
       state = checkDynamics(profile, state, goal);
@@ -70,8 +69,8 @@ class ExponentialProfileTest {
   void posContinuousUnderVelChange() {
     ExponentialProfile profile = new ExponentialProfile(constraints);
 
-    ExponentialProfile.State goal = new ExponentialProfile.State(10, 0);
-    ExponentialProfile.State state = new ExponentialProfile.State(0, 0);
+    ProfileState goal = new ProfileState(10, 0);
+    ProfileState state = new ProfileState(0, 0);
 
     for (int i = 0; i < 300; ++i) {
       if (i == 150) {
@@ -91,8 +90,8 @@ class ExponentialProfileTest {
   void posContinuousUnderVelChangeBackward() {
     ExponentialProfile profile = new ExponentialProfile(constraints);
 
-    ExponentialProfile.State goal = new ExponentialProfile.State(-10, 0);
-    ExponentialProfile.State state = new ExponentialProfile.State(0, 0);
+    ProfileState goal = new ProfileState(-10, 0);
+    ProfileState state = new ProfileState(0, 0);
 
     for (int i = 0; i < 300; ++i) {
       if (i == 150) {
@@ -109,8 +108,8 @@ class ExponentialProfileTest {
   // There is some somewhat tricky code for dealing with going backwards
   @Test
   void backwards() {
-    ExponentialProfile.State goal = new ExponentialProfile.State(-10, 0);
-    ExponentialProfile.State state = new ExponentialProfile.State(0, 0);
+    ProfileState goal = new ProfileState(-10, 0);
+    ProfileState state = new ProfileState(0, 0);
 
     ExponentialProfile profile = new ExponentialProfile(constraints);
 
@@ -122,8 +121,8 @@ class ExponentialProfileTest {
 
   @Test
   void switchGoalInMiddle() {
-    ExponentialProfile.State goal = new ExponentialProfile.State(-10, 0);
-    ExponentialProfile.State state = new ExponentialProfile.State(0, 0);
+    ProfileState goal = new ProfileState(-10, 0);
+    ProfileState state = new ProfileState(0, 0);
 
     ExponentialProfile profile = new ExponentialProfile(constraints);
     for (int i = 0; i < 50; ++i) {
@@ -131,7 +130,7 @@ class ExponentialProfileTest {
     }
     assertNotEquals(state, goal);
 
-    goal = new ExponentialProfile.State(0.0, 0.0);
+    goal = new ProfileState(0.0, 0.0);
     for (int i = 0; i < 100; ++i) {
       state = checkDynamics(profile, state, goal);
     }
@@ -141,8 +140,8 @@ class ExponentialProfileTest {
   // Checks to make sure that it hits top speed
   @Test
   void topSpeed() {
-    ExponentialProfile.State goal = new ExponentialProfile.State(40, 0);
-    ExponentialProfile.State state = new ExponentialProfile.State(0, 0);
+    ProfileState goal = new ProfileState(40, 0);
+    ProfileState state = new ProfileState(0, 0);
 
     ExponentialProfile profile = new ExponentialProfile(constraints);
     double maxSpeed = 0;
@@ -157,8 +156,8 @@ class ExponentialProfileTest {
 
   @Test
   void topSpeedBackward() {
-    ExponentialProfile.State goal = new ExponentialProfile.State(-40, 0);
-    ExponentialProfile.State state = new ExponentialProfile.State(0, 0);
+    ProfileState goal = new ProfileState(-40, 0);
+    ProfileState state = new ProfileState(0, 0);
 
     ExponentialProfile profile = new ExponentialProfile(constraints);
     double maxSpeed = 0;
@@ -173,8 +172,8 @@ class ExponentialProfileTest {
 
   @Test
   void largeInitialVelocity() {
-    ExponentialProfile.State goal = new ExponentialProfile.State(40, 0);
-    ExponentialProfile.State state = new ExponentialProfile.State(0, 8);
+    ProfileState goal = new ProfileState(40, 0);
+    ProfileState state = new ProfileState(0, 8);
 
     ExponentialProfile profile = new ExponentialProfile(constraints);
     for (int i = 0; i < 900; ++i) {
@@ -186,8 +185,8 @@ class ExponentialProfileTest {
 
   @Test
   void largeNegativeInitialVelocity() {
-    ExponentialProfile.State goal = new ExponentialProfile.State(-40, 0);
-    ExponentialProfile.State state = new ExponentialProfile.State(0, -8);
+    ProfileState goal = new ProfileState(-40, 0);
+    ProfileState state = new ProfileState(0, -8);
 
     ExponentialProfile profile = new ExponentialProfile(constraints);
     for (int i = 0; i < 900; ++i) {
@@ -199,14 +198,11 @@ class ExponentialProfileTest {
 
   @SuppressWarnings("PMD.TestClassWithoutTestCases")
   static class TestCase {
-    public final ExponentialProfile.State initial;
-    public final ExponentialProfile.State goal;
-    public final ExponentialProfile.State inflectionPoint;
+    public final ProfileState initial;
+    public final ProfileState goal;
+    public final ProfileState inflectionPoint;
 
-    TestCase(
-        ExponentialProfile.State initial,
-        ExponentialProfile.State goal,
-        ExponentialProfile.State inflectionPoint) {
+    TestCase(ProfileState initial, ProfileState goal, ProfileState inflectionPoint) {
       this.initial = initial;
       this.goal = goal;
       this.inflectionPoint = inflectionPoint;
@@ -218,85 +214,83 @@ class ExponentialProfileTest {
     List<TestCase> testCases =
         List.of(
             new TestCase(
-                new ExponentialProfile.State(0.0, -4),
-                new ExponentialProfile.State(0.75, -4),
-                new ExponentialProfile.State(1.3758, 4.4304)),
+                new ProfileState(0.0, -4),
+                new ProfileState(0.75, -4),
+                new ProfileState(1.3758, 4.4304)),
             new TestCase(
-                new ExponentialProfile.State(0.0, -4),
-                new ExponentialProfile.State(1.4103, 4),
-                new ExponentialProfile.State(1.3758, 4.4304)),
+                new ProfileState(0.0, -4),
+                new ProfileState(1.4103, 4),
+                new ProfileState(1.3758, 4.4304)),
             new TestCase(
-                new ExponentialProfile.State(0.6603, 4),
-                new ExponentialProfile.State(0.75, -4),
-                new ExponentialProfile.State(1.3758, 4.4304)),
+                new ProfileState(0.6603, 4),
+                new ProfileState(0.75, -4),
+                new ProfileState(1.3758, 4.4304)),
             new TestCase(
-                new ExponentialProfile.State(0.6603, 4),
-                new ExponentialProfile.State(1.4103, 4),
-                new ExponentialProfile.State(1.3758, 4.4304)),
+                new ProfileState(0.6603, 4),
+                new ProfileState(1.4103, 4),
+                new ProfileState(1.3758, 4.4304)),
             new TestCase(
-                new ExponentialProfile.State(0.0, -4),
-                new ExponentialProfile.State(0.5, -2),
-                new ExponentialProfile.State(0.4367, 3.7217)),
+                new ProfileState(0.0, -4),
+                new ProfileState(0.5, -2),
+                new ProfileState(0.4367, 3.7217)),
             new TestCase(
-                new ExponentialProfile.State(0.0, -4),
-                new ExponentialProfile.State(0.546, 2),
-                new ExponentialProfile.State(0.4367, 3.7217)),
+                new ProfileState(0.0, -4),
+                new ProfileState(0.546, 2),
+                new ProfileState(0.4367, 3.7217)),
             new TestCase(
-                new ExponentialProfile.State(0.6603, 4),
-                new ExponentialProfile.State(0.5, -2),
-                new ExponentialProfile.State(0.5560, -2.9616)),
+                new ProfileState(0.6603, 4),
+                new ProfileState(0.5, -2),
+                new ProfileState(0.5560, -2.9616)),
             new TestCase(
-                new ExponentialProfile.State(0.6603, 4),
-                new ExponentialProfile.State(0.546, 2),
-                new ExponentialProfile.State(0.5560, -2.9616)),
+                new ProfileState(0.6603, 4),
+                new ProfileState(0.546, 2),
+                new ProfileState(0.5560, -2.9616)),
             new TestCase(
-                new ExponentialProfile.State(0.0, -4),
-                new ExponentialProfile.State(-0.75, -4),
-                new ExponentialProfile.State(-0.7156, -4.4304)),
+                new ProfileState(0.0, -4),
+                new ProfileState(-0.75, -4),
+                new ProfileState(-0.7156, -4.4304)),
             new TestCase(
-                new ExponentialProfile.State(0.0, -4),
-                new ExponentialProfile.State(-0.0897, 4),
-                new ExponentialProfile.State(-0.7156, -4.4304)),
+                new ProfileState(0.0, -4),
+                new ProfileState(-0.0897, 4),
+                new ProfileState(-0.7156, -4.4304)),
             new TestCase(
-                new ExponentialProfile.State(0.6603, 4),
-                new ExponentialProfile.State(-0.75, -4),
-                new ExponentialProfile.State(-0.7156, -4.4304)),
+                new ProfileState(0.6603, 4),
+                new ProfileState(-0.75, -4),
+                new ProfileState(-0.7156, -4.4304)),
             new TestCase(
-                new ExponentialProfile.State(0.6603, 4),
-                new ExponentialProfile.State(-0.0897, 4),
-                new ExponentialProfile.State(-0.7156, -4.4304)),
+                new ProfileState(0.6603, 4),
+                new ProfileState(-0.0897, 4),
+                new ProfileState(-0.7156, -4.4304)),
             new TestCase(
-                new ExponentialProfile.State(0.0, -4),
-                new ExponentialProfile.State(-0.5, -4.5),
-                new ExponentialProfile.State(1.095, 4.314)),
+                new ProfileState(0.0, -4),
+                new ProfileState(-0.5, -4.5),
+                new ProfileState(1.095, 4.314)),
             new TestCase(
-                new ExponentialProfile.State(0.0, -4),
-                new ExponentialProfile.State(1.0795, 4.5),
-                new ExponentialProfile.State(-0.5122, -4.351)),
+                new ProfileState(0.0, -4),
+                new ProfileState(1.0795, 4.5),
+                new ProfileState(-0.5122, -4.351)),
             new TestCase(
-                new ExponentialProfile.State(0.6603, 4),
-                new ExponentialProfile.State(-0.5, -4.5),
-                new ExponentialProfile.State(1.095, 4.314)),
+                new ProfileState(0.6603, 4),
+                new ProfileState(-0.5, -4.5),
+                new ProfileState(1.095, 4.314)),
             new TestCase(
-                new ExponentialProfile.State(0.6603, 4),
-                new ExponentialProfile.State(1.0795, 4.5),
-                new ExponentialProfile.State(-0.5122, -4.351)),
+                new ProfileState(0.6603, 4),
+                new ProfileState(1.0795, 4.5),
+                new ProfileState(-0.5122, -4.351)),
             new TestCase(
-                new ExponentialProfile.State(0.0, -8),
-                new ExponentialProfile.State(0, 0),
-                new ExponentialProfile.State(-0.1384, 3.342)),
+                new ProfileState(0.0, -8),
+                new ProfileState(0, 0),
+                new ProfileState(-0.1384, 3.342)),
             new TestCase(
-                new ExponentialProfile.State(0.0, -8),
-                new ExponentialProfile.State(-1, 0),
-                new ExponentialProfile.State(-0.562, -6.792)),
+                new ProfileState(0.0, -8),
+                new ProfileState(-1, 0),
+                new ProfileState(-0.562, -6.792)),
             new TestCase(
-                new ExponentialProfile.State(0.0, 8),
-                new ExponentialProfile.State(1, 0),
-                new ExponentialProfile.State(0.562, 6.792)),
+                new ProfileState(0.0, 8), new ProfileState(1, 0), new ProfileState(0.562, 6.792)),
             new TestCase(
-                new ExponentialProfile.State(0.0, 8),
-                new ExponentialProfile.State(-1, 0),
-                new ExponentialProfile.State(-0.785, -4.346)));
+                new ProfileState(0.0, 8),
+                new ProfileState(-1, 0),
+                new ProfileState(-0.785, -4.346)));
 
     var profile = new ExponentialProfile(constraints);
 
@@ -308,8 +302,8 @@ class ExponentialProfileTest {
 
   @Test
   void timingToCurrent() {
-    ExponentialProfile.State goal = new ExponentialProfile.State(2, 0);
-    ExponentialProfile.State state = new ExponentialProfile.State(0, 0);
+    ProfileState goal = new ProfileState(2, 0);
+    ProfileState state = new ProfileState(0, 0);
 
     ExponentialProfile profile = new ExponentialProfile(constraints);
     for (int i = 0; i < 400; i++) {
@@ -322,8 +316,8 @@ class ExponentialProfileTest {
   void timingToGoal() {
     ExponentialProfile profile = new ExponentialProfile(constraints);
 
-    ExponentialProfile.State goal = new ExponentialProfile.State(2, 0);
-    ExponentialProfile.State state = new ExponentialProfile.State(0, 0);
+    ProfileState goal = new ProfileState(2, 0);
+    ProfileState state = new ProfileState(0, 0);
 
     double predictedTimeLeft = profile.timeLeftUntil(state, goal);
     boolean reachedGoal = false;
@@ -344,8 +338,8 @@ class ExponentialProfileTest {
   void timingToNegativeGoal() {
     ExponentialProfile profile = new ExponentialProfile(constraints);
 
-    ExponentialProfile.State goal = new ExponentialProfile.State(-2, 0);
-    ExponentialProfile.State state = new ExponentialProfile.State(0, 0);
+    ProfileState goal = new ProfileState(-2, 0);
+    ProfileState state = new ProfileState(0, 0);
 
     double predictedTimeLeft = profile.timeLeftUntil(state, goal);
     boolean reachedGoal = false;

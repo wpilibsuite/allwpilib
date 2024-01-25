@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import edu.wpi.first.math.trajectory.ProfileState;
 import edu.wpi.first.wpilibj.UtilityClassTest;
 import org.junit.jupiter.api.Test;
 
@@ -109,6 +110,89 @@ class MathUtilTest extends UtilityClassTest<MathUtil> {
     assertEquals(MathUtil.angleModulus(-5 * Math.PI), Math.PI);
     assertEquals(MathUtil.angleModulus(Math.PI / 2), Math.PI / 2);
     assertEquals(MathUtil.angleModulus(-Math.PI / 2), -Math.PI / 2);
+  }
+
+  @Test
+  void testContinuousProfileShortestGoal() {
+    // Simple tests
+    // Go backwards
+    assertEquals(
+        new ProfileState(-90.0, 0.0),
+        MathUtil.continuousProfileShortestGoal(
+            new ProfileState(0.0, 0.0), new ProfileState(270.0, 0.0), 0.0, 360.0));
+    // Go forwards
+    assertEquals(
+        new ProfileState(360.0, 0.0),
+        MathUtil.continuousProfileShortestGoal(
+            new ProfileState(270.0, 0.0), new ProfileState(), 0.0, 360.0));
+
+    // Test symmetric range
+    assertEquals(
+        new ProfileState(170.0 - (-170.0) + 20.0, 0.0),
+        MathUtil.continuousProfileShortestGoal(
+            new ProfileState(170.0 - (-170.0), 0.0), new ProfileState(), -180.0, 180.0));
+    assertEquals(
+        new ProfileState(170.0 + 360.0 - (-170.0) + 20.0, 0.0),
+        MathUtil.continuousProfileShortestGoal(
+            new ProfileState(170.0 + 360.0 - (-170.0), 0.0), new ProfileState(), -180.0, 180.0));
+    assertEquals(
+        new ProfileState(170.0 - (-170.0 + 360.0) + 20.0, 0.0),
+        MathUtil.continuousProfileShortestGoal(
+            new ProfileState(170.0 - (-170.0 + 360.0), 0.0), new ProfileState(), -180.0, 180.0));
+    assertEquals(
+        new ProfileState(-170.0 - 170.0 - 20.0, 0.0),
+        MathUtil.continuousProfileShortestGoal(
+            new ProfileState(-170.0 - 170.0, 0.0), new ProfileState(), -180.0, 180.0));
+    assertEquals(
+        new ProfileState(-170.0 + 360.0 - 170.0 - 20.0, 0.0),
+        MathUtil.continuousProfileShortestGoal(
+            new ProfileState(-170.0 + 360.0 - 170.0, 0.0), new ProfileState(), -180.0, 180.0));
+    assertEquals(
+        new ProfileState(-170.0 - (170.0 + 360.0) - 20.0, 0.0),
+        MathUtil.continuousProfileShortestGoal(
+            new ProfileState(-170.0 - (170.0 + 360.0), 0.0), new ProfileState(), -180.0, 180.0));
+
+    // Test range start at zero
+    assertEquals(
+        new ProfileState(170.0 - 190.0 + 20.0, 0.0),
+        MathUtil.continuousProfileShortestGoal(
+            new ProfileState(170.0 - 190.0, 0.0), new ProfileState(), 0.0, 360.0));
+    assertEquals(
+        new ProfileState(170.0 + 360.0 - 190.0 + 20.0, 0.0),
+        MathUtil.continuousProfileShortestGoal(
+            new ProfileState(170.0 + 360.0 - 190.0, 0.0), new ProfileState(), 0.0, 360.0));
+    assertEquals(
+        new ProfileState(170.0 - (190.0 + 360) + 20.0, 0.0),
+        MathUtil.continuousProfileShortestGoal(
+            new ProfileState(170.0 - (190.0 + 360), 0.0), new ProfileState(), 0.0, 360.0));
+
+    // Test asymmetric range that doesn't start at zero
+    assertEquals(
+        new ProfileState(170.0 - (-170.0) + 20.0, 0.0),
+        MathUtil.continuousProfileShortestGoal(
+            new ProfileState(170.0 - (-170.0), 0.0), new ProfileState(), -170.0, 190.0));
+
+    // Test range with both positive endpoints
+    assertEquals(
+        new ProfileState(0.0, 0.0),
+        MathUtil.continuousProfileShortestGoal(
+            new ProfileState(0.0, 0.0), new ProfileState(), 1.0, 3.0));
+    assertEquals(
+        new ProfileState(2.0, 0.0),
+        MathUtil.continuousProfileShortestGoal(
+            new ProfileState(1.0, 0.0), new ProfileState(), 1.0, 3.0));
+    assertEquals(
+        new ProfileState(2.0, 0.0),
+        MathUtil.continuousProfileShortestGoal(
+            new ProfileState(2.0, 0.0), new ProfileState(), 1.0, 3.0));
+    assertEquals(
+        new ProfileState(4.0, 0.0),
+        MathUtil.continuousProfileShortestGoal(
+            new ProfileState(3.0, 0.0), new ProfileState(), 1.0, 3.0));
+    assertEquals(
+        new ProfileState(4.0, 0.0),
+        MathUtil.continuousProfileShortestGoal(
+            new ProfileState(4.0, 0.0), new ProfileState(), 1.0, 3.0));
   }
 
   @Test

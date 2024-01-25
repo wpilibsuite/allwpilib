@@ -4,9 +4,9 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import static edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
+import edu.wpi.first.math.trajectory.ProfileState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Timer;
 import java.util.function.Consumer;
@@ -19,9 +19,9 @@ import java.util.function.Supplier;
  */
 public class TrapezoidProfileCommand extends Command {
   private final TrapezoidProfile m_profile;
-  private final Consumer<State> m_output;
-  private final Supplier<State> m_goal;
-  private final Supplier<State> m_currentState;
+  private final Consumer<ProfileState> m_output;
+  private final Supplier<ProfileState> m_goal;
+  private final Supplier<ProfileState> m_currentState;
   private final boolean m_newAPI; // TODO: Remove
   private final Timer m_timer = new Timer();
 
@@ -38,9 +38,9 @@ public class TrapezoidProfileCommand extends Command {
   @SuppressWarnings("this-escape")
   public TrapezoidProfileCommand(
       TrapezoidProfile profile,
-      Consumer<State> output,
-      Supplier<State> goal,
-      Supplier<State> currentState,
+      Consumer<ProfileState> output,
+      Supplier<ProfileState> goal,
+      Supplier<ProfileState> currentState,
       Subsystem... requirements) {
     m_profile = requireNonNullParam(profile, "profile", "TrapezoidProfileCommand");
     m_output = requireNonNullParam(output, "output", "TrapezoidProfileCommand");
@@ -63,7 +63,7 @@ public class TrapezoidProfileCommand extends Command {
   @Deprecated(since = "2024", forRemoval = true)
   @SuppressWarnings("this-escape")
   public TrapezoidProfileCommand(
-      TrapezoidProfile profile, Consumer<State> output, Subsystem... requirements) {
+      TrapezoidProfile profile, Consumer<ProfileState> output, Subsystem... requirements) {
     m_profile = requireNonNullParam(profile, "profile", "TrapezoidProfileCommand");
     m_output = requireNonNullParam(output, "output", "TrapezoidProfileCommand");
     m_newAPI = false;

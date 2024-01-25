@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj.examples.drivedistanceoffboard;
 
+import edu.wpi.first.math.trajectory.ProfileState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.examples.drivedistanceoffboard.Constants.DriveConstants;
@@ -76,9 +77,9 @@ public class RobotContainer {
                     // Pipe the profile state to the drive
                     setpointState -> m_robotDrive.setDriveStates(setpointState, setpointState),
                     // End at desired position in meters; implicitly starts at 0
-                    () -> new TrapezoidProfile.State(3, 0),
+                    () -> new ProfileState(3, 0),
                     // Current position
-                    TrapezoidProfile.State::new,
+                    ProfileState::new,
                     // Require the drive
                     m_robotDrive)
                 .beforeStarting(m_robotDrive::resetEncoders)

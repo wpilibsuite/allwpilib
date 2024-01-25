@@ -4,8 +4,6 @@
 
 package edu.wpi.first.math.trajectory;
 
-import java.util.Objects;
-
 /**
  * A exponential curve-shaped velocity profile.
  *
@@ -18,8 +16,8 @@ import java.util.Objects;
  * <pre><code>
  * ExponentialProfile.Constraints constraints =
  *   ExponentialProfile.Constraints.fromCharacteristics(kMaxV, kV, kA);
- * ExponentialProfile.State previousProfiledReference =
- *   new ExponentialProfile.State(initialReference, 0.0);
+ * ProfileState previousProfiledReference =
+ *   new ProfileState(initialReference, 0.0);
  * ExponentialProfile profile = new ExponentialProfile(constraints);
  * </code></pre>
  *
@@ -127,44 +125,6 @@ public class ExponentialProfile {
     }
   }
 
-  /** Profile state. */
-  public static class State {
-    /** The position at this state. */
-    public double position;
-
-    /** The velocity at this state. */
-    public double velocity;
-
-    /** Default constructor. */
-    public State() {}
-
-    /**
-     * Construct a state within an exponential profile.
-     *
-     * @param position The position at this state.
-     * @param velocity The velocity at this state.
-     */
-    public State(double position, double velocity) {
-      this.position = position;
-      this.velocity = velocity;
-    }
-
-    @Override
-    public boolean equals(Object other) {
-      if (other instanceof State) {
-        State rhs = (State) other;
-        return this.position == rhs.position && this.velocity == rhs.velocity;
-      } else {
-        return false;
-      }
-    }
-
-    @Override
-    public int hashCode() {
-      return Objects.hash(position, velocity);
-    }
-  }
-
   /**
    * Construct an ExponentialProfile.
    *
@@ -183,7 +143,7 @@ public class ExponentialProfile {
    * @param goal The desired state when the profile is complete.
    * @return The position and velocity of the profile at time t.
    */
-  public State calculate(double t, State current, State goal) {
+  public ProfileState calculate(double t, ProfileState current, ProfileState goal) {
     var direction = shouldFlipInput(current, goal) ? -1 : 1;
     var u = direction * m_constraints.maxInput;
 
@@ -193,10 +153,10 @@ public class ExponentialProfile {
     if (t < 0) {
       return current;
     } else if (t < timing.inflectionTime) {
-      return new State(
+      return new ProfileState(
           computeDistanceFromTime(t, u, current), computeVelocityFromTime(t, u, current));
     } else if (t < timing.totalTime) {
-      return new State(
+      return new ProfileState(
           computeDistanceFromTime(t - timing.totalTime, -u, goal),
           computeVelocityFromTime(t - timing.totalTime, -u, goal));
     } else {
@@ -212,7 +172,7 @@ public class ExponentialProfile {
    * @param goal The desired state when the profile is complete.
    * @return The position and velocity of the profile at the inflection point.
    */
-  public State calculateInflectionPoint(State current, State goal) {
+  public ProfileState calculateInflectionPoint(ProfileState current, ProfileState goal) {
     var direction = shouldFlipInput(current, goal) ? -1 : 1;
     var u = direction * m_constraints.maxInput;
 
@@ -228,7 +188,8 @@ public class ExponentialProfile {
    * @param input The signed input applied to this profile from the current state.
    * @return The position and velocity of the profile at the inflection point.
    */
-  private State calculateInflectionPoint(State current, State goal, double input) {
+  private ProfileState calculateInflectionPoint(
+      ProfileState current, ProfileState goal, double input) {
     var u = input;
 
     if (current.equals(goal)) {
@@ -238,7 +199,7 @@ public class ExponentialProfile {
     var inflectionVelocity = solveForInflectionVelocity(u, current, goal);
     var inflectionPosition = computeDistanceFromVelocity(inflectionVelocity, -u, goal);
 
-    return new State(inflectionPosition, inflectionVelocity);
+    return new ProfileState(inflectionPosition, inflectionVelocity);
   }
 
   /**
@@ -248,7 +209,7 @@ public class ExponentialProfile {
    * @param goal The desired state when the profile is complete.
    * @return The total duration of this profile.
    */
-  public double timeLeftUntil(State current, State goal) {
+  public double timeLeftUntil(ProfileState current, ProfileState goal) {
     var timing = calculateProfileTiming(current, goal);
 
     return timing.totalTime;
@@ -262,7 +223,7 @@ public class ExponentialProfile {
    * @param goal The desired state when the profile is complete.
    * @return The timing information for this profile.
    */
-  public ProfileTiming calculateProfileTiming(State current, State goal) {
+  public ProfileTiming calculateProfileTiming(ProfileState current, ProfileState goal) {
     var direction = shouldFlipInput(current, goal) ? -1 : 1;
     var u = direction * m_constraints.maxInput;
 
@@ -281,7 +242,7 @@ public class ExponentialProfile {
    * @return The timing information for this profile.
    */
   private ProfileTiming calculateProfileTiming(
-      State current, State inflectionPoint, State goal, double input) {
+      ProfileState current, ProfileState inflectionPoint, ProfileState goal, double input) {
     var u = input;
 
     double inflectionT_forward;
@@ -339,7 +300,7 @@ public class ExponentialProfile {
    * @param initial The initial state.
    * @return The distance travelled by this profile.
    */
-  private double computeDistanceFromTime(double t, double input, State initial) {
+  private double computeDistanceFromTime(double t, double input, ProfileState initial) {
     var A = m_constraints.A;
     var B = m_constraints.B;
     var u = input;
@@ -356,7 +317,7 @@ public class ExponentialProfile {
    * @param initial The initial state.
    * @return The distance travelled by this profile.
    */
-  private double computeVelocityFromTime(double t, double input, State initial) {
+  private double computeVelocityFromTime(double t, double input, ProfileState initial) {
     var A = m_constraints.A;
     var B = m_constraints.B;
     var u = input;
@@ -389,7 +350,7 @@ public class ExponentialProfile {
    * @param initial The initial state.
    * @return The distance reached when the given velocity is reached.
    */
-  private double computeDistanceFromVelocity(double velocity, double input, State initial) {
+  private double computeDistanceFromVelocity(double velocity, double input, ProfileState initial) {
     var A = m_constraints.A;
     var B = m_constraints.B;
     var u = input;
@@ -408,7 +369,7 @@ public class ExponentialProfile {
    * @param goal The goal state.
    * @return The inflection velocity.
    */
-  private double solveForInflectionVelocity(double input, State current, State goal) {
+  private double solveForInflectionVelocity(double input, ProfileState current, ProfileState goal) {
     var A = m_constraints.A;
     var B = m_constraints.B;
     var u = input;
@@ -442,7 +403,7 @@ public class ExponentialProfile {
    * @param goal The desired state when the profile is complete.
    */
   @SuppressWarnings("UnnecessaryParentheses")
-  private boolean shouldFlipInput(State current, State goal) {
+  private boolean shouldFlipInput(ProfileState current, ProfileState goal) {
     var u = m_constraints.maxInput;
 
     var xf = goal.position;

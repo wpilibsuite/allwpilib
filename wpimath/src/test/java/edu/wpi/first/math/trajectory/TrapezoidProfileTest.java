@@ -54,8 +54,8 @@ class TrapezoidProfileTest {
   @Test
   void reachesGoal() {
     TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(1.75, 0.75);
-    TrapezoidProfile.State goal = new TrapezoidProfile.State(3, 0);
-    TrapezoidProfile.State state = new TrapezoidProfile.State();
+    ProfileState goal = new ProfileState(3, 0);
+    ProfileState state = new ProfileState();
 
     TrapezoidProfile profile = new TrapezoidProfile(constraints);
     for (int i = 0; i < 450; ++i) {
@@ -69,10 +69,10 @@ class TrapezoidProfileTest {
   @Test
   void posContinuousUnderVelChange() {
     TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(1.75, 0.75);
-    TrapezoidProfile.State goal = new TrapezoidProfile.State(12, 0);
+    ProfileState goal = new ProfileState(12, 0);
 
     TrapezoidProfile profile = new TrapezoidProfile(constraints);
-    TrapezoidProfile.State state = profile.calculate(kDt, goal, new TrapezoidProfile.State());
+    ProfileState state = profile.calculate(kDt, goal, new ProfileState());
 
     double lastPos = state.position;
     for (int i = 0; i < 1600; ++i) {
@@ -102,8 +102,8 @@ class TrapezoidProfileTest {
   @Test
   void backwards() {
     TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(0.75, 0.75);
-    TrapezoidProfile.State goal = new TrapezoidProfile.State(-2, 0);
-    TrapezoidProfile.State state = new TrapezoidProfile.State();
+    ProfileState goal = new ProfileState(-2, 0);
+    ProfileState state = new ProfileState();
 
     TrapezoidProfile profile = new TrapezoidProfile(constraints);
     for (int i = 0; i < 400; ++i) {
@@ -115,8 +115,8 @@ class TrapezoidProfileTest {
   @Test
   void switchGoalInMiddle() {
     TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(0.75, 0.75);
-    TrapezoidProfile.State goal = new TrapezoidProfile.State(-2, 0);
-    TrapezoidProfile.State state = new TrapezoidProfile.State();
+    ProfileState goal = new ProfileState(-2, 0);
+    ProfileState state = new ProfileState();
 
     TrapezoidProfile profile = new TrapezoidProfile(constraints);
     for (int i = 0; i < 200; ++i) {
@@ -124,7 +124,7 @@ class TrapezoidProfileTest {
     }
     assertNotEquals(state, goal);
 
-    goal = new TrapezoidProfile.State(0.0, 0.0);
+    goal = new ProfileState(0.0, 0.0);
     profile = new TrapezoidProfile(constraints);
     for (int i = 0; i < 550; ++i) {
       state = profile.calculate(kDt, state, goal);
@@ -136,8 +136,8 @@ class TrapezoidProfileTest {
   @Test
   void topSpeed() {
     TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(0.75, 0.75);
-    TrapezoidProfile.State goal = new TrapezoidProfile.State(4, 0);
-    TrapezoidProfile.State state = new TrapezoidProfile.State();
+    ProfileState goal = new ProfileState(4, 0);
+    ProfileState state = new ProfileState();
 
     TrapezoidProfile profile = new TrapezoidProfile(constraints);
     for (int i = 0; i < 200; ++i) {
@@ -155,8 +155,8 @@ class TrapezoidProfileTest {
   @Test
   void timingToCurrent() {
     TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(0.75, 0.75);
-    TrapezoidProfile.State goal = new TrapezoidProfile.State(2, 0);
-    TrapezoidProfile.State state = new TrapezoidProfile.State();
+    ProfileState goal = new ProfileState(2, 0);
+    ProfileState state = new ProfileState();
 
     TrapezoidProfile profile = new TrapezoidProfile(constraints);
     for (int i = 0; i < 400; i++) {
@@ -168,10 +168,10 @@ class TrapezoidProfileTest {
   @Test
   void timingToGoal() {
     TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(0.75, 0.75);
-    TrapezoidProfile.State goal = new TrapezoidProfile.State(2, 0);
+    ProfileState goal = new ProfileState(2, 0);
 
     TrapezoidProfile profile = new TrapezoidProfile(constraints);
-    TrapezoidProfile.State state = profile.calculate(kDt, goal, new TrapezoidProfile.State());
+    ProfileState state = profile.calculate(kDt, goal, new ProfileState());
 
     double predictedTimeLeft = profile.timeLeftUntil(goal.position);
     boolean reachedGoal = false;
@@ -190,10 +190,10 @@ class TrapezoidProfileTest {
   @Test
   void timingBeforeGoal() {
     TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(0.75, 0.75);
-    TrapezoidProfile.State goal = new TrapezoidProfile.State(2, 0);
+    ProfileState goal = new ProfileState(2, 0);
 
     TrapezoidProfile profile = new TrapezoidProfile(constraints);
-    TrapezoidProfile.State state = profile.calculate(kDt, goal, new TrapezoidProfile.State());
+    ProfileState state = profile.calculate(kDt, goal, new ProfileState());
 
     double predictedTimeLeft = profile.timeLeftUntil(1);
     boolean reachedGoal = false;
@@ -209,10 +209,10 @@ class TrapezoidProfileTest {
   @Test
   void timingToNegativeGoal() {
     TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(0.75, 0.75);
-    TrapezoidProfile.State goal = new TrapezoidProfile.State(-2, 0);
+    ProfileState goal = new ProfileState(-2, 0);
 
     TrapezoidProfile profile = new TrapezoidProfile(constraints);
-    TrapezoidProfile.State state = profile.calculate(kDt, goal, new TrapezoidProfile.State());
+    ProfileState state = profile.calculate(kDt, goal, new ProfileState());
 
     double predictedTimeLeft = profile.timeLeftUntil(goal.position);
     boolean reachedGoal = false;
@@ -231,10 +231,10 @@ class TrapezoidProfileTest {
   @Test
   void timingBeforeNegativeGoal() {
     TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(0.75, 0.75);
-    TrapezoidProfile.State goal = new TrapezoidProfile.State(-2, 0);
+    ProfileState goal = new ProfileState(-2, 0);
 
     TrapezoidProfile profile = new TrapezoidProfile(constraints);
-    TrapezoidProfile.State state = profile.calculate(kDt, goal, new TrapezoidProfile.State());
+    ProfileState state = profile.calculate(kDt, goal, new ProfileState());
 
     double predictedTimeLeft = profile.timeLeftUntil(-1);
     boolean reachedGoal = false;

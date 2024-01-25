@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj.commands.trapezoidprofilesubsystem;
 
+import edu.wpi.first.math.trajectory.ProfileState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.TrapezoidProfileSubsystem;
 
@@ -18,7 +19,7 @@ public class ReplaceMeTrapezoidProfileSubsystem extends TrapezoidProfileSubsyste
   }
 
   @Override
-  protected void useState(TrapezoidProfile.State state) {
+  protected void useState(ProfileState state) {
     // Use the computed profile state here.
   }
 }

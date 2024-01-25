@@ -5,7 +5,7 @@
 package edu.wpi.first.wpilibj.examples.drivedistanceoffboard.subsystems;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.ProfileState;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.examples.drivedistanceoffboard.Constants.DriveConstants;
@@ -71,7 +71,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @param left The left wheel state.
    * @param right The right wheel state.
    */
-  public void setDriveStates(TrapezoidProfile.State left, TrapezoidProfile.State right) {
+  public void setDriveStates(ProfileState left, ProfileState right) {
     m_leftLeader.setSetpoint(
         ExampleSmartMotorController.PIDMode.kPosition,
         left.position,

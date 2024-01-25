@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj.commands.trapezoidprofilecommand;
 
+import edu.wpi.first.math.trajectory.ProfileState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.TrapezoidProfileCommand;
 
@@ -22,8 +23,8 @@ public class ReplaceMeTrapezoidProfileCommand extends TrapezoidProfileCommand {
           // Use current trajectory state here
         },
         // Goal state
-        TrapezoidProfile.State::new,
+        ProfileState::new,
         // Current state
-        TrapezoidProfile.State::new);
+        ProfileState::new);
   }
 }

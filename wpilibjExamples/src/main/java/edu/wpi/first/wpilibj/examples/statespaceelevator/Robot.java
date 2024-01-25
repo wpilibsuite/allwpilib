@@ -14,6 +14,7 @@ import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.LinearSystemLoop;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.math.trajectory.ProfileState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Encoder;
@@ -47,7 +48,7 @@ public class Robot extends TimedRobot {
           new TrapezoidProfile.Constraints(
               Units.feetToMeters(3.0),
               Units.feetToMeters(6.0))); // Max elevator speed and acceleration.
-  private TrapezoidProfile.State m_lastProfiledReference = new TrapezoidProfile.State();
+  private ProfileState m_lastProfiledReference = new ProfileState();
 
   /* The plant holds a state-space model of our elevator. This system has the following properties:
 
@@ -112,21 +113,20 @@ public class Robot extends TimedRobot {
     m_loop.reset(VecBuilder.fill(m_encoder.getDistance(), m_encoder.getRate()));
 
     // Reset our last reference to the current state.
-    m_lastProfiledReference =
-        new TrapezoidProfile.State(m_encoder.getDistance(), m_encoder.getRate());
+    m_lastProfiledReference = new ProfileState(m_encoder.getDistance(), m_encoder.getRate());
   }
 
   @Override
   public void teleopPeriodic() {
     // Sets the target position of our arm. This is similar to setting the setpoint of a
     // PID controller.
-    TrapezoidProfile.State goal;
+    ProfileState goal;
     if (m_joystick.getTrigger()) {
       // the trigger is pressed, so we go to the high goal.
-      goal = new TrapezoidProfile.State(kHighGoalPosition, 0.0);
+      goal = new ProfileState(kHighGoalPosition, 0.0);
     } else {
       // Otherwise, we go to the low goal
-      goal = new TrapezoidProfile.State(kLowGoalPosition, 0.0);
+      goal = new ProfileState(kLowGoalPosition, 0.0);
     }
     // Step our TrapezoidalProfile forward 20ms and set it as our next reference
     m_lastProfiledReference = m_profile.calculate(0.020, m_lastProfiledReference, goal);

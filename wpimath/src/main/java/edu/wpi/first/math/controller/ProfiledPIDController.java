@@ -7,6 +7,7 @@ package edu.wpi.first.math.controller;
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.trajectory.ProfileState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -25,8 +26,8 @@ public class ProfiledPIDController implements Sendable {
 
   private TrapezoidProfile.Constraints m_constraints;
   private TrapezoidProfile m_profile;
-  private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
-  private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
+  private ProfileState m_goal = new ProfileState();
+  private ProfileState m_setpoint = new ProfileState();
 
   /**
    * Allocates a ProfiledPIDController with the given constants for Kp, Ki, and Kd.
@@ -191,7 +192,7 @@ public class ProfiledPIDController implements Sendable {
    *
    * @param goal The desired goal state.
    */
-  public void setGoal(TrapezoidProfile.State goal) {
+  public void setGoal(ProfileState goal) {
     m_goal = goal;
   }
 
@@ -201,7 +202,7 @@ public class ProfiledPIDController implements Sendable {
    * @param goal The desired goal position.
    */
   public void setGoal(double goal) {
-    m_goal = new TrapezoidProfile.State(goal, 0);
+    m_goal = new ProfileState(goal, 0);
   }
 
   /**
@@ -209,7 +210,7 @@ public class ProfiledPIDController implements Sendable {
    *
    * @return The goal.
    */
-  public TrapezoidProfile.State getGoal() {
+  public ProfileState getGoal() {
     return m_goal;
   }
 
@@ -248,7 +249,7 @@ public class ProfiledPIDController implements Sendable {
    *
    * @return The current setpoint.
    */
-  public TrapezoidProfile.State getSetpoint() {
+  public ProfileState getSetpoint() {
     return m_setpoint;
   }
 
@@ -367,7 +368,7 @@ public class ProfiledPIDController implements Sendable {
    * @param goal The new goal of the controller.
    * @return The controller's next output.
    */
-  public double calculate(double measurement, TrapezoidProfile.State goal) {
+  public double calculate(double measurement, ProfileState goal) {
     setGoal(goal);
     return calculate(measurement);
   }
@@ -393,7 +394,7 @@ public class ProfiledPIDController implements Sendable {
    * @return The controller's next output.
    */
   public double calculate(
-      double measurement, TrapezoidProfile.State goal, TrapezoidProfile.Constraints constraints) {
+      double measurement, ProfileState goal, TrapezoidProfile.Constraints constraints) {
     setConstraints(constraints);
     return calculate(measurement, goal);
   }
@@ -403,7 +404,7 @@ public class ProfiledPIDController implements Sendable {
    *
    * @param measurement The current measured State of the system.
    */
-  public void reset(TrapezoidProfile.State measurement) {
+  public void reset(ProfileState measurement) {
     m_controller.reset();
     m_setpoint = measurement;
   }
@@ -415,7 +416,7 @@ public class ProfiledPIDController implements Sendable {
    * @param measuredVelocity The current measured velocity of the system.
    */
   public void reset(double measuredPosition, double measuredVelocity) {
-    reset(new TrapezoidProfile.State(measuredPosition, measuredVelocity));
+    reset(new ProfileState(measuredPosition, measuredVelocity));
   }
 
   /**

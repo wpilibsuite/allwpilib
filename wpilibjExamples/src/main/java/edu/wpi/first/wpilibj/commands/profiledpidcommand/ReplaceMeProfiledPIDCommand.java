@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj.commands.profiledpidcommand;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.ProfileState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.ProfiledPIDCommand;
 
@@ -26,7 +27,7 @@ public class ReplaceMeProfiledPIDCommand extends ProfiledPIDCommand {
         // This should return the measurement
         () -> 0,
         // This should return the goal (can also be a constant)
-        () -> new TrapezoidProfile.State(),
+        () -> new ProfileState(),
         // This uses the output
         (output, setpoint) -> {
           // Use the output (and setpoint, if desired) here
