@@ -25,7 +25,7 @@ void SysIdRoutineBot::ConfigureBindings() {
       m_drive.SysIdDynamic(frc2::sysid::Direction::kReverse));
 
   m_shooter.SetDefaultCommand(m_shooter.RunShooterCommand(
-      [this] { return constants::shooter::kShooterTargetSpeed.value(); }));
+      [] { return constants::shooter::kShooterTargetSpeed.value(); }));
 
   /* Uncomment to bind Shooter routine, but comment out the drive routine too
   m_driverController.A().WhileTrue(
