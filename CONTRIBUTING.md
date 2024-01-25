@@ -28,7 +28,7 @@ So you want to contribute your changes back to WPILib. Great! We have a few cont
     - We will generally accept bug fixes without too much question. If they are only implemented for one language, we will implement them for any other necessary languages. Bug reports are also welcome, please submit them to our GitHub issue tracker.
 - While we do welcome improvements to the API, there are a few important rules to consider:
     - Features must be added to Java (WPILibJ), C++ (WPILibC), with rare exceptions.
-        - Most of Python (RobotPy) is created by wrapping WPILibC in python. However, new features to the command framework should also be submitted to [robotpy-commands-v2](https://github.com/robotpy/robotpy-commands-v2) as the command framework is reimplemented in Python.
+        - Most of Python (RobotPy) is created by wrapping WPILibC with pybind11 via robotpy-build. However, new features to the command framework should also be submitted to [robotpy-commands-v2](https://github.com/robotpy/robotpy-commands-v2) as the command framework is reimplemented in Python.
     - During competition season, we will not merge any new feature additions. We want to ensure that the API is stable during the season to help minimize issues for teams.
     - Ask about large changes before spending a bunch of time on them! You can create a new issue on our GitHub tracker for feature request/discussion and talk about it with us there.
     - Features that make it easier for teams with less experience to be more successful are more likely to be accepted.
