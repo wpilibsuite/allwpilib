@@ -197,6 +197,17 @@ else()
     endif()
 endif()
 
+install(
+    DIRECTORY src/main/native/thirdparty/expected/include/
+    DESTINATION "${include_dest}/wpiutil"
+)
+target_include_directories(
+    wpiutil
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/expected/include>
+        $<INSTALL_INTERFACE:${include_dest}/wpiutil>
+)
 install(DIRECTORY src/main/native/thirdparty/memory/include/ DESTINATION "${include_dest}/wpiutil")
 target_include_directories(
     wpiutil
