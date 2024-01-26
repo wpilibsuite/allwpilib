@@ -23,9 +23,7 @@ class Storage : frc2::SubsystemBase {
   bool IsFull() const;
 
   /** Exposes the IsFull trigger. */
-  frc2::Trigger HasCargo{[this] {
-    return IsFull();
-  }};
+  frc2::Trigger HasCargo{[this] { return IsFull(); }};
 
  private:
   frc::PWMSparkMax m_motor{StorageConstants::kMotorPort};

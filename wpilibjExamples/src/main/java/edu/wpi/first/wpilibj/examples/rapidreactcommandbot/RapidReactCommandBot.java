@@ -46,7 +46,7 @@ public class RapidReactCommandBot {
    */
   public void configureBindings() {
     // Automatically run the storage motor whenever the ball storage is not full,
-    // and turn it off whenever it fills. Uses subsystem-hosted trigger to 
+    // and turn it off whenever it fills. Uses subsystem-hosted trigger to
     // improve readability and make inter-subsystem communication easier.
     m_storage.hasCargo.whileFalse(m_storage.runCommand());
 
