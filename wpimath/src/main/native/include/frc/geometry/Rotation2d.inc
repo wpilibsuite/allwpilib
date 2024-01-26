@@ -11,13 +11,12 @@
 
 namespace frc {
 
-constexpr Rotation2d::Rotation2d(units::radian_t value)
+template <typename Angle>
+  requires units::traits::is_angle_unit_v<Angle>
+constexpr Rotation2d::Rotation2d(Angle value)
     : m_value(value),
-      m_cos(gcem::cos(value.to<double>())),
-      m_sin(gcem::sin(value.to<double>())) {}
-
-constexpr Rotation2d::Rotation2d(units::degree_t value)
-    : Rotation2d(units::radian_t{value}) {}
+      m_cos(gcem::cos(value.template convert<units::radian>().value())),
+      m_sin(gcem::sin(value.template convert<units::radian>().value())) {}
 
 constexpr Rotation2d::Rotation2d(double x, double y) {
   double magnitude = gcem::hypot(x, y);
