@@ -63,7 +63,7 @@ public class TrapezoidProfile {
     public final double maxAcceleration;
 
     /**
-     * Construct constraints for a TrapezoidProfile.
+     * Constructs constraints for a TrapezoidProfile.
      *
      * @param maxVelocity maximum velocity
      * @param maxAcceleration maximum acceleration
@@ -75,7 +75,7 @@ public class TrapezoidProfile {
     }
 
     /**
-     * Construct constraints for a TrapezoidProfile.
+     * Constructs constraints for a TrapezoidProfile.
      *
      * @param <U> Unit type.
      * @param maxVelocity maximum velocity
@@ -137,7 +137,7 @@ public class TrapezoidProfile {
   }
 
   /**
-   * Construct a TrapezoidProfile.
+   * Constructs a TrapezoidProfile.
    *
    * @param constraints The constraints on the profile, like maximum velocity.
    */
@@ -147,7 +147,7 @@ public class TrapezoidProfile {
   }
 
   /**
-   * Construct a TrapezoidProfile.
+   * Constructs a TrapezoidProfile.
    *
    * @param constraints The constraints on the profile, like maximum velocity.
    * @param goal The desired state when the profile is complete.
@@ -197,7 +197,7 @@ public class TrapezoidProfile {
   }
 
   /**
-   * Construct a TrapezoidProfile.
+   * Constructs a TrapezoidProfile.
    *
    * @param constraints The constraints on the profile, like maximum velocity.
    * @param goal The desired state when the profile is complete.
@@ -210,10 +210,10 @@ public class TrapezoidProfile {
   }
 
   /**
-   * Calculate the correct position and velocity for the profile at a time t where the beginning of
-   * the profile was at time t = 0.
+   * Calculates the position and velocity for the profile at a time t where the current state is at
+   * time t = 0.
    *
-   * @param t The time since the beginning of the profile.
+   * @param t How long to advance from the current state toward the desired state.
    * @return The position and velocity of the profile at time t.
    * @deprecated Pass the desired and current state into calculate instead of constructing a new
    *     TrapezoidProfile with the desired and current state
@@ -247,10 +247,10 @@ public class TrapezoidProfile {
   }
 
   /**
-   * Calculate the correct position and velocity for the profile at a time t where the beginning of
-   * the profile was at time t = 0.
+   * Calculates the position and velocity for the profile at a time t where the current state is at
+   * time t = 0.
    *
-   * @param t The time since the beginning of the profile.
+   * @param t How long to advance from the current state toward the desired state.
    * @param current The current state.
    * @param goal The desired state when the profile is complete.
    * @return The position and velocity of the profile at time t.
