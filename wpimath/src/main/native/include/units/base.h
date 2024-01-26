@@ -53,7 +53,6 @@
 
 #if !defined(_MSC_VER) || _MSC_VER > 1800
 #   define UNIT_HAS_LITERAL_SUPPORT
-#   define UNIT_HAS_VARIADIC_TEMPLATE_SUPPORT
 #endif
 
 #ifndef UNIT_LIB_DEFAULT_TYPE
@@ -358,25 +357,14 @@ template<> inline constexpr const char* abbreviation(const namespaceName::nameSi
 		/** @endcond */\
 	}
 
-#if defined(UNIT_HAS_VARIADIC_TEMPLATE_SUPPORT)
 #define UNIT_ADD_IS_UNIT_CATEGORY_TRAIT(unitCategory)\
 	namespace traits\
 	{\
 		template<typename... T> struct is_ ## unitCategory ## _unit : std::integral_constant<bool, units::all_true<units::traits::detail::is_ ## unitCategory ## _unit_impl<std::decay_t<T>>::value...>::value> {};\
 		template<typename... T> inline constexpr bool is_ ## unitCategory ## _unit_v = is_ ## unitCategory ## _unit<T...>::value;\
-	}
-#else
-#define UNIT_ADD_IS_UNIT_CATEGORY_TRAIT(unitCategory)\
-	namespace traits\
-	{\
-			template<typename T1, typename T2 = T1, typename T3 = T1>\
-			struct is_ ## unitCategory ## _unit : std::integral_constant<bool, units::traits::detail::is_ ## unitCategory ## _unit_impl<typename std::decay<T1>::type>::value &&\
-				units::traits::detail::is_ ## unitCategory ## _unit_impl<typename std::decay<T2>::type>::value &&\
-				units::traits::detail::is_ ## unitCategory ## _unit_impl<typename std::decay<T3>::type>::value>{};\
-			template<typename T1, typename T2 = T1, typename T3 = T1>\
-			inline constexpr bool is_ ## unitCategory ## _unit_v = is_ ## unitCategory ## _unit<T1, T2, T3>::value;\
-	}
-#endif
+	}\
+	template <typename T>\
+	concept unitCategory ## _unit = traits::is_ ## unitCategory ## _unit_v<T>;
 
 #define UNIT_ADD_CATEGORY_TRAIT(unitCategory)\
 	UNIT_ADD_CATEGORY_TRAIT_DETAIL(unitCategory)\
