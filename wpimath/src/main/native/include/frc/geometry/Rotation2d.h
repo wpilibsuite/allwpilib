@@ -32,9 +32,7 @@ class WPILIB_DLLEXPORT Rotation2d {
    *
    * @param value The value of the angle.
    */
-  template <typename Angle>
-    requires units::traits::is_angle_unit_v<Angle>
-  constexpr Rotation2d(Angle value);  // NOLINT
+  constexpr Rotation2d(units::angle_unit auto value);  // NOLINT
 
   /**
    * Constructs a Rotation2d with the given x and y (cosine and sine)

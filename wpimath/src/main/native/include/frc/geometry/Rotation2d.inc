@@ -11,9 +11,7 @@
 
 namespace frc {
 
-template <typename Angle>
-  requires units::traits::is_angle_unit_v<Angle>
-constexpr Rotation2d::Rotation2d(Angle value)
+constexpr Rotation2d::Rotation2d(units::angle_unit auto value)
     : m_value(value),
       m_cos(gcem::cos(value.template convert<units::radian>().value())),
       m_sin(gcem::sin(value.template convert<units::radian>().value())) {}
