@@ -48,10 +48,10 @@ public class RapidReactCommandBot {
     // Automatically run the storage motor whenever the ball storage is not full,
     // and turn it off whenever it fills. Uses subsystem-hosted trigger to 
     // improve readability and make inter-subsystem communication easier.
-    m_storage.m_isFull.whileFalse(m_storage.runCommand());
+    m_storage.hasCargo.whileFalse(m_storage.runCommand());
 
     // Automatically disable and retract the intake whenever the ball storage is full.
-    m_storage.m_isFull.onTrue(m_intake.retractCommand());
+    m_storage.hasCargo.onTrue(m_intake.retractCommand());
 
     // Control the drive with split-stick arcade controls
     m_drive.setDefaultCommand(

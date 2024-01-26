@@ -23,7 +23,7 @@ class Storage : frc2::SubsystemBase {
   bool IsFull() const;
 
   /** Exposes the IsFull trigger. */
-  frc2::Trigger m_isFull{[this] {
+  frc2::Trigger HasCargo{[this] {
     return IsFull();
   }};
 

@@ -16,7 +16,7 @@ public class Storage extends SubsystemBase {
   private final DigitalInput m_ballSensor = new DigitalInput(StorageConstants.kBallSensorPort);
   // Expose trigger from subsystem to improve readability and ease 
   // inter-subsystem communications
-  public final Trigger m_isFull = new Trigger(this::isFull);
+  public final Trigger hasCargo = new Trigger(this::isFull);
 
   /** Create a new Storage subsystem. */
   public Storage() {
