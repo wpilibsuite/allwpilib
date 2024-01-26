@@ -35,13 +35,6 @@ class WPILIB_DLLEXPORT Rotation2d {
   constexpr Rotation2d(units::radian_t value);  // NOLINT
 
   /**
-   * Constructs a Rotation2d with the given degree value.
-   *
-   * @param value The value of the angle in degrees.
-   */
-  constexpr Rotation2d(units::degree_t value);  // NOLINT
-
-  /**
    * Constructs a Rotation2d with the given x and y (cosine and sine)
    * components. The x and y don't have to be normalized.
    *
