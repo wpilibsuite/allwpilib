@@ -19,6 +19,9 @@ constexpr Rotation2d::Rotation2d(units::radian_t value)
 constexpr Rotation2d::Rotation2d(units::degree_t value)
     : Rotation2d(units::radian_t{value}) {}
 
+constexpr Rotation2d::Rotation2d(units::turn_t value)
+    : Rotation2d(units::radian_t{value}) {}
+
 constexpr Rotation2d::Rotation2d(double x, double y) {
   double magnitude = gcem::hypot(x, y);
   if (magnitude > 1e-6) {

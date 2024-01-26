@@ -42,6 +42,13 @@ class WPILIB_DLLEXPORT Rotation2d {
   constexpr Rotation2d(units::degree_t value);  // NOLINT
 
   /**
+   * Constructs a Rotation2d with the given number of turns.
+   *
+   * @param value The value of the angle in turns.
+   */
+  constexpr Rotation2d(units::turn_t value);  // NOLINT
+
+  /**
    * Constructs a Rotation2d with the given x and y (cosine and sine)
    * components. The x and y don't have to be normalized.
    *
