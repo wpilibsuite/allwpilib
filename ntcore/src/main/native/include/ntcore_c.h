@@ -1537,12 +1537,12 @@ float* NT_AllocateFloatArray(size_t size);
 double* NT_AllocateDoubleArray(size_t size);
 
 /**
- * Allocates an array of struct WPI_Strings.
+ * Allocates an array of WPI_Strings.
  * Note that the size is the number of elements, and not the
  * specific number of bytes to allocate. That is calculated internally.
  *
  * @param size  the number of elements the array will contain
- * @return      the allocated struct WPI_String array
+ * @return      the allocated WPI_String array
  *
  * After use, the array should be freed using the NT_FreeStringArray()
  * function.
