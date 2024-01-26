@@ -8,6 +8,7 @@
 #include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc2/command/CommandPtr.h>
 #include <frc2/command/SubsystemBase.h>
+#include <frc2/command/button/Trigger.h>
 
 #include "Constants.h"
 
@@ -20,6 +21,11 @@ class Storage : frc2::SubsystemBase {
 
   /** Whether the ball storage is full. */
   bool IsFull() const;
+
+  /** Exposes the IsFull trigger. */
+  frc2::Trigger m_isFull{[this] {
+    return IsFull();
+  }};
 
  private:
   frc::PWMSparkMax m_motor{StorageConstants::kMotorPort};
