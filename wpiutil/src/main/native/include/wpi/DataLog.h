@@ -1276,6 +1276,14 @@ void WPI_DataLog_AppendStringArray(struct WPI_DataLog* datalog, int entry,
                                    const struct WPI_String* arr, size_t len,
                                    int64_t timestamp);
 
+void WPI_DataLog_AddSchemaString(struct WPI_DataLog* datalog, const char* name,
+                                 const char* type, const char* schema,
+                                 int64_t timestamp);
+
+void WPI_DataLog_AddSchema(struct WPI_DataLog* datalog, const char* name,
+                           const char* type, const uint8_t* schema,
+                           size_t schema_len, int64_t timestamp);
+
 #ifdef __cplusplus
 }  // extern "C"
 #endif  // __cplusplus

@@ -46,8 +46,9 @@ class FMSModel : public Model {
  *
  * @param matchTimeEnabled If not null, a checkbox is displayed for
  *                         "enable match time" linked to this value
+ * @param editableDsAttached If true, DS attached should be editable
  */
-void DisplayFMS(FMSModel* model);
+void DisplayFMS(FMSModel* model, bool editableDsAttached);
 void DisplayFMSReadOnly(FMSModel* model);
 
 }  // namespace glass

@@ -86,29 +86,99 @@ public class WPINetJNI {
    */
   public static native void removePortForwarder(int port);
 
+  /**
+   * Creates a MulticastServiceAnnouncer.
+   *
+   * @param serviceName service name
+   * @param serviceType service type
+   * @param port port
+   * @param keys keys
+   * @param values values
+   * @return MulticastServiceAnnouncer handle.
+   */
   public static native int createMulticastServiceAnnouncer(
       String serviceName, String serviceType, int port, String[] keys, String[] values);
 
+  /**
+   * Frees a MulticastServiceAnnouncer.
+   *
+   * @param handle MulticastServiceAnnouncer handle.
+   */
   public static native void freeMulticastServiceAnnouncer(int handle);
 
+  /**
+   * Starts MulticastServiceAnnouncer.
+   *
+   * @param handle MulticastServiceAnnouncer handle.
+   */
   public static native void startMulticastServiceAnnouncer(int handle);
 
+  /**
+   * Stops MulticastServiceAnnouncer.
+   *
+   * @param handle MulticastServiceAnnouncer handle.
+   */
   public static native void stopMulticastServiceAnnouncer(int handle);
 
+  /**
+   * Returns true if MulticastServiceAnnouncer has an implementation.
+   *
+   * @param handle MulticastServiceAnnouncer handle.
+   * @return True if MulticastServiceAnnouncer has an implementation.
+   */
   public static native boolean getMulticastServiceAnnouncerHasImplementation(int handle);
 
+  /**
+   * Creates a MulticastServiceResolver.
+   *
+   * @param serviceType Service type.
+   * @return MulticastServiceResolver handle.
+   */
   public static native int createMulticastServiceResolver(String serviceType);
 
+  /**
+   * Frees MulticastServiceResolver.
+   *
+   * @param handle MulticastServiceResolver handle.
+   */
   public static native void freeMulticastServiceResolver(int handle);
 
+  /**
+   * Starts MulticastServiceResolver.
+   *
+   * @param handle MulticastServiceResolver handle.
+   */
   public static native void startMulticastServiceResolver(int handle);
 
+  /**
+   * Stops MulticastServiceResolver.
+   *
+   * @param handle MulticastServiceResolver handle.
+   */
   public static native void stopMulticastServiceResolver(int handle);
 
+  /**
+   * Returns true if MulticastServiceResolver has an implementation.
+   *
+   * @param handle MulticastServiceResolver handle.
+   * @return True if MulticastServiceResolver has an implementation.
+   */
   public static native boolean getMulticastServiceResolverHasImplementation(int handle);
 
+  /**
+   * Returns event handle for MulticastServiceResolver.
+   *
+   * @param handle MulticastServiceResolver handle.
+   * @return Event handle for MulticastServiceResolver.
+   */
   public static native int getMulticastServiceResolverEventHandle(int handle);
 
+  /**
+   * Returns service data for MulticastServiceResolver.
+   *
+   * @param handle MulticastServiceResolver handle.
+   * @return Service data for MulticastServiceResolver.
+   */
   public static native ServiceData[] getMulticastServiceResolverData(int handle);
 
   /** Utility class. */

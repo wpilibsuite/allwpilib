@@ -173,7 +173,7 @@ class MeasureTest {
     var measure = Units.Volts.of(343);
     assertEquals("343.0 Volt", measure.toLongString());
     assertEquals("343.0001 Volt", Units.Volts.of(343.0001).toLongString());
-    assertEquals("1.2345678912345679E8 Volt", Units.Volts.of(123456789.123456789).toLongString());
+    assertEquals("1.2345678912345678E8 Volt", Units.Volts.of(123456789.12345678).toLongString());
   }
 
   @Test

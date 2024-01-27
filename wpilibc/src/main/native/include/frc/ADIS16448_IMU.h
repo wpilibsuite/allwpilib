@@ -16,7 +16,6 @@
 #include <stdint.h>
 
 #include <atomic>
-#include <memory>
 #include <thread>
 
 #include <hal/SimDevice.h>
@@ -33,7 +32,6 @@
 
 #include "frc/DigitalInput.h"
 #include "frc/DigitalOutput.h"
-#include "frc/DigitalSource.h"
 #include "frc/SPI.h"
 
 namespace frc {
@@ -117,8 +115,8 @@ class ADIS16448_IMU : public wpi::Sendable,
 
   ~ADIS16448_IMU() override;
 
-  ADIS16448_IMU(ADIS16448_IMU&&) = default;
-  ADIS16448_IMU& operator=(ADIS16448_IMU&&) = default;
+  ADIS16448_IMU(ADIS16448_IMU&&);
+  ADIS16448_IMU& operator=(ADIS16448_IMU&&);
 
   /**
    * Initialize the IMU.
@@ -352,8 +350,8 @@ class ADIS16448_IMU : public wpi::Sendable,
   };
 
   /** @brief Internal Resources **/
-  DigitalInput* m_reset_in;
-  DigitalOutput* m_status_led;
+  DigitalInput* m_reset_in = nullptr;
+  DigitalOutput* m_status_led = nullptr;
 
   bool SwitchToStandardSPI();
 
@@ -417,10 +415,10 @@ class ADIS16448_IMU : public wpi::Sendable,
   double CompFilterProcess(double compAngle, double accelAngle, double omega);
 
   // State and resource variables
-  volatile bool m_thread_active = false;
-  volatile bool m_first_run = true;
-  volatile bool m_thread_idle = false;
-  volatile bool m_start_up_mode = true;
+  std::atomic<bool> m_thread_active = false;
+  std::atomic<bool> m_first_run = true;
+  std::atomic<bool> m_thread_idle = false;
+  std::atomic<bool> m_start_up_mode = true;
 
   bool m_auto_configured = false;
   SPI::Port m_spi_port;

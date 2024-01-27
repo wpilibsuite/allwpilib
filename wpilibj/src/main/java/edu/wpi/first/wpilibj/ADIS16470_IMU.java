@@ -453,7 +453,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
    * @return
    */
   private static int toUShort(ByteBuffer buf) {
-    return (buf.getShort(0)) & 0xFFFF;
+    return buf.getShort(0) & 0xFFFF;
   }
 
   /**
@@ -469,7 +469,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
    * @return
    */
   private static int toShort(int... buf) {
-    return (short) (((buf[0] & 0xFF) << 8) + ((buf[1] & 0xFF)));
+    return (short) (((buf[0] & 0xFF) << 8) + (buf[1] & 0xFF));
   }
 
   /**
@@ -693,7 +693,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
   private void writeRegister(int reg, int val) {
     ByteBuffer buf = ByteBuffer.allocateDirect(2);
     // low byte
-    buf.put(0, (byte) ((0x80 | reg)));
+    buf.put(0, (byte) (0x80 | reg));
     buf.put(1, (byte) (val & 0xff));
     m_spi.write(buf, 2);
     // high byte
@@ -1137,6 +1137,33 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
   }
 
   /**
+   * Returns the Yaw axis angle in degrees (CCW positive).
+   *
+   * @return The Yaw axis angle in degrees (CCW positive).
+   */
+  public synchronized double getAngle() {
+    switch (m_yaw_axis) {
+      case kX:
+        if (m_simGyroAngleX != null) {
+          return m_simGyroAngleX.get();
+        }
+        return m_integ_angle_x;
+      case kY:
+        if (m_simGyroAngleY != null) {
+          return m_simGyroAngleY.get();
+        }
+        return m_integ_angle_y;
+      case kZ:
+        if (m_simGyroAngleZ != null) {
+          return m_simGyroAngleZ.get();
+        }
+        return m_integ_angle_z;
+      default:
+    }
+    return 0.0;
+  }
+
+  /**
    * Returns the axis angular rate in degrees per second (CCW positive).
    *
    * @param axis The IMUAxis whose rate to return.
@@ -1157,6 +1184,33 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
     }
 
     switch (axis) {
+      case kX:
+        if (m_simGyroRateX != null) {
+          return m_simGyroRateX.get();
+        }
+        return m_gyro_rate_x;
+      case kY:
+        if (m_simGyroRateY != null) {
+          return m_simGyroRateY.get();
+        }
+        return m_gyro_rate_y;
+      case kZ:
+        if (m_simGyroRateZ != null) {
+          return m_simGyroRateZ.get();
+        }
+        return m_gyro_rate_z;
+      default:
+    }
+    return 0.0;
+  }
+
+  /**
+   * Returns the Yaw axis angular rate in degrees per second (CCW positive).
+   *
+   * @return Yaw axis angular rate in degrees per second (CCW positive).
+   */
+  public synchronized double getRate() {
+    switch (m_yaw_axis) {
       case kX:
         if (m_simGyroRateX != null) {
           return m_simGyroRateX.get();

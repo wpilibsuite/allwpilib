@@ -213,7 +213,13 @@ task generateJavaDocs(type: Javadoc) {
     options.links("https://docs.oracle.com/en/java/javase/17/docs/api/")
     options.links("https://docs.opencv.org/4.x/javadoc/")
     options.addStringOption("tag", "pre:a:Pre-Condition")
-    options.addBooleanOption("Xdoclint/package:-edu.wpi.first.math.proto," +
+    options.addBooleanOption("Xdoclint/package:" +
+            // TODO: v Document these, then remove them from the list
+            "-edu.wpi.first.hal," +
+            "-edu.wpi.first.hal.can," +
+            "-edu.wpi.first.hal.simulation," +
+            // TODO: ^ Document these, then remove them from the list
+            "-edu.wpi.first.math.proto," +
             "-edu.wpi.first.math.controller.proto," +
             "-edu.wpi.first.math.controller.struct," +
             "-edu.wpi.first.math.geometry.proto," +

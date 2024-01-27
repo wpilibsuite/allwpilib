@@ -42,8 +42,6 @@ model {
                                 into '/'
                             }
 
-                            from(applicationPath)
-
                             if (binary.targetPlatform.operatingSystem.isWindows()) {
                                 def exePath = binary.executable.file.absolutePath
                                 exePath = exePath.substring(0, exePath.length() - 4)
@@ -94,10 +92,13 @@ model {
 
                             // Reset the application path if we are creating a bundle.
                             applicationPath = file("$project.buildDir/outputs/bundles/$binary.targetPlatform.architecture.name")
+                            task.from(applicationPath)
                             project.build.dependsOn bundleTask
 
                             bundleTask.dependsOn binary.tasks.link
                             task.dependsOn(bundleTask)
+                        } else {
+                            task.from(applicationPath)
                         }
 
                         task.dependsOn binary.tasks.link

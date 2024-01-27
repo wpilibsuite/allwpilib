@@ -236,6 +236,12 @@ public interface GenericPublisher extends Publisher, Consumer<NetworkTableValue>
   boolean setDefault{{ t.TypeName }}({{ t.java.ValueType }} defaultValue);
 {% endif -%}
 {% if t.java.WrapValueType %}
+  /**
+   * Sets the entry's value if it does not exist.
+   *
+   * @param defaultValue the default value to set
+   * @return False if the entry exists with a different type
+   */
   boolean setDefault{{ t.TypeName }}({{ t.java.WrapValueType }} defaultValue);
 {% endif -%}
 {% endfor %}

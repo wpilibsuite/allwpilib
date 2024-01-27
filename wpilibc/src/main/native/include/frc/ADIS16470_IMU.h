@@ -16,7 +16,6 @@
 #include <stdint.h>
 
 #include <atomic>
-#include <memory>
 #include <thread>
 
 #include <hal/SimDevice.h>
@@ -30,7 +29,6 @@
 
 #include "frc/DigitalInput.h"
 #include "frc/DigitalOutput.h"
-#include "frc/DigitalSource.h"
 #include "frc/SPI.h"
 
 namespace frc {
@@ -146,8 +144,8 @@ class ADIS16470_IMU : public wpi::Sendable,
 
   ~ADIS16470_IMU() override;
 
-  ADIS16470_IMU(ADIS16470_IMU&&) = default;
-  ADIS16470_IMU& operator=(ADIS16470_IMU&&) = default;
+  ADIS16470_IMU(ADIS16470_IMU&& other);
+  ADIS16470_IMU& operator=(ADIS16470_IMU&& other);
 
   /**
    * Configures the decimation rate of the IMU.
@@ -218,18 +216,20 @@ class ADIS16470_IMU : public wpi::Sendable,
   /**
    * Returns the axis angle (CCW positive).
    *
-   * @param axis The IMUAxis whose angle to return.
+   * @param axis The IMUAxis whose angle to return. Defaults to user configured
+   * Yaw.
    * @return The axis angle (CCW positive).
    */
-  units::degree_t GetAngle(IMUAxis axis) const;
+  units::degree_t GetAngle(IMUAxis axis = IMUAxis::kYaw) const;
 
   /**
    * Returns the axis angular rate (CCW positive).
    *
-   * @param axis The IMUAxis whose rate to return.
+   * @param axis The IMUAxis whose rate to return. Defaults to user configured
+   * Yaw.
    * @return Axis angular rate (CCW positive).
    */
-  units::degrees_per_second_t GetRate(IMUAxis axis) const;
+  units::degrees_per_second_t GetRate(IMUAxis axis = IMUAxis::kYaw) const;
 
   /**
    * Returns the acceleration in the X axis.
@@ -423,8 +423,8 @@ class ADIS16470_IMU : public wpi::Sendable,
   static constexpr double grav = 9.81;
 
   /** @brief Resources **/
-  DigitalInput* m_reset_in;
-  DigitalOutput* m_status_led;
+  DigitalInput* m_reset_in = nullptr;
+  DigitalOutput* m_status_led = nullptr;
 
   /**
    * @brief Switches to standard SPI operation. Primarily used when exiting auto
@@ -501,9 +501,9 @@ class ADIS16470_IMU : public wpi::Sendable,
   double CompFilterProcess(double compAngle, double accelAngle, double omega);
 
   // State and resource variables
-  volatile bool m_thread_active = false;
-  volatile bool m_first_run = true;
-  volatile bool m_thread_idle = false;
+  std::atomic<bool> m_thread_active = false;
+  std::atomic<bool> m_first_run = true;
+  std::atomic<bool> m_thread_idle = false;
   bool m_auto_configured = false;
   SPI::Port m_spi_port;
   uint16_t m_calibration_time = 0;

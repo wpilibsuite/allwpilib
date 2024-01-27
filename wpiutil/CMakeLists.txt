@@ -270,4 +270,7 @@ if(WITH_TESTS)
 
     wpilib_add_test(wpiutil src/test/native/cpp)
     target_link_libraries(wpiutil_test wpiutil gmock_main wpiutil_testlib)
+    if(MSVC)
+        target_compile_options(wpiutil_test PRIVATE /utf-8)
+    endif()
 endif()

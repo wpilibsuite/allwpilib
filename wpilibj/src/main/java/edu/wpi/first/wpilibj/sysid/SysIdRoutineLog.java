@@ -32,7 +32,7 @@ import java.util.Map;
 public class SysIdRoutineLog {
   private final Map<String, Map<String, DoubleLogEntry>> m_logEntries = new HashMap<>();
   private final String m_logName;
-  private final StringLogEntry m_state;
+  private StringLogEntry m_state;
 
   /**
    * Create a new logging utility for a SysId test routine.
@@ -44,8 +44,6 @@ public class SysIdRoutineLog {
    */
   public SysIdRoutineLog(String logName) {
     m_logName = logName;
-    m_state = new StringLogEntry(DataLogManager.getLog(), "sysid-test-state-" + logName);
-    m_state.append(State.kNone.toString());
   }
 
   /** Possible state of a SysId routine. */
@@ -163,12 +161,14 @@ public class SysIdRoutineLog {
     /**
      * Log the linear acceleration of the motor.
      *
+     * <p>This is optional; SysId can perform an accurate fit without it.
+     *
      * @param acceleration The linear acceleration to record.
      * @return The motor log (for call chaining).
      */
     public MotorLog linearAcceleration(Measure<Velocity<Velocity<Distance>>> acceleration) {
       return value(
-          "position",
+          "acceleration",
           acceleration.in(MetersPerSecond.per(Second)),
           MetersPerSecond.per(Second).name());
     }
@@ -176,18 +176,22 @@ public class SysIdRoutineLog {
     /**
      * Log the angular acceleration of the motor.
      *
+     * <p>This is optional; SysId can perform an accurate fit without it.
+     *
      * @param acceleration The angular acceleration to record.
      * @return The motor log (for call chaining).
      */
     public MotorLog angularAcceleration(Measure<Velocity<Velocity<Angle>>> acceleration) {
       return value(
-          "position",
+          "acceleration",
           acceleration.in(RotationsPerSecond.per(Second)),
           RotationsPerSecond.per(Second).name());
     }
 
     /**
      * Log the current applied to the motor.
+     *
+     * <p>This is optional; SysId can perform an accurate fit without it.
      *
      * @param current The current to record.
      * @return The motor log (for call chaining).
@@ -215,6 +219,9 @@ public class SysIdRoutineLog {
    * @param state The current state of the SysId test routine.
    */
   public void recordState(State state) {
+    if (m_state == null) {
+      m_state = new StringLogEntry(DataLogManager.getLog(), "sysid-test-state-" + m_logName);
+    }
     m_state.append(state.toString());
   }
 }

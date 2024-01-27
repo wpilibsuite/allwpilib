@@ -51,6 +51,11 @@ public class VideoListener implements AutoCloseable {
     }
   }
 
+  /**
+   * Returns true if the video listener handle is valid.
+   *
+   * @return True if the video listener handle is valid.
+   */
   public boolean isValid() {
     return m_handle != 0;
   }

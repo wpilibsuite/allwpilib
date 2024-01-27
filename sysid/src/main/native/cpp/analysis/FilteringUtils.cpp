@@ -14,6 +14,7 @@
 #include <frc/filter/LinearFilter.h>
 #include <frc/filter/MedianFilter.h>
 #include <units/math.h>
+#include <wpi/MathExtras.h>
 #include <wpi/StringExtras.h>
 
 using namespace sysid;
@@ -126,7 +127,7 @@ sysid::TrimStepVoltageData(std::vector<PreparedData>* data,
   auto motionBegins = std::find_if(
       data->begin(), data->end(), [settings, firstPosition](auto& datum) {
         return std::abs(datum.position - firstPosition) >
-               (settings->motionThreshold * datum.dt.value());
+               (settings->velocityThreshold * datum.dt.value());
       });
 
   units::second_t positionDelay;
@@ -138,7 +139,11 @@ sysid::TrimStepVoltageData(std::vector<PreparedData>* data,
 
   auto maxAccel = std::max_element(
       data->begin(), data->end(), [](const auto& a, const auto& b) {
-        return std::abs(a.acceleration) < std::abs(b.acceleration);
+        // Since we don't know if its a forward or backwards test here, we use
+        // the sign of each point's velocity to determine how to compare their
+        // accelerations.
+        return wpi::sgn(a.velocity) * a.acceleration <
+               wpi::sgn(b.velocity) * b.acceleration;
       });
 
   units::second_t velocityDelay;
@@ -153,18 +158,22 @@ sysid::TrimStepVoltageData(std::vector<PreparedData>* data,
 
   minStepTime = std::min(data->at(0).timestamp - firstTimestamp, minStepTime);
 
-  // Find maximum speed reached
-  const auto maxSpeed =
-      GetMaxSpeed(*data, [](auto&& pt) { return pt.velocity; });
-  // Find place where 90% of maximum speed exceeded
-  auto endIt =
-      std::find_if(data->begin(), data->end(), [&](const PreparedData& entry) {
-        return std::abs(entry.velocity) > maxSpeed * 0.9;
-      });
+  // If step test duration not yet specified, calculate default
+  if (settings->stepTestDuration == 0_s) {
+    // Find maximum speed reached
+    const auto maxSpeed =
+        GetMaxSpeed(*data, [](auto&& pt) { return pt.velocity; });
+    // Find place where 90% of maximum speed exceeded
+    auto endIt = std::find_if(
+        data->begin(), data->end(), [&](const PreparedData& entry) {
+          return std::abs(entry.velocity) > maxSpeed * 0.9;
+        });
 
-  if (endIt != data->end()) {
-    settings->stepTestDuration = std::min(
-        endIt->timestamp - data->front().timestamp + minStepTime, maxStepTime);
+    if (endIt != data->end()) {
+      settings->stepTestDuration =
+          std::min(endIt->timestamp - data->front().timestamp + minStepTime,
+                   maxStepTime);
+    }
   }
 
   // Find first entry greater than the step test duration
@@ -326,13 +335,13 @@ void sysid::InitialTrimAndFilter(
   maxStepTime = GetMaxStepTime(preparedData);
 
   // Calculate Velocity Threshold if it hasn't been set yet
-  if (settings->motionThreshold == std::numeric_limits<double>::infinity()) {
+  if (settings->velocityThreshold == std::numeric_limits<double>::infinity()) {
     for (auto& it : preparedData) {
       auto key = it.first();
       auto& dataset = it.getValue();
       if (wpi::contains(key, "quasistatic")) {
-        settings->motionThreshold =
-            std::min(settings->motionThreshold,
+        settings->velocityThreshold =
+            std::min(settings->velocityThreshold,
                      GetNoiseFloor(dataset, kNoiseMeanWindow,
                                    [](auto&& pt) { return pt.velocity; }));
       }
@@ -344,13 +353,13 @@ void sysid::InitialTrimAndFilter(
     auto& dataset = it.getValue();
 
     // Trim quasistatic test data to remove all points where voltage is zero or
-    // velocity < motion threshold.
+    // velocity < velocity threshold.
     if (wpi::contains(key, "quasistatic")) {
       dataset.erase(std::remove_if(dataset.begin(), dataset.end(),
                                    [&](const auto& pt) {
                                      return std::abs(pt.voltage) <= 0 ||
                                             std::abs(pt.velocity) <
-                                                settings->motionThreshold;
+                                                settings->velocityThreshold;
                                    }),
                     dataset.end());
 

@@ -70,13 +70,13 @@ jobs:
             artifact-name: Win64Debug
             architecture: x64
             task: "build"
-            build-options: "-PciDebugOnly --max-workers 1"
+            build-options: "-PciDebugOnly"
             outputs: "build/allOutputs"
             build-dir: "c:\\work"
           - os: windows-2022
             artifact-name: Win64Release
             architecture: x64
-            build-options: "-PciReleaseOnly --max-workers 1"
+            build-options: "-PciReleaseOnly"
             task: "copyAllOutputs"
             outputs: "build/allOutputs"
             build-dir: "c:\\work"
@@ -84,13 +84,13 @@ jobs:
             artifact-name: WinArm64Debug
             architecture: x64
             task: "build"
-            build-options: "-PciDebugOnly -Pbuildwinarm64 -Ponlywindowsarm64 --max-workers 1"
+            build-options: "-PciDebugOnly -Pbuildwinarm64 -Ponlywindowsarm64"
             outputs: "build/allOutputs"
             build-dir: "c:\\work"
           - os: windows-2022
             artifact-name: WinArm64Release
             architecture: x64
-            build-options: "-PciReleaseOnly -Pbuildwinarm64 -Ponlywindowsarm64 --max-workers 1"
+            build-options: "-PciReleaseOnly -Pbuildwinarm64 -Ponlywindowsarm64"
             task: "copyAllOutputs"
             outputs: "build/allOutputs"
             build-dir: "c:\\work"
@@ -174,7 +174,7 @@ jobs:
       - uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
-          java-version: 13
+          java-version: 17
       - name: Set release environment variable
         run: echo "EXTRA_GRADLE_ARGS=-PreleaseMode" >> $GITHUB_ENV
         if: startsWith(github.ref, 'refs/tags/v')

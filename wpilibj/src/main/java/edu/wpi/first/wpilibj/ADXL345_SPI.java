@@ -19,7 +19,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 /** ADXL345 SPI Accelerometer. */
-@SuppressWarnings({"TypeName", "PMD.UnusedPrivateField"})
+@SuppressWarnings("TypeName")
 public class ADXL345_SPI implements NTSendable, AutoCloseable {
   private static final int kPowerCtlRegister = 0x2D;
   private static final int kDataFormatRegister = 0x31;
@@ -29,16 +29,17 @@ public class ADXL345_SPI implements NTSendable, AutoCloseable {
   private static final int kAddress_Read = 0x80;
   private static final int kAddress_MultiByte = 0x40;
 
-  private static final int kPowerCtl_Link = 0x20;
-  private static final int kPowerCtl_AutoSleep = 0x10;
+  // private static final int kPowerCtl_Link = 0x20;
+  // private static final int kPowerCtl_AutoSleep = 0x10;
   private static final int kPowerCtl_Measure = 0x08;
-  private static final int kPowerCtl_Sleep = 0x04;
+  // private static final int kPowerCtl_Sleep = 0x04;
 
-  private static final int kDataFormat_SelfTest = 0x80;
-  private static final int kDataFormat_SPI = 0x40;
-  private static final int kDataFormat_IntInvert = 0x20;
+  // private static final int kDataFormat_SelfTest = 0x80;
+  // private static final int kDataFormat_SPI = 0x40;
+  // private static final int kDataFormat_IntInvert = 0x20;
   private static final int kDataFormat_FullRes = 0x08;
-  private static final int kDataFormat_Justify = 0x04;
+
+  // private static final int kDataFormat_Justify = 0x04;
 
   /** Accelerometer range. */
   public enum Range {

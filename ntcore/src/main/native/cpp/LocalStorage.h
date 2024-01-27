@@ -254,13 +254,13 @@ class LocalStorage final : public net::ILocalStorage {
       wpi::SmallVectorImpl<typename TypeInfo<T>::SmallElem>& buf,
       typename TypeInfo<T>::View defaultValue);
 
-  std::vector<Value> ReadQueueValue(NT_Handle subentry) {
+  std::vector<Value> ReadQueueValue(NT_Handle subentry, unsigned int types) {
     std::scoped_lock lock{m_mutex};
     auto subscriber = m_impl.GetSubEntry(subentry);
     if (!subscriber) {
       return {};
     }
-    return subscriber->pollStorage.ReadValue();
+    return subscriber->pollStorage.ReadValue(types);
   }
 
   template <ValidType T>

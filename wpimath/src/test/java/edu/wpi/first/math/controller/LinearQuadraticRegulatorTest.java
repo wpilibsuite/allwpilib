@@ -78,8 +78,8 @@ class LinearQuadraticRegulatorTest {
    *
    * <p>This is used to test the QRN overload of LQR.
    *
-   * @param States Number of states.
-   * @param Inputs Number of inputs.
+   * @param <States> Number of states.
+   * @param <Inputs> Number of inputs.
    * @param A State matrix.
    * @param B Input matrix.
    * @param Q State cost matrix.
@@ -119,10 +119,10 @@ class LinearQuadraticRegulatorTest {
 
     // QR overload
     var K = new LinearQuadraticRegulator<>(A, B, Q, R, 0.005).getK();
-    assertEquals(0.99750312499512261, K.get(0, 0), 1e-10);
+    assertEquals(0.9975031249951226, K.get(0, 0), 1e-10);
     assertEquals(0.0, K.get(0, 1), 1e-10);
     assertEquals(0.0, K.get(1, 0), 1e-10);
-    assertEquals(0.99750312499512261, K.get(1, 1), 1e-10);
+    assertEquals(0.9975031249951226, K.get(1, 1), 1e-10);
 
     // QRN overload
     var N = MatBuilder.fill(Nat.N2(), Nat.N2(), 1, 0, 0, 1);
@@ -146,13 +146,13 @@ class LinearQuadraticRegulatorTest {
     // QR overload
     var K = new LinearQuadraticRegulator<>(A, B, Q, R, 0.005).getK();
     assertEquals(1.9960017786537287, K.get(0, 0), 1e-10);
-    assertEquals(0.51182128351092726, K.get(0, 1), 1e-10);
+    assertEquals(0.5118212835109273, K.get(0, 1), 1e-10);
 
     // QRN overload
     var Aref = MatBuilder.fill(Nat.N2(), Nat.N2(), 0, 1, 0, -Kv / (Ka * 5.0));
     var Kimf = getImplicitModelFollowingK(A, B, Q, R, Aref, 0.005);
     assertEquals(0.0, Kimf.get(0, 0), 1e-10);
-    assertEquals(-6.9190500116751458e-05, Kimf.get(0, 1), 1e-10);
+    assertEquals(-6.919050011675146e-05, Kimf.get(0, 1), 1e-10);
   }
 
   @Test

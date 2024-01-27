@@ -11,12 +11,7 @@
 using namespace frc::sysid;
 
 SysIdRoutineLog::SysIdRoutineLog(std::string_view logName)
-    : m_logName(logName),
-      m_state(wpi::log::StringLogEntry{
-          frc::DataLogManager::GetLog(),
-          fmt::format("sysid-test-state{}", logName)}) {
-  m_state.Append(StateEnumToString(State::kNone));
-}
+    : m_logName(logName) {}
 
 SysIdRoutineLog::MotorLog::MotorLog(std::string_view motorName,
                                     std::string_view logName,
@@ -45,6 +40,12 @@ SysIdRoutineLog::MotorLog SysIdRoutineLog::Motor(std::string_view motorName) {
 }
 
 void SysIdRoutineLog::RecordState(State state) {
+  if (!m_stateInitialized) {
+    m_state =
+        wpi::log::StringLogEntry{frc::DataLogManager::GetLog(),
+                                 fmt::format("sysid-test-state-{}", m_logName)};
+    m_stateInitialized = true;
+  }
   m_state.Append(StateEnumToString(state));
 }
 

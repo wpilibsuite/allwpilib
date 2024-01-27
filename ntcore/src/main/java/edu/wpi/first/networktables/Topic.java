@@ -336,6 +336,9 @@ public class Topic {
     return m_handle;
   }
 
+  /** NetworkTables instance. */
   protected NetworkTableInstance m_inst;
+
+  /** NetworkTables handle. */
   protected int m_handle;
 }

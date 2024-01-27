@@ -21,8 +21,8 @@ namespace frc {
  * Allows multiple MotorController objects to be linked together.
  */
 class [[deprecated(
-    "Use CAN motor controller followers or "
-    "PWMMotorController::AddFollower()")]] MotorControllerGroup
+    "Use PWMMotorController::AddFollower() or if using CAN motor controllers,"
+    "use their method of following.")]] MotorControllerGroup
     : public wpi::Sendable,
       public MotorController,
       public wpi::SendableHelper<MotorControllerGroup> {

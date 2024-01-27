@@ -12,8 +12,8 @@ import java.util.Arrays;
 /**
  * Allows multiple {@link MotorController} objects to be linked together.
  *
- * @deprecated Use CAN motor controller followers or {@link
- *     PWMMotorController#addFollower(PWMMotorController)}.
+ * @deprecated Use {@link PWMMotorController#addFollower(PWMMotorController)} or if using CAN motor
+ *     controllers, use their method of following.
  */
 @SuppressWarnings("removal")
 @Deprecated(forRemoval = true, since = "2024")

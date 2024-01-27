@@ -52,6 +52,7 @@ public final class TestBench {
   public static final int DIOCrossConnectA1 = 6;
 
   /** The Singleton instance of the Test Bench. */
+  @SuppressWarnings("unused")
   private static TestBench instance = null;
 
   /**

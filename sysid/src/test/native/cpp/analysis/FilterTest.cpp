@@ -43,25 +43,96 @@ TEST(FilterTest, NoiseFloor) {
   EXPECT_NEAR(0.953, noiseFloor, 0.001);
 }
 
+void FillStepVoltageData(std::vector<sysid::PreparedData>& data) {
+  auto previousDatum = data.front();
+  for (size_t i = 1; i < data.size(); ++i) {
+    auto& datum = data.at(i);
+    datum.timestamp = previousDatum.timestamp + previousDatum.dt;
+    datum.position = 0.5 * previousDatum.acceleration *
+                         units::math::pow<2>(previousDatum.dt).value() +
+                     previousDatum.velocity * previousDatum.dt.value() +
+                     previousDatum.position;
+    datum.velocity = previousDatum.velocity +
+                     previousDatum.acceleration * previousDatum.dt.value();
+
+    previousDatum = datum;
+  }
+}
+
 TEST(FilterTest, StepTrim) {
-  std::vector<sysid::PreparedData> testData = {
-      {0_s, 1, 2, 0, 5_ms, 0, 0},   {1_s, 1, 2, 3, 5_ms, 0.25, 0},
-      {2_s, 1, 2, 0, 5_ms, 10, 0},  {3_s, 1, 2, 3, 5_ms, 0.45, 0},
-      {4_s, 1, 2, 9.6, 5_ms, 0, 0}, {5_s, 1, 2, 3, 5_ms, 0.15, 0},
-      {6_s, 1, 2, 0, 5_ms, 0, 0},   {7_s, 1, 2, 3, 5_ms, 0.02, 0},
-      {8_s, 1, 2, 10, 5_ms, 0, 0},  {9_s, 1, 2, 3, 5_ms, 0, 0},
-  };
+  {
+    std::vector<sysid::PreparedData> forwardTestData = {
+        {0_s, 1, 0, 0, 1_s, 0},  {0_s, 1, 0, 0, 1_s, 0.25},
+        {0_s, 1, 0, 0, 1_s, 10}, {0_s, 1, 0, 0, 1_s, 0.45},
+        {0_s, 1, 0, 0, 1_s, 0},  {0_s, 1, 0, 0, 1_s, 0.15},
+        {0_s, 1, 0, 0, 1_s, 0},  {0_s, 1, 0, 0, 1_s, 0.02},
+        {0_s, 1, 0, 0, 1_s, 0},  {0_s, 1, 0, 0, 0_s, 0},
+    };
 
-  auto maxTime = 9_s;
-  auto minTime = maxTime;
+    FillStepVoltageData(forwardTestData);
 
-  sysid::AnalysisManager::Settings settings;
-  auto [tempMinTime, positionDelay, velocityDelay] =
-      sysid::TrimStepVoltageData(&testData, &settings, minTime, maxTime);
-  minTime = tempMinTime;
+    auto maxTime = 9_s;
+    auto minTime = maxTime;
 
-  EXPECT_EQ(4, settings.stepTestDuration.value());
-  EXPECT_EQ(2, minTime.value());
+    sysid::AnalysisManager::Settings settings;
+    auto [tempMinTime, positionDelay, velocityDelay] =
+        sysid::TrimStepVoltageData(&forwardTestData, &settings, minTime,
+                                   maxTime);
+    minTime = tempMinTime;
+
+    EXPECT_EQ(3, settings.stepTestDuration.value());
+    EXPECT_EQ(2, minTime.value());
+  }
+
+  {
+    std::vector<sysid::PreparedData> backwardsTestData = {
+        {0_s, -1, 0, 0, 1_s, 0},     {0_s, -1, 0, 0, 1_s, -0.46},
+        {0_s, -1, 0, 0, 1_s, -8},    {0_s, -1, 0, 0, 1_s, -0.32},
+        {0_s, -1, 0, 0, 1_s, -0.12}, {0_s, -1, 0, 0, 1_s, -0.08},
+        {0_s, -1, 0, 0, 1_s, -0.06}, {0_s, -1, 0, 0, 1_s, -0.02},
+        {0_s, -1, 0, 0, 1_s, 0},     {0_s, -1, 0, 0, 0_s, 0},
+    };
+
+    FillStepVoltageData(backwardsTestData);
+
+    auto maxTime = 9_s;
+    auto minTime = maxTime;
+
+    sysid::AnalysisManager::Settings settings;
+    auto [tempMinTime, positionDelay, velocityDelay] =
+        sysid::TrimStepVoltageData(&backwardsTestData, &settings, minTime,
+                                   maxTime);
+    minTime = tempMinTime;
+
+    EXPECT_EQ(3, settings.stepTestDuration.value());
+    EXPECT_EQ(2, minTime.value());
+  }
+
+  {
+    // Forward test but with an erroneous negative acceleration at the end
+    std::vector<sysid::PreparedData> noisyTestData = {
+        {0_s, 1, 0, 0, 1_s, 0},    {0_s, 1, 0, 0, 1_s, 0.41},
+        {0_s, 1, 0, 0, 1_s, 11.5}, {0_s, 1, 0, 0, 1_s, 1.2},
+        {0_s, 1, 0, 0, 1_s, 0.34}, {0_s, 1, 0, 0, 1_s, 0.25},
+        {0_s, 1, 0, 0, 1_s, 0.11}, {0_s, 1, 0, 0, 1_s, -0.08},
+        {0_s, 1, 0, 0, 1_s, -12},  {0_s, 1, 0, 0, 0_s, 0},
+    };
+
+    FillStepVoltageData(noisyTestData);
+
+    auto maxTime = 9_s;
+    auto minTime = maxTime;
+
+    sysid::AnalysisManager::Settings settings;
+    auto [tempMinTime, positionDelay, velocityDelay] =
+        sysid::TrimStepVoltageData(&noisyTestData, &settings, minTime, maxTime);
+    minTime = tempMinTime;
+
+    // Expect trimming to reject the erroneous peak negative accel,
+    // correctly picking up the max positive accel instead.
+    EXPECT_EQ(4, settings.stepTestDuration.value());
+    EXPECT_EQ(2, minTime.value());
+  }
 }
 
 template <int Derivative, int Samples, typename F, typename DfDx>

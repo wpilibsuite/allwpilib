@@ -8,6 +8,7 @@
 #include <future>
 #include <map>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <glass/View.h>
@@ -37,7 +38,7 @@ class DataSelector : public glass::View {
    * @param logger The program logger
    */
   explicit DataSelector(glass::Storage& storage, wpi::Logger& logger)
-  /*: m_logger{logger}*/ {}
+      : m_logger{logger} {}
 
   /**
    * Displays the log loader window.
@@ -56,8 +57,8 @@ class DataSelector : public glass::View {
   std::function<void(TestData)> testdata;
 
  private:
-  // wpi::Logger& m_logger;
-  using Runs = std::vector<glass::DataLogReaderRange>;
+  wpi::Logger& m_logger;
+  using Runs = std::vector<std::pair<int64_t, int64_t>>;
   using State = std::map<std::string, Runs, std::less<>>;   // full name
   using Tests = std::map<std::string, State, std::less<>>;  // e.g. "dynamic"
   std::future<Tests> m_testsFuture;

@@ -20,5 +20,5 @@ class SysIdRoutineBot {
   void ConfigureBindings();
   frc2::CommandXboxController m_driverController{
       constants::oi::kDriverControllerPort};
-  Drive m_drive{};
+  Drive m_drive;
 };

@@ -38,8 +38,8 @@ public class ADXL362 implements NTSendable, AutoCloseable {
 
   private static final byte kPowerCtl_UltraLowNoise = 0x20;
 
-  @SuppressWarnings("PMD.UnusedPrivateField")
-  private static final byte kPowerCtl_AutoSleep = 0x04;
+  // @SuppressWarnings("PMD.UnusedPrivateField")
+  // private static final byte kPowerCtl_AutoSleep = 0x04;
 
   private static final byte kPowerCtl_Measure = 0x02;
 

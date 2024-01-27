@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.motorcontrol.MockPWMMotorController;
 import org.junit.jupiter.api.Test;
 
+@SuppressWarnings("resource")
 class MecanumDriveTest {
   @Test
   void testCartesianIK() {

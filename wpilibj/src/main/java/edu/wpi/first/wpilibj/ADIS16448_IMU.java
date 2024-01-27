@@ -383,7 +383,7 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
 
   /** */
   private static int toShort(int... buf) {
-    return (short) (((buf[0] & 0xFF) << 8) + ((buf[1] & 0xFF)));
+    return (short) (((buf[0] & 0xFF) << 8) + (buf[1] & 0xFF));
   }
 
   /** */

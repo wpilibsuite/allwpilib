@@ -4,14 +4,18 @@
 
 #include "frc2/command/sysid/SysIdRoutine.h"
 
+#include <frc/sysid/SysIdRoutineLog.h>
+
 using namespace frc2::sysid;
 
 frc2::CommandPtr SysIdRoutine::Quasistatic(Direction direction) {
-  std::unordered_map<Direction, frc::sysid::State> stateOptions{
-      {Direction::kForward, frc::sysid::State::kQuasistaticForward},
-      {Direction::kReverse, frc::sysid::State::kQuasistaticReverse},
-  };
-  frc::sysid::State state = stateOptions[direction];
+  frc::sysid::State state;
+  if (direction == Direction::kForward) {
+    state = frc::sysid::State::kQuasistaticForward;
+  } else {  // if (direction == Direction::kReverse) {
+    state = frc::sysid::State::kQuasistaticReverse;
+  }
+
   double outputSign = direction == Direction::kForward ? 1.0 : -1.0;
 
   return m_mechanism.m_subsystem
@@ -39,11 +43,13 @@ frc2::CommandPtr SysIdRoutine::Quasistatic(Direction direction) {
 }
 
 frc2::CommandPtr SysIdRoutine::Dynamic(Direction direction) {
-  std::unordered_map<Direction, frc::sysid::State> stateOptions{
-      {Direction::kForward, frc::sysid::State::kDynamicForward},
-      {Direction::kReverse, frc::sysid::State::kDynamicReverse},
-  };
-  frc::sysid::State state = stateOptions[direction];
+  frc::sysid::State state;
+  if (direction == Direction::kForward) {
+    state = frc::sysid::State::kDynamicForward;
+  } else {  // if (direction == Direction::kReverse) {
+    state = frc::sysid::State::kDynamicReverse;
+  }
+
   double outputSign = direction == Direction::kForward ? 1.0 : -1.0;
 
   return m_mechanism.m_subsystem
