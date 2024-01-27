@@ -149,7 +149,7 @@ struct NT_Value* NT_GetValueStringArrayForTesting(uint64_t last_change,
   for (size_t i = 0; i < value->data.arr_string.size; ++i) {
     size_t len = arr[i].len;
     auto write = WPI_AllocateString(&value->data.arr_string.arr[i], len);
-    std::memcpy(write, arr[i].str);
+    std::memcpy(write, arr[i].str, len);
   }
   *struct_size = sizeof(NT_Value);
   return value;
