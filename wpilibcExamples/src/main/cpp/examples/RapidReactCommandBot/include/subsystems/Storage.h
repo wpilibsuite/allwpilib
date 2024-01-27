@@ -19,11 +19,9 @@ class Storage : frc2::SubsystemBase {
   [[nodiscard]]
   frc2::CommandPtr RunCommand();
 
-  /** Whether the ball storage is full. */
-  bool IsFull() const;
 
-  /** Exposes the IsFull trigger. */
-  frc2::Trigger HasCargo{[this] { return IsFull(); }};
+  /** Whether the ball storage is full. */
+  frc2::Trigger HasCargo{[this] { return m_ballSensor.Get(); }};
 
  private:
   frc::PWMSparkMax m_motor{StorageConstants::kMotorPort};

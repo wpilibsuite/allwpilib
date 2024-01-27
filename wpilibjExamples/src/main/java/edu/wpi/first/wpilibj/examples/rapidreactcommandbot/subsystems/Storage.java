@@ -17,18 +17,14 @@ public class Storage extends SubsystemBase {
 
   // Expose trigger from subsystem to improve readability and ease
   // inter-subsystem communications
+  /** Whether the ball storage is full. */
   @SuppressWarnings("checkstyle:MemberName")
-  public final Trigger hasCargo = new Trigger(this::isFull);
+  public final Trigger hasCargo = new Trigger(m_ballSensor::get);
 
   /** Create a new Storage subsystem. */
   public Storage() {
     // Set default command to turn off the storage motor and then idle
     setDefaultCommand(runOnce(m_motor::disable).andThen(run(() -> {})).withName("Idle"));
-  }
-
-  /** Whether the ball storage is full. */
-  public boolean isFull() {
-    return m_ballSensor.get();
   }
 
   /** Returns a command that runs the storage motor indefinitely. */
