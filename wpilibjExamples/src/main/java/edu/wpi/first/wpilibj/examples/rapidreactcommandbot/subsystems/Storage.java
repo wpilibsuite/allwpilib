@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class Storage extends SubsystemBase {
   private final PWMSparkMax m_motor = new PWMSparkMax(StorageConstants.kMotorPort);
   private final DigitalInput m_ballSensor = new DigitalInput(StorageConstants.kBallSensorPort);
-  
+
   // Expose trigger from subsystem to improve readability and ease
   // inter-subsystem communications
   @SuppressWarnings("checkstyle:MemberName")
