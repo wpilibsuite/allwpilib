@@ -19,7 +19,6 @@ class Storage : frc2::SubsystemBase {
   [[nodiscard]]
   frc2::CommandPtr RunCommand();
 
-
   /** Whether the ball storage is full. */
   frc2::Trigger HasCargo{[this] { return m_ballSensor.Get(); }};
 
