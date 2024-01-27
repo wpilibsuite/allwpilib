@@ -1213,17 +1213,23 @@ void WPI_DataLog_AppendStringArray(struct WPI_DataLog* datalog, int entry,
                                                          timestamp);
 }
 
-void WPI_DataLog_AddSchemaString(struct WPI_DataLog* datalog, const char* name,
-                                 const char* type, const char* schema,
+void WPI_DataLog_AddSchemaString(struct WPI_DataLog* datalog,
+                                 const struct WPI_String* name,
+                                 const struct WPI_String* type,
+                                 const struct WPI_String* schema,
                                  int64_t timestamp) {
-  reinterpret_cast<DataLog*>(datalog)->AddSchema(name, type, schema, timestamp);
+  reinterpret_cast<DataLog*>(datalog)->AddSchema(
+      wpi::to_string_view(*name), wpi::to_string_view(*type),
+      wpi::to_string_view(*schema), timestamp);
 }
 
-void WPI_DataLog_AddSchema(struct WPI_DataLog* datalog, const char* name,
-                           const char* type, const uint8_t* schema,
+void WPI_DataLog_AddSchema(struct WPI_DataLog* datalog,
+                           const struct WPI_String* name,
+                           const struct WPI_String* type, const uint8_t* schema,
                            size_t schema_len, int64_t timestamp) {
   reinterpret_cast<DataLog*>(datalog)->AddSchema(
-      name, type, std::span<const uint8_t>{schema, schema_len}, timestamp);
+      wpi::to_string_view(*name), wpi::to_string_view(*type),
+      std::span<const uint8_t>{schema, schema_len}, timestamp);
 }
 
 }  // extern "C"
