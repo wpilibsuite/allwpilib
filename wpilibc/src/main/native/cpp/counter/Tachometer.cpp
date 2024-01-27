@@ -44,7 +44,7 @@ Tachometer::~Tachometer() {
 
 units::hertz_t Tachometer::GetFrequency() const {
   auto period = GetPeriod();
-  if (period.to<double>() == 0) {
+  if (period.value() == 0) {
     return units::hertz_t{0.0};
   }
   return 1 / period;
@@ -66,7 +66,7 @@ void Tachometer::SetEdgesPerRevolution(int edges) {
 
 units::turns_per_second_t Tachometer::GetRevolutionsPerSecond() const {
   auto period = GetPeriod();
-  if (period.to<double>() == 0) {
+  if (period.value() == 0) {
     return units::turns_per_second_t{0.0};
   }
   int edgesPerRevolution = GetEdgesPerRevolution();
@@ -74,7 +74,7 @@ units::turns_per_second_t Tachometer::GetRevolutionsPerSecond() const {
     return units::turns_per_second_t{0.0};
   }
   auto rotationHz = ((1.0 / edgesPerRevolution) / period);
-  return units::turns_per_second_t{rotationHz.to<double>()};
+  return units::turns_per_second_t{rotationHz.value()};
 }
 
 units::revolutions_per_minute_t Tachometer::GetRevolutionsPerMinute() const {
@@ -103,7 +103,7 @@ void Tachometer::SetSamplesToAverage(int samples) {
 
 void Tachometer::SetMaxPeriod(units::second_t maxPeriod) {
   int32_t status = 0;
-  HAL_SetCounterMaxPeriod(m_handle, maxPeriod.to<double>(), &status);
+  HAL_SetCounterMaxPeriod(m_handle, maxPeriod.value(), &status);
   FRC_CheckErrorStatus(status, "Channel {}", m_source->GetChannel());
 }
 
@@ -116,7 +116,7 @@ void Tachometer::SetUpdateWhenEmpty(bool updateWhenEmpty) {
 void Tachometer::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Tachometer");
   builder.AddDoubleProperty(
-      "RPS", [&] { return GetRevolutionsPerSecond().to<double>(); }, nullptr);
+      "RPS", [&] { return GetRevolutionsPerSecond().value(); }, nullptr);
   builder.AddDoubleProperty(
-      "RPM", [&] { return GetRevolutionsPerMinute().to<double>(); }, nullptr);
+      "RPM", [&] { return GetRevolutionsPerMinute().value(); }, nullptr);
 }
