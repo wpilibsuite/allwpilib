@@ -937,7 +937,7 @@ struct WPI_String* NT_GetValueStringArray(const struct NT_Value* value,
   for (size_t i = 0; i < value->data.arr_string.size; ++i) {
     size_t len = value->data.arr_string.arr[i].len;
     auto write = WPI_AllocateString(&arr[i], len);
-    std::memcpy(write, value->data.arr_string.arr[i].str, len + 1);
+    std::memcpy(write, value->data.arr_string.arr[i].str, len);
   }
   return arr;
 }
