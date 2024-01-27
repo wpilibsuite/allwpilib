@@ -27,7 +27,7 @@ void SysIdRoutineBot::ConfigureBindings() {
       .WhileTrue(m_drive.SysIdDynamic(frc2::sysid::Direction::kReverse));
 
   m_shooter.SetDefaultCommand(m_shooter.RunShooterCommand(
-      [] { return constants::shooter::kShooterTargetSpeed.value(); }));
+      [this] { return m_driverController.GetLeftTriggerAxis(); }));
 
   (m_driverController.A() && m_driverController.LeftBumper())
       .WhileTrue(m_shooter.SysIdQuasistatic(frc2::sysid::Direction::kForward));
