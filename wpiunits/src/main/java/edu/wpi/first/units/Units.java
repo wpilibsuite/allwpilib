@@ -242,14 +242,14 @@ public final class Units {
   public static final Voltage Volt = Volts; // alias
 
   /**
-   * 1/1000 of a {@link #Volt}. Useful when dealing with low-voltage applications like LED
-   * drivers or low-power circuits.
+   * 1/1000 of a {@link #Volt}. Useful when dealing with low-voltage applications like LED drivers
+   * or low-power circuits.
    */
   public static final Voltage Millivolts = Milli(Volts);
 
   /**
-   * 1/1000 of a {@link #Volt}. Useful when dealing with low-voltage applications like LED
-   * drivers or low-power circuits.
+   * 1/1000 of a {@link #Volt}. Useful when dealing with low-voltage applications like LED drivers
+   * or low-power circuits.
    */
   public static final Voltage Millivolt = Millivolts; // alias
 
@@ -261,14 +261,14 @@ public final class Units {
   public static final Current Amp = Amps; // alias
 
   /**
-   * A unit equal to 1/1000 of an {@link #Amp}. Useful when dealing with low-current
-   * applications like LED drivers or low-power circuits.
+   * A unit equal to 1/1000 of an {@link #Amp}. Useful when dealing with low-current applications
+   * like LED drivers or low-power circuits.
    */
   public static final Current Milliamps = Milli(Amps);
 
   /**
-   * A unit equal to 1/1000 of an {@link #Amp}. Useful when dealing with low-current
-   * applications like LED drivers or low-power circuits.
+   * A unit equal to 1/1000 of an {@link #Amp}. Useful when dealing with low-current applications
+   * like LED drivers or low-power circuits.
    */
   public static final Current Milliamp = Milliamps; // alias
 
@@ -280,14 +280,12 @@ public final class Units {
   public static final Energy Joule = Joules; // alias
 
   /**
-   * A unit equal to 1/1000 of a {@link #Joule}. Useful when dealing with lower-power
-   * applications.
+   * A unit equal to 1/1000 of a {@link #Joule}. Useful when dealing with lower-power applications.
    */
   public static final Energy Millijoules = Milli(Joules);
 
   /**
-   * A unit equal to 1/1000 of a {@link #Joule}. Useful when dealing with lower-power
-   * applications.
+   * A unit equal to 1/1000 of a {@link #Joule}. Useful when dealing with lower-power applications.
    */
   public static final Energy Millijoule = Millijoules; // alias
 
@@ -311,14 +309,12 @@ public final class Units {
   public static final Power Watt = Watts; // alias
 
   /**
-   * A unit equal to 1/1000 of a {@link #Watt}. Useful when dealing with lower-power
-   * applications.
+   * A unit equal to 1/1000 of a {@link #Watt}. Useful when dealing with lower-power applications.
    */
   public static final Power Milliwatts = Milli(Watts);
 
   /**
-   * A unit equal to 1/1000 of a {@link #Watt}. Useful when dealing with lower-power
-   * applications.
+   * A unit equal to 1/1000 of a {@link #Watt}. Useful when dealing with lower-power applications.
    */
   public static final Power Milliwatt = Milliwatts; // alias
 
