@@ -15,11 +15,16 @@ package edu.wpi.first.units;
  */
 public class Mass extends Unit<Mass> {
   /** Creates a new unit with the given name and multiplier to the base unit. */
-  Mass(double baseUnitEquivalent, String name, String symbol) {
-    super(Mass.class, baseUnitEquivalent, name, symbol);
+  Mass(Mass baseUnit, double baseUnitEquivalent, String name, String symbol) {
+    super(baseUnit, baseUnitEquivalent, name, symbol);
   }
 
-  Mass(UnaryFunction toBaseConverter, UnaryFunction fromBaseConverter, String name, String symbol) {
-    super(Mass.class, toBaseConverter, fromBaseConverter, name, symbol);
+  Mass(
+      Mass baseUnit,
+      UnaryFunction toBaseConverter,
+      UnaryFunction fromBaseConverter,
+      String name,
+      String symbol) {
+    super(baseUnit, toBaseConverter, fromBaseConverter, name, symbol);
   }
 }

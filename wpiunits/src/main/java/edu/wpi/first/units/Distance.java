@@ -14,13 +14,16 @@ package edu.wpi.first.units;
  * {@link Units} class.
  */
 public class Distance extends Unit<Distance> {
-  /** Creates a new unit with the given name and multiplier to the base unit. */
-  Distance(double baseUnitEquivalent, String name, String symbol) {
-    super(Distance.class, baseUnitEquivalent, name, symbol);
+  Distance(Distance baseUnit, double baseUnitEquivalent, String name, String symbol) {
+    super(baseUnit, baseUnitEquivalent, name, symbol);
   }
 
   Distance(
-      UnaryFunction toBaseConverter, UnaryFunction fromBaseConverter, String name, String symbol) {
-    super(Distance.class, toBaseConverter, fromBaseConverter, name, symbol);
+      Distance baseUnit,
+      UnaryFunction toBaseConverter,
+      UnaryFunction fromBaseConverter,
+      String name,
+      String symbol) {
+    super(baseUnit, toBaseConverter, fromBaseConverter, name, symbol);
   }
 }

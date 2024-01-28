@@ -135,7 +135,7 @@ class UnitsTest {
     assertEquals(9.80665, Gs.of(1).in(MetersPerSecondPerSecond), thresh);
     assertEquals("G", Gs.name());
     assertEquals("G", Gs.symbol());
-    assertEquals(Units.AnonymousBaseUnit, Gs.getUnit());
+    assertEquals(MetersPerSecond, Gs.getUnit());
     assertEquals(Seconds, Gs.getPeriod());
   }
 
