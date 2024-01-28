@@ -9,6 +9,7 @@
 #include <utility>
 #include <vector>
 
+#include <fmt/format.h>
 #include <wpi/MemAlloc.h>
 #include <wpi/StringExtras.h>
 #include <wpi/timestamp.h>
@@ -520,11 +521,10 @@ bool HttpCameraImpl::SetVideoMode(const VideoMode& mode, CS_Status* status) {
   m_mode = mode;
   m_streamSettings.clear();
   if (mode.width != 0 && mode.height != 0) {
-    (wpi::Twine{mode.width} + "x" + wpi::Twine{mode.height})
-        .toVector(m_streamSettings["resolution"]);
+    m_streamSettings["resolution"] = fmt::format("{}x{}", mode.width, mode.height);
   }
   if (mode.fps != 0) {
-    wpi::Twine{mode.fps}.toVector(m_streamSettings["fps"]);
+    m_streamSettings["fps"] = fmt::format("{}", mode.fps);
   }
   m_streamSettingsUpdated = true;
   return true;
