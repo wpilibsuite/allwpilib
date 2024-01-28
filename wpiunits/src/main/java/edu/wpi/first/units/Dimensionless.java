@@ -15,12 +15,16 @@ public class Dimensionless extends Unit<Dimensionless> {
    * @param name the name of the unit
    * @param symbol the symbol of the unit
    */
-  Dimensionless(double baseUnitEquivalent, String name, String symbol) {
-    super(Dimensionless.class, baseUnitEquivalent, name, symbol);
+  Dimensionless(Dimensionless baseUnit, double baseUnitEquivalent, String name, String symbol) {
+    super(baseUnit, baseUnitEquivalent, name, symbol);
   }
 
   Dimensionless(
-      UnaryFunction toBaseConverter, UnaryFunction fromBaseConverter, String name, String symbol) {
-    super(Dimensionless.class, toBaseConverter, fromBaseConverter, name, symbol);
+      Dimensionless baseUnit,
+      UnaryFunction toBaseConverter,
+      UnaryFunction fromBaseConverter,
+      String name,
+      String symbol) {
+    super(baseUnit, toBaseConverter, fromBaseConverter, name, symbol);
   }
 }

@@ -4,7 +4,6 @@
 
 package edu.wpi.first.units;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Objects;
 
@@ -15,8 +14,8 @@ import java.util.Objects;
  */
 public final class UnitBuilder<U extends Unit<U>> {
   private final U m_base;
-  private UnaryFunction m_fromBase;
-  private UnaryFunction m_toBase;
+  private UnaryFunction m_fromBase = UnaryFunction.IDENTITY;
+  private UnaryFunction m_toBase = UnaryFunction.IDENTITY;
   private String m_name;
   private String m_symbol;
 
@@ -188,16 +187,18 @@ public final class UnitBuilder<U extends Unit<U>> {
    * @throws RuntimeException if the base unit does not define a constructor accepting the
    *     conversion functions, unit name, and unit symbol - in that order
    */
-  @SuppressWarnings("PMD.AvoidAccessibilityAlteration")
+  @SuppressWarnings({"PMD.AvoidAccessibilityAlteration", "unchecked"})
   public U make() {
     Objects.requireNonNull(m_fromBase, "fromBase function was not set");
     Objects.requireNonNull(m_toBase, "toBase function was not set");
     Objects.requireNonNull(m_name, "new unit name was not set");
     Objects.requireNonNull(m_symbol, "new unit symbol was not set");
-    Class<? extends U> baseType = m_base.m_baseType;
+    var baseUnit = m_base.getBaseUnit();
+    var baseClass = baseUnit.getClass();
     try {
-      Constructor<? extends U> ctor =
-          baseType.getDeclaredConstructor(
+      var ctor =
+          baseClass.getDeclaredConstructor(
+              baseClass, // baseUnit
               UnaryFunction.class, // toBaseUnits
               UnaryFunction.class, // fromBaseUnits
               String.class, // name
@@ -205,19 +206,27 @@ public final class UnitBuilder<U extends Unit<U>> {
       // need to flag the constructor as accessible so we can use private, package-private, and
       // protected constructors
       ctor.setAccessible(true);
-      return ctor.newInstance(
-          m_toBase.pipeTo(m_base.getConverterToBase()),
-          m_base.getConverterFromBase().pipeTo(m_fromBase),
-          m_name,
-          m_symbol);
+      return (U)
+          ctor.newInstance(
+              baseUnit,
+              m_toBase.pipeTo(m_base.getConverterToBase()),
+              m_base.getConverterFromBase().pipeTo(m_fromBase),
+              m_name,
+              m_symbol);
     } catch (InstantiationException e) {
-      throw new RuntimeException("Could not instantiate class " + baseType.getName(), e);
+      throw new RuntimeException("Could not instantiate class " + baseClass.getName(), e);
     } catch (IllegalAccessException e) {
       throw new RuntimeException("Could not access constructor", e);
     } catch (InvocationTargetException e) {
-      throw new RuntimeException("Constructing " + baseType.getName() + " raised an exception", e);
+      throw new RuntimeException("Constructing " + baseClass.getName() + " raised an exception", e);
     } catch (NoSuchMethodException e) {
-      throw new RuntimeException("No compatible constructor", e);
+      throw new RuntimeException(
+          "No compatible constructor "
+              + baseClass.getSimpleName()
+              + "("
+              + baseClass.getSimpleName()
+              + ", UnaryFunction, UnaryFunction, String, String)",
+          e);
     }
   }
 }
