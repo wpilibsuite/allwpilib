@@ -23,7 +23,7 @@ public class ProxyCommand extends Command {
   /**
    * Creates a new ProxyCommand that schedules the supplied command when initialized, and ends when
    * it is no longer scheduled. Useful for lazily creating proxied commands at runtime. Proxying 
-   * should only be done if truly needed, if only runtime command construction is needed, 
+   * should only be done if truly necessary, if only runtime command construction is needed, 
    * use {@link DeferredCommand} instead.
    *
    * @param supplier the command supplier
