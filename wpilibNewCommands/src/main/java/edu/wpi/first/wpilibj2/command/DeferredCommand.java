@@ -29,8 +29,8 @@ public class DeferredCommand extends Command {
 
   /**
    * Creates a new DeferredCommand that runs the supplied command when initialized without scheduling 
-   * it, and ends when it ends.  Useful for lazily creating commands at scheduling-time instead of 
-   * binding-time. The {@link Supplier} will be called each time this command is initialized. The 
+   * it, and ends when it ends. Useful for lazily creating commands at scheduling-time instead of 
+   * binding-time, for example in case the supplied command depends on runtime state. The {@link Supplier} will be called each time this command is initialized. The 
    * Supplier <i>must</i> create a new Command each call.
    *
    * @param supplier The command supplier
