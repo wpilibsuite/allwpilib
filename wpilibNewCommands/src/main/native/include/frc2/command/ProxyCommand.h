@@ -14,7 +14,7 @@
 namespace frc2 {
 /**
  * Schedules the given command when this command is initialized, and ends when
- * it ends. Useful for forking off from CommandGroups. If this command is
+ * it ends. Useful for including a command in a composition without adding its requirements. If this command is
  * interrupted, it will cancel the command.
  *
  * <p>This class is provided by the NewCommands VendorDep
@@ -22,18 +22,20 @@ namespace frc2 {
 class ProxyCommand : public CommandHelper<Command, ProxyCommand> {
  public:
   /**
-   * Creates a new ProxyCommand that schedules the supplied command when
-   * initialized, and ends when it is no longer scheduled. Useful for lazily
-   * creating commands at runtime.
+   * Creates a new ProxyCommand that schedules the supplied command when initialized, and ends when
+   * it is no longer scheduled. Useful for lazily creating proxied commands at runtime. Proxying 
+   * should only be done if truly necessary, if only runtime command construction is needed, 
+   * use {@link DeferredCommand} instead.
    *
    * @param supplier the command supplier
    */
   explicit ProxyCommand(wpi::unique_function<Command*()> supplier);
 
   /**
-   * Creates a new ProxyCommand that schedules the supplied command when
-   * initialized, and ends when it is no longer scheduled. Useful for lazily
-   * creating commands at runtime.
+   * Creates a new ProxyCommand that schedules the supplied command when initialized, and ends when
+   * it is no longer scheduled. Useful for lazily creating proxied commands at runtime. Proxying 
+   * should only be done if truly necessary, if only runtime command construction is needed, 
+   * use {@link DeferredCommand} instead.
    *
    * @param supplier the command supplier
    */
