@@ -173,8 +173,12 @@ public final class Commands {
    *
    * @param supplier the command supplier
    * @return the command
+   * @deprecated the ProxyCommand suppler constructo has been deprecated in favor of directly
+   *     proxying a {@link DeferredCommand}, see ProxyCommand documentaion for more details.
    * @see ProxyCommand
    */
+  @Deprecated(since = "2024", forRemoval = true)
+  @SuppressWarnings("removal")
   public static Command deferredProxy(Supplier<Command> supplier) {
     return new ProxyCommand(supplier);
   }
