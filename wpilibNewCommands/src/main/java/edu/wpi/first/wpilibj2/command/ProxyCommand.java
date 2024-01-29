@@ -31,6 +31,7 @@ public class ProxyCommand extends Command {
    *
    * @param supplier the command supplier
    */
+  @Deprecated(since = "2024", forRemoval = true)
   public ProxyCommand(Supplier<Command> supplier) {
     m_supplier = requireNonNullParam(supplier, "supplier", "ProxyCommand");
   }
