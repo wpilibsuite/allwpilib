@@ -10,7 +10,7 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import java.util.function.Supplier;
 
 /**
- * Schedules the given command when this command is initialized and ends when it ends, but does not 
+ * Schedules a given command when this command is initialized and ends when it ends, but does not 
  * directly run it. Useful for including a command in a composition without adding its requirements.
  * If this command is interrupted, it will cancel the command.
  *

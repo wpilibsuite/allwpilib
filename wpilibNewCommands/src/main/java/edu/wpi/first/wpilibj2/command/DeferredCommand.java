@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 /**
- * Defers Command construction to runtime. Runs the command returned by the supplier when this
+ * Defers Command construction to runtime. Runs the command returned by a supplier when this
  * command is initialized, and ends when it ends. Useful for performing runtime tasks before
  * creating a new command. If this command is interrupted, it will cancel the command.
  *
@@ -28,10 +28,11 @@ public class DeferredCommand extends Command {
   private Command m_command = m_nullCommand;
 
   /**
-   * Creates a new DeferredCommand that runs the supplied command when initialized without scheduling 
-   * it, and ends when it ends. Useful for lazily creating commands at scheduling-time instead of 
-   * binding-time, for example in case the supplied command depends on runtime state. The {@link Supplier} will be called each time this command is initialized. The 
-   * Supplier <i>must</i> create a new Command each call.
+   * Creates a new DeferredCommand that runs the supplied command when initialized, and ends when
+   * it ends. Useful for lazily creating commands when the DeferredCommand is reached in a 
+   * composition, such as if the supplied command depends on runtime state. The {@link Supplier} 
+   * will be called each time this command is initialized. The Supplier <i>must</i> create a new 
+   * Command each call.
    *
    * @param supplier The command supplier
    * @param requirements The command requirements. This is a {@link Set} to prevent accidental
