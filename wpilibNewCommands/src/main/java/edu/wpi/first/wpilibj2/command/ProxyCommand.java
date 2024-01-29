@@ -10,8 +10,9 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import java.util.function.Supplier;
 
 /**
- * Schedules the given command when this command is initialized, and ends when it ends. Useful for
- * forking off from CommandGroups. If this command is interrupted, it will cancel the command.
+ * Schedules the given command when this command is initialized and ends when it ends, but does not 
+ * directly run it. Useful for including a command in a composition without adding its requirements.
+ * If this command is interrupted, it will cancel the command.
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
@@ -21,7 +22,8 @@ public class ProxyCommand extends Command {
 
   /**
    * Creates a new ProxyCommand that schedules the supplied command when initialized, and ends when
-   * it is no longer scheduled. Useful for lazily creating commands at runtime.
+   * it is no longer scheduled. Useful for lazily creating proxied commands at runtime. If proxy
+   * behavior is not desired, use {@link DeferredCommand}.
    *
    * @param supplier the command supplier
    */

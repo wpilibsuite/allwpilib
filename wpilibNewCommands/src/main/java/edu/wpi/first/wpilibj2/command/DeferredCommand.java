@@ -28,9 +28,10 @@ public class DeferredCommand extends Command {
   private Command m_command = m_nullCommand;
 
   /**
-   * Creates a new DeferredCommand that runs the supplied command when initialized, and ends when it
-   * ends. Useful for lazily creating commands at runtime. The {@link Supplier} will be called each
-   * time this command is initialized. The Supplier <i>must</i> create a new Command each call.
+   * Creates a new DeferredCommand that runs the supplied command when initialized without scheduling 
+   * it, and ends when it ends.  Useful for lazily creating commands at scheduling-time instead of 
+   * binding-time. The {@link Supplier} will be called each time this command is initialized. The 
+   * Supplier <i>must</i> create a new Command each call.
    *
    * @param supplier The command supplier
    * @param requirements The command requirements. This is a {@link Set} to prevent accidental
