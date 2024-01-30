@@ -112,7 +112,6 @@ frc::DifferentialDriveWheelSpeeds DriveSubsystem::GetWheelSpeeds() {
 }
 
 void DriveSubsystem::ResetOdometry(frc::Pose2d pose) {
-  ResetEncoders();
   m_drivetrainSimulator.SetPose(pose);
   m_odometry.ResetPosition(m_gyro.GetRotation2d(),
                            units::meter_t{m_leftEncoder.GetDistance()},
