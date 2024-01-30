@@ -22,10 +22,10 @@ jobs:
         run: |
           git checkout -b pr
           git branch -f main origin/main
-      - name: Set up Python 3.8
+      - name: Set up Python 3.10
         uses: actions/setup-python@v5
         with:
-          python-version: 3.8
+          python-version: '3.10'
       - name: Install wpiformat
         run: pip3 install wpiformat==2023.36
       - name: Run
@@ -61,10 +61,10 @@ jobs:
           git config --global --add safe.directory /__w/allwpilib/allwpilib
           git checkout -b pr
           git branch -f main origin/main
-      - name: Set up Python 3.8
+      - name: Set up Python 3.10
         uses: actions/setup-python@v5
         with:
-          python-version: 3.8
+          python-version: '3.10'
       - name: Install wpiformat
         run: pip3 install wpiformat
       - name: Create compile_commands.json

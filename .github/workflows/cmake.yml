@@ -16,11 +16,11 @@ jobs:
             name: Linux
             container: wpilib/roborio-cross-ubuntu:2024-22.04
             flags: "-DCMAKE_BUILD_TYPE=Release -DWITH_EXAMPLES=ON"
-          - os: macOS-12
+          - os: macOS-14
             name: macOS
             container: ""
-            env: "PATH=\"/usr/local/opt/protobuf@3/bin:$PATH\""
-            flags: "-DCMAKE_BUILD_TYPE=Release -DWITH_JAVA=OFF -DWITH_EXAMPLES=ON -DCMAKE_LIBRARY_PATH=/usr/local/opt/protobuf@3/lib -DProtobuf_INCLUDE_DIR=/usr/local/opt/protobuf@3/include -DProtobuf_PROTOC_EXECUTABLE=/usr/local/opt/protobuf@3/bin/protoc"
+            env: "PATH=\"/opt/homebrew/opt/protobuf@3/bin:$PATH\""
+            flags: "-DCMAKE_BUILD_TYPE=Release -DWITH_JAVA=OFF -DWITH_EXAMPLES=ON -DCMAKE_LIBRARY_PATH=/opt/homebrew/opt/protobuf@3/lib -DProtobuf_INCLUDE_DIR=/opt/homebrew/opt/protobuf@3/include -DProtobuf_PROTOC_EXECUTABLE=/opt/homebrew/opt/protobuf@3/bin/protoc"
 
     name: "Build - ${{ matrix.name }}"
     runs-on: ${{ matrix.os }}
@@ -34,15 +34,15 @@ jobs:
         if: runner.os == 'Linux'
         run: wget https://github.com/HebiRobotics/QuickBuffers/releases/download/1.3.3/protoc-gen-quickbuf_1.3.3_amd64.deb && sudo apt install ./protoc-gen-quickbuf_1.3.3_amd64.deb
 
-      - name: Install opencv (macOS)
+      - name: Install dependencies (macOS)
         run: brew install opencv protobuf@3 ninja
         if: runner.os == 'macOS'
 
-      - name: Set up Python 3.8 (macOS)
+      - name: Set up Python 3.10 (macOS)
         if: runner.os == 'macOS'
         uses: actions/setup-python@v5
         with:
-          python-version: 3.8
+          python-version: '3.10'
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@v0.0.3

@@ -94,9 +94,9 @@ jobs:
             task: "copyAllOutputs"
             outputs: "build/allOutputs"
             build-dir: "c:\\work"
-          - os: macOS-12
+          - os: macOS-14
             artifact-name: macOS
-            architecture: x64
+            architecture: aarch64
             task: "build"
             outputs: "build/allOutputs"
             build-dir: "."
