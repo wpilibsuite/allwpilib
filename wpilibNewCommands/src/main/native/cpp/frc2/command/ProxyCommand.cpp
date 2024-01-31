@@ -3,11 +3,13 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "frc2/command/ProxyCommand.h"
+#include "wpi/deprecated.h"
 
 #include <wpi/sendable/SendableBuilder.h>
 
 using namespace frc2;
 
+WPI_IGNORE_DEPRECATED
 ProxyCommand::ProxyCommand(wpi::unique_function<Command*()> supplier)
     : m_supplier(std::move(supplier)) {}
 
@@ -22,6 +24,7 @@ ProxyCommand::ProxyCommand(Command* command)
     : ProxyCommand([command] { return command; }) {
   SetName(fmt::format("Proxy({})", command->GetName()));
 }
+WPI_UNIGNORE_DEPRECATED
 
 ProxyCommand::ProxyCommand(std::unique_ptr<Command> command) {
   SetName(fmt::format("Proxy({})", command->GetName()));
