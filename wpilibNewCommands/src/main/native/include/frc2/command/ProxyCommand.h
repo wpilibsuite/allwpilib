@@ -30,17 +30,18 @@ class ProxyCommand : public CommandHelper<Command, ProxyCommand> {
    *
    * @param supplier the command supplier
    */
+  [[deprecated("Proxy a DeferredCommand instead")]]
   explicit ProxyCommand(wpi::unique_function<Command*()> supplier);
 
   /**
-   * Creates a new ProxyCommand that schedules the supplied command when
-   * initialized, and ends when it is no longer scheduled. Useful for lazily
-   * creating proxied commands at runtime. Proxying should only be done if truly
-   * necessary, if only runtime command construction is needed, use {@link
-   * DeferredCommand} instead.
+   * Creates a new ProxyCommand that schedules the supplied command when initialized, and ends when
+   * it is no longer scheduled. Use this for lazily creating <strong>proxied</strong> commands at
+   * runtime. Proxying should only be done to escape from composition requirement semantics, so if
+   * only initialization time command construction is needed, use {@link DeferredCommand} instead.
    *
    * @param supplier the command supplier
    */
+  [[deprecated("Proxy a DeferredCommand instead")]]
   explicit ProxyCommand(wpi::unique_function<CommandPtr()> supplier);
 
   /**
