@@ -230,10 +230,10 @@ int main(int argc, char** argv) {
       glass::GetStorageRoot().GetChild("Plots"));
   gNtProvider = std::make_unique<glass::NetworkTablesProvider>(
       glass::GetStorageRoot().GetChild("NetworkTables"));
-  gNtCameraProvider =
-      std::make_unique<glass::NTCameraProvider>("NTCameraProvider");
-  gUsbCameraProvider =
-      std::make_unique<glass::UsbCameraProvider>("UsbCameraProvider");
+  gNtCameraProvider = std::make_unique<glass::NTCameraProvider>(
+      glass::GetStorageRoot().GetChild("NT Cameras"));
+  gUsbCameraProvider = std::make_unique<glass::UsbCameraProvider>(
+      glass::GetStorageRoot().GetChild("USB Cameras"));
 
   glass::SetStorageName("glass");
   glass::SetStorageDir(saveDir.empty() ? gui::GetPlatformSaveFileDir()

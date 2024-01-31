@@ -4,15 +4,15 @@
 
 #pragma once
 
-#include <string>
 #include <vector>
 
 #include <cscore_cpp.h>
-#include <wpi/Twine.h>
 
 #include "glass/camera/CameraProviderBase.h"
 
 namespace glass {
+
+class Storage;
 
 /**
  * Provider for CameraServer models and views that pulls directly from
@@ -20,7 +20,7 @@ namespace glass {
  */
 class CSCameraProvider : public CameraProviderBase {
  public:
-  explicit CSCameraProvider(const wpi::Twine& iniName);
+  explicit CSCameraProvider(Storage& storage);
   ~CSCameraProvider() override;
 
   /**

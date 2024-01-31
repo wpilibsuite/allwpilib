@@ -5,17 +5,17 @@
 #pragma once
 
 #include <atomic>
+#include <span>
 #include <string>
+#include <string_view>
 #include <thread>
 #include <utility>
 #include <vector>
 
+#define IMGUI_DEFINE_MATH_OPERATORS
+#include <imgui.h>
 #include <cscore_cpp.h>
 #include <cscore_cv.h>
-#include <imgui.h>
-#include <wpi/ArrayRef.h>
-#include <wpi/StringRef.h>
-#include <wpi/Twine.h>
 #include <wpi/mutex.h>
 #include <wpi/spinlock.h>
 #include <wpigui.h>
@@ -25,9 +25,11 @@
 
 namespace glass {
 
+class Storage;
+
 class CameraModel : public Model {
  public:
-  explicit CameraModel(const wpi::Twine& name);
+  explicit CameraModel(Storage& storage, std::string_view id);
   ~CameraModel() override;
 
   CameraModel(const CameraModel&) = delete;
@@ -40,7 +42,7 @@ class CameraModel : public Model {
   void Start();
   void Stop();
 
-  const std::string& GetName() { return m_name; }
+  const std::string& GetId() { return m_id; }
 
   wpi::gui::Texture& GetTexture() { return m_tex; }
 
@@ -80,7 +82,7 @@ class CameraModel : public Model {
   /**
    * For a HTTP camera, change the URLs used to connect to the camera.
    */
-  void SetUrls(wpi::ArrayRef<std::string> urls);
+  void SetUrls(std::span<const std::string> urls);
 
   CS_SourceKind GetKind() const;
 
@@ -88,15 +90,20 @@ class CameraModel : public Model {
   void SetVideoMode(const cs::VideoMode& mode);
   void ResetVideoMode();
 
-  void ReadIni(wpi::StringRef name, wpi::StringRef value);
-  void WriteIni(ImGuiTextBuffer* out_buf);
-
  private:
   cv::Mat* AllocMat();
 
-  std::string m_name;
+  std::string m_id;
   CS_Source m_source{0};
   CS_Sink m_cvSink{0};
+
+  std::string& m_cameraType;
+  std::string& m_usbPath;
+  std::vector<std::string>& m_urls;
+  std::string& m_pixelFormatStr;
+  int& m_width;
+  int& m_height;
+  int& m_fps;
 
   cs::VideoMode m_videoMode;
   std::vector<std::pair<std::string, int>> m_properties;

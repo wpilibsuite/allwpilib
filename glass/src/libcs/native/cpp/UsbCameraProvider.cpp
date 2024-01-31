@@ -7,6 +7,7 @@
 #include <algorithm>
 
 #include <cscore_cpp.h>
+#include <fmt/format.h>
 
 #include "glass/camera/Camera.h"
 
@@ -66,8 +67,8 @@ void UsbCameraProvider::UsbInfoThread::Main() {
   }
 }
 
-UsbCameraProvider::UsbCameraProvider(const wpi::Twine& iniName)
-    : CameraProviderBase{iniName}, m_poller{cs::CreateListenerPoller()} {
+UsbCameraProvider::UsbCameraProvider(Storage& storage)
+    : CameraProviderBase{storage}, m_poller{cs::CreateListenerPoller()} {
   CS_Status status = 0;
   cs::AddPolledListener(m_poller, CS_USB_CAMERAS_CHANGED, false, &status);
 
@@ -109,7 +110,7 @@ void UsbCameraProvider::InitCamera(SourceInfo* info) {
   info->camera = CreateModel(info->name);
   CS_Status status = 0;
   auto source = cs::CreateUsbCameraPath(
-      wpi::StringRef{"glass::usb::"} + info->name,
+      fmt::format("glass::usb::{}", info->name),
       static_cast<UsbInfoThread::UsbSourceInfo*>(info)->usb.path, &status);
   info->camera->SetSource(source);
 }

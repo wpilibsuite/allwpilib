@@ -11,8 +11,8 @@
 
 using namespace glass;
 
-CSCameraProvider::CSCameraProvider(const wpi::Twine& iniName)
-    : CameraProviderBase{iniName}, m_poller{cs::CreateListenerPoller()} {
+CSCameraProvider::CSCameraProvider(Storage& storage)
+    : CameraProviderBase{storage}, m_poller{cs::CreateListenerPoller()} {
   CS_Status status = 0;
   cs::AddPolledListener(m_poller,
                         CS_SOURCE_CREATED | CS_SOURCE_DESTROYED |

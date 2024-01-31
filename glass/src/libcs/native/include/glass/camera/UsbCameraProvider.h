@@ -6,18 +6,19 @@
 
 #include <cscore_cpp.h>
 #include <wpi/SafeThread.h>
-#include <wpi/Twine.h>
 
 #include "glass/camera/CameraProviderBase.h"
 
 namespace glass {
+
+class Storage;
 
 /**
  * Provider for CameraServer models and views for USB cameras.
  */
 class UsbCameraProvider : public CameraProviderBase {
  public:
-  explicit UsbCameraProvider(const wpi::Twine& iniName);
+  explicit UsbCameraProvider(Storage& storage);
   ~UsbCameraProvider() override;
 
   /**

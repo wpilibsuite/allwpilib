@@ -4,16 +4,19 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 #include <vector>
 
-#include <ntcore_cpp.h>
-#include <wpi/Twine.h>
+#include <networktables/NetworkTableInstance.h>
+#include <networktables/NetworkTableListener.h>
+#include <wpi/DenseMap.h>
 
-#include "glass/networktables/NetworkTablesHelper.h"
 #include "glass/camera/CameraProviderBase.h"
 
 namespace glass {
+
+class Storage;
 
 /**
  * Provider for CameraServer models and views for NetworkTables-published
@@ -21,8 +24,8 @@ namespace glass {
  */
 class NTCameraProvider : public CameraProviderBase {
  public:
-  explicit NTCameraProvider(const wpi::Twine& iniName);
-  NTCameraProvider(const wpi::Twine& iniName, NT_Inst inst);
+  explicit NTCameraProvider(Storage& storage);
+  NTCameraProvider(Storage& storage, nt::NetworkTableInstance inst);
 
   /**
    * Displays menu contents.
@@ -31,15 +34,21 @@ class NTCameraProvider : public CameraProviderBase {
 
  private:
   struct NTSourceInfo : public SourceInfo {
+    NT_Topic descTopic{0};
+    NT_Topic connTopic{0};
+    NT_Topic streamsTopic{0};
     std::vector<std::string> streams;
   };
 
   void Update() override;
   void InitCamera(SourceInfo* info) override;
 
-  std::vector<NTSourceInfo> m_sourceInfo;
+  std::vector<std::unique_ptr<NTSourceInfo>> m_sourceInfo;
+  wpi::DenseMap<NT_Topic, NTSourceInfo*> m_topicMap;
 
-  NetworkTablesHelper m_helper;
+  nt::NetworkTableInstance m_inst;
+  nt::NetworkTableListenerPoller m_poller;
+  NT_Listener m_listener{0};
 };
 
 }  // namespace glass

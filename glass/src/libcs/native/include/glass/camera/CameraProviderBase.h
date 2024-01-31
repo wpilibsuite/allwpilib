@@ -6,13 +6,11 @@
 
 #include <memory>
 #include <string>
+#include <string_view>
 #include <vector>
 
-#include <wpi/StringRef.h>
-#include <wpi/Twine.h>
-
+#include "glass/Storage.h"
 #include "glass/WindowManager.h"
-#include "glass/support/IniSaverBase.h"
 
 namespace glass {
 
@@ -23,7 +21,7 @@ class CameraModel;
  */
 class CameraProviderBase : protected WindowManager {
  public:
-  explicit CameraProviderBase(const wpi::Twine& iniName);
+  explicit CameraProviderBase(Storage& storage);
   ~CameraProviderBase() override;
 
   /**
@@ -32,7 +30,7 @@ class CameraProviderBase : protected WindowManager {
    */
   void GlobalInit() override;
 
-  CameraModel* GetModel(wpi::StringRef name);
+  CameraModel* GetModel(std::string_view name);
 
  protected:
   struct SourceInfo {
@@ -45,32 +43,17 @@ class CameraProviderBase : protected WindowManager {
 
   virtual void Update() = 0;
   virtual void InitCamera(SourceInfo* info) = 0;
-  virtual CameraModel* IniReadOpen(const char* name) = 0;
 
   void MenuItem(const char* label, SourceInfo* info);
   void Show(SourceInfo* info, Window* window);
 
-  void DisplayWindows() override;
-  CameraModel* CreateModel(const wpi::Twine& name);
+  CameraModel* CreateModel(std::string_view id);
 
+  std::vector<std::unique_ptr<Storage>>& m_modelStorage;
   std::vector<std::unique_ptr<CameraModel>> m_models;
 
  private:
   void UpdateModels();
-
-  class IniSaver : public IniSaverBase {
-   public:
-    IniSaver(const wpi::Twine& typeName, CameraProviderBase* provider);
-
-    void* IniReadOpen(const char* name) override;
-    void IniReadLine(void* entry, const char* lineStr) override;
-    void IniWriteAll(ImGuiTextBuffer* out_buf) override;
-
-   private:
-    CameraProviderBase* m_provider;
-  };
-
-  IniSaver m_cameraSaver;
 };
 
 }  // namespace glass

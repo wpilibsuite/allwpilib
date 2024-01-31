@@ -9,11 +9,18 @@
 #include <wpigui.h>
 
 #include "glass/camera/Camera.h"
+#include "glass/Storage.h"
 
 using namespace glass;
 
-CameraProviderBase::CameraProviderBase(const wpi::Twine& iniName)
-    : WindowManager{iniName} {}
+CameraProviderBase::CameraProviderBase(Storage& storage)
+    : WindowManager{storage.GetChild("windows")},
+      m_modelStorage{storage.GetChildArray("cameras")} {
+  for (auto&& v : m_modelStorage) {
+    m_models.emplace_back(
+        std::make_unique<CameraModel>(*v, v->ReadString("id")));
+  }
+}
 
 CameraProviderBase::~CameraProviderBase() = default;
 
@@ -70,41 +77,15 @@ void CameraProviderBase::Show(SourceInfo* info, Window* window) {
   info->window->SetVisible(true);
 }
 
-void CameraProviderBase::DisplayWindows() {
-  WindowManager::DisplayWindows();
-}
-
-CameraModel* CameraProviderBase::CreateModel(const wpi::Twine& name) {
-  m_models.emplace_back(std::make_unique<CameraModel>(name));
+CameraModel* CameraProviderBase::CreateModel(std::string_view id) {
+  m_modelStorage.emplace_back(std::make_unique<Storage>());
+  m_models.emplace_back(
+      std::make_unique<CameraModel>(*m_modelStorage.back(), id));
   return m_models.back().get();
 }
 
 void CameraProviderBase::UpdateModels() {
   for (auto&& model : m_models) {
     model->Update();
-  }
-}
-
-CameraProviderBase::IniSaver::IniSaver(const wpi::Twine& typeName,
-                                       CameraProviderBase* provider)
-    : IniSaverBase{typeName}, m_provider{provider} {}
-
-void* CameraProviderBase::IniSaver::IniReadOpen(const char* name) {
-  return m_provider->CreateModel(name);
-}
-
-void CameraProviderBase::IniSaver::IniReadLine(void* entry,
-                                               const char* lineStr) {
-  auto [name, value] = wpi::StringRef{lineStr}.split('=');
-  name = name.trim();
-  value = value.trim();
-  static_cast<CameraModel*>(entry)->ReadIni(name, value);
-}
-
-void CameraProviderBase::IniSaver::IniWriteAll(ImGuiTextBuffer* out_buf) {
-  for (auto&& model : m_provider->m_models) {
-    out_buf->appendf("[%s][%s]\n", GetTypeName(), model->GetName().c_str());
-    model->WriteIni(out_buf);
-    out_buf->append("\n");
   }
 }
