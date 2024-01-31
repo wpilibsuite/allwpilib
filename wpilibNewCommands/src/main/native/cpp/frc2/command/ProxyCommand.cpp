@@ -20,11 +20,11 @@ ProxyCommand::ProxyCommand(wpi::unique_function<CommandPtr()> supplier)
 
 ProxyCommand::ProxyCommand(Command* command)
     : ProxyCommand([command] { return command; }) {
-  SetName(std::string{"Proxy("}.append(command->GetName()).append(")"));
+  SetName(fmt::format("Proxy({})", command->GetName()));
 }
 
 ProxyCommand::ProxyCommand(std::unique_ptr<Command> command) {
-  SetName(std::string{"Proxy("}.append(command->GetName()).append(")"));
+  SetName(fmt::format("Proxy({})", command->GetName()));
   m_supplier = [command = std::move(command)] { return command.get(); };
 }
 
