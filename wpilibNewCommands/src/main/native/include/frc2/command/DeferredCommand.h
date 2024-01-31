@@ -32,7 +32,7 @@ class DeferredCommand : public CommandHelper<Command, DeferredCommand> {
    * Creates a new DeferredCommand that directly runs the supplied command when
    * initialized, and ends when it ends. Useful for lazily creating commands
    * when the DeferredCommand is reached in a composition, such as if the
-   * supplied command depends on runtime state.The supplier will be called each
+   * supplied command depends on runtime state. The supplier will be called each
    * time this command is initialized. The supplier <i>must</i> create a new
    * Command each call.
    *
@@ -40,6 +40,7 @@ class DeferredCommand : public CommandHelper<Command, DeferredCommand> {
    * @param requirements The command requirements.
    *
    */
+   
   DeferredCommand(wpi::unique_function<CommandPtr()> supplier,
                   Requirements requirements);
 
