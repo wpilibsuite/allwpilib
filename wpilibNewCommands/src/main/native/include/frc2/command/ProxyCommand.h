@@ -10,6 +10,7 @@
 
 #include "frc2/command/Command.h"
 #include "frc2/command/CommandHelper.h"
+#include "wpi/deprecated.h"
 
 namespace frc2 {
 /**
@@ -30,6 +31,7 @@ class ProxyCommand : public CommandHelper<Command, ProxyCommand> {
    *
    * @param supplier the command supplier
    */
+   WPI_IGNORE_DEPRECATED
   [[deprecated("Proxy a DeferredCommand instead")]] explicit ProxyCommand(
       wpi::unique_function<Command*()> supplier);
 
@@ -45,7 +47,7 @@ class ProxyCommand : public CommandHelper<Command, ProxyCommand> {
    */
   [[deprecated("Proxy a DeferredCommand instead")]] explicit ProxyCommand(
       wpi::unique_function<CommandPtr()> supplier);
-
+WPI_UNIGNORE_DEPRECATED
   /**
    * Creates a new ProxyCommand that schedules the given command when
    * initialized, and ends when it is no longer scheduled.

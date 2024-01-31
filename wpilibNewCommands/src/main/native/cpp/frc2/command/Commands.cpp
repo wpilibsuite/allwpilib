@@ -17,6 +17,7 @@
 #include "frc2/command/SequentialCommandGroup.h"
 #include "frc2/command/WaitCommand.h"
 #include "frc2/command/WaitUntilCommand.h"
+#include "wpi/deprecated.h"
 
 using namespace frc2;
 
@@ -60,6 +61,7 @@ CommandPtr cmd::Print(std::string_view msg) {
   return PrintCommand(msg).ToPtr();
 }
 
+WPI_IGNORE_DEPRECATED
 CommandPtr cmd::DeferredProxy(wpi::unique_function<Command*()> supplier) {
   return ProxyCommand(std::move(supplier)).ToPtr();
 }
@@ -67,6 +69,7 @@ CommandPtr cmd::DeferredProxy(wpi::unique_function<Command*()> supplier) {
 CommandPtr cmd::DeferredProxy(wpi::unique_function<CommandPtr()> supplier) {
   return ProxyCommand(std::move(supplier)).ToPtr();
 }
+WPI_UNIGNORE_DEPRECATED
 
 CommandPtr cmd::Wait(units::second_t duration) {
   return WaitCommand(duration).ToPtr();

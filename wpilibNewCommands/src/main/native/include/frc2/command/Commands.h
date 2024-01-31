@@ -12,6 +12,8 @@
 #include <utility>
 #include <vector>
 
+#include <wpi/deprecated.h>
+
 #include "frc2/command/CommandPtr.h"
 #include "frc2/command/Requirements.h"
 #include "frc2/command/SelectCommand.h"
@@ -159,6 +161,7 @@ CommandPtr Defer(wpi::unique_function<CommandPtr()> supplier,
  *
  * @param supplier the command supplier
  */
+WPI_IGNORE_DEPRECATED
 [[nodiscard]] [[deprecated(
     "The ProxyCommand supplier constructor has been deprecated im favor of "
     "proxying a DeferredCommand, see ProxyCommand for more details.")]]
@@ -175,7 +178,7 @@ CommandPtr DeferredProxy(wpi::unique_function<Command*()> supplier);
     "The ProxyCommand supplier constructor has been deprecated im favor of "
     "proxying a DeferredCommand, see ProxyCommand for more details.")]]
 CommandPtr DeferredProxy(wpi::unique_function<CommandPtr()> supplier);
-
+WPI_UNIGNORE_DEPRECATED
 // Command Groups
 
 namespace impl {
