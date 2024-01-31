@@ -123,8 +123,6 @@ public class Drivetrain {
 
   /** Resets robot odometry. */
   public void resetOdometry(Pose2d pose) {
-    m_leftEncoder.reset();
-    m_rightEncoder.reset();
     m_drivetrainSimulator.setPose(pose);
     m_odometry.resetPosition(
         m_gyro.getRotation2d(), m_leftEncoder.getDistance(), m_rightEncoder.getDistance(), pose);
