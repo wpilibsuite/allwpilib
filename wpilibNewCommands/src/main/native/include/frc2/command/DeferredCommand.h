@@ -40,7 +40,7 @@ class DeferredCommand : public CommandHelper<Command, DeferredCommand> {
    * @param requirements The command requirements.
    *
    */
-   
+
   DeferredCommand(wpi::unique_function<CommandPtr()> supplier,
                   Requirements requirements);
 
