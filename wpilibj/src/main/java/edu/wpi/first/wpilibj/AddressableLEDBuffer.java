@@ -131,8 +131,7 @@ public class AddressableLEDBuffer {
    * @return the LED color at the specified index
    */
   public Color8Bit getLED8Bit(int index) {
-    return new Color8Bit(
-        m_buffer[index * 4 + 2] & 0xFF, m_buffer[index * 4 + 1] & 0xFF, m_buffer[index * 4] & 0xFF);
+    return new Color8Bit(getRed(index), getGreen(index), getBlue(index));
   }
 
   /**
@@ -142,9 +141,70 @@ public class AddressableLEDBuffer {
    * @return the LED color at the specified index
    */
   public Color getLED(int index) {
-    return new Color(
-        (m_buffer[index * 4 + 2] & 0xFF) / 255.0,
-        (m_buffer[index * 4 + 1] & 0xFF) / 255.0,
-        (m_buffer[index * 4] & 0xFF) / 255.0);
+    return new Color(getRed(index) / 255.0, getGreen(index) / 255.0, getBlue(index) / 255.0);
+  }
+
+  /**
+   * Gets the red channel of the color at the specified index.
+   *
+   * @param index the index of the LED to read
+   * @return the value of the red channel, from [0, 255]
+   */
+  public int getRed(int index) {
+    return m_buffer[index * 4 + 2] & 0xFF;
+  }
+
+  /**
+   * Gets the green channel of the color at the specified index.
+   *
+   * @param index the index of the LED to read
+   * @return the value of the green channel, from [0, 255]
+   */
+  public int getGreen(int index) {
+    return m_buffer[index * 4 + 1] & 0xFF;
+  }
+
+  /**
+   * Gets the blue channel of the color at the specified index.
+   *
+   * @param index the index of the LED to read
+   * @return the value of the blue channel, from [0, 255]
+   */
+  public int getBlue(int index) {
+    return m_buffer[index * 4] & 0xFF;
+  }
+
+  /**
+   * A functional interface that allows for iteration over an LED buffer without manually writing an
+   * indexed for-loop.
+   */
+  @FunctionalInterface
+  public interface IndexedColorIterator {
+    /**
+     * Accepts an index of an LED in the buffer and the red, green, and blue components of the
+     * currently stored color for that LED.
+     *
+     * @param index the index of the LED in the buffer that the red, green, and blue channels
+     *     corresponds to
+     * @param r the value of the red channel of the color currently in the buffer at index {@code i}
+     * @param g the value of the green channel of the color currently in the buffer at index {@code
+     *     i}
+     * @param b the value of the blue channel of the color currently in the buffer at index {@code
+     *     i}
+     */
+    void accept(int index, int r, int g, int b);
+  }
+
+  /**
+   * Iterates over the LEDs in the buffer, starting from index 0. The iterator function is passed
+   * the current index of iteration, along with the values for the red, green, and blue components
+   * of the color written to the LED at that index.
+   *
+   * @param iterator the iterator function to call for each LED in the buffer.
+   */
+  public void forEach(IndexedColorIterator iterator) {
+    for (int i = 0; i < getLength(); i++) {
+      iterator.accept(i, getRed(i), getGreen(i), getBlue(i));
+    }
   }
 }
