@@ -129,6 +129,7 @@ class AddressableLEDBufferTest {
               break;
             default:
               fail("Unexpected index " + index);
+              break;
           }
         });
   }
