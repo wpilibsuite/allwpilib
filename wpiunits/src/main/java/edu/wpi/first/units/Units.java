@@ -124,7 +124,7 @@ public final class Units {
    * The standard SI unit of linear velocity, equivalent to travelling at a rate of one {@link
    * #Meters Meter} per {@link #Second}.
    */
-  public static final Velocity<Distance> MetersPerSecond = BaseUnits.Velocity;
+  public static final Velocity<Distance> MetersPerSecond = Meters.per(Second);
 
   /**
    * A unit of linear velocity equivalent to travelling at a rate one {@link #Feet Foot} per {@link
