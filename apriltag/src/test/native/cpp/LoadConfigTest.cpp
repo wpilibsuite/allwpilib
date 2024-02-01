@@ -4,6 +4,7 @@
 
 #include <gtest/gtest.h>
 
+#include "frc/apriltag/AprilTagFieldLayout.h"
 #include "frc/apriltag/AprilTagFields.h"
 
 namespace frc {

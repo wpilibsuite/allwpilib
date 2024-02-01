@@ -8,8 +8,6 @@
 
 #include <wpi/SymbolExports.h>
 
-#include "frc/apriltag/AprilTagFieldLayout.h"
-
 namespace frc {
 
 /**
@@ -27,13 +25,5 @@ enum class AprilTagField {
   // always be the last entry in the enum and should not be used by users
   kNumFields,
 };
-
-/**
- * Loads an AprilTagFieldLayout from a predefined field
- *
- * @param field The predefined field
- */
-WPILIB_DLLEXPORT AprilTagFieldLayout
-LoadAprilTagLayoutField(AprilTagField field);
 
 }  // namespace frc
