@@ -3,8 +3,8 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "frc2/command/ProxyCommand.h"
-#include "wpi/deprecated.h"
 
+#include <wpi/deprecated.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <fmt/core.h>
 

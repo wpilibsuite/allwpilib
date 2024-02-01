@@ -4,6 +4,8 @@
 
 #include "frc2/command/Commands.h"
 
+#include <wpi/deprecated.h>
+
 #include "frc2/command/ConditionalCommand.h"
 #include "frc2/command/DeferredCommand.h"
 #include "frc2/command/FunctionalCommand.h"
@@ -17,7 +19,6 @@
 #include "frc2/command/SequentialCommandGroup.h"
 #include "frc2/command/WaitCommand.h"
 #include "frc2/command/WaitUntilCommand.h"
-#include "wpi/deprecated.h"
 
 using namespace frc2;
 
