@@ -3,6 +3,7 @@ cppHeaderFileInclude {
   \.hpp$
   \.inc$
   \.inl$
+  expected$
   math$
   numbers$
   scope$

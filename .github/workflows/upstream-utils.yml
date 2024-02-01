@@ -23,7 +23,7 @@ jobs:
           git checkout -b pr
           git branch -f main origin/main
       - name: Set up Python 3.9
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: 3.9
       - name: Configure committer identity

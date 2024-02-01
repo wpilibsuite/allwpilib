@@ -25,20 +25,35 @@ public final class Units {
   /** The base unit of distance. */
   public static final Distance Meters = BaseUnits.Distance;
 
-  /** 1/1000 of a {@link #Meters Meter}. */
+  /** The base unit of distance. */
+  public static final Distance Meter = Meters; // alias
+
+  /** 1/1000 of a {@link #Meter}. */
   public static final Distance Millimeters = Milli(Meters, "Millimeter", "mm");
 
-  /** 1/100 of a {@link #Meters Meter}. */
+  /** 1/1000 of a {@link #Meter}. */
+  public static final Distance Millimeter = Millimeters; // alias
+
+  /** 1/100 of a {@link #Meter}. */
   public static final Distance Centimeters =
       derive(Meters).splitInto(100).named("Centimeter").symbol("cm").make();
 
-  /** 25.4/1000 of a {@link #Meters Meter} and 1/12 of a {@link #Feet Foot}. */
+  /** 1/100 of a {@link #Meter}. */
+  public static final Distance Centimeter = Centimeters; // alias
+
+  /** 25.4/1000 of a {@link #Meter} and 1/12 of a {@link #Foot}. */
   public static final Distance Inches =
       derive(Millimeters).aggregate(25.4).named("Inch").symbol("in").make();
 
-  /** 304.8/1000 of a {@link #Meters Meter}, or 12 {@link #Inches}. */
+  /** 25.4/1000 of a {@link #Meter} and 1/12 of a {@link #Foot}. */
+  public static final Distance Inch = Inches; // alias
+
+  /** 304.8/1000 of a {@link #Meter}, or 12 {@link #Inches}. */
   public static final Distance Feet =
       derive(Inches).aggregate(12).named("Foot").symbol("ft").make();
+
+  /** 304.8/1000 of a {@link #Meter}, or 12 {@link #Inches}. */
+  public static final Distance Foot = Feet; // alias
 
   // Time
   /** The base unit of time. */
@@ -74,10 +89,22 @@ public final class Units {
   public static final Angle Radians = BaseUnits.Angle;
 
   /**
+   * The base SI unit of angle, represented by the distance that the radius of a unit circle can
+   * wrap around its circumference.
+   */
+  public static final Angle Radian = Radians; // alias
+
+  /**
    * A single turn of an object around an external axis. Numerically equivalent to {@link
    * #Rotations}, but may be semantically more expressive in certain scenarios.
    */
   public static final Angle Revolutions = new Angle(2 * Math.PI, "Revolution", "R");
+
+  /**
+   * A single turn of an object around an external axis. Numerically equivalent to a {@link
+   * #Rotation}, but may be semantically more expressive in certain scenarios.
+   */
+  public static final Angle Revolution = Revolutions; // alias
 
   /**
    * A single turn of an object around an internal axis. Numerically equivalent to {@link
@@ -85,9 +112,18 @@ public final class Units {
    */
   public static final Angle Rotations = new Angle(2 * Math.PI, "Rotation", "R"); // alias revolution
 
+  /**
+   * A single turn of an object around an internal axis. Numerically equivalent to a {@link
+   * #Revolution}, but may be semantically more expressive in certain scenarios.
+   */
+  public static final Angle Rotation = Rotations; // alias
+
   /** 1/360 of a turn around a circle, or 1/57.3 {@link #Radians}. */
   public static final Angle Degrees =
       derive(Revolutions).splitInto(360).named("Degree").symbol("°").make();
+
+  /** 1/360 of a turn around a circle, or 1/57.3 {@link #Radians}. */
+  public static final Angle Degree = Degrees; // alias
 
   // Velocity
   /**
@@ -156,8 +192,14 @@ public final class Units {
   /** The base SI unit of mass. */
   public static final Mass Kilograms = BaseUnits.Mass;
 
-  /** 1/1000 of a {@link #Kilograms Kilogram}. */
+  /** The base SI unit of mass. */
+  public static final Mass Kilogram = Kilograms; // alias
+
+  /** 1/1000 of a {@link #Kilogram}. */
   public static final Mass Grams = Milli(Kilograms, "Gram", "g");
+
+  /** 1/1000 of a {@link #Kilogram}. */
+  public static final Mass Gram = Grams; // alias
 
   /**
    * A unit of mass equivalent to approximately 453 {@link #Grams}. This is <i>not</i> equivalent to
@@ -167,9 +209,19 @@ public final class Units {
   public static final Mass Pounds =
       derive(Grams).aggregate(453.592).named("Pound").symbol("lb.").make();
 
-  /** 1/16 of a {@link #Pounds Pound}. */
+  /**
+   * A unit of mass equivalent to approximately 453 {@link #Grams}. This is <i>not</i> equivalent to
+   * pounds-force, which is the amount of force required to accelerate an object with one pound of
+   * mass at a rate of one {@link #Gs G}.
+   */
+  public static final Mass Pound = Pounds; // alias
+
+  /** 1/16 of a {@link #Pound}. */
   public static final Mass Ounces =
       derive(Pounds).splitInto(16).named("Ounce").symbol("oz.").make();
+
+  /** 1/16 of a {@link #Pound}. */
+  public static final Mass Ounce = Ounces; // alias
 
   // Unitless
   /** A dimensionless unit that performs no scaling whatsoever. */
@@ -186,31 +238,56 @@ public final class Units {
   /** The base unit of electric potential. */
   public static final Voltage Volts = BaseUnits.Voltage;
 
+  /** The base unit of electric potential. */
+  public static final Voltage Volt = Volts; // alias
+
   /**
-   * 1/1000 of a {@link #Volts Volt}. Useful when dealing with low-voltage applications like LED
-   * drivers or low-power circuits.
+   * 1/1000 of a {@link #Volt}. Useful when dealing with low-voltage applications like LED drivers
+   * or low-power circuits.
    */
   public static final Voltage Millivolts = Milli(Volts);
+
+  /**
+   * 1/1000 of a {@link #Volt}. Useful when dealing with low-voltage applications like LED drivers
+   * or low-power circuits.
+   */
+  public static final Voltage Millivolt = Millivolts; // alias
 
   // Current
   /** The base unit of electrical current. */
   public static final Current Amps = BaseUnits.Current;
 
+  /** The base unit of electrical current. */
+  public static final Current Amp = Amps; // alias
+
   /**
-   * A unit equal to 1/1000 of an {@link #Amps Amp}. Useful when dealing with low-current
-   * applications like LED drivers or low-power circuits.
+   * A unit equal to 1/1000 of an {@link #Amp}. Useful when dealing with low-current applications
+   * like LED drivers or low-power circuits.
    */
   public static final Current Milliamps = Milli(Amps);
+
+  /**
+   * A unit equal to 1/1000 of an {@link #Amp}. Useful when dealing with low-current applications
+   * like LED drivers or low-power circuits.
+   */
+  public static final Current Milliamp = Milliamps; // alias
 
   // Energy
   /** The base unit of energy. */
   public static final Energy Joules = BaseUnits.Energy;
 
+  /** The base unit of energy. */
+  public static final Energy Joule = Joules; // alias
+
   /**
-   * A unit equal to 1/1000 of a {@link #Joules Joule}. Useful when dealing with lower-power
-   * applications.
+   * A unit equal to 1/1000 of a {@link #Joule}. Useful when dealing with lower-power applications.
    */
   public static final Energy Millijoules = Milli(Joules);
+
+  /**
+   * A unit equal to 1/1000 of a {@link #Joule}. Useful when dealing with lower-power applications.
+   */
+  public static final Energy Millijoule = Millijoules; // alias
 
   /**
    * A unit equal to 1,000 {@link #Joules}. Useful when dealing with higher-level robot energy
@@ -218,15 +295,28 @@ public final class Units {
    */
   public static final Energy Kilojoules = Kilo(Joules);
 
+  /**
+   * A unit equal to 1,000 {@link #Joules}. Useful when dealing with higher-level robot energy
+   * usage.
+   */
+  public static final Energy Kilojoule = Kilojoules; // alias
+
   // Power
-  /** The base unit of power. Equivalent to one {@link #Joules Joule} per {@link #Second}. */
+  /** The base unit of power. Equivalent to one {@link #Joule} per {@link #Second}. */
   public static final Power Watts = BaseUnits.Power;
 
+  /** The base unit of power. Equivalent to one {@link #Joule} per {@link #Second}. */
+  public static final Power Watt = Watts; // alias
+
   /**
-   * A unit equal to 1/1000 of a {@link #Watts Watt}. Useful when dealing with lower-power
-   * applications.
+   * A unit equal to 1/1000 of a {@link #Watt}. Useful when dealing with lower-power applications.
    */
   public static final Power Milliwatts = Milli(Watts);
+
+  /**
+   * A unit equal to 1/1000 of a {@link #Watt}. Useful when dealing with lower-power applications.
+   */
+  public static final Power Milliwatt = Milliwatts; // alias
 
   /**
    * A unit equal to 745.7 {@link #Watts}. May be useful when dealing with high-power gearboxes and

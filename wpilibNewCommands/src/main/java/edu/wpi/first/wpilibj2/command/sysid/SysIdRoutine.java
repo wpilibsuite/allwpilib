@@ -226,7 +226,7 @@ public class SysIdRoutine extends SysIdRoutineLog {
     Timer timer = new Timer();
     return m_mechanism
         .m_subsystem
-        .runOnce(timer::start)
+        .runOnce(timer::restart)
         .andThen(
             m_mechanism.m_subsystem.run(
                 () -> {
