@@ -6,6 +6,8 @@
 #include "wpi/deprecated.h"
 
 #include <wpi/sendable/SendableBuilder.h>
+#include <fmt/core.h>
+
 
 using namespace frc2;
 

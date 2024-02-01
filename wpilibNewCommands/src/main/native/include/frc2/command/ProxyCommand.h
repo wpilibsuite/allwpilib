@@ -7,7 +7,6 @@
 #include <memory>
 
 #include <wpi/FunctionExtras.h>
-#include <fmt/core.h>
 
 #include "frc2/command/Command.h"
 #include "frc2/command/CommandHelper.h"
