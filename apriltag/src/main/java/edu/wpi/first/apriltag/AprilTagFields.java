@@ -35,6 +35,6 @@ public enum AprilTagFields {
    * @throws UncheckedIOException If the layout does not exist
    */
   public AprilTagFieldLayout loadAprilTagLayoutField() {
-    return AprilTagFieldLayout.loadStandardField(this);
+    return AprilTagFieldLayout.loadField(this);
   }
 }

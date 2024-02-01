@@ -223,13 +223,13 @@ public class AprilTagFieldLayout {
   }
 
   /**
-   * Get a standard {@link AprilTagFieldLayout}.
+   * Get an official {@link AprilTagFieldLayout}.
    *
    * @param field The loadable AprilTag field layout.
    * @return AprilTagFieldLayout of the field.
    * @throws UncheckedIOException If the layout does not exist.
    */
-  public static AprilTagFieldLayout loadStandardField(AprilTagFields field) {
+  public static AprilTagFieldLayout loadField(AprilTagFields field) {
     try {
       return loadFromResource(field.m_resourceFile);
     } catch (IOException e) {
