@@ -138,4 +138,13 @@ class WindowManager {
   void DisplayWindows();
 };
 
+namespace imm {
+Window* GetOrAddWindow(std::string_view id, bool duplicateOk = false,
+                       Window::Visibility defaultVisibility = Window::kShow);
+Window* GetWindow(std::string_view id);
+std::vector<std::unique_ptr<Window>>& GetWindows();
+void RemoveAllWindows();
+void RemoveWindow(size_t index);
+}  // namespace imm
+
 }  // namespace glass

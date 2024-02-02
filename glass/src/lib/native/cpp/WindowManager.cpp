@@ -10,9 +10,11 @@
 #include <fmt/format.h>
 #include <wpi/print.h>
 #include <wpigui.h>
+#include <wpi/DenseMap.h>
 
 #include "glass/Context.h"
 #include "glass/Storage.h"
+#include "imgui.h"
 
 using namespace glass;
 
@@ -113,4 +115,62 @@ void WindowManager::DisplayWindows() {
     window->Display();
   }
   PopStorageStack();
+}
+
+imm::Window* imm::GetOrAddWindow(std::string_view id, bool duplicateOk,
+                                 Window::Visibility defaultVisibility) {
+  auto& windows = GetWindows();
+
+  // binary search
+  auto it = std::lower_bound(
+      windows.begin(), windows.end(), id,
+      [](const auto& elem, std::string_view s) { return elem->id < s; });
+  if (it != windows.end() && (*it)->id == id) {
+    if (!duplicateOk) {
+      fmt::print(stderr, "GUI: ignoring duplicate window '{}'\n", id);
+      return nullptr;
+    }
+    return it->get();
+  }
+  // insert before (keeps sort)
+  return windows
+      .emplace(it, std::make_unique<Window>(
+                       GetStorage().GetChild(id).GetChild("window"), id,
+                       defaultVisibility))
+      ->get();
+}
+
+imm::Window* imm::GetWindow(std::string_view id) {
+  auto& windows = GetWindows();
+
+  // binary search
+  auto it = std::lower_bound(
+      windows.begin(), windows.end(), id,
+      [](const auto& elem, std::string_view s) { return elem->id < s; });
+  if (it == windows.end() || (*it)->id != id) {
+    return nullptr;
+  }
+  return it->get();
+}
+
+std::vector<std::unique_ptr<imm::Window>>& imm::GetWindows() {
+  static wpi::DenseMap<ImGuiID, std::vector<std::unique_ptr<imm::Window>>>
+      store;
+
+  auto it = store.find(ImGui::GetID());
+
+  for (auto&& childIt : m_storage.GetChildren()) {
+    GetOrAddWindow(childIt.key(), true);
+  }
+}
+
+void imm::RemoveAllWindows() {
+  GetWindows().clear();
+  GetStorage().Clear();
+}
+
+void imm::RemoveWindow(size_t index) {
+  auto& windows = GetWindows();
+  GetStorage().Erase(windows[index]->id);
+  windows.erase(windows.begin() + index);
 }

@@ -138,4 +138,16 @@ class Window {
   ImVec2 m_padding;
 };
 
+namespace imm {
+struct Window {
+  enum Visibility { kHide = 0, kShow, kDisabled };
+
+  Window(Storage& storage, std::string_view id,
+         Visibility defaultVisibility = kShow);
+
+  Storage& storage;
+  std::string id;
+};
+}  // namespace imm
+
 }  // namespace glass
