@@ -12,11 +12,11 @@
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>
 
+#include "glass/Context.h"
+#include "glass/Storage.h"
 #include "glass/View.h"
 
 namespace glass {
-
-class Storage;
 
 /**
  * Managed window information.
@@ -139,15 +139,17 @@ class Window {
 };
 
 namespace imm {
-struct Window {
-  enum Visibility { kHide = 0, kShow, kDisabled };
-
-  Window(Storage& storage, std::string_view id,
-         Visibility defaultVisibility = kShow);
-
-  Storage& storage;
-  std::string id;
-};
+enum class Visibility { kHide = 0, kShow, kDisabled };
+Storage& GetOrAddWindow(std::string_view id, bool duplicateOk = false,
+                        Visibility defaultVisibility = Visibility::kShow);
+inline Storage& GetWindow() {
+  return GetStorage().GetChild("window");
+}
+inline Storage& GetWindow(std::string_view id) {
+  return GetStorage().GetChild(id).GetChild("window");
+}
+bool BeginWindow();
+void EndWindow();
 }  // namespace imm
 
 }  // namespace glass

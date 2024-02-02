@@ -144,3 +144,24 @@ void Window::ScaleDefault(float scale) {
     m_size.y *= scale;
   }
 }
+
+struct WindowData {
+  std::string m_id;
+  std::string m_defaultName;
+  ImGuiWindowFlags m_flags = 0;
+  bool m_renamePopupEnabled = true;
+  ImGuiCond m_posCond = 0;
+  ImGuiCond m_sizeCond = 0;
+  ImVec2 m_pos;
+  ImVec2 m_size;
+  bool m_setPadding = false;
+  ImVec2 m_padding;
+};
+
+Storage& imm::GetOrAddWindow(std::string_view id, bool duplicateOk,
+                             Visibility defaultVisibility) {
+  Storage& storage = GetStorage().GetChild(id).GetChild("window");
+  storage.GetBool("visible", defaultVisibility != Visibility::kHide);
+  storage.GetBool("enabled", defaultVisibility != Visibility::kDisabled);
+  return storage;
+}
