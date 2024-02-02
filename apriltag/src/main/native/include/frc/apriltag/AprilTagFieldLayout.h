@@ -166,7 +166,9 @@ void from_json(const wpi::json& json, AprilTagFieldLayout& layout);
  *
  * @param field The predefined field
  * @return AprilTagFieldLayout of the field
+ * @deprecated Use AprilTagFieldLayout::LoadField() instead
  */
+[[deprecated("Use AprilTagFieldLayout::LoadField() instead")]]
 WPILIB_DLLEXPORT AprilTagFieldLayout
 LoadAprilTagLayoutField(AprilTagField field);
 
