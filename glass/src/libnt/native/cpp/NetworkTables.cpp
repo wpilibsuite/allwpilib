@@ -2054,30 +2054,28 @@ void glass::DisplayNetworkTables(NetworkTablesModel* model,
   }
 }
 
-void NetworkTablesFlagsSettings::Update() {
-  if (!m_pTreeView) {
-    auto& storage = GetStorage();
-    m_pTreeView =
-        &storage.GetBool("tree", m_defaultFlags & NetworkTablesFlags_TreeView);
-    m_pCombinedView = &storage.GetBool(
-        "combined", m_defaultFlags & NetworkTablesFlags_CombinedView);
-    m_pShowSpecial = &storage.GetBool(
-        "special", m_defaultFlags & NetworkTablesFlags_ShowSpecial);
-    m_pShowProperties = &storage.GetBool(
-        "properties", m_defaultFlags & NetworkTablesFlags_ShowProperties);
-    m_pShowTimestamp = &storage.GetBool(
-        "timestamp", m_defaultFlags & NetworkTablesFlags_ShowTimestamp);
-    m_pShowServerTimestamp = &storage.GetBool(
-        "serverTimestamp",
-        m_defaultFlags & NetworkTablesFlags_ShowServerTimestamp);
-    m_pCreateNoncanonicalKeys = &storage.GetBool(
-        "createNonCanonical",
-        m_defaultFlags & NetworkTablesFlags_CreateNoncanonicalKeys);
-    m_pPrecision = &storage.GetInt(
-        "precision", (m_defaultFlags & NetworkTablesFlags_Precision) >>
-                         kNetworkTablesFlags_PrecisionBitShift);
-  }
-
+NetworkTablesFlagsSettings::NetworkTablesFlagsSettings(
+    Storage& storage, NetworkTablesFlags defaultFlags)
+    : m_treeView{storage.GetBool("tree",
+                                 defaultFlags & NetworkTablesFlags_TreeView)},
+      m_combinedView{storage.GetBool(
+          "combined", defaultFlags & NetworkTablesFlags_CombinedView)},
+      m_showSpecial{storage.GetBool(
+          "special", defaultFlags & NetworkTablesFlags_ShowSpecial)},
+      m_showProperties{storage.GetBool(
+          "properties", defaultFlags & NetworkTablesFlags_ShowProperties)},
+      m_showTimestamp{storage.GetBool(
+          "timestamp", defaultFlags & NetworkTablesFlags_ShowTimestamp)},
+      m_showServerTimestamp{storage.GetBool(
+          "serverTimestamp",
+          defaultFlags & NetworkTablesFlags_ShowServerTimestamp)},
+      m_createNoncanonicalKeys{storage.GetBool(
+          "createNonCanonical",
+          defaultFlags & NetworkTablesFlags_CreateNoncanonicalKeys)},
+      m_precision{storage.GetInt(
+          "precision", (defaultFlags & NetworkTablesFlags_Precision) >>
+                           kNetworkTablesFlags_PrecisionBitShift)},
+      m_flags{defaultFlags} {
   m_flags &= ~(
       NetworkTablesFlags_TreeView | NetworkTablesFlags_CombinedView |
       NetworkTablesFlags_ShowSpecial | NetworkTablesFlags_ShowProperties |
@@ -2085,53 +2083,52 @@ void NetworkTablesFlagsSettings::Update() {
       NetworkTablesFlags_ShowServerTimestamp |
       NetworkTablesFlags_CreateNoncanonicalKeys | NetworkTablesFlags_Precision);
   m_flags |=
-      (*m_pTreeView ? NetworkTablesFlags_TreeView : 0) |
-      (*m_pCombinedView ? NetworkTablesFlags_CombinedView : 0) |
-      (*m_pShowSpecial ? NetworkTablesFlags_ShowSpecial : 0) |
-      (*m_pShowProperties ? NetworkTablesFlags_ShowProperties : 0) |
-      (*m_pShowTimestamp ? NetworkTablesFlags_ShowTimestamp : 0) |
-      (*m_pShowServerTimestamp ? NetworkTablesFlags_ShowServerTimestamp : 0) |
-      (*m_pCreateNoncanonicalKeys ? NetworkTablesFlags_CreateNoncanonicalKeys
-                                  : 0) |
-      (*m_pPrecision << kNetworkTablesFlags_PrecisionBitShift);
+      (m_treeView ? NetworkTablesFlags_TreeView : 0) |
+      (m_combinedView ? NetworkTablesFlags_CombinedView : 0) |
+      (m_showSpecial ? NetworkTablesFlags_ShowSpecial : 0) |
+      (m_showProperties ? NetworkTablesFlags_ShowProperties : 0) |
+      (m_showTimestamp ? NetworkTablesFlags_ShowTimestamp : 0) |
+      (m_showServerTimestamp ? NetworkTablesFlags_ShowServerTimestamp : 0) |
+      (m_createNoncanonicalKeys ? NetworkTablesFlags_CreateNoncanonicalKeys
+                                : 0) |
+      (m_precision << kNetworkTablesFlags_PrecisionBitShift);
 }
 
+NetworkTablesFlagsSettings::NetworkTablesFlagsSettings(
+    NetworkTablesFlags defaultFlags)
+    : NetworkTablesFlagsSettings{GetStorage(), defaultFlags} {}
+
 void NetworkTablesFlagsSettings::DisplayMenu() {
-  if (!m_pTreeView) {
-    return;
-  }
-  ImGui::MenuItem("Tree View", "", m_pTreeView);
-  ImGui::MenuItem("Combined View", "", m_pCombinedView);
-  ImGui::MenuItem("Show Special", "", m_pShowSpecial);
-  ImGui::MenuItem("Show Properties", "", m_pShowProperties);
-  ImGui::MenuItem("Show Timestamp", "", m_pShowTimestamp);
-  ImGui::MenuItem("Show Server Timestamp", "", m_pShowServerTimestamp);
+  auto Flag = [this](const char* label, bool& value, NetworkTablesFlags flag) {
+    if (ImGui::MenuItem(label, "", value)) {
+      if (value) {
+        m_flags |= flag;
+      } else {
+        m_flags &= ~flag;
+      }
+    }
+  };
+
+  Flag("Tree View", m_treeView, NetworkTablesFlags_TreeView);
+  Flag("Combined View", m_combinedView, NetworkTablesFlags_CombinedView);
+  Flag("Show Special", m_showSpecial, NetworkTablesFlags_ShowSpecial);
+  Flag("Show Properties", m_showProperties, NetworkTablesFlags_ShowProperties);
+  Flag("Show Timestamp", m_showTimestamp, NetworkTablesFlags_ShowTimestamp);
+  Flag("Show Server Timestamp", m_showServerTimestamp,
+       NetworkTablesFlags_ShowServerTimestamp);
   if (ImGui::BeginMenu("Decimal Precision")) {
     static const char* precisionOptions[] = {"1", "2", "3", "4", "5",
                                              "6", "7", "8", "9", "10"};
     for (int i = 1; i <= 10; i++) {
-      if (ImGui::MenuItem(precisionOptions[i - 1], nullptr,
-                          i == *m_pPrecision)) {
-        *m_pPrecision = i;
+      if (ImGui::MenuItem(precisionOptions[i - 1], nullptr, i == m_precision)) {
+        m_precision = i;
+        m_flags &= ~NetworkTablesFlags_Precision;
+        m_flags |= m_precision << kNetworkTablesFlags_PrecisionBitShift;
       }
     }
     ImGui::EndMenu();
   }
   ImGui::Separator();
-  ImGui::MenuItem("Allow creation of non-canonical keys", "",
-                  m_pCreateNoncanonicalKeys);
-}
-
-void NetworkTablesView::Display() {
-  m_flags.Update();
-  DisplayNetworkTables(m_model, m_flags.GetFlags());
-}
-
-void NetworkTablesView::Settings() {
-  m_flags.DisplayMenu();
-  DisplayNetworkTablesAddMenu(m_model, {}, m_flags.GetFlags());
-}
-
-bool NetworkTablesView::HasSettings() {
-  return true;
+  Flag("Allow creation of non-canonical keys", m_createNoncanonicalKeys,
+       NetworkTablesFlags_CreateNoncanonicalKeys);
 }

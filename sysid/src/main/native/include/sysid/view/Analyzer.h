@@ -9,7 +9,6 @@
 #include <string_view>
 #include <thread>
 
-#include <glass/View.h>
 #include <implot.h>
 #include <portable-file-dialogs.h>
 #include <units/time.h>
@@ -34,7 +33,7 @@ namespace sysid {
  * load their data, visualize the data, adjust certain variables, and then view
  * the calculated gains.
  */
-class Analyzer : public glass::View {
+class Analyzer {
  public:
   TestData m_data;
   /**
@@ -82,9 +81,9 @@ class Analyzer : public glass::View {
   /**
    * Displays the analyzer widget
    */
-  void Display() override;
+  void Display();
 
-  ~Analyzer() override { AbortDataPrep(); };
+  ~Analyzer() { AbortDataPrep(); };
 
   /**
    * Analyzes the selected data.

@@ -16,33 +16,42 @@
 using namespace halsimgui;
 
 static std::unique_ptr<glass::NetworkTablesModel> gNetworkTablesModel;
-static std::unique_ptr<glass::Window> gNetworkTablesWindow;
-static std::unique_ptr<glass::Window> gNetworkTablesInfoWindow;
+static glass::Window* gNetworkTablesWindow;
+static glass::Window* gNetworkTablesInfoWindow;
 
 void NetworkTablesSimGui::Initialize() {
   gNetworkTablesModel = std::make_unique<glass::NetworkTablesModel>();
   wpi::gui::AddEarlyExecute([] { gNetworkTablesModel->Update(); });
 
-  gNetworkTablesWindow = std::make_unique<glass::Window>(
-      glass::GetStorageRoot().GetChild("NetworkTables View"), "NetworkTables");
-  gNetworkTablesWindow->SetView(
-      std::make_unique<glass::NetworkTablesView>(gNetworkTablesModel.get()));
+  gNetworkTablesWindow = glass::imm::CreateWindow("NetworkTables View");
   gNetworkTablesWindow->SetDefaultPos(250, 277);
   gNetworkTablesWindow->SetDefaultSize(750, 185);
-  gNetworkTablesWindow->DisableRenamePopup();
-  wpi::gui::AddLateExecute([] { gNetworkTablesWindow->Display(); });
 
   // NetworkTables info window
-  gNetworkTablesInfoWindow = std::make_unique<glass::Window>(
-      glass::GetStorageRoot().GetChild("NetworkTables Info"),
-      "NetworkTables Info");
-  gNetworkTablesInfoWindow->SetView(glass::MakeFunctionView(
-      [&] { glass::DisplayNetworkTablesInfo(gNetworkTablesModel.get()); }));
+  gNetworkTablesInfoWindow = glass::imm::CreateWindow(
+      "NetworkTables Info", false, glass::Window::kHide);
   gNetworkTablesInfoWindow->SetDefaultPos(250, 130);
   gNetworkTablesInfoWindow->SetDefaultSize(750, 145);
-  gNetworkTablesInfoWindow->SetDefaultVisibility(glass::Window::kHide);
-  gNetworkTablesInfoWindow->DisableRenamePopup();
-  wpi::gui::AddLateExecute([] { gNetworkTablesInfoWindow->Display(); });
+
+  wpi::gui::AddLateExecute([] {
+    if (glass::imm::BeginWindow(gNetworkTablesWindow)) {
+      auto& settings =
+          glass::GetStorage().GetOrNewData<glass::NetworkTablesFlagsSettings>();
+      if (glass::imm::BeginWindowSettingsPopup()) {
+        settings.DisplayMenu();
+        glass::DisplayNetworkTablesAddMenu(gNetworkTablesModel.get(), {},
+                                           settings.GetFlags());
+        ImGui::EndPopup();
+      }
+      DisplayNetworkTables(gNetworkTablesModel.get(), settings.GetFlags());
+    }
+    glass::imm::EndWindow();
+
+    if (glass::imm::BeginWindow(gNetworkTablesInfoWindow)) {
+      glass::DisplayNetworkTablesInfo(gNetworkTablesModel.get());
+    }
+    glass::imm::EndWindow();
+  });
 
   wpi::gui::AddWindowScaler([](float scale) {
     // scale default window positions

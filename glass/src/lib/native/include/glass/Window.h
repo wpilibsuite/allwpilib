@@ -12,11 +12,11 @@
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>
 
+#include "glass/Context.h"
+#include "glass/Storage.h"
 #include "glass/View.h"
 
 namespace glass {
-
-class Storage;
 
 /**
  * Managed window information.
@@ -27,7 +27,8 @@ class Window {
   enum Visibility { kHide = 0, kShow, kDisabled };
 
   Window(Storage& storage, std::string_view id,
-         Visibility defaultVisibility = kShow);
+         Visibility defaultVisibility = kShow)
+      : Window{storage, storage.GetChild("window"), id, defaultVisibility} {}
 
   std::string_view GetId() const { return m_id; }
 
@@ -60,14 +61,20 @@ class Window {
    *
    * @param visibility 0=hide, 1=show, 2=disabled (force-hide)
    */
-  void SetVisibility(Visibility visibility);
+  void SetVisibility(Visibility visibility) {
+    m_visible = visibility != kHide;
+    m_enabled = visibility != kDisabled;
+  }
 
   /**
    * Sets default visibility of window.
    *
    * @param visibility 0=hide, 1=show, 2=disabled (force-hide)
    */
-  void SetDefaultVisibility(Visibility visibility);
+  void SetDefaultVisibility(Visibility visibility) {
+    m_defaultVisible = visibility != kHide;
+    m_defaultEnabled = visibility != kDisabled;
+  }
 
   /**
    * Sets default position of window.
@@ -119,7 +126,19 @@ class Window {
    */
   void ScaleDefault(float scale);
 
+  [[nodiscard]]
+  bool BeginWindow();
+  void EndWindow();
+  [[nodiscard]]
+  bool BeginWindowSettingsPopup();
+
+  bool EditName() { return ItemEditName(&m_name); }
+
  private:
+  Window(Storage& storage, Storage& windowStorage, std::string_view id,
+         Visibility defaultVisibility);
+
+  Storage& m_storage;
   std::string m_id;
   std::string& m_name;
   std::string m_defaultName;
@@ -136,6 +155,55 @@ class Window {
   ImVec2 m_size;
   bool m_setPadding = false;
   ImVec2 m_padding;
+  bool m_inWindow = false;
 };
+
+namespace imm {
+Window* CreateWindow(
+    Storage& root, std::string_view id, bool duplicateOk = false,
+    Window::Visibility defaultVisibility = Window::Visibility::kShow);
+
+inline Window* CreateWindow(
+    std::string_view id, bool duplicateOk = false,
+    Window::Visibility defaultVisibility = Window::Visibility::kShow) {
+  return CreateWindow(GetStorage(), id, duplicateOk, defaultVisibility);
+}
+
+inline Window* GetWindow() {
+  return GetStorage().GetChild("window").GetData<Window>();
+}
+
+inline Window* GetWindow(std::string_view id) {
+  return GetStorage().GetChild(id).GetChild("window").GetData<Window>();
+}
+
+[[nodiscard]]
+inline bool BeginWindow(Window* window) {
+  assert(window);
+  return window->BeginWindow();
+}
+
+[[nodiscard]]
+inline bool BeginWindow() {
+  return BeginWindow(GetWindow());
+}
+
+[[nodiscard]]
+inline bool BeginWindow(std::string_view id) {
+  return BeginWindow(GetWindow(id));
+}
+
+inline void EndWindow() {
+  Window* window = GetWindow();
+  assert(window);
+  window->EndWindow();
+}
+
+[[nodiscard]]
+inline bool BeginWindowSettingsPopup() {
+  return GetWindow()->BeginWindowSettingsPopup();
+}
+
+}  // namespace imm
 
 }  // namespace glass
