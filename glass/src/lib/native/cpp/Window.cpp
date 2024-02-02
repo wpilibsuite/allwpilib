@@ -47,72 +47,12 @@ void Window::Display() {
     return;
   }
 
-  if (m_posCond != 0) {
-    ImGui::SetNextWindowPos(m_pos, m_posCond);
-  }
-  if (m_sizeCond != 0) {
-    ImGui::SetNextWindowSize(m_size, m_sizeCond);
-  }
-  if (m_setPadding) {
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, m_padding);
-  }
-
-  std::string label;
-  if (m_name.empty()) {
-    label = fmt::format("{}###{}", m_defaultName, m_id);
-  } else {
-    label = fmt::format("{}###{}", m_name, m_id);
-  }
-
-  if (Begin(label.c_str(), &m_visible, m_flags)) {
+  if (BeginWindow()) {
     if (m_renamePopupEnabled || m_view->HasSettings()) {
-      bool isClicked = (ImGui::IsMouseReleased(ImGuiMouseButton_Right) &&
-                        ImGui::IsItemHovered());
-      ImGuiWindow* window = ImGui::GetCurrentWindow();
-
-      bool settingsButtonClicked = false;
-      // Not docked, and window has just enough for the circles not to be
-      // touching
-      if (!ImGui::IsWindowDocked() &&
-          ImGui::GetWindowWidth() > (ImGui::GetFontSize() + 2) * 3 +
-                                        ImGui::GetStyle().FramePadding.x * 2) {
-        const ImGuiItemFlags itemFlagsRestore =
-            ImGui::GetCurrentContext()->CurrentItemFlags;
-
-        ImGui::GetCurrentContext()->CurrentItemFlags |=
-            ImGuiItemFlags_NoNavDefaultFocus;
-        window->DC.NavLayerCurrent = ImGuiNavLayer_Menu;
-
-        // Allow to draw outside of normal window
-        ImGui::PushClipRect(window->OuterRectClipped.Min,
-                            window->OuterRectClipped.Max, false);
-
-        const ImRect titleBarRect = ImGui::GetCurrentWindow()->TitleBarRect();
-        const ImVec2 position = {titleBarRect.Max.x -
-                                     (ImGui::GetStyle().FramePadding.x * 3) -
-                                     (ImGui::GetFontSize() * 2),
-                                 titleBarRect.Min.y};
-        settingsButtonClicked =
-            HamburgerButton(ImGui::GetID("#SETTINGS"), position);
-
-        ImGui::PopClipRect();
-
-        ImGui::GetCurrentContext()->CurrentItemFlags = itemFlagsRestore;
-      }
-      if (settingsButtonClicked || isClicked) {
-        ImGui::OpenPopup(window->ID);
-      }
-
-      if (ImGui::BeginPopupEx(window->ID,
-                              ImGuiWindowFlags_AlwaysAutoResize |
-                                  ImGuiWindowFlags_NoTitleBar |
-                                  ImGuiWindowFlags_NoSavedSettings)) {
-        if (m_renamePopupEnabled) {
-          ItemEditName(&m_name);
-        }
+      if (BeginWindowSettingsPopup()) {
         m_view->Settings();
 
-        ImGui::EndPopup();
+        EndWindowSettingsPopup();
       }
     }
 
@@ -120,10 +60,7 @@ void Window::Display() {
   } else {
     m_view->Hidden();
   }
-  End();
-  if (m_setPadding) {
-    ImGui::PopStyleVar();
-  }
+  EndWindow();
 }
 
 bool Window::DisplayMenuItem(const char* label) {
@@ -145,23 +82,105 @@ void Window::ScaleDefault(float scale) {
   }
 }
 
-struct WindowData {
-  std::string m_id;
-  std::string m_defaultName;
-  ImGuiWindowFlags m_flags = 0;
-  bool m_renamePopupEnabled = true;
-  ImGuiCond m_posCond = 0;
-  ImGuiCond m_sizeCond = 0;
-  ImVec2 m_pos;
-  ImVec2 m_size;
-  bool m_setPadding = false;
-  ImVec2 m_padding;
-};
+bool Window::BeginWindow() {
+  if (m_posCond != 0) {
+    ImGui::SetNextWindowPos(m_pos, m_posCond);
+  }
+  if (m_sizeCond != 0) {
+    ImGui::SetNextWindowSize(m_size, m_sizeCond);
+  }
+  if (m_setPadding) {
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, m_padding);
+  }
 
-Storage& imm::GetOrAddWindow(std::string_view id, bool duplicateOk,
-                             Visibility defaultVisibility) {
+  std::string label;
+  if (m_name.empty()) {
+    label = fmt::format("{}###{}", m_defaultName, m_id);
+  } else {
+    label = fmt::format("{}###{}", m_name, m_id);
+  }
+
+  return Begin(label.c_str(), &m_visible, m_flags);
+}
+
+void Window::EndWindow() {
+  End();
+  if (m_setPadding) {
+    ImGui::PopStyleVar();
+  }
+}
+
+bool Window::BeginWindowSettingsPopup() {
+  bool isClicked = (ImGui::IsMouseReleased(ImGuiMouseButton_Right) &&
+                    ImGui::IsItemHovered());
+  ImGuiWindow* window = ImGui::GetCurrentWindow();
+
+  bool settingsButtonClicked = false;
+  // Not docked, and window has just enough for the circles not to be touching
+  if (!ImGui::IsWindowDocked() &&
+      ImGui::GetWindowWidth() > (ImGui::GetFontSize() + 2) * 3 +
+                                    ImGui::GetStyle().FramePadding.x * 2) {
+    const ImGuiItemFlags itemFlagsRestore =
+        ImGui::GetCurrentContext()->CurrentItemFlags;
+
+    ImGui::GetCurrentContext()->CurrentItemFlags |=
+        ImGuiItemFlags_NoNavDefaultFocus;
+    window->DC.NavLayerCurrent = ImGuiNavLayer_Menu;
+
+    // Allow to draw outside of normal window
+    ImGui::PushClipRect(window->OuterRectClipped.Min,
+                        window->OuterRectClipped.Max, false);
+
+    const ImRect titleBarRect = ImGui::GetCurrentWindow()->TitleBarRect();
+    const ImVec2 position = {titleBarRect.Max.x -
+                                 (ImGui::GetStyle().FramePadding.x * 3) -
+                                 (ImGui::GetFontSize() * 2),
+                             titleBarRect.Min.y};
+    settingsButtonClicked =
+        HamburgerButton(ImGui::GetID("#SETTINGS"), position);
+
+    ImGui::PopClipRect();
+
+    ImGui::GetCurrentContext()->CurrentItemFlags = itemFlagsRestore;
+  }
+  if (settingsButtonClicked || isClicked) {
+    ImGui::OpenPopup(window->ID);
+  }
+
+  if (ImGui::BeginPopupEx(window->ID, ImGuiWindowFlags_AlwaysAutoResize |
+                                          ImGuiWindowFlags_NoTitleBar |
+                                          ImGuiWindowFlags_NoSavedSettings)) {
+    if (m_renamePopupEnabled) {
+      ItemEditName(&m_name);
+    }
+    return true;
+  }
+
+  return false;
+}
+
+void Window::EndWindowSettingsPopup() {
+  ImGui::EndPopup();
+}
+
+Window* imm::GetOrAddWindow(std::string_view id, bool duplicateOk,
+                            Window::Visibility defaultVisibility) {
   Storage& storage = GetStorage().GetChild(id).GetChild("window");
-  storage.GetBool("visible", defaultVisibility != Visibility::kHide);
-  storage.GetBool("enabled", defaultVisibility != Visibility::kDisabled);
-  return storage;
+  if (auto window = storage.GetData<Window>()) {
+    if (!duplicateOk) {
+      fmt::print(stderr, "GUI: ignoring duplicate window '{}'\n", id);
+      return nullptr;
+    }
+    return window;
+  }
+  storage.SetData(std::make_shared<Window>(storage, id, defaultVisibility));
+  return storage.GetData<Window>();
+}
+
+bool imm::BeginWindow() {
+  auto window = GetWindow();
+  if (!window || !window->IsVisible() || !window->IsEnabled()) {
+    return false;
+  }
+  return window->BeginWindow();
 }

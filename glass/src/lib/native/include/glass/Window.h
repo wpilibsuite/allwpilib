@@ -119,6 +119,13 @@ class Window {
    */
   void ScaleDefault(float scale);
 
+  [[nodiscard]]
+  bool BeginWindow();
+  void EndWindow();
+  [[nodiscard]]
+  bool BeginWindowSettingsPopup();
+  void EndWindowSettingsPopup();
+
  private:
   std::string m_id;
   std::string& m_name;
@@ -139,17 +146,34 @@ class Window {
 };
 
 namespace imm {
-enum class Visibility { kHide = 0, kShow, kDisabled };
-Storage& GetOrAddWindow(std::string_view id, bool duplicateOk = false,
-                        Visibility defaultVisibility = Visibility::kShow);
-inline Storage& GetWindow() {
-  return GetStorage().GetChild("window");
+Window* GetOrAddWindow(
+    std::string_view id, bool duplicateOk = false,
+    Window::Visibility defaultVisibility = Window::Visibility::kShow);
+
+inline Window* GetWindow() {
+  return GetStorage().GetChild("window").GetData<Window>();
 }
-inline Storage& GetWindow(std::string_view id) {
-  return GetStorage().GetChild(id).GetChild("window");
+
+inline Window* GetWindow(std::string_view id) {
+  return GetStorage().GetChild(id).GetChild("window").GetData<Window>();
 }
+
+[[nodiscard]]
 bool BeginWindow();
-void EndWindow();
+
+inline void EndWindow() {
+  GetWindow()->EndWindow();
+}
+
+[[nodiscard]]
+inline bool BeginWindowSettingsPopup() {
+  return GetWindow()->BeginWindowSettingsPopup();
+}
+
+inline void EndWindowSettingsPopup() {
+  return GetWindow()->EndWindowSettingsPopup();
+}
+
 }  // namespace imm
 
 }  // namespace glass
