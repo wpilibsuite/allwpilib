@@ -160,11 +160,12 @@ CommandPtr Defer(wpi::unique_function<CommandPtr()> supplier,
  * called when the command is initialized.
  *
  * @param supplier the command supplier
+ * @deprecated The ProxyCommand supplier constructor has been deprecated in favor of directly
+ *     proxying a {@link DeferredCommand}, see ProxyCommand documentaion for more details.
  */
 WPI_IGNORE_DEPRECATED
-[[nodiscard]] [[deprecated(
-    "The ProxyCommand supplier constructor has been deprecated im favor of "
-    "proxying a DeferredCommand, see ProxyCommand for more details.")]]
+[[nodiscard]] 
+[[deprecated("The ProxyCommand supplier constructor has been deprecated.")]]
 CommandPtr DeferredProxy(wpi::unique_function<Command*()> supplier);
 
 /**
@@ -173,10 +174,11 @@ CommandPtr DeferredProxy(wpi::unique_function<Command*()> supplier);
  * called when the command is initialized.
  *
  * @param supplier the command supplier
+ * @deprecated The ProxyCommand supplier constructor has been deprecated in favor of directly
+ *     proxying a {@link DeferredCommand}, see ProxyCommand documentaion for more details.
  */
-[[nodiscard]] [[deprecated(
-    "The ProxyCommand supplier constructor has been deprecated im favor of "
-    "proxying a DeferredCommand, see ProxyCommand for more details.")]]
+[[nodiscard]]
+[[deprecated("The ProxyCommand supplier constructor has been deprecated")]]
 CommandPtr DeferredProxy(wpi::unique_function<CommandPtr()> supplier);
 WPI_UNIGNORE_DEPRECATED
 // Command Groups

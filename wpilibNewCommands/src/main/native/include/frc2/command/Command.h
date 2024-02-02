@@ -256,6 +256,8 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
    * href="https://docs.wpilib.org/en/stable/docs/software/commandbased/command-compositions.html#scheduling-other-commands">the
    * WPILib docs</a> for a full explanation.
    *
+   * <p>This overload transfers command ownership to the returned CommandPtr.
+   *
    * @return the decorated command
    */
   [[nodiscard]]
