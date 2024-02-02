@@ -12,9 +12,11 @@
 #include <fmt/format.h>
 #include <wpi/print.h>
 #include <wpigui.h>
+#include <wpi/DenseMap.h>
 
 #include "glass/Context.h"
 #include "glass/Storage.h"
+#include "imgui.h"
 
 using namespace glass;
 
