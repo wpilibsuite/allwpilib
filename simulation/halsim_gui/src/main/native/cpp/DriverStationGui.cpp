@@ -227,36 +227,24 @@ class FMSSimModel : public glass::FMSModel {
   glass::DataSource* GetAutonomousData() override { return &m_autonomous; }
   std::string_view GetGameSpecificMessage(
       wpi::SmallVectorImpl<char>& buf) override {
-    HAL_MatchInfo info;
-    HALSIM_GetMatchInfo(&info);
-    buf.clear();
-    buf.append(info.gameSpecificMessage,
-               info.gameSpecificMessage + info.gameSpecificMessageSize);
-    return std::string_view(buf.begin(), buf.size());
+    return m_gameMessage;
   }
 
-  void SetFmsAttached(bool val) override {
-    HALSIM_SetDriverStationFmsAttached(val);
-  }
-  void SetDsAttached(bool val) override {
-    HALSIM_SetDriverStationDsAttached(val);
-  }
+  void SetFmsAttached(bool val) override { m_fmsAttached.SetValue(val); }
+  void SetDsAttached(bool val) override { m_dsAttached.SetValue(val); }
   void SetAllianceStationId(int val) override {
-    HALSIM_SetDriverStationAllianceStationId(
-        static_cast<HAL_AllianceStationID>(val));
+    m_allianceStationId.SetValue(val);
   }
-  void SetMatchTime(double val) override {
-    HALSIM_SetDriverStationMatchTime(val);
-  }
-  void SetEStop(bool val) override { HALSIM_SetDriverStationEStop(val); }
-  void SetEnabled(bool val) override { HALSIM_SetDriverStationEnabled(val); }
-  void SetTest(bool val) override { HALSIM_SetDriverStationTest(val); }
-  void SetAutonomous(bool val) override {
-    HALSIM_SetDriverStationAutonomous(val);
-  }
+  void SetMatchTime(double val) override { m_matchTime.SetValue(val); }
+  void SetEStop(bool val) override { m_estop.SetValue(val); }
+  void SetEnabled(bool val) override { m_enabled.SetValue(val); }
+  void SetTest(bool val) override { m_test.SetValue(val); }
+  void SetAutonomous(bool val) override { m_autonomous.SetValue(val); }
   void SetGameSpecificMessage(std::string_view val) override {
-    HALSIM_SetGameSpecificMessage(val.data(), val.size());
+    m_gameMessage = val;
   }
+
+  void UpdateHAL();
 
   void Update() override;
 
@@ -274,6 +262,7 @@ class FMSSimModel : public glass::FMSModel {
   glass::DataSource m_test{"FMS:TestMode"};
   glass::DataSource m_autonomous{"FMS:AutonomousMode"};
   double m_startMatchTime = -1.0;
+  std::string m_gameMessage;
 };
 
 }  // namespace
@@ -1019,6 +1008,21 @@ void RobotJoystick::GetHAL(int i) {
   HALSIM_GetJoystickPOVs(i, &data.povs);
 }
 
+static void DriverStationConnect(bool enabled, bool autonomous, bool test) {
+  if (!HALSIM_GetDriverStationDsAttached()) {
+    // initialize FMS bits too
+    gFMSModel->SetDsAttached(true);
+    gFMSModel->SetEnabled(enabled);
+    gFMSModel->SetAutonomous(autonomous);
+    gFMSModel->SetTest(test);
+    gFMSModel->UpdateHAL();
+  } else {
+    HALSIM_SetDriverStationEnabled(enabled);
+    HALSIM_SetDriverStationAutonomous(autonomous);
+    HALSIM_SetDriverStationTest(test);
+  }
+}
+
 static void DriverStationExecute() {
   // update sources
   for (int i = 0; i < HAL_kMaxJoysticks; ++i) {
@@ -1072,6 +1076,7 @@ static void DriverStationExecute() {
     joy.Update();
   }
 
+  bool isAttached = HALSIM_GetDriverStationDsAttached();
   bool isEnabled = HALSIM_GetDriverStationEnabled();
   bool isAuto = HALSIM_GetDriverStationAutonomous();
   bool isTest = HALSIM_GetDriverStationTest();
@@ -1100,38 +1105,45 @@ static void DriverStationExecute() {
 
     ImGui::SetNextWindowPos(ImVec2{5, 20}, ImGuiCond_FirstUseEver);
     ImGui::Begin("Robot State", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
-    if (ImGui::Selectable("Disabled", !isEnabled) || disableHotkey) {
+    if (ImGui::Selectable("Disconnected", !isAttached)) {
       HALSIM_SetDriverStationEnabled(false);
+      HALSIM_SetDriverStationDsAttached(false);
+      isAttached = false;
+      gFMSModel->Update();
     }
-    if (ImGui::Selectable("Autonomous", isEnabled && isAuto && !isTest)) {
-      HALSIM_SetDriverStationAutonomous(true);
-      HALSIM_SetDriverStationTest(false);
-      HALSIM_SetDriverStationEnabled(true);
+    if (ImGui::Selectable("Disabled", isAttached && !isEnabled) ||
+        disableHotkey) {
+      DriverStationConnect(false, false, false);
     }
-    if (ImGui::Selectable("Teleoperated", isEnabled && !isAuto && !isTest) ||
+    if (ImGui::Selectable("Autonomous",
+                          isAttached && isEnabled && isAuto && !isTest)) {
+      DriverStationConnect(true, true, false);
+    }
+    if (ImGui::Selectable("Teleoperated",
+                          isAttached && isEnabled && !isAuto && !isTest) ||
         enableHotkey) {
-      HALSIM_SetDriverStationAutonomous(false);
-      HALSIM_SetDriverStationTest(false);
-      HALSIM_SetDriverStationEnabled(true);
+      DriverStationConnect(true, false, false);
     }
     if (ImGui::Selectable("Test", isEnabled && isTest)) {
-      HALSIM_SetDriverStationAutonomous(false);
-      HALSIM_SetDriverStationTest(true);
-      HALSIM_SetDriverStationEnabled(true);
+      DriverStationConnect(true, false, true);
     }
     ImGui::End();
   }
 
   // Update HAL
-  for (int i = 0, end = gRobotJoysticks.size();
-       i < end && i < HAL_kMaxJoysticks; ++i) {
-    gRobotJoysticks[i].SetHAL(i);
+  if (isAttached) {
+    for (int i = 0, end = gRobotJoysticks.size();
+         i < end && i < HAL_kMaxJoysticks; ++i) {
+      gRobotJoysticks[i].SetHAL(i);
+    }
   }
 
   // Send new data every 20 ms (may be slower depending on GUI refresh rate)
   static double lastNewDataTime = 0.0;
-  if ((curTime - lastNewDataTime) > 0.02 && !HALSIM_IsTimingPaused()) {
+  if ((curTime - lastNewDataTime) > 0.02 && !HALSIM_IsTimingPaused() &&
+      isAttached) {
     lastNewDataTime = curTime;
+    gFMSModel->Update();
     HALSIM_NotifyDriverStationNewData();
   }
 }
@@ -1144,6 +1156,20 @@ FMSSimModel::FMSSimModel() {
   m_test.SetDigital(true);
   m_autonomous.SetDigital(true);
   m_matchTime.SetValue(-1.0);
+  m_allianceStationId.SetValue(HAL_AllianceStationID_kRed1);
+}
+
+void FMSSimModel::UpdateHAL() {
+  HALSIM_SetDriverStationFmsAttached(m_fmsAttached.GetValue());
+  HALSIM_SetDriverStationAllianceStationId(
+      static_cast<HAL_AllianceStationID>(m_allianceStationId.GetValue()));
+  HALSIM_SetDriverStationEStop(m_estop.GetValue());
+  HALSIM_SetDriverStationEnabled(m_enabled.GetValue());
+  HALSIM_SetDriverStationTest(m_test.GetValue());
+  HALSIM_SetDriverStationAutonomous(m_autonomous.GetValue());
+  HALSIM_SetDriverStationMatchTime(m_matchTime.GetValue());
+  HALSIM_SetGameSpecificMessage(m_gameMessage.data(), m_gameMessage.size());
+  HALSIM_SetDriverStationDsAttached(m_dsAttached.GetValue());
 }
 
 void FMSSimModel::Update() {
@@ -1176,6 +1202,11 @@ void FMSSimModel::Update() {
     m_startMatchTime = -1.0;
   }
   m_matchTime.SetValue(matchTime);
+
+  HAL_MatchInfo info;
+  HALSIM_GetMatchInfo(&info);
+  m_gameMessage.assign(info.gameSpecificMessage,
+                       info.gameSpecificMessage + info.gameSpecificMessageSize);
 }
 
 bool FMSSimModel::IsReadOnly() {
@@ -1387,7 +1418,6 @@ void DriverStationGui::GlobalInit() {
   gFMSModel = std::make_unique<FMSSimModel>();
 
   wpi::gui::AddEarlyExecute(DriverStationExecute);
-  wpi::gui::AddEarlyExecute([] { gFMSModel->Update(); });
 
   storageRoot.SetCustomApply([&storageRoot] {
     gpDisableDS = &storageRoot.GetBool("disable", false);
@@ -1433,8 +1463,13 @@ void DriverStationGui::GlobalInit() {
         win->SetDefaultSize(300, 560);
       }
     }
-    if (auto win =
-            dsManager->AddWindow("FMS", [] { DisplayFMS(gFMSModel.get()); })) {
+    if (auto win = dsManager->AddWindow("FMS", [] {
+          if (HALSIM_GetDriverStationDsAttached()) {
+            DisplayFMSReadOnly(gFMSModel.get());
+          } else {
+            DisplayFMS(gFMSModel.get(), false);
+          }
+        })) {
       win->DisableRenamePopup();
       win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
       win->SetDefaultPos(5, 540);

@@ -18,8 +18,8 @@ import edu.wpi.first.wpilibj.Notifier;
  * <p>This class is provided by the NewCommands VendorDep
  */
 public class NotifierCommand extends Command {
-  protected final Notifier m_notifier;
-  protected final double m_period;
+  private final Notifier m_notifier;
+  private final double m_period;
 
   /**
    * Creates a new NotifierCommand.

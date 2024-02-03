@@ -4,6 +4,7 @@
 
 package edu.wpi.first.cameraserver;
 
+/** CameraServer shared functions. */
 public interface CameraServerShared {
   /**
    * get the main thread id func.

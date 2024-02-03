@@ -23,9 +23,9 @@ namespace frc::sim {
  * voltage). Call the Update() method to update the simulation. Set simulated
  * sensor readings with the simulated positions in the GetOutput() method.
  *
- * @tparam States  The number of states of the system.
- * @tparam Inputs  The number of inputs to the system.
- * @tparam Outputs The number of outputs of the system.
+ * @tparam States  Number of states of the system.
+ * @tparam Inputs  Number of inputs to the system.
+ * @tparam Outputs Number of outputs of the system.
  */
 template <int States, int Inputs, int Outputs>
 class LinearSystemSim {
@@ -140,11 +140,20 @@ class LinearSystemSim {
         u, frc::RobotController::GetInputVoltage());
   }
 
+  /// The plant that represents the linear system.
   LinearSystem<States, Inputs, Outputs> m_plant;
 
+  /// State vector.
   Vectord<States> m_x;
-  Vectord<Outputs> m_y;
+
+  /// Input vector.
   Vectord<Inputs> m_u;
+
+  /// Output vector.
+  Vectord<Outputs> m_y;
+
+  /// The standard deviations of measurements, used for adding noise to the
+  /// measurements.
   std::array<double, Outputs> m_measurementStdDevs;
 };
 }  // namespace frc::sim

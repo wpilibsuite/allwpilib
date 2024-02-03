@@ -26,15 +26,46 @@ namespace frc {
 class ADXL345_I2C : public nt::NTSendable,
                     public wpi::SendableHelper<ADXL345_I2C> {
  public:
-  enum Range { kRange_2G = 0, kRange_4G = 1, kRange_8G = 2, kRange_16G = 3 };
-
-  enum Axes { kAxis_X = 0x00, kAxis_Y = 0x02, kAxis_Z = 0x04 };
-
-  struct AllAxes {
-    double XAxis;
-    double YAxis;
-    double ZAxis;
+  /**
+   * Accelerometer range.
+   */
+  enum Range {
+    /// 2 Gs max.
+    kRange_2G = 0,
+    /// 4 Gs max.
+    kRange_4G = 1,
+    /// 8 Gs max.
+    kRange_8G = 2,
+    /// 16 Gs max.
+    kRange_16G = 3
   };
+
+  /**
+   * Accelerometer axes.
+   */
+  enum Axes {
+    /// X axis.
+    kAxis_X = 0x00,
+    /// Y axis.
+    kAxis_Y = 0x02,
+    /// Z axis.
+    kAxis_Z = 0x04
+  };
+
+  /**
+   * Container type for accelerations from all axes.
+   */
+  struct AllAxes {
+    /// Acceleration along the X axis in g-forces.
+    double XAxis = 0.0;
+    /// Acceleration along the Y axis in g-forces.
+    double YAxis = 0.0;
+    /// Acceleration along the Z axis in g-forces.
+    double ZAxis = 0.0;
+  };
+
+  /// Default I2C device address.
+  static constexpr int kAddress = 0x1D;
 
   /**
    * Constructs the ADXL345 Accelerometer over I2C.
@@ -100,7 +131,7 @@ class ADXL345_I2C : public nt::NTSendable,
 
   void InitSendable(nt::NTSendableBuilder& builder) override;
 
- protected:
+ private:
   I2C m_i2c;
 
   hal::SimDevice m_simDevice;
@@ -109,7 +140,6 @@ class ADXL345_I2C : public nt::NTSendable,
   hal::SimDouble m_simY;
   hal::SimDouble m_simZ;
 
-  static constexpr int kAddress = 0x1D;
   static constexpr int kPowerCtlRegister = 0x2D;
   static constexpr int kDataFormatRegister = 0x31;
   static constexpr int kDataRegister = 0x32;

@@ -23,11 +23,16 @@ public class SynchronousInterrupt implements AutoCloseable {
 
   /** Event trigger combinations for a synchronous interrupt. */
   public enum WaitResult {
+    /** Timeout event. */
     kTimeout(0x0),
+    /** Rising edge event. */
     kRisingEdge(0x1),
+    /** Falling edge event. */
     kFallingEdge(0x100),
+    /** Both rising and falling edge events. */
     kBoth(0x101);
 
+    /** WaitResult value. */
     public final int value;
 
     WaitResult(int value) {

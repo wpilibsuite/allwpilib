@@ -7,23 +7,42 @@
 #include <functional>
 #include <vector>
 
+#include <wpi/deprecated.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
 #include "frc/motorcontrol/MotorController.h"
+
+WPI_IGNORE_DEPRECATED
 
 namespace frc {
 
 /**
  * Allows multiple MotorController objects to be linked together.
  */
-class MotorControllerGroup : public wpi::Sendable,
-                             public MotorController,
-                             public wpi::SendableHelper<MotorControllerGroup> {
+class [[deprecated(
+    "Use PWMMotorController::AddFollower() or if using CAN motor controllers,"
+    "use their method of following.")]] MotorControllerGroup
+    : public wpi::Sendable,
+      public MotorController,
+      public wpi::SendableHelper<MotorControllerGroup> {
  public:
+  /**
+   * Create a new MotorControllerGroup with the provided MotorControllers.
+   *
+   * @tparam MotorControllers The MotorController types.
+   * @param motorController The first MotorController to add
+   * @param motorControllers The MotorControllers to add
+   */
   template <class... MotorControllers>
   explicit MotorControllerGroup(MotorController& motorController,
                                 MotorControllers&... motorControllers);
+
+  /**
+   * Create a new MotorControllerGroup with the provided MotorControllers.
+   *
+   * @param motorControllers The MotorControllers to add.
+   */
   explicit MotorControllerGroup(
       std::vector<std::reference_wrapper<MotorController>>&& motorControllers);
 
@@ -50,3 +69,5 @@ class MotorControllerGroup : public wpi::Sendable,
 }  // namespace frc
 
 #include "frc/motorcontrol/MotorControllerGroup.inc"
+
+WPI_UNIGNORE_DEPRECATED

@@ -465,6 +465,24 @@ uint64_t NT_GetEntryLastChange(NT_Entry entry);
 void NT_GetEntryValue(NT_Entry entry, struct NT_Value* value);
 
 /**
+ * Get Entry Value.
+ *
+ * Returns copy of current entry value.
+ * Note that one of the type options is "unassigned".
+ *
+ * @param entry     entry handle
+ * @param types     bitmask of NT_Type values; 0 is treated specially
+ *                  as a "don't care"
+ * @param value     storage for returned entry value
+ *
+ * It is the caller's responsibility to free value once it's no longer
+ * needed (the utility function NT_DisposeValue() is useful for this
+ * purpose).
+ */
+void NT_GetEntryValueType(NT_Entry entry, unsigned int types,
+                          struct NT_Value* value);
+
+/**
  * Set Default Entry Value.
  *
  * Returns copy of current entry value if it exists.
@@ -517,6 +535,21 @@ unsigned int NT_GetEntryFlags(NT_Entry entry);
  * @return entry value array; returns NULL and count=0 if no new values
  */
 struct NT_Value* NT_ReadQueueValue(NT_Handle subentry, size_t* count);
+
+/**
+ * Read Entry Queue.
+ *
+ * Returns new entry values since last call. The returned array must be freed
+ * using NT_DisposeValueArray().
+ *
+ * @param subentry     subscriber or entry handle
+ * @param types        bitmask of NT_Type values; 0 is treated specially
+ *                     as a "don't care"
+ * @param count        count of items in returned array (output)
+ * @return entry value array; returns NULL and count=0 if no new values
+ */
+struct NT_Value* NT_ReadQueueValueType(NT_Handle subentry, unsigned int types,
+                                       size_t* count);
 
 /** @} */
 

@@ -73,7 +73,7 @@ int WebSocketWriteReqBase::Continue(Stream& stream, std::shared_ptr<Req> req) {
   }
 
   int sentBytes = stream.TryWrite(bufs);
-  WS_DEBUG("TryWrite({}) -> {} (expected {})\n", bufs.size(), sentBytes,
+  WS_DEBUG(stream, "TryWrite({}) -> {} (expected {})", bufs.size(), sentBytes,
            numBytes);
   if (sentBytes < 0) {
     return sentBytes;  // error
@@ -133,10 +133,10 @@ int WebSocketWriteReqBase::Continue(Stream& stream, std::shared_ptr<Req> req) {
   m_continueBufPos += bufIt - bufs.begin();
 
   if (writeBufs.empty()) {
-    WS_DEBUG("Write Done\n");
+    WS_DEBUG(stream, "Write Done");
     return 0;
   }
-  WS_DEBUG("Write({})\n", writeBufs.size());
+  WS_DEBUG(stream, "Write({})", writeBufs.size());
   stream.Write(writeBufs, req);
   return 1;
 }
@@ -146,7 +146,7 @@ std::span<const WebSocket::Frame> TrySendFrames(
     bool server, Stream& stream, std::span<const WebSocket::Frame> frames,
     MakeReq&& makeReq,
     std::function<void(std::span<uv::Buffer>, uv::Error)> callback) {
-  WS_DEBUG("TrySendFrames({})\n", frames.size());
+  WS_DEBUG(stream, "TrySendFrames({})", frames.size());
   auto frameIt = frames.begin();
   auto frameEnd = frames.end();
   while (frameIt != frameEnd) {
@@ -157,8 +157,8 @@ std::span<const WebSocket::Frame> TrySendFrames(
     SmallVector<int, 32> frameOffs;
     int numBytes = 0;
     while (frameIt != frameEnd) {
-      frameOffs.emplace_back(numBytes);
       numBytes += sendFrames.AddFrame(*frameIt++, server);
+      frameOffs.emplace_back(numBytes);
       if ((server && (numBytes >= 65536 || frameOffs.size() > 32)) ||
           (!server && numBytes >= 8192)) {
         // don't waste too much memory or effort on header generation or masking
@@ -168,8 +168,8 @@ std::span<const WebSocket::Frame> TrySendFrames(
 
     // try to send
     int sentBytes = stream.TryWrite(sendFrames.m_bufs);
-    WS_DEBUG("TryWrite({}) -> {} (expected {})\n", sendFrames.m_bufs.size(),
-             sentBytes, numBytes);
+    WS_DEBUG(stream, "TryWrite({}) -> {} (expected {})",
+             sendFrames.m_bufs.size(), sentBytes, numBytes);
 
     if (sentBytes == 0) {
       // we haven't started a frame yet; clean up any bufs that have actually
@@ -200,15 +200,15 @@ std::span<const WebSocket::Frame> TrySendFrames(
       // figure out what the last (partially) frame sent actually was
       auto offIt = frameOffs.begin();
       auto offEnd = frameOffs.end();
-      bool isFin = true;
       while (offIt != offEnd && *offIt < sentBytes) {
         ++offIt;
-        isFin = (frameStart->opcode & WebSocket::kFlagFin) != 0;
         ++frameStart;
       }
 
+      bool isFin = (frameStart->opcode & WebSocket::kFlagFin) != 0;
       if (offIt != offEnd && *offIt == sentBytes && isFin) {
         // we finished at a normal FIN frame boundary; no need for a Write()
+        ++frameStart;
         SmallVector<uv::Buffer, 4> bufs;
         for (auto it = frames.begin(); it != frameStart; ++it) {
           bufs.append(it->data.begin(), it->data.end());
@@ -239,12 +239,13 @@ std::span<const WebSocket::Frame> TrySendFrames(
       }
 
       // continue through the last buffer of the last partial frame
-      while (bufIt != bufEnd && offIt != offEnd && pos < *offIt) {
-        pos += bufIt->len;
-        writeBufs.emplace_back(*bufIt++);
-      }
       if (offIt != offEnd) {
+        while (bufIt != bufEnd && pos < *offIt) {
+          pos += bufIt->len;
+          writeBufs.emplace_back(*bufIt++);
+        }
         ++offIt;
+        ++frameStart;
       }
 
       // move allocated buffers into request
@@ -258,7 +259,7 @@ std::span<const WebSocket::Frame> TrySendFrames(
       while (frameStart != frameEnd && !isFin) {
         if (offIt != offEnd) {
           // we already generated the wire buffers for this frame, use them
-          while (pos < *offIt && bufIt != bufEnd) {
+          while (bufIt != bufEnd && pos < *offIt) {
             pos += bufIt->len;
             continuePos += bufIt->len;
             req->m_frames.m_bufs.emplace_back(*bufIt++);
@@ -280,7 +281,7 @@ std::span<const WebSocket::Frame> TrySendFrames(
         req->m_userBufs.append(it->data.begin(), it->data.end());
       }
 
-      WS_DEBUG("Write({})\n", writeBufs.size());
+      WS_DEBUG(stream, "Write({})", writeBufs.size());
       stream.Write(writeBufs, req);
 #ifdef __clang__
       // work around clang bug

@@ -9,11 +9,16 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.MotorSafety;
 import edu.wpi.first.wpilibj.PWM;
+import java.util.ArrayList;
 
 /** Common base class for all PWM Motor Controllers. */
+@SuppressWarnings("removal")
 public abstract class PWMMotorController extends MotorSafety
     implements MotorController, Sendable, AutoCloseable {
   private boolean m_isInverted;
+  private final ArrayList<PWMMotorController> m_followers = new ArrayList<>();
+
+  /** PWM instances for motor controller. */
   protected PWM m_pwm;
 
   /**
@@ -46,7 +51,15 @@ public abstract class PWMMotorController extends MotorSafety
    */
   @Override
   public void set(double speed) {
-    m_pwm.setSpeed(m_isInverted ? -speed : speed);
+    if (m_isInverted) {
+      speed = -speed;
+    }
+    m_pwm.setSpeed(speed);
+
+    for (var follower : m_followers) {
+      follower.set(speed);
+    }
+
     feed();
   }
 
@@ -115,6 +128,15 @@ public abstract class PWMMotorController extends MotorSafety
    */
   public void enableDeadbandElimination(boolean eliminateDeadband) {
     m_pwm.enableDeadbandElimination(eliminateDeadband);
+  }
+
+  /**
+   * Make the given PWM motor controller follow the output of this one.
+   *
+   * @param follower The motor controller follower.
+   */
+  public void addFollower(PWMMotorController follower) {
+    m_followers.add(follower);
   }
 
   @Override

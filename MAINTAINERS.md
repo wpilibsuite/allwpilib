@@ -1,5 +1,5 @@
 ## Publishing Third Party Dependencies
-Currently the 3rd party deps are imgui, opencv, and google test
+Currently the 3rd party deps are imgui, opencv, google test, libssh, and apriltaglib
 
 For publishing these dependencies, the version needs to be manually updated in the publish.gradle file of their respective repository.
 Then, in the azure build for the dependency you want to build for, manually start a pipeline build (As of current, this is the `Run Pipeline` button).
@@ -24,4 +24,4 @@ Upon pushing a tag, a release will be built, and the files will be uploaded to t
 Before publishing, make sure to update the version in build.gradle. Publishing must happen locally, using the command `./gradlew publishPlugin`. This does require your API key for publishing to be set.
 
 ## Building the installer
-Update the GradleRIO version in gradle.properties, and in the scripts folder in vscode, update the vscode extension. Then push, it will build the installer on azure.
+Update the GradleRIO version in gradle.properties, and in the scripts folder in vscode, update the vscode extension. To publish a release build, upload a new tag, and a release will automatically be built and published to artifactory and cloudflare.

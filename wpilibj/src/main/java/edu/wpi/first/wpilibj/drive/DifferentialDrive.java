@@ -14,49 +14,16 @@ import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
+import java.util.function.DoubleConsumer;
 
 /**
  * A class for driving differential drive/skid-steer drive platforms such as the Kit of Parts drive
  * base, "tank drive", or West Coast Drive.
  *
  * <p>These drive bases typically have drop-center / skid-steer with two or more wheels per side
- * (e.g., 6WD or 8WD). This class takes a MotorController per side. For four and six motor
- * drivetrains, construct and pass in {@link
- * edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup} instances as follows.
- *
- * <p>Four motor drivetrain:
- *
- * <pre><code>
- * public class Robot {
- *   MotorController m_frontLeft = new PWMVictorSPX(1);
- *   MotorController m_rearLeft = new PWMVictorSPX(2);
- *   MotorControllerGroup m_left = new MotorControllerGroup(m_frontLeft, m_rearLeft);
- *
- *   MotorController m_frontRight = new PWMVictorSPX(3);
- *   MotorController m_rearRight = new PWMVictorSPX(4);
- *   MotorControllerGroup m_right = new MotorControllerGroup(m_frontRight, m_rearRight);
- *
- *   DifferentialDrive m_drive = new DifferentialDrive(m_left, m_right);
- * }
- * </code></pre>
- *
- * <p>Six motor drivetrain:
- *
- * <pre><code>
- * public class Robot {
- *   MotorController m_frontLeft = new PWMVictorSPX(1);
- *   MotorController m_midLeft = new PWMVictorSPX(2);
- *   MotorController m_rearLeft = new PWMVictorSPX(3);
- *   MotorControllerGroup m_left = new MotorControllerGroup(m_frontLeft, m_midLeft, m_rearLeft);
- *
- *   MotorController m_frontRight = new PWMVictorSPX(4);
- *   MotorController m_midRight = new PWMVictorSPX(5);
- *   MotorController m_rearRight = new PWMVictorSPX(6);
- *   MotorControllerGroup m_right = new MotorControllerGroup(m_frontRight, m_midRight, m_rearRight);
- *
- *   DifferentialDrive m_drive = new DifferentialDrive(m_left, m_right);
- * }
- * </code></pre>
+ * (e.g., 6WD or 8WD). This class takes a setter per side. For four and six motor drivetrains, use
+ * CAN motor controller followers or {@link
+ * edu.wpi.first.wpilibj.motorcontrol.PWMMotorController#addFollower(PWMMotorController)}.
  *
  * <p>A differential drive robot has left and right wheels separated by an arbitrary width.
  *
@@ -88,8 +55,12 @@ import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoCloseable {
   private static int instances;
 
-  private final MotorController m_leftMotor;
-  private final MotorController m_rightMotor;
+  private final DoubleConsumer m_leftMotor;
+  private final DoubleConsumer m_rightMotor;
+
+  // Used for Sendable property getters
+  private double m_leftOutput;
+  private double m_rightOutput;
 
   private boolean m_reported;
 
@@ -100,7 +71,10 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    */
   @SuppressWarnings("MemberName")
   public static class WheelSpeeds {
+    /** Left wheel speed. */
     public double left;
+
+    /** Right wheel speed. */
     public double right;
 
     /** Constructs a WheelSpeeds with zeroes for left and right speeds. */
@@ -121,22 +95,37 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
   /**
    * Construct a DifferentialDrive.
    *
-   * <p>To pass multiple motors per side, use a {@link
-   * edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup}. If a motor needs to be inverted, do
-   * so before passing it in.
+   * <p>To pass multiple motors per side, use CAN motor controller followers or {@link
+   * edu.wpi.first.wpilibj.motorcontrol.PWMMotorController#addFollower(PWMMotorController)}. If a
+   * motor needs to be inverted, do so before passing it in.
    *
    * @param leftMotor Left motor.
    * @param rightMotor Right motor.
    */
-  @SuppressWarnings("this-escape")
+  @SuppressWarnings({"removal", "this-escape"})
   public DifferentialDrive(MotorController leftMotor, MotorController rightMotor) {
+    this((double output) -> leftMotor.set(output), (double output) -> rightMotor.set(output));
+    SendableRegistry.addChild(this, leftMotor);
+    SendableRegistry.addChild(this, rightMotor);
+  }
+
+  /**
+   * Construct a DifferentialDrive.
+   *
+   * <p>To pass multiple motors per side, use CAN motor controller followers or {@link
+   * edu.wpi.first.wpilibj.motorcontrol.PWMMotorController#addFollower(PWMMotorController)}. If a
+   * motor needs to be inverted, do so before passing it in.
+   *
+   * @param leftMotor Left motor setter.
+   * @param rightMotor Right motor setter.
+   */
+  @SuppressWarnings("this-escape")
+  public DifferentialDrive(DoubleConsumer leftMotor, DoubleConsumer rightMotor) {
     requireNonNullParam(leftMotor, "leftMotor", "DifferentialDrive");
     requireNonNullParam(rightMotor, "rightMotor", "DifferentialDrive");
 
     m_leftMotor = leftMotor;
     m_rightMotor = rightMotor;
-    SendableRegistry.addChild(this, m_leftMotor);
-    SendableRegistry.addChild(this, m_rightMotor);
     instances++;
     SendableRegistry.addLW(this, "DifferentialDrive", instances);
   }
@@ -178,8 +167,11 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
 
     var speeds = arcadeDriveIK(xSpeed, zRotation, squareInputs);
 
-    m_leftMotor.set(speeds.left * m_maxOutput);
-    m_rightMotor.set(speeds.right * m_maxOutput);
+    m_leftOutput = speeds.left * m_maxOutput;
+    m_rightOutput = speeds.right * m_maxOutput;
+
+    m_leftMotor.accept(m_leftOutput);
+    m_rightMotor.accept(m_rightOutput);
 
     feed();
   }
@@ -207,8 +199,11 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
 
     var speeds = curvatureDriveIK(xSpeed, zRotation, allowTurnInPlace);
 
-    m_leftMotor.set(speeds.left * m_maxOutput);
-    m_rightMotor.set(speeds.right * m_maxOutput);
+    m_leftOutput = speeds.left * m_maxOutput;
+    m_rightOutput = speeds.right * m_maxOutput;
+
+    m_leftMotor.accept(m_leftOutput);
+    m_rightMotor.accept(m_rightOutput);
 
     feed();
   }
@@ -245,8 +240,11 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
 
     var speeds = tankDriveIK(leftSpeed, rightSpeed, squareInputs);
 
-    m_leftMotor.set(speeds.left * m_maxOutput);
-    m_rightMotor.set(speeds.right * m_maxOutput);
+    m_leftOutput = speeds.left * m_maxOutput;
+    m_rightOutput = speeds.right * m_maxOutput;
+
+    m_leftMotor.accept(m_leftOutput);
+    m_rightMotor.accept(m_rightOutput);
 
     feed();
   }
@@ -351,8 +349,12 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
 
   @Override
   public void stopMotor() {
-    m_leftMotor.stopMotor();
-    m_rightMotor.stopMotor();
+    m_leftOutput = 0.0;
+    m_rightOutput = 0.0;
+
+    m_leftMotor.accept(0.0);
+    m_rightMotor.accept(0.0);
+
     feed();
   }
 
@@ -366,7 +368,7 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
     builder.setSmartDashboardType("DifferentialDrive");
     builder.setActuator(true);
     builder.setSafeState(this::stopMotor);
-    builder.addDoubleProperty("Left Motor Speed", m_leftMotor::get, m_leftMotor::set);
-    builder.addDoubleProperty("Right Motor Speed", m_rightMotor::get, m_rightMotor::set);
+    builder.addDoubleProperty("Left Motor Speed", () -> m_leftOutput, m_leftMotor);
+    builder.addDoubleProperty("Right Motor Speed", () -> m_rightOutput, m_rightMotor);
   }
 }

@@ -6,17 +6,29 @@ package edu.wpi.first.networktables;
 
 /** Network table data types. */
 public enum NetworkTableType {
+  /** Unassigned data type. */
   kUnassigned(0, ""),
+  /** Boolean data type. */
   kBoolean(0x01, "boolean"),
+  /** Double precision floating-point data type. */
   kDouble(0x02, "double"),
+  /** String data type. */
   kString(0x04, "string"),
+  /** Raw data type. */
   kRaw(0x08, "raw"),
+  /** Boolean array data type. */
   kBooleanArray(0x10, "boolean[]"),
+  /** Double precision floating-point array data type. */
   kDoubleArray(0x20, "double[]"),
+  /** String array data type. */
   kStringArray(0x40, "string[]"),
+  /** Integer data type. */
   kInteger(0x100, "int"),
+  /** Single precision floating-point data type. */
   kFloat(0x200, "float"),
+  /** Integer array data type. */
   kIntegerArray(0x400, "int[]"),
+  /** Single precision floating-point array data type. */
   kFloatArray(0x800, "float[]");
 
   private final int m_value;
@@ -27,10 +39,20 @@ public enum NetworkTableType {
     m_valueStr = valueStr;
   }
 
+  /**
+   * Returns the NetworkTable type value.
+   *
+   * @return The NetworkTable type value.
+   */
   public int getValue() {
     return m_value;
   }
 
+  /**
+   * Returns the NetworkTable type value as as string.
+   *
+   * @return The NetworkTable type value as a string.
+   */
   public String getValueStr() {
     return m_valueStr;
   }

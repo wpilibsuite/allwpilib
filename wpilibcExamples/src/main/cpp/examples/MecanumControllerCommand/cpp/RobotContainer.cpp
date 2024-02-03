@@ -111,8 +111,8 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
   // command, then stop at the end.
   return frc2::cmd::Sequence(
       frc2::InstantCommand(
-          [this, &exampleTrajectory]() {
-            m_drive.ResetOdometry(exampleTrajectory.InitialPose());
+          [this, initialPose = exampleTrajectory.InitialPose()]() {
+            m_drive.ResetOdometry(initialPose);
           },
           {})
           .ToPtr(),

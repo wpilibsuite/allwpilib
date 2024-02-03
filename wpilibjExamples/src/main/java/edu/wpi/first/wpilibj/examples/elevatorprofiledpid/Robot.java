@@ -10,7 +10,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 
 @SuppressWarnings("PMD.RedundantFieldInitializer")
@@ -27,7 +26,7 @@ public class Robot extends TimedRobot {
 
   private final Joystick m_joystick = new Joystick(1);
   private final Encoder m_encoder = new Encoder(1, 2);
-  private final MotorController m_motor = new PWMSparkMax(1);
+  private final PWMSparkMax m_motor = new PWMSparkMax(1);
 
   // Create a PID controller whose setpoint's change is subject to maximum
   // velocity and acceleration constraints.

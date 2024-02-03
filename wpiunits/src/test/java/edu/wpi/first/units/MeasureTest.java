@@ -173,7 +173,7 @@ class MeasureTest {
     var measure = Units.Volts.of(343);
     assertEquals("343.0 Volt", measure.toLongString());
     assertEquals("343.0001 Volt", Units.Volts.of(343.0001).toLongString());
-    assertEquals("1.2345678912345679E8 Volt", Units.Volts.of(123456789.123456789).toLongString());
+    assertEquals("1.2345678912345678E8 Volt", Units.Volts.of(123456789.12345678).toLongString());
   }
 
   @Test
@@ -319,5 +319,29 @@ class MeasureTest {
     assertFalse(measureA.isNear(measureB, 0.739370));
     assertTrue(measureA.isNear(measureB, 0.739375));
     assertTrue(measureA.isNear(measureB, 100)); // some stupidly large range +/- 10000%
+
+    var measureC = unit.of(-1.21);
+    var measureD = unit.ofBaseUnits(-64);
+
+    assertTrue(measureC.isNear(measureC, 0));
+    assertTrue(measureD.isNear(measureD, 0));
+
+    assertFalse(measureC.isNear(measureD, 0));
+    assertFalse(measureC.isNear(measureD, 0.50));
+    assertFalse(measureC.isNear(measureD, 0.739370));
+    assertTrue(measureC.isNear(measureD, 0.739375));
+    assertTrue(measureC.isNear(measureD, 100)); // some stupidly large range +/- 10000%
+
+    var measureE = Units.Meters.of(1);
+    var measureF = Units.Feet.of(-3.28084);
+
+    assertTrue(measureE.isNear(measureF, 2.01));
+    assertFalse(measureE.isNear(measureF, 1.99));
+
+    assertTrue(measureF.isNear(measureE, 2.01));
+    assertFalse(measureF.isNear(measureE, 1.99));
+
+    assertTrue(Units.Feet.zero().isNear(Units.Millimeters.zero(), 0.001));
+    assertFalse(Units.Feet.of(2).isNear(Units.Millimeters.of(0), 0.001));
   }
 }

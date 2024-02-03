@@ -28,7 +28,7 @@ void DriverStationData::ResetData() {
   test.Reset(false);
   eStop.Reset(false);
   fmsAttached.Reset(false);
-  dsAttached.Reset(true);
+  dsAttached.Reset(false);
   allianceStationId.Reset(static_cast<HAL_AllianceStationID>(0));
   matchTime.Reset(-1.0);
 

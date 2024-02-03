@@ -41,7 +41,9 @@ import org.ejml.simple.SimpleMatrix;
  */
 public class SwerveDriveKinematics
     implements Kinematics<SwerveDriveKinematics.SwerveDriveWheelStates, SwerveDriveWheelPositions> {
+  /** Wrapper class for swerve module states. */
   public static class SwerveDriveWheelStates {
+    /** Swerve module states. */
     public SwerveModuleState[] states;
 
     /**

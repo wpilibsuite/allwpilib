@@ -6,8 +6,12 @@ package edu.wpi.first.hal.simulation;
 
 import edu.wpi.first.hal.JNIWrapper;
 
+/** JNI for notifier data. */
 public class NotifierDataJNI extends JNIWrapper {
   public static native long getNextTimeout();
 
   public static native int getNumNotifiers();
+
+  /** Utility class. */
+  private NotifierDataJNI() {}
 }

@@ -34,21 +34,36 @@ public class PS4Controller extends GenericHID {
 
   /** Represents a digital button on a PS4Controller. */
   public enum Button {
+    /** Square button. */
     kSquare(1),
+    /** X button. */
     kCross(2),
+    /** Circle button. */
     kCircle(3),
+    /** Triangle button. */
     kTriangle(4),
+    /** Left Trigger 1 button. */
     kL1(5),
+    /** Right Trigger 1 button. */
     kR1(6),
+    /** Left Trigger 2 button. */
     kL2(7),
+    /** Right Trigger 2 button. */
     kR2(8),
+    /** Share button. */
     kShare(9),
+    /** Option button. */
     kOptions(10),
+    /** Left stick button. */
     kL3(11),
+    /** Right stick button. */
     kR3(12),
+    /** PlayStation button. */
     kPS(13),
+    /** Touchpad click button. */
     kTouchpad(14);
 
+    /** Button value. */
     public final int value;
 
     Button(int index) {
@@ -75,13 +90,20 @@ public class PS4Controller extends GenericHID {
 
   /** Represents an axis on a PS4Controller. */
   public enum Axis {
+    /** Left X axis. */
     kLeftX(0),
+    /** Left Y axis. */
     kLeftY(1),
+    /** Right X axis. */
     kRightX(2),
+    /** Right Y axis. */
     kRightY(5),
+    /** Left Trigger 2. */
     kL2(3),
+    /** Right Trigger 2. */
     kR2(4);
 
+    /** Axis value. */
     public final int value;
 
     Axis(int index) {

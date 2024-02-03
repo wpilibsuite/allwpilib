@@ -114,7 +114,9 @@ class Drivetrain : public frc2::SubsystemBase {
   frc::Encoder m_leftEncoder{4, 5};
   frc::Encoder m_rightEncoder{6, 7};
 
-  frc::DifferentialDrive m_drive{m_leftMotor, m_rightMotor};
+  frc::DifferentialDrive m_drive{
+      [&](double output) { m_leftMotor.Set(output); },
+      [&](double output) { m_rightMotor.Set(output); }};
 
   frc::RomiGyro m_gyro;
   frc::BuiltInAccelerometer m_accelerometer;

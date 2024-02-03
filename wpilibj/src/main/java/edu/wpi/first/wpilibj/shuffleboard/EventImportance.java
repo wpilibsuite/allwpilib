@@ -38,6 +38,11 @@ public enum EventImportance {
     m_simpleName = simpleName;
   }
 
+  /**
+   * Returns name of the given enum.
+   *
+   * @return Name of the given enum.
+   */
   public String getSimpleName() {
     return m_simpleName;
   }

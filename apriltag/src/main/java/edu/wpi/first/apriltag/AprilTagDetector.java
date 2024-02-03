@@ -57,8 +57,21 @@ public class AprilTagDetector implements AutoCloseable {
      */
     public boolean debug;
 
+    /** Default constructor. */
     public Config() {}
 
+    /**
+     * Constructs a detector configuration.
+     *
+     * @param numThreads How many threads should be used for computation.
+     * @param quadDecimate Quad decimation.
+     * @param quadSigma What Gaussian blur should be applied to the segmented image (used for quad
+     *     detection).
+     * @param refineEdges When true, the edges of the each quad are adjusted to "snap to" strong
+     *     gradients nearby.
+     * @param decodeSharpening How much sharpening should be done to decoded images.
+     * @param debug Debug mode.
+     */
     Config(
         int numThreads,
         float quadDecimate,
@@ -139,8 +152,21 @@ public class AprilTagDetector implements AutoCloseable {
      */
     public boolean deglitch;
 
+    /** Default constructor. */
     public QuadThresholdParameters() {}
 
+    /**
+     * Constructs quad threshold parameters.
+     *
+     * @param minClusterPixels Threshold used to reject quads containing too few pixels.
+     * @param maxNumMaxima How many corner candidates to consider when segmenting a group of pixels
+     *     into a quad.
+     * @param criticalAngle Critical angle, in radians.
+     * @param maxLineFitMSE When fitting lines to the contours, the maximum mean squared error
+     *     allowed.
+     * @param minWhiteBlackDiff Minimum brightness offset.
+     * @param deglitch Whether the thresholded image be should be deglitched.
+     */
     QuadThresholdParameters(
         int minClusterPixels,
         int maxNumMaxima,
@@ -182,6 +208,7 @@ public class AprilTagDetector implements AutoCloseable {
     }
   }
 
+  /** Constructs an AprilTagDetector. */
   public AprilTagDetector() {
     m_native = AprilTagJNI.createDetector();
   }

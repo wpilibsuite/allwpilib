@@ -6,6 +6,7 @@ package edu.wpi.first.hal.simulation;
 
 import edu.wpi.first.hal.JNIWrapper;
 
+/** JNI for SPI data. */
 public class SPIDataJNI extends JNIWrapper {
   public static native int registerInitializedCallback(
       int index, NotifyCallback callback, boolean initialNotify);
@@ -30,4 +31,7 @@ public class SPIDataJNI extends JNIWrapper {
   public static native void cancelReadAutoReceiveBufferCallback(int index, int uid);
 
   public static native void resetData(int index);
+
+  /** Utility class. */
+  private SPIDataJNI() {}
 }

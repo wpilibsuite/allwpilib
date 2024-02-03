@@ -4,9 +4,13 @@
 
 #pragma once
 
+#include <wpi/deprecated.h>
+
 #include "frc/motorcontrol/MotorController.h"
 
 namespace frc {
+
+WPI_IGNORE_DEPRECATED
 
 class MockMotorController : public MotorController {
  public:
@@ -21,5 +25,7 @@ class MockMotorController : public MotorController {
   double m_speed = 0.0;
   bool m_isInverted = false;
 };
+
+WPI_UNIGNORE_DEPRECATED
 
 }  // namespace frc

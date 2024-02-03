@@ -32,18 +32,31 @@ class StructDescriptorDatabase;
  * Known data types for raw struct dynamic fields (see StructFieldDescriptor).
  */
 enum class StructFieldType {
+  /// bool.
   kBool,
+  /// char.
   kChar,
+  /// int8.
   kInt8,
+  /// int16.
   kInt16,
+  /// int32.
   kInt32,
+  /// int64.
   kInt64,
+  /// uint8.
   kUint8,
+  /// uint16.
   kUint16,
+  /// uint32.
   kUint32,
+  /// uint64.
   kUint64,
+  /// float.
   kFloat,
+  /// double.
   kDouble,
+  /// struct.
   kStruct
 };
 
@@ -459,13 +472,7 @@ class DynamicStruct {
    * @param field field descriptor
    * @return field value
    */
-  std::string_view GetStringField(const StructFieldDescriptor* field) const {
-    assert(field->m_type == StructFieldType::kChar);
-    assert(field->m_parent == m_desc);
-    assert(m_desc->IsValid());
-    return {reinterpret_cast<const char*>(&m_data[field->m_offset]),
-            field->m_arraySize};
-  }
+  std::string_view GetStringField(const StructFieldDescriptor* field) const;
 
   /**
    * Gets the value of a struct field.
@@ -597,8 +604,9 @@ class MutableDynamicStruct : public DynamicStruct {
    *
    * @param field field descriptor
    * @param value field value
+   * @return true if the full value fit in the struct, false if truncated
    */
-  void SetStringField(const StructFieldDescriptor* field,
+  bool SetStringField(const StructFieldDescriptor* field,
                       std::string_view value);
 
   /**

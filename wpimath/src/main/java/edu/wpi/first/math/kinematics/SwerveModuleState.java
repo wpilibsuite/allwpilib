@@ -18,17 +18,18 @@ import java.util.Objects;
 
 /** Represents the state of one swerve module. */
 public class SwerveModuleState
-    implements Comparable<SwerveModuleState>,
-        ProtobufSerializable<SwerveModuleState>,
-        StructSerializable<SwerveModuleState> {
+    implements Comparable<SwerveModuleState>, ProtobufSerializable, StructSerializable {
   /** Speed of the wheel of the module. */
   public double speedMetersPerSecond;
 
   /** Angle of the module. */
   public Rotation2d angle = Rotation2d.fromDegrees(0);
 
-  public static final SwerveModuleStateStruct struct = new SwerveModuleStateStruct();
+  /** SwerveModuleState protobuf for serialization. */
   public static final SwerveModuleStateProto proto = new SwerveModuleStateProto();
+
+  /** SwerveModuleState struct for serialization. */
+  public static final SwerveModuleStateStruct struct = new SwerveModuleStateStruct();
 
   /** Constructs a SwerveModuleState with zeros for speed and angle. */
   public SwerveModuleState() {}

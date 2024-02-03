@@ -6,6 +6,7 @@ package edu.wpi.first.wpilibj.simulation;
 
 import edu.wpi.first.hal.simulation.SimulatorJNI;
 
+/** Simulation hooks. */
 public final class SimHooks {
   private SimHooks() {}
 
@@ -18,14 +19,21 @@ public final class SimHooks {
     SimulatorJNI.setRuntimeType(type);
   }
 
+  /** Waits until the user program has started. */
   public static void waitForProgramStart() {
     SimulatorJNI.waitForProgramStart();
   }
 
+  /** Sets that the user program has started. */
   public static void setProgramStarted() {
     SimulatorJNI.setProgramStarted();
   }
 
+  /**
+   * Returns true if the user program has started.
+   *
+   * @return True if the user program has started.
+   */
   public static boolean getProgramStarted() {
     return SimulatorJNI.getProgramStarted();
   }

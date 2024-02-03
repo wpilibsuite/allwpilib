@@ -57,4 +57,7 @@ public class RelayJNI extends DIOJNI {
    * @see "HAL_GetRelay"
    */
   public static native boolean getRelay(int relayPortHandle);
+
+  /** Utility class. */
+  private RelayJNI() {}
 }

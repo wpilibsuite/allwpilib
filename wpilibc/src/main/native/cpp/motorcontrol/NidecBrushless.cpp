@@ -11,6 +11,8 @@
 
 using namespace frc;
 
+WPI_IGNORE_DEPRECATED
+
 NidecBrushless::NidecBrushless(int pwmChannel, int dioChannel)
     : m_dio(dioChannel), m_pwm(pwmChannel) {
   wpi::SendableRegistry::AddChild(this, &m_dio);
@@ -25,6 +27,8 @@ NidecBrushless::NidecBrushless(int pwmChannel, int dioChannel)
   HAL_Report(HALUsageReporting::kResourceType_NidecBrushless, pwmChannel + 1);
   wpi::SendableRegistry::AddLW(this, "Nidec Brushless", pwmChannel);
 }
+
+WPI_UNIGNORE_DEPRECATED
 
 void NidecBrushless::Set(double speed) {
   if (!m_disabled) {

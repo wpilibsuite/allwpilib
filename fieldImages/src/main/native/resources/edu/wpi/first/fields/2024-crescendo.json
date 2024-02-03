@@ -1,0 +1,19 @@
+{
+  "game": "Crescendo",
+  "field-image": "2024-field.png",
+  "field-corners": {
+    "top-left": [
+      150,
+      79
+    ],
+    "bottom-right": [
+      2961,
+      1476
+    ]
+  },
+  "field-size": [
+    54.27083,
+    26.9375
+  ],
+  "field-unit": "foot"
+}

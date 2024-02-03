@@ -14,6 +14,9 @@ import java.util.Stack;
 
 /** Database of raw struct dynamic descriptors. */
 public class StructDescriptorDatabase {
+  /** Default constructor. */
+  public StructDescriptorDatabase() {}
+
   /**
    * Adds a structure schema to the database. If the struct references other structs that have not
    * yet been added, it will not be valid until those structs are also added.

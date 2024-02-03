@@ -25,8 +25,10 @@ import java.util.function.BooleanSupplier;
  * <p>This class is provided by the NewCommands VendorDep
  */
 public abstract class Command implements Sendable {
+  /** Requirements set. */
   protected Set<Subsystem> m_requirements = new HashSet<>();
 
+  /** Default constructor. */
   @SuppressWarnings("this-escape")
   protected Command() {
     String name = getClass().getName();

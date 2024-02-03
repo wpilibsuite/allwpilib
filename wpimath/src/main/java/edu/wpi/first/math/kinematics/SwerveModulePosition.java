@@ -21,16 +21,19 @@ import java.util.Objects;
 public class SwerveModulePosition
     implements Comparable<SwerveModulePosition>,
         Interpolatable<SwerveModulePosition>,
-        ProtobufSerializable<SwerveModulePosition>,
-        StructSerializable<SwerveModulePosition> {
+        ProtobufSerializable,
+        StructSerializable {
   /** Distance measured by the wheel of the module. */
   public double distanceMeters;
 
   /** Angle of the module. */
   public Rotation2d angle = Rotation2d.fromDegrees(0);
 
-  public static final SwerveModulePositionStruct struct = new SwerveModulePositionStruct();
+  /** SwerveModulePosition protobuf for serialization. */
   public static final SwerveModulePositionProto proto = new SwerveModulePositionProto();
+
+  /** SwerveModulePosition struct for serialization. */
+  public static final SwerveModulePositionStruct struct = new SwerveModulePositionStruct();
 
   /** Constructs a SwerveModulePosition with zeros for distance and angle. */
   public SwerveModulePosition() {}

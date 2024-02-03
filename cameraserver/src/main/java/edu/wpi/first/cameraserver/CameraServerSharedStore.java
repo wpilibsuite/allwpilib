@@ -4,6 +4,7 @@
 
 package edu.wpi.first.cameraserver;
 
+/** Storage for CameraServerShared instance. */
 public final class CameraServerSharedStore {
   private static CameraServerShared cameraServerShared;
 

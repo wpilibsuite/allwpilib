@@ -282,4 +282,7 @@ public class PowerDistributionJNI extends JNIWrapper {
    * @see "HAL_GetPowerDistributionVersion"
    */
   public static native PowerDistributionVersion getVersion(int handle);
+
+  /** Utility class. */
+  private PowerDistributionJNI() {}
 }

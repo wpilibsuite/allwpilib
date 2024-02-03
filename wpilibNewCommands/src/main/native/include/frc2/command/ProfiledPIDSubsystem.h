@@ -91,7 +91,10 @@ class ProfiledPIDSubsystem : public SubsystemBase {
   frc::ProfiledPIDController<Distance>& GetController() { return m_controller; }
 
  protected:
+  /// Profiled PID controller.
   frc::ProfiledPIDController<Distance> m_controller;
+
+  /// Whether the profiled PID controller output is enabled.
   bool m_enabled{false};
 
   /**

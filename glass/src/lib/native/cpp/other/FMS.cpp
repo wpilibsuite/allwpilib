@@ -14,7 +14,7 @@ using namespace glass;
 static const char* stations[] = {"Invalid", "Red 1",  "Red 2", "Red 3",
                                  "Blue 1",  "Blue 2", "Blue 3"};
 
-void glass::DisplayFMS(FMSModel* model) {
+void glass::DisplayFMS(FMSModel* model, bool editableDsAttached) {
   if (!model->Exists() || model->IsReadOnly()) {
     return DisplayFMSReadOnly(model);
   }
@@ -31,10 +31,17 @@ void glass::DisplayFMS(FMSModel* model) {
   // DS Attached
   if (auto data = model->GetDsAttachedData()) {
     bool val = data->GetValue();
-    if (ImGui::Checkbox("DS Attached", &val)) {
-      model->SetDsAttached(val);
+    if (editableDsAttached) {
+      if (ImGui::Checkbox("DS Attached", &val)) {
+        model->SetDsAttached(val);
+      }
+      data->EmitDrag();
+    } else {
+      ImGui::Selectable("DS Attached: ");
+      data->EmitDrag();
+      ImGui::SameLine();
+      ImGui::TextUnformatted(val ? "Yes" : "No");
     }
-    data->EmitDrag();
   }
 
   // Alliance Station

@@ -29,7 +29,7 @@ class SimpleMotorFeedforwardTest {
     var r = VecBuilder.fill(2.0);
     var nextR = VecBuilder.fill(3.0);
 
-    assertEquals(37.524995834325161 + 0.5, simpleMotor.calculate(2.0, 3.0, dt), 0.002);
+    assertEquals(37.52499583432516 + 0.5, simpleMotor.calculate(2.0, 3.0, dt), 0.002);
     assertEquals(
         plantInversion.calculate(r, nextR).get(0, 0) + Ks,
         simpleMotor.calculate(2.0, 3.0, dt),

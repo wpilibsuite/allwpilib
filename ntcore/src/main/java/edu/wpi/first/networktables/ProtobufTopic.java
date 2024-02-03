@@ -153,6 +153,11 @@ public final class ProtobufTopic<T> extends Topic {
         false);
   }
 
+  /**
+   * Returns the protobuf.
+   *
+   * @return The protobuf.
+   */
   public Protobuf<T, ?> getProto() {
     return m_proto;
   }

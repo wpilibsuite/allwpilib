@@ -47,8 +47,10 @@ public final class SensorUtil {
   /** Number of PCM Modules. */
   public static final int kCTREPCMModules = PortsJNI.getNumCTREPCMModules();
 
+  /** Number of power distribution channels per PH. */
   public static final int kREVPHChannels = PortsJNI.getNumREVPHChannels();
 
+  /** Number of PH modules. */
   public static final int kREVPHModules = PortsJNI.getNumREVPHModules();
 
   /**

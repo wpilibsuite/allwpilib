@@ -14,11 +14,24 @@
 
 // These are copies of defines located in CANSessionMux.h prepended with HAL_
 
+/**
+ * Flag for sending a CAN message once.
+ */
 #define HAL_CAN_SEND_PERIOD_NO_REPEAT 0
+
+/**
+ * Flag for stopping periodic CAN message sends.
+ */
 #define HAL_CAN_SEND_PERIOD_STOP_REPEATING -1
 
-/* Flags in the upper bits of the messageID */
+/**
+ * Mask for "is frame remote" in message ID.
+ */
 #define HAL_CAN_IS_FRAME_REMOTE 0x80000000
+
+/**
+ * Mask for "is frame 11 bits" in message ID.
+ */
 #define HAL_CAN_IS_FRAME_11BIT 0x40000000
 
 #define HAL_ERR_CANSessionMux_InvalidBuffer -44086

@@ -4,6 +4,11 @@
 
 #include "Robot.h"
 
+Robot::Robot() {
+  wpi::SendableRegistry::AddChild(&m_robotDrive, &m_left);
+  wpi::SendableRegistry::AddChild(&m_robotDrive, &m_right);
+}
+
 void Robot::AutonomousInit() {
   // Set setpoint of the pid controller
   m_pidController.SetSetpoint(kHoldDistance.value());

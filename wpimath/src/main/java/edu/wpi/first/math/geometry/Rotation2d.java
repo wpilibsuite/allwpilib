@@ -31,9 +31,7 @@ import java.util.Objects;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Rotation2d
-    implements Interpolatable<Rotation2d>,
-        ProtobufSerializable<Rotation2d>,
-        StructSerializable<Rotation2d> {
+    implements Interpolatable<Rotation2d>, ProtobufSerializable, StructSerializable {
   private final double m_value;
   private final double m_cos;
   private final double m_sin;
@@ -277,6 +275,9 @@ public class Rotation2d
     return plus(endValue.minus(this).times(MathUtil.clamp(t, 0, 1)));
   }
 
-  public static final Rotation2dStruct struct = new Rotation2dStruct();
+  /** Rotation2d protobuf for serialization. */
   public static final Rotation2dProto proto = new Rotation2dProto();
+
+  /** Rotation2d struct for serialization. */
+  public static final Rotation2dStruct struct = new Rotation2dStruct();
 }

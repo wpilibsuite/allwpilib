@@ -27,9 +27,7 @@ import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Rotation3d
-    implements Interpolatable<Rotation3d>,
-        ProtobufSerializable<Rotation3d>,
-        StructSerializable<Rotation3d> {
+    implements Interpolatable<Rotation3d>, ProtobufSerializable, StructSerializable {
   private final Quaternion m_q;
 
   /** Constructs a Rotation3d with a default angle of 0 degrees. */
@@ -434,6 +432,9 @@ public class Rotation3d
     return plus(endValue.minus(this).times(MathUtil.clamp(t, 0, 1)));
   }
 
-  public static final Rotation3dStruct struct = new Rotation3dStruct();
+  /** Rotation3d protobuf for serialization. */
   public static final Rotation3dProto proto = new Rotation3dProto();
+
+  /** Rotation3d struct for serialization. */
+  public static final Rotation3dStruct struct = new Rotation3dStruct();
 }

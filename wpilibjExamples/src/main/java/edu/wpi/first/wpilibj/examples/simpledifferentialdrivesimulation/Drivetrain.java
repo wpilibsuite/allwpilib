@@ -18,7 +18,6 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj.simulation.AnalogGyroSim;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
@@ -40,11 +39,6 @@ public class Drivetrain {
   private final PWMSparkMax m_leftFollower = new PWMSparkMax(2);
   private final PWMSparkMax m_rightLeader = new PWMSparkMax(3);
   private final PWMSparkMax m_rightFollower = new PWMSparkMax(4);
-
-  private final MotorControllerGroup m_leftGroup =
-      new MotorControllerGroup(m_leftLeader, m_leftFollower);
-  private final MotorControllerGroup m_rightGroup =
-      new MotorControllerGroup(m_rightLeader, m_rightFollower);
 
   private final Encoder m_leftEncoder = new Encoder(0, 1);
   private final Encoder m_rightEncoder = new Encoder(2, 3);
@@ -77,10 +71,13 @@ public class Drivetrain {
 
   /** Subsystem constructor. */
   public Drivetrain() {
+    m_leftLeader.addFollower(m_leftFollower);
+    m_rightLeader.addFollower(m_rightFollower);
+
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
-    m_rightGroup.setInverted(true);
+    m_rightLeader.setInverted(true);
 
     // Set the distance per pulse for the drive encoders. We can simply use the
     // distance traveled for one rotation of the wheel divided by the encoder
@@ -91,7 +88,7 @@ public class Drivetrain {
     m_leftEncoder.reset();
     m_rightEncoder.reset();
 
-    m_rightGroup.setInverted(true);
+    m_rightLeader.setInverted(true);
     SmartDashboard.putData("Field", m_fieldSim);
   }
 
@@ -104,8 +101,8 @@ public class Drivetrain {
     double rightOutput =
         m_rightPIDController.calculate(m_rightEncoder.getRate(), speeds.rightMetersPerSecond);
 
-    m_leftGroup.setVoltage(leftOutput + leftFeedforward);
-    m_rightGroup.setVoltage(rightOutput + rightFeedforward);
+    m_leftLeader.setVoltage(leftOutput + leftFeedforward);
+    m_rightLeader.setVoltage(rightOutput + rightFeedforward);
   }
 
   /**
@@ -126,8 +123,6 @@ public class Drivetrain {
 
   /** Resets robot odometry. */
   public void resetOdometry(Pose2d pose) {
-    m_leftEncoder.reset();
-    m_rightEncoder.reset();
     m_drivetrainSimulator.setPose(pose);
     m_odometry.resetPosition(
         m_gyro.getRotation2d(), m_leftEncoder.getDistance(), m_rightEncoder.getDistance(), pose);
@@ -145,8 +140,8 @@ public class Drivetrain {
     // simulated encoder and gyro. We negate the right side so that positive
     // voltages make the right side move forward.
     m_drivetrainSimulator.setInputs(
-        m_leftGroup.get() * RobotController.getInputVoltage(),
-        m_rightGroup.get() * RobotController.getInputVoltage());
+        m_leftLeader.get() * RobotController.getInputVoltage(),
+        m_rightLeader.get() * RobotController.getInputVoltage());
     m_drivetrainSimulator.update(0.02);
 
     m_leftEncoderSim.setDistance(m_drivetrainSimulator.getLeftPositionMeters());

@@ -7,12 +7,6 @@
 using namespace sysid;
 
 AnalysisType sysid::analysis::FromName(std::string_view name) {
-  if (name == "Drivetrain") {
-    return sysid::analysis::kDrivetrain;
-  }
-  if (name == "Drivetrain (Angular)") {
-    return sysid::analysis::kDrivetrainAngular;
-  }
   if (name == "Elevator") {
     return sysid::analysis::kElevator;
   }

@@ -19,32 +19,54 @@ import java.util.Map;
  * the mapping of ports to hardware buttons depends on the code in the Driver Station.
  */
 public class GenericHID {
-  /** Represents a rumble output on the JoyStick. */
+  /** Represents a rumble output on the Joystick. */
   public enum RumbleType {
+    /** Left rumble motor. */
     kLeftRumble,
+    /** Right rumble motor. */
     kRightRumble,
+    /** Both left and right rumble motors. */
     kBothRumble
   }
 
+  /** USB HID interface type. */
   public enum HIDType {
+    /** Unknown. */
     kUnknown(-1),
+    /** XInputUnknown. */
     kXInputUnknown(0),
+    /** XInputGamepad. */
     kXInputGamepad(1),
+    /** XInputWheel. */
     kXInputWheel(2),
+    /** XInputArcadeStick. */
     kXInputArcadeStick(3),
+    /** XInputFlightStick. */
     kXInputFlightStick(4),
+    /** XInputDancePad. */
     kXInputDancePad(5),
+    /** XInputGuitar. */
     kXInputGuitar(6),
+    /** XInputGuitar2. */
     kXInputGuitar2(7),
+    /** XInputDrumKit. */
     kXInputDrumKit(8),
+    /** XInputGuitar3. */
     kXInputGuitar3(11),
+    /** XInputArcadePad. */
     kXInputArcadePad(19),
+    /** HIDJoystick. */
     kHIDJoystick(20),
+    /** HIDGamepad. */
     kHIDGamepad(21),
+    /** HIDDriving. */
     kHIDDriving(22),
+    /** HIDFlight. */
     kHIDFlight(23),
+    /** HID1stPerson. */
     kHID1stPerson(24);
 
+    /** HIDType value. */
     public final int value;
 
     @SuppressWarnings("PMD.UseConcurrentHashMap")
@@ -60,6 +82,12 @@ public class GenericHID {
       }
     }
 
+    /**
+     * Creates an HIDType with the given value.
+     *
+     * @param value HIDType's value.
+     * @return HIDType with the given value.
+     */
     public static HIDType of(int value) {
       return map.get(value);
     }

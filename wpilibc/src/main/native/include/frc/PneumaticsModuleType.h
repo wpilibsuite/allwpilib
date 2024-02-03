@@ -5,5 +5,13 @@
 #pragma once
 
 namespace frc {
-enum class PneumaticsModuleType { CTREPCM, REVPH };
+/**
+ * Pneumatics module type.
+ */
+enum class PneumaticsModuleType {
+  /// CTRE PCM.
+  CTREPCM,
+  /// REV PH.
+  REVPH
+};
 }  // namespace frc

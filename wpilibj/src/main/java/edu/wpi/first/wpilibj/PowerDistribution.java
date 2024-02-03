@@ -22,12 +22,17 @@ public class PowerDistribution implements Sendable, AutoCloseable {
   private final int m_handle;
   private final int m_module;
 
+  /** Default module number. */
   public static final int kDefaultModule = PowerDistributionJNI.DEFAULT_MODULE;
 
+  /** Power distribution module type. */
   public enum ModuleType {
+    /** CTRE (Cross The Road Electronics) CTRE Power Distribution Panel (PDP). */
     kCTRE(PowerDistributionJNI.CTRE_TYPE),
+    /** REV Power Distribution Hub (PDH). */
     kRev(PowerDistributionJNI.REV_TYPE);
 
+    /** ModuleType value. */
     public final int value;
 
     ModuleType(int value) {
@@ -184,14 +189,29 @@ public class PowerDistribution implements Sendable, AutoCloseable {
     PowerDistributionJNI.setSwitchableChannel(m_handle, enabled);
   }
 
+  /**
+   * Returns the power distribution version number.
+   *
+   * @return The power distribution version number.
+   */
   public PowerDistributionVersion getVersion() {
     return PowerDistributionJNI.getVersion(m_handle);
   }
 
+  /**
+   * Returns the power distribution faults.
+   *
+   * @return The power distribution faults.
+   */
   public PowerDistributionFaults getFaults() {
     return PowerDistributionJNI.getFaults(m_handle);
   }
 
+  /**
+   * Returns the power distribution sticky faults.
+   *
+   * @return The power distribution sticky faults.
+   */
   public PowerDistributionStickyFaults getStickyFaults() {
     return PowerDistributionJNI.getStickyFaults(m_handle);
   }

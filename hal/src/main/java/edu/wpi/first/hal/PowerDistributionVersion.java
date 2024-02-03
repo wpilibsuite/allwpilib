@@ -4,18 +4,25 @@
 
 package edu.wpi.first.hal;
 
+/** Power distribution version. */
 @SuppressWarnings("MemberName")
 public class PowerDistributionVersion {
+  /** Firmware major version number. */
   public final int firmwareMajor;
 
+  /** Firmware minor version number. */
   public final int firmwareMinor;
 
+  /** Firmware fix version number. */
   public final int firmwareFix;
 
+  /** Hardware minor version number. */
   public final int hardwareMinor;
 
+  /** Hardware major version number. */
   public final int hardwareMajor;
 
+  /** Unique ID. */
   public final int uniqueId;
 
   /**

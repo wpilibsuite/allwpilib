@@ -14,8 +14,8 @@ void Drivetrain::SetSpeeds(const frc::DifferentialDriveWheelSpeeds& speeds) {
   double rightOutput = m_rightPIDController.Calculate(m_rightEncoder.GetRate(),
                                                       speeds.right.value());
 
-  m_leftGroup.SetVoltage(units::volt_t{leftOutput} + leftFeedforward);
-  m_rightGroup.SetVoltage(units::volt_t{rightOutput} + rightFeedforward);
+  m_leftLeader.SetVoltage(units::volt_t{leftOutput} + leftFeedforward);
+  m_rightLeader.SetVoltage(units::volt_t{rightOutput} + rightFeedforward);
 }
 
 void Drivetrain::Drive(units::meters_per_second_t xSpeed,
@@ -30,8 +30,6 @@ void Drivetrain::UpdateOdometry() {
 }
 
 void Drivetrain::ResetOdometry(const frc::Pose2d& pose) {
-  m_leftEncoder.Reset();
-  m_rightEncoder.Reset();
   m_drivetrainSimulator.SetPose(pose);
   m_odometry.ResetPosition(m_gyro.GetRotation2d(),
                            units::meter_t{m_leftEncoder.GetDistance()},
@@ -43,9 +41,9 @@ void Drivetrain::SimulationPeriodic() {
   // simulation, and write the simulated positions and velocities to our
   // simulated encoder and gyro. We negate the right side so that positive
   // voltages make the right side move forward.
-  m_drivetrainSimulator.SetInputs(units::volt_t{m_leftGroup.Get()} *
+  m_drivetrainSimulator.SetInputs(units::volt_t{m_leftLeader.Get()} *
                                       frc::RobotController::GetInputVoltage(),
-                                  units::volt_t{m_rightGroup.Get()} *
+                                  units::volt_t{m_rightLeader.Get()} *
                                       frc::RobotController::GetInputVoltage());
   m_drivetrainSimulator.Update(20_ms);
 

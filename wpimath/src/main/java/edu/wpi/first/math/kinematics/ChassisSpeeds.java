@@ -30,8 +30,7 @@ import edu.wpi.first.util.struct.StructSerializable;
  * component because it can never move sideways. Holonomic drivetrains such as swerve and mecanum
  * will often have all three components.
  */
-public class ChassisSpeeds
-    implements ProtobufSerializable<ChassisSpeeds>, StructSerializable<ChassisSpeeds> {
+public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
   /** Velocity along the x-axis. (Fwd is +) */
   public double vxMetersPerSecond;
 
@@ -41,7 +40,10 @@ public class ChassisSpeeds
   /** Represents the angular velocity of the robot frame. (CCW is +) */
   public double omegaRadiansPerSecond;
 
+  /** ChassisSpeeds protobuf for serialization. */
   public static final ChassisSpeedsProto proto = new ChassisSpeedsProto();
+
+  /** ChassisSpeeds struct for serialization. */
   public static final ChassisSpeedsStruct struct = new ChassisSpeedsStruct();
 
   /** Constructs a ChassisSpeeds with zeros for dx, dy, and theta. */

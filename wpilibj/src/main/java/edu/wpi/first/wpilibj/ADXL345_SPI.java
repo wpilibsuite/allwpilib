@@ -19,7 +19,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 /** ADXL345 SPI Accelerometer. */
-@SuppressWarnings({"TypeName", "PMD.UnusedPrivateField"})
+@SuppressWarnings("TypeName")
 public class ADXL345_SPI implements NTSendable, AutoCloseable {
   private static final int kPowerCtlRegister = 0x2D;
   private static final int kDataFormatRegister = 0x31;
@@ -29,27 +29,37 @@ public class ADXL345_SPI implements NTSendable, AutoCloseable {
   private static final int kAddress_Read = 0x80;
   private static final int kAddress_MultiByte = 0x40;
 
-  private static final int kPowerCtl_Link = 0x20;
-  private static final int kPowerCtl_AutoSleep = 0x10;
+  // private static final int kPowerCtl_Link = 0x20;
+  // private static final int kPowerCtl_AutoSleep = 0x10;
   private static final int kPowerCtl_Measure = 0x08;
-  private static final int kPowerCtl_Sleep = 0x04;
+  // private static final int kPowerCtl_Sleep = 0x04;
 
-  private static final int kDataFormat_SelfTest = 0x80;
-  private static final int kDataFormat_SPI = 0x40;
-  private static final int kDataFormat_IntInvert = 0x20;
+  // private static final int kDataFormat_SelfTest = 0x80;
+  // private static final int kDataFormat_SPI = 0x40;
+  // private static final int kDataFormat_IntInvert = 0x20;
   private static final int kDataFormat_FullRes = 0x08;
-  private static final int kDataFormat_Justify = 0x04;
 
+  // private static final int kDataFormat_Justify = 0x04;
+
+  /** Accelerometer range. */
   public enum Range {
+    /** 2 Gs max. */
     k2G,
+    /** 4 Gs max. */
     k4G,
+    /** 8 Gs max. */
     k8G,
+    /** 16 Gs max. */
     k16G
   }
 
+  /** Accelerometer axes. */
   public enum Axes {
+    /** X axis. */
     kX((byte) 0x00),
+    /** Y axis. */
     kY((byte) 0x02),
+    /** Z axis. */
     kZ((byte) 0x04);
 
     /** The integer value representing this enumeration. */
@@ -60,20 +70,29 @@ public class ADXL345_SPI implements NTSendable, AutoCloseable {
     }
   }
 
+  /** Container type for accelerations from all axes. */
   @SuppressWarnings("MemberName")
   public static class AllAxes {
+    /** Acceleration along the X axis in g-forces. */
     public double XAxis;
+
+    /** Acceleration along the Y axis in g-forces. */
     public double YAxis;
+
+    /** Acceleration along the Z axis in g-forces. */
     public double ZAxis;
+
+    /** Default constructor. */
+    public AllAxes() {}
   }
 
-  protected SPI m_spi;
+  private SPI m_spi;
 
-  protected SimDevice m_simDevice;
-  protected SimEnum m_simRange;
-  protected SimDouble m_simX;
-  protected SimDouble m_simY;
-  protected SimDouble m_simZ;
+  private SimDevice m_simDevice;
+  private SimEnum m_simRange;
+  private SimDouble m_simX;
+  private SimDouble m_simY;
+  private SimDouble m_simZ;
 
   /**
    * Constructor.
@@ -102,6 +121,11 @@ public class ADXL345_SPI implements NTSendable, AutoCloseable {
     SendableRegistry.addLW(this, "ADXL345_SPI", port.value);
   }
 
+  /**
+   * Returns the SPI port.
+   *
+   * @return The SPI port.
+   */
   public int getPort() {
     return m_spi.getPort();
   }

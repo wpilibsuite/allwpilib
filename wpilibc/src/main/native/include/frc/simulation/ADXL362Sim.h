@@ -13,7 +13,7 @@ class ADXL362;
 namespace sim {
 
 /**
- * Class to control a simulated ADXRS450 gyroscope.
+ * Class to control a simulated ADXL362.
  */
 class ADXL362Sim {
  public:

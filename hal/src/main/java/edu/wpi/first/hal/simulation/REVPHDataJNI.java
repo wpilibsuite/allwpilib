@@ -6,6 +6,7 @@ package edu.wpi.first.hal.simulation;
 
 import edu.wpi.first.hal.JNIWrapper;
 
+/** JNI for REV PH data. */
 public class REVPHDataJNI extends JNIWrapper {
   public static native int registerInitializedCallback(
       int index, NotifyCallback callback, boolean initialNotify);
@@ -68,4 +69,7 @@ public class REVPHDataJNI extends JNIWrapper {
       int index, int channel, NotifyCallback callback, boolean initialNotify);
 
   public static native void resetData(int index);
+
+  /** Utility class. */
+  private REVPHDataJNI() {}
 }

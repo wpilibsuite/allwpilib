@@ -101,4 +101,7 @@ public class NotifierJNI extends JNIWrapper {
    * @return the FPGA time the notifier returned
    */
   public static native long waitForNotifierAlarm(int notifierHandle);
+
+  /** Utility class. */
+  private NotifierJNI() {}
 }

@@ -25,8 +25,7 @@ import java.util.Objects;
 /** Represents a 2D pose containing translational and rotational elements. */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
-public class Pose2d
-    implements Interpolatable<Pose2d>, ProtobufSerializable<Pose2d>, StructSerializable<Pose2d> {
+public class Pose2d implements Interpolatable<Pose2d>, ProtobufSerializable, StructSerializable {
   private final Translation2d m_translation;
   private final Rotation2d m_rotation;
 
@@ -327,6 +326,9 @@ public class Pose2d
     }
   }
 
-  public static final Pose2dStruct struct = new Pose2dStruct();
+  /** Pose2d protobuf for serialization. */
   public static final Pose2dProto proto = new Pose2dProto();
+
+  /** Pose2d struct for serialization. */
+  public static final Pose2dStruct struct = new Pose2dStruct();
 }

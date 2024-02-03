@@ -12,27 +12,18 @@ import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
+import java.lang.ref.Reference;
 
 /** Class for creating and configuring Analog Triggers. */
 public class AnalogTrigger implements Sendable, AutoCloseable {
-  /** Exceptions dealing with improper operation of the Analog trigger. */
-  public static class AnalogTriggerException extends RuntimeException {
-    /**
-     * Create a new exception with the given message.
-     *
-     * @param message the message to pass with the exception
-     */
-    public AnalogTriggerException(String message) {
-      super(message);
-    }
-  }
-
   /** Where the analog trigger is attached. */
   protected int m_port;
 
-  protected AnalogInput m_analogInput;
-  protected DutyCycle m_dutyCycle;
-  protected boolean m_ownsAnalog;
+  private AnalogInput m_analogInput;
+
+  private DutyCycle m_dutyCycle;
+
+  private boolean m_ownsAnalog;
 
   /**
    * Constructor for an analog trigger given a channel number.
@@ -89,6 +80,7 @@ public class AnalogTrigger implements Sendable, AutoCloseable {
     if (m_ownsAnalog && m_analogInput != null) {
       m_analogInput.close();
     }
+    Reference.reachabilityFence(m_dutyCycle);
   }
 
   /**

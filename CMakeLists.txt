@@ -54,7 +54,7 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
 if("${isSystemDir}" STREQUAL "-1")
     set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-endif("${isSystemDir}" STREQUAL "-1")
+endif()
 
 # Options for building certain parts of the repo. Everything is built by default.
 option(BUILD_SHARED_LIBS "Build with shared libs (needed for JNI)" ON)
@@ -214,7 +214,6 @@ endif()
 find_package(LIBSSH 0.7.1)
 
 find_package(Protobuf REQUIRED)
-find_program(Quickbuf_EXECUTABLE NAMES protoc-gen-quickbuf DOC "The Quickbuf protoc plugin")
 
 set(APRILTAG_DEP_REPLACE "find_dependency(apriltag)")
 set(CAMERASERVER_DEP_REPLACE_IMPL "find_dependency(cameraserver)")

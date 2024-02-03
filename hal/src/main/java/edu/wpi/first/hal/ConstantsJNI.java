@@ -17,4 +17,7 @@ public class ConstantsJNI extends JNIWrapper {
    * @see "HAL_GetSystemClockTicksPerMicrosecond"
    */
   public static native int getSystemClockTicksPerMicrosecond();
+
+  /** Utility class. */
+  private ConstantsJNI() {}
 }

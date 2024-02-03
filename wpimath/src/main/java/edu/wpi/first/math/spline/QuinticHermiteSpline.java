@@ -6,6 +6,7 @@ package edu.wpi.first.math.spline;
 
 import org.ejml.simple.SimpleMatrix;
 
+/** Represents a hermite spline of degree 5. */
 public class QuinticHermiteSpline extends Spline {
   private static SimpleMatrix hermiteBasis;
   private final SimpleMatrix m_coefficients;

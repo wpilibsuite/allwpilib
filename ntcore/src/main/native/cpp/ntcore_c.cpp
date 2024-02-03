@@ -175,9 +175,17 @@ uint64_t NT_GetEntryLastChange(NT_Entry entry) {
 }
 
 void NT_GetEntryValue(NT_Entry entry, struct NT_Value* value) {
+  NT_GetEntryValueType(entry, 0, value);
+}
+
+void NT_GetEntryValueType(NT_Entry entry, unsigned int types,
+                          struct NT_Value* value) {
   NT_InitValue(value);
   auto v = nt::GetEntryValue(entry);
   if (!v) {
+    return;
+  }
+  if (types != 0 && (types & v.type()) == 0) {
     return;
   }
   ConvertToC(v, value);
@@ -202,6 +210,11 @@ unsigned int NT_GetEntryFlags(NT_Entry entry) {
 
 struct NT_Value* NT_ReadQueueValue(NT_Handle subentry, size_t* count) {
   return ConvertToC<NT_Value>(nt::ReadQueueValue(subentry), count);
+}
+
+struct NT_Value* NT_ReadQueueValueType(NT_Handle subentry, unsigned int types,
+                                       size_t* count) {
+  return ConvertToC<NT_Value>(nt::ReadQueueValue(subentry, types), count);
 }
 
 NT_Topic* NT_GetTopics(NT_Inst inst, const char* prefix, size_t prefix_len,

@@ -1,6 +1,6 @@
 = Network Tables Alloy Model
 
-Alloy (http://alloy.mit.edu/alloy/) is a formal logic tool that can analyze
+[Alloy](https://www.csail.mit.edu/research/alloy) is a formal logic tool that can analyze
 first-order logic expressions. Under the proposed sequence number -based
 protocol, assuming that all nodes start from the same state, Alloy is unable to
 find a way where two nodes with the same sequence number have different state

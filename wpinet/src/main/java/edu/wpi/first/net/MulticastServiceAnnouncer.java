@@ -54,14 +54,21 @@ public class MulticastServiceAnnouncer implements AutoCloseable {
     m_cleanable.clean();
   }
 
+  /** Starts multicast service announcer. */
   public void start() {
     WPINetJNI.startMulticastServiceAnnouncer(m_handle);
   }
 
+  /** Stops multicast service announcer. */
   public void stop() {
     WPINetJNI.stopMulticastServiceAnnouncer(m_handle);
   }
 
+  /**
+   * Returns true if there's a multicast service announcer implementation.
+   *
+   * @return True if there's a multicast service announcer implementation.
+   */
   public boolean hasImplementation() {
     return WPINetJNI.getMulticastServiceAnnouncerHasImplementation(m_handle);
   }

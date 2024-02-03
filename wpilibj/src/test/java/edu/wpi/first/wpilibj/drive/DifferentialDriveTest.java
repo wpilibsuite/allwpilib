@@ -6,9 +6,10 @@ package edu.wpi.first.wpilibj.drive;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import edu.wpi.first.wpilibj.motorcontrol.MockMotorController;
+import edu.wpi.first.wpilibj.motorcontrol.MockPWMMotorController;
 import org.junit.jupiter.api.Test;
 
+@SuppressWarnings("resource")
 class DifferentialDriveTest {
   @Test
   void testArcadeDriveIK() {
@@ -250,9 +251,9 @@ class DifferentialDriveTest {
 
   @Test
   void testArcadeDrive() {
-    var left = new MockMotorController();
-    var right = new MockMotorController();
-    var drive = new DifferentialDrive(left, right);
+    var left = new MockPWMMotorController();
+    var right = new MockPWMMotorController();
+    var drive = new DifferentialDrive(left::set, right::set);
     drive.setDeadband(0.0);
 
     // Forward
@@ -288,9 +289,9 @@ class DifferentialDriveTest {
 
   @Test
   void testArcadeDriveSquared() {
-    var left = new MockMotorController();
-    var right = new MockMotorController();
-    var drive = new DifferentialDrive(left, right);
+    var left = new MockPWMMotorController();
+    var right = new MockPWMMotorController();
+    var drive = new DifferentialDrive(left::set, right::set);
     drive.setDeadband(0.0);
 
     // Forward
@@ -326,9 +327,9 @@ class DifferentialDriveTest {
 
   @Test
   void testCurvatureDrive() {
-    var left = new MockMotorController();
-    var right = new MockMotorController();
-    var drive = new DifferentialDrive(left, right);
+    var left = new MockPWMMotorController();
+    var right = new MockPWMMotorController();
+    var drive = new DifferentialDrive(left::set, right::set);
     drive.setDeadband(0.0);
 
     // Forward
@@ -364,9 +365,9 @@ class DifferentialDriveTest {
 
   @Test
   void testCurvatureDriveTurnInPlace() {
-    var left = new MockMotorController();
-    var right = new MockMotorController();
-    var drive = new DifferentialDrive(left, right);
+    var left = new MockPWMMotorController();
+    var right = new MockPWMMotorController();
+    var drive = new DifferentialDrive(left::set, right::set);
     drive.setDeadband(0.0);
 
     // Forward
@@ -402,9 +403,9 @@ class DifferentialDriveTest {
 
   @Test
   void testTankDrive() {
-    var left = new MockMotorController();
-    var right = new MockMotorController();
-    var drive = new DifferentialDrive(left, right);
+    var left = new MockPWMMotorController();
+    var right = new MockPWMMotorController();
+    var drive = new DifferentialDrive(left::set, right::set);
     drive.setDeadband(0.0);
 
     // Forward
@@ -440,9 +441,9 @@ class DifferentialDriveTest {
 
   @Test
   void testTankDriveSquared() {
-    var left = new MockMotorController();
-    var right = new MockMotorController();
-    var drive = new DifferentialDrive(left, right);
+    var left = new MockPWMMotorController();
+    var right = new MockPWMMotorController();
+    var drive = new DifferentialDrive(left::set, right::set);
     drive.setDeadband(0.0);
 
     // Forward

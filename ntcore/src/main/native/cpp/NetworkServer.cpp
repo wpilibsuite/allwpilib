@@ -242,7 +242,7 @@ void NetworkServer::ServerConnection4::ProcessWsUpgrade() {
     m_info.protocol_version =
         protocol == "v4.1.networktables.first.wpi.edu" ? 0x0401 : 0x0400;
     m_wire = std::make_shared<net::WebSocketConnection>(
-        *m_websocket, m_info.protocol_version);
+        *m_websocket, m_info.protocol_version, m_logger);
 
     if (protocol == "rtt.networktables.first.wpi.edu") {
       INFO("CONNECTED RTT client (from {})", m_connInfo);
@@ -281,7 +281,6 @@ void NetworkServer::ServerConnection4::ProcessWsUpgrade() {
     INFO("CONNECTED NT4 client '{}' (from {})", dedupName, m_connInfo);
     m_info.remote_id = dedupName;
     m_server.AddConnection(this, m_info);
-    m_wire->Start();
     m_websocket->closed.connect([this](uint16_t, std::string_view reason) {
       auto realReason = m_wire->GetDisconnectReason();
       INFO("DISCONNECTED NT4 client '{}' (from {}): {}", m_info.remote_id,
@@ -500,6 +499,7 @@ void NetworkServer::Init() {
       if (!tcp) {
         return;
       }
+      tcp->SetLogger(&m_logger);
       tcp->error.connect([logger = &m_logger](uv::Error err) {
         WPI_INFO(*logger, "NT4 socket error: {}", err.str());
       });

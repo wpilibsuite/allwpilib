@@ -34,7 +34,7 @@
 #define STRINGIZE(s) #s
 
 namespace sysid {
-static constexpr const char* kUnits[] = {"Meters",  "Feet",      "Inches",
+inline constexpr const char* kUnits[] = {"Meters",  "Feet",      "Inches",
                                          "Radians", "Rotations", "Degrees"};
 
 /**
@@ -44,6 +44,14 @@ static constexpr const char* kUnits[] = {"Meters",  "Feet",      "Inches",
  * @param text The text to show in the tooltip.
  */
 void CreateTooltip(const char* text);
+
+/**
+ * Displays an error tooltip beside the widget that this method is called after
+ * with the provided text.
+ *
+ * @param text The text to show in the error tooltip.
+ */
+void CreateErrorTooltip(const char* text);
 
 /**
  * Utility function to launch an error popup if an exception is detected.

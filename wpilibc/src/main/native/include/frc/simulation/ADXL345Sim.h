@@ -14,7 +14,7 @@ class ADXL345_I2C;
 namespace sim {
 
 /**
- * Class to control a simulated ADXRS450 gyroscope.
+ * Class to control a simulated ADXL345.
  */
 class ADXL345Sim {
  public:

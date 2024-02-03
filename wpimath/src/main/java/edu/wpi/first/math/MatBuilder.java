@@ -40,7 +40,10 @@ public class MatBuilder<R extends Num, C extends Num> {
     return new Matrix<>(new SimpleMatrix(rows.getNum(), cols.getNum(), true, data));
   }
 
+  /** Number of rows. */
   protected final Nat<R> m_rows;
+
+  /** Number of columns. */
   protected final Nat<C> m_cols;
 
   /**

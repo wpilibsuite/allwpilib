@@ -84,6 +84,16 @@ public class AnalogJNI extends JNIWrapper {
    */
   public static native boolean checkAnalogInputChannel(int channel);
 
+  /**
+   * Checks that the analog output channel number is valid.
+   *
+   * <p>Verifies that the analog channel number is one of the legal channel numbers. Channel numbers
+   * are 0-based.
+   *
+   * @param channel The analog output channel number.
+   * @return Analog channel is valid
+   * @see "HAL_CheckAnalogOutputChannel"
+   */
   public static native boolean checkAnalogOutputChannel(int channel);
 
   /**
@@ -95,8 +105,22 @@ public class AnalogJNI extends JNIWrapper {
    */
   public static native void setAnalogInputSimDevice(int handle, int device);
 
+  /**
+   * Sets an analog output value.
+   *
+   * @param portHandle the analog output handle
+   * @param voltage the voltage (0-5v) to output
+   * @see "HAL_SetAnalogOutput"
+   */
   public static native void setAnalogOutput(int portHandle, double voltage);
 
+  /**
+   * Gets the current analog output value.
+   *
+   * @param portHandle the analog output handle
+   * @return the current output voltage (0-5v)
+   * @see "HAL_GetAnalogOutput"
+   */
   public static native double getAnalogOutput(int portHandle);
 
   /**
@@ -497,4 +521,7 @@ public class AnalogJNI extends JNIWrapper {
    * @see "HAL_GetAnalogTriggerFPGAIndex"
    */
   public static native int getAnalogTriggerFPGAIndex(int analogTriggerHandle);
+
+  /** Utility class. */
+  private AnalogJNI() {}
 }

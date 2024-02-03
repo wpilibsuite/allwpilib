@@ -63,7 +63,7 @@ public abstract class TrapezoidProfileSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    m_state = m_profile.calculate(m_period, m_goal, m_state);
+    m_state = m_profile.calculate(m_period, m_state, m_goal);
     if (m_enabled) {
       useState(m_state);
     }

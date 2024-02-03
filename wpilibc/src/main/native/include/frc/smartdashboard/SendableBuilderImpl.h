@@ -21,6 +21,9 @@
 
 namespace frc {
 
+/**
+ * Implementation detail for SendableBuilder.
+ */
 class SendableBuilderImpl : public nt::NTSendableBuilder {
  public:
   SendableBuilderImpl() = default;

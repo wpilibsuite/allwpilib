@@ -528,6 +528,18 @@ unsigned int GetEntryFlags(NT_Entry entry);
  */
 std::vector<Value> ReadQueueValue(NT_Handle subentry);
 
+/**
+ * Read Entry Queue.
+ *
+ * Returns new entry values since last call.
+ *
+ * @param subentry     subscriber or entry handle
+ * @param types        bitmask of NT_Type values; 0 is treated specially
+ *                     as a "don't care"
+ * @return entry value array
+ */
+std::vector<Value> ReadQueueValue(NT_Handle subentry, unsigned int types);
+
 /** @} */
 
 /**

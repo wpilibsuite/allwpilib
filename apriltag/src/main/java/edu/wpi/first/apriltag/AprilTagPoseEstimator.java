@@ -29,10 +29,19 @@ public class AprilTagPoseEstimator {
       this.cy = cy;
     }
 
+    /** Tag size, in meters. */
     public double tagSize;
+
+    /** Camera horizontal focal length, in pixels. */
     public double fx;
+
+    /** Camera vertical focal length, in pixels. */
     public double fy;
+
+    /** Camera horizontal focal center, in pixels. */
     public double cx;
+
+    /** Camera vertical focal center, in pixels. */
     public double cy;
 
     @Override

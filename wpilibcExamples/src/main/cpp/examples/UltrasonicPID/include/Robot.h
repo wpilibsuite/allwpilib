@@ -18,6 +18,7 @@
  */
 class Robot : public frc::TimedRobot {
  public:
+  Robot();
   void AutonomousInit() override;
   void AutonomousPeriodic() override;
 
@@ -44,6 +45,8 @@ class Robot : public frc::TimedRobot {
   frc::Ultrasonic m_ultrasonic{kUltrasonicPingPort, kUltrasonicEchoPort};
   frc::PWMSparkMax m_left{kLeftMotorPort};
   frc::PWMSparkMax m_right{kRightMotorPort};
-  frc::DifferentialDrive m_robotDrive{m_left, m_right};
+  frc::DifferentialDrive m_robotDrive{
+      [&](double output) { m_left.Set(output); },
+      [&](double output) { m_right.Set(output); }};
   frc::PIDController m_pidController{kP, kI, kD};
 };

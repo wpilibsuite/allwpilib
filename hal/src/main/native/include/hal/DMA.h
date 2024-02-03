@@ -138,6 +138,8 @@ void HAL_AddDMACounter(HAL_DMAHandle handle, HAL_CounterHandle counterHandle,
 /**
  * Adds timer data for an counter to be collected by DMA.
  *
+ * This can only be called if DMA is not started.
+ *
  * @param[in] handle the dma handle
  * @param[in] counterHandle the counter to add
  * @param[out] status Error status variable. 0 on success.

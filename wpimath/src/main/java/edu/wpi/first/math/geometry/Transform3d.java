@@ -11,8 +11,7 @@ import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
 
 /** Represents a transformation for a Pose3d in the pose's frame. */
-public class Transform3d
-    implements ProtobufSerializable<Transform3d>, StructSerializable<Transform3d> {
+public class Transform3d implements ProtobufSerializable, StructSerializable {
   private final Translation3d m_translation;
   private final Rotation3d m_rotation;
 
@@ -179,6 +178,9 @@ public class Transform3d
     return Objects.hash(m_translation, m_rotation);
   }
 
-  public static final Transform3dStruct struct = new Transform3dStruct();
+  /** Transform3d protobuf for serialization. */
   public static final Transform3dProto proto = new Transform3dProto();
+
+  /** Transform3d struct for serialization. */
+  public static final Transform3dStruct struct = new Transform3dStruct();
 }

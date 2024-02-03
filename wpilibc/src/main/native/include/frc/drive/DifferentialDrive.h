@@ -4,8 +4,10 @@
 
 #pragma once
 
+#include <functional>
 #include <string>
 
+#include <wpi/deprecated.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
@@ -20,43 +22,9 @@ class MotorController;
  * the Kit of Parts drive base, "tank drive", or West Coast Drive.
  *
  * These drive bases typically have drop-center / skid-steer with two or more
- * wheels per side (e.g., 6WD or 8WD). This class takes a MotorController per
- * side. For four and six motor drivetrains, construct and pass in
- * MotorControllerGroup instances as follows.
- *
- * Four motor drivetrain:
- * @code{.cpp}
- * class Robot {
- *  public:
- *   frc::PWMVictorSPX m_frontLeft{1};
- *   frc::PWMVictorSPX m_rearLeft{2};
- *   frc::MotorControllerGroup m_left{m_frontLeft, m_rearLeft};
- *
- *   frc::PWMVictorSPX m_frontRight{3};
- *   frc::PWMVictorSPX m_rearRight{4};
- *   frc::MotorControllerGroup m_right{m_frontRight, m_rearRight};
- *
- *   frc::DifferentialDrive m_drive{m_left, m_right};
- * };
- * @endcode
- *
- * Six motor drivetrain:
- * @code{.cpp}
- * class Robot {
- *  public:
- *   frc::PWMVictorSPX m_frontLeft{1};
- *   frc::PWMVictorSPX m_midLeft{2};
- *   frc::PWMVictorSPX m_rearLeft{3};
- *   frc::MotorControllerGroup m_left{m_frontLeft, m_midLeft, m_rearLeft};
- *
- *   frc::PWMVictorSPX m_frontRight{4};
- *   frc::PWMVictorSPX m_midRight{5};
- *   frc::PWMVictorSPX m_rearRight{6};
- *   frc::MotorControllerGroup m_right{m_frontRight, m_midRight, m_rearRight};
- *
- *   frc::DifferentialDrive m_drive{m_left, m_right};
- * };
- * @endcode
+ * wheels per side (e.g., 6WD or 8WD). This class takes a setter per side. For
+ * four and six motor drivetrains, use CAN motor controller followers or
+ * PWMMotorController::AddFollower().
  *
  * A differential drive robot has left and right wheels separated by an
  * arbitrary width.
@@ -97,17 +65,40 @@ class DifferentialDrive : public RobotDriveBase,
    * Uses normalized voltage [-1.0..1.0].
    */
   struct WheelSpeeds {
+    /// Left wheel speed.
     double left = 0.0;
+    /// Right wheel speed.
     double right = 0.0;
   };
+
+  WPI_IGNORE_DEPRECATED
 
   /**
    * Construct a DifferentialDrive.
    *
-   * To pass multiple motors per side, use a MotorControllerGroup. If a motor
-   * needs to be inverted, do so before passing it in.
+   * To pass multiple motors per side, use CAN motor controller followers or
+   * PWMSpeedController::AddFollower(). If a motor needs to be inverted, do so
+   * before passing it in.
+   *
+   * @param leftMotor Left motor.
+   * @param rightMotor Right motor.
    */
   DifferentialDrive(MotorController& leftMotor, MotorController& rightMotor);
+
+  WPI_UNIGNORE_DEPRECATED
+
+  /**
+   * Construct a DifferentialDrive.
+   *
+   * To pass multiple motors per side, use CAN motor controller followers or
+   * PWMSpeedController::AddFollower(). If a motor needs to be inverted, do so
+   * before passing it in.
+   *
+   * @param leftMotor Left motor setter.
+   * @param rightMotor Right motor setter.
+   */
+  DifferentialDrive(std::function<void(double)> leftMotor,
+                    std::function<void(double)> rightMotor);
 
   ~DifferentialDrive() override = default;
 
@@ -210,8 +201,12 @@ class DifferentialDrive : public RobotDriveBase,
   void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
-  MotorController* m_leftMotor;
-  MotorController* m_rightMotor;
+  std::function<void(double)> m_leftMotor;
+  std::function<void(double)> m_rightMotor;
+
+  // Used for Sendable property getters
+  double m_leftOutput = 0.0;
+  double m_rightOutput = 0.0;
 };
 
 }  // namespace frc

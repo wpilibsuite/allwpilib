@@ -7,6 +7,7 @@
 #include <filesystem>
 #include <stdexcept>
 
+#include <IconsFontAwesome6.h>
 #include <imgui.h>
 #include <wpi/raw_ostream.h>
 
@@ -18,6 +19,20 @@ void sysid::CreateTooltip(const char* text) {
     ImGui::BeginTooltip();
     ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
     ImGui::TextUnformatted(text);
+    ImGui::PopTextWrapPos();
+    ImGui::EndTooltip();
+  }
+}
+
+void sysid::CreateErrorTooltip(const char* text) {
+  ImGui::SameLine();
+  ImGui::TextColored(ImVec4(1.0f, 0.4f, 0.4f, 1.0f),
+                     ICON_FA_TRIANGLE_EXCLAMATION);
+
+  if (ImGui::IsItemHovered()) {
+    ImGui::BeginTooltip();
+    ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+    ImGui::TextColored(ImVec4(1.0f, 0.4f, 0.4f, 1.0f), "%s", text);
     ImGui::PopTextWrapPos();
     ImGui::EndTooltip();
   }

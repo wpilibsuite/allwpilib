@@ -4,18 +4,15 @@
 
 #pragma once
 
-#include <fmt/format.h>
+#include <wpi/Logger.h>
 
-// #define WPINET_WEBSOCKET_VERBOSE_DEBUG
-// #define WPINET_WEBSOCKET_VERBOSE_DEBUG_CONTENT
+#define WPINET_WEBSOCKET_VERBOSE_DEBUG_CONTENT
 
 #ifdef __clang__
 #pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
 #endif
 
-#ifdef WPINET_WEBSOCKET_VERBOSE_DEBUG
-#define WS_DEBUG(format, ...) \
-  ::fmt::print(FMT_STRING(format) __VA_OPT__(, ) __VA_ARGS__)
-#else
-#define WS_DEBUG(fmt, ...)
-#endif
+#define WS_DEBUG(stream, format, ...)                              \
+  if (auto logger_ = stream.GetLogger()) {                         \
+    WPI_DEBUG4(*logger_, "WS: " format __VA_OPT__(, ) __VA_ARGS__) \
+  }

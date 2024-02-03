@@ -99,7 +99,10 @@ public abstract class Spline {
    * the value of x[2] is the second derivative in the x dimension.
    */
   public static class ControlVector {
+    /** The x components of the control vector. */
     public double[] x;
+
+    /** The y components of the control vector. */
     public double[] y;
 
     /**

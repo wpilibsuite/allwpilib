@@ -11,10 +11,15 @@ package edu.wpi.first.wpilibj.interfaces;
  */
 @Deprecated(since = "2024", forRemoval = true)
 public interface Accelerometer {
+  /** Accelerometer range. */
   enum Range {
+    /** 2 Gs max. */
     k2G,
+    /** 4 Gs max. */
     k4G,
+    /** 8 Gs max. */
     k8G,
+    /** 16 Gs max. */
     k16G
   }
 

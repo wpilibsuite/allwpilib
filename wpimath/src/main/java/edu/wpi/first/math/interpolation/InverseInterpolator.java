@@ -24,6 +24,11 @@ public interface InverseInterpolator<T> {
    */
   double inverseInterpolate(T startValue, T endValue, T q);
 
+  /**
+   * Returns inverse interpolator for Double.
+   *
+   * @return Inverse interpolator for Double.
+   */
   static InverseInterpolator<Double> forDouble() {
     return MathUtil::inverseInterpolate;
   }

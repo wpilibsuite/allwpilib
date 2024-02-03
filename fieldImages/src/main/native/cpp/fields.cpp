@@ -15,10 +15,13 @@
 #include "fields/2021-slalom.h"
 #include "fields/2022-rapidreact.h"
 #include "fields/2023-chargedup.h"
+#include "fields/2024-crescendo.h"
 
 using namespace fields;
 
 static const Field kFields[] = {
+    {"2024 Crescendo", GetResource_2024_crescendo_json,
+     GetResource_2024_field_png},
     {"2023 Charged Up", GetResource_2023_chargedup_json,
      GetResource_2023_field_png},
     {"2022 Rapid React", GetResource_2022_rapidreact_json,

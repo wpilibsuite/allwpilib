@@ -106,9 +106,13 @@ public class AnalogTriggerOutput extends DigitalSource implements Sendable {
 
   /** Defines the state in which the AnalogTrigger triggers. */
   public enum AnalogTriggerType {
+    /** In window. */
     kInWindow(AnalogJNI.AnalogTriggerType.kInWindow),
+    /** State. */
     kState(AnalogJNI.AnalogTriggerType.kState),
+    /** Rising pulse. */
     kRisingPulse(AnalogJNI.AnalogTriggerType.kRisingPulse),
+    /** Falling pulse. */
     kFallingPulse(AnalogJNI.AnalogTriggerType.kFallingPulse);
 
     private final int value;

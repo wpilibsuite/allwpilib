@@ -7,27 +7,49 @@ package edu.wpi.first.cscore;
 /** Video event. */
 @SuppressWarnings("MemberName")
 public class VideoEvent {
+  /** VideoEvent kind. */
   public enum Kind {
+    /** Unknown video event. */
     kUnknown(0x0000),
+    /** Source Created event. */
     kSourceCreated(0x0001),
+    /** Source Destroyed event. */
     kSourceDestroyed(0x0002),
+    /** Source Connected event. */
     kSourceConnected(0x0004),
+    /** Source Disconnected event. */
     kSourceDisconnected(0x0008),
+    /** Source Video Modes Updated event. */
     kSourceVideoModesUpdated(0x0010),
+    /** Source VideoMode Changed event. */
     kSourceVideoModeChanged(0x0020),
+    /** Source Property Created event. */
     kSourcePropertyCreated(0x0040),
+    /** Source Property Value Updated event. */
     kSourcePropertyValueUpdated(0x0080),
+    /** Source Property Choices Updated event. */
     kSourcePropertyChoicesUpdated(0x0100),
+    /** Sink Source Changed event. */
     kSinkSourceChanged(0x0200),
+    /** Sink Created event. */
     kSinkCreated(0x0400),
+    /** Sink Destroyed event. */
     kSinkDestroyed(0x0800),
+    /** Sink Enabled event. */
     kSinkEnabled(0x1000),
+    /** Sink Disabled event. */
     kSinkDisabled(0x2000),
+    /** Network Interfaces Changed event. */
     kNetworkInterfacesChanged(0x4000),
+    /** Telemetry Updated event. */
     kTelemetryUpdated(0x8000),
+    /** Sink Property Created event. */
     kSinkPropertyCreated(0x10000),
+    /** Sink Property Value Updated event. */
     kSinkPropertyValueUpdated(0x20000),
+    /** Sink Property Choices Updated event. */
     kSinkPropertyChoicesUpdated(0x40000),
+    /** Usb Cameras Changed event. */
     kUsbCamerasChanged(0x80000);
 
     private final int value;
@@ -36,6 +58,11 @@ public class VideoEvent {
       this.value = value;
     }
 
+    /**
+     * Returns the kind value.
+     *
+     * @return The kind value.
+     */
     public int getValue() {
       return value;
     }
@@ -118,39 +145,67 @@ public class VideoEvent {
     this.listener = listener;
   }
 
+  /** The video event kind. */
   public Kind kind;
 
-  // Valid for kSource* and kSink* respectively
+  /**
+   * The source handle.
+   *
+   * <p>Valid for kSource* and kSink* respectively.
+   */
   public int sourceHandle;
 
+  /** The sink handle. */
   public int sinkHandle;
 
-  // Source/sink/property name
+  /** Source/sink/property name. */
   public String name;
 
-  // Fields for kSourceVideoModeChanged event
+  // Fields for kSourceVideoModeChanged event.
+
+  /** New source video mode. */
   public VideoMode mode;
 
-  // Fields for kSourceProperty* events
+  // Fields for kSourceProperty* events.
+
+  /** Source property handle. */
   public int propertyHandle;
 
+  /** Source property kind. */
   public VideoProperty.Kind propertyKind;
 
+  /** Event value. */
   public int value;
 
+  /** Event value as a string. */
   public String valueStr;
 
-  // Listener that was triggered
+  /** Listener that was triggered. */
   public int listener;
 
+  /**
+   * Returns the source associated with the event (if any).
+   *
+   * @return The source associated with the event (if any).
+   */
   public VideoSource getSource() {
     return new VideoSource(CameraServerJNI.copySource(sourceHandle));
   }
 
+  /**
+   * Returns the sink associated with the event (if any).
+   *
+   * @return The sink associated with the event (if any).
+   */
   public VideoSink getSink() {
     return new VideoSink(CameraServerJNI.copySink(sinkHandle));
   }
 
+  /**
+   * Returns the property associated with the event (if any).
+   *
+   * @return The property associated with the event (if any).
+   */
   public VideoProperty getProperty() {
     return new VideoProperty(propertyHandle, propertyKind);
   }

@@ -286,4 +286,7 @@ public class REVPHJNI extends JNIWrapper {
    * @see "HAL_GetREVPHVersion"
    */
   public static native REVPHVersion getVersion(int handle);
+
+  /** Utility class. */
+  private REVPHJNI() {}
 }

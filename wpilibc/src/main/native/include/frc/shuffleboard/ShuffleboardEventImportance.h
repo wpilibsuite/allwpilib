@@ -14,6 +14,11 @@ namespace frc {
 
 enum ShuffleboardEventImportance { kTrivial, kLow, kNormal, kHigh, kCritical };
 
+/**
+ * Returns name of the given enum.
+ *
+ * @return Name of the given enum.
+ */
 inline std::string_view ShuffleboardEventImportanceName(
     ShuffleboardEventImportance importance) {
   switch (importance) {

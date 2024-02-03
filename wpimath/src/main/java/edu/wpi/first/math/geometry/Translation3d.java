@@ -30,9 +30,7 @@ import java.util.Objects;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Translation3d
-    implements Interpolatable<Translation3d>,
-        ProtobufSerializable<Translation3d>,
-        StructSerializable<Translation3d> {
+    implements Interpolatable<Translation3d>, ProtobufSerializable, StructSerializable {
   private final double m_x;
   private final double m_y;
   private final double m_z;
@@ -255,6 +253,9 @@ public class Translation3d
         MathUtil.interpolate(this.getZ(), endValue.getZ(), t));
   }
 
-  public static final Translation3dStruct struct = new Translation3dStruct();
+  /** Translation3d protobuf for serialization. */
   public static final Translation3dProto proto = new Translation3dProto();
+
+  /** Translation3d struct for serialization. */
+  public static final Translation3dStruct struct = new Translation3dStruct();
 }
