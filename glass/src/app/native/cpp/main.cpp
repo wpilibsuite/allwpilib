@@ -152,8 +152,6 @@ static void NtInitialize() {
   gui::AddEarlyExecute([] { gNetworkTablesModel->Update(); });
 
   gNetworkTablesWindow = glass::imm::GetOrAddWindow("NetworkTables View");
-  gNetworkTablesWindow->SetView(
-      std::make_unique<glass::NetworkTablesView>(gNetworkTablesModel.get()));
   gNetworkTablesWindow->SetDefaultPos(250, 277);
   gNetworkTablesWindow->SetDefaultSize(750, 185);
 
@@ -315,11 +313,16 @@ int main(int argc, char** argv) {
     glass::imm::EndWindow();
 
     if (glass::imm::BeginWindow(gNetworkTablesWindow)) {
+      auto& settings =
+          glass::GetStorage().GetOrNewData<glass::NetworkTablesFlagsSettings>();
       if (glass::imm::BeginWindowSettingsPopup()) {
+        settings.DisplayMenu();
+        glass::DisplayNetworkTablesAddMenu(gNetworkTablesModel.get(), {},
+                                           settings.GetFlags());
         gNetworkTablesWindow->GetView()->Settings();
         ImGui::EndPopup();
       }
-      gNetworkTablesWindow->GetView()->Display();
+      DisplayNetworkTables(gNetworkTablesModel.get(), settings.GetFlags());
     }
     glass::imm::EndWindow();
 
