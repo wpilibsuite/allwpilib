@@ -140,10 +140,8 @@ static void NtInitialize() {
     }
   });
 
-  gNetworkTablesLogWindow = glass::imm::CreateWindow(
-      "NetworkTables Log", false, glass::Window::kHide);
-  gNetworkTablesLogWindow->SetView(
-      std::make_unique<glass::LogView>(&gNetworkTablesLog));
+  gNetworkTablesLogWindow = glass::imm::CreateWindow("NetworkTables Log", false,
+                                                     glass::Window::kHide);
   gNetworkTablesLogWindow->SetDefaultPos(250, 615);
   gNetworkTablesLogWindow->SetDefaultSize(600, 130);
 
@@ -304,11 +302,14 @@ int main(int argc, char** argv) {
 
   gui::AddLateExecute([] {
     if (glass::imm::BeginWindow(gNetworkTablesLogWindow)) {
+      auto& settings = glass::GetStorage().GetOrNewData<glass::LogSettings>(
+          &gNetworkTablesLog);
       if (glass::imm::BeginWindowSettingsPopup()) {
-        gNetworkTablesLogWindow->GetView()->Settings();
+        settings.DisplayMenu();
         ImGui::EndPopup();
       }
       gNetworkTablesLogWindow->GetView()->Display();
+      glass::DisplayLog(&gNetworkTablesLog, settings.IsAutoScroll());
     }
     glass::imm::EndWindow();
 

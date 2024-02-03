@@ -120,8 +120,7 @@ void Application(std::string_view saveDir) {
 
   gAnalyzerWindow = gWindowManager->AddWindow("Analyzer", std::move(analyzer));
 
-  gProgramLogWindow = gWindowManager->AddWindow(
-      "Program Log", std::make_unique<glass::LogView>(&gLog));
+  gProgramLogWindow = glass::imm::CreateWindow(storage, "Program Log");
 
   // Set default positions and sizes for windows.
 
@@ -148,7 +147,6 @@ void Application(std::string_view saveDir) {
                                    sysid::kProgramLogWindowPos.y);
   gProgramLogWindow->SetDefaultSize(sysid::kProgramLogWindowSize.x,
                                     sysid::kProgramLogWindowSize.y);
-  gProgramLogWindow->DisableRenamePopup();
 
   // Configure save file.
   gui::ConfigurePlatformSaveFile("sysid.ini");
@@ -160,6 +158,7 @@ void Application(std::string_view saveDir) {
     gui::EmitViewMenu();
 
     if (ImGui::BeginMenu("Widgets")) {
+      gProgramLogWindow->DisplayMenuItem();
       gWindowManager->DisplayMenu();
       ImGui::EndMenu();
     }
@@ -199,6 +198,17 @@ void Application(std::string_view saveDir) {
       }
       ImGui::EndPopup();
     }
+
+    if (glass::imm::BeginWindow(gProgramLogWindow)) {
+      auto& settings =
+          glass::GetStorage().GetOrNewData<glass::LogSettings>(&gLog);
+      if (glass::imm::BeginWindowSettingsPopup()) {
+        settings.DisplayMenu();
+        ImGui::EndPopup();
+      }
+      glass::DisplayLog(&gLog, settings.IsAutoScroll());
+    }
+    glass::imm::EndWindow();
   });
 
   gui::Initialize("System Identification", sysid::kAppWindowSize.x,
