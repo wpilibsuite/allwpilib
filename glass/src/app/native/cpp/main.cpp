@@ -229,8 +229,6 @@ int main(int argc, char** argv) {
 
   glass::AddStandardNetworkTablesViews(*gNtProvider);
 
-  gui::AddLateExecute([] { gMainMenu.Display(); });
-
   gMainMenu.AddMainMenu([] {
     if (ImGui::BeginMenu("View")) {
       if (ImGui::MenuItem("Set Enter Key")) {
@@ -299,6 +297,8 @@ int main(int argc, char** argv) {
   });
 
   gui::AddLateExecute([] {
+    gMainMenu.Display();
+
     if (glass::imm::BeginWindow(gNetworkTablesLogWindow)) {
       auto& settings = glass::GetStorage().GetOrNewData<glass::LogSettings>(
           &gNetworkTablesLog);
