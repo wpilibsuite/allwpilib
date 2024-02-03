@@ -18,6 +18,7 @@
 #include "glass/Model.h"
 #include "glass/Storage.h"
 #include "glass/View.h"
+#include "glass/Window.h"
 #include "glass/camera/NTCameraProvider.h"
 #include "glass/camera/UsbCameraProvider.h"
 #include "glass/networktables/NetworkTables.h"
@@ -48,10 +49,10 @@ static std::unique_ptr<glass::UsbCameraProvider> gUsbCameraProvider;
 static std::unique_ptr<glass::NetworkTablesModel> gNetworkTablesModel;
 static std::unique_ptr<glass::NetworkTablesSettings> gNetworkTablesSettings;
 static glass::LogData gNetworkTablesLog;
-static std::unique_ptr<glass::Window> gNetworkTablesWindow;
-static std::unique_ptr<glass::Window> gNetworkTablesInfoWindow;
-static std::unique_ptr<glass::Window> gNetworkTablesSettingsWindow;
-static std::unique_ptr<glass::Window> gNetworkTablesLogWindow;
+static glass::Window* gNetworkTablesWindow;
+static glass::Window* gNetworkTablesInfoWindow;
+static glass::Window* gNetworkTablesSettingsWindow;
+static glass::Window* gNetworkTablesLogWindow;
 
 static glass::MainMenuBar gMainMenu;
 static bool gAbout = false;
@@ -139,55 +140,38 @@ static void NtInitialize() {
     }
   });
 
-  gNetworkTablesLogWindow = std::make_unique<glass::Window>(
-      glass::GetStorageRoot().GetChild("NetworkTables Log"),
-      "NetworkTables Log", glass::Window::kHide);
+  gNetworkTablesLogWindow = glass::imm::GetOrAddWindow(
+      "NetworkTables Log", false, glass::Window::kHide);
   gNetworkTablesLogWindow->SetView(
       std::make_unique<glass::LogView>(&gNetworkTablesLog));
   gNetworkTablesLogWindow->SetDefaultPos(250, 615);
   gNetworkTablesLogWindow->SetDefaultSize(600, 130);
-  gNetworkTablesLogWindow->DisableRenamePopup();
-  gui::AddLateExecute([] { gNetworkTablesLogWindow->Display(); });
 
   // NetworkTables table window
   gNetworkTablesModel = std::make_unique<glass::NetworkTablesModel>();
   gui::AddEarlyExecute([] { gNetworkTablesModel->Update(); });
 
-  gNetworkTablesWindow = std::make_unique<glass::Window>(
-      glass::GetStorageRoot().GetChild("NetworkTables View"), "NetworkTables");
+  gNetworkTablesWindow = glass::imm::GetOrAddWindow("NetworkTables View");
   gNetworkTablesWindow->SetView(
       std::make_unique<glass::NetworkTablesView>(gNetworkTablesModel.get()));
   gNetworkTablesWindow->SetDefaultPos(250, 277);
   gNetworkTablesWindow->SetDefaultSize(750, 185);
-  gNetworkTablesWindow->DisableRenamePopup();
-  gui::AddLateExecute([] { gNetworkTablesWindow->Display(); });
 
   // NetworkTables info window
-  gNetworkTablesInfoWindow = std::make_unique<glass::Window>(
-      glass::GetStorageRoot().GetChild("NetworkTables Info"),
-      "NetworkTables Info");
-  gNetworkTablesInfoWindow->SetView(glass::MakeFunctionView(
-      [&] { glass::DisplayNetworkTablesInfo(gNetworkTablesModel.get()); }));
+  gNetworkTablesInfoWindow = glass::imm::GetOrAddWindow(
+      "NetworkTables Info", false, glass::Window::kHide);
   gNetworkTablesInfoWindow->SetDefaultPos(250, 130);
   gNetworkTablesInfoWindow->SetDefaultSize(750, 145);
-  gNetworkTablesInfoWindow->SetDefaultVisibility(glass::Window::kHide);
-  gNetworkTablesInfoWindow->DisableRenamePopup();
-  gui::AddLateExecute([] { gNetworkTablesInfoWindow->Display(); });
 
   // NetworkTables settings window
   gNetworkTablesSettings = std::make_unique<glass::NetworkTablesSettings>(
       "glass", glass::GetStorageRoot().GetChild("NetworkTables Settings"));
   gui::AddEarlyExecute([] { gNetworkTablesSettings->Update(); });
 
-  gNetworkTablesSettingsWindow = std::make_unique<glass::Window>(
-      glass::GetStorageRoot().GetChild("NetworkTables Settings"),
-      "NetworkTables Settings");
-  gNetworkTablesSettingsWindow->SetView(
-      glass::MakeFunctionView([] { gNetworkTablesSettings->Display(); }));
+  gNetworkTablesSettingsWindow =
+      glass::imm::GetOrAddWindow("NetworkTables Settings");
   gNetworkTablesSettingsWindow->SetDefaultPos(30, 30);
   gNetworkTablesSettingsWindow->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
-  gNetworkTablesSettingsWindow->DisableRenamePopup();
-  gui::AddLateExecute([] { gNetworkTablesSettingsWindow->Display(); });
 
   gui::AddWindowScaler([](float scale) {
     // scale default window positions
@@ -321,6 +305,34 @@ int main(int argc, char** argv) {
   });
 
   gui::AddLateExecute([] {
+    if (glass::imm::BeginWindow(gNetworkTablesLogWindow)) {
+      if (glass::imm::BeginWindowSettingsPopup()) {
+        gNetworkTablesLogWindow->GetView()->Settings();
+        ImGui::EndPopup();
+      }
+      gNetworkTablesLogWindow->GetView()->Display();
+    }
+    glass::imm::EndWindow();
+
+    if (glass::imm::BeginWindow(gNetworkTablesWindow)) {
+      if (glass::imm::BeginWindowSettingsPopup()) {
+        gNetworkTablesWindow->GetView()->Settings();
+        ImGui::EndPopup();
+      }
+      gNetworkTablesWindow->GetView()->Display();
+    }
+    glass::imm::EndWindow();
+
+    if (glass::imm::BeginWindow(gNetworkTablesInfoWindow)) {
+      glass::DisplayNetworkTablesInfo(gNetworkTablesModel.get());
+    }
+    glass::imm::EndWindow();
+
+    if (glass::imm::BeginWindow(gNetworkTablesSettingsWindow)) {
+      gNetworkTablesSettings->Display();
+    }
+    glass::imm::EndWindow();
+
     if (gAbout) {
       ImGui::OpenPopup("About");
       gAbout = false;
@@ -388,9 +400,6 @@ int main(int argc, char** argv) {
   // cs::Shutdown();
   gUsbCameraProvider.reset();
   gNtCameraProvider.reset();
-  gNetworkTablesSettingsWindow.reset();
-  gNetworkTablesLogWindow.reset();
-  gNetworkTablesWindow.reset();
   gNetworkTablesModel.reset();
   gNtProvider.reset();
   gPlotProvider.reset();
