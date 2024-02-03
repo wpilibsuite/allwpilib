@@ -14,7 +14,6 @@
 #include <glass/MainMenuBar.h>
 #include <glass/Storage.h>
 #include <glass/Window.h>
-#include <glass/WindowManager.h>
 #include <glass/other/Log.h>
 #include <imgui.h>
 #include <uv.h>
@@ -29,8 +28,6 @@
 #include "sysid/view/UILayout.h"
 
 namespace gui = wpi::gui;
-
-static std::unique_ptr<glass::WindowManager> gWindowManager;
 
 glass::Window* gLogLoaderWindow;
 glass::Window* gDataSelectorWindow;
@@ -99,8 +96,6 @@ void Application(std::string_view saveDir) {
 
   // Initialize window manager and add views.
   auto& storage = glass::GetStorageRoot().GetChild("SysId");
-  gWindowManager = std::make_unique<glass::WindowManager>(storage);
-  gWindowManager->GlobalInit();
 
   auto logLoader = std::make_unique<sysid::LogLoader>(storage, gLogger);
   auto dataSelector = std::make_unique<sysid::DataSelector>(storage, gLogger);
@@ -112,15 +107,17 @@ void Application(std::string_view saveDir) {
     _analyzer->AnalyzeData();
   };
 
-  gLogLoaderWindow =
-      gWindowManager->AddWindow("Log Loader", std::move(logLoader));
-
-  gDataSelectorWindow =
-      gWindowManager->AddWindow("Data Selector", std::move(dataSelector));
-
-  gAnalyzerWindow = gWindowManager->AddWindow("Analyzer", std::move(analyzer));
-
+  gLogLoaderWindow = glass::imm::CreateWindow(storage, "Log Loader");
+  gDataSelectorWindow = glass::imm::CreateWindow(storage, "Data Selector");
+  gAnalyzerWindow = glass::imm::CreateWindow(storage, "Analyzer");
   gProgramLogWindow = glass::imm::CreateWindow(storage, "Program Log");
+
+  wpi::gui::AddWindowScaler([](float scale) {
+    gLogLoaderWindow->ScaleDefault(scale);
+    gDataSelectorWindow->ScaleDefault(scale);
+    gAnalyzerWindow->ScaleDefault(scale);
+    gProgramLogWindow->ScaleDefault(scale);
+  });
 
   // Set default positions and sizes for windows.
 
@@ -152,14 +149,16 @@ void Application(std::string_view saveDir) {
   gui::ConfigurePlatformSaveFile("sysid.ini");
 
   // Add menu bar.
-  gui::AddLateExecute([] {
+  gui::AddLateExecute([&] {
     ImGui::BeginMainMenuBar();
     gMainMenu.WorkspaceMenu();
     gui::EmitViewMenu();
 
     if (ImGui::BeginMenu("Widgets")) {
+      gLogLoaderWindow->DisplayMenuItem();
+      gDataSelectorWindow->DisplayMenuItem();
+      gAnalyzerWindow->DisplayMenuItem();
       gProgramLogWindow->DisplayMenuItem();
-      gWindowManager->DisplayMenu();
       ImGui::EndMenu();
     }
 
@@ -198,6 +197,21 @@ void Application(std::string_view saveDir) {
       }
       ImGui::EndPopup();
     }
+
+    if (glass::imm::BeginWindow(gLogLoaderWindow)) {
+      logLoader->Display();
+    }
+    glass::imm::EndWindow();
+
+    if (glass::imm::BeginWindow(gDataSelectorWindow)) {
+      dataSelector->Display();
+    }
+    glass::imm::EndWindow();
+
+    if (glass::imm::BeginWindow(gAnalyzerWindow)) {
+      analyzer->Display();
+    }
+    glass::imm::EndWindow();
 
     if (glass::imm::BeginWindow(gProgramLogWindow)) {
       auto& settings =
