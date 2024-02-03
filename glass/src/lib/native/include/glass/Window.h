@@ -148,7 +148,7 @@ class Window {
 };
 
 namespace imm {
-Window* GetOrAddWindow(
+Window* CreateWindow(
     std::string_view id, bool duplicateOk = false,
     Window::Visibility defaultVisibility = Window::Visibility::kShow);
 

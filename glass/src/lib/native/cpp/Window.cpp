@@ -161,8 +161,8 @@ bool Window::BeginWindowSettingsPopup() {
                                              ImGuiWindowFlags_NoSavedSettings);
 }
 
-Window* imm::GetOrAddWindow(std::string_view id, bool duplicateOk,
-                            Window::Visibility defaultVisibility) {
+Window* imm::CreateWindow(std::string_view id, bool duplicateOk,
+                          Window::Visibility defaultVisibility) {
   Storage& storage = GetStorage().GetChild(id).GetChild("window");
   if (auto window = storage.GetData<Window>()) {
     if (!duplicateOk) {

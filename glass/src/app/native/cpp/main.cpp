@@ -140,7 +140,7 @@ static void NtInitialize() {
     }
   });
 
-  gNetworkTablesLogWindow = glass::imm::GetOrAddWindow(
+  gNetworkTablesLogWindow = glass::imm::CreateWindow(
       "NetworkTables Log", false, glass::Window::kHide);
   gNetworkTablesLogWindow->SetView(
       std::make_unique<glass::LogView>(&gNetworkTablesLog));
@@ -151,12 +151,12 @@ static void NtInitialize() {
   gNetworkTablesModel = std::make_unique<glass::NetworkTablesModel>();
   gui::AddEarlyExecute([] { gNetworkTablesModel->Update(); });
 
-  gNetworkTablesWindow = glass::imm::GetOrAddWindow("NetworkTables View");
+  gNetworkTablesWindow = glass::imm::CreateWindow("NetworkTables View");
   gNetworkTablesWindow->SetDefaultPos(250, 277);
   gNetworkTablesWindow->SetDefaultSize(750, 185);
 
   // NetworkTables info window
-  gNetworkTablesInfoWindow = glass::imm::GetOrAddWindow(
+  gNetworkTablesInfoWindow = glass::imm::CreateWindow(
       "NetworkTables Info", false, glass::Window::kHide);
   gNetworkTablesInfoWindow->SetDefaultPos(250, 130);
   gNetworkTablesInfoWindow->SetDefaultSize(750, 145);
@@ -167,7 +167,7 @@ static void NtInitialize() {
   gui::AddEarlyExecute([] { gNetworkTablesSettings->Update(); });
 
   gNetworkTablesSettingsWindow =
-      glass::imm::GetOrAddWindow("NetworkTables Settings");
+      glass::imm::CreateWindow("NetworkTables Settings");
   gNetworkTablesSettingsWindow->SetDefaultPos(30, 30);
   gNetworkTablesSettingsWindow->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
 
