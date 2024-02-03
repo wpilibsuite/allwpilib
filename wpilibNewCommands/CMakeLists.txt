@@ -56,7 +56,11 @@ if(WITH_JAVA_SOURCE)
     set_property(TARGET wpilibNewCommands_src_jar PROPERTY FOLDER "java")
 endif()
 
-file(GLOB_RECURSE wpilibNewCommands_native_src src/main/native/cpp/*.cpp)
+file(
+    GLOB_RECURSE wpilibNewCommands_native_src
+    src/main/native/cpp/*.cpp
+    src/generated/main/native/cpp/*.cpp
+)
 add_library(wpilibNewCommands ${wpilibNewCommands_native_src})
 set_target_properties(wpilibNewCommands PROPERTIES DEBUG_POSTFIX "d")
 set_property(TARGET wpilibNewCommands PROPERTY FOLDER "libraries")
@@ -69,6 +73,7 @@ target_include_directories(
     wpilibNewCommands
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/generated/main/native/include>
         $<INSTALL_INTERFACE:${include_dest}/wpilibNewCommands>
 )
 

@@ -28,7 +28,7 @@ BUTTON_TEST(PS5Controller, L3Button)
 BUTTON_TEST(PS5Controller, R3Button)
 
 BUTTON_TEST(PS5Controller, PSButton)
-BUTTON_TEST(PS5Controller, Touchpad)
+BUTTON_TEST(PS5Controller, TouchpadButton)
 
 AXIS_TEST(PS5Controller, LeftX)
 AXIS_TEST(PS5Controller, RightX)
