@@ -1,0 +1,570 @@
+[
+  {
+    "ConsoleName": "Xbox",
+    "Manufacturer": "Microsoft",
+    "SkipReporting": false,
+    "AxisNameSuffix": "Trigger",
+    "buttons": [
+      {
+        "NameParts": [
+          "a"
+        ],
+        "value": 1,
+        "DocName": "A"
+      },
+      {
+        "NameParts": [
+          "b"
+        ],
+        "value": 2,
+        "DocName": "B"
+      },
+      {
+        "NameParts": [
+          "x"
+        ],
+        "value": 3,
+        "DocName": "X"
+      },
+      {
+        "NameParts": [
+          "y"
+        ],
+        "value": 4,
+        "DocName": "Y"
+      },
+      {
+        "NameParts": [
+          "left",
+          "Bumper"
+        ],
+        "value": 5
+      },
+      {
+        "NameParts": [
+          "right",
+          "Bumper"
+        ],
+        "value": 6
+      },
+      {
+        "NameParts": [
+          "back"
+        ],
+        "value": 7
+      },
+      {
+        "NameParts": [
+          "start"
+        ],
+        "value": 8
+      },
+      {
+        "NameParts": [
+          "left",
+          "Stick"
+        ],
+        "value": 9
+      },
+      {
+        "NameParts": [
+          "right",
+          "Stick"
+        ],
+        "value": 10
+      }
+    ],
+    "axes": [
+      {
+        "NameParts": [
+          "left",
+          "X"
+        ],
+        "value": 0,
+        "type": "stick"
+      },
+      {
+        "NameParts": [
+          "right",
+          "X"
+        ],
+        "value": 4,
+        "type": "stick"
+      },
+      {
+        "NameParts": [
+          "left",
+          "Y"
+        ],
+        "value": 1,
+        "type": "stick"
+      },
+      {
+        "NameParts": [
+          "right",
+          "Y"
+        ],
+        "value": 5,
+        "type": "stick"
+      },
+      {
+        "HumanName": "LeftTrigger",
+        "value": 2,
+        "type": "trigger",
+        "DocName": "left trigger",
+        "EventMethodName": "leftTrigger",
+        "UseThresholdMethods": true
+      },
+      {
+        "HumanName": "RightTrigger",
+        "value": 3,
+        "type": "trigger",
+        "DocName": "right trigger",
+        "EventMethodName": "rightTrigger",
+        "UseThresholdMethods": true
+      }
+    ]
+  },
+  {
+    "ConsoleName": "PS4",
+    "Manufacturer": "Sony",
+    "SkipReporting": false,
+    "AxisNameSuffix": "2",
+    "buttons": [
+      {
+        "NameParts": [
+          "square"
+        ],
+        "value": 1
+      },
+      {
+        "NameParts": [
+          "cross"
+        ],
+        "value": 2
+      },
+      {
+        "NameParts": [
+          "circle"
+        ],
+        "value": 3
+      },
+      {
+        "NameParts": [
+          "triangle"
+        ],
+        "value": 4
+      },
+      {
+        "NameParts": [
+          "L1"
+        ],
+        "value": 5,
+        "DocName": "left trigger 1"
+      },
+      {
+        "NameParts": [
+          "R1"
+        ],
+        "value": 6,
+        "DocName": "right trigger 1"
+      },
+      {
+        "NameParts": [
+          "L2"
+        ],
+        "value": 7,
+        "DocName": "left trigger 2"
+      },
+      {
+        "NameParts": [
+          "R2"
+        ],
+        "value": 8,
+        "DocName": "right trigger 2"
+      },
+      {
+        "NameParts": [
+          "share"
+        ],
+        "value": 9
+      },
+      {
+        "NameParts": [
+          "options"
+        ],
+        "value": 10
+      },
+      {
+        "NameParts": [
+          "L3"
+        ],
+        "value": 11,
+        "DocName": "L3 (left stick)"
+      },
+      {
+        "NameParts": [
+          "R3"
+        ],
+        "value": 12,
+        "DocName": "R3 (right stick)"
+      },
+      {
+        "NameParts": [
+          "P",
+          "S"
+        ],
+        "value": 13,
+        "DocName": "PlayStation"
+      },
+      {
+        "NameParts": [
+          "touchpad"
+        ],
+        "value": 14
+      }
+    ],
+    "axes": [
+      {
+        "NameParts": [
+          "left",
+          "X"
+        ],
+        "value": 0,
+        "type": "stick"
+      },
+      {
+        "NameParts": [
+          "left",
+          "Y"
+        ],
+        "value": 1,
+        "type": "stick"
+      },
+      {
+        "NameParts": [
+          "right",
+          "X"
+        ],
+        "value": 2,
+        "type": "stick"
+      },
+      {
+        "NameParts": [
+          "right",
+          "Y"
+        ],
+        "value": 5,
+        "type": "stick"
+      },
+      {
+        "HumanName": "L2",
+        "value": 3,
+        "type": "trigger",
+        "DocName": "left trigger 2",
+        "EventMethodName": "L2",
+        "UseThresholdMethods": false
+      },
+      {
+        "HumanName": "R2",
+        "value": 4,
+        "type": "trigger",
+        "DocName": "right trigger 2",
+        "EventMethodName": "R2",
+        "UseThresholdMethods": false
+      }
+    ]
+  },
+  {
+    "ConsoleName": "PS5",
+    "Manufacturer": "Sony",
+    "SkipReporting": true,
+    "AxisNameSuffix": "2",
+    "buttons": [
+      {
+        "NameParts": [
+          "square"
+        ],
+        "value": 1
+      },
+      {
+        "NameParts": [
+          "cross"
+        ],
+        "value": 2
+      },
+      {
+        "NameParts": [
+          "circle"
+        ],
+        "value": 3
+      },
+      {
+        "NameParts": [
+          "triangle"
+        ],
+        "value": 4
+      },
+      {
+        "NameParts": [
+          "L1"
+        ],
+        "value": 5,
+        "DocName": "left trigger 1"
+      },
+      {
+        "NameParts": [
+          "R1"
+        ],
+        "value": 6,
+        "DocName": "right trigger 1"
+      },
+      {
+        "NameParts": [
+          "L2"
+        ],
+        "value": 7,
+        "DocName": "left trigger 2"
+      },
+      {
+        "NameParts": [
+          "R2"
+        ],
+        "value": 8,
+        "DocName": "right trigger 2"
+      },
+      {
+        "NameParts": [
+          "create"
+        ],
+        "value": 9
+      },
+      {
+        "NameParts": [
+          "options"
+        ],
+        "value": 10
+      },
+      {
+        "NameParts": [
+          "L3"
+        ],
+        "value": 11,
+        "DocName": "L3 (left stick)"
+      },
+      {
+        "NameParts": [
+          "R3"
+        ],
+        "value": 12,
+        "DocName": "R3 (right stick)"
+      },
+      {
+        "NameParts": [
+          "P",
+          "S"
+        ],
+        "value": 13,
+        "DocName": "PlayStation"
+      },
+      {
+        "NameParts": [
+          "touchpad"
+        ],
+        "value": 14
+      }
+    ],
+    "axes": [
+      {
+        "NameParts": [
+          "left",
+          "X"
+        ],
+        "value": 0,
+        "type": "stick"
+      },
+      {
+        "NameParts": [
+          "left",
+          "Y"
+        ],
+        "value": 1,
+        "type": "stick"
+      },
+      {
+        "NameParts": [
+          "right",
+          "X"
+        ],
+        "value": 2,
+        "type": "stick"
+      },
+      {
+        "NameParts": [
+          "right",
+          "Y"
+        ],
+        "value": 5,
+        "type": "stick"
+      },
+      {
+        "HumanName": "L2",
+        "value": 3,
+        "type": "trigger",
+        "DocName": "left trigger 2",
+        "EventMethodName": "L2",
+        "UseThresholdMethods": false
+      },
+      {
+        "HumanName": "R2",
+        "value": 4,
+        "type": "trigger",
+        "DocName": "right trigger 2",
+        "EventMethodName": "R2",
+        "UseThresholdMethods": false
+      }
+    ]
+  },
+  {
+    "ConsoleName": "Stadia",
+    "Manufacturer": "Google",
+    "SkipReporting": true,
+    "AxisNameSuffix": "Trigger",
+    "buttons": [
+      {
+        "NameParts": [
+          "a"
+        ],
+        "value": 1,
+        "DocName": "A"
+      },
+      {
+        "NameParts": [
+          "b"
+        ],
+        "value": 2,
+        "DocName": "B"
+      },
+      {
+        "NameParts": [
+          "x"
+        ],
+        "value": 3,
+        "DocName": "X"
+      },
+      {
+        "NameParts": [
+          "y"
+        ],
+        "value": 4,
+        "DocName": "Y"
+      },
+      {
+        "NameParts": [
+          "left",
+          "Bumper"
+        ],
+        "value": 5
+      },
+      {
+        "NameParts": [
+          "right",
+          "Bumper"
+        ],
+        "value": 6
+      },
+      {
+        "NameParts": [
+          "left",
+          "Stick"
+        ],
+        "value": 7
+      },
+      {
+        "NameParts": [
+          "right",
+          "Stick"
+        ],
+        "value": 8
+      },
+      {
+        "NameParts": [
+          "ellipses"
+        ],
+        "value": 9
+      },
+      {
+        "NameParts": [
+          "hamburger"
+        ],
+        "value": 10
+      },
+      {
+        "NameParts": [
+          "stadia"
+        ],
+        "value": 11
+      },
+      {
+        "NameParts": [
+          "right",
+          "Trigger"
+        ],
+        "value": 12
+      },
+      {
+        "NameParts": [
+          "left",
+          "Trigger"
+        ],
+        "value": 13
+      },
+      {
+        "NameParts": [
+          "google"
+        ],
+        "value": 14
+      },
+      {
+        "NameParts": [
+          "frame"
+        ],
+        "value": 15
+      }
+    ],
+    "axes": [
+      {
+        "NameParts": [
+          "left",
+          "X"
+        ],
+        "value": 0,
+        "type": "stick"
+      },
+      {
+        "NameParts": [
+          "right",
+          "X"
+        ],
+        "value": 3,
+        "type": "stick"
+      },
+      {
+        "NameParts": [
+          "left",
+          "Y"
+        ],
+        "value": 1,
+        "type": "stick"
+      },
+      {
+        "NameParts": [
+          "right",
+          "Y"
+        ],
+        "value": 4,
+        "type": "stick"
+      }
+    ]
+  }
+]
