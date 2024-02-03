@@ -161,18 +161,20 @@ bool Window::BeginWindowSettingsPopup() {
                                              ImGuiWindowFlags_NoSavedSettings);
 }
 
-Window* imm::CreateWindow(std::string_view id, bool duplicateOk,
+Window* imm::CreateWindow(Storage& storage, std::string_view id,
+                          bool duplicateOk,
                           Window::Visibility defaultVisibility) {
-  Storage& storage = GetStorage().GetChild(id).GetChild("window");
-  if (auto window = storage.GetData<Window>()) {
+  Storage& windowStorage = storage.GetChild(id).GetChild("window");
+  if (auto window = windowStorage.GetData<Window>()) {
     if (!duplicateOk) {
       fmt::print(stderr, "GUI: ignoring duplicate window '{}'\n", id);
       return nullptr;
     }
     return window;
   }
-  storage.SetData(std::make_shared<Window>(storage, id, defaultVisibility));
-  return storage.GetData<Window>();
+  windowStorage.SetData(
+      std::make_shared<Window>(windowStorage, id, defaultVisibility));
+  return windowStorage.GetData<Window>();
 }
 
 bool imm::BeginWindow(Window* window) {

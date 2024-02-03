@@ -149,8 +149,14 @@ class Window {
 
 namespace imm {
 Window* CreateWindow(
-    std::string_view id, bool duplicateOk = false,
+    Storage& storage, std::string_view id, bool duplicateOk = false,
     Window::Visibility defaultVisibility = Window::Visibility::kShow);
+
+inline Window* CreateWindow(
+    std::string_view id, bool duplicateOk = false,
+    Window::Visibility defaultVisibility = Window::Visibility::kShow) {
+  return CreateWindow(GetStorage(), id, duplicateOk, defaultVisibility);
+}
 
 inline Window* GetWindow() {
   return GetStorage().GetChild("window").GetData<Window>();
