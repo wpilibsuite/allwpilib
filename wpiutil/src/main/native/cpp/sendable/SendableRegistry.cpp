@@ -9,6 +9,7 @@
 #include <fmt/format.h>
 
 #include "wpi/DenseMap.h"
+#include "wpi/GlobalState.h"
 #include "wpi/SmallVector.h"
 #include "wpi/UidVector.h"
 #include "wpi/mutex.h"
@@ -72,11 +73,10 @@ static SendableRegistryInst& GetInstance() {
 }
 
 #ifndef __FRC_ROBORIO__
-namespace wpi::impl {
-void ResetSendableRegistry() {
-  std::make_unique<SendableRegistryInst>().swap(GetInstanceHolder());
-}
-}  // namespace wpi::impl
+static wpi::impl::RegisterGlobalStateResetHelper _(
+    wpi::impl::GSPrioritySendableRegistry, []() {
+      std::make_unique<SendableRegistryInst>().swap(GetInstanceHolder());
+    });
 #endif
 
 void SendableRegistry::SetLiveWindowBuilderFactory(

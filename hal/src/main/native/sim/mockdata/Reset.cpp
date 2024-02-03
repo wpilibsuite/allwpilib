@@ -25,6 +25,8 @@
 #include <hal/simulation/SPIData.h>
 #include <hal/simulation/SimDeviceData.h>
 
+#include <wpi/GlobalState.h>
+
 #include "../PortsInternal.h"
 
 extern "C" void HALSIM_ResetAllSimData(void) {
@@ -107,3 +109,6 @@ extern "C" void HALSIM_ResetAllSimData(void) {
     HALSIM_ResetSPIData(i);
   }
 }
+
+static wpi::impl::RegisterGlobalStateResetHelper _(
+    wpi::impl::GSPriorityHalSimData, HALSIM_ResetAllSimData);

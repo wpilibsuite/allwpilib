@@ -8,6 +8,7 @@
 #include <utility>
 
 #include <hal/DriverStation.h>
+#include <wpi/GlobalState.h>
 #include <wpi/SafeThread.h>
 #include <wpi/SmallPtrSet.h>
 
@@ -81,6 +82,9 @@ void ResetMotorSafety() {
   manager.threadStarted = false;
 }
 }  // namespace frc::impl
+
+static wpi::impl::RegisterGlobalStateResetHelper _(
+    wpi::impl::GSPriorityMotorSafety, frc::impl::ResetMotorSafety);
 #endif
 
 MotorSafety::MotorSafety() {

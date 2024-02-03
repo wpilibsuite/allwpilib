@@ -7,6 +7,7 @@
 #include <cstdio>
 #include <vector>
 
+#include <wpi/GlobalState.h>
 #include <wpi/mutex.h>
 #include <wpi/spinlock.h>
 
@@ -437,6 +438,9 @@ void HALSIM_CancelAllSimPeriodicCallbacks(void) {
   gSimPeriodicBefore.Reset();
   gSimPeriodicAfter.Reset();
 }
+
+static wpi::impl::RegisterGlobalStateResetHelper _(
+    wpi::impl::GSPriorityHalCallbacks, HALSIM_CancelAllSimPeriodicCallbacks);
 
 int64_t HAL_Report(int32_t resource, int32_t instanceNumber, int32_t context,
                    const char* feature) {
