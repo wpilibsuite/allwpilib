@@ -16,25 +16,17 @@
 
 using namespace glass;
 
-Window::Window(Storage& storage, std::string_view id,
+Window::Window(Storage& storage, Storage& windowStorage, std::string_view id,
                Visibility defaultVisibility)
-    : m_id{id},
-      m_name{storage.GetString("name")},
+    : m_storage{storage},
+      m_id{id},
+      m_name{windowStorage.GetString("name")},
       m_defaultName{id},
-      m_visible{storage.GetBool("visible", defaultVisibility != kHide)},
-      m_enabled{storage.GetBool("enabled", defaultVisibility != kDisabled)},
-      m_defaultVisible{storage.GetValue("visible").boolDefault},
-      m_defaultEnabled{storage.GetValue("enabled").boolDefault} {}
-
-void Window::SetVisibility(Visibility visibility) {
-  m_visible = visibility != kHide;
-  m_enabled = visibility != kDisabled;
-}
-
-void Window::SetDefaultVisibility(Visibility visibility) {
-  m_defaultVisible = visibility != kHide;
-  m_defaultEnabled = visibility != kDisabled;
-}
+      m_visible{windowStorage.GetBool("visible", defaultVisibility != kHide)},
+      m_enabled{
+          windowStorage.GetBool("enabled", defaultVisibility != kDisabled)},
+      m_defaultVisible{windowStorage.GetValue("visible").boolDefault},
+      m_defaultEnabled{windowStorage.GetValue("enabled").boolDefault} {}
 
 void Window::Display() {
   if (!m_view) {
@@ -86,6 +78,11 @@ void Window::ScaleDefault(float scale) {
 }
 
 bool Window::BeginWindow() {
+  PushStorageStack(m_storage);
+
+  if (!m_visible || !m_enabled) {
+    return false;
+  }
   m_inWindow = true;
 
   if (m_posCond != 0) {
@@ -105,15 +102,16 @@ bool Window::BeginWindow() {
     label = fmt::format("{}###{}", m_name, m_id);
   }
 
-  return Begin(label.c_str(), &m_visible, m_flags);
+  return ImGui::Begin(label.c_str(), &m_visible, m_flags);
 }
 
 void Window::EndWindow() {
+  PopStorageStack();
   if (!m_inWindow) {
     return;
   }
   m_inWindow = false;
-  End();
+  ImGui::End();
   if (m_setPadding) {
     ImGui::PopStyleVar();
   }
@@ -161,10 +159,10 @@ bool Window::BeginWindowSettingsPopup() {
                                              ImGuiWindowFlags_NoSavedSettings);
 }
 
-Window* imm::CreateWindow(Storage& storage, std::string_view id,
-                          bool duplicateOk,
+Window* imm::CreateWindow(Storage& root, std::string_view id, bool duplicateOk,
                           Window::Visibility defaultVisibility) {
-  Storage& windowStorage = storage.GetChild(id).GetChild("window");
+  Storage& storage = root.GetChild(id);
+  Storage& windowStorage = storage.GetChild("window");
   if (auto window = windowStorage.GetData<Window>()) {
     if (!duplicateOk) {
       fmt::print(stderr, "GUI: ignoring duplicate window '{}'\n", id);
@@ -173,13 +171,6 @@ Window* imm::CreateWindow(Storage& storage, std::string_view id,
     return window;
   }
   windowStorage.SetData(
-      std::make_shared<Window>(windowStorage, id, defaultVisibility));
+      std::make_shared<Window>(storage, id, defaultVisibility));
   return windowStorage.GetData<Window>();
-}
-
-bool imm::BeginWindow(Window* window) {
-  if (!window || !window->IsVisible() || !window->IsEnabled()) {
-    return false;
-  }
-  return window->BeginWindow();
 }

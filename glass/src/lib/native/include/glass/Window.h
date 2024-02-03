@@ -27,7 +27,8 @@ class Window {
   enum Visibility { kHide = 0, kShow, kDisabled };
 
   Window(Storage& storage, std::string_view id,
-         Visibility defaultVisibility = kShow);
+         Visibility defaultVisibility = kShow)
+      : Window{storage, storage.GetChild("window"), id, defaultVisibility} {}
 
   std::string_view GetId() const { return m_id; }
 
@@ -60,14 +61,20 @@ class Window {
    *
    * @param visibility 0=hide, 1=show, 2=disabled (force-hide)
    */
-  void SetVisibility(Visibility visibility);
+  void SetVisibility(Visibility visibility) {
+    m_visible = visibility != kHide;
+    m_enabled = visibility != kDisabled;
+  }
 
   /**
    * Sets default visibility of window.
    *
    * @param visibility 0=hide, 1=show, 2=disabled (force-hide)
    */
-  void SetDefaultVisibility(Visibility visibility);
+  void SetDefaultVisibility(Visibility visibility) {
+    m_defaultVisible = visibility != kHide;
+    m_defaultEnabled = visibility != kDisabled;
+  }
 
   /**
    * Sets default position of window.
@@ -128,6 +135,10 @@ class Window {
   bool EditName() { return ItemEditName(&m_name); }
 
  private:
+  Window(Storage& storage, Storage& windowStorage, std::string_view id,
+         Visibility defaultVisibility);
+
+  Storage& m_storage;
   std::string m_id;
   std::string& m_name;
   std::string m_defaultName;
@@ -149,7 +160,7 @@ class Window {
 
 namespace imm {
 Window* CreateWindow(
-    Storage& storage, std::string_view id, bool duplicateOk = false,
+    Storage& root, std::string_view id, bool duplicateOk = false,
     Window::Visibility defaultVisibility = Window::Visibility::kShow);
 
 inline Window* CreateWindow(
@@ -167,7 +178,10 @@ inline Window* GetWindow(std::string_view id) {
 }
 
 [[nodiscard]]
-bool BeginWindow(Window* window);
+inline bool BeginWindow(Window* window) {
+  assert(window);
+  return window->BeginWindow();
+}
 
 [[nodiscard]]
 inline bool BeginWindow() {
@@ -180,9 +194,9 @@ inline bool BeginWindow(std::string_view id) {
 }
 
 inline void EndWindow() {
-  if (Window* window = GetWindow()) {
-    window->EndWindow();
-  }
+  Window* window = GetWindow();
+  assert(window);
+  window->EndWindow();
 }
 
 [[nodiscard]]
