@@ -240,18 +240,10 @@ int main(int argc, char** argv) {
       ImGui::EndMenu();
     }
     if (ImGui::BeginMenu("NetworkTables")) {
-      if (gNetworkTablesSettingsWindow) {
-        gNetworkTablesSettingsWindow->DisplayMenuItem("NetworkTables Settings");
-      }
-      if (gNetworkTablesWindow) {
-        gNetworkTablesWindow->DisplayMenuItem("NetworkTables View");
-      }
-      if (gNetworkTablesInfoWindow) {
-        gNetworkTablesInfoWindow->DisplayMenuItem("NetworkTables Info");
-      }
-      if (gNetworkTablesLogWindow) {
-        gNetworkTablesLogWindow->DisplayMenuItem("NetworkTables Log");
-      }
+      gNetworkTablesSettingsWindow->DisplayMenuItem("NetworkTables Settings");
+      gNetworkTablesWindow->DisplayMenuItem("NetworkTables View");
+      gNetworkTablesInfoWindow->DisplayMenuItem("NetworkTables Info");
+      gNetworkTablesLogWindow->DisplayMenuItem("NetworkTables Log");
       ImGui::MenuItem("NetworkTables Debug Logging", nullptr,
                       &gNetworkTablesDebugLog);
       ImGui::Separator();
