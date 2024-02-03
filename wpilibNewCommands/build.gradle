@@ -24,6 +24,8 @@ dependencies {
     testImplementation 'org.mockito:mockito-core:4.1.0'
 }
 
+sourceSets.main.java.srcDir "${projectDir}/src/generated/main/java"
+
 nativeUtils.exportsConfigs {
     wpilibNewCommands {
         x64ExcludeSymbols = [

@@ -17,7 +17,7 @@ if(WITH_JAVA)
 
     configure_file(src/generate/WPILibVersion.java.in WPILibVersion.java)
 
-    file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
+    file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java src/generated/main/java/*.java)
     file(GLOB EJML_JARS "${WPILIB_BINARY_DIR}/wpimath/thirdparty/ejml/*.jar")
     file(GLOB JACKSON_JARS "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/jackson/*.jar")
 
@@ -49,14 +49,22 @@ endif()
 if(WITH_JAVA_SOURCE)
     find_package(Java REQUIRED)
     include(UseJava)
-    file(GLOB WPILIBJ_SOURCES src/main/java/edu/wpi/first/wpilibj/*.java)
+    file(
+        GLOB WPILIBJ_SOURCES
+        src/main/java/edu/wpi/first/wpilibj/*.java
+        src/generated/main/java/edu/wpi/first/wpilibj/*.java
+    )
     file(GLOB WPILIBJ_COUNTER_SOURCES src/main/java/edu/wpi/first/wpilibj/counter/*.java)
     file(GLOB WPILIBJ_DRIVE_SOURCES src/main/java/edu/wpi/first/wpilibj/drive/*.java)
     file(GLOB WPILIBJ_EVENT_SOURCES src/main/java/edu/wpi/first/wpilibj/event/*.java)
     file(GLOB WPILIBJ_INTERFACES_SOURCES src/main/java/edu/wpi/first/wpilibj/interfaces/*.java)
     file(GLOB WPILIBJ_MOTORCONTROL_SOURCES src/main/java/edu/wpi/first/wpilibj/motorcontrol*.java)
     file(GLOB WPILIBJ_SHUFFLEBOARD_SOURCES src/main/java/edu/wpi/first/wpilibj/shuffleboard*.java)
-    file(GLOB WPILIBJ_SIMULATION_SOURCES src/main/java/edu/wpi/first/wpilibj/simulation*.java)
+    file(
+        GLOB WPILIBJ_SIMULATION_SOURCES
+        src/main/java/edu/wpi/first/wpilibj/simulation/*.java
+        src/generated/main/java/edu/wpi/first/wpilibj/simulation/*.java
+    )
     file(GLOB WPILIBJ_SMARTDASHBOARD_SOURCES src/main/java/edu/wpi/first/wpilibj/*.java)
     file(
         GLOB WPILIBJ_UTIL_SOURCES

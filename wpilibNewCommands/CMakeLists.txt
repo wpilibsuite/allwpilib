@@ -8,7 +8,7 @@ if(WITH_JAVA)
     find_package(Java REQUIRED)
     include(UseJava)
 
-    file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
+    file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java src/generated/main/java/*.java)
     add_jar(
         wpilibNewCommands_jar
         ${JAVA_SOURCES}
@@ -39,7 +39,8 @@ if(WITH_JAVA_SOURCE)
     file(GLOB WPILIBNEWCOMMANDS_SOURCES src/main/java/edu/wpi/first/wpilibj2/command/*.java)
     file(
         GLOB WPILIBNEWCOMMANDS_BUTTON_SOURCES
-        src/main/java/edu/wpi/first/wpilibj2/command/button*.java
+        src/main/java/edu/wpi/first/wpilibj2/command/button/*.java
+        src/generated/main/java/edu/wpi/first/wpilibj2/command/button/*.java
     )
     add_jar(
         wpilibNewCommands_src_jar
