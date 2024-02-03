@@ -15,9 +15,7 @@
 
 #include "glass/Context.h"
 #include "glass/MainMenuBar.h"
-#include "glass/Model.h"
 #include "glass/Storage.h"
-#include "glass/View.h"
 #include "glass/Window.h"
 #include "glass/camera/NTCameraProvider.h"
 #include "glass/camera/UsbCameraProvider.h"
@@ -308,7 +306,6 @@ int main(int argc, char** argv) {
         settings.DisplayMenu();
         ImGui::EndPopup();
       }
-      gNetworkTablesLogWindow->GetView()->Display();
       glass::DisplayLog(&gNetworkTablesLog, settings.IsAutoScroll());
     }
     glass::imm::EndWindow();
@@ -320,7 +317,6 @@ int main(int argc, char** argv) {
         settings.DisplayMenu();
         glass::DisplayNetworkTablesAddMenu(gNetworkTablesModel.get(), {},
                                            settings.GetFlags());
-        gNetworkTablesWindow->GetView()->Settings();
         ImGui::EndPopup();
       }
       DisplayNetworkTables(gNetworkTablesModel.get(), settings.GetFlags());
