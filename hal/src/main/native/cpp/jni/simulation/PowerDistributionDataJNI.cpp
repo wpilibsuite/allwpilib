@@ -65,6 +65,57 @@ Java_edu_wpi_first_hal_simulation_PowerDistributionDataJNI_setInitialized
 
 /*
  * Class:     edu_wpi_first_hal_simulation_PowerDistributionDataJNI
+ * Method:    registerChannelCountCallback
+ * Signature: (ILjava/lang/Object;Z)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_simulation_PowerDistributionDataJNI_registerChannelCountCallback
+  (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
+{
+  return sim::AllocateCallback(
+      env, index, callback, initialNotify,
+      &HALSIM_RegisterPowerDistributionChannelCountCallback);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_PowerDistributionDataJNI
+ * Method:    cancelChannelCountCallback
+ * Signature: (II)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_PowerDistributionDataJNI_cancelChannelCountCallback
+  (JNIEnv* env, jclass, jint index, jint handle)
+{
+  return sim::FreeCallback(env, handle, index,
+                           &HALSIM_CancelPowerDistributionChannelCountCallback);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_PowerDistributionDataJNI
+ * Method:    getChannelCount
+ * Signature: (I)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_simulation_PowerDistributionDataJNI_getChannelCount
+  (JNIEnv*, jclass, jint index)
+{
+  return HALSIM_GetPowerDistributionChannelCount(index);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_PowerDistributionDataJNI
+ * Method:    setChannelCount
+ * Signature: (II)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_PowerDistributionDataJNI_setChannelCount
+  (JNIEnv*, jclass, jint index, jint channelCount)
+{
+  HALSIM_SetPowerDistributionChannelCount(index, channelCount);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_PowerDistributionDataJNI
  * Method:    registerTemperatureCallback
  * Signature: (ILjava/lang/Object;Z)I
  */
