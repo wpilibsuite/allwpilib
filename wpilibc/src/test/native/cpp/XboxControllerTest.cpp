@@ -11,8 +11,8 @@
 
 using namespace frc;
 
-BUTTON_TEST(XboxController, LeftBumper)
-BUTTON_TEST(XboxController, RightBumper)
+BUTTON_TEST(XboxController, LeftBumperButton)
+BUTTON_TEST(XboxController, RightBumperButton)
 
 BUTTON_TEST(XboxController, LeftStickButton)
 BUTTON_TEST(XboxController, RightStickButton)

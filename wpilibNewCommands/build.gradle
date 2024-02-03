@@ -45,7 +45,24 @@ nativeUtils.exportsConfigs {
 }
 
 model {
-    components {}
+    components {
+        "${nativeName}Base" {
+            it.sources.cpp {
+                source {
+                    srcDirs 'src/generated/main/native/cpp'
+                    include '**/*.cpp'
+                }
+                exportedHeaders {
+                    srcDirs 'src/generated/main/native/include'
+                }
+            }
+        }
+        "${nativeName}" {
+            it.sources.cpp.exportedHeaders {
+                srcDirs 'src/generated/main/native/include'
+            }
+        }
+    }
     binaries {
         all {
             if (!it.buildable || !(it instanceof NativeBinarySpec)) {

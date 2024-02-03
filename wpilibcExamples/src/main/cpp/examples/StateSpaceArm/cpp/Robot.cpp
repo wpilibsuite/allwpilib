@@ -110,7 +110,7 @@ class Robot : public frc::TimedRobot {
     // Sets the target position of our arm. This is similar to setting the
     // setpoint of a PID controller.
     frc::TrapezoidProfile<units::radians>::State goal;
-    if (m_joystick.GetRightBumper()) {
+    if (m_joystick.GetRightBumperButton()) {
       // We pressed the bumper, so let's set our next reference
       goal = {kRaisedPosition, 0_rad_per_s};
     } else {

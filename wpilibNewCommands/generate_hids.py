@@ -50,5 +50,39 @@ def main():
         output = template.render(controller)
         write_controller_file(rootPath, controllerName, output)
 
+    # C++ headers
+    env = Environment(
+        loader=FileSystemLoader(
+            f"{dirname}/src/generate/main/native/include/frc2/command/button"
+        ),
+        autoescape=False,
+        keep_trailing_newline=True,
+    )
+    rootPath = f"{dirname}/src/generated/main/native/include/frc2/command/button"
+    template = env.get_template("commandhid.h.jinja")
+    for controller in controllers:
+        controllerName = os.path.basename(
+            f"Command{controller['ConsoleName']}Controller.h"
+        )
+        output = template.render(controller)
+        write_controller_file(rootPath, controllerName, output)
+
+    # C++ files
+    env = Environment(
+        loader=FileSystemLoader(
+            f"{dirname}/src/generate/main/native/cpp/frc2/command/button"
+        ),
+        autoescape=False,
+    )
+    rootPath = f"{dirname}/src/generated/main/native/cpp/frc2/command/button"
+    template = env.get_template("commandhid.cpp.jinja")
+    for controller in controllers:
+        controllerName = os.path.basename(
+            f"Command{controller['ConsoleName']}Controller.cpp"
+        )
+        output = template.render(controller)
+        write_controller_file(rootPath, controllerName, output)
+
+
 if __name__ == "__main__":
     main()
