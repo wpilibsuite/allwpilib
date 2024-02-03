@@ -124,7 +124,8 @@ class Window {
   void EndWindow();
   [[nodiscard]]
   bool BeginWindowSettingsPopup();
-  void EndWindowSettingsPopup();
+
+  bool EditName() { return ItemEditName(&m_name); }
 
  private:
   std::string m_id;
@@ -143,6 +144,7 @@ class Window {
   ImVec2 m_size;
   bool m_setPadding = false;
   ImVec2 m_padding;
+  bool m_inWindow = false;
 };
 
 namespace imm {
@@ -159,19 +161,27 @@ inline Window* GetWindow(std::string_view id) {
 }
 
 [[nodiscard]]
-bool BeginWindow();
+bool BeginWindow(Window* window);
+
+[[nodiscard]]
+inline bool BeginWindow() {
+  return BeginWindow(GetWindow());
+}
+
+[[nodiscard]]
+inline bool BeginWindow(std::string_view id) {
+  return BeginWindow(GetWindow(id));
+}
 
 inline void EndWindow() {
-  GetWindow()->EndWindow();
+  if (Window* window = GetWindow()) {
+    window->EndWindow();
+  }
 }
 
 [[nodiscard]]
 inline bool BeginWindowSettingsPopup() {
   return GetWindow()->BeginWindowSettingsPopup();
-}
-
-inline void EndWindowSettingsPopup() {
-  return GetWindow()->EndWindowSettingsPopup();
 }
 
 }  // namespace imm

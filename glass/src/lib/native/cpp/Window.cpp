@@ -50,9 +50,12 @@ void Window::Display() {
   if (BeginWindow()) {
     if (m_renamePopupEnabled || m_view->HasSettings()) {
       if (BeginWindowSettingsPopup()) {
+        if (m_renamePopupEnabled) {
+          EditName();
+        }
         m_view->Settings();
 
-        EndWindowSettingsPopup();
+        ImGui::EndPopup();
       }
     }
 
@@ -83,6 +86,8 @@ void Window::ScaleDefault(float scale) {
 }
 
 bool Window::BeginWindow() {
+  m_inWindow = true;
+
   if (m_posCond != 0) {
     ImGui::SetNextWindowPos(m_pos, m_posCond);
   }
@@ -104,6 +109,10 @@ bool Window::BeginWindow() {
 }
 
 void Window::EndWindow() {
+  if (!m_inWindow) {
+    return;
+  }
+  m_inWindow = false;
   End();
   if (m_setPadding) {
     ImGui::PopStyleVar();
@@ -147,20 +156,9 @@ bool Window::BeginWindowSettingsPopup() {
     ImGui::OpenPopup(window->ID);
   }
 
-  if (ImGui::BeginPopupEx(window->ID, ImGuiWindowFlags_AlwaysAutoResize |
-                                          ImGuiWindowFlags_NoTitleBar |
-                                          ImGuiWindowFlags_NoSavedSettings)) {
-    if (m_renamePopupEnabled) {
-      ItemEditName(&m_name);
-    }
-    return true;
-  }
-
-  return false;
-}
-
-void Window::EndWindowSettingsPopup() {
-  ImGui::EndPopup();
+  return ImGui::BeginPopupEx(window->ID, ImGuiWindowFlags_AlwaysAutoResize |
+                                             ImGuiWindowFlags_NoTitleBar |
+                                             ImGuiWindowFlags_NoSavedSettings);
 }
 
 Window* imm::GetOrAddWindow(std::string_view id, bool duplicateOk,
@@ -177,8 +175,7 @@ Window* imm::GetOrAddWindow(std::string_view id, bool duplicateOk,
   return storage.GetData<Window>();
 }
 
-bool imm::BeginWindow() {
-  auto window = GetWindow();
+bool imm::BeginWindow(Window* window) {
   if (!window || !window->IsVisible() || !window->IsEnabled()) {
     return false;
   }
