@@ -29,8 +29,6 @@ void NetworkTablesSimGui::Initialize() {
   // NetworkTables info window
   gNetworkTablesInfoWindow = glass::imm::CreateWindow(
       "NetworkTables Info", false, glass::Window::kHide);
-  gNetworkTablesInfoWindow->SetView(glass::MakeFunctionView(
-      [&] { glass::DisplayNetworkTablesInfo(gNetworkTablesModel.get()); }));
   gNetworkTablesInfoWindow->SetDefaultPos(250, 130);
   gNetworkTablesInfoWindow->SetDefaultSize(750, 145);
 
