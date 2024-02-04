@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <Eigen/Core>
 #include <initializer_list>
 #include <span>
 
+#include <Eigen/Core>
 #include <wpi/SymbolExports.h>
 #include <wpi/json_fwd.h>
 
@@ -50,8 +50,8 @@ class WPILIB_DLLEXPORT Translation2d {
   constexpr Translation2d(units::meter_t distance, const Rotation2d& angle);
 
   /**
-   * Constructs a Translation2d from the provided translation vector's X and Y components. The
-   * values are assumed to be in meters.
+   * Constructs a Translation2d from the provided translation vector's X and Y
+   * components. The values are assumed to be in meters.
    *
    * @param vector The translation vector to represent.
    */

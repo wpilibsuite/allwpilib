@@ -49,8 +49,8 @@ class WPILIB_DLLEXPORT Translation3d {
   Translation3d(units::meter_t distance, const Rotation3d& angle);
 
   /**
-   * Constructs a Translation3d from the provided translation vector's X, Y, and Z components. The
-   * values are assumed to be in meters.
+   * Constructs a Translation3d from the provided translation vector's X, Y, and
+   * Z components. The values are assumed to be in meters.
    *
    * @param vector The translation vector to represent.
    */
