@@ -537,9 +537,6 @@ class DataLogEntry {
     rhs.m_log = nullptr;
   }
   DataLogEntry& operator=(DataLogEntry&& rhs) {
-    if (m_log) {
-      m_log->Finish(m_entry);
-    }
     m_log = rhs.m_log;
     rhs.m_log = nullptr;
     m_entry = rhs.m_entry;
