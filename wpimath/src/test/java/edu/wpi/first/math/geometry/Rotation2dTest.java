@@ -118,13 +118,4 @@ class Rotation2dTest {
     interpolated = rot1.interpolate(rot2, 0.5);
     assertEquals(-175.0, interpolated.getDegrees(), kEpsilon);
   }
-
-  @Test
-  void testMatrix() {
-    var rotation = Rotation2d.fromDegrees(90);
-    var point = VecBuilder.fill(1.0, 2.0);
-    var rotated = rotation.getRotationMatrix().times(point);
-    var expected = MatBuilder.fill(Nat.N2(), Nat.N1(), -2.0, 1.0);
-    assertTrue(rotated.isEqual(expected, 0.01));
-  }
 }

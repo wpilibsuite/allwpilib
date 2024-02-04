@@ -249,15 +249,6 @@ public class Rotation2d
     return m_sin / m_cos;
   }
 
-  /**
-   * Returns the rotation matrix representation of the Rotation2d.
-   *
-   * @return A rotation matrix.
-   */
-  public Matrix<N2, N2> getRotationMatrix() {
-    return MatBuilder.fill(Nat.N2(), Nat.N2(), m_cos, -m_sin, m_sin, m_cos);
-  }
-
   @Override
   public String toString() {
     return String.format("Rotation2d(Rads: %.2f, Deg: %.2f)", m_value, Math.toDegrees(m_value));
