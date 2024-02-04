@@ -15,7 +15,7 @@ class DistanceTest {
     Velocity<Distance> anonBaseUnit =
         new Distance(null, 1, "D", "d").per(new Time(null, 1, "T", "t"));
 
-    assertTrue(BaseUnits.Velocity.equivalent(anonBaseUnit));
+    assertTrue(Units.MetersPerSecond.equivalent(anonBaseUnit));
   }
 
   @Test
