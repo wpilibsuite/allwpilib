@@ -16,9 +16,6 @@ constexpr Translation2d::Translation2d(units::meter_t distance,
                                        const Rotation2d& angle)
     : m_x(distance * angle.Cos()), m_y(distance * angle.Sin()) {}
 
-constexpr Translation2d::Translation2d(const Eigen::Vector2d& vector)
-    : m_x(units::meter_t(vector.x())), m_y(units::meter_t(vector.y())) {}
-
 constexpr Rotation2d Translation2d::Angle() const {
   return Rotation2d{m_x.value(), m_y.value()};
 }

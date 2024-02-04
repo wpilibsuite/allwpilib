@@ -15,11 +15,6 @@ constexpr Translation3d::Translation3d(units::meter_t x, units::meter_t y,
                                        units::meter_t z)
     : m_x(x), m_y(y), m_z(z) {}
 
-constexpr Translation3d::Translation3d(const Eigen::Vector3d& vector)
-    : m_x(units::meter_t(vector.x())),
-      m_y(units::meter_t(vector.y())),
-      m_z(units::meter_t(vector.z())) {}
-
 constexpr Translation2d Translation3d::ToTranslation2d() const {
   return Translation2d{m_x, m_y};
 }

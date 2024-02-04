@@ -54,7 +54,7 @@ class WPILIB_DLLEXPORT Translation3d {
    *
    * @param vector The translation vector to represent.
    */
-  constexpr Translation3d(const Eigen::Vector3d& vector);
+  Translation3d(const Eigen::Vector3d& vector);
 
   /**
    * Calculates the distance between two translations in 3D space.
