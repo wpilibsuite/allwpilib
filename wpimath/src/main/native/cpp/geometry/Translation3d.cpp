@@ -25,6 +25,10 @@ units::meter_t Translation3d::Distance(const Translation3d& other) const {
                            units::math::pow<2>(other.m_z - m_z));
 }
 
+Eigen::Vector3d Translation3d::ToVector() const {
+  return Eigen::Vector3d{m_x.value(), m_y.value(), m_z.value()};
+}
+
 units::meter_t Translation3d::Norm() const {
   return units::math::sqrt(m_x * m_x + m_y * m_y + m_z * m_z);
 }

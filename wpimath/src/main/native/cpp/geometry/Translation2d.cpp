@@ -15,6 +15,10 @@ units::meter_t Translation2d::Distance(const Translation2d& other) const {
   return units::math::hypot(other.m_x - m_x, other.m_y - m_y);
 }
 
+Eigen::Vector2d Translation2d::ToVector() const {
+  return Eigen::Vector2d{m_x.value(), m_y.value()};
+}
+
 units::meter_t Translation2d::Norm() const {
   return units::math::hypot(m_x, m_y);
 }

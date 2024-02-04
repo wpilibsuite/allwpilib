@@ -142,7 +142,7 @@ public class Translation3d
   /**
    * Returns a vector representation of this translation.
    *
-   * @return A Vector.
+   * @return A Vector representation of this translation.
    */
   public Vector<N3> toVector() {
     return VecBuilder.fill(m_x, m_y, m_z);

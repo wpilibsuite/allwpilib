@@ -126,7 +126,7 @@ public class Translation2d
   /**
    * Returns a vector representation of this translation.
    *
-   * @return A Vector.
+   * @return A Vector representation of this translation.
    */
   public Vector<N2> toVector() {
     return VecBuilder.fill(m_x, m_y);
