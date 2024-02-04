@@ -80,7 +80,7 @@ public class Shooter extends SubsystemBase {
       new SimpleMotorFeedforward(
           ShooterConstants.kSVolts, ShooterConstants.kVVoltSecondsPerRotation, 0);
 
-  /** Creates a new Drive subsystem. */
+  /** Creates a new Shooter subsystem. */
   public Shooter() {
     // Sets the distance per pulse for the encoders
     m_shooterEncoder.setDistancePerPulse(ShooterConstants.kEncoderDistancePerPulse);
