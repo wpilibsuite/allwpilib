@@ -257,7 +257,7 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
    * @return true if this unit is near the other measure, otherwise false
    */
   default boolean isNear(Measure<?> other, double varianceThreshold) {
-    if (!this.unit().equivalent(other.unit())) {
+    if (!this.unit().getBaseUnit().equivalent(other.unit().getBaseUnit())) {
       return false; // Disjoint units, not compatible
     }
 

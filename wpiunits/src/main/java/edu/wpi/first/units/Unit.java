@@ -268,6 +268,11 @@ public class Unit<U extends Unit<U>> {
    * @return true if both units are equivalent, false if not
    */
   public boolean equivalent(Unit<?> other) {
+    if (!getClass().equals(other.getClass())) {
+      // different unit types, not compatible
+      return false;
+    }
+
     double arbitrary = 16_777.214; // 2^24 / 1e3
 
     return Math.abs(
