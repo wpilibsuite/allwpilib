@@ -55,7 +55,7 @@ class WPILIB_DLLEXPORT Translation2d {
    *
    * @param vector The translation vector to represent.
    */
-  Translation2d(const Eigen::Vector2d& vector);
+  explicit Translation2d(const Eigen::Vector2d& vector);
 
   /**
    * Calculates the distance between two translations in 2D space.
