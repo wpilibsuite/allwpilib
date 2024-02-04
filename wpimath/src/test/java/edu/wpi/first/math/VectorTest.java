@@ -65,4 +65,23 @@ class VectorTest {
     assertEquals(Math.sqrt(14.0), VecBuilder.fill(1.0, 2.0, 3.0).norm());
     assertEquals(Math.sqrt(14.0), VecBuilder.fill(1.0, -2.0, 3.0).norm());
   }
+
+  @Test
+  void testVectorProj() {
+    var vec1 = VecBuilder.fill(1.0, 2.0, 3.0);
+    var vec2 = VecBuilder.fill(4.0, 5.0, 6.0);
+    var res1 = vec1.proj(vec2);
+
+    assertEquals(res1.get(0), 1.662, 0.01);
+    assertEquals(res1.get(1), 2.077, 0.01);
+    assertEquals(res1.get(2), 2.49, 0.01);
+
+    var vec3 = VecBuilder.fill(-1.0, 2.0, -3.0);
+    var vec4 = VecBuilder.fill(4.0, -5.0, 6.0);
+    var res2 = vec4.proj(vec3);
+
+    assertEquals(res2.get(0), 2.29, 0.01);
+    assertEquals(res2.get(1), -4.57, 0.01);
+    assertEquals(res2.get(2), 6.86, 0.01);
+  }
 }

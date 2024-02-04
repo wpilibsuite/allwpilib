@@ -7,7 +7,11 @@ package edu.wpi.first.math.geometry;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import edu.wpi.first.math.MatBuilder;
+import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.units.Units;
 import org.junit.jupiter.api.Test;
 
@@ -113,5 +117,14 @@ class Rotation2dTest {
     rot2 = Rotation2d.fromDegrees(-160);
     interpolated = rot1.interpolate(rot2, 0.5);
     assertEquals(-175.0, interpolated.getDegrees(), kEpsilon);
+  }
+
+  @Test
+  void testMatrix() {
+    var rotation = Rotation2d.fromDegrees(90);
+    var point = VecBuilder.fill(1.0, 2.0);
+    var rotated = rotation.getRotationMatrix().times(point);
+    var expected = MatBuilder.fill(Nat.N2(), Nat.N1(), -2.0, 1.0);
+    assertTrue(rotated.isEqual(expected, 0.01));
   }
 }
