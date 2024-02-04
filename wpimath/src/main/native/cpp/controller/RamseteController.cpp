@@ -4,8 +4,6 @@
 
 #include "frc/controller/RamseteController.h"
 
-#include <cmath>
-
 #include "units/angle.h"
 #include "units/math.h"
 
