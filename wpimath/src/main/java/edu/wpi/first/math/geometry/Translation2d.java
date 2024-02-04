@@ -128,7 +128,7 @@ public class Translation2d
    *
    * @return A Vector.
    */
-  public Vector<N2> getVector() {
+  public Vector<N2> toVector() {
     return VecBuilder.fill(m_x, m_y);
   }
 

@@ -141,6 +141,6 @@ class Translation2dTest {
     assertEquals(vec.get(0), translation.getX());
     assertEquals(vec.get(1), translation.getY());
 
-    assertEquals(vec, translation.getVector());
+    assertEquals(vec, translation.toVector());
   }
 }

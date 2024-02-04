@@ -144,7 +144,7 @@ public class Translation3d
    *
    * @return A Vector.
    */
-  public Vector<N3> getVector() {
+  public Vector<N3> toVector() {
     return VecBuilder.fill(m_x, m_y, m_z);
   }
 

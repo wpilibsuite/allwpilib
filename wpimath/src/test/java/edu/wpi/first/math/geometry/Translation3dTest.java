@@ -170,6 +170,6 @@ class Translation3dTest {
     assertEquals(vec.get(1), translation.getY());
     assertEquals(vec.get(2), translation.getZ());
 
-    assertEquals(vec, translation.getVector());
+    assertEquals(vec, translation.toVector());
   }
 }
