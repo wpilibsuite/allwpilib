@@ -4,10 +4,16 @@
 
 package edu.wpi.first.wpilibj.util;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class ColorTest {
   @Test
@@ -81,5 +87,40 @@ class ColorTest {
 
     assertEquals("#FF8040", color.toHexString());
     assertEquals("#FF8040", color.toString());
+  }
+
+  @ParameterizedTest
+  @MethodSource("hsvToRgbProvider")
+  void hsvToRgb(int h, int s, int v, int r, int g, int b) {
+    int rgb = Color.hsvToRgb(h, s, v);
+    int R = Color.unpackRGB(rgb, Color.RGBChannel.kRed);
+    int G = Color.unpackRGB(rgb, Color.RGBChannel.kGreen);
+    int B = Color.unpackRGB(rgb, Color.RGBChannel.kBlue);
+
+    assertAll(
+        () -> assertEquals(r, R, "R value didn't match"),
+        () -> assertEquals(g, G, "G value didn't match"),
+        () -> assertEquals(b, B, "B value didn't match"));
+  }
+
+  private static Stream<Arguments> hsvToRgbProvider() {
+    return Stream.of(
+        arguments(0, 0, 0, 0, 0, 0), // Black
+        arguments(0, 0, 255, 255, 255, 255), // White
+        arguments(0, 255, 255, 255, 0, 0), // Red
+        arguments(60, 255, 255, 0, 255, 0), // Lime
+        arguments(120, 255, 255, 0, 0, 255), // Blue
+        arguments(30, 255, 255, 255, 255, 0), // Yellow
+        arguments(90, 255, 255, 0, 255, 255), // Cyan
+        arguments(150, 255, 255, 255, 0, 255), // Magenta
+        arguments(0, 0, 191, 191, 191, 191), // Silver
+        arguments(0, 0, 128, 128, 128, 128), // Gray
+        arguments(0, 255, 128, 128, 0, 0), // Maroon
+        arguments(30, 255, 128, 128, 128, 0), // Olive
+        arguments(60, 255, 128, 0, 128, 0), // Green
+        arguments(150, 255, 128, 128, 0, 128), // Purple
+        arguments(90, 255, 128, 0, 128, 128), // Teal
+        arguments(120, 255, 128, 0, 0, 128) // Navy
+        );
   }
 }
