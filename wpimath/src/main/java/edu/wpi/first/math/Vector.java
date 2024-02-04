@@ -128,22 +128,12 @@ public class Vector<R extends Num> extends Matrix<R, N1> {
   }
 
   /**
-   * Returns the scalar component of this vector along another.
-   *
-   * @param other The vector to find the component of this along.
-   * @return The component.
-   */
-  public double component(Vector<R> other) {
-    return dot(other) / other.norm();
-  }
-
-  /**
    * Returns the projection of this vector along another.
    *
    * @param other The vector to project along.
    * @return The projection.
    */
-  public Vector<R> projection(Vector<R> other) {
-    return other.unit().times(component(other));
+  public Vector<R> proj(Vector<R> other) {
+    return other.times(dot(other)).div(other.dot(other));
   }
 }
