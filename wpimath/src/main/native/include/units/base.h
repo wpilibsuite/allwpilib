@@ -81,6 +81,8 @@
 	#include <fmt/format.h>
 #endif
 
+#include <gcem.hpp>
+
 //------------------------------
 //	STRING FORMATTER
 //------------------------------
@@ -2803,10 +2805,10 @@ namespace units
 		 * @returns		new unit_t, raised to the given exponent
 		 */
 		template<int power, class UnitType, class = typename std::enable_if<traits::has_linear_scale<UnitType>::value, int>>
-		inline auto pow(const UnitType& value) noexcept -> unit_t<typename units::detail::power_of_unit<power, typename units::traits::unit_t_traits<UnitType>::unit_type>::type, typename units::traits::unit_t_traits<UnitType>::underlying_type, linear_scale>
+		inline constexpr auto pow(const UnitType& value) noexcept -> unit_t<typename units::detail::power_of_unit<power, typename units::traits::unit_t_traits<UnitType>::unit_type>::type, typename units::traits::unit_t_traits<UnitType>::underlying_type, linear_scale>
 		{
 			return unit_t<typename units::detail::power_of_unit<power, typename units::traits::unit_t_traits<UnitType>::unit_type>::type, typename units::traits::unit_t_traits<UnitType>::underlying_type, linear_scale>
-				(std::pow(value(), power));
+				(gcem::pow(value(), power));
 		}
 
 		/**
