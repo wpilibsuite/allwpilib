@@ -48,6 +48,16 @@ public class Vector<R extends Num> extends Matrix<R, N1> {
     super(other);
   }
 
+  /**
+   * Returns an element of the vector at a specified row.
+   *
+   * @param row The row that the element is located at.
+   * @return An element of the vector.
+   */
+  public double get(int row) {
+    return get(row, 0);
+  }
+
   @Override
   public Vector<R> times(double value) {
     return new Vector<>(this.m_storage.scale(value));
@@ -105,12 +115,35 @@ public class Vector<R extends Num> extends Matrix<R, N1> {
    * @return The norm.
    */
   public double norm() {
-    double squaredNorm = 0.0;
+    return Math.sqrt(dot(this));
+  }
 
-    for (int i = 0; i < getNumRows(); ++i) {
-      squaredNorm += get(i, 0) * get(i, 0);
-    }
+  /**
+   * Returns the unit vector parallel with this vector.
+   *
+   * @return The unit vector.
+   */
+  public Vector<R> unit() {
+    return div(norm());
+  }
 
-    return Math.sqrt(squaredNorm);
+  /**
+   * Returns the scalar component of this vector along another.
+   *
+   * @param other The vector to find the component of this along.
+   * @return The component.
+   */
+  public double comp(Vector<R> other) {
+    return dot(other) / other.norm();
+  }
+
+  /**
+   * Returns the projection of this vector along another.
+   *
+   * @param other The vector to project along.
+   * @return The projection.
+   */
+  public Vector<R> proj(Vector<R> other) {
+    return other.unit().times(comp(other));
   }
 }
