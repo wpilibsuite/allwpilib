@@ -16,10 +16,6 @@ public final class BaseUnits {
   /** The standard unit of time, seconds. */
   public static final Time Time = new Time(null, 1, "Second", "s");
 
-  /** The standard unit of velocity, meters per second. */
-  public static final Velocity<Distance> Velocity =
-      new Velocity<>(Distance, Time, "Meter per Second", "m/s");
-
   /** The standard unit of mass, kilograms. */
   public static final Mass Mass = new Mass(null, 1, "Kilogram", "Kg");
 
