@@ -19,11 +19,11 @@ Transform3d::Transform3d(Pose3d initial, Pose3d final) {
 }
 
 Transform3d::Transform3d(Translation3d translation, Rotation3d rotation)
-    : m_translation(std::move(translation)), m_rotation(std::move(rotation)) {}
+    : m_translation{std::move(translation)}, m_rotation{std::move(rotation)} {}
 
 Transform3d::Transform3d(units::meter_t x, units::meter_t y, units::meter_t z,
                          Rotation3d rotation)
-    : m_translation(x, y, z), m_rotation(std::move(rotation)) {}
+    : m_translation{x, y, z}, m_rotation{std::move(rotation)} {}
 
 Transform3d Transform3d::Inverse() const {
   // We are rotating the difference between the translations
