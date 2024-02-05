@@ -134,7 +134,7 @@ class Translation2dTest {
   }
 
   @Test
-  void testVector() {
+  void testToVector() {
     var vec = VecBuilder.fill(1.0, 2.0);
     var translation = new Translation2d(vec);
 
