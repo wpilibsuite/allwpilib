@@ -90,4 +90,15 @@ class VectorTest {
     assertEquals(res2.get(1), -4.57, 0.01);
     assertEquals(res2.get(2), 6.86, 0.01);
   }
+
+  @Test
+  void testVectorCross() {
+    var e1 = VecBuilder.fill(1.0, 0.0, 0.0);
+    var e2 = VecBuilder.fill(0.0, 1.0, 0.0);
+    assertEquals(Vector.cross(e1, e2), VecBuilder.fill(0.0, 0.0, 1.0));
+
+    var vec1 = VecBuilder.fill(1.0, 2.0, 3.0);
+    var vec2 = VecBuilder.fill(3.0, 4.0, 5.0);
+    assertEquals(Vector.cross(vec1, vec2), VecBuilder.fill(-2.0, 4.0, -2.0));
+  }
 }
