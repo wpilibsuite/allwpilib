@@ -133,7 +133,7 @@ public class Vector<R extends Num> extends Matrix<R, N1> {
    * @param other The vector to project along.
    * @return The projection.
    */
-  public Vector<R> proj(Vector<R> other) {
+  public Vector<R> projection(Vector<R> other) {
     return other.times(dot(other)).div(other.dot(other));
   }
 }
