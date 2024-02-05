@@ -162,7 +162,7 @@ class Translation3dTest {
   }
 
   @Test
-  void testVector() {
+  void testToVector() {
     var vec = VecBuilder.fill(1.0, 2.0, 3.0);
     var translation = new Translation3d(vec);
 
