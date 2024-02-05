@@ -94,7 +94,7 @@ class WPILIB_DLLEXPORT Translation3d {
    *
    * @return A Vector representation of this translation.
    */
-  Eigen::Vector3d ToVector() const;
+  constexpr Eigen::Vector3d ToVector() const;
 
   /**
    * Returns the norm, or distance from the origin to the translation.

@@ -19,6 +19,10 @@ constexpr Translation2d Translation3d::ToTranslation2d() const {
   return Translation2d{m_x, m_y};
 }
 
+constexpr Eigen::Vector3d Translation3d::ToVector() const {
+  return Eigen::Vector3d{{m_x.value(), m_y.value(), m_z.value()}};
+}
+
 constexpr Translation3d Translation3d::operator+(
     const Translation3d& other) const {
   return {X() + other.X(), Y() + other.Y(), Z() + other.Z()};
