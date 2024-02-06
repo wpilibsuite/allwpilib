@@ -7,6 +7,7 @@ package edu.wpi.first.math.controller;
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.util.PIDConstants;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
@@ -107,6 +108,24 @@ public class PIDController implements Sendable, AutoCloseable {
       throw new IllegalArgumentException("Controller period must be a positive number!");
     }
     m_period = period;
+
+    instances++;
+    SendableRegistry.addLW(this, "PIDController", instances);
+
+    MathSharedStore.reportUsage(MathUsageId.kController_PIDController2, instances);
+  }
+
+  /**
+   * Allocates a PIDController with the given PIDConstants.
+   *
+   * @param constants The PIDConstants object.
+   */
+  public PIDController(PIDConstants constants) {
+    m_kp = constants.kp;
+    m_ki = constants.ki;
+    m_kd = constants.kd;
+    m_period = constants.period;
+    m_iZone = constants.IZone;
 
     instances++;
     SendableRegistry.addLW(this, "PIDController", instances);

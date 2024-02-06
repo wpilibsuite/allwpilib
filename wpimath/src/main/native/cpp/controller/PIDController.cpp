@@ -56,6 +56,20 @@ PIDController::PIDController(double Kp, double Ki, double Kd,
   wpi::SendableRegistry::Add(this, "PIDController", instances);
 }
 
+PIDController::PIDController(PIDConstants constants) {
+  m_Kp = constants.Kp;
+  m_Ki = constants.Ki;
+  m_Kd = constants.Kd;
+  m_period = constants.period;
+  m_iZone = constants.IZone;
+  static int instances = 0;
+  instances++;
+
+  wpi::math::MathSharedStore::ReportUsage(
+      wpi::math::MathUsageId::kController_PIDController2, instances);
+  wpi::SendableRegistry::Add(this, "PIDController", instances);
+}
+
 void PIDController::SetPID(double Kp, double Ki, double Kd) {
   m_Kp = Kp;
   m_Ki = Ki;

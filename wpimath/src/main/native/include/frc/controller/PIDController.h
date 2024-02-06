@@ -4,13 +4,13 @@
 
 #pragma once
 
-#include <functional>
 #include <limits>
 
 #include <wpi/SymbolExports.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
+#include "frc/util/PIDConstants.h"
 #include "units/time.h"
 
 namespace frc {
@@ -33,6 +33,13 @@ class WPILIB_DLLEXPORT PIDController
    */
   PIDController(double Kp, double Ki, double Kd,
                 units::second_t period = 20_ms);
+
+  /**
+   * Allocates a PIDController with the given PIDConstants.
+   *
+   * @param constants The PIDConstants object.
+   */
+  explicit PIDController(PIDConstants constants);
 
   ~PIDController() override = default;
 
