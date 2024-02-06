@@ -7,7 +7,6 @@ package edu.wpi.first.math;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import java.util.Objects;
-import java.util.Vector;
 import org.ejml.simple.SimpleMatrix;
 
 /**
