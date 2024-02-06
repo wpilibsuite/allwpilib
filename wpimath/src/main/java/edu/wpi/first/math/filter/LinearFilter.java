@@ -314,6 +314,15 @@ public class LinearFilter {
   }
 
   /**
+   * Returns the last value calculated by the LinearFilter.
+   *
+   * @return The last value.
+   */
+  public double lastValue() {
+    return m_outputs.getFirst();
+  }
+
+  /**
    * Factorial of n.
    *
    * @param n Argument of which to take factorial.
