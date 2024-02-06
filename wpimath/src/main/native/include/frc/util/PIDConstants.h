@@ -10,10 +10,15 @@ namespace frc {
 /** A class to configure a PIDController with */
 class PIDConstants {
  public:
+  /** P */
   double Kp;
+  /** I */
   double Ki;
+  /** D */
   double Kd;
+  /** Integral Sum */
   double IZone;
+  /** Period */
   units::second_t period;
 
   /* Create a new PIDConstants object

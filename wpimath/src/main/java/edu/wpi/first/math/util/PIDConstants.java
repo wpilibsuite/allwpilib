@@ -6,10 +6,15 @@ package edu.wpi.first.math.util;
 
 /** A class to configure a PIDController with */
 public class PIDConstants {
+  /** P */
   public final double kp;
+  /** I */
   public final double ki;
+  /** D */
   public final double kd;
+  /** Integral Sum */
   public final double IZone;
+  /** Period */
   public final double period;
 
   /* Create a new PIDConstants object
