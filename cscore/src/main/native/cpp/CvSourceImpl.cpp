@@ -168,9 +168,9 @@ void SetSourceEnumPropertyChoices(CS_Source source, CS_Property property,
 
 extern "C" {
 
-CS_Source CS_CreateCvSource(const char* name, const CS_VideoMode* mode,
+CS_Source CS_CreateCvSource(const WPI_String* name, const CS_VideoMode* mode,
                             CS_Status* status) {
-  return cs::CreateCvSource(name, static_cast<const cs::VideoMode&>(*mode),
+  return cs::CreateCvSource(wpi::to_string_view(*name), static_cast<const cs::VideoMode&>(*mode),
                             status);
 }
 
@@ -186,9 +186,9 @@ void CS_PutSourceFrameCpp(CS_Source source, cv::Mat* image, CS_Status* status) {
   return cs::PutSourceFrame(source, *image, status);
 }
 
-void CS_NotifySourceError(CS_Source source, const char* msg,
+void CS_NotifySourceError(CS_Source source, const WPI_String* msg,
                           CS_Status* status) {
-  return cs::NotifySourceError(source, msg, status);
+  return cs::NotifySourceError(source, wpi::to_string_view(*msg), status);
 }
 
 void CS_SetSourceConnected(CS_Source source, CS_Bool connected,
@@ -196,35 +196,35 @@ void CS_SetSourceConnected(CS_Source source, CS_Bool connected,
   return cs::SetSourceConnected(source, connected, status);
 }
 
-void CS_SetSourceDescription(CS_Source source, const char* description,
+void CS_SetSourceDescription(CS_Source source, const WPI_String* description,
                              CS_Status* status) {
-  return cs::SetSourceDescription(source, description, status);
+  return cs::SetSourceDescription(source, wpi::to_string_view(*description), status);
 }
 
-CS_Property CS_CreateSourceProperty(CS_Source source, const char* name,
+CS_Property CS_CreateSourceProperty(CS_Source source, const WPI_String* name,
                                     enum CS_PropertyKind kind, int minimum,
                                     int maximum, int step, int defaultValue,
                                     int value, CS_Status* status) {
-  return cs::CreateSourceProperty(source, name, kind, minimum, maximum, step,
+  return cs::CreateSourceProperty(source, wpi::to_string_view(*name), kind, minimum, maximum, step,
                                   defaultValue, value, status);
 }
 
 CS_Property CS_CreateSourcePropertyCallback(
-    CS_Source source, const char* name, enum CS_PropertyKind kind, int minimum,
+    CS_Source source, const WPI_String* name, enum CS_PropertyKind kind, int minimum,
     int maximum, int step, int defaultValue, int value, void* data,
     void (*onChange)(void* data, CS_Property property), CS_Status* status) {
   return cs::CreateSourcePropertyCallback(
-      source, name, kind, minimum, maximum, step, defaultValue, value,
+      source, wpi::to_string_view(*name), kind, minimum, maximum, step, defaultValue, value,
       [=](CS_Property property) { onChange(data, property); }, status);
 }
 
 void CS_SetSourceEnumPropertyChoices(CS_Source source, CS_Property property,
-                                     const char** choices, int count,
+                                     const WPI_String* choices, int count,
                                      CS_Status* status) {
   wpi::SmallVector<std::string, 8> vec;
   vec.reserve(count);
   for (int i = 0; i < count; ++i) {
-    vec.push_back(choices[i]);
+    vec.emplace_back(wpi::to_string_view(choices[i]));
   }
   return cs::SetSourceEnumPropertyChoices(source, property, vec, status);
 }

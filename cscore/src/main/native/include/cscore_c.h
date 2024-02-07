@@ -249,7 +249,7 @@ int CS_GetPropertyStep(CS_Property property, CS_Status* status);
 int CS_GetPropertyDefault(CS_Property property, CS_Status* status);
 void CS_GetStringProperty(CS_Property property, struct WPI_String* value,
                           CS_Status* status);
-void CS_SetStringProperty(CS_Property property, const char* value,
+void CS_SetStringProperty(CS_Property property, const WPI_String* value,
                           CS_Status* status);
 struct WPI_String* CS_GetEnumPropertyChoices(CS_Property property, int* count,
                                              CS_Status* status);
@@ -346,7 +346,7 @@ void CS_SetUsbCameraPath(CS_Source source, const struct WPI_String* path,
                          CS_Status* status);
 void CS_GetUsbCameraPath(CS_Source source, struct WPI_String* path,
                          CS_Status* status);
-CS_UsbCameraInfo* CS_GetUsbCameraInfo(CS_Source source, CS_Status* status);
+void CS_GetUsbCameraInfo(CS_Source source, CS_UsbCameraInfo* info, CS_Status* status);
 /** @} */
 
 /**
@@ -438,7 +438,7 @@ int CS_GetMjpegServerPort(CS_Sink sink, CS_Status* status);
  */
 void CS_SetSinkDescription(CS_Sink sink, const struct WPI_String* description,
                            CS_Status* status);
-char* CS_GetSinkError(CS_Sink sink, CS_Status* status);
+void CS_GetSinkError(CS_Sink sink, WPI_String* error, CS_Status* status);
 void CS_SetSinkEnabled(CS_Sink sink, CS_Bool enabled, CS_Status* status);
 /** @} */
 

@@ -1047,13 +1047,17 @@ int GetMjpegServerPort(CS_Sink sink, CS_Status* status) {
 
 extern "C" {
 
-CS_Sink CS_CreateMjpegServer(const char* name, const char* listenAddress,
-                             int port, CS_Status* status) {
-  return cs::CreateMjpegServer(name, listenAddress, port, status);
+CS_Sink CS_CreateMjpegServer(const WPI_String* name,
+                             const WPI_String* listenAddress, int port,
+                             CS_Status* status) {
+  return cs::CreateMjpegServer(wpi::to_string_view(*name),
+                               wpi::to_string_view(*listenAddress), port,
+                               status);
 }
 
-char* CS_GetMjpegServerListenAddress(CS_Sink sink, CS_Status* status) {
-  return ConvertToC(cs::GetMjpegServerListenAddress(sink, status));
+void CS_GetMjpegServerListenAddress(CS_Sink sink, WPI_String* listenAddress,
+                                    CS_Status* status) {
+  cs::ConvertToC(listenAddress, cs::GetMjpegServerListenAddress(sink, status));
 }
 
 int CS_GetMjpegServerPort(CS_Sink sink, CS_Status* status) {

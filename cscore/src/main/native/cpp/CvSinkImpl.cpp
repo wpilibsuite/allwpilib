@@ -211,24 +211,24 @@ void SetSinkEnabled(CS_Sink sink, bool enabled, CS_Status* status) {
 
 extern "C" {
 
-CS_Sink CS_CreateCvSink(const char* name, enum WPI_PixelFormat pixelFormat,
+CS_Sink CS_CreateCvSink(const WPI_String* name, enum WPI_PixelFormat pixelFormat,
                         CS_Status* status) {
   return cs::CreateCvSink(
-      name, static_cast<VideoMode::PixelFormat>(pixelFormat), status);
+      wpi::to_string_view(*name), static_cast<VideoMode::PixelFormat>(pixelFormat), status);
 }
 
-CS_Sink CS_CreateCvSinkCallback(const char* name,
+CS_Sink CS_CreateCvSinkCallback(const WPI_String* name,
                                 enum WPI_PixelFormat pixelFormat, void* data,
                                 void (*processFrame)(void* data, uint64_t time),
                                 CS_Status* status) {
   return cs::CreateCvSinkCallback(
-      name, static_cast<VideoMode::PixelFormat>(pixelFormat),
+      wpi::to_string_view(*name), static_cast<VideoMode::PixelFormat>(pixelFormat),
       [=](uint64_t time) { processFrame(data, time); }, status);
 }
 
-void CS_SetSinkDescription(CS_Sink sink, const char* description,
+void CS_SetSinkDescription(CS_Sink sink, const WPI_String* description,
                            CS_Status* status) {
-  return cs::SetSinkDescription(sink, description, status);
+  return cs::SetSinkDescription(sink, wpi::to_string_view(*description), status);
 }
 
 #if CV_VERSION_MAJOR < 4
@@ -254,13 +254,9 @@ uint64_t CS_GrabSinkFrameTimeoutCpp(CS_Sink sink, cv::Mat* image,
   return cs::GrabSinkFrameTimeout(sink, *image, timeout, status);
 }
 
-char* CS_GetSinkError(CS_Sink sink, CS_Status* status) {
+void CS_GetSinkError(CS_Sink sink, WPI_String* error, CS_Status* status) {
   wpi::SmallString<128> buf;
-  auto str = cs::GetSinkError(sink, buf, status);
-  if (*status != 0) {
-    return nullptr;
-  }
-  return cs::ConvertToC(str);
+  cs::ConvertToC(error, cs::GetSinkError(sink, buf, status));
 }
 
 void CS_SetSinkEnabled(CS_Sink sink, CS_Bool enabled, CS_Status* status) {
