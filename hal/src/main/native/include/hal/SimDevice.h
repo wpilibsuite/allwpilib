@@ -10,10 +10,13 @@
 #include <initializer_list>
 #include <span>
 #include <string>
+#include <string_view>
+#include <wpi/SmallVector.h>
 #endif
 
 #include "hal/Types.h"
 #include "hal/Value.h"
+#include "wpi/string.h"
 
 /**
  * @defgroup hal_simdevice Simulator Device Framework
@@ -53,7 +56,7 @@ extern "C" {
  * @param name device name
  * @return simulated device handle
  */
-HAL_SimDeviceHandle HAL_CreateSimDevice(const char* name);
+HAL_SimDeviceHandle HAL_CreateSimDevice(const WPI_String* name);
 
 /**
  * Frees a simulated device.
@@ -68,10 +71,11 @@ void HAL_FreeSimDevice(HAL_SimDeviceHandle handle);
 /**
  * Get the name of a simulated device
  *
+ * @param deviceName the name of the device.
  * @param handle simulated device handle
- * @return name of the simulated device
  */
-const char* HAL_GetSimDeviceName(HAL_SimDeviceHandle handle);
+void HAL_GetSimDeviceName(WPI_UnownedString* deviceName,
+                          HAL_SimDeviceHandle handle);
 
 /**
  * Creates a value on a simulated device.
@@ -86,16 +90,17 @@ const char* HAL_GetSimDeviceName(HAL_SimDeviceHandle handle);
  * @return simulated value handle
  */
 HAL_SimValueHandle HAL_CreateSimValue(HAL_SimDeviceHandle device,
-                                      const char* name, int32_t direction,
+                                      const WPI_String* name, int32_t direction,
                                       const struct HAL_Value* initialValue);
 
 #ifdef __cplusplus
 extern "C++" {
 inline HAL_SimValueHandle HAL_CreateSimValue(HAL_SimDeviceHandle device,
-                                             const char* name,
+                                             std::string_view name,
                                              int32_t direction,
                                              const HAL_Value& initialValue) {
-  return HAL_CreateSimValue(device, name, direction, &initialValue);
+  WPI_String wpiName = wpi::make_string(name);
+  return HAL_CreateSimValue(device, &wpiName, direction, &initialValue);
 }
 }  // extern "C++"
 #endif
@@ -113,7 +118,7 @@ inline HAL_SimValueHandle HAL_CreateSimValue(HAL_SimDeviceHandle device,
  * @return simulated value handle
  */
 inline HAL_SimValueHandle HAL_CreateSimValueInt(HAL_SimDeviceHandle device,
-                                                const char* name,
+                                                const WPI_String* name,
                                                 int32_t direction,
                                                 int32_t initialValue) {
   struct HAL_Value v = HAL_MakeInt(initialValue);
@@ -133,7 +138,7 @@ inline HAL_SimValueHandle HAL_CreateSimValueInt(HAL_SimDeviceHandle device,
  * @return simulated value handle
  */
 inline HAL_SimValueHandle HAL_CreateSimValueLong(HAL_SimDeviceHandle device,
-                                                 const char* name,
+                                                 const WPI_String* name,
                                                  int32_t direction,
                                                  int64_t initialValue) {
   struct HAL_Value v = HAL_MakeLong(initialValue);
@@ -153,7 +158,7 @@ inline HAL_SimValueHandle HAL_CreateSimValueLong(HAL_SimDeviceHandle device,
  * @return simulated value handle
  */
 inline HAL_SimValueHandle HAL_CreateSimValueDouble(HAL_SimDeviceHandle device,
-                                                   const char* name,
+                                                   const WPI_String* name,
                                                    int32_t direction,
                                                    double initialValue) {
   struct HAL_Value v = HAL_MakeDouble(initialValue);
@@ -177,9 +182,9 @@ inline HAL_SimValueHandle HAL_CreateSimValueDouble(HAL_SimDeviceHandle device,
  * @return simulated value handle
  */
 HAL_SimValueHandle HAL_CreateSimValueEnum(HAL_SimDeviceHandle device,
-                                          const char* name, int32_t direction,
-                                          int32_t numOptions,
-                                          const char** options,
+                                          const WPI_String* name,
+                                          int32_t direction, int32_t numOptions,
+                                          const WPI_String* options,
                                           int32_t initialValue);
 
 /**
@@ -200,8 +205,8 @@ HAL_SimValueHandle HAL_CreateSimValueEnum(HAL_SimDeviceHandle device,
  * @return simulated value handle
  */
 HAL_SimValueHandle HAL_CreateSimValueEnumDouble(
-    HAL_SimDeviceHandle device, const char* name, int32_t direction,
-    int32_t numOptions, const char** options, const double* optionValues,
+    HAL_SimDeviceHandle device, const WPI_String* name, int32_t direction,
+    int32_t numOptions, const WPI_String* options, const double* optionValues,
     int32_t initialValue);
 
 /**
@@ -217,7 +222,7 @@ HAL_SimValueHandle HAL_CreateSimValueEnumDouble(
  * @return simulated value handle
  */
 inline HAL_SimValueHandle HAL_CreateSimValueBoolean(HAL_SimDeviceHandle device,
-                                                    const char* name,
+                                                    const WPI_String* name,
                                                     int32_t direction,
                                                     HAL_Bool initialValue) {
   struct HAL_Value v = HAL_MakeBoolean(initialValue);
@@ -669,7 +674,10 @@ class SimDevice {
    *
    * @param name device name
    */
-  explicit SimDevice(const char* name) : m_handle(HAL_CreateSimDevice(name)) {}
+  explicit SimDevice(std::string_view name) {
+    WPI_String wpiName = wpi::make_string(name);
+    m_handle = HAL_CreateSimDevice(&wpiName);
+  }
 
   /**
    * Creates a simulated device.
@@ -685,7 +693,7 @@ class SimDevice {
    * @param name device name
    * @param index device index number to append to name
    */
-  SimDevice(const char* name, int index);
+  SimDevice(std::string_view name, int index);
 
   /**
    * Creates a simulated device.
@@ -702,7 +710,7 @@ class SimDevice {
    * @param index device index number to append to name
    * @param channel device channel number to append to name
    */
-  SimDevice(const char* name, int index, int channel);
+  SimDevice(std::string_view name, int index, int channel);
 
   ~SimDevice() {
     if (m_handle != HAL_kInvalidHandle) {
@@ -744,7 +752,10 @@ class SimDevice {
    * @return name
    */
   std::string GetName() const {
-    return std::string(HAL_GetSimDeviceName(m_handle));
+    WPI_UnownedString deviceName;
+    HAL_GetSimDeviceName(&deviceName, m_handle);
+    std::string ret{wpi::to_string_view(&deviceName)};
+    return ret;
   }
 
   /**
@@ -758,9 +769,10 @@ class SimDevice {
    * @param initialValue initial value
    * @return simulated value object
    */
-  SimValue CreateValue(const char* name, int32_t direction,
+  SimValue CreateValue(std::string_view name, int32_t direction,
                        const HAL_Value& initialValue) {
-    return HAL_CreateSimValue(m_handle, name, direction, &initialValue);
+    WPI_String wpiName = wpi::make_string(name);
+    return HAL_CreateSimValue(m_handle, &wpiName, direction, &initialValue);
   }
 
   /**
@@ -774,8 +786,10 @@ class SimDevice {
    * @param initialValue initial value
    * @return simulated double value object
    */
-  SimInt CreateInt(const char* name, int32_t direction, int32_t initialValue) {
-    return HAL_CreateSimValueInt(m_handle, name, direction, initialValue);
+  SimInt CreateInt(std::string_view name, int32_t direction,
+                   int32_t initialValue) {
+    WPI_String wpiName = wpi::make_string(name);
+    return HAL_CreateSimValueInt(m_handle, &wpiName, direction, initialValue);
   }
 
   /**
@@ -789,9 +803,10 @@ class SimDevice {
    * @param initialValue initial value
    * @return simulated double value object
    */
-  SimLong CreateLong(const char* name, int32_t direction,
+  SimLong CreateLong(std::string_view name, int32_t direction,
                      int64_t initialValue) {
-    return HAL_CreateSimValueLong(m_handle, name, direction, initialValue);
+    WPI_String wpiName = wpi::make_string(name);
+    return HAL_CreateSimValueLong(m_handle, &wpiName, direction, initialValue);
   }
 
   /**
@@ -805,9 +820,11 @@ class SimDevice {
    * @param initialValue initial value
    * @return simulated double value object
    */
-  SimDouble CreateDouble(const char* name, int32_t direction,
+  SimDouble CreateDouble(std::string_view name, int32_t direction,
                          double initialValue) {
-    return HAL_CreateSimValueDouble(m_handle, name, direction, initialValue);
+    WPI_String wpiName = wpi::make_string(name);
+    return HAL_CreateSimValueDouble(m_handle, &wpiName, direction,
+                                    initialValue);
   }
 
   /**
@@ -824,11 +841,18 @@ class SimDevice {
    * @param initialValue initial value (selection)
    * @return simulated enum value object
    */
-  SimEnum CreateEnum(const char* name, int32_t direction,
+  SimEnum CreateEnum(std::string_view name, int32_t direction,
                      std::initializer_list<const char*> options,
                      int32_t initialValue) {
-    return HAL_CreateSimValueEnum(m_handle, name, direction, options.size(),
-                                  const_cast<const char**>(options.begin()),
+    WPI_String wpiName = wpi::make_string(name);
+    wpi::SmallVector<WPI_String, 8> optionsVec;
+    for (auto&& option : options) {
+      WPI_String str;
+      WPI_InitString(&str, option);
+      optionsVec.emplace_back(str);
+    }
+    return HAL_CreateSimValueEnum(m_handle, &wpiName, direction,
+                                  optionsVec.size(), optionsVec.data(),
                                   initialValue);
   }
 
@@ -846,11 +870,18 @@ class SimDevice {
    * @param initialValue initial value (selection)
    * @return simulated enum value object
    */
-  SimEnum CreateEnum(const char* name, int32_t direction,
+  SimEnum CreateEnum(std::string_view name, int32_t direction,
                      std::span<const char* const> options,
                      int32_t initialValue) {
-    return HAL_CreateSimValueEnum(m_handle, name, direction, options.size(),
-                                  const_cast<const char**>(options.data()),
+    WPI_String wpiName = wpi::make_string(name);
+    wpi::SmallVector<WPI_String, 8> optionsVec;
+    for (auto&& option : options) {
+      WPI_String str;
+      WPI_InitString(&str, option);
+      optionsVec.emplace_back(str);
+    }
+    return HAL_CreateSimValueEnum(m_handle, &wpiName, direction,
+                                  optionsVec.size(), optionsVec.data(),
                                   initialValue);
   }
 
@@ -870,17 +901,23 @@ class SimDevice {
    * @param initialValue initial value (selection)
    * @return simulated enum value object
    */
-  SimEnum CreateEnumDouble(const char* name, int32_t direction,
+  SimEnum CreateEnumDouble(std::string_view name, int32_t direction,
                            std::initializer_list<const char*> options,
                            std::initializer_list<double> optionValues,
                            int32_t initialValue) {
     if (options.size() != optionValues.size()) {
       return {};
     }
-    return HAL_CreateSimValueEnumDouble(
-        m_handle, name, direction, options.size(),
-        const_cast<const char**>(options.begin()), optionValues.begin(),
-        initialValue);
+    WPI_String wpiName = wpi::make_string(name);
+    wpi::SmallVector<WPI_String, 8> optionsVec;
+    for (auto&& option : options) {
+      WPI_String str;
+      WPI_InitString(&str, option);
+      optionsVec.emplace_back(str);
+    }
+    return HAL_CreateSimValueEnumDouble(m_handle, &wpiName, direction,
+                                        optionsVec.size(), optionsVec.data(),
+                                        optionValues.begin(), initialValue);
   }
 
   /**
@@ -899,17 +936,23 @@ class SimDevice {
    * @param initialValue initial value (selection)
    * @return simulated enum value object
    */
-  SimEnum CreateEnumDouble(const char* name, int32_t direction,
+  SimEnum CreateEnumDouble(std::string_view name, int32_t direction,
                            std::span<const char* const> options,
                            std::span<const double> optionValues,
                            int32_t initialValue) {
     if (options.size() != optionValues.size()) {
       return {};
     }
-    return HAL_CreateSimValueEnumDouble(
-        m_handle, name, direction, options.size(),
-        const_cast<const char**>(options.data()), optionValues.data(),
-        initialValue);
+    WPI_String wpiName = wpi::make_string(name);
+    wpi::SmallVector<WPI_String, 8> optionsVec;
+    for (auto&& option : options) {
+      WPI_String str;
+      WPI_InitString(&str, option);
+      optionsVec.emplace_back(str);
+    }
+    return HAL_CreateSimValueEnumDouble(m_handle, &wpiName, direction,
+                                        optionsVec.size(), optionsVec.data(),
+                                        optionValues.data(), initialValue);
   }
 
   /**
@@ -923,9 +966,11 @@ class SimDevice {
    * @param initialValue initial value
    * @return simulated boolean value object
    */
-  SimBoolean CreateBoolean(const char* name, int32_t direction,
+  SimBoolean CreateBoolean(std::string_view name, int32_t direction,
                            bool initialValue) {
-    return HAL_CreateSimValueBoolean(m_handle, name, direction, initialValue);
+    WPI_String wpiName = wpi::make_string(name);
+    return HAL_CreateSimValueBoolean(m_handle, &wpiName, direction,
+                                     initialValue);
   }
 
  protected:

@@ -30,8 +30,7 @@ Java_edu_wpi_first_hal_PWMJNI_initializePWMPort
 {
   int32_t status = 0;
   auto stack = wpi::java::GetJavaStackTrace(env, "edu.wpi.first");
-  WPI_String wpiStack;
-  WPI_InitStringWithLength(&wpiStack, stack.data(), stack.size());
+  WPI_String wpiStack = wpi::make_string(stack);
   auto pwm = HAL_InitializePWMPort((HAL_PortHandle)id, &wpiStack, &status);
   CheckStatusForceThrow(env, status);
   return (jint)pwm;

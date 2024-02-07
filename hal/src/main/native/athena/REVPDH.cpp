@@ -228,7 +228,7 @@ HAL_REVPDHHandle HAL_InitializeREVPDH(int32_t module,
     return HAL_kInvalidHandle;
   }
 
-  hpdh->previousAllocation = allocationLocation ? wpi::to_string_view(*allocationLocation) : "";;
+  hpdh->previousAllocation = allocationLocation ? wpi::to_string_view(allocationLocation) : "";;
   hpdh->hcan = hcan;
   hpdh->controlPeriod = kDefaultControlPeriod;
   std::memset(&hpdh->versionInfo, 0, sizeof(hpdh->versionInfo));

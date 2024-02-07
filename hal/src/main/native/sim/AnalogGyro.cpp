@@ -71,7 +71,7 @@ HAL_GyroHandle HAL_InitializeAnalogGyro(HAL_AnalogInputHandle analogHandle,
 
   SimAnalogGyroData[channel].initialized = true;
 
-  gyro->previousAllocation = allocationLocation ? wpi::to_string_view(*allocationLocation) : "";;
+  gyro->previousAllocation = allocationLocation ? wpi::to_string_view(allocationLocation) : "";;
 
   return handle;
 }

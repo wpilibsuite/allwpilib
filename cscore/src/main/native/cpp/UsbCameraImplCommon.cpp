@@ -36,18 +36,18 @@ extern "C" {
 
 CS_Source CS_CreateUsbCameraDev(const WPI_String* name, int dev,
                                 CS_Status* status) {
-  return cs::CreateUsbCameraDev(wpi::to_string_view(*name), dev, status);
+  return cs::CreateUsbCameraDev(wpi::to_string_view(name), dev, status);
 }
 
 CS_Source CS_CreateUsbCameraPath(const WPI_String* name, const WPI_String* path,
                                  CS_Status* status) {
-  return cs::CreateUsbCameraPath(wpi::to_string_view(*name),
-                                 wpi::to_string_view(*path), status);
+  return cs::CreateUsbCameraPath(wpi::to_string_view(name),
+                                 wpi::to_string_view(path), status);
 }
 
 void CS_SetUsbCameraPath(CS_Source source, const WPI_String* path,
                          CS_Status* status) {
-  cs::SetUsbCameraPath(source, wpi::to_string_view(*path), status);
+  cs::SetUsbCameraPath(source, wpi::to_string_view(path), status);
 }
 
 void CS_GetUsbCameraPath(CS_Source source, WPI_String* path,

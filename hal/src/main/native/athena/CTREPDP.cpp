@@ -156,7 +156,7 @@ HAL_PDPHandle HAL_InitializePDP(int32_t module, const WPI_String* allocationLoca
     return HAL_kInvalidHandle;
   }
 
-  pdp->previousAllocation = allocationLocation ? wpi::to_string_view(*allocationLocation) : "";;
+  pdp->previousAllocation = allocationLocation ? wpi::to_string_view(allocationLocation) : "";;
 
   return handle;
 }

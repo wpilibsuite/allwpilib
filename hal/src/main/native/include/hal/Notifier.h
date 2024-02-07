@@ -9,6 +9,7 @@
 #include <wpi/nodiscard.h>
 
 #include "hal/Types.h"
+#include "wpi/string.h"
 
 /**
  * @defgroup hal_notifier Notifier Functions
@@ -57,7 +58,7 @@ HAL_Bool HAL_SetNotifierThreadPriority(HAL_Bool realTime, int32_t priority,
  * @param[in] name name
  * @param[out] status Error status variable. 0 on success.
  */
-void HAL_SetNotifierName(HAL_NotifierHandle notifierHandle, const char* name,
+void HAL_SetNotifierName(HAL_NotifierHandle notifierHandle, const WPI_String* name,
                          int32_t* status);
 
 /**

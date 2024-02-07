@@ -214,7 +214,7 @@ extern "C" {
 CS_Sink CS_CreateCvSink(const WPI_String* name, enum WPI_PixelFormat pixelFormat,
                         CS_Status* status) {
   return cs::CreateCvSink(
-      wpi::to_string_view(*name), static_cast<VideoMode::PixelFormat>(pixelFormat), status);
+      wpi::to_string_view(name), static_cast<VideoMode::PixelFormat>(pixelFormat), status);
 }
 
 CS_Sink CS_CreateCvSinkCallback(const WPI_String* name,
@@ -222,13 +222,13 @@ CS_Sink CS_CreateCvSinkCallback(const WPI_String* name,
                                 void (*processFrame)(void* data, uint64_t time),
                                 CS_Status* status) {
   return cs::CreateCvSinkCallback(
-      wpi::to_string_view(*name), static_cast<VideoMode::PixelFormat>(pixelFormat),
+      wpi::to_string_view(name), static_cast<VideoMode::PixelFormat>(pixelFormat),
       [=](uint64_t time) { processFrame(data, time); }, status);
 }
 
 void CS_SetSinkDescription(CS_Sink sink, const WPI_String* description,
                            CS_Status* status) {
-  return cs::SetSinkDescription(sink, wpi::to_string_view(*description), status);
+  return cs::SetSinkDescription(sink, wpi::to_string_view(description), status);
 }
 
 #if CV_VERSION_MAJOR < 4

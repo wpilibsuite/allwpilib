@@ -56,7 +56,7 @@ HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(
   SimAnalogInData[channel].accumulatorInitialized = false;
   SimAnalogInData[channel].simDevice = 0;
 
-  analog_port->previousAllocation = allocationLocation ? wpi::to_string_view(*allocationLocation) : "";;
+  analog_port->previousAllocation = allocationLocation ? wpi::to_string_view(allocationLocation) : "";;
 
   return handle;
 }

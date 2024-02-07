@@ -14,17 +14,6 @@
 #include "hal/Types.h"
 #include "wpi/string.h"
 
-#ifdef __cplusplus
-#include <string_view>
-
-namespace hal {
-int32_t SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
-                    std::string_view details, std::string_view location,
-                    std::string_view callStack, HAL_Bool printMsg);
-int32_t SendConsoleLine(std::string_view line);
-}
-#endif
-
 /**
  * @defgroup hal_driverstation Driver Station Functions
  * @ingroup hal_capi
@@ -49,8 +38,8 @@ extern "C" {
  * @return the error code, or 0 for success
  */
 int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
-                      const WPI_String* details, const WPI_String* location,
-                      const WPI_String* callStack, HAL_Bool printMsg);
+                      const char* details, const char* location,
+                      const char* callStack, HAL_Bool printMsg);
 
 /**
  * Set the print function used by HAL_SendError
@@ -62,10 +51,10 @@ void HAL_SetPrintErrorImpl(void (*func)(const char* line, size_t size));
 /**
  * Sends a line to the driver station console.
  *
- * @param line the line to send
+ * @param line the line to send (null terminated)
  * @return the error code, or 0 for success
  */
-int32_t HAL_SendConsoleLine(const WPI_String* line);
+int32_t HAL_SendConsoleLine(const char* line);
 
 /**
  * Gets the current control word of the driver station.

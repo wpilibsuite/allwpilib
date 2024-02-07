@@ -401,8 +401,8 @@ Java_edu_wpi_first_hal_DriverStationJNI_sendError
   JStringRef callStackStr{env, callStack};
 
   jint returnValue =
-      hal::SendError(isError, errorCode, isLVCode, detailsStr.str(),
-                    locationStr.str(), callStackStr.str(), printMsg);
+      HAL_SendError(isError, errorCode, isLVCode, detailsStr.c_str(),
+                    locationStr.c_str(), callStackStr.c_str(), printMsg);
   return returnValue;
 }
 
@@ -417,7 +417,7 @@ Java_edu_wpi_first_hal_DriverStationJNI_sendConsoleLine
 {
   JStringRef lineStr{env, line};
 
-  jint returnValue = hal::SendConsoleLine(lineStr.str());
+  jint returnValue = HAL_SendConsoleLine(lineStr.c_str());
   return returnValue;
 }
 

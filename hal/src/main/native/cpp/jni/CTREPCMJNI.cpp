@@ -27,8 +27,7 @@ Java_edu_wpi_first_hal_CTREPCMJNI_initialize
 {
   int32_t status = 0;
   auto stack = wpi::java::GetJavaStackTrace(env, "edu.wpi.first");
-  WPI_String wpiStack;
-  WPI_InitStringWithLength(&wpiStack, stack.data(), stack.size());
+  WPI_String wpiStack = wpi::make_string(stack);
   auto handle = HAL_InitializeCTREPCM(module, &wpiStack, &status);
   CheckStatusForceThrow(env, status);
   return handle;

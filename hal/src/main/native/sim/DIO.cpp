@@ -66,7 +66,7 @@ HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
   SimDIOData[channel].initialized = true;
   SimDIOData[channel].isInput = input;
   SimDIOData[channel].simDevice = 0;
-  port->previousAllocation = allocationLocation ? wpi::to_string_view(*allocationLocation) : "";;
+  port->previousAllocation = allocationLocation ? wpi::to_string_view(allocationLocation) : "";;
 
   return handle;
 }

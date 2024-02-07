@@ -636,8 +636,8 @@ extern "C" {
 
 CS_Source CS_CreateHttpCamera(const WPI_String* name, const WPI_String* url,
                               CS_HttpCameraKind kind, CS_Status* status) {
-  return cs::CreateHttpCamera(wpi::to_string_view(*name),
-                              wpi::to_string_view(*url), kind, status);
+  return cs::CreateHttpCamera(wpi::to_string_view(name),
+                              wpi::to_string_view(url), kind, status);
 }
 
 CS_Source CS_CreateHttpCameraMulti(const WPI_String* name,
@@ -646,9 +646,9 @@ CS_Source CS_CreateHttpCameraMulti(const WPI_String* name,
   wpi::SmallVector<std::string, 4> vec;
   vec.reserve(count);
   for (int i = 0; i < count; ++i) {
-    vec.emplace_back(wpi::to_string_view(urls[i]));
+    vec.emplace_back(wpi::to_string_view(&urls[i]));
   }
-  return cs::CreateHttpCamera(wpi::to_string_view(*name), vec, kind, status);
+  return cs::CreateHttpCamera(wpi::to_string_view(name), vec, kind, status);
 }
 
 CS_HttpCameraKind CS_GetHttpCameraKind(CS_Source source, CS_Status* status) {
@@ -660,7 +660,7 @@ void CS_SetHttpCameraUrls(CS_Source source, const WPI_String* urls, int count,
   wpi::SmallVector<std::string, 4> vec;
   vec.reserve(count);
   for (int i = 0; i < count; ++i) {
-    vec.emplace_back(wpi::to_string_view(urls[i]));
+    vec.emplace_back(wpi::to_string_view(&urls[i]));
   }
   cs::SetHttpCameraUrls(source, vec, status);
 }

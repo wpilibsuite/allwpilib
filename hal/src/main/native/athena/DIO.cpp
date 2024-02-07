@@ -121,7 +121,7 @@ HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
   }
 
   digitalSystem->writeOutputEnable(outputEnable, status);
-  port->previousAllocation = allocationLocation ? wpi::to_string_view(*allocationLocation) : "";;
+  port->previousAllocation = allocationLocation ? wpi::to_string_view(allocationLocation) : "";;
 
   return handle;
 }

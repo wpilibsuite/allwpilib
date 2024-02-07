@@ -30,8 +30,7 @@ Java_edu_wpi_first_hal_DIOJNI_initializeDIOPort
 {
   int32_t status = 0;
   auto stack = wpi::java::GetJavaStackTrace(env, "edu.wpi.first");
-  WPI_String wpiStack;
-  WPI_InitStringWithLength(&wpiStack, stack.data(), stack.size());
+  WPI_String wpiStack = wpi::make_string(stack);
   auto dio = HAL_InitializeDIOPort(
       (HAL_PortHandle)id, static_cast<uint8_t>(input), &wpiStack, &status);
   CheckStatusForceThrow(env, status);

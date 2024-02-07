@@ -197,7 +197,7 @@ HAL_CTREPCMHandle HAL_InitializeCTREPCM(int32_t module,
   std::memset(&pcm->oneShot, 0, sizeof(pcm->oneShot));
   std::memset(&pcm->control, 0, sizeof(pcm->control));
 
-  pcm->previousAllocation = allocationLocation ? wpi::to_string_view(*allocationLocation) : "";;
+  pcm->previousAllocation = allocationLocation ? wpi::to_string_view(allocationLocation) : "";;
 
   // Enable closed loop control
   HAL_SetCTREPCMClosedLoopControl(handle, true, status);

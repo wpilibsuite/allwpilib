@@ -122,7 +122,7 @@ HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
   // Defaults to allow an always valid config.
   HAL_SetPWMConfigMicroseconds(handle, 2000, 1501, 1500, 1499, 1000, status);
 
-  port->previousAllocation = allocationLocation ? wpi::to_string_view(*allocationLocation) : "";;
+  port->previousAllocation = allocationLocation ? wpi::to_string_view(allocationLocation) : "";;
 
   return handle;
 }

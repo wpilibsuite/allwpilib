@@ -221,7 +221,7 @@ HAL_REVPHHandle HAL_InitializeREVPH(int32_t module,
     return HAL_kInvalidHandle;
   }
 
-  hph->previousAllocation = allocationLocation ? wpi::to_string_view(*allocationLocation) : "";;
+  hph->previousAllocation = allocationLocation ? wpi::to_string_view(allocationLocation) : "";;
   hph->hcan = hcan;
   hph->controlPeriod = kDefaultControlPeriod;
   std::memset(&hph->desiredSolenoidsState, 0,

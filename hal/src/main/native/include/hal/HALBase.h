@@ -15,6 +15,7 @@
 #endif
 
 #include "hal/Types.h"
+#include "wpi/string.h"
 
 /**
  * @defgroup hal_capi WPILib HAL API
@@ -38,20 +39,20 @@ extern "C" {
  * If passed HAL_USE_LAST_ERROR, the last error set on the thread will be
  * returned.
  *
+ * @param[out] message the error message for the code. This does not need to be freed,
+ *               but can be overwritten by another hal call on the same thread.
  * @param[out] status the status code, set to the error status code if input is
  *               HAL_USE_LAST_ERROR
- * @return the error message for the code. This does not need to be freed,
- *               but can be overwritten by another hal call on the same thread.
  */
-const char* HAL_GetLastError(int32_t* status);
+void HAL_GetLastError(WPI_UnownedString* message, int32_t* status);
 
 /**
  * Gets the error message for a specific status code.
  *
+ * @param message the error message. This does not need to be freed.
  * @param code the status code
- * @return the error message for the code. This does not need to be freed.
  */
-const char* HAL_GetErrorMessage(int32_t code);
+void HAL_GetErrorMessage(WPI_UnownedString* message, int32_t code);
 
 /**
  * Returns the FPGA Version number.
@@ -79,20 +80,16 @@ int64_t HAL_GetFPGARevision(int32_t* status);
 /**
  * Returns the roboRIO serial number.
  *
- * @param[out] buffer The roboRIO serial number.
- * @param size The maximum characters to copy into buffer.
- * @return Number of characters copied into buffer.
+ * @param[out] serialNumber The roboRIO serial number. Free with WPI_FreeString
  */
-size_t HAL_GetSerialNumber(char* buffer, size_t size);
+void HAL_GetSerialNumber(WPI_String* serialNumber);
 
 /**
  * Returns the comments from the roboRIO web interface.
  *
- * @param[out] buffer The comments string.
- * @param size The maximum characters to copy into buffer.
- * @return Number of characters copied into buffer.
+ * @param[out] comments The comments string. Free with WPI_FreeString
  */
-size_t HAL_GetComments(char* buffer, size_t size);
+void HAL_GetComments(WPI_String* comments);
 
 /**
  * Returns the team number configured for the robot controller.

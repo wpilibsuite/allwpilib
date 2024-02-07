@@ -441,7 +441,7 @@ void HALSIM_CancelAllSimPeriodicCallbacks(void) {
 int64_t HAL_Report(int32_t resource, int32_t instanceNumber, int32_t context,
                    const WPI_String* feature) {
   return hal::UsageReport(resource, instanceNumber, context,
-                   feature ? wpi::to_string_view(*feature) : nullptr);
+                   feature ? wpi::to_string_view(feature) : nullptr);
 }
 
 }  // extern "C"

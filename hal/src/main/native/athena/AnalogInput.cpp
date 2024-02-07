@@ -66,7 +66,7 @@ HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(
   analogInputSystem->writeScanList(channel, channel, status);
   HAL_SetAnalogAverageBits(handle, kDefaultAverageBits, status);
   HAL_SetAnalogOversampleBits(handle, kDefaultOversampleBits, status);
-  analog_port->previousAllocation = allocationLocation ? wpi::to_string_view(*allocationLocation) : "";;
+  analog_port->previousAllocation = allocationLocation ? wpi::to_string_view(allocationLocation) : "";;
   return handle;
 }
 

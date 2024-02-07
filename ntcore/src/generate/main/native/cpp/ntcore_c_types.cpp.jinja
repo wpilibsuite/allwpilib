@@ -17,7 +17,7 @@ static inline std::span<const T> ConvertFromC(const T* arr, size_t size) {
 }
 
 static inline std::string_view ConvertFromC(const struct WPI_String* str) {
-  return wpi::to_string_view(*str);
+  return wpi::to_string_view(str);
 }
 
 static std::vector<std::string> ConvertFromC(const WPI_String* arr, size_t size) {
