@@ -26,7 +26,7 @@ extern "C" {
  * @return the created PDH handle
  */
 HAL_REVPDHHandle HAL_InitializeREVPDH(int32_t module,
-                                      const WPI_String* allocationLocation,
+                                      const char* allocationLocation,
                                       int32_t* status);
 
 /**

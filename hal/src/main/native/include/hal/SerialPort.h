@@ -7,7 +7,6 @@
 #include <stdint.h>
 
 #include "hal/Types.h"
-#include "wpi/string.h"
 
 /**
  * @defgroup hal_serialport Serial Port Functions
@@ -51,7 +50,7 @@ HAL_SerialPortHandle HAL_InitializeSerialPort(HAL_SerialPort port,
  * @return Serial Port Handle
  */
 HAL_SerialPortHandle HAL_InitializeSerialPortDirect(HAL_SerialPort port,
-                                                    const WPI_String* portName,
+                                                    const char* portName,
                                                     int32_t* status);
 
 /**

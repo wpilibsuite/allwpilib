@@ -199,7 +199,7 @@ PDH_status_4_t HAL_GetREVPDHStatus4(HAL_REVPDHHandle handle, int32_t* status) {
 }
 
 HAL_REVPDHHandle HAL_InitializeREVPDH(int32_t module,
-                                      const WPI_String* allocationLocation,
+                                      const char* allocationLocation,
                                       int32_t* status) {
   hal::init::CheckInit();
   if (!HAL_CheckREVPDHModuleNumber(module)) {
@@ -228,7 +228,7 @@ HAL_REVPDHHandle HAL_InitializeREVPDH(int32_t module,
     return HAL_kInvalidHandle;
   }
 
-  hpdh->previousAllocation = allocationLocation ? wpi::to_string_view(allocationLocation) : "";;
+  hpdh->previousAllocation = allocationLocation ? allocationLocation : "";
   hpdh->hcan = hcan;
   hpdh->controlPeriod = kDefaultControlPeriod;
   std::memset(&hpdh->versionInfo, 0, sizeof(hpdh->versionInfo));

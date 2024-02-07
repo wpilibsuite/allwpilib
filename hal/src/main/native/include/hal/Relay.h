@@ -7,7 +7,6 @@
 #include <stdint.h>
 
 #include "hal/Types.h"
-#include "wpi/string.h"
 
 /**
  * @defgroup hal_relay Relay Output Functions
@@ -34,7 +33,7 @@ extern "C" {
  * @return the created relay handle
  */
 HAL_RelayHandle HAL_InitializeRelayPort(HAL_PortHandle portHandle, HAL_Bool fwd,
-                                        const WPI_String* allocationLocation,
+                                        const char* allocationLocation,
                                         int32_t* status);
 
 /**

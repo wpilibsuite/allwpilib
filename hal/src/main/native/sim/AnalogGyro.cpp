@@ -38,7 +38,7 @@ void InitializeAnalogGyro() {
 
 extern "C" {
 HAL_GyroHandle HAL_InitializeAnalogGyro(HAL_AnalogInputHandle analogHandle,
-                                        const WPI_String* allocationLocation,
+                                        const char* allocationLocation,
                                         int32_t* status) {
   hal::init::CheckInit();
   // Handle will be type checked by HAL_IsAccumulatorChannel
@@ -71,7 +71,7 @@ HAL_GyroHandle HAL_InitializeAnalogGyro(HAL_AnalogInputHandle analogHandle,
 
   SimAnalogGyroData[channel].initialized = true;
 
-  gyro->previousAllocation = allocationLocation ? wpi::to_string_view(allocationLocation) : "";;
+  gyro->previousAllocation = allocationLocation ? allocationLocation : "";
 
   return handle;
 }

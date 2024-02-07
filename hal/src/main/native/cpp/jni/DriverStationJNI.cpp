@@ -113,8 +113,8 @@ Java_edu_wpi_first_hal_DriverStationJNI_report
    jint paramContext, jstring paramFeature)
 {
   JStringRef featureStr{paramEnv, paramFeature};
-  jint returnValue = hal::UsageReport(paramResource, paramInstanceNumber,
-                                paramContext, featureStr.str());
+  jint returnValue = HAL_Report(paramResource, paramInstanceNumber,
+                                paramContext, featureStr.c_str());
   return returnValue;
 }
 

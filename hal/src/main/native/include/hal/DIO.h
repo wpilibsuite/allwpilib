@@ -7,7 +7,6 @@
 #include <stdint.h>
 
 #include "hal/Types.h"
-#include "wpi/string.h"
 
 /**
  * @defgroup hal_dio DIO Functions
@@ -31,7 +30,7 @@ extern "C" {
  */
 HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
                                         HAL_Bool input,
-                                        const WPI_String* allocationLocation,
+                                        const char* allocationLocation,
                                         int32_t* status);
 
 /**

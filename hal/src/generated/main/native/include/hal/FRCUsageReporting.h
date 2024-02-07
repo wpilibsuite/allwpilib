@@ -7,13 +7,13 @@
 #pragma once
 
 #include <stdint.h>
-#include "wpi/string.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // ifdef's definition is to allow for default parameters in C++.
 #ifdef __cplusplus
-#include <string_view>
-
-namespace hal {
 /**
  * Reports a hardware usage to the HAL.
  *
@@ -23,14 +23,9 @@ namespace hal {
  * @param feature        a user specified feature string
  * @return               the index of the added value in NetComm
  */
-int64_t UsageReport(int32_t resource, int32_t instanceNumber,
-                    int32_t context = 0, std::string_view feature = "");
-}  // namespace hal
-#endif
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+int64_t HAL_Report(int32_t resource, int32_t instanceNumber,
+                   int32_t context = 0, const char* feature = nullptr);
+#else
 
 /**
  * Reports a hardware usage to the HAL.
@@ -42,7 +37,8 @@ extern "C" {
  * @return               the index of the added value in NetComm
  */
 int64_t HAL_Report(int32_t resource, int32_t instanceNumber, int32_t context,
-                   const WPI_String* feature);
+                   const char* feature);
+#endif
 
 #ifdef __cplusplus
 }

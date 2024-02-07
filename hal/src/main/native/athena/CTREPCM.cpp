@@ -170,7 +170,7 @@ static void SendControl(PCM* pcm, int32_t* status) {
 extern "C" {
 
 HAL_CTREPCMHandle HAL_InitializeCTREPCM(int32_t module,
-                                        const WPI_String* allocationLocation,
+                                        const char* allocationLocation,
                                         int32_t* status) {
   hal::init::CheckInit();
 
@@ -197,7 +197,7 @@ HAL_CTREPCMHandle HAL_InitializeCTREPCM(int32_t module,
   std::memset(&pcm->oneShot, 0, sizeof(pcm->oneShot));
   std::memset(&pcm->control, 0, sizeof(pcm->control));
 
-  pcm->previousAllocation = allocationLocation ? wpi::to_string_view(allocationLocation) : "";;
+  pcm->previousAllocation = allocationLocation ? allocationLocation : "";
 
   // Enable closed loop control
   HAL_SetCTREPCMClosedLoopControl(handle, true, status);

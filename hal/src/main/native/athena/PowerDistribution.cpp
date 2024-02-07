@@ -21,7 +21,7 @@ extern "C" {
 
 HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
     int32_t moduleNumber, HAL_PowerDistributionType type,
-    const WPI_String* allocationLocation, int32_t* status) {
+    const char* allocationLocation, int32_t* status) {
   if (type == HAL_PowerDistributionType::HAL_PowerDistributionType_kAutomatic) {
     if (moduleNumber != HAL_DEFAULT_POWER_DISTRIBUTION_MODULE) {
       *status = PARAMETER_OUT_OF_RANGE;

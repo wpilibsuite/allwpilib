@@ -285,18 +285,14 @@ int64_t HAL_GetFPGARevision(int32_t* status) {
   return global->readRevision(status);
 }
 
-size_t HAL_GetSerialNumber(char* buffer, size_t size) {
+void HAL_GetSerialNumber(WPI_String* serialNumber) {
   const char* serialNum = std::getenv("serialnum");
-  if (serialNum) {
-    std::strncpy(buffer, serialNum, size);
-    buffer[size - 1] = '\0';
-    return std::strlen(buffer);
-  } else {
-    if (size > 0) {
-      buffer[0] = '\0';
-    }
-    return 0;
+  if (!serialNum) {
+    serialNum = "";
   }
+  size_t len = strlen(serialNum);
+  auto write = WPI_AllocateString(serialNumber, len);
+  std::memcpy(write, serialNum, len);
 }
 
 void InitializeRoboRioComments(void) {
@@ -340,21 +336,12 @@ void InitializeRoboRioComments(void) {
   }
 }
 
-size_t HAL_GetComments(char* buffer, size_t size) {
+void HAL_GetComments(WPI_String* comments) {
   if (!roboRioCommentsStringInitialized) {
     InitializeRoboRioComments();
   }
-  size_t toCopy = size;
-  if (size > roboRioCommentsStringSize) {
-    toCopy = roboRioCommentsStringSize;
-  }
-  std::memcpy(buffer, roboRioCommentsString, toCopy);
-  if (toCopy < size) {
-    buffer[toCopy] = '\0';
-  } else {
-    buffer[toCopy - 1] = '\0';
-  }
-  return toCopy;
+  auto write = WPI_AllocateString(comments, roboRioCommentsStringSize);
+  std::memcpy(write, roboRioCommentsString, roboRioCommentsStringSize);
 }
 
 void InitializeTeamNumber(void) {
@@ -640,18 +627,13 @@ void HAL_SimPeriodicBefore(void) {}
 void HAL_SimPeriodicAfter(void) {}
 
 int64_t HAL_Report(int32_t resource, int32_t instanceNumber, int32_t context,
-                   const WPI_String* feature) {
-  return hal::UsageReport(resource, instanceNumber, context, wpi::to_string_view(feature));
+                   const char* feature) {
+  if (feature == nullptr) {
+    feature = "";
+  }
+
+  return FRC_NetworkCommunication_nUsageReporting_report(
+      resource, instanceNumber, context, feature);
 }
 
 }  // extern "C"
-
-namespace hal {
-int64_t UsageReport(int32_t resource, int32_t instanceNumber, int32_t context,
-                    std::string_view feature) {
-  std::string featureStr{feature};
-
-  return FRC_NetworkCommunication_nUsageReporting_report(
-      resource, instanceNumber, context, featureStr.c_str());
-}
-}  // namespace hal

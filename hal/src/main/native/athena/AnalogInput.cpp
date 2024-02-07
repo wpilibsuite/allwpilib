@@ -23,7 +23,7 @@ using namespace hal;
 extern "C" {
 
 HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(
-    HAL_PortHandle portHandle, const WPI_String* allocationLocation,
+    HAL_PortHandle portHandle, const char* allocationLocation,
     int32_t* status) {
   hal::init::CheckInit();
   initializeAnalog(status);
@@ -66,7 +66,8 @@ HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(
   analogInputSystem->writeScanList(channel, channel, status);
   HAL_SetAnalogAverageBits(handle, kDefaultAverageBits, status);
   HAL_SetAnalogOversampleBits(handle, kDefaultOversampleBits, status);
-  analog_port->previousAllocation = allocationLocation ? wpi::to_string_view(allocationLocation) : "";;
+  analog_port->previousAllocation =
+      allocationLocation ? allocationLocation : "";
   return handle;
 }
 

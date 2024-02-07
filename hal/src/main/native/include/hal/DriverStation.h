@@ -143,9 +143,8 @@ int32_t HAL_GetJoystickType(int32_t joystickNum);
 /**
  * Gets the name of a joystick.
  *
- * The returned array must be freed with WPI_FreeString.
+ * The returned string must be freed with WPI_FreeString
  *
- * @param name the joystick name (output)
  * @param joystickNum the joystick number
  * @return the joystick name
  */

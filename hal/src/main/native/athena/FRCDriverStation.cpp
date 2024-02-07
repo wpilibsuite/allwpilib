@@ -426,13 +426,13 @@ int32_t HAL_GetJoystickType(int32_t joystickNum) {
 
 void HAL_GetJoystickName(WPI_String* name, int32_t joystickNum) {
   HAL_JoystickDescriptor joystickDesc;
+  const char* cName = joystickDesc.name;
   if (HAL_GetJoystickDescriptor(joystickNum, &joystickDesc) < 0) {
-    WPI_AllocateString(name, 0);
-  } else {
-    auto len = strlen(joystickDesc.name);
-    auto write = WPI_AllocateString(name, len);
-    std::memcpy(write, joystickDesc.name, len);
+    cName = "";
   }
+  auto len = strlen(cName);
+  auto write = WPI_AllocateString(name, len);
+  std::memcpy(write, cName, len);
 }
 
 int32_t HAL_GetJoystickAxisType(int32_t joystickNum, int32_t axis) {

@@ -7,7 +7,6 @@
 #include <stdint.h>
 
 #include "hal/Types.h"
-#include "wpi/string.h"
 
 /**
  * @defgroup hal_analoggyro Analog Gyro Functions
@@ -29,7 +28,7 @@ extern "C" {
  * @return the initialized gyro handle
  */
 HAL_GyroHandle HAL_InitializeAnalogGyro(HAL_AnalogInputHandle handle,
-                                        const WPI_String* allocationLocation,
+                                        const char* allocationLocation,
                                         int32_t* status);
 
 /**

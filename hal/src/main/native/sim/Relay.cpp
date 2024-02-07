@@ -36,7 +36,7 @@ void InitializeRelay() {
 
 extern "C" {
 HAL_RelayHandle HAL_InitializeRelayPort(HAL_PortHandle portHandle, HAL_Bool fwd,
-                                        const WPI_String* allocationLocation,
+                                        const char* allocationLocation,
                                         int32_t* status) {
   hal::init::CheckInit();
   if (*status != 0) {
@@ -82,7 +82,7 @@ HAL_RelayHandle HAL_InitializeRelayPort(HAL_PortHandle portHandle, HAL_Bool fwd,
   }
 
   port->channel = static_cast<uint8_t>(channel);
-  port->previousAllocation = allocationLocation ? wpi::to_string_view(allocationLocation) : "";;
+  port->previousAllocation = allocationLocation ? allocationLocation : "";
 
   return handle;
 }

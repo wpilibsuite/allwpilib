@@ -280,12 +280,18 @@ int64_t HAL_GetFPGARevision(int32_t* status) {
   return 0;  // TODO: Find a better number to return;
 }
 
-size_t HAL_GetSerialNumber(char* buffer, size_t size) {
-  return HALSIM_GetRoboRioSerialNumber(buffer, size);
+void HAL_GetSerialNumber(WPI_String* serialNumber) {
+  char buffer[9];
+  size_t len = HALSIM_GetRoboRioSerialNumber(buffer, sizeof(buffer));
+  auto write = WPI_AllocateString(serialNumber, len);
+  std::memcpy(write, buffer, len);
 }
 
-size_t HAL_GetComments(char* buffer, size_t size) {
-  return HALSIM_GetRoboRioComments(buffer, size);
+void HAL_GetComments(WPI_String* comments) {
+  char buffer[65];
+  size_t len = HALSIM_GetRoboRioComments(buffer, sizeof(buffer));
+  auto write = WPI_AllocateString(comments, len);
+  std::memcpy(write, buffer, len);
 }
 
 int32_t HAL_GetTeamNumber(void) {
@@ -439,17 +445,8 @@ void HALSIM_CancelAllSimPeriodicCallbacks(void) {
 }
 
 int64_t HAL_Report(int32_t resource, int32_t instanceNumber, int32_t context,
-                   const WPI_String* feature) {
-  return hal::UsageReport(resource, instanceNumber, context,
-                   feature ? wpi::to_string_view(feature) : nullptr);
+                   const char* feature) {
+  return 0;  // Do nothing for now
 }
 
 }  // extern "C"
-
-namespace hal {
-int64_t UsageReport(int32_t resource, int32_t instanceNumber, int32_t context,
-                    std::string_view feature) {
-  // For now do nothing
-  return 0;
-}
-}  // namespace hal

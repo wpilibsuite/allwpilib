@@ -35,9 +35,8 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_initialize
 {
   int32_t status = 0;
   auto stack = wpi::java::GetJavaStackTrace(env, "edu.wpi.first");
-  WPI_String wpiStack = wpi::make_string(stack);
   auto handle = HAL_InitializePowerDistribution(
-      module, static_cast<HAL_PowerDistributionType>(type), &wpiStack,
+      module, static_cast<HAL_PowerDistributionType>(type), stack.c_str(),
       &status);
   CheckStatusForceThrow(env, status);
   return static_cast<jint>(handle);

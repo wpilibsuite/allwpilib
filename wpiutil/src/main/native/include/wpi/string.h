@@ -8,23 +8,6 @@
 #include <string_view>
 #endif
 
-#define WPI_CONST_STRING(name, value) WPI_String name; WPI_InitString(&name, value);
-
-/**
- * A string pointing to non owned memory.
- *
- * Only used for receiving strings from WPILib with extended
- * lifetimes.
- *
- * This string should not be freed.
-*/
-struct WPI_UnownedString {
-  /** Contents. */
-  const char* str;
-  /** Length */
-  size_t len;
-};
-
 /**
  * A const UTF8 string.
  */
@@ -39,15 +22,6 @@ struct WPI_String {
 namespace wpi {
 /** Converts a WPI_String to a string_view */
 constexpr std::string_view to_string_view(const WPI_String* str) {
-  if (str) {
-    return {str->str, str->len};
-  } else {
-    return "";
-  }
-}
-
-/** Converts a WPI_String to a string_view */
-constexpr std::string_view to_string_view(const WPI_UnownedString* str) {
   if (str) {
     return {str->str, str->len};
   } else {

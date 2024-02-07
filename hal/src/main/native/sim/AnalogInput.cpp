@@ -20,7 +20,7 @@ void InitializeAnalogInput() {}
 
 extern "C" {
 HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(
-    HAL_PortHandle portHandle, const WPI_String* allocationLocation,
+    HAL_PortHandle portHandle, const char* allocationLocation,
     int32_t* status) {
   hal::init::CheckInit();
   int16_t channel = getPortHandleChannel(portHandle);
@@ -56,7 +56,8 @@ HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(
   SimAnalogInData[channel].accumulatorInitialized = false;
   SimAnalogInData[channel].simDevice = 0;
 
-  analog_port->previousAllocation = allocationLocation ? wpi::to_string_view(allocationLocation) : "";;
+  analog_port->previousAllocation =
+      allocationLocation ? allocationLocation : "";
 
   return handle;
 }

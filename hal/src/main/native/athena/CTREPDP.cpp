@@ -127,7 +127,7 @@ void InitializeCTREPDP() {
 
 extern "C" {
 
-HAL_PDPHandle HAL_InitializePDP(int32_t module, const WPI_String* allocationLocation,
+HAL_PDPHandle HAL_InitializePDP(int32_t module, const char* allocationLocation,
                                 int32_t* status) {
   hal::init::CheckInit();
   if (!HAL_CheckPDPModule(module)) {
@@ -156,7 +156,7 @@ HAL_PDPHandle HAL_InitializePDP(int32_t module, const WPI_String* allocationLoca
     return HAL_kInvalidHandle;
   }
 
-  pdp->previousAllocation = allocationLocation ? wpi::to_string_view(allocationLocation) : "";;
+  pdp->previousAllocation = allocationLocation ? allocationLocation : "";
 
   return handle;
 }

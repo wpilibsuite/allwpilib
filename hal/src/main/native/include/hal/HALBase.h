@@ -39,20 +39,20 @@ extern "C" {
  * If passed HAL_USE_LAST_ERROR, the last error set on the thread will be
  * returned.
  *
- * @param[out] message the error message for the code. This does not need to be freed,
- *               but can be overwritten by another hal call on the same thread.
  * @param[out] status the status code, set to the error status code if input is
  *               HAL_USE_LAST_ERROR
+ * @return the error message for the code. This does not need to be freed,
+ *               but can be overwritten by another hal call on the same thread.
  */
-void HAL_GetLastError(WPI_UnownedString* message, int32_t* status);
+const char* HAL_GetLastError(int32_t* status);
 
 /**
  * Gets the error message for a specific status code.
  *
- * @param message the error message. This does not need to be freed.
  * @param code the status code
+ * @return the error message for the code. This does not need to be freed.
  */
-void HAL_GetErrorMessage(WPI_UnownedString* message, int32_t code);
+const char* HAL_GetErrorMessage(int32_t code);
 
 /**
  * Returns the FPGA Version number.
