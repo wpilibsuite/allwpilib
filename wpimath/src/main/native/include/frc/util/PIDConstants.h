@@ -5,24 +5,25 @@
 #pragma once
 
 namespace frc {
+
 /** A class to configure a PIDController with */
 struct PIDConstants {
  public:
   /** P */
-  double Kp;
+  double Kp = 0.0;
   /** I */
-  double Ki;
+  double Ki = 0.0;
   /** D */
-  double Kd;
+  double Kd = 0.0;
 
   /**
-   * Create a new PIDConstants object with IZone set to a default 1 and period
-   * set to a default 20_ms
+   * Create a new PIDConstants object.
    *
-   * @param Kp P
-   * @param Ki I
-   * @param Kd D
+   * @param Kp     The proportional coefficient. Must be >= 0.
+   * @param Ki     The integral coefficient. Must be >= 0.
+   * @param Kd     The derivative coefficient. Must be >= 0.
    */
   PIDConstants(double Kp, double Ki, double Kd);
 };
+
 }  // namespace frc
