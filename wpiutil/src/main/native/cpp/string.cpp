@@ -32,9 +32,18 @@ void WPI_InitStringWithLength(struct WPI_String* wpiString,
   wpiString->len = length;
 }
 
+// Returned from AllocateString if 0 length is requested.
+// Returned instead of nullptr due to memcpy pointer validity rules
+static char writeBuffer;
+
 char* WPI_AllocateString(struct WPI_String* wpiString, size_t length) {
   if (wpiString == nullptr) {
     return nullptr;
+  }
+  if (length == 0) {
+    wpiString->len = 0;
+    wpiString->str = nullptr;
+    return &writeBuffer;
   }
   char* str = static_cast<char*>(wpi::safe_malloc(length));
   wpiString->str = str;

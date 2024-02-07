@@ -276,8 +276,6 @@ public class DriverStationJNI extends JNIWrapper {
   /**
    * Gets the name of a joystick.
    *
-   * <p>The returned array must be freed with HAL_FreeJoystickName.
-   *
    * @param joystickNum the joystick number
    * @return the joystick name
    * @see "HAL_GetJoystickName"

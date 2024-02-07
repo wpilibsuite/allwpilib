@@ -641,8 +641,7 @@ void HAL_SimPeriodicAfter(void) {}
 
 int64_t HAL_Report(int32_t resource, int32_t instanceNumber, int32_t context,
                    const WPI_String* feature) {
-  return hal::UsageReport(resource, instanceNumber, context,
-                   feature ? wpi::to_string_view(*feature) : "");
+  return hal::UsageReport(resource, instanceNumber, context, wpi::to_string_view(feature));
 }
 
 }  // extern "C"

@@ -337,9 +337,10 @@ JNIEXPORT jstring JNICALL
 Java_edu_wpi_first_hal_DriverStationJNI_getJoystickName
   (JNIEnv* env, jclass, jbyte port)
 {
-  char* joystickName = HAL_GetJoystickName(port);
-  jstring str = MakeJString(env, joystickName);
-  HAL_FreeJoystickName(joystickName);
+  WPI_String joystickName;
+  HAL_GetJoystickName(&joystickName, port);
+  jstring str = MakeJString(env, wpi::to_string_view(&joystickName));
+  WPI_FreeString(&joystickName);
   return str;
 }
 
@@ -400,8 +401,8 @@ Java_edu_wpi_first_hal_DriverStationJNI_sendError
   JStringRef callStackStr{env, callStack};
 
   jint returnValue =
-      HAL_SendError(isError, errorCode, isLVCode, detailsStr.c_str(),
-                    locationStr.c_str(), callStackStr.c_str(), printMsg);
+      hal::SendError(isError, errorCode, isLVCode, detailsStr.str(),
+                    locationStr.str(), callStackStr.str(), printMsg);
   return returnValue;
 }
 
@@ -416,7 +417,7 @@ Java_edu_wpi_first_hal_DriverStationJNI_sendConsoleLine
 {
   JStringRef lineStr{env, line};
 
-  jint returnValue = HAL_SendConsoleLine(lineStr.c_str());
+  jint returnValue = hal::SendConsoleLine(lineStr.str());
   return returnValue;
 }
 

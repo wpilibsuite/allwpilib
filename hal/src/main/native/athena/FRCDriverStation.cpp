@@ -238,11 +238,10 @@ static void DefaultPrintErrorImpl(const char* line, size_t size) {
 static std::atomic<void (*)(const char* line, size_t size)> gPrintErrorImpl{
     hal::DefaultPrintErrorImpl};
 
-extern "C" {
-
-int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
-                      const char* details, const char* location,
-                      const char* callStack, HAL_Bool printMsg) {
+namespace hal {
+int32_t SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
+                  std::string_view details, std::string_view location,
+                  std::string_view callStack, HAL_Bool printMsg) {
   // Avoid flooding console by keeping track of previous 5 error
   // messages and only printing again if they're longer than 1 second old.
   static constexpr int KEEP_MSGS = 5;
@@ -335,20 +334,32 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
   return retval;
 }
 
+int32_t SendConsoleLine(std::string_view line) {
+  // Truncate if too long
+  if (line.size() > 65535) {
+    line = line.substr(0, 65535);
+  }
+  std::string lineStr{line};
+  return FRC_NetworkCommunication_sendConsoleLine(lineStr.c_str());
+}
+}  // namespace hal
+
+extern "C" {
+
+int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
+                      const WPI_String* details, const WPI_String* location,
+                      const WPI_String* callStack, HAL_Bool printMsg) {
+  return hal::SendError(
+      isError, errorCode, isLVCode, wpi::to_string_view(details),
+      wpi::to_string_view(location), wpi::to_string_view(callStack), printMsg);
+}
+
 void HAL_SetPrintErrorImpl(void (*func)(const char* line, size_t size)) {
   gPrintErrorImpl.store(func ? func : hal::DefaultPrintErrorImpl);
 }
 
-int32_t HAL_SendConsoleLine(const char* line) {
-  std::string_view lineRef{line};
-  if (lineRef.size() <= 65535) {
-    // Send directly
-    return FRC_NetworkCommunication_sendConsoleLine(line);
-  } else {
-    // Need to truncate
-    std::string newLine{line, 65535};
-    return FRC_NetworkCommunication_sendConsoleLine(newLine.c_str());
-  }
+int32_t HAL_SendConsoleLine(const WPI_String* line) {
+  return hal::SendConsoleLine(wpi::to_string_view(line));
 }
 
 int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {
@@ -424,22 +435,15 @@ int32_t HAL_GetJoystickType(int32_t joystickNum) {
   }
 }
 
-char* HAL_GetJoystickName(int32_t joystickNum) {
+void HAL_GetJoystickName(WPI_String* name, int32_t joystickNum) {
   HAL_JoystickDescriptor joystickDesc;
   if (HAL_GetJoystickDescriptor(joystickNum, &joystickDesc) < 0) {
-    char* name = static_cast<char*>(std::malloc(1));
-    name[0] = '\0';
-    return name;
+    WPI_AllocateString(name, 0);
   } else {
-    const size_t len = std::strlen(joystickDesc.name) + 1;
-    char* name = static_cast<char*>(std::malloc(len));
-    std::memcpy(name, joystickDesc.name, len);
-    return name;
+    auto len = strlen(joystickDesc.name);
+    auto write = WPI_AllocateString(name, len);
+    std::memcpy(write, joystickDesc.name, len);
   }
-}
-
-void HAL_FreeJoystickName(char* name) {
-  std::free(name);
 }
 
 int32_t HAL_GetJoystickAxisType(int32_t joystickNum, int32_t axis) {

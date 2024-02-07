@@ -12,6 +12,18 @@
 
 #include "hal/DriverStationTypes.h"
 #include "hal/Types.h"
+#include "wpi/string.h"
+
+#ifdef __cplusplus
+#include <string_view>
+
+namespace hal {
+int32_t SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
+                    std::string_view details, std::string_view location,
+                    std::string_view callStack, HAL_Bool printMsg);
+int32_t SendConsoleLine(std::string_view line);
+}
+#endif
 
 /**
  * @defgroup hal_driverstation Driver Station Functions
@@ -37,8 +49,8 @@ extern "C" {
  * @return the error code, or 0 for success
  */
 int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
-                      const char* details, const char* location,
-                      const char* callStack, HAL_Bool printMsg);
+                      const WPI_String* details, const WPI_String* location,
+                      const WPI_String* callStack, HAL_Bool printMsg);
 
 /**
  * Set the print function used by HAL_SendError
@@ -50,10 +62,10 @@ void HAL_SetPrintErrorImpl(void (*func)(const char* line, size_t size));
 /**
  * Sends a line to the driver station console.
  *
- * @param line the line to send (null terminated)
+ * @param line the line to send
  * @return the error code, or 0 for success
  */
-int32_t HAL_SendConsoleLine(const char* line);
+int32_t HAL_SendConsoleLine(const WPI_String* line);
 
 /**
  * Gets the current control word of the driver station.
@@ -142,21 +154,13 @@ int32_t HAL_GetJoystickType(int32_t joystickNum);
 /**
  * Gets the name of a joystick.
  *
- * The returned array must be freed with HAL_FreeJoystickName.
+ * The returned array must be freed with WPI_FreeString.
  *
- * Will be null terminated.
- *
+ * @param name the joystick name (output)
  * @param joystickNum the joystick number
  * @return the joystick name
  */
-char* HAL_GetJoystickName(int32_t joystickNum);
-
-/**
- * Frees a joystick name received with HAL_GetJoystickName
- *
- * @param name the name storage
- */
-void HAL_FreeJoystickName(char* name);
+void HAL_GetJoystickName(WPI_String* name, int32_t joystickNum);
 
 /**
  * Gets the type of a specific joystick axis.
