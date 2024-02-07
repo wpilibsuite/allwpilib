@@ -122,7 +122,7 @@ void NT_Meta_FreeClientPublishers(struct NT_Meta_ClientPublisher* arr,
 void NT_Meta_FreeClientSubscribers(struct NT_Meta_ClientSubscriber* arr,
                                    size_t count) {
   for (size_t i = 0; i < count; ++i) {
-    NT_FreeStringArray(arr[i].topics, arr[i].topicsCount);
+    WPI_FreeStringArray(arr[i].topics, arr[i].topicsCount);
   }
   std::free(arr);
 }

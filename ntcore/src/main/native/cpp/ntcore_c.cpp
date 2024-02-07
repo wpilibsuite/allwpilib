@@ -767,12 +767,6 @@ double* NT_AllocateDoubleArray(size_t size) {
   return retVal;
 }
 
-struct WPI_String* NT_AllocateStringArray(size_t size) {
-  struct WPI_String* retVal = static_cast<struct WPI_String*>(
-      wpi::safe_malloc(size * sizeof(struct WPI_String)));
-  return retVal;
-}
-
 void NT_FreeCharArray(char* v_char) {
   std::free(v_char);
 }
@@ -787,12 +781,6 @@ void NT_FreeFloatArray(float* v_float) {
 }
 void NT_FreeDoubleArray(double* v_double) {
   std::free(v_double);
-}
-void NT_FreeStringArray(struct WPI_String* v_string, size_t arr_size) {
-  for (size_t i = 0; i < arr_size; ++i) {
-    WPI_FreeString(&v_string[i]);
-  }
-  std::free(v_string);
 }
 
 enum NT_Type NT_GetValueType(const struct NT_Value* value) {
@@ -932,8 +920,7 @@ struct WPI_String* NT_GetValueStringArray(const struct NT_Value* value,
   }
   *last_change = value->last_change;
   *arr_size = value->data.arr_string.size;
-  struct WPI_String* arr = static_cast<struct WPI_String*>(wpi::safe_malloc(
-      value->data.arr_string.size * sizeof(struct WPI_String)));
+  struct WPI_String* arr = WPI_AllocateStringArray(value->data.arr_string.size);
   for (size_t i = 0; i < value->data.arr_string.size; ++i) {
     size_t len = value->data.arr_string.arr[i].len;
     auto write = WPI_AllocateString(&arr[i], len);

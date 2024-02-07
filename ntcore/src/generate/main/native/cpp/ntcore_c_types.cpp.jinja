@@ -96,7 +96,7 @@ void NT_GetAtomic{{ t.TypeName }}(NT_Handle subentry, {{ t.c.ParamType }} defaul
 
 void NT_DisposeTimestamped{{ t.TypeName }}(struct NT_Timestamped{{ t.TypeName }}* value) {
 {%- if t.TypeName == "StringArray" %}
-  NT_FreeStringArray(value->value, value->len);
+  WPI_FreeStringArray(value->value, value->len);
 {%- elif t.TypeName == "String" %}
   WPI_FreeString(&value->value);
 {%- elif t.c.IsArray %}
@@ -125,4 +125,3 @@ void NT_FreeQueue{{ t.TypeName }}(struct NT_Timestamped{{ t.TypeName }}* arr, si
 
 {% endfor %}
 }  // extern "C"
-

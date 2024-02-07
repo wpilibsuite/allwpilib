@@ -18,7 +18,6 @@ NT_AllocateCharArray
 NT_AllocateDoubleArray
 NT_AllocateFloatArray
 NT_AllocateIntegerArray
-NT_AllocateStringArray
 NT_CreateInstance
 NT_CreateListenerPoller
 NT_DeleteTopicProperty
@@ -61,7 +60,6 @@ NT_FreeQueueIntegerArray
 NT_FreeQueueRaw
 NT_FreeQueueString
 NT_FreeQueueStringArray
-NT_FreeStringArray
 NT_FreeTopicInfoForTesting
 NT_GetAtomicBoolean
 NT_GetAtomicBooleanArray
@@ -138,6 +136,8 @@ WPI_InitString
 WPI_InitStringWithLength
 WPI_AllocateString
 WPI_FreeString
+WPI_AllocateStringArray
+WPI_FreeStringArray
 NT_InitValue
 NT_IsConnected
 NT_Meta_DecodeClientPublishers

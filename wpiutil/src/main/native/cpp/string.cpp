@@ -37,4 +37,17 @@ void WPI_FreeString(const struct WPI_String* wpiString) {
   std::free(const_cast<char*>(wpiString->str));
 }
 
+struct WPI_String* WPI_AllocateStringArray(size_t length) {
+  return static_cast<struct WPI_String*>(
+      wpi::safe_malloc(length * sizeof(struct WPI_String)));
+}
+
+void WPI_FreeStringArray(const struct WPI_String* wpiStringArray,
+                         size_t length) {
+  for (size_t i = 0; i < length; ++i) {
+    WPI_FreeString(&wpiStringArray[i]);
+  }
+  std::free(const_cast<struct WPI_String*>(wpiStringArray));
+}
+
 }  // extern "C"

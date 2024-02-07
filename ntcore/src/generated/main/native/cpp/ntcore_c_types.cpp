@@ -476,7 +476,7 @@ void NT_GetAtomicStringArray(NT_Handle subentry, const struct WPI_String* defaul
 }
 
 void NT_DisposeTimestampedStringArray(struct NT_TimestampedStringArray* value) {
-  NT_FreeStringArray(value->value, value->len);
+  WPI_FreeStringArray(value->value, value->len);
 }
 
 struct NT_TimestampedStringArray* NT_ReadQueueStringArray(NT_Handle subentry, size_t* len) {

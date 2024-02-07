@@ -81,6 +81,23 @@ char* WPI_AllocateString(struct WPI_String* wpiString, size_t length);
  */
 void WPI_FreeString(const struct WPI_String* wpiString);
 
+/**
+ * Allocates an array of WPI_Strings.
+ *
+ * @param length array length
+ * @return string array
+ */
+struct WPI_String* WPI_AllocateStringArray(size_t length);
+
+/**
+ * Frees a WPI_String array returned by WPI_AllocateStringArray().
+ *
+ * @param wpiStringArray string array to free
+ * @param length length of array
+ */
+void WPI_FreeStringArray(const struct WPI_String* wpiStringArray,
+                         size_t length);
+
 #ifdef __cplusplus
 }  // extern "C"
 #endif  // __cplusplus

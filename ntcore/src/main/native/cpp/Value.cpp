@@ -250,8 +250,7 @@ void nt::ConvertToC(const Value& in, NT_Value* out) {
     }
     case NT_STRING_ARRAY: {
       auto v = in.GetStringArray();
-      out->data.arr_string.arr = static_cast<WPI_String*>(
-          wpi::safe_malloc(v.size() * sizeof(WPI_String)));
+      out->data.arr_string.arr = WPI_AllocateStringArray(v.size());
       for (size_t i = 0; i < v.size(); ++i) {
         ConvertToC(std::string_view{v[i]}, &out->data.arr_string.arr[i]);
       }

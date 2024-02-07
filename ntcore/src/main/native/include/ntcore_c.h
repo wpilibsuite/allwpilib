@@ -1570,19 +1570,6 @@ float* NT_AllocateFloatArray(size_t size);
 double* NT_AllocateDoubleArray(size_t size);
 
 /**
- * Allocates an array of WPI_Strings.
- * Note that the size is the number of elements, and not the
- * specific number of bytes to allocate. That is calculated internally.
- *
- * @param size  the number of elements the array will contain
- * @return      the allocated WPI_String array
- *
- * After use, the array should be freed using the NT_FreeStringArray()
- * function.
- */
-struct WPI_String* NT_AllocateStringArray(size_t size);
-
-/**
  * Frees an array of chars.
  *
  * @param v_char pointer to the char array to free
@@ -1616,18 +1603,6 @@ void NT_FreeFloatArray(float* v_float);
  * @param v_double pointer to the double array to free
  */
 void NT_FreeDoubleArray(double* v_double);
-
-/**
- * Frees an array of struct WPI_Strings.
- *
- * @param v_string  pointer to the string array to free
- * @param arr_size  size of the string array to free
- *
- * Note that the individual struct WPI_Strings in the array should NOT be
- * freed before calling this. This function will free all the strings
- * individually.
- */
-void NT_FreeStringArray(struct WPI_String* v_string, size_t arr_size);
 
 /** @} */
 
@@ -1805,10 +1780,10 @@ double* NT_GetValueDoubleArray(const struct NT_Value* value,
  * @return            pointer to the struct WPI_String array, or null if error
  *
  * It is the caller's responsibility to free the array once its no longer
- * needed. The NT_FreeStringArray() function is useful for this purpose.
+ * needed. The WPI_FreeStringArray() function is useful for this purpose.
  * The returned array is a copy of the array in the value, and must be
  * freed separately. Note that the individual struct WPI_Strings should not be
- * freed, but the entire array should be freed at once. The NT_FreeStringArray()
+ * freed, but the entire array should be freed at once. The WPI_FreeStringArray()
  * function will free all the struct WPI_Strings.
  */
 struct WPI_String* NT_GetValueStringArray(const struct NT_Value* value,
