@@ -21,7 +21,6 @@ public class PIDConstants {
    * @param kp P
    * @param ki I
    * @param kd D
-   * @param IZone Integral range
    * @throws IllegalArgumentException if kp &lt; 0
    * @throws IllegalArgumentException if ki &lt; 0
    * @throws IllegalArgumentException if kd &lt; 0
