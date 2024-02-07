@@ -121,16 +121,7 @@ public class PIDController implements Sendable, AutoCloseable {
    * @param constants The PIDConstants object.
    */
   public PIDController(PIDConstants constants) {
-    m_kp = constants.kp;
-    m_ki = constants.ki;
-    m_kd = constants.kd;
-    m_period = constants.period;
-    m_iZone = constants.IZone;
-
-    instances++;
-    SendableRegistry.addLW(this, "PIDController", instances);
-
-    MathSharedStore.reportUsage(MathUsageId.kController_PIDController2, instances);
+    this(constants.kp, constants.ki, constants.kd);
   }
 
   @Override
