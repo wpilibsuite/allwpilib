@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 #include "hal/Types.h"
+#include "wpi/string.h"
 
 /**
  * @defgroup hal_rev_ph REV Pneumatic Hub (PH) Functions
@@ -101,7 +102,7 @@ extern "C" {
  * @return the created PH handle
  */
 HAL_REVPHHandle HAL_InitializeREVPH(int32_t module,
-                                    const char* allocationLocation,
+                                    const WPI_String* allocationLocation,
                                     int32_t* status);
 
 /**

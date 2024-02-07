@@ -41,7 +41,7 @@ void InitializeAnalogOutput() {
 extern "C" {
 
 HAL_AnalogOutputHandle HAL_InitializeAnalogOutputPort(
-    HAL_PortHandle portHandle, const char* allocationLocation,
+    HAL_PortHandle portHandle, const WPI_String* allocationLocation,
     int32_t* status) {
   hal::init::CheckInit();
   initializeAnalog(status);
@@ -74,7 +74,7 @@ HAL_AnalogOutputHandle HAL_InitializeAnalogOutputPort(
   }
 
   port->channel = static_cast<uint8_t>(channel);
-  port->previousAllocation = allocationLocation ? allocationLocation : "";
+  port->previousAllocation = allocationLocation ? wpi::to_string_view(*allocationLocation) : "";;
 
   return handle;
 }

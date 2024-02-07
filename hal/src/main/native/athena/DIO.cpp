@@ -39,7 +39,7 @@ extern "C" {
 
 HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
                                         HAL_Bool input,
-                                        const char* allocationLocation,
+                                        const WPI_String* allocationLocation,
                                         int32_t* status) {
   hal::init::CheckInit();
   initializeDigital(status);
@@ -121,7 +121,7 @@ HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
   }
 
   digitalSystem->writeOutputEnable(outputEnable, status);
-  port->previousAllocation = allocationLocation ? allocationLocation : "";
+  port->previousAllocation = allocationLocation ? wpi::to_string_view(*allocationLocation) : "";;
 
   return handle;
 }

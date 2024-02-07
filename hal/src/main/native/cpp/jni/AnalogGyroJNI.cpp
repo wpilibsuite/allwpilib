@@ -27,8 +27,10 @@ Java_edu_wpi_first_hal_AnalogGyroJNI_initializeAnalogGyro
 {
   int32_t status = 0;
   auto stack = wpi::java::GetJavaStackTrace(env, "edu.wpi.first");
+  WPI_String wpiStack;
+  WPI_InitStringWithLength(&wpiStack, stack.data(), stack.size());
   HAL_GyroHandle handle = HAL_InitializeAnalogGyro((HAL_AnalogInputHandle)id,
-                                                   stack.c_str(), &status);
+                                                   &wpiStack, &status);
   // Analog input does range checking, so we don't need to do so.
   CheckStatusForceThrow(env, status);
   return (jint)handle;

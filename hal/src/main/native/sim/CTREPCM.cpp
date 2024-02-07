@@ -35,7 +35,7 @@ void InitializeCTREPCM() {
 }  // namespace hal::init
 
 HAL_CTREPCMHandle HAL_InitializeCTREPCM(int32_t module,
-                                        const char* allocationLocation,
+                                        const WPI_String* allocationLocation,
                                         int32_t* status) {
   hal::init::CheckInit();
 
@@ -53,7 +53,7 @@ HAL_CTREPCMHandle HAL_InitializeCTREPCM(int32_t module,
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
   }
 
-  pcm->previousAllocation = allocationLocation ? allocationLocation : "";
+  pcm->previousAllocation = allocationLocation ? wpi::to_string_view(*allocationLocation) : "";;
   pcm->module = module;
 
   SimCTREPCMData[module].initialized = true;

@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 #include "hal/Types.h"
+#include "wpi/string.h"
 
 /**
  * @defgroup hal_analoginput Analog Input Functions
@@ -28,7 +29,7 @@ extern "C" {
  * @return the created analog input handle
  */
 HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(
-    HAL_PortHandle portHandle, const char* allocationLocation, int32_t* status);
+    HAL_PortHandle portHandle, const WPI_String* allocationLocation, int32_t* status);
 
 /**
  * Frees an analog input port.

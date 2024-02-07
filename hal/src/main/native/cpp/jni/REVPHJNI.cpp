@@ -40,7 +40,9 @@ Java_edu_wpi_first_hal_REVPHJNI_initialize
 {
   int32_t status = 0;
   auto stack = wpi::java::GetJavaStackTrace(env, "edu.wpi.first");
-  auto handle = HAL_InitializeREVPH(module, stack.c_str(), &status);
+  WPI_String wpiStack;
+  WPI_InitStringWithLength(&wpiStack, stack.data(), stack.size());
+  auto handle = HAL_InitializeREVPH(module, &wpiStack, &status);
   CheckStatusForceThrow(env, status);
   return handle;
 }

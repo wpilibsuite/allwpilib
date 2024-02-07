@@ -35,7 +35,7 @@ void InitializeREVPH() {
 }  // namespace hal::init
 
 HAL_REVPHHandle HAL_InitializeREVPH(int32_t module,
-                                    const char* allocationLocation,
+                                    const WPI_String* allocationLocation,
                                     int32_t* status) {
   hal::init::CheckInit();
 
@@ -59,7 +59,7 @@ HAL_REVPHHandle HAL_InitializeREVPH(int32_t module,
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
   }
 
-  pcm->previousAllocation = allocationLocation ? allocationLocation : "";
+  pcm->previousAllocation = allocationLocation ? wpi::to_string_view(*allocationLocation) : "";;
   pcm->module = module;
 
   SimREVPHData[module].initialized = true;

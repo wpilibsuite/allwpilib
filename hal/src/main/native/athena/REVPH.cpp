@@ -191,7 +191,7 @@ static HAL_Bool HAL_CheckREVPHPulseTime(int32_t time) {
 }
 
 HAL_REVPHHandle HAL_InitializeREVPH(int32_t module,
-                                    const char* allocationLocation,
+                                    const WPI_String* allocationLocation,
                                     int32_t* status) {
   hal::init::CheckInit();
   if (!HAL_CheckREVPHModuleNumber(module)) {
@@ -221,7 +221,7 @@ HAL_REVPHHandle HAL_InitializeREVPH(int32_t module,
     return HAL_kInvalidHandle;
   }
 
-  hph->previousAllocation = allocationLocation ? allocationLocation : "";
+  hph->previousAllocation = allocationLocation ? wpi::to_string_view(*allocationLocation) : "";;
   hph->hcan = hcan;
   hph->controlPeriod = kDefaultControlPeriod;
   std::memset(&hph->desiredSolenoidsState, 0,

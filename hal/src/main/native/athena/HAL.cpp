@@ -640,13 +640,16 @@ void HAL_SimPeriodicBefore(void) {}
 void HAL_SimPeriodicAfter(void) {}
 
 int64_t HAL_Report(int32_t resource, int32_t instanceNumber, int32_t context,
-                   const char* feature) {
+                   const WPI_String* feature) {
+  std::string featureStr;
   if (feature == nullptr) {
-    feature = "";
+    featureStr = "";
+  } else {
+    featureStr = wpi::to_string_view(*feature);
   }
 
   return FRC_NetworkCommunication_nUsageReporting_report(
-      resource, instanceNumber, context, feature);
+      resource, instanceNumber, context, featureStr.c_str());
 }
 
 }  // extern "C"

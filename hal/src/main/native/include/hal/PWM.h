@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 #include "hal/Types.h"
+#include "wpi/string.h"
 
 /**
  * @defgroup hal_pwm PWM Output Functions
@@ -28,7 +29,7 @@ extern "C" {
  * @return the created pwm handle
  */
 HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
-                                        const char* allocationLocation,
+                                        const WPI_String* allocationLocation,
                                         int32_t* status);
 
 /**

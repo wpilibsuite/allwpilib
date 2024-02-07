@@ -29,8 +29,10 @@ Java_edu_wpi_first_hal_RelayJNI_initializeRelayPort
 {
   int32_t status = 0;
   auto stack = wpi::java::GetJavaStackTrace(env, "edu.wpi.first");
+  WPI_String wpiStack;
+  WPI_InitStringWithLength(&wpiStack, stack.data(), stack.size());
   HAL_RelayHandle handle = HAL_InitializeRelayPort(
-      (HAL_PortHandle)id, static_cast<uint8_t>(fwd), stack.c_str(), &status);
+      (HAL_PortHandle)id, static_cast<uint8_t>(fwd), &wpiStack, &status);
   CheckStatusForceThrow(env, status);
   return (jint)handle;
 }

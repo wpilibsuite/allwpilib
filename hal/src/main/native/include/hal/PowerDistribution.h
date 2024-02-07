@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 #include "hal/Types.h"
+#include "wpi/string.h"
 
 /**
  * @defgroup hal_pd Power Distribution Functions
@@ -41,7 +42,7 @@ extern "C" {
  */
 HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
     int32_t moduleNumber, HAL_PowerDistributionType type,
-    const char* allocationLocation, int32_t* status);
+    const WPI_String* allocationLocation, int32_t* status);
 
 /**
  * Gets the module number for a specific handle.

@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 #include "hal/Types.h"
+#include "wpi/string.h"
 
 /**
  * @defgroup hal_ctre_pcm CTRE Pneumatic Control Module (PCM) Functions
@@ -28,7 +29,7 @@ extern "C" {
  * @return the created PH handle
  */
 HAL_CTREPCMHandle HAL_InitializeCTREPCM(int32_t module,
-                                        const char* allocationLocation,
+                                        const WPI_String* allocationLocation,
                                         int32_t* status);
 
 /**

@@ -7,6 +7,7 @@
 #pragma once
 
 #include <stdint.h>
+#include "wpi/string.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -24,7 +25,7 @@ extern "C" {
  * @return               the index of the added value in NetComm
  */
 int64_t HAL_Report(int32_t resource, int32_t instanceNumber,
-                   int32_t context = 0, const char* feature = nullptr);
+                   int32_t context = 0, const WPI_String* feature = nullptr);
 #else
 
 /**
@@ -37,7 +38,7 @@ int64_t HAL_Report(int32_t resource, int32_t instanceNumber,
  * @return               the index of the added value in NetComm
  */
 int64_t HAL_Report(int32_t resource, int32_t instanceNumber, int32_t context,
-                   const char* feature);
+                   const WPI_String* feature);
 #endif
 
 #ifdef __cplusplus
