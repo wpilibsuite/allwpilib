@@ -14,9 +14,9 @@ TEST(OLSTest, TwoVariablesTwoPoints) {
   auto [coeffs, rSquared, rmse] = sysid::OLS(X, y);
   EXPECT_EQ(coeffs.size(), 2u);
 
-  EXPECT_NEAR(coeffs[0], 1.0, 0.05);
-  EXPECT_NEAR(coeffs[1], 2.0, 0.05);
-  EXPECT_NEAR(rSquared, 1.0, 1e-4);
+  EXPECT_NEAR(coeffs[0], 1.0, 1e-12);
+  EXPECT_NEAR(coeffs[1], 2.0, 1e-12);
+  EXPECT_DOUBLE_EQ(rSquared, 1.0);
 }
 
 TEST(OLSTest, TwoVariablesFivePoints) {
@@ -28,9 +28,9 @@ TEST(OLSTest, TwoVariablesFivePoints) {
   auto [coeffs, rSquared, rmse] = sysid::OLS(X, y);
   EXPECT_EQ(coeffs.size(), 2u);
 
-  EXPECT_NEAR(coeffs[0], 0.305, 0.05);
-  EXPECT_NEAR(coeffs[1], 1.518, 0.05);
-  EXPECT_NEAR(rSquared, 0.985, 0.05);
+  EXPECT_NEAR(coeffs[0], 0.30487804878048774, 1e-12);
+  EXPECT_NEAR(coeffs[1], 1.5182926829268293, 1e-12);
+  EXPECT_DOUBLE_EQ(rSquared, 0.91906029466386019);
 }
 
 #ifndef NDEBUG

@@ -222,8 +222,8 @@ class ObjectInfo {
 
 class FieldInfo {
  public:
-  static constexpr auto kDefaultWidth = 15.98_m;
-  static constexpr auto kDefaultHeight = 8.21_m;
+  static constexpr auto kDefaultWidth = 16.541052_m;
+  static constexpr auto kDefaultHeight = 8.211_m;
 
   explicit FieldInfo(Storage& storage);
 

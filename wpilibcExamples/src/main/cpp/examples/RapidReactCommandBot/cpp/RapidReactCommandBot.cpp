@@ -12,16 +12,13 @@
 
 void RapidReactCommandBot::ConfigureBindings() {
   // Automatically run the storage motor whenever the ball storage is not full,
-  // and turn it off whenever it fills.
-  frc2::Trigger([this] {
-    return m_storage.IsFull();
-  }).WhileFalse(m_storage.RunCommand());
+  // and turn it off whenever it fills. Uses subsystem-hosted trigger to
+  // improve readability and make inter-subsystem communication easier.
+  m_storage.HasCargo.WhileFalse(m_storage.RunCommand());
 
   // Automatically disable and retract the intake whenever the ball storage is
   // full.
-  frc2::Trigger([this] {
-    return m_storage.IsFull();
-  }).OnTrue(m_intake.RetractCommand());
+  m_storage.HasCargo.OnTrue(m_intake.RetractCommand());
 
   // Control the drive with split-stick arcade controls
   m_drive.SetDefaultCommand(m_drive.ArcadeDriveCommand(

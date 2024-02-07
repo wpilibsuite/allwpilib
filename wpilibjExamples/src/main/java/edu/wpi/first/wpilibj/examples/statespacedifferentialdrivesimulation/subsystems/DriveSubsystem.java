@@ -179,7 +179,6 @@ public class DriveSubsystem extends SubsystemBase {
    * @param pose The pose to which to set the odometry.
    */
   public void resetOdometry(Pose2d pose) {
-    resetEncoders();
     m_drivetrainSimulator.setPose(pose);
     m_odometry.resetPosition(
         Rotation2d.fromDegrees(getHeading()),

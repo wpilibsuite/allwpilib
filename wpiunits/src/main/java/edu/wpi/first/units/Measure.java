@@ -260,10 +260,9 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
     }
 
     // abs so negative inputs are calculated correctly
-    var allowedVariance = Math.abs(varianceThreshold);
+    var tolerance = Math.abs(other.baseUnitMagnitude() * varianceThreshold);
 
-    return other.baseUnitMagnitude() * (1 - allowedVariance) <= this.baseUnitMagnitude()
-        && other.baseUnitMagnitude() * (1 + allowedVariance) >= this.baseUnitMagnitude();
+    return Math.abs(this.baseUnitMagnitude() - other.baseUnitMagnitude()) <= tolerance;
   }
 
   /**

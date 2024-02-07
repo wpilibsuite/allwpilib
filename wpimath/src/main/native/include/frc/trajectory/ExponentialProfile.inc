@@ -51,23 +51,6 @@ ExponentialProfile<Distance, Input>::CalculateInflectionPoint(
 }
 
 template <class Distance, class Input>
-typename ExponentialProfile<Distance, Input>::State
-ExponentialProfile<Distance, Input>::CalculateInflectionPoint(
-    const State& current, const State& goal, const Input_t& input) const {
-  auto u = input;
-
-  if (current == goal) {
-    return current;
-  }
-
-  auto inflectionVelocity = SolveForInflectionVelocity(u, current, goal);
-  auto inflectionPosition =
-      ComputeDistanceFromVelocity(inflectionVelocity, -u, goal);
-
-  return {inflectionPosition, inflectionVelocity};
-}
-
-template <class Distance, class Input>
 units::second_t ExponentialProfile<Distance, Input>::TimeLeftUntil(
     const State& current, const State& goal) const {
   auto timing = CalculateProfileTiming(current, goal);
@@ -84,6 +67,23 @@ ExponentialProfile<Distance, Input>::CalculateProfileTiming(
 
   auto inflectionPoint = CalculateInflectionPoint(current, goal, u);
   return CalculateProfileTiming(current, inflectionPoint, goal, u);
+}
+
+template <class Distance, class Input>
+typename ExponentialProfile<Distance, Input>::State
+ExponentialProfile<Distance, Input>::CalculateInflectionPoint(
+    const State& current, const State& goal, const Input_t& input) const {
+  auto u = input;
+
+  if (current == goal) {
+    return current;
+  }
+
+  auto inflectionVelocity = SolveForInflectionVelocity(u, current, goal);
+  auto inflectionPosition =
+      ComputeDistanceFromVelocity(inflectionVelocity, -u, goal);
+
+  return {inflectionPosition, inflectionVelocity};
 }
 
 template <class Distance, class Input>
