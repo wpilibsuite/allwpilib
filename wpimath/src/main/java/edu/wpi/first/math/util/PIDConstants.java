@@ -6,21 +6,21 @@ package edu.wpi.first.math.util;
 
 /** A class to configure a PIDController with */
 public class PIDConstants {
-  /** P */
+  // Factor for "proportion" control
   public final double kp;
 
-  /** I */
+  // Factor for "integral" control
   public final double ki;
 
-  /** D */
+  // Factor for "derivative" control
   public final double kd;
 
   /**
    * Create a new PIDConstants object.
    *
-   * @param Kp The proportional coefficient. Must be >= 0.
-   * @param Ki The integral coefficient. Must be >= 0.
-   * @param Kd The derivative coefficient. Must be >= 0.
+   * @param kp The proportional coefficient. Must be >= 0.
+   * @param ki The integral coefficient. Must be >= 0.
+   * @param kd The derivative coefficient. Must be >= 0.
    * @throws IllegalArgumentException if kp &lt; 0
    * @throws IllegalArgumentException if ki &lt; 0
    * @throws IllegalArgumentException if kd &lt; 0
