@@ -26,7 +26,7 @@ class ElevatorSimTest {
     var controller = new PIDController(10, 0, 0);
 
     var sim =
-        new ElevatorSim(
+        ElevatorSim.create(
             DCMotor.getVex775Pro(4),
             14.67,
             8,
@@ -35,6 +35,7 @@ class ElevatorSimTest {
             3.0,
             true,
             0.0,
+            9.8,
             VecBuilder.fill(0.01));
 
     try (var motor = new PWMVictorSPX(0);
@@ -65,7 +66,7 @@ class ElevatorSimTest {
   @Test
   void testMinMax() {
     var sim =
-        new ElevatorSim(
+        ElevatorSim.create(
             DCMotor.getVex775Pro(4),
             14.67,
             8.0,
@@ -74,6 +75,7 @@ class ElevatorSimTest {
             1.0,
             true,
             0.0,
+            9.8,
             VecBuilder.fill(0.01));
 
     for (int i = 0; i < 100; i++) {
@@ -94,8 +96,8 @@ class ElevatorSimTest {
   @Test
   void testStability() {
     var sim =
-        new ElevatorSim(
-            DCMotor.getVex775Pro(4), 100, 4, Units.inchesToMeters(0.5), 0, 10, false, 0.0);
+        ElevatorSim.create(
+            DCMotor.getVex775Pro(4), 100, 4, Units.inchesToMeters(0.5), 0, 10, false, 0.0, 9.8);
 
     sim.setState(VecBuilder.fill(0, 0));
     sim.setInput(12);
