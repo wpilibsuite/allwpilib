@@ -353,6 +353,10 @@ public final class Units {
           .symbol("°F")
           .make();
 
+  // Moment of Interia units
+  public static final Mult<Mass, Mult<Distance, Distance>> KilogramsMetersSquared =
+      Kilograms.mult(Meters.mult(Meters));
+
   // Standard feedforward units for kV and kA.
   // kS and kG are just volts, which is already defined earlier
   /**
