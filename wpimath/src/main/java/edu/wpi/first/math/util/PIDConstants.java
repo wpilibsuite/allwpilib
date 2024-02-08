@@ -6,13 +6,13 @@ package edu.wpi.first.math.util;
 
 /** A class to configure a PIDController with */
 public class PIDConstants {
-  // Factor for "proportion" control
+  /// Factor for "proportion" control.
   public final double kp;
 
-  // Factor for "integral" control
+  /// Factor for "integral" control.
   public final double ki;
 
-  // Factor for "derivative" control
+  /// Factor for "derivative" control.
   public final double kd;
 
   /**

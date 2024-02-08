@@ -39,7 +39,7 @@ class WPILIB_DLLEXPORT PIDController
    *
    * @param constants The PIDConstants object.
    */
-  explicit PIDController(const PIDConstants& constants);
+  explicit PIDController(const PIDConstants& constants, units::second_t period = 20_ms);
 
   ~PIDController() override = default;
 

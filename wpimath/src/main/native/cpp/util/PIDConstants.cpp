@@ -8,7 +8,7 @@
 
 using namespace frc;
 
-PIDConstants::PIDConstants(double Kp, double Ki, double Kd)
+constexpr PIDConstants::PIDConstants(double Kp, double Ki, double Kd)
     : Kp{Kp}, Ki{Ki}, Kd{Kd} {
   bool invalidGains = false;
   if (Kp < 0.0) {

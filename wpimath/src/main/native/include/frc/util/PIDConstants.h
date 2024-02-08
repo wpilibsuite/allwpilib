@@ -9,11 +9,11 @@ namespace frc {
 /** A class to configure a PIDController with */
 struct PIDConstants {
  public:
-  // Factor for "proportion" control
+  /// Factor for "proportion" control.
   const double Kp = 0.0;
-  // Factor for "integral" control
+  /// Factor for "integral" control.
   const double Ki = 0.0;
-  // Factor for "derivative" control
+  /// Factor for "derivative" control.
   const double Kd = 0.0;
 
   /**
