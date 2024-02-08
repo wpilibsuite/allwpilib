@@ -16,11 +16,11 @@ public class PIDConstants {
   public final double kd;
 
   /**
-   * Create a new PIDConstants object
+   * Create a new PIDConstants object.
    *
-   * @param kp P
-   * @param ki I
-   * @param kd D
+   * @param Kp The proportional coefficient. Must be >= 0.
+   * @param Ki The integral coefficient. Must be >= 0.
+   * @param Kd The derivative coefficient. Must be >= 0.
    * @throws IllegalArgumentException if kp &lt; 0
    * @throws IllegalArgumentException if ki &lt; 0
    * @throws IllegalArgumentException if kd &lt; 0

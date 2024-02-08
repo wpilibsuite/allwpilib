@@ -10,11 +10,11 @@ namespace frc {
 struct PIDConstants {
  public:
   /** P */
-  double Kp = 0.0;
+  const double Kp = 0.0;
   /** I */
-  double Ki = 0.0;
+  const double Ki = 0.0;
   /** D */
-  double Kd = 0.0;
+  const double Kd = 0.0;
 
   /**
    * Create a new PIDConstants object.
