@@ -18,6 +18,14 @@ namespace frc::sim {
  */
 class DCMotorSim : public LinearSystemSim<2, 1, 2> {
  public:
+   template <typename Distance>
+  using Velocity_t = units::unit_t<
+      units::compound_unit<Distance, units::inverse<units::seconds>>>;
+
+  template <typename Distance>
+  using Acceleration_t = units::unit_t<units::compound_unit<
+      units::compound_unit<Distance, units::inverse<units::seconds>>,
+      units::inverse<units::seconds>>>;
   /**
    * Creates a simulated DC motor mechanism.
    *
@@ -26,12 +34,9 @@ class DCMotorSim : public LinearSystemSim<2, 1, 2> {
    *                           LinearSystemId::DCMotorSystem().
    * @param gearbox            The type of and number of motors in the DC motor
    * gearbox.
-   * @param gearing            The gearing of the DC motor (numbers greater than
-   * 1 represent reductions).
    * @param measurementStdDevs The standard deviation of the measurement noise.
    */
   DCMotorSim(const LinearSystem<2, 1, 2>& plant, const DCMotor& gearbox,
-             double gearing,
              const std::array<double, 2>& measurementStdDevs = {0.0, 0.0});
 
   /**
@@ -47,6 +52,21 @@ class DCMotorSim : public LinearSystemSim<2, 1, 2> {
   DCMotorSim(const DCMotor& gearbox, double gearing,
              units::kilogram_square_meter_t moi,
              const std::array<double, 2>& measurementStdDevs = {0.0, 0.0});
+
+  /**
+   * Constructs a simulated elevator mechanism.
+   *
+   * @param kV                 The velocity gain.
+   * @param kA                 The acceleration gain.
+   * @param gearbox            The type of and number of motors in the
+   *                           DC motor gearbox.
+   */
+  template <typename Distance>
+    requires std::same_as<units::radian, Distance>
+  DCMotorSim(decltype(1_V / Velocity_t<Distance>(1)) kV,
+              decltype(1_V / Acceleration_t<Distance>(1)) kA,
+              const DCMotor& gearbox, 
+              const std::array<double, 2>& measurementStdDevs = {0.0, 0.0});
 
   using LinearSystemSim::SetState;
 
@@ -89,6 +109,5 @@ class DCMotorSim : public LinearSystemSim<2, 1, 2> {
 
  private:
   DCMotor m_gearbox;
-  double m_gearing;
 };
 }  // namespace frc::sim
