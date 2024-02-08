@@ -70,10 +70,10 @@ void PutSourceFrame(CS_Source source, const WPI_RawFrame& image,
 }  // namespace cs
 
 extern "C" {
-CS_Source CS_CreateRawSource(const char* name, const CS_VideoMode* mode,
+CS_Source CS_CreateRawSource(const WPI_String* name, const CS_VideoMode* mode,
                              CS_Status* status) {
-  return cs::CreateRawSource(name, static_cast<const cs::VideoMode&>(*mode),
-                             status);
+  return cs::CreateRawSource(wpi::to_string_view(name),
+                             static_cast<const cs::VideoMode&>(*mode), status);
 }
 
 void CS_PutRawSourceFrame(CS_Source source, const struct WPI_RawFrame* image,

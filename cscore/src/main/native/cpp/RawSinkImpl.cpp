@@ -180,16 +180,17 @@ uint64_t GrabSinkFrameTimeout(CS_Sink sink, WPI_RawFrame& image, double timeout,
 }  // namespace cs
 
 extern "C" {
-CS_Sink CS_CreateRawSink(const char* name, CS_Status* status) {
-  return cs::CreateRawSink(name, status);
+CS_Sink CS_CreateRawSink(const WPI_String* name, CS_Status* status) {
+  return cs::CreateRawSink(wpi::to_string_view(name), status);
 }
 
-CS_Sink CS_CreateRawSinkCallback(const char* name, void* data,
+CS_Sink CS_CreateRawSinkCallback(const WPI_String* name, void* data,
                                  void (*processFrame)(void* data,
                                                       uint64_t time),
                                  CS_Status* status) {
   return cs::CreateRawSinkCallback(
-      name, [=](uint64_t time) { processFrame(data, time); }, status);
+      wpi::to_string_view(name),
+      [=](uint64_t time) { processFrame(data, time); }, status);
 }
 
 uint64_t CS_GrabRawSinkFrame(CS_Sink sink, struct WPI_RawFrame* image,
