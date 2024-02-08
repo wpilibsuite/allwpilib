@@ -23,7 +23,7 @@ struct PIDConstants {
    * @param Ki     The integral coefficient. Must be >= 0.
    * @param Kd     The derivative coefficient. Must be >= 0.
    */
-  PIDConstants(double Kp, double Ki, double Kd);
+  constexpr PIDConstants(double Kp, double Ki, double Kd);
 };
 
 }  // namespace frc
