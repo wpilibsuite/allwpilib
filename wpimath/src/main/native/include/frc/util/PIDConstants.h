@@ -16,6 +16,13 @@ struct PIDConstants {
   /// Factor for "derivative" control.
   const double Kd = 0.0;
 
+  ~PIDConstants() = default;
+
+  PIDConstants(const PIDConstants&) = default;
+  PIDConstants& operator=(const PIDConstants&) = delete;
+  PIDConstants(PIDConstants&&) = default;
+  PIDConstants& operator=(PIDConstants&&) = delete;
+
   /**
    * Create a new PIDConstants object.
    *

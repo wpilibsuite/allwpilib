@@ -56,7 +56,8 @@ PIDController::PIDController(double Kp, double Ki, double Kd,
   wpi::SendableRegistry::Add(this, "PIDController", instances);
 }
 
-PIDController::PIDController(const PIDConstants& constants, units::second_t period)
+PIDController::PIDController(const PIDConstants& constants,
+                             units::second_t period)
     : PIDController{constants.Kp, constants.Ki, constants.Kd, period} {}
 
 void PIDController::SetPID(double Kp, double Ki, double Kd) {
