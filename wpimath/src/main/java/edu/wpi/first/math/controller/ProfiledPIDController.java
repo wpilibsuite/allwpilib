@@ -444,6 +444,18 @@ public class ProfiledPIDController implements Sendable {
             MathSharedStore.reportError("IZone must be a non-negative number!", e.getStackTrace());
           }
         });
+    builder.addDoubleProperty(
+        "maxvelocity",
+        () -> getConstraints().maxVelocity,
+        maxVelocity ->
+            setConstraints(
+                new TrapezoidProfile.Constraints(maxVelocity, getConstraints().maxAcceleration)));
+    builder.addDoubleProperty(
+        "maxacceleration",
+        () -> getConstraints().maxAcceleration,
+        maxAcceleration ->
+            setConstraints(
+                new TrapezoidProfile.Constraints(getConstraints().maxVelocity, maxAcceleration)));
     builder.addDoubleProperty("goal", () -> getGoal().position, this::setGoal);
   }
 }
