@@ -259,6 +259,7 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
    * <p>This overload transfers command ownership to the returned CommandPtr.
    *
    * @return the decorated command
+   * @see ProxyCommand
    */
   [[nodiscard]]
   CommandPtr AsProxy() &&;

@@ -59,6 +59,7 @@ class CommandPtr final {
    * WPILib docs</a> for a full explanation.
    *
    * @return the decorated command
+   * @see ProxyCommand
    */
   [[nodiscard]]
   CommandPtr AsProxy() &&;

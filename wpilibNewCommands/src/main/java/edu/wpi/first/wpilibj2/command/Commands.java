@@ -174,7 +174,8 @@ public final class Commands {
    * @param supplier the command supplier
    * @return the command
    * @deprecated The ProxyCommand supplier constructor has been deprecated in favor of directly
-   *     proxying a {@link DeferredCommand}, see ProxyCommand documentaion for more details.
+   *     proxying a {@link DeferredCommand}, see ProxyCommand documentaion for more details. As a
+   *     replacement, consider using `defer(supplier).asProxy()`.
    * @see ProxyCommand
    */
   @Deprecated(since = "2024", forRemoval = true)

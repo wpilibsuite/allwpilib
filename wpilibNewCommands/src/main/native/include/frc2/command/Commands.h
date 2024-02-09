@@ -175,7 +175,7 @@ CommandPtr DeferredProxy(wpi::unique_function<Command*()> supplier);
  *
  * @param supplier the command supplier
  * @deprecated The ProxyCommand supplier constructor has been deprecated in favor of directly
- *     proxying a {@link DeferredCommand}, see ProxyCommand documentaion for more details.
+ *     proxying a {@link DeferredCommand}, see ProxyCommand documentaion for more details. To replace this, use `Defer(supplier).AsProxy()`.
  */
 [[nodiscard]]
 [[deprecated("The ProxyCommand supplier constructor has been deprecated")]]
