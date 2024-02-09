@@ -83,14 +83,14 @@ int64_t HAL_GetFPGARevision(int32_t* status);
  *
  * @param[out] serialNumber The roboRIO serial number. Free with WPI_FreeString
  */
-void HAL_GetSerialNumber(WPI_String* serialNumber);
+void HAL_GetSerialNumber(struct WPI_String* serialNumber);
 
 /**
  * Returns the comments from the roboRIO web interface.
  *
  * @param[out] comments The comments string. Free with WPI_FreeString
  */
-void HAL_GetComments(WPI_String* comments);
+void HAL_GetComments(struct WPI_String* comments);
 
 /**
  * Returns the team number configured for the robot controller.

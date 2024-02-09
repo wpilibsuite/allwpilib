@@ -249,7 +249,7 @@ int CS_GetPropertyStep(CS_Property property, CS_Status* status);
 int CS_GetPropertyDefault(CS_Property property, CS_Status* status);
 void CS_GetStringProperty(CS_Property property, struct WPI_String* value,
                           CS_Status* status);
-void CS_SetStringProperty(CS_Property property, const WPI_String* value,
+void CS_SetStringProperty(CS_Property property, const struct WPI_String* value,
                           CS_Status* status);
 struct WPI_String* CS_GetEnumPropertyChoices(CS_Property property, int* count,
                                              CS_Status* status);
@@ -439,7 +439,7 @@ int CS_GetMjpegServerPort(CS_Sink sink, CS_Status* status);
  */
 void CS_SetSinkDescription(CS_Sink sink, const struct WPI_String* description,
                            CS_Status* status);
-void CS_GetSinkError(CS_Sink sink, WPI_String* error, CS_Status* status);
+void CS_GetSinkError(CS_Sink sink, struct WPI_String* error, CS_Status* status);
 void CS_SetSinkEnabled(CS_Sink sink, CS_Bool enabled, CS_Status* status);
 /** @} */
 
