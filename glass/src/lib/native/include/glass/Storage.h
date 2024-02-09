@@ -175,7 +175,7 @@ class Storage {
   }
 
   template <typename T, typename... Args>
-  T& GetOrNewData(Args... args) {
+  T& GetOrNewData(Args&&... args) {
     if (!m_data) {
       m_data = std::make_shared<T>(std::forward<Args>(args)...);
     }

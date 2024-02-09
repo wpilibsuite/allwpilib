@@ -11,6 +11,7 @@
 #include <thread>
 #include <utility>
 #include <vector>
+#include "cscore_c.h"
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>
@@ -21,6 +22,7 @@
 #include <wpigui.h>
 
 #include "glass/Model.h"
+#include "glass/Storage.h"
 #include "glass/View.h"
 
 namespace glass {
@@ -49,26 +51,19 @@ class CameraModel : public Model {
   /**
    * Set the source handle.
    */
-  void SetSource(CS_Source source);
+  void SetSource(cs::VideoSource source);
 
   /**
    * Get the source handle.
    */
-  CS_Source GetSource() { return m_source; }
-
-  /**
-   * Enable or disable the camera feed.
-   *
-   * @param enabled True to enable, false to disable
-   */
-  void SetEnabled(bool enabled);
+  cs::VideoSource& GetSource() { return m_source; }
 
   /**
    * Get the actual FPS.
    *
    * @return Actual FPS averaged over a 1 second period.
    */
-  double GetActualFPS();
+  double GetActualFPS() { return m_source.GetActualFPS(); }
 
   /**
    * Get the data rate (in bytes per second).
@@ -77,16 +72,16 @@ class CameraModel : public Model {
    *
    * @return Data rate averaged over a 1 second period.
    */
-  double GetActualDataRate();
+  double GetActualDataRate() { return m_source.GetActualDataRate(); }
 
   /**
    * For a HTTP camera, change the URLs used to connect to the camera.
    */
   void SetUrls(std::span<const std::string> urls);
 
-  CS_SourceKind GetKind() const;
+  cs::VideoSource::Kind GetKind() const { return m_source.GetKind(); }
 
-  cs::VideoMode GetVideoMode() const;
+  cs::VideoMode GetVideoMode() const { return m_source.GetVideoMode(); }
   void SetVideoMode(const cs::VideoMode& mode);
   void ResetVideoMode();
 
@@ -94,8 +89,7 @@ class CameraModel : public Model {
   cv::Mat* AllocMat();
 
   std::string m_id;
-  CS_Source m_source{0};
-  CS_Sink m_cvSink{0};
+  cs::VideoSource m_source;
 
   std::string& m_cameraType;
   std::string& m_usbPath;
@@ -122,6 +116,21 @@ void DisplayCameraSettings(CameraModel* model);
 
 void DisplayCamera(CameraModel* model, const ImVec2& contentSize,
                    bool showFpsDataRate = true);
+
+void DisplayCameraWindow(CameraModel* model);
+
+inline CameraModel* GetOrNewCameraModel(Storage& root, std::string_view id) {
+  Storage& storage = root.GetChild(id);
+  return &storage.GetOrNewData<CameraModel>(storage, id);
+}
+
+inline CameraModel* GetCameraModel(Storage& root, std::string_view id) {
+  return root.GetChild(id).GetData<CameraModel>();
+}
+
+void DisplayCameraModelTable(Storage& root,
+                             int kinds = CS_SOURCE_USB | CS_SOURCE_HTTP |
+                                         CS_SOURCE_CV | CS_SOURCE_RAW);
 
 class CameraView : public View {
  public:

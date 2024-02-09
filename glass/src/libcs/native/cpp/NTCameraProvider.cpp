@@ -11,6 +11,7 @@
 #include <cscore_cpp.h>
 #include <wpi/StringExtras.h>
 
+#include "cscore_oo.h"
 #include "glass/camera/Camera.h"
 #include "ntcore_c.h"
 
@@ -124,9 +125,7 @@ void NTCameraProvider::Update() {
 
 void NTCameraProvider::InitCamera(SourceInfo* info) {
   info->camera = CreateModel(info->name);
-  CS_Status status = 0;
-  auto source = cs::CreateHttpCamera(fmt::format("glass::http::{}", info->name),
-                                     static_cast<NTSourceInfo*>(info)->streams,
-                                     CS_HTTP_UNKNOWN, &status);
-  info->camera->SetSource(source);
+  info->camera->SetSource(cs::HttpCamera(
+      fmt::format("glass::http::{}", info->name),
+      static_cast<NTSourceInfo*>(info)->streams, cs::HttpCamera::kUnknown));
 }

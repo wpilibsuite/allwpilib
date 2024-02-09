@@ -17,6 +17,8 @@
 #include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
 
+#include "cscore_c.h"
+#include "cscore_oo.h"
 #include "glass/Context.h"
 #include "glass/Storage.h"
 
@@ -57,9 +59,9 @@ static int StringToPixelFormat(std::string_view str) {
 
 static void VideoModeToString(char* buf, size_t len,
                               const cs::VideoMode& mode) {
-  std::snprintf(buf, len, "%s (%dx%d %d FPS)",
-                PixelFormatToString(mode.pixelFormat), mode.width, mode.height,
-                mode.fps);
+  wpi::format_to_n_c_str(buf, len, "{} ({}x{} {} FPS)",
+                         PixelFormatToString(mode.pixelFormat), mode.width,
+                         mode.height, mode.fps);
 }
 
 CameraModel::CameraModel(Storage& storage, std::string_view id)
@@ -70,30 +72,13 @@ CameraModel::CameraModel(Storage& storage, std::string_view id)
       m_pixelFormatStr{storage.GetString("pixelFormat")},
       m_width{storage.GetInt("width")},
       m_height{storage.GetInt("height")},
-      m_fps{storage.GetInt("fps")} {
-  if (m_cameraType == "usb") {
-    CS_Status status = 0;
-    m_source = cs::CreateUsbCameraPath(fmt::format("glass::usb::{}", m_id),
-                                       m_usbPath, &status);
-  } else if (m_cameraType == "http") {
-    CS_Status status = 0;
-    m_source = cs::CreateHttpCamera(fmt::format("glass::http::{}", m_id),
-                                    m_urls, CS_HTTP_UNKNOWN, &status);
-  }
-
-  if (!m_pixelFormatStr.empty() && m_width != 0 && m_height != 0 &&
-      m_fps != 0) {
-    cs::VideoMode mode;
-    mode.pixelFormat = StringToPixelFormat(m_pixelFormatStr);
-    mode.width = m_width;
-    mode.height = m_height;
-    mode.fps = m_fps;
-    SetVideoMode(mode);
-  }
-}
+      m_fps{storage.GetInt("fps")} {}
 
 CameraModel::~CameraModel() {
   Stop();
+  if (m_frameThread.joinable()) {
+    m_frameThread.join();
+  }
   delete m_latestFrame.load();
   for (auto frame : m_sharedFreeList) {
     delete frame;
@@ -120,25 +105,41 @@ void CameraModel::Update() {
 }
 
 bool CameraModel::Exists() {
-  CS_Status status = 0;
-  return m_source != 0 && cs::IsSourceConnected(m_source, &status);
+  return m_source && m_source.IsConnected();
 }
 
 void CameraModel::Start() {
-  if (m_cvSink != 0) {
+  if (m_frameThread.joinable()) {
     return;
   }
 
-  CS_Status status = 0;
-  m_cvSink = cs::CreateCvSink(fmt::format("glass::CameraModel_{}", m_id),
-                              cs::VideoMode::kBGR, &status);
+  if (!m_source) {
+    if (m_cameraType == "usb") {
+      m_source = cs::UsbCamera(m_id, m_usbPath);
+    } else if (m_cameraType == "http") {
+      m_source = cs::HttpCamera(m_id, m_urls, cs::HttpCamera::kUnknown);
+    } else {
+      return;
+    }
+  }
 
-  m_frameThread = std::thread([this] {
+  if (!m_pixelFormatStr.empty() && m_width != 0 && m_height != 0 &&
+      m_fps != 0) {
+    cs::VideoMode mode;
+    mode.pixelFormat = StringToPixelFormat(m_pixelFormatStr);
+    mode.width = m_width;
+    mode.height = m_height;
+    mode.fps = m_fps;
+    SetVideoMode(mode);
+  }
+
+  m_frameThread = std::thread([this, source = m_source] {
+    cs::CvSink cvSink{fmt::format("{}_view", m_id), cs::VideoMode::kBGR};
+    cvSink.SetSource(source);
     cv::Mat frame;
     while (!m_stopCamera) {
       // get frame from camera
-      CS_Status status = 0;
-      uint64_t time = cs::GrabSinkFrameTimeout(m_cvSink, frame, 0.25, &status);
+      uint64_t time = cvSink.GrabFrame(frame, 0.25);
       if (m_stopCamera) {
         break;
       }
@@ -165,58 +166,39 @@ void CameraModel::Start() {
 
 void CameraModel::Stop() {
   m_stopCamera = true;
-  if (m_cvSink != 0) {
-    CS_Status status = 0;
-    cs::ReleaseSink(m_cvSink, &status);
-  }
-  if (m_frameThread.joinable()) {
-    m_frameThread.join();
-  }
-  m_cvSink = 0;
 }
 
-void CameraModel::SetSource(CS_Source source) {
+void CameraModel::SetSource(cs::VideoSource source) {
   m_source = source;
-}
-
-void CameraModel::SetEnabled(bool enabled) {
-  CS_Status status = 0;
-  cs::SetSinkSource(m_cvSink, enabled ? m_source : 0, &status);
-}
-
-double CameraModel::GetActualFPS() {
-  CS_Status status = 0;
-  double rv = cs::GetTelemetryAverageValue(m_source, CS_SOURCE_FRAMES_RECEIVED,
-                                           &status);
-  return rv;
-}
-
-double CameraModel::GetActualDataRate() {
-  CS_Status status = 0;
-  double rv =
-      cs::GetTelemetryAverageValue(m_source, CS_SOURCE_BYTES_RECEIVED, &status);
-  return rv;
+  switch (GetKind()) {
+    case cs::VideoSource::Kind::kUsb:
+      m_cameraType = "usb";
+      m_usbPath = static_cast<cs::UsbCamera&>(source).GetPath();
+      break;
+    case cs::VideoSource::Kind::kHttp:
+      m_cameraType = "http";
+      m_urls = static_cast<cs::HttpCamera&>(source).GetUrls();
+      break;
+    case cs::VideoSource::Kind::kCv:
+      m_cameraType = "cv";
+      break;
+    case cs::VideoSource::Kind::kRaw:
+      m_cameraType = "raw";
+      break;
+    default:
+      m_cameraType.clear();
+      break;
+  }
 }
 
 void CameraModel::SetUrls(std::span<const std::string> urls) {
   CS_Status status = 0;
-  cs::SetHttpCameraUrls(m_source, urls, &status);
+  cs::SetHttpCameraUrls(m_source.GetHandle(), urls, &status);
   m_urls.assign(urls.begin(), urls.end());
 }
 
-CS_SourceKind CameraModel::GetKind() const {
-  CS_Status status = 0;
-  return cs::GetSourceKind(m_source, &status);
-}
-
-cs::VideoMode CameraModel::GetVideoMode() const {
-  CS_Status status = 0;
-  return cs::GetSourceVideoMode(m_source, &status);
-}
-
 void CameraModel::SetVideoMode(const cs::VideoMode& mode) {
-  CS_Status status = 0;
-  cs::SetSourceVideoMode(m_source, mode, &status);
+  m_source.SetVideoMode(mode);
   m_videoMode = mode;
   m_pixelFormatStr = PixelFormatToString(m_videoMode.pixelFormat);
   m_width = mode.width;
@@ -252,19 +234,18 @@ cv::Mat* CameraModel::AllocMat() {
   return out;
 }
 
-static void EditProperty(const std::string& name, CS_Property prop) {
-  CS_Status status = 0;
-  switch (cs::GetPropertyKind(prop, &status)) {
-    case CS_PROP_BOOLEAN: {
-      bool val = cs::GetProperty(prop, &status);
+static void EditProperty(const std::string& name, cs::VideoProperty& prop) {
+  switch (prop.GetKind()) {
+    case cs::VideoProperty::kBoolean: {
+      bool val = prop.Get();
       if (ImGui::Checkbox(name.c_str(), &val)) {
-        cs::SetProperty(prop, val, &status);
+        prop.Set(val);
       }
       break;
     }
-    case CS_PROP_ENUM: {
-      int val = cs::GetProperty(prop, &status);
-      auto options = cs::GetEnumPropertyChoices(prop, &status);
+    case cs::VideoProperty::kEnum: {
+      int val = prop.Get();
+      std::vector<std::string> options = prop.GetChoices();
       if (ImGui::BeginCombo(name.c_str(), options[val].c_str())) {
         for (int i = 0; i < static_cast<int>(options.size()); ++i) {
           if (options[i].empty()) {
@@ -272,7 +253,7 @@ static void EditProperty(const std::string& name, CS_Property prop) {
           }
           bool selected = (val == i);
           if (ImGui::Selectable(options[i].c_str(), selected)) {
-            cs::SetProperty(prop, i, &status);
+            prop.Set(i);
           }
           if (selected) {
             ImGui::SetItemDefaultFocus();
@@ -282,16 +263,16 @@ static void EditProperty(const std::string& name, CS_Property prop) {
       }
       break;
     }
-    case CS_PROP_INTEGER: {
-      int val = cs::GetProperty(prop, &status);
-      // int step = cs::GetPropertyStep(prop, &status);
-      int min = cs::GetPropertyMin(prop, &status);
-      int max = cs::GetPropertyMax(prop, &status);
+    case cs::VideoProperty::kInteger: {
+      int val = prop.Get();
+      // int step = prop.GetStep();
+      int min = prop.GetMin();
+      int max = prop.GetMax();
       if (min == 0 && max == 1) {
         // treat like boolean
         bool boolVal = val;
         if (ImGui::Checkbox(name.c_str(), &boolVal)) {
-          cs::SetProperty(prop, boolVal, &status);
+          prop.Set(boolVal);
         }
         break;
       }
@@ -303,14 +284,14 @@ static void EditProperty(const std::string& name, CS_Property prop) {
         if (val > max) {
           val = max;
         }
-        cs::SetProperty(prop, val, &status);
+        prop.Set(val);
       }
       break;
     }
-    case CS_PROP_STRING: {
-      std::string val = cs::GetStringProperty(prop, &status);
+    case cs::VideoProperty::kString: {
+      std::string val = prop.GetString();
       if (ImGui::InputText(name.c_str(), &val)) {
-        cs::SetStringProperty(prop, val, &status);
+        prop.SetString(val);
       }
       break;
     }
@@ -319,22 +300,13 @@ static void EditProperty(const std::string& name, CS_Property prop) {
   }
 }
 
-void glass::DisplayCameraSettings(CameraModel* model) {
-  auto& storage = GetStorage();
-
-  bool& showFpsDataRate = storage.GetBool("showFpsDataRate", true);
-  ImGui::Checkbox("Show FPS and data rate", &showFpsDataRate);
-
-  bool& streamEnabled = storage.GetBool("streamEnabled", true);
-  ImGui::Checkbox("Stream enabled", &streamEnabled);
-
-  CS_Source source = model->GetSource();
-  CS_Status status = 0;
-
-  auto kind = model->GetKind();
+static bool EditMode(CameraModel* model) {
+  bool rv = false;
+  cs::VideoSource& source = model->GetSource();
+  cs::VideoSource::Kind kind = model->GetKind();
 
   // video mode; split out width/height/fps for HTTP cameras
-  if (kind == CS_SOURCE_HTTP) {
+  if (kind == cs::VideoSource::kHttp) {
     static int res[2];
     static int fps;
     if (ImGui::IsWindowAppearing()) {
@@ -356,16 +328,17 @@ void glass::DisplayCameraSettings(CameraModel* model) {
       ImGui::CloseCurrentPopup();
     }
   } else {
-    auto mode = cs::GetSourceVideoMode(source, &status);
+    auto mode = source.GetVideoMode();
     char modeStr[64];
     VideoModeToString(modeStr, sizeof(modeStr), mode);
     if (ImGui::BeginCombo("Video Mode", modeStr)) {
-      auto modes = cs::EnumerateSourceVideoModes(source, &status);
+      auto modes = source.EnumerateVideoModes();
       for (auto&& amode : modes) {
         bool selected = (amode == mode);
         VideoModeToString(modeStr, sizeof(modeStr), amode);
         if (ImGui::Selectable(modeStr, selected)) {
           model->SetVideoMode(amode);
+          rv = true;
         }
         if (selected) {
           ImGui::SetItemDefaultFocus();
@@ -374,12 +347,13 @@ void glass::DisplayCameraSettings(CameraModel* model) {
       ImGui::EndCombo();
     }
   }
+  return rv;
+}
 
+static void EditProperties(cs::VideoSource& source) {
   if (ImGui::CollapsingHeader("Properties")) {
-    wpi::SmallVector<CS_Property, 16> propertiesArr;
-    for (auto&& prop :
-         cs::EnumerateSourceProperties(source, propertiesArr, &status)) {
-      std::string name = cs::GetPropertyName(prop, &status);
+    for (auto&& prop : source.EnumerateProperties()) {
+      std::string name = prop.GetName();
       if (!wpi::starts_with(name, "raw_")) {
         EditProperty(name, prop);
       }
@@ -387,17 +361,26 @@ void glass::DisplayCameraSettings(CameraModel* model) {
   }
 
   if (ImGui::CollapsingHeader("Raw Properties")) {
-    CS_Source source = model->GetSource();
-    wpi::SmallVector<CS_Property, 16> propertiesArr;
-    CS_Status status = 0;
-    for (auto&& prop :
-         cs::EnumerateSourceProperties(source, propertiesArr, &status)) {
-      std::string name = cs::GetPropertyName(prop, &status);
+    for (auto&& prop : source.EnumerateProperties()) {
+      std::string name = prop.GetName();
       if (wpi::starts_with(name, "raw_")) {
         EditProperty(name, prop);
       }
     }
   }
+}
+
+void glass::DisplayCameraSettings(CameraModel* model) {
+  auto& storage = GetStorage();
+
+  bool& showFpsDataRate = storage.GetBool("showFpsDataRate", true);
+  ImGui::Checkbox("Show FPS and data rate", &showFpsDataRate);
+
+  bool& streamEnabled = storage.GetBool("streamEnabled", true);
+  ImGui::Checkbox("Stream enabled", &streamEnabled);
+
+  EditMode(model);
+  EditProperties(model->GetSource());
 }
 
 void glass::DisplayCamera(CameraModel* model, const ImVec2& contentSize,
@@ -420,17 +403,36 @@ void glass::DisplayCamera(CameraModel* model, const ImVec2& contentSize,
 
   // fill the space
   ImGui::Dummy(size);
+  if (ImGui::BeginDragDropTarget()) {
+    if (auto payload = ImGui::AcceptDragDropPayload("Camera")) {
+      glass::GetStorage().GetString("camera").assign(
+          static_cast<const char*>(payload->Data), payload->DataSize);
+    }
+    ImGui::EndDragDropTarget();
+  }
 
   if (showFpsDataRate) {
     ImGui::Text("%2.1f FPS", model->GetActualFPS());
 
     char buf[64];
-    std::snprintf(buf, sizeof(buf), "%.1f Mbps",
-                  model->GetActualDataRate() * 8 / 1000000);
+    wpi::format_to_n_c_str(buf, sizeof(buf), "{:.1f} Mbps",
+                           model->GetActualDataRate() * 8 / 1000000);
     ImGui::SameLine(size.x - ImGui::CalcTextSize(buf).x -
                     ImGui::GetStyle().ItemSpacing.x);
     ImGui::TextUnformatted(buf);
   }
+}
+
+void glass::DisplayCameraWindow(CameraModel* model) {
+  auto& storage = GetStorage();
+  bool showFpsDataRate = storage.GetBool("showFpsDataRate", true);
+
+  ImVec2 size =
+      ImGui::GetWindowContentRegionMax() - ImGui::GetWindowContentRegionMin();
+  if (showFpsDataRate) {
+    size -= ImVec2(0, ImGui::GetTextLineHeightWithSpacing());
+  }
+  DisplayCamera(model, size, showFpsDataRate);
 }
 
 void CameraView::Display() {
@@ -440,9 +442,6 @@ void CameraView::Display() {
   }
   auto& storage = GetStorage();
   bool showFpsDataRate = storage.GetBool("showFpsDataRate", true);
-  bool streamEnabled = storage.GetBool("streamEnabled", true);
-
-  m_model->SetEnabled(streamEnabled);
 
   ImVec2 size =
       ImGui::GetWindowContentRegionMax() - ImGui::GetWindowContentRegionMin();
@@ -452,6 +451,99 @@ void CameraView::Display() {
   DisplayCamera(m_model, size, showFpsDataRate);
 }
 
-void CameraView::Hidden() {
-  m_model->SetEnabled(false);
+void CameraView::Hidden() {}
+
+void glass::DisplayCameraModelTable(Storage& root, int kinds) {
+  if (!ImGui::BeginTable("cameras", 7,
+                         ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersInnerV |
+                             ImGuiTableFlags_SizingFixedFit)) {
+    return;
+  }
+
+  ImGui::TableSetupColumn("Id");
+  ImGui::TableSetupColumn("Mode");
+  ImGui::TableSetupColumn("Enabled");
+  ImGui::TableSetupColumn("Active");
+  ImGui::TableSetupColumn("FPS", ImGuiTableColumnFlags_WidthFixed,
+                          ImGui::GetFontSize() * 5);
+  ImGui::TableSetupColumn("Data Rate", ImGuiTableColumnFlags_WidthFixed,
+                          ImGui::GetFontSize() * 5);
+  ImGui::TableSetupColumn("Actions");
+  ImGui::TableHeadersRow();
+
+  std::string toDelete;
+  for (auto&& kv : root.GetChildren()) {
+    CameraModel* model = kv.value().GetData<CameraModel>();
+    if (!model) {
+      continue;
+    }
+    if ((model->GetKind() & kinds) == 0) {
+      continue;
+    }
+
+    ImGui::TableNextRow();
+    ImGui::TableNextColumn();
+    ImGui::Selectable(model->GetId().c_str());
+    if (ImGui::BeginDragDropSource()) {
+      ImGui::SetDragDropPayload("Camera", model->GetId().data(),
+                                model->GetId().size());
+      ImGui::Text("Camera: %s", model->GetId().c_str());
+      ImGui::EndDragDropSource();
+    }
+
+    ImGui::TableNextColumn();
+    char buf[64];
+    VideoModeToString(buf, sizeof(buf), model->GetVideoMode());
+    ImGui::TextUnformatted(buf);
+    ImGui::SameLine();
+    if (ImGui::SmallButton(">")) {
+      ImGui::OpenPopup("mode");
+    }
+    if (ImGui::BeginPopup("mode")) {
+      if (EditMode(model)) {
+        ImGui::CloseCurrentPopup();
+      }
+      ImGui::EndPopup();
+    }
+
+    ImGui::TableNextColumn();
+    ImGui::TextUnformatted(model->Exists() ? "Yes" : "No");
+
+    ImGui::TableNextColumn();
+    ImGui::TextUnformatted(model->GetSource().IsEnabled() ? "Yes" : "No");
+
+    ImGui::TableNextColumn();
+    ImGui::Text("%2.1f FPS", model->GetActualFPS());
+
+    ImGui::TableNextColumn();
+    wpi::format_to_n_c_str(buf, sizeof(buf), "{:.1f} Mbps",
+                           model->GetActualDataRate() * 8 / 1000000);
+    ImGui::TextUnformatted(buf);
+
+    ImGui::TableNextColumn();
+    if (ImGui::SmallButton(model->GetSource().IsEnabled() ? "Stop" : "Start")) {
+      if (model->Exists()) {
+        model->Stop();
+      } else {
+        model->Start();
+      }
+    }
+    ImGui::SameLine();
+    if (ImGui::SmallButton("Delete")) {
+      toDelete = kv.key();
+    }
+    ImGui::SameLine();
+    if (ImGui::SmallButton("Properties")) {
+      ImGui::OpenPopup("properties");
+    }
+    if (ImGui::BeginPopup("properties")) {
+      EditProperties(model->GetSource());
+      ImGui::EndPopup();
+    }
+  }
+  if (!toDelete.empty()) {
+    root.Erase(toDelete);
+  }
+
+  ImGui::EndTable();
 }
