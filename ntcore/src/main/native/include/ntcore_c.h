@@ -1783,8 +1783,8 @@ double* NT_GetValueDoubleArray(const struct NT_Value* value,
  * needed. The WPI_FreeStringArray() function is useful for this purpose.
  * The returned array is a copy of the array in the value, and must be
  * freed separately. Note that the individual struct WPI_Strings should not be
- * freed, but the entire array should be freed at once. The WPI_FreeStringArray()
- * function will free all the struct WPI_Strings.
+ * freed, but the entire array should be freed at once. The
+ * WPI_FreeStringArray() function will free all the struct WPI_Strings.
  */
 struct WPI_String* NT_GetValueStringArray(const struct NT_Value* value,
                                           uint64_t* last_change,

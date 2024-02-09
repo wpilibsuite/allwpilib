@@ -290,7 +290,7 @@ void HAL_GetSerialNumber(WPI_String* serialNumber) {
   if (!serialNum) {
     serialNum = "";
   }
-  size_t len = strlen(serialNum);
+  size_t len = std::strlen(serialNum);
   auto write = WPI_AllocateString(serialNumber, len);
   std::memcpy(write, serialNum, len);
 }

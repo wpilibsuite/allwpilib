@@ -346,7 +346,8 @@ void CS_SetUsbCameraPath(CS_Source source, const struct WPI_String* path,
                          CS_Status* status);
 void CS_GetUsbCameraPath(CS_Source source, struct WPI_String* path,
                          CS_Status* status);
-void CS_GetUsbCameraInfo(CS_Source source, CS_UsbCameraInfo* info, CS_Status* status);
+void CS_GetUsbCameraInfo(CS_Source source, CS_UsbCameraInfo* info,
+                         CS_Status* status);
 /** @} */
 
 /**

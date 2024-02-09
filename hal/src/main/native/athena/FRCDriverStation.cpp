@@ -430,7 +430,7 @@ void HAL_GetJoystickName(WPI_String* name, int32_t joystickNum) {
   if (HAL_GetJoystickDescriptor(joystickNum, &joystickDesc) < 0) {
     cName = "";
   }
-  auto len = strlen(cName);
+  auto len = std::strlen(cName);
   auto write = WPI_AllocateString(name, len);
   std::memcpy(write, cName, len);
 }

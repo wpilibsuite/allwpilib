@@ -14,8 +14,9 @@
 
 #endif
 
+#include <wpi/string.h>
+
 #include "hal/Types.h"
-#include "wpi/string.h"
 
 /**
  * @defgroup hal_capi WPILib HAL API

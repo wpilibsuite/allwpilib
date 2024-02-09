@@ -8,7 +8,7 @@
 #include <cstring>
 #include <string_view>
 
-#include "wpi/string.h"
+#include <wpi/string.h>
 
 namespace cs {
 
