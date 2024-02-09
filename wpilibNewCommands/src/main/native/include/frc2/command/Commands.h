@@ -166,7 +166,7 @@ CommandPtr Select(std::function<Key()> selector,
  */
 template <std::convertible_to<CommandPtr>... CommandPtrs>
 [[nodiscard]]
-CommandPtr Choose(std::function<wpi::Sendable*()> publish,
+CommandPtr Choose(std::function<void(wpi::Sendable*)> publish,
                   CommandPtrs&&... commands) {
   frc::SendableChooser<std::string_view> chooser;
   ((void)chooser.AddOption(commands.GetName(), commands.GetName()), ...);
