@@ -55,17 +55,17 @@ class NTProfiledPIDControllerModel : public ProfiledPIDControllerModel {
   nt::DoubleEntry m_p;
   nt::DoubleEntry m_i;
   nt::DoubleEntry m_d;
+  nt::DoubleEntry m_iZone;
   nt::DoubleEntry m_maxVelocity;
   nt::DoubleEntry m_maxAcceleration;
-  nt::DoubleEntry m_iZone;
   nt::DoubleEntry m_goal;
 
   DataSource m_pData;
   DataSource m_iData;
   DataSource m_dData;
+  DataSource m_iZoneData;
   DataSource m_maxVelocityData;
   DataSource m_maxAccelerationData;
-  DataSource m_iZoneData;
   DataSource m_goalData;
 
   std::string m_nameValue;
