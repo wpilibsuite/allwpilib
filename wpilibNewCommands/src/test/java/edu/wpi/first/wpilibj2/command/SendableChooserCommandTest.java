@@ -17,7 +17,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-class CommandSendableButtonTest extends CommandTestBase {
+class SendableChooserCommandTest extends CommandTestBase {
   private NetworkTableInstance m_inst;
   private BooleanPublisher m_publish;
   private static final String kBasePath = "/SmartDashboard/chooser/";
