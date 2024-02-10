@@ -4,22 +4,15 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.PubSubOptions;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -27,8 +20,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 class CommandSendableButtonTest extends CommandTestBase {
   private NetworkTableInstance m_inst;
   private BooleanPublisher m_publish;
-  private AtomicReference<String> m_flag;
-  static final String kBasePath = "/SmartDashboard/chooser/";
+  private static final String kBasePath = "/SmartDashboard/chooser/";
 
   @BeforeEach
   void setUp() {
@@ -36,13 +28,13 @@ class CommandSendableButtonTest extends CommandTestBase {
     SmartDashboard.setNetworkTableInstance(m_inst);
     m_publish = m_inst.getBooleanTopic("/SmartDashboard/chooser").publish();
     SmartDashboard.updateValues();
-    m_flag = new AtomicReference<>("");
   }
 
   @ParameterizedTest(name = "options[{index}]: {0}")
   @MethodSource
   void optionsAreCorrect(@SuppressWarnings("unused") String testName, Command[] commands, String[] names) {
     try (var optionsSubscriber = m_inst.getStringArrayTopic(kBasePath + "options").subscribe(new String[] {})) {
+      @SuppressWarnings("unused")
       var command = Commands.choose(c -> SmartDashboard.putData("chooser", c), commands);
       SmartDashboard.updateValues();
       assertArrayEquals(names, optionsSubscriber.get());
@@ -51,10 +43,9 @@ class CommandSendableButtonTest extends CommandTestBase {
 
   static Stream<Arguments> optionsAreCorrect() {
     return Stream.of(
-      Arguments.of("empty", new Command[]{}),
-      Arguments.of("duplicateName", new Command[]{ commandNamed("a"), commandNamed("b"), commandNamed("a")}),
-      Arguments.of("happyPath", new Command[]{ commandNamed("a"), commandNamed("b"), commandNamed("c")}),
-    )
+        Arguments.of("empty", new Command[] {}),
+        Arguments.of("duplicateName", new Command[] { commandNamed("a"), commandNamed("b"), commandNamed("a") }),
+        Arguments.of("happyPath", new Command[] { commandNamed("a"), commandNamed("b"), commandNamed("c") }));
   }
 
   @AfterEach
