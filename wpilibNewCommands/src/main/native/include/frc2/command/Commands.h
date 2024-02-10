@@ -13,8 +13,9 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/sendable/Sendable.h>
 #include <frc/smartdashboard/SendableChooser.h>
+#include <wpi/sendable/Sendable.h>
+
 #include "frc2/command/CommandPtr.h"
 #include "frc2/command/Requirements.h"
 #include "frc2/command/SelectCommand.h"
@@ -153,8 +154,8 @@ CommandPtr Select(std::function<Key()> selector,
  * <pre>
  * <code>
  * CommandPtr autonomousCommand = frc2::cmd::Choose(
- *   [](wpi::Sendable* chooser) { frc::SmartDashboard::PutData("Auto Chooser", chooser); },
- *   std::move(myFirstAuto).WithName("First Auto"),
+ *   [](wpi::Sendable* chooser) { frc::SmartDashboard::PutData("Auto Chooser",
+ * chooser); }, std::move(myFirstAuto).WithName("First Auto"),
  *   std::move(mySecondAuto).WithName("Second Auto")
  * );
  * </code>
