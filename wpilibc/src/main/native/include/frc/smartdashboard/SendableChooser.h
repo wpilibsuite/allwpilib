@@ -37,9 +37,6 @@ class SendableChooser : public SendableChooserBase {
   static U _unwrap_smart_ptr(const U& value);
 
   template <class U>
-  static U* _unwrap_smart_ptr(const std::unique_ptr<U>& value);
-
-  template <class U>
   static std::weak_ptr<U> _unwrap_smart_ptr(const std::shared_ptr<U>& value);
 
  public:
@@ -71,8 +68,8 @@ class SendableChooser : public SendableChooserBase {
   void SetDefaultOption(std::string_view name, T object);
 
   /**
-   * Returns a copy of the selected option (a raw pointer U* if T =
-   * std::unique_ptr<U> or a std::weak_ptr<U> if T = std::shared_ptr<U>).
+   * Returns a copy of the selected option (a std::weak_ptr<U> if T =
+   * std::shared_ptr<U>).
    *
    * If there is none selected, it will return the default. If there is none
    * selected and no default, then it will return a value-initialized instance.

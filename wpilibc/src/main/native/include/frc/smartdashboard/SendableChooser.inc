@@ -124,13 +124,6 @@ U SendableChooser<T>::_unwrap_smart_ptr(const U& value) {
 template <class T>
   requires std::copy_constructible<T> && std::default_initializable<T>
 template <class U>
-U* SendableChooser<T>::_unwrap_smart_ptr(const std::unique_ptr<U>& value) {
-  return value.get();
-}
-
-template <class T>
-  requires std::copy_constructible<T> && std::default_initializable<T>
-template <class U>
 std::weak_ptr<U> SendableChooser<T>::_unwrap_smart_ptr(
     const std::shared_ptr<U>& value) {
   return value;
