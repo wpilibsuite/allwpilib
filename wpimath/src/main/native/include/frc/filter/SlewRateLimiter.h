@@ -76,6 +76,13 @@ class SlewRateLimiter {
   }
 
   /**
+   * Returns the value last calculated by the SlewRateLimiter.
+   *
+   * @return The last value.
+   */
+  Unit_t LastValue() const { return m_prevVal; }
+
+  /**
    * Resets the slew rate limiter to the specified value; ignores the rate limit
    * when doing so.
    *

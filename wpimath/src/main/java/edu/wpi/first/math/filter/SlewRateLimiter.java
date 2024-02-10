@@ -65,6 +65,15 @@ public class SlewRateLimiter {
   }
 
   /**
+   * Returns the value last calculated by the SlewRateLimiter.
+   *
+   * @return The last value.
+   */
+  public double lastValue() {
+    return m_prevVal;
+  }
+
+  /**
    * Resets the slew rate limiter to the specified value; ignores the rate limit when doing so.
    *
    * @param value The value to reset to.
