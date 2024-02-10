@@ -78,7 +78,9 @@ public class Shooter extends SubsystemBase {
   // those calculated by SysId
   private final SimpleMotorFeedforward m_shooterFeedforward =
       new SimpleMotorFeedforward(
-          ShooterConstants.kSVolts, ShooterConstants.kVVoltSecondsPerRotation, ShooterConstants.kAVoltSecondsSquaredPerRotation);
+          ShooterConstants.kSVolts,
+          ShooterConstants.kVVoltSecondsPerRotation,
+          ShooterConstants.kAVoltSecondsSquaredPerRotation);
 
   /** Creates a new Shooter subsystem. */
   public Shooter() {

@@ -50,6 +50,5 @@ class Shooter : public frc2::SubsystemBase {
           this}};
   frc::PIDController m_shooterFeedback{constants::shooter::kP, 0, 0};
   frc::SimpleMotorFeedforward<units::turns> m_shooterFeedforward{
-      constants::shooter::kS, constants::shooter::kV,
-      constants::shooter::kA};
+      constants::shooter::kS, constants::shooter::kV, constants::shooter::kA};
 };
