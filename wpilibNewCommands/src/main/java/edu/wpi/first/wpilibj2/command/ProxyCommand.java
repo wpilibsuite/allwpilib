@@ -36,6 +36,7 @@ public class ProxyCommand extends Command {
    *     proxying, but who simply want runtime construction. Users who do know what they are doing
    *     and need a supplier-constructed proxied command should instead proxy a DeferredCommand
    *     using the <code>asProxy</code> decorator.
+   * @see DeferredCommand
    */
   @Deprecated(since = "2024", forRemoval = true)
   public ProxyCommand(Supplier<Command> supplier) {
