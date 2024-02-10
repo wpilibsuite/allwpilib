@@ -33,8 +33,7 @@ void SendableChooser<T>::SetDefaultOption(std::string_view name, T object) {
 
 template <class T>
   requires std::copy_constructible<T> && std::default_initializable<T>
-auto SendableChooser<T>::GetSelected()
-    -> decltype(_unwrap_smart_ptr(m_choices[""])) {
+typename SendableChooser<T>::CopyType SendableChooser<T>::GetSelected() const {
   std::string selected = m_defaultChoice;
   {
     std::scoped_lock lock(m_mutex);
@@ -43,9 +42,9 @@ auto SendableChooser<T>::GetSelected()
     }
   }
   if (selected.empty()) {
-    return decltype(_unwrap_smart_ptr(m_choices[""])){};
+    return CopyType{};
   } else {
-    return _unwrap_smart_ptr(m_choices[selected]);
+    return _unwrap_smart_ptr(m_choices.lookup(selected));
   }
 }
 
