@@ -11,9 +11,12 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.proto.Translation2dProto;
 import edu.wpi.first.math.geometry.struct.Translation2dStruct;
 import edu.wpi.first.math.interpolation.Interpolatable;
+import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
@@ -79,6 +82,16 @@ public class Translation2d
   }
 
   /**
+   * Constructs a Translation2d from the provided translation vector's X and Y components. The
+   * values are assumed to be in meters.
+   *
+   * @param vector The translation vector to represent.
+   */
+  public Translation2d(Vector<N2> vector) {
+    this(vector.get(0), vector.get(1));
+  }
+
+  /**
    * Calculates the distance between two translations in 2D space.
    *
    * <p>The distance between translations is defined as √((x₂−x₁)²+(y₂−y₁)²).
@@ -108,6 +121,15 @@ public class Translation2d
   @JsonProperty
   public double getY() {
     return m_y;
+  }
+
+  /**
+   * Returns a vector representation of this translation.
+   *
+   * @return A Vector representation of this translation.
+   */
+  public Vector<N2> toVector() {
+    return VecBuilder.fill(m_x, m_y);
   }
 
   /**
