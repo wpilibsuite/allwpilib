@@ -10,7 +10,6 @@ import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.stream.Stream;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -32,8 +31,10 @@ class SendableChooserCommandTest extends CommandTestBase {
 
   @ParameterizedTest(name = "options[{index}]: {0}")
   @MethodSource
-  void optionsAreCorrect(@SuppressWarnings("unused") String testName, Command[] commands, String[] names) {
-    try (var optionsSubscriber = m_inst.getStringArrayTopic(kBasePath + "options").subscribe(new String[] {})) {
+  void optionsAreCorrect(
+      @SuppressWarnings("unused") String testName, Command[] commands, String[] names) {
+    try (var optionsSubscriber =
+        m_inst.getStringArrayTopic(kBasePath + "options").subscribe(new String[] {})) {
       @SuppressWarnings("unused")
       var command = Commands.choose(c -> SmartDashboard.putData("chooser", c), commands);
       SmartDashboard.updateValues();
@@ -44,8 +45,11 @@ class SendableChooserCommandTest extends CommandTestBase {
   static Stream<Arguments> optionsAreCorrect() {
     return Stream.of(
         Arguments.of("empty", new Command[] {}),
-        Arguments.of("duplicateName", new Command[] { commandNamed("a"), commandNamed("b"), commandNamed("a") }),
-        Arguments.of("happyPath", new Command[] { commandNamed("a"), commandNamed("b"), commandNamed("c") }));
+        Arguments.of(
+            "duplicateName",
+            new Command[] {commandNamed("a"), commandNamed("b"), commandNamed("a")}),
+        Arguments.of(
+            "happyPath", new Command[] {commandNamed("a"), commandNamed("b"), commandNamed("c")}));
   }
 
   @AfterEach
@@ -55,7 +59,7 @@ class SendableChooserCommandTest extends CommandTestBase {
     SmartDashboard.setNetworkTableInstance(NetworkTableInstance.getDefault());
   }
 
-  static private Command commandNamed(String name) {
+  private static Command commandNamed(String name) {
     return Commands.print(name).withName(name);
   }
 }
