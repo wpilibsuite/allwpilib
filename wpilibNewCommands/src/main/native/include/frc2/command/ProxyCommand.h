@@ -14,9 +14,13 @@
 
 namespace frc2 {
 /**
- * Schedules the given command when this command is initialized, and ends when
- * it ends. Useful for including a command in a composition without adding its
- * requirements. If this command is interrupted, it will cancel the command.
+ * Schedules a given command when this command is initialized and ends when it ends, but does not
+ * directly run it. Use this for including a command in a composition without adding its
+ * requirements, <strong>but only if you know what you are doing. If you are unsure, see
+ * <a href="https://docs.wpilib.org/en/stable/docs/software/commandbased/command-compositions.html#scheduling-other-commands">the WPILib docs</a>
+ * for a complete explanation of proxy semantics.</strong> Do not proxy a command from a subsystem
+ * already required by the composition, or else the composition will cancel itself when the proxy is
+ * reached. If this command is interrupted, it will cancel the command.
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
