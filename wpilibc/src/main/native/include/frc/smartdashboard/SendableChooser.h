@@ -43,6 +43,8 @@ class SendableChooser : public SendableChooserBase {
   static std::weak_ptr<U> _unwrap_smart_ptr(const std::shared_ptr<U>& value);
 
  public:
+  using CopyType = decltype(_unwrap_smart_ptr(m_choices.lookup("")));
+
   SendableChooser() = default;
   ~SendableChooser() override = default;
   SendableChooser(SendableChooser&& rhs) = default;
@@ -81,7 +83,7 @@ class SendableChooser : public SendableChooserBase {
    *
    * @return The option selected
    */
-  auto GetSelected() -> decltype(_unwrap_smart_ptr(m_choices[""]));
+  CopyType GetSelected() const;
 
   /**
    * Bind a listener that's called when the selected value changes.
