@@ -157,7 +157,8 @@ CommandPtr Defer(wpi::unique_function<CommandPtr()> supplier,
 /**
  * Constructs a command that schedules the command returned from the supplier
  * when initialized, and ends when it is no longer scheduled. The supplier is
- * called when the command is initialized. As a replacement, consider using `Defer(supplier).AsProxy()`.
+ * called when the command is initialized. As a replacement, consider using
+ * `Defer(supplier).AsProxy()`.
  *
  * @param supplier the command supplier
  * @deprecated The ProxyCommand supplier constructor has been deprecated in
@@ -177,7 +178,8 @@ CommandPtr DeferredProxy(wpi::unique_function<Command*()> supplier);
  * @param supplier the command supplier
  * @deprecated The ProxyCommand supplier constructor has been deprecated in
  * favor of directly proxying a {@link DeferredCommand}, see ProxyCommand
- * documentaion for more details. As a replacement, consider using `Defer(supplier).AsProxy()`.
+ * documentaion for more details. As a replacement, consider using
+ * `Defer(supplier).AsProxy()`.
  */
 [[nodiscard]] [[deprecated(
     "The ProxyCommand supplier constructor has been deprecated")]]

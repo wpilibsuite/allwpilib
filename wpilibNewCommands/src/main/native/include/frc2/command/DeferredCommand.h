@@ -31,9 +31,10 @@ class DeferredCommand : public CommandHelper<Command, DeferredCommand> {
   /**
    * Creates a new DeferredCommand that directly runs the supplied command when
    * initialized, and ends when it ends. Useful for lazily creating commands
-   * when the DeferredCommand is initialized, such as if the supplied command depends on runtime state. The supplier will be called each
-   * time this command is initialized. The supplier <i>must</i> create a new
-   * Command each call.
+   * when the DeferredCommand is initialized, such as if the supplied command
+   * depends on runtime state. The supplier will be called each time this
+   * command is initialized. The supplier <i>must</i> create a new Command each
+   * call.
    *
    * @param supplier The command supplier
    * @param requirements The command requirements.
