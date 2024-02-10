@@ -171,9 +171,11 @@ CommandPtr Choose(std::function<void(wpi::Sendable*)> publish,
   frc::SendableChooser<std::string_view> chooser;
   ((void)chooser.AddOption(commands.GetName(), commands.GetName()), ...);
   publish(&chooser);
-  return Select([sendableChooser = std::move(
-                     chooser)] { return sendableChooser.GetSelected(); },
-                (std::pair{commands.GetName(), std::move(commands)}, ...));
+  return Select(
+      [sendableChooser = std::move(chooser)]() mutable {
+        return sendableChooser.GetSelected();
+      },
+      (std::pair{commands.GetName(), std::move(commands)}, ...));
 }
 
 /**
