@@ -9,6 +9,7 @@
 
 #include "Constants.h"
 #include "subsystems/Drive.h"
+#include "subsystems/Shooter.h"
 
 class SysIdRoutineBot {
  public:
@@ -21,4 +22,5 @@ class SysIdRoutineBot {
   frc2::CommandXboxController m_driverController{
       constants::oi::kDriverControllerPort};
   Drive m_drive;
+  Shooter m_shooter;
 };
