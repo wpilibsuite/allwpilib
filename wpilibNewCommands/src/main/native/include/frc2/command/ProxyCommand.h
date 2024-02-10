@@ -14,13 +14,15 @@
 
 namespace frc2 {
 /**
- * Schedules a given command when this command is initialized and ends when it ends, but does not
- * directly run it. Use this for including a command in a composition without adding its
- * requirements, <strong>but only if you know what you are doing. If you are unsure, see
- * <a href="https://docs.wpilib.org/en/stable/docs/software/commandbased/command-compositions.html#scheduling-other-commands">the WPILib docs</a>
- * for a complete explanation of proxy semantics.</strong> Do not proxy a command from a subsystem
- * already required by the composition, or else the composition will cancel itself when the proxy is
- * reached. If this command is interrupted, it will cancel the command.
+ * Schedules a given command when this command is initialized and ends when it
+ * ends, but does not directly run it. Use this for including a command in a
+ * composition without adding its requirements, <strong>but only if you know
+ * what you are doing. If you are unsure, see <a
+ * href="https://docs.wpilib.org/en/stable/docs/software/commandbased/command-compositions.html#scheduling-other-commands">the
+ * WPILib docs</a> for a complete explanation of proxy semantics.</strong> Do
+ * not proxy a command from a subsystem already required by the composition, or
+ * else the composition will cancel itself when the proxy is reached. If this
+ * command is interrupted, it will cancel the command.
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
@@ -35,10 +37,11 @@ class ProxyCommand : public CommandHelper<Command, ProxyCommand> {
    * DeferredCommand} instead.
    *
    * @param supplier the command supplier
-   * @deprecated This constructor's similarity to {@link DeferredCommand} is confusing and opens
-   *     potential footguns for users who do not fully understand the semantics and implications of
-   *     proxying, but who simply want runtime construction. Users who do know what they are doing
-   *     and need a supplier-constructed proxied command should instead proxy a DeferredCommand
+   * @deprecated This constructor's similarity to {@link DeferredCommand} is
+   * confusing and opens potential footguns for users who do not fully
+   * understand the semantics and implications of proxying, but who simply want
+   * runtime construction. Users who do know what they are doing and need a
+   * supplier-constructed proxied command should instead proxy a DeferredCommand
    *     using the <code>AsProxy</code> decorator.
    * @see DeferredCommand
    */
@@ -55,10 +58,11 @@ class ProxyCommand : public CommandHelper<Command, ProxyCommand> {
    * DeferredCommand} instead.
    *
    * @param supplier the command supplier
-   * @deprecated This constructor's similarity to {@link DeferredCommand} is confusing and opens
-   *     potential footguns for users who do not fully understand the semantics and implications of
-   *     proxying, but who simply want runtime construction. Users who do know what they are doing
-   *     and need a supplier-constructed proxied command should instead proxy a DeferredCommand
+   * @deprecated This constructor's similarity to {@link DeferredCommand} is
+   * confusing and opens potential footguns for users who do not fully
+   * understand the semantics and implications of proxying, but who simply want
+   * runtime construction. Users who do know what they are doing and need a
+   * supplier-constructed proxied command should instead proxy a DeferredCommand
    *     using the <code>AsProxy</code> decorator.
    * @see DeferredCommand
    */
