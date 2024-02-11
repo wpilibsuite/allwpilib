@@ -58,7 +58,7 @@ public class CvSink extends ImageSink {
    * @param pixelFormat Source pixel format
    */
   public CvSink(String name, PixelFormat pixelFormat) {
-    super(CameraServerJNI.createRawSink(name));
+    super(CameraServerJNI.createRawSink(name, true));
     m_pixelFormat = pixelFormat;
     OpenCvLoader.forceStaticLoad();
   }

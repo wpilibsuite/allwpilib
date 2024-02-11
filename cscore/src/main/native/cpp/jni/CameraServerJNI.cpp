@@ -569,11 +569,11 @@ Java_edu_wpi_first_cscore_CameraServerJNI_createHttpCameraMulti
 /*
  * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    createRawSource
- * Signature: (Ljava/lang/String;IIII)I
+ * Signature: (Ljava/lang/String;ZIIII)I
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_cscore_CameraServerJNI_createRawSource
-  (JNIEnv* env, jclass, jstring name, jint pixelFormat, jint width, jint height,
+  (JNIEnv* env, jclass, jstring name, jboolean isCv, jint pixelFormat, jint width, jint height,
    jint fps)
 {
   if (!name) {
@@ -582,7 +582,7 @@ Java_edu_wpi_first_cscore_CameraServerJNI_createRawSource
   }
   CS_Status status = 0;
   auto val = cs::CreateRawSource(
-      JStringRef{env, name}.str(),
+      JStringRef{env, name}.str(), isCv,
       cs::VideoMode{static_cast<cs::VideoMode::PixelFormat>(pixelFormat),
                     static_cast<int>(width), static_cast<int>(height),
                     static_cast<int>(fps)},
@@ -1351,18 +1351,18 @@ Java_edu_wpi_first_cscore_CameraServerJNI_createMjpegServer
 /*
  * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    createRawSink
- * Signature: (Ljava/lang/String;)I
+ * Signature: (Ljava/lang/String;Z)I
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_cscore_CameraServerJNI_createRawSink
-  (JNIEnv* env, jclass, jstring name)
+  (JNIEnv* env, jclass, jstring name, jboolean isCv)
 {
   if (!name) {
     nullPointerEx.Throw(env, "name cannot be null");
     return 0;
   }
   CS_Status status = 0;
-  auto val = cs::CreateRawSink(JStringRef{env, name}.str(), &status);
+  auto val = cs::CreateRawSink(JStringRef{env, name}.str(), isCv, &status);
   CheckStatus(env, status);
   return val;
 }

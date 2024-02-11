@@ -4,8 +4,11 @@
 
 #include "RawSinkImpl.h"
 
+#include <wpi/SmallString.h>
+
 #include "Instance.h"
 #include "cscore.h"
+#include "c_util.h"
 #include "cscore_raw.h"
 
 using namespace cs;
@@ -143,25 +146,28 @@ void RawSinkImpl::ThreadMain() {
 }
 
 namespace cs {
-CS_Sink CreateRawSink(std::string_view name, CS_Status* status) {
+static constexpr unsigned SinkMask = CS_SINK_CV | CS_SINK_RAW;
+
+CS_Sink CreateRawSink(std::string_view name, bool isCv, CS_Status* status) {
   auto& inst = Instance::GetInstance();
-  return inst.CreateSink(CS_SINK_RAW,
+  return inst.CreateSink(isCv ? CS_SINK_CV : CS_SINK_RAW,
                          std::make_shared<RawSinkImpl>(
                              name, inst.logger, inst.notifier, inst.telemetry));
 }
 
-CS_Sink CreateRawSinkCallback(std::string_view name,
+CS_Sink CreateRawSinkCallback(std::string_view name, bool isCv,
                               std::function<void(uint64_t time)> processFrame,
                               CS_Status* status) {
   auto& inst = Instance::GetInstance();
-  return inst.CreateSink(CS_SINK_RAW, std::make_shared<RawSinkImpl>(
-                                          name, inst.logger, inst.notifier,
-                                          inst.telemetry, processFrame));
+  return inst.CreateSink(
+      isCv ? CS_SINK_CV : CS_SINK_RAW,
+      std::make_shared<RawSinkImpl>(name, inst.logger, inst.notifier,
+                                    inst.telemetry, processFrame));
 }
 
 uint64_t GrabSinkFrame(CS_Sink sink, WPI_RawFrame& image, CS_Status* status) {
   auto data = Instance::GetInstance().GetSink(sink);
-  if (!data || data->kind != CS_SINK_RAW) {
+  if (!data || (data->kind & SinkMask) == 0) {
     *status = CS_INVALID_HANDLE;
     return 0;
   }
@@ -171,25 +177,64 @@ uint64_t GrabSinkFrame(CS_Sink sink, WPI_RawFrame& image, CS_Status* status) {
 uint64_t GrabSinkFrameTimeout(CS_Sink sink, WPI_RawFrame& image, double timeout,
                               CS_Status* status) {
   auto data = Instance::GetInstance().GetSink(sink);
-  if (!data || data->kind != CS_SINK_RAW) {
+  if (!data || (data->kind & SinkMask) == 0) {
     *status = CS_INVALID_HANDLE;
     return 0;
   }
   return static_cast<RawSinkImpl&>(*data->sink).GrabFrame(image, timeout);
 }
+
+void SetSinkDescription(CS_Sink sink, std::string_view description,
+                        CS_Status* status) {
+  auto data = Instance::GetInstance().GetSink(sink);
+  if (!data || (data->kind & SinkMask) == 0) {
+    *status = CS_INVALID_HANDLE;
+    return;
+  }
+  static_cast<RawSinkImpl&>(*data->sink).SetDescription(description);
+}
+
+std::string GetSinkError(CS_Sink sink, CS_Status* status) {
+  auto data = Instance::GetInstance().GetSink(sink);
+  if (!data || (data->kind & SinkMask) == 0) {
+    *status = CS_INVALID_HANDLE;
+    return std::string{};
+  }
+  return static_cast<RawSinkImpl&>(*data->sink).GetError();
+}
+
+std::string_view GetSinkError(CS_Sink sink, wpi::SmallVectorImpl<char>& buf,
+                              CS_Status* status) {
+  auto data = Instance::GetInstance().GetSink(sink);
+  if (!data || (data->kind & SinkMask) == 0) {
+    *status = CS_INVALID_HANDLE;
+    return {};
+  }
+  return static_cast<RawSinkImpl&>(*data->sink).GetError(buf);
+}
+
+void SetSinkEnabled(CS_Sink sink, bool enabled, CS_Status* status) {
+  auto data = Instance::GetInstance().GetSink(sink);
+  if (!data || (data->kind & SinkMask) == 0) {
+    *status = CS_INVALID_HANDLE;
+    return;
+  }
+  static_cast<RawSinkImpl&>(*data->sink).SetEnabled(enabled);
+}
+
 }  // namespace cs
 
 extern "C" {
-CS_Sink CS_CreateRawSink(const char* name, CS_Status* status) {
-  return cs::CreateRawSink(name, status);
+CS_Sink CS_CreateRawSink(const char* name, CS_Bool isCv, CS_Status* status) {
+  return cs::CreateRawSink(name, isCv, status);
 }
 
-CS_Sink CS_CreateRawSinkCallback(const char* name, void* data,
+CS_Sink CS_CreateRawSinkCallback(const char* name, CS_Bool isCv, void* data,
                                  void (*processFrame)(void* data,
                                                       uint64_t time),
                                  CS_Status* status) {
   return cs::CreateRawSinkCallback(
-      name, [=](uint64_t time) { processFrame(data, time); }, status);
+      name, isCv, [=](uint64_t time) { processFrame(data, time); }, status);
 }
 
 uint64_t CS_GrabRawSinkFrame(CS_Sink sink, struct WPI_RawFrame* image,
@@ -201,4 +246,23 @@ uint64_t CS_GrabRawSinkFrameTimeout(CS_Sink sink, struct WPI_RawFrame* image,
                                     double timeout, CS_Status* status) {
   return cs::GrabSinkFrameTimeout(sink, *image, timeout, status);
 }
+
+void CS_SetSinkDescription(CS_Sink sink, const char* description,
+                           CS_Status* status) {
+  return cs::SetSinkDescription(sink, description, status);
+}
+
+char* CS_GetSinkError(CS_Sink sink, CS_Status* status) {
+  wpi::SmallString<128> buf;
+  auto str = cs::GetSinkError(sink, buf, status);
+  if (*status != 0) {
+    return nullptr;
+  }
+  return cs::ConvertToC(str);
+}
+
+void CS_SetSinkEnabled(CS_Sink sink, CS_Bool enabled, CS_Status* status) {
+  return cs::SetSinkEnabled(sink, enabled, status);
+}
+
 }  // extern "C"

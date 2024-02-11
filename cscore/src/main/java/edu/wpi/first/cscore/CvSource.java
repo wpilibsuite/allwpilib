@@ -21,7 +21,7 @@ public class CvSource extends ImageSource {
   public CvSource(String name, VideoMode mode) {
     super(
         CameraServerJNI.createRawSource(
-            name, mode.pixelFormat.getValue(), mode.width, mode.height, mode.fps));
+            name, true, mode.pixelFormat.getValue(), mode.width, mode.height, mode.fps));
     OpenCvLoader.forceStaticLoad();
   }
 
@@ -35,7 +35,7 @@ public class CvSource extends ImageSource {
    * @param fps fps
    */
   public CvSource(String name, PixelFormat pixelFormat, int width, int height, int fps) {
-    super(CameraServerJNI.createRawSource(name, pixelFormat.getValue(), width, height, fps));
+    super(CameraServerJNI.createRawSource(name, true, pixelFormat.getValue(), width, height, fps));
     OpenCvLoader.forceStaticLoad();
   }
 

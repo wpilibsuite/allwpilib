@@ -133,13 +133,13 @@ class CvSink : public ImageSink {
 };
 
 inline CvSource::CvSource(std::string_view name, const VideoMode& mode) {
-  m_handle = CreateRawSource(name, mode, &m_status);
+  m_handle = CreateRawSource(name, true, mode, &m_status);
 }
 
 inline CvSource::CvSource(std::string_view name, VideoMode::PixelFormat format,
                           int width, int height, int fps) {
   m_handle =
-      CreateRawSource(name, VideoMode{format, width, height, fps}, &m_status);
+      CreateRawSource(name, true, VideoMode{format, width, height, fps}, &m_status);
 }
 
 inline void CvSource::PutFrame(cv::Mat& image) {
@@ -178,7 +178,7 @@ inline void CvSource::PutFrame(cv::Mat& image) {
 }
 
 inline CvSink::CvSink(std::string_view name, VideoMode::PixelFormat pixelFormat) {
-  m_handle = CreateRawSink(name, &m_status);
+  m_handle = CreateRawSink(name, true, &m_status);
   this->pixelFormat = pixelFormat;
 }
 
