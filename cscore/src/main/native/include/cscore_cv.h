@@ -7,72 +7,17 @@
 
 #include <functional>
 
-#include "cscore_c.h"
-
-#ifdef CSCORE_CSCORE_RAW_CV_H_
-#error "Cannot include both cscore_cv.h and cscore_raw_cv.h in the same file"
-#endif
-
-#ifdef __cplusplus
-#include "cscore_oo.h"  // NOLINT(build/include_order)
-
-#endif
-
-#if CV_VERSION_MAJOR < 4
-
-#ifdef __cplusplus
-extern "C" {  // NOLINT(build/include_order)
-#endif
-
-struct CvMat;
-
-void CS_PutSourceFrame(CS_Source source, struct CvMat* image,
-                       CS_Status* status);
-
-uint64_t CS_GrabSinkFrame(CS_Sink sink, struct CvMat* image, CS_Status* status);
-uint64_t CS_GrabSinkFrameTimeout(CS_Sink sink, struct CvMat* image,
-                                 double timeout, CS_Status* status);
-
-#ifdef __cplusplus
-}  // extern "C"
-#endif
-
-#endif  // CV_VERSION_MAJOR < 4
-
-#ifdef __cplusplus
+#include <opencv2/core/mat.hpp>
 
 #include "cscore_oo.h"
-
-namespace cv {
-class Mat;
-}  // namespace cv
+#include "cscore_raw.h"
 
 namespace cs {
-
-/**
- * @defgroup cscore_cpp_opencv_special cscore C functions taking a cv::Mat*
- *
- * These are needed for specific interop implementations.
- * @{
- */
-extern "C" {
-uint64_t CS_GrabSinkFrameCpp(CS_Sink sink, cv::Mat* image, CS_Status* status);
-uint64_t CS_GrabSinkFrameTimeoutCpp(CS_Sink sink, cv::Mat* image,
-                                    double timeout, CS_Status* status);
-void CS_PutSourceFrameCpp(CS_Source source, cv::Mat* image, CS_Status* status);
-}  // extern "C"
-/** @} */
-
-void PutSourceFrame(CS_Source source, cv::Mat& image, CS_Status* status);
-uint64_t GrabSinkFrame(CS_Sink sink, cv::Mat& image, CS_Status* status);
-uint64_t GrabSinkFrameTimeout(CS_Sink sink, cv::Mat& image, double timeout,
-                              CS_Status* status);
-
 /**
  * A source for user code to provide OpenCV images as video frames.
- * These sources require the WPILib OpenCV builds.
- * For an alternate OpenCV, include "cscore_raw_cv.h" instead, and
- * include your Mat header before that header.
+ *
+ * This is not dependent on any opencv binary ABI, and can be used
+ * with versions of most versions of OpenCV.
  */
 class CvSource : public ImageSource {
  public:
@@ -87,7 +32,7 @@ class CvSource : public ImageSource {
   CvSource(std::string_view name, const VideoMode& mode);
 
   /**
-   * Create an OpenCV source.
+   * Create an  OpenCV source.
    *
    * @param name Source name (arbitrary unique identifier)
    * @param pixelFormat Pixel format
@@ -111,10 +56,10 @@ class CvSource : public ImageSource {
 };
 
 /**
- * A sink for user code to accept video frames as OpenCV images.
- * These sinks require the WPILib OpenCV builds.
- * For an alternate OpenCV, include "cscore_raw_cv.h" instead, and
- * include your Mat header before that header.
+ * A source for user code to accept video frames as OpenCV images.
+ *
+ * This is not dependent on any opencv binary ABI, and can be used
+ * with versions of most versions of OpenCV.
  */
 class CvSink : public ImageSink {
  public:
@@ -127,89 +72,179 @@ class CvSink : public ImageSink {
    * image.
    *
    * @param name Source name (arbitrary unique identifier)
-   * @param pixelFormat Source pixel format
    */
-  explicit CvSink(std::string_view name, VideoMode::PixelFormat pixelFormat =
-                                             VideoMode::PixelFormat::kBGR);
-
-  /**
-   * Create a sink for accepting OpenCV images in a separate thread.
-   *
-   * <p>A thread will be created that calls WaitForFrame() and calls the
-   * processFrame() callback each time a new frame arrives.
-   *
-   * @param name Source name (arbitrary unique identifier)
-   * @param processFrame Frame processing function; will be called with a
-   *        time=0 if an error occurred.  processFrame should call GetImage()
-   *        or GetError() as needed, but should not call (except in very
-   *        unusual circumstances) WaitForImage().
-   * @param pixelFormat Source pixel format
-   */
-  CvSink(std::string_view name, std::function<void(uint64_t time)> processFrame,
-         VideoMode::PixelFormat pixelFormat = VideoMode::PixelFormat::kBGR);
+  explicit CvSink(std::string_view name, VideoMode::PixelFormat pixelFormat = VideoMode::PixelFormat::kBGR);
 
   /**
    * Wait for the next frame and get the image.
    * Times out (returning 0) after timeout seconds.
-   * The provided image will have three 8-bit channels stored in BGR order.
+   * The provided image will have the pixelFormat this class was constructed
+   * with.
    *
    * @return Frame time, or 0 on error (call GetError() to obtain the error
    *         message); the frame time is in the same time base as wpi::Now(),
    *         and is in 1 us increments.
    */
   [[nodiscard]]
-  uint64_t GrabFrame(cv::Mat& image, double timeout = 0.225) const;
+  uint64_t GrabFrame(cv::Mat& image, double timeout = 0.225);
 
   /**
    * Wait for the next frame and get the image.  May block forever.
-   * The provided image will have three 8-bit channels stored in BGR order.
+   * The provided image will have the pixelFormat this class was constructed
+   * with.
    *
    * @return Frame time, or 0 on error (call GetError() to obtain the error
    *         message); the frame time is in the same time base as wpi::Now(),
    *         and is in 1 us increments.
    */
   [[nodiscard]]
-  uint64_t GrabFrameNoTimeout(cv::Mat& image) const;
+  uint64_t GrabFrameNoTimeout(cv::Mat& image);
+
+  /**
+   * Wait for the next frame and get the image.
+   * Times out (returning 0) after timeout seconds.
+   * The provided image will have the pixelFormat this class was constructed
+   * with. The data is backed by data in the CvSink. It will be invalidated by
+   * any grabFrame*() call on the sink.
+   *
+   * @return Frame time, or 0 on error (call GetError() to obtain the error
+   *         message); the frame time is in the same time base as wpi::Now(),
+   *         and is in 1 us increments.
+   */
+  [[nodiscard]]
+  uint64_t GrabFrameDirect(cv::Mat& image, double timeout = 0.225);
+
+  /**
+   * Wait for the next frame and get the image.  May block forever.
+   * The provided image will have the pixelFormat this class was constructed
+   * with. The data is backed by data in the CvSink. It will be invalidated by
+   * any grabFrame*() call on the sink.
+   *
+   * @return Frame time, or 0 on error (call GetError() to obtain the error
+   *         message); the frame time is in the same time base as wpi::Now(),
+   *         and is in 1 us increments.
+   */
+  [[nodiscard]]
+  uint64_t GrabFrameNoTimeoutDirect(cv::Mat& image);
+
+ private:
+  wpi::RawFrame rawFrame;
+  VideoMode::PixelFormat pixelFormat;
 };
 
 inline CvSource::CvSource(std::string_view name, const VideoMode& mode) {
-  m_handle = CreateCvSource(name, mode, &m_status);
+  m_handle = CreateRawSource(name, mode, &m_status);
 }
 
 inline CvSource::CvSource(std::string_view name, VideoMode::PixelFormat format,
                           int width, int height, int fps) {
   m_handle =
-      CreateCvSource(name, VideoMode{format, width, height, fps}, &m_status);
+      CreateRawSource(name, VideoMode{format, width, height, fps}, &m_status);
 }
 
 inline void CvSource::PutFrame(cv::Mat& image) {
+  // We only support 8-bit images; convert if necessary.
+  cv::Mat finalImage;
+  if (image.depth() == CV_8U) {
+    finalImage = image;
+  } else {
+    image.convertTo(finalImage, CV_8U);
+  }
+
+  int channels = finalImage.channels();
+  WPI_PixelFormat format;
+  if (channels == 1) {
+    format = WPI_PIXFMT_GRAY;
+  } else if (channels == 3) {
+    format = WPI_PIXFMT_BGR;
+  } else {
+    // TODO Error
+    return;
+  }
+  // TODO old code supported BGRA, but the only way I can support that is slow.
+  // Update cscore to support BGRA for raw frames
+
+  WPI_RawFrame frame; // use WPI_Frame because we don't want the destructor
+  frame.data = finalImage.data;
+  frame.freeFunc = nullptr;
+  frame.freeCbData = nullptr;
+  frame.size = finalImage.total() * channels;
+  frame.width = finalImage.cols;
+  frame.height = finalImage.rows;
+  frame.stride = finalImage.cols;
+  frame.pixelFormat = format;
   m_status = 0;
-  PutSourceFrame(m_handle, image, &m_status);
+  PutSourceFrame(m_handle, frame, &m_status);
 }
 
-inline CvSink::CvSink(std::string_view name,
-                      VideoMode::PixelFormat pixelFormat) {
-  m_handle = CreateCvSink(name, pixelFormat, &m_status);
+inline CvSink::CvSink(std::string_view name, VideoMode::PixelFormat pixelFormat) {
+  m_handle = CreateRawSink(name, &m_status);
+  this->pixelFormat = pixelFormat;
 }
 
-inline CvSink::CvSink(std::string_view name,
-                      std::function<void(uint64_t time)> processFrame,
-                      VideoMode::PixelFormat pixelFormat) {
-  m_handle = CreateCvSinkCallback(name, pixelFormat, processFrame, &m_status);
+inline uint64_t CvSink::GrabFrame(cv::Mat& image, double timeout) {
+  cv::Mat tmpnam;
+  auto retVal = GrabFrameDirect(tmpnam);
+  if (retVal <= 0) {
+    return retVal;
+  }
+  tmpnam.copyTo(image);
+  return retVal;
 }
 
-inline uint64_t CvSink::GrabFrame(cv::Mat& image, double timeout) const {
-  m_status = 0;
-  return GrabSinkFrameTimeout(m_handle, image, timeout, &m_status);
+inline uint64_t CvSink::GrabFrameNoTimeout(cv::Mat& image) {
+  cv::Mat tmpnam;
+  auto retVal = GrabFrameNoTimeoutDirect(tmpnam);
+  if (retVal <= 0) {
+    return retVal;
+  }
+  tmpnam.copyTo(image);
+  return retVal;
 }
 
-inline uint64_t CvSink::GrabFrameNoTimeout(cv::Mat& image) const {
-  m_status = 0;
-  return GrabSinkFrame(m_handle, image, &m_status);
+inline constexpr int GetCvFormat(WPI_PixelFormat pixelFormat) {
+    int type = 0;
+    switch (pixelFormat) {
+      case WPI_PIXFMT_YUYV:
+      case WPI_PIXFMT_RGB565:
+        type = CV_8UC2;
+        break;
+      case WPI_PIXFMT_BGR:
+        type = CV_8UC3;
+        break;
+      case WPI_PIXFMT_GRAY:
+      case WPI_PIXFMT_MJPEG:
+      default:
+        type = CV_8UC1;
+        break;
+    }
+    return type;
+}
+
+inline uint64_t CvSink::GrabFrameDirect(cv::Mat& image, double timeout) {
+  rawFrame.height = 0;
+  rawFrame.width = 0;
+  rawFrame.pixelFormat = pixelFormat;
+  m_status = GrabSinkFrameTimeout(m_handle, rawFrame, timeout, &m_status);
+  if (m_status <= 0) {
+    return m_status;
+  }
+  image = cv::Mat{rawFrame.height, rawFrame.width, GetCvFormat(static_cast<WPI_PixelFormat>(rawFrame.pixelFormat)), rawFrame.data};
+  return m_status;
+}
+
+inline uint64_t CvSink::GrabFrameNoTimeoutDirect(cv::Mat& image) {
+  rawFrame.height = 0;
+  rawFrame.width = 0;
+  rawFrame.pixelFormat = pixelFormat;
+  m_status = GrabSinkFrame(m_handle, rawFrame, &m_status);
+  if (m_status <= 0) {
+    return m_status;
+  }
+  image = cv::Mat{rawFrame.height, rawFrame.width, GetCvFormat(static_cast<WPI_PixelFormat>(rawFrame.pixelFormat)), rawFrame.data};
+  return m_status;
 }
 
 }  // namespace cs
 
-#endif
-
-#endif  // CSCORE_CSCORE_CV_H_
+#endif  // CSCORE_CSCORE_RAW_CV_H_

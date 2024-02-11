@@ -60,23 +60,6 @@ void CvSourceImpl::PutFrame(cv::Mat& image) {
 
 namespace cs {
 
-CS_Source CreateCvSource(std::string_view name, const VideoMode& mode,
-                         CS_Status* status) {
-  auto& inst = Instance::GetInstance();
-  return inst.CreateSource(CS_SOURCE_CV, std::make_shared<CvSourceImpl>(
-                                             name, inst.logger, inst.notifier,
-                                             inst.telemetry, mode));
-}
-
-void PutSourceFrame(CS_Source source, cv::Mat& image, CS_Status* status) {
-  auto data = Instance::GetInstance().GetSource(source);
-  if (!data || data->kind != CS_SOURCE_CV) {
-    *status = CS_INVALID_HANDLE;
-    return;
-  }
-  static_cast<CvSourceImpl&>(*data->source).PutFrame(image);
-}
-
 static constexpr unsigned SourceMask = CS_SINK_CV | CS_SINK_RAW;
 
 void NotifySourceError(CS_Source source, std::string_view msg,
@@ -167,24 +150,6 @@ void SetSourceEnumPropertyChoices(CS_Source source, CS_Property property,
 }  // namespace cs
 
 extern "C" {
-
-CS_Source CS_CreateCvSource(const char* name, const CS_VideoMode* mode,
-                            CS_Status* status) {
-  return cs::CreateCvSource(name, static_cast<const cs::VideoMode&>(*mode),
-                            status);
-}
-
-#if CV_VERSION_MAJOR < 4
-void CS_PutSourceFrame(CS_Source source, struct CvMat* image,
-                       CS_Status* status) {
-  auto mat = cv::cvarrToMat(image);
-  return cs::PutSourceFrame(source, mat, status);
-}
-#endif  // CV_VERSION_MAJOR < 4
-
-void CS_PutSourceFrameCpp(CS_Source source, cv::Mat* image, CS_Status* status) {
-  return cs::PutSourceFrame(source, *image, status);
-}
 
 void CS_NotifySourceError(CS_Source source, const char* msg,
                           CS_Status* status) {
