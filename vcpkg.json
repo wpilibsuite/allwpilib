@@ -3,7 +3,6 @@
   "version-string": "latest",
   "dependencies": [
     "opencv",
-    "eigen3",
     "fmt",
     "libuv",
     "protobuf"

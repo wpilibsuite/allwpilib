@@ -7,6 +7,7 @@
 #include <initializer_list>
 #include <span>
 
+#include <Eigen/Core>
 #include <wpi/SymbolExports.h>
 #include <wpi/json_fwd.h>
 
@@ -49,6 +50,14 @@ class WPILIB_DLLEXPORT Translation2d {
   constexpr Translation2d(units::meter_t distance, const Rotation2d& angle);
 
   /**
+   * Constructs a Translation2d from the provided translation vector's X and Y
+   * components. The values are assumed to be in meters.
+   *
+   * @param vector The translation vector to represent.
+   */
+  explicit Translation2d(const Eigen::Vector2d& vector);
+
+  /**
    * Calculates the distance between two translations in 2D space.
    *
    * The distance between translations is defined as √((x₂−x₁)²+(y₂−y₁)²).
@@ -72,6 +81,13 @@ class WPILIB_DLLEXPORT Translation2d {
    * @return The Y component of the translation.
    */
   constexpr units::meter_t Y() const { return m_y; }
+
+  /**
+   * Returns a vector representation of this translation.
+   *
+   * @return A Vector representation of this translation.
+   */
+  constexpr Eigen::Vector2d ToVector() const;
 
   /**
    * Returns the norm, or distance from the origin to the translation.

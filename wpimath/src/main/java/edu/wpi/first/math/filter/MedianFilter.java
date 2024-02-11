@@ -72,6 +72,15 @@ public class MedianFilter {
     }
   }
 
+  /**
+   * Returns the last value calculated by the MedianFilter.
+   *
+   * @return The last value.
+   */
+  public double lastValue() {
+    return m_valueBuffer.getFirst();
+  }
+
   /** Resets the filter, clearing the window of all elements. */
   public void reset() {
     m_orderedValues.clear();
