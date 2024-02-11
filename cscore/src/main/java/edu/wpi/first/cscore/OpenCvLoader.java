@@ -58,6 +58,11 @@ public final class OpenCvLoader {
     }
   }
 
+  /**
+   * Forces a static load.
+   *
+   * @return a garbage value
+   */
   public static int forceStaticLoad() {
     return libraryLoaded ? 1 : 0;
   }
