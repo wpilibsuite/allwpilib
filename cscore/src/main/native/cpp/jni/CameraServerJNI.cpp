@@ -6,7 +6,6 @@
 #include <span>
 
 #include <fmt/format.h>
-#include <opencv2/core/core.hpp>
 
 #define WPI_RAWFRAME_JNI
 #include <wpi/RawFrame.h>
@@ -80,32 +79,6 @@ static void ListenerOnExit() {
     return;
   }
   jvm->DetachCurrentThread();
-}
-
-/// throw java exception
-static void ThrowJavaException(JNIEnv* env, const std::exception* e) {
-  wpi::SmallString<128> what;
-  jclass je = nullptr;
-
-  if (e) {
-    const char* exception_type = "std::exception";
-
-    if (dynamic_cast<const cv::Exception*>(e)) {
-      exception_type = "cv::Exception";
-      je = env->FindClass("org/opencv/core/CvException");
-    }
-
-    what = exception_type;
-    what += ": ";
-    what += e->what();
-  } else {
-    what = "unknown exception";
-  }
-
-  if (!je) {
-    je = exceptionEx;
-  }
-  env->ThrowNew(je, what.c_str());
 }
 
 extern "C" {
@@ -589,31 +562,6 @@ Java_edu_wpi_first_cscore_CameraServerJNI_createHttpCameraMulti
   auto val =
       cs::CreateHttpCamera(JStringRef{env, name}.str(), vec,
                            static_cast<CS_HttpCameraKind>(kind), &status);
-  CheckStatus(env, status);
-  return val;
-}
-
-/*
- * Class:     edu_wpi_first_cscore_CameraServerCvJNI
- * Method:    createCvSource
- * Signature: (Ljava/lang/String;IIII)I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_cscore_CameraServerCvJNI_createCvSource
-  (JNIEnv* env, jclass, jstring name, jint pixelFormat, jint width, jint height,
-   jint fps)
-{
-  if (!name) {
-    nullPointerEx.Throw(env, "name cannot be null");
-    return 0;
-  }
-  CS_Status status = 0;
-  auto val = cs::CreateCvSource(
-      JStringRef{env, name}.str(),
-      cs::VideoMode{static_cast<cs::VideoMode::PixelFormat>(pixelFormat),
-                    static_cast<int>(width), static_cast<int>(height),
-                    static_cast<int>(fps)},
-      &status);
   CheckStatus(env, status);
   return val;
 }
@@ -1203,27 +1151,6 @@ Java_edu_wpi_first_cscore_CameraServerJNI_getHttpCameraUrls
 }
 
 /*
- * Class:     edu_wpi_first_cscore_CameraServerCvJNI
- * Method:    putSourceFrame
- * Signature: (IJ)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_cscore_CameraServerCvJNI_putSourceFrame
-  (JNIEnv* env, jclass, jint source, jlong imageNativeObj)
-{
-  try {
-    cv::Mat& image = *((cv::Mat*)imageNativeObj);
-    CS_Status status = 0;
-    cs::PutSourceFrame(source, image, &status);
-    CheckStatus(env, status);
-  } catch (const std::exception& e) {
-    ThrowJavaException(env, &e);
-  } catch (...) {
-    ThrowJavaException(env, nullptr);
-  }
-}
-
-/*
  * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    putRawSourceFrame
  * Signature: (IJ)V
@@ -1417,27 +1344,6 @@ Java_edu_wpi_first_cscore_CameraServerJNI_createMjpegServer
   auto val = cs::CreateMjpegServer(JStringRef{env, name}.str(),
                                    JStringRef{env, listenAddress}.str(), port,
                                    &status);
-  CheckStatus(env, status);
-  return val;
-}
-
-/*
- * Class:     edu_wpi_first_cscore_CameraServerCvJNI
- * Method:    createCvSink
- * Signature: (Ljava/lang/String;I)I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_cscore_CameraServerCvJNI_createCvSink
-  (JNIEnv* env, jclass, jstring name, jint pixelFormat)
-{
-  if (!name) {
-    nullPointerEx.Throw(env, "name cannot be null");
-    return 0;
-  }
-  CS_Status status = 0;
-  auto val = cs::CreateCvSink(
-      JStringRef{env, name}.str(),
-      static_cast<cs::VideoMode::PixelFormat>(pixelFormat), &status);
   CheckStatus(env, status);
   return val;
 }
@@ -1705,54 +1611,6 @@ Java_edu_wpi_first_cscore_CameraServerJNI_setSinkDescription
   CS_Status status = 0;
   cs::SetSinkDescription(sink, JStringRef{env, description}.str(), &status);
   CheckStatus(env, status);
-}
-
-/*
- * Class:     edu_wpi_first_cscore_CameraServerCvJNI
- * Method:    grabSinkFrame
- * Signature: (IJ)J
- */
-JNIEXPORT jlong JNICALL
-Java_edu_wpi_first_cscore_CameraServerCvJNI_grabSinkFrame
-  (JNIEnv* env, jclass, jint sink, jlong imageNativeObj)
-{
-  try {
-    cv::Mat& image = *((cv::Mat*)imageNativeObj);
-    CS_Status status = 0;
-    auto rv = cs::GrabSinkFrame(sink, image, &status);
-    CheckStatus(env, status);
-    return rv;
-  } catch (const std::exception& e) {
-    ThrowJavaException(env, &e);
-    return 0;
-  } catch (...) {
-    ThrowJavaException(env, nullptr);
-    return 0;
-  }
-}
-
-/*
- * Class:     edu_wpi_first_cscore_CameraServerCvJNI
- * Method:    grabSinkFrameTimeout
- * Signature: (IJD)J
- */
-JNIEXPORT jlong JNICALL
-Java_edu_wpi_first_cscore_CameraServerCvJNI_grabSinkFrameTimeout
-  (JNIEnv* env, jclass, jint sink, jlong imageNativeObj, jdouble timeout)
-{
-  try {
-    cv::Mat& image = *((cv::Mat*)imageNativeObj);
-    CS_Status status = 0;
-    auto rv = cs::GrabSinkFrameTimeout(sink, image, timeout, &status);
-    CheckStatus(env, status);
-    return rv;
-  } catch (const std::exception& e) {
-    ThrowJavaException(env, &e);
-    return 0;
-  } catch (...) {
-    ThrowJavaException(env, nullptr);
-    return 0;
-  }
 }
 
 /*
