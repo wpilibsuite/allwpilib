@@ -4,11 +4,8 @@
 
 #include "RawSinkImpl.h"
 
-#include <wpi/SmallString.h>
-
 #include "Instance.h"
 #include "cscore.h"
-#include "c_util.h"
 #include "cscore_raw.h"
 
 using namespace cs;
@@ -184,44 +181,6 @@ uint64_t GrabSinkFrameTimeout(CS_Sink sink, WPI_RawFrame& image, double timeout,
   return static_cast<RawSinkImpl&>(*data->sink).GrabFrame(image, timeout);
 }
 
-void SetSinkDescription(CS_Sink sink, std::string_view description,
-                        CS_Status* status) {
-  auto data = Instance::GetInstance().GetSink(sink);
-  if (!data || (data->kind & SinkMask) == 0) {
-    *status = CS_INVALID_HANDLE;
-    return;
-  }
-  static_cast<RawSinkImpl&>(*data->sink).SetDescription(description);
-}
-
-std::string GetSinkError(CS_Sink sink, CS_Status* status) {
-  auto data = Instance::GetInstance().GetSink(sink);
-  if (!data || (data->kind & SinkMask) == 0) {
-    *status = CS_INVALID_HANDLE;
-    return std::string{};
-  }
-  return static_cast<RawSinkImpl&>(*data->sink).GetError();
-}
-
-std::string_view GetSinkError(CS_Sink sink, wpi::SmallVectorImpl<char>& buf,
-                              CS_Status* status) {
-  auto data = Instance::GetInstance().GetSink(sink);
-  if (!data || (data->kind & SinkMask) == 0) {
-    *status = CS_INVALID_HANDLE;
-    return {};
-  }
-  return static_cast<RawSinkImpl&>(*data->sink).GetError(buf);
-}
-
-void SetSinkEnabled(CS_Sink sink, bool enabled, CS_Status* status) {
-  auto data = Instance::GetInstance().GetSink(sink);
-  if (!data || (data->kind & SinkMask) == 0) {
-    *status = CS_INVALID_HANDLE;
-    return;
-  }
-  static_cast<RawSinkImpl&>(*data->sink).SetEnabled(enabled);
-}
-
 }  // namespace cs
 
 extern "C" {
@@ -245,24 +204,6 @@ uint64_t CS_GrabRawSinkFrame(CS_Sink sink, struct WPI_RawFrame* image,
 uint64_t CS_GrabRawSinkFrameTimeout(CS_Sink sink, struct WPI_RawFrame* image,
                                     double timeout, CS_Status* status) {
   return cs::GrabSinkFrameTimeout(sink, *image, timeout, status);
-}
-
-void CS_SetSinkDescription(CS_Sink sink, const char* description,
-                           CS_Status* status) {
-  return cs::SetSinkDescription(sink, description, status);
-}
-
-char* CS_GetSinkError(CS_Sink sink, CS_Status* status) {
-  wpi::SmallString<128> buf;
-  auto str = cs::GetSinkError(sink, buf, status);
-  if (*status != 0) {
-    return nullptr;
-  }
-  return cs::ConvertToC(str);
-}
-
-void CS_SetSinkEnabled(CS_Sink sink, CS_Bool enabled, CS_Status* status) {
-  return cs::SetSinkEnabled(sink, enabled, status);
 }
 
 }  // extern "C"
