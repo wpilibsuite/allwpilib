@@ -18,7 +18,6 @@
 #include "Instance.h"
 #include "c_util.h"
 #include "cscore_cpp.h"
-#include "opencv2/imgproc.hpp"
 #include "UsbCameraImpl.h"
 
 namespace cs {
