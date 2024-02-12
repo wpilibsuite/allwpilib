@@ -134,7 +134,8 @@ void SetSourceDescription(CS_Source source, std::string_view description,
     *status = CS_INVALID_HANDLE;
     return;
   }
-  static_cast<ConfigurableSourceImpl&>(*data->source).SetDescription(description);
+  static_cast<ConfigurableSourceImpl&>(*data->source)
+      .SetDescription(description);
 }
 
 CS_Property CreateSourceProperty(CS_Source source, std::string_view name,

@@ -573,8 +573,8 @@ Java_edu_wpi_first_cscore_CameraServerJNI_createHttpCameraMulti
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_cscore_CameraServerJNI_createRawSource
-  (JNIEnv* env, jclass, jstring name, jboolean isCv, jint pixelFormat, jint width, jint height,
-   jint fps)
+  (JNIEnv* env, jclass, jstring name, jboolean isCv, jint pixelFormat,
+   jint width, jint height, jint fps)
 {
   if (!name) {
     nullPointerEx.Throw(env, "name cannot be null");

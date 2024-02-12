@@ -38,8 +38,8 @@ CS_Sink CS_CreateRawSinkCallback(const char* name, CS_Bool isCv, void* data,
 void CS_PutRawSourceFrame(CS_Source source, const struct WPI_RawFrame* image,
                           CS_Status* status);
 
-CS_Source CS_CreateRawSource(const char* name, CS_Bool isCv, const CS_VideoMode* mode,
-                             CS_Status* status);
+CS_Source CS_CreateRawSource(const char* name, CS_Bool isCv,
+                             const CS_VideoMode* mode, CS_Status* status);
 /** @} */
 
 #ifdef __cplusplus
@@ -54,8 +54,8 @@ namespace cs {
  * @{
  */
 
-CS_Source CreateRawSource(std::string_view name, bool isCv, const VideoMode& mode,
-                          CS_Status* status);
+CS_Source CreateRawSource(std::string_view name, bool isCv,
+                          const VideoMode& mode, CS_Status* status);
 
 CS_Sink CreateRawSink(std::string_view name, bool isCv, CS_Status* status);
 CS_Sink CreateRawSinkCallback(std::string_view name, bool isCv,
@@ -172,8 +172,8 @@ inline RawSource::RawSource(std::string_view name, const VideoMode& mode) {
 inline RawSource::RawSource(std::string_view name,
                             VideoMode::PixelFormat format, int width,
                             int height, int fps) {
-  m_handle =
-      CreateRawSource(name, false, VideoMode{format, width, height, fps}, &m_status);
+  m_handle = CreateRawSource(name, false, VideoMode{format, width, height, fps},
+                             &m_status);
 }
 
 inline void RawSource::PutFrame(wpi::RawFrame& image) {

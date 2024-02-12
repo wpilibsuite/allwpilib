@@ -259,4 +259,4 @@ inline uint64_t CvSink::GrabFrameNoTimeoutDirect(cv::Mat& image) {
 
 }  // namespace cs
 
-#endif  // CSCORE_CSCORE_RAW_CV_H_
+#endif  // CSCORE_CSCORE_CV_H_
