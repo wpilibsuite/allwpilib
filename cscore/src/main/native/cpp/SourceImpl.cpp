@@ -458,7 +458,7 @@ void SourceImpl::PutFrame(VideoMode::PixelFormat pixelFormat, int width,
   if (pixelFormat == VideoMode::PixelFormat::kBGRA) {
     // Write BGRA as BGR to save a copy
     auto image =
-        CreateImageFromBGRA(this, width, height, width,
+        CreateImageFromBGRA(this, width, height, width * 4,
                             reinterpret_cast<const uint8_t*>(data.data()));
     PutFrame(std::move(image), time);
     return;

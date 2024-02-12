@@ -315,7 +315,8 @@ Image* Frame::ConvertImpl(Image* image, VideoMode::PixelFormat pixelFormat,
       }
       break;
     case VideoMode::kBGRA:
-      // If source is RGB565, YUYV, UYVY, Gray or Y16, need to convert to BGR first
+      // If source is RGB565, YUYV, UYVY, Gray or Y16, need to convert to BGR
+      // first
       if (cur->pixelFormat == VideoMode::kRGB565) {
         // Check to see if BGR version already exists...
         if (Image* newImage =

@@ -274,7 +274,7 @@ inline void CvSource::PutFrame(cv::Mat& image,
   frame.size = finalImage.total() * finalImage.channels();
   frame.width = finalImage.cols;
   frame.height = finalImage.rows;
-  frame.stride = finalImage.cols;
+  frame.stride = finalImage.step;
   frame.pixelFormat = pixelFormat;
   m_status = 0;
   PutSourceFrame(m_handle, frame, &m_status);
@@ -336,31 +336,33 @@ inline constexpr int CvSink::GetCvFormat(WPI_PixelFormat pixelFormat) {
 inline uint64_t CvSink::GrabFrameDirect(cv::Mat& image, double timeout) {
   rawFrame.height = 0;
   rawFrame.width = 0;
+  rawFrame.stride = 0;
   rawFrame.pixelFormat = pixelFormat;
-  m_status = GrabSinkFrameTimeout(m_handle, rawFrame, timeout, &m_status);
-  if (m_status <= 0) {
-    return m_status;
+  auto timestamp = GrabSinkFrameTimeout(m_handle, rawFrame, timeout, &m_status);
+  if (m_status != CS_OK) {
+    return 0;
   }
   image =
       cv::Mat{rawFrame.height, rawFrame.width,
               GetCvFormat(static_cast<WPI_PixelFormat>(rawFrame.pixelFormat)),
-              rawFrame.data};
-  return m_status;
+              rawFrame.data, static_cast<size_t>(rawFrame.stride)};
+  return timestamp;
 }
 
 inline uint64_t CvSink::GrabFrameNoTimeoutDirect(cv::Mat& image) {
   rawFrame.height = 0;
   rawFrame.width = 0;
+  rawFrame.stride = 0;
   rawFrame.pixelFormat = pixelFormat;
-  m_status = GrabSinkFrame(m_handle, rawFrame, &m_status);
-  if (m_status <= 0) {
-    return m_status;
+  auto timestamp = GrabSinkFrame(m_handle, rawFrame, &m_status);
+  if (m_status != CS_OK) {
+    return 0;
   }
   image =
       cv::Mat{rawFrame.height, rawFrame.width,
               GetCvFormat(static_cast<WPI_PixelFormat>(rawFrame.pixelFormat)),
-              rawFrame.data};
-  return m_status;
+              rawFrame.data, static_cast<size_t>(rawFrame.stride)};
+  return timestamp;
 }
 
 }  // namespace cs

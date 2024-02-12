@@ -114,13 +114,14 @@ public class CvSource extends ImageSource {
       if (!skipVerification) {
         verifyFormat(finalImage, format);
       }
+      long step = image.step1() * image.elemSize1();
       CameraServerJNI.putRawSourceFrameData(
           m_handle,
           finalImage.dataAddr(),
           (int) finalImage.total() * finalImage.channels(),
           finalImage.width(),
           finalImage.height(),
-          image.width(),
+          (int)step,
           format.getValue());
 
     } finally {
