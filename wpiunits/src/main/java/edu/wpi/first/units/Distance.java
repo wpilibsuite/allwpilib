@@ -7,8 +7,8 @@ package edu.wpi.first.units;
 /**
  * Unit of linear dimension.
  *
- * <p>This is the base type for units of linear dimension. It is also used to specify the
- * dimension for {@link Measure}: <code>Measure&lt;Distance&gt;</code>.
+ * <p>This is the base type for units of linear dimension. It is also used to specify the dimension
+ * for {@link Measure}: <code>Measure&lt;Distance&gt;</code>.
  *
  * <p>Actual units (such as {@link Units#Meters} and {@link Units#Inches}) can be found in the
  * {@link Units} class.
