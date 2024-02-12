@@ -23,16 +23,9 @@ RawSourceImpl::~RawSourceImpl() = default;
 
 void RawSourceImpl::PutFrame(const WPI_RawFrame& image) {
   auto currentTime = wpi::Now();
-  auto pixelFormat = static_cast<VideoMode::PixelFormat>(image.pixelFormat);
-  if (pixelFormat == VideoMode::PixelFormat::kBGRA) {
-    std::unique_ptr<Image> dest = CreateImageFromBGRA(
-        this, image.width, image.height, image.stride, image.data);
-    SourceImpl::PutFrame(std::move(dest), currentTime);
-    return;
-  }
   std::string_view data_view{reinterpret_cast<char*>(image.data), image.size};
-  SourceImpl::PutFrame(pixelFormat, image.width, image.height, data_view,
-                       currentTime);
+  SourceImpl::PutFrame(static_cast<VideoMode::PixelFormat>(image.pixelFormat),
+                       image.width, image.height, data_view, currentTime);
 }
 
 namespace cs {

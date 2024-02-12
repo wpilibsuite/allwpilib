@@ -337,17 +337,10 @@ void UsbCameraImpl::ProcessFrame(IMFSample* videoSample,
       return;
     }
   }
-  auto pixelFormat = static_cast<VideoMode::PixelFormat>(mode.pixelFormat);
-  if (pixelFormat == VideoMode::PixelFormat::kBGRA) {
-    // Special case BGRA
-    std::unique_ptr<Image> dest =
-        CreateImageFromBGRA(this, mode.width, mode.height, pitch, ptr);
-    SourceImpl::PutFrame(std::move(dest), currentTime);
-  } else {
-    std::string_view data_view{reinterpret_cast<char*>(ptr), length};
-    SourceImpl::PutFrame(pixelFormat, mode.width, mode.height, data_view,
-                         currentTime);
-  }
+
+  std::string_view data_view{reinterpret_cast<char*>(ptr), length};
+  SourceImpl::PutFrame(static_cast<VideoMode::PixelFormat>(mode.pixelFormat),
+                       mode.width, mode.height, data_view, currentTime);
 
   if (buffer2d) {
     buffer2d->Unlock2D();

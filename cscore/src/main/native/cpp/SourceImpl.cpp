@@ -455,6 +455,15 @@ std::unique_ptr<Image> SourceImpl::AllocImage(
 
 void SourceImpl::PutFrame(VideoMode::PixelFormat pixelFormat, int width,
                           int height, std::string_view data, Frame::Time time) {
+  if (pixelFormat == VideoMode::PixelFormat::kBGRA) {
+    // Write BGRA as BGR to save a copy
+    auto image =
+        CreateImageFromBGRA(this, width, height, width,
+                            reinterpret_cast<const uint8_t*>(data.data()));
+    PutFrame(std::move(image), time);
+    return;
+  }
+
   auto image = AllocImage(pixelFormat, width, height, data.size());
 
   // Copy in image data

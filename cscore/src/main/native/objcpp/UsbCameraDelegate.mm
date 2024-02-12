@@ -52,7 +52,7 @@
   }
 
   std::unique_ptr<cs::Image> dest = cs::CreateImageFromBGRA(
-      this, width, height, rowBytes, baseaddress);
+      this, width, height, rowBytes, reinterpret_cast<uint8_t*>(baseaddress));
 
   CVPixelBufferUnlockBaseAddress(imageBuffer, 0);
 
