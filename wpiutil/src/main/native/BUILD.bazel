@@ -37,6 +37,7 @@ wpilib_cc_static_and_shared_library(
     hdrs = glob(["include/**/*"]),
     includes = ["include"],
     standard_deps = [
+        "//wpiutil/src/main/native/thirdparty/expected:expected-headers",
         "//wpiutil/src/main/native/thirdparty/fmtlib:fmtlib-headers",
         "//wpiutil/src/main/native/thirdparty/json:json-headers",
         "//wpiutil/src/main/native/thirdparty/llvm:llvm-headers",

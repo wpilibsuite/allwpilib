@@ -24,9 +24,9 @@ def main():
 
     # Gets the folder this script is in (the hal/ directory)
     java_package = "edu/wpi/first/hal"
-    (output_dir/"main/native/include/hal").mkdir(parents=True, exist_ok=True)
-    (output_dir/f"main/java/{java_package}").mkdir(parents=True, exist_ok=True)
-    usage_reporting_types_cpp = [] 
+    (output_dir / "main/native/include/hal").mkdir(parents=True, exist_ok=True)
+    (output_dir / f"main/java/{java_package}").mkdir(parents=True, exist_ok=True)
+    usage_reporting_types_cpp = []
     usage_reporting_instances_cpp = []
     usage_reporting_types = []
     usage_reporting_instances = []
@@ -51,9 +51,12 @@ def main():
             # fmt: off
             java_usage_reporting.read()
             .replace(r"${usage_reporting_types}", "\n".join(usage_reporting_types))
-            .replace(r"${usage_reporting_instances}", "\n".join(usage_reporting_instances)))
-        
-        with open(output_dir/f"main/java/{java_package}/FRCNetComm.java", "w") as java_out:
+            .replace(r"${usage_reporting_instances}", "\n".join(usage_reporting_instances))
+        )
+
+        with open(
+            output_dir / f"main/java/{java_package}/FRCNetComm.java", "w"
+        ) as java_out:
             java_out.write(contents)
 
     with open(HAL_ROOT / "src/generate/FRCUsageReporting.h.in") as cpp_usage_reporting:
@@ -65,7 +68,9 @@ def main():
             # fmt: on
         )
 
-        with open(output_dir/"main/native/include/hal/FRCUsageReporting.h", "w") as cpp_out:
+        with open(
+            output_dir / "main/native/include/hal/FRCUsageReporting.h", "w"
+        ) as cpp_out:
             cpp_out.write(contents)
 
 
