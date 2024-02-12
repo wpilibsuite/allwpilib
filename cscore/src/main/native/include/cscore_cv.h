@@ -66,7 +66,7 @@ class CvSource : public ImageSource {
    * is skipped and is passed straight through.
    *
    * @param image            OpenCV image
-   * @param format           The pixel format of the image
+   * @param pixelFormat      The pixel format of the image
    * @param skipVerification skip verifying pixel format
    */
   void PutFrame(cv::Mat& image, VideoMode::PixelFormat pixelFormat,
