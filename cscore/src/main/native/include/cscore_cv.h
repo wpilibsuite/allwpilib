@@ -73,6 +73,7 @@ class CvSink : public ImageSink {
    * image.
    *
    * @param name Source name (arbitrary unique identifier)
+   * @param pixelFormat The pixel format to read
    */
   explicit CvSink(std::string_view name, VideoMode::PixelFormat pixelFormat =
                                              VideoMode::PixelFormat::kBGR);
