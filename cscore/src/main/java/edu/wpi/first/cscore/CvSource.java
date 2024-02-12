@@ -121,7 +121,7 @@ public class CvSource extends ImageSource {
           (int) finalImage.total() * finalImage.channels(),
           finalImage.width(),
           finalImage.height(),
-          (int)step,
+          (int) step,
           format.getValue());
 
     } finally {
