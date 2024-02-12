@@ -210,6 +210,7 @@ class Frame {
   Image* ConvertGrayToMJPEG(Image* image, int quality);
   Image* ConvertGrayToY16(Image* image);
   Image* ConvertY16ToGray(Image* image);
+  Image* ConvertBGRToBGRA(Image* image);
 
   Image* GetImage(int width, int height, VideoMode::PixelFormat pixelFormat) {
     if (pixelFormat == VideoMode::kMJPEG) {
