@@ -185,7 +185,8 @@ inline CvSink::CvSink(std::string_view name,
   this->pixelFormat = pixelFormat;
 }
 
-inline CvSink::CvSink(const CvSink& sink) : ImageSink{sink} {}
+inline CvSink::CvSink(const CvSink& sink)
+    : ImageSink{sink}, pixelFormat{sink.pixelFormat} {}
 
 inline uint64_t CvSink::GrabFrame(cv::Mat& image, double timeout) {
   cv::Mat tmpnam;
