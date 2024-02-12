@@ -21,6 +21,8 @@
   (void)sampleBuffer;
   (void)connection;
 
+  auto currentTime = wpi::Now()
+
   auto sharedThis = self.cppImpl.lock();
   if (!sharedThis) {
     return;
@@ -49,14 +51,12 @@
     return;
   }
 
-  size_t currSize = width * 3 * height;
-
   std::unique_ptr<Image> dest = cv::CreateImageFromBGRA(
       this, width, height, rowBytes, baseaddress);
 
   CVPixelBufferUnlockBaseAddress(imageBuffer, 0);
 
-  sharedThis->objcPutFrame(std::move(image), wpi::Now());
+  sharedThis->objcPutFrame(std::move(image), currentTime);
 }
 
 @end
