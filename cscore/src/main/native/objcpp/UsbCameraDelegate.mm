@@ -7,9 +7,6 @@
 
 #include <wpi/timestamp.h>
 
-#include <opencv2/core/core.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-
 @implementation UsbCameraDelegate
 
 - (id)init {
@@ -54,10 +51,8 @@
 
   size_t currSize = width * 3 * height;
 
-  auto tmpMat = cv::Mat(height, width, CV_8UC4, baseaddress, rowBytes);
-  auto image = sharedThis->AllocImage(cs::VideoMode::PixelFormat::kBGR, width,
-                                      height, currSize);
-  cv::cvtColor(tmpMat, image->AsMat(), cv::COLOR_BGRA2BGR);
+  std::unique_ptr<Image> dest = cv::CreateImageFromBGRA(
+      this, width, height, rowBytes, baseaddress);
 
   CVPixelBufferUnlockBaseAddress(imageBuffer, 0);
 

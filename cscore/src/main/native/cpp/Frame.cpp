@@ -727,3 +727,15 @@ void Frame::ReleaseFrame() {
   m_impl->source.ReleaseFrameImpl(std::unique_ptr<Impl>(m_impl));
   m_impl = nullptr;
 }
+
+namespace cs {
+std::unique_ptr<Image> CreateImageFromBGRA(cs::SourceImpl* source, size_t width,
+                                           size_t height, size_t stride,
+                                           uint8_t* data) {
+  cv::Mat finalImage{static_cast<int>(height), static_cast<int>(width), CV_8UC4, data, stride};
+  std::unique_ptr<Image> dest = source->AllocImage(
+      VideoMode::PixelFormat::kBGR, width, height, width * height * 3);
+  cv::cvtColor(finalImage, dest->AsMat(), cv::COLOR_BGRA2BGR);
+  return dest;
+}
+}  // namespace cs

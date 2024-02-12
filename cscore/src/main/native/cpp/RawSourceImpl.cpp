@@ -4,10 +4,6 @@
 
 #include "RawSourceImpl.h"
 
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-
 #include <wpi/timestamp.h>
 
 #include "Handle.h"
@@ -31,13 +27,8 @@ void RawSourceImpl::PutFrame(const WPI_RawFrame& image) {
     case VideoMode::kBGRA:
       // Special case BGRA to avoid a copy
       {
-        type = CV_8UC4;
-        cv::Mat finalImage{image.height, image.width, type, image.data,
-                           static_cast<size_t>(image.stride)};
-        std::unique_ptr<Image> dest =
-            AllocImage(VideoMode::PixelFormat::kBGR,
-                       image.width, image.height, image.size);
-        cv::cvtColor(finalImage, dest->AsMat(), cv::COLOR_BGRA2BGR);
+        std::unique_ptr<Image> dest = CreateImageFromBGRA(
+            this, image.width, image.height, image.stride, image.data);
         SourceImpl::PutFrame(std::move(dest), wpi::Now());
       }
       return;
