@@ -63,6 +63,9 @@ class Image {
       case VideoMode::kBGR:
         type = CV_8UC3;
         break;
+      case VideoMode::kBGRA:
+        type = CV_8UC4;
+        break;
       case VideoMode::kGray:
       case VideoMode::kMJPEG:
       default:
@@ -81,6 +84,8 @@ class Image {
         return 2 * width;
       case VideoMode::kBGR:
         return 3 * width;
+      case VideoMode::kBGRA:
+        return 4 * width;
       case VideoMode::kGray:
         return width;
       case VideoMode::kMJPEG:

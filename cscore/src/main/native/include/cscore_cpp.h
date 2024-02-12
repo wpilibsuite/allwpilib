@@ -68,7 +68,8 @@ struct VideoMode : public CS_VideoMode {
     kBGR = WPI_PIXFMT_BGR,
     kGray = WPI_PIXFMT_GRAY,
     kY16 = WPI_PIXFMT_Y16,
-    kUYVY = WPI_PIXFMT_UYVY
+    kUYVY = WPI_PIXFMT_UYVY,
+    kBGRA = WPI_PIXFMT_BGRA,
   };
   VideoMode() {
     pixelFormat = 0;

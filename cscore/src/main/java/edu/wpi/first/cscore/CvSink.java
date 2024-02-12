@@ -36,10 +36,15 @@ public class CvSink extends ImageSink {
     switch (pixelFormat) {
       case kYUYV:
       case kRGB565:
+      case kY16:
+      case kUYVY:
         type = CvType.CV_8UC2;
         break;
       case kBGR:
         type = CvType.CV_8UC3;
+        break;
+      case kBGRA:
+        type = CvType.CV_8UC4;
         break;
       case kGray:
       case kMJPEG:

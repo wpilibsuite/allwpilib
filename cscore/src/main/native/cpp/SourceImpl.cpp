@@ -196,6 +196,8 @@ bool SourceImpl::SetConfigJson(const wpi::json& config, CS_Status* status) {
         mode.pixelFormat = cs::VideoMode::kRGB565;
       } else if (wpi::equals_lower(str, "bgr")) {
         mode.pixelFormat = cs::VideoMode::kBGR;
+      } else if (wpi::equals_lower(str, "bgra")) {
+        mode.pixelFormat = cs::VideoMode::kBGRA;
       } else if (wpi::equals_lower(str, "gray")) {
         mode.pixelFormat = cs::VideoMode::kGray;
       } else if (wpi::equals_lower(str, "y16")) {
@@ -360,6 +362,9 @@ wpi::json SourceImpl::GetConfigJsonObject(CS_Status* status) {
       break;
     case VideoMode::kBGR:
       pixelFormat = "bgr";
+      break;
+    case VideoMode::kBGRA:
+      pixelFormat = "bgra";
       break;
     case VideoMode::kGray:
       pixelFormat = "gray";

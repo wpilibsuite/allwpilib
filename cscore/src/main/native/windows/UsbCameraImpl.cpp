@@ -369,6 +369,12 @@ void UsbCameraImpl::ProcessFrame(IMFSample* videoSample,
                         tmpMat.total() * 3);
       tmpMat.copyTo(dest->AsMat());
       break;
+    case cs::VideoMode::PixelFormat::kBGRA:
+      tmpMat = cv::Mat(mode.height, mode.width, CV_8UC4, ptr, pitch);
+      dest = AllocImage(VideoMode::kBGRA, tmpMat.cols, tmpMat.rows,
+                        tmpMat.total() * 4);
+      tmpMat.copyTo(dest->AsMat());
+      break;
     case cs::VideoMode::PixelFormat::kYUYV:
       tmpMat = cv::Mat(mode.height, mode.width, CV_8UC2, ptr, pitch);
       dest = AllocImage(VideoMode::kYUYV, tmpMat.cols, tmpMat.rows,
@@ -378,6 +384,12 @@ void UsbCameraImpl::ProcessFrame(IMFSample* videoSample,
     case cs::VideoMode::PixelFormat::kUYVY:
       tmpMat = cv::Mat(mode.height, mode.width, CV_8UC2, ptr, pitch);
       dest = AllocImage(VideoMode::kUYVY, tmpMat.cols, tmpMat.rows,
+                        tmpMat.total() * 2);
+      tmpMat.copyTo(dest->AsMat());
+      break;
+    case cs::VideoMode::PixelFormat::kRGB565:
+      tmpMat = cv::Mat(mode.height, mode.width, CV_8UC2, ptr, pitch);
+      dest = AllocImage(VideoMode::kRGB565, tmpMat.cols, tmpMat.rows,
                         tmpMat.total() * 2);
       tmpMat.copyTo(dest->AsMat());
       break;
@@ -482,6 +494,8 @@ static cs::VideoMode::PixelFormat GetFromGUID(const GUID& guid) {
     return cs::VideoMode::PixelFormat::kYUYV;
   } else if (IsEqualGUID(guid, MFVideoFormat_RGB24)) {
     return cs::VideoMode::PixelFormat::kBGR;
+  } else if (IsEqualGUID(guid, MFVideoFormat_ARGB32)) {
+    return cs::VideoMode::PixelFormat::kBGRA;
   } else if (IsEqualGUID(guid, MFVideoFormat_MJPG)) {
     return cs::VideoMode::PixelFormat::kMJPEG;
   } else if (IsEqualGUID(guid, MFVideoFormat_RGB565)) {
