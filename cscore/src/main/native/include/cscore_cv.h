@@ -64,6 +64,7 @@ class CvSource : public ImageSource {
 class CvSink : public ImageSink {
  public:
   CvSink() = default;
+  CvSink(const CvSink& sink);
 
   /**
    * Create a sink for accepting OpenCV images.
@@ -73,7 +74,8 @@ class CvSink : public ImageSink {
    *
    * @param name Source name (arbitrary unique identifier)
    */
-  explicit CvSink(std::string_view name, VideoMode::PixelFormat pixelFormat = VideoMode::PixelFormat::kBGR);
+  explicit CvSink(std::string_view name, VideoMode::PixelFormat pixelFormat =
+                                             VideoMode::PixelFormat::kBGR);
 
   /**
    * Wait for the next frame and get the image.
@@ -138,8 +140,8 @@ inline CvSource::CvSource(std::string_view name, const VideoMode& mode) {
 
 inline CvSource::CvSource(std::string_view name, VideoMode::PixelFormat format,
                           int width, int height, int fps) {
-  m_handle =
-      CreateRawSource(name, true, VideoMode{format, width, height, fps}, &m_status);
+  m_handle = CreateRawSource(name, true, VideoMode{format, width, height, fps},
+                             &m_status);
 }
 
 inline void CvSource::PutFrame(cv::Mat& image) {
@@ -164,7 +166,7 @@ inline void CvSource::PutFrame(cv::Mat& image) {
   // TODO old code supported BGRA, but the only way I can support that is slow.
   // Update cscore to support BGRA for raw frames
 
-  WPI_RawFrame frame; // use WPI_Frame because we don't want the destructor
+  WPI_RawFrame frame;  // use WPI_Frame because we don't want the destructor
   frame.data = finalImage.data;
   frame.freeFunc = nullptr;
   frame.freeCbData = nullptr;
@@ -177,10 +179,13 @@ inline void CvSource::PutFrame(cv::Mat& image) {
   PutSourceFrame(m_handle, frame, &m_status);
 }
 
-inline CvSink::CvSink(std::string_view name, VideoMode::PixelFormat pixelFormat) {
+inline CvSink::CvSink(std::string_view name,
+                      VideoMode::PixelFormat pixelFormat) {
   m_handle = CreateRawSink(name, true, &m_status);
   this->pixelFormat = pixelFormat;
 }
+
+inline CvSink::CvSink(const CvSink& sink) : ImageSink{sink} {}
 
 inline uint64_t CvSink::GrabFrame(cv::Mat& image, double timeout) {
   cv::Mat tmpnam;
@@ -203,22 +208,22 @@ inline uint64_t CvSink::GrabFrameNoTimeout(cv::Mat& image) {
 }
 
 inline constexpr int GetCvFormat(WPI_PixelFormat pixelFormat) {
-    int type = 0;
-    switch (pixelFormat) {
-      case WPI_PIXFMT_YUYV:
-      case WPI_PIXFMT_RGB565:
-        type = CV_8UC2;
-        break;
-      case WPI_PIXFMT_BGR:
-        type = CV_8UC3;
-        break;
-      case WPI_PIXFMT_GRAY:
-      case WPI_PIXFMT_MJPEG:
-      default:
-        type = CV_8UC1;
-        break;
-    }
-    return type;
+  int type = 0;
+  switch (pixelFormat) {
+    case WPI_PIXFMT_YUYV:
+    case WPI_PIXFMT_RGB565:
+      type = CV_8UC2;
+      break;
+    case WPI_PIXFMT_BGR:
+      type = CV_8UC3;
+      break;
+    case WPI_PIXFMT_GRAY:
+    case WPI_PIXFMT_MJPEG:
+    default:
+      type = CV_8UC1;
+      break;
+  }
+  return type;
 }
 
 inline uint64_t CvSink::GrabFrameDirect(cv::Mat& image, double timeout) {
@@ -229,7 +234,10 @@ inline uint64_t CvSink::GrabFrameDirect(cv::Mat& image, double timeout) {
   if (m_status <= 0) {
     return m_status;
   }
-  image = cv::Mat{rawFrame.height, rawFrame.width, GetCvFormat(static_cast<WPI_PixelFormat>(rawFrame.pixelFormat)), rawFrame.data};
+  image =
+      cv::Mat{rawFrame.height, rawFrame.width,
+              GetCvFormat(static_cast<WPI_PixelFormat>(rawFrame.pixelFormat)),
+              rawFrame.data};
   return m_status;
 }
 
@@ -241,7 +249,10 @@ inline uint64_t CvSink::GrabFrameNoTimeoutDirect(cv::Mat& image) {
   if (m_status <= 0) {
     return m_status;
   }
-  image = cv::Mat{rawFrame.height, rawFrame.width, GetCvFormat(static_cast<WPI_PixelFormat>(rawFrame.pixelFormat)), rawFrame.data};
+  image =
+      cv::Mat{rawFrame.height, rawFrame.width,
+              GetCvFormat(static_cast<WPI_PixelFormat>(rawFrame.pixelFormat)),
+              rawFrame.data};
   return m_status;
 }
 
