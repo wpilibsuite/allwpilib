@@ -113,6 +113,8 @@ static std::string_view MakeSourceValue(CS_Source source,
     }
     case CS_SOURCE_CV:
       return "cv:";
+    case CS_SOURCE_RAW:
+      return "raw:";
     default:
       return "unknown:";
   }

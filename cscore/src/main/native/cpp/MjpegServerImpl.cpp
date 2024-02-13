@@ -457,6 +457,9 @@ void MjpegServerImpl::ConnThread::SendHTML(wpi::raw_ostream& os,
       case VideoMode::kBGR:
         os << "BGR";
         break;
+      case VideoMode::kBGRA:
+        os << "BGRA";
+        break;
       case VideoMode::kGray:
         os << "gray";
         break;
