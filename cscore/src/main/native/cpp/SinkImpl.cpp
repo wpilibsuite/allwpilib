@@ -242,7 +242,7 @@ void SetSinkEnabled(CS_Sink sink, bool enabled, CS_Status* status) {
 }  // namespace cs
 
 extern "C" {
-void CS_SetSinkDescription(CS_Sink sink, const WPI_String* description,
+void CS_SetSinkDescription(CS_Sink sink, const struct WPI_String* description,
                            CS_Status* status) {
   return cs::SetSinkDescription(sink, wpi::to_string_view(description), status);
 }

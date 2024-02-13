@@ -53,7 +53,7 @@ void PutSourceFrame(CS_Source source, const WPI_RawFrame& image,
 }  // namespace cs
 
 extern "C" {
-CS_Source CS_CreateRawSource(const WPI_String* name, CS_Bool isCv,
+CS_Source CS_CreateRawSource(const struct WPI_String* name, CS_Bool isCv,
                              const CS_VideoMode* mode, CS_Status* status) {
   return cs::CreateRawSource(wpi::to_string_view(name), isCv,
                              static_cast<const cs::VideoMode&>(*mode), status);

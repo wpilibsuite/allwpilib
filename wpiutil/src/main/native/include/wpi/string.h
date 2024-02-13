@@ -21,7 +21,7 @@ struct WPI_String {
 #ifdef __cplusplus
 namespace wpi {
 /** Converts a WPI_String to a string_view */
-constexpr std::string_view to_string_view(const WPI_String* str) {
+constexpr std::string_view to_string_view(const struct WPI_String* str) {
   if (str) {
     return {str->str, str->len};
   } else {

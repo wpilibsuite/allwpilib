@@ -424,7 +424,7 @@ int32_t HAL_GetJoystickType(int32_t joystickNum) {
   }
 }
 
-void HAL_GetJoystickName(WPI_String* name, int32_t joystickNum) {
+void HAL_GetJoystickName(struct WPI_String* name, int32_t joystickNum) {
   HAL_JoystickDescriptor joystickDesc;
   const char* cName = joystickDesc.name;
   if (HAL_GetJoystickDescriptor(joystickNum, &joystickDesc) < 0) {

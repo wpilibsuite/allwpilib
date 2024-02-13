@@ -261,7 +261,7 @@ int32_t HAL_GetJoystickType(int32_t joystickNum) {
   return desc.type;
 }
 
-void HAL_GetJoystickName(WPI_String* name, int32_t joystickNum) {
+void HAL_GetJoystickName(struct WPI_String* name, int32_t joystickNum) {
   HAL_JoystickDescriptor desc;
   SimDriverStationData->GetJoystickDescriptor(joystickNum, &desc);
   size_t len = std::strlen(desc.name);

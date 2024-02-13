@@ -12,7 +12,7 @@
 
 namespace cs {
 
-inline void ConvertToC(WPI_String* output, std::string_view str) {
+inline void ConvertToC(struct WPI_String* output, std::string_view str) {
   char* write = WPI_AllocateString(output, str.size());
   std::memcpy(write, str.data(), str.size());
 }

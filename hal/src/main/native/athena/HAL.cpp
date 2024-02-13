@@ -285,7 +285,7 @@ int64_t HAL_GetFPGARevision(int32_t* status) {
   return global->readRevision(status);
 }
 
-void HAL_GetSerialNumber(WPI_String* serialNumber) {
+void HAL_GetSerialNumber(struct WPI_String* serialNumber) {
   const char* serialNum = std::getenv("serialnum");
   if (!serialNum) {
     serialNum = "";
@@ -336,7 +336,7 @@ void InitializeRoboRioComments(void) {
   }
 }
 
-void HAL_GetComments(WPI_String* comments) {
+void HAL_GetComments(struct WPI_String* comments) {
   if (!roboRioCommentsStringInitialized) {
     InitializeRoboRioComments();
   }

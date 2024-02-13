@@ -280,14 +280,14 @@ int64_t HAL_GetFPGARevision(int32_t* status) {
   return 0;  // TODO: Find a better number to return;
 }
 
-void HAL_GetSerialNumber(WPI_String* serialNumber) {
+void HAL_GetSerialNumber(struct WPI_String* serialNumber) {
   char buffer[9];
   size_t len = HALSIM_GetRoboRioSerialNumber(buffer, sizeof(buffer));
   auto write = WPI_AllocateString(serialNumber, len);
   std::memcpy(write, buffer, len);
 }
 
-void HAL_GetComments(WPI_String* comments) {
+void HAL_GetComments(struct WPI_String* comments) {
   char buffer[65];
   size_t len = HALSIM_GetRoboRioComments(buffer, sizeof(buffer));
   auto write = WPI_AllocateString(comments, len);

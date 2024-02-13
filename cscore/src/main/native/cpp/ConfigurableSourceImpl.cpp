@@ -197,7 +197,7 @@ void SetSourceEnumPropertyChoices(CS_Source source, CS_Property property,
 }  // namespace cs
 
 extern "C" {
-void CS_NotifySourceError(CS_Source source, const WPI_String* msg,
+void CS_NotifySourceError(CS_Source source, const struct WPI_String* msg,
                           CS_Status* status) {
   return cs::NotifySourceError(source, wpi::to_string_view(msg), status);
 }
@@ -207,12 +207,12 @@ void CS_SetSourceConnected(CS_Source source, CS_Bool connected,
   return cs::SetSourceConnected(source, connected, status);
 }
 
-void CS_SetSourceDescription(CS_Source source, const WPI_String* description,
+void CS_SetSourceDescription(CS_Source source, const struct WPI_String* description,
                              CS_Status* status) {
   return cs::SetSourceDescription(source, wpi::to_string_view(description), status);
 }
 
-CS_Property CS_CreateSourceProperty(CS_Source source, const WPI_String* name,
+CS_Property CS_CreateSourceProperty(CS_Source source, const struct WPI_String* name,
                                     enum CS_PropertyKind kind, int minimum,
                                     int maximum, int step, int defaultValue,
                                     int value, CS_Status* status) {
@@ -230,7 +230,7 @@ CS_Property CS_CreateSourcePropertyCallback(
 }
 
 void CS_SetSourceEnumPropertyChoices(CS_Source source, CS_Property property,
-                                     const WPI_String* choices, int count,
+                                     const struct WPI_String* choices, int count,
                                      CS_Status* status) {
   wpi::SmallVector<std::string, 8> vec;
   vec.reserve(count);

@@ -1050,8 +1050,8 @@ int GetMjpegServerPort(CS_Sink sink, CS_Status* status) {
 
 extern "C" {
 
-CS_Sink CS_CreateMjpegServer(const WPI_String* name,
-                             const WPI_String* listenAddress, int port,
+CS_Sink CS_CreateMjpegServer(const struct WPI_String* name,
+                             const struct WPI_String* listenAddress, int port,
                              CS_Status* status) {
   return cs::CreateMjpegServer(wpi::to_string_view(name),
                                wpi::to_string_view(listenAddress), port,

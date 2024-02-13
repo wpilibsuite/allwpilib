@@ -89,7 +89,7 @@ void CS_GetStringProperty(CS_Property property, WPI_String* value,
   cs::ConvertToC(value, cs::GetStringProperty(property, buf, status));
 }
 
-void CS_SetStringProperty(CS_Property property, const WPI_String* value,
+void CS_SetStringProperty(CS_Property property, const struct WPI_String* value,
                           CS_Status* status) {
   return cs::SetStringProperty(property, wpi::to_string_view(value), status);
 }
@@ -138,7 +138,7 @@ CS_Bool CS_IsSourceEnabled(CS_Source source, CS_Status* status) {
   return cs::IsSourceEnabled(source, status);
 }
 
-CS_Property CS_GetSourceProperty(CS_Source source, const WPI_String* name,
+CS_Property CS_GetSourceProperty(CS_Source source, const struct WPI_String* name,
                                  CS_Status* status) {
   return cs::GetSourceProperty(source, wpi::to_string_view(name), status);
 }
@@ -195,7 +195,7 @@ CS_Bool CS_SetSourceFPS(CS_Source source, int fps, CS_Status* status) {
   return cs::SetSourceFPS(source, fps, status);
 }
 
-CS_Bool CS_SetSourceConfigJson(CS_Source source, const WPI_String* config,
+CS_Bool CS_SetSourceConfigJson(CS_Source source, const struct WPI_String* config,
                                CS_Status* status) {
   return cs::SetSourceConfigJson(source, wpi::to_string_view(config), status);
 }
@@ -284,7 +284,7 @@ void CS_GetSinkDescription(CS_Sink sink, WPI_String* description,
   cs::ConvertToC(description, cs::GetSinkDescription(sink, buf, status));
 }
 
-CS_Property CS_GetSinkProperty(CS_Sink sink, const WPI_String* name,
+CS_Property CS_GetSinkProperty(CS_Sink sink, const struct WPI_String* name,
                                CS_Status* status) {
   return cs::GetSinkProperty(sink, wpi::to_string_view(name), status);
 }
@@ -300,7 +300,7 @@ CS_Property* CS_EnumerateSinkProperties(CS_Sink sink, int* count,
   return out;
 }
 
-CS_Bool CS_SetSinkConfigJson(CS_Sink sink, const WPI_String* config,
+CS_Bool CS_SetSinkConfigJson(CS_Sink sink, const struct WPI_String* config,
                              CS_Status* status) {
   return cs::SetSinkConfigJson(sink, wpi::to_string_view(config), status);
 }
@@ -317,7 +317,7 @@ CS_Source CS_GetSinkSource(CS_Sink sink, CS_Status* status) {
   return cs::GetSinkSource(sink, status);
 }
 
-CS_Property CS_GetSinkSourceProperty(CS_Sink sink, const WPI_String* name,
+CS_Property CS_GetSinkSourceProperty(CS_Sink sink, const struct WPI_String* name,
                                      CS_Status* status) {
   return cs::GetSinkSourceProperty(sink, wpi::to_string_view(name), status);
 }
@@ -481,7 +481,7 @@ void CS_FreeEnumeratedVideoModes(CS_VideoMode* modes, int count) {
   std::free(modes);
 }
 
-void CS_GetHostname(WPI_String* hostname) {
+void CS_GetHostname(struct WPI_String* hostname) {
   cs::ConvertToC(hostname, cs::GetHostname());
 }
 
