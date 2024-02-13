@@ -340,7 +340,7 @@ void CS_SetListenerOnExit(void (*onExit)(void* data), void* data) {
 
 CS_Listener CS_AddListener(void* data,
                            void (*callback)(void* data, const CS_Event* event),
-                           int eventMask, int immediateNotify,
+                           int eventMask, CS_Bool immediateNotify,
                            CS_Status* status) {
   return cs::AddListener(
       [=](const cs::RawEvent& rawEvent) {
