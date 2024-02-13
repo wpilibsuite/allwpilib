@@ -206,7 +206,7 @@ cppHeadersZip {
     from('src/main/native/thirdparty/libuv/include') {
         into '/'
     }
-    from('src/main/native/third_party/tcpsockets/include') {
+    from('src/main/native/thirdparty/tcpsockets/include') {
         into '/'
     }
 }
