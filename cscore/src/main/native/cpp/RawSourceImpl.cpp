@@ -22,31 +22,10 @@ RawSourceImpl::RawSourceImpl(std::string_view name, wpi::Logger& logger,
 RawSourceImpl::~RawSourceImpl() = default;
 
 void RawSourceImpl::PutFrame(const WPI_RawFrame& image) {
-  int type;
-  switch (image.pixelFormat) {
-    case VideoMode::kYUYV:
-    case VideoMode::kRGB565:
-    case VideoMode::kY16:
-    case VideoMode::kUYVY:
-      type = CV_8UC2;
-      break;
-    case VideoMode::kBGR:
-      type = CV_8UC3;
-      break;
-    case VideoMode::kGray:
-    case VideoMode::kMJPEG:
-    default:
-      type = CV_8UC1;
-      break;
-  }
-  cv::Mat finalImage{image.height, image.width, type, image.data,
-                     static_cast<size_t>(image.stride)};
-  std::unique_ptr<Image> dest =
-      AllocImage(static_cast<VideoMode::PixelFormat>(image.pixelFormat),
-                 image.width, image.height, image.size);
-  finalImage.copyTo(dest->AsMat());
-
-  SourceImpl::PutFrame(std::move(dest), wpi::Now());
+  auto currentTime = wpi::Now();
+  std::string_view data_view{reinterpret_cast<char*>(image.data), image.size};
+  SourceImpl::PutFrame(static_cast<VideoMode::PixelFormat>(image.pixelFormat),
+                       image.width, image.height, data_view, currentTime);
 }
 
 namespace cs {

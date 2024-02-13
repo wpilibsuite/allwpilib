@@ -12,7 +12,6 @@
 #include <wpi/SmallString.h>
 #include <wpi/jni_util.h>
 
-#include "cscore_cv.h"
 #include "cscore_raw.h"
 #include "cscore_runloop.h"
 #include "edu_wpi_first_cscore_CameraServerJNI.h"

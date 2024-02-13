@@ -44,15 +44,36 @@ class CvSource : public ImageSource {
            int height, int fps);
 
   /**
-   * Put an OpenCV image and notify sinks.
+   * Put an OpenCV image and notify sinks
    *
-   * <p>Only 8-bit single-channel or 3-channel (with BGR channel order) images
-   * are supported. If the format, depth or channel order is different, use
-   * cv::Mat::convertTo() and/or cv::cvtColor() to convert it first.
+   * <p>
+   * The image format is guessed from the number of channels. The channel
+   * mapping is as follows. 1: kGray 2: kYUYV 3: BGR 4: BGRA Any other channel
+   * numbers will throw an error. If your image is an in alternate format, use
+   * the overload that takes a PixelFormat.
    *
-   * @param image OpenCV image
+   * @param image OpenCV Image
    */
   void PutFrame(cv::Mat& image);
+
+  /**
+   * Put an OpenCV image and notify sinks.
+   *
+   * <p>
+   * The format of the Mat must match the PixelFormat. You will corrupt memory
+   * if they dont. With skipVerification false, we will verify the number of
+   * channels matches the pixel format. If skipVerification is true, this step
+   * is skipped and is passed straight through.
+   *
+   * @param image            OpenCV image
+   * @param pixelFormat      The pixel format of the image
+   * @param skipVerification skip verifying pixel format
+   */
+  void PutFrame(cv::Mat& image, VideoMode::PixelFormat pixelFormat,
+                bool skipVerification);
+
+ private:
+  static bool VerifyFormat(cv::Mat& image, VideoMode::PixelFormat pixelFormat);
 };
 
 /**
@@ -131,6 +152,8 @@ class CvSink : public ImageSink {
   uint64_t GrabFrameNoTimeoutDirect(cv::Mat& image);
 
  private:
+  constexpr int GetCvFormat(WPI_PixelFormat pixelFormat);
+
   wpi::RawFrame rawFrame;
   VideoMode::PixelFormat pixelFormat;
 };
@@ -145,6 +168,56 @@ inline CvSource::CvSource(std::string_view name, VideoMode::PixelFormat format,
                              &m_status);
 }
 
+inline bool CvSource::VerifyFormat(cv::Mat& image,
+                                   VideoMode::PixelFormat pixelFormat) {
+  int channels = image.channels();
+  switch (pixelFormat) {
+    case VideoMode::PixelFormat::kBGR:
+      if (channels == 3) {
+        return true;
+      }
+      break;
+    case VideoMode::PixelFormat::kBGRA:
+      if (channels == 4) {
+        return true;
+      }
+      break;
+    case VideoMode::PixelFormat::kGray:
+      if (channels == 1) {
+        return true;
+      }
+      break;
+    case VideoMode::PixelFormat::kRGB565:
+      if (channels == 2) {
+        return true;
+      }
+      break;
+    case VideoMode::PixelFormat::kUYVY:
+      if (channels == 2) {
+        return true;
+      }
+      break;
+    case VideoMode::PixelFormat::kY16:
+      if (channels == 2) {
+        return true;
+      }
+      break;
+    case VideoMode::PixelFormat::kYUYV:
+      if (channels == 2) {
+        return true;
+      }
+      break;
+    case VideoMode::PixelFormat::kMJPEG:
+      if (channels == 1) {
+        return true;
+      }
+      break;
+    default:
+      break;
+  }
+  return false;
+}
+
 inline void CvSource::PutFrame(cv::Mat& image) {
   // We only support 8-bit images; convert if necessary.
   cv::Mat finalImage;
@@ -155,27 +228,54 @@ inline void CvSource::PutFrame(cv::Mat& image) {
   }
 
   int channels = finalImage.channels();
-  WPI_PixelFormat format;
+  VideoMode::PixelFormat format;
   if (channels == 1) {
-    format = WPI_PIXFMT_GRAY;
+    // 1 channel is assumed Graysacle
+    format = VideoMode::PixelFormat::kGray;
+  } else if (channels == 2) {
+    // 2 channels is assumed YUYV
+    format = VideoMode::PixelFormat::kYUYV;
   } else if (channels == 3) {
-    format = WPI_PIXFMT_BGR;
+    // 3 channels is assumed BGR
+    format = VideoMode::PixelFormat::kBGR;
+  } else if (channels == 4) {
+    // 4 channels is assumed BGRA
+    format = VideoMode::PixelFormat::kBGRA;
   } else {
     // TODO Error
     return;
   }
-  // TODO old code supported BGRA, but the only way I can support that is slow.
-  // Update cscore to support BGRA for raw frames
+
+  PutFrame(finalImage, format, true);
+}
+
+inline void CvSource::PutFrame(cv::Mat& image,
+                               VideoMode::PixelFormat pixelFormat,
+                               bool skipVerification) {
+  // We only support 8-bit images; convert if necessary.
+  cv::Mat finalImage;
+  if (image.depth() == CV_8U) {
+    finalImage = image;
+  } else {
+    image.convertTo(finalImage, CV_8U);
+  }
+
+  if (!skipVerification) {
+    if (!VerifyFormat(finalImage, pixelFormat)) {
+      // TODO Error
+      return;
+    }
+  }
 
   WPI_RawFrame frame;  // use WPI_Frame because we don't want the destructor
   frame.data = finalImage.data;
   frame.freeFunc = nullptr;
   frame.freeCbData = nullptr;
-  frame.size = finalImage.total() * channels;
+  frame.size = finalImage.total() * finalImage.channels();
   frame.width = finalImage.cols;
   frame.height = finalImage.rows;
-  frame.stride = finalImage.cols;
-  frame.pixelFormat = format;
+  frame.stride = finalImage.step;
+  frame.pixelFormat = pixelFormat;
   m_status = 0;
   PutSourceFrame(m_handle, frame, &m_status);
 }
@@ -209,15 +309,20 @@ inline uint64_t CvSink::GrabFrameNoTimeout(cv::Mat& image) {
   return retVal;
 }
 
-inline constexpr int GetCvFormat(WPI_PixelFormat pixelFormat) {
+inline constexpr int CvSink::GetCvFormat(WPI_PixelFormat pixelFormat) {
   int type = 0;
   switch (pixelFormat) {
     case WPI_PIXFMT_YUYV:
     case WPI_PIXFMT_RGB565:
+    case WPI_PIXFMT_Y16:
+    case WPI_PIXFMT_UYVY:
       type = CV_8UC2;
       break;
     case WPI_PIXFMT_BGR:
       type = CV_8UC3;
+      break;
+    case WPI_PIXFMT_BGRA:
+      type = CV_8UC4;
       break;
     case WPI_PIXFMT_GRAY:
     case WPI_PIXFMT_MJPEG:
@@ -231,31 +336,33 @@ inline constexpr int GetCvFormat(WPI_PixelFormat pixelFormat) {
 inline uint64_t CvSink::GrabFrameDirect(cv::Mat& image, double timeout) {
   rawFrame.height = 0;
   rawFrame.width = 0;
+  rawFrame.stride = 0;
   rawFrame.pixelFormat = pixelFormat;
-  m_status = GrabSinkFrameTimeout(m_handle, rawFrame, timeout, &m_status);
-  if (m_status <= 0) {
-    return m_status;
+  auto timestamp = GrabSinkFrameTimeout(m_handle, rawFrame, timeout, &m_status);
+  if (m_status != CS_OK) {
+    return 0;
   }
   image =
       cv::Mat{rawFrame.height, rawFrame.width,
               GetCvFormat(static_cast<WPI_PixelFormat>(rawFrame.pixelFormat)),
-              rawFrame.data};
-  return m_status;
+              rawFrame.data, static_cast<size_t>(rawFrame.stride)};
+  return timestamp;
 }
 
 inline uint64_t CvSink::GrabFrameNoTimeoutDirect(cv::Mat& image) {
   rawFrame.height = 0;
   rawFrame.width = 0;
+  rawFrame.stride = 0;
   rawFrame.pixelFormat = pixelFormat;
-  m_status = GrabSinkFrame(m_handle, rawFrame, &m_status);
-  if (m_status <= 0) {
-    return m_status;
+  auto timestamp = GrabSinkFrame(m_handle, rawFrame, &m_status);
+  if (m_status != CS_OK) {
+    return 0;
   }
   image =
       cv::Mat{rawFrame.height, rawFrame.width,
               GetCvFormat(static_cast<WPI_PixelFormat>(rawFrame.pixelFormat)),
-              rawFrame.data};
-  return m_status;
+              rawFrame.data, static_cast<size_t>(rawFrame.stride)};
+  return timestamp;
 }
 
 }  // namespace cs

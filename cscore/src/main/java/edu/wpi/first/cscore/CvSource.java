@@ -40,16 +40,16 @@ public class CvSource extends ImageSource {
   }
 
   /**
-   * Put an OpenCV image and notify sinks.
+   * Put an OpenCV image and notify sinks
    *
-   * <p>Only 8-bit single-channel or 3-channel (with BGR channel order) images are supported. If the
-   * format, depth or channel order is different, use Mat.convertTo() and/or cvtColor() to convert
-   * it first.
+   * <p>The image format is guessed from the number of channels. The channel mapping is as follows.
+   * 1: kGray 2: kYUYV 3: BGR 4: BGRA Any other channel numbers will throw an error. If your image
+   * is an in alternate format, use the overload that takes a PixelFormat.
    *
-   * @param image OpenCV image
+   * @param image OpenCV Image
    */
   public void putFrame(Mat image) {
-    // We only support 8-bit images, convert if necessary
+    // We only support 8 bit channels
     boolean cleanupRequired = false;
     Mat finalImage;
     if (image.depth() == 0) {
@@ -64,28 +64,118 @@ public class CvSource extends ImageSource {
       int channels = finalImage.channels();
       PixelFormat format;
       if (channels == 1) {
+        // 1 channel is assumed Graysacle
         format = PixelFormat.kGray;
+      } else if (channels == 2) {
+        // 2 channels is assumed YUYV
+        format = PixelFormat.kYUYV;
       } else if (channels == 3) {
+        // 3 channels is assumed BGR
         format = PixelFormat.kBGR;
+      } else if (channels == 4) {
+        // 4 channels is assumed BGRA
+        format = PixelFormat.kBGRA;
       } else {
-        throw new VideoException("Unsupported image type");
+        throw new VideoException("Unable to get pixel format for " + channels + " channels");
       }
-      // TODO old code supported BGRA, but the only way I can support that is slow.
-      // Update cscore to support BGRA for raw frames
 
+      putFrame(finalImage, format, true);
+    } finally {
+      if (cleanupRequired) {
+        finalImage.release();
+      }
+    }
+  }
+
+  /**
+   * Put an OpenCV image and notify sinks.
+   *
+   * <p>The format of the Mat must match the PixelFormat. You will corrupt memory if they dont. With
+   * skipVerification false, we will verify the number of channels matches the pixel format. If
+   * skipVerification is true, this step is skipped and is passed straight through.
+   *
+   * @param image OpenCV image
+   * @param format The pixel format of the image
+   * @param skipVerification skip verifying pixel format
+   */
+  public void putFrame(Mat image, PixelFormat format, boolean skipVerification) {
+    // We only support 8-bit images, convert if necessary
+    boolean cleanupRequired = false;
+    Mat finalImage;
+    if (image.depth() == 0) {
+      finalImage = image;
+    } else {
+      finalImage = new Mat();
+      image.convertTo(finalImage, 0);
+      cleanupRequired = true;
+    }
+
+    try {
+      if (!skipVerification) {
+        verifyFormat(finalImage, format);
+      }
+      long step = image.step1() * image.elemSize1();
       CameraServerJNI.putRawSourceFrameData(
           m_handle,
           finalImage.dataAddr(),
-          (int) finalImage.total() * channels,
+          (int) finalImage.total() * finalImage.channels(),
           finalImage.width(),
           finalImage.height(),
-          image.width(),
+          (int) step,
           format.getValue());
 
     } finally {
       if (cleanupRequired) {
         finalImage.release();
       }
+    }
+  }
+
+  private void verifyFormat(Mat image, PixelFormat pixelFormat) {
+    int channels = image.channels();
+    switch (pixelFormat) {
+      case kBGR:
+        if (channels == 3) {
+          return;
+        }
+        break;
+      case kBGRA:
+        if (channels == 4) {
+          return;
+        }
+        break;
+      case kGray:
+        if (channels == 1) {
+          return;
+        }
+        break;
+      case kRGB565:
+        if (channels == 2) {
+          return;
+        }
+        break;
+      case kUYVY:
+        if (channels == 2) {
+          return;
+        }
+        break;
+      case kY16:
+        if (channels == 2) {
+          return;
+        }
+        break;
+      case kYUYV:
+        if (channels == 2) {
+          return;
+        }
+        break;
+      case kMJPEG:
+        if (channels == 1) {
+          return;
+        }
+        break;
+      default:
+        break;
     }
   }
 }
