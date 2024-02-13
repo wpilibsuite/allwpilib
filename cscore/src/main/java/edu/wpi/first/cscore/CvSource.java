@@ -20,8 +20,9 @@ public class CvSource extends ImageSource {
    */
   public CvSource(String name, VideoMode mode) {
     super(
-        CameraServerCvJNI.createCvSource(
-            name, mode.pixelFormat.getValue(), mode.width, mode.height, mode.fps));
+        CameraServerJNI.createRawSource(
+            name, true, mode.pixelFormat.getValue(), mode.width, mode.height, mode.fps));
+    OpenCvLoader.forceStaticLoad();
   }
 
   /**
@@ -34,7 +35,8 @@ public class CvSource extends ImageSource {
    * @param fps fps
    */
   public CvSource(String name, PixelFormat pixelFormat, int width, int height, int fps) {
-    super(CameraServerCvJNI.createCvSource(name, pixelFormat.getValue(), width, height, fps));
+    super(CameraServerJNI.createRawSource(name, true, pixelFormat.getValue(), width, height, fps));
+    OpenCvLoader.forceStaticLoad();
   }
 
   /**
@@ -47,6 +49,43 @@ public class CvSource extends ImageSource {
    * @param image OpenCV image
    */
   public void putFrame(Mat image) {
-    CameraServerCvJNI.putSourceFrame(m_handle, image.nativeObj);
+    // We only support 8-bit images, convert if necessary
+    boolean cleanupRequired = false;
+    Mat finalImage;
+    if (image.depth() == 0) {
+      finalImage = image;
+    } else {
+      finalImage = new Mat();
+      image.convertTo(finalImage, 0);
+      cleanupRequired = true;
+    }
+
+    try {
+      int channels = finalImage.channels();
+      PixelFormat format;
+      if (channels == 1) {
+        format = PixelFormat.kGray;
+      } else if (channels == 3) {
+        format = PixelFormat.kBGR;
+      } else {
+        throw new VideoException("Unsupported image type");
+      }
+      // TODO old code supported BGRA, but the only way I can support that is slow.
+      // Update cscore to support BGRA for raw frames
+
+      CameraServerJNI.putRawSourceFrameData(
+          m_handle,
+          finalImage.dataAddr(),
+          (int) finalImage.total() * channels,
+          finalImage.width(),
+          finalImage.height(),
+          image.width(),
+          format.getValue());
+
+    } finally {
+      if (cleanupRequired) {
+        finalImage.release();
+      }
+    }
   }
 }
