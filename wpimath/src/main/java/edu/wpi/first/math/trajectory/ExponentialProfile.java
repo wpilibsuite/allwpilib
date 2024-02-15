@@ -191,7 +191,7 @@ public class ExponentialProfile {
     var timing = calculateProfileTiming(current, inflectionPoint, goal, u);
 
     if (t < 0) {
-      return current;
+      return new State(current.position, current.velocity);
     } else if (t < timing.inflectionTime) {
       return new State(
           computeDistanceFromTime(t, u, current), computeVelocityFromTime(t, u, current));
