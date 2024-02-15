@@ -201,7 +201,7 @@ public class ExponentialProfile {
           computeVelocityFromTime(t - timing.totalTime, -u, goal));
     } else {
       // Return a clone of goal so that the new previousProfiledReference does not refer to the
-      // same object as unprofiledReference. 
+      // same object as unprofiledReference.
       return new State(goal.position, goal.velocity);
     }
   }
