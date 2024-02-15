@@ -31,7 +31,7 @@ import java.util.Objects;
  * </code></pre>
  *
  * <p>where `unprofiledReference` is free to change between calls. Note that when the unprofiled
- * reference is within the constraints, `calculate()` returns a copy of the unprofiled reference.
+ * reference is within the constraints, `calculate()` returns the unprofiled reference unchanged.
  *
  * <p>Otherwise, a timer can be started to provide monotonic values for `calculate()` and to
  * determine when the profile has completed via `isFinished()`.
@@ -200,8 +200,6 @@ public class ExponentialProfile {
           computeDistanceFromTime(t - timing.totalTime, -u, goal),
           computeVelocityFromTime(t - timing.totalTime, -u, goal));
     } else {
-      // Return a clone of goal so that the new previousProfiledReference does not refer to the
-      // same object as unprofiledReference.
       return new State(goal.position, goal.velocity);
     }
   }
