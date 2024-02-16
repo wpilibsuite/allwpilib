@@ -524,7 +524,7 @@ static bool killExistingProgram(int timeout, int mode) {
   return true;
 }
 
-static void SetupNowRio(void) {
+static bool SetupNowRio(void) {
   nFPGA::nRoboRIO_FPGANamespace::g_currentTargetClass =
       nLoadOut::getTargetClass();
 
@@ -534,13 +534,13 @@ static void SetupNowRio(void) {
   status = dladdr(reinterpret_cast<void*>(tHMB::create), &info);
   if (status == 0) {
     fmt::print(stderr, "Failed to call dladdr on chipobject {}\n", dlerror());
-    return;
+    return false;
   }
 
   void* chipObjectLibrary = dlopen(info.dli_fname, RTLD_LAZY);
   if (chipObjectLibrary == nullptr) {
     fmt::print(stderr, "Failed to call dlopen on chipobject {}\n", dlerror());
-    return;
+    return false;
   }
 
   std::unique_ptr<tHMB> hmb;
@@ -548,9 +548,9 @@ static void SetupNowRio(void) {
   if (hmb == nullptr) {
     fmt::print(stderr, "Failed to open HMB on chipobject {}\n", status);
     dlclose(chipObjectLibrary);
-    return;
+    return false;
   }
-  wpi::impl::SetupNowRio(chipObjectLibrary, std::move(hmb));
+  return wpi::impl::SetupNowRio(chipObjectLibrary, std::move(hmb));
 }
 
 HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
@@ -593,7 +593,9 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
     setNewDataSem(nullptr);
   });
 
-  SetupNowRio();
+  if (!SetupNowRio()) {
+    return false;
+  }
 
   int32_t status = 0;
 
