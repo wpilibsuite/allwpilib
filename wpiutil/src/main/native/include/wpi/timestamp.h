@@ -77,7 +77,9 @@ template <typename T>
 bool SetupNowRio(void* chipObjectLibrary, std::unique_ptr<T> hmbObject);
 #else
 template <typename T>
-inline bool SetupNowRio(void*, std::unique_ptr<T>) { return true; }
+inline bool SetupNowRio(void*, std::unique_ptr<T>) {
+  return true;
+}
 #endif
 
 /**
