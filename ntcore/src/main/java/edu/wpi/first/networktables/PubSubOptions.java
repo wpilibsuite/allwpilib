@@ -134,5 +134,5 @@ public class PubSubOptions {
    * means updates will not be received from the network unless another subscription overlaps with
    * this one, and the subscription will not appear in metatopics.
    */
-  boolean hidden;
+  public boolean hidden;
 }
