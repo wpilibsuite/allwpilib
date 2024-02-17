@@ -611,7 +611,7 @@ LocalStorage::SubscriberData* LocalStorage::Impl::AddLocalSubscriber(
         "published as '{}')",
         topic->name, config.typeStr, topic->typeStr);
   }
-  if (m_network) {
+  if (m_network && !subscriber->config.hidden) {
     DEBUG4("-> NetworkSubscribe({})", topic->name);
     m_network->Subscribe(subscriber->handle, {{topic->name}}, config);
   }
@@ -640,7 +640,7 @@ LocalStorage::Impl::RemoveLocalSubscriber(NT_Subscriber subHandle) {
         listener.getSecond()->subscriber = nullptr;
       }
     }
-    if (m_network) {
+    if (m_network && !subscriber->config.hidden) {
       m_network->Unsubscribe(subscriber->handle);
     }
   }
@@ -676,7 +676,7 @@ LocalStorage::MultiSubscriberData* LocalStorage::Impl::AddMultiSubscriber(
       }
     }
   }
-  if (m_network) {
+  if (m_network && !subscriber->options.hidden) {
     DEBUG4("-> NetworkSubscribe");
     m_network->Subscribe(subscriber->handle, subscriber->prefixes,
                          subscriber->options);
@@ -696,7 +696,7 @@ LocalStorage::Impl::RemoveMultiSubscriber(NT_MultiSubscriber subHandle) {
         listener.getSecond()->multiSubscriber = nullptr;
       }
     }
-    if (m_network) {
+    if (m_network && !subscriber->options.hidden) {
       m_network->Unsubscribe(subscriber->handle);
     }
   }
@@ -1128,12 +1128,16 @@ void LocalStorage::Impl::StartNetwork(net::NetworkInterface* network) {
     }
   }
   for (auto&& subscriber : m_subscribers) {
-    network->Subscribe(subscriber->handle, {{subscriber->topic->name}},
-                       subscriber->config);
+    if (!subscriber->config.hidden) {
+      network->Subscribe(subscriber->handle, {{subscriber->topic->name}},
+                         subscriber->config);
+    }
   }
   for (auto&& subscriber : m_multiSubscribers) {
-    network->Subscribe(subscriber->handle, subscriber->prefixes,
-                       subscriber->options);
+    if (!subscriber->options.hidden) {
+      network->Subscribe(subscriber->handle, subscriber->prefixes,
+                         subscriber->options);
+    }
   }
 }
 

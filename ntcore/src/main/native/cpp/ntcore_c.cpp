@@ -126,6 +126,7 @@ static PubSubOptions ConvertToCpp(const NT_PubSubOptions* in) {
   out.disableRemote = in->disableRemote;
   out.disableLocal = in->disableLocal;
   out.excludeSelf = in->excludeSelf;
+  out.hidden = in->hidden;
   return out;
 }
 
