@@ -382,6 +382,7 @@ void NewDriverStationData() {
   if (gShutdown) {
     return;
   }
+  SimDriverStationData->dsAttached = true;
   cacheToUpdate->Update();
 
   JoystickDataCache* given = cacheToUpdate;
@@ -395,7 +396,6 @@ void NewDriverStationData() {
   }
   lastGiven = given;
 
-  SimDriverStationData->dsAttached = true;
   driverStation->newDataEvents.Wakeup();
   SimDriverStationData->CallNewDataCallbacks();
 }
