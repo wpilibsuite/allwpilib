@@ -146,9 +146,18 @@ sysid::TrimStepVoltageData(std::vector<PreparedData>* data,
                wpi::sgn(b.velocity) * b.acceleration;
       });
 
+  // Current limiting can delay onset of the peak acceleration, so we need to
+  // find the first acceleration *near* the max.  Magic number tolerance here
+  // because this whole file is tech debt already
+  auto accelBegins = std::find_if(
+      data->begin(), data->end(), [&maxAccel](const auto& measurement) {
+        return wpi::sgn(measurement.velocity) * measurement.acceleration >
+               0.8 * wpi::sgn(maxAccel->velocity) * maxAccel->acceleration;
+      });
+
   units::second_t velocityDelay;
-  if (maxAccel != data->end()) {
-    velocityDelay = maxAccel->timestamp - firstTimestamp;
+  if (accelBegins != data->end()) {
+    velocityDelay = accelBegins->timestamp - firstTimestamp;
 
     // Trim data before max acceleration
     data->erase(data->begin(), maxAccel);
