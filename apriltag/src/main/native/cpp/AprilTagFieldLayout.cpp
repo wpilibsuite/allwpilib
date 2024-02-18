@@ -125,3 +125,37 @@ void frc::from_json(const wpi::json& json, AprilTagFieldLayout& layout) {
   layout.m_fieldWidth =
       units::meter_t{json.at("field").at("width").get<double>()};
 }
+
+// Use namespace declaration for forward declaration
+namespace frc {
+
+// C++ generated from resource files
+std::string_view GetResource_2022_rapidreact_json();
+std::string_view GetResource_2023_chargedup_json();
+std::string_view GetResource_2024_crescendo_json();
+
+}  // namespace frc
+
+AprilTagFieldLayout AprilTagFieldLayout::LoadField(AprilTagField field) {
+  std::string_view fieldString;
+  switch (field) {
+    case AprilTagField::k2022RapidReact:
+      fieldString = GetResource_2022_rapidreact_json();
+      break;
+    case AprilTagField::k2023ChargedUp:
+      fieldString = GetResource_2023_chargedup_json();
+      break;
+    case AprilTagField::k2024Crescendo:
+      fieldString = GetResource_2024_crescendo_json();
+      break;
+    case AprilTagField::kNumFields:
+      throw std::invalid_argument("Invalid Field");
+  }
+
+  wpi::json json = wpi::json::parse(fieldString);
+  return json.get<AprilTagFieldLayout>();
+}
+
+AprilTagFieldLayout frc::LoadAprilTagLayoutField(AprilTagField field) {
+  return AprilTagFieldLayout::LoadField(field);
+}

@@ -14,6 +14,7 @@
 #include <wpi/json_fwd.h>
 
 #include "frc/apriltag/AprilTag.h"
+#include "frc/apriltag/AprilTagFields.h"
 #include "frc/geometry/Pose3d.h"
 
 namespace frc {
@@ -47,6 +48,14 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
     /// Red alliance wall, right side.
     kRedAllianceWallRightSide,
   };
+
+  /**
+   * Loads an AprilTagFieldLayout from a predefined field
+   *
+   * @param field The predefined field
+   * @return AprilTagFieldLayout of the field
+   */
+  static AprilTagFieldLayout LoadField(AprilTagField field);
 
   AprilTagFieldLayout() = default;
 
@@ -151,5 +160,16 @@ void to_json(wpi::json& json, const AprilTagFieldLayout& layout);
 
 WPILIB_DLLEXPORT
 void from_json(const wpi::json& json, AprilTagFieldLayout& layout);
+
+/**
+ * Loads an AprilTagFieldLayout from a predefined field
+ *
+ * @param field The predefined field
+ * @return AprilTagFieldLayout of the field
+ * @deprecated Use AprilTagFieldLayout::LoadField() instead
+ */
+[[deprecated("Use AprilTagFieldLayout::LoadField() instead")]]
+WPILIB_DLLEXPORT AprilTagFieldLayout
+LoadAprilTagLayoutField(AprilTagField field);
 
 }  // namespace frc

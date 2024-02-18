@@ -131,7 +131,7 @@ class Drivetrain {
   nt::DoubleArrayEntry& m_cameraToObjectEntryRef = m_cameraToObjectEntry;
 
   frc::AprilTagFieldLayout m_aprilTagFieldLayout{
-      frc::LoadAprilTagLayoutField(frc::AprilTagField::k2022RapidReact)};
+      frc::AprilTagFieldLayout::LoadField(frc::AprilTagField::k2024Crescendo)};
   frc::Pose3d m_objectInField{m_aprilTagFieldLayout.GetTagPose(0).value()};
 
   frc::PWMSparkMax m_leftLeader{1};
