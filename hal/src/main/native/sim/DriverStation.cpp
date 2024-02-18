@@ -44,6 +44,7 @@ struct JoystickDataCache {
   HAL_JoystickButtons buttons[kJoystickPorts];
   HAL_AllianceStationID allianceStation;
   double matchTime;
+  HAL_ControlWord controlWord;
 };
 static_assert(std::is_standard_layout_v<JoystickDataCache>);
 // static_assert(std::is_trivial_v<JoystickDataCache>);
@@ -65,6 +66,16 @@ void JoystickDataCache::Update() {
   }
   allianceStation = SimDriverStationData->allianceStationId;
   matchTime = SimDriverStationData->matchTime;
+
+  HAL_ControlWord tmpControlWord;
+  std::memset(&tmpControlWord, 0, sizeof(tmpControlWord));
+  tmpControlWord.enabled = SimDriverStationData->enabled;
+  tmpControlWord.autonomous = SimDriverStationData->autonomous;
+  tmpControlWord.test = SimDriverStationData->test;
+  tmpControlWord.eStop = SimDriverStationData->eStop;
+  tmpControlWord.fmsAttached = SimDriverStationData->fmsAttached;
+  tmpControlWord.dsAttached = SimDriverStationData->dsAttached;
+  this->controlWord = tmpControlWord;
 }
 
 #define CHECK_JOYSTICK_NUMBER(stickNum)                  \
@@ -322,20 +333,22 @@ HAL_Bool HAL_RefreshDSData(void) {
   if (gShutdown) {
     return false;
   }
-  HAL_ControlWord controlWord;
-  std::memset(&controlWord, 0, sizeof(controlWord));
-  controlWord.enabled = SimDriverStationData->enabled;
-  controlWord.autonomous = SimDriverStationData->autonomous;
-  controlWord.test = SimDriverStationData->test;
-  controlWord.eStop = SimDriverStationData->eStop;
-  controlWord.fmsAttached = SimDriverStationData->fmsAttached;
-  controlWord.dsAttached = SimDriverStationData->dsAttached;
+  bool dsAttached = SimDriverStationData->dsAttached;
   std::scoped_lock lock{driverStation->cacheMutex};
   JoystickDataCache* prev = currentCache.exchange(nullptr);
   if (prev != nullptr) {
     currentRead = prev;
   }
-  newestControlWord = controlWord;
+  // If newest state shows we have a DS attached, just use the
+  // control word out of the cache, As it will be the one in sync
+  // with the data. Otherwise use the state that shows disconnected.
+  if (dsAttached) {
+    newestControlWord = currentRead->controlWord;
+  } else {
+    // Zero out the control word. When the DS has never been connected
+    // this returns garbage. And there is no way we can detect that.
+    std::memset(&newestControlWord, 0, sizeof(newestControlWord));
+  }
   return prev != nullptr;
 }
 
