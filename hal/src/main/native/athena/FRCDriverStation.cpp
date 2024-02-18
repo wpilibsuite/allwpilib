@@ -543,7 +543,7 @@ HAL_Bool HAL_RefreshDSData(void) {
     // and a DS wasn't attached previously, this will still return
     // a zeroed out control word, with is the correct state for
     // no new data.
-    if (!dsAttached) {
+    if (!controlWord.dsAttached) {
       // If the DS is not attached, we need to zero out the control word.
       // This is because HAL_RefreshDSData is called asynchronously from
       // the DS data. The dsAttached variable comes directly from netcomm
@@ -554,7 +554,8 @@ HAL_Bool HAL_RefreshDSData(void) {
       // Also, when the DS has never been connected the rest of the fields
       // in control word are garbage, so we also need to zero out in that
       // case too
-      std::memset(&currentRead->controlWord, 0, sizeof(currentRead->controlWord));
+      std::memset(&currentRead->controlWord, 0,
+                  sizeof(currentRead->controlWord));
     }
     newestControlWord = currentRead->controlWord;
   }
