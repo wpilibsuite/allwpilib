@@ -78,7 +78,6 @@ void glass::DisplayFMS(FMSModel* model, bool editableDsAttached) {
   }
 
   // Game Specific Message
-  // make buffer full 64 width, null terminated, for editability
   wpi::SmallString<64> gameSpecificMessageBuf;
   std::string gameSpecificMessage{
       model->GetGameSpecificMessage(gameSpecificMessageBuf)};
