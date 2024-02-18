@@ -4,7 +4,6 @@
 
 package edu.wpi.first.apriltag;
 
-import java.io.IOException;
 import java.io.UncheckedIOException;
 
 /** Loadable AprilTag field layouts. */
@@ -36,11 +35,6 @@ public enum AprilTagFields {
    * @throws UncheckedIOException If the layout does not exist
    */
   public AprilTagFieldLayout loadAprilTagLayoutField() {
-    try {
-      return AprilTagFieldLayout.loadFromResource(m_resourceFile);
-    } catch (IOException e) {
-      throw new UncheckedIOException(
-          "Could not load AprilTagFieldLayout from " + m_resourceFile, e);
-    }
+    return AprilTagFieldLayout.loadField(this);
   }
 }
