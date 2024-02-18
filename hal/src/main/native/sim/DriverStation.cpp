@@ -334,8 +334,8 @@ HAL_Bool HAL_RefreshDSData(void) {
   JoystickDataCache* prev = currentCache.exchange(nullptr);
   if (prev != nullptr) {
     currentRead = prev;
+    newestControlWord = controlWord;
   }
-  newestControlWord = controlWord;
   return prev != nullptr;
 }
 
