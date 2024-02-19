@@ -5,6 +5,7 @@
 #include "glass/other/FMS.h"
 
 #include <imgui.h>
+#include <imgui_stdlib.h>
 #include <wpi/SmallString.h>
 
 #include "glass/DataSource.h"
@@ -58,8 +59,7 @@ void glass::DisplayFMS(FMSModel* model, bool editableDsAttached) {
   if (auto data = model->GetMatchTimeData()) {
     double val = data->GetValue();
     ImGui::SetNextItemWidth(ImGui::GetFontSize() * 8);
-    if (ImGui::InputDouble("Match Time", &val, 0, 0, "%.1f",
-                           ImGuiInputTextFlags_EnterReturnsTrue)) {
+    if (ImGui::InputDouble("Match Time", &val, 0, 0, "%.1f")) {
       model->SetMatchTime(val);
     }
     data->EmitDrag();
@@ -78,16 +78,12 @@ void glass::DisplayFMS(FMSModel* model, bool editableDsAttached) {
   }
 
   // Game Specific Message
-  // make buffer full 64 width, null terminated, for editability
-  wpi::SmallString<64> gameSpecificMessage;
-  model->GetGameSpecificMessage(gameSpecificMessage);
-  gameSpecificMessage.resize(63);
-  gameSpecificMessage.push_back('\0');
+  wpi::SmallString<64> gameSpecificMessageBuf;
+  std::string gameSpecificMessage{
+      model->GetGameSpecificMessage(gameSpecificMessageBuf)};
   ImGui::SetNextItemWidth(ImGui::GetFontSize() * 8);
-  if (ImGui::InputText("Game Specific", gameSpecificMessage.data(),
-                       gameSpecificMessage.size(),
-                       ImGuiInputTextFlags_EnterReturnsTrue)) {
-    model->SetGameSpecificMessage(gameSpecificMessage.data());
+  if (ImGui::InputText("Game Specific", &gameSpecificMessage)) {
+    model->SetGameSpecificMessage(gameSpecificMessage);
   }
 }
 
@@ -151,9 +147,10 @@ void glass::DisplayFMSReadOnly(FMSModel* model) {
     }
   }
 
-  wpi::SmallString<64> gameSpecificMessage;
-  model->GetGameSpecificMessage(gameSpecificMessage);
-  ImGui::Text("Game Specific: %s", exists ? gameSpecificMessage.c_str() : "?");
+  wpi::SmallString<64> gameSpecificMessageBuf;
+  std::string_view gameSpecificMessage =
+      model->GetGameSpecificMessage(gameSpecificMessageBuf);
+  ImGui::Text("Game Specific: %s", exists ? gameSpecificMessage.data() : "?");
 
   if (!exists) {
     ImGui::PopStyleColor();
