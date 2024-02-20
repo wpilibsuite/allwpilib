@@ -25,9 +25,9 @@ NTProfiledPIDControllerModel::NTProfiledPIDControllerModel(
       m_d{inst.GetDoubleTopic(fmt::format("{}/d", path)).GetEntry(0)},
       m_iZone{inst.GetDoubleTopic(fmt::format("{}/izone", path)).GetEntry(0)},
       m_maxVelocity{
-          inst.GetDoubleTopic(fmt::format("{}/maxvelocity", path)).GetEntry(0)},
+          inst.GetDoubleTopic(fmt::format("{}/maxVelocity", path)).GetEntry(0)},
       m_maxAcceleration{
-          inst.GetDoubleTopic(fmt::format("{}/maxacceleration", path))
+          inst.GetDoubleTopic(fmt::format("{}/maxAcceleration", path))
               .GetEntry(0)},
       m_goal{inst.GetDoubleTopic(fmt::format("{}/goal", path)).GetEntry(0)},
       m_pData{fmt::format("NTPIDCtrlP:{}", path)},

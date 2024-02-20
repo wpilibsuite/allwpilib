@@ -445,13 +445,13 @@ public class ProfiledPIDController implements Sendable {
           }
         });
     builder.addDoubleProperty(
-        "maxvelocity",
+        "maxVelocity",
         () -> getConstraints().maxVelocity,
         maxVelocity ->
             setConstraints(
                 new TrapezoidProfile.Constraints(maxVelocity, getConstraints().maxAcceleration)));
     builder.addDoubleProperty(
-        "maxacceleration",
+        "maxAcceleration",
         () -> getConstraints().maxAcceleration,
         maxAcceleration ->
             setConstraints(

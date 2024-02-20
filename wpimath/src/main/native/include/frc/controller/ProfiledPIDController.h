@@ -405,13 +405,13 @@ class ProfiledPIDController
         "izone", [this] { return GetIZone(); },
         [this](double value) { SetIZone(value); });
     builder.AddDoubleProperty(
-        "maxvelocity", [this] { return GetConstraints().maxVelocity.value(); },
+        "maxVelocity", [this] { return GetConstraints().maxVelocity.value(); },
         [this](double value) {
           SetConstraints(
               Constraints{Velocity_t{value}, GetConstraints().maxAcceleration});
         });
     builder.AddDoubleProperty(
-        "maxacceleration",
+        "maxAcceleration",
         [this] { return GetConstraints().maxAcceleration.value(); },
         [this](double value) {
           SetConstraints(
