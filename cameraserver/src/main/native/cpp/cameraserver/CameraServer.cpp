@@ -21,6 +21,7 @@
 #include <wpi/mutex.h>
 
 #include "cameraserver/CameraServerShared.h"
+#include "cscore_raw.h"
 #include "ntcore_cpp.h"
 
 using namespace frc;
@@ -563,7 +564,7 @@ cs::AxisCamera CameraServer::AddAxisCamera(std::string_view name,
 cs::MjpegServer CameraServer::AddSwitchedCamera(std::string_view name) {
   auto& inst = ::GetInstance();
   // create a dummy CvSource
-  cs::CvSource source{name, cs::VideoMode::PixelFormat::kMJPEG, 160, 120, 30};
+  cs::RawSource source{name, cs::VideoMode::PixelFormat::kMJPEG, 160, 120, 30};
   cs::MjpegServer server = StartAutomaticCapture(source);
   inst.m_fixedSources[server.GetHandle()] = source.GetHandle();
 
@@ -576,120 +577,6 @@ cs::MjpegServer CameraServer::StartAutomaticCapture(
   auto server = AddServer(fmt::format("serve_{}", camera.GetName()));
   server.SetSource(camera);
   return server;
-}
-
-cs::CvSink CameraServer::GetVideo() {
-  auto& inst = ::GetInstance();
-  cs::VideoSource source;
-  {
-    auto csShared = GetCameraServerShared();
-    std::scoped_lock lock(inst.m_mutex);
-    if (inst.m_primarySourceName.empty()) {
-      csShared->SetCameraServerError("no camera available");
-      return cs::CvSink{};
-    }
-    auto it = inst.m_sources.find(inst.m_primarySourceName);
-    if (it == inst.m_sources.end()) {
-      csShared->SetCameraServerError("no camera available");
-      return cs::CvSink{};
-    }
-    source = it->second;
-  }
-  return GetVideo(std::move(source));
-}
-
-cs::CvSink CameraServer::GetVideo(const cs::VideoSource& camera) {
-  auto& inst = ::GetInstance();
-  wpi::SmallString<64> name{"opencv_"};
-  name += camera.GetName();
-
-  {
-    std::scoped_lock lock(inst.m_mutex);
-    auto it = inst.m_sinks.find(name);
-    if (it != inst.m_sinks.end()) {
-      auto kind = it->second.GetKind();
-      if (kind != cs::VideoSink::kCv) {
-        auto csShared = GetCameraServerShared();
-        csShared->SetCameraServerError("expected OpenCV sink, but got {}",
-                                       static_cast<int>(kind));
-        return cs::CvSink{};
-      }
-      return *static_cast<cs::CvSink*>(&it->second);
-    }
-  }
-
-  cs::CvSink newsink{name.str()};
-  newsink.SetSource(camera);
-  AddServer(newsink);
-  return newsink;
-}
-
-cs::CvSink CameraServer::GetVideo(const cs::VideoSource& camera,
-                                  cs::VideoMode::PixelFormat pixelFormat) {
-  auto& inst = ::GetInstance();
-  wpi::SmallString<64> name{"opencv_"};
-  name += camera.GetName();
-
-  {
-    std::scoped_lock lock(inst.m_mutex);
-    auto it = inst.m_sinks.find(name);
-    if (it != inst.m_sinks.end()) {
-      auto kind = it->second.GetKind();
-      if (kind != cs::VideoSink::kCv) {
-        auto csShared = GetCameraServerShared();
-        csShared->SetCameraServerError("expected OpenCV sink, but got {}",
-                                       static_cast<int>(kind));
-        return cs::CvSink{};
-      }
-      return *static_cast<cs::CvSink*>(&it->second);
-    }
-  }
-
-  cs::CvSink newsink{name.str(), pixelFormat};
-  newsink.SetSource(camera);
-  AddServer(newsink);
-  return newsink;
-}
-
-cs::CvSink CameraServer::GetVideo(std::string_view name) {
-  auto& inst = ::GetInstance();
-  cs::VideoSource source;
-  {
-    std::scoped_lock lock(inst.m_mutex);
-    auto it = inst.m_sources.find(name);
-    if (it == inst.m_sources.end()) {
-      auto csShared = GetCameraServerShared();
-      csShared->SetCameraServerError("could not find camera {}", name);
-      return cs::CvSink{};
-    }
-    source = it->second;
-  }
-  return GetVideo(source);
-}
-
-cs::CvSink CameraServer::GetVideo(std::string_view name,
-                                  cs::VideoMode::PixelFormat pixelFormat) {
-  auto& inst = ::GetInstance();
-  cs::VideoSource source;
-  {
-    std::scoped_lock lock(inst.m_mutex);
-    auto it = inst.m_sources.find(name);
-    if (it == inst.m_sources.end()) {
-      auto csShared = GetCameraServerShared();
-      csShared->SetCameraServerError("could not find camera {}", name);
-      return cs::CvSink{};
-    }
-    source = it->second;
-  }
-  return GetVideo(source, pixelFormat);
-}
-
-cs::CvSource CameraServer::PutVideo(std::string_view name, int width,
-                                    int height) {
-  ::GetInstance();
-  cs::CvSource source{name, cs::VideoMode::kMJPEG, width, height, 30};
-  StartAutomaticCapture(source);
-  return source;
 }
 
 cs::MjpegServer CameraServer::AddServer(std::string_view name) {
@@ -762,4 +649,55 @@ void CameraServer::RemoveCamera(std::string_view name) {
   auto& inst = ::GetInstance();
   std::scoped_lock lock(inst.m_mutex);
   inst.m_sources.erase(name);
+}
+
+cs::VideoSource CameraServer::GetInternalPrimarySource() {
+  auto& inst = ::GetInstance();
+  auto csShared = GetCameraServerShared();
+  std::scoped_lock lock(inst.m_mutex);
+  if (inst.m_primarySourceName.empty()) {
+    csShared->SetCameraServerError("no camera available");
+    return cs::VideoSource{};
+  }
+  auto it = inst.m_sources.find(inst.m_primarySourceName);
+  if (it == inst.m_sources.end()) {
+    csShared->SetCameraServerError("no camera available");
+    return cs::VideoSource{};
+  }
+  return it->second;
+}
+
+cs::VideoSource CameraServer::GetInternalVideoSource(std::string_view name) {
+  auto& inst = ::GetInstance();
+  std::scoped_lock lock(inst.m_mutex);
+  auto it = inst.m_sources.find(name);
+  if (it == inst.m_sources.end()) {
+    auto csShared = GetCameraServerShared();
+    csShared->SetCameraServerError("could not find camera {}", name);
+    return cs::VideoSource{};
+  }
+  return it->second;
+}
+
+std::optional<CS_Sink> CameraServer::GetInternalCvSink(std::string_view name) {
+  auto& inst = ::GetInstance();
+  std::scoped_lock lock(inst.m_mutex);
+  auto it = inst.m_sinks.find(name);
+  if (it != inst.m_sinks.end()) {
+    auto kind = it->second.GetKind();
+    if (kind != cs::VideoSink::kCv) {
+      auto csShared = GetCameraServerShared();
+      csShared->SetCameraServerError("expected OpenCV sink, but got {}",
+                                      static_cast<int>(kind));
+      // Wrong type. Return an invalid handle so the caller knows
+      // to return nothing;
+      return CS_Sink{0};
+    }
+    // Correct type, return a handle with a ref added already.
+    CS_Status status = 0;
+    return cs::CopySink(it->second.GetHandle(), &status);
+  }
+  // Sink does not exist at all, return empty optional
+  // Calling code will create a new sink
+  return {};
 }

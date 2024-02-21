@@ -8,7 +8,6 @@ ext {
     sharedCvConfigs = [
         apriltagDev : [],
         apriltagTest: []]
-    staticCvConfigs = []
 
     def generateTask = createGenerateResourcesTask('main', 'APRILTAG', 'frc', project)
 

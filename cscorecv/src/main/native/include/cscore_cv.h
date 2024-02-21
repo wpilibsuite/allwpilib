@@ -12,6 +12,10 @@
 #include "cscore_oo.h"
 #include "cscore_raw.h"
 
+namespace frc {
+class CameraServerCv;
+}
+
 namespace cs {
 /**
  * A source for user code to provide OpenCV images as video frames.
@@ -21,6 +25,8 @@ namespace cs {
  */
 class CvSource : public ImageSource {
  public:
+  friend class frc::CameraServerCv;
+
   CvSource() = default;
 
   /**
@@ -84,6 +90,8 @@ class CvSource : public ImageSource {
  */
 class CvSink : public ImageSink {
  public:
+  friend class frc::CameraServerCv;
+
   CvSink() = default;
   CvSink(const CvSink& sink);
 
@@ -153,6 +161,8 @@ class CvSink : public ImageSink {
 
  private:
   constexpr int GetCvFormat(WPI_PixelFormat pixelFormat);
+
+  CvSink(CS_Sink handle, VideoMode::PixelFormat pixelFormat);
 
   wpi::RawFrame rawFrame;
   VideoMode::PixelFormat pixelFormat;
@@ -278,6 +288,11 @@ inline void CvSource::PutFrame(cv::Mat& image,
   frame.pixelFormat = pixelFormat;
   m_status = 0;
   PutSourceFrame(m_handle, frame, &m_status);
+}
+
+inline CvSink::CvSink(CS_Sink handle, VideoMode::PixelFormat pixelFormat) {
+  m_handle = handle;
+  this->pixelFormat = pixelFormat;
 }
 
 inline CvSink::CvSink(std::string_view name,
