@@ -230,12 +230,19 @@ public class AprilTagFieldLayout {
    * @throws UncheckedIOException If the layout does not exist.
    */
   public static AprilTagFieldLayout loadField(AprilTagFields field) {
-    try {
-      return loadFromResource(field.m_resourceFile);
-    } catch (IOException e) {
-      throw new UncheckedIOException(
-          "Could not load AprilTagFieldLayout from " + field.m_resourceFile, e);
+    if (field.m_FieldLayout == null) {
+      try {
+        field.m_FieldLayout = loadFromResource(field.m_resourceFile);
+      } catch (IOException e) {
+        throw new UncheckedIOException(
+            "Could not load AprilTagFieldLayout from " + field.m_resourceFile, e);
+      }
     }
+    // Copy layout because the layout's origin is mutable
+    return new AprilTagFieldLayout(
+        field.m_FieldLayout.getTags(),
+        field.m_FieldLayout.getFieldLength(),
+        field.m_FieldLayout.getFieldWidth());
   }
 
   /**

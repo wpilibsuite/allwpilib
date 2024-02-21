@@ -24,6 +24,8 @@ public enum AprilTagFields {
   /** Resource filename. */
   public final String m_resourceFile;
 
+  AprilTagFieldLayout m_FieldLayout = null;
+
   AprilTagFields(String resourceFile) {
     m_resourceFile = kBaseResourceDir + resourceFile;
   }
