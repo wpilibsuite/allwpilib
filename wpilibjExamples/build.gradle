@@ -21,6 +21,8 @@ dependencies {
     implementation project(':ntcore')
     implementation project(':cscore')
     implementation project(':cameraserver')
+    implementation project(':cscorecv')
+    implementation project(':cameraservercv')
     implementation project(':wpilibNewCommands')
     implementation project(':romiVendordep')
     implementation project(':xrpVendordep')

@@ -66,8 +66,10 @@ model {
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                 project(':ntcore').addNtcoreDependency(binary, 'shared')
                 lib project: ':cscore', library: 'cscore', linkage: 'shared'
+                lib project: ':cscorecv', library: 'cscorecv', linkage: 'shared'
                 project(':hal').addHalDependency(binary, 'shared')
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
+                lib project: ':cameraservercv', library: 'cameraservercv', linkage: 'shared'
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             }
@@ -97,8 +99,10 @@ model {
                     lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                     project(':ntcore').addNtcoreDependency(binary, 'shared')
                     lib project: ':cscore', library: 'cscore', linkage: 'shared'
+                    lib project: ':cscorecv', library: 'cscorecv', linkage: 'shared'
                     project(':hal').addHalDependency(binary, 'shared')
                     lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
+                    lib project: ':cameraservercv', library: 'cameraservercv', linkage: 'shared'
                     lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                     if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
@@ -148,8 +152,10 @@ model {
                     lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                     project(':ntcore').addNtcoreDependency(binary, 'shared')
                     lib project: ':cscore', library: 'cscore', linkage: 'shared'
+                    lib project: ':cscorecv', library: 'cscorecv', linkage: 'shared'
                     project(':hal').addHalDependency(binary, 'shared')
                     lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
+                    lib project: ':cameraservercv', library: 'cameraservercv', linkage: 'shared'
                     lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                     if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
@@ -216,8 +222,10 @@ model {
             lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
             project(':ntcore').addNtcoreDependency(it, 'shared')
             lib project: ':cscore', library: 'cscore', linkage: 'shared'
+            lib project: ':cscorecv', library: 'cscorecv', linkage: 'shared'
             project(':hal').addHalDependency(it, 'shared')
             lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
+            lib project: ':cameraservercv', library: 'cameraservercv', linkage: 'shared'
             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
