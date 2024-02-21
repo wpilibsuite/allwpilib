@@ -688,7 +688,7 @@ std::optional<CS_Sink> CameraServer::GetInternalCvSink(std::string_view name) {
     if (kind != cs::VideoSink::kCv) {
       auto csShared = GetCameraServerShared();
       csShared->SetCameraServerError("expected OpenCV sink, but got {}",
-                                      static_cast<int>(kind));
+                                     static_cast<int>(kind));
       // Wrong type. Return an invalid handle so the caller knows
       // to return nothing;
       return CS_Sink{0};
