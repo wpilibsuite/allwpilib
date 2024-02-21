@@ -9,6 +9,7 @@
 #include <thread>
 
 #include <cameraserver/CameraServer.h>
+#include <cameraservercv/CameraServerCv.h>
 #include <fmt/format.h>
 #include <frc/TimedRobot.h>
 #include <frc/apriltag/AprilTagDetection.h>
@@ -59,10 +60,10 @@ class Robot : public frc::TimedRobot {
     camera.SetResolution(640, 480);
 
     // Get a CvSink. This will capture Mats from the Camera
-    cs::CvSink cvSink = frc::CameraServer::GetVideo();
+    cs::CvSink cvSink = frc::CameraServerCv::GetVideo();
     // Setup a CvSource. This will send images back to the Dashboard
     cs::CvSource outputStream =
-        frc::CameraServer::PutVideo("Detected", 640, 480);
+        frc::CameraServerCv::PutVideo("Detected", 640, 480);
 
     // Mats are very memory expensive. Lets reuse this Mat.
     cv::Mat mat;

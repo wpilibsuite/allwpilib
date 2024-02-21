@@ -8,9 +8,10 @@ import edu.wpi.first.apriltag.AprilTagDetection;
 import edu.wpi.first.apriltag.AprilTagDetector;
 import edu.wpi.first.apriltag.AprilTagPoseEstimator;
 import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.cscore.CvSink;
-import edu.wpi.first.cscore.CvSource;
+import edu.wpi.first.cameraservercv.CameraServerCv;
 import edu.wpi.first.cscore.UsbCamera;
+import edu.wpi.first.cscorecv.CvSink;
+import edu.wpi.first.cscorecv.CvSource;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.networktables.IntegerArrayPublisher;
@@ -57,9 +58,9 @@ public class Robot extends TimedRobot {
     camera.setResolution(640, 480);
 
     // Get a CvSink. This will capture Mats from the camera
-    CvSink cvSink = CameraServer.getVideo();
+    CvSink cvSink = CameraServerCv.getVideo();
     // Setup a CvSource. This will send images back to the Dashboard
-    CvSource outputStream = CameraServer.putVideo("Detected", 640, 480);
+    CvSource outputStream = CameraServerCv.putVideo("Detected", 640, 480);
 
     // Mats are very memory expensive. Lets reuse these.
     var mat = new Mat();
