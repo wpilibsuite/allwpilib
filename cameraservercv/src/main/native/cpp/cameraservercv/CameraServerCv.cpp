@@ -4,10 +4,11 @@
 
 #include "cameraservercv/CameraServerCv.h"
 
+#include <cameraserver/CameraServer.h>
+
 #include <atomic>
 #include <vector>
 
-#include <cameraserver/CameraServer.h>
 #include <fmt/format.h>
 #include <networktables/BooleanTopic.h>
 #include <networktables/IntegerTopic.h>
