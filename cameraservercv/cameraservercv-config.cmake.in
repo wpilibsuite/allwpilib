@@ -1,0 +1,14 @@
+include(CMakeFindDependencyMacro)
+@FILENAME_DEP_REPLACE@
+@WPIUTIL_DEP_REPLACE@
+@NTCORE_DEP_REPLACE@
+@CSCORE_DEP_REPLACE@
+@CSCORECV_DEP_REPLACE@
+@CAMERASERVER_DEP_REPLACE@
+find_dependency(OpenCV)
+
+@FILENAME_DEP_REPLACE@
+include(${SELF_DIR}/cameraservercv.cmake)
+if(@WITH_JAVA@)
+    include(${SELF_DIR}/cameraservercv_jar.cmake)
+endif()

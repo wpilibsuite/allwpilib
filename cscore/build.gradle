@@ -5,10 +5,6 @@ ext {
     devMain = 'edu.wpi.first.cscore.DevMain'
 }
 
-// Removed because having the objective-cpp plugin added breaks
-// embedded tools and its toolchain check. It causes an obj-cpp
-// source set to be added to all binaries, even cross binaries
-// with no support.
 if (OperatingSystem.current().isMacOsX()) {
     apply plugin: 'objective-cpp'
 }
@@ -16,45 +12,6 @@ if (OperatingSystem.current().isMacOsX()) {
 apply from: "${rootDir}/shared/jni/setupBuild.gradle"
 
 model {
-    components {
-        cscoreJNICvStatic(JniNativeLibrarySpec) {
-            baseName = 'cscorejnicvstatic'
-
-            enableCheckTask true
-            javaCompileTasks << compileJava
-            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.roborio)
-            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.linuxarm32)
-            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.linuxarm64)
-
-            sources {
-                cpp {
-                    source {
-                        srcDirs 'src/main/native/cpp'
-                        include '**/jni/*.cpp'
-                    }
-                    exportedHeaders {
-                        srcDir 'src/main/native/include'
-                        include '**/*.h'
-                    }
-                }
-            }
-            binaries.all {
-                if (it instanceof StaticLibraryBinarySpec) {
-                    it.buildable = false
-                    return
-                }
-                lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
-
-                if (it.targetPlatform.operatingSystem.linux) {
-                    it.linker.args '-Wl,--version-script=' + file('src/main/native/LinuxSymbolScript.txt')
-                } else if (it.targetPlatform.operatingSystem.macOsX) {
-                    it.linker.args '-exported_symbols_list'
-                    it.linker.args file('src/main/native/MacSymbolScript.txt').toString()
-                }
-            }
-        }
-    }
     binaries {
         all {
             if (!it.buildable || !(it instanceof NativeBinarySpec)) {
@@ -73,16 +30,14 @@ model {
 
 
 ext {
-    sharedCvConfigs = [cscore    : [],
+    staticCvConfigs = [cscore    : [],
         cscoreBase: [],
         cscoreDev : [],
         cscoreTest: [],
-        cscoreJNIShared: []]
-    staticCvConfigs = [cscoreJNI: [],
-        cscoreJNICvStatic: []]
+        cscoreJNIShared: [],
+        cscoreJNI: []]
     useJava = true
     useCpp = true
-    cvStaticBuild = true
     splitSetup = {
         if (it.targetPlatform.operatingSystem.isMacOsX()) {
             it.sources {
@@ -146,7 +101,7 @@ examplesTree.list(new FilenameFilter() {
                 return new File(current, name).isDirectory();
             }
         }).each {
-            sharedCvConfigs.put(it, [])
+            staticCvConfigs.put(it, [])
             examplesMap.put(it, [])
         }
 
@@ -179,9 +134,6 @@ nativeUtils.exportsConfigs {
         ]
     }
     cscoreJNI {
-        x64SymbolFilter = symbolFilter
-    }
-    cscoreJNICvStatic {
         x64SymbolFilter = symbolFilter
     }
 }

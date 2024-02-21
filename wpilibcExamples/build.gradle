@@ -42,7 +42,6 @@ nativeUtils.platformConfigs.named(nativeUtils.wpi.platforms.windowsx64).configur
 
 ext {
     sharedCvConfigs = examplesMap + templatesMap + [commands: []]
-    staticCvConfigs = [:]
     useJava = false
     useCpp = true
 }

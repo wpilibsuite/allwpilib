@@ -9,7 +9,6 @@ apply from: '../shared/config.gradle'
 
 ext {
     sharedCvConfigs = [wpilibcIntegrationTests: []]
-    staticCvConfigs = [:]
     useJava = false
     useCpp = true
     staticGtestConfigs = [wpilibcIntegrationTests: []]

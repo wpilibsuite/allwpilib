@@ -16,18 +16,6 @@ dependencies {
     implementation project(':cscore')
 }
 
-ext {
-    sharedCvConfigs = [cameraserver    : [],
-        cameraserverBase: [],
-        cameraserverDev : [],
-        cameraserverTest: []]
-    staticCvConfigs = [:]
-    useJava = true
-    useCpp = true
-}
-
-apply from: "${rootDir}/shared/opencv.gradle"
-
 nativeUtils.exportsConfigs {
     cameraserver {
         x64ExcludeSymbols = [

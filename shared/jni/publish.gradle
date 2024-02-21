@@ -121,39 +121,5 @@ model {
                 version wpilibVersioning.version.get()
             }
         }
-
-        if (project.hasProperty('cvStaticBuild') && project.getProperty('cvStaticBuild') == true) {
-            def jniCvTaskList = createComponentZipTasks($.components, ["${nativeName}JNICvStatic"], jniCvStaticBaseName, Zip, project, { task, value ->
-                value.each { binary ->
-                    if (binary.buildable) {
-                        if (binary instanceof SharedLibraryBinarySpec) {
-                            task.dependsOn binary.tasks.link
-                            task.inputs.file(binary.sharedLibraryFile)
-                            task.from(binary.sharedLibraryFile) {
-                                into nativeUtils.getPlatformPath(binary) + '/shared'
-                            }
-                            def sharedPath = binary.sharedLibraryFile.absolutePath
-                            sharedPath = sharedPath.substring(0, sharedPath.length() - 4)
-
-                            task.from(new File(sharedPath + '.pdb')) {
-                                into nativeUtils.getPlatformPath(binary) + '/shared'
-                            }
-                        }
-                    }
-                }
-            })
-
-            publications {
-                jniCvStatic(MavenPublication) {
-                    jniCvTaskList.each {
-                        artifact it
-                    }
-
-                    artifactId = "${baseArtifactId}-jnicvstatic"
-                    groupId artifactGroupId
-                    version wpilibVersioning.version.get()
-                }
-            }
-        }
     }
 }
