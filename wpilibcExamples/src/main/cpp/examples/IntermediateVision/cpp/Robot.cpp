@@ -6,6 +6,7 @@
 #include <thread>
 
 #include <cameraserver/CameraServer.h>
+#include <cameraservercv/CameraServerCv.h>
 #include <frc/TimedRobot.h>
 #include <opencv2/core/core.hpp>
 #include <opencv2/core/types.hpp>
@@ -28,10 +29,10 @@ class Robot : public frc::TimedRobot {
     camera.SetResolution(640, 480);
 
     // Get a CvSink. This will capture Mats from the Camera
-    cs::CvSink cvSink = frc::CameraServer::GetVideo();
+    cs::CvSink cvSink = frc::CameraServerCv::GetVideo();
     // Setup a CvSource. This will send images back to the Dashboard
     cs::CvSource outputStream =
-        frc::CameraServer::PutVideo("Rectangle", 640, 480);
+        frc::CameraServerCv::PutVideo("Rectangle", 640, 480);
 
     // Mats are very memory expensive. Lets reuse this Mat.
     cv::Mat mat;
