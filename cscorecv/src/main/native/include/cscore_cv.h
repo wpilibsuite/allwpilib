@@ -2,8 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef CSCORE_CSCORE_CV_H_
-#define CSCORE_CSCORE_CV_H_
+#ifndef CSCORECV_CSCORE_CV_H_
+#define CSCORECV_CSCORE_CV_H_
 
 #include <functional>
 
@@ -14,7 +14,7 @@
 
 namespace frc {
 class CameraServerCv;
-}
+}  // namespace frc
 
 namespace cs {
 /**
@@ -382,4 +382,4 @@ inline uint64_t CvSink::GrabFrameNoTimeoutDirect(cv::Mat& image) {
 
 }  // namespace cs
 
-#endif  // CSCORE_CSCORE_CV_H_
+#endif  // CSCORECV_CSCORE_CV_H_
