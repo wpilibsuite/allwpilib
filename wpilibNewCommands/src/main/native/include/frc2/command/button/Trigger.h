@@ -58,6 +58,25 @@ class Trigger {
   Trigger(const Trigger& other);
 
   /**
+   * Starts the given command whenever the trigger just becomes active.
+   * 
+   * <p>Takes a raw pointer, and so is non-owning; users are responsible for the
+   * lifespan of the command.
+   * 
+   * @param command The command to bind.
+   * @return The trigger, for chained calls.
+  */
+  Trigger OnChange(Command* command);
+
+  /**
+   * Starts the given command whenever the trigger just becomes active.
+   * 
+   * @param command The command to bind.
+   * @return The trigger, for chained calls.
+  */
+  Trigger OnChange(CommandPtr&& command);
+
+  /**
    * Starts the given command whenever the condition changes from `false` to
    * `true`.
    *
