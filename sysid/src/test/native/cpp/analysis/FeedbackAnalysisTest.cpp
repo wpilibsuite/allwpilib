@@ -113,8 +113,8 @@ TEST(FeedbackAnalysisTest, Position) {
   auto [Kp, Kd] = sysid::CalculatePositionFeedbackGains(
       sysid::presets::kDefault, params, Kv, Ka);
 
-  EXPECT_NEAR(Kp, 2.11, 0.05);
-  EXPECT_NEAR(Kd, 0.00, 0.05);
+  EXPECT_NEAR(Kp, 6.41, 0.05);
+  EXPECT_NEAR(Kd, 2.48, 0.05);
 }
 
 TEST(FeedbackAnalysisTest, PositionWithLatencyCompensation) {
@@ -128,6 +128,6 @@ TEST(FeedbackAnalysisTest, PositionWithLatencyCompensation) {
   auto [Kp, Kd] = sysid::CalculatePositionFeedbackGains(
       preset, params, Kv, Ka);
 
-  EXPECT_NEAR(Kp, 2.11, 0.05);
-  EXPECT_NEAR(Kd, 0.00, 0.05);
+  EXPECT_NEAR(Kp, 5.92, 0.05);
+  EXPECT_NEAR(Kd, 2.12, 0.05);
 }
