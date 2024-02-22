@@ -125,8 +125,7 @@ TEST(FeedbackAnalysisTest, PositionWithLatencyCompensation) {
   sysid::FeedbackControllerPreset preset{sysid::presets::kDefault};
 
   preset.measurementDelay = 10_ms;
-  auto [Kp, Kd] = sysid::CalculatePositionFeedbackGains(
-      preset, params, Kv, Ka);
+  auto [Kp, Kd] = sysid::CalculatePositionFeedbackGains(preset, params, Kv, Ka);
 
   EXPECT_NEAR(Kp, 5.92, 0.05);
   EXPECT_NEAR(Kd, 2.12, 0.05);
