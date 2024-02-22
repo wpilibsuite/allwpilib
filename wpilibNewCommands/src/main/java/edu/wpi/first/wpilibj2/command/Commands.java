@@ -11,6 +11,9 @@ import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Time;
+
 /**
  * Namespace for command factory methods.
  *
@@ -113,6 +116,17 @@ public final class Commands {
    */
   public static Command waitSeconds(double seconds) {
     return new WaitCommand(seconds);
+  }
+
+  /**
+   * Constructs a command that does nothing, finishing after a specified duration.
+   *
+   * @param time after how long the command finishes
+   * @return the command
+   * @see WaitCommand
+   */
+  public static Command waitTime(Measure<Time> time) {
+    return new WaitCommand(time);
   }
 
   /**
