@@ -15,7 +15,8 @@ public class PubSubOption {
     disableRemote,
     disableLocal,
     excludePublisher,
-    excludeSelf
+    excludeSelf,
+    hidden
   }
 
   PubSubOption(Kind kind, boolean value) {
@@ -147,6 +148,18 @@ public class PubSubOption {
    */
   public static PubSubOption excludeSelf(boolean enabled) {
     return new PubSubOption(Kind.excludeSelf, enabled);
+  }
+
+  /**
+   * For subscriptions, don't share the existence of the subscription with the network. Note this
+   * means updates will not be received from the network unless another subscription overlaps with
+   * this one, and the subscription will not appear in metatopics.
+   *
+   * @param enabled True to enable, false to disable
+   * @return option
+   */
+  public static PubSubOption hidden(boolean enabled) {
+    return new PubSubOption(Kind.hidden, enabled);
   }
 
   final Kind m_kind;

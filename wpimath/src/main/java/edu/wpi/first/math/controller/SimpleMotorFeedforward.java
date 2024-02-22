@@ -37,7 +37,7 @@ public class SimpleMotorFeedforward {
       throw new IllegalArgumentException("kv must be a non-negative number, got " + kv + "!");
     }
     if (ka < 0.0) {
-      throw new IllegalArgumentException("ka must be a non-negative number, got " + kv + "!");
+      throw new IllegalArgumentException("ka must be a non-negative number, got " + ka + "!");
     }
   }
 
