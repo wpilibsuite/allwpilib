@@ -50,7 +50,7 @@ public class Trigger implements BooleanSupplier {
   }
 
   /**
-   * Starts the given command whenever the trigger just becomes active.
+   * Starts the command when the condition changes.
    * 
    * @param command the command to start
    * @return this trigger, so calls can be chained
