@@ -6,13 +6,12 @@ package edu.wpi.first.wpilibj2.command;
 
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Time;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
-
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Time;
 
 /**
  * Namespace for command factory methods.
