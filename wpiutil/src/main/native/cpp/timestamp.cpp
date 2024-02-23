@@ -277,9 +277,9 @@ uint64_t wpi::Now() {
       uint64_t cur = timestamp();
       if ((cur - last) > 100000) {
         last = cur;
-        fmt::print(
-            stderr,
-            "FPGA not yet configured in wpi::Now(). Time will not be correct.\n");
+        fmt::print(stderr,
+                   "FPGA not yet configured in wpi::Now(). Time will not be "
+                   "correct.\n");
         std::fflush(stderr);
       }
       return 1;
