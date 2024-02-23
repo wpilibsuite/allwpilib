@@ -32,7 +32,8 @@ FeedbackGains sysid::CalculatePositionFeedbackGains(
     frc::LinearQuadraticRegulator<2, 1> controller{
         system, {params.qp, params.qv}, {params.r}, preset.period};
     // Compensate for any latency from sensor measurements, filtering, etc.
-    controller.LatencyCompensate(system, preset.period, 0.0_s);
+    controller.LatencyCompensate(system, preset.period,
+                                 preset.measurementDelay);
 
     return {controller.K(0, 0) * preset.outputConversionFactor,
             controller.K(0, 1) * preset.outputConversionFactor /
@@ -47,7 +48,7 @@ FeedbackGains sysid::CalculatePositionFeedbackGains(
   frc::LinearQuadraticRegulator<1, 1> controller{
       system, {params.qp}, {params.r}, preset.period};
   // Compensate for any latency from sensor measurements, filtering, etc.
-  controller.LatencyCompensate(system, preset.period, 0.0_s);
+  controller.LatencyCompensate(system, preset.period, preset.measurementDelay);
 
   return {Kv * controller.K(0, 0) * preset.outputConversionFactor, 0.0};
 }
