@@ -273,10 +273,15 @@ uint64_t wpi::Now() {
     if (nowUseDefaultOnFailure.test()) {
       return timestamp() - offset_val;
     } else {
-      fmt::print(
-          stderr,
-          "FPGA not yet configured in wpi::Now(). Time will not be correct.\n");
-      std::fflush(stderr);
+      static uint64_t last = 0;
+      uint64_t cur = timestamp();
+      if ((cur - last) > 100000) {
+        last = cur;
+        fmt::print(
+            stderr,
+            "FPGA not yet configured in wpi::Now(). Time will not be correct.\n");
+        std::fflush(stderr);
+      }
       return 1;
     }
   }
