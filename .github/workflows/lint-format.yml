@@ -27,7 +27,7 @@ jobs:
         with:
           python-version: 3.8
       - name: Install wpiformat
-        run: pip3 install wpiformat==2023.36
+        run: pip3 install wpiformat==2024.32
       - name: Run
         run: wpiformat
       - name: Check output
