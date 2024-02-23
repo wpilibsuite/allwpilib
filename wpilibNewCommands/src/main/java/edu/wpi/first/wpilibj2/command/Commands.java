@@ -13,6 +13,8 @@ import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
+import static edu.wpi.first.units.Units.Second;
+
 /**
  * Namespace for command factory methods.
  *
@@ -125,7 +127,7 @@ public final class Commands {
    * @see WaitCommand
    */
   public static Command waitTime(Measure<Time> time) {
-    return new WaitCommand(time);
+    return new WaitCommand(time.in(Second));
   }
 
   /**
