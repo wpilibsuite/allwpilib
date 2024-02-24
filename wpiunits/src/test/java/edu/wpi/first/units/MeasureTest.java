@@ -343,5 +343,17 @@ class MeasureTest {
 
     assertTrue(Units.Feet.zero().isNear(Units.Millimeters.zero(), 0.001));
     assertFalse(Units.Feet.of(2).isNear(Units.Millimeters.of(0), 0.001));
+
+    var measureG = Units.Meters.of(1);
+    var measureH = Units.Meters.of(1.2);
+
+    assertTrue(measureG.isNear(measureH, Units.Millimeters.of(300)));
+    assertFalse(measureG.isNear(measureH, Units.Centimeters.of(10)));
+
+    measureG = measureG.negate();
+    measureH = measureH.negate();
+
+    assertTrue(measureG.isNear(measureH, Units.Millimeters.of(300)));
+    assertFalse(measureG.isNear(measureH, Units.Centimeters.of(10)));
   }
 }
