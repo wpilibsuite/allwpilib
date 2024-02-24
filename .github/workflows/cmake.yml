@@ -95,7 +95,6 @@ jobs:
         env:
           SCCACHE_GHA_ENABLED: "true"
 
-      # Build everything else fast
       - name: build
         working-directory: build
         run: cmake --build . --parallel $(nproc)
