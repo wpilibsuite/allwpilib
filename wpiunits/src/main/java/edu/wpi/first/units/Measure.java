@@ -266,8 +266,8 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
   }
 
   /**
-   * Checks if this measure is near another measure of the same unit,
-   * with a specified tolerance of the same unit.
+   * Checks if this measure is near another measure of the same unit, with a specified tolerance of
+   * the same unit.
    *
    * <pre>
    *     Meters.of(1).isNear(Meters.of(1.2), Millimeters.of(300)) // true
@@ -275,18 +275,18 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
    * </pre>
    *
    * @param other the other measure to compare against.
-   * @param tolerance the tolerance allowed in which the two measures
-   *                  are defined as near each other.
+   * @param tolerance the tolerance allowed in which the two measures are defined as near each
+   *     other.
    * @return true if this unit is near the other measure, otherwise false.
    */
   default boolean isNear(Measure<?> other, Measure<?> tolerance) {
-    if (this.unit().m_baseType != other.unit().m_baseType ||
-        other.unit().m_baseType != tolerance.unit().m_baseType) {
+    if (this.unit().m_baseType != other.unit().m_baseType
+        || other.unit().m_baseType != tolerance.unit().m_baseType) {
       return false;
     }
 
-    return Math.abs(this.baseUnitMagnitude() - other.baseUnitMagnitude()) <=
-            Math.abs(tolerance.baseUnitMagnitude());
+    return Math.abs(this.baseUnitMagnitude() - other.baseUnitMagnitude())
+        <= Math.abs(tolerance.baseUnitMagnitude());
   }
 
   /**
