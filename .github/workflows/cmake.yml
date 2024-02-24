@@ -95,20 +95,6 @@ jobs:
         env:
           SCCACHE_GHA_ENABLED: "true"
 
-      # Build wpiutil at full speed, wpimath depends on wpiutil
-      - name: build wpiutil
-        working-directory: build
-        run: cmake --build . --parallel $(nproc) --target wpiutil/all
-        env:
-          SCCACHE_GHA_ENABLED: "true"
-
-      # Build wpimath slow to prevent OOM
-      - name: build wpimath
-        working-directory: build
-        run: cmake --build . --parallel 1 --target wpimath/all
-        env:
-          SCCACHE_GHA_ENABLED: "true"
-
       # Build everything else fast
       - name: build
         working-directory: build
