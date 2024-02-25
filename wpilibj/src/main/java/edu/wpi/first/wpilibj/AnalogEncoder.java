@@ -13,7 +13,13 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
 
-/** Class for supporting continuous analog encoders, such as the US Digital MA3. */
+/**
+ * Class for supporting continuous analog encoders, such as the US Digital MA3.
+ *
+ * @deprecated Use AnalogPotentiometer instead. If rollover support is necessary,
+ * use enableRolloverSupport() on AnalogPotentiometer.
+ */
+@Deprecated(since = "2025", forRemoval = true)
 public class AnalogEncoder implements Sendable, AutoCloseable {
   private final AnalogInput m_analogInput;
   private AnalogTrigger m_analogTrigger;

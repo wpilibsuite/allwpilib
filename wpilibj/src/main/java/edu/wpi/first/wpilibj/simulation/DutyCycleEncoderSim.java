@@ -9,6 +9,7 @@ import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 
 /** Class to control a simulated duty cycle encoder. */
+@Deprecated()
 public class DutyCycleEncoderSim {
   private final SimDouble m_simPosition;
   private final SimDouble m_simDistancePerRotation;
@@ -20,6 +21,7 @@ public class DutyCycleEncoderSim {
    *
    * @param encoder DutyCycleEncoder to simulate
    */
+  @SuppressWarnings("removal")
   public DutyCycleEncoderSim(DutyCycleEncoder encoder) {
     this(encoder.getSourceChannel());
   }

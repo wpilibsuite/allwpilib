@@ -4,15 +4,21 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DutyCyclePotentiometer;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class MyRobot extends TimedRobot {
+  DutyCyclePotentiometer pot;
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
   @Override
-  public void robotInit() {}
+  public void robotInit() {
+    pot = new DutyCyclePotentiometer(0);
+    pot.setAssumedFrequency(967.77);
+  }
 
   /** This function is run once each time the robot enters autonomous mode. */
   @Override
@@ -36,5 +42,8 @@ public class MyRobot extends TimedRobot {
 
   /** This function is called periodically during all modes. */
   @Override
-  public void robotPeriodic() {}
+  public void robotPeriodic() {
+    SmartDashboard.putNumber("DC", pot.get());
+    SmartDashboard.putNumber("Freq", pot.getFrequency());
+  }
 }

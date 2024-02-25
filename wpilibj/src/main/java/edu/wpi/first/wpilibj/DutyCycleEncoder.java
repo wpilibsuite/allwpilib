@@ -16,7 +16,11 @@ import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
 /**
  * Class for supporting duty cycle/PWM encoders, such as the US Digital MA3 with PWM Output, the
  * CTRE Mag Encoder, the Rev Hex Encoder, and the AM Mag Encoder.
+ *
+ * @deprecated Use DutyCyclePotentiometer instead. Rollover support is not supported for
+ * duty cycle encoders, there is no reliable way to do so.
  */
+@Deprecated(since = "2025", forRemoval = true)
 public class DutyCycleEncoder implements Sendable, AutoCloseable {
   private final DutyCycle m_dutyCycle;
   private boolean m_ownsDutyCycle;
