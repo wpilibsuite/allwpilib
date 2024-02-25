@@ -4,7 +4,6 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.units.Measure;
