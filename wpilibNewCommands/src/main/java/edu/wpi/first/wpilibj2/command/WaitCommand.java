@@ -40,8 +40,7 @@ public class WaitCommand extends Command {
    * @param time the time to wait
    */
   public WaitCommand(Measure<Time> time) {
-    m_duration = time.in(Second);
-    SendableRegistry.setName(this, getName() + ": " + m_duration + " seconds");
+    this(time.in(Second));
   }
 
   @Override
