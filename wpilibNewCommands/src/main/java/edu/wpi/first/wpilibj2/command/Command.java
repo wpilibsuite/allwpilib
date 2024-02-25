@@ -166,7 +166,7 @@ public abstract class Command implements Sendable {
    * @return the command with the timeout added
    */
   public ParallelRaceGroup withTimeout(Measure<Time> time) {
-    return raceWith(new WaitCommand(time.in(Second)));
+    return withTimeout(time.in(Second));
   }
 
   /**

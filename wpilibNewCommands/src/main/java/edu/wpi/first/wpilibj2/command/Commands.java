@@ -126,7 +126,7 @@ public final class Commands {
    * @see WaitCommand
    */
   public static Command wait(Measure<Time> time) {
-    return new WaitCommand(time.in(Second));
+    return new WaitCommand(time);
   }
 
   /**
