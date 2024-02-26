@@ -26,6 +26,7 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
   private double m_periodNanos;
   private double m_sensorMin;
   private double m_sensorMax = 1.0;
+  private boolean m_isInverted;
 
   private SimDevice m_simDevice;
   private SimDouble m_simPosition;
@@ -121,7 +122,12 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
     pos = pos * m_fullRange - m_expectedZero;
 
     // Map from 0 - Full Range
-    return MathUtil.inputModulus(pos, 0, m_fullRange);
+    double result = MathUtil.inputModulus(pos, 0, m_fullRange);
+    // Invert if necessary
+    if (m_isInverted) {
+      return m_fullRange - result;
+    }
+    return result;
   }
 
   /**
@@ -196,6 +202,10 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
       } else {
           m_periodNanos = 1000000000 / frequency;
       }
+  }
+
+  public void SetInverted(boolean inverted) {
+    m_isInverted = inverted;
   }
 
   @Override

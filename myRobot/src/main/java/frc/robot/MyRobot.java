@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -16,7 +17,7 @@ public class MyRobot extends TimedRobot {
    */
   @Override
   public void robotInit() {
-    pot = new DutyCycleEncoder(0, 1, 0.5);
+    pot = new DutyCycleEncoder(0, 3, 0.5);
     pot.setAssumedFrequency(967.77);
   }
 
@@ -43,7 +44,11 @@ public class MyRobot extends TimedRobot {
   /** This function is called periodically during all modes. */
   @Override
   public void robotPeriodic() {
-    SmartDashboard.putNumber("DC", pot.get());
+    double val = pot.get() + 1;
+    SmartDashboard.putNumber("DC4", val);
+    SmartDashboard.putNumber("DC3", MathUtil.invertInput(val, 1, 4));
+    SmartDashboard.putNumber("DC2", MathUtil.inputModulus(pot.get(), -0.1, 0.9));
+    SmartDashboard.putNumber("DC", MathUtil.inputModulus(MathUtil.invertInput(pot.get(), 0, 1), -0.1, 0.9));
     SmartDashboard.putNumber("Freq", pot.getFrequency());
   }
 }
