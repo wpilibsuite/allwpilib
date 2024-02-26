@@ -9,7 +9,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.AnalogEncoder;
 
 /** Class to control a simulated analog encoder. */
-@Deprecated()
 public class AnalogEncoderSim {
   private final SimDouble m_simPosition;
 
@@ -18,7 +17,6 @@ public class AnalogEncoderSim {
    *
    * @param encoder AnalogEncoder to simulate
    */
-  @SuppressWarnings("removal")
   public AnalogEncoderSim(AnalogEncoder encoder) {
     SimDeviceSim wrappedSimDevice =
         new SimDeviceSim("AnalogEncoder" + "[" + encoder.getChannel() + "]");
