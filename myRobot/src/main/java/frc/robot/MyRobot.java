@@ -4,19 +4,19 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.DutyCyclePotentiometer;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class MyRobot extends TimedRobot {
-  DutyCyclePotentiometer pot;
+  DutyCycleEncoder pot;
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
   @Override
   public void robotInit() {
-    pot = new DutyCyclePotentiometer(0);
+    pot = new DutyCycleEncoder(0, 1, 0.5);
     pot.setAssumedFrequency(967.77);
   }
 
