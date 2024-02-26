@@ -22,6 +22,7 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
   private double m_expectedZero;
   private double m_sensorMin;
   private double m_sensorMax = 1.0;
+  private boolean m_isInverted;
 
   private SimDevice m_simDevice;
   private SimDouble m_simPosition;
@@ -93,7 +94,12 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
     pos = pos * m_fullRange - m_expectedZero;
 
     // Map from 0 - Full Range
-    return MathUtil.inputModulus(pos, 0, m_fullRange);
+    double result = MathUtil.inputModulus(pos, 0, m_fullRange);
+    // Invert if necessary
+    if (m_isInverted) {
+      return m_fullRange - result;
+    }
+    return result;
   }
 
   /**
@@ -107,6 +113,10 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
   public void setVoltagePercentageRange(double min, double max) {
     m_sensorMin = MathUtil.clamp(min, 0.0, 1.0);
     m_sensorMax = MathUtil.clamp(max, 0.0, 1.0);
+  }
+
+  public void SetInverted(boolean inverted) {
+    m_isInverted = inverted;
   }
 
 

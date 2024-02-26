@@ -125,6 +125,10 @@ public final class MathUtil {
     return input;
   }
 
+  public static double invertInput(double input, double minimumInput, double maximumInput) {
+    return maximumInput - input + minimumInput;
+  }
+
   /**
    * Wraps an angle to the range -pi to pi radians.
    *
