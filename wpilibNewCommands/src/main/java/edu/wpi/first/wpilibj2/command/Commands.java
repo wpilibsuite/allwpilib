@@ -113,7 +113,7 @@ public final class Commands {
    * @return the command
    * @see WaitCommand
    */
-  public static Command waitTime(double seconds) {
+  public static Command waitSeconds(double seconds) {
     return new WaitCommand(seconds);
   }
 
@@ -124,7 +124,7 @@ public final class Commands {
    * @return the command
    * @see WaitCommand
    */
-  public static Command waitTime(Measure<Time> time) {
+  public static Command wait(Measure<Time> time) {
     return new WaitCommand(time);
   }
 
