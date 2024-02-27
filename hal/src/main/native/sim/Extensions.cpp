@@ -41,6 +41,7 @@ static wpi::recursive_spinlock gExtensionRegistryMutex;
 static std::vector<std::pair<const char*, void*>> gExtensionRegistry;
 static std::vector<std::pair<void*, void (*)(void*, const char*, void*)>>
     gExtensionListeners;
+static std::vector<std::string> gExplicitExtensions;
 
 namespace hal::init {
 void InitializeExtensions() {}
@@ -100,14 +101,20 @@ int HAL_LoadExtensions(void) {
   int rc = 1;
   wpi::SmallVector<std::string_view, 2> libraries;
   const char* e = std::getenv("HALSIM_EXTENSIONS");
-  if (!e) {
+  if (e) {
+    wpi::split(e, libraries, DELIM, -1, false);
+  }
+  for (auto&& expl : gExplicitExtensions) {
+    std::string_view view = expl;
+    libraries.emplace_back(view);
+  }
+  if (libraries.empty()) {
     if (GetShowNotFoundMessage()) {
       std::puts("HAL Extensions: No extensions found");
       std::fflush(stdout);
     }
     return rc;
   }
-  wpi::split(e, libraries, DELIM, -1, false);
   for (auto& library : libraries) {
     rc = HAL_LoadOneExtension(std::string(library).c_str());
     if (rc < 0) {
@@ -137,6 +144,10 @@ void HAL_RegisterExtensionListener(void* param,
 
 void HAL_SetShowExtensionsNotFoundMessages(HAL_Bool showMessage) {
   GetShowNotFoundMessage() = showMessage;
+}
+
+void HAL_AddExplicitExtension(const char* extensionPath) {
+  gExplicitExtensions.emplace_back(extensionPath);
 }
 
 }  // extern "C"

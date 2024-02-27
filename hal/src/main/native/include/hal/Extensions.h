@@ -91,6 +91,13 @@ void HAL_SetShowExtensionsNotFoundMessages(HAL_Bool showMessage);
  */
 void HAL_OnShutdown(void* param, void (*func)(void*));
 
+/**
+ * Adds an extension to be loaded when HAL_LoadExtensions is called
+ * internally. Libraries will be loaded in addition to HALSIM_EXTENSIONS,
+ * without checking for duplicates.
+ */
+void HAL_AddExplicitExtension(const char* extensionPath);
+
 #ifdef __cplusplus
 }  // extern "C"
 #endif
