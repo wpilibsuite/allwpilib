@@ -124,7 +124,7 @@ public final class Commands {
    * @return the command
    * @see WaitCommand
    */
-  public static Command wait(Measure<Time> time) {
+  public static Command waitTime(Measure<Time> time) {
     return new WaitCommand(time);
   }
 
