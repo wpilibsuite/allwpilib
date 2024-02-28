@@ -23,7 +23,9 @@ public interface LEDReader {
    * @return the LED color
    * @throws IndexOutOfBoundsException if the index is negative or greater than {@link #getLength()}
    */
-  Color getLED(int index);
+  default Color getLED(int index) {
+    return new Color(getRed(index) / 255.0, getGreen(index) / 255.0, getBlue(index) / 255.0);
+  }
 
   /**
    * Gets the most recently written color for a particular LED in the buffer.
@@ -32,7 +34,9 @@ public interface LEDReader {
    * @return the LED color
    * @throws IndexOutOfBoundsException if the index is negative or greater than {@link #getLength()}
    */
-  Color8Bit getLED8Bit(int index);
+  default Color8Bit getLED8Bit(int index) {
+    return new Color8Bit(getRed(index), getGreen(index), getBlue(index));
+  }
 
   /**
    * Gets the red channel of the color at the specified index.
