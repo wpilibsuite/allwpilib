@@ -238,8 +238,8 @@ public class Color {
   }
 
   /**
-   * Packs 3 RGB values into a single 32-bit integer. These values can be unpacked with
-   * {@link #unpackRGB(int, RGBChannel)} to retrieve the values. This is helpful for avoiding memory
+   * Packs 3 RGB values into a single 32-bit integer. These values can be unpacked with {@link
+   * #unpackRGB(int, RGBChannel)} to retrieve the values. This is helpful for avoiding memory
    * allocations of new {@code Color} objects and its resulting garbage collector pressure.
    *
    * @param r the value of the first channel to pack
