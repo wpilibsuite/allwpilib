@@ -41,7 +41,6 @@ class Wrist : public frc2::PIDSubsystem {
 
  private:
   frc::PWMSparkMax m_motor{6};
-  double m_setpoint = 0;
 
 // Conversion value of potentiometer varies between the real world and
 // simulation
