@@ -173,7 +173,9 @@ public interface LEDPattern {
    * segment that's only 5 LEDs long (assuming equal LED density on both segments).
    *
    * <p>For example, scrolling a pattern by one quarter of any LED strip's length per second,
-   * regardless of the total number of LEDs on that strip:<pre>
+   * regardless of the total number of LEDs on that strip:
+   *
+   * <pre>
    *   LEDPattern rainbow = LEDPattern.rainbow(255, 255);
    *   LEDPattern scrollingRainbow = rainbow.scrollAtRelativeSpeed(Percent.per(Second).of(25));
    * </pre>
@@ -208,14 +210,17 @@ public interface LEDPattern {
    * Creates a pattern that plays this one scrolling up an LED strip. A negative velocity makes the
    * pattern play in reverse.
    *
-   * <p>For example, scrolling a pattern at 4 inches per second along an LED strip with 60 LEDs
-   * per meter:<pre>
+   * <p>For example, scrolling a pattern at 4 inches per second along an LED strip with 60 LEDs per
+   * meter:
+   *
+   * <pre>
    *   // LEDs per meter, a known value taken from the spec sheet of our particular LED strip
    *   Measure&lt;Distance&gt; LED_SPACING = Meters.of(1.0 / 60);
    *
    *   LEDPattern rainbow = LEDPattern.rainbow();
    *   LEDPattern scrollingRainbow = rainbow.scrollAtAbsoluteSpeed(InchesPerSecond.of(4), LED_SPACING);
    * </pre>
+   *
    * Note that this pattern will scroll <i>faster</i> if applied to a less dense LED strip (such as
    * 30 LEDs per meter), or <i>slower</i> if applied to a denser LED strip (such as 120 or 144 LEDs
    * per meter).

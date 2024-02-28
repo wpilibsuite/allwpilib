@@ -6,7 +6,6 @@ package edu.wpi.first.wpilibj;
 
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
-import edu.wpi.first.util.ErrorMessages;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 
@@ -35,10 +34,10 @@ public class AddressableLEDBufferView implements LEDReader, LEDWriter {
   public <B extends LEDReader & LEDWriter> AddressableLEDBufferView(
       B backingBuffer, int startingIndex, int endingIndex) {
     this(
-      requireNonNullParam(backingBuffer, "backingBuffer", "AddressableLEDBufferView"),
-      backingBuffer,
-      startingIndex,
-      endingIndex);
+        requireNonNullParam(backingBuffer, "backingBuffer", "AddressableLEDBufferView"),
+        backingBuffer,
+        startingIndex,
+        endingIndex);
   }
 
   /**
