@@ -32,7 +32,7 @@ class AddressableLEDBufferViewTest {
   }
 
   @Test
-  void reversed() {
+  void manualReversed() {
     var buffer = new AddressableLEDBuffer(10);
     var view = new AddressableLEDBufferView(buffer, 8, 2);
 
@@ -46,7 +46,7 @@ class AddressableLEDBufferViewTest {
   }
 
   @Test
-  void fullReversed() {
+  void fullManualReversed() {
     var buffer = new AddressableLEDBuffer(10);
     var view = new AddressableLEDBufferView(buffer, 9, 0);
     view.setLED(0, Color.kWhite);
@@ -54,5 +54,16 @@ class AddressableLEDBufferViewTest {
 
     buffer.setLED(8, Color.kRed);
     assertEquals(Color.kRed, view.getLED(1));
+  }
+
+  @Test
+  void reversed() {
+    var buffer = new AddressableLEDBuffer(10);
+    var view = new AddressableLEDBufferView(buffer, 0, 9).reversed();
+    view.setLED(0, Color.kWhite);
+    assertEquals(Color.kWhite, buffer.getLED(9));
+
+    view.setLED(9, Color.kRed);
+    assertEquals(Color.kRed, buffer.getLED(0));
   }
 }
