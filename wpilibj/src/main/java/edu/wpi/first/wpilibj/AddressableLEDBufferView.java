@@ -4,6 +4,9 @@
 
 package edu.wpi.first.wpilibj;
 
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
+
+import edu.wpi.first.util.ErrorMessages;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 
@@ -14,7 +17,8 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
  * whole) that can be animated individually without modifying LEDs outside those sections.
  */
 public class AddressableLEDBufferView implements LEDReader, LEDWriter {
-  private final AddressableLEDBuffer m_backingBuffer;
+  private final LEDReader m_backingReader;
+  private final LEDWriter m_backingWriter;
   private final int m_startingIndex;
   private final int m_endingIndex;
   private final int m_length;
@@ -28,16 +32,40 @@ public class AddressableLEDBufferView implements LEDReader, LEDWriter {
    * @param startingIndex the index of the LED in the backing buffer that the view should start from
    * @param endingIndex the index of the LED in the backing buffer that the view should end on
    */
+  public <B extends LEDReader & LEDWriter> AddressableLEDBufferView(
+      B backingBuffer, int startingIndex, int endingIndex) {
+    this(
+      requireNonNullParam(backingBuffer, "backingBuffer", "AddressableLEDBufferView"),
+      backingBuffer,
+      startingIndex,
+      endingIndex);
+  }
+
+  /**
+   * Creates a new view of a buffer. A view will be reversed if the starting index is after the
+   * ending index; writing front-to-back in the view will write in the back-to-front direction on
+   * the underlying buffer.
+   *
+   * @param backingReader the backing LED data reader
+   * @param backingWriter the backing LED data writer
+   * @param startingIndex the index of the LED in the backing buffer that the view should start from
+   * @param endingIndex the index of the LED in the backing buffer that the view should end on
+   */
   public AddressableLEDBufferView(
-      AddressableLEDBuffer backingBuffer, int startingIndex, int endingIndex) {
-    if (startingIndex < 0 || startingIndex >= backingBuffer.getLength()) {
+      LEDReader backingReader, LEDWriter backingWriter, int startingIndex, int endingIndex) {
+    requireNonNullParam(backingReader, "backingReader", "AddressableLEDBufferView");
+    requireNonNullParam(backingWriter, "backingWriter", "AddressableLEDBufferView");
+
+    if (startingIndex < 0 || startingIndex >= backingReader.getLength()) {
       throw new IndexOutOfBoundsException("Start index out of range: " + startingIndex);
     }
-    if (endingIndex < 0 || endingIndex >= backingBuffer.getLength()) {
+    if (endingIndex < 0 || endingIndex >= backingReader.getLength()) {
       throw new IndexOutOfBoundsException("End index out of range: " + endingIndex);
     }
 
-    m_backingBuffer = backingBuffer;
+    m_backingReader = backingReader;
+    m_backingWriter = backingWriter;
+
     m_startingIndex = startingIndex;
     m_endingIndex = endingIndex;
     m_length = Math.abs(endingIndex - startingIndex) + 1;
@@ -45,13 +73,13 @@ public class AddressableLEDBufferView implements LEDReader, LEDWriter {
 
   /**
    * Creates a view that operates on the same range as this one, but goes in reverse order. This is
-   * useful for serpentine runs of LED strips connected front-to-front; simply reverse the view for
-   * one side and animations will move in the same physical direction along both strips.
+   * useful for serpentine runs of LED strips connected front-to-end; simply reverse the view for
+   * reversed sections and animations will move in the same physical direction along both strips.
    *
    * @return the reversed view
    */
   public AddressableLEDBufferView reversed() {
-    return new AddressableLEDBufferView(m_backingBuffer, m_endingIndex, m_startingIndex);
+    return new AddressableLEDBufferView(this, m_length - 1, 0);
   }
 
   @Override
@@ -61,32 +89,34 @@ public class AddressableLEDBufferView implements LEDReader, LEDWriter {
 
   @Override
   public void setRGB(int index, int r, int g, int b) {
-    m_backingBuffer.setRGB(nativeIndex(index), r, g, b);
+    m_backingWriter.setRGB(nativeIndex(index), r, g, b);
   }
 
   @Override
   public Color getLED(int index) {
-    return m_backingBuffer.getLED(nativeIndex(index));
+    // override to delegate to the backing buffer to avoid 3x native index lookups & bounds checks
+    return m_backingReader.getLED(nativeIndex(index));
   }
 
   @Override
   public Color8Bit getLED8Bit(int index) {
-    return m_backingBuffer.getLED8Bit(nativeIndex(index));
+    // override to delegate to the backing buffer to avoid 3x native index lookups & bounds checks
+    return m_backingReader.getLED8Bit(nativeIndex(index));
   }
 
   @Override
   public int getRed(int index) {
-    return m_backingBuffer.getRed(nativeIndex(index));
+    return m_backingReader.getRed(nativeIndex(index));
   }
 
   @Override
   public int getGreen(int index) {
-    return m_backingBuffer.getGreen(nativeIndex(index));
+    return m_backingReader.getGreen(nativeIndex(index));
   }
 
   @Override
   public int getBlue(int index) {
-    return m_backingBuffer.getBlue(nativeIndex(index));
+    return m_backingReader.getBlue(nativeIndex(index));
   }
 
   /**
@@ -104,6 +134,8 @@ public class AddressableLEDBufferView implements LEDReader, LEDWriter {
    *
    * @param viewIndex the view-local index
    * @return the corresponding global index
+   * @throws IndexOutOfBoundsException if the view index is not contained withing the bounds of this
+   *     view
    */
   private int nativeIndex(int viewIndex) {
     if (isReversed()) {
