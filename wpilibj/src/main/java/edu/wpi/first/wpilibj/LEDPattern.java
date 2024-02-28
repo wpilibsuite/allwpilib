@@ -38,6 +38,7 @@ import java.util.function.BooleanSupplier;
  *
  *     public LEDs() {
  *       m_led.setLength(120);
+ *       m_led.start();
  *     }
  *
  *    {@literal @}Override
@@ -55,7 +56,7 @@ import java.util.function.BooleanSupplier;
  * sections of the same LED strip, since the roboRIO can only drive a single LED strip). In this
  * example, we split the single buffer into two views - one for the section of the LED strip on the
  * left side of a robot, and another view for the section of LEDs on the right side. The same
- * pattern is able to be applied to both sides
+ * pattern is able to be applied to both sides.
  *
  * <pre><code>
  *   public class LEDs extends SubsystemBase {
@@ -65,7 +66,8 @@ import java.util.function.BooleanSupplier;
  *     private final AddressableLEDBufferView m_rightData = m_ledData.createView(30, 59).reversed();
  *
  *     public LEDs() {
- *       m_led.setLength(120);
+ *       m_led.setLength(60);
+ *       m_led.start();
  *     }
  *
  *    {@literal @}Override
@@ -96,7 +98,8 @@ public interface LEDPattern {
    * <p>This method is intentionally designed to use separate objects for reading and writing data.
    * By splitting them up, we can easily modify the behavior of some base pattern to make it {@link
    * #scrollAtRelativeSpeed(Measure) scroll}, {@link #blink(Measure, Measure) blink}, or {@link
-   * #breathe(Measure) breathe}.
+   * #breathe(Measure) breathe} by intercepting the data writes to transform their behavior to
+   * whatever we like.
    *
    * @param reader data reader for accessing buffer length and current colors
    * @param writer data writer for setting new LED colors on the buffer
@@ -125,9 +128,17 @@ public interface LEDPattern {
   }
 
   /**
-   * Creates a pattern that plays this one in reverse. Has no effect on non-animated patterns.
+   * Creates a pattern that displays this one in reverse. Scrolling patterns will scroll in the
+   * opposite direction (but at the same speed). It will treat the end of an LED strip as the start,
+   * and the start of the strip as the end. This can be useful for making ping-pong patterns that
+   * travel from one end of an LED strip to the other, then reverse direction and move back to the
+   * start. This can also be useful when working with LED strips connected in a serpentine pattern
+   * (where the start of one strip is connected to the end of the previous one); however, consider
+   * using a {@link AddressableLEDBufferView#reversed() reversed view} of the overall buffer for
+   * that segment rather than reversing patterns.
    *
    * @return the reverse pattern
+   * @see AddressableLEDBufferView#reversed()
    */
   default LEDPattern reversed() {
     return (reader, writer) -> {
@@ -161,6 +172,12 @@ public interface LEDPattern {
    * strip; scrolling across a segment that is 10 LEDs long will travel twice as fast as on a
    * segment that's only 5 LEDs long (assuming equal LED density on both segments).
    *
+   * <p>For example, scrolling a pattern by one quarter of any LED strip's length per second,
+   * regardless of the total number of LEDs on that strip:<pre>
+   *   LEDPattern rainbow = LEDPattern.rainbow(255, 255);
+   *   LEDPattern scrollingRainbow = rainbow.scrollAtRelativeSpeed(Percent.per(Second).of(25));
+   * </pre>
+   *
    * @param velocity how fast the pattern should move, in terms of how long it takes to do a full
    *     scroll along the length of LEDs and return back to the starting position
    * @return the scrolling pattern
@@ -190,6 +207,18 @@ public interface LEDPattern {
   /**
    * Creates a pattern that plays this one scrolling up an LED strip. A negative velocity makes the
    * pattern play in reverse.
+   *
+   * <p>For example, scrolling a pattern at 4 inches per second along an LED strip with 60 LEDs
+   * per meter:<pre>
+   *   // LEDs per meter, a known value taken from the spec sheet of our particular LED strip
+   *   Measure&lt;Distance&gt; LED_SPACING = Meters.of(1.0 / 60);
+   *
+   *   LEDPattern rainbow = LEDPattern.rainbow();
+   *   LEDPattern scrollingRainbow = rainbow.scrollAtAbsoluteSpeed(InchesPerSecond.of(4), LED_SPACING);
+   * </pre>
+   * Note that this pattern will scroll <i>faster</i> if applied to a less dense LED strip (such as
+   * 30 LEDs per meter), or <i>slower</i> if applied to a denser LED strip (such as 120 or 144 LEDs
+   * per meter).
    *
    * @param velocity how fast the pattern should move along a physical LED strip
    * @param ledSpacing the distance between adjacent LEDs on the physical LED strip
