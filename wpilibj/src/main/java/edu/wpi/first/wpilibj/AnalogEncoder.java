@@ -48,6 +48,25 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
     init(fullRange, expectedZero);
   }
 
+  /**
+   * Construct a new AnalogEncoder attached to a specific AnalogIn channel.
+   *
+   * @param channel the analog input channel to attach to
+   */
+  public AnalogEncoder(int channel) {
+    this(channel, 1.0, 0.0);
+  }
+
+  /**
+   * Construct a new AnalogEncoder attached to a specific AnalogInput.
+   *
+   * @param analogInput the analog input to attach to
+   */
+  @SuppressWarnings("this-escape")
+  public AnalogEncoder(AnalogInput analogInput) {
+    this(analogInput, 1.0, 0.0);
+  }
+
   private void init(double fullRange, double expectedZero) {
     m_simDevice = SimDevice.create("AnalogEncoder", m_analogInput.getChannel());
 
@@ -76,7 +95,8 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
   /**
    * Get the encoder value since the last reset.
    *
-   * <p>This is reported in rotations since the last reset.
+   * <p>
+   * This is reported in rotations since the last reset.
    *
    * @return the encoder value in rotations
    */
@@ -115,10 +135,9 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
     m_sensorMax = MathUtil.clamp(max, 0.0, 1.0);
   }
 
-  public void SetInverted(boolean inverted) {
+  public void setInverted(boolean inverted) {
     m_isInverted = inverted;
   }
-
 
   /**
    * Get the channel number.
