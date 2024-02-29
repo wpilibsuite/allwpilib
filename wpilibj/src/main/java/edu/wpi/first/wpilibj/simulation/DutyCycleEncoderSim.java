@@ -43,12 +43,12 @@ public class DutyCycleEncoderSim {
   }
 
   /**
-   * Set the position in turns.
+   * Set the position.
    *
    * @param turns The position.
    */
-  public void set(double turns) {
-    m_simPosition.set(turns);
+  public void set(double value) {
+    m_simPosition.set(value);
   }
 
   /**
