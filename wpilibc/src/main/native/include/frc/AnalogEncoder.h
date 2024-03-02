@@ -106,7 +106,6 @@ class AnalogEncoder : public wpi::Sendable,
   double MapSensorRange(double pos) const;
 
   std::shared_ptr<AnalogInput> m_analogInput;
-  bool m_ownsAnalogInput;
   double m_fullRange;
   double m_expectedZero;
   double m_sensorMin{0.0};
