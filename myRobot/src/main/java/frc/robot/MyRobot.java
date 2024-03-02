@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class MyRobot extends TimedRobot {
   DutyCycleEncoder pot;
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -48,7 +49,8 @@ public class MyRobot extends TimedRobot {
     SmartDashboard.putNumber("DC4", val);
     SmartDashboard.putNumber("DC3", MathUtil.invertInput(val, 1, 4));
     SmartDashboard.putNumber("DC2", MathUtil.inputModulus(pot.get(), -0.1, 0.9));
-    SmartDashboard.putNumber("DC", MathUtil.inputModulus(MathUtil.invertInput(pot.get(), 0, 1), -0.1, 0.9));
+    SmartDashboard.putNumber(
+        "DC", MathUtil.inputModulus(MathUtil.invertInput(pot.get(), 0, 1), -0.1, 0.9));
     SmartDashboard.putNumber("Freq", pot.getFrequency());
   }
 }

@@ -100,28 +100,32 @@ class DutyCycleEncoder : public wpi::Sendable,
    *
    * @param dutyCycle the duty cycle to attach to
    */
-  DutyCycleEncoder(std::shared_ptr<DutyCycle> dutyCycle, double fullRange, double expectedZero);
+  DutyCycleEncoder(std::shared_ptr<DutyCycle> dutyCycle, double fullRange,
+                   double expectedZero);
 
   /**
    * Construct a new DutyCycleEncoder attached to a DigitalSource object.
    *
    * @param digitalSource the digital source to attach to
    */
-  DutyCycleEncoder(DigitalSource& digitalSource, double fullRange, double expectedZero);
+  DutyCycleEncoder(DigitalSource& digitalSource, double fullRange,
+                   double expectedZero);
 
   /**
    * Construct a new DutyCycleEncoder attached to a DigitalSource object.
    *
    * @param digitalSource the digital source to attach to
    */
-  DutyCycleEncoder(DigitalSource* digitalSource, double fullRange, double expectedZero);
+  DutyCycleEncoder(DigitalSource* digitalSource, double fullRange,
+                   double expectedZero);
 
   /**
    * Construct a new DutyCycleEncoder attached to a DigitalSource object.
    *
    * @param digitalSource the digital source to attach to
    */
-  DutyCycleEncoder(std::shared_ptr<DigitalSource> digitalSource, double fullRange, double expectedZero);
+  DutyCycleEncoder(std::shared_ptr<DigitalSource> digitalSource,
+                   double fullRange, double expectedZero);
 
   ~DutyCycleEncoder() override = default;
 

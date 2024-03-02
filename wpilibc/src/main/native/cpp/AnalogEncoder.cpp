@@ -10,8 +10,8 @@
 #include "frc/AnalogInput.h"
 #include "frc/Counter.h"
 #include "frc/Errors.h"
-#include "frc/RobotController.h"
 #include "frc/MathUtil.h"
+#include "frc/RobotController.h"
 
 using namespace frc;
 

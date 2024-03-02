@@ -13,8 +13,7 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
 
 /**
- * Class for supporting duty cycle/PWM encoders, such as the US Digital MA3 with
- * PWM Output, the
+ * Class for supporting duty cycle/PWM encoders, such as the US Digital MA3 with PWM Output, the
  * CTRE Mag Encoder, the Rev Hex Encoder, and the AM Mag Encoder.
  */
 public class DutyCycleEncoder implements Sendable, AutoCloseable {
@@ -128,8 +127,7 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
   /**
    * Get the encoder value since the last reset.
    *
-   * <p>
-   * This is reported in rotations since the last reset.
+   * <p>This is reported in rotations since the last reset.
    *
    * @return the encoder value in rotations
    */
@@ -163,16 +161,11 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
   }
 
   /**
-   * Set the encoder duty cycle range. As the encoder needs to maintain a duty
-   * cycle, the duty cycle
-   * cannot go all the way to 0% or all the way to 100%. For example, an encoder
-   * with a 4096 us
-   * period might have a minimum duty cycle of 1 us / 4096 us and a maximum duty
-   * cycle of 4095 /
-   * 4096 us. Setting the range will result in an encoder duty cycle less than or
-   * equal to the
-   * minimum being output as 0 rotation, the duty cycle greater than or equal to
-   * the maximum being
+   * Set the encoder duty cycle range. As the encoder needs to maintain a duty cycle, the duty cycle
+   * cannot go all the way to 0% or all the way to 100%. For example, an encoder with a 4096 us
+   * period might have a minimum duty cycle of 1 us / 4096 us and a maximum duty cycle of 4095 /
+   * 4096 us. Setting the range will result in an encoder duty cycle less than or equal to the
+   * minimum being output as 0 rotation, the duty cycle greater than or equal to the maximum being
    * output as 1 rotation, and values in between linearly scaled from 0 to 1.
    *
    * @param min minimum duty cycle (0-1 range)
@@ -195,11 +188,8 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
   /**
    * Get if the sensor is connected
    *
-   * <p>
-   * This uses the duty cycle frequency to determine if the sensor is connected.
-   * By default, a
-   * value of 100 Hz is used as the threshold, and this value can be changed with
-   * {@link
+   * <p>This uses the duty cycle frequency to determine if the sensor is connected. By default, a
+   * value of 100 Hz is used as the threshold, and this value can be changed with {@link
    * #setConnectedFrequencyThreshold(int)}.
    *
    * @return true if the sensor is connected
@@ -212,8 +202,7 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
   }
 
   /**
-   * Change the frequency threshold for detecting connection used by
-   * {@link #isConnected()}.
+   * Change the frequency threshold for detecting connection used by {@link #isConnected()}.
    *
    * @param frequency the minimum frequency in Hz.
    */
@@ -228,12 +217,10 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
   /**
    * Sets the assumed frequency of the connected device.
    *
-   * <p>
-   * By default, the DutyCycle engine has to compute the frequency of the input
-   * signal. This can result in both delayed readings and jumpy readings. To solve
-   * this, you can pass the expected frequency of the sensor to this function.
-   * This will use that frequency to compute the DutyCycle percentage, rather than
-   * the computed frequency.
+   * <p>By default, the DutyCycle engine has to compute the frequency of the input signal. This can
+   * result in both delayed readings and jumpy readings. To solve this, you can pass the expected
+   * frequency of the sensor to this function. This will use that frequency to compute the DutyCycle
+   * percentage, rather than the computed frequency.
    *
    * @param frequency
    */
