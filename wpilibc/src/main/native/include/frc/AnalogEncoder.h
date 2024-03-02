@@ -62,21 +62,24 @@ class AnalogEncoder : public wpi::Sendable,
    *
    * @param analogInput the analog input to attach to
    */
-  AnalogEncoder(AnalogInput& analogInput, double fullRange, double expectedZero);
+  AnalogEncoder(AnalogInput& analogInput, double fullRange,
+                double expectedZero);
 
   /**
    * Construct a new AnalogEncoder attached to a specific AnalogInput.
    *
    * @param analogInput the analog input to attach to
    */
-  AnalogEncoder(AnalogInput* analogInput, double fullRange, double expectedZero);
+  AnalogEncoder(AnalogInput* analogInput, double fullRange,
+                double expectedZero);
 
   /**
    * Construct a new AnalogEncoder attached to a specific AnalogInput.
    *
    * @param analogInput the analog input to attach to
    */
-  AnalogEncoder(std::shared_ptr<AnalogInput> analogInput, double fullRange, double expectedZero);
+  AnalogEncoder(std::shared_ptr<AnalogInput> analogInput, double fullRange,
+                double expectedZero);
 
   ~AnalogEncoder() override = default;
 

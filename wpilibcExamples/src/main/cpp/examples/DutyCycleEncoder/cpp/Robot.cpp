@@ -3,9 +3,9 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <frc/DutyCycleEncoder.h>
+#include <frc/MathUtil.h>
 #include <frc/TimedRobot.h>
 #include <frc/smartdashboard/SmartDashboard.h>
-#include <frc/MathUtil.h>
 
 constexpr double fullRange = 1.3;
 constexpr double expectedZero = 0.0;

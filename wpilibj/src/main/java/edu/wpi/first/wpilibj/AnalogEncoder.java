@@ -13,9 +13,7 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
 
-/**
- * Class for supporting continuous analog encoders, such as the US Digital MA3.
- */
+/** Class for supporting continuous analog encoders, such as the US Digital MA3. */
 public class AnalogEncoder implements Sendable, AutoCloseable {
   private final AnalogInput m_analogInput;
   private boolean m_ownsAnalogInput;
@@ -100,8 +98,7 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
   /**
    * Get the encoder value since the last reset.
    *
-   * <p>
-   * This is reported in rotations since the last reset.
+   * <p>This is reported in rotations since the last reset.
    *
    * @return the encoder value in rotations
    */
@@ -119,9 +116,8 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
   }
 
   /**
-   * Set the encoder voltage percentage range. Analog sensors are not
-   * always fully stable at the end of their travel ranges. Shrinking
-   * this range down can help mitigate issues with that.
+   * Set the encoder voltage percentage range. Analog sensors are not always fully stable at the end
+   * of their travel ranges. Shrinking this range down can help mitigate issues with that.
    *
    * @param min minimum voltage percentage (0-1 range)
    * @param max maximum voltage percentage (0-1 range)
@@ -160,7 +156,8 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
       m_rolloverTrigger.setLimitsVoltage(1.25, 3.75);
       m_rolloverCounter = new Counter();
       m_rolloverCounter.setUpSource(m_rolloverTrigger.createOutput(AnalogTriggerType.kRisingPulse));
-      m_rolloverCounter.setDownSource(m_rolloverTrigger.createOutput(AnalogTriggerType.kFallingPulse));
+      m_rolloverCounter.setDownSource(
+          m_rolloverTrigger.createOutput(AnalogTriggerType.kFallingPulse));
     } else if (!enable && m_rolloverCounter != null) {
       m_rolloverTrigger.close();
       m_rolloverTrigger = null;

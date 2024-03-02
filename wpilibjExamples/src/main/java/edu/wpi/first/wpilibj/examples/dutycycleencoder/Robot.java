@@ -9,10 +9,7 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-/**
- * This example shows how to use a duty cycle encoder for devices such as an
- * arm or elevator.
- */
+/** This example shows how to use a duty cycle encoder for devices such as an arm or elevator. */
 public class Robot extends TimedRobot {
   private DutyCycleEncoder m_dutyCycleEncoder;
   private final double m_fullRange = 1.3;
@@ -27,7 +24,6 @@ public class Robot extends TimedRobot {
     // where you want "0" to be, and observe the value on the dashboard, That
     // is the value to enter for the 3rd parameter.
     m_dutyCycleEncoder = new DutyCycleEncoder(0, m_fullRange, m_expectedZero);
-
 
     // If you know the frequency of your sensor, uncomment the following
     // method, and set the method to the frequency of your sensor.
@@ -65,7 +61,8 @@ public class Robot extends TimedRobot {
     // This does not change where "0" is, so no calibration numbers need
     // to be changed.
     double percentOfRange = m_fullRange * 0.1;
-    double shiftedOutput = MathUtil.inputModulus(output, 0 - percentOfRange, m_fullRange - percentOfRange);
+    double shiftedOutput =
+        MathUtil.inputModulus(output, 0 - percentOfRange, m_fullRange - percentOfRange);
 
     SmartDashboard.putBoolean("Connected", connected);
     SmartDashboard.putNumber("Frequency", frequency);
