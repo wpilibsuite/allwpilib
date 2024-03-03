@@ -167,7 +167,7 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
   /**
    * Configures if this encoder has rollover counting enabled.
    *
-   * <p> By default, the encoder will not count rollovers. This
+   * <p>By default, the encoder will not count rollovers. This
    * behavior is very rarely needed, and is usually a sign you are
    * using the wrong encoder type.
    *

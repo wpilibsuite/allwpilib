@@ -45,7 +45,7 @@ public class DutyCycleEncoderSim {
   /**
    * Set the position.
    *
-   * @param turns The position.
+   * @param value The position.
    */
   public void set(double value) {
     m_simPosition.set(value);
