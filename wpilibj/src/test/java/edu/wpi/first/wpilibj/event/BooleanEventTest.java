@@ -112,7 +112,7 @@ class BooleanEventTest {
     bool.set(true);
     loop.poll();
 
-    assertEquals(1, counter.get()); // FIXME?: natural sense dictates counter == 2!!
+    assertEquals(1, counter.get()); // See https://github.com/wpilibsuite/allwpilib/issues/6409
 
     loop.poll();
 
