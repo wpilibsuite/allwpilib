@@ -60,7 +60,8 @@ class CommandScheduler final : public wpi::Sendable,
   void SetPeriod(units::second_t period);
 
   /**
-   * Starts publishing loop timings to NetworkTables. Subsequent calls will do nothing.
+   * Starts publishing loop timings to NetworkTables. Subsequent calls will do
+   * nothing.
    *
    * This will publish how long it takes for methods in the command-based
    * framework to execute; periodic methods in subsystems, execute methods in
@@ -70,7 +71,8 @@ class CommandScheduler final : public wpi::Sendable,
   void PublishLoopTimingsToNetworkTables(std::string_view topicName);
 
   /**
-   * Starts logging loop timings to the data log. Subsequent calls will do nothing.
+   * Starts logging loop timings to the data log. Subsequent calls will do
+   * nothing.
    *
    * This will log how long it takes for methods in the command-based
    * framework to execute; periodic methods in subsystems, execute methods in

@@ -53,12 +53,13 @@ public class Tracer implements AutoCloseable {
    * @param topicName The NetworkTables topic to publish to
    */
   public void publishToNetworkTables(String topicName) {
-    if (!m_publishNT) {
-      m_publishNT = true;
-      m_inst = NetworkTableInstance.getDefault();
-      m_ntTopic = topicName;
-      m_publisherCache = new HashMap<>(10);
+    if (m_publishNT) {
+      return;
     }
+    m_publishNT = true;
+    m_inst = NetworkTableInstance.getDefault();
+    m_ntTopic = topicName;
+    m_publisherCache = new HashMap<>(10);
   }
 
   /**
@@ -69,11 +70,12 @@ public class Tracer implements AutoCloseable {
    */
   public void startDataLog(DataLog dataLog, String entry) {
     if (!m_dataLogEnabled) {
-      m_dataLog = dataLog;
-      m_dataLogEntry = entry;
-      m_dataLogEnabled = true;
-      m_entryCache = new HashMap<>(10);
+      return;
     }
+    m_dataLog = dataLog;
+    m_dataLogEntry = entry;
+    m_dataLogEnabled = true;
+    m_entryCache = new HashMap<>(10);
   }
 
   /** Clears all epochs. */

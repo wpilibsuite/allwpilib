@@ -206,7 +206,8 @@ class IterativeRobotBase : public RobotBase {
   virtual void TestExit();
 
   /**
-   * Starts publishing loop timings to NetworkTables. Subsequent calls will do nothing.
+   * Starts publishing loop timings to NetworkTables. Subsequent calls will do
+   * nothing.
    *
    * This will publish the execution time of method calls in the robot loop;
    * methods like robot periodic and init methods, various NT
@@ -218,7 +219,8 @@ class IterativeRobotBase : public RobotBase {
   void PublishLoopTimingsToNetworkTables(std::string_view topicName);
 
   /**
-   * Starts logging loop timings to the data log. Subsequent calls will do nothing.
+   * Starts logging loop timings to the data log. Subsequent calls will do
+   * nothing.
    *
    * This will publish the execution time of method calls in the robot loop;
    * methods like robot periodic and init methods, various NT

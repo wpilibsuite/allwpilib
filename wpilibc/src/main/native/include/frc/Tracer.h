@@ -35,14 +35,16 @@ class Tracer {
   Tracer();
 
   /**
-   * Starts publishing added epochs to NetworkTables. Subsequent calls will do nothing.
+   * Starts publishing added epochs to NetworkTables. Subsequent calls will do
+   * nothing.
    *
    * @param topicName The NetworkTables topic to publish to
    */
   void PublishToNetworkTables(std::string_view topicName);
 
   /**
-   * Starts logging added epochs to the data log. Subsequent calls will do nothing.
+   * Starts logging added epochs to the data log. Subsequent calls will do
+   * nothing.
    *
    * @param dataLog The data log to log epochs to
    * @param entry The name of the entry to log to
