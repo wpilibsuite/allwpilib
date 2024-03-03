@@ -39,7 +39,8 @@ CS_Source CS_CreateUsbCameraDev(const struct WPI_String* name, int dev,
   return cs::CreateUsbCameraDev(wpi::to_string_view(name), dev, status);
 }
 
-CS_Source CS_CreateUsbCameraPath(const struct WPI_String* name, const struct WPI_String* path,
+CS_Source CS_CreateUsbCameraPath(const struct WPI_String* name,
+                                 const struct WPI_String* path,
                                  CS_Status* status) {
   return cs::CreateUsbCameraPath(wpi::to_string_view(name),
                                  wpi::to_string_view(path), status);

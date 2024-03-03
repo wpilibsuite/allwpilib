@@ -207,17 +207,21 @@ void CS_SetSourceConnected(CS_Source source, CS_Bool connected,
   return cs::SetSourceConnected(source, connected, status);
 }
 
-void CS_SetSourceDescription(CS_Source source, const struct WPI_String* description,
+void CS_SetSourceDescription(CS_Source source,
+                             const struct WPI_String* description,
                              CS_Status* status) {
-  return cs::SetSourceDescription(source, wpi::to_string_view(description), status);
+  return cs::SetSourceDescription(source, wpi::to_string_view(description),
+                                  status);
 }
 
-CS_Property CS_CreateSourceProperty(CS_Source source, const struct WPI_String* name,
+CS_Property CS_CreateSourceProperty(CS_Source source,
+                                    const struct WPI_String* name,
                                     enum CS_PropertyKind kind, int minimum,
                                     int maximum, int step, int defaultValue,
                                     int value, CS_Status* status) {
-  return cs::CreateSourceProperty(source, wpi::to_string_view(name), kind, minimum, maximum, step,
-                                  defaultValue, value, status);
+  return cs::CreateSourceProperty(source, wpi::to_string_view(name), kind,
+                                  minimum, maximum, step, defaultValue, value,
+                                  status);
 }
 
 CS_Property CS_CreateSourcePropertyCallback(
@@ -230,8 +234,8 @@ CS_Property CS_CreateSourcePropertyCallback(
 }
 
 void CS_SetSourceEnumPropertyChoices(CS_Source source, CS_Property property,
-                                     const struct WPI_String* choices, int count,
-                                     CS_Status* status) {
+                                     const struct WPI_String* choices,
+                                     int count, CS_Status* status) {
   wpi::SmallVector<std::string, 8> vec;
   vec.reserve(count);
   for (int i = 0; i < count; ++i) {

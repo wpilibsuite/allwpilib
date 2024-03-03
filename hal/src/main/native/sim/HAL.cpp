@@ -5,6 +5,7 @@
 #include "hal/HAL.h"
 
 #include <cstdio>
+#include <cstring>
 #include <vector>
 
 #include <wpi/mutex.h>
