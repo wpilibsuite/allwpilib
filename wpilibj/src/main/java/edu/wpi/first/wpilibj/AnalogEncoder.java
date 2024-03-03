@@ -106,8 +106,8 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
   /**
    * Get the encoder value.
    *
-   * <p>By default, this will not count rollovers. If that behavior
-   * is necessary, call configureRolloverCounting(true).
+   * <p>By default, this will not count rollovers. If that behavior is necessary, call
+   * configureRolloverCounting(true).
    *
    * @return the encoder value
    */
@@ -167,9 +167,8 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
   /**
    * Configures if this encoder has rollover counting enabled.
    *
-   * <p>By default, the encoder will not count rollovers. This
-   * behavior is very rarely needed, and is usually a sign you are
-   * using the wrong encoder type.
+   * <p>By default, the encoder will not count rollovers. This behavior is very rarely needed, and
+   * is usually a sign you are using the wrong encoder type.
    *
    * @param enable True to enable rollover counting, false to disable.
    */
@@ -192,8 +191,7 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
   /**
    * Reset the number of rollovers that have been counted.
    *
-   * <p>This has no effect unless configureRolloverSupport(true)
-   * has been called.
+   * <p>This has no effect unless configureRolloverSupport(true) has been called.
    */
   public void resetRolloverCount() {
     if (m_rolloverCounter != null) {
