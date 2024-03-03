@@ -12,8 +12,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 /** This example shows how to use a duty cycle encoder for devices such as an arm or elevator. */
 public class Robot extends TimedRobot {
   private DutyCycleEncoder m_dutyCycleEncoder;
-  private final double m_fullRange = 1.3;
-  private final double m_expectedZero = 0;
+  private static final double m_fullRange = 1.3;
+  private static final double m_expectedZero = 0;
 
   @Override
   public void robotInit() {
