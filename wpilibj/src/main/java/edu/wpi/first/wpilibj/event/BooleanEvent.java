@@ -64,7 +64,8 @@ public class BooleanEvent implements BooleanSupplier {
   }
 
   /**
-   * Get a new event that events only when this one newly changes to true.
+   * Get a new event that triggers only when this one newly changes to true. Binding multiple
+   * actions to the returned event will not trigger all of them, instead, create multiple events.
    *
    * @return a new event representing when this one newly changes to true.
    */
@@ -85,7 +86,8 @@ public class BooleanEvent implements BooleanSupplier {
   }
 
   /**
-   * Get a new event that triggers only when this one newly changes to false.
+   * Get a new event that triggers only when this one newly changes to false. Binding multiple
+   * actions to the returned event will not trigger all of them, instead, create multiple events.
    *
    * @return a new event representing when this one newly changes to false.
    */
