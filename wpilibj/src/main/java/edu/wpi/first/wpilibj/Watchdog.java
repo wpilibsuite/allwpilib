@@ -58,6 +58,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
 
   @Override
   public void close() {
+    m_tracer.close();
     disable();
   }
 
