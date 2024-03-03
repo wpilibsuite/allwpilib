@@ -19,7 +19,7 @@ import java.util.function.Consumer;
  * <p>Epochs are a way to partition the time elapsed so that when overruns occur, one can determine
  * which parts of an operation consumed the most time.
  */
-public class Tracer {
+public class Tracer implements AutoCloseable {
   private static final long kMinPrintPeriod = 1000000; // microseconds
 
   private long m_lastEpochsPrintTime; // microseconds
@@ -38,6 +38,13 @@ public class Tracer {
   /** Tracer constructor. */
   public Tracer() {
     resetTimer();
+  }
+
+  @Override
+  public void close() {
+    for (IntegerPublisher pub : m_publisherCache.values()) {
+      pub.close();
+    }
   }
 
   /**
