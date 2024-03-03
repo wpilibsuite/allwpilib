@@ -81,7 +81,7 @@ class AnalogEncoder : public wpi::Sendable,
   AnalogEncoder(std::shared_ptr<AnalogInput> analogInput, double fullRange,
                 double expectedZero);
 
-  ~AnalogEncoder() override = default;
+  ~AnalogEncoder() override;
 
   AnalogEncoder(AnalogEncoder&&) = default;
   AnalogEncoder& operator=(AnalogEncoder&&) = default;

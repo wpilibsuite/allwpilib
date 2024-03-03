@@ -15,6 +15,8 @@
 
 using namespace frc;
 
+AnalogEncoder::~AnalogEncoder() {}
+
 AnalogEncoder::AnalogEncoder(int channel)
     : AnalogEncoder(std::make_shared<AnalogInput>(channel)) {}
 
