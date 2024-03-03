@@ -34,6 +34,8 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
    * Construct a new AnalogEncoder attached to a specific AnalogIn channel.
    *
    * @param channel the analog input channel to attach to
+   * @param fullRange the value to report at maximum travel
+   * @param expectedZero the reading where you would expect a 0 from get()
    */
   public AnalogEncoder(int channel, double fullRange, double expectedZero) {
     this(new AnalogInput(channel), fullRange, expectedZero);
@@ -44,6 +46,8 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
    * Construct a new AnalogEncoder attached to a specific AnalogInput.
    *
    * @param analogInput the analog input to attach to
+   * @param fullRange the value to report at maximum travel
+   * @param expectedZero the reading where you would expect a 0 from get()
    */
   @SuppressWarnings("this-escape")
   public AnalogEncoder(AnalogInput analogInput, double fullRange, double expectedZero) {
@@ -53,6 +57,8 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
 
   /**
    * Construct a new AnalogEncoder attached to a specific AnalogIn channel.
+   * 
+   * <p>This has a fullRange of 1 and an expectedZero of 0.
    *
    * @param channel the analog input channel to attach to
    */
@@ -62,6 +68,8 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
 
   /**
    * Construct a new AnalogEncoder attached to a specific AnalogInput.
+   * 
+   * <p>This has a fullRange of 1 and an expectedZero of 0.
    *
    * @param analogInput the analog input to attach to
    */
@@ -96,11 +104,12 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
   }
 
   /**
-   * Get the encoder value since the last reset.
+   * Get the encoder value.
    *
-   * <p>This is reported in rotations since the last reset.
+   * <p>By default, this will not count rollovers. If that behavior
+   * is necessary, call configureRolloverCounting(true).
    *
-   * @return the encoder value in rotations
+   * @return the encoder value
    */
   public double get() {
     if (m_simPosition != null) {
@@ -127,6 +136,11 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
     m_sensorMax = MathUtil.clamp(max, 0.0, 1.0);
   }
 
+  /**
+   * Set if this encoder is inverted.
+   * 
+   * @param inverted true to invert the encoder, false otherwise
+   */
   public void setInverted(boolean inverted) {
     m_isInverted = inverted;
   }
@@ -150,7 +164,16 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
     }
   }
 
-  public void configureRolloverSupport(boolean enable) {
+  /**
+   * Configures if this encoder has rollover counting enabled.
+   * 
+   * <p> By default, the encoder will not count rollovers. This
+   * behavior is very rarely needed, and is usually a sign you are
+   * using the wrong encoder type.
+   * 
+   * @param enable True to enable rollover counting, false to disable.
+   */
+  public void configureRolloverCounting(boolean enable) {
     if (enable && m_rolloverCounter == null) {
       m_rolloverTrigger = new AnalogTrigger(m_analogInput);
       m_rolloverTrigger.setLimitsVoltage(1.25, 3.75);
@@ -166,7 +189,13 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
     }
   }
 
-  public void resetRollovers() {
+  /**
+   * Reset the number of rollovers that have been counted.
+   * 
+   * <p>This has no effect unless configureRolloverSupport(true)
+   * has been called.
+   */
+  public void resetRolloverCount() {
     if (m_rolloverCounter != null) {
       m_rolloverCounter.reset();
     }

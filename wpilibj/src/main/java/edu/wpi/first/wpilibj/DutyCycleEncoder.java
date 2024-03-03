@@ -36,6 +36,8 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
    * Construct a new DutyCycleEncoder on a specific channel.
    *
    * @param channel the channel to attach to
+   * @param fullRange the value to report at maximum travel
+   * @param expectedZero the reading where you would expect a 0 from get()
    */
   @SuppressWarnings("this-escape")
   public DutyCycleEncoder(int channel, double fullRange, double expectedZero) {
@@ -49,6 +51,8 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
    * Construct a new DutyCycleEncoder attached to an existing DutyCycle object.
    *
    * @param dutyCycle the duty cycle to attach to
+   * @param fullRange the value to report at maximum travel
+   * @param expectedZero the reading where you would expect a 0 from get()
    */
   @SuppressWarnings("this-escape")
   public DutyCycleEncoder(DutyCycle dutyCycle, double fullRange, double expectedZero) {
@@ -60,6 +64,8 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
    * Construct a new DutyCycleEncoder attached to a DigitalSource object.
    *
    * @param source the digital source to attach to
+   * @param fullRange the value to report at maximum travel
+   * @param expectedZero the reading where you would expect a 0 from get()
    */
   @SuppressWarnings("this-escape")
   public DutyCycleEncoder(DigitalSource source, double fullRange, double expectedZero) {
@@ -71,6 +77,8 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
   /**
    * Construct a new DutyCycleEncoder on a specific channel.
    *
+   * <p>This has a fullRange of 1 and an expectedZero of 0.
+   * 
    * @param channel the channel to attach to
    */
   @SuppressWarnings("this-escape")
@@ -81,6 +89,8 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
   /**
    * Construct a new DutyCycleEncoder attached to an existing DutyCycle object.
    *
+   * <p>This has a fullRange of 1 and an expectedZero of 0.
+   * 
    * @param dutyCycle the duty cycle to attach to
    */
   @SuppressWarnings("this-escape")
@@ -90,6 +100,8 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
 
   /**
    * Construct a new DutyCycleEncoder attached to a DigitalSource object.
+   * 
+   * <p>This has a fullRange of 1 and an expectedZero of 0.
    *
    * @param source the digital source to attach to
    */
@@ -222,7 +234,7 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
    * frequency of the sensor to this function. This will use that frequency to compute the DutyCycle
    * percentage, rather than the computed frequency.
    *
-   * @param frequency
+   * @param frequency the assumed frequency of the sensor
    */
   public void setAssumedFrequency(double frequency) {
     if (frequency == 0.0) {
@@ -232,6 +244,11 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
     }
   }
 
+  /**
+   * Set if this encoder is inverted.
+   * 
+   * @param inverted true to invert the encoder, false otherwise
+   */
   public void setInverted(boolean inverted) {
     m_isInverted = inverted;
   }
