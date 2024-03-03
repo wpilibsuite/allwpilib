@@ -17,7 +17,7 @@ Tracer::Tracer() {
 }
 
 void Tracer::PublishToNetworkTables(std::string_view topicName) {
-  if (!m_publishNT) {
+  if (m_publishNT) {
     return;
   }
   m_publishNT = true;
@@ -27,7 +27,7 @@ void Tracer::PublishToNetworkTables(std::string_view topicName) {
 }
 
 void Tracer::StartDataLog(wpi::log::DataLog& dataLog, std::string_view entry) {
-  if (!m_dataLogEnabled) {
+  if (m_dataLogEnabled) {
     return;
   }
   m_dataLogEnabled = true;

@@ -42,8 +42,10 @@ public class Tracer implements AutoCloseable {
 
   @Override
   public void close() {
-    for (IntegerPublisher pub : m_publisherCache.values()) {
-      pub.close();
+    if (m_entryCache != null) {
+      for (IntegerPublisher pub : m_publisherCache.values()) {
+        pub.close();
+      }
     }
   }
 
