@@ -78,7 +78,7 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
    * Construct a new DutyCycleEncoder on a specific channel.
    *
    * <p>This has a fullRange of 1 and an expectedZero of 0.
-   * 
+   *
    * @param channel the channel to attach to
    */
   @SuppressWarnings("this-escape")
@@ -90,7 +90,7 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
    * Construct a new DutyCycleEncoder attached to an existing DutyCycle object.
    *
    * <p>This has a fullRange of 1 and an expectedZero of 0.
-   * 
+   *
    * @param dutyCycle the duty cycle to attach to
    */
   @SuppressWarnings("this-escape")
@@ -100,7 +100,7 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
 
   /**
    * Construct a new DutyCycleEncoder attached to a DigitalSource object.
-   * 
+   *
    * <p>This has a fullRange of 1 and an expectedZero of 0.
    *
    * @param source the digital source to attach to
@@ -246,7 +246,7 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
 
   /**
    * Set if this encoder is inverted.
-   * 
+   *
    * @param inverted true to invert the encoder, false otherwise
    */
   public void setInverted(boolean inverted) {

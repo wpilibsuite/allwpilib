@@ -42,7 +42,7 @@ class DutyCycleEncoderSim {
   /**
    * Set the position.
    *
-   * @param turns The position.
+   * @param value The position.
    */
   void Set(double value);
 

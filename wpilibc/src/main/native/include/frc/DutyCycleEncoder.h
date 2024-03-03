@@ -27,7 +27,7 @@ class DutyCycleEncoder : public wpi::Sendable,
  public:
   /**
    * Construct a new DutyCycleEncoder on a specific channel.
-   * 
+   *
    * <p>This has a fullRange of 1 and an expectedZero of 0.
    *
    * @param channel the channel to attach to
@@ -38,7 +38,7 @@ class DutyCycleEncoder : public wpi::Sendable,
    * Construct a new DutyCycleEncoder attached to an existing DutyCycle object.
    *
    * <p>This has a fullRange of 1 and an expectedZero of 0.
-   * 
+   *
    * @param dutyCycle the duty cycle to attach to
    */
   explicit DutyCycleEncoder(DutyCycle& dutyCycle);
@@ -47,7 +47,7 @@ class DutyCycleEncoder : public wpi::Sendable,
    * Construct a new DutyCycleEncoder attached to an existing DutyCycle object.
    *
    * <p>This has a fullRange of 1 and an expectedZero of 0.
-   * 
+   *
    * @param dutyCycle the duty cycle to attach to
    */
   explicit DutyCycleEncoder(DutyCycle* dutyCycle);
@@ -56,7 +56,7 @@ class DutyCycleEncoder : public wpi::Sendable,
    * Construct a new DutyCycleEncoder attached to an existing DutyCycle object.
    *
    * <p>This has a fullRange of 1 and an expectedZero of 0.
-   * 
+   *
    * @param dutyCycle the duty cycle to attach to
    */
   explicit DutyCycleEncoder(std::shared_ptr<DutyCycle> dutyCycle);
@@ -65,7 +65,7 @@ class DutyCycleEncoder : public wpi::Sendable,
    * Construct a new DutyCycleEncoder attached to a DigitalSource object.
    *
    * <p>This has a fullRange of 1 and an expectedZero of 0.
-   * 
+   *
    * @param digitalSource the digital source to attach to
    */
   explicit DutyCycleEncoder(DigitalSource& digitalSource);
@@ -74,7 +74,7 @@ class DutyCycleEncoder : public wpi::Sendable,
    * Construct a new DutyCycleEncoder attached to a DigitalSource object.
    *
    * <p>This has a fullRange of 1 and an expectedZero of 0.
-   * 
+   *
    * @param digitalSource the digital source to attach to
    */
   explicit DutyCycleEncoder(DigitalSource* digitalSource);
@@ -83,7 +83,7 @@ class DutyCycleEncoder : public wpi::Sendable,
    * Construct a new DutyCycleEncoder attached to a DigitalSource object.
    *
    * <p>This has a fullRange of 1 and an expectedZero of 0.
-   * 
+   *
    * @param digitalSource the digital source to attach to
    */
   explicit DutyCycleEncoder(std::shared_ptr<DigitalSource> digitalSource);
@@ -210,14 +210,14 @@ class DutyCycleEncoder : public wpi::Sendable,
 
   /**
    * Set if this encoder is inverted.
-   * 
+   *
    * @param inverted true to invert the encoder, false otherwise
    */
   void SetAssumedFrequency(units::hertz_t frequency);
 
   /**
    * Set if this encoder is inverted.
-   * 
+   *
    * @param inverted true to invert the encoder, false otherwise
    */
   void SetInverted(bool inverted);
