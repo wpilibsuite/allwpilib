@@ -17,17 +17,21 @@ Tracer::Tracer() {
 }
 
 void Tracer::PublishToNetworkTables(std::string_view topicName) {
+  if (!m_publishNT){
   m_publishNT = true;
   m_inst = nt::NetworkTableInstance::GetDefault();
   m_ntTopic = topicName;
   m_publisherCache = wpi::StringMap<std::shared_ptr<nt::IntegerPublisher>>(10);
+  }
 }
 
 void Tracer::StartDataLog(wpi::log::DataLog& dataLog, std::string_view entry) {
+  if (!m_dataLogEnabled){
+  m_dataLogEnabled = true;
   m_dataLog = &dataLog;
   m_dataLogEntry = entry;
-  m_dataLogEnabled = true;
   m_entryCache = wpi::StringMap<int>(10);
+  }
 }
 
 void Tracer::ResetTimer() {

@@ -41,28 +41,32 @@ public class Tracer {
   }
 
   /**
-   * Starts publishing added epochs to NetworkTables.
+   * Starts publishing added epochs to NetworkTables. Subsequent calls will do nothing.
    *
    * @param topicName The NetworkTables topic to publish to
    */
   public void publishToNetworkTables(String topicName) {
-    m_publishNT = true;
-    m_inst = NetworkTableInstance.getDefault();
-    m_ntTopic = topicName;
-    m_publisherCache = new HashMap<>(10);
+    if (!m_publishNT) {
+      m_publishNT = true;
+      m_inst = NetworkTableInstance.getDefault();
+      m_ntTopic = topicName;
+      m_publisherCache = new HashMap<>(10);
+    }
   }
 
   /**
-   * Starts logging added epochs to the data log.
+   * Starts logging added epochs to the data log. Subsequent calls will do nothing.
    *
    * @param dataLog The data log to log epochs to
    * @param entry The name of the entry to log to
    */
   public void startDataLog(DataLog dataLog, String entry) {
-    m_dataLog = dataLog;
-    m_dataLogEntry = entry;
-    m_dataLogEnabled = true;
-    m_entryCache = new HashMap<>(10);
+    if (!m_dataLogEnabled) {
+      m_dataLog = dataLog;
+      m_dataLogEntry = entry;
+      m_dataLogEnabled = true;
+      m_entryCache = new HashMap<>(10);
+    }
   }
 
   /** Clears all epochs. */

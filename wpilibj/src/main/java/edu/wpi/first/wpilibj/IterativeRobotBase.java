@@ -252,7 +252,7 @@ public abstract class IterativeRobotBase extends RobotBase {
   public void testExit() {}
 
   /**
-   * Starts publishing loop timings to NetworkTables.
+   * Starts publishing loop timings to NetworkTables. Subsequent calls will do nothing.
    *
    * <p>This will publish the execution time of method calls in the robot loop; methods like robot
    * periodic and init methods, various NT updates (SmartDashboard.update(),
@@ -265,7 +265,7 @@ public abstract class IterativeRobotBase extends RobotBase {
   }
 
   /**
-   * Starts logging loop timings to the data log.
+   * Starts logging loop timings to the data log. Subsequent calls will do nothing.
    *
    * <p>This will log the execution time of method calls in the robot loop; methods like robot
    * periodic and init methods, various NT updates (SmartDashboard.update(),
