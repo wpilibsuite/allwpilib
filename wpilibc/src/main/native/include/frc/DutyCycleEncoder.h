@@ -209,9 +209,15 @@ class DutyCycleEncoder : public wpi::Sendable,
   void SetDutyCycleRange(double min, double max);
 
   /**
-   * Set if this encoder is inverted.
+   * Sets the assumed frequency of the connected device.
    *
-   * @param inverted true to invert the encoder, false otherwise
+   * <p>By default, the DutyCycle engine has to compute the frequency of the
+   * input signal. This can result in both delayed readings and jumpy readings.
+   * To solve this, you can pass the expected frequency of the sensor to this
+   * function. This will use that frequency to compute the DutyCycle percentage,
+   * rather than the computed frequency.
+   *
+   * @param frequency the assumed frequency of the sensor
    */
   void SetAssumedFrequency(units::hertz_t frequency);
 
