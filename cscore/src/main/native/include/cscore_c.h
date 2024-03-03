@@ -484,9 +484,10 @@ double CS_GetTelemetryAverageValue(CS_Handle handle, enum CS_TelemetryKind kind,
  * @defgroup cscore_logging_cfunc Logging Functions
  * @{
  */
-typedef void (*CS_LogFunc)(unsigned int level, const char* file,
-                           unsigned int line, const char* msg);
-void CS_SetLogger(CS_LogFunc func, unsigned int min_level);
+typedef void (*CS_LogFunc)(void* data, unsigned int level,
+                           const WPI_String* file, unsigned int line,
+                           const WPI_String* msg);
+void CS_SetLogger(CS_LogFunc func, void* data, unsigned int min_level);
 void CS_SetDefaultLogger(unsigned int min_level);
 /** @} */
 

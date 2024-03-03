@@ -138,7 +138,8 @@ CS_Bool CS_IsSourceEnabled(CS_Source source, CS_Status* status) {
   return cs::IsSourceEnabled(source, status);
 }
 
-CS_Property CS_GetSourceProperty(CS_Source source, const struct WPI_String* name,
+CS_Property CS_GetSourceProperty(CS_Source source,
+                                 const struct WPI_String* name,
                                  CS_Status* status) {
   return cs::GetSourceProperty(source, wpi::to_string_view(name), status);
 }
@@ -195,7 +196,8 @@ CS_Bool CS_SetSourceFPS(CS_Source source, int fps, CS_Status* status) {
   return cs::SetSourceFPS(source, fps, status);
 }
 
-CS_Bool CS_SetSourceConfigJson(CS_Source source, const struct WPI_String* config,
+CS_Bool CS_SetSourceConfigJson(CS_Source source,
+                               const struct WPI_String* config,
                                CS_Status* status) {
   return cs::SetSourceConfigJson(source, wpi::to_string_view(config), status);
 }
@@ -317,7 +319,8 @@ CS_Source CS_GetSinkSource(CS_Sink sink, CS_Status* status) {
   return cs::GetSinkSource(sink, status);
 }
 
-CS_Property CS_GetSinkSourceProperty(CS_Sink sink, const struct WPI_String* name,
+CS_Property CS_GetSinkSourceProperty(CS_Sink sink,
+                                     const struct WPI_String* name,
                                      CS_Status* status) {
   return cs::GetSinkSourceProperty(sink, wpi::to_string_view(name), status);
 }
@@ -415,8 +418,15 @@ double CS_GetTelemetryAverageValue(CS_Handle handle, CS_TelemetryKind kind,
   return cs::GetTelemetryAverageValue(handle, kind, status);
 }
 
-void CS_SetLogger(CS_LogFunc func, unsigned int min_level) {
-  cs::SetLogger(func, min_level);
+void CS_SetLogger(CS_LogFunc func, void* data, unsigned int min_level) {
+  cs::SetLogger(
+      [=](unsigned int level, const char* file, unsigned int line,
+          const char* msg) {
+        auto fileStr = wpi::make_string(file);
+        auto msgStr = wpi::make_string(msg);
+        func(data, level, &fileStr, line, &msgStr);
+      },
+      min_level);
 }
 
 void CS_SetDefaultLogger(unsigned int min_level) {
