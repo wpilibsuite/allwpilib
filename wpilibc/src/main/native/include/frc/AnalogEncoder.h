@@ -93,8 +93,21 @@ class AnalogEncoder : public wpi::Sendable,
    */
   double Get() const;
 
+  /**
+   * Set the encoder voltage percentage range. Analog sensors are not always
+   * fully stable at the end of their travel ranges. Shrinking this range down
+   * can help mitigate issues with that.
+   *
+   * @param min minimum voltage percentage (0-1 range)
+   * @param max maximum voltage percentage (0-1 range)
+   */
   void SetVoltagePercentageRange(double min, double max);
 
+  /**
+   * Set if this encoder is inverted.
+   *
+   * @param inverted true to invert the encoder, false otherwise
+   */
   void SetInverted(bool inverted);
 
   /**
@@ -106,7 +119,23 @@ class AnalogEncoder : public wpi::Sendable,
 
   void InitSendable(wpi::SendableBuilder& builder) override;
 
+  /**
+   * Configures if this encoder has rollover counting enabled.
+   *
+   * <p> By default, the encoder will not count rollovers. This
+   * behavior is very rarely needed, and is usually a sign you are
+   * using the wrong encoder type.
+   *
+   * @param enable True to enable rollover counting, false to disable.
+   */
   void ConfigureRolloverSupport(bool enable);
+
+  /**
+   * Reset the number of rollovers that have been counted.
+   *
+   * <p>This has no effect unless configureRolloverSupport(true)
+   * has been called.
+   */
   void ResetRollovers();
 
  private:
