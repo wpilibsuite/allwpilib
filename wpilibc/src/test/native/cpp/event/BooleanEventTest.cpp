@@ -116,22 +116,21 @@ TEST(BooleanEventTest, EdgeReuse) {
   boolean = true;
   loop.Poll();
 
-  EXPECT_EQ(
-      1, counter);  // See https://github.com/wpilibsuite/allwpilib/issues/6409
+  EXPECT_EQ(2, counter);
 
   loop.Poll();
 
-  EXPECT_EQ(1, counter);
+  EXPECT_EQ(2, counter);
 
   boolean = false;
   loop.Poll();
 
-  EXPECT_EQ(1, counter);
+  EXPECT_EQ(2, counter);
 
   boolean = true;
   loop.Poll();
 
-  EXPECT_EQ(2, counter);
+  EXPECT_EQ(4, counter);
 }
 
 /**
@@ -156,8 +155,7 @@ TEST(BooleanEventTest, EdgeReconstruct) {
   boolean = true;
   loop.Poll();
 
-  // unlike the previous test ...
-  EXPECT_EQ(2, counter);  // as natural sense dictates, counter == 2
+  EXPECT_EQ(2, counter);
 
   loop.Poll();
 
