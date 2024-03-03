@@ -25,12 +25,16 @@ class AnalogEncoder : public wpi::Sendable,
   /**
    * Construct a new AnalogEncoder attached to a specific AnalogIn channel.
    *
+   * <p>This has a fullRange of 1 and an expectedZero of 0.
+   *
    * @param channel the analog input channel to attach to
    */
   explicit AnalogEncoder(int channel);
 
   /**
    * Construct a new AnalogEncoder attached to a specific AnalogInput.
+   *
+   * <p>This has a fullRange of 1 and an expectedZero of 0.
    *
    * @param analogInput the analog input to attach to
    */
@@ -39,12 +43,16 @@ class AnalogEncoder : public wpi::Sendable,
   /**
    * Construct a new AnalogEncoder attached to a specific AnalogInput.
    *
+   * <p>This has a fullRange of 1 and an expectedZero of 0.
+   *
    * @param analogInput the analog input to attach to
    */
   explicit AnalogEncoder(AnalogInput* analogInput);
 
   /**
    * Construct a new AnalogEncoder attached to a specific AnalogInput.
+   *
+   * <p>This has a fullRange of 1 and an expectedZero of 0.
    *
    * @param analogInput the analog input to attach to
    */
@@ -54,6 +62,8 @@ class AnalogEncoder : public wpi::Sendable,
    * Construct a new AnalogEncoder attached to a specific AnalogIn channel.
    *
    * @param channel the analog input channel to attach to
+   * @param fullRange the value to report at maximum travel
+   * @param expectedZero the reading where you would expect a 0 from get()
    */
   AnalogEncoder(int channel, double fullRange, double expectedZero);
 
@@ -61,6 +71,8 @@ class AnalogEncoder : public wpi::Sendable,
    * Construct a new AnalogEncoder attached to a specific AnalogInput.
    *
    * @param analogInput the analog input to attach to
+   * @param fullRange the value to report at maximum travel
+   * @param expectedZero the reading where you would expect a 0 from get()
    */
   AnalogEncoder(AnalogInput& analogInput, double fullRange,
                 double expectedZero);
@@ -69,6 +81,8 @@ class AnalogEncoder : public wpi::Sendable,
    * Construct a new AnalogEncoder attached to a specific AnalogInput.
    *
    * @param analogInput the analog input to attach to
+   * @param fullRange the value to report at maximum travel
+   * @param expectedZero the reading where you would expect a 0 from get()
    */
   AnalogEncoder(AnalogInput* analogInput, double fullRange,
                 double expectedZero);
@@ -77,6 +91,8 @@ class AnalogEncoder : public wpi::Sendable,
    * Construct a new AnalogEncoder attached to a specific AnalogInput.
    *
    * @param analogInput the analog input to attach to
+   * @param fullRange the value to report at maximum travel
+   * @param expectedZero the reading where you would expect a 0 from get()
    */
   AnalogEncoder(std::shared_ptr<AnalogInput> analogInput, double fullRange,
                 double expectedZero);

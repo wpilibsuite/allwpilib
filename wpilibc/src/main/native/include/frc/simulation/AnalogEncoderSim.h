@@ -30,7 +30,7 @@ class AnalogEncoderSim {
   /**
    * Set the position.
    *
-   * @param angle The position.
+   * @param value The position.
    */
   void Set(double value);
 

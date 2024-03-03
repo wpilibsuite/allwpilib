@@ -57,7 +57,7 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
 
   /**
    * Construct a new AnalogEncoder attached to a specific AnalogIn channel.
-   * 
+   *
    * <p>This has a fullRange of 1 and an expectedZero of 0.
    *
    * @param channel the analog input channel to attach to
@@ -68,7 +68,7 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
 
   /**
    * Construct a new AnalogEncoder attached to a specific AnalogInput.
-   * 
+   *
    * <p>This has a fullRange of 1 and an expectedZero of 0.
    *
    * @param analogInput the analog input to attach to
@@ -138,7 +138,7 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
 
   /**
    * Set if this encoder is inverted.
-   * 
+   *
    * @param inverted true to invert the encoder, false otherwise
    */
   public void setInverted(boolean inverted) {
@@ -166,11 +166,11 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
 
   /**
    * Configures if this encoder has rollover counting enabled.
-   * 
+   *
    * <p> By default, the encoder will not count rollovers. This
    * behavior is very rarely needed, and is usually a sign you are
    * using the wrong encoder type.
-   * 
+   *
    * @param enable True to enable rollover counting, false to disable.
    */
   public void configureRolloverCounting(boolean enable) {
@@ -191,7 +191,7 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
 
   /**
    * Reset the number of rollovers that have been counted.
-   * 
+   *
    * <p>This has no effect unless configureRolloverSupport(true)
    * has been called.
    */
