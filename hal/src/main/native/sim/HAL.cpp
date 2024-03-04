@@ -282,17 +282,11 @@ int64_t HAL_GetFPGARevision(int32_t* status) {
 }
 
 void HAL_GetSerialNumber(struct WPI_String* serialNumber) {
-  char buffer[9];
-  size_t len = HALSIM_GetRoboRioSerialNumber(buffer, sizeof(buffer));
-  auto write = WPI_AllocateString(serialNumber, len);
-  std::memcpy(write, buffer, len);
+  HALSIM_GetRoboRioSerialNumber(serialNumber);
 }
 
 void HAL_GetComments(struct WPI_String* comments) {
-  char buffer[65];
-  size_t len = HALSIM_GetRoboRioComments(buffer, sizeof(buffer));
-  auto write = WPI_AllocateString(comments, len);
-  std::memcpy(write, buffer, len);
+  HALSIM_GetRoboRioComments(comments);
 }
 
 int32_t HAL_GetTeamNumber(void) {
