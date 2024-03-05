@@ -92,8 +92,8 @@ void RoboRioData::GetComments(struct WPI_String* comments) {
 }
 
 void RoboRioData::SetComments(std::string_view comments) {
-  if (comments.size() > 8) {
-    comments = comments.substr(0, 8);
+  if (comments.size() > 64) {
+    comments = comments.substr(0, 64);
   }
   std::scoped_lock lock(m_commentsMutex);
   m_comments = std::string(comments);

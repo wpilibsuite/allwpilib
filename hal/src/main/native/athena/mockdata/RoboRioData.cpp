@@ -37,7 +37,7 @@ int32_t HALSIM_RegisterRoboRioSerialNumberCallback(
   return 0;
 }
 void HALSIM_CancelRoboRioSerialNumberCallback(int32_t uid) {}
-size_t HALSIM_GetRoboRioSerialNumber(struct WPI_String* serialNumber) {
+void HALSIM_GetRoboRioSerialNumber(struct WPI_String* serialNumber) {
   WPI_AllocateString(serialNumber, 0);
 }
 void HALSIM_SetRoboRioSerialNumber(const struct WPI_String* serialNumber) {}
