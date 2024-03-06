@@ -20,6 +20,7 @@ import edu.wpi.first.units.Time;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
+import java.util.Objects;
 
 /**
  * Represents the speed of a robot chassis. Although this class contains similar members compared to
@@ -360,6 +361,28 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
   public ChassisSpeeds div(double scalar) {
     return new ChassisSpeeds(
         vxMetersPerSecond / scalar, vyMetersPerSecond / scalar, omegaRadiansPerSecond / scalar);
+  }
+
+  @Override
+  public final int hashCode() {
+    return Objects.hash(vxMetersPerSecond, vyMetersPerSecond, omegaRadiansPerSecond);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (o == this) {
+      return true;
+    }
+
+    if (!(o instanceof ChassisSpeeds)) {
+      return false;
+    }
+
+    ChassisSpeeds c = (ChassisSpeeds) o;
+
+    return vxMetersPerSecond == c.vxMetersPerSecond
+        && vyMetersPerSecond == c.vyMetersPerSecond
+        && omegaRadiansPerSecond == c.omegaRadiansPerSecond;
   }
 
   @Override
