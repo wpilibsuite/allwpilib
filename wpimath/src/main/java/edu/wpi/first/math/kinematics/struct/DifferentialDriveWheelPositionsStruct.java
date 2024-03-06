@@ -5,8 +5,7 @@ import java.nio.ByteBuffer;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelPositions;
 import edu.wpi.first.util.struct.Struct;
 
-public class DifferentialDriveWheelPositionsStruct implements Struct<DifferentialDriveWheelPositions> {
-
+public class DifferentialDriveWheelPositionsStruct implements Struct<DifferentialDriveWheelPositions> {    
     @Override
     public Class<DifferentialDriveWheelPositions> getTypeClass() {
         return DifferentialDriveWheelPositions.class;
@@ -39,5 +38,4 @@ public class DifferentialDriveWheelPositionsStruct implements Struct<Differentia
         bb.putDouble(value.leftMeters);
         bb.putDouble(value.rightMeters);
     }
-    
 }
