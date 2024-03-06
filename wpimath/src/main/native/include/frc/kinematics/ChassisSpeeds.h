@@ -38,6 +38,9 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
    */
   units::radians_per_second_t omega = 0_rad_per_s;
 
+  ChassisSpeeds(ChassisSpeeds&&) = default;
+  ChassisSpeeds& operator=(ChassisSpeeds&&) = default;
+
   /**
    * Disretizes a continuous-time chassis speed.
    *
