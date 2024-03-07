@@ -8,6 +8,8 @@
 #include <wpi/SymbolExports.h>
 
 #include "units/length.h"
+#include "frc/kinematics/proto/DifferentialDriveWheelPositionsProto.h"
+#include "frc/kinematics/struct/DifferentialDriveWheelPositionsStruct.h"
 
 namespace frc {
 /**
