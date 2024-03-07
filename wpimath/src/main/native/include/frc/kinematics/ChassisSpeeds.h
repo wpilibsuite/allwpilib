@@ -265,6 +265,17 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
   constexpr ChassisSpeeds operator/(double scalar) const {
     return operator*(1.0 / scalar);
   }
+
+  /**
+   * Compares the ChassisSpeeds with another ChassisSpeed.
+   *
+   * @param other The other ChassisSpeeds.
+   *
+   * @return The result of the comparison. Is true if they are the same.
+   */
+  constexpr bool operator==(ChassisSpeeds& other) {
+    return vx == other.vx && vy == other.vy && omega == other.omega;
+  }
 };
 }  // namespace frc
 
