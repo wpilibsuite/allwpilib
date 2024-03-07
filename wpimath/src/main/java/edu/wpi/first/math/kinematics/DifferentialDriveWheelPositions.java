@@ -22,9 +22,12 @@ public class DifferentialDriveWheelPositions
   /** Distance measured by the right side. */
   public double rightMeters;
 
-  public static DifferentialDriveWheelPositionsStruct struct = new DifferentialDriveWheelPositionsStruct();
+  public static DifferentialDriveWheelPositionsStruct struct =
+      new DifferentialDriveWheelPositionsStruct();
 
-  public static DifferentialDriveWheelPositionsProto proto = new DifferentialDriveWheelPositionsProto();
+  public static DifferentialDriveWheelPositionsProto proto =
+      new DifferentialDriveWheelPositionsProto();
+
   /**
    * Constructs a DifferentialDriveWheelPositions.
    *

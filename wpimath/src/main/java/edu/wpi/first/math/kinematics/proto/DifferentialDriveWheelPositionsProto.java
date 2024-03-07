@@ -5,32 +5,33 @@ import edu.wpi.first.math.proto.Kinematics.ProtobufDifferentialDriveWheelPositio
 import edu.wpi.first.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;
 
-public class DifferentialDriveWheelPositionsProto implements Protobuf<DifferentialDriveWheelPositions, ProtobufDifferentialDriveWheelPositions> {
+public class DifferentialDriveWheelPositionsProto
+    implements Protobuf<DifferentialDriveWheelPositions, ProtobufDifferentialDriveWheelPositions> {
 
-    @Override
-    public Class<DifferentialDriveWheelPositions> getTypeClass() {
-        return DifferentialDriveWheelPositions.class;
-    }
+  @Override
+  public Class<DifferentialDriveWheelPositions> getTypeClass() {
+    return DifferentialDriveWheelPositions.class;
+  }
 
-    @Override
-    public Descriptor getDescriptor() {
-        return ProtobufDifferentialDriveWheelPositions.getDescriptor();
-    }
+  @Override
+  public Descriptor getDescriptor() {
+    return ProtobufDifferentialDriveWheelPositions.getDescriptor();
+  }
 
-    @Override
-    public ProtobufDifferentialDriveWheelPositions createMessage() {
-        return ProtobufDifferentialDriveWheelPositions.newInstance();
-    }
+  @Override
+  public ProtobufDifferentialDriveWheelPositions createMessage() {
+    return ProtobufDifferentialDriveWheelPositions.newInstance();
+  }
 
-    @Override
-    public DifferentialDriveWheelPositions unpack(ProtobufDifferentialDriveWheelPositions msg) {
-        return new DifferentialDriveWheelPositions(msg.getLeft(), msg.getRight());
-    }
+  @Override
+  public DifferentialDriveWheelPositions unpack(ProtobufDifferentialDriveWheelPositions msg) {
+    return new DifferentialDriveWheelPositions(msg.getLeft(), msg.getRight());
+  }
 
-    @Override
-    public void pack(ProtobufDifferentialDriveWheelPositions msg, DifferentialDriveWheelPositions value) {
-        msg.setLeft(value.leftMeters);
-        msg.setRight(value.rightMeters);
-    }
-    
+  @Override
+  public void pack(
+      ProtobufDifferentialDriveWheelPositions msg, DifferentialDriveWheelPositions value) {
+    msg.setLeft(value.leftMeters);
+    msg.setRight(value.rightMeters);
+  }
 }
