@@ -7,6 +7,7 @@ package edu.wpi.first.math.kinematics;
 import static edu.wpi.first.units.Units.Meters;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.kinematics.proto.DifferentialDriveWheelPositionsProto;
 import edu.wpi.first.math.kinematics.struct.DifferentialDriveWheelPositionsStruct;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
@@ -23,6 +24,7 @@ public class DifferentialDriveWheelPositions
 
   public static DifferentialDriveWheelPositionsStruct struct = new DifferentialDriveWheelPositionsStruct();
 
+  public static DifferentialDriveWheelPositionsProto proto = new DifferentialDriveWheelPositionsProto();
   /**
    * Constructs a DifferentialDriveWheelPositions.
    *
