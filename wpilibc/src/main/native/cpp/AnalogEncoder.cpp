@@ -8,7 +8,6 @@
 #include <wpi/sendable/SendableBuilder.h>
 
 #include "frc/AnalogInput.h"
-#include "frc/Counter.h"
 #include "frc/Errors.h"
 #include "frc/MathUtil.h"
 #include "frc/RobotController.h"
@@ -76,12 +75,22 @@ double AnalogEncoder::Get() const {
     return m_simPosition.Get();
   }
 
-  if (m_rolloverCounter) {
-    return GetWithRollovers();
-  } else {
-    double analog = m_analogInput->GetVoltage();
-    return GetWithoutRollovers(analog);
+  double analog = m_analogInput->GetVoltage();
+  double pos = analog / RobotController::GetVoltage5V();
+
+  // Map sensor range if range isn't full
+  pos = MapSensorRange(pos);
+
+  // Compute full range and offset
+  pos = pos * m_fullRange - m_expectedZero;
+
+  // Map from 0 - Full Range
+  double result = InputModulus(pos, 0.0, m_fullRange);
+  // Invert if necessary
+  if (m_isInverted) {
+    return m_fullRange - result;
   }
+  return result;
 }
 
 void AnalogEncoder::SetVoltagePercentageRange(double min, double max) {
@@ -112,77 +121,4 @@ void AnalogEncoder::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("AbsoluteEncoder");
   builder.AddDoubleProperty(
       "Position", [this] { return this->Get(); }, nullptr);
-}
-
-void AnalogEncoder::ConfigureRolloverSupport(bool enable) {
-  if (enable && !m_rolloverCounter) {
-    m_rolloverTrigger = std::make_unique<AnalogTrigger>(m_analogInput.get());
-    m_rolloverTrigger->SetLimitsVoltage(1.25, 3.75);
-    m_rolloverCounter = std::make_unique<Counter>();
-    m_rolloverCounter->SetUpSource(
-        m_rolloverTrigger->CreateOutput(AnalogTriggerType::kRisingPulse));
-    m_rolloverCounter->SetDownSource(
-        m_rolloverTrigger->CreateOutput(AnalogTriggerType::kFallingPulse));
-  } else if (!enable && m_rolloverCounter) {
-    m_rolloverCounter = nullptr;
-    m_rolloverTrigger = nullptr;
-  }
-}
-
-void AnalogEncoder::ResetRollovers() {
-  if (m_rolloverCounter) {
-    m_rolloverCounter->Reset();
-  }
-}
-
-double AnalogEncoder::GetWithoutRollovers(double analog) const {
-  double pos = analog / RobotController::GetVoltage5V();
-
-  // Map sensor range if range isn't full
-  pos = MapSensorRange(pos);
-
-  // Compute full range and offset
-  pos = pos * m_fullRange - m_expectedZero;
-
-  // Map from 0 - Full Range
-  double result = InputModulus(pos, 0.0, m_fullRange);
-  // Invert if necessary
-  if (m_isInverted) {
-    return m_fullRange - result;
-  }
-  return result;
-}
-
-static bool DoubleEquals(double a, double b) {
-  constexpr double epsilon = 0.00001;
-  return std::abs(a - b) < epsilon;
-}
-
-double AnalogEncoder::GetWithRollovers() const {
-  // As the values are not atomic, keep trying until we get 2 reads of the same
-  // value If we don't within 10 attempts, error
-  for (int i = 0; i < 10; i++) {
-    auto counter = m_rolloverCounter->Get();
-    auto pos = m_analogInput->GetVoltage();
-    auto counter2 = m_rolloverCounter->Get();
-    auto pos2 = m_analogInput->GetVoltage();
-    if (counter == counter2 && DoubleEquals(pos, pos2)) {
-      pos = GetWithoutRollovers(pos);
-
-      if (m_isInverted) {
-        pos = pos - counter;
-      } else {
-        pos = pos + counter;
-      }
-
-      m_lastPosition = pos;
-      return pos;
-    }
-  }
-
-  FRC_ReportError(
-      warn::Warning,
-      "Failed to read Analog Encoder. Potential Speed Overrun. Returning last "
-      "value");
-  return m_lastPosition;
 }

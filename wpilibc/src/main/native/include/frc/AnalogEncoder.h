@@ -13,8 +13,6 @@
 
 namespace frc {
 class AnalogInput;
-class Counter;
-class AnalogTrigger;
 
 /**
  * Class for supporting continuous analog encoders, such as the US Digital MA3.
@@ -135,31 +133,9 @@ class AnalogEncoder : public wpi::Sendable,
 
   void InitSendable(wpi::SendableBuilder& builder) override;
 
-  /**
-   * Configures if this encoder has rollover counting enabled.
-   *
-   * <p> By default, the encoder will not count rollovers. This
-   * behavior is very rarely needed, and is usually a sign you are
-   * using the wrong encoder type.
-   *
-   * @param enable True to enable rollover counting, false to disable.
-   */
-  void ConfigureRolloverSupport(bool enable);
-
-  /**
-   * Reset the number of rollovers that have been counted.
-   *
-   * <p>This has no effect unless configureRolloverSupport(true)
-   * has been called.
-   */
-  void ResetRollovers();
-
  private:
   void Init(double fullRange, double expectedZero);
   double MapSensorRange(double pos) const;
-
-  double GetWithoutRollovers(double analog) const;
-  double GetWithRollovers() const;
 
   std::shared_ptr<AnalogInput> m_analogInput;
   double m_fullRange;
@@ -167,10 +143,6 @@ class AnalogEncoder : public wpi::Sendable,
   double m_sensorMin{0.0};
   double m_sensorMax{1.0};
   bool m_isInverted{false};
-
-  std::unique_ptr<AnalogTrigger> m_rolloverTrigger{nullptr};
-  std::unique_ptr<Counter> m_rolloverCounter{nullptr};
-  mutable double m_lastPosition{0.0};
 
   hal::SimDevice m_simDevice;
   hal::SimDouble m_simPosition;
