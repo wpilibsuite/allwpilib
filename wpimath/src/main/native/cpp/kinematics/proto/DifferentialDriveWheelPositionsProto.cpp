@@ -18,8 +18,8 @@ wpi::Protobuf<frc::DifferentialDriveWheelPositions>::Unpack(
   auto m = static_cast<const wpi::proto::ProtobufDifferentialDriveWheelPositions*>(
       &msg);
   return frc::DifferentialDriveWheelPositions{
-      units::meters_per_second_t{m->left()},
-      units::meters_per_second_t{m->right()},
+      units::meter_t{m->left()},
+      units::meter_t{m->right()},
   };
 }
 
