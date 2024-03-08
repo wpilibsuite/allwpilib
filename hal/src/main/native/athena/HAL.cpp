@@ -599,7 +599,7 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
                "process is being terminated.\n");
     std::fflush(stdout);
     // Attempt to force a segfault to get a better java log
-    *(int*)0 = 0;
+    *reinterpret_cast<int*>(0) = 0;
     // If that fails, terminate
     std::terminate();
     return false;
