@@ -365,7 +365,7 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
   /**
    * Checks if the ChassisSpeeds is equivalent to the other provided ChassisSpeeds.
    *
-   * @param other The ChassiSpeeds object to compare to.
+   * @param o The object compare this to.
    */
   @Override
   public boolean equals(Object o) {
