@@ -278,7 +278,7 @@ uint64_t wpi::Now() {
                  "error. The process is being terminated.\n");
       std::fflush(stderr);
       // Attempt to force a segfault to get a better java log
-      *(int*)0 = 0;
+      *reinterpret_cast<int*>(0) = 0;
       // If that fails, terminate
       std::terminate();
       return 1;
