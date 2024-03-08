@@ -367,10 +367,21 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    *
    * @param other The ChassiSpeeds object to compare to.
    */
-  public Boolean equals(ChassisSpeeds other) {
-    return vxMetersPerSecond == other.vxMetersPerSecond
-        && vyMetersPerSecond == other.vyMetersPerSecond
-        && omegaRadiansPerSecond == other.omegaRadiansPerSecond;
+  @Override
+  public boolean equals(Object o) {
+    if (o == this) {
+      return true;
+    }
+
+    if (!(o instanceof Object)) {
+      return false;
+    }
+
+    ChassisSpeeds c = (ChassisSpeeds) o;
+
+    return vxMetersPerSecond == c.vxMetersPerSecond
+        && vyMetersPerSecond == c.vyMetersPerSecond
+        && omegaRadiansPerSecond == c.omegaRadiansPerSecond;
   }
 
   @Override
