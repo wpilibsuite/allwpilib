@@ -362,18 +362,13 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
         vxMetersPerSecond / scalar, vyMetersPerSecond / scalar, omegaRadiansPerSecond / scalar);
   }
 
-  /**
-   * Checks if the ChassisSpeeds is equivalent to the other provided ChassisSpeeds.
-   *
-   * @param o The object compare this to.
-   */
   @Override
   public boolean equals(Object o) {
     if (o == this) {
       return true;
     }
 
-    if (!(o instanceof Object)) {
+    if (!(o instanceof ChassisSpeeds)) {
       return false;
     }
 
