@@ -15,8 +15,9 @@ google::protobuf::Message* wpi::Protobuf<
 frc::DifferentialDriveWheelPositions
 wpi::Protobuf<frc::DifferentialDriveWheelPositions>::Unpack(
     const google::protobuf::Message& msg) {
-  auto m = static_cast<const wpi::proto::ProtobufDifferentialDriveWheelPositions*>(
-      &msg);
+  auto m =
+      static_cast<const wpi::proto::ProtobufDifferentialDriveWheelPositions*>(
+          &msg);
   return frc::DifferentialDriveWheelPositions{
       units::meter_t{m->left()},
       units::meter_t{m->right()},
@@ -26,7 +27,8 @@ wpi::Protobuf<frc::DifferentialDriveWheelPositions>::Unpack(
 void wpi::Protobuf<frc::DifferentialDriveWheelPositions>::Pack(
     google::protobuf::Message* msg,
     const frc::DifferentialDriveWheelPositions& value) {
-  auto m = static_cast<wpi::proto::ProtobufDifferentialDriveWheelPositions*>(msg);
+  auto m =
+      static_cast<wpi::proto::ProtobufDifferentialDriveWheelPositions*>(msg);
   m->set_left(value.left.value());
   m->set_right(value.right.value());
 }
