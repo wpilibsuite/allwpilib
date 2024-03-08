@@ -273,9 +273,7 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
    *
    * @return The result of the comparison. Is true if they are the same.
    */
-  constexpr bool operator==(ChassisSpeeds& other) {
-    return vx == other.vx && vy == other.vy && omega == other.omega;
-  }
+  constexpr bool operator==(const ChassisSpeeds& other) const = default;
 };
 }  // namespace frc
 
