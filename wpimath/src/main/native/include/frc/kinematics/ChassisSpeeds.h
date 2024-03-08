@@ -53,6 +53,8 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
   constexpr ChassisSpeeds() = default;
   constexpr ChassisSpeeds(ChassisSpeeds&&) = default;
   constexpr ChassisSpeeds& operator=(ChassisSpeeds&&) = default;
+  constexpr ChassisSpeeds(ChassisSpeeds&) = default;
+  constexpr ChassisSpeeds& operator=(ChassisSpeeds&) = default;
 
   /**
    * Disretizes a continuous-time chassis speed.
