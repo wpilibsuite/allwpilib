@@ -273,15 +273,14 @@ uint64_t wpi::Now() {
     if (nowUseDefaultOnFailure.test()) {
       return timestamp() - offset_val;
     } else {
-      static uint64_t last = 0;
-      uint64_t cur = timestamp();
-      if ((cur - last) > 100000) {
-        last = cur;
-        fmt::print(stderr,
-                   "FPGA not yet configured in wpi::Now(). Time will not be "
-                   "correct.\n");
-        std::fflush(stderr);
-      }
+      fmt::print(stderr,
+                 "FPGA not yet configured in wpi::Now(). This is a fatal "
+                 "error. The process is being terminated.\n");
+      std::fflush(stderr);
+      // Attempt to force a segfault to get a better java log
+      *(int*)0 = 0;
+      // If that fails, terminate
+      std::terminate();
       return 1;
     }
   }
