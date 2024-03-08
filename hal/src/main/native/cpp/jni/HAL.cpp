@@ -88,7 +88,7 @@ Java_edu_wpi_first_hal_HAL_exitMain
  * Method:    terminate
  * Signature: ()Z
  */
-JNIEXPORT jboolean JNICALL
+JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_HAL_terminate
   (JNIEnv*, jclass)
 {
