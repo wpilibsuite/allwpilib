@@ -11,7 +11,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
-import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
 
 /** Class for supporting continuous analog encoders, such as the US Digital MA3. */
 public class AnalogEncoder implements Sendable, AutoCloseable {
@@ -22,10 +21,6 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
   private double m_sensorMin;
   private double m_sensorMax = 1.0;
   private boolean m_isInverted;
-
-  private AnalogTrigger m_rolloverTrigger;
-  private Counter m_rolloverCounter;
-  private double m_lastPosition;
 
   private SimDevice m_simDevice;
   private SimDouble m_simPosition;
@@ -116,12 +111,22 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
       return m_simPosition.get();
     }
 
-    if (m_rolloverCounter != null) {
-      return getWithRollovers();
-    } else {
-      double analog = m_analogInput.getVoltage();
-      return getWithoutRollovers(analog);
+    double analog = m_analogInput.getVoltage();
+    double pos = analog / RobotController.getVoltage5V();
+
+    // Map sensor range if range isn't full
+    pos = mapSensorRange(pos);
+
+    // Compute full range and offset
+    pos = pos * m_fullRange - m_expectedZero;
+
+    // Map from 0 - Full Range
+    double result = MathUtil.inputModulus(pos, 0, m_fullRange);
+    // Invert if necessary
+    if (m_isInverted) {
+      return m_fullRange - result;
     }
+    return result;
   }
 
   /**
@@ -162,91 +167,6 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
     if (m_simDevice != null) {
       m_simDevice.close();
     }
-  }
-
-  /**
-   * Configures if this encoder has rollover counting enabled.
-   *
-   * <p>By default, the encoder will not count rollovers. This behavior is very rarely needed, and
-   * is usually a sign you are using the wrong encoder type.
-   *
-   * @param enable True to enable rollover counting, false to disable.
-   */
-  public void configureRolloverCounting(boolean enable) {
-    if (enable && m_rolloverCounter == null) {
-      m_rolloverTrigger = new AnalogTrigger(m_analogInput);
-      m_rolloverTrigger.setLimitsVoltage(1.25, 3.75);
-      m_rolloverCounter = new Counter();
-      m_rolloverCounter.setUpSource(m_rolloverTrigger.createOutput(AnalogTriggerType.kRisingPulse));
-      m_rolloverCounter.setDownSource(
-          m_rolloverTrigger.createOutput(AnalogTriggerType.kFallingPulse));
-    } else if (!enable && m_rolloverCounter != null) {
-      m_rolloverTrigger.close();
-      m_rolloverTrigger = null;
-      m_rolloverCounter.close();
-      m_rolloverCounter = null;
-    }
-  }
-
-  /**
-   * Reset the number of rollovers that have been counted.
-   *
-   * <p>This has no effect unless configureRolloverSupport(true) has been called.
-   */
-  public void resetRolloverCount() {
-    if (m_rolloverCounter != null) {
-      m_rolloverCounter.reset();
-    }
-  }
-
-  private boolean doubleEquals(double a, double b) {
-    double epsilon = 0.00001d;
-    return Math.abs(a - b) < epsilon;
-  }
-
-  private double getWithRollovers() {
-    // As the values are not atomic, keep trying until we get 2 reads of the same
-    // value. If we don't within 10 attempts, warn
-    for (int i = 0; i < 10; i++) {
-      double counter = m_rolloverCounter.get();
-      double pos = m_analogInput.getVoltage();
-      double counter2 = m_rolloverCounter.get();
-      double pos2 = m_analogInput.getVoltage();
-      if (counter == counter2 && doubleEquals(pos, pos2)) {
-        pos = getWithoutRollovers(pos);
-
-        if (m_isInverted) {
-          pos = pos - counter;
-        } else {
-          pos = pos + counter;
-        }
-
-        m_lastPosition = pos;
-        return pos;
-      }
-    }
-
-    DriverStation.reportWarning(
-        "Failed to read Analog Encoder. Potential Speed Overrun. Returning last value", false);
-    return m_lastPosition;
-  }
-
-  private double getWithoutRollovers(double analog) {
-    double pos = analog / RobotController.getVoltage5V();
-
-    // Map sensor range if range isn't full
-    pos = mapSensorRange(pos);
-
-    // Compute full range and offset
-    pos = pos * m_fullRange - m_expectedZero;
-
-    // Map from 0 - Full Range
-    double result = MathUtil.inputModulus(pos, 0, m_fullRange);
-    // Invert if necessary
-    if (m_isInverted) {
-      return m_fullRange - result;
-    }
-    return result;
   }
 
   @Override
