@@ -11,9 +11,12 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.proto.Translation3dProto;
 import edu.wpi.first.math.geometry.struct.Translation3dStruct;
 import edu.wpi.first.math.interpolation.Interpolatable;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
@@ -84,6 +87,16 @@ public class Translation3d
   }
 
   /**
+   * Constructs a Translation3d from the provided translation vector's X, Y, and Z components. The
+   * values are assumed to be in meters.
+   *
+   * @param vector The translation vector to represent.
+   */
+  public Translation3d(Vector<N3> vector) {
+    this(vector.get(0), vector.get(1), vector.get(2));
+  }
+
+  /**
    * Calculates the distance between two translations in 3D space.
    *
    * <p>The distance between translations is defined as √((x₂−x₁)²+(y₂−y₁)²+(z₂−z₁)²).
@@ -124,6 +137,15 @@ public class Translation3d
   @JsonProperty
   public double getZ() {
     return m_z;
+  }
+
+  /**
+   * Returns a vector representation of this translation.
+   *
+   * @return A Vector representation of this translation.
+   */
+  public Vector<N3> toVector() {
+    return VecBuilder.fill(m_x, m_y, m_z);
   }
 
   /**

@@ -7,6 +7,7 @@
 #include <jni.h>
 
 #include <cassert>
+#include <cstdlib>
 #include <cstring>
 
 #include <fmt/format.h>
@@ -80,6 +81,20 @@ Java_edu_wpi_first_hal_HAL_exitMain
   (JNIEnv*, jclass)
 {
   HAL_ExitMain();
+}
+
+/*
+ * Class:     edu_wpi_first_hal_HAL
+ * Method:    terminate
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_HAL_terminate
+  (JNIEnv*, jclass)
+{
+#ifdef __FRC_ROBORIO__
+  std::abort();
+#endif
 }
 
 /*

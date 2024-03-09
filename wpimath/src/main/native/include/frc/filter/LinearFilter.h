@@ -371,6 +371,13 @@ class LinearFilter {
     return retVal;
   }
 
+  /**
+   * Returns the last value calculated by the LinearFilter.
+   *
+   * @return The last value.
+   */
+  T LastValue() const { return m_outputs.front(); }
+
  private:
   wpi::circular_buffer<T> m_inputs;
   wpi::circular_buffer<T> m_outputs;

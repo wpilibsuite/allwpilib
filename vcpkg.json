@@ -3,10 +3,9 @@
   "version-string": "latest",
   "dependencies": [
     "opencv",
-    "eigen3",
     "fmt",
     "libuv",
     "protobuf"
   ],
-  "builtin-baseline": "78b61582c9e093fda56a01ebb654be15a0033897"
+  "builtin-baseline": "37c3e63a1306562f7f59c4c3c8892ddd50fdf992"
 }

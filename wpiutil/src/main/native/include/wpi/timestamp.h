@@ -74,10 +74,12 @@ void SetupNowDefaultOnRio();
  */
 #ifdef __FRC_ROBORIO__
 template <typename T>
-void SetupNowRio(void* chipObjectLibrary, std::unique_ptr<T> hmbObject);
+bool SetupNowRio(void* chipObjectLibrary, std::unique_ptr<T> hmbObject);
 #else
 template <typename T>
-inline void SetupNowRio(void*, std::unique_ptr<T>) {}
+inline bool SetupNowRio(void*, std::unique_ptr<T>) {
+  return true;
+}
 #endif
 
 /**
@@ -85,7 +87,7 @@ inline void SetupNowRio(void*, std::unique_ptr<T>) {}
  * No effect on non-Rio platforms. This take an FPGA session that has
  * already been initialized, and is used from LabVIEW.
  */
-void SetupNowRio(uint32_t session);
+bool SetupNowRio(uint32_t session);
 
 /**
  * De-initialize the on-Rio Now() implementation. No effect on non-Rio

@@ -38,7 +38,7 @@ class SendableChooserBase : public wpi::Sendable,
   std::string m_defaultChoice;
   std::string m_selected;
   bool m_haveSelected = false;
-  wpi::mutex m_mutex;
+  mutable wpi::mutex m_mutex;
   int m_instance;
   std::string m_previousVal;
   static std::atomic_int s_instances;

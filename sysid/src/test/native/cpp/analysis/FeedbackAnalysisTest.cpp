@@ -103,3 +103,30 @@ TEST(FeedbackAnalysisTest, VelocityREVConversion) {
   EXPECT_NEAR(Kp, 0.00241 / 3, 0.005);
   EXPECT_NEAR(Kd, 0.00, 0.05);
 }
+
+TEST(FeedbackAnalysisTest, Position) {
+  auto Kv = 3.060;
+  auto Ka = 0.327;
+
+  sysid::LQRParameters params{1, 1.5, 7};
+
+  auto [Kp, Kd] = sysid::CalculatePositionFeedbackGains(
+      sysid::presets::kDefault, params, Kv, Ka);
+
+  EXPECT_NEAR(Kp, 6.41, 0.05);
+  EXPECT_NEAR(Kd, 2.48, 0.05);
+}
+
+TEST(FeedbackAnalysisTest, PositionWithLatencyCompensation) {
+  auto Kv = 3.060;
+  auto Ka = 0.327;
+
+  sysid::LQRParameters params{1, 1.5, 7};
+  sysid::FeedbackControllerPreset preset{sysid::presets::kDefault};
+
+  preset.measurementDelay = 10_ms;
+  auto [Kp, Kd] = sysid::CalculatePositionFeedbackGains(preset, params, Kv, Ka);
+
+  EXPECT_NEAR(Kp, 5.92, 0.05);
+  EXPECT_NEAR(Kd, 2.12, 0.05);
+}

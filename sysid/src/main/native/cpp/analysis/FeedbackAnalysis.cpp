@@ -4,6 +4,8 @@
 
 #include "sysid/analysis/FeedbackAnalysis.h"
 
+#include <cmath>
+
 #include <frc/controller/LinearQuadraticRegulator.h>
 #include <frc/system/LinearSystem.h>
 #include <frc/system/plant/LinearSystemId.h>
@@ -21,6 +23,10 @@ using Ka_t = decltype(1_V / 1_mps_sq);
 FeedbackGains sysid::CalculatePositionFeedbackGains(
     const FeedbackControllerPreset& preset, const LQRParameters& params,
     double Kv, double Ka) {
+  if (!std::isfinite(Kv) || !std::isfinite(Ka)) {
+    return {0.0, 0.0};
+  }
+
   // If acceleration requires no effort, velocity becomes an input for position
   // control. We choose an appropriate model in this case to avoid numerical
   // instabilities in the LQR.
@@ -32,7 +38,8 @@ FeedbackGains sysid::CalculatePositionFeedbackGains(
     frc::LinearQuadraticRegulator<2, 1> controller{
         system, {params.qp, params.qv}, {params.r}, preset.period};
     // Compensate for any latency from sensor measurements, filtering, etc.
-    controller.LatencyCompensate(system, preset.period, 0.0_s);
+    controller.LatencyCompensate(system, preset.period,
+                                 preset.measurementDelay);
 
     return {controller.K(0, 0) * preset.outputConversionFactor,
             controller.K(0, 1) * preset.outputConversionFactor /
@@ -47,7 +54,7 @@ FeedbackGains sysid::CalculatePositionFeedbackGains(
   frc::LinearQuadraticRegulator<1, 1> controller{
       system, {params.qp}, {params.r}, preset.period};
   // Compensate for any latency from sensor measurements, filtering, etc.
-  controller.LatencyCompensate(system, preset.period, 0.0_s);
+  controller.LatencyCompensate(system, preset.period, preset.measurementDelay);
 
   return {Kv * controller.K(0, 0) * preset.outputConversionFactor, 0.0};
 }
@@ -55,6 +62,10 @@ FeedbackGains sysid::CalculatePositionFeedbackGains(
 FeedbackGains sysid::CalculateVelocityFeedbackGains(
     const FeedbackControllerPreset& preset, const LQRParameters& params,
     double Kv, double Ka, double encFactor) {
+  if (!std::isfinite(Kv) || !std::isfinite(Ka)) {
+    return {0.0, 0.0};
+  }
+
   // If acceleration for velocity control requires no effort, the feedback
   // control gains approach zero. We special-case it here because numerical
   // instabilities arise in LQR otherwise.
