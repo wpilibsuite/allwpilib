@@ -39,24 +39,6 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
   units::radians_per_second_t omega = 0_rad_per_s;
 
   /**
-   * Creates a new ChassisSpeeds object.
-   *
-   * @param vx The desired speed along the X axis.
-   * @param vy The desired speed along the Y axis.
-   * @param omega The desired rotational velocity.
-   */
-  constexpr ChassisSpeeds(units::meters_per_second_t vx,
-                          units::meters_per_second_t vy,
-                          units::radians_per_second_t omega)
-      : vx{vx}, vy{vy}, omega{omega} {};
-
-  constexpr ChassisSpeeds() = default;
-  constexpr ChassisSpeeds(ChassisSpeeds&&) = default;
-  constexpr ChassisSpeeds& operator=(ChassisSpeeds&&) = default;
-  constexpr ChassisSpeeds(ChassisSpeeds&) = default;
-  constexpr ChassisSpeeds& operator=(ChassisSpeeds&) = default;
-
-  /**
    * Disretizes a continuous-time chassis speed.
    *
    * This function converts a continuous-time chassis speed into a discrete-time
