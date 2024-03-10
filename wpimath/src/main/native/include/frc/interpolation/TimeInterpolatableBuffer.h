@@ -100,7 +100,7 @@ class TimeInterpolatableBuffer {
    *
    * @param time The time at which to sample the buffer.
    */
-  std::optional<T> Sample(units::second_t time) {
+  std::optional<T> Sample(units::second_t time) const {
     if (m_pastSnapshots.empty()) {
       return {};
     }
