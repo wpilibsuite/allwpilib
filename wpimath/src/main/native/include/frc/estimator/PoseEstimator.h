@@ -94,7 +94,7 @@ class WPILIB_DLLEXPORT PoseEstimator {
   /**
    * Return the pose at a given timestamp, if the buffer is not empty.
    *
-   * @param timestampSeconds The pose's timestamp.
+   * @param timestamp The pose's timestamp.
    * @return The pose at the given timestamp (or std::nullopt if the buffer is
    * empty).
    */
