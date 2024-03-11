@@ -5,9 +5,11 @@
 #include "hal/HAL.h"
 
 #include <jni.h>
+#ifdef __FRC_ROBORIO__
+#include <signal.h>
+#endif
 
 #include <cassert>
-#include <cstdlib>
 #include <cstring>
 
 #include <fmt/format.h>
@@ -93,7 +95,7 @@ Java_edu_wpi_first_hal_HAL_terminate
   (JNIEnv*, jclass)
 {
 #ifdef __FRC_ROBORIO__
-  std::abort();
+  ::raise(SIGILL);
 #endif
 }
 
