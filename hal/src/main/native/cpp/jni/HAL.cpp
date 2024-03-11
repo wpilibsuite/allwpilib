@@ -5,6 +5,7 @@
 #include "hal/HAL.h"
 
 #include <jni.h>
+
 #ifdef __FRC_ROBORIO__
 #include <signal.h>
 #endif
