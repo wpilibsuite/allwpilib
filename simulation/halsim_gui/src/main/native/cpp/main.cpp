@@ -48,7 +48,7 @@ __declspec(dllexport)
 
   gui::CreateContext();
   glass::CreateContext();
-
+  gui::AddInit([] { ImGui::GetIO().ConfigDockingWithShift = true; });
   glass::SetStorageName("simgui");
 
   HAL_RegisterExtension(HALSIMGUI_EXT_ADDGUIINIT,
