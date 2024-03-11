@@ -96,7 +96,7 @@ Java_edu_wpi_first_hal_HAL_terminate
   (JNIEnv*, jclass)
 {
 #ifdef __FRC_ROBORIO__
-  ::raise(SIGILL);
+  ::raise(SIGKILL);
 #endif
 }
 
