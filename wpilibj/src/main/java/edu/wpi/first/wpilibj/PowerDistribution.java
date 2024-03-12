@@ -93,7 +93,9 @@ public class PowerDistribution implements Sendable, AutoCloseable {
   }
 
   /**
-   * Query the temperature of the PDP/PDH.
+   * Query the temperature of the PDP.
+   *
+   * <p>Not supported on the Rev PDH and returns 0.
    *
    * @return The temperature in degrees Celsius
    */
@@ -121,7 +123,9 @@ public class PowerDistribution implements Sendable, AutoCloseable {
   }
 
   /**
-   * Query the total power drawn from the monitored channels.
+   * Query the total power drawn from the monitored channels of the PDP.
+   *
+   * <p>Not supported on the Rev PDH and returns 0.
    *
    * @return the total power in Watts
    */
@@ -130,7 +134,9 @@ public class PowerDistribution implements Sendable, AutoCloseable {
   }
 
   /**
-   * Query the total energy drawn from the monitored channels.
+   * Query the total energy drawn from the monitored channels of the PDP.
+   *
+   * <p>Not supported on the Rev PDH and returns 0.
    *
    * @return the total energy in Joules
    */
@@ -138,7 +144,11 @@ public class PowerDistribution implements Sendable, AutoCloseable {
     return PowerDistributionJNI.getTotalEnergy(m_handle);
   }
 
-  /** Reset the total energy to 0. */
+  /**
+   * Reset the total energy to 0 of the PDP.
+   *
+   * <p>Not supported on the Rev PDH and does nothing.
+   */
   public void resetTotalEnergy() {
     PowerDistributionJNI.resetTotalEnergy(m_handle);
   }
