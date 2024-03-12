@@ -36,12 +36,6 @@ class ProxyCommand : public CommandHelper<Command, ProxyCommand> {
    * DeferredCommand} instead.
    *
    * @param supplier the command supplier
-   * @deprecated This constructor's similarity to {@link DeferredCommand} is
-   * confusing and opens potential footguns for users who do not fully
-   * understand the semantics and implications of proxying, but who simply want
-   * runtime construction. Users who do know what they are doing and need a
-   * supplier-constructed proxied command should instead proxy a DeferredCommand
-   *     using the <code>AsProxy</code> decorator.
    * @see DeferredCommand
    */
   explicit ProxyCommand(wpi::unique_function<Command*()> supplier);
@@ -55,12 +49,6 @@ class ProxyCommand : public CommandHelper<Command, ProxyCommand> {
    * DeferredCommand} instead.
    *
    * @param supplier the command supplier
-   * @deprecated This constructor's similarity to {@link DeferredCommand} is
-   * confusing and opens potential footguns for users who do not fully
-   * understand the semantics and implications of proxying, but who simply want
-   * runtime construction. Users who do know what they are doing and need a
-   * supplier-constructed proxied command should instead proxy a DeferredCommand
-   *     using the <code>AsProxy</code> decorator.
    * @see DeferredCommand
    */
   explicit ProxyCommand(wpi::unique_function<CommandPtr()> supplier);
