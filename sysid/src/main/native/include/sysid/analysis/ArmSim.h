@@ -33,7 +33,7 @@ class ArmSim {
    * forward dt seconds.
    *
    * @param voltage Voltage to apply over the timestep.
-   * @param dt      Sammple period.
+   * @param dt      Sample period.
    */
   void Update(units::volt_t voltage, units::second_t dt);
 
