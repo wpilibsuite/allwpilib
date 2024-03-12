@@ -44,8 +44,7 @@ class ProxyCommand : public CommandHelper<Command, ProxyCommand> {
    *     using the <code>AsProxy</code> decorator.
    * @see DeferredCommand
    */
-   explicit ProxyCommand(
-      wpi::unique_function<Command*()> supplier);
+  explicit ProxyCommand(wpi::unique_function<Command*()> supplier);
 
   /**
    * Creates a new ProxyCommand that schedules the supplied command when
@@ -64,8 +63,7 @@ class ProxyCommand : public CommandHelper<Command, ProxyCommand> {
    *     using the <code>AsProxy</code> decorator.
    * @see DeferredCommand
    */
-  explicit ProxyCommand(
-      wpi::unique_function<CommandPtr()> supplier);
+  explicit ProxyCommand(wpi::unique_function<CommandPtr()> supplier);
 
   /**
    * Creates a new ProxyCommand that schedules the given command when
