@@ -12,6 +12,7 @@
 #include <hal/DriverStation.h>
 #include <hal/FRCUsageReporting.h>
 #include <hal/Notifier.h>
+#include <units/math.h>
 
 #include "frc/Errors.h"
 #include "frc/Timer.h"
@@ -49,7 +50,16 @@ void TimedRobot::StartCompetition() {
 
     callback.func();
 
-    callback.expirationTime += callback.period;
+    // Increment the expiration time by the number of full periods it's behind
+    // plus one to avoid rapid repeat fires from a large loop overrun. We assume
+    // currentTime >= expirationTime rather than checking for it since the
+    // callback wouldn't be running otherwise.
+    units::second_t currentTime = frc::Timer::GetFPGATimestamp();
+    callback.expirationTime +=
+        units::math::floor((currentTime - callback.expirationTime) /
+                           callback.period) *
+            callback.period +
+        callback.period;
     m_callbacks.push(std::move(callback));
 
     // Process all other callbacks that are ready to run
