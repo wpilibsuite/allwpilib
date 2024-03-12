@@ -42,11 +42,10 @@ FeedbackGains sysid::CalculatePositionFeedbackGains(
     controller.LatencyCompensate(system, preset.period,
                                  preset.measurementDelay);
 
-    return {controller.K(0, 0) * preset.outputConversionFactor,
-            controller.K(0, 1) * preset.outputConversionFactor /
-                (preset.normalized
-                     ? 1
-                     : units::second_t{preset.period}.value())};
+    return {
+        controller.K(0, 0) * preset.outputConversionFactor,
+        controller.K(0, 1) * preset.outputConversionFactor /
+            (preset.normalized ? 1 : units::second_t{preset.period}.value())};
   }
 
   // This is our special model to avoid instabilities in the LQR.
