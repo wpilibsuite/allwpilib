@@ -46,7 +46,7 @@ FeedbackGains sysid::CalculatePositionFeedbackGains(
             controller.K(0, 1) * preset.outputConversionFactor /
                 (preset.normalized
                      ? 1
-                     : static_cast<units::second_t>(preset.period).value())};
+                     : units::second_t{preset.period}.value())};
   }
 
   // This is our special model to avoid instabilities in the LQR.
