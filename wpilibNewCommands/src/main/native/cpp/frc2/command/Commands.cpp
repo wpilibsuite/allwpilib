@@ -4,8 +4,6 @@
 
 #include "frc2/command/Commands.h"
 
-#include <wpi/deprecated.h>
-
 #include "frc2/command/ConditionalCommand.h"
 #include "frc2/command/DeferredCommand.h"
 #include "frc2/command/FunctionalCommand.h"
@@ -62,7 +60,6 @@ CommandPtr cmd::Print(std::string_view msg) {
   return PrintCommand(msg).ToPtr();
 }
 
-WPI_IGNORE_DEPRECATED
 CommandPtr cmd::DeferredProxy(wpi::unique_function<Command*()> supplier) {
   return ProxyCommand(std::move(supplier)).ToPtr();
 }
@@ -70,7 +67,6 @@ CommandPtr cmd::DeferredProxy(wpi::unique_function<Command*()> supplier) {
 CommandPtr cmd::DeferredProxy(wpi::unique_function<CommandPtr()> supplier) {
   return ProxyCommand(std::move(supplier)).ToPtr();
 }
-WPI_UNIGNORE_DEPRECATED
 
 CommandPtr cmd::Wait(units::second_t duration) {
   return WaitCommand(duration).ToPtr();

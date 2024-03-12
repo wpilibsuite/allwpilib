@@ -12,8 +12,6 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/deprecated.h>
-
 #include "frc2/command/CommandPtr.h"
 #include "frc2/command/Requirements.h"
 #include "frc2/command/SelectCommand.h"
@@ -160,15 +158,8 @@ CommandPtr Defer(wpi::unique_function<CommandPtr()> supplier,
  * called when the command is initialized.
  *
  * @param supplier the command supplier
- * @deprecated The ProxyCommand supplier constructor has been deprecated in
- * favor of directly proxying a {@link DeferredCommand}, see ProxyCommand
- * documentation for more details. As a replacement, consider using
- * `Defer(supplier).AsProxy()`.
  */
-WPI_IGNORE_DEPRECATED
-[[nodiscard]] [[deprecated(
-    "The ProxyCommand supplier constructor has been deprecated. Use "
-    "Defer(supplier).AsProxy() instead.")]]
+[[nodiscard]]
 CommandPtr DeferredProxy(wpi::unique_function<Command*()> supplier);
 
 /**
@@ -177,16 +168,10 @@ CommandPtr DeferredProxy(wpi::unique_function<Command*()> supplier);
  * called when the command is initialized.
  *
  * @param supplier the command supplier
- * @deprecated The ProxyCommand supplier constructor has been deprecated in
- * favor of directly proxying a {@link DeferredCommand}, see ProxyCommand
- * documentaion for more details. As a replacement, consider using
- * `Defer(supplier).AsProxy()`.
  */
-[[nodiscard]] [[deprecated(
-    "The ProxyCommand supplier constructor has been deprecated. Use "
-    "Defer(supplier).AsProxy() instead.")]]
+[[nodiscard]]
 CommandPtr DeferredProxy(wpi::unique_function<CommandPtr()> supplier);
-WPI_UNIGNORE_DEPRECATED
+
 // Command Groups
 
 namespace impl {
