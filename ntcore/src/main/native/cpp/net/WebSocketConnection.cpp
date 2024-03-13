@@ -227,7 +227,9 @@ int WebSocketConnection::Flush() {
   if (m_err) {
     m_frames.clear();
     for(auto& _buf : m_bufs) {
-      if(_buf.len == 0) _buf.Deallocate();
+      if(_buf.len == 0) {
+        _buf.Deallocate();
+      }
     }
     m_bufs.clear();
     return m_err.code();
@@ -240,7 +242,9 @@ int WebSocketConnection::Flush() {
   }
   m_frames.clear();
   for(auto& _buf : m_bufs) {
-    if(_buf.len == 0) _buf.Deallocate();
+    if(_buf.len == 0) {
+      _buf.Deallocate();
+    }
   }
   m_bufs.clear();
   return count;
