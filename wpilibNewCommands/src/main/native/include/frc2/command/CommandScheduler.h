@@ -44,6 +44,11 @@ class CommandScheduler final : public wpi::Sendable,
    */
   static CommandScheduler& GetInstance();
 
+  /**
+   * For testing only: Clear the global command scheduler instance
+   */
+  static void ResetInstance();
+
   ~CommandScheduler() override;
   CommandScheduler(const CommandScheduler&) = delete;
   CommandScheduler& operator=(const CommandScheduler&) = delete;
