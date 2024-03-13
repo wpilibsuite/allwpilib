@@ -9,6 +9,7 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.MotorSafety;
 import edu.wpi.first.wpilibj.PWM;
+import edu.wpi.first.wpilibj.RobotController;
 import java.util.ArrayList;
 
 /** Common base class for all PWM Motor Controllers. */
@@ -73,6 +74,15 @@ public abstract class PWMMotorController extends MotorSafety
   @Override
   public double get() {
     return m_pwm.getSpeed() * (m_isInverted ? -1.0 : 1.0);
+  }
+
+  /**
+   * Gets the voltage output of the motor controller, nominally between -12 V and 12 V.
+   *
+   * @return The voltage of the motor controller, nominally between -12 V and 12 V.
+   */
+  public double getVoltage() {
+    return get() * RobotController.getBatteryVoltage();
   }
 
   @Override
