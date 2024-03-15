@@ -9,6 +9,7 @@ import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 /**
@@ -113,6 +114,18 @@ public final class Commands {
    */
   public static Command waitSeconds(double seconds) {
     return new WaitCommand(seconds);
+  }
+
+  /**
+   * Constructs a command that does nothing, finishing after the duration returned by the provided
+   * supplier.
+   *
+   * @param durationSupplier Function that provides the time to wait, in seconds.
+   * @return the command
+   * @see WaitCommand#WaitCommand(DoubleSupplier)
+   */
+  public static Command waitSeconds(DoubleSupplier durationSupplier) {
+    return new WaitCommand(durationSupplier);
   }
 
   /**

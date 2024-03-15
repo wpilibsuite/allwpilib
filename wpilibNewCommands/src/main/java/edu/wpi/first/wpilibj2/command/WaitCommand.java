@@ -5,8 +5,8 @@
 package edu.wpi.first.wpilibj2.command;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.Timer;
+import java.util.function.DoubleSupplier;
 
 /**
  * A command that does nothing but takes a specified amount of time to finish.
@@ -17,27 +17,39 @@ public class WaitCommand extends Command {
   /** The timer used for waiting. */
   protected Timer m_timer = new Timer();
 
-  private final double m_duration;
+  private double m_duration;
+  private final DoubleSupplier m_durationSupplier;
 
   /**
    * Creates a new WaitCommand. This command will do nothing, and end after the specified duration.
    *
    * @param seconds the time to wait, in seconds
    */
-  @SuppressWarnings("this-escape")
   public WaitCommand(double seconds) {
-    m_duration = seconds;
-    SendableRegistry.setName(this, getName() + ": " + seconds + " seconds");
+    this(() -> seconds);
+    setName(getName() + ": " + seconds + " seconds");
+  }
+
+  /**
+   * Creates a new WaitCommand. This command will do nothing, and end after the duration returned by
+   * the provided supplier. The supplier will be called once each time the command is initialized.
+   *
+   * @param durationSupplier Function that provides the time to wait, in seconds.
+   */
+  public WaitCommand(DoubleSupplier durationSupplier) {
+    m_durationSupplier = durationSupplier;
   }
 
   @Override
   public void initialize() {
+    m_duration = m_durationSupplier.getAsDouble();
     m_timer.restart();
   }
 
   @Override
   public void end(boolean interrupted) {
     m_timer.stop();
+    m_duration = 0;
   }
 
   @Override

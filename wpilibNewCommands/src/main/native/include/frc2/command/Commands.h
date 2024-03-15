@@ -103,6 +103,14 @@ CommandPtr Print(std::string_view msg);
 CommandPtr Wait(units::second_t duration);
 
 /**
+ * Constructs a command that does nothing, finishing after the duration returned
+ * by the provided supplier.
+ *
+ * @param durationSupplier Function that provides the time to wait, in seconds.
+ */
+CommandPtr Wait(std::function<units::second_t()> durationSupplier);
+
+/**
  * Constructs a command that does nothing, finishing once a condition becomes
  * true.
  *
