@@ -347,34 +347,39 @@ class MeasureTest {
 
   @Test
   void testIsNearMeasureTolerance() {
-    var measureG = Units.Meters.of(1);
-    var measureH = Units.Meters.of(1.2);
+    var measureCompared = Units.Meters.of(1);
+    var measureComparing = Units.Meters.of(1.2);
 
-    assertTrue(measureG.isNear(measureH, Units.Millimeters.of(300)));
-    assertFalse(measureG.isNear(measureH, Units.Centimeters.of(10)));
+    // Positive value with positive tolerance
+    assertTrue(measureCompared.isNear(measureComparing, Units.Millimeters.of(300)));
+    assertFalse(measureCompared.isNear(measureComparing, Units.Centimeters.of(10)));
 
-    measureG = measureG.negate();
-    measureH = measureH.negate();
+    measureCompared = measureCompared.negate();
+    measureComparing = measureComparing.negate();
 
-    assertTrue(measureG.isNear(measureH, Units.Millimeters.of(300)));
-    assertFalse(measureG.isNear(measureH, Units.Centimeters.of(10)));
+    // Negative value with positive tolerance
+    assertTrue(measureCompared.isNear(measureComparing, Units.Millimeters.of(300)));
+    assertFalse(measureCompared.isNear(measureComparing, Units.Centimeters.of(10)));
 
-    measureG = measureG.negate();
-    measureH = measureH.negate();
+    measureCompared = measureCompared.negate();
+    measureComparing = measureComparing.negate();
 
-    assertTrue(measureG.isNear(measureH, Units.Millimeters.of(-300)));
-    assertFalse(measureG.isNear(measureH, Units.Centimeters.of(-10)));
+    // Positive value with negative tolerance
+    assertTrue(measureCompared.isNear(measureComparing, Units.Millimeters.of(-300)));
+    assertFalse(measureCompared.isNear(measureComparing, Units.Centimeters.of(-10)));
 
-    measureG = measureG.negate();
-    measureH = measureH.negate();
+    measureCompared = measureCompared.negate();
+    measureComparing = measureComparing.negate();
 
-    assertTrue(measureG.isNear(measureH, Units.Millimeters.of(-300)));
-    assertFalse(measureG.isNear(measureH, Units.Centimeters.of(-10)));
+    // Negative value with negative tolerance.
+    assertTrue(measureCompared.isNear(measureComparing, Units.Millimeters.of(-300)));
+    assertFalse(measureCompared.isNear(measureComparing, Units.Centimeters.of(-10)));
 
-    measureG = measureG.negate();
-    measureH = measureH.negate();
+    measureCompared = measureCompared.negate();
+    measureComparing = measureComparing.negate();
 
-    assertTrue(measureG.isNear(measureH, Units.Millimeters.of(200)));
-    assertTrue(measureG.isNear(measureH, Units.Centimeters.of(-20)));
+    // Tolerance exact difference between measures.
+    assertTrue(measureCompared.isNear(measureComparing, Units.Millimeters.of(200)));
+    assertTrue(measureCompared.isNear(measureComparing, Units.Centimeters.of(-20)));
   }
 }
