@@ -358,5 +358,23 @@ class MeasureTest {
 
     assertTrue(measureG.isNear(measureH, Units.Millimeters.of(300)));
     assertFalse(measureG.isNear(measureH, Units.Centimeters.of(10)));
+
+    measureG = measureG.negate();
+    measureH = measureH.negate();
+
+    assertTrue(measureG.isNear(measureH, Units.Millimeters.of(-300)));
+    assertFalse(measureG.isNear(measureH, Units.Centimeters.of(-10)));
+
+    measureG = measureG.negate();
+    measureH = measureH.negate();
+
+    assertTrue(measureG.isNear(measureH, Units.Millimeters.of(-300)));
+    assertFalse(measureG.isNear(measureH, Units.Centimeters.of(-10)));
+
+    measureG = measureG.negate();
+    measureH = measureH.negate();
+
+    assertTrue(measureG.isNear(measureH, Units.Millimeters.of(200)));
+    assertTrue(measureG.isNear(measureH, Units.Centimeters.of(-20)));
   }
 }
