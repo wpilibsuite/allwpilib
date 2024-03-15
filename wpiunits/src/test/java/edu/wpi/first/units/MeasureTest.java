@@ -303,7 +303,7 @@ class MeasureTest {
   }
 
   @Test
-  void testIsNear() {
+  void testIsNearVarianceThreshold() {
     var unit = new ExampleUnit(92);
     var measureA = unit.of(1.21);
     var measureB = unit.ofBaseUnits(64);
@@ -343,7 +343,10 @@ class MeasureTest {
 
     assertTrue(Units.Feet.zero().isNear(Units.Millimeters.zero(), 0.001));
     assertFalse(Units.Feet.of(2).isNear(Units.Millimeters.of(0), 0.001));
+  }
 
+  @Test
+  void testIsNearMeasureTolerance() {
     var measureG = Units.Meters.of(1);
     var measureH = Units.Meters.of(1.2);
 
