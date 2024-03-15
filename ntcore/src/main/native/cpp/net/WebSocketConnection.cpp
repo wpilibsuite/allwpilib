@@ -226,11 +226,6 @@ int WebSocketConnection::Flush() {
   m_ws_frames.clear();
   if (m_err) {
     m_frames.clear();
-    for(auto& _buf : m_bufs) {
-      if(_buf.len == 0) {
-        _buf.Deallocate();
-      }
-    }
     m_bufs.clear();
     return m_err.code();
   }
@@ -238,14 +233,11 @@ int WebSocketConnection::Flush() {
   int count = 0;
   for (auto&& frame :
        wpi::take_back(std::span{m_frames}, unsentFrames.size())) {
+    ReleaseBufs(
+        std::span{m_bufs}.subspan(frame.start, frame.end - frame.start));
     count += frame.count;
   }
   m_frames.clear();
-  for(auto& _buf : m_bufs) {
-    if(_buf.len == 0) {
-      _buf.Deallocate();
-    }
-  }
   m_bufs.clear();
   return count;
 }
