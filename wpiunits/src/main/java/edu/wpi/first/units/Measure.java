@@ -280,11 +280,6 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
    * @return true if this unit is near the other measure, otherwise false.
    */
   default boolean isNear(Measure<U> other, Measure<U> tolerance) {
-    if (this.unit().m_baseType != other.unit().m_baseType
-        || other.unit().m_baseType != tolerance.unit().m_baseType) {
-      return false;
-    }
-
     return Math.abs(this.baseUnitMagnitude() - other.baseUnitMagnitude())
         <= Math.abs(tolerance.baseUnitMagnitude());
   }
