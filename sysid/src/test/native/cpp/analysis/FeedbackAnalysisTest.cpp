@@ -130,3 +130,16 @@ TEST(FeedbackAnalysisTest, PositionWithLatencyCompensation) {
   EXPECT_NEAR(Kp, 5.92, 0.05);
   EXPECT_NEAR(Kd, 2.12, 0.05);
 }
+
+TEST(FeedbackAnalysisTest, PositionREV) {
+  auto Kv = 3.060;
+  auto Ka = 0.327;
+
+  sysid::LQRParameters params{1, 1.5, 7};
+
+  auto [Kp, Kd] = sysid::CalculatePositionFeedbackGains(
+      sysid::presets::kREVNEOBuiltIn, params, Kv, Ka);
+
+  EXPECT_NEAR(Kp, 0.30202, 0.05);
+  EXPECT_NEAR(Kd, 48.518, 0.05);
+}
