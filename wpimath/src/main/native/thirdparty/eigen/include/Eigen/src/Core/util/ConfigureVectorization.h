@@ -354,6 +354,7 @@ extern "C" {
 
 #define EIGEN_VECTORIZE
 #define EIGEN_VECTORIZE_VSX 1
+#define EIGEN_VECTORIZE_FMA
 #include <altivec.h>
 // We need to #undef all these ugly tokens defined in <altivec.h>
 // => use __vector instead of vector
@@ -365,6 +366,7 @@ extern "C" {
 
 #define EIGEN_VECTORIZE
 #define EIGEN_VECTORIZE_ALTIVEC
+#define EIGEN_VECTORIZE_FMA
 #include <altivec.h>
 // We need to #undef all these ugly tokens defined in <altivec.h>
 // => use __vector instead of vector
@@ -429,6 +431,11 @@ extern "C" {
 // See also: https://bugs.llvm.org/show_bug.cgi?id=47955
 #if defined(EIGEN_HAS_ARM64_FP16_SCALAR_ARITHMETIC)
 #include <arm_fp16.h>
+#endif
+
+// Enable FMA for ARM.
+#if defined(__ARM_FEATURE_FMA)
+#define EIGEN_VECTORIZE_FMA
 #endif
 
 #if defined(__F16C__) && !defined(EIGEN_GPUCC) && (!EIGEN_COMP_CLANG_STRICT || EIGEN_CLANG_STRICT_AT_LEAST(3, 8, 0))

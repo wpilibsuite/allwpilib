@@ -228,6 +228,21 @@ class CompleteOrthogonalDecomposition
    */
   typename MatrixType::RealScalar logAbsDeterminant() const;
 
+  /** \returns the sign of the determinant of the
+   * matrix of which *this is the complete orthogonal decomposition. It has
+   * only linear complexity (that is, O(n) where n is the dimension of the
+   * square matrix) as the complete orthogonal decomposition has already been
+   * computed.
+   *
+   * \note This is only for square matrices.
+   *
+   * \note This method is useful to work around the risk of overflow/underflow
+   * that's inherent to determinant computation.
+   *
+   * \sa determinant(), absDeterminant(), logAbsDeterminant(), MatrixBase::determinant()
+   */
+  typename MatrixType::Scalar signDeterminant() const;
+
   /** \returns the rank of the matrix of which *this is the complete orthogonal
    * decomposition.
    *
@@ -422,6 +437,11 @@ template <typename MatrixType, typename PermutationIndex>
 typename MatrixType::RealScalar CompleteOrthogonalDecomposition<MatrixType, PermutationIndex>::logAbsDeterminant()
     const {
   return m_cpqr.logAbsDeterminant();
+}
+
+template <typename MatrixType, typename PermutationIndex>
+typename MatrixType::Scalar CompleteOrthogonalDecomposition<MatrixType, PermutationIndex>::signDeterminant() const {
+  return m_cpqr.signDeterminant();
 }
 
 /** Performs the complete orthogonal decomposition of the given matrix \a

@@ -75,10 +75,10 @@ struct traits<IndexedView<XprType, RowIndices, ColIndices>> : traits<XprType> {
   typedef Block<XprType, RowsAtCompileTime, ColsAtCompileTime, IsInnerPannel> BlockType;
 };
 
-}  // namespace internal
-
-template <typename XprType, typename RowIndices, typename ColIndices, typename StorageKind>
+template <typename XprType, typename RowIndices, typename ColIndices, typename StorageKind, bool DirectAccess>
 class IndexedViewImpl;
+
+}  // namespace internal
 
 /** \class IndexedView
  * \ingroup Core_Module
@@ -120,19 +120,36 @@ class IndexedViewImpl;
  */
 template <typename XprType, typename RowIndices, typename ColIndices>
 class IndexedView
-    : public IndexedViewImpl<XprType, RowIndices, ColIndices, typename internal::traits<XprType>::StorageKind> {
+    : public internal::IndexedViewImpl<XprType, RowIndices, ColIndices, typename internal::traits<XprType>::StorageKind,
+                                       (internal::traits<IndexedView<XprType, RowIndices, ColIndices>>::Flags &
+                                        DirectAccessBit) != 0> {
  public:
-  typedef
-      typename IndexedViewImpl<XprType, RowIndices, ColIndices, typename internal::traits<XprType>::StorageKind>::Base
-          Base;
+  typedef typename internal::IndexedViewImpl<
+      XprType, RowIndices, ColIndices, typename internal::traits<XprType>::StorageKind,
+      (internal::traits<IndexedView<XprType, RowIndices, ColIndices>>::Flags & DirectAccessBit) != 0>
+      Base;
   EIGEN_GENERIC_PUBLIC_INTERFACE(IndexedView)
   EIGEN_INHERIT_ASSIGNMENT_OPERATORS(IndexedView)
 
+  template <typename T0, typename T1>
+  IndexedView(XprType& xpr, const T0& rowIndices, const T1& colIndices) : Base(xpr, rowIndices, colIndices) {}
+};
+
+namespace internal {
+
+// Generic API dispatcher
+template <typename XprType, typename RowIndices, typename ColIndices, typename StorageKind, bool DirectAccess>
+class IndexedViewImpl : public internal::generic_xpr_base<IndexedView<XprType, RowIndices, ColIndices>>::type {
+ public:
+  typedef typename internal::generic_xpr_base<IndexedView<XprType, RowIndices, ColIndices>>::type Base;
   typedef typename internal::ref_selector<XprType>::non_const_type MatrixTypeNested;
   typedef internal::remove_all_t<XprType> NestedExpression;
+  typedef typename XprType::Scalar Scalar;
+
+  EIGEN_INHERIT_ASSIGNMENT_OPERATORS(IndexedViewImpl)
 
   template <typename T0, typename T1>
-  IndexedView(XprType& xpr, const T0& rowIndices, const T1& colIndices)
+  IndexedViewImpl(XprType& xpr, const T0& rowIndices, const T1& colIndices)
       : m_xpr(xpr), m_rowIndices(rowIndices), m_colIndices(colIndices) {}
 
   /** \returns number of rows */
@@ -153,20 +170,76 @@ class IndexedView
   /** \returns a const reference to the object storing/generating the column indices */
   const ColIndices& colIndices() const { return m_colIndices; }
 
+  constexpr Scalar& coeffRef(Index rowId, Index colId) {
+    return nestedExpression().coeffRef(m_rowIndices[rowId], m_colIndices[colId]);
+  }
+
+  constexpr const Scalar& coeffRef(Index rowId, Index colId) const {
+    return nestedExpression().coeffRef(m_rowIndices[rowId], m_colIndices[colId]);
+  }
+
  protected:
   MatrixTypeNested m_xpr;
   RowIndices m_rowIndices;
   ColIndices m_colIndices;
 };
 
-// Generic API dispatcher
 template <typename XprType, typename RowIndices, typename ColIndices, typename StorageKind>
-class IndexedViewImpl : public internal::generic_xpr_base<IndexedView<XprType, RowIndices, ColIndices>>::type {
+class IndexedViewImpl<XprType, RowIndices, ColIndices, StorageKind, true>
+    : public IndexedViewImpl<XprType, RowIndices, ColIndices, StorageKind, false> {
  public:
-  typedef typename internal::generic_xpr_base<IndexedView<XprType, RowIndices, ColIndices>>::type Base;
-};
+  using Base = internal::IndexedViewImpl<XprType, RowIndices, ColIndices,
+                                         typename internal::traits<XprType>::StorageKind, false>;
+  using Derived = IndexedView<XprType, RowIndices, ColIndices>;
 
-namespace internal {
+  EIGEN_INHERIT_ASSIGNMENT_OPERATORS(IndexedViewImpl)
+
+  template <typename T0, typename T1>
+  IndexedViewImpl(XprType& xpr, const T0& rowIndices, const T1& colIndices) : Base(xpr, rowIndices, colIndices) {}
+
+  Index rowIncrement() const {
+    if (traits<Derived>::RowIncr != DynamicIndex && traits<Derived>::RowIncr != UndefinedIncr) {
+      return traits<Derived>::RowIncr;
+    }
+    return get_runtime_incr(this->rowIndices());
+  }
+  Index colIncrement() const {
+    if (traits<Derived>::ColIncr != DynamicIndex && traits<Derived>::ColIncr != UndefinedIncr) {
+      return traits<Derived>::ColIncr;
+    }
+    return get_runtime_incr(this->colIndices());
+  }
+
+  Index innerIncrement() const { return traits<Derived>::IsRowMajor ? colIncrement() : rowIncrement(); }
+
+  Index outerIncrement() const { return traits<Derived>::IsRowMajor ? rowIncrement() : colIncrement(); }
+
+  std::decay_t<typename XprType::Scalar>* data() {
+    Index row_offset = this->rowIndices()[0] * this->nestedExpression().rowStride();
+    Index col_offset = this->colIndices()[0] * this->nestedExpression().colStride();
+    return this->nestedExpression().data() + row_offset + col_offset;
+  }
+
+  const std::decay_t<typename XprType::Scalar>* data() const {
+    Index row_offset = this->rowIndices()[0] * this->nestedExpression().rowStride();
+    Index col_offset = this->colIndices()[0] * this->nestedExpression().colStride();
+    return this->nestedExpression().data() + row_offset + col_offset;
+  }
+
+  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index innerStride() const EIGEN_NOEXCEPT {
+    if (traits<Derived>::InnerStrideAtCompileTime != Dynamic) {
+      return traits<Derived>::InnerStrideAtCompileTime;
+    }
+    return innerIncrement() * this->nestedExpression().innerStride();
+  }
+
+  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index outerStride() const EIGEN_NOEXCEPT {
+    if (traits<Derived>::OuterStrideAtCompileTime != Dynamic) {
+      return traits<Derived>::OuterStrideAtCompileTime;
+    }
+    return outerIncrement() * this->nestedExpression().outerStride();
+  }
+};
 
 template <typename ArgType, typename RowIndices, typename ColIndices>
 struct unary_evaluator<IndexedView<ArgType, RowIndices, ColIndices>, IndexBased>

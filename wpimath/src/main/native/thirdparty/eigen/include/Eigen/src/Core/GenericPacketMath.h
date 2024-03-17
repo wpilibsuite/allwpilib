@@ -44,24 +44,30 @@ namespace internal {
 
 struct default_packet_traits {
   enum {
+    // Ops that are implemented for most types.
     HasAdd = 1,
     HasSub = 1,
     HasShift = 1,
     HasMul = 1,
     HasNegate = 1,
     HasAbs = 1,
-    HasArg = 0,
     HasAbs2 = 1,
-    HasAbsDiff = 0,
     HasMin = 1,
     HasMax = 1,
     HasConj = 1,
     HasSetLinear = 1,
     HasSign = 1,
+
+    HasArg = 0,
+    HasAbsDiff = 0,
     HasBlend = 0,
     // This flag is used to indicate whether packet comparison is supported.
     // pcmp_eq, pcmp_lt and pcmp_le should be defined for it to be true.
     HasCmp = 0,
+    HasRound = 0,
+    HasRint = 0,
+    HasFloor = 0,
+    HasCeil = 0,
 
     HasDiv = 0,
     HasReciprocal = 0,
@@ -73,7 +79,6 @@ struct default_packet_traits {
     HasLog1p = 0,
     HasLog10 = 0,
     HasPow = 0,
-
     HasSin = 0,
     HasCos = 0,
     HasTan = 0,
@@ -96,12 +101,7 @@ struct default_packet_traits {
     HasIGammaDerA = 0,
     HasGammaSampleDerAlpha = 0,
     HasIGammac = 0,
-    HasBetaInc = 0,
-
-    HasRound = 0,
-    HasRint = 0,
-    HasFloor = 0,
-    HasCeil = 0
+    HasBetaInc = 0
   };
 };
 
@@ -376,6 +376,12 @@ struct ptrue_impl {
   }
 };
 
+// For booleans, we can only directly set a valid `bool` value to avoid UB.
+template <>
+struct ptrue_impl<bool, void> {
+  static EIGEN_DEVICE_FUNC inline bool run(const bool& /*a*/) { return true; }
+};
+
 // For non-trivial scalars, set to Scalar(1) (i.e. a non-zero value).
 // Although this is technically not a valid bitmask, the scalar path for pselect
 // uses a comparison to zero, so this should still work in most cases. We don't
@@ -456,6 +462,32 @@ struct bit_xor {
 template <typename T>
 struct bit_not {
   EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR EIGEN_ALWAYS_INLINE T operator()(const T& a) const { return ~a; }
+};
+
+template <>
+struct bit_and<bool> {
+  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR EIGEN_ALWAYS_INLINE bool operator()(const bool& a, const bool& b) const {
+    return a && b;
+  }
+};
+
+template <>
+struct bit_or<bool> {
+  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR EIGEN_ALWAYS_INLINE bool operator()(const bool& a, const bool& b) const {
+    return a || b;
+  }
+};
+
+template <>
+struct bit_xor<bool> {
+  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR EIGEN_ALWAYS_INLINE bool operator()(const bool& a, const bool& b) const {
+    return a != b;
+  }
+};
+
+template <>
+struct bit_not<bool> {
+  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR EIGEN_ALWAYS_INLINE bool operator()(const bool& a) const { return !a; }
 };
 
 // Use operators &, |, ^, ~.
@@ -612,11 +644,7 @@ struct pminmax_impl<PropagateNumbers> {
   }
 };
 
-#ifndef SYCL_DEVICE_ONLY
-#define EIGEN_BINARY_OP_NAN_PROPAGATION(Type, Func) Func
-#else
 #define EIGEN_BINARY_OP_NAN_PROPAGATION(Type, Func) [](const Type& a, const Type& b) { return Func(a, b); }
-#endif
 
 /** \internal \returns the min of \a a and \a b  (coeff-wise).
     If \a a or \b b is NaN, the return value is implementation defined. */

@@ -206,9 +206,7 @@ struct GenericNumTraits {
 
   EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR static inline T highest() { return (numext::numeric_limits<T>::max)(); }
 
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR static inline T lowest() {
-    return IsInteger ? (numext::numeric_limits<T>::min)() : static_cast<T>(-(numext::numeric_limits<T>::max)());
-  }
+  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR static inline T lowest() { return (numext::numeric_limits<T>::lowest)(); }
 
   EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR static inline T infinity() { return numext::numeric_limits<T>::infinity(); }
 

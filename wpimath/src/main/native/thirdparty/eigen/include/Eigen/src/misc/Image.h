@@ -27,7 +27,7 @@ struct traits<image_retval_base<DecompositionType> > {
                  MatrixType::RowsAtCompileTime,  // the image is a subspace of the destination space, whose
                                                  // dimension is the number of rows of the original matrix
                  Dynamic,                        // we don't know at compile time the dimension of the image (the rank)
-                 MatrixType::Options,
+                 traits<MatrixType>::Options,
                  MatrixType::MaxRowsAtCompileTime,  // the image matrix will consist of columns from the original
                                                     // matrix,
                  MatrixType::MaxColsAtCompileTime   // so it has the same number of rows and at most as many columns.
