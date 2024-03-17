@@ -59,8 +59,7 @@ public class CommandGenericHID {
    */
   public Trigger button(int button, EventLoop loop) {
     var cache = m_buttonCache.computeIfAbsent(loop, k -> new HashMap<>());
-    return cache.computeIfAbsent(button, k ->
-        new Trigger(loop, () -> m_hid.getRawButton(k)));
+    return cache.computeIfAbsent(button, k -> new Trigger(loop, () -> m_hid.getRawButton(k)));
   }
 
   /**
@@ -93,8 +92,8 @@ public class CommandGenericHID {
   public Trigger pov(int pov, int angle, EventLoop loop) {
     var cache = m_povCache.computeIfAbsent(loop, k -> new HashMap<>());
     // angle can be -1, so use 3600 instead of 360
-    return cache.computeIfAbsent(pov * 3600 + angle, k ->
-        new Trigger(loop, () -> m_hid.getPOV(pov) == angle));
+    return cache.computeIfAbsent(
+        pov * 3600 + angle, k -> new Trigger(loop, () -> m_hid.getPOV(pov) == angle));
   }
 
   /**
