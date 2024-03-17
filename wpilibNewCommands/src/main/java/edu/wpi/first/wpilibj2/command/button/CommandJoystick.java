@@ -55,7 +55,7 @@ public class CommandJoystick extends CommandGenericHID {
    *     given loop.
    */
   public Trigger trigger(EventLoop loop) {
-    return m_hid.trigger(loop).castTo(Trigger::new);
+    return button(Joystick.ButtonType.kTrigger.value, loop);
   }
 
   /**
@@ -77,7 +77,7 @@ public class CommandJoystick extends CommandGenericHID {
    *     loop.
    */
   public Trigger top(EventLoop loop) {
-    return m_hid.top(loop).castTo(Trigger::new);
+    return button(Joystick.ButtonType.kTop.value, loop);
   }
 
   /**
