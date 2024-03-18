@@ -24,8 +24,8 @@ std::vector<CommonType> make_vector(Args&&... args) {
     vec.reserve(sizeof...(Args));
 
     using arr_t = int[];
-    [[maybe_unused]] arr_t arr{
-        0, (vec.emplace_back(std::forward<Args>(args)), 0)...};
+    [[maybe_unused]]
+    arr_t arr{0, (vec.emplace_back(std::forward<Args>(args)), 0)...};
 
     return vec;
   }

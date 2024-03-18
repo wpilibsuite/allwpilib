@@ -6,7 +6,6 @@
 
 #include <algorithm>
 
-#include <wpi/deprecated.h>
 #include <wpi/timestamp.h>
 
 #include "units/time.h"

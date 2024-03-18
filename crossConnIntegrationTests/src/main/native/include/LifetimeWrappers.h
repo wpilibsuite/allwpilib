@@ -190,12 +190,12 @@ struct RelayHandle {
   HAL_RelayHandle handle = 0;
 };
 
-#define ASSERT_LAST_ERROR_STATUS(status, x)                \
-  do {                                                     \
-    ASSERT_EQ(status, HAL_USE_LAST_ERROR);                 \
-    [[maybe_unused]] const char* lastErrorMessageInMacro = \
-        HAL_GetLastError(&status);                         \
-    ASSERT_EQ(status, x);                                  \
+#define ASSERT_LAST_ERROR_STATUS(status, x)                          \
+  do {                                                               \
+    ASSERT_EQ(status, HAL_USE_LAST_ERROR);                           \
+    [[maybe_unused]]                                                 \
+    const char* lastErrorMessageInMacro = HAL_GetLastError(&status); \
+    ASSERT_EQ(status, x);                                            \
   } while (0)
 
 }  // namespace hlt

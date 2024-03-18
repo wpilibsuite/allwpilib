@@ -50,19 +50,19 @@ int main(int argc, char** argv) {
                        }
                      }});
 
-  testVec.push_back(
-      {"Double array append", [](auto& log) {
-         wpi::log::DoubleArrayLogEntry entry{log, "double_array", 1};
-         entry.Append({1, 2, 3}, 20000);
-         entry.Append({4, 5}, 30000);
-       }});
+  testVec.push_back({"Double array append", [](auto& log) {
+                       wpi::log::DoubleArrayLogEntry entry{log, "double_array",
+                                                           1};
+                       entry.Append({1, 2, 3}, 20000);
+                       entry.Append({4, 5}, 30000);
+                     }});
 
-  testVec.push_back(
-      {"String array append", [](auto& log) {
-         wpi::log::StringArrayLogEntry entry{log, "string_array", 1};
-         entry.Append({"Hello", "World"}, 20000);
-         entry.Append({"This", "Is", "Fun"}, 30000);
-       }});
+  testVec.push_back({"String array append", [](auto& log) {
+                       wpi::log::StringArrayLogEntry entry{log, "string_array",
+                                                           1};
+                       entry.Append({"Hello", "World"}, 20000);
+                       entry.Append({"This", "Is", "Fun"}, 30000);
+                     }});
 
   for (const auto& [name, fn] : testVec) {
     auto resVec = std::vector<microseconds::rep>();
