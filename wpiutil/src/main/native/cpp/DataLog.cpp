@@ -20,6 +20,7 @@
 #endif
 
 #include <atomic>
+#include <bit>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -821,8 +822,7 @@ void DataLog::AppendFloat(int entry, float value, int64_t timestamp) {
     [[unlikely]] return;
   }
   uint8_t* buf = StartRecord(entry, timestamp, 4, 4);
-  if constexpr (wpi::support::endian::system_endianness() ==
-                wpi::support::little) {
+  if constexpr (std::endian::native == std::endian::little) {
     std::memcpy(buf, &value, 4);
   } else {
     wpi::support::endian::write32le(buf, wpi::bit_cast<uint32_t>(value));
@@ -838,8 +838,7 @@ void DataLog::AppendDouble(int entry, double value, int64_t timestamp) {
     [[unlikely]] return;
   }
   uint8_t* buf = StartRecord(entry, timestamp, 8, 8);
-  if constexpr (wpi::support::endian::system_endianness() ==
-                wpi::support::little) {
+  if constexpr (std::endian::native == std::endian::little) {
     std::memcpy(buf, &value, 8);
   } else {
     wpi::support::endian::write64le(buf, wpi::bit_cast<uint64_t>(value));
@@ -908,8 +907,7 @@ void DataLog::AppendBooleanArray(int entry, std::span<const uint8_t> arr,
 
 void DataLog::AppendIntegerArray(int entry, std::span<const int64_t> arr,
                                  int64_t timestamp) {
-  if constexpr (wpi::support::endian::system_endianness() ==
-                wpi::support::little) {
+  if constexpr (std::endian::native == std::endian::little) {
     AppendRaw(entry,
               {reinterpret_cast<const uint8_t*>(arr.data()), arr.size() * 8},
               timestamp);
@@ -941,8 +939,7 @@ void DataLog::AppendIntegerArray(int entry, std::span<const int64_t> arr,
 
 void DataLog::AppendFloatArray(int entry, std::span<const float> arr,
                                int64_t timestamp) {
-  if constexpr (wpi::support::endian::system_endianness() ==
-                wpi::support::little) {
+  if constexpr (std::endian::native == std::endian::little) {
     AppendRaw(entry,
               {reinterpret_cast<const uint8_t*>(arr.data()), arr.size() * 4},
               timestamp);
@@ -974,8 +971,7 @@ void DataLog::AppendFloatArray(int entry, std::span<const float> arr,
 
 void DataLog::AppendDoubleArray(int entry, std::span<const double> arr,
                                 int64_t timestamp) {
-  if constexpr (wpi::support::endian::system_endianness() ==
-                wpi::support::little) {
+  if constexpr (std::endian::native == std::endian::little) {
     AppendRaw(entry,
               {reinterpret_cast<const uint8_t*>(arr.data()), arr.size() * 8},
               timestamp);
