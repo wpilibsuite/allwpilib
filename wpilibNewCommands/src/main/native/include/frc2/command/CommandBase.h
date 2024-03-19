@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <wpi/deprecated.h>
-
 #include "frc2/command/Command.h"
 
 namespace frc2 {
@@ -19,7 +17,7 @@ namespace frc2 {
  */
 class [[deprecated("Use Command instead")]] CommandBase : public Command {
  protected:
-  WPI_DEPRECATED("Use Command instead")
+  [[deprecated("Use Command instead")]]
   CommandBase();
 };
 }  // namespace frc2

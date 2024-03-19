@@ -225,8 +225,8 @@ using copy_cv_t = typename copy_cv<CvSrc, Dest>::type;
 
 template <typename From, typename To>
 constexpr bool is_qualification_convertible_v =
-    !(std::is_const_v<From> && !std::is_const_v<To>)&&!(
-        std::is_volatile_v<From> && !std::is_volatile_v<To>);
+    !(std::is_const_v<From> && !std::is_const_v<To>) &&
+    !(std::is_volatile_v<From> && !std::is_volatile_v<To>);
 
 /**
  * Helper class for working with JNI arrays.
