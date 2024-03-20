@@ -5,9 +5,10 @@
 package edu.wpi.first.util.sendable2;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.WeakHashMap;
 
-public class SendableCloser implements AutoCloseable {
+public class SendableSet implements AutoCloseable {
   private Map<SendableTable, Boolean> m_sendables = new WeakHashMap<>();
 
   @Override
@@ -19,6 +20,10 @@ public class SendableCloser implements AutoCloseable {
         // ignored
       }
     }
+  }
+
+  public Set<SendableTable> getAll() {
+    return m_sendables.keySet();
   }
 
   public void add(SendableTable table) {
