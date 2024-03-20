@@ -43,7 +43,7 @@ jobs:
           distribution: 'zulu'
           java-version: 17
       - name: Install wpiformat
-        run: pip3 install wpiformat
+        run: pip3 install wpiformat==2024.32
       - name: Run wpiformat
         run: wpiformat
       - name: Run spotlessApply
