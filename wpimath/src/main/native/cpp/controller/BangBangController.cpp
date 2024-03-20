@@ -62,8 +62,7 @@ void BangBangController::InitSendable(wpi::SendableBuilder& builder) {
       [this](double setpoint) { SetSetpoint(setpoint); });
   builder.AddDoubleProperty(
       "measurement", [this] { return GetMeasurement(); }, nullptr);
-  builder.AddDoubleProperty(
-      "error", [this] { return GetError(); }, nullptr);
+  builder.AddDoubleProperty("error", [this] { return GetError(); }, nullptr);
   builder.AddBooleanProperty(
       "atSetpoint", [this] { return AtSetpoint(); }, nullptr);
 }
