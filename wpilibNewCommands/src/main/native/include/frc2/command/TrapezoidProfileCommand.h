@@ -8,12 +8,11 @@
 
 #include <frc/Timer.h>
 #include <frc/trajectory/TrapezoidProfile.h>
+#include <units/time.h>
 
 #include "frc2/command/Command.h"
 #include "frc2/command/CommandHelper.h"
 #include "frc2/command/Requirements.h"
-
-#include <units/time.h>
 
 namespace frc2 {
 /**
@@ -108,7 +107,7 @@ class TrapezoidProfileCommand
 
   void Execute() override {
     if (m_newAPI) {
-      m_output(m_profile.Calculate(m_period, m_currentState(), m_goal())); 
+      m_output(m_profile.Calculate(m_period, m_currentState(), m_goal()));
     } else {
       m_output(m_profile.Calculate(m_timer.Get()));
     }
@@ -125,8 +124,8 @@ class TrapezoidProfileCommand
   std::function<void(State)> m_output;
   std::function<State()> m_goal;
   std::function<State()> m_currentState;
-  bool m_newAPI;  // TODO: Remove
-  frc::Timer m_timer; // TODO: Remove
+  bool m_newAPI;       // TODO: Remove
+  frc::Timer m_timer;  // TODO: Remove
   units::second_t m_period = 20_ms;
 };
 
