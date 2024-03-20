@@ -23,7 +23,8 @@ public class TrapezoidProfileCommand extends Command {
   private final Supplier<State> m_goal;
   private final Supplier<State> m_currentState;
   private final boolean m_newAPI; // TODO: Remove
-  private final Timer m_timer = new Timer();
+  private final Timer m_timer = new Timer(); // TODO: Remove
+  private final double m_period;
 
   /**
    * Creates a new TrapezoidProfileCommand that will execute the given {@link TrapezoidProfile}.
@@ -33,6 +34,7 @@ public class TrapezoidProfileCommand extends Command {
    * @param output The consumer for the profile output.
    * @param goal The supplier for the desired state
    * @param currentState The current state
+   * @param period The period of the command scheduler loop, in seconds.
    * @param requirements The subsystems required by this command.
    */
   @SuppressWarnings("this-escape")
@@ -41,13 +43,24 @@ public class TrapezoidProfileCommand extends Command {
       Consumer<State> output,
       Supplier<State> goal,
       Supplier<State> currentState,
+      double period,
       Subsystem... requirements) {
     m_profile = requireNonNullParam(profile, "profile", "TrapezoidProfileCommand");
     m_output = requireNonNullParam(output, "output", "TrapezoidProfileCommand");
     m_goal = goal;
     m_currentState = currentState;
     m_newAPI = true;
+    m_period = period;
     addRequirements(requirements);
+  }
+
+  public TrapezoidProfileCommand(
+      TrapezoidProfile profile,
+      Consumer<State> output,
+      Supplier<State> goal,
+      Supplier<State> currentState,
+      Subsystem... requirements) {
+    this(profile, output, goal, currentState, 0.02, requirements);
   }
 
   /**
@@ -69,6 +82,7 @@ public class TrapezoidProfileCommand extends Command {
     m_newAPI = false;
     m_goal = null;
     m_currentState = null;
+    m_period = 0.02;
     addRequirements(requirements);
   }
 
@@ -81,7 +95,7 @@ public class TrapezoidProfileCommand extends Command {
   @SuppressWarnings("removal")
   public void execute() {
     if (m_newAPI) {
-      m_output.accept(m_profile.calculate(m_timer.get(), m_currentState.get(), m_goal.get()));
+      m_output.accept(m_profile.calculate(m_period, m_currentState.get(), m_goal.get()));
     } else {
       m_output.accept(m_profile.calculate(m_timer.get()));
     }
