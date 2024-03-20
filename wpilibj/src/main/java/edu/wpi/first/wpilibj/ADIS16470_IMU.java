@@ -393,28 +393,28 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
       }
 
       // Set IMU internal decimation to 4 (output data rate of 2000 SPS / (4 + 1) = 400Hz), output bandwidth = 200Hz
-      if(readRegister(DEC_RATE) != 0x0004){
+      if (readRegister(DEC_RATE) != 0x0004) {
         writeRegister(DEC_RATE, 0x0004);
         m_needs_flash = true;
         DriverStation.reportWarning("ADIS16470: DEC_RATE register configuration inconsistent! Scheduling flash update.", false);
       }
 
       // Set data ready polarity (HIGH = Good Data), Disable gSense Compensation and PoP
-      if(readRegister(MSC_CTRL) != 0x0001){
+      if (readRegister(MSC_CTRL) != 0x0001) {
         writeRegister(MSC_CTRL, 0x0001); 
         m_needs_flash = true;
         DriverStation.reportWarning("ADIS16470: MSC_CTRL register configuration inconsistent! Scheduling flash update.", false);
       }
 
       // Disable IMU internal Bartlett filter (200Hz bandwidth is sufficient)
-      if(readRegister(FILT_CTRL) != 0x0000{
+      if (readRegister(FILT_CTRL) != 0x0000) {
         writeRegister(FILT_CTRL, 0x0000);
         m_needs_flash = true;
         DriverStation.reportWarning("ADIS16470: FILT_CTRL register configuration inconsistent! Scheduling flash update.", false);
       }
 
       // If any registers on the IMU don't match the config, trigger a flash update
-      if(m_needs_flash){
+      if (m_needs_flash){
         DriverStation.reportWarning("ADIS16470: Register configuration changed! Starting IMU flash update.", false);
         writeRegister(GLOB_CMD, 0x0008);
         // Wait long enough for the flash update to finish (72ms minimum as per the datasheet)
@@ -423,7 +423,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
         m_needs_flash = false;
       }
       else {
-        DriverStation.reportWarning("ADIS16470: and RAM configuration consistent. No flash update required!", false);
+        DriverStation.reportWarning("ADIS16470: Flash and RAM configuration consistent. No flash update required!", false);
       }
 
       // Configure continuous bias calibration time based on user setting
@@ -431,7 +431,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
 
       // Notify DS that IMU calibration delay is active
       DriverStation.reportWarning(
-          "ADIS16470 IMU Detected. Starting initial calibration delay.", false);
+          "ADIS16470: Starting initial calibration delay.", false);
 
       // Wait for samples to accumulate internal to the IMU (110% of user-defined
       // time)
