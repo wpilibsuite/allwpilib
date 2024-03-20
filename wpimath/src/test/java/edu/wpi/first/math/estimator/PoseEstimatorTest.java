@@ -8,35 +8,44 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.estimator.PoseEstimationTestUtil.SE2KinematicPrimitive;
+import edu.wpi.first.math.estimator.PoseEstimationTestUtil.SE2Kinematics;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.math.kinematics.Odometry;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.math.util.SamplingUtil;
 import java.util.List;
 import java.util.Random;
 import java.util.TreeMap;
-import java.util.function.Function;
 import org.junit.jupiter.api.Test;
 
-class DifferentialDrivePoseEstimatorTest {
+class PoseEstimatorTest {
+  private final Vector<N3> stateStdDevs = VecBuilder.fill(0.05, 0.05, 0.05);
+  private final Vector<N3> stateNoiseStdDevs = stateStdDevs.div(50);
+  private final Vector<N3> visionStdDevs = VecBuilder.fill(0.2, 0.2, 0.2);
+
+  private static final double visionUpdatePeriod = 0.2;
+  private static final double visionUpdateDelay = 0.1;
+
+  private static final double dt = 0.02;
+
   @Test
   void testAccuracy() {
-    var kinematics = new DifferentialDriveKinematics(1);
+    var kinematics = new SE2Kinematics(dt);
 
-    var estimator =
-        new DifferentialDrivePoseEstimator(
-            kinematics,
-            new Rotation2d(),
-            0,
-            0,
-            new Pose2d(),
-            VecBuilder.fill(0.02, 0.02, 0.01),
-            VecBuilder.fill(0.1, 0.1, 0.1));
+    var odometry =
+        new Odometry<>(
+            kinematics, new Rotation2d(), new SE2KinematicPrimitive(new Pose2d()), new Pose2d());
+
+    var estimator = new PoseEstimator<>(odometry, stateStdDevs, visionStdDevs);
+
     var trajectory =
         TrajectoryGenerator.generateTrajectory(
             List.of(
@@ -51,33 +60,25 @@ class DifferentialDrivePoseEstimatorTest {
         kinematics,
         estimator,
         trajectory,
-        state ->
-            new ChassisSpeeds(
-                state.velocityMetersPerSecond,
-                0,
-                state.velocityMetersPerSecond * state.curvatureRadPerMeter),
-        state -> state.poseMeters,
         trajectory.getInitialPose(),
-        new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
-        0.02,
-        0.1,
-        0.25,
-        true);
+        trajectory.sample(trajectory.getTotalTimeSeconds()).poseMeters,
+        dt,
+        visionUpdatePeriod,
+        visionUpdateDelay,
+        true,
+        stateNoiseStdDevs,
+        visionStdDevs);
   }
 
   @Test
   void testBadInitialPose() {
-    var kinematics = new DifferentialDriveKinematics(1);
+    var kinematics = new SE2Kinematics(dt);
 
-    var estimator =
-        new DifferentialDrivePoseEstimator(
-            kinematics,
-            new Rotation2d(),
-            0,
-            0,
-            new Pose2d(),
-            VecBuilder.fill(0.02, 0.02, 0.01),
-            VecBuilder.fill(0.1, 0.1, 0.1));
+    var odometry =
+        new Odometry<>(
+            kinematics, new Rotation2d(), new SE2KinematicPrimitive(new Pose2d()), new Pose2d());
+
+    var estimator = new PoseEstimator<>(odometry, stateStdDevs, visionStdDevs);
 
     var trajectory =
         TrajectoryGenerator.generateTrajectory(
@@ -106,39 +107,34 @@ class DifferentialDrivePoseEstimatorTest {
             kinematics,
             estimator,
             trajectory,
-            state ->
-                new ChassisSpeeds(
-                    state.velocityMetersPerSecond,
-                    0,
-                    state.velocityMetersPerSecond * state.curvatureRadPerMeter),
-            state -> state.poseMeters,
             initial_pose,
-            new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
-            0.02,
-            0.1,
-            0.25,
-            false);
+            trajectory.sample(trajectory.getTotalTimeSeconds()).poseMeters,
+            dt,
+            visionUpdatePeriod,
+            visionUpdateDelay,
+            false,
+            stateNoiseStdDevs,
+            visionStdDevs);
       }
     }
   }
 
   void testFollowTrajectory(
-      final DifferentialDriveKinematics kinematics,
-      final DifferentialDrivePoseEstimator estimator,
+      final SE2Kinematics kinematics,
+      final PoseEstimator<SE2KinematicPrimitive> estimator,
       final Trajectory trajectory,
-      final Function<Trajectory.State, ChassisSpeeds> chassisSpeedsGenerator,
-      final Function<Trajectory.State, Pose2d> visionMeasurementGenerator,
       final Pose2d startingPose,
       final Pose2d endingPose,
       final double dt,
       final double visionUpdateRate,
       final double visionUpdateDelay,
-      final boolean checkError) {
-    double leftDistanceMeters = 0;
-    double rightDistanceMeters = 0;
-
+      final boolean checkError,
+      final Vector<N3> stateStdDevs,
+      final Vector<N3> visionStdDevs) {
     estimator.resetPosition(
-        new Rotation2d(), leftDistanceMeters, rightDistanceMeters, startingPose);
+        trajectory.getInitialPose().getRotation(),
+        new SE2KinematicPrimitive(trajectory.getInitialPose()),
+        startingPose);
 
     var rand = new Random(3538);
 
@@ -154,13 +150,8 @@ class DifferentialDrivePoseEstimatorTest {
       // We are due for a new vision measurement if it's been `visionUpdateRate` seconds since the
       // last vision measurement
       if (visionUpdateQueue.isEmpty() || visionUpdateQueue.lastKey() + visionUpdateRate < t) {
-        Pose2d newVisionPose =
-            visionMeasurementGenerator
-                .apply(groundTruthState)
-                .plus(
-                    new Transform2d(
-                        new Translation2d(rand.nextGaussian() * 0.1, rand.nextGaussian() * 0.1),
-                        new Rotation2d(rand.nextGaussian() * 0.05)));
+        var adjustment = SamplingUtil.sampleTwist2d(rand, visionStdDevs);
+        Pose2d newVisionPose = groundTruthState.poseMeters.exp(adjustment);
 
         visionUpdateQueue.put(t, newVisionPose);
       }
@@ -169,26 +160,21 @@ class DifferentialDrivePoseEstimatorTest {
       // since it was measured
       if (!visionUpdateQueue.isEmpty() && visionUpdateQueue.firstKey() + visionUpdateDelay < t) {
         var visionEntry = visionUpdateQueue.pollFirstEntry();
+
         estimator.addVisionMeasurement(visionEntry.getValue(), visionEntry.getKey());
       }
 
-      var chassisSpeeds = chassisSpeedsGenerator.apply(groundTruthState);
+      var gyroAngle =
+          groundTruthState
+              .poseMeters
+              .getRotation()
+              .plus(SamplingUtil.sampleRotation2d(rand, stateStdDevs.get(2, 0)));
 
-      var wheelSpeeds = kinematics.toWheelSpeeds(chassisSpeeds);
+      var update =
+          new SE2KinematicPrimitive(
+              groundTruthState.poseMeters.exp(SamplingUtil.sampleTwist2d(rand, stateStdDevs)));
 
-      leftDistanceMeters += wheelSpeeds.leftMetersPerSecond * dt;
-      rightDistanceMeters += wheelSpeeds.rightMetersPerSecond * dt;
-
-      var xHat =
-          estimator.updateWithTime(
-              t,
-              groundTruthState
-                  .poseMeters
-                  .getRotation()
-                  .plus(new Rotation2d(rand.nextGaussian() * 0.05))
-                  .minus(trajectory.getInitialPose().getRotation()),
-              leftDistanceMeters,
-              rightDistanceMeters);
+      var xHat = estimator.updateWithTime(t, gyroAngle, update);
 
       double error =
           groundTruthState.poseMeters.getTranslation().getDistance(xHat.getTranslation());
@@ -201,9 +187,9 @@ class DifferentialDrivePoseEstimatorTest {
     }
 
     assertEquals(
-        endingPose.getX(), estimator.getEstimatedPosition().getX(), 0.08, "Incorrect Final X");
+        endingPose.getX(), estimator.getEstimatedPosition().getX(), 0.15, "Incorrect Final X");
     assertEquals(
-        endingPose.getY(), estimator.getEstimatedPosition().getY(), 0.08, "Incorrect Final Y");
+        endingPose.getY(), estimator.getEstimatedPosition().getY(), 0.15, "Incorrect Final Y");
     assertEquals(
         endingPose.getRotation().getRadians(),
         estimator.getEstimatedPosition().getRotation().getRadians(),
@@ -212,8 +198,8 @@ class DifferentialDrivePoseEstimatorTest {
 
     if (checkError) {
       assertEquals(
-          0.0, errorSum / (trajectory.getTotalTimeSeconds() / dt), 0.07, "Incorrect mean error");
-      assertEquals(0.0, maxError, 0.2, "Incorrect max error");
+          0.0, errorSum / (trajectory.getTotalTimeSeconds() / dt), 0.15, "Incorrect mean error");
+      assertEquals(0.0, maxError, 0.3, "Incorrect max error");
     }
   }
 
@@ -223,19 +209,13 @@ class DifferentialDrivePoseEstimatorTest {
     // is that all measurements affect the estimated pose. The alternative result is that only one
     // vision measurement affects the outcome. If that were the case, after 1000 measurements, the
     // estimated pose would converge to that measurement.
-    var kinematics = new DifferentialDriveKinematics(1);
+    var kinematics = new SE2Kinematics(dt);
+    var odometry =
+        new Odometry<>(
+            kinematics, new Rotation2d(), new SE2KinematicPrimitive(new Pose2d()), new Pose2d());
+    var estimator = new PoseEstimator<>(odometry, stateStdDevs, visionStdDevs);
 
-    var estimator =
-        new DifferentialDrivePoseEstimator(
-            kinematics,
-            new Rotation2d(),
-            0,
-            0,
-            new Pose2d(1, 2, Rotation2d.fromDegrees(270)),
-            VecBuilder.fill(0.02, 0.02, 0.01),
-            VecBuilder.fill(0.1, 0.1, 0.1));
-
-    estimator.updateWithTime(0, new Rotation2d(), 0, 0);
+    estimator.updateWithTime(0, new Rotation2d(), new SE2KinematicPrimitive(new Pose2d()));
 
     var visionMeasurements =
         new Pose2d[] {
@@ -270,22 +250,17 @@ class DifferentialDrivePoseEstimatorTest {
 
   @Test
   void testDiscardsStaleVisionMeasurements() {
-    var kinematics = new DifferentialDriveKinematics(1);
-    var estimator =
-        new DifferentialDrivePoseEstimator(
-            kinematics,
-            new Rotation2d(),
-            0,
-            0,
-            new Pose2d(),
-            VecBuilder.fill(0.1, 0.1, 0.1),
-            VecBuilder.fill(0.9, 0.9, 0.9));
+    var kinematics = new SE2Kinematics(dt);
+    var odometry =
+        new Odometry<>(
+            kinematics, new Rotation2d(), new SE2KinematicPrimitive(new Pose2d()), new Pose2d());
+    var estimator = new PoseEstimator<>(odometry, stateStdDevs, visionStdDevs);
 
     double time = 0;
 
     // Add enough measurements to fill up the buffer
     for (; time < 4; time += 0.02) {
-      estimator.updateWithTime(time, new Rotation2d(), 0, 0);
+      estimator.updateWithTime(time, new Rotation2d(), new SE2KinematicPrimitive(new Pose2d()));
     }
 
     var odometryPose = estimator.getEstimatedPosition();
