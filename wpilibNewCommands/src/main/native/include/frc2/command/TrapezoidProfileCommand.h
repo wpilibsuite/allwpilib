@@ -40,6 +40,32 @@ class TrapezoidProfileCommand
    * @param output       The consumer for the profile output.
    * @param goal The supplier for the desired state
    * @param currentState The current state
+   * @param period       The period of the command scheduler loop, in seconds.
+   * @param requirements The list of requirements.
+   */
+  TrapezoidProfileCommand(frc::TrapezoidProfile<Distance> profile,
+                          std::function<void(State)> output,
+                          std::function<State()> goal,
+                          std::function<State()> currentState,
+                          double period,
+                          Requirements requirements = {})
+      : m_profile(profile),
+        m_output(output),
+        m_goal(goal),
+        m_currentState(currentState),
+        m_period(period) {
+    this->AddRequirements(requirements);
+    m_newAPI = true;
+  }
+
+  /**
+   * Creates a new TrapezoidProfileCommand that will execute the given
+   * TrapezoidalProfile. Output will be piped to the provided consumer function.
+   *
+   * @param profile      The motion profile to execute.
+   * @param output       The consumer for the profile output.
+   * @param goal The supplier for the desired state
+   * @param currentState The current state
    * @param requirements The list of requirements.
    */
   TrapezoidProfileCommand(frc::TrapezoidProfile<Distance> profile,
@@ -50,7 +76,8 @@ class TrapezoidProfileCommand
       : m_profile(profile),
         m_output(output),
         m_goal(goal),
-        m_currentState(currentState) {
+        m_currentState(currentState),
+        m_period(0.02) {
     this->AddRequirements(requirements);
     m_newAPI = true;
   }
@@ -79,7 +106,11 @@ class TrapezoidProfileCommand
   void Initialize() override { m_timer.Restart(); }
 
   void Execute() override {
-    m_output(m_profile.Calculate(m_timer.Get(), m_currentState(), m_goal()));
+    if (m_newAPI) {
+      m_output(m_profile.Calculate(m_period, m_currentState(), m_goal())); 
+    } else {
+      m_output(m_profile.Calculate(m_timer.Get()));
+    }
   }
 
   void End(bool interrupted) override { m_timer.Stop(); }
@@ -94,7 +125,8 @@ class TrapezoidProfileCommand
   std::function<State()> m_goal;
   std::function<State()> m_currentState;
   bool m_newAPI;  // TODO: Remove
-  frc::Timer m_timer;
+  frc::Timer m_timer; // TODO: Remove
+  double m_period;
 };
 
 }  // namespace frc2
