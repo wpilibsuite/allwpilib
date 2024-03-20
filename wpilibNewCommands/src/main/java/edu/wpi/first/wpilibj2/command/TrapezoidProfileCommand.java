@@ -54,6 +54,16 @@ public class TrapezoidProfileCommand extends Command {
     addRequirements(requirements);
   }
 
+    /**
+   * Creates a new TrapezoidProfileCommand that will execute the given {@link TrapezoidProfile}.
+   * Output will be piped to the provided consumer function.
+   *
+   * @param profile The motion profile to execute.
+   * @param output The consumer for the profile output.
+   * @param goal The supplier for the desired state
+   * @param currentState The current state
+   * @param requirements The subsystems required by this command.
+   */
   public TrapezoidProfileCommand(
       TrapezoidProfile profile,
       Consumer<State> output,
