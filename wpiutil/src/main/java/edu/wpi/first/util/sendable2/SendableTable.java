@@ -19,74 +19,63 @@ import java.util.function.Supplier;
 
 /** Helper class for building Sendable dashboard representations. */
 public interface SendableTable extends AutoCloseable {
+  public static class PubSubOption {
+    // TODO: Move ntcore PubSubOption to wpiutil?
+  }
+
   void setBoolean(String name, boolean value);
 
-  void publishBoolean(String name, BooleanSupplier getter);  // TODO: options
+  void publishBoolean(String name, BooleanSupplier supplier, PubSubOption... options);
 
-  void subscribeBoolean(String name, BooleanConsumer getter);  // TODO: options
+  BooleanConsumer publishBoolean(String name, PubSubOption... options);
 
-  void setDouble(String name, double value);
-
-  void publishDouble(String name, DoubleSupplier getter);  // TODO: options
-
-  void subscribeDouble(String name, DoubleConsumer getter);  // TODO: options
-
-  void setFloat(String name, float value);
-
-  void publishFloat(String name, FloatSupplier getter);  // TODO: options
-
-  void subscribeFloat(String name, FloatConsumer getter);  // TODO: options
+  void subscribeBoolean(String name, BooleanConsumer consumer, PubSubOption... options);
 
   void setInt(String name, long value);
 
-  void publishInt(String name, LongSupplier getter);  // TODO: options
+  void publishInt(String name, LongSupplier supplier, PubSubOption... options);
 
-  void subscribeInt(String name, LongConsumer getter);  // TODO: options
+  LongConsumer publishInt(String name, PubSubOption... options);
+
+  void subscribeInt(String name, LongConsumer consumer, PubSubOption... options);
+
+  void setFloat(String name, float value);
+
+  void publishFloat(String name, FloatSupplier supplier, PubSubOption... options);
+
+  FloatConsumer publishFloat(String name, PubSubOption... options);
+
+  void subscribeFloat(String name, FloatConsumer consumer, PubSubOption... options);
+
+  void setDouble(String name, double value);
+
+  void publishDouble(String name, DoubleSupplier supplier, PubSubOption... options);
+
+  DoubleConsumer publishDouble(String name, PubSubOption... options);
+
+  void subscribeDouble(String name, DoubleConsumer consumer, PubSubOption... options);
 
   void setString(String name, String value);
 
-  void publishString(String name, Supplier<String> getter);  // TODO: options
+  void publishString(String name, Supplier<String> supplier, PubSubOption... options);
 
-  void subscribeString(String name, Consumer<String> getter);  // TODO: options
+  Consumer<String> publishString(String name, PubSubOption... options);
+
+  void subscribeString(String name, Consumer<String> consumer, PubSubOption... options);
 
   <T> void setStruct(String name, T value, Struct<T> struct);
 
-  <T> void publishStruct(String name, Struct<T> struct, Supplier<T> getter);  // TODO: options
+  <T> void publishStruct(String name, Struct<T> struct, Supplier<T> supplier, PubSubOption... options);
 
-  <T> void subscribeStruct(String name, Struct<T> struct, Consumer<T> getter);  // TODO: options
+  <T> Consumer<T> publishStruct(String name, Struct<T> struct, PubSubOption... options);
+
+  <T> void subscribeStruct(String name, Struct<T> struct, Consumer<T> consumer, PubSubOption... options);
 
   <T> T addSendable(String name, T obj, Sendable<T> sendable);
 
   <T> T getSendable(String name);
 
   void erase(String name);
-
-  /*
-  public interface BooleanNode {
-    void set(boolean value);
-    boolean get();
-    void publish(BooleanSupplier getter);  // TODO: options
-    void subscribe(BooleanConsumer setter);  // TODO: options
-  }
-
-  BooleanNode booleanNode(String name);
-
-  public interface StructNode<T> {
-    void set(T value);
-    T get();
-    void publish(Supplier<T> getter);  // TODO: options
-    void subscribe(Consumer<T> setter);  // TODO: options
-  }
-
-  <T> StructNode<T> structNode(String name, Struct<T> struct);
-
-  public interface SendableNode<T> {
-    void init(T obj);
-    void close(T obj);
-  }
-
-  <T> SendableNode<T> sendableNode(String name, Sendable<T> sendable);
-  */
 
   /**
    * Return whether this sendable has been published.

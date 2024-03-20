@@ -21,18 +21,18 @@ public interface Sendable<T> {
   Class<T> getTypeClass();
 
   /**
-   * Gets the dashboard type string. This should be globally unique.
+   * Gets the dashboard type string.
    *
    * @return dashboard type string
    */
   String getTypeString();
 
   /**
-   * Gets the closer class for an object instance.
+   * Gets the sendable set for an object instance.
    *
-   * @return closer class
+   * @return sendable set
    */
-  SendableCloser getCloser(T obj);
+  SendableSet getSendableSet(T obj);
 
   /**
    * Gets whether the Sendable should be treated as an actuator.
