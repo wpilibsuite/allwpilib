@@ -13,6 +13,8 @@
 #include "frc2/command/CommandHelper.h"
 #include "frc2/command/Requirements.h"
 
+#include <units/time.h>
+
 namespace frc2 {
 /**
  * A command that runs a TrapezoidProfile.  Useful for smoothly controlling
