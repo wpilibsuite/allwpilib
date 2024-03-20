@@ -47,7 +47,7 @@ class TrapezoidProfileCommand
                           std::function<void(State)> output,
                           std::function<State()> goal,
                           std::function<State()> currentState,
-                          double period,
+                          units::second_t period,
                           Requirements requirements = {})
       : m_profile(profile),
         m_output(output),
@@ -76,8 +76,7 @@ class TrapezoidProfileCommand
       : m_profile(profile),
         m_output(output),
         m_goal(goal),
-        m_currentState(currentState),
-        m_period(0.02) {
+        m_currentState(currentState) {
     this->AddRequirements(requirements);
     m_newAPI = true;
   }
@@ -126,7 +125,7 @@ class TrapezoidProfileCommand
   std::function<State()> m_currentState;
   bool m_newAPI;  // TODO: Remove
   frc::Timer m_timer; // TODO: Remove
-  double m_period;
+  units::second_t m_period = 20_ms;
 };
 
 }  // namespace frc2
