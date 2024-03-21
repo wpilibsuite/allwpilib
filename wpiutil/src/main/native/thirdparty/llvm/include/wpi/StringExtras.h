@@ -358,6 +358,30 @@ inline bool contains_lower(std::string_view str, const char* other) noexcept {
 }
 
 /**
+ * Return a string_view equal to @p str but with @p prefix removed if the string
+ * starts with the prefix. If the string does not start with the prefix, return
+ * a copy of the string.
+ */
+constexpr std::string_view remove_prefix(std::string_view str, std::string_view prefix) noexcept {
+  if (str.starts_with(prefix)) {
+    str.remove_prefix(prefix.size());
+  }
+  return str;
+}
+
+/**
+ * Return a string_view equal to @p str but with @p suffix removed if the
+ * string ends with the suffix. If the string does not end with the suffix,
+ * return a copy of the string.
+ */
+constexpr std::string_view remove_suffix(std::string_view str, std::string_view suffix) noexcept {
+  if (str.ends_with(suffix)) {
+    str.remove_suffix(suffix.size());
+  }
+  return str;
+}
+
+/**
  * Return a string_view equal to @p str but with the first @p n elements
  * dropped.
  */

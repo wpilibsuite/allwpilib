@@ -225,7 +225,7 @@ void NetworkServer::ServerConnection4::ProcessWsUpgrade() {
   std::string_view name;
   bool err = false;
   if (wpi::starts_with(path, "/nt/")) {
-    name = wpi::UnescapeURI(wpi::drop_front(path, 4), nameBuf, &err);
+    name = wpi::UnescapeURI(wpi::remove_prefix(path, "/nt/"), nameBuf, &err);
   }
   if (err || name.empty()) {
     INFO("invalid path '{}' (from {}), must match /nt/[clientId], closing",
