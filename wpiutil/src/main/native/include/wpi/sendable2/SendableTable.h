@@ -11,6 +11,7 @@
 #include <string>
 #include <string_view>
 
+#include "wpi/json_fwd.h"
 #include "wpi/sendable2/Sendable.h"
 #include "wpi/sendable2/SendableTableBackend.h"
 #include "wpi/struct/Struct.h"
@@ -99,6 +100,54 @@ class SendableTable final {
   template <typename T, typename... I>
     requires SendableSerializable<T, I...>
   T* GetSendable(std::string_view name);
+
+  /**
+   * Gets the current value of a property (as a JSON object).
+   *
+   * @param name name
+   * @param propName property name
+   * @return JSON object; null object if the property does not exist.
+   */
+  wpi::json GetProperty(std::string_view name, std::string_view propName) const;
+
+  /**
+   * Sets a property value.
+   *
+   * @param name name
+   * @param propName property name
+   * @param value property value
+   */
+  void SetProperty(std::string_view name, std::string_view propName,
+                   const wpi::json& value);
+
+  /**
+   * Deletes a property.  Has no effect if the property does not exist.
+   *
+   * @param name name
+   * @param propName property name
+   */
+  void DeleteProperty(std::string_view name, std::string_view propName);
+
+  /**
+   * Gets all topic properties as a JSON object.  Each key in the object
+   * is the property name, and the corresponding value is the property value.
+   *
+   * @param name name
+   * @return JSON object
+   */
+  wpi::json GetProperties(std::string_view name) const;
+
+  /**
+   * Updates multiple topic properties.  Each key in the passed-in object is
+   * the name of the property to add/update, and the corresponding value is the
+   * property value to set for that property.  Null values result in deletion
+   * of the corresponding property.
+   *
+   * @param name name
+   * @param properties JSON object with keys to add/update/delete
+   * @return False if properties is not an object
+   */
+  bool SetProperties(std::string_view name, const wpi::json& properties);
 
   void Erase(std::string_view name);
 
