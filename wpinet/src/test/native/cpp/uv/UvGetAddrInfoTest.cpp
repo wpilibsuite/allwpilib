@@ -42,7 +42,8 @@ TEST(UvGetAddrInfoTest, BothNull) {
     fail_cb_called++;
   });
 
-  GetAddrInfo(loop, [](const addrinfo&) { FAIL(); }, "");
+  GetAddrInfo(
+      loop, [](const addrinfo&) { FAIL(); }, "");
   loop->Run();
   ASSERT_EQ(fail_cb_called, 1);
 }
@@ -58,7 +59,8 @@ TEST(UvGetAddrInfoTest, FailedLookup) {
   });
 
   // Use a FQDN by ending in a period
-  GetAddrInfo(loop, [](const addrinfo&) { FAIL(); }, "xyzzy.xyzzy.xyzzy.");
+  GetAddrInfo(
+      loop, [](const addrinfo&) { FAIL(); }, "xyzzy.xyzzy.xyzzy.");
   loop->Run();
   ASSERT_EQ(fail_cb_called, 1);
 }
@@ -69,7 +71,8 @@ TEST(UvGetAddrInfoTest, Basic) {
   auto loop = Loop::Create();
   loop->error.connect([](Error) { FAIL(); });
 
-  GetAddrInfo(loop, [&](const addrinfo&) { getaddrinfo_cbs++; }, "localhost");
+  GetAddrInfo(
+      loop, [&](const addrinfo&) { getaddrinfo_cbs++; }, "localhost");
 
   loop->Run();
 

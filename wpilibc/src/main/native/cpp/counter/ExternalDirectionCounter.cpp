@@ -98,5 +98,6 @@ void ExternalDirectionCounter::SetEdgeConfiguration(
 
 void ExternalDirectionCounter::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("External Direction Counter");
-  builder.AddDoubleProperty("Count", [&] { return GetCount(); }, nullptr);
+  builder.AddDoubleProperty(
+      "Count", [&] { return GetCount(); }, nullptr);
 }
