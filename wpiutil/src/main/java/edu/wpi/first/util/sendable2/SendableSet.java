@@ -4,16 +4,16 @@
 
 package edu.wpi.first.util.sendable2;
 
-import java.util.Map;
+import java.util.Collections;
 import java.util.Set;
 import java.util.WeakHashMap;
 
 public class SendableSet implements AutoCloseable {
-  private Map<SendableTable, Boolean> m_sendables = new WeakHashMap<>();
+  private Set<SendableTable> m_sendables = Collections.newSetFromMap<SendableTable>(new WeakHashMap<>());
 
   @Override
   public void close() {
-    for (SendableTable table : m_sendables.keySet()) {
+    for (SendableTable table : m_sendables) {
       try {
         table.close();
       } catch (Exception e) {
@@ -23,11 +23,11 @@ public class SendableSet implements AutoCloseable {
   }
 
   public Set<SendableTable> getAll() {
-    return m_sendables.keySet();
+    return m_sendables;
   }
 
   public void add(SendableTable table) {
-    m_sendables.put(table, null);
+    m_sendables.add(table);
   }
 
   public void remove(SendableTable table) {
