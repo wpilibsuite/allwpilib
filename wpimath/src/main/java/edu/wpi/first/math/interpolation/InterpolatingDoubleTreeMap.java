@@ -7,9 +7,9 @@ package edu.wpi.first.math.interpolation;
 /**
  * Interpolating Tree Maps are used to get values at points that are not defined by making a guess
  * from points that are defined. This uses linear interpolation.
- * 
+ *
  * <p>Example of use:
- * 
+ *
  * <pre><code>
  * InterpolatingDoubleTreeMap table = new InterpolatingDoubleTreeMap();
  * table.put(0.0, 0.0);
