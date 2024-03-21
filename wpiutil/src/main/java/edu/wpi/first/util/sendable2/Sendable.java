@@ -35,22 +35,6 @@ public interface Sendable<T> {
   SendableSet getSendableSet(T obj);
 
   /**
-   * Gets whether the Sendable should be treated as an actuator.
-   *
-   * @param value true if actuator, false if not
-   */
-  default boolean isActuator() {
-    return false;
-  }
-
-  /**
-   * Sets an object instance to a safe state. This is called
-   * when entering and exiting Live Window mode.
-   */
-  default void setSafeState() {
-  }
-
-  /**
    * Sets up a sendable for a particular object instance and table.
    *
    * @param obj object
