@@ -75,6 +75,53 @@ public interface SendableTable extends AutoCloseable {
 
   <T> T getSendable(String name);
 
+  /**
+   * Gets the current value of a property (as a JSON string).
+   *
+   * @param name name
+   * @param propName property name
+   * @return JSON string; "null" if the property does not exist.
+   */
+  String getProperty(String name, String propName);
+
+  /**
+   * Sets a property value.
+   *
+   * @param name name
+   * @param propName property name
+   * @param value property value (JSON string)
+   * @throws IllegalArgumentException if properties is not parseable as JSON
+   */
+  void setProperty(String name, String propName, String value);
+
+  /**
+   * Deletes a property. Has no effect if the property does not exist.
+   *
+   * @param name name
+   * @param propName property name
+   */
+  void deleteProperty(String name, String propName);
+
+  /**
+   * Gets all topic properties as a JSON object string. Each key in the object is the property name,
+   * and the corresponding value is the property value.
+   *
+   * @param name name
+   * @return JSON string
+   */
+  String getProperties(String name);
+
+  /**
+   * Updates multiple topic properties. Each key in the passed-in object is the name of the property
+   * to add/update, and the corresponding value is the property value to set for that property. Null
+   * values result in deletion of the corresponding property.
+   *
+   * @param name name
+   * @param properties JSON object string with keys to add/update/delete
+   * @throws IllegalArgumentException if properties is not a JSON object
+   */
+  void setProperties(String name, String properties);
+
   void erase(String name);
 
   /**
@@ -89,4 +136,11 @@ public interface SendableTable extends AutoCloseable {
 
   /** Clear properties. */
   void clear();
+
+  /**
+   * Return whether close() has been called on this sendable table.
+   *
+   * @return True if closed, false otherwise.
+   */
+  boolean isClosed();
 }
