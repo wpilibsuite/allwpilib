@@ -32,7 +32,7 @@ Analyzer::Analyzer(glass::Storage& storage, wpi::Logger& logger)
   // Fill the StringMap with preset values.
   m_presets["Default"] = presets::kDefault;
   m_presets["WPILib"] = presets::kWPILib;
-  m_presets["CANCoder v5"] = presets::kCTRECANCoder;
+  m_presets["CTRE Phoenix 5 CANCoder"] = presets::kCTREv5CANCoder;
   m_presets["CTRE Phoenix 5"] = presets::kCTREv5;
   m_presets["CTRE Phoenix 6"] = presets::kCTREv6;
   m_presets["REV Brushless Encoder Port"] = presets::kREVNEOBuiltIn;
