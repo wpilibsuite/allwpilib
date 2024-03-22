@@ -168,6 +168,7 @@ class SendableTable final {
    */
   void ClearProperties();
 
+  std::shared_ptr<SendableTableBackend> GetBackend() const { return m_backend; }
   std::weak_ptr<SendableTableBackend> GetWeak() const { return m_backend; }
 
  private:

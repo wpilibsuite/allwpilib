@@ -9,6 +9,7 @@
 
 namespace wpi2 {
 
+class SendableSet;
 class SendableTable;
 
 /**
