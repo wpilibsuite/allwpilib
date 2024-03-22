@@ -9,6 +9,7 @@ import static edu.wpi.first.units.Units.Microsecond;
 import static edu.wpi.first.units.Units.Microseconds;
 import static edu.wpi.first.units.Units.Value;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.Dimensionless;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
@@ -20,6 +21,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 
 /**
  * An LED pattern controls lights on an LED strip to command patterns of color that may change over
@@ -393,6 +395,32 @@ public interface LEDPattern {
     };
   }
 
+  /**
+   * Similar to {@link #blend(LEDPattern)}, but performs a bitwise mask on each color channel rather
+   * than averaging the colors for each LED. This can be helpful for displaying only a portion of
+   * the base pattern by applying a mask that sets the desired area to white, and all other areas to
+   * black. However, it can also be used to display only certain color channels or hues; for
+   * example, masking with {@code LEDPattern.color(Color.kRed)} will turn off the green and blue
+   * channels on the output pattern, leaving only the red LEDs to be illuminated.
+   *
+   * @param mask the mask to apply
+   * @return the masked pattern
+   */
+  default LEDPattern mask(LEDPattern mask) {
+    return (reader, writer) -> {
+      // Apply the current pattern down as normal...
+      applyTo(reader, writer);
+
+      mask.applyTo(
+          reader,
+          (i, r, g, b) -> {
+
+            // ... then perform a bitwise AND operation on each channel to apply the mask
+            writer.setRGB(i, r & reader.getRed(i), g & reader.getGreen(i), b & reader.getBlue(i));
+          });
+    };
+  }
+
   /** A pattern that turns off all LEDs. */
   LEDPattern kOff = solid(Color.kBlack);
 
@@ -407,6 +435,43 @@ public interface LEDPattern {
       int bufLen = reader.getLength();
       for (int led = 0; led < bufLen; led++) {
         writer.setLED(led, color);
+      }
+    };
+  }
+
+  /**
+   * Creates a pattern that works as a mask layer for {@link #mask(LEDPattern)} that illuminates
+   * only the portion of the LED strip corresponding with some progress. The mask pattern will start
+   * from the base and set LEDs to white at a proportion equal to the progress returned by the
+   * function. Some usages for this could be for displaying progress of a flywheel to its target
+   * velocity, progress of a complex autonomous sequence, or the height of an elevator.
+   *
+   * <p>For example, creating a mask for displaying a red-to-blue gradient, starting from the red
+   * end, based on where an elevator is in its range of travel.
+   *
+   * <pre>
+   *   LEDPattern basePattern = gradient(Color.kRed, Color.kBlue);
+   *   LEDPattern progressPattern =
+   *     basePattern.mask(progressMaskLayer(() -> elevator.getHeight() / elevator.maxHeight());
+   * </pre>
+   *
+   * @param progressSupplier the function to call to determine the progress. This should return
+   *     values in the range [0, 1]; any values outside that range will be clamped.
+   * @return the mask pattern
+   */
+  static LEDPattern progressMaskLayer(DoubleSupplier progressSupplier) {
+    return (reader, writer) -> {
+      double progress = MathUtil.clamp(progressSupplier.getAsDouble(), 0, 1);
+
+      int bufLen = reader.getLength();
+      int max = (int) (bufLen * progress);
+
+      for (int led = 0; led < max; led++) {
+        writer.setLED(led, Color.kWhite);
+      }
+
+      for (int led = max; led < bufLen; led++) {
+        writer.setLED(led, Color.kBlack);
       }
     };
   }

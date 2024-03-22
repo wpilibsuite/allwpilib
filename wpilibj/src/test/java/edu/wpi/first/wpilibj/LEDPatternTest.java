@@ -12,6 +12,7 @@ import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Value;
 import static edu.wpi.first.wpilibj.util.Color.kBlack;
 import static edu.wpi.first.wpilibj.util.Color.kBlue;
+import static edu.wpi.first.wpilibj.util.Color.kLime;
 import static edu.wpi.first.wpilibj.util.Color.kPurple;
 import static edu.wpi.first.wpilibj.util.Color.kRed;
 import static edu.wpi.first.wpilibj.util.Color.kWhite;
@@ -24,6 +25,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -667,7 +669,82 @@ class LEDPatternTest {
     assertColorEquals(new Color(127, 0, 127), buffer.getLED(0));
   }
 
+  @Test
+  void binaryMask() {
+    Color color = new Color(123, 123, 123);
+    var base = LEDPattern.solid(color);
+    // first 50% mask on, last 50% mask off
+    var mask = LEDPattern.steps(Map.of(0, kWhite, 0.5, kBlack));
+    var masked = base.mask(mask);
+
+    var buffer = new AddressableLEDBuffer(10);
+    masked.applyTo(buffer);
+
+    for (int i = 0; i < 5; i++) {
+      assertColorEquals(color, buffer.getLED(i));
+    }
+
+    for (int i = 5; i < 10; i++) {
+      assertColorEquals(kBlack, buffer.getLED(i));
+    }
+  }
+
+  @Test
+  void channelwiseMask() {
+    Color baseColor = new Color(123, 123, 123);
+    Color halfGray = new Color(0.5, 0.5, 0.5);
+    var base = LEDPattern.solid(baseColor);
+
+    var mask =
+        LEDPattern.steps(Map.of(0, kRed, 0.2, kLime, 0.4, kBlue, 0.6, halfGray, 0.8, kWhite));
+
+    var masked = base.mask(mask);
+
+    var buffer = new AddressableLEDBuffer(5);
+    masked.applyTo(buffer);
+
+    assertColorEquals(new Color(123, 0, 0), buffer.getLED(0)); // red channel only
+    assertColorEquals(new Color(0, 123, 0), buffer.getLED(1)); // green channel only
+    assertColorEquals(new Color(0, 0, 123), buffer.getLED(2)); // blue channel only
+
+    // mask channels are all 0b00111111, base is 0b00111011,
+    // so the AND should give us the unmodified base color
+    assertColorEquals(baseColor, buffer.getLED(3));
+    assertColorEquals(baseColor, buffer.getLED(4)); // full color allowed
+  }
+
+  @Test
+  void progressMaskLayer() {
+    var progress = new AtomicReference<>(0.0);
+    var maskLayer = LEDPattern.progressMaskLayer(progress::get);
+    var buffer = new AddressableLEDBuffer(100);
+
+    for (double t = 0; t <= 1.0; t += 0.01) {
+      progress.set(t);
+      maskLayer.applyTo(buffer);
+
+      int lastMaskedLED = (int) (t * 100);
+      for (int i = 0; i < lastMaskedLED; i++) {
+        assertColorEquals(
+            kWhite,
+            buffer.getLED(i),
+            "Progress " + lastMaskedLED + "%, LED " + i + " should be WHITE");
+      }
+
+      for (int i = lastMaskedLED; i < 100; i++) {
+        assertColorEquals(
+            kBlack,
+            buffer.getLED(i),
+            "Progress " + lastMaskedLED + "% , LED " + i + " should be BLACK");
+      }
+    }
+  }
+
   void assertColorEquals(Color expected, Color actual) {
     assertEquals(new Color8Bit(expected), new Color8Bit(actual));
+  }
+
+  void assertColorEquals(Color expected, Color actual, String message) {
+    assertEquals(new Color8Bit(expected), new Color8Bit(actual), message);
   }
 }
