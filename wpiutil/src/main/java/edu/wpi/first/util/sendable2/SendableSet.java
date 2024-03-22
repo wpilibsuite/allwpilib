@@ -9,7 +9,7 @@ import java.util.Set;
 import java.util.WeakHashMap;
 
 public class SendableSet implements AutoCloseable {
-  private Set<SendableTable> m_sendables = Collections.newSetFromMap<SendableTable>(new WeakHashMap<>());
+  private Set<SendableTable> m_sendables = Collections.newSetFromMap(new WeakHashMap<SendableTable, Boolean>());
 
   @Override
   public void close() {
