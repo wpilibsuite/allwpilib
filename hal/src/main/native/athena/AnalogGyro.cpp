@@ -8,7 +8,7 @@
 #include <string>
 #include <thread>
 
-#include <fmt/format.h>
+#include <wpi/print.h>
 
 #include "AnalogInternal.h"
 #include "HALInitializer.h"
@@ -194,7 +194,7 @@ void HAL_CalibrateAnalogGyro(HAL_GyroHandle handle, int32_t* status) {
   if (*status != 0) {
     return;
   }
-  fmt::print("Calibrating analog gyro for {} seconds.\n",
+  wpi::print("Calibrating analog gyro for {} seconds.\n",
              kCalibrationSampleTime);
   Wait(kCalibrationSampleTime);
 

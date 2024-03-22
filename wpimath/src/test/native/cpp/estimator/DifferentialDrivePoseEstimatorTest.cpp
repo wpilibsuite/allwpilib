@@ -8,6 +8,7 @@
 #include <utility>
 
 #include <gtest/gtest.h>
+#include <wpi/print.h>
 
 #include "frc/StateSpaceUtil.h"
 #include "frc/estimator/DifferentialDrivePoseEstimator.h"
@@ -50,7 +51,7 @@ void testFollowTrajectory(
   double errorSum = 0;
 
   if (debug) {
-    fmt::print(
+    wpi::print(
         "time, est_x, est_y, est_theta, true_x, true_y, true_theta, left, "
         "right\n");
   }
@@ -95,7 +96,7 @@ void testFollowTrajectory(
         leftDistance, rightDistance);
 
     if (debug) {
-      fmt::print(
+      wpi::print(
           "{}, {}, {}, {}, {}, {}, {}, {}, {}\n", t.value(), xhat.X().value(),
           xhat.Y().value(), xhat.Rotation().Radians().value(),
           groundTruthState.pose.X().value(), groundTruthState.pose.Y().value(),
@@ -116,14 +117,14 @@ void testFollowTrajectory(
   }
 
   if (debug) {
-    fmt::print("apply_time, measured_time, vision_x, vision_y, vision_theta\n");
+    wpi::print("apply_time, measured_time, vision_x, vision_y, vision_theta\n");
 
     units::second_t apply_time;
     units::second_t measure_time;
     frc::Pose2d vision_pose;
     for (auto record : visionLog) {
       std::tie(apply_time, measure_time, vision_pose) = record;
-      fmt::print("{}, {}, {}, {}, {}\n", apply_time.value(),
+      wpi::print("{}, {}, {}, {}, {}\n", apply_time.value(),
                  measure_time.value(), vision_pose.X().value(),
                  vision_pose.Y().value(),
                  vision_pose.Rotation().Radians().value());

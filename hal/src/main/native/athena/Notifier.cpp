@@ -9,9 +9,9 @@
 #include <memory>
 #include <thread>
 
-#include <fmt/core.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
+#include <wpi/print.h>
 
 #include "HALInitializer.h"
 #include "HALInternal.h"
@@ -164,12 +164,12 @@ HAL_NotifierHandle HAL_InitializeNotifier(int32_t* status) {
                           notifierThreadPriority, status);
     if (*status == HAL_THREAD_PRIORITY_ERROR) {
       *status = 0;
-      fmt::print("{}: HAL Notifier thread\n",
+      wpi::print("{}: HAL Notifier thread\n",
                  HAL_THREAD_PRIORITY_ERROR_MESSAGE);
     }
     if (*status == HAL_THREAD_PRIORITY_RANGE_ERROR) {
       *status = 0;
-      fmt::print("{}: HAL Notifier thread\n",
+      wpi::print("{}: HAL Notifier thread\n",
                  HAL_THREAD_PRIORITY_RANGE_ERROR_MESSAGE);
     }
 
