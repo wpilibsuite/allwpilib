@@ -30,6 +30,7 @@ public class AddressableLEDBufferView implements LEDReader, LEDWriter {
    * @param backingBuffer the backing buffer to view
    * @param startingIndex the index of the LED in the backing buffer that the view should start from
    * @param endingIndex the index of the LED in the backing buffer that the view should end on
+   * @param <B> the type of the buffer object to create a view for
    */
   public <B extends LEDReader & LEDWriter> AddressableLEDBufferView(
       B backingBuffer, int startingIndex, int endingIndex) {
