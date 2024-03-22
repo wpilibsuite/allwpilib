@@ -504,7 +504,6 @@ class ADIS16470_IMU : public wpi::Sendable,
   std::atomic<bool> m_thread_active = false;
   std::atomic<bool> m_first_run = true;
   std::atomic<bool> m_thread_idle = false;
-  std::atomic<bool> m_needs_flash = false;
   bool m_auto_configured = false;
   SPI::Port m_spi_port;
   uint16_t m_calibration_time = 0;
