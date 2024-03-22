@@ -57,9 +57,9 @@ class Analyzer : public glass::View {
    */
   static constexpr const char* kPresetNames[] = {"Default",
                                                  "WPILib",
-                                                 "CANCoder v5",
-                                                 "CTRE v6",
-                                                 "CTRE v5",
+                                                 "CTRE Phoenix 5 CANcoder",
+                                                 "CTRE Phoenix 5",
+                                                 "CTRE Phoenix 6",
                                                  "REV Brushless Encoder Port",
                                                  "REV Brushed Encoder Port",
                                                  "REV Data Port",
