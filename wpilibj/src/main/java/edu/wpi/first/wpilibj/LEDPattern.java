@@ -220,12 +220,13 @@ public interface LEDPattern {
    *   Measure&lt;Distance&gt; LED_SPACING = Meters.of(1.0 / 60);
    *
    *   LEDPattern rainbow = LEDPattern.rainbow();
-   *   LEDPattern scrollingRainbow = rainbow.scrollAtAbsoluteSpeed(InchesPerSecond.of(4), LED_SPACING);
+   *   LEDPattern scrollingRainbow =
+   *     rainbow.scrollAtAbsoluteSpeed(InchesPerSecond.of(4), LED_SPACING);
    * </pre>
    *
-   * Note that this pattern will scroll <i>faster</i> if applied to a less dense LED strip (such as
-   * 30 LEDs per meter), or <i>slower</i> if applied to a denser LED strip (such as 120 or 144 LEDs
-   * per meter).
+   * <p>Note that this pattern will scroll <i>faster</i> if applied to a less dense LED strip (such
+   * as 30 LEDs per meter), or <i>slower</i> if applied to a denser LED strip (such as 120 or 144
+   * LEDs per meter).
    *
    * @param velocity how fast the pattern should move along a physical LED strip
    * @param ledSpacing the distance between adjacent LEDs on the physical LED strip
@@ -414,7 +415,6 @@ public interface LEDPattern {
       mask.applyTo(
           reader,
           (i, r, g, b) -> {
-
             // ... then perform a bitwise AND operation on each channel to apply the mask
             writer.setRGB(i, r & reader.getRed(i), g & reader.getGreen(i), b & reader.getBlue(i));
           });
