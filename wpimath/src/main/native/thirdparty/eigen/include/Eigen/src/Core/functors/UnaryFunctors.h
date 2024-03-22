@@ -286,9 +286,10 @@ struct functor_traits<scalar_imag_op<Scalar>> {
 template <typename Scalar>
 struct scalar_real_ref_op {
   typedef typename NumTraits<Scalar>::Real result_type;
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE result_type& operator()(const Scalar& a) const {
-    return numext::real_ref(*const_cast<Scalar*>(&a));
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const result_type& operator()(const Scalar& a) const {
+    return numext::real_ref(a);
   }
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE result_type& operator()(Scalar& a) const { return numext::real_ref(a); }
 };
 template <typename Scalar>
 struct functor_traits<scalar_real_ref_op<Scalar>> {
@@ -303,8 +304,9 @@ struct functor_traits<scalar_real_ref_op<Scalar>> {
 template <typename Scalar>
 struct scalar_imag_ref_op {
   typedef typename NumTraits<Scalar>::Real result_type;
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE result_type& operator()(const Scalar& a) const {
-    return numext::imag_ref(*const_cast<Scalar*>(&a));
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE result_type& operator()(Scalar& a) const { return numext::imag_ref(a); }
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const result_type& operator()(const Scalar& a) const {
+    return numext::imag_ref(a);
   }
 };
 template <typename Scalar>
@@ -1091,12 +1093,9 @@ struct functor_traits<scalar_sign_op<Scalar>> {
   };
 };
 
-/** \internal
- * \brief Template functor to compute the logistic function of a scalar
- * \sa class CwiseUnaryOp, ArrayBase::logistic()
- */
-template <typename T>
-struct scalar_logistic_op {
+// Real-valued implementation.
+template <typename T, typename EnableIf = void>
+struct scalar_logistic_op_impl {
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE T operator()(const T& x) const { return packetOp(x); }
 
   template <typename Packet>
@@ -1108,6 +1107,22 @@ struct scalar_logistic_op {
     return pselect(inf_mask, one, pdiv(e, padd(one, e)));
   }
 };
+
+// Complex-valud implementation.
+template <typename T>
+struct scalar_logistic_op_impl<T, std::enable_if_t<NumTraits<T>::IsComplex>> {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE T operator()(const T& x) const {
+    const T e = numext::exp(x);
+    return (numext::isinf)(numext::real(e)) ? T(1) : e / (e + T(1));
+  }
+};
+
+/** \internal
+ * \brief Template functor to compute the logistic function of a scalar
+ * \sa class CwiseUnaryOp, ArrayBase::logistic()
+ */
+template <typename T>
+struct scalar_logistic_op : scalar_logistic_op_impl<T> {};
 
 // TODO(rmlarsen): Enable the following on host when integer_packet is defined
 // for the relevant packet types.
@@ -1206,7 +1221,7 @@ struct functor_traits<scalar_logistic_op<T>> {
     Cost = scalar_div_cost<T, packet_traits<T>::HasDiv>::value +
            (internal::is_same<T, float>::value ? NumTraits<T>::AddCost * 15 + NumTraits<T>::MulCost * 11
                                                : NumTraits<T>::AddCost * 2 + functor_traits<scalar_exp_op<T>>::Cost),
-    PacketAccess = packet_traits<T>::HasAdd && packet_traits<T>::HasDiv &&
+    PacketAccess = !NumTraits<T>::IsComplex && packet_traits<T>::HasAdd && packet_traits<T>::HasDiv &&
                    (internal::is_same<T, float>::value
                         ? packet_traits<T>::HasMul && packet_traits<T>::HasMax && packet_traits<T>::HasMin
                         : packet_traits<T>::HasNegate && packet_traits<T>::HasExp)

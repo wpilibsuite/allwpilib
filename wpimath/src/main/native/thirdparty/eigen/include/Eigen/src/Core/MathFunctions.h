@@ -164,7 +164,7 @@ struct imag_ref_default_impl {
   typedef typename NumTraits<Scalar>::Real RealScalar;
   EIGEN_DEVICE_FUNC static inline RealScalar& run(Scalar& x) { return reinterpret_cast<RealScalar*>(&x)[1]; }
   EIGEN_DEVICE_FUNC static inline const RealScalar& run(const Scalar& x) {
-    return reinterpret_cast<RealScalar*>(&x)[1];
+    return reinterpret_cast<const RealScalar*>(&x)[1];
   }
 };
 
@@ -563,34 +563,6 @@ struct pow_impl<ScalarX, ScalarY, true> {
   }
 };
 
-/****************************************************************************
- * Implementation of random                                               *
- ****************************************************************************/
-
-template <typename Scalar, bool IsComplex, bool IsInteger>
-struct random_default_impl {};
-
-template <typename Scalar>
-struct random_impl : random_default_impl<Scalar, NumTraits<Scalar>::IsComplex, NumTraits<Scalar>::IsInteger> {};
-
-template <typename Scalar>
-struct random_retval {
-  typedef Scalar type;
-};
-
-template <typename Scalar>
-inline EIGEN_MATHFUNC_RETVAL(random, Scalar) random(const Scalar& x, const Scalar& y);
-template <typename Scalar>
-inline EIGEN_MATHFUNC_RETVAL(random, Scalar) random();
-
-template <typename Scalar>
-struct random_default_impl<Scalar, false, false> {
-  static inline Scalar run(const Scalar& x, const Scalar& y) {
-    return x + (y - x) * Scalar(std::rand()) / Scalar(RAND_MAX);
-  }
-  static inline Scalar run() { return run(Scalar(NumTraits<Scalar>::IsSigned ? -1 : 0), Scalar(1)); }
-};
-
 enum { meta_floor_log2_terminate, meta_floor_log2_move_up, meta_floor_log2_move_down, meta_floor_log2_bogus };
 
 template <unsigned int n, int lower, int upper>
@@ -628,56 +600,321 @@ struct meta_floor_log2<n, lower, upper, meta_floor_log2_bogus> {
   // no value, error at compile time
 };
 
-template <typename Scalar>
-struct random_default_impl<Scalar, false, true> {
-  static inline Scalar run(const Scalar& x, const Scalar& y) {
-    if (y <= x) return x;
-    // ScalarU is the unsigned counterpart of Scalar, possibly Scalar itself.
-    typedef typename make_unsigned<Scalar>::type ScalarU;
-    // ScalarX is the widest of ScalarU and unsigned int.
-    // We'll deal only with ScalarX and unsigned int below thus avoiding signed
-    // types and arithmetic and signed overflows (which are undefined behavior).
-    typedef std::conditional_t<(ScalarU(-1) > unsigned(-1)), ScalarU, unsigned> ScalarX;
-    // The following difference doesn't overflow, provided our integer types are two's
-    // complement and have the same number of padding bits in signed and unsigned variants.
-    // This is the case in most modern implementations of C++.
-    ScalarX range = ScalarX(y) - ScalarX(x);
-    ScalarX offset = 0;
-    ScalarX divisor = 1;
-    ScalarX multiplier = 1;
-    const unsigned rand_max = RAND_MAX;
-    if (range <= rand_max)
-      divisor = (rand_max + 1) / (range + 1);
-    else
-      multiplier = 1 + range / (rand_max + 1);
-    // Rejection sampling.
-    do {
-      offset = (unsigned(std::rand()) * multiplier) / divisor;
-    } while (offset > range);
-    return Scalar(ScalarX(x) + offset);
+template <typename BitsType, typename EnableIf = void>
+struct count_bits_impl {
+  static_assert(std::is_integral<BitsType>::value && std::is_unsigned<BitsType>::value,
+                "BitsType must be an unsigned integer");
+
+  static EIGEN_DEVICE_FUNC inline int clz(BitsType bits) {
+    int n = CHAR_BIT * sizeof(BitsType);
+    int shift = n / 2;
+    while (bits > 0 && shift > 0) {
+      BitsType y = bits >> shift;
+      if (y > 0) {
+        n -= shift;
+        bits = y;
+      }
+      shift /= 2;
+    }
+    if (shift == 0) {
+      --n;
+    }
+    return n;
   }
 
-  static inline Scalar run() {
+  static EIGEN_DEVICE_FUNC inline int ctz(BitsType bits) {
+    int n = CHAR_BIT * sizeof(BitsType);
+    int shift = n / 2;
+    while (bits > 0 && shift > 0) {
+      BitsType y = bits << shift;
+      if (y > 0) {
+        n -= shift;
+        bits = y;
+      }
+      shift /= 2;
+    }
+    if (shift == 0) {
+      --n;
+    }
+    return n;
+  }
+};
+
+// Count leading zeros.
+template <typename BitsType>
+EIGEN_DEVICE_FUNC inline int clz(BitsType bits) {
+  return count_bits_impl<BitsType>::clz(bits);
+}
+
+// Count trailing zeros.
+template <typename BitsType>
+EIGEN_DEVICE_FUNC inline int ctz(BitsType bits) {
+  return count_bits_impl<BitsType>::ctz(bits);
+}
+
+#if EIGEN_COMP_GNUC || EIGEN_COMP_CLANG
+
+template <typename BitsType>
+struct count_bits_impl<BitsType, std::enable_if_t<sizeof(BitsType) <= sizeof(unsigned int)>> {
+  static constexpr int kNumBits = static_cast<int>(sizeof(BitsType) * CHAR_BIT);
+  static_assert(std::is_integral<BitsType>::value, "BitsType must be a built-in integer");
+  static EIGEN_DEVICE_FUNC inline int clz(BitsType bits) {
+    static constexpr int kLeadingBitsOffset = (sizeof(unsigned int) - sizeof(BitsType)) * CHAR_BIT;
+    return bits == 0 ? kNumBits : __builtin_clz(static_cast<unsigned int>(bits)) - kLeadingBitsOffset;
+  }
+
+  static EIGEN_DEVICE_FUNC inline int ctz(BitsType bits) {
+    return bits == 0 ? kNumBits : __builtin_ctz(static_cast<unsigned int>(bits));
+  }
+};
+
+template <typename BitsType>
+struct count_bits_impl<
+    BitsType, std::enable_if_t<sizeof(unsigned int) < sizeof(BitsType) && sizeof(BitsType) <= sizeof(unsigned long)>> {
+  static constexpr int kNumBits = static_cast<int>(sizeof(BitsType) * CHAR_BIT);
+  static_assert(std::is_integral<BitsType>::value, "BitsType must be a built-in integer");
+  static EIGEN_DEVICE_FUNC inline int clz(BitsType bits) {
+    static constexpr int kLeadingBitsOffset = (sizeof(unsigned long) - sizeof(BitsType)) * CHAR_BIT;
+    return bits == 0 ? kNumBits : __builtin_clzl(static_cast<unsigned long>(bits)) - kLeadingBitsOffset;
+  }
+
+  static EIGEN_DEVICE_FUNC inline int ctz(BitsType bits) {
+    return bits == 0 ? kNumBits : __builtin_ctzl(static_cast<unsigned long>(bits));
+  }
+};
+
+template <typename BitsType>
+struct count_bits_impl<BitsType, std::enable_if_t<sizeof(unsigned long) < sizeof(BitsType) &&
+                                                  sizeof(BitsType) <= sizeof(unsigned long long)>> {
+  static constexpr int kNumBits = static_cast<int>(sizeof(BitsType) * CHAR_BIT);
+  static_assert(std::is_integral<BitsType>::value, "BitsType must be a built-in integer");
+  static EIGEN_DEVICE_FUNC inline int clz(BitsType bits) {
+    static constexpr int kLeadingBitsOffset = (sizeof(unsigned long long) - sizeof(BitsType)) * CHAR_BIT;
+    return bits == 0 ? kNumBits : __builtin_clzll(static_cast<unsigned long long>(bits)) - kLeadingBitsOffset;
+  }
+
+  static EIGEN_DEVICE_FUNC inline int ctz(BitsType bits) {
+    return bits == 0 ? kNumBits : __builtin_ctzll(static_cast<unsigned long long>(bits));
+  }
+};
+
+#elif EIGEN_COMP_MSVC
+
+template <typename BitsType>
+struct count_bits_impl<BitsType, std::enable_if_t<sizeof(BitsType) <= sizeof(unsigned long)>> {
+  static constexpr int kNumBits = static_cast<int>(sizeof(BitsType) * CHAR_BIT);
+  static_assert(std::is_integral<BitsType>::value, "BitsType must be a built-in integer");
+  static EIGEN_DEVICE_FUNC inline int clz(BitsType bits) {
+    unsigned long out;
+    _BitScanReverse(&out, static_cast<unsigned long>(bits));
+    return bits == 0 ? kNumBits : (kNumBits - 1) - static_cast<int>(out);
+  }
+
+  static EIGEN_DEVICE_FUNC inline int ctz(BitsType bits) {
+    unsigned long out;
+    _BitScanForward(&out, static_cast<unsigned long>(bits));
+    return bits == 0 ? kNumBits : static_cast<int>(out);
+  }
+};
+
+#ifdef _WIN64
+
+template <typename BitsType>
+struct count_bits_impl<
+    BitsType, std::enable_if_t<sizeof(unsigned long) < sizeof(BitsType) && sizeof(BitsType) <= sizeof(__int64)>> {
+  static constexpr int kNumBits = static_cast<int>(sizeof(BitsType) * CHAR_BIT);
+  static_assert(std::is_integral<BitsType>::value, "BitsType must be a built-in integer");
+  static EIGEN_DEVICE_FUNC inline int clz(BitsType bits) {
+    unsigned long out;
+    _BitScanReverse64(&out, static_cast<unsigned __int64>(bits));
+    return bits == 0 ? kNumBits : (kNumBits - 1) - static_cast<int>(out);
+  }
+
+  static EIGEN_DEVICE_FUNC inline int ctz(BitsType bits) {
+    unsigned long out;
+    _BitScanForward64(&out, static_cast<unsigned __int64>(bits));
+    return bits == 0 ? kNumBits : static_cast<int>(out);
+  }
+};
+
+#endif  // _WIN64
+
+#endif  // EIGEN_COMP_GNUC || EIGEN_COMP_CLANG
+
+template <typename BitsType>
+int log2_ceil(BitsType x) {
+  int n = CHAR_BIT * sizeof(BitsType) - clz(x);
+  bool powerOfTwo = (x & (x - 1)) == 0;
+  return x == 0 ? 0 : powerOfTwo ? n - 1 : n;
+}
+
+template <typename BitsType>
+int log2_floor(BitsType x) {
+  int n = CHAR_BIT * sizeof(BitsType) - clz(x);
+  return x == 0 ? 0 : n - 1;
+}
+
+/****************************************************************************
+ * Implementation of random                                               *
+ ****************************************************************************/
+
+// return a Scalar filled with numRandomBits beginning from the least significant bit
+template <typename Scalar>
+Scalar getRandomBits(int numRandomBits) {
+  using BitsType = typename numext::get_integer_by_size<sizeof(Scalar)>::unsigned_type;
+  enum : int {
+    StdRandBits = meta_floor_log2<(unsigned int)(RAND_MAX) + 1>::value,
+    ScalarBits = sizeof(Scalar) * CHAR_BIT
+  };
+  eigen_assert((numRandomBits >= 0) && (numRandomBits <= ScalarBits));
+  const BitsType mask = BitsType(-1) >> ((ScalarBits - numRandomBits) & (ScalarBits - 1));
+  BitsType randomBits = BitsType(0);
+  for (int shift = 0; shift < numRandomBits; shift += StdRandBits) {
+    int r = std::rand();
+    randomBits |= static_cast<BitsType>(r) << shift;
+  }
+  // clear the excess bits
+  randomBits &= mask;
+  return numext::bit_cast<Scalar, BitsType>(randomBits);
+}
+
+template <typename Scalar, bool IsComplex, bool IsInteger>
+struct random_default_impl {};
+
+template <typename Scalar>
+struct random_impl : random_default_impl<Scalar, NumTraits<Scalar>::IsComplex, NumTraits<Scalar>::IsInteger> {};
+
+template <typename Scalar>
+struct random_retval {
+  typedef Scalar type;
+};
+
+template <typename Scalar>
+inline EIGEN_MATHFUNC_RETVAL(random, Scalar) random(const Scalar& x, const Scalar& y);
+template <typename Scalar>
+inline EIGEN_MATHFUNC_RETVAL(random, Scalar) random();
+
+template <typename Scalar>
+struct random_default_impl<Scalar, false, false> {
+  using BitsType = typename numext::get_integer_by_size<sizeof(Scalar)>::unsigned_type;
+  static EIGEN_DEVICE_FUNC inline Scalar run(const Scalar& x, const Scalar& y, int numRandomBits) {
+    Scalar half_x = Scalar(0.5) * x;
+    Scalar half_y = Scalar(0.5) * y;
+    Scalar result = (half_x + half_y) + (half_y - half_x) * run(numRandomBits);
+    // result is in the half-open interval [x, y) -- provided that x < y
+    return result;
+  }
+  static EIGEN_DEVICE_FUNC inline Scalar run(const Scalar& x, const Scalar& y) {
+    const int mantissa_bits = NumTraits<Scalar>::digits() - 1;
+    return run(x, y, mantissa_bits);
+  }
+  static EIGEN_DEVICE_FUNC inline Scalar run(int numRandomBits) {
+    const int mantissa_bits = NumTraits<Scalar>::digits() - 1;
+    eigen_assert(numRandomBits >= 0 && numRandomBits <= mantissa_bits);
+    BitsType randomBits = getRandomBits<BitsType>(numRandomBits);
+    // if fewer than MantissaBits is requested, shift them to the left
+    randomBits <<= (mantissa_bits - numRandomBits);
+    // randomBits is in the half-open interval [2,4)
+    randomBits |= numext::bit_cast<BitsType>(Scalar(2));
+    // result is in the half-open interval [-1,1)
+    Scalar result = numext::bit_cast<Scalar>(randomBits) - Scalar(3);
+    return result;
+  }
+  static EIGEN_DEVICE_FUNC inline Scalar run() {
+    const int mantissa_bits = NumTraits<Scalar>::digits() - 1;
+    return run(mantissa_bits);
+  }
+};
+
+// TODO: fix this for PPC
+template <bool Specialize = sizeof(long double) == 2 * sizeof(uint64_t) && !EIGEN_ARCH_PPC>
+struct random_longdouble_impl {
+  enum : int {
+    Size = sizeof(long double),
+    MantissaBits = NumTraits<long double>::digits() - 1,
+    LowBits = MantissaBits > 64 ? 64 : MantissaBits,
+    HighBits = MantissaBits > 64 ? MantissaBits - 64 : 0
+  };
+  static EIGEN_DEVICE_FUNC inline long double run() {
+    EIGEN_USING_STD(memcpy)
+    uint64_t randomBits[2];
+    long double result = 2.0L;
+    memcpy(&randomBits, &result, Size);
+    randomBits[0] |= getRandomBits<uint64_t>(LowBits);
+    randomBits[1] |= getRandomBits<uint64_t>(HighBits);
+    memcpy(&result, &randomBits, Size);
+    result -= 3.0L;
+    return result;
+  }
+};
+
+// GPUs treat long double as double.
+#ifndef EIGEN_GPU_COMPILE_PHASE
+template <>
+struct random_longdouble_impl<false> {
+  using Impl = random_impl<double>;
+  static EIGEN_DEVICE_FUNC inline long double run() { return static_cast<long double>(Impl::run()); }
+};
+
+template <>
+struct random_impl<long double> {
+  static EIGEN_DEVICE_FUNC inline long double run(const long double& x, const long double& y) {
+    long double half_x = 0.5L * x;
+    long double half_y = 0.5L * y;
+    long double result = (half_x + half_y) + (half_y - half_x) * run();
+    return result;
+  }
+  static EIGEN_DEVICE_FUNC inline long double run() { return random_longdouble_impl<>::run(); }
+};
+#endif
+
+template <typename Scalar>
+struct random_default_impl<Scalar, false, true> {
+  using BitsType = typename numext::get_integer_by_size<sizeof(Scalar)>::unsigned_type;
+  enum : int { ScalarBits = sizeof(Scalar) * CHAR_BIT };
+  static EIGEN_DEVICE_FUNC inline Scalar run(const Scalar& x, const Scalar& y) {
+    if (y <= x) return x;
+    const BitsType range = static_cast<BitsType>(y) - static_cast<BitsType>(x) + 1;
+    // handle edge case where [x,y] spans the entire range of Scalar
+    if (range == 0) return getRandomBits<Scalar>(ScalarBits);
+    // calculate the number of random bits needed to fill range
+    const int numRandomBits = log2_ceil(range);
+    BitsType randomBits;
+    do {
+      randomBits = getRandomBits<BitsType>(numRandomBits);
+      // if the random draw is outside [0, range), try again (rejection sampling)
+      // in the worst-case scenario, the probability of rejection is: 1/2 - 1/2^numRandomBits < 50%
+    } while (randomBits >= range);
+    // Avoid overflow in the case where `x` is negative and there is a large range so
+    // `randomBits` would also be negative if cast to `Scalar` first.
+    Scalar result = static_cast<Scalar>(static_cast<BitsType>(x) + randomBits);
+    return result;
+  }
+
+  static EIGEN_DEVICE_FUNC inline Scalar run() {
 #ifdef EIGEN_MAKING_DOCS
     return run(Scalar(NumTraits<Scalar>::IsSigned ? -10 : 0), Scalar(10));
 #else
-    enum {
-      rand_bits = meta_floor_log2<(unsigned int)(RAND_MAX) + 1>::value,
-      scalar_bits = sizeof(Scalar) * CHAR_BIT,
-      shift = plain_enum_max(0, int(rand_bits) - int(scalar_bits)),
-      offset = NumTraits<Scalar>::IsSigned ? (1 << (plain_enum_min(rand_bits, scalar_bits) - 1)) : 0
-    };
-    return Scalar((std::rand() >> shift) - offset);
+    return getRandomBits<Scalar>(ScalarBits);
 #endif
   }
 };
 
+template <>
+struct random_impl<bool> {
+  static EIGEN_DEVICE_FUNC inline bool run(const bool& x, const bool& y) {
+    if (y <= x) return x;
+    return run();
+  }
+  static EIGEN_DEVICE_FUNC inline bool run() { return getRandomBits<int>(1) ? true : false; }
+};
+
 template <typename Scalar>
 struct random_default_impl<Scalar, true, false> {
-  static inline Scalar run(const Scalar& x, const Scalar& y) {
+  static EIGEN_DEVICE_FUNC inline Scalar run(const Scalar& x, const Scalar& y) {
     return Scalar(random(x.real(), y.real()), random(x.imag(), y.imag()));
   }
-  static inline Scalar run() {
+  static EIGEN_DEVICE_FUNC inline Scalar run() {
     typedef typename NumTraits<Scalar>::Real RealScalar;
     return Scalar(random<RealScalar>(), random<RealScalar>());
   }
@@ -749,7 +986,7 @@ EIGEN_DEVICE_FUNC bool isnan_impl(const std::complex<T>& x);
 template <typename T>
 EIGEN_DEVICE_FUNC bool isinf_impl(const std::complex<T>& x);
 template <typename T>
-T generic_fast_tanh_float(const T& a_x);
+EIGEN_DEFINE_FUNCTION_ALLOWING_MULTIPLE_DEFINITIONS T ptanh_float(const T& a_x);
 
 /****************************************************************************
  * Implementation of sign                                                 *
@@ -1304,6 +1541,25 @@ EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE T exp(const T& x) {
   return exp(x);
 }
 
+// MSVC screws up some edge-cases for std::exp(complex).
+#ifdef EIGEN_COMP_MSVC
+template <typename RealScalar>
+EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE std::complex<RealScalar> exp(const std::complex<RealScalar>& x) {
+  EIGEN_USING_STD(exp);
+  // If z is (x,±∞) (for any finite x), the result is (NaN,NaN) and FE_INVALID is raised.
+  // If z is (x,NaN) (for any finite x), the result is (NaN,NaN) and FE_INVALID may be raised.
+  if ((isfinite)(real_ref(x)) && !(isfinite)(imag_ref(x))) {
+    return std::complex<RealScalar>(NumTraits<RealScalar>::quiet_NaN(), NumTraits<RealScalar>::quiet_NaN());
+  }
+  // If z is (+∞,±∞), the result is (±∞,NaN) and FE_INVALID is raised (the sign of the real part is unspecified)
+  // If z is (+∞,NaN), the result is (±∞,NaN) (the sign of the real part is unspecified)
+  if ((real_ref(x) == NumTraits<RealScalar>::infinity() && !(isfinite)(imag_ref(x)))) {
+    return std::complex<RealScalar>(NumTraits<RealScalar>::infinity(), NumTraits<RealScalar>::quiet_NaN());
+  }
+  return exp(x);
+}
+#endif
+
 #if defined(SYCL_DEVICE_ONLY)
 SYCL_SPECIALIZE_FLOATING_TYPES_UNARY(exp, exp)
 #endif
@@ -1567,7 +1823,7 @@ EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE T tanh(const T& x) {
 }
 
 #if (!defined(EIGEN_GPUCC)) && EIGEN_FAST_MATH && !defined(SYCL_DEVICE_ONLY)
-EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE float tanh(float x) { return internal::generic_fast_tanh_float(x); }
+EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE float tanh(float x) { return internal::ptanh_float(x); }
 #endif
 
 #if defined(SYCL_DEVICE_ONLY)
@@ -1721,13 +1977,6 @@ EIGEN_DEVICE_FUNC inline bool isApproxOrLessThan(
 /******************************************
 ***  The special case of the  bool type ***
 ******************************************/
-
-template <>
-struct random_impl<bool> {
-  static inline bool run() { return random<int>(0, 1) == 0 ? false : true; }
-
-  static inline bool run(const bool& a, const bool& b) { return random<int>(a, b) == 0 ? false : true; }
-};
 
 template <>
 struct scalar_fuzzy_impl<bool> {

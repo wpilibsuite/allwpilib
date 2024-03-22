@@ -484,7 +484,7 @@ struct nested_eval {
                                       //      solution could be to count the number of temps?
     NAsInteger = n == Dynamic ? HugeCost : n,
     CostEval = (NAsInteger + 1) * ScalarReadCost + CoeffReadCost,
-    CostNoEval = NAsInteger * CoeffReadCost,
+    CostNoEval = int(NAsInteger) * int(CoeffReadCost),
     Evaluate = (int(evaluator<T>::Flags) & EvalBeforeNestingBit) || (int(CostEval) < int(CostNoEval))
   };
 

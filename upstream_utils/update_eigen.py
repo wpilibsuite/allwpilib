@@ -97,8 +97,8 @@ def unsupported_inclusions(dp, f):
 def main():
     upstream_root = clone_repo(
         "https://gitlab.com/libeigen/eigen.git",
-        # master on 2023-12-01
-        "96880810295b65d77057f4a7fb83a99a590122ad",
+        # master on 2024-03-21
+        "d792f13a61e512e6e637ece2128b5cc4449c6917",
         shallow=False,
     )
     wpilib_root = get_repo_root()

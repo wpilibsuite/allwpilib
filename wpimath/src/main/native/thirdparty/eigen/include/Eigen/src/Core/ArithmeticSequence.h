@@ -226,6 +226,11 @@ struct get_compile_time_incr<ArithmeticSequence<FirstType, SizeType, IncrType> >
   enum { value = get_fixed_value<IncrType, DynamicIndex>::value };
 };
 
+template <typename FirstType, typename SizeType, typename IncrType>
+constexpr Index get_runtime_incr(const ArithmeticSequence<FirstType, SizeType, IncrType>& x) EIGEN_NOEXCEPT {
+  return static_cast<Index>(x.incrObject());
+}
+
 }  // end namespace internal
 
 /** \namespace Eigen::indexing

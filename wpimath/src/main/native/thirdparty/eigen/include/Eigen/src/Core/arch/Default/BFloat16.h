@@ -677,16 +677,22 @@ EIGEN_ALWAYS_INLINE std::ostream& operator<<(std::ostream& os, const bfloat16& v
 namespace internal {
 
 template <>
-struct random_default_impl<bfloat16, false, false> {
-  static inline bfloat16 run(const bfloat16& x, const bfloat16& y) {
-    return x + (y - x) * bfloat16(float(std::rand()) / float(RAND_MAX));
-  }
-  static inline bfloat16 run() { return run(bfloat16(-1.f), bfloat16(1.f)); }
+struct is_arithmetic<bfloat16> {
+  enum { value = true };
 };
 
 template <>
-struct is_arithmetic<bfloat16> {
-  enum { value = true };
+struct random_impl<bfloat16> {
+  enum : int { MantissaBits = 7 };
+  using Impl = random_impl<float>;
+  static EIGEN_DEVICE_FUNC inline bfloat16 run(const bfloat16& x, const bfloat16& y) {
+    float result = Impl::run(x, y, MantissaBits);
+    return bfloat16(result);
+  }
+  static EIGEN_DEVICE_FUNC inline bfloat16 run() {
+    float result = Impl::run(MantissaBits);
+    return bfloat16(result);
+  }
 };
 
 }  // namespace internal

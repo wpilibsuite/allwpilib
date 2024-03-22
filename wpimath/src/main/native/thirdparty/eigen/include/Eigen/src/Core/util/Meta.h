@@ -303,30 +303,30 @@ class noncopyable {
  */
 template <typename T, typename EnableIf = void>
 struct array_size {
-  enum { value = Dynamic };
+  static constexpr Index value = Dynamic;
 };
 
 template <typename T>
 struct array_size<T, std::enable_if_t<((T::SizeAtCompileTime & 0) == 0)>> {
-  enum { value = T::SizeAtCompileTime };
+  static constexpr Index value = T::SizeAtCompileTime;
 };
 
 template <typename T, int N>
 struct array_size<const T (&)[N]> {
-  enum { value = N };
+  static constexpr Index value = N;
 };
 template <typename T, int N>
 struct array_size<T (&)[N]> {
-  enum { value = N };
+  static constexpr Index value = N;
 };
 
 template <typename T, std::size_t N>
 struct array_size<const std::array<T, N>> {
-  enum { value = N };
+  static constexpr Index value = N;
 };
 template <typename T, std::size_t N>
 struct array_size<std::array<T, N>> {
-  enum { value = N };
+  static constexpr Index value = N;
 };
 
 /** \internal

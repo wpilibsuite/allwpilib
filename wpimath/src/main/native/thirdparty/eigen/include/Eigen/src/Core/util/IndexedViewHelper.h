@@ -67,6 +67,11 @@ struct get_compile_time_incr {
   enum { value = UndefinedIncr };
 };
 
+template <typename T>
+constexpr Index get_runtime_incr(const T&) EIGEN_NOEXCEPT {
+  return Index(1);
+}
+
 // Analogue of std::get<0>(x), but tailored for our needs.
 template <typename T>
 EIGEN_CONSTEXPR Index first(const T& x) EIGEN_NOEXCEPT {

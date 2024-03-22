@@ -1271,7 +1271,7 @@ EIGEN_STRONG_INLINE Packet2ul pdiv<Packet2ul>(const Packet2ul& /*a*/, const Pack
   return pset1<Packet2ul>(0ULL);
 }
 
-#ifdef __ARM_FEATURE_FMA
+#ifdef EIGEN_VECTORIZE_FMA
 template <>
 EIGEN_STRONG_INLINE Packet4f pmadd(const Packet4f& a, const Packet4f& b, const Packet4f& c) {
   return vfmaq_f32(c, a, b);
@@ -5249,7 +5249,7 @@ EIGEN_STRONG_INLINE Packet2d pdiv<Packet2d>(const Packet2d& a, const Packet2d& b
   return vdivq_f64(a, b);
 }
 
-#ifdef __ARM_FEATURE_FMA
+#ifdef EIGEN_VECTORIZE_FMA
 // See bug 936. See above comment about FMA for float.
 template <>
 EIGEN_STRONG_INLINE Packet2d pmadd(const Packet2d& a, const Packet2d& b, const Packet2d& c) {
