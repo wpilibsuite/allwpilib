@@ -40,10 +40,9 @@ class BooleanEvent {
   BooleanEvent(EventLoop* loop, std::function<bool()> condition);
 
   /**
-   * Check whether this event is active or not as of the last loop poll.
+   * Check whether this event is active or not.
    *
-   * @return true if active, false if not active. If the event was never polled,
-   * it returns the state at event construction.
+   * @return true if active.
    */
   bool GetAsBoolean() const;
 
@@ -70,7 +69,7 @@ class BooleanEvent {
                [](EventLoop* loop, std::function<bool()> condition) {
                  return T(loop, condition);
                }) {
-    return ctor(m_loop, [state = m_state] { return *state; });
+    return ctor(m_loop, m_condition);
   }
 
   /**
@@ -85,8 +84,7 @@ class BooleanEvent {
    * Composes this event with another event, returning a new event that is
    * active when both events are active.
    *
-   * <p>The events must use the same event loop. If the events use different
-   * event loops, the composed signal won't update until both loops are polled.
+   * <p>The new event will use this event's polling loop.
    *
    * @param rhs the event to compose with
    * @return the event that is active when both events are active
@@ -97,8 +95,7 @@ class BooleanEvent {
    * Composes this event with another event, returning a new event that is
    * active when either event is active.
    *
-   * <p>The events must use the same event loop. If the events use different
-   * event loops, the composed signal won't update until both loops are polled.
+   * <p>The new event will use this event's polling loop.
    *
    * @param rhs the event to compose with
    * @return the event that is active when either event is active
@@ -134,6 +131,5 @@ class BooleanEvent {
  private:
   EventLoop* m_loop;
   std::function<bool()> m_condition;
-  std::shared_ptr<bool> m_state;  // A programmer's worst nightmare.
 };
 }  // namespace frc

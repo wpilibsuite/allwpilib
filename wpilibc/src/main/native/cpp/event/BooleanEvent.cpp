@@ -7,61 +7,56 @@
 using namespace frc;
 
 BooleanEvent::BooleanEvent(EventLoop* loop, std::function<bool()> condition)
-    : m_loop(loop), m_condition(std::move(condition)) {
-  m_state = std::make_shared<bool>(m_condition());
-  m_loop->Bind(
-      // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
-      [condition = m_condition, state = m_state] { *state = condition(); });
-}
+    : m_loop(loop), m_condition(std::move(condition)) {}
 
 BooleanEvent::operator std::function<bool()>() {
-  return [state = m_state] { return *state; };
+  return m_condition;
 }
 
 bool BooleanEvent::GetAsBoolean() const {
-  return *m_state;
+  return m_condition();
 }
 
 void BooleanEvent::IfHigh(std::function<void()> action) {
-  m_loop->Bind([state = m_state, action = std::move(action)] {
-    if (*state) {
+  m_loop->Bind([condition = m_condition, action = std::move(action)] {
+    if (condition()) {
       action();
     }
   });
 }
 
 BooleanEvent BooleanEvent::operator!() {
-  return BooleanEvent(this->m_loop, [state = m_state] { return !*state; });
+  return BooleanEvent(this->m_loop, [lhs = m_condition] { return !lhs(); });
 }
 
 BooleanEvent BooleanEvent::operator&&(std::function<bool()> rhs) {
   return BooleanEvent(this->m_loop,
-                      [state = m_state, rhs] { return *state && rhs(); });
+                      [lhs = m_condition, rhs] { return lhs() && rhs(); });
 }
 
 BooleanEvent BooleanEvent::operator||(std::function<bool()> rhs) {
   return BooleanEvent(this->m_loop,
-                      [state = m_state, rhs] { return *state || rhs(); });
+                      [lhs = m_condition, rhs] { return lhs() || rhs(); });
 }
 
 BooleanEvent BooleanEvent::Rising() {
-  return BooleanEvent(this->m_loop,
-                      [state = m_state, m_previous = *m_state]() mutable {
-                        bool present = *state;
-                        bool past = m_previous;
-                        m_previous = present;
-                        return !past && present;
-                      });
+  return BooleanEvent(
+      this->m_loop, [lhs = m_condition, m_previous = m_condition()]() mutable {
+        bool present = lhs();
+        bool past = m_previous;
+        m_previous = present;
+        return !past && present;
+      });
 }
 
 BooleanEvent BooleanEvent::Falling() {
-  return BooleanEvent(this->m_loop,
-                      [state = m_state, m_previous = *m_state]() mutable {
-                        bool present = *state;
-                        bool past = m_previous;
-                        m_previous = present;
-                        return past && !present;
-                      });
+  return BooleanEvent(
+      this->m_loop, [lhs = m_condition, m_previous = m_condition()]() mutable {
+        bool present = lhs();
+        bool past = m_previous;
+        m_previous = present;
+        return past && !present;
+      });
 }
 
 BooleanEvent BooleanEvent::Debounce(units::second_t debounceTime,
@@ -69,5 +64,5 @@ BooleanEvent BooleanEvent::Debounce(units::second_t debounceTime,
   return BooleanEvent(
       this->m_loop,
       [debouncer = frc::Debouncer(debounceTime, type),
-       state = m_state]() mutable { return debouncer.Calculate(*state); });
+       lhs = m_condition]() mutable { return debouncer.Calculate(lhs()); });
 }
