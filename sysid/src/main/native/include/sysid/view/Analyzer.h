@@ -56,11 +56,10 @@ class Analyzer : public glass::View {
    * The different motor controller timing presets that can be used.
    */
   static constexpr const char* kPresetNames[] = {"Default",
-                                                 "WPILib (2020-)",
-                                                 "WPILib (Pre-2020)",
-                                                 "CANCoder",
-                                                 "CTRE (Pro)",
-                                                 "CTRE",
+                                                 "WPILib",
+                                                 "CANCoder v5",
+                                                 "CTRE v6",
+                                                 "CTRE v5",
                                                  "REV Brushless Encoder Port",
                                                  "REV Brushed Encoder Port",
                                                  "REV Data Port",
