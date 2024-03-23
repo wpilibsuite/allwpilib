@@ -115,8 +115,8 @@ inline constexpr FeedbackControllerPreset kWPILib{kDefault};
  *
  * Total delay = 50 ms + 31.5 ms = 81.5 ms.
  */
-inline constexpr FeedbackControllerPreset kCTREv5CANCoder{1.0 / 12.0, 60.0, 
-                                                        1_ms, true, 81.5_ms};
+inline constexpr FeedbackControllerPreset kCTREv5CANCoder{1.0 / 12.0, 60.0,
+                                                          1_ms, true, 81.5_ms};
 inline constexpr FeedbackControllerPreset kCTREv5{1023.0 / 12.0, 0.1, 1_ms,
                                                   false, 81.5_ms};
 /**
@@ -124,7 +124,7 @@ inline constexpr FeedbackControllerPreset kCTREv5{1023.0 / 12.0, 0.1, 1_ms,
  *
  * Phoenix 6 uses standard units and Voltage output. This means the output
  * is 1.0, time factor is 1.0, and closed loop operates at 1 millisecond. All
- * Phoenix 6 devices make use of Kalman filters default-tuned to lowest latency, 
+ * Phoenix 6 devices make use of Kalman filters default-tuned to lowest latency,
  * which in testing is roughly 1 millisecond
  */
 inline constexpr FeedbackControllerPreset kCTREv6{1.0, 1.0, 1_ms, true, 1_ms};
