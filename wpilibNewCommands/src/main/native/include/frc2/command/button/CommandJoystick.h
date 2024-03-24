@@ -5,6 +5,7 @@
 #pragma once
 #include <frc/Joystick.h>
 
+#include "CommandGenericHID.h"
 #include "Trigger.h"
 #include "frc2/command/CommandScheduler.h"
 
@@ -15,22 +16,9 @@ namespace frc2 {
  *
  * @see Joystick
  */
-class CommandJoystick : public frc::Joystick {
+class CommandJoystick : public CommandGenericHID, public virtual frc::Joystick {
  public:
-  using Joystick::Joystick;
-
-  /**
-   * Constructs an event instance around this button's digital signal.
-   *
-   * @param button the button index
-   * @param loop the event loop instance to attach the event to. Defaults to the
-   * CommandScheduler's default loop.
-   * @return an event instance representing the button's digital signal attached
-   * to the given loop.
-   */
-  class Trigger Button(
-      int button, frc::EventLoop* loop = CommandScheduler::GetInstance()
-                                             .GetDefaultButtonLoop()) const;
+  explicit CommandJoystick(int port);
 
   /**
    * Constructs an event instance around the trigger button's digital signal.
