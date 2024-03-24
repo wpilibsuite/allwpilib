@@ -8,11 +8,14 @@ import static edu.wpi.first.units.Units.Centimeters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Microsecond;
 import static edu.wpi.first.units.Units.Microseconds;
+import static edu.wpi.first.units.Units.Percent;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Value;
 import static edu.wpi.first.wpilibj.util.Color.kBlack;
 import static edu.wpi.first.wpilibj.util.Color.kBlue;
 import static edu.wpi.first.wpilibj.util.Color.kLime;
+import static edu.wpi.first.wpilibj.util.Color.kMagenta;
+import static edu.wpi.first.wpilibj.util.Color.kMidnightBlue;
 import static edu.wpi.first.wpilibj.util.Color.kPurple;
 import static edu.wpi.first.wpilibj.util.Color.kRed;
 import static edu.wpi.first.wpilibj.util.Color.kWhite;
@@ -738,6 +741,51 @@ class LEDPatternTest {
             "Progress " + lastMaskedLED + "% , LED " + i + " should be BLACK");
       }
     }
+  }
+
+  @Test
+  void zeroBrightness() {
+    var pattern = LEDPattern.solid(kRed).atBrightness(Percent.zero());
+    var buffer = new AddressableLEDBuffer(1);
+    pattern.applyTo(buffer);
+
+    assertColorEquals(kBlack, buffer.getLED(0));
+  }
+
+  @Test
+  void sameBrightness() {
+    var pattern = LEDPattern.solid(kMagenta).atBrightness(Percent.of(100));
+    var buffer = new AddressableLEDBuffer(1);
+    pattern.applyTo(buffer);
+
+    assertColorEquals(kMagenta, buffer.getLED(0));
+  }
+
+  @Test
+  void higherBrightness() {
+    var pattern = LEDPattern.solid(kMagenta).atBrightness(Value.of(4 / 3.0));
+    var buffer = new AddressableLEDBuffer(1);
+    pattern.applyTo(buffer);
+
+    assertColorEquals(kMagenta, buffer.getLED(0));
+  }
+
+  @Test
+  void negativeBrightness() {
+    var pattern = LEDPattern.solid(kWhite).atBrightness(Percent.of(-1000));
+    var buffer = new AddressableLEDBuffer(1);
+    pattern.applyTo(buffer);
+
+    assertColorEquals(kBlack, buffer.getLED(0));
+  }
+
+  @Test
+  void clippingBrightness() {
+    var pattern = LEDPattern.solid(kMidnightBlue).atBrightness(Percent.of(10000));
+    var buffer = new AddressableLEDBuffer(1);
+    pattern.applyTo(buffer);
+
+    assertColorEquals(kWhite, buffer.getLED(0));
   }
 
   void assertColorEquals(Color expected, Color actual) {
