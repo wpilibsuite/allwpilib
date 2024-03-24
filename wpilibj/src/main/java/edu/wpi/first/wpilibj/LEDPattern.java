@@ -421,6 +421,48 @@ public interface LEDPattern {
     };
   }
 
+  /**
+   * Creates a pattern that plays this one, but at a different brightness. Brightness multipliers
+   * are applied per-channel in the RGB space; no HSL or HSV conversions are applied. Multipliers
+   * are also uncapped, which may result in the original colors washing out and appearing less
+   * saturated or even just a bright white.
+   *
+   * <p>This method is predominantly intended for dimming LEDs to avoid painfully bright or
+   * distracting patterns from playing (apologies to the 2024 NE Greater Boston field staff).
+   *
+   * <p>For example, dimming can be done simply by adding a call to `atBrightness` at the end of a
+   * pattern:
+   *
+   * <pre>
+   *   // Solid red, but at 50% brightness
+   *   LEDPattern.solid(Color.kRed).atBrightness(Percent.of(50));
+   *
+   *   // Solid white, but at only 10% (i.e. ~0.5V)
+   *   LEDPattern.solid(Color.kWhite).atBrightness(Percent.of(10));
+   * </pre>
+   *
+   * @param relativeBrightness the multiplier to apply to all channels to modify brightness
+   * @return the input pattern, displayed at
+   */
+  default LEDPattern atBrightness(Measure<Dimensionless> relativeBrightness) {
+    double multiplier = relativeBrightness.in(Value);
+
+    return (reader, writer) -> {
+      applyTo(
+          reader,
+          (i, r, g, b) -> {
+            // Clamp RGB values to keep them in the range [0, 255].
+            // Otherwise, the casts to byte would result in values like 256 wrapping to 0
+
+            writer.setRGB(
+                i,
+                (int) MathUtil.clamp(r * multiplier, 0, 255),
+                (int) MathUtil.clamp(g * multiplier, 0, 255),
+                (int) MathUtil.clamp(b * multiplier, 0, 255));
+          });
+    };
+  }
+
   /** A pattern that turns off all LEDs. */
   LEDPattern kOff = solid(Color.kBlack);
 
