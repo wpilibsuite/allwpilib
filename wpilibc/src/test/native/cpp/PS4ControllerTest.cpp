@@ -28,7 +28,7 @@ BUTTON_TEST(PS4Controller, L3Button)
 BUTTON_TEST(PS4Controller, R3Button)
 
 BUTTON_TEST(PS4Controller, PSButton)
-BUTTON_TEST(PS4Controller, Touchpad)
+BUTTON_TEST(PS4Controller, TouchpadButton)
 
 AXIS_TEST(PS4Controller, LeftX)
 AXIS_TEST(PS4Controller, RightX)

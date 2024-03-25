@@ -85,12 +85,16 @@ model {
                 cpp {
                     source {
                         srcDirs = [
-                            'src/main/native/cpp'
+                            'src/main/native/cpp',
+                            'src/generated/main/native/cpp'
                         ]
                         include '**/*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include'
+                        srcDirs = [
+                            'src/main/native/include',
+                            'src/generated/main/native/include'
+                        ]
                     }
                 }
             }
@@ -131,7 +135,7 @@ model {
                         include '**/*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include', '../cameraserver/src/main/native/include'
+                        srcDirs 'src/main/native/include', 'src/generated/main/native/include', '../cameraserver/src/main/native/include'
                     }
                 }
             }

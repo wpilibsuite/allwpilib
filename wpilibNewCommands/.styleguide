@@ -12,6 +12,10 @@ repoRootNameOverride {
   wpilib
 }
 
+generatedFileExclude {
+  wpilibNewCommands/src/generated/
+}
+
 includeOtherLibs {
   ^cameraserver/
   ^cscore
