@@ -31,11 +31,10 @@ Analyzer::Analyzer(glass::Storage& storage, wpi::Logger& logger)
     : m_logger(logger) {
   // Fill the StringMap with preset values.
   m_presets["Default"] = presets::kDefault;
-  m_presets["WPILib (2020-)"] = presets::kWPILibNew;
-  m_presets["WPILib (Pre-2020)"] = presets::kWPILibOld;
-  m_presets["CANCoder"] = presets::kCTRECANCoder;
-  m_presets["CTRE"] = presets::kCTREDefault;
-  m_presets["CTRE (Pro)"] = presets::kCTREProDefault;
+  m_presets["WPILib"] = presets::kWPILib;
+  m_presets["CTRE Phoenix 5 CANcoder"] = presets::kCTREv5CANCoder;
+  m_presets["CTRE Phoenix 5"] = presets::kCTREv5;
+  m_presets["CTRE Phoenix 6"] = presets::kCTREv6;
   m_presets["REV Brushless Encoder Port"] = presets::kREVNEOBuiltIn;
   m_presets["REV Brushed Encoder Port"] = presets::kREVNonNEO;
   m_presets["REV Data Port"] = presets::kREVNonNEO;
