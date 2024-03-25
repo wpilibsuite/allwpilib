@@ -1056,12 +1056,12 @@ void StopLocal(NT_Inst inst);
  * @param persist_filename  the name of the persist file to use (UTF-8 string,
  *                          null terminated)
  * @param listen_address    the address to listen on, or null to listen on any
- *                          address. (UTF-8 string, null terminated)
+ *                          address. (UTF-8 string)
  * @param port3             port to communicate over (NT3)
  * @param port4             port to communicate over (NT4)
  */
 void StartServer(NT_Inst inst, std::string_view persist_filename,
-                 const char* listen_address, unsigned int port3,
+                 std::string_view listen_address, unsigned int port3,
                  unsigned int port4);
 
 /**
@@ -1103,7 +1103,7 @@ void StopClient(NT_Inst inst);
  * @param server_name server name (UTF-8 string, null terminated)
  * @param port        port to communicate over
  */
-void SetServer(NT_Inst inst, const char* server_name, unsigned int port);
+void SetServer(NT_Inst inst, std::string_view server_name, unsigned int port);
 
 /**
  * Sets server addresses for client (without restarting client).

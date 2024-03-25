@@ -40,7 +40,7 @@ static void ConvertToC(const ClientPublisher& in,
 static void ConvertToC(const ClientSubscriber& in,
                        NT_Meta_ClientSubscriber* out) {
   out->uid = in.uid;
-  out->topics = ConvertToC<NT_String>(in.topics, &out->topicsCount);
+  out->topics = ConvertToC<WPI_String>(in.topics, &out->topicsCount);
   ConvertToC(in.options, &out->options);
 }
 
@@ -98,7 +98,7 @@ struct NT_Meta_Client* NT_Meta_DecodeClients(const uint8_t* data, size_t size,
 void NT_Meta_FreeTopicPublishers(struct NT_Meta_TopicPublisher* arr,
                                  size_t count) {
   for (size_t i = 0; i < count; ++i) {
-    std::free(arr[i].client.str);
+    WPI_FreeString(&arr[i].client);
   }
   std::free(arr);
 }
@@ -106,7 +106,7 @@ void NT_Meta_FreeTopicPublishers(struct NT_Meta_TopicPublisher* arr,
 void NT_Meta_FreeTopicSubscribers(struct NT_Meta_TopicSubscriber* arr,
                                   size_t count) {
   for (size_t i = 0; i < count; ++i) {
-    std::free(arr[i].client.str);
+    WPI_FreeString(&arr[i].client);
   }
   std::free(arr);
 }
@@ -114,7 +114,7 @@ void NT_Meta_FreeTopicSubscribers(struct NT_Meta_TopicSubscriber* arr,
 void NT_Meta_FreeClientPublishers(struct NT_Meta_ClientPublisher* arr,
                                   size_t count) {
   for (size_t i = 0; i < count; ++i) {
-    std::free(arr[i].topic.str);
+    WPI_FreeString(&arr[i].topic);
   }
   std::free(arr);
 }
@@ -122,15 +122,15 @@ void NT_Meta_FreeClientPublishers(struct NT_Meta_ClientPublisher* arr,
 void NT_Meta_FreeClientSubscribers(struct NT_Meta_ClientSubscriber* arr,
                                    size_t count) {
   for (size_t i = 0; i < count; ++i) {
-    NT_FreeStringArray(arr[i].topics, arr[i].topicsCount);
+    WPI_FreeStringArray(arr[i].topics, arr[i].topicsCount);
   }
   std::free(arr);
 }
 
 void NT_Meta_FreeClients(struct NT_Meta_Client* arr, size_t count) {
   for (size_t i = 0; i < count; ++i) {
-    std::free(arr[i].id.str);
-    std::free(arr[i].conn.str);
+    WPI_FreeString(&arr[i].id);
+    WPI_FreeString(&arr[i].conn);
   }
   std::free(arr);
 }

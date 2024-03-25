@@ -24,6 +24,7 @@
 #include "wpi/StringExtras.h"
 #include "wpi/mutex.h"
 #include "wpi/raw_ostream.h"
+#include "wpi/string.h"
 
 /** Java Native Interface (JNI) utility functions */
 namespace wpi::java {
@@ -172,6 +173,7 @@ class JStringRef {
   std::string_view str() const { return m_str.str(); }
   const char* c_str() const { return m_str.data(); }
   size_t size() const { return m_str.size(); }
+  WPI_String wpi_str() const { return wpi::make_string(str()); }
 
  private:
   SmallString<128> m_str;

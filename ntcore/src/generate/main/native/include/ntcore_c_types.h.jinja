@@ -33,7 +33,11 @@ struct NT_Timestamped{{ t.TypeName }} {
   /**
    * Value.
    */
+{%- if t.c.ValueInline %}
+  {{ t.c.ValueInline }} value;
+{%- else %}
   {{ t.c.ValueType }} value;
+{%- endif %}
 {%- if t.c.IsArray %}
   /**
    * Value length.
@@ -79,13 +83,22 @@ NT_Bool NT_SetDefault{{ t.TypeName }}(NT_Handle pubentry, {{ t.c.ParamType }} de
  *
  * @param subentry subscriber or entry handle
  * @param defaultValue default value to return if no value has been published
+{%- if t.c.ValueInline %}
+ * @param value returned value (output)
+{% endif %}
 {%- if t.c.IsArray %}
  * @param defaultValueLen length of default value
  * @param len length of returned value (output)
 {% endif %}
+{%- if not t.c.ValueInline %}
  * @return value
+{%- endif %}
  */
+{%- if t.c.ValueInline %}
+void NT_Get{{ t.TypeName }}(NT_Handle subentry, {{ t.c.ParamType }} defaultValue, {{ t.c.ValueType }} value);
+{%- else %}
 {{ t.c.ValueType }} NT_Get{{ t.TypeName }}(NT_Handle subentry, {{ t.c.ParamType }} defaultValue{% if t.c.IsArray %}, size_t defaultValueLen, size_t* len{% endif %});
+{%- endif %}
 
 /**
  * Get the last published value along with its timestamp.
@@ -130,7 +143,7 @@ struct NT_Timestamped{{ t.TypeName }}* NT_ReadQueue{{ t.TypeName }}(NT_Handle su
  */
 void NT_FreeQueue{{ t.TypeName }}(struct NT_Timestamped{{ t.TypeName }}* arr, size_t len);
 
-{%- if not t.c.IsArray %}
+{%- if not t.c.IsArray and not t.c.ValueInline %}
 /**
  * Get an array of all value changes since the last call to ReadQueue.
  *
