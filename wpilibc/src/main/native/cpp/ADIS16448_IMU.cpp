@@ -113,23 +113,86 @@ ADIS16448_IMU::ADIS16448_IMU(IMUAxis yaw_axis, SPI::Port port,
       return;
     }
 
-    // Set IMU internal decimation to 819.2 SPS
-    WriteRegister(SMPL_PRD, 0x0001);
-    // Enable Data Ready (LOW = Good Data) on DIO1 (PWM0 on MXP)
-    WriteRegister(MSC_CTRL, 0x0016);
-    // Disable IMU internal Bartlett filter
-    WriteRegister(SENS_AVG, 0x0400);
+    // Set up flash state variable
+    bool m_needs_flash = false;
+
+    // Set IMU internal decimation to 1 (output data rate of 819.2 SPS / (1 + 1)
+    // = 409.6Hz), output bandwidth = 204.8Hz
+    if (ReadRegister(SMPL_PRD) != 0x0001) {
+      WriteRegister(SMPL_PRD, 0x0001);
+      m_needs_flash = true;
+      REPORT_WARNING(
+          "ADIS16448: SMPL_PRD register configuration inconsistent! Scheduling "
+          "flash update.");
+    }
+
+    // Set data ready polarity (LOW = Good Data) on DIO1 (PWM0 on MXP)
+    if (ReadRegister(MSC_CTRL) != 0x0016) {
+      WriteRegister(MSC_CTRL, 0x0016);
+      m_needs_flash = true;
+      REPORT_WARNING(
+          "ADIS16448: MSC_CTRL register configuration inconsistent! Scheduling "
+          "flash update.");
+    }
+
+    // Disable IMU internal Bartlett filter (204Hz bandwidth is sufficient) and
+    // set IMU scale factor (range)
+    if (ReadRegister(SENS_AVG) != 0x0400) {
+      WriteRegister(SENS_AVG, 0x0400);
+      m_needs_flash = true;
+      REPORT_WARNING(
+          "ADIS16448: SENS_AVG register configuration inconsistent! Scheduling "
+          "flash update.");
+    }
     // Clear offset registers
-    WriteRegister(XGYRO_OFF, 0x0000);
-    WriteRegister(YGYRO_OFF, 0x0000);
-    WriteRegister(ZGYRO_OFF, 0x0000);
+    if (ReadRegister(XGYRO_OFF) != 0x0000) {
+      WriteRegister(XGYRO_OFF, 0x0000);
+      m_needs_flash = true;
+      REPORT_WARNING(
+          "ADIS16448: XGYRO_OFF register configuration inconsistent! "
+          "Scheduling flash update.");
+    }
+
+    if (ReadRegister(YGYRO_OFF) != 0x0000) {
+      WriteRegister(YGYRO_OFF, 0x0000);
+      m_needs_flash = true;
+      REPORT_WARNING(
+          "ADIS16448: YGYRO_OFF register configuration inconsistent! "
+          "Scheduling flash update.");
+    }
+
+    if (ReadRegister(ZGYRO_OFF) != 0x0000) {
+      WriteRegister(ZGYRO_OFF, 0x0000);
+      m_needs_flash = true;
+      REPORT_WARNING(
+          "ADIS16448: ZGYRO_OFF register configuration inconsistent! "
+          "Scheduling flash update.");
+    }
+
+    // If any registers on the IMU don't match the config, trigger a flash
+    // update
+    if (m_needs_flash) {
+      REPORT_WARNING(
+          "ADIS16448: Register configuration changed! Starting IMU flash "
+          "update.");
+      WriteRegister(GLOB_CMD, 0x0008);
+      // Wait long enough for the flash update to finish (72ms minimum as per
+      // the datasheet)
+      Wait(0.5_s);
+      REPORT_WARNING("ADIS16448: Flash update finished!");
+      m_needs_flash = false;
+    } else {
+      REPORT_WARNING(
+          "ADIS16448: Flash and RAM configuration consistent. No flash update "
+          "required!");
+    }
+
     // Configure and enable auto SPI
     if (!SwitchToAutoSPI()) {
       return;
     }
     // Notify DS that IMU calibration delay is active
-    REPORT_WARNING(
-        "ADIS16448 IMU Detected. Starting initial calibration delay.");
+    REPORT_WARNING("ADIS16448: Starting initial calibration delay.");
     // Wait for whatever time the user set as the start-up delay
     Wait(static_cast<double>(m_calibration_time) * 1.2_s);
     // Execute calibration routine

@@ -63,12 +63,12 @@ inline void ADISReportError(int32_t status, const char* file, int line,
  * Constructor.
  */
 ADIS16470_IMU::ADIS16470_IMU()
-    : ADIS16470_IMU(kZ, kY, kX, SPI::Port::kOnboardCS0, CalibrationTime::_4s) {}
+    : ADIS16470_IMU(kZ, kY, kX, SPI::Port::kOnboardCS0, CalibrationTime::_1s) {}
 
 ADIS16470_IMU::ADIS16470_IMU(IMUAxis yaw_axis, IMUAxis pitch_axis,
                              IMUAxis roll_axis)
     : ADIS16470_IMU(yaw_axis, pitch_axis, roll_axis, SPI::Port::kOnboardCS0,
-                    CalibrationTime::_4s) {}
+                    CalibrationTime::_1s) {}
 
 ADIS16470_IMU::ADIS16470_IMU(IMUAxis yaw_axis, IMUAxis pitch_axis,
                              IMUAxis roll_axis, SPI::Port port,
@@ -132,20 +132,60 @@ ADIS16470_IMU::ADIS16470_IMU(IMUAxis yaw_axis, IMUAxis pitch_axis,
       return;
     }
 
+    // Set up flash state variable
+    bool m_needs_flash = false;
+
     // Set IMU internal decimation to 4 (output data rate of 2000 SPS / (4 + 1)
     // = 400Hz)
-    WriteRegister(DEC_RATE, 0x0004);
+    if (ReadRegister(DEC_RATE) != 0x0004) {
+      WriteRegister(DEC_RATE, 0x0004);
+      m_needs_flash = true;
+      REPORT_WARNING(
+          "ADIS16470: DEC_RATE register configuration inconsistent! Scheduling "
+          "flash update.");
+    }
     // Set data ready polarity (HIGH = Good Data), Disable gSense Compensation
     // and PoP
-    WriteRegister(MSC_CTRL, 0x0001);
-    // Configure IMU internal Bartlett filter
-    WriteRegister(FILT_CTRL, 0x0000);
+    if (ReadRegister(MSC_CTRL) != 0x0001) {
+      WriteRegister(MSC_CTRL, 0x0001);
+      m_needs_flash = true;
+      REPORT_WARNING(
+          "ADIS16470: MSC_CTRL register configuration inconsistent! Scheduling "
+          "flash update.");
+    }
+
+    // Disable IMU internal Bartlett filter (200Hz bandwidth is sufficient)
+    if (ReadRegister(FILT_CTRL) != 0x0000) {
+      WriteRegister(FILT_CTRL, 0x0000);
+      m_needs_flash = true;
+      REPORT_WARNING(
+          "ADIS16470: FILT_CTRL register configuration inconsistent! "
+          "Scheduling flash update.");
+    }
+
+    // If any registers on the IMU don't match the config, trigger a flash
+    // update
+    if (m_needs_flash) {
+      REPORT_WARNING(
+          "ADIS16470: Register configuration changed! Starting IMU flash "
+          "update.");
+      WriteRegister(GLOB_CMD, 0x0008);
+      // Wait long enough for the flash update to finish (72ms minimum as per
+      // the datasheet)
+      Wait(0.3_s);
+      REPORT_WARNING("ADIS16470: Flash update finished!");
+      m_needs_flash = false;
+    } else {
+      REPORT_WARNING(
+          "ADIS16470: Flash and RAM configuration consistent. No flash update "
+          "required!");
+    }
+
     // Configure continuous bias calibration time based on user setting
     WriteRegister(NULL_CNFG, m_calibration_time | 0x700);
 
     // Notify DS that IMU calibration delay is active
-    REPORT_WARNING(
-        "ADIS16470 IMU Detected. Starting initial calibration delay.");
+    REPORT_WARNING("ADIS16470: Starting initial calibration delay.");
 
     // Wait for samples to accumulate internal to the IMU (110% of user-defined
     // time)

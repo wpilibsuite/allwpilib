@@ -192,6 +192,7 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
   private volatile boolean m_thread_idle = false;
   private boolean m_auto_configured = false;
   private boolean m_start_up_mode = true;
+  private boolean m_needs_flash = false;
 
   /* Resources */
   private SPI m_spi;
@@ -312,24 +313,77 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
         return;
       }
 
-      // Set IMU internal decimation to 819.2 SPS
-      writeRegister(SMPL_PRD, 0x0001);
-      // Enable Data Ready (LOW = Good Data) on DIO1 (PWM0 on MXP)
-      writeRegister(MSC_CTRL, 0x0016);
-      // Disable IMU internal Bartlett filter
-      writeRegister(SENS_AVG, 0x0400);
+      // Set IMU internal decimation to 1 (ODR = 819.2 SPS / (1 + 1) = 409.6Hz), BW = 204.8Hz
+      if (readRegister(SMPL_PRD) != 0x0001) {
+        writeRegister(SMPL_PRD, 0x0001);
+        m_needs_flash = true;
+        DriverStation.reportWarning(
+            "ADIS16448: SMPL_PRD register configuration inconsistent! Scheduling flash update.",
+            false);
+      }
+
+      // Set data ready polarity (LOW = Good Data) on DIO1 (PWM0 on MXP)
+      if (readRegister(MSC_CTRL) != 0x0016) {
+        writeRegister(MSC_CTRL, 0x0016);
+        m_needs_flash = true;
+        DriverStation.reportWarning(
+            "ADIS16448: MSC_CTRL register configuration inconsistent! Scheduling flash update.",
+            false);
+      }
+
+      // Disable IMU internal Bartlett filter (204Hz BW is sufficient) and set IMU scale factor
+      if (readRegister(SENS_AVG) != 0x0400) {
+        writeRegister(SENS_AVG, 0x0400);
+        m_needs_flash = true;
+        DriverStation.reportWarning(
+            "ADIS16448: SENS_AVG register configuration inconsistent! Scheduling flash update.",
+            false);
+      }
       // Clear offset registers
-      writeRegister(XGYRO_OFF, 0x0000);
-      writeRegister(YGYRO_OFF, 0x0000);
-      writeRegister(ZGYRO_OFF, 0x0000);
+      if (readRegister(XGYRO_OFF) != 0x0000) {
+        writeRegister(XGYRO_OFF, 0x0000);
+        m_needs_flash = true;
+        DriverStation.reportWarning(
+            "ADIS16448: XGYRO_OFF register configuration inconsistent! Scheduling flash update.",
+            false);
+      }
+
+      if (readRegister(YGYRO_OFF) != 0x0000) {
+        writeRegister(YGYRO_OFF, 0x0000);
+        m_needs_flash = true;
+        DriverStation.reportWarning(
+            "ADIS16448: YGYRO_OFF register configuration inconsistent! Scheduling flash update.",
+            false);
+      }
+
+      if (readRegister(ZGYRO_OFF) != 0x0000) {
+        writeRegister(ZGYRO_OFF, 0x0000);
+        m_needs_flash = true;
+        DriverStation.reportWarning(
+            "ADIS16448: ZGYRO_OFF register configuration inconsistent! Scheduling flash update.",
+            false);
+      }
+
+      // If any registers on the IMU don't match the config, trigger a flash update
+      if (m_needs_flash) {
+        DriverStation.reportWarning(
+            "ADIS16448: Register configuration changed! Starting IMU flash update.", false);
+        writeRegister(GLOB_CMD, 0x0008);
+        // Wait long enough for the flash update to finish (75ms minimum as per the datasheet)
+        Timer.delay(0.5);
+        DriverStation.reportWarning("ADIS16448: Flash update finished!", false);
+        m_needs_flash = false;
+      } else {
+        DriverStation.reportWarning(
+            "ADIS16448: and RAM configuration consistent. No flash update required!", false);
+      }
 
       // Configure standard SPI
       if (!switchToAutoSPI()) {
         return;
       }
       // Notify DS that IMU calibration delay is active
-      DriverStation.reportWarning(
-          "ADIS16448 IMU Detected. Starting initial calibration delay.", false);
+      DriverStation.reportWarning("ADIS16448: Starting initial calibration delay.", false);
       // Wait for whatever time the user set as the start-up delay
       try {
         Thread.sleep((long) (m_calibration_time.value * 1.2 * 1000));
