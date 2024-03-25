@@ -16,6 +16,26 @@ Tracer::Tracer() {
   ResetTimer();
 }
 
+void Tracer::PublishToNetworkTables(std::string_view topicName) {
+  if (m_publishNT) {
+    return;
+  }
+  m_publishNT = true;
+  m_inst = nt::NetworkTableInstance::GetDefault();
+  m_ntTopic = topicName;
+  m_publisherCache = wpi::StringMap<std::shared_ptr<nt::IntegerPublisher>>(10);
+}
+
+void Tracer::StartDataLog(wpi::log::DataLog& dataLog, std::string_view entry) {
+  if (m_dataLogEnabled) {
+    return;
+  }
+  m_dataLogEnabled = true;
+  m_dataLog = &dataLog;
+  m_dataLogEntry = entry;
+  m_entryCache = wpi::StringMap<int>(10);
+}
+
 void Tracer::ResetTimer() {
   m_startTime = hal::fpga_clock::now();
 }
@@ -27,7 +47,32 @@ void Tracer::ClearEpochs() {
 
 void Tracer::AddEpoch(std::string_view epochName) {
   auto currentTime = hal::fpga_clock::now();
-  m_epochs[epochName] = currentTime - m_startTime;
+  auto epoch = currentTime - m_startTime;
+  m_epochs[epochName] = epoch;
+  if (m_publishNT) {
+    // Topics are cached with the epoch name as the key, and the publisher
+    // object as the value
+    if (m_publisherCache.count(epochName) == 0) {
+      // Create and prep the epoch publisher
+      auto topic =
+          m_inst.GetIntegerTopic(fmt::format("{}/{}", m_ntTopic, epochName));
+      auto pub = std::make_shared<nt::IntegerPublisher>(topic.Publish());
+      m_publisherCache.insert(std::pair(epochName, pub));
+    }
+    m_publisherCache.lookup(epochName)->Set(epoch.count());
+  }
+  if (m_dataLogEnabled) {
+    // Epochs are cached with the epoch name as the key, and the entry index as
+    // the value
+    if (m_entryCache.count(epochName) == 0) {
+      // Start a data log entry
+      int entryIndex = m_dataLog->Start(
+          fmt::format("{}/{}", m_dataLogEntry, epochName), "int64");
+      // Cache the entry index with the epoch name as the key
+      m_entryCache.insert(std::pair(epochName, entryIndex));
+    }
+    m_dataLog->AppendInteger(m_entryCache.lookup(epochName), epoch.count(), 0);
+  }
   m_startTime = currentTime;
 }
 

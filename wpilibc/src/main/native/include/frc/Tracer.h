@@ -5,9 +5,13 @@
 #pragma once
 
 #include <chrono>
+#include <memory>
 #include <string_view>
 
 #include <hal/cpp/fpga_clock.h>
+#include <networktables/IntegerTopic.h>
+#include <networktables/NetworkTableInstance.h>
+#include <wpi/DataLog.h>
 #include <wpi/StringMap.h>
 
 namespace wpi {
@@ -29,6 +33,23 @@ class Tracer {
    * Constructs a Tracer instance.
    */
   Tracer();
+
+  /**
+   * Starts publishing added epochs to NetworkTables. Subsequent calls will do
+   * nothing.
+   *
+   * @param topicName The NetworkTables topic to publish to
+   */
+  void PublishToNetworkTables(std::string_view topicName);
+
+  /**
+   * Starts logging added epochs to the data log. Subsequent calls will do
+   * nothing.
+   *
+   * @param dataLog The data log to log epochs to
+   * @param entry The name of the entry to log to
+   */
+  void StartDataLog(wpi::log::DataLog& dataLog, std::string_view entry);
 
   /**
    * Restarts the epoch timer.
@@ -67,6 +88,14 @@ class Tracer {
 
   hal::fpga_clock::time_point m_startTime;
   hal::fpga_clock::time_point m_lastEpochsPrintTime = hal::fpga_clock::epoch();
+  bool m_publishNT = false;
+  nt::NetworkTableInstance m_inst;
+  std::string_view m_ntTopic;
+  wpi::StringMap<std::shared_ptr<nt::IntegerPublisher>> m_publisherCache;
+  bool m_dataLogEnabled = false;
+  wpi::log::DataLog* m_dataLog;
+  std::string_view m_dataLogEntry;
+  wpi::StringMap<int> m_entryCache;
 
   wpi::StringMap<std::chrono::nanoseconds> m_epochs;
 };
