@@ -16,13 +16,25 @@ public class ExampleSubsystem extends SubsystemBase {
    *
    * @return a command
    */
-  public Command exampleMethodCommand() {
+  public Command exampleCommand() {
     // Inline construction of command goes here.
     // Subsystem::RunOnce implicitly requires `this` subsystem.
     return runOnce(
         () -> {
           /* one-time action goes here */
         });
+  }
+
+  /**
+   * Example command factory method.
+   *
+   * @return a command
+   */
+  public Command anotherCommand() {
+    return run(() -> {
+          /* repeating action goes here */
+        })
+        .until(this::exampleCondition);
   }
 
   /**
