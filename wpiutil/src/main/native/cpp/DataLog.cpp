@@ -462,6 +462,9 @@ void DataLog::WriterThreadMain(std::string_view dir) {
       lock.unlock();
       StartLogFile(state);
       lock.lock();
+      if (m_state == kStopped) {
+        continue;
+      }
       if (state.f != fs::kInvalidFile) {
         // Emit start and schema data records
         for (auto&& entryInfo : m_entries) {
