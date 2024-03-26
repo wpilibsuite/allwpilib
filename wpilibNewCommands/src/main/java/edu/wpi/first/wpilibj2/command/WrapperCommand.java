@@ -4,9 +4,8 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import java.util.Set;
-
 import edu.wpi.first.util.sendable.SendableBuilder;
+import java.util.Set;
 
 /**
  * A class used internally to wrap commands while overriding a specific method; all other methods
