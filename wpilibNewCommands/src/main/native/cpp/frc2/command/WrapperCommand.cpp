@@ -43,3 +43,7 @@ Command::InterruptionBehavior WrapperCommand::GetInterruptionBehavior() const {
 wpi::SmallSet<Subsystem*, 4> WrapperCommand::GetRequirements() const {
   return m_command->GetRequirements();
 }
+
+void WrapperCommand::InitSendable(wpi::SendableBuilder& builder) {
+  m_command->InitSendable(builder);
+}

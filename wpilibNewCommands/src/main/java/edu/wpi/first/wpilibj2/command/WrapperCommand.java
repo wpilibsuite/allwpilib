@@ -6,6 +6,8 @@ package edu.wpi.first.wpilibj2.command;
 
 import java.util.Set;
 
+import edu.wpi.first.util.sendable.SendableBuilder;
+
 /**
  * A class used internally to wrap commands while overriding a specific method; all other methods
  * will call through to the wrapped command.
@@ -99,5 +101,10 @@ public abstract class WrapperCommand extends Command {
   @Override
   public InterruptionBehavior getInterruptionBehavior() {
     return m_command.getInterruptionBehavior();
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    m_command.initSendable(builder);
   }
 }
