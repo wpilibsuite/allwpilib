@@ -363,6 +363,23 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
   }
 
   @Override
+  public boolean equals(Object o) {
+    if (o == this) {
+      return true;
+    }
+
+    if (!(o instanceof ChassisSpeeds)) {
+      return false;
+    }
+
+    ChassisSpeeds c = (ChassisSpeeds) o;
+
+    return vxMetersPerSecond == c.vxMetersPerSecond
+        && vyMetersPerSecond == c.vyMetersPerSecond
+        && omegaRadiansPerSecond == c.omegaRadiansPerSecond;
+  }
+
+  @Override
   public String toString() {
     return String.format(
         "ChassisSpeeds(Vx: %.2f m/s, Vy: %.2f m/s, Omega: %.2f rad/s)",
