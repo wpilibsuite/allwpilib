@@ -4,13 +4,34 @@
 
 #pragma once
 
+#include <memory>
 #include <string_view>
 #include <type_traits>
 
 namespace wpi2 {
 
+class SendableHelper;
 class SendableSet;
 class SendableTable;
+
+namespace detail {
+
+template <typename T>
+struct is_shared_ptr : std::false_type {};
+template <typename T>
+struct is_shared_ptr<std::shared_ptr<T>> : std::true_type {};
+template <typename T>
+concept IsSharedPtr = is_shared_ptr<T>::value;
+
+template <typename T>
+concept not_movable =
+    !std::move_constructible<T> && !std::assignable_from<T&, T>;
+
+template <typename T>
+concept SendableHelpedOrNotMovable =
+    not_movable<T> || std::derived_from<T, SendableHelper>;
+
+}  // namespace detail
 
 /**
  * Sendable serialization template. Unspecialized class has no members; only
@@ -41,7 +62,8 @@ struct Sendable {};
  * std::string_view.
  */
 template <typename T, typename... I>
-concept SendableSerializable =
+concept SendableSerializableRawPointer =
+    detail::SendableHelpedOrNotMovable<T> &&
     requires(T* obj, SendableTable& table, const I&... info) {
       typename Sendable<typename std::remove_cvref_t<T>,
                         typename std::remove_cvref_t<I>...>;
@@ -55,6 +77,28 @@ concept SendableSerializable =
       Sendable<typename std::remove_cvref_t<T>,
                typename std::remove_cvref_t<I>...>::CloseSendable(obj, info...);
     };
+
+template <typename T, typename... I>
+concept SendableSerializableSharedPointer =
+    detail::IsSharedPtr<T> &&
+    requires(T objPtr, SendableTable& table, const I&... info) {
+      typename Sendable<typename std::remove_cvref_t<T>,
+                        typename std::remove_cvref_t<I>...>;
+      {
+        Sendable<typename std::remove_cvref_t<T>,
+                 typename std::remove_cvref_t<I>...>::GetTypeString(info...)
+      } -> std::convertible_to<std::string_view>;
+      Sendable<typename std::remove_cvref_t<T>,
+               typename std::remove_cvref_t<I>...>::InitSendable(objPtr, table,
+                                                                 info...);
+      Sendable<typename std::remove_cvref_t<T>,
+               typename std::remove_cvref_t<I>...>::CloseSendable(objPtr,
+                                                                  info...);
+    };
+
+template <typename T, typename... I>
+concept SendableSerializable = SendableSerializableRawPointer<T, I...> ||
+                               SendableSerializableSharedPointer<T, I...>;
 
 /**
  * Get the type string for a sendable serializable type

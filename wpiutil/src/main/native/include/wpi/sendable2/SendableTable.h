@@ -164,9 +164,17 @@ class SendableTable final {
   void Update();
 
   /**
-   * Clear properties.
+   * Erases all publishers and subscribers.
    */
-  void ClearProperties();
+  void Clear();
+
+  /**
+   * Reinitializes with a different object pointer.
+   * Intended to be called from SendableHelper/SendableSet.
+   *
+   * @param obj object pointer; nullptr indicates object has been deleted
+   */
+  void ObjectMove(void* obj);
 
   std::shared_ptr<SendableTableBackend> GetBackend() const { return m_backend; }
   std::weak_ptr<SendableTableBackend> GetWeak() const { return m_backend; }
