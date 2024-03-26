@@ -26,7 +26,7 @@ import java.util.function.BooleanSupplier;
  */
 public abstract class Command implements Sendable {
   /** Requirements set. */
-  protected Set<Subsystem> m_requirements = new HashSet<>();
+  private final Set<Subsystem> m_requirements = new HashSet<>();
 
   /** Default constructor. */
   @SuppressWarnings("this-escape")
@@ -88,6 +88,21 @@ public abstract class Command implements Sendable {
    * @param requirements the requirements to add
    */
   public final void addRequirements(Subsystem... requirements) {
+    for (Subsystem requirement : requirements) {
+      m_requirements.add(requireNonNullParam(requirement, "requirement", "addRequirements"));
+    }
+  }
+
+  /**
+   * Adds the specified subsystems to the requirements of the command. The scheduler will prevent
+   * two commands that require the same subsystem from being scheduled simultaneously.
+   *
+   * <p>Note that the scheduler determines the requirements of a command when it is scheduled, so
+   * this method should normally be called from the command's constructor.
+   *
+   * @param requirements the requirements to add
+   */
+  public final void addRequirements(Set<Subsystem> requirements) {
     for (Subsystem requirement : requirements) {
       m_requirements.add(requireNonNullParam(requirement, "requirement", "addRequirements"));
     }

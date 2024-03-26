@@ -78,12 +78,12 @@ public class ParallelDeadlineGroup extends Command {
     CommandScheduler.getInstance().registerComposedCommands(commands);
 
     for (Command command : commands) {
-      if (!Collections.disjoint(command.getRequirements(), m_requirements)) {
+      if (!Collections.disjoint(command.getRequirements(), getRequirements())) {
         throw new IllegalArgumentException(
             "Multiple commands in a parallel group cannot require the same subsystems");
       }
       m_commands.put(command, false);
-      m_requirements.addAll(command.getRequirements());
+      addRequirements(command.getRequirements());
       m_runWhenDisabled &= command.runsWhenDisabled();
       if (command.getInterruptionBehavior() == InterruptionBehavior.kCancelSelf) {
         m_interruptBehavior = InterruptionBehavior.kCancelSelf;
