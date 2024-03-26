@@ -249,14 +249,17 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
   CommandPtr Repeatedly() &&;
 
   /**
-   * Decorates this command to run "by proxy" by wrapping it in a
-   * ProxyCommand. This is useful for "forking off" from command groups
-   * when the user does not wish to extend the command's requirements to the
-   * entire command group.
+   * Decorates this command to run "by proxy" by wrapping it in a ProxyCommand.
+   * Use this for "forking off" from command compositions when the user does not
+   * wish to extend the command's requirements to the entire command
+   * composition. ProxyCommand has unique implications and semantics, see <a
+   * href="https://docs.wpilib.org/en/stable/docs/software/commandbased/command-compositions.html#scheduling-other-commands">the
+   * WPILib docs</a> for a full explanation.
    *
    * <p>This overload transfers command ownership to the returned CommandPtr.
    *
    * @return the decorated command
+   * @see ProxyCommand
    */
   [[nodiscard]]
   CommandPtr AsProxy() &&;

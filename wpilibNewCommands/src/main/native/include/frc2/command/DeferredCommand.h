@@ -16,7 +16,7 @@
 
 namespace frc2 {
 /**
- * Defers Command construction to runtime. Runs the command returned by the
+ * Defers Command construction to runtime. Runs the command returned by a
  * supplier when this command is initialized, and ends when it ends. Useful for
  * performing runtime tasks before creating a new command. If this command is
  * interrupted, it will cancel the command.
@@ -29,9 +29,10 @@ namespace frc2 {
 class DeferredCommand : public CommandHelper<Command, DeferredCommand> {
  public:
   /**
-   * Creates a new DeferredCommand that runs the supplied command when
-   * initialized, and ends when it ends. Useful for lazily
-   * creating commands at runtime. The supplier will be called each time this
+   * Creates a new DeferredCommand that directly runs the supplied command when
+   * initialized, and ends when it ends. Useful for lazily creating commands
+   * when the DeferredCommand is initialized, such as if the supplied command
+   * depends on runtime state. The supplier will be called each time this
    * command is initialized. The supplier <i>must</i> create a new Command each
    * call.
    *
