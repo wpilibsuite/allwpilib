@@ -9,6 +9,18 @@ namespace wpi2 {
 class SendableTableBackend {
   virtual ~SendableTableBackend() = default;
 
+
+  /**
+   * Reinitializes with a different object pointer. Any current callbacks must
+   * be immediately invalidated. This is called from the move constructor
+   * in SendableHelper, and so the new object is not yet fully
+   * moved/initialized and calling Sendable::InitSendable() on this new object
+   * must be a deferred operation to avoid UB.
+   *
+   * @param obj object pointer; nullptr indicates object has been deleted
+   */
+  virtual void ObjectMove(void* obj) = 0;
+
   // TODO
 };
 

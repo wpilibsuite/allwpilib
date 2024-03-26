@@ -7,8 +7,8 @@
 #include <stdint.h>
 
 #include <hal/Types.h>
-#include <wpi/sendable/Sendable.h>
-#include <wpi/sendable/SendableHelper.h>
+#include <wpi/sendable2/Sendable.h>
+#include <wpi/sendable2/SendableHelper.h>
 
 namespace frc {
 
@@ -27,8 +27,7 @@ class DMASample;
  * are divided by the number of samples to retain the resolution, but get more
  * stable values.
  */
-class AnalogInput : public wpi::Sendable,
-                    public wpi::SendableHelper<AnalogInput> {
+class AnalogInput : public wpi2::SendableHelper {
   friend class AnalogTrigger;
   friend class AnalogGyro;
   friend class DMA;
@@ -280,8 +279,6 @@ class AnalogInput : public wpi::Sendable,
    */
   void SetSimDevice(HAL_SimDeviceHandle device);
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
-
  private:
   int m_channel;
   hal::Handle<HAL_AnalogInputHandle> m_port;
@@ -289,3 +286,17 @@ class AnalogInput : public wpi::Sendable,
 };
 
 }  // namespace frc
+
+namespace wpi2 {
+
+template<>
+class Sendable<frc::AnalogInput> {
+ public:
+  static constexpr std::string_view GetTypeString() { return "Analog Input"; }
+  static void InitSendable(frc::AnalogInput* obj, SendableTable& table);
+  static void CloseSendable(frc::AnalogInput* obj) {}
+};
+
+static_assert(SendableSerializable<frc::AnalogInput>);
+
+}  // namespace wpi2
