@@ -13,17 +13,22 @@
 #include <wpigui.h>
 
 #include "glass/Storage.h"
+#include "glass/networktables/NetworkTables.h"
 
 using namespace glass;
 
-NetworkTablesProvider::NetworkTablesProvider(Storage& storage)
-    : NetworkTablesProvider{storage, nt::NetworkTableInstance::GetDefault()} {}
+NetworkTablesProvider::NetworkTablesProvider(
+    Storage& storage, wpi::StructDescriptorDatabase& structDatabase)
+    : NetworkTablesProvider{storage, structDatabase,
+                            nt::NetworkTableInstance::GetDefault()} {}
 
-NetworkTablesProvider::NetworkTablesProvider(Storage& storage,
-                                             nt::NetworkTableInstance inst)
+NetworkTablesProvider::NetworkTablesProvider(
+    Storage& storage, wpi::StructDescriptorDatabase& structDatabase,
+    nt::NetworkTableInstance inst)
     : Provider{storage.GetChild("windows")},
       m_inst{inst},
       m_poller{inst},
+      m_structDatabase{structDatabase},
       m_typeCache{storage.GetChild("types")} {
   storage.SetCustomApply([this] {
     m_listener = m_poller.AddListener({{""}}, nt::EventFlags::kTopic);
@@ -182,8 +187,8 @@ void NetworkTablesProvider::Show(ViewEntry* entry, Window* window) {
 
   // get or create model
   if (!entry->modelEntry->model) {
-    entry->modelEntry->model =
-        entry->modelEntry->createModel(m_inst, entry->name.c_str());
+    entry->modelEntry->model = entry->modelEntry->createModel(
+        m_inst, m_structDatabase, entry->name.c_str());
   }
   if (!entry->modelEntry->model) {
     return;

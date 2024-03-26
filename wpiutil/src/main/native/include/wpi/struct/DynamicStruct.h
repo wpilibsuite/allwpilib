@@ -687,4 +687,47 @@ class DynamicStructObject : private impl::DSOData, public MutableDynamicStruct {
   DynamicStructObject& operator=(DynamicStructObject&&) = delete;
 };
 
+// TODO: Make for mutable structs (use templates?)
+class DynamicStructArray {
+ public:
+  DynamicStructArray(const StructDescriptor* desc,
+                     std::span<const uint8_t> data)
+      : m_desc{desc}, m_data{data} {
+    assert(data.size() % desc->GetSize() == 0);
+
+    size_t count = data.size() / desc->GetSize();
+
+    m_structData.reserve(count);
+    for (size_t i = 0; i < count; ++i) {
+      m_structData.emplace_back(
+          desc, data.subspan(i * desc->GetSize(), desc->GetSize()));
+    }
+  }
+
+  const StructDescriptor* GetDescriptor() const { return m_desc; }
+  std::span<const uint8_t> GetData() const { return m_data; }
+
+  size_t size() const { return m_structData.size(); }
+
+  DynamicStruct& operator[](size_t i) { return m_structData[i]; }
+  const DynamicStruct& operator[](size_t i) const { return m_structData[i]; }
+
+  std::vector<DynamicStruct>::iterator begin() { return m_structData.begin(); }
+  std::vector<DynamicStruct>::iterator end() { return m_structData.end(); }
+
+  std::vector<DynamicStruct>::const_iterator cbegin() const {
+    return m_structData.cbegin();
+  }
+  std::vector<DynamicStruct>::const_iterator cend() const {
+    return m_structData.cend();
+  }
+
+ protected:
+  const StructDescriptor* m_desc;
+
+ private:
+  std::vector<DynamicStruct> m_structData;
+  std::span<const uint8_t> m_data;
+};
+
 }  // namespace wpi
