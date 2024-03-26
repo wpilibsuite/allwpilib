@@ -7,8 +7,6 @@ package edu.wpi.first.wpilibj2.command.button;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * A version of {@link GenericHID} with {@link Trigger} factories for command-based.
@@ -17,8 +15,6 @@ import java.util.Map;
  */
 public class CommandGenericHID {
   private final GenericHID m_hid;
-  private final Map<EventLoop, Map<Integer, Trigger>> m_buttonCache = new HashMap<>();
-  private final Map<EventLoop, Map<Integer, Trigger>> m_povCache = new HashMap<>();
 
   /**
    * Construct an instance of a device.
@@ -58,8 +54,7 @@ public class CommandGenericHID {
    * @return an event instance representing the button's digital signal attached to the given loop.
    */
   public Trigger button(int button, EventLoop loop) {
-    var cache = m_buttonCache.computeIfAbsent(loop, k -> new HashMap<>());
-    return cache.computeIfAbsent(button, k -> new Trigger(loop, () -> m_hid.getRawButton(k)));
+    return new Trigger(loop, () -> m_hid.getRawButton(button));
   }
 
   /**
@@ -90,10 +85,7 @@ public class CommandGenericHID {
    * @return a Trigger instance based around this angle of a POV on the HID.
    */
   public Trigger pov(int pov, int angle, EventLoop loop) {
-    var cache = m_povCache.computeIfAbsent(loop, k -> new HashMap<>());
-    // angle can be -1, so use 3600 instead of 360
-    return cache.computeIfAbsent(
-        pov * 3600 + angle, k -> new Trigger(loop, () -> m_hid.getPOV(pov) == angle));
+    return new Trigger(loop, () -> m_hid.getPOV(pov) == angle);
   }
 
   /**

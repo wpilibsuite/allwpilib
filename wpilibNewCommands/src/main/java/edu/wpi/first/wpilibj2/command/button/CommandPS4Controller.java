@@ -55,7 +55,7 @@ public class CommandPS4Controller extends CommandGenericHID {
    *     loop.
    */
   public Trigger L2(EventLoop loop) {
-    return button(PS4Controller.Button.kL2.value, loop);
+    return m_hid.L2(loop).castTo(Trigger::new);
   }
 
   /**
@@ -76,7 +76,7 @@ public class CommandPS4Controller extends CommandGenericHID {
    *     loop.
    */
   public Trigger R2(EventLoop loop) {
-    return button(PS4Controller.Button.kR2.value, loop);
+    return m_hid.R2(loop).castTo(Trigger::new);
   }
 
   /**
@@ -97,7 +97,7 @@ public class CommandPS4Controller extends CommandGenericHID {
    *     loop.
    */
   public Trigger L1(EventLoop loop) {
-    return button(PS4Controller.Button.kL1.value, loop);
+    return m_hid.L1(loop).castTo(Trigger::new);
   }
 
   /**
@@ -118,7 +118,7 @@ public class CommandPS4Controller extends CommandGenericHID {
    *     loop.
    */
   public Trigger R1(EventLoop loop) {
-    return button(PS4Controller.Button.kR1.value, loop);
+    return m_hid.R1(loop).castTo(Trigger::new);
   }
 
   /**
@@ -139,7 +139,7 @@ public class CommandPS4Controller extends CommandGenericHID {
    *     loop.
    */
   public Trigger L3(EventLoop loop) {
-    return button(PS4Controller.Button.kL3.value, loop);
+    return m_hid.L3(loop).castTo(Trigger::new);
   }
 
   /**
@@ -160,7 +160,7 @@ public class CommandPS4Controller extends CommandGenericHID {
    *     loop.
    */
   public Trigger R3(EventLoop loop) {
-    return button(PS4Controller.Button.kR3.value, loop);
+    return m_hid.R3(loop).castTo(Trigger::new);
   }
 
   /**
@@ -181,7 +181,7 @@ public class CommandPS4Controller extends CommandGenericHID {
    *     loop.
    */
   public Trigger square(EventLoop loop) {
-    return button(PS4Controller.Button.kSquare.value, loop);
+    return m_hid.square(loop).castTo(Trigger::new);
   }
 
   /**
@@ -202,7 +202,7 @@ public class CommandPS4Controller extends CommandGenericHID {
    *     loop.
    */
   public Trigger cross(EventLoop loop) {
-    return button(PS4Controller.Button.kCross.value, loop);
+    return m_hid.cross(loop).castTo(Trigger::new);
   }
 
   /**
@@ -223,7 +223,7 @@ public class CommandPS4Controller extends CommandGenericHID {
    *     given loop.
    */
   public Trigger triangle(EventLoop loop) {
-    return button(PS4Controller.Button.kTriangle.value, loop);
+    return m_hid.triangle(loop).castTo(Trigger::new);
   }
 
   /**
@@ -244,7 +244,7 @@ public class CommandPS4Controller extends CommandGenericHID {
    *     loop.
    */
   public Trigger circle(EventLoop loop) {
-    return button(PS4Controller.Button.kCircle.value, loop);
+    return m_hid.circle(loop).castTo(Trigger::new);
   }
 
   /**
@@ -265,7 +265,7 @@ public class CommandPS4Controller extends CommandGenericHID {
    *     loop.
    */
   public Trigger share(EventLoop loop) {
-    return button(PS4Controller.Button.kShare.value, loop);
+    return m_hid.share(loop).castTo(Trigger::new);
   }
 
   /**
@@ -286,7 +286,7 @@ public class CommandPS4Controller extends CommandGenericHID {
    *     loop.
    */
   public Trigger PS(EventLoop loop) {
-    return button(PS4Controller.Button.kPS.value, loop);
+    return m_hid.PS(loop).castTo(Trigger::new);
   }
 
   /**
@@ -307,7 +307,7 @@ public class CommandPS4Controller extends CommandGenericHID {
    *     given loop.
    */
   public Trigger options(EventLoop loop) {
-    return button(PS4Controller.Button.kOptions.value, loop);
+    return m_hid.options(loop).castTo(Trigger::new);
   }
 
   /**
@@ -328,7 +328,7 @@ public class CommandPS4Controller extends CommandGenericHID {
    *     loop.
    */
   public Trigger touchpad(EventLoop loop) {
-    return button(PS4Controller.Button.kTouchpad.value, loop);
+    return m_hid.touchpad(loop).castTo(Trigger::new);
   }
 
   /**
