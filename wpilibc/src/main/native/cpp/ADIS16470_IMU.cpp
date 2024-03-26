@@ -17,6 +17,7 @@
 #include <frc/DigitalSource.h>
 #include <frc/DriverStation.h>
 #include <frc/Timer.h>
+#include <frc/geometry/Rotation3d.h>
 
 #include <cmath>
 #include <numbers>
@@ -551,6 +552,11 @@ void ADIS16470_IMU::Reset() {
   m_integ_angle_z = 0.0;
 }
 
+void ADIS16470_IMU::Reset(Rotation3d offset) {
+  Reset();
+  angleOffset = offset;
+}
+
 void ADIS16470_IMU::Close() {
   if (m_reset_in != nullptr) {
     delete m_reset_in;
@@ -878,27 +884,27 @@ units::degree_t ADIS16470_IMU::GetAngle(IMUAxis axis) const {
   switch (axis) {
     case kX:
       if (m_simGyroAngleX) {
-        return units::degree_t{m_simGyroAngleX.Get()};
+        return units::degree_t{m_simGyroAngleX.Get()} + angleOffset.X();
       }
       {
         std::scoped_lock sync(m_mutex);
-        return units::degree_t{m_integ_angle_x};
+        return units::degree_t{m_integ_angle_x} + angleOffset.X();
       }
     case kY:
       if (m_simGyroAngleY) {
-        return units::degree_t{m_simGyroAngleY.Get()};
+        return units::degree_t{m_simGyroAngleY.Get()} + angleOffset.Y();
       }
       {
         std::scoped_lock sync(m_mutex);
-        return units::degree_t{m_integ_angle_y};
+        return units::degree_t{m_integ_angle_y} + angleOffset.Y();
       }
     case kZ:
       if (m_simGyroAngleZ) {
-        return units::degree_t{m_simGyroAngleZ.Get()};
+        return units::degree_t{m_simGyroAngleZ.Get()} + angleOffset.Z();
       }
       {
         std::scoped_lock sync(m_mutex);
-        return units::degree_t{m_integ_angle_z};
+        return units::degree_t{m_integ_angle_z} + angleOffset.Z();
       }
     default:
       break;

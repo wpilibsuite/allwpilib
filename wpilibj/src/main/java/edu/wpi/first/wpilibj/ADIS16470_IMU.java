@@ -17,6 +17,8 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SimBoolean;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDouble;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import java.nio.ByteBuffer;
@@ -253,6 +255,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
   private volatile boolean m_thread_idle = false;
   private boolean m_auto_configured = false;
   private double m_scaled_sample_rate = 2500.0;
+  private Rotation3d m_angleOffset = new Rotation3d();
 
   // Resources
   private SPI m_spi;
@@ -1020,6 +1023,68 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
       m_integ_angle_x = 0.0;
       m_integ_angle_y = 0.0;
       m_integ_angle_z = 0.0;
+
+      if (m_simGyroAngleX != null) {
+        m_simGyroAngleX.set(0.0);
+      }
+      if (m_simGyroAngleY != null) {
+        m_simGyroAngleY.set(0.0);
+      }
+      if (m_simGyroAngleZ != null) {
+        m_simGyroAngleZ.set(0.0);
+      }
+
+      m_angleOffset = new Rotation3d();
+    }
+  }
+
+  /**
+   * Returns the raw (un-offset) orientation of the device as a Rotation3d
+   *
+   * @return Rotation3d representing the device orientation
+   */
+  private synchronized Rotation3d getGyroOrientation() {
+    Rotation3d orientation;
+    if (m_simGyroAngleX != null && m_simGyroAngleY != null && m_simGyroAngleZ != null) {
+      orientation =
+          new Rotation3d(
+              Units.degreesToRadians(m_simGyroAngleX.get()),
+              Units.degreesToRadians(m_simGyroAngleY.get()),
+              Units.degreesToRadians(m_simGyroAngleZ.get()));
+    } else {
+      orientation =
+          new Rotation3d(
+              Units.degreesToRadians(m_integ_angle_x),
+              Units.degreesToRadians(m_integ_angle_y),
+              Units.degreesToRadians(m_integ_angle_z));
+    }
+    return orientation;
+  }
+
+  /**
+   * Reset the gyro.
+   *
+   * <p>Resets the gyro angle to an orientation specified by the user.
+   *
+   * @param newAngle The 3d angle to reset the device to
+   */
+  public void reset(Rotation3d newAngle) {
+    synchronized (this) {
+      m_integ_angle_x = 0.0;
+      m_integ_angle_y = 0.0;
+      m_integ_angle_z = 0.0;
+
+      if (m_simGyroAngleX != null) {
+        m_simGyroAngleX.set(0.0);
+      }
+      if (m_simGyroAngleY != null) {
+        m_simGyroAngleY.set(0.0);
+      }
+      if (m_simGyroAngleZ != null) {
+        m_simGyroAngleZ.set(0.0);
+      }
+
+      m_angleOffset = newAngle.unaryMinus();
     }
   }
 
@@ -1116,20 +1181,11 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
 
     switch (axis) {
       case kX:
-        if (m_simGyroAngleX != null) {
-          return m_simGyroAngleX.get();
-        }
-        return m_integ_angle_x;
+        return Units.radiansToDegrees(getGyroOrientation().minus(m_angleOffset).getX());
       case kY:
-        if (m_simGyroAngleY != null) {
-          return m_simGyroAngleY.get();
-        }
-        return m_integ_angle_y;
+        return Units.radiansToDegrees(getGyroOrientation().minus(m_angleOffset).getY());
       case kZ:
-        if (m_simGyroAngleZ != null) {
-          return m_simGyroAngleZ.get();
-        }
-        return m_integ_angle_z;
+        return Units.radiansToDegrees(getGyroOrientation().minus(m_angleOffset).getZ());
       default:
     }
 
@@ -1144,20 +1200,11 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
   public synchronized double getAngle() {
     switch (m_yaw_axis) {
       case kX:
-        if (m_simGyroAngleX != null) {
-          return m_simGyroAngleX.get();
-        }
-        return m_integ_angle_x;
+        return Units.radiansToDegrees(getGyroOrientation().minus(m_angleOffset).getX());
       case kY:
-        if (m_simGyroAngleY != null) {
-          return m_simGyroAngleY.get();
-        }
-        return m_integ_angle_y;
+        return Units.radiansToDegrees(getGyroOrientation().minus(m_angleOffset).getY());
       case kZ:
-        if (m_simGyroAngleZ != null) {
-          return m_simGyroAngleZ.get();
-        }
-        return m_integ_angle_z;
+        return Units.radiansToDegrees(getGyroOrientation().minus(m_angleOffset).getZ());
       default:
     }
     return 0.0;

@@ -33,6 +33,7 @@
 #include "frc/DigitalInput.h"
 #include "frc/DigitalOutput.h"
 #include "frc/SPI.h"
+#include "frc/geometry/Rotation3d.h"
 
 namespace frc {
 /**
@@ -149,6 +150,15 @@ class ADIS16448_IMU : public wpi::Sendable,
    * after running.
    */
   void Reset();
+
+  /**
+   * Reset the gyro.
+   *
+   * Resets the gyro accumulations to a heading of zero. This can be used if
+   * there is significant drift in the gyro and it needs to be recalibrated
+   * after running.
+   */
+  void Reset(Rotation3d offset);
 
   /**
    * Returns the yaw axis angle in degrees (CCW positive).
@@ -352,6 +362,7 @@ class ADIS16448_IMU : public wpi::Sendable,
   /** @brief Internal Resources **/
   DigitalInput* m_reset_in = nullptr;
   DigitalOutput* m_status_led = nullptr;
+  Rotation3d angleOffset = Rotation3d{0_deg, 0_deg, 0_deg};
 
   bool SwitchToStandardSPI();
 

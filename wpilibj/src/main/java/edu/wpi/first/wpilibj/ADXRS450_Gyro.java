@@ -48,6 +48,7 @@ public class ADXRS450_Gyro implements Sendable, AutoCloseable {
   private SimBoolean m_simConnected;
   private SimDouble m_simAngle;
   private SimDouble m_simRate;
+  private Rotation2d m_angleOffset;
 
   /** Constructor. Uses the onboard CS0. */
   public ADXRS450_Gyro() {
@@ -62,6 +63,7 @@ public class ADXRS450_Gyro implements Sendable, AutoCloseable {
   @SuppressWarnings("this-escape")
   public ADXRS450_Gyro(SPI.Port port) {
     m_spi = new SPI(port);
+    m_angleOffset = new Rotation2d();
 
     // simulation
     m_simDevice = SimDevice.create("Gyro:ADXRS450", port.value);
@@ -183,6 +185,18 @@ public class ADXRS450_Gyro implements Sendable, AutoCloseable {
     }
   }
 
+  /**
+   * Reset the gyro.
+   *
+   * <p>Resets the gyro angle to one specified by the user.
+   *
+   * @param offset Angle to set the reading to
+   */
+  public void reset(Rotation2d offset) {
+    reset();
+    m_angleOffset = offset;
+  }
+
   /** Delete (free) the spi port used for the gyro and stop accumulating. */
   @Override
   public void close() {
@@ -213,12 +227,13 @@ public class ADXRS450_Gyro implements Sendable, AutoCloseable {
    */
   public double getAngle() {
     if (m_simAngle != null) {
-      return m_simAngle.get();
+      return m_simAngle.get() + m_angleOffset.getDegrees();
     }
     if (m_spi == null) {
       return 0.0;
     }
-    return m_spi.getAccumulatorIntegratedValue() * kDegreePerSecondPerLSB;
+    return m_spi.getAccumulatorIntegratedValue() * kDegreePerSecondPerLSB
+        + m_angleOffset.getDegrees();
   }
 
   /**
@@ -256,7 +271,7 @@ public class ADXRS450_Gyro implements Sendable, AutoCloseable {
    * @return the current heading of the robot as a {@link edu.wpi.first.math.geometry.Rotation2d}.
    */
   public Rotation2d getRotation2d() {
-    return Rotation2d.fromDegrees(-getAngle());
+    return Rotation2d.fromDegrees(-getAngle()).plus(m_angleOffset);
   }
 
   @Override

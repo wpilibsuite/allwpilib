@@ -19,6 +19,7 @@
 #include <frc/DriverStation.h>
 #include <frc/SPI.h>
 #include <frc/Timer.h>
+#include <frc/geometry/Rotation3d.h>
 
 #include <algorithm>
 #include <cmath>
@@ -509,6 +510,11 @@ void ADIS16448_IMU::Reset() {
   m_integ_gyro_angle_z = 0.0;
 }
 
+void ADIS16448_IMU::Reset(Rotation3d angle) {
+  Reset();
+  angleOffset = angle;
+}
+
 void ADIS16448_IMU::Close() {
   if (m_reset_in != nullptr) {
     delete m_reset_in;
@@ -838,11 +844,11 @@ int ADIS16448_IMU::ConfigDecRate(uint16_t decimationRate) {
 units::degree_t ADIS16448_IMU::GetAngle() const {
   switch (m_yaw_axis) {
     case kX:
-      return GetGyroAngleX();
+      return GetGyroAngleX() + angleOffset.X();
     case kY:
-      return GetGyroAngleY();
+      return GetGyroAngleY() + angleOffset.Y();
     case kZ:
-      return GetGyroAngleZ();
+      return GetGyroAngleZ() + angleOffset.Z();
     default:
       return 0_deg;
   }

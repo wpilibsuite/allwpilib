@@ -81,6 +81,15 @@ class ADXRS450_Gyro : public wpi::Sendable,
   void Reset();
 
   /**
+   * Reset the gyro.
+   *
+   * Resets the gyro to a heading of zero. This can be used if there is
+   * significant drift in the gyro and it needs to be recalibrated after it has
+   * been running.
+   */
+  void Reset(Rotation2d offset);
+
+  /**
    * Calibrate the gyro by running for a number of samples and computing the
    * center value. Then use the center value as the Accumulator center value for
    * subsequent measurements.
@@ -120,6 +129,7 @@ class ADXRS450_Gyro : public wpi::Sendable,
   SPI m_spi;
   SPI::Port m_port;
   bool m_connected{false};
+  Rotation2d angleOffset{0_deg};
 
   hal::SimDevice m_simDevice;
   hal::SimBoolean m_simConnected;
