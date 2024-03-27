@@ -276,7 +276,7 @@ class EncoderSim {
    *
    * @param samplesToAverage the new value
    */
-  void SetDistancePerPulse(double samplesToAverage) {
+  void SetDistancePerPulse(double samplesToAverage);
 
   /**
    * Resets all simulation data for this encoder.
