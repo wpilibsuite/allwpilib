@@ -262,7 +262,7 @@ public final class LinearSystemId {
    * @see <a href="https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
    */
   public static LinearSystem<N1, N1, N1> identifyVelocitySystem(double kV, double kA) {
-    if (kV <= 0.0) {
+    if (kV < 0.0) {
       throw new IllegalArgumentException("Kv must be greater than or equal to zero.");
     }
     if (kA <= 0.0) {
@@ -295,7 +295,7 @@ public final class LinearSystemId {
    * @see <a href="https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
    */
   public static LinearSystem<N2, N1, N1> identifyPositionSystem(double kV, double kA) {
-    if (kV <= 0.0) {
+    if (kV < 0.0) {
       throw new IllegalArgumentException("Kv must be greater than or equal to zero.");
     }
     if (kA <= 0.0) {

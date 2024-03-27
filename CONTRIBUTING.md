@@ -80,6 +80,8 @@ xₖ₊₁ = Axₖ + Buₖ
 
 Changes should be submitted as a Pull Request against the main branch of WPILib. For most changes, commits will be squashed upon merge. For particularly large changes, multiple commits are ok, but assume one commit unless asked otherwise. We may ask you to break a PR into multiple standalone PRs or commits for rebase within one PR to separate unrelated changes. No change will be merged unless it is up to date with the current main branch. We do this to make sure that the git history isn't too cluttered.
 
+During the build season, breaking changes or other changes intended for the next season can be created as a pull request against the development branch of WPILib. After the season is over, the changes in the development branch will be merged into main.
+
 ### Merge Process
 
 When you first submit changes, GitHub Actions will attempt to run `./gradlew check` on your change. If this fails, you will need to fix any issues that it sees. Once Actions passes, we will begin the review process in more earnest. One or more WPILib team members will review your change. This will be a back-and-forth process with the WPILib team and the greater community. Once we are satisfied that your change is ready, we will allow our hosted instance to test it. This will run the full gamut of checks, including integration tests on actual hardware. Once all tests have passed and the team is satisfied, we will merge your change into the WPILib repository.
