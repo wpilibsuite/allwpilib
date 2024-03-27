@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj2.command;
 
+import edu.wpi.first.util.sendable.SendableBuilder;
 import java.util.Set;
 
 /**
@@ -40,5 +41,25 @@ public class ScheduleCommand extends Command {
   @Override
   public boolean runsWhenDisabled() {
     return true;
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    super.initSendable(builder);
+
+    builder.caching(
+        "Commands",
+        m_toSchedule::hashCode,
+        () -> {
+          var names = new String[m_toSchedule.size()];
+          int i = 0;
+          for (Command command : m_toSchedule) {
+            names[i] = command.getName();
+            i++;
+          }
+          return names;
+        },
+        null,
+        builder::addStringArrayProperty);
   }
 }

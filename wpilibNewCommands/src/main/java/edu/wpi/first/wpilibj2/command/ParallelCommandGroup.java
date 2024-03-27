@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj2.command;
 
+import edu.wpi.first.util.sendable.SendableBuilder;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -107,5 +108,51 @@ public class ParallelCommandGroup extends Command {
   @Override
   public InterruptionBehavior getInterruptionBehavior() {
     return m_interruptBehavior;
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    super.initSendable(builder);
+
+    builder.caching(
+        "Commands",
+        m_commands::hashCode,
+        () -> {
+          var names = new String[m_commands.size()];
+          int i = 0;
+          for (var command : m_commands.keySet()) {
+            names[i] = command.getName();
+            i++;
+          }
+          return names;
+        },
+        null,
+        builder::addStringArrayProperty);
+
+    builder.caching(
+        "Running Commands",
+        m_commands::hashCode,
+        () -> {
+          // Initial array sized for the maximum capacity. If any command has finished,
+          // then there will be a null value for that index.
+          var tmp = new String[m_commands.size()];
+          int i = 0;
+          for (var entry : m_commands.entrySet()) {
+            if (entry.getValue()) {
+              tmp[i] = entry.getKey().getName();
+              i++;
+            }
+          }
+          if (tmp.length == i) {
+            return tmp;
+          } else {
+            // To avoid null values in the output, copy to a new, correctly-sized array
+            var names = new String[i];
+            System.arraycopy(tmp, 0, names, 0, i);
+            return names;
+          }
+        },
+        null,
+        builder::addStringArrayProperty);
   }
 }

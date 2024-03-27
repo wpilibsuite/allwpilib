@@ -114,5 +114,18 @@ public class SequentialCommandGroup extends Command {
     super.initSendable(builder);
 
     builder.addIntegerProperty("index", () -> m_currentCommandIndex, null);
+
+    builder.caching(
+        "Commands",
+        m_commands::hashCode,
+        () -> {
+          var names = new String[m_commands.size()];
+          for (int i = 0; i < m_commands.size(); i++) {
+            names[i] = m_commands.get(i).getName();
+          }
+          return names;
+        },
+        null,
+        builder::addStringArrayProperty);
   }
 }

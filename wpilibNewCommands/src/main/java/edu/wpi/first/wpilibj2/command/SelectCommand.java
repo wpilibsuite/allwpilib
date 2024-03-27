@@ -92,5 +92,20 @@ public class SelectCommand<K> extends Command {
 
     builder.addStringProperty(
         "selected", () -> m_selectedCommand == null ? "null" : m_selectedCommand.getName(), null);
+
+    builder.caching(
+        "Options",
+        m_commands::hashCode,
+        () -> {
+          var names = new String[m_commands.size()];
+          int i = 0;
+          for (var command : m_commands.values()) {
+            names[i] = command.getName();
+            i++;
+          }
+          return names;
+        },
+        null,
+        builder::addStringArrayProperty);
   }
 }
