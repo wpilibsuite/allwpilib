@@ -1,0 +1,68 @@
+name: Check RLIs
+on: [pull_request]
+
+jobs:
+  check-rlis:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout frc-docs
+        uses: actions/checkout@v2
+        with:
+          repository: wpilibsuite/frc-docs
+
+      - name: Inspect RLIs
+        uses: Starlight220/Inspector@v1.6
+        id: inspector
+        with:
+          root: ${{ github.workspace }}
+          baseUrl: 'https://raw.githubusercontent.com/wpilibsuite/allwpilib/'
+          versionScheme: 'v\d{4}\.\d\.\d(?:-(?:alpha|beta)-\d)?|[0-9a-f]{40}'
+          latestVersion: ${{ github.event.pull_request.head.sha }}
+          ignoredFiles: '["source/docs/software/pathplanning/trajectory-tutorial/"]'
+
+      # Error if RLIs can't be automatically updated
+      - name: Set exit code
+        if: ${{ steps.inspector.outputs.needs-manual == 'true' }}
+        run: exit 1
+
+    # ---- Post Report ----
+      - name: Find Comment
+        uses: peter-evans/find-comment@v1
+        id: fc
+        if: failure()
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: Inspector Report
+          direction: last
+
+      - name: Create comment
+        if: ${{ failure() && steps.fc.outputs.comment-id == 0 }}
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          body: ${{ env.REPORT }}
+          issue-number: ${{ github.event.pull_request.number }}
+
+      - name: Update comment
+        if: ${{ failure() && steps.fc.outputs.comment-id != 0 }}
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          body: |
+            ### Found RLIs needing manual updates!
+            <details>
+            <summary>See the "needs manual updates" section of the report:</summary>
+
+            ${{ env.REPORT }}
+
+            </summary>
+
+          comment-id: ${{ steps.fc.outputs.comment-id }}
+          edit-mode: replace
+
+      - name: Update comment
+        if: ${{ success() && steps.fc.outputs.comment-id != 0 }}
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          body: All RLIs fixed!
+          comment-id: ${{ steps.fc.outputs.comment-id }}
+          edit-mode: replace
