@@ -180,7 +180,7 @@ double EncoderSim::GetDistancePerPulse() const {
 }
 
 void EncoderSim::SetDistancePerPulse(double samplesToAverage) {
-  HALSIM_SetEncoderDistancePerPulse(m_index, distancePerPulse);
+  HALSIM_SetEncoderDistancePerPulse(m_index, samplesToAverage);
 }
 
 void EncoderSim::ResetData() {
