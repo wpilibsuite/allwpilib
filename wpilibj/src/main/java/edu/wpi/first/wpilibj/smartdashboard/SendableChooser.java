@@ -76,6 +76,28 @@ public class SendableChooser<V> implements Sendable, AutoCloseable {
   }
 
   /**
+   * Removes a given object from this list of options. On the {@link SmartDashboard} on the desktop,
+   * the object with the given name will disappear.
+   *
+   * @param name the name of the option
+   */
+  public void removeOption(String name) {
+    if(name == m_defaultChoice){
+      m_defaultChoice = "";
+    }
+    m_map.remove(name);
+  }
+
+  /**
+   * Clears the list of options. On the {@link SmartDashboard} on the desktop, all options will
+   * disappear.
+   */
+  public void removeAllOptions() {
+    m_defaultChoice = "";
+    m_map.clear();
+  }
+
+  /**
    * Adds the given object to the list of options and marks it as the default. Functionally, this is
    * very close to {@link #addOption(String, Object)} except that it will use this as the default
    * option if none other is explicitly selected.

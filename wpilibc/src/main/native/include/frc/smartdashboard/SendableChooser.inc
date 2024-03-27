@@ -26,6 +26,18 @@ void SendableChooser<T>::AddOption(std::string_view name, T object) {
 
 template <class T>
   requires std::copy_constructible<T> && std::default_initializable<T>
+void SendableChooser<T>::RemoveOption(std::string_view name) {
+  m_choices.erase(name);
+}
+
+template <class T>
+  requires std::copy_constructible<T> && std::default_initializable<T>
+void SendableChooser<T>::RemoveAllOptions() {
+  m_choices.clear();
+}
+
+template <class T>
+  requires std::copy_constructible<T> && std::default_initializable<T>
 void SendableChooser<T>::SetDefaultOption(std::string_view name, T object) {
   m_defaultChoice = name;
   AddOption(name, std::move(object));

@@ -59,6 +59,23 @@ class SendableChooser : public SendableChooserBase {
   void AddOption(std::string_view name, T object);
 
   /**
+   * Removes a given object from this list of options.
+   *
+   * On the SmartDashboard on the desktop, the object with the given name will
+   * disappear.
+   *
+   * @param name the name of the option
+   */
+  void RemoveOption(std::string_view name);
+
+  /**
+   * Clears the list of options.
+   *
+   * On the SmartDashboard on the desktop, all options will disappear.
+   */
+  void RemoveAllOptions();
+
+  /**
    * Add the given object to the list of options and marks it as the default.
    *
    * Functionally, this is very close to AddOption() except that it will use
