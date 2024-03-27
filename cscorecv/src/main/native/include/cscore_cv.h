@@ -2,8 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef CSCORE_CSCORE_CV_H_
-#define CSCORE_CSCORE_CV_H_
+#ifndef CSCORECV_CSCORE_CV_H_
+#define CSCORECV_CSCORE_CV_H_
 
 #include <functional>
 
@@ -11,6 +11,10 @@
 
 #include "cscore_oo.h"
 #include "cscore_raw.h"
+
+namespace frc {
+class CameraServerCv;
+}  // namespace frc
 
 namespace cs {
 /**
@@ -21,6 +25,8 @@ namespace cs {
  */
 class CvSource : public ImageSource {
  public:
+  friend class frc::CameraServerCv;
+
   CvSource() = default;
 
   /**
@@ -84,6 +90,8 @@ class CvSource : public ImageSource {
  */
 class CvSink : public ImageSink {
  public:
+  friend class frc::CameraServerCv;
+
   CvSink() = default;
   CvSink(const CvSink& sink);
 
@@ -153,6 +161,8 @@ class CvSink : public ImageSink {
 
  private:
   constexpr int GetCvFormat(WPI_PixelFormat pixelFormat);
+
+  CvSink(CS_Sink handle, VideoMode::PixelFormat pixelFormat);
 
   wpi::RawFrame rawFrame;
   VideoMode::PixelFormat pixelFormat;
@@ -280,6 +290,11 @@ inline void CvSource::PutFrame(cv::Mat& image,
   PutSourceFrame(m_handle, frame, &m_status);
 }
 
+inline CvSink::CvSink(CS_Sink handle, VideoMode::PixelFormat pixelFormat) {
+  m_handle = handle;
+  this->pixelFormat = pixelFormat;
+}
+
 inline CvSink::CvSink(std::string_view name,
                       VideoMode::PixelFormat pixelFormat) {
   m_handle = CreateRawSink(name, true, &m_status);
@@ -367,4 +382,4 @@ inline uint64_t CvSink::GrabFrameNoTimeoutDirect(cv::Mat& image) {
 
 }  // namespace cs
 
-#endif  // CSCORE_CSCORE_CV_H_
+#endif  // CSCORECV_CSCORE_CV_H_

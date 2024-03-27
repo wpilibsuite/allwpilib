@@ -82,7 +82,6 @@ project(':').libraryBuild.dependsOn build
 
 ext {
     sharedCvConfigs = [wpilibjDev: []]
-    staticCvConfigs = [:]
     useJava = true
     useCpp = true
 }

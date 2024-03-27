@@ -1,0 +1,151 @@
+import org.gradle.internal.os.OperatingSystem
+
+evaluationDependsOn(':wpiutil')
+evaluationDependsOn(':cscore')
+
+ext {
+    nativeName = 'cscorecv'
+    devMain = 'edu.wpi.first.cscorecv.DevMain'
+}
+
+apply from: "${rootDir}/shared/javacpp/setupBuild.gradle"
+
+dependencies {
+    implementation project(':wpiutil')
+    implementation project(':cscore')
+}
+
+
+model {
+    binaries {
+        all {
+            if (!it.buildable || !(it instanceof NativeBinarySpec)) {
+                return
+            }
+            if (it.component.name == "${nativeName}Dev") {
+                lib project: ':cscore', library: 'cscoreJNI', linkage: 'shared'
+            }
+            lib project: ':cscore', library: 'cscore', linkage: 'shared'
+            lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
+            lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+        }
+    }
+}
+
+
+ext {
+    sharedCvConfigs = [cscorecv    : [],
+        cscorecvBase: [],
+        cscorecvDev : [],
+        cscorecvTest: [],
+        cscorecvJNIShared: [],
+        cscorecvJNI: []]
+    staticCvConfigs = [:]
+    useJava = true
+    useCpp = true
+}
+
+def examplesMap = [:];
+
+File examplesTree = file("$projectDir/examples")
+examplesTree.list(new FilenameFilter() {
+            @Override
+            public boolean accept(File current, String name) {
+                return new File(current, name).isDirectory();
+            }
+        }).each {
+            sharedCvConfigs.put(it, [])
+            examplesMap.put(it, [])
+        }
+
+apply from: "${rootDir}/shared/opencv.gradle"
+
+Action<List<String>> symbolFilter = { symbols ->
+    symbols.removeIf({ !it.startsWith('CS_') })
+} as Action<List<String>>;
+
+run {
+    if (OperatingSystem.current().isMacOsX()) {
+        jvmArgs("-XstartOnFirstThread");
+    }
+}
+
+nativeUtils.exportsConfigs {
+    cscorecv {
+        x64ExcludeSymbols = [
+            '_CT??_R0?AV_System_error',
+            '_CT??_R0?AVexception',
+            '_CT??_R0?AVfailure',
+            '_CT??_R0?AVruntime_error',
+            '_CT??_R0?AVsystem_error',
+            '_CTA5?AVfailure',
+            '_TI5?AVfailure',
+            '_CT??_R0?AVout_of_range',
+            '_CTA3?AVout_of_range',
+            '_TI3?AVout_of_range',
+            '_CT??_R0?AVbad_cast'
+        ]
+    }
+}
+
+apply from: "${rootDir}/shared/imgui.gradle"
+
+model {
+    components {
+        examplesMap.each { key, value ->
+            if (key == "usbviewer") {
+                if (!project.hasProperty('onlylinuxathena')) {
+                    "${key}"(NativeExecutableSpec) {
+                        targetBuildTypes 'debug'
+                        binaries.all {
+                            lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                            lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
+                            lib project: ':wpigui', library: 'wpigui', linkage: 'static'
+                            lib project: ':cscore', library: 'cscore', linkage: 'shared'
+                            lib library: 'cscorecv', linkage: 'shared'
+                            nativeUtils.useRequiredLibrary(it, 'imgui')
+                            if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                                it.buildable = false
+                                return
+                            }
+                            if (it.targetPlatform.operatingSystem.isWindows()) {
+                                it.linker.args << 'Gdi32.lib' << 'Shell32.lib' << 'd3d11.lib' << 'd3dcompiler.lib'
+                            } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
+                                it.linker.args << '-framework' << 'Metal' << '-framework' << 'MetalKit' << '-framework' << 'Cocoa' << '-framework' << 'IOKit' << '-framework' << 'CoreFoundation' << '-framework' << 'CoreVideo' << '-framework' << 'QuartzCore'
+                            } else {
+                                it.linker.args << '-lX11'
+                                if (it.targetPlatform.name.startsWith('linuxarm')) {
+                                    it.linker.args << '-lGL'
+                                }
+                            }
+                            if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                                nativeUtils.useRequiredLibrary(it, 'ni_link_libraries', 'ni_runtime_libraries')
+                            }
+                        }
+                        sources.cpp.source {
+                            srcDirs 'examples/' + "${key}"
+                            include '**/*.cpp'
+                        }
+                    }
+                }
+            } else {
+                "${key}"(NativeExecutableSpec) {
+                    targetBuildTypes 'debug'
+                    binaries.all {
+                        lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                        lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
+                        lib project: ':cscore', library: 'cscore', linkage: 'shared'
+                        lib library: 'cscorecv', linkage: 'shared'
+                        if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                            nativeUtils.useRequiredLibrary(it, 'ni_link_libraries', 'ni_runtime_libraries')
+                        }
+                    }
+                    sources.cpp.source {
+                        srcDirs 'examples/' + "${key}"
+                        include '**/*.cpp'
+                    }
+                }
+            }
+        }
+    }
+}
