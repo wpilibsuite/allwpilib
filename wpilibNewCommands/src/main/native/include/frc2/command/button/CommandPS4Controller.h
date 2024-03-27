@@ -7,17 +7,31 @@
 
 #include "Trigger.h"
 #include "frc2/command/CommandScheduler.h"
+#include "frc2/command/button/CommandGenericHID.h"
 
 namespace frc2 {
 /**
- * A version of {@link PS4Controller} with {@link Trigger} factories for
+ * A version of {@link frc::PS4Controller} with {@link Trigger} factories for
  * command-based.
  *
- * @see PS4Controller
+ * @see frc::PS4Controller
  */
-class CommandPS4Controller : public frc::PS4Controller {
+class CommandPS4Controller : public frc2::CommandGenericHID {
  public:
-  using PS4Controller::PS4Controller;
+  /**
+   * Construct an instance of a device.
+   *
+   * @param port The port index on the Driver Station that the device is plugged
+   * into.
+   */
+  explicit CommandPS4Controller(int port);
+
+  /**
+   * Get the underlying GenericHID object.
+   *
+   * @return the wrapped GenericHID object
+   */
+  frc::PS4Controller& GetHID();
 
   /**
    * Constructs an event instance around this button's digital signal.
@@ -174,5 +188,52 @@ class CommandPS4Controller : public frc::PS4Controller {
    */
   Trigger Touchpad(frc::EventLoop* loop = CommandScheduler::GetInstance()
                                               .GetDefaultButtonLoop()) const;
+
+  /**
+   * Get the R2 axis value of the controller. Note that this axis is bound to
+   * the range of [0, 1] as opposed to the usual [-1, 1].
+   *
+   * @return the axis value.
+   */
+  double GetR2Axis();
+
+  /**
+   * Get the L2 axis value of the controller. Note that this axis is bound to
+   * the range of [0, 1] as opposed to the usual [-1, 1].
+   *
+   * @return the axis value.
+   */
+  double GetL2Axis();
+
+  /**
+   * Get the Y axis value of right side of the controller.
+   *
+   * @return the axis value.
+   */
+  double GetRightY();
+
+  /**
+   * Get the Y axis value of left side of the controller.
+   *
+   * @return the axis value.
+   */
+  double GetLeftY();
+
+  /**
+   * Get the X axis value of right side of the controller.
+   *
+   * @return the axis value.
+   */
+  double GetRightX();
+
+  /**
+   * Get the X axis value of left side of the controller.
+   *
+   * @return the axis value.
+   */
+  double GetLeftX();
+
+ private:
+  frc::PS4Controller m_hid;
 };
 }  // namespace frc2
