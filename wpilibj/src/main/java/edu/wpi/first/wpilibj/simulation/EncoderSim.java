@@ -329,10 +329,10 @@ public class EncoderSim {
   /**
    * Set the distance per pulse value.
    *
-   * @param samplesToAverage the new value
+   * @param distancePerPulse the new distancePerPulse
    */
-  public void setDistancePerPulse(double samplesToAverage) {
-    EncoderDataJNI.setDistancePerPulse(m_index, samplesToAverage);
+  public void setDistancePerPulse(double distancePerPulse) {
+    EncoderDataJNI.setDistancePerPulse(m_index, distancePerPulse);
   }
 
   /**
