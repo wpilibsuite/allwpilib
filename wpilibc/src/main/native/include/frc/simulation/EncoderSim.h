@@ -272,11 +272,11 @@ class EncoderSim {
   double GetDistancePerPulse() const;
 
   /**
-   * Change the encoder distance per pulse.
+   * Set the distance per pulse value.
    *
-   * @param distancePerPulse the new distance per pulse
+   * @param samplesToAverage the new value
    */
-  void SetDistancePerPulse(double distancePerPulse);
+  void SetDistancePerPulse(double samplesToAverage) {
 
   /**
    * Resets all simulation data for this encoder.
