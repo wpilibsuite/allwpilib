@@ -181,8 +181,9 @@ class WPILIB_DLLEXPORT PIDController
   /**
    * Sets the minimum and maximum contributions of the integral term.
    *
-   * The internal integrator is clamped so that the integral term's contribution to the output
-   * stays between minimumIntegral and maximumIntegral. This prevents integral windup.
+   * The internal integrator is clamped so that the integral term's contribution
+   * to the output stays between minimumIntegral and maximumIntegral. This
+   * prevents integral windup.
    *
    * @param minimumIntegral The minimum contribution of the integral term.
    * @param maximumIntegral The maximum contribution of the integral term.
