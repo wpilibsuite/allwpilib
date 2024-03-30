@@ -4,24 +4,233 @@
 
 #pragma once
 
+#include <stdint.h>
+
+#include <functional>
+#include <span>
+#include <string>
+#include <string_view>
+
+#include "wpi/json_fwd.h"
+#include "wpi/sendable2/SendableOptions.h"
+
+namespace wpi {
+template <typename T>
+class SmallVectorImpl;
+}  // namespace wpi
+
 namespace wpi2 {
 
 class SendableTableBackend {
+ public:
   virtual ~SendableTableBackend() = default;
 
+  virtual void SetBoolean(std::string_view name, bool value,
+                          const SendableOptions& options) = 0;
+
+  virtual void PublishBoolean(std::string_view name,
+                              std::function<bool()> supplier,
+                              const SendableOptions& options) = 0;
+
+  [[nodiscard]]
+  virtual std::function<void(bool)> PublishBoolean(
+      std::string_view name, const SendableOptions& options) = 0;
+
+  virtual void SubscribeBoolean(std::string_view name,
+                                std::function<void(bool)> consumer,
+                                const SendableOptions& options) = 0;
+
+  virtual void SetInt(std::string_view name, int64_t value,
+                      const SendableOptions& options) = 0;
+
+  virtual void PublishInt(std::string_view name,
+                          std::function<int64_t()> supplier,
+                          const SendableOptions& options) = 0;
+
+  [[nodiscard]]
+  virtual std::function<void(int64_t)> PublishInt(
+      std::string_view name, const SendableOptions& options) = 0;
+
+  virtual void SubscribeInt(std::string_view name,
+                            std::function<void(int64_t)> consumer,
+                            const SendableOptions& options) = 0;
+
+  virtual void SetFloat(std::string_view name, float value,
+                        const SendableOptions& options) = 0;
+
+  virtual void PublishFloat(std::string_view name,
+                            std::function<float()> supplier,
+                            const SendableOptions& options) = 0;
+
+  [[nodiscard]]
+  virtual std::function<void(float)> PublishFloat(
+      std::string_view name, const SendableOptions& options) = 0;
+
+  virtual void SubscribeFloat(std::string_view name,
+                              std::function<void(float)> consumer,
+                              const SendableOptions& options) = 0;
+
+  virtual void SetDouble(std::string_view name, double value,
+                         const SendableOptions& options) = 0;
+
+  virtual void PublishDouble(std::string_view name,
+                             std::function<double()> supplier,
+                             const SendableOptions& options) = 0;
+
+  [[nodiscard]]
+  virtual std::function<void(double)> PublishDouble(
+      std::string_view name, const SendableOptions& options) = 0;
+
+  virtual void SubscribeDouble(std::string_view name,
+                               std::function<void(double)> consumer,
+                               const SendableOptions& options) = 0;
+
+  virtual void SetString(std::string_view name, std::string_view value,
+                         const SendableOptions& options) = 0;
+
+  virtual void PublishString(std::string_view name,
+                             std::function<std::string()> supplier,
+                             const SendableOptions& options) = 0;
+
+  [[nodiscard]]
+  virtual std::function<void(std::string_view)> PublishString(
+      std::string_view name, const SendableOptions& options) = 0;
+
+  virtual void SubscribeString(std::string_view name,
+                               std::function<void(std::string_view)> consumer,
+                               const SendableOptions& options) = 0;
+
+  virtual void SetRaw(std::string_view name, std::string_view typeString,
+                      std::span<const uint8_t> value,
+                      const SendableOptions& options) = 0;
+
+  virtual void PublishRaw(std::string_view name, std::string_view typeString,
+                          std::function<std::vector<uint8_t>()> supplier,
+                          const SendableOptions& options) = 0;
+
+  virtual void PublishRawSmall(
+      std::string_view name, std::string_view typeString,
+      std::function<std::span<uint8_t>(wpi::SmallVectorImpl<uint8_t>& buf)>
+          supplier,
+      const SendableOptions& options) = 0;
+
+  [[nodiscard]]
+  virtual std::function<void(std::span<const uint8_t>)> PublishRaw(
+      std::string_view name, std::string_view typeString,
+      const SendableOptions& options) = 0;
+
+  virtual void SubscribeRaw(
+      std::string_view name, std::string_view typeString,
+      std::function<void(std::span<const uint8_t>)> consumer,
+      const SendableOptions& options) = 0;
 
   /**
-   * Reinitializes with a different object pointer. Any current callbacks must
-   * be immediately invalidated. This is called from the move constructor
-   * in SendableHelper, and so the new object is not yet fully
-   * moved/initialized and calling Sendable::InitSendable() on this new object
-   * must be a deferred operation to avoid UB.
+   * Gets the current value of a property (as a JSON object).
    *
-   * @param obj object pointer; nullptr indicates object has been deleted
+   * @param name name
+   * @param propName property name
+   * @return JSON object; null object if the property does not exist.
    */
-  virtual void ObjectMove(void* obj) = 0;
+  virtual wpi::json GetProperty(std::string_view name,
+                                std::string_view propName) const = 0;
 
-  // TODO
+  /**
+   * Sets a property value.
+   *
+   * @param name name
+   * @param propName property name
+   * @param value property value
+   */
+  virtual void SetProperty(std::string_view name, std::string_view propName,
+                           const wpi::json& value) = 0;
+
+  /**
+   * Deletes a property.  Has no effect if the property does not exist.
+   *
+   * @param name name
+   * @param propName property name
+   */
+  virtual void DeleteProperty(std::string_view name,
+                              std::string_view propName) = 0;
+
+  /**
+   * Gets all topic properties as a JSON object.  Each key in the object
+   * is the property name, and the corresponding value is the property value.
+   *
+   * @param name name
+   * @return JSON object
+   */
+  virtual wpi::json GetProperties(std::string_view name) const = 0;
+
+  /**
+   * Updates multiple topic properties.  Each key in the passed-in object is
+   * the name of the property to add/update, and the corresponding value is the
+   * property value to set for that property.  Null values result in deletion
+   * of the corresponding property.
+   *
+   * @param name name
+   * @param properties JSON object with keys to add/update/delete
+   * @return False if properties is not an object
+   */
+  virtual bool SetProperties(std::string_view name,
+                             const wpi::json& properties) = 0;
+
+  virtual void Erase(std::string_view name) = 0;
+
+  /**
+   * Return whether this sendable has been published.
+   *
+   * @return True if it has been published, false if not.
+   */
+  virtual bool IsPublished() const = 0;
+
+  /**
+   * Update the published values by calling the getters for all properties.
+   */
+  virtual void Update() = 0;
+
+  /**
+   * Erases all publishers and subscribers.
+   */
+  virtual void Clear() = 0;
+
+  /**
+   * Returns whether there is a data schema already registered with the given
+   * name.
+   *
+   * @param name Name (the string passed as the data type for topics using this
+   *             schema)
+   * @return True if schema already registered
+   */
+  virtual bool HasSchema(std::string_view name) const = 0;
+
+  /**
+   * Registers a data schema.  Data schemas provide information for how a
+   * certain data type string can be decoded.  The type string of a data schema
+   * indicates the type of the schema itself (e.g. "protobuf" for protobuf
+   * schemas, "struct" for struct schemas, etc).
+   *
+   * @param name Name (the string passed as the data type for topics using this
+   *             schema)
+   * @param type Type of schema (e.g. "protobuf", "struct", etc)
+   * @param schema Schema data
+   */
+  virtual void AddSchema(std::string_view name, std::string_view type,
+                         std::span<const uint8_t> schema) = 0;
+
+  /**
+   * Registers a data schema.  Data schemas provide information for how a
+   * certain data type string can be decoded.  The type string of a data schema
+   * indicates the type of the schema itself (e.g. "protobuf" for protobuf
+   * schemas, "struct" for struct schemas, etc).
+   *
+   * @param name Name (the string passed as the data type for topics using this
+   *             schema)
+   * @param type Type of schema (e.g. "protobuf", "struct", etc)
+   * @param schema Schema data
+   */
+  virtual void AddSchema(std::string_view name, std::string_view type,
+                         std::string_view schema) = 0;
 };
 
 }  // namespace wpi2

@@ -8,89 +8,153 @@
 
 #include <functional>
 #include <memory>
+#include <span>
 #include <string>
 #include <string_view>
+#include <vector>
 
 #include "wpi/json_fwd.h"
+#include "wpi/protobuf/Protobuf.h"
 #include "wpi/sendable2/Sendable.h"
-#include "wpi/sendable2/SendableTableBackend.h"
+#include "wpi/sendable2/SendableOptions.h"
 #include "wpi/struct/Struct.h"
 
+namespace wpi {
+template <typename T>
+class SmallVectorImpl;
+}  // namespace wpi
+
 namespace wpi2 {
+
+class SendableTableBackend;
 
 class SendableTable final {
  public:
   explicit SendableTable(std::shared_ptr<SendableTableBackend> backend)
       : m_backend{std::move(backend)} {}
 
-  void SetBoolean(std::string_view name, bool value);
+  void SetBoolean(std::string_view name, bool value,
+                  const SendableOptions& options = kDefaultSendableOptions);
 
-  void PublishBoolean(std::string_view name, std::function<bool()> supplier);
-
-  [[nodiscard]]
-  std::function<void(bool)> PublishBoolean(std::string_view name);
-
-  void SubscribeBoolean(std::string_view name,
-                        std::function<void(bool)> consumer);
-
-  void SetInt(std::string_view name, int64_t value);
-
-  void PublishInt(std::string_view name, std::function<int64_t()> supplier);
+  void PublishBoolean(std::string_view name, std::function<bool()> supplier,
+                      const SendableOptions& options = kDefaultSendableOptions);
 
   [[nodiscard]]
-  std::function<void(int64_t)> PublishInt(std::string_view name);
+  std::function<void(bool)> PublishBoolean(
+      std::string_view name,
+      const SendableOptions& options = kDefaultSendableOptions);
+
+  void SubscribeBoolean(
+      std::string_view name, std::function<void(bool)> consumer,
+      const SendableOptions& options = kDefaultSendableOptions);
+
+  void SetInt(std::string_view name, int64_t value,
+              const SendableOptions& options = kDefaultSendableOptions);
+
+  void PublishInt(std::string_view name, std::function<int64_t()> supplier,
+                  const SendableOptions& options = kDefaultSendableOptions);
+
+  [[nodiscard]]
+  std::function<void(int64_t)> PublishInt(
+      std::string_view name,
+      const SendableOptions& options = kDefaultSendableOptions);
 
   void SubscribeInt(std::string_view name,
-                    std::function<void(int64_t)> consumer);
+                    std::function<void(int64_t)> consumer,
+                    const SendableOptions& options = kDefaultSendableOptions);
 
-  void SetFloat(std::string_view name, float value);
+  void SetFloat(std::string_view name, float value,
+                const SendableOptions& options = kDefaultSendableOptions);
 
-  void PublishFloat(std::string_view name, std::function<float()> supplier);
+  void PublishFloat(std::string_view name, std::function<float()> supplier,
+                    const SendableOptions& options = kDefaultSendableOptions);
 
   [[nodiscard]]
-  std::function<void(float)> PublishFloat(std::string_view name);
+  std::function<void(float)> PublishFloat(
+      std::string_view name,
+      const SendableOptions& options = kDefaultSendableOptions);
 
   void SubscribeFloat(std::string_view name,
-                      std::function<void(float)> consumer);
+                      std::function<void(float)> consumer,
+                      const SendableOptions& options = kDefaultSendableOptions);
 
-  void SetDouble(std::string_view name, double value);
+  void SetDouble(std::string_view name, double value,
+                 const SendableOptions& options = kDefaultSendableOptions);
 
-  void PublishDouble(std::string_view name, std::function<double()> supplier);
+  void PublishDouble(std::string_view name, std::function<double()> supplier,
+                     const SendableOptions& options = kDefaultSendableOptions);
 
   [[nodiscard]]
-  std::function<void(double)> PublishDouble(std::string_view name);
+  std::function<void(double)> PublishDouble(
+      std::string_view name,
+      const SendableOptions& options = kDefaultSendableOptions);
 
-  void SubscribeDouble(std::string_view name,
-                       std::function<void(double)> consumer);
+  void SubscribeDouble(
+      std::string_view name, std::function<void(double)> consumer,
+      const SendableOptions& options = kDefaultSendableOptions);
 
-  void SetString(std::string_view name, std::string_view value);
+  void SetString(std::string_view name, std::string_view value,
+                 const SendableOptions& options = kDefaultSendableOptions);
 
   void PublishString(std::string_view name,
-                     std::function<std::string()> supplier);
+                     std::function<std::string()> supplier,
+                     const SendableOptions& options = kDefaultSendableOptions);
 
   [[nodiscard]]
-  std::function<void(std::string_view)> PublishString(std::string_view name);
+  std::function<void(std::string_view)> PublishString(
+      std::string_view name,
+      const SendableOptions& options = kDefaultSendableOptions);
 
-  void SubscribeString(std::string_view name,
-                       std::function<void(std::string_view)> consumer);
+  void SubscribeString(
+      std::string_view name, std::function<void(std::string_view)> consumer,
+      const SendableOptions& options = kDefaultSendableOptions);
+
+  void SetRaw(std::string_view name, std::string_view typeString,
+              std::span<const uint8_t> value,
+              const SendableOptions& options = kDefaultSendableOptions);
+
+  void PublishRaw(std::string_view name, std::string_view typeString,
+                  std::function<std::vector<uint8_t>()> supplier,
+                  const SendableOptions& options = kDefaultSendableOptions);
+
+  void PublishRawSmall(
+      std::string_view name, std::string_view typeString,
+      std::function<std::span<uint8_t>(wpi::SmallVectorImpl<uint8_t>& buf)>
+          supplier,
+      const SendableOptions& options = kDefaultSendableOptions);
+
+  [[nodiscard]]
+  std::function<void(std::span<const uint8_t>)> PublishRaw(
+      std::string_view name, std::string_view typeString,
+      const SendableOptions& options = kDefaultSendableOptions);
+
+  void SubscribeRaw(std::string_view name, std::string_view typeString,
+                    std::function<void(std::span<const uint8_t>)> consumer,
+                    const SendableOptions& options = kDefaultSendableOptions);
 
   template <typename T, typename... I>
     requires wpi::StructSerializable<T, I...>
-  void SetStruct(std::string_view name, const T& obj, I... info);
+  void SetStruct(std::string_view name, const T& value,
+                 const SendableOptions& options = kDefaultSendableOptions,
+                 I... info);
 
   template <typename T, typename... I>
     requires wpi::StructSerializable<T, I...>
   void PublishStruct(std::string_view name, std::function<T()> supplier,
+                     const SendableOptions& options = kDefaultSendableOptions,
                      I... info);
 
   template <typename T, typename... I>
     requires wpi::StructSerializable<T, I...>
   [[nodiscard]]
-  std::function<void(const T&)> PublishStruct(std::string_view name, I... info);
+  std::function<void(const T&)> PublishStruct(
+      std::string_view name,
+      const SendableOptions& options = kDefaultSendableOptions, I... info);
 
   template <typename T, typename... I>
     requires wpi::StructSerializable<T, I...>
   void SubscribeStruct(std::string_view name, std::function<void(T)> consumer,
+                       const SendableOptions& options = kDefaultSendableOptions,
                        I... info);
 
   template <typename T, typename... I>
@@ -169,12 +233,70 @@ class SendableTable final {
   void Clear();
 
   /**
-   * Reinitializes with a different object pointer.
-   * Intended to be called from SendableHelper/SendableSet.
+   * Returns whether there is a data schema already registered with the given
+   * name. This does NOT perform a check as to whether the schema has already
+   * been published by another node on the network.
    *
-   * @param obj object pointer; nullptr indicates object has been deleted
+   * @param name Name (the string passed as the data type for topics using this
+   *             schema)
+   * @return True if schema already registered
    */
-  void ObjectMove(void* obj);
+  bool HasSchema(std::string_view name) const;
+
+  /**
+   * Registers a data schema.  Data schemas provide information for how a
+   * certain data type string can be decoded.  The type string of a data schema
+   * indicates the type of the schema itself (e.g. "protobuf" for protobuf
+   * schemas, "struct" for struct schemas, etc). In NetworkTables, schemas are
+   * published just like normal topics, with the name being generated from the
+   * provided name: "/.schema/<name>".  Duplicate calls to this function with
+   * the same name are silently ignored.
+   *
+   * @param name Name (the string passed as the data type for topics using this
+   *             schema)
+   * @param type Type of schema (e.g. "protobuf", "struct", etc)
+   * @param schema Schema data
+   */
+  void AddSchema(std::string_view name, std::string_view type,
+                 std::span<const uint8_t> schema);
+
+  /**
+   * Registers a data schema.  Data schemas provide information for how a
+   * certain data type string can be decoded.  The type string of a data schema
+   * indicates the type of the schema itself (e.g. "protobuf" for protobuf
+   * schemas, "struct" for struct schemas, etc). In NetworkTables, schemas are
+   * published just like normal topics, with the name being generated from the
+   * provided name: "/.schema/<name>".  Duplicate calls to this function with
+   * the same name are silently ignored.
+   *
+   * @param name Name (the string passed as the data type for topics using this
+   *             schema)
+   * @param type Type of schema (e.g. "protobuf", "struct", etc)
+   * @param schema Schema data
+   */
+  void AddSchema(std::string_view name, std::string_view type,
+                 std::string_view schema);
+
+  /**
+   * Registers a protobuf schema. Duplicate calls to this function with the same
+   * name are silently ignored.
+   *
+   * @tparam T protobuf serializable type
+   * @param msg protobuf message
+   */
+  template <wpi::ProtobufSerializable T>
+  void AddProtobufSchema(wpi::ProtobufMessage<T>& msg);
+
+  /**
+   * Registers a struct schema. Duplicate calls to this function with the same
+   * name are silently ignored.
+   *
+   * @tparam T struct serializable type
+   * @param info optional struct type info
+   */
+  template <typename T, typename... I>
+    requires wpi::StructSerializable<T, I...>
+  void AddStructSchema(const I&... info);
 
   std::shared_ptr<SendableTableBackend> GetBackend() const { return m_backend; }
   std::weak_ptr<SendableTableBackend> GetWeak() const { return m_backend; }

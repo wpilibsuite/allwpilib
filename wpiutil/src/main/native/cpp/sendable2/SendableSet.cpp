@@ -14,9 +14,9 @@ std::vector<SendableTable> SendableSet::GetAll() const {
 }
 
 void SendableSet::Add(const SendableTable& table) {
-  auto backend = table.GetBackend().get();
+  auto backend = table.GetBackend();
   for (auto&& backendWeak : m_tables) {
-    if (backendWeak.lock().get() == backend) {
+    if (backendWeak.lock() == backend) {
       return;
     }
   }
@@ -24,7 +24,6 @@ void SendableSet::Add(const SendableTable& table) {
 }
 
 void SendableSet::Remove(const SendableTable& table) {
-  auto backend = table.GetBackend().get();
-  std::erase_if(m_tables,
-                [=](const auto& v) { return v.lock().get() == backend; });
+  auto backend = table.GetBackend();
+  std::erase_if(m_tables, [&](const auto& v) { return v.lock() == backend; });
 }
