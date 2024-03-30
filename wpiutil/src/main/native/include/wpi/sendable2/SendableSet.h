@@ -12,8 +12,6 @@
 
 namespace wpi2 {
 
-class SendableHelper;
-
 class SendableSet final {
  public:
   std::vector<SendableTable> GetAll() const;
@@ -26,8 +24,6 @@ class SendableSet final {
       }
     }
   }
-
-  void ObjectMove(void* obj);
 
   void Add(const SendableTable& table);
 

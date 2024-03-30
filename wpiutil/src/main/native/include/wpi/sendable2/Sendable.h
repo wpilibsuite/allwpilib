@@ -8,28 +8,23 @@
 #include <string_view>
 #include <type_traits>
 
+namespace wpi {
+class MoveTrackerBase;
+}  // namespace wpi
+
 namespace wpi2 {
 
-class SendableHelper;
-class SendableSet;
 class SendableTable;
 
 namespace detail {
-
-template <typename T>
-struct is_shared_ptr : std::false_type {};
-template <typename T>
-struct is_shared_ptr<std::shared_ptr<T>> : std::true_type {};
-template <typename T>
-concept IsSharedPtr = is_shared_ptr<T>::value;
 
 template <typename T>
 concept not_movable =
     !std::move_constructible<T> && !std::assignable_from<T&, T>;
 
 template <typename T>
-concept SendableHelpedOrNotMovable =
-    not_movable<T> || std::derived_from<T, SendableHelper>;
+concept MoveTrackedOrNotMovable =
+    not_movable<T> || std::derived_from<T, wpi::MoveTrackerBase>;
 
 }  // namespace detail
 
@@ -46,24 +41,24 @@ struct Sendable {};
 
 /**
  * Specifies that a type is capable of sendable serialization and
- * deserialization.
+ * deserialization via a raw pointer. This requires the type be either
+ * non-moveable or derived from wpi::MoveTracker so that moves can be tracked.
  *
  * Implementations must define a template specialization for wpi::Sendable with
  * T being the type that is being serialized/deserialized, with the following
  * static members (as enforced by this concept):
  * - std::string_view GetTypeString(): function that returns the dashboard type
  *   string
- * - void InitSendable(T* obj, SendableTable& table)
- * - void CloseSendable(T* obj)
+ * - void Init(T* obj, SendableTable& table)
+ * - void Close(T* obj)
  *
- * If possible, the GetTypeString(), GetSize(), and GetSchema() functions should
- * be marked constexpr. GetTypeString() may return a type other than
- * std::string_view, as long as the return value is convertible to
- * std::string_view.
+ * If possible, the GetTypeString() function should be marked constexpr.
+ * GetTypeString() may return a type other than std::string_view, as long as the
+ * return value is convertible to std::string_view.
  */
 template <typename T, typename... I>
 concept SendableSerializableRawPointer =
-    detail::SendableHelpedOrNotMovable<T> &&
+    detail::MoveTrackedOrNotMovable<T> &&
     requires(T* obj, SendableTable& table, const I&... info) {
       typename Sendable<typename std::remove_cvref_t<T>,
                         typename std::remove_cvref_t<I>...>;
@@ -72,16 +67,30 @@ concept SendableSerializableRawPointer =
                  typename std::remove_cvref_t<I>...>::GetTypeString(info...)
       } -> std::convertible_to<std::string_view>;
       Sendable<typename std::remove_cvref_t<T>,
-               typename std::remove_cvref_t<I>...>::InitSendable(obj, table,
-                                                                 info...);
+               typename std::remove_cvref_t<I>...>::Init(obj, table, info...);
       Sendable<typename std::remove_cvref_t<T>,
-               typename std::remove_cvref_t<I>...>::CloseSendable(obj, info...);
+               typename std::remove_cvref_t<I>...>::Close(obj, info...);
     };
 
+/**
+ * Specifies that a type is capable of sendable serialization and
+ * deserialization when wrapped in a std::shared_ptr. This works with any type.
+ *
+ * Implementations must define a template specialization for wpi::Sendable with
+ * T being the type that is being serialized/deserialized, with the following
+ * static members (as enforced by this concept):
+ * - std::string_view GetTypeString(): function that returns the dashboard type
+ *   string
+ * - void Init(std::shared_ptr<T> obj, SendableTable& table)
+ * - void Close(std::shared_ptr<T> obj)
+ *
+ * If possible, the GetTypeString() function should be marked constexpr.
+ * GetTypeString() may return a type other than std::string_view, as long as the
+ * return value is convertible to std::string_view.
+ */
 template <typename T, typename... I>
 concept SendableSerializableSharedPointer =
-    detail::IsSharedPtr<T> &&
-    requires(T objPtr, SendableTable& table, const I&... info) {
+    requires(std::shared_ptr<T> obj, SendableTable& table, const I&... info) {
       typename Sendable<typename std::remove_cvref_t<T>,
                         typename std::remove_cvref_t<I>...>;
       {
@@ -89,13 +98,15 @@ concept SendableSerializableSharedPointer =
                  typename std::remove_cvref_t<I>...>::GetTypeString(info...)
       } -> std::convertible_to<std::string_view>;
       Sendable<typename std::remove_cvref_t<T>,
-               typename std::remove_cvref_t<I>...>::InitSendable(objPtr, table,
-                                                                 info...);
+               typename std::remove_cvref_t<I>...>::Init(obj, table, info...);
       Sendable<typename std::remove_cvref_t<T>,
-               typename std::remove_cvref_t<I>...>::CloseSendable(objPtr,
-                                                                  info...);
+               typename std::remove_cvref_t<I>...>::Close(obj, info...);
     };
 
+/**
+ * Specifies that a type is capable of sendable serialization and
+ * deserialization as either a raw pointer type or via std::shared_ptr.
+ */
 template <typename T, typename... I>
 concept SendableSerializable = SendableSerializableRawPointer<T, I...> ||
                                SendableSerializableSharedPointer<T, I...>;
@@ -112,6 +123,43 @@ template <typename T, typename... I>
 constexpr auto GetSendableTypeString(const I&... info) {
   using S = Sendable<T, typename std::remove_cvref_t<I>...>;
   return S::GetTypeString(info...);
+}
+
+template <typename T, typename... I>
+  requires SendableSerializableRawPointer<T, I...>
+inline void InitSendable(T* obj, SendableTable& table, const I&... info) {
+  using S = Sendable<T, typename std::remove_cvref_t<I>...>;
+  S::Init(obj, table, info...);
+}
+
+template <typename T, typename... I>
+  requires SendableSerializable<T, I...>
+inline void InitSendable(std::shared_ptr<T> obj, SendableTable& table,
+                         const I&... info) {
+  using S = Sendable<T, typename std::remove_cvref_t<I>...>;
+  if constexpr (SendableSerializableSharedPointer<T, I...>) {
+    S::Init(std::move(obj), table, info...);
+  } else if constexpr (SendableSerializableRawPointer<T, I...>) {
+    S::Init(obj.get(), table, info...);
+  }
+}
+
+template <typename T, typename... I>
+  requires SendableSerializableRawPointer<T, I...>
+inline void CloseSendable(T* obj, const I&... info) {
+  using S = Sendable<T, typename std::remove_cvref_t<I>...>;
+  S::Close(obj, info...);
+}
+
+template <typename T, typename... I>
+  requires SendableSerializable<T, I...>
+inline void CloseSendable(std::shared_ptr<T> obj, const I&... info) {
+  using S = Sendable<T, typename std::remove_cvref_t<I>...>;
+  if constexpr (SendableSerializableSharedPointer<T, I...>) {
+    S::Close(std::move(obj), info...);
+  } else if constexpr (SendableSerializableRawPointer<T, I...>) {
+    S::Close(obj.get(), info...);
+  }
 }
 
 }  // namespace wpi2

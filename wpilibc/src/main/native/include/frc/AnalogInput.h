@@ -8,7 +8,7 @@
 
 #include <hal/Types.h>
 #include <wpi/sendable2/Sendable.h>
-#include <wpi/sendable2/SendableHelper.h>
+#include <wpi/MoveTracker.h>
 
 namespace frc {
 
@@ -27,7 +27,7 @@ class DMASample;
  * are divided by the number of samples to retain the resolution, but get more
  * stable values.
  */
-class AnalogInput : public wpi2::SendableHelper {
+class AnalogInput : public wpi::MoveTrackerBase {
   friend class AnalogTrigger;
   friend class AnalogGyro;
   friend class DMA;
@@ -293,8 +293,8 @@ template<>
 class Sendable<frc::AnalogInput> {
  public:
   static constexpr std::string_view GetTypeString() { return "Analog Input"; }
-  static void InitSendable(frc::AnalogInput* obj, SendableTable& table);
-  static void CloseSendable(frc::AnalogInput* obj) {}
+  static void Init(frc::AnalogInput* obj, SendableTable& table);
+  static void Close(frc::AnalogInput* obj);
 };
 
 static_assert(SendableSerializable<frc::AnalogInput>);
