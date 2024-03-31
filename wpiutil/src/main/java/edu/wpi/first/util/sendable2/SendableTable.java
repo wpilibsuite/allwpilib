@@ -21,55 +21,59 @@ import java.util.function.Supplier;
 public interface SendableTable extends AutoCloseable {
   void setBoolean(String name, boolean value);
 
-  void publishBoolean(String name, BooleanSupplier supplier, SendableOption... options);
+  void publishBoolean(String name, BooleanSupplier supplier);
 
-  BooleanConsumer publishBoolean(String name, SendableOption... options);
+  BooleanConsumer publishBoolean(String name);
 
-  void subscribeBoolean(String name, BooleanConsumer consumer, SendableOption... options);
+  void subscribeBoolean(String name, BooleanConsumer consumer);
 
   void setInt(String name, long value);
 
-  void publishInt(String name, LongSupplier supplier, SendableOption... options);
+  void publishInt(String name, LongSupplier supplier);
 
-  LongConsumer publishInt(String name, SendableOption... options);
+  LongConsumer publishInt(String name);
 
-  void subscribeInt(String name, LongConsumer consumer, SendableOption... options);
+  void subscribeInt(String name, LongConsumer consumer);
 
   void setFloat(String name, float value);
 
-  void publishFloat(String name, FloatSupplier supplier, SendableOption... options);
+  void publishFloat(String name, FloatSupplier supplier);
 
-  FloatConsumer publishFloat(String name, SendableOption... options);
+  FloatConsumer publishFloat(String name);
 
-  void subscribeFloat(String name, FloatConsumer consumer, SendableOption... options);
+  void subscribeFloat(String name, FloatConsumer consumer);
 
   void setDouble(String name, double value);
 
-  void publishDouble(String name, DoubleSupplier supplier, SendableOption... options);
+  void publishDouble(String name, DoubleSupplier supplier);
 
-  DoubleConsumer publishDouble(String name, SendableOption... options);
+  DoubleConsumer publishDouble(String name);
 
-  void subscribeDouble(String name, DoubleConsumer consumer, SendableOption... options);
+  void subscribeDouble(String name, DoubleConsumer consumer);
 
   void setString(String name, String value);
 
-  void publishString(String name, Supplier<String> supplier, SendableOption... options);
+  void publishString(String name, Supplier<String> supplier);
 
-  Consumer<String> publishString(String name, SendableOption... options);
+  Consumer<String> publishString(String name);
 
-  void subscribeString(String name, Consumer<String> consumer, SendableOption... options);
+  void subscribeString(String name, Consumer<String> consumer);
 
   <T> void setStruct(String name, T value, Struct<T> struct);
 
-  <T> void publishStruct(String name, Struct<T> struct, Supplier<T> supplier, SendableOption... options);
+  <T> void publishStruct(String name, Struct<T> struct, Supplier<T> supplier);
 
-  <T> Consumer<T> publishStruct(String name, Struct<T> struct, SendableOption... options);
+  <T> Consumer<T> publishStruct(String name, Struct<T> struct);
 
-  <T> void subscribeStruct(String name, Struct<T> struct, Consumer<T> consumer, SendableOption... options);
+  <T> void subscribeStruct(String name, Struct<T> struct, Consumer<T> consumer);
 
   <T> SendableTable addSendable(String name, T obj, Sendable<T> sendable);
 
   // SendableTable getSendable(String name);
+
+  void setPublishOptions(SendableOption... options);
+
+  void setSubscribeOptions(SendableOption... options);
 
   /**
    * Gets the current value of a property (as a JSON string).

@@ -18,28 +18,27 @@ namespace wpi2 {
 template <typename T, typename... I>
   requires wpi::StructSerializable<T, I...>
 void SendableTable::SetStruct(std::string_view name, const T& value,
-                              const SendableOptions& options, I... info) {
+                              I... info) {
   using S = wpi::Struct<T, I...>;
   AddStructSchema<T>(info...);
   if constexpr (sizeof...(I) == 0) {
     if constexpr (wpi::is_constexpr([] { S::GetSize(); })) {
       uint8_t buf[S::GetSize()];
       S::Pack(buf, value);
-      SetRaw(name, S::GetTypeString(), buf, options);
+      SetRaw(name, S::GetTypeString(), buf);
       return;
     }
   }
   wpi::SmallVector<uint8_t, 128> buf;
   buf.resize_for_overwrite(S::GetSize(info...));
   S::Pack(buf, value, info...);
-  SetRaw(name, S::GetTypeString(info...), buf, options);
+  SetRaw(name, S::GetTypeString(info...), buf);
 }
 
 template <typename T, typename... I>
   requires wpi::StructSerializable<T, I...>
 void SendableTable::PublishStruct(std::string_view name,
-                                  std::function<T()> supplier,
-                                  const SendableOptions& options, I... info) {
+                                  std::function<T()> supplier, I... info) {
   using S = wpi::Struct<T, I...>;
   AddStructSchema<T>(info...);
   PublishRawSmall(
@@ -53,17 +52,16 @@ void SendableTable::PublishStruct(std::string_view name,
             },
             info);
         return buf;
-      },
-      options);
+      });
 }
 
 template <typename T, typename... I>
   requires wpi::StructSerializable<T, I...>
 std::function<void(const T&)> SendableTable::PublishStruct(
-    std::string_view name, const SendableOptions& options, I... info) {
+    std::string_view name, I... info) {
   using S = wpi::Struct<T, I...>;
   AddStructSchema<T>(info...);
-  return [rawSetter = PublishRaw(name, S::GetTypeString(info...), options),
+  return [rawSetter = PublishRaw(name, S::GetTypeString(info...)),
           info = std::tuple<I...>{info...}](const T& value) {
     if constexpr (sizeof...(I) == 0) {
       if constexpr (wpi::is_constexpr([] { S::GetSize(); })) {
@@ -88,7 +86,7 @@ template <typename T, typename... I>
   requires wpi::StructSerializable<T, I...>
 void SendableTable::SubscribeStruct(std::string_view name,
                                     std::function<void(T)> consumer,
-                                    const SendableOptions& options, I... info) {
+                                    I... info) {
   using S = wpi::Struct<T, I...>;
   AddStructSchema<T>(info...);
   SubscribeRaw(
@@ -100,8 +98,7 @@ void SendableTable::SubscribeStruct(std::string_view name,
               [&](const I&... info) { return S::Unpack(data, info...); },
               info));
         }
-      },
-      options);
+      });
 }
 
 template <typename T, typename... I>

@@ -10,148 +10,133 @@
 
 using namespace wpi2;
 
-void SendableTable::SetBoolean(std::string_view name, bool value,
-                               const SendableOptions& options) {
-  m_backend->SetBoolean(name, value, options);
+void SendableTable::SetBoolean(std::string_view name, bool value) {
+  m_backend->SetBoolean(name, value);
 }
 
 void SendableTable::PublishBoolean(std::string_view name,
-                                   std::function<bool()> supplier,
-                                   const SendableOptions& options) {
-  m_backend->PublishBoolean(name, std::move(supplier), options);
+                                   std::function<bool()> supplier) {
+  m_backend->PublishBoolean(name, std::move(supplier));
 }
 
-std::function<void(bool)> SendableTable::PublishBoolean(
-    std::string_view name, const SendableOptions& options) {
-  return m_backend->PublishBoolean(name, options);
+std::function<void(bool)> SendableTable::PublishBoolean(std::string_view name) {
+  return m_backend->PublishBoolean(name);
 }
 
 void SendableTable::SubscribeBoolean(std::string_view name,
-                                     std::function<void(bool)> consumer,
-                                     const SendableOptions& options) {
-  m_backend->SubscribeBoolean(name, std::move(consumer), options);
+                                     std::function<void(bool)> consumer) {
+  m_backend->SubscribeBoolean(name, std::move(consumer));
 }
 
-void SendableTable::SetInt(std::string_view name, int64_t value,
-                           const SendableOptions& options) {
-  m_backend->SetInt(name, value, options);
+void SendableTable::SetInt(std::string_view name, int64_t value) {
+  m_backend->SetInt(name, value);
 }
 
 void SendableTable::PublishInt(std::string_view name,
-                               std::function<int64_t()> supplier,
-                               const SendableOptions& options) {
-  m_backend->PublishInt(name, std::move(supplier), options);
+                               std::function<int64_t()> supplier) {
+  m_backend->PublishInt(name, std::move(supplier));
 }
 
-std::function<void(int64_t)> SendableTable::PublishInt(
-    std::string_view name, const SendableOptions& options) {
-  return m_backend->PublishInt(name, options);
+std::function<void(int64_t)> SendableTable::PublishInt(std::string_view name) {
+  return m_backend->PublishInt(name);
 }
 
 void SendableTable::SubscribeInt(std::string_view name,
-                                 std::function<void(int64_t)> consumer,
-                                 const SendableOptions& options) {
-  m_backend->SubscribeInt(name, std::move(consumer), options);
+                                 std::function<void(int64_t)> consumer) {
+  m_backend->SubscribeInt(name, std::move(consumer));
 }
 
-void SendableTable::SetFloat(std::string_view name, float value,
-                             const SendableOptions& options) {
-  m_backend->SetFloat(name, value, options);
+void SendableTable::SetFloat(std::string_view name, float value) {
+  m_backend->SetFloat(name, value);
 }
 
 void SendableTable::PublishFloat(std::string_view name,
-                                 std::function<float()> supplier,
-                                 const SendableOptions& options) {
-  m_backend->PublishFloat(name, std::move(supplier), options);
+                                 std::function<float()> supplier) {
+  m_backend->PublishFloat(name, std::move(supplier));
 }
 
-std::function<void(float)> SendableTable::PublishFloat(
-    std::string_view name, const SendableOptions& options) {
-  return m_backend->PublishFloat(name, options);
+std::function<void(float)> SendableTable::PublishFloat(std::string_view name) {
+  return m_backend->PublishFloat(name);
 }
 
 void SendableTable::SubscribeFloat(std::string_view name,
-                                   std::function<void(float)> consumer,
-                                   const SendableOptions& options) {
-  m_backend->SubscribeFloat(name, std::move(consumer), options);
+                                   std::function<void(float)> consumer) {
+  m_backend->SubscribeFloat(name, std::move(consumer));
 }
 
-void SendableTable::SetDouble(std::string_view name, double value,
-                              const SendableOptions& options) {
-  m_backend->SetDouble(name, value, options);
+void SendableTable::SetDouble(std::string_view name, double value) {
+  m_backend->SetDouble(name, value);
 }
 
 void SendableTable::PublishDouble(std::string_view name,
-                                  std::function<double()> supplier,
-                                  const SendableOptions& options) {
-  m_backend->PublishDouble(name, std::move(supplier), options);
+                                  std::function<double()> supplier) {
+  m_backend->PublishDouble(name, std::move(supplier));
 }
 
 std::function<void(double)> SendableTable::PublishDouble(
-    std::string_view name, const SendableOptions& options) {
-  return m_backend->PublishDouble(name, options);
+    std::string_view name) {
+  return m_backend->PublishDouble(name);
 }
 
 void SendableTable::SubscribeDouble(std::string_view name,
-                                    std::function<void(double)> consumer,
-                                    const SendableOptions& options) {
-  m_backend->SubscribeDouble(name, std::move(consumer), options);
+                                    std::function<void(double)> consumer) {
+  m_backend->SubscribeDouble(name, std::move(consumer));
 }
 
-void SendableTable::SetString(std::string_view name, std::string_view value,
-                              const SendableOptions& options) {
-  m_backend->SetString(name, value, options);
+void SendableTable::SetString(std::string_view name, std::string_view value) {
+  m_backend->SetString(name, value);
 }
 
 void SendableTable::PublishString(std::string_view name,
-                                  std::function<std::string()> supplier,
-                                  const SendableOptions& options) {
-  m_backend->PublishString(name, std::move(supplier), options);
+                                  std::function<std::string()> supplier) {
+  m_backend->PublishString(name, std::move(supplier));
 }
 
 std::function<void(std::string_view)> SendableTable::PublishString(
-    std::string_view name, const SendableOptions& options) {
-  return m_backend->PublishString(name, options);
+    std::string_view name) {
+  return m_backend->PublishString(name);
 }
 
 void SendableTable::SubscribeString(
-    std::string_view name, std::function<void(std::string_view)> consumer,
-    const SendableOptions& options) {
-  m_backend->SubscribeString(name, std::move(consumer), options);
+    std::string_view name, std::function<void(std::string_view)> consumer) {
+  m_backend->SubscribeString(name, std::move(consumer));
 }
 
 void SendableTable::SetRaw(std::string_view name, std::string_view typeString,
-                           std::span<const uint8_t> value,
-                           const SendableOptions& options) {
-  m_backend->SetRaw(name, typeString, value, options);
+                           std::span<const uint8_t> value) {
+  m_backend->SetRaw(name, typeString, value);
 }
 
 void SendableTable::PublishRaw(std::string_view name,
                                std::string_view typeString,
-                               std::function<std::vector<uint8_t>()> supplier,
-                               const SendableOptions& options) {
-  m_backend->PublishRaw(name, typeString, std::move(supplier), options);
+                               std::function<std::vector<uint8_t>()> supplier) {
+  m_backend->PublishRaw(name, typeString, std::move(supplier));
 }
 
 void SendableTable::PublishRawSmall(
     std::string_view name, std::string_view typeString,
     std::function<std::span<uint8_t>(wpi::SmallVectorImpl<uint8_t>& buf)>
-        supplier,
-    const SendableOptions& options) {
-  m_backend->PublishRawSmall(name, typeString, std::move(supplier), options);
+        supplier) {
+  m_backend->PublishRawSmall(name, typeString, std::move(supplier));
 }
 
 std::function<void(std::span<const uint8_t>)> SendableTable::PublishRaw(
-    std::string_view name, std::string_view typeString,
-    const SendableOptions& options) {
-  return m_backend->PublishRaw(name, typeString, options);
+    std::string_view name, std::string_view typeString) {
+  return m_backend->PublishRaw(name, typeString);
 }
 
 void SendableTable::SubscribeRaw(
     std::string_view name, std::string_view typeString,
-    std::function<void(std::span<const uint8_t>)> consumer,
-    const SendableOptions& options) {
-  m_backend->SubscribeRaw(name, typeString, std::move(consumer), options);
+    std::function<void(std::span<const uint8_t>)> consumer) {
+  m_backend->SubscribeRaw(name, typeString, std::move(consumer));
+}
+
+void SendableTable::SetPublishOptions(const SendableOptions& options) {
+  m_backend->SetPublishOptions(options);
+}
+
+void SendableTable::SetSubscribeOptions(const SendableOptions& options) {
+  m_backend->SetSubscribeOptions(options);
 }
 
 wpi::json SendableTable::GetProperty(std::string_view name,
