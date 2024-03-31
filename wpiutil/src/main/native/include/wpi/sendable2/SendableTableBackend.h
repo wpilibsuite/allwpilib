@@ -21,6 +21,9 @@ class SmallVectorImpl;
 
 namespace wpi2 {
 
+class SendableTable;
+class SendableWrapper;
+
 class SendableTableBackend {
  public:
   virtual ~SendableTableBackend() = default;
@@ -123,6 +126,9 @@ class SendableTableBackend {
       std::string_view name, std::string_view typeString,
       std::function<void(std::span<const uint8_t>)> consumer,
       const SendableOptions& options) = 0;
+
+  virtual SendableTable CreateSendable(
+      std::string_view name, std::unique_ptr<SendableWrapper> sendable) = 0;
 
   /**
    * Gets the current value of a property (as a JSON object).

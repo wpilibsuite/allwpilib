@@ -27,6 +27,7 @@ class SmallVectorImpl;
 namespace wpi2 {
 
 class SendableTableBackend;
+class SendableWrapper;
 
 class SendableTable final {
  public:
@@ -158,12 +159,19 @@ class SendableTable final {
                        I... info);
 
   template <typename T, typename... I>
-    requires SendableSerializable<T, I...>
-  T* AddSendable(std::string_view name, T* obj, I... info);
+    requires SendableSerializableMoveTracked<T, I...>
+  SendableTable AddSendable(std::string_view name, T* obj, I... info);
 
   template <typename T, typename... I>
+    requires SendableSerializableSharedPointer<T, I...>
+  SendableTable AddSendable(std::string_view name, std::shared_ptr<T> obj,
+                            I... info);
+
+#if 0
+  template <typename T, typename... I>
     requires SendableSerializable<T, I...>
-  T* GetSendable(std::string_view name);
+  SendableTable GetSendable(std::string_view name);
+#endif
 
   /**
    * Gets the current value of a property (as a JSON object).
@@ -302,6 +310,9 @@ class SendableTable final {
   std::weak_ptr<SendableTableBackend> GetWeak() const { return m_backend; }
 
  private:
+  SendableTable CreateSendable(std::string_view name,
+                               std::unique_ptr<SendableWrapper> sendable);
+
   std::shared_ptr<SendableTableBackend> m_backend;
 };
 

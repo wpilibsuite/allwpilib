@@ -5,10 +5,12 @@
 #pragma once
 
 #include <functional>
+#include <memory>
 #include <tuple>
 #include <vector>
 
 #include "wpi/sendable2/SendableTable.h"
+#include "wpi/sendable2/SendableWrapper.h"
 #include "wpi/SmallVector.h"
 
 namespace wpi2 {
@@ -100,6 +102,25 @@ void SendableTable::SubscribeStruct(std::string_view name,
         }
       },
       options);
+}
+
+template <typename T, typename... I>
+  requires SendableSerializableMoveTracked<T, I...>
+inline SendableTable SendableTable::AddSendable(std::string_view name, T* obj,
+                                                I... info) {
+  return CreateSendable(
+      name, std::make_unique<detail::SendableWrapperMoveTracked<T, I...>>(
+                obj, std::move(info)...));
+}
+
+template <typename T, typename... I>
+  requires SendableSerializableSharedPointer<T, I...>
+inline SendableTable SendableTable::AddSendable(std::string_view name,
+                                                std::shared_ptr<T> obj,
+                                                I... info) {
+  return CreateSendable(
+      name, std::make_unique<detail::SendableWrapperSharedPtr<T, I...>>(
+                std::move(obj), std::move(info)...));
 }
 
 // Suppress unused-lambda-capture warning on AddSchema() call

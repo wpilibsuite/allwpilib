@@ -10,7 +10,6 @@ import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.util.AllocationException;
-import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.util.sendable2.Sendable;
 import edu.wpi.first.util.sendable2.SendableSet;
 import edu.wpi.first.util.sendable2.SendableSerializable;
@@ -50,12 +49,10 @@ public class AnalogInput implements SendableSerializable, AutoCloseable {
     m_port = AnalogJNI.initializeAnalogInputPort(portHandle);
 
     HAL.report(tResourceType.kResourceType_AnalogChannel, channel + 1);
-    // SendableRegistry.addLW(this, "AnalogInput", channel);
   }
 
   @Override
   public void close() {
-    // SendableRegistry.remove(this);
     m_sendables.close();
     AnalogJNI.freeAnalogInputPort(m_port);
     m_port = 0;

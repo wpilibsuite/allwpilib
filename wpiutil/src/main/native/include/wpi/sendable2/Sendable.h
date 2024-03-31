@@ -19,12 +19,7 @@ class SendableTable;
 namespace detail {
 
 template <typename T>
-concept not_movable =
-    !std::move_constructible<T> && !std::assignable_from<T&, T>;
-
-template <typename T>
-concept MoveTrackedOrNotMovable =
-    not_movable<T> || std::derived_from<T, wpi::MoveTrackerBase>;
+concept MoveTracked = std::derived_from<T, wpi::MoveTrackerBase>;
 
 }  // namespace detail
 
@@ -41,8 +36,8 @@ struct Sendable {};
 
 /**
  * Specifies that a type is capable of sendable serialization and
- * deserialization via a raw pointer. This requires the type be either
- * non-moveable or derived from wpi::MoveTracker so that moves can be tracked.
+ * deserialization via a raw pointer. This requires the type be derived from
+ * wpi::MoveTracker so that moves can be tracked.
  *
  * Implementations must define a template specialization for wpi::Sendable with
  * T being the type that is being serialized/deserialized, with the following
@@ -57,8 +52,8 @@ struct Sendable {};
  * return value is convertible to std::string_view.
  */
 template <typename T, typename... I>
-concept SendableSerializableRawPointer =
-    detail::MoveTrackedOrNotMovable<T> &&
+concept SendableSerializableMoveTracked =
+    detail::MoveTracked<T> &&
     requires(T* obj, SendableTable& table, const I&... info) {
       typename Sendable<typename std::remove_cvref_t<T>,
                         typename std::remove_cvref_t<I>...>;
@@ -108,7 +103,7 @@ concept SendableSerializableSharedPointer =
  * deserialization as either a raw pointer type or via std::shared_ptr.
  */
 template <typename T, typename... I>
-concept SendableSerializable = SendableSerializableRawPointer<T, I...> ||
+concept SendableSerializable = SendableSerializableMoveTracked<T, I...> ||
                                SendableSerializableSharedPointer<T, I...>;
 
 /**
@@ -126,7 +121,7 @@ constexpr auto GetSendableTypeString(const I&... info) {
 }
 
 template <typename T, typename... I>
-  requires SendableSerializableRawPointer<T, I...>
+  requires SendableSerializableMoveTracked<T, I...>
 inline void InitSendable(T* obj, SendableTable& table, const I&... info) {
   using S = Sendable<T, typename std::remove_cvref_t<I>...>;
   S::Init(obj, table, info...);
@@ -139,13 +134,13 @@ inline void InitSendable(std::shared_ptr<T> obj, SendableTable& table,
   using S = Sendable<T, typename std::remove_cvref_t<I>...>;
   if constexpr (SendableSerializableSharedPointer<T, I...>) {
     S::Init(std::move(obj), table, info...);
-  } else if constexpr (SendableSerializableRawPointer<T, I...>) {
+  } else if constexpr (SendableSerializableMoveTracked<T, I...>) {
     S::Init(obj.get(), table, info...);
   }
 }
 
 template <typename T, typename... I>
-  requires SendableSerializableRawPointer<T, I...>
+  requires SendableSerializableMoveTracked<T, I...>
 inline void CloseSendable(T* obj, const I&... info) {
   using S = Sendable<T, typename std::remove_cvref_t<I>...>;
   S::Close(obj, info...);
@@ -157,7 +152,7 @@ inline void CloseSendable(std::shared_ptr<T> obj, const I&... info) {
   using S = Sendable<T, typename std::remove_cvref_t<I>...>;
   if constexpr (SendableSerializableSharedPointer<T, I...>) {
     S::Close(std::move(obj), info...);
-  } else if constexpr (SendableSerializableRawPointer<T, I...>) {
+  } else if constexpr (SendableSerializableMoveTracked<T, I...>) {
     S::Close(obj.get(), info...);
   }
 }
