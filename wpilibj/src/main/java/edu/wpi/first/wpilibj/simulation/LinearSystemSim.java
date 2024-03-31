@@ -14,17 +14,23 @@ import org.ejml.MatrixDimensionException;
 import org.ejml.simple.SimpleMatrix;
 
 /**
- * This class helps simulate linear systems. To use this class, do the following in the {@link
+ * This class helps simulate linear systems. To use this class, do the following
+ * in the {@link
  * edu.wpi.first.wpilibj.IterativeRobotBase#simulationPeriodic} method.
  *
- * <p>Call {@link #setInput(double...)} with the inputs to the system (usually voltage).
+ * <p>
+ * Call {@link #setInput(double...)} with the inputs to the system (usually
+ * voltage).
  *
- * <p>Call {@link #update} to update the simulation.
+ * <p>
+ * Call {@link #update} to update the simulation.
  *
- * <p>Set simulated sensor readings with the simulated positions in {@link #getOutput()}
+ * <p>
+ * Set simulated sensor readings with the simulated positions in
+ * {@link #getOutput()}
  *
- * @param <States> Number of states of the system.
- * @param <Inputs> Number of inputs to the system.
+ * @param <States>  Number of states of the system.
+ * @param <Inputs>  Number of inputs to the system.
  * @param <Outputs> Number of outputs of the system.
  */
 public class LinearSystemSim<States extends Num, Inputs extends Num, Outputs extends Num> {
@@ -40,7 +46,10 @@ public class LinearSystemSim<States extends Num, Inputs extends Num, Outputs ext
   /** Output vector. */
   protected Matrix<Outputs, N1> m_y;
 
-  /** The standard deviations of measurements, used for adding noise to the measurements. */
+  /**
+   * The standard deviations of measurements, used for adding noise to the
+   * measurements.
+   */
   protected final Matrix<Outputs, N1> m_measurementStdDevs;
 
   /**
@@ -55,9 +64,10 @@ public class LinearSystemSim<States extends Num, Inputs extends Num, Outputs ext
   /**
    * Creates a simulated generic linear system with measurement noise.
    *
-   * @param system The system being controlled.
-   * @param measurementStdDevs Standard deviations of measurements. Can be null if no noise is
-   *     desired.
+   * @param system             The system being controlled.
+   * @param measurementStdDevs Standard deviations of measurements. Can be null if
+   *                           no noise is
+   *                           desired.
    */
   public LinearSystemSim(
       LinearSystem<States, Inputs, Outputs> system, Matrix<Outputs, N1> measurementStdDevs) {
@@ -107,18 +117,39 @@ public class LinearSystemSim<States extends Num, Inputs extends Num, Outputs ext
   }
 
   /**
+   * Returns the current input of the plant.
+   *
+   * @return The current input of the plant.
+   */
+  public Matrix<Inputs, N1> getInput() {
+    return m_u;
+  }
+
+  /**
+   * Returns an element of the current input of the plant.
+   *
+   * @param row The row to return.
+   * @return An element of the current input of the plant.
+   */
+  public double getInput(int row) {
+    return m_u.get(row, 0);
+  }
+
+  /**
    * Sets the system inputs (usually voltages).
    *
    * @param u The system inputs.
    */
   public void setInput(Matrix<Inputs, N1> u) {
     this.m_u = clampInput(u);
+    m_u = clampInput(m_u);
+
   }
 
   /**
    * Sets the system inputs.
    *
-   * @param row The row in the input matrix to set.
+   * @param row   The row in the input matrix to set.
    * @param value The value to set the row to.
    */
   public void setInput(int row, double value) {
@@ -137,6 +168,7 @@ public class LinearSystemSim<States extends Num, Inputs extends Num, Outputs ext
           "Malformed input! Got " + u.length + " elements instead of " + m_u.getNumRows());
     }
     m_u = new Matrix<>(new SimpleMatrix(m_u.getNumRows(), 1, true, u));
+    m_u = clampInput(m_u);
   }
 
   /**
@@ -149,7 +181,8 @@ public class LinearSystemSim<States extends Num, Inputs extends Num, Outputs ext
   }
 
   /**
-   * Returns the current drawn by this simulated system. Override this method to add a custom
+   * Returns the current drawn by this simulated system. Override this method to
+   * add a custom
    * current calculation.
    *
    * @return The current drawn by this simulated mechanism.
@@ -162,8 +195,8 @@ public class LinearSystemSim<States extends Num, Inputs extends Num, Outputs ext
    * Updates the state estimate of the system.
    *
    * @param currentXhat The current state estimate.
-   * @param u The system inputs (usually voltage).
-   * @param dtSeconds The time difference between controller updates.
+   * @param u           The system inputs (usually voltage).
+   * @param dtSeconds   The time difference between controller updates.
    * @return The new state.
    */
   protected Matrix<States, N1> updateX(
@@ -172,7 +205,8 @@ public class LinearSystemSim<States extends Num, Inputs extends Num, Outputs ext
   }
 
   /**
-   * Clamp the input vector such that no element exceeds the given voltage. If any does, the
+   * Clamp the input vector such that no element exceeds the given voltage. If any
+   * does, the
    * relative magnitudes of the input will be maintained.
    *
    * @param u The input vector.
