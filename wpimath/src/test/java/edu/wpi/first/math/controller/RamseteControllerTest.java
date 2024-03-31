@@ -20,6 +20,7 @@ class RamseteControllerTest {
   private static final double kTolerance = 1 / 12.0;
   private static final double kAngularTolerance = Math.toRadians(2);
 
+  @SuppressWarnings("removal")
   @Test
   void testReachesReference() {
     final var controller = new RamseteController(2.0, 0.7);
