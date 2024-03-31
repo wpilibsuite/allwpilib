@@ -81,7 +81,7 @@ class LinearSystemSim {
    */
   double GetOutput(int row) const { return m_y(row); }
 
-    /**
+  /**
    * Returns the current input of the plant.
    *
    * @return The current input of the plant.
