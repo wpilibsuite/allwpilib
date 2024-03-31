@@ -103,7 +103,7 @@ class LinearSystemSim {
    */
   void SetInput(const Vectord<Inputs>& u) { m_u = ClampInput(u); }
 
-  /*
+  /**
    * Sets the system inputs.
    *
    * @param row   The row in the input matrix to set.
