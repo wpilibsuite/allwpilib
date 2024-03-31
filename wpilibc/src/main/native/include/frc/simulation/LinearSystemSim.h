@@ -104,7 +104,7 @@ class LinearSystemSim {
    *
    * @return The current input of the plant.
    */
-  const Vectord<Outputs>& GetInput() const { return m_u; }
+  const Vectord<Inputs>& GetInput() const { return m_u; }
 
   /**
    * Returns an element of the current input of the plant.
