@@ -8,14 +8,15 @@ import edu.wpi.first.hal.AnalogJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.util.BoundaryException;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.util.sendable.SendableRegistry;
+import edu.wpi.first.util.sendable2.Sendable;
+import edu.wpi.first.util.sendable2.SendableSet;
+import edu.wpi.first.util.sendable2.SendableSerializable;
+import edu.wpi.first.util.sendable2.SendableTable;
 import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
 import java.lang.ref.Reference;
 
 /** Class for creating and configuring Analog Triggers. */
-public class AnalogTrigger implements Sendable, AutoCloseable {
+public class AnalogTrigger implements SendableSerializable, AutoCloseable {
   /** Where the analog trigger is attached. */
   protected int m_port;
 
@@ -24,6 +25,8 @@ public class AnalogTrigger implements Sendable, AutoCloseable {
   private DutyCycle m_dutyCycle;
 
   private boolean m_ownsAnalog;
+
+  private SendableSet m_sendables = new SendableSet();
 
   /**
    * Constructor for an analog trigger given a channel number.
@@ -34,7 +37,6 @@ public class AnalogTrigger implements Sendable, AutoCloseable {
   public AnalogTrigger(final int channel) {
     this(new AnalogInput(channel));
     m_ownsAnalog = true;
-    SendableRegistry.addChild(this, m_analogInput);
   }
 
   /**
@@ -52,7 +54,6 @@ public class AnalogTrigger implements Sendable, AutoCloseable {
     int index = getIndex();
 
     HAL.report(tResourceType.kResourceType_AnalogTrigger, index + 1);
-    SendableRegistry.addLW(this, "AnalogTrigger", index);
   }
 
   /**
@@ -69,12 +70,11 @@ public class AnalogTrigger implements Sendable, AutoCloseable {
     int index = getIndex();
 
     HAL.report(tResourceType.kResourceType_AnalogTrigger, index + 1);
-    SendableRegistry.addLW(this, "AnalogTrigger", index);
   }
 
   @Override
   public void close() {
-    SendableRegistry.remove(this);
+    m_sendables.close();
     AnalogJNI.cleanAnalogTrigger(m_port);
     m_port = 0;
     if (m_ownsAnalog && m_analogInput != null) {
@@ -186,10 +186,30 @@ public class AnalogTrigger implements Sendable, AutoCloseable {
     return new AnalogTriggerOutput(this, type);
   }
 
-  @Override
-  public void initSendable(SendableBuilder builder) {
-    if (m_ownsAnalog) {
-      m_analogInput.initSendable(builder);
+  public static class AnalogTriggerSendable implements Sendable<AnalogTrigger> {
+    @Override
+    public Class<AnalogTrigger> getTypeClass() {
+      return AnalogTrigger.class;
+    }
+
+    @Override
+    public String getTypeString() {
+      return "Analog Input";
+    }
+
+    @Override
+    public SendableSet getSendableSet(AnalogTrigger obj) {
+      return obj.m_sendables;
+    }
+
+    @Override
+    public void initSendable(AnalogTrigger obj, SendableTable table) {
+      if (obj.m_ownsAnalog) {
+        AnalogInput.sendable.initSendable(obj.m_analogInput, table);
+      }
     }
   }
+
+  /** Sendable for serialization. */
+  public static final AnalogTriggerSendable sendable = new AnalogTriggerSendable();
 }

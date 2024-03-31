@@ -14,11 +14,16 @@ namespace wpi {
 
 class MoveTrackerBase;
 
+template <typename T>
+concept MoveTracked = std::derived_from<T, wpi::MoveTrackerBase>;
+
 namespace detail {
 class MoveTrackerData {
   friend class wpi::MoveTrackerBase;
 
  public:
+  explicit MoveTrackerData(MoveTrackerBase* ptr) : m_ptr{ptr} {}
+
 #if 0
   ~MoveTrackerData() {
     if (m_ptr != nullptr) {
@@ -47,8 +52,6 @@ class MoveTrackerData {
 #endif
 
  private:
-  explicit MoveTrackerData(MoveTrackerBase* ptr) : m_ptr{ptr} {}
-
   void Move(MoveTrackerBase* to, MoveTrackerBase* from) {
     m_ptr = to;
 #if 0
@@ -65,7 +68,7 @@ class MoveTrackerData {
  * The list of callbacks is not copied or changed on object copy.
  */
 class MoveTrackerBase {
-  template <std::derived_from<MoveTrackerBase> T>
+  template <MoveTracked T>
   friend class MoveWeakPtr;
 
  public:
@@ -107,7 +110,7 @@ class MoveTrackerBase {
   std::shared_ptr<detail::MoveTrackerData> m_tracker;
 };
 
-template <std::derived_from<MoveTrackerBase> T>
+template <MoveTracked T>
 class MoveWeakPtr {
  public:
   explicit MoveWeakPtr(T* ptr)

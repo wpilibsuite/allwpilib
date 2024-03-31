@@ -7,8 +7,8 @@
 #include <memory>
 
 #include <hal/Types.h>
-#include <wpi/sendable/Sendable.h>
-#include <wpi/sendable/SendableHelper.h>
+#include <wpi/sendable2/Sendable.h>
+#include <wpi/MoveTracker.h>
 
 #include "frc/AnalogTriggerOutput.h"
 
@@ -17,9 +17,9 @@ namespace frc {
 class AnalogInput;
 class DutyCycle;
 
-class AnalogTrigger : public wpi::Sendable,
-                      public wpi::SendableHelper<AnalogTrigger> {
+class AnalogTrigger : public wpi::MoveTrackerBase {
   friend class AnalogTriggerOutput;
+  friend struct wpi2::Sendable<frc::AnalogTrigger>;
 
  public:
   /**
@@ -148,8 +148,6 @@ class AnalogTrigger : public wpi::Sendable,
   std::shared_ptr<AnalogTriggerOutput> CreateOutput(
       AnalogTriggerType type) const;
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
-
  private:
   int GetSourceChannel() const;
 
@@ -160,3 +158,16 @@ class AnalogTrigger : public wpi::Sendable,
 };
 
 }  // namespace frc
+
+namespace wpi2 {
+
+template <>
+struct Sendable<frc::AnalogTrigger> {
+  static constexpr std::string_view GetTypeString() { return "Analog Input"; }
+  static void Init(frc::AnalogTrigger* obj, SendableTable& table);
+  static void Close(frc::AnalogTrigger* obj);
+};
+
+static_assert(SendableSerializable<frc::AnalogTrigger>);
+
+}  // namespace wpi2

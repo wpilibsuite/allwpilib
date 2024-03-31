@@ -6,6 +6,7 @@
 
 #include "wpi/json.h"
 #include "wpi/sendable2/SendableTableBackend.h"
+#include "wpi/sendable2/SendableWrapper.h"
 
 using namespace wpi2;
 
@@ -206,4 +207,9 @@ void SendableTable::AddSchema(std::string_view name, std::string_view type,
 void SendableTable::AddSchema(std::string_view name, std::string_view type,
                               std::string_view schema) {
   m_backend->AddSchema(name, type, schema);
+}
+
+SendableTable SendableTable::CreateSendable(
+    std::string_view name, std::unique_ptr<SendableWrapper> sendable) {
+  return m_backend->CreateSendable(name, std::move(sendable));
 }
