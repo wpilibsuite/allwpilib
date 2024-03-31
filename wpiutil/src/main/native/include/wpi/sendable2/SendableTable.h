@@ -34,128 +34,92 @@ class SendableTable final {
   explicit SendableTable(std::shared_ptr<SendableTableBackend> backend)
       : m_backend{std::move(backend)} {}
 
-  void SetBoolean(std::string_view name, bool value,
-                  const SendableOptions& options = kDefaultSendableOptions);
+  void SetBoolean(std::string_view name, bool value);
 
-  void PublishBoolean(std::string_view name, std::function<bool()> supplier,
-                      const SendableOptions& options = kDefaultSendableOptions);
+  void PublishBoolean(std::string_view name, std::function<bool()> supplier);
 
   [[nodiscard]]
-  std::function<void(bool)> PublishBoolean(
-      std::string_view name,
-      const SendableOptions& options = kDefaultSendableOptions);
+  std::function<void(bool)> PublishBoolean(std::string_view name);
 
-  void SubscribeBoolean(
-      std::string_view name, std::function<void(bool)> consumer,
-      const SendableOptions& options = kDefaultSendableOptions);
+  void SubscribeBoolean(std::string_view name,
+                        std::function<void(bool)> consumer);
 
-  void SetInt(std::string_view name, int64_t value,
-              const SendableOptions& options = kDefaultSendableOptions);
+  void SetInt(std::string_view name, int64_t value);
 
-  void PublishInt(std::string_view name, std::function<int64_t()> supplier,
-                  const SendableOptions& options = kDefaultSendableOptions);
+  void PublishInt(std::string_view name, std::function<int64_t()> supplier);
 
   [[nodiscard]]
-  std::function<void(int64_t)> PublishInt(
-      std::string_view name,
-      const SendableOptions& options = kDefaultSendableOptions);
+  std::function<void(int64_t)> PublishInt(std::string_view name);
 
   void SubscribeInt(std::string_view name,
-                    std::function<void(int64_t)> consumer,
-                    const SendableOptions& options = kDefaultSendableOptions);
+                    std::function<void(int64_t)> consumer);
 
-  void SetFloat(std::string_view name, float value,
-                const SendableOptions& options = kDefaultSendableOptions);
+  void SetFloat(std::string_view name, float value);
 
-  void PublishFloat(std::string_view name, std::function<float()> supplier,
-                    const SendableOptions& options = kDefaultSendableOptions);
+  void PublishFloat(std::string_view name, std::function<float()> supplier);
 
   [[nodiscard]]
-  std::function<void(float)> PublishFloat(
-      std::string_view name,
-      const SendableOptions& options = kDefaultSendableOptions);
+  std::function<void(float)> PublishFloat(std::string_view name);
 
   void SubscribeFloat(std::string_view name,
-                      std::function<void(float)> consumer,
-                      const SendableOptions& options = kDefaultSendableOptions);
+                      std::function<void(float)> consumer);
 
-  void SetDouble(std::string_view name, double value,
-                 const SendableOptions& options = kDefaultSendableOptions);
+  void SetDouble(std::string_view name, double value);
 
-  void PublishDouble(std::string_view name, std::function<double()> supplier,
-                     const SendableOptions& options = kDefaultSendableOptions);
+  void PublishDouble(std::string_view name, std::function<double()> supplier);
 
   [[nodiscard]]
-  std::function<void(double)> PublishDouble(
-      std::string_view name,
-      const SendableOptions& options = kDefaultSendableOptions);
+  std::function<void(double)> PublishDouble(std::string_view name);
 
-  void SubscribeDouble(
-      std::string_view name, std::function<void(double)> consumer,
-      const SendableOptions& options = kDefaultSendableOptions);
+  void SubscribeDouble(std::string_view name,
+                       std::function<void(double)> consumer);
 
-  void SetString(std::string_view name, std::string_view value,
-                 const SendableOptions& options = kDefaultSendableOptions);
+  void SetString(std::string_view name, std::string_view value);
 
   void PublishString(std::string_view name,
-                     std::function<std::string()> supplier,
-                     const SendableOptions& options = kDefaultSendableOptions);
+                     std::function<std::string()> supplier);
 
   [[nodiscard]]
-  std::function<void(std::string_view)> PublishString(
-      std::string_view name,
-      const SendableOptions& options = kDefaultSendableOptions);
+  std::function<void(std::string_view)> PublishString(std::string_view name);
 
-  void SubscribeString(
-      std::string_view name, std::function<void(std::string_view)> consumer,
-      const SendableOptions& options = kDefaultSendableOptions);
+  void SubscribeString(std::string_view name,
+                       std::function<void(std::string_view)> consumer);
 
   void SetRaw(std::string_view name, std::string_view typeString,
-              std::span<const uint8_t> value,
-              const SendableOptions& options = kDefaultSendableOptions);
+              std::span<const uint8_t> value);
 
   void PublishRaw(std::string_view name, std::string_view typeString,
-                  std::function<std::vector<uint8_t>()> supplier,
-                  const SendableOptions& options = kDefaultSendableOptions);
+                  std::function<std::vector<uint8_t>()> supplier);
 
   void PublishRawSmall(
       std::string_view name, std::string_view typeString,
       std::function<std::span<uint8_t>(wpi::SmallVectorImpl<uint8_t>& buf)>
-          supplier,
-      const SendableOptions& options = kDefaultSendableOptions);
+          supplier);
 
   [[nodiscard]]
   std::function<void(std::span<const uint8_t>)> PublishRaw(
-      std::string_view name, std::string_view typeString,
-      const SendableOptions& options = kDefaultSendableOptions);
+      std::string_view name, std::string_view typeString);
 
   void SubscribeRaw(std::string_view name, std::string_view typeString,
-                    std::function<void(std::span<const uint8_t>)> consumer,
-                    const SendableOptions& options = kDefaultSendableOptions);
+                    std::function<void(std::span<const uint8_t>)> consumer);
 
   template <typename T, typename... I>
     requires wpi::StructSerializable<T, I...>
-  void SetStruct(std::string_view name, const T& value,
-                 const SendableOptions& options = kDefaultSendableOptions,
-                 I... info);
+  void SetStruct(std::string_view name, const T& value, I... info);
 
   template <typename T, typename... I>
     requires wpi::StructSerializable<T, I...>
   void PublishStruct(std::string_view name, std::function<T()> supplier,
-                     const SendableOptions& options = kDefaultSendableOptions,
                      I... info);
 
   template <typename T, typename... I>
     requires wpi::StructSerializable<T, I...>
   [[nodiscard]]
-  std::function<void(const T&)> PublishStruct(
-      std::string_view name,
-      const SendableOptions& options = kDefaultSendableOptions, I... info);
+  std::function<void(const T&)> PublishStruct(std::string_view name, I... info);
 
   template <typename T, typename... I>
     requires wpi::StructSerializable<T, I...>
   void SubscribeStruct(std::string_view name, std::function<void(T)> consumer,
-                       const SendableOptions& options = kDefaultSendableOptions,
                        I... info);
 
   template <typename T, typename... I>
@@ -172,6 +136,10 @@ class SendableTable final {
     requires SendableSerializable<T, I...>
   SendableTable GetSendable(std::string_view name);
 #endif
+
+  void SetPublishOptions(const SendableOptions& options);
+
+  void SetSubscribeOptions(const SendableOptions& options);
 
   /**
    * Gets the current value of a property (as a JSON object).
