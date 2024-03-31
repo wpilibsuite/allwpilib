@@ -82,21 +82,6 @@ class LinearSystemSim {
   double GetOutput(int row) const { return m_y(row); }
 
   /**
-   * Returns the current input of the plant.
-   *
-   * @return The current input of the plant.
-   */
-  const Vectord<Outputs>& GetInput() const { return m_u; }
-
-  /**
-   * Returns an element of the current input of the plant.
-   *
-   * @param row The row to return.
-   * @return An element of the current input of the plant.
-   */
-  double GetInput(int row) const { return m_u(row); }
-
-  /**
    * Sets the system inputs (usually voltages).
    *
    * @param u The system inputs.
@@ -114,6 +99,21 @@ class LinearSystemSim {
     ClampInput(m_u);
   }
 
+  /**
+   * Returns the current input of the plant.
+   *
+   * @return The current input of the plant.
+   */
+  const Vectord<Outputs>& GetInput() const { return m_u; }
+
+  /**
+   * Returns an element of the current input of the plant.
+   *
+   * @param row The row to return.
+   * @return An element of the current input of the plant.
+   */
+  double GetInput(int row) const { return m_u(row); }
+  
   /**
    * Sets the system state.
    *
