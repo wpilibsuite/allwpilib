@@ -113,7 +113,7 @@ class LinearSystemSim {
    * @return An element of the current input of the plant.
    */
   double GetInput(int row) const { return m_u(row); }
-  
+
   /**
    * Sets the system state.
    *
