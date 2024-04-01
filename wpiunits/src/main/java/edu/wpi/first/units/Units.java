@@ -183,22 +183,25 @@ public final class Units {
       MetersPerSecond.per(Second);
 
   /**
-   * A unit of angular acceleration equivalent to accelerating at a rate of one {@link #Rotations Rotation}
-   * per {@link #Second} every second.
+   * A unit of angular acceleration equivalent to accelerating at a rate of one {@link #Rotations
+   * Rotation} per {@link #Second} every second.
    */
-  public static final Velocity<Velocity<Angle>> RotationsPerSecondPerSecond = RotationsPerSecond.per(Second);
+  public static final Velocity<Velocity<Angle>> RotationsPerSecondPerSecond =
+      RotationsPerSecond.per(Second);
 
   /**
-   * The standard SI unit of angular acceleration, equivalent to accelerating at a rate of one {@link
-   * #Radians Radian} per {@link #Second} every second.
+   * The standard SI unit of angular acceleration, equivalent to accelerating at a rate of one
+   * {@link #Radians Radian} per {@link #Second} every second.
    */
-  public static final Velocity<Velocity<Angle>> RadiansPerSecondPerSecond = RadiansPerSecond.per(Second);      
+  public static final Velocity<Velocity<Angle>> RadiansPerSecondPerSecond =
+      RadiansPerSecond.per(Second);
 
   /**
-   * A unit of angular acceleration equivalent to accelerating at a rate of one {@link #Degrees Degree} per
-   * {@link #Second} every second.
+   * A unit of angular acceleration equivalent to accelerating at a rate of one {@link #Degrees
+   * Degree} per {@link #Second} every second.
    */
-  public static final Velocity<Velocity<Angle>> DegreesPerSecondPerSecond = DegreesPerSecond.per(Second);  
+  public static final Velocity<Velocity<Angle>> DegreesPerSecondPerSecond =
+      DegreesPerSecond.per(Second);
 
   /**
    * A unit of acceleration equivalent to the pull of gravity on an object at sea level on Earth.
@@ -243,7 +246,8 @@ public final class Units {
 
   // Moment of Inertia
   /** The base SI unit for moment of inertia. */
-  public static final Mult<Mult<Mass, Distance>, Distance> KilogramsMetersSquared = Kilograms.mult(Meters).mult(Meters);  
+  public static final Mult<Mult<Mass, Distance>, Distance> KilogramsMetersSquared =
+      Kilograms.mult(Meters).mult(Meters);
 
   // Unitless
   /** A dimensionless unit that performs no scaling whatsoever. */
