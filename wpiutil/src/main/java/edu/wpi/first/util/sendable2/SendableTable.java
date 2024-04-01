@@ -80,6 +80,8 @@ public interface SendableTable extends AutoCloseable {
 
   // SendableTable getSendable(String name);
 
+  SendableTable addChild(String name);
+
   void setPublishOptions(SendableOption... options);
 
   void setSubscribeOptions(SendableOption... options);
