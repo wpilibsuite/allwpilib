@@ -9,7 +9,9 @@ import edu.wpi.first.util.function.FloatConsumer;
 import edu.wpi.first.util.function.FloatSupplier;
 import edu.wpi.first.util.protobuf.Protobuf;
 import edu.wpi.first.util.struct.Struct;
+import edu.wpi.first.util.struct.StructBuffer;
 
+import java.nio.ByteBuffer;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
@@ -60,13 +62,52 @@ public interface SendableTable extends AutoCloseable {
 
   void subscribeString(String name, Consumer<String> consumer);
 
-  <T> void setStruct(String name, T value, Struct<T> struct);
+  void setRaw(String name, String typeString, byte[] value, int start, int len);
 
-  <T> void publishStruct(String name, Struct<T> struct, Supplier<T> supplier);
+  void setRaw(String name, String typeString, ByteBuffer value, int start, int len);
 
-  <T> Consumer<T> publishStruct(String name, Struct<T> struct);
+  void publishRaw(String name, String typeString, Supplier<byte[]> supplier);
 
-  <T> void subscribeStruct(String name, Struct<T> struct, Consumer<T> consumer);
+  void publishRawBB(String name, String typeString, Supplier<ByteBuffer> supplier);
+
+  Consumer<byte[]> publishRaw(String name, String typeString);
+
+  Consumer<ByteBuffer> publishRawBB(String name, String typeString);
+
+  void subscribeRaw(String name, String typeString, Consumer<byte[]> consumer);
+
+  default <T> void setStruct(String name, T value, Struct<T> struct) {
+    addSchema(struct);
+    // this is inefficient; implementations should cache StructBuffer
+    StructBuffer<T> buf = StructBuffer.create(struct);
+    ByteBuffer bb = buf.write(value);
+    setRaw(name, struct.getTypeString(), bb, 0, bb.position());
+  }
+
+  default <T> void publishStruct(String name, Struct<T> struct, Supplier<T> supplier) {
+    addSchema(struct);
+    final StructBuffer<T> buf = StructBuffer.create(struct);
+    publishRawBB(name, struct.getTypeString(), () -> {
+      return buf.write(supplier.get());
+    });
+  }
+
+  default <T> Consumer<T> publishStruct(String name, Struct<T> struct) {
+    addSchema(struct);
+    final StructBuffer<T> buf = StructBuffer.create(struct);
+    final Consumer<ByteBuffer> consumer = publishRawBB(name, struct.getTypeString());
+    return (T value) -> {
+      consumer.accept(buf.write(value));
+    };
+  }
+
+  default <T> void subscribeStruct(String name, Struct<T> struct, Consumer<T> consumer) {
+    addSchema(struct);
+    final StructBuffer<T> buf = StructBuffer.create(struct);
+    subscribeRaw(name, struct.getTypeString(), (data) -> {
+      consumer.accept(buf.read(data));
+    });
+  }
 
   <T> void setProtobuf(String name, T value, Protobuf<T, ?> proto);
 
@@ -147,6 +188,58 @@ public interface SendableTable extends AutoCloseable {
 
   /** Clear properties. */
   void clear();
+
+  /**
+   * Returns whether there is a data schema already registered with the given name that this
+   * instance has published. This does NOT perform a check as to whether the schema has already
+   * been published by another node on the network.
+   *
+   * @param name Name (the string passed as the data type for topics using this schema)
+   * @return True if schema already registered
+   */
+  boolean hasSchema(String name);
+
+  /**
+   * Registers a data schema. Data schemas provide information for how a certain data type string
+   * can be decoded. The type string of a data schema indicates the type of the schema itself (e.g.
+   * "protobuf" for protobuf schemas, "struct" for struct schemas, etc). In NetworkTables, schemas
+   * are published just like normal topics, with the name being generated from the provided name:
+   * "/.schema/name". Duplicate calls to this function with the same name are silently ignored.
+   *
+   * @param name Name (the string passed as the data type for topics using this schema)
+   * @param type Type of schema (e.g. "protobuf", "struct", etc)
+   * @param schema Schema data
+   */
+  void addSchema(String name, String type, byte[] schema);
+
+  /**
+   * Registers a data schema. Data schemas provide information for how a certain data type string
+   * can be decoded. The type string of a data schema indicates the type of the schema itself (e.g.
+   * "protobuf" for protobuf schemas, "struct" for struct schemas, etc). In NetworkTables, schemas
+   * are published just like normal topics, with the name being generated from the provided name:
+   * "/.schema/name". Duplicate calls to this function with the same name are silently ignored.
+   *
+   * @param name Name (the string passed as the data type for topics using this schema)
+   * @param type Type of schema (e.g. "protobuf", "struct", etc)
+   * @param schema Schema data
+   */
+  void addSchema(String name, String type, String schema);
+
+  /**
+   * Registers a protobuf schema. Duplicate calls to this function with the same name are silently
+   * ignored.
+   *
+   * @param proto protobuf serialization object
+   */
+  void addSchema(Protobuf<?, ?> proto);
+
+  /**
+   * Registers a struct schema. Duplicate calls to this function with the same name are silently
+   * ignored.
+   *
+   * @param struct struct serialization object
+   */
+  void addSchema(Struct<?> struct);
 
   /**
    * Return whether close() has been called on this sendable table.
