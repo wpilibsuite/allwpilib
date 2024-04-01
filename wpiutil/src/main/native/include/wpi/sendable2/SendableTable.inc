@@ -163,7 +163,7 @@ inline SendableTable SendableTable::AddSendable(std::string_view name, T* obj,
                                                 I... info) {
   return CreateSendable(
       name, std::make_unique<detail::SendableWrapperMoveTracked<T, I...>>(
-                obj, std::move(info)...));
+                obj, *this, std::move(info)...));
 }
 
 template <typename T, typename... I>
@@ -173,7 +173,7 @@ inline SendableTable SendableTable::AddSendable(std::string_view name,
                                                 I... info) {
   return CreateSendable(
       name, std::make_unique<detail::SendableWrapperSharedPtr<T, I...>>(
-                std::move(obj), std::move(info)...));
+                std::move(obj), *this, std::move(info)...));
 }
 
 // Suppress unused-lambda-capture warning on AddSchema() call

@@ -45,7 +45,7 @@ struct Sendable {};
  * - std::string_view GetTypeString(): function that returns the dashboard type
  *   string
  * - void Init(T* obj, SendableTable& table)
- * - void Close(T* obj)
+ * - void Close(T* obj, SendableTable& table)
  *
  * If possible, the GetTypeString() function should be marked constexpr.
  * GetTypeString() may return a type other than std::string_view, as long as the
@@ -64,7 +64,7 @@ concept SendableSerializableMoveTracked =
       Sendable<typename std::remove_cvref_t<T>,
                typename std::remove_cvref_t<I>...>::Init(obj, table, info...);
       Sendable<typename std::remove_cvref_t<T>,
-               typename std::remove_cvref_t<I>...>::Close(obj, info...);
+               typename std::remove_cvref_t<I>...>::Close(obj, table, info...);
     };
 
 /**
@@ -77,7 +77,7 @@ concept SendableSerializableMoveTracked =
  * - std::string_view GetTypeString(): function that returns the dashboard type
  *   string
  * - void Init(std::shared_ptr<T> obj, SendableTable& table)
- * - void Close(std::shared_ptr<T> obj)
+ * - void Close(std::shared_ptr<T> obj, SendableTable& table)
  *
  * If possible, the GetTypeString() function should be marked constexpr.
  * GetTypeString() may return a type other than std::string_view, as long as the
@@ -95,7 +95,7 @@ concept SendableSerializableSharedPointer =
       Sendable<typename std::remove_cvref_t<T>,
                typename std::remove_cvref_t<I>...>::Init(obj, table, info...);
       Sendable<typename std::remove_cvref_t<T>,
-               typename std::remove_cvref_t<I>...>::Close(obj, info...);
+               typename std::remove_cvref_t<I>...>::Close(obj, table, info...);
     };
 
 /**
@@ -141,19 +141,20 @@ inline void InitSendable(std::shared_ptr<T> obj, SendableTable& table,
 
 template <typename T, typename... I>
   requires SendableSerializableMoveTracked<T, I...>
-inline void CloseSendable(T* obj, const I&... info) {
+inline void CloseSendable(T* obj, SendableTable& table, const I&... info) {
   using S = Sendable<T, typename std::remove_cvref_t<I>...>;
-  S::Close(obj, info...);
+  S::Close(obj, table, info...);
 }
 
 template <typename T, typename... I>
   requires SendableSerializable<T, I...>
-inline void CloseSendable(std::shared_ptr<T> obj, const I&... info) {
+inline void CloseSendable(std::shared_ptr<T> obj, SendableTable& table,
+                          const I&... info) {
   using S = Sendable<T, typename std::remove_cvref_t<I>...>;
   if constexpr (SendableSerializableSharedPointer<T, I...>) {
-    S::Close(std::move(obj), info...);
+    S::Close(std::move(obj), table, info...);
   } else if constexpr (SendableSerializableMoveTracked<T, I...>) {
-    S::Close(obj.get(), info...);
+    S::Close(obj.get(), table, info...);
   }
 }
 
