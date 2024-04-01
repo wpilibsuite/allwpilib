@@ -30,7 +30,7 @@ namespace wpi2 {
 class SendableTableBackend;
 class SendableWrapper;
 
-class SendableTable final {
+class SendableTable {
  public:
   explicit SendableTable(std::shared_ptr<SendableTableBackend> backend)
       : m_backend{std::move(backend)} {}
@@ -294,7 +294,7 @@ class SendableTable final {
   std::shared_ptr<SendableTableBackend> GetBackend() const { return m_backend; }
   std::weak_ptr<SendableTableBackend> GetWeak() const { return m_backend; }
 
- private:
+ protected:
   SendableTable CreateSendable(std::string_view name,
                                std::unique_ptr<SendableWrapper> sendable);
 
