@@ -43,10 +43,10 @@ public interface Sendable<T> {
   void initSendable(T obj, SendableTable table);
 
   /**
-   * Closes a sendable for a particular object instance.
+   * Closes a sendable for a particular object instance and table.
    *
    * @param obj object
    */
-  default void closeSendable(T obj) {
+  default void closeSendable(T obj, SendableTable table) {
   }
 }

@@ -165,7 +165,7 @@ template <>
 struct Sendable<frc::AnalogTrigger> {
   static constexpr std::string_view GetTypeString() { return "Analog Input"; }
   static void Init(frc::AnalogTrigger* obj, SendableTable& table);
-  static void Close(frc::AnalogTrigger* obj);
+  static void Close(frc::AnalogTrigger* obj, SendableTable& table) {}
 };
 
 static_assert(SendableSerializable<frc::AnalogTrigger>);

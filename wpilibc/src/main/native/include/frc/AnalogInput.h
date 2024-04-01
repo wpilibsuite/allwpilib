@@ -293,7 +293,7 @@ template<>
 struct Sendable<frc::AnalogInput> {
   static constexpr std::string_view GetTypeString() { return "Analog Input"; }
   static void Init(frc::AnalogInput* obj, SendableTable& table);
-  static void Close(frc::AnalogInput* obj);
+  static void Close(frc::AnalogInput* obj, SendableTable& table) {}
 };
 
 static_assert(SendableSerializable<frc::AnalogInput>);
