@@ -152,7 +152,7 @@ class SendableTable {
   SendableTable GetSendable(std::string_view name);
 #endif
 
-  SendableTable AddChild(std::string_view name);
+  SendableTable GetChild(std::string_view name);
 
   void SetPublishOptions(const SendableOptions& options);
 

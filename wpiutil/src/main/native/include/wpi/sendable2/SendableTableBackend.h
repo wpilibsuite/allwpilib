@@ -106,7 +106,7 @@ class SendableTableBackend {
   virtual std::shared_ptr<SendableTableBackend> CreateSendable(
       std::string_view name, std::unique_ptr<SendableWrapper> sendable) = 0;
 
-  virtual std::shared_ptr<SendableTableBackend> AddChild(
+  virtual std::shared_ptr<SendableTableBackend> GetChild(
       std::string_view name) = 0;
 
   virtual void SetPublishOptions(const SendableOptions& options) = 0;
