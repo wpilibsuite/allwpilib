@@ -131,8 +131,8 @@ void SendableTable::SubscribeRaw(
   m_backend->SubscribeRaw(name, typeString, std::move(consumer));
 }
 
-SendableTable SendableTable::AddChild(std::string_view name) {
-  return SendableTable{m_backend->AddChild(name)};
+SendableTable SendableTable::GetChild(std::string_view name) {
+  return SendableTable{m_backend->GetChild(name)};
 }
 
 void SendableTable::SetPublishOptions(const SendableOptions& options) {
