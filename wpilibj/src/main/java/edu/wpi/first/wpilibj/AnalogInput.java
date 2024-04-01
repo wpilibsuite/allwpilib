@@ -11,7 +11,6 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.util.AllocationException;
 import edu.wpi.first.util.sendable2.Sendable;
-import edu.wpi.first.util.sendable2.SendableSet;
 import edu.wpi.first.util.sendable2.SendableSerializable;
 import edu.wpi.first.util.sendable2.SendableTable;
 
@@ -33,7 +32,6 @@ public class AnalogInput implements SendableSerializable, AutoCloseable {
   private int m_channel;
   private static final int[] kAccumulatorChannels = {0, 1};
   private long m_accumulatorOffset;
-  private SendableSet m_sendables = new SendableSet();
 
   /**
    * Construct an analog channel.
@@ -53,7 +51,6 @@ public class AnalogInput implements SendableSerializable, AutoCloseable {
 
   @Override
   public void close() {
-    m_sendables.close();
     AnalogJNI.freeAnalogInputPort(m_port);
     m_port = 0;
     m_channel = 0;
@@ -347,8 +344,8 @@ public class AnalogInput implements SendableSerializable, AutoCloseable {
     }
 
     @Override
-    public SendableSet getSendableSet(AnalogInput obj) {
-      return obj.m_sendables;
+    public boolean isClosed(AnalogInput obj) {
+      return obj.m_port == 0;
     }
 
     @Override

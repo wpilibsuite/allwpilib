@@ -9,7 +9,6 @@ import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.util.BoundaryException;
 import edu.wpi.first.util.sendable2.Sendable;
-import edu.wpi.first.util.sendable2.SendableSet;
 import edu.wpi.first.util.sendable2.SendableSerializable;
 import edu.wpi.first.util.sendable2.SendableTable;
 import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
@@ -25,8 +24,6 @@ public class AnalogTrigger implements SendableSerializable, AutoCloseable {
   private DutyCycle m_dutyCycle;
 
   private boolean m_ownsAnalog;
-
-  private SendableSet m_sendables = new SendableSet();
 
   /**
    * Constructor for an analog trigger given a channel number.
@@ -74,7 +71,6 @@ public class AnalogTrigger implements SendableSerializable, AutoCloseable {
 
   @Override
   public void close() {
-    m_sendables.close();
     AnalogJNI.cleanAnalogTrigger(m_port);
     m_port = 0;
     if (m_ownsAnalog && m_analogInput != null) {
@@ -198,8 +194,8 @@ public class AnalogTrigger implements SendableSerializable, AutoCloseable {
     }
 
     @Override
-    public SendableSet getSendableSet(AnalogTrigger obj) {
-      return obj.m_sendables;
+    public boolean isClosed(AnalogTrigger obj) {
+      return obj.m_port == 0;
     }
 
     @Override

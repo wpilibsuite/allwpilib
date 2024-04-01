@@ -28,11 +28,11 @@ public interface Sendable<T> {
   String getTypeString();
 
   /**
-   * Gets the sendable set for an object instance.
+   * Returns true if the object instance has been closed (e.g. is no longer valid).
    *
-   * @return sendable set
+   * @param obj object
    */
-  SendableSet getSendableSet(T obj);
+  boolean isClosed(T obj);
 
   /**
    * Sets up a sendable for a particular object instance and table.
