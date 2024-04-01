@@ -17,6 +17,7 @@
 #include "wpi/protobuf/Protobuf.h"
 #include "wpi/sendable2/Sendable.h"
 #include "wpi/sendable2/SendableOptions.h"
+#include "wpi/protobuf/Protobuf.h"
 #include "wpi/struct/Struct.h"
 
 namespace wpi {
@@ -121,6 +122,20 @@ class SendableTable final {
     requires wpi::StructSerializable<T, I...>
   void SubscribeStruct(std::string_view name, std::function<void(T)> consumer,
                        I... info);
+
+  template <wpi::ProtobufSerializable T>
+  void SetProtobuf(std::string_view name, const T& value);
+
+  template <wpi::ProtobufSerializable T>
+  void PublishProtobuf(std::string_view name, std::function<T()> supplier);
+
+  template <wpi::ProtobufSerializable T>
+  [[nodiscard]]
+  std::function<void(const T&)> PublishProtobuf(std::string_view name);
+
+  template <wpi::ProtobufSerializable T>
+  void SubscribeProtobuf(std::string_view name,
+                         std::function<void(T)> consumer);
 
   template <typename T, typename... I>
     requires SendableSerializableMoveTracked<T, I...>

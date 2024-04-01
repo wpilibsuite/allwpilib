@@ -7,6 +7,7 @@ package edu.wpi.first.util.sendable2;
 import edu.wpi.first.util.function.BooleanConsumer;
 import edu.wpi.first.util.function.FloatConsumer;
 import edu.wpi.first.util.function.FloatSupplier;
+import edu.wpi.first.util.protobuf.Protobuf;
 import edu.wpi.first.util.struct.Struct;
 
 import java.util.function.BooleanSupplier;
@@ -66,6 +67,14 @@ public interface SendableTable extends AutoCloseable {
   <T> Consumer<T> publishStruct(String name, Struct<T> struct);
 
   <T> void subscribeStruct(String name, Struct<T> struct, Consumer<T> consumer);
+
+  <T> void setProtobuf(String name, T value, Protobuf<T, ?> proto);
+
+  <T> void publishProtobuf(String name, Protobuf<T, ?> proto, Supplier<T> supplier);
+
+  <T> Consumer<T> publishProtobuf(String name, Protobuf<T, ?> proto);
+
+  <T> void subscribeProtobuf(String name, Protobuf<T, ?> proto, Consumer<T> consumer);
 
   <T> SendableTable addSendable(String name, T obj, Sendable<T> sendable);
 

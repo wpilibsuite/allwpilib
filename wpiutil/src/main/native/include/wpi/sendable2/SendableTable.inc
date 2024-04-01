@@ -9,6 +9,8 @@
 #include <tuple>
 #include <vector>
 
+#include "wpi/protobuf/Protobuf.h"
+#include "wpi/struct/Struct.h"
 #include "wpi/sendable2/SendableTable.h"
 #include "wpi/sendable2/SendableWrapper.h"
 #include "wpi/SmallVector.h"
@@ -99,6 +101,60 @@ void SendableTable::SubscribeStruct(std::string_view name,
               info));
         }
       });
+}
+
+template <wpi::ProtobufSerializable T>
+void SendableTable::SetProtobuf(std::string_view name, const T& value) {
+  wpi::ProtobufMessage<T> msg;
+  AddProtobufSchema<T>(msg);
+  wpi::SmallVector<uint8_t, 128> buf;
+  msg.Pack(buf, value);
+  SetRaw(name, msg.GetTypeString(), buf);
+}
+
+template <wpi::ProtobufSerializable T>
+void SendableTable::PublishProtobuf(std::string_view name,
+                                    std::function<T()> supplier) {
+  wpi::ProtobufMessage<T> msg;
+  AddProtobufSchema<T>(msg);
+  auto typeString = msg.GetTypeString();
+  PublishRawSmall(
+      name, typeString,
+      [supplier = std::move(supplier), msg = std::move(msg)](
+          wpi::SmallVectorImpl<uint8_t>& buf) mutable -> std::span<uint8_t> {
+        msg.Pack(buf, supplier());
+        return buf;
+      });
+}
+
+template <wpi::ProtobufSerializable T>
+[[nodiscard]]
+std::function<void(const T&)> SendableTable::PublishProtobuf(
+    std::string_view name) {
+  wpi::ProtobufMessage<T> msg;
+  AddProtobufSchema<T>(msg);
+  auto typeString = msg.GetTypeString();
+  return [rawSetter = PublishRaw(name, typeString),
+          msg = std::move(msg)](const T& value) mutable {
+    wpi::SmallVector<uint8_t, 128> buf;
+    msg.Pack(buf, value);
+    rawSetter(buf);
+  };
+}
+
+template <wpi::ProtobufSerializable T>
+void SendableTable::SubscribeProtobuf(std::string_view name,
+                                      std::function<void(T)> consumer) {
+  wpi::ProtobufMessage<T> msg;
+  AddProtobufSchema<T>(msg);
+  auto typeString = msg.GetTypeString();
+  SubscribeRaw(name, typeString,
+               [consumer = std::move(consumer),
+                msg = std::move(msg)](std::span<const uint8_t> data) mutable {
+                 if (auto val = msg.Unpack(data)) {
+                   consumer(*val);
+                 }
+               });
 }
 
 template <typename T, typename... I>
