@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <string>
+
 #include <frc/simulation/DriverStationSim.h>
 #include <frc2/command/CommandScheduler.h>
 #include <gtest/gtest.h>

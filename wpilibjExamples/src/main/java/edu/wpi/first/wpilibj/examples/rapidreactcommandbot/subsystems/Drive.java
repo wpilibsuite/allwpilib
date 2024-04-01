@@ -116,10 +116,10 @@ public class Drive extends SubsystemBase implements AutoCloseable {
 
   @Override
   public void close() {
-    m_leftMotor1.close();
-    m_leftMotor2.close();
-    m_rightMotor1.close();
-    m_rightMotor2.close();
+    m_leftLeader.close();
+    m_leftFollower.close();
+    m_rightLeader.close();
+    m_rightFollower.close();
     m_drive.close();
     m_rightEncoder.close();
     m_leftEncoder.close();
