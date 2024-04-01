@@ -131,6 +131,10 @@ void SendableTable::SubscribeRaw(
   m_backend->SubscribeRaw(name, typeString, std::move(consumer));
 }
 
+SendableTable SendableTable::AddChild(std::string_view name) {
+  return SendableTable{m_backend->AddChild(name)};
+}
+
 void SendableTable::SetPublishOptions(const SendableOptions& options) {
   m_backend->SetPublishOptions(options);
 }
@@ -196,5 +200,5 @@ void SendableTable::AddSchema(std::string_view name, std::string_view type,
 
 SendableTable SendableTable::CreateSendable(
     std::string_view name, std::unique_ptr<SendableWrapper> sendable) {
-  return m_backend->CreateSendable(name, std::move(sendable));
+  return SendableTable{m_backend->CreateSendable(name, std::move(sendable))};
 }

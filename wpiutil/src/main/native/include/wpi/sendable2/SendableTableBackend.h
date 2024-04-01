@@ -21,7 +21,6 @@ class SmallVectorImpl;
 
 namespace wpi2 {
 
-class SendableTable;
 class SendableWrapper;
 
 class SendableTableBackend {
@@ -104,8 +103,11 @@ class SendableTableBackend {
       std::string_view name, std::string_view typeString,
       std::function<void(std::span<const uint8_t>)> consumer) = 0;
 
-  virtual SendableTable CreateSendable(
+  virtual std::shared_ptr<SendableTableBackend> CreateSendable(
       std::string_view name, std::unique_ptr<SendableWrapper> sendable) = 0;
+
+  virtual std::shared_ptr<SendableTableBackend> AddChild(
+      std::string_view name) = 0;
 
   virtual void SetPublishOptions(const SendableOptions& options) = 0;
 
