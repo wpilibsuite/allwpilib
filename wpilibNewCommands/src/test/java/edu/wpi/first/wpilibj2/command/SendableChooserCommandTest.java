@@ -44,12 +44,14 @@ class SendableChooserCommandTest extends CommandTestBase {
 
   static Stream<Arguments> optionsAreCorrect() {
     return Stream.of(
-        Arguments.of("empty", new Command[] {}),
+        Arguments.of("empty", new Command[] {}, new String[]{}),
         Arguments.of(
             "duplicateName",
-            new Command[] {commandNamed("a"), commandNamed("b"), commandNamed("a")}),
+            new Command[] {commandNamed("a"), commandNamed("b"), commandNamed("a")},
+	    new String[] {"a", "b", "c"}),
         Arguments.of(
-            "happyPath", new Command[] {commandNamed("a"), commandNamed("b"), commandNamed("c")}));
+            "happyPath", new Command[] {commandNamed("a"), commandNamed("b"), commandNamed("c")},
+	    new String[] {"a", "b", "c"}));
   }
 
   @AfterEach
