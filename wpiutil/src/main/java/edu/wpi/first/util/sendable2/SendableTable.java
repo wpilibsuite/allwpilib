@@ -174,7 +174,7 @@ public interface SendableTable extends AutoCloseable {
    */
   void setProperties(String name, String properties);
 
-  void erase(String name);
+  void remove(String name);
 
   /**
    * Return whether this sendable has been published.

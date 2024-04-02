@@ -164,7 +164,7 @@ class SendableTableBackend {
   virtual bool SetProperties(std::string_view name,
                              const wpi::json& properties) = 0;
 
-  virtual void Erase(std::string_view name) = 0;
+  virtual void Remove(std::string_view name) = 0;
 
   /**
    * Return whether this sendable has been published.
