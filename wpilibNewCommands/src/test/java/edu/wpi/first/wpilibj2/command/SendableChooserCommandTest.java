@@ -48,7 +48,7 @@ class SendableChooserCommandTest extends CommandTestBase {
         Arguments.of(
             "duplicateName",
             new Command[] {commandNamed("a"), commandNamed("b"), commandNamed("a")},
-	    new String[] {"a", "b", "c"}),
+	    new String[] {"a", "b"}),
         Arguments.of(
             "happyPath", new Command[] {commandNamed("a"), commandNamed("b"), commandNamed("c")},
 	    new String[] {"a", "b", "c"}));
