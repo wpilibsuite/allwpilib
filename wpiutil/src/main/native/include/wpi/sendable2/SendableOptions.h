@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <string>
+#include <string_view>
 
 namespace wpi2 {
 
@@ -19,7 +19,7 @@ struct SendableOptions {
    * Type string.  Default is used for the data type if this is empty.
    * Not used for raw values (pass the type string directly to the functions).
    */
-  std::string typeString;
+  std::string_view typeString;
 
   /**
    * Polling storage size for a subscription. Specifies the maximum number of
@@ -58,7 +58,5 @@ struct SendableOptions {
    */
   bool disableLocal = false;
 };
-
-constexpr SendableOptions kDefaultSendableOptions;
 
 }  // namespace wpi2
