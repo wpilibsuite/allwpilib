@@ -186,7 +186,7 @@ public interface SendableTable extends AutoCloseable {
   /** Update the published values by calling the getters for all properties. */
   void update();
 
-  /** Clear properties. */
+  /** Erases all publishers and subscribers. */
   void clear();
 
   /**
