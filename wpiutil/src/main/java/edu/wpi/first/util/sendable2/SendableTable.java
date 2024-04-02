@@ -66,15 +66,15 @@ public interface SendableTable extends AutoCloseable {
 
   void setRaw(String name, String typeString, ByteBuffer value, int start, int len);
 
-  void publishRaw(String name, String typeString, Supplier<byte[]> supplier);
+  void publishRawBytes(String name, String typeString, Supplier<byte[]> supplier);
 
-  void publishRawBB(String name, String typeString, Supplier<ByteBuffer> supplier);
+  void publishRawBuffer(String name, String typeString, Supplier<ByteBuffer> supplier);
 
-  Consumer<byte[]> publishRaw(String name, String typeString);
+  Consumer<byte[]> publishRawBytes(String name, String typeString);
 
-  Consumer<ByteBuffer> publishRawBB(String name, String typeString);
+  Consumer<ByteBuffer> publishRawBuffer(String name, String typeString);
 
-  void subscribeRaw(String name, String typeString, Consumer<byte[]> consumer);
+  void subscribeRawBytes(String name, String typeString, Consumer<byte[]> consumer);
 
   default <T> void setStruct(String name, T value, Struct<T> struct) {
     addSchema(struct);
@@ -87,7 +87,7 @@ public interface SendableTable extends AutoCloseable {
   default <T> void publishStruct(String name, Struct<T> struct, Supplier<T> supplier) {
     addSchema(struct);
     final StructBuffer<T> buf = StructBuffer.create(struct);
-    publishRawBB(name, struct.getTypeString(), () -> {
+    publishRawBuffer(name, struct.getTypeString(), () -> {
       return buf.write(supplier.get());
     });
   }
@@ -95,7 +95,7 @@ public interface SendableTable extends AutoCloseable {
   default <T> Consumer<T> publishStruct(String name, Struct<T> struct) {
     addSchema(struct);
     final StructBuffer<T> buf = StructBuffer.create(struct);
-    final Consumer<ByteBuffer> consumer = publishRawBB(name, struct.getTypeString());
+    final Consumer<ByteBuffer> consumer = publishRawBuffer(name, struct.getTypeString());
     return (T value) -> {
       consumer.accept(buf.write(value));
     };
@@ -104,7 +104,7 @@ public interface SendableTable extends AutoCloseable {
   default <T> void subscribeStruct(String name, Struct<T> struct, Consumer<T> consumer) {
     addSchema(struct);
     final StructBuffer<T> buf = StructBuffer.create(struct);
-    subscribeRaw(name, struct.getTypeString(), (data) -> {
+    subscribeRawBytes(name, struct.getTypeString(), (data) -> {
       consumer.accept(buf.read(data));
     });
   }
