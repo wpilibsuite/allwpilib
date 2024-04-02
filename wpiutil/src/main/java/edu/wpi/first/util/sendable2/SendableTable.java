@@ -162,8 +162,6 @@ public interface SendableTable extends AutoCloseable {
 
   <T> SendableTable addSendable(String name, T obj, Sendable<T> sendable);
 
-  // SendableTable getSendable(String name);
-
   SendableTable getChild(String name);
 
   void setPublishOptions(SendableOption... options);

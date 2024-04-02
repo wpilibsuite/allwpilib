@@ -146,12 +146,6 @@ class SendableTable {
   SendableTable AddSendable(std::string_view name, std::shared_ptr<T> obj,
                             I... info);
 
-#if 0
-  template <typename T, typename... I>
-    requires SendableSerializable<T, I...>
-  SendableTable GetSendable(std::string_view name);
-#endif
-
   SendableTable GetChild(std::string_view name);
 
   void SetPublishOptions(const SendableOptions& options);
