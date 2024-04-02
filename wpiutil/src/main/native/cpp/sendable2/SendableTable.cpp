@@ -168,8 +168,8 @@ bool SendableTable::SetProperties(std::string_view name,
   return m_backend->SetProperties(name, properties);
 }
 
-void SendableTable::Erase(std::string_view name) {
-  return m_backend->Erase(name);
+void SendableTable::Remove(std::string_view name) {
+  return m_backend->Remove(name);
 }
 
 bool SendableTable::IsPublished() const {

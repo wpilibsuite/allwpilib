@@ -206,7 +206,7 @@ class SendableTable {
    */
   bool SetProperties(std::string_view name, const wpi::json& properties);
 
-  void Erase(std::string_view name);
+  void Remove(std::string_view name);
 
   /**
    * Return whether this sendable has been published.
