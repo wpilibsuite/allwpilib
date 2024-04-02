@@ -8,9 +8,11 @@ import edu.wpi.first.util.function.BooleanConsumer;
 import edu.wpi.first.util.function.FloatConsumer;
 import edu.wpi.first.util.function.FloatSupplier;
 import edu.wpi.first.util.protobuf.Protobuf;
+import edu.wpi.first.util.protobuf.ProtobufBuffer;
 import edu.wpi.first.util.struct.Struct;
 import edu.wpi.first.util.struct.StructBuffer;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
@@ -109,13 +111,54 @@ public interface SendableTable extends AutoCloseable {
     });
   }
 
-  <T> void setProtobuf(String name, T value, Protobuf<T, ?> proto);
+  default <T> void setProtobuf(String name, T value, Protobuf<T, ?> proto) {
+    addSchema(proto);
+    // this is inefficient; implementations should cache ProtobufBuffer
+    ProtobufBuffer<T, ?> buf = ProtobufBuffer.create(proto);
+    try {
+      ByteBuffer bb = buf.write(value);
+      setRaw(name, proto.getTypeString(), bb, 0, bb.position());
+    } catch (IOException e) {
+      // ignore
+    }
+  }
 
-  <T> void publishProtobuf(String name, Protobuf<T, ?> proto, Supplier<T> supplier);
+  default <T> void publishProtobuf(String name, Protobuf<T, ?> proto, Supplier<T> supplier) {
+    addSchema(proto);
+    final ProtobufBuffer<T, ?> buf = ProtobufBuffer.create(proto);
+    publishRawBuffer(name, proto.getTypeString(), () -> {
+      try {
+        return buf.write(supplier.get());
+      } catch (IOException e) {
+        return null; // ignore
+      }
+    });
+  }
 
-  <T> Consumer<T> publishProtobuf(String name, Protobuf<T, ?> proto);
+  default <T> Consumer<T> publishProtobuf(String name, Protobuf<T, ?> proto) {
+    addSchema(proto);
+    final ProtobufBuffer<T, ?> buf = ProtobufBuffer.create(proto);
+    final Consumer<ByteBuffer> consumer = publishRawBuffer(name, proto.getTypeString());
+    return (T value) -> {
+      try {
+        consumer.accept(buf.write(value));
+      } catch (IOException e) {
+        // ignore
+      }
+    };
+  }
 
-  <T> void subscribeProtobuf(String name, Protobuf<T, ?> proto, Consumer<T> consumer);
+  default <T> void subscribeProtobuf(String name, Protobuf<T, ?> proto, Consumer<T> consumer) {
+    addSchema(proto);
+    final ProtobufBuffer<T, ?> buf = ProtobufBuffer.create(proto);
+    subscribeRawBytes(name, proto.getTypeString(), (data) -> {
+      try {
+        consumer.accept(buf.read(data));
+      } catch (IOException e) {
+        // ignore
+      }
+    });
+  }
 
   <T> SendableTable addSendable(String name, T obj, Sendable<T> sendable);
 
