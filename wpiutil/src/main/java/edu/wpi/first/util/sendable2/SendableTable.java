@@ -32,13 +32,13 @@ public interface SendableTable extends AutoCloseable {
 
   void subscribeBoolean(String name, BooleanConsumer consumer);
 
-  void setInt(String name, long value);
+  void setInteger(String name, long value);
 
-  void publishInt(String name, LongSupplier supplier);
+  void publishInteger(String name, LongSupplier supplier);
 
-  LongConsumer publishInt(String name);
+  LongConsumer publishInteger(String name);
 
-  void subscribeInt(String name, LongConsumer consumer);
+  void subscribeInteger(String name, LongConsumer consumer);
 
   void setFloat(String name, float value);
 
@@ -63,6 +63,46 @@ public interface SendableTable extends AutoCloseable {
   Consumer<String> publishString(String name);
 
   void subscribeString(String name, Consumer<String> consumer);
+
+  void setBooleanArray(String name, boolean[] value);
+
+  void publishBooleanArray(String name, Supplier<boolean[]> supplier);
+
+  Consumer<boolean[]> publishBooleanArray(String name);
+
+  void subscribeBooleanArray(String name, Consumer<boolean[]> consumer);
+
+  void setIntegerArray(String name, long[] value);
+
+  void publishIntegerArray(String name, Supplier<long[]> supplier);
+
+  Consumer<long[]> publishIntegerArray(String name);
+
+  void subscribeIntegerArray(String name, Consumer<long[]> consumer);
+
+  void setFloatArray(String name, float[] value);
+
+  void publishFloatArray(String name, Supplier<float[]> supplier);
+
+  Consumer<float[]> publishFloatArray(String name);
+
+  void subscribeFloatArray(String name, Consumer<float[]> consumer);
+
+  void setDoubleArray(String name, double[] value);
+
+  void publishDoubleArray(String name, Supplier<double[]> supplier);
+
+  Consumer<double[]> publishDoubleArray(String name);
+
+  void subscribeDoubleArray(String name, Consumer<double[]> consumer);
+
+  void setStringArray(String name, String[] value);
+
+  void publishStringArray(String name, Supplier<String[]> supplier);
+
+  Consumer<String[]> publishStringArray(String name);
+
+  void subscribeStringArray(String name, Consumer<String[]> consumer);
 
   void setRaw(String name, String typeString, byte[] value, int start, int len);
 

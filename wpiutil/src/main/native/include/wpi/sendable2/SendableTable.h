@@ -45,15 +45,15 @@ class SendableTable {
   void SubscribeBoolean(std::string_view name,
                         std::function<void(bool)> consumer);
 
-  void SetInt(std::string_view name, int64_t value);
+  void SetInteger(std::string_view name, int64_t value);
 
-  void PublishInt(std::string_view name, std::function<int64_t()> supplier);
+  void PublishInteger(std::string_view name, std::function<int64_t()> supplier);
 
   [[nodiscard]]
-  std::function<void(int64_t)> PublishInt(std::string_view name);
+  std::function<void(int64_t)> PublishInteger(std::string_view name);
 
-  void SubscribeInt(std::string_view name,
-                    std::function<void(int64_t)> consumer);
+  void SubscribeInteger(std::string_view name,
+                        std::function<void(int64_t)> consumer);
 
   void SetFloat(std::string_view name, float value);
 
