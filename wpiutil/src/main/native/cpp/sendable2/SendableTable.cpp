@@ -28,22 +28,22 @@ void SendableTable::SubscribeBoolean(std::string_view name,
   m_backend->SubscribeBoolean(name, std::move(consumer));
 }
 
-void SendableTable::SetInt(std::string_view name, int64_t value) {
-  m_backend->SetInt(name, value);
+void SendableTable::SetInteger(std::string_view name, int64_t value) {
+  m_backend->SetInteger(name, value);
 }
 
-void SendableTable::PublishInt(std::string_view name,
+void SendableTable::PublishInteger(std::string_view name,
                                std::function<int64_t()> supplier) {
-  m_backend->PublishInt(name, std::move(supplier));
+  m_backend->PublishInteger(name, std::move(supplier));
 }
 
-std::function<void(int64_t)> SendableTable::PublishInt(std::string_view name) {
-  return m_backend->PublishInt(name);
+std::function<void(int64_t)> SendableTable::PublishInteger(std::string_view name) {
+  return m_backend->PublishInteger(name);
 }
 
-void SendableTable::SubscribeInt(std::string_view name,
+void SendableTable::SubscribeInteger(std::string_view name,
                                  std::function<void(int64_t)> consumer) {
-  m_backend->SubscribeInt(name, std::move(consumer));
+  m_backend->SubscribeInteger(name, std::move(consumer));
 }
 
 void SendableTable::SetFloat(std::string_view name, float value) {

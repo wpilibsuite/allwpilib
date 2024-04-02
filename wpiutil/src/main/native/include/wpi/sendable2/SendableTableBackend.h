@@ -38,16 +38,17 @@ class SendableTableBackend {
   virtual void SubscribeBoolean(std::string_view name,
                                 std::function<void(bool)> consumer) = 0;
 
-  virtual void SetInt(std::string_view name, int64_t value) = 0;
+  virtual void SetInteger(std::string_view name, int64_t value) = 0;
 
-  virtual void PublishInt(std::string_view name,
-                          std::function<int64_t()> supplier) = 0;
+  virtual void PublishInteger(std::string_view name,
+                              std::function<int64_t()> supplier) = 0;
 
   [[nodiscard]]
-  virtual std::function<void(int64_t)> PublishInt(std::string_view name) = 0;
+  virtual std::function<void(int64_t)> PublishInteger(
+      std::string_view name) = 0;
 
-  virtual void SubscribeInt(std::string_view name,
-                            std::function<void(int64_t)> consumer) = 0;
+  virtual void SubscribeInteger(std::string_view name,
+                                std::function<void(int64_t)> consumer) = 0;
 
   virtual void SetFloat(std::string_view name, float value) = 0;
 
