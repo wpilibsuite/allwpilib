@@ -59,11 +59,11 @@ void SendableTable::PublishStruct(std::string_view name,
 
 template <typename T, typename... I>
   requires wpi::StructSerializable<T, I...>
-std::function<void(const T&)> SendableTable::PublishStruct(
+std::function<void(const T&)> SendableTable::AddStructPublisher(
     std::string_view name, I... info) {
   using S = wpi::Struct<T, I...>;
   AddStructSchema<T>(info...);
-  return [rawSetter = PublishRaw(name, S::GetTypeString(info...)),
+  return [rawSetter = AddRawPublisher(name, S::GetTypeString(info...)),
           info = std::tuple<I...>{info...}](const T& value) {
     if constexpr (sizeof...(I) == 0) {
       if constexpr (wpi::is_constexpr([] { S::GetSize(); })) {
@@ -129,12 +129,12 @@ void SendableTable::PublishProtobuf(std::string_view name,
 
 template <wpi::ProtobufSerializable T>
 [[nodiscard]]
-std::function<void(const T&)> SendableTable::PublishProtobuf(
+std::function<void(const T&)> SendableTable::AddProtobufPublisher(
     std::string_view name) {
   wpi::ProtobufMessage<T> msg;
   AddProtobufSchema<T>(msg);
   auto typeString = msg.GetTypeString();
-  return [rawSetter = PublishRaw(name, typeString),
+  return [rawSetter = AddRawPublisher(name, typeString),
           msg = std::move(msg)](const T& value) mutable {
     wpi::SmallVector<uint8_t, 128> buf;
     msg.Pack(buf, value);

@@ -19,8 +19,9 @@ void SendableTable::PublishBoolean(std::string_view name,
   m_backend->PublishBoolean(name, std::move(supplier));
 }
 
-std::function<void(bool)> SendableTable::PublishBoolean(std::string_view name) {
-  return m_backend->PublishBoolean(name);
+std::function<void(bool)> SendableTable::AddBooleanPublisher(
+    std::string_view name) {
+  return m_backend->AddBooleanPublisher(name);
 }
 
 void SendableTable::SubscribeBoolean(std::string_view name,
@@ -33,16 +34,17 @@ void SendableTable::SetInteger(std::string_view name, int64_t value) {
 }
 
 void SendableTable::PublishInteger(std::string_view name,
-                               std::function<int64_t()> supplier) {
+                                   std::function<int64_t()> supplier) {
   m_backend->PublishInteger(name, std::move(supplier));
 }
 
-std::function<void(int64_t)> SendableTable::PublishInteger(std::string_view name) {
-  return m_backend->PublishInteger(name);
+std::function<void(int64_t)> SendableTable::AddIntegerPublisher(
+    std::string_view name) {
+  return m_backend->AddIntegerPublisher(name);
 }
 
 void SendableTable::SubscribeInteger(std::string_view name,
-                                 std::function<void(int64_t)> consumer) {
+                                     std::function<void(int64_t)> consumer) {
   m_backend->SubscribeInteger(name, std::move(consumer));
 }
 
@@ -55,8 +57,9 @@ void SendableTable::PublishFloat(std::string_view name,
   m_backend->PublishFloat(name, std::move(supplier));
 }
 
-std::function<void(float)> SendableTable::PublishFloat(std::string_view name) {
-  return m_backend->PublishFloat(name);
+std::function<void(float)> SendableTable::AddFloatPublisher(
+    std::string_view name) {
+  return m_backend->AddFloatPublisher(name);
 }
 
 void SendableTable::SubscribeFloat(std::string_view name,
@@ -73,9 +76,9 @@ void SendableTable::PublishDouble(std::string_view name,
   m_backend->PublishDouble(name, std::move(supplier));
 }
 
-std::function<void(double)> SendableTable::PublishDouble(
+std::function<void(double)> SendableTable::AddDoublePublisher(
     std::string_view name) {
-  return m_backend->PublishDouble(name);
+  return m_backend->AddDoublePublisher(name);
 }
 
 void SendableTable::SubscribeDouble(std::string_view name,
@@ -92,9 +95,9 @@ void SendableTable::PublishString(std::string_view name,
   m_backend->PublishString(name, std::move(supplier));
 }
 
-std::function<void(std::string_view)> SendableTable::PublishString(
+std::function<void(std::string_view)> SendableTable::AddStringPublisher(
     std::string_view name) {
-  return m_backend->PublishString(name);
+  return m_backend->AddStringPublisher(name);
 }
 
 void SendableTable::SubscribeString(
@@ -120,9 +123,9 @@ void SendableTable::PublishRawSmall(
   m_backend->PublishRawSmall(name, typeString, std::move(supplier));
 }
 
-std::function<void(std::span<const uint8_t>)> SendableTable::PublishRaw(
+std::function<void(std::span<const uint8_t>)> SendableTable::AddRawPublisher(
     std::string_view name, std::string_view typeString) {
-  return m_backend->PublishRaw(name, typeString);
+  return m_backend->AddRawPublisher(name, typeString);
 }
 
 void SendableTable::SubscribeRaw(
