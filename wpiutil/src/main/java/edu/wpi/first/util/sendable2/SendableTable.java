@@ -28,7 +28,7 @@ public interface SendableTable extends AutoCloseable {
 
   void publishBoolean(String name, BooleanSupplier supplier);
 
-  BooleanConsumer publishBoolean(String name);
+  BooleanConsumer addBooleanPublisher(String name);
 
   void subscribeBoolean(String name, BooleanConsumer consumer);
 
@@ -36,7 +36,7 @@ public interface SendableTable extends AutoCloseable {
 
   void publishInteger(String name, LongSupplier supplier);
 
-  LongConsumer publishInteger(String name);
+  LongConsumer addIntegerPublisher(String name);
 
   void subscribeInteger(String name, LongConsumer consumer);
 
@@ -44,7 +44,7 @@ public interface SendableTable extends AutoCloseable {
 
   void publishFloat(String name, FloatSupplier supplier);
 
-  FloatConsumer publishFloat(String name);
+  FloatConsumer addFloatPublisher(String name);
 
   void subscribeFloat(String name, FloatConsumer consumer);
 
@@ -52,7 +52,7 @@ public interface SendableTable extends AutoCloseable {
 
   void publishDouble(String name, DoubleSupplier supplier);
 
-  DoubleConsumer publishDouble(String name);
+  DoubleConsumer addDoublePublisher(String name);
 
   void subscribeDouble(String name, DoubleConsumer consumer);
 
@@ -60,7 +60,7 @@ public interface SendableTable extends AutoCloseable {
 
   void publishString(String name, Supplier<String> supplier);
 
-  Consumer<String> publishString(String name);
+  Consumer<String> addStringPublisher(String name);
 
   void subscribeString(String name, Consumer<String> consumer);
 
@@ -68,7 +68,7 @@ public interface SendableTable extends AutoCloseable {
 
   void publishBooleanArray(String name, Supplier<boolean[]> supplier);
 
-  Consumer<boolean[]> publishBooleanArray(String name);
+  Consumer<boolean[]> addBooleanArrayPublisher(String name);
 
   void subscribeBooleanArray(String name, Consumer<boolean[]> consumer);
 
@@ -76,7 +76,7 @@ public interface SendableTable extends AutoCloseable {
 
   void publishIntegerArray(String name, Supplier<long[]> supplier);
 
-  Consumer<long[]> publishIntegerArray(String name);
+  Consumer<long[]> addIntegerArrayPublisher(String name);
 
   void subscribeIntegerArray(String name, Consumer<long[]> consumer);
 
@@ -84,7 +84,7 @@ public interface SendableTable extends AutoCloseable {
 
   void publishFloatArray(String name, Supplier<float[]> supplier);
 
-  Consumer<float[]> publishFloatArray(String name);
+  Consumer<float[]> addFloatArrayPublisher(String name);
 
   void subscribeFloatArray(String name, Consumer<float[]> consumer);
 
@@ -92,7 +92,7 @@ public interface SendableTable extends AutoCloseable {
 
   void publishDoubleArray(String name, Supplier<double[]> supplier);
 
-  Consumer<double[]> publishDoubleArray(String name);
+  Consumer<double[]> addDoubleArrayPublisher(String name);
 
   void subscribeDoubleArray(String name, Consumer<double[]> consumer);
 
@@ -100,7 +100,7 @@ public interface SendableTable extends AutoCloseable {
 
   void publishStringArray(String name, Supplier<String[]> supplier);
 
-  Consumer<String[]> publishStringArray(String name);
+  Consumer<String[]> addStringArrayPublisher(String name);
 
   void subscribeStringArray(String name, Consumer<String[]> consumer);
 
@@ -112,9 +112,9 @@ public interface SendableTable extends AutoCloseable {
 
   void publishRawBuffer(String name, String typeString, Supplier<ByteBuffer> supplier);
 
-  Consumer<byte[]> publishRawBytes(String name, String typeString);
+  Consumer<byte[]> addRawBytesPublisher(String name, String typeString);
 
-  Consumer<ByteBuffer> publishRawBuffer(String name, String typeString);
+  Consumer<ByteBuffer> addRawBufferPublisher(String name, String typeString);
 
   void subscribeRawBytes(String name, String typeString, Consumer<byte[]> consumer);
 
@@ -134,10 +134,10 @@ public interface SendableTable extends AutoCloseable {
     });
   }
 
-  default <T> Consumer<T> publishStruct(String name, Struct<T> struct) {
+  default <T> Consumer<T> addStructPublisher(String name, Struct<T> struct) {
     addSchema(struct);
     final StructBuffer<T> buf = StructBuffer.create(struct);
-    final Consumer<ByteBuffer> consumer = publishRawBuffer(name, struct.getTypeString());
+    final Consumer<ByteBuffer> consumer = addRawBufferPublisher(name, struct.getTypeString());
     return (T value) -> {
       consumer.accept(buf.write(value));
     };
@@ -175,10 +175,10 @@ public interface SendableTable extends AutoCloseable {
     });
   }
 
-  default <T> Consumer<T> publishProtobuf(String name, Protobuf<T, ?> proto) {
+  default <T> Consumer<T> addProtobufPublisher(String name, Protobuf<T, ?> proto) {
     addSchema(proto);
     final ProtobufBuffer<T, ?> buf = ProtobufBuffer.create(proto);
-    final Consumer<ByteBuffer> consumer = publishRawBuffer(name, proto.getTypeString());
+    final Consumer<ByteBuffer> consumer = addRawBufferPublisher(name, proto.getTypeString());
     return (T value) -> {
       try {
         consumer.accept(buf.write(value));

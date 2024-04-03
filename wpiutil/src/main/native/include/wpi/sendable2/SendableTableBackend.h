@@ -33,7 +33,8 @@ class SendableTableBackend {
                               std::function<bool()> supplier) = 0;
 
   [[nodiscard]]
-  virtual std::function<void(bool)> PublishBoolean(std::string_view name) = 0;
+  virtual std::function<void(bool)> AddBooleanPublisher(
+      std::string_view name) = 0;
 
   virtual void SubscribeBoolean(std::string_view name,
                                 std::function<void(bool)> consumer) = 0;
@@ -44,7 +45,7 @@ class SendableTableBackend {
                               std::function<int64_t()> supplier) = 0;
 
   [[nodiscard]]
-  virtual std::function<void(int64_t)> PublishInteger(
+  virtual std::function<void(int64_t)> AddIntegerPublisher(
       std::string_view name) = 0;
 
   virtual void SubscribeInteger(std::string_view name,
@@ -56,7 +57,8 @@ class SendableTableBackend {
                             std::function<float()> supplier) = 0;
 
   [[nodiscard]]
-  virtual std::function<void(float)> PublishFloat(std::string_view name) = 0;
+  virtual std::function<void(float)> AddFloatPublisher(
+      std::string_view name) = 0;
 
   virtual void SubscribeFloat(std::string_view name,
                               std::function<void(float)> consumer) = 0;
@@ -67,7 +69,8 @@ class SendableTableBackend {
                              std::function<double()> supplier) = 0;
 
   [[nodiscard]]
-  virtual std::function<void(double)> PublishDouble(std::string_view name) = 0;
+  virtual std::function<void(double)> AddDoublePublisher(
+      std::string_view name) = 0;
 
   virtual void SubscribeDouble(std::string_view name,
                                std::function<void(double)> consumer) = 0;
@@ -78,7 +81,7 @@ class SendableTableBackend {
                              std::function<std::string()> supplier) = 0;
 
   [[nodiscard]]
-  virtual std::function<void(std::string_view)> PublishString(
+  virtual std::function<void(std::string_view)> AddStringPublisher(
       std::string_view name) = 0;
 
   virtual void SubscribeString(
@@ -97,7 +100,7 @@ class SendableTableBackend {
           supplier) = 0;
 
   [[nodiscard]]
-  virtual std::function<void(std::span<const uint8_t>)> PublishRaw(
+  virtual std::function<void(std::span<const uint8_t>)> AddRawPublisher(
       std::string_view name, std::string_view typeString) = 0;
 
   virtual void SubscribeRaw(
