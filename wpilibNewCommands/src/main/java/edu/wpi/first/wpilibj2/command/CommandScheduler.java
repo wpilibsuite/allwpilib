@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -628,6 +629,23 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
   }
 
   /**
+   * Strip additional leading stack trace elements that are in the framework package.
+   *
+   * @param stacktrace the original stacktrace
+   * @return the stacktrace stripped of leading elements so there is at max one leading element from
+   *     the edu.wpi.first.wpilibj2.command package.
+   */
+  private StackTraceElement[] stripFrameworkStackElements(StackTraceElement[] stacktrace) {
+    int i = stacktrace.length - 1;
+    for (; i > 0; i--) {
+      if (stacktrace[i].getClassName().startsWith("edu.wpi.first.wpilibj2.command.")) {
+        break;
+      }
+    }
+    return Arrays.copyOfRange(stacktrace, i, stacktrace.length);
+  }
+
+  /**
    * Requires that the specified command hasn't already been added to a composition.
    *
    * @param commands The commands to check
@@ -637,14 +655,16 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
     for (var command : commands) {
       var exception = m_composedCommands.getOrDefault(command, null);
       if (exception != null) {
+        exception.setStackTrace(stripFrameworkStackElements(exception.getStackTrace()));
         var buffer = new StringWriter();
         var writer = new PrintWriter(buffer);
         writer.println(
             "Commands that have been composed may not be added to another composition or scheduled "
                 + "individually!");
-        writer.println(exception.getMessage());
         exception.printStackTrace(writer);
-        throw new IllegalArgumentException(buffer.toString());
+        var thrownException = new IllegalArgumentException(buffer.toString());
+        thrownException.setStackTrace(stripFrameworkStackElements(thrownException.getStackTrace()));
+        throw thrownException;
       }
     }
   }
