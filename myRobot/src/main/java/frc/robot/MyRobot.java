@@ -5,6 +5,8 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
+
 
 public class MyRobot extends TimedRobot {
   /**
@@ -12,7 +14,11 @@ public class MyRobot extends TimedRobot {
    * initialization code.
    */
   @Override
-  public void robotInit() {}
+  public void robotInit() {
+    var c = new PrintCommand("Hello");
+    c.andThen(new PrintCommand("World!"));
+    c.andThen(new PrintCommand("Failure!"));
+  }
 
   /** This function is run once each time the robot enters autonomous mode. */
   @Override
