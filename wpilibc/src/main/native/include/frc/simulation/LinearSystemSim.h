@@ -88,7 +88,7 @@ class LinearSystemSim {
    */
   void SetInput(const Vectord<Inputs>& u) { m_u = ClampInput(u); }
 
-  /*
+  /**
    * Sets the system inputs.
    *
    * @param row   The row in the input matrix to set.
@@ -98,6 +98,21 @@ class LinearSystemSim {
     m_u(row, 0) = value;
     ClampInput(m_u);
   }
+
+  /**
+   * Returns the current input of the plant.
+   *
+   * @return The current input of the plant.
+   */
+  const Vectord<Inputs>& GetInput() const { return m_u; }
+
+  /**
+   * Returns an element of the current input of the plant.
+   *
+   * @param row The row to return.
+   * @return An element of the current input of the plant.
+   */
+  double GetInput(int row) const { return m_u(row); }
 
   /**
    * Sets the system state.
