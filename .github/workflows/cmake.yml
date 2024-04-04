@@ -73,7 +73,7 @@ jobs:
     steps:
       - name: Check XZ-Utils Upstream
         # If this fails, tukaani-project/xz is back online and the liblzma overlay patch should be removed.
-        run:  git ls-remote https://github.com/tukaani-project/xz nonexistant-ref; if ($LastExitCode -eq 0) {$LastExitCode = 1; Write-Output "tuukani-project/xz is reachable. liblzma overlay patch should be removed."} else { $LastExitCode = 0}
+        run:  Invoke-RestMethod -SkipHttpErrorCheck -StatusCodeVariable "sc" -Uri https://api.github.com/repos/tukaani-project/xz > $null; if($sc -eq 200) {$LastExitCode = 1; Write-Output "tuukani-project/xz is reachable. liblzma overlay patch should be removed."} else { $LastExitCode = 0}
 
       - uses: ilammy/msvc-dev-cmd@v1
 
