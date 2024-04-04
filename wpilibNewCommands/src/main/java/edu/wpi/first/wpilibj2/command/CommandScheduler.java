@@ -20,6 +20,8 @@ import edu.wpi.first.wpilibj.Watchdog;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -635,10 +637,14 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
     for (var command : commands) {
       var exception = m_composedCommands.getOrDefault(command, null);
       if (exception != null) {
-        throw new IllegalArgumentException(
+        var buffer = new StringWriter();
+        var writer = new PrintWriter(buffer);
+        writer.println(
             "Commands that have been composed may not be added to another composition or scheduled "
-                + "individually!",
-            exception);
+                + "individually!");
+        writer.println(exception.getMessage());
+        exception.printStackTrace(writer);
+        throw new IllegalArgumentException(buffer.toString());
       }
     }
   }
