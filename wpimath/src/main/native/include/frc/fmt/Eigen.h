@@ -11,11 +11,11 @@
 #include <fmt/format.h>
 
 /**
- * Formatter for classes derived from Eigen::MatrixBase<Derived> or
+ * Formatter for classes derived from Eigen::DenseBase<Derived> or
  * Eigen::SparseCompressedBase<Derived>.
  */
 template <typename Derived, typename CharT>
-  requires std::derived_from<Derived, Eigen::MatrixBase<Derived>> ||
+  requires std::derived_from<Derived, Eigen::DenseBase<Derived>> ||
            std::derived_from<Derived, Eigen::SparseCompressedBase<Derived>>
 struct fmt::formatter<Derived, CharT> {
   constexpr auto parse(fmt::format_parse_context& ctx) {
