@@ -71,6 +71,10 @@ jobs:
     name: "Build - Windows"
     runs-on: windows-2022
     steps:
+      - name: Check XZ-Utils Upstream
+        # If this fails, tukaani-project/xz is back online and the liblzma overlay patch should be removed.
+        run:  Invoke-RestMethod -SkipHttpErrorCheck -StatusCodeVariable "sc" -Uri https://api.github.com/repos/tukaani-project/xz > $null; if($sc -eq 200) {$LastExitCode = 1; Write-Output "tuukani-project/xz is reachable. liblzma overlay patch should be removed."} else { $LastExitCode = 0}
+
       - uses: ilammy/msvc-dev-cmd@v1
 
       - name: Install CMake
