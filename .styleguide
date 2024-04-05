@@ -13,6 +13,7 @@ modifiableFileExclude {
   cmake/toolchains/
   \.patch$
   gradlew
+  vcpkg-ports/
 }
 
 generatedFileExclude {
