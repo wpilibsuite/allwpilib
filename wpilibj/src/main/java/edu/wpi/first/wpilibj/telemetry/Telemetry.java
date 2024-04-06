@@ -41,6 +41,66 @@ public class Telemetry {
     return table;
   }
 
+  public static boolean getBoolean(String name, boolean defaultValue) {
+    return getTable().getBoolean(name, defaultValue);
+  }
+
+  public static long getInteger(String name, long defaultValue) {
+    return getTable().getInteger(name, defaultValue);
+  }
+
+  public static float getFloat(String name, float defaultValue) {
+    return getTable().getFloat(name, defaultValue);
+  }
+
+  public static double getDouble(String name, double defaultValue) {
+    return getTable().getDouble(name, defaultValue);
+  }
+
+  public static String getString(String name, String defaultValue) {
+    return getTable().getString(name, defaultValue);
+  }
+
+  public static boolean[] getBooleanArray(String name, boolean[] defaultValue) {
+    return getTable().getBooleanArray(name, defaultValue);
+  }
+
+  public static long[] getIntegerArray(String name, long[] defaultValue) {
+    return getTable().getIntegerArray(name, defaultValue);
+  }
+
+  public static float[] getFloatArray(String name, float[] defaultValue) {
+    return getTable().getFloatArray(name, defaultValue);
+  }
+
+  public static double[] getDoubleArray(String name, double[] defaultValue) {
+    return getTable().getDoubleArray(name, defaultValue);
+  }
+
+  public static String[] getStringArray(String name, String[] defaultValue) {
+    return getTable().getStringArray(name, defaultValue);
+  }
+
+  public static byte[] getRaw(String name, String typeString, byte[] defaultValue) {
+    return getTable().getRaw(name, typeString, defaultValue);
+  }
+
+  public static <T> T getStruct(String name, Struct<T> struct, T defaultValue) {
+    return getTable().getStruct(name, struct, defaultValue);
+  }
+
+  public static <T> boolean getStructInto(String name, T out, Struct<T> struct) {
+    return getTable().getStructInto(name, out, struct);
+  }
+
+  public static <T> T getProtobuf(String name, Protobuf<T, ?> proto, T defaultValue) {
+    return getTable().getProtobuf(name, proto, defaultValue);
+  }
+
+  public static <T> boolean getProtobufInto(String name, T out, Protobuf<T, ?> proto) {
+    return getTable().getProtobufInto(name, out, proto);
+  }
+
   public static void setBoolean(String name, boolean value) {
     getTable().setBoolean(name, value);
   }
