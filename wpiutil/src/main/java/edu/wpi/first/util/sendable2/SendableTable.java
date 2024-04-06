@@ -24,6 +24,78 @@ import java.util.function.Supplier;
 
 /** Helper class for building Sendable dashboard representations. */
 public interface SendableTable extends AutoCloseable {
+  boolean getBoolean(String name, boolean defaultValue);
+
+  long getInteger(String name, long defaultValue);
+
+  float getFloat(String name, float defaultValue);
+
+  double getDouble(String name, double defaultValue);
+
+  String getString(String name, String defaultValue);
+
+  boolean[] getBooleanArray(String name, boolean[] defaultValue);
+
+  long[] getIntegerArray(String name, long[] defaultValue);
+
+  float[] getFloatArray(String name, float[] defaultValue);
+
+  double[] getDoubleArray(String name, double[] defaultValue);
+
+  String[] getStringArray(String name, String[] defaultValue);
+
+  byte[] getRaw(String name, String typeString, byte[] defaultValue);
+
+  default <T> T getStruct(String name, Struct<T> struct, T defaultValue) {
+    byte[] data = getRaw(name, struct.getTypeString(), null);
+    if (data == null) {
+      return defaultValue;
+    }
+    // this is inefficient; implementations should cache StructBuffer
+    StructBuffer<T> buf = StructBuffer.create(struct);
+    return buf.read(data);
+  }
+
+  default <T> boolean getStructInto(String name, T out, Struct<T> struct) {
+    byte[] data = getRaw(name, struct.getTypeString(), null);
+    if (data == null) {
+      return false;
+    }
+    // this is inefficient; implementations should cache StructBuffer
+    StructBuffer<T> buf = StructBuffer.create(struct);
+    buf.readInto(out, data);
+    return true;
+  }
+
+  default <T> T getProtobuf(String name, Protobuf<T, ?> proto, T defaultValue) {
+    byte[] data = getRaw(name, proto.getTypeString(), null);
+    if (data == null) {
+      return defaultValue;
+    }
+    // this is inefficient; implementations should cache ProtobufBuffer
+    ProtobufBuffer<T, ?> buf = ProtobufBuffer.create(proto);
+    try {
+      return buf.read(data);
+    } catch (IOException e) {
+      return defaultValue;
+    }
+  }
+
+  default <T> boolean getProtobufInto(String name, T out, Protobuf<T, ?> proto) {
+    byte[] data = getRaw(name, proto.getTypeString(), null);
+    if (data == null) {
+      return false;
+    }
+    // this is inefficient; implementations should cache ProtobufBuffer
+    ProtobufBuffer<T, ?> buf = ProtobufBuffer.create(proto);
+    try {
+      buf.readInto(out, data);
+    } catch (IOException e) {
+      return false;
+    }
+    return true;
+  }
+
   void setBoolean(String name, boolean value);
 
   void setInteger(String name, long value);
