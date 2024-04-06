@@ -6,6 +6,7 @@
 
 #include <concepts>
 #include <memory>
+#include <utility>
 #include <vector>
 
 #include "wpi/sendable2/SendableTable.h"

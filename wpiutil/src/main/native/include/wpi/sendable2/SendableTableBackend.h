@@ -7,9 +7,11 @@
 #include <stdint.h>
 
 #include <functional>
+#include <memory>
 #include <span>
 #include <string>
 #include <string_view>
+#include <vector>
 
 #include "wpi/json_fwd.h"
 #include "wpi/sendable2/SendableOptions.h"
