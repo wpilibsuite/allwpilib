@@ -27,7 +27,7 @@ class Telemetry {
  public:
   Telemetry() = delete;
 
-  static wpi2::SendableTable SetTable(wpi2::SendableTable table);
+  static void SetTable(wpi2::SendableTable table);
 
   static wpi2::SendableTable GetTable();
 
