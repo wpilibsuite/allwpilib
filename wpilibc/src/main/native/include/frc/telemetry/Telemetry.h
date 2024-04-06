@@ -27,7 +27,7 @@ class Telemetry {
  public:
   Telemetry() = delete;
 
-  static wpi2::SendableTable SetTable(wpi2::SendableTable);
+  static wpi2::SendableTable SetTable(wpi2::SendableTable table);
 
   static wpi2::SendableTable GetTable();
 
@@ -38,43 +38,6 @@ class Telemetry {
   static void SetFloat(std::string_view name, float value);
 
   static void SetDouble(std::string_view name, double value);
-
-  static void PublishBoolean(std::string_view name,
-                             std::function<bool()> supplier);
-
-  static void PublishInteger(std::string_view name,
-                             std::function<int64_t()> supplier);
-
-  static void PublishFloat(std::string_view name,
-                           std::function<float()> supplier);
-
-  static void PublishDouble(std::string_view name,
-                            std::function<double()> supplier);
-
-  [[nodiscard]]
-  static std::function<void(bool)> AddBooleanPublisher(std::string_view name);
-
-  [[nodiscard]]
-  static std::function<void(int64_t)> AddIntegerPublisher(
-      std::string_view name);
-
-  [[nodiscard]]
-  static std::function<void(float)> AddFloatPublisher(std::string_view name);
-
-  [[nodiscard]]
-  static std::function<void(double)> AddDoublePublisher(std::string_view name);
-
-  static void SubscribeBoolean(std::string_view name,
-                               std::function<void(bool)> consumer);
-
-  static void SubscribeInteger(std::string_view name,
-                               std::function<void(int64_t)> consumer);
-
-  static void SubscribeFloat(std::string_view name,
-                             std::function<void(float)> consumer);
-
-  static void SubscribeDouble(std::string_view name,
-                              std::function<void(double)> consumer);
 
   static void SetString(std::string_view name, std::string_view value);
 
@@ -87,6 +50,18 @@ class Telemetry {
 
   template <wpi::ProtobufSerializable T>
   static void SetProtobuf(std::string_view name, const T& value);
+
+  static void PublishBoolean(std::string_view name,
+                             std::function<bool()> supplier);
+
+  static void PublishInteger(std::string_view name,
+                             std::function<int64_t()> supplier);
+
+  static void PublishFloat(std::string_view name,
+                           std::function<float()> supplier);
+
+  static void PublishDouble(std::string_view name,
+                            std::function<double()> supplier);
 
   static void PublishString(std::string_view name,
                             std::function<std::string()> supplier);
@@ -109,6 +84,19 @@ class Telemetry {
                               std::function<T()> supplier);
 
   [[nodiscard]]
+  static std::function<void(bool)> AddBooleanPublisher(std::string_view name);
+
+  [[nodiscard]]
+  static std::function<void(int64_t)> AddIntegerPublisher(
+      std::string_view name);
+
+  [[nodiscard]]
+  static std::function<void(float)> AddFloatPublisher(std::string_view name);
+
+  [[nodiscard]]
+  static std::function<void(double)> AddDoublePublisher(std::string_view name);
+
+  [[nodiscard]]
   static std::function<void(std::string_view)> AddStringPublisher(
       std::string_view name);
 
@@ -126,6 +114,18 @@ class Telemetry {
   [[nodiscard]]
   static std::function<void(const T&)> AddProtobufPublisher(
       std::string_view name);
+
+  static void SubscribeBoolean(std::string_view name,
+                               std::function<void(bool)> consumer);
+
+  static void SubscribeInteger(std::string_view name,
+                               std::function<void(int64_t)> consumer);
+
+  static void SubscribeFloat(std::string_view name,
+                             std::function<void(float)> consumer);
+
+  static void SubscribeDouble(std::string_view name,
+                              std::function<void(double)> consumer);
 
   static void SubscribeString(std::string_view name,
                               std::function<void(std::string_view)> consumer);
@@ -214,6 +214,11 @@ class Telemetry {
    * Erases all publishers and subscribers.
    */
   static void Clear();
+
+ private:
+  static wpi2::SendableTable& GetTableHolder();
 };
 
 }  // namespace frc
+
+#include "frc/telemetry/Telemetry.inc"
