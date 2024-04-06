@@ -31,13 +31,13 @@ public class Telemetry {
     throw new UnsupportedOperationException("This is a utility class!");
   }
 
-  public static synchronized SendableTable setTable(SendableTable table) {
+  public static SendableTable setTable(SendableTable table) {
     SendableTable oldTable = Telemetry.table;
     Telemetry.table = table;
     return oldTable;
   }
 
-  public static synchronized SendableTable getTable() {
+  public static SendableTable getTable() {
     return table;
   }
 
