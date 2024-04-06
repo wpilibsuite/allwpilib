@@ -37,6 +37,15 @@ void SendableTable::SetStruct(std::string_view name, const T& value,
   SetRaw(name, S::GetTypeString(info...), buf);
 }
 
+template <wpi::ProtobufSerializable T>
+void SendableTable::SetProtobuf(std::string_view name, const T& value) {
+  wpi::ProtobufMessage<T> msg;
+  AddProtobufSchema<T>(msg);
+  wpi::SmallVector<uint8_t, 128> buf;
+  msg.Pack(buf, value);
+  SetRaw(name, msg.GetTypeString(), buf);
+}
+
 template <typename T, typename... I>
   requires wpi::StructSerializable<T, I...>
 void SendableTable::PublishStruct(std::string_view name,
@@ -53,6 +62,21 @@ void SendableTable::PublishStruct(std::string_view name,
               S::Pack(buf, supplier(), info...);
             },
             info);
+        return buf;
+      });
+}
+
+template <wpi::ProtobufSerializable T>
+void SendableTable::PublishProtobuf(std::string_view name,
+                                    std::function<T()> supplier) {
+  wpi::ProtobufMessage<T> msg;
+  AddProtobufSchema<T>(msg);
+  auto typeString = msg.GetTypeString();
+  PublishRawSmall(
+      name, typeString,
+      [supplier = std::move(supplier), msg = std::move(msg)](
+          wpi::SmallVectorImpl<uint8_t>& buf) mutable -> std::span<uint8_t> {
+        msg.Pack(buf, supplier());
         return buf;
       });
 }
@@ -84,6 +108,21 @@ std::function<void(const T&)> SendableTable::AddStructPublisher(
   };
 }
 
+template <wpi::ProtobufSerializable T>
+[[nodiscard]]
+std::function<void(const T&)> SendableTable::AddProtobufPublisher(
+    std::string_view name) {
+  wpi::ProtobufMessage<T> msg;
+  AddProtobufSchema<T>(msg);
+  auto typeString = msg.GetTypeString();
+  return [rawSetter = AddRawPublisher(name, typeString),
+          msg = std::move(msg)](const T& value) mutable {
+    wpi::SmallVector<uint8_t, 128> buf;
+    msg.Pack(buf, value);
+    rawSetter(buf);
+  };
+}
+
 template <typename T, typename... I>
   requires wpi::StructSerializable<T, I...>
 void SendableTable::SubscribeStruct(std::string_view name,
@@ -101,45 +140,6 @@ void SendableTable::SubscribeStruct(std::string_view name,
               info));
         }
       });
-}
-
-template <wpi::ProtobufSerializable T>
-void SendableTable::SetProtobuf(std::string_view name, const T& value) {
-  wpi::ProtobufMessage<T> msg;
-  AddProtobufSchema<T>(msg);
-  wpi::SmallVector<uint8_t, 128> buf;
-  msg.Pack(buf, value);
-  SetRaw(name, msg.GetTypeString(), buf);
-}
-
-template <wpi::ProtobufSerializable T>
-void SendableTable::PublishProtobuf(std::string_view name,
-                                    std::function<T()> supplier) {
-  wpi::ProtobufMessage<T> msg;
-  AddProtobufSchema<T>(msg);
-  auto typeString = msg.GetTypeString();
-  PublishRawSmall(
-      name, typeString,
-      [supplier = std::move(supplier), msg = std::move(msg)](
-          wpi::SmallVectorImpl<uint8_t>& buf) mutable -> std::span<uint8_t> {
-        msg.Pack(buf, supplier());
-        return buf;
-      });
-}
-
-template <wpi::ProtobufSerializable T>
-[[nodiscard]]
-std::function<void(const T&)> SendableTable::AddProtobufPublisher(
-    std::string_view name) {
-  wpi::ProtobufMessage<T> msg;
-  AddProtobufSchema<T>(msg);
-  auto typeString = msg.GetTypeString();
-  return [rawSetter = AddRawPublisher(name, typeString),
-          msg = std::move(msg)](const T& value) mutable {
-    wpi::SmallVector<uint8_t, 128> buf;
-    msg.Pack(buf, value);
-    rawSetter(buf);
-  };
 }
 
 template <wpi::ProtobufSerializable T>

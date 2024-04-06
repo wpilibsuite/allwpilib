@@ -37,58 +37,58 @@ class SendableTable {
 
   void SetBoolean(std::string_view name, bool value);
 
-  void PublishBoolean(std::string_view name, std::function<bool()> supplier);
-
-  [[nodiscard]]
-  std::function<void(bool)> AddBooleanPublisher(std::string_view name);
-
-  void SubscribeBoolean(std::string_view name,
-                        std::function<void(bool)> consumer);
-
   void SetInteger(std::string_view name, int64_t value);
-
-  void PublishInteger(std::string_view name, std::function<int64_t()> supplier);
-
-  [[nodiscard]]
-  std::function<void(int64_t)> AddIntegerPublisher(std::string_view name);
-
-  void SubscribeInteger(std::string_view name,
-                        std::function<void(int64_t)> consumer);
 
   void SetFloat(std::string_view name, float value);
 
-  void PublishFloat(std::string_view name, std::function<float()> supplier);
-
-  [[nodiscard]]
-  std::function<void(float)> AddFloatPublisher(std::string_view name);
-
-  void SubscribeFloat(std::string_view name,
-                      std::function<void(float)> consumer);
-
   void SetDouble(std::string_view name, double value);
+
+  void PublishBoolean(std::string_view name, std::function<bool()> supplier);
+
+  void PublishInteger(std::string_view name, std::function<int64_t()> supplier);
+
+  void PublishFloat(std::string_view name, std::function<float()> supplier);
 
   void PublishDouble(std::string_view name, std::function<double()> supplier);
 
   [[nodiscard]]
+  std::function<void(bool)> AddBooleanPublisher(std::string_view name);
+
+  [[nodiscard]]
+  std::function<void(int64_t)> AddIntegerPublisher(std::string_view name);
+
+  [[nodiscard]]
+  std::function<void(float)> AddFloatPublisher(std::string_view name);
+
+  [[nodiscard]]
   std::function<void(double)> AddDoublePublisher(std::string_view name);
+
+  void SubscribeBoolean(std::string_view name,
+                        std::function<void(bool)> consumer);
+
+  void SubscribeInteger(std::string_view name,
+                        std::function<void(int64_t)> consumer);
+
+  void SubscribeFloat(std::string_view name,
+                      std::function<void(float)> consumer);
 
   void SubscribeDouble(std::string_view name,
                        std::function<void(double)> consumer);
 
   void SetString(std::string_view name, std::string_view value);
 
-  void PublishString(std::string_view name,
-                     std::function<std::string()> supplier);
-
-  [[nodiscard]]
-  std::function<void(std::string_view)> AddStringPublisher(
-      std::string_view name);
-
-  void SubscribeString(std::string_view name,
-                       std::function<void(std::string_view)> consumer);
-
   void SetRaw(std::string_view name, std::string_view typeString,
               std::span<const uint8_t> value);
+
+  template <typename T, typename... I>
+    requires wpi::StructSerializable<T, I...>
+  void SetStruct(std::string_view name, const T& value, I... info);
+
+  template <wpi::ProtobufSerializable T>
+  void SetProtobuf(std::string_view name, const T& value);
+
+  void PublishString(std::string_view name,
+                     std::function<std::string()> supplier);
 
   void PublishRaw(std::string_view name, std::string_view typeString,
                   std::function<std::vector<uint8_t>()> supplier);
@@ -98,21 +98,21 @@ class SendableTable {
       std::function<std::span<uint8_t>(wpi::SmallVectorImpl<uint8_t>& buf)>
           supplier);
 
-  [[nodiscard]]
-  std::function<void(std::span<const uint8_t>)> AddRawPublisher(
-      std::string_view name, std::string_view typeString);
-
-  void SubscribeRaw(std::string_view name, std::string_view typeString,
-                    std::function<void(std::span<const uint8_t>)> consumer);
-
-  template <typename T, typename... I>
-    requires wpi::StructSerializable<T, I...>
-  void SetStruct(std::string_view name, const T& value, I... info);
-
   template <typename T, typename... I>
     requires wpi::StructSerializable<T, I...>
   void PublishStruct(std::string_view name, std::function<T()> supplier,
                      I... info);
+
+  template <wpi::ProtobufSerializable T>
+  void PublishProtobuf(std::string_view name, std::function<T()> supplier);
+
+  [[nodiscard]]
+  std::function<void(std::string_view)> AddStringPublisher(
+      std::string_view name);
+
+  [[nodiscard]]
+  std::function<void(std::span<const uint8_t>)> AddRawPublisher(
+      std::string_view name, std::string_view typeString);
 
   template <typename T, typename... I>
     requires wpi::StructSerializable<T, I...>
@@ -120,20 +120,20 @@ class SendableTable {
   std::function<void(const T&)> AddStructPublisher(std::string_view name,
                                                    I... info);
 
+  template <wpi::ProtobufSerializable T>
+  [[nodiscard]]
+  std::function<void(const T&)> AddProtobufPublisher(std::string_view name);
+
+  void SubscribeString(std::string_view name,
+                       std::function<void(std::string_view)> consumer);
+
+  void SubscribeRaw(std::string_view name, std::string_view typeString,
+                    std::function<void(std::span<const uint8_t>)> consumer);
+
   template <typename T, typename... I>
     requires wpi::StructSerializable<T, I...>
   void SubscribeStruct(std::string_view name, std::function<void(T)> consumer,
                        I... info);
-
-  template <wpi::ProtobufSerializable T>
-  void SetProtobuf(std::string_view name, const T& value);
-
-  template <wpi::ProtobufSerializable T>
-  void PublishProtobuf(std::string_view name, std::function<T()> supplier);
-
-  template <wpi::ProtobufSerializable T>
-  [[nodiscard]]
-  std::function<void(const T&)> AddProtobufPublisher(std::string_view name);
 
   template <wpi::ProtobufSerializable T>
   void SubscribeProtobuf(std::string_view name,
