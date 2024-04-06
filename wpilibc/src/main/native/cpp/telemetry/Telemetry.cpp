@@ -10,7 +10,7 @@
 using namespace frc;
 
 wpi2::SendableTable& Telemetry::GetTableHolder() {
-  static wpi2::SendableTable instance;
+  static wpi2::SendableTable instance{nullptr}; // FIXME
   return instance;
 }
 
