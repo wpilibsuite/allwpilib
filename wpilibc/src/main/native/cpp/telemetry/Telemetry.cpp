@@ -14,11 +14,8 @@ wpi2::SendableTable& Telemetry::GetTableHolder() {
   return instance;
 }
 
-wpi2::SendableTable Telemetry::SetTable(wpi2::SendableTable table) {
-  auto& inst = GetTableHolder();
-  auto rv = std::move(inst);
-  inst = std::move(table);
-  return rv;
+void Telemetry::SetTable(wpi2::SendableTable table) {
+  GetTableHolder() = std::move(table);
 }
 
 wpi2::SendableTable Telemetry::GetTable() {
