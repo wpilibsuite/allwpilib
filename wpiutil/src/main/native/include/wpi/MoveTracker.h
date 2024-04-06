@@ -9,7 +9,9 @@
 #include <memory>
 #include <utility>
 
+#if 0
 #include "wpi/Signal.h"
+#endif
 
 namespace wpi {
 
