@@ -298,3 +298,5 @@ class SendableTable {
 };
 
 }  // namespace wpi2
+
+#include "wpi/sendable2/SendableTable.inc"
