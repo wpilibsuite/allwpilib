@@ -7,6 +7,7 @@
 #include <atomic>
 #include <concepts>
 #include <memory>
+#include <utility>
 
 #include "wpi/Signal.h"
 
