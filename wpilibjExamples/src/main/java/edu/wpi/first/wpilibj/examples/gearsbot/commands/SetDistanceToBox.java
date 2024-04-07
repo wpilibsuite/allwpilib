@@ -5,12 +5,15 @@
 package edu.wpi.first.wpilibj.examples.gearsbot.commands;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.examples.gearsbot.Constants.BoxAlignConstants;
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Drivetrain;
 import edu.wpi.first.wpilibj2.command.PIDCommand;
 
 /**
- * Drive until the robot is the given distance away from the box. Uses a local PID controller to run
- * a simple PID loop that is only enabled while this command is running. The input is the averaged
+ * Drive until the robot is the given distance away from the box. Uses a local
+ * PID controller to run
+ * a simple PID loop that is only enabled while this command is running. The
+ * input is the averaged
  * values of the left and right encoders.
  */
 public class SetDistanceToBox extends PIDCommand {
@@ -23,7 +26,10 @@ public class SetDistanceToBox extends PIDCommand {
    */
   public SetDistanceToBox(double distance, Drivetrain drivetrain) {
     super(
-        new PIDController(-2, 0, 0),
+        new PIDController(
+            BoxAlignConstants.kP,
+            BoxAlignConstants.kI,
+            BoxAlignConstants.kD),
         drivetrain::getDistanceToObstacle,
         distance,
         d -> drivetrain.drive(d, d));
@@ -31,7 +37,7 @@ public class SetDistanceToBox extends PIDCommand {
     m_drivetrain = drivetrain;
     addRequirements(m_drivetrain);
 
-    getController().setTolerance(0.01);
+    getController().setTolerance(BoxAlignConstants.kTolerance);
   }
 
   // Called just before this Command runs the first time

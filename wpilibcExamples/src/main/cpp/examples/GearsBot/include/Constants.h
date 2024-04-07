@@ -98,6 +98,17 @@ namespace DriveStraightConstants {
 inline constexpr double kP = 4.0;
 inline constexpr double kI = 0.0;
 inline constexpr double kD = 0.0;
+
+inline constexpr double kTolerance = 0.01;
+}
+
+namespace BoxAlignConstants {
+inline constexpr double kP = 2.0;
+inline constexpr double kI = 0.0;
+inline constexpr double kD = 0.0;
+
+inline constexpr double kTolerance = 0.01;
+
 }
 
 namespace OIConstants {
