@@ -6,6 +6,7 @@
 
 #include <memory>
 #include <tuple>
+#include <utility>
 
 #include "wpi/sendable2/Sendable.h"
 #include "wpi/sendable2/SendableTable.h"

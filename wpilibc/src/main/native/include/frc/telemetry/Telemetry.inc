@@ -6,6 +6,8 @@
 
 #include "frc/telemetry/Telemetry.h"
 
+#include <functional>
+#include <memory>
 #include <utility>
 
 #include <wpi/sendable2/SendableTable.h>
