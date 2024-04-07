@@ -13,6 +13,7 @@
 #include "commands/PrepareToPickup.h"
 #include "commands/SetDistanceToBox.h"
 #include "commands/SetWristSetpoint.h"
+#include "Constants.h"
 
 Autonomous::Autonomous(Claw& claw, Wrist& wrist, Elevator& elevator,
                        Drivetrain& drivetrain) {
@@ -21,12 +22,12 @@ Autonomous::Autonomous(Claw& claw, Wrist& wrist, Elevator& elevator,
       // clang-format off
       PrepareToPickup(claw, wrist, elevator),
       Pickup(claw, wrist, elevator),
-      SetDistanceToBox(0.10, drivetrain),
+      SetDistanceToBox(AutoConstants::kDistToBox1, drivetrain),
       // DriveStraight(4, drivetrain) // Use encoders if ultrasonic is broken
       Place(claw, wrist, elevator),
-      SetDistanceToBox(0.6, drivetrain),
+      SetDistanceToBox(AutoConstants::kDistToBox2, drivetrain),
       // DriveStraight(-2, drivetrain) // Use encoders if ultrasonic is broken
-      frc2::ParallelCommandGroup(SetWristSetpoint(-45, wrist),
+      frc2::ParallelCommandGroup(SetWristSetpoint(AutoConstants::kWristSetpoint, wrist),
                                  CloseClaw(claw)));
   // clang-format on
 }

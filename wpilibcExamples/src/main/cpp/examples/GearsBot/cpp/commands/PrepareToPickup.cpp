@@ -13,6 +13,6 @@
 PrepareToPickup::PrepareToPickup(Claw& claw, Wrist& wrist, Elevator& elevator) {
   SetName("PrepareToPickup");
   AddCommands(OpenClaw(claw),
-              frc2::ParallelCommandGroup(SetElevatorSetpoint(0, elevator),
-                                         SetWristSetpoint(0, wrist)));
+              frc2::ParallelCommandGroup(SetElevatorSetpoint(Positions::PrepareToPickup::kElevatorSetpoint, elevator),
+                                         SetWristSetpoint(Positions::PrepareToPickup::kWristSetpoint, wrist)));
 }
