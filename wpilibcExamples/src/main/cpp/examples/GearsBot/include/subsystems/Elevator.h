@@ -8,6 +8,8 @@
 #include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc2/command/PIDSubsystem.h>
 
+#include "Constants.h"
+
 /**
  * The elevator subsystem uses PID to go to a given height. Unfortunately, in
  * it's current
@@ -43,18 +45,23 @@ class Elevator : public frc2::PIDSubsystem {
   void Periodic() override;
 
  private:
-  frc::PWMSparkMax m_motor{5};
+  frc::PWMSparkMax m_motor{ElevatorConstants::kMotorPort};
 
 // Conversion value of potentiometer varies between the real world and
 // simulation
 #ifndef SIMULATION
-  frc::AnalogPotentiometer m_pot{2, -2.0 / 5};
+  frc::AnalogPotentiometer m_pot{ElevatorConstants::kPotentiometerPort, -2.0 / 5};
+  frc::PIDController m_PIDcontroller{
+    ElevatorConstants::kP_real,
+    ElevatorConstants::kI_real,
+    ElevatorConstants::kD,
+  };
 #else
-  frc::AnalogPotentiometer m_pot{2};  // Defaults to meters
+  frc::AnalogPotentiometer m_pot{ElevatorConstants::kPotentiometerPort};  // Defaults to meters
+  frc::PIDController m_PIDcontroller{
+    ElevatorConstants::kP_simulation,
+    ElevatorConstants::kI_simulation,
+    ElevatorConstants::kD,
+  };
 #endif
-
-  static constexpr double kP_real = 4;
-  static constexpr double kI_real = 0.07;
-  static constexpr double kP_simulation = 18;
-  static constexpr double kI_simulation = 0.2;
 };

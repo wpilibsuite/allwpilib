@@ -11,6 +11,8 @@
 #include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc2/command/SubsystemBase.h>
 
+#include "Constants.h"
+
 namespace frc {
 class Joystick;
 }  // namespace frc
@@ -63,18 +65,24 @@ class Drivetrain : public frc2::SubsystemBase {
   void Periodic() override;
 
  private:
-  frc::PWMSparkMax m_frontLeft{1};
-  frc::PWMSparkMax m_rearLeft{2};
+  frc::PWMSparkMax m_leftLeader{DriveConstants::kLeftMotorPort1};
+  frc::PWMSparkMax m_leftFollower{DriveConstants::kLeftMotorPort2};
 
-  frc::PWMSparkMax m_frontRight{3};
-  frc::PWMSparkMax m_rearRight{4};
+  frc::PWMSparkMax m_rightLeader{DriveConstants::kLeftMotorPort1};
+  frc::PWMSparkMax m_rightFollower{DriveConstants::kLeftMotorPort2};
 
   frc::DifferentialDrive m_robotDrive{
-      [&](double output) { m_frontLeft.Set(output); },
-      [&](double output) { m_frontRight.Set(output); }};
+      [&](double output) { m_leftLeader.Set(output); },
+      [&](double output) { m_rightLeader.Set(output); }};
 
-  frc::Encoder m_leftEncoder{1, 2};
-  frc::Encoder m_rightEncoder{3, 4};
-  frc::AnalogInput m_rangefinder{6};
-  frc::AnalogGyro m_gyro{1};
+  frc::Encoder m_leftEncoder{
+    DriveConstants::kLeftEncoderPorts[0],
+    DriveConstants::kLeftEncoderPorts[1]};
+
+  frc::Encoder m_rightEncoder{
+    DriveConstants::kLeftEncoderPorts[0],
+    DriveConstants::kLeftEncoderPorts[1]};
+
+  frc::AnalogInput m_rangefinder{DriveConstants::kRangeFinderPort};
+  frc::AnalogGyro m_gyro{DriveConstants::kAnalogGyroPort};
 };

@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#pragma once
+
 #include <numbers>
 
 #include <frc/geometry/Translation2d.h>
@@ -15,8 +17,6 @@
 #include <units/time.h>
 #include <units/velocity.h>
 #include <units/voltage.h>
-
-#pragma once
 
 /**
  * The Constants header provides a convenient place for teams to hold robot-wide
