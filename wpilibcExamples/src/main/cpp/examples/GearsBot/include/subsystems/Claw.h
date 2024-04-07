@@ -9,6 +9,7 @@
 #include <frc2/command/SubsystemBase.h>
 
 #include "Constants.h"
+
 /**
  * The claw subsystem is a simple system with a motor for opening and closing.
  * If using stronger motors, you should probably use a sensor so that the

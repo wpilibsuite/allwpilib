@@ -47,14 +47,16 @@ class Wrist : public frc2::PIDSubsystem {
 // Conversion value of potentiometer varies between the real world and
 // simulation
 #ifndef SIMULATION
-  frc::AnalogPotentiometer m_pot{WristConstants::kPotentiometerPort, -270.0 / 5};
+  frc::AnalogPotentiometer m_pot{WristConstants::kPotentiometerPort,
+                                 -270.0 / 5};
 #else
-  frc::AnalogPotentiometer m_pot{WristConstants::kPotentiometerPort};  // Defaults to degrees
+  frc::AnalogPotentiometer m_pot{
+      WristConstants::kPotentiometerPort};  // Defaults to degrees
 #endif
 
   frc::PIDController m_PIDcontroller{
-    WristConstants::kP,
-    WristConstants::kI,
-    WristConstants::kD,
+      WristConstants::kP,
+      WristConstants::kI,
+      WristConstants::kD,
   };
 };

@@ -8,7 +8,6 @@
 #include <frc/livewindow/LiveWindow.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 
-
 Elevator::Elevator() : frc2::PIDSubsystem{m_PIDcontroller} {
   m_controller.SetTolerance(ElevatorConstants::kTolerance);
 

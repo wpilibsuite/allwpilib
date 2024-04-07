@@ -6,6 +6,7 @@
 
 #include <frc2/command/ParallelCommandGroup.h>
 
+#include "Constants.h"
 #include "commands/CloseClaw.h"
 #include "commands/DriveStraight.h"
 #include "commands/Pickup.h"
@@ -13,7 +14,6 @@
 #include "commands/PrepareToPickup.h"
 #include "commands/SetDistanceToBox.h"
 #include "commands/SetWristSetpoint.h"
-#include "Constants.h"
 
 Autonomous::Autonomous(Claw& claw, Wrist& wrist, Elevator& elevator,
                        Drivetrain& drivetrain) {

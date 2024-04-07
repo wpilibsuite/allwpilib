@@ -50,18 +50,20 @@ class Elevator : public frc2::PIDSubsystem {
 // Conversion value of potentiometer varies between the real world and
 // simulation
 #ifndef SIMULATION
-  frc::AnalogPotentiometer m_pot{ElevatorConstants::kPotentiometerPort, -2.0 / 5};
+  frc::AnalogPotentiometer m_pot{ElevatorConstants::kPotentiometerPort,
+                                 -2.0 / 5};
   frc::PIDController m_PIDcontroller{
-    ElevatorConstants::kP_real,
-    ElevatorConstants::kI_real,
-    ElevatorConstants::kD,
+      ElevatorConstants::kP_real,
+      ElevatorConstants::kI_real,
+      ElevatorConstants::kD,
   };
 #else
-  frc::AnalogPotentiometer m_pot{ElevatorConstants::kPotentiometerPort};  // Defaults to meters
+  frc::AnalogPotentiometer m_pot{
+      ElevatorConstants::kPotentiometerPort};  // Defaults to meters
   frc::PIDController m_PIDcontroller{
-    ElevatorConstants::kP_simulation,
-    ElevatorConstants::kI_simulation,
-    ElevatorConstants::kD,
+      ElevatorConstants::kP_simulation,
+      ElevatorConstants::kI_simulation,
+      ElevatorConstants::kD,
   };
 #endif
 };

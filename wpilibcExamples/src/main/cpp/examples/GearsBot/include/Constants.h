@@ -100,7 +100,7 @@ inline constexpr double kI = 0.0;
 inline constexpr double kD = 0.0;
 
 inline constexpr double kTolerance = 0.01;
-}
+}  // namespace DriveStraightConstants
 
 namespace BoxAlignConstants {
 inline constexpr double kP = 2.0;
@@ -109,23 +109,23 @@ inline constexpr double kD = 0.0;
 
 inline constexpr double kTolerance = 0.01;
 
-}
+}  // namespace BoxAlignConstants
 
 namespace OIConstants {
 inline constexpr int kDriverControllerPort = 0;
 }  // namespace OIConstants
 
-namespace Positions{
-    namespace Pickup {
-        inline constexpr auto kWristSetpoint = -45_deg;
-        inline constexpr auto kElevatorSetpoint = 0.25;
-    }
-    namespace Place{
-        inline constexpr auto kWristSetpoint  = 0.0_deg;
-        inline constexpr auto kElevatorSetpoint = 0.25;
-    }
-    namespace PrepareToPickup{
-        inline constexpr auto kWristSetpoint  = 0.0_deg;
-        inline constexpr auto kElevatorSetpoint = 0.0;
-    }
-};
+namespace Positions {
+namespace Pickup {
+inline constexpr auto kWristSetpoint = -45_deg;
+inline constexpr auto kElevatorSetpoint = 0.25;
+}  // namespace Pickup
+namespace Place {
+inline constexpr auto kWristSetpoint = 0.0_deg;
+inline constexpr auto kElevatorSetpoint = 0.25;
+}  // namespace Place
+namespace PrepareToPickup {
+inline constexpr auto kWristSetpoint = 0.0_deg;
+inline constexpr auto kElevatorSetpoint = 0.0;
+}  // namespace PrepareToPickup
+}  // namespace Positions

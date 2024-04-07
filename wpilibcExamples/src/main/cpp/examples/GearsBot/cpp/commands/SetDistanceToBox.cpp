@@ -8,12 +8,11 @@
 
 #include "Robot.h"
 
-SetDistanceToBox::SetDistanceToBox(units::meter_t distance, Drivetrain& drivetrain)
+SetDistanceToBox::SetDistanceToBox(units::meter_t distance,
+                                   Drivetrain& drivetrain)
     : frc2::CommandHelper<frc2::PIDCommand, SetDistanceToBox>{
-          frc::PIDController{
-            BoxAlignConstants::kP,
-            BoxAlignConstants::kI,
-            BoxAlignConstants::kD},
+          frc::PIDController{BoxAlignConstants::kP, BoxAlignConstants::kI,
+                             BoxAlignConstants::kD},
           [&drivetrain] { return drivetrain.GetDistanceToObstacle(); },
           distance.value(),
           [&drivetrain](double output) { drivetrain.Drive(output, output); },

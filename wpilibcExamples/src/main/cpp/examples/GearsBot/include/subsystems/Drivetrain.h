@@ -75,13 +75,11 @@ class Drivetrain : public frc2::SubsystemBase {
       [&](double output) { m_leftLeader.Set(output); },
       [&](double output) { m_rightLeader.Set(output); }};
 
-  frc::Encoder m_leftEncoder{
-    DriveConstants::kLeftEncoderPorts[0],
-    DriveConstants::kLeftEncoderPorts[1]};
+  frc::Encoder m_leftEncoder{DriveConstants::kLeftEncoderPorts[0],
+                             DriveConstants::kLeftEncoderPorts[1]};
 
-  frc::Encoder m_rightEncoder{
-    DriveConstants::kLeftEncoderPorts[0],
-    DriveConstants::kLeftEncoderPorts[1]};
+  frc::Encoder m_rightEncoder{DriveConstants::kLeftEncoderPorts[0],
+                              DriveConstants::kLeftEncoderPorts[1]};
 
   frc::AnalogInput m_rangefinder{DriveConstants::kRangeFinderPort};
   frc::AnalogGyro m_gyro{DriveConstants::kAnalogGyroPort};
