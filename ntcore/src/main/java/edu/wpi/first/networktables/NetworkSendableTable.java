@@ -18,9 +18,7 @@ import edu.wpi.first.util.struct.StructBuffer;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
@@ -649,10 +647,9 @@ public class NetworkSendableTable implements SendableTable {
     // TODO
   }
 
-  @SuppressWarnings("resource")
   @Override
-  public <T> SendableTable addSendable(String name, T obj, Sendable<T> sendable) {
-    NetworkSendableTable child = m_tables.computeIfAbsent(name, k -> new NetworkSendableTable(m_inst, m_pathWithSep + name));
+  public <T> NetworkSendableTable addSendable(String name, T obj, Sendable<T> sendable) {
+    NetworkSendableTable child = getChild(name);
     if (child.m_closeSendable == null) {
       sendable.initSendable(obj, child);
       child.m_closeSendable = table -> { sendable.closeSendable(obj, table); };
@@ -662,17 +659,17 @@ public class NetworkSendableTable implements SendableTable {
 
   @SuppressWarnings("resource")
   @Override
-  public SendableTable getChild(String name) {
+  public NetworkSendableTable getChild(String name) {
     return m_tables.computeIfAbsent(name, k -> new NetworkSendableTable(m_inst, m_pathWithSep + name));
   }
 
   @Override
-  public void setPublishOptions(SendableOption... options) {
+  public void setPublishOptions(String name, SendableOption... options) {
     // TODO
   }
 
   @Override
-  public void setSubscribeOptions(SendableOption... options) {
+  public void setSubscribeOptions(String name, SendableOption... options) {
     // TODO
   }
 
