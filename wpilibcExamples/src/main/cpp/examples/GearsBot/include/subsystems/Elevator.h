@@ -57,11 +57,11 @@ class Elevator : public frc2::PIDSubsystem {
       ElevatorConstants::kPotentiometerPort};  // Defaults to meters
 #endif
 
-  double kP_real = ElevatorConstants::kP_real;
-  double kI_real = ElevatorConstants::kI_real;
+  static constexpr double kP_real = ElevatorConstants::kP_real;
+  static constexpr double kI_real = ElevatorConstants::kI_real;
 
-  double kP_simulation = ElevatorConstants::kP_simulation;
-  double kI_simulation = ElevatorConstants::kI_simulation;
+  static constexpr double kP_simulation = ElevatorConstants::kP_simulation;
+  static constexpr double kI_simulation = ElevatorConstants::kI_simulation;
 
-  double kD = ElevatorConstants::kD;
+  static constexpr double kD = ElevatorConstants::kD;
 };

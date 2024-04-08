@@ -54,7 +54,7 @@ class Wrist : public frc2::PIDSubsystem {
       WristConstants::kPotentiometerPort};  // Defaults to degrees
 #endif
 
-  double kP = WristConstants::kP;
-  double kI = WristConstants::kI;
-  double kD = WristConstants::kD;
+  static constexpr double kP = WristConstants::kP;
+  static constexpr double kI = WristConstants::kI;
+  static constexpr double kD = WristConstants::kD;
 };
