@@ -276,9 +276,9 @@ public interface SendableTable extends AutoCloseable {
 
   SendableTable getChild(String name);
 
-  void setPublishOptions(SendableOption... options);
+  void setPublishOptions(String name, SendableOption... options);
 
-  void setSubscribeOptions(SendableOption... options);
+  void setSubscribeOptions(String name, SendableOption... options);
 
   /**
    * Gets the current value of a property (as a JSON string).
