@@ -43,7 +43,7 @@ inline constexpr int kRangeFinderPort = 6;
 inline constexpr int kAnalogGyroPort = 1;
 
 inline constexpr int kEncoderCPR = 1024;
-inline constexpr int kWheelDiameterMeters = 0.15;
+inline constexpr double kWheelDiameterMeters = 0.15;
 inline constexpr double kEncoderDistancePerPulse =
     // Assumes the encoders are directly mounted on the wheel shafts
     (kWheelDiameterMeters * std::numbers::pi) /
