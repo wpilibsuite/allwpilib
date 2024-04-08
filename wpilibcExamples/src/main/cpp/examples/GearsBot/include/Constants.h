@@ -65,7 +65,7 @@ inline constexpr double kD = 0.0;
 
 inline constexpr double kTolerance = 2.5;
 
-inline constexpr double kPotentiometerPort = 3;
+inline constexpr int kPotentiometerPort = 3;
 }  // namespace WristConstants
 
 namespace ElevatorConstants {
