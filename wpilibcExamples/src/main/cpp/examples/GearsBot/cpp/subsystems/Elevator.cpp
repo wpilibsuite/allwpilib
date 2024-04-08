@@ -8,7 +8,11 @@
 #include <frc/livewindow/LiveWindow.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 
-Elevator::Elevator() : frc2::PIDSubsystem{m_PIDcontroller} {
+Elevator::Elevator()
+    : frc2::PIDSubsystem{frc::PIDController{kP_real, kI_real, kD}} {
+#ifdef SIMULATION
+  GetPIDController()->SetPID(kP_simulation, kI_simulation, kD, 0);
+#endif
   m_controller.SetTolerance(ElevatorConstants::kTolerance);
 
   SetName("Elevator");
