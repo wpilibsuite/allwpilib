@@ -207,6 +207,10 @@ public class DataLogSendableTable implements SendableTable {
       return true;
     }
 
+    void setRaw(byte[] value) {
+      setRaw(value, 0, value.length);
+    }
+
     void setRaw(byte[] value, int start, int len) {
       if (type != DataType.kRaw && type != DataType.kStruct && type != DataType.kProtobuf) {
         return;
@@ -218,6 +222,11 @@ public class DataLogSendableTable implements SendableTable {
       rawValue = new byte[len];
       System.arraycopy(value, start, rawValue, 0, len);
       log.appendRaw(entry, value, start, len, 0);
+    }
+
+    void setRaw(ByteBuffer value) {
+      int pos = value.position();
+      setRaw(value, pos, value.limit() - pos);
     }
 
     void setRaw(ByteBuffer value, int start, int len) {
@@ -504,7 +513,7 @@ public class DataLogSendableTable implements SendableTable {
 
   @Override
   public <T> void setProtobuf(String name, T value, Protobuf<T, ?> proto) {
-    EntryData td = start(name, proto.getTypeString(), DataType.kStruct);
+    EntryData td = start(name, proto.getTypeString(), DataType.kProtobuf);
     if (td.protobufBuffer == null) {
       td.protobufBuffer = ProtobufBuffer.create(proto);
       addSchema(proto);
@@ -595,38 +604,32 @@ public class DataLogSendableTable implements SendableTable {
 
   @Override
   public <T> void publishStruct(String name, Struct<T> struct, Supplier<T> supplier) {
-    EntryData td = getEntryData(name);
-    if (td.publisher == null) {
-      td.publisher = td.topic.genericPublish(struct.getTypeString(), td.options);
-      addSchema(struct);
-    }
+    EntryData td = start(name, struct.getTypeString(), DataType.kStruct);
     if (td.structBuffer == null) {
       td.structBuffer = StructBuffer.create(struct);
+      addSchema(struct);
     } else if (td.structBuffer.getStruct() != struct) {
       return;
     }
     @SuppressWarnings("unchecked")
     final StructBuffer<T> buf = ((StructBuffer<T>) td.structBuffer);
-    td.polledUpdate = pub -> { pub.setRaw(buf.write(supplier.get())); };
+    td.polledUpdate = entry -> { entry.setRaw(buf.write(supplier.get())); };
   }
 
   @Override
   public <T> void publishProtobuf(String name, Protobuf<T, ?> proto, Supplier<T> supplier) {
-    EntryData td = getEntryData(name);
-    if (td.publisher == null) {
-      td.publisher = td.topic.genericPublish(proto.getTypeString(), td.options);
-      addSchema(proto);
-    }
+    EntryData td = start(name, proto.getTypeString(), DataType.kProtobuf);
     if (td.protobufBuffer == null) {
       td.protobufBuffer = ProtobufBuffer.create(proto);
+      addSchema(proto);
     } else if (td.protobufBuffer.getProto() != proto) {
       return;
     }
     @SuppressWarnings("unchecked")
-    final ProtobufBuffer<T, ?> buf = ((ProtobufBuffer<T, ?>) td.protobufBuffer);
-    td.polledUpdate = pub -> {
+    ProtobufBuffer<T, ?> buf = ((ProtobufBuffer<T, ?>) td.protobufBuffer);
+    td.polledUpdate = entry -> {
       try {
-        pub.setRaw(buf.write(supplier.get()));
+        entry.setRaw(buf.write(supplier.get()));
       } catch (IOException e) {
         return; // ignore
       }
@@ -844,7 +847,7 @@ public class DataLogSendableTable implements SendableTable {
    */
   @Override
   public String getProperty(String name, String propName) {
-    // TODO
+    return "null"; // TODO
   }
 
   /**
@@ -880,7 +883,7 @@ public class DataLogSendableTable implements SendableTable {
    */
   @Override
   public String getProperties(String name) {
-    // TODO
+    return "{}"; // TODO
   }
 
   /**
