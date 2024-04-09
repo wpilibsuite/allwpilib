@@ -35,6 +35,7 @@ target_link_libraries(wpilibc PUBLIC hal ntcore wpimath wpiutil)
 set_property(TARGET wpilibc PROPERTY FOLDER "libraries")
 
 install(TARGETS wpilibc EXPORT wpilibc)
+export(TARGETS wpilibc FILE wpilibc.cmake NAMESPACE wpilibc::)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpilibc")
 
 configure_file(wpilibc-config.cmake.in ${WPILIB_BINARY_DIR}/wpilibc-config.cmake)

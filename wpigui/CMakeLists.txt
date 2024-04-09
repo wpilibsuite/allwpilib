@@ -46,4 +46,5 @@ wpilib_target_warnings(wpiguidev)
 target_link_libraries(wpiguidev wpigui)
 
 install(TARGETS wpigui EXPORT wpigui)
+export(TARGETS wpigui FILE wpigui.cmake NAMESPACE wpigui::)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpigui")

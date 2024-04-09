@@ -77,6 +77,7 @@ if(WITH_JAVA)
     add_dependencies(apriltagjni apriltag_jar)
 
     install(TARGETS apriltagjni EXPORT apriltagjni)
+    export(TARGETS apriltagjni FILE apriltagjni.cmake NAMESPACE apriltagjni::)
 endif()
 
 if(WITH_JAVA_SOURCE)
@@ -137,6 +138,7 @@ target_include_directories(
 )
 
 install(TARGETS apriltag EXPORT apriltag)
+export(TARGETS apriltag FILE apriltag.cmake NAMESPACE apriltag::)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/apriltag")
 
 configure_file(apriltag-config.cmake.in ${WPILIB_BINARY_DIR}/apriltag-config.cmake)
