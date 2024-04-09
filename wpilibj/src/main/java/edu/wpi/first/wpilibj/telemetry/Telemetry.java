@@ -4,6 +4,8 @@
 
 package edu.wpi.first.wpilibj.telemetry;
 
+import edu.wpi.first.networktables.NetworkSendableTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.function.BooleanConsumer;
 import edu.wpi.first.util.function.FloatConsumer;
 import edu.wpi.first.util.function.FloatSupplier;
@@ -26,6 +28,10 @@ import java.util.function.Supplier;
 public class Telemetry {
   /** The {@link SendableTable} used by {@link Telemetry}. */
   private static SendableTable table;
+
+  static {
+    table = new NetworkSendableTable(NetworkTableInstance.getDefault(), "/telemetry");
+  }
 
   private Telemetry() {
     throw new UnsupportedOperationException("This is a utility class!");
