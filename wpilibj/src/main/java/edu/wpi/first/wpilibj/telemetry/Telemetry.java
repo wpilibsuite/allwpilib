@@ -333,12 +333,12 @@ public class Telemetry {
     return getTable().getChild(name);
   }
 
-  public static void setPublishOptions(SendableOption... options) {
-    getTable().setPublishOptions(options);
+  public static void setPublishOptions(String name, SendableOption... options) {
+    getTable().setPublishOptions(name, options);
   }
 
-  public static void setSubscribeOptions(SendableOption... options) {
-    getTable().setSubscribeOptions(options);
+  public static void setSubscribeOptions(String name, SendableOption... options) {
+    getTable().setSubscribeOptions(name, options);
   }
 
   /**
