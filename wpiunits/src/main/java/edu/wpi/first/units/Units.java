@@ -279,12 +279,10 @@ public final class Units {
    */
   public static final Voltage Millivolt = Millivolts; // alias
 
-  /**
-   * 1/12 of a {@link #Volt}.
-   */
-  public static final Voltage DutyCycle = 
+  /** 1/12 of a {@link #Volt}. */
+  public static final Voltage DutyCycle =
       derive(Volt).splitInto(12).named("DutyCycle").make(); // alias
-  
+
   // Current
   /** The base unit of electrical current. */
   public static final Current Amps = BaseUnits.Current;
