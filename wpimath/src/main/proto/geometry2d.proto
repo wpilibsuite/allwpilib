@@ -28,3 +28,9 @@ message ProtobufTwist2d {
   double dy = 2;
   double dtheta = 3;
 }
+
+message ProtobufRectangle2d {
+  ProtobufPose2d center = 1;
+  double width = 2;
+  double height = 3;
+}
