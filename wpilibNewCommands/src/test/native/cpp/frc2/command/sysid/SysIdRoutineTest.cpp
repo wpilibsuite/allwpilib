@@ -75,7 +75,7 @@ class SysIdRoutineTest : public ::testing::Test {
 
   frc2::sysid::SysIdRoutine m_emptySysidRoutine{
       frc2::sysid::Config{std::nullopt, std::nullopt, std::nullopt, nullptr},
-      frc2::sysid::Mechanism{[this](units::volt_t driveVoltage) {}, nullptr,
+      frc2::sysid::Mechanism{[](units::volt_t driveVoltage) {}, nullptr,
                              &m_subsystem}};
 
   frc2::CommandPtr m_emptyRoutineForward{
