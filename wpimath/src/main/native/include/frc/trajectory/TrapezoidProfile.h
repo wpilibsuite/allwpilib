@@ -115,9 +115,9 @@ class TrapezoidProfile {
   [[deprecated(
       "Pass the desired and current state into calculate instead of "
       "constructing a new TrapezoidProfile with the desired and current "
-      "state")]]
-  TrapezoidProfile(Constraints constraints, State goal,
-                   State initial = State{Distance_t{0}, Velocity_t{0}});
+      "state")]] TrapezoidProfile(Constraints constraints, State goal,
+                                  State initial = State{Distance_t{0},
+                                                        Velocity_t{0}});
 
   TrapezoidProfile(const TrapezoidProfile&) = default;
   TrapezoidProfile& operator=(const TrapezoidProfile&) = default;

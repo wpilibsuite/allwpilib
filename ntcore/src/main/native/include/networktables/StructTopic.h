@@ -180,8 +180,7 @@ class StructSubscriber : public Subscriber {
 
  private:
   ValueType m_defaultValue;
-  [[no_unique_address]]
-  std::tuple<I...> m_info;
+  [[no_unique_address]] std::tuple<I...> m_info;
 };
 
 /**
@@ -302,8 +301,7 @@ class StructPublisher : public Publisher {
 
  private:
   std::atomic_bool m_schemaPublished{false};
-  [[no_unique_address]]
-  std::tuple<I...> m_info;
+  [[no_unique_address]] std::tuple<I...> m_info;
 };
 
 /**
@@ -524,8 +522,7 @@ class StructTopic final : public Topic {
   }
 
  private:
-  [[no_unique_address]]
-  std::tuple<I...> m_info;
+  [[no_unique_address]] std::tuple<I...> m_info;
 };
 
 }  // namespace nt

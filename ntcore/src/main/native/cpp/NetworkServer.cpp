@@ -323,7 +323,8 @@ NetworkServer::NetworkServer(std::string_view persistentFilename,
     HandleLocal();
 
     // load persistent file first, then initialize
-    uv::QueueWork(m_loop, [this] { LoadPersistent(); }, [this] { Init(); });
+    uv::QueueWork(
+        m_loop, [this] { LoadPersistent(); }, [this] { Init(); });
   });
 }
 

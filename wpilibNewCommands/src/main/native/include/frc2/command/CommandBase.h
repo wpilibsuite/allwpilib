@@ -17,7 +17,6 @@ namespace frc2 {
  */
 class [[deprecated("Use Command instead")]] CommandBase : public Command {
  protected:
-  [[deprecated("Use Command instead")]]
-  CommandBase();
+  [[deprecated("Use Command instead")]] CommandBase();
 };
 }  // namespace frc2

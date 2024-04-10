@@ -67,10 +67,11 @@ class TrapezoidProfileCommand
    */
   [[deprecated(
       "The new constructor allows you to pass in a supplier for desired and "
-      "current state. This allows you to change goals at runtime.")]]
-  TrapezoidProfileCommand(frc::TrapezoidProfile<Distance> profile,
-                          std::function<void(State)> output,
-                          Requirements requirements = {})
+      "current state. This allows you to change goals at "
+      "runtime.")]] TrapezoidProfileCommand(frc::TrapezoidProfile<Distance>
+                                                profile,
+                                            std::function<void(State)> output,
+                                            Requirements requirements = {})
       : m_profile(profile), m_output(output) {
     this->AddRequirements(requirements);
     m_newAPI = false;
