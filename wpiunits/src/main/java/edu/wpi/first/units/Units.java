@@ -246,7 +246,7 @@ public final class Units {
 
   // Moment of Inertia
   /** The base SI unit for moment of inertia. */
-  public static final Mult<Mult<Mass, Distance>, Distance> KilogramsMetersSquared =
+  public static final Mult<Mult<Mass, Distance>, Distance> KilogramSquareMeters =
       Kilograms.mult(Meters).mult(Meters);
 
   // Unitless
@@ -279,6 +279,12 @@ public final class Units {
    */
   public static final Voltage Millivolt = Millivolts; // alias
 
+  /**
+   * 1/12 of a {@link #Volt}.
+   */
+  public static final Voltage DutyCycle = 
+      derive(Volt).splitInto(12).named("DutyCycle").make(); // alias
+  
   // Current
   /** The base unit of electrical current. */
   public static final Current Amps = BaseUnits.Current;
