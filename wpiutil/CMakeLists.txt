@@ -83,6 +83,7 @@ if(WITH_JAVA)
     add_dependencies(wpiutiljni wpiutil_jar)
 
     install(TARGETS wpiutiljni EXPORT wpiutiljni)
+    export(TARGETS wpiutiljni FILE wpiutiljni.cmake NAMESPACE wpiutiljni::)
 endif()
 
 if(WITH_JAVA_SOURCE)
@@ -258,6 +259,7 @@ target_include_directories(
 )
 
 install(TARGETS wpiutil EXPORT wpiutil)
+export(TARGETS wpiutil FILE wpiutil.cmake NAMESPACE wpiutil::)
 
 configure_file(wpiutil-config.cmake.in ${WPILIB_BINARY_DIR}/wpiutil-config.cmake)
 install(FILES ${WPILIB_BINARY_DIR}/wpiutil-config.cmake DESTINATION share/wpiutil)

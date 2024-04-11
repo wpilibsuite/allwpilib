@@ -73,6 +73,7 @@ target_link_libraries(cameraserver PUBLIC ntcore cscore wpiutil ${OpenCV_LIBS})
 set_property(TARGET cameraserver PROPERTY FOLDER "libraries")
 
 install(TARGETS cameraserver EXPORT cameraserver)
+export(TARGETS cameraserver FILE cameraserver.cmake NAMESPACE cameraserver::)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/cameraserver")
 
 configure_file(cameraserver-config.cmake.in ${WPILIB_BINARY_DIR}/cameraserver-config.cmake)
