@@ -23,7 +23,7 @@ public class Rectangle2dStructTest {
 
   @Test
   void testRoundtrip() {
-    ByteBuffer buffer = ByteBuffer.allocate(Rotation2d.struct.getSize());
+    ByteBuffer buffer = ByteBuffer.allocate(Rectangle2d.struct.getSize());
     buffer.order(ByteOrder.LITTLE_ENDIAN);
     Rectangle2d.struct.pack(buffer, DATA);
     buffer.rewind();
