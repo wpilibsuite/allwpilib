@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package edu.wpi.first.math.geometry;
 
 import java.util.Objects;
@@ -133,33 +137,13 @@ public class Rectangle2d implements ProtobufSerializable, StructSerializable {
   }
 
   /**
-   * Checks if a point is contained within this rectangle. 
-   * This is exclusive, if the point lies on the perimeter it will return {@code false}.
-   * 
-   * @param point The point to check.
-   * @return True, if this rectangle contains the point.
-   */
-  public boolean containsPointExclusive(Translation2d point) {
-    // Rotate the point around the inverse of the rectangle's rotation
-    point = point.rotateAround(m_center.getTranslation(), m_center.getRotation().unaryMinus());
-    
-    // Check if within bounding box
-    return (
-      point.getX() > (m_center.getX() - m_width/2.0) && 
-      point.getX() < (m_center.getX() + m_width/2.0) &&
-      point.getY() > (m_center.getY() - m_height/2.0) &&
-      point.getY() < (m_center.getY() + m_height/2.0)
-    );
-  }
-
-  /**
    * Checks if a point is contained within this rectangle.
    * This is inclusive, if the point lies on the perimeter it will return {@code true}.
    * 
    * @param point The point to check.
    * @return True, if this rectangle contains the point or the perimeter intersects the point.
    */
-  public boolean containsPointInclusive(Translation2d point) {
+  public boolean containsPoint(Translation2d point) {
     // Rotate the point around the inverse of the rectangle's rotation
     point = point.rotateAround(m_center.getTranslation(), m_center.getRotation().unaryMinus());
     
@@ -179,19 +163,19 @@ public class Rectangle2d implements ProtobufSerializable, StructSerializable {
    * @return The distance (0, if the point is on the perimeter or contained by the rectangle)
    */
   public double distanceToPoint(Translation2d point) {
-    if (containsPointInclusive(point)) return 0.0;
+    if (containsPoint(point)) return 0.0;
 
     // Rotate the point around the inverse of the rectangle's rotation
     point = point.rotateAround(m_center.getTranslation(), m_center.getRotation().unaryMinus());
 
     // Find x and y distances
     double dx = 
-      Math.max(m_center.getX() - m_width - point.getX(), 
-      Math.max(0.0, point.getX() - m_center.getX() + m_width));
+      Math.max(m_center.getX() - (m_width/2.0) - point.getX(), 
+      Math.max(0.0, point.getX() - m_center.getX() - (m_width/2.0)));
 
     double dy = 
-      Math.max(m_center.getY() - m_height - point.getY(), 
-      Math.max(0.0, point.getY() - m_center.getY() + m_height));
+      Math.max(m_center.getY() - (m_height/2.0) - point.getY(), 
+      Math.max(0.0, point.getY() - m_center.getY() - (m_height/2.0)));
 
     // Distance formula
     return Math.sqrt(dx*dx + dy*dy);
@@ -205,7 +189,7 @@ public class Rectangle2d implements ProtobufSerializable, StructSerializable {
    */
   public Translation2d findNearestPoint(Translation2d point) {
     // Check if already in rectangle
-    if (containsPointInclusive(point)) return new Translation2d(point.getX(), point.getY());
+    if (containsPoint(point)) return new Translation2d(point.getX(), point.getY());
 
     // Rotate the point around the inverse of the rectangle's rotation
     point = point.rotateAround(m_center.getTranslation(), m_center.getRotation().unaryMinus());
