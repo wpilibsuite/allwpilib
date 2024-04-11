@@ -1,4 +1,4 @@
-package edu.wpi.first.wpilibj2.command;
+package edu.wpi.first.wpilibj3.command.async;
 
 @FunctionalInterface
 public interface ThrowingRunnable {

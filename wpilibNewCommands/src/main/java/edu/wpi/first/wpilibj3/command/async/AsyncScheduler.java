@@ -1,10 +1,18 @@
-package edu.wpi.first.wpilibj2.command.async;
+package edu.wpi.first.wpilibj3.command.async;
 
+import static edu.wpi.first.units.Units.Milliseconds;
+import static edu.wpi.first.units.Units.Seconds;
+
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Time;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.wpilibj.event.EventLoop;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -13,20 +21,35 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.stream.Collectors;
 
 public class AsyncScheduler {
+  /**
+   * The default update period of async commands is 20 milliseconds by convention.
+   */
+  public static final Measure<Time> DEFAULT_UPDATE_PERIOD = Milliseconds.of(20);
+
+  private final Map<AsyncCommand, Throwable> errors = new HashMap<>();
   private final Map<Resource, AsyncCommand> runningCommands = new HashMap<>();
   private final Map<Resource, AsyncCommand> defaultCommands = new HashMap<>();
   private final Map<AsyncCommand, Future<?>> futures = new HashMap<>();
+  private final EventLoop eventLoop = new EventLoop();
 
-  private final ThreadFactory factory = Thread.ofVirtual().name("async-commands").factory();
-  private final ExecutorService service = Executors.newSingleThreadExecutor(factory);
+  // NOTE: This requires the jdk.virtualThreadScheduler.parallelism system property to be set to 1!
+  //       If it is not set, or is set to a value > 1, then commands may be scheduled - at random -
+  //       to run on different threads, with all the race condition and resource contention problems
+  //       that entails. BE SURE TO SET `-Djdk.virtualThreadScheduler.parallelism=1` WHEN RUNNING A
+  //       ROBOT PROGRAM.
+  private final ThreadFactory factory = Thread.ofVirtual().name("async-commands-runner-", 1).factory();
+  // Use a cached thread pool so we can guarantee one virtual thread per command
+  // When commands complete, their virtual threads will be reused by later commands
+  private final ExecutorService service = Executors.newCachedThreadPool(factory);
 
   private static final AsyncScheduler defaultScheduler = new AsyncScheduler();
 
   private final ReadWriteLock lock = new ReentrantReadWriteLock();
 
-  public static AsyncScheduler getDefault() {
+  public static AsyncScheduler getInstance() {
     return defaultScheduler;
   }
 
@@ -35,7 +58,6 @@ public class AsyncScheduler {
   }
 
   public void registerResource(Resource resource, AsyncCommand defaultCommand) {
-    runningCommands.put(resource, defaultCommand);
     defaultCommands.put(resource, defaultCommand);
     schedule(defaultCommand);
   }
@@ -55,20 +77,19 @@ public class AsyncScheduler {
     cancel(oldDefaultCommand);
   }
 
+  public AsyncCommand getDefaultCommand(Resource resource) {
+    return defaultCommands.get(resource);
+  }
+
   /**
    * Schedules a command to run. The command will execute in a virtual thread; its status may be
-   * checked later with {@link #isRunning(AsyncCommand)}. Scheduling will fail if the command is
-   * already running or has a lower priority than a currently running command using one or more of
-   * the same resources.
+   * checked later with {@link #isRunning(AsyncCommand)}. Scheduling will fail if the command has a
+   * lower priority than a currently running command using one or more of the same resources.
    *
    * @param command the command to schedule
    */
   public void schedule(AsyncCommand command) {
     System.out.println("Attempting to schedule " + command);
-    if (isRunning(command)) {
-      // Already running, don't bother rescheduling
-      return;
-    }
 
     // Don't schedule if a required resource is currently running a higher priority command
     for (Resource resource : command.requirements()) {
@@ -81,22 +102,27 @@ public class AsyncScheduler {
       System.out.println("  Resource " + resource + " is available");
     }
 
-    // cancel the currently scheduled command for each required resource and schedule the incoming
-    // command over them
-    for (Resource resource : command.requirements()) {
-      var runningCommand = runningCommands.get(resource);
-      if (runningCommand != null) {
-        System.out.println(
-            "  Cancelling running command "
-                + runningCommand
-                + " on " + resource.getName()
-                + " due to precedence of " + command);
-        cancel(runningCommand);
-      }
-      runningCommands.put(resource, command);
-    }
-
     Util.writing(lock, () -> {
+      // cancel the currently scheduled command for each required resource and schedule the incoming
+      // command over them
+      for (Resource resource : command.requirements()) {
+        var runningCommand = runningCommands.get(resource);
+
+        // Add to the running commands before we've technically scheduled it
+        // Cancelling a command will schedule default commands (which we don't want!) if the
+        // cancelled command is still mapped to a resource
+        runningCommands.put(resource, command);
+
+        if (runningCommand != null) {
+          System.out.println(
+              "  Cancelling running command "
+                  + runningCommand
+                  + " on " + resource.getName()
+                  + " due to precedence of " + command);
+          cancel(runningCommand);
+        }
+      }
+
       // schedule the command to run on a virtual thread, automatically scheduling the default
       // commands for all its required resources when it completes
       var futureRef = new AtomicReference<Future<?>>(null);
@@ -109,8 +135,39 @@ public class AsyncScheduler {
     });
   }
 
-  private Callable<Object> fn(AsyncCommand command, AtomicReference<Future<?>> futureRef) {
+  /**
+   * Checks for errors that have been thrown by the asynchronous commands. This will clear the
+   * cached errors, and any errors were present, those errors will immediately be rethrown
+   */
+  public void checkForErrors() {
+    var errors = Util.writing(lock, () -> {
+      var copy = Map.copyOf(this.errors);
+      this.errors.clear();
+      return copy;
+    });
+    if (errors.isEmpty()) {
+      // No errors, all good
+      return;
+    }
+    if (errors.size() == 1) {
+      // Just a single error, wrap and rethrow that on its own
+      var e = errors.entrySet().iterator().next();
+      throw new CommandExecutionException(e.getKey(), e.getValue());
+    }
+
+    // Multiple errors were thrown since the last check, wrap them all in a MultiException and throw
+    // that
+    var multi = new MultiException();
+    errors.forEach((command, error) -> {
+      multi.add(new CommandExecutionException(command, error));
+    });
+    throw multi;
+  }
+
+  private Callable<?> fn(AsyncCommand command, AtomicReference<Future<?>> futureRef) {
     return () -> {
+      System.out.println("Starting command " + command);
+
       try {
         command.run();
         System.out.println(command + " completed naturally");
@@ -120,20 +177,42 @@ public class AsyncScheduler {
           System.out.println(command + " was cancelled during execution");
         } else {
           System.out.println(command + " encountered an error during execution: " + e);
+          Util.writing(lock, () -> {
+            errors.put(command, e);
+          });
         }
         throw e;
       } finally {
-        System.out.println("Cleaning up after " + command + " completion/termination");
-        Util.writing(lock, () -> futures.remove(command, futureRef.get()));
-        command.requirements().forEach(resource -> {
-          runningCommands.remove(resource, command);
-          scheduleDefault(resource);
+        Util.writing(lock, () -> {
+          var currentMappedFuture = futures.get(command);
+          var expectedFuture = futureRef.get();
+          if (isRunning(command)) {
+            System.out.println("Cleaning up after " + command + " completion/termination");
+            Util.writing(lock, () -> {
+              System.out.println("  Lock acquired, cleaning up");
+              futures.remove(command);
+              command.requirements().forEach(resource -> {
+                runningCommands.remove(resource, command);
+                scheduleDefault(resource);
+              });
+            });
+            System.out.println("  Cleaned up after " + command);
+          } else {
+            System.out.println("The expected future was not running; not cleaning up after " + command + ". Expected " + expectedFuture + ", got " + currentMappedFuture);
+          }
         });
       }
     };
   }
 
-  public void await(AsyncCommand command) throws Exception {
+  /**
+   * Waits for a command to complete. This will block until the command has completed or been
+   * interrupted or cancelled by another command. Does nothing if the given command is not
+   * scheduled.
+   * @param command the command to wait for.
+   * @throws ExecutionException if the command encountered an error while it was executing
+   */
+  public void await(AsyncCommand command) throws ExecutionException {
     var future = Util.reading(lock, () -> futures.get(command));
     if (future == null) {
       // not currently running, nothing to await
@@ -169,8 +248,11 @@ public class AsyncScheduler {
         futures.remove(command, future);
 
         command.requirements().forEach(resource -> {
-          runningCommands.remove(resource, command);
-          scheduleDefault(resource);
+          if (runningCommands.remove(resource, command)) {
+            // If the currently running command for this resource is the one we just cancelled,
+            // we can schedule its default command
+            scheduleDefault(resource);
+          }
         });
       }
     });
@@ -222,8 +304,20 @@ public class AsyncScheduler {
     return runningCommands.get(resource);
   }
 
-  public void schedule(Group<AsyncCommand> group) {
-    schedule(AsyncCommand.noHardware(() -> {
+  public void schedule(Group group) {
+    var resources =
+        group.stages()
+            .stream()
+            .flatMap(s -> s.commands().stream())
+            .flatMap(c -> c.requirements().stream())
+            .distinct()
+            .map(Resource::getName)
+            .collect(Collectors.joining(",", "[", "]"));
+
+    // Because a group is only a bag of data with no logic, build a command that will run the
+    // commands in the group and schedule that command.
+    var groupWrapper = AsyncCommand.noHardware(() -> {
+      System.out.println("Starting up group");
       int stageNum = 0;
       for (var stage : group.stages()) {
         stageNum++;
@@ -234,15 +328,11 @@ public class AsyncScheduler {
             scope.fork(command);
           }
 
-          if (stage.getTimeout() == null) {
-            scope.join().throwIfError();
-          } else {
-            try {
-              scope.joinWithTimeout(stage.getTimeout()).throwIfError();
-            } catch (TimeoutException e) {
-              // just means the maximum execution time was reached
-              System.out.println("Scope timed out after " + stage.getTimeout().toShortString() + " for stage " + stageNum);
-            }
+          try {
+            scope.joinWithTimeout(stage.getTimeout()).throwIfError();
+          } catch (TimeoutException e) {
+            // just means the maximum execution time was reached
+            System.out.println("Scope timed out after " + stage.getTimeout().toShortString() + " for stage " + stageNum);
           }
         } finally {
           // cancel any still-running commands
@@ -250,7 +340,13 @@ public class AsyncScheduler {
           stage.commands().forEach(this::cancel);
         }
       }
-    }));
+    }).named("Anonymous Group on " + resources);
+
+    schedule(groupWrapper);
+  }
+
+  public EventLoop getDefaultButtonLoop() {
+    return eventLoop;
   }
 
   /**
@@ -272,6 +368,7 @@ public class AsyncScheduler {
       return Set.of(resource);
     }
 
+    @Override
     public String name() {
       return resource.getName() + "[IDLE]";
     }

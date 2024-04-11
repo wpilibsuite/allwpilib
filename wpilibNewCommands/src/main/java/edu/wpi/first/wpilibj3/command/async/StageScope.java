@@ -1,4 +1,4 @@
-package edu.wpi.first.wpilibj2.command.async;
+package edu.wpi.first.wpilibj3.command.async;
 
 import static edu.wpi.first.units.Units.Seconds;
 

@@ -1,6 +1,6 @@
-package edu.wpi.first.wpilibj2.command.async;
+package edu.wpi.first.wpilibj3.command.async;
 
-record ComposedEndCondition(EndCondition a, EndCondition b, Op op)
+public record ComposedEndCondition(EndCondition a, EndCondition b, Op op)
     implements EndCondition {
   @FunctionalInterface
   interface Op {
