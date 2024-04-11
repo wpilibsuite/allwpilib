@@ -66,16 +66,6 @@ public class Rectangle2d implements ProtobufSerializable, StructSerializable {
   }
 
   /**
-   * Transforms the center of the rectangle and returns the new rectangle.
-   * 
-   * @param other The transform to transform by.
-   * @return The transformed rectangle
-   */
-  public Rectangle2d transformBy(Transform2d other) {
-    return new Rectangle2d(m_center.transformBy(other), m_width, m_height);
-  }
-
-  /**
    * Returns the center of the rectangle.
    * 
    * @return The center of the rectangle.
@@ -112,13 +102,23 @@ public class Rectangle2d implements ProtobufSerializable, StructSerializable {
   }
 
   /**
+   * Transforms the center of the rectangle and returns the new rectangle.
+   * 
+   * @param other The transform to transform by.
+   * @return The transformed rectangle
+   */
+  public Rectangle2d transformBy(Transform2d other) {
+    return new Rectangle2d(m_center.transformBy(other), m_width, m_height);
+  }
+
+  /**
    * Checks if a point is intersected by this rectangle's perimeter.
    * 
    * @param point The point to check.
    * @return True, if this rectangle's perimeter intersects the point.
    */
   public boolean intersectsPoint(Translation2d point) {
-    // Rotate the point around the inverse of the rectangle's rotation
+    // Rotate the point by the inverse of the rectangle's rotation
     point = point.rotateAround(m_center.getTranslation(), m_center.getRotation().unaryMinus());
 
     // Half of width and height
@@ -144,7 +144,7 @@ public class Rectangle2d implements ProtobufSerializable, StructSerializable {
    * @return True, if this rectangle contains the point or the perimeter intersects the point.
    */
   public boolean containsPoint(Translation2d point) {
-    // Rotate the point around the inverse of the rectangle's rotation
+    // Rotate the point by the inverse of the rectangle's rotation
     point = point.rotateAround(m_center.getTranslation(), m_center.getRotation().unaryMinus());
     
     // Check if within bounding box
@@ -165,7 +165,7 @@ public class Rectangle2d implements ProtobufSerializable, StructSerializable {
   public double distanceToPoint(Translation2d point) {
     if (containsPoint(point)) return 0.0;
 
-    // Rotate the point around the inverse of the rectangle's rotation
+    // Rotate the point by the inverse of the rectangle's rotation
     point = point.rotateAround(m_center.getTranslation(), m_center.getRotation().unaryMinus());
 
     // Find x and y distances
@@ -191,7 +191,7 @@ public class Rectangle2d implements ProtobufSerializable, StructSerializable {
     // Check if already in rectangle
     if (containsPoint(point)) return new Translation2d(point.getX(), point.getY());
 
-    // Rotate the point around the inverse of the rectangle's rotation
+    // Rotate the point by the inverse of the rectangle's rotation
     point = point.rotateAround(m_center.getTranslation(), m_center.getRotation().unaryMinus());
   
     // Find nearest point
