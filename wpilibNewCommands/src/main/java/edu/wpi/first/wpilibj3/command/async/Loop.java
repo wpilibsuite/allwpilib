@@ -1,11 +1,10 @@
-package edu.wpi.first.wpilibj2.command.async;
+package edu.wpi.first.wpilibj3.command.async;
 
 import static edu.wpi.first.units.Units.Milliseconds;
 
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Time;
 import edu.wpi.first.util.ErrorMessages;
-import edu.wpi.first.wpilibj2.command.ThrowingRunnable;
 
 public class Loop {
   public Loop(ThrowingRunnable impl, EndCondition endCondition, Measure<Time> period) {
