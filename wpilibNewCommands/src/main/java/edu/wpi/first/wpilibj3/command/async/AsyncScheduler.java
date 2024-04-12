@@ -48,6 +48,23 @@ public class AsyncScheduler {
     return defaultScheduler;
   }
 
+  public AsyncScheduler() {
+    // Start polling the event loop in 20ms intervals
+    // This intentionally runs on the same carrier thread as commands so the boolean checks
+    // will be guaranteed to run on the same thread as the commands that manipulate state
+    service.submit(
+        () -> {
+          while (true) {
+            try {
+              Thread.sleep(20);
+              eventLoop.poll();
+            } catch (Exception e) {
+              // ignore and keep running
+            }
+          }
+        });
+  }
+
   public void registerResource(Resource resource) {
     registerResource(resource, new IdleCommand(resource));
   }
