@@ -38,6 +38,10 @@ public class ParallelGroup implements AsyncCommand {
     return new Builder(scheduler);
   }
 
+  public static Builder onDefaultScheduler() {
+    return onScheduler(AsyncScheduler.getInstance());
+  }
+
   @Override
   public void run() throws Exception {
     try (var scope = new StageScope<>(scheduler, requiredCommands)) {
