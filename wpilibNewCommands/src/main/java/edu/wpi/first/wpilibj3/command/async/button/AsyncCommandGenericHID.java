@@ -101,8 +101,8 @@ public class AsyncCommandGenericHID {
 
   /**
    * Constructs a Trigger instance based around the 45 degree angle (right up) of the default (index
-   * 0) POV on the HID, attached to {@link AsyncScheduler#getDefaultButtonLoop() the default
-   * command scheduler button loop}.
+   * 0) POV on the HID, attached to {@link AsyncScheduler#getDefaultButtonLoop() the default command
+   * scheduler button loop}.
    *
    * @return a Trigger instance based around the 45 degree angle of a POV on the HID.
    */
@@ -123,8 +123,8 @@ public class AsyncCommandGenericHID {
 
   /**
    * Constructs a Trigger instance based around the 135 degree angle (right down) of the default
-   * (index 0) POV on the HID, attached to {@link AsyncScheduler#getDefaultButtonLoop() the
-   * default command scheduler button loop}.
+   * (index 0) POV on the HID, attached to {@link AsyncScheduler#getDefaultButtonLoop() the default
+   * command scheduler button loop}.
    *
    * @return a Trigger instance based around the 135 degree angle of a POV on the HID.
    */
@@ -145,8 +145,8 @@ public class AsyncCommandGenericHID {
 
   /**
    * Constructs a Trigger instance based around the 225 degree angle (down left) of the default
-   * (index 0) POV on the HID, attached to {@link AsyncScheduler#getDefaultButtonLoop() the
-   * default command scheduler button loop}.
+   * (index 0) POV on the HID, attached to {@link AsyncScheduler#getDefaultButtonLoop() the default
+   * command scheduler button loop}.
    *
    * @return a Trigger instance based around the 225 degree angle of a POV on the HID.
    */
@@ -167,8 +167,8 @@ public class AsyncCommandGenericHID {
 
   /**
    * Constructs a Trigger instance based around the 315 degree angle (left up) of the default (index
-   * 0) POV on the HID, attached to {@link AsyncScheduler#getDefaultButtonLoop() the default
-   * command scheduler button loop}.
+   * 0) POV on the HID, attached to {@link AsyncScheduler#getDefaultButtonLoop() the default command
+   * scheduler button loop}.
    *
    * @return a Trigger instance based around the 315 degree angle of a POV on the HID.
    */
@@ -178,8 +178,8 @@ public class AsyncCommandGenericHID {
 
   /**
    * Constructs a Trigger instance based around the center (not pressed) position of the default
-   * (index 0) POV on the HID, attached to {@link AsyncScheduler#getDefaultButtonLoop() the
-   * default command scheduler button loop}.
+   * (index 0) POV on the HID, attached to {@link AsyncScheduler#getDefaultButtonLoop() the default
+   * command scheduler button loop}.
    *
    * @return a Trigger instance based around the center position of a POV on the HID.
    */

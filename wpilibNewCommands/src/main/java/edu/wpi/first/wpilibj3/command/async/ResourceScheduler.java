@@ -17,12 +17,9 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class ResourceScheduler {
-  public interface Res {
+  public interface Res {}
 
-  }
-
-  private record ExecutionData<V>(Res resource, Lock lock, Callable<V> task, Future<V> future) {
-  }
+  private record ExecutionData<V>(Res resource, Lock lock, Callable<V> task, Future<V> future) {}
 
   private final Set<Res> resources = new HashSet<>();
 
@@ -45,20 +42,25 @@ public class ResourceScheduler {
         data.future.cancel(true);
         try {
           data.future.get(10, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException | ExecutionException | CancellationException | TimeoutException e) {
+        } catch (InterruptedException
+            | ExecutionException
+            | CancellationException
+            | TimeoutException e) {
           // Couldn't schedule
           return Optional.empty();
         }
       }
 
-      var future = executor.submit(() -> {
-        data.lock.lockInterruptibly();
-        try {
-          return task.call();
-        } finally {
-          data.lock.unlock();
-        }
-      });
+      var future =
+          executor.submit(
+              () -> {
+                data.lock.lockInterruptibly();
+                try {
+                  return task.call();
+                } finally {
+                  data.lock.unlock();
+                }
+              });
 
       executionData.put(res, new ExecutionData<T>(res, data.lock, task, future));
       return Optional.of(future);
