@@ -261,8 +261,8 @@ public class AsyncCommandXboxController extends AsyncCommandGenericHID {
    * Constructs a Trigger instance around the axis value of the left trigger. The returned trigger
    * will be true when the axis value is greater than {@code threshold}.
    *
-   * @param threshold the minimum axis value for the returned {@link AsyncTrigger} to be true. This value
-   *     should be in the range [0, 1] where 0 is the unpressed state of the axis.
+   * @param threshold the minimum axis value for the returned {@link AsyncTrigger} to be true. This
+   *     value should be in the range [0, 1] where 0 is the unpressed state of the axis.
    * @param loop the event loop instance to attach the Trigger to.
    * @return a Trigger instance that is true when the left trigger's axis exceeds the provided
    *     threshold, attached to the given event loop
@@ -275,8 +275,8 @@ public class AsyncCommandXboxController extends AsyncCommandGenericHID {
    * Constructs a Trigger instance around the axis value of the left trigger. The returned trigger
    * will be true when the axis value is greater than {@code threshold}.
    *
-   * @param threshold the minimum axis value for the returned {@link AsyncTrigger} to be true. This value
-   *     should be in the range [0, 1] where 0 is the unpressed state of the axis.
+   * @param threshold the minimum axis value for the returned {@link AsyncTrigger} to be true. This
+   *     value should be in the range [0, 1] where 0 is the unpressed state of the axis.
    * @return a Trigger instance that is true when the left trigger's axis exceeds the provided
    *     threshold, attached to the {@link AsyncScheduler#getDefaultButtonLoop() default scheduler
    *     button loop}.
@@ -300,8 +300,8 @@ public class AsyncCommandXboxController extends AsyncCommandGenericHID {
    * Constructs a Trigger instance around the axis value of the right trigger. The returned trigger
    * will be true when the axis value is greater than {@code threshold}.
    *
-   * @param threshold the minimum axis value for the returned {@link AsyncTrigger} to be true. This value
-   *     should be in the range [0, 1] where 0 is the unpressed state of the axis.
+   * @param threshold the minimum axis value for the returned {@link AsyncTrigger} to be true. This
+   *     value should be in the range [0, 1] where 0 is the unpressed state of the axis.
    * @param loop the event loop instance to attach the Trigger to.
    * @return a Trigger instance that is true when the right trigger's axis exceeds the provided
    *     threshold, attached to the given event loop
@@ -314,8 +314,8 @@ public class AsyncCommandXboxController extends AsyncCommandGenericHID {
    * Constructs a Trigger instance around the axis value of the right trigger. The returned trigger
    * will be true when the axis value is greater than {@code threshold}.
    *
-   * @param threshold the minimum axis value for the returned {@link AsyncTrigger} to be true. This value
-   *     should be in the range [0, 1] where 0 is the unpressed state of the axis.
+   * @param threshold the minimum axis value for the returned {@link AsyncTrigger} to be true. This
+   *     value should be in the range [0, 1] where 0 is the unpressed state of the axis.
    * @return a Trigger instance that is true when the right trigger's axis exceeds the provided
    *     threshold, attached to the {@link AsyncScheduler#getDefaultButtonLoop() default scheduler
    *     button loop}.

@@ -3,11 +3,11 @@ package edu.wpi.first.wpilibj3.command.async;
 import static edu.wpi.first.units.Units.Milliseconds;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.BeforeAll;
@@ -101,17 +101,37 @@ class AsyncSchedulerTest {
     var s1c2 = new PriorityCommand(12, s1);
     var s2c2 = new PriorityCommand(22, s2);
 
-    var group =
-        s1c1.alongWith(s2c1).withTimeout(Milliseconds.of(120))
-            .andThen(s1c2.alongWith(s2c2).withTimeout(Milliseconds.of(80)));
+    var firstStage =
+        ParallelGroup.onScheduler(scheduler)
+            .all(s1c1, s2c1)
+            .withTimeout(Milliseconds.of(120))
+            .named("First Stage");
+    var secondStage =
+        ParallelGroup.onScheduler(scheduler)
+            .all(s1c2, s2c2)
+            .withTimeout(Milliseconds.of(80))
+            .named("Second Stage");
+
+    var group = new Sequence(scheduler, firstStage, secondStage);
+
+    assertEquals(Set.of(s1, s2), group.requirements());
+    assertEquals(Set.of(s1, s2), firstStage.requirements());
+    assertEquals(Set.of(s1, s2), secondStage.requirements());
 
     // schedule the entire group
     scheduler.schedule(group);
 
     // need to wait a bit for the virtual threads to spin up and the commands to get scheduled
-    Thread.sleep(10);
+    Thread.sleep(20);
 
-    // both commands in stage 1 should be running now
+    // The sequence and both commands in stage 1 should be running now
+    // The parallel groups aren't scheduled because they're run directly by the sequence
+    assertEquals(
+        Map.of(
+            s1, group,
+            s2, group),
+        scheduler.getRunningCommands());
+
     assertTrue(scheduler.isRunning(s1c1));
     assertTrue(scheduler.isRunning(s2c1));
 
@@ -141,9 +161,10 @@ class AsyncSchedulerTest {
   @Test
   void atomicity() throws Exception {
     var scheduler = new AsyncScheduler();
-    var resource = new Resource("X", scheduler) {
-      int x = 0;
-    };
+    var resource =
+        new Resource("X", scheduler) {
+          int x = 0;
+        };
 
     // Launch 100 commands that each call `x++` 500 times.
     // If commands run on different threads, the lack of atomic
@@ -154,12 +175,15 @@ class AsyncSchedulerTest {
     var commands = new ArrayList<AsyncCommand>(numCommands);
 
     for (int cmdCount = 0; cmdCount < numCommands; cmdCount++) {
-      var command = AsyncCommand.noHardware(() -> {
-        for (int i = 0; i < iterations; i++) {
-          Thread.sleep(1);
-          resource.x++;
-        }
-      }).named("CountCommand[" + cmdCount + "]");
+      var command =
+          AsyncCommand.noHardware(
+                  () -> {
+                    for (int i = 0; i < iterations; i++) {
+                      Thread.sleep(1);
+                      resource.x++;
+                    }
+                  })
+              .named("CountCommand[" + cmdCount + "]");
 
       scheduler.schedule(command);
       commands.add(command);
@@ -177,10 +201,14 @@ class AsyncSchedulerTest {
     var scheduler = new AsyncScheduler();
     var resource = new Resource("X", scheduler);
 
-    var command = resource.run(() -> {
-      Thread.sleep(10);
-      throw new RuntimeException("The exception");
-    }).named("Bad Behavior");
+    var command =
+        resource
+            .run(
+                () -> {
+                  Thread.sleep(10);
+                  throw new RuntimeException("The exception");
+                })
+            .named("Bad Behavior");
 
     scheduler.schedule(command);
 
@@ -204,7 +232,9 @@ class AsyncSchedulerTest {
       if (cause instanceof RuntimeException re) {
         assertEquals("The exception", re.getMessage());
       } else {
-        fail("Expected cause to be a RuntimeException with message 'The exception', but was " + cause);
+        fail(
+            "Expected cause to be a RuntimeException with message 'The exception', but was "
+                + cause);
       }
     }
   }
@@ -212,17 +242,22 @@ class AsyncSchedulerTest {
   @Test
   void runResource() throws Exception {
     var scheduler = new AsyncScheduler();
-    var example = new Resource("Counting", scheduler) {
-      int x = 0;
-    };
+    var example =
+        new Resource("Counting", scheduler) {
+          int x = 0;
+        };
 
-    AsyncCommand countToTen = example.run(() -> {
-      example.x = 0;
-      for (int i = 0; i < 10; i++) {
-        AsyncCommand.yield();
-        example.x++;
-      }
-    }).named("Count To Ten");
+    AsyncCommand countToTen =
+        example
+            .run(
+                () -> {
+                  example.x = 0;
+                  for (int i = 0; i < 10; i++) {
+                    AsyncCommand.yield();
+                    example.x++;
+                  }
+                })
+            .named("Count To Ten");
 
     scheduler.schedule(countToTen);
     scheduler.await(countToTen);

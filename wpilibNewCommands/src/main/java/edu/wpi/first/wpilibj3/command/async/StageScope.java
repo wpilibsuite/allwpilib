@@ -19,15 +19,13 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class StageScope<T> extends StructuredTaskScope<T> {
   private final AsyncScheduler scheduler;
-  private final Set<? extends Callable<? extends T>> requirements;
   private final Set<? extends Callable<? extends T>> remainingRequirements;
   private final Set<T> results = Collections.synchronizedSet(new HashSet<>());
   private final AtomicReference<Throwable> exception = new AtomicReference<>(null);
 
   public StageScope(AsyncScheduler scheduler, Set<? extends Callable<? extends T>> requirements) {
     this.scheduler = scheduler;
-    this.requirements = Set.copyOf(requirements);
-    this.remainingRequirements = Collections.synchronizedSet(new HashSet<>(requirements));
+    this.remainingRequirements = new HashSet<>(requirements);
   }
 
   @Override
@@ -42,7 +40,7 @@ public class StageScope<T> extends StructuredTaskScope<T> {
     Callable<?> task = subtask.task();
 
     // Unwrap a command task, if necessary
-    if (task instanceof CommandTask<?>(_, var command)) {
+    if (task instanceof CommandTask<?>(var _scheduler, var command)) {
       task = command;
     }
     remainingRequirements.remove(task);
@@ -68,7 +66,8 @@ public class StageScope<T> extends StructuredTaskScope<T> {
     return this;
   }
 
-  public StageScope<T> joinWithTimeout(Measure<Time> timeout) throws InterruptedException, TimeoutException {
+  public StageScope<T> joinWithTimeout(Measure<Time> timeout)
+      throws InterruptedException, TimeoutException {
     super.joinUntil(Instant.now().plusNanos((long) (timeout.in(Seconds) * 1e9)));
     return this;
   }
@@ -86,7 +85,8 @@ public class StageScope<T> extends StructuredTaskScope<T> {
     }
   }
 
-  private record CommandTask<T>(AsyncScheduler scheduler, AsyncCommand command) implements Callable<T> {
+  private record CommandTask<T>(AsyncScheduler scheduler, AsyncCommand command)
+      implements Callable<T> {
     @Override
     public T call() throws Exception {
       scheduler.schedule(command);

@@ -6,9 +6,7 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Time;
 import edu.wpi.first.util.ErrorMessages;
 
-/**
- * An end condition that can be used to complete a loop after some period of time has elapsed.
- */
+/** An end condition that can be used to complete a loop after some period of time has elapsed. */
 public class TimedEndCondition implements EndCondition {
   private long startTime;
   private final long offset;

@@ -6,7 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MultiException extends RuntimeException {
-  private static final String EXCEPTION_SEPARATOR = "\n\t______________________________________________________________________\n";
+  private static final String EXCEPTION_SEPARATOR =
+      "\n\t______________________________________________________________________\n";
   private final List<Throwable> nested = new ArrayList<>();
 
   public MultiException() {

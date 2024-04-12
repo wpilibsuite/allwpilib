@@ -2,8 +2,7 @@ package edu.wpi.first.wpilibj3.command.async;
 
 @FunctionalInterface
 public interface EndCondition {
-  default void reset() {
-  }
+  default void reset() {}
 
   boolean reached();
 

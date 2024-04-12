@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.function.Supplier;
 
@@ -37,10 +36,12 @@ public class Util {
   }
 
   public static void reading(ReadWriteLock lock, Runnable task) {
-    reading(lock, () -> {
-      task.run();
-      return null;
-    });
+    reading(
+        lock,
+        () -> {
+          task.run();
+          return null;
+        });
   }
 
   public static <T> T writing(ReadWriteLock lock, Supplier<? extends T> task) {
@@ -53,9 +54,11 @@ public class Util {
   }
 
   public static void writing(ReadWriteLock lock, Runnable task) {
-    writing(lock, () -> {
-      task.run();
-      return null;
-    });
+    writing(
+        lock,
+        () -> {
+          task.run();
+          return null;
+        });
   }
 }
