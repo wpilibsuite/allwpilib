@@ -300,6 +300,13 @@ class ProfiledPIDController
   }
 
   /**
+   * Returns the total accumulated error.
+   */
+  Distance_t GetTotalError() const {
+    return Distance_t{m_controller.GetTotalError()};
+  }
+
+  /**
    * Returns the next output of the PID controller.
    *
    * @param measurement The current measurement of the process variable.

@@ -334,6 +334,15 @@ public class ProfiledPIDController implements Sendable {
   }
 
   /**
+   * Returns the total accumulated error.
+   *
+   * @return The total accumulated error.
+   */
+  public double getTotalError() {
+    return m_controller.getTotalError();
+  }
+
+  /**
    * Returns the next output of the PID controller.
    *
    * @param measurement The current measurement of the process variable.

@@ -365,6 +365,15 @@ public class PIDController implements Sendable, AutoCloseable {
   }
 
   /**
+   * Returns the total accumulated error.
+   *
+   * @return The total error.
+   */
+  public double getTotalError() {
+    return m_totalError;
+  }
+
+  /**
    * Returns the next output of the PID controller.
    *
    * @param measurement The current measurement of the process variable.

@@ -210,6 +210,11 @@ class WPILIB_DLLEXPORT PIDController
   double GetVelocityError() const;
 
   /**
+   * Returns the total accumulated error.
+   */
+  double GetTotalError() const;
+
+  /**
    * Returns the next output of the PID controller.
    *
    * @param measurement The current measurement of the process variable.
