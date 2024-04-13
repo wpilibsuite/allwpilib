@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package edu.wpi.first.math.geometry;
 
 import java.util.Objects;
@@ -79,7 +83,7 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
   public Translation2d getFocalPoint(boolean first) {
     double a = Math.max(m_xSemiAxis, m_ySemiAxis); // Major semi-axis
     double b = Math.min(m_xSemiAxis, m_ySemiAxis); // Minor semi-axis
-    double c = Math.hypot(a, b);
+    double c = Math.sqrt(a*a - b*b);
 
     c = (first ? -c : c);
 
@@ -99,10 +103,7 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
    * @return The transformed ellipse.
    */
   public Ellipse2d transformBy(Transform2d other) {
-    return new Ellipse2d(
-      m_center.transformBy(other), 
-      m_xSemiAxis, 
-      m_ySemiAxis);
+    return new Ellipse2d(m_center.transformBy(other), m_xSemiAxis, m_ySemiAxis);
   }
 
   /**
@@ -133,8 +134,8 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
     double x = point.getX() - m_center.getX();
     double y = point.getY() - m_center.getY();
 
-    return (x * x) / (m_xSemiAxis * m_ySemiAxis) +
-           (y * y) / (m_xSemiAxis * m_ySemiAxis);
+    return (x * x) / (m_xSemiAxis * m_xSemiAxis) +
+           (y * y) / (m_ySemiAxis * m_ySemiAxis);
   }
 
   /**
