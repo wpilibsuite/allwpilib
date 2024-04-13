@@ -5,8 +5,8 @@
 package edu.wpi.first.wpilibj.examples.async;
 
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj3.command.async.AsyncCommand;
+import edu.wpi.first.wpilibj3.command.async.AsyncScheduler;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -37,7 +37,9 @@ public class Robot extends TimedRobot {
    * SmartDashboard integrated updating.
    */
   @Override
-  public void robotPeriodic() {}
+  public void robotPeriodic() {
+    AsyncScheduler.getInstance().checkForErrors();
+  }
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
@@ -77,7 +79,7 @@ public class Robot extends TimedRobot {
   @Override
   public void testInit() {
     // Cancels all running commands at the start of test mode.
-    CommandScheduler.getInstance().cancelAll();
+    AsyncScheduler.getInstance().cancelAll();
   }
 
   /** This function is called periodically during test mode. */

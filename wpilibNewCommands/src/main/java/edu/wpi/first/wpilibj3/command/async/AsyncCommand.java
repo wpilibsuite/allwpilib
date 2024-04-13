@@ -16,7 +16,7 @@ import java.util.concurrent.Callable;
  * command APIs both operate under a collaborative model where the commands have distinct logic
  * for initialization, execution, and completion stages of their lifecycle. Those can be
  *
- * {@snippet lang=java :
+ * {@snippet lang = java:
  * // A 2013-style class-based command definition
  * class ClassBasedCommand extends Command {
  *   public ClassBasedCommand(Subsystem requiredSubsystem) {
@@ -55,7 +55,7 @@ import java.util.concurrent.Callable;
  * AsyncCommand command = requiredSubsystem.run(() -> {
  *   initialize();
  *   while (!isFinished()) {
- *     AsyncCommand.yield();
+ *     AsyncCommand.pause();
  *     execute();
  *   }
  *   end();
@@ -77,7 +77,7 @@ public interface AsyncCommand extends Callable<Object> {
     return null;
   }
 
-  Set<Resource> requirements();
+  Set<HardwareResource> requirements();
 
   default int priority() {
     return DEFAULT_PRIORITY;
@@ -101,24 +101,8 @@ public interface AsyncCommand extends Callable<Object> {
    * @param resource the resource to check
    * @return
    */
-  default boolean requires(Resource resource) {
+  default boolean requires(HardwareResource resource) {
     return requirements().contains(resource);
-  }
-
-  /**
-   * A helper method for executing a command body in a periodic loop until some end condition is
-   * met.
-   *
-   * <pre>{@code
-   * loop(() -> m_motor.set(m_pid.calculate(m_sensor.readValue())))
-   *   .withPeriod(Milliseconds.of(20))
-   *   .forDuration(Seconds.of(1.5));
-   * }</pre>
-   *
-   * @param body the loop body
-   */
-  static Loop.Builder loop(ThrowingRunnable body) {
-    return new Loop.Builder(body);
   }
 
   /**
@@ -160,7 +144,7 @@ public interface AsyncCommand extends Callable<Object> {
     return AsyncScheduler.getInstance().isRunning(this);
   }
 
-  static AsyncCommandBuilder requiring(Resource requirement, Resource... rest) {
+  static AsyncCommandBuilder requiring(HardwareResource requirement, HardwareResource... rest) {
     return new AsyncCommandBuilder().requiring(requirement).requiring(rest);
   }
 
@@ -173,7 +157,7 @@ public interface AsyncCommand extends Callable<Object> {
    *                 if too many commands with low pause times are running concurrently.
    * @throws InterruptedException if the command was interrupted by another command while paused
    */
-  static void yield(Measure<Time> duration) throws InterruptedException {
+  static void pause(Measure<Time> duration) throws InterruptedException {
     Thread.sleep((long) duration.in(Milliseconds));
   }
 
@@ -183,7 +167,7 @@ public interface AsyncCommand extends Callable<Object> {
    *
    * @throws InterruptedException if the command was interrupted by another command while paused.
    */
-  static void yield() throws InterruptedException {
-    AsyncCommand.yield(AsyncScheduler.DEFAULT_UPDATE_PERIOD);
+  static void pause() throws InterruptedException {
+    AsyncCommand.pause(AsyncScheduler.DEFAULT_UPDATE_PERIOD);
   }
 }

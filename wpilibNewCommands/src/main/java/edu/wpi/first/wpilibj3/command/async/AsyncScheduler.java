@@ -6,6 +6,7 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Time;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -24,8 +25,21 @@ public class AsyncScheduler {
   public static final Measure<Time> DEFAULT_UPDATE_PERIOD = Milliseconds.of(20);
 
   private final Map<AsyncCommand, Throwable> errors = new HashMap<>();
-  private final Map<Resource, AsyncCommand> runningCommands = new HashMap<>();
-  private final Map<Resource, AsyncCommand> defaultCommands = new HashMap<>();
+
+  /**
+   * The top-level running commands. This would include the highest-level command groups but not any
+   * of their nested commands.
+   */
+  private final Map<HardwareResource, AsyncCommand> runningCommands = new HashMap<>();
+
+  /**
+   * Maps <i>all</i> running commands to their resources. Used for tracking exactly what commands
+   * are running. Nested commands executed by command groups are wrapped in a {@link NestedCommand}
+   * object to track what group forked them.
+   */
+  final Map<HardwareResource, Collection<AsyncCommand>> shadowrun = new HashMap<>();
+
+  private final Map<HardwareResource, AsyncCommand> defaultCommands = new HashMap<>();
   private final Map<AsyncCommand, Future<?>> futures = new HashMap<>();
   private final EventLoop eventLoop = new EventLoop();
 
@@ -65,16 +79,16 @@ public class AsyncScheduler {
         });
   }
 
-  public void registerResource(Resource resource) {
+  public void registerResource(HardwareResource resource) {
     registerResource(resource, new IdleCommand(resource));
   }
 
-  public void registerResource(Resource resource, AsyncCommand defaultCommand) {
+  public void registerResource(HardwareResource resource, AsyncCommand defaultCommand) {
     defaultCommands.put(resource, defaultCommand);
     schedule(defaultCommand);
   }
 
-  public void setDefaultCommand(Resource resource, AsyncCommand defaultCommand) {
+  public void setDefaultCommand(HardwareResource resource, AsyncCommand defaultCommand) {
     if (!defaultCommand.requires(resource)) {
       throw new IllegalArgumentException("A resource's default command must require that resource");
     }
@@ -88,7 +102,7 @@ public class AsyncScheduler {
     cancel(oldDefaultCommand);
   }
 
-  public AsyncCommand getDefaultCommand(Resource resource) {
+  public AsyncCommand getDefaultCommand(HardwareResource resource) {
     return defaultCommands.get(resource);
   }
 
@@ -101,11 +115,21 @@ public class AsyncScheduler {
    */
   public void schedule(AsyncCommand command) {
     // Don't schedule if a required resource is currently running a higher priority command
-    for (Resource resource : command.requirements()) {
-      var runningCommand = runningCommands.get(resource);
-      if (command.isLowerPriorityThan(runningCommand)) {
-        return;
-      }
+    boolean shouldSchedule =
+        Util.reading(
+            lock,
+            () -> {
+              for (HardwareResource resource : command.requirements()) {
+                var runningCommand = runningCommands.get(resource);
+                if (command.isLowerPriorityThan(runningCommand)) {
+                  return false;
+                }
+              }
+              return true;
+            });
+
+    if (!shouldSchedule) {
+      return;
     }
 
     Util.writing(
@@ -113,36 +137,26 @@ public class AsyncScheduler {
         () -> {
           // Cancel the currently scheduled commands for each required resource and schedule the
           // incoming command over them
-          for (Resource resource : command.requirements()) {
-            var runningCommand = runningCommands.get(resource);
-
-            // Prevent nested commands from interrupting their parent
-            boolean isNested = false;
-            var checked = command;
-            while (checked instanceof NestedCommand(var parent, var _impl)) {
-              if (parent.equals(runningCommand)) {
-                isNested = true;
-                break;
+          for (HardwareResource resource : command.requirements()) {
+            // Don't allow nested commands to cancel their parents
+            if (command instanceof NestedCommand(var parent, var _impl)) {
+              if (!shadowrun.getOrDefault(resource, NopSet.nop()).contains(parent)) {
+                throw new IllegalStateException(
+                    "Nested commands can only be scheduled while their parents are running! "
+                        + command
+                        + " requires "
+                        + parent);
               }
-              for (var shadowed : shadowrun.getOrDefault(resource, NopSet.nop())) {
-                if (shadowed.equals(parent)) {
-                  isNested = true;
-                  break;
-                }
-                if (shadowed instanceof NestedCommand(var shadowParent, var shadowImpl)) {
-                  if (shadowImpl.equals(parent)) {
-                    isNested = true;
-                    break;
-                  }
-                }
-              }
-              checked = parent;
-            }
 
-            if (isNested) {
-              shadowrun.computeIfAbsent(resource, _r -> new HashSet<>()).add(command);
+              // Shadow the nested command as well as its the command it wraps (even though the
+              // wrapped command never runs)
+              var shadowSet = shadowrun.computeIfAbsent(resource, _r -> new HashSet<>());
+              shadowSet.add(command);
+              shadowSet.add(((NestedCommand) command).impl());
               continue;
             }
+
+            var runningCommand = runningCommands.get(resource);
 
             // Add to the running commands before we've technically scheduled it
             // Cancelling a command will schedule default commands (which we don't want!) if the
@@ -162,8 +176,6 @@ public class AsyncScheduler {
           return future;
         });
   }
-
-  private final Map<Resource, Collection<AsyncCommand>> shadowrun = new HashMap<>();
 
   /**
    * Checks for errors that have been thrown by the asynchronous commands. This will clear the
@@ -322,13 +334,16 @@ public class AsyncScheduler {
             });
 
     for (var resource : command.requirements()) {
-      if (shadowrun.getOrDefault(resource, NopSet.nop()).remove(command)) {
-        // This command was a nested command inside a command group
-        // It will not be in runningCommands (that's only top-level stuff)
-        // and should not schedule any default commands
-        // (the parent command's cleanup will handle that)
-        continue;
-      }
+      // Remove from the shadowrun:
+      //   1. All instances of the completed command;
+      //   2. Any nested commands that wrapped the completed command;
+      //   3. The implementation of the completed command, if it was a wrapper
+      var shadowSet = shadowrun.getOrDefault(resource, NopSet.nop());
+      shadowSet.remove(command);
+      shadowSet.removeIf(
+          (c) -> c instanceof NestedCommand(var _p, var impl) && impl.equals(command));
+      shadowSet.removeIf(
+          (c) -> command instanceof NestedCommand(var _p, var impl) && impl.equals(c));
 
       // If the currently running command for this resource is the one we just
       // cancelled, we can schedule its default command
@@ -339,8 +354,9 @@ public class AsyncScheduler {
   }
 
   /**
-   * Checks if a command is currently running. This cannot check a command that's part of a
-   * composition or group; only commands that have been directly scheduled may return {@code true}.
+   * Checks if a command is currently running. A command that's executed as part of a {@link
+   * Sequence} or {@link ParallelGroup} is considered to be running, even if it's not the
+   * highest-level owner of its resources.
    *
    * @param command the command to check
    * @return true if the command is running, false if not
@@ -349,7 +365,10 @@ public class AsyncScheduler {
     return Util.reading(lock, () -> futureFor(command) != null);
   }
 
-  public Map<Resource, AsyncCommand> getRunningCommands() {
+  /**
+   * @return
+   */
+  public Map<HardwareResource, AsyncCommand> getRunningCommands() {
     return Map.copyOf(runningCommands);
   }
 
@@ -365,7 +384,7 @@ public class AsyncScheduler {
    *
    * @param resource the resource to schedule the default command for
    */
-  public void scheduleDefault(Resource resource) {
+  public void scheduleDefault(HardwareResource resource) {
     var defaultCommand = defaultCommands.computeIfAbsent(resource, IdleCommand::new);
     schedule(defaultCommand);
   }
@@ -377,8 +396,12 @@ public class AsyncScheduler {
    * @return the running command using a particular resource, or null if no command is currently
    *     using it
    */
-  public AsyncCommand getCommandUsing(Resource resource) {
+  public AsyncCommand getCommandUsing(HardwareResource resource) {
     return runningCommands.get(resource);
+  }
+
+  public Collection<AsyncCommand> getAllCommandsUsing(HardwareResource resource) {
+    return Collections.unmodifiableCollection(shadowrun.getOrDefault(resource, NopSet.nop()));
   }
 
   public EventLoop getDefaultButtonLoop() {

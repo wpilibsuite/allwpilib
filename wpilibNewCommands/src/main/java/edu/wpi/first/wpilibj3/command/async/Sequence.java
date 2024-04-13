@@ -5,16 +5,21 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringJoiner;
 
+/**
+ * Executes other commands in a defined sequence. A sequence has ownership of all the resources
+ * required by the commands in the sequence, with a priority equal to the highest priority of
+ * all the composed commands.
+ */
 public class Sequence implements AsyncCommand {
-  private final Set<Resource> requirements;
+  private final Set<HardwareResource> requirements;
   private final int priority;
   private final String name;
   private final List<AsyncCommand> commands;
   private final AsyncScheduler scheduler;
 
   public Sequence(AsyncScheduler scheduler, AsyncCommand... sequence) {
-    var requirements = new HashSet<Resource>();
-    int priority = DEFAULT_PRIORITY;
+    var requirements = new HashSet<HardwareResource>();
+    int priority = LOWEST_PRIORITY;
     var nameBuilder = new StringJoiner(" > ");
     for (AsyncCommand command : sequence) {
       requirements.addAll(command.requirements());
@@ -49,7 +54,7 @@ public class Sequence implements AsyncCommand {
   }
 
   @Override
-  public Set<Resource> requirements() {
+  public Set<HardwareResource> requirements() {
     return requirements;
   }
 

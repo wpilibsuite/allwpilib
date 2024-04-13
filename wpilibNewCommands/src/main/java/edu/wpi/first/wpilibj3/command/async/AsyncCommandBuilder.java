@@ -7,22 +7,22 @@ import java.util.Objects;
 import java.util.Set;
 
 public class AsyncCommandBuilder {
-  private final Set<Resource> requirements = new HashSet<>();
+  private final Set<HardwareResource> requirements = new HashSet<>();
   private ThrowingRunnable impl;
   private String name;
   private int priority = AsyncCommand.DEFAULT_PRIORITY;
 
-  public AsyncCommandBuilder requiring(Resource resource) {
+  public AsyncCommandBuilder requiring(HardwareResource resource) {
     requirements.add(resource);
     return this;
   }
 
-  public AsyncCommandBuilder requiring(Resource... resources) {
+  public AsyncCommandBuilder requiring(HardwareResource... resources) {
     requirements.addAll(Arrays.asList(resources));
     return this;
   }
 
-  public AsyncCommandBuilder requiring(Collection<Resource> resources) {
+  public AsyncCommandBuilder requiring(Collection<HardwareResource> resources) {
     requirements.addAll(resources);
     return this;
   }
@@ -62,7 +62,7 @@ public class AsyncCommandBuilder {
       }
 
       @Override
-      public Set<Resource> requirements() {
+      public Set<HardwareResource> requirements() {
         return requirements;
       }
 

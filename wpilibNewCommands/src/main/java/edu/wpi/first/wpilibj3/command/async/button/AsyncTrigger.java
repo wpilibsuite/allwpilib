@@ -136,8 +136,7 @@ public class AsyncTrigger implements BooleanSupplier {
    * Starts the given command when the condition changes to `false` and cancels it when the
    * condition changes to `true`.
    *
-   * <p>Doesn't re-start the command if it ends while the condition is still `false`. If the command
-   * should restart, see {@link edu.wpi.first.wpilibj3.command.RepeatAsyncCommand}.
+   * <p>Doesn't re-start the command if it ends while the condition is still `false`.
    *
    * @param command the command to start
    * @return this trigger, so calls can be chained

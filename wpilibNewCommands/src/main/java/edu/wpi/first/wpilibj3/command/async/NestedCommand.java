@@ -14,7 +14,7 @@ record NestedCommand(AsyncCommand parent, AsyncCommand impl) implements AsyncCom
   }
 
   @Override
-  public Set<Resource> requirements() {
+  public Set<HardwareResource> requirements() {
     return impl.requirements();
   }
 

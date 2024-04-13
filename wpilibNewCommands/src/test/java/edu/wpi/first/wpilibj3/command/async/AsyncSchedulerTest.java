@@ -40,7 +40,7 @@ class AsyncSchedulerTest {
 
   @Test
   void higherPriorityCancels() {
-    var subsystem = new Resource("Subsystem");
+    var subsystem = new HardwareResource("Subsystem");
 
     var lower = new PriorityCommand(-1000, subsystem);
     var higher = new PriorityCommand(+1000, subsystem);
@@ -56,7 +56,7 @@ class AsyncSchedulerTest {
 
   @Test
   void lowerPriorityDoesNotCancel() {
-    var subsystem = new Resource("Subsystem");
+    var subsystem = new HardwareResource("Subsystem");
 
     var lower = new PriorityCommand(-1000, subsystem);
     var higher = new PriorityCommand(+1000, subsystem);
@@ -72,7 +72,7 @@ class AsyncSchedulerTest {
 
   @Test
   void samePriorityCancels() {
-    var subsystem = new Resource("Subsystem");
+    var subsystem = new HardwareResource("Subsystem");
 
     var first = new PriorityCommand(512, subsystem);
     var second = new PriorityCommand(512, subsystem);
@@ -92,8 +92,8 @@ class AsyncSchedulerTest {
     //       likely due to loading classes and static initialization
     var scheduler = new AsyncScheduler();
 
-    var s1 = new Resource("S1", scheduler);
-    var s2 = new Resource("S2", scheduler);
+    var s1 = new HardwareResource("S1", scheduler);
+    var s2 = new HardwareResource("S2", scheduler);
 
     var s1c1 = new PriorityCommand(11, s1);
     var s2c1 = new PriorityCommand(21, s2);
@@ -124,30 +124,29 @@ class AsyncSchedulerTest {
     // need to wait a bit for the virtual threads to spin up and the commands to get scheduled
     Thread.sleep(20);
 
-    // The sequence and both commands in stage 1 should be running now
-    // The parallel groups aren't scheduled because they're run directly by the sequence
-    assertEquals(
-        Map.of(
-            s1, group,
-            s2, group),
-        scheduler.getRunningCommands());
+    // The "running" commands should only be the top-level owners, no nested commands should be here
+    assertEquals(Map.of(s1, group, s2, group), scheduler.getRunningCommands());
 
+    // The sequence and both commands in stage 1 should be running now
+    assertTrue(scheduler.isRunning(firstStage));
+    assertFalse(scheduler.isRunning(secondStage));
     assertTrue(scheduler.isRunning(s1c1));
     assertTrue(scheduler.isRunning(s2c1));
 
-    // wait for both of the commands in the first stage to complete
-    scheduler.await(s1c1);
-    scheduler.await(s2c1);
+    // wait for the first stag to complete...
+    scheduler.await(firstStage);
 
-    Thread.sleep(10); // wait a bit...
+    Thread.sleep(10); // wait a bit the second stage to get scheduled
 
     // both commands in stage 2 should now be running
     assertTrue(scheduler.isRunning(s1c2));
     assertTrue(scheduler.isRunning(s2c2));
+    assertTrue(scheduler.isRunning(secondStage));
 
     // ... and both commands in stage 1 shouldn't be
     assertFalse(scheduler.isRunning(s1c1));
     assertFalse(scheduler.isRunning(s2c1));
+    assertFalse(scheduler.isRunning(firstStage));
 
     // wait for both of the commands in the second stage to complete
     scheduler.await(s1c2);
@@ -156,13 +155,22 @@ class AsyncSchedulerTest {
     // everything should have stopped by this point
     assertFalse(scheduler.isRunning(s1c2));
     assertFalse(scheduler.isRunning(s2c2));
+
+    scheduler.await(group); // wait for the group to fully complete (including cleanup)
+
+    // The shadowrun should no longer have any references to any commands in the group
+    assertEquals(
+        Map.of(
+            s1, Set.of(s1.getDefaultCommand()),
+            s2, Set.of(s2.getDefaultCommand())),
+        scheduler.shadowrun);
   }
 
   @Test
   void atomicity() throws Exception {
     var scheduler = new AsyncScheduler();
     var resource =
-        new Resource("X", scheduler) {
+        new HardwareResource("X", scheduler) {
           int x = 0;
         };
 
@@ -199,7 +207,7 @@ class AsyncSchedulerTest {
   @Test
   void errorDetection() throws Exception {
     var scheduler = new AsyncScheduler();
-    var resource = new Resource("X", scheduler);
+    var resource = new HardwareResource("X", scheduler);
 
     var command =
         resource
@@ -243,7 +251,7 @@ class AsyncSchedulerTest {
   void runResource() throws Exception {
     var scheduler = new AsyncScheduler();
     var example =
-        new Resource("Counting", scheduler) {
+        new HardwareResource("Counting", scheduler) {
           int x = 0;
         };
 
@@ -253,7 +261,7 @@ class AsyncSchedulerTest {
                 () -> {
                   example.x = 0;
                   for (int i = 0; i < 10; i++) {
-                    AsyncCommand.yield();
+                    AsyncCommand.pause();
                     example.x++;
                   }
                 })
@@ -265,14 +273,14 @@ class AsyncSchedulerTest {
     assertEquals(10, example.x);
   }
 
-  record PriorityCommand(int priority, Resource... subsystems) implements AsyncCommand {
+  record PriorityCommand(int priority, HardwareResource... subsystems) implements AsyncCommand {
     @Override
     public void run() throws Exception {
       Thread.sleep(Long.MAX_VALUE);
     }
 
     @Override
-    public Set<Resource> requirements() {
+    public Set<HardwareResource> requirements() {
       return Set.of(subsystems);
     }
 
