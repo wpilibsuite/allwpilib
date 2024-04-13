@@ -7,7 +7,7 @@ import java.util.Set;
  *
  * @param resource the resource to idle.
  */
-public record IdleCommand(Resource resource) implements AsyncCommand {
+public record IdleCommand(HardwareResource resource) implements AsyncCommand {
   @Override
   @SuppressWarnings({"InfiniteLoopStatement", "BusyWait"})
   public void run() throws Exception {
@@ -17,7 +17,7 @@ public record IdleCommand(Resource resource) implements AsyncCommand {
   }
 
   @Override
-  public Set<Resource> requirements() {
+  public Set<HardwareResource> requirements() {
     return Set.of(resource);
   }
 

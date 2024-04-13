@@ -5,14 +5,14 @@
 package edu.wpi.first.wpilibj.examples.async.subsystems;
 
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.Constants.StorageConstants;
+import edu.wpi.first.wpilibj.examples.async.Constants.StorageConstants;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj3.command.async.AsyncCommand;
 import edu.wpi.first.wpilibj3.command.async.AsyncScheduler;
-import edu.wpi.first.wpilibj3.command.async.Resource;
+import edu.wpi.first.wpilibj3.command.async.HardwareResource;
 import edu.wpi.first.wpilibj3.command.async.button.AsyncTrigger;
 
-public class Storage extends Resource {
+public class Storage extends HardwareResource {
   private final PWMSparkMax m_motor = new PWMSparkMax(StorageConstants.kMotorPort);
   private final DigitalInput m_ballSensor = new DigitalInput(StorageConstants.kBallSensorPort);
 

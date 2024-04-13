@@ -12,10 +12,10 @@ import edu.wpi.first.wpilibj.examples.async.subsystems.Intake;
 import edu.wpi.first.wpilibj.examples.async.subsystems.Pneumatics;
 import edu.wpi.first.wpilibj.examples.async.subsystems.Shooter;
 import edu.wpi.first.wpilibj.examples.async.subsystems.Storage;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj3.command.async.AsyncCommand;
 import edu.wpi.first.wpilibj3.command.async.ParallelGroup;
 import edu.wpi.first.wpilibj3.command.async.button.AsyncCommandXboxController;
+import edu.wpi.first.wpilibj3.command.async.button.AsyncTrigger;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -41,7 +41,7 @@ public class AsyncCommandBot {
    *
    * <p>Should be called during {@link Robot#robotInit()}.
    *
-   * <p>Event binding methods are available on the {@link Trigger} class.
+   * <p>Event binding methods are available on the {@link AsyncTrigger} class.
    */
   public void configureBindings() {
     // Automatically run the storage motor whenever the ball storage is not full,
@@ -67,7 +67,7 @@ public class AsyncCommandBot {
         .a()
         .onTrue(
             ParallelGroup.onDefaultScheduler().all(
-                    m_shooter.shootCommand(ShooterConstants.kShooterTargetRPS),
+                    m_shooter.shootCommand(ShooterConstants.kShooterTarget),
                     m_storage.runCommand())
                 .named("Shoot"));
 

@@ -9,10 +9,10 @@ import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj3.command.async.AsyncCommand;
-import edu.wpi.first.wpilibj3.command.async.Resource;
+import edu.wpi.first.wpilibj3.command.async.HardwareResource;
 
 /** Subsystem for managing the compressor, pressure sensor, etc. */
-public class Pneumatics extends Resource {
+public class Pneumatics extends HardwareResource {
   // External analog pressure sensor
   // product-specific voltage->pressure conversion, see product manual
   // in this case, 250(V/5)-25

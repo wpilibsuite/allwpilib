@@ -4,16 +4,22 @@
 
 package edu.wpi.first.wpilibj.examples.async.subsystems;
 
+import static edu.wpi.first.units.Units.Milliseconds;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.wpilibj3.command.async.AsyncCommand.pause;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.Constants.ShooterConstants;
+import edu.wpi.first.wpilibj.examples.async.Constants.ShooterConstants;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj3.command.async.AsyncCommand;
-import edu.wpi.first.wpilibj3.command.async.ParallelGroup;
-import edu.wpi.first.wpilibj3.command.async.Resource;
+import edu.wpi.first.wpilibj3.command.async.HardwareResource;
 
-public class Shooter extends Resource {
+public class Shooter extends HardwareResource {
   private final PWMSparkMax m_shooterMotor = new PWMSparkMax(ShooterConstants.kShooterMotorPort);
   private final PWMSparkMax m_feederMotor = new PWMSparkMax(ShooterConstants.kFeederMotorPort);
   private final Encoder m_shooterEncoder =
@@ -45,33 +51,32 @@ public class Shooter extends Resource {
 
   /**
    * Returns a command to shoot the balls currently stored in the robot. Spins the shooter flywheel
-   * up to the specified setpoint, and then runs the feeder motor.
+   * up to the specified setpoint and runs the feeder motor while it's at that setpoint.
    *
-   * @param setpointRotationsPerSecond The desired shooter velocity
+   * @param setpoint The desired shooter velocity
    */
   @SuppressWarnings("InfiniteLoopStatement")
-  public AsyncCommand shootCommand(double setpointRotationsPerSecond) {
-    return ParallelGroup.onDefaultScheduler().all(
-      run(() -> {
+  public AsyncCommand shootCommand(Measure<Velocity<Angle>> setpoint) {
+    double setpointRotationsPerSecond = setpoint.in(RotationsPerSecond);
+
+    // Use a faster-than-default loop time for finer control over the flywheel
+    var loopTime = Milliseconds.of(10);
+
+    return run(() -> {
         while (true) {
-          AsyncCommand.yield();
+          pause(loopTime);
           m_shooterMotor.set(
             m_shooterFeedforward.calculate(setpointRotationsPerSecond)
               + m_shooterFeedback.calculate(
               m_shooterEncoder.getRate(), setpointRotationsPerSecond));
-        }
-      }).named("Spin Up"),
 
-      AsyncCommand.noHardware(() -> {
-        while (true) {
-          AsyncCommand.yield();
           if (m_shooterFeedback.atSetpoint()) {
             m_feederMotor.set(1);
           } else {
             m_feederMotor.set(0);
           }
         }
-      }).named("Launch")
+      }
     ).named("Shoot[" + setpointRotationsPerSecond + "]");
   }
 }

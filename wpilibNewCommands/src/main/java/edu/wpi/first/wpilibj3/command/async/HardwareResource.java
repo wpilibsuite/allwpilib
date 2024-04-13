@@ -1,15 +1,15 @@
 package edu.wpi.first.wpilibj3.command.async;
 
-public class Resource {
+public class HardwareResource {
   private final String name;
 
   private final AsyncScheduler registeredScheduler;
 
-  public Resource(String name) {
+  public HardwareResource(String name) {
     this(name, AsyncScheduler.getInstance());
   }
 
-  public Resource(String name, AsyncScheduler scheduler) {
+  public HardwareResource(String name, AsyncScheduler scheduler) {
     this.name = name;
     this.registeredScheduler = scheduler;
     scheduler.registerResource(this);

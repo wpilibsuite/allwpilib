@@ -5,19 +5,20 @@
 package edu.wpi.first.wpilibj.examples.async.subsystems;
 
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.wpilibj3.command.async.AsyncCommand.pause;
 
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.Constants.DriveConstants;
+import edu.wpi.first.wpilibj.examples.async.Constants.DriveConstants;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj3.command.async.AsyncCommand;
-import edu.wpi.first.wpilibj3.command.async.Resource;
+import edu.wpi.first.wpilibj3.command.async.HardwareResource;
 import java.util.function.DoubleSupplier;
 
-public class Drive extends Resource {
+public class Drive extends HardwareResource {
   // The motors on the left side of the drive.
   private final PWMSparkMax m_leftLeader = new PWMSparkMax(DriveConstants.kLeftMotor1Port);
   private final PWMSparkMax m_leftFollower = new PWMSparkMax(DriveConstants.kLeftMotor2Port);
@@ -91,7 +92,7 @@ public class Drive extends Resource {
       m_rightEncoder.reset();
 
       while (Math.max(m_leftEncoder.getDistance(), m_rightEncoder.getDistance()) < distanceMeters) {
-        AsyncCommand.yield();
+        pause();
         m_drive.arcadeDrive(speed, 0);
       }
 

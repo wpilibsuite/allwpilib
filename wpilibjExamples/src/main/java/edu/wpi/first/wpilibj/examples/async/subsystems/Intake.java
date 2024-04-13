@@ -4,15 +4,16 @@
 
 package edu.wpi.first.wpilibj.examples.async.subsystems;
 
-import static edu.wpi.first.wpilibj.examples.rapidreactcommandbot.Constants.IntakeConstants;
+import static edu.wpi.first.wpilibj.examples.async.Constants.IntakeConstants;
+import static edu.wpi.first.wpilibj3.command.async.AsyncCommand.pause;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj3.command.async.AsyncCommand;
-import edu.wpi.first.wpilibj3.command.async.Resource;
+import edu.wpi.first.wpilibj3.command.async.HardwareResource;
 
-public class Intake extends Resource {
+public class Intake extends HardwareResource {
   private final PWMSparkMax m_motor = new PWMSparkMax(IntakeConstants.kMotorPort);
 
   // Double solenoid connected to two channels of a PCM with the default CAN ID
@@ -31,7 +32,7 @@ public class Intake extends Resource {
     return run(() -> {
       m_pistons.set(DoubleSolenoid.Value.kForward);
       while (true) {
-        AsyncCommand.yield();
+        pause();
         m_motor.set(1);
       }
     }).named("Intake");
