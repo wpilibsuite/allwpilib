@@ -1,9 +1,12 @@
 package edu.wpi.first.math.geometry;
 
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.StructSerializable;
+
 /** 
  * Represents a 2d ellipse space containing translational, rotational, and scaling components 
  */
-public class Ellipse2d {
+public class Ellipse2d implements ProtobufSerializable, StructSerializable {
   private final Pose2d m_center;
   private final double m_horizontalSemiAxis, m_verticalSemiAxis;
 
@@ -135,23 +138,12 @@ public class Ellipse2d {
 
   /**
    * Checks if a point is contained within this ellipse.
-   * This is inclusive, if the point lies on the circumference it will return {@code true}.
+   * This is inclusive, if the point lies on the circumference this will return {@code true}.
    * 
    * @param point The point to check.
    * @return True, if the point is within or on the ellipse.
    */
   public boolean containsPoint(Translation2d point) {
     return solveEllipseEquation(point) <= 1.0;
-  }
-
-  /**
-   * Finds the minimum distance between the ellipse and the point.
-   * If the point lies within the ellipse, it returns 0.0.
-   * 
-   * @param point The point to check.
-   * @return The distance.
-   */
-  public double distanceToPoint(Translation2d point) {
-    
   }
 }
