@@ -30,7 +30,7 @@ public class Rectangle2dStructTest {
 
     Rectangle2d data = Rectangle2d.struct.unpack(buffer);
     assertEquals(DATA.getCenter(), data.getCenter());
-    assertEquals(DATA.getWidth(), data.getWidth());
-    assertEquals(DATA.getHeight(), data.getHeight());
+    assertEquals(DATA.getXWidth(), data.getXWidth());
+    assertEquals(DATA.getYWidth(), data.getYWidth());
   }
 }

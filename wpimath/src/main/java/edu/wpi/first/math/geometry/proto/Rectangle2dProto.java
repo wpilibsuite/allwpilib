@@ -43,7 +43,7 @@ public class Rectangle2dProto implements Protobuf<Rectangle2d, ProtobufRectangle
   @Override
   public void pack(ProtobufRectangle2d msg, Rectangle2d value) {
     Pose2d.proto.pack(msg.getMutableCenter(), value.getCenter());
-    msg.setWidth(value.getWidth());
-    msg.setHeight(value.getHeight());
+    msg.setWidth(value.getXWidth());
+    msg.setHeight(value.getYWidth());
   }
 }

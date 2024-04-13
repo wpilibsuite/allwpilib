@@ -28,7 +28,7 @@ public class Rectangle2dStruct implements Struct<Rectangle2d> {
 
   @Override
   public String getSchema() {
-    return "Pose2d center;double width; double height";
+    return "Pose2d center;double xWidth; double yWidth";
   }
 
   @Override
@@ -47,7 +47,7 @@ public class Rectangle2dStruct implements Struct<Rectangle2d> {
   @Override
   public void pack(ByteBuffer bb, Rectangle2d value) {
     Pose2d.struct.pack(bb, value.getCenter());
-    bb.putDouble(value.getWidth());
-    bb.putDouble(value.getHeight());
+    bb.putDouble(value.getXWidth());
+    bb.putDouble(value.getYWidth());
   } 
 }

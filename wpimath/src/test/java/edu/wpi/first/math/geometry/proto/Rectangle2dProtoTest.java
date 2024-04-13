@@ -24,7 +24,7 @@ public class Rectangle2dProtoTest {
 
     Rectangle2d data = Rectangle2d.proto.unpack(proto);
     assertEquals(DATA.getCenter(), data.getCenter());
-    assertEquals(DATA.getWidth(), data.getWidth());
-    assertEquals(DATA.getHeight(), data.getHeight());
+    assertEquals(DATA.getXWidth(), data.getXWidth());
+    assertEquals(DATA.getYWidth(), data.getYWidth());
   }
 }

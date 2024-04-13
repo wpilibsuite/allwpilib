@@ -22,8 +22,8 @@ public class Rectangle2dTest {
     var rect = new Rectangle2d(cornerA, cornerB);
 
     assertAll(
-      () -> assertEquals(3.0, rect.getWidth()),
-      () -> assertEquals(4.0, rect.getHeight()),
+      () -> assertEquals(3.0, rect.getXWidth()),
+      () -> assertEquals(4.0, rect.getYWidth()),
       () -> assertEquals(2.5, rect.getCenter().getX()),
       () -> assertEquals(4.0, rect.getCenter().getY()));
   }

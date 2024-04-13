@@ -6,6 +6,7 @@ package edu.wpi.first.math.geometry;
 
 import java.util.Objects;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.proto.Rectangle2dProto;
 import edu.wpi.first.math.geometry.struct.Rectangle2dStruct;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
@@ -16,24 +17,24 @@ import edu.wpi.first.util.struct.StructSerializable;
  */
 public class Rectangle2d implements ProtobufSerializable, StructSerializable {
   private final Pose2d m_center;
-  private final double m_width, m_height;
+  private final double m_xWidth, m_yWidth;
 
   /**
    * Constructs a rectangle at the specified position with the specified width and height.
    * 
    * @param center The position (translation and rotation) of the rectangle.
-   * @param width The width (x size component) of the rectangle.
-   * @param height The height (y size component) of the rectangle.
+   * @param xWidth The x size component of the rectangle, in unrotated coordinate frame.
+   * @param yWidth The y size component of the rectangle, in unrotated coordinate frame.
    */
-  public Rectangle2d(Pose2d center, double width, double height) {
+  public Rectangle2d(Pose2d center, double xWidth, double yWidth) {
     // Safety check size
-    if (width < 0 || height < 0) {
+    if (xWidth < 0 || yWidth < 0) {
       throw new IllegalArgumentException("Rectangle2d dimensions cannot be less than 0!");
     }
 
     m_center = center;
-    m_width = width;
-    m_height = height;
+    m_xWidth = xWidth;
+    m_yWidth = yWidth;
   }
 
   /**
@@ -41,12 +42,12 @@ public class Rectangle2d implements ProtobufSerializable, StructSerializable {
    * height.
    * 
    * @param center The center of the rectangle.
-   * @param width The width (x size component) of the rectangle, in unrotated coordinate frame.
-   * @param height The height (y size component) of the rectangle, in unrotated coordinate frame.
+   * @param width The x size component of the rectangle, in unrotated coordinate frame.
+   * @param height The y size component of the rectangle, in unrotated coordinate frame.
    * @param rotation The rotation of the rectangle.
    */
-  public Rectangle2d(Translation2d center, double width, double height, Rotation2d rotation) {
-    this(new Pose2d(center, rotation), width, height);
+  public Rectangle2d(Translation2d center, double xWidth, double yWidth, Rotation2d rotation) {
+    this(new Pose2d(center, rotation), xWidth, yWidth);
   }
 
   /**
@@ -84,21 +85,21 @@ public class Rectangle2d implements ProtobufSerializable, StructSerializable {
   }
 
   /**
-   * Returns the width (x size component) of the rectangle.
+   * Returns the x size component of the rectangle.
    * 
-   * @return The width (x size component) of the rectangle.
+   * @return The x size component of the rectangle.
    */
-  public double getWidth() {
-    return m_width;
+  public double getXWidth() {
+    return m_xWidth;
   }
 
   /**
-   * Returns the height (y size component) of the rectangle.
+   * Returns the y size component of the rectangle.
    * 
-   * @return The height (y size component) of the rectangle.
+   * @return The y size component of the rectangle.
    */
-  public double getHeight() {
-    return m_height;
+  public double getYWidth() {
+    return m_yWidth;
   }
 
   /**
@@ -108,81 +109,83 @@ public class Rectangle2d implements ProtobufSerializable, StructSerializable {
    * @return The transformed rectangle
    */
   public Rectangle2d transformBy(Transform2d other) {
-    return new Rectangle2d(m_center.transformBy(other), m_width, m_height);
+    return new Rectangle2d(m_center.transformBy(other), m_xWidth, m_yWidth);
   }
 
   /**
-   * Checks if a point is intersected by this rectangle's perimeter.
+   * Rotates the center of the rectangle and returns the new rectangle.
+   * 
+   * @param other The rotation to transform by.
+   * @return The rotated rectangle.
+   */
+  public Rectangle2d rotateBy(Rotation2d other) {
+    return new Rectangle2d(m_center.rotateBy(other), m_xWidth, m_yWidth);
+  }
+
+  /**
+   * Checks if a point is intersected by the rectangle's perimeter.
    * 
    * @param point The point to check.
-   * @return True, if this rectangle's perimeter intersects the point.
+   * @return True, if the rectangle's perimeter intersects the point.
    */
   public boolean intersectsPoint(Translation2d point) {
-    // Rotate the point by the inverse of the rectangle's rotation
-    point = point.rotateAround(m_center.getTranslation(), m_center.getRotation().unaryMinus());
+    // Move the point into the rectangle's coordinate frame
+    point = point.minus(m_center.getTranslation());
+    point = point.rotateBy(m_center.getRotation().unaryMinus());
 
-    // Half of width and height
-    double w = m_width/2.0;
-    double h = m_height/2.0;
-
-    if (point.getX() == (m_center.getX() - w) || point.getX() == (m_center.getX() + w)) {
-      // Rests on left/right perimeter
-      return (point.getY() >= (m_center.getY() - h) && point.getY() <= (m_center.getY() - h));
-    } else if (point.getY() == (m_center.getY() - h) || point.getY() == (m_center.getY() + h)) {
-      // Rest on top/bottom perimeter
-      return (point.getX() >= (m_center.getX() - w) && point.getX() <= (m_center.getX() + h));
+    if (Math.abs(point.getX()) == m_xWidth / 2.0) {
+      // Point rests on left/right perimeter
+      return (Math.abs(point.getY()) <= m_yWidth / 2.0);
+    } else if (Math.abs(point.getY()) == m_yWidth / 2.0) {
+      // Point rests on top/bottom perimeter
+      return (Math.abs(point.getX()) <= m_xWidth / 2.0);
     }
 
     return false;
   }
 
   /**
-   * Checks if a point is contained within this rectangle.
-   * This is inclusive, if the point lies on the perimeter it will return {@code true}.
+   * Checks if a point is contained within the rectangle.
+   * This is inclusive, if the point lies on the perimeter it will return true.
    * 
    * @param point The point to check.
-   * @return True, if this rectangle contains the point or the perimeter intersects the point.
+   * @return True, if the rectangle contains the point or the perimeter intersects the point.
    */
   public boolean containsPoint(Translation2d point) {
-    // Rotate the point by the inverse of the rectangle's rotation
+    // Rotate the point into the rectangle's coordinate frame
     point = point.rotateAround(m_center.getTranslation(), m_center.getRotation().unaryMinus());
     
     // Check if within bounding box
     return (
-      point.getX() >= (m_center.getX() - m_width/2.0) && 
-      point.getX() <= (m_center.getX() + m_width/2.0) &&
-      point.getY() >= (m_center.getY() - m_height/2.0) &&
-      point.getY() <= (m_center.getY() + m_height/2.0)
-    );
+      point.getX() >= (m_center.getX() - m_xWidth/2.0) && 
+      point.getX() <= (m_center.getX() + m_xWidth/2.0) &&
+      point.getY() >= (m_center.getY() - m_yWidth/2.0) &&
+      point.getY() <= (m_center.getY() + m_yWidth/2.0));
   }
 
   /**
    * Returns the distance between the perimeter of the rectangle and the point.
    * 
    * @param point The point to check.
-   * @return The distance (0, if the point is on the perimeter or contained by the rectangle)
+   * @return The distance (0, if the point is contained by the rectangle)
    */
   public double distanceToPoint(Translation2d point) {
     if (containsPoint(point)) return 0.0;
 
-    // Rotate the point by the inverse of the rectangle's rotation
-    point = point.rotateAround(m_center.getTranslation(), m_center.getRotation().unaryMinus());
+    // Move the point into the rectangle's coordinate frame
+    point = point.minus(m_center.getTranslation());
+    point = point.rotateBy(m_center.getRotation().unaryMinus());
 
     // Find x and y distances
-    double dx = 
-      Math.max(m_center.getX() - (m_width/2.0) - point.getX(), 
-      Math.max(0.0, point.getX() - m_center.getX() - (m_width/2.0)));
-
-    double dy = 
-      Math.max(m_center.getY() - (m_height/2.0) - point.getY(), 
-      Math.max(0.0, point.getY() - m_center.getY() - (m_height/2.0)));
+    double dx = Math.max(0.0, Math.abs(point.getX()) - m_xWidth/2.0);
+    double dy = Math.max(0.0, Math.abs(point.getY()) - m_yWidth/2.0);
 
     // Distance formula
-    return Math.sqrt(dx*dx + dy*dy);
+    return Math.hypot(dx, dy);
   }
 
   /**
-   * Returns the nearest point that is contained within this rectangle.
+   * Returns the nearest point that is contained within the rectangle.
    * 
    * @param point The point that this will find the nearest point to.
    * @return A new point that is nearest to {@code point} and contained in the rectangle.
@@ -196,8 +199,8 @@ public class Rectangle2d implements ProtobufSerializable, StructSerializable {
   
     // Find nearest point
     point = new Translation2d(
-      Math.max(m_center.getX()-m_width/2.0, Math.min(point.getX(), m_center.getX()+m_width/2.0)),
-      Math.max(m_center.getY()-m_height/2.0, Math.min(point.getY(), m_center.getY()+m_height/2.0))
+      MathUtil.clamp(point.getX(), m_center.getX() - m_xWidth/2.0, m_center.getX() + m_xWidth/2.0),
+      MathUtil.clamp(point.getY(), m_center.getY() - m_yWidth/2.0, m_center.getY() + m_yWidth/2.0)
     );
 
     // Undo rotation
@@ -206,10 +209,10 @@ public class Rectangle2d implements ProtobufSerializable, StructSerializable {
 
   @Override
   public String toString() {
-    return String.format("Rectangle2d(Center: %s, W: %.2f, H: %.2f)",
-      m_center.toString(),
-      m_width,
-      m_height
+    return String.format("Rectangle2d(center: %s, x: %.2f, y: %.2f)",
+      m_center,
+      m_xWidth,
+      m_yWidth
     );
   }
 
@@ -223,15 +226,15 @@ public class Rectangle2d implements ProtobufSerializable, StructSerializable {
   public boolean equals(Object obj) {
     if (obj instanceof Rectangle2d) {
       return ((Rectangle2d) obj).getCenter().equals(m_center)
-          && ((Rectangle2d) obj).getWidth() == m_width
-          && ((Rectangle2d) obj).getHeight() == m_height;
+          && ((Rectangle2d) obj).getXWidth() == m_xWidth
+          && ((Rectangle2d) obj).getYWidth() == m_yWidth;
     }
     return false;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(m_center, m_width, m_height);
+    return Objects.hash(m_center, m_xWidth, m_yWidth);
   }
 
   /** Rectangle2d protobuf for serialization. */
