@@ -1,5 +1,9 @@
 package edu.wpi.first.math.geometry;
 
+import java.util.Objects;
+
+import edu.wpi.first.math.geometry.proto.Ellipse2dProto;
+import edu.wpi.first.math.geometry.struct.Ellipse2dStruct;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 
@@ -8,26 +12,24 @@ import edu.wpi.first.util.struct.StructSerializable;
  */
 public class Ellipse2d implements ProtobufSerializable, StructSerializable {
   private final Pose2d m_center;
-  private final double m_horizontalSemiAxis, m_verticalSemiAxis;
+  private final double m_xSemiAxis, m_ySemiAxis;
 
   /**
-   * Constructs an ellipse from two semi-axes, a horizontal and vertical one.
-   * 
-   * <p>The orientation of these radii may be changed via the rotational component of the center.
+   * Constructs an ellipse around a center point and two semi-axes, a horizontal and vertical one.
    * 
    * @param center The center of the ellipse.
-   * @param horizontalSemiAxis The horizontal (x-axis parallel) semi-axis.
-   * @param semiMajorAxis The vertical (y-axis parallel) semi-axis.
+   * @param xSemiAxis The x semi-axis.
+   * @param ySemiAxis The y semi-axis.
    */
-  public Ellipse2d(Pose2d center, double horizontalSemiAxis, double verticalSemiAxis) {
+  public Ellipse2d(Pose2d center, double xSemiAxis, double ySemiAxis) {
     // Safety check
-    if (horizontalSemiAxis <= 0 || verticalSemiAxis <= 0) {
+    if (xSemiAxis <= 0 || ySemiAxis <= 0) {
       throw new IllegalArgumentException("Ellipse2d semi-axes must be positive");
     }
 
     m_center = center;
-    m_horizontalSemiAxis = horizontalSemiAxis;
-    m_verticalSemiAxis = verticalSemiAxis;
+    m_xSemiAxis = xSemiAxis;
+    m_ySemiAxis = ySemiAxis;
   }
 
   /**
@@ -50,21 +52,21 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
   }
 
   /**
-   * Returns the horizontal semi-axis.
+   * Returns the x semi-axis.
    * 
-   * @return The horizontal semi-axis.
+   * @return The x semi-axis.
    */
-  public double getHorizontalSemiAxis() {
-    return m_horizontalSemiAxis;
+  public double getXSemiAxis() {
+    return m_xSemiAxis;
   }
 
   /**
-   * Returns the vertical semi-axis.
+   * Returns the y semi-axis.
    * 
-   * @return The vertical semi-axis.
+   * @return The y semi-axis.
    */
-  public double getVerticalSemiAxis() {
-    return m_verticalSemiAxis;
+  public double getYSemiAxis() {
+    return m_ySemiAxis;
   }
 
   /**
@@ -75,13 +77,13 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
    * @return A focal point.
    */
   public Translation2d getFocalPoint(boolean first) {
-    double a = Math.max(m_horizontalSemiAxis, m_verticalSemiAxis); // Major semi-axis
-    double b = Math.min(m_horizontalSemiAxis, m_verticalSemiAxis); // Minor semi-axis
-    double c = Math.sqrt(a*a - b*b);
+    double a = Math.max(m_xSemiAxis, m_ySemiAxis); // Major semi-axis
+    double b = Math.min(m_xSemiAxis, m_ySemiAxis); // Minor semi-axis
+    double c = Math.hypot(a, b);
 
     c = (first ? -c : c);
 
-    if (m_horizontalSemiAxis > m_verticalSemiAxis) {
+    if (m_xSemiAxis > m_ySemiAxis) {
       Transform2d diff = new Transform2d(c, 0.0, new Rotation2d());
       return m_center.plus(diff).getTranslation();
     } else {
@@ -99,10 +101,19 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
   public Ellipse2d transformBy(Transform2d other) {
     return new Ellipse2d(
       m_center.transformBy(other), 
-      m_horizontalSemiAxis, 
-      m_verticalSemiAxis);
+      m_xSemiAxis, 
+      m_ySemiAxis);
   }
 
+  /**
+   * Rotates the center of the ellipse and returns the new ellipse.
+   * 
+   * @param other The rotation to transform by.
+   * @return The rotated ellipse.
+   */
+  public Ellipse2d rotateBy(Rotation2d other) {
+    return new Ellipse2d(m_center.rotateBy(other), m_xSemiAxis, m_ySemiAxis);
+  }
 
   /**
    * Solves the equation of an ellipse from the given point. This is a helper function used to
@@ -122,8 +133,8 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
     double x = point.getX() - m_center.getX();
     double y = point.getY() - m_center.getY();
 
-    return (x * x) / (m_horizontalSemiAxis * m_horizontalSemiAxis) +
-           (y * y) / (m_verticalSemiAxis * m_verticalSemiAxis);
+    return (x * x) / (m_xSemiAxis * m_ySemiAxis) +
+           (y * y) / (m_xSemiAxis * m_ySemiAxis);
   }
 
   /**
@@ -146,4 +157,37 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
   public boolean containsPoint(Translation2d point) {
     return solveEllipseEquation(point) <= 1.0;
   }
+
+  @Override
+  public String toString() {
+    return String.format("Ellipse2d(center: %s, x: %.2f, y:%.2f)",
+      m_center, m_xSemiAxis, m_ySemiAxis);
+  }
+
+  /**
+   * Checks equality between this Ellipse2d and another object
+   * 
+   * @param obj The other object.
+   * @return Whether the two objects are equal or not.
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof Ellipse2d) {
+      return ((Ellipse2d) obj).getCenter().equals(m_center)
+          && ((Ellipse2d) obj).getXSemiAxis() == m_xSemiAxis
+          && ((Ellipse2d) obj).getYSemiAxis() == m_ySemiAxis;
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(m_center, m_xSemiAxis, m_ySemiAxis);
+  }
+
+  /** Ellipse2d protobuf for serialization. */
+  public static final Ellipse2dProto proto = new Ellipse2dProto();
+
+  /** Ellipse2d struct for serialization. */
+  public static final Ellipse2dStruct struct = new Ellipse2dStruct();
 }

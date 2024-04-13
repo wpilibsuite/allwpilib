@@ -210,10 +210,7 @@ public class Rectangle2d implements ProtobufSerializable, StructSerializable {
   @Override
   public String toString() {
     return String.format("Rectangle2d(center: %s, x: %.2f, y: %.2f)",
-      m_center,
-      m_xWidth,
-      m_yWidth
-    );
+      m_center, m_xWidth, m_yWidth);
   }
 
   /**

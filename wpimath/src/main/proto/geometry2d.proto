@@ -31,6 +31,12 @@ message ProtobufTwist2d {
 
 message ProtobufRectangle2d {
   ProtobufPose2d center = 1;
-  double width = 2;
-  double height = 3;
+  double xWidth = 2;
+  double yWidth = 3;
+}
+
+message ProtobufEllipse2d {
+  ProtobufPose2d center = 1;
+  double xSemiAxis = 2;
+  double ySemiAxis = 3;
 }

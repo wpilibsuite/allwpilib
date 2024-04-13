@@ -4,21 +4,21 @@
 
 package edu.wpi.first.math.geometry.proto;
 
+import edu.wpi.first.math.geometry.Ellipse2d;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rectangle2d;
-import edu.wpi.first.math.proto.Geometry2D.ProtobufRectangle2d;
+import edu.wpi.first.math.proto.Geometry2D.ProtobufEllipse2d;
 import edu.wpi.first.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;
 
-public class Rectangle2dProto implements Protobuf<Rectangle2d, ProtobufRectangle2d> {
+public class Ellipse2dProto implements Protobuf<Ellipse2d, ProtobufEllipse2d> {
   @Override
-  public Class<Rectangle2d> getTypeClass() {
-    return Rectangle2d.class;
+  public Class<Ellipse2d> getTypeClass() {
+    return Ellipse2d.class;
   }
 
   @Override
   public Descriptor getDescriptor() {
-    return ProtobufRectangle2d.getDescriptor();
+    return ProtobufEllipse2d.getDescriptor();
   }
 
   @Override
@@ -27,23 +27,23 @@ public class Rectangle2dProto implements Protobuf<Rectangle2d, ProtobufRectangle
   }
 
   @Override
-  public ProtobufRectangle2d createMessage() {
-    return ProtobufRectangle2d.newInstance();
+  public ProtobufEllipse2d createMessage() {
+    return ProtobufEllipse2d.newInstance();
   }
 
   @Override
-  public Rectangle2d unpack(ProtobufRectangle2d msg) {
-    return new Rectangle2d(
+  public Ellipse2d unpack(ProtobufEllipse2d msg) {
+    return new Ellipse2d(
       Pose2d.proto.unpack(msg.getCenter()), 
-      msg.getXWidth(), 
-      msg.getYWidth()
+      msg.getXSemiAxis(), 
+      msg.getYSemiAxis()
     );
   }
 
   @Override
-  public void pack(ProtobufRectangle2d msg, Rectangle2d value) {
+  public void pack(ProtobufEllipse2d msg, Ellipse2d value) {
     Pose2d.proto.pack(msg.getMutableCenter(), value.getCenter());
-    msg.setXWidth(value.getXWidth());
-    msg.setYWidth(value.getYWidth());
+    msg.setXSemiAxis(value.getXSemiAxis());
+    msg.setYSemiAxis(value.getYSemiAxis());
   }
 }
