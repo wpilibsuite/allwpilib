@@ -57,10 +57,10 @@ public class Ellipse2dTest {
     var ellipse1 = new Ellipse2d(center1, 2.0, 3.0);
 
     var center2 = new Pose2d(1.0, 2.0, Rotation2d.fromDegrees(90.0));
-    var ellipse2 = new Ellipse2d(center1, 2.0, 3.0);
+    var ellipse2 = new Ellipse2d(center2, 2.0, 3.0);
 
     var center3 = new Pose2d(1.0, 2.0, Rotation2d.fromDegrees(90.0));
-    var ellipse3 = new Ellipse2d(center1, 3.0, 2.0);
+    var ellipse3 = new Ellipse2d(center3, 3.0, 2.0);
 
     assertAll(
       () -> assertTrue(ellipse1.equals(ellipse2)),
