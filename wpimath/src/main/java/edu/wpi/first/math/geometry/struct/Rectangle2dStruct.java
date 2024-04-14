@@ -4,11 +4,10 @@
 
 package edu.wpi.first.math.geometry.struct;
 
-import java.nio.ByteBuffer;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rectangle2d;
 import edu.wpi.first.util.struct.Struct;
+import java.nio.ByteBuffer;
 
 public class Rectangle2dStruct implements Struct<Rectangle2d> {
   @Override
@@ -49,5 +48,5 @@ public class Rectangle2dStruct implements Struct<Rectangle2d> {
     Pose2d.struct.pack(bb, value.getCenter());
     bb.putDouble(value.getXWidth());
     bb.putDouble(value.getYWidth());
-  } 
+  }
 }

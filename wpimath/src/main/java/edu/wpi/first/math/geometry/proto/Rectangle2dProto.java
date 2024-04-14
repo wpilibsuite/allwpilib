@@ -33,11 +33,7 @@ public class Rectangle2dProto implements Protobuf<Rectangle2d, ProtobufRectangle
 
   @Override
   public Rectangle2d unpack(ProtobufRectangle2d msg) {
-    return new Rectangle2d(
-      Pose2d.proto.unpack(msg.getCenter()), 
-      msg.getXWidth(), 
-      msg.getYWidth()
-    );
+    return new Rectangle2d(Pose2d.proto.unpack(msg.getCenter()), msg.getXWidth(), msg.getYWidth());
   }
 
   @Override

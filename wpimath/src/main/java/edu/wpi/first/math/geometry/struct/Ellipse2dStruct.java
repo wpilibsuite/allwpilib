@@ -4,11 +4,10 @@
 
 package edu.wpi.first.math.geometry.struct;
 
-import java.nio.ByteBuffer;
-
 import edu.wpi.first.math.geometry.Ellipse2d;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.util.struct.Struct;
+import java.nio.ByteBuffer;
 
 public class Ellipse2dStruct implements Struct<Ellipse2d> {
   @Override
@@ -49,5 +48,5 @@ public class Ellipse2dStruct implements Struct<Ellipse2d> {
     Pose2d.struct.pack(bb, value.getCenter());
     bb.putDouble(value.getXSemiAxis());
     bb.putDouble(value.getYSemiAxis());
-  } 
+  }
 }

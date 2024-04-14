@@ -6,20 +6,16 @@ package edu.wpi.first.math.geometry.struct;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-
-import org.junit.jupiter.api.Test;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rectangle2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import org.junit.jupiter.api.Test;
 
 public class Rectangle2dStructTest {
   private static final Rectangle2d DATA =
-    new Rectangle2d(
-      new Pose2d(1.0, 2.0, new Rotation2d(3.1)), 
-      5.0, 3.0);
+      new Rectangle2d(new Pose2d(1.0, 2.0, new Rotation2d(3.1)), 5.0, 3.0);
 
   @Test
   void testRoundtrip() {

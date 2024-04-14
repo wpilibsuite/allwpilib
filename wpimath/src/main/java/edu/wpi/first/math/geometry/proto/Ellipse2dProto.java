@@ -34,10 +34,7 @@ public class Ellipse2dProto implements Protobuf<Ellipse2d, ProtobufEllipse2d> {
   @Override
   public Ellipse2d unpack(ProtobufEllipse2d msg) {
     return new Ellipse2d(
-      Pose2d.proto.unpack(msg.getCenter()), 
-      msg.getXSemiAxis(), 
-      msg.getYSemiAxis()
-    );
+        Pose2d.proto.unpack(msg.getCenter()), msg.getXSemiAxis(), msg.getYSemiAxis());
   }
 
   @Override

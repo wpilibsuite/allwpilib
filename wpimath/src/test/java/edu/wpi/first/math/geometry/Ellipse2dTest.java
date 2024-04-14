@@ -21,8 +21,8 @@ public class Ellipse2dTest {
     var b = ellipse.getFocalPoint(false);
 
     assertAll(
-      () -> assertEquals(new Translation2d(-2.0, 2.0), a),
-      () -> assertEquals(new Translation2d(4.0, 2.0), b));
+        () -> assertEquals(new Translation2d(-2.0, 2.0), a),
+        () -> assertEquals(new Translation2d(4.0, 2.0), b));
   }
 
   @Test
@@ -34,8 +34,8 @@ public class Ellipse2dTest {
     var pointB = new Translation2d(0.0, 3.0);
 
     assertAll(
-      () -> assertTrue(ellipse.intersectsPoint(pointA)),
-      () -> assertFalse(ellipse.intersectsPoint(pointB)));
+        () -> assertTrue(ellipse.intersectsPoint(pointA)),
+        () -> assertFalse(ellipse.intersectsPoint(pointB)));
   }
 
   @Test
@@ -47,8 +47,8 @@ public class Ellipse2dTest {
     var pointB = new Translation2d(0.5, -2.0);
 
     assertAll(
-      () -> assertTrue(ellipse.containsPoint(pointA)),
-      () -> assertFalse(ellipse.containsPoint(pointB)));
+        () -> assertTrue(ellipse.containsPoint(pointA)),
+        () -> assertFalse(ellipse.containsPoint(pointB)));
   }
 
   @Test
@@ -63,8 +63,8 @@ public class Ellipse2dTest {
     var ellipse3 = new Ellipse2d(center3, 3.0, 2.0);
 
     assertAll(
-      () -> assertTrue(ellipse1.equals(ellipse2)),
-      () -> assertFalse(ellipse1.equals(ellipse3)),
-      () -> assertFalse(ellipse3.equals(ellipse2)));
+        () -> assertTrue(ellipse1.equals(ellipse2)),
+        () -> assertFalse(ellipse1.equals(ellipse3)),
+        () -> assertFalse(ellipse3.equals(ellipse2)));
   }
 }

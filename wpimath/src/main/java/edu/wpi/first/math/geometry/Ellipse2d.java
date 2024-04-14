@@ -4,23 +4,20 @@
 
 package edu.wpi.first.math.geometry;
 
-import java.util.Objects;
-
 import edu.wpi.first.math.geometry.proto.Ellipse2dProto;
 import edu.wpi.first.math.geometry.struct.Ellipse2dStruct;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
+import java.util.Objects;
 
-/** 
- * Represents a 2d ellipse space containing translational, rotational, and scaling components 
- */
+/** Represents a 2d ellipse space containing translational, rotational, and scaling components */
 public class Ellipse2d implements ProtobufSerializable, StructSerializable {
   private final Pose2d m_center;
   private final double m_xSemiAxis, m_ySemiAxis;
 
   /**
    * Constructs an ellipse around a center point and two semi-axes, a horizontal and vertical one.
-   * 
+   *
    * @param center The center of the ellipse.
    * @param xSemiAxis The x semi-axis.
    * @param ySemiAxis The y semi-axis.
@@ -38,7 +35,7 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
 
   /**
    * Constructs a perfectly circular ellipse with the specified radius.
-   * 
+   *
    * @param center The center of the circle.
    * @param radius The radius of the circle.
    */
@@ -48,7 +45,7 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
 
   /**
    * Returns the center of the ellipse.
-   * 
+   *
    * @return The center of the ellipse.
    */
   public Pose2d getCenter() {
@@ -57,7 +54,7 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
 
   /**
    * Returns the x semi-axis.
-   * 
+   *
    * @return The x semi-axis.
    */
   public double getXSemiAxis() {
@@ -66,7 +63,7 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
 
   /**
    * Returns the y semi-axis.
-   * 
+   *
    * @return The y semi-axis.
    */
   public double getYSemiAxis() {
@@ -74,16 +71,16 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
   }
 
   /**
-   * Returns either of the focal points of the ellipse.
-   * In a perfect circle, this will always return the center.
-   * 
+   * Returns either of the focal points of the ellipse. In a perfect circle, this will always return
+   * the center.
+   *
    * @param first Whether to return the first (-c) or second (+c) focal point.
    * @return A focal point.
    */
   public Translation2d getFocalPoint(boolean first) {
     double a = Math.max(m_xSemiAxis, m_ySemiAxis); // Major semi-axis
     double b = Math.min(m_xSemiAxis, m_ySemiAxis); // Minor semi-axis
-    double c = Math.sqrt(a*a - b*b);
+    double c = Math.sqrt(a * a - b * b);
 
     c = (first ? -c : c);
 
@@ -98,7 +95,7 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
 
   /**
    * Transforms the center of the ellipse and returns the new ellipse.
-   * 
+   *
    * @param other The transform to transform by.
    * @return The transformed ellipse.
    */
@@ -108,7 +105,7 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
 
   /**
    * Rotates the center of the ellipse and returns the new ellipse.
-   * 
+   *
    * @param other The rotation to transform by.
    * @return The rotated ellipse.
    */
@@ -119,13 +116,14 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
   /**
    * Solves the equation of an ellipse from the given point. This is a helper function used to
    * determine if that point lies inside of or on an ellipse.
-   * 
+   *
    * <pre>
    * (x-h)^2 / a^2 + (y-k)^2 / b^2 = 1
    * </pre>
+   *
    * @param point The point to solve for.
-   * @return < 1.0 if the point lies inside the ellipse, == 1.0 if a point lies on the ellipse,
-   *  and > 1.0 if the point lies outsides the ellipse.
+   * @return < 1.0 if the point lies inside the ellipse, == 1.0 if a point lies on the ellipse, and
+   *     > 1.0 if the point lies outsides the ellipse.
    */
   private double solveEllipseEquation(Translation2d point) {
     // Rotate the point by the inverse of the ellipse's rotation
@@ -134,13 +132,12 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
     double x = point.getX() - m_center.getX();
     double y = point.getY() - m_center.getY();
 
-    return (x * x) / (m_xSemiAxis * m_xSemiAxis) +
-           (y * y) / (m_ySemiAxis * m_ySemiAxis);
+    return (x * x) / (m_xSemiAxis * m_xSemiAxis) + (y * y) / (m_ySemiAxis * m_ySemiAxis);
   }
 
   /**
    * Checks if a point is intersected by this ellipse's circumference.
-   * 
+   *
    * @param point The point to check.
    * @return True, if this ellipse's circumference intersects the point.
    */
@@ -149,9 +146,9 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
   }
 
   /**
-   * Checks if a point is contained within this ellipse.
-   * This is inclusive, if the point lies on the circumference this will return {@code true}.
-   * 
+   * Checks if a point is contained within this ellipse. This is inclusive, if the point lies on the
+   * circumference this will return {@code true}.
+   *
    * @param point The point to check.
    * @return True, if the point is within or on the ellipse.
    */
@@ -161,13 +158,13 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
 
   @Override
   public String toString() {
-    return String.format("Ellipse2d(center: %s, x: %.2f, y:%.2f)",
-      m_center, m_xSemiAxis, m_ySemiAxis);
+    return String.format(
+        "Ellipse2d(center: %s, x: %.2f, y:%.2f)", m_center, m_xSemiAxis, m_ySemiAxis);
   }
 
   /**
    * Checks equality between this Ellipse2d and another object
-   * 
+   *
    * @param obj The other object.
    * @return Whether the two objects are equal or not.
    */

@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 
 public class Rectangle2dTest {
   private static final double kEpsilon = 1E-9;
-  
+
   @Test
   void testNewWithCorners() {
     var cornerA = new Translation2d(1.0, 2.0);
@@ -22,10 +22,10 @@ public class Rectangle2dTest {
     var rect = new Rectangle2d(cornerA, cornerB);
 
     assertAll(
-      () -> assertEquals(3.0, rect.getXWidth()),
-      () -> assertEquals(4.0, rect.getYWidth()),
-      () -> assertEquals(2.5, rect.getCenter().getX()),
-      () -> assertEquals(4.0, rect.getCenter().getY()));
+        () -> assertEquals(3.0, rect.getXWidth()),
+        () -> assertEquals(4.0, rect.getYWidth()),
+        () -> assertEquals(2.5, rect.getCenter().getX()),
+        () -> assertEquals(4.0, rect.getCenter().getY()));
   }
 
   @Test
@@ -34,10 +34,10 @@ public class Rectangle2dTest {
     var rect = new Rectangle2d(center, 2.0, 3.0);
 
     assertAll(
-      () -> assertTrue(rect.intersectsPoint(new Translation2d(5.5, 4.0))),
-      () -> assertTrue(rect.containsPoint(new Translation2d(3.0, 2.0))),
-      () -> assertFalse(rect.containsPoint(new Translation2d(4.0, 1.5))),
-      () -> assertFalse(rect.intersectsPoint(new Translation2d(4.0, 3.5))));
+        () -> assertTrue(rect.intersectsPoint(new Translation2d(5.5, 4.0))),
+        () -> assertTrue(rect.containsPoint(new Translation2d(3.0, 2.0))),
+        () -> assertFalse(rect.containsPoint(new Translation2d(4.0, 1.5))),
+        () -> assertFalse(rect.intersectsPoint(new Translation2d(4.0, 3.5))));
   }
 
   @Test
@@ -46,9 +46,9 @@ public class Rectangle2dTest {
     var rect = new Rectangle2d(center, 3.0, 1.0);
 
     assertAll(
-      () -> assertTrue(rect.containsPoint(new Translation2d(2.0, 3.0))),
-      () -> assertTrue(rect.containsPoint(new Translation2d(3.0, 4.0))),
-      () -> assertFalse(rect.containsPoint(new Translation2d(3.0, 3.0))));
+        () -> assertTrue(rect.containsPoint(new Translation2d(2.0, 3.0))),
+        () -> assertTrue(rect.containsPoint(new Translation2d(3.0, 4.0))),
+        () -> assertFalse(rect.containsPoint(new Translation2d(3.0, 3.0))));
   }
 
   @Test
@@ -62,10 +62,10 @@ public class Rectangle2dTest {
     var point4 = new Translation2d(-1.0, 2.5);
 
     assertAll(
-      () -> assertEquals(0.5, rect.distanceToPoint(point1), kEpsilon),
-      () -> assertEquals(0.0, rect.distanceToPoint(point2), kEpsilon),
-      () -> assertEquals(0.5, rect.distanceToPoint(point3), kEpsilon),
-      () -> assertEquals(1.0, rect.distanceToPoint(point4), kEpsilon));
+        () -> assertEquals(0.5, rect.distanceToPoint(point1), kEpsilon),
+        () -> assertEquals(0.0, rect.distanceToPoint(point2), kEpsilon),
+        () -> assertEquals(0.5, rect.distanceToPoint(point3), kEpsilon),
+        () -> assertEquals(1.0, rect.distanceToPoint(point4), kEpsilon));
   }
 
   @Test
@@ -80,10 +80,10 @@ public class Rectangle2dTest {
     var nearestPoint2 = rect.findNearestPoint(point2);
 
     assertAll(
-      () -> assertEquals(1.0, nearestPoint1.getX(), kEpsilon),
-      () -> assertEquals(2.5, nearestPoint1.getY(), kEpsilon),
-      () -> assertEquals(0.0, nearestPoint2.getX(), kEpsilon),
-      () -> assertEquals(0.0, nearestPoint2.getY(), kEpsilon));
+        () -> assertEquals(1.0, nearestPoint1.getX(), kEpsilon),
+        () -> assertEquals(2.5, nearestPoint1.getY(), kEpsilon),
+        () -> assertEquals(0.0, nearestPoint2.getX(), kEpsilon),
+        () -> assertEquals(0.0, nearestPoint2.getY(), kEpsilon));
   }
 
   @Test
@@ -97,8 +97,6 @@ public class Rectangle2dTest {
     var center3 = new Pose2d(2.0, 3.0, new Rotation2d());
     var rect3 = new Rectangle2d(center3, 3.0, 3.0);
 
-    assertAll(
-      () -> assertTrue(rect1.equals(rect2)),
-      () -> assertFalse(rect2.equals(rect3)));
+    assertAll(() -> assertTrue(rect1.equals(rect2)), () -> assertFalse(rect2.equals(rect3)));
   }
 }

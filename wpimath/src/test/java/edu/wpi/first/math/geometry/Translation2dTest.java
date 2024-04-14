@@ -56,8 +56,8 @@ class Translation2dTest {
     var rotated = original.rotateAround(other, Rotation2d.fromDegrees(180.0));
 
     assertAll(
-      () -> assertEquals(4.0, rotated.getX(), kEpsilon),
-      () -> assertEquals(3.0, rotated.getY(), kEpsilon));
+        () -> assertEquals(4.0, rotated.getX(), kEpsilon),
+        () -> assertEquals(3.0, rotated.getY(), kEpsilon));
   }
 
   @Test
