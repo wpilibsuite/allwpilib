@@ -6,14 +6,14 @@ package edu.wpi.first.util.sendable2;
 
 /** Sendable publish/subscribe option. */
 public class SendableOption {
-  enum Kind {
-    periodic,
-    typeString,
-    sendAll,
-    pollStorage,
-    keepDuplicates,
-    disableRemote,
-    disableLocal
+  public enum Kind {
+    kPeriodic,
+    kTypeString,
+    kSendAll,
+    kPollStorage,
+    kKeepDuplicates,
+    kDisableRemote,
+    kDisableLocal
   }
 
   SendableOption(Kind kind, boolean value) {
@@ -53,7 +53,7 @@ public class SendableOption {
    * Not used for raw values (pass the type string directly to the functions).
    */
   public static SendableOption typeString(String typeString) {
-    return new SendableOption(Kind.typeString, typeString);
+    return new SendableOption(Kind.kTypeString, typeString);
   }
 
   /**
@@ -65,7 +65,7 @@ public class SendableOption {
    * @return option
    */
   public static SendableOption periodic(double period) {
-    return new SendableOption(Kind.periodic, period);
+    return new SendableOption(Kind.kPeriodic, period);
   }
 
   /**
@@ -75,7 +75,7 @@ public class SendableOption {
    * @return option
    */
   public static SendableOption sendAll(boolean enabled) {
-    return new SendableOption(Kind.sendAll, enabled);
+    return new SendableOption(Kind.kSendAll, enabled);
   }
 
   /**
@@ -86,7 +86,7 @@ public class SendableOption {
    * @return option
    */
   public static SendableOption keepDuplicates(boolean enabled) {
-    return new SendableOption(Kind.keepDuplicates, enabled);
+    return new SendableOption(Kind.kKeepDuplicates, enabled);
   }
 
   /**
@@ -98,7 +98,7 @@ public class SendableOption {
    * @return option
    */
   public static SendableOption pollStorage(int depth) {
-    return new SendableOption(Kind.pollStorage, depth);
+    return new SendableOption(Kind.kPollStorage, depth);
   }
 
   /**
@@ -109,7 +109,7 @@ public class SendableOption {
    * @return option
    */
   public static SendableOption disableRemote(boolean disabled) {
-    return new SendableOption(Kind.disableRemote, disabled);
+    return new SendableOption(Kind.kDisableRemote, disabled);
   }
 
   /**
@@ -120,7 +120,27 @@ public class SendableOption {
    * @return option
    */
   public static SendableOption disableLocal(boolean disabled) {
-    return new SendableOption(Kind.disableLocal, disabled);
+    return new SendableOption(Kind.kDisableLocal, disabled);
+  }
+
+  public Kind getKind() {
+    return m_kind;
+  }
+
+  public boolean getBooleanValue() {
+    return m_bValue;
+  }
+
+  public int getIntValue() {
+    return m_iValue;
+  }
+
+  public double getDoubleValue() {
+    return m_dValue;
+  }
+
+  public String getStringValue() {
+    return m_sValue;
   }
 
   final Kind m_kind;

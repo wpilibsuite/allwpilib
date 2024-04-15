@@ -29,6 +29,11 @@ import java.util.function.LongConsumer;
 import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.util.JsonParserDelegate;
+
 /** NetworkTables-backed implementation of SendableTable. */
 public class DataLogSendableTable implements SendableTable {
   private static final char PATH_SEPARATOR = '/';
@@ -61,7 +66,8 @@ public class DataLogSendableTable implements SendableTable {
     byte[] rawValue;
     ByteBuffer rawByteBufferValue;
 
-    String properties = new String();
+    final Map<String, String> propertiesMap = new HashMap<>();
+    String properties = "{}";
     StructBuffer<?> structBuffer;
     ProtobufBuffer<?, ?> protobufBuffer;
     Consumer<EntryData> polledUpdate;
@@ -72,6 +78,24 @@ public class DataLogSendableTable implements SendableTable {
       if (entry != 0) {
         log.finish(entry);
         entry = 0;
+      }
+    }
+
+    void refreshProperties() {
+      StringBuilder sb = new StringBuilder();
+      sb.append('{');
+      propertiesMap.forEach((k, v) -> {
+        sb.append('"');
+        sb.append(k.replace("\"", "\\\""));
+        sb.append("\":");
+        sb.append(v);
+        sb.append(',');
+      });
+      // replace the trailing comma with a }
+      sb.setCharAt(sb.length() - 1, '}');
+      properties = sb.toString();
+      if (entry != 0) {
+        log.setMetadata(entry, properties);
       }
     }
 
@@ -847,7 +871,12 @@ public class DataLogSendableTable implements SendableTable {
    */
   @Override
   public String getProperty(String name, String propName) {
-    return "null"; // TODO
+    EntryData data = m_entries.get(name);
+    if (data == null) {
+      return "null";
+    }
+    String value = data.propertiesMap.get(propName);
+    return value != null ? value : "null";
   }
 
   /**
@@ -860,7 +889,9 @@ public class DataLogSendableTable implements SendableTable {
    */
   @Override
   public void setProperty(String name, String propName, String value) {
-    // TODO
+    EntryData data = m_entries.computeIfAbsent(name, k -> new EntryData());
+    data.propertiesMap.put(propName, value);
+    data.refreshProperties();
   }
 
   /**
@@ -871,7 +902,13 @@ public class DataLogSendableTable implements SendableTable {
    */
   @Override
   public void deleteProperty(String name, String propName) {
-    // TODO
+    EntryData data = m_entries.get(name);
+    if (data == null) {
+      return;
+    }
+    if (data.propertiesMap.remove(propName) != null) {
+      data.refreshProperties();
+    }
   }
 
   /**
@@ -883,7 +920,11 @@ public class DataLogSendableTable implements SendableTable {
    */
   @Override
   public String getProperties(String name) {
-    return "{}"; // TODO
+    EntryData data = m_entries.get(name);
+    if (data == null) {
+      return "{}";
+    }
+    return data.properties;
   }
 
   /**
@@ -892,12 +933,23 @@ public class DataLogSendableTable implements SendableTable {
    * values result in deletion of the corresponding property.
    *
    * @param name name
-   * @param properties JSON object string with keys to add/update/delete
+   * @param properties map of keys/JSON values to add/update/delete
    * @throws IllegalArgumentException if properties is not a JSON object
    */
   @Override
-  public void setProperties(String name, String properties) {
-    // TODO
+  public void setProperties(String name, Map<String, String> properties) {
+    if (properties.isEmpty()) {
+      return;
+    }
+    EntryData data = m_entries.computeIfAbsent(name, k -> new EntryData());
+    properties.forEach((k, v) -> {
+      if (v == null) {
+        data.propertiesMap.remove(k);
+      } else {
+        data.propertiesMap.put(k, v);
+      }
+    });
+    data.refreshProperties();
   }
 
   @Override
