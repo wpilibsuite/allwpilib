@@ -14,6 +14,7 @@ import edu.wpi.first.util.struct.StructBuffer;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Map;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
@@ -212,7 +213,7 @@ public interface SendableTable extends AutoCloseable {
     addSchema(struct);
     final StructBuffer<T> buf = StructBuffer.create(struct);
     final Consumer<ByteBuffer> consumer = addRawBufferPublisher(name, struct.getTypeString());
-    return (T value) -> {
+    return value -> {
       consumer.accept(buf.write(value));
     };
   }
@@ -221,7 +222,7 @@ public interface SendableTable extends AutoCloseable {
     addSchema(proto);
     final ProtobufBuffer<T, ?> buf = ProtobufBuffer.create(proto);
     final Consumer<ByteBuffer> consumer = addRawBufferPublisher(name, proto.getTypeString());
-    return (T value) -> {
+    return value -> {
       try {
         consumer.accept(buf.write(value));
       } catch (IOException e) {
@@ -322,10 +323,10 @@ public interface SendableTable extends AutoCloseable {
    * values result in deletion of the corresponding property.
    *
    * @param name name
-   * @param properties JSON object string with keys to add/update/delete
-   * @throws IllegalArgumentException if properties is not a JSON object
+   * @param properties map of keys/JSON values to add/update/delete
+   * @throws IllegalArgumentException if a properties value is not a JSON object
    */
-  void setProperties(String name, String properties);
+  void setProperties(String name, Map<String, String> properties);
 
   void remove(String name);
 
@@ -347,10 +348,10 @@ public interface SendableTable extends AutoCloseable {
    * instance has published. This does NOT perform a check as to whether the schema has already
    * been published by another node on the network.
    *
-   * @param name Name (the string passed as the data type for topics using this schema)
+   * @param typeString Name (the string passed as the data type for topics using this schema)
    * @return True if schema already registered
    */
-  boolean hasSchema(String name);
+  boolean hasSchema(String typeString);
 
   /**
    * Registers a data schema. Data schemas provide information for how a certain data type string
@@ -359,11 +360,11 @@ public interface SendableTable extends AutoCloseable {
    * are published just like normal topics, with the name being generated from the provided name:
    * "/.schema/name". Duplicate calls to this function with the same name are silently ignored.
    *
-   * @param name Name (the string passed as the data type for topics using this schema)
+   * @param typeString Name (the string passed as the data type for topics using this schema)
    * @param type Type of schema (e.g. "protobuf", "struct", etc)
    * @param schema Schema data
    */
-  void addSchema(String name, String type, byte[] schema);
+  void addSchema(String typeString, String type, byte[] schema);
 
   /**
    * Registers a data schema. Data schemas provide information for how a certain data type string
@@ -372,11 +373,11 @@ public interface SendableTable extends AutoCloseable {
    * are published just like normal topics, with the name being generated from the provided name:
    * "/.schema/name". Duplicate calls to this function with the same name are silently ignored.
    *
-   * @param name Name (the string passed as the data type for topics using this schema)
+   * @param typeString Name (the string passed as the data type for topics using this schema)
    * @param type Type of schema (e.g. "protobuf", "struct", etc)
    * @param schema Schema data
    */
-  void addSchema(String name, String type, String schema);
+  void addSchema(String typeString, String type, String schema);
 
   /**
    * Registers a protobuf schema. Duplicate calls to this function with the same name are silently

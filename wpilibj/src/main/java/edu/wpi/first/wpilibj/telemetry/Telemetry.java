@@ -16,6 +16,7 @@ import edu.wpi.first.util.sendable2.SendableTable;
 import edu.wpi.first.util.struct.Struct;
 
 import java.nio.ByteBuffer;
+import java.util.Map;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
@@ -391,10 +392,10 @@ public class Telemetry {
    * values result in deletion of the corresponding property.
    *
    * @param name name
-   * @param properties JSON object string with keys to add/update/delete
+   * @param properties map of keys/JSON values to add/update/delete
    * @throws IllegalArgumentException if properties is not a JSON object
    */
-  public static void setProperties(String name, String properties) {
+  public static void setProperties(String name, Map<String, String> properties) {
     getTable().setProperties(name, properties);
   }
 
