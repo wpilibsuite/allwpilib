@@ -96,6 +96,7 @@ if(WITH_JAVA)
     add_dependencies(wpimathjni wpimath_jar)
 
     install(TARGETS wpimathjni EXPORT wpimathjni)
+    export(TARGETS wpimathjni FILE wpimathjni.cmake NAMESPACE wpimathjni::)
 endif()
 
 if(WITH_JAVA_SOURCE)
@@ -200,6 +201,7 @@ target_include_directories(
 )
 
 install(TARGETS wpimath EXPORT wpimath)
+export(TARGETS wpimath FILE wpimath.cmake NAMESPACE wpimath::)
 
 configure_file(wpimath-config.cmake.in ${WPILIB_BINARY_DIR}/wpimath-config.cmake)
 install(FILES ${WPILIB_BINARY_DIR}/wpimath-config.cmake DESTINATION share/wpimath)

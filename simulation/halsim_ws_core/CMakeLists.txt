@@ -14,3 +14,4 @@ target_include_directories(halsim_ws_core PUBLIC src/main/native/include)
 set_property(TARGET halsim_ws_core PROPERTY FOLDER "libraries")
 
 install(TARGETS halsim_ws_core EXPORT halsim_ws_core)
+export(TARGETS halsim_ws_core FILE halsim_ws_core.cmake NAMESPACE halsim_ws_core::)

@@ -594,6 +594,14 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   });
 
   if (!SetupNowRio()) {
+    fmt::print(stderr,
+               "Failed to run SetupNowRio(). This is a fatal error. The "
+               "process is being terminated.\n");
+    std::fflush(stderr);
+    // Attempt to force a segfault to get a better java log
+    *reinterpret_cast<int*>(0) = 0;
+    // If that fails, terminate
+    std::terminate();
     return false;
   }
 

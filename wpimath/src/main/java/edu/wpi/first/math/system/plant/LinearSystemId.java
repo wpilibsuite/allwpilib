@@ -135,14 +135,14 @@ public final class LinearSystemId {
    * <p>u = K_v v + K_a a
    *
    * @param kV The velocity gain, in volts/(unit/sec)
-   * @param kA The acceleration gain, in volts/(unit/sec^2)
+   * @param kA The acceleration gain, in volts/(unit/sec²)
    * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if kV &lt;= 0 or kA &lt;= 0.
+   * @throws IllegalArgumentException if kV &lt; 0 or kA &lt;= 0.
    * @see <a href="https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
    */
   public static LinearSystem<N2, N1, N2> createDCMotorSystem(double kV, double kA) {
-    if (kV <= 0.0) {
-      throw new IllegalArgumentException("Kv must be greater than zero.");
+    if (kV < 0.0) {
+      throw new IllegalArgumentException("Kv must be greater than or equal to zero.");
     }
     if (kA <= 0.0) {
       throw new IllegalArgumentException("Ka must be greater than zero.");
@@ -256,14 +256,14 @@ public final class LinearSystemId {
    * <p>u = K_v v + K_a a
    *
    * @param kV The velocity gain, in volts/(unit/sec)
-   * @param kA The acceleration gain, in volts/(unit/sec^2)
+   * @param kA The acceleration gain, in volts/(unit/sec²)
    * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if kV &lt;= 0 or kA &lt;= 0.
+   * @throws IllegalArgumentException if kV &lt; 0 or kA &lt;= 0.
    * @see <a href="https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
    */
   public static LinearSystem<N1, N1, N1> identifyVelocitySystem(double kV, double kA) {
-    if (kV <= 0.0) {
-      throw new IllegalArgumentException("Kv must be greater than zero.");
+    if (kV < 0.0) {
+      throw new IllegalArgumentException("Kv must be greater than or equal to zero.");
     }
     if (kA <= 0.0) {
       throw new IllegalArgumentException("Ka must be greater than zero.");
@@ -291,12 +291,12 @@ public final class LinearSystemId {
    * @param kV The velocity gain, in volts/(unit/sec)
    * @param kA The acceleration gain, in volts/(unit/sec²)
    * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if kV &lt;= 0 or kA &lt;= 0.
+   * @throws IllegalArgumentException if kV &lt; 0 or kA &lt;= 0.
    * @see <a href="https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
    */
   public static LinearSystem<N2, N1, N1> identifyPositionSystem(double kV, double kA) {
-    if (kV <= 0.0) {
-      throw new IllegalArgumentException("Kv must be greater than zero.");
+    if (kV < 0.0) {
+      throw new IllegalArgumentException("Kv must be greater than or equal to zero.");
     }
     if (kA <= 0.0) {
       throw new IllegalArgumentException("Ka must be greater than zero.");

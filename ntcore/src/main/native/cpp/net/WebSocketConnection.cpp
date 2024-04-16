@@ -233,6 +233,8 @@ int WebSocketConnection::Flush() {
   int count = 0;
   for (auto&& frame :
        wpi::take_back(std::span{m_frames}, unsentFrames.size())) {
+    ReleaseBufs(
+        std::span{m_bufs}.subspan(frame.start, frame.end - frame.start));
     count += frame.count;
   }
   m_frames.clear();

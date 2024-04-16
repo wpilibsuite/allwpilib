@@ -67,6 +67,7 @@ target_include_directories(
 )
 
 install(TARGETS romiVendordep EXPORT romivendordep DESTINATION "${main_lib_dest}")
+export(TARGETS romiVendordep FILE romivendordep.cmake NAMESPACE romivendordep::)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/romiVendordep")
 
 configure_file(romivendordep-config.cmake.in ${WPILIB_BINARY_DIR}/romivendordep-config.cmake)

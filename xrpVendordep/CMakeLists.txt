@@ -67,6 +67,7 @@ target_include_directories(
 )
 
 install(TARGETS xrpVendordep EXPORT xrpvendordep DESTINATION "${main_lib_dest}")
+export(TARGETS xrpVendordep FILE xrpvendordep.cmake NAMESPACE xrpvendordep::)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/xrpVendordep")
 
 configure_file(xrpvendordep-config.cmake.in ${WPILIB_BINARY_DIR}/xrpvendordep-config.cmake)

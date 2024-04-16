@@ -7,6 +7,8 @@ package edu.wpi.first.math.kinematics;
 import static edu.wpi.first.units.Units.Meters;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.kinematics.proto.DifferentialDriveWheelPositionsProto;
+import edu.wpi.first.math.kinematics.struct.DifferentialDriveWheelPositionsStruct;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import java.util.Objects;
@@ -19,6 +21,14 @@ public class DifferentialDriveWheelPositions
 
   /** Distance measured by the right side. */
   public double rightMeters;
+
+  /** DifferentialDriveWheelPostions struct for serialization. */
+  public static final DifferentialDriveWheelPositionsStruct struct =
+      new DifferentialDriveWheelPositionsStruct();
+
+  /** DifferentialDriveWheelPostions struct for serialization. */
+  public static final DifferentialDriveWheelPositionsProto proto =
+      new DifferentialDriveWheelPositionsProto();
 
   /**
    * Constructs a DifferentialDriveWheelPositions.

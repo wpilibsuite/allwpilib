@@ -354,6 +354,7 @@ void DataLog::StartLogFile(WriterThreadState& state) {
     WPI_ERROR(m_msglog,
               "Insufficient free space ({} available), no log being saved",
               FormatBytesSize(state.freeSpace));
+    m_state = kStopped;
   } else {
     // try preferred filename, or randomize it a few times, before giving up
     for (int i = 0; i < 5; ++i) {
