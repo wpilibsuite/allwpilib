@@ -31,6 +31,10 @@
     <Bug pattern="EI_EXPOSE_REP2" />
   </Match>
   <Match>
+    <Bug pattern="EI_EXPOSE_STATIC_REP2" />
+    <Class name="edu.wpi.first.wpilibj.telemetry.Telemetry" />
+  </Match>
+  <Match>
     <Bug pattern="FL_FLOATS_AS_LOOP_COUNTERS" />
   </Match>
   <Match>

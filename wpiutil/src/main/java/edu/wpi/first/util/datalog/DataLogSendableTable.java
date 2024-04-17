@@ -14,7 +14,6 @@ import edu.wpi.first.util.sendable2.SendableOption;
 import edu.wpi.first.util.sendable2.SendableTable;
 import edu.wpi.first.util.struct.Struct;
 import edu.wpi.first.util.struct.StructBuffer;
-
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
@@ -39,8 +38,21 @@ public class DataLogSendableTable implements SendableTable {
   private final String m_pathWithSep;
   private final DataLog m_log;
 
-  private static enum DataType {
-    kNone, kBoolean, kInteger, kFloat, kDouble, kString, kBooleanArray, kIntegerArray, kFloatArray, kDoubleArray, kStringArray, kRaw, kStruct, kProtobuf;
+  private enum DataType {
+    kNone,
+    kBoolean,
+    kInteger,
+    kFloat,
+    kDouble,
+    kString,
+    kBooleanArray,
+    kIntegerArray,
+    kFloatArray,
+    kDoubleArray,
+    kStringArray,
+    kRaw,
+    kStruct,
+    kProtobuf;
   }
 
   private static class EntryData {
@@ -54,13 +66,14 @@ public class DataLogSendableTable implements SendableTable {
     synchronized void refreshProperties() {
       StringBuilder sb = new StringBuilder();
       sb.append('{');
-      m_propertiesMap.forEach((k, v) -> {
-        sb.append('"');
-        sb.append(k.replace("\"", "\\\""));
-        sb.append("\":");
-        sb.append(v);
-        sb.append(',');
-      });
+      m_propertiesMap.forEach(
+          (k, v) -> {
+            sb.append('"');
+            sb.append(k.replace("\"", "\\\""));
+            sb.append("\":");
+            sb.append(v);
+            sb.append(',');
+          });
       // replace the trailing comma with a }
       sb.setCharAt(sb.length() - 1, '}');
       m_properties = sb.toString();
@@ -182,6 +195,7 @@ public class DataLogSendableTable implements SendableTable {
 
     // boolean m_appendAll;
   }
+
   private final ConcurrentMap<String, EntryData> m_entries = new ConcurrentHashMap<>();
   private final ConcurrentMap<String, DataLogSendableTable> m_tables = new ConcurrentHashMap<>();
   private Consumer<SendableTable> m_closeSendable;
@@ -361,11 +375,11 @@ public class DataLogSendableTable implements SendableTable {
       if (td.m_structBuffer == null) {
         td.m_structBuffer = StructBuffer.create(struct);
         addSchema(struct);
-      } else if (td.m_structBuffer.getStruct() != struct) {
+      } else if (!td.m_structBuffer.getStruct().equals(struct)) {
         return;
       }
       @SuppressWarnings("unchecked")
-      StructBuffer<T> buf = ((StructBuffer<T>) td.m_structBuffer);
+      StructBuffer<T> buf = (StructBuffer<T>) td.m_structBuffer;
       ByteBuffer bb = buf.write(value);
       td.setRaw(bb, 0, bb.position());
     }
@@ -378,11 +392,11 @@ public class DataLogSendableTable implements SendableTable {
       if (td.m_protobufBuffer == null) {
         td.m_protobufBuffer = ProtobufBuffer.create(proto);
         addSchema(proto);
-      } else if (td.m_protobufBuffer.getProto() != proto) {
+      } else if (!td.m_protobufBuffer.getProto().equals(proto)) {
         return;
       }
       @SuppressWarnings("unchecked")
-      ProtobufBuffer<T, ?> buf = ((ProtobufBuffer<T, ?>) td.m_protobufBuffer);
+      ProtobufBuffer<T, ?> buf = (ProtobufBuffer<T, ?>) td.m_protobufBuffer;
       try {
         ByteBuffer bb = buf.write(value);
         td.setRaw(bb, 0, bb.position());
@@ -395,73 +409,109 @@ public class DataLogSendableTable implements SendableTable {
   @Override
   public void publishBoolean(String name, BooleanSupplier supplier) {
     EntryData data = start(name, "boolean", DataType.kBoolean);
-    data.setPolledUpdate(entry -> { entry.setBoolean(supplier.getAsBoolean()); });
+    data.setPolledUpdate(
+        entry -> {
+          entry.setBoolean(supplier.getAsBoolean());
+        });
   }
 
   @Override
   public void publishInteger(String name, LongSupplier supplier) {
     EntryData data = start(name, "int64", DataType.kInteger);
-    data.setPolledUpdate(entry -> { entry.setInteger(supplier.getAsLong()); });
+    data.setPolledUpdate(
+        entry -> {
+          entry.setInteger(supplier.getAsLong());
+        });
   }
 
   @Override
   public void publishFloat(String name, FloatSupplier supplier) {
     EntryData data = start(name, "float", DataType.kFloat);
-    data.setPolledUpdate(entry -> { entry.setFloat(supplier.getAsFloat()); });
+    data.setPolledUpdate(
+        entry -> {
+          entry.setFloat(supplier.getAsFloat());
+        });
   }
 
   @Override
   public void publishDouble(String name, DoubleSupplier supplier) {
     EntryData data = start(name, "double", DataType.kDouble);
-    data.setPolledUpdate(entry -> { entry.setDouble(supplier.getAsDouble()); });
+    data.setPolledUpdate(
+        entry -> {
+          entry.setDouble(supplier.getAsDouble());
+        });
   }
 
   @Override
   public void publishString(String name, Supplier<String> supplier) {
     EntryData data = start(name, "string", DataType.kString);
-    data.setPolledUpdate(entry -> { entry.setString(supplier.get()); });
+    data.setPolledUpdate(
+        entry -> {
+          entry.setString(supplier.get());
+        });
   }
 
   @Override
   public void publishBooleanArray(String name, Supplier<boolean[]> supplier) {
     EntryData data = start(name, "boolean[]", DataType.kBooleanArray);
-    data.setPolledUpdate(entry -> { entry.setBooleanArray(supplier.get()); });
+    data.setPolledUpdate(
+        entry -> {
+          entry.setBooleanArray(supplier.get());
+        });
   }
 
   @Override
   public void publishIntegerArray(String name, Supplier<long[]> supplier) {
     EntryData data = start(name, "int64[]", DataType.kStringArray);
-    data.setPolledUpdate(entry -> { entry.setIntegerArray(supplier.get()); });
+    data.setPolledUpdate(
+        entry -> {
+          entry.setIntegerArray(supplier.get());
+        });
   }
 
   @Override
   public void publishFloatArray(String name, Supplier<float[]> supplier) {
     EntryData data = start(name, "float[]", DataType.kFloatArray);
-    data.setPolledUpdate(entry -> { entry.setFloatArray(supplier.get()); });
+    data.setPolledUpdate(
+        entry -> {
+          entry.setFloatArray(supplier.get());
+        });
   }
 
   @Override
   public void publishDoubleArray(String name, Supplier<double[]> supplier) {
     EntryData data = start(name, "double[]", DataType.kDoubleArray);
-    data.setPolledUpdate(entry -> { entry.setDoubleArray(supplier.get()); });
+    data.setPolledUpdate(
+        entry -> {
+          entry.setDoubleArray(supplier.get());
+        });
   }
 
   @Override
   public void publishStringArray(String name, Supplier<String[]> supplier) {
     EntryData data = start(name, "string[]", DataType.kStringArray);
-    data.setPolledUpdate(entry -> { entry.setStringArray(supplier.get()); });
+    data.setPolledUpdate(
+        entry -> {
+          entry.setStringArray(supplier.get());
+        });
   }
 
   @Override
   public void publishRawBytes(String name, String typeString, Supplier<byte[]> supplier) {
     EntryData data = start(name, typeString, DataType.kRaw);
-    data.setPolledUpdate(entry -> { entry.setRaw(supplier.get()); });
+    data.setPolledUpdate(
+        entry -> {
+          entry.setRaw(supplier.get());
+        });
   }
 
   @Override
   public void publishRawBuffer(String name, String typeString, Supplier<ByteBuffer> supplier) {
     EntryData data = start(name, typeString, DataType.kRaw);
-    data.setPolledUpdate(entry -> { entry.setRaw(supplier.get()); });
+    data.setPolledUpdate(
+        entry -> {
+          entry.setRaw(supplier.get());
+        });
   }
 
   @Override
@@ -469,7 +519,10 @@ public class DataLogSendableTable implements SendableTable {
     EntryData td = start(name, struct.getTypeString(), DataType.kStruct);
     addSchema(struct);
     final StructBuffer<T> buf = StructBuffer.create(struct);
-    td.setPolledUpdate(entry -> { entry.setRaw(buf.write(supplier.get())); });
+    td.setPolledUpdate(
+        entry -> {
+          entry.setRaw(buf.write(supplier.get()));
+        });
   }
 
   @Override
@@ -477,18 +530,20 @@ public class DataLogSendableTable implements SendableTable {
     EntryData td = start(name, proto.getTypeString(), DataType.kProtobuf);
     addSchema(proto);
     ProtobufBuffer<T, ?> buf = ProtobufBuffer.create(proto);
-    td.setPolledUpdate(entry -> {
-      try {
-        entry.setRaw(buf.write(supplier.get()));
-      } catch (IOException e) {
-        return; // ignore
-      }
-    });
+    td.setPolledUpdate(
+        entry -> {
+          try {
+            entry.setRaw(buf.write(supplier.get()));
+          } catch (IOException e) {
+            return; // ignore
+          }
+        });
   }
 
   @Override
   public BooleanConsumer addBooleanPublisher(String name) {
-    final WeakReference<EntryData> dataRef = new WeakReference<>(start(name, "boolean", DataType.kBoolean));
+    final WeakReference<EntryData> dataRef =
+        new WeakReference<>(start(name, "boolean", DataType.kBoolean));
     return value -> {
       EntryData data = dataRef.get();
       if (data != null && data.m_entry != 0) {
@@ -499,7 +554,8 @@ public class DataLogSendableTable implements SendableTable {
 
   @Override
   public LongConsumer addIntegerPublisher(String name) {
-    final WeakReference<EntryData> dataRef = new WeakReference<>(start(name, "int64", DataType.kInteger));
+    final WeakReference<EntryData> dataRef =
+        new WeakReference<>(start(name, "int64", DataType.kInteger));
     return value -> {
       EntryData data = dataRef.get();
       if (data != null && data.m_entry != 0) {
@@ -510,7 +566,8 @@ public class DataLogSendableTable implements SendableTable {
 
   @Override
   public FloatConsumer addFloatPublisher(String name) {
-    final WeakReference<EntryData> dataRef = new WeakReference<>(start(name, "float", DataType.kFloat));
+    final WeakReference<EntryData> dataRef =
+        new WeakReference<>(start(name, "float", DataType.kFloat));
     return value -> {
       EntryData data = dataRef.get();
       if (data != null && data.m_entry != 0) {
@@ -521,7 +578,8 @@ public class DataLogSendableTable implements SendableTable {
 
   @Override
   public DoubleConsumer addDoublePublisher(String name) {
-    final WeakReference<EntryData> dataRef = new WeakReference<>(start(name, "double", DataType.kDouble));
+    final WeakReference<EntryData> dataRef =
+        new WeakReference<>(start(name, "double", DataType.kDouble));
     return value -> {
       EntryData data = dataRef.get();
       if (data != null && data.m_entry != 0) {
@@ -532,7 +590,8 @@ public class DataLogSendableTable implements SendableTable {
 
   @Override
   public Consumer<String> addStringPublisher(String name) {
-    final WeakReference<EntryData> dataRef = new WeakReference<>(start(name, "string", DataType.kString));
+    final WeakReference<EntryData> dataRef =
+        new WeakReference<>(start(name, "string", DataType.kString));
     return value -> {
       EntryData data = dataRef.get();
       if (data != null && data.m_entry != 0) {
@@ -543,7 +602,8 @@ public class DataLogSendableTable implements SendableTable {
 
   @Override
   public Consumer<boolean[]> addBooleanArrayPublisher(String name) {
-    final WeakReference<EntryData> dataRef = new WeakReference<>(start(name, "boolean[]", DataType.kBooleanArray));
+    final WeakReference<EntryData> dataRef =
+        new WeakReference<>(start(name, "boolean[]", DataType.kBooleanArray));
     return value -> {
       EntryData data = dataRef.get();
       if (data != null && data.m_entry != 0) {
@@ -554,7 +614,8 @@ public class DataLogSendableTable implements SendableTable {
 
   @Override
   public Consumer<long[]> addIntegerArrayPublisher(String name) {
-    final WeakReference<EntryData> dataRef = new WeakReference<>(start(name, "int64[]", DataType.kIntegerArray));
+    final WeakReference<EntryData> dataRef =
+        new WeakReference<>(start(name, "int64[]", DataType.kIntegerArray));
     return value -> {
       EntryData data = dataRef.get();
       if (data != null && data.m_entry != 0) {
@@ -565,7 +626,8 @@ public class DataLogSendableTable implements SendableTable {
 
   @Override
   public Consumer<float[]> addFloatArrayPublisher(String name) {
-    final WeakReference<EntryData> dataRef = new WeakReference<>(start(name, "float[]", DataType.kFloatArray));
+    final WeakReference<EntryData> dataRef =
+        new WeakReference<>(start(name, "float[]", DataType.kFloatArray));
     return value -> {
       EntryData data = dataRef.get();
       if (data != null && data.m_entry != 0) {
@@ -576,7 +638,8 @@ public class DataLogSendableTable implements SendableTable {
 
   @Override
   public Consumer<double[]> addDoubleArrayPublisher(String name) {
-    final WeakReference<EntryData> dataRef = new WeakReference<>(start(name, "double[]", DataType.kDoubleArray));
+    final WeakReference<EntryData> dataRef =
+        new WeakReference<>(start(name, "double[]", DataType.kDoubleArray));
     return value -> {
       EntryData data = dataRef.get();
       if (data != null && data.m_entry != 0) {
@@ -587,7 +650,8 @@ public class DataLogSendableTable implements SendableTable {
 
   @Override
   public Consumer<String[]> addStringArrayPublisher(String name) {
-    final WeakReference<EntryData> dataRef = new WeakReference<>(start(name, "string[]", DataType.kStringArray));
+    final WeakReference<EntryData> dataRef =
+        new WeakReference<>(start(name, "string[]", DataType.kStringArray));
     return value -> {
       EntryData data = dataRef.get();
       if (data != null && data.m_entry != 0) {
@@ -598,7 +662,8 @@ public class DataLogSendableTable implements SendableTable {
 
   @Override
   public Consumer<byte[]> addRawBytesPublisher(String name, String typeString) {
-    final WeakReference<EntryData> dataRef = new WeakReference<>(start(name, typeString, DataType.kRaw));
+    final WeakReference<EntryData> dataRef =
+        new WeakReference<>(start(name, typeString, DataType.kRaw));
     return value -> {
       EntryData data = dataRef.get();
       if (data != null && data.m_entry != 0) {
@@ -609,7 +674,8 @@ public class DataLogSendableTable implements SendableTable {
 
   @Override
   public Consumer<ByteBuffer> addRawBufferPublisher(String name, String typeString) {
-    final WeakReference<EntryData> dataRef = new WeakReference<>(start(name, typeString, DataType.kRaw));
+    final WeakReference<EntryData> dataRef =
+        new WeakReference<>(start(name, typeString, DataType.kRaw));
     return value -> {
       EntryData data = dataRef.get();
       if (data != null && data.m_entry != 0) {
@@ -622,7 +688,8 @@ public class DataLogSendableTable implements SendableTable {
   public <T> Consumer<T> addStructPublisher(String name, Struct<T> struct) {
     addSchema(struct);
     final StructBuffer<T> buf = StructBuffer.create(struct);
-    final WeakReference<EntryData> dataRef = new WeakReference<>(start(name, struct.getTypeString(), DataType.kStruct));
+    final WeakReference<EntryData> dataRef =
+        new WeakReference<>(start(name, struct.getTypeString(), DataType.kStruct));
     return value -> {
       EntryData data = dataRef.get();
       if (data != null && data.m_entry != 0) {
@@ -635,7 +702,8 @@ public class DataLogSendableTable implements SendableTable {
   public <T> Consumer<T> addProtobufPublisher(String name, Protobuf<T, ?> proto) {
     addSchema(proto);
     final ProtobufBuffer<T, ?> buf = ProtobufBuffer.create(proto);
-    final WeakReference<EntryData> dataRef = new WeakReference<>(start(name, proto.getTypeString(), DataType.kProtobuf));
+    final WeakReference<EntryData> dataRef =
+        new WeakReference<>(start(name, proto.getTypeString(), DataType.kProtobuf));
     return value -> {
       EntryData data = dataRef.get();
       if (data != null && data.m_entry != 0) {
@@ -649,55 +717,47 @@ public class DataLogSendableTable implements SendableTable {
   }
 
   @Override
-  public void subscribeBoolean(String name, BooleanConsumer consumer) {
-  }
+  public void subscribeBoolean(String name, BooleanConsumer consumer) {}
 
   @Override
-  public void subscribeInteger(String name, LongConsumer consumer) {
-  }
+  public void subscribeInteger(String name, LongConsumer consumer) {}
 
   @Override
-  public void subscribeFloat(String name, FloatConsumer consumer) {
-  }
+  public void subscribeFloat(String name, FloatConsumer consumer) {}
 
   @Override
-  public void subscribeDouble(String name, DoubleConsumer consumer) {
-  }
+  public void subscribeDouble(String name, DoubleConsumer consumer) {}
 
   @Override
-  public void subscribeString(String name, Consumer<String> consumer) {
-  }
+  public void subscribeString(String name, Consumer<String> consumer) {}
 
   @Override
-  public void subscribeBooleanArray(String name, Consumer<boolean[]> consumer) {
-  }
+  public void subscribeBooleanArray(String name, Consumer<boolean[]> consumer) {}
 
   @Override
-  public void subscribeIntegerArray(String name, Consumer<long[]> consumer) {
-  }
+  public void subscribeIntegerArray(String name, Consumer<long[]> consumer) {}
 
   @Override
-  public void subscribeFloatArray(String name, Consumer<float[]> consumer) {
-  }
+  public void subscribeFloatArray(String name, Consumer<float[]> consumer) {}
 
   @Override
-  public void subscribeDoubleArray(String name, Consumer<double[]> consumer) {
-  }
+  public void subscribeDoubleArray(String name, Consumer<double[]> consumer) {}
 
   @Override
-  public void subscribeStringArray(String name, Consumer<String[]> consumer) {
-  }
+  public void subscribeStringArray(String name, Consumer<String[]> consumer) {}
 
   @Override
-  public void subscribeRawBytes(String name, String typeString, Consumer<byte[]> consumer) {
-  }
+  public void subscribeRawBytes(String name, String typeString, Consumer<byte[]> consumer) {}
 
   @Override
   public <T> DataLogSendableTable addSendable(String name, T obj, Sendable<T> sendable) {
     DataLogSendableTable child = getChild(name);
     if (child.m_closeSendable == null) {
       sendable.initSendable(obj, child);
-      child.m_closeSendable = table -> { sendable.closeSendable(obj, table); };
+      child.m_closeSendable =
+          table -> {
+            sendable.closeSendable(obj, table);
+          };
     }
     return child;
   }
@@ -705,7 +765,8 @@ public class DataLogSendableTable implements SendableTable {
   @SuppressWarnings("resource")
   @Override
   public DataLogSendableTable getChild(String name) {
-    return m_tables.computeIfAbsent(name, k -> new DataLogSendableTable(m_log, m_pathWithSep + name));
+    return m_tables.computeIfAbsent(
+        name, k -> new DataLogSendableTable(m_log, m_pathWithSep + name));
   }
 
   @Override
@@ -714,9 +775,7 @@ public class DataLogSendableTable implements SendableTable {
   }
 
   @Override
-  public void setSubscribeOptions(String name, SendableOption... options) {
-    // TODO
-  }
+  public void setSubscribeOptions(String name, SendableOption... options) {}
 
   /**
    * Gets the current value of a property (as a JSON string).
@@ -805,13 +864,14 @@ public class DataLogSendableTable implements SendableTable {
     }
     EntryData data = m_entries.computeIfAbsent(name, k -> new EntryData());
     synchronized (data) {
-      properties.forEach((k, v) -> {
-        if (v == null) {
-          data.m_propertiesMap.remove(k);
-        } else {
-          data.m_propertiesMap.put(k, v);
-        }
-      });
+      properties.forEach(
+          (k, v) -> {
+            if (v == null) {
+              data.m_propertiesMap.remove(k);
+            } else {
+              data.m_propertiesMap.put(k, v);
+            }
+          });
       data.refreshProperties();
     }
   }
@@ -863,8 +923,8 @@ public class DataLogSendableTable implements SendableTable {
 
   /**
    * Returns whether there is a data schema already registered with the given name that this
-   * instance has published. This does NOT perform a check as to whether the schema has already
-   * been published by another node on the network.
+   * instance has published. This does NOT perform a check as to whether the schema has already been
+   * published by another node on the network.
    *
    * @param name Name (the string passed as the data type for topics using this schema)
    * @return True if schema already registered

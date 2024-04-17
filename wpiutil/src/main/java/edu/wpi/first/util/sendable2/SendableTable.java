@@ -11,7 +11,6 @@ import edu.wpi.first.util.protobuf.Protobuf;
 import edu.wpi.first.util.protobuf.ProtobufBuffer;
 import edu.wpi.first.util.struct.Struct;
 import edu.wpi.first.util.struct.StructBuffer;
-
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Map;
@@ -168,21 +167,27 @@ public interface SendableTable extends AutoCloseable {
   default <T> void publishStruct(String name, Struct<T> struct, Supplier<T> supplier) {
     addSchema(struct);
     final StructBuffer<T> buf = StructBuffer.create(struct);
-    publishRawBuffer(name, struct.getTypeString(), () -> {
-      return buf.write(supplier.get());
-    });
+    publishRawBuffer(
+        name,
+        struct.getTypeString(),
+        () -> {
+          return buf.write(supplier.get());
+        });
   }
 
   default <T> void publishProtobuf(String name, Protobuf<T, ?> proto, Supplier<T> supplier) {
     addSchema(proto);
     final ProtobufBuffer<T, ?> buf = ProtobufBuffer.create(proto);
-    publishRawBuffer(name, proto.getTypeString(), () -> {
-      try {
-        return buf.write(supplier.get());
-      } catch (IOException e) {
-        return null; // ignore
-      }
-    });
+    publishRawBuffer(
+        name,
+        proto.getTypeString(),
+        () -> {
+          try {
+            return buf.write(supplier.get());
+          } catch (IOException e) {
+            return null; // ignore
+          }
+        });
   }
 
   BooleanConsumer addBooleanPublisher(String name);
@@ -256,21 +261,27 @@ public interface SendableTable extends AutoCloseable {
   default <T> void subscribeStruct(String name, Struct<T> struct, Consumer<T> consumer) {
     addSchema(struct);
     final StructBuffer<T> buf = StructBuffer.create(struct);
-    subscribeRawBytes(name, struct.getTypeString(), (data) -> {
-      consumer.accept(buf.read(data));
-    });
+    subscribeRawBytes(
+        name,
+        struct.getTypeString(),
+        data -> {
+          consumer.accept(buf.read(data));
+        });
   }
 
   default <T> void subscribeProtobuf(String name, Protobuf<T, ?> proto, Consumer<T> consumer) {
     addSchema(proto);
     final ProtobufBuffer<T, ?> buf = ProtobufBuffer.create(proto);
-    subscribeRawBytes(name, proto.getTypeString(), (data) -> {
-      try {
-        consumer.accept(buf.read(data));
-      } catch (IOException e) {
-        // ignore
-      }
-    });
+    subscribeRawBytes(
+        name,
+        proto.getTypeString(),
+        data -> {
+          try {
+            consumer.accept(buf.read(data));
+          } catch (IOException e) {
+            // ignore
+          }
+        });
   }
 
   <T> SendableTable addSendable(String name, T obj, Sendable<T> sendable);
@@ -345,8 +356,8 @@ public interface SendableTable extends AutoCloseable {
 
   /**
    * Returns whether there is a data schema already registered with the given name that this
-   * instance has published. This does NOT perform a check as to whether the schema has already
-   * been published by another node on the network.
+   * instance has published. This does NOT perform a check as to whether the schema has already been
+   * published by another node on the network.
    *
    * @param typeString Name (the string passed as the data type for topics using this schema)
    * @return True if schema already registered

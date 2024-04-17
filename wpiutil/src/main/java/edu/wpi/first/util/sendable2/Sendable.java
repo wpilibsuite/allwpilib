@@ -47,6 +47,5 @@ public interface Sendable<T> {
    *
    * @param obj object
    */
-  default void closeSendable(T obj, SendableTable table) {
-  }
+  default void closeSendable(T obj, SendableTable table) {}
 }
