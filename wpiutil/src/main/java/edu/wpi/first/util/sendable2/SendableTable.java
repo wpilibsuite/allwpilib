@@ -341,6 +341,8 @@ public interface SendableTable extends AutoCloseable {
 
   void remove(String name);
 
+  void addPeriodic(Runnable runnable);
+
   /**
    * Return whether this sendable has been published.
    *
