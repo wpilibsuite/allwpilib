@@ -9,11 +9,10 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.hal.SimEnum;
-import edu.wpi.first.networktables.DoublePublisher;
-import edu.wpi.first.networktables.DoubleTopic;
-import edu.wpi.first.networktables.NTSendable;
-import edu.wpi.first.networktables.NTSendableBuilder;
-import edu.wpi.first.util.sendable.SendableRegistry;
+import edu.wpi.first.util.sendable2.Sendable;
+import edu.wpi.first.util.sendable2.SendableSerializable;
+import edu.wpi.first.util.sendable2.SendableTable;
+import edu.wpi.first.util.struct.Struct;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -22,7 +21,7 @@ import java.nio.ByteOrder;
  *
  * <p>This class allows access to an Analog Devices ADXL362 3-axis accelerometer.
  */
-public class ADXL362 implements NTSendable, AutoCloseable {
+public class ADXL362 implements SendableSerializable, AutoCloseable {
   private static final byte kRegWrite = 0x0A;
   private static final byte kRegRead = 0x0B;
 
@@ -84,6 +83,46 @@ public class ADXL362 implements NTSendable, AutoCloseable {
 
     /** Default constructor. */
     public AllAxes() {}
+
+    public static class AllAxesStruct implements Struct<AllAxes> {
+      @Override
+      public Class<AllAxes> getTypeClass() {
+        return AllAxes.class;
+      }
+
+      @Override
+      public String getTypeString() {
+        return "ADXL362.AllAxes";
+      }
+
+      @Override
+      public int getSize() {
+        return 24;
+      }
+
+      @Override
+      public String getSchema() {
+        return "double XAxis;double YAxis;double ZAxis";
+      }
+
+      @Override
+      public AllAxes unpack(ByteBuffer bb) {
+        AllAxes val = new AllAxes();
+        val.XAxis = bb.getDouble();
+        val.YAxis = bb.getDouble();
+        val.ZAxis = bb.getDouble();
+        return val;
+      }
+
+      @Override
+      public void pack(ByteBuffer bb, AllAxes value) {
+        bb.putDouble(value.XAxis);
+        bb.putDouble(value.YAxis);
+        bb.putDouble(value.ZAxis);
+      }
+    }
+
+    public static final AllAxesStruct struct = new AllAxesStruct();
   }
 
   private SPI m_spi;
@@ -157,7 +196,6 @@ public class ADXL362 implements NTSendable, AutoCloseable {
     m_spi.write(transferBuffer, 3);
 
     HAL.report(tResourceType.kResourceType_ADXL362, port.value + 1);
-    SendableRegistry.addLW(this, "ADXL362", port.value);
   }
 
   /**
@@ -171,7 +209,6 @@ public class ADXL362 implements NTSendable, AutoCloseable {
 
   @Override
   public void close() {
-    SendableRegistry.remove(this);
     if (m_spi != null) {
       m_spi.close();
       m_spi = null;
@@ -304,21 +341,28 @@ public class ADXL362 implements NTSendable, AutoCloseable {
     return data;
   }
 
-  @Override
-  public void initSendable(NTSendableBuilder builder) {
-    builder.setSmartDashboardType("3AxisAccelerometer");
-    DoublePublisher pubX = new DoubleTopic(builder.getTopic("X")).publish();
-    DoublePublisher pubY = new DoubleTopic(builder.getTopic("Y")).publish();
-    DoublePublisher pubZ = new DoubleTopic(builder.getTopic("Z")).publish();
-    builder.addCloseable(pubX);
-    builder.addCloseable(pubY);
-    builder.addCloseable(pubZ);
-    builder.setUpdateTable(
-        () -> {
-          AllAxes data = getAccelerations();
-          pubX.set(data.XAxis);
-          pubY.set(data.YAxis);
-          pubZ.set(data.ZAxis);
-        });
+  public static class ADXL362Sendable implements Sendable<ADXL362> {
+    @Override
+    public Class<ADXL362> getTypeClass() {
+      return ADXL362.class;
+    }
+
+    @Override
+    public String getTypeString() {
+      return "3AxisAccelerometer";
+    }
+
+    @Override
+    public boolean isClosed(ADXL362 obj) {
+      return obj.m_spi == null;
+    }
+
+    @Override
+    public void initSendable(ADXL362 obj, SendableTable table) {
+      table.publishStruct("Value", AllAxes.struct, obj::getAccelerations);
+    }
   }
+
+  /** Sendable for serialization. */
+  public static final ADXL362Sendable sendable = new ADXL362Sendable();
 }

@@ -10,11 +10,12 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.hal.SimEnum;
-import edu.wpi.first.networktables.DoublePublisher;
-import edu.wpi.first.networktables.DoubleTopic;
-import edu.wpi.first.networktables.NTSendable;
-import edu.wpi.first.networktables.NTSendableBuilder;
-import edu.wpi.first.util.sendable.SendableRegistry;
+import edu.wpi.first.util.sendable2.Sendable;
+import edu.wpi.first.util.sendable2.SendableSerializable;
+import edu.wpi.first.util.sendable2.SendableTable;
+import edu.wpi.first.util.struct.Struct;
+import edu.wpi.first.util.struct.StructSerializable;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -26,7 +27,7 @@ import java.nio.ByteOrder;
  * WPILib Known Issues</a> page for details.
  */
 @SuppressWarnings("TypeName")
-public class ADXL345_I2C implements NTSendable, AutoCloseable {
+public class ADXL345_I2C implements SendableSerializable, AutoCloseable {
   /** Default I2C device address. */
   public static final byte kAddress = 0x1D;
 
@@ -77,7 +78,7 @@ public class ADXL345_I2C implements NTSendable, AutoCloseable {
 
   /** Container type for accelerations from all axes. */
   @SuppressWarnings("MemberName")
-  public static class AllAxes {
+  public static class AllAxes implements StructSerializable {
     /** Acceleration along the X axis in g-forces. */
     public double XAxis;
 
@@ -89,6 +90,46 @@ public class ADXL345_I2C implements NTSendable, AutoCloseable {
 
     /** Default constructor. */
     public AllAxes() {}
+
+    public static class AllAxesStruct implements Struct<AllAxes> {
+      @Override
+      public Class<AllAxes> getTypeClass() {
+        return AllAxes.class;
+      }
+
+      @Override
+      public String getTypeString() {
+        return "ADXL345_I2C.AllAxes";
+      }
+
+      @Override
+      public int getSize() {
+        return 24;
+      }
+
+      @Override
+      public String getSchema() {
+        return "double XAxis;double YAxis;double ZAxis";
+      }
+
+      @Override
+      public AllAxes unpack(ByteBuffer bb) {
+        AllAxes val = new AllAxes();
+        val.XAxis = bb.getDouble();
+        val.YAxis = bb.getDouble();
+        val.ZAxis = bb.getDouble();
+        return val;
+      }
+
+      @Override
+      public void pack(ByteBuffer bb, AllAxes value) {
+        bb.putDouble(value.XAxis);
+        bb.putDouble(value.YAxis);
+        bb.putDouble(value.ZAxis);
+      }
+    }
+
+    public static final AllAxesStruct struct = new AllAxesStruct();
   }
 
   private I2C m_i2c;
@@ -141,7 +182,6 @@ public class ADXL345_I2C implements NTSendable, AutoCloseable {
     setRange(range);
 
     HAL.report(tResourceType.kResourceType_ADXL345, tInstances.kADXL345_I2C);
-    SendableRegistry.addLW(this, "ADXL345_I2C", port.value);
   }
 
   /**
@@ -164,7 +204,6 @@ public class ADXL345_I2C implements NTSendable, AutoCloseable {
 
   @Override
   public void close() {
-    SendableRegistry.remove(this);
     if (m_i2c != null) {
       m_i2c.close();
       m_i2c = null;
@@ -273,21 +312,28 @@ public class ADXL345_I2C implements NTSendable, AutoCloseable {
     return data;
   }
 
-  @Override
-  public void initSendable(NTSendableBuilder builder) {
-    builder.setSmartDashboardType("3AxisAccelerometer");
-    DoublePublisher pubX = new DoubleTopic(builder.getTopic("X")).publish();
-    DoublePublisher pubY = new DoubleTopic(builder.getTopic("Y")).publish();
-    DoublePublisher pubZ = new DoubleTopic(builder.getTopic("Z")).publish();
-    builder.addCloseable(pubX);
-    builder.addCloseable(pubY);
-    builder.addCloseable(pubZ);
-    builder.setUpdateTable(
-        () -> {
-          AllAxes data = getAccelerations();
-          pubX.set(data.XAxis);
-          pubY.set(data.YAxis);
-          pubZ.set(data.ZAxis);
-        });
+  public static class ADXL345I2CSendable implements Sendable<ADXL345_I2C> {
+    @Override
+    public Class<ADXL345_I2C> getTypeClass() {
+      return ADXL345_I2C.class;
+    }
+
+    @Override
+    public String getTypeString() {
+      return "3AxisAccelerometer";
+    }
+
+    @Override
+    public boolean isClosed(ADXL345_I2C obj) {
+      return obj.m_i2c == null;
+    }
+
+    @Override
+    public void initSendable(ADXL345_I2C obj, SendableTable table) {
+      table.publishStruct("Value", AllAxes.struct, obj::getAccelerations);
+    }
   }
+
+  /** Sendable for serialization. */
+  public static final ADXL345I2CSendable sendable = new ADXL345I2CSendable();
 }

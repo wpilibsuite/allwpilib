@@ -10,9 +10,10 @@ import edu.wpi.first.hal.SimBoolean;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.util.sendable.SendableRegistry;
+import edu.wpi.first.util.sendable2.Sendable;
+import edu.wpi.first.util.sendable2.SendableSerializable;
+import edu.wpi.first.util.sendable2.SendableTable;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -27,7 +28,7 @@ import java.nio.ByteOrder;
  * an ADXRS Gyro is supported.
  */
 @SuppressWarnings("TypeName")
-public class ADXRS450_Gyro implements Sendable, AutoCloseable {
+public class ADXRS450_Gyro implements SendableSerializable, AutoCloseable {
   private static final double kSamplePeriod = 0.0005;
   private static final double kCalibrationSampleTime = 5.0;
   private static final double kDegreePerSecondPerLSB = 0.0125;
@@ -91,7 +92,6 @@ public class ADXRS450_Gyro implements Sendable, AutoCloseable {
     }
 
     HAL.report(tResourceType.kResourceType_ADXRS450, port.value + 1);
-    SendableRegistry.addLW(this, "ADXRS450_Gyro", port.value);
   }
 
   /**
@@ -186,7 +186,6 @@ public class ADXRS450_Gyro implements Sendable, AutoCloseable {
   /** Delete (free) the spi port used for the gyro and stop accumulating. */
   @Override
   public void close() {
-    SendableRegistry.remove(this);
     if (m_spi != null) {
       m_spi.close();
       m_spi = null;
@@ -259,9 +258,28 @@ public class ADXRS450_Gyro implements Sendable, AutoCloseable {
     return Rotation2d.fromDegrees(-getAngle());
   }
 
-  @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("Gyro");
-    builder.addDoubleProperty("Value", this::getAngle, null);
+  public static class ADXRS450GyroSendable implements Sendable<ADXRS450_Gyro> {
+    @Override
+    public Class<ADXRS450_Gyro> getTypeClass() {
+      return ADXRS450_Gyro.class;
+    }
+
+    @Override
+    public String getTypeString() {
+      return "Gyro";
+    }
+
+    @Override
+    public boolean isClosed(ADXRS450_Gyro obj) {
+      return !obj.isConnected();
+    }
+
+    @Override
+    public void initSendable(ADXRS450_Gyro obj, SendableTable table) {
+      table.publishDouble("Value", obj::getAngle);
+    }
   }
+
+  /** Sendable for serialization. */
+  public static final ADXRS450GyroSendable sendable = new ADXRS450GyroSendable();
 }
