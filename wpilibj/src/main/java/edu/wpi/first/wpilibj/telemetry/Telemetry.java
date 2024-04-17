@@ -404,6 +404,10 @@ public final class Telemetry {
     getTable().remove(name);
   }
 
+  public static void addPeriodic(Runnable runnable) {
+    getTable().addPeriodic(runnable);
+  }
+
   /** Erases all publishers and subscribers. */
   public static void clear() {
     getTable().clear();
