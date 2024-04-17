@@ -10,9 +10,11 @@ import java.util.WeakHashMap;
 import java.util.function.Consumer;
 
 public class SendableSet implements AutoCloseable {
-  private Set<SendableTable> m_tables = Collections.newSetFromMap(new WeakHashMap<SendableTable, Boolean>());
+  private final Set<SendableTable> m_tables =
+      Collections.newSetFromMap(new WeakHashMap<SendableTable, Boolean>());
 
   @Override
+  @SuppressWarnings("PMD.AvoidCatchingGenericException")
   public void close() {
     for (SendableTable table : m_tables) {
       try {

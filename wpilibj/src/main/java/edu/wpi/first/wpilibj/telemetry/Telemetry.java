@@ -14,7 +14,6 @@ import edu.wpi.first.util.sendable2.Sendable;
 import edu.wpi.first.util.sendable2.SendableOption;
 import edu.wpi.first.util.sendable2.SendableTable;
 import edu.wpi.first.util.struct.Struct;
-
 import java.nio.ByteBuffer;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
@@ -26,7 +25,7 @@ import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 
 /** Helper class for building Sendable dashboard representations. */
-public class Telemetry {
+public final class Telemetry {
   /** The {@link SendableTable} used by {@link Telemetry}. */
   private static SendableTable table;
 
@@ -206,7 +205,8 @@ public class Telemetry {
     getTable().publishRawBytes(name, typeString, supplier);
   }
 
-  public static void publishRawBuffer(String name, String typeString, Supplier<ByteBuffer> supplier) {
+  public static void publishRawBuffer(
+      String name, String typeString, Supplier<ByteBuffer> supplier) {
     getTable().publishRawBuffer(name, typeString, supplier);
   }
 
@@ -322,7 +322,8 @@ public class Telemetry {
     getTable().subscribeStruct(name, struct, consumer);
   }
 
-  public static <T> void subscribeProtobuf(String name, Protobuf<T, ?> proto, Consumer<T> consumer) {
+  public static <T> void subscribeProtobuf(
+      String name, Protobuf<T, ?> proto, Consumer<T> consumer) {
     getTable().subscribeProtobuf(name, proto, consumer);
   }
 

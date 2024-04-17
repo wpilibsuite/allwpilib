@@ -49,8 +49,8 @@ public class SendableOption {
   }
 
   /**
-   * Type string.  Default is used for the data type if this is empty.
-   * Not used for raw values (pass the type string directly to the functions).
+   * Type string. Default is used for the data type if this is empty. Not used for raw values (pass
+   * the type string directly to the functions).
    */
   public static SendableOption typeString(String typeString) {
     return new SendableOption(Kind.kTypeString, typeString);

@@ -14,7 +14,6 @@ import edu.wpi.first.util.sendable2.SendableOption;
 import edu.wpi.first.util.sendable2.SendableTable;
 import edu.wpi.first.util.struct.Struct;
 import edu.wpi.first.util.struct.StructBuffer;
-
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
@@ -62,8 +61,8 @@ public class NetworkSendableTable implements SendableTable {
       if (m_publisher != null) {
         return m_publisher;
       }
-      if (typeString == null) {
-        this.m_typeString = typeString;
+      if (m_typeString == null) {
+        m_typeString = typeString;
       }
       m_publisher = m_topic.genericPublish(m_typeString, m_pubOptions);
       return m_publisher;
@@ -73,8 +72,8 @@ public class NetworkSendableTable implements SendableTable {
       if (m_subscriber != null) {
         return m_subscriber;
       }
-      if (typeString == null) {
-        this.m_typeString = typeString;
+      if (m_typeString == null) {
+        m_typeString = typeString;
       }
       m_subscriber = m_topic.genericSubscribe(m_typeString, m_subOptions);
       return m_subscriber;
@@ -140,11 +139,17 @@ public class NetworkSendableTable implements SendableTable {
       if (m_subscriber == null) {
         subscribe(typeString);
       }
-      m_listeners.add(m_topic.getInstance().addListener(m_subscriber, EnumSet.of(NetworkTableEvent.Kind.kValueAll), e -> {
-        if (e.valueData != null) {
-          cb.accept(e.valueData.value);
-        }
-      }));
+      m_listeners.add(
+          m_topic
+              .getInstance()
+              .addListener(
+                  m_subscriber,
+                  EnumSet.of(NetworkTableEvent.Kind.kValueAll),
+                  e -> {
+                    if (e.valueData != null) {
+                      cb.accept(e.valueData.value);
+                    }
+                  }));
     }
 
     void setPolledUpdate(Consumer<GenericPublisher> consumer) {
@@ -166,13 +171,15 @@ public class NetworkSendableTable implements SendableTable {
     final AtomicReference<Consumer<GenericPublisher>> m_polledUpdate = new AtomicReference<>();
     final List<Integer> m_listeners = new ArrayList<>();
   }
+
   private final ConcurrentMap<String, TopicData> m_topics = new ConcurrentHashMap<>();
   private final ConcurrentMap<String, NetworkSendableTable> m_tables = new ConcurrentHashMap<>();
   private Consumer<SendableTable> m_closeSendable;
   private boolean m_closed;
 
   private TopicData getTopicData(String name) {
-    return m_topics.computeIfAbsent(name, k -> new TopicData(m_inst.getTopic(m_pathWithSep + name)));
+    return m_topics.computeIfAbsent(
+        name, k -> new TopicData(m_inst.getTopic(m_pathWithSep + name)));
   }
 
   private TopicData publish(String name, String typeString) {
@@ -181,6 +188,12 @@ public class NetworkSendableTable implements SendableTable {
     return data;
   }
 
+  /**
+   * Construct a NetworkTables-backed SendableTable.
+   *
+   * @param inst NetworkTables instance
+   * @param path NetworkTables path for table root
+   */
   public NetworkSendableTable(NetworkTableInstance inst, String path) {
     m_path = path;
     m_pathWithSep = path + PATH_SEPARATOR;
@@ -265,11 +278,11 @@ public class NetworkSendableTable implements SendableTable {
     }
     if (td.m_structBuffer == null) {
       td.m_structBuffer = StructBuffer.create(struct);
-    } else if (td.m_structBuffer.getStruct() != struct) {
+    } else if (!td.m_structBuffer.getStruct().equals(struct)) {
       return defaultValue;
     }
     @SuppressWarnings("unchecked")
-    StructBuffer<T> buf = ((StructBuffer<T>) td.m_structBuffer);
+    StructBuffer<T> buf = (StructBuffer<T>) td.m_structBuffer;
     return buf.read(data);
   }
 
@@ -287,11 +300,11 @@ public class NetworkSendableTable implements SendableTable {
       }
       if (td.m_structBuffer == null) {
         td.m_structBuffer = StructBuffer.create(struct);
-      } else if (td.m_structBuffer.getStruct() != struct) {
+      } else if (!td.m_structBuffer.getStruct().equals(struct)) {
         return false;
       }
       @SuppressWarnings("unchecked")
-      StructBuffer<T> buf = ((StructBuffer<T>) td.m_structBuffer);
+      StructBuffer<T> buf = (StructBuffer<T>) td.m_structBuffer;
       buf.readInto(out, data);
       return true;
     }
@@ -311,11 +324,11 @@ public class NetworkSendableTable implements SendableTable {
       }
       if (td.m_protobufBuffer == null) {
         td.m_protobufBuffer = ProtobufBuffer.create(proto);
-      } else if (td.m_protobufBuffer.getProto() != proto) {
+      } else if (!td.m_protobufBuffer.getProto().equals(proto)) {
         return defaultValue;
       }
       @SuppressWarnings("unchecked")
-      ProtobufBuffer<T, ?> buf = ((ProtobufBuffer<T, ?>) td.m_protobufBuffer);
+      ProtobufBuffer<T, ?> buf = (ProtobufBuffer<T, ?>) td.m_protobufBuffer;
       try {
         return buf.read(data);
       } catch (IOException e) {
@@ -333,11 +346,11 @@ public class NetworkSendableTable implements SendableTable {
     }
     if (td.m_protobufBuffer == null) {
       td.m_protobufBuffer = ProtobufBuffer.create(proto);
-    } else if (td.m_protobufBuffer.getProto() != proto) {
+    } else if (!td.m_protobufBuffer.getProto().equals(proto)) {
       return false;
     }
     @SuppressWarnings("unchecked")
-    ProtobufBuffer<T, ?> buf = ((ProtobufBuffer<T, ?>) td.m_protobufBuffer);
+    ProtobufBuffer<T, ?> buf = (ProtobufBuffer<T, ?>) td.m_protobufBuffer;
     try {
       buf.readInto(out, data);
     } catch (IOException e) {
@@ -416,11 +429,11 @@ public class NetworkSendableTable implements SendableTable {
       }
       if (td.m_structBuffer == null) {
         td.m_structBuffer = StructBuffer.create(struct);
-      } else if (td.m_structBuffer.getStruct() != struct) {
+      } else if (!td.m_structBuffer.getStruct().equals(struct)) {
         return;
       }
       @SuppressWarnings("unchecked")
-      StructBuffer<T> buf = ((StructBuffer<T>) td.m_structBuffer);
+      StructBuffer<T> buf = (StructBuffer<T>) td.m_structBuffer;
       ByteBuffer bb = buf.write(value);
       td.m_publisher.setRaw(bb, 0, bb.position());
     }
@@ -436,11 +449,11 @@ public class NetworkSendableTable implements SendableTable {
       }
       if (td.m_protobufBuffer == null) {
         td.m_protobufBuffer = ProtobufBuffer.create(proto);
-      } else if (td.m_protobufBuffer.getProto() != proto) {
+      } else if (!td.m_protobufBuffer.getProto().equals(proto)) {
         return;
       }
       @SuppressWarnings("unchecked")
-      ProtobufBuffer<T, ?> buf = ((ProtobufBuffer<T, ?>) td.m_protobufBuffer);
+      ProtobufBuffer<T, ?> buf = (ProtobufBuffer<T, ?>) td.m_protobufBuffer;
       try {
         ByteBuffer bb = buf.write(value);
         td.m_publisher.setRaw(bb, 0, bb.position());
@@ -453,73 +466,109 @@ public class NetworkSendableTable implements SendableTable {
   @Override
   public void publishBoolean(String name, BooleanSupplier supplier) {
     TopicData data = publish(name, "boolean");
-    data.setPolledUpdate(pub -> { pub.setBoolean(supplier.getAsBoolean()); });
+    data.setPolledUpdate(
+        pub -> {
+          pub.setBoolean(supplier.getAsBoolean());
+        });
   }
 
   @Override
   public void publishInteger(String name, LongSupplier supplier) {
     TopicData data = publish(name, "int");
-    data.setPolledUpdate(pub -> { pub.setInteger(supplier.getAsLong()); });
+    data.setPolledUpdate(
+        pub -> {
+          pub.setInteger(supplier.getAsLong());
+        });
   }
 
   @Override
   public void publishFloat(String name, FloatSupplier supplier) {
     TopicData data = publish(name, "float");
-    data.setPolledUpdate(pub -> { pub.setFloat(supplier.getAsFloat()); });
+    data.setPolledUpdate(
+        pub -> {
+          pub.setFloat(supplier.getAsFloat());
+        });
   }
 
   @Override
   public void publishDouble(String name, DoubleSupplier supplier) {
     TopicData data = publish(name, "double");
-    data.setPolledUpdate(pub -> { pub.setDouble(supplier.getAsDouble()); });
+    data.setPolledUpdate(
+        pub -> {
+          pub.setDouble(supplier.getAsDouble());
+        });
   }
 
   @Override
   public void publishString(String name, Supplier<String> supplier) {
     TopicData data = publish(name, "string");
-    data.setPolledUpdate(pub -> { pub.setString(supplier.get()); });
+    data.setPolledUpdate(
+        pub -> {
+          pub.setString(supplier.get());
+        });
   }
 
   @Override
   public void publishBooleanArray(String name, Supplier<boolean[]> supplier) {
     TopicData data = publish(name, "boolean[]");
-    data.setPolledUpdate(pub -> { pub.setBooleanArray(supplier.get()); });
+    data.setPolledUpdate(
+        pub -> {
+          pub.setBooleanArray(supplier.get());
+        });
   }
 
   @Override
   public void publishIntegerArray(String name, Supplier<long[]> supplier) {
     TopicData data = publish(name, "int[]");
-    data.setPolledUpdate(pub -> { pub.setIntegerArray(supplier.get()); });
+    data.setPolledUpdate(
+        pub -> {
+          pub.setIntegerArray(supplier.get());
+        });
   }
 
   @Override
   public void publishFloatArray(String name, Supplier<float[]> supplier) {
     TopicData data = publish(name, "float[]");
-    data.setPolledUpdate(pub -> { pub.setFloatArray(supplier.get()); });
+    data.setPolledUpdate(
+        pub -> {
+          pub.setFloatArray(supplier.get());
+        });
   }
 
   @Override
   public void publishDoubleArray(String name, Supplier<double[]> supplier) {
     TopicData data = publish(name, "double[]");
-    data.setPolledUpdate(pub -> { pub.setDoubleArray(supplier.get()); });
+    data.setPolledUpdate(
+        pub -> {
+          pub.setDoubleArray(supplier.get());
+        });
   }
 
   @Override
   public void publishStringArray(String name, Supplier<String[]> supplier) {
     TopicData data = publish(name, "string[]");
-    data.setPolledUpdate(pub -> { pub.setStringArray(supplier.get()); });
+    data.setPolledUpdate(
+        pub -> {
+          pub.setStringArray(supplier.get());
+        });
   }
 
   @Override
   public void publishRawBytes(String name, String typeString, Supplier<byte[]> supplier) {
     TopicData data = publish(name, typeString);
-    data.setPolledUpdate(pub -> { pub.setRaw(supplier.get()); });
+    data.setPolledUpdate(
+        pub -> {
+          pub.setRaw(supplier.get());
+        });
   }
 
   @Override
   public void publishRawBuffer(String name, String typeString, Supplier<ByteBuffer> supplier) {
     TopicData data = publish(name, typeString);
-    data.setPolledUpdate(pub -> { pub.setRaw(supplier.get()); });
+    data.setPolledUpdate(
+        pub -> {
+          pub.setRaw(supplier.get());
+        });
   }
 
   @Override
@@ -528,7 +577,10 @@ public class NetworkSendableTable implements SendableTable {
     td.publish(struct.getTypeString());
     addSchema(struct);
     final StructBuffer<T> buf = StructBuffer.create(struct);
-    td.setPolledUpdate(pub -> { pub.setRaw(buf.write(supplier.get())); });
+    td.setPolledUpdate(
+        pub -> {
+          pub.setRaw(buf.write(supplier.get()));
+        });
   }
 
   @Override
@@ -537,13 +589,14 @@ public class NetworkSendableTable implements SendableTable {
     td.publish(proto.getTypeString());
     addSchema(proto);
     final ProtobufBuffer<T, ?> buf = ProtobufBuffer.create(proto);
-    td.setPolledUpdate(pub -> {
-      try {
-        pub.setRaw(buf.write(supplier.get()));
-      } catch (IOException e) {
-        return; // ignore
-      }
-    });
+    td.setPolledUpdate(
+        pub -> {
+          try {
+            pub.setRaw(buf.write(supplier.get()));
+          } catch (IOException e) {
+            return; // ignore
+          }
+        });
   }
 
   @Override
@@ -730,7 +783,8 @@ public class NetworkSendableTable implements SendableTable {
   public <T> Consumer<T> addStructPublisher(String name, Struct<T> struct) {
     addSchema(struct);
     final StructBuffer<T> buf = StructBuffer.create(struct);
-    final WeakReference<TopicData> dataRef = new WeakReference<>(publish(name, struct.getTypeString()));
+    final WeakReference<TopicData> dataRef =
+        new WeakReference<>(publish(name, struct.getTypeString()));
     return value -> {
       TopicData data = dataRef.get();
       if (data == null) {
@@ -747,7 +801,8 @@ public class NetworkSendableTable implements SendableTable {
   public <T> Consumer<T> addProtobufPublisher(String name, Protobuf<T, ?> proto) {
     addSchema(proto);
     final ProtobufBuffer<T, ?> buf = ProtobufBuffer.create(proto);
-    final WeakReference<TopicData> dataRef = new WeakReference<>(publish(name, proto.getTypeString()));
+    final WeakReference<TopicData> dataRef =
+        new WeakReference<>(publish(name, proto.getTypeString()));
     return value -> {
       TopicData data = dataRef.get();
       if (data == null) {
@@ -766,101 +821,134 @@ public class NetworkSendableTable implements SendableTable {
 
   @Override
   public void subscribeBoolean(String name, BooleanConsumer consumer) {
-    getTopicData(name).addValueListener("boolean", value -> {
-      if (value.isBoolean()) {
-        consumer.accept(value.getBoolean());
-      }
-    });
+    getTopicData(name)
+        .addValueListener(
+            "boolean",
+            value -> {
+              if (value.isBoolean()) {
+                consumer.accept(value.getBoolean());
+              }
+            });
   }
 
   @Override
   public void subscribeInteger(String name, LongConsumer consumer) {
-    getTopicData(name).addValueListener("int", value -> {
-      if (value.isInteger()) {
-        consumer.accept(value.getInteger());
-      }
-    });
+    getTopicData(name)
+        .addValueListener(
+            "int",
+            value -> {
+              if (value.isInteger()) {
+                consumer.accept(value.getInteger());
+              }
+            });
   }
 
   @Override
   public void subscribeFloat(String name, FloatConsumer consumer) {
-    getTopicData(name).addValueListener("float", value -> {
-      if (value.isFloat()) {
-        consumer.accept(value.getFloat());
-      }
-    });
+    getTopicData(name)
+        .addValueListener(
+            "float",
+            value -> {
+              if (value.isFloat()) {
+                consumer.accept(value.getFloat());
+              }
+            });
   }
 
   @Override
   public void subscribeDouble(String name, DoubleConsumer consumer) {
-    getTopicData(name).addValueListener("double", value -> {
-      if (value.isDouble()) {
-        consumer.accept(value.getDouble());
-      }
-    });
+    getTopicData(name)
+        .addValueListener(
+            "double",
+            value -> {
+              if (value.isDouble()) {
+                consumer.accept(value.getDouble());
+              }
+            });
   }
 
   @Override
   public void subscribeString(String name, Consumer<String> consumer) {
-    getTopicData(name).addValueListener("string", value -> {
-      if (value.isString()) {
-        consumer.accept(value.getString());
-      }
-    });
+    getTopicData(name)
+        .addValueListener(
+            "string",
+            value -> {
+              if (value.isString()) {
+                consumer.accept(value.getString());
+              }
+            });
   }
 
   @Override
   public void subscribeBooleanArray(String name, Consumer<boolean[]> consumer) {
-    getTopicData(name).addValueListener("boolean[]", value -> {
-      if (value.isBooleanArray()) {
-        consumer.accept(value.getBooleanArray());
-      }
-    });
+    getTopicData(name)
+        .addValueListener(
+            "boolean[]",
+            value -> {
+              if (value.isBooleanArray()) {
+                consumer.accept(value.getBooleanArray());
+              }
+            });
   }
 
   @Override
   public void subscribeIntegerArray(String name, Consumer<long[]> consumer) {
-    getTopicData(name).addValueListener("int[]", value -> {
-      if (value.isIntegerArray()) {
-        consumer.accept(value.getIntegerArray());
-      }
-    });
+    getTopicData(name)
+        .addValueListener(
+            "int[]",
+            value -> {
+              if (value.isIntegerArray()) {
+                consumer.accept(value.getIntegerArray());
+              }
+            });
   }
 
   @Override
   public void subscribeFloatArray(String name, Consumer<float[]> consumer) {
-    getTopicData(name).addValueListener("float[]", value -> {
-      if (value.isFloatArray()) {
-        consumer.accept(value.getFloatArray());
-      }
-    });
+    getTopicData(name)
+        .addValueListener(
+            "float[]",
+            value -> {
+              if (value.isFloatArray()) {
+                consumer.accept(value.getFloatArray());
+              }
+            });
   }
 
   @Override
   public void subscribeDoubleArray(String name, Consumer<double[]> consumer) {
-    getTopicData(name).addValueListener("double[]", value -> {
-      if (value.isDoubleArray()) {
-        consumer.accept(value.getDoubleArray());
-      }
-    });
+    getTopicData(name)
+        .addValueListener(
+            "double[]",
+            value -> {
+              if (value.isDoubleArray()) {
+                consumer.accept(value.getDoubleArray());
+              }
+            });
   }
 
   @Override
   public void subscribeStringArray(String name, Consumer<String[]> consumer) {
-    getTopicData(name).addValueListener("string[]", value -> {
-      if (value.isStringArray()) {
-        consumer.accept(value.getStringArray());
-      }
-    });
+    getTopicData(name)
+        .addValueListener(
+            "string[]",
+            value -> {
+              if (value.isStringArray()) {
+                consumer.accept(value.getStringArray());
+              }
+            });
   }
 
   @Override
   public void subscribeRawBytes(String name, String typeString, Consumer<byte[]> consumer) {
-    getTopicData(name).addValueListener(typeString, value -> {
-      if (value.isRaw()) {
-        consumer.accept(value.getRaw());
-      }
-    });
+    getTopicData(name)
+        .addValueListener(
+            typeString,
+            value -> {
+              if (value.isRaw()) {
+                consumer.accept(value.getRaw());
+              }
+            });
   }
 
   @Override
@@ -868,7 +956,10 @@ public class NetworkSendableTable implements SendableTable {
     NetworkSendableTable child = getChild(name);
     if (child.m_closeSendable == null) {
       sendable.initSendable(obj, child);
-      child.m_closeSendable = table -> { sendable.closeSendable(obj, table); };
+      child.m_closeSendable =
+          table -> {
+            sendable.closeSendable(obj, table);
+          };
     }
     return child;
   }
@@ -876,7 +967,8 @@ public class NetworkSendableTable implements SendableTable {
   @SuppressWarnings("resource")
   @Override
   public NetworkSendableTable getChild(String name) {
-    return m_tables.computeIfAbsent(name, k -> new NetworkSendableTable(m_inst, m_pathWithSep + name));
+    return m_tables.computeIfAbsent(
+        name, k -> new NetworkSendableTable(m_inst, m_pathWithSep + name));
   }
 
   @Override
@@ -954,13 +1046,14 @@ public class NetworkSendableTable implements SendableTable {
     // convert properties to a single JSON string
     StringBuilder jsonProperties = new StringBuilder();
     jsonProperties.append('{');
-    properties.forEach((k, v) -> {
-      jsonProperties.append('"');
-      jsonProperties.append(k.replace("\"", "\\\""));
-      jsonProperties.append("\":");
-      jsonProperties.append(v);
-      jsonProperties.append(',');
-    });
+    properties.forEach(
+        (k, v) -> {
+          jsonProperties.append('"');
+          jsonProperties.append(k.replace("\"", "\\\""));
+          jsonProperties.append("\":");
+          jsonProperties.append(v);
+          jsonProperties.append(',');
+        });
     // replace the trailing comma with a }
     jsonProperties.setCharAt(jsonProperties.length() - 1, '}');
     getTopicData(name).m_topic.setProperties(jsonProperties.toString());
@@ -1019,8 +1112,8 @@ public class NetworkSendableTable implements SendableTable {
 
   /**
    * Returns whether there is a data schema already registered with the given name that this
-   * instance has published. This does NOT perform a check as to whether the schema has already
-   * been published by another node on the network.
+   * instance has published. This does NOT perform a check as to whether the schema has already been
+   * published by another node on the network.
    *
    * @param typeString Name (the string passed as the data type for topics using this schema)
    * @return True if schema already registered
