@@ -50,7 +50,7 @@ The following build options are available:
 * `WITH_EXAMPLES` (OFF Default)
   * This option will build C++ examples.
 * `WITH_GUI` (ON Default)
-  * This option will build GUI items. If this is off, and `WITH_SIMULATION_MODULES` is on, the simulation GUI will not be built. 
+  * This option will build GUI items. If this is off, and `WITH_SIMULATION_MODULES` is on, the simulation GUI will not be built.
 * `WITH_JAVA` (ON Default)
   * This option will enable Java and JNI builds. If this is on, `BUILD_SHARED_LIBS` must be on. Otherwise CMake will error.
 * `WITH_JAVA_SOURCE` (`WITH_JAVA` Default)
@@ -58,7 +58,7 @@ The following build options are available:
 * `WITH_NTCORE` (ON Default)
   * This option will cause ntcore to be built. Turning this off will implicitly disable wpinet, and will cause an error if `WITH_WPILIB` is enabled.
 * `WITH_SIMULATION_MODULES` (ON Default)
-  * This option will build simulation modules. 
+  * This option will build simulation modules.
 * `WITH_TESTS` (ON Default)
   * This option will build C++ unit tests. These can be run via `ctest -C <config>`, where `<config>` is the build configuration, e.g. `Debug` or `Release`.
 * `WITH_WPILIB` (ON Default)
@@ -143,7 +143,7 @@ After that, run `cmake --build .`. That will create your executable. Then you sh
 
 Using the built JARs is move involved than using the C++ libraries, but mostly consists of adding the correct directories to PATH.
 
-Add the directory where the JARs are located (e.g, `/usr/local/java`) to PATH. If you are on Windows, you also need to add the `lib`, `bin`, and `share` directories to PATH. Then, create a new folder to contain your project. Add the following code below to a `CMakeLists.txt` file in that directory. 
+Add the directory where the JARs are located (e.g, `/usr/local/java`) to PATH. If you are on Windows, you also need to add the `lib`, `bin`, and `share` directories to PATH. Then, create a new folder to contain your project. Add the following code below to a `CMakeLists.txt` file in that directory.
 
 ```cmake
 cmake_minimum_required(VERSION 3.11)
@@ -157,7 +157,7 @@ find_jar(opencvJar opencv-xxx PATHS ENV PATH) # Change to OpenCV version
 file(GLOB_RECURSE JAVA_SOURCES *.java)
 # If you want Gradle compatibility or you are using one of the templates/examples, comment out the above line and uncomment this line instead:
 # file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
-add_jar(robot ${JAVA_SOURCES} 
+add_jar(robot ${JAVA_SOURCES}
     INCLUDE_JARS apriltag_jar cscore_jar hal_jar ntcore_jar wpilibNewCommands_jar wpimath_jar wpinet_jar wpiutil_jar wpiunits_jar wpilibj_jar ${opencvJar})
 export_jars(TARGETS robot FILE robot.jar)
 ```
