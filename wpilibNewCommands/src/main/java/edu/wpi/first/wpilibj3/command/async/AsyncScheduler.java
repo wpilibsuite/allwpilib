@@ -1,6 +1,7 @@
 package edu.wpi.first.wpilibj3.command.async;
 
 import static edu.wpi.first.units.Units.Milliseconds;
+import static edu.wpi.first.units.Units.Nanoseconds;
 
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Time;
@@ -9,7 +10,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.OptionalInt;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
@@ -63,20 +66,27 @@ public class AsyncScheduler {
   }
 
   public AsyncScheduler() {
-    // Start polling the event loop in 20ms intervals
+    this(Milliseconds.of(20));
+  }
+
+  public AsyncScheduler(Measure<Time> triggerPollingPeriod) {
+    // Start polling the event loop
     // This intentionally runs on the same carrier thread as commands so the boolean checks
     // will be guaranteed to run on the same thread as the commands that manipulate state
-    service.submit(
-        () -> {
-          while (true) {
-            try {
-              Thread.sleep(20);
-              eventLoop.poll();
-            } catch (Exception e) {
-              // ignore and keep running
-            }
-          }
-        });
+    service.submit(() -> pollEventLoop(triggerPollingPeriod));
+  }
+
+  @SuppressWarnings({"InfiniteLoopStatement", "BusyWait"})
+  private void pollEventLoop(Measure<Time> period) {
+    var ms = (long) period.in(Milliseconds);
+    while (true) {
+      try {
+        Thread.sleep(ms);
+        eventLoop.poll();
+      } catch (Exception e) {
+        // ignore and keep running
+      }
+    }
   }
 
   public void registerResource(HardwareResource resource) {
@@ -164,7 +174,8 @@ public class AsyncScheduler {
             runningCommands.put(resource, command);
             shadowrun.computeIfAbsent(resource, _r -> new HashSet<>()).add(command);
 
-            if (runningCommand != null) {
+            if (runningCommand != null
+                    && runningCommand.interruptBehavior() == AsyncCommand.InterruptBehavior.Cancel) {
               cancel(runningCommand);
             }
           }
@@ -216,6 +227,7 @@ public class AsyncScheduler {
    */
   private Callable<?> createCommandExecutorCallback(AsyncCommand command) {
     return () -> {
+      commandOnCurrentThread.set(command);
       try {
         command.run();
         return null;
@@ -375,7 +387,8 @@ public class AsyncScheduler {
   /** Cancels all currently running commands. */
   public void cancelAll() {
     Util.writing(
-        lock, () -> runningCommands.forEach((_resource, runningCommand) -> cancel(runningCommand)));
+        lock,
+        () -> List.copyOf(runningCommands.values()).forEach(this::cancel));
   }
 
   /**
@@ -397,7 +410,82 @@ public class AsyncScheduler {
    *     using it
    */
   public AsyncCommand getCommandUsing(HardwareResource resource) {
-    return runningCommands.get(resource);
+    return Util.reading(lock, () -> runningCommands.get(resource));
+  }
+
+  private final ThreadLocal<AsyncCommand> commandOnCurrentThread = new ThreadLocal<>();
+
+  /**
+   * Pauses the current command for 20 milliseconds. If a higher priority command on
+   * any of the current command's required resources is scheduled while paused, and if the current
+   * command is set to {@link AsyncCommand.InterruptBehavior#Suspend}, then the command will
+   * continue to stay paused as long as any higher priority command is running. Otherwise, a higher
+   * priority command will interrupt the command while it is paused.
+   *
+   * @throws InterruptedException if the current command was canceled, or, if the command's
+   *  {@link AsyncCommand#interruptBehavior() interrupt behavior} is not set to suspend,
+   *  interrupted by a higher priority command
+   */
+  public void pauseCurrentCommand() throws InterruptedException {
+    pauseCurrentCommand(DEFAULT_UPDATE_PERIOD);
+  }
+
+  /**
+   * Pauses the current command for the specified period of time. If a higher priority command on
+   * any of the current command's required resources is scheduled while paused, and if the current
+   * command is set to {@link AsyncCommand.InterruptBehavior#Suspend}, then the command will
+   * continue to stay paused as long as any higher priority command is running. Otherwise, a higher
+   * priority command will interrupt the command while it is paused.
+   *
+   * @throws InterruptedException if the current command was canceled, or, if the command's
+   *  {@link AsyncCommand#interruptBehavior() interrupt behavior} is not set to suspend,
+   *  interrupted by a higher priority command
+   */
+  @SuppressWarnings("BusyWait")
+  public void pauseCurrentCommand(Measure<Time> time) throws InterruptedException {
+    var command = commandOnCurrentThread.get();
+    if (command == null) {
+      throw new IllegalStateException(
+          "pauseCurrentCommand() may only be called by a running command!");
+    }
+
+    long ms = (long) time.in(Milliseconds);
+    int ns = (int) (time.in(Nanoseconds) % 1e6);
+
+    // Always sleep once
+    Thread.sleep(ms, ns);
+
+    // Then, if the command is configured to suspend while higher priority commands run,
+    // continue to sleep in a loop. If we're ever interrupted, it means the command was canceled
+    // outright, and we should respect the cancellation
+    if (command.interruptBehavior() == AsyncCommand.InterruptBehavior.Suspend) {
+      // TODO: We allow commands to interrupt running commands with the same priority level.
+      //       However, this check only pauses if a HIGHER priority command is running, and thus can
+      //       allow two commands of the same priority level to run concurrently. THIS IS BAD
+      for (var highestPriority = getHighestPriorityCommandUsingAnyOf(command.requirements());
+           highestPriority.isPresent() && highestPriority.getAsInt() >= command.priority();
+           highestPriority = getHighestPriorityCommandUsingAnyOf(command.requirements())) {
+        Thread.sleep(ms, ns);
+      }
+    }
+  }
+
+  public OptionalInt getHighestPriorityCommandUsingAnyOf(Collection<HardwareResource> resources) {
+    return Util.reading(lock, () -> {
+      boolean set = false;
+      int priority = Integer.MIN_VALUE;
+      for (HardwareResource resource : resources) {
+        var command = getCommandUsing(resource);
+        if (command == null) {
+          continue;
+        }
+        priority = Math.max(priority, command.priority());
+        set = true;
+      }
+
+      if (set) return OptionalInt.of(priority);
+      else return OptionalInt.empty();
+    });
   }
 
   public Collection<AsyncCommand> getAllCommandsUsing(HardwareResource resource) {

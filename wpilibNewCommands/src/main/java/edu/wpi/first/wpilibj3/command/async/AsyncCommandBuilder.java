@@ -11,6 +11,7 @@ public class AsyncCommandBuilder {
   private ThrowingRunnable impl;
   private String name;
   private int priority = AsyncCommand.DEFAULT_PRIORITY;
+  private AsyncCommand.InterruptBehavior interruptBehavior = AsyncCommand.InterruptBehavior.Cancel;
 
   public AsyncCommandBuilder requiring(HardwareResource resource) {
     requirements.add(resource);
@@ -38,6 +39,15 @@ public class AsyncCommandBuilder {
 
   public AsyncCommandBuilder withPriority(int priority) {
     this.priority = priority;
+    return this;
+  }
+
+  public AsyncCommandBuilder suspendOnInterrupt() {
+    return withInterruptBehavior(AsyncCommand.InterruptBehavior.Suspend);
+  }
+
+  public AsyncCommandBuilder withInterruptBehavior(AsyncCommand.InterruptBehavior behavior) {
+    this.interruptBehavior = behavior;
     return this;
   }
 
@@ -69,6 +79,11 @@ public class AsyncCommandBuilder {
       @Override
       public int priority() {
         return priority;
+      }
+
+      @Override
+      public InterruptBehavior interruptBehavior() {
+        return interruptBehavior;
       }
 
       @Override

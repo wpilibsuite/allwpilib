@@ -3,6 +3,7 @@ package edu.wpi.first.wpilibj3.command.async;
 import static edu.wpi.first.units.Units.Milliseconds;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
@@ -187,7 +189,7 @@ class AsyncSchedulerTest {
           AsyncCommand.noHardware(
                   () -> {
                     for (int i = 0; i < iterations; i++) {
-                      Thread.sleep(1);
+                      scheduler.pauseCurrentCommand(Milliseconds.one());
                       resource.x++;
                     }
                   })
@@ -261,7 +263,7 @@ class AsyncSchedulerTest {
                 () -> {
                   example.x = 0;
                   for (int i = 0; i < 10; i++) {
-                    AsyncCommand.pause();
+                    scheduler.pauseCurrentCommand();
                     example.x++;
                   }
                 })
@@ -271,6 +273,93 @@ class AsyncSchedulerTest {
     scheduler.await(countToTen);
 
     assertEquals(10, example.x);
+  }
+
+  @RepeatedTest(10)
+  void suspendOnInterruptContinuesAutomatically() throws Exception {
+    var scheduler = new AsyncScheduler();
+    var count = new AtomicInteger(0);
+
+    var resource = new HardwareResource("Resource", scheduler);
+
+    var suspendable = AsyncCommand.requiring(resource).executing(() -> {
+      count.set(1);
+      scheduler.pauseCurrentCommand();
+      count.set(2);
+    }).suspendOnInterrupt().withPriority(1).named("Suspender");
+
+    var interrupter = AsyncCommand.requiring(resource).executing(() -> {
+      Thread.sleep(37);
+    }).withPriority(2).named("Interrupter");
+
+    scheduler.schedule(suspendable);
+    Thread.sleep(5); // wait for command to start up and hit the pause
+    scheduler.schedule(interrupter);
+    scheduler.await(interrupter);
+    assertTrue(scheduler.isRunning(suspendable)); // should still be running
+    assertTrue(scheduler.shadowrun.get(resource).contains(suspendable)); // and in the shadowrun too
+    scheduler.await(suspendable);
+    assertEquals(2, count.get());
+  }
+
+  @RepeatedTest(10)
+  void cancelOnSuspendedReallyDoesCancel() throws Exception {
+    var scheduler = new AsyncScheduler();
+    var count = new AtomicInteger(0);
+
+    var resource = new HardwareResource("Resource", scheduler);
+
+    var suspendable = AsyncCommand.requiring(resource).executing(() -> {
+      count.set(1);
+      scheduler.pauseCurrentCommand();
+      count.set(2);
+    }).suspendOnInterrupt().withPriority(1).named("Suspender");
+
+    var interrupter = AsyncCommand.requiring(resource).executing(() -> {
+      Thread.sleep(50);
+    }).withPriority(2).named("Interrupter");
+
+    scheduler.schedule(suspendable);
+    Thread.sleep(5); // wait for command to start up and hit the pause
+    scheduler.schedule(interrupter);
+    scheduler.cancel(suspendable);
+    assertFalse(scheduler.isRunning(suspendable)); // should not still be running
+    assertFalse(scheduler.shadowrun.get(resource).contains(suspendable)); // and in the shadowrun too
+    scheduler.await(suspendable);
+    assertEquals(1, count.get());
+    scheduler.cancelAll();
+  }
+
+  @Test
+  void cancelOnInterruptDoesNotResume() throws Exception {
+    var scheduler = new AsyncScheduler();
+
+    var count = new AtomicInteger(0);
+
+    var resource = new HardwareResource("Resource", scheduler);
+
+    var interrupter = AsyncCommand.requiring(resource).executing(() -> {
+      Thread.sleep(50);
+    }).withPriority(2).named("Interrupter");
+
+    var canceledCommand = AsyncCommand.requiring(resource).executing(() -> {
+      count.set(1);
+      scheduler.pauseCurrentCommand();
+      count.set(2);
+    }).withPriority(1).named("Cancel By Default");
+
+    scheduler.schedule(canceledCommand);
+    Thread.sleep(5); // wait for command to start up and hit the pause
+
+    scheduler.schedule(interrupter);
+    scheduler.await(canceledCommand);
+    assertEquals(1, count.get()); // the second set should not have run
+  }
+
+  @Test
+  void pauseOutsideCommand() {
+    var scheduler = new AsyncScheduler();
+    assertThrows(IllegalStateException.class, scheduler::pauseCurrentCommand);
   }
 
   record PriorityCommand(int priority, HardwareResource... subsystems) implements AsyncCommand {
