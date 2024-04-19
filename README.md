@@ -20,7 +20,7 @@ Welcome to the WPILib project. This repository contains the HAL, WPILibJ, and WP
   - [Running examples in simulation](#running-examples-in-simulation)
   - [Publishing](#publishing)
   - [Structure and Organization](#structure-and-organization)
-- [Contributing to WPILib](#contributing-to-wpilib)
+- [Contributing to WPILib](./CONTRIBUTING.md)
 
 ## WPILib Mission
 
@@ -179,7 +179,3 @@ The hal directory contains more C++ code meant to run on the roboRIO. HAL is an 
 The upstream_utils directory contains scripts for updating copies of thirdparty code in the repository.
 
 The [styleguide repository](https://github.com/wpilibsuite/styleguide) contains our style guides for C++ and Java code. Anything submitted to the WPILib project needs to follow the code style guides outlined in there. For details about the style, please see the contributors document [here](CONTRIBUTING.md#coding-guidelines).
-
-# Contributing to WPILib
-
-See [CONTRIBUTING.md](CONTRIBUTING.md).
