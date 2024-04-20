@@ -9,7 +9,6 @@ find_package(OpenCV REQUIRED)
 if(WITH_JAVA)
     find_package(Java REQUIRED)
     include(UseJava)
-    set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
 
     #find java files, copy them locally
 

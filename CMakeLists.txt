@@ -198,6 +198,9 @@ endif()
 set(include_dest include)
 set(java_lib_dest java)
 set(jni_lib_dest jni)
+if(WITH_JAVA)
+    set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
+endif()
 
 if(USE_SYSTEM_LIBUV)
     set(LIBUV_SYSTEM_REPLACE
