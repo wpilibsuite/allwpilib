@@ -59,8 +59,6 @@ if(WITH_JAVA)
     find_package(JNI REQUIRED)
     include(UseJava)
 
-    configure_file(src/generate/FRCNetComm.java.in FRCNetComm.java)
-
     file(GLOB_RECURSE hal_shared_jni_src src/main/native/cpp/jni/*.cpp)
 
     file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java src/generated/main/java/*.java)
