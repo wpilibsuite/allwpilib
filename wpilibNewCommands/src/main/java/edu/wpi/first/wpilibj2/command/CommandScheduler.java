@@ -736,4 +736,13 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
           }
         });
   }
+
+  /**
+   * Returns a readonly Map of the Subsystems registered with the Scheduler.
+   *
+   * @return NavigableMap of the registered Subsystems and their active commands.
+   */
+  public Map<Subsystem, Command> getRegisteredSubsystems() {
+    return Collections.unmodifiableMap(m_subsystems);
+  }
 }
