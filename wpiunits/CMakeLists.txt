@@ -8,6 +8,7 @@ if(WITH_JAVA)
     file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
 
     add_jar(wpiunits_jar ${JAVA_SOURCES} OUTPUT_NAME wpiunits)
+    set_property(TARGET wpiunits_jar PROPERTY FOLDER "java")
 
     install_jar(wpiunits_jar DESTINATION ${java_lib_dest})
     install_jar_exports(TARGETS wpiunits_jar FILE wpiunits.cmake DESTINATION share/wpiunits)

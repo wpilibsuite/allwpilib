@@ -29,6 +29,7 @@ if(WITH_JAVA)
         INCLUDE_JARS wpiutil_jar cscore_jar ntcore_jar ${OPENCV_JAR_FILE}
         OUTPUT_NAME cameraserver
     )
+    set_property(TARGET cameraserver_jar PROPERTY FOLDER "java")
 
     install_jar(cameraserver_jar DESTINATION ${java_lib_dest})
     install_jar_exports(

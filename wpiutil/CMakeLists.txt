@@ -68,6 +68,7 @@ if(WITH_JAVA)
         OUTPUT_NAME wpiutil
         GENERATE_NATIVE_HEADERS wpiutil_jni_headers
     )
+    set_property(TARGET wpiutil_jar PROPERTY FOLDER "java")
 
     install_jar(wpiutil_jar DESTINATION ${java_lib_dest})
     install_jar_exports(TARGETS wpiutil_jar FILE wpiutil_jar.cmake DESTINATION share/wpiutil)

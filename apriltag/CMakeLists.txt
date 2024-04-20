@@ -62,6 +62,7 @@ if(WITH_JAVA)
         OUTPUT_NAME apriltag
         GENERATE_NATIVE_HEADERS apriltag_jni_headers
     )
+    set_property(TARGET apriltag_jar PROPERTY FOLDER "java")
 
     install_jar(apriltag_jar DESTINATION ${java_lib_dest})
     install_jar_exports(TARGETS apriltag_jar FILE apriltag_jar.cmake DESTINATION share/apriltag)

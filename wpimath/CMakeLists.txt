@@ -82,6 +82,7 @@ if(WITH_JAVA)
         OUTPUT_NAME wpimath
         GENERATE_NATIVE_HEADERS wpimath_jni_headers
     )
+    set_property(TARGET wpimath_jar PROPERTY FOLDER "java")
 
     install_jar(wpimath_jar DESTINATION ${java_lib_dest})
     install_jar_exports(TARGETS wpimath_jar FILE wpimath_jar.cmake DESTINATION share/wpimath)

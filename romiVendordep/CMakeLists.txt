@@ -23,6 +23,7 @@ if(WITH_JAVA)
             wpilibj_jar
         OUTPUT_NAME romiVendordep
     )
+    set_property(TARGET romiVendordep_jar PROPERTY FOLDER "java")
 
     install_jar(romiVendordep_jar DESTINATION ${java_lib_dest})
     install_jar_exports(

@@ -23,6 +23,7 @@ if(WITH_JAVA)
             wpilibj_jar
         OUTPUT_NAME wpilibNewCommands
     )
+    set_property(TARGET wpilibNewCommands_jar PROPERTY FOLDER "java")
 
     install_jar(wpilibNewCommands_jar DESTINATION ${java_lib_dest})
     install_jar_exports(

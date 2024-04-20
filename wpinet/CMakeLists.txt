@@ -24,6 +24,7 @@ if(WITH_JAVA)
         OUTPUT_NAME wpinet
         GENERATE_NATIVE_HEADERS wpinet_jni_headers
     )
+    set_property(TARGET wpinet_jar PROPERTY FOLDER "java")
 
     install_jar(wpinet_jar DESTINATION ${java_lib_dest})
     install_jar_exports(TARGETS wpinet_jar FILE wpinet_jar.cmake DESTINATION share/wpinet)
