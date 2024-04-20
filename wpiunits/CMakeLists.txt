@@ -18,3 +18,16 @@ if(WITH_JAVA)
     install_jar_exports(TARGETS wpiunits_jar FILE wpiunits.cmake DESTINATION share/wpiunits)
     install(FILES wpiunits-config.cmake DESTINATION share/wpiunits)
 endif()
+
+if(WITH_JAVA_SOURCE)
+    include(UseJava)
+    include(CreateSourceJar)
+    add_source_jar(
+        wpiunits_src_jar
+        BASE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/src/main/java
+        OUTPUT_NAME wpiunits-sources
+    )
+    set_property(TARGET wpiunits_src_jar PROPERTY FOLDER "java")
+
+    install_jar(wpiunits_src_jar DESTINATION ${java_lib_dest})
+endif()
