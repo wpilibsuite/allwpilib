@@ -100,7 +100,13 @@ if(WITH_JAVA_SOURCE)
     set_property(TARGET apriltag_src_jar PROPERTY FOLDER "java")
 endif()
 
-generate_resources(src/main/native/resources/edu/wpi/first/apriltag generated/main/cpp APRILTAG frc apriltag_resources_src)
+generate_resources(
+    src/main/native/resources/edu/wpi/first/apriltag
+    generated/main/cpp
+    APRILTAG
+    frc
+    apriltag_resources_src
+)
 
 file(GLOB apriltag_native_src src/main/native/cpp/*.cpp)
 

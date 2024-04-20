@@ -40,25 +40,32 @@ if(WITH_JAVA)
 
         message(STATUS "Downloading EJML jarfiles...")
 
-        download_and_check("${BASE_URL}org/ejml/ejml-cdense/0.43.1/ejml-cdense-0.43.1.jar"
+        download_and_check(
+            "${BASE_URL}org/ejml/ejml-cdense/0.43.1/ejml-cdense-0.43.1.jar"
             "${JAR_ROOT}/ejml-cdense-0.43.1.jar"
         )
-        download_and_check("${BASE_URL}org/ejml/ejml-core/0.43.1/ejml-core-0.43.1.jar"
+        download_and_check(
+            "${BASE_URL}org/ejml/ejml-core/0.43.1/ejml-core-0.43.1.jar"
             "${JAR_ROOT}/ejml-core-0.43.1.jar"
         )
-        download_and_check("${BASE_URL}org/ejml/ejml-ddense/0.43.1/ejml-ddense-0.43.1.jar"
+        download_and_check(
+            "${BASE_URL}org/ejml/ejml-ddense/0.43.1/ejml-ddense-0.43.1.jar"
             "${JAR_ROOT}/ejml-ddense-0.43.1.jar"
         )
-        download_and_check("${BASE_URL}org/ejml/ejml-dsparse/0.43.1/ejml-dsparse-0.43.1.jar"
+        download_and_check(
+            "${BASE_URL}org/ejml/ejml-dsparse/0.43.1/ejml-dsparse-0.43.1.jar"
             "${JAR_ROOT}/ejml-dsparse-0.43.1.jar"
         )
-        download_and_check("${BASE_URL}org/ejml/ejml-fdense/0.43.1/ejml-fdense-0.43.1.jar"
+        download_and_check(
+            "${BASE_URL}org/ejml/ejml-fdense/0.43.1/ejml-fdense-0.43.1.jar"
             "${JAR_ROOT}/ejml-fdense-0.43.1.jar"
         )
-        download_and_check("${BASE_URL}org/ejml/ejml-simple/0.43.1/ejml-simple-0.43.1.jar"
+        download_and_check(
+            "${BASE_URL}org/ejml/ejml-simple/0.43.1/ejml-simple-0.43.1.jar"
             "${JAR_ROOT}/ejml-simple-0.43.1.jar"
         )
-        download_and_check("${BASE_URL}org/ejml/ejml-zdense/0.43.1/ejml-zdense-0.43.1.jar"
+        download_and_check(
+            "${BASE_URL}org/ejml/ejml-zdense/0.43.1/ejml-zdense-0.43.1.jar"
             "${JAR_ROOT}/ejml-zdense-0.43.1.jar"
         )
 
