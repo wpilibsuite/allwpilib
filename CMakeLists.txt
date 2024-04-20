@@ -287,7 +287,7 @@ set(CMAKE_EXE_LINKER_FLAGS_ASAN
 set(CMAKE_SHARED_LINKER_FLAGS_ASAN
     "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} -fsanitize=address"
     CACHE STRING
-    "Linker lags to be used to create shared libraries for Asan build type."
+    "Linker flags to be used to create shared libraries for Asan build type."
     FORCE
 )
 
@@ -315,7 +315,7 @@ set(CMAKE_EXE_LINKER_FLAGS_TSAN
 set(CMAKE_SHARED_LINKER_FLAGS_TSAN
     "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} -fsanitize=thread"
     CACHE STRING
-    "Linker lags to be used to create shared libraries for Tsan build type."
+    "Linker flags to be used to create shared libraries for Tsan build type."
     FORCE
 )
 
@@ -343,7 +343,7 @@ set(CMAKE_EXE_LINKER_FLAGS_UBSAN
 set(CMAKE_SHARED_LINKER_FLAGS_UBSAN
     "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} -fsanitize=undefined"
     CACHE STRING
-    "Linker lags to be used to create shared libraries for Ubsan build type."
+    "Linker flags to be used to create shared libraries for Ubsan build type."
     FORCE
 )
 
