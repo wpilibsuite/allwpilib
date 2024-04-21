@@ -223,6 +223,24 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
   }
 
   /**
+   * Absolute value of measure.
+   *
+   * @return a new measure containing the result
+   */
+  default Measure<U> abs() {
+    return lt(unit().ofBaseUnits(0)) ? times(-1) : this;
+  }
+
+  /**
+   * Take the sign of another measure
+   * @param other measure from which to take sign
+   * @return a new measure with the sign from another measure
+   */
+  default Measure<U> copySign(Measure<U> other) {
+    return other.lt(other.unit().ofBaseUnits(0)) ? times(-1) : this;
+  }
+
+  /**
    * Returns an immutable copy of this measure. The copy can be used freely and is guaranteed never
    * to change.
    *
