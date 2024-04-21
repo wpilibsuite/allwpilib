@@ -14,6 +14,7 @@
 #include <fmt/format.h>
 #include <networktables/NetworkTableInstance.h>
 #include <wpi/DataLog.h>
+#include <wpi/DataLogBackgroundWriter.h>
 #include <wpi/SafeThread.h>
 #include <wpi/StringExtras.h>
 #include <wpi/fs.h>
@@ -39,7 +40,7 @@ struct Thread final : public wpi::SafeThread {
 
   std::string m_logDir;
   bool m_filenameOverride;
-  wpi::log::DataLog m_log;
+  wpi::log::DataLogBackgroundWriter m_log;
   bool m_ntLoggerEnabled = false;
   NT_DataLogger m_ntEntryLogger = 0;
   NT_ConnectionDataLogger m_ntConnLogger = 0;

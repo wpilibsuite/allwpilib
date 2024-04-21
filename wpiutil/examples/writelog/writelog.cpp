@@ -10,7 +10,7 @@
 
 #include <fmt/format.h>
 
-#include "wpi/DataLog.h"
+#include "wpi/DataLogBackgroundWriter.h"
 
 int main(int argc, char** argv) {
   using std::chrono::duration_cast;
@@ -23,7 +23,7 @@ int main(int argc, char** argv) {
     kNumRuns = std::stoi(argv[1]);
   }
 
-  wpi::log::DataLog log;
+  wpi::log::DataLogBackgroundWriter log;
   log.SetFilename("test.wpilog");
 
   auto testVec =
