@@ -298,8 +298,8 @@ Java_edu_wpi_first_hal_DriverStationJNI_getJoystickButtons
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_DriverStationJNI_setJoystickOutputs
-  (JNIEnv*, jclass, jbyte port, jint outputs, jshort leftRumble,
-   jshort rightRumble)
+  (JNIEnv*, jclass, jbyte port, jint outputs, jint leftRumble,
+   jint rightRumble)
 {
   return HAL_SetJoystickOutputs(port, outputs, leftRumble, rightRumble);
 }
