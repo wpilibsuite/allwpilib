@@ -11,8 +11,7 @@
 
 #include <imgui.h>
 
-namespace glass {
-namespace expression {
+namespace glass::expression {
 
 template <typename V>
 ParseResult<V> ParseResult<V>::CreateSuccess(V value) {
@@ -57,16 +56,17 @@ struct Token {
 
 class Lexer {
  public:
-  explicit Lexer(const char* input)
-      : input(input), startIdx(0), currentIdx(0) {}
+  explicit Lexer(const char* input) : input(input) {}
 
   Token NextToken() {
     // Skip leading whitespace
     startIdx = currentIdx;
-    while (std::isspace(input[startIdx]))
+    while (std::isspace(input[startIdx])) {
       startIdx++;
-    if (input[startIdx] == 0)
+    }
+    if (input[startIdx] == 0) {
       return Token(TokenType::End);
+    }
     currentIdx = startIdx;
 
     char c = input[currentIdx];
@@ -88,8 +88,9 @@ class Lexer {
         return Token(TokenType::CloseParen);
       default:
         currentIdx--;
-        if (std::isdigit(c) || c == '.')
+        if (std::isdigit(c) || c == '.') {
           return nextNumber();
+        }
         return Token(TokenType::Error);
     }
   }
@@ -99,7 +100,7 @@ class Lexer {
 
  private:
   const char* input;
-  int startIdx, currentIdx;
+  int startIdx = 0, currentIdx = 0;
 
   Token nextNumber() {
     // Read whole part
@@ -112,11 +113,13 @@ class Lexer {
     // Read decimal part if it exists
     if (input[currentIdx] == '.') {
       currentIdx++;
-      if (!hasDigitsBeforeDecimal && !std::isdigit(input[currentIdx]))
+      if (!hasDigitsBeforeDecimal && !std::isdigit(input[currentIdx])) {
         return Token(TokenType::Error);
+      }
 
-      while (std::isdigit(input[currentIdx]))
+      while (std::isdigit(input[currentIdx])) {
         currentIdx++;
+      }
     }
 
     return Token(TokenType::Number, input + startIdx, currentIdx - startIdx);
@@ -233,30 +236,35 @@ ParseResult<V> ParseExpr(Lexer& lexer, bool insideParen) {
         goto end;
       case TokenType::Number:
         // This happens if there's multiple decimal places in the number
-        if (prevType == TokenType::Number)
+        if (prevType == TokenType::Number) {
           return ParseResult<V>::CreateError("Invalid number");
+        }
 
         // Implicit multiplication. Ex: 2(4 + 5)
-        if (!prevWasOp)
+        if (!prevWasOp) {
           operStack.push(Operator::Multiply);
+        }
 
-        valStack.push(std::atof(std::string(token.str, token.strLen).c_str()));
+        valStack.push(ValueFromString<V>(std::string(token.str, token.strLen)));
         break;
 
       case TokenType::OpenParen: {
         // Implicit multiplication
-        if (!prevWasOp)
+        if (!prevWasOp) {
           operStack.push(Operator::Multiply);
+        }
 
         ParseResult<V> result = ParseExpr<V>(lexer, true);
-        if (result.kind == ParseResultKind::Error)
+        if (result.kind == ParseResultKind::Error) {
           return result;
+        }
         valStack.push(result.successVal);
 
         TokenType nextType = lexer.NextToken().type;
         if (nextType != TokenType::CloseParen) {
-          if (nextType == TokenType::End)
+          if (nextType == TokenType::End) {
             goto end;  // Act as if closed at end of expression
+          }
           return ParseResult<V>::CreateError("Expected )");
         }
         break;
@@ -338,5 +346,4 @@ template ParseResult<double> TryParseExpr(const char*);
 template ParseResult<float> TryParseExpr(const char*);
 template ParseResult<int64_t> TryParseExpr(const char*);
 
-}  // namespace expression
-}  // namespace glass
+}  // namespace glass::expression

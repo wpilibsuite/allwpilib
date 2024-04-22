@@ -6,8 +6,7 @@
 
 #include <stdint.h>
 
-namespace glass {
-namespace expression {
+namespace glass::expression {
 
 enum class ParseResultKind {
   Success,
@@ -35,5 +34,4 @@ extern template ParseResult<double> TryParseExpr(const char*);
 extern template ParseResult<float> TryParseExpr(const char*);
 extern template ParseResult<int64_t> TryParseExpr(const char*);
 
-}  // namespace expression
-}  // namespace glass
+}  // namespace glass::expression
