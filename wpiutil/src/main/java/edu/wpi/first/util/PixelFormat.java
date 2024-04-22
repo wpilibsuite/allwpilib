@@ -21,7 +21,9 @@ public enum PixelFormat {
   /** Grayscale, 16 bpp. */
   kY16(6),
   /** YUV 4:2:2, 16 bpp. */
-  kUYVY(7);
+  kUYVY(7),
+  /** BGRA 8-8-8-8. 32 bpp. */
+  kBGRA(8);
 
   private final int value;
 

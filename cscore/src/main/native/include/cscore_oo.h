@@ -221,7 +221,9 @@ class VideoSource {
     /// HTTP video source.
     kHttp = CS_SOURCE_HTTP,
     /// CV video source.
-    kCv = CS_SOURCE_CV
+    kCv = CS_SOURCE_CV,
+    /// Raw video source.
+    kRaw = CS_SOURCE_RAW,
   };
 
   /** Connection strategy.  Used for SetConnectionStrategy(). */
@@ -856,7 +858,9 @@ class VideoSink {
     /// MJPEG video sink.
     kMjpeg = CS_SINK_MJPEG,
     /// CV video sink.
-    kCv = CS_SINK_CV
+    kCv = CS_SINK_CV,
+    /// Raw video sink.
+    kRaw = CS_SINK_RAW,
   };
 
   VideoSink() noexcept = default;

@@ -228,7 +228,8 @@ class StructArraySubscriber : public Subscriber {
 
  private:
   ValueType m_defaultValue;
-  [[no_unique_address]] std::tuple<I...> m_info;
+  [[no_unique_address]]
+  std::tuple<I...> m_info;
 };
 
 /**
@@ -387,7 +388,8 @@ class StructArrayPublisher : public Publisher {
  private:
   wpi::StructArrayBuffer<T, I...> m_buf;
   std::atomic_bool m_schemaPublished{false};
-  [[no_unique_address]] std::tuple<I...> m_info;
+  [[no_unique_address]]
+  std::tuple<I...> m_info;
 };
 
 /**
@@ -702,7 +704,8 @@ class StructArrayTopic final : public Topic {
   }
 
  private:
-  [[no_unique_address]] std::tuple<I...> m_info;
+  [[no_unique_address]]
+  std::tuple<I...> m_info;
 };
 
 }  // namespace nt

@@ -347,7 +347,7 @@ char** CS_GetHttpCameraUrls(CS_Source source, int* count, CS_Status* status);
 /** @} */
 
 /**
- * @defgroup cscore_opencv_source_cfunc OpenCV Source Functions
+ * @defgroup cscore_frame_source_cfunc Frame Source Functions
  * @{
  */
 void CS_NotifySourceError(CS_Source source, const char* msg, CS_Status* status);
@@ -409,7 +409,7 @@ int CS_GetMjpegServerPort(CS_Sink sink, CS_Status* status);
 /** @} */
 
 /**
- * @defgroup cscore_opencv_sink_cfunc OpenCV Sink Functions
+ * @defgroup cscore_frame_sink_cfunc Frame Sink Functions
  * @{
  */
 void CS_SetSinkDescription(CS_Sink sink, const char* description,

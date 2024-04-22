@@ -29,6 +29,16 @@
 
 namespace wpi {
 
+enum class endianness {
+  big,
+  little,
+#if defined(BYTE_ORDER) && defined(BIG_ENDIAN) && BYTE_ORDER == BIG_ENDIAN
+  native = big
+#else
+  native = little
+#endif
+};
+
 // This implementation of bit_cast is different from the C++20 one in two ways:
 //  - It isn't constexpr because that requires compiler support.
 //  - It requires trivially-constructible To, to avoid UB in the implementation.
