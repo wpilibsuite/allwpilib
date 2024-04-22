@@ -227,14 +227,15 @@ struct InputExprState {
   bool wasActive = false;
 };
 
-bool InputDoubleExpr(const char* label, double* v, const char* format,
-                     ImGuiInputTextFlags flags) {
-  static const int kBufferSize = 256;
+static const int kBufferSize = 256;
 
-  static std::unordered_map<int, InputExprState> exprStates;
-  static char* previewBuffer =
-      reinterpret_cast<char*>(std::malloc(kBufferSize * sizeof(char)));
+static std::unordered_map<int, InputExprState> exprStates;
+static char* previewBuffer =
+    reinterpret_cast<char*>(std::malloc(kBufferSize * sizeof(char)));
 
+template <typename V>
+bool InputExpr(const char* label, V* v, const char* format,
+               ImGuiInputTextFlags flags) {
   int id = ImGui::GetID(label);
   InputExprState& state = exprStates[id];
 
@@ -267,9 +268,8 @@ bool InputDoubleExpr(const char* label, double* v, const char* format,
     }
 
     // Attempt to parse current value
-    glass::expression::ParseResult result =
-        glass::expression::TryParseExpr(state.inputBuffer);
-    if (result.kind == glass::expression::ParseResult::Success) {
+    auto result = glass::expression::TryParseExpr<V>(state.inputBuffer);
+    if (result.kind == glass::expression::ParseResultKind::Success) {
       *v = result.successVal;
     } else if (active) {
       ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "%s",
@@ -280,5 +280,10 @@ bool InputDoubleExpr(const char* label, double* v, const char* format,
 
   return changed;
 }
+
+template bool InputExpr(const char*, int64_t*, const char*,
+                        ImGuiInputTextFlags);
+template bool InputExpr(const char*, float*, const char*, ImGuiInputTextFlags);
+template bool InputExpr(const char*, double*, const char*, ImGuiInputTextFlags);
 
 }  // namespace glass

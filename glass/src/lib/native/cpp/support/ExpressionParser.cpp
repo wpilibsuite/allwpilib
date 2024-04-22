@@ -14,16 +14,18 @@
 namespace glass {
 namespace expression {
 
-ParseResult ParseResult::CreateSuccess(double value) {
-  ParseResult result;
-  result.kind = ParseResult::Success;
+template <typename V>
+ParseResult<V> ParseResult<V>::CreateSuccess(V value) {
+  ParseResult<V> result;
+  result.kind = ParseResultKind::Success;
   result.successVal = value;
   return result;
 }
 
-ParseResult ParseResult::CreateError(const char* errorMessage) {
-  ParseResult result;
-  result.kind = ParseResult::Error;
+template <typename V>
+ParseResult<V> ParseResult<V>::CreateError(const char* errorMessage) {
+  ParseResult<V> result;
+  result.kind = ParseResultKind::Error;
   result.errorMessage = errorMessage;
   return result;
 }
@@ -162,13 +164,14 @@ bool IsOperatorRightAssociative(Operator op) {
   return op == Operator::Exponent || op == Operator::Negate;
 }
 
-void ApplyOperator(std::stack<double>& valStack, Operator op) {
-  double right = valStack.top();
+template <typename V>
+void ApplyOperator(std::stack<V>& valStack, Operator op) {
+  V right = valStack.top();
   valStack.pop();
-  double left = valStack.top();
+  V left = valStack.top();
   valStack.pop();
 
-  double val = 0;
+  V val = 0;
   switch (op) {
     case Operator::Add:
       val = left + right;
@@ -195,9 +198,28 @@ void ApplyOperator(std::stack<double>& valStack, Operator op) {
   valStack.push(val);
 }
 
-ParseResult ParseExpr(Lexer& lexer, bool insideParen) {
+template <typename V>
+V ValueFromString(const std::string& str);
+
+template <>
+int64_t ValueFromString(const std::string& str) {
+  return std::stoll(str);
+}
+
+template <>
+float ValueFromString(const std::string& str) {
+  return std::stof(str);
+}
+
+template <>
+double ValueFromString(const std::string& str) {
+  return std::stod(str);
+}
+
+template <typename V>
+ParseResult<V> ParseExpr(Lexer& lexer, bool insideParen) {
   std::stack<Operator> operStack;
-  std::stack<double> valStack;
+  std::stack<V> valStack;
 
   bool prevWasOp = true;
   TokenType prevType = TokenType::Add;
@@ -212,11 +234,12 @@ ParseResult ParseExpr(Lexer& lexer, bool insideParen) {
       case TokenType::Number:
         // This happens if there's multiple decimal places in the number
         if (prevType == TokenType::Number)
-          return ParseResult::CreateError("Invalid number");
+          return ParseResult<V>::CreateError("Invalid number");
 
         // Implicit multiplication. Ex: 2(4 + 5)
         if (!prevWasOp)
           operStack.push(Operator::Multiply);
+
         valStack.push(std::atof(std::string(token.str, token.strLen).c_str()));
         break;
 
@@ -225,8 +248,8 @@ ParseResult ParseExpr(Lexer& lexer, bool insideParen) {
         if (!prevWasOp)
           operStack.push(Operator::Multiply);
 
-        ParseResult result = ParseExpr(lexer, true);
-        if (result.kind == ParseResult::Error)
+        ParseResult<V> result = ParseExpr<V>(lexer, true);
+        if (result.kind == ParseResultKind::Error)
           return result;
         valStack.push(result.successVal);
 
@@ -234,7 +257,7 @@ ParseResult ParseExpr(Lexer& lexer, bool insideParen) {
         if (nextType != TokenType::CloseParen) {
           if (nextType == TokenType::End)
             goto end;  // Act as if closed at end of expression
-          return ParseResult::CreateError("Expected )");
+          return ParseResult<V>::CreateError("Expected )");
         }
         break;
       }
@@ -248,7 +271,7 @@ ParseResult ParseExpr(Lexer& lexer, bool insideParen) {
         break;
 
       case TokenType::Error:
-        return ParseResult::CreateError("Unexpected character");
+        return ParseResult<V>::CreateError("Unexpected character");
 
       default:
         Operator op = GetOperator(token.type);
@@ -274,9 +297,9 @@ ParseResult ParseExpr(Lexer& lexer, bool insideParen) {
               precedence < prevPrecedence) {
             operStack.pop();
             if (valStack.size() < 2) {
-              return ParseResult::CreateError("Missing operand");
+              return ParseResult<V>::CreateError("Missing operand");
             }
-            ApplyOperator(valStack, prevOp);
+            ApplyOperator<V>(valStack, prevOp);
           } else {
             break;
           }
@@ -292,23 +315,28 @@ ParseResult ParseExpr(Lexer& lexer, bool insideParen) {
 end:
   while (!operStack.empty()) {
     if (valStack.size() < 2) {
-      return ParseResult::CreateError("Missing operand");
+      return ParseResult<V>::CreateError("Missing operand");
     }
-    ApplyOperator(valStack, operStack.top());
+    ApplyOperator<V>(valStack, operStack.top());
     operStack.pop();
   }
   if (valStack.empty()) {
-    return ParseResult::CreateError("No value");
+    return ParseResult<V>::CreateError("No value");
   }
 
-  return ParseResult::CreateSuccess(valStack.top());
+  return ParseResult<V>::CreateSuccess(valStack.top());
 }
 
 // expr is null-terminated string, as ImGui::inputText() uses
-ParseResult TryParseExpr(const char* expr) {
+template <typename V>
+ParseResult<V> TryParseExpr(const char* expr) {
   Lexer lexer(expr);
-  return ParseExpr(lexer, false);
+  return ParseExpr<V>(lexer, false);
 }
+
+template ParseResult<double> TryParseExpr(const char*);
+template ParseResult<float> TryParseExpr(const char*);
+template ParseResult<int64_t> TryParseExpr(const char*);
 
 }  // namespace expression
 }  // namespace glass

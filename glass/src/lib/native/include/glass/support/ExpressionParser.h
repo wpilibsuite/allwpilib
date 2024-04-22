@@ -4,24 +4,36 @@
 
 #pragma once
 
+#include <stdint.h>
+
 namespace glass {
 namespace expression {
 
-struct ParseResult {
-  static ParseResult CreateSuccess(double value);
-  static ParseResult CreateError(const char* errorMessage);
+enum class ParseResultKind {
+  Success,
+  Error,
+};
 
-  enum { Success, Error } kind;
+template <typename V>
+struct ParseResult {
+  static ParseResult<V> CreateSuccess(V value);
+  static ParseResult<V> CreateError(const char* errorMessage);
 
   // If kind is Success, expression value is in successVal
   // If kind is Error, error message is in errorMessage
+  ParseResultKind kind;
   union {
-    double successVal;
+    V successVal;
     const char* errorMessage;
   };
 };
 
-ParseResult TryParseExpr(const char* expr);
+template <typename V>
+ParseResult<V> TryParseExpr(const char* expr);
+
+extern template ParseResult<double> TryParseExpr(const char*);
+extern template ParseResult<float> TryParseExpr(const char*);
+extern template ParseResult<int64_t> TryParseExpr(const char*);
 
 }  // namespace expression
 }  // namespace glass
