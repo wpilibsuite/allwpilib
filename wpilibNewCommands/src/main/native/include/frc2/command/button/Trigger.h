@@ -58,6 +58,23 @@ class Trigger {
   Trigger(const Trigger& other);
 
   /**
+   * Starts the command when the condition changes.
+   *
+   * @param command the command to start
+   * @return this trigger, so calls can be chained
+   */
+  Trigger OnChange(Command* command);
+
+  /**
+   * Starts the command when the condition changes. Moves command ownership to
+   * the button scheduler.
+   *
+   * @param command the command to start
+   * @return this trigger, so calls can be chained
+   */
+  Trigger OnChange(CommandPtr&& command);
+
+  /**
    * Starts the given command whenever the condition changes from `false` to
    * `true`.
    *
