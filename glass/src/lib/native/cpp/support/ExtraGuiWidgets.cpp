@@ -8,7 +8,12 @@
 #include <imgui.h>
 #include <imgui_internal.h>
 
+#include <cstdio>
+#include <cstdlib>
+#include <unordered_map>
+
 #include "glass/DataSource.h"
+#include "glass/support/ExpressionParser.h"
 
 namespace glass {
 
@@ -215,6 +220,65 @@ bool HamburgerButton(const ImGuiID id, const ImVec2 position) {
   }
 
   return pressed;
+}
+
+struct InputExprState {
+  char* inputBuffer = nullptr;
+  bool wasActive = false;
+};
+
+bool InputDoubleExpr(const char* label, double* v, const char* format,
+                     ImGuiInputTextFlags flags) {
+  static const int kBufferSize = 256;
+
+  static std::unordered_map<int, InputExprState> exprStates;
+  static char* previewBuffer =
+      reinterpret_cast<char*>(std::malloc(kBufferSize * sizeof(char)));
+
+  int id = ImGui::GetID(label);
+  InputExprState& state = exprStates[id];
+
+  char* inputBuffer;
+  if (state.wasActive) {
+    inputBuffer = state.inputBuffer;
+  } else {
+    inputBuffer = previewBuffer;
+
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+#endif
+    // Preview stored value
+    std::snprintf(inputBuffer, kBufferSize, format, *v);
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
+  }
+
+  bool changed = ImGui::InputText(label, inputBuffer, kBufferSize, flags);
+  bool active = ImGui::IsItemActive();
+
+  if (active || changed) {
+    if (!state.inputBuffer) {
+      // Move the preview buffer into state, and make a new buffer for previews
+      state.inputBuffer = previewBuffer;
+      previewBuffer =
+          reinterpret_cast<char*>(std::malloc(kBufferSize * sizeof(char)));
+    }
+
+    // Attempt to parse current value
+    glass::expression::ParseResult result =
+        glass::expression::TryParseExpr(state.inputBuffer);
+    if (result.kind == glass::expression::ParseResult::Success) {
+      *v = result.successVal;
+    } else if (active) {
+      ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "%s",
+                         result.errorMessage);
+    }
+  }
+  state.wasActive = active;
+
+  return changed;
 }
 
 }  // namespace glass

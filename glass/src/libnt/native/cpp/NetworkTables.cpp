@@ -33,6 +33,8 @@
 #include "glass/Context.h"
 #include "glass/DataSource.h"
 #include "glass/Storage.h"
+#include "glass/support/ExpressionParser.h"
+#include "glass/support/ExtraGuiWidgets.h"
 
 using namespace glass;
 using namespace mpack;
@@ -1411,9 +1413,8 @@ static void EmitEntryValueEditable(NetworkTablesModel* model,
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
 #endif
-      if (ImGui::InputDouble(typeStr, &v, 0, 0,
-                             fmt::format("%.{}f", precision).c_str(),
-                             ImGuiInputTextFlags_EnterReturnsTrue)) {
+      if (InputDoubleExpr(typeStr, &v, fmt::format("%.{}f", precision).c_str(),
+                          ImGuiInputTextFlags_EnterReturnsTrue)) {
         if (entry.publisher == 0) {
           entry.publisher = nt::Publish(entry.info.topic, NT_DOUBLE, "double");
         }

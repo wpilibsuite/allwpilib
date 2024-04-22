@@ -99,4 +99,10 @@ bool HeaderDeleteButton(const char* label);
  */
 bool HamburgerButton(const ImGuiID id, const ImVec2 position);
 
+/**
+ * Edit a double value with expression input. Similar to ImGui::InputDouble()
+ */
+bool InputDoubleExpr(const char* label, double* v, const char* format = NULL,
+                     ImGuiInputTextFlags flags = 0);
+
 }  // namespace glass
