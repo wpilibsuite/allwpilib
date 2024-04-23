@@ -101,6 +101,9 @@ bool HeaderDeleteButton(const char* label);
  */
 bool HamburgerButton(const ImGuiID id, const ImVec2 position);
 
+/**
+ * Edit a value with expression input. Similar to ImGui::InputScalar()
+ */
 template <typename V>
 bool InputExpr(const char* label, V* v, const char* format,
                ImGuiInputTextFlags flags = 0);
@@ -110,11 +113,5 @@ extern template bool InputExpr(const char*, float*, const char*,
                                ImGuiInputTextFlags);
 extern template bool InputExpr(const char*, double*, const char*,
                                ImGuiInputTextFlags);
-
-/**
- * Edit a double value with expression input. Similar to ImGui::InputDouble()
- */
-// bool InputDoubleExpr(const char* label, double* v, const char* format = NULL,
-//                      ImGuiInputTextFlags flags = 0);
 
 }  // namespace glass
