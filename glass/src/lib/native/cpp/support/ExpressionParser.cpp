@@ -9,8 +9,6 @@
 #include <stack>
 #include <string>
 
-#include <imgui.h>
-
 namespace glass::expression {
 
 template <typename V>
@@ -220,6 +218,25 @@ double ValueFromString(const std::string& str) {
 }
 
 template <typename V>
+ParseResult<V> EvalAll(std::stack<Operator>& operStack,
+                       std::stack<V>& valStack) {
+  while (!operStack.empty()) {
+    if (valStack.size() < 2) {
+      return ParseResult<V>::CreateError("Missing operand");
+    }
+    ApplyOperator<V>(valStack, operStack.top());
+    operStack.pop();
+  }
+  if (valStack.empty()) {
+    return ParseResult<V>::CreateError("No value");
+  }
+
+  // Intentionally leaves the result value on top of valStack so unmatched
+  // closing parentheses work
+  return ParseResult<V>::CreateSuccess(valStack.top());
+}
+
+template <typename V>
 ParseResult<V> ParseExpr(Lexer& lexer, bool insideParen) {
   std::stack<Operator> operStack;
   std::stack<V> valStack;
@@ -270,13 +287,21 @@ ParseResult<V> ParseExpr(Lexer& lexer, bool insideParen) {
         break;
       }
 
-      case TokenType::CloseParen:
+      case TokenType::CloseParen: {
         if (insideParen) {
           lexer.Repeat();
           goto end;
         }
-        // Act as if there was open paren at start of expression
+
+        // Acts as if there was open paren at start of expression. EvalAll will
+        // clear both stacks, and leave the result value on top of valStack.
+        // This makes sure everything inside the parentheses is evaluated first
+        ParseResult<V> result = EvalAll<V>(operStack, valStack);
+        if (result.kind == ParseResultKind::Error) {
+          return result;
+        }
         break;
+      }
 
       case TokenType::Error:
         return ParseResult<V>::CreateError("Unexpected character");
@@ -321,18 +346,7 @@ ParseResult<V> ParseExpr(Lexer& lexer, bool insideParen) {
 
 // Reached the end of the expression
 end:
-  while (!operStack.empty()) {
-    if (valStack.size() < 2) {
-      return ParseResult<V>::CreateError("Missing operand");
-    }
-    ApplyOperator<V>(valStack, operStack.top());
-    operStack.pop();
-  }
-  if (valStack.empty()) {
-    return ParseResult<V>::CreateError("No value");
-  }
-
-  return ParseResult<V>::CreateSuccess(valStack.top());
+  return EvalAll<V>(operStack, valStack);
 }
 
 // expr is null-terminated string, as ImGui::inputText() uses
