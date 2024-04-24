@@ -111,12 +111,18 @@ class Lexer {
     // Read decimal part if it exists
     if (input[currentIdx] == '.') {
       currentIdx++;
+      // Report a single '.' with no digits as an error
       if (!hasDigitsBeforeDecimal && !std::isdigit(input[currentIdx])) {
         return Token(TokenType::Error);
       }
 
       while (std::isdigit(input[currentIdx])) {
         currentIdx++;
+      }
+
+      // Make sure the number has at most one decimal point
+      if (input[currentIdx] == '.') {
+        return Token(TokenType::Error);
       }
     }
 
@@ -252,12 +258,14 @@ ParseResult<V> ParseExpr(Lexer& lexer, bool insideParen) {
       case TokenType::End:
         goto end;
       case TokenType::Number:
-        // This happens if there's multiple decimal places in the number
+        // Check for two numbers in a row (ex: "2 4"). Implicit multiplication
+        // is probably not what the user intended in this case, so give them an
+        // error.
         if (prevType == TokenType::Number) {
-          return ParseResult<V>::CreateError("Invalid number");
+          return ParseResult<V>::CreateError("Missing operator");
         }
 
-        // Implicit multiplication. Ex: 2(4 + 5)
+        // Implicit multiplication. Ex: "2(4 + 5)"
         if (!prevWasOp) {
           operStack.push(Operator::Multiply);
         }
