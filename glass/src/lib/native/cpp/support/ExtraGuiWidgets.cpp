@@ -10,6 +10,7 @@
 
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 #include <unordered_map>
 
 #include "glass/DataSource.h"
@@ -222,16 +223,15 @@ bool HamburgerButton(const ImGuiID id, const ImVec2 position) {
   return pressed;
 }
 
+static const int kBufferSize = 256;
+
 struct InputExprState {
-  char* inputBuffer = nullptr;
+  char inputBuffer[kBufferSize];
   bool wasActive = false;
 };
 
-static const int kBufferSize = 256;
-
 static std::unordered_map<int, InputExprState> exprStates;
-static char* previewBuffer =
-    reinterpret_cast<char*>(std::malloc(kBufferSize * sizeof(char)));
+// static char previewBuffer[kBufferSize];
 
 template <typename V>
 bool InputExpr(const char* label, V* v, const char* format,
@@ -240,10 +240,10 @@ bool InputExpr(const char* label, V* v, const char* format,
   InputExprState& state = exprStates[id];
 
   char* inputBuffer;
+  inputBuffer = state.inputBuffer;
   if (state.wasActive) {
-    inputBuffer = state.inputBuffer;
   } else {
-    inputBuffer = previewBuffer;
+    // inputBuffer = previewBuffer;
 
 #ifdef __GNUC__
 #pragma GCC diagnostic push
@@ -260,12 +260,13 @@ bool InputExpr(const char* label, V* v, const char* format,
   bool active = ImGui::IsItemActive();
 
   if (active || changed) {
-    if (!state.inputBuffer) {
-      // Move the preview buffer into state, and make a new buffer for previews
-      state.inputBuffer = previewBuffer;
-      previewBuffer =
-          reinterpret_cast<char*>(std::malloc(kBufferSize * sizeof(char)));
-    }
+    // if (!state.inputBuffer) {
+      // Move the preview buffer into state
+      
+      // state.inputBuffer = previewBuffer;
+      // previewBuffer =
+      //     reinterpret_cast<char*>(std::malloc(kBufferSize * sizeof(char)));
+    // }
 
     // Attempt to parse current value
     auto result = glass::expression::TryParseExpr<V>(state.inputBuffer);
