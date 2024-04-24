@@ -453,6 +453,11 @@ public abstract class RobotBase implements AutoCloseable {
       runRobot(robotSupplier);
     }
 
+    // On RIO, this will just terminate rather than shutting down cleanly (it's a no-op in sim).
+    // It's not worth the risk of hanging on shutdown when we want the code to restart as quickly
+    // as possible.
+    HAL.terminate();
+
     HAL.shutdown();
 
     System.exit(0);

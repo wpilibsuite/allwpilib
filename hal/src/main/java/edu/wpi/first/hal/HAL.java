@@ -75,6 +75,9 @@ public final class HAL extends JNIWrapper {
    */
   public static native void exitMain();
 
+  /** Terminates the executable (at the native level). Does nothing in simulation. */
+  public static native void terminate();
+
   private static native void simPeriodicBeforeNative();
 
   private static final List<Runnable> s_simPeriodicBefore = new ArrayList<>();
