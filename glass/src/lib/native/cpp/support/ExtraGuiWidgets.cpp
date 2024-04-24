@@ -227,24 +227,24 @@ static const int kBufferSize = 256;
 
 struct InputExprState {
   char inputBuffer[kBufferSize];
-  bool wasActive = false;
 };
 
 static std::unordered_map<int, InputExprState> exprStates;
-// static char previewBuffer[kBufferSize];
+// Shared string buffer for inactive inputs
+static char previewBuffer[kBufferSize];
 
 template <typename V>
 bool InputExpr(const char* label, V* v, const char* format,
                ImGuiInputTextFlags flags) {
   int id = ImGui::GetID(label);
-  InputExprState& state = exprStates[id];
 
   char* inputBuffer;
-  inputBuffer = state.inputBuffer;
-  if (state.wasActive) {
+  bool hasState = exprStates.find(id) != exprStates.end();
+  if (hasState) {
+    InputExprState& state = exprStates[id];
+    inputBuffer = state.inputBuffer;
   } else {
-    // inputBuffer = previewBuffer;
-
+    inputBuffer = previewBuffer;
 #ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
@@ -260,13 +260,11 @@ bool InputExpr(const char* label, V* v, const char* format,
   bool active = ImGui::IsItemActive();
 
   if (active || changed) {
-    // if (!state.inputBuffer) {
-      // Move the preview buffer into state
-      
-      // state.inputBuffer = previewBuffer;
-      // previewBuffer =
-      //     reinterpret_cast<char*>(std::malloc(kBufferSize * sizeof(char)));
-    // }
+    InputExprState& state = exprStates[id];
+    if (!hasState) {
+      // State was just created, copy in contents of preview buffer
+      std::strncpy(state.inputBuffer, previewBuffer, kBufferSize);
+    }
 
     // Attempt to parse current value
     auto result = glass::expression::TryParseExpr<V>(state.inputBuffer);
@@ -277,7 +275,11 @@ bool InputExpr(const char* label, V* v, const char* format,
                          result.errorMessage);
     }
   }
-  state.wasActive = active;
+
+  // Don't need the state anymore if not editing
+  if (!active) {
+    exprStates.erase(id);
+  }
 
   return changed;
 }
