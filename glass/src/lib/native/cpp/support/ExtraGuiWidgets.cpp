@@ -11,7 +11,9 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <unordered_map>
+//#include <unordered_map>
+
+#include <wpi/DenseMap.h>
 
 #include "glass/DataSource.h"
 #include "glass/support/ExpressionParser.h"
@@ -229,7 +231,8 @@ struct InputExprState {
   char inputBuffer[kBufferSize];
 };
 
-static std::unordered_map<int, InputExprState> exprStates;
+//static std::unordered_map<int, InputExprState> exprStates;
+static wpi::DenseMap<int, InputExprState> exprStates;
 // Shared string buffer for inactive inputs
 static char previewBuffer[kBufferSize];
 
@@ -239,7 +242,7 @@ bool InputExpr(const char* label, V* v, const char* format,
   int id = ImGui::GetID(label);
 
   char* inputBuffer;
-  bool hasState = exprStates.find(id) != exprStates.end();
+  bool hasState = exprStates.contains(id);
   if (hasState) {
     InputExprState& state = exprStates[id];
     inputBuffer = state.inputBuffer;
