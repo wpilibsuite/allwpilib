@@ -33,7 +33,6 @@
 #include "glass/Context.h"
 #include "glass/DataSource.h"
 #include "glass/Storage.h"
-#include "glass/support/ExpressionParser.h"
 #include "glass/support/ExtraGuiWidgets.h"
 
 using namespace glass;

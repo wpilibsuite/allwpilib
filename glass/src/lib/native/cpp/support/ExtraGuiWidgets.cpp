@@ -11,7 +11,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-//#include <unordered_map>
+// #include <unordered_map>
 
 #include <wpi/DenseMap.h>
 
@@ -231,7 +231,7 @@ struct InputExprState {
   char inputBuffer[kBufferSize];
 };
 
-//static std::unordered_map<int, InputExprState> exprStates;
+// static std::unordered_map<int, InputExprState> exprStates;
 static wpi::DenseMap<int, InputExprState> exprStates;
 // Shared string buffer for inactive inputs
 static char previewBuffer[kBufferSize];
@@ -271,11 +271,11 @@ bool InputExpr(const char* label, V* v, const char* format,
 
     // Attempt to parse current value
     auto result = glass::expression::TryParseExpr<V>(state.inputBuffer);
-    if (result.kind == glass::expression::ParseResultKind::Success) {
-      *v = result.successVal;
+    if (result) {
+      *v = result.value();
     } else if (active) {
       ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "%s",
-                         result.errorMessage);
+                         result.error().c_str());
     }
   }
 

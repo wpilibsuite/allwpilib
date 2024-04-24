@@ -6,32 +6,17 @@
 
 #include <stdint.h>
 
+#include <string>
+
+#include <wpi/expected>
+
 namespace glass::expression {
 
-enum class ParseResultKind {
-  Success,
-  Error,
-};
-
 template <typename V>
-struct ParseResult {
-  static ParseResult<V> CreateSuccess(V value);
-  static ParseResult<V> CreateError(const char* errorMessage);
+wpi::expected<V, std::string> TryParseExpr(const char* expr);
 
-  // If kind is Success, expression value is in successVal
-  // If kind is Error, error message is in errorMessage
-  ParseResultKind kind;
-  union {
-    V successVal;
-    const char* errorMessage;
-  };
-};
-
-template <typename V>
-ParseResult<V> TryParseExpr(const char* expr);
-
-extern template ParseResult<double> TryParseExpr(const char*);
-extern template ParseResult<float> TryParseExpr(const char*);
-extern template ParseResult<int64_t> TryParseExpr(const char*);
+extern template wpi::expected<double, std::string> TryParseExpr(const char*);
+extern template wpi::expected<float, std::string> TryParseExpr(const char*);
+extern template wpi::expected<int64_t, std::string> TryParseExpr(const char*);
 
 }  // namespace glass::expression
