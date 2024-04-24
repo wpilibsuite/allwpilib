@@ -18,7 +18,6 @@
 #include "Instance.h"
 #include "c_util.h"
 #include "cscore_cpp.h"
-#include "opencv2/imgproc.hpp"
 #include "UsbCameraImpl.h"
 
 namespace cs {
@@ -135,7 +134,11 @@ std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
     std::vector<UsbCameraInfo> retval;
     NSArray<AVCaptureDeviceType>* deviceTypes = @[
       AVCaptureDeviceTypeBuiltInWideAngleCamera,
+#if MAC_OS_X_VERSION_MIN_REQUIRED >= 140000
+      AVCaptureDeviceTypeExternal
+#else
       AVCaptureDeviceTypeExternalUnknown
+#endif
     ];
     AVCaptureDeviceDiscoverySession* session = [AVCaptureDeviceDiscoverySession
         discoverySessionWithDeviceTypes:deviceTypes

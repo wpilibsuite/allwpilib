@@ -26,7 +26,7 @@ public class RawSource extends ImageSource {
   public RawSource(String name, VideoMode mode) {
     super(
         CameraServerJNI.createRawSource(
-            name, mode.pixelFormat.getValue(), mode.width, mode.height, mode.fps));
+            name, false, mode.pixelFormat.getValue(), mode.width, mode.height, mode.fps));
   }
 
   /**
@@ -39,7 +39,7 @@ public class RawSource extends ImageSource {
    * @param fps fps
    */
   public RawSource(String name, PixelFormat pixelFormat, int width, int height, int fps) {
-    super(CameraServerJNI.createRawSource(name, pixelFormat.getValue(), width, height, fps));
+    super(CameraServerJNI.createRawSource(name, false, pixelFormat.getValue(), width, height, fps));
   }
 
   /**

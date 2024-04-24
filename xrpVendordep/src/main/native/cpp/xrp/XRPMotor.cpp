@@ -6,8 +6,6 @@
 
 #include <frc/Errors.h>
 
-#include <wpi/deprecated.h>
-
 using namespace frc;
 
 std::map<int, std::string> XRPMotor::s_simDeviceMap = {

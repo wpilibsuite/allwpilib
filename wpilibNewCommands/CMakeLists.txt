@@ -72,6 +72,7 @@ target_include_directories(
 )
 
 install(TARGETS wpilibNewCommands EXPORT wpilibnewcommands)
+export(TARGETS wpilibNewCommands FILE wpilibnewcommands.cmake NAMESPACE wpilibnewcommands::)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpilibNewCommands")
 
 configure_file(

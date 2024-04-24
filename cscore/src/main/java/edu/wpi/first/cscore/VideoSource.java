@@ -86,6 +86,8 @@ public class VideoSource implements AutoCloseable {
         return Kind.kHttp;
       case 4:
         return Kind.kCv;
+      case 8:
+        return Kind.kRaw;
       default:
         return Kind.kUnknown;
     }

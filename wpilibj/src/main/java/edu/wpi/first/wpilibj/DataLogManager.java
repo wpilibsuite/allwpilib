@@ -269,7 +269,7 @@ public final class DataLogManager {
     // based on free disk space, scan for "old" FRC_*.wpilog files and remove
     {
       File logDir = new File(m_logDir);
-      long freeSpace = logDir.getFreeSpace();
+      long freeSpace = logDir.getUsableSpace();
       if (freeSpace < kFreeSpaceThreshold) {
         // Delete oldest FRC_*.wpilog files (ignore FRC_TBD_*.wpilog as we just created one)
         File[] files =
@@ -304,7 +304,7 @@ public final class DataLogManager {
                 + freeSpace / 1000000
                 + " MB of free space remaining! Logs will get deleted below "
                 + kFreeSpaceThreshold / 1000000
-                + " MB of free space."
+                + " MB of free space. "
                 + "Consider deleting logs off the storage device.",
             false);
       }

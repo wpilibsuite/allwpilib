@@ -48,6 +48,7 @@ target_link_libraries(cscore PUBLIC wpinet wpiutil ${OpenCV_LIBS})
 set_property(TARGET cscore PROPERTY FOLDER "libraries")
 
 install(TARGETS cscore EXPORT cscore)
+export(TARGETS cscore FILE cscore.cmake NAMESPACE cscore::)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/cscore")
 
 configure_file(cscore-config.cmake.in ${WPILIB_BINARY_DIR}/cscore-config.cmake)
@@ -163,6 +164,7 @@ if(WITH_JAVA)
     add_dependencies(cscorejni cscore_jar)
 
     install(TARGETS cscorejni EXPORT cscorejni)
+    export(TARGETS cscorejni FILE cscorejni.cmake NAMESPACE cscorejni::)
 endif()
 
 if(WITH_JAVA_SOURCE)

@@ -253,6 +253,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
   private volatile boolean m_thread_idle = false;
   private boolean m_auto_configured = false;
   private double m_scaled_sample_rate = 2500.0;
+  private boolean m_needs_flash = false;
 
   // Resources
   private SPI m_spi;
@@ -292,17 +293,17 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
   /**
    * Creates a new ADIS16740 IMU object.
    *
-   * <p>The default setup is the onboard SPI port with a calibration time of 4 seconds. Yaw, pitch,
+   * <p>The default setup is the onboard SPI port with a calibration time of 1 second. Yaw, pitch,
    * and roll are kZ, kX, and kY respectively.
    */
   public ADIS16470_IMU() {
-    this(IMUAxis.kZ, IMUAxis.kX, IMUAxis.kY, SPI.Port.kOnboardCS0, CalibrationTime._4s);
+    this(IMUAxis.kZ, IMUAxis.kX, IMUAxis.kY, SPI.Port.kOnboardCS0, CalibrationTime._1s);
   }
 
   /**
    * Creates a new ADIS16740 IMU object.
    *
-   * <p>The default setup is the onboard SPI port with a calibration time of 4 seconds.
+   * <p>The default setup is the onboard SPI port with a calibration time of 1 second.
    *
    * <p><b><i>Input axes limited to kX, kY and kZ. Specifying kYaw, kPitch,or kRoll will result in
    * an error.</i></b>
@@ -312,7 +313,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
    * @param roll_axis The axis that measures the roll
    */
   public ADIS16470_IMU(IMUAxis yaw_axis, IMUAxis pitch_axis, IMUAxis roll_axis) {
-    this(yaw_axis, pitch_axis, roll_axis, SPI.Port.kOnboardCS0, CalibrationTime._4s);
+    this(yaw_axis, pitch_axis, roll_axis, SPI.Port.kOnboardCS0, CalibrationTime._1s);
   }
 
   /**
@@ -391,23 +392,52 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
         return;
       }
 
-      // Set IMU internal decimation to 4 (output data rate of 2000 SPS / (4 + 1) =
-      // 400Hz)
-      writeRegister(DEC_RATE, 4);
+      // Set IMU internal decimation to 4 (ODR = 2000 SPS / (4 + 1) = 400Hz), BW = 200Hz
+      if (readRegister(DEC_RATE) != 0x0004) {
+        writeRegister(DEC_RATE, 0x0004);
+        m_needs_flash = true;
+        DriverStation.reportWarning(
+            "ADIS16470: DEC_RATE register configuration inconsistent! Scheduling flash update.",
+            false);
+      }
 
-      // Set data ready polarity (HIGH = Good Data), Disable gSense Compensation and
-      // PoP
-      writeRegister(MSC_CTRL, 1);
+      // Set data ready polarity (HIGH = Good Data), Disable gSense Compensation and PoP
+      if (readRegister(MSC_CTRL) != 0x0001) {
+        writeRegister(MSC_CTRL, 0x0001);
+        m_needs_flash = true;
+        DriverStation.reportWarning(
+            "ADIS16470: MSC_CTRL register configuration inconsistent! Scheduling flash update.",
+            false);
+      }
 
-      // Configure IMU internal Bartlett filter
-      writeRegister(FILT_CTRL, 0);
+      // Disable IMU internal Bartlett filter (200Hz bandwidth is sufficient)
+      if (readRegister(FILT_CTRL) != 0x0000) {
+        writeRegister(FILT_CTRL, 0x0000);
+        m_needs_flash = true;
+        DriverStation.reportWarning(
+            "ADIS16470: FILT_CTRL register configuration inconsistent! Scheduling flash update.",
+            false);
+      }
+
+      // If any registers on the IMU don't match the config, trigger a flash update
+      if (m_needs_flash) {
+        DriverStation.reportWarning(
+            "ADIS16470: Register configuration changed! Starting IMU flash update.", false);
+        writeRegister(GLOB_CMD, 0x0008);
+        // Wait long enough for the flash update to finish (72ms minimum as per the datasheet)
+        Timer.delay(0.3);
+        DriverStation.reportWarning("ADIS16470: Flash update finished!", false);
+        m_needs_flash = false;
+      } else {
+        DriverStation.reportWarning(
+            "ADIS16470: Flash and RAM configuration consistent. No flash update required!", false);
+      }
 
       // Configure continuous bias calibration time based on user setting
       writeRegister(NULL_CNFG, (m_calibration_time | 0x0700));
 
       // Notify DS that IMU calibration delay is active
-      DriverStation.reportWarning(
-          "ADIS16470 IMU Detected. Starting initial calibration delay.", false);
+      DriverStation.reportWarning("ADIS16470: Starting initial calibration delay.", false);
 
       // Wait for samples to accumulate internal to the IMU (110% of user-defined
       // time)

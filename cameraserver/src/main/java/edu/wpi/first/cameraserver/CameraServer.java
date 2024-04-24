@@ -366,6 +366,8 @@ public final class CameraServer {
         }
       case kCv:
         return "cv:";
+      case kRaw:
+        return "raw:";
       default:
         return "unknown:";
     }

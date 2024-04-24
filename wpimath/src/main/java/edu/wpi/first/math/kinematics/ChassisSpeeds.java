@@ -99,12 +99,19 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
       double vyMetersPerSecond,
       double omegaRadiansPerSecond,
       double dtSeconds) {
+    // Construct the desired pose after a timestep, relative to the current pose. The desired pose
+    // has decoupled translation and rotation.
     var desiredDeltaPose =
         new Pose2d(
             vxMetersPerSecond * dtSeconds,
             vyMetersPerSecond * dtSeconds,
             new Rotation2d(omegaRadiansPerSecond * dtSeconds));
+
+    // Find the chassis translation/rotation deltas in the robot frame that move the robot from its
+    // current pose to the desired pose
     var twist = new Pose2d().log(desiredDeltaPose);
+
+    // Turn the chassis translation/rotation deltas into average velocities
     return new ChassisSpeeds(twist.dx / dtSeconds, twist.dy / dtSeconds, twist.dtheta / dtSeconds);
   }
 

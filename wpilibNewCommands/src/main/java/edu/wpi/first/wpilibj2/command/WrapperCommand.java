@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj2.command;
 
+import edu.wpi.first.util.sendable.SendableBuilder;
 import java.util.Set;
 
 /**
@@ -99,5 +100,10 @@ public abstract class WrapperCommand extends Command {
   @Override
   public InterruptionBehavior getInterruptionBehavior() {
     return m_command.getInterruptionBehavior();
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    m_command.initSendable(builder);
   }
 }

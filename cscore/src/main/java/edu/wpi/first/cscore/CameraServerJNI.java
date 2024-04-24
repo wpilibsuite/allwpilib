@@ -212,6 +212,7 @@ public class CameraServerJNI {
    * Creates a raw source.
    *
    * @param name Source name.
+   * @param isCv true for a Cv source.
    * @param pixelFormat Pixel format.
    * @param width Image width.
    * @param height Image height.
@@ -219,7 +220,7 @@ public class CameraServerJNI {
    * @return Raw source handle.
    */
   public static native int createRawSource(
-      String name, int pixelFormat, int width, int height, int fps);
+      String name, boolean isCv, int pixelFormat, int width, int height, int fps);
 
   //
   // Source Functions
@@ -630,9 +631,10 @@ public class CameraServerJNI {
    * Creates a raw sink.
    *
    * @param name Sink name.
+   * @param isCv true for a Cv source.
    * @return Raw sink handle.
    */
-  public static native int createRawSink(String name);
+  public static native int createRawSink(String name, boolean isCv);
 
   //
   // Sink Functions

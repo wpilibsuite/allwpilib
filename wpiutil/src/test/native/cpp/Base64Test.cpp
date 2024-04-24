@@ -16,9 +16,8 @@ struct Base64TestParam {
 };
 
 std::ostream& operator<<(std::ostream& os, const Base64TestParam& param) {
-  os << "Base64TestParam(Len: " << param.plain_len << ", "
-     << "Plain: \"" << param.plain << "\", "
-     << "Encoded: \"" << param.encoded << "\")";
+  os << "Base64TestParam(Len: " << param.plain_len << ", " << "Plain: \""
+     << param.plain << "\", " << "Encoded: \"" << param.encoded << "\")";
   return os;
 }
 

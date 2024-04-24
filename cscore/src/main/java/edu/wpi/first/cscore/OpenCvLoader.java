@@ -9,11 +9,13 @@ import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.opencv.core.Core;
 
-/** CameraServer CV JNI. */
-public class CameraServerCvJNI {
-  static boolean libraryLoaded = false;
+/** OpenCV Native Loader. */
+public final class OpenCvLoader {
+  @SuppressWarnings("PMD.MutableStaticState")
+  static boolean libraryLoaded;
 
-  static RuntimeLoader<Core> loader = null;
+  @SuppressWarnings("PMD.MutableStaticState")
+  static RuntimeLoader<Core> loader;
 
   /** Sets whether JNI should be loaded in the static block. */
   public static class Helper {
@@ -45,7 +47,6 @@ public class CameraServerCvJNI {
     String opencvName = Core.NATIVE_LIBRARY_NAME;
     if (Helper.getExtractOnStaticLoad()) {
       try {
-        CameraServerJNI.forceLoad();
         loader =
             new RuntimeLoader<>(opencvName, RuntimeLoader.getDefaultExtractionRoot(), Core.class);
         loader.loadLibraryHashed();
@@ -58,6 +59,15 @@ public class CameraServerCvJNI {
   }
 
   /**
+   * Forces a static load.
+   *
+   * @return a garbage value
+   */
+  public static int forceStaticLoad() {
+    return libraryLoaded ? 1 : 0;
+  }
+
+  /**
    * Force load the library.
    *
    * @throws IOException if library load failed
@@ -66,7 +76,6 @@ public class CameraServerCvJNI {
     if (libraryLoaded) {
       return;
     }
-    CameraServerJNI.forceLoad();
     loader =
         new RuntimeLoader<>(
             Core.NATIVE_LIBRARY_NAME, RuntimeLoader.getDefaultExtractionRoot(), Core.class);
@@ -74,64 +83,6 @@ public class CameraServerCvJNI {
     libraryLoaded = true;
   }
 
-  /**
-   * Creates a CV source.
-   *
-   * @param name Name.
-   * @param pixelFormat OpenCV pixel format.
-   * @param width Image width.
-   * @param height Image height.
-   * @param fps Frames per second.
-   * @return CV source.
-   */
-  public static native int createCvSource(
-      String name, int pixelFormat, int width, int height, int fps);
-
-  /**
-   * Put source frame.
-   *
-   * @param source Source handle.
-   * @param imageNativeObj Image native object handle.
-   */
-  public static native void putSourceFrame(int source, long imageNativeObj);
-
-  /**
-   * Creates a CV sink.
-   *
-   * @param name Name.
-   * @param pixelFormat OpenCV pixel format.
-   * @return CV sink handle.
-   */
-  public static native int createCvSink(String name, int pixelFormat);
-
-  // /**
-  //  * Creates a CV sink callback.
-  //  *
-  //  * @param name Name.
-  //  * @param processFrame Process frame callback.
-  //  */
-  // public static native int createCvSinkCallback(String name,
-  //                            void (*processFrame)(long time));
-
-  /**
-   * Returns sink frame handle.
-   *
-   * @param sink Sink handle.
-   * @param imageNativeObj Image native object handle.
-   * @return Sink frame handle.
-   */
-  public static native long grabSinkFrame(int sink, long imageNativeObj);
-
-  /**
-   * Returns sink frame timeout in microseconds.
-   *
-   * @param sink Sink handle.
-   * @param imageNativeObj Image native object handle.
-   * @param timeout Timeout in seconds.
-   * @return Sink frame timeout in microseconds.
-   */
-  public static native long grabSinkFrameTimeout(int sink, long imageNativeObj, double timeout);
-
   /** Utility class. */
-  private CameraServerCvJNI() {}
+  private OpenCvLoader() {}
 }
