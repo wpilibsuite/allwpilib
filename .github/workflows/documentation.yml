@@ -1,0 +1,66 @@
+name: Documentation
+
+on: [push, workflow_dispatch]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  BASE_PATH: allwpilib/docs
+
+jobs:
+  publish:
+    name: "Documentation - Publish"
+    runs-on: ubuntu-22.04
+    if: github.repository_owner == 'wpilibsuite' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+    concurrency: ci-docs-publish
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: 13
+      - name: Set environment variables (Development)
+        run: |
+          echo "BRANCH=development" >> $GITHUB_ENV
+        if: github.ref == 'refs/heads/main'
+      - name: Set environment variables (Tag)
+        run: |
+          echo "EXTRA_GRADLE_ARGS=-PreleaseMode" >> $GITHUB_ENV
+          echo "BRANCH=beta" >> $GITHUB_ENV
+        if: startsWith(github.ref, 'refs/tags/v')
+      - name: Set environment variables (Release)
+        run: |
+          echo "EXTRA_GRADLE_ARGS=-PreleaseMode" >> $GITHUB_ENV
+          echo "BRANCH=release" >> $GITHUB_ENV
+        if: startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, 'alpha') && !contains(github.ref, 'beta')
+      - name: Build with Gradle
+        run: ./gradlew docs:generateJavaDocs docs:doxygen -PbuildServer ${{ env.EXTRA_GRADLE_ARGS }}
+      - name: Install SSH Client 🔑
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.GH_DEPLOY_KEY }}
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@v4.4.1
+        with:
+          ssh-key: true
+          repository-name: wpilibsuite/wpilibsuite.github.io
+          branch: allwpilib-${{ env.BRANCH }}
+          clean: true
+          single-commit: true
+          folder: docs/build/docs
+      - name: Trigger Workflow
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.DISPATCH_PAT_TOKEN }}
+          script: |
+            github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: 'wpilibsuite.github.io',
+              workflow_id: 'static.yml',
+              ref: 'main',
+            })
