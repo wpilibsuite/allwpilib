@@ -10,7 +10,7 @@ bazel_dep(name = "apple_support", version = "1.15.1", repo_name = "build_bazel_a
 bazel_dep(name = "rules_cc", version = "0.0.9")
 bazel_dep(name = "rules_java", version = "6.4.0")
 bazel_dep(name = "rules_jvm_external", version = "5.3")
-bazel_dep(name = "rules_python", version = "0.23.0") # 21
+bazel_dep(name = "rules_python", version = "0.21.0")
 bazel_dep(name = "rules_proto", version = "6.0.0-rc3")
 bazel_dep(name = "protobuf", version = "21.7", repo_name = "com_google_protobuf")
 bazel_dep(name = "bzlmodrio-apriltaglib", version = "2024.3.3.0-1")
@@ -81,16 +81,21 @@ use_repo(
     "quickbuffer_protoc_windows",
 )
 
-python = use_extension("@rules_python//extensions:python.bzl", "python")
+python = use_extension("@rules_python//python:extensions.bzl", "python")
 python.toolchain(
+    name = "python3_10",
     ignore_root_user_error = True,
-    python_version = "3.11",
+    python_version = "3.10",
+)
+use_repo(python, "python3_10_toolchains")
+
+register_toolchains(
+    "@python3_10_toolchains//:all",
 )
 
-pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
+pip = use_extension("@rules_python//python:extensions.bzl", "pip")
 pip.parse(
     name = "allwpilib_pip_deps",
-    # python_version = "3.11",
     requirements_lock = "//:requirements_lock.txt",
 )
 use_repo(pip, "allwpilib_pip_deps")
