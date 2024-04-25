@@ -12,6 +12,7 @@ build:osx --cxxopt=-fPIC
 build:osx --cxxopt=-Wno-unused-parameter
 build:osx --cxxopt=-Wno-error=deprecated-declarations
 build:osx --cxxopt=-Wno-error=deprecated-enum-enum-conversion
+build:osx --cxxopt=-Wno-error=deprecated-anon-enum-enum-conversion
 build:osx --cxxopt=-Wno-missing-field-initializers
 build:osx --cxxopt=-Wno-unused-private-field
 build:osx --cxxopt=-Wno-unused-const-variable

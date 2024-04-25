@@ -66,20 +66,20 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { name: "Mac (native)",            os: macos-latest,   action: "test",  config: "--config=osx -c opt" }
-          - { name: "Mac (bzlmod)",            os: macos-latest,   action: "test",  config: "--config=osx -c opt --enable_bzlmod" }
+          - { name: "Mac (native)",            os: macos-14,   action: "test",  config: "--config=osx -c opt" }
+          - { name: "Mac (bzlmod)",            os: macos-14,   action: "test",  config: "--config=osx -c opt --enable_bzlmod" }
 
-          - { name: "Mac (roborio)",           os: macos-latest,   action: "build", config: "--config=roborio -c opt" }
-          - { name: "Mac (roborio bzlmod)",    os: macos-latest,   action: "build", config: "--config=roborio -c opt --enable_bzlmod" }
+          - { name: "Mac (roborio)",           os: macos-14,   action: "build", config: "--config=roborio -c opt" }
+          - { name: "Mac (roborio bzlmod)",    os: macos-14,   action: "build", config: "--config=roborio -c opt --enable_bzlmod" }
 
-          - { name: "Mac (bullseye32)",        os: macos-latest,   action: "build", config: "--config=bullseye32 -c opt" }
-          - { name: "Mac (bullseye32 bzlmod)", os: macos-latest,   action: "build", config: "--config=bullseye32 -c opt --enable_bzlmod" }
+          - { name: "Mac (bullseye32)",        os: macos-14,   action: "build", config: "--config=bullseye32 -c opt" }
+          - { name: "Mac (bullseye32 bzlmod)", os: macos-14,   action: "build", config: "--config=bullseye32 -c opt --enable_bzlmod" }
 
-          - { name: "Mac (bullseye64)",        os: macos-latest,   action: "build", config: "--config=bullseye64 -c opt" }
-          - { name: "Mac (bullseye64 bzlmod)", os: macos-latest,   action: "build", config: "--config=bullseye64 -c opt --enable_bzlmod" }
+          - { name: "Mac (bullseye64)",        os: macos-14,   action: "build", config: "--config=bullseye64 -c opt" }
+          - { name: "Mac (bullseye64 bzlmod)", os: macos-14,   action: "build", config: "--config=bullseye64 -c opt --enable_bzlmod" }
 
-          - { name: "Mac (raspi32)",           os: macos-latest,   action: "build", config: "--config=raspi32 -c opt" }
-          - { name: "Mac (raspi32 bzlmod)",    os: macos-latest,   action: "build", config: "--config=raspi32 -c opt --enable_bzlmod" }
+          - { name: "Mac (raspi32)",           os: macos-14,   action: "build", config: "--config=raspi32 -c opt" }
+          - { name: "Mac (raspi32 bzlmod)",    os: macos-14,   action: "build", config: "--config=raspi32 -c opt --enable_bzlmod" }
 
     name: "${{ matrix.name }}"
     runs-on: ${{ matrix.os }}
@@ -90,6 +90,11 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: 17
+          architecture: aarch64
 
       - name: Build allowing failures
         run: bazel build -k ...   --config=ci ${{ matrix.config }} --nojava_header_compilation --verbose_failures || true
@@ -121,7 +126,7 @@ jobs:
 
           - { container: "wpilib/ubuntu-base:22.04", action: "build", artifact-name: "Linux (raspi32)",           config: "--config=raspi32" }
           - { container: "wpilib/ubuntu-base:22.04", action: "build", artifact-name: "Linux (raspi32 bzlmod)",    config: "--config=raspi32 --enable_bzlmod" }
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     name: "Build - ${{ matrix.artifact-name }}"
     container: ${{ matrix.container }}
     steps:
@@ -139,7 +144,7 @@ jobs:
   repin-maven:
     strategy:
       fail-fast: false
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
       - run:  bazel run @unpinned_maven//:pin
@@ -157,7 +162,7 @@ jobs:
           - config: "tsan"
           - config: "asan"
           - config: "ubsan"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     container: wpilib/ubuntu-base:22.04
     name: "Sanitizer ${{ matrix.config }}"
     steps:
@@ -191,7 +196,7 @@ jobs:
 
   buildifier:
     name: "buildifier"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Set up Go 1.15.x
         uses: actions/setup-go@v2
@@ -225,7 +230,7 @@ jobs:
 
   unused_deps:
     name: "unused_deps"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Set up Go 1.15.x
         uses: actions/setup-go@v2
