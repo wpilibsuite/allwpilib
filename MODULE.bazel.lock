@@ -5721,7 +5721,7 @@
     },
     "@rules_python~0.21.0//python:extensions.bzl%internal_deps": {
       "general": {
-        "bzlTransitiveDigest": "fLfwSTyVx+zS9TmWExshttdLur3XKuDDKJy5SHyyUfw=",
+        "bzlTransitiveDigest": "AtMzoSJ5TSGvwjYI4BC/Zf53qgAHwoPrmOL5i1pFNdw=",
         "accumulatedFileDigests": {},
         "envVariables": {},
         "generatedRepoSpecs": {
@@ -6169,7 +6169,7 @@
     },
     "@rules_python~0.21.0//python:extensions.bzl%pip": {
       "general": {
-        "bzlTransitiveDigest": "fLfwSTyVx+zS9TmWExshttdLur3XKuDDKJy5SHyyUfw=",
+        "bzlTransitiveDigest": "AtMzoSJ5TSGvwjYI4BC/Zf53qgAHwoPrmOL5i1pFNdw=",
         "accumulatedFileDigests": {
           "@@//:requirements_lock.txt": "715db314386dd7cb9cba1a1f6e387fa0d4cc48dc2ce97725142e7c8fc8cd1720"
         },
