@@ -10,9 +10,9 @@ build:osx --cxxopt=-std=c++20
 build:osx --cxxopt=-pedantic
 build:osx --cxxopt=-fPIC
 build:osx --cxxopt=-Wno-unused-parameter
-build:osx --cxxopt=-Wno-error=deprecated-declarations
-build:osx --cxxopt=-Wno-error=deprecated-enum-enum-conversion
-build:osx --cxxopt=-Wno-error=deprecated-anon-enum-enum-conversion
+build:osx --cxxopt=-Wno-deprecated-declarations
+build:osx --cxxopt=-Wno-deprecated-enum-enum-conversion
+build:osx --cxxopt=-Wno-deprecated-anon-enum-enum-conversion
 build:osx --cxxopt=-Wno-missing-field-initializers
 build:osx --cxxopt=-Wno-unused-private-field
 build:osx --cxxopt=-Wno-unused-const-variable

@@ -12,22 +12,22 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { name: "Windows (native)",             os: windows-2022, action: "test", config: "--config=windows",                        }
+          - { name: "Windows (native)",             os: windows-2022, action: "test", config: "--config=windows --noenable_bzlmod",      }
           - { name: "Windows (bzlmod)",             os: windows-2022, action: "test", config: "--config=windows --enable_bzlmod",        }
 
-          - {  name: "Windows (arm)",               os: windows-2022, action: "build", config: "--config=windows_arm",                   }
+          - {  name: "Windows (arm)",               os: windows-2022, action: "build", config: "--config=windows_arm --noenable_bzlmod", }
           - {  name: "Windows (arm bzlmod)",        os: windows-2022, action: "build", config: "--config=windows_arm --enable_bzlmod",   }
 
-          - {  name: "Windows (roborio)",           os: windows-2022, action: "build", config: "--config=roborio",                     }
+          - {  name: "Windows (roborio)",           os: windows-2022, action: "build", config: "--config=roborio --noenable_bzlmod",      }
           # - {  name: "Windows (roborio bzlmod)",    os: windows-2022, action: "build", config: "--config=roborio --enable_bzlmod",     }
 
-          - {  name: "Windows (bullseye32)",        os: windows-2022, action: "build", config: "--config=bullseye32",                  }
+          - {  name: "Windows (bullseye32)",        os: windows-2022, action: "build", config: "--config=bullseye32 --noenable_bzlmod",      }
           - {  name: "Windows (bullseye32 bzlmod)", os: windows-2022, action: "build", config: "--config=bullseye32 --enable_bzlmod",  }
 
-          - {  name: "Windows (bullseye64)",        os: windows-2022, action: "build", config: "--config=bullseye64",                  }
+          - {  name: "Windows (bullseye64)",        os: windows-2022, action: "build", config: "--config=bullseye64 --noenable_bzlmod",      }
           - {  name: "Windows (bullseye64 bzlmod)", os: windows-2022, action: "build", config: "--config=bullseye64 --enable_bzlmod",  }
 
-          - {  name: "Windows (raspi32)",           os: windows-2022, action: "build", config: "--config=raspi32",                     }
+          - {  name: "Windows (raspi32)",           os: windows-2022, action: "build", config: "--config=raspi32 --noenable_bzlmod",      }
           - {  name: "Windows (raspi32 bzlmod)",    os: windows-2022, action: "build", config: "--config=raspi32 --enable_bzlmod",     }
 
     name: "Build ${{ matrix.name }}"
@@ -66,19 +66,19 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { name: "Mac (native)",            os: macos-14,   action: "test",  config: "--config=osx -c opt" }
+          - { name: "Mac (native)",            os: macos-14,   action: "test",  config: "--config=osx -c opt --noenable_bzlmod",      }
           - { name: "Mac (bzlmod)",            os: macos-14,   action: "test",  config: "--config=osx -c opt --enable_bzlmod" }
 
-          - { name: "Mac (roborio)",           os: macos-14,   action: "build", config: "--config=roborio -c opt" }
+          - { name: "Mac (roborio)",           os: macos-14,   action: "build", config: "--config=roborio -c opt --noenable_bzlmod",      }
           - { name: "Mac (roborio bzlmod)",    os: macos-14,   action: "build", config: "--config=roborio -c opt --enable_bzlmod" }
 
-          - { name: "Mac (bullseye32)",        os: macos-14,   action: "build", config: "--config=bullseye32 -c opt" }
+          - { name: "Mac (bullseye32)",        os: macos-14,   action: "build", config: "--config=bullseye32 -c opt --noenable_bzlmod",      }
           - { name: "Mac (bullseye32 bzlmod)", os: macos-14,   action: "build", config: "--config=bullseye32 -c opt --enable_bzlmod" }
 
-          - { name: "Mac (bullseye64)",        os: macos-14,   action: "build", config: "--config=bullseye64 -c opt" }
+          - { name: "Mac (bullseye64)",        os: macos-14,   action: "build", config: "--config=bullseye64 -c opt --noenable_bzlmod",      }
           - { name: "Mac (bullseye64 bzlmod)", os: macos-14,   action: "build", config: "--config=bullseye64 -c opt --enable_bzlmod" }
 
-          - { name: "Mac (raspi32)",           os: macos-14,   action: "build", config: "--config=raspi32 -c opt" }
+          - { name: "Mac (raspi32)",           os: macos-14,   action: "build", config: "--config=raspi32 -c opt --noenable_bzlmod",      }
           - { name: "Mac (raspi32 bzlmod)",    os: macos-14,   action: "build", config: "--config=raspi32 -c opt --enable_bzlmod" }
 
     name: "${{ matrix.name }}"
@@ -112,19 +112,19 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { container: "wpilib/ubuntu-base:22.04", action: "test", artifact-name: "Linux (native)",             config: "--config=linux " }
+          - { container: "wpilib/ubuntu-base:22.04", action: "test", artifact-name: "Linux (native)",             config: "--config=linux  --noenable_bzlmod",      }
           - { container: "wpilib/ubuntu-base:22.04", action: "test", artifact-name: "Linux (bzlmod)",             config: "--config=linux  --enable_bzlmod" }
 
-          - { container: "wpilib/ubuntu-base:22.04", action: "build", artifact-name: "Linux (roborio)",           config: "--config=roborio " }
+          - { container: "wpilib/ubuntu-base:22.04", action: "build", artifact-name: "Linux (roborio)",           config: "--config=roborio  --noenable_bzlmod",      }
           - { container: "wpilib/ubuntu-base:22.04", action: "build", artifact-name: "Linux (roborio bzlmod)",    config: "--config=roborio --enable_bzlmod" }
 
-          - { container: "wpilib/ubuntu-base:22.04", action: "build", artifact-name: "Linux (bullseye32)",        config: "--config=bullseye32" }
+          - { container: "wpilib/ubuntu-base:22.04", action: "build", artifact-name: "Linux (bullseye32)",        config: "--config=bullseye32 --noenable_bzlmod",      }
           - { container: "wpilib/ubuntu-base:22.04", action: "build", artifact-name: "Linux (bullseye32 bzlmod)", config: "--config=bullseye32 --enable_bzlmod" }
 
-          - { container: "wpilib/ubuntu-base:22.04", action: "build", artifact-name: "Linux (bullseye64)",        config: "--config=bullseye64" }
+          - { container: "wpilib/ubuntu-base:22.04", action: "build", artifact-name: "Linux (bullseye64)",        config: "--config=bullseye64 --noenable_bzlmod",      }
           - { container: "wpilib/ubuntu-base:22.04", action: "build", artifact-name: "Linux (bullseye64 bzlmod)", config: "--config=bullseye64 --enable_bzlmod" }
 
-          - { container: "wpilib/ubuntu-base:22.04", action: "build", artifact-name: "Linux (raspi32)",           config: "--config=raspi32" }
+          - { container: "wpilib/ubuntu-base:22.04", action: "build", artifact-name: "Linux (raspi32)",           config: "--config=raspi32 --noenable_bzlmod",      }
           - { container: "wpilib/ubuntu-base:22.04", action: "build", artifact-name: "Linux (raspi32 bzlmod)",    config: "--config=raspi32 --enable_bzlmod" }
     runs-on: ubuntu-22.04
     name: "Build - ${{ matrix.artifact-name }}"
@@ -147,7 +147,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
-      - run:  bazel run @unpinned_maven//:pin
+      - run:  bazel run --noenable_bzlmod @unpinned_maven//:pin
       - run:  git diff HEAD
       - uses: actions/upload-artifact@v2
         with:
@@ -170,7 +170,7 @@ jobs:
         with: { fetch-depth: 0 }
       - uses: bazelbuild/setup-bazelisk@v1
       - name: Build and Test
-        run: bazel test  -k --config=ci --config=linux --config=${{ matrix.config }} //...
+        run: bazel test  -k --config=ci --config=linux --noenable_bzlmod --config=${{ matrix.config }} //...
 
   build-coverage:
     runs-on: ubuntu-22.04
@@ -183,7 +183,7 @@ jobs:
         run: sudo apt-get install -y lcov
 
       - name: Build, allow buildbudy failure
-        run: bazel coverage --config=ci --config=linux -k -- //... -//simulation/halsim_gui/src/test/native/cpp:halsim_gui-test -//sysid/src/test/native:sysid-test
+        run: bazel coverage --config=ci --config=linux --noenable_bzlmod -k -- //... -//simulation/halsim_gui/src/test/native/cpp:halsim_gui-test -//sysid/src/test/native:sysid-test
 
       - name: genhtml
         run: |
