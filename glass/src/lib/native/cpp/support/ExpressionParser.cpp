@@ -4,12 +4,12 @@
 
 #include "glass/support/ExpressionParser.h"
 
-#include <cctype>
 #include <cmath>
 #include <stack>
-#include <string>
+#include <type_traits>
 
 #include <wpi/expected>
+#include <wpi/StringExtras.h>
 
 namespace glass::expression {
 
@@ -38,14 +38,29 @@ struct Token {
       : type(type), str(str), strLen(strLen) {}
 };
 
+bool isWhitespace(char c) {
+  switch (c) {
+    case ' ':
+    case '\t':
+    case '\r':
+    case '\n':
+    case '\v':
+    case '\f':
+      return true;
+    default:
+      return false;
+  }
+}
+
 class Lexer {
  public:
-  explicit Lexer(const char* input) : input(input) {}
+  explicit Lexer(const char* input, bool isInteger)
+      : input(input), isInteger(isInteger) {}
 
   Token NextToken() {
     // Skip leading whitespace
     startIdx = currentIdx;
-    while (std::isspace(input[startIdx])) {
+    while (isWhitespace(input[startIdx])) {
       startIdx++;
     }
     if (input[startIdx] == 0) {
@@ -72,7 +87,7 @@ class Lexer {
         return Token(TokenType::CloseParen);
       default:
         currentIdx--;
-        if (std::isdigit(c) || c == '.') {
+        if (wpi::isDigit(c) || c == '.') {
           return nextNumber();
         }
         return Token(TokenType::Error);
@@ -84,25 +99,30 @@ class Lexer {
 
  private:
   const char* input;
+  bool isInteger;
   int startIdx = 0, currentIdx = 0;
 
   Token nextNumber() {
     // Read whole part
     bool hasDigitsBeforeDecimal = false;
-    while (std::isdigit(input[currentIdx])) {
+    while (wpi::isDigit(input[currentIdx])) {
       currentIdx++;
       hasDigitsBeforeDecimal = true;
     }
 
     // Read decimal part if it exists
     if (input[currentIdx] == '.') {
+      // Integers can't have fractional part
+      if (isInteger)
+        return Token(TokenType::Error);
+
       currentIdx++;
       // Report a single '.' with no digits as an error
-      if (!hasDigitsBeforeDecimal && !std::isdigit(input[currentIdx])) {
+      if (!hasDigitsBeforeDecimal && !wpi::isDigit(input[currentIdx])) {
         return Token(TokenType::Error);
       }
 
-      while (std::isdigit(input[currentIdx])) {
+      while (wpi::isDigit(input[currentIdx])) {
         currentIdx++;
       }
 
@@ -192,21 +212,21 @@ void ApplyOperator(std::stack<V>& valStack, Operator op) {
 }
 
 template <typename V>
-V ValueFromString(const std::string& str);
+std::optional<V> ValueFromString(std::string_view str);
 
 template <>
-int64_t ValueFromString(const std::string& str) {
-  return std::stoll(str);
+std::optional<int64_t> ValueFromString(std::string_view str) {
+  return wpi::parse_integer<int64_t>(str, 10);
 }
 
 template <>
-float ValueFromString(const std::string& str) {
-  return std::stof(str);
+std::optional<float> ValueFromString(std::string_view str) {
+  return wpi::parse_float<float>(str);
 }
 
 template <>
-double ValueFromString(const std::string& str) {
-  return std::stod(str);
+std::optional<double> ValueFromString(std::string_view str) {
+  return wpi::parse_float<double>(str);
 }
 
 template <typename V>
@@ -243,7 +263,7 @@ wpi::expected<V, std::string> ParseExpr(Lexer& lexer, bool insideParen) {
     switch (token.type) {
       case TokenType::End:
         goto end;
-      case TokenType::Number:
+      case TokenType::Number: {
         // Check for two numbers in a row (ex: "2 4"). Implicit multiplication
         // is probably not what the user intended in this case, so give them an
         // error.
@@ -256,8 +276,18 @@ wpi::expected<V, std::string> ParseExpr(Lexer& lexer, bool insideParen) {
           operStack.push(Operator::Multiply);
         }
 
-        valStack.push(ValueFromString<V>(std::string(token.str, token.strLen)));
+        auto value =
+            ValueFromString<V>(std::string_view(token.str, token.strLen));
+        if (value) {
+          valStack.push(value.value());
+        } else {
+          return wpi::unexpected("Invalid number");
+        }
+        // valStack.push(ValueFromString<V>(std::string(token.str,
+        // token.strLen)));
+
         break;
+      }
 
       case TokenType::OpenParen: {
         // Implicit multiplication
@@ -346,7 +376,7 @@ end:
 // expr is null-terminated string, as ImGui::inputText() uses
 template <typename V>
 wpi::expected<V, std::string> TryParseExpr(const char* expr) {
-  Lexer lexer(expr);
+  Lexer lexer(expr, std::is_integral_v<V>);
   return ParseExpr<V>(lexer, false);
 }
 
