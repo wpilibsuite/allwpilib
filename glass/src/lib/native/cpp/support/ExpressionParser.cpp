@@ -99,8 +99,9 @@ class Lexer {
     // Read decimal part if it exists
     if (input[currentIdx] == '.') {
       // Integers can't have fractional part
-      if (isInteger)
+      if (isInteger) {
         return Token(TokenType::Error, &input[currentIdx], 1);
+      }
 
       currentIdx++;
       // Report a single '.' with no digits as an error
