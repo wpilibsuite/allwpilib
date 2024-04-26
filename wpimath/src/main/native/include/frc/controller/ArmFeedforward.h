@@ -4,18 +4,18 @@
 
 #pragma once
 
+#include <sleipnir/optimization/OptimizationProblem.hpp>
 #include <wpi/MathExtras.h>
 #include <wpi/SymbolExports.h>
 
 #include "frc/controller/LinearPlantInversionFeedforward.h"
+#include "frc/system/NumericalIntegration.h"
 #include "frc/system/plant/LinearSystemId.h"
 #include "units/angle.h"
 #include "units/angular_velocity.h"
 #include "units/math.h"
 #include "units/voltage.h"
 #include "wpimath/MathShared.h"
-#include <sleipnir/optimization/OptimizationProblem.hpp>
-#include "frc/system/NumericalIntegration.h"
 
 namespace frc {
 /**
