@@ -48,10 +48,10 @@ TEST(ArmFeedforwardTest, Calculate) {
   {
     constexpr auto currentAngle = std::numbers::pi * 0.3_rad;
     constexpr auto currentVelocity = 1_rad_per_s;
-    constexpr auto nextAngle = std::numbers::pi * 0.31_rad;
+    constexpr auto nextVelocity = std::numbers::pi * 1.1_rad_per_s;
     constexpr auto dt = 20_ms;
 
-    auto u = armFF.Calculate(currentAngle, currentVelocity, nextAngle, dt);
+    auto u = armFF.Calculate(currentAngle, currentVelocity, nextVelocity, dt);
 
     frc::Matrixd<2, 2> A{{0.0, 1.0}, {0.0, -Kv.value() / Ka.value()}};
     frc::Matrixd<2, 1> B{0.0, 1.0 / Ka.value()};
@@ -66,7 +66,7 @@ TEST(ArmFeedforwardTest, Calculate) {
         frc::Matrixd<2, 1>{currentAngle.value(), currentVelocity.value()},
         frc::Matrixd<1, 1>{u.value()}, dt);
 
-    EXPECT_NEAR(nextAngle.value(), actual_x_k1(0), 7e-3);
+    EXPECT_NEAR(nextVelocity.value(), actual_x_k1(1), 2e-2);
   }
 }
 

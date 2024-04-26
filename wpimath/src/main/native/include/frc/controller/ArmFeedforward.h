@@ -88,16 +88,13 @@ class WPILIB_DLLEXPORT ArmFeedforward {
    *   should be parallel to the floor). If your encoder does not follow this
    *   convention, an offset should be added.
    * @param currentVelocity The current velocity setpoint in radians per second.
-   * @param nextAngle The next angle in radians. This angle should be measured
-   *   from the horizontal (i.e. if the provided angle is 0, the arm should be
-   *   parallel to the floor). If your encoder does not follow this convention,
-   *   an offset should be added.
+   * @param nextVelocity The next velocity setpoint in radians per second.
    * @param dt Time between velocity setpoints in seconds.
    * @return The computed feedforward in volts.
    */
   units::volt_t Calculate(units::unit_t<Angle> currentAngle,
                           units::unit_t<Velocity> currentVelocity,
-                          units::unit_t<Angle> nextAngle,
+                          units::unit_t<Velocity> nextVelocity,
                           units::second_t dt) const {
     using VarMat = sleipnir::VariableMatrix;
 
@@ -116,8 +113,8 @@ class WPILIB_DLLEXPORT ArmFeedforward {
 
     Vectord<2> r_k{currentAngle.value(), currentVelocity.value()};
     auto r_k1 = RK4<decltype(f), VarMat, VarMat>(f, r_k, u_k, dt);
-    problem.Minimize((nextAngle.value() - r_k1(0)) *
-                     (nextAngle.value() - r_k1(0)));
+    problem.Minimize((nextVelocity.value() - r_k1(1)) *
+                     (nextVelocity.value() - r_k1(1)));
     problem.Solve({.tolerance = 1e-14, .diagnostics = true});
 
     return units::volt_t{u_k.Value()};
