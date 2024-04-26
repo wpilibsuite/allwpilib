@@ -83,46 +83,42 @@ class WPILIB_DLLEXPORT ArmFeedforward {
   /**
    * Calculates the feedforward from the gains and setpoints.
    *
-   * @param currentAngle        The current angle, in radians. This
-   * angle should be measured from the horizontal (i.e. if the provided angle is
-   * 0, the arm should be parallel to the floor). If your encoder does not
-   * follow this convention, an offset should be added.
-   * @param nextAngle        The next angle, in radians. This
-   * angle should be measured from the horizontal (i.e. if the provided angle is
-   * 0, the arm should be parallel to the floor). If your encoder does not
-   * follow this convention, an offset should be added.
-   * @param currentVelocity The current velocity setpoint, in radians per
-   *                        second.
-   * @param nextVelocity    The next velocity setpoint, in radians per second.
-   * @param dt              Time between velocity setpoints in seconds.
-   * @return The computed feedforward, in volts.
+   * @param currentAngle The current angle in radians. This angle should be
+   *   measured from the horizontal (i.e. if the provided angle is 0, the arm
+   *   should be parallel to the floor). If your encoder does not follow this
+   *   convention, an offset should be added.
+   * @param currentVelocity The current velocity setpoint in radians per second.
+   * @param nextAngle The next angle in radians. This angle should be measured
+   *   from the horizontal (i.e. if the provided angle is 0, the arm should be
+   *   parallel to the floor). If your encoder does not follow this convention,
+   *   an offset should be added.
+   * @param dt Time between velocity setpoints in seconds.
+   * @return The computed feedforward in volts.
    */
   units::volt_t Calculate(units::unit_t<Angle> currentAngle,
-                          units::unit_t<Angle> nextAngle,
                           units::unit_t<Velocity> currentVelocity,
-                          units::unit_t<Velocity> nextVelocity,
+                          units::unit_t<Angle> nextAngle,
                           units::second_t dt) const {
-    Vectord<2> r{currentAngle.value(), currentVelocity.value()};
-    Vectord<2> nextR{nextAngle.value(), nextVelocity.value()};
+    using VarMat = sleipnir::VariableMatrix;
+
+    // Arm dynamics
+    Matrixd<2, 2> A{{0.0, 1.0}, {0.0, -kV.value() / kA.value()}};
+    Matrixd<2, 1> B{0.0, 1.0 / kA.value()};
+    const auto& f = [&](const VarMat& x, const VarMat& u) -> VarMat {
+      VarMat c{{0.0},
+               {(-kS / kA).value() * sleipnir::sign(x(1)) -
+                (kG / kA).value() * sleipnir::cos(x(0))}};
+      return A * x + B * u + c;
+    };
 
     sleipnir::OptimizationProblem problem;
     auto u_k = problem.DecisionVariable();
 
-    Matrixd<2, 2> A{{0.0, 1.0}, {0.0, -kV.value() / kA.value()}};
-    Matrixd<2, 1> B{0.0, 1.0 / kA.value()};
-    Matrixd<2, 1> C{0.0, (-kS / kA) * wpi::sgn(currentVelocity.value()) -
-                             (kG / kA) * units::math::cos(currentAngle)};
-
-    auto f = [&](const Vectord<2>& x, const Vectord<1>& u) -> Vectord<2> {
-      return A * x + B * u + C;
-    };
-
-    auto residual =
-        (nextR - RK4(f, r, Vectord<1>{u_k.Value()}, dt)).transpose() *
-        (nextR - RK4(f, r, Vectord<1>{u_k.Value()}, dt));
-
-    problem.Minimize(sleipnir::Variable(residual.value()));
-    problem.Solve();
+    Vectord<2> r_k{currentAngle.value(), currentVelocity.value()};
+    auto r_k1 = RK4<decltype(f), VarMat, VarMat>(f, r_k, u_k, dt);
+    problem.Minimize((nextAngle.value() - r_k1(0)) *
+                     (nextAngle.value() - r_k1(0)));
+    problem.Solve({.tolerance = 1e-14, .diagnostics = true});
 
     return units::volt_t{u_k.Value()};
   }
