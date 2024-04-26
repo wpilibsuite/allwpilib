@@ -6,10 +6,10 @@
 
 using namespace frc;
 
-units::volt_t Calculate(units::unit_t<Angle> currentAngle,
-                        units::unit_t<Velocity> currentVelocity,
-                        units::unit_t<Velocity> nextVelocity,
-                        units::second_t dt) const {
+units::volt_t ArmFeedforward::Calculate(units::unit_t<Angle> currentAngle,
+                                        units::unit_t<Velocity> currentVelocity,
+                                        units::unit_t<Velocity> nextVelocity,
+                                        units::second_t dt) const {
   using VarMat = sleipnir::VariableMatrix;
 
   // Arm dynamics
