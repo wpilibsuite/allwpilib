@@ -13,8 +13,8 @@
 #include "units/time.h"
 
 static constexpr auto Ks = 0.5_V;
-static constexpr auto Kv = 1.5_V * 1_s / 1_rad;
-static constexpr auto Ka = 2_V * 1_s * 1_s / 1_rad;
+static constexpr auto Kv = 1.5_V / 1_rad_per_s;
+static constexpr auto Ka = 2_V / 1_rad_per_s_sq;
 static constexpr auto Kg = 1_V;
 
 TEST(ArmFeedforwardTest, Calculate) {
@@ -46,27 +46,27 @@ TEST(ArmFeedforwardTest, Calculate) {
 
   // Calculate(currentAngle, currentVelocity, nextAngle, dt)
   {
-    constexpr auto currentAngle = std::numbers::pi * 0.3_rad;
+    constexpr auto currentAngle = std::numbers::pi / 3 * 1_rad;
     constexpr auto currentVelocity = 1_rad_per_s;
-    constexpr auto nextVelocity = std::numbers::pi * 1.1_rad_per_s;
+    constexpr auto nextVelocity = 1.05_rad_per_s;
     constexpr auto dt = 20_ms;
 
     auto u = armFF.Calculate(currentAngle, currentVelocity, nextVelocity, dt);
 
     frc::Matrixd<2, 2> A{{0.0, 1.0}, {0.0, -Kv.value() / Ka.value()}};
-    frc::Matrixd<2, 1> B{0.0, 1.0 / Ka.value()};
+    frc::Matrixd<2, 1> B{{0.0}, {1.0 / Ka.value()}};
 
     frc::Matrixd<2, 1> actual_x_k1 = frc::RK4(
         [&](const frc::Matrixd<2, 1>& x, const frc::Matrixd<1, 1>& u) {
           frc::Matrixd<2, 1> c{0.0,
-                               (-Ks.value() / Ka.value()) * wpi::sgn(x(1)) -
-                                   (Kg.value() / Ka.value()) * std::cos(x(0))};
+                               -Ks.value() / Ka.value() * wpi::sgn(x(1)) -
+                                   Kg.value() / Ka.value() * std::cos(x(0))};
           return A * x + B * u + c;
         },
         frc::Matrixd<2, 1>{currentAngle.value(), currentVelocity.value()},
         frc::Matrixd<1, 1>{u.value()}, dt);
 
-    EXPECT_NEAR(nextVelocity.value(), actual_x_k1(1), 2e-2);
+    EXPECT_NEAR(nextVelocity.value(), actual_x_k1(1), 1e-2);
   }
 }
 
