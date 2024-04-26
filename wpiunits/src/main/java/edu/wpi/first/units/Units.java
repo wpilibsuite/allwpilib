@@ -183,8 +183,8 @@ public final class Units {
       MetersPerSecond.per(Second);
 
   /**
-   * A unit of linear acceleration equivalent to accelerating at a rate of one {@link #Foot
-   * Foot} per {@link #Second} every second.
+   * A unit of linear acceleration equivalent to accelerating at a rate of one {@link #Foot Foot}
+   * per {@link #Second} every second.
    */
   public static final Velocity<Velocity<Distance>> FeetPerSecondPerSecond =
       FeetPerSecond.per(Second);
