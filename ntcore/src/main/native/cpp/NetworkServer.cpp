@@ -7,7 +7,6 @@
 #include <stdint.h>
 
 #include <atomic>
-#include <filesystem>
 #include <span>
 #include <system_error>
 #include <vector>
