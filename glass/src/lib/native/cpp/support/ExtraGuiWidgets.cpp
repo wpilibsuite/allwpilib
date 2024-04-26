@@ -11,7 +11,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-// #include <unordered_map>
 
 #include <wpi/DenseMap.h>
 
@@ -231,7 +230,6 @@ struct InputExprState {
   char inputBuffer[kBufferSize];
 };
 
-// static std::unordered_map<int, InputExprState> exprStates;
 static wpi::DenseMap<int, InputExprState> exprStates;
 // Shared string buffer for inactive inputs
 static char previewBuffer[kBufferSize];

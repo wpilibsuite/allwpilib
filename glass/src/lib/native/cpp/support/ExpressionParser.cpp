@@ -8,8 +8,8 @@
 #include <stack>
 #include <type_traits>
 
-#include <wpi/expected>
 #include <wpi/StringExtras.h>
+#include <wpi/expected>
 
 namespace glass::expression {
 
@@ -38,20 +38,6 @@ struct Token {
       : type(type), str(str), strLen(strLen) {}
 };
 
-bool isWhitespace(char c) {
-  switch (c) {
-    case ' ':
-    case '\t':
-    case '\r':
-    case '\n':
-    case '\v':
-    case '\f':
-      return true;
-    default:
-      return false;
-  }
-}
-
 class Lexer {
  public:
   explicit Lexer(const char* input, bool isInteger)
@@ -60,7 +46,7 @@ class Lexer {
   Token NextToken() {
     // Skip leading whitespace
     startIdx = currentIdx;
-    while (isWhitespace(input[startIdx])) {
+    while (std::isspace(input[startIdx])) {
       startIdx++;
     }
     if (input[startIdx] == 0) {
@@ -90,7 +76,7 @@ class Lexer {
         if (wpi::isDigit(c) || c == '.') {
           return nextNumber();
         }
-        return Token(TokenType::Error);
+        return Token(TokenType::Error, &input[currentIdx], 1);
     }
   }
 
@@ -114,12 +100,13 @@ class Lexer {
     if (input[currentIdx] == '.') {
       // Integers can't have fractional part
       if (isInteger)
-        return Token(TokenType::Error);
+        return Token(TokenType::Error, &input[currentIdx], 1);
 
       currentIdx++;
       // Report a single '.' with no digits as an error
       if (!hasDigitsBeforeDecimal && !wpi::isDigit(input[currentIdx])) {
-        return Token(TokenType::Error);
+        // Report the decimal as the unexpected char
+        return Token(TokenType::Error, &input[currentIdx - 1], 1);
       }
 
       while (wpi::isDigit(input[currentIdx])) {
@@ -128,7 +115,7 @@ class Lexer {
 
       // Make sure the number has at most one decimal point
       if (input[currentIdx] == '.') {
-        return Token(TokenType::Error);
+        return Token(TokenType::Error, &input[currentIdx], 1);
       }
     }
 
@@ -283,8 +270,6 @@ wpi::expected<V, std::string> ParseExpr(Lexer& lexer, bool insideParen) {
         } else {
           return wpi::unexpected("Invalid number");
         }
-        // valStack.push(ValueFromString<V>(std::string(token.str,
-        // token.strLen)));
 
         break;
       }
@@ -328,7 +313,8 @@ wpi::expected<V, std::string> ParseExpr(Lexer& lexer, bool insideParen) {
       }
 
       case TokenType::Error:
-        return wpi::unexpected("Unexpected character");
+        return wpi::unexpected(std::string("Unexpected character: ")
+                                   .append(token.str, token.strLen));
 
       default:
         Operator op = GetOperator(token.type);
