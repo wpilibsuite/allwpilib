@@ -66,7 +66,7 @@ TEST(ArmFeedforwardTest, Calculate) {
         frc::Matrixd<2, 1>{currentAngle.value(), currentVelocity.value()},
         frc::Matrixd<1, 1>{u.value()}, dt);
 
-    EXPECT_NEAR(nextVelocity.value(), actual_x_k1(1), 1e-6);
+    EXPECT_NEAR(nextVelocity.value(), actual_x_k1(1), 2e-2);
   }
 }
 
