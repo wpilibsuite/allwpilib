@@ -5,7 +5,6 @@
 #pragma once
 
 #include <functional>
-#include <memory>
 #include <utility>
 
 #include <frc/simulation/DriverStationSim.h>
@@ -16,14 +15,13 @@
 #include "frc2/command/Requirements.h"
 #include "frc2/command/SubsystemBase.h"
 #include "gmock/gmock.h"
-#include "make_vector.h"
 
 namespace frc2 {
 
 class TestSubsystem : public SubsystemBase {
  public:
   explicit TestSubsystem(std::function<void()> periodic = [] {})
-      : m_periodic{periodic} {}
+      : m_periodic{std::move(periodic)} {}
   void Periodic() override { m_periodic(); }
 
  private:
