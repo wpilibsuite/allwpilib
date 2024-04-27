@@ -97,10 +97,10 @@ void DataLogReaderThread::ReadMain() {
       continue;
     }
     if (wpi::starts_with(name, "NT:")) {
-      name = wpi::drop_front(name, 3);
+      name = wpi::remove_prefix(name, "NT:");
     }
     if (wpi::starts_with(name, "/.schema/struct:")) {
-      auto typeStr = wpi::drop_front(name, 16);
+      auto typeStr = wpi::remove_prefix(name, "/.schema/struct:");
       std::string_view schema{reinterpret_cast<const char*>(data.data()),
                               data.size()};
       std::string err;
@@ -111,7 +111,7 @@ void DataLogReaderThread::ReadMain() {
       }
     } else if (wpi::starts_with(name, "/.schema/proto:")) {
       // protobuf descriptor handling
-      auto filename = wpi::drop_front(name, 15);
+      auto filename = wpi::remove_prefix(name, "/.schema/proto:");
       if (!m_protoDb.Add(filename, data)) {
         fmt::print("could not decode protobuf '{}' filename '{}'\n", name,
                    filename);
