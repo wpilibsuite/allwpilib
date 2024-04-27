@@ -205,4 +205,7 @@ public class SerialPortJNI extends JNIWrapper {
    * @see "HAL_CloseSerial"
    */
   public static native void serialClose(int handle);
+
+  /** Utility class. */
+  private SerialPortJNI() {}
 }

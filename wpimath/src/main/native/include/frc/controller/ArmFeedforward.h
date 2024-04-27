@@ -33,10 +33,10 @@ class WPILIB_DLLEXPORT ArmFeedforward {
   /**
    * Creates a new ArmFeedforward with the specified gains.
    *
-   * @param kS   The static gain, in volts.
+   * @param kS The static gain, in volts.
    * @param kG The gravity gain, in volts.
-   * @param kV   The velocity gain, in volt seconds per radian.
-   * @param kA   The acceleration gain, in volt seconds² per radian.
+   * @param kV The velocity gain, in volt seconds per radian.
+   * @param kA The acceleration gain, in volt seconds² per radian.
    */
   constexpr ArmFeedforward(
       units::volt_t kS, units::volt_t kG, units::unit_t<kv_unit> kV,
@@ -175,9 +175,16 @@ class WPILIB_DLLEXPORT ArmFeedforward {
     return MaxAchievableAcceleration(-maxVoltage, angle, velocity);
   }
 
+  /// The static gain, in volts.
   const units::volt_t kS;
+
+  /// The gravity gain, in volts.
   const units::volt_t kG;
+
+  /// The velocity gain, in volt seconds per radian.
   const units::unit_t<kv_unit> kV;
+
+  /// The acceleration gain, in volt seconds² per radian.
   const units::unit_t<ka_unit> kA;
 };
 }  // namespace frc

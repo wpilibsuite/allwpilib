@@ -21,8 +21,11 @@ import edu.wpi.first.util.sendable.SendableRegistry;
 public class DoubleSolenoid implements Sendable, AutoCloseable {
   /** Possible values for a DoubleSolenoid. */
   public enum Value {
+    /** Off position. */
     kOff,
+    /** Forward position. */
     kForward,
+    /** Reverse position. */
     kReverse
   }
 

@@ -494,6 +494,11 @@ public final class DataLog implements AutoCloseable {
     DataLogJNI.appendStringArray(m_impl, entry, arr, timestamp);
   }
 
+  /**
+   * Gets the JNI implementation handle.
+   *
+   * @return data log handle.
+   */
   public long getImpl() {
     return m_impl;
   }

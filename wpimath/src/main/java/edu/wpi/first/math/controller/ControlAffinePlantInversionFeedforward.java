@@ -27,6 +27,9 @@ import java.util.function.Function;
  *
  * <p>For more on the underlying math, read <a
  * href="https://file.tavsys.net/control/controls-engineering-in-frc.pdf">https://file.tavsys.net/control/controls-engineering-in-frc.pdf</a>.
+ *
+ * @param <States> Number of states.
+ * @param <Inputs> Number of inputs.
  */
 public class ControlAffinePlantInversionFeedforward<States extends Num, Inputs extends Num> {
   /** The current reference state. */
@@ -178,7 +181,7 @@ public class ControlAffinePlantInversionFeedforward<States extends Num, Inputs e
    * @return The calculated feedforward.
    */
   public Matrix<Inputs, N1> calculate(Matrix<States, N1> r, Matrix<States, N1> nextR) {
-    var rDot = (nextR.minus(r)).div(m_dt);
+    var rDot = nextR.minus(r).div(m_dt);
 
     // ṙ = f(r) + Bu
     // Bu = ṙ − f(r)

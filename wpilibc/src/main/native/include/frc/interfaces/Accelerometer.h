@@ -20,7 +20,27 @@ class [[deprecated(
   Accelerometer(Accelerometer&&) = default;
   Accelerometer& operator=(Accelerometer&&) = default;
 
-  enum Range { kRange_2G = 0, kRange_4G = 1, kRange_8G = 2, kRange_16G = 3 };
+  /**
+   * Accelerometer range.
+   */
+  enum Range {
+    /**
+     * 2 Gs max.
+     */
+    kRange_2G = 0,
+    /**
+     * 4 Gs max.
+     */
+    kRange_4G = 1,
+    /**
+     * 8 Gs max.
+     */
+    kRange_8G = 2,
+    /**
+     * 16 Gs max.
+     */
+    kRange_16G = 3
+  };
 
   /**
    * Common interface for setting the measuring range of an accelerometer.

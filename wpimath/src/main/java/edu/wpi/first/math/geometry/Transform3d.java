@@ -178,6 +178,9 @@ public class Transform3d implements ProtobufSerializable, StructSerializable {
     return Objects.hash(m_translation, m_rotation);
   }
 
-  public static final Transform3dStruct struct = new Transform3dStruct();
+  /** Transform3d protobuf for serialization. */
   public static final Transform3dProto proto = new Transform3dProto();
+
+  /** Transform3d struct for serialization. */
+  public static final Transform3dStruct struct = new Transform3dStruct();
 }

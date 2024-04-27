@@ -243,6 +243,9 @@ class IterativeRobotBase : public RobotBase {
   IterativeRobotBase(IterativeRobotBase&&) = default;
   IterativeRobotBase& operator=(IterativeRobotBase&&) = default;
 
+  /**
+   * Loop function.
+   */
   void LoopFunc();
 
  private:

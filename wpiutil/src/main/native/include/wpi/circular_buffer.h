@@ -13,10 +13,17 @@ namespace wpi {
 /**
  * This is a simple circular buffer so we don't need to "bucket brigade" copy
  * old values.
+ *
+ * @tparam T Buffer element type.
  */
 template <class T>
 class circular_buffer {
  public:
+  /**
+   * Constructs a circular buffer.
+   *
+   * @param size Maximum number of buffer elements.
+   */
   explicit circular_buffer(size_t size) : m_data(size, T{}) {}
 
   circular_buffer(const circular_buffer&) = default;

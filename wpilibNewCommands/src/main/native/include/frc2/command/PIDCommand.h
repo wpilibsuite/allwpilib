@@ -74,9 +74,16 @@ class PIDCommand : public CommandHelper<Command, PIDCommand> {
   frc::PIDController& GetController();
 
  protected:
+  /// PID controller.
   frc::PIDController m_controller;
+
+  /// Measurement getter.
   std::function<double()> m_measurement;
+
+  /// Setpoint getter.
   std::function<double()> m_setpoint;
+
+  /// PID controller output consumer.
   std::function<void(double)> m_useOutput;
 };
 }  // namespace frc2

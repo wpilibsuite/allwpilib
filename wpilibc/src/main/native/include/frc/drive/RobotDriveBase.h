@@ -23,12 +23,19 @@ class RobotDriveBase : public MotorSafety {
    * The location of a motor on the robot for the purpose of driving.
    */
   enum MotorType {
+    /// Front-left motor.
     kFrontLeft = 0,
+    /// Front-right motor.
     kFrontRight = 1,
+    /// Rear-left motor.
     kRearLeft = 2,
+    /// Rear-right motor.
     kRearRight = 3,
+    /// Left motor.
     kLeft = 0,
+    /// Right motor.
     kRight = 1,
+    /// Back motor.
     kBack = 2
   };
 
@@ -70,14 +77,23 @@ class RobotDriveBase : public MotorSafety {
   std::string GetDescription() const override = 0;
 
  protected:
+  /// Default input deadband.
+  static constexpr double kDefaultDeadband = 0.02;
+
+  /// Default maximum output.
+  static constexpr double kDefaultMaxOutput = 1.0;
+
   /**
    * Renormalize all wheel speeds if the magnitude of any wheel is greater than
    * 1.0.
    */
   static void Desaturate(std::span<double> wheelSpeeds);
 
-  double m_deadband = 0.02;
-  double m_maxOutput = 1.0;
+  /// Input deadband.
+  double m_deadband = kDefaultDeadband;
+
+  /// Maximum output.
+  double m_maxOutput = kDefaultMaxOutput;
 };
 
 }  // namespace frc

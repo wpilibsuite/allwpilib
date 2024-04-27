@@ -222,8 +222,8 @@ class ObjectInfo {
 
 class FieldInfo {
  public:
-  static constexpr auto kDefaultWidth = 15.98_m;
-  static constexpr auto kDefaultHeight = 8.21_m;
+  static constexpr auto kDefaultWidth = 16.541052_m;
+  static constexpr auto kDefaultHeight = 8.211_m;
 
   explicit FieldInfo(Storage& storage);
 
@@ -343,7 +343,7 @@ static bool InputPose(frc::Pose2d* pose) {
 }
 
 FieldInfo::FieldInfo(Storage& storage)
-    : m_builtin{storage.GetString("builtin")},
+    : m_builtin{storage.GetString("builtin", "2024 Crescendo")},
       m_filename{storage.GetString("image")},
       m_width{storage.GetFloat("width", kDefaultWidth.to<float>())},
       m_height{storage.GetFloat("height", kDefaultHeight.to<float>())},
@@ -508,6 +508,16 @@ bool FieldInfo::LoadJson(std::span<const char> is, std::string_view filename) {
     height = units::convert<units::feet, units::meters>(height);
   }
 
+  // check scaling
+  int fieldWidth = m_right - m_left;
+  int fieldHeight = m_bottom - m_top;
+  if (std::abs((fieldWidth / width) - (fieldHeight / height)) > 0.3) {
+    fmt::print(stderr,
+               "GUI: Field X and Y scaling substantially different: "
+               "xscale={} yscale={}\n",
+               (fieldWidth / width), (fieldHeight / height));
+  }
+
   if (!filename.empty()) {
     // the image filename is relative to the json file
     auto pathname = fs::path{filename}.replace_filename(image).string();
@@ -560,22 +570,28 @@ FieldFrameData FieldInfo::GetFrameData(ImVec2 min, ImVec2 max) const {
   // fit the image into the window
   if (m_texture && m_imageHeight != 0 && m_imageWidth != 0) {
     gui::MaxFit(&min, &max, m_imageWidth, m_imageHeight);
+  } else {
+    gui::MaxFit(&min, &max, m_width, m_height);
   }
 
   FieldFrameData ffd;
   ffd.imageMin = min;
   ffd.imageMax = max;
 
-  // size down the box by the image corners (if any)
-  if (m_bottom > 0 && m_right > 0) {
-    min.x += m_left * (max.x - min.x) / m_imageWidth;
-    min.y += m_top * (max.y - min.y) / m_imageHeight;
-    max.x -= (m_imageWidth - m_right) * (max.x - min.x) / m_imageWidth;
-    max.y -= (m_imageHeight - m_bottom) * (max.y - min.y) / m_imageHeight;
+  if (m_bottom > 0 && m_right > 0 && m_imageWidth != 0) {
+    // size down the box by the image corners
+    float scale = (max.x - min.x) / m_imageWidth;
+    min.x += m_left * scale;
+    min.y += m_top * scale;
+    max.x -= (m_imageWidth - m_right) * scale;
+    max.y -= (m_imageHeight - m_bottom) * scale;
+  } else if ((max.x - min.x) > 40 && (max.y - min.y > 40)) {
+    // ensure there's some padding
+    min.x += 20;
+    max.x -= 20;
+    min.y += 20;
+    max.y -= 20;
   }
-
-  // draw the field "active area" as a yellow boundary box
-  gui::MaxFit(&min, &max, m_width, m_height);
 
   ffd.min = min;
   ffd.max = max;

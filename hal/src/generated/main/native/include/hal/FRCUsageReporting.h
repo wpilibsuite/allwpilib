@@ -216,6 +216,7 @@ namespace HALUsageReporting {
     kCommand_Scheduler = 1,
     kCommand2_Scheduler = 2,
     kSmartDashboard_Instance = 1,
+    kSmartDashboard_LiveWindow = 2,
     kKinematics_DifferentialDrive = 1,
     kKinematics_MecanumDrive = 2,
     kKinematics_SwerveDrive = 3,

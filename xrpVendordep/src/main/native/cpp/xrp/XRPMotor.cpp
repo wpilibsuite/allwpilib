@@ -27,6 +27,8 @@ void XRPMotor::CheckDeviceAllocation(int deviceNum) {
   s_registeredDevices.insert(deviceNum);
 }
 
+WPI_IGNORE_DEPRECATED
+
 XRPMotor::XRPMotor(int deviceNum) {
   CheckDeviceAllocation(deviceNum);
 
@@ -41,6 +43,8 @@ XRPMotor::XRPMotor(int deviceNum) {
         m_simDevice.CreateDouble("speed", hal::SimDevice::kOutput, 0.0);
   }
 }
+
+WPI_UNIGNORE_DEPRECATED
 
 void XRPMotor::Set(double speed) {
   if (m_simSpeed) {

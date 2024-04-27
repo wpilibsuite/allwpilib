@@ -372,5 +372,6 @@ public class DriverStationJNI extends JNIWrapper {
    */
   public static native boolean getOutputsActive();
 
+  /** Utility class. */
   private DriverStationJNI() {}
 }

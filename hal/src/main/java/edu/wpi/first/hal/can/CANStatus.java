@@ -22,6 +22,9 @@ public class CANStatus {
   /** The CAN Bus transmit error count. */
   public int transmitErrorCount;
 
+  /** Default constructor. */
+  public CANStatus() {}
+
   /**
    * Set CAN bus status.
    *

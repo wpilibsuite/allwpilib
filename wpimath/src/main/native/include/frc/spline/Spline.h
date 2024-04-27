@@ -44,7 +44,10 @@ class Spline {
    * dimension.
    */
   struct ControlVector {
+    /// The x components of the control vector.
     wpi::array<double, (Degree + 1) / 2> x;
+
+    /// The y components of the control vector.
     wpi::array<double, (Degree + 1) / 2> y;
   };
 

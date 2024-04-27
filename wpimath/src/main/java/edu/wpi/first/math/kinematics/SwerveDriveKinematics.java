@@ -46,7 +46,9 @@ public class SwerveDriveKinematics
     implements Kinematics<SwerveDriveKinematics.SwerveDriveWheelStates, SwerveDriveWheelPositions>,
         ProtobufSerializable,
         StructSerializable {
+  /** Wrapper class for swerve module states. */
   public static class SwerveDriveWheelStates {
+    /** Swerve module states. */
     public SwerveModuleState[] states;
 
     /**

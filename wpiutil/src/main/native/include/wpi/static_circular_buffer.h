@@ -13,6 +13,9 @@ namespace wpi {
 /**
  * This is a simple circular buffer so we don't need to "bucket brigade" copy
  * old values.
+ *
+ * @tparam T Buffer element type.
+ * @tparam N Maximum number of buffer elements.
  */
 template <class T, size_t N>
 class static_circular_buffer {

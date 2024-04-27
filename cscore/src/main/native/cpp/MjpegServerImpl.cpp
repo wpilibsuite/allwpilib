@@ -438,9 +438,7 @@ void MjpegServerImpl::ConnThread::SendHTML(wpi::raw_ostream& os,
 
   os << "<p>Supported Video Modes:</p>\n";
   os << "<table cols=\"4\" style=\"border: 1px solid black\">\n";
-  os << "<tr><th>Pixel Format</th>"
-     << "<th>Width</th>"
-     << "<th>Height</th>"
+  os << "<tr><th>Pixel Format</th>" << "<th>Width</th>" << "<th>Height</th>"
      << "<th>FPS</th></tr>";
   for (auto mode : source.EnumerateVideoModes(&status)) {
     os << "<tr><td>";
@@ -456,6 +454,9 @@ void MjpegServerImpl::ConnThread::SendHTML(wpi::raw_ostream& os,
         break;
       case VideoMode::kBGR:
         os << "BGR";
+        break;
+      case VideoMode::kBGRA:
+        os << "BGRA";
         break;
       case VideoMode::kGray:
         os << "gray";
@@ -878,8 +879,7 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
         ProcessCommand(os, *source, parameters, true);
       } else {
         SendHeader(os, 200, "OK", "text/plain");
-        os << "Ignored due to no connected source."
-           << "\r\n";
+        os << "Ignored due to no connected source." << "\r\n";
         SDEBUG("Ignored due to no connected source.");
       }
       break;

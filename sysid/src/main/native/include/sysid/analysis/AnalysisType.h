@@ -52,11 +52,9 @@ struct AnalysisType {
 };
 
 namespace analysis {
-constexpr AnalysisType kDrivetrain{3, 9, "Drivetrain"};
-constexpr AnalysisType kDrivetrainAngular{3, 9, "Drivetrain (Angular)"};
-constexpr AnalysisType kElevator{4, 4, "Elevator"};
-constexpr AnalysisType kArm{5, 4, "Arm"};
-constexpr AnalysisType kSimple{3, 4, "Simple"};
+inline constexpr AnalysisType kElevator{4, 4, "Elevator"};
+inline constexpr AnalysisType kArm{5, 4, "Arm"};
+inline constexpr AnalysisType kSimple{3, 4, "Simple"};
 
 AnalysisType FromName(std::string_view name);
 }  // namespace analysis

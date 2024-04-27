@@ -38,6 +38,7 @@ public class Counter implements CounterBase, Sendable, AutoCloseable {
     /** mode: external direction. */
     kExternalDirection(3);
 
+    /** Mode value. */
     public final int value;
 
     Mode(int value) {
@@ -45,13 +46,23 @@ public class Counter implements CounterBase, Sendable, AutoCloseable {
     }
   }
 
-  protected DigitalSource m_upSource; // /< What makes the counter count up.
-  protected DigitalSource m_downSource; // /< What makes the counter count down.
+  /** What makes the counter count up. */
+  protected DigitalSource m_upSource;
+
+  /** What makes the counter count down. */
+  protected DigitalSource m_downSource;
+
   private boolean m_allocatedUpSource;
   private boolean m_allocatedDownSource;
-  int m_counter; // /< The FPGA counter object.
-  private int m_index; // /< The index of this counter.
-  private double m_distancePerPulse = 1; // distance of travel for each tick
+
+  /** The FPGA counter object. */
+  int m_counter;
+
+  /** The index of this counter. */
+  private int m_index;
+
+  /** Distance of travel for each tick. */
+  private double m_distancePerPulse = 1;
 
   /**
    * Create an instance of a counter with the given mode.

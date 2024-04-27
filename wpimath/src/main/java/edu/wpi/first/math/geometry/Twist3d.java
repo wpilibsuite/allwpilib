@@ -35,6 +35,7 @@ public class Twist3d implements ProtobufSerializable, StructSerializable {
   /** Rotation vector z component (radians). */
   public double rz;
 
+  /** Default constructor. */
   public Twist3d() {}
 
   /**
@@ -87,6 +88,9 @@ public class Twist3d implements ProtobufSerializable, StructSerializable {
     return Objects.hash(dx, dy, dz, rx, ry, rz);
   }
 
-  public static final Twist3dStruct struct = new Twist3dStruct();
+  /** Twist3d protobuf for serialization. */
   public static final Twist3dProto proto = new Twist3dProto();
+
+  /** Twist3d struct for serialization. */
+  public static final Twist3dStruct struct = new Twist3dStruct();
 }

@@ -189,7 +189,9 @@ class RobotBase {
   bool IsTestEnabled() const;
 
   /**
-   * Gets the ID of the main robot thread.
+   * Returns the main thread ID.
+   *
+   * @return The main thread ID.
    */
   static std::thread::id GetThreadId();
 

@@ -38,6 +38,10 @@ import org.ejml.simple.SimpleMatrix;
  * <p>This class implements a square-root-form unscented Kalman filter (SR-UKF). For more
  * information about the SR-UKF, see <a
  * href="https://www.researchgate.net/publication/3908304">https://www.researchgate.net/publication/3908304</a>.
+ *
+ * @param <States> Number of states.
+ * @param <Inputs> Number of inputs.
+ * @param <Outputs> Number of outputs.
  */
 public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outputs extends Num>
     implements KalmanTypeFilter<States, Inputs, Outputs> {

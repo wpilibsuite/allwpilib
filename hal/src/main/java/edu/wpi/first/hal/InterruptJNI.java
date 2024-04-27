@@ -113,4 +113,7 @@ public class InterruptJNI extends JNIWrapper {
    * @see "HAL_ReleaseWaitingInterrupt"
    */
   public static native void releaseWaitingInterrupt(int interruptHandle);
+
+  /** Utility class. */
+  private InterruptJNI() {}
 }

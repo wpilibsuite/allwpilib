@@ -506,6 +506,9 @@ public final class SendableRegistry {
 
     /** Sendable builder for the sendable. */
     public SendableBuilder builder;
+
+    /** Default constructor. */
+    public CallbackData() {}
   }
 
   // As foreachLiveWindow is single threaded, cache the components it

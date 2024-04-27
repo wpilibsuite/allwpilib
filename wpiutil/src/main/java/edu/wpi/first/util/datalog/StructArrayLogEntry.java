@@ -87,7 +87,7 @@ public final class StructArrayLogEntry<T> extends DataLogEntry {
    * @param nelem number of elements
    */
   public void reserve(int nelem) {
-    synchronized (m_buf) {
+    synchronized (this) {
       m_buf.reserve(nelem);
     }
   }
@@ -121,7 +121,7 @@ public final class StructArrayLogEntry<T> extends DataLogEntry {
    * @param timestamp Time stamp (0 to indicate now)
    */
   public void append(Collection<T> value, long timestamp) {
-    synchronized (m_buf) {
+    synchronized (this) {
       ByteBuffer bb = m_buf.writeArray(value);
       m_log.appendRaw(m_entry, bb, 0, bb.position(), timestamp);
     }

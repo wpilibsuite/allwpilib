@@ -94,18 +94,31 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
   private static final int PROD_ID = 0x56; // Product identifier
   private static final int SERIAL_NUM = 0x58; // Lot-specific serial number
 
+  /** ADIS16448 calibration times. */
   public enum CalibrationTime {
+    /** 32 ms calibration time */
     _32ms(0),
+    /** 64 ms calibration time */
     _64ms(1),
+    /** 128 ms calibration time */
     _128ms(2),
+    /** 256 ms calibration time */
     _256ms(3),
+    /** 512 ms calibration time */
     _512ms(4),
+    /** 1 s calibration time */
     _1s(5),
+    /** 2 s calibration time */
     _2s(6),
+    /** 4 s calibration time */
     _4s(7),
+    /** 8 s calibration time */
     _8s(8),
+    /** 16 s calibration time */
     _16s(9),
+    /** 32 s calibration time */
     _32s(10),
+    /** 64 s calibration time */
     _64s(11);
 
     private final int value;
@@ -115,9 +128,13 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
     }
   }
 
+  /** IMU axes. */
   public enum IMUAxis {
+    /** The IMU's X axis. */
     kX,
+    /** The IMU's Y axis. */
     kY,
+    /** The IMU's Z axis. */
     kZ
   }
 
@@ -175,6 +192,7 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
   private volatile boolean m_thread_idle = false;
   private boolean m_auto_configured = false;
   private boolean m_start_up_mode = true;
+  private boolean m_needs_flash = false;
 
   /* Resources */
   private SPI m_spi;
@@ -248,11 +266,14 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
     }
   }
 
+  /** Creates a new ADIS16448_IMU object. */
   public ADIS16448_IMU() {
     this(IMUAxis.kZ, SPI.Port.kMXP, CalibrationTime._512ms);
   }
 
   /**
+   * Creates a new ADIS16448_IMU object.
+   *
    * @param yaw_axis The axis that measures the yaw
    * @param port The SPI Port the gyro is plugged into
    * @param cal_time Calibration time
@@ -292,24 +313,77 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
         return;
       }
 
-      // Set IMU internal decimation to 819.2 SPS
-      writeRegister(SMPL_PRD, 0x0001);
-      // Enable Data Ready (LOW = Good Data) on DIO1 (PWM0 on MXP)
-      writeRegister(MSC_CTRL, 0x0016);
-      // Disable IMU internal Bartlett filter
-      writeRegister(SENS_AVG, 0x0400);
+      // Set IMU internal decimation to 1 (ODR = 819.2 SPS / (1 + 1) = 409.6Hz), BW = 204.8Hz
+      if (readRegister(SMPL_PRD) != 0x0001) {
+        writeRegister(SMPL_PRD, 0x0001);
+        m_needs_flash = true;
+        DriverStation.reportWarning(
+            "ADIS16448: SMPL_PRD register configuration inconsistent! Scheduling flash update.",
+            false);
+      }
+
+      // Set data ready polarity (LOW = Good Data) on DIO1 (PWM0 on MXP)
+      if (readRegister(MSC_CTRL) != 0x0016) {
+        writeRegister(MSC_CTRL, 0x0016);
+        m_needs_flash = true;
+        DriverStation.reportWarning(
+            "ADIS16448: MSC_CTRL register configuration inconsistent! Scheduling flash update.",
+            false);
+      }
+
+      // Disable IMU internal Bartlett filter (204Hz BW is sufficient) and set IMU scale factor
+      if (readRegister(SENS_AVG) != 0x0400) {
+        writeRegister(SENS_AVG, 0x0400);
+        m_needs_flash = true;
+        DriverStation.reportWarning(
+            "ADIS16448: SENS_AVG register configuration inconsistent! Scheduling flash update.",
+            false);
+      }
       // Clear offset registers
-      writeRegister(XGYRO_OFF, 0x0000);
-      writeRegister(YGYRO_OFF, 0x0000);
-      writeRegister(ZGYRO_OFF, 0x0000);
+      if (readRegister(XGYRO_OFF) != 0x0000) {
+        writeRegister(XGYRO_OFF, 0x0000);
+        m_needs_flash = true;
+        DriverStation.reportWarning(
+            "ADIS16448: XGYRO_OFF register configuration inconsistent! Scheduling flash update.",
+            false);
+      }
+
+      if (readRegister(YGYRO_OFF) != 0x0000) {
+        writeRegister(YGYRO_OFF, 0x0000);
+        m_needs_flash = true;
+        DriverStation.reportWarning(
+            "ADIS16448: YGYRO_OFF register configuration inconsistent! Scheduling flash update.",
+            false);
+      }
+
+      if (readRegister(ZGYRO_OFF) != 0x0000) {
+        writeRegister(ZGYRO_OFF, 0x0000);
+        m_needs_flash = true;
+        DriverStation.reportWarning(
+            "ADIS16448: ZGYRO_OFF register configuration inconsistent! Scheduling flash update.",
+            false);
+      }
+
+      // If any registers on the IMU don't match the config, trigger a flash update
+      if (m_needs_flash) {
+        DriverStation.reportWarning(
+            "ADIS16448: Register configuration changed! Starting IMU flash update.", false);
+        writeRegister(GLOB_CMD, 0x0008);
+        // Wait long enough for the flash update to finish (75ms minimum as per the datasheet)
+        Timer.delay(0.5);
+        DriverStation.reportWarning("ADIS16448: Flash update finished!", false);
+        m_needs_flash = false;
+      } else {
+        DriverStation.reportWarning(
+            "ADIS16448: and RAM configuration consistent. No flash update required!", false);
+      }
 
       // Configure standard SPI
       if (!switchToAutoSPI()) {
         return;
       }
       // Notify DS that IMU calibration delay is active
-      DriverStation.reportWarning(
-          "ADIS16448 IMU Detected. Starting initial calibration delay.", false);
+      DriverStation.reportWarning("ADIS16448: Starting initial calibration delay.", false);
       // Wait for whatever time the user set as the start-up delay
       try {
         Thread.sleep((long) (m_calibration_time.value * 1.2 * 1000));
@@ -332,6 +406,11 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
     m_connected = true;
   }
 
+  /**
+   * Checks the connection status of the IMU.
+   *
+   * @return True if the IMU is connected, false otherwise.
+   */
   public boolean isConnected() {
     if (m_simConnected != null) {
       return m_simConnected.get();
@@ -339,7 +418,6 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
     return m_connected;
   }
 
-  /** */
   private static int toUShort(byte[] buf) {
     return (((buf[0] & 0xFF) << 8) + ((buf[1] & 0xFF) << 0));
   }
@@ -348,7 +426,7 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
     return (buf[0] & 0xFF);
   }
 
-  public static int toUShort(int... buf) {
+  private static int toUShort(int... buf) {
     return (((buf[0] & 0xFF) << 8) + (buf[1] & 0xFF));
   }
 
@@ -359,7 +437,7 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
 
   /** */
   private static int toShort(int... buf) {
-    return (short) (((buf[0] & 0xFF) << 8) + ((buf[1] & 0xFF)));
+    return (short) (((buf[0] & 0xFF) << 8) + (buf[1] & 0xFF));
   }
 
   /** */
@@ -481,7 +559,18 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
     return true;
   }
 
-  public int configDecRate(int m_decRate) {
+  /**
+   * Configures the decimation rate of the IMU.
+   *
+   * @param decimationRate The new decimation value.
+   * @return 0 if success, 1 if no change, 2 if error.
+   */
+  public int configDecRate(int decimationRate) {
+    // Switches the active SPI port to standard SPI mode, writes a new value to
+    // the DECIMATE register in the IMU, and re-enables auto SPI.
+    //
+    // This function enters standard SPI mode, writes a new DECIMATE setting to
+    // the IMU, adjusts the sample scale factor, and re-enters auto SPI mode.
     int writeValue;
     int readbackValue;
     if (!switchToStandardSPI()) {
@@ -490,19 +579,19 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
     }
 
     /* Check max */
-    if (m_decRate > 9) {
+    if (decimationRate > 9) {
       DriverStation.reportError(
           "Attempted to write an invalid decimation value. Capping at 9", false);
-      m_decRate = 9;
+      decimationRate = 9;
     }
-    if (m_decRate < 0) {
+    if (decimationRate < 0) {
       DriverStation.reportError(
           "Attempted to write an invalid decimation value. Capping at 0", false);
-      m_decRate = 0;
+      decimationRate = 0;
     }
 
     /* Shift decimation setting to correct position and select internal sync */
-    writeValue = (m_decRate << 8) | 0x1;
+    writeValue = (decimationRate << 8) | 0x1;
 
     /* Apply to IMU */
     writeRegister(SMPL_PRD, writeValue);
@@ -624,6 +713,12 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
     m_spi.write(buf, 2);
   }
 
+  /**
+   * Reset the gyro.
+   *
+   * <p>Resets the gyro accumulations to a heading of zero. This can be used if there is significant
+   * drift in the gyro and it needs to be recalibrated after running.
+   */
   public void reset() {
     synchronized (this) {
       m_integ_gyro_angle_x = 0.0;
@@ -957,7 +1052,9 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
   }
 
   /**
-   * @return Yaw axis angle in degrees (CCW positive)
+   * Returns the yaw axis angle in degrees (CCW positive).
+   *
+   * @return Yaw axis angle in degrees (CCW positive).
    */
   public synchronized double getAngle() {
     switch (m_yaw_axis) {
@@ -973,7 +1070,9 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
   }
 
   /**
-   * @return Yaw axis angular rate in degrees per second (CCW positive)
+   * Returns the yaw axis angular rate in degrees per second (CCW positive).
+   *
+   * @return Yaw axis angular rate in degrees per second (CCW positive).
    */
   public synchronized double getRate() {
     switch (m_yaw_axis) {
@@ -989,14 +1088,18 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
   }
 
   /**
-   * @return Yaw Axis
+   * Returns which axis, kX, kY, or kZ, is set to the yaw axis.
+   *
+   * @return IMUAxis Yaw Axis
    */
   public IMUAxis getYawAxis() {
     return m_yaw_axis;
   }
 
   /**
-   * @return accumulated gyro angle in the X axis in degrees
+   * Returns the accumulated gyro angle in the X axis in degrees.
+   *
+   * @return The accumulated gyro angle in the X axis in degrees.
    */
   public synchronized double getGyroAngleX() {
     if (m_simGyroAngleX != null) {
@@ -1006,7 +1109,9 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
   }
 
   /**
-   * @return accumulated gyro angle in the Y axis in degrees
+   * Returns the accumulated gyro angle in the Y axis in degrees.
+   *
+   * @return The accumulated gyro angle in the Y axis in degrees.
    */
   public synchronized double getGyroAngleY() {
     if (m_simGyroAngleY != null) {
@@ -1016,7 +1121,9 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
   }
 
   /**
-   * @return accumulated gyro angle in the Z axis in degrees
+   * Returns the accumulated gyro angle in the Z axis in degrees.
+   *
+   * @return The accumulated gyro angle in the Z axis in degrees.
    */
   public synchronized double getGyroAngleZ() {
     if (m_simGyroAngleZ != null) {
@@ -1026,7 +1133,9 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
   }
 
   /**
-   * @return gyro angular rate in the X axis in degrees per second
+   * Returns the gyro angular rate in the X axis in degrees per second.
+   *
+   * @return The gyro angular rate in the X axis in degrees per second.
    */
   public synchronized double getGyroRateX() {
     if (m_simGyroRateX != null) {
@@ -1036,7 +1145,9 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
   }
 
   /**
-   * @return gyro angular rate in the Y axis in degrees per second
+   * Returns the gyro angular rate in the Y axis in degrees per second.
+   *
+   * @return The gyro angular rate in the Y axis in degrees per second.
    */
   public synchronized double getGyroRateY() {
     if (m_simGyroRateY != null) {
@@ -1046,7 +1157,9 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
   }
 
   /**
-   * @return gyro angular rate in the Z axis in degrees per second
+   * Returns the gyro angular rate in the Z axis in degrees per second.
+   *
+   * @return The gyro angular rate in the Z axis in degrees per second.
    */
   public synchronized double getGyroRateZ() {
     if (m_simGyroRateZ != null) {
@@ -1056,7 +1169,9 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
   }
 
   /**
-   * @return urrent acceleration in the X axis in meters per second squared
+   * Returns the acceleration in the X axis in meters per second squared.
+   *
+   * @return The acceleration in the X axis in meters per second squared.
    */
   public synchronized double getAccelX() {
     if (m_simAccelX != null) {
@@ -1066,7 +1181,9 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
   }
 
   /**
-   * @return current acceleration in the Y axis in meters per second squared
+   * Returns the acceleration in the Y axis in meters per second squared.
+   *
+   * @return The acceleration in the Y axis in meters per second squared.
    */
   public synchronized double getAccelY() {
     if (m_simAccelY != null) {
@@ -1076,7 +1193,9 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
   }
 
   /**
-   * @return current acceleration in the Z axis in meters per second squared
+   * Returns the acceleration in the Z axis in meters per second squared.
+   *
+   * @return The acceleration in the Z axis in meters per second squared.
    */
   public synchronized double getAccelZ() {
     if (m_simAccelZ != null) {
@@ -1086,7 +1205,9 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
   }
 
   /**
-   * @return Magnetic field strength in the X axis in Tesla
+   * Returns the magnetic field strength in the X axis in Tesla.
+   *
+   * @return The magnetic field strength in the X axis in Tesla.
    */
   public synchronized double getMagneticFieldX() {
     // mG to T
@@ -1094,7 +1215,9 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
   }
 
   /**
-   * @return Magnetic field strength in the Y axis in Tesla
+   * Returns the magnetic field strength in the Y axis in Tesla.
+   *
+   * @return The magnetic field strength in the Y axis in Tesla.
    */
   public synchronized double getMagneticFieldY() {
     // mG to T
@@ -1102,7 +1225,9 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
   }
 
   /**
-   * @return Magnetic field strength in the Z axis in Tesla
+   * Returns the magnetic field strength in the Z axis in Tesla.
+   *
+   * @return The magnetic field strength in the Z axis in Tesla.
    */
   public synchronized double getMagneticFieldZ() {
     // mG to T
@@ -1110,35 +1235,47 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
   }
 
   /**
-   * @return X-axis complementary angle in degrees
+   * Returns the complementary angle around the X axis computed from accelerometer and gyro rate
+   * measurements.
+   *
+   * @return The X-axis complementary angle in degrees.
    */
   public synchronized double getXComplementaryAngle() {
     return m_compAngleX;
   }
 
   /**
-   * @return Y-axis complementary angle in degrees
+   * Returns the complementary angle around the Y axis computed from accelerometer and gyro rate
+   * measurements.
+   *
+   * @return The Y-axis complementary angle in degrees.
    */
   public synchronized double getYComplementaryAngle() {
     return m_compAngleY;
   }
 
   /**
-   * @return X-axis filtered acceleration angle in degrees
+   * Returns the X-axis filtered acceleration angle in degrees.
+   *
+   * @return The X-axis filtered acceleration angle in degrees.
    */
   public synchronized double getXFilteredAccelAngle() {
     return m_accelAngleX;
   }
 
   /**
-   * @return Y-axis filtered acceleration angle in degrees
+   * Returns the Y-axis filtered acceleration angle in degrees.
+   *
+   * @return The Y-axis filtered acceleration angle in degrees.
    */
   public synchronized double getYFilteredAccelAngle() {
     return m_accelAngleY;
   }
 
   /**
-   * @return Barometric Pressure in PSI
+   * Returns the barometric pressure in PSI.
+   *
+   * @return The barometric pressure in PSI.
    */
   public synchronized double getBarometricPressure() {
     // mbar to PSI conversion
@@ -1146,7 +1283,9 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
   }
 
   /**
-   * @return Temperature in degrees Celsius
+   * Returns the temperature in degrees Celsius.
+   *
+   * @return The temperature in degrees Celsius.
    */
   public synchronized double getTemperature() {
     return m_temp;

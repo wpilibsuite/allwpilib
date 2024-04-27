@@ -260,10 +260,28 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
     }
 
     // abs so negative inputs are calculated correctly
-    var allowedVariance = Math.abs(varianceThreshold);
+    var tolerance = Math.abs(other.baseUnitMagnitude() * varianceThreshold);
 
-    return other.baseUnitMagnitude() * (1 - allowedVariance) <= this.baseUnitMagnitude()
-        && other.baseUnitMagnitude() * (1 + allowedVariance) >= this.baseUnitMagnitude();
+    return Math.abs(this.baseUnitMagnitude() - other.baseUnitMagnitude()) <= tolerance;
+  }
+
+  /**
+   * Checks if this measure is near another measure of the same unit, with a specified tolerance of
+   * the same unit.
+   *
+   * <pre>
+   *     Meters.of(1).isNear(Meters.of(1.2), Millimeters.of(300)) // true
+   *     Degrees.of(90).isNear(Rotations.of(0.5), Degrees.of(45)) // false
+   * </pre>
+   *
+   * @param other the other measure to compare against.
+   * @param tolerance the tolerance allowed in which the two measures are defined as near each
+   *     other.
+   * @return true if this unit is near the other measure, otherwise false.
+   */
+  default boolean isNear(Measure<U> other, Measure<U> tolerance) {
+    return Math.abs(this.baseUnitMagnitude() - other.baseUnitMagnitude())
+        <= Math.abs(tolerance.baseUnitMagnitude());
   }
 
   /**

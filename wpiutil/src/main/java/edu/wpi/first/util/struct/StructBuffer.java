@@ -12,7 +12,7 @@ import java.util.Collection;
 /**
  * Reusable buffer for serialization/deserialization to/from a raw struct.
  *
- * @param <T> object type
+ * @param <T> Object type.
  */
 public final class StructBuffer<T> {
   private StructBuffer(Struct<T> struct) {
@@ -21,6 +21,13 @@ public final class StructBuffer<T> {
     m_struct = struct;
   }
 
+  /**
+   * Returns a StructBuffer for the given struct.
+   *
+   * @param struct A struct.
+   * @param <T> Object type.
+   * @return A StructBuffer for the given struct.
+   */
   public static <T> StructBuffer<T> create(Struct<T> struct) {
     return new StructBuffer<>(struct);
   }

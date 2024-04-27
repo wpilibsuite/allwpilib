@@ -11,14 +11,23 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.util.RawFrame;
 import java.util.Objects;
 
+/** Represents an AprilTag's metadata. */
 @SuppressWarnings("MemberName")
 public class AprilTag {
+  /** The tag's ID. */
   @JsonProperty(value = "ID")
   public int ID;
 
+  /** The tag's pose. */
   @JsonProperty(value = "pose")
   public Pose3d pose;
 
+  /**
+   * Constructs an AprilTag.
+   *
+   * @param ID The tag's ID.
+   * @param pose The tag's pose.
+   */
   @SuppressWarnings("ParameterName")
   @JsonCreator
   public AprilTag(

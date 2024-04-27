@@ -23,11 +23,12 @@ DriverStationModeThread::~DriverStationModeThread() {
   }
 }
 
-void DriverStationModeThread::InAutonomous(bool entering) {
-  m_userInAutonomous = entering;
-}
 void DriverStationModeThread::InDisabled(bool entering) {
   m_userInDisabled = entering;
+}
+
+void DriverStationModeThread::InAutonomous(bool entering) {
+  m_userInAutonomous = entering;
 }
 
 void DriverStationModeThread::InTeleop(bool entering) {

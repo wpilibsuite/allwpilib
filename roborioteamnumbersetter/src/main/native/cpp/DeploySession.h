@@ -18,6 +18,12 @@ namespace sysid {
 // GUI).
 static constexpr unsigned int kLogSuccess = 31;
 
+struct DeviceStatus {
+  bool webServerEnabled = false;
+  std::string serialNumber;
+  std::string image;
+};
+
 /**
  * Represents a single deploy session.
  *
@@ -49,15 +55,19 @@ class DeploySession {
 
   bool Blink(const std::string& macAddress, unsigned int ipAddress);
 
+  bool DisableWebServer(const std::string& macAddress, unsigned int ipAddress);
+
+  bool EnableWebServer(const std::string& macAddress, unsigned int ipAddress);
+
   bool Reboot(const std::string& macAddress, unsigned int ipAddress);
+
+  bool GetStatus(const std::string& macAddress, unsigned int ipAddress);
 
   std::future<int>* GetFuture(const std::string& macAddress);
   void DestroyFuture(const std::string& macAddress);
 
-  /**
-   * Returns the state of the deploy session.
-   */
-  Status GetStatus() const;
+  std::future<DeviceStatus>* GetStatusFuture(const std::string& macAddress);
+  void DestroyStatusFuture(const std::string& macAddress);
 
  private:
   // Logger reference where log messages will be sent.

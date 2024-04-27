@@ -6,6 +6,7 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.ThreadsJNI;
 
+/** Thread utility functions. */
 public final class Threads {
   /**
    * Get the thread priority for the current thread.

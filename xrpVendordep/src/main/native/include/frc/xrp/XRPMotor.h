@@ -12,8 +12,11 @@
 #include <string>
 
 #include <hal/SimDevice.h>
+#include <wpi/deprecated.h>
 
 namespace frc {
+
+WPI_IGNORE_DEPRECATED
 
 class XRPMotor : public frc::MotorController, public frc::MotorSafety {
  public:
@@ -42,5 +45,7 @@ class XRPMotor : public frc::MotorController, public frc::MotorSafety {
 
   static void CheckDeviceAllocation(int deviceNum);
 };
+
+WPI_UNIGNORE_DEPRECATED
 
 }  // namespace frc

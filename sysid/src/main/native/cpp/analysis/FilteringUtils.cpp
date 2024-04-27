@@ -14,6 +14,7 @@
 #include <frc/filter/LinearFilter.h>
 #include <frc/filter/MedianFilter.h>
 #include <units/math.h>
+#include <wpi/MathExtras.h>
 #include <wpi/StringExtras.h>
 
 using namespace sysid;
@@ -126,7 +127,7 @@ sysid::TrimStepVoltageData(std::vector<PreparedData>* data,
   auto motionBegins = std::find_if(
       data->begin(), data->end(), [settings, firstPosition](auto& datum) {
         return std::abs(datum.position - firstPosition) >
-               (settings->motionThreshold * datum.dt.value());
+               (settings->velocityThreshold * datum.dt.value());
       });
 
   units::second_t positionDelay;
@@ -138,12 +139,25 @@ sysid::TrimStepVoltageData(std::vector<PreparedData>* data,
 
   auto maxAccel = std::max_element(
       data->begin(), data->end(), [](const auto& a, const auto& b) {
-        return std::abs(a.acceleration) < std::abs(b.acceleration);
+        // Since we don't know if its a forward or backwards test here, we use
+        // the sign of each point's velocity to determine how to compare their
+        // accelerations.
+        return wpi::sgn(a.velocity) * a.acceleration <
+               wpi::sgn(b.velocity) * b.acceleration;
+      });
+
+  // Current limiting can delay onset of the peak acceleration, so we need to
+  // find the first acceleration *near* the max.  Magic number tolerance here
+  // because this whole file is tech debt already
+  auto accelBegins = std::find_if(
+      data->begin(), data->end(), [&maxAccel](const auto& measurement) {
+        return wpi::sgn(measurement.velocity) * measurement.acceleration >
+               0.8 * wpi::sgn(maxAccel->velocity) * maxAccel->acceleration;
       });
 
   units::second_t velocityDelay;
-  if (maxAccel != data->end()) {
-    velocityDelay = maxAccel->timestamp - firstTimestamp;
+  if (accelBegins != data->end()) {
+    velocityDelay = accelBegins->timestamp - firstTimestamp;
 
     // Trim data before max acceleration
     data->erase(data->begin(), maxAccel);
@@ -153,32 +167,28 @@ sysid::TrimStepVoltageData(std::vector<PreparedData>* data,
 
   minStepTime = std::min(data->at(0).timestamp - firstTimestamp, minStepTime);
 
-  // If step duration hasn't been set yet, calculate a default (find the entry
-  // before the acceleration first hits zero)
-  if (settings->stepTestDuration <= minStepTime) {
-    // Get noise floor
-    const double accelNoiseFloor = GetNoiseFloor(
-        *data, kNoiseMeanWindow, [](auto&& pt) { return pt.acceleration; });
-    // Find latest element with nonzero acceleration
+  // If step test duration not yet specified, calculate default
+  if (settings->stepTestDuration == 0_s) {
+    // Find maximum speed reached
+    const auto maxSpeed =
+        GetMaxSpeed(*data, [](auto&& pt) { return pt.velocity; });
+    // Find place where 90% of maximum speed exceeded
     auto endIt = std::find_if(
-        data->rbegin(), data->rend(), [&](const PreparedData& entry) {
-          return std::abs(entry.acceleration) > accelNoiseFloor;
+        data->begin(), data->end(), [&](const PreparedData& entry) {
+          return std::abs(entry.velocity) > maxSpeed * 0.9;
         });
 
-    if (endIt != data->rend()) {
-      // Calculate default duration
-      settings->stepTestDuration = std::min(
-          endIt->timestamp - data->front().timestamp + minStepTime + 1_s,
-          maxStepTime);
-    } else {
-      settings->stepTestDuration = maxStepTime;
+    if (endIt != data->end()) {
+      settings->stepTestDuration =
+          std::min(endIt->timestamp - data->front().timestamp + minStepTime,
+                   maxStepTime);
     }
   }
 
   // Find first entry greater than the step test duration
   auto maxIt =
       std::find_if(data->begin(), data->end(), [&](PreparedData entry) {
-        return entry.timestamp - data->front().timestamp + minStepTime >
+        return entry.timestamp - data->front().timestamp >
                settings->stepTestDuration;
       });
 
@@ -186,6 +196,7 @@ sysid::TrimStepVoltageData(std::vector<PreparedData>* data,
   if (maxIt != data->end()) {
     data->erase(maxIt, data->end());
   }
+
   return std::make_tuple(minStepTime, positionDelay, velocityDelay);
 }
 
@@ -202,6 +213,16 @@ double sysid::GetNoiseFloor(
     }
   }
   return std::sqrt(sum / (data.size() - step));
+}
+
+double sysid::GetMaxSpeed(
+    const std::vector<PreparedData>& data,
+    std::function<double(const PreparedData&)> accessorFunction) {
+  double max = 0.0;
+  for (size_t i = 0; i < data.size(); i++) {
+    max = std::max(max, std::abs(accessorFunction(data[i])));
+  }
+  return max;
 }
 
 units::second_t sysid::GetMeanTimeDelta(const std::vector<PreparedData>& data) {
@@ -301,7 +322,7 @@ static units::second_t GetMaxStepTime(
     auto key = it.first();
     auto& dataset = it.getValue();
 
-    if (IsRaw(key) && wpi::contains(key, "fast")) {
+    if (IsRaw(key) && wpi::contains(key, "dynamic")) {
       auto duration = dataset.back().timestamp - dataset.front().timestamp;
       if (duration > maxStepTime) {
         maxStepTime = duration;
@@ -323,13 +344,13 @@ void sysid::InitialTrimAndFilter(
   maxStepTime = GetMaxStepTime(preparedData);
 
   // Calculate Velocity Threshold if it hasn't been set yet
-  if (settings->motionThreshold == std::numeric_limits<double>::infinity()) {
+  if (settings->velocityThreshold == std::numeric_limits<double>::infinity()) {
     for (auto& it : preparedData) {
       auto key = it.first();
       auto& dataset = it.getValue();
-      if (wpi::contains(key, "slow")) {
-        settings->motionThreshold =
-            std::min(settings->motionThreshold,
+      if (wpi::contains(key, "quasistatic")) {
+        settings->velocityThreshold =
+            std::min(settings->velocityThreshold,
                      GetNoiseFloor(dataset, kNoiseMeanWindow,
                                    [](auto&& pt) { return pt.velocity; }));
       }
@@ -341,13 +362,13 @@ void sysid::InitialTrimAndFilter(
     auto& dataset = it.getValue();
 
     // Trim quasistatic test data to remove all points where voltage is zero or
-    // velocity < motion threshold.
-    if (wpi::contains(key, "slow")) {
+    // velocity < velocity threshold.
+    if (wpi::contains(key, "quasistatic")) {
       dataset.erase(std::remove_if(dataset.begin(), dataset.end(),
                                    [&](const auto& pt) {
                                      return std::abs(pt.voltage) <= 0 ||
                                             std::abs(pt.velocity) <
-                                                settings->motionThreshold;
+                                                settings->velocityThreshold;
                                    }),
                     dataset.end());
 
@@ -366,7 +387,7 @@ void sysid::InitialTrimAndFilter(
     PrepareMechData(&dataset, unit);
 
     // Trims filtered Dynamic Test Data
-    if (IsFiltered(key) && wpi::contains(key, "fast")) {
+    if (IsFiltered(key) && wpi::contains(key, "dynamic")) {
       // Get the filtered dataset name
       auto filteredKey = RemoveStr(key, "raw-");
 

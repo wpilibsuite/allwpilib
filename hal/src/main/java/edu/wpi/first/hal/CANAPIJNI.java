@@ -177,4 +177,7 @@ public class CANAPIJNI extends JNIWrapper {
    */
   public static native boolean readCANPacketTimeout(
       int handle, int apiId, int timeoutMs, CANData data);
+
+  /** Utility class. */
+  private CANAPIJNI() {}
 }

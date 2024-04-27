@@ -62,7 +62,7 @@ public class TravelingSalesman {
                 sum +=
                     m_cost.applyAsDouble(
                         poses[(int) state.get(i, 0)],
-                        poses[(int) (state.get((i + 1) % poses.length, 0))]);
+                        poses[(int) state.get((i + 1) % poses.length, 0)]);
               }
               return sum;
             });

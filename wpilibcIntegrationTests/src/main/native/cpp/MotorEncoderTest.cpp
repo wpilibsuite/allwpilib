@@ -6,6 +6,7 @@
 
 #include <gtest/gtest.h>
 #include <units/time.h>
+#include <wpi/deprecated.h>
 
 #include "TestBench.h"
 #include "frc/Encoder.h"
@@ -36,6 +37,8 @@ std::ostream& operator<<(std::ostream& os, MotorEncoderTestType const& type) {
 }
 
 static constexpr auto kMotorTime = 0.5_s;
+
+WPI_IGNORE_DEPRECATED
 
 /**
  * A fixture that includes a PWM motor controller and an encoder connected to
@@ -197,3 +200,5 @@ TEST_P(MotorEncoderTest, Reset) {
 
 INSTANTIATE_TEST_SUITE_P(Tests, MotorEncoderTest,
                          testing::Values(TEST_VICTOR, TEST_JAGUAR, TEST_TALON));
+
+WPI_UNIGNORE_DEPRECATED

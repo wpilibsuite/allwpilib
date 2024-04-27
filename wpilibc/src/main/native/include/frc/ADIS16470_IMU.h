@@ -16,7 +16,6 @@
 #include <stdint.h>
 
 #include <atomic>
-#include <memory>
 #include <thread>
 
 #include <hal/SimDevice.h>
@@ -30,7 +29,6 @@
 
 #include "frc/DigitalInput.h"
 #include "frc/DigitalOutput.h"
-#include "frc/DigitalSource.h"
 #include "frc/SPI.h"
 
 namespace frc {
@@ -53,40 +51,109 @@ namespace frc {
 class ADIS16470_IMU : public wpi::Sendable,
                       public wpi::SendableHelper<ADIS16470_IMU> {
  public:
-  /* ADIS16470 Calibration Time Enum Class */
+  /**
+   * ADIS16470 calibration times.
+   */
   enum class CalibrationTime {
+    /// 32 ms calibration time.
     _32ms = 0,
+    /// 64 ms calibration time.
     _64ms = 1,
+    /// 128 ms calibration time.
     _128ms = 2,
+    /// 256 ms calibration time.
     _256ms = 3,
+    /// 512 ms calibration time.
     _512ms = 4,
+    /// 1 s calibration time.
     _1s = 5,
+    /// 2 s calibration time.
     _2s = 6,
+    /// 4 s calibration time.
     _4s = 7,
+    /// 8 s calibration time.
     _8s = 8,
+    /// 16 s calibration time.
     _16s = 9,
+    /// 32 s calibration time.
     _32s = 10,
+    /// 64 s calibration time.
     _64s = 11
   };
 
-  enum IMUAxis { kX, kY, kZ, kYaw, kPitch, kRoll };
+  /**
+   * IMU axes.
+   *
+   * kX, kY, and kZ refer to the IMU's X, Y, and Z axes respectively. kYaw,
+   * kPitch, and kRoll are configured by the user to refer to an X, Y, or Z
+   * axis.
+   */
+  enum IMUAxis {
+    /// The IMU's X axis.
+    kX,
+    /// The IMU's Y axis.
+    kY,
+    /// The IMU's Z axis.
+    kZ,
+    /// The user-configured yaw axis.
+    kYaw,
+    /// The user-configured pitch axis.
+    kPitch,
+    /// The user-configured roll axis.
+    kRoll
+  };
 
+  /**
+   * Creates a new ADIS16740 IMU object.
+   *
+   * The default setup is the onboard SPI port with a calibration time of 1
+   * second. Yaw, pitch, and roll are kZ, kX, and kY respectively.
+   */
   ADIS16470_IMU();
+
+  /**
+   * Creates a new ADIS16740 IMU object.
+   *
+   * The default setup is the onboard SPI port with a calibration time of 1
+   * second.
+   *
+   * <b><i>Input axes limited to kX, kY and kZ. Specifying kYaw, kPitch,or kRoll
+   * will result in an error.</i></b>
+   *
+   * @param yaw_axis The axis that measures the yaw
+   * @param pitch_axis The axis that measures the pitch
+   * @param roll_axis The axis that measures the roll
+   */
   ADIS16470_IMU(IMUAxis yaw_axis, IMUAxis pitch_axis, IMUAxis roll_axis);
 
+  /**
+   * Creates a new ADIS16740 IMU object.
+   *
+   * <b><i>Input axes limited to kX, kY and kZ. Specifying kYaw, kPitch, or
+   * kRoll will result in an error.</i></b>
+   *
+   * @param yaw_axis The axis that measures the yaw
+   * @param pitch_axis The axis that measures the pitch
+   * @param roll_axis The axis that measures the roll
+   * @param port The SPI Port the gyro is plugged into
+   * @param cal_time Calibration time
+   */
   explicit ADIS16470_IMU(IMUAxis yaw_axis, IMUAxis pitch_axis,
                          IMUAxis roll_axis, frc::SPI::Port port,
                          CalibrationTime cal_time);
 
   ~ADIS16470_IMU() override;
 
-  ADIS16470_IMU(ADIS16470_IMU&&) = default;
-  ADIS16470_IMU& operator=(ADIS16470_IMU&&) = default;
+  ADIS16470_IMU(ADIS16470_IMU&& other);
+  ADIS16470_IMU& operator=(ADIS16470_IMU&& other);
 
   /**
-   * @brief Configures the decimation rate of the IMU.
+   * Configures the decimation rate of the IMU.
+   *
+   * @param decimationRate The new decimation value.
+   * @return 0 if success, 1 if no change, 2 if error.
    */
-  int ConfigDecRate(uint16_t reg);
+  int ConfigDecRate(uint16_t decimationRate);
 
   /**
    * @brief Switches the active SPI port to standard SPI mode, writes the
@@ -101,8 +168,11 @@ class ADIS16470_IMU : public wpi::Sendable,
   int ConfigCalTime(CalibrationTime new_cal_time);
 
   /**
-   * @brief Resets the gyro accumulations to a heading of zero. This can be used
-   * if the "zero" orientation of the sensor needs to be changed in runtime.
+   * Reset the gyro.
+   *
+   * Resets the gyro accumulations to a heading of zero. This can be used if
+   * there is significant drift in the gyro and it needs to be recalibrated
+   * after running.
    */
   void Reset();
 
@@ -144,16 +214,22 @@ class ADIS16470_IMU : public wpi::Sendable,
   void SetGyroAngleZ(units::degree_t angle);
 
   /**
-   * @param axis The IMUAxis whose angle to return
-   * @return The axis angle (CCW positive)
+   * Returns the axis angle (CCW positive).
+   *
+   * @param axis The IMUAxis whose angle to return. Defaults to user configured
+   * Yaw.
+   * @return The axis angle (CCW positive).
    */
-  units::degree_t GetAngle(IMUAxis axis) const;
+  units::degree_t GetAngle(IMUAxis axis = IMUAxis::kYaw) const;
 
   /**
-   * @param axis The IMUAxis whose rate to return
-   * @return Axis angular rate (CCW positive)
+   * Returns the axis angular rate (CCW positive).
+   *
+   * @param axis The IMUAxis whose rate to return. Defaults to user configured
+   * Yaw.
+   * @return Axis angular rate (CCW positive).
    */
-  units::degrees_per_second_t GetRate(IMUAxis axis) const;
+  units::degrees_per_second_t GetRate(IMUAxis axis = IMUAxis::kYaw) const;
 
   /**
    * Returns the acceleration in the X axis.
@@ -347,8 +423,8 @@ class ADIS16470_IMU : public wpi::Sendable,
   static constexpr double grav = 9.81;
 
   /** @brief Resources **/
-  DigitalInput* m_reset_in;
-  DigitalOutput* m_status_led;
+  DigitalInput* m_reset_in = nullptr;
+  DigitalOutput* m_status_led = nullptr;
 
   /**
    * @brief Switches to standard SPI operation. Primarily used when exiting auto
@@ -425,9 +501,9 @@ class ADIS16470_IMU : public wpi::Sendable,
   double CompFilterProcess(double compAngle, double accelAngle, double omega);
 
   // State and resource variables
-  volatile bool m_thread_active = false;
-  volatile bool m_first_run = true;
-  volatile bool m_thread_idle = false;
+  std::atomic<bool> m_thread_active = false;
+  std::atomic<bool> m_first_run = true;
+  std::atomic<bool> m_thread_idle = false;
   bool m_auto_configured = false;
   SPI::Port m_spi_port;
   uint16_t m_calibration_time = 0;

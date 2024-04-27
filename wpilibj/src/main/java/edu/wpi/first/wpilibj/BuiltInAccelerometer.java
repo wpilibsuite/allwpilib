@@ -17,9 +17,13 @@ import edu.wpi.first.util.sendable.SendableRegistry;
  * <p>This class allows access to the roboRIO's internal accelerometer.
  */
 public class BuiltInAccelerometer implements Sendable, AutoCloseable {
+  /** Accelerometer range. */
   public enum Range {
+    /** 2 Gs max. */
     k2G,
+    /** 4 Gs max. */
     k4G,
+    /** 8 Gs max. */
     k8G
   }
 

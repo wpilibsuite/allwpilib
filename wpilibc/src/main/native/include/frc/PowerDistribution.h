@@ -17,8 +17,18 @@ namespace frc {
 class PowerDistribution : public wpi::Sendable,
                           public wpi::SendableHelper<PowerDistribution> {
  public:
+  /// Default module number.
   static constexpr int kDefaultModule = -1;
-  enum class ModuleType { kCTRE = 1, kRev = 2 };
+
+  /**
+   * Power distribution module type.
+   */
+  enum class ModuleType {
+    /// CTRE (Cross The Road Electronics) CTRE Power Distribution Panel (PDP).
+    kCTRE = 1,
+    /// REV Power Distribution Hub (PDH).
+    kRev = 2
+  };
 
   /**
    * Constructs a PowerDistribution object.
@@ -48,7 +58,10 @@ class PowerDistribution : public wpi::Sendable,
   double GetVoltage() const;
 
   /**
-   * Query the temperature of the PDP/PDH.
+   * Query the temperature of the PDP.
+   *
+   * Not supported on the Rev PDH and returns 0.
+   *
    *
    * @return The temperature in degrees Celsius
    */
@@ -70,21 +83,27 @@ class PowerDistribution : public wpi::Sendable,
   double GetTotalCurrent() const;
 
   /**
-   * Query the total power drawn from all monitored PDP/PDH channels.
+   * Query the total power drawn from all monitored PDP channels.
+   *
+   * Not supported on the Rev PDH and returns 0.
    *
    * @return The total power drawn in Watts
    */
   double GetTotalPower() const;
 
   /**
-   * Query the total energy drawn from the monitored PDP/PDH channels.
+   * Query the total energy drawn from the monitored PDP channels.
+   *
+   * Not supported on the Rev PDH and returns 0.
    *
    * @return The total energy drawn in Joules
    */
   double GetTotalEnergy() const;
 
   /**
-   * Reset the total energy drawn from the PDP/PDH.
+   * Reset the total energy drawn from the PDP.
+   *
+   * Not supported on the Rev PDH and does nothing.
    *
    * @see PowerDistribution#GetTotalEnergy
    */
@@ -170,6 +189,11 @@ class PowerDistribution : public wpi::Sendable,
     bool GetBreakerFault(int channel) const;
   };
 
+  /**
+   * Returns the power distribution faults.
+   *
+   * @return The power distribution faults.
+   */
   Faults GetFaults() const;
 
   struct StickyFaults {
@@ -213,6 +237,11 @@ class PowerDistribution : public wpi::Sendable,
     bool GetBreakerFault(int channel) const;
   };
 
+  /**
+   * Returns the power distribution sticky faults.
+   *
+   * @return The power distribution sticky faults.
+   */
   StickyFaults GetStickyFaults() const;
 
   void InitSendable(wpi::SendableBuilder& builder) override;

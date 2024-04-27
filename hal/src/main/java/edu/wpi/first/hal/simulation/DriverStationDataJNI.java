@@ -6,6 +6,7 @@ package edu.wpi.first.hal.simulation;
 
 import edu.wpi.first.hal.JNIWrapper;
 
+/** JNI for Driver Station data. */
 public class DriverStationDataJNI extends JNIWrapper {
   public static native int registerEnabledCallback(NotifyCallback callback, boolean initialNotify);
 
@@ -134,4 +135,7 @@ public class DriverStationDataJNI extends JNIWrapper {
   public static native void setReplayNumber(int replayNumber);
 
   public static native void resetData();
+
+  /** Utility class. */
+  private DriverStationDataJNI() {}
 }

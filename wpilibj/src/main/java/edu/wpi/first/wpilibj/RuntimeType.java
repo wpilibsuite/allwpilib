@@ -6,11 +6,16 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.HALUtil;
 
+/** Runtime type. */
 public enum RuntimeType {
+  /** roboRIO 1.0. */
   kRoboRIO(HALUtil.RUNTIME_ROBORIO),
+  /** roboRIO 2.0. */
   kRoboRIO2(HALUtil.RUNTIME_ROBORIO2),
+  /** Simulation runtime. */
   kSimulation(HALUtil.RUNTIME_SIMULATION);
 
+  /** RuntimeType value. */
   public final int value;
 
   RuntimeType(int value) {

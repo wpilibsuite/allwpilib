@@ -10,6 +10,7 @@ import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 import org.ejml.simple.SimpleMatrix;
 
+/** Represents a hermite spline of degree 3. */
 public class CubicHermiteSpline extends Spline implements ProtobufSerializable, StructSerializable {
   private static SimpleMatrix hermiteBasis;
   private final SimpleMatrix m_coefficients;

@@ -6,6 +6,7 @@ package edu.wpi.first.hal.simulation;
 
 import edu.wpi.first.hal.JNIWrapper;
 
+/** JNI for analog gyro data. */
 public class AnalogGyroDataJNI extends JNIWrapper {
   public static native int registerAngleCallback(
       int index, NotifyCallback callback, boolean initialNotify);
@@ -35,4 +36,7 @@ public class AnalogGyroDataJNI extends JNIWrapper {
   public static native void setInitialized(int index, boolean initialized);
 
   public static native void resetData(int index);
+
+  /** Utility class. */
+  private AnalogGyroDataJNI() {}
 }

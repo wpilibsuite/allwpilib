@@ -38,5 +38,6 @@ class EventLoop {
 
  private:
   std::vector<wpi::unique_function<void()>> m_bindings;
+  bool m_running{false};
 };
 }  // namespace frc

@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.MotorSafety;
 import edu.wpi.first.wpilibj.PWM;
 
 /** Nidec Brushless Motor. */
+@SuppressWarnings("removal")
 public class NidecBrushless extends MotorSafety
     implements MotorController, Sendable, AutoCloseable {
   private boolean m_isInverted;

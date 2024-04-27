@@ -24,6 +24,11 @@ public interface Interpolator<T> {
    */
   T interpolate(T startValue, T endValue, double t);
 
+  /**
+   * Returns interpolator for Double.
+   *
+   * @return Interpolator for Double.
+   */
   static Interpolator<Double> forDouble() {
     return MathUtil::interpolate;
   }

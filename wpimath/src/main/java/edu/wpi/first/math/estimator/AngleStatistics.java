@@ -11,10 +11,10 @@ import edu.wpi.first.math.numbers.N1;
 import java.util.function.BiFunction;
 import org.ejml.simple.SimpleMatrix;
 
+/** Angle statistics functions. */
 public final class AngleStatistics {
-  private AngleStatistics() {
-    // Utility class
-  }
+  /** Utility class. */
+  private AngleStatistics() {}
 
   /**
    * Subtracts a and b while normalizing the resulting value in the selected row as if it were an

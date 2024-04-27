@@ -4,7 +4,11 @@
 
 package edu.wpi.first.networktables;
 
-/** NetworkTables timestamped object. */
+/**
+ * NetworkTables timestamped object.
+ *
+ * @param <T> Value type.
+ */
 public final class TimestampedObject<T> {
   /**
    * Create a timestamped value.

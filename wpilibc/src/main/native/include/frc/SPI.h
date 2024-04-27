@@ -25,14 +25,34 @@ class DigitalSource;
  */
 class SPI {
  public:
-  enum Port { kOnboardCS0 = 0, kOnboardCS1, kOnboardCS2, kOnboardCS3, kMXP };
+  /**
+   * SPI port.
+   */
+  enum Port {
+    /// Onboard SPI bus port CS0.
+    kOnboardCS0 = 0,
+    /// Onboard SPI bus port CS1.
+    kOnboardCS1,
+    /// Onboard SPI bus port CS2.
+    kOnboardCS2,
+    /// Onboard SPI bus port CS3.
+    kOnboardCS3,
+    /// MXP (roboRIO MXP) SPI bus port.
+    kMXP
+  };
+
+  /**
+   * SPI mode.
+   */
   enum Mode {
-    kMode0 = HAL_SPI_kMode0, /*!< Clock idle low, data sampled on rising edge */
-    kMode1 =
-        HAL_SPI_kMode1, /*!< Clock idle low, data sampled on falling edge */
-    kMode2 =
-        HAL_SPI_kMode2, /*!< Clock idle high, data sampled on falling edge */
-    kMode3 = HAL_SPI_kMode3 /*!< Clock idle high, data sampled on rising edge */
+    /// Clock idle low, data sampled on rising edge.
+    kMode0 = HAL_SPI_kMode0,
+    /// Clock idle low, data sampled on falling edge.
+    kMode1 = HAL_SPI_kMode1,
+    /// Clock idle high, data sampled on falling edge.
+    kMode2 = HAL_SPI_kMode2,
+    /// Clock idle high, data sampled on rising edge.
+    kMode3 = HAL_SPI_kMode3
   };
 
   /**
@@ -47,6 +67,11 @@ class SPI {
   SPI(SPI&&) = default;
   SPI& operator=(SPI&&) = default;
 
+  /**
+   * Returns the SPI port.
+   *
+   * @return The SPI port.
+   */
   Port GetPort() const;
 
   /**

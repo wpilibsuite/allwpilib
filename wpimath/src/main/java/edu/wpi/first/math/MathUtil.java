@@ -4,6 +4,7 @@
 
 package edu.wpi.first.math;
 
+/** Math utility functions. */
 public final class MathUtil {
   private MathUtil() {
     throw new AssertionError("utility class");

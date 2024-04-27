@@ -28,10 +28,14 @@ public class DifferentialDriveKinematics
     implements Kinematics<DifferentialDriveWheelSpeeds, DifferentialDriveWheelPositions>,
         ProtobufSerializable,
         StructSerializable {
+  /** Differential drive trackwidth. */
   public final double trackWidthMeters;
 
+  /** DifferentialDriveKinematics protobuf for serialization. */
   public static final DifferentialDriveKinematicsProto proto =
       new DifferentialDriveKinematicsProto();
+
+  /** DifferentialDriveKinematics struct for serialization. */
   public static final DifferentialDriveKinematicsStruct struct =
       new DifferentialDriveKinematicsStruct();
 

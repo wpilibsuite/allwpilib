@@ -26,8 +26,8 @@ frc::MecanumDriveKinematics wpi::Protobuf<frc::MecanumDriveKinematics>::Unpack(
 void wpi::Protobuf<frc::MecanumDriveKinematics>::Pack(
     google::protobuf::Message* msg, const frc::MecanumDriveKinematics& value) {
   auto m = static_cast<wpi::proto::ProtobufMecanumDriveKinematics*>(msg);
-  wpi::PackProtobuf(m->mutable_front_left(), value.GetFrontLeftWheel());
-  wpi::PackProtobuf(m->mutable_front_right(), value.GetFrontRightWheel());
-  wpi::PackProtobuf(m->mutable_rear_left(), value.GetRearLeftWheel());
-  wpi::PackProtobuf(m->mutable_rear_right(), value.GetRearRightWheel());
+  wpi::PackProtobuf(m->mutable_front_left(), value.GetFrontLeft());
+  wpi::PackProtobuf(m->mutable_front_right(), value.GetFrontRight());
+  wpi::PackProtobuf(m->mutable_rear_left(), value.GetRearLeft());
+  wpi::PackProtobuf(m->mutable_rear_right(), value.GetRearRight());
 }

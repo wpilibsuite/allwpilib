@@ -23,6 +23,17 @@ public class Current extends Unit<Current> {
     super(Current.class, toBaseConverter, fromBaseConverter, name, symbol);
   }
 
+  /**
+   * Constructs a unit of power equivalent to this unit of electrical current multiplied by another
+   * unit of voltage. For example, {@code Amps.times(Volts)} will return a unit of power equivalent
+   * to one Watt; {@code Amps.times(Millivolts)} will return a unit of power equivalent to a
+   * milliwatt, and so on.
+   *
+   * @param voltage the voltage unit to multiply by
+   * @param name the name of the resulting unit of power
+   * @param symbol the symbol used to represent the unit of power
+   * @return the power unit
+   */
   public Power times(Unit<Voltage> voltage, String name, String symbol) {
     return new Power(this.toBaseUnits(1) * voltage.toBaseUnits(1), name, symbol);
   }

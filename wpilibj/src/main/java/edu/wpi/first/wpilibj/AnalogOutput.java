@@ -50,10 +50,20 @@ public class AnalogOutput implements Sendable, AutoCloseable {
     return m_channel;
   }
 
+  /**
+   * Set the value of the analog output.
+   *
+   * @param voltage The output value in Volts, from 0.0 to +5.0.
+   */
   public void setVoltage(double voltage) {
     AnalogJNI.setAnalogOutput(m_port, voltage);
   }
 
+  /**
+   * Get the voltage of the analog output.
+   *
+   * @return The value in Volts, from 0.0 to +5.0.
+   */
   public double getVoltage() {
     return AnalogJNI.getAnalogOutput(m_port);
   }

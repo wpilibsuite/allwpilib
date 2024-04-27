@@ -11,11 +11,17 @@ import edu.wpi.first.util.PixelFormat;
  * (e.g. from a stereo or depth camera); these are called channels.
  */
 public class VideoSource implements AutoCloseable {
+  /** Video source kind. */
   public enum Kind {
+    /** Unknown video source. */
     kUnknown(0),
+    /** USB video source. */
     kUsb(1),
+    /** HTTP video source. */
     kHttp(2),
+    /** CV video source. */
     kCv(4),
+    /** Raw video source. */
     kRaw(8);
 
     private final int value;
@@ -24,6 +30,11 @@ public class VideoSource implements AutoCloseable {
       this.value = value;
     }
 
+    /**
+     * Returns the Kind value.
+     *
+     * @return The Kind value.
+     */
     public int getValue() {
       return value;
     }
@@ -51,6 +62,11 @@ public class VideoSource implements AutoCloseable {
       this.value = value;
     }
 
+    /**
+     * Returns the ConnectionStrategy value.
+     *
+     * @return The ConnectionStrategy value.
+     */
     public int getValue() {
       return value;
     }
@@ -70,11 +86,18 @@ public class VideoSource implements AutoCloseable {
         return Kind.kHttp;
       case 4:
         return Kind.kCv;
+      case 8:
+        return Kind.kRaw;
       default:
         return Kind.kUnknown;
     }
   }
 
+  /**
+   * Constructs a VideoSource.
+   *
+   * @param handle The video source handle.
+   */
   protected VideoSource(int handle) {
     m_handle = handle;
   }
@@ -87,10 +110,20 @@ public class VideoSource implements AutoCloseable {
     m_handle = 0;
   }
 
+  /**
+   * Returns true if the VideoSource is valid.
+   *
+   * @return True if the VideoSource is valid.
+   */
   public boolean isValid() {
     return m_handle != 0;
   }
 
+  /**
+   * Returns the video source handle.
+   *
+   * @return The video source handle.
+   */
   public int getHandle() {
     return m_handle;
   }
@@ -374,5 +407,6 @@ public class VideoSource implements AutoCloseable {
     return rv;
   }
 
+  /** Video source handle. */
   protected int m_handle;
 }

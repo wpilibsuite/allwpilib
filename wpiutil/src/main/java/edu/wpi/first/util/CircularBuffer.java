@@ -4,7 +4,11 @@
 
 package edu.wpi.first.util;
 
-/** This is a simple circular buffer so we don't need to "bucket brigade" copy old values. */
+/**
+ * This is a simple circular buffer so we don't need to "bucket brigade" copy old values.
+ *
+ * @param <T> Buffer element type.
+ */
 public class CircularBuffer<T> {
   private T[] m_data;
 
@@ -17,7 +21,7 @@ public class CircularBuffer<T> {
   /**
    * Create a CircularBuffer with the provided size.
    *
-   * @param size The size of the circular buffer.
+   * @param size Maximum number of buffer elements.
    */
   @SuppressWarnings("unchecked")
   public CircularBuffer(int size) {
@@ -49,7 +53,6 @@ public class CircularBuffer<T> {
    * @throws IndexOutOfBoundsException if the index is out of range (index &lt; 0 || index &gt;=
    *     size())
    */
-  @SuppressWarnings("unchecked")
   public T getLast() {
     // If there are no elements in the buffer, do nothing
     if (m_length == 0) {
@@ -107,7 +110,6 @@ public class CircularBuffer<T> {
    * @throws IndexOutOfBoundsException if the index is out of range (index &lt; 0 || index &gt;=
    *     size())
    */
-  @SuppressWarnings("unchecked")
   public T removeFirst() {
     // If there are no elements in the buffer, do nothing
     if (m_length == 0) {
@@ -127,7 +129,6 @@ public class CircularBuffer<T> {
    * @throws IndexOutOfBoundsException if the index is out of range (index &lt; 0 || index &gt;=
    *     size())
    */
-  @SuppressWarnings("unchecked")
   public T removeLast() {
     // If there are no elements in the buffer, do nothing
     if (m_length == 0) {

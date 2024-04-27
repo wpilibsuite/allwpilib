@@ -20,6 +20,9 @@
 #include "units/voltage.h"
 
 namespace frc {
+/**
+ * Linear system ID utility functions.
+ */
 class WPILIB_DLLEXPORT LinearSystemId {
  public:
   template <typename Distance>
@@ -76,7 +79,7 @@ class WPILIB_DLLEXPORT LinearSystemId {
    *
    * @param kV The velocity gain, in volts/(unit/sec).
    * @param kA The acceleration gain, in volts/(unit/sec²).
-   * @throws std::domain_error if kV <= 0 or kA <= 0.
+   * @throws std::domain_error if kV < 0 or kA <= 0.
    * @see <a
    * href="https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
    */
@@ -86,8 +89,8 @@ class WPILIB_DLLEXPORT LinearSystemId {
   static LinearSystem<1, 1, 1> IdentifyVelocitySystem(
       decltype(1_V / Velocity_t<Distance>(1)) kV,
       decltype(1_V / Acceleration_t<Distance>(1)) kA) {
-    if (kV <= decltype(kV){0}) {
-      throw std::domain_error("Kv must be greater than zero.");
+    if (kV < decltype(kV){0}) {
+      throw std::domain_error("Kv must be greater than or equal to zero.");
     }
     if (kA <= decltype(kA){0}) {
       throw std::domain_error("Ka must be greater than zero.");
@@ -119,7 +122,7 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * @param kV The velocity gain, in volts/(unit/sec).
    * @param kA The acceleration gain, in volts/(unit/sec²).
    *
-   * @throws std::domain_error if kV <= 0 or kA <= 0.
+   * @throws std::domain_error if kV < 0 or kA <= 0.
    * @see <a
    * href="https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
    */
@@ -129,8 +132,8 @@ class WPILIB_DLLEXPORT LinearSystemId {
   static LinearSystem<2, 1, 1> IdentifyPositionSystem(
       decltype(1_V / Velocity_t<Distance>(1)) kV,
       decltype(1_V / Acceleration_t<Distance>(1)) kA) {
-    if (kV <= decltype(kV){0}) {
-      throw std::domain_error("Kv must be greater than zero.");
+    if (kV < decltype(kV){0}) {
+      throw std::domain_error("Kv must be greater than or equal to zero.");
     }
     if (kA <= decltype(kA){0}) {
       throw std::domain_error("Ka must be greater than zero.");
@@ -248,7 +251,7 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * @param kV The velocity gain, in volts/(unit/sec).
    * @param kA The acceleration gain, in volts/(unit/sec²).
    *
-   * @throws std::domain_error if kV <= 0 or kA <= 0.
+   * @throws std::domain_error if kV < 0 or kA <= 0.
    */
   template <typename Distance>
     requires std::same_as<units::meter, Distance> ||
@@ -256,8 +259,8 @@ class WPILIB_DLLEXPORT LinearSystemId {
   static LinearSystem<2, 1, 2> DCMotorSystem(
       decltype(1_V / Velocity_t<Distance>(1)) kV,
       decltype(1_V / Acceleration_t<Distance>(1)) kA) {
-    if (kV <= decltype(kV){0}) {
-      throw std::domain_error("Kv must be greater than zero.");
+    if (kV < decltype(kV){0}) {
+      throw std::domain_error("Kv must be greater than or equal to zero.");
     }
     if (kA <= decltype(kA){0}) {
       throw std::domain_error("Ka must be greater than zero.");

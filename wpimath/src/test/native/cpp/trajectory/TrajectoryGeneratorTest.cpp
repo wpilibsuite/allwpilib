@@ -52,6 +52,6 @@ TEST(TrajectoryGenerationTest, CurvatureOptimization) {
       TrajectoryConfig{12_fps, 12_fps_sq});
 
   for (size_t i = 1; i < t.States().size() - 1; ++i) {
-    EXPECT_NE(0, t.States()[i].curvature.to<double>());
+    EXPECT_NE(0, t.States()[i].curvature.value());
   }
 }

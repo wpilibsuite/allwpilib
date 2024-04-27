@@ -7,9 +7,6 @@
 
 #include <wpi/timestamp.h>
 
-#include <opencv2/core/core.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-
 @implementation UsbCameraDelegate
 
 - (id)init {
@@ -23,6 +20,8 @@
   (void)captureOutput;
   (void)sampleBuffer;
   (void)connection;
+
+  auto currentTime = wpi::Now();
 
   auto sharedThis = self.cppImpl.lock();
   if (!sharedThis) {
@@ -52,16 +51,12 @@
     return;
   }
 
-  size_t currSize = width * 3 * height;
-
-  auto tmpMat = cv::Mat(height, width, CV_8UC4, baseaddress, rowBytes);
-  auto image = sharedThis->AllocImage(cs::VideoMode::PixelFormat::kBGR, width,
-                                      height, currSize);
-  cv::cvtColor(tmpMat, image->AsMat(), cv::COLOR_BGRA2BGR);
+  std::unique_ptr<cs::Image> image = cs::CreateImageFromBGRA(
+      sharedThis.get(), width, height, rowBytes, reinterpret_cast<uint8_t*>(baseaddress));
 
   CVPixelBufferUnlockBaseAddress(imageBuffer, 0);
 
-  sharedThis->objcPutFrame(std::move(image), wpi::Now());
+  sharedThis->objcPutFrame(std::move(image), currentTime);
 }
 
 @end

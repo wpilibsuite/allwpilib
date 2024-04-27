@@ -20,7 +20,8 @@
 template <typename Unit, typename CharT>
 struct fmt::formatter<Unit, CharT,
                       std::enable_if_t<units::traits::is_unit_t_v<Unit>>> {
-  constexpr auto parse(fmt::format_parse_context& ctx) {
+  template <typename ParseContext>
+  constexpr auto parse(ParseContext& ctx) {
     return m_underlying.parse(ctx);
   }
 
@@ -30,7 +31,8 @@ struct fmt::formatter<Unit, CharT,
    * @param obj Unit instance.
    * @param ctx Format string context.
    */
-  auto format(const Unit& obj, fmt::format_context& ctx) const {
+  template <typename FmtContext>
+  auto format(const Unit& obj, FmtContext& ctx) const {
     using Units = typename Unit::unit_type;
     using BaseUnits =
         units::unit<std::ratio<1>,

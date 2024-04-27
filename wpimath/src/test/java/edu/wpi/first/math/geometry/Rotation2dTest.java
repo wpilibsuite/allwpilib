@@ -112,6 +112,6 @@ class Rotation2dTest {
     rot1 = Rotation2d.fromDegrees(170);
     rot2 = Rotation2d.fromDegrees(-160);
     interpolated = rot1.interpolate(rot2, 0.5);
-    assertEquals(-175.0, interpolated.getDegrees());
+    assertEquals(-175.0, interpolated.getDegrees(), kEpsilon);
   }
 }

@@ -26,6 +26,7 @@ target_include_directories(
 )
 
 install(TARGETS libglass EXPORT libglass)
+export(TARGETS libglass FILE libglass.cmake NAMESPACE libglass::)
 install(DIRECTORY src/lib/native/include/ DESTINATION "${include_dest}/glass")
 
 #
@@ -50,6 +51,7 @@ target_include_directories(
 )
 
 install(TARGETS libglassnt EXPORT libglassnt)
+export(TARGETS libglassnt FILE libglassnt.cmake NAMESPACE libglassnt::)
 install(DIRECTORY src/libnt/native/include/ DESTINATION "${include_dest}/glass")
 
 #

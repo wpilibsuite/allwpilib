@@ -26,6 +26,11 @@ public interface Nat<T extends Num> {
    */
   int getNum();
 {% for num in nums %}
+  /**
+   * Returns the Nat instance for {{ num }}.
+   *
+   * @return The Nat instance for {{ num }}.
+   */
   static Nat<N{{ num }}> N{{ num }}() {
     return N{{ num }}.instance;
   }

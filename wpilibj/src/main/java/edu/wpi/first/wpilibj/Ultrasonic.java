@@ -108,6 +108,11 @@ public class Ultrasonic implements Sendable, AutoCloseable {
     SendableRegistry.addLW(this, "Ultrasonic", m_echoChannel.getChannel());
   }
 
+  /**
+   * Returns the echo channel.
+   *
+   * @return The echo channel.
+   */
   public int getEchoChannel() {
     return m_echoChannel.getChannel();
   }

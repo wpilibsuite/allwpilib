@@ -247,6 +247,43 @@ public class LinearFilter {
   }
 
   /**
+   * Resets the filter state, initializing internal buffers to the provided values.
+   *
+   * <p>These are the expected lengths of the buffers, depending on what type of linear filter used:
+   *
+   * <table>
+   * <tr><th>Type</th><th>Input Buffer Length</th><th>Output Buffer Length</th></tr>
+   * <tr><td>Unspecified</td><td>length of {@code ffGains}</td><td>length of {@code fbGains}</td>
+   * </tr>
+   * <tr><td>Single Pole IIR</td><td>1</td><td>1</td></tr>
+   * <tr><td>High-Pass</td><td>2</td><td>1</td></tr>
+   * <tr><td>Moving Average</td><td>{@code taps}</td><td>0</td></tr>
+   * <tr><td>Finite Difference</td><td>length of {@code stencil}</td><td>0</td></tr>
+   * <tr><td>Backward Finite Difference</td><td>{@code samples}</td><td>0</td></tr>
+   * </table>
+   *
+   * @param inputBuffer Values to initialize input buffer.
+   * @param outputBuffer Values to initialize output buffer.
+   * @throws IllegalArgumentException if length of inputBuffer or outputBuffer does not match the
+   *     length of ffGains and fbGains provided in the constructor.
+   */
+  public void reset(double[] inputBuffer, double[] outputBuffer) {
+    // Clear buffers
+    reset();
+
+    if (inputBuffer.length != m_inputGains.length || outputBuffer.length != m_outputGains.length) {
+      throw new IllegalArgumentException("Incorrect length of inputBuffer or outputBuffer");
+    }
+
+    for (double input : inputBuffer) {
+      m_inputs.addFirst(input);
+    }
+    for (double output : outputBuffer) {
+      m_outputs.addFirst(output);
+    }
+  }
+
+  /**
    * Calculates the next value of the filter.
    *
    * @param input Current input value.
@@ -274,6 +311,15 @@ public class LinearFilter {
     }
 
     return retVal;
+  }
+
+  /**
+   * Returns the last value calculated by the LinearFilter.
+   *
+   * @return The last value.
+   */
+  public double lastValue() {
+    return m_outputs.getFirst();
   }
 
   /**

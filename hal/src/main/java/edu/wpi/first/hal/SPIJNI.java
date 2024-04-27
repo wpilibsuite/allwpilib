@@ -302,4 +302,7 @@ public class SPIJNI extends JNIWrapper {
    */
   public static native void spiConfigureAutoStall(
       int port, int csToSclkTicks, int stallTicks, int pow2BytesPerRead);
+
+  /** Utility class. */
+  private SPIJNI() {}
 }

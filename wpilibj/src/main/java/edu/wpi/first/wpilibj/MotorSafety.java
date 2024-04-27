@@ -186,7 +186,13 @@ public abstract class MotorSafety {
     }
   }
 
+  /** Called to stop the motor when the timeout expires. */
   public abstract void stopMotor();
 
+  /**
+   * Returns a description to print when an error occurs.
+   *
+   * @return Description to print when an error occurs.
+   */
   public abstract String getDescription();
 }

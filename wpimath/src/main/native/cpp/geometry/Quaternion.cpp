@@ -8,8 +8,6 @@
 
 #include <wpi/json.h>
 
-#include "geometry3d.pb.h"
-
 using namespace frc;
 
 Quaternion::Quaternion(double w, double x, double y, double z)
@@ -138,11 +136,12 @@ Quaternion Quaternion::Log(const Quaternion& other) const {
 }
 
 Quaternion Quaternion::Log() const {
-  double scalar = std::log(Norm());
+  double norm = Norm();
+  double scalar = std::log(norm);
 
   double v_norm = m_v.norm();
 
-  double s_norm = W() / Norm();
+  double s_norm = W() / norm;
 
   if (std::abs(s_norm + 1) < 1e-9) {
     return Quaternion{scalar, -std::numbers::pi, 0, 0};

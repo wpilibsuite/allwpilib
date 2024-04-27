@@ -170,7 +170,10 @@ class CAN {
    */
   static uint64_t GetTimestampBaseTime();
 
+  /// Team manufacturer.
   static constexpr HAL_CANManufacturer kTeamManufacturer = HAL_CAN_Man_kTeamUse;
+
+  /// Team device type.
   static constexpr HAL_CANDeviceType kTeamDeviceType =
       HAL_CAN_Dev_kMiscellaneous;
 

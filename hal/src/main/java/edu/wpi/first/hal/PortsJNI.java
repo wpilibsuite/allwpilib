@@ -185,4 +185,7 @@ public class PortsJNI extends JNIWrapper {
    * @see "HAL_GetNumREVPHChannels"
    */
   public static native int getNumREVPHChannels();
+
+  /** Utility class. */
+  private PortsJNI() {}
 }

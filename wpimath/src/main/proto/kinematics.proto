@@ -21,6 +21,11 @@ message ProtobufDifferentialDriveWheelSpeeds {
   double right = 2;
 }
 
+message ProtobufDifferentialDriveWheelPositions {
+  double left = 1;
+  double right = 2;
+}
+
 message ProtobufMecanumDriveKinematics {
   ProtobufTranslation2d front_left = 1;
   ProtobufTranslation2d front_right = 2;

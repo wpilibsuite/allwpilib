@@ -4,34 +4,27 @@
 
 package edu.wpi.first.wpilibj.examples.gearsbot.subsystems;
 
+import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.examples.gearsbot.Constants.DriveConstants;
 import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
-import edu.wpi.first.wpilibj.motorcontrol.MotorController;
-import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Drivetrain extends SubsystemBase {
-  /**
-   * The Drivetrain subsystem incorporates the sensors and actuators attached to the robots chassis.
-   * These include four drive motors, a left and right encoder and a gyro.
-   */
-  private final MotorController m_leftMotor =
-      new MotorControllerGroup(
-          new PWMSparkMax(DriveConstants.kLeftMotorPort1),
-          new PWMSparkMax(DriveConstants.kLeftMotorPort1));
+  // The Drivetrain subsystem incorporates the sensors and actuators attached to the robots chassis.
+  // These include four drive motors, a left and right encoder and a gyro.
+  private final PWMSparkMax m_leftLeader = new PWMSparkMax(DriveConstants.kLeftMotorPort1);
+  private final PWMSparkMax m_leftFollower = new PWMSparkMax(DriveConstants.kLeftMotorPort2);
+  private final PWMSparkMax m_rightLeader = new PWMSparkMax(DriveConstants.kRightMotorPort1);
+  private final PWMSparkMax m_rightFollower = new PWMSparkMax(DriveConstants.kRightMotorPort2);
 
-  private final MotorController m_rightMotor =
-      new MotorControllerGroup(
-          new PWMSparkMax(DriveConstants.kRightMotorPort2),
-          new PWMSparkMax(DriveConstants.kLeftMotorPort2));
-
-  private final DifferentialDrive m_drive = new DifferentialDrive(m_leftMotor, m_rightMotor);
+  private final DifferentialDrive m_drive =
+      new DifferentialDrive(m_leftLeader::set, m_rightLeader::set);
 
   private final Encoder m_leftEncoder =
       new Encoder(
@@ -50,10 +43,16 @@ public class Drivetrain extends SubsystemBase {
   public Drivetrain() {
     super();
 
+    SendableRegistry.addChild(m_drive, m_leftLeader);
+    SendableRegistry.addChild(m_drive, m_rightLeader);
+
+    m_leftLeader.addFollower(m_leftFollower);
+    m_rightLeader.addFollower(m_rightFollower);
+
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
-    m_rightMotor.setInverted(true);
+    m_rightLeader.setInverted(true);
 
     // Encoders may measure differently in the real world and in
     // simulation. In this example the robot moves 0.042 barleycorns

@@ -218,10 +218,8 @@ class AnalogGyro : public wpi::Sendable,
 
   void InitSendable(wpi::SendableBuilder& builder) override;
 
- protected:
-  std::shared_ptr<AnalogInput> m_analog;
-
  private:
+  std::shared_ptr<AnalogInput> m_analog;
   hal::Handle<HAL_GyroHandle> m_gyroHandle;
 };
 

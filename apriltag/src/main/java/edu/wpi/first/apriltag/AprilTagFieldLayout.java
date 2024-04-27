@@ -16,6 +16,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,8 +45,11 @@ import java.util.Optional;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class AprilTagFieldLayout {
+  /** Common origin positions for the AprilTag coordinate system. */
   public enum OriginPosition {
+    /** Blue alliance wall, right side. */
     kBlueAllianceWallRightSide,
+    /** Red alliance wall, right side. */
     kRedAllianceWallRightSide,
   }
 
@@ -216,6 +220,29 @@ public class AprilTagFieldLayout {
    */
   public void serialize(Path path) throws IOException {
     new ObjectMapper().writeValue(path.toFile(), this);
+  }
+
+  /**
+   * Get an official {@link AprilTagFieldLayout}.
+   *
+   * @param field The loadable AprilTag field layout.
+   * @return AprilTagFieldLayout of the field.
+   * @throws UncheckedIOException If the layout does not exist.
+   */
+  public static AprilTagFieldLayout loadField(AprilTagFields field) {
+    if (field.m_fieldLayout == null) {
+      try {
+        field.m_fieldLayout = loadFromResource(field.m_resourceFile);
+      } catch (IOException e) {
+        throw new UncheckedIOException(
+            "Could not load AprilTagFieldLayout from " + field.m_resourceFile, e);
+      }
+    }
+    // Copy layout because the layout's origin is mutable
+    return new AprilTagFieldLayout(
+        field.m_fieldLayout.getTags(),
+        field.m_fieldLayout.getFieldLength(),
+        field.m_fieldLayout.getFieldWidth());
   }
 
   /**

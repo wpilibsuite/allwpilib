@@ -19,22 +19,38 @@ import edu.wpi.first.wpilibj.event.EventLoop;
 public class StadiaController extends GenericHID {
   /** Represents a digital button on a StadiaController. */
   public enum Button {
+    /** A button. */
     kA(1),
+    /** B button. */
     kB(2),
+    /** X Button. */
     kX(3),
+    /** Y Button. */
     kY(4),
+    /** Left bumper button. */
     kLeftBumper(5),
+    /** Right bumper button. */
     kRightBumper(6),
+    /** Left stick button. */
     kLeftStick(7),
+    /** Right stick button. */
     kRightStick(8),
+    /** Ellipses button. */
     kEllipses(9),
+    /** Hamburger button. */
     kHamburger(10),
+    /** Stadia button. */
     kStadia(11),
+    /** Right trigger button. */
     kRightTrigger(12),
+    /** Left trigger button. */
     kLeftTrigger(13),
+    /** Google button. */
     kGoogle(14),
+    /** Frame button. */
     kFrame(15);
 
+    /** Button value. */
     public final int value;
 
     Button(int value) {
@@ -61,11 +77,16 @@ public class StadiaController extends GenericHID {
 
   /** Represents an axis on a StadiaController. */
   public enum Axis {
+    /** Left X axis. */
     kLeftX(0),
+    /** Right X axis. */
     kRightX(3),
+    /** Left Y axis. */
     kLeftY(1),
+    /** Right Y axis. */
     kRightY(4);
 
+    /** Axis value. */
     public final int value;
 
     Axis(int value) {

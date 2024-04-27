@@ -374,6 +374,14 @@ struct PubSubOptions {
    * internal publisher.
    */
   bool excludeSelf = false;
+
+  /**
+   * For subscriptions, don't share the existence of the subscription with the
+   * network. Note this means updates will not be received from the network
+   * unless another subscription overlaps with this one, and the subscription
+   * will not appear in metatopics.
+   */
+  bool hidden = false;
 };
 
 /**
@@ -527,6 +535,18 @@ unsigned int GetEntryFlags(NT_Entry entry);
  * @return entry value array
  */
 std::vector<Value> ReadQueueValue(NT_Handle subentry);
+
+/**
+ * Read Entry Queue.
+ *
+ * Returns new entry values since last call.
+ *
+ * @param subentry     subscriber or entry handle
+ * @param types        bitmask of NT_Type values; 0 is treated specially
+ *                     as a "don't care"
+ * @return entry value array
+ */
+std::vector<Value> ReadQueueValue(NT_Handle subentry, unsigned int types);
 
 /** @} */
 

@@ -6,6 +6,7 @@ package edu.wpi.first.hal.simulation;
 
 import edu.wpi.first.hal.JNIWrapper;
 
+/** JNI for relay data. */
 public class RelayDataJNI extends JNIWrapper {
   public static native int registerInitializedForwardCallback(
       int index, NotifyCallback callback, boolean initialNotify);
@@ -44,4 +45,7 @@ public class RelayDataJNI extends JNIWrapper {
   public static native void setReverse(int index, boolean reverse);
 
   public static native void resetData(int index);
+
+  /** Utility class. */
+  private RelayDataJNI() {}
 }

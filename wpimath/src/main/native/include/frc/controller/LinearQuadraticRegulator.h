@@ -40,6 +40,7 @@ class LinearQuadraticRegulator {
    * https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-intro.html#lqr-tuning
    * for how to select the tolerances.
    *
+   * @tparam Outputs Number of outputs.
    * @param plant  The plant being controlled.
    * @param Qelems The maximum desired error tolerance for each state.
    * @param Relems The maximum desired control effort for each input.

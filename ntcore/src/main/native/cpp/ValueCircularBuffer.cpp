@@ -6,10 +6,13 @@
 
 using namespace nt;
 
-std::vector<Value> ValueCircularBuffer::ReadValue() {
+std::vector<Value> ValueCircularBuffer::ReadValue(unsigned int types) {
   std::vector<Value> rv;
   rv.reserve(m_storage.size());
   for (auto&& val : m_storage) {
+    if (types != 0 && (types & val.type()) == 0) {
+      continue;
+    }
     rv.emplace_back(std::move(val));
   }
   m_storage.reset();

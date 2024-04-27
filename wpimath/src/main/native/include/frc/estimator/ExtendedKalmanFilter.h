@@ -33,9 +33,9 @@ namespace frc {
  * https://file.tavsys.net/control/controls-engineering-in-frc.pdf chapter 9
  * "Stochastic control theory".
  *
- * @tparam States The number of states.
- * @tparam Inputs The number of inputs.
- * @tparam Outputs The number of outputs.
+ * @tparam States Number of states.
+ * @tparam Inputs Number of inputs.
+ * @tparam Outputs Number of outputs.
  */
 template <int States, int Inputs, int Outputs>
 class ExtendedKalmanFilter {

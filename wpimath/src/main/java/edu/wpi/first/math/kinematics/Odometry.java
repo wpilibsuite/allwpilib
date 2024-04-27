@@ -15,6 +15,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
  *
  * <p>Teams can use odometry during the autonomous period for complex tasks like path following.
  * Furthermore, odometry can be used for latency compensation when using computer-vision systems.
+ *
+ * @param <T> Wheel positions type.
  */
 public class Odometry<T extends WheelPositions<T>> {
   private final Kinematics<?, T> m_kinematics;

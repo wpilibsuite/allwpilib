@@ -362,9 +362,9 @@ class Rotation3dTest {
     rot1 = new Rotation3d(xAxis, Units.degreesToRadians(170));
     rot2 = new Rotation3d(xAxis, Units.degreesToRadians(-160));
     interpolated = rot1.interpolate(rot2, 0.5);
-    assertEquals(Units.degreesToRadians(-175.0), interpolated.getX());
+    assertEquals(Units.degreesToRadians(-175.0), interpolated.getX(), kEpsilon);
     assertEquals(Units.degreesToRadians(0.0), interpolated.getY(), kEpsilon);
-    assertEquals(Units.degreesToRadians(0.0), interpolated.getZ());
+    assertEquals(Units.degreesToRadians(0.0), interpolated.getZ(), kEpsilon);
 
     // 50 + (70 - 50) * 0.5 = 60
     rot1 = new Rotation3d(yAxis, Units.degreesToRadians(50));

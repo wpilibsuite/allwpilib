@@ -66,12 +66,13 @@ target_include_directories(
         $<INSTALL_INTERFACE:${include_dest}/romiVendordep>
 )
 
-install(TARGETS romiVendordep EXPORT romiVendordep DESTINATION "${main_lib_dest}")
+install(TARGETS romiVendordep EXPORT romivendordep DESTINATION "${main_lib_dest}")
+export(TARGETS romiVendordep FILE romivendordep.cmake NAMESPACE romivendordep::)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/romiVendordep")
 
-configure_file(romiVendordep-config.cmake.in ${WPILIB_BINARY_DIR}/romiVendordep-config.cmake)
-install(FILES ${WPILIB_BINARY_DIR}/romiVendordep-config.cmake DESTINATION share/romiVendordep)
-install(EXPORT romiVendordep DESTINATION share/romiVendordep)
+configure_file(romivendordep-config.cmake.in ${WPILIB_BINARY_DIR}/romivendordep-config.cmake)
+install(FILES ${WPILIB_BINARY_DIR}/romivendordep-config.cmake DESTINATION share/romiVendordep)
+install(EXPORT romivendordep DESTINATION share/romiVendordep)
 
 if(WITH_TESTS)
     wpilib_add_test(romiVendordep src/test/native/cpp)

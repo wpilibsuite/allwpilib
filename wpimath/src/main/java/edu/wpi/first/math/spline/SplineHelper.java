@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import org.ejml.simple.SimpleMatrix;
 
+/** Helper class that is used to generate cubic and quintic splines from user provided waypoints. */
 public final class SplineHelper {
   /** Private constructor because this is a utility class. */
   private SplineHelper() {}

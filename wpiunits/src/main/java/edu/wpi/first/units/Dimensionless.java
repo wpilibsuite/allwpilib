@@ -15,7 +15,7 @@ public class Dimensionless extends Unit<Dimensionless> {
    * @param name the name of the unit
    * @param symbol the symbol of the unit
    */
-  protected Dimensionless(double baseUnitEquivalent, String name, String symbol) {
+  Dimensionless(double baseUnitEquivalent, String name, String symbol) {
     super(Dimensionless.class, baseUnitEquivalent, name, symbol);
   }
 

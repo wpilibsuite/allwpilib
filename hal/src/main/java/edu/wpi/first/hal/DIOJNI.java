@@ -178,4 +178,7 @@ public class DIOJNI extends JNIWrapper {
    * @see "HAL_SetDigitalPWMOutputChannel"
    */
   public static native void setDigitalPWMOutputChannel(int pwmGenerator, int channel);
+
+  /** Utility class. */
+  DIOJNI() {}
 }

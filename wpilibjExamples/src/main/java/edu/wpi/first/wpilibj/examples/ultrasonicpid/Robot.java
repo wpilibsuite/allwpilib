@@ -6,6 +6,7 @@ package edu.wpi.first.wpilibj.examples.ultrasonicpid;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.MedianFilter;
+import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Ultrasonic;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -40,8 +41,14 @@ public class Robot extends TimedRobot {
   private final Ultrasonic m_ultrasonic = new Ultrasonic(kUltrasonicPingPort, kUltrasonicEchoPort);
   private final PWMSparkMax m_leftMotor = new PWMSparkMax(kLeftMotorPort);
   private final PWMSparkMax m_rightMotor = new PWMSparkMax(kRightMotorPort);
-  private final DifferentialDrive m_robotDrive = new DifferentialDrive(m_leftMotor, m_rightMotor);
+  private final DifferentialDrive m_robotDrive =
+      new DifferentialDrive(m_leftMotor::set, m_rightMotor::set);
   private final PIDController m_pidController = new PIDController(kP, kI, kD);
+
+  public Robot() {
+    SendableRegistry.addChild(m_robotDrive, m_leftMotor);
+    SendableRegistry.addChild(m_robotDrive, m_rightMotor);
+  }
 
   @Override
   public void autonomousInit() {

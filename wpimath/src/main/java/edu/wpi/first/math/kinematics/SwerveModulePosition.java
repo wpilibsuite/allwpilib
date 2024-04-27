@@ -29,8 +29,11 @@ public class SwerveModulePosition
   /** Angle of the module. */
   public Rotation2d angle = Rotation2d.fromDegrees(0);
 
-  public static final SwerveModulePositionStruct struct = new SwerveModulePositionStruct();
+  /** SwerveModulePosition protobuf for serialization. */
   public static final SwerveModulePositionProto proto = new SwerveModulePositionProto();
+
+  /** SwerveModulePosition struct for serialization. */
+  public static final SwerveModulePositionStruct struct = new SwerveModulePositionStruct();
 
   /** Constructs a SwerveModulePosition with zeros for distance and angle. */
   public SwerveModulePosition() {}

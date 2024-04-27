@@ -92,38 +92,51 @@ static void CheckOLSDataQuality(const Eigen::MatrixXd& X,
 
   constexpr double threshold = 10.0;
 
-  // For n x n matrix XᵀX, need n - 1 nonzero eigenvalues for good fit
+  // For n x n matrix XᵀX, need n nonzero eigenvalues for good fit
   for (int row = 0; row < eigvals.rows(); ++row) {
-    if (std::abs(eigvals(row)) <= threshold) {
-      // Find row of eigenvector with largest magnitude. This determines which
-      // gain is rank-deficient
-      int maxIndex;
-      eigvecs.col(row).cwiseAbs().maxCoeff(&maxIndex);
+    // Find row of eigenvector with largest magnitude. This determines the
+    // primary regression variable that corresponds to the eigenvalue.
+    int maxIndex;
+    double maxCoeff = eigvecs.col(row).cwiseAbs().maxCoeff(&maxIndex);
 
-      // Fit for α is rank-deficient
+    // Check whether the eigenvector component along the regression variable's
+    // direction is below the threshold. If it is, the regression variable's fit
+    // is bad.
+    if (std::abs(eigvals(row) * maxCoeff) <= threshold) {
+      // Fit for α is bad
       if (maxIndex == 0) {
+        // Affects Kv
         badGains.set(1);
       }
-      // Fit for β is rank-deficient
+
+      // Fit for β is bad
       if (maxIndex == 1) {
+        // Affects all gains
         badGains.set();
         break;
       }
-      // Fit for γ is rank-deficient
+
+      // Fit for γ is bad
       if (maxIndex == 2) {
+        // Affects Ks
         badGains.set(0);
       }
-      // Fit for δ is rank-deficient
+
+      // Fit for δ is bad
       if (maxIndex == 3) {
         if (type == analysis::kElevator) {
+          // Affects Kg
           badGains.set(3);
         } else if (type == analysis::kArm) {
+          // Affects Kg and offset
           badGains.set(3);
           badGains.set(4);
         }
       }
-      // Fit for ε is rank-deficient
+
+      // Fit for ε is bad
       if (maxIndex == 4) {
+        // Affects Kg and offset
         badGains.set(3);
         badGains.set(4);
       }

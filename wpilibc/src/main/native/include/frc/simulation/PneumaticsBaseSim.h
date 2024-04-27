@@ -177,9 +177,22 @@ class PneumaticsBaseSim {
   virtual void ResetData() = 0;
 
  protected:
+  /// PneumaticsBase index.
   const int m_index;
-  explicit PneumaticsBaseSim(const PneumaticsBase& module);
+
+  /**
+   * Constructs a PneumaticsBaseSim with the given index.
+   *
+   * @param index The index.
+   */
   explicit PneumaticsBaseSim(const int index);
+
+  /**
+   * Constructs a PneumaticsBaseSim for the given module.
+   *
+   * @param module The module.
+   */
+  explicit PneumaticsBaseSim(const PneumaticsBase& module);
 };
 
 }  // namespace frc::sim

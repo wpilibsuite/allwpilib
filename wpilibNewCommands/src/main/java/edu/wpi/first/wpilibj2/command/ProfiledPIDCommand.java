@@ -21,9 +21,16 @@ import java.util.function.Supplier;
  * <p>This class is provided by the NewCommands VendorDep
  */
 public class ProfiledPIDCommand extends Command {
+  /** Profiled PID controller. */
   protected final ProfiledPIDController m_controller;
+
+  /** Measurement getter. */
   protected DoubleSupplier m_measurement;
+
+  /** Goal getter. */
   protected Supplier<State> m_goal;
+
+  /** Profiled PID controller output consumer. */
   protected BiConsumer<Double, State> m_useOutput;
 
   /**

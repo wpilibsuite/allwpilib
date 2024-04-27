@@ -10,6 +10,9 @@
 
 namespace frc {
 
+/**
+ * Represents a quaternion.
+ */
 class WPILIB_DLLEXPORT Quaternion {
  public:
   /**

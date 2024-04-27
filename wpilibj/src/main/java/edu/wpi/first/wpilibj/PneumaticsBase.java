@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj;
 
+/** Interface for pneumatics devices. */
 public interface PneumaticsBase extends AutoCloseable {
   /**
    * For internal use to get a module for a specific type.

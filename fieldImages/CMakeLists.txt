@@ -50,3 +50,6 @@ target_include_directories(
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
         $<INSTALL_INTERFACE:${include_dest}/fields>
 )
+
+install(TARGETS fieldImages EXPORT fieldimages)
+export(TARGETS fieldImages FILE fieldimages.cmake NAMESPACE fieldimages::)

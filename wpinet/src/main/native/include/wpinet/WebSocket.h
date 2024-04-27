@@ -458,6 +458,12 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
   void Shutdown();
 
   /**
+   * Gets the last time data was received on the stream.
+   * @return Timestamp
+   */
+  uint64_t GetLastReceivedTime() const { return m_lastReceivedTime; }
+
+  /**
    * Open event.  Emitted when the connection is open and ready to communicate.
    * The parameter is the selected subprotocol.
    */
@@ -521,6 +527,7 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
   State m_state = CONNECTING;
 
   // incoming message buffers/state
+  uint64_t m_lastReceivedTime = 0;
   SmallVector<uint8_t, 14> m_header;
   size_t m_headerSize = 0;
   SmallVector<uint8_t, 1024> m_payload;

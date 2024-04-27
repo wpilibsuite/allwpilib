@@ -17,6 +17,7 @@ import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
 
+/** Represents a quaternion. */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Quaternion implements ProtobufSerializable, StructSerializable {
@@ -284,11 +285,12 @@ public class Quaternion implements ProtobufSerializable, StructSerializable {
    * @return The logarithm of this quaternion.
    */
   public Quaternion log() {
-    var scalar = Math.log(norm());
+    var norm = norm();
+    var scalar = Math.log(norm);
 
     var v_norm = Math.sqrt(getX() * getX() + getY() * getY() + getZ() * getZ());
 
-    var s_norm = getW() / norm();
+    var s_norm = getW() / norm;
 
     if (Math.abs(s_norm + 1) < 1e-9) {
       return new Quaternion(scalar, -Math.PI, 0, 0);
@@ -405,6 +407,9 @@ public class Quaternion implements ProtobufSerializable, StructSerializable {
     return VecBuilder.fill(coeff * getX(), coeff * getY(), coeff * getZ());
   }
 
-  public static final QuaternionStruct struct = new QuaternionStruct();
+  /** Quaternion protobuf for serialization. */
   public static final QuaternionProto proto = new QuaternionProto();
+
+  /** Quaternion struct for serialization. */
+  public static final QuaternionStruct struct = new QuaternionStruct();
 }

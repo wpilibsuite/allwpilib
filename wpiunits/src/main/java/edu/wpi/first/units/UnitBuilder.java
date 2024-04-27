@@ -20,6 +20,12 @@ public final class UnitBuilder<U extends Unit<U>> {
   private String m_name;
   private String m_symbol;
 
+  /**
+   * Creates a new unit builder object, building off of a base unit. The base unit does not have to
+   * be <i>the</i> base unit of its unit system; furlongs work just as well here as meters.
+   *
+   * @param base the unit to base the new unit off of
+   */
   public UnitBuilder(U base) {
     this.m_base = Objects.requireNonNull(base, "Base unit cannot be null");
   }

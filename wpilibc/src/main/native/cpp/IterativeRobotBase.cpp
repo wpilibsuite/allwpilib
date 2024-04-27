@@ -8,6 +8,7 @@
 
 #include <fmt/format.h>
 #include <hal/DriverStation.h>
+#include <hal/FRCUsageReporting.h>
 #include <networktables/NetworkTableInstance.h>
 
 #include "frc/DSControlWord.h"
@@ -97,9 +98,15 @@ void IterativeRobotBase::SetNetworkTablesFlushEnabled(bool enabled) {
 }
 
 void IterativeRobotBase::EnableLiveWindowInTest(bool testLW) {
+  static bool hasReported;
   if (IsTestEnabled()) {
     throw FRC_MakeError(err::IncompatibleMode,
                         "Can't configure test mode while in test mode!");
+  }
+  if (!hasReported && testLW) {
+    HAL_Report(HALUsageReporting::kResourceType_SmartDashboard,
+               HALUsageReporting::kSmartDashboard_LiveWindow);
+    hasReported = true;
   }
   m_lwEnabledInTest = testLW;
 }

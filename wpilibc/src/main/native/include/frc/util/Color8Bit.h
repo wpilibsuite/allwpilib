@@ -115,8 +115,13 @@ class Color8Bit {
          wpi::hexdigit(blue / 16), wpi::hexdigit(blue % 16)}};
   }
 
+  /// Red component (0-255).
   int red = 0;
+
+  /// Green component (0-255).
   int green = 0;
+
+  /// Blue component (0-255).
   int blue = 0;
 };
 

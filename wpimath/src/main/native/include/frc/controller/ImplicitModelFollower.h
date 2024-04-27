@@ -24,6 +24,9 @@ namespace frc {
  *
  * For more on the underlying math, read appendix B.3 in
  * https://file.tavsys.net/control/controls-engineering-in-frc.pdf.
+ *
+ * @tparam States Number of states.
+ * @tparam Inputs Number of inputs.
  */
 template <int States, int Inputs>
 class ImplicitModelFollower {

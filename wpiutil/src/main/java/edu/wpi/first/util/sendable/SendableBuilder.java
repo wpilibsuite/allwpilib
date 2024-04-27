@@ -15,10 +15,14 @@ import java.util.function.LongConsumer;
 import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 
+/** Helper class for building Sendable dashboard representations. */
 public interface SendableBuilder extends AutoCloseable {
   /** The backend kinds used for the sendable builder. */
   enum BackendKind {
+    /** Unknown. */
     kUnknown,
+
+    /** NetworkTables. */
     kNetworkTables
   }
 

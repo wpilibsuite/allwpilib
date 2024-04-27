@@ -6,6 +6,7 @@ package edu.wpi.first.hal.simulation;
 
 import edu.wpi.first.hal.JNIWrapper;
 
+/** JNI for roboRIO data. */
 public class RoboRioDataJNI extends JNIWrapper {
   public static native int registerFPGAButtonCallback(
       NotifyCallback callback, boolean initialNotify);
@@ -186,4 +187,7 @@ public class RoboRioDataJNI extends JNIWrapper {
   public static native void setRadioLEDState(int state);
 
   public static native void resetData();
+
+  /** Utility class. */
+  private RoboRioDataJNI() {}
 }

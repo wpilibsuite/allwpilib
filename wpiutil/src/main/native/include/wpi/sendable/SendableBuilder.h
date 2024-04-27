@@ -15,12 +15,20 @@
 
 namespace wpi {
 
+/**
+ * Helper class for building Sendable dashboard representations.
+ */
 class SendableBuilder {
  public:
   /**
    * The backend kinds used for the sendable builder.
    */
-  enum BackendKind { kUnknown, kNetworkTables };
+  enum BackendKind {
+    /// Unknown.
+    kUnknown,
+    /// NetworkTables.
+    kNetworkTables
+  };
 
   virtual ~SendableBuilder() = default;
 

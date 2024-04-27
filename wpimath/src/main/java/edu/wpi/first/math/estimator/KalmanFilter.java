@@ -28,6 +28,10 @@ import edu.wpi.first.math.system.LinearSystem;
  * <p>For more on the underlying math, read <a
  * href="https://file.tavsys.net/control/controls-engineering-in-frc.pdf">https://file.tavsys.net/control/controls-engineering-in-frc.pdf</a>
  * chapter 9 "Stochastic control theory".
+ *
+ * @param <States> Number of states.
+ * @param <Inputs> Number of inputs.
+ * @param <Outputs> Number of outputs.
  */
 public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extends Num>
     implements KalmanTypeFilter<States, Inputs, Outputs> {

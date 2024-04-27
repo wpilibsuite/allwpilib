@@ -22,6 +22,7 @@ public interface CounterBase {
     /** Count rising and falling on both channels. */
     k4X(2);
 
+    /** EncodingType value. */
     public final int value;
 
     EncodingType(int value) {

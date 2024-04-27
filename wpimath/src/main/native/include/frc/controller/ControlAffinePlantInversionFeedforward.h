@@ -34,8 +34,8 @@ namespace frc {
  * For more on the underlying math, read
  * https://file.tavsys.net/control/controls-engineering-in-frc.pdf.
  *
- * @tparam States The number of states.
- * @tparam Inputs the number of inputs.
+ * @tparam States Number of states.
+ * @tparam Inputs Number of inputs.
  */
 template <int States, int Inputs>
 class ControlAffinePlantInversionFeedforward {

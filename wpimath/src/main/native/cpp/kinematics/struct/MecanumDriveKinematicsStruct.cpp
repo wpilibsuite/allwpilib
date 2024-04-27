@@ -27,8 +27,8 @@ frc::MecanumDriveKinematics StructType::Unpack(std::span<const uint8_t> data) {
 
 void StructType::Pack(std::span<uint8_t> data,
                       const frc::MecanumDriveKinematics& value) {
-  wpi::PackStruct<kFrontLeftOff>(data, value.GetFrontLeftWheel());
-  wpi::PackStruct<kFrontRightOff>(data, value.GetFrontRightWheel());
-  wpi::PackStruct<kRearLeftOff>(data, value.GetRearLeftWheel());
-  wpi::PackStruct<kRearRightOff>(data, value.GetRearRightWheel());
+  wpi::PackStruct<kFrontLeftOff>(data, value.GetFrontLeft());
+  wpi::PackStruct<kFrontRightOff>(data, value.GetFrontRight());
+  wpi::PackStruct<kRearLeftOff>(data, value.GetRearLeft());
+  wpi::PackStruct<kRearRightOff>(data, value.GetRearRight());
 }

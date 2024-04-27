@@ -29,6 +29,7 @@ namespace frc {
  */
 class TimedRobot : public IterativeRobotBase {
  public:
+  /// Default loop period.
   static constexpr auto kDefaultPeriod = 20_ms;
 
   /**

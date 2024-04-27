@@ -40,9 +40,9 @@ void DMA::SetPause(bool pause) {
   FRC_CheckErrorStatus(status, "SetPause");
 }
 
-void DMA::SetTimedTrigger(units::second_t seconds) {
+void DMA::SetTimedTrigger(units::second_t period) {
   int32_t status = 0;
-  HAL_SetDMATimedTrigger(dmaHandle, seconds.value(), &status);
+  HAL_SetDMATimedTrigger(dmaHandle, period.value(), &status);
   FRC_CheckErrorStatus(status, "SetTimedTrigger");
 }
 

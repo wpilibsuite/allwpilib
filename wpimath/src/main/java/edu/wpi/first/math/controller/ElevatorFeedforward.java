@@ -17,12 +17,22 @@ import edu.wpi.first.util.struct.StructSerializable;
  * against the force of gravity).
  */
 public class ElevatorFeedforward implements ProtobufSerializable, StructSerializable {
+  /** The static gain. */
   public final double ks;
+
+  /** The gravity gain. */
   public final double kg;
+
+  /** The velocity gain. */
   public final double kv;
+
+  /** The acceleration gain. */
   public final double ka;
 
+  /** ElevatorFeedforward protobuf for serialization. */
   public static final ElevatorFeedforwardProto proto = new ElevatorFeedforwardProto();
+
+  /** ElevatorFeedforward struct for serialization. */
   public static final ElevatorFeedforwardStruct struct = new ElevatorFeedforwardStruct();
 
   /**
@@ -45,7 +55,7 @@ public class ElevatorFeedforward implements ProtobufSerializable, StructSerializ
       throw new IllegalArgumentException("kv must be a non-negative number, got " + kv + "!");
     }
     if (ka < 0.0) {
-      throw new IllegalArgumentException("ka must be a non-negative number, got " + kv + "!");
+      throw new IllegalArgumentException("ka must be a non-negative number, got " + ka + "!");
     }
   }
 

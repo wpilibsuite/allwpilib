@@ -17,6 +17,11 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Locale;
 import java.util.Scanner;
 
+/**
+ * Loads a native library at runtime.
+ *
+ * @param <T> The class to load.
+ */
 public final class RuntimeLoader<T> {
   private static String defaultExtractionRoot;
 

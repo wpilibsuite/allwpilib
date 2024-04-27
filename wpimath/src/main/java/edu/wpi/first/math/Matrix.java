@@ -27,6 +27,7 @@ import org.ejml.simple.SimpleMatrix;
  * @param <C> The number of columns in this matrix.
  */
 public class Matrix<R extends Num, C extends Num> implements ProtobufSerializable {
+  /** Storage for underlying EJML matrix. */
   protected final SimpleMatrix m_storage;
 
   /**

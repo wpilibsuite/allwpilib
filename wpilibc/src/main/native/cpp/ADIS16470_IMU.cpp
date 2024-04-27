@@ -20,7 +20,7 @@
 
 #include <cmath>
 #include <numbers>
-#include <string>
+#include <utility>
 
 #include <hal/HAL.h>
 #include <wpi/sendable/SendableBuilder.h>
@@ -63,12 +63,12 @@ inline void ADISReportError(int32_t status, const char* file, int line,
  * Constructor.
  */
 ADIS16470_IMU::ADIS16470_IMU()
-    : ADIS16470_IMU(kZ, kY, kX, SPI::Port::kOnboardCS0, CalibrationTime::_4s) {}
+    : ADIS16470_IMU(kZ, kY, kX, SPI::Port::kOnboardCS0, CalibrationTime::_1s) {}
 
 ADIS16470_IMU::ADIS16470_IMU(IMUAxis yaw_axis, IMUAxis pitch_axis,
                              IMUAxis roll_axis)
     : ADIS16470_IMU(yaw_axis, pitch_axis, roll_axis, SPI::Port::kOnboardCS0,
-                    CalibrationTime::_4s) {}
+                    CalibrationTime::_1s) {}
 
 ADIS16470_IMU::ADIS16470_IMU(IMUAxis yaw_axis, IMUAxis pitch_axis,
                              IMUAxis roll_axis, SPI::Port port,
@@ -132,20 +132,60 @@ ADIS16470_IMU::ADIS16470_IMU(IMUAxis yaw_axis, IMUAxis pitch_axis,
       return;
     }
 
+    // Set up flash state variable
+    bool m_needs_flash = false;
+
     // Set IMU internal decimation to 4 (output data rate of 2000 SPS / (4 + 1)
     // = 400Hz)
-    WriteRegister(DEC_RATE, 0x0004);
+    if (ReadRegister(DEC_RATE) != 0x0004) {
+      WriteRegister(DEC_RATE, 0x0004);
+      m_needs_flash = true;
+      REPORT_WARNING(
+          "ADIS16470: DEC_RATE register configuration inconsistent! Scheduling "
+          "flash update.");
+    }
     // Set data ready polarity (HIGH = Good Data), Disable gSense Compensation
     // and PoP
-    WriteRegister(MSC_CTRL, 0x0001);
-    // Configure IMU internal Bartlett filter
-    WriteRegister(FILT_CTRL, 0x0000);
+    if (ReadRegister(MSC_CTRL) != 0x0001) {
+      WriteRegister(MSC_CTRL, 0x0001);
+      m_needs_flash = true;
+      REPORT_WARNING(
+          "ADIS16470: MSC_CTRL register configuration inconsistent! Scheduling "
+          "flash update.");
+    }
+
+    // Disable IMU internal Bartlett filter (200Hz bandwidth is sufficient)
+    if (ReadRegister(FILT_CTRL) != 0x0000) {
+      WriteRegister(FILT_CTRL, 0x0000);
+      m_needs_flash = true;
+      REPORT_WARNING(
+          "ADIS16470: FILT_CTRL register configuration inconsistent! "
+          "Scheduling flash update.");
+    }
+
+    // If any registers on the IMU don't match the config, trigger a flash
+    // update
+    if (m_needs_flash) {
+      REPORT_WARNING(
+          "ADIS16470: Register configuration changed! Starting IMU flash "
+          "update.");
+      WriteRegister(GLOB_CMD, 0x0008);
+      // Wait long enough for the flash update to finish (72ms minimum as per
+      // the datasheet)
+      Wait(0.3_s);
+      REPORT_WARNING("ADIS16470: Flash update finished!");
+      m_needs_flash = false;
+    } else {
+      REPORT_WARNING(
+          "ADIS16470: Flash and RAM configuration consistent. No flash update "
+          "required!");
+    }
+
     // Configure continuous bias calibration time based on user setting
     WriteRegister(NULL_CNFG, m_calibration_time | 0x700);
 
     // Notify DS that IMU calibration delay is active
-    REPORT_WARNING(
-        "ADIS16470 IMU Detected. Starting initial calibration delay.");
+    REPORT_WARNING("ADIS16470: Starting initial calibration delay.");
 
     // Wait for samples to accumulate internal to the IMU (110% of user-defined
     // time)
@@ -171,6 +211,104 @@ ADIS16470_IMU::ADIS16470_IMU(IMUAxis yaw_axis, IMUAxis pitch_axis,
 
   wpi::SendableRegistry::AddLW(this, "ADIS16470", port);
   m_connected = true;
+}
+
+ADIS16470_IMU::ADIS16470_IMU(ADIS16470_IMU&& other)
+    : m_yaw_axis{std::move(other.m_yaw_axis)},
+      m_pitch_axis{std::move(other.m_pitch_axis)},
+      m_roll_axis{std::move(other.m_roll_axis)},
+      m_reset_in{std::move(other.m_reset_in)},
+      m_status_led{std::move(other.m_status_led)},
+      m_integ_angle_x{std::move(other.m_integ_angle_x)},
+      m_integ_angle_y{std::move(other.m_integ_angle_y)},
+      m_integ_angle_z{std::move(other.m_integ_angle_z)},
+      m_gyro_rate_x{std::move(other.m_gyro_rate_x)},
+      m_gyro_rate_y{std::move(other.m_gyro_rate_y)},
+      m_gyro_rate_z{std::move(other.m_gyro_rate_z)},
+      m_accel_x{std::move(other.m_accel_x)},
+      m_accel_y{std::move(other.m_accel_y)},
+      m_accel_z{std::move(other.m_accel_z)},
+      m_tau{std::move(other.m_tau)},
+      m_dt{std::move(other.m_dt)},
+      m_alpha{std::move(other.m_alpha)},
+      m_compAngleX{std::move(other.m_compAngleX)},
+      m_compAngleY{std::move(other.m_compAngleY)},
+      m_accelAngleX{std::move(other.m_accelAngleX)},
+      m_accelAngleY{std::move(other.m_accelAngleY)},
+      m_thread_active{other.m_thread_active.load()},
+      m_first_run{other.m_first_run.load()},
+      m_thread_idle{other.m_thread_idle.load()},
+      m_auto_configured{std::move(other.m_auto_configured)},
+      m_spi_port{std::move(other.m_spi_port)},
+      m_calibration_time{std::move(other.m_calibration_time)},
+      m_spi{std::move(other.m_spi)},
+      m_auto_interrupt{std::move(other.m_auto_interrupt)},
+      m_scaled_sample_rate{std::move(other.m_scaled_sample_rate)},
+      m_connected{std::move(other.m_connected)},
+      m_acquire_task{std::move(other.m_acquire_task)},
+      m_simDevice{std::move(other.m_simDevice)},
+      m_simConnected{std::move(other.m_simConnected)},
+      m_simGyroAngleX{std::move(other.m_simGyroAngleX)},
+      m_simGyroAngleY{std::move(other.m_simGyroAngleZ)},
+      m_simGyroAngleZ{std::move(other.m_simGyroAngleZ)},
+      m_simGyroRateX{std::move(other.m_simGyroRateX)},
+      m_simGyroRateY{std::move(other.m_simGyroRateY)},
+      m_simGyroRateZ{std::move(other.m_simGyroRateZ)},
+      m_simAccelX{std::move(other.m_simAccelX)},
+      m_simAccelY{std::move(other.m_simAccelY)},
+      m_simAccelZ{std::move(other.m_simAccelZ)},
+      m_mutex{std::move(other.m_mutex)} {}
+
+ADIS16470_IMU& ADIS16470_IMU::operator=(ADIS16470_IMU&& other) {
+  if (this == &other) {
+    return *this;
+  }
+
+  std::swap(this->m_yaw_axis, other.m_yaw_axis);
+  std::swap(this->m_pitch_axis, other.m_pitch_axis);
+  std::swap(this->m_roll_axis, other.m_roll_axis);
+  std::swap(this->m_reset_in, other.m_reset_in);
+  std::swap(this->m_status_led, other.m_status_led);
+  std::swap(this->m_integ_angle_x, other.m_integ_angle_x);
+  std::swap(this->m_integ_angle_y, other.m_integ_angle_y);
+  std::swap(this->m_integ_angle_z, other.m_integ_angle_z);
+  std::swap(this->m_gyro_rate_x, other.m_gyro_rate_x);
+  std::swap(this->m_gyro_rate_y, other.m_gyro_rate_y);
+  std::swap(this->m_gyro_rate_z, other.m_gyro_rate_z);
+  std::swap(this->m_accel_x, other.m_accel_x);
+  std::swap(this->m_accel_y, other.m_accel_y);
+  std::swap(this->m_accel_z, other.m_accel_z);
+  std::swap(this->m_tau, other.m_tau);
+  std::swap(this->m_dt, other.m_dt);
+  std::swap(this->m_alpha, other.m_alpha);
+  std::swap(this->m_compAngleX, other.m_compAngleX);
+  std::swap(this->m_compAngleY, other.m_compAngleY);
+  std::swap(this->m_accelAngleX, other.m_accelAngleX);
+  std::swap(this->m_accelAngleY, other.m_accelAngleY);
+  this->m_thread_active = other.m_thread_active.load();
+  this->m_first_run = other.m_first_run.load();
+  this->m_thread_idle = other.m_thread_idle.load();
+  std::swap(this->m_auto_configured, other.m_auto_configured);
+  std::swap(this->m_spi_port, other.m_spi_port);
+  std::swap(this->m_calibration_time, other.m_calibration_time);
+  std::swap(this->m_spi, other.m_spi);
+  std::swap(this->m_auto_interrupt, other.m_auto_interrupt);
+  std::swap(this->m_scaled_sample_rate, other.m_scaled_sample_rate);
+  std::swap(this->m_connected, other.m_connected);
+  std::swap(this->m_acquire_task, other.m_acquire_task);
+  std::swap(this->m_simDevice, other.m_simDevice);
+  std::swap(this->m_simConnected, other.m_simConnected);
+  std::swap(this->m_simGyroAngleX, other.m_simGyroAngleX);
+  std::swap(this->m_simGyroAngleY, other.m_simGyroAngleZ);
+  std::swap(this->m_simGyroAngleZ, other.m_simGyroAngleZ);
+  std::swap(this->m_simGyroRateX, other.m_simGyroRateX);
+  std::swap(this->m_simGyroRateY, other.m_simGyroRateY);
+  std::swap(this->m_simGyroRateZ, other.m_simGyroRateZ);
+  std::swap(this->m_simAccelX, other.m_simAccelX);
+  std::swap(this->m_simAccelY, other.m_simAccelY);
+  std::swap(this->m_simAccelZ, other.m_simAccelZ);
+  std::swap(this->m_mutex, other.m_mutex);
+  return *this;
 }
 
 bool ADIS16470_IMU::IsConnected() const {
@@ -348,31 +486,22 @@ int ADIS16470_IMU::ConfigCalTime(CalibrationTime new_cal_time) {
   return 0;
 }
 
-/**
- * @brief Switches the active SPI port to standard SPI mode, writes a new value
- *to the DECIMATE register in the IMU, and re-enables auto SPI.
- *
- * @param reg Decimation value to be set.
- *
- * @return An int indicating the success or failure of writing the new DECIMATE
- *setting and returning to auto SPI mode. 0 = Success, 1 = No Change, 2 =
- *Failure
- *
- * This function enters standard SPI mode, writes a new DECIMATE setting to the
- *IMU, adjusts the sample scale factor, and re-enters auto SPI mode.
- **/
-int ADIS16470_IMU::ConfigDecRate(uint16_t reg) {
-  uint16_t m_reg = reg;
+int ADIS16470_IMU::ConfigDecRate(uint16_t decimationRate) {
+  // Switches the active SPI port to standard SPI mode, writes a new value to
+  // the DECIMATE register in the IMU, and re-enables auto SPI.
+  //
+  // This function enters standard SPI mode, writes a new DECIMATE setting to
+  // the IMU, adjusts the sample scale factor, and re-enters auto SPI mode.
   if (!SwitchToStandardSPI()) {
     REPORT_ERROR("Failed to configure/reconfigure standard SPI.");
     return 2;
   }
-  if (m_reg > 1999) {
+  if (decimationRate > 1999) {
     REPORT_ERROR("Attempted to write an invalid decimation value.");
-    m_reg = 1999;
+    decimationRate = 1999;
   }
-  m_scaled_sample_rate = (((m_reg + 1.0) / 2000.0) * 1000000.0);
-  WriteRegister(DEC_RATE, m_reg);
+  m_scaled_sample_rate = (((decimationRate + 1.0) / 2000.0) * 1000000.0);
+  WriteRegister(DEC_RATE, decimationRate);
   if (!SwitchToAutoSPI()) {
     REPORT_ERROR("Failed to configure/reconfigure auto SPI.");
     return 2;

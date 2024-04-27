@@ -22,6 +22,7 @@ import java.util.logging.Logger;
  * fixture. This allows tests to be mailable so that you can easily reconfigure the physical testbed
  * without breaking the tests.
  */
+@SuppressWarnings("removal")
 public abstract class MotorEncoderFixture<T extends MotorController> implements ITestFixture {
   private static final Logger logger = Logger.getLogger(MotorEncoderFixture.class.getName());
   private boolean m_initialized = false;

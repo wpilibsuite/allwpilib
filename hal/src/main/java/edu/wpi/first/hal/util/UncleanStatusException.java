@@ -6,6 +6,7 @@ package edu.wpi.first.hal.util;
 
 /** Exception for bad status codes from the chip object. */
 public final class UncleanStatusException extends IllegalStateException {
+  /** The status code from the chip object. */
   private final int m_statusCode;
 
   /**

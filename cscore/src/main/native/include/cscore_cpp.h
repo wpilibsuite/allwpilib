@@ -68,7 +68,8 @@ struct VideoMode : public CS_VideoMode {
     kBGR = WPI_PIXFMT_BGR,
     kGray = WPI_PIXFMT_GRAY,
     kY16 = WPI_PIXFMT_Y16,
-    kUYVY = WPI_PIXFMT_UYVY
+    kUYVY = WPI_PIXFMT_UYVY,
+    kBGRA = WPI_PIXFMT_BGRA,
   };
   VideoMode() {
     pixelFormat = 0;
@@ -294,7 +295,7 @@ std::vector<std::string> GetHttpCameraUrls(CS_Source source, CS_Status* status);
 /** @} */
 
 /**
- * @defgroup cscore_opencv_source_func OpenCV Source Functions
+ * @defgroup cscore_frame_source_func Frame Source Functions
  * @{
  */
 void NotifySourceError(CS_Source source, std::string_view msg,
@@ -365,7 +366,7 @@ int GetMjpegServerPort(CS_Sink sink, CS_Status* status);
 /** @} */
 
 /**
- * @defgroup cscore_opencv_sink_func OpenCV Sink Functions
+ * @defgroup cscore_frame_sink_func Frame Sink Functions
  * @{
  */
 void SetSinkDescription(CS_Sink sink, std::string_view description,

@@ -62,7 +62,8 @@ TEST(Color8BitTest, ToHexString) {
   EXPECT_EQ("#FF8040", color1.HexString());
 
   // Ensure conversion to std::string works
-  [[maybe_unused]] std::string str = color1.HexString();
+  [[maybe_unused]]
+  std::string str = color1.HexString();
 
   frc::Color8Bit color2{255, 128, 64};
   EXPECT_EQ("#FF8040", color2.HexString());

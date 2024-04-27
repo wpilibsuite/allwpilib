@@ -4,6 +4,7 @@
 
 package edu.wpi.first.math;
 
+/** WPIMath utility functions. */
 public interface MathShared {
   /**
    * Report an error.

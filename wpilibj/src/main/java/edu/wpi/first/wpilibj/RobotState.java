@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj;
 
+/** Robot state utility functions. */
 public final class RobotState {
   /**
    * Returns true if the robot is disabled.

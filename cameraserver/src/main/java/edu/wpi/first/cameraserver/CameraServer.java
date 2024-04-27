@@ -27,6 +27,7 @@ import edu.wpi.first.networktables.StringArrayTopic;
 import edu.wpi.first.networktables.StringEntry;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.util.PixelFormat;
+import java.lang.ref.Reference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -39,6 +40,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * NetworkTables.
  */
 public final class CameraServer {
+  /** CameraServer base port. */
   public static final int kBasePort = 1181;
 
   private static final String kPublishName = "/CameraPublisher";
@@ -139,6 +141,7 @@ public final class CameraServer {
       if (m_choicesPublisher != null) {
         m_choicesPublisher.close();
       }
+      Reference.reachabilityFence(m_videoListener);
     }
 
     BooleanEntry m_booleanValueEntry;
@@ -222,7 +225,7 @@ public final class CameraServer {
   // - "PropertyInfo/{Property}" - Property supporting information
 
   // Listener for video events
-  @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.AvoidCatchingGenericException"})
+  @SuppressWarnings("PMD.AvoidCatchingGenericException")
   private static final VideoListener m_videoListener =
       new VideoListener(
           event -> {
@@ -363,6 +366,8 @@ public final class CameraServer {
         }
       case kCv:
         return "cv:";
+      case kRaw:
+        return "raw:";
       default:
         return "unknown:";
     }

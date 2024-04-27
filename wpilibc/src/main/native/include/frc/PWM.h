@@ -144,6 +144,9 @@ class PWM : public wpi::Sendable, public wpi::SendableHelper<PWM> {
    */
   void SetPeriodMultiplier(PeriodMultiplier mult);
 
+  /**
+   * Latches PWM to zero.
+   */
   void SetZeroLatch();
 
   /**

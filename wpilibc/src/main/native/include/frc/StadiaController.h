@@ -514,28 +514,53 @@ class StadiaController : public GenericHID {
    */
   BooleanEvent RightTrigger(EventLoop* loop) const;
 
+  /**
+   * Represents a digital button on a StadiaController.
+   */
   struct Button {
+    /// A button.
     static constexpr int kA = 1;
+    /// B button.
     static constexpr int kB = 2;
+    /// X button.
     static constexpr int kX = 3;
+    /// Y button.
     static constexpr int kY = 4;
+    /// Left bumper button.
     static constexpr int kLeftBumper = 5;
+    /// Right bumper button.
     static constexpr int kRightBumper = 6;
+    /// Left stick button.
     static constexpr int kLeftStick = 7;
+    /// Right stick button.
     static constexpr int kRightStick = 8;
+    /// Ellipses button.
     static constexpr int kEllipses = 9;
+    /// Hamburger button.
     static constexpr int kHamburger = 10;
+    /// Stadia button.
     static constexpr int kStadia = 11;
+    /// Right trigger button.
     static constexpr int kRightTrigger = 12;
+    /// Left trigger button.
     static constexpr int kLeftTrigger = 13;
+    /// Google button.
     static constexpr int kGoogle = 14;
+    /// Frame button.
     static constexpr int kFrame = 15;
   };
 
+  /**
+   * Represents an axis on a StadiaController.
+   */
   struct Axis {
+    /// Left X axis.
     static constexpr int kLeftX = 0;
+    /// Right X axis.
     static constexpr int kRightX = 4;
+    /// Left Y axis.
     static constexpr int kLeftY = 1;
+    /// Right Y axis.
     static constexpr int kRightY = 5;
   };
 };

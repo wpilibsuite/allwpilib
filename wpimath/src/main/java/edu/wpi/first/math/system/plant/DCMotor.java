@@ -12,16 +12,34 @@ import edu.wpi.first.util.struct.StructSerializable;
 
 /** Holds the constants for a DC motor. */
 public class DCMotor implements ProtobufSerializable, StructSerializable {
+  /** Voltage at which the motor constants were measured. */
   public final double nominalVoltageVolts;
+
+  /** Torque when stalled. */
   public final double stallTorqueNewtonMeters;
+
+  /** Current draw when stalled. */
   public final double stallCurrentAmps;
+
+  /** Current draw under no load. */
   public final double freeCurrentAmps;
+
+  /** Angular velocity under no load. */
   public final double freeSpeedRadPerSec;
+
+  /** Motor internal resistance. */
   public final double rOhms;
+
+  /** Motor velocity constant. */
   public final double KvRadPerSecPerVolt;
+
+  /** Motor torque constant. */
   public final double KtNMPerAmp;
 
+  /** DCMotor protobuf for serialization. */
   public static final DCMotorProto proto = new DCMotorProto();
+
+  /** DCMotor struct for serialization. */
   public static final DCMotorStruct struct = new DCMotorStruct();
 
   /**

@@ -59,4 +59,7 @@ public class AccelerometerJNI extends JNIWrapper {
    * @return the Z acceleration
    */
   public static native double getAccelerometerZ();
+
+  /** Utility class. */
+  private AccelerometerJNI() {}
 }

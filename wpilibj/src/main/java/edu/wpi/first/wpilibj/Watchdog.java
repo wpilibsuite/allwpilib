@@ -208,6 +208,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
     m_suppressTimeoutMessage = suppress;
   }
 
+  @SuppressWarnings("resource")
   private static void updateAlarm() {
     if (m_watchdogs.isEmpty()) {
       NotifierJNI.cancelNotifierAlarm(m_notifier);

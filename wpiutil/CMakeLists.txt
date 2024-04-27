@@ -83,6 +83,7 @@ if(WITH_JAVA)
     add_dependencies(wpiutiljni wpiutil_jar)
 
     install(TARGETS wpiutiljni EXPORT wpiutiljni)
+    export(TARGETS wpiutiljni FILE wpiutiljni.cmake NAMESPACE wpiutiljni::)
 endif()
 
 if(WITH_JAVA_SOURCE)
@@ -197,6 +198,17 @@ else()
     endif()
 endif()
 
+install(
+    DIRECTORY src/main/native/thirdparty/expected/include/
+    DESTINATION "${include_dest}/wpiutil"
+)
+target_include_directories(
+    wpiutil
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/expected/include>
+        $<INSTALL_INTERFACE:${include_dest}/wpiutil>
+)
 install(DIRECTORY src/main/native/thirdparty/memory/include/ DESTINATION "${include_dest}/wpiutil")
 target_include_directories(
     wpiutil
@@ -247,6 +259,7 @@ target_include_directories(
 )
 
 install(TARGETS wpiutil EXPORT wpiutil)
+export(TARGETS wpiutil FILE wpiutil.cmake NAMESPACE wpiutil::)
 
 configure_file(wpiutil-config.cmake.in ${WPILIB_BINARY_DIR}/wpiutil-config.cmake)
 install(FILES ${WPILIB_BINARY_DIR}/wpiutil-config.cmake DESTINATION share/wpiutil)
@@ -270,4 +283,7 @@ if(WITH_TESTS)
 
     wpilib_add_test(wpiutil src/test/native/cpp)
     target_link_libraries(wpiutil_test wpiutil gmock_main wpiutil_testlib)
+    if(MSVC)
+        target_compile_options(wpiutil_test PRIVATE /utf-8)
+    endif()
 endif()

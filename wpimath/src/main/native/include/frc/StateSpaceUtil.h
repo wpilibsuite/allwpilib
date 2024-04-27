@@ -194,8 +194,8 @@ Eigen::Vector4d PoseTo4dVector(const Pose2d& pose);
  * any, have absolute values less than one, where an eigenvalue is
  * uncontrollable if rank([λI - A, B]) < n where n is the number of states.
  *
- * @tparam States The number of states.
- * @tparam Inputs The number of inputs.
+ * @tparam States Number of states.
+ * @tparam Inputs Number of inputs.
  * @param A System matrix.
  * @param B Input matrix.
  */
@@ -253,8 +253,8 @@ IsStabilizable<Eigen::Dynamic, Eigen::Dynamic>(const Eigen::MatrixXd& A,
  * any, have absolute values less than one, where an eigenvalue is unobservable
  * if rank([λI - A; C]) < n where n is the number of states.
  *
- * @tparam States The number of states.
- * @tparam Outputs The number of outputs.
+ * @tparam States Number of states.
+ * @tparam Outputs Number of outputs.
  * @param A System matrix.
  * @param C Output matrix.
  */
@@ -277,7 +277,7 @@ Eigen::Vector3d PoseToVector(const Pose2d& pose);
 /**
  * Clamps input vector between system's minimum and maximum allowable input.
  *
- * @tparam Inputs The number of inputs.
+ * @tparam Inputs Number of inputs.
  * @param u Input vector to clamp.
  * @param umin The minimum input magnitude.
  * @param umax The maximum input magnitude.
@@ -298,7 +298,7 @@ Vectord<Inputs> ClampInputMaxMagnitude(const Vectord<Inputs>& u,
  * Renormalize all inputs if any exceeds the maximum magnitude. Useful for
  * systems such as differential drivetrains.
  *
- * @tparam Inputs      The number of inputs.
+ * @tparam Inputs      Number of inputs.
  * @param u            The input vector.
  * @param maxMagnitude The maximum magnitude any input can have.
  * @return The normalizedInput

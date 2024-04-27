@@ -15,7 +15,10 @@ import edu.wpi.first.math.controller.PIDController;
  * <p>This class is provided by the NewCommands VendorDep
  */
 public abstract class PIDSubsystem extends SubsystemBase {
+  /** PID controller. */
   protected final PIDController m_controller;
+
+  /** Whether PID controller output is enabled. */
   protected boolean m_enabled;
 
   /**
@@ -47,6 +50,11 @@ public abstract class PIDSubsystem extends SubsystemBase {
     }
   }
 
+  /**
+   * Returns the PIDController.
+   *
+   * @return The controller.
+   */
   public PIDController getController() {
     return m_controller;
   }

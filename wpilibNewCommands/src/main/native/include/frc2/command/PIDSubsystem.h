@@ -69,7 +69,10 @@ class PIDSubsystem : public SubsystemBase {
   frc::PIDController& GetController();
 
  protected:
+  /// PID controller.
   frc::PIDController m_controller;
+
+  /// Whether PID controller output is enabled.
   bool m_enabled{false};
 
   /**

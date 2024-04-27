@@ -9,6 +9,10 @@ import java.util.List;
 
 /** Raw struct schema. */
 public class ParsedSchema {
+  /** Declarations. */
   @SuppressWarnings("MemberName")
   public List<ParsedDeclaration> declarations = new ArrayList<>();
+
+  /** Default constructor. */
+  public ParsedSchema() {}
 }

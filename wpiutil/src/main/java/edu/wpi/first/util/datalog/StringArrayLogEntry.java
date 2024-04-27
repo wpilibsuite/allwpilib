@@ -6,20 +6,49 @@ package edu.wpi.first.util.datalog;
 
 /** Log array of string values. */
 public class StringArrayLogEntry extends DataLogEntry {
+  /** The data type for string array values. */
   public static final String kDataType = "string[]";
 
+  /**
+   * Constructs a string array log entry.
+   *
+   * @param log datalog
+   * @param name name of the entry
+   * @param metadata metadata
+   * @param timestamp entry creation timestamp (0=now)
+   */
   public StringArrayLogEntry(DataLog log, String name, String metadata, long timestamp) {
     super(log, name, kDataType, metadata, timestamp);
   }
 
+  /**
+   * Constructs a string array log entry.
+   *
+   * @param log datalog
+   * @param name name of the entry
+   * @param metadata metadata
+   */
   public StringArrayLogEntry(DataLog log, String name, String metadata) {
     this(log, name, metadata, 0);
   }
 
+  /**
+   * Constructs a string array log entry.
+   *
+   * @param log datalog
+   * @param name name of the entry
+   * @param timestamp entry creation timestamp (0=now)
+   */
   public StringArrayLogEntry(DataLog log, String name, long timestamp) {
     this(log, name, "", timestamp);
   }
 
+  /**
+   * Constructs a string array log entry.
+   *
+   * @param log datalog
+   * @param name name of the entry
+   */
   public StringArrayLogEntry(DataLog log, String name) {
     this(log, name, 0);
   }

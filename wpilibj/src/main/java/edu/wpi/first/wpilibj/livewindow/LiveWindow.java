@@ -67,14 +67,29 @@ public final class LiveWindow {
     throw new UnsupportedOperationException("This is a utility class!");
   }
 
+  /**
+   * Sets function to be called when LiveWindow is enabled.
+   *
+   * @param runnable function (or null for none)
+   */
   public static synchronized void setEnabledListener(Runnable runnable) {
     enabledListener = runnable;
   }
 
+  /**
+   * Sets function to be called when LiveWindow is disabled.
+   *
+   * @param runnable function (or null for none)
+   */
   public static synchronized void setDisabledListener(Runnable runnable) {
     disabledListener = runnable;
   }
 
+  /**
+   * Returns true if LiveWindow is enabled.
+   *
+   * @return True if LiveWindow is enabled.
+   */
   public static synchronized boolean isEnabled() {
     return liveWindowEnabled;
   }

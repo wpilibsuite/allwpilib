@@ -983,5 +983,18 @@
     "gradlebase": "java",
     "commandversion": 2,
     "mainclass": "Main"
+  },
+  {
+    "name": "SysIdRoutine",
+    "description": "A sample command-based robot demonstrating use of the SysIdRoutine command factory",
+    "tags": [
+      "SysId",
+      "Command-based",
+      "DataLog"
+    ],
+    "foldername": "sysid",
+    "gradlebase": "java",
+    "commandversion": 2,
+    "mainclass": "Main"
   }
 ]

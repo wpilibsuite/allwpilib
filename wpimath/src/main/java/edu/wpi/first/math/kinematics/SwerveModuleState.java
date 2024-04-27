@@ -25,8 +25,11 @@ public class SwerveModuleState
   /** Angle of the module. */
   public Rotation2d angle = Rotation2d.fromDegrees(0);
 
-  public static final SwerveModuleStateStruct struct = new SwerveModuleStateStruct();
+  /** SwerveModuleState protobuf for serialization. */
   public static final SwerveModuleStateProto proto = new SwerveModuleStateProto();
+
+  /** SwerveModuleState struct for serialization. */
+  public static final SwerveModuleStateStruct struct = new SwerveModuleStateStruct();
 
   /** Constructs a SwerveModuleState with zeros for speed and angle. */
   public SwerveModuleState() {}

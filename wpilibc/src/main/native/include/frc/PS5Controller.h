@@ -503,29 +503,55 @@ class PS5Controller : public GenericHID {
    */
   BooleanEvent Touchpad(EventLoop* loop) const;
 
+  /**
+   * Represents a digital button on a PS5Controller.
+   */
   struct Button {
+    /// Square button.
     static constexpr int kSquare = 1;
+    /// X button.
     static constexpr int kCross = 2;
+    /// Circle button.
     static constexpr int kCircle = 3;
+    /// Triangle button.
     static constexpr int kTriangle = 4;
+    /// Left trigger 1 button.
     static constexpr int kL1 = 5;
+    /// Right trigger 1 button.
     static constexpr int kR1 = 6;
+    /// Left trigger 2 button.
     static constexpr int kL2 = 7;
+    /// Right trigger 2 button.
     static constexpr int kR2 = 8;
+    /// Create button.
     static constexpr int kCreate = 9;
+    /// Options button.
     static constexpr int kOptions = 10;
+    /// Left stick button.
     static constexpr int kL3 = 11;
+    /// Right stick button.
     static constexpr int kR3 = 12;
+    /// PlayStation button.
     static constexpr int kPS = 13;
+    /// Touchpad click button.
     static constexpr int kTouchpad = 14;
   };
 
+  /**
+   * Represents an axis on a PS5Controller.
+   */
   struct Axis {
+    /// Left X axis.
     static constexpr int kLeftX = 0;
+    /// Left Y axis.
     static constexpr int kLeftY = 1;
+    /// Right X axis.
     static constexpr int kRightX = 2;
+    /// Right Y axis.
     static constexpr int kRightY = 5;
+    /// Left Trigger 2.
     static constexpr int kL2 = 3;
+    /// Right Trigger 2.
     static constexpr int kR2 = 4;
   };
 };

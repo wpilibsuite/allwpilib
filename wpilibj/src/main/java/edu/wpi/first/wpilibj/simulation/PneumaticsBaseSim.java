@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.PneumaticsModuleType;
 
 /** Common base class for pneumatics module simulation classes. */
 public abstract class PneumaticsBaseSim {
+  /** PneumaticsBase index. */
   protected final int m_index;
 
   /**
@@ -30,10 +31,20 @@ public abstract class PneumaticsBaseSim {
     }
   }
 
+  /**
+   * Constructs a PneumaticsBaseSim with the given index.
+   *
+   * @param index The index.
+   */
   protected PneumaticsBaseSim(int index) {
     m_index = index;
   }
 
+  /**
+   * Constructs a PneumaticsBaseSim for the given module.
+   *
+   * @param module The module.
+   */
   protected PneumaticsBaseSim(PneumaticsBase module) {
     this(module.getModuleNumber());
   }

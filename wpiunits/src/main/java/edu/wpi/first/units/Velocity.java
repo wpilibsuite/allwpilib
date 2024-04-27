@@ -33,7 +33,7 @@ public class Velocity<D extends Unit<D>> extends Unit<Velocity<D>> {
 
   /** Generates a cache key used for cache lookups. */
   private static long cacheKey(Unit<?> numerator, Unit<?> denominator) {
-    return ((long) numerator.hashCode()) << 32L | ((long) denominator.hashCode()) & 0xFFFFFFFFL;
+    return ((long) numerator.hashCode()) << 32L | (((long) denominator.hashCode()) & 0xFFFFFFFFL);
   }
 
   /**

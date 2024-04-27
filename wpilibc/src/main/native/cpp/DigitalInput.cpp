@@ -68,6 +68,5 @@ int DigitalInput::GetChannel() const {
 
 void DigitalInput::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Digital Input");
-  builder.AddBooleanProperty(
-      "Value", [=, this] { return Get(); }, nullptr);
+  builder.AddBooleanProperty("Value", [=, this] { return Get(); }, nullptr);
 }

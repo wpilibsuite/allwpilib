@@ -57,6 +57,7 @@ import java.util.function.LongConsumer;
 import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 
+/** Implementation detail for SendableBuilder. */
 @SuppressWarnings("PMD.CompareObjectsWithEquals")
 public class SendableBuilderImpl implements NTSendableBuilder {
   @FunctionalInterface
@@ -108,6 +109,9 @@ public class SendableBuilderImpl implements NTSendableBuilder {
   private BooleanPublisher m_actuatorPub;
 
   private final List<AutoCloseable> m_closeables = new ArrayList<>();
+
+  /** Default constructor. */
+  public SendableBuilderImpl() {}
 
   @Override
   @SuppressWarnings("PMD.AvoidCatchingGenericException")

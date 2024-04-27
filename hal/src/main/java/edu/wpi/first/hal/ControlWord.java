@@ -13,6 +13,9 @@ public class ControlWord {
   private boolean m_fmsAttached;
   private boolean m_dsAttached;
 
+  /** Default constructor. */
+  public ControlWord() {}
+
   void update(
       boolean enabled,
       boolean autonomous,

@@ -8,20 +8,35 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/** WPIUtil JNI. */
 public class WPIUtilJNI {
   static boolean libraryLoaded = false;
   static RuntimeLoader<WPIUtilJNI> loader = null;
 
+  /** Sets whether JNI should be loaded in the static block. */
   public static class Helper {
     private static AtomicBoolean extractOnStaticLoad = new AtomicBoolean(true);
 
+    /**
+     * Returns true if the JNI should be loaded in the static block.
+     *
+     * @return True if the JNI should be loaded in the static block.
+     */
     public static boolean getExtractOnStaticLoad() {
       return extractOnStaticLoad.get();
     }
 
+    /**
+     * Sets whether the JNI should be loaded in the static block.
+     *
+     * @param load Whether the JNI should be loaded in the static block.
+     */
     public static void setExtractOnStaticLoad(boolean load) {
       extractOnStaticLoad.set(load);
     }
+
+    /** Utility class. */
+    private Helper() {}
   }
 
   static {
@@ -55,30 +70,101 @@ public class WPIUtilJNI {
     libraryLoaded = true;
   }
 
+  /**
+   * Write the given string to stderr.
+   *
+   * @param str String to write.
+   */
   public static native void writeStderr(String str);
 
+  /** Enable mock time. */
   public static native void enableMockTime();
 
+  /** Disable mock time. */
   public static native void disableMockTime();
 
+  /**
+   * Set mock time.
+   *
+   * @param time The desired time in microseconds.
+   */
   public static native void setMockTime(long time);
 
+  /**
+   * Returns the time.
+   *
+   * @return The time.
+   */
   public static native long now();
 
+  /**
+   * Returns the system time.
+   *
+   * @return The system time.
+   */
   public static native long getSystemTime();
 
+  /**
+   * Creates an event. Events have binary state (signaled or not signaled) and may be either
+   * automatically reset or manually reset. Automatic-reset events go to non-signaled state when a
+   * WaitForObject is woken up by the event; manual-reset events require ResetEvent() to be called
+   * to set the event to non-signaled state; if ResetEvent() is not called, any waiter on that event
+   * will immediately wake when called.
+   *
+   * @param manualReset true for manual reset, false for automatic reset
+   * @param initialState true to make the event initially in signaled state
+   * @return Event handle
+   */
   public static native int createEvent(boolean manualReset, boolean initialState);
 
+  /**
+   * Destroys an event. Destruction wakes up any waiters.
+   *
+   * @param eventHandle event handle
+   */
   public static native void destroyEvent(int eventHandle);
 
+  /**
+   * Sets an event to signaled state.
+   *
+   * @param eventHandle event handle
+   */
   public static native void setEvent(int eventHandle);
 
+  /**
+   * Sets an event to non-signaled state.
+   *
+   * @param eventHandle event handle
+   */
   public static native void resetEvent(int eventHandle);
 
+  /**
+   * Creates a semaphore. Semaphores keep an internal counter. Releasing the semaphore increases the
+   * count. A semaphore with a non-zero count is considered signaled. When a waiter wakes up it
+   * atomically decrements the count by 1. This is generally useful in a single-supplier,
+   * multiple-consumer scenario.
+   *
+   * @param initialCount initial value for the semaphore's internal counter
+   * @param maximumCount maximum value for the samephore's internal counter
+   * @return Semaphore handle
+   */
   public static native int createSemaphore(int initialCount, int maximumCount);
 
+  /**
+   * Destroys a semaphore. Destruction wakes up any waiters.
+   *
+   * @param semHandle semaphore handle
+   */
   public static native void destroySemaphore(int semHandle);
 
+  /**
+   * Releases N counts of a semaphore.
+   *
+   * @param semHandle semaphore handle
+   * @param releaseCount amount to add to semaphore's internal counter; must be positive
+   * @return True on successful release, false on failure (e.g. release count would exceed maximum
+   *     value, or handle invalid)
+   */
   public static native boolean releaseSemaphore(int semHandle, int releaseCount);
 
   static native long allocateRawFrame();
@@ -137,4 +223,7 @@ public class WPIUtilJNI {
    */
   public static native int[] waitForObjectsTimeout(int[] handles, double timeout)
       throws InterruptedException;
+
+  /** Utility class. */
+  protected WPIUtilJNI() {}
 }

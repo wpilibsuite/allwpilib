@@ -6,6 +6,7 @@
 
 #include <string>
 
+#include <wpi/deprecated.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
@@ -15,6 +16,8 @@
 #include "frc/motorcontrol/MotorController.h"
 
 namespace frc {
+
+WPI_IGNORE_DEPRECATED
 
 /**
  * Nidec Brushless Motor.
@@ -94,5 +97,7 @@ class NidecBrushless : public MotorController,
   PWM m_pwm;
   double m_speed = 0.0;
 };
+
+WPI_UNIGNORE_DEPRECATED
 
 }  // namespace frc

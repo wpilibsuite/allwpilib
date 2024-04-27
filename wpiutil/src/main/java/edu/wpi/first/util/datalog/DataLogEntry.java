@@ -6,15 +6,39 @@ package edu.wpi.first.util.datalog;
 
 /** Log entry base class. */
 public class DataLogEntry {
+  /**
+   * Constructs a data log entry.
+   *
+   * @param log datalog
+   * @param name name of the entry
+   * @param type Data type
+   * @param metadata metadata
+   * @param timestamp entry creation timestamp (0=now)
+   */
   protected DataLogEntry(DataLog log, String name, String type, String metadata, long timestamp) {
     m_log = log;
     m_entry = log.start(name, type, metadata, timestamp);
   }
 
+  /**
+   * Constructs a data log entry.
+   *
+   * @param log datalog
+   * @param name name of the entry
+   * @param type Data type
+   * @param metadata metadata
+   */
   protected DataLogEntry(DataLog log, String name, String type, String metadata) {
     this(log, name, type, metadata, 0);
   }
 
+  /**
+   * Constructs a data log entry.
+   *
+   * @param log datalog
+   * @param name name of the entry
+   * @param type Data type
+   */
   protected DataLogEntry(DataLog log, String name, String type) {
     this(log, name, type, "");
   }
@@ -52,6 +76,9 @@ public class DataLogEntry {
     finish(0);
   }
 
+  /** The data log instance associated with the entry. */
   protected final DataLog m_log;
+
+  /** The data log entry index. */
   protected final int m_entry;
 }

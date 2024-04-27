@@ -26,30 +26,73 @@ namespace frc {
  */
 class SerialPort {
  public:
+  /**
+   * Serial port.
+   */
+  enum Port {
+    /// Onboard serial port on the roboRIO.
+    kOnboard = 0,
+    /// MXP (roboRIO MXP) serial port.
+    kMXP = 1,
+    /// USB serial port (same as KUSB1).
+    kUSB = 2,
+    /// USB serial port 1.
+    kUSB1 = 2,
+    /// USB serial port 2.
+    kUSB2 = 3
+  };
+
+  /**
+   * Represents the parity to use for serial communications.
+   */
   enum Parity {
+    /// No parity.
     kParity_None = 0,
+    /// Odd parity.
     kParity_Odd = 1,
+    /// Even parity.
     kParity_Even = 2,
+    /// Parity bit always on.
     kParity_Mark = 3,
+    /// Parity bit always off.
     kParity_Space = 4
   };
 
+  /**
+   * Represents the number of stop bits to use for Serial Communication.
+   */
   enum StopBits {
+    /// One stop bit.
     kStopBits_One = 10,
+    /// One and a half stop bits.
     kStopBits_OnePointFive = 15,
+    /// Two stop bits.
     kStopBits_Two = 20
   };
 
+  /**
+   * Represents what type of flow control to use for serial communication.
+   */
   enum FlowControl {
+    /// No flow control.
     kFlowControl_None = 0,
+    /// XON/XOFF flow control.
     kFlowControl_XonXoff = 1,
+    /// RTS/CTS flow control.
     kFlowControl_RtsCts = 2,
+    /// DTS/DSR flow control.
     kFlowControl_DtrDsr = 4
   };
 
-  enum WriteBufferMode { kFlushOnAccess = 1, kFlushWhenFull = 2 };
-
-  enum Port { kOnboard = 0, kMXP = 1, kUSB = 2, kUSB1 = 2, kUSB2 = 3 };
+  /**
+   * Represents which type of buffer mode to use when writing to a serial port.
+   */
+  enum WriteBufferMode {
+    /// Flush the buffer on each access.
+    kFlushOnAccess = 1,
+    /// Flush the buffer when it is full.
+    kFlushWhenFull = 2
+  };
 
   /**
    * Create an instance of a Serial Port class.

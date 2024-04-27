@@ -23,17 +23,28 @@ import edu.wpi.first.wpilibj.event.EventLoop;
 public class XboxController extends GenericHID {
   /** Represents a digital button on an XboxController. */
   public enum Button {
+    /** Left bumper. */
     kLeftBumper(5),
+    /** Right bumper. */
     kRightBumper(6),
+    /** Left stick. */
     kLeftStick(9),
+    /** Right stick. */
     kRightStick(10),
+    /** A. */
     kA(1),
+    /** B. */
     kB(2),
+    /** X. */
     kX(3),
+    /** Y. */
     kY(4),
+    /** Back. */
     kBack(7),
+    /** Start. */
     kStart(8);
 
+    /** Button value. */
     public final int value;
 
     Button(int value) {
@@ -60,13 +71,20 @@ public class XboxController extends GenericHID {
 
   /** Represents an axis on an XboxController. */
   public enum Axis {
+    /** Left X. */
     kLeftX(0),
+    /** Right X. */
     kRightX(4),
+    /** Left Y. */
     kLeftY(1),
+    /** Right Y. */
     kRightY(5),
+    /** Left trigger. */
     kLeftTrigger(2),
+    /** Right trigger. */
     kRightTrigger(3);
 
+    /** Axis value. */
     public final int value;
 
     Axis(int value) {

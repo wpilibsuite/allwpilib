@@ -17,6 +17,7 @@ import java.util.HashSet;
  *
  * <p>A SimDevice based motor controller representing the motors on an XRP robot
  */
+@SuppressWarnings("removal")
 public class XRPMotor implements MotorController {
   private static HashMap<Integer, String> s_simDeviceNameMap = new HashMap<>();
   private static HashSet<Integer> s_registeredDevices = new HashSet<>();
