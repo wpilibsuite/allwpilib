@@ -61,7 +61,7 @@ public final class WPIMathJNI {
    * @param dt The time between velocity setpoints in seconds.
    * @return The calculated feedforward in volts.
    */
-  public static native double ArmFeedforward_calculate(
+  public static native double calculate(
       double ks,
       double kv,
       double ka,

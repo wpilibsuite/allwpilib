@@ -19,7 +19,7 @@ extern "C" {
  * Signature: (DDDDDDDD)D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_math_WPIMathJNI_ArmFeedforward_calculate
+Java_edu_wpi_first_math_WPIMathJNI_calculate
   (JNIEnv* env, jclass, jdouble ks, jdouble kv, jdouble ka, jdouble kg,
    jdouble currentAngle, jdouble currentVelocity, jdouble nextVelocity,
    jdouble dt)
