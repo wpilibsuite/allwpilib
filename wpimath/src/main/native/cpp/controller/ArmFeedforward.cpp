@@ -36,6 +36,7 @@ units::volt_t ArmFeedforward::Calculate(units::unit_t<Angle> currentAngle,
   u_k.SetValue((kS * wpi::sgn(currentVelocity.value()) + kV * currentVelocity +
                 kA * acceleration + kG * units::math::cos(currentAngle))
                    .value());
+  fmt::print("u₀ = {}\n", u_k.Value());
 
   auto r_k1 = RK4<decltype(f), VarMat, VarMat>(f, r_k, u_k, dt);
 
@@ -98,7 +99,7 @@ units::volt_t ArmFeedforward::Calculate(units::unit_t<Angle> currentAngle,
   }
   auto solveEndTime = std::chrono::system_clock::now();
 
-  sleipnir::println("\nSolve time: {:.3f} ms",
+  sleipnir::println("Solve time: {:.3f} ms",
                     std::chrono::duration_cast<std::chrono::microseconds>(
                         solveEndTime - solveStartTime)
                             .count() /

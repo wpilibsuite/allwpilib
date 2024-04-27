@@ -66,6 +66,7 @@ TEST(ArmFeedforwardTest, Calculate) {
         frc::Matrixd<2, 1>{currentAngle.value(), currentVelocity.value()},
         frc::Matrixd<1, 1>{u.value()}, dt);
 
+    fmt::print("residual = {}\n", actual_x_k1(1) - nextVelocity.value());
     EXPECT_NEAR(nextVelocity.value(), actual_x_k1(1), 2e-2);
   }
 }
