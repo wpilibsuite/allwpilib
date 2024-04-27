@@ -319,16 +319,16 @@ TEST(MecanumDrivePoseEstimatorTest, TestSampleAt) {
   }
 
   // Sample at an added time
-  EXPECT_EQ(std::make_optional(frc::Pose2d{1.02_m, 0_m, frc::Rotation2d{}}),
+  EXPECT_EQ(std::optional(frc::Pose2d{1.02_m, 0_m, frc::Rotation2d{}}),
             estimator.SampleAt(1.02_s));
   // Sample between updates (test interpolation)
-  EXPECT_EQ(std::make_optional(frc::Pose2d{1.01_m, 0_m, frc::Rotation2d{}}),
+  EXPECT_EQ(std::optional(frc::Pose2d{1.01_m, 0_m, frc::Rotation2d{}}),
             estimator.SampleAt(1.01_s));
   // Sampling before the oldest value returns the oldest value
-  EXPECT_EQ(std::make_optional(frc::Pose2d{1_m, 0_m, frc::Rotation2d{}}),
+  EXPECT_EQ(std::optional(frc::Pose2d{1_m, 0_m, frc::Rotation2d{}}),
             estimator.SampleAt(0.5_s));
   // Sampling after the newest value returns the newest value
-  EXPECT_EQ(std::make_optional(frc::Pose2d{2_m, 0_m, frc::Rotation2d{}}),
+  EXPECT_EQ(std::optional(frc::Pose2d{2_m, 0_m, frc::Rotation2d{}}),
             estimator.SampleAt(2.5_s));
 
   // Add a vision measurement after the odometry measurements (while keeping all
@@ -337,11 +337,11 @@ TEST(MecanumDrivePoseEstimatorTest, TestSampleAt) {
                                  2.2_s);
 
   // Make sure nothing changed (except the newest value)
-  EXPECT_EQ(std::make_optional(frc::Pose2d{1.02_m, 0_m, frc::Rotation2d{}}),
+  EXPECT_EQ(std::optional(frc::Pose2d{1.02_m, 0_m, frc::Rotation2d{}}),
             estimator.SampleAt(1.02_s));
-  EXPECT_EQ(std::make_optional(frc::Pose2d{1.01_m, 0_m, frc::Rotation2d{}}),
+  EXPECT_EQ(std::optional(frc::Pose2d{1.01_m, 0_m, frc::Rotation2d{}}),
             estimator.SampleAt(1.01_s));
-  EXPECT_EQ(std::make_optional(frc::Pose2d{1_m, 0_m, frc::Rotation2d{}}),
+  EXPECT_EQ(std::optional(frc::Pose2d{1_m, 0_m, frc::Rotation2d{}}),
             estimator.SampleAt(0.5_s));
 
   // Add a vision measurement before the odometry measurements that's still in
@@ -350,12 +350,12 @@ TEST(MecanumDrivePoseEstimatorTest, TestSampleAt) {
                                  0.9_s);
 
   // Everything should be the same except Y is 0.1 (halfway between 0 and 0.2)
-  EXPECT_EQ(std::make_optional(frc::Pose2d{1.02_m, 0.1_m, frc::Rotation2d{}}),
+  EXPECT_EQ(std::optional(frc::Pose2d{1.02_m, 0.1_m, frc::Rotation2d{}}),
             estimator.SampleAt(1.02_s));
-  EXPECT_EQ(std::make_optional(frc::Pose2d{1.01_m, 0.1_m, frc::Rotation2d{}}),
+  EXPECT_EQ(std::optional(frc::Pose2d{1.01_m, 0.1_m, frc::Rotation2d{}}),
             estimator.SampleAt(1.01_s));
-  EXPECT_EQ(std::make_optional(frc::Pose2d{1_m, 0.1_m, frc::Rotation2d{}}),
+  EXPECT_EQ(std::optional(frc::Pose2d{1_m, 0.1_m, frc::Rotation2d{}}),
             estimator.SampleAt(0.5_s));
-  EXPECT_EQ(std::make_optional(frc::Pose2d{2_m, 0.1_m, frc::Rotation2d{}}),
+  EXPECT_EQ(std::optional(frc::Pose2d{2_m, 0.1_m, frc::Rotation2d{}}),
             estimator.SampleAt(2.5_s));
 }
