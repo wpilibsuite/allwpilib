@@ -4,11 +4,11 @@
 
 package edu.wpi.first.math.controller;
 
+import edu.wpi.first.math.WPIMathJNI;
 import edu.wpi.first.math.controller.proto.ArmFeedforwardProto;
 import edu.wpi.first.math.controller.struct.ArmFeedforwardStruct;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
-import edu.wpi.first.math.WPIMathJNI;
 
 /**
  * A helper class that computes feedforward outputs for a simple arm (modeled as a motor acting
@@ -104,10 +104,9 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
   /**
    * Calculates the feedforward from the gains and setpoints.
    *
-   * @param currentAngle The current angle in radians. This angle should be
-   *   measured from the horizontal (i.e. if the provided angle is 0, the arm
-   *   should be parallel to the floor). If your encoder does not follow this
-   *   convention, an offset should be added.
+   * @param currentAngle The current angle in radians. This angle should be measured from the
+   *     horizontal (i.e. if the provided angle is 0, the arm should be parallel to the floor). If
+   *     your encoder does not follow this convention, an offset should be added.
    * @param currentVelocity The current velocity setpoint in radians per second.
    * @param nextVelocity The next velocity setpoint in radians per second.
    * @param dt Time between velocity setpoints in seconds.
@@ -115,9 +114,10 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
    */
   public double calculate(
       double currentAngle, double currentVelocity, double nextVelocity, double dt) {
-    return WPIMathJNI.ArmFeedforward_calculate(ks, kv, ka, kg, currentAngle, currentVelocity, nextVelocity, dt);
+    return WPIMathJNI.ArmFeedforward_calculate(
+        ks, kv, ka, kg, currentAngle, currentVelocity, nextVelocity, dt);
   }
-  
+
   // Rearranging the main equation from the calculate() method yields the
   // formulas for the methods below:
 

@@ -14,14 +14,16 @@ using namespace wpi::java;
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_math_WPIMathJNI
+ * Class:     edu_wpi_first_math_WPIMathJNI_ArmFeedforward
  * Method:    calculate
- * Signature: (DDDD)D
+ * Signature: (DDDDDDDD)D
  */
-JNIEXPORT jdouble JNICALL Java_edu_wpi_first_math_WPIMathJNI_ArmFeedforward_calculate(
-    JNIEnv* env, jclass, jdouble ks, jdouble kv, jdouble ka, jdouble kg,
-    jdouble currentAngle, jdouble currentVelocity, jdouble nextVelocity,
-    jdouble dt) {
+JNIEXPORT jdouble JNICALL
+Java_edu_wpi_first_math_WPIMathJNI_ArmFeedforward_calculate
+  (JNIEnv* env, jclass, jdouble ks, jdouble kv, jdouble ka, jdouble kg,
+   jdouble currentAngle, jdouble currentVelocity, jdouble nextVelocity,
+   jdouble dt)
+{
   using Acceleration = units::compound_unit<units::radians_per_second,
                                             units::inverse<units::second>>;
   using kv_unit =
