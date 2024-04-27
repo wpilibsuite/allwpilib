@@ -137,6 +137,26 @@ public class LinearSystemSim<States extends Num, Inputs extends Num, Outputs ext
           "Malformed input! Got " + u.length + " elements instead of " + m_u.getNumRows());
     }
     m_u = new Matrix<>(new SimpleMatrix(m_u.getNumRows(), 1, true, u));
+    m_u = clampInput(m_u);
+  }
+
+  /**
+   * Returns the current input of the plant.
+   *
+   * @return The current input of the plant.
+   */
+  public Matrix<Inputs, N1> getInput() {
+    return m_u;
+  }
+
+  /**
+   * Returns an element of the current input of the plant.
+   *
+   * @param row The row to return.
+   * @return An element of the current input of the plant.
+   */
+  public double getInput(int row) {
+    return m_u.get(row, 0);
   }
 
   /**

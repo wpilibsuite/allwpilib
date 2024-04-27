@@ -4,9 +4,11 @@
 
 #include "glass/Window.h"
 
+#include <string>
+
+#include <fmt/format.h>
 #include <imgui.h>
 #include <imgui_internal.h>
-#include <wpi/StringExtras.h>
 
 #include "glass/Context.h"
 #include "glass/Storage.h"
@@ -55,15 +57,14 @@ void Window::Display() {
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, m_padding);
   }
 
-  char label[128];
+  std::string label;
   if (m_name.empty()) {
-    wpi::format_to_n_c_str(label, sizeof(label), "{}###{}", m_defaultName,
-                           m_id);
+    label = fmt::format("{}###{}", m_defaultName, m_id);
   } else {
-    wpi::format_to_n_c_str(label, sizeof(label), "{}###{}", m_name, m_id);
+    label = fmt::format("{}###{}", m_name, m_id);
   }
 
-  if (Begin(label, &m_visible, m_flags)) {
+  if (Begin(label.c_str(), &m_visible, m_flags)) {
     if (m_renamePopupEnabled || m_view->HasSettings()) {
       bool isClicked = (ImGui::IsMouseReleased(ImGuiMouseButton_Right) &&
                         ImGui::IsItemHovered());

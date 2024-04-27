@@ -303,7 +303,7 @@ class MeasureTest {
   }
 
   @Test
-  void testIsNear() {
+  void testIsNearVarianceThreshold() {
     var unit = new ExampleUnit(92);
     var measureA = unit.of(1.21);
     var measureB = unit.ofBaseUnits(64);
@@ -343,5 +343,43 @@ class MeasureTest {
 
     assertTrue(Units.Feet.zero().isNear(Units.Millimeters.zero(), 0.001));
     assertFalse(Units.Feet.of(2).isNear(Units.Millimeters.of(0), 0.001));
+  }
+
+  @Test
+  void testIsNearMeasureTolerance() {
+    var measureCompared = Units.Meters.of(1);
+    var measureComparing = Units.Meters.of(1.2);
+
+    // Positive value with positive tolerance
+    assertTrue(measureCompared.isNear(measureComparing, Units.Millimeters.of(300)));
+    assertFalse(measureCompared.isNear(measureComparing, Units.Centimeters.of(10)));
+
+    measureCompared = measureCompared.negate();
+    measureComparing = measureComparing.negate();
+
+    // Negative value with positive tolerance
+    assertTrue(measureCompared.isNear(measureComparing, Units.Millimeters.of(300)));
+    assertFalse(measureCompared.isNear(measureComparing, Units.Centimeters.of(10)));
+
+    measureCompared = measureCompared.negate();
+    measureComparing = measureComparing.negate();
+
+    // Positive value with negative tolerance
+    assertTrue(measureCompared.isNear(measureComparing, Units.Millimeters.of(-300)));
+    assertFalse(measureCompared.isNear(measureComparing, Units.Centimeters.of(-10)));
+
+    measureCompared = measureCompared.negate();
+    measureComparing = measureComparing.negate();
+
+    // Negative value with negative tolerance.
+    assertTrue(measureCompared.isNear(measureComparing, Units.Millimeters.of(-300)));
+    assertFalse(measureCompared.isNear(measureComparing, Units.Centimeters.of(-10)));
+
+    measureCompared = measureCompared.negate();
+    measureComparing = measureComparing.negate();
+
+    // Tolerance exact difference between measures.
+    assertTrue(measureCompared.isNear(measureComparing, Units.Millimeters.of(200)));
+    assertTrue(measureCompared.isNear(measureComparing, Units.Centimeters.of(-20)));
   }
 }

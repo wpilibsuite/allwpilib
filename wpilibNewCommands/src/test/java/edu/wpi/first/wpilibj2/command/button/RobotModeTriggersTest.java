@@ -6,7 +6,6 @@ package edu.wpi.first.wpilibj2.command.button;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj2.command.CommandTestBase;
 import org.junit.jupiter.api.Test;
@@ -18,7 +17,7 @@ class RobotModeTriggersTest extends CommandTestBase {
     DriverStationSim.setAutonomous(true);
     DriverStationSim.setTest(false);
     DriverStationSim.setEnabled(true);
-    DriverStation.refreshData();
+    DriverStationSim.notifyNewData();
     Trigger auto = RobotModeTriggers.autonomous();
     assertTrue(auto.getAsBoolean());
   }
@@ -29,7 +28,7 @@ class RobotModeTriggersTest extends CommandTestBase {
     DriverStationSim.setAutonomous(false);
     DriverStationSim.setTest(false);
     DriverStationSim.setEnabled(true);
-    DriverStation.refreshData();
+    DriverStationSim.notifyNewData();
     Trigger teleop = RobotModeTriggers.teleop();
     assertTrue(teleop.getAsBoolean());
   }
@@ -40,7 +39,7 @@ class RobotModeTriggersTest extends CommandTestBase {
     DriverStationSim.setAutonomous(false);
     DriverStationSim.setTest(true);
     DriverStationSim.setEnabled(true);
-    DriverStation.refreshData();
+    DriverStationSim.notifyNewData();
     Trigger test = RobotModeTriggers.test();
     assertTrue(test.getAsBoolean());
   }
@@ -51,7 +50,7 @@ class RobotModeTriggersTest extends CommandTestBase {
     DriverStationSim.setAutonomous(false);
     DriverStationSim.setTest(false);
     DriverStationSim.setEnabled(false);
-    DriverStation.refreshData();
+    DriverStationSim.notifyNewData();
     Trigger disabled = RobotModeTriggers.disabled();
     assertTrue(disabled.getAsBoolean());
   }

@@ -150,6 +150,5 @@ int ADXRS450_Gyro::GetPort() const {
 
 void ADXRS450_Gyro::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Gyro");
-  builder.AddDoubleProperty(
-      "Value", [=, this] { return GetAngle(); }, nullptr);
+  builder.AddDoubleProperty("Value", [=, this] { return GetAngle(); }, nullptr);
 }

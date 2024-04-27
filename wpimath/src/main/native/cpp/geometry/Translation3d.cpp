@@ -19,6 +19,11 @@ Translation3d::Translation3d(units::meter_t distance, const Rotation3d& angle) {
   m_z = rectangular.Z();
 }
 
+Translation3d::Translation3d(const Eigen::Vector3d& vector)
+    : m_x{units::meter_t{vector.x()}},
+      m_y{units::meter_t{vector.y()}},
+      m_z{units::meter_t{vector.z()}} {}
+
 units::meter_t Translation3d::Distance(const Translation3d& other) const {
   return units::math::sqrt(units::math::pow<2>(other.m_x - m_x) +
                            units::math::pow<2>(other.m_y - m_y) +

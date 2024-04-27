@@ -128,6 +128,17 @@ TEST(Translation3dTest, PolarConstructor) {
   EXPECT_NEAR(two.Z().value(), 0.0, kEpsilon);
 }
 
+TEST(Translation3dTest, ToVector) {
+  const Eigen::Vector3d vec(1.0, 2.0, 3.0);
+  const Translation3d translation{vec};
+
+  EXPECT_DOUBLE_EQ(vec[0], translation.X().value());
+  EXPECT_DOUBLE_EQ(vec[1], translation.Y().value());
+  EXPECT_DOUBLE_EQ(vec[2], translation.Z().value());
+
+  EXPECT_TRUE(vec == translation.ToVector());
+}
+
 TEST(Translation3dTest, Constexpr) {
   constexpr Translation3d defaultCtor;
   constexpr Translation3d componentCtor{1_m, 2_m, 3_m};

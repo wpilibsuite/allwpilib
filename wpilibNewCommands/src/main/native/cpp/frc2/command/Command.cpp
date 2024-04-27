@@ -174,8 +174,7 @@ std::optional<std::string> Command::GetPreviousCompositionSite() const {
 
 void Command::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Command");
-  builder.AddStringProperty(
-      ".name", [this] { return GetName(); }, nullptr);
+  builder.AddStringProperty(".name", [this] { return GetName(); }, nullptr);
   builder.AddBooleanProperty(
       "running", [this] { return IsScheduled(); },
       [this](bool value) {

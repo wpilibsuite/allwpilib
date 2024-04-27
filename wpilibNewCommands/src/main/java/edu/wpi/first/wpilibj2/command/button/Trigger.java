@@ -50,6 +50,32 @@ public class Trigger implements BooleanSupplier {
   }
 
   /**
+   * Starts the command when the condition changes.
+   *
+   * @param command the command to start
+   * @return this trigger, so calls can be chained
+   */
+  public Trigger onChange(Command command) {
+    requireNonNullParam(command, "command", "onChange");
+    m_loop.bind(
+        new Runnable() {
+          private boolean m_pressedLast = m_condition.getAsBoolean();
+
+          @Override
+          public void run() {
+            boolean pressed = m_condition.getAsBoolean();
+
+            if (m_pressedLast != pressed) {
+              command.schedule();
+            }
+
+            m_pressedLast = pressed;
+          }
+        });
+    return this;
+  }
+
+  /**
    * Starts the given command whenever the condition changes from `false` to `true`.
    *
    * @param command the command to start
@@ -237,7 +263,7 @@ public class Trigger implements BooleanSupplier {
    * @return A trigger which is active when both component triggers are active.
    */
   public Trigger and(BooleanSupplier trigger) {
-    return new Trigger(() -> m_condition.getAsBoolean() && trigger.getAsBoolean());
+    return new Trigger(m_loop, () -> m_condition.getAsBoolean() && trigger.getAsBoolean());
   }
 
   /**
@@ -247,7 +273,7 @@ public class Trigger implements BooleanSupplier {
    * @return A trigger which is active when either component trigger is active.
    */
   public Trigger or(BooleanSupplier trigger) {
-    return new Trigger(() -> m_condition.getAsBoolean() || trigger.getAsBoolean());
+    return new Trigger(m_loop, () -> m_condition.getAsBoolean() || trigger.getAsBoolean());
   }
 
   /**
@@ -257,7 +283,7 @@ public class Trigger implements BooleanSupplier {
    * @return the negated trigger
    */
   public Trigger negate() {
-    return new Trigger(() -> !m_condition.getAsBoolean());
+    return new Trigger(m_loop, () -> !m_condition.getAsBoolean());
   }
 
   /**
@@ -281,6 +307,7 @@ public class Trigger implements BooleanSupplier {
    */
   public Trigger debounce(double seconds, Debouncer.DebounceType type) {
     return new Trigger(
+        m_loop,
         new BooleanSupplier() {
           final Debouncer m_debouncer = new Debouncer(seconds, type);
 

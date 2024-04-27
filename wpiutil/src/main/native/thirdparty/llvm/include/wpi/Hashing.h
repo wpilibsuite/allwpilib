@@ -682,11 +682,25 @@ template <typename T> hash_code hash_value(const std::optional<T> &arg) {
 template <> struct DenseMapInfo<hash_code, void> {
   static inline hash_code getEmptyKey() { return hash_code(-1); }
   static inline hash_code getTombstoneKey() { return hash_code(-2); }
-  static unsigned getHashValue(hash_code val) { return val; }
+  static unsigned getHashValue(hash_code val) {
+    return static_cast<unsigned>(size_t(val));
+  }
   static bool isEqual(hash_code LHS, hash_code RHS) { return LHS == RHS; }
 };
 
 } // namespace wpi
+
+/// Implement std::hash so that hash_code can be used in STL containers.
+namespace std {
+
+template<>
+struct hash<wpi::hash_code> {
+  size_t operator()(wpi::hash_code const& Val) const {
+    return Val;
+  }
+};
+
+} // namespace std;
 
 #ifdef _WIN32
 #pragma warning(pop)

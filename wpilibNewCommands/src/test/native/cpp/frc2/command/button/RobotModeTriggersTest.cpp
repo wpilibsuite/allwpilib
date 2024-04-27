@@ -18,7 +18,7 @@ TEST(RobotModeTriggersTest, Autonomous) {
   DriverStationSim::SetAutonomous(true);
   DriverStationSim::SetTest(false);
   DriverStationSim::SetEnabled(true);
-  frc::DriverStation::RefreshData();
+  DriverStationSim::NotifyNewData();
   Trigger autonomous = RobotModeTriggers::Autonomous();
   EXPECT_TRUE(autonomous.Get());
 }
@@ -28,7 +28,7 @@ TEST(RobotModeTriggersTest, Teleop) {
   DriverStationSim::SetAutonomous(false);
   DriverStationSim::SetTest(false);
   DriverStationSim::SetEnabled(true);
-  frc::DriverStation::RefreshData();
+  DriverStationSim::NotifyNewData();
   Trigger teleop = RobotModeTriggers::Teleop();
   EXPECT_TRUE(teleop.Get());
 }
@@ -38,7 +38,7 @@ TEST(RobotModeTriggersTest, Disabled) {
   DriverStationSim::SetAutonomous(false);
   DriverStationSim::SetTest(false);
   DriverStationSim::SetEnabled(false);
-  frc::DriverStation::RefreshData();
+  DriverStationSim::NotifyNewData();
   Trigger disabled = RobotModeTriggers::Disabled();
   EXPECT_TRUE(disabled.Get());
 }
@@ -48,7 +48,7 @@ TEST(RobotModeTriggersTest, TestMode) {
   DriverStationSim::SetAutonomous(false);
   DriverStationSim::SetTest(true);
   DriverStationSim::SetEnabled(true);
-  frc::DriverStation::RefreshData();
+  DriverStationSim::NotifyNewData();
   Trigger test = RobotModeTriggers::Test();
   EXPECT_TRUE(test.Get());
 }

@@ -13,6 +13,34 @@ using namespace frc2;
 
 Trigger::Trigger(const Trigger& other) = default;
 
+Trigger Trigger::OnChange(Command* command) {
+  m_loop->Bind(
+      [condition = m_condition, previous = m_condition(), command]() mutable {
+        bool current = condition();
+
+        if (previous != current) {
+          command->Schedule();
+        }
+
+        previous = current;
+      });
+  return *this;
+}
+
+Trigger Trigger::OnChange(CommandPtr&& command) {
+  m_loop->Bind([condition = m_condition, previous = m_condition(),
+                command = std::move(command)]() mutable {
+    bool current = condition();
+
+    if (previous != current) {
+      command.Schedule();
+    }
+
+    previous = current;
+  });
+  return *this;
+}
+
 Trigger Trigger::OnTrue(Command* command) {
   m_loop->Bind(
       [condition = m_condition, previous = m_condition(), command]() mutable {

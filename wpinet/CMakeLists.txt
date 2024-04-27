@@ -39,6 +39,7 @@ if(WITH_JAVA)
     add_dependencies(wpinetjni wpinet_jar)
 
     install(TARGETS wpinetjni EXPORT wpinetjni)
+    export(TARGETS wpinetjni FILE wpinetjni.cmake NAMESPACE wpinetjni::)
 endif()
 
 if(WITH_JAVA_SOURCE)
@@ -196,6 +197,7 @@ target_include_directories(
 )
 
 install(TARGETS wpinet EXPORT wpinet)
+export(TARGETS wpinet FILE wpinet.cmake NAMESPACE wpinet::)
 
 configure_file(wpinet-config.cmake.in ${WPILIB_BINARY_DIR}/wpinet-config.cmake)
 install(FILES ${WPILIB_BINARY_DIR}/wpinet-config.cmake DESTINATION share/wpinet)

@@ -320,6 +320,5 @@ bool Counter::GetDirection() const {
 
 void Counter::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Counter");
-  builder.AddDoubleProperty(
-      "Value", [=, this] { return Get(); }, nullptr);
+  builder.AddDoubleProperty("Value", [=, this] { return Get(); }, nullptr);
 }

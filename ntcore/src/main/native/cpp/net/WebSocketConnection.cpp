@@ -124,7 +124,7 @@ void WebSocketConnection::SendPing(uint64_t time) {
   WPI_DEBUG4(m_logger, "conn: sending ping {}", time);
   auto buf = AllocBuf();
   buf.len = 8;
-  wpi::support::endian::write64<wpi::support::native>(buf.base, time);
+  wpi::support::endian::write64<wpi::endianness::native>(buf.base, time);
   m_ws.SendPing({buf}, [selfweak = weak_from_this()](auto bufs, auto err) {
     if (auto self = selfweak.lock()) {
       self->m_err = err;
@@ -233,6 +233,8 @@ int WebSocketConnection::Flush() {
   int count = 0;
   for (auto&& frame :
        wpi::take_back(std::span{m_frames}, unsentFrames.size())) {
+    ReleaseBufs(
+        std::span{m_bufs}.subspan(frame.start, frame.end - frame.start));
     count += frame.count;
   }
   m_frames.clear();

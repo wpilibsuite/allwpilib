@@ -4,8 +4,11 @@
 
 package edu.wpi.first.wpilibj2.command;
 
+import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Time;
 import edu.wpi.first.util.function.BooleanConsumer;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -147,6 +150,23 @@ public abstract class Command implements Sendable {
    */
   public ParallelRaceGroup withTimeout(double seconds) {
     return raceWith(new WaitCommand(seconds));
+  }
+
+  /**
+   * Decorates this command with a timeout. If the specified timeout is exceeded before the command
+   * finishes normally, the command will be interrupted and un-scheduled.
+   *
+   * <p>Note: This decorator works by adding this command to a composition. The command the
+   * decorator was called on cannot be scheduled independently or be added to a different
+   * composition (namely, decorators), unless it is manually cleared from the list of composed
+   * commands with {@link CommandScheduler#removeComposedCommand(Command)}. The command composition
+   * returned from this method can be further decorated without issue.
+   *
+   * @param time the timeout duration
+   * @return the command with the timeout added
+   */
+  public ParallelRaceGroup withTimeout(Measure<Time> time) {
+    return withTimeout(time.in(Second));
   }
 
   /**

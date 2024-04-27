@@ -188,6 +188,15 @@ public class Rotation2d
   }
 
   /**
+   * Returns the measure of the Rotation2d.
+   *
+   * @return The measure of the Rotation2d.
+   */
+  public Measure<Angle> getMeasure() {
+    return Radians.of(getRadians());
+  }
+
+  /**
    * Returns the radian value of the Rotation2d.
    *
    * @return The radian value of the Rotation2d.

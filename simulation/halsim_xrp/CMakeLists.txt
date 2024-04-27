@@ -14,3 +14,4 @@ target_include_directories(halsim_xrp PRIVATE src/main/native/include)
 set_property(TARGET halsim_xrp PROPERTY FOLDER "libraries")
 
 install(TARGETS halsim_xrp EXPORT halsim_xrp DESTINATION "${main_lib_dest}")
+export(TARGETS halsim_xrp FILE halsim_xrp.cmake NAMESPACE halsim_xrp::)
