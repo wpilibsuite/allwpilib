@@ -34,9 +34,9 @@ public final class MecanumDriveMotorVoltagesProto
 
   @Override
   public void pack(ProtobufMecanumDriveMotorVoltages msg, MecanumDriveMotorVoltages value) {
-    msg.setFrontLeft(value.frontLeftVoltage)
-        .setFrontRight(value.frontRightVoltage)
-        .setRearLeft(value.rearLeftVoltage)
-        .setRearRight(value.rearRightVoltage);
+    msg.setFrontLeft(value.frontLeftVoltage);
+    msg.setFrontRight(value.frontRightVoltage);
+    msg.setRearLeft(value.rearLeftVoltage);
+    msg.setRearRight(value.rearRightVoltage);
   }
 }
