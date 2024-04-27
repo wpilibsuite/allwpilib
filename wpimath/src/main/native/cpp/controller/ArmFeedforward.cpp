@@ -39,7 +39,7 @@ units::volt_t ArmFeedforward::Calculate(units::unit_t<Angle> currentAngle,
 
   auto r_k1 = RK4<decltype(f), VarMat, VarMat>(f, r_k, u_k, dt);
 
-  // Minimize f
+  // Minimize difference between desired and actual next velocity
   auto cost =
       (nextVelocity.value() - r_k1(1)) * (nextVelocity.value() - r_k1(1));
 
