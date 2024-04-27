@@ -14,7 +14,7 @@ using namespace wpi::java;
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_math_WPIMathJNI_ArmFeedforward
+ * Class:     edu_wpi_first_math_WPIMathJNI
  * Method:    calculate
  * Signature: (DDDDDDDD)D
  */
