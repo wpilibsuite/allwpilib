@@ -9,6 +9,9 @@
 #include <sleipnir/autodiff/Gradient.hpp>
 #include <sleipnir/autodiff/Hessian.hpp>
 
+#include "frc/EigenCore.h"
+#include "frc/system/NumericalIntegration.h"
+
 using namespace frc;
 
 units::volt_t ArmFeedforward::Calculate(units::unit_t<Angle> currentAngle,
@@ -36,7 +39,6 @@ units::volt_t ArmFeedforward::Calculate(units::unit_t<Angle> currentAngle,
   u_k.SetValue((kS * wpi::sgn(currentVelocity.value()) + kV * currentVelocity +
                 kA * acceleration + kG * units::math::cos(currentAngle))
                    .value());
-  fmt::print("u₀ = {}\n", u_k.Value());
 
   auto r_k1 = RK4<decltype(f), VarMat, VarMat>(f, r_k, u_k, dt);
 
@@ -45,7 +47,6 @@ units::volt_t ArmFeedforward::Calculate(units::unit_t<Angle> currentAngle,
       (nextVelocity.value() - r_k1(1)) * (nextVelocity.value() - r_k1(1));
 
   // Refine solution via Newton's method
-  auto solveStartTime = std::chrono::system_clock::now();
   {
     auto xAD = u_k;
     double x = xAD.Value();
@@ -94,14 +95,6 @@ units::volt_t ArmFeedforward::Calculate(units::unit_t<Angle> currentAngle,
       error = std::abs(g.coeff(0));
     }
   }
-  auto solveEndTime = std::chrono::system_clock::now();
 
-  sleipnir::println("Solve time: {:.3f} ms",
-                    std::chrono::duration_cast<std::chrono::microseconds>(
-                        solveEndTime - solveStartTime)
-                            .count() /
-                        1e3);
-
-  fmt::print("uₖ = {}\n", u_k.Value());
   return units::volt_t{u_k.Value()};
 }

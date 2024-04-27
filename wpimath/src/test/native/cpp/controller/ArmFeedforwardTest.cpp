@@ -7,10 +7,13 @@
 
 #include <gtest/gtest.h>
 
+#include "frc/EigenCore.h"
 #include "frc/controller/ArmFeedforward.h"
-#include "units/acceleration.h"
-#include "units/length.h"
+#include "frc/system/NumericalIntegration.h"
+#include "units/angular_acceleration.h"
+#include "units/angular_velocity.h"
 #include "units/time.h"
+#include "units/voltage.h"
 
 static constexpr auto Ks = 0.5_V;
 static constexpr auto Kv = 1.5_V / 1_rad_per_s;
@@ -57,7 +60,8 @@ TEST(ArmFeedforwardTest, Calculate) {
     frc::Matrixd<2, 1> B{{0.0}, {1.0 / Ka.value()}};
 
     frc::Matrixd<2, 1> actual_x_k1 = frc::RK4(
-        [&](const frc::Matrixd<2, 1>& x, const frc::Matrixd<1, 1>& u) {
+        [&](const frc::Matrixd<2, 1>& x,
+            const frc::Matrixd<1, 1>& u) -> frc::Matrixd<2, 1> {
           frc::Matrixd<2, 1> c{0.0,
                                -Ks.value() / Ka.value() * wpi::sgn(x(1)) -
                                    Kg.value() / Ka.value() * std::cos(x(0))};
@@ -66,8 +70,7 @@ TEST(ArmFeedforwardTest, Calculate) {
         frc::Matrixd<2, 1>{currentAngle.value(), currentVelocity.value()},
         frc::Matrixd<1, 1>{u.value()}, dt);
 
-    fmt::print("residual = {}\n", actual_x_k1(1) - nextVelocity.value());
-    EXPECT_NEAR(nextVelocity.value(), actual_x_k1(1), 2e-2);
+    EXPECT_NEAR(nextVelocity.value(), actual_x_k1(1), 1e-12);
   }
 }
 

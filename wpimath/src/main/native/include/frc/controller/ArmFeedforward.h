@@ -8,9 +8,6 @@
 #include <wpi/MathExtras.h>
 #include <wpi/SymbolExports.h>
 
-#include "frc/controller/LinearPlantInversionFeedforward.h"
-#include "frc/system/NumericalIntegration.h"
-#include "frc/system/plant/LinearSystemId.h"
 #include "units/angle.h"
 #include "units/angular_velocity.h"
 #include "units/math.h"
