@@ -33,15 +33,15 @@ class ArmFeedforwardTest {
     final double currentVelocityRadPerSec = 1.0;
     final double nextVelocityRadPerSec = 1.05;
     final double dtSeconds = 0.020;
-    
+
     final double u =
         m_armFF.calculate(
             currentAngleRadians, currentVelocityRadPerSec, nextVelocityRadPerSec, dtSeconds);
-    
-            final Matrix<N2, N2> A =
+
+    final Matrix<N2, N2> A =
         new Matrix<>(Nat.N2(), Nat.N2(), new double[] {0.0, 1.0, 0.0, -kv / ka});
     final Matrix<N2, N1> B = new Matrix<>(Nat.N2(), Nat.N1(), new double[] {0.0, 1.0 / ka});
-    
+
     final BiFunction<Matrix<N2, N1>, Matrix<N1, N1>, Matrix<N2, N1>> f =
         (x_, u_) -> {
           Matrix<N2, N1> c =
@@ -59,7 +59,7 @@ class ArmFeedforwardTest {
             MatBuilder.fill(Nat.N2(), Nat.N1(), currentAngleRadians, currentVelocityRadPerSec),
             MatBuilder.fill(Nat.N1(), Nat.N1(), u),
             dtSeconds);
-            
+
     assertEquals(nextVelocityRadPerSec, actual_x_k1.get(1, 0), 1e-12);
   }
 
