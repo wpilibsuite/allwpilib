@@ -79,9 +79,11 @@ public class DifferentialDriveFeedforward implements ProtobufSerializable, Struc
     return new DifferentialDriveWheelVoltages(u.get(0, 0), u.get(1, 0));
   }
 
+  /** DifferentialDriveFeedforward struct for serialization. */
   public static final DifferentialDriveFeedforwardStruct struct =
       new DifferentialDriveFeedforwardStruct();
 
+  /** DifferentialDriveFeedforward protobuf for serialization. */
   public static final DifferentialDriveFeedforwardProto proto =
       new DifferentialDriveFeedforwardProto();
 }

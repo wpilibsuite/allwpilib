@@ -157,7 +157,9 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
     return maxAchievableAcceleration(-maxVoltage, velocity);
   }
 
+  /** SimpleMotorFeedforward struct for serialization. */
   public static final SimpleMotorFeedforwardStruct struct = new SimpleMotorFeedforwardStruct();
 
+  /** SimpleMotorFeedforward protobuf for serialization. */
   public static final SimpleMotorFeedforwardProto proto = new SimpleMotorFeedforwardProto();
 }

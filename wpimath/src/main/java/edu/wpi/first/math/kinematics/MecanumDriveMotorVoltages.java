@@ -53,8 +53,10 @@ public class MecanumDriveMotorVoltages implements ProtobufSerializable, StructSe
         frontLeftVoltage, frontRightVoltage, rearLeftVoltage, rearRightVoltage);
   }
 
+  /** MecanumDriveMotorVoltages struct for serialization. */
   public static final MecanumDriveMotorVoltagesStruct struct =
       new MecanumDriveMotorVoltagesStruct();
 
+  /** MecanumDriveMotorVoltages protobuf for serialization. */
   public static final MecanumDriveMotorVoltagesProto proto = new MecanumDriveMotorVoltagesProto();
 }

@@ -184,6 +184,9 @@ public class QuinticHermiteSpline extends Spline
         });
   }
 
+  /** QuinticHermiteSpline struct for serialization. */
   public static final QuinticHermiteSplineProto proto = new QuinticHermiteSplineProto();
+
+  /** QuinticHermiteSpline protobuf for serialization. */
   public static final QuinticHermiteSplineStruct struct = new QuinticHermiteSplineStruct();
 }

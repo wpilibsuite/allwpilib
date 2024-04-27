@@ -417,5 +417,6 @@ public class SwerveDriveKinematics
     return m_modules;
   }
 
+  /** SwerveDriveKinematics protobuf for serialization. */
   public static final SwerveDriveKinematicsProto proto = new SwerveDriveKinematicsProto();
 }

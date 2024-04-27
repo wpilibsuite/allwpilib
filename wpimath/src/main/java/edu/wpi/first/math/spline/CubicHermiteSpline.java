@@ -175,6 +175,9 @@ public class CubicHermiteSpline extends Spline implements ProtobufSerializable, 
         });
   }
 
+  /** CubicHermiteSpline struct for serialization. */
   public static final CubicHermiteSplineProto proto = new CubicHermiteSplineProto();
+
+  /** CubicHermiteSpline protobuf for serialization. */
   public static final CubicHermiteSplineStruct struct = new CubicHermiteSplineStruct();
 }
