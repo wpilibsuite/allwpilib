@@ -26,7 +26,7 @@ class LinearSystemLoopTest {
   private static final double kPositionStddev = 0.0001;
   private static final Random random = new Random();
 
-  LinearSystem<N2, N1, N1> m_plant =
+  LinearSystem<N2, N1, N2> m_plant =
       LinearSystemId.createElevatorSystem(DCMotor.getVex775Pro(2), 5, 0.0181864, 1.0);
 
   KalmanFilter<N2, N1, N1> m_observer =

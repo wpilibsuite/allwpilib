@@ -27,7 +27,7 @@ import java.util.Random;
 import org.junit.jupiter.api.Test;
 
 class KalmanFilterTest {
-  private static LinearSystem<N2, N1, N1> elevatorPlant;
+  private static LinearSystem<N2, N1, N2> elevatorPlant;
 
   private static final double kDt = 0.00505;
 
