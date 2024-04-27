@@ -52,12 +52,15 @@ TEST(ArmFeedforwardTest, Calculate) {
     constexpr auto dt = 20_ms;
 
     auto u = armFF.Calculate(currentAngle, currentVelocity, nextVelocity, dt);
+    // fmt::print("u = {}\n", u.value());
 
     frc::Matrixd<2, 2> A{{0.0, 1.0}, {0.0, -Kv.value() / Ka.value()}};
     frc::Matrixd<2, 1> B{{0.0}, {1.0 / Ka.value()}};
 
     frc::Matrixd<2, 1> actual_x_k1 = frc::RK4(
         [&](const frc::Matrixd<2, 1>& x, const frc::Matrixd<1, 1>& u) {
+          // fmt::print("double c1 = {}\n", -(Ks / Ka).value() * wpi::sgn(x(1)));
+          // fmt::print("double c2 = {}\n", -(Kg / Ka).value() * std::cos(x(0)));
           frc::Matrixd<2, 1> c{0.0,
                                -Ks.value() / Ka.value() * wpi::sgn(x(1)) -
                                    Kg.value() / Ka.value() * std::cos(x(0))};
@@ -65,8 +68,9 @@ TEST(ArmFeedforwardTest, Calculate) {
         },
         frc::Matrixd<2, 1>{currentAngle.value(), currentVelocity.value()},
         frc::Matrixd<1, 1>{u.value()}, dt);
+    // fmt::print("residual = {}\n", actual_x_k1(1) - nextVelocity.value());
 
-    EXPECT_NEAR(nextVelocity.value(), actual_x_k1(1), 1e-2);
+    EXPECT_NEAR(nextVelocity.value(), actual_x_k1(1), 1e-6);
   }
 }
 
