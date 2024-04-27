@@ -75,7 +75,6 @@ public class MecanumDrivePoseEstimator extends PoseEstimator<MecanumDriveWheelPo
       Matrix<N3, N1> stateStdDevs,
       Matrix<N3, N1> visionMeasurementStdDevs) {
     super(
-        kinematics,
         new MecanumDriveOdometry(kinematics, gyroAngle, wheelPositions, initialPoseMeters),
         stateStdDevs,
         visionMeasurementStdDevs);

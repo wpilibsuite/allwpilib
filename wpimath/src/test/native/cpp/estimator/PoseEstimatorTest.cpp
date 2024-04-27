@@ -7,34 +7,40 @@
 #include <tuple>
 #include <utility>
 
+#include <fmt/format.h>
 #include <gtest/gtest.h>
 
+#include "../SamplingUtil.h"
+#include "PoseEstimationTestUtil.h"
 #include "frc/StateSpaceUtil.h"
-#include "frc/estimator/DifferentialDrivePoseEstimator.h"
+#include "frc/estimator/PoseEstimator.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
-#include "frc/kinematics/DifferentialDriveKinematics.h"
+#include "frc/kinematics/Odometry.h"
 #include "frc/trajectory/TrajectoryGenerator.h"
 #include "units/angle.h"
 #include "units/length.h"
 #include "units/time.h"
 
-void testFollowTrajectory(
-    const frc::DifferentialDriveKinematics& kinematics,
-    frc::DifferentialDrivePoseEstimator& estimator,
-    const frc::Trajectory& trajectory,
-    std::function<frc::ChassisSpeeds(frc::Trajectory::State&)>
-        chassisSpeedsGenerator,
-    std::function<frc::Pose2d(frc::Trajectory::State&)>
-        visionMeasurementGenerator,
-    const frc::Pose2d& startingPose, const frc::Pose2d& endingPose,
-    const units::second_t dt, const units::second_t kVisionUpdateRate,
-    const units::second_t kVisionUpdateDelay, const bool checkError,
-    const bool debug) {
-  units::meter_t leftDistance = 0_m;
-  units::meter_t rightDistance = 0_m;
+namespace frc {
 
-  estimator.ResetPosition(frc::Rotation2d{}, leftDistance, rightDistance,
+using SE2Odometry = Odometry<SE2KinematicPrimitive, SE2KinematicPrimitive>;
+using SE2PoseEstimator =
+    PoseEstimator<SE2KinematicPrimitive, SE2KinematicPrimitive>;
+
+}  // namespace frc
+
+void testFollowTrajectory(const frc::SE2Kinematics& kinematics,
+                          frc::SE2PoseEstimator& estimator,
+                          const frc::Trajectory& trajectory,
+                          const frc::Pose2d& startingPose,
+                          const frc::Pose2d& endingPose,
+                          const units::second_t dt,
+                          const units::second_t kVisionUpdateRate,
+                          const units::second_t kVisionUpdateDelay,
+                          const bool checkError, const bool debug) {
+  frc::SE2KinematicPrimitive wheelPositions{frc::Pose2d{}};
+  estimator.ResetPosition(trajectory.InitialPose().Rotation(), wheelPositions,
                           startingPose);
 
   std::default_random_engine generator;
@@ -50,9 +56,7 @@ void testFollowTrajectory(
   double errorSum = 0;
 
   if (debug) {
-    fmt::print(
-        "time, est_x, est_y, est_theta, true_x, true_y, true_theta, left, "
-        "right\n");
+    fmt::print("time, est_x, est_y, est_theta, true_x, true_y, true_theta\n");
   }
 
   while (t < trajectory.TotalTime()) {
@@ -62,11 +66,9 @@ void testFollowTrajectory(
     // seconds since the last vision measurement
     if (visionPoses.empty() ||
         visionPoses.back().first + kVisionUpdateRate < t) {
-      auto visionPose =
-          visionMeasurementGenerator(groundTruthState) +
-          frc::Transform2d{frc::Translation2d{distribution(generator) * 0.1_m,
-                                              distribution(generator) * 0.1_m},
-                           frc::Rotation2d{distribution(generator) * 0.05_rad}};
+      auto adjustment =
+          frc::SampleTwist2d(generator, distribution, {0.1, 0.1, 0.05});
+      auto visionPose = groundTruthState.pose.Exp(adjustment);
       visionPoses.push_back({t, visionPose});
     }
 
@@ -80,27 +82,25 @@ void testFollowTrajectory(
       visionLog.push_back({t, visionEntry.first, visionEntry.second});
     }
 
-    auto chassisSpeeds = chassisSpeedsGenerator(groundTruthState);
+    auto gyroAngle = groundTruthState.pose.Rotation() +
+                     frc::SampleRotation2d(generator, distribution, 0.05);
 
-    auto wheelSpeeds = kinematics.ToWheelSpeeds(chassisSpeeds);
+    frc::Twist2d trueDelta{
+        groundTruthState.velocity * dt, 0_m,
+        groundTruthState.velocity * groundTruthState.curvature * dt};
 
-    leftDistance += wheelSpeeds.left * dt;
-    rightDistance += wheelSpeeds.right * dt;
+    wheelPositions = frc::SE2KinematicPrimitive{
+        wheelPositions.GetPose().Exp(trueDelta).Exp(frc::SampleTwist2d(
+            generator, distribution, {0.001, 0.001, 0.005}))};
 
-    auto xhat = estimator.UpdateWithTime(
-        t,
-        groundTruthState.pose.Rotation() +
-            frc::Rotation2d{distribution(generator) * 0.05_rad} -
-            trajectory.InitialPose().Rotation(),
-        leftDistance, rightDistance);
+    auto xhat = estimator.UpdateWithTime(t, gyroAngle, wheelPositions);
 
     if (debug) {
-      fmt::print(
-          "{}, {}, {}, {}, {}, {}, {}, {}, {}\n", t.value(), xhat.X().value(),
-          xhat.Y().value(), xhat.Rotation().Radians().value(),
-          groundTruthState.pose.X().value(), groundTruthState.pose.Y().value(),
-          groundTruthState.pose.Rotation().Radians().value(),
-          leftDistance.value(), rightDistance.value());
+      fmt::print("{}, {}, {}, {}, {}, {}, {}\n", t.value(), xhat.X().value(),
+                 xhat.Y().value(), xhat.Rotation().Radians().value(),
+                 groundTruthState.pose.X().value(),
+                 groundTruthState.pose.Y().value(),
+                 groundTruthState.pose.Rotation().Radians().value());
     }
 
     double error = groundTruthState.pose.Translation()
@@ -131,12 +131,12 @@ void testFollowTrajectory(
   }
 
   EXPECT_NEAR(endingPose.X().value(),
-              estimator.GetEstimatedPosition().X().value(), 0.08);
+              estimator.GetEstimatedPosition().X().value(), 0.06);
   EXPECT_NEAR(endingPose.Y().value(),
-              estimator.GetEstimatedPosition().Y().value(), 0.08);
+              estimator.GetEstimatedPosition().Y().value(), 0.06);
   EXPECT_NEAR(endingPose.Rotation().Radians().value(),
               estimator.GetEstimatedPosition().Rotation().Radians().value(),
-              0.15);
+              0.10);
 
   if (checkError) {
     // NOLINTNEXTLINE(bugprone-integer-division)
@@ -145,12 +145,13 @@ void testFollowTrajectory(
   }
 }
 
-TEST(DifferentialDrivePoseEstimatorTest, Accuracy) {
-  frc::DifferentialDriveKinematics kinematics{1.0_m};
-
-  frc::DifferentialDrivePoseEstimator estimator{
-      kinematics,         frc::Rotation2d{}, 0_m, 0_m, frc::Pose2d{},
-      {0.02, 0.02, 0.01}, {0.1, 0.1, 0.1}};
+TEST(PoseEstimatorTest, Accuracy) {
+  frc::SE2Kinematics kinematics{0.02_s};
+  frc::SE2Odometry odometry{kinematics, frc::Rotation2d{},
+                            frc::SE2KinematicPrimitive{frc::Pose2d{}},
+                            frc::Pose2d{}};
+  frc::SE2PoseEstimator estimator{
+      odometry, {0.02, 0.02, 0.01}, {0.1, 0.1, 0.1}};
 
   frc::Trajectory trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
       std::vector{frc::Pose2d{0_m, 0_m, 45_deg}, frc::Pose2d{3_m, 0_m, -90_deg},
@@ -159,23 +160,19 @@ TEST(DifferentialDrivePoseEstimatorTest, Accuracy) {
                   frc::Pose2d{0_m, 0_m, 45_deg}},
       frc::TrajectoryConfig(2_mps, 2_mps_sq));
 
-  testFollowTrajectory(
-      kinematics, estimator, trajectory,
-      [&](frc::Trajectory::State& state) {
-        return frc::ChassisSpeeds{state.velocity, 0_mps,
-                                  state.velocity * state.curvature};
-      },
-      [&](frc::Trajectory::State& state) { return state.pose; },
-      trajectory.InitialPose(), {0_m, 0_m, frc::Rotation2d{45_deg}}, 0.02_s,
-      0.1_s, 0.25_s, true, false);
+  testFollowTrajectory(kinematics, estimator, trajectory,
+                       trajectory.InitialPose(),
+                       trajectory.Sample(trajectory.TotalTime()).pose, 0.02_s,
+                       0.1_s, 0.25_s, true, false);
 }
 
-TEST(DifferentialDrivePoseEstimatorTest, BadInitialPose) {
-  frc::DifferentialDriveKinematics kinematics{1.0_m};
-
-  frc::DifferentialDrivePoseEstimator estimator{
-      kinematics,         frc::Rotation2d{}, 0_m, 0_m, frc::Pose2d{},
-      {0.02, 0.02, 0.01}, {0.1, 0.1, 0.1}};
+TEST(PoseEstimatorTest, BadInitialPose) {
+  frc::SE2Kinematics kinematics{0.02_s};
+  frc::SE2Odometry odometry{kinematics, frc::Rotation2d{},
+                            frc::SE2KinematicPrimitive{frc::Pose2d{}},
+                            frc::Pose2d{}};
+  frc::SE2PoseEstimator estimator{
+      odometry, {0.02, 0.02, 0.01}, {0.1, 0.1, 0.1}};
 
   frc::Trajectory trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
       std::vector{frc::Pose2d{0_m, 0_m, 45_deg}, frc::Pose2d{3_m, 0_m, -90_deg},
@@ -197,37 +194,28 @@ TEST(DifferentialDrivePoseEstimatorTest, BadInitialPose) {
                                               pose_offset.Sin() * 1_m},
                            heading_offset};
 
-      testFollowTrajectory(
-          kinematics, estimator, trajectory,
-          [&](frc::Trajectory::State& state) {
-            return frc::ChassisSpeeds{state.velocity, 0_mps,
-                                      state.velocity * state.curvature};
-          },
-          [&](frc::Trajectory::State& state) { return state.pose; },
-          initial_pose, {0_m, 0_m, frc::Rotation2d{45_deg}}, 0.02_s, 0.1_s,
-          0.25_s, false, false);
+      testFollowTrajectory(kinematics, estimator, trajectory, initial_pose,
+                           trajectory.Sample(trajectory.TotalTime()).pose,
+                           0.02_s, 0.1_s, 0.25_s, false, false);
     }
   }
 }
 
-TEST(DifferentialDrivePoseEstimatorTest, SimultaneousVisionMeasurements) {
+TEST(PoseEstimatorTest, SimultaneousVisionMeasurements) {
   // This tests for multiple vision measurements appled at the same time.
   // The expected behavior is that all measurements affect the estimated pose.
   // The alternative result is that only one vision measurement affects the
   // outcome. If that were the case, after 1000 measurements, the estimated
   // pose would converge to that measurement.
-  frc::DifferentialDriveKinematics kinematics{1.0_m};
+  frc::SE2Kinematics kinematics{0.02_s};
+  frc::SE2Odometry odometry{kinematics, frc::Rotation2d{},
+                            frc::SE2KinematicPrimitive{frc::Pose2d{}},
+                            frc::Pose2d{1_m, 2_m, frc::Rotation2d{270_deg}}};
+  frc::SE2PoseEstimator estimator{
+      odometry, {0.02, 0.02, 0.01}, {0.1, 0.1, 0.1}};
 
-  frc::DifferentialDrivePoseEstimator estimator{
-      kinematics,
-      frc::Rotation2d{},
-      0_m,
-      0_m,
-      frc::Pose2d{1_m, 2_m, frc::Rotation2d{270_deg}},
-      {0.02, 0.02, 0.01},
-      {0.1, 0.1, 0.1}};
-
-  estimator.UpdateWithTime(0_s, frc::Rotation2d{}, 0_m, 0_m);
+  estimator.UpdateWithTime(0_s, frc::Rotation2d{},
+                           frc::SE2KinematicPrimitive{frc::Pose2d{}});
 
   for (int i = 0; i < 1000; i++) {
     estimator.AddVisionMeasurement(
@@ -266,16 +254,18 @@ TEST(DifferentialDrivePoseEstimatorTest, SimultaneousVisionMeasurements) {
   }
 }
 
-TEST(DifferentialDrivePoseEstimatorTest, TestDiscardStaleVisionMeasurements) {
-  frc::DifferentialDriveKinematics kinematics{1_m};
-
-  frc::DifferentialDrivePoseEstimator estimator{
-      kinematics,      frc::Rotation2d{}, 0_m, 0_m, frc::Pose2d{},
-      {0.1, 0.1, 0.1}, {0.45, 0.45, 0.45}};
+TEST(PoseEstimatorTest, TestDiscardStaleVisionMeasurements) {
+  frc::SE2Kinematics kinematics{0.02_s};
+  frc::SE2Odometry odometry{kinematics, frc::Rotation2d{},
+                            frc::SE2KinematicPrimitive{frc::Pose2d{}},
+                            frc::Pose2d{}};
+  frc::SE2PoseEstimator estimator{
+      odometry, {0.1, 0.1, 0.1}, {0.45, 0.45, 0.45}};
 
   // Add enough measurements to fill up the buffer
   for (auto time = 0.0_s; time < 4_s; time += 0.02_s) {
-    estimator.UpdateWithTime(time, frc::Rotation2d{}, 0_m, 0_m);
+    estimator.UpdateWithTime(time, frc::Rotation2d{},
+                             frc::SE2KinematicPrimitive{frc::Pose2d{}});
   }
 
   auto odometryPose = estimator.GetEstimatedPosition();

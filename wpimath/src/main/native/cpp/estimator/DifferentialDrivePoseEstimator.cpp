@@ -21,5 +21,5 @@ DifferentialDrivePoseEstimator::DifferentialDrivePoseEstimator(
     const wpi::array<double, 3>& visionMeasurementStdDevs)
     : PoseEstimator<DifferentialDriveWheelSpeeds,
                     DifferentialDriveWheelPositions>(
-          kinematics, m_odometryImpl, stateStdDevs, visionMeasurementStdDevs),
+          m_odometryImpl, stateStdDevs, visionMeasurementStdDevs),
       m_odometryImpl{gyroAngle, leftDistance, rightDistance, initialPose} {}

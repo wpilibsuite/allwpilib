@@ -10,11 +10,10 @@ namespace frc {
 
 template <typename WheelSpeeds, WheelPositions WheelPositions>
 PoseEstimator<WheelSpeeds, WheelPositions>::PoseEstimator(
-    Kinematics<WheelSpeeds, WheelPositions>& kinematics,
     Odometry<WheelSpeeds, WheelPositions>& odometry,
     const wpi::array<double, 3>& stateStdDevs,
     const wpi::array<double, 3>& visionMeasurementStdDevs)
-    : m_kinematics(kinematics), m_odometry(odometry) {
+    : m_odometry(odometry), m_poseEstimate{odometry.GetPose()} {
   for (size_t i = 0; i < 3; ++i) {
     m_q[i] = stateStdDevs[i] * stateStdDevs[i];
   }
@@ -49,12 +48,25 @@ void PoseEstimator<WheelSpeeds, WheelPositions>::ResetPosition(
   // Reset state estimate and error covariance
   m_odometry.ResetPosition(gyroAngle, wheelPositions, pose);
   m_poseBuffer.Clear();
+  m_poseEstimate = m_odometry.GetPose();
 }
 
 template <typename WheelSpeeds, WheelPositions WheelPositions>
 Pose2d PoseEstimator<WheelSpeeds, WheelPositions>::GetEstimatedPosition()
     const {
-  return m_odometry.GetPose();
+  return m_poseEstimate;
+}
+
+template <typename WheelSpeeds, WheelPositions WheelPositions>
+std::optional<Pose2d> PoseEstimator<WheelSpeeds, WheelPositions>::SampleAt(
+    units::second_t timestamp) const {
+  // TODO Use C++23 std::optional::transform
+  std::optional<frc::Pose2d> sample = m_poseBuffer.Sample(timestamp);
+  if (sample) {
+    return *sample + Transform2d{m_odometry.GetPose(), m_poseEstimate};
+  } else {
+    return std::nullopt;
+  }
 }
 
 template <typename WheelSpeeds, WheelPositions WheelPositions>
@@ -75,44 +87,33 @@ void PoseEstimator<WheelSpeeds, WheelPositions>::AddVisionMeasurement(
     return;
   }
 
-  // Step 2: Measure the twist between the odometry pose and the vision pose
-  auto twist = sample.value().pose.Log(visionRobotPose);
+  // Step 2: Record the odometry updates that have occurred since the vision
+  // measurement
+  Transform2d odometry_backtrack{m_odometry.GetPose(), *sample};
+  Transform2d odometry_forward{*sample, m_odometry.GetPose()};
 
-  // Step 3: We should not trust the twist entirely, so instead we scale this
+  // Step 3: Revert said odometry updates to get a state estimate from when the
+  // vision measurement occurred.
+  auto old_estimate = m_poseEstimate + odometry_backtrack;
+
+  // Step 4: Measure the twist between the odometry pose and the vision pose.
+  auto twist = old_estimate.Log(visionRobotPose);
+
+  // Step 5: We should not trust the twist entirely, so instead we scale this
   // twist by a Kalman gain matrix representing how much we trust vision
   // measurements compared to our current pose.
   Eigen::Vector3d k_times_twist =
       m_visionK *
       Eigen::Vector3d{twist.dx.value(), twist.dy.value(), twist.dtheta.value()};
 
-  // Step 4: Convert back to Twist2d
+  // Step 6: Convert back to Twist2d.
   Twist2d scaledTwist{units::meter_t{k_times_twist(0)},
                       units::meter_t{k_times_twist(1)},
                       units::radian_t{k_times_twist(2)}};
 
-  // Step 5: Reset Odometry to state at sample with vision adjustment.
-  m_odometry.ResetPosition(sample.value().gyroAngle,
-                           sample.value().wheelPositions,
-                           sample.value().pose.Exp(scaledTwist));
-
-  // Step 6: Record the current pose to allow multiple measurements from the
-  // same timestamp
-  m_poseBuffer.AddSample(timestamp,
-                         {GetEstimatedPosition(), sample.value().gyroAngle,
-                          sample.value().wheelPositions});
-
-  // Step 7: Replay odometry inputs between sample time and latest recorded
-  // sample to update the pose buffer and correct odometry.
-  auto internal_buf = m_poseBuffer.GetInternalBuffer();
-
-  auto upper_bound =
-      std::lower_bound(internal_buf.begin(), internal_buf.end(), timestamp,
-                       [](const auto& pair, auto t) { return t > pair.first; });
-
-  for (auto entry = upper_bound; entry != internal_buf.end(); entry++) {
-    UpdateWithTime(entry->first, entry->second.gyroAngle,
-                   entry->second.wheelPositions);
-  }
+  // Step 7: Apply this adjustment to the old estimate, then replay dometry
+  // updates.
+  m_poseEstimate = old_estimate.Exp(scaledTwist) + odometry_forward;
 }
 
 template <typename WheelSpeeds, WheelPositions WheelPositions>
@@ -126,40 +127,13 @@ template <typename WheelSpeeds, WheelPositions WheelPositions>
 Pose2d PoseEstimator<WheelSpeeds, WheelPositions>::UpdateWithTime(
     units::second_t currentTime, const Rotation2d& gyroAngle,
     const WheelPositions& wheelPositions) {
-  m_odometry.Update(gyroAngle, wheelPositions);
+  auto lastOdom = m_odometry.GetPose();
+  auto currOdom = m_odometry.Update(gyroAngle, wheelPositions);
+  m_poseBuffer.AddSample(currentTime, currOdom);
 
-  WheelPositions internalWheelPositions = wheelPositions;
-
-  m_poseBuffer.AddSample(
-      currentTime, {GetEstimatedPosition(), gyroAngle, internalWheelPositions});
+  m_poseEstimate = m_poseEstimate.Exp(lastOdom.Log(currOdom));
 
   return GetEstimatedPosition();
-}
-
-template <typename WheelSpeeds, WheelPositions WheelPositions>
-typename PoseEstimator<WheelSpeeds, WheelPositions>::InterpolationRecord
-PoseEstimator<WheelSpeeds, WheelPositions>::InterpolationRecord::Interpolate(
-    Kinematics<WheelSpeeds, WheelPositions>& kinematics,
-    InterpolationRecord endValue, double i) const {
-  if (i < 0) {
-    return *this;
-  } else if (i > 1) {
-    return endValue;
-  } else {
-    // Find the new wheel distance measurements.
-    WheelPositions wheels_lerp =
-        this->wheelPositions.Interpolate(endValue.wheelPositions, i);
-
-    // Find the new gyro angle.
-    auto gyro = wpi::Lerp(this->gyroAngle, endValue.gyroAngle, i);
-
-    // Create a twist to represent the change based on the interpolated
-    // sensor inputs.
-    auto twist = kinematics.ToTwist2d(this->wheelPositions, wheels_lerp);
-    twist.dtheta = (gyro - gyroAngle).Radians();
-
-    return {pose.Exp(twist), gyro, wheels_lerp};
-  }
 }
 
 }  // namespace frc
