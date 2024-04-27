@@ -88,10 +88,7 @@ units::volt_t ArmFeedforward::Calculate(units::unit_t<Angle> currentAngle,
 
       xAD.SetValue(x);
 
-      gradientF.Update();
       g = gradientF.Value();
-
-      hessianF.Update();
       H = hessianF.Value();
 
       error = std::abs(g.coeff(0));
