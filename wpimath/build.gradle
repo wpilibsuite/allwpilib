@@ -12,7 +12,7 @@ ext {
 
     splitSetup = {
         it.sources {
-            drakeCpp(CppSourceSet) {
+            sleipnirCpp(CppSourceSet) {
                 source {
                     srcDirs 'src/main/native/thirdparty/sleipnir/src'
                     include '**/*.cpp'
