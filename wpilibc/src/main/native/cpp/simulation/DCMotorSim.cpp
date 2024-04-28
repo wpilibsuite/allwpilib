@@ -48,4 +48,5 @@ units::ampere_t DCMotorSim::GetCurrentDraw() const {
 
 void DCMotorSim::SetInputVoltage(units::volt_t voltage) {
   SetInput(Vectord<1>{voltage.value()});
+  ClampInput(frc::RobotController::GetBatteryVoltage().value());
 }

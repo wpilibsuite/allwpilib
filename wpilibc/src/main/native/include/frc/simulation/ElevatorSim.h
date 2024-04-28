@@ -150,7 +150,7 @@ class ElevatorSim : public LinearSystemSim<2, 1, 1> {
    *
    * @return The elevator current draw.
    */
-  units::ampere_t GetCurrentDraw() const override;
+  units::ampere_t GetCurrentDraw() const;
 
   /**
    * Sets the input voltage for the elevator.

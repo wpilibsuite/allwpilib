@@ -4,13 +4,13 @@
 
 package edu.wpi.first.wpilibj.simulation;
 
-import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.RobotController;
 
 /** Represents a simulated flywheel mechanism. */
 public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
@@ -23,31 +23,17 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
   /**
    * Creates a simulated flywheel mechanism.
    *
-   * @param plant The linear system that represents the flywheel. This system can be created with
-   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createFlywheelSystem(DCMotor, double,
-   *     double)}.
-   * @param gearbox The type of and number of motors in the flywheel gearbox.
-   * @param gearing The gearing of the flywheel (numbers greater than 1 represent reductions).
-   */
-  public FlywheelSim(LinearSystem<N1, N1, N1> plant, DCMotor gearbox, double gearing) {
-    super(plant);
-    m_gearbox = gearbox;
-    m_gearing = gearing;
-  }
-
-  /**
-   * Creates a simulated flywheel mechanism.
-   *
    * @param plant The linear system that represents the flywheel.
    * @param gearbox The type of and number of motors in the flywheel gearbox.
    * @param gearing The gearing of the flywheel (numbers greater than 1 represent reductions).
-   * @param measurementStdDevs The standard deviations of the measurements.
+   * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
+   *     noise is desired. If present must have 1 element for velocity.
    */
   public FlywheelSim(
       LinearSystem<N1, N1, N1> plant,
       DCMotor gearbox,
       double gearing,
-      Matrix<N1, N1> measurementStdDevs) {
+      double... measurementStdDevs) {
     super(plant, measurementStdDevs);
     m_gearbox = gearbox;
     m_gearing = gearing;
@@ -59,25 +45,12 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
    * @param gearbox The type of and number of motors in the flywheel gearbox.
    * @param gearing The gearing of the flywheel (numbers greater than 1 represent reductions).
    * @param jKgMetersSquared The moment of inertia of the flywheel. If this is unknown, use the
-   *     {@link #FlywheelSim(LinearSystem, DCMotor, double, Matrix)} constructor.
-   */
-  public FlywheelSim(DCMotor gearbox, double gearing, double jKgMetersSquared) {
-    super(LinearSystemId.createFlywheelSystem(gearbox, jKgMetersSquared, gearing));
-    m_gearbox = gearbox;
-    m_gearing = gearing;
-  }
-
-  /**
-   * Creates a simulated flywheel mechanism.
-   *
-   * @param gearbox The type of and number of motors in the flywheel gearbox.
-   * @param gearing The gearing of the flywheel (numbers greater than 1 represent reductions).
-   * @param jKgMetersSquared The moment of inertia of the flywheel. If this is unknown, use the
-   *     {@link #FlywheelSim(LinearSystem, DCMotor, double, Matrix)} constructor.
-   * @param measurementStdDevs The standard deviations of the measurements.
+   *     {@link #FlywheelSim(LinearSystem, DCMotor, double, double...)} constructor.
+   * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
+   *     noise is desired. If present must have 1 element for velocity.
    */
   public FlywheelSim(
-      DCMotor gearbox, double gearing, double jKgMetersSquared, Matrix<N1, N1> measurementStdDevs) {
+      DCMotor gearbox, double gearing, double jKgMetersSquared, double... measurementStdDevs) {
     super(
         LinearSystemId.createFlywheelSystem(gearbox, jKgMetersSquared, gearing),
         measurementStdDevs);
@@ -117,7 +90,6 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
    *
    * @return The flywheel current draw.
    */
-  @Override
   public double getCurrentDrawAmps() {
     // I = V / R - omega / (Kv * R)
     // Reductions are output over input, so a reduction of 2:1 means the motor is spinning
@@ -133,5 +105,6 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
    */
   public void setInputVoltage(double volts) {
     setInput(volts);
+    clampInput(RobotController.getBatteryVoltage());
   }
 }

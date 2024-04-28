@@ -81,6 +81,7 @@ units::ampere_t SingleJointedArmSim::GetCurrentDraw() const {
 
 void SingleJointedArmSim::SetInputVoltage(units::volt_t voltage) {
   SetInput(Vectord<1>{voltage.value()});
+  ClampInput(frc::RobotController::GetBatteryVoltage().value());
 }
 
 Vectord<2> SingleJointedArmSim::UpdateX(const Vectord<2>& currentXhat,
