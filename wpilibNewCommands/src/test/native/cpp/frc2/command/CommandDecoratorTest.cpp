@@ -5,12 +5,9 @@
 #include <frc/simulation/SimHooks.h>
 
 #include "CommandTestBase.h"
-#include "frc2/command/ConditionalCommand.h"
 #include "frc2/command/FunctionalCommand.h"
 #include "frc2/command/InstantCommand.h"
-#include "frc2/command/ParallelRaceGroup.h"
 #include "frc2/command/RunCommand.h"
-#include "frc2/command/SequentialCommandGroup.h"
 
 using namespace frc2;
 class CommandDecoratorTest : public CommandTestBase {};

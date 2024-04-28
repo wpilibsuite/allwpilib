@@ -19,6 +19,7 @@ protobuf_generate_cpp(
 
 file(
     GLOB wpimath_jni_src
+    src/main/native/cpp/jni/WPIMathJNI_ArmFeedforward.cpp
     src/main/native/cpp/jni/WPIMathJNI_DARE.cpp
     src/main/native/cpp/jni/WPIMathJNI_Eigen.cpp
     src/main/native/cpp/jni/WPIMathJNI_Exceptions.cpp
@@ -149,7 +150,11 @@ if(WITH_JAVA_SOURCE)
     set_property(TARGET wpimath_src_jar PROPERTY FOLDER "java")
 endif()
 
-file(GLOB_RECURSE wpimath_native_src src/main/native/cpp/*.cpp)
+file(
+    GLOB_RECURSE wpimath_native_src
+    src/main/native/cpp/*.cpp
+    src/main/native/thirdparty/sleipnir/src/*.cpp
+)
 list(REMOVE_ITEM wpimath_native_src ${wpimath_jni_src})
 
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS FALSE)
@@ -158,7 +163,7 @@ set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
 set_target_properties(wpimath PROPERTIES DEBUG_POSTFIX "d")
 
 set_property(TARGET wpimath PROPERTY FOLDER "libraries")
-target_compile_definitions(wpimath PRIVATE WPILIB_EXPORTS)
+target_compile_definitions(wpimath PRIVATE WPILIB_EXPORTS SLEIPNIR_EXPORTS)
 
 target_compile_features(wpimath PUBLIC cxx_std_20)
 if(MSVC)
@@ -183,6 +188,18 @@ else()
     find_package(Eigen3 CONFIG REQUIRED)
     target_link_libraries(wpimath Eigen3::Eigen)
 endif()
+
+install(
+    DIRECTORY src/main/native/thirdparty/sleipnir/include/
+    DESTINATION "${include_dest}/wpimath"
+)
+target_include_directories(
+    wpimath
+    SYSTEM
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/sleipnir/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/sleipnir/src>
+)
 
 install(DIRECTORY src/main/native/thirdparty/gcem/include/ DESTINATION "${include_dest}/wpimath")
 target_include_directories(

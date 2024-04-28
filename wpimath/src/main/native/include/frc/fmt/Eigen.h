@@ -18,11 +18,13 @@ template <typename Derived, typename CharT>
   requires std::derived_from<Derived, Eigen::DenseBase<Derived>> ||
            std::derived_from<Derived, Eigen::SparseCompressedBase<Derived>>
 struct fmt::formatter<Derived, CharT> {
-  constexpr auto parse(fmt::format_parse_context& ctx) {
+  template <typename ParseContext>
+  constexpr auto parse(ParseContext& ctx) {
     return m_underlying.parse(ctx);
   }
 
-  auto format(const Derived& mat, fmt::format_context& ctx) const {
+  template <typename FmtContext>
+  auto format(const Derived& mat, FmtContext& ctx) const {
     auto out = ctx.out();
 
     for (int row = 0; row < mat.rows(); ++row) {

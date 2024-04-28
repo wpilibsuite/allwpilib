@@ -7,7 +7,6 @@
 #include <concepts>
 #include <functional>
 #include <memory>
-#include <optional>
 #include <string>
 #include <utility>
 #include <vector>
@@ -51,12 +50,15 @@ class CommandPtr final {
   CommandPtr Repeatedly() &&;
 
   /**
-   * Decorates this command to run "by proxy" by wrapping it in a
-   * ProxyCommand. This is useful for "forking off" from command groups
-   * when the user does not wish to extend the command's requirements to the
-   * entire command group.
+   * Decorates this command to run "by proxy" by wrapping it in a ProxyCommand.
+   * Use this for "forking off" from command compositions when the user does not
+   * wish to extend the command's requirements to the entire command
+   * composition. ProxyCommand has unique implications and semantics, see <a
+   * href="https://docs.wpilib.org/en/stable/docs/software/commandbased/command-compositions.html#scheduling-other-commands">the
+   * WPILib docs</a> for a full explanation.
    *
    * @return the decorated command
+   * @see ProxyCommand
    */
   [[nodiscard]]
   CommandPtr AsProxy() &&;
@@ -189,9 +191,21 @@ class CommandPtr final {
    * @param parallel the commands to run in parallel
    * @return the decorated command
    */
-  [[nodiscard]]
+  [[nodiscard]] [[deprecated("Replace with DeadlineFor")]]
   CommandPtr DeadlineWith(CommandPtr&& parallel) &&;
 
+  /**
+   * Decorates this command with a set of commands to run parallel to it, ending
+   * when the calling command ends and interrupting all the others. Often more
+   * convenient/less-verbose than constructing a new {@link
+   * ParallelDeadlineGroup} explicitly.
+   *
+   * @param parallel the commands to run in parallel. Note the parallel commands
+   * will be interupted when the deadline command ends
+   * @return the decorated command
+   */
+  [[nodiscard]]
+  CommandPtr DeadlineFor(CommandPtr&& parallel) &&;
   /**
    * Decorates this command with a set of commands to run parallel to it, ending
    * when the last command ends. Often more convenient/less-verbose than
