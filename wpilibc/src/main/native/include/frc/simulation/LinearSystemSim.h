@@ -112,21 +112,6 @@ class LinearSystemSim {
   double GetInput(int row) const { return m_u(row); }
 
   /**
-   * Returns the current input of the plant.
-   *
-   * @return The current input of the plant.
-   */
-  const Vectord<Inputs>& GetInput() const { return m_u; }
-
-  /**
-   * Returns an element of the current input of the plant.
-   *
-   * @param row The row to return.
-   * @return An element of the current input of the plant.
-   */
-  double GetInput(int row) const { return m_u(row); }
-
-  /**
    * Sets the system state.
    *
    * @param state The new state.
