@@ -21,7 +21,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import java.util.Random;
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings("unchecked")
 class LinearSystemLoopTest {
   private static final double kDt = 0.00505;
   private static final double kPositionStddev = 0.0001;
@@ -30,6 +29,7 @@ class LinearSystemLoopTest {
   LinearSystem<N2, N1, N2> m_plant =
       LinearSystemId.createElevatorSystem(DCMotor.getVex775Pro(2), 5, 0.0181864, 1.0);
 
+  @SuppressWarnings("unchecked")
   KalmanFilter<N2, N1, N1> m_observer =
       new KalmanFilter<>(
           Nat.N2(),
@@ -39,6 +39,7 @@ class LinearSystemLoopTest {
           VecBuilder.fill(0.0001),
           kDt);
 
+  @SuppressWarnings("unchecked")
   LinearQuadraticRegulator<N2, N1, N1> m_controller =
       new LinearQuadraticRegulator<>(
           (LinearSystem<N2, N1, N1>) m_plant.slice(0),
@@ -46,6 +47,7 @@ class LinearSystemLoopTest {
           VecBuilder.fill(12.0),
           0.00505);
 
+  @SuppressWarnings("unchecked")
   private final LinearSystemLoop<N2, N1, N1> m_loop =
       new LinearSystemLoop<>(
           (LinearSystem<N2, N1, N1>) m_plant.slice(0), m_controller, m_observer, 12, 0.00505);
@@ -59,6 +61,7 @@ class LinearSystemLoopTest {
   }
 
   @Test
+  @SuppressWarnings("unchecked")
   void testStateSpaceEnabled() {
     m_loop.reset(VecBuilder.fill(0, 0));
     Matrix<N2, N1> references = VecBuilder.fill(2.0, 0.0);
