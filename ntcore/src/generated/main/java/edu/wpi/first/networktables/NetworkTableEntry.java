@@ -16,14 +16,6 @@ import java.nio.ByteBuffer;
 @SuppressWarnings("UnnecessaryParentheses")
 public final class NetworkTableEntry implements Publisher, Subscriber {
   /**
-   * Flag values (as returned by {@link #getFlags()}).
-   *
-   * @deprecated Use isPersistent() instead.
-   */
-  @Deprecated(since = "2022", forRemoval = true)
-  public static final int kPersistent = 0x01;
-
-  /**
    * Construct from native handle.
    *
    * @param inst Instance
@@ -112,17 +104,6 @@ public final class NetworkTableEntry implements Publisher, Subscriber {
    */
   public NetworkTableType getType() {
     return NetworkTableType.getFromInt(NetworkTablesJNI.getType(m_handle));
-  }
-
-  /**
-   * Returns the flags.
-   *
-   * @return the flags (bitmask)
-   * @deprecated Use isPersistent() or topic properties instead
-   */
-  @Deprecated(since = "2022", forRemoval = true)
-  public int getFlags() {
-    return NetworkTablesJNI.getEntryFlags(m_handle);
   }
 
   /**
@@ -933,28 +914,6 @@ public final class NetworkTableEntry implements Publisher, Subscriber {
    */
   public boolean setNumberArray(Number[] value) {
     return setDoubleArray(NetworkTableValue.toNativeDoubleArray(value));
-  }
-
-  /**
-   * Sets flags.
-   *
-   * @param flags the flags to set (bitmask)
-   * @deprecated Use setPersistent() or topic properties instead
-   */
-  @Deprecated(since = "2022", forRemoval = true)
-  public void setFlags(int flags) {
-    NetworkTablesJNI.setEntryFlags(m_handle, getFlags() | flags);
-  }
-
-  /**
-   * Clears flags.
-   *
-   * @param flags the flags to clear (bitmask)
-   * @deprecated Use setPersistent() or topic properties instead
-   */
-  @Deprecated(since = "2022", forRemoval = true)
-  public void clearFlags(int flags) {
-    NetworkTablesJNI.setEntryFlags(m_handle, getFlags() & ~flags);
   }
 
   /** Make value persistent through program restarts. */
