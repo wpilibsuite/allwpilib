@@ -349,11 +349,16 @@ public abstract class Command implements Sendable {
   }
 
   /**
-   * Decorates this command to run "by proxy" by wrapping it in a {@link ProxyCommand}. This is
-   * useful for "forking off" from command compositions when the user does not wish to extend the
-   * command's requirements to the entire command composition.
+   * Decorates this command to run "by proxy" by wrapping it in a {@link ProxyCommand}. Use this for
+   * "forking off" from command compositions when the user does not wish to extend the command's
+   * requirements to the entire command composition. ProxyCommand has unique implications and
+   * semantics, see the WPILib docs for a full explanation.
    *
    * @return the decorated command
+   * @see ProxyCommand
+   * @see <a
+   *     href="https://docs.wpilib.org/en/stable/docs/software/commandbased/command-compositions.html#scheduling-other-commands">WPILib
+   *     docs</a>
    */
   public ProxyCommand asProxy() {
     return new ProxyCommand(this);

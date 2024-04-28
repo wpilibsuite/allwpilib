@@ -35,7 +35,9 @@ public enum AprilTagFields {
    *
    * @return AprilTagFieldLayout of the field
    * @throws UncheckedIOException If the layout does not exist
+   * @deprecated Use {@link AprilTagFieldLayout#loadField(AprilTagFields)} instead.
    */
+  @Deprecated(forRemoval = true, since = "2025")
   public AprilTagFieldLayout loadAprilTagLayoutField() {
     return AprilTagFieldLayout.loadField(this);
   }
