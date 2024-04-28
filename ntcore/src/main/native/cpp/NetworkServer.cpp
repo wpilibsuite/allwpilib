@@ -359,6 +359,9 @@ void NetworkServer::LoadPersistent() {
         "could not open persistent file '{}': {} "
         "(this can be ignored if you aren't expecting persistent values)",
         m_persistentFilename, ec.message());
+    // backup file
+    fs::copy_file(m_persistentFilename, m_persistentFilename + ".bak",
+                  std::filesystem::copy_options::overwrite_existing, ec);
     // try to write an empty file so it doesn't happen again
     wpi::raw_fd_ostream os{m_persistentFilename, ec, fs::F_Text};
     if (ec.value() == 0) {
