@@ -21,6 +21,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import java.util.Random;
 import org.junit.jupiter.api.Test;
 
+@SuppressWarnings("unchecked")
 class LinearSystemLoopTest {
   private static final double kDt = 0.00505;
   private static final double kPositionStddev = 0.0001;

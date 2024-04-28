@@ -61,6 +61,7 @@ class KalmanFilterTest {
           new Matrix<>(Nat.N3(), Nat.N3())); // D
 
   @Test
+  @SuppressWarnings("unchecked")
   void testElevatorKalmanFilter() {
     var Q = VecBuilder.fill(0.05, 1.0);
     var R = VecBuilder.fill(0.0001);

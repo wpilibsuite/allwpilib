@@ -229,7 +229,7 @@ public class LinearSystem<States extends Num, Inputs extends Num, Outputs extend
    * @throws IllegalArgumentException if any outputIndices are outside the range of system outputs.
    * @throws IllegalArgumentException if number of outputIndices exceeds the system output number.
    */
-  public LinearSystem<States, Inputs, ?> slice(int... outputIndices) {
+  public LinearSystem<States, Inputs, ? extends Num> slice(int... outputIndices) {
     for (int index = 0; index < outputIndices.length; ++index) {
       if (outputIndices[index] <= 0 || outputIndices[index] > m_C.getNumRows()) {
         throw new IllegalArgumentException(
