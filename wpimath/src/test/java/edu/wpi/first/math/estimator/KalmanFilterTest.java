@@ -65,7 +65,10 @@ class KalmanFilterTest {
     var Q = VecBuilder.fill(0.05, 1.0);
     var R = VecBuilder.fill(0.0001);
 
-    assertDoesNotThrow(() -> new KalmanFilter<>(Nat.N2(), Nat.N1(), elevatorPlant, Q, R, kDt));
+    assertDoesNotThrow(
+        () ->
+            new KalmanFilter<>(
+                Nat.N2(), Nat.N1(), elevatorPlant.getTrimmedLinearSystem(), Q, R, kDt));
   }
 
   @Test

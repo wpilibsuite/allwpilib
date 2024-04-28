@@ -230,7 +230,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N2> {
    * @return The current arm angle.
    */
   public double getAngleRads() {
-    return m_y.get(0, 0);
+    return getOutput(0);
   }
 
   /**
@@ -239,7 +239,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N2> {
    * @return The current arm velocity.
    */
   public double getVelocityRadPerSec() {
-    return m_x.get(1, 0);
+    return getOutput(1);
   }
 
   /**
@@ -251,7 +251,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N2> {
   public double getCurrentDrawAmps() {
     // Reductions are greater than 1, so a reduction of 10:1 would mean the motor is
     // spinning 10x faster than the output
-    var motorVelocity = m_x.get(1, 0) * m_gearing;
+    var motorVelocity = getVelocityRadPerSec() * m_gearing;
     return m_gearbox.getCurrent(motorVelocity, m_u.get(0, 0)) * Math.signum(m_u.get(0, 0));
   }
 

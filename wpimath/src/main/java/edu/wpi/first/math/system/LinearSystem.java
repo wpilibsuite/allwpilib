@@ -5,23 +5,19 @@
 package edu.wpi.first.math.system;
 
 import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Num;
 import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N2;
 
 /**
  * A plant defined using state-space notation.
  *
- * <p>
- * A plant is a mathematical model of a system's dynamics.
+ * <p>A plant is a mathematical model of a system's dynamics.
  *
- * <p>
- * For more on the underlying math, read
+ * <p>For more on the underlying math, read
  * https://file.tavsys.net/control/controls-engineering-in-frc.pdf.
  *
- * @param <States>  Number of states.
- * @param <Inputs>  Number of inputs.
+ * @param <States> Number of states.
+ * @param <Inputs> Number of inputs.
  * @param <Outputs> Number of outputs.
  */
 public class LinearSystem<States extends Num, Inputs extends Num, Outputs extends Num> {
@@ -173,12 +169,10 @@ public class LinearSystem<States extends Num, Inputs extends Num, Outputs extend
   /**
    * Computes the new x given the old x and the control input.
    *
-   * <p>
-   * This is used by state observers directly to run updates based on state
-   * estimate.
+   * <p>This is used by state observers directly to run updates based on state estimate.
    *
-   * @param x         The current state.
-   * @param clampedU  The control input.
+   * @param x The current state.
+   * @param clampedU The control input.
    * @param dtSeconds Timestep for model update.
    * @return the updated x.
    */
@@ -192,16 +186,25 @@ public class LinearSystem<States extends Num, Inputs extends Num, Outputs extend
   /**
    * Computes the new y given the control input.
    *
-   * <p>
-   * This is used by state observers directly to run updates based on state
-   * estimate.
+   * <p>This is used by state observers directly to run updates based on state estimate.
    *
-   * @param x        The current state.
+   * @param x The current state.
    * @param clampedU The control input.
    * @return the updated output matrix Y.
    */
   public Matrix<Outputs, N1> calculateY(Matrix<States, N1> x, Matrix<Inputs, N1> clampedU) {
     return m_C.times(x).plus(m_D.times(clampedU));
+  }
+
+  /**
+   * Returns the LinearSystem with the number of outputs set to 1
+   *
+   * <p>This is used by state observers such as the Kalman Filter.
+   *
+   * @return the trimmed LinearSystem with outputs set to 1.
+   */
+  public LinearSystem<States, Inputs, N1> getTrimmedLinearSystem() {
+    return new LinearSystem<>(m_A, m_B, m_C.extractRowVector(0), m_D.extractRowVector(0));
   }
 
   @Override
@@ -210,23 +213,4 @@ public class LinearSystem<States extends Num, Inputs extends Num, Outputs extend
         "Linear System: A\n%s\n\nB:\n%s\n\nC:\n%s\n\nD:\n%s\n",
         m_A.toString(), m_B.toString(), m_C.toString(), m_D.toString());
   }
-
-  /**
-   * Trims the bottom row off of matrices C and D.
-   *
-   * <p>
-   * This is used to convert a LinearSystem with 2 States, 1 Input, and 2 Outputs
-   * to one with 2 States, 1 Input, and 1 Output for use with KalmanFilter,
-   * LinearSystemLoop, etc.
-   *
-   * @param plant The plant to trim.
-   * @return The trimmed plant.
-   */
-  public static LinearSystem<N2, N1, N1> trimCD(LinearSystem<N2, N1, N2> plant) {
-    Matrix<N1, N2> new_C = new Matrix<>(Nat.N1(), Nat.N2());
-    Matrix<N1, N1> new_D = new Matrix<>(Nat.N1(), Nat.N1());
-    new_C.set(0, 0, plant.getC(0, 0));
-    new_C.set(0, 1, plant.getC(0, 1));
-  }
-
 }

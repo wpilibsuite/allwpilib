@@ -281,7 +281,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
    * @return The velocity of the elevator.
    */
   public double getVelocityMetersPerSecond() {
-    return m_x.get(1, 0);
+    return getOutput(1);
   }
 
   /**

@@ -57,7 +57,7 @@ public class Robot extends TimedRobot {
 
   This elevator is driven by two NEO motors.
    */
-  private final LinearSystem<N2, N1, N1> m_elevatorPlant =
+  private final LinearSystem<N2, N1, N2> m_elevatorPlant =
       LinearSystemId.createElevatorSystem(
           DCMotor.getNEO(2), kCarriageMass, kDrumRadius, kElevatorGearing);
 
@@ -66,7 +66,7 @@ public class Robot extends TimedRobot {
       new KalmanFilter<>(
           Nat.N2(),
           Nat.N1(),
-          m_elevatorPlant,
+          m_elevatorPlant.getTrimmedLinearSystem(),
           VecBuilder.fill(Units.inchesToMeters(2), Units.inchesToMeters(40)), // How accurate we
           // think our model is, in meters and meters/second.
           VecBuilder.fill(0.001), // How accurate we think our encoder position
@@ -76,7 +76,7 @@ public class Robot extends TimedRobot {
   // A LQR uses feedback to create voltage commands.
   private final LinearQuadraticRegulator<N2, N1, N1> m_controller =
       new LinearQuadraticRegulator<>(
-          m_elevatorPlant,
+          m_elevatorPlant.getTrimmedLinearSystem(),
           VecBuilder.fill(Units.inchesToMeters(1.0), Units.inchesToMeters(10.0)), // qelms. Position
           // and velocity error tolerances, in meters and meters per second. Decrease this to more
           // heavily penalize state excursion, or make the controller behave more aggressively. In
@@ -90,7 +90,8 @@ public class Robot extends TimedRobot {
 
   // The state-space loop combines a controller, observer, feedforward and plant for easy control.
   private final LinearSystemLoop<N2, N1, N1> m_loop =
-      new LinearSystemLoop<>(m_elevatorPlant, m_controller, m_observer, 12.0, 0.020);
+      new LinearSystemLoop<>(
+          m_elevatorPlant.getTrimmedLinearSystem(), m_controller, m_observer, 12.0, 0.020);
 
   // An encoder set up to measure elevator height in meters.
   private final Encoder m_encoder = new Encoder(kEncoderAChannel, kEncoderBChannel);
