@@ -68,7 +68,7 @@ class KalmanFilterTest {
     assertDoesNotThrow(
         () ->
             new KalmanFilter<>(
-                Nat.N2(), Nat.N1(), elevatorPlant.getTrimmedLinearSystem(), Q, R, kDt));
+                Nat.N2(), Nat.N1(), (LinearSystem<N2, N1, N1>)elevatorPlant.slice(0), Q, R, kDt));
   }
 
   @Test
