@@ -183,7 +183,7 @@ public class LinearSystemSim<States extends Num, Inputs extends Num, Outputs ext
    * Clamp the input vector such that no element exceeds the maximum allowed value. If any does, the
    * relative magnitudes of the input will be maintained.
    *
-   * @param maxInput maximum value for input vector.
+   * @param maxInput The maximum magnitude of the input vector after clamping.
    */
   protected void clampInput(double maxInput) {
     m_u = StateSpaceUtil.desaturateInputVector(m_u, maxInput);

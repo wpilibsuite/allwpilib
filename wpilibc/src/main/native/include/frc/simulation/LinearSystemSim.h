@@ -136,7 +136,7 @@ class LinearSystemSim {
    * Clamp the input vector such that no element exceeds the given voltage. If
    * any does, the relative magnitudes of the input will be maintained.
    *
-   * @param maxInput The input vector.
+   * @param maxInput The maximum magnitude of the input vector after clamping.
    */
   void ClampInput(double maxInput) {
     m_u = frc::DesaturateInputVector<Inputs>(m_u, maxInput);
