@@ -230,16 +230,17 @@ public class LinearSystem<States extends Num, Inputs extends Num, Outputs extend
    * @throws IllegalArgumentException if number of outputIndices exceeds the system output number.
    */
   public LinearSystem<States, Inputs, ? extends Num> slice(int... outputIndices) {
-    for (int index = 0; index < outputIndices.length; ++index) {
-      if (outputIndices[index] < 0 || outputIndices[index] >= m_C.getNumRows()) {
+    for (int index : outputIndices) {
+      if (index < 0 || index >= m_C.getNumRows()) {
         throw new IllegalArgumentException(
-            "Not all elements of outputIndices are in range of possible outputs. This is usually due to model implementation errors.");
+            "Output indices out of range. This is usually due to model implementation errors.");
       }
     }
 
     if (outputIndices.length >= m_C.getNumRows()) {
       throw new IllegalArgumentException(
-          "More outputs requested than available. This is usually due to model implementation errors.");
+          "More outputs requested than available. This is usually due to model implementation "
+              + "errors.");
     }
 
     List<Integer> outputIndicesList =
