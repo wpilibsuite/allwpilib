@@ -6,9 +6,11 @@
 
 #include <fmt/core.h>
 #include <wpi/sendable/SendableBuilder.h>
+#include "wpi/deprecated.h"
 
 using namespace frc2;
 
+WPI_IGNORE_DEPRECATED
 ProxyCommand::ProxyCommand(wpi::unique_function<Command*()> supplier)
     : m_supplier(std::move(supplier)) {}
 
@@ -18,6 +20,7 @@ ProxyCommand::ProxyCommand(wpi::unique_function<CommandPtr()> supplier)
         holder = supplier();
         return holder->get();
       }) {}
+WPI_UNIGNORE_DEPRECATED
 
 ProxyCommand::ProxyCommand(Command* command)
     : ProxyCommand([command] { return command; }) {
