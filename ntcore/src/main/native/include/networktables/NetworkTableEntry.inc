@@ -240,8 +240,4 @@ inline void NetworkTableEntry::Unpublish() {
   return nt::Unpublish(m_handle);
 }
 
-inline void NetworkTableEntry::Delete() {
-  Unpublish();
-}
-
 }  // namespace nt

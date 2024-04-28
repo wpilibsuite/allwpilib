@@ -981,16 +981,6 @@ public final class NetworkTableEntry implements Publisher, Subscriber {
     NetworkTablesJNI.unpublish(m_handle);
   }
 
-  /**
-   * Deletes the entry.
-   *
-   * @deprecated Use unpublish() instead.
-   */
-  @Deprecated(since = "2022", forRemoval = true)
-  public void delete() {
-    unpublish();
-  }
-
   @Override
   public boolean equals(Object other) {
     if (other == this) {
