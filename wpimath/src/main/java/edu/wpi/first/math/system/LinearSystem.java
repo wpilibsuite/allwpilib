@@ -221,10 +221,11 @@ public class LinearSystem<States extends Num, Inputs extends Num, Outputs extend
   }
 
   /**
-   * Returns the LinearSystem with the number of outputs set to 1
+   * Returns the LinearSystem with the outputs listed in outputIndices.
    *
    * <p>This is used by state observers such as the Kalman Filter.
    *
+   * @param outputIndices the list of output indices to include in the sliced system.
    * @return the sliced LinearSystem with outputs set to row vectors of LinearSystem.
    * @throws IllegalArgumentException if any outputIndices are outside the range of system outputs.
    * @throws IllegalArgumentException if number of outputIndices exceeds the system output number.
