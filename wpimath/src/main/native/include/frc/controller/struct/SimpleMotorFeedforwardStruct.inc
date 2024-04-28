@@ -6,28 +6,34 @@
 
 #include "frc/controller/struct/SimpleMotorFeedforwardStruct.h"
 
+namespace {
+constexpr size_t kKsOff = 0;
+constexpr size_t kKvOff = kKsOff + 8;
+constexpr size_t kKaOff = kKvOff + 8;
+}  // namespace
+
 template <class Distance>
 frc::SimpleMotorFeedforward<Distance>
 wpi::Struct<frc::SimpleMotorFeedforward<Distance>>::Unpack(
     std::span<const uint8_t> data) {
-  return {units::volt_t{wpi::UnpackStruct<double, 0>(data)},
+  return {units::volt_t{wpi::UnpackStruct<double, kKsOff>(data)},
           units::unit_t<frc::SimpleMotorFeedforward<units::meters>::kv_unit>{
-              wpi::UnpackStruct<double, 8>(data)},
+              wpi::UnpackStruct<double, kKvOff>(data)},
           units::unit_t<frc::SimpleMotorFeedforward<units::meters>::ka_unit>{
-              wpi::UnpackStruct<double, 16>(data)}};
+              wpi::UnpackStruct<double, kKaOff>(data)}};
 }
 
 template <class Distance>
 void wpi::Struct<frc::SimpleMotorFeedforward<Distance>>::Pack(
     std::span<uint8_t> data,
     const frc::SimpleMotorFeedforward<Distance>& value) {
-  wpi::PackStruct<0>(data, value.kS.value());
-  wpi::PackStruct<8>(
+  wpi::PackStruct<kKsOff>(data, value.kS.value());
+  wpi::PackStruct<kKvOff>(
       data,
       units::unit_t<frc::SimpleMotorFeedforward<units::meters>::kv_unit>{
           value.kV}
           .value());
-  wpi::PackStruct<16>(
+  wpi::PackStruct<kKaOff>(
       data,
       units::unit_t<frc::SimpleMotorFeedforward<units::meters>::ka_unit>{
           value.kA}

@@ -4,18 +4,28 @@
 
 #include "frc/spline/struct/CubicHermiteSplineStruct.h"
 
+namespace {
+constexpr size_t kXInitialOff = 0;
+constexpr size_t kXFinalOff = kXInitialOff + 2 * 8;
+constexpr size_t kYInitialOff = kXFinalOff + 2 * 8;
+constexpr size_t kYFinalOff = kYInitialOff + 2 * 8;
+}  // namespace
+
 frc::CubicHermiteSpline wpi::Struct<frc::CubicHermiteSpline>::Unpack(
     std::span<const uint8_t> data) {
-  return frc::CubicHermiteSpline{wpi::UnpackStructArray<double, 0, 2>(data),
-                                 wpi::UnpackStructArray<double, 16, 2>(data),
-                                 wpi::UnpackStructArray<double, 32, 2>(data),
-                                 wpi::UnpackStructArray<double, 48, 2>(data)};
+  return frc::CubicHermiteSpline{
+      wpi::UnpackStructArray<double, kXInitialOff, 2>(data),
+      wpi::UnpackStructArray<double, kXFinalOff, 2>(data),
+      wpi::UnpackStructArray<double, kYInitialOff, 2>(data),
+      wpi::UnpackStructArray<double, kYFinalOff, 2>(data)};
 }
 
 void wpi::Struct<frc::CubicHermiteSpline>::Pack(
     std::span<uint8_t> data, const frc::CubicHermiteSpline& value) {
-  wpi::PackStructArray<0, 2>(data, value.GetInitialControlVector().x);
-  wpi::PackStructArray<16, 2>(data, value.GetFinalControlVector().x);
-  wpi::PackStructArray<32, 2>(data, value.GetInitialControlVector().y);
-  wpi::PackStructArray<48, 2>(data, value.GetFinalControlVector().y);
+  wpi::PackStructArray<kXInitialOff, 2>(data,
+                                        value.GetInitialControlVector().x);
+  wpi::PackStructArray<kXFinalOff, 2>(data, value.GetFinalControlVector().x);
+  wpi::PackStructArray<kYInitialOff, 2>(data,
+                                        value.GetInitialControlVector().y);
+  wpi::PackStructArray<kYFinalOff, 2>(data, value.GetFinalControlVector().y);
 }
