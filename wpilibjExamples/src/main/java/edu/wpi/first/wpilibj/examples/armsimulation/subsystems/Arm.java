@@ -39,8 +39,7 @@ public class Arm implements AutoCloseable {
   private final PWMSparkMax m_motor = new PWMSparkMax(Constants.kMotorPort);
 
   // Simulation classes help us simulate what's going on, including gravity.
-  // This arm sim represents an arm that can travel from -75 degrees (rotated down
-  // front)
+  // This arm sim represents an arm that can travel from -75 degrees (rotated down front)
   // to 255 degrees (rotated down in the back).
   private final SingleJointedArmSim m_armSim =
       new SingleJointedArmSim(
@@ -79,8 +78,7 @@ public class Arm implements AutoCloseable {
     SmartDashboard.putData("Arm Sim", m_mech2d);
     m_armTower.setColor(new Color8Bit(Color.kBlue));
 
-    // Set the Arm position setpoint and P constant to Preferences if the keys don't
-    // already exist
+    // Set the Arm position setpoint and P constant to Preferences if the keys don't already exist
     Preferences.initDouble(Constants.kArmPositionKey, m_armSetpointDegrees);
     Preferences.initDouble(Constants.kArmPKey, m_armKp);
   }
@@ -94,8 +92,7 @@ public class Arm implements AutoCloseable {
     // Next, we update it. The standard loop time is 20ms.
     m_armSim.update(0.020);
 
-    // Finally, we set our simulated encoder's readings and simulated battery
-    // voltage
+    // Finally, we set our simulated encoder's readings and simulated battery voltage
     m_encoderSim.setDistance(m_armSim.getAngleRads());
     // SimBattery estimates loaded battery voltages
     RoboRioSim.setVInVoltage(
