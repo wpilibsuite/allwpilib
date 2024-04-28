@@ -412,6 +412,12 @@ public class SwerveDriveKinematics
         attainableMaxRotationalVelocity.in(RadiansPerSecond));
   }
 
+  /**
+   * Gets the locations of the modules relative to the center of rotation.
+   *
+   * @return The locations of the modules relative to the center of rotation. This array should not
+   *     be modified.
+   */
   @SuppressWarnings("PMD.MethodReturnsInternalArray")
   public Translation2d[] getModules() {
     return m_modules;

@@ -16,9 +16,17 @@ import edu.wpi.first.util.struct.StructSerializable;
 /** A helper class which computes the feedforward outputs for a differential drive drivetrain. */
 public class DifferentialDriveFeedforward implements ProtobufSerializable, StructSerializable {
   private final LinearSystem<N2, N2, N2> m_plant;
+
+  /** The linear velocity gain in volts per (meters per second). */
   public final double m_kVLinear;
+
+  /** The linear acceleration gain in volts per (meters per second squared). */
   public final double m_kALinear;
+
+  /** The angular velocity gain in volts per (radians per second). */
   public final double m_kVAngular;
+
+  /** The angular acceleration gain in volts per (radians per second squared). */
   public final double m_kAAngular;
 
   /**

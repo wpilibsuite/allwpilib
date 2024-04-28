@@ -14,9 +14,17 @@ import org.ejml.simple.SimpleMatrix;
 public class CubicHermiteSpline extends Spline implements ProtobufSerializable, StructSerializable {
   private static SimpleMatrix hermiteBasis;
   private final SimpleMatrix m_coefficients;
+
+  /** The control vector for the initial point in the x dimension. DO NOT MODIFY THIS ARRAY! */
   public final double[] xInitialControlVector;
+
+  /** The control vector for the final point in the x dimension. DO NOT MODIFY THIS ARRAY! */
   public final double[] xFinalControlVector;
+
+  /** The control vector for the initial point in the y dimension. DO NOT MODIFY THIS ARRAY! */
   public final double[] yInitialControlVector;
+
+  /** The control vector for the final point in the y dimension. DO NOT MODIFY THIS ARRAY! */
   public final double[] yFinalControlVector;
 
   private final ControlVector m_initialControlVector;
