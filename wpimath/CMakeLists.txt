@@ -19,6 +19,7 @@ protobuf_generate_cpp(
 
 file(
     GLOB wpimath_jni_src
+    src/main/native/cpp/jni/WPIMathJNI_ArmFeedforward.cpp
     src/main/native/cpp/jni/WPIMathJNI_DARE.cpp
     src/main/native/cpp/jni/WPIMathJNI_Eigen.cpp
     src/main/native/cpp/jni/WPIMathJNI_Exceptions.cpp
