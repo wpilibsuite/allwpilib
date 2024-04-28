@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <sleipnir/optimization/OptimizationProblem.hpp>
 #include <wpi/MathExtras.h>
 #include <wpi/SymbolExports.h>
 

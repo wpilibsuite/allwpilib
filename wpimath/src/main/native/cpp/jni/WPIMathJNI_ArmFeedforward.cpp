@@ -24,23 +24,13 @@ Java_edu_wpi_first_math_WPIMathJNI_calculate
    jdouble currentAngle, jdouble currentVelocity, jdouble nextVelocity,
    jdouble dt)
 {
-  using Acceleration = units::compound_unit<units::radians_per_second,
-                                            units::inverse<units::second>>;
-  using kv_unit =
-      units::compound_unit<units::volts,
-                           units::inverse<units::radians_per_second>>;
-  using ka_unit =
-      units::compound_unit<units::volts, units::inverse<Acceleration>>;
-
-  auto armFeedForward = frc::ArmFeedforward{
-      units::volt_t{ks}, units::volt_t{kg}, units::unit_t<kv_unit>{kv},
-      units::unit_t<ka_unit>{ka}};
-
-  units::volt_t voltage{armFeedForward.Calculate(
-      units::radian_t{currentAngle},
-      units::radians_per_second_t{currentVelocity},
-      units::radians_per_second_t{nextVelocity}, units::second_t{dt})};
-  return voltage.value();
+  return frc::ArmFeedforward{units::volt_t{ks}, units::volt_t{kg},
+                             units::unit_t<frc::ArmFeedforward::kv_unit>{kv},
+                             units::unit_t<frc::ArmFeedforward::ka_unit>{ka}}
+      .Calculate(units::radian_t{currentAngle},
+                 units::radians_per_second_t{currentVelocity},
+                 units::radians_per_second_t{nextVelocity}, units::second_t{dt})
+      .value();
 }
 
 }  // extern "C"
