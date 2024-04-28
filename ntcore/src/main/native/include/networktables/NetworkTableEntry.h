@@ -501,13 +501,6 @@ class NetworkTableEntry final {
   void Unpublish();
 
   /**
-   * Deletes the entry.
-   * @deprecated Use Unpublish() instead.
-   */
-  [[deprecated("Use Unpublish() instead")]]
-  void Delete();
-
-  /**
    * Gets the entry's topic.
    *
    * @return Topic
