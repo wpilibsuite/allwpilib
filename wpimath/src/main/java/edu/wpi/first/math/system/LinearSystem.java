@@ -4,15 +4,7 @@
 
 package edu.wpi.first.math.system;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.ejml.simple.SimpleMatrix;
-
 import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Num;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N10;
@@ -34,19 +26,22 @@ import edu.wpi.first.math.numbers.N6;
 import edu.wpi.first.math.numbers.N7;
 import edu.wpi.first.math.numbers.N8;
 import edu.wpi.first.math.numbers.N9;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.ejml.simple.SimpleMatrix;
 
 /**
  * A plant defined using state-space notation.
  *
- * <p>
- * A plant is a mathematical model of a system's dynamics.
+ * <p>A plant is a mathematical model of a system's dynamics.
  *
- * <p>
- * For more on the underlying math, read
+ * <p>For more on the underlying math, read
  * https://file.tavsys.net/control/controls-engineering-in-frc.pdf.
  *
- * @param <States>  Number of states.
- * @param <Inputs>  Number of inputs.
+ * @param <States> Number of states.
+ * @param <Inputs> Number of inputs.
  * @param <Outputs> Number of outputs.
  */
 public class LinearSystem<States extends Num, Inputs extends Num, Outputs extends Num> {
@@ -198,12 +193,10 @@ public class LinearSystem<States extends Num, Inputs extends Num, Outputs extend
   /**
    * Computes the new x given the old x and the control input.
    *
-   * <p>
-   * This is used by state observers directly to run updates based on state
-   * estimate.
+   * <p>This is used by state observers directly to run updates based on state estimate.
    *
-   * @param x         The current state.
-   * @param clampedU  The control input.
+   * @param x The current state.
+   * @param clampedU The control input.
    * @param dtSeconds Timestep for model update.
    * @return the updated x.
    */
@@ -217,11 +210,9 @@ public class LinearSystem<States extends Num, Inputs extends Num, Outputs extend
   /**
    * Computes the new y given the control input.
    *
-   * <p>
-   * This is used by state observers directly to run updates based on state
-   * estimate.
+   * <p>This is used by state observers directly to run updates based on state estimate.
    *
-   * @param x        The current state.
+   * @param x The current state.
    * @param clampedU The control input.
    * @return the updated output matrix Y.
    */
@@ -232,16 +223,11 @@ public class LinearSystem<States extends Num, Inputs extends Num, Outputs extend
   /**
    * Returns the LinearSystem with the number of outputs set to 1
    *
-   * <p>
-   * This is used by state observers such as the Kalman Filter.
+   * <p>This is used by state observers such as the Kalman Filter.
    *
-   * @return the sliced LinearSystem with outputs set to row vectors of
-   *         LinearSystem.
-   * @throws IllegalArgumentException if any outputIndices are outside the range
-   *                                  of system outputs.
-   * @throws IllegalArgumentException if number of outputIndices exceeds the
-   *                                  system output number.
-   * 
+   * @return the sliced LinearSystem with outputs set to row vectors of LinearSystem.
+   * @throws IllegalArgumentException if any outputIndices are outside the range of system outputs.
+   * @throws IllegalArgumentException if number of outputIndices exceeds the system output number.
    */
   public LinearSystem<States, Inputs, ?> slice(int... outputIndices) {
     for (int index = 0; index < outputIndices.length; ++index) {
@@ -256,7 +242,8 @@ public class LinearSystem<States extends Num, Inputs extends Num, Outputs extend
           "More outputs requested than available. This is usually due to model implementation errors.");
     }
 
-    List<Integer> outputIndicesList = Arrays.stream(outputIndices).boxed().collect(Collectors.toList());
+    List<Integer> outputIndicesList =
+        Arrays.stream(outputIndices).boxed().collect(Collectors.toList());
     Collections.sort(outputIndicesList);
 
     SimpleMatrix new_C_Storage = new SimpleMatrix(outputIndices.length, m_C.getNumCols());

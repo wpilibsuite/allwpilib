@@ -33,22 +33,21 @@ class LinearSystemLoopTest {
       new KalmanFilter<>(
           Nat.N2(),
           Nat.N1(),
-          (LinearSystem<N2, N1, N1>)m_plant.slice(0),
+          (LinearSystem<N2, N1, N1>) m_plant.slice(0),
           VecBuilder.fill(0.05, 1.0),
           VecBuilder.fill(0.0001),
           kDt);
 
   LinearQuadraticRegulator<N2, N1, N1> m_controller =
       new LinearQuadraticRegulator<>(
-        (LinearSystem<N2, N1, N1>)m_plant.slice(0),
-        VecBuilder.fill(0.02, 0.4),
+          (LinearSystem<N2, N1, N1>) m_plant.slice(0),
+          VecBuilder.fill(0.02, 0.4),
           VecBuilder.fill(12.0),
           0.00505);
 
   private final LinearSystemLoop<N2, N1, N1> m_loop =
       new LinearSystemLoop<>(
-        (LinearSystem<N2, N1, N1>)m_plant.slice(0),
-        m_controller, m_observer, 12, 0.00505);
+          (LinearSystem<N2, N1, N1>) m_plant.slice(0), m_controller, m_observer, 12, 0.00505);
 
   private static void updateTwoState(
       LinearSystem<N2, N1, N1> plant, LinearSystemLoop<N2, N1, N1> loop, double noise) {
@@ -77,8 +76,9 @@ class LinearSystemLoopTest {
       m_loop.setNextR(VecBuilder.fill(state.position, state.velocity));
 
       updateTwoState(
-        (LinearSystem<N2, N1, N1>)m_plant.slice(0),
-        m_loop, (random.nextGaussian()) * kPositionStddev);
+          (LinearSystem<N2, N1, N1>) m_plant.slice(0),
+          m_loop,
+          (random.nextGaussian()) * kPositionStddev);
       var u = m_loop.getU(0);
 
       assertTrue(u >= -12.1 && u <= 12.1, "U out of bounds! Got " + u);
