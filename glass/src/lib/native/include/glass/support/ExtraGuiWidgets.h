@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <stdint.h>
+
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>
 
@@ -98,5 +100,18 @@ bool HeaderDeleteButton(const char* label);
  * Settings button similar to ImGui::CloseButton.
  */
 bool HamburgerButton(const ImGuiID id, const ImVec2 position);
+
+/**
+ * Edit a value with expression input. Similar to ImGui::InputScalar()
+ */
+template <typename V>
+bool InputExpr(const char* label, V* v, const char* format,
+               ImGuiInputTextFlags flags = 0);
+extern template bool InputExpr(const char*, int64_t*, const char*,
+                               ImGuiInputTextFlags);
+extern template bool InputExpr(const char*, float*, const char*,
+                               ImGuiInputTextFlags);
+extern template bool InputExpr(const char*, double*, const char*,
+                               ImGuiInputTextFlags);
 
 }  // namespace glass

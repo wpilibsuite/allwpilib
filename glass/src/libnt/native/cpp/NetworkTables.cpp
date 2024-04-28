@@ -33,6 +33,7 @@
 #include "glass/Context.h"
 #include "glass/DataSource.h"
 #include "glass/Storage.h"
+#include "glass/support/ExtraGuiWidgets.h"
 
 using namespace glass;
 using namespace mpack;
@@ -1383,8 +1384,8 @@ static void EmitEntryValueEditable(NetworkTablesModel* model,
     }
     case NT_INTEGER: {
       int64_t v = val.GetInteger();
-      if (ImGui::InputScalar(typeStr, ImGuiDataType_S64, &v, nullptr, nullptr,
-                             nullptr, ImGuiInputTextFlags_EnterReturnsTrue)) {
+      if (InputExpr<int64_t>(typeStr, &v, "%d",
+                             ImGuiInputTextFlags_EnterReturnsTrue)) {
         if (entry.publisher == 0) {
           entry.publisher = nt::Publish(entry.info.topic, NT_INTEGER, "int");
         }
@@ -1394,8 +1395,8 @@ static void EmitEntryValueEditable(NetworkTablesModel* model,
     }
     case NT_FLOAT: {
       float v = val.GetFloat();
-      if (ImGui::InputFloat(typeStr, &v, 0, 0, "%.6f",
-                            ImGuiInputTextFlags_EnterReturnsTrue)) {
+      if (InputExpr<float>(typeStr, &v, "%.6f",
+                           ImGuiInputTextFlags_EnterReturnsTrue)) {
         if (entry.publisher == 0) {
           entry.publisher = nt::Publish(entry.info.topic, NT_FLOAT, "float");
         }
@@ -1411,9 +1412,9 @@ static void EmitEntryValueEditable(NetworkTablesModel* model,
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
 #endif
-      if (ImGui::InputDouble(typeStr, &v, 0, 0,
-                             fmt::format("%.{}f", precision).c_str(),
-                             ImGuiInputTextFlags_EnterReturnsTrue)) {
+      if (InputExpr<double>(typeStr, &v,
+                            fmt::format("%.{}f", precision).c_str(),
+                            ImGuiInputTextFlags_EnterReturnsTrue)) {
         if (entry.publisher == 0) {
           entry.publisher = nt::Publish(entry.info.topic, NT_DOUBLE, "double");
         }
