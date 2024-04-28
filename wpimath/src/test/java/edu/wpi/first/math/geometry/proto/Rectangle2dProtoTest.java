@@ -12,7 +12,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.proto.Geometry2D.ProtobufRectangle2d;
 import org.junit.jupiter.api.Test;
 
-public class Rectangle2dProtoTest {
+class Rectangle2dProtoTest {
   private static final Rectangle2d DATA =
       new Rectangle2d(new Pose2d(0.1, 0.2, new Rotation2d()), 4.0, 3.0);
 

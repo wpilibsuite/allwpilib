@@ -13,7 +13,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import org.junit.jupiter.api.Test;
 
-public class Ellipse2dStructTest {
+class Ellipse2dStructTest {
   private static final Ellipse2d DATA =
       new Ellipse2d(new Pose2d(0.0, 1.0, new Rotation2d(2.4)), 3.0, 4.0);
 

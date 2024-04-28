@@ -10,10 +10,11 @@ import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
 
-/** Represents a 2d ellipse space containing translational, rotational, and scaling components */
+/** Represents a 2d ellipse space containing translational, rotational, and scaling components. */
 public class Ellipse2d implements ProtobufSerializable, StructSerializable {
   private final Pose2d m_center;
-  private final double m_xSemiAxis, m_ySemiAxis;
+  private final double m_xSemiAxis;
+  private final double m_ySemiAxis;
 
   /**
    * Constructs an ellipse around a center point and two semi-axes, a horizontal and vertical one.
@@ -82,7 +83,7 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
     double b = Math.min(m_xSemiAxis, m_ySemiAxis); // Minor semi-axis
     double c = Math.sqrt(a * a - b * b);
 
-    c = (first ? -c : c);
+    c = first ? -c : c;
 
     if (m_xSemiAxis > m_ySemiAxis) {
       Transform2d diff = new Transform2d(c, 0.0, new Rotation2d());
@@ -163,7 +164,7 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
   }
 
   /**
-   * Checks equality between this Ellipse2d and another object
+   * Checks equality between this Ellipse2d and another object.
    *
    * @param obj The other object.
    * @return Whether the two objects are equal or not.

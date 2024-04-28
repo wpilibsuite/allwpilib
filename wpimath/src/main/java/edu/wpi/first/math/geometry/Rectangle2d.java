@@ -16,7 +16,8 @@ import java.util.Objects;
  */
 public class Rectangle2d implements ProtobufSerializable, StructSerializable {
   private final Pose2d m_center;
-  private final double m_xWidth, m_yWidth;
+  private final double m_xWidth;
+  private final double m_yWidth;
 
   /**
    * Constructs a rectangle at the specified position with the specified width and height.
@@ -37,12 +38,12 @@ public class Rectangle2d implements ProtobufSerializable, StructSerializable {
   }
 
   /**
-   * Constructs a rectangle at the specified position and rotation with the specified width and
-   * height.
+   * Constructs a rectangle at the specified position and rotation with the specified x width and y
+   * width.
    *
    * @param center The center of the rectangle.
-   * @param width The x size component of the rectangle, in unrotated coordinate frame.
-   * @param height The y size component of the rectangle, in unrotated coordinate frame.
+   * @param xWidth The x size component of the rectangle, in unrotated coordinate frame.
+   * @param yWidth The y size component of the rectangle, in unrotated coordinate frame.
    * @param rotation The rotation of the rectangle.
    */
   public Rectangle2d(Translation2d center, double xWidth, double yWidth, Rotation2d rotation) {
@@ -133,10 +134,10 @@ public class Rectangle2d implements ProtobufSerializable, StructSerializable {
 
     if (Math.abs(point.getX()) == m_xWidth / 2.0) {
       // Point rests on left/right perimeter
-      return (Math.abs(point.getY()) <= m_yWidth / 2.0);
+      return Math.abs(point.getY()) <= m_yWidth / 2.0;
     } else if (Math.abs(point.getY()) == m_yWidth / 2.0) {
       // Point rests on top/bottom perimeter
-      return (Math.abs(point.getX()) <= m_xWidth / 2.0);
+      return Math.abs(point.getX()) <= m_xWidth / 2.0;
     }
 
     return false;
@@ -154,10 +155,10 @@ public class Rectangle2d implements ProtobufSerializable, StructSerializable {
     point = point.rotateAround(m_center.getTranslation(), m_center.getRotation().unaryMinus());
 
     // Check if within bounding box
-    return (point.getX() >= (m_center.getX() - m_xWidth / 2.0)
+    return point.getX() >= (m_center.getX() - m_xWidth / 2.0)
         && point.getX() <= (m_center.getX() + m_xWidth / 2.0)
         && point.getY() >= (m_center.getY() - m_yWidth / 2.0)
-        && point.getY() <= (m_center.getY() + m_yWidth / 2.0));
+        && point.getY() <= (m_center.getY() + m_yWidth / 2.0);
   }
 
   /**
@@ -167,7 +168,9 @@ public class Rectangle2d implements ProtobufSerializable, StructSerializable {
    * @return The distance (0, if the point is contained by the rectangle)
    */
   public double distanceToPoint(Translation2d point) {
-    if (containsPoint(point)) return 0.0;
+    if (containsPoint(point)) {
+      return 0.0;
+    }
 
     // Move the point into the rectangle's coordinate frame
     point = point.minus(m_center.getTranslation());
@@ -189,7 +192,9 @@ public class Rectangle2d implements ProtobufSerializable, StructSerializable {
    */
   public Translation2d findNearestPoint(Translation2d point) {
     // Check if already in rectangle
-    if (containsPoint(point)) return new Translation2d(point.getX(), point.getY());
+    if (containsPoint(point)) {
+      return new Translation2d(point.getX(), point.getY());
+    }
 
     // Rotate the point by the inverse of the rectangle's rotation
     point = point.rotateAround(m_center.getTranslation(), m_center.getRotation().unaryMinus());

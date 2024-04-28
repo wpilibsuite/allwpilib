@@ -7,11 +7,12 @@ package edu.wpi.first.math.geometry;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
-public class Rectangle2dTest {
+class Rectangle2dTest {
   private static final double kEpsilon = 1E-9;
 
   @Test
@@ -97,6 +98,6 @@ public class Rectangle2dTest {
     var center3 = new Pose2d(2.0, 3.0, new Rotation2d());
     var rect3 = new Rectangle2d(center3, 3.0, 3.0);
 
-    assertAll(() -> assertTrue(rect1.equals(rect2)), () -> assertFalse(rect2.equals(rect3)));
+    assertAll(() -> assertEquals(rect1, rect2), () -> assertNotEquals(rect2, rect3));
   }
 }

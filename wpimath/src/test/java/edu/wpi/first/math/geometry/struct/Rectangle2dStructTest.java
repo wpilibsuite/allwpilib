@@ -13,7 +13,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import org.junit.jupiter.api.Test;
 
-public class Rectangle2dStructTest {
+class Rectangle2dStructTest {
   private static final Rectangle2d DATA =
       new Rectangle2d(new Pose2d(1.0, 2.0, new Rotation2d(3.1)), 5.0, 3.0);
 

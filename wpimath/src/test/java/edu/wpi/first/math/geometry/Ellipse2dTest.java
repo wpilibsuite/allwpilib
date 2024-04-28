@@ -7,11 +7,12 @@ package edu.wpi.first.math.geometry;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
-public class Ellipse2dTest {
+class Ellipse2dTest {
   @Test
   void testGetFocalPoints() {
     var center = new Pose2d(1, 2, new Rotation2d());
@@ -63,8 +64,8 @@ public class Ellipse2dTest {
     var ellipse3 = new Ellipse2d(center3, 3.0, 2.0);
 
     assertAll(
-        () -> assertTrue(ellipse1.equals(ellipse2)),
-        () -> assertFalse(ellipse1.equals(ellipse3)),
-        () -> assertFalse(ellipse3.equals(ellipse2)));
+        () -> assertEquals(ellipse1, ellipse2),
+        () -> assertNotEquals(ellipse1, ellipse3),
+        () -> assertNotEquals(ellipse3, ellipse2));
   }
 }
