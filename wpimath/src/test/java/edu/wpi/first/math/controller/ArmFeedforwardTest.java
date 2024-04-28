@@ -22,55 +22,69 @@ class ArmFeedforwardTest {
   private static final double ka = 2;
   private final ArmFeedforward m_armFF = new ArmFeedforward(ks, kg, kv, ka);
 
+  /**
+   * Simulates a single-jointed arm and returns the final state.
+   *
+   * @param currentAngle The starting angle in radians.
+   * @param currentVelocity The starting angular velocity in radians per second.
+   * @param input The input voltage.
+   * @param dt The simulation time in seconds.
+   * @return The final state as a 2-vector of angle and angular velocity.
+   */
+  private Matrix<N2, N1> simulate(
+      double currentAngle, double currentVelocity, double input, double dt) {
+    final Matrix<N2, N2> A =
+        new Matrix<>(Nat.N2(), Nat.N2(), new double[] {0.0, 1.0, 0.0, -kv / ka});
+    final Matrix<N2, N1> B = new Matrix<>(Nat.N2(), Nat.N1(), new double[] {0.0, 1.0 / ka});
+
+    final BiFunction<Matrix<N2, N1>, Matrix<N1, N1>, Matrix<N2, N1>> f =
+        (x, u) -> {
+          Matrix<N2, N1> c =
+              MatBuilder.fill(
+                  Nat.N2(),
+                  Nat.N1(),
+                  0.0,
+                  Math.signum(x.get(1, 0)) * (-ks / ka) - (kg / ka) * Math.cos(x.get(0, 0)));
+          return A.times(x).plus(B.times(u)).plus(c);
+        };
+
+    return NumericalIntegration.rk4(
+        f,
+        MatBuilder.fill(Nat.N2(), Nat.N1(), currentAngle, currentVelocity),
+        MatBuilder.fill(Nat.N1(), Nat.N1(), input),
+        dt);
+  }
+
+  /**
+   * Calculates a feedforward voltage using overload taking angle, two angular velocities, and dt;
+   * then simulates an arm using that voltage to verify correctness.
+   *
+   * @param currentAngle The starting angle in radians.
+   * @param currentVelocity The starting angular velocity in radians per second.
+   * @param input The input voltage.
+   * @param dt The simulation time in seconds.
+   */
+  private void calculateAndSimulate(
+      double currentAngle, double currentVelocity, double nextVelocity, double dt) {
+    final double input = m_armFF.calculate(currentAngle, currentVelocity, nextVelocity, dt);
+    assertEquals(nextVelocity, simulate(currentAngle, currentVelocity, input, dt).get(1, 0), 1e-12);
+  }
+
   @Test
   void testCalculate() {
-    // calculate(angle, angular velocity, dt)
-    {
-      assertEquals(0.5, m_armFF.calculate(Math.PI / 3, 0), 0.002);
-      assertEquals(2.5, m_armFF.calculate(Math.PI / 3, 1), 0.002);
-    }
+    // calculate(angle, angular velocity)
+    assertEquals(0.5, m_armFF.calculate(Math.PI / 3, 0), 0.002);
+    assertEquals(2.5, m_armFF.calculate(Math.PI / 3, 1), 0.002);
 
-    // calculate(angle, angular velocity, angular acceleration, dt)
-    {
-      assertEquals(6.5, m_armFF.calculate(Math.PI / 3, 1, 2), 0.002);
-      assertEquals(2.5, m_armFF.calculate(Math.PI / 3, -1, 2), 0.002);
-    }
+    // calculate(angle, angular velocity, angular acceleration)
+    assertEquals(6.5, m_armFF.calculate(Math.PI / 3, 1, 2), 0.002);
+    assertEquals(2.5, m_armFF.calculate(Math.PI / 3, -1, 2), 0.002);
 
     // calculate(currentAngle, currentVelocity, nextAngle, dt)
-    {
-      final double currentAngleRadians = Math.PI / 3;
-      final double currentVelocityRadPerSec = 1.0;
-      final double nextVelocityRadPerSec = 1.05;
-      final double dtSeconds = 0.020;
-
-      final double u =
-          m_armFF.calculate(
-              currentAngleRadians, currentVelocityRadPerSec, nextVelocityRadPerSec, dtSeconds);
-
-      final Matrix<N2, N2> A =
-          new Matrix<>(Nat.N2(), Nat.N2(), new double[] {0.0, 1.0, 0.0, -kv / ka});
-      final Matrix<N2, N1> B = new Matrix<>(Nat.N2(), Nat.N1(), new double[] {0.0, 1.0 / ka});
-
-      final BiFunction<Matrix<N2, N1>, Matrix<N1, N1>, Matrix<N2, N1>> f =
-          (x_, u_) -> {
-            Matrix<N2, N1> c =
-                MatBuilder.fill(
-                    Nat.N2(),
-                    Nat.N1(),
-                    0.0,
-                    Math.signum(x_.get(1, 0)) * (-ks / ka) - (kg / ka) * Math.cos(x_.get(0, 0)));
-            return A.times(x_).plus(B.times(u_)).plus(c);
-          };
-
-      final Matrix<N2, N1> actual_x_k1 =
-          NumericalIntegration.rk4(
-              f,
-              MatBuilder.fill(Nat.N2(), Nat.N1(), currentAngleRadians, currentVelocityRadPerSec),
-              MatBuilder.fill(Nat.N1(), Nat.N1(), u),
-              dtSeconds);
-
-      assertEquals(nextVelocityRadPerSec, actual_x_k1.get(1, 0), 1e-12);
-    }
+    calculateAndSimulate(Math.PI / 3, 1.0, 1.05, 0.020);
+    calculateAndSimulate(Math.PI / 3, 1.0, 0.95, 0.020);
+    calculateAndSimulate(-Math.PI / 3, 1.0, 1.05, 0.020);
+    calculateAndSimulate(-Math.PI / 3, 1.0, 0.95, 0.020);
   }
 
   @Test
