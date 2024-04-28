@@ -297,8 +297,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
     // v = r w, so w = v/r
     double kA = 1 / m_plant.getB().get(1, 0);
     double kV = -m_plant.getA().get(1, 1) * kA;
-    double motorVelocityRadPerSec =
-        m_x.get(1, 0) * kV * m_gearbox.KvRadPerSecPerVolt;
+    double motorVelocityRadPerSec = m_x.get(1, 0) * kV * m_gearbox.KvRadPerSecPerVolt;
     var appliedVoltage = m_u.get(0, 0);
     return m_gearbox.getCurrent(motorVelocityRadPerSec, appliedVoltage)
         * Math.signum(appliedVoltage);

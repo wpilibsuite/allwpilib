@@ -60,7 +60,7 @@ public class Robot extends TimedRobot {
       new KalmanFilter<>(
           Nat.N2(),
           Nat.N1(),
-          m_armPlant.getTrimmedLinearSystem(),
+          (LinearSystem<N2, N1, N1>)m_armPlant.slice(0),
           VecBuilder.fill(0.015, 0.17), // How accurate we
           // think our model is, in radians and radians/sec
           VecBuilder.fill(0.01), // How accurate we think our encoder position
@@ -70,8 +70,8 @@ public class Robot extends TimedRobot {
   // A LQR uses feedback to create voltage commands.
   private final LinearQuadraticRegulator<N2, N1, N1> m_controller =
       new LinearQuadraticRegulator<>(
-          m_armPlant.getTrimmedLinearSystem(),
-          VecBuilder.fill(Units.degreesToRadians(1.0), Units.degreesToRadians(10.0)), // qelms.
+        (LinearSystem<N2, N1, N1>)m_armPlant.slice(0),
+        VecBuilder.fill(Units.degreesToRadians(1.0), Units.degreesToRadians(10.0)), // qelms.
           // Position and velocity error tolerances, in radians and radians per second. Decrease
           // this
           // to more heavily penalize state excursion, or make the controller behave more
@@ -87,7 +87,8 @@ public class Robot extends TimedRobot {
   // The state-space loop combines a controller, observer, feedforward and plant for easy control.
   private final LinearSystemLoop<N2, N1, N1> m_loop =
       new LinearSystemLoop<>(
-          m_armPlant.getTrimmedLinearSystem(), m_controller, m_observer, 12.0, 0.020);
+        (LinearSystem<N2, N1, N1>)m_armPlant.slice(0),
+        m_controller, m_observer, 12.0, 0.020);
 
   // An encoder set up to measure arm position in radians.
   private final Encoder m_encoder = new Encoder(kEncoderAChannel, kEncoderBChannel);
