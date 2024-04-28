@@ -191,9 +191,21 @@ class CommandPtr final {
    * @param parallel the commands to run in parallel
    * @return the decorated command
    */
-  [[nodiscard]]
+  [[nodiscard]] [[deprecated("Replace with DeadlineFor")]]
   CommandPtr DeadlineWith(CommandPtr&& parallel) &&;
 
+  /**
+   * Decorates this command with a set of commands to run parallel to it, ending
+   * when the calling command ends and interrupting all the others. Often more
+   * convenient/less-verbose than constructing a new {@link
+   * ParallelDeadlineGroup} explicitly.
+   *
+   * @param parallel the commands to run in parallel. Note the parallel commands
+   * will be interupted when the deadline command ends
+   * @return the decorated command
+   */
+  [[nodiscard]]
+  CommandPtr DeadlineFor(CommandPtr&& parallel) &&;
   /**
    * Decorates this command with a set of commands to run parallel to it, ending
    * when the last command ends. Often more convenient/less-verbose than
