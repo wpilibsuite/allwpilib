@@ -201,9 +201,10 @@ class LinearSystem {
 
     // Sort and deduplicate output indices
     wpi::SmallVector<int> outputIndicesArray{outputIndices...};
-    std::ranges::sort(outputIndicesArray);
-    const auto [first, last] = std::ranges::unique(outputIndicesArray);
-    outputIndicesArray.erase(first, last);
+    std::sort(outputIndicesArray.begin(), outputIndicesArray.end());
+    auto last =
+        std::unique(outputIndicesArray.begin(), outputIndicesArray.end());
+    outputIndicesArray.erase(last, outputIndicesArray.end());
 
     return LinearSystem<States, Inputs, sizeof...(OutputIndices)>{
         m_A, m_B, m_C(outputIndicesArray, Eigen::placeholders::all),
