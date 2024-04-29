@@ -142,8 +142,8 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
    * @param point The point to check.
    * @return True, if this ellipse's circumference intersects the point.
    */
-  public boolean intersectsPoint(Translation2d point) {
-    return solveEllipseEquation(point) == 1.0;
+  public boolean intersects(Translation2d point) {
+    return Math.abs(1.0 - solveEllipseEquation(point)) <= 1E-9;
   }
 
   /**
@@ -153,7 +153,7 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
    * @param point The point to check.
    * @return True, if the point is within or on the ellipse.
    */
-  public boolean containsPoint(Translation2d point) {
+  public boolean contains(Translation2d point) {
     return solveEllipseEquation(point) <= 1.0;
   }
 

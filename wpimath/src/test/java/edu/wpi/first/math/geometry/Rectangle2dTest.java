@@ -35,10 +35,10 @@ class Rectangle2dTest {
     var rect = new Rectangle2d(center, 2.0, 3.0);
 
     assertAll(
-        () -> assertTrue(rect.intersectsPoint(new Translation2d(5.5, 4.0))),
-        () -> assertTrue(rect.containsPoint(new Translation2d(3.0, 2.0))),
-        () -> assertFalse(rect.containsPoint(new Translation2d(4.0, 1.5))),
-        () -> assertFalse(rect.intersectsPoint(new Translation2d(4.0, 3.5))));
+        () -> assertTrue(rect.intersects(new Translation2d(5.5, 4.0))),
+        () -> assertTrue(rect.intersects(new Translation2d(3.0, 2.0))),
+        () -> assertFalse(rect.intersects(new Translation2d(4.0, 1.5))),
+        () -> assertFalse(rect.intersects(new Translation2d(4.0, 3.5))));
   }
 
   @Test
@@ -47,9 +47,9 @@ class Rectangle2dTest {
     var rect = new Rectangle2d(center, 3.0, 1.0);
 
     assertAll(
-        () -> assertTrue(rect.containsPoint(new Translation2d(2.0, 3.0))),
-        () -> assertTrue(rect.containsPoint(new Translation2d(3.0, 4.0))),
-        () -> assertFalse(rect.containsPoint(new Translation2d(3.0, 3.0))));
+        () -> assertTrue(rect.contains(new Translation2d(2.0, 3.0))),
+        () -> assertTrue(rect.contains(new Translation2d(3.0, 4.0))),
+        () -> assertFalse(rect.contains(new Translation2d(3.0, 3.0))));
   }
 
   @Test
@@ -63,10 +63,10 @@ class Rectangle2dTest {
     var point4 = new Translation2d(-1.0, 2.5);
 
     assertAll(
-        () -> assertEquals(0.5, rect.distanceToPoint(point1), kEpsilon),
-        () -> assertEquals(0.0, rect.distanceToPoint(point2), kEpsilon),
-        () -> assertEquals(0.5, rect.distanceToPoint(point3), kEpsilon),
-        () -> assertEquals(1.0, rect.distanceToPoint(point4), kEpsilon));
+        () -> assertEquals(0.5, rect.distance(point1), kEpsilon),
+        () -> assertEquals(0.0, rect.distance(point2), kEpsilon),
+        () -> assertEquals(0.5, rect.distance(point3), kEpsilon),
+        () -> assertEquals(1.0, rect.distance(point4), kEpsilon));
   }
 
   @Test

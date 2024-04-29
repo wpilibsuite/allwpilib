@@ -35,8 +35,8 @@ class Ellipse2dTest {
     var pointB = new Translation2d(0.0, 3.0);
 
     assertAll(
-        () -> assertTrue(ellipse.intersectsPoint(pointA)),
-        () -> assertFalse(ellipse.intersectsPoint(pointB)));
+        () -> assertTrue(ellipse.intersects(pointA)),
+        () -> assertFalse(ellipse.intersects(pointB)));
   }
 
   @Test
@@ -48,8 +48,7 @@ class Ellipse2dTest {
     var pointB = new Translation2d(0.5, -2.0);
 
     assertAll(
-        () -> assertTrue(ellipse.containsPoint(pointA)),
-        () -> assertFalse(ellipse.containsPoint(pointB)));
+        () -> assertTrue(ellipse.contains(pointA)), () -> assertFalse(ellipse.contains(pointB)));
   }
 
   @Test

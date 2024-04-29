@@ -127,15 +127,15 @@ public class Rectangle2d implements ProtobufSerializable, StructSerializable {
    * @param point The point to check.
    * @return True, if the rectangle's perimeter intersects the point.
    */
-  public boolean intersectsPoint(Translation2d point) {
+  public boolean intersects(Translation2d point) {
     // Move the point into the rectangle's coordinate frame
     point = point.minus(m_center.getTranslation());
     point = point.rotateBy(m_center.getRotation().unaryMinus());
 
-    if (Math.abs(point.getX()) == m_xWidth / 2.0) {
+    if (Math.abs(Math.abs(point.getX()) - m_xWidth / 2.0) <= 1E-9) {
       // Point rests on left/right perimeter
       return Math.abs(point.getY()) <= m_yWidth / 2.0;
-    } else if (Math.abs(point.getY()) == m_yWidth / 2.0) {
+    } else if (Math.abs(Math.abs(point.getY()) - m_yWidth / 2.0) <= 1E-9) {
       // Point rests on top/bottom perimeter
       return Math.abs(point.getX()) <= m_xWidth / 2.0;
     }
@@ -150,7 +150,7 @@ public class Rectangle2d implements ProtobufSerializable, StructSerializable {
    * @param point The point to check.
    * @return True, if the rectangle contains the point or the perimeter intersects the point.
    */
-  public boolean containsPoint(Translation2d point) {
+  public boolean contains(Translation2d point) {
     // Rotate the point into the rectangle's coordinate frame
     point = point.rotateAround(m_center.getTranslation(), m_center.getRotation().unaryMinus());
 
@@ -167,8 +167,8 @@ public class Rectangle2d implements ProtobufSerializable, StructSerializable {
    * @param point The point to check.
    * @return The distance (0, if the point is contained by the rectangle)
    */
-  public double distanceToPoint(Translation2d point) {
-    if (containsPoint(point)) {
+  public double distance(Translation2d point) {
+    if (contains(point)) {
       return 0.0;
     }
 
@@ -192,8 +192,8 @@ public class Rectangle2d implements ProtobufSerializable, StructSerializable {
    */
   public Translation2d findNearestPoint(Translation2d point) {
     // Check if already in rectangle
-    if (containsPoint(point)) {
-      return new Translation2d(point.getX(), point.getY());
+    if (contains(point)) {
+      return point;
     }
 
     // Rotate the point by the inverse of the rectangle's rotation
