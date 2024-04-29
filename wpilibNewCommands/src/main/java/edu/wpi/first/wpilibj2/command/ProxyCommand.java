@@ -51,7 +51,7 @@ public class ProxyCommand extends Command {
    */
   @SuppressWarnings("this-escape")
   public ProxyCommand(Command command) {
-    this(() -> command);
+    m_supplier = () -> requireNonNullParam(command, "command", "ProxyCommand");
     setName("Proxy(" + command.getName() + ")");
   }
 

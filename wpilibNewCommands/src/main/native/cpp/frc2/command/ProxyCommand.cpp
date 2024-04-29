@@ -20,12 +20,13 @@ ProxyCommand::ProxyCommand(wpi::unique_function<CommandPtr()> supplier)
         holder = supplier();
         return holder->get();
       }) {}
+WPI_UNIGNORE_DEPRECATED
 
 ProxyCommand::ProxyCommand(Command* command)
-    : ProxyCommand([command] { return command; }) {
+    : m_supplier([command] { return command; }) {
   SetName(fmt::format("Proxy({})", command->GetName()));
 }
-WPI_UNIGNORE_DEPRECATED
+
 ProxyCommand::ProxyCommand(std::unique_ptr<Command> command) {
   SetName(fmt::format("Proxy({})", command->GetName()));
   m_supplier = [command = std::move(command)] { return command.get(); };
