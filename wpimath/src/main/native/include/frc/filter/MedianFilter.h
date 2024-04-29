@@ -62,6 +62,13 @@ class MedianFilter {
   }
 
   /**
+   * Returns the last value calculated by the MedianFilter.
+   *
+   * @return The last value.
+   */
+  T LastValue() const { return m_valueBuffer.front(); }
+
+  /**
    * Resets the filter, clearing the window of all elements.
    */
   void Reset() {

@@ -19,6 +19,7 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.TreeMap;
 import java.util.function.Function;
@@ -320,5 +321,60 @@ class MecanumDrivePoseEstimatorTest {
         odometryPose.getRotation().getRadians(),
         estimator.getEstimatedPosition().getRotation().getRadians(),
         "Incorrect Final Theta");
+  }
+
+  @Test
+  void testSampleAt() {
+    var kinematics =
+        new MecanumDriveKinematics(
+            new Translation2d(1, 1),
+            new Translation2d(-1, 1),
+            new Translation2d(1, -1),
+            new Translation2d(-1, -1));
+    var estimator =
+        new MecanumDrivePoseEstimator(
+            kinematics,
+            new Rotation2d(),
+            new MecanumDriveWheelPositions(),
+            new Pose2d(),
+            VecBuilder.fill(1, 1, 1),
+            VecBuilder.fill(1, 1, 1));
+
+    // Returns empty when null
+    assertEquals(Optional.empty(), estimator.sampleAt(1));
+
+    // Add odometry measurements, but don't fill up the buffer
+    // Add a tiny tolerance for the upper bound because of floating point rounding error
+    for (double time = 1; time <= 2 + 1e-9; time += 0.02) {
+      var wheelPositions = new MecanumDriveWheelPositions(time, time, time, time);
+      estimator.updateWithTime(time, new Rotation2d(), wheelPositions);
+    }
+
+    // Sample at an added time
+    assertEquals(Optional.of(new Pose2d(1.02, 0, new Rotation2d())), estimator.sampleAt(1.02));
+    // Sample between updates (test interpolation)
+    assertEquals(Optional.of(new Pose2d(1.01, 0, new Rotation2d())), estimator.sampleAt(1.01));
+    // Sampling before the oldest value returns the oldest value
+    assertEquals(Optional.of(new Pose2d(1, 0, new Rotation2d())), estimator.sampleAt(0.5));
+    // Sampling after the newest value returns the newest value
+    assertEquals(Optional.of(new Pose2d(2, 0, new Rotation2d())), estimator.sampleAt(2.5));
+
+    // Add a vision measurement after the odometry measurements (while keeping all of the old
+    // odometry measurements)
+    estimator.addVisionMeasurement(new Pose2d(2, 0, new Rotation2d(1)), 2.2);
+
+    // Make sure nothing changed (except the newest value)
+    assertEquals(Optional.of(new Pose2d(1.02, 0, new Rotation2d())), estimator.sampleAt(1.02));
+    assertEquals(Optional.of(new Pose2d(1.01, 0, new Rotation2d())), estimator.sampleAt(1.01));
+    assertEquals(Optional.of(new Pose2d(1, 0, new Rotation2d())), estimator.sampleAt(0.5));
+
+    // Add a vision measurement before the odometry measurements that's still in the buffer
+    estimator.addVisionMeasurement(new Pose2d(1, 0.2, new Rotation2d()), 0.9);
+
+    // Everything should be the same except Y is 0.1 (halfway between 0 and 0.2)
+    assertEquals(Optional.of(new Pose2d(1.02, 0.1, new Rotation2d())), estimator.sampleAt(1.02));
+    assertEquals(Optional.of(new Pose2d(1.01, 0.1, new Rotation2d())), estimator.sampleAt(1.01));
+    assertEquals(Optional.of(new Pose2d(1, 0.1, new Rotation2d())), estimator.sampleAt(0.5));
+    assertEquals(Optional.of(new Pose2d(2, 0.1, new Rotation2d())), estimator.sampleAt(2.5));
   }
 }

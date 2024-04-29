@@ -160,4 +160,16 @@ class Translation3dTest {
         () -> assertEquals(Math.sqrt(3.0), two.getY(), kEpsilon),
         () -> assertEquals(0.0, two.getZ(), kEpsilon));
   }
+
+  @Test
+  void testToVector() {
+    var vec = VecBuilder.fill(1.0, 2.0, 3.0);
+    var translation = new Translation3d(vec);
+
+    assertEquals(vec.get(0), translation.getX());
+    assertEquals(vec.get(1), translation.getY());
+    assertEquals(vec.get(2), translation.getZ());
+
+    assertEquals(vec, translation.toVector());
+  }
 }

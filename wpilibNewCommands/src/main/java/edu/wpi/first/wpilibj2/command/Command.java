@@ -4,8 +4,11 @@
 
 package edu.wpi.first.wpilibj2.command;
 
+import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Time;
 import edu.wpi.first.util.function.BooleanConsumer;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -150,6 +153,23 @@ public abstract class Command implements Sendable {
   }
 
   /**
+   * Decorates this command with a timeout. If the specified timeout is exceeded before the command
+   * finishes normally, the command will be interrupted and un-scheduled.
+   *
+   * <p>Note: This decorator works by adding this command to a composition. The command the
+   * decorator was called on cannot be scheduled independently or be added to a different
+   * composition (namely, decorators), unless it is manually cleared from the list of composed
+   * commands with {@link CommandScheduler#removeComposedCommand(Command)}. The command composition
+   * returned from this method can be further decorated without issue.
+   *
+   * @param time the timeout duration
+   * @return the command with the timeout added
+   */
+  public ParallelRaceGroup withTimeout(Measure<Time> time) {
+    return withTimeout(time.in(Second));
+  }
+
+  /**
    * Decorates this command with an interrupt condition. If the specified condition becomes true
    * before the command finishes normally, the command will be interrupted and un-scheduled.
    *
@@ -267,8 +287,29 @@ public abstract class Command implements Sendable {
    *
    * @param parallel the commands to run in parallel
    * @return the decorated command
+   * @deprecated Use {@link deadlineFor} instead.
    */
+  @Deprecated(since = "2025", forRemoval = true)
   public ParallelDeadlineGroup deadlineWith(Command... parallel) {
+    return new ParallelDeadlineGroup(this, parallel);
+  }
+
+  /**
+   * Decorates this command with a set of commands to run parallel to it, ending when the calling
+   * command ends and interrupting all the others. Often more convenient/less-verbose than
+   * constructing a new {@link ParallelDeadlineGroup} explicitly.
+   *
+   * <p>Note: This decorator works by adding this command to a composition. The command the
+   * decorator was called on cannot be scheduled independently or be added to a different
+   * composition (namely, decorators), unless it is manually cleared from the list of composed
+   * commands with {@link CommandScheduler#removeComposedCommand(Command)}. The command composition
+   * returned from this method can be further decorated without issue.
+   *
+   * @param parallel the commands to run in parallel. Note the parallel commands will be interupted
+   *     when the deadline command ends
+   * @return the decorated command
+   */
+  public ParallelDeadlineGroup deadlineFor(Command... parallel) {
     return new ParallelDeadlineGroup(this, parallel);
   }
 
@@ -329,11 +370,16 @@ public abstract class Command implements Sendable {
   }
 
   /**
-   * Decorates this command to run "by proxy" by wrapping it in a {@link ProxyCommand}. This is
-   * useful for "forking off" from command compositions when the user does not wish to extend the
-   * command's requirements to the entire command composition.
+   * Decorates this command to run "by proxy" by wrapping it in a {@link ProxyCommand}. Use this for
+   * "forking off" from command compositions when the user does not wish to extend the command's
+   * requirements to the entire command composition. ProxyCommand has unique implications and
+   * semantics, see the WPILib docs for a full explanation.
    *
    * @return the decorated command
+   * @see ProxyCommand
+   * @see <a
+   *     href="https://docs.wpilib.org/en/stable/docs/software/commandbased/command-compositions.html#scheduling-other-commands">WPILib
+   *     docs</a>
    */
   public ProxyCommand asProxy() {
     return new ProxyCommand(this);

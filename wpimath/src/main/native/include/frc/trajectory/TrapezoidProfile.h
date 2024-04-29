@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <wpi/deprecated.h>
-
 #include "units/time.h"
 #include "wpimath/MathShared.h"
 
@@ -114,10 +112,10 @@ class TrapezoidProfile {
    * @deprecated Pass the desired and current state into calculate instead of
    * constructing a new TrapezoidProfile with the desired and current state
    */
-  WPI_DEPRECATED(
+  [[deprecated(
       "Pass the desired and current state into calculate instead of "
       "constructing a new TrapezoidProfile with the desired and current "
-      "state")
+      "state")]]
   TrapezoidProfile(Constraints constraints, State goal,
                    State initial = State{Distance_t{0}, Velocity_t{0}});
 

@@ -57,6 +57,7 @@ public final class Constants {
     public static final double kVVoltSecondsPerRotation =
         // Should have value 12V at free speed...
         12.0 / kShooterFreeRPS;
+    public static final double kAVoltSecondsSquaredPerRotation = 0;
 
     public static final double kFeederSpeed = 0.5;
   }

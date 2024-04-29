@@ -88,28 +88,13 @@ jobs:
         uses: lukka/run-vcpkg@v11.1
         with:
           vcpkgDirectory: ${{ runner.workspace }}/vcpkg
-          vcpkgGitCommitId: 78b61582c9e093fda56a01ebb654be15a0033897 # HEAD on 2023-08-6
+          vcpkgGitCommitId: 37c3e63a1306562f7f59c4c3c8892ddd50fdf992 # HEAD on 2024-02-24
 
       - name: configure
-        run: cmake -S . -B build -G "Ninja" -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache -DCMAKE_BUILD_TYPE=Release -DWITH_JAVA=OFF -DWITH_EXAMPLES=ON -DUSE_SYSTEM_FMTLIB=ON -DUSE_SYSTEM_LIBUV=ON -DUSE_SYSTEM_EIGEN=ON -DCMAKE_TOOLCHAIN_FILE=${{ runner.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_INSTALL_OPTIONS=--clean-after-build -DVCPKG_TARGET_TRIPLET=x64-windows-release -DVCPKG_HOST_TRIPLET=x64-windows-release
+        run: cmake -S . -B build -G "Ninja" -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache -DCMAKE_BUILD_TYPE=Release -DWITH_JAVA=OFF -DWITH_EXAMPLES=ON -DUSE_SYSTEM_FMTLIB=ON -DUSE_SYSTEM_LIBUV=ON -DUSE_SYSTEM_EIGEN=OFF -DCMAKE_TOOLCHAIN_FILE=${{ runner.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_INSTALL_OPTIONS=--clean-after-build -DVCPKG_TARGET_TRIPLET=x64-windows-release -DVCPKG_HOST_TRIPLET=x64-windows-release
         env:
           SCCACHE_GHA_ENABLED: "true"
 
-      # Build wpiutil at full speed, wpimath depends on wpiutil
-      - name: build wpiutil
-        working-directory: build
-        run: cmake --build . --parallel $(nproc) --target wpiutil/all
-        env:
-          SCCACHE_GHA_ENABLED: "true"
-
-      # Build wpimath slow to prevent OOM
-      - name: build wpimath
-        working-directory: build
-        run: cmake --build . --parallel 1 --target wpimath/all
-        env:
-          SCCACHE_GHA_ENABLED: "true"
-
-      # Build everything else fast
       - name: build
         working-directory: build
         run: cmake --build . --parallel $(nproc)

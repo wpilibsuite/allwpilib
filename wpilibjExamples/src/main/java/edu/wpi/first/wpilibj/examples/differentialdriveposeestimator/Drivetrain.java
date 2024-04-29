@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj.examples.differentialdriveposeestimator;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.ComputerVisionUtil;
 import edu.wpi.first.math.VecBuilder;
@@ -125,7 +126,8 @@ public class Drivetrain {
 
     m_cameraToObjectEntry = cameraToObjectTopic.getEntry(m_defaultVal);
 
-    m_objectInField = AprilTagFields.k2022RapidReact.loadAprilTagLayoutField().getTagPose(0).get();
+    m_objectInField =
+        AprilTagFieldLayout.loadField(AprilTagFields.k2024Crescendo).getTagPose(0).get();
 
     SmartDashboard.putData("Field", m_fieldSim);
     SmartDashboard.putData("FieldEstimation", m_fieldApproximation);

@@ -374,6 +374,14 @@ struct PubSubOptions {
    * internal publisher.
    */
   bool excludeSelf = false;
+
+  /**
+   * For subscriptions, don't share the existence of the subscription with the
+   * network. Note this means updates will not be received from the network
+   * unless another subscription overlaps with this one, and the subscription
+   * will not appear in metatopics.
+   */
+  bool hidden = false;
 };
 
 /**

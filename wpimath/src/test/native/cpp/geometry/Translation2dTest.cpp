@@ -126,6 +126,16 @@ TEST(Translation2dTest, Nearest) {
       translation2.Y().value());
 }
 
+TEST(Translation2dTest, ToVector) {
+  const Eigen::Vector2d vec(1.0, 2.0);
+  const Translation2d translation{vec};
+
+  EXPECT_DOUBLE_EQ(vec[0], translation.X().value());
+  EXPECT_DOUBLE_EQ(vec[1], translation.Y().value());
+
+  EXPECT_TRUE(vec == translation.ToVector());
+}
+
 TEST(Translation2dTest, Constexpr) {
   constexpr Translation2d defaultCtor;
   constexpr Translation2d componentCtor{1_m, 2_m};

@@ -890,7 +890,8 @@ class StructLogEntry : public DataLogEntry {
   }
 
  private:
-  [[no_unique_address]] std::tuple<I...> m_info;
+  [[no_unique_address]]
+  std::tuple<I...> m_info;
 };
 /**
  * Log raw struct serializable array of objects.
@@ -957,7 +958,8 @@ class StructArrayLogEntry : public DataLogEntry {
 
  private:
   StructArrayBuffer<T, I...> m_buf;
-  [[no_unique_address]] std::tuple<I...> m_info;
+  [[no_unique_address]]
+  std::tuple<I...> m_info;
 };
 
 /**

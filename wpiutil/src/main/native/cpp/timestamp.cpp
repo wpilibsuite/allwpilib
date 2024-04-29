@@ -133,13 +133,15 @@ struct HMBLowLevel {
                                                           dlcloseWrapper};
 };
 struct HMBHolder {
-  void Configure(void* col, std::unique_ptr<fpga::tHMB> hmbObject) {
+  bool Configure(void* col, std::unique_ptr<fpga::tHMB> hmbObject) {
     hmb = std::move(hmbObject);
     chipObjectLibrary.reset(col);
     if (!lowLevel.Configure(hmb->getSystemInterface()->getHandle())) {
       hmb = nullptr;
       chipObjectLibrary = nullptr;
+      return false;
     }
+    return true;
   }
   void Reset() {
     lowLevel.Reset();
@@ -236,20 +238,22 @@ void wpi::impl::SetupNowDefaultOnRio() {
 
 #ifdef __FRC_ROBORIO__
 template <>
-void wpi::impl::SetupNowRio(void* chipObjectLibrary,
+bool wpi::impl::SetupNowRio(void* chipObjectLibrary,
                             std::unique_ptr<fpga::tHMB> hmbObject) {
   if (!hmbInitialized.test()) {
-    hmb.Configure(chipObjectLibrary, std::move(hmbObject));
+    return hmb.Configure(chipObjectLibrary, std::move(hmbObject));
   }
+  return true;
 }
 #endif
 
-void wpi::impl::SetupNowRio(uint32_t session) {
+bool wpi::impl::SetupNowRio(uint32_t session) {
 #ifdef __FRC_ROBORIO__
   if (!hmbInitialized.test()) {
-    hmb.lowLevel.Configure(session);
+    return hmb.lowLevel.Configure(session);
   }
 #endif
+  return true;
 }
 
 void wpi::impl::ShutdownNowRio() {
@@ -269,10 +273,14 @@ uint64_t wpi::Now() {
     if (nowUseDefaultOnFailure.test()) {
       return timestamp() - offset_val;
     } else {
-      fmt::print(
-          stderr,
-          "FPGA not yet configured in wpi::Now(). Time will not be correct.\n");
+      fmt::print(stderr,
+                 "FPGA not yet configured in wpi::Now(). This is a fatal "
+                 "error. The process is being terminated.\n");
       std::fflush(stderr);
+      // Attempt to force a segfault to get a better java log
+      *reinterpret_cast<int*>(0) = 0;
+      // If that fails, terminate
+      std::terminate();
       return 1;
     }
   }
@@ -311,7 +319,7 @@ void WPI_Impl_SetupNowUseDefaultOnRio(void) {
 }
 
 void WPI_Impl_SetupNowRioWithSession(uint32_t session) {
-  return wpi::impl::SetupNowRio(session);
+  wpi::impl::SetupNowRio(session);
 }
 
 void WPI_Impl_ShutdownNowRio(void) {

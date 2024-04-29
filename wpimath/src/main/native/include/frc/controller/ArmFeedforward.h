@@ -76,6 +76,23 @@ class WPILIB_DLLEXPORT ArmFeedforward {
            kV * velocity + kA * acceleration;
   }
 
+  /**
+   * Calculates the feedforward from the gains and setpoints.
+   *
+   * @param currentAngle The current angle in radians. This angle should be
+   *   measured from the horizontal (i.e. if the provided angle is 0, the arm
+   *   should be parallel to the floor). If your encoder does not follow this
+   *   convention, an offset should be added.
+   * @param currentVelocity The current velocity setpoint in radians per second.
+   * @param nextVelocity The next velocity setpoint in radians per second.
+   * @param dt Time between velocity setpoints in seconds.
+   * @return The computed feedforward in volts.
+   */
+  units::volt_t Calculate(units::unit_t<Angle> currentAngle,
+                          units::unit_t<Velocity> currentVelocity,
+                          units::unit_t<Velocity> nextVelocity,
+                          units::second_t dt) const;
+
   // Rearranging the main equation from the calculate() method yields the
   // formulas for the methods below:
 

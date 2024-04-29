@@ -45,7 +45,7 @@ class TrapezoidProfileSubsystem : public SubsystemBase {
         m_period(period) {}
 
   void Periodic() override {
-    m_state = m_profile.Calculate(m_period, m_goal, m_state);
+    m_state = m_profile.Calculate(m_period, m_state, m_goal);
     if (m_enabled) {
       UseState(m_state);
     }
