@@ -24,6 +24,11 @@ dependencies {
     testImplementation 'org.mockito:mockito-core:4.1.0'
 }
 
+tasks.withType(Javadoc) {
+    options.addBooleanOption("-enable-preview", true)
+    options.addStringOption("-release", "21")
+}
+
 nativeUtils.exportsConfigs {
     wpilibNewCommands {
         x64ExcludeSymbols = [

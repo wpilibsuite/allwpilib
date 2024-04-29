@@ -8,6 +8,8 @@ import java.util.List;
 public class MultiException extends RuntimeException {
   private static final String EXCEPTION_SEPARATOR =
       "\n\t______________________________________________________________________\n";
+
+  /** The nested exceptions. These will be printed out in order of appearance. */
   private final List<Throwable> nested = new ArrayList<>();
 
   public MultiException() {

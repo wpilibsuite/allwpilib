@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Nanoseconds;
 
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Time;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import java.util.Collection;
 import java.util.Collections;
@@ -13,6 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.OptionalInt;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
@@ -124,40 +126,33 @@ public class AsyncScheduler {
    * @param command the command to schedule
    */
   public void schedule(AsyncCommand command) {
-    // Don't schedule if a required resource is currently running a higher priority command
-    boolean shouldSchedule =
-        Util.reading(
-            lock,
-            () -> {
-              for (HardwareResource resource : command.requirements()) {
-                var runningCommand = runningCommands.get(resource);
-                if (command.isLowerPriorityThan(runningCommand)) {
-                  return false;
-                }
-              }
-              return true;
-            });
-
-    if (!shouldSchedule) {
-      return;
-    }
-
     Util.writing(
         lock,
         () -> {
+          // Don't schedule if a required resource is currently running a higher priority command
+          boolean shouldSchedule = true;
+          for (HardwareResource resource : command.requirements()) {
+            var runningCommand = runningCommands.get(resource);
+            if (command.isLowerPriorityThan(runningCommand)) {
+              shouldSchedule = false;
+              break;
+            }
+            if (command instanceof NestedCommand(var parent, var _impl) && !isRunning(parent)) {
+              DriverStation.reportError(
+                  "Nested command " + command.name() + " can only be scheduled if its parent is running: " + parent.name(), false);
+              shouldSchedule = false;
+              break;
+            }
+          }
+          if (!shouldSchedule) {
+            return;
+          }
+
           // Cancel the currently scheduled commands for each required resource and schedule the
           // incoming command over them
           for (HardwareResource resource : command.requirements()) {
             // Don't allow nested commands to cancel their parents
             if (command instanceof NestedCommand(var parent, var _impl)) {
-              if (!shadowrun.getOrDefault(resource, NopSet.nop()).contains(parent)) {
-                throw new IllegalStateException(
-                    "Nested commands can only be scheduled while their parents are running! "
-                        + command
-                        + " requires "
-                        + parent);
-              }
-
               // Shadow the nested command as well as its the command it wraps (even though the
               // wrapped command never runs)
               var shadowSet = shadowrun.computeIfAbsent(resource, _r -> new HashSet<>());
@@ -184,7 +179,6 @@ public class AsyncScheduler {
           // commands for all its required resources when it completes
           var future = service.submit(createCommandExecutorCallback(command));
           futures.put(command, future);
-          return future;
         });
   }
 
@@ -232,11 +226,21 @@ public class AsyncScheduler {
         command.run();
         return null;
       } catch (Throwable e) {
-        if (e instanceof InterruptedException || e instanceof CancellationException) {
+        if (e instanceof ManualInterruptedException) {
+          System.err.println("WARNING: " + command.name() + " had to be manually interrupted during pause because it did not respect Future.cancel()");
+          Thread.currentThread().interrupt();
+        } else if (e instanceof InterruptedException) {
           // Cancelled during execution. This is expected and totally fine.
+          System.out.println("INFO: " + command.name() + " was interrupted with Future.cancel() while parked");
+          Thread.currentThread().interrupt();
+        } else if (e instanceof CancellationException) {
+          // Cancelled during execution. This is expected and totally fine.
+          System.out.println("INFO: " + command.name() + " was cancelled without an interrupt");
         } else {
           // Command execution raised an error.
           // Cache it in the errors map for `checkForErrors` to pick up.
+          System.err.println("COMMAND ERROR: " + e.getMessage());
+          e.printStackTrace(System.err);
           Util.writing(lock, () -> errors.put(command, e));
         }
         // Rethrow the exception. This will make the future complete with an error state.
@@ -301,7 +305,8 @@ public class AsyncScheduler {
             return;
           }
 
-          if (!future.cancel(true)) {
+          future.cancel(true);
+          if (!future.isCancelled()) {
             throw new IllegalStateException(
                 "Execution for command " + command + " was unable to be canceled!");
           }
@@ -381,7 +386,16 @@ public class AsyncScheduler {
    * @return
    */
   public Map<HardwareResource, AsyncCommand> getRunningCommands() {
-    return Map.copyOf(runningCommands);
+    return Util.reading(lock, () -> Map.copyOf(runningCommands));
+  }
+
+  public Map<HardwareResource, Collection<AsyncCommand>> getAllCommands() {
+    return Util.reading(lock, () -> {
+      var copy = new HashMap<HardwareResource, Collection<AsyncCommand>>(shadowrun.size());
+      // need to deep copy the values as well, since they're mutable in the backing map
+      shadowrun.forEach((res, commands) -> copy.put(res, Set.copyOf(commands)));
+      return copy;
+    });
   }
 
   /** Cancels all currently running commands. */
@@ -468,6 +482,11 @@ public class AsyncScheduler {
         Thread.sleep(ms, ns);
       }
     }
+
+    // TODO: How can a command be removed from the futures list without being interrupted?
+    if (!isRunning(command)) {
+      throw new ManualInterruptedException();
+    }
   }
 
   public OptionalInt getHighestPriorityCommandUsingAnyOf(Collection<HardwareResource> resources) {
@@ -494,5 +513,9 @@ public class AsyncScheduler {
 
   public EventLoop getDefaultButtonLoop() {
     return eventLoop;
+  }
+
+  static class ManualInterruptedException extends InterruptedException {
+
   }
 }

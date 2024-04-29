@@ -1,11 +1,11 @@
 package edu.wpi.first.wpilibj3.command.async;
 
-import static edu.wpi.first.units.Units.Milliseconds;
-
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Time;
+import java.util.Arrays;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 
 /**
  * An asynchronous command allows command logic to be written in a traditional imperative style
@@ -101,6 +101,15 @@ public interface AsyncCommand extends Callable<Object> {
     return InterruptBehavior.Cancel;
   }
 
+  enum RobotDisabledBehavior {
+    CancelWhileDisabled,
+    RunWhileDisabled,
+  }
+
+  default RobotDisabledBehavior robotDisabledBehavior() {
+    return RobotDisabledBehavior.CancelWhileDisabled;
+  }
+
   /**
    * Checks if this command has a lower {@link #priority() priority} than another command.
    *
@@ -145,6 +154,18 @@ public interface AsyncCommand extends Callable<Object> {
 
   default AsyncCommand andThen(AsyncCommand next) {
     return new Sequence(AsyncScheduler.getInstance(), this, next);
+  }
+
+  default AsyncCommand withTimeout(Measure<Time> timeout) {
+    return ParallelGroup.onDefaultScheduler().withTimeout(timeout).all(this).named(name());
+  }
+
+  default AsyncCommand deadlineWith(AsyncCommand... commands) {
+    return ParallelGroup
+               .onDefaultScheduler()
+               .all(this, commands)
+               .requiring(this)
+               .named(name() + "[" + Arrays.stream(commands).map(AsyncCommand::name).collect(Collectors.joining(" & ")) + "]");
   }
 
   /** Schedules this command with the default async scheduler. */

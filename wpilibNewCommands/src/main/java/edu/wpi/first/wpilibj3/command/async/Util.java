@@ -1,31 +1,25 @@
 package edu.wpi.first.wpilibj3.command.async;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.function.Supplier;
 
-public class Util {
-  @SafeVarargs
-  public static <T> Set<T> combineSets(Set<? extends T>... sets) {
-    var result = new HashSet<T>();
-    for (Set<? extends T> set : sets) {
-      result.addAll(set);
-    }
-    return result;
+/**
+ * Miscellaneous utility class for the async command API.
+ */
+public final class Util {
+  private Util() {
+    throw new UnsupportedOperationException("This is a utility class!");
   }
 
-  @SafeVarargs
-  public static <T> List<T> concat(List<? extends T>... lists) {
-    var result = new ArrayList<T>();
-    for (List<? extends T> list : lists) {
-      result.addAll(list);
-    }
-    return result;
-  }
-
+  /**
+   * Performs a read operation using a {@code ReadWriteLock}, automatically locking and unlocking.
+   * The result of the read operation is returned.
+   *
+   * @param lock the lock to read with
+   * @param task the read task to perform
+   * @param <T>  the type of data that may be returned by the task
+   * @return the result of the read task
+   */
   public static <T> T reading(ReadWriteLock lock, Supplier<? extends T> task) {
     lock.readLock().lock();
     try {
@@ -35,6 +29,12 @@ public class Util {
     }
   }
 
+  /**
+   * Performs a read operation using a {@code ReadWriteLock}, automatically locking and unlocking.
+   *
+   * @param lock the lock to read with
+   * @param task the read task to perform
+   */
   public static void reading(ReadWriteLock lock, Runnable task) {
     reading(
         lock,
@@ -44,6 +44,15 @@ public class Util {
         });
   }
 
+  /**
+   * Performs a write operation using a {@code ReadWriteLock}, automatically locking and unlocking.
+   * The result of the write operation is returned.
+   *
+   * @param lock the lock to write with
+   * @param task the write task to perform
+   * @param <T>  the type of data that may be returned by the task
+   * @return the result of the write task
+   */
   public static <T> T writing(ReadWriteLock lock, Supplier<? extends T> task) {
     lock.writeLock().lock();
     try {
@@ -53,6 +62,12 @@ public class Util {
     }
   }
 
+  /**
+   * Performs a write operation using a {@code ReadWriteLock}, automatically locking and unlocking.
+   *
+   * @param lock the lock to write with
+   * @param task the write task to perform
+   */
   public static void writing(ReadWriteLock lock, Runnable task) {
     writing(
         lock,

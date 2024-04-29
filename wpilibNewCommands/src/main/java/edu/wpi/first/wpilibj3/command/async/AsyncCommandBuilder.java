@@ -12,6 +12,7 @@ public class AsyncCommandBuilder {
   private String name;
   private int priority = AsyncCommand.DEFAULT_PRIORITY;
   private AsyncCommand.InterruptBehavior interruptBehavior = AsyncCommand.InterruptBehavior.Cancel;
+  private AsyncCommand.RobotDisabledBehavior disabledBehavior = AsyncCommand.RobotDisabledBehavior.CancelWhileDisabled;
 
   public AsyncCommandBuilder requiring(HardwareResource resource) {
     requirements.add(resource);
@@ -48,6 +49,15 @@ public class AsyncCommandBuilder {
 
   public AsyncCommandBuilder withInterruptBehavior(AsyncCommand.InterruptBehavior behavior) {
     this.interruptBehavior = behavior;
+    return this;
+  }
+
+  public AsyncCommandBuilder ignoringDisable() {
+    return withDisabledBehavior(AsyncCommand.RobotDisabledBehavior.RunWhileDisabled);
+  }
+
+  public AsyncCommandBuilder withDisabledBehavior(AsyncCommand.RobotDisabledBehavior behavior) {
+    this.disabledBehavior = behavior;
     return this;
   }
 
