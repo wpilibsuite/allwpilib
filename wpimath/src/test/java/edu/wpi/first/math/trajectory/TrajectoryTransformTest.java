@@ -19,7 +19,7 @@ class TrajectoryTransformTest {
     var config = new TrajectoryConfig(3, 3);
     var trajectory =
         TrajectoryGenerator.generateTrajectory(
-            new Pose2d(), List.of(), new Pose2d(1, 1, Rotation2d.fromDegrees(90)), config);
+            Pose2d.kZero, List.of(), new Pose2d(1, 1, Rotation2d.fromDegrees(90)), config);
 
     var transformedTrajectory =
         trajectory.transformBy(
@@ -45,7 +45,7 @@ class TrajectoryTransformTest {
     var transformedTrajectory = trajectory.relativeTo(new Pose2d(1, 2, Rotation2d.fromDegrees(30)));
 
     // Test initial pose.
-    assertEquals(new Pose2d(), transformedTrajectory.sample(0).poseMeters);
+    assertEquals(Pose2d.kZero, transformedTrajectory.sample(0).poseMeters);
 
     testSameShapedTrajectory(trajectory.getStates(), transformedTrajectory.getStates());
   }

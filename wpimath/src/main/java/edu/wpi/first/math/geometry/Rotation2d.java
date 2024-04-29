@@ -32,6 +32,34 @@ import java.util.Objects;
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Rotation2d
     implements Interpolatable<Rotation2d>, ProtobufSerializable, StructSerializable {
+  /**
+   * A preallocated Rotation2d representing a counterclockwise rotation by 0 rad (0°).
+   *
+   * <p>This exists to avoid allocations for common rotations.
+   */
+  public static final Rotation2d kZero = new Rotation2d();
+
+  /**
+   * A preallocated Rotation2d representing a counterclockwise rotation by −π/2 rad (−90°).
+   *
+   * <p>This exists to avoid allocations for common rotations.
+   */
+  public static final Rotation2d kCW_Pi_2 = new Rotation2d(-Math.PI / 2);
+
+  /**
+   * A preallocated Rotation2d representing a counterclockwise rotation by π/2 rad (90°).
+   *
+   * <p>This exists to avoid allocations for common rotations.
+   */
+  public static final Rotation2d kCCW_Pi_2 = new Rotation2d(Math.PI / 2);
+
+  /**
+   * A preallocated Rotation2d representing a counterclockwise rotation by π rad (180°).
+   *
+   * <p>This exists to avoid allocations for common rotations.
+   */
+  public static final Rotation2d kPi = new Rotation2d(Math.PI);
+
   private final double m_value;
   private final double m_cos;
   private final double m_sin;

@@ -30,7 +30,7 @@ class ChassisSpeedsTest {
             speeds.vyMetersPerSecond * dt,
             speeds.omegaRadiansPerSecond * dt);
 
-    var pose = new Pose2d();
+    var pose = Pose2d.kZero;
     for (double time = 0; time < duration; time += dt) {
       pose = pose.exp(twist);
     }

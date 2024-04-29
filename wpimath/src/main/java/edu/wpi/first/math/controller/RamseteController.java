@@ -37,8 +37,8 @@ public class RamseteController {
 
   private final double m_zeta;
 
-  private Pose2d m_poseError = new Pose2d();
-  private Pose2d m_poseTolerance = new Pose2d();
+  private Pose2d m_poseError = Pose2d.kZero;
+  private Pose2d m_poseTolerance = Pose2d.kZero;
   private boolean m_enabled = true;
 
   /**

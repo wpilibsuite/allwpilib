@@ -13,16 +13,16 @@ class Twist2dTest {
   @Test
   void testStraight() {
     var straight = new Twist2d(5.0, 0.0, 0.0);
-    var straightPose = new Pose2d().exp(straight);
+    var straightPose = Pose2d.kZero.exp(straight);
 
-    var expected = new Pose2d(5.0, 0.0, new Rotation2d());
+    var expected = new Pose2d(5.0, 0.0, Rotation2d.kZero);
     assertEquals(expected, straightPose);
   }
 
   @Test
   void testQuarterCirle() {
     var quarterCircle = new Twist2d(5.0 / 2.0 * Math.PI, 0, Math.PI / 2.0);
-    var quarterCirclePose = new Pose2d().exp(quarterCircle);
+    var quarterCirclePose = Pose2d.kZero.exp(quarterCircle);
 
     var expected = new Pose2d(5.0, 5.0, Rotation2d.fromDegrees(90.0));
     assertEquals(expected, quarterCirclePose);
@@ -31,9 +31,9 @@ class Twist2dTest {
   @Test
   void testDiagonalNoDtheta() {
     var diagonal = new Twist2d(2.0, 2.0, 0.0);
-    var diagonalPose = new Pose2d().exp(diagonal);
+    var diagonalPose = Pose2d.kZero.exp(diagonal);
 
-    var expected = new Pose2d(2.0, 2.0, new Rotation2d());
+    var expected = new Pose2d(2.0, 2.0, Rotation2d.kZero);
     assertEquals(expected, diagonalPose);
   }
 
@@ -53,7 +53,7 @@ class Twist2dTest {
 
   @Test
   void testPose2dLog() {
-    final var start = new Pose2d();
+    final var start = Pose2d.kZero;
     final var end = new Pose2d(5.0, 5.0, Rotation2d.fromDegrees(90.0));
 
     final var twist = start.log(end);

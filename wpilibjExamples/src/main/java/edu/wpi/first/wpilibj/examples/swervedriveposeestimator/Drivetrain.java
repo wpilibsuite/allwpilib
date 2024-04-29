@@ -48,7 +48,7 @@ public class Drivetrain {
             m_backLeft.getPosition(),
             m_backRight.getPosition()
           },
-          new Pose2d(),
+          Pose2d.kZero,
           VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)),
           VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30)));
 

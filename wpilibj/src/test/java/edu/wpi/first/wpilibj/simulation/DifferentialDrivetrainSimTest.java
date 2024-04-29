@@ -55,9 +55,9 @@ class DifferentialDrivetrainSimTest {
 
     var traj =
         TrajectoryGenerator.generateTrajectory(
-            new Pose2d(),
+            Pose2d.kZero,
             List.of(),
-            new Pose2d(2, 2, new Rotation2d()),
+            new Pose2d(2, 2, Rotation2d.kZero),
             new TrajectoryConfig(1, 1)
                 .addConstraint(new DifferentialDriveKinematicsConstraint(kinematics, 1)));
 
