@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <concepts>
 #include <algorithm>
 #include <functional>
 #include <stdexcept>
@@ -178,8 +179,9 @@ class LinearSystem {
    * @throws std::domain_error if number of outputIndices exceeds the system
    * output number.
    */
-  LinearSystem<States, Inputs, sizeof(outputIndices)> Slice(
-      int*... outputIndices) {
+  template <std::same_as<int>... OutputIndices>
+  LinearSystem<States, Inputs, sizeof...(OutputIndices)> Slice(
+        OutputIndices... outputIndices) {
 
     int len = sizeof(outputIndices) / sizeof(outputIndices[0]);
     for (int i : outputIndices) {
@@ -195,14 +197,8 @@ class LinearSystem {
           "More outputs requested than available. This is usually due to model "
           "implementation errors.");
     }
-
-
-
-    std::vector<int> outputIndicesVector;
-    outputIndices.assign(outputIndices, outputIndices + len);
-    sort(outputIndicesVector.begin(), v.end());
-
-    //Help needed on extracting rows from m_C and m_d as in the Java version.  
+    
+     
 
   }
 
