@@ -41,7 +41,8 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 2> {
                       units::meter_t armLength, units::radian_t minAngle,
                       units::radian_t maxAngle, bool simulateGravity,
                       units::radian_t startingAngle,
-                      const std::array<double, 2>& measurementStdDevs = {0.0, 0.0});
+                      const std::array<double, 2>& measurementStdDevs = {0.0,
+                                                                         0.0});
   /**
    * Creates a simulated arm mechanism.
    *
@@ -62,7 +63,8 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 2> {
                       units::meter_t armLength, units::radian_t minAngle,
                       units::radian_t maxAngle, bool simulateGravity,
                       units::radian_t startingAngle,
-                      const std::array<double, 2>& measurementStdDevs = {0.0, 0.0});
+                      const std::array<double, 2>& measurementStdDevs = {0.0,
+                                                                         0.0});
 
   using LinearSystemSim::SetState;
 

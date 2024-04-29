@@ -4,10 +4,13 @@
 
 #pragma once
 
-#include <concepts>
 #include <algorithm>
+#include <concepts>
 #include <functional>
 #include <stdexcept>
+
+#include <wpi/Algorithm.h>
+#include <wpi/SmallVector.h>
 
 #include "frc/EigenCore.h"
 #include "frc/StateSpaceUtil.h"
@@ -181,32 +184,30 @@ class LinearSystem {
    */
   template <std::same_as<int>... OutputIndices>
   LinearSystem<States, Inputs, sizeof...(OutputIndices)> Slice(
-        OutputIndices... outputIndices) {
+      OutputIndices... outputIndices) {
+    static_assert(sizeof...(OutputIndices) <= Outputs,
+                  "More outputs requested than available. This is usually due "
+                  "to model implementation errors.");
 
-    int len = sizeof(outputIndices) / sizeof(outputIndices[0]);
-    for (int i : outputIndices) {
-      if (i < 0 || i >= sizeof(m_C.rows())) {
-        throw std::domain_error(
-            "Elements of A aren't finite. This is usually due to model "
-            "implementation errors.");
-      }
-    }
+    wpi::for_each(
+        [](size_t i, const auto& elem) {
+          if (elem < 0 || elem >= Outputs) {
+            throw std::domain_error(
+                "Slice indices out of range. This is usually due to model "
+                "implementation errors.");
+          }
+        },
+        outputIndices...);
 
-    if (len >= sizeof(m_C.rows())) {
-      throw std::domain_error(
-          "More outputs requested than available. This is usually due to model "
-          "implementation errors.");
-    }
-    
-    std::array outputIndicesArray = std::array{outputIndices...};
+    // Sort and deduplicate output indices
+    wpi::SmallVector<int> outputIndicesArray{outputIndices...};
     std::ranges::sort(outputIndicesArray);
-    std::ranges::unique(outputIndicesArray);
+    const auto [first, last] = std::ranges::unique(outputIndicesArray);
+    outputIndicesArray.erase(first, last);
 
-    auto new_m_C = m_C(Eigen::placeholders::all, outputIndicesArray);
-    auto new_m_D = m_D(Eigen::placeholders::all, outputIndicesArray);
-
-    return LinearSystem{m_A, m_B, new_m_C, new_m_D};
-
+    return LinearSystem<States, Inputs, sizeof...(OutputIndices)>{
+        m_A, m_B, m_C(outputIndicesArray, Eigen::placeholders::all),
+        m_D(outputIndicesArray, Eigen::placeholders::all)};
   }
 
  private:
