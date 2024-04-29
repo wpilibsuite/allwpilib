@@ -6,10 +6,11 @@
 
 #include <cstddef>
 
+#include <wpi/string.h>
+
 #include "hal/LEDs.h"
 #include "hal/Types.h"
 #include "hal/simulation/NotifyListener.h"
-#include "wpi/string.h"
 
 typedef void (*HAL_RoboRioStringCallback)(const char* name, void* param,
                                           const char* str, size_t size);
