@@ -164,6 +164,48 @@ class LinearSystem {
     return m_C * x + m_D * clampedU;
   }
 
+  /**
+   * Returns the LinearSystem with the outputs listed in outputIndices.
+   *
+   * <p>This is used by state observers such as the Kalman Filter.
+   *
+   * @param outputIndices the list of output indices to include in the sliced
+   * system.
+   * @return the sliced LinearSystem with outputs set to row vectors of
+   * LinearSystem.
+   * @throws std::domain_error if any outputIndices are outside the range of
+   * system outputs.
+   * @throws std::domain_error if number of outputIndices exceeds the system
+   * output number.
+   */
+  LinearSystem<States, Inputs, sizeof(outputIndices)> Slice(
+      int*... outputIndices) {
+
+    int len = sizeof(outputIndices) / sizeof(outputIndices[0]);
+    for (int i : outputIndices) {
+      if (index < 0 || index >= sizeof(m_C.rows())) {
+        throw std::domain_error(
+            "Elements of A aren't finite. This is usually due to model "
+            "implementation errors.");
+      }
+    }
+
+    if (len >= sizeof(m_C.rows())) {
+      throw std::domain_error(
+          "More outputs requested than available. This is usually due to model "
+          "implementation errors.");
+    }
+
+
+
+    std::vector<int> outputIndicesVector;
+    outputIndices.assign(outputIndices, outputIndices + len);
+    sort(outputIndicesVector.begin(), v.end());
+
+    //Help needed on extracting rows from m_C and m_d as in the Java version.  
+
+  }
+
  private:
   /**
    * Continuous system matrix.

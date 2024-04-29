@@ -16,12 +16,12 @@ using namespace frc;
 using namespace frc::sim;
 
 SingleJointedArmSim::SingleJointedArmSim(
-    const LinearSystem<2, 1, 1>& system, const DCMotor& gearbox, double gearing,
+    const LinearSystem<2, 1, 2>& system, const DCMotor& gearbox, double gearing,
     units::meter_t armLength, units::radian_t minAngle,
     units::radian_t maxAngle, bool simulateGravity,
     units::radian_t startingAngle,
-    const std::array<double, 1>& measurementStdDevs)
-    : LinearSystemSim<2, 1, 1>(system, measurementStdDevs),
+    const std::array<double, 2>& measurementStdDevs)
+    : LinearSystemSim<2, 1, 2>(system, measurementStdDevs),
       m_armLen(armLength),
       m_minAngle(minAngle),
       m_maxAngle(maxAngle),
@@ -36,7 +36,7 @@ SingleJointedArmSim::SingleJointedArmSim(
     units::meter_t armLength, units::radian_t minAngle,
     units::radian_t maxAngle, bool simulateGravity,
     units::radian_t startingAngle,
-    const std::array<double, 1>& measurementStdDevs)
+    const std::array<double, 2>& measurementStdDevs)
     : SingleJointedArmSim(
           LinearSystemId::SingleJointedArmSystem(gearbox, moi, gearing),
           gearbox, gearing, armLength, minAngle, maxAngle, simulateGravity,
