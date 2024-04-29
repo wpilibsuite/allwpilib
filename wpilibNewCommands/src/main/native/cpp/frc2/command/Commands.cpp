@@ -4,7 +4,7 @@
 
 #include "frc2/command/Commands.h"
 
-#include "wpi/deprecated.h"
+#include <wpi/deprecated.h>
 
 #include "frc2/command/ConditionalCommand.h"
 #include "frc2/command/DeferredCommand.h"

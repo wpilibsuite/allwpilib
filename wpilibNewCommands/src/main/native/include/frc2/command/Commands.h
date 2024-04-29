@@ -12,10 +12,11 @@
 #include <utility>
 #include <vector>
 
+#include <wpi/deprecated.h>
+
 #include "frc2/command/CommandPtr.h"
 #include "frc2/command/Requirements.h"
 #include "frc2/command/SelectCommand.h"
-#include "wpi/deprecated.h"
 
 namespace frc2 {
 class Subsystem;
@@ -161,11 +162,11 @@ CommandPtr Defer(wpi::unique_function<CommandPtr()> supplier,
  *
  * @param supplier the command supplier
  */
- WPI_IGNORE_DEPRECATED
+WPI_IGNORE_DEPRECATED
 [[nodiscard]] [[deprecated(
-    "The ProxyCommand supplier constructor has been deprecated. Use Defer(supplier).AsProxy() instead.")]]
+    "The ProxyCommand supplier constructor has been deprecated. Use "
+    "Defer(supplier).AsProxy() instead.")]]
 CommandPtr DeferredProxy(wpi::unique_function<Command*()> supplier);
-
 
 /**
  * Constructs a command that schedules the command returned from the supplier
@@ -175,8 +176,8 @@ CommandPtr DeferredProxy(wpi::unique_function<Command*()> supplier);
  * @param supplier the command supplier
  */
 [[nodiscard]] [[deprecated(
-  "The ProxyCommand supplier constructor has been deprecated. Use Defer(supplier).AsProxy() instead."
-)]]
+    "The ProxyCommand supplier constructor has been deprecated. Use "
+    "Defer(supplier).AsProxy() instead.")]]
 CommandPtr DeferredProxy(wpi::unique_function<CommandPtr()> supplier);
 WPI_UNIGNORE_DEPRECATED
 // Command Groups
