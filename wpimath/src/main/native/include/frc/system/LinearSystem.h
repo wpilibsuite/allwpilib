@@ -185,7 +185,7 @@ class LinearSystem {
 
     int len = sizeof(outputIndices) / sizeof(outputIndices[0]);
     for (int i : outputIndices) {
-      if (index < 0 || index >= sizeof(m_C.rows())) {
+      if (i < 0 || i >= sizeof(m_C.rows())) {
         throw std::domain_error(
             "Elements of A aren't finite. This is usually due to model "
             "implementation errors.");
@@ -198,7 +198,14 @@ class LinearSystem {
           "implementation errors.");
     }
     
-     
+    std::array outputIndicesArray = std::array{outputIndices...};
+    std::ranges::sort(outputIndicesArray);
+    std::ranges::unique(outputIndicesArray);
+
+    auto new_m_C = m_C(Eigen::placeholders::all, outputIndicesArray);
+    auto new_m_D = m_D(Eigen::placeholders::all, outputIndicesArray);
+
+    return LinearSystem{m_A, m_B, new_m_C, new_m_D};
 
   }
 
