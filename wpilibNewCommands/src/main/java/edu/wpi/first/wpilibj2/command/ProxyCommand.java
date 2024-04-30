@@ -38,7 +38,7 @@ public class ProxyCommand extends Command {
    *     using the <code>asProxy</code> decorator.
    * @see DeferredCommand
    */
-  @Deprecated(since = "2024", forRemoval = true)
+  @Deprecated(since = "2025", forRemoval = true)
   public ProxyCommand(Supplier<Command> supplier) {
     m_supplier = requireNonNullParam(supplier, "supplier", "ProxyCommand");
   }
@@ -51,8 +51,9 @@ public class ProxyCommand extends Command {
    */
   @SuppressWarnings("this-escape")
   public ProxyCommand(Command command) {
-    m_supplier = () -> requireNonNullParam(command, "command", "ProxyCommand");
-    setName("Proxy(" + command.getName() + ")");
+    Command nullCheckedCommand = requireNonNullParam(command, "command", "ProxyCommand");
+    m_supplier = () -> nullCheckedCommand;
+    setName("Proxy(" + nullCheckedCommand.getName() + ")");
   }
 
   @Override
