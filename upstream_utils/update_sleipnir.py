@@ -15,8 +15,8 @@ from upstream_utils import (
 def main():
     upstream_root = clone_repo(
         "https://github.com/SleipnirGroup/Sleipnir",
-        # main on 2024-04-25
-        "fd2df40330df1f39b04f831f41fbcc22bab07a70",
+        # main on 2024-04-29
+        "9bac50e0f6c1b9ae20e1f611fb7db2cc305ca4fc",
         shallow=False,
     )
     wpilib_root = get_repo_root()
@@ -26,6 +26,7 @@ def main():
     os.chdir(upstream_root)
     for f in [
         "0001-Remove-using-enum-declarations.patch",
+        "0002-Add-implicit-typename.patch",
     ]:
         git_am(os.path.join(wpilib_root, "upstream_utils/sleipnir_patches", f))
 
