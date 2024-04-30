@@ -191,7 +191,7 @@ public final class Commands {
    *     replacement, consider using `defer(supplier).asProxy()`.
    * @see ProxyCommand
    */
-  @Deprecated(since = "2024", forRemoval = true)
+  @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings("removal")
   public static Command deferredProxy(Supplier<Command> supplier) {
     return new ProxyCommand(supplier);
