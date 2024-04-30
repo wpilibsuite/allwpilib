@@ -3,7 +3,6 @@
 #pragma once
 
 #include <utility>
-#include <vector>
 
 #include <Eigen/SparseCore>
 
@@ -11,6 +10,7 @@
 #include "sleipnir/autodiff/Profiler.hpp"
 #include "sleipnir/autodiff/Variable.hpp"
 #include "sleipnir/autodiff/VariableMatrix.hpp"
+#include "sleipnir/util/SmallVector.hpp"
 #include "sleipnir/util/SymbolExports.hpp"
 
 namespace sleipnir {
@@ -81,7 +81,7 @@ class SLEIPNIR_DLLEXPORT Jacobian {
   VariableMatrix Get() const {
     VariableMatrix result{m_variables.Rows(), m_wrt.Rows()};
 
-    std::vector<detail::ExpressionPtr> wrtVec;
+    small_vector<detail::ExpressionPtr> wrtVec;
     wrtVec.reserve(m_wrt.size());
     for (auto& elem : m_wrt) {
       wrtVec.emplace_back(elem.expr);
@@ -145,16 +145,16 @@ class SLEIPNIR_DLLEXPORT Jacobian {
   VariableMatrix m_variables;
   VariableMatrix m_wrt;
 
-  std::vector<detail::ExpressionGraph> m_graphs;
+  small_vector<detail::ExpressionGraph> m_graphs;
 
   Eigen::SparseMatrix<double> m_J{m_variables.Rows(), m_wrt.Rows()};
 
   // Cached triplets for gradients of linear rows
-  std::vector<Eigen::Triplet<double>> m_cachedTriplets;
+  small_vector<Eigen::Triplet<double>> m_cachedTriplets;
 
   // List of row indices for nonlinear rows whose graients will be computed in
   // Value()
-  std::vector<int> m_nonlinearRows;
+  small_vector<int> m_nonlinearRows;
 
   Profiler m_profiler;
 };

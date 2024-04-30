@@ -10,7 +10,6 @@
 #include <optional>
 #include <type_traits>
 #include <utility>
-#include <vector>
 
 #include <Eigen/Core>
 
@@ -23,6 +22,7 @@
 #include "sleipnir/optimization/SolverStatus.hpp"
 #include "sleipnir/optimization/solver/InteriorPoint.hpp"
 #include "sleipnir/util/Print.hpp"
+#include "sleipnir/util/SmallVector.hpp"
 #include "sleipnir/util/SymbolExports.hpp"
 
 namespace sleipnir {
@@ -531,16 +531,16 @@ class SLEIPNIR_DLLEXPORT OptimizationProblem {
  private:
   // The list of decision variables, which are the root of the problem's
   // expression tree
-  std::vector<Variable> m_decisionVariables;
+  small_vector<Variable> m_decisionVariables;
 
   // The cost function: f(x)
   std::optional<Variable> m_f;
 
   // The list of equality constraints: cₑ(x) = 0
-  std::vector<Variable> m_equalityConstraints;
+  small_vector<Variable> m_equalityConstraints;
 
   // The list of inequality constraints: cᵢ(x) ≥ 0
-  std::vector<Variable> m_inequalityConstraints;
+  small_vector<Variable> m_inequalityConstraints;
 
   // The user callback
   std::function<bool(const SolverIterationInfo&)> m_callback =

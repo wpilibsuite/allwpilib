@@ -1,0 +1,24 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Mon, 29 Apr 2024 19:17:18 -0700
+Subject: [PATCH 2/2] Add implicit typename
+
+---
+ include/sleipnir/util/SmallVector.hpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/include/sleipnir/util/SmallVector.hpp b/include/sleipnir/util/SmallVector.hpp
+index a4fd51931bb86b2b689805b2c4c5e0125cc560fc..e301b973f1dcd1f662bd9c9f8fd567053e5ee578 100644
+--- a/include/sleipnir/util/SmallVector.hpp
++++ b/include/sleipnir/util/SmallVector.hpp
+@@ -152,8 +152,8 @@ class small_vector
+ };
+ 
+ template <typename T, size_t N, typename Pred>
+-constexpr small_vector<T, N>::size_type erase_if(small_vector<T, N>& c,
+-                                                 Pred pred) {
++constexpr typename small_vector<T, N>::size_type erase_if(small_vector<T, N>& c,
++                                                          Pred pred) {
+   auto it = std::remove_if(c.begin(), c.end(), pred);
+   auto r = c.end() - it;
+   c.erase(it, c.end());

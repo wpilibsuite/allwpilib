@@ -5,10 +5,10 @@
 #include <algorithm>
 #include <future>
 #include <span>
-#include <vector>
 
 #include "sleipnir/optimization/SolverStatus.hpp"
 #include "sleipnir/util/FunctionRef.hpp"
+#include "sleipnir/util/SmallVector.hpp"
 
 namespace sleipnir {
 
@@ -43,12 +43,16 @@ MultistartResult<DecisionVariables> Multistart(
     function_ref<MultistartResult<DecisionVariables>(const DecisionVariables&)>
         solve,
     std::span<const DecisionVariables> initialGuesses) {
-  std::vector<std::future<MultistartResult<DecisionVariables>>> futures;
+  small_vector<std::future<MultistartResult<DecisionVariables>>> futures;
+  futures.reserve(initialGuesses.size());
+
   for (const auto& initialGuess : initialGuesses) {
     futures.emplace_back(std::async(std::launch::async, solve, initialGuess));
   }
 
-  std::vector<MultistartResult<DecisionVariables>> results;
+  small_vector<MultistartResult<DecisionVariables>> results;
+  results.reserve(futures.size());
+
   for (auto& future : futures) {
     results.emplace_back(future.get());
   }
