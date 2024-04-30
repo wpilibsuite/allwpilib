@@ -206,7 +206,7 @@ class LinearSystem {
         std::unique(outputIndicesArray.begin(), outputIndicesArray.end());
     outputIndicesArray.erase(last, outputIndicesArray.end());
 
-    if (outputIndicesArray.size() != sizeof(outputIndices)) {
+    if (outputIndicesArray.size() != sizeof...(outputIndices)) {
       throw std::domain_error(
           "Duplicate indices exist. This is usually due to model "
           "implementation errors.");
