@@ -249,12 +249,11 @@ public class LinearSystem<States extends Num, Inputs extends Num, Outputs extend
         Arrays.stream(outputIndices).distinct().boxed().collect(Collectors.toList());
     Collections.sort(outputIndicesList);
 
-    if (outputIndices.length != outputIndicesList.size()){
+    if (outputIndices.length != outputIndicesList.size()) {
       throw new IllegalArgumentException(
-        "Duplicate indices exist.  This is usually due to model implementation "
-            + "errors.");
+          "Duplicate indices exist.  This is usually due to model implementation " + "errors.");
     }
-    
+
     SimpleMatrix new_C_Storage = new SimpleMatrix(outputIndices.length, m_C.getNumCols());
     int row = 0;
     for (var index : outputIndicesList) {
