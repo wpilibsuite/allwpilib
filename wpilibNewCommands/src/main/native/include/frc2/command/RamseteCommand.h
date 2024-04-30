@@ -69,7 +69,9 @@ class RamseteCommand : public CommandHelper<Command, RamseteCommand> {
    * @param output          A function that consumes the computed left and right
    * outputs (in volts) for the robot drive.
    * @param requirements    The subsystems to require.
+   * @deprecated Use LTVUnicycleController instead.
    */
+  [[deprecated("Use LTVUnicycleController instead.")]]
   RamseteCommand(frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
                  frc::RamseteController controller,
                  frc::SimpleMotorFeedforward<units::meters> feedforward,
@@ -95,13 +97,14 @@ class RamseteCommand : public CommandHelper<Command, RamseteCommand> {
    * @param output          A function that consumes the computed left and right
    * wheel speeds.
    * @param requirements    The subsystems to require.
+   * @deprecated Use LTVUnicycleController instead.
    */
+  [[deprecated("Use LTVUnicycleController instead.")]]
   RamseteCommand(frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
                  frc::RamseteController controller,
                  frc::DifferentialDriveKinematics kinematics,
                  std::function<void(units::meters_per_second_t,
-                                    units::meters_per_second_t)>
-                     output,
+                                    units::meters_per_second_t)> output,
                  Requirements requirements = {});
 
   void Initialize() override;

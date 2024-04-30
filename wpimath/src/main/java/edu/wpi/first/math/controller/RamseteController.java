@@ -48,7 +48,9 @@ public class RamseteController {
    *     aggressive like a proportional term.
    * @param zeta Tuning parameter (0 rad⁻¹ &lt; zeta &lt; 1 rad⁻¹) for which larger values provide
    *     more damping in response.
+   * @deprecated Use LTVUnicycleController instead.
    */
+  @Deprecated(since = "2024", forRemoval = true)
   public RamseteController(double b, double zeta) {
     m_b = b;
     m_zeta = zeta;
@@ -57,7 +59,10 @@ public class RamseteController {
   /**
    * Construct a Ramsete unicycle controller. The default arguments for b and zeta of 2.0 rad²/m²
    * and 0.7 rad⁻¹ have been well-tested to produce desirable results.
+   *
+   * @deprecated Use LTVUnicycleController instead.
    */
+  @Deprecated(since = "2024", forRemoval = true)
   public RamseteController() {
     this(2.0, 0.7);
   }
