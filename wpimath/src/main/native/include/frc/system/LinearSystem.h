@@ -206,6 +206,12 @@ class LinearSystem {
         std::unique(outputIndicesArray.begin(), outputIndicesArray.end());
     outputIndicesArray.erase(last, outputIndicesArray.end());
 
+    if (outputIndicesArray.size() != sizeof(outputIndices)) {
+      throw std::domain_error(
+          "Duplicate indices exist. This is usually due to model "
+          "implementation errors.");
+    }
+
     return LinearSystem<States, Inputs, sizeof...(OutputIndices)>{
         m_A, m_B, m_C(outputIndicesArray, Eigen::placeholders::all),
         m_D(outputIndicesArray, Eigen::placeholders::all)};

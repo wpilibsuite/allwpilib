@@ -229,6 +229,7 @@ public class LinearSystem<States extends Num, Inputs extends Num, Outputs extend
    * @return the sliced LinearSystem with outputs set to row vectors of LinearSystem.
    * @throws IllegalArgumentException if any outputIndices are outside the range of system outputs.
    * @throws IllegalArgumentException if number of outputIndices exceeds the system output number.
+   * @throws IllegalArgumentException if duplication exists in outputIndices.
    */
   public LinearSystem<States, Inputs, ? extends Num> slice(int... outputIndices) {
     for (int index : outputIndices) {
@@ -245,9 +246,15 @@ public class LinearSystem<States extends Num, Inputs extends Num, Outputs extend
     }
 
     List<Integer> outputIndicesList =
-        Arrays.stream(outputIndices).boxed().collect(Collectors.toList());
+        Arrays.stream(outputIndices).distinct().boxed().collect(Collectors.toList());
     Collections.sort(outputIndicesList);
 
+    if (outputIndices.length != outputIndicesList.size()){
+      throw new IllegalArgumentException(
+        "Duplicate indices exist.  This is usually due to model implementation "
+            + "errors.");
+    }
+    
     SimpleMatrix new_C_Storage = new SimpleMatrix(outputIndices.length, m_C.getNumCols());
     int row = 0;
     for (var index : outputIndicesList) {
