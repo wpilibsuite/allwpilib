@@ -24,7 +24,7 @@ class Twist2dTest {
     var quarterCircle = new Twist2d(5.0 / 2.0 * Math.PI, 0, Math.PI / 2.0);
     var quarterCirclePose = Pose2d.kZero.exp(quarterCircle);
 
-    var expected = new Pose2d(5.0, 5.0, Rotation2d.fromDegrees(90.0));
+    var expected = new Pose2d(5.0, 5.0, Rotation2d.kCCW_Pi_2);
     assertEquals(expected, quarterCirclePose);
   }
 
@@ -54,7 +54,7 @@ class Twist2dTest {
   @Test
   void testPose2dLog() {
     final var start = Pose2d.kZero;
-    final var end = new Pose2d(5.0, 5.0, Rotation2d.fromDegrees(90.0));
+    final var end = new Pose2d(5.0, 5.0, Rotation2d.kCCW_Pi_2);
 
     final var twist = start.log(end);
 

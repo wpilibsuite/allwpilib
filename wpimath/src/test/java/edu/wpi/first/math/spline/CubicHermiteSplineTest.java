@@ -113,7 +113,7 @@ class CubicHermiteSplineTest {
 
   @Test
   void testOneInterior() {
-    var start = new Pose2d(0, 0, Rotation2d.kZero);
+    var start = Pose2d.kZero;
     ArrayList<Translation2d> waypoints = new ArrayList<>();
     waypoints.add(new Translation2d(2.0, 0.0));
     var end = new Pose2d(4, 0, Rotation2d.kZero);
@@ -123,7 +123,7 @@ class CubicHermiteSplineTest {
 
   @Test
   void testWindyPath() {
-    final var start = new Pose2d(0, 0, Rotation2d.kZero);
+    final var start = Pose2d.kZero;
     final ArrayList<Translation2d> waypoints = new ArrayList<>();
     waypoints.add(new Translation2d(0.5, 0.5));
     waypoints.add(new Translation2d(0.5, 0.5));

@@ -80,7 +80,7 @@ class SwerveDriveKinematicsTest {
 
   @Test
   void testStraightStrafeForwardKinematics() {
-    SwerveModuleState state = new SwerveModuleState(5.0, Rotation2d.fromDegrees(90.0));
+    SwerveModuleState state = new SwerveModuleState(5.0, Rotation2d.kCCW_Pi_2);
     var chassisSpeeds = m_kinematics.toChassisSpeeds(state, state, state, state);
 
     assertAll(
@@ -91,7 +91,7 @@ class SwerveDriveKinematicsTest {
 
   @Test
   void testStraightStrafeForwardKinematicsWithDeltas() {
-    SwerveModulePosition delta = new SwerveModulePosition(5.0, Rotation2d.fromDegrees(90.0));
+    SwerveModulePosition delta = new SwerveModulePosition(5.0, Rotation2d.kCCW_Pi_2);
     var twist = m_kinematics.toTwist2d(delta, delta, delta, delta);
 
     assertAll(
@@ -223,7 +223,7 @@ class SwerveDriveKinematicsTest {
   void testOffCenterCORRotationForwardKinematics() {
     SwerveModuleState flState = new SwerveModuleState(0.0, Rotation2d.kZero);
     SwerveModuleState frState = new SwerveModuleState(150.796, Rotation2d.kZero);
-    SwerveModuleState blState = new SwerveModuleState(150.796, Rotation2d.fromDegrees(-90));
+    SwerveModuleState blState = new SwerveModuleState(150.796, Rotation2d.kCW_Pi_2);
     SwerveModuleState brState = new SwerveModuleState(213.258, Rotation2d.fromDegrees(-45));
 
     var chassisSpeeds = m_kinematics.toChassisSpeeds(flState, frState, blState, brState);

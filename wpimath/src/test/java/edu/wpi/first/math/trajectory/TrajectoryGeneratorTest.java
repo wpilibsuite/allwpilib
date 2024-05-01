@@ -70,7 +70,7 @@ class TrajectoryGeneratorTest {
   void testMalformedTrajectory() {
     var traj =
         TrajectoryGenerator.generateTrajectory(
-            List.of(new Pose2d(0, 0, Rotation2d.kZero), new Pose2d(1, 0, Rotation2d.kPi)),
+            List.of(Pose2d.kZero, new Pose2d(1, 0, Rotation2d.kPi)),
             new TrajectoryConfig(feetToMeters(12), feetToMeters(12)));
 
     assertEquals(traj.getStates().size(), 1);
