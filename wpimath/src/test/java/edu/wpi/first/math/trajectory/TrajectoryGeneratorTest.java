@@ -84,7 +84,7 @@ class TrajectoryGeneratorTest {
             List.of(
                 new Pose2d(1, 0, Rotation2d.kCCW_Pi_2),
                 new Pose2d(0, 1, Rotation2d.kPi),
-                new Pose2d(-1, 0, Rotation2d.fromDegrees(270)),
+                new Pose2d(-1, 0, Rotation2d.kCW_Pi_2),
                 new Pose2d(0, -1, Rotation2d.kZero),
                 new Pose2d(1, 0, Rotation2d.kCCW_Pi_2)),
             new TrajectoryConfig(2, 2));

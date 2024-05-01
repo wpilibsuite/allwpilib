@@ -232,7 +232,7 @@ class DifferentialDrivePoseEstimatorTest {
             Rotation2d.kZero,
             0,
             0,
-            new Pose2d(1, 2, Rotation2d.fromDegrees(270)),
+            new Pose2d(1, 2, Rotation2d.kCW_Pi_2),
             VecBuilder.fill(0.02, 0.02, 0.01),
             VecBuilder.fill(0.1, 0.1, 0.1));
 

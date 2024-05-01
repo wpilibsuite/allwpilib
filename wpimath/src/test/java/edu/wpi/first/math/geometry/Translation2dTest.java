@@ -126,7 +126,7 @@ class Translation2dTest {
     var translation2 = new Translation2d(2, Rotation2d.kCCW_Pi_2);
     var translation3 = new Translation2d(3, Rotation2d.fromDegrees(135));
     var translation4 = new Translation2d(4, Rotation2d.kPi);
-    var translation5 = new Translation2d(5, Rotation2d.fromDegrees(270));
+    var translation5 = new Translation2d(5, Rotation2d.kCW_Pi_2);
 
     assertEquals(origin.nearest(List.of(translation5, translation3, translation4)), translation3);
     assertEquals(origin.nearest(List.of(translation1, translation2, translation3)), translation1);

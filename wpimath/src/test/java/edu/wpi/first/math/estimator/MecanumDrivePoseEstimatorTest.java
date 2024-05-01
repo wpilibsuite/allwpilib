@@ -245,7 +245,7 @@ class MecanumDrivePoseEstimatorTest {
             kinematics,
             Rotation2d.kZero,
             wheelPositions,
-            new Pose2d(1, 2, Rotation2d.fromDegrees(270)),
+            new Pose2d(1, 2, Rotation2d.kCW_Pi_2),
             VecBuilder.fill(0.1, 0.1, 0.1),
             VecBuilder.fill(0.45, 0.45, 0.1));
 

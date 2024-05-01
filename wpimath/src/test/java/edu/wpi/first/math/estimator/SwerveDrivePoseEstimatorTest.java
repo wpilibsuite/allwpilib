@@ -266,7 +266,7 @@ class SwerveDrivePoseEstimatorTest {
             kinematics,
             Rotation2d.kZero,
             new SwerveModulePosition[] {fl, fr, bl, br},
-            new Pose2d(1, 2, Rotation2d.fromDegrees(270)),
+            new Pose2d(1, 2, Rotation2d.kCW_Pi_2),
             VecBuilder.fill(0.1, 0.1, 0.1),
             VecBuilder.fill(0.9, 0.9, 0.9));
 

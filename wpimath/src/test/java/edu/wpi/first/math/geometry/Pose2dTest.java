@@ -111,8 +111,7 @@ class Pose2dTest {
     final var pose3 =
         new Pose2d(new Translation2d(3, Rotation2d.fromDegrees(135)), Rotation2d.kZero);
     final var pose4 = new Pose2d(new Translation2d(4, Rotation2d.kPi), Rotation2d.kZero);
-    final var pose5 =
-        new Pose2d(new Translation2d(5, Rotation2d.fromDegrees(270)), Rotation2d.kZero);
+    final var pose5 = new Pose2d(new Translation2d(5, Rotation2d.kCW_Pi_2), Rotation2d.kZero);
 
     assertEquals(pose3, origin.nearest(List.of(pose5, pose3, pose4)));
     assertEquals(pose1, origin.nearest(List.of(pose1, pose2, pose3)));
