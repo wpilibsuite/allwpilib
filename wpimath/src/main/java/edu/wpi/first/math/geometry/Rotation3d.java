@@ -29,7 +29,7 @@ import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 public class Rotation3d
     implements Interpolatable<Rotation3d>, ProtobufSerializable, StructSerializable {
   /**
-   * A preallocated Rotation2d representing a counterclockwise rotation by 0 rad (0°).
+   * A preallocated Rotation3d representing no rotation.
    *
    * <p>This exists to avoid allocations for common rotations.
    */

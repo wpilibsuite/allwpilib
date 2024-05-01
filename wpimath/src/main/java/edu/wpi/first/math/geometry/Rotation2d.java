@@ -33,7 +33,7 @@ import java.util.Objects;
 public class Rotation2d
     implements Interpolatable<Rotation2d>, ProtobufSerializable, StructSerializable {
   /**
-   * A preallocated Rotation2d representing a counterclockwise rotation by 0 rad (0°).
+   * A preallocated Rotation2d representing no rotation.
    *
    * <p>This exists to avoid allocations for common rotations.
    */
