@@ -30,7 +30,7 @@ public class Rotation3d
     implements Interpolatable<Rotation3d>, ProtobufSerializable, StructSerializable {
   private final Quaternion m_q;
 
-  /** Constructs a Rotation3d with a default angle of 0 degrees. */
+  /** Constructs a Rotation3d representing no rotation. */
   public Rotation3d() {
     m_q = new Quaternion();
   }
