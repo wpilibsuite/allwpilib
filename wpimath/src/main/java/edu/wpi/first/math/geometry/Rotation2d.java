@@ -47,6 +47,13 @@ public class Rotation2d
   public static final Rotation2d kCW_Pi_2 = new Rotation2d(-Math.PI / 2);
 
   /**
+   * A preallocated Rotation2d representing a counterclockwise rotation by −90° (−π/2 rad).
+   *
+   * <p>This exists to avoid allocations for common rotations.
+   */
+  public static final Rotation2d kCW_90deg = kCW_Pi_2;
+
+  /**
    * A preallocated Rotation2d representing a counterclockwise rotation by π/2 rad (90°).
    *
    * <p>This exists to avoid allocations for common rotations.
@@ -54,11 +61,25 @@ public class Rotation2d
   public static final Rotation2d kCCW_Pi_2 = new Rotation2d(Math.PI / 2);
 
   /**
+   * A preallocated Rotation2d representing a counterclockwise rotation by 90° (π/2 rad).
+   *
+   * <p>This exists to avoid allocations for common rotations.
+   */
+  public static final Rotation2d kCCW_90deg = kCCW_Pi_2;
+
+  /**
    * A preallocated Rotation2d representing a counterclockwise rotation by π rad (180°).
    *
    * <p>This exists to avoid allocations for common rotations.
    */
   public static final Rotation2d kPi = new Rotation2d(Math.PI);
+
+  /**
+   * A preallocated Rotation2d representing a counterclockwise rotation by 180° (π rad).
+   *
+   * <p>This exists to avoid allocations for common rotations.
+   */
+  public static final Rotation2d k180deg = kPi;
 
   private final double m_value;
   private final double m_cos;
