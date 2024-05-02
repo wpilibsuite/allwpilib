@@ -37,9 +37,7 @@ public class Sequence implements AsyncCommand {
   @Override
   public void run() throws Exception {
     for (var command : commands) {
-      NestedCommand cmd = new NestedCommand(this, command);
-      scheduler.schedule(cmd);
-      scheduler.await(cmd);
+      command.run();
     }
   }
 

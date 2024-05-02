@@ -4,7 +4,6 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Time;
 import java.util.Arrays;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 /**
@@ -62,7 +61,7 @@ import java.util.stream.Collectors;
  * }).named("The Command");
  *}
  */
-public interface AsyncCommand extends Callable<Object> {
+public interface AsyncCommand {
   int DEFAULT_PRIORITY = 0;
   int LOWEST_PRIORITY = Integer.MIN_VALUE;
   int HIGHEST_PRIORITY = Integer.MAX_VALUE;
@@ -70,12 +69,6 @@ public interface AsyncCommand extends Callable<Object> {
   void run() throws Exception;
 
   String name();
-
-  @Override
-  default Object call() throws Exception {
-    run();
-    return null;
-  }
 
   Set<HardwareResource> requirements();
 
@@ -175,7 +168,7 @@ public interface AsyncCommand extends Callable<Object> {
 
   /** Cancels this command, if running on the default async scheduler. */
   default void cancel() {
-    AsyncScheduler.getInstance().cancel(this);
+    AsyncScheduler.getInstance().cancelAndWait(this, true);
   }
 
   /** Checks if this command is currently scheduled to be running on the default async scheduler. */

@@ -32,7 +32,7 @@ public class AsyncRobot extends IterativeRobotBase {
   public void startCompetition() {
     var future =
         Executors
-            .newVirtualThreadPerTaskExecutor()
+            .newThreadPerTaskExecutor(Thread.ofVirtual().name("main vthread").factory())
             .submit(() -> {
               robotInit();
 

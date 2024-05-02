@@ -23,7 +23,7 @@ public class StageScope<T> extends StructuredTaskScope<T> {
   /** The scheduler that actually manages concurrent tasks. */
   private final AsyncScheduler scheduler;
   /** The remaining required tasks in the scope that need to complete. */
-  private final Set<? extends Callable<? extends T>> remainingRequirements;
+  private final Set<AsyncCommand> remainingRequirements;
   /** The results of the completed tasks. */
   private final Set<T> results = Collections.synchronizedSet(new HashSet<>());
   /** The exception thrown by the first failing task. */
@@ -34,7 +34,8 @@ public class StageScope<T> extends StructuredTaskScope<T> {
    * @param scheduler the command scheduler to handle the commands
    * @param requirements the set of tasks required to complete before the scope can shut down
    */
-  public StageScope(AsyncScheduler scheduler, Set<? extends Callable<? extends T>> requirements) {
+  public StageScope(AsyncScheduler scheduler, Set<AsyncCommand> requirements) {
+    super("StageScope", Thread.ofVirtual().name("ParallelGroup").factory());
     this.scheduler = scheduler;
     this.remainingRequirements = new HashSet<>(requirements);
   }
@@ -52,9 +53,8 @@ public class StageScope<T> extends StructuredTaskScope<T> {
 
     // Unwrap a command task, if necessary
     if (task instanceof CommandTask<?>(var _scheduler, var command)) {
-      task = command;
+      remainingRequirements.remove(command);
     }
-    remainingRequirements.remove(task);
 
     if (remainingRequirements.isEmpty()) {
       shutdown();
@@ -124,7 +124,8 @@ public class StageScope<T> extends StructuredTaskScope<T> {
   public void throwIfError() throws ExecutionException {
     ensureOwnerAndJoined();
     Throwable throwable = exception.get();
-    if (throwable != null) {
+    if (throwable != null && !(throwable instanceof InterruptedException)) {
+      // Don't throw interrupts!
       throw new ExecutionException(throwable);
     }
   }

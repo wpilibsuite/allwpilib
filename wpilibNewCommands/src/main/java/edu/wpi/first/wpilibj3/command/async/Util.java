@@ -1,5 +1,6 @@
 package edu.wpi.first.wpilibj3.command.async;
 
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.function.Supplier;
 
@@ -7,6 +8,8 @@ import java.util.function.Supplier;
  * Miscellaneous utility class for the async command API.
  */
 public final class Util {
+  public static final AtomicReference<Thread> currentLockOwner = new AtomicReference<>(null);
+
   private Util() {
     throw new UnsupportedOperationException("This is a utility class!");
   }
@@ -21,10 +24,16 @@ public final class Util {
    * @return the result of the read task
    */
   public static <T> T reading(ReadWriteLock lock, Supplier<? extends T> task) {
+    Logger.log("LOCK", "Attempting to acquire read lock... (current owner: " + currentLockOwner.get() + ")");
     lock.readLock().lock();
+    Logger.log("LOCK", "Read lock acquired by " + Thread.currentThread().getName());
+    currentLockOwner.compareAndSet(null, Thread.currentThread());
     try {
       return task.get();
     } finally {
+      if (currentLockOwner.compareAndSet(Thread.currentThread(), null)) {
+        Logger.log("LOCK", "Read lock released by " + Thread.currentThread().getName());
+      }
       lock.readLock().unlock();
     }
   }
@@ -54,10 +63,16 @@ public final class Util {
    * @return the result of the write task
    */
   public static <T> T writing(ReadWriteLock lock, Supplier<? extends T> task) {
+    Logger.log("LOCK", "Attempting to acquire write lock... (current owner: " + currentLockOwner.get() + ")");
     lock.writeLock().lock();
+    Logger.log("LOCK", "Write lock acquired by " + Thread.currentThread().getName());
+    currentLockOwner.compareAndSet(null, Thread.currentThread());
     try {
       return task.get();
     } finally {
+      if (currentLockOwner.compareAndSet(Thread.currentThread(), null)) {
+        Logger.log("LOCK", "Write lock released by " + Thread.currentThread().getName());
+      }
       lock.writeLock().unlock();
     }
   }

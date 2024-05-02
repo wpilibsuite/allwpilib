@@ -97,6 +97,11 @@ public class AsyncCommandBuilder {
       }
 
       @Override
+      public RobotDisabledBehavior robotDisabledBehavior() {
+        return disabledBehavior;
+      }
+
+      @Override
       public String toString() {
         return name();
       }

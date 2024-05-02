@@ -1,6 +1,7 @@
 package edu.wpi.first.wpilibj3.command.async;
 
 import static edu.wpi.first.units.Units.Milliseconds;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -8,34 +9,42 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 
 @Timeout(5)
 class AsyncSchedulerTest {
-  @BeforeAll
-  static void warmup() {
-    var scheduler = new AsyncScheduler();
-    scheduler.schedule(AsyncCommand.noHardware(() -> {}).named("warmup"));
+  @BeforeEach
+  void setup() {
+    Logger.clear();
   }
 
-  @Test
+  @RepeatedTest(value = 1000, failureThreshold = 1)
   void basic() throws Exception {
+    var enabled = new AtomicBoolean(false);
     var ran = new AtomicBoolean(false);
     var scheduler = new AsyncScheduler();
-    var command = AsyncCommand.noHardware(() -> ran.set(true)).named("Basic");
+    // to account for random jitter or slowness
+    scheduler.scheduleTimeout = Milliseconds.of(10);
+    var command = AsyncCommand.noHardware(() -> {
+      do {} while (!enabled.get());
+      ran.set(true);
+    }).named("Basic Command");
 
     scheduler.schedule(command);
-    assertTrue(scheduler.isRunning(command));
+    assertTrue(scheduler.isRunning(command), "Command should be running after being scheduled");
 
+    enabled.set(true);
     scheduler.await(command);
-    assertFalse(scheduler.isRunning(command));
+    if (scheduler.isRunning(command)) {
+      System.err.println(Logger.formattedLogTable());
+      fail("Command should no longer be running after awaiting its completion");
+    }
 
     assertTrue(ran.get());
   }
@@ -97,19 +106,21 @@ class AsyncSchedulerTest {
     var s1 = new HardwareResource("S1", scheduler);
     var s2 = new HardwareResource("S2", scheduler);
 
-    var s1c1 = new PriorityCommand(11, s1);
-    var s2c1 = new PriorityCommand(21, s2);
+    var s1c1 = new RunningCommand(s1);
+    var s2c1 = new RunningCommand(s2);
 
-    var s1c2 = new PriorityCommand(12, s1);
-    var s2c2 = new PriorityCommand(22, s2);
+    var s1c2 = new RunningCommand(s1);
+    var s2c2 = new RunningCommand(s2);
 
     var firstStage =
-        ParallelGroup.onScheduler(scheduler)
+        ParallelGroup
+            .onScheduler(scheduler)
             .all(s1c1, s2c1)
             .withTimeout(Milliseconds.of(120))
             .named("First Stage");
     var secondStage =
-        ParallelGroup.onScheduler(scheduler)
+        ParallelGroup
+            .onScheduler(scheduler)
             .all(s1c2, s2c2)
             .withTimeout(Milliseconds.of(80))
             .named("Second Stage");
@@ -122,50 +133,17 @@ class AsyncSchedulerTest {
 
     // schedule the entire group
     scheduler.schedule(group);
-
-    // need to wait a bit for the virtual threads to spin up and the commands to get scheduled
-    Thread.sleep(20);
-
-    // The "running" commands should only be the top-level owners, no nested commands should be here
-    assertEquals(Map.of(s1, group, s2, group), scheduler.getRunningCommands());
-
-    // The sequence and both commands in stage 1 should be running now
-    assertTrue(scheduler.isRunning(firstStage));
-    assertFalse(scheduler.isRunning(secondStage));
-    assertTrue(scheduler.isRunning(s1c1));
-    assertTrue(scheduler.isRunning(s2c1));
-
-    // wait for the first stag to complete...
-    scheduler.await(firstStage);
-
-    Thread.sleep(10); // wait a bit the second stage to get scheduled
-
-    // both commands in stage 2 should now be running
-    assertTrue(scheduler.isRunning(s1c2));
-    assertTrue(scheduler.isRunning(s2c2));
-    assertTrue(scheduler.isRunning(secondStage));
-
-    // ... and both commands in stage 1 shouldn't be
-    assertFalse(scheduler.isRunning(s1c1));
-    assertFalse(scheduler.isRunning(s2c1));
-    assertFalse(scheduler.isRunning(firstStage));
-
-    // wait for both of the commands in the second stage to complete
-    scheduler.await(s1c2);
-    scheduler.await(s2c2);
-
-    // everything should have stopped by this point
-    assertFalse(scheduler.isRunning(s1c2));
-    assertFalse(scheduler.isRunning(s2c2));
+    assertTrue(scheduler.isRunning(group));
 
     scheduler.await(group); // wait for the group to fully complete (including cleanup)
+    assertFalse(scheduler.isRunning(group));
 
-    // The shadowrun should no longer have any references to any commands in the group
-    assertEquals(
-        Map.of(
-            s1, Set.of(s1.getDefaultCommand()),
-            s2, Set.of(s2.getDefaultCommand())),
-        scheduler.shadowrun);
+    // and the parallel commands should have run
+    assertAll(
+        () -> assertTrue(s1c1.ran, "Subsystem #1 Command #1 did not run"),
+        () -> assertTrue(s2c1.ran, "Subsystem #2 Command #1 did not run"),
+        () -> assertTrue(s1c2.ran, "Subsystem #1 Command #2 did not run"),
+        () -> assertTrue(s2c2.ran, "Subsystem #2 Command #2 did not run"));
   }
 
   @Test
@@ -232,8 +210,6 @@ class AsyncSchedulerTest {
       scheduler.checkForErrors();
       fail("An exception should have been thrown");
     } catch (CommandExecutionException e) {
-      System.err.println(e.getMessage());
-      e.printStackTrace(System.err);
       if (e.getCommand() != command) {
         fail("Expected command " + command + ", but was " + e.getCommand());
       }
@@ -297,7 +273,6 @@ class AsyncSchedulerTest {
     scheduler.schedule(interrupter);
     scheduler.await(interrupter);
     assertTrue(scheduler.isRunning(suspendable)); // should still be running
-    assertTrue(scheduler.shadowrun.get(resource).contains(suspendable)); // and in the shadowrun too
     scheduler.await(suspendable);
     assertEquals(2, count.get());
   }
@@ -305,6 +280,8 @@ class AsyncSchedulerTest {
   @RepeatedTest(10)
   void cancelOnSuspendedReallyDoesCancel() throws Exception {
     var scheduler = new AsyncScheduler();
+    scheduler.cancelTimeout = Milliseconds.of(10);
+
     var count = new AtomicInteger(0);
 
     var resource = new HardwareResource("Resource", scheduler);
@@ -322,9 +299,8 @@ class AsyncSchedulerTest {
     scheduler.schedule(suspendable);
     Thread.sleep(5); // wait for command to start up and hit the pause
     scheduler.schedule(interrupter);
-    scheduler.cancel(suspendable);
+    scheduler.cancelAndWait(suspendable, true);
     assertFalse(scheduler.isRunning(suspendable)); // should not still be running
-    assertFalse(scheduler.shadowrun.get(resource).contains(suspendable)); // and in the shadowrun too
     scheduler.await(suspendable);
     assertEquals(1, count.get());
     scheduler.cancelAll();
@@ -360,6 +336,58 @@ class AsyncSchedulerTest {
   void pauseOutsideCommand() {
     var scheduler = new AsyncScheduler();
     assertThrows(IllegalStateException.class, scheduler::pauseCurrentCommand);
+  }
+
+  @RepeatedTest(10)
+  void scheduleOverDefaultDoesNotRescheduleDefault() throws Exception {
+    var count = new AtomicInteger(0);
+
+    var scheduler = new AsyncScheduler();
+    var resource = new HardwareResource("Resource", scheduler);
+    var defaultCmd = resource.run(() -> {
+      count.incrementAndGet();
+      scheduler.pauseCurrentCommand(Milliseconds.of(50));
+    }).named("Default Command");
+
+    var newerCmd = resource.run(scheduler::pauseCurrentCommand).named("Newer Command");
+    resource.setDefaultCommand(defaultCmd);
+    assertTrue(scheduler.isRunning(defaultCmd));
+
+    scheduler.schedule(newerCmd);
+    assertFalse(scheduler.isRunning(defaultCmd));
+    assertEquals(1, count.get());
+
+    scheduler.await(newerCmd);
+    assertTrue(scheduler.isRunning(defaultCmd));
+  }
+
+  static final class RunningCommand implements AsyncCommand {
+    private final Set<HardwareResource> subsystems;
+    boolean ran = false;
+
+    RunningCommand(HardwareResource... subsystems) {
+      this.subsystems = Set.of(subsystems);
+    }
+
+    @Override
+    public void run() throws Exception {
+      // Sleep and set the 'ran' flag only when interrupted
+      try {
+        AsyncCommand.pause(Milliseconds.of(Long.MAX_VALUE));
+      } finally {
+        ran = true;
+      }
+    }
+
+    @Override
+    public String name() {
+      return "RunningCommand";
+    }
+
+    @Override
+    public Set<HardwareResource> requirements() {
+      return subsystems;
+    }
   }
 
   record PriorityCommand(int priority, HardwareResource... subsystems) implements AsyncCommand {

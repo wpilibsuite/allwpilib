@@ -36,17 +36,4 @@ public record IdleCommand(HardwareResource resource) implements AsyncCommand {
   public String toString() {
     return name();
   }
-
-  @Override
-  public int hashCode() {
-    return 31 * resource.hashCode();
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (obj instanceof IdleCommand(var resource)) {
-      return resource.equals(this.resource);
-    }
-    return false;
-  }
 }
