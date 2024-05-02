@@ -19,5 +19,5 @@ jobs:
                 issue_number: context.issue.number,
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                body: 'This PR modifies commands. Please open a corresponding PR for [Python Commands](https://github.com/robotpy/robotpy-commands-v2/)'
+                body: 'This PR modifies commands. Please open a corresponding PR in [Python Commands](https://github.com/robotpy/robotpy-commands-v2/) and include a link to this PR.'
             })
