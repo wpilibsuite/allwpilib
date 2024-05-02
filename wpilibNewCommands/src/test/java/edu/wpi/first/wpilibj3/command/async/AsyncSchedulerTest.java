@@ -225,7 +225,7 @@ class AsyncSchedulerTest {
     }
   }
 
-  @Test
+  @RepeatedTest(value = 100, failureThreshold = 1)
   void runResource() throws Exception {
     var scheduler = new AsyncScheduler();
     var example =
@@ -239,7 +239,7 @@ class AsyncSchedulerTest {
                 () -> {
                   example.x = 0;
                   for (int i = 0; i < 10; i++) {
-                    scheduler.pauseCurrentCommand();
+                    scheduler.pauseCurrentCommand(Milliseconds.one());
                     example.x++;
                   }
                 })
@@ -249,61 +249,6 @@ class AsyncSchedulerTest {
     scheduler.await(countToTen);
 
     assertEquals(10, example.x);
-  }
-
-  @RepeatedTest(10)
-  void suspendOnInterruptContinuesAutomatically() throws Exception {
-    var scheduler = new AsyncScheduler();
-    var count = new AtomicInteger(0);
-
-    var resource = new HardwareResource("Resource", scheduler);
-
-    var suspendable = AsyncCommand.requiring(resource).executing(() -> {
-      count.set(1);
-      scheduler.pauseCurrentCommand();
-      count.set(2);
-    }).suspendOnInterrupt().withPriority(1).named("Suspender");
-
-    var interrupter = AsyncCommand.requiring(resource).executing(() -> {
-      Thread.sleep(37);
-    }).withPriority(2).named("Interrupter");
-
-    scheduler.schedule(suspendable);
-    Thread.sleep(5); // wait for command to start up and hit the pause
-    scheduler.schedule(interrupter);
-    scheduler.await(interrupter);
-    assertTrue(scheduler.isRunning(suspendable)); // should still be running
-    scheduler.await(suspendable);
-    assertEquals(2, count.get());
-  }
-
-  @RepeatedTest(10)
-  void cancelOnSuspendedReallyDoesCancel() throws Exception {
-    var scheduler = new AsyncScheduler();
-    scheduler.cancelTimeout = Milliseconds.of(10);
-
-    var count = new AtomicInteger(0);
-
-    var resource = new HardwareResource("Resource", scheduler);
-
-    var suspendable = AsyncCommand.requiring(resource).executing(() -> {
-      count.set(1);
-      scheduler.pauseCurrentCommand();
-      count.set(2);
-    }).suspendOnInterrupt().withPriority(1).named("Suspender");
-
-    var interrupter = AsyncCommand.requiring(resource).executing(() -> {
-      Thread.sleep(50);
-    }).withPriority(2).named("Interrupter");
-
-    scheduler.schedule(suspendable);
-    Thread.sleep(5); // wait for command to start up and hit the pause
-    scheduler.schedule(interrupter);
-    scheduler.cancelAndWait(suspendable, true);
-    assertFalse(scheduler.isRunning(suspendable)); // should not still be running
-    scheduler.await(suspendable);
-    assertEquals(1, count.get());
-    scheduler.cancelAll();
   }
 
   @Test
@@ -343,6 +288,7 @@ class AsyncSchedulerTest {
     var count = new AtomicInteger(0);
 
     var scheduler = new AsyncScheduler();
+    scheduler.scheduleTimeout = Milliseconds.of(10);
     var resource = new HardwareResource("Resource", scheduler);
     var defaultCmd = resource.run(() -> {
       count.incrementAndGet();

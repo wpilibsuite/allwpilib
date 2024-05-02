@@ -76,24 +76,6 @@ public interface AsyncCommand {
     return DEFAULT_PRIORITY;
   }
 
-  enum InterruptBehavior {
-    /**
-     * Cancel the command when interrupted. This is the default behavior.
-     */
-    Cancel,
-
-    /**
-     * Suspend the command when interrupted, resuming when no higher-priority commands are still
-     * running. Useful for commands to automatically pick back up from where they left off; however,
-     * be careful to ensure the command should still be running when it resumes!
-     */
-    Suspend
-  }
-
-  default InterruptBehavior interruptBehavior() {
-    return InterruptBehavior.Cancel;
-  }
-
   enum RobotDisabledBehavior {
     CancelWhileDisabled,
     RunWhileDisabled,
