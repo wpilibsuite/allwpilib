@@ -1,7 +1,5 @@
 package edu.wpi.first.wpilibj3.command.async;
 
-import static edu.wpi.first.units.Units.Microsecond;
-import static edu.wpi.first.units.Units.Microseconds;
 import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.units.Measure;
@@ -10,7 +8,6 @@ import edu.wpi.first.units.Time;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
@@ -58,23 +55,13 @@ public class ParallelGroup implements AsyncCommand {
       scope.joinWithTimeout(timeout).throwIfError();
     } catch (TimeoutException e) {
       // just means the maximum execution time was reached
-      Logger.log("PARALLEL", name + " timed out after " + timeout.in(Microseconds) + " µs while waiting for required commands to complete");
-    } catch (ExecutionException e) {
-      if (e.getCause() instanceof InterruptedException) {
-        // The commands in the group were interrupted by an interrupt signal to the enclosing parallel group.
-        // This is totally fine
-        Logger.log("PARALLEL", name + " was interrupted during execution");
-      }
-      throw e;
     } finally {
       // Cancel any still-running commands in this stage
       // This should only occur if the scope join timed out or
       // [0..N-1] commands are required for a N-sized group
-      Logger.log("PARALLEL", name + " - Cancelling still-running commands");
 
       // Note: cancelAll will wait for each command to be cancelled before returning
       scheduler.cancelAll(commands);
-      Logger.log("PARALLEL", name + " - All commands cancelled");
     }
   }
 

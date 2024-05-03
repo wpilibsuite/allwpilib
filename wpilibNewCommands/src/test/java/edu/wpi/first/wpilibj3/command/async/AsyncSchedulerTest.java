@@ -23,8 +23,6 @@ class AsyncSchedulerTest {
 
   @BeforeEach
   void setup() {
-    Logger.clear();
-
     // Initialize with high default timeouts so random jitter doesn't make tests flake out
     scheduler = new AsyncScheduler(
         Seconds.one(), // event loop period
@@ -47,7 +45,6 @@ class AsyncSchedulerTest {
     enabled.set(true);
     scheduler.await(command);
     if (scheduler.isRunning(command)) {
-      System.err.println(Logger.formattedLogTable());
       fail("Command should no longer be running after awaiting its completion");
     }
 
@@ -82,11 +79,9 @@ class AsyncSchedulerTest {
 
     scheduler.schedule(lower);
     if (!scheduler.isRunning(higher)) {
-      System.err.println(Logger.formattedLogTable());
       fail("Higher priority command should still be running");
     }
     if (scheduler.isRunning(lower)) {
-      System.err.println(Logger.formattedLogTable());
       fail("Lower priority command should not be running");
     }
   }

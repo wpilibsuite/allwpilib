@@ -7,14 +7,11 @@ import static edu.wpi.first.units.Units.Nanoseconds;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Time;
 import edu.wpi.first.wpilibj.event.EventLoop;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.OptionalInt;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
@@ -50,12 +47,12 @@ public class AsyncScheduler {
    * How long to wait for a command to be canceled before timing out and throwing an error. Defaults
    * to 2.5ms.
    */
-  public volatile Measure<Time> cancelTimeout = Microseconds.of(2500);
+  public volatile Measure<Time> cancelTimeout;
   /**
    * How long to wait for a command to start up after being scheduled before timing out and throwing
-   * an error. Defaults to 2ms.
+   * an error. Defaults to 2.5ms.
    */
-  public volatile Measure<Time> scheduleTimeout = Microseconds.of(2000);
+  public volatile Measure<Time> scheduleTimeout;
 
   // NOTE: This requires the jdk.virtualThreadScheduler.parallelism system property to be set to 1!
   //       If it is not set, or is set to a value > 1, then commands may be scheduled - at random -
@@ -149,12 +146,8 @@ public class AsyncScheduler {
    * @param command the command to schedule
    */
   public void schedule(AsyncCommand command) {
-    Logger.log("SCHEDULE", "Scheduling " + command.name());
-    final long start = System.nanoTime();
-
     var currentState = Util.reading(lock, () -> futures.get(command));
     if (currentState != null) {
-      Logger.log("SCHEDULE", "Command " + command.name() + " is already running (run ID=" + currentState.id + "), not rescheduling");
       return;
     }
 
@@ -177,11 +170,8 @@ public class AsyncScheduler {
             }
           }
           if (!shouldSchedule) {
-            Logger.log("SCHEDULE", "Lower priority than running commands, not scheduling");
             return false;
           }
-
-          Logger.log("SCHEDULE", "Command " + command.name() + " is higher priority than all conflicting commands. Cancelling the running commands");
 
           // Cancel the currently scheduled commands for each required resource and schedule the
           // incoming command over them
@@ -221,7 +211,6 @@ public class AsyncScheduler {
       throw new IllegalStateException("One or more canceled commands encountered an internal exception", e.getCause());
     } catch (TimeoutException e) {
       var stillRunning = canceledCommandStates.stream().filter(s -> !s.completion.isDone()).map(s -> s.id).toList();
-      System.err.println(Logger.formattedLogTable());
       throw new IllegalStateException("Timed out while waiting for all canceled commands to complete. Still running: " + stillRunning, e);
     }
 
@@ -238,12 +227,11 @@ public class AsyncScheduler {
           // schedule the command to run on a virtual thread, automatically scheduling the default
           // commands for all its required resources when it completes
           var scheduled = new CompletableFuture<Boolean>();
-          var completion = new CompletableFuture<Object>();
+          var completion = new CompletableFuture<>();
           var states = new CommandState(scheduled, completion);
           Callable<?> callback = createCommandExecutorCallback(command, states);
           states.exec = service.submit(callback);
           futures.put(command, states);
-          Logger.log("SCHEDULE", "Created async future for command " + command.name() + " (assigned run ID=" + states.id + ")");
           return states;
         });
 
@@ -253,15 +241,11 @@ public class AsyncScheduler {
       try {
         newCommandStates.schedule.get((long) scheduleTimeout.in(Nanoseconds), TimeUnit.NANOSECONDS);
       } catch (TimeoutException e) {
-        System.err.println(Logger.formattedLogTable());
         throw new RuntimeException("Command " + command.name() + " (run ID=" + newCommandStates.id  + ") did not start within " + scheduleTimeout.toLongString() + " of being scheduled!", e);
       } catch (InterruptedException e) {
         throw new RuntimeException("Interrupted during the " + scheduleTimeout.toLongString() + " wait for " + command.name() + " to start", e);
       } catch (ExecutionException e) {
         throw new RuntimeException("Unable to wait for command to start", e);
-      } finally {
-        long end = System.nanoTime();
-        Logger.log("SCHEDULE", "Took " + (end - start) / 1e3 + " µs to schedule " + command.name() + " (assigned run ID=" + newCommandStates.id + ")");
       }
     }
   }
@@ -308,8 +292,6 @@ public class AsyncScheduler {
   private Callable<?> createCommandExecutorCallback(AsyncCommand command, CommandState state) {
     return () -> {
       long runId = state.id;
-      Logger.log("COMMAND", "Starting up vthread for command " + command.name() + " (run ID=" + runId + ")");
-      Logger.log("COMMAND", "Setting thread local command owner to " + command.name() + " (run ID=" + runId + ")");
       commandOnCurrentThread.set(command);
 
       boolean wasInterrupted = false;
@@ -318,26 +300,19 @@ public class AsyncScheduler {
       try {
         // Put this inside the try-catch to handle the case where cancellation occurs directly after
         // scheduling
-        Logger.log("COMMAND", "Completing the schedule future for " + command.name() + " (run ID=" + runId + ")");
         state.schedule.complete(true);
 
-        Logger.log("COMMAND", "Starting execution for " + command.name() + " (run ID=" + runId + ")");
-        long start = System.nanoTime();
         command.run();
-        long end = System.nanoTime();
-        Logger.log("COMMAND", command + " completed naturally in " + (end - start) / 1e3 + " µs" + " (run ID=" + runId + ")");
         result = COMPLETED_VALUE;
         return null;
       } catch (Throwable e) {
         if (e instanceof InterruptedException) {
           // Cancelled during execution. This is expected and totally fine.
           wasInterrupted = true;
-          Logger.log("COMMAND", command.name()  + " (run ID=" + runId + ")" + " was interrupted with Future.cancel() while parked");
           result = COMPLETED_VALUE;
         } else {
           // Command execution raised an error.
           // Cache it in the errors map for `checkForErrors` to pick up.
-          Logger.log("COMMAND ERROR", e.getMessage());
           Util.writing(lock, () -> errors.put(command, e));
           exception = e;
         }
@@ -347,23 +322,16 @@ public class AsyncScheduler {
         // to be picked up by calling `checkForErrors` (presumably in a periodic loop)
         throw e;
       } finally {
-        Logger.log("COMMAND", "Execution completed for " + command.name() + " (run ID=" + runId + ")" + ", starting cleanup");
-        Logger.log("COMMAND", "Acquiring lock..." + " (run ID=" + runId + ")");
         // Not using Util.writing() because `wasInterrupted` can't be captured
         lock.writeLock().lock();
-        Logger.log("COMMAND", "Lock acquired" + " (run ID=" + runId + ")");
         try {
           if (futures.get(command) instanceof CommandState s && s.id == runId) {
-            Logger.log("COMMAND", "Cleaning up after " + command.name() + " (run ID=" + runId + ")");
             // Clean up if still running. Schedule the default command if we weren't interrupted
             // Interruption means a new command was explicitly scheduled, so the default command
             // would not be desired.
             cleanupAfterCompletion(command, !wasInterrupted);
-          } else {
-            Logger.log("COMMAND", "Command " + command.name() + " (run ID=" + runId + ")" + " was already cleaned up");
           }
         } finally {
-          Logger.log("COMMAND", "Releasing lock" + " (run ID=" + runId + ")");
           if (exception != null) {
             state.completion.completeExceptionally(exception);
           } else if (result != null) {
@@ -387,24 +355,17 @@ public class AsyncScheduler {
    * @throws ExecutionException if the command encountered an error while it was executing
    */
   public void await(AsyncCommand command) throws ExecutionException {
-    Logger.log("AWAIT", "Awaiting " + command.name());
     var states = Util.reading(lock, () -> futures.get(command));
 
     if (states == null) {
       // not currently running, nothing to await
-      Logger.log("AWAIT", "Command " + command.name() + " is not currently running, nothing to await");
       return;
     }
 
     try {
-      Logger.log("AWAIT", "Parking until " + command.name() + " (run ID=" + states.id + ") completes or is canceled...");
-      long start = System.nanoTime();
       states.completion.get();
-      long end = System.nanoTime();
-      Logger.log("AWAIT", "Command " + command.name() + " (run ID=" + states.id + ") exited after waiting " + (end - start) / 1e3 + " µs");
     } catch (InterruptedException e) {
       // Interrupted while waiting, reset the interrupt flag but do not raise
-      Logger.log("AWAIT", "Interrupted while awaiting " + command.name());
       Thread.currentThread().interrupt();
     } catch (ExecutionException e) {
       // Swallow execution exceptions caused by interrupts
@@ -413,12 +374,10 @@ public class AsyncScheduler {
         interuptionCause = interuptionCause.getCause();
       }
       if (interuptionCause == null) {
-        Logger.log("AWAIT", "Command " + command.name() + " errored while awaiting its completion: " + e.getMessage());
         throw e;
       }
     } catch (CancellationException e) {
       // Command was cancelled, nothing wrong here
-      Logger.log("AWAIT", "Command " + command.name() + " (run ID=" + states.id + ") was cancelled while awaiting its completion");
     }
   }
 
@@ -428,7 +387,6 @@ public class AsyncScheduler {
       return null;
     }
 
-    Logger.log("CANCEL", "Cancelling command " + command.name());;
     return Util.writing(
         lock,
         () -> {
@@ -438,7 +396,6 @@ public class AsyncScheduler {
             return null;
           }
 
-          Logger.log("CANCEL", "Triggering interrupt for command " + command.name() + " (run ID=" + value.id + ")");
           value.exec.cancel(true);
           return value;
         });
@@ -471,24 +428,17 @@ public class AsyncScheduler {
       // immediately return, but the command could continue running until it reaches a point where it
       // calls an interruptible function like Thread.sleep.
 
-      Logger.log("CANCEL", "Waiting for command " + command.name() + " to exit (run ID=" + runId + ")");
 
       // TODO: This seems to break. The caller thread sometimes waits the full duration without
       //       yielding control to the execution thread, so the wait times out and throws an
       //       exception, only /after/ which the execution thread is picked up and is able to process
       //       the cancellation request
       states.completion.get((long) cancelTimeout.in(Nanoseconds), TimeUnit.NANOSECONDS);
-      Logger.log("CANCEL", "Command " + command.name() + " (run ID=" + runId + ") exited within " + cancelTimeout.in(Microseconds) + " µs of the cancellation request");
 
       // Clean up only after the command has completed
       cleanupAfterCompletion(command, thenRunDefault);
     } catch (TimeoutException e) {
       String message = "Command " + command.name() + " (run ID=" + runId + ") did not stop within " + cancelTimeout.in(Microseconds) + " µs of the cancellation request!";
-      Logger.log("CANCEL", message);
-      Logger.log("CANCEL", "Current lock owner: " + Util.currentLockOwner.get());
-      try {
-        Files.writeString(Path.of("foo.xsv"), Logger.formattedLogTable());
-      } catch (Exception ignore) {}
       throw new IllegalStateException(message);
     } catch (InterruptedException e) {
       // Why would the carrier thread be interrupted?
@@ -497,21 +447,10 @@ public class AsyncScheduler {
       // I think we'd want to rethrow the original exception instead of rewrapping it...
       throw new RuntimeException(e);
     }
-    Logger.log("CANCEL", "Cancelled command " + command.name() + " (run ID=" + runId + ")");
   }
 
   public void cancelAll(Collection<AsyncCommand> commands) {
     Util.writing(lock, () -> commands.forEach(cmd -> cancelAndWait(cmd, true)));
-  }
-
-  private Future<?> futureFor(AsyncCommand command) {
-    return Util.reading(
-        lock,
-        () -> {
-          if (futures.get(command) instanceof CommandState s)
-            return s.exec;
-          return null;
-        });
   }
 
   /**
@@ -524,17 +463,13 @@ public class AsyncScheduler {
     // TODO: This may be buggy at the boundary where a command completes and is immediately rescheduled
     var states = futures.get(command);
     if (states == null) {
-      Logger.log("CLEANUP", "Cannot clean up for a command that isn't running! Requested command " + command.name() + " has no associated states");
       return;
     }
 
-    long runId = states.id;
-    Logger.log("CLEANUP", "Removing future states for " + command.name() + " (run ID=" + runId + ")");
     futures.remove(command);
 
     // Clear current thread owner
     if (commandOnCurrentThread.get() == command) {
-      Logger.log("CLEANUP", "Clearing threadlocal owner " + command.name() + " (run ID=" + runId + ")");
       commandOnCurrentThread.remove();
     }
 
@@ -542,11 +477,9 @@ public class AsyncScheduler {
       // If the currently running command for this resource is the one we just
       // cancelled, we can schedule its default command
       if (runningCommands.remove(resource, command) && thenRunDefault) {
-        Logger.log("CLEANUP", "Scheduling default command for " + resource.getName() + " after run " + runId);
         scheduleDefault(resource);
       }
     }
-    Logger.log("CLEANUP", "Completed cleanup for " + command.name() + " (run ID=" + runId + ")");
   }
 
   /**
@@ -572,7 +505,6 @@ public class AsyncScheduler {
    * Cancels all currently running commands.
    */
   public void cancelAll() {
-    Logger.log("CANCELALL", "Cancelling all commands");
     Util.writing(
         lock,
         () -> {
@@ -588,7 +520,6 @@ public class AsyncScheduler {
           // ... and then schedule the default commands
           defaultCommands.forEach((res, cmd) -> schedule(cmd));
         });
-    Logger.log("CANCELALL", "Canceled all and scheduled defaults");
   }
 
   /**
@@ -635,7 +566,6 @@ public class AsyncScheduler {
    * @throws InterruptedException if the current command was canceled or interrupted by a higher
    *   priority command
    */
-  @SuppressWarnings("BusyWait")
   public void pauseCurrentCommand(Measure<Time> time) throws InterruptedException {
     var command = commandOnCurrentThread.get();
     if (command == null) {
@@ -643,31 +573,22 @@ public class AsyncScheduler {
           "pauseCurrentCommand() may only be called by a running command!");
     }
 
-    Logger.log("PAUSE", "Reading state of command " + command.name());
-
     var states = Util.reading(lock, () -> futures.get(command));
 
     if (Thread.currentThread().isInterrupted()) {
       // Thread interrupt flag was set prior to entering pause
       // This can happen if command code uses Timer.delay or something similar where an interrupted
       // exception is caught and the interrupt flag is set
-      Logger.log("PAUSE", "Thread interrupt flag was set for " + command.name() + " prior to entering pause");
       throw new InterruptedException();
     }
 
     long ms = (long) time.in(Milliseconds);
     int ns = (int) (time.in(Nanoseconds) % 1e6);
 
-    long start = System.nanoTime();
-
-    Logger.log("PAUSE", "Sleeping " + command.name() + " (run ID=" + states.id + ")" + " for " + time.in(Microseconds) + " µs...");
     Thread.sleep(ms, ns);
-    long end = System.nanoTime();
-    Logger.log("PAUSE", "Pause completed for " + command.name()  + " (run ID=" + states.id + ")" + " in " + (end - start) / 1e3 + " µs");
 
     if (Thread.currentThread().isInterrupted()) {
       // Interrupted while paused, but without an interrupted exception being thrown?
-      Logger.log("PAUSE", "Thread interrupt flag was set during sleep for " + command.name() + " (run ID=" + states.id + ")" + "without an InterruptedException being thrown");
       throw new InterruptedException();
     }
 
@@ -678,7 +599,6 @@ public class AsyncScheduler {
       if (statesAfterPause != null) {
         message += " (current run ID=" + statesAfterPause.id + " did not match!)";
       }
-      Logger.log("PAUSE", message);
       throw new IllegalStateException(message);
     }
   }
