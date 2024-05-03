@@ -366,9 +366,13 @@ public abstract class RobotBase implements AutoCloseable {
     } catch (Throwable throwable) {
       Throwable cause = throwable.getCause();
       if (cause != null) {
-        throwable = cause;
+//        throwable = cause;
       }
       DriverStation.reportError("Unhandled exception: " + throwable, throwable.getStackTrace());
+      while (cause != null) {
+        DriverStation.reportError("  Caused by: " + cause, cause.getStackTrace());
+        cause = cause.getCause();
+      }
       errorOnExit = true;
     } finally {
       m_runMutex.lock();
