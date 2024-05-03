@@ -20,7 +20,7 @@ class GenericHIDTest {
 
     for (int i = 0; i <= 100; i++) {
       double rumbleValue = i / 100.0;
-      hid.setRumble(RumbleType.kBothRumble, i / 100.0);
+      hid.setRumble(RumbleType.kBothRumble, rumbleValue);
       assertEquals(sim.getRumble(RumbleType.kLeftRumble), rumbleValue, kEpsilon);
       assertEquals(sim.getRumble(RumbleType.kRightRumble), rumbleValue, kEpsilon);
     }
