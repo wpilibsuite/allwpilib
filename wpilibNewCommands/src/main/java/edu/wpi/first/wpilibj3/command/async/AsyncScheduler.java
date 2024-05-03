@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj.event.EventLoop;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
@@ -40,7 +39,7 @@ public class AsyncScheduler {
    */
   private final Map<HardwareResource, AsyncCommand> runningCommands = new HashMap<>();
   private final Map<HardwareResource, AsyncCommand> defaultCommands = new HashMap<>();
-  private final Map<AsyncCommand, CommandState> futures = new HashMap<>();
+  private final Map<AsyncCommand, CommandState> commandStates = new HashMap<>();
   private final EventLoop eventLoop = new EventLoop();
 
   /**
@@ -146,7 +145,7 @@ public class AsyncScheduler {
    * @param command the command to schedule
    */
   public void schedule(AsyncCommand command) {
-    var currentState = Util.reading(lock, () -> futures.get(command));
+    var currentState = Util.reading(lock, () -> commandStates.get(command));
     if (currentState != null) {
       return;
     }
@@ -201,25 +200,14 @@ public class AsyncScheduler {
       return;
     }
 
-    try {
-      CompletableFuture
-          .allOf(canceledCommandStates.stream().map(s -> s.completion).toArray(CompletableFuture[]::new))
-          .get((long) cancelTimeout.in(Nanoseconds), TimeUnit.NANOSECONDS);
-    } catch (InterruptedException e) {
-      throw new IllegalStateException("Interrupted while waiting for all commands to cancel", e);
-    } catch (ExecutionException e) {
-      throw new IllegalStateException("One or more canceled commands encountered an internal exception", e.getCause());
-    } catch (TimeoutException e) {
-      var stillRunning = canceledCommandStates.stream().filter(s -> !s.completion.isDone()).map(s -> s.id).toList();
-      throw new IllegalStateException("Timed out while waiting for all canceled commands to complete. Still running: " + stillRunning, e);
-    }
+    awaitBulkCancellation(canceledCommandStates);
 
     var newCommandStates = Util.writing(
         lock,
         () -> {
           // Sanity check to make sure we're not overwriting state for the scheduled command, if it
           // was already running when rescheduled. It should have been cancelled above.
-          var existingStates = futures.get(command);
+          var existingStates = commandStates.get(command);
           if (existingStates != null) {
             throw new IllegalStateException("Command state was not cleared!");
           }
@@ -228,10 +216,10 @@ public class AsyncScheduler {
           // commands for all its required resources when it completes
           var scheduled = new CompletableFuture<Boolean>();
           var completion = new CompletableFuture<>();
-          var states = new CommandState(scheduled, completion);
+          var states = new CommandState(command, scheduled, completion);
           Callable<?> callback = createCommandExecutorCallback(command, states);
           states.exec = service.submit(callback);
-          futures.put(command, states);
+          commandStates.put(command, states);
           return states;
         });
 
@@ -247,6 +235,21 @@ public class AsyncScheduler {
       } catch (ExecutionException e) {
         throw new RuntimeException("Unable to wait for command to start", e);
       }
+    }
+  }
+
+  private void awaitBulkCancellation(Collection<CommandState> canceledCommandStates) {
+    try {
+      CompletableFuture
+          .allOf(canceledCommandStates.stream().map(s -> s.completion).toArray(CompletableFuture[]::new))
+          .get((long) cancelTimeout.in(Nanoseconds), TimeUnit.NANOSECONDS);
+    } catch (InterruptedException e) {
+      throw new IllegalStateException("Interrupted while waiting for all commands to cancel", e);
+    } catch (ExecutionException e) {
+      throw new IllegalStateException("One or more canceled commands encountered an internal exception", e.getCause());
+    } catch (TimeoutException e) {
+      var stillRunning = canceledCommandStates.stream().filter(s -> !s.completion.isDone()).map(s -> s.command.name()).toList();
+      throw new IllegalStateException("Timed out while waiting for all canceled commands to complete. Still running: " + stillRunning, e);
     }
   }
 
@@ -325,7 +328,7 @@ public class AsyncScheduler {
         // Not using Util.writing() because `wasInterrupted` can't be captured
         lock.writeLock().lock();
         try {
-          if (futures.get(command) instanceof CommandState s && s.id == runId) {
+          if (commandStates.get(command) instanceof CommandState s && s.id == runId) {
             // Clean up if still running. Schedule the default command if we weren't interrupted
             // Interruption means a new command was explicitly scheduled, so the default command
             // would not be desired.
@@ -355,7 +358,7 @@ public class AsyncScheduler {
    * @throws ExecutionException if the command encountered an error while it was executing
    */
   public void await(AsyncCommand command) throws ExecutionException {
-    var states = Util.reading(lock, () -> futures.get(command));
+    var states = Util.reading(lock, () -> commandStates.get(command));
 
     if (states == null) {
       // not currently running, nothing to await
@@ -390,14 +393,14 @@ public class AsyncScheduler {
     return Util.writing(
         lock,
         () -> {
-          var value = futures.get(command);
-          if (value == null) {
+          var state = commandStates.get(command);
+          if (state == null) {
             // Not running, nothing to cancel
             return null;
           }
 
-          value.exec.cancel(true);
-          return value;
+          state.exec.cancel(true);
+          return state;
         });
   }
 
@@ -453,10 +456,6 @@ public class AsyncScheduler {
     }
   }
 
-  public void cancelAll(Collection<AsyncCommand> commands) {
-    Util.writing(lock, () -> commands.forEach(cmd -> cancelAndWait(cmd, true)));
-  }
-
   /**
    * Cleans up state after a command completes or is cancelled. This method is not inherently
    * thread-safe and must be wrapped in calls to the write lock.
@@ -465,12 +464,12 @@ public class AsyncScheduler {
    */
   private void cleanupAfterCompletion(AsyncCommand command, boolean thenRunDefault) {
     // TODO: This may be buggy at the boundary where a command completes and is immediately rescheduled
-    var states = futures.get(command);
+    var states = commandStates.get(command);
     if (states == null) {
       return;
     }
 
-    futures.remove(command);
+    commandStates.remove(command);
 
     // Clear current thread owner
     if (commandOnCurrentThread.get() == command) {
@@ -493,7 +492,7 @@ public class AsyncScheduler {
    * @return true if the command is running, false if not
    */
   public boolean isRunning(AsyncCommand command) {
-    return Util.reading(lock, () -> futures.containsKey(command));
+    return Util.reading(lock, () -> commandStates.containsKey(command));
   }
 
   /**
@@ -504,24 +503,28 @@ public class AsyncScheduler {
   }
 
   /**
-   * Cancels all currently running commands.
+   * Cancels all currently running commands, then starts the default commands for any resources
+   * that had canceled commands. A default command that is currently running will not be canceled.
    */
   public void cancelAll() {
-    Util.writing(
+    var canceledStates = Util.writing(
         lock,
         () -> {
-          // Cancel every running command...
-          for (AsyncCommand asyncCommand : List.copyOf(runningCommands.values())) {
-            if (defaultCommands.containsValue(asyncCommand)) {
-              // ... except for default commands (no point in cancelling and then immediately restarting)
+          var states = new ArrayList<CommandState>();
+          for (AsyncCommand command : commandStates.keySet()) {
+            if (defaultCommands.containsValue(command)) {
+              // Don't bother cancelling a default command.
+              // It'd be reinitialized immediately afterward
               continue;
             }
-            cancelAndWait(asyncCommand, false);
+            states.add(fireCancelEvent(command));
           }
-
-          // ... and then schedule the default commands
-          defaultCommands.forEach((res, cmd) -> schedule(cmd));
+          return states;
         });
+    awaitBulkCancellation(canceledStates);
+    Util.writing(lock, () -> {
+      defaultCommands.forEach((_res, cmd) -> schedule(cmd));
+    });
   }
 
   /**
@@ -575,7 +578,7 @@ public class AsyncScheduler {
           "pauseCurrentCommand() may only be called by a running command!");
     }
 
-    var states = Util.reading(lock, () -> futures.get(command));
+    var states = Util.reading(lock, () -> commandStates.get(command));
 
     if (Thread.currentThread().isInterrupted()) {
       // Thread interrupt flag was set prior to entering pause
@@ -595,7 +598,7 @@ public class AsyncScheduler {
     }
 
     // TODO: How can a command be removed from the futures list without being interrupted?
-    var statesAfterPause = Util.reading(lock, () -> futures.get(command));
+    var statesAfterPause = Util.reading(lock, () -> commandStates.get(command));
     if (statesAfterPause != states) {
       String message = "Command " + command.name() + " (run ID=" + states.id + ")" + " was removed from the scheduler while paused without being interrupted!";
       if (statesAfterPause != null) {
@@ -614,12 +617,15 @@ public class AsyncScheduler {
      */
     final long id = invocationId.incrementAndGet();
 
+    final AsyncCommand command;
+
     // assigned after construction
     Future<?> exec;
     final CompletableFuture<Boolean> schedule;
     final CompletableFuture<Object> completion;
 
-    CommandState(CompletableFuture<Boolean> schedule, CompletableFuture<Object> completion) {
+    CommandState(AsyncCommand command, CompletableFuture<Boolean> schedule, CompletableFuture<Object> completion) {
+      this.command = command;
       this.schedule = schedule;
       this.completion = completion;
     }

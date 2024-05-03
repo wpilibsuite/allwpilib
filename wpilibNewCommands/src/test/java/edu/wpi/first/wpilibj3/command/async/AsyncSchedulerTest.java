@@ -253,6 +253,50 @@ class AsyncSchedulerTest {
     assertTrue(scheduler.isRunning(defaultCmd));
   }
 
+  @RepeatedTest(value = 10, failureThreshold = 1)
+  void cancelAllCancelsAll() {
+    var commands = new ArrayList<AsyncCommand>(10);
+    for (int i = 1; i <= 10; i++) {
+      commands.add(AsyncCommand.noHardware(AsyncCommand::pause).named("Command " + i));
+    }
+    commands.forEach(scheduler::schedule);
+    scheduler.cancelAll();
+    for (AsyncCommand command : commands) {
+      if (scheduler.isRunning(command)) {
+        fail(command.name() + " was not canceled by cancelAll()");
+      }
+    }
+  }
+
+  @RepeatedTest(value = 100, failureThreshold = 1)
+  void cancelAllStartsDefaults() {
+    var resources = new ArrayList<HardwareResource>(10);
+    for (int i = 1; i <= 10; i++) {
+      resources.add(new HardwareResource("System " + i, scheduler));
+    }
+
+    var command =
+        new AsyncCommandBuilder()
+            .requiring(resources)
+            .executing(AsyncCommand::pause)
+            .named("Big Command");
+
+    for (int i = 0; i < 10; i++) {
+      scheduler.schedule(command);
+      scheduler.cancelAll();
+
+      if (scheduler.isRunning(command)) {
+        fail(command.name() + " was not canceled by cancelAll()");
+      }
+
+      for (var resource : resources) {
+        if (!scheduler.isRunning(resource.getDefaultCommand())) {
+          fail("Default command for " + resource.getName() + " should have been scheduled after cancelAll() was called");
+        }
+      }
+    }
+  }
+
   static final class RunningCommand implements AsyncCommand {
     private final Set<HardwareResource> subsystems;
     boolean ran = false;
