@@ -1,5 +1,8 @@
 package edu.wpi.first.wpilibj3.command.async;
 
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Time;
+
 public class HardwareResource {
   private final String name;
 
@@ -46,6 +49,29 @@ public class HardwareResource {
 
   public AsyncCommandBuilder run(ThrowingRunnable command) {
     return new AsyncCommandBuilder().requiring(this).executing(command);
+  }
+
+  public AsyncCommand idle() {
+    return new IdleCommand(this);
+  }
+
+  public AsyncCommand idle(Measure<Time> duration) {
+    return new IdleCommand(this, duration);
+  }
+
+  public AsyncCommandBuilder runSequence(AsyncCommand... commands) {
+    // All commands most only have this resource as a requirement
+    for (AsyncCommand command : commands) {
+      if (command.requirements().size() != 1 || !command.requires(this)) {
+        throw new IllegalArgumentException("Command " + command.name() + " can only require " + getName());
+      }
+    }
+
+    return new AsyncCommandBuilder().requiring(this).executing(() -> {
+      for (AsyncCommand command : commands) {
+        command.run();
+      }
+    });
   }
 
   @Override

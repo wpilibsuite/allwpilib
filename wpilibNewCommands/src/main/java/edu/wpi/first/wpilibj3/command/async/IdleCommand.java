@@ -1,5 +1,10 @@
 package edu.wpi.first.wpilibj3.command.async;
 
+import static edu.wpi.first.units.Units.Milliseconds;
+
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Time;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -7,13 +12,14 @@ import java.util.Set;
  *
  * @param resource the resource to idle.
  */
-public record IdleCommand(HardwareResource resource) implements AsyncCommand {
+public record IdleCommand(HardwareResource resource, Measure<Time> duration) implements AsyncCommand {
+  public IdleCommand(HardwareResource resource) {
+    this(resource, Milliseconds.of(Long.MAX_VALUE));
+  }
+
   @Override
-  @SuppressWarnings({"InfiniteLoopStatement", "BusyWait"})
-  public void run() throws Exception {
-    while (true) {
-      Thread.sleep(Long.MAX_VALUE);
-    }
+  public void run() throws InterruptedException {
+    AsyncCommand.pause(duration);
   }
 
   @Override
@@ -35,5 +41,15 @@ public record IdleCommand(HardwareResource resource) implements AsyncCommand {
   @Override
   public String toString() {
     return name();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return obj == this;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(resource, duration);
   }
 }
