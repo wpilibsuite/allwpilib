@@ -2,7 +2,6 @@ package edu.wpi.first.wpilibj3.command.async;
 
 import static edu.wpi.first.units.Units.Milliseconds;
 import static edu.wpi.first.units.Units.Seconds;
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -99,51 +98,6 @@ class AsyncSchedulerTest {
     scheduler.schedule(second);
     assertTrue(scheduler.isRunning(second), "New command should be running");
     assertFalse(scheduler.isRunning(first), "Old command should be canceled");
-  }
-
-  @RepeatedTest(value = 10, failureThreshold = 1)
-  void group() throws Exception {
-    var s1 = new HardwareResource("S1", scheduler);
-    var s2 = new HardwareResource("S2", scheduler);
-
-    var s1c1 = new RunningCommand(s1);
-    var s2c1 = new RunningCommand(s2);
-
-    var s1c2 = new RunningCommand(s1);
-    var s2c2 = new RunningCommand(s2);
-
-    var firstStage =
-        ParallelGroup
-            .onScheduler(scheduler)
-            .all(s1c1, s2c1)
-            .withTimeout(Milliseconds.of(120))
-            .named("First Stage");
-    var secondStage =
-        ParallelGroup
-            .onScheduler(scheduler)
-            .all(s1c2, s2c2)
-            .withTimeout(Milliseconds.of(80))
-            .named("Second Stage");
-
-    var group = new Sequence(scheduler, firstStage, secondStage);
-
-    assertEquals(Set.of(s1, s2), group.requirements());
-    assertEquals(Set.of(s1, s2), firstStage.requirements());
-    assertEquals(Set.of(s1, s2), secondStage.requirements());
-
-    // schedule the entire group
-    scheduler.schedule(group);
-    assertTrue(scheduler.isRunning(group));
-
-    scheduler.await(group); // wait for the group to fully complete (including cleanup)
-    assertFalse(scheduler.isRunning(group));
-
-    // and the parallel commands should have run
-    assertAll(
-        () -> assertTrue(s1c1.ran, "Subsystem #1 Command #1 did not run"),
-        () -> assertTrue(s2c1.ran, "Subsystem #2 Command #1 did not run"),
-        () -> assertTrue(s1c2.ran, "Subsystem #1 Command #2 did not run"),
-        () -> assertTrue(s2c2.ran, "Subsystem #2 Command #2 did not run"));
   }
 
   @RepeatedTest(value = 100, failureThreshold = 1)

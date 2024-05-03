@@ -119,30 +119,6 @@ public interface AsyncCommand {
     return new AsyncCommandBuilder().executing(impl);
   }
 
-  default ParallelGroup.Builder alongWith(AsyncScheduler scheduler, AsyncCommand... other) {
-    return ParallelGroup.onScheduler(scheduler).all(this, other);
-  }
-
-  default ParallelGroup.Builder alongWith(AsyncCommand... other) {
-    return alongWith(AsyncScheduler.getInstance(), other);
-  }
-
-  default AsyncCommand andThen(AsyncCommand next) {
-    return new Sequence(AsyncScheduler.getInstance(), this, next);
-  }
-
-  default AsyncCommand withTimeout(Measure<Time> timeout) {
-    return ParallelGroup.onDefaultScheduler().withTimeout(timeout).all(this).named(name());
-  }
-
-  default AsyncCommand deadlineWith(AsyncCommand... commands) {
-    return ParallelGroup
-               .onDefaultScheduler()
-               .all(this, commands)
-               .requiring(this)
-               .named(name() + "[" + Arrays.stream(commands).map(AsyncCommand::name).collect(Collectors.joining(" & ")) + "]");
-  }
-
   /** Schedules this command with the default async scheduler. */
   default void schedule() {
     AsyncScheduler.getInstance().schedule(this);
@@ -156,6 +132,42 @@ public interface AsyncCommand {
   /** Checks if this command is currently scheduled to be running on the default async scheduler. */
   default boolean isScheduled() {
     return AsyncScheduler.getInstance().isRunning(this);
+  }
+
+  default AsyncCommand withTimeout(Measure<Time> timeout) {
+    final AsyncCommand original = this;
+
+    return new AsyncCommand() {
+      @Override
+      public void run() throws Exception {
+        AsyncScheduler.getInstance().schedule(AsyncCommand.noHardware(() -> {
+          AsyncCommand.pause(timeout);
+          AsyncScheduler.getInstance().cancelAndWait(this, true);
+        }).named("Timer for " + original.name()));
+
+        original.run();
+      }
+
+      @Override
+      public String name() {
+        return original.name();
+      }
+
+      @Override
+      public Set<HardwareResource> requirements() {
+        return original.requirements();
+      }
+
+      @Override
+      public int priority() {
+        return original.priority();
+      }
+
+      @Override
+      public RobotDisabledBehavior robotDisabledBehavior() {
+        return original.robotDisabledBehavior();
+      }
+    };
   }
 
   static AsyncCommandBuilder requiring(HardwareResource requirement, HardwareResource... rest) {

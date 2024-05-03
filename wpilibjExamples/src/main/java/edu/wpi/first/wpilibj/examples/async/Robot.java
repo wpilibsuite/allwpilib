@@ -4,8 +4,8 @@
 
 package edu.wpi.first.wpilibj.examples.async;
 
-import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj3.command.async.AsyncCommand;
+import edu.wpi.first.wpilibj3.command.async.AsyncRobot;
 import edu.wpi.first.wpilibj3.command.async.AsyncScheduler;
 
 /**
@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj3.command.async.AsyncScheduler;
  * the package after creating this project, you must also update the build.gradle file in the
  * project.
  */
-public class Robot extends TimedRobot {
+public class Robot extends AsyncRobot {
   private AsyncCommand m_autonomousCommand;
 
   private final AsyncCommandBot m_robot = new AsyncCommandBot();
@@ -37,9 +37,7 @@ public class Robot extends TimedRobot {
    * SmartDashboard integrated updating.
    */
   @Override
-  public void robotPeriodic() {
-    AsyncScheduler.getInstance().checkForErrors();
-  }
+  public void robotPeriodic() {}
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
@@ -53,7 +51,7 @@ public class Robot extends TimedRobot {
     m_autonomousCommand = m_robot.getAutonomousCommand();
 
     if (m_autonomousCommand != null) {
-      m_autonomousCommand.schedule();
+      scheduler.schedule(m_autonomousCommand);
     }
   }
 
@@ -67,9 +65,7 @@ public class Robot extends TimedRobot {
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
     // this line or comment it out.
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.cancel();
-    }
+    scheduler.cancel(m_autonomousCommand);
   }
 
   /** This function is called periodically during operator control. */

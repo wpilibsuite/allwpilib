@@ -4,6 +4,8 @@
 
 package edu.wpi.first.wpilibj.examples.async;
 
+import static edu.wpi.first.units.Units.Milliseconds;
+
 import edu.wpi.first.wpilibj.examples.async.Constants.AutoConstants;
 import edu.wpi.first.wpilibj.examples.async.Constants.OIConstants;
 import edu.wpi.first.wpilibj.examples.async.Constants.ShooterConstants;
@@ -13,7 +15,6 @@ import edu.wpi.first.wpilibj.examples.async.subsystems.Pneumatics;
 import edu.wpi.first.wpilibj.examples.async.subsystems.Shooter;
 import edu.wpi.first.wpilibj.examples.async.subsystems.Storage;
 import edu.wpi.first.wpilibj3.command.async.AsyncCommand;
-import edu.wpi.first.wpilibj3.command.async.ParallelGroup;
 import edu.wpi.first.wpilibj3.command.async.button.AsyncCommandXboxController;
 import edu.wpi.first.wpilibj3.command.async.button.AsyncTrigger;
 
@@ -66,9 +67,16 @@ public class AsyncCommandBot {
     m_driverController
         .a()
         .onTrue(
-            ParallelGroup.onDefaultScheduler().all(
-                    m_shooter.shootCommand(ShooterConstants.kShooterTarget),
-                    m_storage.runCommand())
+            AsyncCommand
+                .requiring(m_shooter, m_storage)
+                .executing(() -> {
+                  while (true) {
+                    AsyncCommand.pause(Milliseconds.of(10));
+                    m_storage.run();
+                    m_shooter.ramp(ShooterConstants.kShooterTarget);
+                    m_shooter.tryFeed();
+                  }
+                })
                 .named("Shoot"));
 
     // Toggle compressor with the Start button
@@ -82,10 +90,8 @@ public class AsyncCommandBot {
    */
   public AsyncCommand getAutonomousCommand() {
     // Drive forward for 2 meters at half speed with a 3 second timeout
-    return ParallelGroup
-             .onDefaultScheduler()
-             .all(m_drive.driveDistanceCommand(AutoConstants.kDriveDistance, AutoConstants.kDriveSpeed))
-             .withTimeout(AutoConstants.kTimeout)
-             .named("Drive Across Starting Line");
+    return m_drive
+               .driveDistanceCommand(AutoConstants.kDriveDistance, AutoConstants.kDriveSpeed)
+               .withTimeout(AutoConstants.kTimeout);
   }
 }

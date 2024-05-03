@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class AsyncRobot extends IterativeRobotBase {
   public static final Measure<Time> DEFAULT_PERIOD = Milliseconds.of(20);
   private final Measure<Time> period;
-  private final AsyncScheduler scheduler;
+  protected final AsyncScheduler scheduler;
 
   private final AtomicBoolean ended = new AtomicBoolean(false);
 

@@ -401,6 +401,10 @@ public class AsyncScheduler {
         });
   }
 
+  public void cancel(AsyncCommand command) {
+    cancelAndWait(command, true);
+  }
+
   /**
    * Cancels a running command and schedules the default commands for all of its required resources.
    * Has no effect if the given command is not currently running.
@@ -483,9 +487,7 @@ public class AsyncScheduler {
   }
 
   /**
-   * Checks if a command is currently running. A command that's executed as part of a {@link
-   * Sequence} or {@link ParallelGroup} is considered to be running, even if it's not the
-   * highest-level owner of its resources.
+   * Checks if a command is currently running.
    *
    * @param command the command to check
    * @return true if the command is running, false if not

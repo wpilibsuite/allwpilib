@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj.examples.async.subsystems;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.examples.async.AsyncCommandBot;
 import edu.wpi.first.wpilibj.examples.async.Constants.StorageConstants;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj3.command.async.AsyncCommand;
@@ -33,8 +34,17 @@ public class Storage extends HardwareResource {
     }).named("Idle"));
   }
 
+  public void run() throws InterruptedException {
+    m_motor.set(1);
+  }
+
   /** Returns a command that runs the storage motor indefinitely. */
   public AsyncCommand runCommand() {
-    return run(() -> m_motor.set(1)).named("Run");
+    return run(() -> {
+      while (true) {
+        AsyncCommand.pause();
+        run();
+      }
+    }).named("Run");
   }
 }

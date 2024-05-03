@@ -49,34 +49,18 @@ public class Shooter extends HardwareResource {
         .named("Idle"));
   }
 
-  /**
-   * Returns a command to shoot the balls currently stored in the robot. Spins the shooter flywheel
-   * up to the specified setpoint and runs the feeder motor while it's at that setpoint.
-   *
-   * @param setpoint The desired shooter velocity
-   */
-  @SuppressWarnings("InfiniteLoopStatement")
-  public AsyncCommand shootCommand(Measure<Velocity<Angle>> setpoint) {
-    double setpointRotationsPerSecond = setpoint.in(RotationsPerSecond);
+  public void ramp(Measure<Velocity<Angle>> setpoint) {
+    m_shooterMotor.set(
+        m_shooterFeedforward.calculate(setpoint.in(RotationsPerSecond))
+            + m_shooterFeedback.calculate(
+            m_shooterEncoder.getRate(), setpoint.in(RotationsPerSecond)));
+  }
 
-    // Use a faster-than-default loop time for finer control over the flywheel
-    var loopTime = Milliseconds.of(10);
-
-    return run(() -> {
-        while (true) {
-          pause(loopTime);
-          m_shooterMotor.set(
-            m_shooterFeedforward.calculate(setpointRotationsPerSecond)
-              + m_shooterFeedback.calculate(
-              m_shooterEncoder.getRate(), setpointRotationsPerSecond));
-
-          if (m_shooterFeedback.atSetpoint()) {
-            m_feederMotor.set(1);
-          } else {
-            m_feederMotor.set(0);
-          }
-        }
-      }
-    ).named("Shoot[" + setpointRotationsPerSecond + "]");
+  public void tryFeed() {
+    if (m_shooterFeedback.atSetpoint()) {
+      m_feederMotor.set(1);
+    } else {
+      m_feederMotor.set(0);
+    }
   }
 }
