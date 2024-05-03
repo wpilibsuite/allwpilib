@@ -212,6 +212,7 @@ public final class UnitBuilder<U extends Unit<U>> {
    * Creates the new unit based off of the builder methods called prior, passing them to a provided
    * constructor function.
    *
+   * @param constructor the function to use to create the new derived unit
    * @return the new derived unit
    * @throws NullPointerException if the unit conversions, unit name, or unit symbol were not set
    */
