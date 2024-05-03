@@ -55,15 +55,20 @@ public class Logger {
     StringBuilder table = new StringBuilder();
 
     // First row: |---|---|---|...|
-    table.append('|');
-    table.append("-".repeat(timestampColumnWidth + 1));
 
-    for (int i = 0; i < threadCount; i++) {
+    Runnable printDivider = () -> {
       table.append('|');
-      table.append("-".repeat(threadColumnWidth + 1));
-    }
-    table.append('|');
-    table.append('\n');
+      table.append("-".repeat(timestampColumnWidth + 1));
+
+      for (int i = 0; i < threadCount; i++) {
+        table.append('|');
+        table.append("-".repeat(threadColumnWidth + 1));
+      }
+      table.append('|');
+      table.append('\n');
+    };
+
+    printDivider.run();
     // end first row
 
     // Second row: |   Timestamp |   threadA |    threadB |
@@ -78,6 +83,8 @@ public class Logger {
     table.append('|');
     table.append('\n');
     // End second row
+
+    printDivider.run();
 
     Consumer<LogRecord> printRow = (record) -> {
       int threadIndex = threadNames.indexOf(record.threadName);
@@ -97,6 +104,8 @@ public class Logger {
     };
 
     records.forEach(printRow);
+
+    printDivider.run(); // footer
 
     return table.toString();
   }

@@ -1,6 +1,7 @@
 package edu.wpi.first.wpilibj3.command.async;
 
 import static edu.wpi.first.units.Units.Milliseconds;
+import static edu.wpi.first.units.Units.Seconds;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -14,23 +15,27 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 
 @Timeout(5)
 class AsyncSchedulerTest {
+  private AsyncScheduler scheduler;
+
   @BeforeEach
   void setup() {
     Logger.clear();
+
+    // Initialize with high default timeouts so random jitter doesn't make tests flake out
+    scheduler = new AsyncScheduler(
+        Seconds.one(), // event loop period
+        Milliseconds.of(25), // cancel timeout
+        Milliseconds.of(25)); // schedule timeout
   }
 
   @RepeatedTest(value = 1000, failureThreshold = 1)
   void basic() throws Exception {
     var enabled = new AtomicBoolean(false);
     var ran = new AtomicBoolean(false);
-    var scheduler = new AsyncScheduler();
-    // to account for random jitter or slowness
-    scheduler.scheduleTimeout = Milliseconds.of(10);
     var command = AsyncCommand.noHardware(() -> {
       do {} while (!enabled.get());
       ran.set(true);
@@ -49,14 +54,14 @@ class AsyncSchedulerTest {
     assertTrue(ran.get());
   }
 
-  @Test
+  @RepeatedTest(value = 100, failureThreshold = 1)
   void higherPriorityCancels() {
-    var subsystem = new HardwareResource("Subsystem");
+    var subsystem = new HardwareResource("Subsystem", scheduler);
 
     var lower = new PriorityCommand(-1000, subsystem);
     var higher = new PriorityCommand(+1000, subsystem);
 
-    var scheduler = new AsyncScheduler();
+    scheduler.scheduleTimeout = Milliseconds.of(25);
     scheduler.schedule(lower);
     assertTrue(scheduler.isRunning(lower));
 
@@ -65,30 +70,34 @@ class AsyncSchedulerTest {
     assertFalse(scheduler.isRunning(lower));
   }
 
-  @Test
+  @RepeatedTest(value = 100, failureThreshold = 1)
   void lowerPriorityDoesNotCancel() {
-    var subsystem = new HardwareResource("Subsystem");
+    var subsystem = new HardwareResource("Subsystem", scheduler);
 
     var lower = new PriorityCommand(-1000, subsystem);
     var higher = new PriorityCommand(+1000, subsystem);
 
-    var scheduler = new AsyncScheduler();
     scheduler.schedule(higher);
     assertTrue(scheduler.isRunning(higher));
 
     scheduler.schedule(lower);
-    assertTrue(scheduler.isRunning(higher), "Higher priority command should still be running");
-    assertFalse(scheduler.isRunning(lower), "Lower priority command should not be running");
+    if (!scheduler.isRunning(higher)) {
+      System.err.println(Logger.formattedLogTable());
+      fail("Higher priority command should still be running");
+    }
+    if (scheduler.isRunning(lower)) {
+      System.err.println(Logger.formattedLogTable());
+      fail("Lower priority command should not be running");
+    }
   }
 
-  @Test
+  @RepeatedTest(value = 100, failureThreshold = 1)
   void samePriorityCancels() {
-    var subsystem = new HardwareResource("Subsystem");
+    var subsystem = new HardwareResource("Subsystem", scheduler);
 
     var first = new PriorityCommand(512, subsystem);
     var second = new PriorityCommand(512, subsystem);
 
-    var scheduler = new AsyncScheduler();
     scheduler.schedule(first);
     assertTrue(scheduler.isRunning(first));
 
@@ -97,12 +106,8 @@ class AsyncSchedulerTest {
     assertFalse(scheduler.isRunning(first), "Old command should be canceled");
   }
 
-  @RepeatedTest(10)
+  @RepeatedTest(value = 10, failureThreshold = 1)
   void group() throws Exception {
-    // NOTE: If this is the first test that runs, its first iteration will be flaky,
-    //       likely due to loading classes and static initialization
-    var scheduler = new AsyncScheduler();
-
     var s1 = new HardwareResource("S1", scheduler);
     var s2 = new HardwareResource("S2", scheduler);
 
@@ -146,9 +151,8 @@ class AsyncSchedulerTest {
         () -> assertTrue(s2c2.ran, "Subsystem #2 Command #2 did not run"));
   }
 
-  @Test
+  @RepeatedTest(value = 100, failureThreshold = 1)
   void atomicity() throws Exception {
-    var scheduler = new AsyncScheduler();
     var resource =
         new HardwareResource("X", scheduler) {
           int x = 0;
@@ -184,9 +188,8 @@ class AsyncSchedulerTest {
     assertEquals(numCommands * iterations, resource.x);
   }
 
-  @Test
+  @RepeatedTest(value = 100, failureThreshold = 1)
   void errorDetection() throws Exception {
-    var scheduler = new AsyncScheduler();
     var resource = new HardwareResource("X", scheduler);
 
     var command =
@@ -227,7 +230,6 @@ class AsyncSchedulerTest {
 
   @RepeatedTest(value = 100, failureThreshold = 1)
   void runResource() throws Exception {
-    var scheduler = new AsyncScheduler();
     var example =
         new HardwareResource("Counting", scheduler) {
           int x = 0;
@@ -251,10 +253,8 @@ class AsyncSchedulerTest {
     assertEquals(10, example.x);
   }
 
-  @Test
+  @RepeatedTest(value = 100, failureThreshold = 1)
   void cancelOnInterruptDoesNotResume() throws Exception {
-    var scheduler = new AsyncScheduler();
-
     var count = new AtomicInteger(0);
 
     var resource = new HardwareResource("Resource", scheduler);
@@ -277,18 +277,15 @@ class AsyncSchedulerTest {
     assertEquals(1, count.get()); // the second set should not have run
   }
 
-  @Test
+  @RepeatedTest(value = 100, failureThreshold = 1)
   void pauseOutsideCommand() {
-    var scheduler = new AsyncScheduler();
     assertThrows(IllegalStateException.class, scheduler::pauseCurrentCommand);
   }
 
-  @RepeatedTest(10)
+  @RepeatedTest(value = 10, failureThreshold = 1)
   void scheduleOverDefaultDoesNotRescheduleDefault() throws Exception {
     var count = new AtomicInteger(0);
 
-    var scheduler = new AsyncScheduler();
-    scheduler.scheduleTimeout = Milliseconds.of(10);
     var resource = new HardwareResource("Resource", scheduler);
     var defaultCmd = resource.run(() -> {
       count.incrementAndGet();

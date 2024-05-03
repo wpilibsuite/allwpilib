@@ -81,6 +81,10 @@ public class AsyncScheduler {
   }
 
   public AsyncScheduler(Measure<Time> triggerPollingPeriod) {
+    this(triggerPollingPeriod, Milliseconds.of(2.5), Milliseconds.of(2.5));
+  }
+
+  public AsyncScheduler(Measure<Time> triggerPollingPeriod, Measure<Time> cancelTimeout, Measure<Time> scheduleTimeout) {
     // Start polling the event loop
     // This intentionally runs on the same carrier thread as commands so the boolean checks
     // will be guaranteed to run on the same thread as the commands that manipulate state
@@ -88,6 +92,9 @@ public class AsyncScheduler {
       Thread.currentThread().setName("async-scheduler-eventloop");
       pollEventLoop(triggerPollingPeriod);
     });
+
+    this.cancelTimeout = cancelTimeout.copy();
+    this.scheduleTimeout = scheduleTimeout.copy();
   }
 
   @SuppressWarnings({"InfiniteLoopStatement", "BusyWait"})
@@ -151,9 +158,13 @@ public class AsyncScheduler {
       return;
     }
 
-    var canceledCommandStates = new ArrayList<CommandState>();
+    // Fire cancel requests on all conflicting commands (in a lock), then wait for them all to
+    // exit (outside the lock, to avoid contention with locking behavior in the cancellation cleanup)
+    // Then (in a lock again), create and schedule the carrier for the command, and (outside the
+    // lock), wait for the carrier to start up before finally returning from schedule().
 
-    var newCommandStates = Util.writing(
+    var canceledCommandStates = new ArrayList<CommandState>();
+    boolean isSchedulable = Util.writing(
         lock,
         () -> {
           // Don't schedule if a required resource is currently running a higher priority command
@@ -167,8 +178,10 @@ public class AsyncScheduler {
           }
           if (!shouldSchedule) {
             Logger.log("SCHEDULE", "Lower priority than running commands, not scheduling");
-            return null;
+            return false;
           }
+
+          Logger.log("SCHEDULE", "Command " + command.name() + " is higher priority than all conflicting commands. Cancelling the running commands");
 
           // Cancel the currently scheduled commands for each required resource and schedule the
           // incoming command over them
@@ -190,6 +203,31 @@ public class AsyncScheduler {
             }
           }
 
+          return true;
+        });
+
+    if (!isSchedulable) {
+      // Not schedulable, bail
+      return;
+    }
+
+    try {
+      CompletableFuture
+          .allOf(canceledCommandStates.stream().map(s -> s.completion).toArray(CompletableFuture[]::new))
+          .get((long) cancelTimeout.in(Nanoseconds), TimeUnit.NANOSECONDS);
+    } catch (InterruptedException e) {
+      throw new IllegalStateException("Interrupted while waiting for all commands to cancel", e);
+    } catch (ExecutionException e) {
+      throw new IllegalStateException("One or more canceled commands encountered an internal exception", e.getCause());
+    } catch (TimeoutException e) {
+      var stillRunning = canceledCommandStates.stream().filter(s -> !s.completion.isDone()).map(s -> s.id).toList();
+      System.err.println(Logger.formattedLogTable());
+      throw new IllegalStateException("Timed out while waiting for all canceled commands to complete. Still running: " + stillRunning, e);
+    }
+
+    var newCommandStates = Util.writing(
+        lock,
+        () -> {
           // Sanity check to make sure we're not overwriting state for the scheduled command, if it
           // was already running when rescheduled. It should have been cancelled above.
           var existingStates = futures.get(command);
@@ -205,22 +243,9 @@ public class AsyncScheduler {
           Callable<?> callback = createCommandExecutorCallback(command, states);
           states.exec = service.submit(callback);
           futures.put(command, states);
+          Logger.log("SCHEDULE", "Created async future for command " + command.name() + " (assigned run ID=" + states.id + ")");
           return states;
         });
-
-    try {
-      CompletableFuture
-          .allOf(canceledCommandStates.stream().map(s -> s.completion).toArray(CompletableFuture[]::new))
-          .get((long) cancelTimeout.in(Nanoseconds), TimeUnit.NANOSECONDS);
-    } catch (InterruptedException e) {
-      throw new IllegalStateException("Interrupted while waiting for all commands to cancel", e);
-    } catch (ExecutionException e) {
-      throw new IllegalStateException("One or more canceled commands encountered an internal exception", e.getCause());
-    } catch (TimeoutException e) {
-      var stillRunning = canceledCommandStates.stream().filter(s -> !s.completion.isDone()).map(s -> s.id).toList();
-      System.err.println(Logger.formattedLogTable());
-      throw new IllegalStateException("Timed out while waiting for all canceled commands to complete. Still running: " + stillRunning, e);
-    }
 
     if (newCommandStates != null) {
       // Wait for the command to have started before returning
