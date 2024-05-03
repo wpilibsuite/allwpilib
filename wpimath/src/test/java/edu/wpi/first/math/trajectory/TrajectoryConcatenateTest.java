@@ -17,14 +17,14 @@ class TrajectoryConcatenateTest {
   void testStates() {
     var t1 =
         TrajectoryGenerator.generateTrajectory(
-            new Pose2d(),
+            Pose2d.kZero,
             List.of(),
-            new Pose2d(1, 1, new Rotation2d()),
+            new Pose2d(1, 1, Rotation2d.kZero),
             new TrajectoryConfig(2, 2));
 
     var t2 =
         TrajectoryGenerator.generateTrajectory(
-            new Pose2d(1, 1, new Rotation2d()),
+            new Pose2d(1, 1, Rotation2d.kZero),
             List.of(),
             new Pose2d(2, 2, Rotation2d.fromDegrees(45)),
             new TrajectoryConfig(2, 2));

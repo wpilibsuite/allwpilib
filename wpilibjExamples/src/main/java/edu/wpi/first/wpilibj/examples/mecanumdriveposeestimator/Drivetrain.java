@@ -58,7 +58,7 @@ public class Drivetrain {
           m_kinematics,
           m_gyro.getRotation2d(),
           getCurrentDistances(),
-          new Pose2d(),
+          Pose2d.kZero,
           VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)),
           VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30)));
 
