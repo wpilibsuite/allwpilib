@@ -10,9 +10,11 @@
 #include <string>
 #include <string_view>
 
+#include <wpi/deprecated.h>
+
 #include "cscore.h"
 #include "cscore_cv.h"
-#include <wpi/deprecated.h>
+
 namespace frc {
 
 /**

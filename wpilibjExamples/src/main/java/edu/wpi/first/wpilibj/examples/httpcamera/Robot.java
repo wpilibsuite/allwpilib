@@ -28,7 +28,8 @@ public class Robot extends TimedRobot {
         new Thread(
             () -> {
               // Create an HTTP camera
-              HttpCamera camera = new HttpCamera("HTTP Camera", "http://10.x.y.11/video/stream.mjpg");
+              HttpCamera camera =
+                  new HttpCamera("HTTP Camera", "http://10.x.y.11/video/stream.mjpg");
               // Start capturing images
               CameraServer.startAutomaticCapture(camera);
               // Set the resolution

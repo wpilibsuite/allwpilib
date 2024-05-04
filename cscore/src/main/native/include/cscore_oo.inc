@@ -10,6 +10,7 @@
 #include <string_view>
 #include <utility>
 #include <vector>
+
 #include <wpi/deprecated.h>
 
 #include "cscore_oo.h"
