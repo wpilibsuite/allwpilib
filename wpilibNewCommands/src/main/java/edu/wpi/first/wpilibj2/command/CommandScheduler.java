@@ -530,6 +530,10 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
     m_disabled = false;
   }
 
+  public void printWatchdogEpochs(Consumer<String> output) {
+    m_watchdog.printEpochs(output);
+  }
+
   /**
    * Adds an action to perform on the initialization of any command by the scheduler.
    *

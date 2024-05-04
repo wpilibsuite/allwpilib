@@ -84,6 +84,13 @@ class Watchdog {
   void PrintEpochs();
 
   /**
+   * Prints list of epochs added so far and their times to a stream.
+   *
+   * @param os output stream
+   */
+  void PrintEpochs(wpi::raw_ostream& os);
+
+  /**
    * Resets the watchdog timer.
    *
    * This also enables the timer if it was previously disabled.

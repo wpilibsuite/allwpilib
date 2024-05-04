@@ -334,6 +334,13 @@ class CommandScheduler final : public wpi::Sendable,
   void Enable();
 
   /**
+   * Prints list of epochs added so far and their times to a stream.
+   *
+   * @param os output stream
+   */
+  void PrintWatchdogEpochs(wpi::raw_ostream& os);
+
+  /**
    * Adds an action to perform on the initialization of any command by the
    * scheduler.
    *
