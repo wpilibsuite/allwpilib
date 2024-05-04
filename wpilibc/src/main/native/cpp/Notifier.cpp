@@ -161,11 +161,6 @@ void Notifier::SetName(std::string_view name) {
   HAL_SetNotifierName(m_notifier, buf.data(), &status);
 }
 
-void Notifier::SetHandler(std::function<void()> callback) {
-  std::scoped_lock lock(m_processMutex);
-  m_callback = callback;
-}
-
 void Notifier::SetCallback(std::function<void()> callback) {
   std::scoped_lock lock(m_processMutex);
   m_callback = callback;

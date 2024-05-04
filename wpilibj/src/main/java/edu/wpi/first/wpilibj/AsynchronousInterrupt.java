@@ -6,6 +6,7 @@ package edu.wpi.first.wpilibj;
 
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
+import edu.wpi.first.wpilibj.SynchronousInterrupt.WaitResult;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 
@@ -127,14 +128,32 @@ public class AsynchronousInterrupt implements AutoCloseable {
 
   private void threadMain() {
     while (m_keepRunning.get()) {
-      var result = m_interrupt.waitForInterruptRaw(10, false);
+      var result = m_interrupt.waitForInterrupt(10, false);
       if (!m_keepRunning.get()) {
         break;
       }
-      if (result == 0) {
+      if (result == WaitResult.kTimeout) {
         continue;
       }
-      m_callback.accept((result & 0x1) != 0, (result & 0x100) != 0);
+
+      boolean rising = false;
+      boolean falling = false;
+      switch (result) {
+        case kBoth:
+          rising = true;
+          falling = true;
+          break;
+        case kFallingEdge:
+          falling = true;
+          break;
+        case kRisingEdge:
+          rising = true;
+          break;
+        default:
+          break;
+      }
+
+      m_callback.accept(rising, falling);
     }
   }
 }

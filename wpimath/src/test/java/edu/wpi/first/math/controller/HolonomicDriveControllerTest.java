@@ -32,10 +32,10 @@ class HolonomicDriveControllerTest {
             new PIDController(1.0, 0.0, 0.0),
             new ProfiledPIDController(
                 1.0, 0.0, 0.0, new TrapezoidProfile.Constraints(2.0 * Math.PI, Math.PI)));
-    Pose2d robotPose = new Pose2d(2.7, 23.0, Rotation2d.fromDegrees(0.0));
+    Pose2d robotPose = new Pose2d(2.7, 23.0, Rotation2d.kZero);
 
     List<Pose2d> waypoints = new ArrayList<>();
-    waypoints.add(new Pose2d(2.75, 22.521, new Rotation2d(0)));
+    waypoints.add(new Pose2d(2.75, 22.521, Rotation2d.kZero));
     waypoints.add(new Pose2d(24.73, 19.68, new Rotation2d(5.8)));
 
     TrajectoryConfig config = new TrajectoryConfig(8.0, 4.0);
@@ -46,7 +46,7 @@ class HolonomicDriveControllerTest {
 
     for (int i = 0; i < (kTotalTime / kDt); i++) {
       Trajectory.State state = trajectory.sample(kDt * i);
-      ChassisSpeeds output = controller.calculate(robotPose, state, new Rotation2d());
+      ChassisSpeeds output = controller.calculate(robotPose, state, Rotation2d.kZero);
 
       robotPose =
           robotPose.exp(
@@ -83,7 +83,7 @@ class HolonomicDriveControllerTest {
 
     ChassisSpeeds speeds =
         controller.calculate(
-            new Pose2d(0, 0, new Rotation2d(1.57)), new Pose2d(), 0, new Rotation2d(1.57));
+            new Pose2d(0, 0, new Rotation2d(1.57)), Pose2d.kZero, 0, new Rotation2d(1.57));
 
     assertEquals(0.0, speeds.omegaRadiansPerSecond);
   }

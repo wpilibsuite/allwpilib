@@ -148,7 +148,7 @@ class CommandDecoratorTest extends CommandTestBase {
       Command endsBefore = new InstantCommand();
       Command endsAfter = new WaitUntilCommand(() -> false);
 
-      Command group = dictator.deadlineWith(endsBefore, endsAfter);
+      Command group = dictator.deadlineFor(endsBefore, endsAfter);
 
       scheduler.schedule(group);
       scheduler.run();
