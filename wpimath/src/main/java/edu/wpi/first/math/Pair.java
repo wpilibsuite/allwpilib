@@ -60,4 +60,18 @@ public class Pair<A, B> {
   public String toString() {
     return String.format("Pair(%s, %s)", m_first, m_second);
   }
+
+  /**
+   * Checks equality between this Pair and another object.
+   *
+   * @param obj The other object.
+   * @return Whether the two objects are equal or not.
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof Pair pair) {
+      return m_first.equals(pair.getFirst()) && m_second.equals(pair.getSecond());
+    }
+    return false;
+  }
 }
