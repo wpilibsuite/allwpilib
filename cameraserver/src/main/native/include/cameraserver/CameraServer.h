@@ -12,7 +12,7 @@
 
 #include "cscore.h"
 #include "cscore_cv.h"
-
+#include <wpi/deprecated.h>
 namespace frc {
 
 /**
@@ -73,6 +73,7 @@ class CameraServer {
    */
   static cs::MjpegServer StartAutomaticCapture(const cs::VideoSource& camera);
 
+  WPI_IGNORE_DEPRECATED
   /**
    * Adds an Axis IP camera.
    *
@@ -183,6 +184,7 @@ class CameraServer {
   [[deprecated("Call StartAutomaticCapture with a HttpCamera instead.")]]
   static cs::AxisCamera AddAxisCamera(std::string_view name,
                                       std::initializer_list<T> hosts);
+  WPI_UNIGNORE_DEPRECATED
 
   /**
    * Adds a virtual camera for switching between two streams.  Unlike the
