@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package edu.wpi.first.epilogue.logging;
 
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
@@ -45,7 +49,6 @@ public class FileLogger implements DataLogger {
   @SuppressWarnings("unchecked")
   private <E extends DataLogEntry> E getEntry(
       String identifier, BiFunction<DataLog, String, ? extends E> ctor) {
-
     if (m_entries.get(identifier) != null) {
       return (E) m_entries.get(identifier);
     }
