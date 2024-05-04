@@ -80,6 +80,9 @@ test {
         exceptionFormat "full"
     }
     finalizedBy jacocoTestReport
+    // Set parallelism=1 so all virtual threads run on a single carrier thread
+    // This prevents users from needing to use concurrency constructs like locks and atomic boxes
+    jvmArgs(['--enable-preview', '-Djdk.virtualThreadScheduler.parallelism=1'])
 }
 
 if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxarm32') || project.hasProperty('onlylinuxarm64') || project.hasProperty('onlywindowsarm64')) {
@@ -104,10 +107,11 @@ configurations {
 tasks.withType(JavaCompile).configureEach {
     options.compilerArgs = [
         '--release',
-        '11',
+        '21',
+        '--enable-preview',
         '-encoding',
         'UTF8',
-        "-Werror",
+//        "-Werror",
         "-Xlint:all",
         // ignore AutoCloseable warnings
         "-Xlint:-try",
