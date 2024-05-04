@@ -6,25 +6,12 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include <chrono>
-#include <fmt/chrono.h>
-#include <fmt/ostream.h>
-
 #include "wpi/Chrono.h"
 #include "gtest/gtest.h"
 
 using namespace wpi;
 using namespace wpi::sys;
 using namespace std::chrono;
-
-namespace std::chrono {
-
-template <typename Clock, typename Duration>
-void PrintTo(const std::chrono::time_point<Clock, Duration>& time_point, std::ostream* os) {
-  fmt::print(*os, "{}", time_point);
-}
-
-}  // namespace std::chrono
 
 namespace {
 
