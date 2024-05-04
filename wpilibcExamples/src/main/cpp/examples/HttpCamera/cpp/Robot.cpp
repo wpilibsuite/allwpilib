@@ -10,16 +10,17 @@
 
 /**
  * This is a demo program showing the use of OpenCV to do vision processing. The
- * image is acquired from the Axis camera, then a rectangle is put on the image
+ * image is acquired from an HTTP camera, then a rectangle is put on the image
  * and sent to the dashboard. OpenCV has many methods for different types of
  * processing.
  */
 class Robot : public frc::TimedRobot {
  private:
   static void VisionThread() {
-    // Get the Axis camera from CameraServer
-    cs::AxisCamera camera =
-        frc::CameraServer::AddAxisCamera("axis-camera.local");
+    // Create an HTTP camera
+    cs::HttpCamera camera{"My Camera", "http://10.x.y.11/video/stream.mjpg"};
+    // Start capturing images
+    frc::CameraServer::StartAutomaticCapture(camera);
     // Set the resolution
     camera.SetResolution(640, 480);
 
