@@ -4,6 +4,8 @@
 
 package edu.wpi.first.math;
 
+import java.util.Objects;
+
 /**
  * Represents a pair of two objects.
  *
@@ -70,7 +72,7 @@ public class Pair<A, B> {
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof Pair) {
-      return m_first.equals((Pair) obj.getFirst()) && m_second.equals((Pair) obj.getSecond());
+      return m_first.equals(((Pair) obj).getFirst()) && m_second.equals(((Pair) obj).getSecond());
     }
     return false;
   }
