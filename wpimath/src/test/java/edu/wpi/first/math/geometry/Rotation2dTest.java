@@ -43,8 +43,8 @@ class Rotation2dTest {
 
   @Test
   void testRotateByFromZero() {
-    var zero = new Rotation2d();
-    var rotated = zero.rotateBy(Rotation2d.fromDegrees(90.0));
+    var zero = Rotation2d.kZero;
+    var rotated = zero.rotateBy(Rotation2d.kCCW_Pi_2);
 
     assertAll(
         () -> assertEquals(Math.PI / 2.0, rotated.getRadians(), kEpsilon),
@@ -53,7 +53,7 @@ class Rotation2dTest {
 
   @Test
   void testRotateByNonZero() {
-    var rot = Rotation2d.fromDegrees(90.0);
+    var rot = Rotation2d.kCCW_Pi_2;
     rot = rot.plus(Rotation2d.fromDegrees(30.0));
 
     assertEquals(120.0, rot.getDegrees(), kEpsilon);

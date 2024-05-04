@@ -65,7 +65,7 @@ public class SwerveDriveKinematics
   private final int m_numModules;
   private final Translation2d[] m_modules;
   private Rotation2d[] m_moduleHeadings;
-  private Translation2d m_prevCoR = new Translation2d();
+  private Translation2d m_prevCoR = Translation2d.kZero;
 
   /**
    * Constructs a swerve drive kinematics object. This takes in a variable number of module
@@ -84,7 +84,7 @@ public class SwerveDriveKinematics
     m_numModules = moduleTranslationsMeters.length;
     m_modules = Arrays.copyOf(moduleTranslationsMeters, m_numModules);
     m_moduleHeadings = new Rotation2d[m_numModules];
-    Arrays.fill(m_moduleHeadings, new Rotation2d());
+    Arrays.fill(m_moduleHeadings, Rotation2d.kZero);
     m_inverseKinematics = new SimpleMatrix(m_numModules * 2, 3);
 
     for (int i = 0; i < m_numModules; i++) {
@@ -196,7 +196,7 @@ public class SwerveDriveKinematics
    * @return An array containing the module states.
    */
   public SwerveModuleState[] toSwerveModuleStates(ChassisSpeeds chassisSpeeds) {
-    return toSwerveModuleStates(chassisSpeeds, new Translation2d());
+    return toSwerveModuleStates(chassisSpeeds, Translation2d.kZero);
   }
 
   @Override

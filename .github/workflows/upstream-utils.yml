@@ -70,6 +70,10 @@ jobs:
         run: |
           cd upstream_utils
           ./update_protobuf.py
+      - name: Run update_sleipnir.py
+        run: |
+          cd upstream_utils
+          ./update_sleipnir.py
       - name: Add untracked files to index so they count as changes
         run: git add -A
       - name: Check output

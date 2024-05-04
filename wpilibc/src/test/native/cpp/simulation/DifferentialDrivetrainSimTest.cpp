@@ -7,8 +7,8 @@
 #include <units/math.h>
 #include <units/moment_of_inertia.h>
 
+#include "frc/controller/LTVUnicycleController.h"
 #include "frc/controller/LinearPlantInversionFeedforward.h"
-#include "frc/controller/RamseteController.h"
 #include "frc/kinematics/DifferentialDriveKinematics.h"
 #include "frc/simulation/DifferentialDrivetrainSim.h"
 #include "frc/system/NumericalIntegration.h"
@@ -28,7 +28,7 @@ TEST(DifferentialDrivetrainSimTest, Convergence) {
       1.0,   2_in,  {0.001, 0.001, 0.0001, 0.1, 0.1, 0.005, 0.005}};
 
   frc::LinearPlantInversionFeedforward feedforward{plant, 20_ms};
-  frc::RamseteController ramsete;
+  frc::LTVUnicycleController feedback{20_ms};
 
   feedforward.Reset(frc::Vectord<2>{0.0, 0.0});
 
@@ -44,9 +44,9 @@ TEST(DifferentialDrivetrainSimTest, Convergence) {
 
   for (auto t = 0_s; t < trajectory.TotalTime(); t += 20_ms) {
     auto state = trajectory.Sample(t);
-    auto ramseteOut = ramsete.Calculate(sim.GetPose(), state);
+    auto feedbackOut = feedback.Calculate(sim.GetPose(), state);
 
-    auto [l, r] = kinematics.ToWheelSpeeds(ramseteOut);
+    auto [l, r] = kinematics.ToWheelSpeeds(feedbackOut);
     auto voltages =
         feedforward.Calculate(frc::Vectord<2>{l.value(), r.value()});
 

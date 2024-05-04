@@ -32,6 +32,55 @@ import java.util.Objects;
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Rotation2d
     implements Interpolatable<Rotation2d>, ProtobufSerializable, StructSerializable {
+  /**
+   * A preallocated Rotation2d representing no rotation.
+   *
+   * <p>This exists to avoid allocations for common rotations.
+   */
+  public static final Rotation2d kZero = new Rotation2d();
+
+  /**
+   * A preallocated Rotation2d representing a clockwise rotation by π/2 rad (90°).
+   *
+   * <p>This exists to avoid allocations for common rotations.
+   */
+  public static final Rotation2d kCW_Pi_2 = new Rotation2d(-Math.PI / 2);
+
+  /**
+   * A preallocated Rotation2d representing a clockwise rotation by 90° (π/2 rad).
+   *
+   * <p>This exists to avoid allocations for common rotations.
+   */
+  public static final Rotation2d kCW_90deg = kCW_Pi_2;
+
+  /**
+   * A preallocated Rotation2d representing a counterclockwise rotation by π/2 rad (90°).
+   *
+   * <p>This exists to avoid allocations for common rotations.
+   */
+  public static final Rotation2d kCCW_Pi_2 = new Rotation2d(Math.PI / 2);
+
+  /**
+   * A preallocated Rotation2d representing a counterclockwise rotation by 90° (π/2 rad).
+   *
+   * <p>This exists to avoid allocations for common rotations.
+   */
+  public static final Rotation2d kCCW_90deg = kCCW_Pi_2;
+
+  /**
+   * A preallocated Rotation2d representing a counterclockwise rotation by π rad (180°).
+   *
+   * <p>This exists to avoid allocations for common rotations.
+   */
+  public static final Rotation2d kPi = new Rotation2d(Math.PI);
+
+  /**
+   * A preallocated Rotation2d representing a counterclockwise rotation by 180° (π rad).
+   *
+   * <p>This exists to avoid allocations for common rotations.
+   */
+  public static final Rotation2d k180deg = kPi;
+
   private final double m_value;
   private final double m_cos;
   private final double m_sin;
