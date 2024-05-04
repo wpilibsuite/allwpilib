@@ -69,8 +69,8 @@ public class Pair<A, B> {
    */
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof Pair pair) {
-      return m_first.equals(pair.getFirst()) && m_second.equals(pair.getSecond());
+    if (obj instanceof Pair) {
+      return m_first.equals((Pair) obj.getFirst()) && m_second.equals((Pair) obj.getSecond());
     }
     return false;
   }
