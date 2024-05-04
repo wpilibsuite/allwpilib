@@ -335,7 +335,7 @@ class CommandScheduler final : public wpi::Sendable,
 
   /**
    * Prints list of epochs added so far and their times.
-  */
+   */
   void PrintWatchdogEpochs();
 
   /**
