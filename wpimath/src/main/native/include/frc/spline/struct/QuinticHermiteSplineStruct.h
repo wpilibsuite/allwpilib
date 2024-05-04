@@ -24,3 +24,5 @@ struct WPILIB_DLLEXPORT wpi::Struct<frc::QuinticHermiteSpline> {
   static void Pack(std::span<uint8_t> data,
                    const frc::QuinticHermiteSpline& value);
 };
+
+static_assert(wpi::StructSerializable<frc::QuinticHermiteSpline>);

@@ -25,3 +25,5 @@ struct WPILIB_DLLEXPORT wpi::Struct<frc::DifferentialDriveFeedforward> {
   static void Pack(std::span<uint8_t> data,
                    const frc::DifferentialDriveFeedforward& value);
 };
+
+static_assert(wpi::StructSerializable<frc::DifferentialDriveFeedforward>);

@@ -28,4 +28,9 @@ struct WPILIB_DLLEXPORT wpi::Struct<frc::SimpleMotorFeedforward<Distance>> {
                    const frc::SimpleMotorFeedforward<Distance>& value);
 };
 
+static_assert(
+    wpi::StructSerializable<frc::SimpleMotorFeedforward<units::meters>>);
+static_assert(
+    wpi::StructSerializable<frc::SimpleMotorFeedforward<units::feet>>);
+
 #include "frc/controller/struct/SimpleMotorFeedforwardStruct.inc"
