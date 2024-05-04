@@ -24,6 +24,8 @@ dependencies {
     implementation project(':wpilibNewCommands')
     implementation project(':romiVendordep')
     implementation project(':xrpVendordep')
+    implementation project(':epilogue-runtime')
+    annotationProcessor project(':epilogue-processor')
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
