@@ -27,7 +27,8 @@ public class Robot extends TimedRobot {
     m_visionThread =
         new Thread(
             () -> {
-              // Create an HTTP camera
+              // Create an HTTP camera. The address will need to be modified to have the correct
+              // team number. The exact path will depend on the source.
               HttpCamera camera =
                   new HttpCamera("HTTP Camera", "http://10.x.y.11/video/stream.mjpg");
               // Start capturing images
@@ -37,7 +38,7 @@ public class Robot extends TimedRobot {
 
               // Get a CvSink. This will capture Mats from the camera
               CvSink cvSink = CameraServer.getVideo();
-              // Setup a CvSource. This will send images back  to the Dashboard
+              // Setup a CvSource. This will send images back to the Dashboard
               CvSource outputStream = CameraServer.putVideo("Rectangle", 640, 480);
 
               // Mats are very memory expensive. Lets reuse this Mat.

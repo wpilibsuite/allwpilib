@@ -17,7 +17,8 @@
 class Robot : public frc::TimedRobot {
  private:
   static void VisionThread() {
-    // Create an HTTP camera
+    // Create an HTTP camera. The address will need to be modified to have the
+    // correct team number. The exact path will depend on the source.
     cs::HttpCamera camera{"My Camera", "http://10.x.y.11/video/stream.mjpg"};
     // Start capturing images
     frc::CameraServer::StartAutomaticCapture(camera);
