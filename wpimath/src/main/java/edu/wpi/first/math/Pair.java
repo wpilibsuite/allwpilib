@@ -74,4 +74,9 @@ public class Pair<A, B> {
     }
     return false;
   }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(m_first, m_second);
+  }
 }
