@@ -30,9 +30,6 @@
 #include "wpi/string.h"
 #include "wpi/struct/Struct.h"
 #include "wpi/timestamp.h"
-#endif  // __cplusplus
-
-#ifdef __cplusplus
 
 namespace wpi {
 class Logger;
