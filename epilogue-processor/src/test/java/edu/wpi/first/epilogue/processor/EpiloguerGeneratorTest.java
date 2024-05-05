@@ -57,6 +57,53 @@ class EpiloguerGeneratorTest {
     assertGeneratedEpiloguerContents(source, expected);
   }
 
+  /** Subclassing RobotBase should not generate the bind() method because it lacks addPeriodic(). */
+  @Test
+  void robotBase() {
+    String source =
+        """
+          package edu.wpi.first.epilogue;
+
+          @Epilogue
+          class HelloWorld extends edu.wpi.first.wpilibj.RobotBase {
+            @Override
+            public void startCompetition() {}
+            @Override
+            public void endCompetition() {}
+          }
+          """;
+
+    String expected =
+        """
+        package edu.wpi.first.epilogue;
+
+        import edu.wpi.first.epilogue.HelloWorldLogger;
+
+        public final class Epiloguer {
+          private static final EpilogueConfiguration config = new EpilogueConfiguration();
+
+          public static final HelloWorldLogger helloWorldLogger = new HelloWorldLogger();
+
+          public static void configure(java.util.function.Consumer<EpilogueConfiguration> configurator) {
+            configurator.accept(config);
+          }
+
+          public static EpilogueConfiguration getConfig() {
+            return config;
+          }
+
+          /**
+           * Checks if data associated with a given importance level should be logged.
+           */
+          public static boolean shouldLog(Epilogue.Importance importance) {
+            return importance.compareTo(config.minimumImportance) >= 0;
+          }
+        }
+        """;
+
+    assertGeneratedEpiloguerContents(source, expected);
+  }
+
   @Test
   void timedRobot() {
     String source =
