@@ -56,14 +56,19 @@ class WPILIB_DLLEXPORT RamseteController {
    *             convergence more aggressive like a proportional term.
    * @param zeta Tuning parameter (0 rad⁻¹ < zeta < 1 rad⁻¹) for which larger
    *             values provide more damping in response.
+   * @deprecated Use LTVUnicycleController instead.
    */
+  [[deprecated("Use LTVUnicycleController instead.")]]
   RamseteController(units::unit_t<b_unit> b, units::unit_t<zeta_unit> zeta);
 
   /**
    * Construct a Ramsete unicycle controller. The default arguments for
    * b and zeta of 2.0 rad²/m² and 0.7 rad⁻¹ have been well-tested to produce
    * desirable results.
+   *
+   * @deprecated Use LTVUnicycleController instead.
    */
+  [[deprecated("Use LTVUnicycleController instead.")]]
   RamseteController();
 
   /**

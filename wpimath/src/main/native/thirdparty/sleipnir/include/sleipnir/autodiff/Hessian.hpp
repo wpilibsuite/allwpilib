@@ -3,7 +3,6 @@
 #pragma once
 
 #include <utility>
-#include <vector>
 
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
@@ -13,6 +12,7 @@
 #include "sleipnir/autodiff/Profiler.hpp"
 #include "sleipnir/autodiff/Variable.hpp"
 #include "sleipnir/autodiff/VariableMatrix.hpp"
+#include "sleipnir/util/SmallVector.hpp"
 #include "sleipnir/util/SymbolExports.hpp"
 
 namespace sleipnir {
@@ -36,7 +36,7 @@ class SLEIPNIR_DLLEXPORT Hessian {
   Hessian(Variable variable, const VariableMatrix& wrt) noexcept
       : m_jacobian{
             [&] {
-              std::vector<detail::ExpressionPtr> wrtVec;
+              small_vector<detail::ExpressionPtr> wrtVec;
               wrtVec.reserve(wrt.size());
               for (auto& elem : wrt) {
                 wrtVec.emplace_back(elem.expr);

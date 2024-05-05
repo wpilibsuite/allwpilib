@@ -20,7 +20,7 @@ namespace frc {
 class WPILIB_DLLEXPORT Rotation3d {
  public:
   /**
-   * Constructs a Rotation3d with a default angle of 0 degrees.
+   * Constructs a Rotation3d representing no rotation.
    */
   Rotation3d() = default;
 

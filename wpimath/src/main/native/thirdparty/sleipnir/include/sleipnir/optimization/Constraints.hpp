@@ -4,11 +4,11 @@
 
 #include <algorithm>
 #include <concepts>
-#include <vector>
 
 #include "sleipnir/autodiff/Variable.hpp"
 #include "sleipnir/util/Assert.hpp"
 #include "sleipnir/util/Concepts.hpp"
+#include "sleipnir/util/SmallVector.hpp"
 #include "sleipnir/util/SymbolExports.hpp"
 
 namespace sleipnir {
@@ -28,8 +28,8 @@ template <typename LHS, typename RHS>
   requires(ScalarLike<LHS> || MatrixLike<LHS>) &&
           (ScalarLike<RHS> || MatrixLike<RHS>) &&
           (!std::same_as<LHS, double> || !std::same_as<RHS, double>)
-std::vector<Variable> MakeConstraints(const LHS& lhs, const RHS& rhs) {
-  std::vector<Variable> constraints;
+small_vector<Variable> MakeConstraints(const LHS& lhs, const RHS& rhs) {
+  small_vector<Variable> constraints;
 
   if constexpr (ScalarLike<LHS> && ScalarLike<RHS>) {
     constraints.emplace_back(lhs - rhs);
@@ -113,7 +113,7 @@ std::vector<Variable> MakeConstraints(const LHS& lhs, const RHS& rhs) {
  */
 struct SLEIPNIR_DLLEXPORT EqualityConstraints {
   /// A vector of scalar equality constraints.
-  std::vector<Variable> constraints;
+  small_vector<Variable> constraints;
 
   /**
    * Constructs an equality constraint from a left and right side.
@@ -146,7 +146,7 @@ struct SLEIPNIR_DLLEXPORT EqualityConstraints {
  */
 struct SLEIPNIR_DLLEXPORT InequalityConstraints {
   /// A vector of scalar inequality constraints.
-  std::vector<Variable> constraints;
+  small_vector<Variable> constraints;
 
   /**
    * Constructs an inequality constraint from a left and right side.

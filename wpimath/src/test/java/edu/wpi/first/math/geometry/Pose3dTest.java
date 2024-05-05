@@ -51,17 +51,11 @@ class Pose3dTest {
 
   @Test
   void testTransformByRotations() {
-    var initialPose =
-        new Pose3d(
-            new Translation3d(0.0, 0.0, 0.0),
-            new Rotation3d(
-                Units.degreesToRadians(0.0),
-                Units.degreesToRadians(0.0),
-                Units.degreesToRadians(0.0)));
+    var initialPose = Pose3d.kZero;
 
     var transform1 =
         new Transform3d(
-            new Translation3d(0.0, 0.0, 0.0),
+            Translation3d.kZero,
             new Rotation3d(
                 Units.degreesToRadians(90.0),
                 Units.degreesToRadians(45.0),
@@ -69,7 +63,7 @@ class Pose3dTest {
 
     var transform2 =
         new Transform3d(
-            new Translation3d(0.0, 0.0, 0.0),
+            Translation3d.kZero,
             new Rotation3d(
                 Units.degreesToRadians(-90.0),
                 Units.degreesToRadians(0.0),
@@ -77,7 +71,7 @@ class Pose3dTest {
 
     var transform3 =
         new Transform3d(
-            new Translation3d(0.0, 0.0, 0.0),
+            Translation3d.kZero,
             new Rotation3d(
                 Units.degreesToRadians(0.0),
                 Units.degreesToRadians(-45.0),

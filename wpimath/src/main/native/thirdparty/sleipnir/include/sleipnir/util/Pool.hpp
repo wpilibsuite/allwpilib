@@ -4,8 +4,8 @@
 
 #include <cstddef>
 #include <memory>
-#include <vector>
 
+#include "sleipnir/util/SmallVector.hpp"
 #include "sleipnir/util/SymbolExports.hpp"
 
 namespace sleipnir {
@@ -76,8 +76,8 @@ class SLEIPNIR_DLLEXPORT PoolResource {
   }
 
  private:
-  std::vector<std::unique_ptr<std::byte[]>> m_buffer;
-  std::vector<void*> m_freeList;
+  small_vector<std::unique_ptr<std::byte[]>> m_buffer;
+  small_vector<void*> m_freeList;
   size_t blocksPerChunk;
 
   /**
