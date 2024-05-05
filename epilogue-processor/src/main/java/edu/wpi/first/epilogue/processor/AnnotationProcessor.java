@@ -42,6 +42,11 @@ import javax.tools.Diagnostic;
 @SupportedSourceVersion(SourceVersion.RELEASE_17)
 @AutoService(Processor.class)
 public class AnnotationProcessor extends AbstractProcessor {
+  private static final String kCustomLoggerFqn = "edu.wpi.first.epilogue.CustomLoggerFor";
+  private static final String kClassSpecificLoggerFqn =
+      "edu.wpi.first.epilogue.logging.ClassSpecificLogger";
+  private static final String kEpilogueFqn = "edu.wpi.first.epilogue.Epilogue";
+
   private EpiloguerGenerator m_epiloguerGenerator;
   private LoggerGenerator m_loggerGenerator;
   private List<ElementHandler> m_handlers;
@@ -56,7 +61,7 @@ public class AnnotationProcessor extends AbstractProcessor {
     Map<TypeMirror, DeclaredType> customLoggers = new HashMap<>();
 
     annotations.stream()
-        .filter(ann -> "CustomLoggerFor".contentEquals(ann.getSimpleName()))
+        .filter(ann -> kCustomLoggerFqn.contentEquals(ann.getQualifiedName()))
         .findAny()
         .ifPresent(
             customLogger -> {
@@ -75,8 +80,7 @@ public class AnnotationProcessor extends AbstractProcessor {
                             .erasure(
                                 processingEnv
                                     .getElementUtils()
-                                    .getTypeElement(
-                                        "edu.wpi.first.epilogue.logging.ClassSpecificLogger")
+                                    .getTypeElement(kClassSpecificLoggerFqn)
                                     .asType())))
         .filter(e -> e.getAnnotation(CustomLoggerFor.class) == null)
         .forEach(
@@ -110,7 +114,7 @@ public class AnnotationProcessor extends AbstractProcessor {
     m_loggerGenerator = new LoggerGenerator(processingEnv, m_handlers);
 
     annotations.stream()
-        .filter(ann -> "Epilogue".contentEquals(ann.getSimpleName()))
+        .filter(ann -> kEpilogueFqn.contentEquals(ann.getQualifiedName()))
         .findAny()
         .ifPresent(
             epilogue -> {
