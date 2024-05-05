@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Wed, 24 Apr 2024 15:56:06 -0700
-Subject: [PATCH] Remove "using enum" declarations
+Subject: [PATCH 1/2] Remove "using enum" declarations
 
 ---
  include/sleipnir/autodiff/Expression.hpp      | 161 +++++++-----------
@@ -9,7 +9,7 @@ Subject: [PATCH] Remove "using enum" declarations
  2 files changed, 73 insertions(+), 110 deletions(-)
 
 diff --git a/include/sleipnir/autodiff/Expression.hpp b/include/sleipnir/autodiff/Expression.hpp
-index ff904cec61315b244e3302ccc8ba68e2a6f6a3a3..460be3791c084cf30c979fe8ca53d27c72ac71ee 100644
+index b60226ccffef9ac161727483ebca3d53df09dec2..fc503c10a209b4779e204e598d3bae45d27916cb 100644
 --- a/include/sleipnir/autodiff/Expression.hpp
 +++ b/include/sleipnir/autodiff/Expression.hpp
 @@ -192,8 +192,6 @@ struct SLEIPNIR_DLLEXPORT Expression {

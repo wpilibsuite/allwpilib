@@ -20,13 +20,20 @@ import java.util.Objects;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, StructSerializable {
+  /**
+   * A preallocated Pose3d representing the origin.
+   *
+   * <p>This exists to avoid allocations for common poses.
+   */
+  public static final Pose3d kZero = new Pose3d();
+
   private final Translation3d m_translation;
   private final Rotation3d m_rotation;
 
   /** Constructs a pose at the origin facing toward the positive X axis. */
   public Pose3d() {
-    m_translation = new Translation3d();
-    m_rotation = new Rotation3d();
+    m_translation = Translation3d.kZero;
+    m_rotation = Rotation3d.kZero;
   }
 
   /**

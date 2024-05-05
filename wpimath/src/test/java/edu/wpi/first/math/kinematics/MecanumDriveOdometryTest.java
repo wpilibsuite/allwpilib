@@ -28,16 +28,16 @@ class MecanumDriveOdometryTest {
   private final MecanumDriveWheelPositions zero = new MecanumDriveWheelPositions();
 
   private final MecanumDriveOdometry m_odometry =
-      new MecanumDriveOdometry(m_kinematics, new Rotation2d(), zero);
+      new MecanumDriveOdometry(m_kinematics, Rotation2d.kZero, zero);
 
   @Test
   void testMultipleConsecutiveUpdates() {
     var wheelPositions = new MecanumDriveWheelPositions(3.536, 3.536, 3.536, 3.536);
 
-    m_odometry.resetPosition(new Rotation2d(), wheelPositions, new Pose2d());
+    m_odometry.resetPosition(Rotation2d.kZero, wheelPositions, Pose2d.kZero);
 
-    m_odometry.update(new Rotation2d(), wheelPositions);
-    var secondPose = m_odometry.update(new Rotation2d(), wheelPositions);
+    m_odometry.update(Rotation2d.kZero, wheelPositions);
+    var secondPose = m_odometry.update(Rotation2d.kZero, wheelPositions);
 
     assertAll(
         () -> assertEquals(secondPose.getX(), 0.0, 0.01),
@@ -49,10 +49,10 @@ class MecanumDriveOdometryTest {
   void testTwoIterations() {
     // 5 units/sec  in the x-axis (forward)
     final var wheelPositions = new MecanumDriveWheelPositions(0.3536, 0.3536, 0.3536, 0.3536);
-    m_odometry.resetPosition(new Rotation2d(), new MecanumDriveWheelPositions(), new Pose2d());
+    m_odometry.resetPosition(Rotation2d.kZero, new MecanumDriveWheelPositions(), Pose2d.kZero);
 
-    m_odometry.update(new Rotation2d(), new MecanumDriveWheelPositions());
-    var pose = m_odometry.update(new Rotation2d(), wheelPositions);
+    m_odometry.update(Rotation2d.kZero, new MecanumDriveWheelPositions());
+    var pose = m_odometry.update(Rotation2d.kZero, wheelPositions);
 
     assertAll(
         () -> assertEquals(0.3536, pose.getX(), 0.01),
@@ -65,10 +65,10 @@ class MecanumDriveOdometryTest {
     // This is a 90 degree turn about the point between front left and rear left wheels
     // fl -13.328649 fr 39.985946 rl -13.328649 rr 39.985946
     final var wheelPositions = new MecanumDriveWheelPositions(-13.328, 39.986, -13.329, 39.986);
-    m_odometry.resetPosition(new Rotation2d(), new MecanumDriveWheelPositions(), new Pose2d());
+    m_odometry.resetPosition(Rotation2d.kZero, new MecanumDriveWheelPositions(), Pose2d.kZero);
 
-    m_odometry.update(new Rotation2d(), new MecanumDriveWheelPositions());
-    final var pose = m_odometry.update(Rotation2d.fromDegrees(90.0), wheelPositions);
+    m_odometry.update(Rotation2d.kZero, new MecanumDriveWheelPositions());
+    final var pose = m_odometry.update(Rotation2d.kCCW_Pi_2, wheelPositions);
 
     assertAll(
         () -> assertEquals(8.4855, pose.getX(), 0.01),
@@ -78,10 +78,10 @@ class MecanumDriveOdometryTest {
 
   @Test
   void testGyroAngleReset() {
-    var gyro = Rotation2d.fromDegrees(90.0);
-    var fieldAngle = Rotation2d.fromDegrees(0.0);
+    var gyro = Rotation2d.kCCW_Pi_2;
+    var fieldAngle = Rotation2d.kZero;
     m_odometry.resetPosition(
-        gyro, new MecanumDriveWheelPositions(), new Pose2d(new Translation2d(), fieldAngle));
+        gyro, new MecanumDriveWheelPositions(), new Pose2d(Translation2d.kZero, fieldAngle));
     var speeds = new MecanumDriveWheelPositions(3.536, 3.536, 3.536, 3.536);
     m_odometry.update(gyro, new MecanumDriveWheelPositions());
     var pose = m_odometry.update(gyro, speeds);
@@ -102,17 +102,17 @@ class MecanumDriveOdometryTest {
     var wheelPositions = new MecanumDriveWheelPositions();
 
     var odometry =
-        new MecanumDriveOdometry(kinematics, new Rotation2d(), wheelPositions, new Pose2d());
+        new MecanumDriveOdometry(kinematics, Rotation2d.kZero, wheelPositions, Pose2d.kZero);
 
     var trajectory =
         TrajectoryGenerator.generateTrajectory(
             List.of(
-                new Pose2d(),
-                new Pose2d(20, 20, Rotation2d.fromDegrees(0)),
-                new Pose2d(10, 10, Rotation2d.fromDegrees(180)),
-                new Pose2d(30, 30, Rotation2d.fromDegrees(0)),
-                new Pose2d(20, 20, Rotation2d.fromDegrees(180)),
-                new Pose2d(10, 10, Rotation2d.fromDegrees(0))),
+                Pose2d.kZero,
+                new Pose2d(20, 20, Rotation2d.kZero),
+                new Pose2d(10, 10, Rotation2d.kPi),
+                new Pose2d(30, 30, Rotation2d.kZero),
+                new Pose2d(20, 20, Rotation2d.kPi),
+                new Pose2d(10, 10, Rotation2d.kZero)),
             new TrajectoryConfig(0.5, 2));
 
     var rand = new Random(5190);
@@ -191,17 +191,17 @@ class MecanumDriveOdometryTest {
     var wheelPositions = new MecanumDriveWheelPositions();
 
     var odometry =
-        new MecanumDriveOdometry(kinematics, new Rotation2d(), wheelPositions, new Pose2d());
+        new MecanumDriveOdometry(kinematics, Rotation2d.kZero, wheelPositions, Pose2d.kZero);
 
     var trajectory =
         TrajectoryGenerator.generateTrajectory(
             List.of(
-                new Pose2d(),
-                new Pose2d(20, 20, Rotation2d.fromDegrees(0)),
-                new Pose2d(10, 10, Rotation2d.fromDegrees(180)),
-                new Pose2d(30, 30, Rotation2d.fromDegrees(0)),
-                new Pose2d(20, 20, Rotation2d.fromDegrees(180)),
-                new Pose2d(10, 10, Rotation2d.fromDegrees(0))),
+                Pose2d.kZero,
+                new Pose2d(20, 20, Rotation2d.kZero),
+                new Pose2d(10, 10, Rotation2d.kPi),
+                new Pose2d(30, 30, Rotation2d.kZero),
+                new Pose2d(20, 20, Rotation2d.kPi),
+                new Pose2d(10, 10, Rotation2d.kZero)),
             new TrajectoryConfig(0.5, 2));
 
     var rand = new Random(5190);

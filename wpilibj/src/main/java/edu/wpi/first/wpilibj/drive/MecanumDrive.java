@@ -181,7 +181,7 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
    *     positive.
    */
   public void driveCartesian(double xSpeed, double ySpeed, double zRotation) {
-    driveCartesian(xSpeed, ySpeed, zRotation, new Rotation2d());
+    driveCartesian(xSpeed, ySpeed, zRotation, Rotation2d.kZero);
   }
 
   /**
@@ -240,7 +240,7 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
     }
 
     driveCartesian(
-        magnitude * angle.getCos(), magnitude * angle.getSin(), zRotation, new Rotation2d());
+        magnitude * angle.getCos(), magnitude * angle.getSin(), zRotation, Rotation2d.kZero);
   }
 
   /**
@@ -256,7 +256,7 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
    * @return Wheel speeds [-1.0..1.0].
    */
   public static WheelSpeeds driveCartesianIK(double xSpeed, double ySpeed, double zRotation) {
-    return driveCartesianIK(xSpeed, ySpeed, zRotation, new Rotation2d());
+    return driveCartesianIK(xSpeed, ySpeed, zRotation, Rotation2d.kZero);
   }
 
   /**

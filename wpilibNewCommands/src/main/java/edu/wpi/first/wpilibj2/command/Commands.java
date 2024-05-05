@@ -94,6 +94,19 @@ public final class Commands {
   }
 
   /**
+   * Constructs a command that runs an action once, and then runs an action every iteration until
+   * interrupted.
+   *
+   * @param start the action to run on start
+   * @param run the action to run every iteration
+   * @param requirements subsystems the action requires
+   * @return the command
+   */
+  public static Command startRun(Runnable start, Runnable run, Subsystem... requirements) {
+    return new FunctionalCommand(start, run, interrupted -> {}, () -> false, requirements);
+  }
+
+  /**
    * Constructs a command that prints a message and finishes.
    *
    * @param message the message to print
@@ -186,8 +199,13 @@ public final class Commands {
    *
    * @param supplier the command supplier
    * @return the command
+   * @deprecated The ProxyCommand supplier constructor has been deprecated in favor of directly
+   *     proxying a {@link DeferredCommand}, see ProxyCommand documentaion for more details. As a
+   *     replacement, consider using `defer(supplier).asProxy()`.
    * @see ProxyCommand
    */
+  @Deprecated(since = "2025", forRemoval = true)
+  @SuppressWarnings("removal")
   public static Command deferredProxy(Supplier<Command> supplier) {
     return new ProxyCommand(supplier);
   }

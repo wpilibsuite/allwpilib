@@ -6,11 +6,11 @@
 #include <cmath>
 #include <limits>
 #include <utility>
-#include <vector>
 
 #include <Eigen/Core>
 
 #include "sleipnir/autodiff/Variable.hpp"
+#include "sleipnir/util/SmallVector.hpp"
 
 namespace sleipnir {
 
@@ -108,7 +108,7 @@ class Filter {
    */
   void Add(const FilterEntry& entry) {
     // Remove dominated entries
-    std::erase_if(m_filter, [&](const auto& elem) {
+    erase_if(m_filter, [&](const auto& elem) {
       return entry.cost <= elem.cost &&
              entry.constraintViolation <= elem.constraintViolation;
     });
@@ -123,7 +123,7 @@ class Filter {
    */
   void Add(FilterEntry&& entry) {
     // Remove dominated entries
-    std::erase_if(m_filter, [&](const auto& elem) {
+    erase_if(m_filter, [&](const auto& elem) {
       return entry.cost <= elem.cost &&
              entry.constraintViolation <= elem.constraintViolation;
     });
@@ -182,7 +182,7 @@ class Filter {
  private:
   Variable* m_f = nullptr;
   double m_μ = 0.0;
-  std::vector<FilterEntry> m_filter;
+  small_vector<FilterEntry> m_filter;
 };
 
 }  // namespace sleipnir

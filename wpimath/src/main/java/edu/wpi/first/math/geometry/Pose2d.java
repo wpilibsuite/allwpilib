@@ -26,13 +26,20 @@ import java.util.Objects;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Pose2d implements Interpolatable<Pose2d>, ProtobufSerializable, StructSerializable {
+  /**
+   * A preallocated Pose2d representing the origin.
+   *
+   * <p>This exists to avoid allocations for common poses.
+   */
+  public static final Pose2d kZero = new Pose2d();
+
   private final Translation2d m_translation;
   private final Rotation2d m_rotation;
 
   /** Constructs a pose at the origin facing toward the positive X axis. */
   public Pose2d() {
-    m_translation = new Translation2d();
-    m_rotation = new Rotation2d();
+    m_translation = Translation2d.kZero;
+    m_rotation = Rotation2d.kZero;
   }
 
   /**
