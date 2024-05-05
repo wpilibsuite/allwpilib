@@ -9,7 +9,7 @@ find_package(OpenCV REQUIRED)
 
 file(GLOB cscorecv_native_src src/main/native/cpp/*.cpp)
 
-add_library(cscorev ${cscorecv_native_src})
+add_library(cscorecv ${cscorecv_native_src})
 set_target_properties(cscorecv PROPERTIES DEBUG_POSTFIX "d")
 
 if(NOT MSVC)
