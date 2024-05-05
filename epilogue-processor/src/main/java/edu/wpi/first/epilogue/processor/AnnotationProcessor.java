@@ -279,7 +279,7 @@ public class AnnotationProcessor extends AbstractProcessor {
         processingEnv
             .getMessager()
             .printMessage(
-                Diagnostic.Kind.NOTE,
+                Diagnostic.Kind.ERROR,
                 "Logger classes must have a public no-argument constructor",
                 annotatedElement);
         continue;
