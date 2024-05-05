@@ -222,11 +222,9 @@ public class LoggerGenerator {
               handler.ifPresent(
                   h -> {
                     // May be null if the handler consumes the element but does not actually want it
-                    // to be
-                    // logged. For example, the sendable handler consumes all sendable types but
-                    // does not
-                    // log commands or subsystems, to prevent excessive warnings about unloggable
-                    // commands.
+                    // to be logged. For example, the sendable handler consumes all sendable types
+                    // but does not log commands or subsystems, to prevent excessive warnings about
+                    // unloggable commands.
                     var logInvocation = h.logInvocation(loggableElement);
                     if (logInvocation != null) {
                       out.println(logInvocation.indent(6).stripTrailing() + ";");
