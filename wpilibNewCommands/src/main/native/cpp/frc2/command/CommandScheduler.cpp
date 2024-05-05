@@ -428,6 +428,10 @@ void CommandScheduler::Enable() {
   m_impl->disabled = false;
 }
 
+void CommandScheduler::PrintWatchdogEpochs(wpi::raw_ostream& os) {
+  m_watchdog.PrintEpochs(os);
+}
+
 void CommandScheduler::OnCommandInitialize(Action action) {
   m_impl->initActions.emplace_back(std::move(action));
 }

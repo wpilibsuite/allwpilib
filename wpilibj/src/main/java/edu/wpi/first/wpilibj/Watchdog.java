@@ -8,6 +8,7 @@ import edu.wpi.first.hal.NotifierJNI;
 import java.io.Closeable;
 import java.util.PriorityQueue;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Consumer;
 
 /**
  * A class that's a wrapper around a watchdog timer.
@@ -157,6 +158,10 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
    */
   public void printEpochs() {
     m_tracer.printEpochs();
+  }
+
+  public void printEpochs(Consumer<String> output) {
+    m_tracer.printEpochs(output);
   }
 
   /**
