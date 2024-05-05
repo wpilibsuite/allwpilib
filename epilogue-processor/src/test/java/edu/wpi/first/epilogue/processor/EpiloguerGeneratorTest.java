@@ -22,7 +22,7 @@ class EpiloguerGeneratorTest {
           package edu.wpi.first.epilogue;
 
           @Logged
-          class HelloWorld {
+          class Example {
           }
           """;
 
@@ -30,12 +30,12 @@ class EpiloguerGeneratorTest {
         """
         package edu.wpi.first.epilogue;
 
-        import edu.wpi.first.epilogue.HelloWorldLogger;
+        import edu.wpi.first.epilogue.ExampleLogger;
 
         public final class Epiloguer {
           private static final EpilogueConfiguration config = new EpilogueConfiguration();
 
-          public static final HelloWorldLogger helloWorldLogger = new HelloWorldLogger();
+          public static final ExampleLogger exampleLogger = new ExampleLogger();
 
           public static void configure(java.util.function.Consumer<EpilogueConfiguration> configurator) {
             configurator.accept(config);
@@ -65,7 +65,7 @@ class EpiloguerGeneratorTest {
           package edu.wpi.first.epilogue;
 
           @Logged
-          class HelloWorld extends edu.wpi.first.wpilibj.RobotBase {
+          class Example extends edu.wpi.first.wpilibj.RobotBase {
             @Override
             public void startCompetition() {}
             @Override
@@ -77,12 +77,12 @@ class EpiloguerGeneratorTest {
         """
         package edu.wpi.first.epilogue;
 
-        import edu.wpi.first.epilogue.HelloWorldLogger;
+        import edu.wpi.first.epilogue.ExampleLogger;
 
         public final class Epiloguer {
           private static final EpilogueConfiguration config = new EpilogueConfiguration();
 
-          public static final HelloWorldLogger helloWorldLogger = new HelloWorldLogger();
+          public static final ExampleLogger exampleLogger = new ExampleLogger();
 
           public static void configure(java.util.function.Consumer<EpilogueConfiguration> configurator) {
             configurator.accept(config);
@@ -111,7 +111,7 @@ class EpiloguerGeneratorTest {
           package edu.wpi.first.epilogue;
 
           @Logged
-          class HelloWorld extends edu.wpi.first.wpilibj.TimedRobot {
+          class Example extends edu.wpi.first.wpilibj.TimedRobot {
           }
           """;
 
@@ -119,12 +119,12 @@ class EpiloguerGeneratorTest {
         """
         package edu.wpi.first.epilogue;
 
-        import edu.wpi.first.epilogue.HelloWorldLogger;
+        import edu.wpi.first.epilogue.ExampleLogger;
 
         public final class Epiloguer {
           private static final EpilogueConfiguration config = new EpilogueConfiguration();
 
-          public static final HelloWorldLogger helloWorldLogger = new HelloWorldLogger();
+          public static final ExampleLogger exampleLogger = new ExampleLogger();
 
           public static void configure(java.util.function.Consumer<EpilogueConfiguration> configurator) {
             configurator.accept(config);
@@ -149,10 +149,10 @@ class EpiloguerGeneratorTest {
            * directly from sensors will be slightly different from data used in the main robot
            * loop.
            */
-          public static void bind(edu.wpi.first.epilogue.HelloWorld robot) {
+          public static void bind(edu.wpi.first.epilogue.Example robot) {
             robot.addPeriodic(() -> {
               long start = System.nanoTime();
-              helloWorldLogger.tryUpdate(config.dataLogger.getSubLogger(config.root), robot, config.errorHandler);
+              exampleLogger.tryUpdate(config.dataLogger.getSubLogger(config.root), robot, config.errorHandler);
               edu.wpi.first.networktables.NetworkTableInstance.getDefault().getEntry("Epilogue/Stats/Last Run").setDouble((System.nanoTime() - start) / 1e6);
             }, robot.getPeriod(), robot.getPeriod() / 2);
           }
@@ -261,7 +261,7 @@ class EpiloguerGeneratorTest {
         }
 
         @Logged
-        class HelloWorld {
+        class Example {
           A a_b_or_c;
           B b;
           C c;
@@ -272,13 +272,13 @@ class EpiloguerGeneratorTest {
         """
         package edu.wpi.first.epilogue;
 
-        import edu.wpi.first.epilogue.HelloWorldLogger;
+        import edu.wpi.first.epilogue.ExampleLogger;
         import edu.wpi.first.epilogue.CustomLogger;
 
         public final class Epiloguer {
           private static final EpilogueConfiguration config = new EpilogueConfiguration();
 
-          public static final HelloWorldLogger helloWorldLogger = new HelloWorldLogger();
+          public static final ExampleLogger exampleLogger = new ExampleLogger();
           public static final CustomLogger customLogger = new CustomLogger();
 
           public static void configure(java.util.function.Consumer<EpilogueConfiguration> configurator) {

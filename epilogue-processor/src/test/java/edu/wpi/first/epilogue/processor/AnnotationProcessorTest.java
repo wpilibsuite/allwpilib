@@ -27,7 +27,7 @@ class AnnotationProcessorTest {
       package edu.wpi.first.epilogue;
 
       @Logged
-      class HelloWorld {
+      class Example {
         double x;
       }
     """;
@@ -41,13 +41,13 @@ class AnnotationProcessorTest {
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
 
-      public class HelloWorldLogger extends ClassSpecificLogger<HelloWorld> {
-        public HelloWorldLogger() {
-          super(HelloWorld.class);
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
         }
 
         @Override
-        public void update(DataLogger dataLogger, HelloWorld object) {
+        public void update(DataLogger dataLogger, Example object) {
           if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("x", object.x);
           }
@@ -65,7 +65,7 @@ class AnnotationProcessorTest {
       package edu.wpi.first.epilogue;
 
       @Logged
-      class HelloWorld {
+      class Example {
         double x;
         double y;
       }
@@ -80,13 +80,13 @@ class AnnotationProcessorTest {
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
 
-      public class HelloWorldLogger extends ClassSpecificLogger<HelloWorld> {
-        public HelloWorldLogger() {
-          super(HelloWorld.class);
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
         }
 
         @Override
-        public void update(DataLogger dataLogger, HelloWorld object) {
+        public void update(DataLogger dataLogger, Example object) {
           if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("x", object.x);
             dataLogger.log("y", object.y);
@@ -105,7 +105,7 @@ class AnnotationProcessorTest {
       package edu.wpi.first.epilogue;
 
       @Logged
-      class HelloWorld {
+      class Example {
         private double x;
       }
     """;
@@ -121,24 +121,24 @@ class AnnotationProcessorTest {
       import java.lang.invoke.MethodHandles;
       import java.lang.invoke.VarHandle;
 
-      public class HelloWorldLogger extends ClassSpecificLogger<HelloWorld> {
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
         private static final VarHandle $x;
 
         static {
           try {
-            var lookup = MethodHandles.privateLookupIn(HelloWorld.class, MethodHandles.lookup());
-            $x = lookup.findVarHandle(HelloWorld.class, "x", double.class);
+            var lookup = MethodHandles.privateLookupIn(Example.class, MethodHandles.lookup());
+            $x = lookup.findVarHandle(Example.class, "x", double.class);
           } catch (ReflectiveOperationException e) {
             throw new RuntimeException("[EPILOGUE] Could not load private fields for logging!", e);
           }
         }
 
-        public HelloWorldLogger() {
-          super(HelloWorld.class);
+        public ExampleLogger() {
+          super(Example.class);
         }
 
         @Override
-        public void update(DataLogger dataLogger, HelloWorld object) {
+        public void update(DataLogger dataLogger, Example object) {
           if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("x", (double) $x.get(object));
           }
@@ -156,7 +156,7 @@ class AnnotationProcessorTest {
       package edu.wpi.first.epilogue;
 
       @Logged
-      class HelloWorld {
+      class Example {
         private edu.wpi.first.wpilibj.smartdashboard.SendableChooser<String> chooser;
       }
       """;
@@ -172,24 +172,24 @@ class AnnotationProcessorTest {
       import java.lang.invoke.MethodHandles;
       import java.lang.invoke.VarHandle;
 
-      public class HelloWorldLogger extends ClassSpecificLogger<HelloWorld> {
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
         private static final VarHandle $chooser;
 
         static {
           try {
-            var lookup = MethodHandles.privateLookupIn(HelloWorld.class, MethodHandles.lookup());
-            $chooser = lookup.findVarHandle(HelloWorld.class, "chooser", edu.wpi.first.wpilibj.smartdashboard.SendableChooser.class);
+            var lookup = MethodHandles.privateLookupIn(Example.class, MethodHandles.lookup());
+            $chooser = lookup.findVarHandle(Example.class, "chooser", edu.wpi.first.wpilibj.smartdashboard.SendableChooser.class);
           } catch (ReflectiveOperationException e) {
             throw new RuntimeException("[EPILOGUE] Could not load private fields for logging!", e);
           }
         }
 
-        public HelloWorldLogger() {
-          super(HelloWorld.class);
+        public ExampleLogger() {
+          super(Example.class);
         }
 
         @Override
-        public void update(DataLogger dataLogger, HelloWorld object) {
+        public void update(DataLogger dataLogger, Example object) {
           if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
             logSendable(dataLogger.getSubLogger("chooser"), (edu.wpi.first.wpilibj.smartdashboard.SendableChooser<java.lang.String>) $chooser.get(object));
           }
@@ -207,7 +207,7 @@ class AnnotationProcessorTest {
       package edu.wpi.first.epilogue;
 
       @Logged(importance = Logged.Importance.INFO)
-      class HelloWorld {
+      class Example {
         @Logged(importance = Logged.Importance.DEBUG)    double low;
         @Logged(importance = Logged.Importance.INFO)     int    medium;
         @Logged(importance = Logged.Importance.CRITICAL) long   high;
@@ -223,13 +223,13 @@ class AnnotationProcessorTest {
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
 
-      public class HelloWorldLogger extends ClassSpecificLogger<HelloWorld> {
-        public HelloWorldLogger() {
-          super(HelloWorld.class);
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
         }
 
         @Override
-        public void update(DataLogger dataLogger, HelloWorld object) {
+        public void update(DataLogger dataLogger, Example object) {
           if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("low", object.low);
           }
@@ -253,7 +253,7 @@ class AnnotationProcessorTest {
       package edu.wpi.first.epilogue;
 
       @Logged
-      class HelloWorld {
+      class Example {
         enum E {
           a, b, c;
         }
@@ -271,13 +271,13 @@ class AnnotationProcessorTest {
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
 
-      public class HelloWorldLogger extends ClassSpecificLogger<HelloWorld> {
-        public HelloWorldLogger() {
-          super(HelloWorld.class);
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
         }
 
         @Override
-        public void update(DataLogger dataLogger, HelloWorld object) {
+        public void update(DataLogger dataLogger, Example object) {
           if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("enumValue", object.enumValue);
           }
@@ -295,7 +295,7 @@ class AnnotationProcessorTest {
       package edu.wpi.first.epilogue;
 
       @Logged
-      class HelloWorld {
+      class Example {
         byte x;        // Should be logged
         byte[] arr1;   // Should be logged
         byte[][] arr2; // Should not be logged
@@ -315,13 +315,13 @@ class AnnotationProcessorTest {
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
 
-      public class HelloWorldLogger extends ClassSpecificLogger<HelloWorld> {
-        public HelloWorldLogger() {
-          super(HelloWorld.class);
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
         }
 
         @Override
-        public void update(DataLogger dataLogger, HelloWorld object) {
+        public void update(DataLogger dataLogger, Example object) {
           if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("x", object.x);
             dataLogger.log("arr1", object.arr1);
@@ -342,7 +342,7 @@ class AnnotationProcessorTest {
       package edu.wpi.first.epilogue;
 
       @Logged
-      class HelloWorld {
+      class Example {
         char x;        // Should be logged
         char[] arr1;   // Should not be logged
         char[][] arr2; // Should not be logged
@@ -362,13 +362,13 @@ class AnnotationProcessorTest {
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
 
-      public class HelloWorldLogger extends ClassSpecificLogger<HelloWorld> {
-        public HelloWorldLogger() {
-          super(HelloWorld.class);
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
         }
 
         @Override
-        public void update(DataLogger dataLogger, HelloWorld object) {
+        public void update(DataLogger dataLogger, Example object) {
           if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("x", object.x);
             dataLogger.log("getX", object.getX());
@@ -387,7 +387,7 @@ class AnnotationProcessorTest {
       package edu.wpi.first.epilogue;
 
       @Logged
-      class HelloWorld {
+      class Example {
         short x;        // Should be logged
         short[] arr1;   // Should not be logged
         short[][] arr2; // Should not be logged
@@ -407,13 +407,13 @@ class AnnotationProcessorTest {
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
 
-      public class HelloWorldLogger extends ClassSpecificLogger<HelloWorld> {
-        public HelloWorldLogger() {
-          super(HelloWorld.class);
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
         }
 
         @Override
-        public void update(DataLogger dataLogger, HelloWorld object) {
+        public void update(DataLogger dataLogger, Example object) {
           if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("x", object.x);
             dataLogger.log("getX", object.getX());
@@ -432,7 +432,7 @@ class AnnotationProcessorTest {
       package edu.wpi.first.epilogue;
 
       @Logged
-      class HelloWorld {
+      class Example {
         int x;           // Should be logged
         int[] arr1;   // Should be logged
         int[][] arr2; // Should not be logged
@@ -452,13 +452,13 @@ class AnnotationProcessorTest {
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
 
-      public class HelloWorldLogger extends ClassSpecificLogger<HelloWorld> {
-        public HelloWorldLogger() {
-          super(HelloWorld.class);
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
         }
 
         @Override
-        public void update(DataLogger dataLogger, HelloWorld object) {
+        public void update(DataLogger dataLogger, Example object) {
           if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("x", object.x);
             dataLogger.log("arr1", object.arr1);
@@ -479,7 +479,7 @@ class AnnotationProcessorTest {
       package edu.wpi.first.epilogue;
 
       @Logged
-      class HelloWorld {
+      class Example {
         long x;        // Should be logged
         long[] arr1;   // Should be logged
         long[][] arr2; // Should not be logged
@@ -499,13 +499,13 @@ class AnnotationProcessorTest {
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
 
-      public class HelloWorldLogger extends ClassSpecificLogger<HelloWorld> {
-        public HelloWorldLogger() {
-          super(HelloWorld.class);
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
         }
 
         @Override
-        public void update(DataLogger dataLogger, HelloWorld object) {
+        public void update(DataLogger dataLogger, Example object) {
           if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("x", object.x);
             dataLogger.log("arr1", object.arr1);
@@ -526,7 +526,7 @@ class AnnotationProcessorTest {
       package edu.wpi.first.epilogue;
 
       @Logged
-      class HelloWorld {
+      class Example {
         float x;        // Should be logged
         float[] arr1;   // Should be logged
         float[][] arr2; // Should not be logged
@@ -546,13 +546,13 @@ class AnnotationProcessorTest {
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
 
-      public class HelloWorldLogger extends ClassSpecificLogger<HelloWorld> {
-        public HelloWorldLogger() {
-          super(HelloWorld.class);
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
         }
 
         @Override
-        public void update(DataLogger dataLogger, HelloWorld object) {
+        public void update(DataLogger dataLogger, Example object) {
           if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("x", object.x);
             dataLogger.log("arr1", object.arr1);
@@ -575,7 +575,7 @@ class AnnotationProcessorTest {
       import java.util.List;
 
       @Logged
-      class HelloWorld {
+      class Example {
         double x;        // Should be logged
         double[] arr1;   // Should be logged
         double[][] arr2; // Should not be logged
@@ -596,13 +596,13 @@ class AnnotationProcessorTest {
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
 
-      public class HelloWorldLogger extends ClassSpecificLogger<HelloWorld> {
-        public HelloWorldLogger() {
-          super(HelloWorld.class);
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
         }
 
         @Override
-        public void update(DataLogger dataLogger, HelloWorld object) {
+        public void update(DataLogger dataLogger, Example object) {
           if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("x", object.x);
             dataLogger.log("arr1", object.arr1);
@@ -624,7 +624,7 @@ class AnnotationProcessorTest {
       import java.util.List;
 
       @Logged
-      class HelloWorld {
+      class Example {
         boolean x;        // Should be logged
         boolean[] arr1;   // Should be logged
         boolean[][] arr2; // Should not be logged
@@ -645,13 +645,13 @@ class AnnotationProcessorTest {
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
 
-      public class HelloWorldLogger extends ClassSpecificLogger<HelloWorld> {
-        public HelloWorldLogger() {
-          super(HelloWorld.class);
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
         }
 
         @Override
-        public void update(DataLogger dataLogger, HelloWorld object) {
+        public void update(DataLogger dataLogger, Example object) {
           if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("x", object.x);
             dataLogger.log("arr1", object.arr1);
@@ -674,7 +674,7 @@ class AnnotationProcessorTest {
       import java.util.List;
 
       @Logged
-      class HelloWorld {
+      class Example {
         String x;         // Should be logged
         String[] arr1;   // Should be logged
         String[][] arr2; // Should not be logged
@@ -695,13 +695,13 @@ class AnnotationProcessorTest {
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
 
-      public class HelloWorldLogger extends ClassSpecificLogger<HelloWorld> {
-        public HelloWorldLogger() {
-          super(HelloWorld.class);
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
         }
 
         @Override
-        public void update(DataLogger dataLogger, HelloWorld object) {
+        public void update(DataLogger dataLogger, Example object) {
           if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("x", object.x);
             dataLogger.log("arr1", object.arr1);
@@ -727,7 +727,7 @@ class AnnotationProcessorTest {
       import java.util.List;
 
       @Logged
-      class HelloWorld {
+      class Example {
         static class Structable implements StructSerializable {
           int x, y;
 
@@ -754,19 +754,19 @@ class AnnotationProcessorTest {
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
 
-      public class HelloWorldLogger extends ClassSpecificLogger<HelloWorld> {
-        public HelloWorldLogger() {
-          super(HelloWorld.class);
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
         }
 
         @Override
-        public void update(DataLogger dataLogger, HelloWorld object) {
+        public void update(DataLogger dataLogger, Example object) {
           if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
-            dataLogger.log("x", object.x, edu.wpi.first.epilogue.HelloWorld.Structable.struct);
-            dataLogger.log("arr1", object.arr1, edu.wpi.first.epilogue.HelloWorld.Structable.struct);
-            dataLogger.log("list", object.list, edu.wpi.first.epilogue.HelloWorld.Structable.struct);
-            dataLogger.log("getX", object.getX(), edu.wpi.first.epilogue.HelloWorld.Structable.struct);
-            dataLogger.log("getArr1", object.getArr1(), edu.wpi.first.epilogue.HelloWorld.Structable.struct);
+            dataLogger.log("x", object.x, edu.wpi.first.epilogue.Example.Structable.struct);
+            dataLogger.log("arr1", object.arr1, edu.wpi.first.epilogue.Example.Structable.struct);
+            dataLogger.log("list", object.list, edu.wpi.first.epilogue.Example.Structable.struct);
+            dataLogger.log("getX", object.getX(), edu.wpi.first.epilogue.Example.Structable.struct);
+            dataLogger.log("getArr1", object.getArr1(), edu.wpi.first.epilogue.Example.Structable.struct);
           }
         }
       }
@@ -786,7 +786,7 @@ class AnnotationProcessorTest {
       import java.util.*;
 
       @Logged
-      class HelloWorld {
+      class Example {
         /* Logged */     List<String> list;
         /* Not Logged */ List<List<String>> nestedList;
         /* Not logged */ List rawList;
@@ -805,13 +805,13 @@ class AnnotationProcessorTest {
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
 
-      public class HelloWorldLogger extends ClassSpecificLogger<HelloWorld> {
-        public HelloWorldLogger() {
-          super(HelloWorld.class);
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
         }
 
         @Override
-        public void update(DataLogger dataLogger, HelloWorld object) {
+        public void update(DataLogger dataLogger, Example object) {
           if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("list", object.list);
             dataLogger.log("set", object.set);
@@ -839,7 +839,7 @@ class AnnotationProcessorTest {
       import java.util.List;
 
       @Logged
-      class HelloWorld {
+      class Example {
         /* Not logged */ List<Integer> ints;
         /* Not logged */ List<Double> doubles;
         /* Not logged */ List<Long> longs;
@@ -855,13 +855,13 @@ class AnnotationProcessorTest {
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
 
-      public class HelloWorldLogger extends ClassSpecificLogger<HelloWorld> {
-        public HelloWorldLogger() {
-          super(HelloWorld.class);
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
         }
 
         @Override
-        public void update(DataLogger dataLogger, HelloWorld object) {
+        public void update(DataLogger dataLogger, Example object) {
         }
       }
       """;
@@ -880,7 +880,7 @@ class AnnotationProcessorTest {
       import java.util.*;
 
       @Logged
-      class HelloWorld {
+      class Example {
         @Logged Map<String, String> notLoggableType;
         @Logged List rawType;
         @NotLogged List skippedUnloggable;
@@ -911,7 +911,7 @@ class AnnotationProcessorTest {
     Compilation compilation =
         javac()
             .withProcessors(new AnnotationProcessor())
-            .compile(JavaFileObjects.forSourceString("edu.wpi.first.epilogue.HelloWorld", source));
+            .compile(JavaFileObjects.forSourceString("edu.wpi.first.epilogue.Example", source));
 
     assertThat(compilation).failed();
     assertThat(compilation).hadErrorCount(10);
@@ -969,7 +969,7 @@ class AnnotationProcessorTest {
       package edu.wpi.first.epilogue;
 
       @Logged
-      class HelloWorld<T extends String> {
+      class Example<T extends String> {
         T value;
 
         public <S extends T> S upcast() { return (S) value; }
@@ -985,13 +985,13 @@ class AnnotationProcessorTest {
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
 
-      public class HelloWorldLogger extends ClassSpecificLogger<HelloWorld> {
-        public HelloWorldLogger() {
-          super(HelloWorld.class);
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
         }
 
         @Override
-        public void update(DataLogger dataLogger, HelloWorld object) {
+        public void update(DataLogger dataLogger, Example object) {
           if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("value", object.value);
             dataLogger.log("upcast", object.upcast());
@@ -1020,7 +1020,7 @@ class AnnotationProcessorTest {
       class IOImpl implements IO {}
 
       @Logged
-      public class HelloWorld {
+      public class Example {
         /* Logged */     Child child;
         /* Not Logged */ GoldenChild goldenChild;
         /* Logged */     IO io;
@@ -1037,13 +1037,13 @@ class AnnotationProcessorTest {
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
 
-      public class HelloWorldLogger extends ClassSpecificLogger<HelloWorld> {
-        public HelloWorldLogger() {
-          super(HelloWorld.class);
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
         }
 
         @Override
-        public void update(DataLogger dataLogger, HelloWorld object) {
+        public void update(DataLogger dataLogger, Example object) {
           if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
             Epiloguer.childLogger.tryUpdate(dataLogger.getSubLogger("child"), object.child, Epiloguer.getConfig().errorHandler);
             Epiloguer.ioLogger.tryUpdate(dataLogger.getSubLogger("io"), object.io, Epiloguer.getConfig().errorHandler);
@@ -1078,7 +1078,7 @@ class AnnotationProcessorTest {
         }
 
         @Logged
-        class HelloWorld {
+        class Example {
           Point point;
         }
         """;
@@ -1092,13 +1092,13 @@ class AnnotationProcessorTest {
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
 
-      public class HelloWorldLogger extends ClassSpecificLogger<HelloWorld> {
-        public HelloWorldLogger() {
-          super(HelloWorld.class);
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
         }
 
         @Override
-        public void update(DataLogger dataLogger, HelloWorld object) {
+        public void update(DataLogger dataLogger, Example object) {
           if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
             Epiloguer.customPointLogger.tryUpdate(dataLogger.getSubLogger("point"), object.point, Epiloguer.getConfig().errorHandler);
           }
@@ -1116,7 +1116,7 @@ class AnnotationProcessorTest {
         package edu.wpi.first.epilogue;
 
         @Logged
-        class HelloWorld {
+        class Example {
           Throwable t;
         }
         """;
@@ -1124,7 +1124,7 @@ class AnnotationProcessorTest {
     Compilation compilation =
         javac()
             .withProcessors(new AnnotationProcessor())
-            .compile(JavaFileObjects.forSourceString("edu.wpi.first.epilogue.HelloWorld", source));
+            .compile(JavaFileObjects.forSourceString("edu.wpi.first.epilogue.Example", source));
 
     assertThat(compilation).succeeded();
     assertEquals(1, compilation.notes().size());
@@ -1152,13 +1152,13 @@ class AnnotationProcessorTest {
             .withProcessors(new AnnotationProcessor())
             .compile(
                 JavaFileObjects.forSourceString(
-                    "edu.wpi.first.epilogue.HelloWorld", loggedClassContent));
+                    "edu.wpi.first.epilogue.Example", loggedClassContent));
 
     assertThat(compilation).succeeded();
     var generatedFiles = compilation.generatedSourceFiles();
     var generatedFile =
         generatedFiles.stream()
-            .filter(jfo -> jfo.getName().contains("HelloWorld"))
+            .filter(jfo -> jfo.getName().contains("Example"))
             .findFirst()
             .orElseThrow(() -> new IllegalStateException("Logger file was not generated!"));
     try {
