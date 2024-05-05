@@ -33,17 +33,23 @@
 #endif  // __cplusplus
 
 #ifdef __cplusplus
+
 namespace wpi {
 class Logger;
 }  // namespace wpi
+
 namespace wpi::log {
+
 namespace impl {
+
 enum ControlRecordType {
   kControlStart = 0,
   kControlFinish,
   kControlSetMetadata
 };
+
 }  // namespace impl
+
 /**
  * A data log. The log file is created immediately upon construction with a
  * temporary filename.  The file may be renamed at any time using the
@@ -86,6 +92,7 @@ class DataLog final {
    */
   explicit DataLog(std::string_view dir = "", std::string_view filename = "",
                    double period = 0.25, std::string_view extraHeader = "");
+
   /**
    * Construct a new Data Log.  The log will be initially created with a
    * temporary filename.
@@ -101,6 +108,7 @@ class DataLog final {
   explicit DataLog(wpi::Logger& msglog, std::string_view dir = "",
                    std::string_view filename = "", double period = 0.25,
                    std::string_view extraHeader = "");
+
   /**
    * Construct a new Data Log that passes its output to the provided function
    * rather than a file.  The write function will be called on a separate
@@ -114,6 +122,7 @@ class DataLog final {
    */
   explicit DataLog(std::function<void(std::span<const uint8_t> data)> write,
                    double period = 0.25, std::string_view extraHeader = "");
+
   /**
    * Construct a new Data Log that passes its output to the provided function
    * rather than a file.  The write function will be called on a separate
@@ -129,27 +138,32 @@ class DataLog final {
   explicit DataLog(wpi::Logger& msglog,
                    std::function<void(std::span<const uint8_t> data)> write,
                    double period = 0.25, std::string_view extraHeader = "");
+
   ~DataLog();
   DataLog(const DataLog&) = delete;
   DataLog& operator=(const DataLog&) = delete;
   DataLog(DataLog&&) = delete;
   DataLog& operator=(const DataLog&&) = delete;
+
   /**
    * Change log filename.
    *
    * @param filename filename
    */
   void SetFilename(std::string_view filename);
+
   /**
    * Explicitly flushes the log data to disk.
    */
   void Flush();
+
   /**
    * Pauses appending of data records to the log.  While paused, no data records
    * are saved (e.g. AppendX is a no-op).  Has no effect on entry starts /
    * finishes / metadata changes.
    */
   void Pause();
+
   /**
    * Resumes appending of data records to the log.  If called after Stop(),
    * opens a new file (with random name if SetFilename was not called after
@@ -157,10 +171,12 @@ class DataLog final {
    * started entries and schemas.
    */
   void Resume();
+
   /**
    * Stops appending all records to the log, and closes the log file.
    */
   void Stop();
+
   /**
    * Returns whether there is a data schema already registered with the given
    * name.
@@ -170,6 +186,7 @@ class DataLog final {
    * @return True if schema already registered
    */
   bool HasSchema(std::string_view name) const;
+
   /**
    * Registers a data schema.  Data schemas provide information for how a
    * certain data type string can be decoded.  The type string of a data schema
@@ -187,6 +204,7 @@ class DataLog final {
    */
   void AddSchema(std::string_view name, std::string_view type,
                  std::span<const uint8_t> schema, int64_t timestamp = 0);
+
   /**
    * Registers a data schema.  Data schemas provide information for how a
    * certain data type string can be decoded.  The type string of a data schema
@@ -210,6 +228,7 @@ class DataLog final {
             reinterpret_cast<const uint8_t*>(schema.data()), schema.size()},
         timestamp);
   }
+
   /**
    * Registers a protobuf schema. Duplicate calls to this function with the same
    * name are silently ignored.
@@ -229,6 +248,7 @@ class DataLog final {
           AddSchema(typeString, "proto:FileDescriptorProto", schema, timestamp);
         });
   }
+
   /**
    * Registers a struct schema. Duplicate calls to this function with the same
    * name are silently ignored.
@@ -249,6 +269,7 @@ class DataLog final {
         },
         info...);
   }
+
   /**
    * Start an entry.  Duplicate names are allowed (with the same type), and
    * result in the same index being returned (Start/Finish are reference
@@ -265,6 +286,7 @@ class DataLog final {
    */
   int Start(std::string_view name, std::string_view type,
             std::string_view metadata = {}, int64_t timestamp = 0);
+
   /**
    * Finish an entry.
    *
@@ -272,6 +294,7 @@ class DataLog final {
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
   void Finish(int entry, int64_t timestamp = 0);
+
   /**
    * Updates the metadata for an entry.
    *
@@ -280,6 +303,7 @@ class DataLog final {
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
   void SetMetadata(int entry, std::string_view metadata, int64_t timestamp = 0);
+
   /**
    * Appends a raw record to the log.
    *
@@ -288,6 +312,7 @@ class DataLog final {
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
   void AppendRaw(int entry, std::span<const uint8_t> data, int64_t timestamp);
+
   /**
    * Appends a raw record to the log.
    *
@@ -297,6 +322,7 @@ class DataLog final {
    */
   void AppendRaw2(int entry, std::span<const std::span<const uint8_t>> data,
                   int64_t timestamp);
+
   /**
    * Appends a boolean record to the log.
    *
@@ -305,6 +331,7 @@ class DataLog final {
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
   void AppendBoolean(int entry, bool value, int64_t timestamp);
+
   /**
    * Appends an integer record to the log.
    *
@@ -313,6 +340,7 @@ class DataLog final {
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
   void AppendInteger(int entry, int64_t value, int64_t timestamp);
+
   /**
    * Appends a float record to the log.
    *
@@ -321,6 +349,7 @@ class DataLog final {
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
   void AppendFloat(int entry, float value, int64_t timestamp);
+
   /**
    * Appends a double record to the log.
    *
@@ -329,6 +358,7 @@ class DataLog final {
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
   void AppendDouble(int entry, double value, int64_t timestamp);
+
   /**
    * Appends a string record to the log.
    *
@@ -337,6 +367,7 @@ class DataLog final {
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
   void AppendString(int entry, std::string_view value, int64_t timestamp);
+
   /**
    * Appends a boolean array record to the log.
    *
@@ -346,6 +377,7 @@ class DataLog final {
    */
   void AppendBooleanArray(int entry, std::span<const bool> arr,
                           int64_t timestamp);
+
   /**
    * Appends a boolean array record to the log.
    *
@@ -355,6 +387,7 @@ class DataLog final {
    */
   void AppendBooleanArray(int entry, std::span<const int> arr,
                           int64_t timestamp);
+
   /**
    * Appends a boolean array record to the log.
    *
@@ -364,6 +397,7 @@ class DataLog final {
    */
   void AppendBooleanArray(int entry, std::span<const uint8_t> arr,
                           int64_t timestamp);
+
   /**
    * Appends an integer array record to the log.
    *
@@ -373,6 +407,7 @@ class DataLog final {
    */
   void AppendIntegerArray(int entry, std::span<const int64_t> arr,
                           int64_t timestamp);
+
   /**
    * Appends a float array record to the log.
    *
@@ -382,6 +417,7 @@ class DataLog final {
    */
   void AppendFloatArray(int entry, std::span<const float> arr,
                         int64_t timestamp);
+
   /**
    * Appends a double array record to the log.
    *
@@ -391,6 +427,7 @@ class DataLog final {
    */
   void AppendDoubleArray(int entry, std::span<const double> arr,
                          int64_t timestamp);
+
   /**
    * Appends a string array record to the log.
    *
@@ -400,6 +437,7 @@ class DataLog final {
    */
   void AppendStringArray(int entry, std::span<const std::string> arr,
                          int64_t timestamp);
+
   /**
    * Appends a string array record to the log.
    *
@@ -409,6 +447,7 @@ class DataLog final {
    */
   void AppendStringArray(int entry, std::span<const std::string_view> arr,
                          int64_t timestamp);
+
   /**
    * Appends a string array record to the log.
    *
@@ -421,10 +460,12 @@ class DataLog final {
 
  private:
   struct WriterThreadState;
+
   void StartLogFile(WriterThreadState& state);
   void WriterThreadMain(std::string_view dir);
   void WriterThreadMain(
       std::function<void(std::span<const uint8_t> data)> write);
+
   // must be called with m_mutex held
   int StartImpl(std::string_view name, std::string_view type,
                 std::string_view metadata, int64_t timestamp);
@@ -435,6 +476,7 @@ class DataLog final {
   void AppendStringImpl(std::string_view str);
   void AppendStartRecord(int id, std::string_view name, std::string_view type,
                          std::string_view metadata, int64_t timestamp);
+
   wpi::Logger& m_msglog;
   mutable wpi::mutex m_mutex;
   wpi::condition_variable m_cond;
@@ -466,6 +508,7 @@ class DataLog final {
   int m_lastId = 0;
   std::thread m_thread;
 };
+
 /**
  * Log entry base class.
  */
@@ -479,6 +522,7 @@ class DataLogEntry {
  public:
   DataLogEntry(const DataLogEntry&) = delete;
   DataLogEntry& operator=(const DataLogEntry&) = delete;
+
   DataLogEntry(DataLogEntry&& rhs) : m_log{rhs.m_log}, m_entry{rhs.m_entry} {
     rhs.m_log = nullptr;
   }
@@ -491,7 +535,9 @@ class DataLogEntry {
     m_entry = rhs.m_entry;
     return *this;
   }
+
   explicit operator bool() const { return m_log != nullptr; }
+
   /**
    * Updates the metadata for the entry.
    *
@@ -501,6 +547,7 @@ class DataLogEntry {
   void SetMetadata(std::string_view metadata, int64_t timestamp = 0) {
     m_log->SetMetadata(m_entry, metadata, timestamp);
   }
+
   /**
    * Finishes the entry.
    *
@@ -512,12 +559,14 @@ class DataLogEntry {
   DataLog* m_log = nullptr;
   int m_entry = 0;
 };
+
 /**
  * Log arbitrary byte data.
  */
 class RawLogEntry : public DataLogEntry {
  public:
   static constexpr std::string_view kDataType = "raw";
+
   RawLogEntry() = default;
   RawLogEntry(DataLog& log, std::string_view name, int64_t timestamp = 0)
       : RawLogEntry{log, name, {}, kDataType, timestamp} {}
@@ -527,6 +576,7 @@ class RawLogEntry : public DataLogEntry {
   RawLogEntry(DataLog& log, std::string_view name, std::string_view metadata,
               std::string_view type, int64_t timestamp = 0)
       : DataLogEntry{log, name, type, metadata, timestamp} {}
+
   /**
    * Appends a record to the log.
    *
@@ -537,18 +587,21 @@ class RawLogEntry : public DataLogEntry {
     m_log->AppendRaw(m_entry, data, timestamp);
   }
 };
+
 /**
  * Log boolean values.
  */
 class BooleanLogEntry : public DataLogEntry {
  public:
   static constexpr std::string_view kDataType = "boolean";
+
   BooleanLogEntry() = default;
   BooleanLogEntry(DataLog& log, std::string_view name, int64_t timestamp = 0)
       : BooleanLogEntry{log, name, {}, timestamp} {}
   BooleanLogEntry(DataLog& log, std::string_view name,
                   std::string_view metadata, int64_t timestamp = 0)
       : DataLogEntry{log, name, kDataType, metadata, timestamp} {}
+
   /**
    * Appends a record to the log.
    *
@@ -559,18 +612,21 @@ class BooleanLogEntry : public DataLogEntry {
     m_log->AppendBoolean(m_entry, value, timestamp);
   }
 };
+
 /**
  * Log integer values.
  */
 class IntegerLogEntry : public DataLogEntry {
  public:
   static constexpr std::string_view kDataType = "int64";
+
   IntegerLogEntry() = default;
   IntegerLogEntry(DataLog& log, std::string_view name, int64_t timestamp = 0)
       : IntegerLogEntry{log, name, {}, timestamp} {}
   IntegerLogEntry(DataLog& log, std::string_view name,
                   std::string_view metadata, int64_t timestamp = 0)
       : DataLogEntry{log, name, kDataType, metadata, timestamp} {}
+
   /**
    * Appends a record to the log.
    *
@@ -581,18 +637,21 @@ class IntegerLogEntry : public DataLogEntry {
     m_log->AppendInteger(m_entry, value, timestamp);
   }
 };
+
 /**
  * Log float values.
  */
 class FloatLogEntry : public DataLogEntry {
  public:
   static constexpr std::string_view kDataType = "float";
+
   FloatLogEntry() = default;
   FloatLogEntry(DataLog& log, std::string_view name, int64_t timestamp = 0)
       : FloatLogEntry{log, name, {}, timestamp} {}
   FloatLogEntry(DataLog& log, std::string_view name, std::string_view metadata,
                 int64_t timestamp = 0)
       : DataLogEntry{log, name, kDataType, metadata, timestamp} {}
+
   /**
    * Appends a record to the log.
    *
@@ -603,18 +662,21 @@ class FloatLogEntry : public DataLogEntry {
     m_log->AppendFloat(m_entry, value, timestamp);
   }
 };
+
 /**
  * Log double values.
  */
 class DoubleLogEntry : public DataLogEntry {
  public:
   static constexpr std::string_view kDataType = "double";
+
   DoubleLogEntry() = default;
   DoubleLogEntry(DataLog& log, std::string_view name, int64_t timestamp = 0)
       : DoubleLogEntry{log, name, {}, timestamp} {}
   DoubleLogEntry(DataLog& log, std::string_view name, std::string_view metadata,
                  int64_t timestamp = 0)
       : DataLogEntry{log, name, kDataType, metadata, timestamp} {}
+
   /**
    * Appends a record to the log.
    *
@@ -625,12 +687,14 @@ class DoubleLogEntry : public DataLogEntry {
     m_log->AppendDouble(m_entry, value, timestamp);
   }
 };
+
 /**
  * Log string values.
  */
 class StringLogEntry : public DataLogEntry {
  public:
   static constexpr const char* kDataType = "string";
+
   StringLogEntry() = default;
   StringLogEntry(DataLog& log, std::string_view name, int64_t timestamp = 0)
       : StringLogEntry{log, name, {}, kDataType, timestamp} {}
@@ -640,6 +704,7 @@ class StringLogEntry : public DataLogEntry {
   StringLogEntry(DataLog& log, std::string_view name, std::string_view metadata,
                  std::string_view type, int64_t timestamp = 0)
       : DataLogEntry{log, name, type, metadata, timestamp} {}
+
   /**
    * Appends a record to the log.
    *
@@ -650,12 +715,14 @@ class StringLogEntry : public DataLogEntry {
     m_log->AppendString(m_entry, value, timestamp);
   }
 };
+
 /**
  * Log array of boolean values.
  */
 class BooleanArrayLogEntry : public DataLogEntry {
  public:
   static constexpr const char* kDataType = "boolean[]";
+
   BooleanArrayLogEntry() = default;
   BooleanArrayLogEntry(DataLog& log, std::string_view name,
                        int64_t timestamp = 0)
@@ -663,6 +730,7 @@ class BooleanArrayLogEntry : public DataLogEntry {
   BooleanArrayLogEntry(DataLog& log, std::string_view name,
                        std::string_view metadata, int64_t timestamp = 0)
       : DataLogEntry{log, name, kDataType, metadata, timestamp} {}
+
   /**
    * Appends a record to the log.  For find functions to work, timestamp
    * must be monotonically increasing.
@@ -673,6 +741,7 @@ class BooleanArrayLogEntry : public DataLogEntry {
   void Append(std::span<const bool> arr, int64_t timestamp = 0) {
     m_log->AppendBooleanArray(m_entry, arr, timestamp);
   }
+
   /**
    * Appends a record to the log.
    *
@@ -682,6 +751,7 @@ class BooleanArrayLogEntry : public DataLogEntry {
   void Append(std::initializer_list<bool> arr, int64_t timestamp = 0) {
     Append(std::span{arr.begin(), arr.end()}, timestamp);
   }
+
   /**
    * Appends a record to the log.
    *
@@ -691,6 +761,7 @@ class BooleanArrayLogEntry : public DataLogEntry {
   void Append(std::span<const int> arr, int64_t timestamp = 0) {
     m_log->AppendBooleanArray(m_entry, arr, timestamp);
   }
+
   /**
    * Appends a record to the log.
    *
@@ -700,6 +771,7 @@ class BooleanArrayLogEntry : public DataLogEntry {
   void Append(std::initializer_list<int> arr, int64_t timestamp = 0) {
     Append(std::span{arr.begin(), arr.end()}, timestamp);
   }
+
   /**
    * Appends a record to the log.
    *
@@ -710,12 +782,14 @@ class BooleanArrayLogEntry : public DataLogEntry {
     m_log->AppendBooleanArray(m_entry, arr, timestamp);
   }
 };
+
 /**
  * Log array of integer values.
  */
 class IntegerArrayLogEntry : public DataLogEntry {
  public:
   static constexpr const char* kDataType = "int64[]";
+
   IntegerArrayLogEntry() = default;
   IntegerArrayLogEntry(DataLog& log, std::string_view name,
                        int64_t timestamp = 0)
@@ -723,6 +797,7 @@ class IntegerArrayLogEntry : public DataLogEntry {
   IntegerArrayLogEntry(DataLog& log, std::string_view name,
                        std::string_view metadata, int64_t timestamp = 0)
       : DataLogEntry{log, name, kDataType, metadata, timestamp} {}
+
   /**
    * Appends a record to the log.
    *
@@ -732,6 +807,7 @@ class IntegerArrayLogEntry : public DataLogEntry {
   void Append(std::span<const int64_t> arr, int64_t timestamp = 0) {
     m_log->AppendIntegerArray(m_entry, arr, timestamp);
   }
+
   /**
    * Appends a record to the log.
    *
@@ -742,18 +818,21 @@ class IntegerArrayLogEntry : public DataLogEntry {
     Append({arr.begin(), arr.end()}, timestamp);
   }
 };
+
 /**
  * Log array of float values.
  */
 class FloatArrayLogEntry : public DataLogEntry {
  public:
   static constexpr const char* kDataType = "float[]";
+
   FloatArrayLogEntry() = default;
   FloatArrayLogEntry(DataLog& log, std::string_view name, int64_t timestamp = 0)
       : FloatArrayLogEntry{log, name, {}, timestamp} {}
   FloatArrayLogEntry(DataLog& log, std::string_view name,
                      std::string_view metadata, int64_t timestamp = 0)
       : DataLogEntry{log, name, kDataType, metadata, timestamp} {}
+
   /**
    * Appends a record to the log.
    *
@@ -763,6 +842,7 @@ class FloatArrayLogEntry : public DataLogEntry {
   void Append(std::span<const float> arr, int64_t timestamp = 0) {
     m_log->AppendFloatArray(m_entry, arr, timestamp);
   }
+
   /**
    * Appends a record to the log.
    *
@@ -773,12 +853,14 @@ class FloatArrayLogEntry : public DataLogEntry {
     Append({arr.begin(), arr.end()}, timestamp);
   }
 };
+
 /**
  * Log array of double values.
  */
 class DoubleArrayLogEntry : public DataLogEntry {
  public:
   static constexpr const char* kDataType = "double[]";
+
   DoubleArrayLogEntry() = default;
   DoubleArrayLogEntry(DataLog& log, std::string_view name,
                       int64_t timestamp = 0)
@@ -786,6 +868,7 @@ class DoubleArrayLogEntry : public DataLogEntry {
   DoubleArrayLogEntry(DataLog& log, std::string_view name,
                       std::string_view metadata, int64_t timestamp = 0)
       : DataLogEntry{log, name, kDataType, metadata, timestamp} {}
+
   /**
    * Appends a record to the log.
    *
@@ -795,6 +878,7 @@ class DoubleArrayLogEntry : public DataLogEntry {
   void Append(std::span<const double> arr, int64_t timestamp = 0) {
     m_log->AppendDoubleArray(m_entry, arr, timestamp);
   }
+
   /**
    * Appends a record to the log.
    *
@@ -805,12 +889,14 @@ class DoubleArrayLogEntry : public DataLogEntry {
     Append({arr.begin(), arr.end()}, timestamp);
   }
 };
+
 /**
  * Log array of string values.
  */
 class StringArrayLogEntry : public DataLogEntry {
  public:
   static constexpr const char* kDataType = "string[]";
+
   StringArrayLogEntry() = default;
   StringArrayLogEntry(DataLog& log, std::string_view name,
                       int64_t timestamp = 0)
@@ -818,6 +904,7 @@ class StringArrayLogEntry : public DataLogEntry {
   StringArrayLogEntry(DataLog& log, std::string_view name,
                       std::string_view metadata, int64_t timestamp = 0)
       : DataLogEntry{log, name, kDataType, metadata, timestamp} {}
+
   /**
    * Appends a record to the log.
    *
@@ -827,6 +914,7 @@ class StringArrayLogEntry : public DataLogEntry {
   void Append(std::span<const std::string> arr, int64_t timestamp = 0) {
     m_log->AppendStringArray(m_entry, arr, timestamp);
   }
+
   /**
    * Appends a record to the log.
    *
@@ -836,6 +924,7 @@ class StringArrayLogEntry : public DataLogEntry {
   void Append(std::span<const std::string_view> arr, int64_t timestamp = 0) {
     m_log->AppendStringArray(m_entry, arr, timestamp);
   }
+
   /**
    * Appends a record to the log.
    *
@@ -848,6 +937,7 @@ class StringArrayLogEntry : public DataLogEntry {
            timestamp);
   }
 };
+
 /**
  * Log raw struct serializable objects.
  */
@@ -868,6 +958,7 @@ class StructLogEntry : public DataLogEntry {
     log.AddStructSchema<T, I...>(info..., timestamp);
     m_entry = log.Start(name, S::GetTypeString(info...), metadata, timestamp);
   }
+
   /**
    * Appends a record to the log.
    *
@@ -893,6 +984,7 @@ class StructLogEntry : public DataLogEntry {
   [[no_unique_address]]
   std::tuple<I...> m_info;
 };
+
 /**
  * Log raw struct serializable array of objects.
  */
@@ -916,6 +1008,7 @@ class StructArrayLogEntry : public DataLogEntry {
         name, MakeStructArrayTypeString<T, std::dynamic_extent>(info...),
         metadata, timestamp);
   }
+
   /**
    * Appends a record to the log.
    *
@@ -927,7 +1020,6 @@ class StructArrayLogEntry : public DataLogEntry {
     requires std::ranges::range<U> &&
              std::convertible_to<std::ranges::range_value_t<U>, T>
 #endif
-
   void Append(U&& data, int64_t timestamp = 0) {
     std::apply(
         [&](const I&... info) {
