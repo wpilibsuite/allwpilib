@@ -43,7 +43,7 @@ public class SendableHandler extends ElementHandler {
       // We accept all sendable objects to prevent them from being reported as not loggable,
       // but their sendable implementations do not include helpful information.
       // Users are free to provide custom logging implementations for commands, and tag their
-      // subsystems with @Epilogue to log their contents automatically
+      // subsystems with @Logged to log their contents automatically
       return null;
     }
 

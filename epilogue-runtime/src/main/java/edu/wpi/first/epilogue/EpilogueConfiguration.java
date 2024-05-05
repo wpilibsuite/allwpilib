@@ -27,7 +27,7 @@ public class EpilogueConfiguration {
    * The minimum importance level of data to be logged. Defaults to debug, which logs data of all
    * importance levels. Any data tagged with an importance level lower than this will not be logged.
    */
-  public Epilogue.Importance minimumImportance = Epilogue.Importance.DEBUG;
+  public Logged.Importance minimumImportance = Logged.Importance.DEBUG;
 
   /**
    * The error handler for loggers to use if they encounter an error while logging. Defaults to

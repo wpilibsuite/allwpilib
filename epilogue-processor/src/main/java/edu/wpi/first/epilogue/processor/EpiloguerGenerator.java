@@ -126,7 +126,7 @@ public class EpiloguerGenerator {
               /**
                * Checks if data associated with a given importance level should be logged.
                */
-              public static boolean shouldLog(Epilogue.Importance importance) {
+              public static boolean shouldLog(Logged.Importance importance) {
                 return importance.compareTo(config.minimumImportance) >= 0;
               }
             """

@@ -13,8 +13,8 @@ import java.lang.annotation.Target;
  * Place this annotation on a class to automatically log every field and every public accessor
  * method (methods with no arguments and return a loggable data type). Use {@link #strategy()} to
  * flag a class as logging everything it can, except for those elements tagged with
- * {@code @Epilogue(importance = NONE)}; or for logging only specific items also tagged with
- * {@code @Epilogue}.
+ * {@code @Logged(importance = NONE)}; or for logging only specific items also tagged with
+ * {@code @Logged}.
  *
  * <p>Logged fields may have any access modifier. Logged methods must be public; non-public methods
  * will be ignored.
@@ -25,7 +25,7 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.METHOD, ElementType.TYPE})
-public @interface Epilogue {
+public @interface Logged {
   /**
    * The name for the annotated element to be logged as. Does nothing on class-level annotations.
    * Fields and methods will default to be logged using their in-code names; use this attribute to
@@ -33,9 +33,9 @@ public @interface Epilogue {
    *
    * <p>If the annotation is placed on a class, the specified name will not change logged data
    * (since that uses the names of the specific usages of the class in fields and methods); however,
-   * it will be used to set the names of the generated logger that Epilogue will use to log
-   * instances of the class. This can be used to avoid name conflicts if you have multiple classes
-   * with the same name, but in different packages, and want to be able to log both.
+   * it will be used to set the names of the generated logger that Logged will use to log instances
+   * of the class. This can be used to avoid name conflicts if you have multiple classes with the
+   * same name, but in different packages, and want to be able to log both.
    *
    * @return the name to use to log the field or method under; or the name of the generated
    *     class-specific logger
@@ -50,7 +50,7 @@ public @interface Epilogue {
      */
     OPT_OUT,
 
-    /** Log only fields and methods tagged with an {@link Epilogue} annotation. */
+    /** Log only fields and methods tagged with an {@link Logged} annotation. */
     OPT_IN
   }
 
@@ -84,7 +84,7 @@ public @interface Epilogue {
   /**
    * The importance of the annotated data. If placed on a class or interface, this will be the
    * default importance of all data within that class; this can be overridden on a per-element basis
-   * by annotating fields and methods with their own {@code @Epilogue(importance = ...)} annotation.
+   * by annotating fields and methods with their own {@code @Logged(importance = ...)} annotation.
    *
    * @return the importance of the annotated element
    */

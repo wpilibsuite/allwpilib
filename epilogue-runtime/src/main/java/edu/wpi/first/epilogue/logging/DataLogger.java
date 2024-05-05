@@ -28,7 +28,7 @@ public interface DataLogger {
    * additional CPU and memory overhead associated with tracking the current value of every logged
    * entry. The most surefire way to reduce CPU and memory usage associated with logging is to log
    * fewer things - which can be done by opting out of logging unnecessary data or increasing the
-   * minimum logged importance level in the Epiloguer configuration.
+   * minimum logged importance level in the Epilogue configuration.
    *
    * @return the lazy logger
    */

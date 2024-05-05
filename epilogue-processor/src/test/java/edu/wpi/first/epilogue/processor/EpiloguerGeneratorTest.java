@@ -21,7 +21,7 @@ class EpiloguerGeneratorTest {
         """
           package edu.wpi.first.epilogue;
 
-          @Epilogue
+          @Logged
           class HelloWorld {
           }
           """;
@@ -48,7 +48,7 @@ class EpiloguerGeneratorTest {
           /**
            * Checks if data associated with a given importance level should be logged.
            */
-          public static boolean shouldLog(Epilogue.Importance importance) {
+          public static boolean shouldLog(Logged.Importance importance) {
             return importance.compareTo(config.minimumImportance) >= 0;
           }
         }
@@ -64,7 +64,7 @@ class EpiloguerGeneratorTest {
         """
           package edu.wpi.first.epilogue;
 
-          @Epilogue
+          @Logged
           class HelloWorld extends edu.wpi.first.wpilibj.RobotBase {
             @Override
             public void startCompetition() {}
@@ -95,7 +95,7 @@ class EpiloguerGeneratorTest {
           /**
            * Checks if data associated with a given importance level should be logged.
            */
-          public static boolean shouldLog(Epilogue.Importance importance) {
+          public static boolean shouldLog(Logged.Importance importance) {
             return importance.compareTo(config.minimumImportance) >= 0;
           }
         }
@@ -110,7 +110,7 @@ class EpiloguerGeneratorTest {
         """
           package edu.wpi.first.epilogue;
 
-          @Epilogue
+          @Logged
           class HelloWorld extends edu.wpi.first.wpilibj.TimedRobot {
           }
           """;
@@ -137,7 +137,7 @@ class EpiloguerGeneratorTest {
           /**
            * Checks if data associated with a given importance level should be logged.
            */
-          public static boolean shouldLog(Epilogue.Importance importance) {
+          public static boolean shouldLog(Logged.Importance importance) {
             return importance.compareTo(config.minimumImportance) >= 0;
           }
 
@@ -168,10 +168,10 @@ class EpiloguerGeneratorTest {
         """
           package edu.wpi.first.epilogue;
 
-          @Epilogue
+          @Logged
           class AlphaBot extends edu.wpi.first.wpilibj.TimedRobot { }
 
-          @Epilogue
+          @Logged
           class BetaBot extends edu.wpi.first.wpilibj.TimedRobot { }
           """;
 
@@ -199,7 +199,7 @@ class EpiloguerGeneratorTest {
           /**
            * Checks if data associated with a given importance level should be logged.
            */
-          public static boolean shouldLog(Epilogue.Importance importance) {
+          public static boolean shouldLog(Logged.Importance importance) {
             return importance.compareTo(config.minimumImportance) >= 0;
           }
 
@@ -260,7 +260,7 @@ class EpiloguerGeneratorTest {
           public void update(DataLogger logger, A object) {} // implementation is irrelevant
         }
 
-        @Epilogue
+        @Logged
         class HelloWorld {
           A a_b_or_c;
           B b;
@@ -292,7 +292,7 @@ class EpiloguerGeneratorTest {
           /**
            * Checks if data associated with a given importance level should be logged.
            */
-          public static boolean shouldLog(Epilogue.Importance importance) {
+          public static boolean shouldLog(Logged.Importance importance) {
             return importance.compareTo(config.minimumImportance) >= 0;
           }
         }

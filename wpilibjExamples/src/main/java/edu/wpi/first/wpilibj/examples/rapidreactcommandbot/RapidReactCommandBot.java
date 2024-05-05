@@ -6,7 +6,7 @@ package edu.wpi.first.wpilibj.examples.rapidreactcommandbot;
 
 import static edu.wpi.first.wpilibj2.command.Commands.parallel;
 
-import edu.wpi.first.epilogue.Epilogue;
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.Constants.AutoConstants;
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.Constants.OIConstants;
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.Constants.ShooterConstants;
@@ -25,7 +25,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
  * subsystems, commands, and button mappings) should be declared here.
  */
-@Epilogue(name = "Rapid React Command Robot Container")
+@Logged(name = "Rapid React Command Robot Container")
 public class RapidReactCommandBot {
   // The robot's subsystems
   private final Drive m_drive = new Drive();

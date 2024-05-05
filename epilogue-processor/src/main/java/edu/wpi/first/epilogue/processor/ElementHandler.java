@@ -4,7 +4,7 @@
 
 package edu.wpi.first.epilogue.processor;
 
-import edu.wpi.first.epilogue.Epilogue;
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
 import edu.wpi.first.epilogue.logging.DataLogger;
 import javax.annotation.processing.ProcessingEnvironment;
@@ -58,12 +58,12 @@ public abstract class ElementHandler {
    * Gets the name of a field or method as it would appear in logs.
    *
    * @param element the field or method element to check
-   * @return the name specified in the {@link Epilogue @Epilogue} annotation on the element, if
-   *     present; otherwise, the field or method's name with no modifications
+   * @return the name specified in the {@link Logged @Logged} annotation on the element, if present;
+   *     otherwise, the field or method's name with no modifications
    */
   public String loggedName(Element element) {
     var elementName = element.getSimpleName().toString();
-    var config = element.getAnnotation(Epilogue.class);
+    var config = element.getAnnotation(Logged.class);
 
     if (config != null && !config.name().isBlank()) {
       return config.name();

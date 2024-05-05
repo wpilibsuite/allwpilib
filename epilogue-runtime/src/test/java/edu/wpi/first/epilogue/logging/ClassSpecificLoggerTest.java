@@ -6,12 +6,12 @@ package edu.wpi.first.epilogue.logging;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import edu.wpi.first.epilogue.Epilogue;
+import edu.wpi.first.epilogue.Logged;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class ClassSpecificLoggerTest {
-  @Epilogue
+  @Logged
   record Point2d(double x, double y, int dim) {
     static class Logger extends ClassSpecificLogger<Point2d> {
       Logger() {

@@ -7,7 +7,7 @@ package edu.wpi.first.epilogue.processor;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 
-import edu.wpi.first.epilogue.Epilogue;
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -22,7 +22,7 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 
-/** Generates logger class files for {@link Epilogue @Epilogue}-annotated classes. */
+/** Generates logger class files for {@link Logged @Logged}-annotated classes. */
 public class LoggerGenerator {
   private final ProcessingEnvironment m_processingEnv;
   private final List<ElementHandler> m_handlers;
@@ -46,12 +46,12 @@ public class LoggerGenerator {
    * @throws IOException if the file could not be written
    */
   public void writeLoggerFile(TypeElement clazz) throws IOException {
-    var epilogue = clazz.getAnnotation(Epilogue.class);
-    boolean requireExplicitOptIn = epilogue.strategy() == Epilogue.Strategy.OPT_IN;
+    var config = clazz.getAnnotation(Logged.class);
+    boolean requireExplicitOptIn = config.strategy() == Logged.Strategy.OPT_IN;
 
     Predicate<Element> notSkipped = LoggerGenerator::isNotSkipped;
     Predicate<Element> optedIn =
-        e -> !requireExplicitOptIn || e.getAnnotation(Epilogue.class) != null;
+        e -> !requireExplicitOptIn || e.getAnnotation(Logged.class) != null;
 
     var fieldsToLog =
         clazz.getEnclosedElements().stream()
@@ -76,12 +76,12 @@ public class LoggerGenerator {
             .filter(this::isLoggable)
             .toList();
 
-    writeLoggerFile(clazz.getQualifiedName().toString(), epilogue, fieldsToLog, methodsToLog);
+    writeLoggerFile(clazz.getQualifiedName().toString(), config, fieldsToLog, methodsToLog);
   }
 
   private void writeLoggerFile(
       String className,
-      Epilogue classConfig,
+      Logged classConfig,
       List<VariableElement> loggableFields,
       List<ExecutableElement> loggableMethods)
       throws IOException {
@@ -120,7 +120,7 @@ public class LoggerGenerator {
         out.println();
       }
 
-      out.println("import edu.wpi.first.epilogue.Epilogue;");
+      out.println("import edu.wpi.first.epilogue.Logged;");
       out.println("import edu.wpi.first.epilogue.Epiloguer;");
       out.println("import edu.wpi.first.epilogue.logging.ClassSpecificLogger;");
       out.println("import edu.wpi.first.epilogue.logging.DataLogger;");
@@ -195,7 +195,7 @@ public class LoggerGenerator {
               .collect(
                   groupingBy(
                       element -> {
-                        var config = element.getAnnotation(Epilogue.class);
+                        var config = element.getAnnotation(Logged.class);
                         if (config == null) {
                           // No configuration on this element, fall back to the class-level
                           // configuration
@@ -206,13 +206,13 @@ public class LoggerGenerator {
                       },
                       () ->
                           new EnumMap<>(
-                              Epilogue.Importance.class), // EnumMap for consistent ordering
+                              Logged.Importance.class), // EnumMap for consistent ordering
                       toList()));
 
       loggedElementsByImportance.forEach(
           (importance, elements) -> {
             out.println(
-                "    if (Epiloguer.shouldLog(Epilogue.Importance." + importance.name() + ")) {");
+                "    if (Epiloguer.shouldLog(Logged.Importance." + importance.name() + ")) {");
 
             for (var loggableElement : elements) {
               // findFirst for prioritization

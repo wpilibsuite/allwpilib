@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj.examples.rapidreactcommandbot.subsystems;
 
-import edu.wpi.first.epilogue.Epilogue;
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.Constants.StorageConstants;
@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
-@Epilogue
+@Logged
 public class Storage extends SubsystemBase {
   private final PWMSparkMax m_motor = new PWMSparkMax(StorageConstants.kMotorPort);
   @NotLogged // We'll log a more meaningful boolean instead
@@ -22,7 +22,7 @@ public class Storage extends SubsystemBase {
   // Expose trigger from subsystem to improve readability and ease
   // inter-subsystem communications
   /** Whether the ball storage is full. */
-  @Epilogue(name = "Has Cargo")
+  @Logged(name = "Has Cargo")
   @SuppressWarnings("checkstyle:MemberName")
   public final Trigger hasCargo = new Trigger(m_ballSensor::get);
 

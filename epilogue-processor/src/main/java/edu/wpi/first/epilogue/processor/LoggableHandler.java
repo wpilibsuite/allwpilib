@@ -4,13 +4,13 @@
 
 package edu.wpi.first.epilogue.processor;
 
-import edu.wpi.first.epilogue.Epilogue;
+import edu.wpi.first.epilogue.Logged;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 
-/** Handles logging for types annotated with the {@link Epilogue @Epilogue} annotation. */
+/** Handles logging for types annotated with the {@link Logged @Logged} annotation. */
 public class LoggableHandler extends ElementHandler {
   protected LoggableHandler(ProcessingEnvironment processingEnv) {
     super(processingEnv);
@@ -19,9 +19,9 @@ public class LoggableHandler extends ElementHandler {
   @Override
   public boolean isLoggable(Element element) {
     var dataType = dataType(element);
-    return dataType.getAnnotation(Epilogue.class) != null
+    return dataType.getAnnotation(Logged.class) != null
         || dataType instanceof DeclaredType decl
-            && decl.asElement().getAnnotation(Epilogue.class) != null;
+            && decl.asElement().getAnnotation(Logged.class) != null;
   }
 
   @Override

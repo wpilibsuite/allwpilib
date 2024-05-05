@@ -7,7 +7,7 @@ package edu.wpi.first.epilogue.logging.errors;
 import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
 
 /**
- * An error handler is used by the Epilogue framework to catch and process any errors that occur
+ * An error handler is used by the Logged framework to catch and process any errors that occur
  * during the logging process. Different handlers can be used in different operating modes, such as
  * crashing in simulation to identify errors before they make it to a robot, or automatically
  * disabling loggers if they encounter too many errors on the field to let the robot keep running

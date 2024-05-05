@@ -6,7 +6,7 @@ package edu.wpi.first.epilogue.processor;
 
 import com.google.auto.service.AutoService;
 import edu.wpi.first.epilogue.CustomLoggerFor;
-import edu.wpi.first.epilogue.Epilogue;
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -37,7 +37,7 @@ import javax.tools.Diagnostic;
 
 @SupportedAnnotationTypes({
   "edu.wpi.first.epilogue.CustomLoggerFor",
-  "edu.wpi.first.epilogue.Epilogue"
+  "edu.wpi.first.epilogue.Logged"
 })
 @SupportedSourceVersion(SourceVersion.RELEASE_17)
 @AutoService(Processor.class)
@@ -45,7 +45,7 @@ public class AnnotationProcessor extends AbstractProcessor {
   private static final String kCustomLoggerFqn = "edu.wpi.first.epilogue.CustomLoggerFor";
   private static final String kClassSpecificLoggerFqn =
       "edu.wpi.first.epilogue.logging.ClassSpecificLogger";
-  private static final String kEpilogueFqn = "edu.wpi.first.epilogue.Epilogue";
+  private static final String kLoggedFqn = "edu.wpi.first.epilogue.Logged";
 
   private EpiloguerGenerator m_epiloguerGenerator;
   private LoggerGenerator m_loggerGenerator;
@@ -114,7 +114,7 @@ public class AnnotationProcessor extends AbstractProcessor {
     m_loggerGenerator = new LoggerGenerator(processingEnv, m_handlers);
 
     annotations.stream()
-        .filter(ann -> kEpilogueFqn.contentEquals(ann.getQualifiedName()))
+        .filter(ann -> kLoggedFqn.contentEquals(ann.getQualifiedName()))
         .findAny()
         .ifPresent(
             epilogue -> {
@@ -142,7 +142,7 @@ public class AnnotationProcessor extends AbstractProcessor {
             .getMessager()
             .printMessage(
                 Diagnostic.Kind.ERROR,
-                "[EPILOGUE] You have opted in to Epilogue logging on this field, "
+                "[EPILOGUE] You have opted in to logging on this field, "
                     + "but it is not a loggable data type!",
                 field);
         valid = false;
@@ -170,7 +170,7 @@ public class AnnotationProcessor extends AbstractProcessor {
               .getMessager()
               .printMessage(
                   Diagnostic.Kind.ERROR,
-                  "[EPILOGUE] You have opted in to Epilogue logging on this method, "
+                  "[EPILOGUE] You have opted in to logging on this method, "
                       + "but it does not return a loggable data type!",
                   method);
           valid = false;
@@ -380,8 +380,8 @@ public class AnnotationProcessor extends AbstractProcessor {
   }
 
   private void warnOfNonLoggableElements(TypeElement clazz) {
-    var epilogue = clazz.getAnnotation(Epilogue.class);
-    if (epilogue.strategy() == Epilogue.Strategy.OPT_IN) {
+    var config = clazz.getAnnotation(Logged.class);
+    if (config.strategy() == Logged.Strategy.OPT_IN) {
       // field and method validations will have already checked everything
       return;
     }

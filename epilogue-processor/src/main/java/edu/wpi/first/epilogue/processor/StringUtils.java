@@ -4,7 +4,7 @@
 
 package edu.wpi.first.epilogue.processor;
 
-import edu.wpi.first.epilogue.Epilogue;
+import edu.wpi.first.epilogue.Logged;
 import javax.lang.model.element.TypeElement;
 
 public final class StringUtils {
@@ -77,7 +77,7 @@ public final class StringUtils {
    * @return the logger class name
    */
   public static String loggerClassName(TypeElement clazz) {
-    var epilogue = clazz.getAnnotation(Epilogue.class);
+    var config = clazz.getAnnotation(Logged.class);
     var className = clazz.getQualifiedName().toString();
 
     String packageName;
@@ -92,10 +92,10 @@ public final class StringUtils {
 
     // Use the name on the class config to set the generated logger names
     // This helps to avoid naming conflicts
-    if (epilogue.name().isBlank()) {
+    if (config.name().isBlank()) {
       loggerClassName = className + "Logger";
     } else {
-      String cleaned = epilogue.name().replaceAll(" ", "");
+      String cleaned = config.name().replaceAll(" ", "");
 
       var loggerSimpleClassName = StringUtils.capitalize(cleaned) + "Logger";
       if (packageName != null) {

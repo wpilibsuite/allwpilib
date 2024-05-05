@@ -26,7 +26,7 @@ class AnnotationProcessorTest {
         """
       package edu.wpi.first.epilogue;
 
-      @Epilogue
+      @Logged
       class HelloWorld {
         double x;
       }
@@ -36,7 +36,7 @@ class AnnotationProcessorTest {
         """
       package edu.wpi.first.epilogue;
 
-      import edu.wpi.first.epilogue.Epilogue;
+      import edu.wpi.first.epilogue.Logged;
       import edu.wpi.first.epilogue.Epiloguer;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
@@ -48,7 +48,7 @@ class AnnotationProcessorTest {
 
         @Override
         public void update(DataLogger dataLogger, HelloWorld object) {
-          if (Epiloguer.shouldLog(Epilogue.Importance.DEBUG)) {
+          if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("x", object.x);
           }
         }
@@ -64,7 +64,7 @@ class AnnotationProcessorTest {
         """
       package edu.wpi.first.epilogue;
 
-      @Epilogue
+      @Logged
       class HelloWorld {
         double x;
         double y;
@@ -75,7 +75,7 @@ class AnnotationProcessorTest {
         """
       package edu.wpi.first.epilogue;
 
-      import edu.wpi.first.epilogue.Epilogue;
+      import edu.wpi.first.epilogue.Logged;
       import edu.wpi.first.epilogue.Epiloguer;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
@@ -87,7 +87,7 @@ class AnnotationProcessorTest {
 
         @Override
         public void update(DataLogger dataLogger, HelloWorld object) {
-          if (Epiloguer.shouldLog(Epilogue.Importance.DEBUG)) {
+          if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("x", object.x);
             dataLogger.log("y", object.y);
           }
@@ -104,7 +104,7 @@ class AnnotationProcessorTest {
         """
       package edu.wpi.first.epilogue;
 
-      @Epilogue
+      @Logged
       class HelloWorld {
         private double x;
       }
@@ -114,7 +114,7 @@ class AnnotationProcessorTest {
         """
       package edu.wpi.first.epilogue;
 
-      import edu.wpi.first.epilogue.Epilogue;
+      import edu.wpi.first.epilogue.Logged;
       import edu.wpi.first.epilogue.Epiloguer;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
@@ -139,7 +139,7 @@ class AnnotationProcessorTest {
 
         @Override
         public void update(DataLogger dataLogger, HelloWorld object) {
-          if (Epiloguer.shouldLog(Epilogue.Importance.DEBUG)) {
+          if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("x", (double) $x.get(object));
           }
         }
@@ -155,7 +155,7 @@ class AnnotationProcessorTest {
         """
       package edu.wpi.first.epilogue;
 
-      @Epilogue
+      @Logged
       class HelloWorld {
         private edu.wpi.first.wpilibj.smartdashboard.SendableChooser<String> chooser;
       }
@@ -165,7 +165,7 @@ class AnnotationProcessorTest {
         """
       package edu.wpi.first.epilogue;
 
-      import edu.wpi.first.epilogue.Epilogue;
+      import edu.wpi.first.epilogue.Logged;
       import edu.wpi.first.epilogue.Epiloguer;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
@@ -190,7 +190,7 @@ class AnnotationProcessorTest {
 
         @Override
         public void update(DataLogger dataLogger, HelloWorld object) {
-          if (Epiloguer.shouldLog(Epilogue.Importance.DEBUG)) {
+          if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
             logSendable(dataLogger.getSubLogger("chooser"), (edu.wpi.first.wpilibj.smartdashboard.SendableChooser<java.lang.String>) $chooser.get(object));
           }
         }
@@ -206,11 +206,11 @@ class AnnotationProcessorTest {
         """
       package edu.wpi.first.epilogue;
 
-      @Epilogue(importance = Epilogue.Importance.INFO)
+      @Logged(importance = Logged.Importance.INFO)
       class HelloWorld {
-        @Epilogue(importance = Epilogue.Importance.DEBUG)    double low;
-        @Epilogue(importance = Epilogue.Importance.INFO)     int    medium;
-        @Epilogue(importance = Epilogue.Importance.CRITICAL) long   high;
+        @Logged(importance = Logged.Importance.DEBUG)    double low;
+        @Logged(importance = Logged.Importance.INFO)     int    medium;
+        @Logged(importance = Logged.Importance.CRITICAL) long   high;
       }
       """;
 
@@ -218,7 +218,7 @@ class AnnotationProcessorTest {
         """
       package edu.wpi.first.epilogue;
 
-      import edu.wpi.first.epilogue.Epilogue;
+      import edu.wpi.first.epilogue.Logged;
       import edu.wpi.first.epilogue.Epiloguer;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
@@ -230,13 +230,13 @@ class AnnotationProcessorTest {
 
         @Override
         public void update(DataLogger dataLogger, HelloWorld object) {
-          if (Epiloguer.shouldLog(Epilogue.Importance.DEBUG)) {
+          if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("low", object.low);
           }
-          if (Epiloguer.shouldLog(Epilogue.Importance.INFO)) {
+          if (Epiloguer.shouldLog(Logged.Importance.INFO)) {
             dataLogger.log("medium", object.medium);
           }
-          if (Epiloguer.shouldLog(Epilogue.Importance.CRITICAL)) {
+          if (Epiloguer.shouldLog(Logged.Importance.CRITICAL)) {
             dataLogger.log("high", object.high);
           }
         }
@@ -252,7 +252,7 @@ class AnnotationProcessorTest {
         """
       package edu.wpi.first.epilogue;
 
-      @Epilogue
+      @Logged
       class HelloWorld {
         enum E {
           a, b, c;
@@ -266,7 +266,7 @@ class AnnotationProcessorTest {
         """
       package edu.wpi.first.epilogue;
 
-      import edu.wpi.first.epilogue.Epilogue;
+      import edu.wpi.first.epilogue.Logged;
       import edu.wpi.first.epilogue.Epiloguer;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
@@ -278,7 +278,7 @@ class AnnotationProcessorTest {
 
         @Override
         public void update(DataLogger dataLogger, HelloWorld object) {
-          if (Epiloguer.shouldLog(Epilogue.Importance.DEBUG)) {
+          if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("enumValue", object.enumValue);
           }
         }
@@ -294,7 +294,7 @@ class AnnotationProcessorTest {
         """
       package edu.wpi.first.epilogue;
 
-      @Epilogue
+      @Logged
       class HelloWorld {
         byte x;        // Should be logged
         byte[] arr1;   // Should be logged
@@ -310,7 +310,7 @@ class AnnotationProcessorTest {
         """
       package edu.wpi.first.epilogue;
 
-      import edu.wpi.first.epilogue.Epilogue;
+      import edu.wpi.first.epilogue.Logged;
       import edu.wpi.first.epilogue.Epiloguer;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
@@ -322,7 +322,7 @@ class AnnotationProcessorTest {
 
         @Override
         public void update(DataLogger dataLogger, HelloWorld object) {
-          if (Epiloguer.shouldLog(Epilogue.Importance.DEBUG)) {
+          if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("x", object.x);
             dataLogger.log("arr1", object.arr1);
             dataLogger.log("getX", object.getX());
@@ -341,7 +341,7 @@ class AnnotationProcessorTest {
         """
       package edu.wpi.first.epilogue;
 
-      @Epilogue
+      @Logged
       class HelloWorld {
         char x;        // Should be logged
         char[] arr1;   // Should not be logged
@@ -357,7 +357,7 @@ class AnnotationProcessorTest {
         """
       package edu.wpi.first.epilogue;
 
-      import edu.wpi.first.epilogue.Epilogue;
+      import edu.wpi.first.epilogue.Logged;
       import edu.wpi.first.epilogue.Epiloguer;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
@@ -369,7 +369,7 @@ class AnnotationProcessorTest {
 
         @Override
         public void update(DataLogger dataLogger, HelloWorld object) {
-          if (Epiloguer.shouldLog(Epilogue.Importance.DEBUG)) {
+          if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("x", object.x);
             dataLogger.log("getX", object.getX());
           }
@@ -386,7 +386,7 @@ class AnnotationProcessorTest {
         """
       package edu.wpi.first.epilogue;
 
-      @Epilogue
+      @Logged
       class HelloWorld {
         short x;        // Should be logged
         short[] arr1;   // Should not be logged
@@ -402,7 +402,7 @@ class AnnotationProcessorTest {
         """
       package edu.wpi.first.epilogue;
 
-      import edu.wpi.first.epilogue.Epilogue;
+      import edu.wpi.first.epilogue.Logged;
       import edu.wpi.first.epilogue.Epiloguer;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
@@ -414,7 +414,7 @@ class AnnotationProcessorTest {
 
         @Override
         public void update(DataLogger dataLogger, HelloWorld object) {
-          if (Epiloguer.shouldLog(Epilogue.Importance.DEBUG)) {
+          if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("x", object.x);
             dataLogger.log("getX", object.getX());
           }
@@ -431,7 +431,7 @@ class AnnotationProcessorTest {
         """
       package edu.wpi.first.epilogue;
 
-      @Epilogue
+      @Logged
       class HelloWorld {
         int x;           // Should be logged
         int[] arr1;   // Should be logged
@@ -447,7 +447,7 @@ class AnnotationProcessorTest {
         """
       package edu.wpi.first.epilogue;
 
-      import edu.wpi.first.epilogue.Epilogue;
+      import edu.wpi.first.epilogue.Logged;
       import edu.wpi.first.epilogue.Epiloguer;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
@@ -459,7 +459,7 @@ class AnnotationProcessorTest {
 
         @Override
         public void update(DataLogger dataLogger, HelloWorld object) {
-          if (Epiloguer.shouldLog(Epilogue.Importance.DEBUG)) {
+          if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("x", object.x);
             dataLogger.log("arr1", object.arr1);
             dataLogger.log("getX", object.getX());
@@ -478,7 +478,7 @@ class AnnotationProcessorTest {
         """
       package edu.wpi.first.epilogue;
 
-      @Epilogue
+      @Logged
       class HelloWorld {
         long x;        // Should be logged
         long[] arr1;   // Should be logged
@@ -494,7 +494,7 @@ class AnnotationProcessorTest {
         """
       package edu.wpi.first.epilogue;
 
-      import edu.wpi.first.epilogue.Epilogue;
+      import edu.wpi.first.epilogue.Logged;
       import edu.wpi.first.epilogue.Epiloguer;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
@@ -506,7 +506,7 @@ class AnnotationProcessorTest {
 
         @Override
         public void update(DataLogger dataLogger, HelloWorld object) {
-          if (Epiloguer.shouldLog(Epilogue.Importance.DEBUG)) {
+          if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("x", object.x);
             dataLogger.log("arr1", object.arr1);
             dataLogger.log("getX", object.getX());
@@ -525,7 +525,7 @@ class AnnotationProcessorTest {
         """
       package edu.wpi.first.epilogue;
 
-      @Epilogue
+      @Logged
       class HelloWorld {
         float x;        // Should be logged
         float[] arr1;   // Should be logged
@@ -541,7 +541,7 @@ class AnnotationProcessorTest {
         """
       package edu.wpi.first.epilogue;
 
-      import edu.wpi.first.epilogue.Epilogue;
+      import edu.wpi.first.epilogue.Logged;
       import edu.wpi.first.epilogue.Epiloguer;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
@@ -553,7 +553,7 @@ class AnnotationProcessorTest {
 
         @Override
         public void update(DataLogger dataLogger, HelloWorld object) {
-          if (Epiloguer.shouldLog(Epilogue.Importance.DEBUG)) {
+          if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("x", object.x);
             dataLogger.log("arr1", object.arr1);
             dataLogger.log("getX", object.getX());
@@ -574,7 +574,7 @@ class AnnotationProcessorTest {
 
       import java.util.List;
 
-      @Epilogue
+      @Logged
       class HelloWorld {
         double x;        // Should be logged
         double[] arr1;   // Should be logged
@@ -591,7 +591,7 @@ class AnnotationProcessorTest {
         """
       package edu.wpi.first.epilogue;
 
-      import edu.wpi.first.epilogue.Epilogue;
+      import edu.wpi.first.epilogue.Logged;
       import edu.wpi.first.epilogue.Epiloguer;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
@@ -603,7 +603,7 @@ class AnnotationProcessorTest {
 
         @Override
         public void update(DataLogger dataLogger, HelloWorld object) {
-          if (Epiloguer.shouldLog(Epilogue.Importance.DEBUG)) {
+          if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("x", object.x);
             dataLogger.log("arr1", object.arr1);
             dataLogger.log("getX", object.getX());
@@ -623,7 +623,7 @@ class AnnotationProcessorTest {
       package edu.wpi.first.epilogue;
       import java.util.List;
 
-      @Epilogue
+      @Logged
       class HelloWorld {
         boolean x;        // Should be logged
         boolean[] arr1;   // Should be logged
@@ -640,7 +640,7 @@ class AnnotationProcessorTest {
         """
       package edu.wpi.first.epilogue;
 
-      import edu.wpi.first.epilogue.Epilogue;
+      import edu.wpi.first.epilogue.Logged;
       import edu.wpi.first.epilogue.Epiloguer;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
@@ -652,7 +652,7 @@ class AnnotationProcessorTest {
 
         @Override
         public void update(DataLogger dataLogger, HelloWorld object) {
-          if (Epiloguer.shouldLog(Epilogue.Importance.DEBUG)) {
+          if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("x", object.x);
             dataLogger.log("arr1", object.arr1);
             dataLogger.log("getX", object.getX());
@@ -673,7 +673,7 @@ class AnnotationProcessorTest {
 
       import java.util.List;
 
-      @Epilogue
+      @Logged
       class HelloWorld {
         String x;         // Should be logged
         String[] arr1;   // Should be logged
@@ -690,7 +690,7 @@ class AnnotationProcessorTest {
         """
       package edu.wpi.first.epilogue;
 
-      import edu.wpi.first.epilogue.Epilogue;
+      import edu.wpi.first.epilogue.Logged;
       import edu.wpi.first.epilogue.Epiloguer;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
@@ -702,7 +702,7 @@ class AnnotationProcessorTest {
 
         @Override
         public void update(DataLogger dataLogger, HelloWorld object) {
-          if (Epiloguer.shouldLog(Epilogue.Importance.DEBUG)) {
+          if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("x", object.x);
             dataLogger.log("arr1", object.arr1);
             dataLogger.log("list", object.list);
@@ -726,7 +726,7 @@ class AnnotationProcessorTest {
       import edu.wpi.first.util.struct.StructSerializable;
       import java.util.List;
 
-      @Epilogue
+      @Logged
       class HelloWorld {
         static class Structable implements StructSerializable {
           int x, y;
@@ -749,7 +749,7 @@ class AnnotationProcessorTest {
         """
       package edu.wpi.first.epilogue;
 
-      import edu.wpi.first.epilogue.Epilogue;
+      import edu.wpi.first.epilogue.Logged;
       import edu.wpi.first.epilogue.Epiloguer;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
@@ -761,7 +761,7 @@ class AnnotationProcessorTest {
 
         @Override
         public void update(DataLogger dataLogger, HelloWorld object) {
-          if (Epiloguer.shouldLog(Epilogue.Importance.DEBUG)) {
+          if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("x", object.x, edu.wpi.first.epilogue.HelloWorld.Structable.struct);
             dataLogger.log("arr1", object.arr1, edu.wpi.first.epilogue.HelloWorld.Structable.struct);
             dataLogger.log("list", object.list, edu.wpi.first.epilogue.HelloWorld.Structable.struct);
@@ -785,7 +785,7 @@ class AnnotationProcessorTest {
       import edu.wpi.first.util.struct.StructSerializable;
       import java.util.*;
 
-      @Epilogue
+      @Logged
       class HelloWorld {
         /* Logged */     List<String> list;
         /* Not Logged */ List<List<String>> nestedList;
@@ -800,7 +800,7 @@ class AnnotationProcessorTest {
         """
       package edu.wpi.first.epilogue;
 
-      import edu.wpi.first.epilogue.Epilogue;
+      import edu.wpi.first.epilogue.Logged;
       import edu.wpi.first.epilogue.Epiloguer;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
@@ -812,7 +812,7 @@ class AnnotationProcessorTest {
 
         @Override
         public void update(DataLogger dataLogger, HelloWorld object) {
-          if (Epiloguer.shouldLog(Epilogue.Importance.DEBUG)) {
+          if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("list", object.list);
             dataLogger.log("set", object.set);
             dataLogger.log("queue", object.queue);
@@ -838,7 +838,7 @@ class AnnotationProcessorTest {
       import edu.wpi.first.util.struct.StructSerializable;
       import java.util.List;
 
-      @Epilogue
+      @Logged
       class HelloWorld {
         /* Not logged */ List<Integer> ints;
         /* Not logged */ List<Double> doubles;
@@ -850,7 +850,7 @@ class AnnotationProcessorTest {
         """
       package edu.wpi.first.epilogue;
 
-      import edu.wpi.first.epilogue.Epilogue;
+      import edu.wpi.first.epilogue.Logged;
       import edu.wpi.first.epilogue.Epiloguer;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
@@ -879,31 +879,31 @@ class AnnotationProcessorTest {
       import edu.wpi.first.util.struct.StructSerializable;
       import java.util.*;
 
-      @Epilogue
+      @Logged
       class HelloWorld {
-        @Epilogue Map<String, String> notLoggableType;
-        @Epilogue List rawType;
+        @Logged Map<String, String> notLoggableType;
+        @Logged List rawType;
         @NotLogged List skippedUnloggable;
 
-        @Epilogue
+        @Logged
         private String privateMethod() { return ""; }
 
-        @Epilogue
+        @Logged
         String packagePrivateMethod() { return ""; }
 
-        @Epilogue
+        @Logged
         protected String protectedMethod() { return ""; }
 
-        @Epilogue
+        @Logged
         public static String publicStaticMethod() { return ""; }
 
-        @Epilogue
+        @Logged
         private static String privateStaticMethod() { return ""; }
 
-        @Epilogue
+        @Logged
         public void publicVoidMethod() {}
 
-        @Epilogue
+        @Logged
         public Map<String, String> publicNonLoggableMethod() { return notLoggableType; }
       }
       """;
@@ -920,15 +920,15 @@ class AnnotationProcessorTest {
     assertAll(
         () ->
             assertCompilationError(
-                "[EPILOGUE] You have opted in to Epilogue logging on this field, but it is not a loggable data type!",
+                "[EPILOGUE] You have opted in to logging on this field, but it is not a loggable data type!",
                 9,
-                33,
+                31,
                 errors.get(0)),
         () ->
             assertCompilationError(
-                "[EPILOGUE] You have opted in to Epilogue logging on this field, but it is not a loggable data type!",
+                "[EPILOGUE] You have opted in to logging on this field, but it is not a loggable data type!",
                 10,
-                18,
+                16,
                 errors.get(1)),
         () ->
             assertCompilationError(
@@ -950,13 +950,13 @@ class AnnotationProcessorTest {
                 "[EPILOGUE] Logged methods cannot be static", 26, 25, errors.get(7)),
         () ->
             assertCompilationError(
-                "[EPILOGUE] You have opted in to Epilogue logging on this method, but it does not return a loggable data type!",
+                "[EPILOGUE] You have opted in to logging on this method, but it does not return a loggable data type!",
                 29,
                 15,
                 errors.get(8)),
         () ->
             assertCompilationError(
-                "[EPILOGUE] You have opted in to Epilogue logging on this method, but it does not return a loggable data type!",
+                "[EPILOGUE] You have opted in to logging on this method, but it does not return a loggable data type!",
                 32,
                 30,
                 errors.get(9)));
@@ -968,7 +968,7 @@ class AnnotationProcessorTest {
         """
       package edu.wpi.first.epilogue;
 
-      @Epilogue
+      @Logged
       class HelloWorld<T extends String> {
         T value;
 
@@ -980,7 +980,7 @@ class AnnotationProcessorTest {
         """
       package edu.wpi.first.epilogue;
 
-      import edu.wpi.first.epilogue.Epilogue;
+      import edu.wpi.first.epilogue.Logged;
       import edu.wpi.first.epilogue.Epiloguer;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
@@ -992,7 +992,7 @@ class AnnotationProcessorTest {
 
         @Override
         public void update(DataLogger dataLogger, HelloWorld object) {
-          if (Epiloguer.shouldLog(Epilogue.Importance.DEBUG)) {
+          if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("value", object.value);
             dataLogger.log("upcast", object.upcast());
           }
@@ -1009,17 +1009,17 @@ class AnnotationProcessorTest {
         """
       package edu.wpi.first.epilogue;
 
-      @Epilogue
+      @Logged
       class Child {}
 
-      class GoldenChild extends Child {} // inherits the @Epilogue annotation from the parent
+      class GoldenChild extends Child {} // inherits the @Logged annotation from the parent
 
-      @Epilogue
+      @Logged
       interface IO {}
 
       class IOImpl implements IO {}
 
-      @Epilogue
+      @Logged
       public class HelloWorld {
         /* Logged */     Child child;
         /* Not Logged */ GoldenChild goldenChild;
@@ -1032,7 +1032,7 @@ class AnnotationProcessorTest {
         """
       package edu.wpi.first.epilogue;
 
-      import edu.wpi.first.epilogue.Epilogue;
+      import edu.wpi.first.epilogue.Logged;
       import edu.wpi.first.epilogue.Epiloguer;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
@@ -1044,7 +1044,7 @@ class AnnotationProcessorTest {
 
         @Override
         public void update(DataLogger dataLogger, HelloWorld object) {
-          if (Epiloguer.shouldLog(Epilogue.Importance.DEBUG)) {
+          if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
             Epiloguer.childLogger.tryUpdate(dataLogger.getSubLogger("child"), object.child, Epiloguer.getConfig().errorHandler);
             Epiloguer.ioLogger.tryUpdate(dataLogger.getSubLogger("io"), object.io, Epiloguer.getConfig().errorHandler);
           }
@@ -1077,7 +1077,7 @@ class AnnotationProcessorTest {
           }
         }
 
-        @Epilogue
+        @Logged
         class HelloWorld {
           Point point;
         }
@@ -1087,7 +1087,7 @@ class AnnotationProcessorTest {
         """
       package edu.wpi.first.epilogue;
 
-      import edu.wpi.first.epilogue.Epilogue;
+      import edu.wpi.first.epilogue.Logged;
       import edu.wpi.first.epilogue.Epiloguer;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
@@ -1099,7 +1099,7 @@ class AnnotationProcessorTest {
 
         @Override
         public void update(DataLogger dataLogger, HelloWorld object) {
-          if (Epiloguer.shouldLog(Epilogue.Importance.DEBUG)) {
+          if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
             Epiloguer.customPointLogger.tryUpdate(dataLogger.getSubLogger("point"), object.point, Epiloguer.getConfig().errorHandler);
           }
         }
@@ -1115,7 +1115,7 @@ class AnnotationProcessorTest {
         """
         package edu.wpi.first.epilogue;
 
-        @Epilogue
+        @Logged
         class HelloWorld {
           Throwable t;
         }
