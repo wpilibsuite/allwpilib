@@ -11,7 +11,7 @@ import edu.wpi.first.epilogue.logging.errors.ErrorPrinter;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
 /**
- * A configuration object to be used by the generated {@code Epiloguer} class to customize its
+ * A configuration object to be used by the generated {@code Epilogue} class to customize its
  * behavior.
  */
 @SuppressWarnings("checkstyle:MemberName")

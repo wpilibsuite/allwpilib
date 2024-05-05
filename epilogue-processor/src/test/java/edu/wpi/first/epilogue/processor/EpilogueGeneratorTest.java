@@ -14,7 +14,7 @@ import java.io.IOException;
 import org.junit.jupiter.api.Test;
 
 @SuppressWarnings("checkstyle:LineLength") // Source code templates exceed the line length limit
-class EpiloguerGeneratorTest {
+class EpilogueGeneratorTest {
   @Test
   void noFields() {
     String source =
@@ -32,7 +32,7 @@ class EpiloguerGeneratorTest {
 
         import edu.wpi.first.epilogue.ExampleLogger;
 
-        public final class Epiloguer {
+        public final class Epilogue {
           private static final EpilogueConfiguration config = new EpilogueConfiguration();
 
           public static final ExampleLogger exampleLogger = new ExampleLogger();
@@ -54,7 +54,7 @@ class EpiloguerGeneratorTest {
         }
         """;
 
-    assertGeneratedEpiloguerContents(source, expected);
+    assertGeneratedEpilogueContents(source, expected);
   }
 
   /** Subclassing RobotBase should not generate the bind() method because it lacks addPeriodic(). */
@@ -79,7 +79,7 @@ class EpiloguerGeneratorTest {
 
         import edu.wpi.first.epilogue.ExampleLogger;
 
-        public final class Epiloguer {
+        public final class Epilogue {
           private static final EpilogueConfiguration config = new EpilogueConfiguration();
 
           public static final ExampleLogger exampleLogger = new ExampleLogger();
@@ -101,7 +101,7 @@ class EpiloguerGeneratorTest {
         }
         """;
 
-    assertGeneratedEpiloguerContents(source, expected);
+    assertGeneratedEpilogueContents(source, expected);
   }
 
   @Test
@@ -121,7 +121,7 @@ class EpiloguerGeneratorTest {
 
         import edu.wpi.first.epilogue.ExampleLogger;
 
-        public final class Epiloguer {
+        public final class Epilogue {
           private static final EpilogueConfiguration config = new EpilogueConfiguration();
 
           public static final ExampleLogger exampleLogger = new ExampleLogger();
@@ -159,7 +159,7 @@ class EpiloguerGeneratorTest {
         }
         """;
 
-    assertGeneratedEpiloguerContents(source, expected);
+    assertGeneratedEpilogueContents(source, expected);
   }
 
   @Test
@@ -182,7 +182,7 @@ class EpiloguerGeneratorTest {
         import edu.wpi.first.epilogue.AlphaBotLogger;
         import edu.wpi.first.epilogue.BetaBotLogger;
 
-        public final class Epiloguer {
+        public final class Epilogue {
           private static final EpilogueConfiguration config = new EpilogueConfiguration();
 
           public static final AlphaBotLogger alphaBotLogger = new AlphaBotLogger();
@@ -237,7 +237,7 @@ class EpiloguerGeneratorTest {
         }
         """;
 
-    assertGeneratedEpiloguerContents(source, expected);
+    assertGeneratedEpilogueContents(source, expected);
   }
 
   @Test
@@ -275,7 +275,7 @@ class EpiloguerGeneratorTest {
         import edu.wpi.first.epilogue.ExampleLogger;
         import edu.wpi.first.epilogue.CustomLogger;
 
-        public final class Epiloguer {
+        public final class Epilogue {
           private static final EpilogueConfiguration config = new EpilogueConfiguration();
 
           public static final ExampleLogger exampleLogger = new ExampleLogger();
@@ -298,10 +298,10 @@ class EpiloguerGeneratorTest {
         }
         """;
 
-    assertGeneratedEpiloguerContents(source, expected);
+    assertGeneratedEpilogueContents(source, expected);
   }
 
-  private void assertGeneratedEpiloguerContents(
+  private void assertGeneratedEpilogueContents(
       String loggedClassContent, String loggerClassContent) {
     Compilation compilation =
         javac()
@@ -312,9 +312,9 @@ class EpiloguerGeneratorTest {
     var generatedFiles = compilation.generatedSourceFiles();
     var generatedFile =
         generatedFiles.stream()
-            .filter(jfo -> jfo.getName().contains("Epiloguer"))
+            .filter(jfo -> jfo.getName().contains("Epilogue"))
             .findFirst()
-            .orElseThrow(() -> new IllegalStateException("Epiloguer file was not generated!"));
+            .orElseThrow(() -> new IllegalStateException("Epilogue file was not generated!"));
     try {
       var content = generatedFile.getCharContent(false);
       assertEquals(loggerClassContent, content);

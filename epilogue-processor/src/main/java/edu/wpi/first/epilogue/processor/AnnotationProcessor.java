@@ -47,7 +47,7 @@ public class AnnotationProcessor extends AbstractProcessor {
       "edu.wpi.first.epilogue.logging.ClassSpecificLogger";
   private static final String kLoggedFqn = "edu.wpi.first.epilogue.Logged";
 
-  private EpiloguerGenerator m_epiloguerGenerator;
+  private EpilogueGenerator m_epiloguerGenerator;
   private LoggerGenerator m_loggerGenerator;
   private List<ElementHandler> m_handlers;
 
@@ -110,7 +110,7 @@ public class AnnotationProcessor extends AbstractProcessor {
             new StructHandler(processingEnv), // prioritize struct over sendable
             new SendableHandler(processingEnv));
 
-    m_epiloguerGenerator = new EpiloguerGenerator(processingEnv, customLoggers);
+    m_epiloguerGenerator = new EpilogueGenerator(processingEnv, customLoggers);
     m_loggerGenerator = new LoggerGenerator(processingEnv, m_handlers);
 
     annotations.stream()
@@ -376,7 +376,7 @@ public class AnnotationProcessor extends AbstractProcessor {
 
     // Sort alphabetically
     mainRobotClasses.sort(Comparator.comparing(c -> c.getSimpleName().toString()));
-    m_epiloguerGenerator.writeEpiloguerFile(loggerClassNames, mainRobotClasses);
+    m_epiloguerGenerator.writeEpilogueFile(loggerClassNames, mainRobotClasses);
   }
 
   private void warnOfNonLoggableElements(TypeElement clazz) {

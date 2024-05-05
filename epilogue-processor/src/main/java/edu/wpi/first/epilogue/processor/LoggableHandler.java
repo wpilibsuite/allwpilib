@@ -32,12 +32,12 @@ public class LoggableHandler extends ElementHandler {
             .getElementUtils()
             .getTypeElement(m_processingEnv.getTypeUtils().erasure(dataType).toString());
 
-    return "Epiloguer."
+    return "Epilogue."
         + StringUtils.loggerFieldName(reflectedType)
         + ".tryUpdate(dataLogger.getSubLogger(\""
         + loggedName(element)
         + "\"), "
         + elementAccess(element)
-        + ", Epiloguer.getConfig().errorHandler)";
+        + ", Epilogue.getConfig().errorHandler)";
   }
 }

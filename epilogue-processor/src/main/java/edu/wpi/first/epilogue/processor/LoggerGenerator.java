@@ -121,7 +121,7 @@ public class LoggerGenerator {
       }
 
       out.println("import edu.wpi.first.epilogue.Logged;");
-      out.println("import edu.wpi.first.epilogue.Epiloguer;");
+      out.println("import edu.wpi.first.epilogue.Epilogue;");
       out.println("import edu.wpi.first.epilogue.logging.ClassSpecificLogger;");
       out.println("import edu.wpi.first.epilogue.logging.DataLogger;");
       if (requiresVarHandles) {
@@ -205,14 +205,13 @@ public class LoggerGenerator {
                         }
                       },
                       () ->
-                          new EnumMap<>(
-                              Logged.Importance.class), // EnumMap for consistent ordering
+                          new EnumMap<>(Logged.Importance.class), // EnumMap for consistent ordering
                       toList()));
 
       loggedElementsByImportance.forEach(
           (importance, elements) -> {
             out.println(
-                "    if (Epiloguer.shouldLog(Logged.Importance." + importance.name() + ")) {");
+                "    if (Epilogue.shouldLog(Logged.Importance." + importance.name() + ")) {");
 
             for (var loggableElement : elements) {
               // findFirst for prioritization

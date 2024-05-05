@@ -37,7 +37,7 @@ class AnnotationProcessorTest {
       package edu.wpi.first.epilogue;
 
       import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epiloguer;
+      import edu.wpi.first.epilogue.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
 
@@ -48,7 +48,7 @@ class AnnotationProcessorTest {
 
         @Override
         public void update(DataLogger dataLogger, Example object) {
-          if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("x", object.x);
           }
         }
@@ -76,7 +76,7 @@ class AnnotationProcessorTest {
       package edu.wpi.first.epilogue;
 
       import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epiloguer;
+      import edu.wpi.first.epilogue.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
 
@@ -87,7 +87,7 @@ class AnnotationProcessorTest {
 
         @Override
         public void update(DataLogger dataLogger, Example object) {
-          if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("x", object.x);
             dataLogger.log("y", object.y);
           }
@@ -115,7 +115,7 @@ class AnnotationProcessorTest {
       package edu.wpi.first.epilogue;
 
       import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epiloguer;
+      import edu.wpi.first.epilogue.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
       import java.lang.invoke.MethodHandles;
@@ -139,7 +139,7 @@ class AnnotationProcessorTest {
 
         @Override
         public void update(DataLogger dataLogger, Example object) {
-          if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("x", (double) $x.get(object));
           }
         }
@@ -166,7 +166,7 @@ class AnnotationProcessorTest {
       package edu.wpi.first.epilogue;
 
       import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epiloguer;
+      import edu.wpi.first.epilogue.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
       import java.lang.invoke.MethodHandles;
@@ -190,7 +190,7 @@ class AnnotationProcessorTest {
 
         @Override
         public void update(DataLogger dataLogger, Example object) {
-          if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
             logSendable(dataLogger.getSubLogger("chooser"), (edu.wpi.first.wpilibj.smartdashboard.SendableChooser<java.lang.String>) $chooser.get(object));
           }
         }
@@ -219,7 +219,7 @@ class AnnotationProcessorTest {
       package edu.wpi.first.epilogue;
 
       import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epiloguer;
+      import edu.wpi.first.epilogue.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
 
@@ -230,13 +230,13 @@ class AnnotationProcessorTest {
 
         @Override
         public void update(DataLogger dataLogger, Example object) {
-          if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("low", object.low);
           }
-          if (Epiloguer.shouldLog(Logged.Importance.INFO)) {
+          if (Epilogue.shouldLog(Logged.Importance.INFO)) {
             dataLogger.log("medium", object.medium);
           }
-          if (Epiloguer.shouldLog(Logged.Importance.CRITICAL)) {
+          if (Epilogue.shouldLog(Logged.Importance.CRITICAL)) {
             dataLogger.log("high", object.high);
           }
         }
@@ -267,7 +267,7 @@ class AnnotationProcessorTest {
       package edu.wpi.first.epilogue;
 
       import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epiloguer;
+      import edu.wpi.first.epilogue.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
 
@@ -278,7 +278,7 @@ class AnnotationProcessorTest {
 
         @Override
         public void update(DataLogger dataLogger, Example object) {
-          if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("enumValue", object.enumValue);
           }
         }
@@ -311,7 +311,7 @@ class AnnotationProcessorTest {
       package edu.wpi.first.epilogue;
 
       import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epiloguer;
+      import edu.wpi.first.epilogue.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
 
@@ -322,7 +322,7 @@ class AnnotationProcessorTest {
 
         @Override
         public void update(DataLogger dataLogger, Example object) {
-          if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("x", object.x);
             dataLogger.log("arr1", object.arr1);
             dataLogger.log("getX", object.getX());
@@ -358,7 +358,7 @@ class AnnotationProcessorTest {
       package edu.wpi.first.epilogue;
 
       import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epiloguer;
+      import edu.wpi.first.epilogue.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
 
@@ -369,7 +369,7 @@ class AnnotationProcessorTest {
 
         @Override
         public void update(DataLogger dataLogger, Example object) {
-          if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("x", object.x);
             dataLogger.log("getX", object.getX());
           }
@@ -403,7 +403,7 @@ class AnnotationProcessorTest {
       package edu.wpi.first.epilogue;
 
       import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epiloguer;
+      import edu.wpi.first.epilogue.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
 
@@ -414,7 +414,7 @@ class AnnotationProcessorTest {
 
         @Override
         public void update(DataLogger dataLogger, Example object) {
-          if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("x", object.x);
             dataLogger.log("getX", object.getX());
           }
@@ -448,7 +448,7 @@ class AnnotationProcessorTest {
       package edu.wpi.first.epilogue;
 
       import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epiloguer;
+      import edu.wpi.first.epilogue.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
 
@@ -459,7 +459,7 @@ class AnnotationProcessorTest {
 
         @Override
         public void update(DataLogger dataLogger, Example object) {
-          if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("x", object.x);
             dataLogger.log("arr1", object.arr1);
             dataLogger.log("getX", object.getX());
@@ -495,7 +495,7 @@ class AnnotationProcessorTest {
       package edu.wpi.first.epilogue;
 
       import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epiloguer;
+      import edu.wpi.first.epilogue.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
 
@@ -506,7 +506,7 @@ class AnnotationProcessorTest {
 
         @Override
         public void update(DataLogger dataLogger, Example object) {
-          if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("x", object.x);
             dataLogger.log("arr1", object.arr1);
             dataLogger.log("getX", object.getX());
@@ -542,7 +542,7 @@ class AnnotationProcessorTest {
       package edu.wpi.first.epilogue;
 
       import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epiloguer;
+      import edu.wpi.first.epilogue.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
 
@@ -553,7 +553,7 @@ class AnnotationProcessorTest {
 
         @Override
         public void update(DataLogger dataLogger, Example object) {
-          if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("x", object.x);
             dataLogger.log("arr1", object.arr1);
             dataLogger.log("getX", object.getX());
@@ -592,7 +592,7 @@ class AnnotationProcessorTest {
       package edu.wpi.first.epilogue;
 
       import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epiloguer;
+      import edu.wpi.first.epilogue.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
 
@@ -603,7 +603,7 @@ class AnnotationProcessorTest {
 
         @Override
         public void update(DataLogger dataLogger, Example object) {
-          if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("x", object.x);
             dataLogger.log("arr1", object.arr1);
             dataLogger.log("getX", object.getX());
@@ -641,7 +641,7 @@ class AnnotationProcessorTest {
       package edu.wpi.first.epilogue;
 
       import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epiloguer;
+      import edu.wpi.first.epilogue.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
 
@@ -652,7 +652,7 @@ class AnnotationProcessorTest {
 
         @Override
         public void update(DataLogger dataLogger, Example object) {
-          if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("x", object.x);
             dataLogger.log("arr1", object.arr1);
             dataLogger.log("getX", object.getX());
@@ -691,7 +691,7 @@ class AnnotationProcessorTest {
       package edu.wpi.first.epilogue;
 
       import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epiloguer;
+      import edu.wpi.first.epilogue.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
 
@@ -702,7 +702,7 @@ class AnnotationProcessorTest {
 
         @Override
         public void update(DataLogger dataLogger, Example object) {
-          if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("x", object.x);
             dataLogger.log("arr1", object.arr1);
             dataLogger.log("list", object.list);
@@ -750,7 +750,7 @@ class AnnotationProcessorTest {
       package edu.wpi.first.epilogue;
 
       import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epiloguer;
+      import edu.wpi.first.epilogue.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
 
@@ -761,7 +761,7 @@ class AnnotationProcessorTest {
 
         @Override
         public void update(DataLogger dataLogger, Example object) {
-          if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("x", object.x, edu.wpi.first.epilogue.Example.Structable.struct);
             dataLogger.log("arr1", object.arr1, edu.wpi.first.epilogue.Example.Structable.struct);
             dataLogger.log("list", object.list, edu.wpi.first.epilogue.Example.Structable.struct);
@@ -801,7 +801,7 @@ class AnnotationProcessorTest {
       package edu.wpi.first.epilogue;
 
       import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epiloguer;
+      import edu.wpi.first.epilogue.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
 
@@ -812,7 +812,7 @@ class AnnotationProcessorTest {
 
         @Override
         public void update(DataLogger dataLogger, Example object) {
-          if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("list", object.list);
             dataLogger.log("set", object.set);
             dataLogger.log("queue", object.queue);
@@ -851,7 +851,7 @@ class AnnotationProcessorTest {
       package edu.wpi.first.epilogue;
 
       import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epiloguer;
+      import edu.wpi.first.epilogue.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
 
@@ -981,7 +981,7 @@ class AnnotationProcessorTest {
       package edu.wpi.first.epilogue;
 
       import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epiloguer;
+      import edu.wpi.first.epilogue.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
 
@@ -992,7 +992,7 @@ class AnnotationProcessorTest {
 
         @Override
         public void update(DataLogger dataLogger, Example object) {
-          if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
             dataLogger.log("value", object.value);
             dataLogger.log("upcast", object.upcast());
           }
@@ -1033,7 +1033,7 @@ class AnnotationProcessorTest {
       package edu.wpi.first.epilogue;
 
       import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epiloguer;
+      import edu.wpi.first.epilogue.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
 
@@ -1044,9 +1044,9 @@ class AnnotationProcessorTest {
 
         @Override
         public void update(DataLogger dataLogger, Example object) {
-          if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
-            Epiloguer.childLogger.tryUpdate(dataLogger.getSubLogger("child"), object.child, Epiloguer.getConfig().errorHandler);
-            Epiloguer.ioLogger.tryUpdate(dataLogger.getSubLogger("io"), object.io, Epiloguer.getConfig().errorHandler);
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+            Epilogue.childLogger.tryUpdate(dataLogger.getSubLogger("child"), object.child, Epilogue.getConfig().errorHandler);
+            Epilogue.ioLogger.tryUpdate(dataLogger.getSubLogger("io"), object.io, Epilogue.getConfig().errorHandler);
           }
         }
       }
@@ -1088,7 +1088,7 @@ class AnnotationProcessorTest {
       package edu.wpi.first.epilogue;
 
       import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epiloguer;
+      import edu.wpi.first.epilogue.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.DataLogger;
 
@@ -1099,8 +1099,8 @@ class AnnotationProcessorTest {
 
         @Override
         public void update(DataLogger dataLogger, Example object) {
-          if (Epiloguer.shouldLog(Logged.Importance.DEBUG)) {
-            Epiloguer.customPointLogger.tryUpdate(dataLogger.getSubLogger("point"), object.point, Epiloguer.getConfig().errorHandler);
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+            Epilogue.customPointLogger.tryUpdate(dataLogger.getSubLogger("point"), object.point, Epilogue.getConfig().errorHandler);
           }
         }
       }

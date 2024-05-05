@@ -16,37 +16,37 @@ import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 
 /**
- * Generates the {@code Epiloguer} file used as the main entry point to logging with Epilogue in a
- * robot program. {@code Epiloguer} has instances of every generated logger class, a {@link
+ * Generates the {@code Epilogue} file used as the main entry point to logging with Epilogue in a
+ * robot program. {@code Epilogue} has instances of every generated logger class, a {@link
  * EpilogueConfiguration config} object, and (if the main robot class inherits from {@link
  * edu.wpi.first.wpilibj.TimedRobot TimedRobot}) a {@code bind()} method to automatically add a
  * periodic logging call to the robot.
  */
-public class EpiloguerGenerator {
+public class EpilogueGenerator {
   private final ProcessingEnvironment m_processingEnv;
   private final Map<TypeMirror, DeclaredType> m_customLoggers;
 
-  public EpiloguerGenerator(
+  public EpilogueGenerator(
       ProcessingEnvironment processingEnv, Map<TypeMirror, DeclaredType> customLoggers) {
     this.m_processingEnv = processingEnv;
     this.m_customLoggers = customLoggers;
   }
 
   /**
-   * Creates the Epiloguer file, which is the main entry point for users to set up and interact with
+   * Creates the Epilogue file, which is the main entry point for users to set up and interact with
    * the generated loggers.
    *
    * @param loggerClassNames the names of the generated logger classes. Each of these will be
-   *     instantiated in a public static field on the Epiloguer class.
+   *     instantiated in a public static field on the Epilogue class.
    * @param mainRobotClasses the main robot classes. May be empty. Used to generate a {@code bind()}
    *     method to add a callback hook to a TimedRobot to log itself.
    */
   @SuppressWarnings("checkstyle:LineLength") // Source code templates exceed the line length limit
-  public void writeEpiloguerFile(
+  public void writeEpilogueFile(
       List<String> loggerClassNames, Collection<TypeElement> mainRobotClasses) {
     try {
       var centralStore =
-          m_processingEnv.getFiler().createSourceFile("edu.wpi.first.epilogue.Epiloguer");
+          m_processingEnv.getFiler().createSourceFile("edu.wpi.first.epilogue.Epilogue");
 
       try (var out = new PrintWriter(centralStore.openOutputStream())) {
         out.println("package edu.wpi.first.epilogue;");
@@ -76,7 +76,7 @@ public class EpiloguerGenerator {
                 });
         out.println();
 
-        out.println("public final class Epiloguer {");
+        out.println("public final class Epilogue {");
         out.println(
             "  private static final EpilogueConfiguration config = new EpilogueConfiguration();");
         out.println();
