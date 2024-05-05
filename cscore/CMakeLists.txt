@@ -87,36 +87,6 @@ if(WITH_JAVA)
     set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
 
     #find java files, copy them locally
-
-    if("${OPENCV_JAVA_INSTALL_DIR}" STREQUAL "")
-        set(OPENCV_JAVA_INSTALL_DIR ${OpenCV_INSTALL_PATH}/share/OpenCV/java/)
-    endif()
-
-    find_file(
-        OPENCV_JAR_FILE
-        NAMES opencv-${OpenCV_VERSION_MAJOR}${OpenCV_VERSION_MINOR}${OpenCV_VERSION_PATCH}.jar
-        PATHS
-            ${OPENCV_JAVA_INSTALL_DIR}
-            ${OpenCV_INSTALL_PATH}/bin
-            ${OpenCV_INSTALL_PATH}/share/java
-        NO_DEFAULT_PATH
-    )
-    find_file(
-        OPENCV_JNI_FILE
-        NAMES
-            libopencv_java${OpenCV_VERSION_MAJOR}${OpenCV_VERSION_MINOR}${OpenCV_VERSION_PATCH}.so
-            libopencv_java${OpenCV_VERSION_MAJOR}${OpenCV_VERSION_MINOR}${OpenCV_VERSION_PATCH}.dylib
-            opencv_java${OpenCV_VERSION_MAJOR}${OpenCV_VERSION_MINOR}${OpenCV_VERSION_PATCH}.dll
-        PATHS
-            ${OPENCV_JAVA_INSTALL_DIR}
-            ${OpenCV_INSTALL_PATH}/bin
-            ${OpenCV_INSTALL_PATH}/bin/Release
-            ${OpenCV_INSTALL_PATH}/bin/Debug
-            ${OpenCV_INSTALL_PATH}/lib
-            ${OpenCV_INSTALL_PATH}/lib/jni
-        NO_DEFAULT_PATH
-    )
-
     file(GLOB cscore_jni_src src/main/native/cpp/jni/CameraServerJNI.cpp)
 
     file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
@@ -125,34 +95,13 @@ if(WITH_JAVA)
     add_jar(
         cscore_jar
         ${JAVA_SOURCES}
-        INCLUDE_JARS wpiutil_jar ${OPENCV_JAR_FILE}
+        INCLUDE_JARS wpiutil_jar
         OUTPUT_NAME cscore
         GENERATE_NATIVE_HEADERS cscore_jni_headers
     )
 
     install_jar(cscore_jar DESTINATION ${java_lib_dest})
     install_jar_exports(TARGETS cscore_jar FILE cscore_jar.cmake DESTINATION share/cscore)
-    install(FILES ${OPENCV_JAR_FILE} DESTINATION "${java_lib_dest}")
-
-    if(MSVC)
-        install(FILES ${OPENCV_JNI_FILE} DESTINATION "${jni_lib_dest}")
-
-        foreach(cvFile ${OpenCV_LIBS})
-            find_file(
-                ${cvFile}Loc
-                NAMES
-                    ${cvFile}${OpenCV_VERSION_MAJOR}${OpenCV_VERSION_MINOR}${OpenCV_VERSION_PATCH}.dll
-                PATHS
-                    ${OPENCV_JAVA_INSTALL_DIR}
-                    ${OpenCV_INSTALL_PATH}/bin
-                    ${OpenCV_INSTALL_PATH}/bin/Release
-                    ${OpenCV_INSTALL_PATH}/bin/Debug
-                    ${OpenCV_INSTALL_PATH}/lib
-                NO_DEFAULT_PATH
-            )
-            install(FILES ${${cvFile}Loc} DESTINATION "${jni_lib_dest}")
-        endforeach()
-    endif()
 
     add_library(cscorejni ${cscore_jni_src})
     wpilib_target_warnings(cscorejni)

@@ -113,15 +113,15 @@ if(WITH_JAVA)
     set(CMAKE_JNI_TARGET true)
 
     add_jar(
-        cscore_jar
+        cscorecv_jar
         ${JAVA_SOURCES}
-        INCLUDE_JARS wpiutil_jar ${OPENCV_JAR_FILE}
+        INCLUDE_JARS cscore_jar wpiutil_jar ${OPENCV_JAR_FILE}
         OUTPUT_NAME cscorecv
         GENERATE_NATIVE_HEADERS cscore_jni_headers
     )
 
-    install_jar(cscore_jar DESTINATION ${java_lib_dest})
-    install_jar_exports(TARGETS cscore_jar FILE cscore_jar.cmake DESTINATION share/cscorecv)
+    install_jar(cscorecv_jar DESTINATION ${java_lib_dest})
+    install_jar_exports(TARGETS cscorecv_jar FILE cscorecv_jar.cmake DESTINATION share/cscorecv)
     install(FILES ${OPENCV_JAR_FILE} DESTINATION "${java_lib_dest}")
 
     if(MSVC)
@@ -143,6 +143,18 @@ if(WITH_JAVA)
             install(FILES ${${cvFile}Loc} DESTINATION "${jni_lib_dest}")
         endforeach()
     endif()
+
+    add_library(cscorecvjni ${cscore_jni_src})
+    wpilib_target_warnings(cscorecvjni)
+    target_link_libraries(cscorecvjni PUBLIC cscore wpiutil ${OpenCV_LIBS})
+
+    set_property(TARGET cscorecvjni PROPERTY FOLDER "libraries")
+
+    target_link_libraries(cscorecvjni PRIVATE cscorecv_jni_headers)
+    add_dependencies(cscorecvjni cscorecv_jar)
+
+    install(TARGETS cscorecvjni EXPORT cscorecvjni)
+    export(TARGETS cscorecvjni FILE cscorecvjni.cmake NAMESPACE cscorecvjni::)
 endif()
 
 if(WITH_JAVA_SOURCE)
@@ -150,19 +162,19 @@ if(WITH_JAVA_SOURCE)
     include(UseJava)
     file(GLOB CSCORECV_SOURCES src/main/java/edu/wpi/first/cscorecv/*.java)
     add_jar(
-        cscore_src_jar
+        cscorecv_src_jar
         RESOURCES
         NAMESPACE "edu/wpi/first/cscorecv" ${CSCORECV_SOURCES}
         OUTPUT_NAME cscorecv-sources
     )
 
-    get_property(CSCORE_SRC_JAR_FILE TARGET cscore_src_jar PROPERTY JAR_FILE)
-    install(FILES ${CSCORE_SRC_JAR_FILE} DESTINATION "${java_lib_dest}")
+    get_property(CSCORECV_SRC_JAR_FILE TARGET cscorecv_src_jar PROPERTY JAR_FILE)
+    install(FILES ${CSCORECV_SRC_JAR_FILE} DESTINATION "${java_lib_dest}")
 
     set_property(TARGET cscorecv_src_jar PROPERTY FOLDER "java")
 endif()
 
 if(WITH_TESTS)
     wpilib_add_test(cscorecv src/test/native/cpp)
-    target_link_libraries(cscore_test cscorecv gmock)
+    target_link_libraries(cscorecv_test cscorecv gmock)
 endif()
