@@ -188,9 +188,6 @@ public class LoggerGenerator {
       out.println("  @Override");
       out.println("  public void update(DataLogger dataLogger, " + simpleClassName + " object) {");
 
-      // [log fields]
-      // [log methods]
-
       // Build a map of importance levels to the fields logged at those levels
       // e.g. { DEBUG: [fieldA, fieldB], INFO: [fieldC], CRITICAL: [fieldD, fieldE, fieldF] }
       var loggedElementsByImportance =

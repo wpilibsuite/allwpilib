@@ -341,7 +341,6 @@ public class AnnotationProcessor extends AbstractProcessor {
 
     if (!(validFields && validMethods)) {
       // Generate nothing and bail
-      // Return `true` to mark the annotations as claimed so they're not processed again
       return;
     }
 
