@@ -34,6 +34,13 @@ import java.util.Objects;
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Translation3d
     implements Interpolatable<Translation3d>, ProtobufSerializable, StructSerializable {
+  /**
+   * A preallocated Translation3d representing the origin.
+   *
+   * <p>This exists to avoid allocations for common translations.
+   */
+  public static final Translation3d kZero = new Translation3d();
+
   private final double m_x;
   private final double m_y;
   private final double m_z;

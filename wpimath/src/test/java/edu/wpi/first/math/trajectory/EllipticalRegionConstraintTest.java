@@ -27,7 +27,7 @@ class EllipticalRegionConstraintTest {
             new Translation2d(Units.feetToMeters(5.0), Units.feetToMeters(5.0)),
             Units.feetToMeters(10.0),
             Units.feetToMeters(5.0),
-            Rotation2d.fromDegrees(180.0),
+            Rotation2d.kPi,
             maxVelocityConstraint);
 
     // Get trajectory
@@ -58,23 +58,23 @@ class EllipticalRegionConstraintTest {
             new Translation2d(Units.feetToMeters(1.0), Units.feetToMeters(1.0)),
             Units.feetToMeters(2.0),
             Units.feetToMeters(4.0),
-            new Rotation2d(),
+            Rotation2d.kZero,
             maxVelocityConstraint);
 
     assertFalse(
         regionConstraintNoRotation.isPoseInRegion(
-            new Pose2d(Units.feetToMeters(2.1), Units.feetToMeters(1.0), new Rotation2d())));
+            new Pose2d(Units.feetToMeters(2.1), Units.feetToMeters(1.0), Rotation2d.kZero)));
 
     var regionConstraintWithRotation =
         new EllipticalRegionConstraint(
             new Translation2d(Units.feetToMeters(1.0), Units.feetToMeters(1.0)),
             Units.feetToMeters(2.0),
             Units.feetToMeters(4.0),
-            Rotation2d.fromDegrees(90.0),
+            Rotation2d.kCCW_Pi_2,
             maxVelocityConstraint);
 
     assertTrue(
         regionConstraintWithRotation.isPoseInRegion(
-            new Pose2d(Units.feetToMeters(2.1), Units.feetToMeters(1.0), new Rotation2d())));
+            new Pose2d(Units.feetToMeters(2.1), Units.feetToMeters(1.0), Rotation2d.kZero)));
   }
 }

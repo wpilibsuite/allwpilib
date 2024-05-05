@@ -101,20 +101,17 @@ class Pose2dTest {
 
   @Test
   void testNearest() {
-    var origin = new Pose2d();
+    var origin = Pose2d.kZero;
 
     // Distance sort
     // each poseX is X units away from the origin at a random angle.
     final var pose1 =
-        new Pose2d(new Translation2d(1, Rotation2d.fromDegrees(45)), new Rotation2d());
-    final var pose2 =
-        new Pose2d(new Translation2d(2, Rotation2d.fromDegrees(90)), new Rotation2d());
+        new Pose2d(new Translation2d(1, Rotation2d.fromDegrees(45)), Rotation2d.kZero);
+    final var pose2 = new Pose2d(new Translation2d(2, Rotation2d.kCCW_Pi_2), Rotation2d.kZero);
     final var pose3 =
-        new Pose2d(new Translation2d(3, Rotation2d.fromDegrees(135)), new Rotation2d());
-    final var pose4 =
-        new Pose2d(new Translation2d(4, Rotation2d.fromDegrees(180)), new Rotation2d());
-    final var pose5 =
-        new Pose2d(new Translation2d(5, Rotation2d.fromDegrees(270)), new Rotation2d());
+        new Pose2d(new Translation2d(3, Rotation2d.fromDegrees(135)), Rotation2d.kZero);
+    final var pose4 = new Pose2d(new Translation2d(4, Rotation2d.kPi), Rotation2d.kZero);
+    final var pose5 = new Pose2d(new Translation2d(5, Rotation2d.kCW_Pi_2), Rotation2d.kZero);
 
     assertEquals(pose3, origin.nearest(List.of(pose5, pose3, pose4)));
     assertEquals(pose1, origin.nearest(List.of(pose1, pose2, pose3)));
@@ -123,12 +120,12 @@ class Pose2dTest {
     // Rotation component sort (when distance is the same)
     // Use the same translation because using different angles at the same distance can cause
     // rounding error.
-    final var translation = new Translation2d(1, new Rotation2d());
+    final var translation = new Translation2d(1, Rotation2d.kZero);
 
-    final var poseA = new Pose2d(translation, Rotation2d.fromDegrees(0));
+    final var poseA = new Pose2d(translation, Rotation2d.kZero);
     final var poseB = new Pose2d(translation, Rotation2d.fromDegrees(30));
     final var poseC = new Pose2d(translation, Rotation2d.fromDegrees(120));
-    final var poseD = new Pose2d(translation, Rotation2d.fromDegrees(90));
+    final var poseD = new Pose2d(translation, Rotation2d.kCCW_Pi_2);
     final var poseE = new Pose2d(translation, Rotation2d.fromDegrees(-180));
 
     assertEquals(

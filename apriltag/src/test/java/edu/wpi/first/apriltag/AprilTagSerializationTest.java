@@ -20,8 +20,8 @@ class AprilTagSerializationTest {
     var layout =
         new AprilTagFieldLayout(
             List.of(
-                new AprilTag(1, new Pose3d(0, 0, 0, new Rotation3d(0, 0, 0))),
-                new AprilTag(3, new Pose3d(0, 1, 0, new Rotation3d(0, 0, 0)))),
+                new AprilTag(1, Pose3d.kZero),
+                new AprilTag(3, new Pose3d(0, 1, 0, Rotation3d.kZero))),
             Units.feetToMeters(54.0),
             Units.feetToMeters(27.0));
 

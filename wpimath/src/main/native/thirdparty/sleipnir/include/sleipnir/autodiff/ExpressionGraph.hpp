@@ -3,10 +3,10 @@
 #pragma once
 
 #include <span>
-#include <vector>
 
 #include "sleipnir/autodiff/Expression.hpp"
 #include "sleipnir/util/FunctionRef.hpp"
+#include "sleipnir/util/SmallVector.hpp"
 #include "sleipnir/util/SymbolExports.hpp"
 
 namespace sleipnir::detail {
@@ -36,7 +36,7 @@ class SLEIPNIR_DLLEXPORT ExpressionGraph {
     // https://en.wikipedia.org/wiki/Breadth-first_search
 
     // BFS list sorted from parent to child.
-    std::vector<Expression*> stack;
+    small_vector<Expression*> stack;
 
     stack.emplace_back(root.Get());
 
@@ -119,7 +119,7 @@ class SLEIPNIR_DLLEXPORT ExpressionGraph {
    *
    * @param wrt Variables with respect to which to compute the gradient.
    */
-  std::vector<ExpressionPtr> GenerateGradientTree(
+  small_vector<ExpressionPtr> GenerateGradientTree(
       std::span<const ExpressionPtr> wrt) const {
     // Read docs/algorithms.md#Reverse_accumulation_automatic_differentiation
     // for background on reverse accumulation automatic differentiation.
@@ -128,7 +128,7 @@ class SLEIPNIR_DLLEXPORT ExpressionGraph {
       wrt[row]->row = row;
     }
 
-    std::vector<ExpressionPtr> grad;
+    small_vector<ExpressionPtr> grad;
     grad.reserve(wrt.size());
     for (size_t row = 0; row < wrt.size(); ++row) {
       grad.emplace_back(MakeExpressionPtr());
@@ -231,13 +231,13 @@ class SLEIPNIR_DLLEXPORT ExpressionGraph {
 
  private:
   // List that maps nodes to their respective row.
-  std::vector<int> m_rowList;
+  small_vector<int> m_rowList;
 
   // List for updating adjoints
-  std::vector<Expression*> m_adjointList;
+  small_vector<Expression*> m_adjointList;
 
   // List for updating values
-  std::vector<Expression*> m_valueList;
+  small_vector<Expression*> m_valueList;
 };
 
 }  // namespace sleipnir::detail

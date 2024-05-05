@@ -12,6 +12,13 @@ import java.util.Objects;
 
 /** Represents a transformation for a Pose3d in the pose's frame. */
 public class Transform3d implements ProtobufSerializable, StructSerializable {
+  /**
+   * A preallocated Transform3d representing no transformation.
+   *
+   * <p>This exists to avoid allocations for common transformations.
+   */
+  public static final Transform3d kZero = new Transform3d();
+
   private final Translation3d m_translation;
   private final Rotation3d m_rotation;
 
@@ -59,8 +66,8 @@ public class Transform3d implements ProtobufSerializable, StructSerializable {
 
   /** Constructs the identity transform -- maps an initial pose to itself. */
   public Transform3d() {
-    m_translation = new Translation3d();
-    m_rotation = new Rotation3d();
+    m_translation = Translation3d.kZero;
+    m_rotation = Rotation3d.kZero;
   }
 
   /**
@@ -91,7 +98,7 @@ public class Transform3d implements ProtobufSerializable, StructSerializable {
    * @return The composition of the two transformations.
    */
   public Transform3d plus(Transform3d other) {
-    return new Transform3d(new Pose3d(), new Pose3d().transformBy(this).transformBy(other));
+    return new Transform3d(Pose3d.kZero, Pose3d.kZero.transformBy(this).transformBy(other));
   }
 
   /**

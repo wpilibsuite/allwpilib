@@ -150,7 +150,7 @@ public class AprilTagFieldLayout {
   public final void setOrigin(OriginPosition origin) {
     switch (origin) {
       case kBlueAllianceWallRightSide:
-        setOrigin(new Pose3d());
+        setOrigin(Pose3d.kZero);
         break;
       case kRedAllianceWallRightSide:
         setOrigin(

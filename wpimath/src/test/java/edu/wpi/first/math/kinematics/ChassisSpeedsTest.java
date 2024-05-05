@@ -30,7 +30,7 @@ class ChassisSpeedsTest {
             speeds.vyMetersPerSecond * dt,
             speeds.omegaRadiansPerSecond * dt);
 
-    var pose = new Pose2d();
+    var pose = Pose2d.kZero;
     for (double time = 0; time < duration; time += dt) {
       pose = pose.exp(twist);
     }
@@ -62,7 +62,7 @@ class ChassisSpeedsTest {
   @Test
   void testFromFieldRelativeSpeeds() {
     final var chassisSpeeds =
-        ChassisSpeeds.fromFieldRelativeSpeeds(1.0, 0.0, 0.5, Rotation2d.fromDegrees(-90.0));
+        ChassisSpeeds.fromFieldRelativeSpeeds(1.0, 0.0, 0.5, Rotation2d.kCW_Pi_2);
 
     assertAll(
         () -> assertEquals(0.0, chassisSpeeds.vxMetersPerSecond, kEpsilon),

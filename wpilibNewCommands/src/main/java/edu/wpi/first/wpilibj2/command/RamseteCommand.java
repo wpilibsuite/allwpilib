@@ -69,7 +69,9 @@ public class RamseteCommand extends Command {
    * @param outputVolts A function that consumes the computed left and right outputs (in volts) for
    *     the robot drive.
    * @param requirements The subsystems to require.
+   * @deprecated Use LTVUnicycleController instead.
    */
+  @Deprecated(since = "2024", forRemoval = true)
   @SuppressWarnings("this-escape")
   public RamseteCommand(
       Trajectory trajectory,
@@ -109,7 +111,9 @@ public class RamseteCommand extends Command {
    * @param kinematics The kinematics for the robot drivetrain.
    * @param outputMetersPerSecond A function that consumes the computed left and right wheel speeds.
    * @param requirements The subsystems to require.
+   * @deprecated Use LTVUnicycleController instead.
    */
+  @Deprecated(since = "2024", forRemoval = true)
   @SuppressWarnings("this-escape")
   public RamseteCommand(
       Trajectory trajectory,

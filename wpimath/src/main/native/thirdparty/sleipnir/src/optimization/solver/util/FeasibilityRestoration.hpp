@@ -6,7 +6,6 @@
 #include <cmath>
 #include <iterator>
 #include <span>
-#include <vector>
 
 #include <Eigen/Core>
 
@@ -17,6 +16,7 @@
 #include "sleipnir/optimization/SolverStatus.hpp"
 #include "sleipnir/optimization/solver/InteriorPoint.hpp"
 #include "sleipnir/util/FunctionRef.hpp"
+#include "sleipnir/util/SmallVector.hpp"
 
 namespace sleipnir {
 
@@ -66,7 +66,7 @@ inline void FeasibilityRestoration(
 
   constexpr double ρ = 1000.0;
 
-  std::vector<Variable> fr_decisionVariables;
+  small_vector<Variable> fr_decisionVariables;
   fr_decisionVariables.reserve(decisionVariables.size() +
                                2 * equalityConstraints.size() +
                                2 * inequalityConstraints.size());
@@ -158,7 +158,7 @@ inline void FeasibilityRestoration(
   }
 
   // cₑ(x) - pₑ + nₑ = 0
-  std::vector<Variable> fr_equalityConstraints;
+  small_vector<Variable> fr_equalityConstraints;
   fr_equalityConstraints.assign(equalityConstraints.begin(),
                                 equalityConstraints.end());
   for (size_t row = 0; row < fr_equalityConstraints.size(); ++row) {
@@ -167,7 +167,7 @@ inline void FeasibilityRestoration(
   }
 
   // cᵢ(x) - s - pᵢ + nᵢ = 0
-  std::vector<Variable> fr_inequalityConstraints;
+  small_vector<Variable> fr_inequalityConstraints;
   fr_inequalityConstraints.assign(inequalityConstraints.begin(),
                                   inequalityConstraints.end());
   for (size_t row = 0; row < fr_inequalityConstraints.size(); ++row) {

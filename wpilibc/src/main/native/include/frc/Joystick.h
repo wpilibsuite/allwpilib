@@ -252,26 +252,6 @@ class Joystick : public GenericHID {
   double GetMagnitude() const;
 
   /**
-   * Get the direction of the vector formed by the joystick and its origin
-   * in radians.
-   *
-   * @return The direction of the vector in radians
-   * @deprecated Use GetDirection() instead.
-   */
-  [[deprecated("Use GetDirection() instead.")]]
-  double GetDirectionRadians() const;
-
-  /**
-   * Get the direction of the vector formed by the joystick and its origin
-   * in degrees.
-   *
-   * @return The direction of the vector in degrees
-   * @deprecated Use GetDirection() instead.
-   */
-  [[deprecated("Use GetDirection() instead.")]]
-  double GetDirectionDegrees() const;
-
-  /**
    * Get the direction of the vector formed by the joystick and its origin.
    *
    * @return The direction of the vector.
