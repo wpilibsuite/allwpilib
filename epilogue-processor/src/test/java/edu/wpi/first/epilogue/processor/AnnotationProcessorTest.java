@@ -1163,7 +1163,8 @@ class AnnotationProcessorTest {
             .orElseThrow(() -> new IllegalStateException("Logger file was not generated!"));
     try {
       var content = generatedFile.getCharContent(false);
-      assertEquals(loggerClassContent, content);
+      assertEquals(
+          loggerClassContent.replace("\r\n", "\n"), content.toString().replace("\r\n", "\n"));
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
