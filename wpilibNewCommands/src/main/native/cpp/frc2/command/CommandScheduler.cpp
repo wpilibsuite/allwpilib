@@ -209,14 +209,18 @@ void CommandScheduler::Run() {
     m_watchdog.AddEpoch(command->GetName() + ".Execute()");
 
     if (command->IsFinished()) {
+      printf("Command %s is finished\n", command->GetName().c_str());
       m_impl->endingCommands.insert(command);
+      printf("Ending command %s\n", command->GetName().c_str());
       command->End(false);
+      printf("Command %s has ended\n", command->GetName().c_str());
       for (auto&& action : m_impl->finishActions) {
         action(*command);
       }
       m_impl->endingCommands.erase(command);
 
       m_impl->scheduledCommands.erase(command);
+      printf("Erasing command %s from scheduledCommands\n", command->GetName().c_str());
       for (auto&& requirement : command->GetRequirements()) {
         m_impl->requirements.erase(requirement);
       }
