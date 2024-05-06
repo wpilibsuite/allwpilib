@@ -140,12 +140,13 @@ TEST_F(CommandDecoratorTest, RepeatFor) {
 
   int counter = 0;
 
-  auto command = InstantCommand([&counter] { counter++;}, {}).Repeatedly(3);
+  auto command = InstantCommand([&counter] { counter++; printf("Incrementing counter to: %d\n", counter);}, {}).Repeatedly(3);
 
   scheduler.Schedule(command);
   for (int i = 0; scheduler.IsScheduled(command); i++) {
     scheduler.Run();
     EXPECT_EQ(i + 1, counter);
+    printf("counter: %d\n", counter);
   }
 
   EXPECT_EQ(3, counter);

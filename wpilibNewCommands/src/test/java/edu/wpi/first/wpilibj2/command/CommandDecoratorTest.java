@@ -225,7 +225,10 @@ class CommandDecoratorTest extends CommandTestBase {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicInteger counter = new AtomicInteger(0);
 
-      Command command = new InstantCommand(counter::incrementAndGet);
+      Command command = new InstantCommand(() -> {
+        counter.incrementAndGet();
+        System.out.println("Counter at: " + counter.get());
+      });
 
       Command group = command.repeatedly(3);
 
