@@ -6,9 +6,7 @@ package edu.wpi.first.util.datalog;
 
 import java.io.IOException;
 
-/**
- * A data log writer that flushes the data log to a file when flush() is called.
- */
+/** A data log writer that flushes the data log to a file when flush() is called. */
 public class DataLogWriter extends DataLog {
   /**
    * Construct a new Data Log.
@@ -24,7 +22,6 @@ public class DataLogWriter extends DataLog {
   /**
    * Construct a new Data Log.
    *
-   * @param dir directory to store the log
    * @param filename filename to use
    * @throws IOException if file cannot be opened
    */

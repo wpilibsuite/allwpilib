@@ -5,14 +5,12 @@
 package edu.wpi.first.util.datalog;
 
 /**
- * A data log background writer that periodically flushes the data log on a
- * background thread.  The data log file is created immediately upon
- * construction with a temporary filename.  The file may be renamed at any time
- * using the setFilename() function.
+ * A data log background writer that periodically flushes the data log on a background thread. The
+ * data log file is created immediately upon construction with a temporary filename. The file may be
+ * renamed at any time using the setFilename() function.
  *
- * The data log is periodically flushed to disk.  It can also be explicitly
- * flushed to disk by using the flush() function.  This operation is, however,
- * non-blocking.
+ * <p>The data log is periodically flushed to disk. It can also be explicitly flushed to disk by
+ * using the flush() function. This operation is, however, non-blocking.
  */
 public final class DataLogBackgroundWriter extends DataLog {
   /**
@@ -81,6 +79,7 @@ public final class DataLogBackgroundWriter extends DataLog {
    * random name if SetFilename was not called after stop()) and appends Start records and schema
    * data values for all previously started entries and schemas.
    */
+  @Override
   public void resume() {
     DataLogJNI.resume(m_impl);
   }

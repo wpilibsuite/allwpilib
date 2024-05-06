@@ -45,9 +45,7 @@ public class DataLog implements AutoCloseable {
     DataLogJNI.pause(m_impl);
   }
 
-  /**
-   * Resumes appending of data records to the log.
-   */
+  /** Resumes appending of data records to the log. */
   public void resume() {
     DataLogJNI.resume(m_impl);
   }
