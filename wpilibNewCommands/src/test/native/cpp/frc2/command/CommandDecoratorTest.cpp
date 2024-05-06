@@ -383,6 +383,39 @@ TEST_F(CommandDecoratorTest, RaceWithOrder) {
   EXPECT_TRUE(firstWasPolled);
 }
 
+TEST_F(CommandDecoratorTest, Repeatedly) {
+  CommandScheduler scheduler = GetScheduler();
+
+  int counter = 0;
+
+  auto command = InstantCommand([&counter] { counter++; }, {}).Repeatedly();
+
+  scheduler.Schedule(command);
+
+  for (int i = 1; i <= 50; i++) {
+    scheduler.Run();
+    EXPECT_EQ(i, counter);
+  }
+
+  EXPECT_TRUE(scheduler.IsScheduled(command));
+}
+
+TEST_F(CommandDecoratorTest, RepeatFor) {
+  CommandScheduler scheduler = GetScheduler();
+
+  int counter = 0;
+
+  auto command = InstantCommand([&counter] { counter++; }, {}).Repeatedly(3);
+
+  scheduler.Schedule(command);
+  for (int i = 0; scheduler.IsScheduled(command); i++) {
+    scheduler.Run();
+    EXPECT_EQ(i + 1, counter);
+  }
+
+  EXPECT_EQ(3, counter);
+}
+
 TEST_F(CommandDecoratorTest, Unless) {
   CommandScheduler scheduler = GetScheduler();
 
