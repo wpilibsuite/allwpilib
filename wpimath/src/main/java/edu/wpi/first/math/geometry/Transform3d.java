@@ -4,6 +4,8 @@
 
 package edu.wpi.first.math.geometry;
 
+import static edu.wpi.first.units.Units.Meters;
+
 import edu.wpi.first.math.geometry.proto.Transform3dProto;
 import edu.wpi.first.math.geometry.struct.Transform3dStruct;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
@@ -62,6 +64,19 @@ public class Transform3d implements ProtobufSerializable, StructSerializable {
   public Transform3d(double x, double y, double z, Rotation3d rotation) {
     m_translation = new Translation3d(x, y, z);
     m_rotation = rotation;
+  }
+
+  /**
+   * Constructs a transform with x, y, and z translations instead of a separate Translation3d. The X,
+   * Y, and Z translations will be converted to and tracked as meters.
+   *
+   * @param x The x component of the translational component of the transform.
+   * @param y The y component of the translational component of the transform.
+   * @param z The z component of the translational component of the transform.
+   * @param rotation The rotational component of the transform.
+   */
+  public Transform3d(Measure<Distance> x, Measure<Distance> y, Measure<Distance> z, Rotation2d rotation) {
+    this(x.in(Meters), y.in(Meters), z.in(Meters), rotation);
   }
 
   /** Constructs the identity transform -- maps an initial pose to itself. */
@@ -135,6 +150,33 @@ public class Transform3d implements ProtobufSerializable, StructSerializable {
    */
   public double getZ() {
     return m_translation.getZ();
+  }
+
+  /**
+   * Returns the X component of the transformation's translation in a measure.
+   * 
+   * @return The x component of the transformation's translation in a measure.
+   */
+  public Measure<Distance> getMeasureX() {
+    return m_translation.getMeasureX();
+  }
+
+  /**
+   * Returns the Y component of the transformation's translation in a measure.
+   * 
+   * @return The y component of the transformation's translation in a measure.
+   */
+  public Measure<Distance> getMeasureY() {
+    return m_translation.getMeasureY();
+  }
+
+  /**
+   * Returns the Z component of the transformation's translation in a measure.
+   * 
+   * @return The z component of the transformation's translation in a measure.
+   */
+  public Measure<Distance> getMeasureZ() {
+    return m_translation.getMeasureZ();
   }
 
   /**

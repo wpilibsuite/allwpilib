@@ -147,6 +147,33 @@ public class Translation3d
   }
 
   /**
+   * Returns the X component of the translation in a measure.
+   * 
+   * @return The X component of the translation in a measure.
+   */
+  public Measure<Distance> getMeasureX() {
+    return Meters.of(m_x);
+  }
+
+  /**
+   * Returns the Y component of the translation in a measure.
+   * 
+   * @return The Y component of the translation in a measure.
+   */
+  public Measure<Distance> getMeasureY() {
+    return Meters.of(m_y);
+  }
+
+  /**
+   * Returns the Z component of the translation in a measure.
+   * 
+   * @return The Z component of the translation in a measure.
+   */
+  public Measure<Distance> getMeasureZ() {
+    return Meters.of(m_z);
+  }
+
+  /**
    * Returns a vector representation of this translation.
    *
    * @return A Vector representation of this translation.

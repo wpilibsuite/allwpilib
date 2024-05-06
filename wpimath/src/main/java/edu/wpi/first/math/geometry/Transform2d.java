@@ -144,6 +144,24 @@ public class Transform2d implements ProtobufSerializable, StructSerializable {
   }
 
   /**
+   * Returns the X component of the transformation's translation in a measure.
+   * 
+   * @return The x component of the transformation's translation in a measure.
+   */
+  public Measure<Distance> getMeasureX() {
+    return m_translation.getMeasureX();
+  }
+
+  /**
+   * Returns the Y component of the transformation's translation in a measure.
+   * 
+   * @return The y component of the transformation's translation in a measure.
+   */
+  public Measure<Distance> getMeasureY() {
+    return m_translation.getMeasureY();
+  }
+
+  /**
    * Returns the rotational component of the transformation.
    *
    * @return Reference to the rotational component of the transform.
