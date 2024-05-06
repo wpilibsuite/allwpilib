@@ -148,7 +148,7 @@ public class Translation3d
 
   /**
    * Returns the X component of the translation in a measure.
-   * 
+   *
    * @return The X component of the translation in a measure.
    */
   public Measure<Distance> getMeasureX() {
@@ -157,7 +157,7 @@ public class Translation3d
 
   /**
    * Returns the Y component of the translation in a measure.
-   * 
+   *
    * @return The Y component of the translation in a measure.
    */
   public Measure<Distance> getMeasureY() {
@@ -166,7 +166,7 @@ public class Translation3d
 
   /**
    * Returns the Z component of the translation in a measure.
-   * 
+   *
    * @return The Z component of the translation in a measure.
    */
   public Measure<Distance> getMeasureZ() {

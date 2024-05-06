@@ -132,7 +132,7 @@ public class Translation2d
 
   /**
    * Returns the X component of the translation in a measure.
-   * 
+   *
    * @return The x component of the translation in a measure.
    */
   public Measure<Distance> getMeasureX() {
@@ -141,7 +141,7 @@ public class Translation2d
 
   /**
    * Returns the Y component of the translation in a measure.
-   * 
+   *
    * @return The y component of the translation in a measure.
    */
   public Measure<Distance> getMeasureY() {

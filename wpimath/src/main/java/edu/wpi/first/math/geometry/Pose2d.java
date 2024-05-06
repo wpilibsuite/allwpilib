@@ -137,7 +137,7 @@ public class Pose2d implements Interpolatable<Pose2d>, ProtobufSerializable, Str
 
   /**
    * Returns the X component of the pose's translation in a measure.
-   * 
+   *
    * @return The x component of the pose's translation in a measure.
    */
   public Measure<Distance> getMeasureX() {
@@ -146,7 +146,7 @@ public class Pose2d implements Interpolatable<Pose2d>, ProtobufSerializable, Str
 
   /**
    * Returns the Y component of the pose's translation in a measure.
-   * 
+   *
    * @return The y component of the pose's translation in a measure.
    */
   public Measure<Distance> getMeasureY() {

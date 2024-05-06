@@ -4,6 +4,8 @@
 
 package edu.wpi.first.math.geometry;
 
+import static edu.wpi.first.units.Units.Meters;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -16,9 +18,6 @@ import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
-
-import static edu.wpi.first.units.Units.Meters;
-
 import java.util.Objects;
 
 /** Represents a 3D pose containing translational and rotational elements. */
@@ -69,15 +68,16 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
   }
 
   /**
-   * Constructs a pose with x, y, and z translations instead of a separate Translation3d. The X,
-   * Y, and Z translations will be converted to and tracked as meters.
+   * Constructs a pose with x, y, and z translations instead of a separate Translation3d. The X, Y,
+   * and Z translations will be converted to and tracked as meters.
    *
    * @param x The x component of the translational component of the pose.
    * @param y The y component of the translational component of the pose.
    * @param z The z component of the translational component of the pose.
    * @param rotation The rotational component of the pose.
    */
-  public Pose3d(Measure<Distance> x, Measure<Distance> y, Measure<Distance> z, Rotation3d rotation) {
+  public Pose3d(
+      Measure<Distance> x, Measure<Distance> y, Measure<Distance> z, Rotation3d rotation) {
     this(x.in(Meters), y.in(Meters), z.in(Meters), rotation);
   }
 
@@ -154,7 +154,7 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
 
   /**
    * Returns the X component of the pose's translation in a measure.
-   * 
+   *
    * @return The x component of the pose's translation in a measure.
    */
   public Measure<Distance> getMeasureX() {
@@ -163,7 +163,7 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
 
   /**
    * Returns the Y component of the pose's translation in a measure.
-   * 
+   *
    * @return The y component of the pose's translation in a measure.
    */
   public Measure<Distance> getMeasureY() {
@@ -172,7 +172,7 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
 
   /**
    * Returns the Z component of the pose's translation in a measure.
-   * 
+   *
    * @return The z component of the pose's translation in a measure.
    */
   public Measure<Distance> getMeasureZ() {
