@@ -196,6 +196,7 @@ void CommandScheduler::Run() {
   m_impl->inRunLoop = true;
   bool isDisabled = frc::RobotState::IsDisabled();
   // Run scheduled commands, remove finished commands.
+  auto toRemove = std::vector<Command*>(m_impl->scheduledCommands.size());
   for (Command* command : m_impl->scheduledCommands) {
     if (isDisabled && !command->RunsWhenDisabled()) {
       Cancel(command, std::nullopt);
@@ -216,7 +217,7 @@ void CommandScheduler::Run() {
       }
       m_impl->endingCommands.erase(command);
 
-      m_impl->scheduledCommands.erase(command);
+      toRemove.push_back(command);
       for (auto&& requirement : command->GetRequirements()) {
         m_impl->requirements.erase(requirement);
       }
@@ -224,6 +225,12 @@ void CommandScheduler::Run() {
       m_watchdog.AddEpoch(command->GetName() + ".End(false)");
     }
   }
+
+  // remove the commands that should be removed
+  for (auto&& command : toRemove) {
+    m_impl->scheduledCommands.erase(command);
+  }
+
   m_impl->inRunLoop = false;
 
   for (Command* command : m_impl->toSchedule) {
