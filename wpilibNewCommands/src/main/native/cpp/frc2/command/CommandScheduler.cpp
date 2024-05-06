@@ -210,8 +210,8 @@ void CommandScheduler::Run() {
 
   m_impl->inRunLoop = true;
   bool isDisabled = frc::RobotState::IsDisabled();
-  // Run scheduled commands, remove finished commands.
-  for (Command* command : m_impl->scheduledCommands) {
+  // create a new set to avoid iterator invalidation.
+  for (Command* command : wpi::SmallSet(m_impl->scheduledCommands)) {
     if (isDisabled && !command->RunsWhenDisabled()) {
       Cancel(command, std::nullopt);
       continue;
@@ -231,7 +231,6 @@ void CommandScheduler::Run() {
       }
       m_impl->endingCommands.erase(command);
 
-      m_impl->scheduledCommands.erase(command);
       for (auto&& requirement : command->GetRequirements()) {
         m_impl->requirements.erase(requirement);
       }
@@ -241,6 +240,7 @@ void CommandScheduler::Run() {
       m_impl->ownedCommands.erase(command);
     }
   }
+
   m_impl->inRunLoop = false;
 
   for (Command* command : m_impl->toSchedule) {
