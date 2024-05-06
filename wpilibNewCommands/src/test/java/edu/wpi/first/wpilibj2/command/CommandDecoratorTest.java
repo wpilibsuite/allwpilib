@@ -208,11 +208,11 @@ class CommandDecoratorTest extends CommandTestBase {
       Command command = new InstantCommand(counter::incrementAndGet);
 
       Command group = command.repeatedly();
-      
+
       scheduler.schedule(group);
       for (int i = 1; i <= 50; i++) {
-          scheduler.run();
-          assertEquals(i, counter.get());
+        scheduler.run();
+        assertEquals(i, counter.get());
       }
 
       // Should still be scheduled
@@ -225,21 +225,24 @@ class CommandDecoratorTest extends CommandTestBase {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicInteger counter = new AtomicInteger(0);
 
-      Command command = new InstantCommand(() -> {
-        counter.incrementAndGet();
-        System.out.println("Counter at: " + counter.get());
-      });
+      Command command =
+          new InstantCommand(
+              () -> {
+                counter.incrementAndGet();
+                System.out.println("Counter at: " + counter.get());
+              });
 
       Command group = command.repeatedly(3);
 
       scheduler.schedule(group);
-      for (int i = 0; scheduler.isScheduled(group); i++) { // If this causes an infinite loop, repeatedly is cooked
+      for (int i = 0;
+          scheduler.isScheduled(group);
+          i++) { // If this causes an infinite loop, repeatedly is cooked
         scheduler.run();
         assertEquals(i + 1, counter.get());
       }
       assertEquals(3, counter.get());
     }
-
   }
 
   @Test

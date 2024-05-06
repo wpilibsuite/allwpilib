@@ -51,13 +51,18 @@ CommandPtr CommandPtr::Repeatedly(int times) && {
   AssertValid();
   std::shared_ptr<int> countPtr = std::make_shared<int>(0);
   return std::move(*this)
-      .FinallyDo([countPtr = countPtr] { (*countPtr)++; printf("command finished\n");})
+      .FinallyDo([countPtr = countPtr] {
+        (*countPtr)++;
+        std::printf("command finished\n");
+      })
       .Repeatedly()
       .Until([countPtr = countPtr, times = times] {
-        printf("checking if command should run again... current count: %d, should be: %d, finished:%s\n", *countPtr, times, (*countPtr) >= times ? "true" : "false");
+        std::printf(
+            "checking if command should run again... current count: %d, should "
+            "be: %d, finished:%s\n",
+            *countPtr, times, (*countPtr) >= times ? "true" : "false");
         return ((*countPtr) >= times);
       });
-
 }
 
 CommandPtr CommandPtr::AsProxy() && {
