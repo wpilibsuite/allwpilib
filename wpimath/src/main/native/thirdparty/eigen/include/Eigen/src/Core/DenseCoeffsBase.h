@@ -89,12 +89,13 @@ class DenseCoeffsBase<Derived, ReadOnlyAccessors> : public EigenBase<Derived> {
    *
    * \sa operator()(Index,Index) const, coeffRef(Index,Index), coeff(Index) const
    */
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE CoeffReturnType coeff(Index row, Index col) const {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE EIGEN_CONSTEXPR CoeffReturnType coeff(Index row, Index col) const {
     eigen_internal_assert(row >= 0 && row < rows() && col >= 0 && col < cols());
     return internal::evaluator<Derived>(derived()).coeff(row, col);
   }
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE CoeffReturnType coeffByOuterInner(Index outer, Index inner) const {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE EIGEN_CONSTEXPR CoeffReturnType coeffByOuterInner(Index outer,
+                                                                                          Index inner) const {
     return coeff(rowIndexByOuterInner(outer, inner), colIndexByOuterInner(outer, inner));
   }
 
@@ -102,7 +103,7 @@ class DenseCoeffsBase<Derived, ReadOnlyAccessors> : public EigenBase<Derived> {
    *
    * \sa operator()(Index,Index), operator[](Index)
    */
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE CoeffReturnType operator()(Index row, Index col) const {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE EIGEN_CONSTEXPR CoeffReturnType operator()(Index row, Index col) const {
     eigen_assert(row >= 0 && row < rows() && col >= 0 && col < cols());
     return coeff(row, col);
   }
@@ -122,7 +123,7 @@ class DenseCoeffsBase<Derived, ReadOnlyAccessors> : public EigenBase<Derived> {
    * \sa operator[](Index) const, coeffRef(Index), coeff(Index,Index) const
    */
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE CoeffReturnType coeff(Index index) const {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE EIGEN_CONSTEXPR CoeffReturnType coeff(Index index) const {
     EIGEN_STATIC_ASSERT(internal::evaluator<Derived>::Flags & LinearAccessBit,
                         THIS_COEFFICIENT_ACCESSOR_TAKING_ONE_ACCESS_IS_ONLY_FOR_EXPRESSIONS_ALLOWING_LINEAR_ACCESS)
     eigen_internal_assert(index >= 0 && index < size());
@@ -137,7 +138,7 @@ class DenseCoeffsBase<Derived, ReadOnlyAccessors> : public EigenBase<Derived> {
    * z() const, w() const
    */
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE CoeffReturnType operator[](Index index) const {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE EIGEN_CONSTEXPR CoeffReturnType operator[](Index index) const {
     EIGEN_STATIC_ASSERT(Derived::IsVectorAtCompileTime,
                         THE_BRACKET_OPERATOR_IS_ONLY_FOR_VECTORS__USE_THE_PARENTHESIS_OPERATOR_INSTEAD)
     eigen_assert(index >= 0 && index < size());
@@ -154,32 +155,32 @@ class DenseCoeffsBase<Derived, ReadOnlyAccessors> : public EigenBase<Derived> {
    * z() const, w() const
    */
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE CoeffReturnType operator()(Index index) const {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE EIGEN_CONSTEXPR CoeffReturnType operator()(Index index) const {
     eigen_assert(index >= 0 && index < size());
     return coeff(index);
   }
 
   /** equivalent to operator[](0).  */
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE CoeffReturnType x() const { return (*this)[0]; }
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE EIGEN_CONSTEXPR CoeffReturnType x() const { return (*this)[0]; }
 
   /** equivalent to operator[](1).  */
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE CoeffReturnType y() const {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE EIGEN_CONSTEXPR CoeffReturnType y() const {
     EIGEN_STATIC_ASSERT(Derived::SizeAtCompileTime == -1 || Derived::SizeAtCompileTime >= 2, OUT_OF_RANGE_ACCESS);
     return (*this)[1];
   }
 
   /** equivalent to operator[](2).  */
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE CoeffReturnType z() const {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE EIGEN_CONSTEXPR CoeffReturnType z() const {
     EIGEN_STATIC_ASSERT(Derived::SizeAtCompileTime == -1 || Derived::SizeAtCompileTime >= 3, OUT_OF_RANGE_ACCESS);
     return (*this)[2];
   }
 
   /** equivalent to operator[](3).  */
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE CoeffReturnType w() const {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE EIGEN_CONSTEXPR CoeffReturnType w() const {
     EIGEN_STATIC_ASSERT(Derived::SizeAtCompileTime == -1 || Derived::SizeAtCompileTime >= 4, OUT_OF_RANGE_ACCESS);
     return (*this)[3];
   }
@@ -361,32 +362,32 @@ class DenseCoeffsBase<Derived, WriteAccessors> : public DenseCoeffsBase<Derived,
    * \sa operator[](Index) const, operator()(Index,Index), x(), y(), z(), w()
    */
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Scalar& operator()(Index index) {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE EIGEN_CONSTEXPR Scalar& operator()(Index index) {
     eigen_assert(index >= 0 && index < size());
     return coeffRef(index);
   }
 
   /** equivalent to operator[](0).  */
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Scalar& x() { return (*this)[0]; }
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE EIGEN_CONSTEXPR Scalar& x() { return (*this)[0]; }
 
   /** equivalent to operator[](1).  */
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Scalar& y() {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE EIGEN_CONSTEXPR Scalar& y() {
     EIGEN_STATIC_ASSERT(Derived::SizeAtCompileTime == -1 || Derived::SizeAtCompileTime >= 2, OUT_OF_RANGE_ACCESS);
     return (*this)[1];
   }
 
   /** equivalent to operator[](2).  */
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Scalar& z() {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE EIGEN_CONSTEXPR Scalar& z() {
     EIGEN_STATIC_ASSERT(Derived::SizeAtCompileTime == -1 || Derived::SizeAtCompileTime >= 3, OUT_OF_RANGE_ACCESS);
     return (*this)[2];
   }
 
   /** equivalent to operator[](3).  */
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Scalar& w() {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE EIGEN_CONSTEXPR Scalar& w() {
     EIGEN_STATIC_ASSERT(Derived::SizeAtCompileTime == -1 || Derived::SizeAtCompileTime >= 4, OUT_OF_RANGE_ACCESS);
     return (*this)[3];
   }

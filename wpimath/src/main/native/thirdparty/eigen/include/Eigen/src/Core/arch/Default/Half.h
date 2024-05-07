@@ -722,6 +722,7 @@ EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC half ceil(const half& a) {
 }
 EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC half rint(const half& a) { return half(::rintf(float(a))); }
 EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC half round(const half& a) { return half(::roundf(float(a))); }
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC half trunc(const half& a) { return half(::truncf(float(a))); }
 EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC half fmod(const half& a, const half& b) {
   return half(::fmodf(float(a), float(b)));
 }
@@ -762,16 +763,22 @@ EIGEN_ALWAYS_INLINE std::ostream& operator<<(std::ostream& os, const half& v) {
 namespace internal {
 
 template <>
-struct random_default_impl<half, false, false> {
-  static inline half run(const half& x, const half& y) {
-    return x + (y - x) * half(float(std::rand()) / float(RAND_MAX));
-  }
-  static inline half run() { return run(half(-1.f), half(1.f)); }
+struct is_arithmetic<half> {
+  enum { value = true };
 };
 
 template <>
-struct is_arithmetic<half> {
-  enum { value = true };
+struct random_impl<half> {
+  enum : int { MantissaBits = 10 };
+  using Impl = random_impl<float>;
+  static EIGEN_DEVICE_FUNC inline half run(const half& x, const half& y) {
+    float result = Impl::run(x, y, MantissaBits);
+    return half(result);
+  }
+  static EIGEN_DEVICE_FUNC inline half run() {
+    float result = Impl::run(MantissaBits);
+    return half(result);
+  }
 };
 
 }  // end namespace internal
