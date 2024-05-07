@@ -7,9 +7,9 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/raw_ostream.h"
 #include "wpi/DataLogWriter.h"
 #include "wpi/Logger.h"
+#include "wpi/raw_ostream.h"
 
 namespace {
 struct ThingA {

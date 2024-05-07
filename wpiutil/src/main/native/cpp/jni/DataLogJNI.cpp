@@ -42,9 +42,9 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_bgCreate
     wpi::ThrowNullPointerException(env, "extraHeader is null");
     return 0;
   }
-  return reinterpret_cast<jlong>(new DataLogBackgroundWriter{JStringRef{env, dir},
-                                             JStringRef{env, filename}, period,
-                                             JStringRef{env, extraHeader}});
+  return reinterpret_cast<jlong>(new DataLogBackgroundWriter{
+      JStringRef{env, dir}, JStringRef{env, filename}, period,
+      JStringRef{env, extraHeader}});
 }
 
 /*
@@ -64,7 +64,8 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_bgSetFilename
     wpi::ThrowNullPointerException(env, "filename is null");
     return;
   }
-  reinterpret_cast<DataLogBackgroundWriter*>(impl)->SetFilename(JStringRef{env, filename});
+  reinterpret_cast<DataLogBackgroundWriter*>(impl)->SetFilename(
+      JStringRef{env, filename});
 }
 
 /*
