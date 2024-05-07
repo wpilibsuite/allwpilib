@@ -28,6 +28,11 @@ import java.util.concurrent.ConcurrentMap;
  * the log are not guaranteed to be sorted by timestamp.
  */
 public class DataLog implements AutoCloseable {
+  /**
+   * Constructs.
+   *
+   * @param impl implementation handle
+   */
   protected DataLog(long impl) {
     m_impl = impl;
   }
@@ -453,6 +458,8 @@ public class DataLog implements AutoCloseable {
     seen.remove(typeString);
   }
 
+  /** Implementation handle. */
   protected long m_impl;
+
   private final ConcurrentMap<String, Integer> m_schemaMap = new ConcurrentHashMap<>();
 }
