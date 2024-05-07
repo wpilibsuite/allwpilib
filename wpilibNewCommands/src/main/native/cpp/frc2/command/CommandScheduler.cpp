@@ -231,6 +231,8 @@ void CommandScheduler::Run() {
       }
       m_impl->endingCommands.erase(command);
 
+      // do not remove the command from the scheduled commands until the end
+      // because this causes undefined behavior in the next iteration of the loop
       toRemove.push_back(command);
       for (auto&& requirement : command->GetRequirements()) {
         m_impl->requirements.erase(requirement);
