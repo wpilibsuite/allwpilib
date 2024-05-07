@@ -202,9 +202,9 @@ class SparseMatrix : public SparseCompressedBase<SparseMatrix<Scalar_, Options_,
   inline StorageIndex* innerNonZeroPtr() { return m_innerNonZeros; }
 
   /** \internal */
-  inline Storage& data() { return m_data; }
+  constexpr Storage& data() { return m_data; }
   /** \internal */
-  inline const Storage& data() const { return m_data; }
+  constexpr const Storage& data() const { return m_data; }
 
   /** \returns the value of the matrix at position \a i, \a j
    * This function returns Scalar(0) if the element is an explicit \em zero */
@@ -829,6 +829,8 @@ class SparseMatrix : public SparseCompressedBase<SparseMatrix<Scalar_, Options_,
     std::swap(m_innerNonZeros, other.m_innerNonZeros);
     m_data.swap(other.m_data);
   }
+  /** Free-function swap. */
+  friend EIGEN_DEVICE_FUNC void swap(SparseMatrix& a, SparseMatrix& b) { a.swap(b); }
 
   /** Sets *this to the identity matrix.
    * This function also turns the matrix into compressed mode, and drop any reserved memory. */

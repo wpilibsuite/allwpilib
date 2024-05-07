@@ -74,7 +74,9 @@ struct cross3_impl<Architecture::Target, VectorLhs, VectorRhs, float, true> {
     Packet4f mul1 = pmul(vec4f_swizzle1(a, 1, 2, 0, 3), vec4f_swizzle1(b, 2, 0, 1, 3));
     Packet4f mul2 = pmul(vec4f_swizzle1(a, 2, 0, 1, 3), vec4f_swizzle1(b, 1, 2, 0, 3));
     DstPlainType res;
-    pstoret<float, Packet4f, DstAlignment>(&res.x(), psub(mul1, mul2));
+    pstoret<float, Packet4f, DstAlignment>(res.data(), psub(mul1, mul2));
+    // Ensure last component is 0 in case original a or b contain inf/nan.
+    res[3] = 0.0f;
     return res;
   }
 };

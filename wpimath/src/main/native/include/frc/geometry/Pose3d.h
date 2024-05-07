@@ -281,9 +281,9 @@ constexpr Eigen::Matrix3d RotationVectorToMatrix(
   //         [ 0 -c  b]
   // Omega = [ c  0 -a]
   //         [-b  a  0]
-  return Eigen::Matrix3d{{0.0, -rotation.coeff(2), rotation.coeff(1)},
-                         {rotation.coeff(2), 0.0, -rotation.coeff(0)},
-                         {-rotation.coeff(1), rotation.coeff(0), 0.0}};
+  return Eigen::Matrix3d{{0.0, -rotation(2), rotation(1)},
+                         {rotation(2), 0.0, -rotation(0)},
+                         {-rotation(1), rotation(0), 0.0}};
 }
 
 }  // namespace detail

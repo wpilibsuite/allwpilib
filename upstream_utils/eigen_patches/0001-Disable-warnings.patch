@@ -8,7 +8,7 @@ Subject: [PATCH 1/2] Disable warnings
  1 file changed, 6 insertions(+)
 
 diff --git a/Eigen/src/Core/util/DisableStupidWarnings.h b/Eigen/src/Core/util/DisableStupidWarnings.h
-index 32a427d852355a51dc4263d81498554ff4c3cbba..1182198231ab784346f8d80838363e4a0abba2ba 100644
+index ab0c542d0e24c6ecb77abfc535c8232774cba6d5..7ecd7bf8cc927d07a28c9da4ebbe1ea4d4d2b97b 100644
 --- a/Eigen/src/Core/util/DisableStupidWarnings.h
 +++ b/Eigen/src/Core/util/DisableStupidWarnings.h
 @@ -81,6 +81,12 @@
@@ -23,4 +23,4 @@ index 32a427d852355a51dc4263d81498554ff4c3cbba..1182198231ab784346f8d80838363e4a
 +#endif
  #endif
  
- #if defined __NVCC__
+ #if defined __NVCC__ && defined __CUDACC__

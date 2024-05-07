@@ -197,6 +197,7 @@ struct packet_traits<float> : default_packet_traits {
     HasRsqrt = 1,
     HasTanh = EIGEN_FAST_MATH,
     HasErf = EIGEN_FAST_MATH,
+    HasErfc = EIGEN_FAST_MATH,
     HasBlend = 1,
     HasSign = 0  // The manually vectorized version is slightly slower for SSE.
   };
@@ -214,11 +215,14 @@ struct packet_traits<double> : default_packet_traits {
     HasDiv = 1,
     HasSin = EIGEN_FAST_MATH,
     HasCos = EIGEN_FAST_MATH,
+    HasTanh = EIGEN_FAST_MATH,
     HasLog = 1,
+    HasErfc = EIGEN_FAST_MATH,
     HasExp = 1,
     HasSqrt = 1,
     HasRsqrt = 1,
     HasATan = 1,
+    HasATanh = 1,
     HasBlend = 1
   };
 };
@@ -1228,13 +1232,13 @@ EIGEN_STRONG_INLINE Packet4ui plogical_shift_left(const Packet4ui& a) {
 
 template <>
 EIGEN_STRONG_INLINE Packet4f pabs(const Packet4f& a) {
-  const Packet4f mask = _mm_castsi128_ps(_mm_setr_epi32(0x7FFFFFFF, 0x7FFFFFFF, 0x7FFFFFFF, 0x7FFFFFFF));
-  return _mm_and_ps(a, mask);
+  const __m128i mask = _mm_setr_epi32(0x7FFFFFFF, 0x7FFFFFFF, 0x7FFFFFFF, 0x7FFFFFFF);
+  return _mm_castsi128_ps(_mm_and_si128(mask, _mm_castps_si128(a)));
 }
 template <>
 EIGEN_STRONG_INLINE Packet2d pabs(const Packet2d& a) {
-  const Packet2d mask = _mm_castsi128_pd(_mm_setr_epi32(0xFFFFFFFF, 0x7FFFFFFF, 0xFFFFFFFF, 0x7FFFFFFF));
-  return _mm_and_pd(a, mask);
+  const __m128i mask = _mm_setr_epi32(0xFFFFFFFF, 0x7FFFFFFF, 0xFFFFFFFF, 0x7FFFFFFF);
+  return _mm_castsi128_pd(_mm_and_si128(mask, _mm_castpd_si128(a)));
 }
 template <>
 EIGEN_STRONG_INLINE Packet2l pabs(const Packet2l& a) {
@@ -2277,8 +2281,6 @@ EIGEN_STRONG_INLINE __m128i half2floatsse(__m128i h) {
 }
 
 EIGEN_STRONG_INLINE __m128i float2half(__m128 f) {
-  __m128i o = _mm_setzero_si128();
-
   // unsigned int sign_mask = 0x80000000u;
   __m128i sign = _mm_set1_epi32(0x80000000u);
   // unsigned int sign = f.u & sign_mask;
@@ -2305,7 +2307,7 @@ EIGEN_STRONG_INLINE __m128i float2half(__m128 f) {
   //  f.f += denorm_magic.f;
   f = _mm_add_ps(f, _mm_castsi128_ps(denorm_magic));
   // f.u - denorm_magic.u
-  o = _mm_sub_epi32(_mm_castps_si128(f), denorm_magic);
+  __m128i o = _mm_sub_epi32(_mm_castps_si128(f), denorm_magic);
   o = _mm_and_si128(o, subnorm_mask);
   // Correct result for inf/nan/zero/subnormal, 0 otherwise
   o = _mm_or_si128(o, naninf_value);

@@ -299,7 +299,7 @@ class WPILIB_DLLEXPORT Quaternion {
     // 𝑞 = std::cos(θ/2) + std::sin(θ/2) * v̂
     // 𝑞 = std::cos(θ/2) + std::sin(θ/2) / θ * 𝑣⃗
 
-    double theta = gcem::hypot(rvec.coeff(0), rvec.coeff(1), rvec.coeff(2));
+    double theta = gcem::hypot(rvec(0), rvec(1), rvec(2));
     double cos = gcem::cos(theta / 2);
 
     double axial_scalar;
@@ -312,9 +312,8 @@ class WPILIB_DLLEXPORT Quaternion {
       axial_scalar = gcem::sin(theta / 2) / theta;
     }
 
-    return Quaternion{cos, axial_scalar * rvec.coeff(0),
-                      axial_scalar * rvec.coeff(1),
-                      axial_scalar * rvec.coeff(2)};
+    return Quaternion{cos, axial_scalar * rvec(0), axial_scalar * rvec(1),
+                      axial_scalar * rvec(2)};
   }
 
  private:

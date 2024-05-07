@@ -62,7 +62,7 @@ class ct_matrix {
    * @param col Column index.
    */
   constexpr const Scalar& operator()(int row, int col) const {
-    return m_storage.coeff(row, col);
+    return m_storage(row, col);
   }
 
   /**
@@ -71,9 +71,7 @@ class ct_matrix {
    * @param row Row index.
    * @param col Column index.
    */
-  constexpr Scalar& operator()(int row, int col) {
-    return m_storage.coeffRef(row, col);
-  }
+  constexpr Scalar& operator()(int row, int col) { return m_storage(row, col); }
 
   /**
    * Returns reference to matrix element.
@@ -83,7 +81,7 @@ class ct_matrix {
   constexpr const Scalar& operator()(int index) const
     requires(Rows == 1 || Cols == 1)
   {
-    return m_storage.coeff(index);
+    return m_storage(index);
   }
 
   /**
@@ -94,7 +92,7 @@ class ct_matrix {
   constexpr Scalar& operator()(int index)
     requires(Rows == 1 || Cols == 1)
   {
-    return m_storage.coeffRef(index);
+    return m_storage(index);
   }
 
   /**
