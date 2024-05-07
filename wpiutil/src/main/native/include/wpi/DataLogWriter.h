@@ -4,7 +4,6 @@
 
 #pragma once
 
-#ifdef __cplusplus
 #include <memory>
 #include <string_view>
 #include <system_error>
@@ -89,21 +88,3 @@ class DataLogWriter final : public DataLog {
 };
 
 }  // namespace wpi::log
-
-extern "C" {
-#endif  // __cplusplus
-
-struct WPI_DataLog;
-
-/**
- * Construct a new Data Log.
- *
- * @param filename filename to use
- * @param errorCode error if file failed to open (output)
- * @param extraHeader extra header data
- */
-struct WPI_DataLog* WPI_DataLog_CreateWriter(const char* filename,
-                                             int* errorCode,
-                                             const char* extraHeader);
-
-}  // extern "C"

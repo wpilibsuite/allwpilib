@@ -6,7 +6,6 @@
 
 #include <stdint.h>
 
-#ifdef __cplusplus
 #include <functional>
 #include <span>
 #include <string>
@@ -16,9 +15,7 @@
 #include "wpi/DataLog.h"
 #include "wpi/condition_variable.h"
 #include "wpi/mutex.h"
-#endif
 
-#ifdef __cplusplus
 namespace wpi {
 class Logger;
 }  // namespace wpi
@@ -171,53 +168,3 @@ class DataLogBackgroundWriter final : public DataLog {
 };
 
 }  // namespace wpi::log
-
-extern "C" {
-#endif  // __cplusplus
-
-struct WPI_DataLog;
-
-/**
- * Construct a new Data Log background writer.  The log will be initially
- * created with a temporary filename.
- *
- * @param dir directory to store the log
- * @param filename filename to use; if none provided, a random filename is
- *                 generated of the form "wpilog_{}.wpilog"
- * @param period time between automatic flushes to disk, in seconds;
- *               this is a time/storage tradeoff
- * @param extraHeader extra header data
- */
-struct WPI_DataLog* WPI_DataLog_CreateBackgroundWriter(const char* dir,
-                                                       const char* filename,
-                                                       double period,
-                                                       const char* extraHeader);
-
-/**
- * Construct a new Data Log background writer that passes its output to the
- * provided function rather than a file.  The write function will be called on a
- * separate background thread and may block.  The write function is called with
- * an empty data array (data=NULL, len=0) when the thread is terminating.
- *
- * @param write write function
- * @param ptr pointer to pass to write function ptr parameter
- * @param period time between automatic calls to write, in seconds;
- *               this is a time/storage tradeoff
- * @param extraHeader extra header data
- */
-struct WPI_DataLog* WPI_DataLog_CreateBackgroundWriter_Func(
-    void (*write)(void* ptr, const uint8_t* data, size_t len), void* ptr,
-    double period, const char* extraHeader);
-
-/**
- * Change log filename.  Can only be used on background writer data logs.
- *
- * @param datalog data log
- * @param filename filename
- */
-void WPI_DataLog_SetBackgroundWriterFilename(struct WPI_DataLog* datalog,
-                                             const char* filename);
-
-#ifdef __cplusplus
-}  // extern "C"
-#endif
