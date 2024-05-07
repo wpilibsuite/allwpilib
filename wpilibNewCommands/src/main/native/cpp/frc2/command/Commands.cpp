@@ -58,6 +58,14 @@ CommandPtr cmd::RunEnd(std::function<void()> run, std::function<void()> end,
       .ToPtr();
 }
 
+CommandPtr cmd::StartRun(std::function<void()> start, std::function<void()> run,
+                         Requirements requirements) {
+  return FunctionalCommand(
+             std::move(start), std::move(run), [](bool interrupted) {},
+             [] { return false; }, requirements)
+      .ToPtr();
+}
+
 CommandPtr cmd::Print(std::string_view msg) {
   return PrintCommand(msg).ToPtr();
 }

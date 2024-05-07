@@ -295,7 +295,7 @@ public class Trajectory implements ProtobufSerializable {
 
     /** Default constructor. */
     public State() {
-      poseMeters = new Pose2d();
+      poseMeters = Pose2d.kZero;
     }
 
     /**

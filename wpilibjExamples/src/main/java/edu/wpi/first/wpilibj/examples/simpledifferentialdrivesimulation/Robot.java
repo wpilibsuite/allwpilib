@@ -34,9 +34,9 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     m_trajectory =
         TrajectoryGenerator.generateTrajectory(
-            new Pose2d(2, 2, new Rotation2d()),
+            new Pose2d(2, 2, Rotation2d.kZero),
             List.of(),
-            new Pose2d(6, 4, new Rotation2d()),
+            new Pose2d(6, 4, Rotation2d.kZero),
             new TrajectoryConfig(2, 2));
   }
 

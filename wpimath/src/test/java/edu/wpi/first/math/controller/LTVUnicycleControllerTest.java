@@ -28,10 +28,10 @@ class LTVUnicycleControllerTest {
     final var controller =
         new LTVUnicycleController(
             VecBuilder.fill(0.0625, 0.125, 2.5), VecBuilder.fill(4.0, 4.0), kDt);
-    var robotPose = new Pose2d(2.7, 23.0, Rotation2d.fromDegrees(0.0));
+    var robotPose = new Pose2d(2.7, 23.0, Rotation2d.kZero);
 
     final var waypoints = new ArrayList<Pose2d>();
-    waypoints.add(new Pose2d(2.75, 22.521, new Rotation2d(0)));
+    waypoints.add(new Pose2d(2.75, 22.521, Rotation2d.kZero));
     waypoints.add(new Pose2d(24.73, 19.68, new Rotation2d(5.846)));
     var config = new TrajectoryConfig(8.8, 0.1);
     final var trajectory = TrajectoryGenerator.generateTrajectory(waypoints, config);

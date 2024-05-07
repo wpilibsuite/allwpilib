@@ -16,7 +16,7 @@ class TimeInterpolatableBufferTest {
     TimeInterpolatableBuffer<Rotation2d> buffer = TimeInterpolatableBuffer.createBuffer(10);
 
     // No entries
-    buffer.addSample(1.0, new Rotation2d());
+    buffer.addSample(1.0, Rotation2d.kZero);
     assertEquals(0.0, buffer.getSample(1.0).get().getRadians(), 0.001);
 
     // New entry at start of container
@@ -36,7 +36,7 @@ class TimeInterpolatableBufferTest {
   void testInterpolation() {
     TimeInterpolatableBuffer<Rotation2d> buffer = TimeInterpolatableBuffer.createBuffer(10);
 
-    buffer.addSample(0.0, new Rotation2d());
+    buffer.addSample(0.0, Rotation2d.kZero);
     assertEquals(0.0, buffer.getSample(0.0).get().getRadians(), 0.001);
     buffer.addSample(1.0, new Rotation2d(1.0));
     assertEquals(0.5, buffer.getSample(0.5).get().getRadians(), 0.001);
@@ -53,8 +53,8 @@ class TimeInterpolatableBufferTest {
     TimeInterpolatableBuffer<Pose2d> buffer = TimeInterpolatableBuffer.createBuffer(10);
 
     // We expect to be at (1 - 1/Math.sqrt(2), 1/Math.sqrt(2), 45deg) at t=0.5
-    buffer.addSample(0.0, new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(90.0)));
-    buffer.addSample(1.0, new Pose2d(1.0, 1.0, Rotation2d.fromDegrees(0.0)));
+    buffer.addSample(0.0, new Pose2d(0.0, 0.0, Rotation2d.kCCW_Pi_2));
+    buffer.addSample(1.0, new Pose2d(1.0, 1.0, Rotation2d.kZero));
     Pose2d sample = buffer.getSample(0.5).get();
 
     assertEquals(1.0 - 1.0 / Math.sqrt(2.0), sample.getTranslation().getX(), 0.01);
