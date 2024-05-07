@@ -9,6 +9,10 @@ on:
 
 jobs:
   comment:
+    permissions:
+      issues: write
+      pull-requests: write
+    
     runs-on: ubuntu-latest
     steps:
       - name: Comment on PR
