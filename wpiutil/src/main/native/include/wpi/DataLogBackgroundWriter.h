@@ -16,7 +16,9 @@
 #include "wpi/DataLog.h"
 #include "wpi/condition_variable.h"
 #include "wpi/mutex.h"
+#endif
 
+#ifdef __cplusplus
 namespace wpi {
 class Logger;
 }  // namespace wpi
@@ -216,4 +218,6 @@ struct WPI_DataLog* WPI_DataLog_CreateBackgroundWriter_Func(
 void WPI_DataLog_SetBackgroundWriterFilename(struct WPI_DataLog* datalog,
                                              const char* filename);
 
+#ifdef __cplusplus
 }  // extern "C"
+#endif
