@@ -6,7 +6,7 @@ package edu.wpi.first.wpilibj2.command;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -22,7 +22,7 @@ import java.util.Map;
  */
 public class ParallelDeadlineGroup extends Command {
   // maps commands in this composition to whether they are still running
-  private final Map<Command, Boolean> m_commands = new HashMap<>();
+  private final Map<Command, Boolean> m_commands = new LinkedHashMap<>();
   private boolean m_runWhenDisabled = true;
   private boolean m_finished = true;
   private Command m_deadline;
@@ -39,8 +39,8 @@ public class ParallelDeadlineGroup extends Command {
    * @throws IllegalArgumentException if the deadline command is also in the otherCommands argument
    */
   public ParallelDeadlineGroup(Command deadline, Command... otherCommands) {
-    addCommands(otherCommands);
     setDeadline(deadline);
+    addCommands(otherCommands);
   }
 
   /**
