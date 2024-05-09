@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Timeout;
@@ -22,11 +23,19 @@ class AsyncSchedulerTest {
 
   @BeforeEach
   void setup() {
+    Logger.clear();
+
     // Initialize with high default timeouts so random jitter doesn't make tests flake out
     scheduler = new AsyncScheduler(
         Seconds.one(), // event loop period
         Milliseconds.of(25), // cancel timeout
         Milliseconds.of(25)); // schedule timeout
+  }
+
+  @AfterEach
+  void printLogs() {
+    System.out.println(Logger.formattedLogTable());
+    Logger.clear();
   }
 
   @RepeatedTest(value = 1000, failureThreshold = 1)
@@ -44,6 +53,7 @@ class AsyncSchedulerTest {
     enabled.set(true);
     scheduler.await(command);
     if (scheduler.isRunning(command)) {
+      System.err.println(Logger.formattedLogTable());
       fail("Command should no longer be running after awaiting its completion");
     }
 
@@ -78,9 +88,11 @@ class AsyncSchedulerTest {
 
     scheduler.schedule(lower);
     if (!scheduler.isRunning(higher)) {
+      System.err.println(Logger.formattedLogTable());
       fail("Higher priority command should still be running");
     }
     if (scheduler.isRunning(lower)) {
+      System.err.println(Logger.formattedLogTable());
       fail("Lower priority command should not be running");
     }
   }
@@ -286,12 +298,15 @@ class AsyncSchedulerTest {
       scheduler.cancelAll();
 
       if (scheduler.isRunning(command)) {
-        fail(command.name() + " was not canceled by cancelAll()");
+        System.err.println(scheduler.getRunningCommands());
+        fail("Run " + i + ": " + command.name() + " was not canceled by cancelAll()");
       }
 
       for (var resource : resources) {
         if (!scheduler.isRunning(resource.getDefaultCommand())) {
-          fail("Default command for " + resource.getName() + " should have been scheduled after cancelAll() was called");
+          System.err.println(Logger.formattedLogTable());
+          System.err.println("Running commands: " + scheduler.getRunningCommands());
+          fail("Run " + i + ": " + "Default command for " + resource.getName() + " should have been scheduled after cancelAll() was called");
         }
       }
     }

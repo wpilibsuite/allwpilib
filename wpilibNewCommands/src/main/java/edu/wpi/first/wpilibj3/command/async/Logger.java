@@ -8,14 +8,14 @@ import java.util.function.Consumer;
 public class Logger {
   private static final List<LogRecord> records = new ArrayList<>();
 
-  public static void log(String context, String message) {
+  public static synchronized void log(String context, String message) {
     var now = WPIUtilJNI.now() / 1e6;
     LogRecord record = new LogRecord(now, Thread.currentThread().getName(), context, message);
 
     records.add(record);
   }
 
-  public static void clear() {
+  public static synchronized void clear() {
     records.clear();
   }
 
