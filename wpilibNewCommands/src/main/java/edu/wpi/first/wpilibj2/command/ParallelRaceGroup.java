@@ -4,9 +4,9 @@
 
 package edu.wpi.first.wpilibj2.command;
 
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 /**
  * A composition that runs a set of commands in parallel, ending when any one of the commands ends
@@ -19,7 +19,7 @@ import java.util.Set;
  * <p>This class is provided by the NewCommands VendorDep
  */
 public class ParallelRaceGroup extends Command {
-  private final Set<Command> m_commands = new HashSet<>();
+  private final List<Command> m_commands = new ArrayList<>();
   private boolean m_runWhenDisabled = true;
   private boolean m_finished = true;
   private InterruptionBehavior m_interruptBehavior = InterruptionBehavior.kCancelIncoming;

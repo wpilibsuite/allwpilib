@@ -50,6 +50,31 @@ TEST_F(CommandDecoratorTest, Until) {
   EXPECT_FALSE(scheduler.IsScheduled(command));
 }
 
+TEST_F(CommandDecoratorTest, UntilOrder) {
+  CommandScheduler scheduler = GetScheduler();
+
+  bool firstHasRun = false;
+  bool firstWasPolled = false;
+
+  auto first = FunctionalCommand([] {}, [&firstHasRun] { firstHasRun = true; },
+                                 [](bool interrupted) {},
+                                 [&firstWasPolled] {
+                                   firstWasPolled = true;
+                                   return true;
+                                 });
+  auto command = std::move(first).Until([&firstHasRun, &firstWasPolled] {
+    EXPECT_TRUE(firstHasRun);
+    EXPECT_TRUE(firstWasPolled);
+    return true;
+  });
+
+  scheduler.Schedule(command);
+  scheduler.Run();
+
+  EXPECT_TRUE(firstHasRun);
+  EXPECT_TRUE(firstWasPolled);
+}
+
 TEST_F(CommandDecoratorTest, OnlyWhile) {
   CommandScheduler scheduler = GetScheduler();
 
@@ -66,6 +91,31 @@ TEST_F(CommandDecoratorTest, OnlyWhile) {
 
   scheduler.Run();
   EXPECT_FALSE(scheduler.IsScheduled(command));
+}
+
+TEST_F(CommandDecoratorTest, OnlyWhileOrder) {
+  CommandScheduler scheduler = GetScheduler();
+
+  bool firstHasRun = false;
+  bool firstWasPolled = false;
+
+  auto first = FunctionalCommand([] {}, [&firstHasRun] { firstHasRun = true; },
+                                 [](bool interrupted) {},
+                                 [&firstWasPolled] {
+                                   firstWasPolled = true;
+                                   return true;
+                                 });
+  auto command = std::move(first).Until([&firstHasRun, &firstWasPolled] {
+    EXPECT_TRUE(firstHasRun);
+    EXPECT_TRUE(firstWasPolled);
+    return false;
+  });
+
+  scheduler.Schedule(command);
+  scheduler.Run();
+
+  EXPECT_TRUE(firstHasRun);
+  EXPECT_TRUE(firstWasPolled);
 }
 
 TEST_F(CommandDecoratorTest, IgnoringDisable) {
@@ -116,6 +166,88 @@ TEST_F(CommandDecoratorTest, AndThen) {
 
   EXPECT_FALSE(scheduler.IsScheduled(command));
   EXPECT_TRUE(finished);
+}
+
+TEST_F(CommandDecoratorTest, DeadlineForOrder) {
+  CommandScheduler scheduler = GetScheduler();
+
+  bool dictatorHasRun = false;
+  bool dictatorWasPolled = false;
+
+  auto dictator =
+      FunctionalCommand([] {}, [&dictatorHasRun] { dictatorHasRun = true; },
+                        [](bool interrupted) {},
+                        [&dictatorWasPolled] {
+                          dictatorWasPolled = true;
+                          return true;
+                        });
+  auto other = RunCommand([&dictatorHasRun, &dictatorWasPolled] {
+    EXPECT_TRUE(dictatorHasRun);
+    EXPECT_TRUE(dictatorWasPolled);
+  });
+
+  auto group =
+      std::move(dictator).ToPtr().DeadlineFor(std::move(other).ToPtr());
+
+  scheduler.Schedule(group);
+  scheduler.Run();
+
+  EXPECT_TRUE(dictatorHasRun);
+  EXPECT_TRUE(dictatorWasPolled);
+}
+
+TEST_F(CommandDecoratorTest, AlongWithOrder) {
+  CommandScheduler scheduler = GetScheduler();
+
+  bool firstHasRun = false;
+  bool firstWasPolled = false;
+
+  auto command1 = FunctionalCommand(
+      [] {}, [&firstHasRun] { firstHasRun = true; }, [](bool interrupted) {},
+      [&firstWasPolled] {
+        firstWasPolled = true;
+        return true;
+      });
+  auto command2 = RunCommand([&firstHasRun, &firstWasPolled] {
+    EXPECT_TRUE(firstHasRun);
+    EXPECT_TRUE(firstWasPolled);
+  });
+
+  auto group =
+      std::move(command1).ToPtr().AlongWith(std::move(command2).ToPtr());
+
+  scheduler.Schedule(group);
+  scheduler.Run();
+
+  EXPECT_TRUE(firstHasRun);
+  EXPECT_TRUE(firstWasPolled);
+}
+
+TEST_F(CommandDecoratorTest, RaceWithOrder) {
+  CommandScheduler scheduler = GetScheduler();
+
+  bool firstHasRun = false;
+  bool firstWasPolled = false;
+
+  auto command1 = FunctionalCommand(
+      [] {}, [&firstHasRun] { firstHasRun = true; }, [](bool interrupted) {},
+      [&firstWasPolled] {
+        firstWasPolled = true;
+        return true;
+      });
+  auto command2 = RunCommand([&firstHasRun, &firstWasPolled] {
+    EXPECT_TRUE(firstHasRun);
+    EXPECT_TRUE(firstWasPolled);
+  });
+
+  auto group =
+      std::move(command1).ToPtr().RaceWith(std::move(command2).ToPtr());
+
+  scheduler.Schedule(group);
+  scheduler.Run();
+
+  EXPECT_TRUE(firstHasRun);
+  EXPECT_TRUE(firstWasPolled);
 }
 
 TEST_F(CommandDecoratorTest, Unless) {
