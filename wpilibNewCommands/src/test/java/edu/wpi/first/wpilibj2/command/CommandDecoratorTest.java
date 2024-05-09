@@ -4,7 +4,6 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -59,36 +58,6 @@ class CommandDecoratorTest extends CommandTestBase {
   }
 
   @Test
-  void untilOrderTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      AtomicBoolean firstHasRun = new AtomicBoolean(false);
-      AtomicBoolean firstWasPolled = new AtomicBoolean(false);
-
-      Command first =
-          new FunctionalCommand(
-              () -> {},
-              () -> firstHasRun.set(true),
-              interrupted -> {},
-              () -> {
-                firstWasPolled.set(true);
-                return true;
-              });
-      Command command =
-          first.until(
-              () -> {
-                assertAll(
-                    () -> assertTrue(firstHasRun.get()), () -> assertTrue(firstWasPolled.get()));
-                return true;
-              });
-
-      scheduler.schedule(command);
-      scheduler.run();
-
-      assertAll(() -> assertTrue(firstHasRun.get()), () -> assertTrue(firstWasPolled.get()));
-    }
-  }
-
-  @Test
   void onlyWhileTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicBoolean run = new AtomicBoolean(true);
@@ -104,36 +73,6 @@ class CommandDecoratorTest extends CommandTestBase {
       scheduler.run();
 
       assertFalse(scheduler.isScheduled(command));
-    }
-  }
-
-  @Test
-  void onlyWhileOrderTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      AtomicBoolean firstHasRun = new AtomicBoolean(false);
-      AtomicBoolean firstWasPolled = new AtomicBoolean(false);
-
-      Command first =
-          new FunctionalCommand(
-              () -> {},
-              () -> firstHasRun.set(true),
-              interrupted -> {},
-              () -> {
-                firstWasPolled.set(true);
-                return true;
-              });
-      Command command =
-          first.onlyWhile(
-              () -> {
-                assertAll(
-                    () -> assertTrue(firstHasRun.get()), () -> assertTrue(firstWasPolled.get()));
-                return false;
-              });
-
-      scheduler.schedule(command);
-      scheduler.run();
-
-      assertAll(() -> assertTrue(firstHasRun.get()), () -> assertTrue(firstWasPolled.get()));
     }
   }
 
@@ -241,37 +180,6 @@ class CommandDecoratorTest extends CommandTestBase {
   }
 
   @Test
-  void deadlineForOrderTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      AtomicBoolean dictatorHasRun = new AtomicBoolean(false);
-      AtomicBoolean dictatorWasPolled = new AtomicBoolean(false);
-
-      Command dictator =
-          new FunctionalCommand(
-              () -> {},
-              () -> dictatorHasRun.set(true),
-              interrupted -> {},
-              () -> {
-                dictatorWasPolled.set(true);
-                return true;
-              });
-      Command other =
-          new RunCommand(
-              () ->
-                  assertAll(
-                      () -> assertTrue(dictatorHasRun.get()),
-                      () -> assertTrue(dictatorWasPolled.get())));
-
-      Command group = dictator.deadlineFor(other);
-
-      scheduler.schedule(group);
-      scheduler.run();
-
-      assertAll(() -> assertTrue(dictatorHasRun.get()), () -> assertTrue(dictatorWasPolled.get()));
-    }
-  }
-
-  @Test
   void alongWithTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicBoolean finish = new AtomicBoolean(false);
@@ -294,36 +202,6 @@ class CommandDecoratorTest extends CommandTestBase {
   }
 
   @Test
-  void alongWithOrderTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      AtomicBoolean firstHasRun = new AtomicBoolean(false);
-      AtomicBoolean firstWasPolled = new AtomicBoolean(false);
-
-      Command command1 =
-          new FunctionalCommand(
-              () -> {},
-              () -> firstHasRun.set(true),
-              interrupted -> {},
-              () -> {
-                firstWasPolled.set(true);
-                return true;
-              });
-      Command command2 =
-          new RunCommand(
-              () ->
-                  assertAll(
-                      () -> assertTrue(firstHasRun.get()), () -> assertTrue(firstWasPolled.get())));
-
-      Command group = command1.alongWith(command2);
-
-      scheduler.schedule(group);
-      scheduler.run();
-
-      assertAll(() -> assertTrue(firstHasRun.get()), () -> assertTrue(firstWasPolled.get()));
-    }
-  }
-
-  @Test
   void raceWithTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       Command command1 = new WaitUntilCommand(() -> false);
@@ -335,37 +213,6 @@ class CommandDecoratorTest extends CommandTestBase {
       scheduler.run();
 
       assertFalse(scheduler.isScheduled(group));
-    }
-  }
-
-  @Test
-  void raceWithOrderTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      AtomicBoolean firstHasRun = new AtomicBoolean(false);
-      AtomicBoolean firstWasPolled = new AtomicBoolean(false);
-
-      Command command1 =
-          new FunctionalCommand(
-              () -> {},
-              () -> firstHasRun.set(true),
-              interrupted -> {},
-              () -> {
-                firstWasPolled.set(true);
-                return true;
-              });
-      Command command2 =
-          new RunCommand(
-              () -> {
-                assertTrue(firstHasRun.get());
-                assertTrue(firstWasPolled.get());
-              });
-
-      Command group = command1.raceWith(command2);
-
-      scheduler.schedule(group);
-      scheduler.run();
-
-      assertAll(() -> assertTrue(firstHasRun.get()), () -> assertTrue(firstWasPolled.get()));
     }
   }
 
