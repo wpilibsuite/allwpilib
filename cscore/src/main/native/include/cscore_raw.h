@@ -199,10 +199,9 @@ inline uint64_t RawSink::GrabFrameNoTimeout(wpi::RawFrame& image) const {
   m_status = 0;
   return GrabSinkFrame(m_handle, image, &m_status);
 }
+/** @} */
 
 }  // namespace cs
-
-/** @} */
 
 #endif
 
