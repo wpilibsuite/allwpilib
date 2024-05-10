@@ -15,7 +15,7 @@
 namespace nt {
 
 inline DoubleArraySubscriber::DoubleArraySubscriber(
-    NT_Subscriber handle, std::span<const double> defaultValue)
+    NT_Subscriber handle, ParamType defaultValue)
     : Subscriber{handle},
       m_defaultValue{defaultValue.begin(), defaultValue.end()} {}
 
@@ -24,7 +24,7 @@ inline std::vector<double> DoubleArraySubscriber::Get() const {
 }
 
 inline std::vector<double> DoubleArraySubscriber::Get(
-    std::span<const double> defaultValue) const {
+    ParamType defaultValue) const {
   return ::nt::GetDoubleArray(m_subHandle, defaultValue);
 }
 
@@ -32,7 +32,7 @@ inline std::span<double> DoubleArraySubscriber::Get(wpi::SmallVectorImpl<double>
   return Get(buf, m_defaultValue);
 }
 
-inline std::span<double> DoubleArraySubscriber::Get(wpi::SmallVectorImpl<double>& buf, std::span<const double> defaultValue) const {
+inline std::span<double> DoubleArraySubscriber::Get(wpi::SmallVectorImpl<double>& buf, ParamType defaultValue) const {
   return nt::GetDoubleArray(m_subHandle, buf, defaultValue);
 }
 
@@ -41,7 +41,7 @@ inline TimestampedDoubleArray DoubleArraySubscriber::GetAtomic() const {
 }
 
 inline TimestampedDoubleArray DoubleArraySubscriber::GetAtomic(
-    std::span<const double> defaultValue) const {
+    ParamType defaultValue) const {
   return ::nt::GetAtomicDoubleArray(m_subHandle, defaultValue);
 }
 
@@ -49,7 +49,7 @@ inline TimestampedDoubleArrayView DoubleArraySubscriber::GetAtomic(wpi::SmallVec
   return GetAtomic(buf, m_defaultValue);
 }
 
-inline TimestampedDoubleArrayView DoubleArraySubscriber::GetAtomic(wpi::SmallVectorImpl<double>& buf, std::span<const double> defaultValue) const {
+inline TimestampedDoubleArrayView DoubleArraySubscriber::GetAtomic(wpi::SmallVectorImpl<double>& buf, ParamType defaultValue) const {
   return nt::GetAtomicDoubleArray(m_subHandle, buf, defaultValue);
 }
 
@@ -65,12 +65,12 @@ inline DoubleArrayTopic DoubleArraySubscriber::GetTopic() const {
 inline DoubleArrayPublisher::DoubleArrayPublisher(NT_Publisher handle)
     : Publisher{handle} {}
 
-inline void DoubleArrayPublisher::Set(std::span<const double> value,
+inline void DoubleArrayPublisher::Set(ParamType value,
                                          int64_t time) {
   ::nt::SetDoubleArray(m_pubHandle, value, time);
 }
 
-inline void DoubleArrayPublisher::SetDefault(std::span<const double> value) {
+inline void DoubleArrayPublisher::SetDefault(ParamType value) {
   ::nt::SetDefaultDoubleArray(m_pubHandle, value);
 }
 
@@ -79,7 +79,7 @@ inline DoubleArrayTopic DoubleArrayPublisher::GetTopic() const {
 }
 
 inline DoubleArrayEntry::DoubleArrayEntry(
-    NT_Entry handle, std::span<const double> defaultValue)
+    NT_Entry handle, ParamType defaultValue)
     : DoubleArraySubscriber{handle, defaultValue},
       DoubleArrayPublisher{handle} {}
 
