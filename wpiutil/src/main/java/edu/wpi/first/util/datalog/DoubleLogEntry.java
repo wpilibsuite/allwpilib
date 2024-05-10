@@ -71,4 +71,39 @@ public class DoubleLogEntry extends DataLogEntry {
   public void append(double value) {
     m_log.appendDouble(m_entry, value, 0);
   }
+
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @param value Value to record
+   * @param timestamp Time stamp (0 to indicate now)
+   */
+  public synchronized void update(double value, long timestamp) {
+    if (!m_hasLastValue || m_lastValue != value) {
+      m_lastValue = value;
+      m_hasLastValue = true;
+      append(value, timestamp);
+    }
+  }
+
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @param value Value to record
+   */
+  public void update(double value) {
+    update(value, 0);
+  }
+
+  /**
+   * Gets the last value.
+   *
+   * @return Last value, or 0 if none.
+   */
+  public synchronized double getLastValue() {
+    return m_lastValue;
+  }
+
+  boolean m_hasLastValue;
+  double m_lastValue;
 }

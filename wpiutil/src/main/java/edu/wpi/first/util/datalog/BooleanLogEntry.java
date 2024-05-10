@@ -71,4 +71,39 @@ public class BooleanLogEntry extends DataLogEntry {
   public void append(boolean value) {
     m_log.appendBoolean(m_entry, value, 0);
   }
+
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @param value Value to record
+   * @param timestamp Time stamp (0 to indicate now)
+   */
+  public synchronized void update(boolean value, long timestamp) {
+    if (!m_hasLastValue || m_lastValue != value) {
+      m_lastValue = value;
+      m_hasLastValue = true;
+      append(value, timestamp);
+    }
+  }
+
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @param value Value to record
+   */
+  public void update(boolean value) {
+    update(value, 0);
+  }
+
+  /**
+   * Gets the last value.
+   *
+   * @return Last value, or false if none.
+   */
+  public synchronized boolean getLastValue() {
+    return m_lastValue;
+  }
+
+  private boolean m_hasLastValue;
+  private boolean m_lastValue;
 }
