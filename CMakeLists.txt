@@ -214,6 +214,7 @@ endif()
 find_package(LIBSSH 0.7.1)
 
 find_package(Protobuf REQUIRED)
+find_package(Absl REQUIRED)
 
 set(APRILTAG_DEP_REPLACE "find_dependency(apriltag)")
 set(CAMERASERVER_DEP_REPLACE_IMPL "find_dependency(cameraserver)")
