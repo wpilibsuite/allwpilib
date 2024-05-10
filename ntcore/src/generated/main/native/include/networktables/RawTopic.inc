@@ -15,7 +15,7 @@
 namespace nt {
 
 inline RawSubscriber::RawSubscriber(
-    NT_Subscriber handle, std::span<const uint8_t> defaultValue)
+    NT_Subscriber handle, ParamType defaultValue)
     : Subscriber{handle},
       m_defaultValue{defaultValue.begin(), defaultValue.end()} {}
 
@@ -24,7 +24,7 @@ inline std::vector<uint8_t> RawSubscriber::Get() const {
 }
 
 inline std::vector<uint8_t> RawSubscriber::Get(
-    std::span<const uint8_t> defaultValue) const {
+    ParamType defaultValue) const {
   return ::nt::GetRaw(m_subHandle, defaultValue);
 }
 
@@ -32,7 +32,7 @@ inline std::span<uint8_t> RawSubscriber::Get(wpi::SmallVectorImpl<uint8_t>& buf)
   return Get(buf, m_defaultValue);
 }
 
-inline std::span<uint8_t> RawSubscriber::Get(wpi::SmallVectorImpl<uint8_t>& buf, std::span<const uint8_t> defaultValue) const {
+inline std::span<uint8_t> RawSubscriber::Get(wpi::SmallVectorImpl<uint8_t>& buf, ParamType defaultValue) const {
   return nt::GetRaw(m_subHandle, buf, defaultValue);
 }
 
@@ -41,7 +41,7 @@ inline TimestampedRaw RawSubscriber::GetAtomic() const {
 }
 
 inline TimestampedRaw RawSubscriber::GetAtomic(
-    std::span<const uint8_t> defaultValue) const {
+    ParamType defaultValue) const {
   return ::nt::GetAtomicRaw(m_subHandle, defaultValue);
 }
 
@@ -49,7 +49,7 @@ inline TimestampedRawView RawSubscriber::GetAtomic(wpi::SmallVectorImpl<uint8_t>
   return GetAtomic(buf, m_defaultValue);
 }
 
-inline TimestampedRawView RawSubscriber::GetAtomic(wpi::SmallVectorImpl<uint8_t>& buf, std::span<const uint8_t> defaultValue) const {
+inline TimestampedRawView RawSubscriber::GetAtomic(wpi::SmallVectorImpl<uint8_t>& buf, ParamType defaultValue) const {
   return nt::GetAtomicRaw(m_subHandle, buf, defaultValue);
 }
 
@@ -65,12 +65,12 @@ inline RawTopic RawSubscriber::GetTopic() const {
 inline RawPublisher::RawPublisher(NT_Publisher handle)
     : Publisher{handle} {}
 
-inline void RawPublisher::Set(std::span<const uint8_t> value,
+inline void RawPublisher::Set(ParamType value,
                                          int64_t time) {
   ::nt::SetRaw(m_pubHandle, value, time);
 }
 
-inline void RawPublisher::SetDefault(std::span<const uint8_t> value) {
+inline void RawPublisher::SetDefault(ParamType value) {
   ::nt::SetDefaultRaw(m_pubHandle, value);
 }
 
@@ -79,7 +79,7 @@ inline RawTopic RawPublisher::GetTopic() const {
 }
 
 inline RawEntry::RawEntry(
-    NT_Entry handle, std::span<const uint8_t> defaultValue)
+    NT_Entry handle, ParamType defaultValue)
     : RawSubscriber{handle, defaultValue},
       RawPublisher{handle} {}
 

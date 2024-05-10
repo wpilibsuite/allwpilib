@@ -15,7 +15,7 @@
 namespace nt {
 
 inline {{ TypeName }}Subscriber::{{ TypeName }}Subscriber(
-    NT_Subscriber handle, {{ cpp.ParamType }} defaultValue)
+    NT_Subscriber handle, ParamType defaultValue)
     : Subscriber{handle},
       m_defaultValue{{ '{' }}{{ cpp.DefaultValueCopy|default('defaultValue') }}} {}
 
@@ -24,7 +24,7 @@ inline {{ cpp.ValueType }} {{ TypeName }}Subscriber::Get() const {
 }
 
 inline {{ cpp.ValueType }} {{ TypeName }}Subscriber::Get(
-    {{ cpp.ParamType }} defaultValue) const {
+    ParamType defaultValue) const {
   return ::nt::Get{{ TypeName }}(m_subHandle, defaultValue);
 }
 {% if cpp.SmallRetType and cpp.SmallElemType %}
@@ -32,7 +32,7 @@ inline {{ cpp.SmallRetType }} {{ TypeName }}Subscriber::Get(wpi::SmallVectorImpl
   return Get(buf, m_defaultValue);
 }
 
-inline {{ cpp.SmallRetType }} {{ TypeName }}Subscriber::Get(wpi::SmallVectorImpl<{{ cpp.SmallElemType }}>& buf, {{ cpp.ParamType }} defaultValue) const {
+inline {{ cpp.SmallRetType }} {{ TypeName }}Subscriber::Get(wpi::SmallVectorImpl<{{ cpp.SmallElemType }}>& buf, ParamType defaultValue) const {
   return nt::Get{{ TypeName }}(m_subHandle, buf, defaultValue);
 }
 {% endif %}
@@ -41,7 +41,7 @@ inline Timestamped{{ TypeName }} {{ TypeName }}Subscriber::GetAtomic() const {
 }
 
 inline Timestamped{{ TypeName }} {{ TypeName }}Subscriber::GetAtomic(
-    {{ cpp.ParamType }} defaultValue) const {
+    ParamType defaultValue) const {
   return ::nt::GetAtomic{{ TypeName }}(m_subHandle, defaultValue);
 }
 {% if cpp.SmallRetType and cpp.SmallElemType %}
@@ -49,7 +49,7 @@ inline Timestamped{{ TypeName }}View {{ TypeName }}Subscriber::GetAtomic(wpi::Sm
   return GetAtomic(buf, m_defaultValue);
 }
 
-inline Timestamped{{ TypeName }}View {{ TypeName }}Subscriber::GetAtomic(wpi::SmallVectorImpl<{{ cpp.SmallElemType }}>& buf, {{ cpp.ParamType }} defaultValue) const {
+inline Timestamped{{ TypeName }}View {{ TypeName }}Subscriber::GetAtomic(wpi::SmallVectorImpl<{{ cpp.SmallElemType }}>& buf, ParamType defaultValue) const {
   return nt::GetAtomic{{ TypeName }}(m_subHandle, buf, defaultValue);
 }
 {% endif %}
@@ -65,12 +65,12 @@ inline {{ TypeName }}Topic {{ TypeName }}Subscriber::GetTopic() const {
 inline {{ TypeName }}Publisher::{{ TypeName }}Publisher(NT_Publisher handle)
     : Publisher{handle} {}
 
-inline void {{ TypeName }}Publisher::Set({{ cpp.ParamType }} value,
+inline void {{ TypeName }}Publisher::Set(ParamType value,
                                          int64_t time) {
   ::nt::Set{{ TypeName }}(m_pubHandle, value, time);
 }
 
-inline void {{ TypeName }}Publisher::SetDefault({{ cpp.ParamType }} value) {
+inline void {{ TypeName }}Publisher::SetDefault(ParamType value) {
   ::nt::SetDefault{{ TypeName }}(m_pubHandle, value);
 }
 
@@ -79,7 +79,7 @@ inline {{ TypeName }}Topic {{ TypeName }}Publisher::GetTopic() const {
 }
 
 inline {{ TypeName }}Entry::{{ TypeName }}Entry(
-    NT_Entry handle, {{ cpp.ParamType }} defaultValue)
+    NT_Entry handle, ParamType defaultValue)
     : {{ TypeName }}Subscriber{handle, defaultValue},
       {{ TypeName }}Publisher{handle} {}
 
