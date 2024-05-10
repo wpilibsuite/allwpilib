@@ -4,6 +4,8 @@
 
 package edu.wpi.first.util.datalog;
 
+import java.util.Arrays;
+
 /** Log array of string values. */
 public class StringArrayLogEntry extends DataLogEntry {
   /** The data type for string array values. */
@@ -71,4 +73,58 @@ public class StringArrayLogEntry extends DataLogEntry {
   public void append(String[] value) {
     m_log.appendStringArray(m_entry, value, 0);
   }
+
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @param value Value to record
+   * @param timestamp Time stamp (0 to indicate now)
+   */
+  public synchronized void update(String[] value, long timestamp) {
+    if (!equalsLast(value)) {
+      copyToLast(value);
+      append(value, timestamp);
+    }
+  }
+
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @param value Value to record
+   */
+  public void update(String[] value) {
+    update(value, 0);
+  }
+
+  /**
+   * Gets the last value.
+   *
+   * @return Last value, or false if none.
+   */
+  @SuppressWarnings("PMD.ReturnEmptyCollectionRatherThanNull")
+  public synchronized String[] getLastValue() {
+    if (m_lastValue == null) {
+      return null;
+    }
+    return Arrays.copyOf(m_lastValue, m_lastValueLen);
+  }
+
+  private boolean equalsLast(String[] value) {
+    if (m_lastValue == null || m_lastValueLen != value.length) {
+      return false;
+    }
+    return Arrays.equals(m_lastValue, 0, value.length, value, 0, value.length);
+  }
+
+  private void copyToLast(String[] value) {
+    if (m_lastValue == null || m_lastValue.length < value.length) {
+      m_lastValue = Arrays.copyOf(value, value.length);
+    } else {
+      System.arraycopy(value, 0, m_lastValue, 0, value.length);
+    }
+    m_lastValueLen = value.length;
+  }
+
+  private String[] m_lastValue;
+  private int m_lastValueLen;
 }

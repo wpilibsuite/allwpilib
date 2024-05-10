@@ -96,4 +96,37 @@ public class StringLogEntry extends DataLogEntry {
   public void append(String value) {
     m_log.appendString(m_entry, value, 0);
   }
+
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @param value Value to record
+   * @param timestamp Time stamp (0 to indicate now)
+   */
+  public synchronized void update(String value, long timestamp) {
+    if (m_lastValue == null || !value.equals(m_lastValue)) {
+      m_lastValue = value;
+      append(value, timestamp);
+    }
+  }
+
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @param value Value to record
+   */
+  public void update(String value) {
+    update(value, 0);
+  }
+
+  /**
+   * Gets the last value.
+   *
+   * @return Last value, or null if none.
+   */
+  public synchronized String getLastValue() {
+    return m_lastValue;
+  }
+
+  private String m_lastValue;
 }
