@@ -43,7 +43,6 @@ import us.hebi.quickbuf.ProtoMessage;
  * kept to the NetworkTableInstance returned by this function to keep it from being garbage
  * collected.
  */
-@SuppressWarnings("PMD.CouplingBetweenObjects")
 public final class NetworkTableInstance implements AutoCloseable {
   /** Client/server mode flag values (as returned by {@link #getNetworkMode()}). */
   public enum NetworkMode {
