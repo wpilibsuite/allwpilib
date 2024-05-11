@@ -11,7 +11,6 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.MatchInfoData;
 import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.IntegerPublisher;
-import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.util.EventVector;
@@ -94,8 +93,6 @@ public final class DriverStation {
 
   @SuppressWarnings("MemberName")
   private static class MatchDataSender {
-    NetworkTable table;
-    StringPublisher typeMetadata;
     StringPublisher gameSpecificMessage;
     StringPublisher eventName;
     IntegerPublisher matchNumber;
@@ -114,9 +111,8 @@ public final class DriverStation {
     int oldControlWord;
 
     MatchDataSender() {
-      table = NetworkTableInstance.getDefault().getTable("FMSInfo");
-      typeMetadata = table.getStringTopic(".type").publish();
-      typeMetadata.set("FMSInfo");
+      var table = NetworkTableInstance.getDefault().getTable("FMSInfo");
+      table.getStringTopic(".type").publish().set("FMSInfo");
       gameSpecificMessage = table.getStringTopic("GameSpecificMessage").publish();
       gameSpecificMessage.set("");
       eventName = table.getStringTopic("EventName").publish();
