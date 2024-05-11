@@ -32,7 +32,7 @@ public final class DriverStation {
   /** Number of Joystick ports. */
   public static final int kJoystickPorts = 6;
 
-  private static class HALJoystickButtons {
+  private static final class HALJoystickButtons {
     public int m_buttons;
     public byte m_count;
   }

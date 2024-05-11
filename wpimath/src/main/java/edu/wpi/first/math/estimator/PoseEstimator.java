@@ -271,7 +271,7 @@ public class PoseEstimator<T> {
    * Represents an odometry record. The record contains the inputs provided as well as the pose that
    * was observed based on these inputs, as well as the previous record and its inputs.
    */
-  private class InterpolationRecord implements Interpolatable<InterpolationRecord> {
+  private final class InterpolationRecord implements Interpolatable<InterpolationRecord> {
     // The pose observed given the current sensor inputs and the previous pose.
     private final Pose2d poseMeters;
 
