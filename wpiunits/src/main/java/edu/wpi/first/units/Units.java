@@ -419,7 +419,7 @@ public final class Units {
    * @param symbol the symbol of the new derived unit
    * @return the milli-unit
    */
-  @SuppressWarnings({"PMD.MethodName", "checkstyle:methodname"})
+  @SuppressWarnings("checkstyle:methodname")
   public static <U extends Unit<U>> U Milli(Unit<U> baseUnit, String name, String symbol) {
     return derive(baseUnit).splitInto(1000).named(name).symbol(symbol).make();
   }
@@ -431,7 +431,7 @@ public final class Units {
    * @param baseUnit the unit being derived from. This does not have to be the base unit of measure
    * @return the milli-unit
    */
-  @SuppressWarnings({"PMD.MethodName", "checkstyle:methodname"})
+  @SuppressWarnings("checkstyle:methodname")
   public static <U extends Unit<U>> U Milli(Unit<U> baseUnit) {
     return Milli(
         baseUnit, "Milli" + baseUnit.name().toLowerCase(Locale.ROOT), "m" + baseUnit.symbol());
@@ -447,7 +447,7 @@ public final class Units {
    * @param symbol the symbol of the new derived unit
    * @return the micro-unit
    */
-  @SuppressWarnings({"PMD.MethodName", "checkstyle:methodname"})
+  @SuppressWarnings("checkstyle:methodname")
   public static <U extends Unit<U>> U Micro(Unit<U> baseUnit, String name, String symbol) {
     return derive(baseUnit).splitInto(1_000_000).named(name).symbol(symbol).make();
   }
@@ -459,7 +459,7 @@ public final class Units {
    * @param baseUnit the unit being derived from. This does not have to be the base unit of measure
    * @return the micro-unit
    */
-  @SuppressWarnings({"PMD.MethodName", "checkstyle:methodname"})
+  @SuppressWarnings("checkstyle:methodname")
   public static <U extends Unit<U>> U Micro(Unit<U> baseUnit) {
     return Micro(
         baseUnit, "Micro" + baseUnit.name().toLowerCase(Locale.ROOT), "u" + baseUnit.symbol());
@@ -474,7 +474,7 @@ public final class Units {
    * @param symbol the symbol of the new derived unit
    * @return the kilo-unit
    */
-  @SuppressWarnings({"PMD.MethodName", "checkstyle:methodname"})
+  @SuppressWarnings("checkstyle:methodname")
   public static <U extends Unit<U>> U Kilo(Unit<U> baseUnit, String name, String symbol) {
     return derive(baseUnit).aggregate(1000).named(name).symbol(symbol).make();
   }
@@ -486,7 +486,7 @@ public final class Units {
    * @param baseUnit the unit being derived from. This does not have to be the base unit of measure
    * @return the kilo-unit
    */
-  @SuppressWarnings({"PMD.MethodName", "checkstyle:methodname"})
+  @SuppressWarnings("checkstyle:methodname")
   public static <U extends Unit<U>> U Kilo(Unit<U> baseUnit) {
     return Kilo(
         baseUnit, "Kilo" + baseUnit.name().toLowerCase(Locale.ROOT), "K" + baseUnit.symbol());
