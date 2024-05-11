@@ -202,7 +202,7 @@ public class Matrix<R extends Num, C extends Num> {
    * @return The mean value of this matrix.
    */
   public final double mean() {
-    return this.elementSum() / (double) this.m_storage.getNumElements();
+    return this.elementSum() / this.m_storage.getNumElements();
   }
 
   /**
