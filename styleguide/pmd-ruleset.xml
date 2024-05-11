@@ -42,10 +42,12 @@
 
   <rule ref="category/java/design.xml">
     <exclude name="AvoidThrowingRawExceptionTypes" />
+    <exclude name="AvoidThrowingNewInstanceOfSameException" />
     <exclude name="CognitiveComplexity" />
     <exclude name="CouplingBetweenObjects" />
     <exclude name="CyclomaticComplexity" />
     <exclude name="DataClass" />
+    <exclude name="ExceptionAsFlowControl" />
     <exclude name="ExcessiveImports" />
     <exclude name="ExcessiveParameterList" />
     <exclude name="ExcessivePublicCount" />
