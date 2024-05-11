@@ -825,7 +825,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
         // Could be multiple data sets in the buffer. Handle each one.
         for (int i = 0; i < data_to_read; i += dataset_len) {
           // Timestamp is at buffer[i]
-          m_dt = ((double) buffer[i] - previous_timestamp) / 1000000.0;
+          m_dt = (buffer[i] - previous_timestamp) / 1000000.0;
 
           /*
            * System.out.println(((toInt(buffer[i + 3], buffer[i + 4], buffer[i + 5],
