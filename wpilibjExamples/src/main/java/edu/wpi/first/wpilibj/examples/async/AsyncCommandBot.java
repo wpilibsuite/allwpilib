@@ -4,8 +4,6 @@
 
 package edu.wpi.first.wpilibj.examples.async;
 
-import static edu.wpi.first.units.Units.Milliseconds;
-
 import edu.wpi.first.wpilibj.examples.async.Constants.AutoConstants;
 import edu.wpi.first.wpilibj.examples.async.Constants.OIConstants;
 import edu.wpi.first.wpilibj.examples.async.Constants.ShooterConstants;
@@ -71,7 +69,7 @@ public class AsyncCommandBot {
                 .requiring(m_shooter, m_storage)
                 .executing(() -> {
                   while (true) {
-                    AsyncCommand.pause(Milliseconds.of(10));
+                    AsyncCommand.yield();
                     m_storage.run();
                     m_shooter.ramp(ShooterConstants.kShooterTarget);
                     m_shooter.tryFeed();

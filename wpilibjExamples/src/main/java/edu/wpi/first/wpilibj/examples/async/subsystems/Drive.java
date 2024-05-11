@@ -5,7 +5,6 @@
 package edu.wpi.first.wpilibj.examples.async.subsystems;
 
 import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.wpilibj3.command.async.AsyncCommand.pause;
 
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
@@ -92,7 +91,7 @@ public class Drive extends HardwareResource {
       m_rightEncoder.reset();
 
       while (Math.max(m_leftEncoder.getDistance(), m_rightEncoder.getDistance()) < distanceMeters) {
-        pause();
+        AsyncCommand.yield();
         m_drive.arcadeDrive(speed, 0);
       }
 

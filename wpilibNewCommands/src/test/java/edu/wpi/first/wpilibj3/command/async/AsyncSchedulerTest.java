@@ -1,10 +1,7 @@
 package edu.wpi.first.wpilibj3.command.async;
 
-import static edu.wpi.first.units.Units.Milliseconds;
-import static edu.wpi.first.units.Units.Seconds;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -14,7 +11,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.RepeatedTest;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 
 @Timeout(5)
@@ -25,11 +22,11 @@ class AsyncSchedulerTest {
   void setup() {
     Logger.clear();
 
-    // Initialize with high default timeouts so random jitter doesn't make tests flake out
-    scheduler = new AsyncScheduler(
-        Seconds.one(), // event loop period
-        Milliseconds.of(25), // cancel timeout
-        Milliseconds.of(25)); // schedule timeout
+    // Any command that calls AsyncCommand.park() or AsyncCommand.yield() uses the default
+    // scheduler instance. Notably, this includes commands with timeouts, wait commands, and
+    // the default idle commands
+    scheduler = new AsyncScheduler();
+    AsyncScheduler.setDefaultScheduler(scheduler);
   }
 
   @AfterEach
@@ -38,20 +35,23 @@ class AsyncSchedulerTest {
     Logger.clear();
   }
 
-  @RepeatedTest(value = 1000, failureThreshold = 1)
+  @Test
   void basic() throws Exception {
     var enabled = new AtomicBoolean(false);
     var ran = new AtomicBoolean(false);
     var command = AsyncCommand.noHardware(() -> {
-      do {} while (!enabled.get());
+      do {
+        scheduler.yield();
+      } while (!enabled.get());
       ran.set(true);
     }).named("Basic Command");
 
     scheduler.schedule(command);
+    scheduler.run();
     assertTrue(scheduler.isRunning(command), "Command should be running after being scheduled");
 
     enabled.set(true);
-    scheduler.await(command);
+    scheduler.run();
     if (scheduler.isRunning(command)) {
       System.err.println(Logger.formattedLogTable());
       fail("Command should no longer be running after awaiting its completion");
@@ -60,23 +60,24 @@ class AsyncSchedulerTest {
     assertTrue(ran.get());
   }
 
-  @RepeatedTest(value = 100, failureThreshold = 1)
+  @Test
   void higherPriorityCancels() {
     var subsystem = new HardwareResource("Subsystem", scheduler);
 
     var lower = new PriorityCommand(-1000, subsystem);
     var higher = new PriorityCommand(+1000, subsystem);
 
-    scheduler.scheduleTimeout = Milliseconds.of(25);
     scheduler.schedule(lower);
+    scheduler.run();
     assertTrue(scheduler.isRunning(lower));
 
     scheduler.schedule(higher);
+    scheduler.run();
     assertTrue(scheduler.isRunning(higher));
     assertFalse(scheduler.isRunning(lower));
   }
 
-  @RepeatedTest(value = 100, failureThreshold = 1)
+  @Test
   void lowerPriorityDoesNotCancel() {
     var subsystem = new HardwareResource("Subsystem", scheduler);
 
@@ -84,9 +85,11 @@ class AsyncSchedulerTest {
     var higher = new PriorityCommand(+1000, subsystem);
 
     scheduler.schedule(higher);
+    scheduler.run();
     assertTrue(scheduler.isRunning(higher));
 
     scheduler.schedule(lower);
+    scheduler.run();
     if (!scheduler.isRunning(higher)) {
       System.err.println(Logger.formattedLogTable());
       fail("Higher priority command should still be running");
@@ -97,7 +100,7 @@ class AsyncSchedulerTest {
     }
   }
 
-  @RepeatedTest(value = 100, failureThreshold = 1)
+  @Test
   void samePriorityCancels() {
     var subsystem = new HardwareResource("Subsystem", scheduler);
 
@@ -105,15 +108,17 @@ class AsyncSchedulerTest {
     var second = new PriorityCommand(512, subsystem);
 
     scheduler.schedule(first);
+    scheduler.run();
     assertTrue(scheduler.isRunning(first));
 
     scheduler.schedule(second);
+    scheduler.run();
     assertTrue(scheduler.isRunning(second), "New command should be running");
     assertFalse(scheduler.isRunning(first), "Old command should be canceled");
   }
 
-  @RepeatedTest(value = 100, failureThreshold = 1)
-  void atomicity() throws Exception {
+  @Test
+  void atomicity() {
     var resource =
         new HardwareResource("X", scheduler) {
           int x = 0;
@@ -132,7 +137,7 @@ class AsyncSchedulerTest {
           AsyncCommand.noHardware(
                   () -> {
                     for (int i = 0; i < iterations; i++) {
-                      scheduler.pauseCurrentCommand(Milliseconds.one());
+                      scheduler.yield();
                       resource.x++;
                     }
                   })
@@ -142,14 +147,15 @@ class AsyncSchedulerTest {
       commands.add(command);
     }
 
-    for (var command : commands) {
-      scheduler.await(command);
+    for (int i = 0; i < iterations; i++) {
+      scheduler.run();
     }
+    scheduler.run();
 
     assertEquals(numCommands * iterations, resource.x);
   }
 
-  @RepeatedTest(value = 100, failureThreshold = 1)
+  @Test
   void errorDetection() throws Exception {
     var resource = new HardwareResource("X", scheduler);
 
@@ -157,21 +163,14 @@ class AsyncSchedulerTest {
         resource
             .run(
                 () -> {
-                  Thread.sleep(10);
                   throw new RuntimeException("The exception");
                 })
             .named("Bad Behavior");
 
     scheduler.schedule(command);
 
-    // wait for the command to complete, but not using await, since that would throw an error
-    // immediately - and we want to confirm that checkForErrors will correctly capture and throw
-    while (scheduler.isRunning(command)) {
-      Thread.sleep(1);
-    }
-
     try {
-      scheduler.checkForErrors();
+      scheduler.run();
       fail("An exception should have been thrown");
     } catch (CommandExecutionException e) {
       if (e.getCommand() != command) {
@@ -186,11 +185,13 @@ class AsyncSchedulerTest {
             "Expected cause to be a RuntimeException with message 'The exception', but was "
                 + cause);
       }
+    } catch (Throwable t) {
+      fail("Expected a CommandExecutionException to be thrown, but got " + t);
     }
   }
 
-  @RepeatedTest(value = 100, failureThreshold = 1)
-  void runResource() throws Exception {
+  @Test
+  void runResource() {
     var example =
         new HardwareResource("Counting", scheduler) {
           int x = 0;
@@ -202,76 +203,79 @@ class AsyncSchedulerTest {
                 () -> {
                   example.x = 0;
                   for (int i = 0; i < 10; i++) {
-                    scheduler.pauseCurrentCommand(Milliseconds.one());
+                    scheduler.yield();
                     example.x++;
                   }
                 })
             .named("Count To Ten");
 
     scheduler.schedule(countToTen);
-    scheduler.await(countToTen);
+    for (int i = 0; i < 10; i++) {
+      scheduler.run();
+    }
+    scheduler.run();
 
     assertEquals(10, example.x);
   }
 
-  @RepeatedTest(value = 100, failureThreshold = 1)
+  @Test
   void cancelOnInterruptDoesNotResume() throws Exception {
     var count = new AtomicInteger(0);
 
     var resource = new HardwareResource("Resource", scheduler);
 
     var interrupter = AsyncCommand.requiring(resource).executing(() -> {
-      Thread.sleep(50);
     }).withPriority(2).named("Interrupter");
 
     var canceledCommand = AsyncCommand.requiring(resource).executing(() -> {
       count.set(1);
-      scheduler.pauseCurrentCommand();
+      scheduler.yield();
       count.set(2);
     }).withPriority(1).named("Cancel By Default");
 
     scheduler.schedule(canceledCommand);
-    Thread.sleep(5); // wait for command to start up and hit the pause
+    scheduler.run();
 
     scheduler.schedule(interrupter);
-    scheduler.await(canceledCommand);
-    assertEquals(1, count.get()); // the second set should not have run
+    scheduler.run();
+    assertEquals(1, count.get()); // the second "set" call should not have run
   }
 
-  @RepeatedTest(value = 100, failureThreshold = 1)
-  void pauseOutsideCommand() {
-    assertThrows(IllegalStateException.class, scheduler::pauseCurrentCommand);
-  }
-
-  @RepeatedTest(value = 10, failureThreshold = 1)
+  @Test
   void scheduleOverDefaultDoesNotRescheduleDefault() throws Exception {
     var count = new AtomicInteger(0);
 
     var resource = new HardwareResource("Resource", scheduler);
     var defaultCmd = resource.run(() -> {
-      count.incrementAndGet();
-      scheduler.pauseCurrentCommand(Milliseconds.of(50));
+      while (true) {
+        count.incrementAndGet();
+        scheduler.yield();
+      }
     }).named("Default Command");
 
-    var newerCmd = resource.run(scheduler::pauseCurrentCommand).named("Newer Command");
+    var newerCmd = resource.run(() -> {
+    }).named("Newer Command");
     resource.setDefaultCommand(defaultCmd);
-    assertTrue(scheduler.isRunning(defaultCmd));
+    scheduler.run();
+    assertTrue(scheduler.isRunning(defaultCmd), "Default command should be running");
 
     scheduler.schedule(newerCmd);
-    assertFalse(scheduler.isRunning(defaultCmd));
-    assertEquals(1, count.get());
+    scheduler.run();
+    assertFalse(scheduler.isRunning(defaultCmd), "Default command should have been interrupted");
+    assertEquals(1, count.get(), "Default command should have run once");
 
-    scheduler.await(newerCmd);
+    scheduler.run();
     assertTrue(scheduler.isRunning(defaultCmd));
   }
 
-  @RepeatedTest(value = 10, failureThreshold = 1)
+  @Test
   void cancelAllCancelsAll() {
     var commands = new ArrayList<AsyncCommand>(10);
     for (int i = 1; i <= 10; i++) {
-      commands.add(AsyncCommand.noHardware(AsyncCommand::pause).named("Command " + i));
+      commands.add(AsyncCommand.noHardware(scheduler::yield).named("Command " + i));
     }
     commands.forEach(scheduler::schedule);
+    scheduler.run();
     scheduler.cancelAll();
     for (AsyncCommand command : commands) {
       if (scheduler.isRunning(command)) {
@@ -280,7 +284,7 @@ class AsyncSchedulerTest {
     }
   }
 
-  @RepeatedTest(value = 100, failureThreshold = 1)
+  @Test
   void cancelAllStartsDefaults() {
     var resources = new ArrayList<HardwareResource>(10);
     for (int i = 1; i <= 10; i++) {
@@ -290,61 +294,40 @@ class AsyncSchedulerTest {
     var command =
         new AsyncCommandBuilder()
             .requiring(resources)
-            .executing(AsyncCommand::pause)
+            .executing(scheduler::yield)
             .named("Big Command");
 
-    for (int i = 0; i < 10; i++) {
-      scheduler.schedule(command);
-      scheduler.cancelAll();
+    // Scheduling the command should evict the on-deck default commands
+    scheduler.schedule(command);
+    // Then running should get it into the set of running commands
+    scheduler.run();
+    // Cancelling should clear out the set of running commands
+    scheduler.cancelAll();
+    // Then ticking the scheduler once to fully remove the command and schedule the defaults
+    scheduler.run();
+    // Then one more tick to start running the scheduled defaults
+    scheduler.run();
 
-      if (scheduler.isRunning(command)) {
-        System.err.println(scheduler.getRunningCommands());
-        fail("Run " + i + ": " + command.name() + " was not canceled by cancelAll()");
+    if (scheduler.isRunning(command)) {
+      System.err.println(scheduler.getRunningCommands());
+      fail(command.name() + " was not canceled by cancelAll()");
+    }
+
+    for (var resource : resources) {
+      if (!scheduler.isRunning(resource.getDefaultCommand())) {
+        System.err.println(Logger.formattedLogTable());
+        System.err.println("Running commands: " + scheduler.getRunningCommands());
+        fail("Default command for " + resource.getName() + " should have been scheduled after cancelAll() was called");
       }
-
-      for (var resource : resources) {
-        if (!scheduler.isRunning(resource.getDefaultCommand())) {
-          System.err.println(Logger.formattedLogTable());
-          System.err.println("Running commands: " + scheduler.getRunningCommands());
-          fail("Run " + i + ": " + "Default command for " + resource.getName() + " should have been scheduled after cancelAll() was called");
-        }
-      }
-    }
-  }
-
-  static final class RunningCommand implements AsyncCommand {
-    private final Set<HardwareResource> subsystems;
-    boolean ran = false;
-
-    RunningCommand(HardwareResource... subsystems) {
-      this.subsystems = Set.of(subsystems);
-    }
-
-    @Override
-    public void run() throws Exception {
-      // Sleep and set the 'ran' flag only when interrupted
-      try {
-        AsyncCommand.pause(Milliseconds.of(Long.MAX_VALUE));
-      } finally {
-        ran = true;
-      }
-    }
-
-    @Override
-    public String name() {
-      return "RunningCommand";
-    }
-
-    @Override
-    public Set<HardwareResource> requirements() {
-      return subsystems;
     }
   }
 
   record PriorityCommand(int priority, HardwareResource... subsystems) implements AsyncCommand {
     @Override
     public void run() throws Exception {
-      Thread.sleep(Long.MAX_VALUE);
+      while (true) {
+        AsyncScheduler.getInstance().yield();
+      }
     }
 
     @Override

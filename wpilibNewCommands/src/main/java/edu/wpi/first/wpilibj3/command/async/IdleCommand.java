@@ -12,14 +12,12 @@ import java.util.Set;
  *
  * @param resource the resource to idle.
  */
-public record IdleCommand(HardwareResource resource, Measure<Time> duration) implements AsyncCommand {
-  public IdleCommand(HardwareResource resource) {
-    this(resource, Milliseconds.of(Long.MAX_VALUE));
-  }
-
+public record IdleCommand(HardwareResource resource) implements AsyncCommand {
   @Override
   public void run() throws InterruptedException {
-    AsyncCommand.pause(duration);
+    while (true) {
+      AsyncScheduler.getInstance().yield();
+    }
   }
 
   @Override
@@ -41,15 +39,5 @@ public record IdleCommand(HardwareResource resource, Measure<Time> duration) imp
   @Override
   public String toString() {
     return name();
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    return obj == this;
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(resource, duration);
   }
 }

@@ -4,9 +4,7 @@
 
 package edu.wpi.first.wpilibj.examples.async.subsystems;
 
-import static edu.wpi.first.units.Units.Milliseconds;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.wpilibj3.command.async.AsyncCommand.pause;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -44,7 +42,7 @@ public class Shooter extends HardwareResource {
         () -> {
           m_shooterMotor.disable();
           m_feederMotor.disable();
-          Thread.sleep(Long.MAX_VALUE);
+          AsyncCommand.park();
         })
         .named("Idle"));
   }

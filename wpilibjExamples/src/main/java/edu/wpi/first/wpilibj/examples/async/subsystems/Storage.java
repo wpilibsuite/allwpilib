@@ -42,7 +42,7 @@ public class Storage extends HardwareResource {
   public AsyncCommand runCommand() {
     return run(() -> {
       while (true) {
-        AsyncCommand.pause();
+        AsyncCommand.yield();
         run();
       }
     }).named("Run");

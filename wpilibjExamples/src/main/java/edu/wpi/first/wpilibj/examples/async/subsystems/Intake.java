@@ -5,7 +5,6 @@
 package edu.wpi.first.wpilibj.examples.async.subsystems;
 
 import static edu.wpi.first.wpilibj.examples.async.Constants.IntakeConstants;
-import static edu.wpi.first.wpilibj3.command.async.AsyncCommand.pause;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
@@ -32,7 +31,7 @@ public class Intake extends HardwareResource {
     return run(() -> {
       m_pistons.set(DoubleSolenoid.Value.kForward);
       while (true) {
-        pause();
+        AsyncCommand.yield();
         m_motor.set(1);
       }
     }).named("Intake");

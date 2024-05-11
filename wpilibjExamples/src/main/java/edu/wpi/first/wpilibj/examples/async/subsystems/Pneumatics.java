@@ -53,10 +53,8 @@ public class Pneumatics extends HardwareResource {
     return run(() -> {
       m_compressor.disable();
 
-      try {
-        Thread.sleep(Long.MAX_VALUE);
-      } finally {
-        m_compressor.enableDigital();
+      while (true) {
+        AsyncCommand.yield();
       }
     }).named("Compressor Disabled");
   }

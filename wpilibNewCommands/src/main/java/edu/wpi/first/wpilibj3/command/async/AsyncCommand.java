@@ -3,6 +3,8 @@ package edu.wpi.first.wpilibj3.command.async;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Time;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -108,6 +110,17 @@ public interface AsyncCommand {
   }
 
   /**
+   * Checks if this command conflicts with another command.
+   *
+   * @param other the commands to check against
+   * @return true if both commands require at least one of the same resource, false if both commands
+   *   have completely different requirements
+   */
+  default boolean conflictsWith(AsyncCommand other) {
+    return !Collections.disjoint(requirements(), other.requirements());
+  }
+
+  /**
    * Creates an async command that does not require any hardware; that is, it does not affect the
    * state of any physical objects. This is useful for commands that do some house cleaning work
    * like resetting odometry and sensors.
@@ -126,7 +139,7 @@ public interface AsyncCommand {
 
   /** Cancels this command, if running on the default async scheduler. */
   default void cancel() {
-    AsyncScheduler.getInstance().cancelAndWait(this, true);
+    AsyncScheduler.getInstance().cancel(this);
   }
 
   /** Checks if this command is currently scheduled to be running on the default async scheduler. */
@@ -135,65 +148,20 @@ public interface AsyncCommand {
   }
 
   default AsyncCommand withTimeout(Measure<Time> timeout) {
-    final AsyncCommand original = this;
-
-    return new AsyncCommand() {
-      @Override
-      public void run() throws Exception {
-        AsyncScheduler.getInstance().schedule(AsyncCommand.noHardware(() -> {
-          AsyncCommand.pause(timeout);
-          AsyncScheduler.getInstance().cancelAndWait(this, true);
-        }).named("Timer for " + original.name()));
-
-        original.run();
-      }
-
-      @Override
-      public String name() {
-        return original.name();
-      }
-
-      @Override
-      public Set<HardwareResource> requirements() {
-        return original.requirements();
-      }
-
-      @Override
-      public int priority() {
-        return original.priority();
-      }
-
-      @Override
-      public RobotDisabledBehavior robotDisabledBehavior() {
-        return original.robotDisabledBehavior();
-      }
-    };
+    return ParallelGroup.race(name(), this, new WaitCommand(timeout));
   }
 
   static AsyncCommandBuilder requiring(HardwareResource requirement, HardwareResource... rest) {
     return new AsyncCommandBuilder().requiring(requirement).requiring(rest);
   }
 
-  /**
-   * Pauses the execution thread for the given duration. This is intended to be used by commands to
-   * pause themselves and allow other commands to run.
-   *
-   * @param duration how long the command should pause for. Shorter durations provide higher
-   *                 resolution for control loops, but incur higher CPU use and may cause contention
-   *                 if too many commands with low pause times are running concurrently.
-   * @throws InterruptedException if the command was interrupted by another command while paused
-   */
-  static void pause(Measure<Time> duration) throws InterruptedException {
-    AsyncScheduler.getInstance().pauseCurrentCommand(duration);
+  static void yield() {
+    AsyncScheduler.getInstance().yield();
   }
 
-  /**
-   * Pauses the execution thread for the {@link AsyncScheduler#DEFAULT_UPDATE_PERIOD default period}
-   * to allow commands to pause themselves and allow other commands to run.
-   *
-   * @throws InterruptedException if the command was interrupted by another command while paused.
-   */
-  static void pause() throws InterruptedException {
-    AsyncCommand.pause(AsyncScheduler.DEFAULT_UPDATE_PERIOD);
+  static void park() {
+    while (true) {
+      AsyncCommand.yield();
+    }
   }
 }

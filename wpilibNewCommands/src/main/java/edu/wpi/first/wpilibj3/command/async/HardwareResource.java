@@ -56,7 +56,7 @@ public class HardwareResource {
   }
 
   public AsyncCommand idle(Measure<Time> duration) {
-    return new IdleCommand(this, duration);
+    return idle().withTimeout(duration);
   }
 
   public AsyncCommandBuilder runSequence(AsyncCommand... commands) {

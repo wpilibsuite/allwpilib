@@ -9,8 +9,13 @@ public class Logger {
   private static final List<LogRecord> records = new ArrayList<>();
 
   public static synchronized void log(String context, String message) {
+    if (true) {
+      // Remove this for live debugging.
+      // The logger can use a lot of memory to store records so it is disabled by default
+      return;
+    }
     var now = WPIUtilJNI.now() / 1e6;
-    LogRecord record = new LogRecord(now, Thread.currentThread().getName(), context, message);
+    LogRecord record = new LogRecord(now, "Async Runner", context, message);
 
     records.add(record);
   }
@@ -94,7 +99,7 @@ public class Logger {
       for (int thread = 0; thread < threadCount; thread++) {
         table.append('|');
         if (thread == threadIndex) {
-          table.append(("%" + threadColumnWidth + "s ").formatted(record.printedMessage()));
+          table.append((" %-" + threadColumnWidth + "s").formatted(record.printedMessage()));
         } else {
           table.append(" ".repeat(threadColumnWidth + 1));
         }
