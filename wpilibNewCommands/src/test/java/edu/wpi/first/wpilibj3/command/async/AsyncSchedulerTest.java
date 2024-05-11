@@ -324,7 +324,7 @@ class AsyncSchedulerTest {
 
   record PriorityCommand(int priority, HardwareResource... subsystems) implements AsyncCommand {
     @Override
-    public void run() throws Exception {
+    public void run() {
       while (true) {
         AsyncScheduler.getInstance().yield();
       }

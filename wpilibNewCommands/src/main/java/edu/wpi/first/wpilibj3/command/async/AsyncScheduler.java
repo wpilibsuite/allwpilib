@@ -30,20 +30,26 @@ public class AsyncScheduler {
     }
   }
 
-  /**
-   * The top-level running commands. This would include the highest-level command groups but not any
-   * of their nested commands.
-   */
+  private record CommandState(AsyncCommand command, Continuation continuation) { }
+
+  /** The default commands for each resource. */
   private final Map<HardwareResource, AsyncCommand> defaultCommands = new HashMap<>();
+  /** The set of commands scheduled since the start of the previous run. */
   private final Set<AsyncCommand> onDeck = new LinkedHashSet<>();
+  /** The states of all running commands (does not include on deck commands). */
   private final Map<AsyncCommand, CommandState> commandStates = new LinkedHashMap<>();
+  /** The periodic callbacks to run, outside of the command structure. */
   private final List<Continuation> periodicCallbacks = new ArrayList<>();
+  /** Event loop for trigger bindings. */
   private final EventLoop eventLoop = new EventLoop();
 
+  /** The currently executing command. */
   private AsyncCommand currentCommand = null;
 
+  /** The scope for continuations to yield to. */
   private final ContinuationScope scope = new ContinuationScope("async command");
 
+  /** The default scheduler instance. */
   private static AsyncScheduler defaultScheduler = new AsyncScheduler();
 
   // package-private for tests
@@ -63,8 +69,7 @@ public class AsyncScheduler {
   }
 
   public void registerResource(HardwareResource resource, AsyncCommand defaultCommand) {
-    defaultCommands.put(resource, defaultCommand);
-    schedule(defaultCommand);
+    setDefaultCommand(resource, defaultCommand);
   }
 
   public void setDefaultCommand(HardwareResource resource, AsyncCommand defaultCommand) {
@@ -161,6 +166,10 @@ public class AsyncScheduler {
   public void run() {
     runNum++;
     Logger.log("RUN", "Starting run #" + runNum);
+
+    Logger.log("RUN", "Polling event loop");
+    eventLoop.poll();
+
     // Apply scheduled commands, evicting any commands that require the same resources
     // Priority checking is done at schedule time so we don't need to repeat those checks here
     // Note that if multiple commands are scheduled in the same loop that use the same resources,
@@ -290,22 +299,9 @@ public class AsyncScheduler {
     schedule(defaultCommand);
   }
 
-  /**
-   * Gets the currently running command that uses the given resource.
-   *
-   * @param resource the resource to query for
-   * @return the running command using a particular resource, or null if no command is currently
-   * using it
-   */
-  public AsyncCommand getCommandUsing(HardwareResource resource) {
-    return commandStates.keySet().stream().filter(c -> c.requires(resource)).findFirst().orElse(null);
-  }
-
   public boolean yield() {
     return Continuation.yield(scope);
   }
-
-  record CommandState(AsyncCommand command, Continuation continuation) { }
 
   public EventLoop getDefaultButtonLoop() {
     return eventLoop;

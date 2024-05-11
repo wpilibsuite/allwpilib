@@ -1,10 +1,5 @@
 package edu.wpi.first.wpilibj3.command.async;
 
-import static edu.wpi.first.units.Units.Milliseconds;
-
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Time;
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -14,7 +9,7 @@ import java.util.Set;
  */
 public record IdleCommand(HardwareResource resource) implements AsyncCommand {
   @Override
-  public void run() throws InterruptedException {
+  public void run() {
     while (true) {
       AsyncScheduler.getInstance().yield();
     }

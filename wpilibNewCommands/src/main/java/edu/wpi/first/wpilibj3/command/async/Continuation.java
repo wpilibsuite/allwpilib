@@ -3,6 +3,7 @@ package edu.wpi.first.wpilibj3.command.async;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
+import java.lang.invoke.WrongMethodTypeException;
 
 /**
  * A wrapper around the JDK internal Continuation class.
@@ -85,8 +86,15 @@ public final class Continuation {
   public void run() {
     try {
       RUN.invoke(continuation);
+    } catch (WrongMethodTypeException | ClassCastException e) {
+      throw new IllegalStateException("Unable to run the underlying continuation!", e);
+    } catch (RuntimeException e) {
+      // The bound task threw an exception; re-throw it
+      throw e;
     } catch (Throwable t) {
-      throw new RuntimeException(t);
+      // Other error type (eg StackOverflowError, OutOfMemoryError), wrap in an Error so it won't
+      // be caught by a naive `catch (Exception e)` statement
+      throw new Error(t);
     }
   }
 

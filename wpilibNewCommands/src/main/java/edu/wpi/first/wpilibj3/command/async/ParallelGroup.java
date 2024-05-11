@@ -100,7 +100,7 @@ public class ParallelGroup implements AsyncCommand {
   }
 
   @Override
-  public void run() throws Exception {
+  public void run() {
     Logger.log(name, "Starting");
     for (AsyncCommand command : commands) {
       Logger.log(name, "Scheduling child command " + command);

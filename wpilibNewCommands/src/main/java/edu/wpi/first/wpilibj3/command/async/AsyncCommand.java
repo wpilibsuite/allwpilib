@@ -56,7 +56,7 @@ import java.util.stream.Collectors;
  * AsyncCommand command = requiredSubsystem.run(() -> {
  *   initialize();
  *   while (!isFinished()) {
- *     AsyncCommand.pause();
+ *     AsyncCommand.yield();
  *     execute();
  *   }
  *   end();
@@ -68,7 +68,7 @@ public interface AsyncCommand {
   int LOWEST_PRIORITY = Integer.MIN_VALUE;
   int HIGHEST_PRIORITY = Integer.MAX_VALUE;
 
-  void run() throws Exception;
+  void run();
 
   String name();
 
@@ -128,7 +128,7 @@ public interface AsyncCommand {
    * @param impl the implementation of the command logic
    * @return
    */
-  static AsyncCommandBuilder noHardware(ThrowingRunnable impl) {
+  static AsyncCommandBuilder noHardware(Runnable impl) {
     return new AsyncCommandBuilder().executing(impl);
   }
 

@@ -42,12 +42,7 @@ public class HardwareResource {
     return registeredScheduler.getDefaultCommand(this);
   }
 
-  /** Gets the currently executing command on this resource. */
-  public AsyncCommand getCurrentCommand() {
-    return registeredScheduler.getCommandUsing(this);
-  }
-
-  public AsyncCommandBuilder run(ThrowingRunnable command) {
+  public AsyncCommandBuilder run(Runnable command) {
     return new AsyncCommandBuilder().requiring(this).executing(command);
   }
 

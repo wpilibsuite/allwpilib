@@ -18,7 +18,7 @@ public class WaitCommand implements AsyncCommand {
   }
 
   @Override
-  public void run() throws Exception {
+  public void run() {
     var timer = new Timer();
     timer.start();
     while (!timer.hasElapsed(duration.in(Seconds))) {

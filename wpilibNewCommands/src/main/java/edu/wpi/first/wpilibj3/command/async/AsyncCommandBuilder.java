@@ -8,7 +8,7 @@ import java.util.Set;
 
 public class AsyncCommandBuilder {
   private final Set<HardwareResource> requirements = new HashSet<>();
-  private ThrowingRunnable impl;
+  private Runnable impl;
   private String name;
   private int priority = AsyncCommand.DEFAULT_PRIORITY;
   private AsyncCommand.RobotDisabledBehavior disabledBehavior = AsyncCommand.RobotDisabledBehavior.CancelWhileDisabled;
@@ -51,7 +51,7 @@ public class AsyncCommandBuilder {
     return this;
   }
 
-  public AsyncCommandBuilder executing(ThrowingRunnable impl) {
+  public AsyncCommandBuilder executing(Runnable impl) {
     this.impl = impl;
     return this;
   }
@@ -62,7 +62,7 @@ public class AsyncCommandBuilder {
 
     return new AsyncCommand() {
       @Override
-      public void run() throws Exception {
+      public void run() {
         impl.run();
       }
 
