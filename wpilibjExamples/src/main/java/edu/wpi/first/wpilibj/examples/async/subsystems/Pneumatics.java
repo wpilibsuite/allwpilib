@@ -24,6 +24,7 @@ public class Pneumatics extends HardwareResource {
       new AnalogPotentiometer(/* the AnalogIn port*/ 2, kScale, kOffset);
 
   // Compressor connected to a PCM with a default CAN ID (0)
+  // Note: the compressor is enabled by default
   private final Compressor m_compressor = new Compressor(PneumaticsModuleType.CTREPCM);
 
   public Pneumatics() {
@@ -43,19 +44,22 @@ public class Pneumatics extends HardwareResource {
   }
 
   /**
-   * Disable the compressor closed-loop for as long as the command runs.
-   *
-   * <p>Structured this way as the compressor is enabled by default.
+   * Disable the compressor closed-loop control. The compressor can be re-enabled with
+   * {@link #enableCompressor()}.
    *
    * @return command
    */
-  public AsyncCommand disableCompressorCommand() {
-    return run(() -> {
-      m_compressor.disable();
+  public AsyncCommand disableCompressor() {
+    return run(m_compressor::disable).named("Disable Compressor");
+  }
 
-      while (true) {
-        AsyncCommand.yield();
-      }
-    }).named("Compressor Disabled");
+  /**
+   * Enable the compressor closed-loop control. The compressor can be disabled again with
+   * {@link #disableCompressor()}.
+   *
+   * @return command
+   */
+  public AsyncCommand enableCompressor() {
+    return run(m_compressor::enableDigital).named("Enable Compressor");
   }
 }

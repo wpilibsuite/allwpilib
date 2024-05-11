@@ -28,13 +28,13 @@ public class Storage extends HardwareResource {
     super("Storage");
 
     // Set default command to turn off the storage motor and then idle
-    AsyncScheduler.getInstance().setDefaultCommand(this, run(() -> {
+    setDefaultCommand(run(() -> {
       m_motor.disable();
-      Thread.sleep(Long.MAX_VALUE);
+      AsyncCommand.park();
     }).named("Idle"));
   }
 
-  public void run() throws InterruptedException {
+  public void run() {
     m_motor.set(1);
   }
 
