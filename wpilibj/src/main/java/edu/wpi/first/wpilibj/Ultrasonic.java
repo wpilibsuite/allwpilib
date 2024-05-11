@@ -57,7 +57,7 @@ public class Ultrasonic implements Sendable, AutoCloseable {
    * certainly break. Make sure to disable automatic mode before changing anything with the
    * sensors!!
    */
-  private static class UltrasonicChecker extends Thread {
+  private static final class UltrasonicChecker extends Thread {
     @Override
     public synchronized void run() {
       while (m_automaticEnabled) {

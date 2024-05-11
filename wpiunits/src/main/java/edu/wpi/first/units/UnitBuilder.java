@@ -69,7 +69,7 @@ public final class UnitBuilder<U extends Unit<U>> {
   }
 
   /** Helper class used for safely chaining mapping builder calls. */
-  public class MappingBuilder {
+  public final class MappingBuilder {
     private final double m_minInput;
     private final double m_maxInput;
 

@@ -15,7 +15,7 @@ public final class OpenCvLoader {
   static boolean libraryLoaded;
 
   /** Sets whether JNI should be loaded in the static block. */
-  public static class Helper {
+  public static final class Helper {
     private static AtomicBoolean extractOnStaticLoad = new AtomicBoolean(true);
 
     /**
