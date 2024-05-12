@@ -146,10 +146,10 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
     if (unit().m_baseType.equals(other.unit().m_baseType) || other.unit() instanceof Dimensionless) {
       return divide(other.baseUnitMagnitude());
     }
-    if (other.unit() instanceof Velocity<?> velocity && velocity.getUnit().equals(unit())) {
+    if (other.unit() instanceof Velocity<?> velocity && velocity.getUnit().m_baseType.equals(unit().m_baseType)) {
       return times(velocity.reciprocal().ofBaseUnits(1 / other.baseUnitMagnitude()));
     }
-    if (other.unit() instanceof Per<?, ?> per && per.numerator().equals(unit())) {
+    if (other.unit() instanceof Per<?, ?> per && per.numerator().m_baseType.equals(unit().m_baseType)) {
       return times(per.reciprocal().ofBaseUnits(1 / other.baseUnitMagnitude()));
     }
     return unit().per(other.unit()).ofBaseUnits(baseUnitMagnitude() / other.baseUnitMagnitude());
