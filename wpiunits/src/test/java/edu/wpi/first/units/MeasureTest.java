@@ -4,6 +4,7 @@
 
 package edu.wpi.first.units;
 
+import static edu.wpi.first.units.Units.Amps;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
@@ -160,6 +161,32 @@ class MeasureTest {
     var m3 = exampleUnit.per(Units.Feet).of(42);
     var m4 = Units.Millimeters.of(17);
     assertEquals(exampleUnit.of(42 * 17 / (12 * 25.4)), m3.times(m4));
+  }
+
+  @Test
+  void testDivideMeasure() {
+    // Dimensionless divide
+    var m1 = Units.Meters.of(6);
+    var m2 = Units.Value.of(3);
+    assertEquals(m1.divide(m2).magnitude(), 2);
+    // Velocity divide
+    var m3 = Units.Meters.of(8);
+    var m4 = Units.Meters.per(Units.Second).of(4);
+    var result = m3.divide(m4);
+    assertEquals(result.magnitude(), 2);
+    assertEquals(result.unit(), Units.Second);
+    // Per divide
+    var m5 = Units.Volts.of(6);
+    var m6 = Units.Volts.per(Units.Meter).of(2);
+    result = m5.divide(m6);
+    assertEquals(result.magnitude(), 3);
+    assertEquals(result.unit(), Units.Meter);
+    // Fallthrough divide
+    var m7 = Units.Seconds.of(10);
+    var m8 = Units.Amps.of(2);
+    result = m7.divide(m8);
+    assertEquals(result.magnitude(), 5);
+    assertEquals(result.unit(), Units.Seconds.per(Amps));
   }
 
   @Test

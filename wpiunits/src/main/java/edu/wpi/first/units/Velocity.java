@@ -147,6 +147,14 @@ public class Velocity<D extends Unit<D>> extends Unit<Velocity<D>> {
     return m_period;
   }
 
+  /**
+   * Returns the reciprocal of this velocity.
+   * @return the reciprocal
+   */
+  public Per<Time, D> reciprocal() {
+    return m_period.per(m_unit);
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
