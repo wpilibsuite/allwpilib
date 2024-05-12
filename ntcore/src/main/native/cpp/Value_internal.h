@@ -443,7 +443,7 @@ O* ConvertToC(const std::vector<I>& in, size_t* out_len) {
 
 template <typename O, typename I>
 O* ConvertToC(const std::basic_string<I>& in, size_t* out_len) {
-  if (in.size() == std::numeric_limits<size_t>::max()) {
+  if (in.size() == (std::numeric_limits<size_t>::max)()) {
     wpi::report_bad_alloc_error("Allocation failed");
   }
 

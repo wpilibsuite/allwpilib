@@ -14,7 +14,7 @@
 namespace cs {
 
 inline char* ConvertToC(std::string_view in) {
-  if (in.size() == std::numeric_limits<size_t>::max()) {
+  if (in.size() == (std::numeric_limits<size_t>::max)()) {
     wpi::report_bad_alloc_error("Allocation failed");
   }
 
