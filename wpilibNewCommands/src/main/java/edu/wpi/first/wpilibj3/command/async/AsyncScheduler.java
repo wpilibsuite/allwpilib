@@ -103,29 +103,45 @@ public class AsyncScheduler {
     });
   }
 
-  public void scheduleComposed(AsyncCommand command, AsyncCommand parent) {
-    if (currentCommand == parent) {
-      // The parent command is currently executing; skip conflict checks
-      onDeck.add(command);
-    } else {
-      // The parent isn't currently running
-      schedule(command);
-    }
-  }
-
   /**
-   * Schedules a command to run. The command will execute in a virtual thread; its status may be
-   * checked later with {@link #isRunning(AsyncCommand)}. Scheduling will fail if the command has a
-   * lower priority than a currently running command using one or more of the same resources.
+   * Schedules a command to run. If a running command schedules another command (for example,
+   * parallel groups will do this), then the new command is assumed to be a bound child of the
+   * running command. The scheduling command is expected to have ownership over the scheduled
+   * command, including cancelling it if the parent command completes before the child does
+   * (for example, deadline groups will cancel unfinished child commands when all the required
+   * commands in the group have completed).
    *
    * @param command the command to schedule
    */
   public void schedule(AsyncCommand command) {
     Logger.log("SCHEDULE", "Attempting to schedule " + command);
-    for (AsyncCommand c : commandStates.keySet()) {
-      if (c.conflictsWith(command) && command.isLowerPriorityThan(c)) {
-        Logger.log("SCHEDULE", command + " conflicts with and is lower priority than " + c + ", not scheduling");
-        return;
+
+    if (currentCommand == null) {
+      // Scheduling from outside a command, eg a trigger binding or manual schedule call
+      // Check for conflicts with the commands that are already running
+      for (AsyncCommand c : commandStates.keySet()) {
+        if (c.conflictsWith(command) && command.isLowerPriorityThan(c)) {
+          Logger.log("SCHEDULE", command + " conflicts with and is lower priority than " + c + ", not scheduling");
+          return;
+        }
+      }
+    } else {
+      // Scheduled by a command.
+      // Instead of checking for conflicts with all running commands (which would include the
+      // parent), we instead need to verify that the scheduled command ONLY uses resources also
+      // used by the parent. Technically, we should also verify that the scheduled command also
+      // does not require any of the same resources as any sibling, either. But that can come later.
+      if (!currentCommand.requirements().containsAll(command.requirements())) {
+        var disallowedResources = new LinkedHashSet<>(command.requirements());
+        disallowedResources.removeIf(currentCommand::requires);
+        throw new IllegalStateException(
+            "Nested commands can only require resources used by their parents. "
+                + "Command "
+                + command
+                + " requires these resources that are not used by "
+                + currentCommand
+                + ": "
+                + disallowedResources);
       }
     }
 
@@ -151,7 +167,9 @@ public class AsyncScheduler {
     onDeck.add(command);
 
     Logger.log("SCHEDULE", "Dropping commands that conflict with " + command);
-    commandStates.entrySet().removeIf(e -> e.getKey().conflictsWith(command));
+    commandStates
+        .entrySet()
+        .removeIf(e -> e.getKey() != currentCommand && e.getKey().conflictsWith(command));
   }
 
   public void cancel(AsyncCommand command) {

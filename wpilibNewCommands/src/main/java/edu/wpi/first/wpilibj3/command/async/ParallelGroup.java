@@ -104,7 +104,7 @@ public class ParallelGroup implements AsyncCommand {
     Logger.log(name, "Starting");
     for (AsyncCommand command : commands) {
       Logger.log(name, "Scheduling child command " + command);
-      scheduler.scheduleComposed(command, this);
+      scheduler.schedule(command);
     }
     scheduler.yield();
 
